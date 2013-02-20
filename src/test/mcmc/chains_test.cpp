@@ -179,7 +179,43 @@ TEST_F(McmcChains_New, blocker1_warmup) {
   EXPECT_EQ(50, chains.warmup()(1));
   EXPECT_EQ(50, chains.warmup(1));
 }
+TEST_F(McmcChains_New, blocker_mean) {
+  stan::io::stan_csv blocker1 = stan::io::stan_csv_reader::parse(blocker1_stream);
+  stan::io::stan_csv blocker2 = stan::io::stan_csv_reader::parse(blocker2_stream);
+  
+  stan::mcmc::chains_new<> chains(blocker1);
 
+  Eigen::VectorXd means1 = blocker1.samples.colwise().mean();
+  for (int j = 0; j < chains.num_params(); j++) {
+    EXPECT_FLOAT_EQ(means1(j), chains.mean(0,j))
+      << "1: chain, param mean";
+    EXPECT_FLOAT_EQ(means1(j), chains.mean(j))
+      << "1: param mean";
+  }
+
+  EXPECT_NO_THROW(chains.add(blocker2))
+    << "adding a second chain";
+  Eigen::VectorXd means2 = blocker2.samples.colwise().mean();
+  for (int j = 0; j < chains.num_params(); j++) {
+    EXPECT_FLOAT_EQ(means2(j), chains.mean(1,j))
+      << "2: chain, param mean";
+    EXPECT_FLOAT_EQ((means1(j) + means2(j)) * 0.5, chains.mean(j))
+      << "2: param mean";
+  }
+
+
+  chains.set_warmup(501);
+  means1 = blocker1.samples.bottomRows(500).colwise().mean();
+  means2 = blocker2.samples.bottomRows(500).colwise().mean();
+  for (int j = 0; j < chains.num_params(); j++) {
+    EXPECT_FLOAT_EQ(means1(j), chains.mean(0,j))
+      << "3: chain mean 1 with warmup";
+    EXPECT_FLOAT_EQ(means2(j), chains.mean(1,j))
+      << "3: chain mean 2 with warmup";
+    EXPECT_FLOAT_EQ((means1(j) + means2(j)) * 0.5, chains.mean(j))
+      << "3: param mean with warmup";
+  }
+}
 
 /*
 

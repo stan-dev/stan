@@ -358,11 +358,14 @@ namespace stan {
       }
       
       double mean(int chain, int index) {
-	return 0;
+	return samples_(chain).col(index).bottomRows(num_kept_samples(chain)).mean();
       }
       
       double mean(int index) {
-      	return 0;
+	Eigen::VectorXd m(num_chains());
+	for (int chain = 0; chain < num_chains(); chain++)
+	  m(chain) = mean(chain, index);
+	return m.mean();
       }
 
       double sd(int chain, int index) { 
