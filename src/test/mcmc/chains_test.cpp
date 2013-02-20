@@ -247,6 +247,49 @@ TEST_F(McmcChains_New, blocker_mean) {
   }
 }
 
+double sd(Eigen::VectorXd x) {
+  return sqrt((x.array() - x.mean()).square().sum() / (x.rows() - 1));
+}
+
+TEST_F(McmcChains_New, blocker_sd) {
+  stan::io::stan_csv blocker1 = stan::io::stan_csv_reader::parse(blocker1_stream);
+  stan::io::stan_csv blocker2 = stan::io::stan_csv_reader::parse(blocker2_stream);
+  
+  stan::mcmc::chains_new<> chains(blocker1);
+  
+  using std::sqrt;
+  Eigen::VectorXd means1 = blocker1.samples.colwise().mean();
+  for (int j = 0; j < chains.num_params(); j++) {
+    ASSERT_NEAR(sd(blocker1.samples.col(j)), chains.sd(0,j), 1e-11)
+      << "1: chain, param sd. index: " << j;
+    ASSERT_NEAR(sd(blocker1.samples.col(j)), chains.sd(j), 1e-11)
+      << "1: param sd. index: " << j;
+  }
+
+/*ASSERT_NO_THROW(chains.add(blocker2))
+    << "adding a second chain";
+  Eigen::VectorXd means2 = blocker2.samples.colwise().mean();
+  for (int j = 0; j < chains.num_params(); j++) {
+    ASSERT_FLOAT_EQ(means2(j), chains.mean(1,j))
+      << "2: chain, param mean";
+    ASSERT_FLOAT_EQ((means1(j) + means2(j)) * 0.5, chains.mean(j))
+      << "2: param mean";
+  }
+
+
+  ASSERT_NO_THROW(chains.set_warmup(500));
+  means1 = blocker1.samples.bottomRows(500).colwise().mean();
+  means2 = blocker2.samples.bottomRows(500).colwise().mean();
+  for (int j = 0; j < chains.num_params(); j++) {
+    ASSERT_FLOAT_EQ(means1(j), chains.mean(0,j))
+      << "3: chain mean 1 with warmup";
+    ASSERT_FLOAT_EQ(means2(j), chains.mean(1,j))
+      << "3: chain mean 2 with warmup";
+    ASSERT_FLOAT_EQ((means1(j) + means2(j)) * 0.5, chains.mean(j))
+      << "3: param mean with warmup";
+      }*/
+}
+
 /*
 
 void test_permutation(size_t N) {

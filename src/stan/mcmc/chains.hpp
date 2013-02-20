@@ -237,6 +237,19 @@ namespace stan {
       Eigen::Matrix<std::string, Eigen::Dynamic, 1> param_names_;
       Eigen::Matrix<Eigen::MatrixXd, Eigen::Dynamic, 1> samples_;
       Eigen::VectorXi warmup_;
+      
+      double sd(const Eigen::VectorXd& x) {
+      	using boost::accumulators::accumulator_set;
+	using boost::accumulators::stats;
+	using boost::accumulators::tag::variance;
+	accumulator_set<double, stats<variance> > acc;
+	
+	for (int i = 0; i < x.size(); i++)
+	  acc(x(i));
+	double M = x.rows();
+	
+	return std::sqrt(M/(M-1) * boost::accumulators::variance(acc));
+      }
 
     public:
       chains_new(const Eigen::Matrix<std::string, Eigen::Dynamic, 1>& param_names) 
@@ -356,23 +369,35 @@ namespace stan {
 	add(stan_csv.samples);
       }
       
+      Eigen::VectorXd samples(int chain, int index) {
+	return samples_(chain).col(index).bottomRows(num_kept_samples(chain));
+      }
+      
+      Eigen::VectorXd samples(int index) {
+	Eigen::VectorXd s(num_kept_samples());
+	int start = 0;
+	for (int chain = 0; chain < num_chains(); chain++) {
+	  int n = num_kept_samples(chain);
+	  s.middleRows(start,n) = samples_(chain).col(index).bottomRows(n);
+	  start += n;
+	}
+	return s;
+      }
+      
       double mean(int chain, int index) {
-	return samples_(chain).col(index).bottomRows(num_kept_samples(chain)).mean();
+	return samples(chain,index).mean();
       }
       
       double mean(int index) {
-	Eigen::VectorXd m(num_chains());
-	for (int chain = 0; chain < num_chains(); chain++)
-	  m(chain) = mean(chain, index);
-	return m.mean();
+	return samples(index).mean();
       }
 
       double sd(int chain, int index) { 
-      	return 0;
+	return sd(samples(chain,index));
       }
       
       double sd(int index) {
-	return 0;
+	return sd(samples(index));
       }
       
       double variance(int chain, int index) {
