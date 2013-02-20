@@ -108,30 +108,25 @@ namespace stan {
           double gradCold = 0;
           
           int k = 0;
-          double tOld = 1.0;
-          double tNew = 0;
+          double tDak = 1.0 / (a - 1);
           
-          while( (fabs(tNew) > precision) || (k == 0) )
+          while( (fabs(tDak * (a + (k - 1)) ) > precision) || (k == 0) )
           {
               
-              tNew = ( (a + k) / (c + k) ) * ( (b + k) / (double)(k + 1) ) * z * tOld;
+              const double r = ( (a + k) / (c + k) ) * ( (b + k) / (double)(k + 1) ) * z;
+              tDak = r * tDak * (a + (k - 1)) / (a + k);
 
-              if(tNew == 0) break;
-              if(tNew == std::numeric_limits<double>::infinity())
-              {
-                  std::cout << "Terminating grad2F1 calc (called from gradRegIncBeta) because of infinity!" << std::endl;
-                  break;
-              }
+              if(r == 0) break;
               
-              gradAold = tNew * (gradAold / tOld + 1.0 / (a + k) );
-              gradCold = tNew * (gradCold / tOld - 1.0 / (c + k) );              
+              gradAold = r * gradAold + tDak;
+              gradCold = r * gradCold - tDak * ((a + k) / (c + k));
               
               gradA += gradAold;
               gradC += gradCold;
               
               ++k;
               
-              tOld = tNew;
+              if(k > 200) break;
 
           }
           
@@ -153,8 +148,9 @@ namespace stan {
           double dF1 = 0;
           double dF2 = 0;
           
-          grad2F1(dF1, dF2, a + b, 1, a + 1, z);
+          if(C) grad2F1(dF1, dF2, a + b, 1, a + 1, z);
 
+          
           g1 = (c1 - 1.0 / a) * c3 + C * (dF1 + dF2);
           g2 = c2 * c3 + C * dF1;
           
