@@ -29,14 +29,77 @@ public:
 };
 
 TEST_F(McmcChains_New, constructor) {
+  stan::io::stan_csv blocker1 = stan::io::stan_csv_reader::parse(blocker1_stream);
   // construct with Eigen::Vector
+  stan::mcmc::chains_new<> chains1(blocker1.header);
+  EXPECT_EQ(0, chains1.num_chains());
+  EXPECT_EQ(blocker1.header.size(), chains1.num_params());
+  for (int i = 0; i < blocker1.header.size(); i++)
+    EXPECT_EQ(blocker1.header(i), chains1.param_name(i));
+  
+  
   // construct with stan_csv
-  FAIL() << "Test not implemented";
+  stan::mcmc::chains_new<> chains2(blocker1);
+  EXPECT_EQ(1, chains2.num_chains());
+  EXPECT_EQ(blocker1.header.size(), chains2.num_params());
+  for (int i = 0; i < blocker1.header.size(); i++)
+    EXPECT_EQ(blocker1.header(i), chains2.param_name(i));
+  EXPECT_EQ(0, chains2.warmup(0));
+  EXPECT_EQ(1001, chains2.num_samples(0));
 }
 
 TEST_F(McmcChains_New, add) {
-  // add all variants
-  FAIL() << "Test not implemented";
+  stan::io::stan_csv blocker1 = stan::io::stan_csv_reader::parse(blocker1_stream);
+  
+  // construct with Eigen::Vector
+  stan::mcmc::chains_new<> chains(blocker1.header);
+  EXPECT_EQ(0, chains.num_chains());
+  EXPECT_EQ(0, chains.num_samples());
+
+  Eigen::RowVectorXd theta = blocker1.samples.row(0);
+  EXPECT_NO_THROW(chains.add(1, theta)) 
+    << "adding a single sample to a new chain";
+  EXPECT_EQ(2, chains.num_chains());
+  EXPECT_EQ(0, chains.num_samples(0));
+  EXPECT_EQ(1, chains.num_samples(1));
+  EXPECT_EQ(1, chains.num_samples());
+
+  theta = blocker1.samples.row(1);
+  EXPECT_NO_THROW(chains.add(1, theta)) 
+    << "adding a single sample to an existing chain";
+  EXPECT_EQ(2, chains.num_chains());
+  EXPECT_EQ(0, chains.num_samples(0));
+  EXPECT_EQ(2, chains.num_samples(1));
+  EXPECT_EQ(2, chains.num_samples());
+  
+  EXPECT_NO_THROW(chains.add(3, blocker1.samples))
+    << "adding multiple samples to a new chain";
+  EXPECT_EQ(4, chains.num_chains());
+  EXPECT_EQ(0, chains.num_samples(0));
+  EXPECT_EQ(2, chains.num_samples(1));
+  EXPECT_EQ(0, chains.num_samples(2));
+  EXPECT_EQ(1001, chains.num_samples(3));
+  EXPECT_EQ(1003, chains.num_samples());
+
+  EXPECT_NO_THROW(chains.add(3, blocker1.samples))
+    << "adding multiple samples to an existing chain";
+  EXPECT_EQ(4, chains.num_chains());
+  EXPECT_EQ(0, chains.num_samples(0));
+  EXPECT_EQ(2, chains.num_samples(1));
+  EXPECT_EQ(0, chains.num_samples(2));
+  EXPECT_EQ(2002, chains.num_samples(3));
+  EXPECT_EQ(2004, chains.num_samples());
+
+
+  EXPECT_NO_THROW(chains.add(blocker1.samples))
+    << "adding multiple samples, adds new chain";
+  EXPECT_EQ(5, chains.num_chains());
+  EXPECT_EQ(0, chains.num_samples(0));
+  EXPECT_EQ(2, chains.num_samples(1));
+  EXPECT_EQ(0, chains.num_samples(2));
+  EXPECT_EQ(2002, chains.num_samples(3));
+  EXPECT_EQ(1001, chains.num_samples(4));
+  EXPECT_EQ(3005, chains.num_samples());
 }
 
 TEST_F(McmcChains_New, blocker1_num_chains) {
@@ -118,7 +181,7 @@ TEST_F(McmcChains_New, blocker1_warmup) {
 }
 
 
-
+/*
 
 TEST(McmcChains, validate_dim_idxs) {
   using stan::mcmc::validate_dims_idxs;
@@ -1255,3 +1318,4 @@ TEST(McmcChains,correlation) {
     "correlation";
 }
 
+*/

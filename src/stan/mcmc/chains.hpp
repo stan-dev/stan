@@ -247,11 +247,11 @@ namespace stan {
 	add(stan_csv.samples);
       }
       
-      inline int num_chains() {
+      inline const int num_chains() {
         return samples_.size();
       }
       
-      inline int num_params() { 
+      inline const int num_params() { 
         return param_names_.size();
       }
 
@@ -263,7 +263,7 @@ namespace stan {
         return param_names_(j);
       }
 
-      int index(const std::string& name) {
+      const int index(const std::string& name) {
 	int index = -1;
 	for (int i = 0; i < param_names_.size(); i++)
 	  if (param_names_(i) == name)
@@ -287,6 +287,28 @@ namespace stan {
 	return warmup_(chain);
       }
 
+      const int num_samples(int chain) {
+	return samples_(chain).rows();
+      }
+
+      const int num_samples() {
+	int n = 0;
+	for (int chain = 0; chain < num_chains(); chain++)
+	  n += num_samples(chain);
+	return n;
+      }
+
+      const int num_kept_samples(int chain) {
+	return num_samples(chain) - warmup(chain);
+      }
+      
+      const int num_kept_samples() {
+	int n = 0;
+	for (int chain = 0; chain < num_chains(); chain++)
+	  n += num_kept_samples(chain);
+	return n;
+      }
+      
       void add(const int chain,
                const Eigen::RowVectorXd& theta) {
 	if (theta.cols() != num_params())
@@ -296,8 +318,8 @@ namespace stan {
 	  warmup_.conservativeResize(chain+1);
 	}
 	int row = samples_(chain).rows();
-	samples_(chain).conservativeResize(row+1);
-	samples_(chain)(row) = theta;
+	samples_(chain).conservativeResize(row+1, num_params());
+	samples_(chain).row(row) = theta;
 	warmup_(chain) = 0;
       }
       
@@ -310,7 +332,7 @@ namespace stan {
 	  warmup_.conservativeResize(chain+1);
 	}
 	int row = samples_(chain).rows();
-	samples_(chain).conservativeResize(row+sample.rows());
+	samples_(chain).conservativeResize(row+sample.rows(), num_params());
 	samples_(chain).bottomRows(sample.rows()) = sample;
 	warmup_(chain) = 0;
       }
