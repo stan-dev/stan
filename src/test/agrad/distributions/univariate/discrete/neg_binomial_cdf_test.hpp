@@ -71,24 +71,21 @@ public:
 	       const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
 
     using std::log;
-    using stan::agrad::exp;
-    using boost::math::binomial_coefficient;
+    using std::exp;
+    using stan::math::binomial_coefficient_log;
     
-    return stan::prob::neg_binomial_cdf(n, alpha, beta);
-      
-    /*
     typename stan::return_type<T_shape, T_inv_scale>::type cdf(0);
-    typename stan::return_type<T_shape, T_inv_scale>::type temp(0);
- 
-    for (int i = 0; i <= n; i++) {
-      //cdf += binomial_coefficient<typename stan::scalar_type<T_shape> >(alpha + i - 1, alpha) 
-      temp = exp(alpha * log(beta / 1 + beta) + i * log(1 - beta / 1 + beta));
-      temp *= binomial_coefficient<typename stan::scalar_type<T_shape> >(alpha + i - 1, alpha); 
-      cdf += temp;
-    }
-    */
       
-    //return cdf;
+    for (int i = 0; i <= n; i++) {
+        
+        typename stan::return_type<T_shape, T_inv_scale>::type temp;
+        temp = binomial_coefficient_log(i + alpha - 1, i);
+
+        cdf += exp( temp + alpha * log(beta / (1 + beta) ) + i * log(1 / (1 + beta) ) );
+        
+    }
+      
+    return cdf;
       
   }
 };
