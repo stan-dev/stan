@@ -251,6 +251,37 @@ namespace stan {
 	return std::sqrt(M/(M-1) * boost::accumulators::variance(acc));
       }
 
+      double variance(const Eigen::VectorXd& x) {
+      	using boost::accumulators::accumulator_set;
+	using boost::accumulators::stats;
+	using boost::accumulators::tag::variance;
+	accumulator_set<double, stats<variance> > acc;
+	
+	for (int i = 0; i < x.size(); i++)
+	  acc(x(i));
+	double M = x.rows();
+	
+	return M / (M-1) * boost::accumulators::variance(acc);
+      }
+
+      double covariance(const Eigen::VectorXd& x, const Eigen::VectorXd& y) {
+	if (x.rows() != y.rows())
+	  std::cerr << "warning: covariance of different length chains";
+        using boost::accumulators::accumulator_set;
+        using boost::accumulators::stats;
+        using boost::accumulators::tag::variance;
+        using boost::accumulators::tag::covariance;
+        using boost::accumulators::tag::covariate1;
+
+        accumulator_set<double, stats<covariance<double, covariate1> > > acc;
+	
+	int M = std::min(x.size(), y.size());
+	for (int i = 0; i < M; i++)
+	  acc(x(i), boost::accumulators::covariate1=y(i));
+	
+	return boost::accumulators::covariance(acc) * M / (M-1);
+      }
+
     public:
       chains_new(const Eigen::Matrix<std::string, Eigen::Dynamic, 1>& param_names) 
 	: param_names_(param_names) { }
@@ -401,19 +432,19 @@ namespace stan {
       }
       
       double variance(int chain, int index) {
-	return 0;
+	return variance(samples(chain,index));
       }
       
       double variance(int index) { 	
-	return 0;
+	return variance(samples(index));
       }
 
       double covariance(int chain, int index1, int index2) {
-	return 0;
+	return covariance(samples(chain,index1), samples(chain,index2));
       }
       
       double covariance(int index1, int index2) {
-	return 0;
+	return covariance(samples(index1), samples(index2));
       }
 
       double correlation(int chain, int index1, int index2) {

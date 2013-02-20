@@ -259,20 +259,20 @@ TEST_F(McmcChains_New, blocker_sd) {
   
   using std::sqrt;
   for (int j = 0; j < chains.num_params(); j++) {
-    ASSERT_NEAR(sd(blocker1.samples.col(j)), chains.sd(0,j), 1e-11)
+    ASSERT_NEAR(sd(blocker1.samples.col(j)), chains.sd(0,j), 1e-8)
       << "1: chain, param sd. index: " << j;
-    ASSERT_NEAR(sd(blocker1.samples.col(j)), chains.sd(j), 1e-11)
+    ASSERT_NEAR(sd(blocker1.samples.col(j)), chains.sd(j), 1e-8)
       << "1: param sd. index: " << j;
   }
 
   ASSERT_NO_THROW(chains.add(blocker2))
     << "adding a second chain";
   for (int j = 0; j < chains.num_params(); j++) {
-    ASSERT_NEAR(sd(blocker2.samples.col(j)), chains.sd(1,j), 1e-11)
+    ASSERT_NEAR(sd(blocker2.samples.col(j)), chains.sd(1,j), 1e-8)
       << "2: chain, param sd. index: " << j;
     Eigen::VectorXd x(blocker1.samples.rows() + blocker2.samples.rows());
     x << blocker1.samples.col(j), blocker2.samples.col(j);
-    ASSERT_NEAR(sd(x), chains.sd(j), 1e-11)
+    ASSERT_NEAR(sd(x), chains.sd(j), 1e-8)
       << "2: param sd. index: " << j;
   }
   
@@ -283,14 +283,107 @@ TEST_F(McmcChains_New, blocker_sd) {
     x2 << blocker2.samples.col(j).bottomRows(500);
     x << x1, x2;
     
-    ASSERT_NEAR(sd(x1), chains.sd(0,j), 1e-11)
+    ASSERT_NEAR(sd(x1), chains.sd(0,j), 1e-8)
       << "3: chain sd 1 with warmup";
-    ASSERT_NEAR(sd(x2), chains.sd(1,j), 1e-11)
+    ASSERT_NEAR(sd(x2), chains.sd(1,j), 1e-8)
       << "3: chain sd 2 with warmup";
-    ASSERT_NEAR(sd(x), chains.sd(j), 1e-11)
+    ASSERT_NEAR(sd(x), chains.sd(j), 1e-8)
       << "3: param sd with warmup";
   }
 }
+
+
+double variance(Eigen::VectorXd x) {
+  return (x.array() - x.mean()).square().sum() / (x.rows() - 1);
+}
+
+TEST_F(McmcChains_New, blocker_variance) {
+  stan::io::stan_csv blocker1 = stan::io::stan_csv_reader::parse(blocker1_stream);
+  stan::io::stan_csv blocker2 = stan::io::stan_csv_reader::parse(blocker2_stream);
+  
+  stan::mcmc::chains_new<> chains(blocker1);
+  
+  using std::sqrt;
+  for (int j = 0; j < chains.num_params(); j++) {
+    ASSERT_NEAR(variance(blocker1.samples.col(j)), chains.variance(0,j), 1e-8)
+      << "1: chain, param variance. index: " << j;
+    ASSERT_NEAR(variance(blocker1.samples.col(j)), chains.variance(j), 1e-8)
+      << "1: param variance. index: " << j;
+  }
+
+  ASSERT_NO_THROW(chains.add(blocker2))
+    << "adding a second chain";
+  for (int j = 0; j < chains.num_params(); j++) {
+    ASSERT_NEAR(variance(blocker2.samples.col(j)), chains.variance(1,j), 1e-8)
+      << "2: chain, param variance. index: " << j;
+    Eigen::VectorXd x(blocker1.samples.rows() + blocker2.samples.rows());
+    x << blocker1.samples.col(j), blocker2.samples.col(j);
+    ASSERT_NEAR(variance(x), chains.variance(j), 1e-8)
+      << "2: param variance. index: " << j;
+  }
+  
+  ASSERT_NO_THROW(chains.set_warmup(500));
+  for (int j = 0; j < chains.num_params(); j++) {
+    Eigen::VectorXd x1(500), x2(500), x(1000);
+    x1 << blocker1.samples.col(j).bottomRows(500);
+    x2 << blocker2.samples.col(j).bottomRows(500);
+    x << x1, x2;
+    
+    ASSERT_NEAR(variance(x1), chains.variance(0,j), 1e-8)
+      << "3: chain variance 1 with warmup";
+    ASSERT_NEAR(variance(x2), chains.variance(1,j), 1e-8)
+      << "3: chain variance 2 with warmup";
+    ASSERT_NEAR(variance(x), chains.variance(j), 1e-8)
+      << "3: param variance with warmup";
+  }
+}
+
+double covariance(Eigen::VectorXd x, Eigen::VectorXd y) {
+  double x_mean = x.mean();
+  double y_mean = y.mean();
+  return ((x.array() - x_mean) * (y.array() - y_mean)).sum() / (x.rows() - 1);
+}
+
+TEST_F(McmcChains_New, blocker_covariance) {
+  stan::io::stan_csv blocker1 = stan::io::stan_csv_reader::parse(blocker1_stream);
+  stan::io::stan_csv blocker2 = stan::io::stan_csv_reader::parse(blocker2_stream);
+  
+  stan::mcmc::chains_new<> chains(blocker1);
+  chains.add(blocker2);
+  
+  int n = 0;
+  for (int i = 0; i < chains.num_params(); i++) {
+    for (int j = i; j < chains.num_params(); j++) {
+      if (++n % 13 == 0) { // test every 13th value
+	Eigen::VectorXd x1(1000), x2(1000), x(2000);
+	Eigen::VectorXd y1(1000), y2(1000), y(2000);
+	x1 << blocker1.samples.col(i);
+	x2 << blocker1.samples.col(j);
+
+	y1 << blocker2.samples.col(i);
+	y2 << blocker2.samples.col(j);
+
+	x << x1, y1;
+	y << x2, y2;
+      
+	double cov1 = covariance(x1, x2);
+	double cov2 = covariance(y1, y2);
+	double cov = covariance(x, y);
+      
+	ASSERT_NEAR(cov1, chains.covariance(0,i,j), 1e-8);
+	ASSERT_NEAR(cov2, chains.covariance(1,i,j), 1e-8);
+	ASSERT_NEAR(cov, chains.covariance(i,j), 1e-8);
+
+	ASSERT_NEAR(cov1, chains.covariance(0,j,i), 1e-8);
+	ASSERT_NEAR(cov2, chains.covariance(1,j,i), 1e-8);
+	ASSERT_NEAR(cov, chains.covariance(j,i), 1e-8);
+      }
+    }
+  }
+}
+
+
+
 
 /*
 void test_permutation(size_t N) {
@@ -1200,32 +1293,6 @@ TEST(McmcChains,split_potential_scale_reduction) {
                                   idxs);
   EXPECT_FLOAT_EQ(1.03715,  c.split_potential_scale_reduction(index)) <<
     "delta.22 split R hat should be near 1.04";
-}
-TEST(McmcChains,covariance) {
-  std::vector<std::string> names;
-  std::vector<std::vector<size_t> > dimss;
-  stan::mcmc::read_variables("src/test/mcmc/test_csv_files/blocker1.csv", 2,
-                             names, dimss);
-
-  stan::mcmc::chains<> c(2, names, dimss);
-  add_chain(c, 0, "src/test/mcmc/test_csv_files/blocker1.csv", 2);
-  add_chain(c, 1, "src/test/mcmc/test_csv_files/blocker2.csv", 2);
-
-  size_t index1, index2;
-  std::vector<size_t> idxs;
-  idxs.push_back(0);
-  index1 = c.get_total_param_index(c.param_name_to_index("mu"), 
-                                  idxs);
-  idxs.clear();
-  idxs.push_back(1);
-  index2 = c.get_total_param_index(c.param_name_to_index("mu"), 
-                                  idxs);
-  EXPECT_FLOAT_EQ(0.03349357,   c.covariance(0U, index1, index2)) <<
-    "covariance of chain 0";
-  EXPECT_FLOAT_EQ(-0.007968091, c.covariance(1U, index1, index2)) <<
-    "covariance of chain 1";
-  EXPECT_FLOAT_EQ(0.02145364,   c.covariance(index1, index2)) <<
-    "covariance";
 }
 TEST(McmcChains,correlation) {
   std::vector<std::string> names;
