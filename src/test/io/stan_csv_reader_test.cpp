@@ -24,12 +24,11 @@ public:
 
   std::ifstream blocker0_stream;
   std::ifstream metadata_stream, header_stream, adaptation_stream, samples_stream;
-  stan::io::stan_csv_reader reader;
 };
 
 TEST_F(StanIoStanCsvReader,read_metadata) {
   stan::io::stan_csv_metadata metadata;
-  EXPECT_TRUE(reader.read_metadata(metadata_stream, metadata));
+  EXPECT_TRUE(stan::io::stan_csv_reader::read_metadata(metadata_stream, metadata));
 
   EXPECT_EQ(1U, metadata.stan_version_major);
   EXPECT_EQ(1U, metadata.stan_version_minor);
@@ -55,7 +54,7 @@ TEST_F(StanIoStanCsvReader,read_metadata) {
 }
 TEST_F(StanIoStanCsvReader,read_header) { 
   Eigen::Matrix<std::string, Eigen::Dynamic, 1> header;
-  EXPECT_TRUE(reader.read_header(header_stream, header));
+  EXPECT_TRUE(stan::io::stan_csv_reader::read_header(header_stream, header));
   
   ASSERT_EQ(51, header.size());
   EXPECT_EQ("lp__", header(0));
@@ -113,7 +112,7 @@ TEST_F(StanIoStanCsvReader,read_header) {
 
 TEST_F(StanIoStanCsvReader,read_adaptation) { 
   stan::io::stan_csv_adaptation adaptation;
-  EXPECT_TRUE(reader.read_adaptation(adaptation_stream, adaptation));
+  EXPECT_TRUE(stan::io::stan_csv_reader::read_adaptation(adaptation_stream, adaptation));
   
   EXPECT_EQ("mcmc::nuts_diag", adaptation.sampler);
   EXPECT_FLOAT_EQ(0.104225, adaptation.step_size);
@@ -169,7 +168,7 @@ TEST_F(StanIoStanCsvReader,read_adaptation) {
 
 TEST_F(StanIoStanCsvReader,read_samples) { 
   Eigen::MatrixXd samples;
-  EXPECT_TRUE(reader.read_samples(samples_stream, samples));
+  EXPECT_TRUE(stan::io::stan_csv_reader::read_samples(samples_stream, samples));
 
   ASSERT_EQ(6, samples.rows());
   ASSERT_EQ(51, samples.cols());
@@ -192,7 +191,7 @@ TEST_F(StanIoStanCsvReader,read_samples) {
 
 TEST_F(StanIoStanCsvReader,Parse) {
   stan::io::stan_csv blocker0;
-  blocker0 = reader.parse(blocker0_stream);
+  blocker0 = stan::io::stan_csv_reader::parse(blocker0_stream);
 
   // metadata
   EXPECT_EQ(1U, blocker0.metadata.stan_version_major);
