@@ -382,7 +382,61 @@ TEST_F(McmcChains_New, blocker_covariance) {
   }
 }
 
+TEST_F(McmcChains_New, blocker_correlation) {
+  stan::io::stan_csv blocker1 = stan::io::stan_csv_reader::parse(blocker1_stream);
+  stan::io::stan_csv blocker2 = stan::io::stan_csv_reader::parse(blocker2_stream);
+  
+  stan::mcmc::chains_new<> chains(blocker1);
+  chains.add(blocker2);
+  
+  int n = 0;
+  for (int i = 0; i < chains.num_params(); i++) {
+    for (int j = i; j < chains.num_params(); j++) {
+      if (++n % 13 == 0) { // test every 13th value
+	Eigen::VectorXd x1(1000), x2(1000), x(2000);
+	Eigen::VectorXd y1(1000), y2(1000), y(2000);
+	x1 << blocker1.samples.col(i);
+	x2 << blocker1.samples.col(j);
 
+	y1 << blocker2.samples.col(i);
+	y2 << blocker2.samples.col(j);
+
+	x << x1, y1;
+	y << x2, y2;
+      
+
+	double cov1 = covariance(x1, x2);
+	double cov2 = covariance(y1, y2);
+	double cov = covariance(x, y);
+
+	double corr1 = 0;
+	double corr2 = 0;
+	double corr = 0;
+
+	if (std::fabs(cov1) > 1e-8)
+	  corr1 = cov1 / sd(x1) / sd(x2);
+	if (std::fabs(cov2) > 1e-8)
+	  corr2 = cov2 / sd(y1) / sd(y2);
+	if (std::fabs(cov) > 1e-8)
+	  corr = cov / sd(x) / sd(y);
+		
+	ASSERT_NEAR(corr1, chains.correlation(0,i,j), 1e-8)
+	  << "(" << i << ", " << j << ")";
+	ASSERT_NEAR(corr2, chains.correlation(1,i,j), 1e-8)
+	  << "(" << i << ", " << j << ")";
+	ASSERT_NEAR(corr, chains.correlation(i,j), 1e-8)
+	  << "(" << i << ", " << j << ")";
+
+	ASSERT_NEAR(corr1, chains.correlation(0,j,i), 1e-8)
+	  << "(" << i << ", " << j << ")";
+	ASSERT_NEAR(corr2, chains.correlation(1,j,i), 1e-8)
+	  << "(" << i << ", " << j << ")";
+	ASSERT_NEAR(corr, chains.correlation(j,i), 1e-8)
+	  << "(" << i << ", " << j << ")";
+      }
+    }
+  }
+}
 
 
 /*

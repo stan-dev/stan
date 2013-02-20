@@ -282,6 +282,31 @@ namespace stan {
 	return boost::accumulators::covariance(acc) * M / (M-1);
       }
 
+      double correlation(const Eigen::VectorXd& x, const Eigen::VectorXd& y) {
+	if (x.rows() != y.rows())
+	  std::cerr << "warning: covariance of different length chains";
+        using boost::accumulators::accumulator_set;
+        using boost::accumulators::stats;
+        using boost::accumulators::tag::variance;
+        using boost::accumulators::tag::covariance;
+        using boost::accumulators::tag::covariate1;
+
+        accumulator_set<double, stats<variance, covariance<double, covariate1> > > acc_xy;
+        accumulator_set<double, stats<variance> > acc_y;
+	
+	int M = std::min(x.size(), y.size());
+	for (int i = 0; i < M; i++) {
+	  acc_xy(x(i), boost::accumulators::covariate1=y(i));
+	  acc_y(y(i));
+	}
+	
+	double cov = boost::accumulators::covariance(acc_xy);
+	if (cov > -1e-8 && cov < 1e-8)
+	  return cov;
+	return cov / std::sqrt(boost::accumulators::variance(acc_xy) * boost::accumulators::variance(acc_y));
+      }
+
+
     public:
       chains_new(const Eigen::Matrix<std::string, Eigen::Dynamic, 1>& param_names) 
 	: param_names_(param_names) { }
@@ -448,11 +473,11 @@ namespace stan {
       }
 
       double correlation(int chain, int index1, int index2) {
-	return 0;
+	return correlation(samples(chain,index1),samples(chain,index2));
       }
       
       double correlation(int index1, int index2) { 	
-	return 0;
+	return correlation(samples(index1),samples(index2));
       }
 
       double quantile(int chain, int index, double prob) {
