@@ -1085,7 +1085,7 @@ public:
       ASSERT_EQ(expected_gradients.size(), gradients.size()) 
 	<< "Number of expected gradients and calculated gradients must match -- error in test fixture";
       for (size_t i = 0; i < expected_gradients.size(); i++) {
-	EXPECT_FLOAT_EQ(expected_gradients[i], gradients[i])
+	EXPECT_NEAR(expected_gradients[i], gradients[i], 1e-6)
 	  << "Comparison of expected gradient to calculated gradient failed";
       }
     }
