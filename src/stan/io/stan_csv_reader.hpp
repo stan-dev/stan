@@ -240,6 +240,7 @@ namespace stan {
 	    }
 	    rows++;
 	  }
+	  in.peek();
 	}
 	ss.seekg(std::ios_base::beg);
 	
