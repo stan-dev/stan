@@ -9,10 +9,10 @@ public:
   void SetUp () {
     blocker0_stream.open("src/test/io/test_csv_files/blocker.0.csv");
     epil0_stream.open("src/test/io/test_csv_files/epil.0.csv");
-    metadata1_stream.open("src/test/io/test_csv_files/metadata.csv");
-    header1_stream.open("src/test/io/test_csv_files/header.csv");
-    adaptation1_stream.open("src/test/io/test_csv_files/adaptation.csv");
-    samples1_stream.open("src/test/io/test_csv_files/samples.csv");
+    metadata1_stream.open("src/test/io/test_csv_files/metadata1.csv");
+    header1_stream.open("src/test/io/test_csv_files/header1.csv");
+    adaptation1_stream.open("src/test/io/test_csv_files/adaptation1.csv");
+    samples1_stream.open("src/test/io/test_csv_files/samples1.csv");
   }
 
   void TearDown() {
