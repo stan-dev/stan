@@ -13,10 +13,10 @@ class McmcChains_New : public testing::Test {
 public:
   
   void SetUp() {
-    blocker1_stream.open("src/test/mcmc/test_csv_files/blocker1.csv");
-    blocker2_stream.open("src/test/mcmc/test_csv_files/blocker2.csv");
-    epil1_stream.open("src/test/mcmc/test_csv_files/epil1.csv");
-    epil2_stream.open("src/test/mcmc/test_csv_files/epil2.csv");
+    blocker1_stream.open("src/test/mcmc/test_csv_files/blocker.1.csv");
+    blocker2_stream.open("src/test/mcmc/test_csv_files/blocker.2.csv");
+    epil1_stream.open("src/test/mcmc/test_csv_files/epil.1.csv");
+    epil2_stream.open("src/test/mcmc/test_csv_files/epil.2.csv");
   }
   
   void TearDown() {
@@ -45,7 +45,7 @@ TEST_F(McmcChains_New, constructor) {
   for (int i = 0; i < blocker1.header.size(); i++)
     EXPECT_EQ(blocker1.header(i), chains2.param_name(i));
   EXPECT_EQ(0, chains2.warmup(0));
-  EXPECT_EQ(1001, chains2.num_samples(0));
+  EXPECT_EQ(1000, chains2.num_samples(0));
 }
 
 TEST_F(McmcChains_New, add) {
@@ -78,8 +78,8 @@ TEST_F(McmcChains_New, add) {
   EXPECT_EQ(0, chains.num_samples(0));
   EXPECT_EQ(2, chains.num_samples(1));
   EXPECT_EQ(0, chains.num_samples(2));
-  EXPECT_EQ(1001, chains.num_samples(3));
-  EXPECT_EQ(1003, chains.num_samples());
+  EXPECT_EQ(1000, chains.num_samples(3));
+  EXPECT_EQ(1002, chains.num_samples());
 
   EXPECT_NO_THROW(chains.add(3, blocker1.samples))
     << "adding multiple samples to an existing chain";
@@ -87,8 +87,8 @@ TEST_F(McmcChains_New, add) {
   EXPECT_EQ(0, chains.num_samples(0));
   EXPECT_EQ(2, chains.num_samples(1));
   EXPECT_EQ(0, chains.num_samples(2));
-  EXPECT_EQ(2002, chains.num_samples(3));
-  EXPECT_EQ(2004, chains.num_samples());
+  EXPECT_EQ(2000, chains.num_samples(3));
+  EXPECT_EQ(2002, chains.num_samples());
 
 
   EXPECT_NO_THROW(chains.add(blocker1.samples))
@@ -97,9 +97,39 @@ TEST_F(McmcChains_New, add) {
   EXPECT_EQ(0, chains.num_samples(0));
   EXPECT_EQ(2, chains.num_samples(1));
   EXPECT_EQ(0, chains.num_samples(2));
-  EXPECT_EQ(2002, chains.num_samples(3));
-  EXPECT_EQ(1001, chains.num_samples(4));
-  EXPECT_EQ(3005, chains.num_samples());
+  EXPECT_EQ(2000, chains.num_samples(3));
+  EXPECT_EQ(1000, chains.num_samples(4));
+  EXPECT_EQ(3002, chains.num_samples());
+
+
+  stan::io::stan_csv epil1 = stan::io::stan_csv_reader::parse(epil1_stream);
+  theta.resize(epil1.samples.cols());
+  theta = epil1.samples.row(0);
+  EXPECT_THROW(chains.add(1, theta), std::invalid_argument)
+    << "adding mismatched sample to an existing chain";
+  EXPECT_THROW(chains.add(10, theta), std::invalid_argument)
+    << "adding mismatched sample to a new chain";
+  EXPECT_THROW(chains.add(3, epil1.samples), std::invalid_argument)
+    << "adding mismatched samples to an existing chain";
+  EXPECT_THROW(chains.add(10, epil1.samples), std::invalid_argument)
+    << "adding mismatched samples to a new chain";
+  EXPECT_THROW(chains.add(epil1), std::invalid_argument)
+    << "adding mismatched sample";
+
+  EXPECT_EQ(5, chains.num_chains())
+    << "validate state is identical to before";
+  EXPECT_EQ(0, chains.num_samples(0))
+    << "validate state is identical to before";
+  EXPECT_EQ(2, chains.num_samples(1))
+    << "validate state is identical to before";
+  EXPECT_EQ(0, chains.num_samples(2))
+    << "validate state is identical to before";
+  EXPECT_EQ(2000, chains.num_samples(3))
+    << "validate state is identical to before";
+  EXPECT_EQ(1000, chains.num_samples(4))
+    << "validate state is identical to before";
+  EXPECT_EQ(3002, chains.num_samples())
+    << "validate state is identical to before";
 }
 
 TEST_F(McmcChains_New, blocker1_num_chains) {
@@ -187,53 +217,37 @@ TEST_F(McmcChains_New, blocker_mean) {
 
   Eigen::VectorXd means1 = blocker1.samples.colwise().mean();
   for (int j = 0; j < chains.num_params(); j++) {
-    EXPECT_FLOAT_EQ(means1(j), chains.mean(0,j))
+    ASSERT_FLOAT_EQ(means1(j), chains.mean(0,j))
       << "1: chain, param mean";
-    EXPECT_FLOAT_EQ(means1(j), chains.mean(j))
+    ASSERT_FLOAT_EQ(means1(j), chains.mean(j))
       << "1: param mean";
   }
 
-  EXPECT_NO_THROW(chains.add(blocker2))
+  ASSERT_NO_THROW(chains.add(blocker2))
     << "adding a second chain";
   Eigen::VectorXd means2 = blocker2.samples.colwise().mean();
   for (int j = 0; j < chains.num_params(); j++) {
-    EXPECT_FLOAT_EQ(means2(j), chains.mean(1,j))
+    ASSERT_FLOAT_EQ(means2(j), chains.mean(1,j))
       << "2: chain, param mean";
-    EXPECT_FLOAT_EQ((means1(j) + means2(j)) * 0.5, chains.mean(j))
+    ASSERT_FLOAT_EQ((means1(j) + means2(j)) * 0.5, chains.mean(j))
       << "2: param mean";
   }
 
 
-  chains.set_warmup(501);
+  ASSERT_NO_THROW(chains.set_warmup(500));
   means1 = blocker1.samples.bottomRows(500).colwise().mean();
   means2 = blocker2.samples.bottomRows(500).colwise().mean();
   for (int j = 0; j < chains.num_params(); j++) {
-    EXPECT_FLOAT_EQ(means1(j), chains.mean(0,j))
+    ASSERT_FLOAT_EQ(means1(j), chains.mean(0,j))
       << "3: chain mean 1 with warmup";
-    EXPECT_FLOAT_EQ(means2(j), chains.mean(1,j))
+    ASSERT_FLOAT_EQ(means2(j), chains.mean(1,j))
       << "3: chain mean 2 with warmup";
-    EXPECT_FLOAT_EQ((means1(j) + means2(j)) * 0.5, chains.mean(j))
+    ASSERT_FLOAT_EQ((means1(j) + means2(j)) * 0.5, chains.mean(j))
       << "3: param mean with warmup";
   }
 }
 
 /*
-
-TEST(McmcChains, validate_dim_idxs) {
-  using stan::mcmc::validate_dims_idxs;
-  std::vector<size_t> dims(3,2);
-  std::vector<size_t> idxs(3,0);
-  EXPECT_NO_THROW(validate_dims_idxs(dims,idxs));
-  idxs[0] = 4;
-  EXPECT_THROW(validate_dims_idxs(dims,idxs), std::out_of_range);
-  idxs[0] = 0;
-  idxs[2] = 5;
-  EXPECT_THROW(validate_dims_idxs(dims,idxs), std::out_of_range);
-  
-  std::vector<size_t> idxs4(4,0);
-  EXPECT_THROW(validate_dims_idxs(dims,idxs4), std::invalid_argument);
-  
-}
 
 void test_permutation(size_t N) {
   int seed = 187049587;
@@ -302,72 +316,6 @@ TEST(McmcChains, permute) {
 }
 
 
-TEST(McmcChains,get_offset) {
-  using stan::mcmc::get_offset;
-  using std::vector;
-  vector<size_t> idxs(3);
-  idxs[0] = 0;
-  idxs[1] = 0;
-  idxs[2] = 0;
-  vector<size_t> dims(3);
-  dims[0] = 2;
-  dims[1] = 3;
-  dims[2] = 4;
-  size_t offset = 0;
-  for (size_t c = 0; c < 4; ++c) {
-    for (size_t b = 0; b < 3; ++b) {
-      for (size_t a = 0; a < 2; ++a) {
-        idxs[0] = a;
-        idxs[1] = b;
-        idxs[2] = c;
-        EXPECT_EQ(offset,get_offset(dims,idxs));
-        ++offset;
-      }
-    }
-  }
-}
-
-
-TEST(McmcChains,increment_indexes) {
-  using std::vector;
-  using stan::mcmc::increment_indexes;
-  vector<size_t> idxs(3);
-  idxs[0] = 0;
-  idxs[1] = 0;
-  idxs[2] = 0;
-  vector<size_t> dims(3);
-  dims[0] = 2;
-  dims[1] = 3;
-  dims[2] = 4;
-  for (size_t c = 0; c < 4; ++c) {
-    for (size_t b = 0; b < 3; ++b) {
-      for (size_t a = 0; a < 2; ++a) {
-        EXPECT_FLOAT_EQ(a,idxs[0]);
-        EXPECT_FLOAT_EQ(b,idxs[1]);
-        EXPECT_FLOAT_EQ(c,idxs[2]);
-        if (a != 1 || b != 2 || c != 3)
-          increment_indexes(dims,idxs);
-      }
-    }
-  }
-
-  increment_indexes(dims,idxs);
-  EXPECT_FLOAT_EQ(0.0,idxs[0]);
-  EXPECT_FLOAT_EQ(0.0,idxs[1]);
-  EXPECT_FLOAT_EQ(0.0,idxs[2]);
-  
-  vector<size_t> dims4(4,5);
-  vector<size_t> idxs4(4,0); 
-  EXPECT_THROW(increment_indexes(dims4,idxs),
-               std::invalid_argument);
-  EXPECT_THROW(increment_indexes(dims,idxs4),
-               std::invalid_argument);
-  EXPECT_NO_THROW(increment_indexes(dims4,idxs4));
-
-  idxs4[3] = 12; // now out of range
-  EXPECT_THROW(increment_indexes(dims4,idxs4),
-               std::out_of_range);
-}
 
 TEST(McmcChains,ctor_and_immutable_getters) {
   using std::vector;
@@ -469,62 +417,6 @@ TEST(McmcChains,ctor_and_immutable_getters) {
 
   EXPECT_THROW(c.param_dims(5), std::out_of_range);
 
-  size_t pos = 0;
-  std::vector<size_t> idxs(0);
-  EXPECT_EQ(pos, c.get_total_param_index(0,idxs));
-  ++pos;
-
-  idxs.resize(1);
-  idxs[0] = 0;
-  EXPECT_EQ(pos, c.get_total_param_index(1,idxs));
-  ++pos;
-  idxs[0] = 1;
-  EXPECT_EQ(pos, c.get_total_param_index(1,idxs));
-  ++pos;
-
-  idxs.resize(3);
-  for (size_t i2 = 0; i2 < 5; ++i2) {
-    idxs[2] = i2;
-    for (size_t i1 = 0; i1 < 4; ++i1) {
-      idxs[1] = i1;
-      for (size_t i0 = 0; i0 < 3; ++i0) {
-        idxs[0] = i0;
-        EXPECT_EQ(pos, c.get_total_param_index(2,idxs));
-        ++pos;
-      }
-    }
-  }
-
-  idxs.resize(2);
-  for (size_t i1 = 0; i1 < 7; ++i1) {
-    idxs[1] = i1;
-    for (size_t i0 = 0; i0 < 6; ++i0) {
-      idxs[0] = i0;
-      EXPECT_EQ(pos, c.get_total_param_index(3,idxs));
-      ++pos;
-    }
-  }
-  
-  EXPECT_THROW(c.get_total_param_index(5,idxs), std::out_of_range);
-
-}
-
-TEST(McmcChains,warmup_get_set) {
-  using std::vector;
-  using std::string;
-  using stan::mcmc::chains;
-
-  chains<> c(2,
-             vector<string>(1,"a"), 
-             vector<vector<size_t> >(1,vector<size_t>(0)));
-
-  EXPECT_EQ(0U, c.warmup());
-  c.set_warmup(1000U);
-  EXPECT_EQ(1000U,c.warmup());
-}
-
-
-
 
 TEST(McmcChains,add) {
   using std::vector;
@@ -589,42 +481,6 @@ TEST(McmcChains,add) {
 
   EXPECT_THROW(c.num_samples(5), std::out_of_range);
 
-  c.add(0,theta);
-  c.add(1,theta);
-  c.add(1,theta);
-  c.add(1,theta);
-  c.add(2,theta);
-
-  // 0=3, 1=4, 2=1, 3=0
-
-  c.set_warmup(1);
-  EXPECT_EQ(3U, c.num_warmup_samples());
-  EXPECT_EQ(1U, c.num_warmup_samples(0));
-  EXPECT_EQ(1U, c.num_warmup_samples(1));
-  EXPECT_EQ(1U, c.num_warmup_samples(2));
-  EXPECT_EQ(0U, c.num_warmup_samples(3));
-  EXPECT_THROW(c.num_warmup_samples(5), std::out_of_range);
-
-  EXPECT_EQ(5U, c.num_kept_samples());
-  EXPECT_EQ(2U, c.num_kept_samples(0));
-  EXPECT_EQ(3U, c.num_kept_samples(1));
-  EXPECT_EQ(0U, c.num_kept_samples(2));
-  EXPECT_EQ(0U, c.num_kept_samples(3));
-  EXPECT_THROW(c.num_kept_samples(5), std::out_of_range);
-
-  c.set_warmup(0);
-  EXPECT_EQ(0U, c.num_warmup_samples());
-  EXPECT_EQ(0U, c.num_warmup_samples(0));
-  EXPECT_EQ(0U, c.num_warmup_samples(1));
-  EXPECT_EQ(0U, c.num_warmup_samples(2));
-  EXPECT_EQ(0U, c.num_warmup_samples(3));
-
-  EXPECT_EQ(8U, c.num_kept_samples());
-  EXPECT_EQ(3U, c.num_kept_samples(0));
-  EXPECT_EQ(4U, c.num_kept_samples(1));
-  EXPECT_EQ(1U, c.num_kept_samples(2));
-  EXPECT_EQ(0U, c.num_kept_samples(3));
-}
 
 TEST(McmcChains,get_samples) {
   using std::vector;

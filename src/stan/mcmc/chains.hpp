@@ -348,10 +348,9 @@ namespace stan {
       }
 
       void add(const stan::io::stan_csv& stan_csv) {
+	if (stan_csv.header.size() != num_params())
+	  throw std::invalid_argument("number of columns in sample does not match chains");
 	if (!param_names_.cwiseEqual(stan_csv.header).all()) {
-	  //std::cerr << "add: existing parameter names " 
-	  //<< param_names_ << " does not match "
-	  //<< stan_csv.header << std::endl;
 	  throw std::invalid_argument("header does not match chain's header");
 	}
 	add(stan_csv.samples);
