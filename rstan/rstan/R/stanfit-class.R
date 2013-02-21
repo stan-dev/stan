@@ -24,7 +24,7 @@ print.stanfit <- function(x, pars = x@sim$pars_oi,
       "; warmup=", x@sim$warmup, "; thin=", x@sim$thin, "; ", 
       x@sim$n_save[1], " iterations saved.\n\n", sep = '') 
 
-  # round n_eff to 0 decimal point 
+  # round n_eff to integers
   s$summary[, 'n_eff'] <- round(s$summary[, 'n_eff'], 0)
 
   print(round(s$summary, digits_summary), ...) 
