@@ -3954,7 +3954,7 @@ TEST(AgradMatrix, assign) {
   EXPECT_FLOAT_EQ(100,m_var(1,0).val());
   EXPECT_FLOAT_EQ(300,m_var(1,2).val());
 }
-TEST(AgradMatrix, assign_failure) {
+TEST(AgradMatrix, assign_error) {
   using stan::agrad::assign;
   using std::vector;
   using Eigen::Matrix;
