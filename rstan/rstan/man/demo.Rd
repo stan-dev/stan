@@ -1,4 +1,3 @@
-
 \name{stan_demo}
 \alias{stan_demo} 
 
@@ -30,7 +29,7 @@
 }
 
 \references{
-  The Stan Development Team (2012) 
+  The Stan Development Team (\Sexpr[eval=TRUE,results=text,stage=build]{format(Sys.time(),'\%Y')})
   \emph{Stan Modeling Language User's Guide and Reference Manual}. 
   \url{http://mc-stan.org/}. 
 } 

@@ -15,13 +15,15 @@
 }
 
 \arguments{
-  \item{x}{An object of S4 class \code{stanfit}}
+  \item{x}{An object of S4 class \code{stanfit}.}
   \item{pars}{Parameters in which the summaries are interest; defaults to all parameters
-    for which samples are saved}
+    for which samples are saved.}
   \item{probs}{Quantiles of interest; defaults to \code{"c(0.025,0.25,0.5,0.75,0.975)"}}
   \item{digits_summary}{The number of significant digits for printing out
-    the summary; defaults to 1.} 
-  \item{\dots}{passed to method \code{summary} of \code{stanfit}}
+    the summary; defaults to 1. The effective sample size is always rounded to
+    integers.} 
+  \item{\dots}{Additional arguments that would be passed to method
+    \code{summary} of \code{stanfit}.}
 }
 
 \details{

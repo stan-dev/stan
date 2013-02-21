@@ -236,7 +236,7 @@ stan(file, model_name = "anon_model", model_code = "",
 }
 
 \references{
-  Stan Development Team (2012) 
+  Stan Development Team (2013) 
   \emph{Stan Modeling Language User's Guide and Reference Manual}. 
   \url{http://mc-stan.org}. 
 }
