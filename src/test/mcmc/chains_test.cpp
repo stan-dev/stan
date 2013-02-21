@@ -507,6 +507,25 @@ TEST_F(McmcChains_New, blocker_quantiles) {
   EXPECT_NEAR(-1.90839, quantiles(8), 1e-2);
 
 }
+TEST_F(McmcChains_New, blocker_central_interval) {
+  stan::io::stan_csv blocker1 = stan::io::stan_csv_reader::parse(blocker1_stream);
+  
+  stan::mcmc::chains_new<> chains(blocker1);
+  
+  int index = 5;
+  
+  Eigen::Vector2d interval;
+
+  interval = chains.central_interval(0,index,0.6);
+  // R's quantile function
+  EXPECT_NEAR(-2.71573, interval(0), 1e-2); // 0.2
+  EXPECT_NEAR(-2.08649, interval(1), 1e-2); // 0.8
+
+  interval = chains.central_interval(index,0.6);
+  // R's quantile function
+  EXPECT_NEAR(-2.71573, interval(0), 1e-2); // 0.2
+  EXPECT_NEAR(-2.08649, interval(1), 1e-2); // 0.8
+}
 
 
 /*

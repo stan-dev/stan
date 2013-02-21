@@ -555,6 +555,24 @@ namespace stan {
       Eigen::VectorXd quantiles(int index, Eigen::VectorXd& probs) {
 	return quantiles(samples(index), probs);
       }
+      
+      Eigen::Vector2d central_interval(int chain, int index, double prob) {
+	double low_prob = (1-prob)/2;
+	double high_prob = 1-low_prob;
+	
+	Eigen::Vector2d interval;
+	interval << quantile(chain,index,low_prob), quantile(chain,index,high_prob);
+	return interval;
+      }
+
+      Eigen::Vector2d central_interval(int index, double prob) {
+	double low_prob = (1-prob)/2;
+	double high_prob = 1-low_prob;
+	
+	Eigen::Vector2d interval;
+	interval << quantile(index,low_prob), quantile(index,high_prob);
+	return interval;
+      }
 
       // central_interval
       // autocorrelation
