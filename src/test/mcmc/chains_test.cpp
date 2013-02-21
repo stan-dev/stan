@@ -438,6 +438,76 @@ TEST_F(McmcChains_New, blocker_correlation) {
   }
 }
 
+TEST_F(McmcChains_New, blocker_quantile) {
+  stan::io::stan_csv blocker1 = stan::io::stan_csv_reader::parse(blocker1_stream);
+  
+  stan::mcmc::chains_new<> chains(blocker1);
+  
+  int index = 5;
+  
+  // R's quantile function
+  EXPECT_NEAR(-2.93776, chains.quantile(0,index,0.1), 1e-2);
+  EXPECT_NEAR(-2.71573, chains.quantile(0,index,0.2), 1e-2);
+  EXPECT_NEAR(-2.58469, chains.quantile(0,index,0.3), 1e-2);
+  EXPECT_NEAR(-2.57960, chains.quantile(0,index,0.4), 1e-2);
+  EXPECT_NEAR(-2.49539, chains.quantile(0,index,0.5), 1e-2);
+  EXPECT_NEAR(-2.37983, chains.quantile(0,index,0.6), 1e-2);
+  EXPECT_NEAR(-2.22837, chains.quantile(0,index,0.7), 1e-2);
+  EXPECT_NEAR(-2.08649, chains.quantile(0,index,0.8), 1e-2);
+  EXPECT_NEAR(-1.90839, chains.quantile(0,index,0.9), 1e-2);
+
+  EXPECT_NEAR(-2.93776, chains.quantile(index,0.1), 1e-2);
+  EXPECT_NEAR(-2.71573, chains.quantile(index,0.2), 1e-2);
+  EXPECT_NEAR(-2.58469, chains.quantile(index,0.3), 1e-2);
+  EXPECT_NEAR(-2.57960, chains.quantile(index,0.4), 1e-2);
+  EXPECT_NEAR(-2.49539, chains.quantile(index,0.5), 1e-2);
+  EXPECT_NEAR(-2.37983, chains.quantile(index,0.6), 1e-2);
+  EXPECT_NEAR(-2.22837, chains.quantile(index,0.7), 1e-2);
+  EXPECT_NEAR(-2.08649, chains.quantile(index,0.8), 1e-2);
+  EXPECT_NEAR(-1.90839, chains.quantile(index,0.9), 1e-2);
+}
+
+TEST_F(McmcChains_New, blocker_quantiles) {
+  stan::io::stan_csv blocker1 = stan::io::stan_csv_reader::parse(blocker1_stream);
+  
+  stan::mcmc::chains_new<> chains(blocker1);
+  
+  int index = 5;
+
+  Eigen::VectorXd probs(9);
+  probs << 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9;
+  
+  Eigen::VectorXd quantiles;
+  
+  quantiles = chains.quantiles(0,index,probs);
+  // R's quantile function
+  ASSERT_EQ(9, quantiles.size());
+  EXPECT_NEAR(-2.93776, quantiles(0), 1e-2);
+  EXPECT_NEAR(-2.71573, quantiles(1), 1e-2);
+  EXPECT_NEAR(-2.58469, quantiles(2), 1e-2);
+  EXPECT_NEAR(-2.57960, quantiles(3), 1e-2);
+  EXPECT_NEAR(-2.49539, quantiles(4), 1e-2);
+  EXPECT_NEAR(-2.37983, quantiles(5), 1e-2);
+  EXPECT_NEAR(-2.22837, quantiles(6), 1e-2);
+  EXPECT_NEAR(-2.08649, quantiles(7), 1e-2);
+  EXPECT_NEAR(-1.90839, quantiles(8), 1e-2);
+
+
+  quantiles = chains.quantiles(index,probs);
+  // R's quantile function
+  ASSERT_EQ(9, quantiles.size());
+  EXPECT_NEAR(-2.93776, quantiles(0), 1e-2);
+  EXPECT_NEAR(-2.71573, quantiles(1), 1e-2);
+  EXPECT_NEAR(-2.58469, quantiles(2), 1e-2);
+  EXPECT_NEAR(-2.57960, quantiles(3), 1e-2);
+  EXPECT_NEAR(-2.49539, quantiles(4), 1e-2);
+  EXPECT_NEAR(-2.37983, quantiles(5), 1e-2);
+  EXPECT_NEAR(-2.22837, quantiles(6), 1e-2);
+  EXPECT_NEAR(-2.08649, quantiles(7), 1e-2);
+  EXPECT_NEAR(-1.90839, quantiles(8), 1e-2);
+
+}
+
 
 /*
 void test_permutation(size_t N) {

@@ -17,6 +17,7 @@
 #include <boost/accumulators/statistics/stats.hpp>
 #include <boost/accumulators/statistics/mean.hpp>
 #include <boost/accumulators/statistics/tail_quantile.hpp>
+#include <boost/accumulators/statistics/p_square_quantile.hpp>
 #include <boost/accumulators/statistics/variance.hpp>
 #include <boost/accumulators/statistics/covariance.hpp>
 #include <boost/accumulators/statistics/variates/covariate.hpp>
@@ -305,8 +306,67 @@ namespace stan {
 	  return cov;
 	return cov / std::sqrt(boost::accumulators::variance(acc_xy) * boost::accumulators::variance(acc_y));
       }
+      
+      double quantile(const Eigen::VectorXd& x, const double prob) {
+        using boost::accumulators::accumulator_set;
+        using boost::accumulators::left;
+        using boost::accumulators::quantile_probability;
+        using boost::accumulators::right;
+        using boost::accumulators::stats;
+        using boost::accumulators::tag::tail;
+        using boost::accumulators::tag::tail_quantile;
+        double M = x.rows();
+	//size_t cache_size = std::min(prob, 1-prob)*M + 2;
+	size_t cache_size = M;
 
+        if (prob < 0.5) {
+          accumulator_set<double, stats<tail_quantile<left> > > 
+            acc(tail<left>::cache_size = cache_size);
+	  for (int i = 0; i < M; i++)
+	    acc(x(i));
+	  return boost::accumulators::quantile(acc, quantile_probability=prob);
+        } 
+	accumulator_set<double, stats<tail_quantile<right> > > 
+	  acc(tail<right>::cache_size = cache_size);
+	for (int i = 0; i < M; i++)
+	  acc(x(i));
+	return boost::accumulators::quantile(acc, quantile_probability=prob);
+      }
 
+      Eigen::VectorXd quantiles(const Eigen::VectorXd& x, const Eigen::VectorXd& probs) {
+        using boost::accumulators::accumulator_set;
+        using boost::accumulators::left;
+        using boost::accumulators::quantile_probability;
+        using boost::accumulators::right;
+        using boost::accumulators::stats;
+        using boost::accumulators::tag::tail;
+        using boost::accumulators::tag::tail_quantile;
+        double M = x.rows();
+
+	//size_t cache_size = M/2 + 2;
+	size_t cache_size = M;///2 + 2;
+
+	accumulator_set<double, stats<tail_quantile<left> > > 
+	  acc_left(tail<left>::cache_size = cache_size);
+	accumulator_set<double, stats<tail_quantile<right> > > 
+	  acc_right(tail<right>::cache_size = cache_size);
+	
+	for (int i = 0; i < M; i++) {
+	  acc_left(x(i));
+	  acc_right(x(i));
+	}
+
+	Eigen::VectorXd q(probs.size());	
+	for (int i = 0; i < probs.size(); i++) {
+	  if (probs(i) < 0.5) 
+	    q(i) = boost::accumulators::quantile(acc_left, quantile_probability=probs(i));
+	  else
+	    q(i) = boost::accumulators::quantile(acc_right, quantile_probability=probs(i));
+	}
+	return q;
+      }
+
+      
     public:
       chains_new(const Eigen::Matrix<std::string, Eigen::Dynamic, 1>& param_names) 
 	: param_names_(param_names) { }
@@ -481,19 +541,19 @@ namespace stan {
       }
 
       double quantile(int chain, int index, double prob) {
-	return 0;
+	return quantile(samples(chain,index), prob);
       }
       
-      double quantile(int index, double prob) { 	
-	return 0;
+      double quantile(int index, double prob) {
+	return quantile(samples(index), prob);
       }
 
       Eigen::VectorXd quantiles(int chain, int index, Eigen::VectorXd& probs) {
-	
+	return quantiles(samples(chain,index), probs);
       }
 
       Eigen::VectorXd quantiles(int index, Eigen::VectorXd& probs) {
-	
+	return quantiles(samples(index), probs);
       }
 
       // central_interval
