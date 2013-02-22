@@ -111,4 +111,25 @@ TEST(AgradAutoDiff,jacobianAndJacobianRev) {
   EXPECT_FLOAT_EQ(0, J_rev(1,0));
   EXPECT_FLOAT_EQ(6, J_rev(1,1));
 }
+
+TEST(AgradAutodiff,hessian) {
+  using Eigen::Matrix;  using Eigen::Dynamic;
+  fun1 f;
+  Matrix<double,Dynamic,1> x(2);
+  x << 5, 7;
+  double fx;
+  Matrix<double,Dynamic,Dynamic> H;
+  stan::agrad::hessian(f,x,fx,H);
+
+  // x^2 * y + 3 * y^2
+  EXPECT_FLOAT_EQ(5 * 5 * 7 + 3 * 7  * 7, fx);
+
+  EXPECT_EQ(2,H.rows());
+  EXPECT_EQ(2,H.cols());
+  EXPECT_FLOAT_EQ(2 * 7, H(0,0));
+  EXPECT_FLOAT_EQ(2 * 5, H(0,1));
+  EXPECT_FLOAT_EQ(2 * 5, H(1,0));
+  EXPECT_FLOAT_EQ(2 * 3, H(1,1));
+
+}
   

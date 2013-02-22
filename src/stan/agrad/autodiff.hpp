@@ -158,15 +158,24 @@ namespace stan {
  
     }
 
-
-    // // N * bk
-    // template <typename F>
-    // void
-    // jacobian_fast(const F& f,
-    //               const Eigen::Matrix<double,Eigen::Dynamic,1>& x,
-    //               Eigen::Matrix<double,Eigen::Dynamic,1>& fx,
-    //               Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamci>& J);
-
+    template <typename F>
+    void
+    hessian(const F& f,
+            const Eigen::Matrix<double,Eigen::Dynamic,1>& x,
+            double& fx,
+            Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& H) {
+      H.resize(x.size(), x.size());
+      for (int i = 0; i < x.size(); ++i) {
+        Eigen::Matrix<fvar<var>, Eigen::Dynamic, 1> x_fvar(x.size());
+        for (int j = 0; j < x.size(); ++j) 
+          x_fvar(j) = fvar<var>(x(j),i==j);
+        fvar<var> fx_fvar = f(x_fvar);
+        if (i == 0) fx = fx_fvar.val_.val();
+        stan::agrad::grad(fx_fvar.d_.vi_);
+        for (int j = 0; j < x.size(); ++j)
+          H(i,j) = x_fvar(j).val_.adj();
+      }
+    }
 
     // // 1 * fwd
     // template <typename F, typename S>
@@ -177,59 +186,7 @@ namespace stan {
     //         int i,
     //         S& dfx_dxi); 
 
-    // // 1 * fwd
-    // template <typename F, typename S>
-    // void
-    // vector_dot_gradient(const F& f,
-    //                     const Eigen::Matrix<S,Eigen::Dynamic,1> x,
-    //                     S& fx,
-    //                     Eigen::Matrix<S,Eigen::Dynamic,1> v,
-    //                     S& v_dot_grad_fx);
 
-        
-    // // N * N * fwd
-    // template <typename F, typename S>
-    // void
-    // jacobian(const F& f,
-    //          const Eigen::Matrix<S,Eigen::Dynamic,1>& x,
-    //          Eigen::Matrix<S,Eigen::Dynamic,1>& fx,
-    //          Eigen::Matrix<S,Eigen::Dynamic,Eigen::Dynamic>& J);
-
-    // // N * (fwd + rev)
-    // template <typename F>
-    // void
-    // hessian_fast(const F& f,
-    //              const Eigen::Matrix<double,Eigen::Dynamic,1>& x,
-    //              double& fx,
-    //              const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& H);
-
-    // // N * N * fwd(2nd order)
-    // template <typename F, typename S>
-    // void
-    // hessian(const F& f,
-    //         const Eigen::Matrix<S,Eigen::Dynamic,1>& x,
-    //         S& fx,
-    //         const Eigen::Matrix<S,Eigen::Dynamic,Eigen::Dynamic>& H);
-
-
-    // // N * N * fwd(2nd order)
-    // template <typename F, typename S>
-    // void
-    // hessian_times_vector(const F& f,
-    //                      const Eigen::Matrix<S,Eigen::Dynamic,1>& x,
-    //                      S& fx,
-    //                      const Eigen::Matrix<S,Eigen::Dynamic,1>& v,
-    //                      Eigen::Matrix<S,Eigen::Dynamic,1>& Hv);
-
-    // // 1 * (fwd + rev)
-    // template <typename F>
-    // void
-    // hessian_times_vector_fast(const F& f,
-    //                           const Eigen::Matrix<double,Eigen::Dynamic,1>& x,
-    //                           double& fx,
-    //                           const Eigen::Matrix<double,Eigen::Dynamic,1>& v,
-    //                           double& v_dot_grad_fx,
-    //                           Eigen::Matrix<double,Eigen::Dynamic,1>& Hv);
     // // N * (fwd(2) + bk)
     // template <typename F>
     // void
