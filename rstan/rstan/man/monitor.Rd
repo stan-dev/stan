@@ -40,7 +40,7 @@ monitor(sims, warmup = floor(dim(sims)[1]/2),
 }
 
 \references{
-  Stan Development Team (2013) 
+  The Stan Development Team (\Sexpr[eval=TRUE,results=text,stage=build]{format(Sys.time(),'\%Y')})
   \emph{Stan Modeling Language User's Guide and Reference Manual}. 
   \url{http://mc-stan.org}. 
 }
