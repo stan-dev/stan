@@ -60,7 +60,7 @@ namespace stan {
       stan::agrad::recover_memory();
     }
 
-    template <typename F, typename T>
+    template <typename T, typename F>
     void
     gradient(const F& f,
              const Eigen::Matrix<T,Eigen::Dynamic,1>& x,
@@ -81,10 +81,10 @@ namespace stan {
 
     template <typename F>
     void
-    jacobian_rev(const F& f,
-                 const Eigen::Matrix<double,Eigen::Dynamic,1>& x,
-                 Eigen::Matrix<double,Eigen::Dynamic,1>& fx,
-                 Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& J) {
+    jacobian(const F& f,
+             const Eigen::Matrix<double,Eigen::Dynamic,1>& x,
+             Eigen::Matrix<double,Eigen::Dynamic,1>& fx,
+             Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& J) {
       using Eigen::Matrix;  using Eigen::Dynamic;
       using stan::agrad::var;
       Matrix<var,Dynamic,1> x_var(x.size());
@@ -104,7 +104,7 @@ namespace stan {
       }
     }
 
-    template <typename F, typename T>
+    template <typename T, typename F>
     void
     jacobian(const F& f,
              const Eigen::Matrix<T,Eigen::Dynamic,1>& x,
@@ -173,10 +173,9 @@ namespace stan {
       for (int i = 0; i < x.size(); ++i) 
         Hv(i) = x_var(i).adj();
       stan::agrad::recover_memory();
-
- 
     }
 
+    // time O(N^2);  space O(N^2)
     template <typename F>
     void
     hessian(const F& f,
@@ -193,6 +192,28 @@ namespace stan {
         stan::agrad::grad(fx_fvar.d_.vi_);
         for (int j = 0; j < x.size(); ++j)
           H(i,j) = x_fvar(j).val_.adj();
+      }
+    }
+    // time O(N^3);  space O(N^2)
+    template <typename T, typename F>
+    void
+    hessian(const F& f,
+            const Eigen::Matrix<T,Eigen::Dynamic,1>& x,
+            T& fx,
+            Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& H) {
+      H.resize(x.size(), x.size());
+      Eigen::Matrix<fvar<fvar<T> >,Eigen::Dynamic,1> x_fvar(x.size());
+      for (int i = 0; i < x.size(); ++i) {
+        for (int j = i; j < x.size(); ++j) {
+          for (int k = 0; k < x.size(); ++k)
+            x_fvar(k) = fvar<fvar<T> >(fvar<T>(x(k),j==k), 
+                                       fvar<T>(i==k,0));
+          fvar<fvar<T> > fx_fvar = f(x_fvar);
+          if (i == 0 && j == 0) 
+            fx = fx_fvar.val_.val_;
+          H(i,j) = fx_fvar.d_.d_;
+          H(j,i) = H(i,j);
+        }
       }
     }
 

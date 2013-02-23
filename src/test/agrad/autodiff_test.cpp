@@ -38,7 +38,7 @@ TEST(AgradAutoDiff,gradient) {
 
   double fx2;
   Matrix<double,Dynamic,1> grad_fx2;
-  stan::agrad::gradient<fun1,double>(f,x,fx2,grad_fx2);
+  stan::agrad::gradient<double>(f,x,fx2,grad_fx2);
   EXPECT_FLOAT_EQ(5 * 5 * 7 + 3 * 7 * 7, fx2);
   EXPECT_EQ(2,grad_fx2.size());
   EXPECT_FLOAT_EQ(2 * x[0] * x[1], grad_fx2[0]);
@@ -85,10 +85,9 @@ TEST(AgradAutoDiff,hessianTimesVector) {
   EXPECT_FLOAT_EQ(2 * x(1) * v(0) + 2 * x(0) * v(1), Hv(0));
   EXPECT_FLOAT_EQ(2 * x(0) * v(0) + 6 * v(1), Hv(1));
 }
-TEST(AgradAutoDiff,jacobianAndJacobianRev) {
+TEST(AgradAutoDiff,jacobian) {
   using Eigen::Matrix;  using Eigen::Dynamic;
   using stan::agrad::jacobian;
-  using stan::agrad::jacobian_rev;
 
   fun2 f;
   Matrix<double,Dynamic,1> x(2);
@@ -110,7 +109,7 @@ TEST(AgradAutoDiff,jacobianAndJacobianRev) {
 
   Matrix<double,Dynamic,1> fx_rev;
   Matrix<double,Dynamic,Dynamic> J_rev;
-  jacobian_rev(f,x,fx_rev,J_rev);
+  jacobian<double>(f,x,fx_rev,J_rev);
 
   EXPECT_EQ(2,fx_rev.size());
   EXPECT_FLOAT_EQ(2 * 2, fx_rev(0));
@@ -140,6 +139,19 @@ TEST(AgradAutodiff,hessian) {
   EXPECT_FLOAT_EQ(2 * 5, H(0,1));
   EXPECT_FLOAT_EQ(2 * 5, H(1,0));
   EXPECT_FLOAT_EQ(2 * 3, H(1,1));
+
+  double fx2;
+  Matrix<double,Dynamic,Dynamic> H2;
+  stan::agrad::hessian<double>(f,x,fx2,H2);
+
+  EXPECT_FLOAT_EQ(5 * 5 * 7 + 3 * 7  * 7, fx2);
+
+  EXPECT_EQ(2,H2.rows());
+  EXPECT_EQ(2,H2.cols());
+  EXPECT_FLOAT_EQ(2 * 7, H2(0,0));
+  EXPECT_FLOAT_EQ(2 * 5, H2(0,1));
+  EXPECT_FLOAT_EQ(2 * 5, H2(1,0));
+  EXPECT_FLOAT_EQ(2 * 3, H2(1,1));
 
 }
   
