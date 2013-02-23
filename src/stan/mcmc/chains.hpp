@@ -543,7 +543,7 @@ namespace stan {
       void add(const int chain,
                const Eigen::RowVectorXd& theta) {
 	if (theta.cols() != num_params())
-	  throw std::invalid_argument("number of columns in theta does not match chains");
+	  throw std::invalid_argument("add(chain,theta): number of columns in theta does not match chains");
 	if (chain > num_chains()) {
 	  samples_.conservativeResize(chain+1);
 	  warmup_.conservativeResize(chain+1);
@@ -557,7 +557,7 @@ namespace stan {
       void add(const int chain,
 	       const Eigen::MatrixXd& sample) {
 	if (sample.cols() != num_params())
-	  throw std::invalid_argument("number of columns in sample does not match chains");
+	  throw std::invalid_argument("add(chain,sample): number of columns in sample does not match chains");
 	if (chain > num_chains()) {
 	  samples_.conservativeResize(chain+1);
 	  warmup_.conservativeResize(chain+1);
@@ -569,8 +569,10 @@ namespace stan {
       }
 
       void add(const Eigen::MatrixXd& sample) {
+	if (sample.rows() == 0)
+	  return;
 	if (sample.cols() != num_params())
-	  throw std::invalid_argument("number of columns in sample does not match chains");
+	  throw std::invalid_argument("add(sample): number of columns in sample does not match chains");
 	int n = num_chains();
 	samples_.conservativeResize(n+1);
 	warmup_.conservativeResize(n+1);
@@ -580,9 +582,9 @@ namespace stan {
 
       void add(const stan::io::stan_csv& stan_csv) {
 	if (stan_csv.header.size() != num_params())
-	  throw std::invalid_argument("number of columns in sample does not match chains");
+	  throw std::invalid_argument("add(stan_csv): number of columns in sample does not match chains");
 	if (!param_names_.cwiseEqual(stan_csv.header).all()) {
-	  throw std::invalid_argument("header does not match chain's header");
+	  throw std::invalid_argument("add(stan_csv): header does not match chain's header");
 	}
 	add(stan_csv.samples);
       }
@@ -600,6 +602,14 @@ namespace stan {
 	  start += n;
 	}
 	return s;
+      }
+
+      Eigen::VectorXd samples(int chain, std::string param) {
+	return samples(chain,index(param));
+      }
+      
+      Eigen::VectorXd samples(std::string param) {
+	return samples(index(param));
       }
       
       double mean(int chain, int index) {

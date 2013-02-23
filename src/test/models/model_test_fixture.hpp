@@ -158,7 +158,7 @@ public:
     ifstream.open(get_csv_file(1).c_str());
     stan::io::stan_csv stan_csv = stan::io::stan_csv_reader::parse(ifstream);
     ifstream.close();
-
+    
     return (new stan::mcmc::chains_new<>(stan_csv));
   }
 
