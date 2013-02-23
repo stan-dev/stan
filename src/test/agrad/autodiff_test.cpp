@@ -33,16 +33,16 @@ TEST(AgradAutoDiff,gradient) {
   stan::agrad::gradient(f,x,fx,grad_fx);
   EXPECT_FLOAT_EQ(5 * 5 * 7 + 3 * 7 * 7, fx);
   EXPECT_EQ(2,grad_fx.size());
-  EXPECT_FLOAT_EQ(2 * x[0] * x[1], grad_fx[0]);
-  EXPECT_FLOAT_EQ(x[0] * x[0] + 3 * 2 * x[1], grad_fx[1]);
+  EXPECT_FLOAT_EQ(2 * x(0) * x(1), grad_fx(0));
+  EXPECT_FLOAT_EQ(x(0) * x(0) + 3 * 2 * x(1), grad_fx(1));
 
   double fx2;
   Matrix<double,Dynamic,1> grad_fx2;
   stan::agrad::gradient<double>(f,x,fx2,grad_fx2);
   EXPECT_FLOAT_EQ(5 * 5 * 7 + 3 * 7 * 7, fx2);
   EXPECT_EQ(2,grad_fx2.size());
-  EXPECT_FLOAT_EQ(2 * x[0] * x[1], grad_fx2[0]);
-  EXPECT_FLOAT_EQ(x[0] * x[0] + 3 * 2 * x[1], grad_fx2[1]);
+  EXPECT_FLOAT_EQ(2 * x(0) * x(1), grad_fx2(0));
+  EXPECT_FLOAT_EQ(x(0) * x(0) + 3 * 2 * x(1), grad_fx2(1));
 }
 TEST(AgradAutoDiff,gradientDotVector) {
   using Eigen::Matrix;  using Eigen::Dynamic;
@@ -127,11 +127,16 @@ TEST(AgradAutodiff,hessian) {
   Matrix<double,Dynamic,1> x(2);
   x << 5, 7;
   double fx;
+  Matrix<double,Dynamic,1> grad;
   Matrix<double,Dynamic,Dynamic> H;
-  stan::agrad::hessian(f,x,fx,H);
+  stan::agrad::hessian(f,x,fx,grad,H);
 
   // x^2 * y + 3 * y^2
   EXPECT_FLOAT_EQ(5 * 5 * 7 + 3 * 7  * 7, fx);
+
+  EXPECT_FLOAT_EQ(2,grad.size());
+  EXPECT_FLOAT_EQ(2 * x(0) * x(1), grad(0));
+  EXPECT_FLOAT_EQ(x(0) * x(0) + 3 * 2 * x(1), grad(1));
 
   EXPECT_EQ(2,H.rows());
   EXPECT_EQ(2,H.cols());
@@ -141,10 +146,15 @@ TEST(AgradAutodiff,hessian) {
   EXPECT_FLOAT_EQ(2 * 3, H(1,1));
 
   double fx2;
+  Matrix<double,Dynamic,1> grad2;
   Matrix<double,Dynamic,Dynamic> H2;
-  stan::agrad::hessian<double>(f,x,fx2,H2);
+  stan::agrad::hessian<double>(f,x,fx2,grad2,H2);
 
   EXPECT_FLOAT_EQ(5 * 5 * 7 + 3 * 7  * 7, fx2);
+
+  EXPECT_FLOAT_EQ(2,grad2.size());
+  EXPECT_FLOAT_EQ(2 * x(0) * x(1), grad2(0));
+  EXPECT_FLOAT_EQ(x(0) * x(0) + 3 * 2 * x(1), grad2(1));
 
   EXPECT_EQ(2,H2.rows());
   EXPECT_EQ(2,H2.cols());
