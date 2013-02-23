@@ -438,6 +438,35 @@ namespace stan {
         }
         return ess;
       }
+
+      double split_potential_scale_reduction(const Eigen::Matrix<Eigen::VectorXd, Eigen::Dynamic, 1> &samples) {
+	int chains = samples.size();
+	int n_samples = samples(0).size();
+        for (int chain = 1; chain < chains; chain++) {
+          n_samples = std::min(n_samples, int(samples(chain).size()));
+        }
+        if (n_samples % 2 == 1)
+          n_samples--;
+	int n = n_samples / 2;
+
+	Eigen::VectorXd split_chain_mean(2*chains);
+	Eigen::VectorXd split_chain_var(2*chains);
+	
+	for (int chain = 0; chain < chains; chain++) {
+	  split_chain_mean(2*chain) = samples(chain).topRows(n).mean();
+	  split_chain_mean(2*chain+1) = samples(chain).bottomRows(n).mean();
+	  
+	  split_chain_var(2*chain) = variance(samples(chain).topRows(n));
+	  split_chain_var(2*chain+1) = variance(samples(chain).bottomRows(n));
+	}
+
+
+	double var_between = n * variance(split_chain_mean);
+	double var_within = split_chain_var.mean();
+			
+        // rewrote [(n-1)*W/n + B/n]/W as (n-1+ B/W)/n
+        return sqrt((var_between/var_within + n-1)/n);
+      }
       
     public:
       chains_new(const Eigen::Matrix<std::string, Eigen::Dynamic, 1>& param_names) 
@@ -663,7 +692,14 @@ namespace stan {
 	return effective_sample_size(samples);
       }
       
-      // split_potential_scale_reduction
+      double split_potential_scale_reduction(int index) {	
+	Eigen::Matrix<Eigen::VectorXd, Eigen::Dynamic, 1> samples(num_chains());
+	for (int chain = 0; chain < num_chains(); chain++) {
+	  samples(chain) = this->samples(chain, index);
+	}
+	return split_potential_scale_reduction(samples);
+      }
+      
 
      
     };
@@ -1962,7 +1998,7 @@ namespace stan {
 
         double var_between = n_samples/2 * stan::math::variance(split_chain_mean);
         double var_within = stan::math::mean(split_chain_var);
-        
+
         // rewrote [(n-1)*W/n + B/n]/W as (n-1+ B/W)/n
         return sqrt((var_between/var_within + n_samples/2 -1)/(n_samples/2));
       }

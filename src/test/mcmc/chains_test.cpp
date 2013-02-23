@@ -632,25 +632,32 @@ TEST_F(McmcChains_New,blocker_effective_sample_size) {
   }
 }
 
-TEST(McmcChains,effective_sample_size) {
-  std::vector<std::string> names;
-  std::vector<std::vector<size_t> > dimss;
-  stan::mcmc::read_variables("src/test/mcmc/test_csv_files/blocker.1.csv", 2,
-                             names, dimss);
+TEST_F(McmcChains_New,blocker_split_potential_scale_reduction) {
+  stan::io::stan_csv blocker1 = stan::io::stan_csv_reader::parse(blocker1_stream);
+  stan::io::stan_csv blocker2 = stan::io::stan_csv_reader::parse(blocker2_stream);
+  
+  stan::mcmc::chains_new<> chains(blocker1);
+  chains.add(blocker2);
 
-  stan::mcmc::chains<> c(2, names, dimss);
-  add_chain(c, 0, "src/test/mcmc/test_csv_files/blocker.1.csv", 2);
-  add_chain(c, 1, "src/test/mcmc/test_csv_files/blocker.2.csv", 2);
+  Eigen::VectorXd rhat(48);
+  rhat << 
+    1.0044119, 1.0130149, 1.0024355, 1.0123774, 1.0091136,
+    1.0046465, 1.0030522, 1.0025938, 1.0016099, 1.0218149, 
+    1.0397644, 1.0087594, 1.0017704, 1.0048593, 1.0113208,
+    1.0401753, 1.0040739, 1.0151312, 1.0120381, 1.0034498, 
+    1.0179943, 1.0160549, 1.0107518, 1.0050004, 0.9997756, 
+    1.0014585, 1.0002573, 1.0113728, 1.0368905, 1.0020098,
+    1.0058891, 1.0008469, 1.0031100, 1.0071503, 1.0083617,
+    1.0062931, 0.9997813, 1.0169052, 0.9998256, 0.9994163,
+    1.0029211, 1.0013409, 1.0073875, 1.0023928, 1.0029867,
+    1.0002895, 1.0018717, 1.0289164;
 
-  size_t index;
-  std::vector<size_t> idxs;
-  idxs.push_back(0);
-  index = c.get_total_param_index(c.param_name_to_index("mu"), 
-                                  idxs);
-  EXPECT_NEAR(450, c.effective_sample_size(index), 1.0) <<
-    "mu.1 sample size should be 13.1";
+  for (int index = 3; index < chains.num_params(); index++) {
+    ASSERT_FLOAT_EQ(rhat(index - 3), chains.split_potential_scale_reduction(index))
+      << "rhat for index: " << index << ", parameter: " 
+      << chains.param_name(index);
+  }
 }
-
 
 /*
 void test_permutation(size_t N) {
