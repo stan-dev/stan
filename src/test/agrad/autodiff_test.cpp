@@ -23,16 +23,26 @@ struct fun2 {
 };
 
 TEST(AgradAutoDiff,gradient) {
+  using Eigen::Matrix;  
+  using Eigen::Dynamic;
   fun1 f;
-  Eigen::Matrix<double,Eigen::Dynamic,1> x(2);
+  Matrix<double,Dynamic,1> x(2);
   x << 5, 7;
   double fx;
-  Eigen::Matrix<double,Eigen::Dynamic,1> grad_fx;
+  Matrix<double,Dynamic,1> grad_fx;
   stan::agrad::gradient(f,x,fx,grad_fx);
   EXPECT_FLOAT_EQ(5 * 5 * 7 + 3 * 7 * 7, fx);
   EXPECT_EQ(2,grad_fx.size());
   EXPECT_FLOAT_EQ(2 * x[0] * x[1], grad_fx[0]);
   EXPECT_FLOAT_EQ(x[0] * x[0] + 3 * 2 * x[1], grad_fx[1]);
+
+  double fx2;
+  Matrix<double,Dynamic,1> grad_fx2;
+  stan::agrad::gradient<fun1,double>(f,x,fx2,grad_fx2);
+  EXPECT_FLOAT_EQ(5 * 5 * 7 + 3 * 7 * 7, fx2);
+  EXPECT_EQ(2,grad_fx2.size());
+  EXPECT_FLOAT_EQ(2 * x[0] * x[1], grad_fx2[0]);
+  EXPECT_FLOAT_EQ(x[0] * x[0] + 3 * 2 * x[1], grad_fx2[1]);
 }
 TEST(AgradAutoDiff,gradientDotVector) {
   using Eigen::Matrix;  using Eigen::Dynamic;
