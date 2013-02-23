@@ -474,7 +474,8 @@ namespace stan {
       
       chains_new(const stan::io::stan_csv& stan_csv) 
 	: param_names_(stan_csv.header) {
-	add(stan_csv.samples);
+	if (stan_csv.samples.rows() > 0)
+	  add(stan_csv.samples);
       }
       
       inline const int num_chains() {

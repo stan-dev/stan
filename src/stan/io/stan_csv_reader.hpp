@@ -172,7 +172,7 @@ namespace stan {
 	std::stringstream ss;
 	std::string line;
 
-	if (in.peek() != '#')
+	if (in.peek() != '#' || in.good() == false)
 	  return false;
 	while (in.peek() == '#') {
 	  std::getline(in, line);
@@ -223,8 +223,9 @@ namespace stan {
 	int rows = 0;	
 	int cols = -1;
 
-	if (in.peek() == '#')
+	if (in.peek() == '#' || in.good() == false)
 	  return false;
+
 	while (in.good()) {
 	  bool comment_line = (in.peek() == '#');
 	  std::getline(in, line);
@@ -243,15 +244,18 @@ namespace stan {
 	  in.peek();
 	}
 	ss.seekg(std::ios_base::beg);
-	
-	samples.resize(rows, cols);
-	char comma;
-	for (int row = 0; row < rows; row++)
-	  for (int col = 0; col < cols; col++) {
-	    ss >> samples(row,col);
-	    if (col != cols-1)
-	      ss >> comma;
+
+	if (rows > 0) {
+	  samples.resize(rows, cols);
+	  char comma;
+	  for (int row = 0; row < rows; row++) {
+	    for (int col = 0; col < cols; col++) {
+	      ss >> samples(row,col);
+	      if (col != cols-1)
+		ss >> comma;
+	    }
 	  }
+	}
 	return true;
       }
 
@@ -272,8 +276,7 @@ namespace stan {
 	  std::cout << "Warning: non-fatal error reading adapation data" << std::endl;
 	}
 	if (!read_samples(in, data.samples)) {
-	  std::cout << "Error: error reading samples" << std::endl;
-	  throw std::invalid_argument("Error with samples of input file in parse");
+	  std::cout << "Warning: non-fatal error reading samples" << std::endl;
 	}
 	return data;
       }
