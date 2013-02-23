@@ -366,6 +366,78 @@ namespace stan {
 	return q;
       }
 
+      Eigen::VectorXd autocorrelation(const Eigen::VectorXd& x) {
+	std::vector<double> ac;
+	std::vector<double> sample(x.size());
+	for (int i = 0; i < x.size(); i++)
+	  sample[i] = x(i);
+	stan::prob::autocorrelation(sample, ac);
+
+	Eigen::VectorXd ac2(ac.size());
+	for (int i = 0; i < ac.size(); i++)
+	  ac2(i) = ac[i];
+	return ac2;
+      }
+
+      Eigen::VectorXd autocovariance(const Eigen::VectorXd& x) {
+	std::vector<double> ac;
+	std::vector<double> sample(x.size());
+	for (int i = 0; i < x.size(); i++)
+	  sample[i] = x(i);
+	stan::prob::autocovariance(sample, ac);
+
+	Eigen::VectorXd ac2(ac.size());
+	for (int i = 0; i < ac.size(); i++)
+	  ac2(i) = ac[i];
+	return ac2;
+      }
+
+      double effective_sample_size(const Eigen::Matrix<Eigen::VectorXd, Eigen::Dynamic, 1> &samples) {
+	int chains = samples.size();
+	
+        // need to generalize to each jagged samples per chain
+        int n_samples = samples(0).size();
+        for (int chain = 1; chain < chains; chain++) {
+          n_samples = std::min(n_samples, int(samples(chain).size()));
+        }
+
+	Eigen::Matrix<Eigen::VectorXd, Eigen::Dynamic, 1> acov(chains);
+	for (int chain = 0; chain < chains; chain++) {
+	  acov(chain) = autocovariance(samples(chain));
+	}
+	
+	Eigen::VectorXd chain_mean(chains);
+	Eigen::VectorXd chain_var(chains);
+        for (int chain = 0; chain < chains; chain++) {
+          double n_kept_samples = num_kept_samples(chain);
+          chain_mean(chain) = samples(chain).mean();
+          chain_var(chain) = acov(chain)(0)*n_kept_samples/(n_kept_samples-1);
+        }
+      
+	double mean_var = chain_var.mean();
+        double var_plus = mean_var*(n_samples-1)/n_samples;
+        if (chains > 1) 
+	  var_plus += variance(chain_mean);
+        Eigen::VectorXd rho_hat_t(n_samples);
+	rho_hat_t.setZero();
+        double rho_hat = 0;
+	int max_t = 0;
+        for (int t = 1; (t < n_samples && rho_hat >= 0); t++) {
+	  Eigen::VectorXd acov_t(chains);
+          for (int chain = 0; chain < chains; chain++) {
+            acov_t(chain) = acov(chain)(t);
+          }
+          rho_hat = 1 - (mean_var - acov_t.mean()) / var_plus;
+          if (rho_hat >= 0)
+            rho_hat_t(t) = rho_hat;
+	  max_t = t;
+        }
+        double ess = chains * n_samples;
+        if (max_t > 1) {
+          ess /= 1 + 2 * rho_hat_t.sum();
+        }
+        return ess;
+      }
       
     public:
       chains_new(const Eigen::Matrix<std::string, Eigen::Dynamic, 1>& param_names) 
@@ -575,36 +647,22 @@ namespace stan {
       }
 
       Eigen::VectorXd autocorrelation(int chain, int index) {
-	std::vector<double> ac;
-	std::vector<double> sample(num_kept_samples(chain));
-	Eigen::VectorXd s = samples(chain,index);
-	for (int i = 0; i < num_kept_samples(chain); i++)
-	  sample[i] = s(i);
-	stan::prob::autocorrelation(sample, ac);
-
-	Eigen::VectorXd ac2(ac.size());
-	for (int i = 0; i < ac.size(); i++)
-	  ac2(i) = ac[i];
-	return ac2;
+	return autocorrelation(samples(chain,index));
       }
       
       Eigen::VectorXd autocovariance(int chain, int index) {
-	std::vector<double> ac;
-	std::vector<double> sample(num_kept_samples(chain));
-	Eigen::VectorXd s = samples(chain,index);
-	for (int i = 0; i < num_kept_samples(chain); i++)
-	  sample[i] = s(i);
-	stan::prob::autocovariance(sample, ac);
+	return autocovariance(samples(chain,index));
+      }
 
-	Eigen::VectorXd ac2(ac.size());
-	for (int i = 0; i < ac.size(); i++)
-	  ac2(i) = ac[i];
-	return ac2;
+      // FIXME: reimplement using autocorrelation.
+      double effective_sample_size(int index) {
+	Eigen::Matrix<Eigen::VectorXd, Eigen::Dynamic, 1> samples(num_chains());
+	for (int chain = 0; chain < num_chains(); chain++) {
+	  samples(chain) = this->samples(chain, index);
+	}
+	return effective_sample_size(samples);
       }
       
-
-      // autocovariance
-      // effective_sample_size
       // split_potential_scale_reduction
 
      

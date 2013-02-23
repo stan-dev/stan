@@ -605,6 +605,52 @@ TEST_F(McmcChains_New, blocker_autocovariance) {
   EXPECT_NEAR(-0.0028139251, ac[30], 0.01);
 }
 
+TEST_F(McmcChains_New,blocker_effective_sample_size) {
+  stan::io::stan_csv blocker1 = stan::io::stan_csv_reader::parse(blocker1_stream);
+  stan::io::stan_csv blocker2 = stan::io::stan_csv_reader::parse(blocker2_stream);
+  
+  stan::mcmc::chains_new<> chains(blocker1);
+  chains.add(blocker2);
+
+  Eigen::VectorXd n_eff(48);
+  n_eff << 
+    431,136,450,121,258,
+    202,287,615,107,131,
+    39,573,608,538,412,
+    32,199,106,153,298,
+    105,155,340,475,806,
+    518,657,277,149,979,
+    150,741,923,647,473,
+    638,796,62,709,551,
+    687,933,798,574,377,
+    457,650,44;
+
+  for (int index = 3; index < chains.num_params(); index++) {
+    ASSERT_NEAR(n_eff(index - 3), chains.effective_sample_size(index), 1.0)
+      << "n_effective for index: " << index << ", parameter: " 
+      << chains.param_name(index);
+  }
+}
+
+TEST(McmcChains,effective_sample_size) {
+  std::vector<std::string> names;
+  std::vector<std::vector<size_t> > dimss;
+  stan::mcmc::read_variables("src/test/mcmc/test_csv_files/blocker.1.csv", 2,
+                             names, dimss);
+
+  stan::mcmc::chains<> c(2, names, dimss);
+  add_chain(c, 0, "src/test/mcmc/test_csv_files/blocker.1.csv", 2);
+  add_chain(c, 1, "src/test/mcmc/test_csv_files/blocker.2.csv", 2);
+
+  size_t index;
+  std::vector<size_t> idxs;
+  idxs.push_back(0);
+  index = c.get_total_param_index(c.param_name_to_index("mu"), 
+                                  idxs);
+  EXPECT_NEAR(450, c.effective_sample_size(index), 1.0) <<
+    "mu.1 sample size should be 13.1";
+}
+
 
 /*
 void test_permutation(size_t N) {
@@ -1466,30 +1512,6 @@ TEST(McmcChains,autocovariance) {
    EXPECT_NEAR(0.90, ac[5], 0.01);
 }
 
-TEST(McmcChains,effective_sample_size) {
-  std::vector<std::string> names;
-  std::vector<std::vector<size_t> > dimss;
-  stan::mcmc::read_variables("src/test/mcmc/test_csv_files/blocker1.csv", 2,
-                             names, dimss);
-
-  stan::mcmc::chains<> c(2, names, dimss);
-  add_chain(c, 0, "src/test/mcmc/test_csv_files/blocker1.csv", 2);
-  add_chain(c, 1, "src/test/mcmc/test_csv_files/blocker2.csv", 2);
-
-  size_t index;
-  std::vector<size_t> idxs;
-  idxs.push_back(0);
-  index = c.get_total_param_index(c.param_name_to_index("mu"), 
-                                  idxs);
-  EXPECT_NEAR(13.08, c.effective_sample_size(index), 0.01) <<
-    "mu.1 sample size should be 13.1";
-  idxs.clear();
-  idxs.push_back(21);
-  index = c.get_total_param_index(c.param_name_to_index("delta"), 
-                                  idxs);
-  EXPECT_NEAR(43.02,  c.effective_sample_size(index), 0.01) <<
-    "delta.22 sample size should be 43.0";
-}
 TEST(McmcChains,split_potential_scale_reduction) {
   std::vector<std::string> names;
   std::vector<std::vector<size_t> > dimss;
