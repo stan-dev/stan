@@ -526,6 +526,84 @@ TEST_F(McmcChains_New, blocker_central_interval) {
   EXPECT_NEAR(-2.71573, interval(0), 1e-2); // 0.2
   EXPECT_NEAR(-2.08649, interval(1), 1e-2); // 0.8
 }
+TEST_F(McmcChains_New, blocker_autocorrelation) {
+  stan::io::stan_csv blocker1 = stan::io::stan_csv_reader::parse(blocker1_stream);
+  
+  stan::mcmc::chains_new<> chains(blocker1);
+  Eigen::VectorXd ac;
+  EXPECT_NO_THROW(ac = chains.autocorrelation(0,5));
+
+  EXPECT_NEAR(1.0, ac[0], 0.01);  
+  EXPECT_NEAR(0.277, ac[1], 0.01);
+  EXPECT_NEAR(0.197, ac[2], 0.01);
+  EXPECT_NEAR(0.123, ac[3], 0.01);
+  EXPECT_NEAR(0.087, ac[4], 0.01);
+  EXPECT_NEAR(0.096, ac[5], 0.01);
+  EXPECT_NEAR(0.100, ac[6], 0.01);
+  EXPECT_NEAR(0.007, ac[7], 0.01);
+  EXPECT_NEAR(0.052, ac[8], 0.01);
+  EXPECT_NEAR(0.038, ac[9], 0.01);
+  EXPECT_NEAR(-0.007, ac[10], 0.01);
+  EXPECT_NEAR(0.070, ac[11], 0.01);
+  EXPECT_NEAR(0.004, ac[12], 0.01);
+  EXPECT_NEAR(0.019, ac[13], 0.01);
+  EXPECT_NEAR(0.003, ac[14], 0.01);
+  EXPECT_NEAR(-0.035, ac[15], 0.01);
+  EXPECT_NEAR(-0.076, ac[16], 0.01);
+  EXPECT_NEAR(-0.048, ac[17], 0.01);
+  EXPECT_NEAR(-0.097, ac[18], 0.01);
+  EXPECT_NEAR(-0.014, ac[19], 0.01);
+  EXPECT_NEAR(-0.065, ac[20], 0.01);
+  EXPECT_NEAR(-0.069, ac[21], 0.01);
+  EXPECT_NEAR(-0.004, ac[22], 0.01);
+  EXPECT_NEAR(-0.084, ac[23], 0.01);
+  EXPECT_NEAR(-0.005, ac[24], 0.01);
+  EXPECT_NEAR(0.031, ac[25], 0.01);
+  EXPECT_NEAR(0.002, ac[26], 0.01);
+  EXPECT_NEAR(-0.019, ac[27], 0.01);
+  EXPECT_NEAR(0.002, ac[28], 0.01);
+  EXPECT_NEAR(-0.011, ac[29], 0.01);
+  EXPECT_NEAR(-0.016, ac[30], 0.01);
+}
+TEST_F(McmcChains_New, blocker_autocovariance) {
+  stan::io::stan_csv blocker1 = stan::io::stan_csv_reader::parse(blocker1_stream);
+  
+  stan::mcmc::chains_new<> chains(blocker1);
+  Eigen::VectorXd ac;
+  EXPECT_NO_THROW(ac = chains.autocovariance(0,5));
+
+  EXPECT_NEAR( 0.1728635075, ac[0], 0.01);  
+  EXPECT_NEAR( 0.0479453913, ac[1], 0.01);
+  EXPECT_NEAR( 0.0339712275, ac[2], 0.01);
+  EXPECT_NEAR( 0.0213133322, ac[3], 0.01);
+  EXPECT_NEAR( 0.0150613410, ac[4], 0.01);
+  EXPECT_NEAR( 0.0166353592, ac[5], 0.01);
+  EXPECT_NEAR( 0.0173524816, ac[6], 0.01);
+  EXPECT_NEAR( 0.0011691359, ac[7], 0.01);
+  EXPECT_NEAR( 0.0089205594, ac[8], 0.01);
+  EXPECT_NEAR( 0.0065516382, ac[9], 0.01);
+  EXPECT_NEAR(-0.0012707460, ac[10], 0.01);
+  EXPECT_NEAR( 0.0120453780, ac[11], 0.01);
+  EXPECT_NEAR( 0.0007551419, ac[12], 0.01);
+  EXPECT_NEAR( 0.0032945508, ac[13], 0.01);
+  EXPECT_NEAR( 0.0005656385, ac[14], 0.01);
+  EXPECT_NEAR(-0.0060412611, ac[15], 0.01);
+  EXPECT_NEAR(-0.0131231022, ac[16], 0.01);
+  EXPECT_NEAR(-0.0083577880, ac[17], 0.01);
+  EXPECT_NEAR(-0.0168234290, ac[18], 0.01);
+  EXPECT_NEAR(-0.0024401327, ac[19], 0.01);
+  EXPECT_NEAR(-0.0112285003, ac[20], 0.01);
+  EXPECT_NEAR(-0.0120031605, ac[21], 0.01);
+  EXPECT_NEAR(-0.0007499154, ac[22], 0.01);
+  EXPECT_NEAR(-0.0144821063, ac[23], 0.01);
+  EXPECT_NEAR(-0.0008450844, ac[24], 0.01);
+  EXPECT_NEAR( 0.0054121234, ac[25], 0.01);
+  EXPECT_NEAR( 0.0003861726, ac[26], 0.01);
+  EXPECT_NEAR(-0.0032979440, ac[27], 0.01);
+  EXPECT_NEAR( 0.0003806655, ac[28], 0.01);
+  EXPECT_NEAR(-0.0019447624, ac[29], 0.01);
+  EXPECT_NEAR(-0.0028139251, ac[30], 0.01);
+}
 
 
 /*

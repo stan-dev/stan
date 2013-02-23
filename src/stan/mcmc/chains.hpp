@@ -574,8 +574,35 @@ namespace stan {
 	return interval;
       }
 
-      // central_interval
-      // autocorrelation
+      Eigen::VectorXd autocorrelation(int chain, int index) {
+	std::vector<double> ac;
+	std::vector<double> sample(num_kept_samples(chain));
+	Eigen::VectorXd s = samples(chain,index);
+	for (int i = 0; i < num_kept_samples(chain); i++)
+	  sample[i] = s(i);
+	stan::prob::autocorrelation(sample, ac);
+
+	Eigen::VectorXd ac2(ac.size());
+	for (int i = 0; i < ac.size(); i++)
+	  ac2(i) = ac[i];
+	return ac2;
+      }
+      
+      Eigen::VectorXd autocovariance(int chain, int index) {
+	std::vector<double> ac;
+	std::vector<double> sample(num_kept_samples(chain));
+	Eigen::VectorXd s = samples(chain,index);
+	for (int i = 0; i < num_kept_samples(chain); i++)
+	  sample[i] = s(i);
+	stan::prob::autocovariance(sample, ac);
+
+	Eigen::VectorXd ac2(ac.size());
+	for (int i = 0; i < ac.size(); i++)
+	  ac2(i) = ac[i];
+	return ac2;
+      }
+      
+
       // autocovariance
       // effective_sample_size
       // split_potential_scale_reduction
