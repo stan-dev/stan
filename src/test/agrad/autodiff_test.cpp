@@ -203,3 +203,18 @@ TEST(AgradAutodiff,hessian) {
 
 }
   
+TEST(AgradAutodiff,GradientTraceMatrixTimesHessian) {
+  using Eigen::Matrix;
+  using Eigen::Dynamic;
+  Matrix<double,Dynamic,Dynamic> M(2,2);
+  M << 11, 13, 17, 23;
+  fun1 f;
+  Matrix<double,Dynamic,1> x(2);
+  x << 5, 7;
+  Matrix<double,Dynamic,1> grad_tr_MH;
+  stan::agrad::grad_tr_mat_times_hessian(f,x,M,grad_tr_MH);
+
+  EXPECT_EQ(2,grad_tr_MH.size());
+  EXPECT_FLOAT_EQ(60,grad_tr_MH(0));
+  EXPECT_FLOAT_EQ(22,grad_tr_MH(1));
+}
