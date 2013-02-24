@@ -245,6 +245,16 @@ TEST_F(McmcChains_New, blocker_mean) {
     ASSERT_FLOAT_EQ((means1(j) + means2(j)) * 0.5, chains.mean(j))
       << "3: param mean with warmup";
   }
+
+  for (int j = 0; j < chains.num_params(); j++) {
+    std::string param_name = chains.param_name(j);
+    ASSERT_FLOAT_EQ(chains.mean(0,j), chains.mean(0,param_name))
+      << "4: chain mean 0 called with string name: " << param_name;
+    ASSERT_FLOAT_EQ(chains.mean(1,j), chains.mean(1,param_name))
+      << "4: chain mean 1 called with string name: " << param_name;
+    ASSERT_FLOAT_EQ(chains.mean(j), chains.mean(param_name))
+      << "4: mean called with string name: " << param_name;
+  }
 }
 
 double sd(Eigen::VectorXd x) {
@@ -290,6 +300,17 @@ TEST_F(McmcChains_New, blocker_sd) {
     ASSERT_NEAR(sd(x), chains.sd(j), 1e-8)
       << "3: param sd with warmup";
   }
+
+  for (int j = 0; j < chains.num_params(); j++) {
+    std::string param_name = chains.param_name(j);
+    ASSERT_FLOAT_EQ(chains.sd(0,j), chains.sd(0,param_name))
+      << "4: chain sd 0 called with string name: " << param_name;
+    ASSERT_FLOAT_EQ(chains.sd(1,j), chains.sd(1,param_name))
+      << "4: chain sd 1 called with string name: " << param_name;
+    ASSERT_FLOAT_EQ(chains.sd(j), chains.sd(param_name))
+      << "4: sd called with string name: " << param_name;
+  }
+
 }
 
 
@@ -336,6 +357,17 @@ TEST_F(McmcChains_New, blocker_variance) {
     ASSERT_NEAR(variance(x), chains.variance(j), 1e-8)
       << "3: param variance with warmup";
   }
+
+  for (int j = 0; j < chains.num_params(); j++) {
+    std::string param_name = chains.param_name(j);
+    ASSERT_FLOAT_EQ(chains.variance(0,j), chains.variance(0,param_name))
+      << "4: chain variance 0 called with string name: " << param_name;
+    ASSERT_FLOAT_EQ(chains.variance(1,j), chains.variance(1,param_name))
+      << "4: chain variance 1 called with string name: " << param_name;
+    ASSERT_FLOAT_EQ(chains.variance(j), chains.variance(param_name))
+      << "4: variance called with string name: " << param_name;
+  }
+
 }
 
 double covariance(Eigen::VectorXd x, Eigen::VectorXd y) {
@@ -377,6 +409,12 @@ TEST_F(McmcChains_New, blocker_covariance) {
 	ASSERT_NEAR(cov1, chains.covariance(0,j,i), 1e-8);
 	ASSERT_NEAR(cov2, chains.covariance(1,j,i), 1e-8);
 	ASSERT_NEAR(cov, chains.covariance(j,i), 1e-8);
+
+	std::string name1 = chains.param_name(i);
+	std::string name2 = chains.param_name(j);
+	ASSERT_FLOAT_EQ(chains.covariance(0,i,j), chains.covariance(0,name1,name2));
+	ASSERT_FLOAT_EQ(chains.covariance(1,j,i), chains.covariance(1,name2,name1));
+	ASSERT_FLOAT_EQ(chains.covariance(i,j), chains.covariance(name1,name2));
       }
     }
   }
@@ -433,6 +471,12 @@ TEST_F(McmcChains_New, blocker_correlation) {
 	  << "(" << i << ", " << j << ")";
 	ASSERT_NEAR(corr, chains.correlation(j,i), 1e-8)
 	  << "(" << i << ", " << j << ")";
+	
+	std::string name1 = chains.param_name(i);
+	std::string name2 = chains.param_name(j);
+	ASSERT_FLOAT_EQ(chains.correlation(0,i,j), chains.correlation(0,name1,name2));
+	ASSERT_FLOAT_EQ(chains.correlation(1,j,i), chains.correlation(1,name2,name1));
+	ASSERT_FLOAT_EQ(chains.correlation(i,j), chains.correlation(name1,name2));
       }
     }
   }
@@ -465,6 +509,15 @@ TEST_F(McmcChains_New, blocker_quantile) {
   EXPECT_NEAR(-2.22837, chains.quantile(index,0.7), 1e-2);
   EXPECT_NEAR(-2.08649, chains.quantile(index,0.8), 1e-2);
   EXPECT_NEAR(-1.90839, chains.quantile(index,0.9), 1e-2);
+
+  std::string name = chains.param_name(index);
+  EXPECT_FLOAT_EQ(chains.quantile(0,index,0.1), chains.quantile(0,name,0.1));
+  EXPECT_FLOAT_EQ(chains.quantile(0,index,0.3), chains.quantile(0,name,0.3));  
+  EXPECT_FLOAT_EQ(chains.quantile(0,index,0.5), chains.quantile(0,name,0.5));
+
+  EXPECT_FLOAT_EQ(chains.quantile(index,0.2), chains.quantile(name,0.2));
+  EXPECT_FLOAT_EQ(chains.quantile(index,0.4), chains.quantile(name,0.4));  
+  EXPECT_FLOAT_EQ(chains.quantile(index,0.6), chains.quantile(name,0.6));
 }
 
 TEST_F(McmcChains_New, blocker_quantiles) {
@@ -506,6 +559,25 @@ TEST_F(McmcChains_New, blocker_quantiles) {
   EXPECT_NEAR(-2.08649, quantiles(7), 1e-2);
   EXPECT_NEAR(-1.90839, quantiles(8), 1e-2);
 
+
+  std::string name = chains.param_name(index);
+  Eigen::VectorXd quantiles_by_name;
+  quantiles = chains.quantiles(0,index,probs);
+  quantiles_by_name = chains.quantiles(0,name,probs);
+  
+  ASSERT_EQ(quantiles.size(), quantiles_by_name.size());
+  for (int i = 0; i < quantiles.size(); i++) {
+    EXPECT_FLOAT_EQ(quantiles(i), quantiles_by_name(i));
+  }
+
+  quantiles = chains.quantiles(index,probs);
+  quantiles_by_name = chains.quantiles(name,probs);
+  
+  ASSERT_EQ(quantiles.size(), quantiles_by_name.size());
+  for (int i = 0; i < quantiles.size(); i++) {
+    EXPECT_FLOAT_EQ(quantiles(i), quantiles_by_name(i));
+  }
+
 }
 TEST_F(McmcChains_New, blocker_central_interval) {
   stan::io::stan_csv blocker1 = stan::io::stan_csv_reader::parse(blocker1_stream);
@@ -525,6 +597,20 @@ TEST_F(McmcChains_New, blocker_central_interval) {
   // R's quantile function
   EXPECT_NEAR(-2.71573, interval(0), 1e-2); // 0.2
   EXPECT_NEAR(-2.08649, interval(1), 1e-2); // 0.8
+
+  std::string name = chains.param_name(index);
+  Eigen::VectorXd interval_by_name;
+  interval = chains.central_interval(0,index,0.6);
+  interval_by_name = chains.central_interval(0,name,0.6);
+  ASSERT_EQ(2, interval_by_name.size());
+  EXPECT_FLOAT_EQ(interval(0), interval_by_name(0));
+  EXPECT_FLOAT_EQ(interval(1), interval_by_name(1));
+
+  interval = chains.central_interval(index,0.6);
+  interval_by_name = chains.central_interval(name,0.6);
+  ASSERT_EQ(2, interval_by_name.size());
+  EXPECT_FLOAT_EQ(interval(0), interval_by_name(0));
+  EXPECT_FLOAT_EQ(interval(1), interval_by_name(1));
 }
 TEST_F(McmcChains_New, blocker_autocorrelation) {
   stan::io::stan_csv blocker1 = stan::io::stan_csv_reader::parse(blocker1_stream);
@@ -564,6 +650,14 @@ TEST_F(McmcChains_New, blocker_autocorrelation) {
   EXPECT_NEAR(0.002, ac[28], 0.01);
   EXPECT_NEAR(-0.011, ac[29], 0.01);
   EXPECT_NEAR(-0.016, ac[30], 0.01);
+
+  std::string name = chains.param_name(5);
+  Eigen::VectorXd ac_by_name;
+  EXPECT_NO_THROW(ac_by_name = chains.autocorrelation(0,name));
+  ASSERT_EQ(ac.size(), ac_by_name.size());
+  for (int i = 0; i < ac.size(); i++) {
+    EXPECT_FLOAT_EQ(ac(i), ac_by_name(i));
+  }
 }
 TEST_F(McmcChains_New, blocker_autocovariance) {
   stan::io::stan_csv blocker1 = stan::io::stan_csv_reader::parse(blocker1_stream);
@@ -603,6 +697,14 @@ TEST_F(McmcChains_New, blocker_autocovariance) {
   EXPECT_NEAR( 0.0003806655, ac[28], 0.01);
   EXPECT_NEAR(-0.0019447624, ac[29], 0.01);
   EXPECT_NEAR(-0.0028139251, ac[30], 0.01);
+
+  std::string name = chains.param_name(5);
+  Eigen::VectorXd ac_by_name;
+  EXPECT_NO_THROW(ac_by_name = chains.autocovariance(0,name));
+  ASSERT_EQ(ac.size(), ac_by_name.size());
+  for (int i = 0; i < ac.size(); i++) {
+    EXPECT_FLOAT_EQ(ac(i), ac_by_name(i));
+  }
 }
 
 TEST_F(McmcChains_New,blocker_effective_sample_size) {
@@ -629,6 +731,12 @@ TEST_F(McmcChains_New,blocker_effective_sample_size) {
     ASSERT_NEAR(n_eff(index - 3), chains.effective_sample_size(index), 1.0)
       << "n_effective for index: " << index << ", parameter: " 
       << chains.param_name(index);
+  }
+
+  for (int index = 0; index < chains.num_params(); index++) {
+    std::string name = chains.param_name(index);
+    ASSERT_EQ(chains.effective_sample_size(index), 
+	      chains.effective_sample_size(name));
   }
 }
 
@@ -657,6 +765,13 @@ TEST_F(McmcChains_New,blocker_split_potential_scale_reduction) {
       << "rhat for index: " << index << ", parameter: " 
       << chains.param_name(index);
   }
+
+  for (int index = 0; index < chains.num_params(); index++) {
+    std::string name = chains.param_name(index);
+    ASSERT_EQ(chains.split_potential_scale_reduction(index), 
+	      chains.split_potential_scale_reduction(name));
+  }
+
 }
 
 /*
