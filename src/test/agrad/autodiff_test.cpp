@@ -1,6 +1,14 @@
 #include <gtest/gtest.h>
 #include <stan/agrad/autodiff.hpp>
 
+struct fun0 {
+  template <typename T>
+  inline
+  T operator()(const T& x) const {
+    return 5.0 * x * x * x;
+  }
+};
+
 // fun1(x,y) = (x^2 * y) + (3 * y^2)
 struct fun1 {
   template <typename T>
@@ -21,6 +29,36 @@ struct fun2 {
     return z;
   }
 };
+
+TEST(AgradAutoDiff,derivative) {
+  fun0 f;
+  double x = 7;
+  double fx;
+  double d;
+  stan::agrad::derivative(f,x,fx,d);
+  EXPECT_FLOAT_EQ(fx, 5 * 7 * 7 * 7);
+  EXPECT_FLOAT_EQ(d, 5 * 3 * 7 * 7);
+}
+
+TEST(AgradAutoDiff,partialDerivative) {
+  using Eigen::Matrix;
+  using Eigen::Dynamic;
+  fun1 f;
+  Matrix<double,Dynamic,1> x(2);
+  x << 5, 7;
+  
+  double fx;
+  double d;
+  stan::agrad::partial_derivative(f,x,0,fx,d);
+  EXPECT_FLOAT_EQ(5 * 5 * 7 + 3 * 7 * 7,fx);
+  EXPECT_FLOAT_EQ(2 * 5 * 7, d);
+
+  double fx2;
+  double d2;
+  stan::agrad::partial_derivative(f,x,1,fx2,d2);
+  EXPECT_FLOAT_EQ(5 * 5 * 7 + 3 * 7 * 7,fx);
+  EXPECT_FLOAT_EQ(5 * 5 + 3 * 2 * 7,d2);
+}
 
 TEST(AgradAutoDiff,gradient) {
   using Eigen::Matrix;  
