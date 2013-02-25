@@ -24,12 +24,12 @@ public:
     return true;
   }
 
-  static size_t num_iterations() {
-    return 2000U;
+  static int num_iterations() {
+    return 2000;
   }
 
-  static std::vector<size_t> skip_chains_test() {
-    std::vector<size_t> params_to_skip;
+  static std::vector<int> skip_chains_test() {
+    std::vector<int> params_to_skip;
     return params_to_skip;
   }
 
@@ -37,16 +37,16 @@ public:
     default_populate_chains();
   }
 
-  static std::vector<std::pair<size_t, double> >
+  static std::vector<std::pair<int, double> >
   get_expected_values() {
     using std::make_pair;
-    std::vector<std::pair<size_t, double> > expected_values;
+    std::vector<std::pair<int, double> > expected_values;
     
-    expected_values.push_back(make_pair(0U, -0.2446));  // alpha
-    expected_values.push_back(make_pair(2U, 0.7833));   // A
+    expected_values.push_back(make_pair(chains->index("alpha"), -0.2446));  // alpha
+    expected_values.push_back(make_pair(chains->index("A"), 0.7833));   // A
 
-    expected_values.push_back(make_pair(1U, -0.07886)); // beta
-    expected_values.push_back(make_pair(3U, 0.9242));   // B
+    expected_values.push_back(make_pair(chains->index("beta"), -0.07886)); // beta
+    expected_values.push_back(make_pair(chains->index("B"), 0.9242));   // B
 
     return expected_values;
   }
