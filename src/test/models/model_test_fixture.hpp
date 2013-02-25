@@ -326,7 +326,7 @@ TYPED_TEST_P(Model_Test_Fixture, ChainsTest) {
     for (int param = TypeParam::skip; param < num_params; param++) {
       if (!std::binary_search(params_to_skip.begin(), params_to_skip.end(), param)) {
 	EXPECT_GT(c->variance(chain, param), 0)
-	  << "Chain " << chain << ", param " << param
+	  << "Chain " << chain << ", param " << param << ", name " << c->param_name(param)
 	  << ": variance is 0" << std::endl
 	  << err_message[chain];
       }

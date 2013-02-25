@@ -24,18 +24,13 @@ public:
     return true;
   }
 
-  static size_t num_iterations() {
-    return 8000U;
+  static int num_iterations() {
+    return 8000;
   }
 
-  static std::vector<size_t> skip_chains_test() {
-    std::vector<size_t> params_to_skip;
-    std::vector<size_t> dims;
-    size_t index;
-    dims.push_back(4);
-    index = chains->get_total_param_index(chains->param_name_to_index("logRR"),
-					  dims);
-    params_to_skip.push_back(index);
+  static std::vector<int> skip_chains_test() {
+    std::vector<int> params_to_skip;
+    params_to_skip.push_back(chains->index("logRR[5]"));
     return params_to_skip;
   }
 
@@ -43,32 +38,24 @@ public:
     default_populate_chains();
   }
 
-  static std::vector<std::pair<size_t, double> >
+  static std::vector<std::pair<int, double> >
   get_expected_values() {
     using std::make_pair;
-    size_t index;
-    std::vector<size_t> dims;
-    dims.push_back(0);
+    std::vector<std::pair<int, double> > expected_values;
 
-    std::vector<std::pair<size_t, double> > expected_values;
-
-    index = chains->get_total_param_index(chains->param_name_to_index("logRR"),
-					  dims);
-    expected_values.push_back(make_pair(index + 0U, -1.075));
-    expected_values.push_back(make_pair(index + 1U, -0.7717));
-    expected_values.push_back(make_pair(index + 2U, -0.4721));
-    expected_values.push_back(make_pair(index + 3U, -0.2016));
+    expected_values.push_back(make_pair(chains->index("logRR[1]"), -1.075));
+    expected_values.push_back(make_pair(chains->index("logRR[2]"), -0.7717));
+    expected_values.push_back(make_pair(chains->index("logRR[3]"), -0.4721));
+    expected_values.push_back(make_pair(chains->index("logRR[4]"), -0.2016));
     
-    expected_values.push_back(make_pair(index + 5U, 0.1588));
-    expected_values.push_back(make_pair(index + 6U, 0.319));
-    expected_values.push_back(make_pair(index + 7U, 0.4829));
-    expected_values.push_back(make_pair(index + 8U, 0.6512));
-    expected_values.push_back(make_pair(index + 9U, 0.8466));
-    expected_values.push_back(make_pair(index +10U, 1.059));
+    expected_values.push_back(make_pair(chains->index("logRR[6]"), 0.1588));
+    expected_values.push_back(make_pair(chains->index("logRR[7]"), 0.319));
+    expected_values.push_back(make_pair(chains->index("logRR[8]"), 0.4829));
+    expected_values.push_back(make_pair(chains->index("logRR[9]"), 0.6512));
+    expected_values.push_back(make_pair(chains->index("logRR[10]"), 0.8466));
+    expected_values.push_back(make_pair(chains->index("logRR[11]"), 1.059));
 
-    index = chains->get_total_param_index(chains->param_name_to_index("sigma"),
-					  dims);
-    expected_values.push_back(make_pair(index, 0.05286));
+    expected_values.push_back(make_pair(chains->index("sigma"), 0.05286));
     
     return expected_values;
   }
