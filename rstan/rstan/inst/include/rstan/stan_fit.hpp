@@ -2,30 +2,20 @@
 #ifndef __RSTAN__STAN_FIT_HPP__
 #define __RSTAN__STAN_FIT_HPP__
 
-#include <cmath>
-#include <cstddef>
-#include <ctime>
 #include <iomanip>
-#include <iostream>
-#include <fstream>
 #include <sstream>
-#include <vector>
+#include <boost/date_time/posix_time/posix_time_types.hpp>
+#include <fstream>
 #include <boost/random/additive_combine.hpp> // L'Ecuyer RNG
-//#include <boost/random/mersenne_twister.hpp>
-#include <boost/random/uniform_01.hpp>
 #include <boost/random/uniform_real_distribution.hpp>
-//#include <boost/random/uniform_int_distribution.hpp>
 #include <stan/version.hpp>
-//#include <stan/io/cmd_line.hpp>
+#include <stan/io/cmd_line.hpp>
 #include <stan/io/dump.hpp>
-#include <stan/mcmc/adaptive_sampler.hpp>
 #include <stan/mcmc/adaptive_hmc.hpp>
-#include <stan/mcmc/hmc.hpp>
 #include <stan/mcmc/nuts.hpp>
 #include <stan/mcmc/nuts_diag.hpp>
-#include <stan/model/prob_grad_ad.hpp>
-#include <stan/model/prob_grad.hpp>
-#include <stan/mcmc/sampler.hpp>
+#include <stan/mcmc/nuts_nondiag.hpp>
+#include <stan/mcmc/nuts_massgiven.hpp>
 #include <stan/optimization/newton.hpp>
 
 #include <rstan/io/rlist_ref_var_context.hpp> 
@@ -571,12 +561,12 @@ namespace rstan {
       if (0 > leapfrog_steps && !equal_step_sizes) {
         // NUTS II (with diagonal mass matrix estimation during warmup)
         args.set_sampler("NUTS2"); 
-        stan::mcmc::nuts_diag<rng_t> nuts2_sampler(model, 
+        stan::mcmc::nuts_diag<rng_t> nuts2_sampler(model,params_r,params_i, 
                                                    max_treedepth, epsilon, 
                                                    epsilon_pm, epsilon_adapt,
                                                    delta, gamma, 
-                                                   base_rng, 
-                                                   &params_r, &params_i);
+                                                   base_rng);
+
 
         nuts2_sampler.get_sampler_param_names(sampler_param_names);
         for (size_t i = 0; i < sampler_param_names.size(); i++) 
@@ -601,12 +591,11 @@ namespace rstan {
       } else if (0 > leapfrog_steps && equal_step_sizes) {
         // NUTS I (unit mass matrix)
         args.set_sampler("NUTS1"); 
-        stan::mcmc::nuts<rng_t> nuts_sampler(model, 
+        stan::mcmc::nuts<rng_t> nuts_sampler(model, params_r, params_i,
                                              max_treedepth, epsilon, 
                                              epsilon_pm, epsilon_adapt,
                                              delta, gamma, 
-                                             base_rng,
-                                             &params_r, &params_i);
+                                             base_rng);
 
         nuts_sampler.get_sampler_param_names(sampler_param_names);
         for (size_t i = 0; i < sampler_param_names.size(); i++) 
@@ -627,12 +616,11 @@ namespace rstan {
       } else {
         // Stardard HMC
         args.set_sampler("HMC"); 
-        stan::mcmc::adaptive_hmc<rng_t> hmc_sampler(model,
+        stan::mcmc::adaptive_hmc<rng_t> hmc_sampler(model,params_r,params_i,
                                                     leapfrog_steps,
                                                     epsilon, epsilon_pm, epsilon_adapt,
                                                     delta, gamma,
-                                                    base_rng,
-                                                    &params_r, &params_i);
+                                                    base_rng);
 
         hmc_sampler.get_sampler_param_names(sampler_param_names);
         for (size_t i = 0; i < sampler_param_names.size(); i++) 

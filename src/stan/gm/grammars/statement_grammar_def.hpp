@@ -476,7 +476,7 @@ namespace stan {
       printable_string_r.name("printable quoted string");
       printable_string_r
         %= lit('"')
-        > lexeme[*char_("a-zA-Z0-9/~!@#$%^&*()_+`-={}|[]:;'<>?,./ ")]
+        > lexeme[*char_("a-zA-Z0-9/~!@#$%^&*()`_+-={}|[]:;'<>?,./ ")]
         > lit('"');
       
       identifier_r.name("identifier");

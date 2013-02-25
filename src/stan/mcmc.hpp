@@ -5,7 +5,6 @@
 #include "stan/mcmc/adaptive_hmc.hpp"
 #include "stan/mcmc/adaptive_sampler.hpp"
 #include "stan/mcmc/dualaverage.hpp"
-#include "stan/mcmc/hmc.hpp"
 #include "stan/mcmc/nuts.hpp"
 #include "stan/mcmc/sampler.hpp"
 #include "stan/mcmc/util.hpp"

@@ -207,7 +207,7 @@ data_preprocess <- function(data) { # , varnames) {
                    if (is.integer(x)) return(x) 
          
                    # change those integers stored as reals to integers 
-                   if (isTRUE(all.equal(x, round(x), check.attributes = FALSE))) 
+                   if (max(abs(x)) < .Machine$integer.max && isTRUE(all.equal(x, round(x), check.attributes = FALSE))) 
                      storage.mode(x) <- "integer"  
                    return(x) 
                  })   
@@ -431,14 +431,13 @@ function(file, warn = TRUE,
 } 
 
 
-probs2str <- function(probs, digits = 1) {
-  paste(formatC(probs * 100,  
-                digits = digits, 
-                format = 'f', 
-                drop0trailing = TRUE), 
-        "%", sep = '')
-} 
-
+#   probs2str <- function(probs, digits = 1) {
+#     paste(formatC(probs * 100,  
+#                   digits = digits, 
+#                   format = 'f', 
+#                   drop0trailing = TRUE), 
+#           "%", sep = '')
+#   } 
 
 stan_rdump <- function(list, file = "", append = FALSE, 
                        envir = parent.frame(),
@@ -911,7 +910,6 @@ combine_msd_quan <- function(msd, quan) {
 
 summary_sim <- function(sim, pars, probs = default_summary_probs()) {
   # cat("summary_sim is called.\n")
-  probs_str <- probs2str(probs)
   probs_len <- length(probs) 
   pars <- if (missing(pars)) sim$pars_oi else check_pars_second(sim, pars) 
   tidx <- pars_total_indexes(sim$pars_oi, sim$dims_oi, sim$fnames_oi, pars) 
@@ -922,6 +920,7 @@ summary_sim <- function(sim, pars, probs = default_summary_probs()) {
   lmsdq <- lapply(tidx, function(n) get_par_summary(sim, n, probs)) 
   msd <- do.call(rbind, lapply(lmsdq, function(x) x$msd)) 
   quan <- do.call(rbind, lapply(lmsdq, function(x) x$quan)) 
+  probs_str <- colnames(quan)
   dim(msd) <- c(tidx_len, 2) 
   dim(quan) <- c(tidx_len, probs_len) 
   rownames(msd) <- sim$fnames_oi[tidx] 
@@ -961,7 +960,6 @@ summary_sim <- function(sim, pars, probs = default_summary_probs()) {
 
 summary_sim_quan <- function(sim, pars, probs = default_summary_probs()) {
   # cat("summary_sim is called.\n")
-  probs_str <- probs2str(probs)
   probs_len <- length(probs) 
   pars <- if (missing(pars)) sim$pars_oi else check_pars_second(sim, pars) 
   tidx <- pars_total_indexes(sim$pars_oi, sim$dims_oi, sim$fnames_oi, pars) 
@@ -971,6 +969,7 @@ summary_sim_quan <- function(sim, pars, probs = default_summary_probs()) {
   tidx_rowm <- unlist(tidx_rowm, use.names = FALSE)
   lquan <- lapply(tidx, function(n) get_par_summary_quantile(sim, n, probs)) 
   quan <- do.call(rbind, lapply(lquan, function(x) x$quan)) 
+  probs_str <- colnames(quan) 
   dim(quan) <- c(tidx_len, probs_len) 
   rownames(quan) <- sim$fnames_oi[tidx] 
   colnames(quan) <- probs_str 
