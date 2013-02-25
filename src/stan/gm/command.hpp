@@ -192,7 +192,7 @@ namespace stan {
             sampler.write_sampler_params(sample_file_stream);
             sample.params_r(params_r);
             sample.params_i(params_i);
-            model.write_csv(params_r,params_i,sample_file_stream);
+            model.write_csv(params_r,params_i,sample_file_stream,&std::cout);
           } else {
             sampler.next(); // discard
           }
@@ -212,7 +212,7 @@ namespace stan {
             sampler.write_sampler_params(sample_file_stream);
             sample.params_r(params_r);
             sample.params_i(params_i);
-            model.write_csv(params_r,params_i,sample_file_stream);
+            model.write_csv(params_r,params_i,sample_file_stream,&std::cout);
           }
         }
       }
