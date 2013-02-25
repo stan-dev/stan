@@ -62,11 +62,11 @@ int main(int argc, const char* argv[]) {
   }
   
   
-  // read from each file and populate
+  /*// read from each file and populate
   stan::mcmc::chains<> chains(argc-1, names, dimss);
   for (size_t n = 0; n < argc-1; n++) {
     stan::mcmc::add_chain(chains, n, argv[n+1], skip);
-  }
+    }*/
 
   
   // print
@@ -100,7 +100,8 @@ For each parameter, n_eff is a crude measure of effective sample size,
 and Rhat is the potential scale reduction factor on split chains (at 
 convergence, Rhat=1).
    */
-
+  
+  /*
   std::string model_name = "NEED MODEL NAME";
   size_t thin = 0;
   std::vector<size_t> name_lengths(names.size());
@@ -134,6 +135,7 @@ convergence, Rhat=1).
     }
     std::cout << std::endl;
   }
+  */
   /*for (size_t i = 0; i < dimss.size(); i++) {
     for (size_t j = 0; j < dimss[i].size(); j++) {
       
