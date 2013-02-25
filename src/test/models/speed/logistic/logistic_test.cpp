@@ -157,22 +157,28 @@ public:
    * 
    * @return a chain object
    */
-  stan::mcmc::chains<> create_chains(const std::string& filename) {
+  stan::mcmc::chains_new<> create_chains(const std::string& filename) {
     std::stringstream samples;
     samples << path << get_path_separator()
             << filename << ".chain_0.csv";
   
-    std::vector<std::string> names;
-    std::vector<std::vector<size_t> > dimss;
-    stan::mcmc::read_variables(samples.str(), 3U,
-                               names, dimss);
 
-    stan::mcmc::chains<> chains(num_chains, names, dimss);
-    for (size_t chain = 0; chain < num_chains; chain++) {
+
+    std::ifstream ifstream;
+    ifstream.open(samples.str().c_str());
+    stan::io::stan_csv stan_csv = stan::io::stan_csv_reader::parse(ifstream);
+    ifstream.close();
+    
+    stan::mcmc::chains_new<> chains(stan_csv);
+    for (size_t chain = 1; chain < num_chains; chain++) {
       samples.str("");
       samples << path << get_path_separator()
               << filename << ".chain_" << chain << ".csv";
-      stan::mcmc::add_chain(chains, chain, samples.str(), 3U);
+      ifstream.open(samples.str().c_str());
+      stan_csv = stan::io::stan_csv_reader::parse(ifstream);
+      ifstream.close();
+      
+      chains.add(stan_csv);
     }
     return chains;
   }
@@ -230,7 +236,7 @@ public:
 
 
     // 3) Test values of sampled parameters
-    stan::mcmc::chains<> chains = create_chains(filename);
+    stan::mcmc::chains_new<> chains = create_chains(filename);
     int num_failed = 0;
     std::stringstream err_message;
     double alpha = 0.05;
