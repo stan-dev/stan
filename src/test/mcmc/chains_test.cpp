@@ -223,8 +223,7 @@ TEST_F(McmcChains, blocker_mean) {
       << "1: param mean";
   }
 
-  ASSERT_NO_THROW(chains.add(blocker2))
-    << "adding a second chain";
+  chains.add(blocker2);
   Eigen::VectorXd means2 = blocker2.samples.colwise().mean();
   for (int j = 0; j < chains.num_params(); j++) {
     ASSERT_FLOAT_EQ(means2(j), chains.mean(1,j))
@@ -234,7 +233,7 @@ TEST_F(McmcChains, blocker_mean) {
   }
 
 
-  ASSERT_NO_THROW(chains.set_warmup(500));
+  chains.set_warmup(500);
   means1 = blocker1.samples.bottomRows(500).colwise().mean();
   means2 = blocker2.samples.bottomRows(500).colwise().mean();
   for (int j = 0; j < chains.num_params(); j++) {
@@ -275,8 +274,7 @@ TEST_F(McmcChains, blocker_sd) {
       << "1: param sd. index: " << j;
   }
 
-  ASSERT_NO_THROW(chains.add(blocker2))
-    << "adding a second chain";
+  chains.add(blocker2);
   for (int j = 0; j < chains.num_params(); j++) {
     ASSERT_NEAR(sd(blocker2.samples.col(j)), chains.sd(1,j), 1e-8)
       << "2: chain, param sd. index: " << j;
@@ -286,7 +284,7 @@ TEST_F(McmcChains, blocker_sd) {
       << "2: param sd. index: " << j;
   }
   
-  ASSERT_NO_THROW(chains.set_warmup(500));
+  chains.set_warmup(500);
   for (int j = 0; j < chains.num_params(); j++) {
     Eigen::VectorXd x1(500), x2(500), x(1000);
     x1 << blocker1.samples.col(j).bottomRows(500);
@@ -332,8 +330,7 @@ TEST_F(McmcChains, blocker_variance) {
       << "1: param variance. index: " << j;
   }
 
-  ASSERT_NO_THROW(chains.add(blocker2))
-    << "adding a second chain";
+  chains.add(blocker2);
   for (int j = 0; j < chains.num_params(); j++) {
     ASSERT_NEAR(variance(blocker2.samples.col(j)), chains.variance(1,j), 1e-8)
       << "2: chain, param variance. index: " << j;
@@ -343,7 +340,7 @@ TEST_F(McmcChains, blocker_variance) {
       << "2: param variance. index: " << j;
   }
   
-  ASSERT_NO_THROW(chains.set_warmup(500));
+  chains.set_warmup(500);
   for (int j = 0; j < chains.num_params(); j++) {
     Eigen::VectorXd x1(500), x2(500), x(1000);
     x1 << blocker1.samples.col(j).bottomRows(500);
