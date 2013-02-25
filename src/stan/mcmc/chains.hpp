@@ -390,14 +390,24 @@ namespace stan {
 	       const Eigen::MatrixXd& sample) {
 	if (sample.cols() != num_params())
 	  throw std::invalid_argument("add(chain,sample): number of columns in sample does not match chains");
-	if (chain > num_chains()) {
+	if (num_chains() == 0 || chain >= num_chains()) {
+	  int n = num_chains();
+	  
+	  // Need this block for Windows. conservativeResize does not keep the references.
+	  Eigen::Matrix<Eigen::MatrixXd, Eigen::Dynamic, 1> samples_copy(num_chains());
+	  for (int i = 0; i < n; i++)
+	    samples_copy(i) = samples_(i);
+	  
 	  samples_.conservativeResize(chain+1);
 	  warmup_.conservativeResize(chain+1);
+	  for (int i = n; i < chain+1; i++) {
+	    samples_(i) = Eigen::MatrixXd(0, num_params());
+	    warmup_(i) = 0;
+	  }
 	}
 	int row = samples_(chain).rows();
-	samples_(chain).conservativeResize(row+sample.rows(), num_params());
+	samples_(chain).conservativeResize(row+sample.rows(), Eigen::NoChange);
 	samples_(chain).bottomRows(sample.rows()) = sample;
-	warmup_(chain) = 0;
       }
 
       void add(const Eigen::MatrixXd& sample) {
@@ -405,11 +415,7 @@ namespace stan {
 	  return;
 	if (sample.cols() != num_params())
 	  throw std::invalid_argument("add(sample): number of columns in sample does not match chains");
-	int n = num_chains();
-	samples_.conservativeResize(n+1);
-	warmup_.conservativeResize(n+1);
-	samples_(n) = sample;
-	warmup_(n) = 0;
+	add(num_chains(), sample);
       }
 
       void add(const stan::io::stan_csv& stan_csv) {

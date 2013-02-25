@@ -71,7 +71,7 @@ TEST_F(McmcChains, add) {
   EXPECT_EQ(0, chains.num_samples(0));
   EXPECT_EQ(2, chains.num_samples(1));
   EXPECT_EQ(2, chains.num_samples());
-  
+
   EXPECT_NO_THROW(chains.add(3, blocker1.samples))
     << "adding multiple samples to a new chain";
   EXPECT_EQ(4, chains.num_chains());
@@ -100,7 +100,6 @@ TEST_F(McmcChains, add) {
   EXPECT_EQ(2000, chains.num_samples(3));
   EXPECT_EQ(1000, chains.num_samples(4));
   EXPECT_EQ(3002, chains.num_samples());
-
 
   stan::io::stan_csv epil1 = stan::io::stan_csv_reader::parse(epil1_stream);
   theta.resize(epil1.samples.cols());
