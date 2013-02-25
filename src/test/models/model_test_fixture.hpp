@@ -337,7 +337,7 @@ TYPED_TEST_P(Model_Test_Fixture, ChainsTest) {
     if (std::find(params_to_skip.begin(), params_to_skip.end(), param) == params_to_skip.end()) {
       // made this 1.5 to fail less often
       EXPECT_LT(c->split_potential_scale_reduction(param), 1.5) 
-	<< "Param " << param
+	<< "Param " << param << ", " << c->param_name(param)
 	<< ": split r hat > 1.5" << std::endl;
     }
   }
