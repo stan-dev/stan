@@ -395,19 +395,27 @@ namespace stan {
 	  
 	  // Need this block for Windows. conservativeResize does not keep the references.
 	  Eigen::Matrix<Eigen::MatrixXd, Eigen::Dynamic, 1> samples_copy(num_chains());
-	  for (int i = 0; i < n; i++)
+	  Eigen::VectorXi warmup_copy(num_chains());
+	  for (int i = 0; i < n; i++) {
 	    samples_copy(i) = samples_(i);
+	    warmup_copy(i) = warmup_(i);
+	  }
 	  
-	  samples_.conservativeResize(chain+1);
-	  warmup_.conservativeResize(chain+1);
+	  samples_.resize(chain+1);
+	  warmup_.resize(chain+1);
+	  for (int i = 0; i < n; i++) {
+	    samples_(i) = samples_copy(i);
+	    warmup_(i) = warmup_copy(i);
+	  }
 	  for (int i = n; i < chain+1; i++) {
 	    samples_(i) = Eigen::MatrixXd(0, num_params());
 	    warmup_(i) = 0;
 	  }
 	}
 	int row = samples_(chain).rows();
-	samples_(chain).conservativeResize(row+sample.rows(), Eigen::NoChange);
-	samples_(chain).bottomRows(sample.rows()) = sample;
+	Eigen::MatrixXd new_samples(row+sample.rows(), num_params());
+	new_samples << samples_(chain), sample;
+	samples_(chain) = new_samples;
       }
 
       void add(const Eigen::MatrixXd& sample) {
