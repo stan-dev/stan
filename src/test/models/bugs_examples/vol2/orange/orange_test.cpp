@@ -42,8 +42,6 @@ public:
     using std::make_pair;
     std::vector<std::pair<int, double> > expected_values;
 
-    index = chains->get_total_param_index(chains->param_name_to_index("mu"),
-					  dims);
     expected_values.push_back(make_pair(chains->index("mu[1]"), 5.257));
     expected_values.push_back(make_pair(chains->index("mu[2]"), 2.211));    
     expected_values.push_back(make_pair(chains->index("mu[3]"), -5.869));

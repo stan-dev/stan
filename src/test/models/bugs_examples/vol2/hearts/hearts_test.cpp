@@ -40,10 +40,6 @@ public:
   static std::vector<std::pair<int, double> >
   get_expected_values() {
         using std::make_pair;
-    int index;
-    std::vector<int> dims;
-    dims.push_back(0);
-
     std::vector<std::pair<int, double> > expected_values;
 
     expected_values.push_back(make_pair(chains->index("alpha"), -0.4809));

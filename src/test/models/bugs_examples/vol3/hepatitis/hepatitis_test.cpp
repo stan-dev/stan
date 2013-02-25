@@ -24,7 +24,7 @@ public:
   }
 
   static int num_iterations() {
-    return iterations;
+    return 5000;
   }
 
   static std::vector<int> skip_chains_test() {

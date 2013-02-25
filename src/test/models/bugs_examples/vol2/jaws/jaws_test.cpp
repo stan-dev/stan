@@ -42,8 +42,6 @@ public:
     using std::make_pair;
     std::vector<std::pair<int, double> > expected_values;
 
-    index = chains->get_total_param_index(,
-					  dims);
     expected_values.push_back(make_pair(chains->index("Sigma[1,1]"), 6.701));  // Sigma[1,1]
     expected_values.push_back(make_pair(chains->index("Sigma[1,2]"), 6.496));  // Sigma[1,2]
     expected_values.push_back(make_pair(chains->index("Sigma[1,3]"), 6.704));  // Sigma[1,3]
