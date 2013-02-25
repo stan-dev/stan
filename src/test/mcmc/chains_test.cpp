@@ -139,6 +139,36 @@ TEST_F(McmcChains, blocker1_num_chains) {
   
   EXPECT_EQ(1, chains.num_chains());
 }
+
+TEST_F(McmcChains, blocker1_num_samples) {
+  stan::io::stan_csv blocker1 = stan::io::stan_csv_reader::parse(blocker1_stream);
+  
+  stan::mcmc::chains<> chains(blocker1);
+  
+  EXPECT_EQ(1000, chains.num_samples());
+}
+
+TEST_F(McmcChains, blocker2_num_samples) {
+  stan::io::stan_csv blocker2 = stan::io::stan_csv_reader::parse(blocker2_stream);
+  
+  stan::mcmc::chains<> chains(blocker2);
+  
+  EXPECT_EQ(1000, chains.num_samples());
+}
+
+TEST_F(McmcChains, blocker_num_samples) {
+  stan::io::stan_csv blocker1 = stan::io::stan_csv_reader::parse(blocker1_stream);
+  stan::io::stan_csv blocker2 = stan::io::stan_csv_reader::parse(blocker2_stream);
+  
+  stan::mcmc::chains<> chains(blocker1);
+  chains.add(blocker2);
+  
+  EXPECT_EQ(2000, chains.num_samples());
+  EXPECT_EQ(1000, chains.num_samples(0));
+  EXPECT_EQ(1000, chains.num_samples(1));
+}
+
+
 TEST_F(McmcChains, blocker1_param_names) {
   stan::io::stan_csv blocker1 = stan::io::stan_csv_reader::parse(blocker1_stream);
   
