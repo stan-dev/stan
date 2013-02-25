@@ -1,5 +1,6 @@
 #include <iostream>
 #include <iomanip>
+#include <ios>
 #include <stan/mcmc/chains.hpp>
 
 /** 
@@ -12,63 +13,34 @@
  *         non-zero otherwise
  */
 int main(int argc, const char* argv[]) {
-  if (argc == 1)
+  if (argc == 1) {
+    std::cout << "usage: print <filename 1> <filename 2>";
     return 0;
+  }
 
-
-  const size_t skip = 3U;  // number of cols to skip up front.
-  
-  std::vector<std::string> names;
-  std::vector<std::vector<size_t> > dimss;
-  stan::mcmc::read_variables(argv[1], skip,
-			     names, dimss);
-  
-  // test each file for correctness
-  for (int i = 2; i <= argc; i++) {
-    std::vector<std::string> curr_names;
-    std::vector<std::vector<size_t> > curr_dimss;
-    
-    stan::mcmc::read_variables(argv[1], skip,
-			       curr_names, curr_dimss);
-    if (names.size() != curr_names.size()) {
-      std::cerr << "names size doesn't match for file: " << argv[1] << " and " << argv[i] << std::endl;
-      return -1;
-    }
-    for (size_t j = 0; j < names.size(); j++) {
-      if (names[j] != curr_names[j]) {
-	std::cerr << "names don't match for file: " << argv[1] << " and " << argv[i] << std::endl
-		  << "  variable " << j << ": " << names[j] << " and " << curr_names[j] << std::endl;
-	return -1;
-      }
-    }
-
-
-    if (dimss.size() != curr_dimss.size()) {
-      std::cerr << "dimss don't match for file: " << argv[1] << " and " << argv[i] << std::endl;
-      return -1;
-    }
-    for (size_t j = 0; j < dimss.size(); j++) {
-      if (dimss[j].size() != curr_dimss[j].size()) {
-	std::cerr << "dimss size don't match for file: " << argv[1] << " and " << argv[i] << std::endl;
-	return -1;
-      }
-      for (size_t k = 0; k < dimss[j].size(); k++) {
-	if (dimss[j][k] != curr_dimss[j][k]) {
-	  std::cerr << "dimss don't match for file: " << argv[1] << " and " << argv[i] << std::endl;
-	  return -1;
-	}
-      }
-    }
+  std::vector<std::string> filenames;
+  for (int i = 1; i < argc; i++) {
+    filenames.push_back(argv[i]);
   }
   
+  Eigen::VectorXi thin(filenames.size());
   
-  /*// read from each file and populate
-  stan::mcmc::chains<> chains(argc-1, names, dimss);
-  for (size_t n = 0; n < argc-1; n++) {
-    stan::mcmc::add_chain(chains, n, argv[n+1], skip);
-    }*/
+  std::ifstream ifstream;
+  ifstream.open(filenames[0].c_str());
+  stan::io::stan_csv stan_csv = stan::io::stan_csv_reader::parse(ifstream);
+  stan::mcmc::chains<> chains(stan_csv);
+  ifstream.close();
+  thin(0) = stan_csv.metadata.thin;
+  
 
-  
+  for (int chain = 1; chain < filenames.size(); chain++) {
+    ifstream.open(filenames[chain].c_str());
+    stan_csv = stan::io::stan_csv_reader::parse(ifstream);
+    chains.add(stan_csv);
+    ifstream.close();
+    thin(chain) = stan_csv.metadata.thin;
+  }
+
   // print
   /*
 Inference for Stan model: schools_code.
@@ -101,56 +73,75 @@ and Rhat is the potential scale reduction factor on split chains (at
 convergence, Rhat=1).
    */
   
-  /*
+  const int skip = 3;
   std::string model_name = "NEED MODEL NAME";
-  size_t thin = 0;
-  std::vector<size_t> name_lengths(names.size());
+  int max_name_length = 0;
+  for (int i = skip; i < chains.num_params(); i++) 
+    if (chains.param_name(i).length() > max_name_length)
+      max_name_length = chains.param_name(i).length();
+  Eigen::VectorXi column_lengths(11);
+  column_lengths(0) = max_name_length + 1;
+  column_lengths(1) = std::string("mean").length()+1;
+  column_lengths(2) = std::string("se_mean").length()+1;
+  column_lengths(3) = std::string("  sd").length()+1;
+  column_lengths(4) = std::string("2.5%").length()+1;
+  column_lengths(5) = std::string("25%").length()+1;
+  column_lengths(6) = std::string("50%").length()+1;
+  column_lengths(7) = std::string("75%").length()+1;
+  column_lengths(8) = std::string("97.5%").length()+1;
+  column_lengths(9) = std::string("n_eff").length()+1;
+  column_lengths(10) = std::string("Rhat").length()+1;
 
-  for (size_t i = 0; i < names.size(); i++) {
-    std::cout << "n: " << names[i] << std::endl;
-    name_lengths[i] = names[i].length();
-  }
-  for (size_t i = 0; i < dimss.size(); i++) {
-    if (dimss[i].size() == 1 && dimss[i][0] == 1) {
-      name_lengths[i] += 0;
-    } else {
-      for (size_t j = 0; j < dimss[i].size(); j++) {
-	name_lengths[i] += 2 + (dimss[i][j]+1) % 10;
-      }
-    }
-  }
-
-  size_t max_name_length = *std::max_element(name_lengths.begin(), 
-					     name_lengths.end());
+  
   
   std::cout << "Inference for Stan model: " << model_name << std::endl
-	    << chains.num_chains() << " chains: each with iter=" << chains.num_samples()/chains.num_chains()
-	    << "; warmup=" << chains.num_warmup_samples() << "; thin=" << thin 
-	    << "; " << chains.num_samples() << " iterations saved." << std::endl;
-  size_t idx = 0;
-
-  for (size_t i = 0; i < dimss.size(); i++) {
-    for (size_t j = 0; j < dimss[i].size(); j++) {
-      std::cout << "dims[i][j]: " << dimss[i][j] << std::endl;
-    }
-    std::cout << std::endl;
+	    << chains.num_chains() << " chains: each with iter=(" << chains.num_kept_samples(0);
+  for (int chain = 1; chain < chains.num_chains(); chain++)
+    std::cout << "," << chains.num_kept_samples(chain);
+  std::cout << ")";
+  std::cout << "; warmup=(" << chains.warmup(0);
+  for (int chain = 1; chain < chains.num_chains(); chain++)
+    std::cout << "," << chains.warmup(chain);
+  std::cout << ")";
+  std::cout << "; thin=(" << thin(0);
+  for (int chain = 1; chain < chains.num_chains(); chain++)
+    std::cout << "," << thin(chain);
+  std::cout << ")";
+  std::cout << "; " << chains.num_samples() << " iterations saved." 
+	    << std::endl << std::endl;
+  
+  // header
+  std::cout << std::setw(column_lengths(0)) << ""
+	    << std::setw(column_lengths(1)) << "mean"
+	    << std::setw(column_lengths(2)) << "se_mean" 
+	    << std::setw(column_lengths(3)) << "sd" 
+	    << std::setw(column_lengths(4)) << "2.5%" 
+	    << std::setw(column_lengths(5)) << "25%" 
+	    << std::setw(column_lengths(6)) << "50%" 
+	    << std::setw(column_lengths(7)) << "75%" 
+	    << std::setw(column_lengths(8)) << "97.5%" 
+	    << std::setw(column_lengths(9)) << "n_eff" 
+	    << std::setw(column_lengths(10)) << "Rhat" 
+	    << std::endl;
+  // each row
+  for (int i = skip; i < chains.num_params(); i++) {
+    std::cout << std::setw(column_lengths(0)) << std::left << chains.param_name(i)
+	      << std::right << std::fixed << std::setprecision(1)
+	      << std::setw(column_lengths(1)) << chains.mean(i)
+	      << std::setw(column_lengths(2)) << chains.sd(i) / std::sqrt(chains.num_kept_samples())
+	      << std::setw(column_lengths(3)) << chains.sd(i)
+	      << std::setw(column_lengths(4)) << chains.quantile(i,0.025)
+	      << std::setw(column_lengths(5)) << chains.quantile(i,0.25)
+	      << std::setw(column_lengths(6)) << chains.quantile(i,0.5)
+	      << std::setw(column_lengths(7)) << chains.quantile(i,0.75)
+	      << std::setw(column_lengths(8)) << chains.quantile(i,0.975)
+	      << std::setw(column_lengths(9)) << chains.effective_sample_size(i)
+	      << std::setw(column_lengths(10)) << chains.split_potential_scale_reduction(i)
+	      << std::endl;
   }
-  */
-  /*for (size_t i = 0; i < dimss.size(); i++) {
-    for (size_t j = 0; j < dimss[i].size(); j++) {
-      
-      for (size_t k = 0; k < dimss[i][j]; k++) {
-	std::cout.width(max_name_length);
-	std::cout.setf(std::ios::left);
-	std::cout << names[i];
-	if (dimss[i][j] > 1)
-	  std::cout << "[" << j+1 << "]";
-	std::cout << std::endl;
-	
-	idx++;
-      }
-    }
-    }*/
+  std::cout << std::endl;
+  
+
   return 0;
 }
 
