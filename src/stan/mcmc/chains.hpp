@@ -387,20 +387,6 @@ namespace stan {
       }
       
       void add(const int chain,
-               const Eigen::RowVectorXd& theta) {
-	if (theta.cols() != num_params())
-	  throw std::invalid_argument("add(chain,theta): number of columns in theta does not match chains");
-	if (chain > num_chains()) {
-	  samples_.conservativeResize(chain+1);
-	  warmup_.conservativeResize(chain+1);
-	}
-	int row = samples_(chain).rows();
-	samples_(chain).conservativeResize(row+1, num_params());
-	samples_(chain).row(row) = theta;
-	warmup_(chain) = 0;
-      }
-      
-      void add(const int chain,
 	       const Eigen::MatrixXd& sample) {
 	if (sample.cols() != num_params())
 	  throw std::invalid_argument("add(chain,sample): number of columns in sample does not match chains");
