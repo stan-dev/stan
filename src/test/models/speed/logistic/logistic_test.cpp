@@ -157,7 +157,7 @@ public:
    * 
    * @return a chain object
    */
-  stan::mcmc::chains_new<> create_chains(const std::string& filename) {
+  stan::mcmc::chains<> create_chains(const std::string& filename) {
     std::stringstream samples;
     samples << path << get_path_separator()
             << filename << ".chain_0.csv";
@@ -169,7 +169,7 @@ public:
     stan::io::stan_csv stan_csv = stan::io::stan_csv_reader::parse(ifstream);
     ifstream.close();
     
-    stan::mcmc::chains_new<> chains(stan_csv);
+    stan::mcmc::chains<> chains(stan_csv);
     for (size_t chain = 1; chain < num_chains; chain++) {
       samples.str("");
       samples << path << get_path_separator()
@@ -236,7 +236,7 @@ public:
 
 
     // 3) Test values of sampled parameters
-    stan::mcmc::chains_new<> chains = create_chains(filename);
+    stan::mcmc::chains<> chains = create_chains(filename);
     int num_failed = 0;
     std::stringstream err_message;
     double alpha = 0.05;

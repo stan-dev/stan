@@ -51,7 +51,7 @@ namespace stan {
      * <p><b>Storage Order</b>: Storage is column/last-index major.
      */
     template <typename RNG = boost::random::ecuyer1988>
-    class chains_new {
+    class chains {
     private:
       Eigen::Matrix<std::string, Eigen::Dynamic, 1> param_names_;
       Eigen::Matrix<Eigen::MatrixXd, Eigen::Dynamic, 1> samples_;
@@ -315,10 +315,10 @@ namespace stan {
       }
       
     public:
-      chains_new(const Eigen::Matrix<std::string, Eigen::Dynamic, 1>& param_names) 
+      chains(const Eigen::Matrix<std::string, Eigen::Dynamic, 1>& param_names) 
 	: param_names_(param_names) { }
       
-      chains_new(const stan::io::stan_csv& stan_csv) 
+      chains(const stan::io::stan_csv& stan_csv) 
 	: param_names_(stan_csv.header) {
 	if (stan_csv.samples.rows() > 0)
 	  add(stan_csv.samples);

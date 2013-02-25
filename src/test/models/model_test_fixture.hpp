@@ -25,7 +25,7 @@ class Model_Test_Fixture : public ::testing::Test {
 public:
   static char path_separator;
   static std::string model_path;
-  static stan::mcmc::chains_new<> *chains;
+  static stan::mcmc::chains<> *chains;
   static int num_chains;
   static std::vector<std::string> command_outputs;
   static const int skip;
@@ -147,7 +147,7 @@ public:
    * 
    * @return An initialized chains object.
    */
-  static stan::mcmc::chains_new<>* create_chains() {
+  static stan::mcmc::chains<>* create_chains() {
     std::stringstream command;
     command << get_command(1)
 	    << " --iter=0";
@@ -159,7 +159,7 @@ public:
     stan::io::stan_csv stan_csv = stan::io::stan_csv_reader::parse(ifstream);
     ifstream.close();
     
-    return (new stan::mcmc::chains_new<>(stan_csv));
+    return (new stan::mcmc::chains<>(stan_csv));
   }
 
 
@@ -269,7 +269,7 @@ public:
 };
   
 template<class Derived> 
-stan::mcmc::chains_new<> *Model_Test_Fixture<Derived>::chains;
+stan::mcmc::chains<> *Model_Test_Fixture<Derived>::chains;
 
 template<class Derived>
 int Model_Test_Fixture<Derived>::num_chains = 4;
@@ -316,7 +316,7 @@ TYPED_TEST_P(Model_Test_Fixture, ChainsTest) {
     err_message.push_back(msg);
   }
 
-  stan::mcmc::chains_new<> *c = TypeParam::chains;
+  stan::mcmc::chains<> *c = TypeParam::chains;
   int num_chains = c->num_chains();
   int num_params = c->num_params();
   std::vector<int> params_to_skip = TypeParam::skip_chains_test();
@@ -360,7 +360,7 @@ TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTest) {
   if (n == 0)
     return;
 
-  stan::mcmc::chains_new<> *c = TypeParam::chains;
+  stan::mcmc::chains<> *c = TypeParam::chains;
   double alpha = 0.05;
   if (n == 1) 
     alpha = 0.0005;

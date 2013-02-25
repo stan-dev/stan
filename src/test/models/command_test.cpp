@@ -318,13 +318,13 @@ TEST_F(ModelCommand, HelpOptionsMatch) {
   }
 }
 
-void test_sampled_mean(const bitset<options_count>& options, stan::mcmc::chains_new<>& c) {
+void test_sampled_mean(const bitset<options_count>& options, stan::mcmc::chains<>& c) {
   double expected_mean = (options[data])*100.0; // 1: mean = 0, 2: mean = 100
   EXPECT_NEAR(expected_mean, c.mean("y"), 50)
     << "Test that data file is being used";
 }
 
-void test_number_of_samples(const bitset<options_count>& options, stan::mcmc::chains_new<>& c) {
+void test_number_of_samples(const bitset<options_count>& options, stan::mcmc::chains<>& c) {
   int num_iter = options[iter] ? 100 : 2000;
   int num_warmup = options[warmup_opt] ? 60 : num_iter/2;
   size_t expected_num_samples = num_iter - num_warmup;
@@ -340,7 +340,7 @@ void test_number_of_samples(const bitset<options_count>& options, stan::mcmc::ch
   }
 }
 
-void test_specific_sample_values(const bitset<options_count>& options, stan::mcmc::chains_new<>& c) {
+void test_specific_sample_values(const bitset<options_count>& options, stan::mcmc::chains<>& c) {
   if (options[iter] || 
       options[leapfrog_steps] || 
       options[epsilon] ||
@@ -423,7 +423,7 @@ TEST_P(ModelCommand, OptionsTest) {
   stan::io::stan_csv stan_csv = stan::io::stan_csv_reader::parse(ifstream);
   ifstream.close();
 
-  stan::mcmc::chains_new<> c(stan_csv);
+  stan::mcmc::chains<> c(stan_csv);
 
   test_sampled_mean(options, c);
   test_number_of_samples(options, c);

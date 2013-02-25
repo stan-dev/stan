@@ -9,7 +9,7 @@
 
 
 
-class McmcChains_New : public testing::Test {
+class McmcChains : public testing::Test {
 public:
   
   void SetUp() {
@@ -28,10 +28,10 @@ public:
   std::ifstream blocker1_stream, blocker2_stream, epil1_stream, epil2_stream;
 };
 
-TEST_F(McmcChains_New, constructor) {
+TEST_F(McmcChains, constructor) {
   stan::io::stan_csv blocker1 = stan::io::stan_csv_reader::parse(blocker1_stream);
   // construct with Eigen::Vector
-  stan::mcmc::chains_new<> chains1(blocker1.header);
+  stan::mcmc::chains<> chains1(blocker1.header);
   EXPECT_EQ(0, chains1.num_chains());
   EXPECT_EQ(blocker1.header.size(), chains1.num_params());
   for (int i = 0; i < blocker1.header.size(); i++)
@@ -39,7 +39,7 @@ TEST_F(McmcChains_New, constructor) {
   
   
   // construct with stan_csv
-  stan::mcmc::chains_new<> chains2(blocker1);
+  stan::mcmc::chains<> chains2(blocker1);
   EXPECT_EQ(1, chains2.num_chains());
   EXPECT_EQ(blocker1.header.size(), chains2.num_params());
   for (int i = 0; i < blocker1.header.size(); i++)
@@ -48,11 +48,11 @@ TEST_F(McmcChains_New, constructor) {
   EXPECT_EQ(1000, chains2.num_samples(0));
 }
 
-TEST_F(McmcChains_New, add) {
+TEST_F(McmcChains, add) {
   stan::io::stan_csv blocker1 = stan::io::stan_csv_reader::parse(blocker1_stream);
   
   // construct with Eigen::Vector
-  stan::mcmc::chains_new<> chains(blocker1.header);
+  stan::mcmc::chains<> chains(blocker1.header);
   EXPECT_EQ(0, chains.num_chains());
   EXPECT_EQ(0, chains.num_samples());
 
@@ -132,44 +132,44 @@ TEST_F(McmcChains_New, add) {
     << "validate state is identical to before";
 }
 
-TEST_F(McmcChains_New, blocker1_num_chains) {
+TEST_F(McmcChains, blocker1_num_chains) {
   stan::io::stan_csv blocker1 = stan::io::stan_csv_reader::parse(blocker1_stream);
   
-  stan::mcmc::chains_new<> chains(blocker1);
+  stan::mcmc::chains<> chains(blocker1);
   
   EXPECT_EQ(1, chains.num_chains());
 }
-TEST_F(McmcChains_New, blocker1_param_names) {
+TEST_F(McmcChains, blocker1_param_names) {
   stan::io::stan_csv blocker1 = stan::io::stan_csv_reader::parse(blocker1_stream);
   
-  stan::mcmc::chains_new<> chains(blocker1);
+  stan::mcmc::chains<> chains(blocker1);
   ASSERT_EQ(blocker1.header.size(), chains.num_params());
   ASSERT_EQ(blocker1.header.size(), chains.param_names().size());
   for (int i = 0; i < blocker1.header.size(); i++) {
     EXPECT_EQ(blocker1.header(i), chains.param_names()(i));
   }
 }
-TEST_F(McmcChains_New, blocker1_param_name) {
+TEST_F(McmcChains, blocker1_param_name) {
   stan::io::stan_csv blocker1 = stan::io::stan_csv_reader::parse(blocker1_stream);
   
-  stan::mcmc::chains_new<> chains(blocker1);
+  stan::mcmc::chains<> chains(blocker1);
   ASSERT_EQ(blocker1.header.size(), chains.num_params());
   for (int i = 0; i < blocker1.header.size(); i++) {
     EXPECT_EQ(blocker1.header(i), chains.param_name(i));
   }
 }
-TEST_F(McmcChains_New, blocker1_index) {
+TEST_F(McmcChains, blocker1_index) {
   stan::io::stan_csv blocker1 = stan::io::stan_csv_reader::parse(blocker1_stream);
   
-  stan::mcmc::chains_new<> chains(blocker1);
+  stan::mcmc::chains<> chains(blocker1);
   ASSERT_EQ(blocker1.header.size(), chains.num_params());
   for (int i = 0; i < blocker1.header.size(); i++)
     EXPECT_EQ(i, chains.index(blocker1.header(i)));
 }
-TEST_F(McmcChains_New, blocker1_warmup) {
+TEST_F(McmcChains, blocker1_warmup) {
   stan::io::stan_csv blocker1 = stan::io::stan_csv_reader::parse(blocker1_stream);
   
-  stan::mcmc::chains_new<> chains(blocker1);
+  stan::mcmc::chains<> chains(blocker1);
 
   ASSERT_EQ(1, chains.warmup().size());
   EXPECT_EQ(0, chains.warmup()(0));
@@ -209,11 +209,11 @@ TEST_F(McmcChains_New, blocker1_warmup) {
   EXPECT_EQ(50, chains.warmup()(1));
   EXPECT_EQ(50, chains.warmup(1));
 }
-TEST_F(McmcChains_New, blocker_mean) {
+TEST_F(McmcChains, blocker_mean) {
   stan::io::stan_csv blocker1 = stan::io::stan_csv_reader::parse(blocker1_stream);
   stan::io::stan_csv blocker2 = stan::io::stan_csv_reader::parse(blocker2_stream);
   
-  stan::mcmc::chains_new<> chains(blocker1);
+  stan::mcmc::chains<> chains(blocker1);
 
   Eigen::VectorXd means1 = blocker1.samples.colwise().mean();
   for (int j = 0; j < chains.num_params(); j++) {
@@ -261,11 +261,11 @@ double sd(Eigen::VectorXd x) {
   return sqrt((x.array() - x.mean()).square().sum() / (x.rows() - 1));
 }
 
-TEST_F(McmcChains_New, blocker_sd) {
+TEST_F(McmcChains, blocker_sd) {
   stan::io::stan_csv blocker1 = stan::io::stan_csv_reader::parse(blocker1_stream);
   stan::io::stan_csv blocker2 = stan::io::stan_csv_reader::parse(blocker2_stream);
   
-  stan::mcmc::chains_new<> chains(blocker1);
+  stan::mcmc::chains<> chains(blocker1);
   
   using std::sqrt;
   for (int j = 0; j < chains.num_params(); j++) {
@@ -318,11 +318,11 @@ double variance(Eigen::VectorXd x) {
   return (x.array() - x.mean()).square().sum() / (x.rows() - 1);
 }
 
-TEST_F(McmcChains_New, blocker_variance) {
+TEST_F(McmcChains, blocker_variance) {
   stan::io::stan_csv blocker1 = stan::io::stan_csv_reader::parse(blocker1_stream);
   stan::io::stan_csv blocker2 = stan::io::stan_csv_reader::parse(blocker2_stream);
   
-  stan::mcmc::chains_new<> chains(blocker1);
+  stan::mcmc::chains<> chains(blocker1);
   
   using std::sqrt;
   for (int j = 0; j < chains.num_params(); j++) {
@@ -376,11 +376,11 @@ double covariance(Eigen::VectorXd x, Eigen::VectorXd y) {
   return ((x.array() - x_mean) * (y.array() - y_mean)).sum() / (x.rows() - 1);
 }
 
-TEST_F(McmcChains_New, blocker_covariance) {
+TEST_F(McmcChains, blocker_covariance) {
   stan::io::stan_csv blocker1 = stan::io::stan_csv_reader::parse(blocker1_stream);
   stan::io::stan_csv blocker2 = stan::io::stan_csv_reader::parse(blocker2_stream);
   
-  stan::mcmc::chains_new<> chains(blocker1);
+  stan::mcmc::chains<> chains(blocker1);
   chains.add(blocker2);
   
   int n = 0;
@@ -420,11 +420,11 @@ TEST_F(McmcChains_New, blocker_covariance) {
   }
 }
 
-TEST_F(McmcChains_New, blocker_correlation) {
+TEST_F(McmcChains, blocker_correlation) {
   stan::io::stan_csv blocker1 = stan::io::stan_csv_reader::parse(blocker1_stream);
   stan::io::stan_csv blocker2 = stan::io::stan_csv_reader::parse(blocker2_stream);
   
-  stan::mcmc::chains_new<> chains(blocker1);
+  stan::mcmc::chains<> chains(blocker1);
   chains.add(blocker2);
   
   int n = 0;
@@ -482,10 +482,10 @@ TEST_F(McmcChains_New, blocker_correlation) {
   }
 }
 
-TEST_F(McmcChains_New, blocker_quantile) {
+TEST_F(McmcChains, blocker_quantile) {
   stan::io::stan_csv blocker1 = stan::io::stan_csv_reader::parse(blocker1_stream);
   
-  stan::mcmc::chains_new<> chains(blocker1);
+  stan::mcmc::chains<> chains(blocker1);
   
   int index = 5;
   
@@ -520,10 +520,10 @@ TEST_F(McmcChains_New, blocker_quantile) {
   EXPECT_FLOAT_EQ(chains.quantile(index,0.6), chains.quantile(name,0.6));
 }
 
-TEST_F(McmcChains_New, blocker_quantiles) {
+TEST_F(McmcChains, blocker_quantiles) {
   stan::io::stan_csv blocker1 = stan::io::stan_csv_reader::parse(blocker1_stream);
   
-  stan::mcmc::chains_new<> chains(blocker1);
+  stan::mcmc::chains<> chains(blocker1);
   
   int index = 5;
 
@@ -579,10 +579,10 @@ TEST_F(McmcChains_New, blocker_quantiles) {
   }
 
 }
-TEST_F(McmcChains_New, blocker_central_interval) {
+TEST_F(McmcChains, blocker_central_interval) {
   stan::io::stan_csv blocker1 = stan::io::stan_csv_reader::parse(blocker1_stream);
   
-  stan::mcmc::chains_new<> chains(blocker1);
+  stan::mcmc::chains<> chains(blocker1);
   
   int index = 5;
   
@@ -612,10 +612,10 @@ TEST_F(McmcChains_New, blocker_central_interval) {
   EXPECT_FLOAT_EQ(interval(0), interval_by_name(0));
   EXPECT_FLOAT_EQ(interval(1), interval_by_name(1));
 }
-TEST_F(McmcChains_New, blocker_autocorrelation) {
+TEST_F(McmcChains, blocker_autocorrelation) {
   stan::io::stan_csv blocker1 = stan::io::stan_csv_reader::parse(blocker1_stream);
   
-  stan::mcmc::chains_new<> chains(blocker1);
+  stan::mcmc::chains<> chains(blocker1);
   Eigen::VectorXd ac;
   EXPECT_NO_THROW(ac = chains.autocorrelation(0,5));
 
@@ -659,10 +659,10 @@ TEST_F(McmcChains_New, blocker_autocorrelation) {
     EXPECT_FLOAT_EQ(ac(i), ac_by_name(i));
   }
 }
-TEST_F(McmcChains_New, blocker_autocovariance) {
+TEST_F(McmcChains, blocker_autocovariance) {
   stan::io::stan_csv blocker1 = stan::io::stan_csv_reader::parse(blocker1_stream);
   
-  stan::mcmc::chains_new<> chains(blocker1);
+  stan::mcmc::chains<> chains(blocker1);
   Eigen::VectorXd ac;
   EXPECT_NO_THROW(ac = chains.autocovariance(0,5));
 
@@ -707,11 +707,11 @@ TEST_F(McmcChains_New, blocker_autocovariance) {
   }
 }
 
-TEST_F(McmcChains_New,blocker_effective_sample_size) {
+TEST_F(McmcChains,blocker_effective_sample_size) {
   stan::io::stan_csv blocker1 = stan::io::stan_csv_reader::parse(blocker1_stream);
   stan::io::stan_csv blocker2 = stan::io::stan_csv_reader::parse(blocker2_stream);
   
-  stan::mcmc::chains_new<> chains(blocker1);
+  stan::mcmc::chains<> chains(blocker1);
   chains.add(blocker2);
 
   Eigen::VectorXd n_eff(48);
@@ -740,11 +740,11 @@ TEST_F(McmcChains_New,blocker_effective_sample_size) {
   }
 }
 
-TEST_F(McmcChains_New,blocker_split_potential_scale_reduction) {
+TEST_F(McmcChains,blocker_split_potential_scale_reduction) {
   stan::io::stan_csv blocker1 = stan::io::stan_csv_reader::parse(blocker1_stream);
   stan::io::stan_csv blocker2 = stan::io::stan_csv_reader::parse(blocker2_stream);
   
-  stan::mcmc::chains_new<> chains(blocker1);
+  stan::mcmc::chains<> chains(blocker1);
   chains.add(blocker2);
 
   Eigen::VectorXd rhat(48);
