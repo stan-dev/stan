@@ -1018,48 +1018,79 @@ namespace stan {
     template <int R1,int C1,int R2,int C2>
     class mdivide_left_dv_vari : public vari {
     public:
-      Eigen::Matrix<double,R1,C1> _A;
-      Eigen::Matrix<double,R1,C2> _C;
-      
-      Eigen::Matrix<vari*,R2,C2> _variRefB;
-      Eigen::Matrix<vari*,R1,C2> _variRefC;
+      int _M; // A.rows() = A.cols() = B.rows()
+      int _N; // B.cols()
+      double* _A;
+      double* _C;
+      vari** _variRefB;
+      vari** _variRefC;
       
       mdivide_left_dv_vari(const Eigen::Matrix<double,R1,C1> &A,
                            const Eigen::Matrix<var,R2,C2> &B)
       : vari(0.0),
-      _A(A), _C(B.rows(),B.cols()),
-      _variRefB(B.rows(),B.cols()), _variRefC(B.rows(),B.cols())
+ 	_M(A.rows()),
+	_N(B.cols()),
+	_A((double*)stan::agrad::memalloc_.alloc(sizeof(double) 
+                                                 * A.rows() * A.cols())),
+	_C((double*)stan::agrad::memalloc_.alloc(sizeof(double) 
+                                                 * B.rows() * B.cols())),
+        _variRefB((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
+						       * B.rows() * B.cols())),
+        _variRefC((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
+						       * B.rows() * B.cols()))
       {
-        for (size_type j = 0; j < _variRefB.cols(); j++) {
-          for (size_type i = 0; i < _variRefB.rows(); i++) {
-            _variRefB(i,j) = B(i,j).vi_;
-            _C(i,j) = B(i,j).val();
+	using Eigen::Matrix;
+	using Eigen::Map;
+	
+	size_t pos = 0;
+	for (size_type j = 0; j < _M; j++) {
+	  for (size_type i = 0; i < _M; i++) {
+	    _A[pos++] = A(i,j);
+	  }
+	}
+	
+	pos = 0;
+	for (size_type j = 0; j < _N; j++) {
+          for (size_type i = 0; i < _M; i++) {
+            _variRefB[pos] = B(i,j).vi_;
+            _C[pos++] = B(i,j).val();
           }
         }
-        
-        _C = _A.colPivHouseholderQr().solve(_C);
-        
-        for (size_type j = 0; j < _variRefC.cols(); j++) {
-          for (size_type i = 0; i < _variRefC.rows(); i++) {
-            _variRefC(i,j) = new vari(_C(i,j),false);
+                
+	Matrix<double,R1,C2> C(_M,_N);
+	C = Map<Matrix<double,R1,C2> >(_C,_M,_N);
+
+	C = Map<Matrix<double,R1,C1> >(_A,_M,_M)
+	  .colPivHouseholderQr().solve(C);
+	
+	pos = 0;
+        for (size_type j = 0; j < _N; j++) {
+          for (size_type i = 0; i < _M; i++) {
+	    _C[pos] = C(i,j);
+            _variRefC[pos] = new vari(_C[pos],false);
+	    pos++;
           }
         }
       }
       
       virtual void chain() {
-        Eigen::Matrix<double,R2,C2> adjB(_variRefB.rows(),_variRefB.cols());
-        Eigen::Matrix<double,R1,C2> adjC(_variRefC.rows(),_variRefC.cols());
-        
+	using Eigen::Matrix;
+        using Eigen::Map;
+        Eigen::Matrix<double,R2,C2> adjB(_M,_N);
+        Eigen::Matrix<double,R1,C2> adjC(_M,_N);
+
+	size_t pos = 0;
         for (size_type j = 0; j < adjC.cols(); j++)
           for (size_type i = 0; i < adjC.rows(); i++)
-            adjC(i,j) = _variRefC(i,j)->adj_;
-        
-        
-        adjB = _A.transpose().colPivHouseholderQr().solve(adjC);
-        
+            adjC(i,j) = _variRefC[pos++]->adj_;
+
+        adjB = Map<Matrix<double,R1,C1> >(_A,_M,_M)
+	  .transpose().colPivHouseholderQr().solve(adjC);
+
+	pos = 0;
         for (size_type j = 0; j < adjB.cols(); j++)
           for (size_type i = 0; i < adjB.rows(); i++)
-            _variRefB(i,j)->adj_ += adjB(i,j);
+            _variRefB[pos++]->adj_ += adjB(i,j);
       }
     };
     
@@ -1171,9 +1202,10 @@ namespace stan {
       // for the returned matrix.  Memory will be cleaned up with the arena allocator.
       mdivide_left_dv_vari<R1,C1,R2,C2> *baseVari = new mdivide_left_dv_vari<R1,C1,R2,C2>(A,b);
       
-      for (size_type i = 0; i < res.rows(); i++)
-        for (size_type j = 0; j < res.cols(); j++)
-          res(i,j).vi_ = baseVari->_variRefC(i,j);
+      size_t pos = 0;
+      for (size_type j = 0; j < res.cols(); j++)
+	for (size_type i = 0; i < res.rows(); i++)
+          res(i,j).vi_ = baseVari->_variRefC[pos++];
       
       return res;
     }
