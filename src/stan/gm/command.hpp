@@ -397,7 +397,13 @@ namespace stan {
           for (size_t i = 0; i < params_r.size(); ++i)
             params_r[i] = init_rng();
           // FIXME: allow config vs. std::cout
-          double init_log_prob = model.grad_log_prob(params_r,params_i,init_grad,&std::cout);
+          double init_log_prob;
+	  try {
+	    init_log_prob = model.grad_log_prob(params_r,params_i,init_grad,&std::cout);
+	  } catch (std::domain_error e) {
+	    stan::mcmc::write_error_msgs(&std::cout, e);
+	    init_log_prob = -std::numeric_limits<double>::infinity();
+	  }
           if (!boost::math::isfinite(init_log_prob))
             continue;
           for (size_t i = 0; i < init_grad.size(); ++i)
@@ -406,7 +412,8 @@ namespace stan {
           break;
         }
         if (num_init_tries > MAX_INIT_TRIES) {
-          std::cout << "Initialization failed after " << MAX_INIT_TRIES 
+          std::cout << std::endl << std::endl
+		    << "Initialization failed after " << MAX_INIT_TRIES 
                     << " attempts. "
                     << " Try specifying initial values,"
                     << " reducing ranges of constrained values,"
@@ -467,7 +474,13 @@ namespace stan {
         model.write_csv_header(sample_stream);
 
         std::vector<double> gradient;
-        double lp = model.grad_log_prob(params_r, params_i, gradient);
+	double lp;
+	try {
+	  lp = model.grad_log_prob(params_r, params_i, gradient);
+	} catch (std::domain_error e) {
+	  stan::mcmc::write_error_msgs(&std::cout, e);
+	  lp = -std::numeric_limits<double>::infinity();
+	}
         
         double lastlp = lp - 1;
         std::cout << "initial log joint probability = " << lp << std::endl;
