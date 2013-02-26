@@ -4,14 +4,19 @@
 #include <ios>
 #include <stan/mcmc/chains.hpp>
 
-int calculate_size(const Eigen::VectorXd& x, const std::string& name) {
+int calculate_size(const Eigen::VectorXd& x, const std::string& name,
+		   int digits) {
   using std::max;
   using std::ceil;
   using std::log10;
+  
+  double padding = 0;
+  if (digits > 0)
+    padding = digits + 1;
 
-  double size = ceil(log10(x.maxCoeff()+0.001)) + 2.0;
+  double size = ceil(log10(x.maxCoeff()+0.001)) + padding;
   if (x.minCoeff() < 0)
-    size = max(size, ceil(log10(-x.minCoeff()+0.01))+3.0);
+    size = max(size, ceil(log10(-x.minCoeff()+0.01))+(padding+1));
 
   return max(size,
 	     max(name.length(), std::string("-0.0").length())+0.0);
@@ -69,28 +74,30 @@ int main(int argc, const char* argv[]) {
   probs << 0.025, 0.25, 0.5, 0.75, 0.975;
 
   for (int i = skip; i < chains.num_params(); i++) {
+    double sd = chains.sd(i);
+    double n_eff = chains.effective_sample_size(i);
     values(i,0) = chains.mean(i);
-    values(i,1) = chains.sd(i) / std::sqrt(chains.num_kept_samples());
-    values(i,2) = chains.sd(i);
+    values(i,1) = sd / sqrt(n_eff);
+    values(i,2) = sd;
     Eigen::VectorXd quantiles = chains.quantiles(i,probs);
     for (int j = 0; j < 5; j++)
       values(i,3+j) = quantiles(j);
-    values(i,8) = chains.effective_sample_size(i);
+    values(i,8) = n_eff;
     values(i,9) = chains.split_potential_scale_reduction(i);
   }
   
   Eigen::VectorXi column_lengths(11);
   column_lengths(0) = max_name_length + 1;
-  column_lengths(1) = calculate_size(values.col(0), "mean")+1;
-  column_lengths(2) = calculate_size(values.col(1), "se_mean")+1;
-  column_lengths(3) = calculate_size(values.col(2), "sd")+1;
-  column_lengths(4) = calculate_size(values.col(3), "2.5%")+1;
-  column_lengths(5) = calculate_size(values.col(4), "25%")+1;
-  column_lengths(6) = calculate_size(values.col(5), "50%")+1;
-  column_lengths(7) = calculate_size(values.col(6), "75%")+1;
-  column_lengths(8) = calculate_size(values.col(7), "97.5%")+1;
-  column_lengths(9) = calculate_size(values.col(8), "n_eff")+1;
-  column_lengths(10) = calculate_size(values.col(9), "Rhat")+1;
+  column_lengths(1) = calculate_size(values.col(0), "mean", 1)+1;
+  column_lengths(2) = calculate_size(values.col(1), "se_mean", 1)+1;
+  column_lengths(3) = calculate_size(values.col(2), "sd", 1)+1;
+  column_lengths(4) = calculate_size(values.col(3), "2.5%", 1)+1;
+  column_lengths(5) = calculate_size(values.col(4), "25%", 1)+1;
+  column_lengths(6) = calculate_size(values.col(5), "50%", 1)+1;
+  column_lengths(7) = calculate_size(values.col(6), "75%", 1)+1;
+  column_lengths(8) = calculate_size(values.col(7), "97.5%", 1)+1;
+  column_lengths(9) = calculate_size(values.col(8), "n_eff", 0)+1;
+  column_lengths(10) = calculate_size(values.col(9), "Rhat", 1)+1;
   
   std::cout << "Inference for Stan model: " << model_name << std::endl
 	    << chains.num_chains() << " chains: each with iter=(" << chains.num_kept_samples(0);
@@ -122,19 +129,21 @@ int main(int argc, const char* argv[]) {
 	    << std::setw(column_lengths(10)) << "Rhat" 
 	    << std::endl;
   // each row
+  using std::setprecision;
+  using std::setw;
   for (int i = skip; i < chains.num_params(); i++) {
-    std::cout << std::setw(column_lengths(0)) << std::left << chains.param_name(i)
-	      << std::right << std::fixed << std::setprecision(1)
-	      << std::setw(column_lengths(1)) << chains.mean(i)
-	      << std::setw(column_lengths(2)) << chains.sd(i) / std::sqrt(chains.num_kept_samples())
-	      << std::setw(column_lengths(3)) << chains.sd(i)
-	      << std::setw(column_lengths(4)) << chains.quantile(i,0.025)
-	      << std::setw(column_lengths(5)) << chains.quantile(i,0.25)
-	      << std::setw(column_lengths(6)) << chains.quantile(i,0.5)
-	      << std::setw(column_lengths(7)) << chains.quantile(i,0.75)
-	      << std::setw(column_lengths(8)) << chains.quantile(i,0.975)
-	      << std::setw(column_lengths(9)) << chains.effective_sample_size(i)
-	      << std::setw(column_lengths(10)) << chains.split_potential_scale_reduction(i)
+    std::cout << setw(column_lengths(0)) << std::left << chains.param_name(i)
+	      << std::right << std::fixed
+	      << setprecision(1) << setw(column_lengths(1)) << values(i,0)
+	      << setprecision(1) << setw(column_lengths(2)) << values(i,1)
+	      << setprecision(1) << setw(column_lengths(3)) << values(i,2)
+	      << setprecision(1) << setw(column_lengths(4)) << values(i,3)
+	      << setprecision(1) << setw(column_lengths(5)) << values(i,4)
+	      << setprecision(1) << setw(column_lengths(6)) << values(i,5)
+	      << setprecision(1) << setw(column_lengths(7)) << values(i,6)
+	      << setprecision(1) << setw(column_lengths(8)) << values(i,7)
+	      << setprecision(0) << setw(column_lengths(9)) << values(i,8)
+	      << setprecision(1) << setw(column_lengths(10)) << values(i,9)
 	      << std::endl;
   }
   std::cout << std::endl;
