@@ -124,12 +124,3 @@ public:
   }
 };
 
-const double p = 0.57;
-const double beta = p / (1.0 - p);
-
-TEST(ProbDistributionsNegBinomialCDF,Values) {
-    EXPECT_FLOAT_EQ(0.042817421, stan::prob::neg_binomial_cdf(30, 24, beta));
-    
-    // Consistency with implemented Binomial
-    EXPECT_FLOAT_EQ(stan::prob::binomial_cdf(24, 54, p), stan::prob::neg_binomial_cdf(30, 24, beta));
-}
