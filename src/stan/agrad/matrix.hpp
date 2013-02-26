@@ -1393,34 +1393,52 @@ namespace stan {
     
     template<int R,int C>
     class determinant_vari : public vari {
-      Eigen::Matrix<double,R,C> _A;
-      Eigen::Matrix<vari*,R,C> _adjARef;
+      int _rows;
+      int _cols;
+      double* _A;
+      // Eigen::Matrix<double,R,C> _A;
+      // Eigen::Matrix<vari*,R,C> _adjARef;
+      vari** _adjARef;
     public:
       determinant_vari(const Eigen::Matrix<var,R,C> &A)
-      : vari(determinant_vari_calc(A)), _A(A.rows(),A.cols()), _adjARef(A.rows(),A.cols())
+      : vari(determinant_vari_calc(A)), 
+        _rows(A.rows()),
+        _cols(A.cols()),
+        _A((double*)stan::agrad::memalloc_.alloc(sizeof(double) 
+                                                 * A.rows() * A.cols())),
+        _adjARef((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
+                                                      * A.rows() * A.cols()))
       {
-        for (size_type j = 0; j < A.cols(); j++) {
-          for (size_type i = 0; i < A.rows(); i++) {
-            _A(i,j) = A(i,j).val();
-            _adjARef(i,j) = A(i,j).vi_;
+        size_t pos = 0;
+        for (size_type j = 0; j < _cols; j++) {
+          for (size_type i = 0; i < _rows; i++) {
+            // _A(i,j) = A(i,j).val();
+            // _adjARef(i,j) = A(i,j).vi_;
+            _A[pos] = A(i,j).val();
+            _adjARef[pos++] = A(i,j).vi_;
           }
         }
       }
       static 
-      double determinant_vari_calc(const Eigen::Matrix<var,R,C> &A)
-      {
+      double determinant_vari_calc(const Eigen::Matrix<var,R,C> &A) {
         Eigen::Matrix<double,R,C> Ad(A.rows(),A.cols());
-        for (size_type j = 0; j < A.cols(); j++)
-          for (size_type i = 0; i < A.rows(); i++)
+        for (size_type j = 0; j < A.rows(); j++)
+          for (size_type i = 0; i < A.cols(); i++)
             Ad(i,j) = A(i,j).val();
         return Ad.determinant();
       }
       virtual void chain() {
-        Eigen::Matrix<double,R,C> adjA(_A.rows(),_A.cols());
-        adjA = (adj_ * val_) * _A.inverse().transpose();
-        for (size_type j = 0; j < _adjARef.cols(); j++) {
-          for (size_type i = 0; i < _adjARef.rows(); i++) {
-            _adjARef(i,j)->adj_ += adjA(i,j);
+        using Eigen::Matrix;
+        using Eigen::Map;
+        Matrix<double,R,C> adjA(_rows,_cols);
+        // adjA = (adj_ * val_) * _A.inverse().transpose();
+        adjA = (adj_ * val_) * 
+          Map<Matrix<double,R,C> >(_A,_rows,_cols).inverse().transpose();
+        size_t pos = 0;
+        for (size_type j = 0; j < _cols; j++) {
+          for (size_type i = 0; i < _rows; i++) {
+            // _adjARef(i,j)->adj_ += adjA(i,j);
+            _adjARef[pos++]->adj_ += adjA(i,j);
           }
         }
       }
