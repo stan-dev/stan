@@ -321,7 +321,7 @@ namespace stan {
       chains(const stan::io::stan_csv& stan_csv) 
 	: param_names_(stan_csv.header) {
 	if (stan_csv.samples.rows() > 0)
-	  add(stan_csv.samples);
+	  add(stan_csv);
       }
       
       inline const int num_chains() {
@@ -433,6 +433,8 @@ namespace stan {
 	  throw std::invalid_argument("add(stan_csv): header does not match chain's header");
 	}
 	add(stan_csv.samples);
+	if (stan_csv.metadata.save_warmup)
+	  set_warmup(num_chains()-1, stan_csv.metadata.warmup);
       }
       
       Eigen::VectorXd samples(const int chain, const int index) {
