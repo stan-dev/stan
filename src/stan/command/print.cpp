@@ -86,18 +86,20 @@ int main(int argc, const char* argv[]) {
     values(i,9) = chains.split_potential_scale_reduction(i);
   }
   
-  Eigen::VectorXi column_lengths(11);
-  column_lengths(0) = max_name_length + 1;
-  column_lengths(1) = calculate_size(values.col(0), "mean", 1)+1;
-  column_lengths(2) = calculate_size(values.col(1), "se_mean", 1)+1;
-  column_lengths(3) = calculate_size(values.col(2), "sd", 1)+1;
-  column_lengths(4) = calculate_size(values.col(3), "2.5%", 1)+1;
-  column_lengths(5) = calculate_size(values.col(4), "25%", 1)+1;
-  column_lengths(6) = calculate_size(values.col(5), "50%", 1)+1;
-  column_lengths(7) = calculate_size(values.col(6), "75%", 1)+1;
-  column_lengths(8) = calculate_size(values.col(7), "97.5%", 1)+1;
-  column_lengths(9) = calculate_size(values.col(8), "n_eff", 0)+1;
-  column_lengths(10) = calculate_size(values.col(9), "Rhat", 1)+1;
+  int n = 10;
+  Eigen::Matrix<std::string, Eigen::Dynamic, 1> headers(n);
+  headers << 
+    "mean", "se_mean", "sd", 
+    "2.5%", "25%", "50%", "75%", "97.5%", 
+    "n_eff", "Rhat";
+  Eigen::VectorXi digits(n);
+  digits.setConstant(1);
+  digits(8) = 0;
+
+  Eigen::VectorXi column_lengths(n);
+  for (int i = 0; i < n; i++) {
+    column_lengths(i) = calculate_size(values.col(i), headers(i), digits(i)) + 1;
+  }
   
   std::cout << "Inference for Stan model: " << model_name << std::endl
 	    << chains.num_chains() << " chains: each with iter=(" << chains.num_kept_samples(0);
@@ -115,36 +117,22 @@ int main(int argc, const char* argv[]) {
   std::cout << "; " << chains.num_samples() << " iterations saved." 
 	    << std::endl << std::endl;
   
-  // header
-  std::cout << std::setw(column_lengths(0)) << ""
-	    << std::setw(column_lengths(1)) << "mean"
-	    << std::setw(column_lengths(2)) << "se_mean" 
-	    << std::setw(column_lengths(3)) << "sd" 
-	    << std::setw(column_lengths(4)) << "2.5%" 
-	    << std::setw(column_lengths(5)) << "25%" 
-	    << std::setw(column_lengths(6)) << "50%" 
-	    << std::setw(column_lengths(7)) << "75%" 
-	    << std::setw(column_lengths(8)) << "97.5%" 
-	    << std::setw(column_lengths(9)) << "n_eff" 
-	    << std::setw(column_lengths(10)) << "Rhat" 
-	    << std::endl;
-  // each row
   using std::setprecision;
   using std::setw;
+
+  // header
+  std::cout << std::setw(max_name_length+1) << "";
+  for (int i = 0; i < n; i++) {
+    std::cout << setw(column_lengths(i)) << headers(i);
+  }
+  std::cout << std::endl;
+  // each row
   for (int i = skip; i < chains.num_params(); i++) {
-    std::cout << setw(column_lengths(0)) << std::left << chains.param_name(i)
-	      << std::right << std::fixed
-	      << setprecision(1) << setw(column_lengths(1)) << values(i,0)
-	      << setprecision(1) << setw(column_lengths(2)) << values(i,1)
-	      << setprecision(1) << setw(column_lengths(3)) << values(i,2)
-	      << setprecision(1) << setw(column_lengths(4)) << values(i,3)
-	      << setprecision(1) << setw(column_lengths(5)) << values(i,4)
-	      << setprecision(1) << setw(column_lengths(6)) << values(i,5)
-	      << setprecision(1) << setw(column_lengths(7)) << values(i,6)
-	      << setprecision(1) << setw(column_lengths(8)) << values(i,7)
-	      << setprecision(0) << setw(column_lengths(9)) << values(i,8)
-	      << setprecision(1) << setw(column_lengths(10)) << values(i,9)
-	      << std::endl;
+    std::cout << setw(max_name_length+1) << std::left << chains.param_name(i);
+    std::cout << std::right << std::fixed;
+    for (int j = 0; j < n; j++)
+      std::cout << setprecision(digits(j)) << setw(column_lengths(j)) << values(i,j);
+    std::cout << std::endl;
   }
   std::cout << std::endl;
   std::cout << "Samples were drawn using " << stan_csv.adaptation.sampler << "." << std::endl
