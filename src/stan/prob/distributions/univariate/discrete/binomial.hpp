@@ -374,8 +374,6 @@ namespace stan {
 
         const double Pi = ibeta(N_dbl - n_dbl, n_dbl + 1, 1 - theta_dbl);
           
-          std::cout << i << "\t" << Pi << std::endl;
-          
         P *= Pi;
 
         if (!is_constant_struct<T_prob>::value)
