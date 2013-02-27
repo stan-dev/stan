@@ -24,12 +24,12 @@ public:
     return false;
   }
 
-  static size_t num_iterations() {
+  static int num_iterations() {
     return iterations;
   }
 
-  static std::vector<size_t> skip_chains_test() {
-    std::vector<size_t> params_to_skip;
+  static std::vector<int> skip_chains_test() {
+    std::vector<int> params_to_skip;
     return params_to_skip;
   }
 
@@ -37,27 +37,17 @@ public:
     default_populate_chains();
   }
 
-  static std::vector<std::pair<size_t, double> >
+  static std::vector<std::pair<int, double> >
   get_expected_values() {
     using std::make_pair;
-    size_t index;
-    std::vector<size_t> dims;
-    dims.push_back(0);
+    std::vector<std::pair<int, double> > expected_values;
 
-    std::vector<std::pair<size_t, double> > expected_values;
+    expected_values.push_back(make_pair(chains->index("X[1]"), 12.92));
+    expected_values.push_back(make_pair(chains->index("X[2]"), 27.21));
+    expected_values.push_back(make_pair(chains->index("X[3]"), 40.85));
 
-    index = chains->get_total_param_index(chains->param_name_to_index("X"),
-					  dims);
-    expected_values.push_back(make_pair(index + 0U, 12.92));
-    expected_values.push_back(make_pair(index + 1U, 27.21));
-    expected_values.push_back(make_pair(index + 2U, 40.85));
-
-    index = chains->get_total_param_index(chains->param_name_to_index("theta1"),
-					  dims);
-    expected_values.push_back(make_pair(index, -0.9628));
-    index = chains->get_total_param_index(chains->param_name_to_index("theta2"),
-					  dims);
-    expected_values.push_back(make_pair(index, 0.04927));
+    expected_values.push_back(make_pair(chains->index("theta1"), -0.9628));
+    expected_values.push_back(make_pair(chains->index("theta2"), 0.04927));
     
     return expected_values;
   }

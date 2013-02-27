@@ -113,14 +113,14 @@ namespace stan {
        * @param rand_int Base random integer generator.
        */
       hmc_base(stan::model::prob_grad& model,
+               const std::vector<double>& params_r,
+               const std::vector<int>& params_i,
                double epsilon=-1,
                double epsilon_pm = 0.0,
                bool epsilon_adapt = true,
                double delta = 0.651,
                double gamma = 0.05,
-               BaseRNG rand_int = BaseRNG(std::time(0)),
-               const std::vector<double>* params_r = 0,
-               const std::vector<int>* params_i = 0) 
+	       BaseRNG rand_int = BaseRNG(std::time(0))) 
         : adaptive_sampler(epsilon_adapt),
           _model(model),
           _epsilon(epsilon),
@@ -138,16 +138,12 @@ namespace stan {
           _g(model.num_params_r())
       {
         model.init(_x,_z);
-        if (params_r) {
-          if (params_r->size() != model.num_params_r())
-            throw std::invalid_argument("hmc_base ctor:  double params must match in size"); 
-          _x = *params_r;
-        }
-        if (params_i) {
-          if (params_i->size() != model.num_params_i())
-            throw std::invalid_argument("hmc_base ctor:  int params must match in size"); 
-          _z = *params_i;
-        }
+	if (params_r.size() != model.num_params_r())
+	  throw std::invalid_argument("hmc_base ctor:  double params must match in size"); 
+	_x = params_r;
+	if (params_i.size() != model.num_params_i())
+	  throw std::invalid_argument("hmc_base ctor:  int params must match in size"); 
+	_z = params_i;
         _logp = model.grad_log_prob(_x,_z,_g);
         if (epsilon_adapt)
           find_reasonable_parameters();

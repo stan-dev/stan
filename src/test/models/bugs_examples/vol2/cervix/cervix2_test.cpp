@@ -24,12 +24,12 @@ public:
     return true;
   }
 
-  static size_t num_iterations() {
+  static int num_iterations() {
     return iterations;
   }
 
-  static std::vector<size_t> skip_chains_test() {
-    std::vector<size_t> params_to_skip;
+  static std::vector<int> skip_chains_test() {
+    std::vector<int> params_to_skip;
     return params_to_skip;
   }
 
@@ -37,38 +37,22 @@ public:
     default_populate_chains();
   }
 
-  static std::vector<std::pair<size_t, double> >
+  static std::vector<std::pair<int, double> >
   get_expected_values() {
     using std::make_pair;
-    size_t index;
-    std::vector<size_t> dims;
-    dims.push_back(0);
+    std::vector<std::pair<int, double> > expected_values;
 
-    std::vector<std::pair<size_t, double> > expected_values;
+    expected_values.push_back(make_pair(chains->index("beta0C"), -0.921));
 
-    index = chains->get_total_param_index(chains->param_name_to_index("beta0C"),
-					  dims);
-    expected_values.push_back(make_pair(index, -0.921));
+    expected_values.push_back(make_pair(chains->index("gamma1"), 0.4389));
+    expected_values.push_back(make_pair(chains->index("gamma2"), 0.5964));
 
-    index = chains->get_total_param_index(chains->param_name_to_index("gamma1"),
-					  dims);
-    expected_values.push_back(make_pair(index, 0.4389));
-    index = chains->get_total_param_index(chains->param_name_to_index("gamma2"),
-					  dims);
-    expected_values.push_back(make_pair(index, 0.5964));
+    expected_values.push_back(make_pair(chains->index("phi[1,1]"), 0.318));  // phi[1,1]
+    expected_values.push_back(make_pair(chains->index("phi[1,2]"), 0.221));  // phi[1,2]
+    expected_values.push_back(make_pair(chains->index("phi[2,1]"), 0.5664)); // phi[2,1]
+    expected_values.push_back(make_pair(chains->index("phi[2,2]"), 0.7585)); // phi[2,2]
 
-    dims.push_back(0);
-    index = chains->get_total_param_index(chains->param_name_to_index("phi"),
-					  dims);
-    expected_values.push_back(make_pair(index + 0U, 0.318));  // phi[1,1]
-    expected_values.push_back(make_pair(index + 2U, 0.221));  // phi[1,2]
-    expected_values.push_back(make_pair(index + 1U, 0.5664)); // phi[2,1]
-    expected_values.push_back(make_pair(index + 3U, 0.7585)); // phi[2,2]
-
-    dims.resize(1);
-    index = chains->get_total_param_index(chains->param_name_to_index("q"),
-					  dims);
-    expected_values.push_back(make_pair(index, 0.4953));
+    expected_values.push_back(make_pair(chains->index("q"), 0.4953));
     
     return expected_values;
   }

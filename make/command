@@ -1,5 +1,10 @@
+.PRECIOUS: bin/print$(EXE)
+bin/print$(EXE) : bin/stan/command/print.o
+	@mkdir -p $(dir $@)
+	$(LINK.c) -O$(O_STANC) $(OUTPUT_OPTION) $< 
+
 .PRECIOUS: bin/stanc$(EXE)
-bin/stanc$(EXE) : bin/stan/command/stanc.o bin/libstanc.a
+bin/stanc$(EXE) : bin/stan/command/stanc.o bin/libstanc.a bin/print$(EXE)
 	@mkdir -p $(dir $@)
 	$(LINK.c) -O$(O_STANC) $(OUTPUT_OPTION) $< $(LDLIBS_STANC)
 

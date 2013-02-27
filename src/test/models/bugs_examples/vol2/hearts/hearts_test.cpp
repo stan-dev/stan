@@ -24,12 +24,12 @@ public:
     return true;
   }
 
-  static size_t num_iterations() {
+  static int num_iterations() {
     return iterations;
   }
 
-  static std::vector<size_t> skip_chains_test() {
-    std::vector<size_t> params_to_skip;
+  static std::vector<int> skip_chains_test() {
+    std::vector<int> params_to_skip;
     return params_to_skip;
   }
 
@@ -37,35 +37,18 @@ public:
     default_populate_chains();
   }
 
-  static std::vector<std::pair<size_t, double> >
+  static std::vector<std::pair<int, double> >
   get_expected_values() {
         using std::make_pair;
-    size_t index;
-    std::vector<size_t> dims;
-    dims.push_back(0);
+    std::vector<std::pair<int, double> > expected_values;
 
-    std::vector<std::pair<size_t, double> > expected_values;
-
-    index = chains->get_total_param_index(chains->param_name_to_index("alpha"),
-					  dims);
-    expected_values.push_back(make_pair(index, -0.4809));
-
-    index = chains->get_total_param_index(chains->param_name_to_index("beta"),
-					  dims);
-    expected_values.push_back(make_pair(index, 0.6427));
-
-    index = chains->get_total_param_index(chains->param_name_to_index("delta"),
-					  dims);
-    expected_values.push_back(make_pair(index, 0.3144));
-
-    index = chains->get_total_param_index(chains->param_name_to_index("theta"),
-					  dims);
-    expected_values.push_back(make_pair(index, 0.5717));
+    expected_values.push_back(make_pair(chains->index("alpha"), -0.4809));
+    expected_values.push_back(make_pair(chains->index("beta"), 0.6427));
+    expected_values.push_back(make_pair(chains->index("delta"), 0.3144));
+    expected_values.push_back(make_pair(chains->index("theta"), 0.5717));
     
     return expected_values;
-
   }
-
 };
 
 INSTANTIATE_TYPED_TEST_CASE_P(Models_BugsExamples_Vol2_Hearts,

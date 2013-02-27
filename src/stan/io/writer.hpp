@@ -50,6 +50,8 @@ namespace stan {
         : data_r_(data_r),
           data_i_(data_i),
           CONSTRAINT_TOLERANCE(1E-8) {
+        data_r_.clear();
+        data_i_.clear();
       }
 
       /**

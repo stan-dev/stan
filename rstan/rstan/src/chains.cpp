@@ -252,9 +252,13 @@ namespace rstan {
 } 
 
 RcppExport SEXP effective_sample_size(SEXP sim, SEXP n_); 
+RcppExport SEXP effective_sample_size2(SEXP sims);
 RcppExport SEXP split_potential_scale_reduction(SEXP sim, SEXP n_); 
+RcppExport SEXP split_potential_scale_reduction2(SEXP sims_);
 RcppExport SEXP seq_permutation(SEXP conf);  
 RcppExport SEXP read_comments(SEXP file, SEXP n);
+
+RcppExport SEXP stan_prob_autocovariance(SEXP v);
 
 /** 
  * Returns the effective sample size for the specified parameter
@@ -270,7 +274,7 @@ RcppExport SEXP read_comments(SEXP file, SEXP n);
  *  iterations (warmup, etc), and parameter information.  
  * @param[in] n Parameter index
  * 
- * @return the effective sample size.
+ * @return The effective sample size.
  */
 // FIXME: reimplement using autocorrelation.
 SEXP effective_sample_size(SEXP sim, SEXP n_) { 
@@ -308,7 +312,7 @@ SEXP effective_sample_size(SEXP sim, SEXP n_) {
   vector<double> chain_mean;
   vector<double> chain_var;
   for (size_t chain = 0; chain < m; chain++) {
-    double n_kept_samples = ns_kept[chain]; 
+    unsigned int n_kept_samples = ns_kept[chain]; 
     chain_mean.push_back(rstan::get_chain_mean(sim,chain,n));
     chain_var.push_back(acov[chain][0]*n_kept_samples/(n_kept_samples-1));
   }
@@ -335,7 +339,117 @@ SEXP effective_sample_size(SEXP sim, SEXP n_) {
   END_RCPP; 
 }
 
+/*
+ * Wrap the autocovariance function in Stan 
+ * @param v: a vector in R
+ */ 
+SEXP stan_prob_autocovariance(SEXP v) {
+  BEGIN_RCPP; 
+  std::vector<double> dv = Rcpp::as<std::vector<double> >(v);
+  std::vector<double> acov;
+  stan::prob::autocovariance(dv, acov);
+  return Rcpp::wrap(acov);
+  END_RCPP;
+} 
 
+/**
+ * Returns the effective sample size for samples 
+ * of 2-d without warmup, similar to effective_sample_size 
+ * but with simpler input of samples.
+ *
+ * @param sims A 2-d array of # iter * # chains _without_ warmup for 
+ *  one parameter 
+ * @return The effective sample size.
+ */ 
+SEXP effective_sample_size2(SEXP sims) { 
+  BEGIN_RCPP; 
+  Rcpp::NumericMatrix nm(sims);
+  unsigned int m(nm.ncol());
+  unsigned int n_samples(nm.nrow());
+  using std::vector;
+  vector<vector<double> > acov;
+  vector<double> chain_mean;
+  for (size_t chain = 0; chain < m; chain++) {
+    Rcpp::NumericMatrix::Column samples_c = nm(Rcpp::_, chain);
+    vector<double> samples;
+    samples.assign(samples_c.begin(), samples_c.end());
+    vector<double> acov_chain;
+    stan::prob::autocovariance(samples, acov_chain);
+    acov.push_back(acov_chain);
+    chain_mean.push_back(stan::math::mean(samples));
+  }
+
+  vector<double> chain_var;
+  for (size_t chain = 0; chain < m; chain++) {
+    chain_var.push_back(acov[chain][0]*n_samples/(n_samples-1));
+  }
+  
+  double mean_var = stan::math::mean(chain_var);
+  double var_plus = mean_var*(n_samples-1)/n_samples;
+  if (m > 1) var_plus += stan::math::variance(chain_mean);
+  vector<double> rho_hat_t;
+  double rho_hat = 0;
+  for (size_t t = 1; (t < n_samples && rho_hat >= 0); t++) {
+    vector<double> acov_t(m);
+    for (size_t chain = 0; chain < m; chain++) {
+      acov_t[chain] = acov[chain][t];
+    }
+    rho_hat = 1 - (mean_var - stan::math::mean(acov_t)) / var_plus;
+    if (rho_hat >= 0)
+      rho_hat_t.push_back(rho_hat);
+  }
+  
+  double ess = m*n_samples;
+  if (rho_hat_t.size() > 0) {
+    ess /= 1 + 2 * stan::math::sum(rho_hat_t);
+  }
+  return Rcpp::wrap(ess);
+  END_RCPP; 
+} 
+
+
+/**
+ *
+ * Return the split rhat as split_potential_scale_reduction.
+ * Here the input is a two-d array: # iters * # chains 
+ * 
+ * @param[in] sims Simulation samples of several chains for one parameters,
+ *  no warmup samples are included 
+ * @return split R hat.
+ */ 
+SEXP split_potential_scale_reduction2(SEXP sims_) {
+  BEGIN_RCPP; 
+  Rcpp::NumericMatrix nm(sims_);
+  unsigned int n_chains = nm.ncol();
+  unsigned int n_samples = nm.nrow(); 
+  if (n_samples % 2 == 1)
+    n_samples--;
+
+  std::vector<double> split_chain_mean;
+  std::vector<double> split_chain_var;
+
+  for (size_t chain = 0; chain < n_chains; chain++) {
+    std::vector<double> split_chain(n_samples/2);
+    Rcpp::NumericMatrix::Column samples = nm(Rcpp::_, chain);
+    split_chain.assign(samples.begin(), 
+                       samples.begin() + n_samples/2);
+    split_chain_mean.push_back(stan::math::mean(split_chain));
+    split_chain_var.push_back(stan::math::variance(split_chain));
+    split_chain.assign(samples.end()-n_samples/2, 
+                       samples.end());
+    split_chain_mean.push_back(stan::math::mean(split_chain));
+    split_chain_var.push_back(stan::math::variance(split_chain));
+  } 
+  // copied and pasted from split_potential_scale_reduction
+  double var_between = n_samples/2 * stan::math::variance(split_chain_mean);
+  double var_within = stan::math::mean(split_chain_var);
+  
+  // rewrote [(n-1)*W/n + B/n]/W as (n-1+ B/W)/n
+  double srhat = sqrt((var_between/var_within + n_samples/2 -1)/(n_samples/2));
+  return Rcpp::wrap(srhat);
+
+  END_RCPP;
+} 
 
 /** 
  * Return the split potential scale reduction (split R hat)

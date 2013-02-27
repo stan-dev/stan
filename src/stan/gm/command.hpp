@@ -1,32 +1,18 @@
 #ifndef __STAN__GM__COMMAND_HPP__
 #define __STAN__GM__COMMAND_HPP__
 
-//#include <cmath>
-//#include <cstddef>
-//#include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
-//#include <iomanip>
-//#include <iostream>
 #include <fstream>
-//#include <sstream>
-//#include <vector>
 #include <boost/random/additive_combine.hpp> // L'Ecuyer RNG
-//#include <boost/random/mersenne_twister.hpp>
-//#include <boost/random/uniform_01.hpp>
 #include <boost/random/uniform_real_distribution.hpp>
 #include <stan/version.hpp>
 #include <stan/io/cmd_line.hpp>
 #include <stan/io/dump.hpp>
-//#include <stan/mcmc/adaptive_sampler.hpp>
 #include <stan/mcmc/adaptive_hmc.hpp>
-//#include <stan/mcmc/hmc.hpp>
 #include <stan/mcmc/nuts.hpp>
 #include <stan/mcmc/nuts_diag.hpp>
 #include <stan/mcmc/nuts_nondiag.hpp>
 #include <stan/mcmc/nuts_massgiven.hpp>
-//#include <stan/model/prob_grad_ad.hpp>
-//#include <stan/model/prob_grad.hpp>
-//#include <stan/mcmc/sampler.hpp>
 #include <stan/optimization/newton.hpp>
 
 namespace stan {
@@ -133,8 +119,8 @@ namespace stan {
 
       print_help_option(&std::cout,
                         "gamma","+float",
-                    "Gamma parameter for dual averaging step-size adaptation",
-                    "default = 0.05");
+                        "Gamma parameter for dual averaging step-size adaptation",
+                        "default = 0.05");
 
       print_help_option(&std::cout,
                         "save_warmup","",
@@ -149,12 +135,12 @@ namespace stan {
                         "Fit point estimate of hidden parameters by maximizing log joint probability");
       
       print_help_option(&std::cout,
-                          "nondiag_mass","",
-                          "Use a nondiagonal matrix to do the sampling");
+                        "nondiag_mass","",
+                        "Use a nondiagonal matrix to do the sampling");
         
-        print_help_option(&std::cout,
-                          "cov_matrix","file",
-                          "Preset an estimated covariance matrix");
+      print_help_option(&std::cout,
+                        "cov_matrix","file",
+                        "Preset an estimated covariance matrix");
       
       std::cout << std::endl;
     }
@@ -206,7 +192,7 @@ namespace stan {
             sampler.write_sampler_params(sample_file_stream);
             sample.params_r(params_r);
             sample.params_i(params_i);
-            model.write_csv(params_r,params_i,sample_file_stream);
+            model.write_csv(params_r,params_i,sample_file_stream,&std::cout);
           } else {
             sampler.next(); // discard
           }
@@ -226,7 +212,7 @@ namespace stan {
             sampler.write_sampler_params(sample_file_stream);
             sample.params_r(params_r);
             sample.params_i(params_i);
-            model.write_csv(params_r,params_i,sample_file_stream);
+            model.write_csv(params_r,params_i,sample_file_stream,&std::cout);
           }
         }
       }
@@ -294,6 +280,12 @@ namespace stan {
 
       double epsilon_pm = 0.0;
       command.val("epsilon_pm",epsilon_pm);
+      if (epsilon_pm < 0.0 || epsilon_pm > 1.0) {
+        std::stringstream ss;
+        ss << "epsilon_pm must be between 0 and 1"
+           << "; found epsilon_pm=" << epsilon_pm;
+        throw std::invalid_argument(ss.str());
+      }
 
       bool epsilon_adapt = epsilon <= 0.0;
 
@@ -311,8 +303,8 @@ namespace stan {
         
       bool nondiag_mass = command.has_flag("nondiag_mass");
     
-        std::string cov_file = "";
-        command.val("cov_matrix", cov_file);
+      std::string cov_file = "";
+      command.val("cov_matrix", cov_file);
 
       unsigned int random_seed = 0;
       if (command.has_key("seed")) {
@@ -392,7 +384,7 @@ namespace stan {
         boost::random::uniform_real_distribution<double> 
           init_range_distribution(-2.0,2.0);
         boost::variate_generator<rng_t&, 
-                       boost::random::uniform_real_distribution<double> >
+                                 boost::random::uniform_real_distribution<double> >
           init_rng(base_rng,init_range_distribution);
 
         params_i = std::vector<int>(model.num_params_i(),0);
@@ -405,7 +397,13 @@ namespace stan {
           for (size_t i = 0; i < params_r.size(); ++i)
             params_r[i] = init_rng();
           // FIXME: allow config vs. std::cout
-          double init_log_prob = model.grad_log_prob(params_r,params_i,init_grad,&std::cout);
+          double init_log_prob;
+	  try {
+	    init_log_prob = model.grad_log_prob(params_r,params_i,init_grad,&std::cout);
+	  } catch (std::domain_error e) {
+	    stan::mcmc::write_error_msgs(&std::cout, e);
+	    init_log_prob = -std::numeric_limits<double>::infinity();
+	  }
           if (!boost::math::isfinite(init_log_prob))
             continue;
           for (size_t i = 0; i < init_grad.size(); ++i)
@@ -414,7 +412,8 @@ namespace stan {
           break;
         }
         if (num_init_tries > MAX_INIT_TRIES) {
-          std::cout << "Initialization failed after " << MAX_INIT_TRIES 
+          std::cout << std::endl << std::endl
+		    << "Initialization failed after " << MAX_INIT_TRIES 
                     << " attempts. "
                     << " Try specifying initial values,"
                     << " reducing ranges of constrained values,"
@@ -475,7 +474,13 @@ namespace stan {
         model.write_csv_header(sample_stream);
 
         std::vector<double> gradient;
-        double lp = model.grad_log_prob(params_r, params_i, gradient);
+	double lp;
+	try {
+	  lp = model.grad_log_prob(params_r, params_i, gradient);
+	} catch (std::domain_error e) {
+	  stan::mcmc::write_error_msgs(&std::cout, e);
+	  lp = -std::numeric_limits<double>::infinity();
+	}
         
         double lastlp = lp - 1;
         std::cout << "initial log joint probability = " << lp << std::endl;
@@ -490,9 +495,9 @@ namespace stan {
           std::cout << std::endl;
           std::cout.flush();
           m++;
-//           for (size_t i = 0; i < params_r.size(); i++)
-//             fprintf(stderr, "%f ", params_r[i]);
-//           fprintf(stderr, "   %f  (last = %f)\n", lp, lastlp);
+          //           for (size_t i = 0; i < params_r.size(); i++)
+          //             fprintf(stderr, "%f ", params_r[i]);
+          //           fprintf(stderr, "   %f  (last = %f)\n", lp, lastlp);
           if (save_warmup) {
             sample_stream << lp << ',';
             model.write_csv(params_r,params_i,sample_stream);
@@ -571,61 +576,58 @@ namespace stan {
       write_comment(sample_stream);
 
         
-        clock_t start = clock();
-        if (cov_file != ""){
-            stan::mcmc::nuts_massgiven<rng_t> nuts_massgiven_sampler(model,
-                                                                     cov_file,
-                                                                     max_treedepth, epsilon,
-                                                                     epsilon_pm, epsilon_adapt,
-                                                                     delta, gamma,
-                                                                     base_rng, &params_r,
-                                                                     &params_i);
-            
-            // cut & paste (see below) to enable sample-specific params
-            if (!append_samples) {
-                sample_stream << "lp__,"; // log probability first
-                nuts_massgiven_sampler.write_sampler_param_names(sample_stream);
-                model.write_csv_header(sample_stream);
-            }
-            nuts_massgiven_sampler.set_error_stream(std::cout);  // cout intended
-            nuts_massgiven_sampler.set_output_stream(std::cout);
-            
-            sample_from(nuts_massgiven_sampler,epsilon_adapt,refresh,
-                        num_iterations,num_warmup,num_thin,save_warmup,
-                        sample_stream,params_r,params_i,
-                        model);//Yuanjun add a comment here to allow nondiag_mass matrix
-            
-            }
-        else if (nondiag_mass){
-            stan::mcmc::nuts_nondiag<rng_t> nuts_nondiag_sampler(model,
+      clock_t start = clock();
+      if (cov_file != ""){
+        stan::mcmc::nuts_massgiven<rng_t> nuts_massgiven_sampler(model,params_r,params_i,
+                                                                 cov_file,
                                                                  max_treedepth, epsilon,
                                                                  epsilon_pm, epsilon_adapt,
                                                                  delta, gamma,
-                                                                 base_rng, &params_r,
-                                                                 &params_i);
+                                                                 base_rng);
             
-            // cut & paste (see below) to enable sample-specific params
-            if (!append_samples) {
-                sample_stream << "lp__,"; // log probability first
-                nuts_nondiag_sampler.write_sampler_param_names(sample_stream);
-                model.write_csv_header(sample_stream);
-            }
-            nuts_nondiag_sampler.set_error_stream(std::cout);  // cout intended
-            nuts_nondiag_sampler.set_output_stream(std::cout);
+        // cut & paste (see below) to enable sample-specific params
+        if (!append_samples) {
+          sample_stream << "lp__,"; // log probability first
+          nuts_massgiven_sampler.write_sampler_param_names(sample_stream);
+          model.write_csv_header(sample_stream);
+        }
+        nuts_massgiven_sampler.set_error_stream(std::cout);  // cout intended
+        nuts_massgiven_sampler.set_output_stream(std::cout);
             
-            sample_from(nuts_nondiag_sampler,epsilon_adapt,refresh,
-                        num_iterations,num_warmup,num_thin,save_warmup,
-                        sample_stream,params_r,params_i,
-                        model);//Yuanjun add a comment here to allow nondiag_mass matrix
-     }
-     else if (leapfrog_steps < 0 && !equal_step_sizes) {
+        sample_from(nuts_massgiven_sampler,epsilon_adapt,refresh,
+                    num_iterations,num_warmup,num_thin,save_warmup,
+                    sample_stream,params_r,params_i,
+                    model);//Yuanjun add a comment here to allow nondiag_mass matrix
+            
+      }
+      else if (nondiag_mass){
+        stan::mcmc::nuts_nondiag<rng_t> nuts_nondiag_sampler(model,params_r,params_i,
+                                                             max_treedepth, epsilon,
+                                                             epsilon_pm, epsilon_adapt,
+                                                             delta, gamma,
+                                                             base_rng);
+            
+        // cut & paste (see below) to enable sample-specific params
+        if (!append_samples) {
+          sample_stream << "lp__,"; // log probability first
+          nuts_nondiag_sampler.write_sampler_param_names(sample_stream);
+          model.write_csv_header(sample_stream);
+        }
+        nuts_nondiag_sampler.set_error_stream(std::cout);  // cout intended
+        nuts_nondiag_sampler.set_output_stream(std::cout);
+            
+        sample_from(nuts_nondiag_sampler,epsilon_adapt,refresh,
+                    num_iterations,num_warmup,num_thin,save_warmup,
+                    sample_stream,params_r,params_i,
+                    model);//Yuanjun add a comment here to allow nondiag_mass matrix
+      }
+      else if (leapfrog_steps < 0 && !equal_step_sizes) {
         // NUTS II (with varying step size estimation during warmup)
-        stan::mcmc::nuts_diag<rng_t> nuts2_sampler(model, 
+        stan::mcmc::nuts_diag<rng_t> nuts2_sampler(model,params_r,params_i, 
                                                    max_treedepth, epsilon, 
                                                    epsilon_pm, epsilon_adapt,
                                                    delta, gamma, 
-                                                   base_rng, &params_r,
-                                                   &params_i);
+                                                   base_rng);
 
         // cut & paste (see below) to enable sample-specific params
         if (!append_samples) {
@@ -644,16 +646,15 @@ namespace stan {
       } else if (leapfrog_steps < 0 && equal_step_sizes) {
 
         // NUTS I (equal step sizes)
-        stan::mcmc::nuts<rng_t> nuts_sampler(model, 
+        stan::mcmc::nuts<rng_t> nuts_sampler(model,params_r,params_i,
                                              max_treedepth, epsilon, 
                                              epsilon_pm, epsilon_adapt,
                                              delta, gamma, 
-                                             base_rng, &params_r,
-                                             &params_i);
+                                             base_rng);
 
         nuts_sampler.set_error_stream(std::cout);
         nuts_sampler.set_output_stream(std::cout); // cout intended
-          // cut & paste (see below) to enable sample-specific params
+        // cut & paste (see below) to enable sample-specific params
         if (!append_samples) {
           sample_stream << "lp__,"; // log probability first
           nuts_sampler.write_sampler_param_names(sample_stream);
@@ -668,12 +669,11 @@ namespace stan {
       } else {
 
         // STANDARD HMC
-        stan::mcmc::adaptive_hmc<rng_t> hmc_sampler(model,
+        stan::mcmc::adaptive_hmc<rng_t> hmc_sampler(model,params_r,params_i,
                                                     leapfrog_steps,
                                                     epsilon, epsilon_pm, epsilon_adapt,
                                                     delta, gamma,
-                                                    base_rng, &params_r,
-                                                    &params_i);
+                                                    base_rng);
 
         hmc_sampler.set_error_stream(std::cout); // intended
         hmc_sampler.set_output_stream(std::cout);
@@ -689,9 +689,11 @@ namespace stan {
                     sample_stream,params_r,params_i,
                     model);
       }
-        clock_t end = clock();
-        double deltaT = (double)(end - start) / CLOCKS_PER_SEC;
-        std::cout<<"used " << deltaT << " seconds" <<std::endl;
+      clock_t end = clock();
+      double deltaT = (double)(end - start) / CLOCKS_PER_SEC;
+      std::cout << std::endl 
+                << "Elapsed Time: " << deltaT << " seconds" 
+                << std::endl;
       
       sample_stream.close();
       std::cout << std::endl << std::endl;
