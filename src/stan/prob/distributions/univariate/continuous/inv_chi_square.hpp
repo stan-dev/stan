@@ -130,6 +130,7 @@ namespace stan {
       using stan::math::check_nonnegative;
           
       using boost::math::tools::promote_args;
+      using stan::math::value_of;
           
       double P(1.0);
           
@@ -169,7 +170,6 @@ namespace stan {
       }
         
       // Compute CDF and its gradients
-      using stan::math::value_of;
       using boost::math::gamma_p_derivative;
       using boost::math::gamma_q;
       using boost::math::tgamma;
