@@ -2060,7 +2060,7 @@ TEST(AgradFvar,ne) {
 }
 
 
-TEST(AgradFvar,eq) {
+TEST(AgradFvar, eq) {
   using stan::agrad::fvar;
   fvar<double> v4 = 4;
   fvar<double> v5 = 5;
@@ -2083,4 +2083,91 @@ TEST(AgradFvar,eq) {
   EXPECT_FALSE(i5 == d4);
   EXPECT_TRUE(i6 == i5);
   EXPECT_TRUE(i6 == v5);
+}
+
+TEST(AgradFvar, numeric_limits) {
+  using stan::agrad::fvar;
+
+  EXPECT_TRUE(std::numeric_limits<stan::agrad::fvar<double> >::is_specialized);
+  EXPECT_TRUE(std::numeric_limits<stan::agrad::fvar<int> >::is_specialized);
+
+  EXPECT_FLOAT_EQ(std::numeric_limits<stan::agrad::fvar<double> >::digits, 53);
+  EXPECT_FLOAT_EQ(std::numeric_limits<stan::agrad::fvar<int> >::digits, 31);
+
+
+
+
+
+  EXPECT_FLOAT_EQ(std::numeric_limits<stan::agrad::fvar<double> >::digits10, 15);
+  EXPECT_FLOAT_EQ(std::numeric_limits<stan::agrad::fvar<int> >::digits10, 9);
+
+  EXPECT_FLOAT_EQ(std::numeric_limits<stan::agrad::fvar<double> >::is_signed, 1);
+  EXPECT_FLOAT_EQ(std::numeric_limits<stan::agrad::fvar<int> >::is_signed, 1);
+
+  EXPECT_FLOAT_EQ(std::numeric_limits<stan::agrad::fvar<double> >::is_integer, 0);
+  EXPECT_FLOAT_EQ(std::numeric_limits<stan::agrad::fvar<int> >::is_integer, 1);
+
+  EXPECT_FLOAT_EQ(std::numeric_limits<stan::agrad::fvar<double> >::is_exact, 0);
+  EXPECT_FLOAT_EQ(std::numeric_limits<stan::agrad::fvar<int> >::is_exact, 1);
+
+  EXPECT_FLOAT_EQ(std::numeric_limits<stan::agrad::fvar<double> >::radix, 2);
+  EXPECT_FLOAT_EQ(std::numeric_limits<stan::agrad::fvar<int> >::radix, 2);
+
+
+
+
+
+  EXPECT_FLOAT_EQ(std::numeric_limits<stan::agrad::fvar<double> >::min_exponent, -1021);
+  EXPECT_FLOAT_EQ(std::numeric_limits<stan::agrad::fvar<int> >::min_exponent, 0);
+
+  EXPECT_FLOAT_EQ(std::numeric_limits<stan::agrad::fvar<double> >::min_exponent10, -307);
+  EXPECT_FLOAT_EQ(std::numeric_limits<stan::agrad::fvar<int> >::min_exponent10, 0);
+
+  EXPECT_FLOAT_EQ(std::numeric_limits<stan::agrad::fvar<double> >::max_exponent, 1024);
+  EXPECT_FLOAT_EQ(std::numeric_limits<stan::agrad::fvar<int> >::max_exponent, 0);
+
+  EXPECT_FLOAT_EQ(std::numeric_limits<stan::agrad::fvar<double> >::max_exponent10, 308);
+  EXPECT_FLOAT_EQ(std::numeric_limits<stan::agrad::fvar<int> >::max_exponent10, 0);
+
+  EXPECT_FLOAT_EQ(std::numeric_limits<stan::agrad::fvar<double> >::has_infinity, 1);
+  EXPECT_FLOAT_EQ(std::numeric_limits<stan::agrad::fvar<int> >::has_infinity, 0);
+
+  EXPECT_FLOAT_EQ(std::numeric_limits<stan::agrad::fvar<double> >::has_quiet_NaN, 1);
+  EXPECT_FLOAT_EQ(std::numeric_limits<stan::agrad::fvar<int> >::has_quiet_NaN, 0);
+
+  EXPECT_FLOAT_EQ(std::numeric_limits<stan::agrad::fvar<double> >::has_signaling_NaN, 1);
+  EXPECT_FLOAT_EQ(std::numeric_limits<stan::agrad::fvar<int> >::has_signaling_NaN, 0);
+
+  EXPECT_FLOAT_EQ(std::numeric_limits<stan::agrad::fvar<double> >::has_denorm, 1);
+  EXPECT_FLOAT_EQ(std::numeric_limits<stan::agrad::fvar<int> >::has_denorm, 0);
+
+  EXPECT_FLOAT_EQ(std::numeric_limits<stan::agrad::fvar<double> >::has_denorm_loss, 0);
+  EXPECT_FLOAT_EQ(std::numeric_limits<stan::agrad::fvar<int> >::has_denorm_loss, 0);
+
+
+
+
+
+
+
+
+
+
+  EXPECT_FLOAT_EQ(std::numeric_limits<stan::agrad::fvar<double> >::is_iec559, 1);
+  EXPECT_FLOAT_EQ(std::numeric_limits<stan::agrad::fvar<int> >::is_iec559, 0);
+
+  EXPECT_FLOAT_EQ(std::numeric_limits<stan::agrad::fvar<double> >::is_bounded, 1);
+  EXPECT_FLOAT_EQ(std::numeric_limits<stan::agrad::fvar<int> >::is_bounded, 1);
+
+  EXPECT_FLOAT_EQ(std::numeric_limits<stan::agrad::fvar<double> >::is_modulo, 0);
+  EXPECT_FLOAT_EQ(std::numeric_limits<stan::agrad::fvar<int> >::is_modulo, 1);
+
+  EXPECT_FLOAT_EQ(std::numeric_limits<stan::agrad::fvar<double> >::traps, 0);
+  EXPECT_FLOAT_EQ(std::numeric_limits<stan::agrad::fvar<int> >::traps, 1);
+
+  EXPECT_FLOAT_EQ(std::numeric_limits<stan::agrad::fvar<double> >::tinyness_before, 0);
+  EXPECT_FLOAT_EQ(std::numeric_limits<stan::agrad::fvar<int> >::tinyness_before, 0);
+
+  EXPECT_FLOAT_EQ(std::numeric_limits<stan::agrad::fvar<double> >::round_style, 1);
+  EXPECT_FLOAT_EQ(std::numeric_limits<stan::agrad::fvar<int> >::round_style, 0);
 }
