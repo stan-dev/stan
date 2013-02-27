@@ -159,7 +159,8 @@ namespace stan {
       using stan::math::check_positive;
       using stan::math::check_finite;
       using stan::math::check_consistent_sizes;
-          
+      using stan::math::value_of;
+
       using boost::math::tools::promote_args;
           
       double P(1.0);
@@ -201,8 +202,6 @@ namespace stan {
       }
           
       // Compute vectorized CDF and its gradients
-      using stan::math::value_of;
-          
       for (size_t n = 0; n < N; n++) {
               
 	// Explicit results for extreme values

@@ -224,6 +224,12 @@ for (size_t i = 0; i < vector_types.size(); ++i)
       add("logistic_log",
           DOUBLE_T, // result
           vector_types[i], vector_types[j], vector_types[k]); // args
+for (size_t i = 0; i < vector_types.size(); ++i)
+  for (size_t j = 0; j < vector_types.size(); ++j)
+    for (size_t k = 0; k < vector_types.size(); ++k)
+      add("logistic_cdf",
+          DOUBLE_T, // result
+          vector_types[i], vector_types[j], vector_types[k]); // args
 add_unary("logit");
 add_ternary("lognormal_cdf");
 for (size_t i = 0; i < vector_types.size(); ++i)
