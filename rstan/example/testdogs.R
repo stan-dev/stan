@@ -108,9 +108,9 @@ ss1 <- sampling(dogsrr, data = dogsdat, chains = 1, seed = 1340384924,
   dogsdat <- rstan:::data_preprocess(dogsdat)
 
   mod <- dogsrr@dso@.CXXDSOMISC$module 
-  model_cppname <- dogsrr@model_cpp$model_cppname 
+  model_cppname <- paste0('stan_fit4', dogsrr@model_cpp$model_cppname) 
   stan_fit_cpp_module <- eval(call("$", mod, model_cppname))
-  sampler <- new(stan_fit_cpp_module, dogsdat) 
+  sampler <- new(stan_fit_cpp_module, dogsdat, dogsrr@dso@.CXXDSOMISC$cxxfun) 
 
 
   t1 <- sampler$call_sampler(args) 
@@ -129,7 +129,7 @@ print(args)
 post <- read.csv(file = 'dogs.csv', header = TRUE, skip = 19, comment = "#") 
 colMeans(post)
 
-stop('no reason')
+# stop('no reason')
 
 print(ss1)
 print(ss)

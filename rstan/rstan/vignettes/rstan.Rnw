@@ -88,14 +88,14 @@ This is a short introduction to \RStan \footnote{The name of this package is
 the \R interface to \Stan. Users of \RStan need to be familiar with \Stan first,
 especially the \Stan modeling language.  Details about \Stan can be found in 
 \emph{Stan Modeling Language User's Guide and Reference
-Manual} (\citealt{StanManual:2012}), so we focus on how to use \RStan by an
+Manual} (\citealt{StanManual:2013}), so we focus on how to use \RStan by an
 example in \cite{GelmanCarlinSternRubin:2003} here. 
 
 \subsection{Prerequisites} 
 
 Although we refer to \RStan as an \R interface to \Stan, \RStan does not 
 need \Stan to be installed. However, we need a \Cpp compiler as needed by
-\Stan. Refer to \cite{StanManual:2012} for how to install a \Cpp compiler if there 
+\Stan. Refer to \cite{StanManual:2013} for how to install a \Cpp compiler if there 
 not exists one. 
 
 In addition, package \pkg{rstan} depends on other \R packages: \cpkg{Rcpp}, \cpkg{inline},
@@ -383,6 +383,25 @@ dim(s2)
 dimnames(s2)
 @
 
+\subsection{The log posterior function and its gradient} 
+
+As of RStan 1.1.2, the log posterior function (up to a 
+additive constant in general) can be evaluated through two
+methods of a stanfit object. These two functions are \code{log\_prob}
+and \code{grad\_log\_prob}. Both functions take parameters
+on the \textit{unconstrained} space, when the support of a parameter 
+is not the whole real line. See \cite{StanManual:2013} for more details
+about transformation. Also the number of unconstrained parameters 
+might be less than the number of parameters. For example, when
+a parameter is a simplex of length $K$, the number of unconstrained 
+parameters are $K-1$. To get the number of unconstrained parameters, 
+function \code{get\_num\_upars} for a stanfit object can be used. 
+To transform parameters between the constrained space and 
+the unconstrained, we can use functions \code{transform\_pars} 
+and \code{constrained\_pars}. The former takes a list of parameters 
+as input and transforms to unconstrained space, and the latter 
+does the inversion. 
+
 \subsection{The dynamic shared objects for models} 
 
 In \Stan, for every model, we use \stanc to compile the 
@@ -400,7 +419,7 @@ In addition, if the fitted model is saved, for example, by function
 \code{save} and \code{save.image}, \RStan is able to save the 
 DSO for models, so that they can be used across \R sessions. 
 Saving the DSO is optional by specifying parameter \code{save\_dso}, which
-is \code{TRUE}, by default, during calling function \code{stan}. 
+is \code{TRUE} by default, during calling function \code{stan}. 
 
 \section{Miscellaneous} 
 
@@ -432,10 +451,14 @@ Name  &    Functionality    \\
 \code{get\_logposterior}     & get the log posterior  \\
 \code{get\_sampler\_params}    & get parameters used by the sampler such as \code{treedepth} of NUTS  \\
 \code{get\_adaptation\_info}    & get adaptation information, if any, of the sampler \\ 
+\code{get\_num\_upars}    & get the number of parameters on unconstrained space \\ 
+\code{transform\_pars}    & transform parameter to unconstrained space \\ 
+\code{constrain\_pars}    & transform parameter from unconstrained space to its defined space \\
+\code{log\_prob}    & evaluate the log posterior for parameter on unconstrained space \\
+\code{grad\_log\_prob}    & evaluate the gradient of the log posterior for parameter on unconstrained space \\
 \bottomrule 
 \end{tabular}
 \end{table}
-
 \nocite{*} 
 \bibliography{rstan} 
 \end{document} 

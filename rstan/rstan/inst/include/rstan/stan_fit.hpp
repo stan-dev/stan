@@ -18,6 +18,8 @@
 #include <stan/mcmc/nuts_massgiven.hpp>
 #include <stan/optimization/newton.hpp>
 
+#include <stan/agrad/agrad.hpp>
+
 #include <rstan/io/rlist_ref_var_context.hpp> 
 #include <rstan/io/r_ostream.hpp> 
 #include <rstan/stan_args.hpp> 
@@ -691,6 +693,7 @@ namespace rstan {
     std::vector<unsigned int> starts_oi_;  
     unsigned int num_params2_;  // total number of POI's.   
     std::vector<std::string> fnames_oi_; 
+    Rcpp::Function cxxfunction; // keep a reference to the cxxfun, no functional purpose.
 
   private: 
     /**
@@ -747,7 +750,7 @@ namespace rstan {
       return Rcpp::wrap(true); 
     } 
 
-    stan_fit(SEXP data) : 
+    stan_fit(SEXP data, SEXP cxxf) : 
       data_(Rcpp::as<Rcpp::List>(data)), 
       model_(data_, &rstan::io::rcout),  
       names_(get_param_names(model_)), 
@@ -755,7 +758,8 @@ namespace rstan {
       num_params_(calc_total_num_params(dims_)), 
       names_oi_(names_), 
       dims_oi_(dims_),
-      num_params2_(num_params_)  
+      num_params2_(num_params_),
+      cxxfunction(cxxf)  
     {
       for (size_t j = 0; j < num_params2_ - 1; j++) 
         names_oi_tidx_.push_back(j);
@@ -764,6 +768,114 @@ namespace rstan {
       get_all_flatnames(names_oi_, dims_oi_, fnames_oi_, true); 
     }             
 
+    /**
+     * Transform the parameters from its defined support
+     * to unconstrained space 
+     * 
+     * @param par An R list as for specifying the initial values
+     *  for a chain 
+     */
+    SEXP transform_pars(SEXP par) {
+      Rcpp::List par_lst(par); 
+      rstan::io::rlist_ref_var_context par_context(par_lst); 
+      std::vector<int> params_i;
+      std::vector<double> params_r;
+      model_.transform_inits(par_context, params_i, params_r);
+      return Rcpp::wrap(params_r);
+    } 
+
+    /**
+     * Contrary to transform_pars, transform parameters
+     * from unconstrained support to the constrained. 
+     * 
+     * @param upar The parameter values on the unconstrained 
+     *  space 
+     */ 
+    SEXP constrain_pars(SEXP upar) {
+      std::vector<double> par;
+      std::vector<double> params_r = Rcpp::as<std::vector<double> >(upar);
+      if (params_r.size() != model_.num_params_r()) {
+        std::stringstream msg; 
+        msg << "Number of unconstrained parameters does not match " 
+               "that of the model (" 
+            << params_r.size() << " vs " 
+            << model_.num_params_r() 
+            << ").";
+        throw std::domain_error(msg.str()); 
+      } 
+      std::vector<int> params_i(model_.num_params_i());
+      model_.write_array(params_r, params_i, par);
+      return Rcpp::wrap(par);
+    } 
+  
+    /**
+     * Expose the log_prob of the model to stan_fit so R user
+     * can call this function. 
+     * 
+     * @param upar The real parameters on the unconstrained 
+     *  space. 
+     */
+    SEXP log_prob(SEXP upar) {
+      BEGIN_RCPP;
+      using std::vector;
+      vector<double> par_r = Rcpp::as<vector<double> >(upar);
+      if (par_r.size() != model_.num_params_r()) {
+        std::stringstream msg; 
+        msg << "Number of unconstrained parameters does not match " 
+               "that of the model (" 
+            << par_r.size() << " vs " 
+            << model_.num_params_r() 
+            << ").";
+        throw std::domain_error(msg.str()); 
+      } 
+      vector<stan::agrad::var> par_r2; 
+      for (size_t i = 0; i < par_r.size(); i++) 
+        par_r2.push_back(stan::agrad::var(par_r[i]));
+      vector<int> par_i(model_.num_params_i(), 0);
+      SEXP lp = Rcpp::wrap(model_.log_prob(par_r2, par_i, &rstan::io::rcout).val());
+      return lp;
+      END_RCPP;
+    } 
+
+    /**
+     * Expose the grad_log_prob of the model to stan_fit so R user
+     * can call this function. 
+     * 
+     * @param upar The real parameters on the unconstrained 
+     *  space. 
+     */
+    SEXP grad_log_prob(SEXP upar) {
+      // TODO: add the log_prob as well since it's a byproduct
+      BEGIN_RCPP;
+      std::vector<double> par_r = Rcpp::as<std::vector<double> >(upar);
+      if (par_r.size() != model_.num_params_r()) {
+        std::stringstream msg; 
+        msg << "Number of unconstrained parameters does not match " 
+               "that of the model (" 
+            << par_r.size() << " vs " 
+            << model_.num_params_r() 
+            << ").";
+        throw std::domain_error(msg.str()); 
+      } 
+      std::vector<int> par_i(model_.num_params_i(), 0);
+      std::vector<double> gradient; 
+      model_.grad_log_prob(par_r, par_i, gradient, &rstan::io::rcout);
+      Rcpp::NumericVector grad = Rcpp::wrap(gradient); 
+      // grad.attr("log_prob") = 0; // FIXME
+      return grad;
+      END_RCPP;
+    } 
+
+    /**
+     * Return the number of unconstrained parameters 
+     */ 
+    SEXP num_pars_unconstrained() {
+      BEGIN_RCPP;
+      int n = model_.num_params_r();
+      return Rcpp::wrap(n);
+      END_RCPP;
+    } 
+    
     SEXP call_sampler(SEXP args_) { 
       BEGIN_RCPP; 
       Rcpp::List lst_args(args_); 

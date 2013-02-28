@@ -71,7 +71,9 @@ stan(file, model_name = "anon_model", model_code = "",
       values of parameters by name for the corresponding chain.
     \code{function}: a function that returns a list for specifying 
       the initial values of parameters for a chain. The function
-      can take an optional parameter \code{chain_id}. 
+      can take an optional parameter \code{chain_id}.
+     See below notes on that RStan treats a vector of lenght 1 as
+     a scalar. 
   }
   \item{sample_file}{A character string of file name for specifying where to 
     write samples for \emph{all} parameters and other saved quantities. 
@@ -218,7 +220,10 @@ stan(file, model_name = "anon_model", model_code = "",
 
   Stan treats a vector of length 1 in R as a scalar.  So technically 
   if, for example, \code{"real y[1];"} is defined in the data block, an array 
-  such as \code{"y = array(1.0, dim = 1)"} in R should be used. 
+  such as \code{"y = array(1.0, dim = 1)"} in R should be used. This
+  is also the case for specifying initial values since the same 
+  underlying approach for reading data from R in Stan is used, in which
+  vector of length 1 is treated as a scalar.
 
   The returned S4 class \code{stanfit} includes the compiled model
   if option \code{save_dso} is \code{TRUE}, so the compiled model
