@@ -53,7 +53,7 @@ namespace stan {
             && stan::length(s)))
         return 0.0;
 
-      typename return_type<T_y,T_dof,T_scale>::type logp(0.0);
+      double logp(0.0);
       if (!check_not_nan(function, y, "Random variable", &logp, Policy()))
         return logp;
       if (!check_finite(function, nu, "Degrees of freedom parameter", &logp, Policy()))
@@ -84,22 +84,82 @@ namespace stan {
 	  return LOG_ZERO;
       }
 
+      using boost::math::lgamma;
+      using boost::math::digamma;
       using stan::math::multiply_log;
       using stan::math::square;
-    
-      for (size_t n = 0; n < N; n++) {
-	if (include_summand<propto,T_dof>::value) {
-	  typename return_type<T_dof>::type half_nu = 0.5 * nu_vec[n];
-	  logp += multiply_log(half_nu,half_nu) - lgamma(half_nu);
-	}
-	if (include_summand<propto,T_dof,T_scale>::value)
-	  logp += nu_vec[n] * log(s_vec[n]);
-	if (include_summand<propto,T_dof,T_y>::value)
-	  logp -= multiply_log(nu_vec[n]*0.5+1.0, y_vec[n]);
+      
+      DoubleVectorView<include_summand<propto,T_dof,T_y,T_scale>::value,
+	is_vector<T_dof>::value> half_nu(length(nu));
+      for (size_t i = 0; i < length(nu); i++)
 	if (include_summand<propto,T_dof,T_y,T_scale>::value)
-	  logp -= nu_vec[n] * 0.5 * square(s_vec[n]) / y_vec[n];
+	  half_nu[i] = 0.5 * value_of(nu_vec[i]);
+
+      DoubleVectorView<include_summand<propto,T_dof,T_y>::value,
+	is_vector<T_y>::value> log_y(length(y));      
+      for (size_t i = 0; i < length(y); i++)
+	if (include_summand<propto,T_dof,T_y>::value)
+	  log_y[i] = log(value_of(y_vec[i]));
+
+      DoubleVectorView<include_summand<propto,T_dof,T_y,T_scale>::value,
+	is_vector<T_y>::value> inv_y(length(y));
+      for (size_t i = 0; i < length(y); i++)
+	if (include_summand<propto,T_dof,T_y,T_scale>::value)
+	  inv_y[i] = 1.0 / value_of(y_vec[i]);
+      
+      DoubleVectorView<include_summand<propto,T_dof,T_scale>::value,
+	is_vector<T_scale>::value> log_s(length(s));
+      for (size_t i = 0; i < length(s); i++)
+	if (include_summand<propto,T_dof,T_scale>::value)
+	  log_s[i] = log(value_of(s_vec[i]));
+      
+      DoubleVectorView<include_summand<propto,T_dof>::value,
+	is_vector<T_dof>::value> log_half_nu(length(nu));
+      DoubleVectorView<include_summand<propto,T_dof>::value,
+	is_vector<T_dof>::value> lgamma_half_nu(length(nu));
+      DoubleVectorView<!is_constant_struct<T_dof>::value,
+	is_vector<T_dof>::value> digamma_half_nu_over_two(length(nu));
+      for (size_t i = 0; i < length(nu); i++) {
+	if (include_summand<propto,T_dof>::value)
+	  lgamma_half_nu[i] = lgamma(half_nu[i]);
+	if (include_summand<propto,T_dof>::value)
+	  log_half_nu[i] = log(half_nu[i]);
+	if (!is_constant_struct<T_dof>::value)
+	  digamma_half_nu_over_two[i] = digamma(half_nu[i]) * 0.5;
       }
-      return logp;
+
+      agrad::OperandsAndPartials<T_y,T_dof,T_scale> operands_and_partials(y, nu, s);
+      for (size_t n = 0; n < N; n++) {
+	const double s_dbl = value_of(s_vec[n]);
+	const double nu_dbl = value_of(nu_vec[n]);
+	if (include_summand<propto,T_dof>::value) 
+	  logp += half_nu[n] * log_half_nu[n] - lgamma_half_nu[n];
+	if (include_summand<propto,T_dof,T_scale>::value)
+	  logp += nu_dbl * log_s[n];
+	if (include_summand<propto,T_dof,T_y>::value)
+	  logp -= (half_nu[n]+1.0) * log_y[n];
+	if (include_summand<propto,T_dof,T_y,T_scale>::value)
+	  logp -= half_nu[n] * s_dbl*s_dbl * inv_y[n];
+
+	if (!is_constant_struct<T_y>::value) {
+	  operands_and_partials.d_x1[n] 
+	    += -(half_nu[n] + 1.0) * inv_y[n] 
+	    + half_nu[n] * s_dbl*s_dbl * inv_y[n]*inv_y[n];
+	}
+	if (!is_constant_struct<T_dof>::value) {
+	  operands_and_partials.d_x2[n] 
+	    += 0.5 * log_half_nu[n] + 0.5
+	    - digamma_half_nu_over_two[n]
+	    + log_s[n]
+	    - 0.5 * log_y[n]
+	    - 0.5* s_dbl*s_dbl * inv_y[n];
+	}
+	if (!is_constant_struct<T_scale>::value) {
+	  operands_and_partials.d_x3[n] 
+	    += nu_dbl / s_dbl - nu_dbl * inv_y[n] * s_dbl;
+	}
+      }
+      return operands_and_partials.to_var(logp);
     }
 
     template <bool propto,
