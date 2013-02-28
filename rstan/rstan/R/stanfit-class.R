@@ -488,6 +488,71 @@ if (!isGeneric("traceplot")) {
              def = function(object, ...) { standardGeneric("traceplot") }) 
 } 
 
+if (!isGeneric("log_prob")) {
+  setGeneric(name = "log_prob", 
+             def = function(object, ...) { standardGeneric("log_prob") }) 
+} 
+
+if (!isGeneric("transform_pars")) {
+  setGeneric(name = "transform_pars", 
+             def = function(object, ...) { standardGeneric("transform_pars") }) 
+} 
+
+setMethod("transform_pars", signature = "stanfit", 
+          function(object, pars) {
+            # pars is a list as specifying inits for a chain
+            if (!is_sfinstance_valid(object)) 
+              stop("the model object is not created or not valid")
+            object@.MISC$stan_fit_instance$transform_pars(pars)
+          })
+
+if (!isGeneric("constrain_pars")) {
+  setGeneric(name = "constrain_pars", 
+             def = function(object, ...) { standardGeneric("constrain_pars") }) 
+} 
+
+setMethod("constrain_pars", signature = "stanfit", 
+          function(object, pars) {
+            # pars is a list as specifying inits for a chain
+            if (!is_sfinstance_valid(object)) 
+              stop("the model object is not created or not valid")
+            p <- object@.MISC$stan_fit_instance$constrain_pars(pars)
+            par_vector2list(p, object@model_pars[which(object@model_pars != 'lp__')],
+                            object@par_dims)
+          })
+
+
+setMethod("log_prob", signature = "stanfit", 
+          function(object, pars) {
+            if (!is_sfinstance_valid(object)) 
+              stop("the model object is not created or not valid")
+            object@.MISC$stan_fit_instance$log_prob(pars) 
+          }) 
+
+if (!isGeneric("get_num_upars")) {
+  setGeneric(name = "get_num_upars", 
+             def = function(object, ...) { standardGeneric("get_num_upars") }) 
+} 
+
+setMethod("get_num_upars", signature = "stanfit", 
+          function(object, pars) {
+            if (!is_sfinstance_valid(object)) 
+              stop("the model object is not created or not valid")
+            object@.MISC$stan_fit_instance$num_pars_unconstrained()
+          })
+
+if (!isGeneric("grad_log_prob")) {
+  setGeneric(name = "grad_log_prob", 
+             def = function(object, ...) { standardGeneric("grad_log_prob") }) 
+} 
+
+setMethod("grad_log_prob", signature = "stanfit", 
+          function(object, pars) {
+            if (!is_sfinstance_valid(object)) 
+              stop("the model object is not created or not valid")
+            object@.MISC$stan_fit_instance$grad_log_prob(pars) 
+          }) 
+
 setMethod("traceplot", signature = "stanfit", 
           function(object, pars, inc_warmup = TRUE, ask = FALSE, ...) { 
             # Args:
@@ -533,9 +598,20 @@ setMethod("traceplot", signature = "stanfit",
             invisible(NULL) 
           })  
 
+
 is_sf_valid <- function(sf) {
-  # Similar to is_sm_valid  
+  # Similar to is_sm_valid, this is only to test whether
+  # the compiled DSO is loaded 
   return(rstan:::is_sm_valid(sf@stanmodel)) 
+} 
+
+is_sfinstance_valid <- function(object) {
+  # Args
+  #  object: an instance of S4 class stanfit 
+  exists("stan_fit_instance", envir = object@.MISC, inherits = FALSE) && 
+  !(is_null_ptr(object@.MISC$stan_fit_instance@.xData$.pointer) ||
+    is_null_ptr(object@.MISC$stan_fit_instance@.xData$.module) || 
+    is_null_ptr(object@.MISC$stan_fit_instance@.xData$.cppclass)) 
 } 
 
 

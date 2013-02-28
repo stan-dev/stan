@@ -1038,12 +1038,14 @@ step $k$, is defined elementwise for $1 \leq k < K$ by
 %
 \[
 z_k = \mbox{logit}^{-1} \left( y_k 
-                             - \log \left( \frac{1}{K - k}
+                             + \log \left( \frac{1}{K - k}
                                             \right)
                        \right).
 \]
 %
-The logit term in the above definition adjusts the transform so that a
+The logit term
+$\log\left(\frac{1}{K-k}\right) (i.e., \mbox{logit}\left(\frac{1}{K-k+1}\right)$) in
+the above definition adjusts the transform so that a
 zero vector $y$ is mapped to the simplex $x = (1/K,\ldots,1/K)$.  For instance, if
 $y_1 = 0$, then $z_1 = 1/K$; if $y_2 = 0$, then $z_2 = 1/(K-1)$; and
 if $y_{K-1} = 0$, then $z_{K-1} = 1/2$.  
@@ -1084,7 +1086,7 @@ where
 \frac{\partial z_k}{\partial y_k} 
 = \frac{\partial}{\partial y_k} 
    \mbox{logit}^{-1} \left(
-                       y_k - \log \left( \frac{1}{K-k}
+                       y_k + \log \left( \frac{1}{K-k}
                                           \right)
                     \right)
 = z_k (1 - z_k),
@@ -1155,7 +1157,7 @@ $z$, $y$ is defined elementwise by
 \[
 y_k 
 = \mbox{logit}(z_k)
-+ \mbox{log}\left(
+- \mbox{log}\left(
    \frac{1}{K-k}
    \right)
 .

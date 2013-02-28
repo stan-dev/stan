@@ -28,6 +28,20 @@
 \alias{get_adaptation_info,stanfit-method}
 \alias{get_sampler_params}
 \alias{get_sampler_params,stanfit,logical-method}
+\alias{get_num_upars}
+\alias{get_num_upars,stanfit-method}
+\alias{transform_pars}
+\alias{transform_pars,stanfit-method}
+%%\alias{transform_pars,stanfit,list-method}
+\alias{constrain_pars}
+\alias{constrain_pars,stanfit-method}
+%%\alias{constrain_pars,stanfit,numeric-method}
+\alias{log_prob}
+\alias{log_prob,stanfit-method}
+%% \alias{log_prob,stanfit,numeric-method}
+\alias{grad_log_prob}
+\alias{grad_log_prob,stanfit-method}
+%% \alias{grad_log_prob,stanfit,numeric-method}
 %% \alias{traceplot,stanfit-method}
 
 \title{Class \code{stanfit}: fitted Stan model}
@@ -42,6 +56,8 @@
   Access methods allow the underlying data making up a fit
   to be retrieved. There are three modes; sampling mode, 
   test gradient mode, error mode (no samples included). 
+  The model's functions for computing the log probability density \code{lp__} 
+  and the gradient are also exposed for a stanfit object. 
 } 
 
 \section{Objects from the Class}{
@@ -147,7 +163,7 @@
       sampler, which now only NUTS2 has. The results are returned 
       as a list, each element of which is a character string
       for a chain.} 
-    \item{\code{get_sampler_params}}{\code{signature(obtain = "stanfit")}: 
+    \item{\code{get_sampler_params}}{\code{signature(object = "stanfit")}: 
       obtain the parameters used for the sampler such as 
       \code{stepsize} and \code{treedepth}. The results are returned
       as a list, each element of which is an array for a chain.
@@ -155,6 +171,31 @@
       of parameters used in the sampler and its column names 
       provide the parameter names. Optional parameter \code{inc_warmup}
       indicates whether to include the warmup period.} 
+    \item{\code{prob_log}}{\code{signature(object = "stanfit", "numeric")}: compute
+      the log probability density (\code{lp__}) for a set of parameter 
+      values (on the \emph{unconstrained} space) up to an additive constant. 
+      The unconstrained parameters are specified using a numeric vector.
+      A numeric value is returned.} 
+    \item{\code{grad_prob_log}}{\code{signature(object = "stanfit", "numeric")}: compute
+      the gradient of log probability density function for a set of parameter 
+      values (on the \emph{unconstrained} space) up to an additive constant.
+      The unconstrained parameters are specified using a numeric vector
+      with the length being the number of unconstrained parameters. .
+      A numeric vector is returned with the length of the number of 
+      unconstrained parameters.} 
+    \item{\code{get_num_upars}}{\code{signature(object = "stanfit")}: get the 
+      number of unconstrained parameters of the model. The number of parameters 
+      for a model is not necessarily equal to this number of unconstrained 
+      parameters. For example, when a parameter is specified as a simplex of 
+      length K, the number of unconstrained parameters is K-1.} 
+    \item{\code{transform_pars}}{\code{signature(object = "stanfit", "list")}: transform
+      the parameter to unconstrained space. The input is a named list as
+      for specifying initial values for each parameter. A numeric vector is
+      returned.}
+    \item{\code{constrain_pars}}{\code{signature(object = "stanfit", "numeric")}: get the
+      parameter values from their unconstrained space. The input is a numeric 
+      vector. A list is returned.  This function is contrary to
+      \code{transform_pars}.}
   }
 }
 
@@ -168,16 +209,31 @@
 }
 \examples{\dontrun{
 showClass("stanfit")
-fit <- stan(model_code = 'parameters {real y[2];} model {y ~ normal(0,1);}')
+ecode <- '
+  parameters {
+    real<lower=0> y[2];
+  } 
+  model {
+    y ~ exponential(1);
+  }
+'
+fit <- stan(model_code = ecode, iter = 10, chains = 1)
 fit2 <- stan(fit = fit)
-print(fit)
-plot(fit)
-traceplot(fit)
-ainfo <- get_adaptation_info(fit)
+print(fit2)
+plot(fit2)
+traceplot(fit2)
+ainfo <- get_adaptation_info(fit2)
 cat(ainfo[[1]])
-seed <- get_seed(fit)
-sp <- get_sampler_params(fit)
-sp2 <- get_sampler_params(fit, inc_warmup = FALSE)
+seed <- get_seed(fit2)
+sp <- get_sampler_params(fit2)
+sp2 <- get_sampler_params(fit2, inc_warmup = FALSE)
 head(sp[[1]])
+
+lp <- log_prob(fit, c(1, 2))
+grad <- grad_log_prob(fit, c(1, 2))
+n <- get_num_upars(fit)
+uy <- transform_pars(fit, list(y = rep(1, 2)))
+## uy should be c(0, 0) since here the log transformation is used
+y <- constrain_pars(fit, rep(0, n))
 }}
 \keyword{classes}

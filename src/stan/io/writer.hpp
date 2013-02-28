@@ -332,8 +332,7 @@ namespace stan {
        * the returned unconstrained vector is of size <code>K-1</code>.
        *
        * <p>The transform takes <code>y = y[1],...,y[K]</code> and
-       * produces the unconstrained vector <code>x = log(y[1]) -
-       * log(y[K]), ..., log(y[K-1]) - log(y[K])</code>.  This inverts
+       * produces the unconstrained vector. This inverts
        * the constraining transform of
        * <code>simplex_constrain(size_t)</code>.
        *
@@ -343,11 +342,9 @@ namespace stan {
        */
       void simplex_unconstrain(vector_t& y) {
         stan::math::check_simplex("stan::io::simplex_unconstrain(%1%)", y, "Vector");
-        typename vector_t::size_type k_minus_1 = y.size() - 1;
-        double log_y_k = log(y[k_minus_1]);
-        for (typename vector_t::size_type i = 0; i < k_minus_1; ++i) {
-          data_r_.push_back(log(y[i]) - log_y_k);
-        }
+        vector_t uy = stan::prob::simplex_free(y);
+        for (typename vector_t::size_type i = 0; i < uy.size(); ++i) 
+          data_r_.push_back(uy[i]);
       }
 
       /**
