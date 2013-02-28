@@ -273,97 +273,97 @@ namespace stan {
           return operands_and_partials.to_var(0.0);
       }
       
-        // Compute CDF and its gradients
-        using boost::math::ibeta;
-        using boost::math::ibeta_derivative;
-        using boost::math::digamma;
+      // Compute CDF and its gradients
+      using boost::math::ibeta;
+      using boost::math::ibeta_derivative;
+      using boost::math::digamma;
         
-        // Cache a few expensive function calls if alpha or beta is a parameter
-        DoubleVectorView<!is_constant_struct<T_scale_succ>::value || !is_constant_struct<T_scale_fail>::value,
-                         is_vector<T_scale_succ>::value || is_vector<T_scale_fail>::value>
-          digamma_alpha_vec(max_size(alpha, beta));
+      // Cache a few expensive function calls if alpha or beta is a parameter
+      DoubleVectorView<!is_constant_struct<T_scale_succ>::value || !is_constant_struct<T_scale_fail>::value,
+	is_vector<T_scale_succ>::value || is_vector<T_scale_fail>::value>
+	digamma_alpha_vec(max_size(alpha, beta));
         
-        DoubleVectorView<!is_constant_struct<T_scale_succ>::value || !is_constant_struct<T_scale_fail>::value,
-                         is_vector<T_scale_succ>::value || is_vector<T_scale_fail>::value>
-          digamma_beta_vec(max_size(alpha, beta));
+      DoubleVectorView<!is_constant_struct<T_scale_succ>::value || !is_constant_struct<T_scale_fail>::value,
+	is_vector<T_scale_succ>::value || is_vector<T_scale_fail>::value>
+	digamma_beta_vec(max_size(alpha, beta));
         
-        DoubleVectorView<!is_constant_struct<T_scale_succ>::value || !is_constant_struct<T_scale_fail>::value,
-                         is_vector<T_scale_succ>::value || is_vector<T_scale_fail>::value>
-          digamma_sum_vec(max_size(alpha, beta));
+      DoubleVectorView<!is_constant_struct<T_scale_succ>::value || !is_constant_struct<T_scale_fail>::value,
+	is_vector<T_scale_succ>::value || is_vector<T_scale_fail>::value>
+	digamma_sum_vec(max_size(alpha, beta));
         
-        DoubleVectorView<!is_constant_struct<T_scale_succ>::value || !is_constant_struct<T_scale_fail>::value,
-                         is_vector<T_scale_succ>::value || is_vector<T_scale_fail>::value>
-          betafunc_vec(max_size(alpha, beta));
+      DoubleVectorView<!is_constant_struct<T_scale_succ>::value || !is_constant_struct<T_scale_fail>::value,
+	is_vector<T_scale_succ>::value || is_vector<T_scale_fail>::value>
+	betafunc_vec(max_size(alpha, beta));
         
-        if (!is_constant_struct<T_scale_succ>::value || !is_constant_struct<T_scale_fail>::value) {
+      if (!is_constant_struct<T_scale_succ>::value || !is_constant_struct<T_scale_fail>::value) {
             
-            //for (size_t i = 0; i < stan::length(max_size(alpha, beta)); i++) {
-            for (size_t i = 0; i < N; i++) {
+	//for (size_t i = 0; i < stan::length(max_size(alpha, beta)); i++) {
+	for (size_t i = 0; i < N; i++) {
 
-                const double alpha_dbl = value_of(alpha_vec[i]);
-                const double beta_dbl = value_of(beta_vec[i]);
+	  const double alpha_dbl = value_of(alpha_vec[i]);
+	  const double beta_dbl = value_of(beta_vec[i]);
                 
-                digamma_alpha_vec[i] = digamma(alpha_dbl);
-                digamma_beta_vec[i] = digamma(beta_dbl);
-                digamma_sum_vec[i] = digamma(alpha_dbl + beta_dbl);
-                betafunc_vec[i] = boost::math::beta(alpha_dbl, beta_dbl);
+	  digamma_alpha_vec[i] = digamma(alpha_dbl);
+	  digamma_beta_vec[i] = digamma(beta_dbl);
+	  digamma_sum_vec[i] = digamma(alpha_dbl + beta_dbl);
+	  betafunc_vec[i] = boost::math::beta(alpha_dbl, beta_dbl);
                 
-            }
+	}
             
-        }
+      }
         
-        // Compute vectorized CDF and gradient
-        for (size_t n = 0; n < N; n++) {
+      // Compute vectorized CDF and gradient
+      for (size_t n = 0; n < N; n++) {
             
-            // Explicit results for extreme values
-            // The gradients are technically ill-defined, but treated as zero
-            if (value_of(y_vec[n]) >= 1.0) continue;
+	// Explicit results for extreme values
+	// The gradients are technically ill-defined, but treated as zero
+	if (value_of(y_vec[n]) >= 1.0) continue;
             
-            // Pull out values
-            const double y_dbl = value_of(y_vec[n]);
-            const double alpha_dbl = value_of(alpha_vec[n]);
-            const double beta_dbl = value_of(beta_vec[n]);
+	// Pull out values
+	const double y_dbl = value_of(y_vec[n]);
+	const double alpha_dbl = value_of(alpha_vec[n]);
+	const double beta_dbl = value_of(beta_vec[n]);
             
-            // Compute
-            const double Pn = ibeta(alpha_dbl, beta_dbl, y_dbl);
+	// Compute
+	const double Pn = ibeta(alpha_dbl, beta_dbl, y_dbl);
             
-            P *= Pn;
+	P *= Pn;
             
-            if (!is_constant_struct<T_y>::value)
-              operands_and_partials.d_x1[n] += ibeta_derivative(alpha_dbl, beta_dbl, y_dbl) / Pn;
+	if (!is_constant_struct<T_y>::value)
+	  operands_and_partials.d_x1[n] += ibeta_derivative(alpha_dbl, beta_dbl, y_dbl) / Pn;
 
-            double g1 = 0;
-            double g2 = 0;
+	double g1 = 0;
+	double g2 = 0;
         
-            if (!is_constant_struct<T_scale_succ>::value || !is_constant_struct<T_scale_fail>::value)
-            {
-              stan::math::gradRegIncBeta(g1, g2, alpha_dbl, beta_dbl, y_dbl, digamma_alpha_vec[n], 
-                                         digamma_beta_vec[n], digamma_sum_vec[n], betafunc_vec[n]);
-            }
+	if (!is_constant_struct<T_scale_succ>::value || !is_constant_struct<T_scale_fail>::value)
+	  {
+	    stan::math::gradRegIncBeta(g1, g2, alpha_dbl, beta_dbl, y_dbl, digamma_alpha_vec[n], 
+				       digamma_beta_vec[n], digamma_sum_vec[n], betafunc_vec[n]);
+	  }
 
-            if (!is_constant_struct<T_scale_succ>::value)
-              operands_and_partials.d_x2[n] 
-                += g1 / Pn;
+	if (!is_constant_struct<T_scale_succ>::value)
+	  operands_and_partials.d_x2[n] 
+	    += g1 / Pn;
             
-            if (!is_constant_struct<T_scale_fail>::value)
-              operands_and_partials.d_x3[n] 
-                += g2 / Pn;
+	if (!is_constant_struct<T_scale_fail>::value)
+	  operands_and_partials.d_x3[n] 
+	    += g2 / Pn;
             
-        }
+      }
         
-        if (!is_constant_struct<T_y>::value) {
-          for(size_t n = 0; n < stan::length(y); ++n) operands_and_partials.d_x1[n] *= P;
-        }
+      if (!is_constant_struct<T_y>::value) {
+	for(size_t n = 0; n < stan::length(y); ++n) operands_and_partials.d_x1[n] *= P;
+      }
         
-        if (!is_constant_struct<T_scale_succ>::value) {
-          for(size_t n = 0; n < stan::length(alpha); ++n) operands_and_partials.d_x2[n] *= P;
-        }
+      if (!is_constant_struct<T_scale_succ>::value) {
+	for(size_t n = 0; n < stan::length(alpha); ++n) operands_and_partials.d_x2[n] *= P;
+      }
         
-        if (!is_constant_struct<T_scale_fail>::value) {
-          for(size_t n = 0; n < stan::length(beta); ++n) operands_and_partials.d_x3[n] *= P;
-        }
+      if (!is_constant_struct<T_scale_fail>::value) {
+	for(size_t n = 0; n < stan::length(beta); ++n) operands_and_partials.d_x3[n] *= P;
+      }
         
-        return operands_and_partials.to_var(P);
+      return operands_and_partials.to_var(P);
 
     }
 

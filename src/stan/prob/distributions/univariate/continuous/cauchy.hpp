@@ -187,7 +187,8 @@ namespace stan {
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
       using boost::math::tools::promote_args;
-      
+      using stan::math::value_of;
+	    
       double P(1.0);
         
       if(!check_not_nan(function, y, "Random variable", &P, Policy()))
@@ -204,7 +205,7 @@ namespace stan {
 
       if (!(check_consistent_sizes(function, y, mu, sigma,
                                    "Random variable", "Location parameter", "Scale Parameter",
-                                     &P, Policy())))
+				   &P, Policy())))
         return P;
         
       // Wrap arguments in vectors
@@ -235,7 +236,7 @@ namespace stan {
         // Explicit results for extreme values
         // The gradients are technically ill-defined, but treated as zero
         if (value_of(y_vec[n]) == std::numeric_limits<double>::infinity()) {
-            continue;
+	  continue;
         }
             
         // Pull out values
@@ -262,21 +263,21 @@ namespace stan {
           operands_and_partials.d_x3[n] 
             += - z * sigma_inv_dbl / (pi() * (1.0 + z * z) * Pn);
             
-        }
+      }
         
-        if (!is_constant_struct<T_y>::value) {
-          for(size_t n = 0; n < stan::length(y); ++n) operands_and_partials.d_x1[n] *= P;
-        }
+      if (!is_constant_struct<T_y>::value) {
+	for(size_t n = 0; n < stan::length(y); ++n) operands_and_partials.d_x1[n] *= P;
+      }
         
-        if (!is_constant_struct<T_loc>::value) {
-          for(size_t n = 0; n < stan::length(mu); ++n) operands_and_partials.d_x2[n] *= P;
-        }
+      if (!is_constant_struct<T_loc>::value) {
+	for(size_t n = 0; n < stan::length(mu); ++n) operands_and_partials.d_x2[n] *= P;
+      }
         
-        if (!is_constant_struct<T_scale>::value) {
-          for(size_t n = 0; n < stan::length(sigma); ++n) operands_and_partials.d_x3[n] *= P;
-        }
+      if (!is_constant_struct<T_scale>::value) {
+	for(size_t n = 0; n < stan::length(sigma); ++n) operands_and_partials.d_x3[n] *= P;
+      }
         
-        return operands_and_partials.to_var(P);
+      return operands_and_partials.to_var(P);
     }
 
     template <typename T_y, typename T_loc, typename T_scale>
