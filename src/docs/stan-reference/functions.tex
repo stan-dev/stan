@@ -1311,6 +1311,14 @@ If $\theta \in [0,1]$, then for $y \in \setlist{0,1}$,
 %
 \end{description}
 
+\begin{description}
+%
+\fitem{real}{bernoulli\_cdf}{ints \farg{y}, reals \farg{theta}}{The
+  Bernoulli cumulative distribution function of \farg{y} given chance of success
+  \farg{theta}}
+%
+\end{description}
+
 \subsection{Bernoulli Distribution, Logit Parameterization}
 
 \Stan also supplies a direct parameterization in terms of a
@@ -1382,6 +1390,10 @@ Suppose $N \in \nats$ and $\theta \in [0,1]$, and $n \in
     \farg{theta}}{The log binomial probability mass of \farg{n}
     successes in \farg{N} trials given chance of success \farg{theta}}
 %
+  \fitem{real}{binomial\_cdf}{ints \farg{n}, ints \farg{N}, reals
+    \farg{theta}}{The binomial cumulative distribution function of \farg{n}
+    successes in \farg{N} trials given chance of success \farg{theta}}
+
 \end{description}
 
 
@@ -1459,6 +1471,12 @@ where the beta function $\Betafun(x,y)$ is defined for $x \in
   (plus one) of \farg{alpha} and prior failure count (plus one) of
   \farg{beta}}
 %
+\fitem{real}{beta\_binomial\_cdf}{ints \farg{n}, ints \farg{N}, reals
+  \farg{alpha}, reals \farg{beta}}{The beta-binomial cumulative
+  distribution function
+  of \farg{n} successes in \farg{N} trials given prior success count
+  (plus one) of \farg{alpha} and prior failure count (plus one) of
+  \farg{beta}}
 \end{description}
 
 
@@ -1716,6 +1734,14 @@ then for $y \in \reals$,
     \farg{sigma}}
 \end{description}
 
+\begin{description}
+  \fitem{real}{student\_t\_cdf}{reals \farg{y}, reals \farg{nu}, reals
+    \farg{mu}, reals \farg{sigma}}{The Student-$t$ cumulative
+    distribution function of \farg{y}
+    given degrees of freedom \farg{nu}, location \farg{mu}, and scale
+    \farg{sigma}}
+\end{description}
+
 \subsection{Cauchy Distribution}
 
 If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in \reals$,
@@ -1887,6 +1913,13 @@ y^{-(\nu/2 + 1)}
     \farg{s}}
 \end{description}
 
+\begin{description}
+  \fitem{real}{scaled\_inv\_chi\_square\_cdf}{reals \farg{y}, reals
+    \farg{nu}, reals \farg{s}}{The scaled inverse Chi-square
+    cumulative distribution function
+    of \farg{y} given degrees of freedom \farg{nu} and scale
+    \farg{s}}
+\end{description}
 
 \subsection{Exponential Distribution}
 
@@ -2014,6 +2047,11 @@ $y \in \posreals$,
     positive minimum value \farg{y\_min} and shape \farg{alpha}}
 \end{description}
 
+\begin{description}
+  \fitem{real}{pareto\_cdf}{reals \farg{y}, reals \farg{y\_min}, reals
+    \farg{alpha}}{The Pareto cumulative distribution function of \farg{y} given
+    positive minimum value \farg{y\_min} and shape \farg{alpha}}
+\end{description}
 
 
 \section{$[0,1]$ Continuous Probabilities}
