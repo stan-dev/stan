@@ -49,7 +49,7 @@ namespace stan {
       using stan::math::check_consistent_sizes;
       using stan::math::value_of;
       
-      typename return_type<T_y,T_dof>::type logp(0);
+      double logp(0.0);
       if (!check_not_nan(function, y, "Random variable", &logp, Policy()))
         return logp;
       if (!check_finite(function, nu, "Degrees of freedom parameter", &logp, Policy()))
@@ -77,18 +77,33 @@ namespace stan {
       if (!include_summand<propto,T_y,T_dof>::value)
 	return 0.0;
 
+      agrad::OperandsAndPartials<T_y,T_dof> operands_and_partials(y, nu);
+
       using boost::math::lgamma;
       using stan::math::multiply_log;
-      
+      using boost::math::digamma;
+
       for (size_t n = 0; n < N; n++) {
+	const double y_dbl = value_of(y_vec[n]);
+	const double half_y = 0.5 * y_dbl;
+	const double nu_dbl = value_of(nu_vec[n]);
+	const double half_nu = 0.5 * nu_dbl;
 	if (include_summand<propto,T_dof>::value)
-	  logp += nu_vec[n] * NEG_LOG_TWO_OVER_TWO - lgamma(0.5 * nu_vec[n]);
+	  logp += nu_dbl * NEG_LOG_TWO_OVER_TWO - lgamma(half_nu);
 	if (include_summand<propto,T_y,T_dof>::value)
-	  logp += multiply_log(0.5*nu_vec[n]-1.0, y_vec[n]);
+	  logp += multiply_log(half_nu-1.0, y_dbl);
 	if (include_summand<propto,T_y>::value)
-	  logp -= 0.5 * y_vec[n];
+	  logp -= half_y;
+	
+	if (!is_constant_struct<T_y>::value) {
+	  operands_and_partials.d_x1[n] += (half_nu - 1) / y_dbl - 0.5;
+	}
+	if (!is_constant_struct<T_dof>::value) {
+	  operands_and_partials.d_x2[n] 
+	    += NEG_LOG_TWO_OVER_TWO - digamma(half_nu)*0.5 + log(y_dbl)*0.5; 
+	}
       }
-      return logp;
+      return operands_and_partials.to_var(logp);
     }
 
 
