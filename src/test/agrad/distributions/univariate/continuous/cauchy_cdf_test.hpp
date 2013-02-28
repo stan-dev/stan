@@ -1,4 +1,4 @@
-// Arguments: Double, Double, Double
+// Arguments: Doubles, Doubles, Doubles
 #include <stan/prob/distributions/univariate/continuous/cauchy.hpp>
 
 using std::vector;
