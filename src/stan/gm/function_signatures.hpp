@@ -39,6 +39,9 @@ for (size_t i = 0; i < int_vector_types.size(); ++i)
     add("bernoulli_log",DOUBLE_T,int_vector_types[i],vector_types[j]);
 for (size_t i = 0; i < int_vector_types.size(); ++i) 
   for (size_t j = 0; j < vector_types.size(); ++j)
+    add("bernoulli_cdf",DOUBLE_T,int_vector_types[i],vector_types[j]);
+for (size_t i = 0; i < int_vector_types.size(); ++i) 
+  for (size_t j = 0; j < vector_types.size(); ++j)
     add("bernoulli_logit_log",DOUBLE_T,int_vector_types[i],vector_types[j]);
 for (size_t i = 0; i < int_vector_types.size(); i++) 
   for (size_t j = 0; j < int_vector_types.size(); j++)
