@@ -205,13 +205,10 @@ clean-manual:
 clean-models:
 	$(RM) -r models $(MODEL_HEADER).gch $(MODEL_HEADER).pch $(MODEL_HEADER).d
 
-clean-demo:
-	$(RM) -r demo
-
-clean-all: clean clean-dox clean-manual clean-models clean-demo
+clean-all: clean clean-dox clean-manual clean-models
 	$(RM) -r test bin doc
 	$(RM) $(wildcard *.d) $(wildcard *.o)
-	cd src/test/gm/model_specs/compiled; $(RM) *.cpp *.o function_signatures[0-9]$(EXE) illegal_generated_quantities illegal_transformed_data illegal_transformed_parameters
+	$(RM) src/test/gm/model_specs/compiled/*.cpp src/test/gm/model_specs/compiled/*.o $(patsubst %.stan,%$(EXE),$(wildcard src/test/gm/model_specs/compiled/*.stan))
 	cd src/test/agrad/distributions/univariate/continuous; $(RM) *_generated_test.cpp
 	cd src/test/agrad/distributions/univariate/discrete; $(RM) *_generated_test.cpp
 	cd src/test/agrad/distributions/multivariate/continuous; $(RM) *_generated_test.cpp

@@ -260,101 +260,100 @@ namespace stan {
       return bernoulli_logit_log<false>(n,theta,stan::math::default_policy());
     }
       
-      // Bernoulli CDF
-      template <bool propto, typename T_n, typename T_prob, class Policy>
-      typename return_type<T_prob>::type
-      bernoulli_cdf(const T_n& n, const T_prob& theta, const Policy&) {
-          
-          static const char* function = "stan::prob::bernoulli_cdf(%1%)";
-          
-          using stan::math::check_finite;
-          using stan::math::check_bounded;
-          using stan::math::check_consistent_sizes;
-          using stan::prob::include_summand;
-          
-          // Ensure non-zero argument lenghts
-          if (!(stan::length(n) && stan::length(theta)))
-              return 0.0;
-          
-          double P(1.0);
-          
-          // Validate arguments
-          if (!check_bounded(function, n, 0, 1, "n", &P, Policy()))
-              return P;
-          
-          if (!check_finite(function, theta, "Probability parameter", &P, Policy()))
-              return P;
-          
-          if (!check_bounded(function, theta, 0.0, 1.0,
-                             "Probability parameter", &P, Policy()))
-              return P;
-          
-          if (!(check_consistent_sizes(function,
-                                       n, theta,
-                                       "Random variable","Probability parameter",
-                                       &P, Policy())))
-              return P;
-          
-          // Return if everything is constant and only proportionality is required
-          if (!include_summand<propto,T_prob>::value)
-              return 0.0;
-          
-          // set up template expressions wrapping scalars into vector views
-          VectorView<const T_n> n_vec(n);
-          VectorView<const T_prob> theta_vec(theta);
-          size_t size = max_size(n, theta);
-          
-          // Compute vectorized CDF and gradient
-          using stan::math::value_of;
-          using boost::math::ibetac;
-          using boost::math::ibeta_derivative;
-          
-          agrad::OperandsAndPartials<T_prob> operands_and_partials(theta);
-          
-          for (size_t i = 0; i < size; i++) {
-              
-              const double n_dbl = value_of(n_vec[i]);
-              const double theta_dbl = value_of(theta_vec[i]);
-              
-              const double Pi = ibetac(n_dbl + 1, 1 - n_dbl, theta_dbl);
-              
-              P *= Pi;
-              
-              if (!is_constant_struct<T_prob>::value)
-                  operands_and_partials.d_x1[i] += - ibeta_derivative(n_dbl + 1, 1 - n_dbl, theta_dbl) / Pi;
-              
-          }
-          
-          for (size_t i = 0; i < size; i++) {
-              
-              if (!is_constant_struct<T_prob>::value)
-                  operands_and_partials.d_x1[i] *= P;
-              
-          }
-          
-          return P;
-
-      }
+    // Bernoulli CDF
+    template <bool propto, typename T_n, typename T_prob, class Policy>
+    typename return_type<T_prob>::type
+    bernoulli_cdf(const T_n& n, const T_prob& theta, const Policy&) {
+      static const char* function = "stan::prob::bernoulli_cdf(%1%)";
       
-      template <bool propto, typename T_y, typename T_prob>
-      inline typename return_type<T_prob>::type
-      bernoulli_cdf(const T_y& n, const T_prob& theta) {
-          return bernoulli_log<propto>(n, theta, stan::math::default_policy());
+      using stan::math::check_finite;
+      using stan::math::check_bounded;
+      using stan::math::check_consistent_sizes;
+      using stan::prob::include_summand;
+          
+      // Ensure non-zero argument lenghts
+      if (!(stan::length(n) && stan::length(theta)))
+	return 0.0;
+          
+      double P(1.0);
+          
+      // Validate arguments
+      if (!check_finite(function, theta, "Probability parameter", &P, Policy()))
+	return P;
+          
+      if (!check_bounded(function, theta, 0.0, 1.0,
+			 "Probability parameter", &P, Policy()))
+	return P;
+          
+      if (!(check_consistent_sizes(function,
+				   n, theta,
+				   "Random variable","Probability parameter",
+				   &P, Policy())))
+	return P;
+          
+      // Return if everything is constant and only proportionality is required
+      if (!include_summand<propto,T_prob>::value)
+	return 0.0;
+          
+      // set up template expressions wrapping scalars into vector views
+      VectorView<const T_n> n_vec(n);
+      VectorView<const T_prob> theta_vec(theta);
+      size_t size = max_size(n, theta);
+          
+      // Compute vectorized CDF and gradient
+      using stan::math::value_of;
+      agrad::OperandsAndPartials<T_prob> operands_and_partials(theta);
+          
+      std::fill(operands_and_partials.all_partials,
+		operands_and_partials.all_partials 
+		+ operands_and_partials.nvaris, 0.0);
+          
+      // Explicit return for extreme values
+      // The gradients are technically ill-defined, but treated as zero
+      for (size_t i = 0; i < stan::length(n); i++) {
+	if (value_of(n_vec[i]) < 0) 
+	  return operands_and_partials.to_var(0.0);
       }
+          
+      for (size_t i = 0; i < size; i++) {
+          
+	// Explicit results for extreme values
+	// The gradients are technically ill-defined, but treated as zero
+	if (value_of(n_vec[i]) >= 1) continue;
+	else {
+	  const double Pi = 1 - value_of(theta_vec[i]);
+              
+	  P *= Pi;
+              
+	  if (!is_constant_struct<T_prob>::value)
+	    operands_and_partials.d_x1[i] += - 1 / Pi;
+	}
+              
+      }
+          
+      if (!is_constant_struct<T_prob>::value) {
+	for(size_t i = 0; i < stan::length(theta); ++i) operands_and_partials.d_x1[i] *= P;
+      }
+      return operands_and_partials.to_var(P);
+    }
       
-      template <typename T_y, typename T_prob, class Policy>
-      inline typename return_type<T_prob>::type
-      bernoulli_cdf(const T_y& n, const T_prob& theta, const Policy&) {
-          return bernoulli_cdf<false>(n, theta, Policy());
-      }
+    template <bool propto, typename T_n, typename T_prob>
+    inline typename return_type<T_prob>::type
+    bernoulli_cdf(const T_n& n, const T_prob& theta) {
+      return bernoulli_cdf<propto>(n, theta, stan::math::default_policy());
+    }
       
-      template <typename T_y, typename T_prob>
-      inline typename return_type<T_prob>::type
-      bernoulli_cdf(const T_y& n, const T_prob& theta) {
-          return bernoulli_cdf<false>(n, theta, stan::math::default_policy());
-      }
-
-
+    template <typename T_n, typename T_prob, class Policy>
+    inline typename return_type<T_prob>::type
+    bernoulli_cdf(const T_n& n, const T_prob& theta, const Policy&) {
+      return bernoulli_cdf<false>(n, theta, Policy());
+    }
+      
+    template <typename T_n, typename T_prob>
+    inline typename return_type<T_prob>::type
+    bernoulli_cdf(const T_n& n, const T_prob& theta) {
+      return bernoulli_cdf<false>(n, theta, stan::math::default_policy());
+    }
   }
 }
 #endif
