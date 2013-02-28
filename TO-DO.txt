@@ -173,7 +173,7 @@ C++ API
 * Vectorize distributions
   - Allows vectorized inputs (but without partials calculated):
     univariate/continuous
-   + inv_chi_square
+    + inv_chi_square
     + scaled_inv_chi_square
     + student_t
     + uniform
