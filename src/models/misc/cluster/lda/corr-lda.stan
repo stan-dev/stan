@@ -21,8 +21,10 @@ transformed parameters {
     theta[m] <- softmax(eta[m]);
   for (m in 1:M) {
     Sigma[m,m] <- sigma[m] * sigma[m] * Omega[m,m];
-    for (n in (m+1):M)
+    for (n in (m+1):M) {
       Sigma[m,n] <- sigma[m] * sigma[n] * Omega[m,n];
+      Sigma[n,m] <- Sigma[m,n];
+    }
   } 
 }
 model {
