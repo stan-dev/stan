@@ -43,9 +43,9 @@ TEST_F(StanIoStanCsvReader,read_metadata1) {
   stan::io::stan_csv_metadata metadata;
   EXPECT_TRUE(stan::io::stan_csv_reader::read_metadata(metadata1_stream, metadata));
 
-  EXPECT_EQ(1U, metadata.stan_version_major);
-  EXPECT_EQ(1U, metadata.stan_version_minor);
-  EXPECT_EQ(1U, metadata.stan_version_patch);
+  EXPECT_EQ(1, metadata.stan_version_major);
+  EXPECT_EQ(1, metadata.stan_version_minor);
+  EXPECT_EQ(1, metadata.stan_version_patch);
   
   EXPECT_EQ("models\\bugs_examples\\vol1\\blocker\\blocker.data.R", metadata.data);
   EXPECT_EQ("models\\bugs_examples\\vol1\\blocker\\blocker.init.R", metadata.init);
@@ -56,7 +56,7 @@ TEST_F(StanIoStanCsvReader,read_metadata1) {
   EXPECT_EQ(0U, metadata.chain_id);
   EXPECT_EQ(4000U, metadata.iter);
   EXPECT_EQ(2000U, metadata.warmup);
-  EXPECT_EQ(2, metadata.thin);
+  EXPECT_EQ(2U, metadata.thin);
   EXPECT_FALSE(metadata.equal_step_sizes);
   EXPECT_EQ(-1, metadata.leapfrog_steps);
   EXPECT_EQ(10, metadata.max_treedepth);
@@ -206,9 +206,9 @@ TEST_F(StanIoStanCsvReader,ParseBlocker) {
   blocker0 = stan::io::stan_csv_reader::parse(blocker0_stream);
 
   // metadata
-  EXPECT_EQ(1U, blocker0.metadata.stan_version_major);
-  EXPECT_EQ(1U, blocker0.metadata.stan_version_minor);
-  EXPECT_EQ(1U, blocker0.metadata.stan_version_patch);
+  EXPECT_EQ(1, blocker0.metadata.stan_version_major);
+  EXPECT_EQ(1, blocker0.metadata.stan_version_minor);
+  EXPECT_EQ(1, blocker0.metadata.stan_version_patch);
   
   EXPECT_EQ("models\\bugs_examples\\vol1\\blocker\\blocker.data.R", blocker0.metadata.data);
   EXPECT_EQ("models\\bugs_examples\\vol1\\blocker\\blocker.init.R", blocker0.metadata.init);
@@ -219,7 +219,7 @@ TEST_F(StanIoStanCsvReader,ParseBlocker) {
   EXPECT_EQ(0U, blocker0.metadata.chain_id);
   EXPECT_EQ(4000U, blocker0.metadata.iter);
   EXPECT_EQ(2000U, blocker0.metadata.warmup);
-  EXPECT_EQ(2, blocker0.metadata.thin);
+  EXPECT_EQ(2U, blocker0.metadata.thin);
   EXPECT_FALSE(blocker0.metadata.equal_step_sizes);
   EXPECT_EQ(-1, blocker0.metadata.leapfrog_steps);
   EXPECT_EQ(10, blocker0.metadata.max_treedepth);
@@ -357,20 +357,20 @@ TEST_F(StanIoStanCsvReader,read_metadata2) {
   stan::io::stan_csv_metadata metadata;
   EXPECT_TRUE(stan::io::stan_csv_reader::read_metadata(metadata2_stream, metadata));
 
-  EXPECT_EQ(1U, metadata.stan_version_major);
-  EXPECT_EQ(1U, metadata.stan_version_minor);
-  EXPECT_EQ(1U, metadata.stan_version_patch);
+  EXPECT_EQ(1, metadata.stan_version_major);
+  EXPECT_EQ(1, metadata.stan_version_minor);
+  EXPECT_EQ(1, metadata.stan_version_patch);
   
   EXPECT_EQ("models\\bugs_examples\\vol1\\epil\\epil.data.R", metadata.data);
   EXPECT_EQ("random initialization", metadata.init);
   EXPECT_FALSE(metadata.append_samples);
   EXPECT_FALSE(metadata.save_warmup);
-  EXPECT_EQ(4258844633, metadata.seed);
+  EXPECT_EQ(4258844633U, metadata.seed);
   EXPECT_FALSE(metadata.random_seed);
   EXPECT_EQ(0U, metadata.chain_id);
-  EXPECT_EQ(2000, metadata.iter);
-  EXPECT_EQ(1000, metadata.warmup);
-  EXPECT_EQ(1, metadata.thin);
+  EXPECT_EQ(2000U, metadata.iter);
+  EXPECT_EQ(1000U, metadata.warmup);
+  EXPECT_EQ(1U, metadata.thin);
   EXPECT_FALSE(metadata.equal_step_sizes);
   EXPECT_EQ(-1, metadata.leapfrog_steps);
   EXPECT_EQ(10, metadata.max_treedepth);
@@ -451,20 +451,20 @@ TEST_F(StanIoStanCsvReader,ParseEpil) {
   epil0 = stan::io::stan_csv_reader::parse(epil0_stream);
 
   // metadata
-  EXPECT_EQ(1U, epil0.metadata.stan_version_major);
-  EXPECT_EQ(1U, epil0.metadata.stan_version_minor);
-  EXPECT_EQ(1U, epil0.metadata.stan_version_patch);
+  EXPECT_EQ(1, epil0.metadata.stan_version_major);
+  EXPECT_EQ(1, epil0.metadata.stan_version_minor);
+  EXPECT_EQ(1, epil0.metadata.stan_version_patch);
   
   EXPECT_EQ("models\\bugs_examples\\vol1\\epil\\epil.data.R", epil0.metadata.data);
   EXPECT_EQ("random initialization", epil0.metadata.init);
   EXPECT_FALSE(epil0.metadata.append_samples);
   EXPECT_FALSE(epil0.metadata.save_warmup);
-  EXPECT_EQ(4258844633, epil0.metadata.seed);
+  EXPECT_EQ(4258844633U, epil0.metadata.seed);
   EXPECT_FALSE(epil0.metadata.random_seed);
   EXPECT_EQ(0U, epil0.metadata.chain_id);
-  EXPECT_EQ(2000, epil0.metadata.iter);
-  EXPECT_EQ(1000, epil0.metadata.warmup);
-  EXPECT_EQ(1, epil0.metadata.thin);
+  EXPECT_EQ(2000U, epil0.metadata.iter);
+  EXPECT_EQ(1000U, epil0.metadata.warmup);
+  EXPECT_EQ(1U, epil0.metadata.thin);
   EXPECT_FALSE(epil0.metadata.equal_step_sizes);
   EXPECT_EQ(-1, epil0.metadata.leapfrog_steps);
   EXPECT_EQ(10, epil0.metadata.max_treedepth);
