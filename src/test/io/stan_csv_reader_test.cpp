@@ -49,15 +49,15 @@ TEST_F(StanIoStanCsvReader,read_metadata1) {
   
   EXPECT_EQ("models\\bugs_examples\\vol1\\blocker\\blocker.data.R", metadata.data);
   EXPECT_EQ("models\\bugs_examples\\vol1\\blocker\\blocker.init.R", metadata.init);
-  EXPECT_EQ(false, metadata.append_samples);
-  EXPECT_EQ(false, metadata.save_warmup);
+  EXPECT_FALSE(metadata.append_samples);
+  EXPECT_FALSE(metadata.save_warmup);
   EXPECT_EQ(4085885484U, metadata.seed);
-  EXPECT_EQ(false, metadata.random_seed);
+  EXPECT_FALSE(metadata.random_seed);
   EXPECT_EQ(0U, metadata.chain_id);
   EXPECT_EQ(4000U, metadata.iter);
   EXPECT_EQ(2000U, metadata.warmup);
   EXPECT_EQ(2, metadata.thin);
-  EXPECT_EQ(false, metadata.equal_step_sizes);
+  EXPECT_FALSE(metadata.equal_step_sizes);
   EXPECT_EQ(-1, metadata.leapfrog_steps);
   EXPECT_EQ(10, metadata.max_treedepth);
   EXPECT_FLOAT_EQ(-1, metadata.epsilon);
@@ -212,15 +212,15 @@ TEST_F(StanIoStanCsvReader,ParseBlocker) {
   
   EXPECT_EQ("models\\bugs_examples\\vol1\\blocker\\blocker.data.R", blocker0.metadata.data);
   EXPECT_EQ("models\\bugs_examples\\vol1\\blocker\\blocker.init.R", blocker0.metadata.init);
-  EXPECT_EQ(false, blocker0.metadata.append_samples);
-  EXPECT_EQ(false, blocker0.metadata.save_warmup);
+  EXPECT_FALSE(blocker0.metadata.append_samples);
+  EXPECT_FALSE(blocker0.metadata.save_warmup);
   EXPECT_EQ(4085885484U, blocker0.metadata.seed);
-  EXPECT_EQ(false, blocker0.metadata.random_seed);
+  EXPECT_FALSE(blocker0.metadata.random_seed);
   EXPECT_EQ(0U, blocker0.metadata.chain_id);
   EXPECT_EQ(4000U, blocker0.metadata.iter);
   EXPECT_EQ(2000U, blocker0.metadata.warmup);
   EXPECT_EQ(2, blocker0.metadata.thin);
-  EXPECT_EQ(false, blocker0.metadata.equal_step_sizes);
+  EXPECT_FALSE(blocker0.metadata.equal_step_sizes);
   EXPECT_EQ(-1, blocker0.metadata.leapfrog_steps);
   EXPECT_EQ(10, blocker0.metadata.max_treedepth);
   EXPECT_FLOAT_EQ(-1, blocker0.metadata.epsilon);
@@ -363,15 +363,15 @@ TEST_F(StanIoStanCsvReader,read_metadata2) {
   
   EXPECT_EQ("models\\bugs_examples\\vol1\\epil\\epil.data.R", metadata.data);
   EXPECT_EQ("random initialization", metadata.init);
-  EXPECT_EQ(false, metadata.append_samples);
-  EXPECT_EQ(false, metadata.save_warmup);
+  EXPECT_FALSE(metadata.append_samples);
+  EXPECT_FALSE(metadata.save_warmup);
   EXPECT_EQ(4258844633, metadata.seed);
-  EXPECT_EQ(false, metadata.random_seed);
+  EXPECT_FALSE(metadata.random_seed);
   EXPECT_EQ(0U, metadata.chain_id);
   EXPECT_EQ(2000, metadata.iter);
   EXPECT_EQ(1000, metadata.warmup);
   EXPECT_EQ(1, metadata.thin);
-  EXPECT_EQ(false, metadata.equal_step_sizes);
+  EXPECT_FALSE(metadata.equal_step_sizes);
   EXPECT_EQ(-1, metadata.leapfrog_steps);
   EXPECT_EQ(10, metadata.max_treedepth);
   EXPECT_FLOAT_EQ(-1, metadata.epsilon);
@@ -457,15 +457,15 @@ TEST_F(StanIoStanCsvReader,ParseEpil) {
   
   EXPECT_EQ("models\\bugs_examples\\vol1\\epil\\epil.data.R", epil0.metadata.data);
   EXPECT_EQ("random initialization", epil0.metadata.init);
-  EXPECT_EQ(false, epil0.metadata.append_samples);
-  EXPECT_EQ(false, epil0.metadata.save_warmup);
+  EXPECT_FALSE(epil0.metadata.append_samples);
+  EXPECT_FALSE(epil0.metadata.save_warmup);
   EXPECT_EQ(4258844633, epil0.metadata.seed);
-  EXPECT_EQ(false, epil0.metadata.random_seed);
+  EXPECT_FALSE(epil0.metadata.random_seed);
   EXPECT_EQ(0U, epil0.metadata.chain_id);
   EXPECT_EQ(2000, epil0.metadata.iter);
   EXPECT_EQ(1000, epil0.metadata.warmup);
   EXPECT_EQ(1, epil0.metadata.thin);
-  EXPECT_EQ(false, epil0.metadata.equal_step_sizes);
+  EXPECT_FALSE(epil0.metadata.equal_step_sizes);
   EXPECT_EQ(-1, epil0.metadata.leapfrog_steps);
   EXPECT_EQ(10, epil0.metadata.max_treedepth);
   EXPECT_FLOAT_EQ(-1, epil0.metadata.epsilon);
