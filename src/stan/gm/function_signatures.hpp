@@ -61,6 +61,12 @@ for (size_t i = 0; i < vector_types.size(); ++i)
       add("beta_log",
           DOUBLE_T, // result
           vector_types[i], vector_types[j], vector_types[k]); // args
+for (size_t i = 0; i < vector_types.size(); ++i)
+  for (size_t j = 0; j < vector_types.size(); ++j)
+    for (size_t k = 0; k < vector_types.size(); ++k)
+      add("beta_cdf",
+          DOUBLE_T, // result
+          vector_types[i], vector_types[j], vector_types[k]); // args
 add("binary_log_loss",DOUBLE_T,INT_T,DOUBLE_T);
 add_binary("binomial_coefficient_log");
 for (size_t i = 0; i < int_vector_types.size(); ++i)

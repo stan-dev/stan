@@ -231,6 +231,7 @@ namespace stan {
       using stan::math::check_not_nan;
       using boost::math::tools::promote_args;
       using stan::math::check_consistent_sizes;
+      using stan::math::value_of;
       
       double P(1.0);
         

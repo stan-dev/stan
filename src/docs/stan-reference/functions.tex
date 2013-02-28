@@ -2054,9 +2054,7 @@ $y \in \posreals$,
   \fitem{real}{pareto\_log}{reals \farg{y}, reals \farg{y\_min}, reals
     \farg{alpha}}{The log of the Pareto density of \farg{y} given
     positive minimum value \farg{y\_min} and shape \farg{alpha}}
-\end{description}
 
-\begin{description}
   \fitem{real}{pareto\_cdf}{reals \farg{y}, reals \farg{y\_min}, reals
     \farg{alpha}}{The Pareto cumulative distribution function of \farg{y} given
     positive minimum value \farg{y\_min} and shape \farg{alpha}}
@@ -2089,6 +2087,10 @@ where the beta function $\Betafun()$ is as defined in \refsection{betafun}
     given positive prior successes (plus one)
     \farg{alpha} and prior failures (plus one) \farg{beta}}
 %
+  \fitem{real}{beta\_cdf}{reals \farg{theta}, reals \farg{alpha}, reals
+    \farg{beta}}{The beta cumulative distribution function of \code{theta} in $[0,1]$
+    given positive prior successes (plus one)
+    \farg{alpha} and prior failures (plus one) \farg{beta}}
 \end{description}
 
 \section{Bounded Continuous Probabilities}
