@@ -366,6 +366,13 @@ for (size_t i = 0; i < vector_types.size(); ++i)
         add("student_t_log",
             DOUBLE_T, // result
             vector_types[i], vector_types[j], vector_types[k], vector_types[l]); // args
+for (size_t i = 0; i < vector_types.size(); ++i)
+  for (size_t j = 0; j < vector_types.size(); ++j)
+    for (size_t k = 0; k < vector_types.size(); ++k)
+      for (size_t l = 0; l < vector_types.size(); ++l)
+        add("student_t_cdf",
+            DOUBLE_T, // result
+            vector_types[i], vector_types[j], vector_types[k], vector_types[l]); // args
 add("subtract",VECTOR_T,VECTOR_T,VECTOR_T);
 add("subtract",ROW_VECTOR_T,ROW_VECTOR_T,ROW_VECTOR_T);
 add("subtract",MATRIX_T,MATRIX_T,MATRIX_T);
