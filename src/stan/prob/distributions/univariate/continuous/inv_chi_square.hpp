@@ -127,27 +127,29 @@ namespace stan {
       using stan::math::check_positive;
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
+      using stan::math::check_nonnegative;
           
       using boost::math::tools::promote_args;
+      using stan::math::value_of;
           
       double P(1.0);
           
       if (!check_finite(function, nu, "Degrees of freedom parameter", &P, Policy()))
-	return P;
+	    return P;
           
       if (!check_positive(function, nu, "Degrees of freedom parameter", &P, Policy()))
-	return P;
+	    return P;
           
       if (!check_not_nan(function, y, "Random variable", &P, Policy()))
-	return P;
+	    return P;
           
-      if (!check_positive(function, y, "Random variable", &P, Policy()))
-	return P;
+      if (!check_nonnegative(function, y, "Random variable", &P, Policy()))
+	    return P;
           
       if (!(check_consistent_sizes(function, y, nu,
 				   "Random variable", "Degrees of freedom parameter",
 				   &P, Policy())))
-	return P;
+        return P;
           
       // Wrap arguments in vectors
       VectorView<const T_y> y_vec(y);
@@ -158,9 +160,16 @@ namespace stan {
           
       std::fill(operands_and_partials.all_partials,
 		operands_and_partials.all_partials + operands_and_partials.nvaris, 0.0);
-          
+        
+      // Explicit return for extreme values
+      // The gradients are technically ill-defined, but treated as zero
+
+      for (size_t i = 0; i < stan::length(y); i++) {
+        if (value_of(y_vec[i]) == 0) 
+          return operands_and_partials.to_var(0.0);
+      }
+        
       // Compute CDF and its gradients
-      using stan::math::value_of;
       using boost::math::gamma_p_derivative;
       using boost::math::gamma_q;
       using boost::math::tgamma;
@@ -172,45 +181,49 @@ namespace stan {
           
       if (!is_constant_struct<T_dof>::value)  {
               
-	for (size_t i = 0; i < stan::length(nu); i++) {
-	  const double nu_dbl = value_of(nu_vec[i]);
-	  gamma_vec[i] = tgamma(nu_dbl);
-	  digamma_vec[i] = digamma(nu_dbl);
-	}
+        for (size_t i = 0; i < stan::length(nu); i++) {
+          const double nu_dbl = value_of(nu_vec[i]);
+          gamma_vec[i] = tgamma(0.5 * nu_dbl);
+          digamma_vec[i] = digamma(0.5 * nu_dbl);
+        }
               
       }
           
       // Compute vectorized CDF and gradient
       for (size_t n = 0; n < N; n++) {
               
-	// Pull out values
-	const double y_dbl = value_of(y_vec[n]);
-	const double y_inv_dbl = 1.0 / y_dbl;
-	const double nu_dbl = value_of(nu_vec[n]);
-              
-	// Compute
-	const double Pn = gamma_q(0.5 * nu_dbl, 0.5 * y_inv_dbl);
-              
-	P *= Pn;
-              
-	if (!is_constant_struct<T_y>::value)
-	  operands_and_partials.d_x1[n] 
-	    += 0.5 * y_inv_dbl * y_inv_dbl * gamma_p_derivative(0.5 * nu_dbl, 0.5 * y_inv_dbl) / Pn;
-              
-	if (!is_constant_struct<T_dof>::value)
-	  operands_and_partials.d_x2[n] 
-	    += 0.5 * stan::math::gradRegIncGamma(0.5 * nu_dbl, 0.5 * y_inv_dbl, gamma_vec[n], digamma_vec[n]) / Pn;
-              
+        // Explicit results for extreme values
+        // The gradients are technically ill-defined, but treated as zero
+        if (value_of(y_vec[n]) == std::numeric_limits<double>::infinity()) {
+          continue;
+        }
+
+        // Pull out values
+        const double y_dbl = value_of(y_vec[n]);
+        const double y_inv_dbl = 1.0 / y_dbl;
+        const double nu_dbl = value_of(nu_vec[n]);
+                  
+        // Compute
+        const double Pn = gamma_q(0.5 * nu_dbl, 0.5 * y_inv_dbl);
+                  
+        P *= Pn;
+                  
+        if (!is_constant_struct<T_y>::value)
+          operands_and_partials.d_x1[n] 
+            += 0.5 * y_inv_dbl * y_inv_dbl * gamma_p_derivative(0.5 * nu_dbl, 0.5 * y_inv_dbl) / Pn;
+                  
+        if (!is_constant_struct<T_dof>::value)
+          operands_and_partials.d_x2[n] 
+            += 0.5 * stan::math::gradRegIncGamma(0.5 * nu_dbl, 0.5 * y_inv_dbl, gamma_vec[n], digamma_vec[n]) / Pn;
+                  
       }
-          
-      for (size_t n = 0; n < N; n++) {
               
-	if (!is_constant_struct<T_y>::value)
-	  operands_and_partials.d_x1[n] *= P;
-              
-	if (!is_constant_struct<T_dof>::value)
-	  operands_and_partials.d_x2[n] *= P;
-              
+      if (!is_constant_struct<T_y>::value) {
+        for(size_t n = 0; n < stan::length(y); ++n) operands_and_partials.d_x1[n] *= P;
+      }
+                  
+      if (!is_constant_struct<T_dof>::value) {
+        for(size_t n = 0; n < stan::length(nu); ++n) operands_and_partials.d_x2[n] *= P;
       }
           
       return operands_and_partials.to_var(P);

@@ -7,6 +7,7 @@
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
+#include <stan/prob/internal_math.hpp>
 
 namespace stan {
 
@@ -215,50 +216,161 @@ namespace stan {
      * @tparam T_scale_fail Type of beta.
      * @tparam Policy Error-handling policy.
      */
-    template <typename T_y, typename T_scale_succ, typename T_scale_fail,
-              class Policy>
+    template <typename T_y, typename T_scale_succ, typename T_scale_fail, class Policy>
     typename return_type<T_y,T_scale_succ,T_scale_fail>::type
-    beta_cdf(const T_y& y, const T_scale_succ& alpha, const T_scale_fail& beta, 
-	     const Policy&) {
+    beta_cdf(const T_y& y, const T_scale_succ& alpha, const T_scale_fail& beta, const Policy&) {
+      
+      // Size checks
+      if ( !( stan::length(y) && stan::length(alpha) && stan::length(beta) ) ) return 0.0;
+      
+      // Error checks
       static const char* function = "stan::prob::beta_cdf(%1%)";
 
       using stan::math::check_positive;
       using stan::math::check_finite;
       using stan::math::check_not_nan;
       using boost::math::tools::promote_args;
+      using stan::math::check_consistent_sizes;
+      using stan::math::value_of;
       
-      typename promote_args<T_y,T_scale_succ,T_scale_fail>::type lp;
-      if (!check_finite(function, alpha,
-                        "First shape parameter",
-                        &lp, Policy()))
-        return lp;
-      if (!check_positive(function, alpha, 
-                          "First shape parameter",
-                          &lp, Policy()))
-        return lp;
-      if (!check_finite(function, beta, 
-                          "Second shape parameter",
-                          &lp, Policy()))
-        return lp;
-      if (!check_positive(function, beta, 
-                          "Second shape parameter",
-                          &lp, Policy()))
-        return lp;
-      if (!check_not_nan(function, y, "Random variable", &lp, Policy()))
-        return lp;
+      double P(1.0);
+        
+      if (!check_finite(function, alpha, "First shape parameter", &P, Policy()))
+        return P;
+        
+      if (!check_positive(function, alpha, "First shape parameter", &P, Policy()))
+        return P;
+        
+      if (!check_finite(function, beta, "Second shape parameter", &P, Policy()))
+        return P;
+        
+      if (!check_positive(function, beta, "Second shape parameter", &P, Policy()))
+        return P;
+        
+      if (!check_not_nan(function, y, "Random variable", &P, Policy()))
+        return P;
+        
+      if (!(check_consistent_sizes(function, y, alpha, beta,
+                                   "Random variable", "Shape parameter", "Scale Parameter",
+                                   &P, Policy())))
+        return P;
       
-      if (y < 0.0)
-        return 0;
-      if (y > 1.0)
-        return 1.0;
+      // Wrap arguments in vectors
+      VectorView<const T_y> y_vec(y);
+      VectorView<const T_scale_succ> alpha_vec(alpha);
+      VectorView<const T_scale_fail> beta_vec(beta);
+      size_t N = max_size(y, alpha, beta);
+
+      agrad::OperandsAndPartials<T_y, T_scale_succ, T_scale_fail> operands_and_partials(y, alpha, beta);
+
+      std::fill(operands_and_partials.all_partials,
+                operands_and_partials.all_partials + operands_and_partials.nvaris, 0.0);
+
+      // Explicit return for extreme values
+      // The gradients are technically ill-defined, but treated as zero
+      for (size_t i = 0; i < stan::length(y); i++) {
+        if (value_of(y_vec[i]) <= 0) 
+          return operands_and_partials.to_var(0.0);
+      }
       
-      return stan::math::ibeta(alpha, beta, y);
+      // Compute CDF and its gradients
+      using boost::math::ibeta;
+      using boost::math::ibeta_derivative;
+      using boost::math::digamma;
+        
+      // Cache a few expensive function calls if alpha or beta is a parameter
+      DoubleVectorView<!is_constant_struct<T_scale_succ>::value || !is_constant_struct<T_scale_fail>::value,
+	is_vector<T_scale_succ>::value || is_vector<T_scale_fail>::value>
+	digamma_alpha_vec(max_size(alpha, beta));
+        
+      DoubleVectorView<!is_constant_struct<T_scale_succ>::value || !is_constant_struct<T_scale_fail>::value,
+	is_vector<T_scale_succ>::value || is_vector<T_scale_fail>::value>
+	digamma_beta_vec(max_size(alpha, beta));
+        
+      DoubleVectorView<!is_constant_struct<T_scale_succ>::value || !is_constant_struct<T_scale_fail>::value,
+	is_vector<T_scale_succ>::value || is_vector<T_scale_fail>::value>
+	digamma_sum_vec(max_size(alpha, beta));
+        
+      DoubleVectorView<!is_constant_struct<T_scale_succ>::value || !is_constant_struct<T_scale_fail>::value,
+	is_vector<T_scale_succ>::value || is_vector<T_scale_fail>::value>
+	betafunc_vec(max_size(alpha, beta));
+        
+      if (!is_constant_struct<T_scale_succ>::value || !is_constant_struct<T_scale_fail>::value) {
+            
+	//for (size_t i = 0; i < stan::length(max_size(alpha, beta)); i++) {
+	for (size_t i = 0; i < N; i++) {
+
+	  const double alpha_dbl = value_of(alpha_vec[i]);
+	  const double beta_dbl = value_of(beta_vec[i]);
+                
+	  digamma_alpha_vec[i] = digamma(alpha_dbl);
+	  digamma_beta_vec[i] = digamma(beta_dbl);
+	  digamma_sum_vec[i] = digamma(alpha_dbl + beta_dbl);
+	  betafunc_vec[i] = boost::math::beta(alpha_dbl, beta_dbl);
+                
+	}
+            
+      }
+        
+      // Compute vectorized CDF and gradient
+      for (size_t n = 0; n < N; n++) {
+            
+	// Explicit results for extreme values
+	// The gradients are technically ill-defined, but treated as zero
+	if (value_of(y_vec[n]) >= 1.0) continue;
+            
+	// Pull out values
+	const double y_dbl = value_of(y_vec[n]);
+	const double alpha_dbl = value_of(alpha_vec[n]);
+	const double beta_dbl = value_of(beta_vec[n]);
+            
+	// Compute
+	const double Pn = ibeta(alpha_dbl, beta_dbl, y_dbl);
+            
+	P *= Pn;
+            
+	if (!is_constant_struct<T_y>::value)
+	  operands_and_partials.d_x1[n] += ibeta_derivative(alpha_dbl, beta_dbl, y_dbl) / Pn;
+
+	double g1 = 0;
+	double g2 = 0;
+        
+	if (!is_constant_struct<T_scale_succ>::value || !is_constant_struct<T_scale_fail>::value)
+	  {
+	    stan::math::gradRegIncBeta(g1, g2, alpha_dbl, beta_dbl, y_dbl, digamma_alpha_vec[n], 
+				       digamma_beta_vec[n], digamma_sum_vec[n], betafunc_vec[n]);
+	  }
+
+	if (!is_constant_struct<T_scale_succ>::value)
+	  operands_and_partials.d_x2[n] 
+	    += g1 / Pn;
+            
+	if (!is_constant_struct<T_scale_fail>::value)
+	  operands_and_partials.d_x3[n] 
+	    += g2 / Pn;
+            
+      }
+        
+      if (!is_constant_struct<T_y>::value) {
+	for(size_t n = 0; n < stan::length(y); ++n) operands_and_partials.d_x1[n] *= P;
+      }
+        
+      if (!is_constant_struct<T_scale_succ>::value) {
+	for(size_t n = 0; n < stan::length(alpha); ++n) operands_and_partials.d_x2[n] *= P;
+      }
+        
+      if (!is_constant_struct<T_scale_fail>::value) {
+	for(size_t n = 0; n < stan::length(beta); ++n) operands_and_partials.d_x3[n] *= P;
+      }
+        
+      return operands_and_partials.to_var(P);
+
     }
 
     template <typename T_y, typename T_scale_succ, typename T_scale_fail>
     typename return_type<T_y,T_scale_succ,T_scale_fail>::type
     beta_cdf(const T_y& y, const T_scale_succ& alpha, const T_scale_fail& beta) {
-      return beta_cdf(y,alpha,beta,stan::math::default_policy());
+      return beta_cdf(y, alpha, beta, stan::math::default_policy());
     }
   }
 }

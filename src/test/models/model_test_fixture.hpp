@@ -367,7 +367,7 @@ TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTest) {
   
   int failed = 0;
   std::stringstream err_message;
-  for (int i = 0; i < n; i++) {
+  for (int i = TypeParam::skip; i < n; i++) {
     int index = expected_values[i].first;
     double expected_mean = expected_values[i].second;
 
@@ -380,7 +380,7 @@ TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTest) {
     if (fabs(expected_mean - sample_mean) > sd) {
       failed++;
       // want the error message to have which, what, how
-      err_message << "parameter index: " << index
+      err_message << "parameter index: " << index << ", name: " << c->param_name(index)
                   << "\n\texpected:    " << setw(10) << expected_mean
                   << "\n\tsampled:     " << setw(10) << sample_mean
 		  << "\n\tsd:          " << setw(10) << c->sd(index)
