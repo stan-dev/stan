@@ -70,7 +70,7 @@ namespace stan {
         return logp;
       if (!(check_consistent_sizes(function,
                                    y,mu,sigma,
-				   "Random variable","Location parameter","Scale parameter",
+                                   "Random variable","Location parameter","Scale parameter",
                                    &logp, Policy())))
         return logp;
 
@@ -90,8 +90,8 @@ namespace stan {
       DoubleVectorView<include_summand<propto,T_scale>::value,is_vector<T_scale>::value> log_sigma(length(sigma));
       for (size_t i = 0; i < length(sigma); i++) {
         inv_sigma[i] = 1.0 / value_of(sigma_vec[i]);
-	if (include_summand<propto,T_scale>::value)
-	  log_sigma[i] = log(value_of(sigma_vec[i]));
+        if (include_summand<propto,T_scale>::value)
+          log_sigma[i] = log(value_of(sigma_vec[i]));
       }
 
       for (size_t n = 0; n < N; n++) {
@@ -197,7 +197,7 @@ namespace stan {
         return cdf;
       if (!(check_consistent_sizes(function,
                                    y,mu,sigma,
-				   "Random variable","Location parameter","Scale parameter",
+                                   "Random variable","Location parameter","Scale parameter",
                                    &cdf, Policy())))
         return cdf;
 
@@ -213,7 +213,7 @@ namespace stan {
       size_t N = max_size(y, mu, sigma);
       
       for (size_t n = 0; n < N; n++) {
-	cdf *= 0.5 + 0.5 * erf((y_vec[n] - mu_vec[n]) / (sigma_vec[n] * SQRT_2));
+        cdf *= 0.5 + 0.5 * erf((y_vec[n] - mu_vec[n]) / (sigma_vec[n] * SQRT_2));
       }
       return cdf;
     }
@@ -226,15 +226,17 @@ namespace stan {
     }
 
 
-    template <typename T_loc, typename T_scale, class RNG>
+    template <class RNG>
     inline double
-    normal_random(const T_loc& mu, const T_scale& sigma, RNG& rng) {
+    normal_rng(double mu,
+               double sigma,
+               RNG& rng) {
       using boost::variate_generator;
       using boost::normal_distribution;
       using stan::math::value_of;
       variate_generator<RNG&, normal_distribution<> >
         rng_unit_norm(rng, normal_distribution<>());
-      return value_of(mu)  + value_of(sigma) * rng_unit_norm();
+      return mu + sigma * rng_unit_norm();
     }
   }
 }
