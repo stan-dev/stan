@@ -115,11 +115,11 @@ namespace stan {
 	  lgamma_half_nu[i] = lgamma(half_nu[i]);
 	  lgamma_half_nu_plus_half[i] = lgamma(half_nu[i] + 0.5);
 	}
-      DoubleVectorView<is_constant_struct<T_dof>::value,
+      DoubleVectorView<!is_constant_struct<T_dof>::value,
 	is_vector<T_dof>::value> digamma_half_nu(length(nu));
-      DoubleVectorView<is_constant_struct<T_dof>::value,
+      DoubleVectorView<!is_constant_struct<T_dof>::value,
 	is_vector<T_dof>::value> digamma_half_nu_plus_half(length(nu));
-      if (is_constant_struct<T_dof>::value)
+      if (!is_constant_struct<T_dof>::value)
 	for (size_t i = 0; i < length(nu); i++) {
 	  digamma_half_nu[i] = digamma(half_nu[i]);
 	  digamma_half_nu_plus_half[i] = digamma(half_nu[i] + 0.5);
@@ -181,9 +181,9 @@ namespace stan {
 	  operands_and_partials.d_x2[n] 
 	    += 0.5*digamma_half_nu_plus_half[n] - 0.5*digamma_half_nu[n]
 	    - 0.5 * inv_nu
-	    - 0.5*(log1p_exp[n] 
-		   - (half_nu[n]+0.5) * 1.0/(1.0 + square_y_minus_mu_over_sigma__over_nu[n])
-		   * square_y_minus_mu_over_sigma__over_nu[n] * inv_nu);
+	    - 0.5*log1p_exp[n]
+	    + (half_nu[n] + 0.5)*(1.0/(1.0 + square_y_minus_mu_over_sigma__over_nu[n])
+				  *square_y_minus_mu_over_sigma__over_nu[n] * inv_nu);
 	}
 	if (!is_constant_struct<T_loc>::value) {
 	  operands_and_partials.d_x3[n] 
