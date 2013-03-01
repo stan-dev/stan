@@ -33,7 +33,7 @@ exportMethods(
   show, sampling, summary, extract,
   traceplot, plot, get_stancode, get_inits, get_seed, get_cppo_mode,
   log_prob, grad_log_prob, 
-  transform_pars, constrain_pars, get_num_upars,
+  unconstrain_pars, constrain_pars, get_num_upars,
   get_seeds,
   get_adaptation_info,
   get_sampler_params,
