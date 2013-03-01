@@ -1,6 +1,9 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__POISSON_HPP__
 #define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__POISSON_HPP__
 
+#include <boost/random/poisson_distribution.hpp>
+#include <boost/random/variate_generator.hpp>
+
 #include <limits>
 
 #include <stan/agrad.hpp>
@@ -336,6 +339,16 @@ namespace stan {
       return poisson_cdf<false>(n, lambda, stan::math::default_policy());
     }
 
+    template <class RNG>
+    inline int
+    poisson_rng(double lambda,
+                       RNG& rng) {
+      using boost::variate_generator;
+      using boost::random::poisson_distribution;
+      variate_generator<RNG&, poisson_distribution<> >
+        poisson_rng(rng, poisson_distribution<>(lambda));
+      return poisson_rng();
+    }
       
   }
 }
