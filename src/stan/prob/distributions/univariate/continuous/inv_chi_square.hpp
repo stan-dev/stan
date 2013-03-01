@@ -1,6 +1,9 @@
 #ifndef __STAN__PROB__DIST__UNI__CONTINUOUS__INV_CHI_SQUARE_HPP__
 #define __STAN__PROB__DIST__UNI__CONTINUOUS__INV_CHI_SQUARE_HPP__
 
+#include <boost/random/chi_squared_distribution.hpp>
+#include <boost/random/variate_generator.hpp>
+
 #include <stan/agrad.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/special_functions.hpp>
@@ -273,6 +276,17 @@ namespace stan {
     inline typename return_type<T_y,T_dof>::type
     inv_chi_square_cdf(const T_y& y, const T_dof& nu) {
       return inv_chi_square_cdf(y, nu, stan::math::default_policy());
+    }
+
+    template <class RNG>
+    inline double
+    inv_chi_square_rng(double nu,
+               RNG& rng) {
+      using boost::variate_generator;
+      using boost::random::chi_squared_distribution;
+      variate_generator<RNG&, chi_squared_distribution<> >
+        chi_square_rng(rng, chi_squared_distribution<>(nu));
+      return 1 / chi_square_rng();
     }
     
   }
