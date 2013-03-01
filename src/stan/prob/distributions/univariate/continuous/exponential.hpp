@@ -1,6 +1,9 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__EXPONENTIAL_HPP__
 #define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__EXPONENTIAL_HPP__
 
+#include <boost/random/exponential_distribution.hpp>
+#include <boost/random/variate_generator.hpp>
+
 #include <stan/agrad.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/special_functions.hpp>
@@ -178,8 +181,16 @@ namespace stan {
       return exponential_cdf(y,beta,stan::math::default_policy());
     }
     
-
-
+    template <class RNG>
+    inline double
+    exponential_rng(double beta,
+                    RNG& rng) {
+      using boost::variate_generator;
+      using boost::exponential_distribution;
+      variate_generator<RNG&, exponential_distribution<> >
+       exp_rng(rng, exponential_distribution<>(beta));
+      return exp_rng();
+    }
   }
 }
 
