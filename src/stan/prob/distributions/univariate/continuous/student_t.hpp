@@ -1,6 +1,9 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__STUDENT_T_HPP__
 #define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__STUDENT_T_HPP__
 
+#include <boost/random/student_t_distribution.hpp>
+#include <boost/random/variate_generator.hpp>
+
 #include <stan/agrad.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/special_functions.hpp>
@@ -346,6 +349,19 @@ namespace stan {
       return student_t_cdf(y, nu, mu, sigma, stan::math::default_policy());
     }
     
+    
+    template <class RNG>
+    inline double
+    student_t_rng(double nu,
+		  double mu,
+		  double sigma,
+                    RNG& rng) {
+      using boost::variate_generator;
+      using boost::random::student_t_distribution;
+      variate_generator<RNG&, student_t_distribution<> >
+        rng_unit_student_t(rng, student_t_distribution<>(nu));
+      return mu + sigma * rng_unit_student_t();
+    }
   }
 }
 #endif
