@@ -1,6 +1,9 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__BETA_HPP__
 #define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__BETA_HPP__
 
+#include <boost/random/gamma_distribution.hpp>
+#include <boost/random/variate_generator.hpp>
+
 #include <stan/agrad.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/special_functions.hpp>
@@ -371,6 +374,21 @@ namespace stan {
     typename return_type<T_y,T_scale_succ,T_scale_fail>::type
     beta_cdf(const T_y& y, const T_scale_succ& alpha, const T_scale_fail& beta) {
       return beta_cdf(y, alpha, beta, stan::math::default_policy());
+    }
+
+    template <class RNG>
+    inline double
+    beta_rng(double alpha,
+             double beta,
+	     RNG& rng1,
+	     RNG& rng2) {
+      using boost::variate_generator;
+      using boost::random::gamma_distribution;
+      variate_generator<RNG&, gamma_distribution<> >
+        rng_gamma_alpha(rng1, gamma_distribution<>(alpha, 1));
+      variate_generator<RNG&, gamma_distribution<> >
+        rng_gamma_beta(rng2, gamma_distribution<>(beta, 1));
+      return rng_gamma_alpha() / (rng_gamma_alpha() + rng_gamma_beta());
     }
   }
 }
