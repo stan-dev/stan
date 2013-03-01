@@ -173,7 +173,6 @@ C++ API
 * Vectorize distributions
   - Allows vectorized inputs (but without partials calculated):
     univariate/continuous
-    + student_t
     + uniform
     + weibull
     univariate/discrete
