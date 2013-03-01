@@ -19,9 +19,9 @@ transformed parameters {
   cov_matrix[K] Sigma;       // covariance matrix
   for (m in 1:M)
     theta[m] <- softmax(eta[m]);
-  for (m in 1:M) {
+  for (m in 1:K) {
     Sigma[m,m] <- sigma[m] * sigma[m] * Omega[m,m];
-    for (n in (m+1):M) {
+    for (n in (m+1):K) {
       Sigma[m,n] <- sigma[m] * sigma[n] * Omega[m,n];
       Sigma[n,m] <- Sigma[m,n];
     }
