@@ -55,6 +55,7 @@ namespace stan {
       using stan::math::check_positive;
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
+      using stan::math::value_of;
       
       double logp(0.0);
       if(!check_not_nan(function, y, "Random variable", &logp, Policy()))
