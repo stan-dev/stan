@@ -1,6 +1,9 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS__WEIBULL_HPP__
 #define __STAN__PROB__DISTRIBUTIONS__WEIBULL_HPP__
 
+#include <boost/random/weibull_distribution.hpp>
+#include <boost/random/variate_generator.hpp>
+
 #include <stan/agrad.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/special_functions.hpp>
@@ -154,6 +157,18 @@ namespace stan {
       return weibull_cdf(y,alpha,sigma,stan::math::default_policy());
     }
 
+   
+    template <class RNG>
+    inline double
+    weibull_rng(double alpha,
+               double sigma,
+               RNG& rng) {
+      using boost::variate_generator;
+      using boost::random::weibull_distribution;
+      variate_generator<RNG&, weibull_distribution<> >
+        weibull_rng(rng, weibull_distribution<>(alpha, sigma));
+      return weibull_rng();
+    }
   }
 }
 #endif
