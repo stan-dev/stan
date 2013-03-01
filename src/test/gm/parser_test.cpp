@@ -201,6 +201,8 @@ TEST(gm_parser,function_signatures) {
   EXPECT_TRUE(is_parsable("src/test/gm/model_specs/compiled/function_signatures_scaled_inv_chi_square.stan"));
   EXPECT_TRUE(is_parsable("src/test/gm/model_specs/compiled/function_signatures_student_t_0.stan"));
   EXPECT_TRUE(is_parsable("src/test/gm/model_specs/compiled/function_signatures_student_t_1.stan"));
+  EXPECT_TRUE(is_parsable("src/test/gm/model_specs/compiled/function_signatures_student_t_2.stan"));
+  EXPECT_TRUE(is_parsable("src/test/gm/model_specs/compiled/function_signatures_student_t_3.stan"));
   EXPECT_TRUE(is_parsable("src/test/gm/model_specs/compiled/function_signatures_uniform.stan"));
   EXPECT_TRUE(is_parsable("src/test/gm/model_specs/compiled/function_signatures_weibull.stan"));
 }
