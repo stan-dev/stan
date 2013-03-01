@@ -233,10 +233,9 @@ namespace stan {
                RNG& rng) {
       using boost::variate_generator;
       using boost::normal_distribution;
-      using stan::math::value_of;
       variate_generator<RNG&, normal_distribution<> >
-        rng_unit_norm(rng, normal_distribution<>());
-      return mu + sigma * rng_unit_norm();
+        norm_rng(rng, normal_distribution<>(mu, sigma));
+      return norm_rng();
     }
   }
 }
