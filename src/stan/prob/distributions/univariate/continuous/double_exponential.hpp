@@ -1,6 +1,9 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS__DOUBLE_EXPONENTIAL_HPP__
 #define __STAN__PROB__DISTRIBUTIONS__DOUBLE_EXPONENTIAL_HPP__
 
+#include <boost/random/uniform_01.hpp>
+#include <boost/random/variate_generator.hpp>
+
 #include <stan/agrad.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/special_functions.hpp>
@@ -199,6 +202,24 @@ namespace stan {
       return double_exponential_cdf(y,mu,sigma,stan::math::default_policy());
     }
     
+    template <class RNG>
+    inline double
+    double_exponential_rng(double mu,
+               double sigma,
+               RNG& rng) {
+      using boost::variate_generator;
+      using boost::random::uniform_01;
+      using std::log;
+      using std::abs;
+      variate_generator<RNG&, uniform_01<> >
+        rng_unit_01(rng, uniform_01<>());
+      int a = 0;
+      if(0.5 - rng_unit_01() > 0)
+	a = 1;
+      else if(0.5 - rng_unit_01() < 0)
+	a = -1;
+      return mu - sigma * a * log(1 - 2 * abs(0.5 - rng_unit_01()));
+    }
   }
 }
 #endif
