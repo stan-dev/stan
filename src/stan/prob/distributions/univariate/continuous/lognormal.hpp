@@ -1,6 +1,9 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__LOGNORMAL_HPP__
 #define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__LOGNORMAL_HPP__
 
+#include <boost/random/lognormal_distribution.hpp>
+#include <boost/random/variate_generator.hpp>
+
 #include <stan/agrad.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/special_functions.hpp>
@@ -195,6 +198,17 @@ namespace stan {
       return lognormal_cdf(y,mu,sigma,stan::math::default_policy());
     }
     
+    template <class RNG>
+    inline double
+    lognormal_rng(double mu,
+               double sigma,
+               RNG& rng) {
+      using boost::variate_generator;
+      using boost::random::lognormal_distribution;
+      variate_generator<RNG&, lognormal_distribution<> >
+        lognorm_rng(rng, lognormal_distribution<>(mu, sigma));
+      return lognorm_rng();
+    }
   }
 }
 #endif

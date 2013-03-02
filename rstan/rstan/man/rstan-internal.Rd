@@ -8,7 +8,7 @@
 \alias{get_num_upars,ANY-method}
 \alias{log_prob,ANY-method}
 \alias{grad_log_prob,ANY-method}
-\alias{transform_pars,ANY-method}
+\alias{unconstrain_pars,ANY-method}
 \alias{constrain_pars,ANY-method}
 
 \alias{cxxdso-class}

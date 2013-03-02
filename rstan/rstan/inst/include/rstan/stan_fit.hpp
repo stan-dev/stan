@@ -775,7 +775,7 @@ namespace rstan {
      * @param par An R list as for specifying the initial values
      *  for a chain 
      */
-    SEXP transform_pars(SEXP par) {
+    SEXP unconstrain_pars(SEXP par) {
       Rcpp::List par_lst(par); 
       rstan::io::rlist_ref_var_context par_context(par_lst); 
       std::vector<int> params_i;
@@ -785,7 +785,7 @@ namespace rstan {
     } 
 
     /**
-     * Contrary to transform_pars, transform parameters
+     * Contrary to unconstrain_pars, transform parameters
      * from unconstrained support to the constrained. 
      * 
      * @param upar The parameter values on the unconstrained 

@@ -493,17 +493,17 @@ if (!isGeneric("log_prob")) {
              def = function(object, ...) { standardGeneric("log_prob") }) 
 } 
 
-if (!isGeneric("transform_pars")) {
-  setGeneric(name = "transform_pars", 
-             def = function(object, ...) { standardGeneric("transform_pars") }) 
+if (!isGeneric("unconstrain_pars")) {
+  setGeneric(name = "unconstrain_pars", 
+             def = function(object, ...) { standardGeneric("unconstrain_pars") }) 
 } 
 
-setMethod("transform_pars", signature = "stanfit", 
+setMethod("unconstrain_pars", signature = "stanfit", 
           function(object, pars) {
             # pars is a list as specifying inits for a chain
             if (!is_sfinstance_valid(object)) 
               stop("the model object is not created or not valid")
-            object@.MISC$stan_fit_instance$transform_pars(pars)
+            object@.MISC$stan_fit_instance$unconstrain_pars(pars)
           })
 
 if (!isGeneric("constrain_pars")) {

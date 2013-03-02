@@ -1,6 +1,9 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__LOGISTIC_HPP__
 #define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__LOGISTIC_HPP__
 
+#include <boost/random/uniform_01.hpp>
+#include <boost/random/variate_generator.hpp>
+
 #include <stan/agrad.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/special_functions.hpp>
@@ -257,6 +260,17 @@ namespace stan {
       return logistic_cdf(y, mu, sigma, stan::math::default_policy());
     }
       
+    template <class RNG>
+    inline double
+    logistic_rng(double mu,
+               double beta,
+               RNG& rng) {
+      using boost::variate_generator;
+      using boost::random::uniform_01;
+      variate_generator<RNG&, uniform_01<> >
+        uniform01_rng(rng, uniform_01<>());
+      return mu + beta * (log(uniform01_rng()) - log(1 - uniform01_rng()));
+    }
   }
 }
 #endif

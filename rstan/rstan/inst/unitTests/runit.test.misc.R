@@ -143,6 +143,8 @@ test_seq_array_ind <- function() {
   e <- matrix(c(1, 1, 1, 2, 1, 3, 2, 1, 2, 2, 2, 3), 
               nrow = 6, byrow = TRUE)
   checkEquals(d, as.array(e)) 
+  f <- rstan:::seq_array_ind(1)
+  checkEquals(f, array(1, dim = c(1, 1)))
 } 
 
 test_flatnames <- function() {

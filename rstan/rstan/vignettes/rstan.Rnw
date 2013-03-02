@@ -397,9 +397,9 @@ a parameter is a simplex of length $K$, the number of unconstrained
 parameters are $K-1$. To get the number of unconstrained parameters, 
 function \code{get\_num\_upars} for a stanfit object can be used. 
 To transform parameters between the constrained space and 
-the unconstrained, we can use functions \code{transform\_pars} 
+the unconstrained, we can use functions \code{unconstrained\_pars} 
 and \code{constrained\_pars}. The former takes a list of parameters 
-as input and transforms to unconstrained space, and the latter 
+as input and transforms it to unconstrained space, and the latter 
 does the inversion. 
 
 \subsection{The dynamic shared objects for models} 
@@ -452,7 +452,7 @@ Name  &    Functionality    \\
 \code{get\_sampler\_params}    & get parameters used by the sampler such as \code{treedepth} of NUTS  \\
 \code{get\_adaptation\_info}    & get adaptation information, if any, of the sampler \\ 
 \code{get\_num\_upars}    & get the number of parameters on unconstrained space \\ 
-\code{transform\_pars}    & transform parameter to unconstrained space \\ 
+\code{unconstrain\_pars}    & transform parameter to unconstrained space \\ 
 \code{constrain\_pars}    & transform parameter from unconstrained space to its defined space \\
 \code{log\_prob}    & evaluate the log posterior for parameter on unconstrained space \\
 \code{grad\_log\_prob}    & evaluate the gradient of the log posterior for parameter on unconstrained space \\

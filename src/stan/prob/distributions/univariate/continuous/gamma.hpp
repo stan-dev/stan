@@ -1,6 +1,9 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__GAMMA_HPP__
 #define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__GAMMA_HPP__
 
+#include <boost/random/gamma_distribution.hpp>
+#include <boost/random/variate_generator.hpp>
+
 #include <stan/agrad.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/special_functions.hpp>
@@ -234,6 +237,18 @@ namespace stan {
       return gamma_cdf(y,alpha,beta,stan::math::default_policy());
     }
     */
+
+    template <class RNG>
+    inline double
+    gamma_rng(double alpha,
+		    double beta,
+                    RNG& rng) {
+      using boost::variate_generator;
+      using boost::gamma_distribution;
+      variate_generator<RNG&, gamma_distribution<> >
+	gamma_rng(rng, gamma_distribution<>(alpha, beta));
+      return gamma_rng();
+    }
 
   }
 }

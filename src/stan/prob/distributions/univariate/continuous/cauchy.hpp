@@ -1,6 +1,9 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CAUCHY_HPP__
 #define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CAUCHY_HPP__
 
+#include <boost/random/cauchy_distribution.hpp>
+#include <boost/random/variate_generator.hpp>
+
 #include <stan/agrad.hpp>
 #include <stan/prob/traits.hpp>
 #include <stan/math/error_handling.hpp>
@@ -284,6 +287,18 @@ namespace stan {
     typename return_type<T_y,T_loc,T_scale>::type
     cauchy_cdf(const T_y& y, const T_loc& mu, const T_scale& sigma) {
       return cauchy_cdf(y, mu, sigma, stan::math::default_policy());
+    }
+
+    template <class RNG>
+    inline double
+    cauchy_rng(double med,
+               double sigma,
+               RNG& rng) {
+      using boost::variate_generator;
+      using boost::random::cauchy_distribution;
+      variate_generator<RNG&, cauchy_distribution<> >
+        cauchy_rng(rng, cauchy_distribution<>(med, sigma));
+      return cauchy_rng();
     }
   }
 }

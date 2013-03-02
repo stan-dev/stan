@@ -1,6 +1,9 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__BERNOULLI_HPP__
 #define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__BERNOULLI_HPP__
 
+#include <boost/random/bernoulli_distribution.hpp>
+#include <boost/random/variate_generator.hpp>
+
 #include <stan/agrad.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/special_functions.hpp>
@@ -353,6 +356,17 @@ namespace stan {
     inline typename return_type<T_prob>::type
     bernoulli_cdf(const T_n& n, const T_prob& theta) {
       return bernoulli_cdf<false>(n, theta, stan::math::default_policy());
+    }
+
+    template <class RNG>
+    inline int
+    bernoulli_rng(double theta,
+                    RNG& rng) {
+      using boost::variate_generator;
+      using boost::bernoulli_distribution;
+      variate_generator<RNG&, bernoulli_distribution<> >
+        bernoulli_rng(rng, bernoulli_distribution<>(theta));
+      return bernoulli_rng();
     }
   }
 }

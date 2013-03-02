@@ -1,6 +1,9 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__EXPONENTIAL_HPP__
 #define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__EXPONENTIAL_HPP__
 
+#include <boost/random/exponential_distribution.hpp>
+#include <boost/random/variate_generator.hpp>
+
 #include <stan/agrad.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/special_functions.hpp>
@@ -55,8 +58,9 @@ namespace stan {
       using stan::math::check_positive;
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
+      using stan::math::value_of;
       
-      typename return_type<T_y,T_inv_scale>::type logp(0.0);
+      double logp(0.0);
       if(!check_not_nan(function, y, "Random variable", &logp, Policy()))
         return logp;
       if(!check_finite(function, beta, "Inverse scale parameter", &logp, Policy()))
@@ -76,13 +80,29 @@ namespace stan {
       VectorView<const T_inv_scale> beta_vec(beta);
       size_t N = max_size(y, beta);
       
-      for (size_t n = 0; n < N; n++) {
+      DoubleVectorView<
+	include_summand<propto,T_inv_scale>::value,
+	is_vector<T_inv_scale>::value> log_beta(length(beta));
+      for (size_t i = 0; i < length(beta); i++)
 	if (include_summand<propto,T_inv_scale>::value)
-	  logp += log(beta_vec[n]);
+	  log_beta[i] = log(value_of(beta_vec[i]));
+
+      agrad::OperandsAndPartials<T_y,T_inv_scale> operands_and_partials(y, beta);
+
+      for (size_t n = 0; n < N; n++) {
+	const double beta_dbl = value_of(beta_vec[n]);
+	const double y_dbl = value_of(y_vec[n]);
+	if (include_summand<propto,T_inv_scale>::value)
+	  logp += log_beta[n];
 	if (include_summand<propto,T_y,T_inv_scale>::value)
-	  logp -= beta_vec[n] * y_vec[n];
+	  logp -= beta_dbl * y_dbl;
+	
+	if (!is_constant_struct<T_y>::value) 
+	  operands_and_partials.d_x1[n] -= beta_dbl;
+	if (!is_constant_struct<T_inv_scale>::value) 
+	  operands_and_partials.d_x2[n] += 1 / beta_dbl - y_dbl;
       }
-      return logp;
+      return operands_and_partials.to_var(logp);
     }
     
     template <bool propto,
@@ -161,8 +181,16 @@ namespace stan {
       return exponential_cdf(y,beta,stan::math::default_policy());
     }
     
-
-
+    template <class RNG>
+    inline double
+    exponential_rng(double beta,
+                    RNG& rng) {
+      using boost::variate_generator;
+      using boost::exponential_distribution;
+      variate_generator<RNG&, exponential_distribution<> >
+       exp_rng(rng, exponential_distribution<>(beta));
+      return exp_rng();
+    }
   }
 }
 

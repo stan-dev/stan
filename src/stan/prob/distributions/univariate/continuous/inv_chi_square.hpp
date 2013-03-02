@@ -1,6 +1,9 @@
 #ifndef __STAN__PROB__DIST__UNI__CONTINUOUS__INV_CHI_SQUARE_HPP__
 #define __STAN__PROB__DIST__UNI__CONTINUOUS__INV_CHI_SQUARE_HPP__
 
+#include <boost/random/chi_squared_distribution.hpp>
+#include <boost/random/variate_generator.hpp>
+
 #include <stan/agrad.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/special_functions.hpp>
@@ -51,7 +54,7 @@ namespace stan {
       using stan::math::value_of;
       using stan::math::check_consistent_sizes;
 
-      typename return_type<T_y,T_dof>::type logp(0.0);
+      double logp(0.0);
       if (!check_finite(function, nu, "Degrees of freedom parameter", &logp, Policy()))
         return logp;
       if (!check_positive(function, nu, "Degrees of freedom parameter", &logp, Policy()))
@@ -75,17 +78,56 @@ namespace stan {
 	if (value_of(y_vec[n]) <= 0)
 	  return LOG_ZERO;
 
+      using boost::math::digamma;
       using boost::math::lgamma;
       using stan::math::multiply_log;
-      for (size_t n = 0; n < N; n++) {
-	if (include_summand<propto,T_dof>::value)
-	  logp += nu_vec[n] * NEG_LOG_TWO_OVER_TWO - lgamma(0.5 * nu_vec[n]);
+
+      DoubleVectorView<include_summand<propto,T_y,T_dof>::value,
+	is_vector<T_y>::value> log_y(length(y));
+      for (size_t i = 0; i < length(y); i++)
 	if (include_summand<propto,T_y,T_dof>::value)
-	  logp -= multiply_log(0.5*nu_vec[n]+1.0, y_vec[n]);
+	  log_y[i] = log(value_of(y_vec[i]));
+
+      DoubleVectorView<include_summand<propto,T_y>::value,
+	is_vector<T_y>::value> inv_y(length(y));
+      for (size_t i = 0; i < length(y); i++)
 	if (include_summand<propto,T_y>::value)
-	  logp -= 0.5 / y_vec[n];
+	  inv_y[i] = 1.0 / value_of(y_vec[i]);
+
+      DoubleVectorView<include_summand<propto,T_dof>::value,
+	is_vector<T_dof>::value> lgamma_half_nu(length(nu));
+      DoubleVectorView<!is_constant_struct<T_dof>::value,
+	is_vector<T_dof>::value> digamma_half_nu_over_two(length(nu));
+      for (size_t i = 0; i < length(nu); i++) {
+	double half_nu = 0.5 * value_of(nu_vec[i]);
+	if (include_summand<propto,T_dof>::value)
+	  lgamma_half_nu[i] = lgamma(half_nu);
+	if (!is_constant_struct<T_dof>::value)
+	  digamma_half_nu_over_two[i] = digamma(half_nu) * 0.5;
       }
-      return logp;
+
+      agrad::OperandsAndPartials<T_y, T_dof> operands_and_partials(y, nu);
+      for (size_t n = 0; n < N; n++) {
+	const double nu_dbl = value_of(nu_vec[n]);
+	const double half_nu = 0.5 * nu_dbl;
+	
+	if (include_summand<propto,T_dof>::value)
+	  logp += nu_dbl * NEG_LOG_TWO_OVER_TWO - lgamma_half_nu[n];
+	if (include_summand<propto,T_y,T_dof>::value)
+	  logp -= (half_nu+1.0) * log_y[n];
+	if (include_summand<propto,T_y>::value)
+	  logp -= 0.5 * inv_y[n];
+
+	if (!is_constant_struct<T_y>::value) {
+	  operands_and_partials.d_x1[n] 
+	    += -(half_nu+1.0) * inv_y[n] + 0.5 * inv_y[n] * inv_y[n];
+	}
+	if (!is_constant_struct<T_dof>::value) {
+	  operands_and_partials.d_x2[n]
+	    += NEG_LOG_TWO_OVER_TWO - digamma_half_nu_over_two[n] - 0.5*log_y[n];
+	}
+      }
+      return operands_and_partials.to_var(logp);
     }
 
     template <bool propto,
@@ -234,6 +276,17 @@ namespace stan {
     inline typename return_type<T_y,T_dof>::type
     inv_chi_square_cdf(const T_y& y, const T_dof& nu) {
       return inv_chi_square_cdf(y, nu, stan::math::default_policy());
+    }
+
+    template <class RNG>
+    inline double
+    inv_chi_square_rng(double nu,
+               RNG& rng) {
+      using boost::variate_generator;
+      using boost::random::chi_squared_distribution;
+      variate_generator<RNG&, chi_squared_distribution<> >
+        chi_square_rng(rng, chi_squared_distribution<>(nu));
+      return 1 / chi_square_rng();
     }
     
   }

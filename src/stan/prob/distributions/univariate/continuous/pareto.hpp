@@ -1,6 +1,9 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS__PARETO_HPP__
 #define __STAN__PROB__DISTRIBUTIONS__PARETO_HPP__
 
+#include <boost/random/exponential_distribution.hpp>
+#include <boost/random/variate_generator.hpp>
+
 #include <stan/agrad.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/special_functions.hpp>
@@ -267,6 +270,17 @@ namespace stan {
       return pareto_cdf(y, y_min, alpha, stan::math::default_policy());
     }
       
+    template <class RNG>
+    inline double
+    pareto_rng(double y_min,
+               double alpha,
+               RNG& rng) {
+      using boost::variate_generator;
+      using boost::exponential_distribution;
+      variate_generator<RNG&, exponential_distribution<> >
+        exp_rng(rng, exponential_distribution<>(alpha));
+      return y_min * std::exp(exp_rng());
+    }
   }
 }
 #endif

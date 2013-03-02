@@ -26,7 +26,7 @@ sampler <- new(stan_fit_cpp_module, list(), sm@dso@.CXXDSOMISC$cxxfun)
 fit <- sampling(sm, data = list())
 
 # from constrained space to the unconstrained 
-up <- sampler$transform_pars(list(y = c(0.1, 0.2, 0.3, 0.3, 0.1)))
+up <- sampler$unconstrain_pars(list(y = c(0.1, 0.2, 0.3, 0.3, 0.1)))
 
 p <- sampler$constrain_pars(up) 
 n <- sampler$num_pars_unconstrained()
@@ -40,7 +40,7 @@ gr <- grad_log_prob(fit, rep(0, K- 1))
 
 nupar <- get_num_upars(fit)
 cat("nupar=", nupar, "\n")
-up2 <- transform_pars(fit, list(y = rep(1 / K, K))) 
+up2 <- unconstrain_pars(fit, list(y = rep(1 / K, K))) 
 # up2 should be rep(0, K - 1) 
 p2 <- constrain_pars(fit, up2)
 
@@ -66,5 +66,3 @@ tfun <- function(y) log_prob(opfit, y)
 tgrfun <- function(y) grad_log_prob(opfit, y)
 or <- optim(1, tfun, tgrfun, method = 'BFGS')
 print(or)
-
-

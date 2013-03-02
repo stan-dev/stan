@@ -1,6 +1,9 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__NEG_BINOMIAL_HPP__
 #define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__NEG_BINOMIAL_HPP__
 
+#include <boost/random/negative_binomial_distribution.hpp>
+#include <boost/random/variate_generator.hpp>
+
 #include <boost/math/special_functions/digamma.hpp>
 #include <stan/agrad.hpp>
 #include <stan/math/error_handling.hpp>
@@ -362,7 +365,17 @@ namespace stan {
           return neg_binomial_cdf<false>(n, alpha, beta, stan::math::default_policy());
       }
 
-
+    template <class RNG>
+    inline int
+    neg_binomial_rng(double alpha,
+			  double beta,
+                       RNG& rng) {
+      using boost::variate_generator;
+      using boost::random::negative_binomial_distribution;
+      variate_generator<RNG&, negative_binomial_distribution<> >
+        neg_binomial_rng(rng, negative_binomial_distribution<>(alpha, 1 / (beta + 1)));
+      return neg_binomial_rng();
+    }
   }
 }
 #endif

@@ -30,9 +30,9 @@
 \alias{get_sampler_params,stanfit,logical-method}
 \alias{get_num_upars}
 \alias{get_num_upars,stanfit-method}
-\alias{transform_pars}
-\alias{transform_pars,stanfit-method}
-%%\alias{transform_pars,stanfit,list-method}
+\alias{unconstrain_pars}
+\alias{unconstrain_pars,stanfit-method}
+%%\alias{unconstrain_pars,stanfit,list-method}
 \alias{constrain_pars}
 \alias{constrain_pars,stanfit-method}
 %%\alias{constrain_pars,stanfit,numeric-method}
@@ -175,6 +175,8 @@
       the log probability density (\code{lp__}) for a set of parameter 
       values (on the \emph{unconstrained} space) up to an additive constant. 
       The unconstrained parameters are specified using a numeric vector.
+      The number of parameters on the unconstrained space can be obtained 
+      using method \code{get_num_upars}.
       A numeric value is returned.} 
     \item{\code{grad_prob_log}}{\code{signature(object = "stanfit", "numeric")}: compute
       the gradient of log probability density function for a set of parameter 
@@ -188,14 +190,14 @@
       for a model is not necessarily equal to this number of unconstrained 
       parameters. For example, when a parameter is specified as a simplex of 
       length K, the number of unconstrained parameters is K-1.} 
-    \item{\code{transform_pars}}{\code{signature(object = "stanfit", "list")}: transform
+    \item{\code{unconstrain_pars}}{\code{signature(object = "stanfit", "list")}: transform
       the parameter to unconstrained space. The input is a named list as
       for specifying initial values for each parameter. A numeric vector is
       returned.}
     \item{\code{constrain_pars}}{\code{signature(object = "stanfit", "numeric")}: get the
       parameter values from their unconstrained space. The input is a numeric 
       vector. A list is returned.  This function is contrary to
-      \code{transform_pars}.}
+      \code{unconstrain_pars}.}
   }
 }
 
@@ -231,9 +233,18 @@ head(sp[[1]])
 
 lp <- log_prob(fit, c(1, 2))
 grad <- grad_log_prob(fit, c(1, 2))
+
+# get the number of parameters on the unconstrained space
 n <- get_num_upars(fit)
-uy <- transform_pars(fit, list(y = rep(1, 2)))
+
+# parameters on the positive real line (constrained space) 
+y1 <- list(y = rep(1, 2)) 
+
+uy <- unconstrain_pars(fit, y1) 
 ## uy should be c(0, 0) since here the log transformation is used
-y <- constrain_pars(fit, rep(0, n))
+y1star <- constrain_pars(fit, uy)
+
+print(y1)
+print(y1star) # y1start should equal to y1 
 }}
 \keyword{classes}

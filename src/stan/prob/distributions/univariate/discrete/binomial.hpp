@@ -1,6 +1,9 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__BINOMIAL_HPP__
 #define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__BINOMIAL_HPP__
 
+#include <boost/random/binomial_distribution.hpp>
+#include <boost/random/variate_generator.hpp>
+
 #include <stan/agrad.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/special_functions.hpp>
@@ -410,6 +413,17 @@ namespace stan {
       return binomial_cdf<false>(n, N, theta, stan::math::default_policy());
     }
 
+    template <class RNG>
+    inline int
+    binomial_rng(int n,
+		 double prob,
+                 RNG& rng) {
+      using boost::variate_generator;
+      using boost::binomial_distribution;
+      variate_generator<RNG&, binomial_distribution<> >
+        binomial_rng(rng, binomial_distribution<>(n, prob));
+      return binomial_rng();
+    }
     
   }
 }

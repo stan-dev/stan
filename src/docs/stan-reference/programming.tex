@@ -2389,10 +2389,12 @@ parameters {
 transformed parameters {
   ... eta as above ...
   cov_matrix[K] Sigma;       // covariance matrix
-  for (m in 1:D) {
+  for (m in 1:K) {
     Sigma[m,m] <- sigma[m] * sigma[m] * Omega[m,n];
-    for (n in (m+1):D)
+    for (n in (m+1):K) {
       Sigma[m,n] <- sigma[m] * sigma[n] * Omega[m,n];
+      Sigma[n,m] <- Sigma[m,n];
+    }
   } 
 }
 model {
