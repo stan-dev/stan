@@ -34,6 +34,9 @@ cat("n=", n, "\n")
 print(p)
 
 K <- 5
+fit <- stan(model_code = mcode)
+lp <- log_prob(fit, rep(0, K - 1))
+gr <- grad_log_prob(fit, rep(0, K- 1))
 
 nupar <- get_num_upars(fit)
 cat("nupar=", nupar, "\n")
