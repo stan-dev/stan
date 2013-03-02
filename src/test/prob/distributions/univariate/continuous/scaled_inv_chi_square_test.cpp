@@ -1,19 +1,18 @@
-#include <stan/prob/distributions/univariate/continuous/lognormal.hpp>
+#include <stan/prob/distributions/univariate/continuous/scaled_inv_chi_square.hpp>
 #include <gtest/gtest.h>
 #include <boost/random/mersenne_twister.hpp>
-#include<boost/math/distributions.hpp>
+#include<boost/math/distributions/non_central_chi_squared.hpp>
 
-TEST(ProbDistributionsLogNormal, random) {
+TEST(ProbDistributionsScaledInvChiSquare, random) {
   boost::random::mt19937 rng;
-  EXPECT_NO_THROW(stan::prob::lognormal_rng(2.0,1.0,rng));
+  EXPECT_NO_THROW(stan::prob::scaled_inv_chi_square_rng(2.0,1.0,rng));
 }
 
-
-TEST(ProbDistributionsLogNormal, doesFit) {
+TEST(ProbDistributionsScaledInvChiSquare, doesFit) {
   boost::random::mt19937 rng;
   int N = 10000;
   int K = 5;
-  boost::math::lognormal_distribution<>dist (2.0,1.0);
+  boost::math::non_central_chi_squared_distribution<>dist (2.0,1.0);
   boost::math::chi_squared mydist(K-1);
 
   double loc[4];
@@ -24,7 +23,7 @@ TEST(ProbDistributionsLogNormal, doesFit) {
   int bin [5] = {0, 0, 0, 0, 0};
 
   while (count < N) {
-    double a = stan::prob::lognormal_rng(2.0,1.0,rng);
+    double a = stan::prob::scaled_inv_chi_square_rng(2.0,1.0,rng);
     int i = 0;
     while (i < K-1 && a > loc[i]) 
 	++i;

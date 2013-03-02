@@ -204,7 +204,7 @@ namespace stan {
                double sigma,
                RNG& rng) {
       using boost::variate_generator;
-      using boost::lognormal_distribution;
+      using boost::random::lognormal_distribution;
       variate_generator<RNG&, lognormal_distribution<> >
         lognorm_rng(rng, lognormal_distribution<>(mu, sigma));
       return lognorm_rng();
