@@ -29,7 +29,6 @@
     panel. Or a list of two integer vectors, each specifying a subset of the
     chains to be plotted in the lower and upper panels respectively. The latter
     option can be useful if you suspect that one chain has failed to converge.}  
-  } 
 } 
 
 \details{
