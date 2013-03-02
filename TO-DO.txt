@@ -172,10 +172,7 @@ C++ API
 
 * Vectorize distributions
   - Allows vectorized inputs (but without partials calculated):
-    univariate/continuous
-    + uniform
-    + weibull
-    univariate/discrete
+   univariate/discrete
     + binomial
     + beta_binomial (needs more testing)
     + hypergeometric
