@@ -15,14 +15,16 @@
 
 \arguments{
   \item{x}{An object of S4 class \code{stanfit}}
-  \item{labels, panel, \dots, lower.panel, upper.panel, diag.panel, text.panel,
-    label.pos, cex.labels, font.labels, row1attop, gap}{Same as in 
-    \code{\link{pairs}} but see the Details section}
+  \item{labels, panel, \dots, lower.panel, upper.panel, diag.panel}{Same as in 
+    \code{\link{pairs}} syntactically but see the Details section for different
+    default arguments}
+  \item{text.panel, label.pos, cex.labels, font.labels, row1attop, gap}{Same as in 
+    \code{\link{pairs}}}
   \item{pars}{If not \code{NULL}, a character vector indicating which quantities
     to include in the plots, which is passed to \code{\link{extract}}. Thus,
     by default, all unknown quantities are included, which may be far too many
     to visualize on a small computer screen.}
-  \item{chain\_id}{By default, \code{NULL}, which will plot roughly half of the
+  \item{chain_id}{By default, \code{NULL}, which will plot roughly half of the
     chains in the lower panel and the rest in the upper panel. Otherwise, an
     integer vector can be passed to select some subset of the chains, of which
     roughly half will be plotted in the lower panel and the rest in the upper
