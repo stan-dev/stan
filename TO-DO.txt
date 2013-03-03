@@ -99,12 +99,13 @@ C++ API
 ======================================================================
 [items go here first, then to RStan/cmd]
 
+* JSON I/O
+
 * refactoring:
   -- remove mcmc/hmc.hpp
   -- merge nuts_nondiag and nuts_givenmass
   -- take in something other than string on input for nutsmass
   -- merge in nuts_diag if possible
-
 
 * replace Eigen .sum() with stan::math::sum() for auto-dif
 
@@ -790,6 +791,12 @@ Testing
 
 RStan / PStan / MStan / Command Line
 ======================================================================
+
+* (RStan) Run the examples rather than dontrun;  see Ben's e-mail
+  of 2013-03-02 (March 2) titled "[stan-dev] Re: final checklist for
+  1.2 release?" for instructions on caching
+
+* (PStan) Simple JSON-based I/O interface
 
 * (RStan) Add RStan doc to reference manual
 
