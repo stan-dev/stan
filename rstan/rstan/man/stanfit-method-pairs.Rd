@@ -18,7 +18,7 @@
   \item{labels, panel, \dots, lower.panel, upper.panel, diag.panel}{Same as in 
     \code{\link{pairs}} syntactically but see the Details section for different
     default arguments}
-  \item{label.pos, cex.labels, font.labels, row1attop, gap}{Same as in 
+  \item{text.panel, label.pos, cex.labels, font.labels, row1attop, gap}{Same as in 
     \code{\link{pairs}}}
   \item{pars}{If not \code{NULL}, a character vector indicating which quantities
     to include in the plots, which is passed to \code{\link{extract}}. Thus,
