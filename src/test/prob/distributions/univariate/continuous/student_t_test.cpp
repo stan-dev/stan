@@ -23,7 +23,7 @@ TEST(ProbDistributionsStudentT, doesFit) {
   int bin [5] = {0, 0, 0, 0, 0};
 
   while (count < N) {
-    double a = stan::prob::student_t_rng(3.0,2.0,1.0,rng);
+    double a = stan::prob::student_t_rng(3.0,2.0,1.0,rng) / 1.0 - 2.0;
     int i = 0;
     while (i < K-1 && a > loc[i]) 
 	++i;

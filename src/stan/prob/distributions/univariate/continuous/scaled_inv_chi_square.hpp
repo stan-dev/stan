@@ -1,7 +1,7 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__SCALED_INV_CHI_SQUARE_HPP__
 #define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__SCALED_INV_CHI_SQUARE_HPP__
 
-#include <boost/random/gamma_distribution.hpp>
+#include <boost/random/chi_squared_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
 
 #include <stan/agrad.hpp>
@@ -348,10 +348,10 @@ namespace stan {
                double s,
                RNG& rng) {
       using boost::variate_generator;
-      using boost::random::gamma_distribution;
-      variate_generator<RNG&, gamma_distribution<> >
-        gamma_rng(rng, gamma_distribution<>(nu / 2, 2 / (nu * s)));
-      return 1 / gamma_rng();
+      using boost::random::chi_squared_distribution;
+      variate_generator<RNG&, chi_squared_distribution<> >
+        chi_square_rng(rng, chi_squared_distribution<>(nu));
+      return nu * s / chi_square_rng();
     }    
   }
 }
