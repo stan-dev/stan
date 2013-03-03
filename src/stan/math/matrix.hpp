@@ -1894,17 +1894,8 @@ namespace stan {
         return transpose(mdivide_left_tri<Eigen::Lower>(transpose(A),transpose(b)));
       }
       else {
-        assert(TriView == Eigen::Lower || TriView == Eigen::Upper);
+        throw std::domain_error("triangular view must be Eigen::Lower or Eigen::Upper");
       }
-
-//      return promote_common<Eigen::Matrix<T1,R1,C1>,
-//                            Eigen::Matrix<T2,R1,C1> >(A)
-//        .template triangularView<TriView>()
-//        .transpose()
-//        .solve(promote_common<Eigen::Matrix<T1,R2,C2>,
-//                              Eigen::Matrix<T2,R2,C2> >(b)
-//               .transpose())
-//        .transpose();
     }
     /**
      * Returns the solution of the system tri(A)x=b when tri(A) is a
