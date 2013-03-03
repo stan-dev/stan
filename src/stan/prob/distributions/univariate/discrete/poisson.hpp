@@ -184,7 +184,11 @@ namespace stan {
       agrad::OperandsAndPartials<T_log_rate> operands_and_partials(alpha);
 
       // FIXME: cache value_of for alpha_vec?  faster if only one?
-      
+      DoubleVectorView<include_summand<propto,T_log_rate>::value,is_vector<T_log_rate>::value>
+	exp_alpha(length(alpha));
+      for (size_t i = 0; i < length(alpha); i++)
+	if (include_summand<propto,T_log_rate>::value)
+	  exp_alpha[i] = exp(value_of(alpha_vec[i]));
       using stan::math::multiply_log;
       for (size_t i = 0; i < size; i++) {
         if (!(alpha_vec[i] == -std::numeric_limits<double>::infinity() 
@@ -192,12 +196,12 @@ namespace stan {
           if (include_summand<propto>::value)
             logp -= lgamma(n_vec[i] + 1.0);
           if (include_summand<propto,T_log_rate>::value)
-            logp += n_vec[i] * value_of(alpha_vec[i]) - exp(value_of(alpha_vec[i]));
+            logp += n_vec[i] * value_of(alpha_vec[i]) - exp_alpha[i];
         }
 
         // gradients
         if (!is_constant_struct<T_log_rate>::value)
-          operands_and_partials.d_x1[i] += n_vec[i] - exp(value_of(alpha_vec[i]));
+          operands_and_partials.d_x1[i] += n_vec[i] - exp_alpha[i];
       }
       return operands_and_partials.to_var(logp);
     }
