@@ -15,7 +15,7 @@ TEST(ProbDistributionsBinomial, doesFit) {
   boost::math::binomial_distribution<>dist (100,0.6);
   boost::math::chi_squared mydist(K-1);
 
-  double loc[K - 1];
+  int loc[K - 1];
   for(int i = 1; i < K; i++)
     loc[i - 1] = i - 1;
 
@@ -30,7 +30,7 @@ TEST(ProbDistributionsBinomial, doesFit) {
   expect[K-1] = N * (1 - cdf(dist, K-2));
 
   while (count < N) {
-    double a = stan::prob::binomial_rng(100,0.6,rng);
+    int a = stan::prob::binomial_rng(100,0.6,rng);
     int i = 0;
     while (i < K-1 && a > loc[i]) 
 	++i;
