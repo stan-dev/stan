@@ -11,16 +11,22 @@ TEST(ProbDistributionsInvChiSquare, random) {
 TEST(ProbDistributionsInvChiSquare, doesFit) {
   boost::random::mt19937 rng;
   int N = 10000;
-  int K = 5;
+  int K = boost::math::round(2 * std::pow(N, 0.4));
   boost::math::inverse_chi_squared_distribution<>dist (4.0);
   boost::math::chi_squared mydist(K-1);
 
-  double loc[4];
+  double loc[K - 1];
   for(int i = 1; i < K; i++)
-    loc[i - 1] = quantile(dist, 0.2 * i);
+    loc[i - 1] = quantile(dist, i * std::pow(K, -1.0));
 
   int count = 0;
-  int bin [5] = {0, 0, 0, 0, 0};
+  int bin [K];
+  double expect [K];
+  for(int i = 0 ; i < K; i++)
+  {
+    bin[i] = 0;
+    expect[i] = N / K;
+  }
 
   while (count < N) {
     double a = stan::prob::inv_chi_square_rng(4.0,rng);
@@ -32,7 +38,6 @@ TEST(ProbDistributionsInvChiSquare, doesFit) {
    }
 
   double chi = 0;
-  double expect [5] = {N / K, N / K, N / K, N / K, N / K};
 
   for(int j = 0; j < K; j++)
     chi += ((bin[j] - expect[j]) * (bin[j] - expect[j]) / expect[j]);

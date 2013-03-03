@@ -380,15 +380,16 @@ namespace stan {
     inline double
     beta_rng(double alpha,
              double beta,
-	     RNG& rng1,
-	     RNG& rng2) {
+	     RNG& rng) {
       using boost::variate_generator;
       using boost::random::gamma_distribution;
       variate_generator<RNG&, gamma_distribution<> >
-        rng_gamma_alpha(rng1, gamma_distribution<>(alpha, 1));
+        rng_gamma_alpha(rng, gamma_distribution<>(alpha, 1.0));
       variate_generator<RNG&, gamma_distribution<> >
-        rng_gamma_beta(rng2, gamma_distribution<>(beta, 1));
-      return rng_gamma_alpha() / (rng_gamma_alpha() + rng_gamma_beta());
+        rng_gamma_beta(rng, gamma_distribution<>(beta, 1.0));
+      double a = rng_gamma_alpha();
+      double b = rng_gamma_beta();
+      return a / (a + b);
     }
   }
 }

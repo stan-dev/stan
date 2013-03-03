@@ -213,12 +213,13 @@ namespace stan {
       using std::abs;
       variate_generator<RNG&, uniform_01<> >
         rng_unit_01(rng, uniform_01<>());
-      int a = 0;
-      if(0.5 - rng_unit_01() > 0)
-	a = 1;
-      else if(0.5 - rng_unit_01() < 0)
-	a = -1;
-      return mu - sigma * a * log(1 - 2 * abs(0.5 - rng_unit_01()));
+      double a = 0;
+      double laplaceRN = rng_unit_01();
+      if(0.5 - laplaceRN > 0)
+	a = 1.0;
+      else if(0.5 - laplaceRN < 0)
+	a = -1.0;
+      return mu - sigma * a * log(1 - 2 * abs(0.5 - laplaceRN));
     }
   }
 }
