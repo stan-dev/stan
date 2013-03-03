@@ -319,7 +319,7 @@ namespace rstan {
         stan::mcmc::sample sample = sampler.next();
         sample.params_r(params_r);
         sample.params_i(params_i);
-        model.write_array(params_r,params_i,params_inr_etc); 
+        model.write_array(params_r,params_i,params_inr_etc,&rstan::io::rcout);
 
         double lp__ = sample.log_prob();
         if (sample_file_flag)
