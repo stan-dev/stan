@@ -54,7 +54,7 @@ stan_model <- function(file,
 
   if (!is.null(eigen_lib)) { 
     old.eigen_lib <- rstan_options(eigen_lib = eigen_lib) 
-    on.exit(rstan_options(eigen_lib = old.eigen_lib)) 
+    on.exit(rstan_options(eigen_lib = old.eigen_lib), add = TRUE) 
   }
 
   
