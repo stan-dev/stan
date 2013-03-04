@@ -3171,7 +3171,7 @@ model {
 The new parameters, \code{phi} and \code{lambda}, are declared in the
 parameters block and the parameters for the Beta distribution, 
 \code{alpha} and \code{beta}, are declared and defined in the
-transformed parameters block.  Ano If their values are not of interest,
+transformed parameters block.  And If their values are not of interest,
 they could instead be defined as local variables in the model as
 follows.
 %
@@ -3511,8 +3511,8 @@ distribution for the Poisson with rate $\lambda \in (0,\infty)$ at outcome $n \i
 The function $\Gamma()$ here is the incomplete gamma function, defined
 recursively by the base case
 \begin{eqnarray*}
-\Gamma(
-\Gamma(n,\lambda) = (n-1) \Gamma(n-1,\lambda) + \lambda^{n-1} \, \exp(-\lambda)
+\Gamma \left(
+\Gamma(n,\lambda) \right) = (n-1) \Gamma(n-1,\lambda) + \lambda^{n-1} \, \exp(-\lambda)
 \end{eqnarray*}
 
 
@@ -3546,7 +3546,7 @@ through reparameterization.
   sampler with default settings.  Both plots are restricted to the
   shown window of $x_1$ and $y$ values; some draws fell outside of
   the displayed area as would be expected given the density.  The samples are
-  consistent witht the marginal density $p(y) =
+  consistent with the marginal density $p(y) =
   \distro{Normal}(y|0,3)$, which has mean 0 and standard deviation
   3.}\label{funnel.figure}
 \end{figure}
@@ -3637,7 +3637,7 @@ Euclidean geometry.%
 %
 The practical problem is that tail of the Cauchy
 requires a relatively large step size compared to the trunk.  With a
-small step size, the no-U-turn sampler requires many steps when
+small step size, the No-U-Turn sampler requires many steps when
 starting in the tail of the distribution; with a large step size,
 there will be too much rejection in the central portion of the
 distribution.  This problem may be mitigated by defining the
@@ -3929,14 +3929,14 @@ A Wishart distribution can also be reparameterized in terms of standard
 normal variates and chi-squared variates. Let $L$ be the Cholesky factor
 of a $K \times K$ positive definite scale matrix $S$ and let $\nu$ be
 the degrees of freedom. If
-\begin{eqnarray*}
-A & = & \begin{array}{cccc}
+\begin{equation*}
+A = \left( \begin{array}{cccc}
 \sqrt{c_{1}} & 0 & \cdots & 0\\
 z_{21} & \sqrt{c_{2}} & \ddots & \vdots\\
 \vdots & \ddots & \ddots & 0\\
 z_{K1} & \cdots & z_{K\left(K-1\right)} & \sqrt{c_{K}}
-\end{array}
-\end{eqnarray*}
+ \end{array} \right),
+\end{equation*}
 where each $c_i$ is distributed chi-squared with $\nu - i + 1$ degrees
 of freedom and each $z_{ij}$ is distributed standard normal, then
 $W = LAA^{\top}L^{\top}$ is distributed Wishart with scale matrix
@@ -4203,15 +4203,13 @@ replaced with a transpose and multiply, as in
 The relative inefficiency of the transpose and multiply approach is
 that the transposition operator allocates a new vector into which the
 result of the transposition is copied.  This consumes both time
-and memory.
-%
-\footnote{Future versions of \Stan may remove this inefficiency
+and memory\footnote{Future versions of \Stan may remove this inefficiency
 by more fully exploiting expression templates inside the Eigen
 \Cpp matrix library.  This will require enhancing Eigen to deal
 with mixed-type arguments, such as the type \code{double} used
 for constants and the algorithmic differentiation type
 \code{stan::agrad::var} 
-used for variables.}
+used for variables.}.
 %
 The inefficiency of transposition could itself be mitigated somewhat by
 reordering the product and pulling the transposition out of the loop,

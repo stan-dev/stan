@@ -85,7 +85,7 @@ parameters.
 
 If the user specifies the number of leapfrog steps (i.e., chooses to
 use standard \HMC), that number of leapfrog steps are simulated.  If
-the user has not specified the number of leapfrog steps, the no-U-turn
+the user has not specified the number of leapfrog steps, the No-U-Turn
 sampler (\NUTS) will determine the number of leapfrog steps adaptively
 \citep{Hoffman-Gelman:2011}.
 
@@ -2850,7 +2850,7 @@ involved for saving the parameter values corresponding to a sample.
 \subsection{Constraining Inverse Transform}
 
 Stan's two samplers, standard Hamiltonian Monte Carlo (\HMC) and the
-adaptive no-U-turn sampler (\NUTS), are most easily (and often most
+adaptive No-U-Turn sampler (\NUTS), are most easily (and often most
 effectively) implemented over a multivariate probability density that
 has support on all of $\reals^n$.  To do this, the parameters
 defined in the \code{parameters} block must be transformed so they are
