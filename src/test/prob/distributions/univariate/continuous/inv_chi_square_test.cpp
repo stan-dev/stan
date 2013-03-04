@@ -8,7 +8,7 @@ TEST(ProbDistributionsInvChiSquare, random) {
   EXPECT_NO_THROW(stan::prob::inv_chi_square_rng(4.0,rng));
 }
 
-TEST(ProbDistributionsInvChiSquare, doesFit) {
+TEST(ProbDistributionsInvChiSquare, chiSquareGoodnessFitTest) {
   boost::random::mt19937 rng;
   int N = 10000;
   int K = boost::math::round(2 * std::pow(N, 0.4));

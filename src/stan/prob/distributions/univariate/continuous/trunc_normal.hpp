@@ -5,6 +5,7 @@
 #include <stan/math/error_handling.hpp>
 #include <stan/prob/traits.hpp>
 #include <stan/prob/distributions/univariate/continuous/normal.hpp>
+#include<boost/math/distributions.hpp>
 
 namespace stan {
   
@@ -111,6 +112,21 @@ namespace stan {
     typename boost::math::tools::promote_args<T_y,T_loc,T_scale,T_alpha,T_beta>::type
     trunc_normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma, const T_alpha& alpha, const T_beta& beta) {
       return trunc_normal_log<false>(y,mu,sigma,alpha,beta,stan::math::default_policy());
+    }
+      
+    template <class RNG>
+    inline double
+    trunc_normal_rng(double mu,
+		     double sigma,
+		     double alpha,
+		     double beta,
+                     RNG& rng) {
+      using boost::variate_generator;
+      using boost::random::uniform_01;
+      variate_generator<RNG&, uniform_01<> >
+        uniform_01_rng(rng, uniform_01<>());
+      boost::math::normal_distribution<>dist (mu,sigma);
+      return quantile(dist, cdf(dist, alpha) + uniform_01_rng() * (cdf(dist,beta) - cdf(dist,alpha)));
     }
   }
 }

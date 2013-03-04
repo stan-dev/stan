@@ -8,7 +8,7 @@ TEST(ProbDistributionsBernoulli, random) {
   EXPECT_NO_THROW(stan::prob::bernoulli_rng(0.6,rng));
 }
 
-TEST(ProbDistributionsBernoulli, doesFit) {
+TEST(ProbDistributionsBernoulli, chiSquareGoodnessFitTest) {
   boost::random::mt19937 rng;
   int N = 10000;
   boost::math::bernoulli_distribution<>dist (0.4);

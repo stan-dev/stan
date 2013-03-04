@@ -8,7 +8,7 @@ TEST(ProbDistributionsExponential, random) {
   EXPECT_NO_THROW(stan::prob::exponential_rng(2.0,rng));
 }
 
-TEST(ProbDistributionsBeta, doesFit) {
+TEST(ProbDistributionsBeta, chiSquareGoodnessFitTest) {
   boost::random::mt19937 rng;
   int N = 10000;
   int K = boost::math::round(2 * std::pow(N, 0.4));
