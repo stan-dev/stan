@@ -58,7 +58,7 @@ namespace stan {
         return 0.0;
 
       // set up return value accumulator
-      typename return_type<T_y,T_low,T_high>::type logp(0.0);
+      double logp(0.0);
       if(!check_not_nan(function, y, "Random variable", &logp, Policy()))
         return logp;
       if (!check_finite(function, alpha, "Lower bound parameter", &logp, Policy()))
@@ -89,12 +89,29 @@ namespace stan {
 	if (y_dbl < value_of(alpha_vec[n]) || y_dbl > value_of(beta_vec[n]))
 	  return LOG_ZERO;
       }
+
+      DoubleVectorView<include_summand<propto,T_low,T_high>::value,
+	is_vector<T_low>::value | is_vector<T_high>::value> inv_beta_minus_alpha(max_size(alpha,beta));
+      for (size_t i = 0; i < max_size(alpha,beta); i++) 
+	if (include_summand<propto,T_low,T_high>::value)
+	  inv_beta_minus_alpha[i] = 1.0 / (value_of(beta_vec[i]) - value_of(alpha_vec[i]));
+      DoubleVectorView<include_summand<propto,T_low,T_high>::value,
+	is_vector<T_low>::value | is_vector<T_high>::value> log_beta_minus_alpha(max_size(alpha,beta));
+      for (size_t i = 0; i < max_size(alpha,beta); i++)
+	if (include_summand<propto,T_low,T_high>::value)
+	  log_beta_minus_alpha[i] = log(value_of(beta_vec[i]) - value_of(alpha_vec[i]));
       
+      agrad::OperandsAndPartials<T_y,T_low,T_high> operands_and_partials(y,alpha,beta);
       for (size_t n = 0; n < N; n++) {
 	if (include_summand<propto,T_low,T_high>::value)
-	  logp -= log(beta_vec[n] - alpha_vec[n]);
+	  logp -= log_beta_minus_alpha[n];
+
+	if (!is_constant_struct<T_low>::value)
+	  operands_and_partials.d_x2[n] += inv_beta_minus_alpha[n];
+	if (!is_constant_struct<T_high>::value)
+	  operands_and_partials.d_x3[n] -= inv_beta_minus_alpha[n];
       }
-      return logp;
+      return operands_and_partials.to_var(logp);
     }
 
 
