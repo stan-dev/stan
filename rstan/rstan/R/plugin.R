@@ -37,7 +37,8 @@ PKG_CPPFLAGS_env_fun <- function() {
          ' -I"', file.path(eigen_path_fun(), '" '),
          ' -I"', file.path(eigen_path_fun(), '/unsupported" '),
          ' -I"', rstan_options("boost_lib"), '"',
-         ' -I"', rstan_inc_path_fun(), '"', sep = '')
+         ' -I"', rstan_inc_path_fun(), '"', 
+         ' -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS', sep = '')
 }
 
 legitimate_space_in_path <- function(path) {
