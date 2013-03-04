@@ -8,7 +8,7 @@ TEST(ProbDistributionsWeibull, random) {
   EXPECT_NO_THROW(stan::prob::weibull_rng(2.0,3.0,rng));
 }
 
-TEST(ProbDistributionsWeibull, doesFit) {
+TEST(ProbDistributionsWeibull, chiSquareGoodnessFitTest) {
   boost::random::mt19937 rng;
   int N = 10000;
   int K = boost::math::round(2 * std::pow(N, 0.4));

@@ -8,8 +8,7 @@ TEST(ProbDistributionsLogistic, random) {
   EXPECT_NO_THROW(stan::prob::logistic_rng(4.0,3.0,rng));
 }
 
-
-TEST(ProbDistributionsLogistic, doesFit) {
+TEST(ProbDistributionsLogistic, chiSquareGoodnessFitTest) {
   boost::random::mt19937 rng;
   int N = 10000;
   int K = 5;

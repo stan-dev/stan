@@ -8,7 +8,7 @@ TEST(ProbDistributionsStudentT, random) {
   EXPECT_NO_THROW(stan::prob::student_t_rng(3.0, 2.0, 1.0, rng));
 }
 
-TEST(ProbDistributionsStudentT, doesFit) {
+TEST(ProbDistributionsStudentT, chiSquareGoodnessFitTest) {
   boost::random::mt19937 rng;
   boost::math::students_t_distribution<>dist (3.0);
   int N = 10000;

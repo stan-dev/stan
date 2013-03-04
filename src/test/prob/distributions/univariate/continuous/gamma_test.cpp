@@ -8,8 +8,7 @@ TEST(ProbDistributionsGamma, random) {
   EXPECT_NO_THROW(stan::prob::gamma_rng(2.0,3.0,rng));
 }
 
-
-TEST(ProbDistributionGamma, doesFit) {
+TEST(ProbDistributionGamma, chiSquareGoodnessFitTest) {
   boost::random::mt19937 rng;
   int N = 10000;
   int K = boost::math::round(2 * std::pow(N, 0.4));

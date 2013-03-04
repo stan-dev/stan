@@ -8,7 +8,7 @@ TEST(ProbDistributionsScaledInvChiSquare, random) {
   EXPECT_NO_THROW(stan::prob::scaled_inv_chi_square_rng(2.0,1.0,rng));
 }
 
-TEST(ProbDistributionsScaledInvChiSquare, doesFit) {
+TEST(ProbDistributionsScaledInvChiSquare, chiSquareGoodnessFitTest) {
   boost::random::mt19937 rng;
   int N = 10000;
   int K = 5;
