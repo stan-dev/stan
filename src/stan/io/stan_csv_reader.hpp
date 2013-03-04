@@ -40,7 +40,7 @@ namespace stan {
     struct stan_csv_adaptation {
       std::string sampler;
       double step_size;
-      Eigen::VectorXd step_size_multipliers;
+      Eigen::MatrixXd step_size_multipliers;
     };
 
     struct stan_csv {
@@ -204,15 +204,20 @@ namespace stan {
 	std::getline(ss, line); // comment line
 	ss >> comment;
 	std::getline(ss, line); // step sizes
-	adaptation.step_size_multipliers.resize(std::count(line.begin(), line.end(), ',') + 1);
+	adaptation.step_size_multipliers.resize(std::count(line.begin(), line.end(), ',') + 1, 1);
 	ss.str(line);
 	int idx = 0;
-	while (ss.good()) {
-	  std::string token;
-	  std::getline(ss, token, ',');
-	  boost::trim(token);
-	  adaptation.step_size_multipliers(idx++) = boost::lexical_cast<double>(token);
-	}
+        try {
+          while (ss.good()) {
+            std::string token;
+            std::getline(ss, token, ',');
+            boost::trim(token);
+            adaptation.step_size_multipliers(idx++) = boost::lexical_cast<double>(token);
+          }
+        } catch(...) {
+          std::cout << "Error: adaptation format not recognized" << std::endl;
+          return false;
+        }
 	return true;
       }
       
