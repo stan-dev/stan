@@ -197,7 +197,7 @@ namespace stan {
     inv_gamma_cdf(const T_y& y, const T_shape& alpha, const T_scale& beta, const Policy&) { 
           
       // Size checks
-      if ( !( stan::length(y) && stan::length(alpha) && stan::length(beta) ) ) return 0.0;
+      if ( !( stan::length(y) && stan::length(alpha) && stan::length(beta) ) ) return 1.0;
           
       // Error checks
       static const char* function = "stan::prob::inv_gamma_cdf(%1%)";
@@ -210,33 +210,33 @@ namespace stan {
       using stan::math::check_less_or_equal;
       using stan::math::check_nonnegative;
       using stan::math::value_of;
-	    
+
       using boost::math::tools::promote_args;
           
       double P(1.0);
           
       if (!check_finite(function, alpha, "Shape parameter", &P, Policy())) 
-	return P;
+        return P;
           
       if (!check_positive(function, alpha, "Shape parameter", &P, Policy())) 
-	return P;
+        return P;
           
       if (!check_finite(function, beta, "Scale parameter", &P, Policy())) 
-	return P;
+        return P;
           
       if (!check_positive(function, beta, "Scale parameter", &P, Policy())) 
-	return P;
+        return P;
           
       if (!check_not_nan(function, y, "Random variable", &P, Policy()))
-	return P;
+        return P;
           
       if (!check_nonnegative(function, y, "Random variable", &P, Policy())) 
-	return P;
+        return P;
           
       if (!(check_consistent_sizes(function, y, alpha, beta,
-				   "Random variable", "Shape parameter", "Scale Parameter",
-				   &P, Policy())))
-	return P;
+          "Random variable", "Shape parameter", "Scale Parameter",
+          &P, Policy())))
+        return P;
           
       // Wrap arguments in vectors
       VectorView<const T_y> y_vec(y);
@@ -247,14 +247,14 @@ namespace stan {
       agrad::OperandsAndPartials<T_y, T_shape, T_scale> operands_and_partials(y, alpha, beta);
           
       std::fill(operands_and_partials.all_partials,
-		operands_and_partials.all_partials + operands_and_partials.nvaris, 0.0);
+                operands_and_partials.all_partials + operands_and_partials.nvaris, 0.0);
           
       // Explicit return for extreme values
       // The gradients are technically ill-defined, but treated as zero
           
       for (size_t i = 0; i < stan::length(y); i++) {
-	if (value_of(y_vec[i]) == 0) 
-	  return operands_and_partials.to_var(0.0);
+        if (value_of(y_vec[i]) == 0) 
+          return operands_and_partials.to_var(0.0);
       }
           
       // Compute CDF and its gradients
@@ -269,58 +269,58 @@ namespace stan {
           
       if (!is_constant_struct<T_shape>::value) {
               
-	for (size_t i = 0; i < stan::length(alpha); i++) {
-	  const double alpha_dbl = value_of(alpha_vec[i]);
-	  gamma_vec[i] = tgamma(alpha_dbl);
-	  digamma_vec[i] = digamma(alpha_dbl);
-	}
+        for (size_t i = 0; i < stan::length(alpha); i++) {
+          const double alpha_dbl = value_of(alpha_vec[i]);
+          gamma_vec[i] = tgamma(alpha_dbl);
+          digamma_vec[i] = digamma(alpha_dbl);
+        }
               
       }
           
       // Compute vectorized CDF and gradient
       for (size_t n = 0; n < N; n++) {
               
-	// Explicit results for extreme values
-	// The gradients are technically ill-defined, but treated as zero
-	if (value_of(y_vec[n]) == std::numeric_limits<double>::infinity()) {
-	  continue;
-	}
+        // Explicit results for extreme values
+        // The gradients are technically ill-defined, but treated as zero
+        if (value_of(y_vec[n]) == std::numeric_limits<double>::infinity()) {
+          continue;
+        }
               
-	// Pull out values
-	const double y_dbl = value_of(y_vec[n]);
-	const double y_inv_dbl = 1.0 / y_dbl;
-	const double alpha_dbl = value_of(alpha_vec[n]);
-	const double beta_dbl = value_of(beta_vec[n]);
+        // Pull out values
+        const double y_dbl = value_of(y_vec[n]);
+        const double y_inv_dbl = 1.0 / y_dbl;
+        const double alpha_dbl = value_of(alpha_vec[n]);
+        const double beta_dbl = value_of(beta_vec[n]);
               
-	// Compute
-	const double Pn = gamma_q(alpha_dbl, beta_dbl * y_inv_dbl);
+        // Compute
+        const double Pn = gamma_q(alpha_dbl, beta_dbl * y_inv_dbl);
               
-	P *= Pn;
+        P *= Pn;
               
-	if (!is_constant_struct<T_y>::value)
-	  operands_and_partials.d_x1[n] 
-	    += beta_dbl * y_inv_dbl * y_inv_dbl * gamma_p_derivative(alpha_dbl, beta_dbl * y_inv_dbl) / Pn;
+        if (!is_constant_struct<T_y>::value)
+          operands_and_partials.d_x1[n] 
+            += beta_dbl * y_inv_dbl * y_inv_dbl * gamma_p_derivative(alpha_dbl, beta_dbl * y_inv_dbl) / Pn;
               
-	if (!is_constant_struct<T_shape>::value)
-	  operands_and_partials.d_x2[n] 
-	    += stan::math::gradRegIncGamma(alpha_dbl, beta_dbl * y_inv_dbl, gamma_vec[n], digamma_vec[n]) / Pn;
+        if (!is_constant_struct<T_shape>::value)
+          operands_and_partials.d_x2[n] 
+            += stan::math::gradRegIncGamma(alpha_dbl, beta_dbl * y_inv_dbl, gamma_vec[n], digamma_vec[n]) / Pn;
               
-	if (!is_constant_struct<T_scale>::value)
-	  operands_and_partials.d_x3[n] 
-	    += - y_inv_dbl * gamma_p_derivative(alpha_dbl, beta_dbl * y_inv_dbl) / Pn;
+        if (!is_constant_struct<T_scale>::value)
+          operands_and_partials.d_x3[n] 
+            += - y_inv_dbl * gamma_p_derivative(alpha_dbl, beta_dbl * y_inv_dbl) / Pn;
               
       }
           
       if (!is_constant_struct<T_y>::value) {
-	for(size_t n = 0; n < stan::length(y); ++n) operands_and_partials.d_x1[n] *= P;
+        for(size_t n = 0; n < stan::length(y); ++n) operands_and_partials.d_x1[n] *= P;
       }
           
       if (!is_constant_struct<T_shape>::value) {
-	for(size_t n = 0; n < stan::length(alpha); ++n) operands_and_partials.d_x2[n] *= P;
+        for(size_t n = 0; n < stan::length(alpha); ++n) operands_and_partials.d_x2[n] *= P;
       }
           
       if (!is_constant_struct<T_scale>::value) {
-	for(size_t n = 0; n < stan::length(beta); ++n) operands_and_partials.d_x3[n] *= P;
+        for(size_t n = 0; n < stan::length(beta); ++n) operands_and_partials.d_x3[n] *= P;
       }
           
       return operands_and_partials.to_var(P);
