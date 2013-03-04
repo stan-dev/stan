@@ -261,18 +261,13 @@ namespace stan {
         o << "# (mcmc::nuts_massgiven) adaptation finished" << '\n';
         o << "# step size=" << this->_epsilon << '\n';
         o << "# Preset covariance matrix:\n"; // FIXME:  names/delineation requires access to model
-        /*for (size_t k = 0; k < _step_sizes.size(); ++k) {
-          if (k > 0) o << ',';
-          o << _step_sizes[k];
+        Eigen::MatrixXd _cov_mat = _cov_L * _cov_L.transpose();
+        for(int i=0; i<_cov_mat.rows(); i++){
+          o << "#";
+          for(int j=0; j<_cov_mat.cols(); j++)
+            o << _cov_mat(i,j) << ",";
+          o << std::endl;
         }
-        o << '\n';*/
-          Eigen::MatrixXd _cov_mat = _cov_L * _cov_L.transpose();
-          for(int i=0; i<_cov_mat.rows(); i++){
-              o << "#";
-              for(int j=0; j<_cov_mat.cols(); j++)
-                  o << _cov_mat(i,j) << " ";
-              o << std::endl;
-          }
       }
 
       virtual void get_sampler_param_names(std::vector<std::string>& names) {
