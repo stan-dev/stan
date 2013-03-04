@@ -170,11 +170,6 @@ C++ API
 * switch error checking for agrad::var matrix ops to
   convert to double-based matrix for check as in vectorized univariates
 
-* Vectorize distributions
-  - Allows vectorized inputs (but without partials calculated):
-   univariate/discrete
-   + beta_binomial (needs more testing)
-
 * Ben's example: 
   matrix[3,2] ~ normal(matrix[3,1], matrix[1,2])
   this could recycle the first arg, a matrix shaped like a vector
