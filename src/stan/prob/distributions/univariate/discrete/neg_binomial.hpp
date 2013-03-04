@@ -373,7 +373,7 @@ namespace stan {
       using boost::variate_generator;
       using boost::random::negative_binomial_distribution;
       variate_generator<RNG&, negative_binomial_distribution<> >
-        neg_binomial_rng(rng, negative_binomial_distribution<>(alpha, 1 / (beta + 1)));
+        neg_binomial_rng(rng, negative_binomial_distribution<>(alpha, beta / (beta + 1)));
       return neg_binomial_rng();
     }
   }
