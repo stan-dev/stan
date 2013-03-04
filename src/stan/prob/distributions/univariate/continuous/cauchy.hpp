@@ -181,7 +181,7 @@ namespace stan {
     cauchy_cdf(const T_y& y, const T_loc& mu, const T_scale& sigma, const Policy&) {
         
       // Size checks
-      if ( !( stan::length(y) && stan::length(mu) && stan::length(sigma) ) ) return 0.0;
+      if ( !( stan::length(y) && stan::length(mu) && stan::length(sigma) ) ) return 1.0;
         
       static const char* function = "stan::prob::cauchy_cdf(%1%)";
       
@@ -191,7 +191,7 @@ namespace stan {
       using stan::math::check_consistent_sizes;
       using boost::math::tools::promote_args;
       using stan::math::value_of;
-	    
+
       double P(1.0);
         
       if(!check_not_nan(function, y, "Random variable", &P, Policy()))
@@ -239,7 +239,7 @@ namespace stan {
         // Explicit results for extreme values
         // The gradients are technically ill-defined, but treated as zero
         if (value_of(y_vec[n]) == std::numeric_limits<double>::infinity()) {
-	  continue;
+          continue;
         }
             
         // Pull out values
@@ -269,15 +269,15 @@ namespace stan {
       }
         
       if (!is_constant_struct<T_y>::value) {
-	for(size_t n = 0; n < stan::length(y); ++n) operands_and_partials.d_x1[n] *= P;
+        for(size_t n = 0; n < stan::length(y); ++n) operands_and_partials.d_x1[n] *= P;
       }
         
       if (!is_constant_struct<T_loc>::value) {
-	for(size_t n = 0; n < stan::length(mu); ++n) operands_and_partials.d_x2[n] *= P;
+        for(size_t n = 0; n < stan::length(mu); ++n) operands_and_partials.d_x2[n] *= P;
       }
         
       if (!is_constant_struct<T_scale>::value) {
-	for(size_t n = 0; n < stan::length(sigma); ++n) operands_and_partials.d_x3[n] *= P;
+        for(size_t n = 0; n < stan::length(sigma); ++n) operands_and_partials.d_x3[n] *= P;
       }
         
       return operands_and_partials.to_var(P);

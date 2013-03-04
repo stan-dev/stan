@@ -116,7 +116,7 @@ major hurdle to ease of use.  \HMC requires two tuning parameters
 set.  The step size parameter could be tuned during warmup based on
 Metropolis rejection rates, but the number of steps was not so easy to
 tune while maintaining detailed balance in the sampler.  This led to
-the development of the no-U-turn sampler (\NUTS)
+the development of the No-U-Turn sampler (\NUTS)
 \citep{Hoffman-Gelman:2012}, which takes an ever increasing number of
 steps until the direction of the simulation turns around, then uses
 slice sampling to select a point on the simulated trajectory.

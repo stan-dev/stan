@@ -100,25 +100,31 @@ Standard \HMC involves three ``tuning'' parameters to which its
 behavior is quite sensitive.  \Stan's samplers allow these parameters
 to be set by hand or set automatically without user intervention.
 
-The first tuning parameter is a mass matrix for the fictional
-particle.  \Stan can be configured to use a unit mass matrix or to
-estimate a diagonal mass matrix during warmup; in the future, it will
-also support a user-defined diagonal mass matrix.  Estimating the mass
-matrix normalizes the scale of each element $\theta_k$ of the unknown
-variable sequence $\theta$.
-
-The other two tuning parameters set the temporal step size of the
+The first two tuning parameters set the temporal step size of the
 discretization of the Hamiltonian and the total number of steps taken
-per iteration.  \Stan can be configured with a user-specified step
-size or it can estimate an optimal step size during warmup using dual
-averaging \citep{Nesterov:2009, Hoffman-Gelman:2012}.  In either case, additional
-randomization may be applied to draw the step size from an interval of
-possible step sizes \citep{Neal:2011}.
+per iteration (with their product determining total simulation time).
+\Stan can be configured with a user-specified step size or it can
+estimate an optimal step size during warmup using dual averaging
+\citep{Nesterov:2009, Hoffman-Gelman:2012}.  In either case,
+additional randomization may be applied to draw the step size from an
+interval of possible step sizes \citep{Neal:2011}.
 
 \Stan can be set to use a specified number of steps, or it can
 automatically adapt the number of steps during sampling using the
-no-U-turn (\NUTS) sampler \citep{Hoffman-Gelman:2012}.  
+No-U-Turn (\NUTS) sampler \citep{Hoffman-Gelman:2012}.  
 
+The third tuning parameter is a mass matrix for the fictional
+particle.  \Stan can be configured to estimate a diagonal mass matrix
+or a full mass matrix during warmup; Stan will support user-specified
+mass matrices in the future.  Estimating a diagonal mass matrix
+normalizes the scale of each element $\theta_k$ of the unknown
+variable sequence $\theta$, whereas estimating a full mass matrix
+accounts for both scaling and rotation.%
+%
+\footnote{These estimated mass matrices are global, meaning they are
+  applied to every point in the parameter space being sampled.
+  Riemann-manifold HMC generalizes this to allow the curvature implied
+  by the mass matrix to vary by position.}
 
 \section{Convergence Monitoring and Effective Sample Size}
 
@@ -501,7 +507,7 @@ The rest of the file contains lines corresponding to the
 samples from each iteration.%
 %
 \footnote{There are repeated entries due to the Metropolis accept step
-in the no-U-turn sampling algorithm.}
+in the No-U-Turn sampling algorithm.}
 %
 %
 \begin{quote}
@@ -563,8 +569,8 @@ file named \code{makefile}).
 \end{Verbatim}
 \end{quote}
 %
-That's the letter 'O' followed by an equal sign followed by the digit
-'0', which sets the tests to run at the lowest optimization level.
+That's the letter `O' followed by an equal sign followed by the digit
+`0', which sets the tests to run at the lowest optimization level.
 
 \emph{Warning}: The \code{make} program may take 20+ minutes 
 and consume 3+GB of memory to run the unit tests.  Warnings can

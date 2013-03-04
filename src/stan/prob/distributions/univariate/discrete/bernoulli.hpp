@@ -276,27 +276,27 @@ namespace stan {
           
       // Ensure non-zero argument lenghts
       if (!(stan::length(n) && stan::length(theta)))
-	return 0.0;
+        return 1.0;
           
       double P(1.0);
           
       // Validate arguments
       if (!check_finite(function, theta, "Probability parameter", &P, Policy()))
-	return P;
+        return P;
           
       if (!check_bounded(function, theta, 0.0, 1.0,
-			 "Probability parameter", &P, Policy()))
-	return P;
+                         "Probability parameter", &P, Policy()))
+        return P;
           
       if (!(check_consistent_sizes(function,
-				   n, theta,
-				   "Random variable","Probability parameter",
-				   &P, Policy())))
-	return P;
+                                   n, theta,
+                                   "Random variable","Probability parameter",
+                                   &P, Policy())))
+        return P;
           
       // Return if everything is constant and only proportionality is required
       if (!include_summand<propto,T_prob>::value)
-	return 0.0;
+        return 0.0;
           
       // set up template expressions wrapping scalars into vector views
       VectorView<const T_n> n_vec(n);
@@ -308,34 +308,34 @@ namespace stan {
       agrad::OperandsAndPartials<T_prob> operands_and_partials(theta);
           
       std::fill(operands_and_partials.all_partials,
-		operands_and_partials.all_partials 
-		+ operands_and_partials.nvaris, 0.0);
+                operands_and_partials.all_partials 
+                + operands_and_partials.nvaris, 0.0);
           
       // Explicit return for extreme values
       // The gradients are technically ill-defined, but treated as zero
       for (size_t i = 0; i < stan::length(n); i++) {
-	if (value_of(n_vec[i]) < 0) 
-	  return operands_and_partials.to_var(0.0);
+        if (value_of(n_vec[i]) < 0) 
+          return operands_and_partials.to_var(0.0);
       }
           
       for (size_t i = 0; i < size; i++) {
           
-	// Explicit results for extreme values
-	// The gradients are technically ill-defined, but treated as zero
-	if (value_of(n_vec[i]) >= 1) continue;
-	else {
-	  const double Pi = 1 - value_of(theta_vec[i]);
-              
-	  P *= Pi;
-              
-	  if (!is_constant_struct<T_prob>::value)
-	    operands_and_partials.d_x1[i] += - 1 / Pi;
-	}
-              
+        // Explicit results for extreme values
+        // The gradients are technically ill-defined, but treated as zero
+        if (value_of(n_vec[i]) >= 1) continue;
+        else {
+          const double Pi = 1 - value_of(theta_vec[i]);
+                    
+          P *= Pi;
+                    
+          if (!is_constant_struct<T_prob>::value)
+            operands_and_partials.d_x1[i] += - 1 / Pi;
+        }
+                    
       }
           
       if (!is_constant_struct<T_prob>::value) {
-	for(size_t i = 0; i < stan::length(theta); ++i) operands_and_partials.d_x1[i] *= P;
+        for(size_t i = 0; i < stan::length(theta); ++i) operands_and_partials.d_x1[i] *= P;
       }
       return operands_and_partials.to_var(P);
     }

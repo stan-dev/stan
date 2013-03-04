@@ -18,6 +18,19 @@ PRIORITIES?
 + (name): actively assigned
 * (name): likely to be assigned to
 
+For the future
+-------------------------------------------
+* How to deal with generated quantities
+  - execute & print every time
+  - warning message for print that it only happens
+    for saved samples
+
+For 1.2.0
+---------
+* C++ compiel fail from Carlos: [stan-users] I get tons of errors during compilation, and I do not know what is wrong...
+
+
+
 Contributed Code
 -------------------------------------------
 + R compiler
@@ -99,7 +112,9 @@ C++ API
 ======================================================================
 [items go here first, then to RStan/cmd]
 
-* JSON I/O
+* JSON I/O.  Check out:
+
+http://www.boost.org/doc/libs/1_53_0/doc/html/property_tree/reference.html#header.boost.property_tree.json_parser_hpp 
 
 * refactoring:
   -- remove mcmc/hmc.hpp

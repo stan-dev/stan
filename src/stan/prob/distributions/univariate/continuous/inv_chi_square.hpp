@@ -160,7 +160,7 @@ namespace stan {
     inv_chi_square_cdf(const T_y& y, const T_dof& nu, const Policy&) {
           
       // Size checks
-      if ( !( stan::length(y) && stan::length(nu) ) ) return 0.0;
+      if ( !( stan::length(y) && stan::length(nu) ) ) return 1.0;
           
       // Error checks
       static const char* function = "stan::prob::inv_chi_square_cdf(%1%)";
@@ -177,20 +177,20 @@ namespace stan {
       double P(1.0);
           
       if (!check_finite(function, nu, "Degrees of freedom parameter", &P, Policy()))
-	    return P;
+        return P;
           
       if (!check_positive(function, nu, "Degrees of freedom parameter", &P, Policy()))
-	    return P;
+        return P;
           
       if (!check_not_nan(function, y, "Random variable", &P, Policy()))
-	    return P;
+        return P;
           
       if (!check_nonnegative(function, y, "Random variable", &P, Policy()))
-	    return P;
+        return P;
           
       if (!(check_consistent_sizes(function, y, nu,
-				   "Random variable", "Degrees of freedom parameter",
-				   &P, Policy())))
+            "Random variable", "Degrees of freedom parameter",
+            &P, Policy())))
         return P;
           
       // Wrap arguments in vectors
@@ -201,7 +201,7 @@ namespace stan {
       agrad::OperandsAndPartials<T_y, T_dof> operands_and_partials(y, nu);
           
       std::fill(operands_and_partials.all_partials,
-		operands_and_partials.all_partials + operands_and_partials.nvaris, 0.0);
+                operands_and_partials.all_partials + operands_and_partials.nvaris, 0.0);
         
       // Explicit return for extreme values
       // The gradients are technically ill-defined, but treated as zero
