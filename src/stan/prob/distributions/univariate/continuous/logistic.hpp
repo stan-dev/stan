@@ -1,7 +1,7 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__LOGISTIC_HPP__
 #define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__LOGISTIC_HPP__
 
-#include <boost/random/uniform_01.hpp>
+#include <boost/random/exponential_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
 
 #include <stan/agrad.hpp>
@@ -263,13 +263,13 @@ namespace stan {
     template <class RNG>
     inline double
     logistic_rng(double mu,
-               double beta,
+		 double beta,
                RNG& rng) {
       using boost::variate_generator;
-      using boost::random::uniform_01;
-      variate_generator<RNG&, uniform_01<> >
-        uniform01_rng(rng, uniform_01<>());
-      return mu + beta * (log(uniform01_rng()) - log(1 - uniform01_rng()));
+      using boost::random::exponential_distribution;
+      variate_generator<RNG&, exponential_distribution<> >
+        exp_rng(rng, exponential_distribution<>(1));
+      return mu - beta * std::log(exp_rng() / exp_rng());
     }
   }
 }
