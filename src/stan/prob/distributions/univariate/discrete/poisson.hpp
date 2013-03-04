@@ -252,7 +252,7 @@ namespace stan {
           
       // Ensure non-zero argument slengths
       if (!(stan::length(n) && stan::length(lambda))) 
-        return 0.0;
+        return 1.0;
           
       double P(1.0);
           
@@ -264,8 +264,8 @@ namespace stan {
           return P;
           
       if (!(check_consistent_sizes(function, n,lambda,
-				   "Random variable","Rate parameter",
-				   &P, Policy())))
+                                   "Random variable","Rate parameter",
+                                   &P, Policy())))
           return P;
           
       // Return if everything is constant and only proportionality is required

@@ -216,7 +216,7 @@ namespace stan {
           
           // Ensure non-zero arugment lengths
           if (!(stan::length(n) && stan::length(alpha) && stan::length(beta)))
-              return 0.0;
+              return 1.0;
           
           double P(1.0);
           
@@ -368,8 +368,8 @@ namespace stan {
     template <class RNG>
     inline int
     neg_binomial_rng(double alpha,
-			  double beta,
-                       RNG& rng) {
+                     double beta,
+                     RNG& rng) {
       using boost::variate_generator;
       using boost::random::negative_binomial_distribution;
       variate_generator<RNG&, negative_binomial_distribution<> >

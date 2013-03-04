@@ -313,7 +313,7 @@ namespace stan {
           
       // Ensure non-zero arguments lenghts
       if (!(stan::length(n) && stan::length(N) && stan::length(theta)))
-	return 0.0;
+        return 1.0;
           
       double P(1.0);
           
@@ -331,8 +331,8 @@ namespace stan {
         return P;
           
       if (!(check_consistent_sizes(function, n, N, theta, 
-				   "Successes variable", "Population size parameter", "Probability parameter",
-				   &P, Policy())))
+                                   "Successes variable", "Population size parameter", "Probability parameter",
+                                   &P, Policy())))
         return P;
           
       // Return if everything constant and propto
@@ -360,7 +360,7 @@ namespace stan {
       // The gradients are technically ill-defined, but treated as zero
       for (size_t i = 0; i < stan::length(n); i++) {
         if (value_of(n_vec[i]) < 0) 
-	  return operands_and_partials.to_var(0.0);
+          return operands_and_partials.to_var(0.0);
       }
         
       for (size_t i = 0; i < size; i++) {
@@ -368,7 +368,7 @@ namespace stan {
         // Explicit results for extreme values
         // The gradients are technically ill-defined, but treated as zero
         if (value_of(n_vec[i]) >= value_of(N_vec[i])) {
-	  continue;
+          continue;
         }
           
         const double n_dbl = value_of(n_vec[i]);
@@ -380,14 +380,14 @@ namespace stan {
         P *= Pi;
 
         if (!is_constant_struct<T_prob>::value)
-	  operands_and_partials.d_x1[i] 
-	    += - ibeta_derivative(N_dbl - n_dbl, n_dbl + 1, 1 - theta_dbl) / Pi;
+          operands_and_partials.d_x1[i] 
+            += - ibeta_derivative(N_dbl - n_dbl, n_dbl + 1, 1 - theta_dbl) / Pi;
           
               
       }
           
       if (!is_constant_struct<T_prob>::value) {
-	for(size_t i = 0; i < stan::length(theta); ++i) operands_and_partials.d_x1[i] *= P;
+        for(size_t i = 0; i < stan::length(theta); ++i) operands_and_partials.d_x1[i] *= P;
       }
           
       return operands_and_partials.to_var(P);
@@ -416,7 +416,7 @@ namespace stan {
     template <class RNG>
     inline int
     binomial_rng(int n,
-		 double prob,
+                 double prob,
                  RNG& rng) {
       using boost::variate_generator;
       using boost::binomial_distribution;

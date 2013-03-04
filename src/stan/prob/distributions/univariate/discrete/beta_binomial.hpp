@@ -213,7 +213,7 @@ namespace stan {
           
       // Ensure non-zero argument lengths
       if (!(stan::length(n) && stan::length(N) && stan::length(alpha) && stan::length(beta)))
-        return 0.0;
+        return 1.0;
           
       double P(1.0);
           
