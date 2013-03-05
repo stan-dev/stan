@@ -64,7 +64,7 @@ int main(int argc, const char* argv[]) {
 
   // print  
   const int skip = 3;
-  std::string model_name = "NEED MODEL NAME";
+  std::string model_name = ""; // FIXME: put in model name
   int max_name_length = 0;
   for (int i = skip; i < chains.num_params(); i++) 
     if (chains.param_name(i).length() > max_name_length)
