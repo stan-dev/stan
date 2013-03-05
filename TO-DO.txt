@@ -26,6 +26,7 @@ Contributed Code
 
 Efficiency/Scalability of Code and Sampling
 -------------------------------------------
++ (Daniel) replace tests with doubles
 + (Daniel) full multivariate probability function tests
 + (Yuanjun) adapting fixed covariance matrix during warmup
 + (Daniel) vectorized derivatives for prob functions

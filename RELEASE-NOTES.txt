@@ -28,6 +28,8 @@ Enhancements
 * probability function speed improvements with vectorization
 * created Stan contributed repositories for user-contributed
   and experimental features (first entry is an emacs mode)
+* modified makefiles so targets are the same under Windows,
+  Linux, and Mac
 
 New Functions
 ----------------------------------

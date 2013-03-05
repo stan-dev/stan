@@ -273,6 +273,10 @@ namespace stan {
         return mcmc::sample(this->_x, this->_z, this->_logp);
       }
 
+      Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> get_mass_matrix() {
+        return _cov_mat;
+      }
+
       virtual void write_sampler_param_names(std::ostream& o) {
         o << "treedepth__,";
         if (this->_epsilon_adapt || this->varying_epsilon())

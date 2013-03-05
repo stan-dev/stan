@@ -564,31 +564,44 @@ followed by information for each parameter and generated quantity. For
 echoed to the standard output:
 %
 \begin{quote}
+{\small
 \begin{Verbatim}[fontshape=sl]
 Inference for Stan model:
-1 chains: each with iter=(1000); warmup=(0); thin=(1); 1000 iterations saved.
+1 chains: each with iter=(1000); warmup=(0); thin=(1); 
+1000 iterations saved.
 
        mean se_mean   sd 2.5%  25%  50%  75% 97.5% n_eff Rhat
 theta   0.2     0.0  0.1  0.1  0.2  0.2  0.3   0.5   478  1.0
 
 Samples were drawn using mcmc::nuts_diag.
-For each parameter, n_eff is a crude measure of effective sample size,
-and Rhat is the potential scale reduction factor on split chains (at 
-convergence, Rhat=1).
+For each parameter, n_eff is a crude measure of effective 
+sample size, and Rhat is the potential scale reduction factor 
+on split chains (at convergence, Rhat=1).
 \end{Verbatim}
+}
 \end{quote}
 %
 In addition to the general information about the runs, \code{print}
-displays summary statistics about each parameter and generated
+displays summary statistics for each parameter and generated
 quantity.
 
 In the \code{bernoulli} model, there is a single parameter,
 \code{theta}. The mean, standard error of the mean, standard
 deviation, the 2.5\%, 25\%, 50\%, 75\%, and 97.5\% quantiles,
-number of effective samples, and Rhat value are displayed.
+number of effective samples, and $\hat{R}$ value are displayed
+These quantities and their uses are described in detail in 
+\refchapter{mcmc}.
 
 \code{print} can be called with more than one csv file by separating
-filenames with spaces. It will also take wildcards in specifying filenames.
+filenames with spaces. It will also take wildcards in specifying
+filenames. A typical usage of Stan from the command line would first
+create one or more Markov chains by calling the model executable,
+typically in parallel, writing the output CSV file for each into its
+own directory.  Next, after all of the processes are finished, the
+results would be analyzed using \code{print} to assess convergence and
+inspect the means and quantiles of the fitted variables.
+Additionally, downstream inferences may be performed using the
+samples (e.g., to make decisions or predictions for unseen data).
 
 \subsection{Configuring Command-Line Options}
 
