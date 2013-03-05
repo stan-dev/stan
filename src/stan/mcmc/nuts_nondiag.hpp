@@ -117,7 +117,7 @@ namespace stan {
                    bool epsilon_adapt = true,
                    double delta = 0.6,
                    double gamma = 0.05,              
-		   BaseRNG base_rng = BaseRNG(std::time(0)))
+                   BaseRNG base_rng = BaseRNG(std::time(0)))
         : hmc_base<BaseRNG>(model,
                             params_r,
                             params_i,
@@ -133,14 +133,14 @@ namespace stan {
           _drop_warm(10),
           _x_sum_n(0),
           _next_diag_adapt(10 + model.num_params_r())
-          //_x_mat(&(this->_x[0]), (this->_x).size())
       {
         // start at 10 * epsilon because NUTS cheaper for larger epsilon
         this->adaptation_init(10.0);
         _x_sum = Eigen::MatrixXd::Zero(model.num_params_r(), 1);
         _xsq_sum = Eigen::MatrixXd::Zero(model.num_params_r(),model.num_params_r());
         _cov_mat = Eigen::MatrixXd::Identity(model.num_params_r(),model.num_params_r());
-        _cov_L = Eigen::MatrixXd::Identity(model.num_params_r(),model.num_params_r()); //use the same initialization method as diagonal one
+        //use the same initialization method as diagonal one
+        _cov_L = Eigen::MatrixXd::Identity(model.num_params_r(),model.num_params_r());
       }
 
       /**
@@ -369,7 +369,7 @@ namespace stan {
           xminus = x;
           gradminus = grad;
           mminus = m;
-          newlogp = nondiag_leapfrog(this->_model, this->_z, _cov_L,  //Yuanjun : implement a new leapfrog function
+          newlogp = nondiag_leapfrog(this->_model, this->_z, _cov_L,  
                                       xminus, mminus, gradminus,
                                       direction * this->_epsilon_last,
                                       this->_error_msgs, this->_output_msgs);
@@ -378,7 +378,7 @@ namespace stan {
           xplus = xminus;
           mplus = mminus;
           gradplus = gradminus;
-          double newH = newlogp - 0.5 * stan::math::dot_self(mminus);   //Yuanjun : No longer need to calculate H with a matrix
+          double newH = newlogp - 0.5 * stan::math::dot_self(mminus);   
           if (newH != newH) // treat nan as -inf
             newH = -std::numeric_limits<double>::infinity();
           nvalid = newH > u;
