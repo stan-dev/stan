@@ -15,6 +15,43 @@ HOW TO (developer notes on how to release, last column is ordering)
 10.  Announce                                                    > 9
 
 
+v1.2.0 (5 March 2012)
+======================================================================
+
+Enhancements
+----------------------------------
+* full mass matrix estimation during warmup
+* expose model log_prob and gradient functions in RStan for use
+  in other packages (such as optimizers)
+* command-line program to display output from multiple chains
+  with parameter-by-parameter mean, se, sd, quantiles, and R-hat
+* probability function speed improvements with vectorization
+* created Stan contributed repositories for user-contributed
+  and experimental features (first entry is an emacs mode)
+
+New Functions
+----------------------------------
+* most of the cumulative distribution functions (see the documentation
+  index for the full list of supported functions)
+* added monitor() function in RStan
+
+Bug Fixes
+----------------------------------
+* disabled Boost asserts in parser to quiet R's warnings
+* enabled prints in generated quantities block
+* various documentation patches
+* fixed memory leak in matrix operations leading to leaks in 
+  multivariate probability function use
+* wrapped call to gradient log prob to catch unexpected exceptions
+* fixed matrix resize issue on Windows that caused models to fail
+  at optimization levels above 0
+* fixed bug in print preventing hyphens or grave accents from 
+  priting
+* fixed issue preventing matrix rows from being assigned on the
+  left side of an assignment statement
+* clearer error messages on matrix and other function arguments
+
+
 v1.1.1 (5 February 2012)
 ======================================================================
 
