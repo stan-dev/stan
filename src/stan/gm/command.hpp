@@ -567,6 +567,7 @@ namespace stan {
       write_comment_property(sample_stream,"iter",num_iterations);
       write_comment_property(sample_stream,"warmup",num_warmup);
       write_comment_property(sample_stream,"thin",num_thin);
+      write_comment_property(sample_stream,"nondiag_mass", nondiag_mass);
       write_comment_property(sample_stream,"equal_step_sizes",equal_step_sizes);
       write_comment_property(sample_stream,"leapfrog_steps",leapfrog_steps);
       write_comment_property(sample_stream,"max_treedepth",max_treedepth);
