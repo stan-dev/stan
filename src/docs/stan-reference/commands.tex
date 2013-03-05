@@ -661,15 +661,21 @@ but different values for chain\_id (see below).}
 \code{[epsilon * (1 - epsilon\_pm),\ epsilon * (1 + epsilon\_pm)]}}
 {default = \code{0.0}}
 %
-\cmdflag{equal\_step\_sizes} {Use unit mass matrix for \NUTS; see
-  related parameter \code{epsilon}} {\NUTS default is to estimate 
-  step sizes that vary by parameter}%
+\cmdflag{equal\_step\_sizes} {Use unit mass matrix for \NUTS; either
+  \code{equal\_step\_sizes} or \code{nondiag\_mass} may be set, but
+  not both; see related parameter \code{epsilon}} {\NUTS default is
+  to estimate step sizes that vary by parameter}%
 \footnote{\Stan's implementation of \NUTS follows the approach in
   \citep[section 5.4.2.4]{Neal:2011}, which is equivalent to having
   different step sizes for each parameter.  Varying step sizes are
   acceptable for \HMC even though they vary the time scale of each
   parameter and thus depart from the Hamiltonian interpretation of the
   trajectory.}
+%
+\cmdflag{nondiag\_mass}{Use full mass matrix estimation with \NUTS;
+  either \code{equal\_step\_sizes} or \code{nondiag\_mass} may be set,
+  but not both; see related parameter \code{epsilon} }{\NUTS default
+  is to estimate step sizes that vary by parameter}
 %
 \cmdarg{delta}{+float}
 {Initial step size for step-size adaptation}

@@ -19,14 +19,6 @@ PRIORITIES?
 + (name): actively assigned
 * (name): likely to be assigned to
 
-For the future
--------------------------------------------
-* How to deal with generated quantities
-  - execute & print every time
-  - warning message for print that it only happens
-    for saved samples
-
-
 Contributed Code
 -------------------------------------------
 + R compiler
@@ -107,6 +99,11 @@ Diagonal Hessian:
 C++ API
 ======================================================================
 [items go here first, then to RStan/cmd]
+
+* How to deal with generated quantities
+  - execute & print every time
+  - warning message for print that it only happens
+    for saved samples
 
 * JSON I/O.  Check out:
 

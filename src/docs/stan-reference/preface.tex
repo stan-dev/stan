@@ -151,10 +151,14 @@ not rotation invariant.
 
 We were still using a unit mass matrix in the simulated Hamiltonian
 dynamics.  The last tweak to \Stan before version 1.0 was to estimate
-a diagonal mass matrix during warmup.  This is beyond the \NUTS paper
-on {\it arXiv}, so we've been calling it \NUTS~{\sc ii}.  Using a mass
-matrix sped up the unscaled data models by an order of magnitude,
-though it breaks the nice theoretical property of rotation invariance.
+a diagonal mass matrix during warmup; this has since been upgraded to
+a full mass matrix in version 1.2.  Both these extensions go a bit
+beyond the \NUTS paper on {\it arXiv}.  Using a mass matrix sped up
+the unscaled data models by an order of magnitude, though it breaks
+the nice theoretical property of rotation invariance.  The full mass
+matrix estimation has rotational invariance as well, but scales less
+well because of the need to invert the mass matrix once and then do matrix
+multiplications every leapfrog step.
 
 \section*{\Stan's Future}
 

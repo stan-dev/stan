@@ -398,12 +398,12 @@ namespace stan {
             params_r[i] = init_rng();
           // FIXME: allow config vs. std::cout
           double init_log_prob;
-	  try {
-	    init_log_prob = model.grad_log_prob(params_r,params_i,init_grad,&std::cout);
-	  } catch (std::domain_error e) {
-	    stan::mcmc::write_error_msgs(&std::cout, e);
-	    init_log_prob = -std::numeric_limits<double>::infinity();
-	  }
+          try {
+            init_log_prob = model.grad_log_prob(params_r,params_i,init_grad,&std::cout);
+          } catch (std::domain_error e) {
+            stan::mcmc::write_error_msgs(&std::cout, e);
+            init_log_prob = -std::numeric_limits<double>::infinity();
+          }
           if (!boost::math::isfinite(init_log_prob))
             continue;
           for (size_t i = 0; i < init_grad.size(); ++i)
@@ -413,7 +413,7 @@ namespace stan {
         }
         if (num_init_tries > MAX_INIT_TRIES) {
           std::cout << std::endl << std::endl
-		    << "Initialization failed after " << MAX_INIT_TRIES 
+                    << "Initialization failed after " << MAX_INIT_TRIES 
                     << " attempts. "
                     << " Try specifying initial values,"
                     << " reducing ranges of constrained values,"
@@ -474,13 +474,13 @@ namespace stan {
         model.write_csv_header(sample_stream);
 
         std::vector<double> gradient;
-	double lp;
-	try {
-	  lp = model.grad_log_prob(params_r, params_i, gradient);
-	} catch (std::domain_error e) {
-	  stan::mcmc::write_error_msgs(&std::cout, e);
-	  lp = -std::numeric_limits<double>::infinity();
-	}
+        double lp;
+        try {
+          lp = model.grad_log_prob(params_r, params_i, gradient);
+        } catch (std::domain_error e) {
+          stan::mcmc::write_error_msgs(&std::cout, e);
+          lp = -std::numeric_limits<double>::infinity();
+        }
         
         double lastlp = lp - 1;
         std::cout << "initial log joint probability = " << lp << std::endl;
@@ -542,6 +542,7 @@ namespace stan {
                 << std::endl;
 
       std::cout << "equal_step_sizes = " << equal_step_sizes << std::endl;
+      std::cout << "nondiag_mass = " << nondiag_mass << std::endl;
       std::cout << "leapfrog_steps = " << leapfrog_steps << std::endl;
       std::cout << "max_treedepth = " << max_treedepth << std::endl;;
       std::cout << "epsilon = " << epsilon << std::endl;;
@@ -577,30 +578,7 @@ namespace stan {
 
         
       clock_t start = clock();
-      if (cov_file != ""){
-        stan::mcmc::nuts_massgiven<rng_t> nuts_massgiven_sampler(model,params_r,params_i,
-                                                                 cov_file,
-                                                                 max_treedepth, epsilon,
-                                                                 epsilon_pm, epsilon_adapt,
-                                                                 delta, gamma,
-                                                                 base_rng);
-            
-        // cut & paste (see below) to enable sample-specific params
-        if (!append_samples) {
-          sample_stream << "lp__,"; // log probability first
-          nuts_massgiven_sampler.write_sampler_param_names(sample_stream);
-          model.write_csv_header(sample_stream);
-        }
-        nuts_massgiven_sampler.set_error_stream(std::cout);  // cout intended
-        nuts_massgiven_sampler.set_output_stream(std::cout);
-            
-        sample_from(nuts_massgiven_sampler,epsilon_adapt,refresh,
-                    num_iterations,num_warmup,num_thin,save_warmup,
-                    sample_stream,params_r,params_i,
-                    model);//Yuanjun add a comment here to allow nondiag_mass matrix
-            
-      }
-      else if (nondiag_mass){
+      if (nondiag_mass) {
         stan::mcmc::nuts_nondiag<rng_t> nuts_nondiag_sampler(model,params_r,params_i,
                                                              max_treedepth, epsilon,
                                                              epsilon_pm, epsilon_adapt,

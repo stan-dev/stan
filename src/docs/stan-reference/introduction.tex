@@ -119,12 +119,15 @@ or a full mass matrix during warmup; Stan will support user-specified
 mass matrices in the future.  Estimating a diagonal mass matrix
 normalizes the scale of each element $\theta_k$ of the unknown
 variable sequence $\theta$, whereas estimating a full mass matrix
-accounts for both scaling and rotation.%
+accounts for both scaling and rotation,%
 %
 \footnote{These estimated mass matrices are global, meaning they are
   applied to every point in the parameter space being sampled.
   Riemann-manifold HMC generalizes this to allow the curvature implied
   by the mass matrix to vary by position.}
+%
+but is more memory and computation intensive per leapfrog step due to
+the underlying matrix operations.
 
 \section{Convergence Monitoring and Effective Sample Size}
 
@@ -407,6 +410,7 @@ iter = 2000
 warmup = 1000
 thin = 1 (default)
 equal_step_sizes = 0
+nondiag_mass = 0
 leapfrog_steps = -1
 max_treedepth = 10
 epsilon = -1
