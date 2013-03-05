@@ -111,6 +111,8 @@
 % need special command for items requiring escapes in index
 \newcommand{\fitemindex}[5]{\item[{\tt #1 {\bfseries #2}(#3)}]\mbox{ }
   \\[4pt] #4\index{{\tt\bfseries #5 }!{\tt (#3):\,#1}}}
+\newcommand{\fitemindexsort}[6]{\item[{\tt #1 {\bfseries #2}(#3)}]\mbox{ }
+  \\[4pt] #4\index{{\tt\bfseries #6 }@{\tt\bfseries #5 }!{\tt (#3):\,#1}}}
 \newcommand{\farg}[1]{{\tt\slshape #1}}
 
 \newcommand{\cmdflag}[3]{\item[\tt {-}-#1] \mbox{ } \\ #2 \\ \hspace*{24pt}(#3)}

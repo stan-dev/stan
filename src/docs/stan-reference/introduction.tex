@@ -283,12 +283,20 @@ The model assumes the binary observed data \code{y[1],...,y[N]}
 are i.i.d.\ with Bernoulli chance-of-success \code{theta}.  The
 prior on \code{theta} is \code{beta(1,1)} (i.e., uniform).%
 %
-\footnote{If no prior were specified in the model block, the
-constraints on \code{theta} ensure it falls between 0 and 1,
-providing \code{theta} an implicit uniform prior.  For parameters
-with no prior specified and unbounded support, the result is an
-improper prior.  Stan accepts improper priors, but posteriors must
-be proper in order for sampling to succeed.}
+\footnote{If no prior is specified for a parameter, it is implicitly
+  given a uniform prior on its support.  For parameters such as
+  \code{theta} in the example, which are constrained to fall between 0
+  and 1, this produces a proper uniform distribution on the support of
+  \code{theta}.  For parameters with unbounded support, the implicit
+  uniform prior is improper.  Stan allows improper priors to be
+  specified in models, but posteriors must be proper in order for
+  sampling to succeed.}
+%
+The variable \code{theta} is defined with lower and upper bounds,
+which constrain its value.  Parameters with constrained support should
+always specify appropriate constraints in the parameter declaration;
+if the constraints are absent, sampling will either slow down or stop
+altogether based on whether the initial values satisfy the constraints.
 
 \subsection{Data Set}
 
