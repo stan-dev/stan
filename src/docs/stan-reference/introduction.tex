@@ -211,7 +211,7 @@ directory containing the file named \code{makefile}).
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-% cd <stan-home>
+> cd <stan-home>
 \end{Verbatim}
 \end{quote}
 %
@@ -219,24 +219,33 @@ Then make the library with the following make command
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-% make bin/libstan.a
+> make bin/libstan.a
 \end{Verbatim}
 \end{quote}
 %
-and then make the model parser and code generator with the following
-call
+then make the model parser and code generator with the following call
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-% make bin/stanc
+> make bin/stanc
 \end{Verbatim}
 \end{quote}
 %
 \emph{Warning}: The \code{make} program may take 10+ minutes and
 consume 2+ GB of memory to build \code{libstan.a} and \code{stanc}.
 Compiler warnings, including \code{uname: not found}, may be safely ignored.
+ 
+Finally, make the Stan output summary program with the following
+make command
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> make bin/print
+\end{Verbatim}
+\end{quote}
+%
 
-Building \code{libstan.a} and \code{bin/stanc} need only be done once.
+Building \code{libstan.a}, \code{bin/stanc}, and \code{bin/print} need only be done once.
 
 \section{Compiling and Executing a Model}
 
@@ -524,6 +533,58 @@ in the No-U-Turn sampling algorithm.}
 \end{quote}
 %
 This ends the output.  
+
+\subsection{Summarizing Output}
+
+\code{bin/print} will display summary information about the
+run. To run \code{print} on the output file generated for
+\code{bernoulli} on Linux or Mac use
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> <stan-home>/bin/print samples.csv
+\end{Verbatim}
+\end{quote}
+%
+For Windows use backslashes for the executable
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> <stan-home>\bin\print samples.csv
+\end{Verbatim}
+\end{quote}
+%
+The output of the command will display information about the run
+followed by information for each parameter and generated quantity. For
+\code{bernoulli}, we ran 1 chain and saved 1000 iterations. The information is
+echoed to the standard output:
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+Inference for Stan model:
+1 chains: each with iter=(1000); warmup=(0); thin=(1); 1000 iterations saved.
+
+       mean se_mean   sd 2.5%  25%  50%  75% 97.5% n_eff Rhat
+theta   0.2     0.0  0.1  0.1  0.2  0.2  0.3   0.5   478  1.0
+
+Samples were drawn using mcmc::nuts_diag.
+For each parameter, n_eff is a crude measure of effective sample size,
+and Rhat is the potential scale reduction factor on split chains (at 
+convergence, Rhat=1).
+\end{Verbatim}
+\end{quote}
+%
+In addition to the general information about the runs, \code{print}
+displays summary statistics about each parameter and generated
+quantity.
+
+In the \code{bernoulli} model, there is a single parameter,
+\code{theta}. The mean, standard error of the mean, standard
+deviation, the 2.5\%, 25\%, 50\%, 75\%, and 97.5\% quantiles,
+number of effective samples, and Rhat value are displayed.
+
+\code{print} can be called with more than one csv file by separating
+filenames with spaces. It will also take wildcards in specifying filenames.
 
 \subsection{Configuring Command-Line Options}
 
