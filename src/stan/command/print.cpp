@@ -5,7 +5,7 @@
 #include <stan/mcmc/chains.hpp>
 
 int calculate_size(const Eigen::VectorXd& x, const std::string& name,
-		   int digits) {
+                   int digits) {
   using std::max;
   using std::ceil;
   using std::log10;
@@ -19,8 +19,15 @@ int calculate_size(const Eigen::VectorXd& x, const std::string& name,
     size = max(size, ceil(log10(-x.minCoeff()+0.01))+(padding+1));
 
   return max(size,
-	     max(name.length(), std::string("-0.0").length())+0.0);
+             max(name.length(), std::string("-0.0").length())+0.0);
 }
+
+void print_usage() {
+  std::cout << "  USAGE:  print <filename 1> [<filename 2> ... <filename N>]"
+            << std::endl
+            << std::endl;
+}
+
 
 /** 
  * The Stan print function.
@@ -33,15 +40,16 @@ int calculate_size(const Eigen::VectorXd& x, const std::string& name,
  */
 int main(int argc, const char* argv[]) {
   if (argc == 1) {
-    std::cout << "  usage: print <filename 1> <filename 2>"
-              << std::endl
-              << std::endl;
-    return 0;
+    print_usage();
   }
 
   std::vector<std::string> filenames;
   for (int i = 1; i < argc; i++) {
     filenames.push_back(argv[i]);
+    if (std::string("--help") == std::string(argv[i])) {
+      print_usage();
+      return 0;
+    }
   }
   
   Eigen::VectorXi thin(filenames.size());
@@ -104,7 +112,7 @@ int main(int argc, const char* argv[]) {
   }
   
   std::cout << "Inference for Stan model: " << model_name << std::endl
-	    << chains.num_chains() << " chains: each with iter=(" << chains.num_kept_samples(0);
+            << chains.num_chains() << " chains: each with iter=(" << chains.num_kept_samples(0);
   for (int chain = 1; chain < chains.num_chains(); chain++)
     std::cout << "," << chains.num_kept_samples(chain);
   std::cout << ")";
@@ -117,7 +125,7 @@ int main(int argc, const char* argv[]) {
     std::cout << "," << thin(chain);
   std::cout << ")";
   std::cout << "; " << chains.num_samples() << " iterations saved." 
-	    << std::endl << std::endl;
+            << std::endl << std::endl;
   
   using std::setprecision;
   using std::setw;
@@ -138,10 +146,10 @@ int main(int argc, const char* argv[]) {
   }
   std::cout << std::endl;
   std::cout << "Samples were drawn using " << stan_csv.adaptation.sampler << "." << std::endl
-	    << "For each parameter, n_eff is a crude measure of effective sample size," << std::endl
-	    << "and Rhat is the potential scale reduction factor on split chains (at " << std::endl
-	    << "convergence, Rhat=1)." << std::endl
-	    << std::endl;
+            << "For each parameter, n_eff is a crude measure of effective sample size," << std::endl
+            << "and Rhat is the potential scale reduction factor on split chains (at " << std::endl
+            << "convergence, Rhat=1)." << std::endl
+            << std::endl;
 
   /*
 Inference for Stan model: schools_code.
