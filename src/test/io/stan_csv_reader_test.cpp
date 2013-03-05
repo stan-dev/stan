@@ -18,6 +18,8 @@ public:
     header2_stream.open("src/test/io/test_csv_files/header2.csv");
     adaptation2_stream.open("src/test/io/test_csv_files/adaptation2.csv");
     samples2_stream.open("src/test/io/test_csv_files/samples2.csv");
+
+    blocker_nondiag0_stream.open("src/test/io/test_csv_files/blocker_nondiag.0.csv");
   }
 
   void TearDown() {
@@ -32,9 +34,12 @@ public:
     header2_stream.close();
     adaptation2_stream.close();
     samples2_stream.close();
+
+    blocker_nondiag0_stream.close();
   }
 
   std::ifstream blocker0_stream, epil0_stream;
+  std::ifstream blocker_nondiag0_stream;
   std::ifstream metadata1_stream, header1_stream, adaptation1_stream, samples1_stream;
   std::ifstream metadata2_stream, header2_stream, adaptation2_stream, samples2_stream;
 };
@@ -529,3 +534,117 @@ TEST_F(StanIoStanCsvReader,ParseEpil) {
 
 }
 
+
+
+TEST_F(StanIoStanCsvReader,ParseBlockerNondiag) {
+  stan::io::stan_csv blocker_nondiag;
+  blocker_nondiag = stan::io::stan_csv_reader::parse(blocker_nondiag0_stream);
+
+  // metadata
+  EXPECT_EQ(1, blocker_nondiag.metadata.stan_version_major);
+  EXPECT_EQ(1, blocker_nondiag.metadata.stan_version_minor);
+  EXPECT_EQ(1, blocker_nondiag.metadata.stan_version_patch);
+  
+  EXPECT_EQ("models/bugs_examples/vol1/blocker/blocker.data.R", blocker_nondiag.metadata.data);
+  EXPECT_EQ("models/bugs_examples/vol1/blocker/blocker.init.R", blocker_nondiag.metadata.init);
+  EXPECT_FALSE(blocker_nondiag.metadata.append_samples);
+  EXPECT_FALSE(blocker_nondiag.metadata.save_warmup);
+  EXPECT_EQ(899581446U, blocker_nondiag.metadata.seed);
+  EXPECT_FALSE(blocker_nondiag.metadata.random_seed);
+  EXPECT_EQ(0U, blocker_nondiag.metadata.chain_id);
+  EXPECT_EQ(4000U, blocker_nondiag.metadata.iter);
+  EXPECT_EQ(2000U, blocker_nondiag.metadata.warmup);
+  EXPECT_EQ(2U, blocker_nondiag.metadata.thin);
+  EXPECT_FALSE(blocker_nondiag.metadata.equal_step_sizes);
+  EXPECT_EQ(-1, blocker_nondiag.metadata.leapfrog_steps);
+  EXPECT_EQ(10, blocker_nondiag.metadata.max_treedepth);
+  EXPECT_FLOAT_EQ(-1, blocker_nondiag.metadata.epsilon);
+  EXPECT_FLOAT_EQ(0, blocker_nondiag.metadata.epsilon_pm);
+  EXPECT_FLOAT_EQ(0.5, blocker_nondiag.metadata.delta);
+  EXPECT_FLOAT_EQ(0.05, blocker_nondiag.metadata.gamma);
+
+  // header
+  ASSERT_EQ(51, blocker_nondiag.header.size());
+  EXPECT_EQ("lp__", blocker_nondiag.header(0));
+  EXPECT_EQ("treedepth__",blocker_nondiag.header(1));
+  EXPECT_EQ("stepsize__",blocker_nondiag.header(2));
+  EXPECT_EQ("d",blocker_nondiag.header(3));
+  EXPECT_EQ("sigmasq_delta",blocker_nondiag.header(4));
+  EXPECT_EQ("mu[1]",blocker_nondiag.header(5));
+  EXPECT_EQ("mu[2]",blocker_nondiag.header(6));
+  EXPECT_EQ("mu[3]",blocker_nondiag.header(7));
+  EXPECT_EQ("mu[4]",blocker_nondiag.header(8));
+  EXPECT_EQ("mu[5]",blocker_nondiag.header(9));
+  EXPECT_EQ("mu[6]",blocker_nondiag.header(10));
+  EXPECT_EQ("mu[7]",blocker_nondiag.header(11));
+  EXPECT_EQ("mu[8]",blocker_nondiag.header(12));
+  EXPECT_EQ("mu[9]",blocker_nondiag.header(13));
+  EXPECT_EQ("mu[10]",blocker_nondiag.header(14));
+  EXPECT_EQ("mu[11]",blocker_nondiag.header(15));
+  EXPECT_EQ("mu[12]",blocker_nondiag.header(16));
+  EXPECT_EQ("mu[13]",blocker_nondiag.header(17));
+  EXPECT_EQ("mu[14]",blocker_nondiag.header(18));
+  EXPECT_EQ("mu[15]",blocker_nondiag.header(19));
+  EXPECT_EQ("mu[16]",blocker_nondiag.header(20));
+  EXPECT_EQ("mu[17]",blocker_nondiag.header(21));
+  EXPECT_EQ("mu[18]",blocker_nondiag.header(22));
+  EXPECT_EQ("mu[19]",blocker_nondiag.header(23));
+  EXPECT_EQ("mu[20]",blocker_nondiag.header(24));
+  EXPECT_EQ("mu[21]",blocker_nondiag.header(25));
+  EXPECT_EQ("mu[22]",blocker_nondiag.header(26));
+  EXPECT_EQ("delta[1]",blocker_nondiag.header(27));
+  EXPECT_EQ("delta[2]",blocker_nondiag.header(28));
+  EXPECT_EQ("delta[3]",blocker_nondiag.header(29));
+  EXPECT_EQ("delta[4]",blocker_nondiag.header(30));
+  EXPECT_EQ("delta[5]",blocker_nondiag.header(31));
+  EXPECT_EQ("delta[6]",blocker_nondiag.header(32));
+  EXPECT_EQ("delta[7]",blocker_nondiag.header(33));
+  EXPECT_EQ("delta[8]",blocker_nondiag.header(34));
+  EXPECT_EQ("delta[9]",blocker_nondiag.header(35));
+  EXPECT_EQ("delta[10]",blocker_nondiag.header(36));
+  EXPECT_EQ("delta[11]",blocker_nondiag.header(37));
+  EXPECT_EQ("delta[12]",blocker_nondiag.header(38));
+  EXPECT_EQ("delta[13]",blocker_nondiag.header(39));
+  EXPECT_EQ("delta[14]",blocker_nondiag.header(40));
+  EXPECT_EQ("delta[15]",blocker_nondiag.header(41));
+  EXPECT_EQ("delta[16]",blocker_nondiag.header(42));
+  EXPECT_EQ("delta[17]",blocker_nondiag.header(43));
+  EXPECT_EQ("delta[18]",blocker_nondiag.header(44));
+  EXPECT_EQ("delta[19]",blocker_nondiag.header(45));
+  EXPECT_EQ("delta[20]",blocker_nondiag.header(46));
+  EXPECT_EQ("delta[21]",blocker_nondiag.header(47));
+  EXPECT_EQ("delta[22]",blocker_nondiag.header(48));
+  EXPECT_EQ("delta_new",blocker_nondiag.header(49));
+  EXPECT_EQ("sigma_delta",blocker_nondiag.header(50));
+
+  // adaptation
+  EXPECT_EQ("mcmc::nuts_nondiag", blocker_nondiag.adaptation.sampler);
+  EXPECT_FLOAT_EQ(0.111184, blocker_nondiag.adaptation.step_size);
+  ASSERT_EQ(47*47, blocker_nondiag.adaptation.step_size_multipliers.size());
+  EXPECT_FLOAT_EQ(0.0896433, blocker_nondiag.adaptation.step_size_multipliers(0,0));
+  EXPECT_FLOAT_EQ(0.0625198, blocker_nondiag.adaptation.step_size_multipliers(0,1));
+  EXPECT_FLOAT_EQ(0.0625198, blocker_nondiag.adaptation.step_size_multipliers(1,0));
+  EXPECT_FLOAT_EQ(17.2042, blocker_nondiag.adaptation.step_size_multipliers(1,1));
+  EXPECT_FLOAT_EQ(-0.0453205, blocker_nondiag.adaptation.step_size_multipliers(4,0));
+  EXPECT_FLOAT_EQ(-0.0933167, blocker_nondiag.adaptation.step_size_multipliers(4,46));
+  EXPECT_FLOAT_EQ(0.0984621, blocker_nondiag.adaptation.step_size_multipliers(46,0));
+  EXPECT_FLOAT_EQ(0.653694, blocker_nondiag.adaptation.step_size_multipliers(46,46));
+
+  // samples
+  ASSERT_EQ(1000, blocker_nondiag.samples.rows());
+  ASSERT_EQ(51, blocker_nondiag.samples.cols());
+
+  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> expected_samples(6, 51);
+  expected_samples <<
+    -5908.68,3,0.111184,-0.255475,0.0080236,-2.42194,-1.73426,-2.51103,-2.47484,-2.4752,-2.85626,-1.76424,-2.04107,-2.02602,-2.26847,-2.35312,-1.41865,-2.94705,-2.93352,-1.35622,-1.42112,-2.18696,-3.00777,-3.37382,-1.62166,-2.05212,-2.81468,-0.202591,-0.330191,-0.270342,-0.320117,-0.188094,-0.214451,-0.387086,-0.220174,-0.19868,-0.250029,-0.259696,-0.282013,-0.303294,0.0992687,-0.211155,-0.142066,0.0162178,-0.258286,-0.204111,-0.290797,-0.303473,-0.295608,-0.19725,0.0895745,
+    -5912.72,3,0.111184,-0.319565,0.00318264,-2.41463,-2.28224,-3.07007,-2.32131,-2.20258,-2.45801,-1.69052,-2.2132,-1.95572,-2.19084,-2.06708,-1.47618,-3.23688,-2.81843,-1.27235,-1.33843,-1.91427,-2.90301,-3.38225,-1.55547,-2.05416,-2.96071,-0.257528,-0.267201,-0.4757,-0.29898,-0.339977,-0.302051,-0.317327,-0.407522,-0.116961,-0.305121,-0.296286,-0.296228,-0.343707,-0.00148217,-0.347452,-0.339316,-0.263011,-0.272357,-0.246625,-0.348569,-0.309279,-0.333286,-0.282,0.0564149,
+    -5916.51,3,0.111184,-0.0694712,0.00493523,-1.78592,-2.35551,-2.19991,-2.28941,-2.71547,-2.70365,-1.60445,-2.19411,-2.07477,-2.37952,-2.34788,-1.62727,-2.82049,-2.74739,-1.28419,-1.50857,-1.96765,-3.51168,-3.97297,-1.27815,-2.21789,-2.99968,-0.0763487,-0.053602,-0.120425,-0.0892594,-0.08325,-0.0464671,-0.353956,-0.124889,-0.0886862,-0.142028,-0.0559313,-0.0540624,-0.194154,0.0816328,-0.16048,-0.0132652,-0.0889155,-0.0017044,-0.0791724,-0.282821,-0.103889,-0.0501008,-0.0909296,0.0702512,
+    -5923,3,0.111184,-0.226348,0.00393445,-1.96637,-2.24194,-2.55643,-2.36651,-2.53624,-2.75053,-1.63101,-2.17904,-1.86247,-2.40414,-2.23857,-1.78203,-2.75029,-2.67815,-1.41398,-1.34285,-1.95915,-3.48534,-3.92941,-1.22321,-1.89724,-2.93004,-0.220485,-0.267124,-0.205044,-0.169493,-0.191528,-0.267911,-0.404385,-0.117276,-0.226033,-0.102288,-0.196429,-0.0923061,-0.296166,-0.288324,-0.194678,-0.270737,-0.170971,-0.274136,-0.24183,-0.655575,-0.20445,-0.267903,-0.372682,0.0627252,
+    -5919.64,3,0.111184,-0.357142,0.0061122,-2.8535,-2.11585,-2.05187,-2.40677,-2.44267,-1.29867,-1.723,-2.20585,-1.98772,-2.09805,-2.27324,-1.43957,-2.4881,-2.64845,-1.25451,-1.39924,-2.22342,-2.60059,-3.70359,-1.1448,-2.08585,-2.71648,-0.413613,-0.376071,-0.412685,-0.255016,-0.00867309,-0.398067,-0.394919,-0.202956,-0.309794,-0.434023,-0.234265,-0.297685,-0.414185,-0.180308,-0.341414,-0.314638,-0.204389,-0.262057,-0.52384,-0.407004,-0.291163,-0.363959,-0.349219,0.0781806,
+    -5915.34,3,0.111184,-0.298994,0.0110628,-2.65206,-2.22827,-2.29467,-2.45905,-2.37849,-2.64126,-1.60728,-1.95505,-1.99092,-2.2644,-2.25574,-1.76591,-2.80661,-2.67536,-1.41373,-1.58578,-1.96677,-2.85476,-2.78062,-1.46859,-2.28469,-2.87438,-0.165057,-0.390393,-0.247368,-0.273446,-0.223784,-0.320736,-0.601674,-0.405595,-0.239817,-0.287705,-0.412927,-0.205721,-0.255067,-0.0389726,-0.400421,-0.263526,-0.224049,-0.253929,-0.325063,-0.304362,-0.351809,-0.54465,-0.210811,0.10518;
+  
+  for (int i = 0; i < 6; i++) 
+    for (int j = 0; j < 51; j++)
+      EXPECT_FLOAT_EQ(expected_samples(i,j), blocker_nondiag.samples(i,j))
+	<< "comparison failed for (" << i << "," << j << ")";
+}

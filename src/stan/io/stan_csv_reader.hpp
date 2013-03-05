@@ -171,12 +171,14 @@ namespace stan {
       static bool read_adaptation(std::istream& in, stan_csv_adaptation& adaptation) { 
 	std::stringstream ss;
 	std::string line;
+        int lines = 0;
 
 	if (in.peek() != '#' || in.good() == false)
 	  return false;
 	while (in.peek() == '#') {
 	  std::getline(in, line);
 	  ss << line << '\n';
+          lines++;
 	}
 	ss.seekg(std::ios_base::beg);
 	
@@ -202,22 +204,25 @@ namespace stan {
 	
 	// parameter step size multipliers
 	std::getline(ss, line); // comment line
-	ss >> comment;
 	std::getline(ss, line); // step sizes
-	adaptation.step_size_multipliers.resize(std::count(line.begin(), line.end(), ',') + 1, 1);
-	ss.str(line);
-	int idx = 0;
-        try {
-          while (ss.good()) {
+        int rows = lines-3;
+        int cols = std::count(line.begin(), line.end(), ',') + 1;
+	adaptation.step_size_multipliers.resize(rows, cols);
+
+        for (int row = 0; row < rows; row++) {
+          std::stringstream line_ss;
+          line_ss.str(line);
+          line_ss >> comment;
+          for (int col = 0; col < cols; col++) {
             std::string token;
-            std::getline(ss, token, ',');
+            std::getline(line_ss, token, ',');
             boost::trim(token);
-            adaptation.step_size_multipliers(idx++) = boost::lexical_cast<double>(token);
+            adaptation.step_size_multipliers(row,col) = boost::lexical_cast<double>(token);
           }
-        } catch(...) {
-          std::cout << "Error: adaptation format not recognized" << std::endl;
-          return false;
+          std::getline(ss, line); // step sizes
         }
+	if (ss.good())
+	  return false;
 	return true;
       }
       
