@@ -35,3 +35,8 @@ endif
 ifeq (clang++,$(CC_TYPE))
   #PCH = .pch
 endif
+
+## adding target that maps targets without extensions
+## to targets with .exe at the end.
+% : %.exe
+	
