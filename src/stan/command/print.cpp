@@ -33,7 +33,9 @@ int calculate_size(const Eigen::VectorXd& x, const std::string& name,
  */
 int main(int argc, const char* argv[]) {
   if (argc == 1) {
-    std::cout << "usage: print <filename 1> <filename 2>";
+    std::cout << "  usage: print <filename 1> <filename 2>"
+              << std::endl
+              << std::endl;
     return 0;
   }
 
