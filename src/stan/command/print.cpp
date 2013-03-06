@@ -41,6 +41,7 @@ void print_usage() {
 int main(int argc, const char* argv[]) {
   if (argc == 1) {
     print_usage();
+    return 0;
   }
 
   std::vector<std::string> filenames;
