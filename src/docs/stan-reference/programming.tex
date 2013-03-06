@@ -1208,7 +1208,7 @@ model {
 \end{quote}
 %
 First, the predictor inside the \code{bernoulli\_logit} term is
-equivalent to the predictor of the 1PL model multipled by the
+equivalent to the predictor of the 1PL model multiplied by the
 discriminativeness for the question, \code{exp(log\_gamma[kk[n]])}.
 The parameter \code{log\_gamma[k]} represents how discriminative a
 question is, with log discriminations above 0 being less (because
@@ -1222,7 +1222,7 @@ is given a weakly informative $\distro{Cauchy}(0,5)$ prior.
 Similarly, the scale terms, \code{sigma\_alpha}, \code{sigma\_beta},
 and \code{sigma\_gamma}, are given half-Cauchy priors.  The truncation
 in the half-Cauchy prior is implicit; explicit truncation is not
-necessary because the log probabilty need only be calculated up to a
+necessary because the log probability need only be calculated up to a
 proportion and the scale variables are constrained to $(0,\infty)$ by 
 their declarations.
 
@@ -1364,7 +1364,7 @@ a_t & = & \sigma_t \epsilon_t
 In order to ensure the noise terms $\sigma^2_t$ are positive, the
 scale coefficients are constrained to be positive, $\alpha_0, \alpha_1
 > 0$.  To ensure stationarity of the time series, the slope is 
-constrained to to be less than onr, $\alpha_1 < 1$.%
+constrained to to be less than one, $\alpha_1 < 1$.%
 %
 \footnote{In practice, it can be useful to remove the constraint to
   test whether a non-stationary set of coefficients provides a better
@@ -1629,7 +1629,7 @@ data {
 
 \subsubsection{Converting to Log Odds and Standard Error}
 
-Although the clincial trial data is binomial in its raw format, it may
+Although the clinical trial data is binomial in its raw format, it may
 be transformed to an unbounded scale by considering the log odds ratio
 \[
 y_j = \log \left( \frac{r^t_j / (n^t_j - r^t_j)}
@@ -1811,7 +1811,7 @@ In the full generative model, each data point $n$ in $1{:}N$ is assigned
 a cluster $z_n \in 1{:}K$ with symmetric uniform probability,
 %
 \[
-z_n \sim \distro{Cateogrical}({\bf 1}/K),
+z_n \sim \distro{Categorical}({\bf 1}/K),
 \]
 where ${\bf 1}$ is the unit vector of $K$ dimensions, so that ${\bf
   1}/K$ is the symmetric $K$-simplex.  Thus the model assumes that
@@ -1894,7 +1894,7 @@ externally or within the model's generated quantities block.
 
 The multivariate normal distribution with unit covariance matrix
 produces a log probability density proportional to Euclidean distance
-(i.e., $L_2$ distance).  Other distribtutions relate to other
+(i.e., $L_2$ distance).  Other distributions relate to other
 geometries.  For instance, replacing the normal distribution with the
 double exponential (Laplace) distribution produces a clustering model
 based on $L_1$ distance (i.e., Manhattan or taxicab
@@ -2028,7 +2028,7 @@ document identity array \code{doc}.
 \subsection{Estimation with Category-Labeled Training Data}
 
 The naive Bayes models along with R programs to simulate data for them
-and a sample data set are available in the distribtution in the
+and a sample data set are available in the distribution in the
 directory \nolinkurl{src/models/misc/clustering/naive-bayes}.
 
 A naive Bayes model for estimating the simplex parameters given
@@ -2373,7 +2373,7 @@ By adding a prior for the mean and covariance, Stan supports full
 Bayesian inference for the correlated topic model.  This requires
 moving the declarations of topic mean \code{mu} and covariance \code{Sigma} 
 from the data block to the parameters block and providing them with
-priors in the model.  A relatively efficient and interpretatable prior
+priors in the model.  A relatively efficient and interpretable prior
 for the covariance matrix \code{Sigma} may be encoded as follows.
 %
 \begin{quote}
@@ -2684,7 +2684,7 @@ exponential covariance function is provided in the distribution in
 \nolinkurl{src/models/misc/gaussian-process/gp-fit.stan}.  The Stan
 code is very similar to the simulation models in terms of the
 computations, but the blocks in which variables are declared and
-statements are executed has changed to accomodate the hyperparameter
+statements are executed has changed to accommodate the hyperparameter
 estimation problem.
 %
 \begin{quote}
@@ -2755,7 +2755,7 @@ The estimation of $\rho$ was termed ``automatic relevance
 determination'' in \citep{Neal:1996}, because the larger $\rho_d$ is,
 the more dimension $d$ is weighted in the distance calculation.
 
-The implementation of automatic relevance determinantion in Stan is
+The implementation of automatic relevance determination in Stan is
 straightforward.  A model like the one to fit the basic
 hyperparameters can be generalized by declaring \code{rho} to be a
 vector of size \code{D} and defining the covariance function as in
@@ -2765,7 +2765,7 @@ The collection of $\rho_d$ parameters can also be modeled
 hierarchically.
 
 
-\section{Predictve Inference with a Gaussian Process}
+\section{Predictive Inference with a Gaussian Process}
 
 Suppose for a given sequence of inputs $x$ that the corresponding
 outputs $y$ are observed.  Given a new sequence of inputs $\tilde{x}$,
@@ -3303,7 +3303,7 @@ only requires the log probability up to a constant.
 \subsection{Multivariate Changes of Variables}
 
 In the case of a multivariate transform, the log of the Jacobian of
-the transform must be added to the log probabilty accumulator (see
+the transform must be added to the log probability accumulator (see
 \refsection{multi-change-of-variables} for more precise definitions of multivariate transforms
 and Jacobians).  In Stan, this can be coded as follows in the general
 case where the Jacobian is not a full matrix.
@@ -3497,8 +3497,8 @@ As of the original writing of this section, Stan does not have
 a complete set of cumulative distribution functions.  For example, the
 cumulative Poisson distribution is missing.%
 %
-\footnote{The distributiosn for which cumulative distribution
-  functions are available can be found by browswing the index looking
+\footnote{The distributions for which cumulative distribution
+  functions are available can be found by browsing the index looking
   for the suffix \code{\_cdf}.}
 %
 Thus in order to write a truncated Poisson distribution, its
