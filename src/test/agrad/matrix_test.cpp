@@ -4790,6 +4790,7 @@ TEST(MathMatrix,getAssignRow) {
   using Eigen::Matrix;
   using Eigen::Dynamic;
   using stan::math::get_base1;
+  using stan::math::get_base1_lhs;
   using stan::agrad::assign;
 
   Matrix<double,Dynamic,Dynamic> m(2,3);
@@ -4798,7 +4799,7 @@ TEST(MathMatrix,getAssignRow) {
   Matrix<double,1,Dynamic> rv(3);
   rv << 10, 100, 1000;
   
-  assign(get_base1(m,1,"m",1),rv);  
+  assign(get_base1_lhs(m,1,"m",1),rv);  
   EXPECT_FLOAT_EQ(10.0, m(0,0));
   EXPECT_FLOAT_EQ(100.0, m(0,1));
   EXPECT_FLOAT_EQ(1000.0, m(0,2));
@@ -4809,7 +4810,7 @@ TEST(MathMatrix,getAssignRowVar) {
   using stan::agrad::var;
   using Eigen::Matrix;
   using Eigen::Dynamic;
-  using stan::math::get_base1;
+  using stan::math::get_base1_lhs;
   using stan::agrad::assign;
 
   Matrix<var,Dynamic,Dynamic> m(2,3);
@@ -4818,7 +4819,7 @@ TEST(MathMatrix,getAssignRowVar) {
   Matrix<double,1,Dynamic> rv(3);
   rv << 10, 100, 1000;
   
-  assign(get_base1(m,1,"m",1),rv);  
+  assign(get_base1_lhs(m,1,"m",1),rv);  
   EXPECT_FLOAT_EQ(10.0, m(0,0).val());
   EXPECT_FLOAT_EQ(100.0, m(0,1).val());
   EXPECT_FLOAT_EQ(1000.0, m(0,2).val());
