@@ -108,13 +108,25 @@ stan(file, model_name = "anon_model", model_code = "",
       \item \code{delta} (\code{double})
       \item \code{equal_step_sizes} (\code{TRUE} or \code{FALSE})
       \item \code{max_treedepth} (\code{integer})
+      \item \code{nondiag_mass} (\code{TRUE} or \code{FALSE})
     }
 
-    More details can be 
-    found in Stan's manual. By default, 
-    \code{leapfrog_steps} is \code{-1} and 
-    \code{equal_step_sizes} is \code{FALSE} so that
-    NUTS2 sampler, the default sampler, is used.
+    More details can be found in Stan's manual. The default   
+    sampler is NUTS2, where \code{leapfrog_steps} is \code{-1} and 
+    \code{equal_step_sizes} is \code{FALSE}. To use NUTS with full
+    mass matrix, set \code{nondiag_mass} to \code{TRUE}. The following 
+    table provides a summary of how to specify arguments to choose 
+    different sampler. 
+
+    \tabular{ll}{
+    HMC \tab epsilon=e leapfrog_steps=L \cr 
+    HMC + tuned step size \tab leapfrog_steps=L \cr 
+    NUTS \tab epsilon=e \cr 
+    NUTS + tuned step size (NUTS1) \tab equal_step_sizes = TRUE \cr 
+    NUTS + tuned varying step sizes (NUTS2) \tab (default) \cr 
+    NUTS + full mass matrix \tab nondiag_mass = TRUE \cr 
+    }
+    
 
     \code{chain_id} can be a vector to specify the chain_id for all 
     chains or an integer. For the former case, they should be unique. 
