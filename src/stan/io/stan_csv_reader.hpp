@@ -29,6 +29,7 @@ namespace stan {
       size_t warmup;
       size_t thin;
       bool equal_step_sizes;
+      bool nondiag_mass;
       int leapfrog_steps;
       int max_treedepth;
       double epsilon;
@@ -120,6 +121,8 @@ namespace stan {
 	    ss >> metadata.thin;
 	  } else if (lhs.compare("equal_step_sizes") == 0) {
 	    ss >> metadata.equal_step_sizes;
+          } else if (lhs.compare("nondiag_mass") == 0) {
+	    ss >> metadata.nondiag_mass;
 	  } else if (lhs.compare("leapfrog_steps") == 0) {
 	    ss >> metadata.leapfrog_steps;
 	  } else if (lhs.compare("max_treedepth") == 0) {
