@@ -57,6 +57,17 @@ namespace stan {
       Eigen::Matrix<Eigen::MatrixXd, Eigen::Dynamic, 1> samples_;
       Eigen::VectorXi warmup_;
       
+      double mean(const Eigen::VectorXd& x) {
+	using boost::accumulators::accumulator_set;
+	using boost::accumulators::stats;
+	using boost::accumulators::tag::mean;
+	accumulator_set<double, stats<mean> > acc;
+	
+	for (int i = 0; i < x.size(); i++)
+	  acc(x(i));
+	return boost::accumulators::mean(acc);
+      }
+
       double sd(const Eigen::VectorXd& x) {
       	using boost::accumulators::accumulator_set;
 	using boost::accumulators::stats;
@@ -243,11 +254,11 @@ namespace stan {
 	Eigen::VectorXd chain_var(chains);
         for (int chain = 0; chain < chains; chain++) {
           double n_kept_samples = num_kept_samples(chain);
-          chain_mean(chain) = samples(chain).mean();
+          chain_mean(chain) = mean(samples(chain));
           chain_var(chain) = acov(chain)(0)*n_kept_samples/(n_kept_samples-1);
         }
       
-	double mean_var = chain_var.mean();
+	double mean_var = mean(chain_var);
         double var_plus = mean_var*(n_samples-1)/n_samples;
         if (chains > 1) 
 	  var_plus += variance(chain_mean);
@@ -260,7 +271,7 @@ namespace stan {
           for (int chain = 0; chain < chains; chain++) {
             acov_t(chain) = acov(chain)(t);
           }
-          rho_hat = 1 - (mean_var - acov_t.mean()) / var_plus;
+          rho_hat = 1 - (mean_var - mean(acov_t)) / var_plus;
           if (rho_hat >= 0)
             rho_hat_t(t) = rho_hat;
 	  max_t = t;
@@ -299,8 +310,8 @@ namespace stan {
 	Eigen::VectorXd split_chain_var(2*chains);
 	
 	for (int chain = 0; chain < chains; chain++) {
-	  split_chain_mean(2*chain) = samples(chain).topRows(n).mean();
-	  split_chain_mean(2*chain+1) = samples(chain).bottomRows(n).mean();
+	  split_chain_mean(2*chain) = mean(samples(chain).topRows(n));
+	  split_chain_mean(2*chain+1) = mean(samples(chain).bottomRows(n));
 	  
 	  split_chain_var(2*chain) = variance(samples(chain).topRows(n));
 	  split_chain_var(2*chain+1) = variance(samples(chain).bottomRows(n));
@@ -308,7 +319,7 @@ namespace stan {
 
 
 	double var_between = n * variance(split_chain_mean);
-	double var_within = split_chain_var.mean();
+	double var_within = mean(split_chain_var);
 			
         // rewrote [(n-1)*W/n + B/n]/W as (n-1+ B/W)/n
         return sqrt((var_between/var_within + n-1)/n);
@@ -461,11 +472,11 @@ namespace stan {
       }
       
       double mean(const int chain, const int index) {
-	return samples(chain,index).mean();
+	return mean(samples(chain,index));
       }
       
       double mean(const int index) {
-	return samples(index).mean();
+	return mean(samples(index));
       }
 
       double mean(const int chain, const std::string& name) {
