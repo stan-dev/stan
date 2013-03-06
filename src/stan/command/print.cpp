@@ -5,7 +5,7 @@
 #include <stan/mcmc/chains.hpp>
 
 int calculate_size(const Eigen::VectorXd& x, const std::string& name,
-                   int digits) {
+                   const int digits) {
   using std::max;
   using std::ceil;
   using std::log10;
@@ -20,6 +20,21 @@ int calculate_size(const Eigen::VectorXd& x, const std::string& name,
 
   return max(size,
              max(name.length(), std::string("-0.0").length())+0.0);
+}
+
+Eigen::VectorXi calculate_sizes(const Eigen::MatrixXd& values, 
+                                const Eigen::Matrix<std::string, Eigen::Dynamic, 1>& headers, 
+                                const Eigen::VectorXi& digits,
+                                Eigen::Matrix<std::ios_base::fmtflags, Eigen::Dynamic, 1>& formats) {
+  int n = values.cols();
+  Eigen::VectorXi column_lengths(n);
+  formats.resize(n);
+  for (int i = 0; i < n; i++)
+    formats(i) = std::ios_base::fixed;
+  for (int i = 0; i < n; i++) {
+    column_lengths(i) = calculate_size(values.col(i), headers(i), digits(i)) + 1;
+  }
+  return column_lengths;
 }
 
 void print_usage() {
@@ -84,7 +99,7 @@ int main(int argc, const char* argv[]) {
   Eigen::VectorXd probs(5);
   probs << 0.025, 0.25, 0.5, 0.75, 0.975;
 
-  for (int i = skip; i < chains.num_params(); i++) {
+  for (int i = 0; i < chains.num_params(); i++) {
     double sd = chains.sd(i);
     double n_eff = chains.effective_sample_size(i);
     values(i,0) = chains.mean(i);
@@ -108,9 +123,8 @@ int main(int argc, const char* argv[]) {
   digits(8) = 0;
 
   Eigen::VectorXi column_lengths(n);
-  for (int i = 0; i < n; i++) {
-    column_lengths(i) = calculate_size(values.col(i), headers(i), digits(i)) + 1;
-  }
+  Eigen::Matrix<std::ios_base::fmtflags, Eigen::Dynamic, 1> formats(n);
+  column_lengths = calculate_sizes(values, headers, digits, formats);
   
   std::cout << "Inference for Stan model: " << model_name << std::endl
             << chains.num_chains() << " chains: each with iter=(" << chains.num_kept_samples(0);
@@ -140,50 +154,28 @@ int main(int argc, const char* argv[]) {
   // each row
   for (int i = skip; i < chains.num_params(); i++) {
     std::cout << setw(max_name_length+1) << std::left << chains.param_name(i);
-    std::cout << std::right << std::fixed;
-    for (int j = 0; j < n; j++)
+    std::cout << std::right;
+    for (int j = 0; j < n; j++) {
+      std::cout.setf(formats(j));
       std::cout << setprecision(digits(j)) << setw(column_lengths(j)) << values(i,j);
+    }
     std::cout << std::endl;
   }
+  // lp
+  std::cout << setw(max_name_length+1) << std::left << chains.param_name(0);
+  std::cout << std::right;
+  for (int j = 0; j < n; j++) {
+    std::cout.setf(formats(j));
+    std::cout << setprecision(digits(j)) << setw(column_lengths(j)) << values(0,j);
+  }
+  std::cout << std::endl;
+    
   std::cout << std::endl;
   std::cout << "Samples were drawn using " << stan_csv.adaptation.sampler << "." << std::endl
             << "For each parameter, n_eff is a crude measure of effective sample size," << std::endl
             << "and Rhat is the potential scale reduction factor on split chains (at " << std::endl
             << "convergence, Rhat=1)." << std::endl
             << std::endl;
-
-  /*
-Inference for Stan model: schools_code.
-1 chains: each with iter=100; warmup=50; thin=1; 100 iterations saved.
-
-         mean se_mean   sd  2.5%  25%  50%  75% 97.5% n_eff Rhat
-mu        8.3     0.6  4.0   1.6  5.2  8.1 11.0  15.8    42  1.0
-tau       6.2     1.0  5.1   0.1  2.5  5.3  8.6  17.9    28  1.0
-eta[1]    0.5     0.2  1.1  -1.8 -0.1  0.5  1.3   2.4    50  1.0
-eta[2]    0.0     0.1  0.8  -1.5 -0.5  0.0  0.6   1.4    50  1.0
-eta[3]   -0.3     0.1  0.7  -1.6 -0.8 -0.3  0.2   1.1    26  1.1
-eta[4]   -0.1     0.1  0.7  -1.6 -0.5 -0.1  0.2   1.5    50  1.0
-eta[5]   -0.4     0.1  0.8  -1.6 -1.1 -0.4  0.1   1.2    49  1.0
-eta[6]   -0.2     0.1  0.9  -1.9 -1.0 -0.5  0.5   1.6    50  1.0
-eta[7]    0.3     0.2  0.9  -1.8 -0.2  0.6  0.9   1.7    27  1.0
-eta[8]    0.0     0.1  0.7  -1.4 -0.4  0.1  0.6   1.1    50  1.0
-theta[1] 12.9     1.5 10.4  -6.5  7.4 11.4 15.1  39.1    50  1.0
-theta[2]  9.2     1.0  6.1   0.0  4.3  8.4 13.3  22.2    35  1.0
-theta[3]  6.3     0.9  6.4 -12.2  3.9  6.7 10.2  13.3    50  1.0
-theta[4]  8.0     1.0  6.8  -6.9  4.6  7.8 12.6  19.4    50  1.0
-theta[5]  4.6     0.8  5.6  -6.4  1.2  6.0  8.9  13.0    50  1.0
-theta[6]  6.2     1.0  5.2  -1.9  2.1  6.8 10.5  13.6    27  1.0
-theta[7] 11.0     0.8  5.1   2.0  7.9 10.8 14.3  21.0    40  1.0
-theta[8]  8.4     1.0  6.2  -3.3  5.3  8.4 13.0  17.8    41  1.0
-lp__     -4.5     0.8  2.7 -11.0 -5.7 -4.3 -2.4  -0.7    13  1.1
-
-Samples were drawn using NUTS2 at Sat Feb 16 00:42:14 2013.
-For each parameter, n_eff is a crude measure of effective sample size,
-and Rhat is the potential scale reduction factor on split chains (at 
-convergence, Rhat=1).
-   */
-  
-
   return 0;
 }
 
