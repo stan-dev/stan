@@ -1,4 +1,6 @@
-get_sampler_name <- function(leapfrog_steps, equal_step_sizes) {
+get_sampler_name <- function(leapfrog_steps, equal_step_sizes, nondiag_mass) {
+  if (!is.null(nondiag_mass) && nondiag_mass > 0) 
+    return("NUTS(nondiag)")
   if (leapfrog_steps < 0) {
     if (equal_step_sizes == 0) return("NUTS2")
     return("NUTS1")
@@ -29,12 +31,19 @@ parse_stancsv_comments <- function(comments) {
   # generated from Stan
 
   nuts_diag_lineno <- which(grepl('(mcmc::nuts_diag)', comments))
+  nuts_nondiag_lineno <- which(grepl('(mcmc::nuts_nondiag)', comments))
   adaptation_info <- character(0)  
   len <- length(comments)
-  if (length(nuts_diag_lineno) > 0) {
+  nondiag_mass <- 0
+  if (length(nuts_diag_lineno) > 0) {  
     adaptation_info <- paste(comments[nuts_diag_lineno:len], collapse = '\n')
     comments <- comments[1:(nuts_diag_lineno - 1)]
+  } else if (length(nuts_nondiag_lineno) > 0) {  
+    adaptation_info <- paste(comments[nuts_nondiag_lineno:len], collapse = '\n')
+    comments <- comments[1:(nuts_nondiag_lineno - 1)]
+    nondiag_mass <- 1
   }
+
   has_eq <- sapply(comments, function(i) grepl('=', i))
   comments <- comments[has_eq] 
   comments <- gsub('^#+\\s*|\\s*$', '', comments)
@@ -43,13 +52,13 @@ parse_stancsv_comments <- function(comments) {
   values <- as.list(substring(comments, eq_pos + 1))
   names(values) <- names
   values[['adaptation_info']] <- adaptation_info 
-
   names1 <- intersect(c("thin", "iter", "warmup", "equal_step_sizes", "chain_id",
-                        "leapfrog_steps",
+                        "leapfrog_steps", "nondiag_mass",
                         "max_treedepth", "save_warmup"), names)
   names2 <- intersect(c("epsilon", "epsilon_pm", "gamma", "delta"), names) 
   for (z in names1) values[[z]] <- as.integer(values[[z]])
   for (z in names2) values[[z]] <- as.numeric(values[[z]])
+  if (!"nondiag_mass" %in% names) values[["nondiag_mass"]] <- nondiag_mass
   values
 }
 
@@ -109,7 +118,7 @@ read_stan_csv <- function(csvfiles) {
   for (i in seq_along(samples)) {
     attr(samples[[i]], "adaptation_info") <- cs_lst2[[i]]$adaptation_info 
     attr(samples[[i]], "args") <- 
-      list(sampler = get_sampler_name(cs_lst2[[i]]$leapfrog_steps, cs_lst2[[i]]$equal_step_sizes),
+      list(sampler = get_sampler_name(cs_lst2[[i]]$leapfrog_steps, cs_lst2[[i]]$equal_step_sizes, cs_lst2[[i]]$nondiag_mass),
            chain_id = cs_lst2[[i]]$chain_id)
   } 
 

@@ -115,6 +115,7 @@ namespace rstan {
     std::string init; 
     SEXP init_list;  
     std::string sampler; // HMC, NUTS1, NUTS2 (not set directy from R now) 
+    bool nondiag_mass; 
 
   public:
    
@@ -247,6 +248,10 @@ namespace rstan {
       idx = find_index(args_names, std::string("point_estimate"));
       if (idx == args_names.size()) point_estimate = false;
       else point_estimate = Rcpp::as<bool>(in[idx]);
+
+      idx = find_index(args_names, std::string("nondiag_mass"));
+      if (idx == args_names.size()) nondiag_mass = false;
+      else nondiag_mass = Rcpp::as<bool>(in[idx]);
     } 
 
     /**
@@ -280,6 +285,7 @@ namespace rstan {
       lst["sampler"] = sampler; 
       lst["test_grad"] = test_grad;
       lst["point_estimate"] = point_estimate;
+      lst["nondiag_mass"] = nondiag_mass; 
       return lst; 
     } 
 
@@ -365,6 +371,9 @@ namespace rstan {
     bool get_equal_step_sizes() const {
       return equal_step_sizes; 
     } 
+    bool get_nondiag_mass() const {
+      return nondiag_mass;
+    } 
     void write_args_as_comment(std::ostream& ostream) const { 
       // write_comment(ostream);
       // write_comment_property(ostream,"data",data_file);
@@ -384,6 +393,7 @@ namespace rstan {
       write_comment_property(ostream,"epsilon_pm",epsilon_pm);
       write_comment_property(ostream,"delta",delta);
       write_comment_property(ostream,"gamma",gamma);
+      write_comment_property(ostream,"nondiag_mass",nondiag_mass);
       write_comment(ostream);
     }
   }; 

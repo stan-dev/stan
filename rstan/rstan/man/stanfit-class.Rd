@@ -171,14 +171,14 @@
       of parameters used in the sampler and its column names 
       provide the parameter names. Optional parameter \code{inc_warmup}
       indicates whether to include the warmup period.} 
-    \item{\code{prob_log}}{\code{signature(object = "stanfit", "numeric")}: compute
+    \item{\code{log_prob}}{\code{signature(object = "stanfit", "numeric")}: compute
       the log probability density (\code{lp__}) for a set of parameter 
       values (on the \emph{unconstrained} space) up to an additive constant. 
       The unconstrained parameters are specified using a numeric vector.
       The number of parameters on the unconstrained space can be obtained 
       using method \code{get_num_upars}.
       A numeric value is returned.} 
-    \item{\code{grad_prob_log}}{\code{signature(object = "stanfit", "numeric")}: compute
+    \item{\code{grad_log_prob}}{\code{signature(object = "stanfit", "numeric")}: compute
       the gradient of log probability density function for a set of parameter 
       values (on the \emph{unconstrained} space) up to an additive constant.
       The unconstrained parameters are specified using a numeric vector

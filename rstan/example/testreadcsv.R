@@ -65,3 +65,8 @@ print(fit_nuts2)
 plot(fit_nuts2)
 traceplot(fit_nuts2)
 
+ss_nutsnondiag <- stan(file = sfile, data = dat, iter = 31, warmup = 13, chains = 4, nondiag_mass = TRUE,
+                       refresh = -100, sample_file = '8schools_nuts_nondiag.csv')
+fit_nutsnondiag <- read_stan_csv(paste("8schools_nuts_nondiag_", 1:4, ".csv", sep = ''))
+df <- as.data.frame(fit_nutsnondiag)
+print(fit_nutsnondiag)
