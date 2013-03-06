@@ -237,10 +237,10 @@ public:
     write_header();
     std::ofstream results("models/timing.csv", std::ios_base::app);
     
-    int N = chains->num_params();
-    std::vector<double> n_eff(chains->num_params());
+    int N = chains->num_params() - skip;
+    std::vector<double> n_eff(N);
     for (int n = 0; n < N; n++)
-      n_eff[n] = chains->effective_sample_size(n);
+      n_eff[n] = chains->effective_sample_size(n+skip-1);
     std::sort(n_eff.begin(), n_eff.end());
     double n_eff_median;
     if (N % 2 == 0)
@@ -256,11 +256,11 @@ public:
 	    << elapsed_milliseconds << ","
 	    << *(std::min_element(n_eff.begin(), n_eff.end())) << ","
 	    << *(std::max_element(n_eff.begin(), n_eff.end())) << ","
-      	    << stan::math::sum(n_eff) / N << ","
+      	    << stan::math::mean(n_eff) << ","
 	    << n_eff_median << ","
 	    << elapsed_milliseconds / *(std::min_element(n_eff.begin(), n_eff.end())) << ","
 	    << elapsed_milliseconds / *(std::max_element(n_eff.begin(), n_eff.end())) << ","
-	    << elapsed_milliseconds / (stan::math::sum(n_eff) / N) << ","
+	    << elapsed_milliseconds / stan::math::mean(n_eff) << ","
 	    << elapsed_milliseconds / n_eff_median
 	    << std::endl;
     results.close();
