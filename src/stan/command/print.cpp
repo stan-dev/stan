@@ -4,8 +4,11 @@
 #include <ios>
 #include <stan/mcmc/chains.hpp>
 
-int calculate_size(const Eigen::VectorXd& x, const std::string& name,
-                   const int digits) {
+
+int calculate_size(const Eigen::VectorXd& x, 
+                   const std::string& name,
+                   const int digits,
+                   std::ios_base::fmtflags& format) {
   using std::max;
   using std::ceil;
   using std::log10;
@@ -14,12 +17,29 @@ int calculate_size(const Eigen::VectorXd& x, const std::string& name,
   if (digits > 0)
     padding = digits + 1;
 
-  double size = ceil(log10(x.maxCoeff()+0.001)) + padding;
+  double fixed_size = 0.0;
+  if (x.maxCoeff() > 0)
+    fixed_size = ceil(log10(x.maxCoeff()+0.001)) + padding;
   if (x.minCoeff() < 0)
-    size = max(size, ceil(log10(-x.minCoeff()+0.01))+(padding+1));
+    fixed_size = max(fixed_size, ceil(log10(-x.minCoeff()+0.01))+(padding+1));
+  format = std::ios_base::fixed;
+  if (fixed_size < 7) {
+    return max(fixed_size,
+               max(name.length(), std::string("-0.0").length())+0.0);
+  }
 
-  return max(size,
-             max(name.length(), std::string("-0.0").length())+0.0);
+  double scientific_size = 0;
+  scientific_size += 4.0;   // "-0.0" has four digits
+  scientific_size += 1.0;   // e
+  double exponent_size = 0;
+  if (x.maxCoeff() > 0)
+    exponent_size = ceil(log10(log10(x.maxCoeff())));
+  if (x.minCoeff() < 0)
+    exponent_size = max(exponent_size,
+                        ceil(log10(log10(-x.minCoeff()))));
+  scientific_size += fmin(exponent_size, 3);
+  format = std::ios_base::scientific;
+  return scientific_size;
 }
 
 Eigen::VectorXi calculate_sizes(const Eigen::MatrixXd& values, 
@@ -29,10 +49,8 @@ Eigen::VectorXi calculate_sizes(const Eigen::MatrixXd& values,
   int n = values.cols();
   Eigen::VectorXi column_lengths(n);
   formats.resize(n);
-  for (int i = 0; i < n; i++)
-    formats(i) = std::ios_base::fixed;
   for (int i = 0; i < n; i++) {
-    column_lengths(i) = calculate_size(values.col(i), headers(i), digits(i)) + 1;
+    column_lengths(i) = calculate_size(values.col(i), headers(i), digits(i), formats(i)) + 1;
   }
   return column_lengths;
 }
@@ -156,16 +174,16 @@ int main(int argc, const char* argv[]) {
     std::cout << setw(max_name_length+1) << std::left << chains.param_name(i);
     std::cout << std::right;
     for (int j = 0; j < n; j++) {
-      std::cout.setf(formats(j));
+      std::cout.setf(formats(j), std::ios::floatfield);
       std::cout << setprecision(digits(j)) << setw(column_lengths(j)) << values(i,j);
     }
     std::cout << std::endl;
   }
-  // lp
+  // lp__
   std::cout << setw(max_name_length+1) << std::left << chains.param_name(0);
   std::cout << std::right;
   for (int j = 0; j < n; j++) {
-    std::cout.setf(formats(j));
+    std::cout.setf(formats(j), std::ios::floatfield);
     std::cout << setprecision(digits(j)) << setw(column_lengths(j)) << values(0,j);
   }
   std::cout << std::endl;
