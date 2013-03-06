@@ -72,6 +72,7 @@ namespace stan {
      }
 
 
+    template <bool isLHS>
     void generate_indexed_expr(const std::string& expr,
                                const std::vector<expression> indexes, 
                                base_expr_type base_type, // may have more dims
@@ -87,7 +88,7 @@ namespace stan {
       }
       if (ai_size <= (e_num_dims + 1) || base_type != MATRIX_T) {
         for (size_t n = 0; n < ai_size; ++n)
-          o << "get_base1(";
+          o << (isLHS ? "get_base1_lhs(" : "get_base1(");
         o << expr;
         for (size_t n = 0; n < ai_size; ++n) {
           o << ',';
@@ -96,7 +97,7 @@ namespace stan {
         }
       } else { 
         for (size_t n = 0; n < ai_size - 1; ++n)
-          o << "get_base1(";
+          o << (isLHS ? "get_base1_lhs(" : "get_base1(");
         o << expr;
         for (size_t n = 0; n < ai_size - 2; ++n) {
           o << ',';
@@ -170,7 +171,7 @@ namespace stan {
         for (size_t i = 0; i < x.dimss_.size(); ++i)
           for (size_t j = 0; j < x.dimss_[i].size(); ++j) 
             indexes.push_back(x.dimss_[i][j]); // wasteful copy, could use refs
-        generate_indexed_expr(expr_string,indexes,base_type,e_num_dims,o_);
+        generate_indexed_expr<false>(expr_string,indexes,base_type,e_num_dims,o_);
       }
       void operator()(const fun& fx) const { 
         o_ << fx.name_ << '(';
@@ -1199,11 +1200,11 @@ namespace stan {
       void operator()(assignment const& x) const {
         generate_indent(indent_,o_);
         o_ << "assign(";
-        generate_indexed_expr(x.var_dims_.name_,
-                              x.var_dims_.dims_,
-                              x.var_type_.base_type_,
-                              x.var_type_.dims_.size(),
-                              o_);
+        generate_indexed_expr<true>(x.var_dims_.name_,
+                                    x.var_dims_.dims_,
+                                    x.var_type_.base_type_,
+                                    x.var_type_.dims_.size(),
+                                    o_);
         o_ << ", ";
         generate_expression(x.expr_,o_);
         o_ << ");" << EOL;
