@@ -394,6 +394,7 @@ namespace rstan {
       unsigned int chain_id = args.get_chain_id(); 
       bool test_grad = args.get_test_grad();
       bool point_estimate = args.get_point_estimate();
+      bool nondiag_mass = args.get_nondiag_mass();
 
       // FASTER, but no parallel guarantees:
       // typedef boost::mt19937 rng_t;
@@ -560,7 +561,31 @@ namespace rstan {
         args.write_args_as_comment(sample_stream); 
       } 
 
-      if (0 > leapfrog_steps && !equal_step_sizes) {
+      if (nondiag_mass) { 
+        stan::mcmc::nuts_nondiag<rng_t> nuts_nondiag_sampler(model,params_r,params_i,
+                                                             max_treedepth, epsilon,
+                                                             epsilon_pm, epsilon_adapt,
+                                                             delta, gamma,
+                                                             base_rng);
+        args.set_sampler("NUTS(nondiag)");
+        nuts_nondiag_sampler.get_sampler_param_names(sampler_param_names);
+        for (size_t i = 0; i < sampler_param_names.size(); i++) 
+          sampler_params.push_back(Rcpp::NumericVector(iter_save));
+        if (sample_file_flag && !append_samples) {
+          sample_stream << "lp__,"; 
+          for (size_t i = 0; i < sampler_param_names.size(); i++) 
+            sample_stream << sampler_param_names[i] << ",";
+          model.write_csv_header(sample_stream);
+        } 
+        nuts_nondiag_sampler.set_error_stream(std::cout);  // cout intended
+        nuts_nondiag_sampler.set_output_stream(std::cout);
+            
+        sample_from(nuts_nondiag_sampler,epsilon_adapt,refresh,
+                    num_iterations,num_warmup,num_thin,
+                    sample_stream,sample_file_flag,params_r,params_i,
+                    model,chains,qoi_idx,mean_pars,mean_lp,sampler_params,
+                    adaptation_info);
+      } else if (0 > leapfrog_steps && !equal_step_sizes) {
         // NUTS II (with diagonal mass matrix estimation during warmup)
         args.set_sampler("NUTS2"); 
         stan::mcmc::nuts_diag<rng_t> nuts2_sampler(model,params_r,params_i, 
