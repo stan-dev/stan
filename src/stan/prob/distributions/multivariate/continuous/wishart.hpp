@@ -63,19 +63,19 @@ namespace stan {
                                   "Degrees of freedom parameter", &lp, Policy()))
         return lp;
       if (!check_size_match(function, 
-			    W.rows(), "Rows of random variable",
-			    W.cols(), "columns of random variable",
-			    &lp, Policy()))
+          W.rows(), "Rows of random variable",
+          W.cols(), "columns of random variable",
+          &lp, Policy()))
         return lp;
       if (!check_size_match(function, 
-			    S.rows(), "Rows of scale parameter",
-			    S.cols(), "columns of scale parameter",
-			    &lp, Policy()))
+          S.rows(), "Rows of scale parameter",
+          S.cols(), "columns of scale parameter",
+          &lp, Policy()))
         return lp;
       if (!check_size_match(function, 
-			    W.rows(), "Rows of random variable",
-			    S.rows(), "columns of scale parameter",
-			    &lp, Policy()))
+          W.rows(), "Rows of random variable",
+          S.rows(), "columns of scale parameter",
+          &lp, Policy()))
         return lp;
       // FIXME: domain checks
 

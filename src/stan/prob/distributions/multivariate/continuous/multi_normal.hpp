@@ -54,19 +54,19 @@ namespace stan {
       typename promote_args<T_y,T_loc,T_covar>::type lp(0.0);
 
       if (!check_size_match(function, 
-			    y.size(), "Size of random variable",
-			    mu.size(), "size of location parameter",
-			    &lp, Policy()))
+          y.size(), "Size of random variable",
+          mu.size(), "size of location parameter",
+          &lp, Policy()))
         return lp;
       if (!check_size_match(function, 
-			    y.size(), "Size of random variable",
-			    L.rows(), "rows of covariance parameter",
-			    &lp, Policy()))
+          y.size(), "Size of random variable",
+          L.rows(), "rows of covariance parameter",
+          &lp, Policy()))
         return lp;
       if (!check_size_match(function, 
-			    y.size(), "Size of random variable",
-			    L.cols(), "columns of covariance parameter",
-			    &lp, Policy()))
+          y.size(), "Size of random variable",
+          L.cols(), "columns of covariance parameter",
+          &lp, Policy()))
         return lp;
       if (!check_finite(function, mu, "Location parameter", &lp, Policy())) 
         return lp;
@@ -86,13 +86,13 @@ namespace stan {
 
       if (include_summand<propto,T_y,T_loc,T_covar>::value) {
         Eigen::Matrix<typename 
-		      boost::math::tools::promote_args<T_y,T_loc>::type,
-		      Eigen::Dynamic, 1> y_minus_mu(y.size());
+          boost::math::tools::promote_args<T_y,T_loc>::type,
+          Eigen::Dynamic, 1> y_minus_mu(y.size());
         for (int i = 0; i < y.size(); i++)
           y_minus_mu(i) = y(i)-mu(i);
         Eigen::Matrix<typename 
-		      boost::math::tools::promote_args<T_covar,T_loc,T_y>::type,
-		      Eigen::Dynamic, 1> 
+          boost::math::tools::promote_args<T_covar,T_loc,T_y>::type,
+          Eigen::Dynamic, 1> 
             half(mdivide_left_tri_low(L,y_minus_mu));
         // FIXME: this code does not compile. revert after fixing subtract()
         // Eigen::Matrix<typename 
@@ -164,19 +164,19 @@ namespace stan {
       typename promote_args<T_y,T_loc,T_covar>::type lp(0.0);
 
       if (!check_size_match(function, 
-			    y.cols(), "Columns of random variable",
-			    mu.rows(), "rows of location parameter",
-			    &lp, Policy()))
+          y.cols(), "Columns of random variable",
+          mu.rows(), "rows of location parameter",
+          &lp, Policy()))
         return lp;
       if (!check_size_match(function, 
-			    y.cols(), "Columns of random variable",
-			    L.rows(), "rows of covariance parameter",
-			    &lp, Policy()))
+          y.cols(), "Columns of random variable",
+          L.rows(), "rows of covariance parameter",
+          &lp, Policy()))
         return lp;
       if (!check_size_match(function, 
-			    y.cols(), "Columns of random variable",
-			    L.cols(), "columns of covariance parameter",
-			    &lp, Policy()))
+          y.cols(), "Columns of random variable",
+          L.cols(), "columns of covariance parameter",
+          &lp, Policy()))
         return lp;
       if (!check_finite(function, mu, "Location parameter", &lp, Policy())) 
         return lp;
@@ -198,7 +198,7 @@ namespace stan {
         Eigen::Matrix<T_loc, Eigen::Dynamic, Eigen::Dynamic> MU(y.rows(),y.cols());
         for(typename Eigen::Matrix<T_loc, Eigen::Dynamic, Eigen::Dynamic>::size_type i = 0; i < y.rows(); i++)
           MU.row(i) = mu;
-	
+  
         Eigen::Matrix<typename
                     boost::math::tools::promote_args<T_loc,T_y>::type,
                     Eigen::Dynamic,Eigen::Dynamic>

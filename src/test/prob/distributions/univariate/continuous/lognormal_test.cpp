@@ -32,7 +32,7 @@ TEST(ProbDistributionsLogNormal, chiSquareGoodnessFitTest) {
     double a = stan::prob::lognormal_rng(2.0,1.0,rng);
     int i = 0;
     while (i < K-1 && a > loc[i]) 
-	++i;
+  ++i;
     ++bin[i];
     count++;
    }

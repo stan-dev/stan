@@ -26,7 +26,7 @@ TEST(ProbDistributionsStudentT, chiSquareGoodnessFitTest) {
     double a = stan::prob::student_t_rng(3.0,2.0,1.0,rng) / 1.0 - 2.0;
     int i = 0;
     while (i < K-1 && a > loc[i]) 
-	++i;
+  ++i;
     ++bin[i];
     count++;
    }

@@ -48,5 +48,5 @@ public:
 };
 
 INSTANTIATE_TYPED_TEST_CASE_P(Models_BasicEstimators_NormalLoc,
-			      Model_Test_Fixture,
-			      Models_BasicEstimators_NormalLoc);
+            Model_Test_Fixture,
+            Models_BasicEstimators_NormalLoc);

@@ -75,8 +75,8 @@ vector<string> tokenize_arguments(const string& arguments) {
   string args_only_string = arguments.substr(arguments.find(":") + 1);
   boost::algorithm::trim(args_only_string);
   boost::algorithm::split(tokens, args_only_string, 
-			  boost::is_any_of(delimiters), 
-			  boost::token_compress_on);
+        boost::is_any_of(delimiters), 
+        boost::token_compress_on);
   return tokens;
 }
 
@@ -171,7 +171,7 @@ void write_types_typedef(vector<std::ostream *>& outs, string base, size_t& N, v
       std::ostream* out = outs[int(N / N_TESTS)];
       *out << "typedef boost::mpl::vector<" << base << args[n] << extra_args;
       if (extra_args.size() == 0)
-	*out << " ";
+  *out << " ";
       *out << "> type_" << N << ";" << endl;
       N++;
     }

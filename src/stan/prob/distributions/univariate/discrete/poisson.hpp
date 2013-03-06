@@ -84,7 +84,7 @@ namespace stan {
             logp += multiply_log(n_vec[i], value_of(lambda_vec[i])) 
               - value_of(lambda_vec[i]);
         }
-	
+  
         // gradients
         if (!is_constant_struct<T_rate>::value)
           operands_and_partials.d_x1[i] += n_vec[i] / value_of(lambda_vec[i]) - 1.0;
@@ -134,7 +134,7 @@ namespace stan {
               class Policy>
     typename return_type<T_log_rate>::type
     poisson_log_log(const T_n& n, const T_log_rate& alpha, 
-		    const Policy&) {
+        const Policy&) {
 
       static const char* function = "stan::prob::poisson_log_log(%1%)";
       
@@ -188,10 +188,10 @@ namespace stan {
 
       // FIXME: cache value_of for alpha_vec?  faster if only one?
       DoubleVectorView<include_summand<propto,T_log_rate>::value,is_vector<T_log_rate>::value>
-	exp_alpha(length(alpha));
+  exp_alpha(length(alpha));
       for (size_t i = 0; i < length(alpha); i++)
-	if (include_summand<propto,T_log_rate>::value)
-	  exp_alpha[i] = exp(value_of(alpha_vec[i]));
+  if (include_summand<propto,T_log_rate>::value)
+    exp_alpha[i] = exp(value_of(alpha_vec[i]));
       using stan::math::multiply_log;
       for (size_t i = 0; i < size; i++) {
         if (!(alpha_vec[i] == -std::numeric_limits<double>::infinity() 
@@ -225,7 +225,7 @@ namespace stan {
     inline
     typename return_type<T_log_rate>::type
     poisson_log_log(const T_n& n, const T_log_rate& alpha, 
-		    const Policy&) {
+        const Policy&) {
       return poisson_log_log<false>(n,alpha,Policy());
     }
 
@@ -308,7 +308,7 @@ namespace stan {
 
           const double Pi = gamma_q(n_dbl+1, lambda_dbl);
           P *= Pi;
-	
+  
           if (!is_constant_struct<T_rate>::value) {
               operands_and_partials.d_x1[i] -= gamma_p_derivative(n_dbl + 1, lambda_dbl) / Pi;
           }

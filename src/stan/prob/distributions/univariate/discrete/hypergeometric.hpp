@@ -16,10 +16,10 @@ namespace stan {
     // n: #white balls drawn;  N: #balls drawn;  
     // a: #white balls;  b: #black balls
     template <bool propto,
-	      typename T_n,
-	      typename T_N,
-	      typename T_a,
-	      typename T_b,
+        typename T_n,
+        typename T_N,
+        typename T_a,
+        typename T_b,
               class Policy>
     double
     hypergeometric_log(const T_n& n, 
@@ -37,10 +37,10 @@ namespace stan {
 
       // check if any vectors are zero length
       if (!(stan::length(n)
-	    && stan::length(N)
-	    && stan::length(a)
-	    && stan::length(b)))
-	return 0.0;
+      && stan::length(N)
+      && stan::length(a)
+      && stan::length(b)))
+  return 0.0;
 
 
       VectorView<const T_n> n_vec(n);
@@ -51,24 +51,24 @@ namespace stan {
       
       double logp(0.0);
       if (!check_bounded(function, n, 0, a, "Successes variable", &logp, Policy()))
-	return logp;
+  return logp;
       if (!check_greater(function, N, n, "Draws parameter", &logp, Policy()))
-	  return logp;
+    return logp;
       for (size_t i = 0; i < size; i++) {
-	if (!check_bounded(function, N_vec[i]-n_vec[i], 0, b_vec[i], "Draws parameter minus successes variable", &logp, Policy()))
-	  return logp;
-	if (!check_bounded(function, N_vec[i], 0, a_vec[i]+b_vec[i], "Draws parameter", &logp, Policy()))
-	  return logp;
+  if (!check_bounded(function, N_vec[i]-n_vec[i], 0, b_vec[i], "Draws parameter minus successes variable", &logp, Policy()))
+    return logp;
+  if (!check_bounded(function, N_vec[i], 0, a_vec[i]+b_vec[i], "Draws parameter", &logp, Policy()))
+    return logp;
       }
       if (!(check_consistent_sizes(function,
-				   n,N,a,b,
-				   "Successes variable","Draws parameter","Successes in population parameter","Failures in population parameter",
-				   &logp, Policy())))
-	return logp;
+           n,N,a,b,
+           "Successes variable","Draws parameter","Successes in population parameter","Failures in population parameter",
+           &logp, Policy())))
+  return logp;
       
       // check if no variables are involved and prop-to
       if (!include_summand<propto>::value)
-	return 0.0;
+  return 0.0;
 
 
       for (size_t i = 0; i < size; i++)
@@ -80,10 +80,10 @@ namespace stan {
 
 
     template <bool propto,
-	      typename T_n,
-	      typename T_N,
-	      typename T_a,
-	      typename T_b>
+        typename T_n,
+        typename T_N,
+        typename T_a,
+        typename T_b>
     inline
     double
     hypergeometric_log(const T_n& n, 
@@ -94,10 +94,10 @@ namespace stan {
     }
 
     template <typename T_n,
-	      typename T_N,
-	      typename T_a,
-	      typename T_b,
-	      class Policy>
+        typename T_N,
+        typename T_a,
+        typename T_b,
+        class Policy>
     inline
     double
     hypergeometric_log(const T_n& n, 
@@ -109,9 +109,9 @@ namespace stan {
     }
 
     template <typename T_n,
-	      typename T_N,
-	      typename T_a,
-	      typename T_b>
+        typename T_N,
+        typename T_a,
+        typename T_b>
     inline
     double
     hypergeometric_log(const T_n& n, 

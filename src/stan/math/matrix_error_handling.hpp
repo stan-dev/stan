@@ -31,19 +31,19 @@ namespace stan {
               class Policy>
     inline bool check_size_match(const char* function,
                                  T_size1 i,
-				 const char* name_i,
+         const char* name_i,
                                  T_size2 j,
-				 const char* name_j,
+         const char* name_j,
                                  T_result* result,
                                  const Policy&) {
       using stan::math::policies::raise_domain_error;
       typedef typename boost::common_type<T_size1,T_size2>::type common_type;
       if (static_cast<common_type>(i) != static_cast<common_type>(j)) {
         std::ostringstream msg;
-	msg << name_i << " (%1%) and " << name_j << " (" << j << ") must match in size";
+  msg << name_i << " (%1%) and " << name_j << " (" << j << ") must match in size";
         T_result tmp = policies::raise_domain_error<T_result,T_size1>(function,
-								      msg.str().c_str(),
-								      i, Policy());
+                      msg.str().c_str(),
+                      i, Policy());
         if (result != 0)
           *result = tmp;
         return false;
@@ -55,9 +55,9 @@ namespace stan {
     inline
     bool check_size_match(const char* function,
                           T_size1 i,
-			  const char* name_i,
+        const char* name_i,
                           T_size2 j,
-			  const char* name_j,
+        const char* name_j,
                           T_result* result) {
       return check_size_match(function,i,name_i,j,name_j,result,default_policy());
     }
@@ -66,9 +66,9 @@ namespace stan {
     inline
     bool check_size_match(const char* function,
                           T_size1 i,
-			  const char* name_i,
+        const char* name_i,
                           T_size2 j,
-			  const char* name_j,
+        const char* name_j,
                           T_size1* result = 0) {
       return check_size_match(function,i,name_i,j,name_j,result,default_policy());
     }
@@ -228,9 +228,9 @@ namespace stan {
                  T_result* result,
                  const Policy&) {
       if (!check_size_match(function, 
-			    y.rows(), "Rows of covariance matrix",
-			    y.cols(), "columns of covariance matrix",
-			    result, Policy())) 
+          y.rows(), "Rows of covariance matrix",
+          y.cols(), "columns of covariance matrix",
+          result, Policy())) 
         return false;
       if (!check_positive(function, y.rows(), "rows", result, Policy()))
         return false;
@@ -283,9 +283,9 @@ namespace stan {
                   T_result* result,
                   const Policy&) {
       if (!check_size_match(function, 
-			    y.rows(), "Rows of correlation matrix",
-			    y.cols(), "columns of correlation matrix",
-			    result, Policy())) 
+          y.rows(), "Rows of correlation matrix",
+          y.cols(), "columns of correlation matrix",
+          result, Policy())) 
         return false;
       if (!check_positive(function, y.rows(), "rows", result, Policy()))
         return false;
@@ -347,8 +347,8 @@ namespace stan {
          T_result* result,
          const Policy&) {
       if (!check_size_match(function, 
-			    Sigma.rows(), "Rows of covariance matrix",
-			    Sigma.cols(), "columns of covariance matrix",
+          Sigma.rows(), "Rows of covariance matrix",
+          Sigma.cols(), "columns of covariance matrix",
                             result, Policy())) 
         return false;
       if (!check_positive(function, Sigma.rows(), "rows", result, Policy()))

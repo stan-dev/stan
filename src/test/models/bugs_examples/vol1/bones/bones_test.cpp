@@ -62,5 +62,5 @@ public:
 };
 
 INSTANTIATE_TYPED_TEST_CASE_P(Models_BugsExamples_Vol1_Bones,
-			      Model_Test_Fixture,
-			      Models_BugsExamples_Vol1_Bones);
+            Model_Test_Fixture,
+            Models_BugsExamples_Vol1_Bones);

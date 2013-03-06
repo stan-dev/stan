@@ -54,6 +54,6 @@ public:
 };
 
 INSTANTIATE_TYPED_TEST_CASE_P(Models_BasicDistributions_Binormal,
-			      Model_Test_Fixture,
-			      Models_BasicDistributions_Binormal);
+            Model_Test_Fixture,
+            Models_BasicDistributions_Binormal);
 

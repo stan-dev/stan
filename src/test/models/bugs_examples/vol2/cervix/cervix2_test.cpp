@@ -60,5 +60,5 @@ public:
 };
 
 INSTANTIATE_TYPED_TEST_CASE_P(Models_BugsExamples_Vol2_Cervix2,
-			      Model_Test_Fixture,
-			      Models_BugsExamples_Vol2_Cervix2);
+            Model_Test_Fixture,
+            Models_BugsExamples_Vol2_Cervix2);

@@ -62,19 +62,19 @@ namespace stan {
                                  &lp, Policy()))
         return lp;
       if (!check_size_match(function, 
-			    W.rows(), "Rows of random variable",
-			    W.cols(), "columns of random variable",
-			    &lp, Policy()))
+          W.rows(), "Rows of random variable",
+          W.cols(), "columns of random variable",
+          &lp, Policy()))
         return lp;
       if (!check_size_match(function, 
-			    S.rows(), "Rows of scale parameter",
-			    S.cols(), "columns of scale parameter",
-			    &lp, Policy()))
+          S.rows(), "Rows of scale parameter",
+          S.cols(), "columns of scale parameter",
+          &lp, Policy()))
         return lp;
       if (!check_size_match(function, 
-			    W.rows(), "Rows of random variable",
-			    S.rows(), "columns of scale parameter",
-			    &lp, Policy()))
+          W.rows(), "Rows of random variable",
+          S.rows(), "columns of scale parameter",
+          &lp, Policy()))
         return lp;
       // FIXME: domain checks
         
@@ -113,7 +113,7 @@ namespace stan {
         lp -= 0.5 * dot_product(S_vec, W_inv_vec); // trace(S * W^-1)
       }
       if (include_summand<propto,T_dof,T_scale>::value)
-	lp += nu * k * NEG_LOG_TWO_OVER_TWO;
+  lp += nu * k * NEG_LOG_TWO_OVER_TWO;
       return lp;
     }
 

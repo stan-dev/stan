@@ -8,7 +8,7 @@ using stan::agrad::var;
 class AgradDistributionsWeibull : public AgradDistributionTest {
 public:
   void valid_values(vector<vector<double> >& parameters,
-		    vector<double>& log_prob) {
+        vector<double>& log_prob) {
     vector<double> param(3);
 
     param[0] = 2.0;                 // y
@@ -31,7 +31,7 @@ public:
   }
  
   void invalid_values(vector<size_t>& index, 
-		      vector<double>& value) {
+          vector<double>& value) {
     // y
     
     // alpha
@@ -50,44 +50,44 @@ public:
   }
 
   template <typename T_y, typename T_shape, typename T_scale,
-	    typename T3, typename T4, typename T5, 
-	    typename T6, typename T7, typename T8, 
-	    typename T9>
+      typename T3, typename T4, typename T5, 
+      typename T6, typename T7, typename T8, 
+      typename T9>
   typename stan::return_type<T_y, T_shape, T_scale>::type 
   log_prob(const T_y& y, const T_shape& alpha, const T_scale& sigma,
-	   const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+     const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
     return stan::prob::weibull_log(y, alpha, sigma);
   }
 
   template <bool propto, 
-	    typename T_y, typename T_shape, typename T_scale,
-	    typename T3, typename T4, typename T5, 
-	    typename T6, typename T7, typename T8, 
-	    typename T9>
+      typename T_y, typename T_shape, typename T_scale,
+      typename T3, typename T4, typename T5, 
+      typename T6, typename T7, typename T8, 
+      typename T9>
   typename stan::return_type<T_y, T_shape, T_scale>::type 
   log_prob(const T_y& y, const T_shape& alpha, const T_scale& sigma,
-	   const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+     const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
     return stan::prob::weibull_log<propto>(y, alpha, sigma);
   }
   
   template <bool propto, 
-	    typename T_y, typename T_shape, typename T_scale,
-	    typename T3, typename T4, typename T5, 
-	    typename T6, typename T7, typename T8, 
-	    typename T9, 
-	    class Policy>
+      typename T_y, typename T_shape, typename T_scale,
+      typename T3, typename T4, typename T5, 
+      typename T6, typename T7, typename T8, 
+      typename T9, 
+      class Policy>
   typename stan::return_type<T_y, T_shape, T_scale>::type 
   log_prob(const T_y& y, const T_shape& alpha, const T_scale& sigma,
-	   const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+     const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
     return stan::prob::weibull_log<propto>(y, alpha, sigma, Policy());
   }
   
   template <typename T_y, typename T_shape, typename T_scale,
-	    typename T3, typename T4, typename T5, 
-	    typename T6, typename T7, typename T8, 
-	    typename T9>
+      typename T3, typename T4, typename T5, 
+      typename T6, typename T7, typename T8, 
+      typename T9>
   var log_prob_function(const T_y& y, const T_shape& alpha, const T_scale& sigma,
-			const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+      const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
     using std::log;
     using std::pow;
     using stan::math::multiply_log;

@@ -203,7 +203,7 @@ TEST_F(StanIoStanCsvReader,read_samples1) {
   for (int i = 0; i < 5; i++) 
     for (int j = 0; j < 51; j++)
       EXPECT_FLOAT_EQ(expected_samples(i,j), samples(i,j))
-	<< "comparison failed for (" << i << "," << j << ")";
+  << "comparison failed for (" << i << "," << j << ")";
 }
 
 TEST_F(StanIoStanCsvReader,ParseBlocker) {
@@ -355,7 +355,7 @@ TEST_F(StanIoStanCsvReader,ParseBlocker) {
   for (int i = 0; i < 6; i++) 
     for (int j = 0; j < 51; j++)
       EXPECT_FLOAT_EQ(expected_samples(i,j), blocker0.samples(i,j))
-	<< "comparison failed for (" << i << "," << j << ")";
+  << "comparison failed for (" << i << "," << j << ")";
 }
 
 TEST_F(StanIoStanCsvReader,read_metadata2) {
@@ -448,7 +448,7 @@ TEST_F(StanIoStanCsvReader,read_samples2) {
   for (int i = 0; i < 3; i++) 
     for (int j = 0; j < 309; j++)
       EXPECT_FLOAT_EQ(expected_samples(i,j), samples(i,j))
-	<< "comparison failed for (" << i << "," << j << ")";
+  << "comparison failed for (" << i << "," << j << ")";
 }
 
 TEST_F(StanIoStanCsvReader,ParseEpil) {
@@ -530,7 +530,7 @@ TEST_F(StanIoStanCsvReader,ParseEpil) {
   for (int i = 0; i < 3; i++) 
     for (int j = 0; j < 309; j++)
       EXPECT_FLOAT_EQ(expected_samples(i,j), epil0.samples(i,j))
-	<< "comparison failed for (" << i << "," << j << ")";
+  << "comparison failed for (" << i << "," << j << ")";
 
 }
 
@@ -646,5 +646,5 @@ TEST_F(StanIoStanCsvReader,ParseBlockerNondiag) {
   for (int i = 0; i < 6; i++) 
     for (int j = 0; j < 51; j++)
       EXPECT_FLOAT_EQ(expected_samples(i,j), blocker_nondiag.samples(i,j))
-	<< "comparison failed for (" << i << "," << j << ")";
+  << "comparison failed for (" << i << "," << j << ")";
 }

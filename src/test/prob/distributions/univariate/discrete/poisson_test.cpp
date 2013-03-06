@@ -33,7 +33,7 @@ TEST(ProbDistributionsPoisson, chiSquareGoodnessFitTest) {
     int a = stan::prob::poisson_rng(5,rng);
     int i = 0;
     while (i < K-1 && a > loc[i]) 
-	++i;
+  ++i;
     ++bin[i];
     count++;
    }

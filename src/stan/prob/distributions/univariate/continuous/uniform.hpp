@@ -70,14 +70,14 @@ namespace stan {
         return logp;
       if (!(check_consistent_sizes(function,
                                    y,alpha,beta,
-				   "Random variable","Lower bound parameter","Upper bound parameter",
+           "Random variable","Lower bound parameter","Upper bound parameter",
                                    &logp, Policy())))
         return logp;
 
       
       // check if no variables are involved and prop-to
       if (!include_summand<propto,T_y,T_low,T_high>::value)
-	return 0.0;
+  return 0.0;
 
       VectorView<const T_y> y_vec(y);
       VectorView<const T_low> alpha_vec(alpha);
@@ -85,31 +85,31 @@ namespace stan {
       size_t N = max_size(y, alpha, beta);
 
       for (size_t n = 0; n < N; n++) {
-	const double y_dbl = value_of(y_vec[n]);
-	if (y_dbl < value_of(alpha_vec[n]) || y_dbl > value_of(beta_vec[n]))
-	  return LOG_ZERO;
+  const double y_dbl = value_of(y_vec[n]);
+  if (y_dbl < value_of(alpha_vec[n]) || y_dbl > value_of(beta_vec[n]))
+    return LOG_ZERO;
       }
 
       DoubleVectorView<include_summand<propto,T_low,T_high>::value,
-	is_vector<T_low>::value | is_vector<T_high>::value> inv_beta_minus_alpha(max_size(alpha,beta));
+  is_vector<T_low>::value | is_vector<T_high>::value> inv_beta_minus_alpha(max_size(alpha,beta));
       for (size_t i = 0; i < max_size(alpha,beta); i++) 
-	if (include_summand<propto,T_low,T_high>::value)
-	  inv_beta_minus_alpha[i] = 1.0 / (value_of(beta_vec[i]) - value_of(alpha_vec[i]));
+  if (include_summand<propto,T_low,T_high>::value)
+    inv_beta_minus_alpha[i] = 1.0 / (value_of(beta_vec[i]) - value_of(alpha_vec[i]));
       DoubleVectorView<include_summand<propto,T_low,T_high>::value,
-	is_vector<T_low>::value | is_vector<T_high>::value> log_beta_minus_alpha(max_size(alpha,beta));
+  is_vector<T_low>::value | is_vector<T_high>::value> log_beta_minus_alpha(max_size(alpha,beta));
       for (size_t i = 0; i < max_size(alpha,beta); i++)
-	if (include_summand<propto,T_low,T_high>::value)
-	  log_beta_minus_alpha[i] = log(value_of(beta_vec[i]) - value_of(alpha_vec[i]));
+  if (include_summand<propto,T_low,T_high>::value)
+    log_beta_minus_alpha[i] = log(value_of(beta_vec[i]) - value_of(alpha_vec[i]));
       
       agrad::OperandsAndPartials<T_y,T_low,T_high> operands_and_partials(y,alpha,beta);
       for (size_t n = 0; n < N; n++) {
-	if (include_summand<propto,T_low,T_high>::value)
-	  logp -= log_beta_minus_alpha[n];
+  if (include_summand<propto,T_low,T_high>::value)
+    logp -= log_beta_minus_alpha[n];
 
-	if (!is_constant_struct<T_low>::value)
-	  operands_and_partials.d_x2[n] += inv_beta_minus_alpha[n];
-	if (!is_constant_struct<T_high>::value)
-	  operands_and_partials.d_x3[n] -= inv_beta_minus_alpha[n];
+  if (!is_constant_struct<T_low>::value)
+    operands_and_partials.d_x2[n] += inv_beta_minus_alpha[n];
+  if (!is_constant_struct<T_high>::value)
+    operands_and_partials.d_x3[n] -= inv_beta_minus_alpha[n];
       }
       return operands_and_partials.to_var(logp);
     }

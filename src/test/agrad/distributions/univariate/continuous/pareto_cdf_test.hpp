@@ -8,7 +8,7 @@ using stan::agrad::var;
 class AgradCdfPareto : public AgradCdfTest {
 public:
   void valid_values(vector<vector<double> >& parameters,
-		    vector<double>& cdf) {
+        vector<double>& cdf) {
     vector<double> param(3);
 
     param[0] = 0.75;          // y
@@ -20,7 +20,7 @@ public:
   }
   
   void invalid_values(vector<size_t>& index, 
-		      vector<double>& value) {
+          vector<double>& value) {
 
     // y
     index.push_back(0U);
@@ -61,9 +61,9 @@ public:
   }
     
   template <typename T_y, typename T_scale, typename T_shape,
-	    typename T3, typename T4, typename T5, 
-	    typename T6, typename T7, typename T8, 
-	    typename T9>
+      typename T3, typename T4, typename T5, 
+      typename T6, typename T7, typename T8, 
+      typename T9>
   typename stan::return_type<T_y, T_scale, T_shape>::type 
   cdf(const T_y& y, const T_scale& y_min, const T_shape& alpha,
       const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
@@ -71,10 +71,10 @@ public:
   }
 
   template <typename T_y, typename T_scale, typename T_shape,
-	    typename T3, typename T4, typename T5, 
-	    typename T6, typename T7, typename T8, 
-	    typename T9,
-	    typename Policy>
+      typename T3, typename T4, typename T5, 
+      typename T6, typename T7, typename T8, 
+      typename T9,
+      typename Policy>
   typename stan::return_type<T_y, T_scale, T_shape>::type 
   cdf(const T_y& y, const T_scale& y_min, const T_shape& alpha,
       const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
@@ -83,12 +83,12 @@ public:
 
   
   template <typename T_y, typename T_scale, typename T_shape,
-	    typename T3, typename T4, typename T5, 
-	    typename T6, typename T7, typename T8, 
-	    typename T9>
+      typename T3, typename T4, typename T5, 
+      typename T6, typename T7, typename T8, 
+      typename T9>
   typename stan::return_type<T_y, T_scale, T_shape>::type 
   cdf_function(const T_y& y, const T_scale& y_min, const T_shape& alpha,
-	       const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+         const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
       using std::exp;
       using std::log;
       return 1.0 - exp( alpha * log( y_min / y ) );

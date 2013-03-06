@@ -8,7 +8,7 @@ using stan::agrad::var;
 class AgradDistributionsBetaBinomial : public AgradDistributionTest {
 public:
   void valid_values(vector<vector<double> >& parameters,
-		    vector<double>& log_prob) {
+        vector<double>& log_prob) {
     vector<double> param(4);
 
 
@@ -28,7 +28,7 @@ public:
   }
  
   void invalid_values(vector<size_t>& index, 
-		      vector<double>& value) {
+          vector<double>& value) {
     // n
     
     // N
@@ -57,52 +57,52 @@ public:
   }
 
   template <class T_n, class T_N, 
-	    class T_size1, class T_size2, 
-	    typename T4, typename T5, typename T6, 
-	    typename T7, typename T8, typename T9>
+      class T_size1, class T_size2, 
+      typename T4, typename T5, typename T6, 
+      typename T7, typename T8, typename T9>
   typename stan::return_type<T_size1, T_size2>::type 
   log_prob(const T_n& n, const T_N& N, 
-	   const T_size1& alpha, const T_size2& beta, 
-	   const T4&, const T5&, const T6&, 
-	   const T7&, const T8&, const T9&) {
+     const T_size1& alpha, const T_size2& beta, 
+     const T4&, const T5&, const T6&, 
+     const T7&, const T8&, const T9&) {
     return stan::prob::beta_binomial_log(n, N, alpha, beta);
   }
 
   template <bool propto, 
-	    class T_n, class T_N, 
-	    class T_size1, class T_size2, 
-	    typename T4, typename T5, typename T6, 
-	    typename T7, typename T8, typename T9>
+      class T_n, class T_N, 
+      class T_size1, class T_size2, 
+      typename T4, typename T5, typename T6, 
+      typename T7, typename T8, typename T9>
   typename stan::return_type<T_size1, T_size2>::type 
   log_prob(const T_n& n, const T_N& N, 
-	   const T_size1& alpha, const T_size2& beta, 
-	   const T4&, const T5&, const T6&, 
-	   const T7&, const T8&, const T9&) {
+     const T_size1& alpha, const T_size2& beta, 
+     const T4&, const T5&, const T6&, 
+     const T7&, const T8&, const T9&) {
     return stan::prob::beta_binomial_log<propto>(n, N, alpha, beta);
   }
   
   template <bool propto, 
-	    class T_n, class T_N, 
-	    class T_size1, class T_size2, 
-	    typename T4, typename T5, typename T6, 
-	    typename T7, typename T8, typename T9, 
-	    class Policy>
+      class T_n, class T_N, 
+      class T_size1, class T_size2, 
+      typename T4, typename T5, typename T6, 
+      typename T7, typename T8, typename T9, 
+      class Policy>
   typename stan::return_type<T_size1, T_size2>::type 
   log_prob(const T_n& n, const T_N& N, 
-	   const T_size1& alpha, const T_size2& beta, 
-	   const T4&, const T5&, const T6&, 
-	   const T7&, const T8&, const T9&) {
+     const T_size1& alpha, const T_size2& beta, 
+     const T4&, const T5&, const T6&, 
+     const T7&, const T8&, const T9&) {
     return stan::prob::beta_binomial_log<propto>(n, N, alpha, beta, Policy());
   }
   
   template <class T_n, class T_N, 
-	    class T_size1, class T_size2, 
-	    typename T4, typename T5, typename T6, 
-	    typename T7, typename T8, typename T9>
+      class T_size1, class T_size2, 
+      typename T4, typename T5, typename T6, 
+      typename T7, typename T8, typename T9>
   var log_prob_function(const T_n& n, const T_N& N, 
-			const T_size1& alpha, const T_size2& beta, 
-			const T4&, const T5&, const T6&, 
-			const T7&, const T8&, const T9&) {
+      const T_size1& alpha, const T_size2& beta, 
+      const T4&, const T5&, const T6&, 
+      const T7&, const T8&, const T9&) {
     using stan::math::lbeta;
     using stan::math::binomial_coefficient_log;
     using stan::prob::include_summand;
@@ -115,7 +115,7 @@ public:
       logp += binomial_coefficient_log(N,n);
     if (include_summand<true,T_size1,T_size2>::value)
       logp += lbeta(n + alpha, N - n + beta) 
-	- lbeta(alpha,beta);
+  - lbeta(alpha,beta);
     return logp;
   }
 };

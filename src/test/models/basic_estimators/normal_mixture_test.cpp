@@ -35,33 +35,33 @@ public:
   static void populate_chains() {
     if (chains->num_kept_samples() == 0) {
       for (int chain = 0; chain < num_chains; chain++) {
-	std::ifstream ifstream;
-	stan::io::stan_csv stan_csv;
-	ifstream.open(get_csv_file(chain).c_str());
-	stan_csv = stan::io::stan_csv_reader::parse(ifstream);
-	ifstream.close();
+  std::ifstream ifstream;
+  stan::io::stan_csv stan_csv;
+  ifstream.open(get_csv_file(chain).c_str());
+  stan_csv = stan::io::stan_csv_reader::parse(ifstream);
+  ifstream.close();
 
 
-	int theta = 3;
-	int mu1 = 4;
-	int mu2 = 5;
-	int log_theta = 6;
-	int log_1mtheta = 7;
-	// if theta > 0.5, swap values
-	if (stan_csv.samples.col(theta).mean() > 0.5) {
-	  stan_csv.samples.col(theta) = 1.0 - stan_csv.samples.col(theta).array();
-	  
-	  Eigen::VectorXd tmp;
-	  tmp = stan_csv.samples.col(mu1);
-	  stan_csv.samples.col(mu1) = stan_csv.samples.col(mu2);
-	  stan_csv.samples.col(mu2) = tmp;
-	  
-	  tmp = stan_csv.samples.col(log_theta);
-	  stan_csv.samples.col(log_theta) = stan_csv.samples.col(log_1mtheta);
-	  stan_csv.samples.col(log_1mtheta) = tmp;
-	}
+  int theta = 3;
+  int mu1 = 4;
+  int mu2 = 5;
+  int log_theta = 6;
+  int log_1mtheta = 7;
+  // if theta > 0.5, swap values
+  if (stan_csv.samples.col(theta).mean() > 0.5) {
+    stan_csv.samples.col(theta) = 1.0 - stan_csv.samples.col(theta).array();
+    
+    Eigen::VectorXd tmp;
+    tmp = stan_csv.samples.col(mu1);
+    stan_csv.samples.col(mu1) = stan_csv.samples.col(mu2);
+    stan_csv.samples.col(mu2) = tmp;
+    
+    tmp = stan_csv.samples.col(log_theta);
+    stan_csv.samples.col(log_theta) = stan_csv.samples.col(log_1mtheta);
+    stan_csv.samples.col(log_1mtheta) = tmp;
+  }
 
-	chains->add(stan_csv);
+  chains->add(stan_csv);
       }
     }
   }
@@ -81,5 +81,5 @@ public:
 };
 
 INSTANTIATE_TYPED_TEST_CASE_P(Models_BasicEstimators_NormalMixture,
-			      Model_Test_Fixture,
-			      Models_BasicEstimators_NormalMixture);
+            Model_Test_Fixture,
+            Models_BasicEstimators_NormalMixture);

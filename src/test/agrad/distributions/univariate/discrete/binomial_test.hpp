@@ -45,52 +45,52 @@ public:
   }
 
   template <class T_n, class T_N, class T_prob,
-	    typename T3, typename T4, typename T5, 
-	    typename T6, typename T7, typename T8, 
-	    typename T9>
+      typename T3, typename T4, typename T5, 
+      typename T6, typename T7, typename T8, 
+      typename T9>
   typename stan::return_type<T_prob>::type 
   log_prob(const T_n& n, const T_N& N, const T_prob& theta,
-	   const T3&, const T4&, const T5&,
-	   const T6&, const T7&, const T8&,
-	   const T9&) {
+     const T3&, const T4&, const T5&,
+     const T6&, const T7&, const T8&,
+     const T9&) {
     return stan::prob::binomial_log(n, N, theta);
   }
 
   template <bool propto, 
-	    class T_n, class T_N, class T_prob,
-	    typename T3, typename T4, typename T5, 
-	    typename T6, typename T7, typename T8, 
-	    typename T9>
+      class T_n, class T_N, class T_prob,
+      typename T3, typename T4, typename T5, 
+      typename T6, typename T7, typename T8, 
+      typename T9>
   typename stan::return_type<T_prob>::type 
   log_prob(const T_n& n, const T_N& N, const T_prob& theta,
-	   const T3&, const T4&, const T5&,
-	   const T6&, const T7&, const T8&,
-	   const T9&) {
+     const T3&, const T4&, const T5&,
+     const T6&, const T7&, const T8&,
+     const T9&) {
     return stan::prob::binomial_log<propto>(n, N, theta);
   }
   
   template <bool propto, 
-	    class T_n, class T_N, class T_prob,
-	    typename T3, typename T4, typename T5, 
-	    typename T6, typename T7, typename T8, 
-	    typename T9, 
-	    class Policy>
+      class T_n, class T_N, class T_prob,
+      typename T3, typename T4, typename T5, 
+      typename T6, typename T7, typename T8, 
+      typename T9, 
+      class Policy>
   typename stan::return_type<T_prob>::type 
   log_prob(const T_n& n, const T_N& N, const T_prob& theta,
-	   const T3&, const T4&, const T5&,
-	   const T6&, const T7&, const T8&,
-	   const T9&) {
+     const T3&, const T4&, const T5&,
+     const T6&, const T7&, const T8&,
+     const T9&) {
     return stan::prob::binomial_log<propto>(n, N, theta, Policy());
   }
   
   template <class T_n, class T_N, class T_prob,
-	    typename T3, typename T4, typename T5, 
-	    typename T6, typename T7, typename T8, 
-	    typename T9>
+      typename T3, typename T4, typename T5, 
+      typename T6, typename T7, typename T8, 
+      typename T9>
   var log_prob_function(const T_n& n, const T_N& N, const T_prob& theta,
-			const T3&, const T4&, const T5&,
-			const T6&, const T7&, const T8&,
-			const T9&) {
+      const T3&, const T4&, const T5&,
+      const T6&, const T7&, const T8&,
+      const T9&) {
     using std::log;
     using stan::math::binomial_coefficient_log;
     using stan::math::log1m;
@@ -102,7 +102,7 @@ public:
       logp += binomial_coefficient_log(N,n);
     if (include_summand<true,T_prob>::value) 
       logp += multiply_log(n,theta)
-	+ (N - n) * log1m(theta);
+  + (N - n) * log1m(theta);
     return logp;
   }
 };

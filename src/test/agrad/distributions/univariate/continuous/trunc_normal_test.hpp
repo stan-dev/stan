@@ -47,7 +47,7 @@ public:
   }
  
   void invalid_values(vector<size_t>& index, 
-		      vector<double>& value) {
+          vector<double>& value) {
     // y
     
     // mu
@@ -69,48 +69,48 @@ public:
   }
 
   template <typename T_y, typename T_loc, typename T_scale,
-	    typename T_alpha, typename T_beta, 
-	    typename T5, typename T6, typename T7, 
-	    typename T8, typename T9>
+      typename T_alpha, typename T_beta, 
+      typename T5, typename T6, typename T7, 
+      typename T8, typename T9>
   typename stan::return_type<T_y,T_loc,T_scale,T_alpha,T_beta>::type 
   log_prob(const T_y& y, const T_loc& mu, const T_scale& sigma,
-	   const T_alpha& alpha, const T_beta& beta, 
-	   const T5&, const T6&, const T7&, const T8&, const T9&) {
+     const T_alpha& alpha, const T_beta& beta, 
+     const T5&, const T6&, const T7&, const T8&, const T9&) {
     return stan::prob::trunc_normal_log(y, mu, sigma, alpha, beta);
   }
 
   template <bool propto, 
-	    typename T_y, typename T_loc, typename T_scale,
-	    typename T_alpha, typename T_beta, 
-	    typename T5, typename T6, typename T7, 
-	    typename T8, typename T9>
+      typename T_y, typename T_loc, typename T_scale,
+      typename T_alpha, typename T_beta, 
+      typename T5, typename T6, typename T7, 
+      typename T8, typename T9>
   typename stan::return_type<T_y,T_loc,T_scale,T_alpha,T_beta>::type 
   log_prob(const T_y& y, const T_loc& mu, const T_scale& sigma,
-	   const T_alpha& alpha, const T_beta& beta, 
-	   const T5&, const T6&, const T7&, const T8&, const T9&) {
+     const T_alpha& alpha, const T_beta& beta, 
+     const T5&, const T6&, const T7&, const T8&, const T9&) {
     return stan::prob::trunc_normal_log<propto>(y, mu, sigma, alpha, beta);
   }
   
   template <bool propto, 
-	    typename T_y, typename T_loc, typename T_scale,
-	    typename T_alpha, typename T_beta, 
-	    typename T5, typename T6, typename T7, 
-	    typename T8, typename T9, 
-	    class Policy>
+      typename T_y, typename T_loc, typename T_scale,
+      typename T_alpha, typename T_beta, 
+      typename T5, typename T6, typename T7, 
+      typename T8, typename T9, 
+      class Policy>
   typename stan::return_type<T_y,T_loc,T_scale,T_alpha,T_beta>::type 
   log_prob(const T_y& y, const T_loc& mu, const T_scale& sigma,
-	   const T_alpha& alpha, const T_beta& beta, 
-	   const T5&, const T6&, const T7&, const T8&, const T9&) {
+     const T_alpha& alpha, const T_beta& beta, 
+     const T5&, const T6&, const T7&, const T8&, const T9&) {
     return stan::prob::trunc_normal_log<propto>(y, mu, sigma, alpha, beta, Policy());
   }
   
   template <typename T_y, typename T_loc, typename T_scale,
-	    typename T_alpha, typename T_beta, 
-	    typename T5, typename T6, typename T7, 
-	    typename T8, typename T9>
+      typename T_alpha, typename T_beta, 
+      typename T5, typename T6, typename T7, 
+      typename T8, typename T9>
   var log_prob_function(const T_y& y, const T_loc& mu, const T_scale& sigma,
-			const T_alpha& alpha, const T_beta& beta, 
-			const T5&, const T6&, const T7&, const T8&, const T9&) {
+      const T_alpha& alpha, const T_beta& beta, 
+      const T5&, const T6&, const T7&, const T8&, const T9&) {
     using stan::math::check_greater;
     using stan::math::check_not_nan;
     using boost::math::tools::promote_args;
@@ -128,17 +128,17 @@ public:
     else {
       lp = normal_log<true>(y,mu,sigma);
       if (include_summand<true,T_loc,T_scale,T_alpha,T_beta>::value) {
-	if (isinf(sigma)) 
-	  lp -= log(beta - alpha);
-	else {
-	  if (!isinf(beta) && !isinf(alpha)) 
-	    lp -= log(Phi((beta - mu)/sigma) - Phi((alpha - mu)/sigma));
-	  else if (isfinite(alpha)) 
-	    lp -= log(1.0 - Phi((alpha - mu)/sigma));
-	  else if (isfinite(beta)) 
-	    lp -= log(Phi((beta - mu)/sigma));
+  if (isinf(sigma)) 
+    lp -= log(beta - alpha);
+  else {
+    if (!isinf(beta) && !isinf(alpha)) 
+      lp -= log(Phi((beta - mu)/sigma) - Phi((alpha - mu)/sigma));
+    else if (isfinite(alpha)) 
+      lp -= log(1.0 - Phi((alpha - mu)/sigma));
+    else if (isfinite(beta)) 
+      lp -= log(Phi((beta - mu)/sigma));
 
-	}
+  }
       }
     }
     return lp;

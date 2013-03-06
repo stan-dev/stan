@@ -23,7 +23,7 @@ public:
   }
  
   void invalid_values(vector<size_t>& index, 
-		      vector<double>& value) {
+          vector<double>& value) {
     // y
     
     // nu
@@ -39,48 +39,48 @@ public:
 
 
   template <typename T_y, typename T_dof, typename T2,
-	    typename T3, typename T4, typename T5, 
-	    typename T6, typename T7, typename T8, 
-	    typename T9>
+      typename T3, typename T4, typename T5, 
+      typename T6, typename T7, typename T8, 
+      typename T9>
   typename stan::return_type<T_y, T_dof, T2>::type 
   log_prob(const T_y& y, const T_dof& nu, 
-	   const T2&, const T3&, const T4&, const T5&, 
-	   const T6&, const T7&, const T8&, const T9&) {
+     const T2&, const T3&, const T4&, const T5&, 
+     const T6&, const T7&, const T8&, const T9&) {
     return stan::prob::chi_square_log(y, nu);
   }
 
   template <bool propto, 
-	    typename T_y, typename T_dof, typename T2,
-	    typename T3, typename T4, typename T5, 
-	    typename T6, typename T7, typename T8, 
-	    typename T9>
+      typename T_y, typename T_dof, typename T2,
+      typename T3, typename T4, typename T5, 
+      typename T6, typename T7, typename T8, 
+      typename T9>
   typename stan::return_type<T_y, T_dof>::type 
   log_prob(const T_y& y, const T_dof& nu, 
-	   const T2&, const T3&, const T4&, const T5&,
-	   const T6&, const T7&, const T8&, const T9&) {
+     const T2&, const T3&, const T4&, const T5&,
+     const T6&, const T7&, const T8&, const T9&) {
     return stan::prob::chi_square_log<propto>(y, nu);
   }
   
   template <bool propto, 
-	    typename T_y, typename T_dof, typename T2,
-	    typename T3, typename T4, typename T5, 
-	    typename T6, typename T7, typename T8, 
-	    typename T9, 
-	    class Policy>
+      typename T_y, typename T_dof, typename T2,
+      typename T3, typename T4, typename T5, 
+      typename T6, typename T7, typename T8, 
+      typename T9, 
+      class Policy>
   typename stan::return_type<T_y, T_dof>::type 
   log_prob(const T_y& y, const T_dof& nu, 
-	   const T2&, const T3&, const T4&, const T5&, 
-	   const T6&, const T7&, const T8&, const T9&) {
+     const T2&, const T3&, const T4&, const T5&, 
+     const T6&, const T7&, const T8&, const T9&) {
     return stan::prob::chi_square_log<propto>(y, nu, Policy());
   }
   
   template <typename T_y, typename T_dof, typename T2,
-	    typename T3, typename T4, typename T5, 
-	    typename T6, typename T7, typename T8, 
-	    typename T9>
+      typename T3, typename T4, typename T5, 
+      typename T6, typename T7, typename T8, 
+      typename T9>
   var log_prob_function(const T_y& y, const T_dof& nu, 
-			const T2&, const T3&, const T4&, const T5&, 
-			const T6&, const T7&, const T8&, const T9&) {
+      const T2&, const T3&, const T4&, const T5&, 
+      const T6&, const T7&, const T8&, const T9&) {
     using stan::prob::include_summand;
     using stan::math::multiply_log;
     using boost::math::lgamma;

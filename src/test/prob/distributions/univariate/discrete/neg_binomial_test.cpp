@@ -33,7 +33,7 @@ TEST(ProbDistributionsNegBinomial, chiSquareGoodnessFitTest) {
     int a = stan::prob::neg_binomial_rng(5,1.5,rng);
     int i = 0;
     while (i < K-1 && a > loc[i]) 
-	++i;
+  ++i;
     ++bin[i];
     count++;
    }

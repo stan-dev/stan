@@ -65,5 +65,5 @@ public:
 };
 
 INSTANTIATE_TYPED_TEST_CASE_P(Models_BugsExamples_Vol1_Stacks_D_Normal_Ridge,
-			      Model_Test_Fixture,
-			      Models_BugsExamples_Vol1_Stacks_D_Normal_Ridge);
+            Model_Test_Fixture,
+            Models_BugsExamples_Vol1_Stacks_D_Normal_Ridge);

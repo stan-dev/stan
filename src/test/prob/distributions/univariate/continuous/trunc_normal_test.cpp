@@ -32,7 +32,7 @@ TEST(ProbDistributionsTruncNormal, approxChiSquareGoodnessFitTest) {
     double a = stan::prob::trunc_normal_rng(0.0,1.0,-100.0,100.0,rng);
     int i = 0;
     while (i < K-1 && a > loc[i]) 
-	++i;
+  ++i;
     ++bin[i];
     count++;
    }

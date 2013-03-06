@@ -102,9 +102,9 @@ public:
   static void default_populate_chains() {
     if (chains->num_kept_samples() == 0U) {
       for (int chain = 0U; chain < num_chains; chain++) {
-	std::ifstream ifstream(get_csv_file(chain).c_str());
-	chains->add(stan::io::stan_csv_reader::parse(ifstream));
-	ifstream.close();
+  std::ifstream ifstream(get_csv_file(chain).c_str());
+  chains->add(stan::io::stan_csv_reader::parse(ifstream));
+  ifstream.close();
       }
     }
   }
@@ -150,7 +150,7 @@ public:
   static stan::mcmc::chains<>* create_chains() {
     std::stringstream command;
     command << get_command(1)
-	    << " --iter=0";
+      << " --iter=0";
     EXPECT_NO_THROW(run_command(command.str())) 
       << "Can not build header using: " << command.str();
       
@@ -216,20 +216,20 @@ public:
       return;
     std::ofstream results("models/timing.csv");
     results << "model" << ","
-	    << "chains" << ","
-	    << "iterations per chain" << ","
-	    << "kept samples" << ","
-	    << "parameters" << ","
-	    << "time (ms)" << ","
-	    << "n_eff (min)" << ","
-	    << "n_eff (max)" << ","
-      	    << "n_eff (mean)" << ","
-      	    << "n_eff (median)" << ","
-	    << "time per n_eff (min)" << ","
-	    << "time per n_eff (max)" << ","
-	    << "time per n_eff (mean)" << ","
-	    << "time per n_eff (median)"
-	    << std::endl;
+      << "chains" << ","
+      << "iterations per chain" << ","
+      << "kept samples" << ","
+      << "parameters" << ","
+      << "time (ms)" << ","
+      << "n_eff (min)" << ","
+      << "n_eff (max)" << ","
+            << "n_eff (mean)" << ","
+            << "n_eff (median)" << ","
+      << "time per n_eff (min)" << ","
+      << "time per n_eff (max)" << ","
+      << "time per n_eff (mean)" << ","
+      << "time per n_eff (median)"
+      << std::endl;
     results.close();
   }
   
@@ -249,20 +249,20 @@ public:
       n_eff_median = n_eff[N/2];
 
     results << "\"" << model_path << ".stan\"" << ","
-	    << chains->num_chains() << ","
-	    << num_iterations() << ","
-	    << chains->num_kept_samples() << ","
-	    << N << ","
-	    << elapsed_milliseconds << ","
-	    << *(std::min_element(n_eff.begin(), n_eff.end())) << ","
-	    << *(std::max_element(n_eff.begin(), n_eff.end())) << ","
-      	    << stan::math::mean(n_eff) << ","
-	    << n_eff_median << ","
-	    << elapsed_milliseconds / *(std::min_element(n_eff.begin(), n_eff.end())) << ","
-	    << elapsed_milliseconds / *(std::max_element(n_eff.begin(), n_eff.end())) << ","
-	    << elapsed_milliseconds / stan::math::mean(n_eff) << ","
-	    << elapsed_milliseconds / n_eff_median
-	    << std::endl;
+      << chains->num_chains() << ","
+      << num_iterations() << ","
+      << chains->num_kept_samples() << ","
+      << N << ","
+      << elapsed_milliseconds << ","
+      << *(std::min_element(n_eff.begin(), n_eff.end())) << ","
+      << *(std::max_element(n_eff.begin(), n_eff.end())) << ","
+            << stan::math::mean(n_eff) << ","
+      << n_eff_median << ","
+      << elapsed_milliseconds / *(std::min_element(n_eff.begin(), n_eff.end())) << ","
+      << elapsed_milliseconds / *(std::max_element(n_eff.begin(), n_eff.end())) << ","
+      << elapsed_milliseconds / stan::math::mean(n_eff) << ","
+      << elapsed_milliseconds / n_eff_median
+      << std::endl;
     results.close();
   }
 
@@ -325,10 +325,10 @@ TYPED_TEST_P(Model_Test_Fixture, ChainsTest) {
   for (int chain = 0; chain < num_chains; chain++) {
     for (int param = TypeParam::skip; param < num_params; param++) {
       if (!std::binary_search(params_to_skip.begin(), params_to_skip.end(), param)) {
-	EXPECT_GT(c->variance(chain, param), 0)
-	  << "Chain " << chain << ", param " << param << ", name " << c->param_name(param)
-	  << ": variance is 0" << std::endl
-	  << err_message[chain];
+  EXPECT_GT(c->variance(chain, param), 0)
+    << "Chain " << chain << ", param " << param << ", name " << c->param_name(param)
+    << ": variance is 0" << std::endl
+    << err_message[chain];
       }
     }
   }
@@ -337,8 +337,8 @@ TYPED_TEST_P(Model_Test_Fixture, ChainsTest) {
     if (std::find(params_to_skip.begin(), params_to_skip.end(), param) == params_to_skip.end()) {
       // made this 1.5 to fail less often
       EXPECT_LT(c->split_potential_scale_reduction(param), 1.5) 
-	<< "Param " << param << ", " << c->param_name(param)
-	<< ": split r hat > 1.5" << std::endl;
+  << "Param " << param << ", " << c->param_name(param)
+  << ": split r hat > 1.5" << std::endl;
     }
   }
 }
@@ -383,7 +383,7 @@ TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTest) {
       err_message << "parameter index: " << index << ", name: " << c->param_name(index)
                   << "\n\texpected:    " << setw(10) << expected_mean
                   << "\n\tsampled:     " << setw(10) << sample_mean
-		  << "\n\tsd:          " << setw(10) << c->sd(index)
+      << "\n\tsd:          " << setw(10) << c->sd(index)
                   << "\n\tneff:        " << setw(10) << neff
                   << "\n\tsplit R.hat: " << setw(10) << c->split_potential_scale_reduction(index)
                   << "\n\tz:           " << setw(10) << z
@@ -398,14 +398,14 @@ TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTest) {
       err_message << "parameter index: " << index
                   << "\n\texpected:    " << setw(10) << expected_mean
                   << "\n\tsampled:     " << setw(10) << sample_mean
-		  << "\n\tsd:          " << setw(10) << c->sd(index)
+      << "\n\tsd:          " << setw(10) << c->sd(index)
                   << "\n\tneff:        " << setw(10) << neff
                   << "\n\tsplit R.hat: " << setw(10) << c->split_potential_scale_reduction(index)
                   << "\n\tz:           " << setw(10) << z
                   << "\n\tse:          " << setw(10) << se
                   << "\n\n\tfabs(diff) > z * se * 5.0: " 
                   << fabs(expected_mean - sample_mean) << " > " << z*se * 5.0 << "\n\n";
-		  }*/
+      }*/
   }
   
   if (failed == 0)

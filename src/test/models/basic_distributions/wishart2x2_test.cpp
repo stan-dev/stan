@@ -51,8 +51,8 @@ public:
 };
 
 INSTANTIATE_TYPED_TEST_CASE_P(Models_BasicDistributions_Wishart2x2,
-			      Model_Test_Fixture,
-			      Models_BasicDistributions_Wishart2x2);
+            Model_Test_Fixture,
+            Models_BasicDistributions_Wishart2x2);
 
 TEST_F(Models_BasicDistributions_Wishart2x2,
        Test_Values) {

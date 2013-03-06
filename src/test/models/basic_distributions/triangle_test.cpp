@@ -49,11 +49,11 @@ public:
 };
 
 INSTANTIATE_TYPED_TEST_CASE_P(Models_BasicDistributions_Triangle,
-			      Model_Test_Fixture,
-			      Models_BasicDistributions_Triangle);
+            Model_Test_Fixture,
+            Models_BasicDistributions_Triangle);
 
 TEST_F(Models_BasicDistributions_Triangle,
-	Test_Triangle) {
+  Test_Triangle) {
   populate_chains();
   
   Eigen::VectorXd y = chains->samples(chains->index("y"));

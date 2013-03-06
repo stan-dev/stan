@@ -42,7 +42,7 @@ public:
     std::vector<std::pair<int, double> > expected_values;
     
     expected_values.push_back(make_pair(chains->index("y"), 
-					0.25*0.0 + 0.75*4));
+          0.25*0.0 + 0.75*4));
     
     return expected_values;
   }
@@ -50,5 +50,5 @@ public:
 };
 
 INSTANTIATE_TYPED_TEST_CASE_P(Models_BasicDistributions_NormalMixture,
-			      Model_Test_Fixture,
-			      Models_BasicDistributions_NormalMixture);
+            Model_Test_Fixture,
+            Models_BasicDistributions_NormalMixture);
