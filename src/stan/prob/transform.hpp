@@ -984,17 +984,13 @@ namespace stan {
     Eigen::Matrix<T,Eigen::Dynamic,1> 
     unit_vector_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& y) {
       typedef typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type size_type;
-      using stan::math::sin;
-      using stan::math::cos;
-      using stan::math::log;
-      using stan::math::abs;
       int Km1 = y.size();
       Eigen::Matrix<T,Eigen::Dynamic,1> x(Km1 + 1);
       x(0) = 1.0;
       const T half_pi = T(M_PI/2.0);
       for (size_type k = 1; k <= Km1; ++k) {
         T yk_1 = y(k-1) - half_pi;
-        T sin_y_k_1 = sin(yk_1);
+        T sin_yk_1 = sin(yk_1);
         x(k) = x(k-1)*sin_yk_1; 
         x(k-1) *= cos(yk_1);
       }
@@ -1014,17 +1010,13 @@ namespace stan {
     Eigen::Matrix<T,Eigen::Dynamic,1> 
     unit_vector_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& y, T &lp) {
       typedef typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type size_type;
-      using stan::math::sin;
-      using stan::math::cos;
-      using stan::math::log;
-      using stan::math::abs;
       int Km1 = y.size();
       Eigen::Matrix<T,Eigen::Dynamic,1> x(Km1 + 1);
       x(0) = 1.0;
       const T half_pi = T(M_PI/2.0);
       for (size_type k = 1; k <= Km1; ++k) {
         T yk_1 = y(k-1) - half_pi;
-        T sin_y_k_1 = sin(yk_1);
+        T sin_yk_1 = sin(yk_1);
         x(k) = x(k-1)*sin_yk_1; 
         x(k-1) *= cos(yk_1);
         if (k < Km1)
