@@ -31,9 +31,11 @@
          \tab Michael Betancourt <betanalpha@gmail.com> \cr 
          \tab Marcus Brubaker <mbrubake@cs.toronto.edu>   \cr 
          \tab Bob Carpenter <carp@alias-i.com>   \cr 
+         \tab Yuanjun Gao <yg2312@columbia.edu>  \cr
          \tab Ben Goodrich <bg2382@columbia.edu> \cr 
          \tab Matt Hoffman <mdhoffma@cs.princeton.edu>  \cr 
          \tab Daniel Lee <bearlee@alum.mit.edu>  \cr 
+         \tab Peter Li <li.peter94@gmail.com>  \cr 
          \tab Michael Malecki <malecki@gmail.com>  \cr 
          \tab Andrew Gelman <gelman@stat.columbia.edu> \cr 
   } 
