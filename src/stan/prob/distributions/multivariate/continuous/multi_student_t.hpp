@@ -9,6 +9,9 @@
 #include <stan/math/special_functions.hpp>
 #include <stan/prob/traits.hpp>
 #include <stan/prob/distributions/multivariate/continuous/multi_normal.hpp>
+#include <stan/prob/distributions/univariate/continuous/inv_gamma.hpp>
+
+#include <boost/random/variate_generator.hpp>
 
 namespace stan {
 
@@ -182,7 +185,20 @@ namespace stan {
     }
 
 
+    template <class RNG>
+    inline Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>
+    multi_student_t_rng(double nu,
+			const Eigen::Matrix<double,Eigen::Dynamic,1>& mu,
+                     const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& s,
+                     RNG& rng) {
 
+      Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> zero(s.rows(), 1);
+      for(int k = 0; k < s.rows(); k++)
+	zero(k,0) = 0.0;
+
+      double w = stan::prob::inv_gamma_rng(nu / 2, nu / 2, rng);
+      return mu + std::sqrt(w) * stan::prob::multi_normal_rng(zero, s, rng);
+    }
   }
 }
 #endif
