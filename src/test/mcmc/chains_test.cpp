@@ -413,34 +413,34 @@ TEST_F(McmcChains, blocker_covariance) {
   for (int i = 0; i < chains.num_params(); i++) {
     for (int j = i; j < chains.num_params(); j++) {
       if (++n % 13 == 0) { // test every 13th value
-	Eigen::VectorXd x1(1000), x2(1000), x(2000);
-	Eigen::VectorXd y1(1000), y2(1000), y(2000);
-	x1 << blocker1.samples.col(i);
-	x2 << blocker1.samples.col(j);
+  Eigen::VectorXd x1(1000), x2(1000), x(2000);
+  Eigen::VectorXd y1(1000), y2(1000), y(2000);
+  x1 << blocker1.samples.col(i);
+  x2 << blocker1.samples.col(j);
 
-	y1 << blocker2.samples.col(i);
-	y2 << blocker2.samples.col(j);
+  y1 << blocker2.samples.col(i);
+  y2 << blocker2.samples.col(j);
 
-	x << x1, y1;
-	y << x2, y2;
+  x << x1, y1;
+  y << x2, y2;
       
-	double cov1 = covariance(x1, x2);
-	double cov2 = covariance(y1, y2);
-	double cov = covariance(x, y);
+  double cov1 = covariance(x1, x2);
+  double cov2 = covariance(y1, y2);
+  double cov = covariance(x, y);
       
-	ASSERT_NEAR(cov1, chains.covariance(0,i,j), 1e-8);
-	ASSERT_NEAR(cov2, chains.covariance(1,i,j), 1e-8);
-	ASSERT_NEAR(cov, chains.covariance(i,j), 1e-8);
+  ASSERT_NEAR(cov1, chains.covariance(0,i,j), 1e-8);
+  ASSERT_NEAR(cov2, chains.covariance(1,i,j), 1e-8);
+  ASSERT_NEAR(cov, chains.covariance(i,j), 1e-8);
 
-	ASSERT_NEAR(cov1, chains.covariance(0,j,i), 1e-8);
-	ASSERT_NEAR(cov2, chains.covariance(1,j,i), 1e-8);
-	ASSERT_NEAR(cov, chains.covariance(j,i), 1e-8);
+  ASSERT_NEAR(cov1, chains.covariance(0,j,i), 1e-8);
+  ASSERT_NEAR(cov2, chains.covariance(1,j,i), 1e-8);
+  ASSERT_NEAR(cov, chains.covariance(j,i), 1e-8);
 
-	std::string name1 = chains.param_name(i);
-	std::string name2 = chains.param_name(j);
-	ASSERT_FLOAT_EQ(chains.covariance(0,i,j), chains.covariance(0,name1,name2));
-	ASSERT_FLOAT_EQ(chains.covariance(1,j,i), chains.covariance(1,name2,name1));
-	ASSERT_FLOAT_EQ(chains.covariance(i,j), chains.covariance(name1,name2));
+  std::string name1 = chains.param_name(i);
+  std::string name2 = chains.param_name(j);
+  ASSERT_FLOAT_EQ(chains.covariance(0,i,j), chains.covariance(0,name1,name2));
+  ASSERT_FLOAT_EQ(chains.covariance(1,j,i), chains.covariance(1,name2,name1));
+  ASSERT_FLOAT_EQ(chains.covariance(i,j), chains.covariance(name1,name2));
       }
     }
   }
@@ -457,52 +457,52 @@ TEST_F(McmcChains, blocker_correlation) {
   for (int i = 0; i < chains.num_params(); i++) {
     for (int j = i; j < chains.num_params(); j++) {
       if (++n % 13 == 0) { // test every 13th value
-	Eigen::VectorXd x1(1000), x2(1000), x(2000);
-	Eigen::VectorXd y1(1000), y2(1000), y(2000);
-	x1 << blocker1.samples.col(i);
-	x2 << blocker1.samples.col(j);
+  Eigen::VectorXd x1(1000), x2(1000), x(2000);
+  Eigen::VectorXd y1(1000), y2(1000), y(2000);
+  x1 << blocker1.samples.col(i);
+  x2 << blocker1.samples.col(j);
 
-	y1 << blocker2.samples.col(i);
-	y2 << blocker2.samples.col(j);
+  y1 << blocker2.samples.col(i);
+  y2 << blocker2.samples.col(j);
 
-	x << x1, y1;
-	y << x2, y2;
+  x << x1, y1;
+  y << x2, y2;
       
 
-	double cov1 = covariance(x1, x2);
-	double cov2 = covariance(y1, y2);
-	double cov = covariance(x, y);
+  double cov1 = covariance(x1, x2);
+  double cov2 = covariance(y1, y2);
+  double cov = covariance(x, y);
 
-	double corr1 = 0;
-	double corr2 = 0;
-	double corr = 0;
+  double corr1 = 0;
+  double corr2 = 0;
+  double corr = 0;
 
-	if (std::fabs(cov1) > 1e-8)
-	  corr1 = cov1 / sd(x1) / sd(x2);
-	if (std::fabs(cov2) > 1e-8)
-	  corr2 = cov2 / sd(y1) / sd(y2);
-	if (std::fabs(cov) > 1e-8)
-	  corr = cov / sd(x) / sd(y);
-		
-	ASSERT_NEAR(corr1, chains.correlation(0,i,j), 1e-8)
-	  << "(" << i << ", " << j << ")";
-	ASSERT_NEAR(corr2, chains.correlation(1,i,j), 1e-8)
-	  << "(" << i << ", " << j << ")";
-	ASSERT_NEAR(corr, chains.correlation(i,j), 1e-8)
-	  << "(" << i << ", " << j << ")";
+  if (std::fabs(cov1) > 1e-8)
+    corr1 = cov1 / sd(x1) / sd(x2);
+  if (std::fabs(cov2) > 1e-8)
+    corr2 = cov2 / sd(y1) / sd(y2);
+  if (std::fabs(cov) > 1e-8)
+    corr = cov / sd(x) / sd(y);
+    
+  ASSERT_NEAR(corr1, chains.correlation(0,i,j), 1e-8)
+    << "(" << i << ", " << j << ")";
+  ASSERT_NEAR(corr2, chains.correlation(1,i,j), 1e-8)
+    << "(" << i << ", " << j << ")";
+  ASSERT_NEAR(corr, chains.correlation(i,j), 1e-8)
+    << "(" << i << ", " << j << ")";
 
-	ASSERT_NEAR(corr1, chains.correlation(0,j,i), 1e-8)
-	  << "(" << i << ", " << j << ")";
-	ASSERT_NEAR(corr2, chains.correlation(1,j,i), 1e-8)
-	  << "(" << i << ", " << j << ")";
-	ASSERT_NEAR(corr, chains.correlation(j,i), 1e-8)
-	  << "(" << i << ", " << j << ")";
-	
-	std::string name1 = chains.param_name(i);
-	std::string name2 = chains.param_name(j);
-	ASSERT_FLOAT_EQ(chains.correlation(0,i,j), chains.correlation(0,name1,name2));
-	ASSERT_FLOAT_EQ(chains.correlation(1,j,i), chains.correlation(1,name2,name1));
-	ASSERT_FLOAT_EQ(chains.correlation(i,j), chains.correlation(name1,name2));
+  ASSERT_NEAR(corr1, chains.correlation(0,j,i), 1e-8)
+    << "(" << i << ", " << j << ")";
+  ASSERT_NEAR(corr2, chains.correlation(1,j,i), 1e-8)
+    << "(" << i << ", " << j << ")";
+  ASSERT_NEAR(corr, chains.correlation(j,i), 1e-8)
+    << "(" << i << ", " << j << ")";
+  
+  std::string name1 = chains.param_name(i);
+  std::string name2 = chains.param_name(j);
+  ASSERT_FLOAT_EQ(chains.correlation(0,i,j), chains.correlation(0,name1,name2));
+  ASSERT_FLOAT_EQ(chains.correlation(1,j,i), chains.correlation(1,name2,name1));
+  ASSERT_FLOAT_EQ(chains.correlation(i,j), chains.correlation(name1,name2));
       }
     }
   }
@@ -762,7 +762,7 @@ TEST_F(McmcChains,blocker_effective_sample_size) {
   for (int index = 0; index < chains.num_params(); index++) {
     std::string name = chains.param_name(index);
     ASSERT_EQ(chains.effective_sample_size(index), 
-	      chains.effective_sample_size(name));
+        chains.effective_sample_size(name));
   }
 }
 
@@ -795,7 +795,7 @@ TEST_F(McmcChains,blocker_split_potential_scale_reduction) {
   for (int index = 0; index < chains.num_params(); index++) {
     std::string name = chains.param_name(index);
     ASSERT_EQ(chains.split_potential_scale_reduction(index), 
-	      chains.split_potential_scale_reduction(name));
+        chains.split_potential_scale_reduction(name));
   }
 
 }

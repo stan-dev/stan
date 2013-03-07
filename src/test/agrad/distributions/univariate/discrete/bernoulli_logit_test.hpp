@@ -8,7 +8,7 @@ using stan::agrad::var;
 class AgradDistributionsBernoulliLogistic : public AgradDistributionTest {
 public:
   void valid_values(vector<vector<double> >& parameters,
-		    vector<double>& log_prob) {
+        vector<double>& log_prob) {
     using stan::math::logit;
     using std::exp;
     vector<double> param(2);
@@ -50,7 +50,7 @@ public:
   }
  
   void invalid_values(vector<size_t>& index, 
-		      vector<double>& value) {
+          vector<double>& value) {
     // y
     index.push_back(0U);
     value.push_back(-1);
@@ -62,44 +62,44 @@ public:
   }
 
   template <class T_n, class T_prob, typename T2,
-	    typename T3, typename T4, typename T5, 
-	    typename T6, typename T7, typename T8, 
-	    typename T9>
+      typename T3, typename T4, typename T5, 
+      typename T6, typename T7, typename T8, 
+      typename T9>
   typename stan::return_type<T_n, T_prob>::type 
   log_prob(const T_n& n, const T_prob& theta, const T2&,
-	   const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+     const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
     return stan::prob::bernoulli_logit_log(n, theta);
   }
 
   template <bool propto, 
-	    class T_n, class T_prob, typename T2,
-	    typename T3, typename T4, typename T5, 
-	    typename T6, typename T7, typename T8, 
-	    typename T9>
+      class T_n, class T_prob, typename T2,
+      typename T3, typename T4, typename T5, 
+      typename T6, typename T7, typename T8, 
+      typename T9>
   typename stan::return_type<T_n, T_prob>::type 
   log_prob(const T_n& n, const T_prob& theta, const T2&,
-	   const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+     const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
     return stan::prob::bernoulli_logit_log<propto>(n, theta);
   }
   
   template <bool propto, 
-	    class T_n, class T_prob, typename T2,
-	    typename T3, typename T4, typename T5, 
-	    typename T6, typename T7, typename T8, 
-	    typename T9, 
-	    class Policy>
+      class T_n, class T_prob, typename T2,
+      typename T3, typename T4, typename T5, 
+      typename T6, typename T7, typename T8, 
+      typename T9, 
+      class Policy>
   typename stan::return_type<T_n, T_prob>::type 
   log_prob(const T_n& n, const T_prob& theta, const T2&,
-	   const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+     const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
     return stan::prob::bernoulli_logit_log<propto>(n, theta, Policy());
   }
   
   template <class T_n, class T_prob, typename T2,
-	    typename T3, typename T4, typename T5, 
-	    typename T6, typename T7, typename T8, 
-	    typename T9>
+      typename T3, typename T4, typename T5, 
+      typename T6, typename T7, typename T8, 
+      typename T9>
   var log_prob_function(const T_n& n, const T_prob& theta, const T2&,
-			const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+      const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
     using std::log;
     using stan::math::log1m;
     using stan::prob::include_summand;
@@ -109,11 +109,11 @@ public:
       // Handle extreme values gracefully using Taylor approximations.
       const static double cutoff = 20.0;
       if (ntheta > cutoff)
-	return -exp(-ntheta);
+  return -exp(-ntheta);
       else if (ntheta < -cutoff)
-	return ntheta;
+  return ntheta;
       else
-	return -log(1 + exp(-ntheta));
+  return -log(1 + exp(-ntheta));
     }
     return 0.0;
   }

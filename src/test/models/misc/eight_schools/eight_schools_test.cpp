@@ -45,5 +45,5 @@ public:
 };
 
 INSTANTIATE_TYPED_TEST_CASE_P(Models_Misc_EightSchools,
-			      Model_Test_Fixture,
-			      Models_Misc_EightSchools);
+            Model_Test_Fixture,
+            Models_Misc_EightSchools);

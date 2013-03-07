@@ -32,7 +32,7 @@ TEST(ProbDistributionsLogistic, chiSquareGoodnessFitTest) {
     double a = stan::prob::logistic_rng(9.0,4.0,rng);
     int i = 0;
     while (i < K-1 && a > loc[i]) 
-	++i;
+  ++i;
     ++bin[i];
     count++;
    }

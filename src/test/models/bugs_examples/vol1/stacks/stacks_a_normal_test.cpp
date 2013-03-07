@@ -61,5 +61,5 @@ public:
 };
 
 INSTANTIATE_TYPED_TEST_CASE_P(Models_BugsExamples_Vol1_Stacks_A_Normal,
-			      Model_Test_Fixture,
-			      Models_BugsExamples_Vol1_Stacks_A_Normal);
+            Model_Test_Fixture,
+            Models_BugsExamples_Vol1_Stacks_A_Normal);

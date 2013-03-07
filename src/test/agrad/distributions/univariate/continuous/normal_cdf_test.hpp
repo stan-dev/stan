@@ -8,7 +8,7 @@ using stan::agrad::var;
 class AgradCdfNormal : public AgradCdfTest {
 public:
   void valid_values(vector<vector<double> >& parameters,
-		    vector<double>& cdf) {
+        vector<double>& cdf) {
     vector<double> param(3);
 
     param[0] = 0;           // y
@@ -37,7 +37,7 @@ public:
   }
   
   void invalid_values(vector<size_t>& index, 
-		      vector<double>& value) {
+          vector<double>& value) {
     // y
     
     // mu
@@ -67,9 +67,9 @@ public:
   }
 
   template <typename T_y, typename T_loc, typename T_scale,
-	    typename T3, typename T4, typename T5, 
-	    typename T6, typename T7, typename T8, 
-	    typename T9>
+      typename T3, typename T4, typename T5, 
+      typename T6, typename T7, typename T8, 
+      typename T9>
   typename stan::return_type<T_y, T_loc, T_scale>::type 
   cdf(const T_y& y, const T_loc& mu, const T_scale& sigma,
       const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
@@ -77,10 +77,10 @@ public:
   }
 
   template <typename T_y, typename T_loc, typename T_scale,
-	    typename T3, typename T4, typename T5, 
-	    typename T6, typename T7, typename T8, 
-	    typename T9,
-	    typename Policy>
+      typename T3, typename T4, typename T5, 
+      typename T6, typename T7, typename T8, 
+      typename T9,
+      typename Policy>
   typename stan::return_type<T_y, T_loc, T_scale>::type 
   cdf(const T_y& y, const T_loc& mu, const T_scale& sigma,
       const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
@@ -88,12 +88,12 @@ public:
   }
 
   template <typename T_y, typename T_loc, typename T_scale,
-	    typename T3, typename T4, typename T5, 
-	    typename T6, typename T7, typename T8, 
-	    typename T9>
+      typename T3, typename T4, typename T5, 
+      typename T6, typename T7, typename T8, 
+      typename T9>
   typename stan::return_type<T_y, T_loc, T_scale>::type 
   cdf_function(const T_y& y, const T_loc& mu, const T_scale& sigma,
-	       const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+         const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
     using stan::math::SQRT_2;
     return (0.5 + 0.5 * erf((y - mu) / (sigma * SQRT_2)));
   }

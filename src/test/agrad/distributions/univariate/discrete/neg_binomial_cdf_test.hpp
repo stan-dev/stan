@@ -10,7 +10,7 @@ using stan::agrad::var;
 class AgradCdfNegBinomial : public AgradCdfTest {
 public:
   void valid_values(vector<vector<double> >& parameters,
-		    vector<double>& cdf) {
+        vector<double>& cdf) {
     vector<double> param(3);
 
     param[0] = 15;          // Failures/Counts
@@ -21,7 +21,7 @@ public:
   }
   
   void invalid_values(vector<size_t>& index, 
-		      vector<double>& value) {
+          vector<double>& value) {
 
     // Successes/Shape
     index.push_back(1U);
@@ -42,9 +42,9 @@ public:
   }
 
   template <typename T_n, typename T_shape, typename T_inv_scale,
-	    typename T3, typename T4, typename T5, 
-	    typename T6, typename T7, typename T8, 
-	    typename T9>
+      typename T3, typename T4, typename T5, 
+      typename T6, typename T7, typename T8, 
+      typename T9>
   typename stan::return_type<T_shape, T_inv_scale>::type
   cdf(const T_n& n, const T_shape& alpha, const T_inv_scale& beta,
       const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
@@ -52,10 +52,10 @@ public:
   }
 
   template <typename T_n, typename T_shape, typename T_inv_scale,
-	    typename T3, typename T4, typename T5, 
-	    typename T6, typename T7, typename T8, 
-	    typename T9,
-	    typename Policy>
+      typename T3, typename T4, typename T5, 
+      typename T6, typename T7, typename T8, 
+      typename T9,
+      typename Policy>
   typename stan::return_type<T_shape, T_inv_scale>::type
   cdf(const T_n& n, const T_shape& alpha, const T_inv_scale& beta,
       const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
@@ -63,12 +63,12 @@ public:
   }
 
   template <typename T_n, typename T_shape, typename T_inv_scale,
-	    typename T3, typename T4, typename T5, 
-	    typename T6, typename T7, typename T8, 
-	    typename T9>
+      typename T3, typename T4, typename T5, 
+      typename T6, typename T7, typename T8, 
+      typename T9>
   typename stan::return_type<T_shape, T_inv_scale>::type
   cdf_function(const T_n& n, const T_shape& alpha, const T_inv_scale& beta,
-	       const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+         const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
 
     using std::log;
     using std::exp;

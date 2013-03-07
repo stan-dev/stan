@@ -72,6 +72,7 @@ namespace stan {
      }
 
 
+    template <bool isLHS>
     void generate_indexed_expr(const std::string& expr,
                                const std::vector<expression> indexes, 
                                base_expr_type base_type, // may have more dims
@@ -87,7 +88,7 @@ namespace stan {
       }
       if (ai_size <= (e_num_dims + 1) || base_type != MATRIX_T) {
         for (size_t n = 0; n < ai_size; ++n)
-          o << "get_base1(";
+          o << (isLHS ? "get_base1_lhs(" : "get_base1(");
         o << expr;
         for (size_t n = 0; n < ai_size; ++n) {
           o << ',';
@@ -96,7 +97,7 @@ namespace stan {
         }
       } else { 
         for (size_t n = 0; n < ai_size - 1; ++n)
-          o << "get_base1(";
+          o << (isLHS ? "get_base1_lhs(" : "get_base1(");
         o << expr;
         for (size_t n = 0; n < ai_size - 2; ++n) {
           o << ',';
@@ -170,7 +171,7 @@ namespace stan {
         for (size_t i = 0; i < x.dimss_.size(); ++i)
           for (size_t j = 0; j < x.dimss_[i].size(); ++j) 
             indexes.push_back(x.dimss_[i][j]); // wasteful copy, could use refs
-        generate_indexed_expr(expr_string,indexes,base_type,e_num_dims,o_);
+        generate_indexed_expr<false>(expr_string,indexes,base_type,e_num_dims,o_);
       }
       void operator()(const fun& fx) const { 
         o_ << fx.name_ << '(';
@@ -360,6 +361,9 @@ namespace stan {
       void operator()(row_vector_var_decl const& x) const {
         generate_validate_context_size(o_,stage_,x.name_,"row_vector_d",x.dims_,x.N_);
       }
+      void operator()(unit_vector_var_decl const& x) const {
+        generate_validate_context_size(o_,stage_,x.name_,"vector_d",x.dims_,x.K_);
+      }
       void operator()(simplex_var_decl const& x) const {
         generate_validate_context_size(o_,stage_,x.name_,"vector_d",x.dims_,x.K_);
       }
@@ -446,6 +450,9 @@ namespace stan {
       void operator()(row_vector_var_decl const& x) const {
         generate_initialization(o_,x.name_,"row_vector_d",x.dims_,x.N_);
       }
+      void operator()(unit_vector_var_decl const& x) const {
+        generate_initialization(o_,x.name_,"vector_d",x.dims_,x.K_);
+      }
       void operator()(simplex_var_decl const& x) const {
         generate_initialization(o_,x.name_,"vector_d",x.dims_,x.K_);
       }
@@ -529,6 +536,11 @@ namespace stan {
         read_args.push_back(x.M_);
         read_args.push_back(x.N_);
         generate_initialize_array_bounded(x,is_var_?"matrix_v":"matrix_d","matrix",read_args);
+      }
+      void operator()(const unit_vector_var_decl& x) const {
+        std::vector<expression> read_args;
+        read_args.push_back(x.K_);
+        generate_initialize_array(is_var_?"vector_v":"vector_d","unit_vector",read_args,x.name_,x.dims_);
       }
       void operator()(const simplex_var_decl& x) const {
         std::vector<expression> read_args;
@@ -741,6 +753,9 @@ namespace stan {
         o_ << "\"); } catch (std::domain_error& e) { throw std::domain_error(std::string(\"Invalid value of " << x.name_ << ": \") + std::string(e.what())); };" << EOL;
         generate_end_for_dims(x.dims_.size());
       }
+      void operator()(unit_vector_var_decl const& x) const {
+        nonbasic_validate(x,"unit_vector");
+      }
       void operator()(simplex_var_decl const& x) const {
         nonbasic_validate(x,"simplex");
       }
@@ -787,6 +802,9 @@ namespace stan {
       }
       void operator()(double_var_decl const& x) const {
         declare_array("double",x.name_,x.dims_.size());
+      }
+      void operator()(unit_vector_var_decl const& x) const {
+        declare_array(("vector_d"), x.name_, x.dims_.size());
       }
       void operator()(simplex_var_decl const& x) const {
         declare_array(("vector_d"), x.name_, x.dims_.size());
@@ -876,6 +894,12 @@ namespace stan {
         ctor_args.push_back(x.M_);
         ctor_args.push_back(x.N_);
         declare_array(is_var_ ? "matrix_v" : "matrix_d", 
+                      ctor_args, x.name_, x.dims_);
+      }
+      void operator()(unit_vector_var_decl const& x) const {
+        std::vector<expression> ctor_args;
+        ctor_args.push_back(x.K_);
+        declare_array(is_var_ ? "vector_v" : "vector_d", 
                       ctor_args, x.name_, x.dims_);
       }
       void operator()(simplex_var_decl const& x) const {
@@ -1027,6 +1051,10 @@ namespace stan {
         generate_indent(indent_,o_);
         o_ << "stan::agrad::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
       }
+      void operator()(unit_vector_var_decl const& x) const {
+        generate_indent(indent_,o_);
+        o_ << "stan::agrad::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
+      }
       void operator()(simplex_var_decl const& x) const {
         generate_indent(indent_,o_);
         o_ << "stan::agrad::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
@@ -1081,6 +1109,11 @@ namespace stan {
       void operator()(vector_var_decl const& x) const {
         std::vector<expression> dims(x.dims_);
         dims.push_back(x.M_);
+        validate_array(x.name_,dims,1);
+      }
+      void operator()(unit_vector_var_decl const& x) const {
+        std::vector<expression> dims(x.dims_);
+        dims.push_back(x.K_);
         validate_array(x.name_,dims,1);
       }
       void operator()(simplex_var_decl const& x) const {
@@ -1199,11 +1232,11 @@ namespace stan {
       void operator()(assignment const& x) const {
         generate_indent(indent_,o_);
         o_ << "assign(";
-        generate_indexed_expr(x.var_dims_.name_,
-                              x.var_dims_.dims_,
-                              x.var_type_.base_type_,
-                              x.var_type_.dims_.size(),
-                              o_);
+        generate_indexed_expr<true>(x.var_dims_.name_,
+                                    x.var_dims_.dims_,
+                                    x.var_type_.base_type_,
+                                    x.var_type_.dims_.size(),
+                                    o_);
         o_ << ", ";
         generate_expression(x.expr_,o_);
         o_ << ");" << EOL;
@@ -1600,6 +1633,40 @@ namespace stan {
         }
         o_ << INDENT2 << "}" << EOL;
       }
+      // same as simplex
+      void operator()(unit_vector_var_decl const& x) const {
+        std::vector<expression> dims = x.dims_;
+        var_size_validator_(x);
+        var_resizer_(x);
+        o_ << INDENT2 << "vals_r__ = context__.vals_r(\"" << x.name_ << "\");" << EOL;
+        o_ << INDENT2 << "pos__ = 0;" << EOL;
+        o_ << INDENT2 << "size_t " << x.name_ << "_i_vec_lim__ = ";
+        generate_expression(x.K_,o_);
+        o_ << ";" << EOL;
+        o_ << INDENT2 << "for (size_t " << "i_vec__ = 0; " << "i_vec__ < " << x.name_ << "_i_vec_lim__; ++i_vec__) {" << EOL;
+        size_t indentation = 2;
+        for (size_t dim_up = 0U; dim_up < dims.size(); ++dim_up) {
+          size_t dim = dims.size() - dim_up - 1U;
+          ++indentation;
+          generate_indent(indentation,o_);
+          o_ << "size_t " << x.name_ << "_limit_" << dim << "__ = ";
+          generate_expression(dims[dim],o_);
+          o_ << ";" << EOL;
+          generate_indent(indentation,o_);
+          o_ << "for (size_t i_" << dim << "__ = 0; i_" << dim << "__ < " << x.name_ << "_limit_" << dim << "__; ++i_" << dim << "__) {" << EOL;
+        }
+        generate_indent(indentation+1,o_);
+        o_ << x.name_;
+        for (size_t dim = 0; dim < dims.size(); ++dim)
+          o_ << "[i_" << dim << "__]";
+        o_ << "[i_vec__]";
+        o_ << " = vals_r__[pos__++];" << EOL;
+        for (size_t dim = 0; dim < dims.size(); ++dim) {
+          generate_indent(dims.size() + 2 - dim,o_);
+          o_ << "}" << EOL;
+        }
+        o_ << INDENT2 << "}" << EOL;
+      }
       // diff name of dims from vector
       void operator()(simplex_var_decl const& x) const {
         std::vector<expression> dims = x.dims_;
@@ -1936,6 +2003,13 @@ namespace stan {
         generate_write_loop(function_args("matrix",x),
                             x.name_,x.dims_);
       }
+      void operator()(unit_vector_var_decl const& x) const {
+        generate_check_double(x.name_,x.dims_.size() + 1);
+        var_size_validator_(x);
+        generate_declaration(x.name_,"vector_d",x.dims_,x.K_);
+        generate_buffer_loop("r",x.name_,x.dims_,x.K_);
+        generate_write_loop("unit_vector_unconstrain(",x.name_,x.dims_);
+      }
       void operator()(simplex_var_decl const& x) const {
         generate_check_double(x.name_,x.dims_.size() + 1);
         var_size_validator_(x);
@@ -2125,6 +2199,11 @@ namespace stan {
         matrix_args.push_back(x.N_);
         generate_dims_array(matrix_args,x.dims_);
       }
+      void operator()(const unit_vector_var_decl& x) const {
+        std::vector<expression> matrix_args;
+        matrix_args.push_back(x.K_);
+        generate_dims_array(matrix_args,x.dims_);
+      }
       void operator()(const simplex_var_decl& x) const {
         std::vector<expression> matrix_args;
         matrix_args.push_back(x.K_);
@@ -2222,6 +2301,9 @@ namespace stan {
       void operator()(const matrix_var_decl& x) const {
         generate_param_names(x.name_);
       }
+      void operator()(const unit_vector_var_decl& x) const {
+        generate_param_names(x.name_);
+      }
       void operator()(const simplex_var_decl& x) const {
         generate_param_names(x.name_);
       }
@@ -2301,6 +2383,11 @@ namespace stan {
         std::vector<expression> matrix_args;
         matrix_args.push_back(x.M_);
         matrix_args.push_back(x.N_);
+        generate_csv_header_array(matrix_args,x.name_,x.dims_);
+      }
+      void operator()(const unit_vector_var_decl& x) const {
+        std::vector<expression> matrix_args;
+        matrix_args.push_back(x.K_);
         generate_csv_header_array(matrix_args,x.name_,x.dims_);
       }
       void operator()(const simplex_var_decl& x) const {
@@ -2440,6 +2527,11 @@ namespace stan {
         read_args.push_back(x.N_);
         generate_initialize_array_bounded(x,"matrix_d","matrix",read_args);
       }
+      void operator()(const unit_vector_var_decl& x) const {
+        std::vector<expression> read_args;
+        read_args.push_back(x.K_);
+        generate_initialize_array("vector_d","unit_vector",read_args,x.name_,x.dims_);
+      }
       void operator()(const simplex_var_decl& x) const {
         std::vector<expression> read_args;
         read_args.push_back(x.K_);
@@ -2554,6 +2646,9 @@ namespace stan {
         write_array(x.name_,x.dims_);
       }
       void operator()(const matrix_var_decl& x) const {
+        write_array(x.name_,x.dims_);
+      }
+      void operator()(const unit_vector_var_decl& x) const {
         write_array(x.name_,x.dims_);
       }
       void operator()(const simplex_var_decl& x) const {
@@ -2724,6 +2819,11 @@ namespace stan {
         read_args.push_back(x.N_);
         generate_initialize_array_bounded(x,"matrix_d","matrix",read_args);
       }
+      void operator()(const unit_vector_var_decl& x) const {
+        std::vector<expression> read_args;
+        read_args.push_back(x.K_);
+        generate_initialize_array("vector_d","unit_vector",read_args,x.name_,x.dims_);
+      }
       void operator()(const simplex_var_decl& x) const {
         std::vector<expression> read_args;
         read_args.push_back(x.K_);
@@ -2849,6 +2949,11 @@ namespace stan {
         matdims.push_back(x.M_);
         matdims.push_back(x.N_);
         write_array(x.name_,x.dims_,matdims);
+      }
+      void operator()(const unit_vector_var_decl& x) const {
+        std::vector<expression> dims(x.dims_);
+        dims.push_back(x.K_);
+        write_array(x.name_,dims,EMPTY_EXP_VECTOR);
       }
       void operator()(const simplex_var_decl& x) const {
         std::vector<expression> dims(x.dims_);
@@ -3033,6 +3138,17 @@ namespace stan {
       }
       void operator()(const matrix_var_decl& x) const {
         generate_increment(x.M_,x.N_,x.dims_);
+      }
+      void operator()(const unit_vector_var_decl& x) const {
+        // only K-1 vals
+        o_ << INDENT2 << "num_params_r__ += (";
+        generate_expression(x.K_,o_);
+        o_ << " - 1)";
+        for (size_t i = 0; i < x.dims_.size(); ++i) {
+          o_ << " * ";
+          generate_expression(x.dims_[i],o_);
+        }
+        o_ << ";" << EOL;
       }
       void operator()(const simplex_var_decl& x) const {
         // only K-1 vals

@@ -27,7 +27,7 @@ using stan::math::value_of;
 class AgradDistributionTest {
 public:
   virtual void valid_values(vector<vector<double> >& /*parameters*/,
-			    vector<double>& /* log_prob */) {
+          vector<double>& /* log_prob */) {
     throw std::runtime_error("valid_values() not implemented");
   }
   
@@ -40,44 +40,44 @@ public:
   // also include 4 templated functions:
   /*
   template <typename T_y, typename T_loc, typename T_scale,
-	    typename T3, typename T4, typename T5, 
-	    typename T6, typename T7, typename T8, 
-	    typename T9>
+      typename T3, typename T4, typename T5, 
+      typename T6, typename T7, typename T8, 
+      typename T9>
   typename stan::return_type<T_y, T_loc, T_scale>::type 
   log_prob(const T_y& y, const T_loc& mu, const T_scale& sigma,
-	   const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+     const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
     return stan::prob::normal_log(y, mu, sigma);
   }
 
   template <bool propto, 
-	    typename T_y, typename T_loc, typename T_scale,
-	    typename T3, typename T4, typename T5, 
-	    typename T6, typename T7, typename T8, 
-	    typename T9>
+      typename T_y, typename T_loc, typename T_scale,
+      typename T3, typename T4, typename T5, 
+      typename T6, typename T7, typename T8, 
+      typename T9>
   typename stan::return_type<T_y, T_loc, T_scale>::type 
   log_prob(const T_y& y, const T_loc& mu, const T_scale& sigma,
-	   const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+     const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
     return stan::prob::normal_log<propto>(y, mu, sigma);
   }
   
   template <bool propto, 
-	    typename T_y, typename T_loc, typename T_scale,
-	    typename T3, typename T4, typename T5, 
-	    typename T6, typename T7, typename T8, 
-	    typename T9, 
-	    class Policy>
+      typename T_y, typename T_loc, typename T_scale,
+      typename T3, typename T4, typename T5, 
+      typename T6, typename T7, typename T8, 
+      typename T9, 
+      class Policy>
   typename stan::return_type<T_y, T_loc, T_scale>::type 
   log_prob(const T_y& y, const T_loc& mu, const T_scale& sigma,
-	   const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+     const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
     return stan::prob::normal_log<propto>(y, mu, sigma, Policy());
   }
   
   template <typename T_y, typename T_loc, typename T_scale,
-	    typename T3, typename T4, typename T5, 
-	    typename T6, typename T7, typename T8, 
-	    typename T9>
+      typename T3, typename T4, typename T5, 
+      typename T6, typename T7, typename T8, 
+      typename T9>
   var log_prob_function(const T_y& y, const T_loc& mu, const T_scale& sigma,
-			const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+      const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
     using stan::prob::include_summand;
     using stan::math::pi;
     using stan::math::square;
@@ -97,7 +97,7 @@ public:
 class AgradCdfTest {
 public:
   virtual void valid_values(vector<vector<double> >& /*parameters*/,
-			    vector<double>& /* cdf */) {
+          vector<double>& /* cdf */) {
     throw std::runtime_error("valid_values() not implemented");
   }
   
@@ -126,33 +126,33 @@ public:
   // also include 3 templated functions:
   /*
   template <typename T_y, typename T_loc, typename T_scale,
-	    typename T3, typename T4, typename T5, 
-	    typename T6, typename T7, typename T8, 
-	    typename T9>
+      typename T3, typename T4, typename T5, 
+      typename T6, typename T7, typename T8, 
+      typename T9>
   typename stan::return_type<T_y, T_loc, T_scale>::type 
   cdf(const T_y& y, const T_loc& mu, const T_scale& sigma,
-	   const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+     const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
     return stan::prob::normal_cdf(y, mu, sigma);
   }
 
   template <typename T_y, typename T_loc, typename T_scale,
-	    typename T3, typename T4, typename T5, 
-	    typename T6, typename T7, typename T8, 
-	    typename T9,
-	    Policy>
+      typename T3, typename T4, typename T5, 
+      typename T6, typename T7, typename T8, 
+      typename T9,
+      Policy>
   typename stan::return_type<T_y, T_loc, T_scale>::type 
   cdf(const T_y& y, const T_loc& mu, const T_scale& sigma,
-	   const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+     const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
     return stan::prob::normal_cdf(y, mu, sigma, Policy());
   }
 
   template <typename T_y, typename T_loc, typename T_scale,
-	    typename T3, typename T4, typename T5, 
-	    typename T6, typename T7, typename T8, 
-	    typename T9>
+      typename T3, typename T4, typename T5, 
+      typename T6, typename T7, typename T8, 
+      typename T9>
   typename stan::return_type<T_y, T_loc, T_scale>::type 
   cdf_function(const T_y& y, const T_loc& mu, const T_scale& sigma,
-	       const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+         const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
       using stan::math::erf;
       return (0.5 + 0.5 * erf((y - mu) / (sigma * SQRT_2)));
   }
@@ -203,28 +203,28 @@ public:
     T9 p9 = get_params<T9>(parameters, 9);
     
     EXPECT_NO_THROW(({ TestClass.template log_prob
-	    <T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>
-	    (p0, p1, p2, p3, p4, p5, p6, p7, p8, p9); }))
+      <T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>
+      (p0, p1, p2, p3, p4, p5, p6, p7, p8, p9); }))
       << "Calling log_prob throws exception with default parameters";
 
     EXPECT_NO_THROW(({ TestClass.template log_prob
-	    <true, T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>
-	    (p0, p1, p2, p3, p4, p5, p6, p7, p8, p9); }))
+      <true, T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>
+      (p0, p1, p2, p3, p4, p5, p6, p7, p8, p9); }))
       << "Calling log_prob throws exception with propto=true";
 
     EXPECT_NO_THROW(({ TestClass.template log_prob
-	    <false, T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>
-	    (p0, p1, p2, p3, p4, p5, p6, p7, p8, p9); }))
+      <false, T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>
+      (p0, p1, p2, p3, p4, p5, p6, p7, p8, p9); }))
       << "Calling log_prob throws exception with propto=false";
     
     EXPECT_NO_THROW(({ TestClass.template log_prob
-	    <true, T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, errno_policy>
-	    (p0, p1, p2, p3, p4, p5, p6, p7, p8, p9); }))
+      <true, T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, errno_policy>
+      (p0, p1, p2, p3, p4, p5, p6, p7, p8, p9); }))
       << "Calling log_prob throws exception with propto=true, errno_policy";
 
     EXPECT_NO_THROW(({ TestClass.template log_prob
-	    <false, T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, errno_policy>
-	    (p0, p1, p2, p3, p4, p5, p6, p7, p8, p9); }))
+      <false, T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, errno_policy>
+      (p0, p1, p2, p3, p4, p5, p6, p7, p8, p9); }))
       << "Calling log_prob throws exception with propto=false, errno_policy";
   }
 
@@ -247,30 +247,30 @@ public:
 
       var lp(0);
       EXPECT_NO_THROW(({ lp = TestClass.template log_prob
-	      <true,T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>
-	      (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9); }))
-	<< "Valid parameters failed at index: " << n << " -- " 
-	<< parameters[n];
+        <true,T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>
+        (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9); }))
+  << "Valid parameters failed at index: " << n << " -- " 
+  << parameters[n];
 
       if (all_constant<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
-	// all double inputs should result in a log probability of 0
+  // all double inputs should result in a log probability of 0
         EXPECT_FLOAT_EQ(0.0, lp.val())
           << "All constant inputs should result in 0 log probability. Failed at index: " << n;
       }
       if (all_scalar<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
-	lp = TestClass.template log_prob
-	  <false,T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>
-	  (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
-	EXPECT_FLOAT_EQ(log_prob[n], lp.val())
-	  << "For all scalar inputs, when propto is false, log_prob should match the provided value. Failed at index: " << n;
+  lp = TestClass.template log_prob
+    <false,T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>
+    (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
+  EXPECT_FLOAT_EQ(log_prob[n], lp.val())
+    << "For all scalar inputs, when propto is false, log_prob should match the provided value. Failed at index: " << n;
       }
       if (all_constant<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value 
-	  && all_scalar<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
-	lp = TestClass.template log_prob
-	  <T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>
-	  (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
-	EXPECT_FLOAT_EQ(log_prob[n], lp.val())
-	  << "For all scalar and all constant inputs log_prob should match the provided value. Failed at index: " << n;
+    && all_scalar<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
+  lp = TestClass.template log_prob
+    <T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>
+    (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
+  EXPECT_FLOAT_EQ(log_prob[n], lp.val())
+    << "For all scalar and all constant inputs log_prob should match the provided value. Failed at index: " << n;
       }
     }
   }
@@ -292,15 +292,15 @@ public:
     Scalar9 p9 = get_param<Scalar9>(invalid_params, 9);
       
     EXPECT_THROW(({ TestClass.template log_prob
-	    <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9>
-	    (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9); }),
+      <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9>
+      (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9); }),
       std::domain_error) 
       << "NaN value at index " << n << " did not fail with the default policy" << std::endl
       << invalid_params;
       
     EXPECT_NO_THROW(({ lp = TestClass.template log_prob
-	    <true,Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9,errno_policy>
-	    (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9); }))
+      <true,Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9,errno_policy>
+      (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9); }))
       << "NaN value at index " << n << " with the errno_policy throws exception when it should not" << std::endl
       << invalid_params;
     EXPECT_TRUE(std::isnan(lp.val())) 
@@ -335,20 +335,20 @@ public:
       Scalar9 p9 = get_param<Scalar9>(invalid_params, 9);
 
       EXPECT_THROW(({ TestClass.template log_prob
-	      <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9>
-	      (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9); }),
-		   std::domain_error) 
-	<< "Invalid value " << n << " did not fail with the default policy" << std::endl
-	<< invalid_params;
+        <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9>
+        (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9); }),
+       std::domain_error) 
+  << "Invalid value " << n << " did not fail with the default policy" << std::endl
+  << invalid_params;
       
       EXPECT_NO_THROW(({ lp = TestClass.template log_prob
-	      <true,Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9,errno_policy>
-	      (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9); }))
-	<< "Invalid value " << n << " with the errno_policy throws exception when it should not" << std::endl
-	<< invalid_params;
+        <true,Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9,errno_policy>
+        (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9); }))
+  << "Invalid value " << n << " with the errno_policy throws exception when it should not" << std::endl
+  << invalid_params;
       EXPECT_TRUE(std::isnan(lp.val())) 
-	<< "Invalid value " << n << " with the errno_policy should return NaN. Returns " << lp << std::endl
-	<< invalid_params;
+  << "Invalid value " << n << " with the errno_policy should return NaN. Returns " << lp << std::endl
+  << invalid_params;
     }
     if (std::numeric_limits<Scalar0>::has_quiet_NaN && parameters.size() > 0) 
       test_nan_value(parameters, 0);
@@ -399,13 +399,13 @@ public:
       Scalar9 p9 = get_param<Scalar9>(parameters[0], 9);
 
       reference_logprob_true 
-	= TestClass.template log_prob
-	<true,Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9>
-	(p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
+  = TestClass.template log_prob
+  <true,Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9>
+  (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
       reference_logprob_false 
-	= TestClass.template log_prob
-	<false,Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9>
-	(p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
+  = TestClass.template log_prob
+  <false,Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9>
+  (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
     }
     
     for (size_t n = 0; n < parameters.size(); n++) {
@@ -421,29 +421,29 @@ public:
       Scalar9 p9 = select_var_param<T9>(parameters, n, 9);
 
       var logprob_true
-	= TestClass.template log_prob
-	<true,Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9>
-	(p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
+  = TestClass.template log_prob
+  <true,Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9>
+  (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
       var logprob_false
-	= TestClass.template log_prob
-	<false,Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9>
-	(p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
+  = TestClass.template log_prob
+  <false,Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9>
+  (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
 
       EXPECT_FLOAT_EQ(reference_logprob_false.val() - logprob_false.val(),
                       reference_logprob_true.val() - logprob_true.val())
-	<< "Proportional test failed at index: " << n << std::endl
-	<< "  reference params: " << parameters[0] << std::endl
-	<< "  current params:   " << parameters[n] << std::endl
-	<< "  ref<true> = " << reference_logprob_true << std::endl
-	<< "  cur<true> = " << logprob_true << std::endl
-	<< "  ref<false> = " << reference_logprob_false << std::endl
-	<< "  cur<false> = " << logprob_false;
+  << "Proportional test failed at index: " << n << std::endl
+  << "  reference params: " << parameters[0] << std::endl
+  << "  current params:   " << parameters[n] << std::endl
+  << "  ref<true> = " << reference_logprob_true << std::endl
+  << "  cur<true> = " << logprob_true << std::endl
+  << "  ref<false> = " << reference_logprob_false << std::endl
+  << "  cur<false> = " << logprob_false;
     }
   }
 
   void add_finite_diff(const vector<double>& params, 
-		       vector<double>& finite_diff, 
-		       const size_t n) {
+           vector<double>& finite_diff, 
+           const size_t n) {
     const double e = 1e-8;
     const double e2 = 2 * e;
 
@@ -551,13 +551,13 @@ public:
       calculate_gradients(parameters[n], gradients);
 
       ASSERT_EQ(finite_diffs.size(), gradients.size()) 
-	<< "Number of finite diff gradients and calculated gradients must match -- error in test fixture";
+  << "Number of finite diff gradients and calculated gradients must match -- error in test fixture";
       for (size_t i = 0; i < finite_diffs.size(); i++) {
-	EXPECT_NEAR(finite_diffs[i], gradients[i], 1e-4)
-	  << "Comparison of finite diff to calculated gradient failed for i=" << i 
-	  << ": " << parameters[n] << std::endl 
-	  << "  finite diffs: " << finite_diffs << std::endl
-	  << "  grads:        " << gradients;
+  EXPECT_NEAR(finite_diffs[i], gradients[i], 1e-4)
+    << "Comparison of finite diff to calculated gradient failed for i=" << i 
+    << ": " << parameters[n] << std::endl 
+    << "  finite diffs: " << finite_diffs << std::endl
+    << "  grads:        " << gradients;
       }
     }
   }
@@ -583,30 +583,30 @@ public:
       calculate_gradients(parameters[n], gradients);
 
       ASSERT_EQ(expected_gradients.size(), gradients.size()) 
-	<< "Number of expected gradients and calculated gradients must match -- error in test fixture";
+  << "Number of expected gradients and calculated gradients must match -- error in test fixture";
       for (size_t i = 0; i < expected_gradients.size(); i++) {
-	EXPECT_FLOAT_EQ(expected_gradients[i], gradients[i])
-	  << "Comparison of expected gradient to calculated gradient failed";
+  EXPECT_FLOAT_EQ(expected_gradients[i], gradients[i])
+    << "Comparison of expected gradient to calculated gradient failed";
       }
     }
   }
 
   void test_multiple_gradient_values(const bool is_vec,
-				     const vector<double>& single_gradients, size_t& pos_single,
-				     const vector<double>& multiple_gradients, size_t& pos_multiple,
-				     const size_t N_REPEAT) {
+             const vector<double>& single_gradients, size_t& pos_single,
+             const vector<double>& multiple_gradients, size_t& pos_multiple,
+             const size_t N_REPEAT) {
     if (is_vec) {
       for (size_t i = 0; i < N_REPEAT; i++) {
-	EXPECT_FLOAT_EQ(single_gradients[pos_single],
-			multiple_gradients[pos_multiple])
-	  << "Comparison of single_gradient value to vectorized gradient failed";
-	pos_multiple++;
+  EXPECT_FLOAT_EQ(single_gradients[pos_single],
+      multiple_gradients[pos_multiple])
+    << "Comparison of single_gradient value to vectorized gradient failed";
+  pos_multiple++;
       }
       pos_single++; 
     } else {
       EXPECT_FLOAT_EQ(single_gradients[pos_single]*double(N_REPEAT), 
-		      multiple_gradients[pos_multiple])
-	<< "Comparison of single_gradient value to vectorized gradient failed";
+          multiple_gradients[pos_multiple])
+  << "Comparison of single_gradient value to vectorized gradient failed";
       pos_single++; pos_multiple++;
     }
   }
@@ -650,61 +650,61 @@ public:
       
 
       EXPECT_FLOAT_EQ(N_REPEAT * single_lp, multiple_lp.val())
-	<< "log prob with repeated vector input should match "
-	<< "a multiple of log prob of single input";
+  << "log prob with repeated vector input should match "
+  << "a multiple of log prob of single input";
 
       size_t pos_single = 0;
       size_t pos_multiple = 0;
       if (!is_constant_struct<T0>::value && !is_empty<T0>::value)
-	test_multiple_gradient_values(is_vector<T0>::value, 
-				      single_gradients, pos_single,
-				      multiple_gradients, pos_multiple,
-				      N_REPEAT);
+  test_multiple_gradient_values(is_vector<T0>::value, 
+              single_gradients, pos_single,
+              multiple_gradients, pos_multiple,
+              N_REPEAT);
       if (!is_constant_struct<T1>::value && !is_empty<T1>::value)
-	test_multiple_gradient_values(is_vector<T1>::value, 
-				      single_gradients, pos_single,
-				      multiple_gradients, pos_multiple,
-				      N_REPEAT);
+  test_multiple_gradient_values(is_vector<T1>::value, 
+              single_gradients, pos_single,
+              multiple_gradients, pos_multiple,
+              N_REPEAT);
       if (!is_constant_struct<T2>::value && !is_empty<T2>::value)
-	test_multiple_gradient_values(is_vector<T2>::value, 
-				      single_gradients, pos_single,
-				      multiple_gradients, pos_multiple,
-				      N_REPEAT);
+  test_multiple_gradient_values(is_vector<T2>::value, 
+              single_gradients, pos_single,
+              multiple_gradients, pos_multiple,
+              N_REPEAT);
       if (!is_constant_struct<T3>::value && !is_empty<T3>::value)
-	test_multiple_gradient_values(is_vector<T3>::value, 
-				      single_gradients, pos_single,
-				      multiple_gradients, pos_multiple,
-				      N_REPEAT);
+  test_multiple_gradient_values(is_vector<T3>::value, 
+              single_gradients, pos_single,
+              multiple_gradients, pos_multiple,
+              N_REPEAT);
       if (!is_constant_struct<T4>::value && !is_empty<T4>::value)
-	test_multiple_gradient_values(is_vector<T4>::value, 
-				      single_gradients, pos_single,
-				      multiple_gradients, pos_multiple,
-				      N_REPEAT);
+  test_multiple_gradient_values(is_vector<T4>::value, 
+              single_gradients, pos_single,
+              multiple_gradients, pos_multiple,
+              N_REPEAT);
       if (!is_constant_struct<T5>::value && !is_empty<T5>::value)
-	test_multiple_gradient_values(is_vector<T5>::value, 
-				      single_gradients, pos_single,
-				      multiple_gradients, pos_multiple,
-				      N_REPEAT);
+  test_multiple_gradient_values(is_vector<T5>::value, 
+              single_gradients, pos_single,
+              multiple_gradients, pos_multiple,
+              N_REPEAT);
       if (!is_constant_struct<T6>::value && !is_empty<T6>::value)
-	test_multiple_gradient_values(is_vector<T6>::value, 
-				      single_gradients, pos_single,
-				      multiple_gradients, pos_multiple,
-				      N_REPEAT);
+  test_multiple_gradient_values(is_vector<T6>::value, 
+              single_gradients, pos_single,
+              multiple_gradients, pos_multiple,
+              N_REPEAT);
       if (!is_constant_struct<T7>::value && !is_empty<T7>::value)
-	test_multiple_gradient_values(is_vector<T7>::value, 
-				      single_gradients, pos_single,
-				      multiple_gradients, pos_multiple,
-				      N_REPEAT);
+  test_multiple_gradient_values(is_vector<T7>::value, 
+              single_gradients, pos_single,
+              multiple_gradients, pos_multiple,
+              N_REPEAT);
       if (!is_constant_struct<T8>::value && !is_empty<T8>::value)
-	test_multiple_gradient_values(is_vector<T8>::value, 
-				      single_gradients, pos_single,
-				      multiple_gradients, pos_multiple,
-				      N_REPEAT);
+  test_multiple_gradient_values(is_vector<T8>::value, 
+              single_gradients, pos_single,
+              multiple_gradients, pos_multiple,
+              N_REPEAT);
       if (!is_constant_struct<T9>::value && !is_empty<T9>::value)
-	test_multiple_gradient_values(is_vector<T9>::value, 
-				      single_gradients, pos_single,
-				      multiple_gradients, pos_multiple,
-				      N_REPEAT);
+  test_multiple_gradient_values(is_vector<T9>::value, 
+              single_gradients, pos_single,
+              multiple_gradients, pos_multiple,
+              N_REPEAT);
     }
   }
     
@@ -747,13 +747,13 @@ TYPED_TEST_P(AgradDistributionTestFixture, RepeatAsVector) {
 }
 
 REGISTER_TYPED_TEST_CASE_P(AgradDistributionTestFixture,
-			   CallAllVersions,
+         CallAllVersions,
                            ValidValues,
-			   InvalidValues,
-			   Propto,
-			   FiniteDiff,
-			   Function,
-			   RepeatAsVector);
+         InvalidValues,
+         Propto,
+         FiniteDiff,
+         Function,
+         RepeatAsVector);
 
 
 template<class T>
@@ -799,13 +799,13 @@ public:
     T9 p9 = get_params<T9>(parameters, 9);
     
     EXPECT_NO_THROW(({ TestClass.template cdf
-	    <T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>
-	    (p0, p1, p2, p3, p4, p5, p6, p7, p8, p9); }))
+      <T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>
+      (p0, p1, p2, p3, p4, p5, p6, p7, p8, p9); }))
       << "Calling cdf throws exception with default parameters";
 
     EXPECT_NO_THROW(({ TestClass.template cdf
-	    <T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, errno_policy>
-	    (p0, p1, p2, p3, p4, p5, p6, p7, p8, p9); }))
+      <T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, errno_policy>
+      (p0, p1, p2, p3, p4, p5, p6, p7, p8, p9); }))
       << "Calling cdf throws exception with errno_policy";
   }
 
@@ -828,20 +828,20 @@ public:
 
       var cdf(0);
       EXPECT_NO_THROW(({ cdf = TestClass.template cdf
-	      <T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>
-	      (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9); }))
-	<< "Valid parameters failed at index: " << n << " -- " 
-	<< parameters[n];
+        <T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>
+        (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9); }))
+  << "Valid parameters failed at index: " << n << " -- " 
+  << parameters[n];
       EXPECT_TRUE(cdf.val() >= 0)
-	<< "cdf value must be greater than or equal to 0. cdf value: " 
-	<< cdf;
+  << "cdf value must be greater than or equal to 0. cdf value: " 
+  << cdf;
       EXPECT_TRUE(cdf.val() <= 1)
-	<< "cdf value must be less than or equal to 1. cdf value: "
-	<< cdf;
+  << "cdf value must be less than or equal to 1. cdf value: "
+  << cdf;
 
       if (all_scalar<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
-	EXPECT_FLOAT_EQ(expected_cdf[n], cdf.val())
-	  << "For all scalar inputs cdf should match the provided value. Failed at index: " << n;
+  EXPECT_FLOAT_EQ(expected_cdf[n], cdf.val())
+    << "For all scalar inputs cdf should match the provided value. Failed at index: " << n;
       }
     }
   }
@@ -863,15 +863,15 @@ public:
     Scalar9 p9 = get_param<Scalar9>(invalid_params, 9);
       
     EXPECT_THROW(({ TestClass.template cdf
-	    <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9>
-	    (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9); }),
+      <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9>
+      (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9); }),
       std::domain_error) 
       << "NaN value at index " << n << " did not fail with the default policy" << std::endl
       << invalid_params;
       
     EXPECT_NO_THROW(({ cdf = TestClass.template cdf
-	    <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9,errno_policy>
-	    (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9); }))
+      <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9,errno_policy>
+      (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9); }))
       << "NaN value at index " << n << " with the errno_policy throws exception when it should not" << std::endl
       << invalid_params;
     EXPECT_TRUE(std::isnan(cdf.val())) 
@@ -903,20 +903,20 @@ public:
       Scalar9 p9 = get_param<Scalar9>(invalid_params, 9);
 
       EXPECT_THROW(({ TestClass.template cdf
-	      <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9>
-	      (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9); }),
-		   std::domain_error) 
-	<< "Invalid value " << n << " did not fail with the default policy" << std::endl
-	<< invalid_params;
+        <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9>
+        (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9); }),
+       std::domain_error) 
+  << "Invalid value " << n << " did not fail with the default policy" << std::endl
+  << invalid_params;
       
       EXPECT_NO_THROW(({ cdf = TestClass.template cdf
-	      <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9,errno_policy>
-	      (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9); }))
-	<< "Invalid value " << n << " with the errno_policy throws exception when it should not" << std::endl
-	<< invalid_params;
+        <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9,errno_policy>
+        (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9); }))
+  << "Invalid value " << n << " with the errno_policy throws exception when it should not" << std::endl
+  << invalid_params;
       EXPECT_TRUE(std::isnan(cdf.val())) 
-	<< "Invalid value " << n << " with the errno_policy should return NaN. Returns " << cdf << std::endl
-	<< invalid_params;
+  << "Invalid value " << n << " with the errno_policy should return NaN. Returns " << cdf << std::endl
+  << invalid_params;
     }
     if (std::numeric_limits<Scalar0>::has_quiet_NaN && parameters.size() > 0) 
       test_nan_value(parameters, 0);
@@ -941,8 +941,8 @@ public:
   }
 
   void add_finite_diff(const vector<double>& params, 
-		       vector<double>& finite_diff, 
-		       const size_t n) {
+           vector<double>& finite_diff, 
+           const size_t n) {
     const double e = 1e-8;
     const double e2 = 2 * e;
 
@@ -1049,13 +1049,13 @@ public:
       calculate_gradients(parameters[n], gradients);
 
       ASSERT_EQ(finite_diffs.size(), gradients.size()) 
-	<< "Number of finite diff gradients and calculated gradients must match -- error in test fixture";
+  << "Number of finite diff gradients and calculated gradients must match -- error in test fixture";
       for (size_t i = 0; i < finite_diffs.size(); i++) {
-	EXPECT_NEAR(finite_diffs[i], gradients[i], 1e-4)
-	  << "Comparison of finite diff to calculated gradient failed for i=" << i 
-	  << ": " << parameters[n] << std::endl 
-	  << "  finite diffs: " << finite_diffs << std::endl
-	  << "  grads:        " << gradients;
+  EXPECT_NEAR(finite_diffs[i], gradients[i], 1e-4)
+    << "Comparison of finite diff to calculated gradient failed for i=" << i 
+    << ": " << parameters[n] << std::endl 
+    << "  finite diffs: " << finite_diffs << std::endl
+    << "  grads:        " << gradients;
       }
     }
   }
@@ -1083,31 +1083,31 @@ public:
       EXPECT_FLOAT_EQ(expected_cdf, cdf);
 
       ASSERT_EQ(expected_gradients.size(), gradients.size()) 
-	<< "Number of expected gradients and calculated gradients must match -- error in test fixture";
+  << "Number of expected gradients and calculated gradients must match -- error in test fixture";
       for (size_t i = 0; i < expected_gradients.size(); i++) {
-	EXPECT_NEAR(expected_gradients[i], gradients[i], 1e-6)
-	  << "Comparison of expected gradient to calculated gradient failed";
+  EXPECT_NEAR(expected_gradients[i], gradients[i], 1e-6)
+    << "Comparison of expected gradient to calculated gradient failed";
       }
     }
   }
 
   void test_multiple_gradient_values(const bool is_vec,
-				     const double single_cdf,
-				     const vector<double>& single_gradients, size_t& pos_single,
-				     const vector<double>& multiple_gradients, size_t& pos_multiple,
-				     const size_t N_REPEAT) {
+             const double single_cdf,
+             const vector<double>& single_gradients, size_t& pos_single,
+             const vector<double>& multiple_gradients, size_t& pos_multiple,
+             const size_t N_REPEAT) {
     if (is_vec) {
       for (size_t i = 0; i < N_REPEAT; i++) {
-	EXPECT_FLOAT_EQ(single_gradients[pos_single] * pow(single_cdf, N_REPEAT-1),
-			multiple_gradients[pos_multiple])
-	  << "Comparison of single_gradient value to vectorized gradient failed";
-	pos_multiple++;
+  EXPECT_FLOAT_EQ(single_gradients[pos_single] * pow(single_cdf, N_REPEAT-1),
+      multiple_gradients[pos_multiple])
+    << "Comparison of single_gradient value to vectorized gradient failed";
+  pos_multiple++;
       }
       pos_single++; 
     } else {
       EXPECT_FLOAT_EQ(N_REPEAT * single_gradients[pos_single] * pow(single_cdf, N_REPEAT-1), 
-		      multiple_gradients[pos_multiple])
-	<< "Comparison of single_gradient value to vectorized gradient failed";
+          multiple_gradients[pos_multiple])
+  << "Comparison of single_gradient value to vectorized gradient failed";
       pos_single++; pos_multiple++;
     }
   }
@@ -1147,71 +1147,71 @@ public:
       
 
       EXPECT_FLOAT_EQ(pow(single_cdf, N_REPEAT), multiple_cdf.val())
-	<< "cdf with repeated vector input should match "
-	<< "a multiple of cdf of single input";
+  << "cdf with repeated vector input should match "
+  << "a multiple of cdf of single input";
 
       size_t pos_single = 0;
       size_t pos_multiple = 0;
       if (!is_constant_struct<T0>::value && !is_empty<T0>::value)
-	test_multiple_gradient_values(is_vector<T0>::value,
-				      single_cdf,
-				      single_gradients, pos_single,
-				      multiple_gradients, pos_multiple,
-				      N_REPEAT);
+  test_multiple_gradient_values(is_vector<T0>::value,
+              single_cdf,
+              single_gradients, pos_single,
+              multiple_gradients, pos_multiple,
+              N_REPEAT);
       if (!is_constant_struct<T1>::value && !is_empty<T1>::value)
-	test_multiple_gradient_values(is_vector<T1>::value, 
-				      single_cdf,
-				      single_gradients, pos_single,
-				      multiple_gradients, pos_multiple,
-				      N_REPEAT);
+  test_multiple_gradient_values(is_vector<T1>::value, 
+              single_cdf,
+              single_gradients, pos_single,
+              multiple_gradients, pos_multiple,
+              N_REPEAT);
       if (!is_constant_struct<T2>::value && !is_empty<T2>::value)
-	test_multiple_gradient_values(is_vector<T2>::value, 
-				      single_cdf,
-				      single_gradients, pos_single,
-				      multiple_gradients, pos_multiple,
-				      N_REPEAT);
+  test_multiple_gradient_values(is_vector<T2>::value, 
+              single_cdf,
+              single_gradients, pos_single,
+              multiple_gradients, pos_multiple,
+              N_REPEAT);
       if (!is_constant_struct<T3>::value && !is_empty<T3>::value)
-	test_multiple_gradient_values(is_vector<T3>::value, 
-				      single_cdf,
-				      single_gradients, pos_single,
-				      multiple_gradients, pos_multiple,
-				      N_REPEAT);
+  test_multiple_gradient_values(is_vector<T3>::value, 
+              single_cdf,
+              single_gradients, pos_single,
+              multiple_gradients, pos_multiple,
+              N_REPEAT);
       if (!is_constant_struct<T4>::value && !is_empty<T4>::value)
-	test_multiple_gradient_values(is_vector<T4>::value, 
-				      single_cdf,
-				      single_gradients, pos_single,    
-				      multiple_gradients, pos_multiple,
-				      N_REPEAT);
+  test_multiple_gradient_values(is_vector<T4>::value, 
+              single_cdf,
+              single_gradients, pos_single,    
+              multiple_gradients, pos_multiple,
+              N_REPEAT);
       if (!is_constant_struct<T5>::value && !is_empty<T5>::value)
-	test_multiple_gradient_values(is_vector<T5>::value, 
-				      single_cdf,
-				      single_gradients, pos_single,
-				      multiple_gradients, pos_multiple,
-				      N_REPEAT);
+  test_multiple_gradient_values(is_vector<T5>::value, 
+              single_cdf,
+              single_gradients, pos_single,
+              multiple_gradients, pos_multiple,
+              N_REPEAT);
       if (!is_constant_struct<T6>::value && !is_empty<T6>::value)
-	test_multiple_gradient_values(is_vector<T6>::value, 
-				      single_cdf,
-				      single_gradients, pos_single,
-				      multiple_gradients, pos_multiple,
-				      N_REPEAT);
+  test_multiple_gradient_values(is_vector<T6>::value, 
+              single_cdf,
+              single_gradients, pos_single,
+              multiple_gradients, pos_multiple,
+              N_REPEAT);
       if (!is_constant_struct<T7>::value && !is_empty<T7>::value)
-	test_multiple_gradient_values(is_vector<T7>::value, 
-				      single_cdf,
-				      single_gradients, pos_single,
-				      multiple_gradients, pos_multiple,
-				      N_REPEAT);
+  test_multiple_gradient_values(is_vector<T7>::value, 
+              single_cdf,
+              single_gradients, pos_single,
+              multiple_gradients, pos_multiple,
+              N_REPEAT);
       if (!is_constant_struct<T8>::value && !is_empty<T8>::value)
-	test_multiple_gradient_values(is_vector<T8>::value, 
-				      single_cdf,
-				      single_gradients, pos_single,
-				      multiple_gradients, pos_multiple,
-				      N_REPEAT);
+  test_multiple_gradient_values(is_vector<T8>::value, 
+              single_cdf,
+              single_gradients, pos_single,
+              multiple_gradients, pos_multiple,
+              N_REPEAT);
       if (!is_constant_struct<T9>::value && !is_empty<T9>::value)
-	test_multiple_gradient_values(is_vector<T9>::value, 
-				      single_cdf,
-				      single_gradients, pos_single,
-				      multiple_gradients, pos_multiple,
-				      N_REPEAT);
+  test_multiple_gradient_values(is_vector<T9>::value, 
+              single_cdf,
+              single_gradients, pos_single,
+              multiple_gradients, pos_multiple,
+              N_REPEAT);
     }
   }
 
@@ -1223,15 +1223,15 @@ public:
     
     if (!TestClass.has_lower_bound()) {
       if (!std::numeric_limits<Scalar0>::has_infinity) {
-	for (size_t n = 0; n < parameters.size(); n++)
-	  parameters[n][0] = stan::agrad::value_of(std::numeric_limits<Scalar0>::min());
+  for (size_t n = 0; n < parameters.size(); n++)
+    parameters[n][0] = stan::agrad::value_of(std::numeric_limits<Scalar0>::min());
       } else {
-	for (size_t n = 0; n < parameters.size(); n++)
-	  parameters[n][0] = -std::numeric_limits<double>::infinity();
+  for (size_t n = 0; n < parameters.size(); n++)
+    parameters[n][0] = -std::numeric_limits<double>::infinity();
       }
     } else {
       for (size_t n = 0; n < parameters.size(); n++)
-	parameters[n][0] = TestClass.lower_bound();
+  parameters[n][0] = TestClass.lower_bound();
     }
 
     for (size_t n = 0; n < parameters.size(); n++) {
@@ -1247,10 +1247,10 @@ public:
       T9 p9 = get_repeated_params<T9>(parameters[n], 9, N_REPEAT);
       
       var cdf_at_lower_bound = TestClass.template cdf
-	<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>
-	(p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
+  <T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>
+  (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
       EXPECT_FLOAT_EQ(0.0, cdf_at_lower_bound.val())
-	<< "CDF evaluated at lower bound should equal 0";
+  << "CDF evaluated at lower bound should equal 0";
     }
   }
   
@@ -1262,15 +1262,15 @@ public:
 
     if (!TestClass.has_upper_bound()) {
       if (!std::numeric_limits<Scalar0>::has_infinity) {
-	for (size_t n = 0; n < parameters.size(); n++)
-	  parameters[n][0] = stan::agrad::value_of(std::numeric_limits<Scalar0>::max());
+  for (size_t n = 0; n < parameters.size(); n++)
+    parameters[n][0] = stan::agrad::value_of(std::numeric_limits<Scalar0>::max());
       } else {
-	for (size_t n = 0; n < parameters.size(); n++)
-	  parameters[n][0] = std::numeric_limits<double>::infinity();
+  for (size_t n = 0; n < parameters.size(); n++)
+    parameters[n][0] = std::numeric_limits<double>::infinity();
       }
     } else {
       for (size_t n = 0; n < parameters.size(); n++)
-	parameters[n][0] = TestClass.upper_bound();
+  parameters[n][0] = TestClass.upper_bound();
     }
 
     for (size_t n = 0; n < parameters.size(); n++) {
@@ -1286,10 +1286,10 @@ public:
       T9 p9 = get_repeated_params<T9>(parameters[n], 9, N_REPEAT);
       
       var cdf_at_upper_bound = TestClass.template cdf
-	<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>
-	(p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
+  <T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>
+  (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
       EXPECT_FLOAT_EQ(1.0, cdf_at_upper_bound.val())
-	<< "CDF evaluated at upper bound should equal 1";
+  << "CDF evaluated at upper bound should equal 1";
     }
   }
 
@@ -1337,14 +1337,14 @@ TYPED_TEST_P(AgradCdfTestFixture, UpperBound) {
 }
 
 REGISTER_TYPED_TEST_CASE_P(AgradCdfTestFixture,
-			   CallAllVersions,
-			   ValidValues,
-			   InvalidValues,
-			   FiniteDiff,
-			   Function,
-			   RepeatAsVector,
-			   LowerBound,
-			   UpperBound);
+         CallAllVersions,
+         ValidValues,
+         InvalidValues,
+         FiniteDiff,
+         Function,
+         RepeatAsVector,
+         LowerBound,
+         UpperBound);
 
 
 #endif

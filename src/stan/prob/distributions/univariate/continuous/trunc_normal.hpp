@@ -77,12 +77,12 @@ namespace stan {
           if (isinf(sigma)) 
             lp -= log(beta - alpha);
           else
-	    if (!isinf(beta) && !isinf(alpha)) 
-	      lp -= log(Phi((beta - mu)/sigma) - Phi((alpha - mu)/sigma));
-	    else if (isfinite(alpha)) 
-	      lp -= log(1.0 - Phi((alpha - mu)/sigma));
-	    else if (isfinite(beta)) 
-	      lp -= log(Phi((beta - mu)/sigma));
+      if (!isinf(beta) && !isinf(alpha)) 
+        lp -= log(Phi((beta - mu)/sigma) - Phi((alpha - mu)/sigma));
+      else if (isfinite(alpha)) 
+        lp -= log(1.0 - Phi((alpha - mu)/sigma));
+      else if (isfinite(beta)) 
+        lp -= log(Phi((beta - mu)/sigma));
         }
       }
       
@@ -117,9 +117,9 @@ namespace stan {
     template <class RNG>
     inline double
     trunc_normal_rng(double mu,
-		     double sigma,
-		     double alpha,
-		     double beta,
+         double sigma,
+         double alpha,
+         double beta,
                      RNG& rng) {
       using boost::variate_generator;
       using boost::random::uniform_01;

@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 #include "stan/prob/distributions/multivariate/continuous/multi_student_t.hpp"
+#include <boost/random/mersenne_twister.hpp>
+#include <boost/math/distributions.hpp>
 
 using Eigen::Dynamic;
 using Eigen::Matrix;
@@ -277,4 +279,20 @@ TEST(ProbDistributionsMultiStudentT,ProptoAllDoublesZero) {
   EXPECT_FLOAT_EQ(0.0,multi_student_t_log<true>(y,nu,mu,Sigma));
   EXPECT_FLOAT_EQ(0.0,multi_student_t_log<true>(y,nu,mu,Sigma,errno_policy()));
 
+}
+
+
+TEST(ProbDistributionsMultiStudentT, random) {
+  boost::random::mt19937 rng;
+  Matrix<double,Dynamic,Dynamic> mu(3,1);
+  mu << 2.0, 
+    3.0,
+    11.0;
+
+Matrix<double,Dynamic,Dynamic> s(3,3);
+ s << 2.0, 1.0, 4.0,
+   3.0, 9.0, 1.3,
+   11.0, 1.2, 2.7;
+
+  EXPECT_NO_THROW(stan::prob::multi_student_t_rng(2.0,mu,s,rng));
 }

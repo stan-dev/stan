@@ -52,7 +52,7 @@ namespace stan {
       // check if any vectors are zero length
       if (!(stan::length(y) 
             && stan::length(beta)))
-	return 0.0;
+  return 0.0;
       
       using stan::math::check_finite;
       using stan::math::check_positive;
@@ -70,7 +70,7 @@ namespace stan {
 
       if (!(check_consistent_sizes(function,
                                    y,beta,
-				   "Random variable","Inverse scale parameter",
+           "Random variable","Inverse scale parameter",
                                    &logp, Policy())))
         return logp;
       
@@ -81,26 +81,26 @@ namespace stan {
       size_t N = max_size(y, beta);
       
       DoubleVectorView<
-	include_summand<propto,T_inv_scale>::value,
-	is_vector<T_inv_scale>::value> log_beta(length(beta));
+  include_summand<propto,T_inv_scale>::value,
+  is_vector<T_inv_scale>::value> log_beta(length(beta));
       for (size_t i = 0; i < length(beta); i++)
-	if (include_summand<propto,T_inv_scale>::value)
-	  log_beta[i] = log(value_of(beta_vec[i]));
+  if (include_summand<propto,T_inv_scale>::value)
+    log_beta[i] = log(value_of(beta_vec[i]));
 
       agrad::OperandsAndPartials<T_y,T_inv_scale> operands_and_partials(y, beta);
 
       for (size_t n = 0; n < N; n++) {
-	const double beta_dbl = value_of(beta_vec[n]);
-	const double y_dbl = value_of(y_vec[n]);
-	if (include_summand<propto,T_inv_scale>::value)
-	  logp += log_beta[n];
-	if (include_summand<propto,T_y,T_inv_scale>::value)
-	  logp -= beta_dbl * y_dbl;
-	
-	if (!is_constant_struct<T_y>::value) 
-	  operands_and_partials.d_x1[n] -= beta_dbl;
-	if (!is_constant_struct<T_inv_scale>::value) 
-	  operands_and_partials.d_x2[n] += 1 / beta_dbl - y_dbl;
+  const double beta_dbl = value_of(beta_vec[n]);
+  const double y_dbl = value_of(y_vec[n]);
+  if (include_summand<propto,T_inv_scale>::value)
+    logp += log_beta[n];
+  if (include_summand<propto,T_y,T_inv_scale>::value)
+    logp -= beta_dbl * y_dbl;
+  
+  if (!is_constant_struct<T_y>::value) 
+    operands_and_partials.d_x1[n] -= beta_dbl;
+  if (!is_constant_struct<T_inv_scale>::value) 
+    operands_and_partials.d_x2[n] += 1 / beta_dbl - y_dbl;
       }
       return operands_and_partials.to_var(logp);
     }

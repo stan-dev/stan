@@ -73,13 +73,13 @@ namespace stan {
         return logp;
       if (!(check_consistent_sizes(function,
                                    y,alpha,beta,
-				   "Random variable","Shape parameter","Scale parameter",
+           "Random variable","Shape parameter","Scale parameter",
                                    &logp, Policy())))
         return logp;
 
       // check if no variables are involved and prop-to
       if (!include_summand<propto,T_y,T_shape,T_scale>::value)
-	return 0.0;
+  return 0.0;
 
       // set up template expressions wrapping scalars into vector views
       VectorView<const T_y> y_vec(y);
@@ -87,9 +87,9 @@ namespace stan {
       VectorView<const T_scale> beta_vec(beta);
 
       for (size_t n = 0; n < length(y); n++) {
-	const double y_dbl = value_of(y_vec[n]);
-	if (y_dbl <= 0)
-	  return LOG_ZERO;
+  const double y_dbl = value_of(y_vec[n]);
+  if (y_dbl <= 0)
+    return LOG_ZERO;
       }
 
       size_t N = max_size(y, alpha, beta);
@@ -100,55 +100,55 @@ namespace stan {
       using boost::math::digamma;
 
       DoubleVectorView<include_summand<propto,T_y,T_shape>::value,is_vector<T_y>::value>
-	log_y(length(y));
+  log_y(length(y));
       DoubleVectorView<include_summand<propto,T_y,T_scale>::value,is_vector<T_y>::value>
-	inv_y(length(y));
+  inv_y(length(y));
       for(size_t n = 0; n < length(y); n++) {
-	if (include_summand<propto,T_y,T_shape>::value)
-	  if (value_of(y_vec[n]) > 0)
-	    log_y[n] = log(value_of(y_vec[n]));
-	if (include_summand<propto,T_y,T_scale>::value)
-	  inv_y[n] = 1.0 / value_of(y_vec[n]);
+  if (include_summand<propto,T_y,T_shape>::value)
+    if (value_of(y_vec[n]) > 0)
+      log_y[n] = log(value_of(y_vec[n]));
+  if (include_summand<propto,T_y,T_scale>::value)
+    inv_y[n] = 1.0 / value_of(y_vec[n]);
       }
 
       DoubleVectorView<include_summand<propto,T_shape>::value,is_vector<T_shape>::value>
-	lgamma_alpha(length(alpha));
+  lgamma_alpha(length(alpha));
       DoubleVectorView<!is_constant_struct<T_shape>::value,is_vector<T_shape>::value>
-	digamma_alpha(length(alpha));
+  digamma_alpha(length(alpha));
       for (size_t n = 0; n < length(alpha); n++) {
-	if (include_summand<propto,T_shape>::value)
-	  lgamma_alpha[n] = lgamma(value_of(alpha_vec[n]));
-	if (!is_constant_struct<T_shape>::value)
-	  digamma_alpha[n] = digamma(value_of(alpha_vec[n]));
+  if (include_summand<propto,T_shape>::value)
+    lgamma_alpha[n] = lgamma(value_of(alpha_vec[n]));
+  if (!is_constant_struct<T_shape>::value)
+    digamma_alpha[n] = digamma(value_of(alpha_vec[n]));
       }
 
       DoubleVectorView<include_summand<propto,T_shape,T_scale>::value,is_vector<T_scale>::value>
-	log_beta(length(beta));
+  log_beta(length(beta));
       if (include_summand<propto,T_shape,T_scale>::value)
-	for (size_t n = 0; n < length(beta); n++)
-	  log_beta[n] = log(value_of(beta_vec[n]));
+  for (size_t n = 0; n < length(beta); n++)
+    log_beta[n] = log(value_of(beta_vec[n]));
 
       for (size_t n = 0; n < N; n++) {
-	// pull out values of arguments
-	const double alpha_dbl = value_of(alpha_vec[n]);
-	const double beta_dbl = value_of(beta_vec[n]);
+  // pull out values of arguments
+  const double alpha_dbl = value_of(alpha_vec[n]);
+  const double beta_dbl = value_of(beta_vec[n]);
 
-	if (include_summand<propto,T_shape>::value)
-	  logp -= lgamma_alpha[n];
-	if (include_summand<propto,T_shape,T_scale>::value)
-	  logp += alpha_dbl * log_beta[n];
-	if (include_summand<propto,T_y,T_shape>::value)
-	  logp -= (alpha_dbl+1.0) * log_y[n];
-	if (include_summand<propto,T_y,T_scale>::value)
-	  logp -= beta_dbl * inv_y[n];
-	
-	// gradients
-	if (!is_constant<typename is_vector<T_y>::type>::value)
-	  operands_and_partials.d_x1[n] += -(alpha_dbl+1) * inv_y[n] + beta_dbl * inv_y[n] * inv_y[n];
-	if (!is_constant<typename is_vector<T_shape>::type>::value)
-	  operands_and_partials.d_x2[n] += -digamma_alpha[n] + log_beta[n] - log_y[n];
-	if (!is_constant<typename is_vector<T_scale>::type>::value)
-	  operands_and_partials.d_x3[n] += alpha_dbl / beta_dbl - inv_y[n];
+  if (include_summand<propto,T_shape>::value)
+    logp -= lgamma_alpha[n];
+  if (include_summand<propto,T_shape,T_scale>::value)
+    logp += alpha_dbl * log_beta[n];
+  if (include_summand<propto,T_y,T_shape>::value)
+    logp -= (alpha_dbl+1.0) * log_y[n];
+  if (include_summand<propto,T_y,T_scale>::value)
+    logp -= beta_dbl * inv_y[n];
+  
+  // gradients
+  if (!is_constant<typename is_vector<T_y>::type>::value)
+    operands_and_partials.d_x1[n] += -(alpha_dbl+1) * inv_y[n] + beta_dbl * inv_y[n] * inv_y[n];
+  if (!is_constant<typename is_vector<T_shape>::type>::value)
+    operands_and_partials.d_x2[n] += -digamma_alpha[n] + log_beta[n] - log_y[n];
+  if (!is_constant<typename is_vector<T_scale>::type>::value)
+    operands_and_partials.d_x3[n] += alpha_dbl / beta_dbl - inv_y[n];
       }
       return operands_and_partials.to_var(logp);
     }

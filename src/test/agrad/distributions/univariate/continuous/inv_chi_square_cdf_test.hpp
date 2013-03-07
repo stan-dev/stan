@@ -8,7 +8,7 @@ using stan::agrad::var;
 class AgradCdfInvChiSquare : public AgradCdfTest {
 public:
   void valid_values(vector<vector<double> >& parameters,
-		    vector<double>& cdf) {
+        vector<double>& cdf) {
     vector<double> param(2);
 
     param[0] = 3.0;           // y
@@ -19,7 +19,7 @@ public:
   }
   
   void invalid_values(vector<size_t>& index, 
-		      vector<double>& value) {
+          vector<double>& value) {
 
     // y
     index.push_back(0U);
@@ -50,9 +50,9 @@ public:
   }
     
   template <typename T_y, typename T_dof, typename T2,
-	    typename T3, typename T4, typename T5, 
-	    typename T6, typename T7, typename T8, 
-	    typename T9>
+      typename T3, typename T4, typename T5, 
+      typename T6, typename T7, typename T8, 
+      typename T9>
   typename stan::return_type<T_y, T_dof>::type 
   cdf(const T_y& y, const T_dof& nu, const T2&,
       const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
@@ -60,10 +60,10 @@ public:
   }
 
   template <typename T_y, typename T_dof, typename T2,
-	    typename T3, typename T4, typename T5, 
-	    typename T6, typename T7, typename T8, 
-	    typename T9,
-	    typename Policy>
+      typename T3, typename T4, typename T5, 
+      typename T6, typename T7, typename T8, 
+      typename T9,
+      typename Policy>
   typename stan::return_type<T_y, T_dof>::type 
   cdf(const T_y& y, const T_dof& nu, const T2&,
       const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
@@ -72,12 +72,12 @@ public:
 
   
   template <typename T_y, typename T_dof, typename T2,
-	    typename T3, typename T4, typename T5, 
-	    typename T6, typename T7, typename T8, 
-	    typename T9>
+      typename T3, typename T4, typename T5, 
+      typename T6, typename T7, typename T8, 
+      typename T9>
   typename stan::return_type<T_y, T_dof>::type 
   cdf_function(const T_y& y, const T_dof& nu, const T2&,
-	       const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+         const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
       return stan::prob::inv_chi_square_cdf(y, nu);
   }
     

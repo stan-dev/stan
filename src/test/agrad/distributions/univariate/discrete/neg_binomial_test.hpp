@@ -52,36 +52,36 @@ public:
             typename T9>
   typename stan::return_type<T_shape,T_inv_scale>::type 
   log_prob(const T_n& n, const T_shape& alpha, const T_inv_scale& beta,
-	   const T3&, const T4&, const T5&, 
-	   const T6&, const T7&, const T8&, 
-	   const T9&) {
+     const T3&, const T4&, const T5&, 
+     const T6&, const T7&, const T8&, 
+     const T9&) {
     return stan::prob::neg_binomial_log(n, alpha, beta);
   }
 
   template <bool propto, 
-	    class T_n, class T_shape, class T_inv_scale,
+      class T_n, class T_shape, class T_inv_scale,
             typename T3, typename T4, typename T5, 
             typename T6, typename T7, typename T8, 
             typename T9>
   typename stan::return_type<T_shape,T_inv_scale>::type 
   log_prob(const T_n& n, const T_shape& alpha, const T_inv_scale& beta,
-	   const T3&, const T4&, const T5&, 
-	   const T6&, const T7&, const T8&, 
-	   const T9&) {
+     const T3&, const T4&, const T5&, 
+     const T6&, const T7&, const T8&, 
+     const T9&) {
     return stan::prob::neg_binomial_log<propto>(n, alpha, beta);
   }
   
   template <bool propto, 
-	    class T_n, class T_shape, class T_inv_scale,
+      class T_n, class T_shape, class T_inv_scale,
             typename T3, typename T4, typename T5, 
             typename T6, typename T7, typename T8, 
             typename T9, 
-	    class Policy>
+      class Policy>
   typename stan::return_type<T_shape,T_inv_scale>::type 
   log_prob(const T_n& n, const T_shape& alpha, const T_inv_scale& beta,
-	   const T3&, const T4&, const T5&, 
-	   const T6&, const T7&, const T8&, 
-	   const T9&) {
+     const T3&, const T4&, const T5&, 
+     const T6&, const T7&, const T8&, 
+     const T9&) {
     return stan::prob::neg_binomial_log<propto>(n, alpha, beta, Policy());
   }
 
@@ -90,9 +90,9 @@ public:
             typename T6, typename T7, typename T8, 
             typename T9>
   var log_prob_function(const T_n& n, const T_shape& alpha, const T_inv_scale& beta,
-			const T3&, const T4&, const T5&, 
-			const T6&, const T7&, const T8&, 
-			const T9&) {
+      const T3&, const T4&, const T5&, 
+      const T6&, const T7&, const T8&, 
+      const T9&) {
     using std::log;
     using stan::math::binomial_coefficient_log;
     using stan::math::log1m;

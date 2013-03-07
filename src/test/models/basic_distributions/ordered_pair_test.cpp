@@ -45,8 +45,8 @@ public:
 
 
 INSTANTIATE_TYPED_TEST_CASE_P(Models_BasicDistributions_OrderedPair,
-			      Model_Test_Fixture,
-			      Models_BasicDistributions_OrderedPair);
+            Model_Test_Fixture,
+            Models_BasicDistributions_OrderedPair);
 
 TEST_F(Models_BasicDistributions_OrderedPair,
        Test_Ordered_Pair) {

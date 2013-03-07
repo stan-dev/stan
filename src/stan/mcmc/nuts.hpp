@@ -95,7 +95,7 @@ namespace stan {
            bool epsilon_adapt = true,
            double delta = 0.6, 
            double gamma = 0.05,
-	   BaseRNG base_rng = BaseRNG(std::time(0))) 
+     BaseRNG base_rng = BaseRNG(std::time(0))) 
         : hmc_base<BaseRNG>(model,
                             params_r,
                             params_i,

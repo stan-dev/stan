@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 #include "stan/prob/distributions/multivariate/continuous/multi_normal.hpp"
+#include <boost/random/mersenne_twister.hpp>
+#include<boost/math/distributions.hpp>
 
 using Eigen::Dynamic;
 using Eigen::Matrix;
@@ -219,4 +221,18 @@ TEST(ProbDistributionsMultiNormal,SizeMismatch) {
   Sigma << 9.0, -3.0, 0.0,
     -3.0,  4.0, 0.0;  
   EXPECT_THROW(stan::prob::multi_normal_log(y, mu, Sigma), std::domain_error);
+}
+
+TEST(ProbDistributionsMultiNormal, random) {
+  boost::random::mt19937 rng;
+  Matrix<double,Dynamic,Dynamic> mu(3,1);
+  mu << 2.0, 
+    -2.0,
+    11.0;
+
+  Matrix<double,Dynamic,Dynamic> sigma(3,3);
+  sigma << 9.0, -3.0, 0.0,
+    -3.0,  4.0, 0.0,
+    2.0, 1.0, 3.0;
+  EXPECT_NO_THROW(stan::prob::multi_normal_rng(mu, sigma,rng));
 }

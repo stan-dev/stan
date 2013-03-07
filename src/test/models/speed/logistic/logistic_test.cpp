@@ -211,7 +211,7 @@ public:
    * @param iterations 
    */
   void test_logistic_speed_stan(const std::string& filename, 
-				const size_t iterations,
+        const size_t iterations,
                                 const TestInfo& info) {
     if (!has_R)
       return;
@@ -317,7 +317,7 @@ public:
   }
 
   void test_logistic_speed_jags(const std::string& filename, 
-				const size_t iterations,
+        const size_t iterations,
                                 const TestInfo& info) {
     if (!has_R)
       return;

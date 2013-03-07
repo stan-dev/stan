@@ -32,7 +32,7 @@ TEST(ProbDistributionsInvChiSquare, chiSquareGoodnessFitTest) {
     double a = stan::prob::inv_chi_square_rng(4.0,rng);
     int i = 0;
     while (i < K-1 && a > loc[i]) 
-	++i;
+  ++i;
     ++bin[i];
     count++;
    }

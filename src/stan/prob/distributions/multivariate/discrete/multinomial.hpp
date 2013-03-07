@@ -35,9 +35,9 @@ namespace stan {
                          &lp, Policy()))
         return lp;
       if (!check_size_match(function, 
-			    ns.size(), "Size of number of trials variable",
-			    theta.rows(), "rows of probabilities parameter",
-			    &lp, Policy()))
+          ns.size(), "Size of number of trials variable",
+          theta.rows(), "rows of probabilities parameter",
+          &lp, Policy()))
         return lp;
       using stan::math::multiply_log;
 

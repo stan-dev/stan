@@ -1,6 +1,9 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__DIRICHLET_HPP__
 #define __STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__DIRICHLET_HPP__
 
+#include <boost/random/gamma_distribution.hpp>
+#include <boost/random/variate_generator.hpp>
+
 #include <stan/prob/constants.hpp>
 #include <stan/math/matrix_error_handling.hpp>
 #include <stan/math/error_handling.hpp>
@@ -87,7 +90,27 @@ namespace stan {
       return dirichlet_log<false>(theta,alpha,stan::math::default_policy());
     }
 
+    template <class RNG>
+    inline Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>
+    dirichlet_rng(const Eigen::Matrix<double,Eigen::Dynamic,1>& alpha,
+                     RNG& rng) {
+      using boost::variate_generator;
+      using boost::gamma_distribution;
 
+      double sum = 0;
+      Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> y(alpha.rows(), 1);
+      for(int i = 0; i < alpha.rows(); i++)
+	{
+        variate_generator<RNG&, gamma_distribution<> >
+	  gamma_rng(rng, gamma_distribution<>(alpha(i,0),1));
+	y(i,0) = gamma_rng();
+	sum += y(i,0);
+	}
+
+      for(int i = 0; i < alpha.rows(); i++)
+	y(i,0) /= sum;
+      return y;
+    }
   }
 }
 #endif

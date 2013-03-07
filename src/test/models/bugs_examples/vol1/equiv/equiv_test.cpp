@@ -58,5 +58,5 @@ public:
 };
 
 INSTANTIATE_TYPED_TEST_CASE_P(Models_BugsExamples_Vol1_Equiv,
-			      Model_Test_Fixture,
-			      Models_BugsExamples_Vol1_Equiv);
+            Model_Test_Fixture,
+            Models_BugsExamples_Vol1_Equiv);

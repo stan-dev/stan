@@ -1,6 +1,9 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__MULTI_NORMAL_HPP__
 #define __STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__MULTI_NORMAL_HPP__
 
+#include <boost/random/normal_distribution.hpp>
+#include <boost/random/variate_generator.hpp>
+
 #include <stan/math/matrix_error_handling.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/special_functions.hpp>
@@ -54,19 +57,19 @@ namespace stan {
       typename promote_args<T_y,T_loc,T_covar>::type lp(0.0);
 
       if (!check_size_match(function, 
-			    y.size(), "Size of random variable",
-			    mu.size(), "size of location parameter",
-			    &lp, Policy()))
+          y.size(), "Size of random variable",
+          mu.size(), "size of location parameter",
+          &lp, Policy()))
         return lp;
       if (!check_size_match(function, 
-			    y.size(), "Size of random variable",
-			    L.rows(), "rows of covariance parameter",
-			    &lp, Policy()))
+          y.size(), "Size of random variable",
+          L.rows(), "rows of covariance parameter",
+          &lp, Policy()))
         return lp;
       if (!check_size_match(function, 
-			    y.size(), "Size of random variable",
-			    L.cols(), "columns of covariance parameter",
-			    &lp, Policy()))
+          y.size(), "Size of random variable",
+          L.cols(), "columns of covariance parameter",
+          &lp, Policy()))
         return lp;
       if (!check_finite(function, mu, "Location parameter", &lp, Policy())) 
         return lp;
@@ -86,13 +89,13 @@ namespace stan {
 
       if (include_summand<propto,T_y,T_loc,T_covar>::value) {
         Eigen::Matrix<typename 
-		      boost::math::tools::promote_args<T_y,T_loc>::type,
-		      Eigen::Dynamic, 1> y_minus_mu(y.size());
+          boost::math::tools::promote_args<T_y,T_loc>::type,
+          Eigen::Dynamic, 1> y_minus_mu(y.size());
         for (int i = 0; i < y.size(); i++)
           y_minus_mu(i) = y(i)-mu(i);
         Eigen::Matrix<typename 
-		      boost::math::tools::promote_args<T_covar,T_loc,T_y>::type,
-		      Eigen::Dynamic, 1> 
+          boost::math::tools::promote_args<T_covar,T_loc,T_y>::type,
+          Eigen::Dynamic, 1> 
             half(mdivide_left_tri_low(L,y_minus_mu));
         // FIXME: this code does not compile. revert after fixing subtract()
         // Eigen::Matrix<typename 
@@ -164,19 +167,19 @@ namespace stan {
       typename promote_args<T_y,T_loc,T_covar>::type lp(0.0);
 
       if (!check_size_match(function, 
-			    y.cols(), "Columns of random variable",
-			    mu.rows(), "rows of location parameter",
-			    &lp, Policy()))
+          y.cols(), "Columns of random variable",
+          mu.rows(), "rows of location parameter",
+          &lp, Policy()))
         return lp;
       if (!check_size_match(function, 
-			    y.cols(), "Columns of random variable",
-			    L.rows(), "rows of covariance parameter",
-			    &lp, Policy()))
+          y.cols(), "Columns of random variable",
+          L.rows(), "rows of covariance parameter",
+          &lp, Policy()))
         return lp;
       if (!check_size_match(function, 
-			    y.cols(), "Columns of random variable",
-			    L.cols(), "columns of covariance parameter",
-			    &lp, Policy()))
+          y.cols(), "Columns of random variable",
+          L.cols(), "columns of covariance parameter",
+          &lp, Policy()))
         return lp;
       if (!check_finite(function, mu, "Location parameter", &lp, Policy())) 
         return lp;
@@ -198,7 +201,7 @@ namespace stan {
         Eigen::Matrix<T_loc, Eigen::Dynamic, Eigen::Dynamic> MU(y.rows(),y.cols());
         for(typename Eigen::Matrix<T_loc, Eigen::Dynamic, Eigen::Dynamic>::size_type i = 0; i < y.rows(); i++)
           MU.row(i) = mu;
-	
+  
         Eigen::Matrix<typename
                     boost::math::tools::promote_args<T_loc,T_y>::type,
                     Eigen::Dynamic,Eigen::Dynamic>
@@ -750,6 +753,40 @@ namespace stan {
       return multi_normal_prec_log<false>(y,mu,Sigma,stan::math::default_policy());
     }
     
+  
+    template <class RNG>
+    inline Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>
+    multi_normal_rng(const Eigen::Matrix<double,Eigen::Dynamic,1>& mu,
+                     const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& sigma,
+                     RNG& rng) {
+      using boost::variate_generator;
+      using boost::normal_distribution;
+      variate_generator<RNG&, normal_distribution<> >
+	std_normal_rng(rng, normal_distribution<>(0,1));
+
+      Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> A(sigma.rows(), sigma.cols());
+
+      for(int j = 0; j < sigma.cols(); j++)
+	{
+	      double c = 0;
+	      for(int k = 1; k < j + 1; k++)
+		c += A(j,k);
+
+	      A(j,j) = std::sqrt(sigma(j,j) - c);
+	   for(int i = j + 1; i < sigma.rows(); i++)
+	   {
+	     double b = 0;
+	     for(int k = 1; k < j; k++)
+		b += A(i,k) * A(j,k);
+	      A(i,j) = (sigma(i,j) - b) / A(j,j);
+	    }
+	}
+
+      Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> z(sigma.cols(),1);
+      for(int i = 0; i < sigma.cols(); i++)
+	z(i,0) = std_normal_rng();
+      return mu + A * z;
+    }
   }
 }
 

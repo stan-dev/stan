@@ -48,8 +48,8 @@ public:
 };
 
 INSTANTIATE_TYPED_TEST_CASE_P(Models_BasicDistributions_Uniform,
-			      Model_Test_Fixture,
-			      Models_BasicDistributions_Uniform);
+            Model_Test_Fixture,
+            Models_BasicDistributions_Uniform);
 
 TEST_F(Models_BasicDistributions_Uniform,
        Test_Variance) {
