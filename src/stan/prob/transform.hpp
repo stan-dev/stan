@@ -1020,7 +1020,7 @@ namespace stan {
         x(k) = x(k-1)*sin_yk_1; 
         x(k-1) *= cos(yk_1);
         if (k < Km1)
-          lp += (Km1 - k)*log(abs(sin_y_k_1));
+          lp += (Km1 - k)*log(abs(sin_yk_1));
       }
       return x;
     }
