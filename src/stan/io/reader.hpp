@@ -751,6 +751,53 @@ namespace stan {
       }
 
       /**
+       * Return a unit_vector of the specified size made up of the
+       * next scalars.  
+       *
+       * <p>See <code>stan::math::check_unit_vector</code>.
+       *
+       * @param k Size of returned unit_vector.
+       * @return Simplex read from the specified size number of scalars.
+       * @throw std::runtime_error if the k values is not a unit_vector.
+       */
+      inline vector_t unit_vector(size_t k) {
+        vector_t theta(vector(k));
+        stan::math::check_unit_vector("stan::io::unit_vector(%1%)", theta, "Constrained vector");
+        return theta;
+      }
+
+      /**
+       * Return the next unit_vector transformed vector of the specified
+       * length.  This operation consumes one less than the specified
+       * length number of scalars.  
+       *
+       * <p>See <code>stan::prob::unit_vector_constrain(Eigen::Matrix)</code>.
+       *
+       * @param k Number of dimensions in resulting unit_vector.
+       * @return Simplex derived from next <code>k-1</code> scalars.
+       */
+      inline 
+      Eigen::Matrix<T,Eigen::Dynamic,1> unit_vector_constrain(size_t k) {
+        return stan::prob::unit_vector_constrain(vector(k-1));
+      }
+
+      /**
+       * Return the next unit_vector of the specified size (using one fewer
+       * unconstrained scalars), incrementing the specified reference with the
+       * log absolute Jacobian determinant.
+       *
+       * <p>See <code>stan::prob::unit_vector_constrain(Eigen::Matrix,T&)</code>.
+       *
+       * @param k Size of unit_vector.
+       * @param lp Log probability to increment with log absolute
+       * Jacobian determinant.
+       * @return The next unit_vector of the specified size.
+       */
+      inline vector_t unit_vector_constrain(size_t k, T& lp) {
+        return stan::prob::unit_vector_constrain(vector(k-1),lp);
+      }
+
+      /**
        * Return a simplex of the specified size made up of the
        * next scalars.  
        *
