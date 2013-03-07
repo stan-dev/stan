@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 #include <stan/prob/distributions/multivariate/continuous/dirichlet.hpp>
+#include <boost/random/mersenne_twister.hpp>
+#include<boost/math/distributions.hpp>
 
 using Eigen::Dynamic;
 using Eigen::Matrix;
@@ -32,3 +34,14 @@ TEST(ProbDistributions,DirichletPropto) {
   EXPECT_FLOAT_EQ(0.0, stan::prob::dirichlet_log<true>(theta2,alpha2));
 }
 
+TEST(ProbDistributionsDirichlet, random) {
+  boost::random::mt19937 rng;
+  Matrix<double,Dynamic,Dynamic> alpha(3,1);
+  alpha << 2.0, 
+    3.0,
+    11.0;
+
+  EXPECT_NO_THROW(stan::prob::dirichlet_rng(alpha,rng));
+}
+
+//more extensive test could entail testing each set of values in position i as if it were a gamma distribution but you have to scale by dividing by sum of i's first.
