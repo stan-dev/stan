@@ -1,6 +1,9 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__MULTI_NORMAL_HPP__
 #define __STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__MULTI_NORMAL_HPP__
 
+#include <boost/random/normal_distribution.hpp>
+#include <boost/random/variate_generator.hpp>
+
 #include <stan/math/matrix_error_handling.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/special_functions.hpp>
@@ -750,6 +753,40 @@ namespace stan {
       return multi_normal_prec_log<false>(y,mu,Sigma,stan::math::default_policy());
     }
     
+  
+    template <class RNG>
+    inline Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>
+    multi_normal_rng(const Eigen::Matrix<double,Eigen::Dynamic,1>& mu,
+                     const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& sigma,
+                     RNG& rng) {
+      using boost::variate_generator;
+      using boost::normal_distribution;
+      variate_generator<RNG&, normal_distribution<> >
+	std_normal_rng(rng, normal_distribution<>(0,1));
+
+      Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> A(sigma.rows(), sigma.cols());
+
+      for(int j = 0; j < sigma.cols(); j++)
+	{
+	      double c = 0;
+	      for(int k = 1; k < j + 1; k++)
+		c += A(j,k);
+
+	      A(j,j) = std::sqrt(sigma(j,j) - c);
+	   for(int i = j + 1; i < sigma.rows(); i++)
+	   {
+	     double b = 0;
+	     for(int k = 1; k < j; k++)
+		b += A(i,k) * A(j,k);
+	      A(i,j) = (sigma(i,j) - b) / A(j,j);
+	    }
+	}
+
+      Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> z(sigma.cols(),1);
+      for(int i = 0; i < sigma.cols(); i++)
+	z(i,0) = std_normal_rng();
+      return mu + A * z;
+    }
   }
 }
 
