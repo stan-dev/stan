@@ -629,6 +629,17 @@ namespace stan {
         range_(range) 
     { }
 
+    unit_vector_var_decl::unit_vector_var_decl() 
+      : base_var_decl(VECTOR_T) 
+    { }
+
+    unit_vector_var_decl::unit_vector_var_decl(expression const& K,
+                                       std::string const& name,
+                                       std::vector<expression> const& dims)
+      : base_var_decl(name,dims,VECTOR_T),
+        K_(K) 
+    { }
+
     simplex_var_decl::simplex_var_decl() 
       : base_var_decl(VECTOR_T) 
     { }
@@ -735,6 +746,9 @@ namespace stan {
     std::string name_vis::operator()(const matrix_var_decl& x) const {
       return x.name_;
     }
+    std::string name_vis::operator()(const unit_vector_var_decl& x) const {
+      return x.name_;
+    }
     std::string name_vis::operator()(const simplex_var_decl& x) const {
       return x.name_;
     }
@@ -764,6 +778,7 @@ namespace stan {
     var_decl::var_decl(const vector_var_decl& decl) : decl_(decl) { }
     var_decl::var_decl(const row_vector_var_decl& decl) : decl_(decl) { }
     var_decl::var_decl(const matrix_var_decl& decl) : decl_(decl) { }
+    var_decl::var_decl(const unit_vector_var_decl& decl) : decl_(decl) { }
     var_decl::var_decl(const simplex_var_decl& decl) : decl_(decl) { }
     var_decl::var_decl(const ordered_var_decl& decl) : decl_(decl) { }
     var_decl::var_decl(const positive_ordered_var_decl& decl) : decl_(decl) { }
