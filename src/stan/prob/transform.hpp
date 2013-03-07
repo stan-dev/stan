@@ -969,7 +969,86 @@ namespace stan {
       return atanh(y);
     }
 
-    
+
+    // Unit vector   
+
+    /**
+     * Return the unit length vector corresponding to the free vector y.
+     * The free vector contains K-1 spherical coordinates.
+     *
+     * @param Vector of K - 1 spherical coordinates
+     * @return Unit length vector of dimension K
+     * @tparam T Scalar type.
+     **/
+    template <typename T>
+    Eigen::Matrix<T,Eigen::Dynamic,1> 
+    unit_vector_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& y) {
+      typedef typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type size_type;
+      using stan::math::sin;
+      using stan::math::cos;
+      using stan::math::log;
+      using stan::math::abs;
+      int Km1 = y.size();
+      Eigen::Matrix<T,Eigen::Dynamic,1> x(Km1 + 1);
+      x(0) = 1.0;
+      const T half_pi = T(M_PI/2.0);
+      for (size_type k = 1; k <= Km1; ++k) {
+        T yk_1 = y(k-1) - half_pi;
+        T sin_y_k_1 = sin(yk_1);
+        x(k) = x(k-1)*sin_yk_1; 
+        x(k-1) *= cos(yk_1);
+      }
+      return x;
+    }
+
+    /**
+     * Return the unit length vector corresponding to the free vector y.
+     * The free vector contains K-1 spherical coordinates.
+     *
+     * @param Vector of K - 1 spherical coordinates
+     * @return Unit length vector of dimension K
+     * @param lp Log probability reference to increment.
+     * @tparam T Scalar type.
+     **/
+    template <typename T>
+    Eigen::Matrix<T,Eigen::Dynamic,1> 
+    unit_vector_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& y, T &lp) {
+      typedef typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type size_type;
+      using stan::math::sin;
+      using stan::math::cos;
+      using stan::math::log;
+      using stan::math::abs;
+      int Km1 = y.size();
+      Eigen::Matrix<T,Eigen::Dynamic,1> x(Km1 + 1);
+      x(0) = 1.0;
+      const T half_pi = T(M_PI/2.0);
+      for (size_type k = 1; k <= Km1; ++k) {
+        T yk_1 = y(k-1) - half_pi;
+        T sin_y_k_1 = sin(yk_1);
+        x(k) = x(k-1)*sin_yk_1; 
+        x(k-1) *= cos(yk_1);
+        if (k < Km1)
+          lp += (Km1 - k)*log(abs(sin_y_k_1));
+      }
+      return x;
+    }
+
+    template <typename T>
+    Eigen::Matrix<T,Eigen::Dynamic,1> 
+    unit_vector_free(const Eigen::Matrix<T,Eigen::Dynamic,1>& x) {
+      typedef typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type size_type;
+      stan::math::check_unit_vector("stan::prob::unit_vector_free(%1%)", x, "Unit vector variable");
+      int Km1 = x.size() - 1;
+      Eigen::Matrix<T,Eigen::Dynamic,1> y(Km1);
+      T sumSq = x(Km1)*x(Km1);
+      const T half_pi = T(M_PI/2.0);
+      for (size_type k = Km1; --k >= 0; ) {
+        y(k) = atan2(sqrt(sumSq),x(k)) + half_pi;
+        sumSq += x(k)*x(k);
+      }
+      return y;
+    }
+
     // SIMPLEX
 
 
