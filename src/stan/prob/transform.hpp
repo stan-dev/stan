@@ -989,7 +989,7 @@ namespace stan {
       x(0) = 1.0;
       const T half_pi = T(M_PI/2.0);
       for (size_type k = 1; k <= Km1; ++k) {
-        T yk_1 = y(k-1) - half_pi;
+        T yk_1 = y(k-1) + half_pi;
         T sin_yk_1 = sin(yk_1);
         x(k) = x(k-1)*sin_yk_1; 
         x(k-1) *= cos(yk_1);
@@ -1015,7 +1015,7 @@ namespace stan {
       x(0) = 1.0;
       const T half_pi = T(M_PI/2.0);
       for (size_type k = 1; k <= Km1; ++k) {
-        T yk_1 = y(k-1) - half_pi;
+        T yk_1 = y(k-1) + half_pi;
         T sin_yk_1 = sin(yk_1);
         x(k) = x(k-1)*sin_yk_1; 
         x(k-1) *= cos(yk_1);
@@ -1035,7 +1035,7 @@ namespace stan {
       T sumSq = x(Km1)*x(Km1);
       const T half_pi = T(M_PI/2.0);
       for (size_type k = Km1; --k >= 0; ) {
-        y(k) = atan2(sqrt(sumSq),x(k)) + half_pi;
+        y(k) = atan2(sqrt(sumSq),x(k)) - half_pi;
         sumSq += x(k)*x(k);
       }
       return y;
