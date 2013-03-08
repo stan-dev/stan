@@ -393,23 +393,26 @@ namespace stan {
       using boost::spirit::qi::lit;
       using boost::spirit::qi::_pass;
       using boost::spirit::qi::_val;
+      using boost::spirit::qi::labels::_r1;
+
+      // _r1 : var_origin
 
       term_r.name("term");
       term_r 
-        = ( negated_factor_r                       
+        = ( negated_factor_r(_r1)                       
             [_val = _1]
-             >> *( (lit('*') > negated_factor_r     
+            >> *( (lit('*') > negated_factor_r(_r1)     
                                [_val = multiplication(_val,_1,
                                                       boost::phoenix::ref(error_msgs_))])
-                   | (lit('/') > negated_factor_r   
+                  | (lit('/') > negated_factor_r(_r1)   
                                  [_val = division(_val,_1,boost::phoenix::ref(error_msgs_))])
-                   | (lit('\\') > negated_factor_r   
+                  | (lit('\\') > negated_factor_r(_r1)   
                                   [_val = left_division(_val,_1,
                                                         boost::phoenix::ref(error_msgs_))])
-                   | (lit(".*") > negated_factor_r   
+                  | (lit(".*") > negated_factor_r(_r1)   
                                   [_val = elt_multiplication(_val,_1,
                                                          boost::phoenix::ref(error_msgs_))])
-                   | (lit("./") > negated_factor_r   
+                  | (lit("./") > negated_factor_r(_r1)   
                                   [_val = elt_division(_val,_1,
                                                        boost::phoenix::ref(error_msgs_))])
                    )
@@ -418,19 +421,19 @@ namespace stan {
 
 
       negated_factor_r 
-        = lit('-') >> negated_factor_r 
+        = lit('-') >> negated_factor_r(_r1) 
                       [_val = negate_expr_f(_1,boost::phoenix::ref(error_msgs_))]
-        | lit('!') >> negated_factor_r 
+        | lit('!') >> negated_factor_r(_r1) 
                       [_val = logical_negate_expr_f(_1,boost::phoenix::ref(error_msgs_))]
-        | lit('+') >> negated_factor_r  [_val = _1]
-        | indexed_factor_r [_val = _1];
+        | lit('+') >> negated_factor_r(_r1)  [_val = _1]
+        | indexed_factor_r(_r1) [_val = _1];
 
 
       indexed_factor_r.name("(optionally) indexed factor [sub]");
       indexed_factor_r 
-        = factor_r [_val = _1]
+        = factor_r(_r1) [_val = _1]
         > * (  
-               (+dims_r) 
+             (+dims_r(_r1)) 
                [_val = add_expression_dimss_f(_val, _1, _pass,
                                             boost::phoenix::ref(error_msgs_))]
                | 
@@ -444,17 +447,16 @@ namespace stan {
       factor_r
         =  int_literal_r     [_val = _1]
         | double_literal_r    [_val = _1]
-        | fun_r               [_val = set_fun_type_f(_1,boost::phoenix::ref(error_msgs_))]
+        | fun_r(_r1)               [_val = set_fun_type_f(_1,boost::phoenix::ref(error_msgs_))]
         | variable_r          
         [_val = set_var_type_f(_1,boost::phoenix::ref(var_map_),
                                boost::phoenix::ref(error_msgs_),
                                _pass)]
         | ( lit('(') 
-            > expression_g    [_val = _1]
+            > expression_g(_r1)    [_val = _1]
             > lit(')') )
         ;
 
-        
       int_literal_r.name("integer literal");
       int_literal_r
         %= int_ 
@@ -471,7 +473,7 @@ namespace stan {
       fun_r.name("function and argument expressions");
       fun_r 
         %= identifier_r // no test yet on valid naming
-        >> args_r; 
+        >> args_r(_r1); 
 
 
       identifier_r.name("identifier (expression grammar)");
@@ -484,7 +486,7 @@ namespace stan {
       args_r 
         %= (lit('(') >> lit(')'))
         | ( lit('(')
-            >> (expression_g % ',')
+            >> (expression_g(_r1) % ',')
             > lit(')') )
         ;
 
@@ -492,7 +494,7 @@ namespace stan {
       dims_r.name("array dimensions");
       dims_r 
         %= lit('[') 
-        > (expression_g
+        > (expression_g(_r1)
            [_pass = validate_int_expr3_f(_1,boost::phoenix::ref(error_msgs_))]
            % ',')
         > lit(']')

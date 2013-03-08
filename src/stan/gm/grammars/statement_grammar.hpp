@@ -40,19 +40,19 @@ namespace stan {
 
       // rules
       boost::spirit::qi::rule<Iterator, 
-                              assignment(), 
+                              assignment(var_origin), 
                               whitespace_grammar<Iterator> > 
       assignment_r;
 
 
       boost::spirit::qi::rule<Iterator, 
-                              std::vector<expression>(), 
+                              std::vector<expression>(var_origin), 
                               whitespace_grammar<Iterator> > 
       dims_r;
 
 
       boost::spirit::qi::rule<Iterator, 
-                              distribution(),
+                              distribution(var_origin),
                               whitespace_grammar<Iterator> >
       distribution_r;
 
@@ -71,13 +71,13 @@ namespace stan {
 
 
       boost::spirit::qi::rule<Iterator,
-                              print_statement(),
+                              print_statement(var_origin),
                               whitespace_grammar<Iterator> >
       print_statement_r;
 
 
       boost::spirit::qi::rule<Iterator,
-                              printable(),
+                              printable(var_origin),
                               whitespace_grammar<Iterator> >
       printable_r;
 
@@ -93,7 +93,7 @@ namespace stan {
       identifier_r;
 
       boost::spirit::qi::rule<Iterator, 
-                              std::vector<var_decl>(), 
+                              std::vector<var_decl>(),
                               whitespace_grammar<Iterator> >
       local_var_decls_r;
 
@@ -103,17 +103,17 @@ namespace stan {
       no_op_statement_r;
 
       boost::spirit::qi::rule<Iterator, 
-                              std::vector<expression>(),
+                              std::vector<expression>(var_origin),
                               whitespace_grammar<Iterator> > 
       opt_dims_r;
 
       boost::spirit::qi::rule<Iterator,
-                              range(), 
+                              range(var_origin), 
                               whitespace_grammar<Iterator> > 
       range_r;
 
       boost::spirit::qi::rule<Iterator, 
-                              sample(bool),
+                              sample(bool,var_origin),
                               whitespace_grammar<Iterator> > 
       sample_r;
 
@@ -129,12 +129,12 @@ namespace stan {
       statement_seq_r;
 
       boost::spirit::qi::rule<Iterator, 
-                              range(), 
+                              range(var_origin), 
                               whitespace_grammar<Iterator> > 
       truncation_range_r;
 
       boost::spirit::qi::rule<Iterator, 
-                              variable_dims(),
+                              variable_dims(var_origin),
                               whitespace_grammar<Iterator> > 
       var_lhs_r;
 
