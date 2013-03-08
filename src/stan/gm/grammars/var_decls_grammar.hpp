@@ -112,6 +112,11 @@ namespace stan {
       row_vector_decl_r;
 
       boost::spirit::qi::rule<Iterator, 
+                              unit_vector_var_decl(), 
+                              whitespace_grammar<Iterator> > 
+      unit_vector_decl_r;
+
+      boost::spirit::qi::rule<Iterator, 
                               simplex_var_decl(), 
                               whitespace_grammar<Iterator> > 
       simplex_decl_r;

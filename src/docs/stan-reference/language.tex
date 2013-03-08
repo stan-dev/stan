@@ -250,10 +250,11 @@ real values), and \code{matrix} (of real values).
 \subsection{Constrained Data Types}
 
 Integer or real types may be constrained with lower bounds, upper
-bounds, or both.  There are three constrained vector data types,
-\code{simplex} for unit simplexes and \code{ordered} for ordered
-vectors of scalars and \code{positive\_ordered} for vectors of positive
-ordered scalars.  There are two specialized matrix data types,
+bounds, or both.  There are four constrained vector data types,
+\code{simplex} for unit simplexes, \code{unit\_vector} for unit-length
+vectors, \code{ordered} for ordered vectors of scalars and
+\code{positive\_ordered} for vectors of positive ordered scalars.
+There are two specialized matrix data types,
 \code{corr\_matrix} and \code{cov\_matrix}, for correlation matrices
 (symmetric, positive definite, unit diagonal) and covariance matrices
 (symmetric, positive definite).
@@ -545,6 +546,27 @@ simplexes, this is only done up to a statically specified accuracy
 threshold $\epsilon$ to account for errors arising from floating-point
 imprecision.
 
+\subsection{Unit Vectors}
+
+A unit vector is a vector with a norm of one.  For instance,
+$(0.5,0.5,0.5,0.5)^{\top}$ is a unit 4-vector.
+Unit vectors are sometimes used in directional statistics.
+Unit vectors are declared with their full
+dimensionality.  For instance, \code{theta} is declared to
+be a unit $5$-vector by
+%
+\begin{quote}
+\begin{Verbatim} 
+unit_vector[5] theta;
+\end{Verbatim}
+\end{quote}
+% 
+Unit vectors are implemented as vectors and may be assigned to other
+vectors and vice-versa.  Unit vector variables, like other constrained
+variables, are validated to ensure that they are indeed unit length; for
+unit vectors, this is only done up to a statically specified accuracy
+threshold $\epsilon$ to account for errors arising from floating-point
+imprecision.
 
 \subsection{Ordered Vectors}
 
@@ -1036,6 +1058,7 @@ any of the following.
 \code{real},
 \code{vector},
 \code{simplex},
+\code{unit\_vector},
 \code{ordered},
 \code{positive\_ordered},
 \code{row\_vector},
@@ -1526,6 +1549,7 @@ primitive types.
 {\it Type} & {\it Primitive Type} \\ \hline \hline
 \code{vector} & \code{vector} \\
 \code{simplex} & \code{vector} \\
+\code{unit\_vector} & \code{vector} \\
 \code{ordered} & \code{vector} \\
 \code{positive\_ordered} & \code{vector} \\[6pt]
 \code{row\_vector} & \code{row\_vector}
@@ -3030,6 +3054,7 @@ var_type ::= 'int' range_constraint
            | 'ordered' '[' expression ']'
            | 'positive_ordered' '[' expression ']'
            | 'simplex' '[' expression ']'
+           | 'unit_vector' '[' expression ']'
            | 'row_vector' range_constraint '[' expression ']'
            | 'matrix' range_constraint '[' expression ',' expression ']'
            | 'corr_matrix' '[' expression ']'

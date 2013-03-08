@@ -47,6 +47,11 @@ BOOST_FUSION_ADAPT_STRUCT(stan::gm::matrix_var_decl,
                           (std::string, name_)
                           (std::vector<stan::gm::expression>, dims_) )
 
+BOOST_FUSION_ADAPT_STRUCT(stan::gm::unit_vector_var_decl,
+                          (stan::gm::expression, K_)
+                          (std::string, name_)
+                          (std::vector<stan::gm::expression>, dims_) )
+
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::simplex_var_decl,
                           (stan::gm::expression, K_)
                           (std::string, name_)
@@ -109,6 +114,11 @@ namespace stan {
       }
       bool operator()(const matrix_var_decl& /*x*/) const {
         return true;
+      }
+      bool operator()(const unit_vector_var_decl& /*x*/) const {
+        error_msgs_ << "require unconstrained variable declaration."
+                    << " found unit_vector." << std::endl;
+        return false;
       }
       bool operator()(const simplex_var_decl& /*x*/) const {
         error_msgs_ << "require unconstrained variable declaration."
@@ -278,7 +288,8 @@ namespace stan {
 
         reserve("int");
         reserve("real"); 
-        reserve("vector"); 
+        reserve("vector");
+        reserve("unit_vector");
         reserve("simplex"); 
         reserve("ordered"); 
         reserve("positive_ordered"); 
@@ -566,6 +577,9 @@ namespace stan {
             | matrix_decl_r        
             [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2,
                               boost::phoenix::ref(error_msgs_))]
+            | unit_vector_decl_r       
+            [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2,
+                              boost::phoenix::ref(error_msgs_))]
             | simplex_decl_r       
             [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2,
                               boost::phoenix::ref(error_msgs_))]
@@ -645,6 +659,17 @@ namespace stan {
         > identifier_r 
         > opt_dims_r
         > lit(';');
+
+      unit_vector_decl_r.name("unit_vector declaration");
+      unit_vector_decl_r 
+        %= lit("unit_vector")
+        > lit('[')
+        > expression_g
+        [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
+        > lit(']')
+        > identifier_r 
+        > opt_dims_r
+        > lit(';'); 
 
       simplex_decl_r.name("simplex declaration");
       simplex_decl_r 

@@ -98,11 +98,13 @@
       \item \code{delta} (\code{double})
       \item \code{equal_step_sizes} (\code{TRUE} or \code{FALSE})
       \item \code{max_treedepth} (\code{integer})
+      \item \code{nondiag_mass} (\code{TRUE} or \code{FALSE})
     }
 
     More details can be 
-    found in Stan's manual. By default, 
-    \code{leapfrog_steps} is \code{-1} and 
+    found in Stan's manual and the doc of \code{\link{stan}}. By default, 
+    \code{nondiag_mass} is \code{FALSE, 
+    \code{leapfrog_steps} is \code{-1}, and 
     \code{equal_step_sizes} is \code{FALSE} so that
     NUTS2 sampler, the default sampler, is used.
 

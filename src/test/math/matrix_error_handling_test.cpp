@@ -19,6 +19,22 @@ TEST(stanMathMatrixErrorHandling, checkNotNanEigenRow) {
                std::domain_error);
   
 }
+TEST(stanMathMatrixErrorHandling, checkUnitVector) {
+  Eigen::Matrix<double,Eigen::Dynamic,1> y(2);
+  double result;
+  y << sqrt(0.5), sqrt(0.5);
+  
+  EXPECT_TRUE(stan::math::check_unit_vector("checkUnitVector(%1%)",
+                                        y, "y", &result));
+  EXPECT_TRUE(stan::math::check_unit_vector("checkUnitVector(%1%)",
+                                        y, "y"));
+                  
+  y[1] = 0.55;
+  EXPECT_THROW(stan::math::check_unit_vector("checkUnitVector(%1%)", y, "y", &result), 
+               std::domain_error);
+  EXPECT_THROW(stan::math::check_unit_vector("checkUnitVector(%1%)", y, "y"),
+               std::domain_error);
+}
 TEST(stanMathMatrixErrorHandling, checkSimplex) {
   Eigen::Matrix<double,Eigen::Dynamic,1> y(2);
   double result;

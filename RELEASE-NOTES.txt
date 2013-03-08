@@ -291,3 +291,8 @@ boost/eigen version
 Cmd:    lib/boost_x.xx.x/, lib/eigen_x.x.x, etc.
 R:      rstan/rstan/src/Makefile{,.win} 
         rstan/rstan/R/options.R
+
+author list 
+Cmd:   web/mc-stan.org/development-team.html
+R:     rstan/rstan/DESCRIPTION
+       rstan/rstan/man/rstan.Rd

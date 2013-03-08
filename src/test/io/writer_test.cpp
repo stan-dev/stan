@@ -117,6 +117,25 @@ TEST(io_writer, positive_ordered_unconstrain_exception) {
   y << 1.0, 0.1;
   EXPECT_THROW (writer.positive_ordered_unconstrain(y), std::domain_error);
 }
+TEST(io_writer, unit_vector_unconstrain_exception) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  stan::io::writer<double> writer(theta,theta_i);
+  Eigen::Matrix<double,Eigen::Dynamic,1> y;
+  
+  y.resize(2);
+  y << sqrt(0.5), sqrt(0.5);
+  EXPECT_NO_THROW (writer.unit_vector_unconstrain(y));
+  
+  y << 1.1, -0.1;
+  EXPECT_THROW (writer.unit_vector_unconstrain(y), std::domain_error);
+
+  y << 0.1, 0.1;
+  EXPECT_THROW (writer.unit_vector_unconstrain(y), std::domain_error);
+  
+  y.resize(0);
+  EXPECT_THROW (writer.unit_vector_unconstrain(y), std::domain_error);
+}
 TEST(io_writer, simplex_unconstrain_exception) {
   std::vector<int> theta_i;
   std::vector<double> theta;

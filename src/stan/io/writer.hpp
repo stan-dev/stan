@@ -327,6 +327,28 @@ namespace stan {
       
 
       /**
+       * Write the unconstrained vector corresponding to the specified unit_vector 
+       * value.  If the specified constrained unit_vector is of size <code>K</code>,
+       * the returned unconstrained vector is of size <code>K-1</code>.
+       *
+       * <p>The transform takes <code>y = y[1],...,y[K]</code> and
+       * produces the unconstrained vector. This inverts
+       * the constraining transform of
+       * <code>unit_vector_constrain(size_t)</code>.
+       *
+       * @param y Simplex constrained value.
+       * @return Unconstrained value.
+       * @throw std::runtime_error if the vector is not a unit_vector.
+       */
+      void unit_vector_unconstrain(vector_t& y) {
+        stan::math::check_unit_vector("stan::io::unit_vector_unconstrain(%1%)", y, "Vector");
+        vector_t uy = stan::prob::unit_vector_free(y);
+        for (typename vector_t::size_type i = 0; i < uy.size(); ++i) 
+          data_r_.push_back(uy[i]);
+      }
+ 
+
+      /**
        * Write the unconstrained vector corresponding to the specified simplex 
        * value.  If the specified constrained simplex is of size <code>K</code>,
        * the returned unconstrained vector is of size <code>K-1</code>.
