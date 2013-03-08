@@ -15,7 +15,7 @@ HOW TO (developer notes on how to release, last column is ordering)
 10.  Announce                                                    > 9
 
 
-v1.2.0 (5 March 2012)
+v1.2.0 (6 March 2012)
 ======================================================================
 
 Enhancements

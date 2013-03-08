@@ -116,7 +116,7 @@ namespace stan {
       conditional_statement_r
         = lit("if")
         > lit('(')
-        > expression_g
+        > expression_g(_r2)
           [_pass = add_conditional_condition_f(_val,_1,
                                                boost::phoenix::ref(error_msgs_))]
         > lit(')')
@@ -125,7 +125,7 @@ namespace stan {
         > * (lit("else")
              >> lit("if")
              > lit('(')
-             > expression_g
+             > expression_g(_r2)
                [_pass = add_conditional_condition_f(_val,_1,
                                                     boost::phoenix::ref(error_msgs_))]
              > lit(')')

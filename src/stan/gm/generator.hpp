@@ -179,6 +179,14 @@ namespace stan {
           if (i > 0) o_ << ',';
           boost::apply_visitor(*this, fx.args_[i].expr_);
         }
+        size_t n = fx.name_.size();
+        if (n > 4 
+            && fx.name_[n-1] == 'g' 
+            && fx.name_[n-2] == 'n'
+            && fx.name_[n-3] == 'r'
+            && fx.name_[n-4] == '_') {
+          o_ << ", base_rng__";
+        }
         o_ << ')';
       }
       void operator()(const binary_op& expr) const {
@@ -2703,7 +2711,9 @@ namespace stan {
     void generate_write_csv_method(const program& prog,
                                    const std::string& model_name,
                                    std::ostream& o) {
-      o << INDENT << "void write_csv(std::vector<double>& params_r__," << EOL;
+      o << INDENT << "template <typename RNG>" << EOL;
+      o << INDENT << "void write_csv(RNG& base_rng__," << EOL;
+      o << INDENT << "               std::vector<double>& params_r__," << EOL;
       o << INDENT << "               std::vector<int>& params_i__," << EOL;
       o << INDENT << "               std::ostream& o__," << EOL;
       o << INDENT << "               std::ostream* pstream__ = 0) {" << EOL;
@@ -3034,7 +3044,9 @@ namespace stan {
     void generate_write_array_method(const program& prog,
                                      const std::string& model_name,
                                      std::ostream& o) {
-      o << INDENT << "void write_array(std::vector<double>& params_r__," << EOL;
+      o << INDENT << "template <typename RNG>" << EOL;
+      o << INDENT << "void write_array(RNG& base_rng__," << EOL;
+      o << INDENT << "                 std::vector<double>& params_r__," << EOL;
       o << INDENT << "                 std::vector<int>& params_i__," << EOL;
       o << INDENT << "                 std::vector<double>& vars__," << EOL;
       o << INDENT << "                 std::ostream* pstream__ = 0) {" << EOL;

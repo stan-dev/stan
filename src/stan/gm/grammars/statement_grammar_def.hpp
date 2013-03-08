@@ -382,12 +382,12 @@ namespace stan {
         | for_statement_r(_r1,_r2)
         | while_statement_r(_r1,_r2)
         | statement_2_g(_r1,_r2)
-        | print_statement_r
-        | assignment_r 
+        | print_statement_r(_r2)
+        | assignment_r(_r2)
           [_pass 
             = validate_assignment_f(_1,_r2,boost::phoenix::ref(var_map_),
                                      boost::phoenix::ref(error_msgs_))]
-        | sample_r(_r1) [_pass = validate_sample_f(_1,
+        | sample_r(_r1,_r2) [_pass = validate_sample_f(_1,
                                                    boost::phoenix::ref(error_msgs_))]
         | no_op_statement_r
         ;
@@ -409,7 +409,7 @@ namespace stan {
       while_statement_r
         = lit("while")
         > lit('(')
-        > expression_g
+        > expression_g(_r2)
           [_pass = add_while_condition_f(_val,_1,
                                          boost::phoenix::ref(error_msgs_))]
         > lit(')')
@@ -417,31 +417,6 @@ namespace stan {
           [add_while_body_f(_val,_1)]
         ;
       
-      // conditional_statement_r.name("if-else statement");
-      // conditional_statement_r
-      //   = lit("if")
-      //   > lit('(')
-      //   > expression_g
-      //     [_pass = add_conditional_condition_f(_val,_1,
-      //                                          boost::phoenix::ref(error_msgs_))]
-      //   > lit(')')
-      //   > statement_r(_r1,_r2)
-      //   [add_conditional_body_f(_val,_1)]
-      //   > * (lit("else")
-      //        >> lit("if")
-      //        > lit('(')
-      //        > expression_g
-      //          [_pass = add_conditional_condition_f(_val,_1,
-      //                                               boost::phoenix::ref(error_msgs_))]
-      //        > lit(')')
-      //        > statement_r(_r1,_r2)
-      //          [add_conditional_body_f(_val,_1)]
-      //        )
-      //   > - (lit("else") 
-      //        > statement_r(_r1,_r2)
-      //          [add_conditional_body_f(_val,_1)]
-      //        )
-      //   ;
 
       // _r1, _r2 same as statement_r
       for_statement_r.name("for statement");
@@ -453,7 +428,7 @@ namespace stan {
                                                 boost::phoenix::ref(var_map_),
                                                 boost::phoenix::ref(error_msgs_))]
         > lit("in")
-        > range_r
+        > range_r(_r2)
         > lit(')')
         > statement_r(_r1,_r2)
         > eps 
@@ -464,14 +439,13 @@ namespace stan {
       print_statement_r
         %= lit("print")
         > lit('(')
-        > (printable_r % ',')
-        // > (expression_g % ',')
+        > (printable_r(_r1) % ',')
         > lit(')');
 
       printable_r.name("printable");
       printable_r
         %= printable_string_r 
-        | expression_g;
+        | expression_g(_r1);
 
       printable_string_r.name("printable quoted string");
       printable_string_r
@@ -486,33 +460,33 @@ namespace stan {
 
       range_r.name("range expression pair, colon");
       range_r 
-        %= expression_g
+        %= expression_g(_r1)
         [_pass = validate_int_expr2_f(_1,boost::phoenix::ref(error_msgs_))]
         >> lit(':') 
-        >> expression_g
+        >> expression_g(_r1)
         [_pass = validate_int_expr2_f(_1,boost::phoenix::ref(error_msgs_))];
 
       assignment_r.name("variable assignment by expression");
       assignment_r
-        %= var_lhs_r
+        %= var_lhs_r(_r1)
         >> lit("<-")
-        > expression_g
+        > expression_g(_r1)
         > lit(';') 
         ;
 
       var_lhs_r.name("variable and array dimensions");
       var_lhs_r 
         %= identifier_r 
-        >> opt_dims_r;
+        >> opt_dims_r(_r1);
 
       opt_dims_r.name("array dimensions (optional)");
       opt_dims_r 
-        %=  - dims_r;
+        %=  - dims_r(_r1);
 
       dims_r.name("array dimensions");
       dims_r 
         %= lit('[') 
-        > (expression_g
+        > (expression_g(_r1)
            [_pass = validate_int_expr2_f(_1,boost::phoenix::ref(error_msgs_))]
            % ',')
         > lit(']')
@@ -521,29 +495,29 @@ namespace stan {
       // inherited  _r1 = true if samples allowed as statements
       sample_r.name("distribution of expression");
       sample_r 
-        %= expression_g
+        %= expression_g(_r2)
         >> lit('~')
         > eps
         [_pass 
          = validate_allow_sample_f(_r1,boost::phoenix::ref(error_msgs_))] 
-        > distribution_r
-        > -truncation_range_r
+        > distribution_r(_r2)
+        > -truncation_range_r(_r2)
         > lit(';');
 
       distribution_r.name("distribution and parameters");
       distribution_r
         %= identifier_r
         >> lit('(')
-        >> -(expression_g % ',')
+        >> -(expression_g(_r1) % ',')
         > lit(')');
 
       truncation_range_r.name("range pair");
       truncation_range_r
         %= lit('T')
         > lit('[') 
-        > -expression_g
+        > -expression_g(_r1)
         > lit(',')
-        > -expression_g
+        > -expression_g(_r1)
         > lit(']');
 
       no_op_statement_r.name("no op statement");

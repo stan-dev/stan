@@ -156,7 +156,7 @@ namespace stan {
             || ((n + 1) % refresh == 0) );
     }
 
-    template <class Sampler, class Model>
+    template <class Sampler, class Model, class RNG>
     void sample_from(Sampler& sampler,
                      bool epsilon_adapt,
                      int refresh,
@@ -167,7 +167,8 @@ namespace stan {
                      std::ostream& sample_file_stream,
                      std::vector<double>& params_r,
                      std::vector<int>& params_i,
-                     Model& model) {
+                     Model& model,
+                     RNG& base_rng) {
 
       sampler.set_params(params_r,params_i);
      
@@ -197,7 +198,7 @@ namespace stan {
             sampler.write_sampler_params(sample_file_stream);
             sample.params_r(params_r);
             sample.params_i(params_i);
-            model.write_csv(params_r,params_i,sample_file_stream,&std::cout);
+            model.write_csv(base_rng,params_r,params_i,sample_file_stream,&std::cout);
           } else {
             sampler.next(); // discard
           }
@@ -217,7 +218,7 @@ namespace stan {
             sampler.write_sampler_params(sample_file_stream);
             sample.params_r(params_r);
             sample.params_i(params_i);
-            model.write_csv(params_r,params_i,sample_file_stream,&std::cout);
+            model.write_csv(base_rng,params_r,params_i,sample_file_stream,&std::cout);
           }
         }
       }
@@ -506,12 +507,12 @@ namespace stan {
           //           fprintf(stderr, "   %f  (last = %f)\n", lp, lastlp);
           if (save_warmup) {
             sample_stream << lp << ',';
-            model.write_csv(params_r,params_i,sample_stream);
+            model.write_csv(base_rng,params_r,params_i,sample_stream);
           }
         }
 
         sample_stream << lp << ',';
-        model.write_csv(params_r,params_i,sample_stream);
+        model.write_csv(base_rng,params_r,params_i,sample_stream);
 
         return 0;
       }
@@ -673,7 +674,8 @@ namespace stan {
         sample_from(nuts_nondiag_sampler,epsilon_adapt,refresh,
                     num_iterations,num_warmup,num_thin,save_warmup,
                     sample_stream,params_r,params_i,
-                    model);//Yuanjun add a comment here to allow nondiag_mass matrix
+                    model,
+                    base_rng);
       }
       else if (leapfrog_steps < 0 && !equal_step_sizes) {
         // NUTS II (with varying step size estimation during warmup)
@@ -695,7 +697,7 @@ namespace stan {
         sample_from(nuts2_sampler,epsilon_adapt,refresh,
                     num_iterations,num_warmup,num_thin,save_warmup,
                     sample_stream,params_r,params_i,
-                    model);
+                    model,base_rng);
 
       } else if (leapfrog_steps < 0 && equal_step_sizes) {
 
@@ -718,7 +720,7 @@ namespace stan {
         sample_from(nuts_sampler,epsilon_adapt,refresh,
                     num_iterations,num_warmup,num_thin,save_warmup,
                     sample_stream,params_r,params_i,
-                    model);
+                    model,base_rng);
 
       } else {
 
@@ -741,7 +743,7 @@ namespace stan {
         sample_from(hmc_sampler,epsilon_adapt,refresh,
                     num_iterations,num_warmup,num_thin,save_warmup,
                     sample_stream,params_r,params_i,
-                    model);
+                    model,base_rng);
       }
       clock_t end = clock();
       double deltaT = (double)(end - start) / CLOCKS_PER_SEC;
