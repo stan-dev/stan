@@ -174,14 +174,10 @@ TEST(ProbDistributionsWishart,ErrnoPolicy) {
 
 TEST(ProbDistributionsWishart, random) {
   boost::random::mt19937 rng;
-  Matrix<double,Dynamic,Dynamic> nu(3,1);
-  nu << 2.0, 
-    -2.0,
-    11.0;
 
   Matrix<double,Dynamic,Dynamic> sigma(3,3);
   sigma << 9.0, -3.0, 0.0,
     -3.0,  4.0, 0.0,
     2.0, 1.0, 3.0;
-  EXPECT_NO_THROW(stan::prob::multi_normal_rng(nu, sigma,rng));
+  EXPECT_NO_THROW(stan::prob::wishart_rng(3.0, sigma,rng));
 }
