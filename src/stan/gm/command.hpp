@@ -576,12 +576,12 @@ namespace stan {
           m++;
           if (save_warmup) {
             sample_stream << lp << ',';
-            model.write_csv(params_r,params_i,sample_stream);
+            model.write_csv(base_rng,params_r,params_i,sample_stream);
           }
         }
 
         sample_stream << lp << ',';
-        model.write_csv(params_r,params_i,sample_stream);
+        model.write_csv(base_rng,params_r,params_i,sample_stream);
 
         return 0;
       }
