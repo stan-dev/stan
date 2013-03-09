@@ -192,12 +192,12 @@ namespace stan {
                      const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& s,
                      RNG& rng) {
 
-      Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> zero(s.rows(), 1);
-      for(int k = 0; k < s.rows(); k++)
-	zero(k,0) = 0.0;
+      Eigen::VectorXd z(s.cols());
+      for(int i = 0; i < s.cols(); i++)
+	z(i) = 0.0;
 
       double w = stan::prob::inv_gamma_rng(nu / 2, nu / 2, rng);
-      return mu + std::sqrt(w) * stan::prob::multi_normal_rng(zero, s, rng);
+      return mu + std::sqrt(w) * stan::prob::multi_normal_rng(z, s, rng);
     }
   }
 }
