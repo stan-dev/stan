@@ -8,6 +8,7 @@
 #include <stan/agrad/matrix.hpp>
 #include <stan/prob/traits.hpp>
 #include <boost/concept_check.hpp>
+#include "stan/prob/distributions/multivariate/continuous/multi_normal.hpp"
 
 namespace stan {
 
@@ -158,7 +159,26 @@ namespace stan {
       return wishart_log<false>(W,nu,S,stan::math::default_policy());
     }
 
+    template <class RNG>
+    inline Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>
+    wishart_rng(double nu,
+		const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
+		RNG& rng) {
 
+      Eigen::VectorXd z(Sigma.cols());
+      for(int i = 0; i < Sigma.cols(); i++)
+	z(i) = 0.0;
+
+      Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> B(Sigma.rows(), Sigma.cols());
+      for(int i = 0; i < Sigma.cols(); i++)
+	{
+	  Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> A = stan::prob::multi_normal_rng(z, Sigma, rng);
+	  for(int j = 0; j < Sigma.cols(); j++)
+	    B(i,j) = A(j, 0);
+	}
+
+      return B.transpose() * B;
+    }
   }
 }
 #endif

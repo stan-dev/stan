@@ -752,7 +752,6 @@ namespace stan {
                      const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma) {
       return multi_normal_prec_log<false>(y,mu,Sigma,stan::math::default_policy());
     }
-    
   
     template <class RNG>
     inline Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>
