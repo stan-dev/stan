@@ -129,8 +129,9 @@ public:
   static void run_model() {
     for (size_t chain = 0; chain < num_chains; chain++) {
       std::string command_output;
-      EXPECT_NO_THROW(command_output = run_command(get_command(chain), elapsed_milliseconds)) 
-        << "Can not execute command: " << get_command(chain);
+      command_output = run_command(get_command(chain), elapsed_milliseconds);
+      //EXPECT_NO_THROW(command_output = run_command(get_command(chain), elapsed_milliseconds)) 
+      //<< "Can not execute command: " << get_command(chain) << std::endl;
       command_outputs.push_back(command_output);
     }
     populate_chains();
@@ -317,10 +318,11 @@ TYPED_TEST_P(Model_Test_Fixture, ChainsTest) {
   size_t num_chains = c->num_chains();
   size_t num_params = c->num_params();
   std::vector<size_t> params_to_skip = TypeParam::skip_chains_test();
-
+  std::sort(params_to_skip.begin(), params_to_skip.end());
+  
   for (size_t chain = 0; chain < num_chains; chain++) {
     for (size_t param = 0; param < num_params; param++) {
-      if (std::find(params_to_skip.begin(), params_to_skip.end(), param) == params_to_skip.end()) {
+      if (!std::binary_search(params_to_skip.begin(), params_to_skip.end(), param)) {
 	EXPECT_GT(c->variance(chain, param), 0)
 	  << "Chain " << chain << ", param " << param
 	  << ": variance is 0" << std::endl

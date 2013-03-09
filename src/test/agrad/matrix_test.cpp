@@ -6,7 +6,7 @@
 typedef stan::agrad::var AVAR;
 typedef std::vector<AVAR> AVEC;
 typedef std::vector<double> VEC;
-typedef typename Eigen::Matrix<double,-1,-1>::size_type size_type;
+typedef Eigen::Matrix<double,-1,-1>::size_type size_type;
 
 AVEC createAVEC(AVAR x) {
   AVEC v;
@@ -4743,7 +4743,46 @@ TEST(AgradMatrix, promoter) {
   for (int i = 0; i < 3; ++i)
     for (int j = 0; j < 4; ++j)
       EXPECT_FLOAT_EQ(A(i,j),D(i,j).val());
+
+
+}
+
+TEST(MathMatrix,getAssignRow) {
+  using Eigen::Matrix;
+  using Eigen::Dynamic;
+  using stan::math::get_base1;
+  using stan::agrad::assign;
+
+  Matrix<double,Dynamic,Dynamic> m(2,3);
+  m << 1, 2, 3, 4, 5, 6;
   
+  Matrix<double,1,Dynamic> rv(3);
+  rv << 10, 100, 1000;
+  
+  assign(get_base1(m,1,"m",1),rv);  
+  EXPECT_FLOAT_EQ(10.0, m(0,0));
+  EXPECT_FLOAT_EQ(100.0, m(0,1));
+  EXPECT_FLOAT_EQ(1000.0, m(0,2));
+}
+
+
+TEST(MathMatrix,getAssignRowVar) {
+  using stan::agrad::var;
+  using Eigen::Matrix;
+  using Eigen::Dynamic;
+  using stan::math::get_base1;
+  using stan::agrad::assign;
+
+  Matrix<var,Dynamic,Dynamic> m(2,3);
+  m << 1, 2, 3, 4, 5, 6;
+  
+  Matrix<double,1,Dynamic> rv(3);
+  rv << 10, 100, 1000;
+  
+  assign(get_base1(m,1,"m",1),rv);  
+  EXPECT_FLOAT_EQ(10.0, m(0,0).val());
+  EXPECT_FLOAT_EQ(100.0, m(0,1).val());
+  EXPECT_FLOAT_EQ(1000.0, m(0,2).val());
 
 }
 

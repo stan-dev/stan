@@ -1829,10 +1829,19 @@ namespace stan {
     }
     template <typename LHS, typename RHS, int R, int C>
     inline void assign_to_var(Eigen::Matrix<LHS,R,C>& x, 
-			      const Eigen::Matrix<RHS,R,C>& y) {
+                              const Eigen::Matrix<RHS,R,C>& y) {
       stan::math::validate_matching_sizes(x,y,"assign_to_var");
       for (size_type n = 0; n < x.cols(); ++n)
         for (size_type m = 0; m < x.rows(); ++m)
+          assign_to_var(x(m,n),y(m,n));
+    }
+
+    template <typename LHS, typename RHS, int R, int C>
+    inline void assign_to_var(Eigen::Block<LHS>& x,
+                              const Eigen::Matrix<RHS,R,C>& y) {
+      stan::math::validate_matching_sizes(x,y,"assign_to_var");
+      for (size_type n = 0; n < y.cols(); ++n)
+        for (size_type m = 0; m < y.rows(); ++m)
           assign_to_var(x(m,n),y(m,n));
     }
     
@@ -1863,6 +1872,11 @@ namespace stan {
       }
     };
     
+    
+    template <typename LHS, typename RHS>
+    inline void assign(Eigen::Block<LHS> var, const RHS& val) {
+      assigner<needs_promotion<Eigen::Block<LHS>,RHS>::value, Eigen::Block<LHS>, RHS>::assign(var,val);
+    }
     
     template <typename LHS, typename RHS>
     inline void assign(LHS& var, const RHS& val) {

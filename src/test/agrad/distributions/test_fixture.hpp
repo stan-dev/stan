@@ -1220,10 +1220,13 @@ public:
     TestClass.valid_values(parameters, expected_cdf);
 
     if (!TestClass.has_lower_bound()) {
-      if (!std::numeric_limits<Scalar0>::has_infinity)
-	return;
-      for (size_t n = 0; n < parameters.size(); n++)
-	parameters[n][0] = -std::numeric_limits<double>::infinity();
+      if (!std::numeric_limits<Scalar0>::has_infinity) {
+	for (size_t n = 0; n < parameters.size(); n++)
+	  parameters[n][0] = stan::agrad::value_of(std::numeric_limits<Scalar0>::min());
+      } else {
+	for (size_t n = 0; n < parameters.size(); n++)
+	  parameters[n][0] = -std::numeric_limits<double>::infinity();
+      }
     } else {
       for (size_t n = 0; n < parameters.size(); n++)
 	parameters[n][0] = TestClass.lower_bound();
@@ -1256,10 +1259,13 @@ public:
     TestClass.valid_values(parameters, expected_cdf);
 
     if (!TestClass.has_upper_bound()) {
-      if (!std::numeric_limits<Scalar0>::has_infinity)
-	return;
-      for (size_t n = 0; n < parameters.size(); n++)
-	parameters[n][0] = std::numeric_limits<double>::infinity();
+      if (!std::numeric_limits<Scalar0>::has_infinity) {
+	for (size_t n = 0; n < parameters.size(); n++)
+	  parameters[n][0] = stan::agrad::value_of(std::numeric_limits<Scalar0>::max());
+      } else {
+	for (size_t n = 0; n < parameters.size(); n++)
+	  parameters[n][0] = std::numeric_limits<double>::infinity();
+      }
     } else {
       for (size_t n = 0; n < parameters.size(); n++)
 	parameters[n][0] = TestClass.upper_bound();

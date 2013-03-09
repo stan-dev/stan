@@ -1,5 +1,5 @@
-#ifndef __STAN__MCMC__NUTS_H__
-#define __STAN__MCMC__NUTS_H__
+#ifndef __STAN__MCMC__NUTS_MASSGIVEN_H__
+#define __STAN__MCMC__NUTS_MASSGIVEN_H__
 
 #include <ctime>
 #include <cstddef>
@@ -17,19 +17,22 @@
 #include <stan/mcmc/hmc_base.hpp>
 #include <stan/mcmc/util.hpp>
 
+#include <Eigen/Dense>
+
 namespace stan {
 
   namespace mcmc {
 
     /**
-     * No-U-Turn Sampler (NUTS).
+     * No-U-Turn Sampler (NUTS) with varying step sizes.
      *
      * The NUTS sampler requires a probability model with the ability
      * to compute gradients, characterized as an instance of
      * <code>prob_grad</code>.  
+     *
      */
     template <class BaseRNG = boost::mt19937>
-    class nuts : public hmc_base<BaseRNG> {
+    class nuts_massgiven : public hmc_base<BaseRNG> {
     private:
 
       // Stop immediately if H < u - _maxchange
@@ -38,8 +41,21 @@ namespace stan {
       // Limit tree depth
       const int _maxdepth;
 
-      // depth of last sample taken (-1 before any samples)
+      // Depth of last sample taken (-1 before any samples)
       int _lastdepth;
+
+      // Yuanjun : now we use a matrix to get the covariance matrix
+      // Yuanjun : The cholesky decomposition of _cov_mat
+      Eigen::MatrixXd _cov_L;
+      // Running statistics to estimate per-coordinate std. deviations.
+
+        
+        //Eigen::Map<Eigen::VectorXd> _x_mat;
+        //Eigen::Map<Eigen::VectorXd> _m_mat;
+        //Eigen::Map<Eigen::VectorXd> _g_mat;
+      
+      // Next time we should adapt the per-parameter step sizes.
+        
 
       /**
        * Determine whether we've started to make a "U-turn" at either end
@@ -48,15 +64,19 @@ namespace stan {
        *
        * @return false if we've made a U-turn, true otherwise.
        */
-      inline static bool compute_criterion(std::vector<double>& xplus,
-                                           std::vector<double>& xminus,
-                                           std::vector<double>& mplus,
-                                           std::vector<double>& mminus) {
-        std::vector<double> total_direction;
-        stan::math::sub(xplus, xminus, total_direction);
-        return stan::math::dot(total_direction, mminus) > 0
-          && stan::math::dot(total_direction, mplus) > 0;
-      }
+        inline bool compute_criterion(std::vector<double>& xplus,
+                                      std::vector<double>& xminus,
+                                      std::vector<double>& mplus,
+                                      std::vector<double>& mminus) {
+            std::vector<double> total_direction;
+            stan::math::sub(xplus, xminus, total_direction);
+            Eigen::Map<Eigen::VectorXd> total_direction_mat(&total_direction[0],total_direction.size());
+            Eigen::Map<Eigen::VectorXd> mplus_mat(&mplus[0],mplus.size());
+            Eigen::Map<Eigen::VectorXd> mminus_mat(&mminus[0],mminus.size());
+            _cov_L.triangularView<Eigen::Lower>().solveInPlace(total_direction_mat);
+            return total_direction_mat.dot(mplus_mat) > 0
+            && total_direction_mat.dot(mminus_mat) > 0;
+        }
 
     public:
 
@@ -71,7 +91,7 @@ namespace stan {
        * called from the <code>ctime</code> library.
        * 
        * @param model Probability model with gradients.
-       * @param maxdepth Maximum depth for searching for a U-Turn. Default is 10.
+       * @param maxdepth 
        * @param epsilon Optional (initial) Hamiltonian dynamics simulation
        * step size. If not specified or set < 0, find_reasonable_parameters()
        * will be called to initialize epsilon.
@@ -86,16 +106,17 @@ namespace stan {
        * @param base_rng Optional Seed for random number generator; if not
        * specified, generate new seed based on system time.
        */
-      nuts(stan::model::prob_grad& model,
-           const std::vector<double>& params_r,
-           const std::vector<int>& params_i,
-           int maxdepth = 10,
-           double epsilon = -1,
-           double epsilon_pm = 0.0,
-           bool epsilon_adapt = true,
-           double delta = 0.6, 
-           double gamma = 0.05,
-	   BaseRNG base_rng = BaseRNG(std::time(0))) 
+      nuts_massgiven(stan::model::prob_grad& model,
+		     const std::vector<double>& params_r,
+		     const std::vector<int>& params_i,
+		     std::string cov_file,
+		     int maxdepth = 10,
+		     double epsilon = -1,
+		     double epsilon_pm = 0.0,
+		     bool epsilon_adapt = true,
+		     double delta = 0.6,
+		     double gamma = 0.05,
+		     BaseRNG base_rng = BaseRNG(std::time(0))) 
         : hmc_base<BaseRNG>(model,
                             params_r,
                             params_i,
@@ -105,20 +126,30 @@ namespace stan {
                             delta,
                             gamma,
                             base_rng),
+          
           _maxchange(-1000),
           _maxdepth(maxdepth),
           _lastdepth(-1)
+          //_x_mat(&(this->_x[0]), (this->_x).size())
       {
         // start at 10 * epsilon because NUTS cheaper for larger epsilon
         this->adaptation_init(10.0);
+  
+        _cov_L = Eigen::MatrixXd::Identity(model.num_params_r(),model.num_params_r());
+        read_cov(cov_file, _cov_L);
+         // std::cout << _cov_L << "baby" << std::endl;
+        
+        //_x_mat = Eigen::Map<Eigen::VectorXd>(this->_x[0], this->_x.size());
+        //_m_mat = Eigen::Map<Eigen::VectorXd>(this->_m[0], this->_m.size());
+        //_g_mat = Eigen::Map<Eigen::VectorXd>(this->_g[0], this->_g.size());
       }
 
       /**
-       * Destructor.
+       * Destroy this sampler.
        *
        * The implementation for this class is a no-op.
        */
-      ~nuts() { }
+      ~nuts_massgiven() { }
 
       /**
        * Return the next sample.
@@ -165,7 +196,7 @@ namespace stan {
         }
         this->_epsilon_last = epsilon; // use epsilon_last in tree build
 
-        while (criterion && (_maxdepth < 0 || depth < _maxdepth)) {
+        while (criterion && (_maxdepth < 0 || depth <= _maxdepth)) {
           direction = 2 * (this->_rand_uniform_01() > 0.5) - 1;
           if (direction == -1)
             build_tree(xminus, mminus, gradminus, u, direction, depth,
@@ -189,28 +220,29 @@ namespace stan {
             this->_logp = newlogp;
           }
           nvalid += newnvalid;
-//          fprintf(stderr, "depth = %d, this->_logp = %g\n", depth, this->_logp);
           ++depth;
         }
         _lastdepth = depth;
 
-        // Now we just have to update epsilon, if adaptation is on.
+        // Now we just have to update global (epsilon) and local
+        // (step_sizes) step sizes, if adaptation is on.
         double adapt_stat = prob_sum / float(n_considered);
-        if (this->adapting()) {
+        if (this->adapting()) { 
+          // epsilon.
           double adapt_g = adapt_stat - this->_delta;
           std::vector<double> gvec(1, -adapt_g);
           std::vector<double> result;
           this->_da.update(gvec, result);
           this->_epsilon = exp(result[0]);
+          // step_sizes. Doesn't happen every step.
+          
         }
         std::vector<double> result;
         this->_da.xbar(result);
-//         fprintf(stderr, "xbar = %f\n", exp(result[0]));
         double avg_eta = 1.0 / this->n_steps();
         this->update_mean_stat(avg_eta,adapt_stat);
 
-        mcmc::sample s(this->_x, this->_z, this->_logp);
-        return s;
+        return mcmc::sample(this->_x, this->_z, this->_logp);
       }
 
       virtual void write_sampler_param_names(std::ostream& o) {
@@ -225,12 +257,31 @@ namespace stan {
           o << this->_epsilon_last << ',';
       }
 
+      virtual void write_adaptation_params(std::ostream& o) {
+        o << "# (mcmc::nuts_massgiven) adaptation finished" << '\n';
+        o << "# step size=" << this->_epsilon << '\n';
+        o << "# Preset covariance matrix:\n"; // FIXME:  names/delineation requires access to model
+        /*for (size_t k = 0; k < _step_sizes.size(); ++k) {
+          if (k > 0) o << ',';
+          o << _step_sizes[k];
+        }
+        o << '\n';*/
+          Eigen::MatrixXd _cov_mat = _cov_L * _cov_L.transpose();
+          for(int i=0; i<_cov_mat.rows(); i++){
+              o << "#";
+              for(int j=0; j<_cov_mat.cols(); j++)
+                  o << _cov_mat(i,j) << " ";
+              o << std::endl;
+          }
+      }
+
       virtual void get_sampler_param_names(std::vector<std::string>& names) {
         names.clear();
         names.push_back("treedepth__");
         if (this->_epsilon_adapt || this->varying_epsilon())
           names.push_back("stepsize__");
       }
+
       virtual void get_sampler_params(std::vector<double>& values) {
         values.clear();
         values.push_back(_lastdepth);
@@ -241,36 +292,36 @@ namespace stan {
       /**
        * The core recursion in NUTS.
        *
-       * @param[in] x The position value to start from.
-       * @param[in] m The momentum value to start from.
-       * @param[in] grad The gradient at the initial position.
-       * @param[in] u The slice variable.
-       * @param[in] direction Simulate backwards if -1, forwards if 1.
-       * @param[in] depth The depth of the tree to build---we'll run 2^depth
+       * @param x The position value to start from.
+       * @param m The momentum value to start from.
+       * @param grad The gradient at the initial position.
+       * @param u The slice variable.
+       * @param direction Simulate backwards if -1, forwards if 1.
+       * @param depth The depth of the tree to build---we'll run 2^depth
        * leapfrog steps.
-       * @param[in] H0 The joint probability of the position-momentum we started
+       * @param H0 The joint probability of the position-momentum we started
        * from initially---used to compute statistic to adapt epsilon.
-       * @param[out] xminus Returns the position of the backwardmost leaf of this
+       * @param xminus Returns the position of the backwardmost leaf of this
        * subtree.
-       * @param[out] mminus Returns the momentum of the backwardmost leaf of this
+       * @param mminus Returns the momentum of the backwardmost leaf of this
        * subtree.
-       * @param[out] gradminus Returns the gradient at xminus.
-       * @param[out] xplus Returns the position of the forwardmost leaf of this
+       * @param gradminus Returns the gradient at xminus.
+       * @param xplus Returns the position of the forwardmost leaf of this
        * subtree.
-       * @param[out] mplus Returns the momentum of the forwardmost leaf of this
+       * @param mplus Returns the momentum of the forwardmost leaf of this
        * subtree.
-       * @param[out] gradplus Returns the gradient at xplus.
-       * @param[out] newx Returns the new position sample selected from
+       * @param gradplus Returns the gradient at xplus.
+       * @param newx Returns the new position sample selected from
        * this subtree.
-       * @param[out] newgrad Returns the gradient at the new sample selected from
+       * @param newgrad Returns the gradient at the new sample selected from
        * this subtree.
-       * @param[out] newlogp Returns the log-probability of the new sample selected
+       * @param newlogp Returns the log-probability of the new sample selected
        * from this subtree.
-       * @param[out] nvalid Returns the number of usable points in the subtree.
-       * @param[out] criterion Returns true if the subtree is usable, false if not.
-       * @param[out] prob_sum Returns the sum of the HMC acceptance probabilities
+       * @param nvalid Returns the number of usable points in the subtree.
+       * @param criterion Returns true if the subtree is usable, false if not.
+       * @param prob_sum Returns the sum of the HMC acceptance probabilities
        * at each point in the subtree.
-       * @param[out] n_considered Returns the number of states in the subtree.
+       * @param n_considered Returns the number of states in the subtree.
        */
       void build_tree(const std::vector<double>& x, 
                       const std::vector<double>& m,
@@ -296,16 +347,16 @@ namespace stan {
           xminus = x;
           gradminus = grad;
           mminus = m;
-          // FIXME:  lepfrog needs +/- this->_epsilon_pm
-          newlogp = leapfrog(this->_model, this->_z, xminus, mminus, gradminus,
-                             direction * this->_epsilon_last,
-                             this->_error_msgs, this->_output_msgs);
+          newlogp = nondiag_leapfrog(this->_model, this->_z, _cov_L,  //Yuanjun : implement a new leapfrog function
+                                      xminus, mminus, gradminus,
+                                      direction * this->_epsilon_last,
+                                      this->_error_msgs, this->_output_msgs);
           newx = xminus;
           newgrad = gradminus;
           xplus = xminus;
           mplus = mminus;
           gradplus = gradminus;
-          double newH = newlogp - 0.5 * stan::math::dot_self(mminus);
+          double newH = newlogp - 0.5 * stan::math::dot_self(mminus);   //Yuanjun : No longer need to calculate H with a matrix
           if (newH != newH) // treat nan as -inf
             newH = -std::numeric_limits<double>::infinity();
           nvalid = newH > u;
@@ -313,6 +364,8 @@ namespace stan {
           prob_sum = stan::math::min(1, exp(newH - H0));
           n_considered = 1;
           this->nfevals_plus_eq(1);
+          // Update running statistics if point is in slice
+
         } else {            // depth >= 1
           build_tree(x, m, grad, u, direction, depth-1, H0, xminus, mminus,
                      gradminus, xplus, mplus, gradplus, newx, newgrad, newlogp,
@@ -338,7 +391,7 @@ namespace stan {
                          prob_sum2, n_considered2);
             if (criterion && 
                 (this->_rand_uniform_01() 
-                 < float(nvalid2) / float(nvalid+nvalid2))) {
+                 < float(nvalid2) / float(nvalid+nvalid2))){
               newx = newx2;
               newgrad = newgrad2;
               newlogp = newlogp2;
@@ -351,7 +404,6 @@ namespace stan {
           criterion &= compute_criterion(xplus, xminus, mplus, mminus);
         }
       }
-
 
 
     };
