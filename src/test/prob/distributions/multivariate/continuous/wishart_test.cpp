@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 #include <stan/prob/distributions/univariate/continuous/chi_square.hpp>
 #include <stan/prob/distributions/multivariate/continuous/wishart.hpp>
+#include <boost/random/mersenne_twister.hpp>
+#include<boost/math/distributions.hpp>
 
 using Eigen::Dynamic;
 using Eigen::Matrix;
@@ -168,4 +170,14 @@ TEST(ProbDistributionsWishart,ErrnoPolicy) {
   nu = 1;
   result = wishart_log(Y, nu, Sigma, errno_policy());
   EXPECT_TRUE(std::isnan(result));
+}
+
+TEST(ProbDistributionsWishart, random) {
+  boost::random::mt19937 rng;
+
+  Matrix<double,Dynamic,Dynamic> sigma(3,3);
+  sigma << 9.0, -3.0, 0.0,
+    -3.0,  4.0, 0.0,
+    2.0, 1.0, 3.0;
+  EXPECT_NO_THROW(stan::prob::wishart_rng(3.0, sigma,rng));
 }

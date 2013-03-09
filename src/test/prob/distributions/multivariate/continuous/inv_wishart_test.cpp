@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 #include <stan/prob/distributions/multivariate/continuous/inv_wishart.hpp>
+#include <boost/random/mersenne_twister.hpp>
+#include<boost/math/distributions.hpp>
 
 using Eigen::Dynamic;
 using Eigen::Matrix;
@@ -131,4 +133,14 @@ TEST(ProbDistributionsInvWishart,ErrnoPolicy) {
   nu = 1;
   result = inv_wishart_log(Y, nu, Sigma, errno_policy());
   EXPECT_TRUE(std::isnan(result));
+}
+
+TEST(ProbDistributionsInvWishart, random) {
+  boost::random::mt19937 rng;
+
+  Matrix<double,Dynamic,Dynamic> sigma(3,3);
+  sigma << 9.0, -3.0, 0.0,
+    -3.0,  4.0, 0.0,
+    2.0, 1.0, 3.0;
+  EXPECT_NO_THROW(stan::prob::inv_wishart_rng(3.0, sigma,rng));
 }
