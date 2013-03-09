@@ -9,6 +9,7 @@
 #include <stan/meta/traits.hpp>
 #include <stan/agrad/agrad.hpp>
 #include <stan/agrad/matrix.hpp>
+#include "stan/prob/distributions/multivariate/continuous/wishart.hpp"
 
 namespace stan {
   namespace prob {
@@ -149,7 +150,14 @@ namespace stan {
       return inv_wishart_log<false>(W,nu,S,stan::math::default_policy());
     }
 
+    template <class RNG>
+    inline Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>
+    inv_wishart_rng(double nu,
+		const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
+		RNG& rng) {
 
+      return wishart_rng(nu, Sigma.inverse(), rng).inverse();
+    }
   }
 }
 #endif
