@@ -368,7 +368,10 @@ namespace stan {
 		      double alpha,
 		      double beta,
 		      RNG& rng) {
-      return stan::prob::binomial_rng(N, stan::prob::beta_rng(alpha, beta,rng), rng);
+      double a = stan::prob::beta_rng(alpha, beta, rng);
+      while(a > 1 || a < 0) 
+	a = stan::prob::beta_rng(alpha, beta, rng);
+      return stan::prob::binomial_rng(N, a, rng);
     }
   }
 }
