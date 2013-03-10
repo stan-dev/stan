@@ -1,6 +1,10 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__BETA_BINOMIAL_HPP__
 #define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__BETA_BINOMIAL_HPP__
 
+
+#include <stan/prob/distributions/univariate/discrete/binomial.hpp>
+#include <stan/prob/distributions/univariate/continuous/beta.hpp>
+
 #include <stan/agrad.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/special_functions.hpp>
@@ -358,7 +362,14 @@ namespace stan {
       return beta_binomial_cdf<false>(n, N, alpha, beta, stan::math::default_policy());
     }
 
-      
+    template <class RNG>
+    inline int
+    beta_binomial_rng(int N,
+		      double alpha,
+		      double beta,
+		      RNG& rng) {
+      return stan::prob::binomial_rng(N, stan::prob::beta_rng(alpha, beta,rng), rng);
+    }
   }
 }
 #endif
