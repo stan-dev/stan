@@ -1483,12 +1483,12 @@ where the beta function $\Betafun(x,y)$ is defined for $x \in
 \subsection{Hypergeometric Distribution}
 
 If $a \in \nats$, $b \in \nats$, and $N \in \setlist{0,\ldots,a+b}$,
-then for $n \in \setlist{0,\ldots,\min(a,N)}$, 
+then for $n \in \setlist{\max(0,N-b),\ldots,\min(a,N)}$, 
 \[
 \distro{Hypergeometric}(n|N,a,b)
 =
 \frac{\normalsize{a \choose n} {b \choose {N - n}}}
-     {\normalsize{{m + n} \choose N}}.
+     {\normalsize{{a + b} \choose N}}.
 \]
 
 \begin{description}
