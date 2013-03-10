@@ -1,6 +1,9 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__ORDERED_LOGISTIC_HPP__
 #define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__ORDERED_LOGISTIC_HPP__
 
+#include <boost/random/uniform_01.hpp>
+#include <boost/random/variate_generator.hpp>
+
 #include <stan/prob/traits.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/special_functions.hpp>
@@ -159,6 +162,22 @@ namespace stan {
       return ordered_logistic_log<false>(y,lambda,c,stan::math::default_policy());
     }
 
+    template <class RNG>
+    inline int
+    ordered_logistic_rng(double eta,
+			 const Eigen::Matrix<double,Eigen::Dynamic,1>& c,
+			 RNG& rng) {
+      using boost::variate_generator;
+      using boost::uniform_01;
+      variate_generator<RNG&, uniform_01<> >
+	uniform01_rng(rng, uniform_01<>());
+      int i = 0;
+      double u = uniform01_rng();
+      double logit = std::log(u) - std::log(1 - u);
+      while(i < c.rows() && logit < c(i))
+	i++;
+      return i+1;
+    }
   }
 }
 

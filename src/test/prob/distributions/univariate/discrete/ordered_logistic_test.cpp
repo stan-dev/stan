@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 #include <stan/math/special_functions.hpp>
 #include <stan/prob/distributions/univariate/discrete/ordered_logistic.hpp>
+#include <boost/random/mersenne_twister.hpp>
+#include<boost/math/distributions.hpp>
 
 using Eigen::Matrix;
 using Eigen::Dynamic;
@@ -202,5 +204,14 @@ TEST(ProbDistributions,ordered_logistic_errno_policy) {
   cbad3[1] = nan;
   expect_nan(ordered_logistic_log(1,1.0,cbad3,errno_policy()));
 
+}
+
+TEST(ProbDistributionOrderedLogistic, random) {
+  boost::random::mt19937 rng;
+  Matrix<double,Dynamic,Dynamic> c(3,1);
+  c << 2.0, 
+    -2.0,
+    11.0;
+  EXPECT_NO_THROW(stan::prob::ordered_logistic_rng(4.0, c, rng));
 }
 
