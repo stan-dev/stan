@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 #include <stan/prob/distributions/multivariate/discrete/multinomial.hpp>
+#include <boost/random/mersenne_twister.hpp>
+#include<boost/math/distributions.hpp>
 
 using Eigen::Matrix;
 using Eigen::Dynamic;
@@ -148,3 +150,49 @@ TEST(ProbDistributionsMultinomial,ErrnoPolicy) {
   result = multinomial_log(ns, theta, errno_policy());
   EXPECT_TRUE(std::isnan(result));
 }
+
+
+TEST(ProbDistributionMultinomial, chiSquareGoodnessFitTest) {
+  boost::random::mt19937 rng;
+  int N = 10000;
+  Matrix<double,Dynamic,Dynamic> theta(3,1);
+  theta << 0.15, 
+    0.45,
+    0.40;
+  int K = theta.rows();
+  boost::math::chi_squared mydist(K-1);
+
+  Eigen::Matrix<double,Eigen::Dynamic,1> loc(theta.rows(),1);
+  for(int i = 0; i < theta.rows(); i++)
+    loc(i) = 0;
+
+      for(int i = 0; i < theta.rows(); i++)
+	{
+	  for(int j = i; j < theta.rows(); j++)
+	    loc(j) += theta(i);
+	}
+
+  int count = 0;
+  int bin [K];
+  double expect [K];
+  for(int i = 0 ; i < K; i++)
+  {
+    bin[i] = 0;
+    expect[i] = N * theta(i);
+  }
+
+  while (count < N) {
+    int a = stan::prob::multinomial_rng(theta,rng);
+    int i = 0;
+    bin[a - 1]++;
+    count++;
+   }
+
+  double chi = 0;
+
+  for(int j = 0; j < K; j++)
+    chi += ((bin[j] - expect[j]) * (bin[j] - expect[j]) / expect[j]);
+
+  EXPECT_TRUE(chi < quantile(complement(mydist, 1e-6)));
+}
+
