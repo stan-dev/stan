@@ -697,7 +697,31 @@ as.data.frame.stanfit <- function(x, ...) {
 dim.stanfit <- function(x) {
   if (x@mode != 0) return(numeric(0)) 
   c(x@sim$n_save[1] - x@sim$warmup2[1], x@sim$chains, x@sim$n_flatnames)
-} 
+}
+
+# function to create mcmc objects and avoid dependency on coda::mcmc
+to_mcmc <- function(x, thin, end) {
+    x <- as.matrix(x)
+    niter <- nrow(x)
+    start <- end - (niter - 1) * thin
+    attr(x, "mcpar") <- c(start, end, thin)
+    class(x) <- "mcmc"
+    x
+}
+
+setGeneric("as.mcmc.list", function(x, ...) standardGeneric("as.mcmc.list"))
+
+as.mcmc.list.stanfit <- function(x, inc_warmup = FALSE, ...) {
+    thin <- x@sim$thin
+    end <- x@sim$iter
+    e <- extract(x, permuted = FALSE, inc_warmup = inc_warmup, ...)
+    out <- mapply(function(x, thin, end) to_mcmc(do.call(cbind, x), thin, end),
+                  x@sim$samples, end=end, thin=thin, SIMPLIFY=FALSE)
+    class(out) <- "mcmc.list"
+    out
+}
+
+setMethod("as.mcmc.list", "stanfit", as.mcmc.list.stanfit)
 
 dimnames.stanfit <- function(x) {
   if (x@mode != 0) return(character(0)) 
