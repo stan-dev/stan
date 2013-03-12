@@ -337,7 +337,7 @@ namespace stan {
           
       // Return if everything constant and propto
       if (!include_summand<propto, T_prob>::value)
-        return 0.0;
+        return 1.0;
           
       // Wrap arguments in vector views
       VectorView<const T_n> n_vec(n);
