@@ -34,7 +34,7 @@ else
   LINKCMD2 = ln -s ../../../../src ./rstan/inst/include/stansrc
 endif
   
-RSTANVER := $(shell $(RSCRIPT) -e "cat(read.dcf(file = './rstan/DESCRIPTION')[1, \"Version\"])")
+RSTANVER := $(shell $(RSCRIPT) -e "cat(read.dcf(file = './rstan/DESCRIPTION')[1, deparse(quote(Version))])")
 STANPKG := rstan_$(RSTANVER).tar.gz 
 
 BOOSTPATH := $(shell find ../lib -path '*lib/boost_*' -regex '.*lib\/boost_[^/]*')
