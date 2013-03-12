@@ -103,7 +103,7 @@
 
     More details can be 
     found in Stan's manual and the doc of \code{\link{stan}}. By default, 
-    \code{nondiag_mass} is \code{FALSE, 
+    \code{nondiag_mass} is \code{FALSE}, 
     \code{leapfrog_steps} is \code{-1}, and 
     \code{equal_step_sizes} is \code{FALSE} so that
     NUTS2 sampler, the default sampler, is used.
