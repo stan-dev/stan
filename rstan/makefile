@@ -55,6 +55,14 @@ build $(STANPKG): ./rstan/DESCRIPTION
 	@echo "git_head <- function() \"`git rev-parse HEAD`\"" > rstan/R/git_head.R
 	$(R) CMD build rstan --md5  # --no-vignettes
 
+buildtest $(STANPKG): ./rstan/DESCRIPTION 
+	@rm -rf "./rstan/inst/include/stanlib"
+	@rm -rf "./rstan/inst/include/stansrc"
+	$(LINKCMD1)
+	$(LINKCMD2)
+	@rm -f $(STANPKG) 
+	@echo "git_head <- function() \"`git rev-parse HEAD`\"" > rstan/R/git_head.R
+	$(R) CMD build rstan --md5  # --no-vignettes
 
 check: $(STANPKG) 
 	$(R) CMD check --as-cran $(STANPKG) 
