@@ -13,6 +13,14 @@ The to-do list is organized into the following sections:
 * C++ API
 
 
+1.2.1
+-------------------------------------------
+
+* add user-contrib ARMA(1,1) model to the manual
+  see Wayne Folta's e-mmail of 3/11/13
+
+* fix truncated distributions to return 1 rather than 0
+  in degenerate cases
 
 PRIORITIES?
 ======================================================================
@@ -847,6 +855,8 @@ Testing
 
 RStan / PStan / MStan / Command Line
 ======================================================================
+
+* (RStan) install checklist -- especially the no spaces thing!
 
 * (RStan) Run the examples rather than dontrun;  see Ben's e-mail
   of 2013-03-02 (March 2) titled "[stan-dev] Re: final checklist for
