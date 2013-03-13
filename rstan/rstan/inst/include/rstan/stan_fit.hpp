@@ -259,7 +259,7 @@ namespace rstan {
     void print_vector(const std::vector<T>& v, std::ostream& o, const std::string& sep = ",") {
       if (v.size() > 0)
         o << v[0];
-      for (size_t i = 1; i < v.size() - 1; i++)
+      for (size_t i = 1; i < v.size(); i++)
         o << sep << v[i];
       o << std::endl;
     }
@@ -301,16 +301,16 @@ namespace rstan {
         bool is_warmup = m < num_warmup;
         R_CheckUserInterrupt(); 
         if (do_print(m,refresh)) {
-          rstan::io::rcout << "Iteration: ";
+          rstan::io::rcout << "\rIteration: ";
           rstan::io::rcout << std::setw(it_print_width) << (m + 1)
                            << " / " << num_iterations;
           rstan::io::rcout << " [" << std::setw(3)
                            << static_cast<int>((100.0 * (m + 1))/num_iterations)
                            << "%] ";
           rstan::io::rcout << (is_warmup ? " (Adapting)" : " (Sampling)");
-          rstan::io::rcout << std::endl;
           rstan::io::rcout.flush();
         } 
+        rstan::io::rcout << std::endl;
 
         if (m == num_warmup && epsilon_adapt) {
           sampler.adapt_off();

@@ -39,8 +39,7 @@ exportMethods(
   get_sampler_params,
   get_logposterior, 
   get_posterior_mean,
-  get_stanmodel,
-  as.mcmc.list
+  get_stanmodel
 )
 S3method(print, stanfit)
 S3method(as.array, stanfit)

@@ -125,6 +125,12 @@
       (see \code{\link{extract}}). Also see \link{as.array.stanfit} 
       for coercing samples without warmup to arrays or matrices. 
     }
+    \item{\code{as.mcmc.list}}{\code{signature(object = "stanfit")}:
+      return a list of all the chains that can be treated as an
+      \code{\link[coda]{mcmc.list}} as in package \pkg{coda}. 
+      Parameter of interest can be specified using \code{pars}. 
+      The warmup samples are discarded. 
+    } 
     \item{\code{traceplot}}{\code{signature(object = "stanfit")}:
       plot the trace of chains (see \code{\link{traceplot}}). 
     } 

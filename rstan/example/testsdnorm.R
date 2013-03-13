@@ -40,3 +40,12 @@ d3 <- as.data.frame(sf3)
 dim(sf3) 
 
 
+sf4 <- stan(fit = sf1, data = list(I = 6, J = 7), sample_file = 'ijnorm.csv')
+ml <- rstan:::as.mcmc.list(sf4) 
+summary(ml)
+yasf4 <- read_stan_csv(paste0('ijnorm_', 1:4, '.csv'))
+ml2 <- rstan:::as.mcmc.list(yasf4)
+summary(ml2)
+
+
+

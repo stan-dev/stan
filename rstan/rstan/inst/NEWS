@@ -1,3 +1,11 @@
+Mar 13 2013
+1. Changes
+   * showing progress of sampling at the same line (using \r instead of \n)
+   * plot for stanfit allows multiple pages 
+2  New features 
+   * add rstan:::as.mcmc.list to convert stanfit object 
+     to coda object 
+
 Fri Feb 24 2013
 1. Bug fixes 
    * NA's are created when converting too large integers during data

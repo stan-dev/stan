@@ -39,7 +39,7 @@ print.stanfit <- function(x, pars = x@sim$pars_oi,
 }  
 
 setMethod("plot", signature(x = "stanfit", y = "missing"), 
-          function(x, pars, display_parallel = FALSE) {
+          function(x, pars, display_parallel = FALSE, ask = TRUE, npars_per_page = 6) {
             if (x@mode == 1L) {
               cat("Stan model '", x@model_name, "' is of mode 'test_grad';\n",
                   "sampling is not conducted.\n", sep = '')
@@ -53,7 +53,17 @@ setMethod("plot", signature(x = "stanfit", y = "missing"),
             if (!exists("summary", envir = x@.MISC, inherits = FALSE))  
               assign("summary", summary_sim(x@sim), envir = x@.MISC)
             info <- list(model_name = x@model_name, model_date = x@date) 
-            stan_plot_inferences(x@sim, x@.MISC$summary, pars, info, display_parallel)
+            npars <- length(pars) 
+            sidx <- seq.int(1, npars, npars_per_page)
+            eidx <- c(sidx[-1] - 1, npars)
+            stan_plot_inferences(x@sim, x@.MISC$summary, pars[sidx[1]:eidx[1]], info, display_parallel)
+            sidx_len <- length(sidx) 
+            if (sidx_len == 1)  return(invisible(NULL))
+            
+            ask_old <- devAskNewPage(ask = ask)
+            on.exit(devAskNewPage(ask = ask_old))
+            for (i in 2:sidx_len)
+              stan_plot_inferences(x@sim, x@.MISC$summary, pars[sidx[i]:eidx[i]], info, display_parallel)
           }) 
 
 setGeneric(name = "get_stancode",
@@ -172,10 +182,14 @@ get_samples2 <- function(n, sim, inc_warmup = TRUE) {
   # different implementation 
   # It seems that this one is fast. 
   if (all(sim$warmup2 == 0)) inc_warmup <- TRUE # for the case warmup sample is discarded
+  npar <- length(n)
   lst <- vector("list", sim$chains)
   for (ic in 1:sim$chains) {
-    lst[[ic]] <- 
+    lst[[ic]] <- if (npar == 1) {
       if (inc_warmup) sim$samples[[ic]][[n]] else sim$samples[[ic]][[n]][-(1:sim$warmup2[ic])]
+    } else { 
+      if (inc_warmup) sim$samples[[ic]][n] else sim$samples[[ic]][n][-(1:sim$warmup2[ic])]
+    }
   }
   lst
 } 
@@ -699,26 +713,29 @@ dim.stanfit <- function(x) {
   c(x@sim$n_save[1] - x@sim$warmup2[1], x@sim$chains, x@sim$n_flatnames)
 }
 
-# function to create mcmc objects and avoid dependency on coda::mcmc
-to_mcmc <- function(x, thin, end) {
+setGeneric("as.mcmc.list", function(object, ...) standardGeneric("as.mcmc.list"))
+
+as.mcmc.list.stanfit <- function(object, pars, ...) {
+  pars <- if (missing(pars)) object@sim$pars_oi else check_pars_second(object@sim, pars) 
+  tidx <- pars_total_indexes(object@sim$pars_oi, object@sim$dims_oi, object@sim$fnames_oi, pars)
+  tidx <- lapply(tidx, function(x) attr(x, "row_major_idx"))
+  tidx <- unlist(tidx, use.names = FALSE)
+
+  lst <- vector("list", object@sim$chains)
+  for (ic in 1:object@sim$chains) { 
+    x <- do.call(cbind, object@sim$samples[[ic]])
+    warmup2 <- object@sim$warmup2[ic] 
+    if (warmup2 > 0) x <- x[-(1:warmup2), ]
     x <- as.matrix(x)
-    niter <- nrow(x)
-    start <- end - (niter - 1) * thin
+    end <- object@sim$iter
+    thin <- object@sim$thin
+    start <- end - (nrow(x) - 1) * thin
+    class(x) <- 'mcmc'
     attr(x, "mcpar") <- c(start, end, thin)
-    class(x) <- "mcmc"
-    x
-}
-
-setGeneric("as.mcmc.list", function(x, ...) standardGeneric("as.mcmc.list"))
-
-as.mcmc.list.stanfit <- function(x, inc_warmup = FALSE, ...) {
-    thin <- x@sim$thin
-    end <- x@sim$iter
-    e <- extract(x, permuted = FALSE, inc_warmup = inc_warmup, ...)
-    out <- mapply(function(x, thin, end) to_mcmc(do.call(cbind, x), thin, end),
-                  x@sim$samples, end=end, thin=thin, SIMPLIFY=FALSE)
-    class(out) <- "mcmc.list"
-    out
+    lst[[ic]] <- x 
+  }
+  class(lst) <- "mcmc.list"
+  invisible(lst)
 }
 
 setMethod("as.mcmc.list", "stanfit", as.mcmc.list.stanfit)
