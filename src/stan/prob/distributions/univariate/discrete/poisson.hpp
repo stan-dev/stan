@@ -270,7 +270,7 @@ namespace stan {
           
       // Return if everything is constant and only proportionality is required
       if (!include_summand<propto,T_rate>::value)
-          return 0.0;
+          return 1.0;
           
       // Wrap arguments into vector views
       VectorView<const T_n> n_vec(n);

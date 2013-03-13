@@ -296,7 +296,7 @@ namespace stan {
           
       // Return if everything is constant and only proportionality is required
       if (!include_summand<propto,T_prob>::value)
-        return 0.0;
+        return 1.0;
           
       // set up template expressions wrapping scalars into vector views
       VectorView<const T_n> n_vec(n);

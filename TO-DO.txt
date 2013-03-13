@@ -13,6 +13,14 @@ The to-do list is organized into the following sections:
 * C++ API
 
 
+1.2.1
+-------------------------------------------
+
+* add user-contrib ARMA(1,1) model to the manual
+  see Wayne Folta's e-mmail of 3/11/13
+
+* fix truncated distributions to return 1 rather than 0
+  in degenerate cases
 
 PRIORITIES?
 ======================================================================
@@ -100,6 +108,66 @@ Diagonal Hessian:
 C++ API
 ======================================================================
 [items go here first, then to RStan/cmd]
+
+* new vector views
+ 
+ ?? promote up from double to matrix?
+ ?? allow matrix | (vector & row_vector & real[] & int[]) | real | int
+
+  template <typename StorageT, typename ReturnT>
+  struct View {
+    View({const} StorageT& values, 
+         const vector<int>& return_dims);  // clunky?
+    int size() const; 
+    {const} ReturnT& operator[](int n) {const};
+    const vector<int>& storage_dims() const;
+    const vector<int>& return_dims() const;        
+  };
+
+  ? Can ReturnT be an array?  not sure we need it, because
+    everything is vector/matrix in multi-dim prob functions
+
+    types:
+       normal_log(scalar,scalar,scalar)
+       dirichlet_log(simplex,vector);
+       multi_normal(vector,vector,cov_matrix);
+       categorical(int,simplex);
+       multinomial(vector,simplex);
+
+  multinomial(T_out& y, T_prob& theta) {
+      View<T_out, vector_d> y_view;
+      View<T_prob, vector_d> theta_view;
+      check_consistency(y,theta); // lots of work here
+      for size of y view
+        check_validity(y);  // non-negative ints
+      for size of theta view
+        check_validity(theta);  // simplex
+
+  ? promote vectors to matrices?
+    -- row vetor copy rows #cols times
+    -- col vector copy cols #rows times
+
+  ? any way to decide from the outside?
+  multi_normal_log(double,double,matrix_d);
+  -- figure out dims of double from matrix
+
+  dirichlet_log(double,double)  
+  -- can't figure out dims of double here
+
+  // promote double to matrix
+  double x = ...;
+  vector<int> dims(2);
+  dims[0] = M;
+  dims[1] = N;
+  View<double, Matrix<double,Dynamic,Dynamic> >(x,dims);
+  
+
+
+
+* deprecate lkj_cov
+  - work out general framework for deprecated functions
+    with warning messages
+  - include option for deleted functions with error messages
 
 * How to deal with generated quantities
   - execute & print every time
@@ -787,6 +855,8 @@ Testing
 
 RStan / PStan / MStan / Command Line
 ======================================================================
+
+* (RStan) install checklist -- especially the no spaces thing!
 
 * (RStan) Run the examples rather than dontrun;  see Ben's e-mail
   of 2013-03-02 (March 2) titled "[stan-dev] Re: final checklist for
