@@ -101,12 +101,10 @@
       \item \code{nondiag_mass} (\code{TRUE} or \code{FALSE})
     }
 
-    More details can be 
-    found in Stan's manual and the doc of \code{\link{stan}}. By default, 
-    \code{nondiag_mass} is \code{FALSE, 
-    \code{leapfrog_steps} is \code{-1}, and 
-    \code{equal_step_sizes} is \code{FALSE} so that
-    NUTS2 sampler, the default sampler, is used.
+    More details can be found in Stan's manual and \code{\link{stan}}. The
+    default sampler is NUTS2, where \code{leapfrog_steps} is \code{-1} and 
+    \code{equal_step_sizes} is \code{FALSE}. To use NUTS with full
+    mass matrix, set \code{nondiag_mass} to \code{TRUE}. 
 
     \code{chain_id} can be a vector to specify the chain_id for all 
     chains or an integer. For the former case, they should be unique. 

@@ -49,7 +49,11 @@ BCP = $(strip $(shell which bcp))
 build $(STANPKG): ./rstan/DESCRIPTION 
 	@rm -rf "./rstan/inst/include/stanlib"
 	@rm -rf "./rstan/inst/include/stansrc"
+ifeq ($(OS), win)
+	$(LINKCMD1)
+else 
 	if test -d $(TMP_STANLIB); then $(LINKCMD1b); else $(LINKCMD1); fi
+endif
 	$(LINKCMD2)
 	@rm -f $(STANPKG) 
 	@echo "git_head <- function() \"`git rev-parse HEAD`\"" > rstan/R/git_head.R
@@ -91,4 +95,4 @@ clean-all:
 # buildbin:   # build a binary version  
 # R CMD INSTALL -l ./tmp --build rstan
 
-.PHONY: build check install clean 
+.PHONY: build check install clean clean-all
