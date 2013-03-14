@@ -25,6 +25,7 @@ AR = ar
 ##
 # Library locations
 ##
+STAN_HOME := $(dir $(firstword $(MAKEFILE_LIST)))
 EIGEN ?= lib/eigen_3.1.2
 BOOST ?= lib/boost_1.53.0
 GTEST ?= lib/gtest_1.6.0
@@ -110,6 +111,7 @@ help:
 	@echo '  - CC (Compiler):           ' $(CC)
 	@echo '  - O (Optimization Level):  ' $(O)
 	@echo '  - O_STANC (Opt for stanc): ' $(O_STANC)
+	@echo '  - STAN_HOME                ' $(STAN_HOME)
 	@echo ''
 	@echo 'Build a Stan model:'
 	@echo '  Given a Stan model at foo/bar.stan, the make target is:'
