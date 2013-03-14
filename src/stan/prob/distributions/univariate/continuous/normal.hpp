@@ -184,7 +184,14 @@ namespace stan {
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
 
+
       typename return_type<T_y, T_loc, T_scale>::type cdf(1);
+      // check if any vectors are zero length
+      if (!(stan::length(y) 
+            && stan::length(mu) 
+            && stan::length(sigma)))
+        return cdf;
+
       if (!check_not_nan(function, y, "Random variable", &cdf, Policy()))
         return cdf;
       if (!check_finite(function, mu, "Location parameter", &cdf, Policy()))
@@ -200,12 +207,6 @@ namespace stan {
                                    "Random variable","Location parameter","Scale parameter",
                                    &cdf, Policy())))
         return cdf;
-
-      // check if any vectors are zero length
-      if (!(stan::length(y) 
-            && stan::length(mu) 
-            && stan::length(sigma)))
-        return 0.0;
 
       VectorView<const T_y> y_vec(y);
       VectorView<const T_loc> mu_vec(mu);
