@@ -56,9 +56,16 @@ Eigen::VectorXi calculate_sizes(const Eigen::MatrixXd& values,
 }
 
 void print_usage() {
-  std::cout << "  USAGE:  print <filename 1> [<filename 2> ... <filename N>]"
+  
+  std::cout << "USAGE:  print <filename 1> [<filename 2> ... <filename N>]"
             << std::endl
             << std::endl;
+  
+  std::cout << "OPTIONS:" << std::endl << std::endl;
+  std::cout << "  --autocorr=<chain_index>\tAppend the autocorrelations for the given chain"
+            << std::endl
+            << std::endl;
+  
 }
 
 
@@ -76,13 +83,19 @@ int main(int argc, const char* argv[]) {
     print_usage();
     return 0;
   }
-
+  
   std::vector<std::string> filenames;
   for (int i = 1; i < argc; i++) {
+    
+    if (std::string(argv[i]).find("--autocorr=") != std::string::npos)
+      continue;
+    
     filenames.push_back(argv[i]);
+    
     if (std::string("--help") == std::string(argv[i])) {
       print_usage();
       return 0;
+      
     }
   }
   
@@ -200,7 +213,55 @@ int main(int argc, const char* argv[]) {
             << "and Rhat is the potential scale reduction factor on split chains (at " << std::endl
             << "convergence, Rhat=1)." << std::endl
             << std::endl;
+  
+  for (int k = 1; k < argc; k++) {
+    
+    if (std::string(argv[k]).find("--autocorr=") != std::string::npos) {
+      
+      const int c = atoi(std::string(argv[k]).substr(11).c_str());
+      
+      if (c < 0 || c >= chains.num_chains()) {
+        std::cout << "Bad chain index " << c << ", aborting autocorrelation display." << std::endl;
+        break;
+      }
+      
+      Eigen::MatrixXd autocorr(chains.num_params(), chains.num_samples(c));
+      
+      for (int i = 0; i < chains.num_params(); i++) {
+        autocorr.row(i) = chains.autocorrelation(c, i);
+      }
+      
+      // Format and print header
+      std::cout << "Displaying the autocorrelations for chain " << c << ":" << std::endl;
+      std::cout << std::endl;
+      
+      const int n_autocorr = autocorr.row(0).size();
+      
+      int lag_width = 1;
+      int number = n_autocorr; 
+      while ( number != 0) { number /= 10; lag_width++; }
+
+      std::cout << setw(lag_width > 4 ? lag_width : 4) << "Lag";
+      for (int i = 0; i < chains.num_params(); ++i) {
+        std::cout << setw(max_name_length + 1) << std::right << chains.param_name(i);
+      }
+      std::cout << std::endl;
+
+      // Print body  
+      for (int n = 0; n < n_autocorr; ++n) {
+        std::cout << setw(lag_width) << std::right << n;
+        for (int i = 0; i < chains.num_params(); ++i) {
+          std::cout << setw(max_name_length + 1) << std::right << autocorr(i, n);
+        }
+        std::cout << std::endl;
+      }
+  
+    }
+        
+  }
+      
   return 0;
+        
 }
 
 
