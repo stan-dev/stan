@@ -2311,8 +2311,17 @@ namespace stan {
         vi_ = new divide_vd_vari(vi_,b);
         return *this;
       }
-  }
 
+    template <typename T>
+    inline bool is_uninitialized(T x) {
+      return false;
+    }
+    inline bool is_uninitialized(var x) {
+      return x.is_uninitialized();
+    }
+
+
+  }
 }
 
 

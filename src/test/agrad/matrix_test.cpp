@@ -124,6 +124,15 @@ TEST(AgradMatrix, fill) {
     for (size_t j = 0; j < 2; ++j)
       EXPECT_FLOAT_EQ(54, d[i][j].val());
 }
+TEST(AgradMatrix, fillDouble) {
+  using Eigen::Matrix;
+  using Eigen::Dynamic;
+  using stan::agrad::fill;
+  Matrix<double,Dynamic,1> y(3);
+  fill(y,3.0);
+  EXPECT_EQ(3,y.size());
+  EXPECT_FLOAT_EQ(3.0,y[0]);
+}
 
 
 // to_var tests

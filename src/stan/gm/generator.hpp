@@ -1173,7 +1173,7 @@ namespace stan {
         }
 
         generate_indent(indents_ + dims.size(), o_);
-        o_ << "if (" << name;
+        o_ << "if (stan::agrad::is_uninitialized(" << name;
         for (size_t k = 0; k < non_matrix_dims; ++k)
           o_ << "[i" << k << "__]";
         if (matrix_dims > 0) {
@@ -1182,7 +1182,7 @@ namespace stan {
             o_ << ",i" << (non_matrix_dims + 1) << "__";
           o_ << ')';
         }
-        o_ << ".is_uninitialized()) {" << EOL;
+        o_ << ")) {" << EOL;
         generate_indent(indents_ + dims.size() + 1, o_);
         o_ << "std::stringstream msg__;" << EOL;
         generate_indent(indents_ + dims.size() + 1, o_);
@@ -1417,12 +1417,12 @@ namespace stan {
     void generate_log_prob(program const& p,
                            std::ostream& o) {
       o << EOL;
-      // o << INDENT << "double log_prob(vector<double>& params_r__," << EOL;
-      // o << INDENT << "                vector<int>& params_i__," << EOL;
-      // o << INDENT << "                std::ostream* pstream__ = 0) {" << EOL;
-      // o << INDENT << "  return log_prob<false,double>(params_r__,params_i__,pstream__);" << EOL;
-      // o << INDENT << "}" << EOL;
-      // o << EOL;
+      o << INDENT << "double log_prob(vector<double>& params_r__," << EOL;
+      o << INDENT << "                vector<int>& params_i__," << EOL;
+      o << INDENT << "                std::ostream* pstream__ = 0) {" << EOL;
+      o << INDENT << "  return log_prob<false,double>(params_r__,params_i__,pstream__);" << EOL;
+      o << INDENT << "}" << EOL;
+      o << EOL;
       o << INDENT << "var log_prob(vector<var>& params_r__," << EOL;
       o << INDENT << "             vector<int>& params_i__," << EOL;
       o << INDENT << "             std::ostream* pstream__ = 0) {" << EOL;
