@@ -84,8 +84,9 @@ namespace stan {
     }
 
     template <class RNG>
-    inline int
+    inline Eigen::VectorXd
     multinomial_rng(const Eigen::Matrix<double,Eigen::Dynamic,1>& theta,
+		    int N,
 		    RNG& rng) {
       using boost::variate_generator;
       using boost::uniform_01;
@@ -93,19 +94,30 @@ namespace stan {
 	uniform01_rng(rng, uniform_01<>());
       
      Eigen::VectorXd index(theta.rows());
+     Eigen::VectorXd result(theta.rows());
      for(int i = 0; i < theta.rows(); i++)
-       index(i) = 0;
+       {
+	 index(i) = 0;
+	 result(i) = 0;
+       }
+
       for(int i = 0; i < theta.rows(); i++)
 	{
 	  for(int j = i; j < theta.rows(); j++)
 	    index(j) += theta(i,0);
 	}
 
-      double c = uniform01_rng();
-      int b = 0;
-      while(c > index(b,0))
-	b++;
-      return b + 1;
+      int count = 0;
+      while(count < N)
+	{
+	  double c = uniform01_rng();
+	  int b = 0;
+	  while(c > index(b,0))
+	    b++;
+	  result[b]++;
+	  count++;
+	}
+      return result;
     }
   }
 }

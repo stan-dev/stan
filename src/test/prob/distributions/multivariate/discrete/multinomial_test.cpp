@@ -154,7 +154,8 @@ TEST(ProbDistributionsMultinomial,ErrnoPolicy) {
 
 TEST(ProbDistributionMultinomial, chiSquareGoodnessFitTest) {
   boost::random::mt19937 rng;
-  int N = 10000;
+  int trials = 10;
+  int N = 10000 * trials;
   Matrix<double,Dynamic,Dynamic> theta(3,1);
   theta << 0.15, 
     0.45,
@@ -181,10 +182,11 @@ TEST(ProbDistributionMultinomial, chiSquareGoodnessFitTest) {
     expect[i] = N * theta(i);
   }
 
-  while (count < N) {
-    int a = stan::prob::multinomial_rng(theta,rng);
-    int i = 0;
-    bin[a - 1]++;
+  while (count < N / trials) {
+    Eigen::VectorXd a(3);
+    a = stan::prob::multinomial_rng(theta,trials,rng);
+    for(int i = 0; i < theta.rows(); i++)
+      bin[i] += a[i];
     count++;
    }
 
