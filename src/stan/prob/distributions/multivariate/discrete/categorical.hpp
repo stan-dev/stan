@@ -1,6 +1,9 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__DISCRETE__CATEGORICAL_HPP__
 #define __STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__DISCRETE__CATEGORICAL_HPP__
 
+#include <boost/random/uniform_01.hpp>
+#include <boost/random/variate_generator.hpp>
+
 #include <stan/prob/traits.hpp>
 #include <stan/math/matrix_error_handling.hpp>
 #include <stan/math/error_handling.hpp>
@@ -82,7 +85,30 @@ namespace stan {
       return categorical_log<false>(n,theta,stan::math::default_policy());
     }
 
+   template <class RNG>
+    inline int
+    categorical_rng(const Eigen::Matrix<double,Eigen::Dynamic,1>& theta,
+		    RNG& rng) {
+      using boost::variate_generator;
+      using boost::uniform_01;
+      variate_generator<RNG&, uniform_01<> >
+	uniform01_rng(rng, uniform_01<>());
+      
+     Eigen::VectorXd index(theta.rows());
+     for(int i = 0; i < theta.rows(); i++)
+       index(i) = 0;
+      for(int i = 0; i < theta.rows(); i++)
+	{
+	  for(int j = i; j < theta.rows(); j++)
+	    index(j) += theta(i,0);
+	}
 
+      double c = uniform01_rng();
+      int b = 0;
+      while(c > index(b,0))
+	b++;
+      return b + 1;
+    }
   }
 }
 #endif
