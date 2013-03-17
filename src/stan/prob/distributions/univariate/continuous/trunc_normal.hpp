@@ -122,11 +122,10 @@ namespace stan {
          double beta,
                      RNG& rng) {
       using boost::variate_generator;
-      using boost::random::uniform_01;
-      variate_generator<RNG&, uniform_01<> >
-        uniform_01_rng(rng, uniform_01<>());
-      boost::math::normal_distribution<>dist (mu,sigma);
-      return quantile(dist, cdf(dist, alpha) + uniform_01_rng() * (cdf(dist,beta) - cdf(dist,alpha)));
+      double a = stan::prob::normal_rng(mu, sigma, rng);
+      while(a > beta || a < alpha)
+	a = stan::prob::normal_rng(mu,sigma,rng);
+      return a;
     }
   }
 }
