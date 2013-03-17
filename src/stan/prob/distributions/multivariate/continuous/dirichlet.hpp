@@ -91,24 +91,24 @@ namespace stan {
     }
 
     template <class RNG>
-    inline Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>
+    inline Eigen::VectorXd
     dirichlet_rng(const Eigen::Matrix<double,Eigen::Dynamic,1>& alpha,
                      RNG& rng) {
       using boost::variate_generator;
       using boost::gamma_distribution;
 
       double sum = 0;
-      Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> y(alpha.rows(), 1);
+      Eigen::VectorXd y(alpha.rows());
       for(int i = 0; i < alpha.rows(); i++)
 	{
         variate_generator<RNG&, gamma_distribution<> >
 	  gamma_rng(rng, gamma_distribution<>(alpha(i,0),1));
-	y(i,0) = gamma_rng();
-	sum += y(i,0);
+	y(i) = gamma_rng();
+	sum += y(i);
 	}
 
       for(int i = 0; i < alpha.rows(); i++)
-	y(i,0) /= sum;
+	y(i) /= sum;
       return y;
     }
   }
