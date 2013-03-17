@@ -214,4 +214,3 @@ TEST(ProbDistributionOrderedLogistic, random) {
     11.0;
   EXPECT_NO_THROW(stan::prob::ordered_logistic_rng(4.0, c, rng));
 }
-
