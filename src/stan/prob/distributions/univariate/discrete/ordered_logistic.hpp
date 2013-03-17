@@ -171,6 +171,7 @@ namespace stan {
       using boost::uniform_01;
       variate_generator<RNG&, uniform_01<> >
 	uniform01_rng(rng, uniform_01<>());
+
       int i = 0;
       double u = uniform01_rng();
       double logit = std::log(u) - std::log(1 - u);

@@ -151,7 +151,6 @@ TEST(ProbDistributionsMultinomial,ErrnoPolicy) {
   EXPECT_TRUE(std::isnan(result));
 }
 
-
 TEST(ProbDistributionMultinomial, chiSquareGoodnessFitTest) {
   boost::random::mt19937 rng;
   int trials = 10;
