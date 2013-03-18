@@ -1592,6 +1592,95 @@ vectorized model being quite a bit faster (per iteration, not to
 converge --- they compute the same model).
 
 
+\section{Autoregressive Moving Average Models}
+
+Autoregressive moving-average models (ARMA), combine the predictors
+of the autoregressive model and the oving average model.  An
+ARMA(1,1) model, with a single state of history, can be encoded in
+Stan as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+  int<lower=1> T;            // num observations
+  real y[T];                 // observed outputs
+}
+parameters {
+  real mu;                   // mean coeff
+  real phi;                  // autoregression coeff
+  real theta;                // moving avg coeff
+  real<lower=0> sigma;       // noise scale
+}
+model {
+  vector[T] nu;              // prediction for time t
+  vector[T] err;             // error for time t
+  nu[1] <- mu + phi * mu;    // assume err[0] == 0
+  err[1] <- y[1] - nu[1];
+  for (t in 2:T) {
+    nu[t] <- mu + phi * y[t-1] + theta * err[t-1];
+    err[t] <- y[t] - nu[t];
+  }
+  mu ~ normal(0,10);         // priors
+  phi ~ normal(0,2);
+  theta ~ normal(0,2);
+  sigma ~ cauchy(0,5);
+  err ~ normal(0,sigma);    // likelihood
+}
+\end{Verbatim}
+\end{quote}
+%
+The data is declared in the same way as the other time-series
+regressions.  Here the are parameters for the mean output \code{mu}
+and error scale \code{sigma}, as well as regression coefficients
+\code{phi} for the autoregression and \code{theta} for the moving
+average component of the model.  
+
+In the model block, the local vector \code{nu} stores the predictions
+and \code{err} the errors.  These are computed similarly to the
+errors in the moving average models described in the previous section.  
+
+The priors are weakly informative for stationary processes.  The
+likelihood only involves the error term, which is efficiently
+vectorized here.
+
+Often in models such as these, it is desirable to inspect the
+calculated error terms.  This could easily be accomplished in Stan by
+declaring \code{err} as a transformed parameter, then defining it the
+same way as in the model above.  The vector \code{nu} could still be a
+local variable, only now it will be in the transformed parameter block.
+
+Wayne Folta suggested encoding the model without local vector
+variables as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+model {
+  real err;
+  mu ~ normal(0,10);
+  phi ~ normal(0,2);
+  theta ~ normal(0,2);
+  sigma ~ cauchy(0,5);
+  err <- y[1] - mu + phi * mu;
+  err ~ normal(0,sigma);
+  for (t in 2:T) {
+    err <- y[t] - (mu + phi * y[t-1] + theta * err); 
+    err ~ normal(0,sigma);
+  }
+}
+\end{Verbatim}
+\end{quote}
+%
+This approach to ARMA models provides a nice example of how local
+variables, such as \code{err} in this case, can be reused in Stan.
+Folta's approach could be extended to higher order moving-average
+models by storing more than one error term as a local variable and
+reassigning them in the loop.  
+
+Both encodings are very fast.  The original encoding has the advantage
+of vectorizing the normal distribution, but it uses a bit more memory.
+A halfway point would be to vectorize just \code{err}.
+
+
 \chapter{Measurement Error and Meta-Analysis}
 
 \noindent
