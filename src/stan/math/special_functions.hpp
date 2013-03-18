@@ -16,22 +16,7 @@ namespace stan {
 
   namespace math {
 
-    // C99 
-    
-
     // OTHER BASIC FUNCTIONS
-
-    /**
-     * The integer step, or Heaviside, function.  
-     *
-     * @param y Value to test.
-     * @return 1 if value is greater than 0 and 0 otherwise
-     * @tparam T Scalar argument type.
-     */
-    template <typename T>
-    unsigned int int_step(T y) {
-      return y > 0;
-    }
 
     /**
      * The step, or Heaviside, function.  

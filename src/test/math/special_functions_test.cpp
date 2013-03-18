@@ -4,13 +4,6 @@
 #include "stan/math/special_functions.hpp"
 
 
-TEST(MathsSpecialFunctions, int_step) {
-  EXPECT_EQ(0U, stan::math::int_step(-1.0));
-  EXPECT_EQ(0U, stan::math::int_step(0.0));
-  EXPECT_EQ(1U, stan::math::int_step(0.00000000001));
-  EXPECT_EQ(1U, stan::math::int_step(100.0));
-}
-
 TEST(MathsSpecialFunctions, binomial_coefficient_log) {
   EXPECT_FLOAT_EQ(1.0, exp(stan::math::binomial_coefficient_log(2.0,2.0)));
   EXPECT_FLOAT_EQ(2.0, exp(stan::math::binomial_coefficient_log(2.0,1.0)));
