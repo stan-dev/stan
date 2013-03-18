@@ -2,7 +2,6 @@
 #include <stdexcept>
 #include <gtest/gtest.h>
 #include "stan/math/special_functions.hpp"
-#include "stan/math/functions/Phi.hpp"
 
 TEST(MathsSpecialFunctions, log1m) {
   EXPECT_FLOAT_EQ(log1p(-0.1),stan::math::log1m(0.1));
@@ -22,12 +21,6 @@ TEST(MathsSpecialFunctions, inv_cloglog) {
   EXPECT_EQ(std::exp(-std::exp(3.7)), stan::math::inv_cloglog(3.7));
   EXPECT_EQ(std::exp(-std::exp(0.0)), stan::math::inv_cloglog(0.0));
   EXPECT_EQ(std::exp(-std::exp(-2.93)), stan::math::inv_cloglog(-2.93));
-}
-
-TEST(MathsSpecialFunctions, Phi_approx) {
-  EXPECT_EQ(0.5, stan::math::Phi_approx(0.0));
-  EXPECT_NEAR(stan::math::Phi(0.9), stan::math::Phi_approx(0.9), 0.00014);
-  EXPECT_NEAR(stan::math::Phi(-5.0), stan::math::Phi_approx(-5.0), 0.00014);
 }
 
 TEST(MathsSpecialFunctions, softmax) {

@@ -4,6 +4,7 @@
 #include "stan/math/constants.hpp"
 
 #include "stan/math/functions/Phi.hpp"
+#include "stan/math/functions/Phi_approx.hpp"
 #include "stan/math/functions/binomial_coefficient_log.hpp"
 #include "stan/math/functions/exp2.hpp"
 #include "stan/math/functions/fdim.hpp"

@@ -18,24 +18,6 @@ namespace stan {
   namespace math {
 
     // PROBABILITY-RELATED FUNCTIONS
-    
-    /**
-     * Approximation of the unit normal CDF.  
-     *
-     * http://www.jiem.org/index.php/jiem/article/download/60/27
-     *
-     * This function can be used to implement the inverse link function
-     * for probit regression.  
-     *
-     * @param x Argument.
-     * @return Probability random sample is less than or equal to argument. 
-     */
-    template <typename T>
-    inline typename boost::math::tools::promote_args<T>::type
-    Phi_approx(T x) {
-      return inv_logit(0.07056 * std::pow(x,3.0) + 1.5976 * x);
-    }
-
     /**
      * The inverse complementary log-log function.
      *
