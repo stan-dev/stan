@@ -18,24 +18,6 @@ namespace stan {
 
     // C99 
     
-    /**
-     * Returns the base 2 logarithm of the argument (C99).
-     *
-     * The function is defined by:
-     *
-     * <code>log2(a) = log(a) / std::log(2.0)</code>.
-     *
-     * @tparam T type of scalar
-     * @param a Value.
-     * @return Base 2 logarithm of the value.
-     */
-    template <typename T>
-    inline typename boost::math::tools::promote_args<T>::type
-    log2(T a) {
-      using std::log;
-      const static double LOG2 = std::log(2.0);
-      return log(a) / LOG2;
-    }
 
     // OTHER BASIC FUNCTIONS
 
@@ -852,14 +834,6 @@ namespace stan {
       return SQRT_2;
     }
 
-    /**
-     * Return natural logarithm of two.
-     *
-     * @return Natural logarithm of two.
-     */
-    inline double log2() {
-      return LOG_2;
-    }
 
     /**
      * Return natural logarithm of ten.

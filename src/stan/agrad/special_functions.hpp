@@ -2,6 +2,7 @@
 #define __STAN__AGRAD__AGRAD_SPECIAL_FUNCTIONS_HPP__
 
 #include <stan/agrad/error_handling.hpp>
+#include <stan/math.hpp>
 #include <stan/math/special_functions.hpp>
 
 #include <boost/math/special_functions/acosh.hpp>

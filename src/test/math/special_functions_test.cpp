@@ -208,9 +208,6 @@ TEST(MathsSpecialFunctions, e_fun) {
 TEST(MathsSpecialFunctions, sqrt2_fun) {
   EXPECT_FLOAT_EQ(std::sqrt(2.0), stan::math::sqrt2());
 }
-TEST(MathsSpecialFunctions, log2_fun) {
-  EXPECT_FLOAT_EQ(std::log(2.0), stan::math::log2());
-}
 TEST(MathsSpecialFunctions, log10_fun) {
   EXPECT_FLOAT_EQ(std::log(10.0), stan::math::log10());
 }

@@ -20,7 +20,7 @@ namespace stan {
      */
     template <typename T1, typename T2, typename T3>
     inline typename boost::math::tools::promote_args<T1,T2,T3>::type
-    fma(T1 a, T2 b, T3 c) {
+    fma(const T1 a, const T2 b, const T3 c) {
       return (a * b) + c;
     }
 
