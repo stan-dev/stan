@@ -1,5 +1,5 @@
-#include <gtest/gtest.h>
 #include "stan/math/constants.hpp"
+#include <gtest/gtest.h>
 
 TEST(MathsConstants, e) {
   EXPECT_FLOAT_EQ(std::exp(1.0), stan::math::E);
