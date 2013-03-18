@@ -19,67 +19,6 @@ namespace stan {
     // PROBABILITY-RELATED FUNCTIONS
     
     /**
-     * Return the log of the beta function applied to the specified
-     * arguments.
-     *
-     * The beta function is defined for \f$a > 0\f$ and \f$b > 0\f$ by
-     *
-     * \f$\mbox{B}(a,b) = \frac{\Gamma(a) \Gamma(b)}{\Gamma(a+b)}\f$.
-     *
-     * This function returns its log,
-     *
-     * \f$\log \mbox{B}(a,b) = \log \Gamma(a) + \log \Gamma(b) - \log \Gamma(a+b)\f$.
-     *
-     * See boost::math::lgamma() for the double-based and stan::agrad for the
-     * variable-based log Gamma function.
-     * 
-     * @param a First value
-     * @param b Second value
-     * @return Log of the beta function applied to the two values.
-     * @tparam T1 Type of first value.
-     * @tparam T2 Type of second value.
-     */
-    template <typename T1, typename T2>
-    inline typename boost::math::tools::promote_args<T1,T2>::type
-    lbeta(T1 a, T2 b) {
-      return lgamma(a)
-        + lgamma(b)
-        - lgamma(a + b);
-    }
-
-    /**
-     * Return the log of the binomial coefficient for the specified
-     * arguments.
-     *
-     * The binomial coefficient, \f${N \choose n}\f$, read "N choose n", is
-     * defined for \f$0 \leq n \leq N\f$ by
-     *
-     * \f${N \choose n} = \frac{N!}{n! (N-n)!}\f$.
-     *
-     * This function uses Gamma functions to define the log
-     * and generalize the arguments to continuous N and n.
-     *
-     * \f$ \log {N \choose n} = \log \ \Gamma(N+1) - \log \Gamma(n+1) - \log \Gamma(N-n+1)\f$.
-     *
-     * @param N total number of objects.
-     * @param n number of objects chosen.
-     * @return log (N choose n).
-     */
-    template <typename T_N, typename T_n>
-    inline typename boost::math::tools::promote_args<T_N, T_n>::type
-    binomial_coefficient_log(T_N N, T_n n) {
-      using std::log;
-
-      const double cutoff = 1000;
-      if ((N < cutoff) || (N - n < cutoff)) {
-        return lgamma(N + 1.0) - lgamma(n + 1.0) - lgamma(N - n + 1.0);
-      } else {
-        return n * log(N - n) + (N + 0.5) * log(N/(N-n))
-          + 1/(12*N) - n - 1/(12*(N-n)) - lgamma(n + 1.0);
-      }
-    }
-
-    /**
      * Returns the inverse logit function applied to the argument.
      *
      * The inverse logit function is defined by

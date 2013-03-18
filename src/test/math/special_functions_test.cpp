@@ -4,20 +4,6 @@
 #include "stan/math/special_functions.hpp"
 
 
-TEST(MathsSpecialFunctions, binomial_coefficient_log) {
-  EXPECT_FLOAT_EQ(1.0, exp(stan::math::binomial_coefficient_log(2.0,2.0)));
-  EXPECT_FLOAT_EQ(2.0, exp(stan::math::binomial_coefficient_log(2.0,1.0)));
-  EXPECT_FLOAT_EQ(3.0, exp(stan::math::binomial_coefficient_log(3.0,1.0)));
-  EXPECT_NEAR(3.0, exp(stan::math::binomial_coefficient_log(3.0,2.0)),0.0001);
-}
-
-TEST(MathsSpecialFunctions, lbeta) {
-  EXPECT_FLOAT_EQ(0.0, stan::math::lbeta(1.0,1.0));
-  EXPECT_FLOAT_EQ(2.981361, stan::math::lbeta(0.1,0.1));
-  EXPECT_FLOAT_EQ(-4.094345, stan::math::lbeta(3.0,4.0));
-  EXPECT_FLOAT_EQ(-4.094345, stan::math::lbeta(4.0,3.0));
-}
-
 TEST(MathsSpecialFunctions, inv_logit) {
   EXPECT_FLOAT_EQ(0.5, stan::math::inv_logit(0.0));
   EXPECT_FLOAT_EQ(1.0/(1.0 + exp(-5.0)), stan::math::inv_logit(5.0));

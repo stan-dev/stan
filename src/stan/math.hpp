@@ -7,6 +7,7 @@
 #include "stan/math/functions/fdim.hpp"
 #include "stan/math/functions/fma.hpp"
 #include "stan/math/functions/int_step.hpp"
+#include "stan/math/functions/lbeta.hpp"
 #include "stan/math/functions/log2.hpp"
 #include "stan/math/functions/step.hpp"
 
