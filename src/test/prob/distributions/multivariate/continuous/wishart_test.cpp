@@ -1,8 +1,9 @@
 #include <gtest/gtest.h>
-#include <stan/prob/distributions/univariate/continuous/chi_square.hpp>
 #include <stan/prob/distributions/multivariate/continuous/wishart.hpp>
 #include <boost/random/mersenne_twister.hpp>
-#include<boost/math/distributions.hpp>
+#include <boost/math/special_functions/digamma.hpp>
+#include <boost/math/distributions.hpp>
+
 
 using Eigen::Dynamic;
 using Eigen::Matrix;
@@ -180,4 +181,29 @@ TEST(ProbDistributionsWishart, random) {
     -3.0,  4.0, 0.0,
     2.0, 1.0, 3.0;
   EXPECT_NO_THROW(stan::prob::wishart_rng(3.0, sigma,rng));
+}
+
+TEST(ProbDistributionsWishart, marginalTwoChiSquareGoodnessFitTest) {
+  boost::random::mt19937 rng;
+  Matrix<double,Dynamic,Dynamic> sigma(3,3);
+  sigma << 9.0, -3.0, 0.0,
+    -3.0,  4.0, 0.0,
+    2.0, 1.0, 3.0;
+  int N = 10000;
+  boost::math::chi_squared mydist(1);
+
+  int count = 0;
+  double avg = 0;
+  double expect = sigma.rows() * std::log(2.0) + std::log(stan::math::determinant(sigma)) + boost::math::digamma(5.0 / 2.0) + boost::math::digamma(4.0 / 2.0) + boost::math::digamma(3.0 / 2.0);
+
+  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> a(sigma.rows(),sigma.rows());
+  while (count < N) {
+    a = stan::prob::wishart_rng(5.0, sigma, rng);
+    avg += std::log(stan::math::determinant(a)) / N;
+    count++;
+   }
+ 
+  double chi = (expect - avg) * (expect - avg) / expect;
+
+  EXPECT_TRUE(chi < quantile(complement(mydist, 1e-6)));
 }
