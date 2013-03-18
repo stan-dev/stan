@@ -16,26 +16,6 @@ namespace stan {
 
   namespace math {
 
-    // OTHER BASIC FUNCTIONS
-
-    /**
-     * The step, or Heaviside, function.  
-     *
-     * The function is defined by 
-     *
-     * <code>step(y) = (y < 0.0) ? 0 : 1</code>.
-     *
-     * @param y Scalar argument.
-     *
-     * @return 1 if the specified argument is greater than or equal to
-     * 0.0, and 0 otherwise.
-     */
-    template <typename T>
-    inline int step(T y) {
-      return y < 0.0 ? 0 : 1;
-    }
-
-
     // PROBABILITY-RELATED FUNCTIONS
     
     /**

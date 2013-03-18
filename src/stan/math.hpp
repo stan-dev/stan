@@ -8,7 +8,7 @@
 #include "stan/math/functions/fma.hpp"
 #include "stan/math/functions/int_step.hpp"
 #include "stan/math/functions/log2.hpp"
-
+#include "stan/math/functions/step.hpp"
 
 // FIXME: remove when refactoring is complete
 #include "stan/math_old.hpp"
