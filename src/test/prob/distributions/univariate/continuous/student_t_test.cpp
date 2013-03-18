@@ -5,7 +5,7 @@
 
 TEST(ProbDistributionsStudentT, random) {
   boost::random::mt19937 rng;
-  EXPECT_NO_THROW(stan::prob::student_t_rng(3.0, 2.0, 1.0, rng));
+  EXPECT_NO_THROW(stan::prob::student_t_rng(3.0, 2.0, 2.0, rng));
 }
 
 TEST(ProbDistributionsStudentT, chiSquareGoodnessFitTest) {
@@ -23,10 +23,10 @@ TEST(ProbDistributionsStudentT, chiSquareGoodnessFitTest) {
   int bin [5] = {0, 0, 0, 0, 0};
 
   while (count < N) {
-    double a = stan::prob::student_t_rng(3.0,2.0,1.0,rng) / 1.0 - 2.0;
+    double a = (stan::prob::student_t_rng(3.0,2.0,2.0,rng) - 2.0) / 2.0;
     int i = 0;
     while (i < K-1 && a > loc[i]) 
-  ++i;
+      ++i;
     ++bin[i];
     count++;
    }
