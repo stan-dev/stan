@@ -3,6 +3,7 @@
 
 #include <boost/random/uniform_01.hpp>
 #include <boost/random/variate_generator.hpp>
+#include <stan/prob/distributions/multivariate/discrete/categorical.hpp>
 
 #include <stan/prob/traits.hpp>
 #include <stan/math/error_handling.hpp>
@@ -168,16 +169,14 @@ namespace stan {
 			 const Eigen::Matrix<double,Eigen::Dynamic,1>& c,
 			 RNG& rng) {
       using boost::variate_generator;
-      using boost::uniform_01;
-      variate_generator<RNG&, uniform_01<> >
-	uniform01_rng(rng, uniform_01<>());
+      using stan::math::inv_logit;
+      Eigen::VectorXd cut(c.rows());
+      cut(0) = 1 - inv_logit(eta - c(0));
+      for(int j = 1; j < c.rows() - 1; j++)
+	cut(j) = inv_logit(eta - c(j - 1)) - inv_logit(eta - c(j));
+      cut(c.rows() - 1) = inv_logit(eta - c(c.rows() - 2));
 
-      int i = 0;
-      double u = uniform01_rng();
-      double logit = std::log(u) - std::log(1 - u);
-      while(i < c.rows() && logit < c(i))
-	i++;
-      return i+1;
+      return stan::prob::categorical_rng(cut, rng);
     }
   }
 }
