@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__FUNCTIONS__LOGIT_HPP__
-#define __STAN__MATH__FUNCTIONS__LOGIT_HPP__
+#ifndef __STAN__MATH__FUNCTIONS__PHI_HPP__
+#define __STAN__MATH__FUNCTIONS__PHI_HPP__
 
 #include <boost/math/tools/promotion.hpp>
 #include <boost/math/special_functions/erf.hpp>

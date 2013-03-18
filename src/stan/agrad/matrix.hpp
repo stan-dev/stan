@@ -1,6 +1,8 @@
 #ifndef __STAN__AGRAD__MATRIX_HPP__
 #define __STAN__AGRAD__MATRIX_HPP__
 
+#include <stan/math/functions/Phi.hpp>
+#include <stan/math/functions/logit.hpp>
 #include <stan/math/matrix.hpp>
 #include <stan/math/matrix_error_handling.hpp>
 
