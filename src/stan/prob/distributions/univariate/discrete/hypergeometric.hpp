@@ -8,6 +8,9 @@
 #include <stan/prob/traits.hpp>
 #include <stan/prob/constants.hpp>
 
+#include <stan/math/functions/binomial_coefficient_log.hpp>
+
+
 namespace stan {
 
   namespace prob {
