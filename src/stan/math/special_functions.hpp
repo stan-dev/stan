@@ -11,6 +11,7 @@
 #include <stan/math/constants.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/meta/traits.hpp>
+#include <stan/math/functions/inv_logit.hpp>
 
 namespace stan {
 
@@ -18,28 +19,6 @@ namespace stan {
 
     // PROBABILITY-RELATED FUNCTIONS
     
-    /**
-     * Returns the inverse logit function applied to the argument.
-     *
-     * The inverse logit function is defined by
-     *
-     * \f$\mbox{logit}^{-1}(x) = \frac{1}{1 + \exp(-x)}\f$.
-     *
-     * This function can be used to implement the inverse link function
-     * for logistic regression.
-     *
-     * The inverse to this function is <code>stan::math::logit</code>.
-     * 
-     * @param a Argument.
-     * @return Inverse logit of argument.
-     */
-    template <typename T>
-    inline typename boost::math::tools::promote_args<T>::type
-    inv_logit(T a) {
-      using std::exp;
-      return 1.0 / (1.0 + exp(-a));
-    }
-
     /**
      * Returns the logit function applied to the
      * argument. 

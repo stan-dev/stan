@@ -3,12 +3,6 @@
 #include <gtest/gtest.h>
 #include "stan/math/special_functions.hpp"
 
-
-TEST(MathsSpecialFunctions, inv_logit) {
-  EXPECT_FLOAT_EQ(0.5, stan::math::inv_logit(0.0));
-  EXPECT_FLOAT_EQ(1.0/(1.0 + exp(-5.0)), stan::math::inv_logit(5.0));
-}
-
 TEST(MathsSpecialFunctions, log1m) {
   EXPECT_FLOAT_EQ(log1p(-0.1),stan::math::log1m(0.1));
 }
