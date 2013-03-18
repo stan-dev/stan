@@ -19,6 +19,12 @@ namespace stan {
      */
     const double SQRT_2 = std::sqrt(2.0);
 
+    /** 
+     * The value of 1 over the square root of 2, 
+     * \f$ 1 / \sqrt{2} \f$. 
+     */
+    const double INV_SQRT_2 = 1.0 / SQRT_2;
+
     /**
      * The natural logarithm of 2, 
      * \f$ \log 2 \f$.

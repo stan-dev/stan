@@ -23,12 +23,6 @@ TEST(MathsSpecialFunctions, inv_cloglog) {
   EXPECT_EQ(std::exp(-std::exp(-2.93)), stan::math::inv_cloglog(-2.93));
 }
 
-TEST(MathsSpecialFunctions, Phi) {
-  EXPECT_EQ(0.5 + 0.5 * boost::math::erf(0.0), stan::math::Phi(0.0));
-  EXPECT_FLOAT_EQ(0.5 + 0.5 * boost::math::erf(0.9/std::sqrt(2.0)), stan::math::Phi(0.9));
-  EXPECT_EQ(0.5 + 0.5 * boost::math::erf(-5.0/std::sqrt(2.0)), stan::math::Phi(-5.0));
-}
-
 TEST(MathsSpecialFunctions, Phi_approx) {
   EXPECT_EQ(0.5, stan::math::Phi_approx(0.0));
   EXPECT_NEAR(stan::math::Phi(0.9), stan::math::Phi_approx(0.9), 0.00014);

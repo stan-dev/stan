@@ -20,28 +20,6 @@ namespace stan {
     // PROBABILITY-RELATED FUNCTIONS
     
     /**
-     * The unit normal cumulative distribution function.  
-     *
-     * The return value for a specified input is the probability that
-     * a random unit normal variate is less than or equal to the
-     * specified value, defined by
-     *
-     * \f$\Phi(x) = \int_{-\infty}^x \mbox{\sf Norm}(x|0,1) \ dx\f$
-     *
-     * This function can be used to implement the inverse link function
-     * for probit regression.  
-     *
-     * @param x Argument.
-     * @return Probability random sample is less than or equal to argument. 
-     */
-    template <typename T>
-    inline typename boost::math::tools::promote_args<T>::type
-    Phi(T x) {
-      static const double INV_SQRT_TWO = 1.0 / std::sqrt(2.0);
-      return 0.5 * (1.0 + boost::math::erf(INV_SQRT_TWO * x));
-    }
-
-    /**
      * Approximation of the unit normal CDF.  
      *
      * http://www.jiem.org/index.php/jiem/article/download/60/27
