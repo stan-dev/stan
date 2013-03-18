@@ -8,7 +8,8 @@
 #include <stan/agrad/matrix.hpp>
 #include <stan/prob/traits.hpp>
 #include <boost/concept_check.hpp>
-#include "stan/prob/distributions/multivariate/continuous/multi_normal.hpp"
+#include "stan/prob/distributions/univariate/continuous/normal.hpp"
+#include "stan/prob/distributions/univariate/continuous/chi_square.hpp"
 
 namespace stan {
 
@@ -165,19 +166,22 @@ namespace stan {
 		const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
 		RNG& rng) {
 
-      Eigen::VectorXd z(Sigma.cols());
-      for(int i = 0; i < Sigma.cols(); i++)
-	z(i) = 0.0;
-
       Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> B(Sigma.rows(), Sigma.cols());
-      for(int i = 0; i < Sigma.cols(); i++)
+      for(int i = 0; i < Sigma.rows(); i++)
 	{
-	  Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> A = stan::prob::multi_normal_rng(z, Sigma, rng);
-	  for(int j = 0; j < Sigma.cols(); j++)
-	    B(i,j) = A(j, 0);
+	  for(int j = 0; j < Sigma.rows(); j++)
+	    B(i,j) = 0;
 	}
 
-      return B.transpose() * B;
+      Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> A(Sigma.rows(), 1);
+      for(int i = 0; i < Sigma.cols(); i++)
+	{
+	  B(i,i) = std::sqrt(chi_square_rng(nu - i, rng));
+	  for(int j = 0; j < i; j++)
+	    B(j,i) = normal_rng(0,1,rng);
+	}
+
+      return Sigma.llt().matrixL() * B * B.transpose() * Sigma.llt().matrixL().transpose();
     }
   }
 }
