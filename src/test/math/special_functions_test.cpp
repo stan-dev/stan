@@ -2,6 +2,7 @@
 #include <stdexcept>
 #include <gtest/gtest.h>
 #include "stan/math/special_functions.hpp"
+#include "stan/math/functions/Phi.hpp"
 
 TEST(MathsSpecialFunctions, log1m) {
   EXPECT_FLOAT_EQ(log1p(-0.1),stan::math::log1m(0.1));
