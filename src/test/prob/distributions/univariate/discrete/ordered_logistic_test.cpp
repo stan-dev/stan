@@ -1,8 +1,7 @@
 #include <gtest/gtest.h>
-#include <stan/math/special_functions.hpp>
 #include <stan/prob/distributions/univariate/discrete/ordered_logistic.hpp>
 #include <boost/random/mersenne_twister.hpp>
-#include<boost/math/distributions.hpp>
+#include <boost/math/distributions.hpp>
 
 using Eigen::Matrix;
 using Eigen::Dynamic;

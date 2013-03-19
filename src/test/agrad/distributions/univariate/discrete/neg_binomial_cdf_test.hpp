@@ -1,6 +1,5 @@
 // Arguments: Ints, Doubles, Doubles
 #include <stan/prob/distributions/univariate/discrete/neg_binomial.hpp>
-#include <stan/math/special_functions.hpp>
 #include <boost/math/special_functions/binomial.hpp>
 
 using std::vector;
