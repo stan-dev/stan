@@ -2527,12 +2527,6 @@ namespace stan {
       return result;
     }
 
-    template <typename T>
-    inline
-    int
-    size(const std::vector<T>& x) {
-      return x.size();
-    }
     
     
 
