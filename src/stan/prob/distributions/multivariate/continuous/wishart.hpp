@@ -10,6 +10,7 @@
 #include <boost/concept_check.hpp>
 #include "stan/prob/distributions/univariate/continuous/normal.hpp"
 #include "stan/prob/distributions/univariate/continuous/chi_square.hpp"
+#include <stan/math/functions/lmgamma.hpp>
 
 namespace stan {
 

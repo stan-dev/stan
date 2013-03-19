@@ -62,6 +62,12 @@ namespace stan {
      */
     const double NEGATIVE_EPSILON = - std::numeric_limits<double>::epsilon();
 
+
+    /*
+     * Log pi divided by 4
+     * \f$ \log \pi / 4 \f$
+     */
+    const double LOG_PI_OVER_FOUR = std::log(boost::math::constants::pi<double>()) / 4.0;
   }
 }
 

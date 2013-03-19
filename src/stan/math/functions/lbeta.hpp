@@ -30,7 +30,7 @@ namespace stan {
      */
     template <typename T1, typename T2>
     inline typename boost::math::tools::promote_args<T1,T2>::type
-    lbeta(T1 a, T2 b) {
+    lbeta(const T1 a, const T2 b) {
       using boost::math::lgamma;
       return lgamma(a)
         + lgamma(b)
