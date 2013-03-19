@@ -3,6 +3,7 @@
 
 #include <boost/math/tools/promotion.hpp>
 #include <stan/math/constants.hpp>
+#include <boost/math/special_functions/gamma.hpp>
 
 namespace stan {
 
@@ -27,8 +28,7 @@ namespace stan {
     template <typename T>
     inline typename boost::math::tools::promote_args<T>::type
     lmgamma(unsigned int k, T x) {
-      //using std::lgamma;
-      // FIXME: where is lgamma coming from? boost::math::lgamma does not work with 0.
+      using boost::math::lgamma;
       typename boost::math::tools::promote_args<T>::type result 
         = k * (k - 1) * LOG_PI_OVER_FOUR;
 
