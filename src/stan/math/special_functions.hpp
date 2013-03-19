@@ -17,14 +17,6 @@ namespace stan {
 
   namespace math {
 
-    template <typename T_a, typename T_b>
-    inline typename boost::math::tools::promote_args<T_a,T_b>::type
-    multiply_log(T_a a, T_b b) {
-      using std::log;
-      if (b == 0.0 && a == 0.0)
-        return 0.0;
-      return a * log(b);
-    }
 
     /**
      * Calculates the log of 1 plus the exponential of the specified
