@@ -17,31 +17,6 @@ namespace stan {
 
   namespace math {
 
-    /** 
-     * Return the scalar value and ignore the remaining
-     * arguments.
-     *
-     * <p>This function provides an overload of
-     * <code>simple_var</code> to use with primitive values for which
-     * the type and derivative type are the same.  The other overloads
-     * are for <code>stan::agrad::var</code> arguments; the
-     * definitions can be found in
-     * <code>stan/agrad/partials_vari.hpp</code>.
-     * 
-     * @tparam T1 Type of first dummy argument and derivative.
-     * @tparam T2 Type of second dummy argument and derivative.
-     * @tparam T3 Type of third dummy argument and derivative.
-     * @param v Value to return.
-     * @return Value.
-     */
-    template <typename T1, typename T2, typename T3>
-    inline double simple_var(double v, 
-                             const T1& /*y1*/, const T1& /*dy1*/, 
-                             const T2& /*y2*/, const T2& /*dy2*/,
-                             const T3& /*y3*/, const T3& /*dy3*/) {
-      return v;
-    }
-
 
     // CONSTANTS
 

@@ -36,7 +36,6 @@
 #include "stan/math/functions/logical_or.hpp"
 #include "stan/math/functions/logit.hpp"
 #include "stan/math/functions/multiply_log.hpp"
-#include "stan/math/functions/simple_var.hpp"
 #include "stan/math/functions/softmax.hpp"
 #include "stan/math/functions/square.hpp"
 #include "stan/math/functions/step.hpp"
