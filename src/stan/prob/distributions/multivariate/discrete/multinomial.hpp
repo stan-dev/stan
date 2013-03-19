@@ -10,7 +10,7 @@
 #include <stan/math/error_handling.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/math/special_functions.hpp>
-
+#include <stan/math/functions/multiply_log.hpp>
 
 namespace stan {
 
