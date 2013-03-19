@@ -6,11 +6,6 @@
 TEST(MathsSpecialFunctions, log1m) {
   EXPECT_FLOAT_EQ(log1p(-0.1),stan::math::log1m(0.1));
 }
-TEST(MathsSpecialFunctions, inverse_softmax_exception) {
-  std::vector<double> simplex(2);
-  std::vector<double> y(3);
-  EXPECT_THROW(stan::math::inverse_softmax< std::vector<double> >(simplex, y), std::invalid_argument);
-}
 
 TEST(MathsSpecialFunctions, log1p) {
   double x;

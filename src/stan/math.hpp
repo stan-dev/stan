@@ -12,6 +12,7 @@
 #include "stan/math/functions/fma.hpp"
 #include "stan/math/functions/int_step.hpp"
 #include "stan/math/functions/inv_logit.hpp"
+#include "stan/math/functions/inverse_softmax.hpp"
 #include "stan/math/functions/lbeta.hpp"
 #include "stan/math/functions/log2.hpp"
 #include "stan/math/functions/logit.hpp"
