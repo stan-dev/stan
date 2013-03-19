@@ -3,40 +3,6 @@
 #include <gtest/gtest.h>
 #include "stan/math/special_functions.hpp"
 
-TEST(MathSpecialFunctions,logicalEq) {
-  using stan::math::logical_eq;
-  EXPECT_TRUE(logical_eq(1,1));
-  EXPECT_TRUE(logical_eq(5.7,5.7));
-  EXPECT_TRUE(logical_eq(0,0.0));
-
-  EXPECT_FALSE(logical_eq(0,1));
-  EXPECT_FALSE(logical_eq(1.0,0));
-  EXPECT_FALSE(logical_eq(1, 2));
-  EXPECT_FALSE(logical_eq(2.0, -1.0));
-}
-TEST(MathSpecialFunctions,logicalNeq) {
-  using stan::math::logical_neq;
-  EXPECT_TRUE(logical_neq(0,1));
-  EXPECT_TRUE(logical_neq(1.0,0));
-  EXPECT_TRUE(logical_neq(1, 2));
-  EXPECT_TRUE(logical_neq(2.0, -1.0));
-
-  EXPECT_FALSE(logical_neq(1,1));
-  EXPECT_FALSE(logical_neq(5.7,5.7));
-  EXPECT_FALSE(logical_neq(0,0.0));
-}
-TEST(MathSpecialFunctions,logicalLt) {
-  using stan::math::logical_lt;
-  EXPECT_TRUE(logical_lt(0,1));
-  EXPECT_TRUE(logical_lt(1.0,2.0));
-  EXPECT_TRUE(logical_lt(1, 2.0));
-  EXPECT_TRUE(logical_lt(-1, 0));
-
-  EXPECT_FALSE(logical_lt(1,1));
-  EXPECT_FALSE(logical_lt(5.7,5.7));
-  EXPECT_FALSE(logical_lt(5.7,-9.0));
-  EXPECT_FALSE(logical_lt(0,0.0));
-}
 TEST(MathSpecialFunctions,logicalLte) {
   using stan::math::logical_lte;
   EXPECT_TRUE(logical_lte(0,1));
