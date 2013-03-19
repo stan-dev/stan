@@ -109,6 +109,10 @@ C++ API
 ======================================================================
 [items go here first, then to RStan/cmd]
 
+* Refactor math library:
+  - src/stan/math/functions/lmgamma.hpp
+    Where is the lmgamma being pulled in from?
+
 * new vector views
  
  ?? promote up from double to matrix?
