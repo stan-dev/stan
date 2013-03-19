@@ -160,6 +160,7 @@ namespace Eigen {
       static inline int run()
       {
         using std::ceil;
+        using std::log;
         return cast<double,int>(ceil(-log(NumTraits<stan::agrad::var>::epsilon().val())
                                      /log(10.0)));
       }
