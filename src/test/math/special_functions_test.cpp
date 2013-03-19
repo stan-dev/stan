@@ -1,7 +1,4 @@
-#include <cmath>
-#include <stdexcept>
 #include <gtest/gtest.h>
-#include "stan/math/special_functions.hpp"
 
 TEST(MathSpecialFunctions,BoostUseTr1Def) {
  bool BOOST_RESULT_OF_USE_TR1_is_defined = false;
