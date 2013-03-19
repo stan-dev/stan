@@ -4,6 +4,7 @@
 #include <stan/math/functions/log1p.hpp>
 #include <vector>
 #include <boost/math/tools/promotion.hpp>
+#include <limits>
 
 namespace stan {
   namespace math {
