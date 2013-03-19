@@ -19,21 +19,6 @@ namespace stan {
 
     // PROBABILITY-RELATED FUNCTIONS
 
-    /**
-     * Return the natural logarithm of one minus the specified value.
-     *
-     * The main use of this function is to cut down on intermediate
-     * values during algorithmic differentiation.
-     *
-     * @param x Specified value.
-     * @return Natural log of one minus <code>x</code>.
-     */
-    template <typename T>
-    inline typename boost::math::tools::promote_args<T>::type
-    log1m(T x) {
-      return log1p(-x);
-    }
-
     namespace {
       const double LOG_PI_OVER_FOUR = std::log(boost::math::constants::pi<double>()) / 4.0;
     }

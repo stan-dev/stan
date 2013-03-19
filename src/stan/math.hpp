@@ -14,6 +14,7 @@
 #include "stan/math/functions/inv_logit.hpp"
 #include "stan/math/functions/inverse_softmax.hpp"
 #include "stan/math/functions/lbeta.hpp"
+#include "stan/math/functions/log1m.hpp"
 #include "stan/math/functions/log1p.hpp"
 #include "stan/math/functions/log2.hpp"
 #include "stan/math/functions/logit.hpp"
