@@ -107,10 +107,10 @@ ee1 <- extract(exfit, permuted = TRUE)
 print(names(ee1))
 
 for (name in names(ee1)) 
-  print(dims(ee1[[name]]))
+  print(dim(ee1[[name]]))
 
 ee2 <- extract(exfit, permuted = FALSE)
-print(dims(ee2))
+print(dim(ee2))
 print(dimnames(ee2))
 } 
 
