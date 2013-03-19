@@ -3,18 +3,6 @@
 #include <gtest/gtest.h>
 #include "stan/math/special_functions.hpp"
 
-TEST(MathSpecialFunctions,logicalAnd) {
-  using stan::math::logical_and;
-  EXPECT_TRUE(logical_and(1,1));
-  EXPECT_TRUE(logical_and(5.7,-1.9));
-
-  EXPECT_FALSE(logical_and(0,0));
-  EXPECT_FALSE(logical_and(0,1));
-  EXPECT_FALSE(logical_and(1,0));
-  EXPECT_FALSE(logical_and(0.0, 0.0));
-  EXPECT_FALSE(logical_and(0.0, 1.0));
-  EXPECT_FALSE(logical_and(1, 0.0));
-}
 TEST(MathSpecialFunctions,logicalEq) {
   using stan::math::logical_eq;
   EXPECT_TRUE(logical_eq(1,1));
