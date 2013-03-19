@@ -6,41 +6,12 @@
 TEST(MathsSpecialFunctions, log1m) {
   EXPECT_FLOAT_EQ(log1p(-0.1),stan::math::log1m(0.1));
 }
-
-TEST(MathsSpecialFunctions, softmax) {
-  std::vector<double> x;
-  x.push_back(1.0);
-  x.push_back(-1.0);
-  x.push_back(2.0);
-  std::vector<double> simplex(3);
-  stan::math::softmax<std::vector<double>,double>(x,simplex);
-  EXPECT_FLOAT_EQ(1.0, simplex[0] + simplex[1] + simplex[2]);
-  double sum = exp(1.0) + exp(-1.0) + exp(2.0);
-  EXPECT_FLOAT_EQ(exp(1.0)/sum, simplex[0]);
-  EXPECT_FLOAT_EQ(exp(-1.0)/sum, simplex[1]);
-  EXPECT_FLOAT_EQ(exp(2.0)/sum, simplex[2]);
-}
-TEST(MathsSpecialFunctions, softmax_exception) {
-  std::vector<double> x;
-  x.push_back(1.0);
-  x.push_back(-1.0);
-  x.push_back(2.0);
-  std::vector<double> simplex(2);
-  
-  // dl: EXPECT_THROW is not able to handle this templating
-  //EXPECT_THROW(stan::math::softmax<std::vector<double>,double>(x,simplex), std::invalid_argument);
-  try{
-    stan::math::softmax<std::vector<double>,double>(x,simplex);
-    FAIL();
-  } catch (std::invalid_argument e) {
-    SUCCEED();
-  }
-}
 TEST(MathsSpecialFunctions, inverse_softmax_exception) {
   std::vector<double> simplex(2);
   std::vector<double> y(3);
   EXPECT_THROW(stan::math::inverse_softmax< std::vector<double> >(simplex, y), std::invalid_argument);
 }
+
 TEST(MathsSpecialFunctions, log1p) {
   double x;
 

@@ -15,6 +15,7 @@
 #include "stan/math/functions/lbeta.hpp"
 #include "stan/math/functions/log2.hpp"
 #include "stan/math/functions/logit.hpp"
+#include "stan/math/functions/softmax.hpp"
 #include "stan/math/functions/step.hpp"
 
 // FIXME: remove when refactoring is complete
