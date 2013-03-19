@@ -113,9 +113,7 @@ C++ API
 [items go here first, then to RStan/cmd]
 
 * Refactor math library:
-  - src/stan/math/functions/lmgamma.hpp
-    Where is the lmgamma being pulled in from?
-  - src/stan/math/functions/ibeta.hpp
+ - src/stan/math/functions/ibeta.hpp
     all doubles for now. If I template it, conflicts with var definition.
 
 * new vector views
