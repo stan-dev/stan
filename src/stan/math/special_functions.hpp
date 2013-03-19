@@ -18,42 +18,6 @@ namespace stan {
   namespace math {
 
     /**
-     * Returns the natural logarithm of 1 minus the inverse logit
-     * of the specified argument.
-     *
-     * @tparam T Scalar type
-     * @param u Input.
-     * @return log of 1 minus the inverse logit of the input.
-     */
-    template <typename T>
-    inline typename boost::math::tools::promote_args<T>::type
-    log1m_inv_logit(const T& u) {
-      using std::exp;
-      if (u > 0.0)
-        return -u - log1p(exp(-u));  // prevent underflow
-      return -log1p(exp(u));
-    }
-
-
-
-
-
-    /**
-     * The logical negation function which returns 1 if the input
-     * is equal to zero and 0 otherwise.
-     *
-     * @tparam T Type to compare to zero.
-     * @param x Value to compare to zero.
-     * @return 1 if input is equal to zero.
-     */
-    template <typename T>
-    inline 
-    int
-    logical_negation(T x) {
-      return (x == 0);
-    }
-
-    /**
      * The logical or function which returns 1 if either
      * argument is unequal to zero and 0 otherwise.  Equivalent
      * to <code>x1 != 0 || x2 != 0</code>.

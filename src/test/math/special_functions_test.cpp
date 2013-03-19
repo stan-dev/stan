@@ -3,17 +3,6 @@
 #include <gtest/gtest.h>
 #include "stan/math/special_functions.hpp"
 
-TEST(MathSpecialFunctions,logicalNegation) {
-  using stan::math::logical_negation;
-  EXPECT_TRUE(logical_negation(0));
-  EXPECT_TRUE(logical_negation(0.0));
-  EXPECT_TRUE(logical_negation(0.0f));
-
-  EXPECT_FALSE(logical_negation(1));
-  EXPECT_FALSE(logical_negation(2.0));
-  EXPECT_FALSE(logical_negation(2.0f));
-}
-
 TEST(MathSpecialFunctions,logicalOr) {
   using stan::math::logical_or;
   EXPECT_TRUE(logical_or(1,0));
