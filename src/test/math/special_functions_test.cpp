@@ -3,17 +3,6 @@
 #include <gtest/gtest.h>
 #include "stan/math/special_functions.hpp"
 
-TEST(MathsSpecialFunctions, square) {
-  double y = 2.0;
-  EXPECT_FLOAT_EQ(y * y, stan::math::square(y));
-
-  y = 0.0;
-  EXPECT_FLOAT_EQ(y * y, stan::math::square(y));
-
-  y = -32.7;
-  EXPECT_FLOAT_EQ(y * y, stan::math::square(y));
-}
-
 TEST(MathsSpecialFunctions, multiply_log) {
   double a = 2.0;
   double b = 3.0;
