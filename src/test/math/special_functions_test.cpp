@@ -3,19 +3,6 @@
 #include <gtest/gtest.h>
 #include "stan/math/special_functions.hpp"
 
-TEST(MathSpecialFunctions,logicalOr) {
-  using stan::math::logical_or;
-  EXPECT_TRUE(logical_or(1,0));
-  EXPECT_TRUE(logical_or(0,1));
-  EXPECT_TRUE(logical_or(1,1));
-  EXPECT_TRUE(logical_or(5.7,-1.9));
-  EXPECT_TRUE(logical_or(5.7,-1));
-
-  EXPECT_FALSE(logical_or(0,0));
-  EXPECT_FALSE(logical_or(0.0, 0.0));
-  EXPECT_FALSE(logical_or(0.0, 0));
-  EXPECT_FALSE(logical_or(0, 0.0));
-}
 TEST(MathSpecialFunctions,logicalAnd) {
   using stan::math::logical_and;
   EXPECT_TRUE(logical_and(1,1));
