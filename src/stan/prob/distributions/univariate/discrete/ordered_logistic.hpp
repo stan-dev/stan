@@ -7,7 +7,6 @@
 
 #include <stan/prob/traits.hpp>
 #include <stan/math/error_handling.hpp>
-#include <stan/math/special_functions.hpp>
 #include <stan/math/functions/log1m.hpp>
 #include <stan/math/functions/log1p_exp.hpp>
 #include <stan/math/matrix_error_handling.hpp>

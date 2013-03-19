@@ -14,7 +14,6 @@
 #include <stan/math/matrix.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/matrix_error_handling.hpp>
-#include <stan/math/special_functions.hpp>
 #include <stan/math/functions/logit.hpp>
 #include <stan/math/functions/Phi.hpp>
 

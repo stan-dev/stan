@@ -3,7 +3,6 @@
 
 #include <stan/agrad/error_handling.hpp>
 #include <stan/math.hpp>
-#include <stan/math/special_functions.hpp>
 #include <stan/math/functions/Phi.hpp>
 #include <stan/math/functions/inv_cloglog.hpp>
 #include <stan/math/functions/log_sum_exp.hpp>
