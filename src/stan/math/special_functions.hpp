@@ -18,24 +18,6 @@ namespace stan {
   namespace math {
 
     /**
-     * Return the second argument if the first argument is true
-     * and otherwise return the second argument.
-     *
-     * <p>This is just a convenience method to provide a function
-     * with the same behavior as the built-in ternary operator.
-     * In general, this function behaves as if defined by
-     *
-     * <p><code>if_else(c,y1,y0) = c ? y1 : y0</code>.
-     *
-     * @param c Boolean condition value.
-     * @param y_true Value to return if condition is true.
-     * @param y_false Value to return if condition is false.
-     */
-    inline double if_else(bool c, double y_true, double y_false) {
-      return c ? y_true : y_false;
-    }
-
-    /**
      * Return the square of the specified argument.
      *
      * <p>\f$\mbox{square}(x) = x^2\f$.
