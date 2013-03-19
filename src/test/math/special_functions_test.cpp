@@ -4,14 +4,6 @@
 #include "stan/math/special_functions.hpp"
 
 
-TEST(MathsSpecialFunctions, log1p_exp) {
-  using stan::math::log1p_exp;
-
-  // exp(10000.0) overflows
-  EXPECT_FLOAT_EQ(10000.0,log1p_exp(10000.0));
-  EXPECT_FLOAT_EQ(0.0,log1p_exp(-10000.0));
-}
-
 TEST(MathsSpecialFunctions, ibeta) {
   using stan::math::ibeta;
   

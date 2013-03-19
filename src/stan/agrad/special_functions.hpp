@@ -7,6 +7,7 @@
 #include <stan/math/functions/Phi.hpp>
 #include <stan/math/functions/inv_cloglog.hpp>
 #include <stan/math/functions/log_sum_exp.hpp>
+#include <stan/math/functions/multiply_log.hpp>
 
 #include <boost/math/special_functions/acosh.hpp>
 #include <boost/math/special_functions/asinh.hpp>

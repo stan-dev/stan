@@ -35,3 +35,4 @@ TEST(MathFunctions, log1p_exception) {
   x = -2;
   EXPECT_THROW(stan::math::log1p(x), std::domain_error);
 }
+

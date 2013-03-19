@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__FUNCTIONS__LOG1P_EXP_HPP__
-#define __STAN__MATH__FUNCTIONS__LOG1P_EXP_HPP__
+#ifndef __STAN__MATH__FUNCTIONS__MULTIPLY_LOG_HPP__
+#define __STAN__MATH__FUNCTIONS__MULTIPLY_LOG_HPP__
 
 #include <boost/math/tools/promotion.hpp>
 
