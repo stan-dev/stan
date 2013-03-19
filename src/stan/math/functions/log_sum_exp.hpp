@@ -38,16 +38,17 @@ namespace stan {
      * 
      * @param x array of specified values
      */
-    double log_sum_exp(const std::vector<double>& x) {
+    template <typename T>
+    T log_sum_exp(const std::vector<T>& x) {
       using std::numeric_limits;
       using std::log;
       using std::exp;
-      double max = -numeric_limits<double>::infinity();
+      T max = -numeric_limits<T>::infinity();
       for (size_t ii = 0; ii < x.size(); ii++) 
         if (x[ii] > max) 
           max = x[ii];
             
-      double sum = 0.0;
+      T sum = 0.0;
       for (size_t ii = 0; ii < x.size(); ii++) 
         if (x[ii] != -numeric_limits<double>::infinity()) 
           sum += exp(x[ii] - max);
