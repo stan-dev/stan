@@ -3,13 +3,6 @@
 #include <gtest/gtest.h>
 #include "stan/math/special_functions.hpp"
 
-TEST(MathsSpecialFunctions, value_of) {
-  using stan::math::value_of;
-  double x = 5.0;
-  EXPECT_FLOAT_EQ(5.0,value_of(x));
-  EXPECT_FLOAT_EQ(5.0,value_of(5));
-}
-
 TEST(MathSpecialFunctions, log_inv_logit) {
   using stan::math::log_inv_logit;
   using std::log;

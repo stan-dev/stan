@@ -9,6 +9,7 @@
 #include <stan/math/error_handling.hpp>
 #include <stan/math/special_functions.hpp>
 #include <stan/prob/constants.hpp>
+#include <stan/math/functions/value_of.hpp>
 
 namespace stan {
 
