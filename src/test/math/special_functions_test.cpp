@@ -16,13 +16,6 @@ TEST(MathsSpecialFunctions, log_loss) {
   EXPECT_FLOAT_EQ(-log(0.75), stan::math::binary_log_loss(1,0.75));
 }
 
-
-TEST(MathsSpecialFunctions, inv_cloglog) {
-  EXPECT_EQ(std::exp(-std::exp(3.7)), stan::math::inv_cloglog(3.7));
-  EXPECT_EQ(std::exp(-std::exp(0.0)), stan::math::inv_cloglog(0.0));
-  EXPECT_EQ(std::exp(-std::exp(-2.93)), stan::math::inv_cloglog(-2.93));
-}
-
 TEST(MathsSpecialFunctions, softmax) {
   std::vector<double> x;
   x.push_back(1.0);

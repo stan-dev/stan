@@ -5,6 +5,7 @@
 #include <stan/math.hpp>
 #include <stan/math/special_functions.hpp>
 #include <stan/math/functions/Phi.hpp>
+#include <stan/math/functions/inv_cloglog.hpp>
 
 #include <boost/math/special_functions/acosh.hpp>
 #include <boost/math/special_functions/asinh.hpp>
