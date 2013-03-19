@@ -22,6 +22,9 @@ The to-do list is organized into the following sections:
 * fix truncated distributions to return 1 rather than 0
   in degenerate cases
 
+* fixed handling of invalid degrees of freedom parameter
+  for wishart and inv_wishart
+
 PRIORITIES?
 ======================================================================
 + (name): actively assigned
