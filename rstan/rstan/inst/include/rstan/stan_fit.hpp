@@ -310,7 +310,6 @@ namespace rstan {
           rstan::io::rcout << (is_warmup ? " (Adapting)" : " (Sampling)");
           rstan::io::rcout.flush();
         } 
-        rstan::io::rcout << std::endl;
 
         if (m == num_warmup && epsilon_adapt) {
           sampler.adapt_off();
@@ -365,6 +364,7 @@ namespace rstan {
           print_vector(params_inr_etc, sample_file_stream);
         }
       }
+      rstan::io::rcout << std::endl;
       // if (refresh > 0) 
       //   rstan::io::rcout << std::endl << std::endl; 
       // rstan::io::rcout << "out of sample_from." << std::endl; 

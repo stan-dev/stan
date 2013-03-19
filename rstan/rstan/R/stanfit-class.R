@@ -185,11 +185,8 @@ get_samples2 <- function(n, sim, inc_warmup = TRUE) {
   npar <- length(n)
   lst <- vector("list", sim$chains)
   for (ic in 1:sim$chains) {
-    lst[[ic]] <- if (npar == 1) {
+    lst[[ic]] <- 
       if (inc_warmup) sim$samples[[ic]][[n]] else sim$samples[[ic]][[n]][-(1:sim$warmup2[ic])]
-    } else { 
-      if (inc_warmup) sim$samples[[ic]][n] else sim$samples[[ic]][n][-(1:sim$warmup2[ic])]
-    }
   }
   lst
 } 
