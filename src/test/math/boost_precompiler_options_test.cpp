@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-TEST(MathSpecialFunctions,BoostUseTr1Def) {
+TEST(BoostPrecompilerOption,BoostUseTr1Def) {
  bool BOOST_RESULT_OF_USE_TR1_is_defined = false;
 
 #ifdef BOOST_RESULT_OF_USE_TR1
@@ -9,7 +9,7 @@ TEST(MathSpecialFunctions,BoostUseTr1Def) {
 
  EXPECT_TRUE(BOOST_RESULT_OF_USE_TR1_is_defined);
 }
-TEST(MathSpecialFunctions,BoostNoDeclTypeDef) {
+TEST(BoostPrecompilerOption,BoostNoDeclTypeDef) {
  bool BOOST_NO_DECLTYPE_is_defined = false;
 #ifdef BOOST_NO_DECLTYPE
  BOOST_NO_DECLTYPE_is_defined = true;
