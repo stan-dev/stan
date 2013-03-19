@@ -3,20 +3,6 @@
 #include <gtest/gtest.h>
 #include "stan/math/special_functions.hpp"
 
-TEST(MathSpecialFunctions,asBool) {
-  using stan::math::as_bool;
-  EXPECT_TRUE(as_bool(1));
-  EXPECT_TRUE(as_bool(1.7));
-  EXPECT_TRUE(as_bool(-1.7));
-  EXPECT_TRUE(as_bool(std::numeric_limits<double>::infinity()));
-  EXPECT_TRUE(as_bool(-std::numeric_limits<double>::infinity()));
-  // don't like this behavior, but it's what C++ does
-  EXPECT_TRUE(as_bool(std::numeric_limits<double>::quiet_NaN()));
-
-  EXPECT_FALSE(as_bool(0));
-  EXPECT_FALSE(as_bool(0.0));
-  EXPECT_FALSE(as_bool(0.0f));
-}
 TEST(MathSpecialFunctions,BoostUseTr1Def) {
  bool BOOST_RESULT_OF_USE_TR1_is_defined = false;
 
