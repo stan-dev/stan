@@ -366,51 +366,6 @@ TEST(matrix_test,std_vector_sum_double) {
   EXPECT_FLOAT_EQ(21.0,sum(m));
 }
 
-TEST(matrix_test,stdVectorProdInt) {
-  using stan::math::prod;
-  std::vector<int> v;
-  EXPECT_EQ(1,prod(v));
-  v.push_back(2);
-  EXPECT_EQ(2,prod(v));
-  v.push_back(3);
-  EXPECT_EQ(6,prod(v));
-}
-TEST(matrix_test,stdVectorProd) {
-  using stan::math::prod;
-  std::vector<double> x;
-  EXPECT_FLOAT_EQ(1.0,prod(x));
-  x.push_back(2.0);
-  EXPECT_FLOAT_EQ(2.0,prod(x));
-  x.push_back(3);
-  EXPECT_FLOAT_EQ(6.0,prod(x));
-
-  vector_d v;
-  EXPECT_FLOAT_EQ(1.0,prod(v));
-  v = vector_d(1);
-  v << 2.0;
-  EXPECT_FLOAT_EQ(2.0,prod(v));
-  v = vector_d(2);
-  v << 2.0, 3.0;
-  EXPECT_FLOAT_EQ(6.0,prod(v));
-
-  row_vector_d rv;
-  EXPECT_FLOAT_EQ(1.0,prod(rv));
-  rv = row_vector_d(1);
-  rv << 2.0;
-  EXPECT_FLOAT_EQ(2.0,prod(rv));
-  rv = row_vector_d(2);
-  rv << 2.0, 3.0;
-  EXPECT_FLOAT_EQ(6.0,prod(rv));
-
-  matrix_d m;
-  EXPECT_FLOAT_EQ(1.0,prod(m));
-  m = matrix_d(1,1);
-  m << 2.0;
-  EXPECT_FLOAT_EQ(2.0,prod(m));
-  m = matrix_d(2,3);
-  m << 1.0, 2.0, 3.0, 4.0, 5.0, 6.0;
-  EXPECT_FLOAT_EQ(720.0,prod(m));
-}
 TEST(MathMatrix,dot_self) {
   using stan::math::dot_self;
 
