@@ -2337,44 +2337,7 @@ namespace stan {
       Eigen::SelfAdjointEigenSolver<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> >
         solver(m);
       return solver.eigenvectors(); 
-    }
-
-
-
-
-    /**
-     * Return the lower-triangular Cholesky factor (i.e., matrix
-     * square root) of the specified square, symmetric matrix.  The return
-     * value \f$L\f$ will be a lower-traingular matrix such that the
-     * original matrix \f$A\f$ is given by
-     * <p>\f$A = L \times L^T\f$.
-     * @param m Symmetrix matrix.
-     * @return Square root of matrix.
-     * @throw std::domain_error if m is not a symmetric matrix.
-     */
-    template <typename T>
-    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
-    cholesky_decompose(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& m) {
-      validate_symmetric(m,"cholesky decomposition");
-      Eigen::LLT<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> >llt(m.rows());
-      llt.compute(m);
-      return llt.matrixL();
-    }
-
-    /**
-     * Return the vector of the singular values of the specified matrix
-     * in decreasing order of magnitude.
-     * <p>See the documentation for <code>svd()</code> for
-     * information on the signular values.
-     * @param m Specified matrix.
-     * @return Singular values of the matrix.
-     */
-    template <typename T>
-    Eigen::Matrix<T,Eigen::Dynamic,1>
-    singular_values(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& m) {
-      return Eigen::JacobiSVD<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> >(m)
-        .singularValues();
-    }
+    }    
 
     // void eigen_decompose_sym(const matrix_d& m,
     //                          vector_d& eigenvalues,

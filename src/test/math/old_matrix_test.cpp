@@ -651,27 +651,6 @@ TEST(matrix_test,multiply_m_m_exception) {
   m2.resize(2, 3);
   EXPECT_THROW(stan::math::multiply(m1, m2), std::domain_error);
 }
-TEST(matrix_test,cholesky_decompose_exception) {
-  matrix_d m;
-  
-  m.resize(2,2);
-  m << 1.0, 2.0, 
-    2.0, 3.0;
-  EXPECT_NO_THROW(stan::math::cholesky_decompose(m));
-
-  m.resize(0, 0);
-  EXPECT_NO_THROW(stan::math::cholesky_decompose(m));
-  
-  m.resize(2, 3);
-  EXPECT_THROW(stan::math::cholesky_decompose(m), std::domain_error);
-
-  // not symmetric
-  m.resize(2,2);
-  m << 1.0, 2.0,
-    3.0, 4.0;
-  EXPECT_THROW(stan::math::cholesky_decompose(m), std::domain_error);
-
-}
 
 TEST(matrix_test,std_vector_sum_int) {
   std::vector<int> x(3);
@@ -1472,12 +1451,6 @@ TEST(MathMatrix, minus) {
   EXPECT_NO_THROW(eigenvectors_sym(ev_m1));
   EXPECT_THROW(eigenvectors_sym(m1),std::domain_error);
 
-  using stan::math::cholesky_decompose;
-  EXPECT_NO_THROW(cholesky_decompose(m0));
-  EXPECT_THROW(cholesky_decompose(m1),std::domain_error);
-
-  using stan::math::singular_values;
-  EXPECT_NO_THROW(singular_values(m0));
 }
 void test_multiply_lower_tri_self_transpose(const matrix_d& x) {
   using stan::math::multiply_lower_tri_self_transpose;
