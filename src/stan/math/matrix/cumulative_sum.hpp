@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__MATRIX__DIMS_HPP__
-#define __STAN__MATH__MATRIX__DIMS_HPP__
+#ifndef __STAN__MATH__MATRIX__CUMULATIVE_SUM_HPP__
+#define __STAN__MATH__MATRIX__CUMULATIVE_SUM_HPP__
 
 #include <stan/math/matrix.hpp>
 
