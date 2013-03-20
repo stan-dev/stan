@@ -537,98 +537,6 @@ TEST(matrixTest,add_c_v) {
   EXPECT_FLOAT_EQ(5.0,result(2));
 }
 
-TEST(matrixTest,multiply_c_v) {
-  vector_d v(3);
-  v << 1, 2, 3;
-  vector_d result = stan::math::multiply(2.0,v);
-  EXPECT_FLOAT_EQ(2.0,result(0));
-  EXPECT_FLOAT_EQ(4.0,result(1));
-  EXPECT_FLOAT_EQ(6.0,result(2));
-}
-TEST(matrixTest,multiply_c_rv) {
-  row_vector_d rv(3);
-  rv << 1, 2, 3;
-  row_vector_d result = stan::math::multiply(2.0,rv);
-  EXPECT_FLOAT_EQ(2.0,result(0));
-  EXPECT_FLOAT_EQ(4.0,result(1));
-  EXPECT_FLOAT_EQ(6.0,result(2));
-}
-TEST(matrixTest,multiply_c_m) {
-  matrix_d m(2,3);
-  m << 1, 2, 3, 4, 5, 6;
-  matrix_d result = stan::math::multiply(2.0,m);
-  EXPECT_FLOAT_EQ(2.0,result(0,0));
-  EXPECT_FLOAT_EQ(4.0,result(0,1));
-  EXPECT_FLOAT_EQ(6.0,result(0,2));
-  EXPECT_FLOAT_EQ(8.0,result(1,0));
-  EXPECT_FLOAT_EQ(10.0,result(1,1));
-  EXPECT_FLOAT_EQ(12.0,result(1,2));
-}
-
-TEST(matrix_test,multiply_rv_v_exception) {
-  row_vector_d rv;
-  vector_d v;
-  
-  rv.resize(3);
-  v.resize(3);
-  EXPECT_NO_THROW(stan::math::multiply(rv, v));
-
-  rv.resize(0);
-  v.resize(0);
-  EXPECT_NO_THROW(stan::math::multiply(rv, v));
-
-  rv.resize(2);
-  v.resize(3);
-  EXPECT_THROW(stan::math::multiply(rv, v), std::domain_error);
-}
-TEST(matrix_test,multiply_m_v_exception) {
-  matrix_d m;
-  vector_d v;
-  
-  m.resize(3, 5);
-  v.resize(5);
-  EXPECT_NO_THROW(stan::math::multiply(m, v));
-
-  m.resize(3, 0);
-  v.resize(0);
-  EXPECT_NO_THROW(stan::math::multiply(m, v));
-
-  m.resize(2, 3);
-  v.resize(2);
-  EXPECT_THROW(stan::math::multiply(m, v), std::domain_error);  
-}
-TEST(matrix_test,multiply_rv_m_exception) {
-  row_vector_d rv;
-  matrix_d m;
-    
-  rv.resize(3);
-  m.resize(3, 5);
-  EXPECT_NO_THROW(stan::math::multiply(rv, m));
-
-  rv.resize(0);
-  m.resize(0, 3);
-  EXPECT_NO_THROW(stan::math::multiply(rv, m));
-
-  rv.resize(3);
-  m.resize(2, 3);
-  EXPECT_THROW(stan::math::multiply(rv, m), std::domain_error);
-}
-TEST(matrix_test,multiply_m_m_exception) {
-  matrix_d m1, m2;
-  
-  m1.resize(1, 3);
-  m2.resize(3, 5);
-  EXPECT_NO_THROW(stan::math::multiply(m1, m2));
-
-  
-  m1.resize(2, 0);
-  m2.resize(0, 3);
-  EXPECT_NO_THROW(stan::math::multiply(m1, m2));
-
-  m1.resize(4, 3);
-  m2.resize(2, 3);
-  EXPECT_THROW(stan::math::multiply(m1, m2), std::domain_error);
-}
 
 TEST(matrix_test,std_vector_sum_int) {
   std::vector<int> x(3);
@@ -1272,13 +1180,4 @@ TEST(MathMatrix, minus) {
   EXPECT_NO_THROW(divide(v0,2.0));
   EXPECT_NO_THROW(divide(rv0,2.0));
   EXPECT_NO_THROW(divide(m0,2.0));
-
-  using stan::math::multiply;
-  EXPECT_NO_THROW(multiply(v0,2.0));
-  EXPECT_NO_THROW(multiply(rv0,2.0));
-  EXPECT_NO_THROW(multiply(m0,2.0));
-  EXPECT_NO_THROW(multiply(2.0,v0));
-  EXPECT_NO_THROW(multiply(2.0,rv0));
-  EXPECT_NO_THROW(multiply(2.0,m0));
-
 }

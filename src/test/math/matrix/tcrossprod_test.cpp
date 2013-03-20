@@ -3,8 +3,8 @@
 
 void test_tcrossprod(const stan::math::matrix_d& x) {
   using stan::math::tcrossprod;
-  matrix_d y = tcrossprod(x);
-  matrix_d xxt = x * x.transpose();
+  stan::math::matrix_d y = tcrossprod(x);
+  stan::math::matrix_d xxt = x * x.transpose();
   EXPECT_EQ(y.rows(),xxt.rows());
   EXPECT_EQ(y.cols(),xxt.cols());
   for (int m = 0; m < y.rows(); ++m)
