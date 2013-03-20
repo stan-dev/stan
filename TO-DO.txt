@@ -120,6 +120,7 @@ C++ API
    + singular_values.hpp
    + cholesky_decompose.hpp
    + eigenvalues_sym.hpp
+   + inverse.hpp
 
 
 * new vector views

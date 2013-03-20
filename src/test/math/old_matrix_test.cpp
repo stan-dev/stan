@@ -1323,8 +1323,6 @@ TEST(MathMatrix, minus) {
   EXPECT_NO_THROW(transpose(rv0));
   EXPECT_NO_THROW(transpose(m0));
 
-  using stan::math::inverse;
-  EXPECT_THROW(inverse(m1),std::domain_error);
 }
 void test_multiply_lower_tri_self_transpose(const matrix_d& x) {
   using stan::math::multiply_lower_tri_self_transpose;
