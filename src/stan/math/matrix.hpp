@@ -2006,28 +2006,6 @@ namespace stan {
         return tcrossprod(M.transpose());
     }
 
-    /**
-     * Return the specified row of the specified matrix, using
-     * start-at-1 indexing.  
-     *
-     * This is equivalent to calling <code>m.row(i - 1)</code> and
-     * assigning the resulting template expression to a row vector.
-     * 
-     * @tparam T Scalar value type for matrix.
-     * @param m Matrix.
-     * @param i Row index (count from 1).
-     * @return Specified row of the matrix.
-     */
-    template <typename T>
-    inline
-    Eigen::Matrix<T,1,Eigen::Dynamic>
-    row(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& m, 
-        size_t i) {
-      validate_row_index(m,i,"row");
-      return m.row(i - 1);
-    }
-
-
 
     // void eigen_decompose_sym(const matrix_d& m,
     //                          vector_d& eigenvalues,
