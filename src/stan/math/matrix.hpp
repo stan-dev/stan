@@ -1971,9 +1971,9 @@ namespace stan {
         return result;
       }
       // FIXME:  write custom following agrad/matrix because can't get L_tri into
-      // multiplication as no template support for tri * tri
-      matrix_d L_tri = L.transpose().triangularView<Eigen::Upper>();
-      return L.triangularView<Eigen::Lower>() * L_tri;
+      //         multiplication as no template support for tri * tri
+      matrix_d L_tri_trans = L.triangularView<Eigen::Lower>().transpose();
+      return L.triangularView<Eigen::Lower>() * L_tri_trans;
     }
 
     /**

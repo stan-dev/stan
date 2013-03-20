@@ -16,11 +16,13 @@ The to-do list is organized into the following sections:
 1.2.1
 -------------------------------------------
 
-* add user-contrib ARMA(1,1) model to the manual
-  see Wayne Folta's e-mmail of 3/11/13
+* fix vector_d(0) to be vector_d(Eigen::DenseIndex(0))
+  in generator
+ 
+* fix zero-size struct inits in RStan
 
 * fix truncated distributions to return 1 rather than 0
-  in degenerate cases
+  in degenerate cases  
 
 PRIORITIES?
 ======================================================================
@@ -108,6 +110,8 @@ Diagonal Hessian:
 C++ API
 ======================================================================
 [items go here first, then to RStan/cmd]
+
+* broadcast ./ operation for real / vector and vector / real.
 
 * new vector views
  
