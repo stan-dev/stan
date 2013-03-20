@@ -1052,8 +1052,4 @@ TEST(MathMatrix, minus) {
   EXPECT_THROW(subtract(rv1,rv2),std::domain_error);
   EXPECT_THROW(subtract(m1,m2),std::domain_error);
 
-  using stan::math::divide;
-  EXPECT_NO_THROW(divide(v0,2.0));
-  EXPECT_NO_THROW(divide(rv0,2.0));
-  EXPECT_NO_THROW(divide(m0,2.0));
 }

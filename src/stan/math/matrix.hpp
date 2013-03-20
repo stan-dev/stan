@@ -1786,23 +1786,6 @@ namespace stan {
     T minus(const T& x) {
       return -x;
     }
-
-
-    /**
-     * Return specified matrix divided by specified scalar.
-     * @tparam R Row type for matrix.
-     * @tparam C Column type for matrix.
-     * @param m Matrix.
-     * @param c Scalar.
-     * @return Matrix divided by scalar.
-     */
-    template <int R, int C>
-    inline
-    Eigen::Matrix<double,R,C>
-    divide(const Eigen::Matrix<double,R,C>& m,
-           double c) {
-      return m / c;
-    }
     // void eigen_decompose_sym(const matrix_d& m,
     //                          vector_d& eigenvalues,
     //                          matrix_d& eigenvectors) {
