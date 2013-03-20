@@ -311,21 +311,6 @@ TEST(matrix,get_base1_8) {
                                             "x8",1));
 }
 
-// exp tests
-TEST(matrix_test, expMatrix) {
-  using stan::math::exp;
-  matrix_d expected_output(2,2);
-  matrix_d mv(2,2), output;
-  int i,j;
-
-  mv << 1, 2, 3, 4;
-  expected_output << std::exp(1), std::exp(2), std::exp(3), std::exp(4);
-  output = exp(mv);
-
-  for (i = 0; i < 2; i++)
-    for (j = 0; j < 2; j++)
-      EXPECT_FLOAT_EQ(expected_output(i,j), output(i,j));
-}
 
 // log tests
 TEST(matrix_test, logMatrix) {
