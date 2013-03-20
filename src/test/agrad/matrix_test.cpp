@@ -1,6 +1,28 @@
 #include <gtest/gtest.h>
 #include <stan/agrad/matrix.hpp>
 
+#include <stan/math/matrix/add.hpp>
+#include <stan/math/matrix/cholesky_decompose.hpp>
+#include <stan/math/matrix/col.hpp>
+#include <stan/math/matrix/cumulative_sum.hpp>
+#include <stan/math/matrix/diag_matrix.hpp>
+#include <stan/math/matrix/divide.hpp>
+#include <stan/math/matrix/eigenvalues_sym.hpp>
+#include <stan/math/matrix/elt_divide.hpp>
+#include <stan/math/matrix/elt_multiply.hpp>
+#include <stan/math/matrix/inverse.hpp>
+#include <stan/math/matrix/mdivide_left.hpp>
+#include <stan/math/matrix/mdivide_left_tri.hpp>
+#include <stan/math/matrix/mdivide_right.hpp>
+#include <stan/math/matrix/minus.hpp>
+#include <stan/math/matrix/multiply.hpp>
+#include <stan/math/matrix/multiply_lower_tri_self_transpose.hpp>
+#include <stan/math/matrix/row.hpp>
+#include <stan/math/matrix/singular_values.hpp>
+#include <stan/math/matrix/softmax.hpp>
+#include <stan/math/matrix/subtract.hpp>
+#include <stan/math/matrix/transpose.hpp>
+
 // FIXME: add tests for Eigen NumTraits
 
 typedef stan::agrad::var AVAR;

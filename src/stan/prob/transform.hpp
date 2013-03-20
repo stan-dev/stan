@@ -17,6 +17,8 @@
 #include <stan/math/functions/logit.hpp>
 #include <stan/math/functions/Phi.hpp>
 
+#include <stan/math/matrix/multiply_lower_tri_self_transpose.hpp>
+
 namespace stan {
   
   namespace prob {

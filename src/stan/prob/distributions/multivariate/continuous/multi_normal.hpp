@@ -11,6 +11,10 @@
 #include <stan/agrad/agrad.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/agrad/matrix.hpp>
+#include <stan/math/matrix/multiply.hpp>
+#include <stan/math/matrix/subtract.hpp>
+#include <stan/math/matrix/mdivide_left_tri_low.hpp>
+#include <stan/math/matrix/mdivide_left.hpp>
 
 namespace stan {
   namespace prob {

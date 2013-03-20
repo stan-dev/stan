@@ -66,7 +66,7 @@ TEST(MathMatrix,subtract_c_m) {
 }
 
 TEST(MathMatrix,subtract_c_rv) {
-  row_vector_d v(3);
+  stan::math::row_vector_d v(3);
   v << 1, 2, 3;
   stan::math::row_vector_d result;
 

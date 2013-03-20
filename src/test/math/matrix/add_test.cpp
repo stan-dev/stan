@@ -51,7 +51,7 @@ TEST(MathMatrix,add_m_exception) {
 TEST(MathMatrix,add_c_m) {
   stan::math::matrix_d v(2,2);
   v << 1, 2, 3, 4;
-  matrix_d result;
+  stan::math::matrix_d result;
 
   result = stan::math::add(2.0,v);
   EXPECT_FLOAT_EQ(3.0,result(0,0));
@@ -67,9 +67,9 @@ TEST(MathMatrix,add_c_m) {
 }
 
 TEST(MathMatrix,add_c_rv) {
-  row_vector_d v(3);
+  stan::math::row_vector_d v(3);
   v << 1, 2, 3;
-  row_vector_d result;
+  stan::math::row_vector_d result;
 
   result = stan::math::add(2.0,v);
   EXPECT_FLOAT_EQ(3.0,result(0));
@@ -84,9 +84,9 @@ TEST(MathMatrix,add_c_rv) {
 
 
 TEST(MathMatrix,add_c_v) {
-  vector_d v(3);
+  stan::math::vector_d v(3);
   v << 1, 2, 3;
-  vector_d result;
+  stan::math::vector_d result;
 
   result = stan::math::add(2.0,v);
   EXPECT_FLOAT_EQ(3.0,result(0));
@@ -100,19 +100,19 @@ TEST(MathMatrix,add_c_v) {
 }
 
 TEST(MathMatrix, add) {
-  vector_d v1(2);
+  stan::math::vector_d v1(2);
   v1 << 1, 2;
-  vector_d v2(3);
+  stan::math::vector_d v2(3);
   v2 << 10, 100, 1000;
 
-  row_vector_d rv1(2);
+  stan::math::row_vector_d rv1(2);
   v1 << 1, 2;
-  row_vector_d rv2(3);
+  stan::math::row_vector_d rv2(3);
   v2 << 10, 100, 1000;
 
-  matrix_d m1(2,3);
+  stan::math::matrix_d m1(2,3);
   m1 << 1, 2, 3, 4, 5, 6;
-  matrix_d m2(3,2);
+  stan::math::matrix_d m2(3,2);
   m2 << 10, 100, 1000, 0, -10, -12;
 
   using stan::math::add;
