@@ -126,6 +126,7 @@ C++ API
    + diagonal.hpp
    + block.hpp
    + diag_post/pre_multiply.hpp
+   + dot_product.hpp
 
 * new vector views
  
