@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__MATRIX__DIMS_HPP__
-#define __STAN__MATH__MATRIX__DIMS_HPP__
+#ifndef __STAN__MATH__MATRIX__STAN_PRINT_HPP__
+#define __STAN__MATH__MATRIX__STAN_PRINT_HPP__
 
 #include <stan/math/matrix.hpp>
 
