@@ -124,6 +124,7 @@ C++ API
    + diag_matrix.hpp
    + transpose.hpp
    + diagonal.hpp
+   + block.hpp
 
 * new vector views
  
