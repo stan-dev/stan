@@ -386,5 +386,4 @@ TEST(MathMatrix,dimensionValidation) {
   Matrix<double,Dynamic,Dynamic> xx(3,2);
   xx << 1, 2, 3, 1, 4, 9;
   EXPECT_THROW(stan::math::determinant(xx),std::domain_error);
-  
 }
