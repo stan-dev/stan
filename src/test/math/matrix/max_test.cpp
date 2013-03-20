@@ -49,7 +49,7 @@ TEST(MathMatrix, max) {
   rv = stan::math::row_vector_d(3);
   rv << 1.0, 0.0, 2.0;
   EXPECT_FLOAT_EQ(2.0,max(rv));
-  rv = row_vector_d(4);
+  rv = stan::math::row_vector_d(4);
   rv << 1.0, 0.0, 2.0, -10.0;
   EXPECT_FLOAT_EQ(2.0,max(rv));
 
