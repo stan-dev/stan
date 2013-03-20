@@ -108,7 +108,6 @@ namespace rstan {
           SEXP ee = in[i]; 
           SEXP dim = Rf_getAttrib(ee, R_DimSymbol); 
           R_len_t eelen = Rf_length(ee); 
-          if (eelen < 1) continue; 
 
           // Note that in R, the default is real, which causes problems as we
           // are thinking they are integers, but Rf_isInteger would return
