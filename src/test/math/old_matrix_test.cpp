@@ -51,16 +51,6 @@ TEST(matrixTest,arrayBuilder) {
 }
 
 
-TEST(matrixTest,col) {
-  matrix_d m(3,4);
-  m << 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12;
-  vector_d c = m.col(0);
-  vector_d c2 = stan::math::col(m,1);
-  EXPECT_EQ(3,c.size());
-  EXPECT_EQ(3,c2.size());
-  for (size_t i = 0; i < 3; ++i)
-    EXPECT_FLOAT_EQ(c[i],c2[i]);
-}
 TEST(matrixTest,row) {
   matrix_d m(3,4);
   m << 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12;
@@ -1302,11 +1292,6 @@ TEST(MathMatrix, minus) {
   EXPECT_NO_THROW(multiply(2.0,v0));
   EXPECT_NO_THROW(multiply(2.0,rv0));
   EXPECT_NO_THROW(multiply(2.0,m0));
-
-  using stan::math::col;
-  EXPECT_THROW(col(m1,5),std::domain_error);
-  EXPECT_THROW(col(m1,0),std::domain_error);
-  
 
   using stan::math::row;
   EXPECT_THROW(row(m1,5),std::domain_error);
