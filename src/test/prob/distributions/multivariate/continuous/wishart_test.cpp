@@ -3,6 +3,7 @@
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/math/special_functions/digamma.hpp>
 #include <boost/math/distributions.hpp>
+#include <stan/math/matrix/determinant.hpp>
 
 
 using Eigen::Dynamic;
