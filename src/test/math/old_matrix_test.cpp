@@ -1439,8 +1439,6 @@ TEST(MathMatrix, minus) {
   using stan::math::softmax;
   EXPECT_THROW(softmax(v0),std::domain_error);
 
-  matrix_d ev_m1(1,1);
-  ev_m1 << 2.0;
 }
 void test_multiply_lower_tri_self_transpose(const matrix_d& x) {
   using stan::math::multiply_lower_tri_self_transpose;
