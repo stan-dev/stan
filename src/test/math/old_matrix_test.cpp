@@ -409,10 +409,6 @@ TEST(MathMatrix,nonzeroMinMax) {
   EXPECT_EQ(-numeric_limits<double>::infinity(),
             stan::math::max(rv));
 
-  EXPECT_THROW(stan::math::mean(m), std::domain_error);
-  EXPECT_THROW(stan::math::mean(v), std::domain_error);
-  EXPECT_THROW(stan::math::mean(rv), std::domain_error);
-
   Matrix<double,Dynamic,Dynamic> m_nz(2,3);
   Matrix<double,Dynamic,1> v_nz(2);
   Matrix<double,1,Dynamic> rv_nz(3);
@@ -423,10 +419,6 @@ TEST(MathMatrix,nonzeroMinMax) {
   EXPECT_NO_THROW(stan::math::max(m_nz));
   EXPECT_NO_THROW(stan::math::max(v_nz));
   EXPECT_NO_THROW(stan::math::max(rv_nz));
-
-  EXPECT_NO_THROW(stan::math::mean(m_nz));
-  EXPECT_NO_THROW(stan::math::mean(v_nz));
-  EXPECT_NO_THROW(stan::math::mean(rv_nz));
 }
 TEST(MathMatrix,minVectorValues) {
   using stan::math::min;
@@ -552,49 +544,5 @@ TEST(MathMatrix,maxVectorValues) {
   EXPECT_FLOAT_EQ(2.0,max(m));
 }
 
-TEST(MathMatrix,mean) {
-  using stan::math::mean;
-  std::vector<double> x;
-  EXPECT_THROW(mean(x),std::domain_error);
-  x.push_back(1.0);
-  EXPECT_FLOAT_EQ(1.0,mean(x));
-  x.push_back(2.0);
-  EXPECT_NEAR(1.5,mean(x),0.000001);
-  x.push_back(3.0);
-  EXPECT_FLOAT_EQ(2.0,mean(x));
-
-  vector_d v;
-  EXPECT_THROW(mean(v),std::domain_error);
-  v = vector_d(1);
-  v << 1.0;
-  EXPECT_FLOAT_EQ(1.0,mean(v));
-  v = vector_d(2);
-  v << 1.0, 2.0;
-  EXPECT_NEAR(1.5,mean(v),0.000001);
-  v = vector_d(3);
-  v << 1.0, 2.0, 3.0;
-  EXPECT_FLOAT_EQ(2.0,mean(v));
-
-  row_vector_d rv;
-  EXPECT_THROW(mean(rv),std::domain_error);
-  rv = row_vector_d(1);
-  rv << 1.0;
-  EXPECT_FLOAT_EQ(1.0,mean(rv));
-  rv = row_vector_d(2);
-  rv << 1.0, 2.0;
-  EXPECT_NEAR(1.5,mean(rv),0.000001);
-  rv = row_vector_d(3);
-  rv << 1.0, 2.0, 3.0;
-  EXPECT_FLOAT_EQ(2.0,mean(rv));
-
-  matrix_d m;
-  EXPECT_THROW(mean(m),std::domain_error);
-  m = matrix_d(1,1);
-  m << 1.0;
-  EXPECT_FLOAT_EQ(1.0,mean(m));
-  m = matrix_d(2,3);
-  m << 1.0, 2.0, 4.0, 9.0, 16.0, 25.0;
-  EXPECT_FLOAT_EQ(9.5,mean(m));
-}
 
 
