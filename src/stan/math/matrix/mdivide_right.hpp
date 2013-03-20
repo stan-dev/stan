@@ -2,6 +2,7 @@
 #define __STAN__MATH__MATRIX__MDIVIDE_RIGHT_HPP__
 
 #include <stan/math/matrix.hpp>
+#include <stan/math/matrix/mdivide_left.hpp>
 
 namespace stan {
   namespace math {
