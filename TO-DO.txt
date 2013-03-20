@@ -121,7 +121,7 @@ C++ API
    + cholesky_decompose.hpp
    + eigenvalues_sym.hpp
    + inverse.hpp
-
+   + diag_matrix.hpp
 
 * new vector views
  

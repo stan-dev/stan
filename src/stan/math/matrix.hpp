@@ -2082,18 +2082,6 @@ namespace stan {
       return m.diagonal();
     }
 
-    /**
-     * Return a square diagonal matrix with the specified vector of
-     * coefficients as the diagonal values.
-     * @param[in] v Specified vector.
-     * @return Diagonal matrix with vector as diagonal values.
-     */
-    template <typename T>
-    inline
-    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
-    diag_matrix(const Eigen::Matrix<T,Eigen::Dynamic,1>& v) {
-      return v.asDiagonal();
-    }
 
     template <typename T, int R, int C>
     Eigen::Matrix<T,C,R>

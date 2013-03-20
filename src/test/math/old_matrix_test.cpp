@@ -1315,8 +1315,6 @@ TEST(MathMatrix, minus) {
   using stan::math::diagonal;
   EXPECT_NO_THROW(diagonal(m0));
 
-  using stan::math::diag_matrix;
-  EXPECT_NO_THROW(diag_matrix(v0));
 
   using stan::math::transpose;
   EXPECT_NO_THROW(transpose(v0));
