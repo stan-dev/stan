@@ -2,6 +2,7 @@
 #define __STAN__MATH__MATRIX__VARIANCE_HPP__
 
 #include <stan/math/matrix.hpp>
+#include <stan/math/matrix/mean.hpp>
 
 namespace stan {
   namespace math {
