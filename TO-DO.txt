@@ -115,12 +115,11 @@ C++ API
 * Refactor math library:
  - src/stan/math/functions/ibeta.hpp
    all doubles for now. If I template it, conflicts with var definition.
- - src/stan/math/matrix/stan_print.hpp
-   no tests
- - src/stan/math/matrix/singular_values.hpp
-   no tests
- - src/stan/math/matrix/cholesky_decompose.hpp
-   need more tests
+ - Needs tests. Currently not tested: src/stan/math/matrix/...
+   + stan_print.hpp
+   + singular_values.hpp
+   + cholesky_decompose.hpp
+   + eigenvalues_sym.hpp
 
 * new vector views
  

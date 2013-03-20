@@ -2310,34 +2310,9 @@ namespace stan {
 //        .transpose();
     }
 
-    /**
-     * Return the eigenvalues of the specified symmetric matrix
-     * in descending order of magnitude.  This function is more
-     * efficient than the general eigenvalues function for symmetric
-     * matrices.
-     * <p>See <code>eigen_decompose()</code> for more information.
-     * @param m Specified matrix.
-     * @return Eigenvalues of matrix.
-     */
-    template <typename T>
-    Eigen::Matrix<T,Eigen::Dynamic,1>
-    eigenvalues_sym(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& m) {
-      validate_nonzero_size(m,"eigenvalues_sym");
-      validate_symmetric(m,"eigenvalues_sym");
-      Eigen::SelfAdjointEigenSolver<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> >
-        solver(m,Eigen::EigenvaluesOnly);
-      return solver.eigenvalues();
-    }
 
-    template <typename T>
-    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
-    eigenvectors_sym(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& m) {
-      validate_nonzero_size(m,"eigenvectors_sym");
-      validate_symmetric(m,"eigenvectors_sym");
-      Eigen::SelfAdjointEigenSolver<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> >
-        solver(m);
-      return solver.eigenvectors(); 
-    }    
+
+
 
     // void eigen_decompose_sym(const matrix_d& m,
     //                          vector_d& eigenvalues,

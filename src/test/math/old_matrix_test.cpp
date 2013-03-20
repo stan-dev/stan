@@ -1441,16 +1441,6 @@ TEST(MathMatrix, minus) {
 
   matrix_d ev_m1(1,1);
   ev_m1 << 2.0;
-
-  using stan::math::eigenvalues_sym;
-  EXPECT_THROW(eigenvalues_sym(m0),std::domain_error);
-  EXPECT_THROW(eigenvalues_sym(m1),std::domain_error);
-
-  using stan::math::eigenvectors_sym;
-  EXPECT_THROW(eigenvectors_sym(m0),std::domain_error);
-  EXPECT_NO_THROW(eigenvectors_sym(ev_m1));
-  EXPECT_THROW(eigenvectors_sym(m1),std::domain_error);
-
 }
 void test_multiply_lower_tri_self_transpose(const matrix_d& x) {
   using stan::math::multiply_lower_tri_self_transpose;
