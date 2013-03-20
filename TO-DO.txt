@@ -127,6 +127,7 @@ C++ API
    + block.hpp
    + diag_post/pre_multiply.hpp
    + dot_product.hpp
+   + columns_dot_product.hpp
 
 * new vector views
  
