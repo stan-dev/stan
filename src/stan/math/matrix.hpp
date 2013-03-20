@@ -1995,16 +1995,6 @@ namespace stan {
           .rankUpdate(M);
     }
 
-    /**
-     * Returns the result of pre-multiplying a matrix by its
-     * own transpose.
-     * @param M Matrix to multiply.
-     * @return Transpose of M times M
-     */
-    inline matrix_d
-    crossprod(const matrix_d& M) {
-        return tcrossprod(M.transpose());
-    }
 
 
     // void eigen_decompose_sym(const matrix_d& m,
