@@ -2,6 +2,7 @@
 #define __STAN__MATH__MATRIX__SD_HPP__
 
 #include <stan/math/matrix.hpp>
+#include <stan/math/matrix/variance.hpp>
 
 namespace stan {
   namespace math {
