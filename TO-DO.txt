@@ -121,6 +121,7 @@ C++ API
    + cholesky_decompose.hpp
    + eigenvalues_sym.hpp
 
+
 * new vector views
  
  ?? promote up from double to matrix?
