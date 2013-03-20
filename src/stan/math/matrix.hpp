@@ -2116,29 +2116,6 @@ namespace stan {
     }
 
 
-   /**
-     * Return the softmax of the specified vector.
-     * @tparam T Scalar type of values in vector.
-     * @param[in] v Vector to transform.
-     * @return Unit simplex result of the softmax transform of the vector.
-     */
-    template <typename T>
-    inline
-    Eigen::Matrix<T,Eigen::Dynamic,1>
-    softmax(const Eigen::Matrix<T,Eigen::Dynamic,1>& v) {
-      using std::exp;
-      stan::math::validate_nonzero_size(v,"vector softmax");
-      Eigen::Matrix<T,Eigen::Dynamic,1> theta(v.size());
-      T sum(0.0);
-      T max_v = v.maxCoeff();
-      for (int i = 0; i < v.size(); ++i) {
-        theta[i] = exp(v[i] - max_v);
-        sum += theta[i];
-      }
-      for (int i = 0; i < v.size(); ++i)
-        theta[i] /= sum;
-      return theta;
-    }
 
     // void eigen_decompose_sym(const matrix_d& m,
     //                          vector_d& eigenvalues,
