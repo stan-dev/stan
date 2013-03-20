@@ -125,6 +125,7 @@ C++ API
    + transpose.hpp
    + diagonal.hpp
    + block.hpp
+   + diag_post/pre_multiply.hpp
 
 * new vector views
  
