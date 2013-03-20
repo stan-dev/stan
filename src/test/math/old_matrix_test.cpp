@@ -552,51 +552,6 @@ TEST(MathMatrix,maxVectorValues) {
   EXPECT_FLOAT_EQ(2.0,max(m));
 }
 
-TEST(MathMatrix,sd) {
-  using stan::math::sd;
-  std::vector<double> x;
-  EXPECT_THROW(sd(x),std::domain_error);
-  x.push_back(1.0);
-  EXPECT_FLOAT_EQ(0.0,sd(x));
-  x.push_back(2.0);
-  EXPECT_NEAR(0.7071068,sd(x),0.000001);
-  x.push_back(3.0);
-  EXPECT_FLOAT_EQ(1.0,sd(x));
-
-  vector_d v;
-  EXPECT_THROW(sd(v),std::domain_error);
-  v = vector_d(1);
-  v << 1.0;
-  EXPECT_FLOAT_EQ(0.0,sd(v));
-  v = vector_d(2);
-  v << 1.0, 2.0;
-  EXPECT_NEAR(0.7071068,sd(v),0.000001);
-  v = vector_d(3);
-  v << 1.0, 2.0, 3.0;
-  EXPECT_FLOAT_EQ(1.0,sd(v));
-
-  row_vector_d rv;
-  EXPECT_THROW(sd(rv),std::domain_error);
-  rv = row_vector_d(1);
-  rv << 1.0;
-  EXPECT_FLOAT_EQ(0.0,sd(rv));
-  rv = row_vector_d(2);
-  rv << 1.0, 2.0;
-  EXPECT_NEAR(0.7071068,sd(rv),0.000001);
-  rv = row_vector_d(3);
-  rv << 1.0, 2.0, 3.0;
-  EXPECT_FLOAT_EQ(1.0,sd(rv));
-
-
-  matrix_d m;
-  EXPECT_THROW(sd(m),std::domain_error);
-  m = matrix_d(1,1);
-  m << 1.0;
-  EXPECT_FLOAT_EQ(0.0,sd(m));
-  m = matrix_d(2,3);
-  m << 1.0, 2.0, 4.0, 9.0, 16.0, 25.0;
-  EXPECT_NEAR(9.396808,sd(m),0.000001);
-}
 
 TEST(MathMatrix,variance) {
   using stan::math::variance;
