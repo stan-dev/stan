@@ -18,17 +18,17 @@ TEST(MathMatrix,eltDivideVecException) {
   EXPECT_THROW(stan::math::elt_divide(v1,v2), std::domain_error);
 }
 TEST(MathMatrix,eltDivideRowVec) {
-  row_stan::math::vector_d v1(2);
-  row_stan::math::vector_d v2(2);
+  stan::math::row_vector_d v1(2);
+  stan::math::row_vector_d v2(2);
   v1 << 1, 2;
   v2 << 10, 100;
-  row_stan::math::vector_d v = stan::math::elt_divide(v1,v2);
+  stan::math::row_vector_d v = stan::math::elt_divide(v1,v2);
   EXPECT_FLOAT_EQ(0.1, v(0));
   EXPECT_FLOAT_EQ(0.02, v(1));
 }
 TEST(MathMatrix,eltDivideRowVecException) {
-  row_stan::math::vector_d v1(2);
-  row_stan::math::vector_d v2(3);
+  stan::math::row_vector_d v1(2);
+  stan::math::row_vector_d v2(3);
   v1 << 1, 2;
   v2 << 10, 100, 1000;
   EXPECT_THROW(stan::math::elt_divide(v1,v2), std::domain_error);
