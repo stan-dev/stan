@@ -8,6 +8,21 @@ namespace stan {
     
     /**
      * Returns the product of the coefficients of the specified
+     * standard vector.
+     * @param v Specified vector.
+     * @return Product of coefficients of vector.
+     */
+    template <typename T>
+    inline T prod(const std::vector<T>& v) {
+      if (v.size() == 0) return 1;
+      T product = v[0];
+      for (size_t i = 1; i < v.size(); ++i)
+        product *= v[i];
+      return product;
+    }
+    
+    /**
+     * Returns the product of the coefficients of the specified
      * column vector.
      * @param v Specified vector.
      * @return Product of coefficients of vector.
