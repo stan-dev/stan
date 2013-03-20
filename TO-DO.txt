@@ -122,6 +122,8 @@ C++ API
    + eigenvalues_sym.hpp
    + inverse.hpp
    + diag_matrix.hpp
+   + transpose.hpp
+   + diagonal.hpp
 
 * new vector views
  

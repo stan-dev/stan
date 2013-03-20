@@ -3,6 +3,7 @@
 
 #include <stan/math/matrix.hpp>
 #include <stan/math/matrix/mdivide_left.hpp>
+#include <stan/math/matrix/transpose.hpp>
 
 namespace stan {
   namespace math {

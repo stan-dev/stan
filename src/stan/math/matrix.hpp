@@ -2068,31 +2068,6 @@ namespace stan {
       return m.block(i - 1,j - 1,nrows,ncols);
     }
 
-
-    /**
-     * Return a column vector of the diagonal elements of the
-     * specified matrix.  The matrix is not required to be square.
-     * @param m Specified matrix.  
-     * @return Diagonal of the matrix.
-     */
-    template <typename T>
-    inline
-    Eigen::Matrix<T,Eigen::Dynamic,1>
-    diagonal(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& m) {
-      return m.diagonal();
-    }
-
-
-    template <typename T, int R, int C>
-    Eigen::Matrix<T,C,R>
-    inline
-    transpose(const Eigen::Matrix<T,R,C>& m) {
-      return m.transpose();
-    }
-
-
-
-
     // void eigen_decompose_sym(const matrix_d& m,
     //                          vector_d& eigenvalues,
     //                          matrix_d& eigenvectors) {
