@@ -9,6 +9,7 @@
 #include <stan/agrad/agrad.hpp>
 #include <stan/agrad/matrix.hpp>
 #include "stan/prob/distributions/multivariate/continuous/wishart.hpp"
+#include <stan/math/matrix/log_determinant.hpp>
 
 namespace stan {
   namespace prob {

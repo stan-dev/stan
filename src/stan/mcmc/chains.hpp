@@ -27,6 +27,7 @@
 #include <boost/random/additive_combine.hpp>
 
 #include <stan/math/matrix.hpp>
+#include <stan/math/matrix/variance.hpp>
 #include <stan/prob/autocorrelation.hpp>
 #include <stan/prob/autocovariance.hpp>
 

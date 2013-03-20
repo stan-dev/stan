@@ -10,8 +10,10 @@
 #include "stan/prob/distributions/univariate/continuous/normal.hpp"
 #include "stan/prob/distributions/univariate/continuous/chi_square.hpp"
 #include <stan/math/functions/lmgamma.hpp>
-#include <stan/math/matrix/mdivide_left_tri_low.hpp>
+#include <stan/math/matrix/columns_dot_product.hpp>
 #include <stan/math/matrix/crossprod.hpp>
+#include <stan/math/matrix/dot_product.hpp>
+#include <stan/math/matrix/mdivide_left_tri_low.hpp>
 
 namespace stan {
 
