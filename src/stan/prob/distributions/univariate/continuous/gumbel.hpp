@@ -206,17 +206,17 @@ namespace stan {
     // }
 
 
-    // template <class RNG>
-    // inline double
-    // gumbel_rng(double mu,
-    //            double beta,
-    //            RNG& rng) {
-    //   using boost::variate_generator;
-    //   using boost::uniform_01;
-    //   variate_generator<RNG&, uniform_01<> >
-    //     uniform01_rng(rng, uniform_01<>());
-    //   return mu - beta * std::log(-std::log(uniform01_rng()));
-    // }
+    template <class RNG>
+    inline double
+    gumbel_rng(double mu,
+               double beta,
+               RNG& rng) {
+      using boost::variate_generator;
+      using boost::uniform_01;
+      variate_generator<RNG&, uniform_01<> >
+        uniform01_rng(rng, uniform_01<>());
+      return mu - beta * std::log(-std::log(uniform01_rng()));
+    }
   }
 }
 #endif
