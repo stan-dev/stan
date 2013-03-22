@@ -15,6 +15,7 @@
 #include <stan/mcmc/nuts_massgiven.hpp>
 #include <stan/optimization/newton.hpp>
 #include <stan/optimization/nesterov_gradient.hpp>
+#include <stan/mcmc/metropolis_rw.hpp>
 
 namespace stan {
 
@@ -146,6 +147,8 @@ namespace stan {
       print_help_option(&std::cout,
                         "cov_matrix","file",
                         "Preset an estimated covariance matrix");
+
+      print_help_option(&std::cout, "metropolis", "", "Metropolis");
       
       std::cout << std::endl;
     }
@@ -438,9 +441,37 @@ namespace stan {
         ? (std::fstream::out | std::fstream::app)
         : std::fstream::out;
 
+      bool metropolis = command.has_flag("metropolis");
+
       if (command.has_flag("test_grad")) {
         std::cout << std::endl << "TEST GRADIENT MODE" << std::endl;
         return model.test_gradients(params_r,params_i);
+      }
+
+      if (metropolis) {
+	std::cout<<"run metropolis"<< std::endl;
+	stan::mcmc::metropolis<rng_t> metropolis_rw_sampler(model, params_r, params_i, epsilon_adapt);
+
+        std::fstream sample_stream(sample_file.c_str(), 
+                                   samples_append_mode);
+
+	metropolis_rw_sampler.set_error_stream(std::cout);
+        metropolis_rw_sampler.set_output_stream(std::cout); // cout intended
+        // cut & paste (see below) to enable sample-specific params
+        if (!append_samples) {
+          sample_stream << "lp__,"; // log probability first
+          metropolis_rw_sampler.write_sampler_param_names(sample_stream);
+          model.write_csv_header(sample_stream);
+        }
+
+        sample_from(metropolis_rw_sampler,epsilon_adapt,refresh,
+                    num_iterations,num_warmup,num_thin,save_warmup,
+                    sample_stream,params_r,params_i,
+                    model,base_rng);
+
+	sample_stream.close();
+
+	return 0;
       }
 
       if (point_estimate_newton) {
