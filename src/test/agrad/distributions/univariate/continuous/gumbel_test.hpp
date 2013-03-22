@@ -1,6 +1,5 @@
 // Arguments: Doubles, Doubles, Doubles
 #include <stan/prob/distributions/univariate/continuous/gumbel.hpp>
-#include <gtest/gtest.h>
 
 using std::vector;
 using std::numeric_limits;
@@ -48,7 +47,7 @@ public:
     index.push_back(1U);
     value.push_back(-numeric_limits<double>::infinity());
 
-    // sigma
+    // beta
     index.push_back(2U);
     value.push_back(0.0);
 

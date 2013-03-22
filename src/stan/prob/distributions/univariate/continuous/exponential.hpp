@@ -128,8 +128,6 @@ namespace stan {
       return exponential_log<false>(y,beta,stan::math::default_policy());
     }
 
-
-
     /**
      * Calculates the exponential cumulative distribution function for
      * the given y and beta.

@@ -139,58 +139,58 @@ namespace stan {
       return gumbel_log<false>(y,mu,beta,stan::math::default_policy());
     }
 
-    // /**
-    //  * 
-    //  * @param y A scalar variate.
-    //  * @param mu The location of the gumbel distriubtion
-    //  * @param beta The scale of the gumbel distriubtion
-    //  * @return The gumbel cdf evaluated at the specified arguments.
-    //  * @tparam T_y Type of y.
-    //  * @tparam T_loc Type of mean parameter.
-    //  * @tparam T_scale Type of standard deviation paramater.
-    //  * @tparam Policy Error-handling policy.
-    //  */
-    // template <typename T_y, typename T_loc, typename T_scale,
-    //           class Policy>
-    // typename return_type<T_y,T_loc,T_scale>::type
-    // gumbel_cdf(const T_y& y, const T_loc& mu, const T_scale& beta, 
-    //          const Policy&) {
-    //   static const char* function = "stan::prob::gumbel_cdf(%1%)";
+    /**
+     * 
+     * @param y A scalar variate.
+     * @param mu The location of the gumbel distriubtion
+     * @param beta The scale of the gumbel distriubtion
+     * @return The gumbel cdf evaluated at the specified arguments.
+     * @tparam T_y Type of y.
+     * @tparam T_loc Type of mean parameter.
+     * @tparam T_scale Type of standard deviation paramater.
+     * @tparam Policy Error-handling policy.
+     */
+    template <typename T_y, typename T_loc, typename T_scale,
+              class Policy>
+    typename return_type<T_y,T_loc,T_scale>::type
+    gumbel_cdf(const T_y& y, const T_loc& mu, const T_scale& beta, 
+             const Policy&) {
+      static const char* function = "stan::prob::gumbel_cdf(%1%)";
 
-    //   using stan::math::check_positive;
-    //   using stan::math::check_finite;
-    //   using stan::math::check_not_nan;
-    //   using stan::math::check_consistent_sizes;
+      using stan::math::check_positive;
+      using stan::math::check_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_consistent_sizes;
 
+      typename return_type<T_y, T_loc, T_scale>::type cdf(1);
+      // check if any vectors are zero length
+      if (!(stan::length(y) 
+            && stan::length(mu) 
+            && stan::length(beta)))
+        return cdf;
 
-    //   typename return_type<T_y, T_loc, T_scale>::type cdf(1);
-    //   // check if any vectors are zero length
-    //   if (!(stan::length(y) 
-    //         && stan::length(mu) 
-    //         && stan::length(beta)))
-    //     return cdf;
+      if (!check_not_nan(function, y, "Random variable", &cdf, Policy()))
+        return cdf;
+      if (!check_finite(function, mu, "Location parameter", &cdf, Policy()))
+        return cdf;
+      if (!check_not_nan(function, beta, "Scale parameter", 
+                         &cdf, Policy()))
+        return cdf;
+      if (!check_positive(function, beta, "Scale parameter", 
+                          &cdf, Policy()))
+        return cdf;
+      if (!(check_consistent_sizes(function,
+                                   y,mu,beta,
+                                   "Random variable","Location parameter","Scale parameter",
+                                   &cdf, Policy())))
+        return cdf;
 
-    //   if (!check_not_nan(function, y, "Random variable", &cdf, Policy()))
-    //     return cdf;
-    //   if (!check_finite(function, mu, "Location parameter", &cdf, Policy()))
-    //     return cdf;
-    //   if (!check_not_nan(function, beta, "Scale parameter", 
-    //                      &cdf, Policy()))
-    //     return cdf;
-    //   if (!check_positive(function, beta, "Scale parameter", 
-    //                       &cdf, Policy()))
-    //     return cdf;
-    //   if (!(check_consistent_sizes(function,
-    //                                y,mu,beta,
-    //                                "Random variable","Location parameter","Scale parameter",
-    //                                &cdf, Policy())))
-    //     return cdf;
-
-    //   VectorView<const T_y> y_vec(y);
-    //   VectorView<const T_loc> mu_vec(mu);
-    //   VectorView<const T_scale> beta_vec(beta);
-    //   size_t N = max_size(y, mu, beta);
+      VectorView<const T_y> y_vec(y);
+      VectorView<const T_loc> mu_vec(mu);
+      VectorView<const T_scale> beta_vec(beta);
+      size_t N = max_size(y, mu, beta);
       
+<<<<<<< HEAD
     //   for (size_t n = 0; n < N; n++) {
     //     cdf *=  exp(-expo(-(y_vec[n] - mu_vec[n]) / beta_vec[n]));
     //   }
@@ -204,6 +204,21 @@ namespace stan {
     // gumbel_cdf(const T_y& y, const T_loc& mu, const T_scale& beta) {
     //   return gumbel_cdf(y,mu,beta,stan::math::default_policy());
     // }
+=======
+      for (size_t n = 0; n < N; n++) {
+        cdf *= exp(-exp(-((y_vec[n]) - (mu_vec[n])) / (beta_vec[n])));
+      }
+
+      return cdf;
+    }
+
+    template <typename T_y, typename T_loc, typename T_scale>
+    inline
+    typename return_type<T_y, T_loc, T_scale>::type
+    gumbel_cdf(const T_y& y, const T_loc& mu, const T_scale& beta) {
+      return gumbel_cdf(y,mu,beta,stan::math::default_policy());
+    }
+>>>>>>> added cdf to gumbel distribution with test
 
 
     template <class RNG>
