@@ -189,22 +189,7 @@ namespace stan {
       VectorView<const T_loc> mu_vec(mu);
       VectorView<const T_scale> beta_vec(beta);
       size_t N = max_size(y, mu, beta);
-      
-<<<<<<< HEAD
-    //   for (size_t n = 0; n < N; n++) {
-    //     cdf *=  exp(-expo(-(y_vec[n] - mu_vec[n]) / beta_vec[n]));
-    //   }
 
-    //   return cdf;
-    // }
-
-    // template <typename T_y, typename T_loc, typename T_scale>
-    // inline
-    // typename return_type<T_y, T_loc, T_scale>::type
-    // gumbel_cdf(const T_y& y, const T_loc& mu, const T_scale& beta) {
-    //   return gumbel_cdf(y,mu,beta,stan::math::default_policy());
-    // }
-=======
       for (size_t n = 0; n < N; n++) {
         cdf *= exp(-exp(-((y_vec[n]) - (mu_vec[n])) / (beta_vec[n])));
       }
@@ -218,7 +203,6 @@ namespace stan {
     gumbel_cdf(const T_y& y, const T_loc& mu, const T_scale& beta) {
       return gumbel_cdf(y,mu,beta,stan::math::default_policy());
     }
->>>>>>> added cdf to gumbel distribution with test
 
 
     template <class RNG>
