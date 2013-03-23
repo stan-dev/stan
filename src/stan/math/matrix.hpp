@@ -977,29 +977,6 @@ namespace stan {
     }
 
 
-
-    // int returns
-
-    template <typename T, int R, int C>
-    inline 
-    size_t 
-    rows(const Eigen::Matrix<T,R,C>& m) {
-      return m.rows();
-    }
-    template <typename T, int R, int C>
-    inline 
-    size_t 
-    cols(const Eigen::Matrix<T,R,C>& m) {
-      return m.cols();
-    }
-
-
-
-    // scalar returns
-
-        
-    // vector and matrix returns
-
     // void eigen_decompose_sym(const matrix_d& m,
     //                          vector_d& eigenvalues,
     //                          matrix_d& eigenvectors) {

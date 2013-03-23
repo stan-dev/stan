@@ -6,6 +6,12 @@
 namespace stan {
   namespace math {
     
+    template <typename T, int R, int C>
+    inline 
+    size_t 
+    cols(const Eigen::Matrix<T,R,C>& m) {
+      return m.cols();
+    }
     
   }
 }
