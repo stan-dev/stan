@@ -4,6 +4,8 @@
 #include <stan/math/matrix.hpp>
 #include <stan/math/matrix/mdivide_left.hpp>
 #include <stan/math/matrix/transpose.hpp>
+#include <stan/math/matrix/validate_multiplicable.hpp>
+#include <stan/math/matrix/validate_square.hpp>
 
 namespace stan {
   namespace math {

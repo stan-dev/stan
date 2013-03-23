@@ -2,6 +2,8 @@
 #define __STAN__MATH__MATRIX__MDIVIDE_LEFT_HPP__
 
 #include <stan/math/matrix.hpp>
+#include <stan/math/matrix/validate_multiplicable.hpp>
+#include <stan/math/matrix/validate_square.hpp>
 
 namespace stan {
   namespace math {
