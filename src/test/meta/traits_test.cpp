@@ -438,11 +438,7 @@ TEST(MetaTraits, DoubleVectorView_true_true) {
 
   DoubleVectorView<true,true> dvv1(length(a_var));
   dvv1[0] = 0.0;
-  dvv1[1] = 1.0;
-  dvv1[2] = 2.0;
   EXPECT_FLOAT_EQ(0.0, dvv1[0]);
-  EXPECT_FLOAT_EQ(1.0, dvv1[1]);
-  EXPECT_FLOAT_EQ(2.0, dvv1[2]);
 
   DoubleVectorView<true,true> dvv2(length(a_std_vector));
   dvv2[0] = 0.0;
