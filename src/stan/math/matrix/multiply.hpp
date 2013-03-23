@@ -2,6 +2,7 @@
 #define __STAN__MATH__MATRIX__MULTIPLY_HPP__
 
 #include <stan/math/matrix.hpp>
+#include <stan/math/matrix/validate_multiplicable.hpp>
 
 namespace stan {
   namespace math {
