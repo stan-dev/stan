@@ -2,6 +2,8 @@
 #define __STAN__MATH__MATRIX__DOT_PRODUCT_HPP__
 
 #include <stan/math/matrix.hpp>
+#include <stan/math/matrix/validate_vector.hpp>
+#include <stan/math/matrix/validate_matching_sizes.hpp>
 
 namespace stan {
   namespace math {

@@ -1084,24 +1084,6 @@ namespace stan {
       throw std::domain_error(ss.str());
     }
 
-    template <typename T, int R, int C>
-    void validate_symmetric(const Eigen::Matrix<T,R,C>& x,
-                            const char* msg) {
-      // tolerance = 1E-8
-      validate_square(x,msg);
-      for (int i = 0; i < x.rows(); ++i) {
-        for (int j = 0; j < x.cols(); ++j) {
-          if (x(i,j) != x(j,i)) {
-            std::stringstream ss;
-            ss << "error in call to " << msg
-               << "; require symmetric matrix, but found"
-               << "; x[" << i << "," << j << "]=" << x(i,j)
-               << "; x[" << j << "," << i << "]=" << x(j,i);
-            throw std::domain_error(ss.str());
-          }
-        }
-      }    
-    }
 
     // scalar returns
 

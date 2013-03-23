@@ -2,6 +2,7 @@
 #define __STAN__MATH__MATRIX__SOFTMAX_HPP__
 
 #include <stan/math/matrix.hpp>
+#include <stan/math/matrix/validate_nonzero_size.hpp>
 
 namespace stan {
   namespace math {

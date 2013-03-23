@@ -2,6 +2,7 @@
 #define __STAN__MATH__MATRIX__CHOLESKY_DECOMPOSE_HPP__
 
 #include <stan/math/matrix.hpp>
+#include <stan/math/matrix/validate_symmetric.hpp>
 
 namespace stan {
   namespace math {
