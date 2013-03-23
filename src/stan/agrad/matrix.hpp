@@ -5,6 +5,7 @@
 #include <stan/math/functions/logit.hpp>
 #include <stan/math/matrix.hpp>
 #include <stan/math/matrix_error_handling.hpp>
+#include <stan/math/matrix/validate_vector.hpp>
 
 #include <stan/agrad/special_functions.hpp>
 

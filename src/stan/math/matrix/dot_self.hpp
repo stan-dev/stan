@@ -2,6 +2,7 @@
 #define __STAN__MATH__MATRIX__DOT_SELF_HPP__
 
 #include <stan/math/matrix.hpp>
+#include <stan/math/matrix/validate_vector.hpp>
 
 namespace stan {
   namespace math {
