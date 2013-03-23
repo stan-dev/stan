@@ -6,6 +6,17 @@
 namespace stan {
   namespace math {
     
+    template <typename T, int R, int C>
+    void validate_column_index(const Eigen::Matrix<T,R,C>& m,
+                               size_t j,
+                               const char* msg) {
+      if (j > 0 && j <=  static_cast<size_t>(m.cols())) return;
+      std::stringstream ss;
+      ss << "require 0 < column index <= number of columns in" << msg;
+      ss << " found cols()=" << m.cols()
+         << "; index j=" << j;
+      throw std::domain_error(ss.str());
+    }
     
   }
 }
