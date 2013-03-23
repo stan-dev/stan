@@ -993,8 +993,6 @@ namespace stan {
       return m.cols();
     }
 
-    template <typename T1, typename T2>
-    inline
 
 
     // scalar returns

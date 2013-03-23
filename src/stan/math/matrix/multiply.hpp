@@ -3,6 +3,7 @@
 
 #include <stan/math/matrix.hpp>
 #include <stan/math/matrix/validate_multiplicable.hpp>
+#include <stan/math/matrix/validate_matching_sizes.hpp>
 
 namespace stan {
   namespace math {

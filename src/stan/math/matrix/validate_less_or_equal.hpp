@@ -6,6 +6,8 @@
 namespace stan {
   namespace math {
     
+    template <typename T1, typename T2>
+    inline
     void validate_less_or_equal(const T1& x, const T2& y,
                                 const char* x_name, const char* y_name, 
                                 const char* fun_name) {
