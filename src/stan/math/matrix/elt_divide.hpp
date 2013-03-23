@@ -2,6 +2,7 @@
 #define __STAN__MATH__MATRIX__ELT_DIVIDE_HPP__
 
 #include <stan/math/matrix.hpp>
+#include <stan/math/matrix/validate_matching_dims.hpp>
 
 namespace stan {
   namespace math {
