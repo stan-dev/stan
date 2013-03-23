@@ -2,6 +2,10 @@
 #include <stan/prob/distributions/univariate/discrete/neg_binomial.hpp>
 #include <stan/prob/distributions/univariate/discrete/binomial.hpp>
 
+#include <stan/math/functions/multiply_log.hpp>
+#include <stan/math/functions/log1m.hpp>
+#include <stan/math/functions/binomial_coefficient_log.hpp>
+
 using std::vector;
 using std::numeric_limits;
 using stan::agrad::var;
