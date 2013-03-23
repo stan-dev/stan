@@ -7,6 +7,7 @@
 #include <stan/math/matrix_error_handling.hpp>
 #include <stan/math/matrix/validate_matching_sizes.hpp>
 #include <stan/math/matrix/validate_multiplicable.hpp>
+#include <stan/math/matrix/validate_square.hpp>
 #include <stan/math/matrix/validate_vector.hpp>
 
 
