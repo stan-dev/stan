@@ -2,6 +2,8 @@
 #define __STAN__MATH__MATRIX__EIGENVECTORS_SYM_HPP__
 
 #include <stan/math/matrix.hpp>
+#include <stan/math/matrix/validate_nonzero_size.hpp>
+#include <stan/math/matrix/validate_symmetric.hpp>
 
 namespace stan {
   namespace math {
