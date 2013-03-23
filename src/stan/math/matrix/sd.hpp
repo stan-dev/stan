@@ -3,6 +3,7 @@
 
 #include <stan/math/matrix.hpp>
 #include <stan/math/matrix/variance.hpp>
+#include <stan/math/matrix/validate_nonzero_size.hpp>
 
 namespace stan {
   namespace math {

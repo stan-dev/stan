@@ -3,6 +3,7 @@
 
 #include <stan/math/matrix.hpp>
 #include <stan/math/matrix/mean.hpp>
+#include <stan/math/matrix/variance.hpp>
 
 namespace stan {
   namespace math {
