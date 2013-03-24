@@ -11,6 +11,9 @@
 #include <boost/random/variate_generator.hpp>
 #include <boost/random/uniform_01.hpp>
 
+#include <stan/math/functions/dot.hpp>
+#include <stan/math/functions/dot_self.hpp>
+#include <stan/math/functions/min.hpp>
 #include <stan/math/functions/sub.hpp>
 #include <stan/mcmc/adaptive_sampler.hpp>
 #include <stan/mcmc/dualaverage.hpp>
