@@ -239,6 +239,7 @@ namespace stan {
 		    double lambda,
 		    RNG& rng) {
       return stan::prob::normal_rng(mu + stan::prob::exponential_rng(lambda, rng), sigma, rng);
+      return stan::prob::normal_rng(mu, sigma,rng) + stan::prob::exponential_rng(lambda, rng);
     }
   }
 }

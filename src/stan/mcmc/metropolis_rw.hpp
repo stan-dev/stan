@@ -21,16 +21,18 @@ namespace stan {
       double log_prob;
       stan::model::prob_grad *_model;
       BaseRNG base_rng;
+      double epsilon;
 
     public:
     metropolis(stan::model::prob_grad& model,
 	       const std::vector<double>& par_r,
 	       const std::vector<int>& par_i,
+	       double eps = 1,
 	       bool adapt,
 	       std::ostream* error_msgs = 0,
 	       std::ostream* output_msgs = 0)
       : adaptive_sampler(adapt, error_msgs, output_msgs),
-	params_r(par_r.size()), params_i(par_i.size()), _model(&model), base_rng(BaseRNG(std::time(0))) {
+	params_r(par_r.size()), params_i(par_i.size()), _model(&model), base_rng(BaseRNG(std::time(0))), epsilon(eps) {
       set_params(par_r, par_i);
     }
 
@@ -39,9 +41,8 @@ namespace stan {
        *
        * The implementation for this class is a no-op.
        */
-    ~metropolis() { }
+      ~metropolis() { }
   
-
       void set_params( const std::vector<double>& par_r,
 		       const std::vector<int>& par_i) {
 	if(par_r.size() != params_r.size())
@@ -54,13 +55,15 @@ namespace stan {
 	log_prob = _model->log_prob(params_r, params_i, _error_msgs);
       }
 
+      void write_adaptation_params(std::ostream& /*o*/) {
+      }
 
       /**
        * Return the next sample.
        *
        * @return The next sample.
        */
-    sample next_impl() {
+      sample next_impl() {
       
       std::vector<double> new_params_r(params_r.size());
       for(size_t i = 0; i < new_params_r.size(); i++)
