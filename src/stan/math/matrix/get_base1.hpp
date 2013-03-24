@@ -1,7 +1,8 @@
 #ifndef __STAN__MATH__MATRIX__GET_BASE1_HPP__
 #define __STAN__MATH__MATRIX__GET_BASE1_HPP__
 
-#include <stan/math/matrix.hpp>
+#include <vector>
+#include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/check_range.hpp>
 
 namespace stan {

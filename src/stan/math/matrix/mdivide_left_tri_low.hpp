@@ -1,7 +1,8 @@
 #ifndef __STAN__MATH__MATRIX__MDIVIDE_LEFT_TRI_LOW_HPP__
 #define __STAN__MATH__MATRIX__MDIVIDE_LEFT_TRI_LOW_HPP__
 
-#include <stan/math/matrix.hpp>
+#include <boost/math/tools/promotion.hpp>
+#include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/mdivide_left_tri.hpp>
 
 namespace stan {

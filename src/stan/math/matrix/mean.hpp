@@ -1,7 +1,9 @@
 #ifndef __STAN__MATH__MATRIX__MEAN_HPP__
 #define __STAN__MATH__MATRIX__MEAN_HPP__
 
-#include <stan/math/matrix.hpp>
+#include <vector>
+#include <boost/math/tools/promotion.hpp>
+#include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/validate_nonzero_size.hpp>
 
 namespace stan {

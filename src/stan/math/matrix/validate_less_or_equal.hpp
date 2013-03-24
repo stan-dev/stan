@@ -1,7 +1,7 @@
 #ifndef __STAN__MATH__MATRIX__VALIDATE_LESS_OR_EQUAL_HPP__
 #define __STAN__MATH__MATRIX__VALIDATE_LESS_OR_EQUAL_HPP__
 
-#include <stan/math/matrix.hpp>
+#include <stdexcept>
 
 namespace stan {
   namespace math {

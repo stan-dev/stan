@@ -1,4 +1,5 @@
 #include <stan/math/matrix/determinant.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
 #include <gtest/gtest.h>
 
 TEST(MathMatrix,dimensionValidation) {

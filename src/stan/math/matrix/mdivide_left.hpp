@@ -1,7 +1,9 @@
 #ifndef __STAN__MATH__MATRIX__MDIVIDE_LEFT_HPP__
 #define __STAN__MATH__MATRIX__MDIVIDE_LEFT_HPP__
 
-#include <stan/math/matrix.hpp>
+#include <boost/math/tools/promotion.hpp>
+#include <stan/math/matrix/Eigen.hpp>
+#include <stan/math/matrix/promote_common.hpp>
 #include <stan/math/matrix/validate_multiplicable.hpp>
 #include <stan/math/matrix/validate_square.hpp>
 

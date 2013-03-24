@@ -1,7 +1,8 @@
 #ifndef __STAN__MATH__MATRIX__ARRAY_BUILDER_HPP__
 #define __STAN__MATH__MATRIX__ARRAY_BUILDER_HPP__
 
-#include <stan/math/matrix.hpp>
+#include <vector>
+#include <stan/math/matrix/promoter.hpp>
 
 namespace stan {
   namespace math {

@@ -1,7 +1,7 @@
 #ifndef __STAN__MATH__MATRIX__CROSSPROD_HPP__
 #define __STAN__MATH__MATRIX__CROSSPROD_HPP__
 
-#include <stan/math/matrix.hpp>
+#include <stan/math/matrix/typedefs.hpp>
 #include <stan/math/matrix/tcrossprod.hpp>
 
 namespace stan {

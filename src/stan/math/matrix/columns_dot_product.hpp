@@ -1,7 +1,9 @@
 #ifndef __STAN__MATH__MATRIX__COLUMNS_DOT_PRODUCT_HPP__
 #define __STAN__MATH__MATRIX__COLUMNS_DOT_PRODUCT_HPP__
 
-#include <stan/math/matrix.hpp>
+#include <stan/math/matrix/Eigen.hpp>
+#include <stan/math/matrix/typedefs.hpp>
+#include <stan/math/matrix/validate_matching_sizes.hpp>
 
 namespace stan {
   namespace math {

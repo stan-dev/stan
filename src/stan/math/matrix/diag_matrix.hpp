@@ -1,7 +1,7 @@
 #ifndef __STAN__MATH__MATRIX__DIAG_MATRIX_HPP__
 #define __STAN__MATH__MATRIX__DIAG_MATRIX_HPP__
 
-#include <stan/math/matrix.hpp>
+#include <stan/math/matrix/Eigen.hpp>
 
 namespace stan {
   namespace math {

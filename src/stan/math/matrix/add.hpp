@@ -1,7 +1,8 @@
 #ifndef __STAN__MATH__MATRIX__ADD_HPP__
 #define __STAN__MATH__MATRIX__ADD_HPP__
 
-#include <stan/math/matrix.hpp>
+#include <boost/math/tools/promotion.hpp>
+#include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/validate_matching_dims.hpp>
 
 namespace stan {

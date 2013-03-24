@@ -1,7 +1,7 @@
 #ifndef __STAN__MATH__MATRIX__EIGENVALUES_SYM_HPP__
 #define __STAN__MATH__MATRIX__EIGENVALUES_SYM_HPP__
 
-#include <stan/math/matrix.hpp>
+#include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/validate_nonzero_size.hpp>
 #include <stan/math/matrix/validate_symmetric.hpp>
 

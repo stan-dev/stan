@@ -1,7 +1,8 @@
 #ifndef __STAN__MATH__MATRIX__VALIDATE_ROW_INDEX_HPP__
 #define __STAN__MATH__MATRIX__VALIDATE_ROW_INDEX_HPP__
 
-#include <stan/math/matrix.hpp>
+#include <stdexcept>
+#include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/validate_square.hpp>
 
 namespace stan {

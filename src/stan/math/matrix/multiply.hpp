@@ -1,7 +1,7 @@
 #ifndef __STAN__MATH__MATRIX__MULTIPLY_HPP__
 #define __STAN__MATH__MATRIX__MULTIPLY_HPP__
 
-#include <stan/math/matrix.hpp>
+#include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/validate_multiplicable.hpp>
 #include <stan/math/matrix/validate_matching_sizes.hpp>
 

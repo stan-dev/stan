@@ -1,9 +1,10 @@
 #ifndef __STAN__MATH__MATRIX__VARIANCE_HPP__
 #define __STAN__MATH__MATRIX__VARIANCE_HPP__
 
-#include <stan/math/matrix.hpp>
+#include <vector>
+#include <boost/math/tools/promotion.hpp>
+#include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/mean.hpp>
-#include <stan/math/matrix/variance.hpp>
 
 namespace stan {
   namespace math {
