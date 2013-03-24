@@ -1,6 +1,13 @@
 #include <stan/math/matrix/resize.hpp>
 #include <gtest/gtest.h>
 
+using Eigen::Matrix;
+using Eigen::Dynamic;
+
+using stan::math::matrix_d;
+using stan::math::vector_d;
+using stan::math::row_vector_d;
+
 TEST(matrix_test, resize_double) {
   double x = 5;
   std::vector<size_t> dims;
