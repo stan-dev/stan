@@ -1,4 +1,5 @@
 #include <stan/math/matrix/eigenvalues_sym.hpp>
+#include <stan/math/matrix/typedefs.hpp>
 #include <gtest/gtest.h>
 
 TEST(MathMatrix, eigenvalues_sym) {

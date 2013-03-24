@@ -1,4 +1,5 @@
 #include <stan/math/matrix/subtract.hpp>
+#include <stan/math/matrix/typedefs.hpp>
 #include <gtest/gtest.h>
 
 TEST(MathMatrix,subtract_v_exception) {

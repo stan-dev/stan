@@ -1,4 +1,5 @@
 #include <stan/math/matrix/mdivide_right.hpp>
+#include <stan/math/matrix/typedefs.hpp>
 #include <gtest/gtest.h>
 
 TEST(MathMatrix,mdivide_right_val) {

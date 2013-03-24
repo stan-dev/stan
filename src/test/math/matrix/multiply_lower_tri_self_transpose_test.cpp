@@ -1,4 +1,5 @@
 #include <stan/math/matrix/multiply_lower_tri_self_transpose.hpp>
+#include <stan/math/matrix/typedefs.hpp>
 #include <gtest/gtest.h>
 
 void test_multiply_lower_tri_self_transpose(const stan::math::matrix_d& x) {

@@ -1,6 +1,7 @@
 #ifndef __STAN__MATH__MATRIX__DIAG_PRE_MULTIPLY_HPP__
 #define __STAN__MATH__MATRIX__DIAG_PRE_MULTIPLY_HPP__
 
+#include <stdexcept>
 #include <boost/math/tools/promotion.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 

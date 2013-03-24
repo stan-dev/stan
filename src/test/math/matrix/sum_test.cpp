@@ -1,4 +1,5 @@
 #include <stan/math/matrix/sum.hpp>
+#include <stan/math/matrix/typedefs.hpp>
 #include <gtest/gtest.h>
 
 TEST(MathMatrix,sum_vector_int) {

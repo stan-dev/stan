@@ -1,4 +1,5 @@
 #include <stan/math/matrix/crossprod.hpp>
+#include <stan/math/matrix/typedefs.hpp>
 #include <gtest/gtest.h>
 
 void test_crossprod(const stan::math::matrix_d& x) {

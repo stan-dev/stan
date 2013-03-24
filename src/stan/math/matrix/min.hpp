@@ -1,6 +1,7 @@
 #ifndef __STAN__MATH__MATRIX__MIN_HPP__
 #define __STAN__MATH__MATRIX__MIN_HPP__
 
+#include <stdexcept>
 #include <vector>
 #include <stan/math/matrix/Eigen.hpp>
 

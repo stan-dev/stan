@@ -1,6 +1,7 @@
 #ifndef __STAN__MATH__MATRIX__MDIVIDE_RIGHT_TRI_HPP__
 #define __STAN__MATH__MATRIX__MDIVIDE_RIGHT_TRI_HPP__
 
+#include <stdexcept>
 #include <boost/math/tools/promotion.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/mdivide_left_tri.hpp>

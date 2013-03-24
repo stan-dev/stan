@@ -1,6 +1,7 @@
 #ifndef __STAN__MATH__MATRIX__VALIDATE_MATCHING_SIZES_HPP__
 #define __STAN__MATH__MATRIX__VALIDATE_MATCHING_SIZES_HPP__
 
+#include <sstream>
 #include <stdexcept>
 #include <vector>
 #include <stan/math/matrix/Eigen.hpp>

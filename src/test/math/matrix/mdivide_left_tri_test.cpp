@@ -1,4 +1,5 @@
 #include <stan/math/matrix/mdivide_left_tri.hpp>
+#include <stan/math/matrix/typedefs.hpp>
 #include <gtest/gtest.h>
 
 TEST(MathMatrix,mdivide_left_tri_val) {

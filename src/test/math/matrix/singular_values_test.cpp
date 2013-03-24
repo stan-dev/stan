@@ -1,4 +1,5 @@
 #include <stan/math/matrix/singular_values.hpp>
+#include <stan/math/matrix/typedefs.hpp>
 #include <gtest/gtest.h>
 
 TEST(MathMatrix, singular_values) {

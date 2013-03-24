@@ -1,4 +1,5 @@
 #include <stan/math/matrix/log.hpp>
+#include <stan/math/matrix/typedefs.hpp>
 #include <gtest/gtest.h>
 
 // log tests
