@@ -13,11 +13,11 @@
 #include <Eigen/QR>
 
 #include <stan/math/boost_error_handling.hpp>
+#include <stan/math/matrix/typedefs.hpp>
 
 namespace stan {
   
   namespace math {
-    typedef Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>::size_type size_type;
     // from input type F to output type T 
 
     // scalar, F != T  (base template)
@@ -144,26 +144,6 @@ namespace stan {
       }
     };
 
-    /**
-     * Type for matrix of double values.
-     */
-    typedef 
-    Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>
-    matrix_d;
-
-    /**
-     * Type for (column) vector of double values.
-     */
-    typedef 
-    Eigen::Matrix<double,Eigen::Dynamic,1>
-    vector_d;
-
-    /**
-     * Type for (row) vector of double values.
-     */
-    typedef 
-    Eigen::Matrix<double,1,Eigen::Dynamic>
-    row_vector_d;
 
 
     // polymorphic gets with bounds checking
