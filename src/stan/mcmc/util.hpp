@@ -11,6 +11,7 @@
 #include <boost/exception_ptr.hpp> 
 
 #include <stan/model/prob_grad.hpp>
+#include <stan/math/functions/scaled_add.hpp>
 
 namespace stan {
 

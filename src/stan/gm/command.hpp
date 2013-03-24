@@ -9,6 +9,7 @@
 #include <stan/version.hpp>
 #include <stan/io/cmd_line.hpp>
 #include <stan/io/dump.hpp>
+#include <stan/math/functions/dot.hpp>
 #include <stan/mcmc/adaptive_hmc.hpp>
 #include <stan/mcmc/nuts.hpp>
 #include <stan/mcmc/nuts_diag.hpp>
