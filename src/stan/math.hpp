@@ -8,6 +8,9 @@
 #include "stan/math/functions/as_bool.hpp"
 #include "stan/math/functions/binary_log_loss.hpp"
 #include "stan/math/functions/binomial_coefficient_log.hpp"
+#include "stan/math/functions/dist.hpp"
+#include "stan/math/functions/dot.hpp"
+#include "stan/math/functions/dot_self.hpp"
 #include "stan/math/functions/exp2.hpp"
 #include "stan/math/functions/fdim.hpp"
 #include "stan/math/functions/fma.hpp"
@@ -36,13 +39,15 @@
 #include "stan/math/functions/logical_neq.hpp"
 #include "stan/math/functions/logical_or.hpp"
 #include "stan/math/functions/logit.hpp"
+#include "stan/math/functions/max.hpp"
+#include "stan/math/functions/min.hpp"
 #include "stan/math/functions/multiply_log.hpp"
+#include "stan/math/functions/scaled_add.hpp"
 #include "stan/math/functions/softmax.hpp"
 #include "stan/math/functions/square.hpp"
 #include "stan/math/functions/step.hpp"
+#include "stan/math/functions/sub.hpp"
+#include "stan/math/functions/sum.hpp"
 #include "stan/math/functions/value_of.hpp"
-
-// FIXME: remove when refactoring is complete
-#include "stan/math_old.hpp"
 
 #endif
