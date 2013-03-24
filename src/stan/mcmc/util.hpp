@@ -10,7 +10,6 @@
 #include <boost/exception/diagnostic_information.hpp> 
 #include <boost/exception_ptr.hpp> 
 
-#include <stan/math/util.hpp>
 #include <stan/model/prob_grad.hpp>
 
 namespace stan {

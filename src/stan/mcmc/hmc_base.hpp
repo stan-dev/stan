@@ -11,7 +11,6 @@
 #include <stan/mcmc/adaptive_sampler.hpp>
 #include <stan/mcmc/dualaverage.hpp>
 #include <stan/model/prob_grad.hpp>
-#include <stan/mcmc/util.hpp>
 
 
 namespace stan {

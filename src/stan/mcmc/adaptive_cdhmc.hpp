@@ -9,7 +9,6 @@
 #include <boost/random/variate_generator.hpp>
 #include <boost/random/uniform_01.hpp>
 
-#include <stan/math/util.hpp>
 #include <stan/mcmc/adaptive_sampler.hpp>
 #include <stan/mcmc/dualaverage.hpp>
 #include <stan/model/prob_grad.hpp>
