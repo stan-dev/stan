@@ -1,7 +1,7 @@
 #include <stan/math/matrix/mdivide_right.hpp>
 #include <gtest/gtest.h>
 
-TEST(matrixTest,mdivide_right_val) {
+TEST(MathMatrix,mdivide_right_val) {
   using stan::math::mdivide_right;
   stan::math::matrix_d Ad(2,2);
   stan::math::matrix_d I;

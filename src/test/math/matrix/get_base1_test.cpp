@@ -1,7 +1,7 @@
 #include <stan/math/matrix/get_base1.hpp>
 #include <gtest/gtest.h>
 
-TEST(matrix,get_base1_vec1) {
+TEST(MathMatrix,get_base1_vec1) {
   using stan::math::get_base1;
   std::vector<double> x(2);
   x[0] = 10.0;
@@ -17,7 +17,7 @@ TEST(matrix,get_base1_vec1) {
   EXPECT_THROW(get_base1(x,3,"x[3]",0),
                std::out_of_range);
 }
-TEST(matrix,get_base1_vec2) {
+TEST(MathMatrix,get_base1_vec2) {
   using stan::math::get_base1;
   using std::vector;
   size_t M = 3;
@@ -49,7 +49,7 @@ TEST(matrix,get_base1_vec2) {
                          12,"",-1),
                std::out_of_range);
 }
-TEST(matrix,get_base1_matrix) {
+TEST(MathMatrix,get_base1_matrix) {
   using Eigen::Matrix;
   using Eigen::Dynamic;
   using stan::math::get_base1;
@@ -80,7 +80,7 @@ TEST(matrix,get_base1_matrix) {
   EXPECT_THROW(get_base1(x,0,1,"x",1), std::out_of_range);
   EXPECT_THROW(get_base1(x,1,0,"x",1), std::out_of_range);
 }
-TEST(matrix,get_base1_vector) {
+TEST(MathMatrix,get_base1_vector) {
   using Eigen::Matrix;
   using Eigen::Dynamic;
   using stan::math::get_base1;
@@ -92,7 +92,7 @@ TEST(matrix,get_base1_vector) {
   EXPECT_THROW(get_base1(x,0,"x",1), std::out_of_range);
   EXPECT_THROW(get_base1(x,100,"x",1), std::out_of_range);
 }
-TEST(matrix,get_base1_row_vector) {
+TEST(MathMatrix,get_base1_row_vector) {
   using Eigen::Matrix;
   using Eigen::Dynamic;
   using stan::math::get_base1;
@@ -104,7 +104,7 @@ TEST(matrix,get_base1_row_vector) {
   EXPECT_THROW(get_base1(x,0,"x",1), std::out_of_range);
   EXPECT_THROW(get_base1(x,100,"x",1), std::out_of_range);
 }
-TEST(matrix,get_base1_8) {
+TEST(MathMatrix,get_base1_8) {
   using stan::math::get_base1;
   using std::vector;
   double x0(42.0);

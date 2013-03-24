@@ -1,7 +1,7 @@
 #include <stan/math/matrix/array_builder.hpp>
 #include <gtest/gtest.h>
 
-TEST(matrixTest,arrayBuilder) {
+TEST(MathMatrix,arrayBuilder) {
   using std::vector;
   using stan::math::array_builder;
 
