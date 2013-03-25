@@ -1,9 +1,9 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__SKEW__NORMAL__HPP__
 #define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__SKEW__NORMAL__HPP__
 
-#include <boost/random/normal_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
 #include <boost/math/special_functions/owens_t.hpp>
+#include <boost/math/distributions.hpp>
 #include <stan/prob/distributions/univariate/continuous/uniform.hpp>
 
 #include <stan/agrad.hpp>
@@ -204,14 +204,6 @@ namespace stan {
     //   return skew_normal_cdf(y,mu,sigma,alpha,stan::math::default_policy());
     // }
 
-    // template <class RNG>
-    // inline double
-    // skew_normal_rng(double mu,
-    // 		    double sigma,
-    // 		    double alpha,
-    // 		    RNG& rng) {
-    //   return mu;
-    // }
     template <class RNG>
     inline double
     skew_normal_rng(double mu,
