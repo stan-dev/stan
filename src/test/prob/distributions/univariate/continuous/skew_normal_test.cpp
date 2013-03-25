@@ -44,6 +44,5 @@ TEST(ProbDistributionsSkewNormal, chiSquareGoodnessFitTest) {
     chi += ((bin[j] - expect[j]) * (bin[j] - expect[j]) / expect[j]);
 
   EXPECT_TRUE(chi < quantile(complement(mydist, 1e-6)));
-  std::cout<<bin[1]<<'d'<<expect[1]<<"chi"<<chi;
 }
 
