@@ -19,7 +19,7 @@ namespace stan {
       ~base_hamiltonian() {}; 
       
       virtual double T(psPoint& z) = 0;
-      double V(psPoint& z) { - _model.log_prob(z.q, z.r); }
+      double V(psPoint& z) { return - _model.log_prob(z.q, z.r); }
       
       virtual double tau(psPoint& z) = 0;
       virtual double phi(psPoint& z) = 0;
@@ -37,7 +37,7 @@ namespace stan {
       
     protected: 
       
-        M _model;
+        M& _model;
       
     };
     
