@@ -1,7 +1,7 @@
-#ifndef __STAN__AGRAD__AGRAD_CPP__
-#define __STAN__AGRAD__AGRAD_CPP__
+#ifndef __STAN__AGRAD__VAR_STACK_CPP__
+#define __STAN__AGRAD__VAR_STACK_CPP__
 
-#include "stan/agrad/agrad.hpp"
+#include <stan/agrad/var_stack.hpp>
 
 namespace stan {
 
