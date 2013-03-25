@@ -1231,8 +1231,8 @@ their declarations.
 
 \noindent
 Times series data come arranged in temporal order.  This chapter
-considers autoregressive models based on previous values as well as on
-previous noise error or noise terms.
+presents two kinds of time series models, regression-like models such
+as autogression and moving average models, and hidden Markov models. 
 
 
 \section{Autoregressive Models}
@@ -1679,6 +1679,341 @@ reassigning them in the loop.
 Both encodings are very fast.  The original encoding has the advantage
 of vectorizing the normal distribution, but it uses a bit more memory.
 A halfway point would be to vectorize just \code{err}.
+
+\section{Hidden Markov Models}
+
+A hidden Markov model (HMM) generates a sequence of $T$ output
+variables $y_t$ conditioned on a parallel sequence of latent
+categorical state variables $z_t \in \{1,\ldots,K\}$.  These
+``hidden'' state variables are assumed to form a Markov chain so that
+$z_t$ is conditionally independent of other variables given $z_{t-1}$.
+This Markov chain is parameterized by a transition matrix $\theta$
+where $\theta_k$ is a $K$-simplex for $k \in \{1,\ldots,K\}$.  The
+probability of transitioning to state $z_t$ from state $z_{t-1}$ is
+\[
+z_t \sim \distro{Categorical}(\theta_{z[t-1]}).
+\]
+The output $y_t$ at time $t$ is generated conditionally independently
+based on the latent state $z_t$.  This section describes HMMs with a
+simple categorical model for outputs $y_t \in \{1,\ldots,V\}$.  The
+categorical distribution for latent state $k$ is parameterized by a
+$V$-simplex $\phi_k$.  The observed output $y_t$ at time $t$ is
+generated based on the hidden state indicator $z_t$ at time $t$,
+\[
+y_t \sim \distro{Categorical}(\phi_{z[t]}).
+\]
+In short, HMMs form a discrete mixture model where the mixture
+component indicators form a latent Markov chain.
+
+\subsection{Supervised Parameter Estimation}
+
+In the situation where the hidden states are known, the following
+naive model can be used to fit the parameters $\theta$ and $\phi$.
+(This model is distributed with Stan on the path
+\nolinkurl{<stan>/src/models/misc/hmm/hmm.stan}.)
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+  int<lower=1> K;  // num categories
+  int<lower=1> V;  // num words
+  int<lower=0> T;  // num instances
+  int<lower=1,upper=V> w[T]; // words
+  int<lower=1,upper=K> z[T]; // categories
+  vector<lower=0>[K] alpha;  // transit prior
+  vector<lower=0>[V] beta;   // emit prior
+}
+parameters {
+  simplex[K] theta[K];  // transit probs
+  simplex[V] phi[K];    // emit probs
+}
+model {
+  for (k in 1:K) 
+    theta[k] ~ dirichlet(alpha);
+  for (k in 1:K)
+    phi[k] ~ dirichlet(beta);
+  for (t in 1:T)
+    w[t] ~ categorical(phi[z[t]]);
+  for (t in 2:T)
+    z[t] ~ categorical(theta[z[t - 1]]);
+}
+\end{Verbatim}
+\end{quote}
+%
+Explicit Dirichlet priors have been provided for $\theta_k$ and
+$\phi_k$; dropping these two statements would implicitly take the
+prior to be uniform over all valid simplexes.
+
+\subsection{Start-State and End-State Probabilities}
+
+Although workable, the above description of HMMs is incomplete because
+the start state $z_1$ is not modeled (the index runs from 2 to $T$).
+If the data are conceived as a subsequence of a long-running process,
+the probability of $z_1$ should be set to the stationary state
+probabilities in the Markov chain.  In this case, there is no distinct
+end to the data, so there is no need to model the probability that the
+sequence ends at $z_T$.  
+
+An alternative conception of HMMs is as models of finite-length
+sequences.  For example, human language sentences have distinct
+starting distributions (usually a capital letter) and ending
+distributions (usually some kind of punctuation).  The simplest way to
+model the sequence boundaries is to add a new latent state $K+1$,
+generate the first state from a categorical distribution with
+parameter vector $\theta_{K+1}$, and restrict the transitions so that
+a transition to state $K+1$ is forced to occur at the end of the
+sentence and is prohibited elsewhere.
+
+\subsection{Calculating Sufficient Statistics}
+
+The naive HMM estimation model presented above can be sped up
+dramatically by replacing the loops over categorical distributions
+with a single multinomial distribution.  A complete implementation is
+available in the Stan source distribution at path
+\nolinkurl{<stan>/src/models/misc/hmm/hmm-sufficient.stan}.  The data
+is declared as before, but now a transformed data blocks computes the
+sufficient statistics for estimating the transition and emission
+matrices.
+%
+\begin{quote}
+\begin{Verbatim}
+transformed data {
+  int<lower=0> trans[K,K];
+  int<lower=0> emit[K,V];
+  for (k1 in 1:K) 
+    for (k2 in 1:K)
+      trans[k1,k2] <- 0;
+  for (t in 2:T)
+    trans[z[t - 1], z[t]] <- 1 + trans[z[t - 1], z[t]];
+  for (k in 1:K)
+    for (v in 1:V)
+      emit[k,v] <- 0;
+  for (t in 1:T)
+    emit[z[t], w[t]] <- 1 + emit[z[t], w[t]];
+}
+\end{Verbatim}
+\end{quote}
+%
+The likelihood component of the model based on looping over the input
+is replaced with multinomials as follows.
+%
+\begin{quote}
+\begin{verbatim}
+model {
+  ...
+  for (k in 1:K)
+    trans[k] ~ multinomial(theta[k]);
+  for (k in 1:K)
+    emit[k] ~ multinomial(phi[k]);
+}
+\end{verbatim}
+\end{quote}
+%
+In a continuous HMM with normal emission probabilities could be sped
+up in the same way by computing sufficient statistics.
+
+\subsection{Analytic Posterior}
+
+With the Dirichlet-multinomial HMM, the posterior can be computed
+analytically because the Dirichlet is the conjugate prior to the
+multinomial.  The following example, available in
+\nolinkurl{<stan>/src/models/hmm/hmm-analytic.stan}, illustrates how a
+Stan model can define the posterior analytically.  This is possible in
+the Stan language because the model only needs to define the
+conditional probability of the parameters given the data up to a
+proportion, which can be done by defining the (unnormalized) joint
+probability or the (unnormalized) conditional posterior, or anything
+in between.  
+
+The model has the same data and parameters as the previous models, but
+now computes the posterior Dirichlet parameters in the transformed
+data block.
+%
+\begin{quote}
+\begin{Verbatim}
+transformed data {
+  vector<lower=0>[K] alpha_post[K];
+  vector<lower=0>[V] beta_post[K];
+  for (k in 1:K) 
+    alpha_post[k] <- alpha;
+  for (t in 2:T)
+    alpha_post[z[t-1],z[t]] <- alpha_post[z[t-1],z[t]] + 1;
+  for (k in 1:K)
+    beta_post[k] <- beta;
+  for (t in 1:T)
+    beta_post[z[t],w[t]] <- beta_post[z[t],w[t]] + 1;
+}
+\end{Verbatim}
+\end{quote}
+%
+The posterior can now be written analytically as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+model {
+  for (k in 1:K) 
+    theta[k] ~ dirichlet(alpha_post[k]);
+  for (k in 1:K)
+    phi[k] ~ dirichlet(beta_post[k]);
+}
+\end{Verbatim}
+\end{quote}
+
+
+\subsection{Semisupervised Estimation}
+
+HMMs can be estimated in a fully unsupervised fashion without any data
+for which latent states are known.  The resulting posteriors are
+typically extremely multimodal.  An intermediate solution is to use
+semisupervised estimation, which is based on a combination of
+supervised and unsupervised data.  Implementing this estimation
+strategy in Stan requires calculating the probability of an output
+sequence with an unknown state sequence.  This is a marginalization
+problem, and for HMMs, it is computed with the so-called forward
+algorithm.  
+
+In Stan, the forward algorithm is coded as follows (the full model
+is in \nolinkurl{<stan>/src/models/misc/hmm/hmm-semisup.stan}).  First,
+two additional data variable are declared for the unsupervised data.
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+  ...
+  int<lower=1> T_unsup;  // num unsupervised items
+  int<lower=1,upper=V> u[T_unsup]; // unsup words
+  ...
+\end{Verbatim}
+\end{quote}
+%
+The model for the supervised data does not change; the unsupervised
+data is handled with the following Stan implementation of the forward
+algorithm.  
+%
+\begin{quote}
+\begin{Verbatim}
+model {
+ ...
+  { 
+    real acc[K];
+    real gamma[T_unsup,K];
+    for (k in 1:K)
+      gamma[1,k] <- log(phi[k,u[1]]);
+    for (t in 2:T_unsup) {
+      for (k in 1:K) {
+        for (j in 1:K)
+          acc[j] <- gamma[t-1,j] + log(theta[j,k]) + log(phi[k,u[t]]);
+        gamma[t,k] <- log_sum_exp(acc);
+      }
+    }
+    lp__ <- lp__ + log_sum_exp(gamma[T_unsup]);
+  }
+\end{Verbatim}
+\end{quote}
+%
+The forward values \code{gamma[t,k]} are defined to be the log
+marginal probability of the inputs \code{u[1],...,u[t]} up to time
+\code{t} and the latent state being equal to \code{k} at time
+\code{t}; the previous latent states are marginalized out.  The first
+row of \code{gamma} is initialized by setting \code{gamma[1,k]} equal
+to the log probability of latent state \code{k} generating the first
+output \code{u[1]}; as before, the probability of the first latent
+state is not itself modeled.  For each subsequent time \code{t} and
+output \code{j}, the value \code{acc[j]} is set to the probability of
+the latent state at time \code{t-1} being \code{j}, plus the log
+transition probability from state \code{j} at time \code{t-1} to state
+\code{k} at time \code{t}, plus the log probability of the output
+\code{u[t]} being generated by state \code{k}.  The
+\code{log\_sum\_exp} operation just multiplies the probabilities for
+each prior state \code{j} on the log scale in an arithmetically stable
+way.
+
+The brackets provide the scope for the local variables \code{acc} and
+\code{gamma}; these could have been declared earlier, but it is
+clearer to keep their declaration near their use. 
+
+
+\subsection{Predictive Inference}
+
+Given the transition and emission parameters, $\theta_{k,k'}$ and
+$\phi_{k,v}$ and an observation sequence $u_1,\ldots,u_T \in \{
+1,\ldots,V \}$, the Viterbi (dynamic programming) algorithm
+computes the state sequence which is most likely to have generated the
+observed output $u$.  
+
+The Viterbi algorithm can be coded in Stan in the generated quantities
+block as follows.  The predictions here is the most likely state
+sequence \code{y\_star[1], ..., y\_star[T\_unsup]} underlying the
+array of observations \code{u[1], ..., u[T\_unsup]}.  Because this
+sequence is determined from the transition probabilities
+\code{theta} and emission probabilities \code{phi}, it may be
+different from sample to sample in the posterior.
+%
+\begin{quote}
+\begin{Verbatim}
+generated quantities {
+  int<lower=1,upper=K> y_star[T_unsup];
+  real log_p_y_star;
+  { 
+    int back_ptr[T_unsup,K];
+    real best_logp[T_unsup,K];
+    real best_total_logp;
+    for (k in 1:K)
+      best_logp[1,K] <- log(phi[k,u[1]]);
+    for (t in 2:T_unsup) {
+      for (k in 1:K) {
+        best_logp[t,k] <- negative_infinity();
+        for (j in 1:K) {
+          real logp;
+          logp <- best_logp[t-1,j] 
+                  + log(theta[j,k]) + log(phi[k,u[t]]);
+          if (logp > best_logp[t,k]) {
+            back_ptr[t,k] <- j;
+            best_logp[t,k] <- logp;
+          }
+        }
+      }
+    }
+    log_p_y_star <- max(best_logp[T_unsup]);
+    for (k in 1:K)
+      if (best_logp[T_unsup,k] == log_p_y_star)
+        y_star[T_unsup] <- k;
+    for (t in 1:(T_unsup - 1))
+      y_star[T_unsup - t] <- back_ptr[T_unsup - t + 1, 
+                                      y_star[T_unsup - t + 1]];
+  }
+}
+\end{Verbatim}
+\end{quote}
+%
+The bracketed block is used to make the three variables
+\code{back\_ptr}, \code{best\_logp}, and \code{best\_total\_logp}
+local so they will not be output.  The variable \code{y\_star} will
+hold the label sequence with the highest probability given the input
+sequence \code{u}.  Unlike the forward algorithm, where the
+intermediate quantities were total probability, here they consist of
+the maximum probabilty \code{best\_logp[t,k]} for the sequence up to
+time \code{t} with final output category \code{k} for time \code{t},
+along with a backpointer to the source of the link.  Following the
+backpointers from the best final log probability for the final time
+\code{t} yields the optimal state sequence.
+
+This inference can be run for the same unsupervised outputs \code{u}
+as are used to fit the semisupervised model.  The above code can be
+found in the same model file as the unsupervised fit.  This is the
+Bayesian approach to inference, where the data being reasoned about is
+used in a semisupervised way to train the model.  It is not
+``cheating'' because the underlying states for \code{u} are never
+observed --- they are just estimated along with all of the other
+parameters.
+
+If the outputs \code{u} are not used for semisupervised estimation but
+simply as the basis for prediction, the result is equivalent to what
+is represented in the BUGS modeling language via the cut operation.
+That is, the model is fit independenlty of \code{u}, then those
+parameters used to find the most likely state to have generated
+\code{u}.
+
 
 
 \chapter{Measurement Error and Meta-Analysis}
