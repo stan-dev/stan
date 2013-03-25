@@ -35,7 +35,8 @@ namespace stan {
     
       hmc_base(M &m, BaseRNG rng = BaseRNG(std::time(0)));
       
-      virtual void sample(std::vector<double>& q, std::vector<int>& r) = 0;
+      // Return acceptance statistic
+      virtual double sample(std::vector<double>& q, std::vector<int>& r) = 0;
     
     protected:
     
