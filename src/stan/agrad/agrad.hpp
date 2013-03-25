@@ -7,6 +7,18 @@
 #include <stan/agrad/var.hpp>
 
 #include <stan/agrad/functions/print_stack.hpp>
+#include <stan/agrad/functions/op_v_vari.hpp>
+#include <stan/agrad/functions/op_vv_vari.hpp>
+#include <stan/agrad/functions/op_vd_vari.hpp>
+#include <stan/agrad/functions/op_dv_vari.hpp>
+#include <stan/agrad/functions/op_vvv_vari.hpp>
+#include <stan/agrad/functions/op_vvd_vari.hpp>
+#include <stan/agrad/functions/op_vdv_vari.hpp>
+#include <stan/agrad/functions/op_vdd_vari.hpp>
+#include <stan/agrad/functions/op_dvv_vari.hpp>
+#include <stan/agrad/functions/op_dvd_vari.hpp>
+#include <stan/agrad/functions/op_ddv_vari.hpp>
+
 
 #include <cmath>
 #include <cstddef>
@@ -27,150 +39,6 @@ namespace stan {
     class var;
 
     namespace {
-
-      class op_v_vari : public vari {
-      protected:
-        vari* avi_;
-      public:
-        op_v_vari(double f, vari* avi) :
-          vari(f),
-          avi_(avi) {
-        }
-      };
-
-      class op_vv_vari : public vari {
-      protected:
-        vari* avi_;
-        vari* bvi_;
-      public:
-        op_vv_vari(double f, vari* avi, vari* bvi):
-          vari(f),
-          avi_(avi),
-          bvi_(bvi) {
-        }
-      };
-
-      class op_vd_vari : public vari {
-      protected:
-        vari* avi_;
-        double bd_;
-      public:
-        op_vd_vari(double f, vari* avi, double b) :
-          vari(f),
-          avi_(avi),
-          bd_(b) {
-        }
-      };
-
-      class op_dv_vari : public vari {
-      protected:
-        double ad_;
-        vari* bvi_;
-      public:
-        op_dv_vari(double f, double a, vari* bvi) :
-          vari(f),
-          ad_(a),
-          bvi_(bvi) {
-        }
-      };
-
-      class op_vvv_vari : public vari {
-      protected:
-        vari* avi_;
-        vari* bvi_;
-        vari* cvi_;
-      public:
-        op_vvv_vari(double f, vari* avi, vari* bvi, vari* cvi) :
-          vari(f),
-          avi_(avi),
-          bvi_(bvi),
-          cvi_(cvi) {
-        }
-      };
-
-      class op_vvd_vari : public vari {
-      protected:
-        vari* avi_;
-        vari* bvi_;
-        double cd_;
-      public:
-        op_vvd_vari(double f, vari* avi, vari* bvi, double c) :
-          vari(f),
-          avi_(avi),
-          bvi_(bvi),
-          cd_(c) {
-        }
-      };
-
-      class op_vdv_vari : public vari {
-      protected:
-        vari* avi_;
-        double bd_;
-        vari* cvi_;
-      public:
-        op_vdv_vari(double f, vari* avi, double b, vari* cvi) :
-          vari(f),
-          avi_(avi),
-          bd_(b), 
-          cvi_(cvi) {
-        }
-      };
-
-      class op_vdd_vari : public vari {
-      protected:
-        vari* avi_;
-        double bd_;
-        double cd_;
-      public:
-        op_vdd_vari(double f, vari* avi, double b, double c) :
-          vari(f),
-          avi_(avi),
-          bd_(b), 
-          cd_(c) {
-        }
-      };
-
-      class op_dvv_vari : public vari {
-      protected:
-        double ad_;
-        vari* bvi_;
-        vari* cvi_;
-      public:
-        op_dvv_vari(double f, double a, vari* bvi, vari* cvi) :
-          vari(f),
-          ad_(a),
-          bvi_(bvi),
-          cvi_(cvi) {
-        }
-      };
-
-      class op_dvd_vari : public vari {
-      protected:
-        double ad_;
-        vari* bvi_;
-        double cd_;
-      public:
-        op_dvd_vari(double f, double a, vari* bvi, double c) :
-          vari(f),
-          ad_(a),
-          bvi_(bvi),
-          cd_(c) {
-        }
-      };
-
-      class op_ddv_vari : public vari {
-      protected:
-        double ad_;
-        double bd_;
-        vari* cvi_;
-      public:
-        op_ddv_vari(double f, double a, double b, vari* cvi) :
-          vari(f),
-          ad_(a),
-          bd_(b),
-          cvi_(cvi) {
-        }
-      };
 
       // use for single precomputed partials
       class precomp_v_vari : public op_v_vari {
