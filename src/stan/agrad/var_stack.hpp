@@ -7,6 +7,7 @@
 namespace stan {
   namespace agrad {
 
+    // forward declaration of chainable
     class chainable;
 
     // FIXME: manage all this as a single singleton (thread local)

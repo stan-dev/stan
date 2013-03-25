@@ -8,7 +8,8 @@
 
 namespace stan {
   namespace agrad {
-
+    
+    // forward declaration of var
     class var;
 
     /**
