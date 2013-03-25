@@ -3,23 +3,23 @@
 
 #include <stan/agrad/var_stack.hpp>
 #include <stan/agrad/chainable.hpp>
-#include <stan/agrad/vari.hpp>
+#include <stan/agrad/vari/vari.hpp>
 #include <stan/agrad/var.hpp>
 
 #include <stan/agrad/functions/print_stack.hpp>
-#include <stan/agrad/functions/op_v_vari.hpp>
-#include <stan/agrad/functions/op_vv_vari.hpp>
-#include <stan/agrad/functions/op_vd_vari.hpp>
-#include <stan/agrad/functions/op_dv_vari.hpp>
-#include <stan/agrad/functions/op_vvv_vari.hpp>
-#include <stan/agrad/functions/op_vvd_vari.hpp>
-#include <stan/agrad/functions/op_vdv_vari.hpp>
-#include <stan/agrad/functions/op_vdd_vari.hpp>
-#include <stan/agrad/functions/op_dvv_vari.hpp>
-#include <stan/agrad/functions/op_dvd_vari.hpp>
-#include <stan/agrad/functions/op_ddv_vari.hpp>
 
-#include <stan/agrad/functions/precomp_v_vari.hpp>
+#include <stan/agrad/vari/op_v_vari.hpp>
+#include <stan/agrad/vari/op_vv_vari.hpp>
+#include <stan/agrad/vari/op_vd_vari.hpp>
+#include <stan/agrad/vari/op_dv_vari.hpp>
+#include <stan/agrad/vari/op_vvv_vari.hpp>
+#include <stan/agrad/vari/op_vvd_vari.hpp>
+#include <stan/agrad/vari/op_vdv_vari.hpp>
+#include <stan/agrad/vari/op_vdd_vari.hpp>
+#include <stan/agrad/vari/op_dvv_vari.hpp>
+#include <stan/agrad/vari/op_dvd_vari.hpp>
+#include <stan/agrad/vari/op_ddv_vari.hpp>
+#include <stan/agrad/vari/precomp_v_vari.hpp>
 
 
 #include <cmath>

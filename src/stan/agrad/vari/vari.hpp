@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__VARI_HPP__
-#define __STAN__AGRAD__VARI_HPP__
+#ifndef __STAN__AGRAD__VARI__VARI_HPP__
+#define __STAN__AGRAD__VARI__VARI_HPP__
 
 #include <ostream>
 
