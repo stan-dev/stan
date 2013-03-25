@@ -14,7 +14,7 @@ namespace stan {
       
     public:
       
-      virtual void evolve(psPoint& z, H hamiltonian, const double epsilon) = 0;
+      virtual void evolve(ps_point& z, H hamiltonian, const double epsilon) = 0;
       
     };
     
@@ -23,15 +23,22 @@ namespace stan {
       
     public:
       
-      void evolve(psPoint& z, H hamiltonian, const double epsilon) {
-        beginUpdateP(z, hamiltonian, 0.5 * epsilon);
-        updateQ(z, hamiltonian, epsilon);
-        endUpdateP(z, hamiltonian, 0.5 * epsilon);
+      void evolve(ps_point& z, H hamiltonian, const double epsilon) {
+        
+        begin_update_p(z, hamiltonian, 0.5 * epsilon);
+        
+        update_q(z, hamiltonian, epsilon);
+        hamiltonian.update(z);
+        
+        end_update_p(z, hamiltonian, 0.5 * epsilon);
+        
       }
       
-      virtual void beginUpdateP(psPoint& z, H hamiltonian, double epsilon) = 0;
-      virtual void updateQ(psPoint& z, H hamiltonian, double epsilon) = 0;
-      virtual void endUpdateP(psPoint& z, H hamiltonian, double epsilon) = 0;
+      virtual void begin_update_p(ps_point& z, H hamiltonian, double epsilon) = 0;
+      virtual void update_q(ps_point& z, H hamiltonian, double epsilon) = 0;
+      virtual void end_update_p(ps_point& z, H hamiltonian, double epsilon) = 0;
+      
+    protected:
       
     };
     
@@ -40,18 +47,20 @@ namespace stan {
       
     public:
       
-      void beginUpdateP(psPoint& z, H hamiltonian, double epsilon) { 
+      void begin_update_p(ps_point& z, H hamiltonian, double epsilon) { 
         z.p += epsilon * hamiltonian.dphi_dq(z); 
       }
       
-      void updateQ(psPoint& z, H hamiltonian, double epsilon) { 
+      void update_q(ps_point& z, H hamiltonian, double epsilon) { 
         Eigen::Map<Eigen::VectorXd> q(&(z.q[0]), z.q.size());
         q += epsilon * hamiltonian.dtau_dp(z); 
       }
       
-      void endUpdateP(psPoint& z, H hamiltonian, double epsilon) { 
+      void end_update_p(ps_point& z, H hamiltonian, double epsilon) { 
         z.p += epsilon * hamiltonian.dphi_dq(z); 
       }
+      
+    private:
       
     };
     

@@ -15,11 +15,11 @@ namespace stan {
 
   namespace mcmc {
 
-    class psPoint {
+    class ps_point {
 
     public:
     
-      psPoint(int n): q(n), r(n), p(Eigen::VectorXd::Zero(n)) {};
+      ps_point(int n): q(n), r(n), p(Eigen::VectorXd::Zero(n)) {};
         
       std::vector<double> q;
       std::vector<int> r;

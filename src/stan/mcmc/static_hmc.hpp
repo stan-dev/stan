@@ -70,7 +70,7 @@ namespace stan {
     template <typename M, class BaseRNG>
     void unit_metric_hmc<M, BaseRNG>::sample(std::vector<double>& q, std::vector<int>& r) {
       
-      psPoint z(q.size());
+      ps_point z(q.size());
       z.q = q;
       z.r = r;
       
@@ -78,6 +78,7 @@ namespace stan {
       for (int i = 0; i < u.size(); ++i) u(i) = this->_rand_unit_gaus();
       
       this->_hamiltonian.sampleP(z, u);
+      this->_hamiltonian.init(z);
       
       double H0 = this->_hamiltonian.H(z);
       
@@ -126,7 +127,7 @@ namespace stan {
       
       _hamiltonian.Minv = MatrixXd::Ones(model.dim(), model.dim());
       
-      psPoint z(model.dim());
+      ps_point z(model.dim());
       z.q = q;
       _hamiltonian.sampleP(z.p, RNG);
       
