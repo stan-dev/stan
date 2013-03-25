@@ -16,15 +16,6 @@ namespace stan {
 
   namespace prob {
 
-    /**
-     * @param y (Sequence of) scalar(s).
-     * @param mu (Sequence of) location parameter(s)
-     * @param beta (Sequence of) scale parameter(s)
-     * @return The log of the product of the densities.
-     * @throw std::domain_error if the scale is not positive.
-     * @tparam T_y Underlying type of scalar in sequence.
-     * @tparam T_loc Type of location parameter.
-     */
     template <bool propto, 
               typename T_y, typename T_loc, typename T_scale,
               class Policy>
@@ -139,17 +130,6 @@ namespace stan {
       return gumbel_log<false>(y,mu,beta,stan::math::default_policy());
     }
 
-    /**
-     * 
-     * @param y A scalar variate.
-     * @param mu The location of the gumbel distriubtion
-     * @param beta The scale of the gumbel distriubtion
-     * @return The gumbel cdf evaluated at the specified arguments.
-     * @tparam T_y Type of y.
-     * @tparam T_loc Type of mean parameter.
-     * @tparam T_scale Type of standard deviation paramater.
-     * @tparam Policy Error-handling policy.
-     */
     template <typename T_y, typename T_loc, typename T_scale,
               class Policy>
     typename return_type<T_y,T_loc,T_scale>::type
