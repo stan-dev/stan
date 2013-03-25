@@ -17,19 +17,6 @@ namespace stan {
 
   namespace prob {
 
-    /**
-     * <p>The result log probability is defined to be the sum of the
-     * log probabilities for each observation/mean/deviation triple.
-     * @param y (Sequence of) scalar(s).
-     * @param mu (Sequence of) location parameter(s)
-     * for the skew_normal distribution.
-     * @param sigma (Sequence of) scale parameters for the skew_normal
-     * distribution.
-     * @return The log of the product of the densities.
-     * @throw std::domain_error if the scale is not positive.
-     * @tparam T_y Underlying type of scalar in sequence.
-     * @tparam T_loc Type of location parameter.
-     */
     template <bool propto, 
               typename T_y, typename T_loc, typename T_scale, typename T_shape,
               class Policy>
@@ -109,23 +96,25 @@ namespace stan {
 	const double pi_dbl = boost::math::constants::pi<double>();
 
         // log probability
+        if (include_summand<propto>::value)
+	  logp -=  0.5 * log(2.0 * pi_dbl);
         if (include_summand<propto, T_scale>::value)
-          logp -= log(sigma_dbl) + log(pi_dbl);
+          logp -= log(sigma_dbl);
         if (include_summand<propto,T_y, T_loc, T_scale>::value)
-          logp += (-y_minus_mu_over_sigma * y_minus_mu_over_sigma / 2);
+          logp -= y_minus_mu_over_sigma * y_minus_mu_over_sigma / 2.0;
         if (include_summand<propto,T_y,T_loc,T_scale,T_shape>::value)
-          logp += log(1.0 + boost::math::erf(alpha_dbl * y_minus_mu_over_sigma / std::sqrt(2)));
+          logp += log(boost::math::erfc(-alpha_dbl * y_minus_mu_over_sigma / std::sqrt(2.0)));
 
         // gradients
-        double scaled_diff = inv_sigma[n] * y_minus_mu_over_sigma;
+        double deriv_logerf = 2.0 / std::sqrt(pi_dbl) * exp(-alpha_dbl * y_minus_mu_over_sigma / std::sqrt(2.0) * alpha_dbl * y_minus_mu_over_sigma / std::sqrt(2.0)) / (1 + boost::math::erf(alpha_dbl * y_minus_mu_over_sigma / std::sqrt(2.0)));
         if (!is_constant_struct<T_y>::value)
-          operands_and_partials.d_x1[n] += -scaled_diff + 2.0 * (-alpha_dbl / (sigma_dbl * std::sqrt(2))) * (std::exp(-(alpha_dbl * y_minus_mu_over_sigma / std::sqrt(2) * alpha_dbl * y_minus_mu_over_sigma / std::sqrt(2)))) / (std::sqrt(pi_dbl) * (1.0 + boost::math::erf(alpha_dbl * y_minus_mu_over_sigma / std::sqrt(2))));
+          operands_and_partials.d_x1[n] += -y_minus_mu_over_sigma / sigma_dbl + deriv_logerf * alpha_dbl / (sigma_dbl * std::sqrt(2.0)) ;
         if (!is_constant_struct<T_loc>::value)
-          operands_and_partials.d_x2[n] += scaled_diff - (alpha_dbl / (sigma_dbl * std::sqrt(2))) * (std::exp(-(alpha_dbl * y_minus_mu_over_sigma / std::sqrt(2) * alpha_dbl * y_minus_mu_over_sigma / std::sqrt(2)))) / (std::sqrt(pi_dbl) * (1.0 + boost::math::erf(alpha_dbl * y_minus_mu_over_sigma / std::sqrt(2))));
+          operands_and_partials.d_x2[n] += y_minus_mu_over_sigma / sigma_dbl + deriv_logerf * -alpha_dbl / (sigma_dbl * std::sqrt(2.0));
         if (!is_constant_struct<T_scale>::value)
-          operands_and_partials.d_x3[n] += 1 / sigma_dbl + (y_minus_mu_over_sigma * y_minus_mu_over_sigma / sigma_dbl) - (alpha_dbl * y_minus_mu_over_sigma / (sigma_dbl * std::sqrt(2)))* (std::exp(-(alpha_dbl * y_minus_mu_over_sigma / std::sqrt(2) * alpha_dbl * y_minus_mu_over_sigma / std::sqrt(2)))) / (std::sqrt(pi_dbl) * (1.0 + boost::math::erf(alpha_dbl * y_minus_mu_over_sigma / std::sqrt(2))));
+          operands_and_partials.d_x3[n] += -1.0 / sigma_dbl + y_minus_mu_over_sigma * y_minus_mu_over_sigma / sigma_dbl - deriv_logerf * y_minus_mu_over_sigma * alpha_dbl / (sigma_dbl * std::sqrt(2.0));
 	if (!is_constant_struct<T_shape>::value)
-          operands_and_partials.d_x4[n] += (y_minus_mu_over_sigma / std::sqrt(2)) * (std::exp(-(alpha_dbl * y_minus_mu_over_sigma / std::sqrt(2) * alpha_dbl * y_minus_mu_over_sigma / std::sqrt(2)))) / (std::sqrt(pi_dbl) * (1.0 + boost::math::erf(alpha_dbl * y_minus_mu_over_sigma / std::sqrt(2))));
+          operands_and_partials.d_x4[n] += deriv_logerf * y_minus_mu_over_sigma / std::sqrt(2.0);
       }
       return operands_and_partials.to_var(logp);
     }
@@ -154,120 +143,75 @@ namespace stan {
       return skew_normal_log<false>(y,mu,sigma,alpha,stan::math::default_policy());
     }
 
+    // template <typename T_y, typename T_loc, typename T_scale, typename T_shape,
+    //           class Policy>
+    // typename return_type<T_y,T_loc,T_scale,T_shape>::type
+    // skew_normal_cdf(const T_y& y, const T_loc& mu, const T_scale& sigma, const T_shape& alpha,
+    //          const Policy&) {
+    //   static const char* function = "stan::prob::skew_normal_cdf(%1%)";
 
-    /**
-     * Calculates the skew_normal cumulative distribution function for the given
-     * variate, location, and scale.
-     * 
-     * \f$\Phi(x) = \frac{1}{\sqrt{2 \pi}} \int_{-\inf}^x e^{-t^2/2} dt\f$.
-     * 
-     * Errors are configured by policy.  All variables must be finite
-     * and the scale must be strictly greater than zero.
-     * 
-     * @param y A scalar variate.
-     * @param mu The location of the skew_normal distribution.
-     * @param sigma The scale of the skew_normal distriubtion
-     * @return The unit skew_normal cdf evaluated at the specified arguments.
-     * @tparam T_y Type of y.
-     * @tparam T_loc Type of mean parameter.
-     * @tparam T_scale Type of standard deviation paramater.
-     * @tparam Policy Error-handling policy.
-     */
-    template <typename T_y, typename T_loc, typename T_scale, typename T_shape,
-              class Policy>
-    typename return_type<T_y,T_loc,T_scale,T_shape>::type
-    skew_normal_cdf(const T_y& y, const T_loc& mu, const T_scale& sigma, const T_shape& alpha,
-             const Policy&) {
-      static const char* function = "stan::prob::skew_normal_cdf(%1%)";
-
-      using stan::math::check_positive;
-      using stan::math::check_finite;
-      using stan::math::check_not_nan;
-      using stan::math::check_consistent_sizes;
+    //   using stan::math::check_positive;
+    //   using stan::math::check_finite;
+    //   using stan::math::check_not_nan;
+    //   using stan::math::check_consistent_sizes;
 
 
-      typename return_type<T_y, T_loc, T_scale, T_shape>::type cdf(1);
-      // check if any vectors are zero length
-      if (!(stan::length(y) 
-            && stan::length(mu) 
-            && stan::length(sigma)
-	    && stan::length(alpha)))
-        return cdf;
+    //   typename return_type<T_y, T_loc, T_scale, T_shape>::type cdf(1);
+    //   // check if any vectors are zero length
+    //   if (!(stan::length(y) 
+    //         && stan::length(mu) 
+    //         && stan::length(sigma)
+    // 	    && stan::length(alpha)))
+    //     return cdf;
 
-      if (!check_not_nan(function, y, "Random variable", &cdf, Policy()))
-        return cdf;
-      if (!check_finite(function, mu, "Location parameter", &cdf, Policy()))
-        return cdf;
-      if (!check_not_nan(function, sigma, "Scale parameter", 
-                         &cdf, Policy()))
-        return cdf;
-      if (!check_positive(function, sigma, "Scale parameter", 
-                          &cdf, Policy()))
-        return cdf;
-      if (!check_finite(function, alpha, "Shape parameter", &cdf, Policy()))
-        return cdf;
-      if (!check_not_nan(function, alpha, "Shape parameter", 
-                         &cdf, Policy()))
-        return cdf;
-      if (!(check_consistent_sizes(function,
-                                   y,mu,sigma,alpha,
-                                   "Random variable","Location parameter","Scale parameter","Shape paramter",
-                                   &cdf, Policy())))
-        return cdf;
+    //   if (!check_not_nan(function, y, "Random variable", &cdf, Policy()))
+    //     return cdf;
+    //   if (!check_finite(function, mu, "Location parameter", &cdf, Policy()))
+    //     return cdf;
+    //   if (!check_not_nan(function, sigma, "Scale parameter", 
+    //                      &cdf, Policy()))
+    //     return cdf;
+    //   if (!check_positive(function, sigma, "Scale parameter", 
+    //                       &cdf, Policy()))
+    //     return cdf;
+    //   if (!check_finite(function, alpha, "Shape parameter", &cdf, Policy()))
+    //     return cdf;
+    //   if (!check_not_nan(function, alpha, "Shape parameter", 
+    //                      &cdf, Policy()))
+    //     return cdf;
+    //   if (!(check_consistent_sizes(function,
+    //                                y,mu,sigma,alpha,
+    //                                "Random variable","Location parameter","Scale parameter","Shape paramter",
+    //                                &cdf, Policy())))
+    //     return cdf;
 
-      VectorView<const T_y> y_vec(y);
-      VectorView<const T_loc> mu_vec(mu);
-      VectorView<const T_scale> sigma_vec(sigma);
-      VectorView<const T_shape> alpha_vec(alpha);
-      size_t N = max_size(y, mu, sigma, alpha);
+    //   VectorView<const T_y> y_vec(y);
+    //   VectorView<const T_loc> mu_vec(mu);
+    //   VectorView<const T_scale> sigma_vec(sigma);
+    //   VectorView<const T_shape> alpha_vec(alpha);
+    //   size_t N = max_size(y, mu, sigma, alpha);
       
-      for (size_t n = 0; n < N; n++) {
-        cdf *= 1 / 2 * (1 + boost::math::erf((y_vec[n] - mu_vec[n]) / (std::sqrt(2) * sigma_vec[n]))) - 2 * boost::math::owens_t((y_vec[n] - mu_vec[n]) / sigma_vec[n], alpha_vec[n]);
-      }
-      return cdf;
-    }
+    //   for (size_t n = 0; n < N; n++) {
+    //     cdf *= 0.5 * (boost::math::erfc(-(y_vec[n] - mu_vec[n]) / (std::sqrt(2) * sigma_vec[n]))) - 2 * boost::math::owens_t((y_vec[n] - mu_vec[n]) / sigma_vec[n], alpha_vec[n]);
+    //   }
+    //   return cdf;
+    // }
 
-    template <typename T_y, typename T_loc, typename T_scale, typename T_shape>
-    inline
-    typename return_type<T_y, T_loc, T_scale, T_shape>::type
-    skew_normal_cdf(const T_y& y, const T_loc& mu, const T_scale& sigma, const T_shape& alpha) {
-      return skew_normal_cdf(y,mu,sigma,alpha,stan::math::default_policy());
-    }
+    // template <typename T_y, typename T_loc, typename T_scale, typename T_shape>
+    // inline
+    // typename return_type<T_y, T_loc, T_scale, T_shape>::type
+    // skew_normal_cdf(const T_y& y, const T_loc& mu, const T_scale& sigma, const T_shape& alpha) {
+    //   return skew_normal_cdf(y,mu,sigma,alpha,stan::math::default_policy());
+    // }
 
-
-    template <class RNG>
-    inline double
-    skew_normal_rng(double mu,
-		    double sigma,
-		    double alpha,
-		    RNG& rng) {
-      double sig = alpha / std::sqrt(1 + alpha * alpha);
-      double pi = boost::math::constants::pi<double>();
-      double skew = (4.0 - pi) / 2.0 * (sig * std::sqrt(2.0 / pi)) * (sig * std::sqrt(2.0 / pi)) * (sig * std::sqrt(2.0 / pi)) / (std::sqrt(1 - 2 * sig * sig / pi) * (1 - 2 * sig * sig / pi));
-      sig = skew / std::sqrt(1 + skew * skew);
-
-      double w = 5.0;
-      double x = 0.0;
-      double y = 0.0;
-      while(w >= 1)
-	{
-	  x = stan::prob::uniform_rng(-1.0,2.0,rng);
-	  y = stan::prob::uniform_rng(-1.0,2.0,rng);
-	  w = x * x + y * y;
-	}
-
-      w = std::sqrt(-2.0 * std::log10(w) / w);
-
-      double u0 = x * w;
-      double v = y * w;
-
-      double u1 = sig * u0 + std::sqrt(1.0 - sig * sig) * v;
-
-      if(u0 >= 0.0)
-	return u1 * sigma + mu;
-      else
-	return -u1 * sigma + mu;
-    }
+    // template <class RNG>
+    // inline double
+    // skew_normal_rng(double mu,
+    // 		    double sigma,
+    // 		    double alpha,
+    // 		    RNG& rng) {
+    //   return mu;
+    // }
   }
 }
 #endif
