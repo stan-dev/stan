@@ -2,6 +2,8 @@
 #define __STAN__AGRAD__AGRAD_SPECIAL_FUNCTIONS_HPP__
 
 #include <stan/agrad/error_handling.hpp>
+#include <stan/agrad/vari/op_vector_vari.hpp>
+
 #include <stan/math.hpp>
 #include <stan/math/functions/Phi.hpp>
 #include <stan/math/functions/inv_cloglog.hpp>

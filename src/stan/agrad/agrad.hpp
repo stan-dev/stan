@@ -5,8 +5,7 @@
 #include <stan/agrad/chainable.hpp>
 #include <stan/agrad/vari/vari.hpp>
 #include <stan/agrad/var.hpp>
-
-#include <stan/agrad/functions/print_stack.hpp>
+#include <stan/agrad/print_stack.hpp>
 
 #include <stan/agrad/vari/op_v_vari.hpp>
 #include <stan/agrad/vari/op_vv_vari.hpp>

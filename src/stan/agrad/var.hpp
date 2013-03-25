@@ -2,7 +2,7 @@
 #define __STAN__AGRAD__VAR_HPP__
 
 #include <ostream>
-#include <stan/agrad/vari.hpp>
+#include <stan/agrad/vari/vari.hpp>
 
 namespace stan {
   namespace agrad {
