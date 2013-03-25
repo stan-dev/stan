@@ -19,6 +19,8 @@
 #include <stan/agrad/functions/op_dvd_vari.hpp>
 #include <stan/agrad/functions/op_ddv_vari.hpp>
 
+#include <stan/agrad/functions/precomp_v_vari.hpp>
+
 
 #include <cmath>
 #include <cstddef>
@@ -34,46 +36,7 @@ namespace stan {
 
   namespace agrad {
 
-    class chainable;
-    class vari;
-    class var;
-
     namespace {
-
-      // use for single precomputed partials
-      class precomp_v_vari : public op_v_vari {
-      protected:
-        double da_;
-      public:
-        precomp_v_vari(double val, vari* avi, double da)
-          : op_v_vari(val,avi),
-            da_(da) { 
-        }
-        void chain() {
-          avi_->adj_ += adj_ * da_;
-        }
-      };
-
-      // FIXME: memory leak -- copy vector to local memory
-      class op_vector_vari : public vari {
-      protected:
-        const size_t size_;
-        vari** vis_;
-      public:
-        op_vector_vari(double f, const std::vector<stan::agrad::var>& vs) :
-          vari(f),
-          size_(vs.size()) {
-          vis_ = (vari**) operator new(sizeof(vari*) * vs.size()); 
-          for (size_t i = 0; i < vs.size(); ++i)
-            vis_[i] = vs[i].vi_;
-        }
-        vari* operator[](size_t n) const {
-          return vis_[n];
-        }
-        size_t size() {
-          return size_;
-        }
-      };
 
       class neg_vari : public op_v_vari {
       public: 
