@@ -12,12 +12,16 @@ namespace stan {
     template <typename H>
     class integrator {
       
+    public:
+      
       virtual void evolve(psPoint& z, H hamiltonian, const double epsilon) = 0;
       
     };
     
     template <typename H>
     class leapfrog: public integrator<H> {
+      
+    public:
       
       void evolve(psPoint& z, H hamiltonian, const double epsilon) {
         beginUpdateP(z, hamiltonian, 0.5 * epsilon);
@@ -34,16 +38,19 @@ namespace stan {
     template <typename H>
     class expl_leapfrog: public leapfrog<H> {
       
+    public:
+      
       void beginUpdateP(psPoint& z, H hamiltonian, double epsilon) { 
-        z.p() += epsilon * _hamiltonian.dphi_dq(z); 
+        z.p += epsilon * hamiltonian.dphi_dq(z); 
       }
       
       void updateQ(psPoint& z, H hamiltonian, double epsilon) { 
-        z.q() += epsilon * _hamiltonian.dtau_dp(z); 
+        Eigen::Map<Eigen::VectorXd> q(&(z.q[0]), z.q.size());
+        q += epsilon * hamiltonian.dtau_dp(z); 
       }
       
-      void beginUpdateP(psPoint& z, H hamiltonian, double epsilon) { 
-        z.p() += epsilon * _hamiltonian.dphi_dq(z); 
+      void endUpdateP(psPoint& z, H hamiltonian, double epsilon) { 
+        z.p += epsilon * hamiltonian.dphi_dq(z); 
       }
       
     };

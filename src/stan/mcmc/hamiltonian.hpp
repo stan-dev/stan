@@ -1,10 +1,9 @@
 #ifndef __STAN__MCMC__HAMILTONIAN__BETA__
 #define __STAN__MCMC__HAMILTONIAN__BETA__
 
-#include <stan/model/prob_grad.hpp>
-
-#include <stan/mcmc/hmc_base.hpp>
 #include <stan/mcmc/util.hpp>
+
+#include <Eigen/Dense>
 
 namespace stan {
 
@@ -20,7 +19,7 @@ namespace stan {
       ~base_hamiltonian() {}; 
       
       virtual double T(psPoint& z) = 0;
-      double V(psPoint& z) { - _model.log_prob(z.q, NULL); }
+      double V(psPoint& z) { - _model.log_prob(z.q, z.r); }
       
       virtual double tau(psPoint& z) = 0;
       virtual double phi(psPoint& z) = 0;
@@ -34,9 +33,9 @@ namespace stan {
       // phi = 0.5 * log | Lambda (q) | + V(q)
       virtual Eigen::VectorXd dphi_dq(psPoint& z) = 0;
       
-      virtual void sampleP(psPoint& z, VectorXd& rand_unit_gaus) = 0;
+      virtual void sampleP(psPoint& z, Eigen::VectorXd& rand_unit_gaus) = 0;
       
-    private: 
+    protected: 
       
         M _model;
       
@@ -48,20 +47,20 @@ namespace stan {
       
     public:
       
-      unit_metric(M& m): base_hamiltonian(m), _g(m.num_params_r()) {};
+      unit_metric(M& m): base_hamiltonian<M>(m), _g(m.num_params_r()) {};
       ~unit_metric() {};
       
       double T(psPoint& z);
       
       double tau(psPoint& z) { return T(z); }
-      double phi(psPoint& z) { return V(z); }
+      double phi(psPoint& z) { return this->V(z); }
       
       Eigen::VectorXd dtau_dq(psPoint& z);
       Eigen::VectorXd dtau_dp(psPoint& z);
       
       Eigen::VectorXd dphi_dq(psPoint& z);
       
-      void sampleP(psPoint& z, VectorXd& rand_unit_gaus);      
+      void sampleP(psPoint& z, Eigen::VectorXd& rand_unit_gaus);      
       
     private:
       
@@ -75,23 +74,27 @@ namespace stan {
     }
     
     template <typename M>
-    double unit_metric<M>::dtau_dq(psPoint& z) {
-      return VectorXd::Zero(_model.num_params_r());
+    Eigen::VectorXd unit_metric<M>::dtau_dq(psPoint& z) {
+      return Eigen::VectorXd::Zero(this->_model.num_params_r());
     }
     
     template <typename M>
-    double unit_metric<M>::dtau_dp(psPoint& z) {
-      return z.p();
+    Eigen::VectorXd unit_metric<M>::dtau_dp(psPoint& z) {
+      return z.p;
     }
     
     template <typename M>
-    double unit_metric<M>::dphi_dq(psPoint& z) {
-      _model.grad_log_prog(z.q, NULL, g);
-      return g;
+    Eigen::VectorXd unit_metric<M>::dphi_dq(psPoint& z) {
+      
+      std::vector<double> g(this->_model.num_params_r());
+      this-> _model.grad_log_prob(z.q, z.r, g);
+      Eigen::Map<Eigen::VectorXd> eigen_g(&g[0], g.size());
+      _g = - eigen_g;
+      return _g;
     }
     
     template <typename M>
-    double unit_metric<M>::sampleP(psPoint& z, VectorXd& rand_unit_gaus) {
+    void unit_metric<M>::sampleP(psPoint& z, Eigen::VectorXd& rand_unit_gaus) {
       z.p = rand_unit_gaus;
     }
     

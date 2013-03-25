@@ -1,5 +1,5 @@
-#ifndef __STAN__MCMC__HAMILTONIAN__BETA__
-#define __STAN__MCMC__HAMILTONIAN__BETA__
+#ifndef __STAN__MCMC__HMCBASE__BETA__
+#define __STAN__MCMC__HMCBASE__BETA__
 
 #include <ctime>
 
@@ -8,7 +8,6 @@
 #include <boost/random/normal_distribution.hpp>
 #include <boost/random/uniform_01.hpp>
 
-#include <stan/mcmc/adaptive_sampler.hpp>
 #include <stan/model/prob_grad.hpp>
 #include <stan/mcmc/util.hpp>
 
@@ -20,28 +19,28 @@ namespace stan {
 
     public:
     
-      psPoint(int n): q(Eigen::VectorXd::Zero(n)), p(Eigen::VectorXd::Zero(n)) {};
+      psPoint(int n): q(n), r(n), p(Eigen::VectorXd::Zero(n)) {};
         
-      Eigen::VectorXd q;
+      std::vector<double> q;
+      std::vector<int> r;
       Eigen::VectorXd p;
 
     };
 
-    template <typename M, typename H, typename I, 
+    template <class M, template<class> class H, template<class> class I, 
               class BaseRNG = boost::mt19937>
-    class hmc_base
-    {
+    class hmc_base {
     
     public:
     
-      hmc_base(M &m, BaseRNG rng = BaseRNG(std::time(0))):hamiltonian(m), _rng(rng) {};
+      hmc_base(M &m, BaseRNG rng = BaseRNG(std::time(0)));
       
-      virtual void sample(psPoint& z, Eigen::VectorXd& rand_unit_gaus) = 0;
+      virtual void sample(std::vector<double>& q, std::vector<int>& r) = 0;
     
-    private:
+    protected:
     
-      I<H> _integrator;
-      H _hamiltonian;
+      I<H<M> > _integrator;
+      H<M> _hamiltonian;
       
       BaseRNG _rng;
       
@@ -51,13 +50,13 @@ namespace stan {
       // Uniform(0, 1) RNG
       boost::uniform_01<BaseRNG&> _rand_uniform;                
     
-    }
+    };
 
-    <template typename M, typename H, typename I<H>, class BaseRNG = boost::mt19937>
-    hmc::base<M, H, I, BaseRNG>::hmc_base(
-                                             M &m, 
-                                             BaseRNG rng = BaseRNG(std::time(0)))
-    :hamiltonian(m), 
+    template <class M, template<class> class H, template<class> class I, class BaseRNG>
+    hmc_base<M, H, I, BaseRNG>::hmc_base(
+                                         M &m, 
+                                         BaseRNG rng)
+    :_hamiltonian(m), 
     _rng(rng),
     _rand_unit_gaus(rng, boost::normal_distribution<>()),
     _rand_uniform(rng)

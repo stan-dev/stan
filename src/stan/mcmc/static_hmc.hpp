@@ -5,9 +5,11 @@
 
 #include <boost/random/mersenne_twister.hpp>
 
-#include <stan/model/prob_grad.hpp>
+#include <stan/model/prob_grad_ad.hpp>
 
 #include <stan/mcmc/hmc_base.hpp>
+#include <stan/mcmc/hamiltonian.hpp>
+#include <stan/mcmc/integrator.hpp>
 #include <stan/mcmc/util.hpp>
 
 namespace stan {
@@ -20,15 +22,18 @@ namespace stan {
     
     // Unit metric
     
-    template <class BaseRNG = boost::mt19937>
-    class unit_metric_hmc: public hmc_base<prob_grad, unit_metric, expl_leapfrog, BaseRNG> {
+    template <typename M, class BaseRNG = boost::mt19937>
+    class unit_metric_hmc: public hmc_base<M, 
+                                           unit_metric, 
+                                           expl_leapfrog, 
+                                           BaseRNG> {
       
     public:
       
-      unit_metric(prob_grad &m);
-      ~unit_metric() {};
+      unit_metric_hmc(M &m);
+      ~unit_metric_hmc() {};
       
-      void sample(VectorXd& q);
+      void sample(std::vector<double>& q, std::vector<int>& r);
       
       void set_stepsize_and_T(const double e, const double t) {
         _epsilon = e; _T = t; _update_L();
@@ -51,36 +56,39 @@ namespace stan {
       double _L;
       double _T;
       
-      _update_L() { _L = static_cast<int>(_T / _epsilon); }
+      void _update_L() { _L = static_cast<int>(_T / _epsilon); }
                         
     };
     
-    unit_metric_hmc::unit_metric_hmc(model& m):
-    hmc_base(m),
+    template <typename M, class BaseRNG>
+    unit_metric_hmc<M, BaseRNG>::unit_metric_hmc(M& m):
+    hmc_base<M, unit_metric, expl_leapfrog, BaseRNG>(m),
     _epsilon(0.1),
     _T(1)
     { _update_L(); }
     
-    void basicHMC::sample(VectorXd& q) {
+    template <typename M, class BaseRNG>
+    void unit_metric_hmc<M, BaseRNG>::sample(std::vector<double>& q, std::vector<int>& r) {
       
       psPoint z(q.size());
       z.q = q;
+      z.r = r;
       
-      VectorXd u(q.size());
-      for (int i = 0; i < u.size(); ++i) u(i) = _rand_unit_gaus();
+      Eigen::VectorXd u(q.size());
+      for (int i = 0; i < u.size(); ++i) u(i) = this->_rand_unit_gaus();
       
-      _hamiltonian.sampleP(z.p, u);
+      this->_hamiltonian.sampleP(z, u);
       
-      double H0 = _hamiltonian.H(z);
+      double H0 = this->_hamiltonian.H(z);
       
       for(int i = 0; i < _L; ++i)
       {
-        _integrator.evolve(z, _hamiltonian, _epsilon);
+        this->_integrator.evolve(z, this->_hamiltonian, _epsilon);
       }
       
-      double acceptProb = exp(H0 - _hamiltonian.H(z));
+      double acceptProb = exp(H0 - this->_hamiltonian.H(z));
       
-      if(_rand_uniform() < acceptProb) q = z.q();
+      if(this->_rand_uniform() < acceptProb) q = z.q;
       
       return;
       
