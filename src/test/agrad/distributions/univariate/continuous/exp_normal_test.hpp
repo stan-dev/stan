@@ -1,5 +1,6 @@
 // Arguments: Doubles, Doubles, Doubles, Doubles
 #include <stan/prob/distributions/univariate/continuous/exp_normal.hpp>
+#include <stan/agrad/special_functions.hpp>
 
 using std::vector;
 using std::numeric_limits;
@@ -13,10 +14,10 @@ public:
 
     param[0] = 0.0;           // y
     param[1] = 0.0;           // mu
-    param[2] = 0.0;           // sigma
+    param[2] = 1.0;           // sigma
     param[3] = 1.0;           // lambda
     parameters.push_back(param);
-    log_prob.push_back(-0.69314718055994530941723); // expected log_prob
+    log_prob.push_back(-1.34102164500926350577078307323252902154767190882327); // expected log_prob
 
     param[0] = 1.0;           // y
     param[1] = 0.0;           // mu
@@ -30,14 +31,14 @@ public:
     param[2] = 1.0;           // sigma
     param[3] = 2.0;           // lambda
     parameters.push_back(param);
-    log_prob.push_back(0.000380054901997); // expected log_prob
+    log_prob.push_back(-3.66695430596734551844348822271447899701975756228145); // expected log_prob
 
     param[0] = -3.5;          // y
     param[1] = 1.9;           // mu
     param[2] = 7.2;           // sigma
     param[3] = 2.9;           // lambda
     parameters.push_back(param);
-    log_prob.push_back(0.371564); // expected log_prob
+    log_prob.push_back(-3.2116852); // expected log_prob
   }
  
   void invalid_values(vector<size_t>& index, 
@@ -46,33 +47,33 @@ public:
     
     // mu
     index.push_back(1U);
-    value.push_back(numeric_limits<double>::infinity());
+    value.push_back(-numeric_limits<double>::infinity());
 
     index.push_back(1U);
-    value.push_back(-numeric_limits<double>::infinity());
+    value.push_back(numeric_limits<double>::infinity());
 
     // sigma
     index.push_back(2U);
-    value.push_back(0.0);
+    value.push_back(-numeric_limits<double>::infinity());
 
     index.push_back(2U);
     value.push_back(-1.0);
 
     index.push_back(2U);
-    value.push_back(-numeric_limits<double>::infinity());
+    value.push_back(0.0);
 
     //lambda
     index.push_back(3U);
-    value.push_back(0.0);
+    value.push_back(-numeric_limits<double>::infinity());
 
     index.push_back(3U);
     value.push_back(-1.0);
 
     index.push_back(3U);
-    value.push_back(numeric_limits<double>::infinity());
+    value.push_back(0.0);
 
     index.push_back(3U);
-    value.push_back(-numeric_limits<double>::infinity());
+    value.push_back(numeric_limits<double>::infinity());
   }
 
   template <typename T_y, typename T_loc, typename T_scale,
@@ -123,7 +124,7 @@ public:
     if (include_summand<true, T_inv_scale>::value)
       lp += log(lambda);
     if (include_summand<true,T_y,T_loc,T_scale,T_inv_scale>::value)
-      lp += lambda / 2.0 * (2.0 * mu + lambda * sigma * sigma - 2.0 * y) + log(1.0 - boost::math::erf((mu + lambda * sigma * sigma - y) / (sqrt(2) * sigma)));
+      lp += lambda * (mu + 0.5 * lambda * sigma * sigma - y) + log(stan::agrad::erfc((mu + lambda * sigma * sigma - y) / (sqrt(2.0) * sigma)));
     return lp;
   }
 };
