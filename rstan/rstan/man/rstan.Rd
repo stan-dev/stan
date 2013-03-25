@@ -14,7 +14,7 @@
   \tabular{ll}{
     Package: \tab rstan\cr
     Type: \tab Package\cr
-    Version: \tab 1.0.3\cr
+    Version: \tab 1.2.0\cr
     Date: \tab \Sexpr[eval=TRUE,results=rd,stage=build]{date()}\cr
     License: \tab GPL-3 \cr
   }
@@ -31,9 +31,11 @@
          \tab Michael Betancourt <betanalpha@gmail.com> \cr 
          \tab Marcus Brubaker <mbrubake@cs.toronto.edu>   \cr 
          \tab Bob Carpenter <carp@alias-i.com>   \cr 
+         \tab Yuanjun Gao <yg2312@columbia.edu>  \cr
          \tab Ben Goodrich <bg2382@columbia.edu> \cr 
          \tab Matt Hoffman <mdhoffma@cs.princeton.edu>  \cr 
          \tab Daniel Lee <bearlee@alum.mit.edu>  \cr 
+         \tab Peter Li <li.peter94@gmail.com>  \cr 
          \tab Michael Malecki <malecki@gmail.com>  \cr 
          \tab Andrew Gelman <gelman@stat.columbia.edu> \cr 
   } 
@@ -43,7 +45,7 @@
   } 
 }
 \references{
-  The Stan Development Team (2012) 
+  The Stan Development Team (\Sexpr[eval=TRUE,results=text,stage=build]{format(Sys.time(),'\%Y')})
   \emph{Stan Modeling Language User's Guide and Reference Manual}. 
   \url{http://mc-stan.org/}. 
 }

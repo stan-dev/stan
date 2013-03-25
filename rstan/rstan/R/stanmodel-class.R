@@ -22,7 +22,8 @@ setGeneric(name = "get_cxxflags",
            def = function(object, ...) { standardGeneric("get_cxxflags") })
 setMethod("get_cxxflags", "stanmodel", function(object) { object@dso@cxxflags }) 
 
-new_empty_stanfit <- function(stanmodel, model_pars = character(0), par_dims = list(), 
+new_empty_stanfit <- function(stanmodel, miscenv = new.env(), 
+                              model_pars = character(0), par_dims = list(), 
                               mode = 2L, sim = list(), 
                               inits = list(), stan_args = list()) { 
   new("stanfit",
@@ -35,7 +36,7 @@ new_empty_stanfit <- function(stanmodel, model_pars = character(0), par_dims = l
       stan_args = stan_args, 
       stanmodel = stanmodel, 
       date = date(),
-      .MISC = new.env()) 
+      .MISC = miscenv) 
 } 
 
 prep_call_sampler <- function(object) {
@@ -80,7 +81,7 @@ setMethod("optimizing", "stanmodel",
               message('failed to create the optimizer; optimization not done') 
               return(invisible(list(stanmodel = object)))
             } 
-            on.exit({rm(sampler); invisible(gc())}) 
+            # on.exit({rm(sampler); invisible(gc())}) 
             m_pars <- sampler$param_names() 
             idx_of_lp <- which(m_pars == "lp__")
             m_pars <- m_pars[-idx_of_lp]
@@ -135,12 +136,14 @@ setMethod("sampling", "stanmodel",
               } else data <- list()
             } 
 
-            sampler <- try(new(stan_fit_cpp_module, data)) 
+            sampler <- try(new(stan_fit_cpp_module, data, object@dso@.CXXDSOMISC$cxxfun)) 
+            sfmiscenv <- new.env()
             if (is(sampler, "try-error")) {
               message('failed to create the sampler; sampling not done') 
-              return(invisible(new_empty_stanfit(object)))
+              return(invisible(new_empty_stanfit(object, miscenv = sfmiscenv)))
             } 
-            on.exit({rm(sampler); invisible(gc())}) 
+            assign("stan_fit_instance", sampler, envir = sfmiscenv)
+            # on.exit({rm(sampler); invisible(gc())}) 
 
             m_pars = sampler$param_names() 
             p_dims = sampler$param_dims() 
@@ -149,13 +152,13 @@ setMethod("sampling", "stanmodel",
               m <- which(match(pars, m_pars, nomatch = 0) == 0)
               if (length(m) > 0) {
                 message("no parameter ", paste(pars[m], collapse = ', '), "; sampling not done") 
-                return(invisible(new_empty_stanfit(object, m_pars, p_dims, 2L))) 
+                return(invisible(new_empty_stanfit(object, miscenv = sfmiscenv, m_pars, p_dims, 2L))) 
               }
             }
 
             if (chains < 1) {
               message("the number of chains is less than 1; sampling not done") 
-              return(invisible(new_empty_stanfit(object, m_pars, p_dims, 2L))) 
+              return(invisible(new_empty_stanfit(object, miscenv = sfmiscenv, m_pars, p_dims, 2L))) 
             }
 
             args_list <- try(config_argss(chains = chains, iter = iter,
@@ -164,7 +167,7 @@ setMethod("sampling", "stanmodel",
    
             if (is(args_list, "try-error")) {
               message('error specification of arguments; sampling not done') 
-              return(invisible(new_empty_stanfit(object, m_pars, p_dims, 2L))) 
+              return(invisible(new_empty_stanfit(object, miscenv = sfmiscenv, m_pars, p_dims, 2L))) 
             }
 
             n_save <- 1 + (iter - 1) %/% thin 
@@ -183,7 +186,8 @@ setMethod("sampling", "stanmodel",
               samples_i <- try(sampler$call_sampler(args_list[[i]])) 
               if (is(samples_i, "try-error") || is.null(samples_i)) {
                 message("error occurred during calling the sampler; sampling not done") 
-                return(invisible(new_empty_stanfit(object, m_pars, p_dims, 2L))) 
+                return(invisible(new_empty_stanfit(object, miscenv = sfmiscenv,
+                                                   m_pars, p_dims, 2L))) 
               }
               samples[[i]] <- samples_i
             }
@@ -194,7 +198,8 @@ setMethod("sampling", "stanmodel",
             # test_gradient mode: no sample 
             if (attr(samples[[1]], 'test_grad')) {
               sim = list(num_failed = sapply(samples, function(x) x$num_failed))
-              return(invisible(new_empty_stanfit(object, m_pars, p_dims, 1L, sim = sim, 
+              return(invisible(new_empty_stanfit(object, miscenv = sfmiscenv,
+                                                 m_pars, p_dims, 1L, sim = sim, 
                                                  inits = inits_used, 
                                                  stan_args = args_list)))
             } 
@@ -231,7 +236,7 @@ setMethod("sampling", "stanmodel",
                           # keep a ref to avoid garbage collection
                           # (see comments in fun stan_model)
                         date = date(),
-                        .MISC = new.env()) 
+                        .MISC = sfmiscenv) 
              invisible(nfit)
           }) 
 

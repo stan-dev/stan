@@ -1,6 +1,30 @@
 \part{Built-In Functions}\label{built-in-functions.part}
 
 
+\chapter{Vectorization}
+
+\section{Vectorized Functions}\label{prob-vectorization.section}
+
+The normal probability function is specified with the signature
+%
+\begin{quote}
+\begin{Verbatim}
+normal_log(reals,reals,reals);
+\end{Verbatim}
+\end{quote}
+%
+The pseudo-type \code{reals} is used to indicate that an argument
+position may be vectorized.  Argument positions declared as
+\code{reals} may be filled with a real, a one-dimensional array, a
+vector, or a row-vector.  If there is more than one array or vector
+argument, their types can be anything but their size must match.  For
+instance, it is legal to use
+\code{normal\_log(row\_vector,vector,real)} as long as the vector and
+row vector have the same size.
+
+The pseudo-type \code{ints} is used for vectorized arguments.
+
+
 \chapter{Integer-Valued Basic Functions}
 
 \noindent
@@ -185,10 +209,10 @@ carried out by first promoting the integer value.
   greater than \farg{y} and 0 otherwise}
 \fitem{int}{operator>=}{int \farg{x}, int \farg{y}}{1 if \farg{x} is
   greater than or equal to \farg{y} and 0 otherwise}
-\fitem{int}{operator==}{int \farg{x}, int \farg{y}}{1 if \farg{x} is
+\fitem{int}{operator{==}}{int \farg{x}, int \farg{y}}{1 if \farg{x} is
   equal to \farg{y} and 0 otherwise}
-\fitem{int}{operator!=}{int \farg{x}, int \farg{y}}{1 if \farg{x} is
-  not equal to \farg{y} and 0 otherwise}
+\fitemindex{int}{operator!=}{int \farg{x}, int \farg{y}}{1 if \farg{x} is
+  not equal to \farg{y} and 0 otherwise}{operator"!"=}
 \end{description}
 %
 The real-valued argument versions are identical other than for
@@ -203,10 +227,10 @@ argument type.
   greater than \farg{y} and 0 otherwise}
 \fitem{int}{operator>=}{real \farg{x}, real \farg{y}}{1 if \farg{x} is
   greater than or equal to \farg{y} and 0 otherwise}
-\fitem{int}{operator==}{real \farg{x}, real \farg{y}}{1 if \farg{x} is
+\fitem{int}{operator{==}}{real \farg{x}, real \farg{y}}{1 if \farg{x} is
   equal to \farg{y} and 0 otherwise}
-\fitem{int}{operator!=}{real \farg{x}, real \farg{y}}{1 if \farg{x} is
-  not equal to \farg{y} and 0 otherwise}
+\fitemindex{int}{operator!=}{real \farg{x}, real \farg{y}}{1 if \farg{x} is
+  not equal to \farg{y} and 0 otherwise}{operator"!"=}
 \end{description}
 
 
@@ -223,23 +247,22 @@ tightly than the comparisons.  Thus an expression such as
 \Verb/(a~<~b)~||~(((c~>=~d)~&&~(e~!=~f)))/.
 %
 \begin{description}
-\fitem{int}{operator{!}}{int \farg{x}}{1 if \farg{x} is zero and 0 otherwise}
+\fitemindex{int}{operator!}{int \farg{x}}{1 if \farg{x} is zero and 0 otherwise}{operator"!}
 \fitem{int}{operator{\&\&}}{int \farg{x}, int \farg{y}}{1 if \farg{x}
   is unequal to 0 and \farg{y} is unequal to 0}
-\fitem{int}{operator{||}}{int \farg{x}, int \farg{y}}{1 if \farg{x}
-  is unequal to 0 or \farg{y} is unequal to 0}
+\fitemindex{int}{operator||}{int \farg{x}, int \farg{y}}{1 if \farg{x}
+  is unequal to 0 or \farg{y} is unequal to 0}{operator"|"|}
 \end{description}
 %
 There are corresponding real-argument versions.
 %
 \begin{description}
-\fitem{int}{operator{!}}{real \farg{x}}{1 if \farg{x} is zero and 0 otherwise}
+\fitemindex{int}{operator!}{real \farg{x}}{1 if \farg{x} is zero and 0 otherwise}{operator"!}
 \fitem{int}{operator{\&\&}}{real \farg{x}, real \farg{y}}{1 if \farg{x}
   is unequal to 0 and \farg{y} is unequal to 0}
-\fitem{int}{operator{||}}{real \farg{x}, real \farg{y}}{1 if \farg{x}
-  is unequal to 0 or \farg{y} is unequal to 0}
+\fitemindex{int}{operator||}{real \farg{x}, real \farg{y}}{1 if \farg{x}
+  is unequal to 0 or \farg{y} is unequal to 0}{operator"|"|}
 \end{description}
-
 
 
 \subsubsection{Boolean Operator Short Circuiting}
@@ -260,7 +283,7 @@ is zero, returns 0 without evaluating \code{b}.
 
 \begin{description}
 %
-\fitem{real}{if\_else}{int cond, real \farg{x}, real \farg{y}}{
+\fitem{real}{if\_else}{int \farg{cond}, real \farg{x}, real \farg{y}}{
 \farg{x} if \farg{cond} is non-zero, and \farg{y} otherwise; unlike
 the ternary operator in \Cpp, Stan's \code{if\_else} function always
 evaluates both arguments \farg{x} and \farg{y}}
@@ -490,12 +513,32 @@ The error function of \farg{x}}
 \fitem{real}{erfc}{real \farg{x}}{
 The complementary error function of \farg{x}}
 %
-\fitem{real}{Phi}{real \farg{x}}{
-The cumulative unit normal density function of \farg{x}}
+\fitemindexsort{real}{Phi}{real \farg{x}}{
+The cumulative unit normal density function of \farg{x}}{Phi}{phi}
 %
+\fitemindexsort{real}{Phi\_approx}{real \farg{x}}{
+Fast approximation of the cumulative unit normal density
+function of \farg{x}, defined by
+\[
+\Phi_{\mbox{\footnotesize approx}}(x) = \mbox{logit}^{-1}(0.07056 \,
+x^3 + 1.5976 \, x).
+\]
+This approximation has a maximum absolute error of 0.00014 and may
+be used instead of \code{Phi} for probit regression.  See
+\citep{BowlingEtAl:2009} for details.  
+}{Phi\_approx}{phi\_approx}
+
 \fitem{real}{binary\_log\_loss}{int \farg{y}, real \farg{y\_hat}}{
 The log loss of predicting probability \farg{y\_hat} for 
-binary outcome \farg{y}}
+binary outcome \farg{y};
+
+The log loss function for predicting $\hat{y} \in [0,1]$ for 
+boolean outcome $y \in \setlist{0,1}$ is defined by
+\[
+\mbox{\code{binary\_log\_loss}}(y,\hat{y})
+= y \log \hat{y} + (1 - y) \log (1 - \hat{y}).
+\]
+}
 %
 \end{description}
 
@@ -613,6 +656,34 @@ is empty}
 The natural logarithm of the sum of the exponentials of the elements in \farg{x}}
 \end{description}
 
+The size of an array or matrix can be obtained using the \code{dims()}
+function.  The \code{dims()} function is defined to take an argument
+consisting of any variable with up to 8 array dimensions (and up to 2
+additional matrix dimensions) and returns an array of integers with
+the dimensions.  For example, if two variables are declared as follows,
+\begin{quote}
+\begin{Verbatim}
+real x[7,8,9];
+matrix[8,9] y[7];
+\end{Verbatim}
+\end{quote}
+%
+then calling \code{dims(x)} or \code{dims(y)} returns an integer 
+array of size 3 containing the elements 7, 8, and 9 in that order. 
+
+The \code{size()} function extracts the number of elements in an
+array.  The function is overloaded to apply to arrays of integers,
+reals, matrices, vectors, and row vectors.
+
+\begin{description}
+\fitem{int[]}{dims}{\farg{T} \farg{x}}{Returns an integer array
+  containing the dimensions of \farg{x}; the type of the argument
+  \farg{T} can be any Stan type with up to 8 array dimensions.}
+%
+\fitem{int}{size}{\farg{T}[] \farg{x}}{Returns the number of elements
+  in the array \farg{x};  the type of the array \farg{T} can be 
+  anything type.}
+\end{description}
 
 \chapter{Matrix Operations}\label{matrix-operations.chapter}
 \noindent
@@ -639,6 +710,8 @@ in the row vector \farg{x}}
 \fitem{int}{cols}{matrix \farg{x}}{The number of columns
 in the matrix \farg{x}}
 \end{description}
+
+
 
 
 \section{Matrix Arithmetic Operators}
@@ -915,21 +988,20 @@ This is a specialization of tcrossprod(x) for lower-triangular matrices.}
 \begin{description}
   \fitem{matrix}{diag\_pre\_multiply}{vector \farg{v}, matrix
     \farg{m}}{Return the product of the diagonal matrix formed from
-    the vector \code{v} and the matrix \code{m}, i.e.,
-    \code{diag\_matrix(v) * m}.}
+    the vector \farg{v} and the matrix \farg{m}, i.e.,
+    \code{diag\_matrix(\farg{v})~*~\farg{m}}.}
 %
-  \fitem{matrix}{diag\_pre\_multiply}{row\_vector rv, matrix m}{Return
+  \fitem{matrix}{diag\_pre\_multiply}{row\_vector \farg{rv}, matrix \farg{m}}{Return
     the product of the diagonal matrix formed from the vector
-    \code{rv} and the matrix \code{m}, i.e., \code{diag\_matrix(rv) *
-      m}.}
+    \farg{rv} and the matrix \farg{m}, i.e., \code{diag\_matrix(\farg{rv})~*~\farg{m}}.}
 %
-  \fitem{matrix}{diag\_post\_multiply}{matrix m, vector v}{Return the
-    product of the matrix \code{m} and the diagonal matrix formed from
-    the vector \code{v}, i.e., \code{m * diag\_matrix(v)}.}
+  \fitem{matrix}{diag\_post\_multiply}{matrix \farg{m}, vector \farg{v}}{Return the
+    product of the matrix \farg{m} and the diagonal matrix formed from
+    the vector \farg{v}, i.e., \code{\farg{m}~*~diag\_matrix(\farg{v})}.}
 %
-\fitem{matrix}{diag\_post\_multiply}{matrix m, row\_vector rv}{Return the
-  product of the matrix \code{m} and the diagonal matrix fromed from
-  the the row vector \code{rv}, i.e., \code{m * diag\_matrix(rv)}.}
+\fitem{matrix}{diag\_post\_multiply}{matrix \farg{m}, row\_vector \farg{rv}}{Return the
+  product of the matrix \code{\farg{m}} and the diagonal matrix fromed from
+  the the row vector \code{\farg{rv}}, i.e., \code{\farg{m}~*~diag\_matrix(\farg{rv})}.}
 \end{description}
 
 
@@ -1082,7 +1154,7 @@ Block operations may be used to extract a sub-block of a matrix.
 \end{description}
 
 
-\section{Special Matrix Functions}
+\section{Special Matrix Functions}\label{softmax.section}
 
 The softmax function maps $\reals^K$ to the $K$-simplex by
 \[
@@ -1168,6 +1240,9 @@ required to be diagonal}
 \fitem{real}{determinant}{matrix \farg{A}}{
 The determinant of \farg{A}}
 %
+\fitem{real}{log\_determinant}{matrix \farg{A}}{
+The log of the absolute value of the determinant of \farg{A}}
+%
 \fitem{matrix}{inverse}{matrix \farg{A}}{
 The inverse of \farg{A}}
 %
@@ -1236,6 +1311,14 @@ If $\theta \in [0,1]$, then for $y \in \setlist{0,1}$,
 %
 \end{description}
 
+\begin{description}
+%
+\fitem{real}{bernoulli\_cdf}{ints \farg{y}, reals \farg{theta}}{The
+  Bernoulli cumulative distribution function of \farg{y} given chance of success
+  \farg{theta}}
+%
+\end{description}
+
 \subsection{Bernoulli Distribution, Logit Parameterization}
 
 \Stan also supplies a direct parameterization in terms of a
@@ -1273,18 +1356,90 @@ $\setlist{0,\ldots,N}$ for some upper bound $N$.
 
 \subsection{Binomial Distribution}
 
-If $N \in \nats$ and $\theta \in [0,1]$, then for $n \in
-\{0,\ldots,N\}$,
+Suppose $N \in \nats$ and $\theta \in [0,1]$, and $n \in
+\{0,\ldots,N\}$.  
+
+\subsubsection{Probability mass function}
 \[
 \distro{Binomial}(n|N,\theta)
 = {N \choose n} \theta^n (1 - \theta)^{N - n}.
 \]
 
+\subsubsection{Log probability mass function}
+%
+\begin{eqnarray*}
+\log \distro{Binomial}(n|N,\theta)
+& = &
+\log \Gamma(N+1) - \log \Gamma(n + 1) - \log \Gamma(N- n + 1)
+\\[4pt]
+& & { } + n \log \theta + (N - n) \log (1 - \theta), 
+\end{eqnarray*}
+%
+\subsubsection{Gradient of log probability mass function}
+%
+\[
+\frac{\partial}{\partial \theta} \log \distro{Binomial}(n|N,\theta)
+= \frac{n}{\theta}
+- \frac{N - n}{1 - \theta}
+\]
+\subsubsection{Stan Function}
+%
 \begin{description}
 %
-  \fitem{real}{binomial\_log}{int \farg{n}, int \farg{N}, real
+  \fitem{real}{binomial\_log}{ints \farg{n}, ints \farg{N}, reals
     \farg{theta}}{The log binomial probability mass of \farg{n}
     successes in \farg{N} trials given chance of success \farg{theta}}
+%
+  \fitem{real}{binomial\_cdf}{ints \farg{n}, ints \farg{N}, reals
+    \farg{theta}}{The binomial cumulative distribution function of \farg{n}
+    successes in \farg{N} trials given chance of success \farg{theta}}
+
+\end{description}
+
+
+\subsection{Binomial Distribution (Logit Parameterization)}
+
+Stan also provides a version of the binomial probability mass function
+distribution with the chance of success parameterized on the
+unconstrained logistic scale.  
+
+Suppose $N \in \nats$, $\alpha \in \reals$, and $n \in
+\{0,\ldots,N\}$.
+
+\subsubsection{Probability mass function}
+\begin{eqnarray*}
+\distro{BinomialLogit}(n|N,\alpha)
+& = & \distro{BinomialLogit}(n|N,\mbox{logit}^{-1}(\alpha))
+\\[6pt]
+& = & {N \choose n} \left( \mbox{logit}^{-1}(\alpha) \right)^{n}
+                    \left( 1 - \mbox{logit}^{-1}(\alpha) \right)^{N - n}.
+\end{eqnarray*}
+%
+\subsubsection{Log probability mass function}
+\begin{eqnarray*}
+\log \distro{BinomialLogit}(n|N,\alpha)
+& = &
+\log \Gamma(N+1) - \log \Gamma(n + 1) - \log \Gamma(N- n + 1)
+\\[4pt]
+& & { } + n \log \mbox{logit}^{-1}(\alpha) + (N - n) \log \left( 1 -
+  \mbox{logit}^{-1}(\alpha) \right), 
+\end{eqnarray*}
+%
+\subsubsection{Gradient log probability mass function}
+%
+\[
+\frac{\partial}{\partial \alpha} \log \distro{BinomialLogit}(n|N,\alpha)
+= \frac{n}{\mbox{logit}^{-1}(-\alpha)}
+- \frac{N - n}{\mbox{logit}^{-1}(\alpha)}
+\]
+%
+\subsubsection{Stan Function}
+%
+\begin{description}
+%
+  \fitem{real}{binomial\_logit\_log}{ints \farg{n}, ints \farg{N}, reals
+    \farg{alpha}}{The log binomial probability mass of \farg{n}
+    successes in \farg{N} trials given logit-scaled chance of success \farg{alpha}}
 %
 \end{description}
 
@@ -1316,18 +1471,24 @@ where the beta function $\Betafun(x,y)$ is defined for $x \in
   (plus one) of \farg{alpha} and prior failure count (plus one) of
   \farg{beta}}
 %
+\fitem{real}{beta\_binomial\_cdf}{ints \farg{n}, ints \farg{N}, reals
+  \farg{alpha}, reals \farg{beta}}{The beta-binomial cumulative
+  distribution function
+  of \farg{n} successes in \farg{N} trials given prior success count
+  (plus one) of \farg{alpha} and prior failure count (plus one) of
+  \farg{beta}}
 \end{description}
 
 
 \subsection{Hypergeometric Distribution}
 
 If $a \in \nats$, $b \in \nats$, and $N \in \setlist{0,\ldots,a+b}$,
-then for $n \in \setlist{0,\ldots,\min(a,N)}$, 
+then for $n \in \setlist{\max(0,N-b),\ldots,\min(a,N)}$, 
 \[
 \distro{Hypergeometric}(n|N,a,b)
 =
 \frac{\normalsize{a \choose n} {b \choose {N - n}}}
-     {\normalsize{{m + n} \choose N}}.
+     {\normalsize{{a + b} \choose N}}.
 \]
 
 \begin{description}
@@ -1399,12 +1560,39 @@ If $\alpha \in \posreals$ and $\beta \in \posreals$, then for $n \in
 \nats$,
 \[
 \distro{NegativeBinomial}(n|\alpha,\beta)
-= 
+ = 
 {{n + \alpha - 1} \choose {\alpha - 1}}
 \,
 \left( \frac{\beta}{\beta+1} \right)^{\!\alpha}
 \,
 \left( \frac{1}{\beta + 1} \right)^{\!n} \!.
+\]
+\begin{eqnarray*}
+\log \distro{NegativeBinomial}(n|\alpha,\beta)
+& = & \log \Gamma(n + \alpha) 
+  - \log \Gamma(n + 1)
+  - \log \Gamma(\alpha)
+\\[4pt]
+& & 
+  {} + \alpha \left(\log \beta - \log (\beta + 1) \right)
+  - n \log (\beta + 1)
+\end{eqnarray*}
+\[
+\frac{\partial}{\partial \alpha} 
+\log \distro{NegativeBinomial}(n|\alpha,\beta)
+= \Psi(n + \alpha)
+- \Psi(\alpha)
++ \log \beta
+- \log (\beta + 1)
+\]
+\[
+\frac{\partial}{\partial \beta} 
+\log \distro{NegativeBinomial}(n|\alpha,\beta)
+= \frac{\alpha}{\beta} - \frac{\alpha + n}{\beta + 1}
+\]
+where $\Psi$ is the digamma function, defined as
+\[
+\Psi(x) = \frac{\partial}{\partial x} \log \Gamma(x).
 \]
 
 \begin{description}
@@ -1413,6 +1601,11 @@ If $\alpha \in \posreals$ and $\beta \in \posreals$, then for $n \in
    \farg{alpha}, reals \farg{beta}}{The log negative binomial probability
    mass of \farg{n} given shape \farg{alpha} and inverse scale \farg{beta}}
 %
+ \fitem{real}{neg\_binomial\_cdf}{ints \farg{n}, reals
+   \farg{alpha}, reals \farg{beta}}{The negative binomial cumulative
+   distribution function
+   of \farg{n} given shape \farg{alpha} and inverse scale \farg{beta}}
+
 \end{description}
 
 
@@ -1432,6 +1625,10 @@ If $\lambda \in \posreals$, then for $n \in \nats$,
 \begin{description}
 \fitem{real}{poisson\_log}{ints \farg{n}, reals \farg{lambda}}{The
   log Poisson probability mass of \farg{n} given rate \farg{lambda}}
+
+\fitem{real}{poisson\_cdf}{ints \farg{n}, reals \farg{lambda}}{The
+  Poisson cumulative distribution function of \farg{n} given rate \farg{lambda}}
+
 \end{description}
 
 
@@ -1491,25 +1688,6 @@ where the multinomial coefficient is defined by
 The various continuous probability functions are organized by their
 support.
 
-\section{Vectorization}\label{prob-vectorization.section}
-
-The normal probability function is specified with the signature
-%
-\begin{quote}
-\begin{Verbatim}
-normal_log(reals,reals,reals);
-\end{Verbatim}
-\end{quote}
-%
-The pseudo-type \code{reals} is used to indicate that an argument
-position may be vectorized.  Argument positions declared as
-\code{reals} may be filled with a real, a one-dimensional array, a
-vector, or a row-vector.  If there is more than one array or vector
-argument, their types can be anything but their size must match.  For
-instance, it is legal to use
-\code{normal\_log(row\_vector,vector,real)} as long as the vector and
-row vector have the same size.
-
 \section{Univariate Continuous Probabilities}
 
 The univariate continuous probability distributions have support on all
@@ -1565,6 +1743,14 @@ then for $y \in \reals$,
     \farg{sigma}}
 \end{description}
 
+\begin{description}
+  \fitem{real}{student\_t\_cdf}{reals \farg{y}, reals \farg{nu}, reals
+    \farg{mu}, reals \farg{sigma}}{The Student-$t$ cumulative
+    distribution function of \farg{y}
+    given degrees of freedom \farg{nu}, location \farg{mu}, and scale
+    \farg{sigma}}
+\end{description}
+
 \subsection{Cauchy Distribution}
 
 If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in \reals$,
@@ -1583,6 +1769,9 @@ If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in \reals$,
  \farg{sigma}}{ The log of the Cauchy density of \farg{y} given location
  \farg{mu} and scale \farg{sigma}}
 %
+\fitem{real}{cauchy\_cdf}{reals \farg{y}, reals \farg{mu}, reals
+ \farg{sigma}}{ The Cauchy cumulative distribution function of \farg{y} given location
+ \farg{mu} and scale \farg{sigma}}
 \end{description}
 
 \subsection{Double Exponential (Laplace) Distribution}
@@ -1621,6 +1810,11 @@ reals \farg{sigma}}{ The log of the logistic density of \farg{y} given
 location \farg{mu} and scale \farg{sigma}}
 \end{description}
 
+\begin{description}
+\fitem{real}{logistic\_cdf}{reals \farg{y}, reals \farg{mu},
+reals \farg{sigma}}{ The logistic cumulative distribution function of \farg{y} given
+location \farg{mu} and scale \farg{sigma}}
+\end{description}
 
 \section{Positive Continuous Probabilities}
 
@@ -1697,6 +1891,12 @@ y^{-(\nu/2 - 1)}
   degrees of freedom \farg{nu}}
 \end{description}
 
+\begin{description}
+\fitem{real}{inv\_chi\_square\_cdf}{reals \farg{y}, reals
+  \farg{nu}}{The inverse Chi-squared cumulative distribution function of \farg{y} given
+  degrees of freedom \farg{nu}}
+\end{description}
+
 \subsection{Scaled Inverse Chi-Square Distribution}
 
 If $\nu \in \posreals$ and $\sigma \in \posreals$, then for $y \in
@@ -1725,6 +1925,13 @@ y^{-(\nu/2 + 1)}
     \farg{s}}
 \end{description}
 
+\begin{description}
+  \fitem{real}{scaled\_inv\_chi\_square\_cdf}{reals \farg{y}, reals
+    \farg{nu}, reals \farg{s}}{The scaled inverse Chi-square
+    cumulative distribution function
+    of \farg{y} given degrees of freedom \farg{nu} and scale
+    \farg{s}}
+\end{description}
 
 \subsection{Exponential Distribution}
 
@@ -1793,6 +2000,12 @@ y^{-(\alpha + 1)}
 \farg{alpha} and scale \farg{beta}}
 \end{description}
 
+\begin{description}
+\fitem{real}{inv\_gamma\_cdf}{reals \farg{y}, reals \farg{alpha}, reals
+\farg{beta}}{The inverse gamma cumulative distribution function of \farg{y} given shape
+\farg{alpha} and scale \farg{beta}}
+\end{description}
+
 \subsection{Weibull Distribution}
 
 % k = alpha   lambda = sigma
@@ -1844,8 +2057,11 @@ $y \in \posreals$,
   \fitem{real}{pareto\_log}{reals \farg{y}, reals \farg{y\_min}, reals
     \farg{alpha}}{The log of the Pareto density of \farg{y} given
     positive minimum value \farg{y\_min} and shape \farg{alpha}}
-\end{description}
 
+  \fitem{real}{pareto\_cdf}{reals \farg{y}, reals \farg{y\_min}, reals
+    \farg{alpha}}{The Pareto cumulative distribution function of \farg{y} given
+    positive minimum value \farg{y\_min} and shape \farg{alpha}}
+\end{description}
 
 
 \section{$[0,1]$ Continuous Probabilities}
@@ -1874,6 +2090,10 @@ where the beta function $\Betafun()$ is as defined in \refsection{betafun}
     given positive prior successes (plus one)
     \farg{alpha} and prior failures (plus one) \farg{beta}}
 %
+  \fitem{real}{beta\_cdf}{reals \farg{theta}, reals \farg{alpha}, reals
+    \farg{beta}}{The beta cumulative distribution function of \code{theta} in $[0,1]$
+    given positive prior successes (plus one)
+    \farg{alpha} and prior failures (plus one) \farg{beta}}
 \end{description}
 
 \section{Bounded Continuous Probabilities}
@@ -1961,6 +2181,25 @@ where $|\Sigma|$ is the absolute determinant of $\Sigma$.
  given location \farg{mu} and covariance matrix \farg{S}}
 %
 \end{description}
+
+\subsection{Multivariate Normal Distribution (Precision Parameterization)}
+
+If $K \in \nats$, $\mu \in \reals^K$, and $\Omega \in \reals^{K
+  \times K}$ is symmetric and positive definite, then for $y \in
+\reals^K$,
+\[
+\distro{MultiNormalPrecision}(y|\mu,\Omega)
+= \distro{MultiNormal}(y|\mu,\Sigma^{-1})
+\]
+
+\begin{description}
+%
+\fitem{real}{multi\_normal\_prec\_log}{vector \farg{y}, vector
+  \farg{mu}, matrix \farg{P}}{The log of the multivariate normal density of vector
+  \farg{y} given location \farg{mu} and precision \farg{P}}
+%
+\end{description}
+
 
 \subsection{Multivariate Normal Distribution (Cholesky Parameterization)}
 

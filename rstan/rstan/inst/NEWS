@@ -1,3 +1,23 @@
+Mar 13 2013
+1. Changes
+   * showing progress of sampling at the same line (using \r instead of \n)
+   * plot for stanfit allows multiple pages 
+2  New features 
+   * add rstan:::as.mcmc.list to convert stanfit object 
+     to coda object 
+
+Fri Feb 24 2013
+1. Bug fixes 
+   * NA's are created when converting too large integers during data
+     preprocessing
+   * plot when there is an array parameter of length 1
+2. New features 
+   * expose a model's log_prob and grad_log_prob function 
+     and add functions for transforming parameters between
+     constrained space and unconstrained space
+   * add a function monitor to summarize any mcmc samples given 
+     as a 3-d array (# iter * # chains * # parameters)
+
 Mon Dec  3 2012
 1. New features
    * add get_posterior_mean for stanfit to obtain the posterior

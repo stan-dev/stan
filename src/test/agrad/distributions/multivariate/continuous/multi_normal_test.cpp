@@ -14,6 +14,11 @@ void expect_propto(T_y y1, T_loc mu1, T_scale sigma1,
                   stan::prob::multi_normal_log<true>(y1,mu1,sigma1),
                   stan::prob::multi_normal_log<true>(y2,mu2,sigma2),
                   message);
+  expect_eq_diffs(stan::prob::multi_normal_prec_log<false>(y1,mu1,sigma1),
+                  stan::prob::multi_normal_prec_log<false>(y2,mu2,sigma2),
+                  stan::prob::multi_normal_prec_log<true>(y1,mu1,sigma1),
+                  stan::prob::multi_normal_prec_log<true>(y2,mu2,sigma2),
+                  message);
 }
 
 using stan::agrad::var;

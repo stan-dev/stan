@@ -6,7 +6,7 @@
 typedef stan::agrad::var AVAR;
 typedef std::vector<AVAR> AVEC;
 typedef std::vector<double> VEC;
-
+typedef Eigen::Matrix<double,-1,-1>::size_type size_type;
 
 AVEC createAVEC(AVAR x) {
   AVEC v;
@@ -26,6 +26,26 @@ AVEC createAVEC(AVAR x1, AVAR x2, AVAR x3) {
 AVEC createAVEC(AVAR x1, AVAR x2, AVAR x3, AVAR x4) {
   AVEC v = createAVEC(x1,x2,x3);
   v.push_back(x4);
+  return v;
+}
+AVEC createAVEC(AVAR x1, AVAR x2, AVAR x3, AVAR x4, AVAR x5) {
+  AVEC v = createAVEC(x1,x2,x3,x4);
+  v.push_back(x5);
+  return v;
+}
+AVEC createAVEC(AVAR x1, AVAR x2, AVAR x3, AVAR x4, AVAR x5, AVAR x6) {
+  AVEC v = createAVEC(x1,x2,x3,x4,x5);
+  v.push_back(x6);
+  return v;
+}
+AVEC createAVEC(AVAR x1, AVAR x2, AVAR x3, AVAR x4, AVAR x5, AVAR x6, AVAR x7) {
+  AVEC v = createAVEC(x1,x2,x3,x4,x5,x6);
+  v.push_back(x7);
+  return v;
+}
+AVEC createAVEC(AVAR x1, AVAR x2, AVAR x3, AVAR x4, AVAR x5, AVAR x6, AVAR x7, AVAR x8) {
+  AVEC v = createAVEC(x1,x2,x3,x4,x5,x6,x7);
+  v.push_back(x8);
   return v;
 }
 
@@ -61,6 +81,57 @@ VEC cgradvec(AVAR f, AVEC x) {
   VEC g;
   f.grad(x,g);
   return g;
+}
+
+
+TEST(AgradMatrix, fill) {
+  using stan::agrad::fill;
+  using std::vector;
+  using Eigen::Matrix;
+  using Eigen::Dynamic;
+
+  AVAR x;
+  AVAR y = 10;
+  fill(x,y);
+  EXPECT_FLOAT_EQ(10.0, x.val());
+
+  AVEC z(2);
+  AVAR a = 15;
+  fill(z,a);
+  EXPECT_FLOAT_EQ(15.0, z[0].val());
+  EXPECT_FLOAT_EQ(15.0, z[1].val());
+  EXPECT_EQ(2U,z.size());
+
+  Matrix<AVAR,Dynamic,Dynamic> m(2,3);
+  fill(m,AVAR(12));
+  for (int i = 0; i < 2; ++i)
+    for (int j = 0; j < 3; ++j)
+      EXPECT_FLOAT_EQ(12.0, m(i,j).val());
+  
+  Matrix<AVAR,Dynamic,1> rv(3);
+  fill(rv,AVAR(13));
+  for (int i = 0; i < 3; ++i)
+    EXPECT_FLOAT_EQ(13.0, rv(i).val());
+
+  Matrix<AVAR,1,Dynamic> v(4);
+  fill(v,AVAR(22));
+  for (int i = 0; i < 4; ++i)
+    EXPECT_FLOAT_EQ(22.0, v(i).val());
+
+  vector<vector<AVAR> > d(3,vector<AVAR>(2));
+  fill(d,AVAR(54));
+  for (size_t i = 0; i < 3; ++i)
+    for (size_t j = 0; j < 2; ++j)
+      EXPECT_FLOAT_EQ(54, d[i][j].val());
+}
+TEST(AgradMatrix, fillDouble) {
+  using Eigen::Matrix;
+  using Eigen::Dynamic;
+  using stan::agrad::fill;
+  Matrix<double,Dynamic,1> y(3);
+  fill(y,3.0);
+  EXPECT_EQ(3,y.size());
+  EXPECT_FLOAT_EQ(3.0,y[0]);
 }
 
 
@@ -217,18 +288,74 @@ TEST(AgradMatrix,determinant) {
   using stan::agrad::matrix_v;
   using stan::math::determinant;
 
+  // expected from auto-diff/Eigen
+  AVEC x1 = createAVEC(0,1,2,3);
+  matrix_v v1(2,2);
+  v1 << x1[0], x1[1], x1[2], x1[3];
+  AVAR det1 = v1.determinant();
+  std::vector<double> g1;
+  det1.grad(x1,g1);
+  
+  // optimized in agrad::matrix
+  AVEC x2 = createAVEC(0,1,2,3);
+  matrix_v v2(2,2);
+  v2 << x2[0], x2[1], x2[2], x2[3];
+  AVAR det2 = determinant(v2);
+  std::vector<double> g2;
+  det2.grad(x2,g2);
+
+  EXPECT_FLOAT_EQ(det1.val(), det2.val());
+  EXPECT_EQ(g1.size(), g2.size());
+  for (size_t i = 0; i < g1.size(); ++i)
+    EXPECT_FLOAT_EQ(g1[i],g2[i]);
+}
+TEST(AgradMatrix,log_determinant_diff) {
+  using stan::agrad::matrix_v;
+  using stan::math::determinant;
+
+  // expected from auto-diff/Eigen
+  AVEC x1 = createAVEC(0,1,2,3);
+  matrix_v v1(2,2);
+  v1 << x1[0], x1[1], x1[2], x1[3];
+  AVAR det1 = log(fabs(v1.determinant()));
+  std::vector<double> g1;
+  det1.grad(x1,g1);
+  
+  // optimized in agrad::matrix
+  AVEC x2 = createAVEC(0,1,2,3);
+  matrix_v v2(2,2);
+  v2 << x2[0], x2[1], x2[2], x2[3];
+  AVAR det2 = log_determinant(v2);
+  std::vector<double> g2;
+  det2.grad(x2,g2);
+
+  EXPECT_FLOAT_EQ(det1.val(), det2.val());
+  EXPECT_EQ(g1.size(), g2.size());
+  for (size_t i = 0; i < g1.size(); ++i)
+    EXPECT_FLOAT_EQ(g1[i],g2[i]);
+}
+TEST(AgradMatrix,log_determinant) {
+  using stan::agrad::matrix_v;
+  using stan::math::log_determinant;
+  
   matrix_v v(2,2);
   v << 0, 1, 2, 3;
-
+  
   AVAR det;
-  det = determinant(v);
-  EXPECT_FLOAT_EQ(-2, det.val());
+  det = log_determinant(v);
+  EXPECT_FLOAT_EQ(std::log(2.0), det.val());
 }
 TEST(AgradMatrix,deteriminant_exception) {
   using stan::agrad::matrix_v;
   using stan::math::determinant;
 
   EXPECT_THROW(determinant(matrix_v(2,3)), std::domain_error);
+}
+TEST(AgradMatrix,log_deteriminant_exception) {
+  using stan::agrad::matrix_v;
+  using stan::math::log_determinant;
+  
+  EXPECT_THROW(log_determinant(matrix_v(2,3)), std::domain_error);
 }
 TEST(AgradMatrix,determinant_grad) {
   using stan::agrad::matrix_v;
@@ -254,6 +381,31 @@ TEST(AgradMatrix,determinant_grad) {
   EXPECT_FLOAT_EQ(-5.0,g[1]);
   EXPECT_FLOAT_EQ(-3.0,g[2]);
   EXPECT_FLOAT_EQ(2.0,g[3]);
+}
+TEST(AgradMatrix,log_determinant_grad) {
+  using stan::agrad::matrix_v;
+  using stan::math::log_determinant;
+  
+  matrix_v X(2,2);
+  AVAR a = 2.0;
+  AVAR b = 3.0;
+  AVAR c = 5.0;
+  AVAR d = 7.0;
+  X << a, b, c, d;
+  
+  AVEC x = createAVEC(a,b,c,d);
+  
+  AVAR f = log_determinant(X);
+  
+  // det = ad - bc
+  EXPECT_NEAR(0.0,f.val(),1E-12);
+  
+  VEC g;
+  f.grad(x,g);
+  EXPECT_FLOAT_EQ(-7.0,g[0]);
+  EXPECT_FLOAT_EQ(5.0,g[1]);
+  EXPECT_FLOAT_EQ(3.0,g[2]);
+  EXPECT_FLOAT_EQ(-2.0,g[3]);
 }
 TEST(AgradMatrix,determinant3by3) {
   // just test it can handle it
@@ -2072,7 +2224,7 @@ TEST(AgradMatrix,transpose_vector) {
 
   row_vector_v a_tr = transpose(a);
   EXPECT_EQ(a.size(),a_tr.size());
-  for (size_t i = 0; i < 3; ++i)
+  for (size_type i = 0; i < 3; ++i)
     EXPECT_FLOAT_EQ(a(i).val(),a_tr(i).val());
 
   VEC g = cgradvec(a_tr(1),x);
@@ -2092,7 +2244,7 @@ TEST(AgradMatrix,transpose_row_vector) {
 
   vector_v a_tr = transpose(a);
   EXPECT_EQ(a.size(),a_tr.size());
-  for (size_t i = 0; i < 3; ++i)
+  for (size_type i = 0; i < 3; ++i)
     EXPECT_FLOAT_EQ(a(i).val(),a_tr(i).val());
 
   VEC g = cgradvec(a_tr(1),x);
@@ -2156,6 +2308,144 @@ TEST(AgradMatrix,mdivide_left_val) {
   EXPECT_NEAR(1.0,I(1,1).val(),1.0e-12);
 }
 
+TEST(AgradMatrix,mdivide_left_grad_vv) {
+  using stan::math::matrix_d;
+  using stan::agrad::matrix_v;
+  using stan::math::mdivide_left;
+  using stan::math::multiply;
+  
+
+  matrix_d Ad(2,2), Ad_tmp(2,2);
+  matrix_d Bd(2,2), Bd_tmp(2,2);
+  matrix_d Cd(2,2);
+  
+  Ad << 2.0, 3.0, 
+  5.0, 7.0;
+  Bd << 12.0, 13.0, 
+  15.0, 17.0;
+  
+  size_type i,j,k;
+  for (i = 0; i < Bd.rows(); i++) {
+    for (j = 0; j < Bd.cols(); j++) {
+      matrix_v A(2,2);
+      matrix_v B(2,2);
+      matrix_v C;
+
+      for (k = 0; k < 4; k++) {
+        A(k) = Ad(k);
+        B(k) = Bd(k);
+      }
+      
+      C = mdivide_left(A,B);
+      AVEC x = createAVEC(A(0,0),A(1,0),A(0,1),A(1,1),
+                          B(0,0),B(1,0),B(0,1),B(1,1));
+
+      
+      VEC g;
+      C(i,j).grad(x,g);
+      
+      for (k = 0; k < 4; k++) {
+        Ad_tmp.setZero();
+        Ad_tmp(k) = 1.0;
+        Cd = -mdivide_left(Ad,multiply(Ad_tmp,mdivide_left(Ad,Bd)));
+        EXPECT_NEAR(Cd(i,j),g[k],1.0E-12);
+      }
+      for (k = 0; k < 4; k++) {
+        Bd_tmp.setZero();
+        Bd_tmp(k) = 1.0;
+        Cd = mdivide_left(Ad,Bd_tmp);
+        EXPECT_NEAR(Cd(i,j),g[4+k],1.0E-12);
+      }
+    }
+  }
+}
+
+TEST(AgradMatrix,mdivide_left_grad_dv) {
+  using stan::math::matrix_d;
+  using stan::agrad::matrix_v;
+  using stan::math::mdivide_left;
+  using stan::math::multiply;
+  
+  
+  matrix_d Ad(2,2), Ad_tmp(2,2);
+  matrix_d Bd(2,2), Bd_tmp(2,2);
+  matrix_d Cd(2,2);
+  
+  Ad << 2.0, 3.0, 
+  5.0, 7.0;
+  Bd << 12.0, 13.0, 
+  15.0, 17.0;
+  
+  size_type i,j,k;
+  for (i = 0; i < Bd.rows(); i++) {
+    for (j = 0; j < Bd.cols(); j++) {
+      matrix_v B(2,2);
+      matrix_v C;
+      
+      for (k = 0; k < 4; k++) {
+        B(k) = Bd(k);
+      }
+      
+      C = mdivide_left(Ad,B);
+      AVEC x = createAVEC(B(0,0),B(1,0),B(0,1),B(1,1));
+      
+      
+      VEC g;
+      C(i,j).grad(x,g);
+
+      for (k = 0; k < 4; k++) {
+        Bd_tmp.setZero();
+        Bd_tmp(k) = 1.0;
+        Cd = mdivide_left(Ad,Bd_tmp);
+        EXPECT_NEAR(Cd(i,j),g[k],1.0E-12);
+      }
+    }
+  }
+}
+
+TEST(AgradMatrix,mdivide_left_grad_vd) {
+  using stan::math::matrix_d;
+  using stan::agrad::matrix_v;
+  using stan::math::mdivide_left;
+  using stan::math::multiply;
+  
+  
+  matrix_d Ad(2,2), Ad_tmp(2,2);
+  matrix_d Bd(2,2), Bd_tmp(2,2);
+  matrix_d Cd(2,2);
+  
+  Ad << 2.0, 3.0, 
+  5.0, 7.0;
+  Bd << 12.0, 13.0, 
+  15.0, 17.0;
+  
+  size_type i,j,k;
+  for (i = 0; i < Bd.rows(); i++) {
+    for (j = 0; j < Bd.cols(); j++) {
+      matrix_v A(2,2);
+      matrix_v C;
+      
+      for (k = 0; k < 4; k++) {
+        A(k) = Ad(k);
+      }
+      
+      C = mdivide_left(A,Bd);
+      AVEC x = createAVEC(A(0,0),A(1,0),A(0,1),A(1,1));
+      
+      
+      VEC g;
+      C(i,j).grad(x,g);
+      
+      for (k = 0; k < 4; k++) {
+        Ad_tmp.setZero();
+        Ad_tmp(k) = 1.0;
+        Cd = -mdivide_left(Ad,multiply(Ad_tmp,mdivide_left(Ad,Bd)));
+        EXPECT_NEAR(Cd(i,j),g[k],1.0E-12);
+      }
+    }
+  }
+}
+
 TEST(AgradMatrix,mdivide_right_val) {
   using stan::math::matrix_d;
   using stan::agrad::matrix_v;
@@ -2198,7 +2488,7 @@ TEST(AgradMatrix,mdivide_left_tri_val) {
   matrix_d Ad(2,2);
   matrix_v I;
   
-  Av << 2.0, 0.0, 
+  Av << 2.0, 0.0,
     5.0, 7.0;
   Ad << 2.0, 0.0, 
     5.0, 7.0;
@@ -2251,6 +2541,299 @@ TEST(AgradMatrix,mdivide_left_tri_val) {
   EXPECT_NEAR(0.0,I(1,0).val(),1.0E-12);
   EXPECT_NEAR(1.0,I(1,1).val(),1.0e-12);
 }
+
+TEST(AgradMatrix,mdivide_left_tri_lower_grad_vv) {
+  using stan::math::matrix_d;
+  using stan::agrad::matrix_v;
+  using stan::math::mdivide_left_tri;
+  using stan::math::multiply;
+  
+  
+  matrix_d Ad(2,2), Ad_tmp(2,2);
+  matrix_d Bd(2,2), Bd_tmp(2,2);
+  matrix_d Cd(2,2);
+  
+  Ad << 2.0, 0.0, 
+  5.0, 7.0;
+  Bd << 12.0, 13.0, 
+  15.0, 17.0;
+  
+  size_type i,j,k,l;
+  for (i = 0; i < Bd.rows(); i++) {
+    for (j = 0; j < Bd.cols(); j++) {
+      matrix_v A(2,2);
+      matrix_v B(2,2);
+      matrix_v C;
+      VEC g;
+
+      for (k = 0; k < 4; k++) {
+        A(k) = Ad(k);
+        B(k) = Bd(k);
+      }
+      
+      C = mdivide_left_tri<Eigen::Lower>(A,B);
+      AVEC x = createAVEC(A(0,0),A(1,0),A(0,1),A(1,1),
+                          B(0,0),B(1,0),B(0,1),B(1,1));
+      C(i,j).grad(x,g);
+      
+      for (l = 0; l < Ad_tmp.cols(); l++) {
+        for (k = 0; k < Ad_tmp.rows(); k++) {
+          if (k >= l) {
+            Ad_tmp.setZero();
+            Ad_tmp(k,l) = 1.0;
+            Cd = -mdivide_left_tri<Eigen::Lower>(Ad,multiply(Ad_tmp,mdivide_left_tri<Eigen::Lower>(Ad,Bd)));
+            EXPECT_NEAR(Cd(i,j),g[k + l*Ad_tmp.rows()],1.0E-12);
+          }
+          else {
+            EXPECT_NEAR(0.0,g[k + l*Ad_tmp.rows()],1.0E-12);
+          }
+        }
+      }
+      for (k = 0; k < 4; k++) {
+        Bd_tmp.setZero();
+        Bd_tmp(k) = 1.0;
+        Cd = mdivide_left_tri<Eigen::Lower>(Ad,Bd_tmp);
+        EXPECT_NEAR(Cd(i,j),g[4+k],1.0E-12);
+      }
+    }
+  }
+}
+
+TEST(AgradMatrix,mdivide_left_tri_lower_grad_dv) {
+  using stan::math::matrix_d;
+  using stan::agrad::matrix_v;
+  using stan::math::mdivide_left_tri;
+  using stan::math::multiply;
+  
+  
+  matrix_d Ad(2,2), Ad_tmp(2,2);
+  matrix_d Bd(2,2), Bd_tmp(2,2);
+  matrix_d Cd(2,2);
+  
+  Ad << 2.0, 0.0, 
+  5.0, 7.0;
+  Bd << 12.0, 13.0, 
+  15.0, 17.0;
+  
+  size_type i,j,k;
+  for (i = 0; i < Bd.rows(); i++) {
+    for (j = 0; j < Bd.cols(); j++) {
+      matrix_v B(2,2);
+      matrix_v C;
+      VEC g;
+      
+      for (k = 0; k < 4; k++) {
+        B(k) = Bd(k);
+      }
+      
+      C = mdivide_left_tri<Eigen::Lower>(Ad,B);
+      AVEC x = createAVEC(B(0,0),B(1,0),B(0,1),B(1,1));
+      C(i,j).grad(x,g);
+
+      for (k = 0; k < 4; k++) {
+        Bd_tmp.setZero();
+        Bd_tmp(k) = 1.0;
+        Cd = mdivide_left_tri<Eigen::Lower>(Ad,Bd_tmp);
+        EXPECT_NEAR(Cd(i,j),g[k],1.0E-12);
+      }
+    }
+  }
+}
+
+TEST(AgradMatrix,mdivide_left_tri_lower_grad_vd) {
+  using stan::math::matrix_d;
+  using stan::agrad::matrix_v;
+  using stan::math::mdivide_left_tri;
+  using stan::math::multiply;
+  
+  
+  matrix_d Ad(2,2), Ad_tmp(2,2);
+  matrix_d Bd(2,2), Bd_tmp(2,2);
+  matrix_d Cd(2,2);
+  
+  Ad << 2.0, 0.0, 
+  5.0, 7.0;
+  Bd << 12.0, 13.0, 
+  15.0, 17.0;
+  
+  size_type i,j,k,l;
+  for (i = 0; i < Bd.rows(); i++) {
+    for (j = 0; j < Bd.cols(); j++) {
+      matrix_v A(2,2);
+      matrix_v C;
+      VEC g;
+      
+      for (k = 0; k < 4; k++) {
+        A(k) = Ad(k);
+      }
+      
+      C = mdivide_left_tri<Eigen::Lower>(A,Bd);
+      AVEC x = createAVEC(A(0,0),A(1,0),A(0,1),A(1,1));
+      C(i,j).grad(x,g);
+      
+      for (l = 0; l < Ad_tmp.cols(); l++) {
+        for (k = 0; k < Ad_tmp.rows(); k++) {
+          if (k >= l) {
+            Ad_tmp.setZero();
+            Ad_tmp(k,l) = 1.0;
+            Cd = -mdivide_left_tri<Eigen::Lower>(Ad,multiply(Ad_tmp,mdivide_left_tri<Eigen::Lower>(Ad,Bd)));
+            EXPECT_NEAR(Cd(i,j),g[k + l*Ad_tmp.rows()],1.0E-12);
+          }
+          else {
+            EXPECT_NEAR(0.0,g[k + l*Ad_tmp.rows()],1.0E-12);
+          }
+        }
+      }
+    }
+  }
+}
+
+TEST(AgradMatrix,mdivide_left_tri_upper_grad_vv) {
+  using stan::math::matrix_d;
+  using stan::agrad::matrix_v;
+  using stan::math::mdivide_left_tri;
+  using stan::math::multiply;
+  
+  
+  matrix_d Ad(2,2), Ad_tmp(2,2);
+  matrix_d Bd(2,2), Bd_tmp(2,2);
+  matrix_d Cd(2,2);
+  
+  Ad << 2.0, 3.0, 
+  0.0, 7.0;
+  Bd << 12.0, 13.0, 
+  15.0, 17.0;
+  
+  size_type i,j,k,l;
+  for (i = 0; i < Bd.rows(); i++) {
+    for (j = 0; j < Bd.cols(); j++) {
+      matrix_v A(2,2);
+      matrix_v B(2,2);
+      matrix_v C;
+      VEC g;
+      
+      for (k = 0; k < 4; k++) {
+        A(k) = Ad(k);
+        B(k) = Bd(k);
+      }
+      
+      C = mdivide_left_tri<Eigen::Upper>(A,B);
+      AVEC x = createAVEC(A(0,0),A(1,0),A(0,1),A(1,1),
+                          B(0,0),B(1,0),B(0,1),B(1,1));
+      C(i,j).grad(x,g);
+      
+      for (l = 0; l < Ad_tmp.cols(); l++) {
+        for (k = 0; k < Ad_tmp.rows(); k++) {
+          if (k <= l) {
+            Ad_tmp.setZero();
+            Ad_tmp(k,l) = 1.0;
+            Cd = -mdivide_left_tri<Eigen::Upper>(Ad,multiply(Ad_tmp,mdivide_left_tri<Eigen::Upper>(Ad,Bd)));
+            EXPECT_NEAR(Cd(i,j),g[k + l*Ad_tmp.rows()],1.0E-12);
+          }
+          else {
+            EXPECT_NEAR(0.0,g[k + l*Ad_tmp.rows()],1.0E-12);
+          }
+        }
+      }
+      for (k = 0; k < 4; k++) {
+        Bd_tmp.setZero();
+        Bd_tmp(k) = 1.0;
+        Cd = mdivide_left_tri<Eigen::Upper>(Ad,Bd_tmp);
+        EXPECT_NEAR(Cd(i,j),g[4+k],1.0E-12);
+      }
+    }
+  }
+}
+
+TEST(AgradMatrix,mdivide_left_tri_upper_grad_dv) {
+  using stan::math::matrix_d;
+  using stan::agrad::matrix_v;
+  using stan::math::mdivide_left_tri;
+  using stan::math::multiply;
+  
+  
+  matrix_d Ad(2,2), Ad_tmp(2,2);
+  matrix_d Bd(2,2), Bd_tmp(2,2);
+  matrix_d Cd(2,2);
+  
+  Ad << 2.0, 3.0, 
+  0.0, 7.0;
+  Bd << 12.0, 13.0, 
+  15.0, 17.0;
+  
+  size_type i,j,k;
+  for (i = 0; i < Bd.rows(); i++) {
+    for (j = 0; j < Bd.cols(); j++) {
+      matrix_v B(2,2);
+      matrix_v C;
+      VEC g;
+      
+      for (k = 0; k < 4; k++) {
+        B(k) = Bd(k);
+      }
+      
+      C = mdivide_left_tri<Eigen::Upper>(Ad,B);
+      AVEC x = createAVEC(B(0,0),B(1,0),B(0,1),B(1,1));
+      C(i,j).grad(x,g);
+      
+      for (k = 0; k < 4; k++) {
+        Bd_tmp.setZero();
+        Bd_tmp(k) = 1.0;
+        Cd = mdivide_left_tri<Eigen::Upper>(Ad,Bd_tmp);
+        EXPECT_NEAR(Cd(i,j),g[k],1.0E-12);
+      }
+    }
+  }
+}
+
+TEST(AgradMatrix,mdivide_left_tri_upper_grad_vd) {
+  using stan::math::matrix_d;
+  using stan::agrad::matrix_v;
+  using stan::math::mdivide_left_tri;
+  using stan::math::multiply;
+  
+  
+  matrix_d Ad(2,2), Ad_tmp(2,2);
+  matrix_d Bd(2,2), Bd_tmp(2,2);
+  matrix_d Cd(2,2);
+  
+  Ad << 2.0, 3.0, 
+  0.0, 7.0;
+  Bd << 12.0, 13.0, 
+  15.0, 17.0;
+  
+  size_type i,j,k,l;
+  for (i = 0; i < Bd.rows(); i++) {
+    for (j = 0; j < Bd.cols(); j++) {
+      matrix_v A(2,2);
+      matrix_v C;
+      VEC g;
+      
+      for (k = 0; k < 4; k++) {
+        A(k) = Ad(k);
+      }
+      
+      C = mdivide_left_tri<Eigen::Upper>(A,Bd);
+      AVEC x = createAVEC(A(0,0),A(1,0),A(0,1),A(1,1));
+      C(i,j).grad(x,g);
+      
+      for (l = 0; l < Ad_tmp.cols(); l++) {
+        for (k = 0; k < Ad_tmp.rows(); k++) {
+          if (k <= l) {
+            Ad_tmp.setZero();
+            Ad_tmp(k,l) = 1.0;
+            Cd = -mdivide_left_tri<Eigen::Upper>(Ad,multiply(Ad_tmp,mdivide_left_tri<Eigen::Upper>(Ad,Bd)));
+            EXPECT_NEAR(Cd(i,j),g[k + l*Ad_tmp.rows()],1.0E-12);
+          }
+          else {
+            EXPECT_NEAR(0.0,g[k + l*Ad_tmp.rows()],1.0E-12);
+          }
+        }
+      }
+    }
+  }
+}
+
 
 // // FIXME:  Fails in g++ 4.2 -- can't find agrad version of mdivide_left_tri
 // //         Works in clang++ and later g++
@@ -3192,12 +3775,12 @@ TEST(AgradMatrix,columns_dot_self) {
   Eigen::Matrix<AVAR,Eigen::Dynamic,Eigen::Dynamic> x;
   x = columns_dot_self(m2);
   EXPECT_NEAR(4.0,x(0,0).val(),1E-12);
-  EXPECT_NEAR(9.0,x(1,0).val(),1E-12);
+  EXPECT_NEAR(9.0,x(0,1).val(),1E-12);
   Eigen::Matrix<AVAR,Eigen::Dynamic,Eigen::Dynamic> m3(2,2);
   m3 << 2.0, 3.0, 4.0, 5.0;
   x = columns_dot_self(m3);
   EXPECT_NEAR(20.0,x(0,0).val(),1E-12);
-  EXPECT_NEAR(34.0,x(1,0).val(),1E-12);
+  EXPECT_NEAR(34.0,x(0,1).val(),1E-12);
 
   Eigen::Matrix<AVAR,Eigen::Dynamic,Eigen::Dynamic> vvv(3,1);
   assert_val_grad(vvv);
@@ -3418,6 +4001,34 @@ TEST(AgradMatrix, assign) {
   EXPECT_FLOAT_EQ(2,m_var(0,0).val());
   EXPECT_FLOAT_EQ(100,m_var(1,0).val());
   EXPECT_FLOAT_EQ(300,m_var(1,2).val());
+}
+TEST(AgradMatrix, assign_error) {
+  using stan::agrad::assign;
+  using std::vector;
+  using Eigen::Matrix;
+  using Eigen::Dynamic;
+  
+  VEC y_dbl(2);
+  y_dbl[0] = 2.0;
+  y_dbl[1] = 3.0;
+  
+  AVEC y_var(3);
+  EXPECT_THROW(assign(y_var,y_dbl), std::domain_error);
+  
+  Matrix<double,Dynamic,1> v_dbl(6);
+  v_dbl << 1,2,3,4,5,6;
+  Matrix<AVAR,Dynamic,1> v_var(5);
+  EXPECT_THROW(assign(v_var,v_dbl), std::domain_error);
+
+  Matrix<double,1,Dynamic> rv_dbl(3);
+  rv_dbl << 2, 4, 6;
+  Matrix<AVAR,1,Dynamic> rv_var(6);
+  EXPECT_THROW(assign(rv_var,rv_dbl), std::domain_error);
+
+  Matrix<double,Dynamic,Dynamic> m_dbl(2,3);
+  m_dbl << 2, 4, 6, 100, 200, 300;
+  Matrix<AVAR,Dynamic,Dynamic> m_var(1,1);
+  EXPECT_THROW(assign(m_var,m_dbl), std::domain_error);
 }
 
 TEST(AgradMatrix, UserCase1) {
@@ -4041,7 +4652,7 @@ void test_cumulative_sum() {
   EXPECT_EQ(c.size(), d.size());
   EXPECT_FLOAT_EQ(c[0].val(),d[0].val());
   VEC grad = cgrad(d[0], c[0]);
-  EXPECT_EQ(1,grad.size());
+  EXPECT_EQ(1U,grad.size());
   EXPECT_FLOAT_EQ(1.0,grad[0]);
 
   T e(2);
@@ -4051,7 +4662,7 @@ void test_cumulative_sum() {
   EXPECT_FLOAT_EQ(e[0].val(),f[0].val());
   EXPECT_FLOAT_EQ((e[0] + e[1]).val(), f[1].val());
   grad = cgrad(f[0],e[0],e[1]);
-  EXPECT_EQ(2,grad.size());
+  EXPECT_EQ(2U,grad.size());
   EXPECT_FLOAT_EQ(1.0,grad[0]);
   EXPECT_FLOAT_EQ(0.0,grad[1]);
 
@@ -4064,7 +4675,7 @@ void test_cumulative_sum() {
   EXPECT_FLOAT_EQ((g[0] + g[1] + g[2]).val(), h[2].val());
 
   grad = cgrad(h[2],g[0],g[1],g[2]);
-  EXPECT_EQ(3,grad.size());
+  EXPECT_EQ(3U,grad.size());
   EXPECT_FLOAT_EQ(1.0,grad[0]);
   EXPECT_FLOAT_EQ(1.0,grad[1]);
   EXPECT_FLOAT_EQ(1.0,grad[2]);
@@ -4112,16 +4723,16 @@ TEST(AgradMatrix, promoter) {
   vector<double> x(5);
   for (int i = 0; i < 5; ++i) x[i] = i * i;
   vector<double> y = promote_common<vector<double>, vector<double> >(x);
-  EXPECT_EQ(5,y.size());
+  EXPECT_EQ(5U,y.size());
   for (int i = 0; i < 5; ++i)
     EXPECT_FLOAT_EQ(x[i],y[i]);
   std::vector<var> z = 
     promote_common<std::vector<double>, std::vector<var> >(x);
-  EXPECT_EQ(5,z.size());
+  EXPECT_EQ(5U,z.size());
   for (int i = 0; i < 5; ++i)
     EXPECT_FLOAT_EQ(x[i],z[i].val());
   vector<var> w = promote_common<vector<var>, vector<var> >(z);
-  EXPECT_EQ(5,w.size());
+  EXPECT_EQ(5U,w.size());
   for (int i = 0; i < 5; ++i)
     EXPECT_FLOAT_EQ(x[i],w[i].val());
   
@@ -4180,7 +4791,47 @@ TEST(AgradMatrix, promoter) {
   for (int i = 0; i < 3; ++i)
     for (int j = 0; j < 4; ++j)
       EXPECT_FLOAT_EQ(A(i,j),D(i,j).val());
+
+
+}
+
+TEST(MathMatrix,getAssignRow) {
+  using Eigen::Matrix;
+  using Eigen::Dynamic;
+  using stan::math::get_base1;
+  using stan::math::get_base1_lhs;
+  using stan::agrad::assign;
+
+  Matrix<double,Dynamic,Dynamic> m(2,3);
+  m << 1, 2, 3, 4, 5, 6;
   
+  Matrix<double,1,Dynamic> rv(3);
+  rv << 10, 100, 1000;
+  
+  assign(get_base1_lhs(m,1,"m",1),rv);  
+  EXPECT_FLOAT_EQ(10.0, m(0,0));
+  EXPECT_FLOAT_EQ(100.0, m(0,1));
+  EXPECT_FLOAT_EQ(1000.0, m(0,2));
+}
+
+
+TEST(MathMatrix,getAssignRowVar) {
+  using stan::agrad::var;
+  using Eigen::Matrix;
+  using Eigen::Dynamic;
+  using stan::math::get_base1_lhs;
+  using stan::agrad::assign;
+
+  Matrix<var,Dynamic,Dynamic> m(2,3);
+  m << 1, 2, 3, 4, 5, 6;
+  
+  Matrix<double,1,Dynamic> rv(3);
+  rv << 10, 100, 1000;
+  
+  assign(get_base1_lhs(m,1,"m",1),rv);  
+  EXPECT_FLOAT_EQ(10.0, m(0,0).val());
+  EXPECT_FLOAT_EQ(100.0, m(0,1).val());
+  EXPECT_FLOAT_EQ(1000.0, m(0,2).val());
 
 }
 

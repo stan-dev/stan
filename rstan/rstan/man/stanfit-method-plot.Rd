@@ -12,7 +12,8 @@
 } 
 
 \usage{
-  \S4method{plot}{stanfit,missing}(x, pars, display_parallel = FALSE)
+  \S4method{plot}{stanfit,missing}(x, pars, display_parallel = FALSE, 
+  ask = TRUE, npars_per_page = 6)
 } 
 
 \section{Methods}{
@@ -31,6 +32,11 @@
     whether to plot the intervals with one line for each chain
     or one line for all chains. The default is \code{FALSE} so
     that only one interval line is drawn for each scalar parameter.} 
+  \item{ask}{\code{TRUE} or \code{FALSE}, to control (for the current device)
+    whether the user is prompted before starting a new page of output in the case
+    there are a lot of parameters (see \code{\link[grDevices]{devAskNewPage}}).}
+  \item{npars_per_page}{An integer to specify the number of parameters 
+    that would be plotted per page.}
 }
 \value{\code{NULL}} 
 \examples{\dontrun{

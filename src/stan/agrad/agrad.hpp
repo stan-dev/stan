@@ -21,6 +21,7 @@ namespace stan {
 
     // FIXME: manage all this as a single singleton (thread local)
     extern std::vector<chainable*> var_stack_; 
+    extern std::vector<chainable*> var_nochain_stack_; 
     extern memory::stack_alloc memalloc_;
 
     static void recover_memory();
@@ -42,9 +43,8 @@ namespace stan {
       chainable() { }
 
       /**
-       * Throws a logic exception.  Chainables are not destructible by
-       * clients because the vari stack manages all memory for
-       * auto-dif.
+       * Chainables are not destructible and should go on the function
+       * call stack or be allocated with operator new.
        */
       ~chainable() { 
         // handled automatically
@@ -71,7 +71,6 @@ namespace stan {
        */
       virtual void set_zero_adjoint() {
       }
-      
 
       /**
        * Allocate memory from the underlying memory pool.  This memory is
@@ -136,6 +135,15 @@ namespace stan {
         var_stack_.push_back(this);
       }
 
+      vari(const double x,bool stacked): 
+        val_(x),
+        adj_(0.0) {
+        if (stacked)
+          var_stack_.push_back(this);
+        else
+          var_nochain_stack_.push_back(this);
+      }
+      
       /**
        * Throw an illegal argument exception.
        *
@@ -144,7 +152,7 @@ namespace stan {
        * @throw Logic exception always.
        */
       ~vari() { 
-        throw std::logic_error("vari destruction handled automatically");
+        // throw std::logic_error("vari destruction handled automatically");
       }
 
       /**
@@ -745,6 +753,20 @@ namespace stan {
         }
       };
 
+      // use for single precomputed partials
+      class precomp_v_vari : public op_v_vari {
+      protected:
+        double da_;
+      public:
+        precomp_v_vari(double val, vari* avi, double da)
+          : op_v_vari(val,avi),
+            da_(da) { 
+        }
+        void chain() {
+          avi_->adj_ += adj_ * da_;
+        }
+      };
+
       // FIXME: memory leak -- copy vector to local memory
       class op_vector_vari : public vari {
       protected:
@@ -754,7 +776,7 @@ namespace stan {
         op_vector_vari(double f, const std::vector<stan::agrad::var>& vs) :
           vari(f),
           size_(vs.size()) {
-          vis_ = (vari**) operator new(sizeof(vari*[vs.size()]));
+          vis_ = (vari**) operator new(sizeof(vari*) * vs.size()); 
           for (size_t i = 0; i < vs.size(); ++i)
             vis_[i] = vs[i].vi_;
         }
@@ -1047,8 +1069,8 @@ namespace stan {
         }
         void chain() {
           double a_sq_plus_b_sq = (avi_->val_ * avi_->val_) + (bvi_->val_ * bvi_->val_);
-          avi_->adj_ += bvi_->val_ / a_sq_plus_b_sq;
-          bvi_->adj_ -= avi_->val_ / a_sq_plus_b_sq;
+          avi_->adj_ += adj_ * bvi_->val_ / a_sq_plus_b_sq;
+          bvi_->adj_ -= adj_ * avi_->val_ / a_sq_plus_b_sq;
         }
       };
 
@@ -1059,7 +1081,7 @@ namespace stan {
         }
         void chain() {
           double a_sq_plus_b_sq = (avi_->val_ * avi_->val_) + (bd_ * bd_);
-          avi_->adj_ += bd_ / a_sq_plus_b_sq;
+          avi_->adj_ += adj_ * bd_ / a_sq_plus_b_sq;
         }
       };
 
@@ -1070,7 +1092,7 @@ namespace stan {
         }
         void chain() {
           double a_sq_plus_b_sq = (ad_ * ad_) + (bvi_->val_ * bvi_->val_);
-          bvi_->adj_ -= ad_ / a_sq_plus_b_sq;
+          bvi_->adj_ -= adj_ * ad_ / a_sq_plus_b_sq;
         }
       };
 
@@ -1658,11 +1680,9 @@ namespace stan {
      * <code>var temp = a;  a = a + 1.0;  return temp;</code>
      *
      * @param a Variable to increment.
-     * @param dummy Unused dummy variable used to distinguish postfix operator
-     * from prefix operator.
      * @return Input variable. 
      */
-    inline var operator++(var& a, int dummy) {
+    inline var operator++(var& a, int /*dummy*/) {
       var temp(a);
       a.vi_ = new increment_vari(a.vi_);
       return temp;
@@ -1695,11 +1715,9 @@ namespace stan {
      * <code>var temp = a;  a = a - 1.0;  return temp;</code>
      *
      * @param a Variable to decrement.
-     * @param dummy Unused dummy variable used to distinguish suffix operator
-     * from prefix operator.
      * @return Input variable. 
      */
-    inline var operator--(var& a, int dummy) {
+    inline var operator--(var& a, int /*dummy*/) {
       var temp(a);
       a.vi_ = new decrement_vari(a.vi_);
       return temp;
@@ -2161,7 +2179,8 @@ namespace stan {
      * Recover memory used for all variables for reuse.
      */
     static void recover_memory() {
-      var_stack_.resize(0);
+      var_stack_.clear();
+      var_nochain_stack_.clear();
       memalloc_.recover_all();
     }
 
@@ -2185,19 +2204,11 @@ namespace stan {
      * derivative propagation.
      */
     static void grad(chainable* vi) {
-      // old with subtle *2 bug
-      // std::vector<chainable*>::iterator begin = var_stack_.begin();
-      // std::vector<chainable*>::iterator it = var_stack_.end();
-      // for (; (it >= begin) && (*it != vi); --it) ;
-
-      std::vector<chainable*>::iterator begin = var_stack_.begin();
-      std::vector<chainable*>::iterator it  = var_stack_.end();
-      if (begin == it) return; // nothing on stack
-      for (--it; (it >= begin) && (*it != vi); --it) ;
+      std::vector<chainable*>::reverse_iterator it;
 
       vi->init_dependent(); 
-      // propagate derivates for remaining vars
-      for (; it >= begin; --it)
+      // propagate derivates for vars
+      for (it = var_stack_.rbegin(); it < var_stack_.rend(); ++it)
         (*it)->chain();
     }
 
@@ -2207,6 +2218,8 @@ namespace stan {
     static void set_zero_all_adjoints() {
       for (size_t i = 0; i < var_stack_.size(); ++i)
         var_stack_[i]->set_zero_adjoint();
+      for (size_t i = 0; i < var_nochain_stack_.size(); ++i)
+        var_nochain_stack_[i]->set_zero_adjoint();
     }
 
     /**
@@ -2298,8 +2311,17 @@ namespace stan {
         vi_ = new divide_vd_vari(vi_,b);
         return *this;
       }
-  }
 
+    template <typename T>
+    inline bool is_uninitialized(T x) {
+      return false;
+    }
+    inline bool is_uninitialized(var x) {
+      return x.is_uninitialized();
+    }
+
+
+  }
 }
 
 

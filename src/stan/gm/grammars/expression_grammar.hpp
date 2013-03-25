@@ -24,7 +24,7 @@ namespace stan {
     template <typename Iterator>
     struct expression_grammar 
       : public boost::spirit::qi::grammar<Iterator,
-                                          expression(),
+                                          expression(var_origin),
                                           whitespace_grammar<Iterator> > {
 
       expression_grammar(variable_map& var_map,
@@ -40,27 +40,27 @@ namespace stan {
 
 
       boost::spirit::qi::rule<Iterator, 
-                              expression(), 
+                              expression(var_origin), 
                               whitespace_grammar<Iterator> > 
       expression_r;
 
       boost::spirit::qi::rule<Iterator, 
-                              expression(), 
+                              expression(var_origin), 
                               whitespace_grammar<Iterator> > 
       expression07_r;
 
       boost::spirit::qi::rule<Iterator, 
-                              expression(), 
+                              expression(var_origin), 
                               whitespace_grammar<Iterator> > 
       expression09_r;
 
       boost::spirit::qi::rule<Iterator, 
-                              expression(), 
+                              expression(var_origin), 
                               whitespace_grammar<Iterator> > 
       expression10_r;
 
       boost::spirit::qi::rule<Iterator, 
-                              expression(), 
+                              expression(var_origin), 
                               whitespace_grammar<Iterator> > 
       expression14_r;
 

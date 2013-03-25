@@ -20,7 +20,8 @@ in the limited format that Stan can read.
 \usage{
 stan_rdump(list, file = "", append = FALSE, 
           envir = parent.frame(),
-          width = options("width")$width)
+          width = options("width")$width, 
+          quiet = FALSE)
 }
 
 \arguments{
@@ -37,6 +38,10 @@ stan_rdump(list, file = "", append = FALSE,
   \item{envir}{The environment to search for objects.}
   \item{width}{The width for maximum characters on a line.  
     The output is broken into lines with \code{width.}}
+  \item{quiet}{Whether to suppress warning messages that would appear when 
+    a variable is not found or not supported for dumping (not being numeric
+    or it would not be converted to numeric) or a variable name is not allowed
+    in Stan.} 
 }
 
 \value{
@@ -45,9 +50,16 @@ stan_rdump(list, file = "", append = FALSE,
 }
 \note{
   \code{stan_rdump} only dumps numeric data, which first can be 
-  a scalar, vector, matrix, or (multidimensional) array.
-  Additional types supported are \code{data.frame} and 
-  a specially structured \code{list}.  
+  a scalar, vector, matrix, or (multidimensional) array.  Additional types
+  supported are \code{logical} (\code{TRUE} and \code{FALSE}), \code{factor},
+  \code{data.frame} and a specially structured \code{list}.  
+
+  The conversion for logical variables is to map \code{TRUE} to 1
+  and \code{FALSE} to 0.  For \code{factor} variable, function 
+  \code{as.integer} is used to do the conversion (If we want to transform a
+  factor \code{f} to approximately its original numeric values, see the help of
+  function \code{factor} and do the transformation before calling
+  \code{stan_rdump}). 
   In the case of \code{data.frame}, function 
   \code{data.matrix} is applied to the data frame before
   dumping. See the notes in \link{stan} for the specially
@@ -66,7 +78,7 @@ stan_rdump(list, file = "", append = FALSE,
 }
 
 \references{
-  Stan Development Team (2012) 
+  The Stan Development Team (\Sexpr[eval=TRUE,results=text,stage=build]{format(Sys.time(),'\%Y')})
   \emph{Stan Modeling Language User's Guide and Reference Manual}. 
   \url{http://mc-stan.org}. 
 }

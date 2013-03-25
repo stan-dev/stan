@@ -1,54 +1,48 @@
-#define _LOG_PROB_ binomial_log
 #include <stan/prob/distributions/univariate/discrete/binomial.hpp>
+#include <gtest/gtest.h>
+#include <boost/random/mersenne_twister.hpp>
+#include<boost/math/distributions.hpp>
 
-#include <test/prob/distributions/distribution_test_fixture.hpp>
-#include <test/prob/distributions/distribution_tests_2_discrete_1_param.hpp>
+TEST(ProbDistributionBinomiali, random) {
+  boost::random::mt19937 rng;
+  EXPECT_NO_THROW(stan::prob::binomial_rng(4,0.6,rng));
+}
 
-using std::vector;
-using std::log;
-using std::numeric_limits;
+TEST(ProbDistributionsBinomial, chiSquareGoodnessFitTest) {
+  boost::random::mt19937 rng;
+  int N = 10000;
+  int K = boost::math::round(2 * std::pow(N, 0.4));
+  boost::math::binomial_distribution<>dist (100,0.6);
+  boost::math::chi_squared mydist(K-1);
 
-class ProbDistributionsBinomial : public DistributionTest {
-public:
-  void valid_values(vector<vector<double> >& parameters,
-		    vector<double>& log_prob) {
-    vector<double> param(3);
+  int loc[K - 1];
+  for(int i = 1; i < K; i++)
+    loc[i - 1] = i - 1;
 
-    param[0] = 10;           // n
-    param[1] = 20;           // N
-    param[2] = 0.4;          // theta
-    parameters.push_back(param);
-    log_prob.push_back(-2.144372); // expected log_prob
-
-    param[0] = 5;            // n
-    param[1] = 15;           // N
-    param[2] = 0.8;          // theta
-    parameters.push_back(param);
-    log_prob.push_back(-9.20273); // expected log_prob
+  int count = 0;
+  int bin [K];
+  double expect [K];
+  for(int i = 0 ; i < K; i++)
+  {
+    bin[i] = 0;
+    expect[i] = N * pdf(dist, i);
   }
- 
-  void invalid_values(vector<size_t>& index, 
-		      vector<double>& value) {
-    // n
-    index.push_back(0U);
-    value.push_back(-1);
-    
-    
-    // N
-    index.push_back(1U);
-    value.push_back(-1);
-    
-    // theta
-    index.push_back(2U);
-    value.push_back(-1e-15);
-    
-    index.push_back(2U);
-    value.push_back(1.0+1e-15);
+  expect[K-1] = N * (1 - cdf(dist, K-2));
 
-  }
-};
+  while (count < N) {
+    int a = stan::prob::binomial_rng(100,0.6,rng);
+    int i = 0;
+    while (i < K-1 && a > loc[i]) 
+  ++i;
+    ++bin[i];
+    count++;
+   }
 
-INSTANTIATE_TYPED_TEST_CASE_P(ProbDistributionsBinomial,
-			      DistributionTestFixture,
-			      ProbDistributionsBinomial);
+  double chi = 0;
+
+  for(int j = 0; j < K; j++)
+    chi += ((bin[j] - expect[j]) * (bin[j] - expect[j]) / expect[j]);
+
+  EXPECT_TRUE(chi < quantile(complement(mydist, 1e-6)));
+}
 

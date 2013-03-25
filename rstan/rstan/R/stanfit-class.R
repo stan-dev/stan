@@ -24,7 +24,7 @@ print.stanfit <- function(x, pars = x@sim$pars_oi,
       "; warmup=", x@sim$warmup, "; thin=", x@sim$thin, "; ", 
       x@sim$n_save[1], " iterations saved.\n\n", sep = '') 
 
-  # round n_eff to 0 decimal point 
+  # round n_eff to integers
   s$summary[, 'n_eff'] <- round(s$summary[, 'n_eff'], 0)
 
   print(round(s$summary, digits_summary), ...) 
@@ -39,7 +39,7 @@ print.stanfit <- function(x, pars = x@sim$pars_oi,
 }  
 
 setMethod("plot", signature(x = "stanfit", y = "missing"), 
-          function(x, pars, display_parallel = FALSE) {
+          function(x, pars, display_parallel = FALSE, ask = TRUE, npars_per_page = 6) {
             if (x@mode == 1L) {
               cat("Stan model '", x@model_name, "' is of mode 'test_grad';\n",
                   "sampling is not conducted.\n", sep = '')
@@ -53,7 +53,17 @@ setMethod("plot", signature(x = "stanfit", y = "missing"),
             if (!exists("summary", envir = x@.MISC, inherits = FALSE))  
               assign("summary", summary_sim(x@sim), envir = x@.MISC)
             info <- list(model_name = x@model_name, model_date = x@date) 
-            stan_plot_inferences(x@sim, x@.MISC$summary, pars, info, display_parallel)
+            npars <- length(pars) 
+            sidx <- seq.int(1, npars, npars_per_page)
+            eidx <- c(sidx[-1] - 1, npars)
+            stan_plot_inferences(x@sim, x@.MISC$summary, pars[sidx[1]:eidx[1]], info, display_parallel)
+            sidx_len <- length(sidx) 
+            if (sidx_len == 1)  return(invisible(NULL))
+            
+            ask_old <- devAskNewPage(ask = ask)
+            on.exit(devAskNewPage(ask = ask_old))
+            for (i in 2:sidx_len)
+              stan_plot_inferences(x@sim, x@.MISC$summary, pars[sidx[i]:eidx[i]], info, display_parallel)
           }) 
 
 setGeneric(name = "get_stancode",
@@ -136,8 +146,12 @@ get_kept_samples2 <- function(n, sim) {
   # It seems this one is faster than get_kept_samples 
   # TODO: to understand why it is faster? 
   lst <- vector("list", sim$chains)
-  for (ic in 1:sim$chains)  
-    lst[[ic]] <- sim$samples[[ic]][[n]][-(1:sim$warmup2[ic])][sim$permutation[[ic]]]
+  for (ic in 1:sim$chains) { 
+    if (sim$warmup2[ic] > 0) 
+      lst[[ic]] <- sim$samples[[ic]][[n]][-(1:sim$warmup2[ic])][sim$permutation[[ic]]]
+    else 
+      lst[[ic]] <- sim$samples[[ic]][[n]][sim$permutation[[ic]]]
+  } 
   do.call(c, lst)
 }
 
@@ -150,6 +164,7 @@ get_samples <- function(n, sim, inc_warmup = TRUE) {
   # Returns:
   #   a list of chains for the nth parameter; each chain is an 
   #   element of the list.  
+  if (all(sim$warmup2 == 0)) inc_warmup <- TRUE # for the case warmup sample is discarded
   gcs <- function(s, inc_warmup, nw) {
     # Args:
     #   s: samples of all chains 
@@ -166,6 +181,8 @@ get_samples2 <- function(n, sim, inc_warmup = TRUE) {
   # serves the same purpose with get_samples, but with 
   # different implementation 
   # It seems that this one is fast. 
+  if (all(sim$warmup2 == 0)) inc_warmup <- TRUE # for the case warmup sample is discarded
+  npar <- length(n)
   lst <- vector("list", sim$chains)
   for (ic in 1:sim$chains) {
     lst[[ic]] <- 
@@ -482,6 +499,71 @@ if (!isGeneric("traceplot")) {
              def = function(object, ...) { standardGeneric("traceplot") }) 
 } 
 
+if (!isGeneric("log_prob")) {
+  setGeneric(name = "log_prob", 
+             def = function(object, ...) { standardGeneric("log_prob") }) 
+} 
+
+if (!isGeneric("unconstrain_pars")) {
+  setGeneric(name = "unconstrain_pars", 
+             def = function(object, ...) { standardGeneric("unconstrain_pars") }) 
+} 
+
+setMethod("unconstrain_pars", signature = "stanfit", 
+          function(object, pars) {
+            # pars is a list as specifying inits for a chain
+            if (!is_sfinstance_valid(object)) 
+              stop("the model object is not created or not valid")
+            object@.MISC$stan_fit_instance$unconstrain_pars(pars)
+          })
+
+if (!isGeneric("constrain_pars")) {
+  setGeneric(name = "constrain_pars", 
+             def = function(object, ...) { standardGeneric("constrain_pars") }) 
+} 
+
+setMethod("constrain_pars", signature = "stanfit", 
+          function(object, pars) {
+            # pars is a list as specifying inits for a chain
+            if (!is_sfinstance_valid(object)) 
+              stop("the model object is not created or not valid")
+            p <- object@.MISC$stan_fit_instance$constrain_pars(pars)
+            par_vector2list(p, object@model_pars[which(object@model_pars != 'lp__')],
+                            object@par_dims)
+          })
+
+
+setMethod("log_prob", signature = "stanfit", 
+          function(object, pars) {
+            if (!is_sfinstance_valid(object)) 
+              stop("the model object is not created or not valid")
+            object@.MISC$stan_fit_instance$log_prob(pars) 
+          }) 
+
+if (!isGeneric("get_num_upars")) {
+  setGeneric(name = "get_num_upars", 
+             def = function(object, ...) { standardGeneric("get_num_upars") }) 
+} 
+
+setMethod("get_num_upars", signature = "stanfit", 
+          function(object, pars) {
+            if (!is_sfinstance_valid(object)) 
+              stop("the model object is not created or not valid")
+            object@.MISC$stan_fit_instance$num_pars_unconstrained()
+          })
+
+if (!isGeneric("grad_log_prob")) {
+  setGeneric(name = "grad_log_prob", 
+             def = function(object, ...) { standardGeneric("grad_log_prob") }) 
+} 
+
+setMethod("grad_log_prob", signature = "stanfit", 
+          function(object, pars) {
+            if (!is_sfinstance_valid(object)) 
+              stop("the model object is not created or not valid")
+            object@.MISC$stan_fit_instance$grad_log_prob(pars) 
+          }) 
+
 setMethod("traceplot", signature = "stanfit", 
           function(object, pars, inc_warmup = TRUE, ask = FALSE, ...) { 
             # Args:
@@ -527,9 +609,20 @@ setMethod("traceplot", signature = "stanfit",
             invisible(NULL) 
           })  
 
+
 is_sf_valid <- function(sf) {
-  # Similar to is_sm_valid  
+  # Similar to is_sm_valid, this is only to test whether
+  # the compiled DSO is loaded 
   return(rstan:::is_sm_valid(sf@stanmodel)) 
+} 
+
+is_sfinstance_valid <- function(object) {
+  # Args
+  #  object: an instance of S4 class stanfit 
+  exists("stan_fit_instance", envir = object@.MISC, inherits = FALSE) && 
+  !(is_null_ptr(object@.MISC$stan_fit_instance@.xData$.pointer) ||
+    is_null_ptr(object@.MISC$stan_fit_instance@.xData$.module) || 
+    is_null_ptr(object@.MISC$stan_fit_instance@.xData$.cppclass)) 
 } 
 
 
@@ -597,14 +690,14 @@ sflist2stanfit <- function(sflist) {
 as.array.stanfit <- function(x, ...) {
   if (x@mode != 0) return(numeric(0)) 
   out <- extract(x, permuted = FALSE, inc_warmup = FALSE, ...)
-  dimnames(out) <- dimnames(x)
+  # dimnames(out) <- dimnames(x)
   return(out)
 } 
 as.matrix.stanfit <- function(x, ...) {
   if (x@mode != 0) return(numeric(0)) 
-  out <- apply(extract(x, permuted = FALSE, inc_warmup = FALSE, ...), 
-               3, FUN = function(y) y)
-  dimnames(out) <- dimnames(x)[-2]
+  e <- extract(x, permuted = FALSE, inc_warmup = FALSE, ...) 
+  out <- apply(e, 3, FUN = function(y) y)
+  dimnames(out) <- dimnames(e)[-2]
   return(out)
 }
  
@@ -615,7 +708,34 @@ as.data.frame.stanfit <- function(x, ...) {
 dim.stanfit <- function(x) {
   if (x@mode != 0) return(numeric(0)) 
   c(x@sim$n_save[1] - x@sim$warmup2[1], x@sim$chains, x@sim$n_flatnames)
-} 
+}
+
+setGeneric("as.mcmc.list", function(object, ...) standardGeneric("as.mcmc.list"))
+
+as.mcmc.list.stanfit <- function(object, pars, ...) {
+  pars <- if (missing(pars)) object@sim$pars_oi else check_pars_second(object@sim, pars) 
+  tidx <- pars_total_indexes(object@sim$pars_oi, object@sim$dims_oi, object@sim$fnames_oi, pars)
+  tidx <- lapply(tidx, function(x) attr(x, "row_major_idx"))
+  tidx <- unlist(tidx, use.names = FALSE)
+
+  lst <- vector("list", object@sim$chains)
+  for (ic in 1:object@sim$chains) { 
+    x <- do.call(cbind, object@sim$samples[[ic]])
+    warmup2 <- object@sim$warmup2[ic] 
+    if (warmup2 > 0) x <- x[-(1:warmup2), ]
+    x <- as.matrix(x)
+    end <- object@sim$iter
+    thin <- object@sim$thin
+    start <- end - (nrow(x) - 1) * thin
+    class(x) <- 'mcmc'
+    attr(x, "mcpar") <- c(start, end, thin)
+    lst[[ic]] <- x 
+  }
+  class(lst) <- "mcmc.list"
+  invisible(lst)
+}
+
+setMethod("as.mcmc.list", "stanfit", as.mcmc.list.stanfit)
 
 dimnames.stanfit <- function(x) {
   if (x@mode != 0) return(character(0)) 

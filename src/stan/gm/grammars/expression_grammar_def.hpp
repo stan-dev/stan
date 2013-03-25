@@ -182,67 +182,68 @@ namespace stan {
       using boost::spirit::qi::lit;
       using boost::spirit::qi::_pass;
       using boost::spirit::qi::_val;
+      using boost::spirit::qi::labels::_r1;
 
-
+      // _r1 : var_origin
 
       expression_r.name("expression (top level, precedence 15, binary ||");
       expression_r
-        = expression14_r [_val = _1]
+        = expression14_r(_r1) [_val = _1]
         > *( lit("||") 
-             > expression14_r  [_val = binary_op_f(_val,_1,"||","logical_or",
+             > expression14_r(_r1)  [_val = binary_op_f(_val,_1,"||","logical_or",
                                                    boost::phoenix::ref(error_msgs))] 
              );
 
       expression14_r.name("expression, precedence 14, binary &&");
       expression14_r 
-        = expression10_r [_val = _1]
+        = expression10_r(_r1) [_val = _1]
         > *( lit("&&") 
-             > expression10_r  [_val = binary_op_f(_val,_1,"&&","logical_and",
+             > expression10_r(_r1)  [_val = binary_op_f(_val,_1,"&&","logical_and",
                                                    boost::phoenix::ref(error_msgs))] 
              );
 
       expression10_r.name("expression, precedence 10, binary ==, !=");
       expression10_r 
-        = expression09_r [_val = _1]
+        = expression09_r(_r1) [_val = _1]
         > *( ( lit("==") 
-               > expression09_r  [_val = binary_op_f(_val,_1,"==","logical_eq",
+               > expression09_r(_r1)  [_val = binary_op_f(_val,_1,"==","logical_eq",
                                                        boost::phoenix::ref(error_msgs))] )
               |
               ( lit("!=") 
-                > expression09_r  [_val = binary_op_f(_val,_1,"!=","logical_neq",
+                > expression09_r(_r1)  [_val = binary_op_f(_val,_1,"!=","logical_neq",
                                                       boost::phoenix::ref(error_msgs))] ) 
               );
 
       expression09_r.name("expression, precedence 9, binary <, <=, >, >=");
       expression09_r 
-        = expression07_r [_val = _1]
+        = expression07_r(_r1) [_val = _1]
         > *( ( lit("<=")
-               > expression07_r  [_val = binary_op_f(_val,_1,"<","logical_lt",
+               > expression07_r(_r1)  [_val = binary_op_f(_val,_1,"<","logical_lte",
                                                       boost::phoenix::ref(error_msgs))] )
               |
               ( lit("<") 
-                > expression07_r  [_val = binary_op_f(_val,_1,"<=","logical_lte",
+                > expression07_r(_r1)  [_val = binary_op_f(_val,_1,"<=","logical_lt",
                                                       boost::phoenix::ref(error_msgs))] ) 
               |
               ( lit(">=") 
-                > expression07_r  [_val = binary_op_f(_val,_1,">","logical_gt",
+                > expression07_r(_r1)  [_val = binary_op_f(_val,_1,">","logical_gte",
                                                       boost::phoenix::ref(error_msgs))] ) 
               |
               ( lit(">") 
-                > expression07_r  [_val = binary_op_f(_val,_1,">=","logical_gte",
+                > expression07_r(_r1)  [_val = binary_op_f(_val,_1,">=","logical_gt",
                                                       boost::phoenix::ref(error_msgs))] ) 
               );
       
       expression07_r.name("expression, precedence 7, binary +, -");
       expression07_r 
-        =  term_g
+        =  term_g(_r1)
             [_val = _1]
         > *( ( lit('+')
-               > term_g // expression07_r       
+               > term_g(_r1) // expression07_r       
                 [_val = addition(_val,_1,boost::phoenix::ref(error_msgs))] )
               |  
               ( lit('-') 
-                > term_g // expression07_r   
+                > term_g(_r1) // expression07_r   
                 [_val = subtraction(_val,_1,boost::phoenix::ref(error_msgs))] )
               )
         > eps[_pass = validate_expr_type2_f(_val,boost::phoenix::ref(error_msgs_))]

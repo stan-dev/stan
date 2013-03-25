@@ -96,7 +96,23 @@ dim(fit_ss2)
 ## `lp__` (the log-posterior) is always included 
 ## in the samples.  
 dimnames(fit_ss2) 
-}} 
+}
+
+# cache of a saved stanfit object 
+# the Stan code for this model is in the example of function stan
+exfit <- rstan:::exfit  
+print(exfit)
+
+ee1 <- extract(exfit, permuted = TRUE)
+print(names(ee1))
+
+for (name in names(ee1)) 
+  print(dim(ee1[[name]]))
+
+ee2 <- extract(exfit, permuted = FALSE)
+print(dim(ee2))
+print(dimnames(ee2))
+} 
 
 \seealso{
   S4 class \code{\linkS4class{stanfit}} and \link{as.array.stanfit}

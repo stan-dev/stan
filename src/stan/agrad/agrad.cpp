@@ -8,6 +8,7 @@ namespace stan {
   namespace agrad {
 
     std::vector<chainable*> var_stack_;
+    std::vector<chainable*> var_nochain_stack_;
     memory::stack_alloc memalloc_;
 
   }

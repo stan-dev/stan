@@ -10,13 +10,14 @@
 
 #define EIGEN_DENSEBASE_PLUGIN "stan/math/EigenDenseBaseAddons.hpp"
 #include <Eigen/Dense>
+#include <Eigen/QR>
 
 #include <stan/math/boost_error_handling.hpp>
 
 namespace stan {
   
   namespace math {
-
+    typedef Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>::size_type size_type;
     // from input type F to output type T 
 
     // scalar, F != T  (base template)
@@ -188,9 +189,9 @@ namespace stan {
       }
 
 
-      void resize(double x, 
-                  const std::vector<size_t>& dims, 
-                  size_t pos) {
+      void resize(double /*x*/, 
+                  const std::vector<size_t>& /*dims*/, 
+                  size_t /*pos*/) {
         // no-op
       }
 
@@ -533,7 +534,7 @@ namespace stan {
               const char* error_msg,
               size_t idx) {
       check_range(x.rows(),m,error_msg,idx);
-      return x.row(m - 1);
+      return x.block(m-1,0,1,x.cols());
     }
 
     /**
@@ -612,6 +613,369 @@ namespace stan {
       check_range(x.size(),n,error_msg,idx);
       return x(n - 1);
     }
+
+
+    // ********************** start lhs
+
+   /**
+     * Return a reference to the value of the specified vector at the
+     * specified base-one index.  If the index is out of range, throw
+     * a <code>std::out_of_range</code> exception with the specified
+     * error message and index indicated.
+     *
+     * @param x Vector from which to get a value.
+     * @param i Index into vector plus 1.
+     * @param error_msg Error message if the index is out of range.
+     * @param idx Nested index level to report in error message if
+     * the index is out of range.
+     * @return Value of vector at <code>i - 1</code>
+     * @tparam T type of value.
+     */
+    template <typename T>
+    inline
+    T& get_base1_lhs(std::vector<T>& x, 
+                 size_t i, 
+                 const char* error_msg,
+                 size_t idx) {
+      check_range(x.size(),i,error_msg,idx);
+      return x[i - 1];
+    }
+
+    /**
+     * Return a reference to the value of the specified vector at the
+     * specified base-one indexes.  If an index is out of range, throw
+     * a <code>std::out_of_range</code> exception with the specified
+     * error message and index indicated.
+     *
+     * @param x Vector from which to get a value.
+     * @param i1 First index plus 1.
+     * @param i2 Second index plus 1.
+     * @param error_msg Error message if an index is out of range.
+     * @param idx Nested index level to report in error message if
+     * the index is out of range.
+     * @return Value of vector at indexes.
+     * @tparam T type of value.
+     */
+    template <typename T>
+    inline
+    T& get_base1_lhs(std::vector<std::vector<T> >& x, 
+                 size_t i1, 
+                 size_t i2,
+                 const char* error_msg,
+                 size_t idx) {
+      check_range(x.size(),i1,error_msg,idx);
+      return get_base1_lhs(x[i1 - 1],i2,error_msg,idx+1);
+    }
+
+    /**
+     * Return a reference to the value of the specified vector at the
+     * specified base-one indexes.  If an index is out of range, throw
+     * a <code>std::out_of_range</code> exception with the specified
+     * error message and index indicated.
+     *
+     * @param x Vector from which to get a value.
+     * @param i1 First index plus 1.
+     * @param i2 Second index plus 1.
+     * @param i3 Third index plus 1.
+     * @param error_msg Error message if an index is out of range.
+     * @param idx Nested index level to report in error message if
+     * the index is out of range.
+     * @return Value of vector at indexes.
+     * @tparam T type of value.
+     */
+    template <typename T>
+    inline
+    T& get_base1_lhs(std::vector<std::vector<std::vector<T> > >& x, 
+                 size_t i1, 
+                 size_t i2,
+                 size_t i3,
+                 const char* error_msg,
+                 size_t idx) {
+      check_range(x.size(),i1,error_msg,idx);
+      return get_base1_lhs(x[i1 - 1],i2,i3,error_msg,idx+1);
+    }
+
+    /**
+     * Return a reference to the value of the specified vector at the
+     * specified base-one indexes.  If an index is out of range, throw
+     * a <code>std::out_of_range</code> exception with the specified
+     * error message and index indicated.
+     *
+     * @param x Vector from which to get a value.
+     * @param i1 First index plus 1.
+     * @param i2 Second index plus 1.
+     * @param i3 Third index plus 1.
+     * @param i4 Fourth index plus 1.
+     * @param error_msg Error message if an index is out of range.
+     * @param idx Nested index level to report in error message if
+     * the index is out of range.
+     * @return Value of vector at indexes.
+     * @tparam T type of value.
+     */
+    template <typename T>
+    inline
+    T& get_base1_lhs(std::vector<std::vector<std::vector<std::vector<T> > > >& x, 
+                 size_t i1, 
+                 size_t i2,
+                 size_t i3,
+                 size_t i4,
+                 const char* error_msg,
+                 size_t idx) {
+      check_range(x.size(),i1,error_msg,idx);
+      return get_base1_lhs(x[i1 - 1],i2,i3,i4,error_msg,idx+1);
+    }
+
+    /**
+     * Return a reference to the value of the specified vector at the
+     * specified base-one indexes.  If an index is out of range, throw
+     * a <code>std::out_of_range</code> exception with the specified
+     * error message and index indicated.
+     *
+     * @param x Vector from which to get a value.
+     * @param i1 First index plus 1.
+     * @param i2 Second index plus 1.
+     * @param i3 Third index plus 1.
+     * @param i4 Fourth index plus 1.
+     * @param i5 Fifth index plus 1.
+     * @param error_msg Error message if an index is out of range.
+     * @param idx Nested index level to report in error message if
+     * the index is out of range.
+     * @return Value of vector at indexes.
+     * @tparam T type of value.
+     */
+    template <typename T>
+    inline
+    T& get_base1_lhs(std::vector<std::vector<std::vector<std::vector<std::vector<T> > > > >& x, 
+                 size_t i1, 
+                 size_t i2,
+                 size_t i3,
+                 size_t i4,
+                 size_t i5,
+                 const char* error_msg,
+                 size_t idx) {
+      check_range(x.size(),i1,error_msg,idx);
+      return get_base1_lhs(x[i1 - 1],i2,i3,i4,i5,error_msg,idx+1);
+    }
+
+    /**
+     * Return a reference to the value of the specified vector at the
+     * specified base-one indexes.  If an index is out of range, throw
+     * a <code>std::out_of_range</code> exception with the specified
+     * error message and index indicated.
+     *
+     * @param x Vector from which to get a value.
+     * @param i1 First index plus 1.
+     * @param i2 Second index plus 1.
+     * @param i3 Third index plus 1.
+     * @param i4 Fourth index plus 1.
+     * @param i5 Fifth index plus 1.
+     * @param i6 Sixth index plus 1.
+     * @param error_msg Error message if an index is out of range.
+     * @param idx Nested index level to report in error message if
+     * the index is out of range.
+     * @return Value of vector at indexes.
+     * @tparam T type of value.
+     */
+    template <typename T>
+    inline
+    T& get_base1_lhs(std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<T> > > > > >& x, 
+                 size_t i1, 
+                 size_t i2,
+                 size_t i3,
+                 size_t i4,
+                 size_t i5,
+                 size_t i6,
+                 const char* error_msg,
+                 size_t idx) {
+      check_range(x.size(),i1,error_msg,idx);
+      return get_base1_lhs(x[i1 - 1],i2,i3,i4,i5,i6,error_msg,idx+1);
+    }
+
+
+    /**
+     * Return a reference to the value of the specified vector at the
+     * specified base-one indexes.  If an index is out of range, throw
+     * a <code>std::out_of_range</code> exception with the specified
+     * error message and index indicated.
+     *
+     * @param x Vector from which to get a value.
+     * @param i1 First index plus 1.
+     * @param i2 Second index plus 1.
+     * @param i3 Third index plus 1.
+     * @param i4 Fourth index plus 1.
+     * @param i5 Fifth index plus 1.
+     * @param i6 Sixth index plus 1.
+     * @param i7 Seventh index plus 1.
+     * @param error_msg Error message if an index is out of range.
+     * @param idx Nested index level to report in error message if
+     * the index is out of range.
+     * @return Value of vector at indexes.
+     * @tparam T type of value.
+     */
+    template <typename T>
+    inline
+    T& get_base1_lhs(std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<T> > > > > > >& x, 
+                 size_t i1, 
+                 size_t i2,
+                 size_t i3,
+                 size_t i4,
+                 size_t i5,
+                 size_t i6,
+                 size_t i7,
+                 const char* error_msg,
+                 size_t idx) {
+      check_range(x.size(),i1,error_msg,idx);
+      return get_base1_lhs(x[i1 - 1],i2,i3,i4,i5,i6,i7,error_msg,idx+1);
+    }
+
+
+    /**
+     * Return a reference to the value of the specified vector at the
+     * specified base-one indexes.  If an index is out of range, throw
+     * a <code>std::out_of_range</code> exception with the specified
+     * error message and index indicated.
+     *
+     * @param x Vector from which to get a value.
+     * @param i1 First index plus 1.
+     * @param i2 Second index plus 1.
+     * @param i3 Third index plus 1.
+     * @param i4 Fourth index plus 1.
+     * @param i5 Fifth index plus 1.
+     * @param i6 Sixth index plus 1.
+     * @param i7 Seventh index plus 1.
+     * @param i8 Eigth index plus 1.
+     * @param error_msg Error message if an index is out of range.
+     * @param idx Nested index level to report in error message if
+     * the index is out of range.
+     * @return Value of vector at indexes.
+     * @tparam T type of value.
+     */
+    template <typename T>
+    inline
+    T& get_base1_lhs(std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<T> > > > > > > >& x, 
+                 size_t i1, 
+                 size_t i2,
+                 size_t i3,
+                 size_t i4,
+                 size_t i5,
+                 size_t i6,
+                 size_t i7,
+                 size_t i8,
+                 const char* error_msg,
+                 size_t idx) {
+      check_range(x.size(),i1,error_msg,idx);
+      return get_base1_lhs(x[i1 - 1],i2,i3,i4,i5,i6,i7,i8,error_msg,idx+1);
+    }
+
+
+
+    /**
+     * Return a copy of the row of the specified vector at the specified
+     * base-one row index.  If the index is out of range, throw a
+     * <code>std::out_of_range</code> exception with the specified
+     * error message and index indicated.
+     *
+     * <b>Warning</b>:  Because a copy is involved, it is inefficient
+     * to access element of matrices by first using this method
+     * to get a row then using a second call to get the value at 
+     a specified column.
+     *
+     * @param x Matrix from which to get a row
+     * @param m Index into matrix plus 1.
+     * @param error_msg Error message if the index is out of range.
+     * @param idx Nested index level to report in error message if
+     * the index is out of range.
+     * @return Row of matrix at <code>i - 1</code>.
+     * @tparam T type of value.
+     */
+    template <typename T>
+    inline
+    Eigen::Block<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> >
+    get_base1_lhs(Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& x,
+              size_t m,
+              const char* error_msg,
+              size_t idx) {
+      check_range(x.rows(),m,error_msg,idx);
+      return x.block(m-1,0,1,x.cols());
+    }
+
+    /**
+     * Return a reference to the value of the specified matrix at the specified
+     * base-one row and column indexes.  If either index is out of range,
+     * throw a <code>std::out_of_range</code> exception with the
+     * specified error message and index indicated.
+     *
+     * @param x Matrix from which to get a row
+     * @param m Row index plus 1.
+     * @param n Column index plus 1.
+     * @param error_msg Error message if either index is out of range.
+     * @param idx Nested index level to report in error message if
+     * either index is out of range.
+     * @return Value of matrix at row <code>m - 1</code> and column
+     * <code>n - 1</code>.
+     * @tparam T type of value.
+     */
+    template <typename T>
+    inline
+    T& get_base1_lhs(Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& x,
+                 size_t m,
+                 size_t n,
+                 const char* error_msg,
+                 size_t idx) {
+      check_range(x.rows(),m,error_msg,idx);
+      check_range(x.cols(),n,error_msg,idx + 1);
+      return x(m - 1, n - 1);
+    }
+
+    /**
+     * Return a reference to the value of the specified column vector
+     * at the specified base-one index.  If the index is out of range,
+     * throw a <code>std::out_of_range</code> exception with the
+     * specified error message and index indicated.
+     *
+     * @param x Column vector from which to get a value.
+     * @param m Row index plus 1.
+     * @param error_msg Error message if the index is out of range.
+     * @param idx Nested index level to report in error message if
+     * the index is out of range.
+     * @return Value of column vector at row <code>m - 1</code>.
+     * @tparam T type of value.
+     */
+    template <typename T>
+    inline
+    T& get_base1_lhs(Eigen::Matrix<T,Eigen::Dynamic,1>& x,
+                 size_t m,
+                 const char* error_msg,
+                 size_t idx) {
+      check_range(x.size(),m,error_msg,idx);
+      return x(m - 1);
+      
+    }
+
+    /**
+     * Return a reference to the value of the specified row vector
+     * at the specified base-one index.  If the index is out of range,
+     * throw a <code>std::out_of_range</code> exception with the
+     * specified error message and index indicated.
+     *
+     * @param x Row vector from which to get a value.
+     * @param n Column index plus 1.
+     * @param error_msg Error message if the index is out of range.
+     * @param idx Nested index level to report in error message if
+     * the index is out of range.
+     * @return Value of row vector at column <code>n - 1</code>.
+     * @tparam T type of value.
+     */
+    template <typename T>
+    inline
+    T& get_base1_lhs(Eigen::Matrix<T,1,Eigen::Dynamic>& x,
+                 size_t n,
+                 const char* error_msg,
+                 size_t idx) {
+      check_range(x.size(),n,error_msg,idx);
+      return x(n - 1);
+    }
+
 
 
     // int returns
@@ -748,8 +1112,8 @@ namespace stan {
       std::stringstream ss;
       ss << "error in call to " << msg
          << "; require matching dimensions, but found"
-         << " arg1 rows=" << x1.rows() << " arg1 cols=" << x1.cols()
-         << " arg2 rows=" << x2.rows() << " arg2 cols=" << x2.cols();
+         << " arg1(rows=" << x1.rows() << ",cols=" << x1.cols() << ");"
+         << " arg2(rows=" << x2.rows() << ",cols=" << x2.cols() << ")";
       throw std::domain_error(ss.str());
     }
 
@@ -759,9 +1123,10 @@ namespace stan {
                                         const char* msg) {
       if (x1.size() == x2.size()) return;
       std::stringstream ss;
-      ss << "require matching sizes in " << msg
-         << " found first argument size=" << x1.size()
-         << "; second argument size=" << x2.size();
+      ss << "error in call to " << msg
+         << "; require matching sizes, but found"
+         << " arg1(size=" << x1.size() << ");"
+         << " arg2(size=" << x2.size() << ");";
       throw std::domain_error(ss.str());
     }
 
@@ -773,12 +1138,59 @@ namespace stan {
       std::stringstream ss;
       ss << "error in call to " << msg
          << "; require matching sizes, but found"
-         << " arg1 rows=" << x1.rows() << " arg1 cols=" << x1.cols()
-         << " arg1 size=" << (x1.rows() * x1.cols())
-         << " arg2 rows=" << x2.rows() << " arg2 cols=" << x2.cols()
-         << " arg2 size=" << (x2.rows() * x2.cols());
+         << " arg1(rows=" << x1.rows() << ",cols=" << x1.cols() 
+         << ",size=" << (x1.rows() * x1.cols()) << ");"
+         << " arg2(rows=" << x2.rows() << ",cols=" << x2.cols() 
+         << ",size=" << (x2.rows() * x2.cols()) << ")";
       throw std::domain_error(ss.str());
     }
+
+    template <typename Derived, typename T2, int R2, int C2>
+    inline void validate_matching_sizes(const Eigen::Block<Derived>& x1,
+                                        const Eigen::Matrix<T2,R2,C2>& x2,
+                                        const char* msg) {
+      if (x1.size() == x2.size()) return;
+      std::stringstream ss;
+      ss << "error in call to " << msg
+         << "; require matching sizes, but found"
+         << " arg1(rows=" << x1.rows() << ",cols=" << x1.cols() 
+         << ",size=" << (x1.rows() * x1.cols()) << ");"
+         << " arg2(rows=" << x2.rows() << ",cols=" << x2.cols() 
+         << ",size=" << (x2.rows() * x2.cols()) << ")";
+      throw std::domain_error(ss.str());
+    }
+
+    template <typename T1, int R1, int C1, typename Derived>
+    inline void validate_matching_sizes(const Eigen::Matrix<T1,R1,C1>& x1,
+                                        const Eigen::Block<Derived>& x2,
+                                        const char* msg) {
+      if (x1.size() == x2.size()) return;
+      std::stringstream ss;
+      ss << "error in call to " << msg
+         << "; require matching sizes, but found"
+         << " arg1(rows=" << x1.rows() << ",cols=" << x1.cols() 
+         << ",size=" << (x1.rows() * x1.cols()) << ");"
+         << " arg2(rows=" << x2.rows() << ",cols=" << x2.cols() 
+         << ",size=" << (x2.rows() * x2.cols()) << ")";
+      throw std::domain_error(ss.str());
+    }
+
+    template <typename Derived1, typename Derived2>
+    inline void validate_matching_sizes(const Eigen::Block<Derived1>& x1,
+                                        const Eigen::Block<Derived2>& x2,
+                                        const char* msg) {
+      if (x1.size() == x2.size()) return;
+      std::stringstream ss;
+      ss << "error in call to " << msg
+         << "; require matching sizes, but found"
+         << " arg1(rows=" << x1.rows() << ",cols=" << x1.cols() 
+         << ",size=" << (x1.rows() * x1.cols()) << ");"
+         << " arg2(rows=" << x2.rows() << ",cols=" << x2.cols() 
+         << ",size=" << (x2.rows() * x2.cols()) << ")";
+      throw std::domain_error(ss.str());
+    }
+
+
 
     template <typename T1, int R1, int C1, typename T2, int R2, int C2>
     inline void validate_multiplicable(const Eigen::Matrix<T1,R1,C1>& x1,
@@ -811,11 +1223,7 @@ namespace stan {
          << "; require vector, found "
          << " rows=" << x.rows() << "cols=" << x.cols();
       throw std::domain_error(ss.str());
-    }
-
-
-
-    
+    }    
 
     // scalar returns
 
@@ -826,14 +1234,25 @@ namespace stan {
      * @return Determinant of the matrix.
      * @throw std::domain_error if matrix is not square.
      */
-    template <typename T>
-    inline
-    T
-    determinant(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& m) {
+    template <typename T,int R, int C>
+    inline T determinant(const Eigen::Matrix<T,R,C>& m) {
       stan::math::validate_square(m,"determinant");
       return m.determinant();
     }
-
+    
+    /**
+     * Returns the log absolute determinant of the specified square matrix.
+     *
+     * @param m Specified matrix.
+     * @return log absolute determinant of the matrix.
+     * @throw std::domain_error if matrix is not square.
+     */
+    template <typename T,int R, int C>
+    inline T log_determinant(const Eigen::Matrix<T,R,C>& m) {
+      stan::math::validate_square(m,"log_determinant");
+      return m.colPivHouseholderQr().logAbsDeterminant();
+    }
+    
 
     /**
      * Returns the dot product of the specified vector with itself.
@@ -856,10 +1275,31 @@ namespace stan {
      * @param x Matrix.
      * @tparam T scalar type
      */
-    template<typename T>
-    inline Eigen::Matrix<T,Eigen::Dynamic,1> 
-    columns_dot_self(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& x) {
+    template<typename T,int R,int C>
+    inline Eigen::Matrix<T,1,C> 
+    columns_dot_self(const Eigen::Matrix<T,R,C>& x) {
       return x.colwise().squaredNorm();
+    }
+
+    /**
+     * Returns the dot product of the specified vectors.
+     *
+     * @param v1 First vector.
+     * @param v2 Second vector.
+     * @return Dot product of the vectors.
+     * @throw std::domain_error If the vectors are not the same
+     * size or if they are both not vector dimensioned.
+     */
+    template<int R1,int C1,int R2, int C2>
+    inline Eigen::Matrix<double, 1, C1>
+    columns_dot_product(const Eigen::Matrix<double, R1, C1>& v1, 
+                        const Eigen::Matrix<double, R2, C2>& v2) {
+      validate_matching_sizes(v1,v2,"columns_dot_product");
+      Eigen::Matrix<double, 1, C1> ret(1,v1.cols());
+      for (size_type j = 0; j < v1.cols(); ++j) {
+        ret(j) = v1.col(j).dot(v2.col(j));
+      }
+      return ret;
     }
 
     /**
@@ -1415,7 +1855,7 @@ namespace stan {
       Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type, R1, C1>
         result(m1.rows(),m1.cols());
       for (int i = 0; i < m1.rows(); ++i)
-        for (int j = 0; i < m1.cols(); ++j)
+        for (int j = 0; j < m1.cols(); ++j)
           result(i,j) = m2(i) * m1(i,j);
       return result;
     }
@@ -1700,35 +2140,6 @@ namespace stan {
       return theta;
     }
 
-
-    template <typename T1, typename T2, int R1,int C1,int R2,int C2>
-    inline 
-    Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type,
-                  R1,C2>
-    mdivide_left_tri_low(const Eigen::Matrix<T1,R1,C1> &A,
-                         const Eigen::Matrix<T2,R2,C2> &b) {
-      stan::math::validate_square(A,"mdivide_left_tri_low/2");
-      stan::math::validate_multiplicable(A,b,"mdivide_left_tri_low");
-      return promote_common<Eigen::Matrix<T1,R1,C1>,
-                            Eigen::Matrix<T2,R1,C1> >(A)
-        .template triangularView<Eigen::Lower>()
-        .solve( promote_common<Eigen::Matrix<T1,R2,C2>,
-                               Eigen::Matrix<T2,R2,C2> >(b) );
-    }
-    template <typename T>
-    inline 
-    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
-    mdivide_left_tri_low(const 
-                         Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> &A) {
-      stan::math::validate_square(A,"mdivide_left_tri_low/1");
-      int n = A.rows();
-      Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> b;
-      b.setIdentity(n,n);
-      A.template triangularView<Eigen::Lower>().solveInPlace(b);
-      return b;
-    }
-
-
     /**
      * Returns the solution of the system Ax=b when A is triangular
      * @param A Triangular matrix.  Specify upper or lower with TriView
@@ -1745,7 +2156,7 @@ namespace stan {
                   R1,C2>
     mdivide_left_tri(const Eigen::Matrix<T1,R1,C1> &A,
                      const Eigen::Matrix<T2,R2,C2> &b) {
-      stan::math::validate_square(A,"mdivide_left_tri_low");
+      stan::math::validate_square(A,"mdivide_left_tri");
       stan::math::validate_multiplicable(A,b,"mdivide_left_tri");
       return promote_common<Eigen::Matrix<T1,R1,C1>,Eigen::Matrix<T2,R1,C1> >(A)
         .template triangularView<TriView>()
@@ -1759,10 +2170,10 @@ namespace stan {
      * @return x = A^-1 .
      * @throws std::domain_error if A is not square
      */
-    template<int TriView, typename T>
+    template<int TriView, typename T,int R1, int C1>
     inline 
-    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> 
-    mdivide_left_tri(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> &A) {
+    Eigen::Matrix<T,R1,C1> 
+    mdivide_left_tri(const Eigen::Matrix<T,R1,C1> &A) {
       stan::math::validate_square(A,"mdivide_left_tri");
       int n = A.rows();
       Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> b;
@@ -1770,7 +2181,35 @@ namespace stan {
       A.template triangularView<TriView>().solveInPlace(b);
       return b;
     }
-
+    template <typename T1, typename T2, int R1,int C1,int R2,int C2>
+    inline 
+    Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type,
+    R1,C2>
+    mdivide_left_tri_low(const Eigen::Matrix<T1,R1,C1> &A,
+                         const Eigen::Matrix<T2,R2,C2> &b) {
+//      stan::math::validate_square(A,"mdivide_left_tri_low/2");
+//      stan::math::validate_multiplicable(A,b,"mdivide_left_tri_low");
+//      return promote_common<Eigen::Matrix<T1,R1,C1>,
+//      Eigen::Matrix<T2,R1,C1> >(A)
+//      .template triangularView<Eigen::Lower>()
+//      .solve( promote_common<Eigen::Matrix<T1,R2,C2>,
+//             Eigen::Matrix<T2,R2,C2> >(b) );
+      return mdivide_left_tri<Eigen::Lower,T1,T2,R1,C1,R2,C2>(A,b);
+    }
+    template <typename T,int R1, int C1>
+    inline 
+    Eigen::Matrix<T,R1,C1>
+    mdivide_left_tri_low(const 
+                         Eigen::Matrix<T,R1,C1> &A) {
+//      stan::math::validate_square(A,"mdivide_left_tri_low/1");
+//      int n = A.rows();
+//      Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> b;
+//      b.setIdentity(n,n);
+//      A.template triangularView<Eigen::Lower>().solveInPlace(b);
+//      return b;
+      return mdivide_left_tri<Eigen::Lower,T,R1,C1>(A);
+    }
+    
     /**
      * Returns the solution of the system Ax=b.
      * @param A Matrix.
@@ -1810,14 +2249,16 @@ namespace stan {
                       const Eigen::Matrix<T2,R2,C2> &A) {
       stan::math::validate_square(A,"mdivide_left_tri_low");
       stan::math::validate_multiplicable(b,A,"mdivide_right_tri");
-      return promote_common<Eigen::Matrix<T1,R1,C1>,
-                            Eigen::Matrix<T2,R1,C1> >(A)
-        .template triangularView<TriView>()
-        .transpose()
-        .solve(promote_common<Eigen::Matrix<T1,R2,C2>,
-                              Eigen::Matrix<T2,R2,C2> >(b)
-               .transpose())
-        .transpose();
+      // FIXME: This is nice and general but requires some extra memory and copying.
+      if (TriView == Eigen::Lower) {
+        return transpose(mdivide_left_tri<Eigen::Upper>(transpose(A),transpose(b)));
+      }
+      else if (TriView == Eigen::Upper) {
+        return transpose(mdivide_left_tri<Eigen::Lower>(transpose(A),transpose(b)));
+      }
+      else {
+        throw std::domain_error("triangular view must be Eigen::Lower or Eigen::Upper");
+      }
     }
     /**
      * Returns the solution of the system tri(A)x=b when tri(A) is a
@@ -1857,14 +2298,16 @@ namespace stan {
                   const Eigen::Matrix<T2,R2,C2> &A) {
       stan::math::validate_square(A,"mdivide_right");
       stan::math::validate_multiplicable(b,A,"mdivide_right");
-      return promote_common<Eigen::Matrix<T1,R2,C2>,
-                            Eigen::Matrix<T2,R2,C2> >(A)
-        .transpose()
-        .lu()
-        .solve(promote_common<Eigen::Matrix<T1,R1,C1>,
-                              Eigen::Matrix<T2,R1,C1> >(b)
-               .transpose())
-        .transpose();
+      // FIXME: This is nice and general but likely slow.
+      return transpose(mdivide_left(transpose(A),transpose(b)));
+//      return promote_common<Eigen::Matrix<T1,R2,C2>,
+//                            Eigen::Matrix<T2,R2,C2> >(A)
+//        .transpose()
+//        .lu()
+//        .solve(promote_common<Eigen::Matrix<T1,R1,C1>,
+//                              Eigen::Matrix<T2,R1,C1> >(b)
+//               .transpose())
+//        .transpose();
     }
 
     /**
@@ -2050,6 +2493,48 @@ namespace stan {
       *o << ']';
     }
 
+    template <typename T>
+    inline
+    void
+    dims(const T& x, std::vector<int>& result) {
+      /* no op */
+    }
+    template <typename T, int R, int C>
+    inline
+    void
+    dims(const Eigen::Matrix<T,R,C>& x,
+         std::vector<int>& result) {
+      result.push_back(x.rows());
+      result.push_back(x.cols());
+    }
+    template <typename T>
+    inline
+    void
+    dims(const std::vector<T>& x,
+         std::vector<int>& result) {
+      result.push_back(x.size());
+      if (x.size() > 0)
+        dims(x[0],result);
+    }
+
+
+    template <typename T>
+    inline
+    std::vector<int>
+    dims(const T& x) {
+      std::vector<int> result;
+      dims(x,result);
+      return result;
+    }
+
+    template <typename T>
+    inline
+    int
+    size(const std::vector<T>& x) {
+      return x.size();
+    }
+    
+    
 
   }
 

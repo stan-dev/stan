@@ -134,7 +134,10 @@ namespace stan {
       typename promote_args<T_y,T_shape>::type lp;
       if (!check_positive(function, eta, "Shape parameter", &lp, Policy()))
         return lp;      
-      if (!check_size_match(function, y.rows(), y.cols(), &lp, Policy()))
+      if (!check_size_match(function, 
+          y.rows(), "Rows of correlation matrix",
+          y.cols(), "columns of correlation matrix",
+          &lp, Policy()))
         return lp;
       if (!check_not_nan(function, y, "Correlation matrix", &lp, Policy())) 
         return lp;

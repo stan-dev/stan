@@ -17,6 +17,7 @@ export(
   stan_demo, 
   sflist2stanfit,
   read_stan_csv,
+  monitor,
   rstan_options 
 # get_rstan.options
 )
@@ -31,12 +32,14 @@ exportMethods(
   get_cppcode, get_cxxflags, # for stanmodel 
   show, sampling, summary, extract,
   traceplot, plot, get_stancode, get_inits, get_seed, get_cppo_mode,
+  log_prob, grad_log_prob, 
+  unconstrain_pars, constrain_pars, get_num_upars,
   get_seeds,
   get_adaptation_info,
   get_sampler_params,
   get_logposterior, 
   get_posterior_mean,
-  get_stanmodel 
+  get_stanmodel
 )
 S3method(print, stanfit)
 S3method(as.array, stanfit)
@@ -45,4 +48,5 @@ S3method(as.data.frame, stanfit)
 S3method(is.array, stanfit)
 S3method(dim, stanfit)
 S3method(dimnames, stanfit)
+S3method(pairs, stanfit)
 import(Rcpp)

@@ -24,12 +24,12 @@ public:
     return false;
   }
 
-  static size_t num_iterations() {
+  static int num_iterations() {
     return iterations;
   }
 
-  static std::vector<size_t> skip_chains_test() {
-    std::vector<size_t> params_to_skip;
+  static std::vector<int> skip_chains_test() {
+    std::vector<int> params_to_skip;
     return params_to_skip;
   }
 
@@ -37,24 +37,24 @@ public:
     default_populate_chains();
   }
 
-  static std::vector<std::pair<size_t, double> >
+  static std::vector<std::pair<int, double> >
   get_expected_values() {
     using std::make_pair;
 
-    std::vector<std::pair<size_t, double> > expected_values;
-    expected_values.push_back(make_pair( 0U, 0.3244));
-    expected_values.push_back(make_pair( 1U, 1.366));
-    expected_values.push_back(make_pair( 2U, 2.357));
-    expected_values.push_back(make_pair( 3U, 2.902));
-    expected_values.push_back(make_pair( 4U, 5.535));
-    expected_values.push_back(make_pair( 5U, 6.751));
-    expected_values.push_back(make_pair( 6U, 6.451));
-    expected_values.push_back(make_pair( 7U, 8.93));
-    expected_values.push_back(make_pair( 8U, 8.981));
-    expected_values.push_back(make_pair( 9U, 11.94));
-    expected_values.push_back(make_pair(10U, 11.58));
-    expected_values.push_back(make_pair(11U, 15.79));
-    expected_values.push_back(make_pair(12U, 16.96));
+    std::vector<std::pair<int, double> > expected_values;
+    expected_values.push_back(make_pair(chains->index("theta[1]"), 0.3244));
+    expected_values.push_back(make_pair(chains->index("theta[2]"), 1.366));
+    expected_values.push_back(make_pair(chains->index("theta[3]"), 2.357));
+    expected_values.push_back(make_pair(chains->index("theta[4]"), 2.902));
+    expected_values.push_back(make_pair(chains->index("theta[5]"), 5.535));
+    expected_values.push_back(make_pair(chains->index("theta[6]"), 6.751));
+    expected_values.push_back(make_pair(chains->index("theta[7]"), 6.451));
+    expected_values.push_back(make_pair(chains->index("theta[8]"), 8.93));
+    expected_values.push_back(make_pair(chains->index("theta[9]"), 8.981));
+    expected_values.push_back(make_pair(chains->index("theta[10]"), 11.94));
+    expected_values.push_back(make_pair(chains->index("theta[11]"), 11.58));
+    expected_values.push_back(make_pair(chains->index("theta[12]"), 15.79));
+    expected_values.push_back(make_pair(chains->index("theta[13]"), 16.96));
 
     return expected_values;
   }
@@ -62,5 +62,5 @@ public:
 };
 
 INSTANTIATE_TYPED_TEST_CASE_P(Models_BugsExamples_Vol1_Bones,
-			      Model_Test_Fixture,
-			      Models_BugsExamples_Vol1_Bones);
+            Model_Test_Fixture,
+            Models_BugsExamples_Vol1_Bones);

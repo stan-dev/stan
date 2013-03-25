@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include <stdexcept>
+#include <fstream>
 
 #include <boost/exception/diagnostic_information.hpp> 
 #include <boost/exception_ptr.hpp> 
@@ -30,7 +31,7 @@ namespace stan {
                   << std::endl;
     
     }
-    
+
   }
 
 }

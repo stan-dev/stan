@@ -207,7 +207,7 @@ data_preprocess <- function(data) { # , varnames) {
                    if (is.integer(x)) return(x) 
          
                    # change those integers stored as reals to integers 
-                   if (isTRUE(all.equal(x, round(x), check.attributes = FALSE))) 
+                   if (max(abs(x)) < .Machine$integer.max && isTRUE(all.equal(x, round(x), check.attributes = FALSE))) 
                      storage.mode(x) <- "integer"  
                    return(x) 
                  })   
@@ -431,18 +431,17 @@ function(file, warn = TRUE,
 } 
 
 
-probs2str <- function(probs, digits = 1) {
-  paste(formatC(probs * 100,  
-                digits = digits, 
-                format = 'f', 
-                drop0trailing = TRUE), 
-        "%", sep = '')
-} 
-
+#   probs2str <- function(probs, digits = 1) {
+#     paste(formatC(probs * 100,  
+#                   digits = digits, 
+#                   format = 'f', 
+#                   drop0trailing = TRUE), 
+#           "%", sep = '')
+#   } 
 
 stan_rdump <- function(list, file = "", append = FALSE, 
                        envir = parent.frame(),
-                       width = options("width")$width) {
+                       width = options("width")$width, quiet = FALSE) {
   # Dump an R list or environment for a model data 
   # to the R dump file that Stan supports.
   #
@@ -453,6 +452,7 @@ stan_rdump <- function(list, file = "", append = FALSE,
   #   append: then TRUE, the file is opened with 
   #           mode of appending; otherwise, a new file
   #           is created.  
+  #   quiet: no warning if TRUE
   # 
   # Return:
  
@@ -460,7 +460,8 @@ stan_rdump <- function(list, file = "", append = FALSE,
     ex <- sapply(list, exists, envir = envir)
     if (!all(ex)) {
       notfound_list <- list[!ex] 
-      warning(paste("objects not found: ", paste(notfound_list, collapse = ', '), sep = '')) 
+      if (!quiet) 
+        warning(paste("objects not found: ", paste(notfound_list, collapse = ', '), sep = '')) 
     } 
     list <- list[ex] 
     if (!any(ex)) 
@@ -475,7 +476,7 @@ stan_rdump <- function(list, file = "", append = FALSE,
   }
 
   for (x in list) { 
-    if (!is_legal_stan_vname(x))
+    if (!is_legal_stan_vname(x) & !quiet)
       warning(paste("variable name ", x, " is not allowed in Stan", sep = ''))
   } 
 
@@ -488,9 +489,17 @@ stan_rdump <- function(list, file = "", append = FALSE,
       vv <- data.matrix(vv) 
     } else if (is.list(vv)) {
       vv <- data_list2array(vv)
+    } else if (is.logical(vv)) {
+      mode(vv) <- "integer"
+    } else if (is.factor(vv)) {
+      vv <- as.integer(vv)
     } 
     
-    if (!is.numeric(vv))  next
+    if (!is.numeric(vv))  {
+      if (!quiet) 
+        warning(paste0("variable ", v, " is not supported for dumping."))
+      next
+    } 
 
     if (is.vector(vv)) {
       if (length(vv) == 1) {
@@ -666,6 +675,9 @@ seq_array_ind <- function(d, col_major = FALSE) {
     return(numeric(0L)) 
   total <- prod(d) 
   len <- length(d) 
+  if (len == 1L)
+    return(array(1:total, dim = c(total, 1)))
+
   res <- array(1L, dim = c(total, len)) 
   jidx <- if (col_major) 1L:len else len:1L
   for (i in 2L:total) {
@@ -901,7 +913,6 @@ combine_msd_quan <- function(msd, quan) {
 
 summary_sim <- function(sim, pars, probs = default_summary_probs()) {
   # cat("summary_sim is called.\n")
-  probs_str <- probs2str(probs)
   probs_len <- length(probs) 
   pars <- if (missing(pars)) sim$pars_oi else check_pars_second(sim, pars) 
   tidx <- pars_total_indexes(sim$pars_oi, sim$dims_oi, sim$fnames_oi, pars) 
@@ -912,6 +923,7 @@ summary_sim <- function(sim, pars, probs = default_summary_probs()) {
   lmsdq <- lapply(tidx, function(n) get_par_summary(sim, n, probs)) 
   msd <- do.call(rbind, lapply(lmsdq, function(x) x$msd)) 
   quan <- do.call(rbind, lapply(lmsdq, function(x) x$quan)) 
+  probs_str <- colnames(quan)
   dim(msd) <- c(tidx_len, 2) 
   dim(quan) <- c(tidx_len, probs_len) 
   rownames(msd) <- sim$fnames_oi[tidx] 
@@ -951,7 +963,6 @@ summary_sim <- function(sim, pars, probs = default_summary_probs()) {
 
 summary_sim_quan <- function(sim, pars, probs = default_summary_probs()) {
   # cat("summary_sim is called.\n")
-  probs_str <- probs2str(probs)
   probs_len <- length(probs) 
   pars <- if (missing(pars)) sim$pars_oi else check_pars_second(sim, pars) 
   tidx <- pars_total_indexes(sim$pars_oi, sim$dims_oi, sim$fnames_oi, pars) 
@@ -961,6 +972,7 @@ summary_sim_quan <- function(sim, pars, probs = default_summary_probs()) {
   tidx_rowm <- unlist(tidx_rowm, use.names = FALSE)
   lquan <- lapply(tidx, function(n) get_par_summary_quantile(sim, n, probs)) 
   quan <- do.call(rbind, lapply(lquan, function(x) x$quan)) 
+  probs_str <- colnames(quan) 
   dim(quan) <- c(tidx_len, probs_len) 
   rownames(quan) <- sim$fnames_oi[tidx] 
   colnames(quan) <- probs_str 

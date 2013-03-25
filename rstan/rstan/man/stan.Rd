@@ -71,7 +71,9 @@ stan(file, model_name = "anon_model", model_code = "",
       values of parameters by name for the corresponding chain.
     \code{function}: a function that returns a list for specifying 
       the initial values of parameters for a chain. The function
-      can take an optional parameter \code{chain_id}. 
+      can take an optional parameter \code{chain_id}.
+     See below notes on that RStan treats a vector of lenght 1 as
+     a scalar. 
   }
   \item{sample_file}{A character string of file name for specifying where to 
     write samples for \emph{all} parameters and other saved quantities. 
@@ -106,13 +108,25 @@ stan(file, model_name = "anon_model", model_code = "",
       \item \code{delta} (\code{double})
       \item \code{equal_step_sizes} (\code{TRUE} or \code{FALSE})
       \item \code{max_treedepth} (\code{integer})
+      \item \code{nondiag_mass} (\code{TRUE} or \code{FALSE})
     }
 
-    More details can be 
-    found in Stan's manual. By default, 
-    \code{leapfrog_steps} is \code{-1} and 
-    \code{equal_step_sizes} is \code{FALSE} so that
-    NUTS2 sampler, the default sampler, is used.
+    More details can be found in Stan's manual. The default   
+    sampler is NUTS2, where \code{leapfrog_steps} is \code{-1} and 
+    \code{equal_step_sizes} is \code{FALSE}. To use NUTS with full
+    mass matrix, set \code{nondiag_mass} to \code{TRUE}. The following 
+    table provides a summary of how to specify arguments to choose 
+    different sampler. 
+
+    \tabular{ll}{
+    HMC \tab epsilon=e leapfrog_steps=L \cr 
+    HMC + tuned step size \tab leapfrog_steps=L \cr 
+    NUTS \tab epsilon=e \cr 
+    NUTS + tuned step size (NUTS1) \tab equal_step_sizes = TRUE \cr 
+    NUTS + tuned varying step sizes (NUTS2) \tab (default) \cr 
+    NUTS + full mass matrix \tab nondiag_mass = TRUE \cr 
+    }
+    
 
     \code{chain_id} can be a vector to specify the chain_id for all 
     chains or an integer. For the former case, they should be unique. 
@@ -218,11 +232,14 @@ stan(file, model_name = "anon_model", model_code = "",
 
   Stan treats a vector of length 1 in R as a scalar.  So technically 
   if, for example, \code{"real y[1];"} is defined in the data block, an array 
-  such as \code{"y = array(1.0, dim = 1)"} in R should be used. 
+  such as \code{"y = array(1.0, dim = 1)"} in R should be used. This
+  is also the case for specifying initial values since the same 
+  underlying approach for reading data from R in Stan is used, in which
+  vector of length 1 is treated as a scalar.
 
-  The returned S4 class \code{stanfit} will save the compiled model
-  across sessions if the option \code{save_dso = TRUE}
-  is supplied.  
+  The returned S4 class \code{stanfit} includes the compiled model
+  if option \code{save_dso} is \code{TRUE}, so the compiled model
+  can be saved for using in future R sessions. 
 
   The function accepts a previously fitted instance of \code{stanfit}
   through parameter \code{fit} in order to reuse the compiled model; other
@@ -236,7 +253,7 @@ stan(file, model_name = "anon_model", model_code = "",
 }
 
 \references{
-  Stan Development Team (2012) 
+  The Stan Development Team (\Sexpr[eval=TRUE,results=text,stage=build]{format(Sys.time(),'\%Y')})
   \emph{Stan Modeling Language User's Guide and Reference Manual}. 
   \url{http://mc-stan.org}. 
 }
@@ -252,6 +269,7 @@ stan(file, model_name = "anon_model", model_code = "",
   compiling the C++ code.
 }
 \examples{\dontrun{
+#### example 1 
 library(rstan)
 scode <- "
 parameters {
@@ -271,5 +289,37 @@ e2 <- extract(fit2, permuted = TRUE)
 
 ## using as.array on the stanfit object to get samples 
 a2 <- as.array(fit2)
+
+#### example 2
+#### the result of this package is included in the package 
+
+excode <- '
+  transformed data {
+    real y[20];
+    y[1] <- 0.5796;  y[2]  <- 0.2276;   y[3] <- -0.2959; 
+    y[4] <- -0.3742; y[5]  <- 0.3885;   y[6] <- -2.1585;
+    y[7] <- 0.7111;  y[8]  <- 1.4424;   y[9] <- 2.5430; 
+    y[10] <- 0.3746; y[11] <- 0.4773;   y[12] <- 0.1803; 
+    y[13] <- 0.5215; y[14] <- -1.6044;  y[15] <- -0.6703; 
+    y[16] <- 0.9459; y[17] <- -0.382;   y[18] <- 0.7619;
+    y[19] <- 0.1006; y[20] <- -1.7461;
+  }
+  parameters {
+    real mu;
+    real<lower=0, upper=10> sigma;
+    vector[2] z[3];
+    real<lower=0> alpha;
+  } 
+  model {
+    y ~ normal(mu, sigma);
+    for (i in 1:3) 
+      z[i] ~ normal(0, 1);
+    alpha ~ exponential(2);
+  } 
+'
+
+exfit <- stan(model_code = excode, save_dso = FALSE, iter = 500)
+print(exfit)
+plot(exfit)
 }} 
 \keyword{rstan} 

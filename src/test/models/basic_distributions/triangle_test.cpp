@@ -23,12 +23,12 @@ public:
     return false;
   }
 
-  static size_t num_iterations() {
+  static int num_iterations() {
     return iterations;
   }
 
-  static std::vector<size_t> skip_chains_test() {
-    std::vector<size_t> params_to_skip;
+  static std::vector<int> skip_chains_test() {
+    std::vector<int> params_to_skip;
     return params_to_skip;
   }
 
@@ -36,12 +36,12 @@ public:
     default_populate_chains();
   }
 
-  static std::vector<std::pair<size_t, double> >
+  static std::vector<std::pair<int, double> >
   get_expected_values() {
     using std::make_pair;
-    std::vector<std::pair<size_t, double> > expected_values;
+    std::vector<std::pair<int, double> > expected_values;
     
-    expected_values.push_back(make_pair(0U, 0));
+    expected_values.push_back(make_pair(chains->index("y"), 0));
     
     return expected_values;
   }
@@ -49,24 +49,18 @@ public:
 };
 
 INSTANTIATE_TYPED_TEST_CASE_P(Models_BasicDistributions_Triangle,
-			      Model_Test_Fixture,
-			      Models_BasicDistributions_Triangle);
+            Model_Test_Fixture,
+            Models_BasicDistributions_Triangle);
 
 TEST_F(Models_BasicDistributions_Triangle,
-	Test_Triangle) {
+  Test_Triangle) {
   populate_chains();
   
-  std::vector<double> y;
-  
-  chains->get_samples(0U, y);
-  
-  double min, max;
-  min = *std::min_element(y.begin(), y.end());
-  max = *std::max_element(y.begin(), y.end());
+  Eigen::VectorXd y = chains->samples(chains->index("y"));
 
-  EXPECT_LE(min, -0.9)
+  EXPECT_LE(y.minCoeff(), -0.9)
     << "expecting to get close to the corner";
-  EXPECT_GE(max, 0.9)
+  EXPECT_GE(y.maxCoeff(), 0.9)
     << "expecting to get close to the corner";
 }
 

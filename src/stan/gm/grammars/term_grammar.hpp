@@ -24,7 +24,7 @@ namespace stan {
     template <typename Iterator>
     struct term_grammar 
       : public boost::spirit::qi::grammar<Iterator,
-                                          expression(),
+                                          expression(var_origin),
                                           whitespace_grammar<Iterator> > {
 
       term_grammar(variable_map& var_map,
@@ -39,13 +39,13 @@ namespace stan {
 
 
       boost::spirit::qi::rule<Iterator, 
-                              std::vector<expression>(), 
+                              std::vector<expression>(var_origin), 
                               whitespace_grammar<Iterator> > 
       args_r;
 
 
       boost::spirit::qi::rule<Iterator, 
-                              std::vector<expression>(), 
+                              std::vector<expression>(var_origin), 
                whitespace_grammar<Iterator> > 
       dims_r;
 
@@ -58,13 +58,13 @@ namespace stan {
 
       boost::spirit::qi::rule<Iterator, 
                               boost::spirit::qi::locals<bool>, 
-                              expression(), 
+                              expression(var_origin), 
                               whitespace_grammar<Iterator> > 
       factor_r;
 
 
       boost::spirit::qi::rule<Iterator, 
-                              fun(), 
+                              fun(var_origin), 
                               whitespace_grammar<Iterator> > 
       fun_r;
 
@@ -76,7 +76,7 @@ namespace stan {
 
 
       boost::spirit::qi::rule<Iterator, 
-                              expression(), 
+                              expression(var_origin), 
                               whitespace_grammar<Iterator> > 
       indexed_factor_r;
 
@@ -88,19 +88,19 @@ namespace stan {
 
 
       boost::spirit::qi::rule<Iterator,
-                              expression(), 
+                              expression(var_origin), 
                               whitespace_grammar<Iterator> > 
       negated_factor_r;
 
 
       boost::spirit::qi::rule<Iterator, 
-                              expression(), 
+                              expression(var_origin), 
                               whitespace_grammar<Iterator> > 
       term_r;
 
 
       boost::spirit::qi::rule<Iterator, 
-                              variable(), 
+                              variable(),
                               whitespace_grammar<Iterator> > 
       variable_r;
 

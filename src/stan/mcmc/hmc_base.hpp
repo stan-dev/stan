@@ -65,6 +65,5 @@ namespace stan {
   } // mcmc
 
 } // stan
-          
 
 #endif

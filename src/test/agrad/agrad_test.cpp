@@ -827,8 +827,39 @@ TEST(AgradAgrad,atan2_var_var) {
   EXPECT_FLOAT_EQ(-1.2 / (1.2 * 1.2 + 3.9 * 3.9), g[1]);
 }
 
+TEST(AgradAgrad,atan2_dvd) {
+  AVAR sigma = 1;
+  AVEC x = createAVEC(sigma);
+  AVAR f = atan2(1.0,sigma) / 3.14;
+  VEC g;
+  f.grad(x,g);
+
+  AVAR sigma1 = 1;
+  AVEC x1 = createAVEC(sigma1);
+  AVAR f1 = atan2(1.0,sigma1);
+  VEC g1;
+  f1.grad(x1,g1);
+
+  EXPECT_FLOAT_EQ(3.14 * g[0],g1[0]);
+}
+TEST(AgradAgrad,atan2_var_var__integration) {
+  double c = 5.0;
+  AVAR a = 1.2;
+  AVAR b = 3.9;
+  AVAR f = atan2(a,b) * c;
+  EXPECT_FLOAT_EQ(atan2(1.2,3.9)*c,f.val());
+
+  AVEC x = createAVEC(a,b);
+  VEC g;
+  f.grad(x,g);
+  EXPECT_FLOAT_EQ(3.9 / (1.2 * 1.2 + 3.9 * 3.9) * c, g[0]);
+  EXPECT_FLOAT_EQ(-1.2 / (1.2 * 1.2 + 3.9 * 3.9) * c, g[1]);
+}
+
+
 TEST(AgradAgrad,atan2_var_double) {
   AVAR a = 1.2;
+
   double b = 3.9;
   AVAR f = atan2(a,b);
   EXPECT_FLOAT_EQ(atan2(1.2,3.9),f.val());
@@ -1091,4 +1122,25 @@ TEST(AgradAgrad, multiple_grads) {
 
   EXPECT_FLOAT_EQ(3.0, grad_f[0]);
   EXPECT_FLOAT_EQ(2.0, grad_f[1]);
+}
+
+TEST(AgradAgrad, stackAllocation) {
+  using stan::agrad::vari;
+  using stan::agrad::var;
+
+  vari ai(1.0);
+  vari bi(2.0);
+
+  var a(&ai);
+  var b(&bi);
+
+  AVEC x = createAVEC(a,b);
+  var f = a * b;
+
+  VEC g;
+  f.grad(x,g);
+  
+  EXPECT_EQ(2,g.size());
+  EXPECT_FLOAT_EQ(2.0,g[0]);
+  EXPECT_FLOAT_EQ(1.0,g[1]);
 }

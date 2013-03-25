@@ -8,6 +8,24 @@
 
 namespace stan {
   namespace agrad {
+    typedef Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>::size_type size_type;
+
+    template <typename T, typename S>
+    void fill(T& x, const S& y) {
+      x = y;
+    }
+    template <typename T, int R, int C, typename S>
+    void fill(Eigen::Matrix<T,R,C>& x, const S& y) {
+      x.fill(y);
+    }
+    template <typename T, typename S>
+    void fill(std::vector<T>& x, const S& y) {
+      for (size_t i = 0; i < x.size(); ++i)
+        fill(x[i],y);
+    }
+
+
+
     class gevv_vvv_vari : public stan::agrad::vari {
     protected:
       stan::agrad::vari* alpha_;
@@ -128,7 +146,7 @@ namespace Eigen {
       ReadCost = 1,
       AddCost = 1,
       MulCost = 1,
-      HasFloatingPoint = 1,
+      HasFloatingPoint = 1
     };
   };
 
@@ -142,6 +160,7 @@ namespace Eigen {
       static inline int run()
       {
         using std::ceil;
+        using std::log;
         return cast<double,int>(ceil(-log(NumTraits<stan::agrad::var>::epsilon().val())
                                      /log(10.0)));
       }
@@ -213,12 +232,12 @@ namespace Eigen {
       typedef stan::agrad::var RhsScalar;
       typedef typename scalar_product_traits<LhsScalar, RhsScalar>::ReturnType ResScalar;
       static void run(Index rows, Index cols, Index depth,
-                      const LhsScalar* _lhs, Index lhsStride,
-                      const RhsScalar* _rhs, Index rhsStride,
-                      ResScalar* res, Index resStride,
-                      const ResScalar &alpha,
-                      level3_blocking<LhsScalar,RhsScalar>& blocking,
-                      GemmParallelInfo<Index>* info = 0)
+                  const LhsScalar* _lhs, Index lhsStride,
+                  const RhsScalar* _rhs, Index rhsStride,
+                  ResScalar* res, Index resStride,
+                  const ResScalar &alpha,
+                  level3_blocking<LhsScalar,RhsScalar>& /* blocking */,
+                  GemmParallelInfo<Index>* /* info = 0 */)
       {
         for (Index i = 0; i < cols; i++) {
           general_matrix_vector_product<Index,LhsScalar,LhsStorageOrder,ConjugateLhs,RhsScalar,ConjugateRhs>::run(
@@ -417,6 +436,13 @@ namespace stan {
             v_(v),
             size_(size) {
         }
+        template<typename Derived>
+        dot_self_vari(const Eigen::DenseBase<Derived> &v) : 
+          vari(var_dot_self(v)), size_(v.size()) {
+          v_ = (vari**)memalloc_.alloc(size_*sizeof(vari*));
+          for (size_t i = 0; i < size_; i++)
+            v_[i] = v[i].vi_;
+        }
         template <int R, int C>
         dot_self_vari(const Eigen::Matrix<var,R,C>& v) :
           vari(var_dot_self(v)), size_(v.size()) {
@@ -431,6 +457,13 @@ namespace stan {
             sum += square(v[i]->val_);
           return sum;
         }
+        template<typename Derived>
+        double var_dot_self(const Eigen::DenseBase<Derived> &v) {
+          double sum = 0.0;
+          for (int i = 0; i < v.size(); ++i)
+            sum += square(v(i).vi_->val_);
+          return sum;
+        }
         template <int R, int C>
         inline static double var_dot_self(const Eigen::Matrix<var,R,C> &v) {
           double sum = 0.0;
@@ -438,7 +471,7 @@ namespace stan {
             sum += square(v(i).vi_->val_);
           return sum;
         }
-        void chain() {
+        virtual void chain() {
           for (size_t i = 0; i < size_; ++i) 
             v_[i]->adj_ += adj_ * 2.0 * v_[i]->val_;
         }
@@ -482,7 +515,7 @@ namespace stan {
           for (size_t i = 0; i < length_; i++)
             v_[i] = v[i].vi_;
         }
-        void chain() {
+        virtual void chain() {
           for (size_t i = 0; i < length_; i++) {
             v_[i]->adj_ += adj_;
           }
@@ -589,7 +622,7 @@ namespace stan {
             v2_ = shared_v2->v2_;
           }
         }
-        void chain() {
+        virtual void chain() {
           for (size_t i = 0; i < length_; i++) {
             v1_[i]->adj_ += adj_ * v2_[i]->val_;
             v2_[i]->adj_ += adj_ * v1_[i]->val_;
@@ -679,7 +712,7 @@ namespace stan {
             v2_ = shared_v2->v2_;
           }
         }
-        void chain() {
+        virtual void chain() {
           for (size_t i = 0; i < length_; i++) {
             v1_[i]->adj_ += adj_ * v2_[i];
           }
@@ -702,6 +735,58 @@ namespace stan {
     inline var dot_self(const Eigen::Matrix<var, R, C>& v) {
       stan::math::validate_vector(v,"dot_self");
       return var(new dot_self_vari(v));
+    }
+    
+    /**
+     * Returns the dot product of each column of a matrix with itself.
+     * @param x Matrix.
+     * @tparam T scalar type
+     */
+    template<int R,int C>
+    inline Eigen::Matrix<var,1,C> 
+    columns_dot_self(const Eigen::Matrix<var,R,C>& x) {
+      Eigen::Matrix<var,1,C> ret(1,x.cols());
+      for (size_type i = 0; i < x.cols(); i++) {
+        ret(i) = var(new dot_self_vari(x.col(i)));
+      }
+      return ret;
+    }
+    
+    template<int R1,int C1,int R2, int C2>
+    inline Eigen::Matrix<var, 1, C1>
+    columns_dot_product(const Eigen::Matrix<var, R1, C1>& v1, 
+                        const Eigen::Matrix<var, R2, C2>& v2) {
+      stan::math::validate_matching_sizes(v1,v2,"columns_dot_product");
+      Eigen::Matrix<var, 1, C1> ret(1,v1.cols());
+      for (size_type j = 0; j < v1.cols(); ++j) {
+        ret(j) = var(new dot_product_vv_vari(v1.col(j),v2.col(j)));
+      }
+      return ret;
+    }
+    
+    template<int R1,int C1,int R2, int C2>
+    inline Eigen::Matrix<var, 1, C1>
+    columns_dot_product(const Eigen::Matrix<var, R1, C1>& v1, 
+                        const Eigen::Matrix<double, R2, C2>& v2) {
+      stan::math::validate_matching_sizes(v1,v2,"columns_dot_product");
+      Eigen::Matrix<var, 1, C1> ret(1,v1.cols());
+      size_t j;
+      for (j = 0; j < v1.cols(); ++j) {
+        ret(j) = var(new dot_product_vd_vari(v1.col(j),v2.col(j)));
+      }
+      return ret;
+    }
+
+    template<int R1,int C1,int R2, int C2>
+    inline Eigen::Matrix<var, 1, C1>
+    columns_dot_product(const Eigen::Matrix<double, R1, C1>& v1, 
+                        const Eigen::Matrix<var, R2, C2>& v2) {
+      stan::math::validate_matching_sizes(v1,v2,"columns_dot_product");
+      Eigen::Matrix<var, 1, C1> ret(1,v1.cols());
+      for (size_type j = 0; j < v1.cols(); ++j) {
+        ret(j) = var(new dot_product_vd_vari(v2.col(j),v1.col(j)));
+      }
+      return ret;
     }
     
     /**
@@ -840,6 +925,769 @@ namespace stan {
       return var(new sum_v_vari(m));
     }
 
+    template <int R1,int C1,int R2,int C2>
+    class mdivide_left_vv_vari : public vari {
+    public:
+      int _M; // A.rows() = A.cols() = B.rows()
+      int _N; // B.cols()
+      double* _A;
+      double* _C;
+      vari** _variRefA;
+      vari** _variRefB;
+      vari** _variRefC;
+
+      mdivide_left_vv_vari(const Eigen::Matrix<var,R1,C1> &A,
+                           const Eigen::Matrix<var,R2,C2> &B)
+      : vari(0.0),
+   _M(A.rows()),
+  _N(B.cols()),
+  _A((double*)stan::agrad::memalloc_.alloc(sizeof(double) 
+                                                 * A.rows() * A.cols())),
+  _C((double*)stan::agrad::memalloc_.alloc(sizeof(double) 
+                                                 * B.rows() * B.cols())),
+        _variRefA((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
+                   * A.rows() * A.cols())),
+        _variRefB((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
+                   * B.rows() * B.cols())),
+        _variRefC((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
+                                                      * B.rows() * B.cols()))
+      {
+  using Eigen::Matrix;
+        using Eigen::Map;
+
+  size_t pos = 0;
+  for (size_type j = 0; j < _M; j++) {
+          for (size_type i = 0; i < _M; i++) {
+            _variRefA[pos] = A(i,j).vi_;
+      _A[pos++] = A(i,j).val();
+          }
+        }
+  
+  pos = 0;
+  for (size_type j = 0; j < _N; j++) {
+          for (size_type i = 0; i < _M; i++) {
+            _variRefB[pos] = B(i,j).vi_;
+            _C[pos++] = B(i,j).val();
+          }
+        }
+        
+  Matrix<double,R1,C2> C(_M,_N);
+  C = Map<Matrix<double,R1,C2> >(_C,_M,_N);
+
+  C = Map<Matrix<double,R1,C1> >(_A,_M,_M)
+    .colPivHouseholderQr().solve(C);
+
+  pos = 0;
+        for (size_type j = 0; j < _N; j++) {
+          for (size_type i = 0; i < _M; i++) {
+      _C[pos] = C(i,j);
+            _variRefC[pos] = new vari(_C[pos],false);
+      pos++;
+          }
+        }
+      }
+      
+      virtual void chain() {
+  using Eigen::Matrix;
+        using Eigen::Map;
+  Eigen::Matrix<double,R1,C1> adjA(_M,_M);
+        Eigen::Matrix<double,R2,C2> adjB(_M,_N);
+        Eigen::Matrix<double,R1,C2> adjC(_M,_N);
+
+  size_t pos = 0;
+        for (size_type j = 0; j < adjC.cols(); j++)
+          for (size_type i = 0; i < adjC.rows(); i++)
+            adjC(i,j) = _variRefC[pos++]->adj_;
+        
+        
+  adjB = Map<Matrix<double,R1,C1> >(_A,_M,_M)
+    .transpose().colPivHouseholderQr().solve(adjC);
+  adjA.noalias() = -adjB
+    * Map<Matrix<double,R1,C2> >(_C,_M,_N).transpose();
+        
+  pos = 0;
+        for (size_type j = 0; j < adjA.cols(); j++)
+          for (size_type i = 0; i < adjA.rows(); i++)
+            _variRefA[pos++]->adj_ += adjA(i,j);
+        
+  pos = 0;
+        for (size_type j = 0; j < adjB.cols(); j++)
+          for (size_type i = 0; i < adjB.rows(); i++)
+            _variRefB[pos++]->adj_ += adjB(i,j);
+      }
+    };
+    
+    template <int R1,int C1,int R2,int C2>
+    class mdivide_left_dv_vari : public vari {
+    public:
+      int _M; // A.rows() = A.cols() = B.rows()
+      int _N; // B.cols()
+      double* _A;
+      double* _C;
+      vari** _variRefB;
+      vari** _variRefC;
+      
+      mdivide_left_dv_vari(const Eigen::Matrix<double,R1,C1> &A,
+                           const Eigen::Matrix<var,R2,C2> &B)
+      : vari(0.0),
+   _M(A.rows()),
+  _N(B.cols()),
+  _A((double*)stan::agrad::memalloc_.alloc(sizeof(double) 
+                                                 * A.rows() * A.cols())),
+  _C((double*)stan::agrad::memalloc_.alloc(sizeof(double) 
+                                                 * B.rows() * B.cols())),
+        _variRefB((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
+                   * B.rows() * B.cols())),
+        _variRefC((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
+                   * B.rows() * B.cols()))
+      {
+  using Eigen::Matrix;
+  using Eigen::Map;
+  
+  size_t pos = 0;
+  for (size_type j = 0; j < _M; j++) {
+    for (size_type i = 0; i < _M; i++) {
+      _A[pos++] = A(i,j);
+    }
+  }
+  
+  pos = 0;
+  for (size_type j = 0; j < _N; j++) {
+          for (size_type i = 0; i < _M; i++) {
+            _variRefB[pos] = B(i,j).vi_;
+            _C[pos++] = B(i,j).val();
+          }
+        }
+                
+  Matrix<double,R1,C2> C(_M,_N);
+  C = Map<Matrix<double,R1,C2> >(_C,_M,_N);
+
+  C = Map<Matrix<double,R1,C1> >(_A,_M,_M)
+    .colPivHouseholderQr().solve(C);
+  
+  pos = 0;
+        for (size_type j = 0; j < _N; j++) {
+          for (size_type i = 0; i < _M; i++) {
+      _C[pos] = C(i,j);
+            _variRefC[pos] = new vari(_C[pos],false);
+      pos++;
+          }
+        }
+      }
+      
+      virtual void chain() {
+  using Eigen::Matrix;
+        using Eigen::Map;
+        Eigen::Matrix<double,R2,C2> adjB(_M,_N);
+        Eigen::Matrix<double,R1,C2> adjC(_M,_N);
+
+  size_t pos = 0;
+        for (size_type j = 0; j < adjC.cols(); j++)
+          for (size_type i = 0; i < adjC.rows(); i++)
+            adjC(i,j) = _variRefC[pos++]->adj_;
+
+        adjB = Map<Matrix<double,R1,C1> >(_A,_M,_M)
+    .transpose().colPivHouseholderQr().solve(adjC);
+
+  pos = 0;
+        for (size_type j = 0; j < adjB.cols(); j++)
+          for (size_type i = 0; i < adjB.rows(); i++)
+            _variRefB[pos++]->adj_ += adjB(i,j);
+      }
+    };
+    
+    template <int R1,int C1,int R2,int C2>
+    class mdivide_left_vd_vari : public vari {
+    public:
+      int _M; // A.rows() = A.cols() = B.rows()
+      int _N; // B.cols()
+      double* _A;
+      double* _C;
+      vari** _variRefA;
+      vari** _variRefC;
+      
+      mdivide_left_vd_vari(const Eigen::Matrix<var,R1,C1> &A,
+                           const Eigen::Matrix<double,R2,C2> &B)
+      : vari(0.0),
+   _M(A.rows()),
+  _N(B.cols()),
+  _A((double*)stan::agrad::memalloc_.alloc(sizeof(double) 
+                                                 * A.rows() * A.cols())),
+  _C((double*)stan::agrad::memalloc_.alloc(sizeof(double) 
+                                                 * B.rows() * B.cols())),
+        _variRefA((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
+                   * A.rows() * A.cols())),
+        _variRefC((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
+                                                      * B.rows() * B.cols()))
+      {
+  using Eigen::Matrix;
+        using Eigen::Map;
+
+  size_t pos = 0;
+  for (size_type j = 0; j < _M; j++) {
+          for (size_type i = 0; i < _M; i++) {
+            _variRefA[pos] = A(i,j).vi_;
+      _A[pos++] = A(i,j).val();
+          }
+        }
+  
+        Matrix<double,R1,C2> C(_M,_N);
+  C = Map<Matrix<double,R1,C1> >(_A,_M,_M)
+    .colPivHouseholderQr().solve(B);
+
+  pos = 0;
+        for (size_type j = 0; j < _N; j++) {
+          for (size_type i = 0; i < _M; i++) {
+      _C[pos] = C(i,j);
+            _variRefC[pos] = new vari(_C[pos],false);
+      pos++;
+          }
+        }
+      }
+      
+      virtual void chain() {
+  using Eigen::Matrix;
+        using Eigen::Map;
+  Eigen::Matrix<double,R1,C1> adjA(_M,_M);
+        Eigen::Matrix<double,R1,C2> adjC(_M,_N);
+
+  size_t pos = 0;
+        for (size_type j = 0; j < adjC.cols(); j++)
+          for (size_type i = 0; i < adjC.rows(); i++)
+            adjC(i,j) = _variRefC[pos++]->adj_;
+        
+  // FIXME: add .noalias() to LHS
+  adjA = -Map<Matrix<double,R1,C1> >(_A,_M,_M)
+    .transpose()
+    .colPivHouseholderQr()
+    .solve(adjC*Map<Matrix<double,R1,C2> >(_C,_M,_N).transpose());
+
+  pos = 0;
+        for (size_type j = 0; j < adjA.cols(); j++)
+          for (size_type i = 0; i < adjA.rows(); i++)
+            _variRefA[pos++]->adj_ += adjA(i,j);
+      }
+    };
+
+    template <int R1,int C1,int R2,int C2>
+    inline 
+    Eigen::Matrix<var,R1,C2>
+    mdivide_left(const Eigen::Matrix<var,R1,C1> &A,
+                 const Eigen::Matrix<var,R2,C2> &b) {
+      Eigen::Matrix<var,R1,C2> res(b.rows(),b.cols());
+      
+      stan::math::validate_square(A,"mdivide_left");
+      stan::math::validate_multiplicable(A,b,"mdivide_left");
+      
+      // NOTE: this is not a memory leak, this vari is used in the 
+      // expression graph to evaluate the adjoint, but is not needed
+      // for the returned matrix.  Memory will be cleaned up with the arena allocator.
+      mdivide_left_vv_vari<R1,C1,R2,C2> *baseVari = new mdivide_left_vv_vari<R1,C1,R2,C2>(A,b);
+      
+      size_t pos = 0;
+      for (size_type j = 0; j < res.cols(); j++)
+  for (size_type i = 0; i < res.rows(); i++)
+          res(i,j).vi_ = baseVari->_variRefC[pos++];
+      
+      return res;
+    }
+
+    template <int R1,int C1,int R2,int C2>
+    inline 
+    Eigen::Matrix<var,R1,C2>
+    mdivide_left(const Eigen::Matrix<var,R1,C1> &A,
+                 const Eigen::Matrix<double,R2,C2> &b) {
+      Eigen::Matrix<var,R1,C2> res(b.rows(),b.cols());
+      
+      stan::math::validate_square(A,"mdivide_left");
+      stan::math::validate_multiplicable(A,b,"mdivide_left");
+      
+      // NOTE: this is not a memory leak, this vari is used in the 
+      // expression graph to evaluate the adjoint, but is not needed
+      // for the returned matrix.  Memory will be cleaned up with the arena allocator.
+      mdivide_left_vd_vari<R1,C1,R2,C2> *baseVari = new mdivide_left_vd_vari<R1,C1,R2,C2>(A,b);
+      
+      size_t pos = 0;
+      for (size_type j = 0; j < res.cols(); j++)
+  for (size_type i = 0; i < res.rows(); i++)
+          res(i,j).vi_ = baseVari->_variRefC[pos++];
+      
+      return res;
+    }
+    
+    template <int R1,int C1,int R2,int C2>
+    inline 
+    Eigen::Matrix<var,R1,C2>
+    mdivide_left(const Eigen::Matrix<double,R1,C1> &A,
+                 const Eigen::Matrix<var,R2,C2> &b) {
+      Eigen::Matrix<var,R1,C2> res(b.rows(),b.cols());
+      
+      stan::math::validate_square(A,"mdivide_left");
+      stan::math::validate_multiplicable(A,b,"mdivide_left");
+      
+      // NOTE: this is not a memory leak, this vari is used in the 
+      // expression graph to evaluate the adjoint, but is not needed
+      // for the returned matrix.  Memory will be cleaned up with the arena allocator.
+      mdivide_left_dv_vari<R1,C1,R2,C2> *baseVari = new mdivide_left_dv_vari<R1,C1,R2,C2>(A,b);
+      
+      size_t pos = 0;
+      for (size_type j = 0; j < res.cols(); j++)
+  for (size_type i = 0; i < res.rows(); i++)
+          res(i,j).vi_ = baseVari->_variRefC[pos++];
+      
+      return res;
+    }
+    
+    template <int TriView,int R1,int C1,int R2,int C2>
+    class mdivide_left_tri_vv_vari : public vari {
+    public:
+      int _M; // A.rows() = A.cols() = B.rows()
+      int _N; // B.cols()
+      double* _A;
+      double* _C;
+      vari** _variRefA;
+      vari** _variRefB;
+      vari** _variRefC;
+      
+      mdivide_left_tri_vv_vari(const Eigen::Matrix<var,R1,C1> &A,
+                               const Eigen::Matrix<var,R2,C2> &B)
+      : vari(0.0),
+  _M(A.rows()),
+  _N(B.cols()),
+  _A((double*)stan::agrad::memalloc_.alloc(sizeof(double) 
+                                                 * A.rows() * A.cols())),
+  _C((double*)stan::agrad::memalloc_.alloc(sizeof(double) 
+                                                 * B.rows() * B.cols())),
+        _variRefA((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
+                   * A.rows() 
+                   * (A.rows() + 1) / 2)),
+        _variRefB((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
+                   * B.rows() * B.cols())),
+        _variRefC((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
+                                                      * B.rows() * B.cols()))
+      {
+  using Eigen::Matrix;
+        using Eigen::Map;
+
+  size_t pos = 0;
+  if (TriView == Eigen::Lower) {
+    for (size_type j = 0; j < _M; j++)
+      for (size_type i = j; i < _M; i++)
+        _variRefA[pos++] = A(i,j).vi_;
+  } else if (TriView == Eigen::Upper) {
+    for (size_type j = 0; j < _M; j++)
+      for (size_type i = 0; i < j+1; i++)
+        _variRefA[pos++] = A(i,j).vi_;
+  }
+
+  pos = 0;
+  for (size_type j = 0; j < _M; j++) {
+          for (size_type i = 0; i < _M; i++) {
+      _A[pos++] = A(i,j).val();
+          }
+        }
+  
+  pos = 0;
+  for (size_type j = 0; j < _N; j++) {
+          for (size_type i = 0; i < _M; i++) {
+            _variRefB[pos] = B(i,j).vi_;
+            _C[pos++] = B(i,j).val();
+          }
+        }
+        
+  Matrix<double,R1,C2> C(_M,_N);
+  C = Map<Matrix<double,R1,C2> >(_C,_M,_N);
+
+  C = Map<Matrix<double,R1,C1> >(_A,_M,_M)
+    .template triangularView<TriView>().solve(C);
+
+  pos = 0;
+        for (size_type j = 0; j < _N; j++) {
+          for (size_type i = 0; i < _M; i++) {
+      _C[pos] = C(i,j);
+            _variRefC[pos] = new vari(_C[pos],false);
+      pos++;
+          }
+        }
+
+      }
+      
+      virtual void chain() {
+  using Eigen::Matrix;
+        using Eigen::Map;
+  Matrix<double,R1,C1> adjA(_M,_M);
+        Matrix<double,R2,C2> adjB(_M,_N);
+        Matrix<double,R1,C2> adjC(_M,_N);
+
+  size_t pos = 0;
+        for (size_type j = 0; j < adjC.cols(); j++)
+          for (size_type i = 0; i < adjC.rows(); i++)
+            adjC(i,j) = _variRefC[pos++]->adj_;
+        
+  adjB = Map<Matrix<double,R1,C1> >(_A,_M,_M)
+    .template triangularView<TriView>().transpose().solve(adjC);
+  adjA.noalias() = -adjB
+    * Map<Matrix<double,R1,C2> >(_C,_M,_N).transpose();
+        
+  pos = 0;
+  if (TriView == Eigen::Lower) {
+    for (size_type j = 0; j < adjA.cols(); j++)
+      for (size_type i = j; i < adjA.rows(); i++)
+        _variRefA[pos++]->adj_ += adjA(i,j);
+  } else if (TriView == Eigen::Upper) {
+    for (size_type j = 0; j < adjA.cols(); j++)
+      for (size_type i = 0; i < j+1; i++)
+        _variRefA[pos++]->adj_ += adjA(i,j);
+  } 
+        
+  pos = 0;
+        for (size_type j = 0; j < adjB.cols(); j++)
+          for (size_type i = 0; i < adjB.rows(); i++)
+            _variRefB[pos++]->adj_ += adjB(i,j);
+      }
+    };
+
+    template <int TriView,int R1,int C1,int R2,int C2>
+    class mdivide_left_tri_dv_vari : public vari {
+    public:
+      int _M; // A.rows() = A.cols() = B.rows()
+      int _N; // B.cols()
+      double* _A;
+      double* _C;
+      vari** _variRefB;
+      vari** _variRefC;
+      
+      mdivide_left_tri_dv_vari(const Eigen::Matrix<double,R1,C1> &A,
+                               const Eigen::Matrix<var,R2,C2> &B)
+      : vari(0.0),
+  _M(A.rows()),
+  _N(B.cols()),
+  _A((double*)stan::agrad::memalloc_.alloc(sizeof(double) 
+                                                 * A.rows() * A.cols())),
+  _C((double*)stan::agrad::memalloc_.alloc(sizeof(double) 
+                                                 * B.rows() * B.cols())),
+        _variRefB((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
+                   * B.rows() * B.cols())),
+        _variRefC((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
+                                                      * B.rows() * B.cols()))
+      {
+  using Eigen::Matrix;
+        using Eigen::Map;
+
+  size_t pos = 0;
+  for (size_type j = 0; j < _M; j++) {
+          for (size_type i = 0; i < _M; i++) {
+      _A[pos++] = A(i,j);
+          }
+        }
+
+  pos = 0;
+  for (size_type j = 0; j < _N; j++) {
+          for (size_type i = 0; i < _M; i++) {
+            _variRefB[pos] = B(i,j).vi_;
+            _C[pos++] = B(i,j).val();
+          }
+        }
+
+  Matrix<double,R1,C2> C(_M,_N);
+  C = Map<Matrix<double,R1,C2> >(_C,_M,_N);
+  
+  C = Map<Matrix<double,R1,C1> >(_A,_M,_M)
+    .template triangularView<TriView>().solve(C);
+
+  pos = 0;
+        for (size_type j = 0; j < _N; j++) {
+          for (size_type i = 0; i < _M; i++) {
+      _C[pos] = C(i,j);
+            _variRefC[pos] = new vari(_C[pos],false);
+      pos++;
+          }
+        }
+      }
+      
+      virtual void chain() {
+  using Eigen::Matrix;
+        using Eigen::Map;
+        Matrix<double,R2,C2> adjB(_M,_N);
+        Matrix<double,R1,C2> adjC(_M,_N);
+
+  size_t pos = 0;
+        for (size_type j = 0; j < adjC.cols(); j++)
+          for (size_type i = 0; i < adjC.rows(); i++)
+            adjC(i,j) = _variRefC[pos++]->adj_;
+
+  adjB = Map<Matrix<double,R1,C1> >(_A,_M,_M)
+    .template triangularView<TriView>().transpose().solve(adjC);
+  
+  pos = 0;
+        for (size_type j = 0; j < adjB.cols(); j++)
+          for (size_type i = 0; i < adjB.rows(); i++)
+            _variRefB[pos++]->adj_ += adjB(i,j);
+      }
+    };
+    
+    template <int TriView,int R1,int C1,int R2,int C2>
+    class mdivide_left_tri_vd_vari : public vari {
+    public:
+      int _M; // A.rows() = A.cols() = B.rows()
+      int _N; // B.cols()
+      double* _A;
+      double* _C;
+      vari** _variRefA;
+      vari** _variRefC;
+
+      mdivide_left_tri_vd_vari(const Eigen::Matrix<var,R1,C1> &A,
+                               const Eigen::Matrix<double,R2,C2> &B)
+      : vari(0.0),
+  _M(A.rows()),
+  _N(B.cols()),
+  _A((double*)stan::agrad::memalloc_.alloc(sizeof(double) 
+                                                 * A.rows() * A.cols())),
+  _C((double*)stan::agrad::memalloc_.alloc(sizeof(double) 
+                                                 * B.rows() * B.cols())),
+        _variRefA((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
+                   * A.rows() 
+                   * (A.rows() + 1) / 2)),
+        _variRefC((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
+                                                      * B.rows() * B.cols()))
+      {
+  using Eigen::Matrix;
+        using Eigen::Map;
+
+  size_t pos = 0;
+  if (TriView == Eigen::Lower) {
+    for (size_type j = 0; j < _M; j++)
+      for (size_type i = j; i < _M; i++)
+        _variRefA[pos++] = A(i,j).vi_;
+  } else if (TriView == Eigen::Upper) {
+    for (size_type j = 0; j < _M; j++)
+      for (size_type i = 0; i < j+1; i++)
+        _variRefA[pos++] = A(i,j).vi_;
+  } 
+
+  pos = 0;
+  for (size_type j = 0; j < _M; j++) {
+          for (size_type i = 0; i < _M; i++) {
+      _A[pos++] = A(i,j).val();
+          }
+        }
+
+  Matrix<double,R1,C2> C(_M,_N);
+  C = Map<Matrix<double,R1,C1> >(_A,_M,_M)
+    .template triangularView<TriView>().solve(B);
+
+  pos = 0;
+        for (size_type j = 0; j < _N; j++) {
+          for (size_type i = 0; i < _M; i++) {
+      _C[pos] = C(i,j);
+            _variRefC[pos] = new vari(_C[pos],false);
+      pos++;
+          }
+        }
+      }
+      
+      virtual void chain() {
+  using Eigen::Matrix;
+        using Eigen::Map;
+  Matrix<double,R1,C1> adjA(_M,_M);
+        Matrix<double,R1,C2> adjC(_M,_N);
+        
+  size_t pos = 0;
+        for (size_type j = 0; j < adjC.cols(); j++)
+          for (size_type i = 0; i < adjC.rows(); i++)
+            adjC(i,j) = _variRefC[pos++]->adj_;
+
+  adjA.noalias() = -Map<Matrix<double,R1,C1> >(_A,_M,_M)
+    .template triangularView<TriView>()
+    .transpose().solve(adjC*Map<Matrix<double,R1,C2> >(_C,_M,_N).transpose());
+  
+  pos = 0;
+  if (TriView == Eigen::Lower) {
+    for (size_type j = 0; j < adjA.cols(); j++)
+      for (size_type i = j; i < adjA.rows(); i++)
+        _variRefA[pos++]->adj_ += adjA(i,j);
+  } else if (TriView == Eigen::Upper) {
+    for (size_type j = 0; j < adjA.cols(); j++)
+      for (size_type i = 0; i < j+1; i++)
+        _variRefA[pos++]->adj_ += adjA(i,j);
+  }
+      }
+    };
+    
+    template <int TriView,int R1,int C1,int R2,int C2>
+    inline 
+    Eigen::Matrix<var,R1,C2>
+    mdivide_left_tri(const Eigen::Matrix<var,R1,C1> &A,
+                     const Eigen::Matrix<var,R2,C2> &b) {
+      Eigen::Matrix<var,R1,C2> res(b.rows(),b.cols());
+      
+      stan::math::validate_square(A,"mdivide_left_tri");
+      stan::math::validate_multiplicable(A,b,"mdivide_left_tri");
+      
+      // NOTE: this is not a memory leak, this vari is used in the 
+      // expression graph to evaluate the adjoint, but is not needed
+      // for the returned matrix.  Memory will be cleaned up with the arena allocator.
+      mdivide_left_tri_vv_vari<TriView,R1,C1,R2,C2> *baseVari = new mdivide_left_tri_vv_vari<TriView,R1,C1,R2,C2>(A,b);
+
+      size_t pos = 0;
+      for (size_type j = 0; j < res.cols(); j++)
+  for (size_type i = 0; i < res.rows(); i++)
+    res(i,j).vi_ = baseVari->_variRefC[pos++];
+      
+      return res;
+    }
+    template <int TriView,int R1,int C1,int R2,int C2>
+    inline 
+    Eigen::Matrix<var,R1,C2>
+    mdivide_left_tri(const Eigen::Matrix<double,R1,C1> &A,
+                     const Eigen::Matrix<var,R2,C2> &b) {
+      Eigen::Matrix<var,R1,C2> res(b.rows(),b.cols());
+      
+      stan::math::validate_square(A,"mdivide_left_tri");
+      stan::math::validate_multiplicable(A,b,"mdivide_left_tri");
+      
+      // NOTE: this is not a memory leak, this vari is used in the 
+      // expression graph to evaluate the adjoint, but is not needed
+      // for the returned matrix.  Memory will be cleaned up with the arena allocator.
+      mdivide_left_tri_dv_vari<TriView,R1,C1,R2,C2> *baseVari = new mdivide_left_tri_dv_vari<TriView,R1,C1,R2,C2>(A,b);
+
+      size_t pos = 0;
+      for (size_type j = 0; j < res.cols(); j++)
+  for (size_type i = 0; i < res.rows(); i++)
+          res(i,j).vi_ = baseVari->_variRefC[pos++];
+      
+      return res;
+    }
+    template <int TriView,int R1,int C1,int R2,int C2>
+    inline 
+    Eigen::Matrix<var,R1,C2>
+    mdivide_left_tri(const Eigen::Matrix<var,R1,C1> &A,
+                     const Eigen::Matrix<double,R2,C2> &b) {
+      Eigen::Matrix<var,R1,C2> res(b.rows(),b.cols());
+      
+      stan::math::validate_square(A,"mdivide_left_tri");
+      stan::math::validate_multiplicable(A,b,"mdivide_left_tri");
+      
+      // NOTE: this is not a memory leak, this vari is used in the 
+      // expression graph to evaluate the adjoint, but is not needed
+      // for the returned matrix.  Memory will be cleaned up with the arena allocator.
+      mdivide_left_tri_vd_vari<TriView,R1,C1,R2,C2> *baseVari = new mdivide_left_tri_vd_vari<TriView,R1,C1,R2,C2>(A,b);
+      
+      size_t pos = 0;
+      for (size_type j = 0; j < res.cols(); j++)
+  for (size_type i = 0; i < res.rows(); i++)
+          res(i,j).vi_ = baseVari->_variRefC[pos++];
+      
+      return res;
+    }
+    
+    template<int R,int C>
+    class determinant_vari : public vari {
+      int _rows;
+      int _cols;
+      double* _A;
+      vari** _adjARef;
+    public:
+      determinant_vari(const Eigen::Matrix<var,R,C> &A)
+      : vari(determinant_vari_calc(A)), 
+        _rows(A.rows()),
+        _cols(A.cols()),
+        _A((double*)stan::agrad::memalloc_.alloc(sizeof(double) 
+                                                 * A.rows() * A.cols())),
+        _adjARef((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
+                                                      * A.rows() * A.cols()))
+      {
+        size_t pos = 0;
+        for (size_type j = 0; j < _cols; j++) {
+          for (size_type i = 0; i < _rows; i++) {
+            _A[pos] = A(i,j).val();
+            _adjARef[pos++] = A(i,j).vi_;
+          }
+        }
+      }
+      static 
+      double determinant_vari_calc(const Eigen::Matrix<var,R,C> &A) {
+        Eigen::Matrix<double,R,C> Ad(A.rows(),A.cols());
+        for (size_type j = 0; j < A.rows(); j++)
+          for (size_type i = 0; i < A.cols(); i++)
+            Ad(i,j) = A(i,j).val();
+        return Ad.determinant();
+      }
+      virtual void chain() {
+        using Eigen::Matrix;
+        using Eigen::Map;
+        Matrix<double,R,C> adjA(_rows,_cols);
+        adjA = (adj_ * val_) * 
+          Map<Matrix<double,R,C> >(_A,_rows,_cols).inverse().transpose();
+        size_t pos = 0;
+        for (size_type j = 0; j < _cols; j++) {
+          for (size_type i = 0; i < _rows; i++) {
+            _adjARef[pos++]->adj_ += adjA(i,j);
+          }
+        }
+      }
+    };
+    
+    template <int R, int C>
+    inline var determinant(const Eigen::Matrix<var,R,C>& m) {
+      stan::math::validate_square(m,"determinant");
+      return var(new determinant_vari<R,C>(m));
+    }
+
+    template<int R,int C>
+    class log_determinant_vari : public vari {
+      int _rows;
+      int _cols;
+      double* _A;
+      vari** _adjARef;
+    public:
+      log_determinant_vari(const Eigen::Matrix<var,R,C> &A)
+      : vari(log_determinant_vari_calc(A)), 
+        _rows(A.rows()),
+        _cols(A.cols()),
+        _A((double*)stan::agrad::memalloc_.alloc(sizeof(double) 
+                                                 * A.rows() * A.cols())),
+        _adjARef((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
+                                                      * A.rows() * A.cols()))
+      {
+        size_t pos = 0;
+        for (size_type j = 0; j < _cols; j++) {
+          for (size_type i = 0; i < _rows; i++) {
+            _A[pos] = A(i,j).val();
+            _adjARef[pos++] = A(i,j).vi_;
+          }
+        }
+      }
+      static 
+      double log_determinant_vari_calc(const Eigen::Matrix<var,R,C> &A)
+      {
+        Eigen::Matrix<double,R,C> Ad(A.rows(),A.cols());
+        for (size_type j = 0; j < A.cols(); j++)
+          for (size_type i = 0; i < A.rows(); i++)
+            Ad(i,j) = A(i,j).val();
+        return Ad.fullPivHouseholderQr().logAbsDeterminant();
+      }
+      virtual void chain() {
+        using Eigen::Matrix;
+        using Eigen::Map;
+        Matrix<double,R,C> adjA(_rows,_cols);
+        adjA = adj_ 
+          * Map<Matrix<double,R,C> >(_A,_rows,_cols)
+          .inverse().transpose();
+        size_t pos = 0;
+        for (size_type j = 0; j < _cols; j++) {
+          for (size_type i = 0; i < _rows; i++) {
+            _adjARef[pos++]->adj_ += adjA(i,j);
+          }
+        }
+      }
+    };
+    
+    template <int R, int C>
+    inline var log_determinant(const Eigen::Matrix<var,R,C>& m) {
+      stan::math::validate_square(m,"log_determinant");
+      return var(new log_determinant_vari<R,C>(m));
+    }
 
     /**
      * Return the division of the first scalar by
@@ -1188,44 +2036,30 @@ namespace stan {
     inline void assign_to_var(double& n_lhs, const double& n_rhs) {
       n_lhs = n_rhs;  // FIXME: no call -- just filler to instantiate
     }
-
+    
     template <typename LHS, typename RHS>
     inline void assign_to_var(std::vector<LHS>& x, const std::vector<RHS>& y) {
+      stan::math::validate_matching_sizes(x,y,"assign_to_var");
       for (size_t i = 0; i < x.size(); ++i)
         assign_to_var(x[i],y[i]);
     }
-    template <typename LHS, typename RHS>
-    inline void assign_to_var(Eigen::Matrix<LHS,Eigen::Dynamic,1>& x, 
-                              const Eigen::Matrix<RHS,Eigen::Dynamic,1>& y) {
-      typedef 
-        typename Eigen::Matrix<LHS,Eigen::Dynamic,1>::size_type 
-        size_type;
-      for (size_type i = 0; i < x.size(); ++i)
-        assign_to_var(x(i),y(i));
-    }
-    template <typename LHS, typename RHS>
-    inline void assign_to_var(Eigen::Matrix<LHS,1,Eigen::Dynamic>& x, 
-                              const Eigen::Matrix<RHS,1,Eigen::Dynamic>& y) {
-      typedef 
-        typename Eigen::Matrix<LHS,1,Eigen::Dynamic>::size_type 
-        size_type;
-      for (size_type i = 0; i < x.size(); ++i)
-        assign_to_var(x(i),y(i));
-    }
-    template <typename LHS, typename RHS>
-    inline void assign_to_var(Eigen::Matrix<LHS,Eigen::Dynamic,Eigen::Dynamic>& x, 
-                      const Eigen::Matrix<RHS,Eigen::Dynamic,Eigen::Dynamic>& y) {
-      typedef 
-        typename Eigen::Matrix<LHS,Eigen::Dynamic,Eigen::Dynamic>::size_type 
-        size_type1;
-      typedef 
-        typename Eigen::Matrix<RHS,Eigen::Dynamic,Eigen::Dynamic>::size_type 
-        size_type2;
-      for (size_type1 n = 0; n < x.cols(); ++n)
-        for (size_type2 m = 0; m < x.rows(); ++m)
+    template <typename LHS, typename RHS, int R, int C>
+    inline void assign_to_var(Eigen::Matrix<LHS,R,C>& x, 
+                              const Eigen::Matrix<RHS,R,C>& y) {
+      stan::math::validate_matching_sizes(x,y,"assign_to_var");
+      for (size_type n = 0; n < x.cols(); ++n)
+        for (size_type m = 0; m < x.rows(); ++m)
           assign_to_var(x(m,n),y(m,n));
     }
 
+    template <typename LHS, typename RHS, int R, int C>
+    inline void assign_to_var(Eigen::Block<LHS>& x,
+                              const Eigen::Matrix<RHS,R,C>& y) {
+      stan::math::validate_matching_sizes(x,y,"assign_to_var");
+      for (size_type n = 0; n < y.cols(); ++n)
+        for (size_type m = 0; m < y.rows(); ++m)
+          assign_to_var(x(m,n),y(m,n));
+    }
     
     template <typename LHS, typename RHS>
     struct needs_promotion {
@@ -1235,7 +2069,7 @@ namespace stan {
     
     template <bool PromoteRHS, typename LHS, typename RHS>
     struct assigner {
-      static inline void assign(LHS& var, const RHS& val) {
+      static inline void assign(LHS& /*var*/, const RHS& /*val*/) {
         throw std::domain_error("should not call base class of assigner");
       }
     };
@@ -1254,6 +2088,11 @@ namespace stan {
       }
     };
     
+    
+    template <typename LHS, typename RHS>
+    inline void assign(Eigen::Block<LHS> var, const RHS& val) {
+      assigner<needs_promotion<Eigen::Block<LHS>,RHS>::value, Eigen::Block<LHS>, RHS>::assign(var,val);
+    }
     
     template <typename LHS, typename RHS>
     inline void assign(LHS& var, const RHS& val) {

@@ -8,6 +8,8 @@
 #include <stan/agrad/matrix.hpp>
 #include <stan/prob/traits.hpp>
 #include <boost/concept_check.hpp>
+#include "stan/prob/distributions/univariate/continuous/normal.hpp"
+#include "stan/prob/distributions/univariate/continuous/chi_square.hpp"
 
 namespace stan {
 
@@ -62,11 +64,20 @@ namespace stan {
       if (!check_greater_or_equal(function, nu, k - 1, 
                                   "Degrees of freedom parameter", &lp, Policy()))
         return lp;
-      if (!check_size_match(function, W.rows(), W.cols(), &lp, Policy()))
+      if (!check_size_match(function, 
+          W.rows(), "Rows of random variable",
+          W.cols(), "columns of random variable",
+          &lp, Policy()))
         return lp;
-      if (!check_size_match(function, S.rows(), S.cols(), &lp, Policy()))
+      if (!check_size_match(function, 
+          S.rows(), "Rows of scale parameter",
+          S.cols(), "columns of scale parameter",
+          &lp, Policy()))
         return lp;
-      if (!check_size_match(function, W.rows(), S.rows(), &lp, Policy()))
+      if (!check_size_match(function, 
+          W.rows(), "Rows of random variable",
+          S.rows(), "columns of scale parameter",
+          &lp, Policy()))
         return lp;
       // FIXME: domain checks
 
@@ -149,7 +160,29 @@ namespace stan {
       return wishart_log<false>(W,nu,S,stan::math::default_policy());
     }
 
+    template <class RNG>
+    inline Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>
+    wishart_rng(double nu,
+		const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
+		RNG& rng) {
 
+      Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> B(Sigma.rows(), Sigma.cols());
+      for(int i = 0; i < Sigma.rows(); i++)
+	{
+	  for(int j = 0; j < Sigma.rows(); j++)
+	    B(i,j) = 0;
+	}
+
+      Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> A(Sigma.rows(), 1);
+      for(int i = 0; i < Sigma.cols(); i++)
+	{
+	  B(i,i) = std::sqrt(chi_square_rng(nu - i, rng));
+	  for(int j = 0; j < i; j++)
+	    B(j,i) = normal_rng(0,1,rng);
+	}
+
+      return Sigma.llt().matrixL() * B * B.transpose() * Sigma.llt().matrixL().transpose();
+    }
   }
 }
 #endif

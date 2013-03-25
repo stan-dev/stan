@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 #include <stan/math/special_functions.hpp>
 #include <stan/prob/distributions/univariate/discrete/ordered_logistic.hpp>
+#include <boost/random/mersenne_twister.hpp>
+#include<boost/math/distributions.hpp>
 
 using Eigen::Matrix;
 using Eigen::Dynamic;
@@ -19,8 +21,6 @@ get_simplex(double lambda,
   theta(K-1) = inv_logit(lambda - c(K-2)); // - 0.0
   return theta;
 }
-
-
 
 TEST(ProbDistributions,ordered_logistic_vals) {
   using Eigen::Matrix;
@@ -202,5 +202,65 @@ TEST(ProbDistributions,ordered_logistic_errno_policy) {
   cbad3[1] = nan;
   expect_nan(ordered_logistic_log(1,1.0,cbad3,errno_policy()));
 
+}
+
+TEST(ProbDistributionOrderedLogistic, random) {
+  boost::random::mt19937 rng;
+  double inf = std::numeric_limits<double>::infinity();
+  Eigen::VectorXd c(3);
+  c << -inf, 
+    2.0,
+    inf;
+  EXPECT_NO_THROW(stan::prob::ordered_logistic_rng(4.0, c, rng));
+}
+
+TEST(ProbDistributionOrderedLogistic, chiSquareGoodnessFitTest) {
+  using stan::math::inv_logit;
+  boost::random::mt19937 rng;
+  int N = 10000;
+  double eta = 1.0;
+  Eigen::VectorXd theta(3);
+  theta << -1.4, 
+    21.0,
+    139.2;
+  Eigen::VectorXd prob(4);
+  prob(0) = 1 - inv_logit(eta - theta(0));
+  prob(1) = inv_logit(eta - theta(0)) - inv_logit(eta - theta(1));
+  prob(2) = inv_logit(eta - theta(1)) - inv_logit(eta - theta(2));
+  prob(3) = inv_logit(eta - theta(2));
+  int K = prob.rows();
+  boost::math::chi_squared mydist(K-1);
+
+  Eigen::VectorXd loc(prob.rows());
+  for(int i = 0; i < prob.rows(); i++)
+    loc(i) = 0;
+
+  for(int i = 0; i < prob.rows(); i++)
+    {
+      for(int j = i; j < prob.rows(); j++)
+	loc(j) += prob(i);
+    }
+
+  int count = 0;
+  int bin [K];
+  double expect [K];
+  for(int i = 0 ; i < K; i++)
+  {
+    bin[i] = 0;
+    expect[i] = N * prob(i);
+  }
+
+  while (count < N) {
+    int a = stan::prob::ordered_logistic_rng(eta,theta,rng);
+    bin[a - 1]++;
+    count++;
+   }
+
+  double chi = 0;
+
+  for(int j = 0; j < K; j++)
+    chi += ((bin[j] - expect[j]) * (bin[j] - expect[j]) / expect[j]);
+
+  EXPECT_TRUE(chi < quantile(complement(mydist, 1e-6)));
 }
 

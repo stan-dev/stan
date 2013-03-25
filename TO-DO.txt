@@ -9,49 +9,38 @@ The to-do list is organized into the following sections:
 * Modeling Language             * Manual
 * Build                         * Web Pages
 * Testing                       * Release Mgmt
-* Command-Line                  * ModelsC++ API
+* Command-Line                  * Models 
+* C++ API
 
-v1.1.0
-======================================================================
--- New Features
-   * Conditiaonl (if-then-else) statements
-   * While statements
--- New Functions
-   * generalized multiply_lower_tri_self_transpose() to non-square
-     matrices
-   * special functions: log_inv_logit(), log1m_inv_logit()
-   * matrix special functions: cumulative_sum()
-   * probability functions: poisson_log_log() for log-rate 
-     parameterized Poisson
-   * matrix functions: block(), diag_pre_multiply(), diag_post_multiply()
-   * comparison operators (<, >, <=, >=, ==, !=)
-   * boolean operators (!, ||, &&)
--- Bug Fixes
-   * fixed bug introduced in 1.0.3 that hid line and column number
-     bug reporting
-   * added checks that data dimensions match as well as sizes
-   * removed non-symmetric versions of eigenvalues() and eigenvectors()
-   * testing identifiers are not reserved words in C++/Stan
-   * trapping/reporting locations of errors in data and init reads
--- Code Improvements
-   * templated out matrix libs to reduce code duplication
-   * vectorized auto-dif for tcrossprod() and crossprod()
--- Libraries Updated
-   * Eigen version 3.1.1 replaced with version 3.1.2
-   * Boost version 1.51.0 replaced with version 1.52.0
+
+1.2.1
+-------------------------------------------
+
+* add user-contrib ARMA(1,1) model to the manual
+  see Wayne Folta's e-mmail of 3/11/13
+
+* fix truncated distributions to return 1 rather than 0
+  in degenerate cases
 
 PRIORITIES?
 ======================================================================
 + (name): actively assigned
 * (name): likely to be assigned to
 
+Contributed Code
+-------------------------------------------
++ R compiler
++ emacs modes, etc.
+
 Efficiency/Scalability of Code and Sampling
 -------------------------------------------
++ (Daniel) replace tests with doubles
++ (Daniel) full multivariate probability function tests
 + (Yuanjun) adapting fixed covariance matrix during warmup
 + (Daniel) vectorized derivatives for prob functions
 + (Marcus) vectorization of multivariate prob functions
++ (Bob) replace std::vector with Eigen constructs in models
 * special function vectorization
-* matrix derivative partial evals
 * (Ben) covariance matrix w. caching (inverse, determinant, Cholesky)
 * multi-threading
 * ensemble samplers: DREAM, differential evolution, stretch/walk
@@ -79,6 +68,7 @@ Modeling Language
 
 Command and Interfaces
 ----------------------
+
 * command for multiple chains + report like print(fit) in RStan
 * Python, MATLAB, Julia, Stata, ??? interfaces
 * convergence diagnostics (basic I/O of leapfrog/gradients + evals)
@@ -101,11 +91,115 @@ Doc
 
 
 
+RM-HMC
+======================================================================
+Need a model that produces:
+
+Full:
+  - Hessian (dense) [symmetric view in Eigen]
+  - grad Tr[M * Hessian];  // M symmetric and fixed
+  - Note: Tr[M * Hessian] == dot_product(vec(M), vec(Hessian))
+
+Diagonal Hessian:
+  - diagonal of Hessian
+  - grad (Hessian * vector)
 
 
 C++ API
 ======================================================================
 [items go here first, then to RStan/cmd]
+
+* new vector views
+ 
+ ?? promote up from double to matrix?
+ ?? allow matrix | (vector & row_vector & real[] & int[]) | real | int
+
+  template <typename StorageT, typename ReturnT>
+  struct View {
+    View({const} StorageT& values, 
+         const vector<int>& return_dims);  // clunky?
+    int size() const; 
+    {const} ReturnT& operator[](int n) {const};
+    const vector<int>& storage_dims() const;
+    const vector<int>& return_dims() const;        
+  };
+
+  ? Can ReturnT be an array?  not sure we need it, because
+    everything is vector/matrix in multi-dim prob functions
+
+    types:
+       normal_log(scalar,scalar,scalar)
+       dirichlet_log(simplex,vector);
+       multi_normal(vector,vector,cov_matrix);
+       categorical(int,simplex);
+       multinomial(vector,simplex);
+
+  multinomial(T_out& y, T_prob& theta) {
+      View<T_out, vector_d> y_view;
+      View<T_prob, vector_d> theta_view;
+      check_consistency(y,theta); // lots of work here
+      for size of y view
+        check_validity(y);  // non-negative ints
+      for size of theta view
+        check_validity(theta);  // simplex
+
+  ? promote vectors to matrices?
+    -- row vetor copy rows #cols times
+    -- col vector copy cols #rows times
+
+  ? any way to decide from the outside?
+  multi_normal_log(double,double,matrix_d);
+  -- figure out dims of double from matrix
+
+  dirichlet_log(double,double)  
+  -- can't figure out dims of double here
+
+  // promote double to matrix
+  double x = ...;
+  vector<int> dims(2);
+  dims[0] = M;
+  dims[1] = N;
+  View<double, Matrix<double,Dynamic,Dynamic> >(x,dims);
+  
+
+
+
+* deprecate lkj_cov
+  - work out general framework for deprecated functions
+    with warning messages
+  - include option for deleted functions with error messages
+
+* How to deal with generated quantities
+  - execute & print every time
+  - warning message for print that it only happens
+    for saved samples
+
+* JSON I/O.  Check out:
+
+http://www.boost.org/doc/libs/1_53_0/doc/html/property_tree/reference.html#header.boost.property_tree.json_parser_hpp 
+
+* refactoring:
+  -- remove mcmc/hmc.hpp
+  -- merge nuts_nondiag and nuts_givenmass
+  -- take in something other than string on input for nutsmass
+  -- merge in nuts_diag if possible
+
+* replace Eigen .sum() with stan::math::sum() for auto-dif
+
+* remove (unsigned) long long instances in dump and error testing
+
+* shift APIs from std::vector<T> to Eigen::Matrix<T,Dynamic,1>, etc.
+
+* remove chainable() intermediate class and get rid of virtual
+  function for init zero
+
+* check out varying target acceptance rates, trying
+    1/2, 1/4, 3/4, 1/8, 7/8, ...
+  and then divide and conquer
+
+* evaluate different maximum number of steps
+  -- during warmup
+  -- during sampling
 
 * rewrite functions in matrix.hpp.
   -- Functions:
@@ -145,37 +239,14 @@ C++ API
   mkdir /tmp/boost_1.52.0
   find ${STAN_HOME}/src/ -name \*\.\[ch]pp -exec bcp --scan --boost=${STAN_HOME}/lib/boost_1.52.0 '{}' /tmp/boost_1.52.0/ \; &> /tmp/boost_1.52.0/bcp.log 
 
-* poisson_log(y|alpha) = poisson(y|exp(alpha))
-
 * change step_size = epsilon +/- epsilon_pm to
   step_size = min(C, epsilon + normal(0,sigma))
-
-* remove (unsigned) long long instances in dump and error testing
 
 * check that positive definiteness enforced for transformed params,
   transformed data
 
-* replace Eigen .sum() with stan::math::sum() for auto-dif
-
 * switch error checking for agrad::var matrix ops to
   convert to double-based matrix for check as in vectorized univariates
-
-* Vectorize distributions
-  - Allows vectorized inputs (but without partials calculated):
-    univariate/continuous
-    + chi_square
-    + exponential
-    + inv_chi_square
-    + scaled_inv_chi_square
-    + student_t
-    + uniform
-    + weibull
-    univariate/discrete
-    + binomial
-    + beta_binomial (needs more testing)
-    + hypergeometric
-    + neg_binomial
-    + poisson
 
 * Ben's example: 
   matrix[3,2] ~ normal(matrix[3,1], matrix[1,2])
@@ -229,6 +300,10 @@ C++ API
         beta  <- (1 - phi) * k
     determinant = k  (det [[a,b],[c,d]] = ad - bc)
 
+* Gumbel distribtuion
+
+* Exponentially-modified Normal distribution
+
 * von Mises distribution (with location and concentration params?)
   -- requires modified/hyperbolic Bessel function of first kind of order 0 and 1
 
@@ -249,7 +324,6 @@ C++ API
   - inv(x) = pow(x,-1) = 1/x
   - inv_square(x) = pow(x,-2)
   - inv_sqrt(x) = pow(x,-1/2)
-
 
 * signum function
   int signum(real); 
@@ -298,7 +372,7 @@ C++ API
 
 
 * matrix special products
-  -- wrap_multiply(u,v) = u' * v * u
+  -- quadratic_multiply(u,v) = u' * v * u
      ++ for square matrices,
         d/dx det(x' * A * x) = 2 det(x' * A * x) inv(x)'
         d/dx det(A) = det(A) inv(A)' = det(A) / A'
@@ -480,6 +554,13 @@ C++ API
   - just a mode on command to print more out per sample?
   - ideally link runtime errors back to lines of Stan code
 
+
+Models
+======================================================================
+* debug BUGS vol 1 kidney model --- sometimes hangs
+
+* figure out what's going on with TS's model that's causing
+  Eigen to throw an assert failure
 
 
 
@@ -774,6 +855,23 @@ Testing
 
 RStan / PStan / MStan / Command Line
 ======================================================================
+
+* (RStan) install checklist -- especially the no spaces thing!
+
+* (RStan) Run the examples rather than dontrun;  see Ben's e-mail
+  of 2013-03-02 (March 2) titled "[stan-dev] Re: final checklist for
+  1.2 release?" for instructions on caching
+
+* (PStan) Simple JSON-based I/O interface
+
+* (RStan) Add RStan doc to reference manual
+
+* (RStan) Expose to R for a model:
+    -- log prob and gradient functions
+    -- inits -> unconstrained param transform
+    -- results -> constrained param transform
+  Then users could do all sorts of things just with our models,
+  like run optimizers, Metropolis, etc.
 
 * (Rstan) I/O functions to read in the output produced by
   command-line Stan (or write-to file RStan)

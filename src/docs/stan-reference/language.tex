@@ -85,7 +85,7 @@ parameters.
 
 If the user specifies the number of leapfrog steps (i.e., chooses to
 use standard \HMC), that number of leapfrog steps are simulated.  If
-the user has not specified the number of leapfrog steps, the no-U-turn
+the user has not specified the number of leapfrog steps, the No-U-Turn
 sampler (\NUTS) will determine the number of leapfrog steps adaptively
 \citep{Hoffman-Gelman:2011}.
 
@@ -250,10 +250,11 @@ real values), and \code{matrix} (of real values).
 \subsection{Constrained Data Types}
 
 Integer or real types may be constrained with lower bounds, upper
-bounds, or both.  There are three constrained vector data types,
-\code{simplex} for unit simplexes and \code{ordered} for ordered
-vectors of scalars and \code{positive\_ordered} for vectors of positive
-ordered scalars.  There are two specialized matrix data types,
+bounds, or both.  There are four constrained vector data types,
+\code{simplex} for unit simplexes, \code{unit\_vector} for unit-length
+vectors, \code{ordered} for ordered vectors of scalars and
+\code{positive\_ordered} for vectors of positive ordered scalars.
+There are two specialized matrix data types,
 \code{corr\_matrix} and \code{cov\_matrix}, for correlation matrices
 (symmetric, positive definite, unit diagonal) and covariance matrices
 (symmetric, positive definite).
@@ -545,6 +546,27 @@ simplexes, this is only done up to a statically specified accuracy
 threshold $\epsilon$ to account for errors arising from floating-point
 imprecision.
 
+\subsection{Unit Vectors}
+
+A unit vector is a vector with a norm of one.  For instance,
+$(0.5,0.5,0.5,0.5)^{\top}$ is a unit 4-vector.
+Unit vectors are sometimes used in directional statistics.
+Unit vectors are declared with their full
+dimensionality.  For instance, \code{theta} is declared to
+be a unit $5$-vector by
+%
+\begin{quote}
+\begin{Verbatim} 
+unit_vector[5] theta;
+\end{Verbatim}
+\end{quote}
+% 
+Unit vectors are implemented as vectors and may be assigned to other
+vectors and vice-versa.  Unit vector variables, like other constrained
+variables, are validated to ensure that they are indeed unit length; for
+unit vectors, this is only done up to a statically specified accuracy
+threshold $\epsilon$ to account for errors arising from floating-point
+imprecision.
 
 \subsection{Ordered Vectors}
 
@@ -672,7 +694,7 @@ cov_matrix[K] Omega;
 \end{Verbatim}
 \end{quote}
 % 
-declares \code{Omega} to be a $K \times K$ correlation matrix, where
+declares \code{Omega} to be a $K \times K$ covariance matrix, where
 $K$ is the value of the data variable \code{K}.  
 
 \subsection{Assigning Constrained Variables}
@@ -1036,6 +1058,7 @@ any of the following.
 \code{real},
 \code{vector},
 \code{simplex},
+\code{unit\_vector},
 \code{ordered},
 \code{positive\_ordered},
 \code{row\_vector},
@@ -1532,8 +1555,9 @@ primitive types.
 {\it Type} & {\it Primitive Type} \\ \hline \hline
 \code{vector} & \code{vector} \\
 \code{simplex} & \code{vector} \\
+\code{unit\_vector} & \code{vector} \\
 \code{ordered} & \code{vector} \\
-\code{pos\_ordered} & \code{vector} \\[6pt]
+\code{positive\_ordered} & \code{vector} \\[6pt]
 \code{row\_vector} & \code{row\_vector}
 \end{tabular}
 \end{center}
@@ -1576,7 +1600,7 @@ to complex expressions.
 
 \subsubsection{Literals}
 
-An iteger literal expression such as \code{42} is of type \code{int}.
+An integer literal expression such as \code{42} is of type \code{int}.
 Real literals such as \code{42.0} are of type \code{real}.
 
 \subsubsection{Variables}
@@ -1588,7 +1612,7 @@ determined by its declaration.  The type of a loop variable is
 There is always a unique declaration for each variable because Stan
 prohibits the redeclaration of an already-declared variables.%
 %
-\footnote{Languages such as \Cpp and R allow the delcaration of a
+\footnote{Languages such as \Cpp and R allow the declaration of a
   variable of a given name in a narrower scope to hide (take
   precedence over for evaluation) a variable defined in a containing
   scope.  Stan will have to introduce this behavior eventually for
@@ -1631,7 +1655,7 @@ In matching a function definition, arguments of type \code{int} may be
 promoted to type \code{real} if necessary (see \refsection{type-promotion} for an
 exact specification of Stan's integer-to-real type-promotion rule).
 
-In general, matirx operations return the lowest inferrable type.  For
+In general, matrix operations return the lowest inferrable type.  For
 example, \code{row\_vector~*~vector} returns a value of type
 \code{real}, which is declared in the function documentation and index
 as \code{real~operator*(row\_vector,vector)}.
@@ -2128,7 +2152,7 @@ a real or integer value, with non-zero values interpreted as true and
 the zero value as false.
 
 The entire sequence of if-then-else clauses forms a single conditional
-statement for evaluation.  The conditions are evaluated in order until
+statement for evaluation.  The conditions are evaluated in order
 until one of the conditions evaluates to a non-zero value, at which
 point its corresponding statement is executed and the conditional
 statement finishes execution.  If none of the conditions evaluates to
@@ -2150,16 +2174,12 @@ while (condition)
 The condition must be an integer or real expression and the body can
 be any statement (or sequence of statements in curly braces).  
 
-Evaluation of a while loop starts by evaluating the condition.
-If the condition evaluates to a true (non-zero) value, the body
-statement is executed, then an attempt is made to execute the entire
-while-loop again.  If the condition evaluates to a false (zero) value
-
-while-loop statement
-completes.  If the condition evaluates to a non-zero value, the
-statement is executed and control, then the loop is evaluated again,
-starting with the condition.  Thus the while loop executes the
-statement for as many times as the condition evaluates to true.
+Evaluation of a while loop starts by evaluating the condition.  If the
+condition evaluates to a false (zero) value, the execution of the loop
+terminates and control moves to the position after the loop.  If the
+loop's condition evaluates to a true (non-zero) value, the body statement is
+executed, then the whole loop is executed again.  Thus the loop is
+continually executed as long as the condition evaluates to a true value.
 
 
 \section{Statement Blocks and Local Variable Declarations}
@@ -2388,7 +2408,7 @@ u[2] = [9,16]
 
 \subsection{Print Frequency}
 
-Printing for a print statement happens every time it is exectued.  The
+Printing for a print statement happens every time it is executed.  The
 \code{transformed data} block is executed once per chain, the
 \code{transformed parameter} and \code{model} blocks once per leapfrog
 step, and the \code{generated quantities} block once per iteration.
@@ -2436,7 +2456,7 @@ may be used anywhere whitespace is allowed in a Stan program.
 \subsection{Line-Based Comments}
 
 In line-based comments, any text on a line following
-two forward slahses (\Verb|//|) or the pound sign (\Verb|#|)
+two forward slashes (\Verb|//|) or the pound sign (\Verb|#|)
 is ignored (along with the slashes or pound sign).  
 
 \subsection{Bracketed Comments}
@@ -2860,7 +2880,7 @@ involved for saving the parameter values corresponding to a sample.
 \subsection{Constraining Inverse Transform}
 
 Stan's two samplers, standard Hamiltonian Monte Carlo (\HMC) and the
-adaptive no-U-turn sampler (\NUTS), are most easily (and often most
+adaptive No-U-Turn sampler (\NUTS), are most easily (and often most
 effectively) implemented over a multivariate probability density that
 has support on all of $\reals^n$.  To do this, the parameters
 defined in the \code{parameters} block must be transformed so they are
@@ -3040,6 +3060,7 @@ var_type ::= 'int' range_constraint
            | 'ordered' '[' expression ']'
            | 'positive_ordered' '[' expression ']'
            | 'simplex' '[' expression ']'
+           | 'unit_vector' '[' expression ']'
            | 'row_vector' range_constraint '[' expression ']'
            | 'matrix' range_constraint '[' expression ',' expression ']'
            | 'corr_matrix' '[' expression ']'

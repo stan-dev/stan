@@ -72,7 +72,6 @@ namespace stan {
       && rho.dot( minus.lambda_dot_p() ) > 0;
     }
 
-
   }
 
 }

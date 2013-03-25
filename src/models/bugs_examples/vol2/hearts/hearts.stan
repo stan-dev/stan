@@ -4,8 +4,6 @@
 
 # integrate out the binary parameters in hearts.stan.0 
 
-
-
 data {
   int<lower=0> N;
   int<lower=0> x[N];
@@ -38,4 +36,9 @@ model {
     else 
      lp__ <- lp__ + log(1 - theta) + binomial_log(y[i], t[i], p);
   }
+}
+
+generated quantities {
+  real beta;
+  beta <- exp(alpha);
 }

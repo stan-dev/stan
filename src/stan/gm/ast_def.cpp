@@ -265,7 +265,7 @@ namespace stan {
         statements_(stmts) {
     }
 
-    expr_type expression_type_vis::operator()(const nil& e) const {
+    expr_type expression_type_vis::operator()(const nil& /*e*/) const {
       return expr_type();
     }
     // template <typename T>
@@ -376,18 +376,18 @@ namespace stan {
     //   return boost::apply_visitor(*this,e.subject);
     // }
 
-    bool is_nil_op::operator()(const nil& x) const { return true; }
-    bool is_nil_op::operator()(const int_literal& x) const { return false; }
-    bool is_nil_op::operator()(const double_literal& x) const { return false; }
-    bool is_nil_op::operator()(const array_literal& x) const { return false; }
-    bool is_nil_op::operator()(const variable& x) const { return false; }
-    bool is_nil_op::operator()(const fun& x) const { return false; }
-    bool is_nil_op::operator()(const index_op& x) const { return false; }
-    bool is_nil_op::operator()(const binary_op& x) const { return false; }
-    bool is_nil_op::operator()(const unary_op& x) const { return false; }
+    bool is_nil_op::operator()(const nil& /*x*/) const { return true; }
+    bool is_nil_op::operator()(const int_literal& /*x*/) const { return false; }
+    bool is_nil_op::operator()(const double_literal& /* x */) const { return false; }
+    bool is_nil_op::operator()(const array_literal& /* x */) const { return false; }
+    bool is_nil_op::operator()(const variable& /* x */) const { return false; }
+    bool is_nil_op::operator()(const fun& /* x */) const { return false; }
+    bool is_nil_op::operator()(const index_op& /* x */) const { return false; }
+    bool is_nil_op::operator()(const binary_op& /* x */) const { return false; }
+    bool is_nil_op::operator()(const unary_op& /* x */) const { return false; }
       
     // template <typename T>
-    // bool is_nil_op::operator()(const T& x) const { return false; }
+    // bool is_nil_op::operator()(const T& /* x */) const { return false; }
 
     bool is_nil(const expression& e) {
       is_nil_op ino;
@@ -629,6 +629,17 @@ namespace stan {
         range_(range) 
     { }
 
+    unit_vector_var_decl::unit_vector_var_decl() 
+      : base_var_decl(VECTOR_T) 
+    { }
+
+    unit_vector_var_decl::unit_vector_var_decl(expression const& K,
+                                       std::string const& name,
+                                       std::vector<expression> const& dims)
+      : base_var_decl(name,dims,VECTOR_T),
+        K_(K) 
+    { }
+
     simplex_var_decl::simplex_var_decl() 
       : base_var_decl(VECTOR_T) 
     { }
@@ -717,7 +728,7 @@ namespace stan {
 
 
     name_vis::name_vis() { }
-    std::string name_vis::operator()(const nil& x) const { 
+    std::string name_vis::operator()(const nil& /* x */) const { 
       return ""; // fail if arises
     } 
     std::string name_vis::operator()(const int_var_decl& x) const {
@@ -733,6 +744,9 @@ namespace stan {
       return x.name_;
     }
     std::string name_vis::operator()(const matrix_var_decl& x) const {
+      return x.name_;
+    }
+    std::string name_vis::operator()(const unit_vector_var_decl& x) const {
       return x.name_;
     }
     std::string name_vis::operator()(const simplex_var_decl& x) const {
@@ -764,6 +778,7 @@ namespace stan {
     var_decl::var_decl(const vector_var_decl& decl) : decl_(decl) { }
     var_decl::var_decl(const row_vector_var_decl& decl) : decl_(decl) { }
     var_decl::var_decl(const matrix_var_decl& decl) : decl_(decl) { }
+    var_decl::var_decl(const unit_vector_var_decl& decl) : decl_(decl) { }
     var_decl::var_decl(const simplex_var_decl& decl) : decl_(decl) { }
     var_decl::var_decl(const ordered_var_decl& decl) : decl_(decl) { }
     var_decl::var_decl(const positive_ordered_var_decl& decl) : decl_(decl) { }

@@ -1,7 +1,6 @@
 #ifndef __STAN__GM__COMMAND_HPP__
 #define __STAN__GM__COMMAND_HPP__
 
-
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <fstream>
 #include <boost/random/additive_combine.hpp> // L'Ecuyer RNG
@@ -20,6 +19,7 @@ namespace stan {
       using stan::io::print_help_option;
 
       std::cout << std::endl;
+
       std::cout << "STAN I AM IN YOU" << std::endl;
       std::cout << std::endl << std::endl;
 
@@ -49,6 +49,7 @@ namespace stan {
       data_stream.close();
 
       Model model(data_var_context, &std::cout);
+
       //stan::model::prob_grad model(data_var_context, &std::cout);
       
       typedef boost::ecuyer1988 rng_t;

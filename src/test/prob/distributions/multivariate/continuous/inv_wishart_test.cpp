@@ -1,5 +1,9 @@
 #include <gtest/gtest.h>
 #include <stan/prob/distributions/multivariate/continuous/inv_wishart.hpp>
+#include <boost/random/mersenne_twister.hpp>
+#include <boost/math/distributions.hpp>
+#include <boost/math/special_functions/digamma.hpp>
+#include <stan/math/special_functions.hpp>
 
 using Eigen::Dynamic;
 using Eigen::Matrix;
@@ -131,4 +135,42 @@ TEST(ProbDistributionsInvWishart,ErrnoPolicy) {
   nu = 1;
   result = inv_wishart_log(Y, nu, Sigma, errno_policy());
   EXPECT_TRUE(std::isnan(result));
+}
+
+TEST(ProbDistributionsInvWishart, random) {
+  boost::random::mt19937 rng;
+
+  Matrix<double,Dynamic,Dynamic> sigma(3,3);
+  sigma << 9.0, -3.0, 0.0,
+    -3.0,  4.0, 0.0,
+    2.0, 1.0, 3.0;
+  EXPECT_NO_THROW(stan::prob::inv_wishart_rng(3.0, sigma,rng));
+}
+
+TEST(ProbDistributionsInvWishart, chiSquareGoodnessFitTest) {
+  boost::random::mt19937 rng;
+  Matrix<double,Dynamic,Dynamic> sigma(3,3);
+  sigma << 9.0, -3.0, 0.0,
+    -3.0,  4.0, 0.0,
+    2.0, 1.0, 3.0;
+  int N = 10000;
+  boost::math::chi_squared mydist(1);
+
+  Matrix<double,Dynamic,Dynamic> siginv(3,3);
+  siginv = sigma.inverse();
+
+  int count = 0;
+  double avg = 0;
+  double expect = sigma.rows() * std::log(2.0) + std::log(stan::math::determinant(siginv)) + boost::math::digamma(5.0 / 2.0) + boost::math::digamma(4.0 / 2.0) + boost::math::digamma(3.0 / 2.0);
+
+  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> a(sigma.rows(),sigma.rows());
+  while (count < N) {
+    a = stan::prob::inv_wishart_rng(5.0, sigma, rng);
+    avg += std::log(stan::math::determinant(a)) / N;
+    count++;
+   }
+ 
+  double chi = (expect - avg) * (expect - avg) / expect;
+
+  EXPECT_TRUE(chi < quantile(complement(mydist, 1e-6)));
 }
