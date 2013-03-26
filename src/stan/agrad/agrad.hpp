@@ -61,6 +61,7 @@
 #include <stan/agrad/rev/operator_plus_equal.hpp>
 #include <stan/agrad/rev/operator_minus_equal.hpp>
 #include <stan/agrad/rev/operator_multiply_equal.hpp>
+#include <stan/agrad/rev/operator_divide_equal.hpp>
 
 #include <stan/agrad/rev/numeric_limits.hpp>
 
