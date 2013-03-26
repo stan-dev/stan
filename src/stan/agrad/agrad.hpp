@@ -58,6 +58,8 @@
 #include <stan/agrad/rev/abs.hpp>
 #include <stan/agrad/rev/jacobian.hpp>
 
+#include <stan/agrad/rev/operator_plus_equal.hpp>
+
 #include <cmath>
 #include <cstddef>
 #include <limits>
@@ -72,17 +74,6 @@ namespace stan {
 
   namespace agrad {
 
-    inline var& var::operator+=(const var& b) {
-      vi_ = new add_vv_vari(vi_,b.vi_);
-      return *this;
-    }
-
-    inline var& var::operator+=(const double b) {
-      if (b == 0.0)
-        return *this;
-      vi_ = new add_vd_vari(vi_,b);
-      return *this;
-    }
 
     inline var& var::operator-=(const var& b) {
       vi_ = new subtract_vv_vari(vi_,b.vi_);
