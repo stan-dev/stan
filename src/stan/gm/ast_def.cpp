@@ -249,6 +249,17 @@ namespace stan {
       }
       for (size_t i = 0; i < args.size(); ++i)
         error_msgs << "    arg " << i << " type=" << args[i] << std::endl;
+
+      error_msgs << "available function signatures for "
+                 << name << ":" << std::endl;
+      for (size_t i = 0; i < signatures.size(); ++i) {
+        error_msgs << i << ".  " << name << "(";
+        for (size_t j = 0; j < signatures[i].second.size(); ++j) {
+          if (j > 0) error_msgs << ", ";
+          error_msgs << signatures[i].second[j];
+        }
+        error_msgs << ") : " << signatures[i].first << std::endl;
+      }
       return expr_type(); // ill-formed dummy
     }
     function_signatures::function_signatures() { 
