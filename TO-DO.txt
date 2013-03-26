@@ -16,7 +16,10 @@ The to-do list is organized into the following sections:
 1.2.1
 -------------------------------------------
 
-* fix bug deriving from m.f. jonker's 25 March e-mail
+* change lgamma to use boost and not throw something unexpected
+  when it overflows
+
+* fix bug (?) in print() deriving from m.f. jonker's 25 March e-mail
 
 * change process so that the manual online on the build bot
   has a different version number

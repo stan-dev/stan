@@ -1,4 +1,12 @@
-// included from constructor for function_signatures() in src/stan/gm/ast.hpp
+// included from constructor for function_signatures() in
+// src/stan/gm/ast.hpp
+
+std::vector<base_expr_type> base_types;
+base_types.push_back(INT_T);
+base_types.push_back(DOUBLE_T);
+base_types.push_back(VECTOR_T);
+base_types.push_back(ROW_VECTOR_T);
+base_types.push_back(MATRIX_T);
 
 std::vector<expr_type> vector_types;
 vector_types.push_back(DOUBLE_T);                  // scalar
@@ -9,8 +17,9 @@ vector_types.push_back(ROW_VECTOR_T);              // Eigen row vector
 std::vector<expr_type> int_vector_types;
 int_vector_types.push_back(INT_T);                  // scalar
 int_vector_types.push_back(expr_type(INT_T,1U));    // std vector
-int_vector_types.push_back(VECTOR_T);               // Eigen vector
-int_vector_types.push_back(ROW_VECTOR_T);           // Eigen row vector
+// FIXME:  these next two don't look like int
+// int_vector_types.push_back(VECTOR_T);               // Eigen vector
+// int_vector_types.push_back(ROW_VECTOR_T);           // Eigen row vector
 
 std::vector<expr_type> primitive_types;
 primitive_types.push_back(INT_T);
@@ -363,6 +372,21 @@ add("prod",DOUBLE_T,expr_type(DOUBLE_T,1));
 add("prod",DOUBLE_T,VECTOR_T);
 add("prod",DOUBLE_T,ROW_VECTOR_T);
 add("prod",DOUBLE_T,MATRIX_T);
+for (size_t i = 0; i < base_types.size(); ++i) {
+  add("rep_array",expr_type(base_types[i],1), base_types[i], INT_T);
+  add("rep_array",expr_type(base_types[i],2), base_types[i], INT_T,INT_T);
+  add("rep_array",expr_type(base_types[i],3), base_types[i], INT_T,INT_T,INT_T);
+  for (size_t j = 1; j <= 3; ++j) {
+    add("rep_array",expr_type(base_types[i],j + 1), expr_type(base_types[i],j),  INT_T);
+    add("rep_array",expr_type(base_types[i],j + 2), expr_type(base_types[i],j),  INT_T,INT_T);
+    add("rep_array",expr_type(base_types[i],j + 3), expr_type(base_types[i],j),  INT_T,INT_T,INT_T);
+  }
+}
+add("rep_matrix", MATRIX_T, DOUBLE_T, INT_T,INT_T);
+add("rep_matrix", MATRIX_T, VECTOR_T, INT_T);
+add("rep_matrix", MATRIX_T, ROW_VECTOR_T, INT_T);
+add("rep_row_vector", ROW_VECTOR_T, DOUBLE_T, INT_T);
+add("rep_vector", VECTOR_T, DOUBLE_T, INT_T);
 add_unary("round");
 add("row",ROW_VECTOR_T,MATRIX_T,INT_T);
 add("rows",INT_T,VECTOR_T);
