@@ -34,6 +34,7 @@
 #include <stan/agrad/rev/operator_multiplication.hpp>
 #include <stan/agrad/rev/operator_division.hpp>
 #include <stan/agrad/rev/operator_unary_increment.hpp>
+#include <stan/agrad/rev/operator_unary_decrement.hpp>
 
 
 
