@@ -7,6 +7,7 @@
 
 #include <stan/model/prob_grad_ad.hpp>
 
+#include <stan/mcmc/adapter.hpp>
 #include <stan/mcmc/hmc_base.hpp>
 #include <stan/mcmc/hamiltonian.hpp>
 #include <stan/mcmc/integrator.hpp>
@@ -33,7 +34,7 @@ namespace stan {
       unit_metric_hmc(M &m);
       ~unit_metric_hmc() {};
       
-      double sample(std::vector<double>& q, std::vector<int>& r);
+      virtual double sample(std::vector<double>& q, std::vector<int>& r);
       
       void set_stepsize_and_T(const double e, const double t) {
         _epsilon = e; _T = t; _update_L();
@@ -50,7 +51,7 @@ namespace stan {
       void get_L() { return _L; }
       void get_T() { return _T; }
       
-    private:
+    protected:
       
       double _epsilon;
       double _L;
@@ -97,6 +98,36 @@ namespace stan {
       }
       
       return accept;
+      
+    }
+    
+    template <typename M, class BaseRNG = boost::mt19937>
+    class adapt_unit_metric_hmc: public unit_metric_hmc<M, BaseRNG>, adapter {
+      
+    public:
+      
+      adapt_unit_metric_hmc(M &m);
+      ~adapt_unit_metric_hmc() {};
+      
+      double sample(std::vector<double>& q, std::vector<int>& r);
+      
+    };
+
+    template <typename M, class BaseRNG>
+    adapt_unit_metric_hmc<M, BaseRNG>::adapt_unit_metric_hmc(M& m):
+    unit_metric_hmc<M, BaseRNG>(m),
+    adapter()
+    {};
+    
+    template <typename M, class BaseRNG>
+    double adapt_unit_metric_hmc<M, BaseRNG>::sample(std::vector<double>& q, std::vector<int>& r) {
+      
+      double accept_stat = unit_metric_hmc<M, BaseRNG>::sample(q, r);
+      
+      this->_learn_stepsize(this->_epsilon, accept_stat);
+      this->_update_L();
+      
+      return accept_stat;
       
     }
     
