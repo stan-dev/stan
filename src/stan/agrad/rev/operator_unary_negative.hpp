@@ -1,7 +1,6 @@
-#ifndef __STAN__AGRAD__REV__OPERATOR_MINUS_HPP__
-#define __STAN__AGRAD__REV__OPERATOR_MINUS_HPP__
+#ifndef __STAN__AGRAD__REV__OPERATOR_UNARY_NEGATIVE_HPP__
+#define __STAN__AGRAD__REV__OPERATOR_UNARY_NEGATIVE_HPP__
 
-#include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/op/v_vari.hpp>
 
 namespace stan {
