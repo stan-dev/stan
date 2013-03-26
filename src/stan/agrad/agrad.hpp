@@ -64,14 +64,6 @@
 
 #include <stan/agrad/rev/numeric_limits.hpp>
 
-#include <cmath>
-#include <cstddef>
-#include <limits>
-#include <stdexcept>
-#include <vector>
-#include <ostream>
-#include <iostream>
-
 #include <stan/memory/stack_alloc.hpp>
 
 namespace stan {
