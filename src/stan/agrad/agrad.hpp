@@ -30,6 +30,8 @@
 #include <stan/agrad/rev/operator_unary_not.hpp>
 #include <stan/agrad/rev/operator_unary_plus.hpp>
 #include <stan/agrad/rev/operator_addition.hpp>
+#include <stan/agrad/rev/operator_subtraction.hpp>
+#include <stan/agrad/rev/operator_multiplication.hpp>
 
 
 #include <cmath>
@@ -68,57 +70,7 @@ namespace stan {
         }
       };
 
-      class subtract_vv_vari : public op_vv_vari {
-      public:
-        subtract_vv_vari(vari* avi, vari* bvi) :
-          op_vv_vari(avi->val_ - bvi->val_, avi, bvi) {
-        }
-        void chain() {
-          avi_->adj_ += adj_;
-          bvi_->adj_ -= adj_;
-        }
-      };
-    
-      class subtract_vd_vari : public op_vd_vari {
-      public:
-        subtract_vd_vari(vari* avi, double b) :
-          op_vd_vari(avi->val_ - b, avi, b) {
-        }
-        void chain() {
-          avi_->adj_ += adj_;
-        }
-      };
 
-      class subtract_dv_vari : public op_dv_vari {
-      public:
-        subtract_dv_vari(double a, vari* bvi) :
-          op_dv_vari(a - bvi->val_, a, bvi) {
-        }
-        void chain() {
-          bvi_->adj_ -= adj_;
-        }
-      };
-
-      class multiply_vv_vari : public op_vv_vari {
-      public:
-        multiply_vv_vari(vari* avi, vari* bvi) :
-          op_vv_vari(avi->val_ * bvi->val_, avi, bvi) {
-        }
-        void chain() {
-          avi_->adj_ += bvi_->val_ * adj_;
-          bvi_->adj_ += avi_->val_ * adj_;
-        }
-      };
-
-      class multiply_vd_vari : public op_vd_vari {
-      public:
-        multiply_vd_vari(vari* avi, double b) :
-          op_vd_vari(avi->val_ * b, avi, b) {
-        }
-        void chain() {
-          avi_->adj_ += adj_ * bd_;
-        }
-      };
 
       // (a/b)' = a' * (1 / b) - b' * (a / [b * b])
       class divide_vv_vari : public op_vv_vari {
@@ -406,111 +358,6 @@ namespace stan {
 
     // ARITHMETIC OPERATORS
 
-
-
-
-
-
-    /**
-     * Subtraction operator for variables (C++).
-     *
-     * The partial derivatives are defined by 
-     *
-     * \f$\frac{\partial}{\partial x} (x-y) = 1\f$, and
-     *
-     * \f$\frac{\partial}{\partial y} (x-y) = -1\f$.
-     * 
-     * @param a First variable operand.
-     * @param b Second variable operand.
-     * @return Variable result of subtracting the second variable from
-     * the first.
-     */
-    inline var operator-(const var& a, const var& b) {
-      return var(new subtract_vv_vari(a.vi_,b.vi_));
-    }
-
-    /**
-     * Subtraction operator for variable and scalar (C++).
-     *
-     * The derivative for the variable is
-     *
-     * \f$\frac{\partial}{\partial x} (x-c) = 1\f$, and
-     *
-     * @param a First variable operand.
-     * @param b Second scalar operand.
-     * @return Result of subtracting the scalar from the variable.
-     */
-    inline var operator-(const var& a, const double b) {
-      if (b == 0.0)
-        return a;
-      return var(new subtract_vd_vari(a.vi_,b));
-    }
-
-    /**
-     * Subtraction operator for scalar and variable (C++).
-     *
-     * The derivative for the variable is
-     *
-     * \f$\frac{\partial}{\partial y} (c-y) = -1\f$, and
-     *
-     * @param a First scalar operand.
-     * @param b Second variable operand.
-     * @return Result of sutracting a variable from a scalar.
-     */
-    inline var operator-(const double a, const var& b) {
-      return var(new subtract_dv_vari(a,b.vi_));
-    }
-
-    /**
-     * Multiplication operator for two variables (C++).
-     *
-     * The partial derivatives are
-     *
-     * \f$\frac{\partial}{\partial x} (x * y) = y\f$, and
-     *
-     * \f$\frac{\partial}{\partial y} (x * y) = x\f$.
-     *
-     * @param a First variable operand.
-     * @param b Second variable operand.
-     * @return Variable result of multiplying operands.
-     */
-    inline var operator*(const var& a, const var& b) {
-      return var(new multiply_vv_vari(a.vi_,b.vi_));
-    }
-
-    /**
-     * Multiplication operator for a variable and a scalar (C++).
-     *
-     * The partial derivative for the variable is
-     *
-     * \f$\frac{\partial}{\partial x} (x * c) = c\f$, and
-     * 
-     * @param a Variable operand.
-     * @param b Scalar operand.
-     * @return Variable result of multiplying operands.
-     */
-    inline var operator*(const var& a, const double b) {
-      if (b == 1.0)
-        return a;
-      return var(new multiply_vd_vari(a.vi_,b));
-    }
-
-    /**
-     * Multiplication operator for a scalar and a variable (C++).
-     *
-     * The partial derivative for the variable is
-     *
-     * \f$\frac{\partial}{\partial y} (c * y) = c\f$.
-     *
-     * @param a Scalar operand.
-     * @param b Variable operand.
-     * @return Variable result of multiplying the operands.
-     */
-    inline var operator*(const double a, const var& b) {
-      if (a == 1.0)
-        return b;
-      return var(new multiply_vd_vari(b.vi_,a)); // by symmetry
-    }
 
     /**
      * Division operator for two variables (C++).
