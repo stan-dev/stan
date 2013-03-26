@@ -1,14 +1,14 @@
 #ifndef __STAN__MCMC__HMCBASE__BETA__
 #define __STAN__MCMC__HMCBASE__BETA__
 
-#include <ctime>
-
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/variate_generator.hpp>
 #include <boost/random/normal_distribution.hpp>
 #include <boost/random/uniform_01.hpp>
 
 #include <stan/model/prob_grad.hpp>
+
+#include <stan/mcmc/mcmc_base.hpp>
 #include <stan/mcmc/util.hpp>
 
 namespace stan {
@@ -29,15 +29,12 @@ namespace stan {
 
     template <class M, template<class> class H, template<class> class I, 
               class BaseRNG = boost::mt19937>
-    class hmc_base {
+    class hmc_base: public mcmc_sampler {
     
     public:
     
       hmc_base(M &m, BaseRNG rng = BaseRNG(std::time(0)));
       
-      // Return acceptance statistic
-      virtual double sample(std::vector<double>& q, std::vector<int>& r) = 0;
-    
     protected:
     
       I<H<M> > _integrator;
@@ -57,7 +54,8 @@ namespace stan {
     hmc_base<M, H, I, BaseRNG>::hmc_base(
                                          M &m, 
                                          BaseRNG rng)
-    :_hamiltonian(m), 
+    : mcmc_sampler(),
+    _hamiltonian(m), 
     _rng(rng),
     _rand_unit_gaus(rng, boost::normal_distribution<>()),
     _rand_uniform(rng)

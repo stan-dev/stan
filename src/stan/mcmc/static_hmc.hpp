@@ -34,7 +34,7 @@ namespace stan {
       unit_metric_hmc(M &m);
       ~unit_metric_hmc() {};
       
-      virtual double sample(std::vector<double>& q, std::vector<int>& r);
+      virtual sample transition(sample& init_sample);
       
       void set_stepsize_and_T(const double e, const double t) {
         _epsilon = e; _T = t; _update_L();
@@ -69,13 +69,13 @@ namespace stan {
     { _update_L(); }
     
     template <typename M, class BaseRNG>
-    double unit_metric_hmc<M, BaseRNG>::sample(std::vector<double>& q, std::vector<int>& r) {
+    sample unit_metric_hmc<M, BaseRNG>::transition(sample& init_sample) {
       
-      ps_point z(q.size());
-      z.q = q;
-      z.r = r;
+      ps_point z(init_sample.size_cont());
+      z.q = init_sample.cont_params();
+      z.r = init_sample.disc_params();
       
-      Eigen::VectorXd u(q.size());
+      Eigen::VectorXd u(init_sample.size_cont());
       for (int i = 0; i < u.size(); ++i) u(i) = this->_rand_unit_gaus();
       
       this->_hamiltonian.sampleP(z, u);
@@ -83,21 +83,21 @@ namespace stan {
       
       double H0 = this->_hamiltonian.H(z);
       
-      for(int i = 0; i < _L; ++i)
+      for (int i = 0; i < _L; ++i)
       {
         this->_integrator.evolve(z, this->_hamiltonian, _epsilon);
       }
       
       double acceptProb = exp(H0 - this->_hamiltonian.H(z));
       
-      double accept = false;
-      if(acceptProb > 1 || this->_rand_uniform() < acceptProb) 
+      double accept = true;
+      if (acceptProb < 1 && this->_rand_uniform() > acceptProb) 
       {
-        q = z.q;
-        accept = true;
+        z.q = init_sample.cont_params();
+        accept = false;
       }
       
-      return accept;
+      return sample(z.q, z.r, - this->_hamiltonian.V(z), acceptProb);
       
     }
     
@@ -109,7 +109,7 @@ namespace stan {
       adapt_unit_metric_hmc(M &m);
       ~adapt_unit_metric_hmc() {};
       
-      double sample(std::vector<double>& q, std::vector<int>& r);
+      sample transition(sample& init_sample);
       
     };
 
@@ -120,14 +120,14 @@ namespace stan {
     {};
     
     template <typename M, class BaseRNG>
-    double adapt_unit_metric_hmc<M, BaseRNG>::sample(std::vector<double>& q, std::vector<int>& r) {
+    sample adapt_unit_metric_hmc<M, BaseRNG>::transition(sample& init_sample) {
       
-      double accept_stat = unit_metric_hmc<M, BaseRNG>::sample(q, r);
+      sample s = unit_metric_hmc<M, BaseRNG>::transition(init_sample);
       
-      this->_learn_stepsize(this->_epsilon, accept_stat);
+      this->_learn_stepsize(this->_epsilon, s.accept_stat());
       this->_update_L();
       
-      return accept_stat;
+      return s;
       
     }
     
