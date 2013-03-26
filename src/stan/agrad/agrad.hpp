@@ -20,7 +20,7 @@
 #include <stan/agrad/rev/op/ddv_vari.hpp>
 #include <stan/agrad/rev/precomp_v_vari.hpp>
 
-#include <stan/agrad/rev/neg_vari.hpp>
+#include <stan/agrad/rev/operator_minus.hpp>
 
 
 #include <cmath>
@@ -682,17 +682,6 @@ namespace stan {
       return a;
     }
 
-    /**
-     * Unary negation operator for variables (C++).
-     *
-     * \f$\frac{d}{dx} -x = -1\f$.
-     *
-     * @param a Argument variable.
-     * @return Negation of variable.
-     */
-    inline var operator-(const var& a) {
-      return var(new neg_vari(a.vi_));
-    }
 
     /**
      * Addition operator for variables (C++).
