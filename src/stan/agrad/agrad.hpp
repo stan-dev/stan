@@ -33,6 +33,8 @@
 #include <stan/agrad/rev/operator_subtraction.hpp>
 #include <stan/agrad/rev/operator_multiplication.hpp>
 #include <stan/agrad/rev/operator_division.hpp>
+#include <stan/agrad/rev/operator_unary_increment.hpp>
+
 
 
 #include <cmath>
@@ -51,15 +53,6 @@ namespace stan {
 
     namespace {
 
-      class increment_vari : public op_v_vari {
-      public:
-        increment_vari(vari* avi) :
-          op_v_vari(avi->val_ + 1.0, avi) {
-        }
-        void chain() {
-          avi_->adj_ += adj_;
-        }
-      };
 
       class decrement_vari : public op_v_vari {
       public:
@@ -330,19 +323,7 @@ namespace stan {
 
 
 
-    /**
-     * Prefix increment operator for variables (C++).  Following C++,
-     * (++a) is defined to behave exactly as (a = a + 1.0) does,
-     * but is faster and uses less memory.  In particular, the
-     * result is an assignable lvalue.
-     *
-     * @param a Variable to increment.
-     * @return Reference the result of incrementing this input variable.
-     */
-    inline var& operator++(var& a) {
-      a.vi_ = new increment_vari(a.vi_);
-      return a;
-    }
+
 
     /**
      * Postfix increment operator for variables (C++).  
