@@ -2,8 +2,8 @@
 #define __STAN__AGRAD__AGRAD_HPP__
 
 #include <stan/agrad/rev/var_stack.hpp>
-#include <stan/agrad/rev/set_zero_all_adjoints.hpp>
 #include <stan/agrad/rev/chainable.hpp>
+#include <stan/agrad/rev/set_zero_all_adjoints.hpp>
 #include <stan/agrad/rev/vari.hpp>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/print_stack.hpp>
@@ -72,24 +72,6 @@
 namespace stan {
 
   namespace agrad {
-
-
-
-    /**
-     * Recover memory used for all variables for reuse.
-     */
-    static void recover_memory() {
-      var_stack_.clear();
-      var_nochain_stack_.clear();
-      memalloc_.recover_all();
-    }
-
-    /**
-     * Return all memory used for gradients back to the system.
-     */
-    static void free_memory() {
-      memalloc_.free_all();
-    }
 
     /**
      * Compute the gradient for all variables starting from the
