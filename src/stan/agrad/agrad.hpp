@@ -23,7 +23,10 @@
 #include <stan/agrad/rev/operator_unary_negative.hpp>
 #include <stan/agrad/rev/operator_equal.hpp>
 #include <stan/agrad/rev/operator_not_equal.hpp>
+#include <stan/agrad/rev/operator_greater_than.hpp>
+#include <stan/agrad/rev/operator_greater_than_or_equal.hpp>
 #include <stan/agrad/rev/operator_less_than.hpp>
+#include <stan/agrad/rev/operator_less_than_or_equal.hpp>
 
 
 #include <cmath>

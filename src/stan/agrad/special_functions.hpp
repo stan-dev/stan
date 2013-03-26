@@ -3,6 +3,7 @@
 
 #include <stan/agrad/error_handling.hpp>
 #include <stan/agrad/rev/op/vector_vari.hpp>
+#include <stan/agrad/rev/operator_greater_than.hpp>
 
 #include <stan/math.hpp>
 #include <stan/math/functions/Phi.hpp>
