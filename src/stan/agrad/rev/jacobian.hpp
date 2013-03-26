@@ -3,7 +3,6 @@
 
 #include <vector>
 #include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/set_zero_all_adjoints.hpp>
 
 namespace stan {
   namespace agrad {

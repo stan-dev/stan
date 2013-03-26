@@ -31,36 +31,6 @@ namespace stan {
       memalloc_.free_all();
     }
 
-    /**
-     * Reset all adjoint values in the stack to zero.
-     */
-    static void set_zero_all_adjoints() {
-      for (size_t i = 0; i < var_stack_.size(); ++i)
-        var_stack_[i]->set_zero_adjoint();
-      for (size_t i = 0; i < var_nochain_stack_.size(); ++i)
-        var_nochain_stack_[i]->set_zero_adjoint();
-    }
-
-    /**
-     * Compute the gradient for all variables starting from the
-     * specified root variable implementation.  Does not recover
-     * memory.  This chainable variable's adjoint is initialized
-     * using the method <code>init_dependent()</code> and then the
-     * chain rule is applied working down the stack from this
-     * chainable and calling each chainable's <code>chain()</code>
-     * method in turn.
-     *
-     * @param vi Variable implementation for root of partial
-     * derivative propagation.
-     */
-    static void grad(chainable* vi) {
-      std::vector<chainable*>::reverse_iterator it;
-
-      vi->init_dependent(); 
-      // propagate derivates for vars
-      for (it = var_stack_.rbegin(); it < var_stack_.rend(); ++it)
-        (*it)->chain();
-    }
 
   }
 }
