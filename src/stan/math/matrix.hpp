@@ -2534,6 +2534,85 @@ namespace stan {
       return x.size();
     }
     
+    inline void validate_non_negative_rep(int n, const std::string& fun) {
+      if (n >= 0) return;
+      std::stringstream msg;
+      msg << "error in " << fun
+          << "; number of replications must be positive"
+          << "; found n=" << n;
+      throw std::domain_error(msg.str());
+    }
+
+    template <typename T>
+    inline std::vector<T>
+    rep_array(const T& x, int n) {
+      validate_non_negative_rep(n,"rep_array 1D");
+      return std::vector<T>(n,x);
+    }
+
+    template <typename T>
+    inline std::vector<T>
+    rep_array(const T& x, int m, int n) {
+      using std::vector;
+      validate_non_negative_rep(m,"rep_array 2D rows");
+      validate_non_negative_rep(n,"rep_array 2D cols");
+      return vector<vector<T> >(m, vector<T>(n, x));
+    }
+
+    template <typename T>
+    inline std::vector<T>
+    rep_array(const T& x, int k, int m, int n) {
+      using std::vector;
+      validate_non_negative_rep(k,"rep_array 2D shelfs");
+      validate_non_negative_rep(m,"rep_array 2D rows");
+      validate_non_negative_rep(n,"rep_array 2D cols");
+      return vector<vector<vector<T> > >(k,
+                                         vector<vector<T> >(m,
+                                                            vector<T>(n, x)));
+    }
+    
+    template <typename T>
+    inline Eigen::Matrix<T,Eigen::Dynamic,1>
+    rep_vector(const T& x, int n) {
+      validate_non_negative_rep(n,"rep_vector");
+      return Eigen::Matrix<T,Eigen::Dynamic,1>::Constant(n,x);
+    }
+
+    template <typename T>
+    inline Eigen::Matrix<T,1,Eigen::Dynamic>
+    rep_row_vector(const T& x, int m) {
+      validate_non_negative_rep(m,"rep_row_vector");
+      return Eigen::Matrix<T,1,Eigen::Dynamic>::Constant(m,x);
+    }
+
+    template <typename T>
+    inline Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
+    rep_matrix(const T& x, int m, int n) {
+      validate_non_negative_rep(m,"rep_matrix rows");
+      validate_non_negative_rep(n,"rep_matrix cols");
+      return Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>::Constant(m,n,x);
+    }
+
+    template <typename T>
+    inline Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
+    rep_matrix(const Eigen::Matrix<T,Eigen::Dynamic,1>& v, int n) {
+      validate_non_negative_rep(n,"rep_matrix of vector, num rows");
+      Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> result(v.size(),n);
+      result.colwise() = v;
+      return result;
+    }
+
+    template <typename T>
+    inline Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
+    rep_matrix(const Eigen::Matrix<T,1,Eigen::Dynamic>& rv, int m) {
+      validate_non_negative_rep(m,"rep_matrix of row vector, num cols");
+      Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> result(m,rv.size());
+      result.rowwise() = rv;
+      return result;
+    }
+
+
+
     
 
   }
