@@ -73,32 +73,6 @@ namespace stan {
   namespace agrad {
 
     namespace {
-
-
-
-
-      class sinh_vari : public op_v_vari {
-      public:
-        sinh_vari(vari* avi) :
-          op_v_vari(std::sinh(avi->val_),avi) {
-        }
-        void chain() {
-          avi_->adj_ += adj_ * std::cosh(avi_->val_);
-        }
-      };
-
-      class tanh_vari : public op_v_vari {
-      public:
-        tanh_vari(vari* avi) :
-          op_v_vari(std::tanh(avi->val_),avi) {
-        }
-        void chain() {
-          double cosh = std::cosh(avi_->val_);
-          avi_->adj_ += adj_ / (cosh * cosh);
-        }
-      };
-
-
       class floor_vari : public vari {
       public:
         floor_vari(vari* avi) :
