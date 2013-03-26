@@ -9,6 +9,7 @@
 #include <boost/math/special_functions/atanh.hpp>
 #include <boost/math/special_functions/digamma.hpp>
 #include <boost/math/special_functions/hypot.hpp>
+#include <boost/math/special_functions/owens_t.hpp>
 
 namespace stan {
 
@@ -229,6 +230,37 @@ namespace stan {
         }
         void chain() {
           avi_->adj_ += adj_ * NEG_TWO_OVER_SQRT_PI * std::exp(- avi_->val_ * avi_->val_);
+        }
+      };
+
+      class owenst_vv_vari : public op_vv_vari {
+      public:
+        owenst_vv_vari(vari* avi, vari* bvi) :
+          op_vv_vari(boost::math::owens_t(avi->val_, bvi->val_), avi, bvi) {
+        }
+        void chain() {
+          avi_->adj_ += adj_ * boost::math::erf(bvi_->val_ * avi_->val_ / std::sqrt(2.0)) * std::exp(-avi_->val_ * avi_->val_ / 2.0) * std::sqrt(boost::math::constants::pi<double>() / 2.0) / (-2.0 * boost::math::constants::pi<double>());
+	  bvi_->adj_ += adj_ * std::exp(-0.5 * avi_->val_ * avi_->val_ * (1.0 + bvi_->val_ * bvi_->val_)) / ((1 + bvi_->val_ * bvi_->val_) * 2.0 * boost::math::constants::pi<double>());
+        }
+      };
+
+      class owenst_vd_vari : public op_vd_vari {
+      public:
+        owenst_vd_vari(vari* avi, double b) :
+          op_vd_vari(boost::math::owens_t(avi->val_, b), avi, b) {
+        }
+        void chain() {
+          avi_->adj_ += adj_ * boost::math::erf(bd_ * avi_->val_ / std::sqrt(2.0)) * std::exp(-avi_->val_ * avi_->val_ / 2.0) * std::sqrt(boost::math::constants::pi<double>() / 2.0) / (-2.0 * boost::math::constants::pi<double>());
+        }
+      };
+
+      class owenst_dv_vari : public op_dv_vari {
+      public:
+        owenst_dv_vari(double a, vari* bvi) :
+          op_dv_vari(boost::math::owens_t(a, bvi->val_), a, bvi) {
+        }
+        void chain() {
+	  bvi_->adj_ += adj_ * std::exp(-0.5 * ad_ * ad_ * (1.0 + bvi_->val_ * bvi_->val_)) / ((1 + bvi_->val_ * bvi_->val_) * 2.0 * boost::math::constants::pi<double>());
         }
       };
 
@@ -1583,6 +1615,18 @@ namespace stan {
                      const var& b,
                      const var& x) {
       return var(new ibeta_vvv_vari(a.vi_, b.vi_, x.vi_));
+    }
+
+    inline var owenst(const var& h, const var&a) {
+      return var(new owenst_vv_vari(h.vi_, a.vi_));
+    }
+
+    inline var owenst(const var& h, const double a) {
+      return var(new owenst_vd_vari(h.vi_, a));
+    }
+
+    inline var owenst(const double  h, const var&a) {
+      return var(new owenst_dv_vari(h, a.vi_));
     }
 
     /**

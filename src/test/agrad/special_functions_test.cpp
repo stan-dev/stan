@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <stan/agrad/special_functions.hpp>
+#include <boost/math/special_functions/owens_t.hpp>
 
 // cut and paste helpers and typedefs from agrad_test.cpp
 typedef stan::agrad::var AVAR;
@@ -1464,7 +1465,57 @@ TEST(AgradSpecialFunctions,ibeta_ddv) {
   f.grad(x,grad_f);
   EXPECT_FLOAT_EQ(ibeta_derivative(a, b, c.val()),grad_f[0]);
 }
+TEST(AgradSpecialFunctions,owenst_vv) {
+  using stan::agrad::var;
+  using stan::math::owenst;
+  using stan::agrad::owenst;
+  using boost::math::owens_t;
 
+  AVAR h = 1.0;
+  AVAR a = 2.0;
+  AVAR f = owenst(h,a);
+  EXPECT_FLOAT_EQ(owens_t(1.0, 2.0), f.val());
+
+  AVEC x = createAVEC(h,a);
+  VEC grad_f;
+  f.grad(x,grad_f);
+  EXPECT_FLOAT_EQ(0.0026128467,grad_f[1]);
+  EXPECT_FLOAT_EQ(-0.1154804963,grad_f[0]);
+}
+TEST(AgradSpecialFunctions,owenst_vd) {
+  using stan::agrad::var;
+  using stan::math::owenst;
+  using stan::agrad::owenst;
+  using boost::math::owens_t;
+
+  AVAR h = 1.0;
+  double a = 2.0;
+  AVAR f = owenst(h,a);
+  EXPECT_FLOAT_EQ(owens_t(1.0, 2.0), f.val());
+
+  AVEC x = createAVEC(h,a);
+  VEC grad_f;
+  f.grad(x,grad_f);
+  EXPECT_FLOAT_EQ(0,grad_f[1]);
+  EXPECT_FLOAT_EQ(-0.1154804963,grad_f[0]);
+}
+TEST(AgradSpecialFunctions,owenst_dv) {
+  using stan::agrad::var;
+  using stan::math::owenst;
+  using stan::agrad::owenst;
+  using boost::math::owens_t;
+
+  double h = 1.0;
+  AVAR a = 2.0;
+  AVAR f = owenst(h,a);
+  EXPECT_FLOAT_EQ(owens_t(1.0, 2.0), f.val());
+
+  AVEC x = createAVEC(h,a);
+  VEC grad_f;
+  f.grad(x,grad_f);
+  EXPECT_FLOAT_EQ(0.0026128467,grad_f[1]);
+  EXPECT_FLOAT_EQ(0,grad_f[0]);
+}
 TEST(AgradSpecialFunctions,value_of) {
   using stan::agrad::var;
   using stan::math::value_of;
