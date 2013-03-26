@@ -419,32 +419,6 @@ namespace stan {
 
     // COMPARISON OPERATORS
 
-
-    /**
-     * Equality operator comparing a variable's value and a double
-     * (C++).
-     *
-     * @param a First variable.  
-     * @param b Second value.
-     * @return True if the first variable's value is the same as the
-     * second value.
-     */
-    inline bool operator==(const var& a, const double b) {
-      return a.val() == b;
-    }
-  
-    /**
-     * Equality operator comparing a scalar and a variable's value
-     * (C++).
-     *
-     * @param a First scalar.
-     * @param b Second variable.
-     * @return True if the variable's value is equal to the scalar.
-     */
-    inline bool operator==(const double a, const var& b) {
-      return a == b.val();
-    }
-
     /**
      * Inequality operator comparing two variables' values (C++).
      *
