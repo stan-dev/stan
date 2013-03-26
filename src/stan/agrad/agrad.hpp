@@ -310,32 +310,6 @@ namespace stan {
     }
 
 
-    // ARITHMETIC OPERATORS
-
-
-
-
-
-    /**
-     * Postfix increment operator for variables (C++).  
-     *
-     * Following C++, the expression <code>(a++)</code> is defined to behave like
-     * the sequence of operations
-     *
-     * <code>var temp = a;  a = a + 1.0;  return temp;</code>
-     *
-     * @param a Variable to increment.
-     * @return Input variable. 
-     */
-    inline var operator++(var& a, int /*dummy*/) {
-      var temp(a);
-      a.vi_ = new increment_vari(a.vi_);
-      return temp;
-    }
-
-
-
-
     // CMATH EXP AND LOG
   
     /**
