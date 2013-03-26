@@ -76,19 +76,6 @@ namespace stan {
 
   namespace agrad {
 
-
-    inline var& var::operator/=(const var& b) {
-        vi_ = new divide_vv_vari(vi_,b.vi_);
-        return *this;
-      }
-
-    inline var& var::operator/=(const double b) {
-        if (b == 1.0)
-          return *this;
-        vi_ = new divide_vd_vari(vi_,b);
-        return *this;
-      }
-
     template <typename T>
     inline bool is_uninitialized(T x) {
       return false;
