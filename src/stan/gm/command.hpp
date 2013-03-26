@@ -68,12 +68,10 @@ namespace stan {
       std::vector<double> q(model.num_params_r(), 1.0);
       std::vector<int> r;
       
-      std::cout << model.log_prob(q, r) << std::endl;
-      
-      //stan::mcmc::unit_metric_hmc<Model, rng_t> sampler(model);
-      //std::cout << "Before: " << q.at(0) << std::endl;
-      //sampler.sample(q, r);
-      //std::cout << "After: " << q.at(0) << std::endl;
+      stan::mcmc::adapt_unit_metric_hmc<Model, rng_t> sampler(model);
+      std::cout << "Before: " << q.at(0) << std::endl;
+      sampler.sample(q, r);
+      std::cout << "After: " << q.at(0) << std::endl;
       
       return 0;
       
