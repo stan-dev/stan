@@ -2,6 +2,7 @@
 #include <stdexcept>
 #include <gtest/gtest.h>
 #include "stan/math/special_functions.hpp"
+#include <boost/math/special_functions/owens_t.hpp>
 
 
 TEST(MathsSpecialFunctions, int_step) {
@@ -468,4 +469,10 @@ TEST(MathSpecialFunctions,BoostNoDeclTypeDef) {
  BOOST_NO_DECLTYPE_is_defined = true;
 #endif
  EXPECT_TRUE(BOOST_NO_DECLTYPE_is_defined);
+}
+
+TEST(MathSpecialFunctions,owenst) {
+  double a = 1.0;
+  double b = 2.0;
+  EXPECT_FLOAT_EQ(stan::math::owenst(a,b), boost::math::owens_t(a,b));
 }

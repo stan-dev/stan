@@ -5,6 +5,8 @@
 
 #include <boost/math/special_functions/gamma.hpp>
 #include <boost/math/special_functions/beta.hpp>
+#include <boost/math/special_functions/owens_t.hpp>
+
 #include <boost/math/tools/promotion.hpp>
 #include <boost/throw_exception.hpp>
 
@@ -988,6 +990,13 @@ namespace stan {
     inline int as_bool(double x) {
       return x != 0.0;
     }
+
+    template <typename T1, typename T2>
+    inline typename boost::math::tools::promote_args<T1,T2>::type
+    owenst(T1 a, T2 b) {
+      return boost::math::owens_t(a, b);
+    }
+
 
   }
 
