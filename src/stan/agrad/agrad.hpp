@@ -32,6 +32,7 @@
 #include <stan/agrad/rev/operator_addition.hpp>
 #include <stan/agrad/rev/operator_subtraction.hpp>
 #include <stan/agrad/rev/operator_multiplication.hpp>
+#include <stan/agrad/rev/operator_division.hpp>
 
 
 #include <cmath>
