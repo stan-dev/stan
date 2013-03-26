@@ -129,19 +129,6 @@ namespace stan {
 
 
 
-    /**
-     * Return the hyperbolic tangent of the specified variable (cmath).
-     *
-     * The derivative is defined by
-     *
-     * \f$\frac{d}{dx} \tanh x = \frac{1}{\cosh^2 x}\f$.
-     *
-     * @param a Variable.
-     * @return Hyperbolic tangent of variable.
-     */
-    inline var tanh(const var& a) {
-      return var(new tanh_vari(a.vi_));
-    }
   
 
     // ROUNDING FUNCTIONS
