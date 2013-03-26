@@ -1617,15 +1617,51 @@ namespace stan {
       return var(new ibeta_vvv_vari(a.vi_, b.vi_, x.vi_));
     }
 
-    inline var owenst(const var& h, const var&a) {
+    /** 
+     * The Owen's T function of h and a.
+     *
+     * Used to compute the cumulative density function for the skew normal
+     * distribution.
+     * 
+     * @param h var parameter.
+     * @param a var parameter.
+     * 
+     * @return The Owen's T function.
+     */
+    inline var owenst(const var& h, 
+		      const var&a) {
       return var(new owenst_vv_vari(h.vi_, a.vi_));
     }
 
-    inline var owenst(const var& h, const double a) {
+    /** 
+     * The Owen's T function of h and a.
+     *
+     * Used to compute the cumulative density function for the skew normal
+     * distribution.
+     * 
+     * @param h var parameter.
+     * @param a double parameter.
+     * 
+     * @return The Owen's T function.
+     */
+    inline var owenst(const var& h, 
+		      const double& a) {
       return var(new owenst_vd_vari(h.vi_, a));
     }
 
-    inline var owenst(const double  h, const var&a) {
+    /** 
+     * The Owen's T function of h and a.
+     *
+     * Used to compute the cumulative density function for the skew normal
+     * distribution.
+     * 
+     * @param h double parameter.
+     * @param a var parameter.
+     * 
+     * @return The Owen's T function.
+     */
+    inline var owenst(const double& h, 
+		      const var&a) {
       return var(new owenst_dv_vari(h, a.vi_));
     }
 
