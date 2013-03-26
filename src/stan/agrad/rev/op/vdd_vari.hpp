@@ -1,7 +1,7 @@
-#ifndef __STAN__AGRAD__VARI__OP_VDD_VARI_HPP__
-#define __STAN__AGRAD__VARI__OP_VDD_VARI_HPP__
+#ifndef __STAN__AGRAD__REV__OP__VDD_VARI_HPP__
+#define __STAN__AGRAD__REV__OP__VDD_VARI_HPP__
 
-#include <stan/agrad/vari/vari.hpp>
+#include <stan/agrad/rev/vari.hpp>
 
 namespace stan {
   namespace agrad {

@@ -1,9 +1,9 @@
-#ifndef __STAN__AGRAD__VARI__OP_VECTOR_VARI_HPP__
-#define __STAN__AGRAD__VARI__OP_VECTOR_VARI_HPP__
+#ifndef __STAN__AGRAD__REV__OP__VECTOR_VARI_HPP__
+#define __STAN__AGRAD__REV__OP__VECTOR_VARI_HPP__
 
 #include <vector>
-#include <stan/agrad/var.hpp>
-#include <stan/agrad/vari/vari.hpp>
+#include <stan/agrad/rev/var.hpp>
+#include <stan/agrad/rev/vari.hpp>
 
 namespace stan {
   namespace agrad {

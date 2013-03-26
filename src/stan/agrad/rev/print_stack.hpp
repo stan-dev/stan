@@ -2,8 +2,8 @@
 #define __STAN__AGRAD__PRINT_STACK_HPP__
 
 #include <ostream>
-#include <stan/agrad/var_stack.hpp>
-#include <stan/agrad/vari/vari.hpp>
+#include <stan/agrad/rev/var_stack.hpp>
+#include <stan/agrad/rev/vari.hpp>
 
 namespace stan {
   namespace agrad {

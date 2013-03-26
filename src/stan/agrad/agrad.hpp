@@ -1,26 +1,26 @@
 #ifndef __STAN__AGRAD__AGRAD_HPP__
 #define __STAN__AGRAD__AGRAD_HPP__
 
-#include <stan/agrad/var_stack.hpp>
-#include <stan/agrad/chainable.hpp>
-#include <stan/agrad/vari/vari.hpp>
-#include <stan/agrad/var.hpp>
-#include <stan/agrad/print_stack.hpp>
+#include <stan/agrad/rev/var_stack.hpp>
+#include <stan/agrad/rev/chainable.hpp>
+#include <stan/agrad/rev/vari.hpp>
+#include <stan/agrad/rev/var.hpp>
+#include <stan/agrad/rev/print_stack.hpp>
 
-#include <stan/agrad/vari/op_v_vari.hpp>
-#include <stan/agrad/vari/op_vv_vari.hpp>
-#include <stan/agrad/vari/op_vd_vari.hpp>
-#include <stan/agrad/vari/op_dv_vari.hpp>
-#include <stan/agrad/vari/op_vvv_vari.hpp>
-#include <stan/agrad/vari/op_vvd_vari.hpp>
-#include <stan/agrad/vari/op_vdv_vari.hpp>
-#include <stan/agrad/vari/op_vdd_vari.hpp>
-#include <stan/agrad/vari/op_dvv_vari.hpp>
-#include <stan/agrad/vari/op_dvd_vari.hpp>
-#include <stan/agrad/vari/op_ddv_vari.hpp>
-#include <stan/agrad/vari/precomp_v_vari.hpp>
+#include <stan/agrad/rev/op/v_vari.hpp>
+#include <stan/agrad/rev/op/vv_vari.hpp>
+#include <stan/agrad/rev/op/vd_vari.hpp>
+#include <stan/agrad/rev/op/dv_vari.hpp>
+#include <stan/agrad/rev/op/vvv_vari.hpp>
+#include <stan/agrad/rev/op/vvd_vari.hpp>
+#include <stan/agrad/rev/op/vdv_vari.hpp>
+#include <stan/agrad/rev/op/vdd_vari.hpp>
+#include <stan/agrad/rev/op/dvv_vari.hpp>
+#include <stan/agrad/rev/op/dvd_vari.hpp>
+#include <stan/agrad/rev/op/ddv_vari.hpp>
+#include <stan/agrad/rev/precomp_v_vari.hpp>
 
-#include <stan/agrad/vari/neg_vari.hpp>
+#include <stan/agrad/rev/neg_vari.hpp>
 
 
 #include <cmath>

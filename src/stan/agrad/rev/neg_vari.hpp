@@ -1,7 +1,7 @@
-#ifndef __STAN__AGRAD__VARI__NEG_VARI_HPP__
-#define __STAN__AGRAD__VARI__NEG_VARI_HPP__
+#ifndef __STAN__AGRAD__REV__NEG_VARI_HPP__
+#define __STAN__AGRAD__REV__NEG_VARI_HPP__
 
-#include <stan/agrad/vari/op_v_vari.hpp>
+#include <stan/agrad/rev/op/v_vari.hpp>
 
 namespace stan {
   namespace agrad {
