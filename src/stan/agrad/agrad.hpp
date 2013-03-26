@@ -153,19 +153,7 @@ namespace stan {
     // HYPERBOLIC FUNCTIONS
 
 
-    /**
-     * Return the hyperbolic sine of the specified variable (cmath).
-     *
-     * The derivative is defined by
-     *
-     * \f$\frac{d}{dx} \sinh x = \cosh x\f$.
-     *
-     * @param a Variable.
-     * @return Hyperbolic sine of variable.
-     */
-    inline var sinh(const var& a) {
-      return var(new sinh_vari(a.vi_));
-    }
+
 
     /**
      * Return the hyperbolic tangent of the specified variable (cmath).
