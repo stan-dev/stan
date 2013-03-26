@@ -20,6 +20,8 @@
 #include <stan/agrad/vari/op_ddv_vari.hpp>
 #include <stan/agrad/vari/precomp_v_vari.hpp>
 
+#include <stan/agrad/vari/neg_vari.hpp>
+
 
 #include <cmath>
 #include <cstddef>
@@ -36,17 +38,6 @@ namespace stan {
   namespace agrad {
 
     namespace {
-
-      class neg_vari : public op_v_vari {
-      public: 
-        neg_vari(vari* avi) :
-          op_v_vari(-(avi->val_), avi) {
-        }
-        void chain() {
-          avi_->adj_ -= adj_;
-        }
-      };
-
 
       class add_vv_vari : public op_vv_vari {
       public:
