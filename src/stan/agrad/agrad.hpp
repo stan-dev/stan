@@ -36,7 +36,27 @@
 #include <stan/agrad/rev/operator_unary_increment.hpp>
 #include <stan/agrad/rev/operator_unary_decrement.hpp>
 
-
+#include <stan/agrad/rev/exp.hpp>
+#include <stan/agrad/rev/log.hpp>
+#include <stan/agrad/rev/log10.hpp>
+#include <stan/agrad/rev/sqrt.hpp>
+#include <stan/agrad/rev/pow.hpp>
+#include <stan/agrad/rev/cos.hpp>
+#include <stan/agrad/rev/sin.hpp>
+#include <stan/agrad/rev/tan.hpp>
+#include <stan/agrad/rev/acos.hpp>
+#include <stan/agrad/rev/asin.hpp>
+#include <stan/agrad/rev/atan.hpp>
+#include <stan/agrad/rev/atan2.hpp>
+#include <stan/agrad/rev/cosh.hpp>
+#include <stan/agrad/rev/sinh.hpp>
+#include <stan/agrad/rev/tanh.hpp>
+#include <stan/agrad/rev/fabs.hpp>
+#include <stan/agrad/rev/floor.hpp>
+#include <stan/agrad/rev/ceil.hpp>
+#include <stan/agrad/rev/fmod.hpp>
+#include <stan/agrad/rev/abs.hpp>
+#include <stan/agrad/rev/jacobian.hpp>
 
 #include <cmath>
 #include <cstddef>
