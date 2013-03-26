@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__REV__OPERATOR_EQUALITY_HPP__
-#define __STAN__AGRAD__REV__OPERATOR_EQUALITY_HPP__
+#ifndef __STAN__AGRAD__REV__OPERATOR_EQUAL_HPP__
+#define __STAN__AGRAD__REV__OPERATOR_EQUAL_HPP__
 
 #include <stan/agrad/rev/var.hpp>
 

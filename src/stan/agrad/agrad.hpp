@@ -21,7 +21,9 @@
 #include <stan/agrad/rev/precomp_v_vari.hpp>
 
 #include <stan/agrad/rev/operator_unary_negative.hpp>
-#include <stan/agrad/rev/operator_equality.hpp>
+#include <stan/agrad/rev/operator_equal.hpp>
+#include <stan/agrad/rev/operator_not_equal.hpp>
+#include <stan/agrad/rev/operator_less_than.hpp>
 
 
 #include <cmath>
@@ -419,78 +421,8 @@ namespace stan {
 
     // COMPARISON OPERATORS
 
-    /**
-     * Inequality operator comparing two variables' values (C++).
-     *
-     * @param a First variable.  
-     * @param b Second variable. 
-     * @return True if the first variable's value is not the same as the
-     * second's.
-     */
-    inline bool operator!=(const var& a, const var& b) {
-      return a.val() != b.val();
-    }
 
-    /**
-     * Inequality operator comparing a variable's value and a double
-     * (C++).
-     *
-     * @param a First variable.  
-     * @param b Second value.
-     * @return True if the first variable's value is not the same as the
-     * second value.
-     */
-    inline bool operator!=(const var& a, const double b) {
-      return a.val() != b;
-    }
 
-    /**
-     * Inequality operator comparing a double and a variable's value
-     * (C++).
-     *
-     * @param a First value.
-     * @param b Second variable. 
-     * @return True if the first value is not the same as the
-     * second variable's value.
-     */
-    inline bool operator!=(const double a, const var& b) {
-      return a != b.val();
-    }
-
-    /**
-     * Less than operator comparing variables' values (C++).
-     *
-     * @param a First variable.
-     * @param b Second variable.
-     * @return True if first variable's value is less than second's.
-     */
-    inline bool operator<(const var& a, const var& b) {
-      return a.val() < b.val();
-    }
-
-    /**
-     * Less than operator comparing variable's value and a double
-     * (C++).
-     *
-     * @param a First variable.
-     * @param b Second value.
-     * @return True if first variable's value is less than second value.
-     */
-    inline bool operator<(const var& a, const double b) {
-      return a.val() < b;
-    }
-
-    /**
-     * Less than operator comparing a double and variable's value
-     * (C++).
-     *
-     * @param a First value.
-     * @param b Second variable.
-     * @return True if first value is less than second variable's value.
-     */
-    inline bool operator<(const double a, const var& b) {
-      return a < b.val();
-    }
 
     /**
      * Greater than operator comparing variables' values (C++).
