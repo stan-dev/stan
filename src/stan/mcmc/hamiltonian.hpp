@@ -1,6 +1,7 @@
 #ifndef __STAN__MCMC__HAMILTONIAN__BETA__
 #define __STAN__MCMC__HAMILTONIAN__BETA__
 
+#include <stan/mcmc/hmc_base.hpp>
 #include <stan/mcmc/util.hpp>
 
 #include <Eigen/Dense>

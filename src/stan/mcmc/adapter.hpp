@@ -1,18 +1,27 @@
 #ifndef __STAN__MCMC__STATIC__ADAPTER__BETA__
 #define __STAN__MCMC__STATIC__ADAPTER__BETA__
 
+#include <stan/mcmc/hmc_base.hpp>
 #include <Eigen/Dense>
 
 namespace stan {
   
   namespace mcmc {
     
-    class adapter {
+    class base_adapter {
       
     public:
       
-      adapter(): _adapt_mu(0.5), _adapt_delta(0.651), _adapt_gamma(0.05),
-                 _adapt_kappa(0.75), _adapt_t0(10) { init(); }
+      virtual void init() = 0;
+      
+    };
+    
+    class stepsize_adapter: public base_adapter {
+      
+    public:
+      
+      stepsize_adapter(): _adapt_mu(0.5), _adapt_delta(0.651), _adapt_gamma(0.05),
+                          _adapt_kappa(0.75), _adapt_t0(10) { init(); }
       
       void set_mu(double m) { _adapt_mu = m; }
       void set_delta(double d) { _adapt_delta = d; }
@@ -33,35 +42,17 @@ namespace stan {
       double _adapt_kappa;   // Adaptation shrinkage
       double _adapt_t0;      // Effective starting iteration
       
-      double _adapt_var_counter;
-      double _adapt_var_next;
-      
-      // Eigen::Vector sum_x;
-      
-      double _adapt_covar_counter;
-      double _adapt_covar_next;
-      
-      // Eigen::Vector sum_x;
-      // Eigen::Vector sum_x2;
-      
       void _learn_stepsize(double& epsilon, double adapt_stat);
-      //void _learn_variance(Eigen::VectorXd& var, ps_point& z);
-      //void _learn_covariance(Eigen::MatrixXd& covar, ps_point& z);
       
     };
     
-    void adapter::init() {
+    void stepsize_adapter::init() {
       _adapt_counter = 0;
       _adapt_s_bar = 0;
       _adapt_x_bar = 0;
-      
-      _adapt_var_counter = 0;
-      _adapt_var_next = 1;
-      _adapt_covar_counter = 0;
-      _adapt_covar_next = 1;
     }
     
-    void adapter::_learn_stepsize(double& epsilon, double adapt_stat) {
+    void stepsize_adapter::_learn_stepsize(double& epsilon, double adapt_stat) {
        
       ++_adapt_counter;
       
@@ -81,86 +72,151 @@ namespace stan {
       
     }
     
-    /*
-    void adapter::_learn_variance(Eigen::VectorXd& var, ps_point& z) {
+    class var_adapter: public stepsize_adapter {
       
-      ++_adapt_var_counter;
+    public:
       
-      if (_adapt_var_counter == _adapt_var_next) {
-        
-        _adapt_var_next *= 2;
-        
-        double step_size_sq_sum = 0;
-        
-        for (size_t i = 0; i < var.size(); i++) {
-          
-          double Ex = _x_sum[i] / _x_sum_n;
-          double Exsq = _xsq_sum[i] / _x_sum_n;
-          
-          _x_sum[i] = 0;
-          _xsq_sum[i] = 0;
-          
-          _step_sizes[i] = sqrt(Exsq - Ex*Ex);
-          step_size_sq_sum += _step_sizes[i] * _step_sizes[i];
-        }
-        
-        if (step_size_sq_sum > 0.0) {
-          
-          _x_sum_n = 0;
-          double normalizer = sqrt((double)_step_sizes.size()) / sqrt(step_size_sq_sum);
-          
-          for (size_t i = 0; i < _step_sizes.size(); i++)
-            _step_sizes[i] *= normalizer;
-        } 
-        else {
-          for (size_t i = 0; i < _step_sizes.size(); i++)
-            _step_sizes[i] = 1.0;
-        }
+      var_adapter(int n): _sum_x(Eigen::VectorXd::Zero(n)),
+                          _sum_x2(Eigen::VectorXd::Zero(n)) { init(); }
       
-      }
+      void init();
+      
+    protected:
+      
+      double _adapt_var_counter;
+      double _adapt_var_next;
+      
+      double _sum_n;
+      Eigen::VectorXd _sum_x;
+      Eigen::VectorXd _sum_x2;
+
+      void _learn_variance(Eigen::VectorXd& var, ps_point& z);
+      
+    };
+    
+    void var_adapter::init() {
+      
+      stepsize_adapter::init();
+      
+      _adapt_var_counter = 0;
+      _adapt_var_next = 1;
+      
+      _sum_n = 0;
+      _sum_x.setZero();
+      _sum_x2.setZero();
       
     }
     
-    void adapter::_learn_covariance(Eigen::MatrixXd& covar, ps_point& z) {
-     
-      ++_adapt_covar_counter;
-      
+    void var_adapter::_learn_variance(Eigen::VectorXd& var, ps_point& z) {
+
+      ++_adapt_var_counter;
+
       std::vector<double>& q = z.q;
       Eigen::Map<Eigen::VectorXd> x(&q[0], q.size());
       
-      ++sum_n;
-      sum_x += x;
-      sum_x2 += x * x.transpose();
+      ++_sum_n;
+      _sum_x += x;
+      _sum_x2 += x.cwiseAbs2();
       
-      if (_adapt_covar_counter == _adapt_covar_next) {
+      if (_adapt_var_counter == _adapt_var_next) {
+
+        _adapt_var_next *= 2;
         
+        _sum_x /= _sum_n;
+        _sum_x2 /= _sum_n;
+        
+        var = _sum_x2 - _sum_x.cwiseAbs2();
+        
+        const double norm = var.squaredNorm() / static_cast<double>(var.size());
+        
+        if (norm) {
+          var /= norm;
+        }
+        else
+          var.setOnes();
+        
+        _sum_n = 0;
+        _sum_x.setZero();
+        _sum_x2.setZero();
+
+      }
+     
+    }
+
+    class covar_adapter: public stepsize_adapter {
+      
+    public:
+      
+      covar_adapter(int n): _sum_x(Eigen::VectorXd::Zero(n)),
+                            _sum_xxt(Eigen::MatrixXd::Zero(n, n)) { init(); }
+      
+      void init();
+      
+    protected:
+
+      double _adapt_covar_counter;
+      double _adapt_covar_next;
+      
+      double _sum_n;
+      Eigen::VectorXd _sum_x;
+      Eigen::MatrixXd _sum_xxt;
+      
+      void _learn_covariance(Eigen::MatrixXd& covar, ps_point& z);
+      
+    };
+    
+    void covar_adapter::init() {
+      
+      stepsize_adapter::init();
+      
+      _adapt_covar_counter = 0;
+      _adapt_covar_next = 1;
+      
+      _sum_n = 0;
+      _sum_x.setZero();
+      _sum_xxt.setZero();
+      
+    }
+    
+    void covar_adapter::_learn_covariance(Eigen::MatrixXd& covar, ps_point& z) {
+
+      ++_adapt_covar_counter;
+
+      std::vector<double>& q = z.q;
+      Eigen::Map<Eigen::VectorXd> x(&q[0], q.size());
+
+      ++_sum_n;
+      _sum_x += x;
+      _sum_xxt += x * x.transpose();
+
+      if (_adapt_covar_counter == _adapt_covar_next) {
+
         _adapt_covar_next *= 2;
 
-        sum_x /= sum_n;
-        sum_x2 /= sum_n;
-        
-        covar = sum_x2 - sum_x * sum_x.transpose();
-        
-        const double norm = _covar.trace() / _covar.rows();
+        _sum_x /= _sum_n;
+        _sum_xxt /= _sum_n;
+
+        covar = _sum_xxt - _sum_x * _sum_x.transpose();
+
+        const double norm = covar.trace() / covar.rows();
         if(norm) {
-          
-          covar *= sum_n / (norm * (sum_n + 5)) ;
-          for(size_t i = 0; i < covar.rows(); i++)
-            covar(i, i) =  ( (sum_x + 2) / sum_n ) * covar(i, i) + ( 3.0 / (sum_n + 5) );
-          
+
+          covar *= _sum_n / (norm * (_sum_n + 5)) ;
+          for (size_t i = 0; i < covar.rows(); i++)
+            covar(i, i) =  ( (_sum_n + 2) / _sum_n ) * covar(i, i) + ( 3.0 / (_sum_n + 5) );
+
         }
         else
           covar = Eigen::MatrixXd::Identity(covar.rows(), covar.cols());
 
-        //_cov_L = _cov_mat.selfadjointView<Eigen::Upper>().llt().matrixL();
-        sum_n *= 0;
-        sum_x *= 0;
-        sum_x2 *= 0;
-        
+        _sum_n = 0;
+        _sum_x.setZero();
+        _sum_xxt.setZero();
+
       }
-       
+
     }
-    */
+
     
   } // mcmc
   

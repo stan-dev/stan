@@ -102,7 +102,7 @@ namespace stan {
     }
     
     template <typename M, class BaseRNG = boost::mt19937>
-    class adapt_unit_metric_hmc: public unit_metric_hmc<M, BaseRNG>, adapter {
+    class adapt_unit_metric_hmc: public unit_metric_hmc<M, BaseRNG>, stepsize_adapter {
       
     public:
       
@@ -116,7 +116,7 @@ namespace stan {
     template <typename M, class BaseRNG>
     adapt_unit_metric_hmc<M, BaseRNG>::adapt_unit_metric_hmc(M& m):
     unit_metric_hmc<M, BaseRNG>(m),
-    adapter()
+    stepsize_adapter()
     {};
     
     template <typename M, class BaseRNG>
