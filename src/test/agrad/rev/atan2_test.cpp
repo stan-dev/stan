@@ -1,5 +1,6 @@
 #include <stan/agrad/rev/atan2.hpp>
 #include <stan/agrad/rev/operator_division.hpp>
+#include <stan/agrad/rev/operator_multiplication.hpp>
 #include <test/agrad/util.hpp>
 #include <gtest/gtest.h>
 
