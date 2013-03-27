@@ -1,3 +1,6 @@
+#include <vector>
+#include <stan/agrad/rev/var.hpp>
+
 typedef stan::agrad::var AVAR;
 typedef std::vector<AVAR> AVEC;
 typedef std::vector<double> VEC;
