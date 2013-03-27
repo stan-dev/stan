@@ -2,10 +2,6 @@
 #include <stan/agrad/agrad.hpp>
 #include <test/agrad/util.hpp>
 
-
-
-
-
 TEST(AgradRev,a_eq_b) {
   AVAR a = 2.0;
   AVAR b = 2.0;
