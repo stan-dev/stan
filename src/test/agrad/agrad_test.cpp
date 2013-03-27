@@ -2,21 +2,6 @@
 #include <stan/agrad/agrad.hpp>
 #include <test/agrad/util.hpp>
 
-
-
-
-
-TEST(AgradRev,asin_var) {
-  AVAR a = 0.68;
-  AVAR f = asin(a);
-  EXPECT_FLOAT_EQ(asin(0.68), f.val());
-
-  AVEC x = createAVEC(a);
-  VEC g;
-  f.grad(x,g);
-  EXPECT_FLOAT_EQ(1.0/sqrt(1.0 - (0.68 * 0.68)), g[0]);
-}
-
 TEST(AgradRev,atan_var) {
   AVAR a = 0.68;
   AVAR f = atan(a);
