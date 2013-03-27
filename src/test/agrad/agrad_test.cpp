@@ -2,30 +2,6 @@
 #include <stan/agrad/agrad.hpp>
 #include <test/agrad/util.hpp>
 
-TEST(AgradRev,free_memory) {
-  AVAR a = 2.0;
-  AVAR b = -3.0;
-  AVAR f = a * b;
-  EXPECT_FLOAT_EQ(-6.0,f.val());
-
-  AVEC x = createAVEC(a,b);
-  VEC grad_f;
-  f.grad(x,grad_f);
-  EXPECT_FLOAT_EQ(-3.0,grad_f[0]);
-  EXPECT_FLOAT_EQ(2.0,grad_f[1]);
-  stan::agrad::free_memory();
-
-  AVAR aa = 2.0;
-  AVAR bb = -3.0;
-  AVAR ff = aa * bb;
-  EXPECT_FLOAT_EQ(-6.0,ff.val());
-
-  AVEC xx = createAVEC(aa,bb);
-  VEC grad_ff;
-  ff.grad(xx,grad_ff);
-  EXPECT_FLOAT_EQ(-3.0,grad_ff[0]);
-  EXPECT_FLOAT_EQ(2.0,grad_ff[1]);
-}
 
 TEST(AgradRev, smart_ptrs) {
   AVAR a = 2.0;
