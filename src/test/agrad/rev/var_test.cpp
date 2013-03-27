@@ -39,3 +39,12 @@ TEST(AgradRev,a_ostream) {
   os << a;
   EXPECT_EQ ("10.5:0", os.str());
 }
+
+TEST(AgradRev, smart_ptrs) {
+  AVAR a = 2.0;
+  EXPECT_FLOAT_EQ(2.0, (*a).val_);
+  EXPECT_FLOAT_EQ(2.0, a->val_);
+
+  EXPECT_FLOAT_EQ(2.0,(*a.vi_).val_);
+  EXPECT_FLOAT_EQ(2.0,a.vi_->val_);
+}

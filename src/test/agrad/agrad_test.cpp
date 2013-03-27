@@ -3,14 +3,6 @@
 #include <test/agrad/util.hpp>
 
 
-TEST(AgradRev, smart_ptrs) {
-  AVAR a = 2.0;
-  EXPECT_FLOAT_EQ(2.0, (*a).val_);
-  EXPECT_FLOAT_EQ(2.0, a->val_);
-
-  EXPECT_FLOAT_EQ(2.0,(*a.vi_).val_);
-  EXPECT_FLOAT_EQ(2.0,a.vi_->val_);
-}
 
 TEST(AgradRev, multiple_grads) {
   for (int i = 0; i < 100; ++i) {
