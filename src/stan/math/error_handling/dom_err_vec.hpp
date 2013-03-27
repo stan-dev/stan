@@ -2,7 +2,7 @@
 #define __STAN__MATH__ERROR_HANDLING__DOM_ERR_VEC_HPP__
 
 #include <sstream>
-#include <stan/math/functions/error_handling/raise_domain_error.hpp>
+#include <stan/math/error_handling/raise_domain_error.hpp>
 
 namespace stan {
   namespace math {

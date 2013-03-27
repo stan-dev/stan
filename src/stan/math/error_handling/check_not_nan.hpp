@@ -1,8 +1,8 @@
 #ifndef __STAN__MATH__ERROR_HANDLING__CHECK_NOT_NAN_HPP__
 #define __STAN__MATH__ERROR_HANDLING__CHECK_NOT_NAN_HPP__
 
-#include <stan/math/functions/error_handling/dom_err.hpp>
-#include <stan/math/functions/error_handling/dom_err_vec.hpp>
+#include <stan/math/error_handling/dom_err.hpp>
+#include <stan/math/error_handling/dom_err_vec.hpp>
 
 namespace stan {
   namespace math {

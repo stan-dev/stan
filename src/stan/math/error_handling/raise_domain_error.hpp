@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__FUNCTIONS__ERROR_HANDLING__RAISE_DOMAIN_ERROR_HPP__
-#define __STAN__MATH__FUNCTIONS__ERROR_HANDLING__RAISE_DOMAIN_ERROR_HPP__
+#ifndef __STAN__MATH__ERROR_HANDLING__RAISE_DOMAIN_ERROR_HPP__
+#define __STAN__MATH__ERROR_HANDLING__RAISE_DOMAIN_ERROR_HPP__
 
 #include <boost/math/policies/policy.hpp>
 #include <boost/math/policies/error_handling.hpp>
