@@ -26,18 +26,5 @@
 #include <stan/math/error_handling/check_consistent_size.hpp>
 #include <stan/math/error_handling/check_consistent_sizes.hpp>
 
-namespace stan { 
-
-  namespace math {
-    
-    /**
-     * The tolerance for checking arithmetic bounds In rank and in
-     * simplexes.  The default value is <code>1E-8</code>.
-     */
-    const double CONSTRAINT_TOLERANCE = 1E-8;
-
-  }
-}
-
 #endif
 
