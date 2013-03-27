@@ -1,4 +1,5 @@
 #include <stan/agrad/rev/var.hpp>
+#include <stan/agrad/rev/operator_multiplication.hpp>
 #include <gtest/gtest.h>
 #include <test/agrad/util.hpp>
 
@@ -47,4 +48,25 @@ TEST(AgradRev, smart_ptrs) {
 
   EXPECT_FLOAT_EQ(2.0,(*a.vi_).val_);
   EXPECT_FLOAT_EQ(2.0,a.vi_->val_);
+}
+
+TEST(AgradRev, stackAllocation) {
+  using stan::agrad::vari;
+  using stan::agrad::var;
+
+  vari ai(1.0);
+  vari bi(2.0);
+
+  var a(&ai);
+  var b(&bi);
+
+  AVEC x = createAVEC(a,b);
+  var f = a * b;
+
+  VEC g;
+  f.grad(x,g);
+  
+  EXPECT_EQ(2,g.size());
+  EXPECT_FLOAT_EQ(2.0,g[0]);
+  EXPECT_FLOAT_EQ(1.0,g[1]);
 }
