@@ -29,11 +29,11 @@ namespace stan {
       
       bool adapting() { return _adapt_flag; }
       
-      void set_mu(double m) { _adapt_mu = m; }
-      void set_delta(double d) { _adapt_delta = d; }
-      void set_gamma(double g) { _adapt_gamma = g; }
-      void set_kappa(double k) { _adapt_kappa = k; }
-      void set_t0(double t) { _adapt_t0 = t; }
+      void set_adapt_mu(double m) { _adapt_mu = m; }
+      void set_adapt_delta(double d) { _adapt_delta = d; }
+      void set_adapt_gamma(double g) { _adapt_gamma = g; }
+      void set_adapt_kappa(double k) { _adapt_kappa = k; }
+      void set_adapt_t0(double t) { _adapt_t0 = t; }
       
       void init();
       

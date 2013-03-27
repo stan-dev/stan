@@ -106,7 +106,7 @@ namespace stan {
     
     template <typename M, class BaseRNG>
     void unit_metric_hmc<M, BaseRNG>::write_sampler_param_names(std::ostream& o) {
-        o << "stepsize__,int_time__";
+        o << "stepsize__,int_time__,";
     }
     
     template <typename M, class BaseRNG>
