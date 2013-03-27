@@ -2,25 +2,6 @@
 #include <stan/agrad/agrad.hpp>
 #include <test/agrad/util.hpp>
 
-TEST(AgradRev,a) {
-  AVAR a = 5.0;
-  AVEC x = createAVEC(a);
-  VEC dx;
-  a.grad(x,dx);
-  EXPECT_FLOAT_EQ(1.0,dx[0]);
-}
-
-
-TEST(AgradRev,eq_a) {
-  AVAR a = 5.0;
-  AVAR f = a;
-  AVEC x = createAVEC(a);
-  VEC dx;
-  f.grad(x,dx);
-  EXPECT_FLOAT_EQ(1.0,dx[0]);
-}
-
-
 
 TEST(AgradRev,a_lt_b) {
   AVAR a = 5.0;
