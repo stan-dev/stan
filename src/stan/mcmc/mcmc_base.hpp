@@ -1,6 +1,7 @@
 #ifndef __STAN__MCMC__MCMCBASE__HPP__
 #define __STAN__MCMC__MCMCBASE__HPP__
 
+#include <fstream>
 #include <vector>
 
 namespace stan {
@@ -11,10 +12,10 @@ namespace stan {
       
     private:
       
-      const std::vector<double> _cont_params; // Continuous coordinates of sample
-      const std::vector<int> _disc_params;    // Discrete coordinates of sample
-      const double _log_prob;                 // Log probability of sample
-      const double _accept_stat;              // Acceptance statistic of transition
+      std::vector<double> _cont_params; // Continuous coordinates of sample
+      std::vector<int> _disc_params;    // Discrete coordinates of sample
+      double _log_prob;                 // Log probability of sample
+      double _accept_stat;              // Acceptance statistic of transition
 
     public:
 
@@ -28,6 +29,8 @@ namespace stan {
         _accept_stat(stat) {}
       
       virtual ~sample() {} // No-op
+      
+      sample& operator = (const sample& s);
 
       inline int size_cont() const { 
         return _cont_params.size(); 
@@ -73,7 +76,17 @@ namespace stan {
     
     class mcmc_sampler {
     public:
+      
       virtual sample transition(sample& init_sample) = 0;
+      
+      virtual void write_sampler_param_names(std::ostream& o) {};
+      
+      virtual void write_sampler_params(std::ostream& o) {};
+      
+      virtual void get_sampler_param_names(std::vector<std::string>& names) {};
+      
+      virtual void get_sampler_params(std::vector<double>& values) {};
+      
     };
 
   } // mcmc

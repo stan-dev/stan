@@ -20,8 +20,14 @@ namespace stan {
       
     public:
       
-      stepsize_adapter(): _adapt_mu(0.5), _adapt_delta(0.651), _adapt_gamma(0.05),
-                          _adapt_kappa(0.75), _adapt_t0(10) { init(); }
+      stepsize_adapter(): _adapt_flag(true), _adapt_mu(0.5), _adapt_delta(0.651),
+                          _adapt_gamma(0.05), _adapt_kappa(0.75), _adapt_t0(10)
+                          { init(); }
+      
+      void engage_adaptation() { _adapt_flag = true; }
+      void disengage_adaptation() { _adapt_flag = false; }
+      
+      bool adapting() { return _adapt_flag; }
       
       void set_mu(double m) { _adapt_mu = m; }
       void set_delta(double d) { _adapt_delta = d; }
@@ -32,6 +38,8 @@ namespace stan {
       void init();
       
     protected:
+      
+      bool _adapt_flag;
       
       double _adapt_counter; // Adaptation iteration
       double _adapt_s_bar;   // Moving average statistic
