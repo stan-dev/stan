@@ -16,6 +16,7 @@
 #include <stan/math/error_handling/default_policy.hpp>
 #include <stan/math/error_handling/check_not_nan.hpp>
 #include <stan/math/error_handling/check_finite.hpp>
+#include <stan/math/error_handling/check_greater.hpp>
 
 namespace stan { 
 
@@ -27,81 +28,6 @@ namespace stan {
      */
     const double CONSTRAINT_TOLERANCE = 1E-8;
 
-    namespace {
-      template <typename T_y,
-                typename T_low,
-                typename T_result,
-                class Policy,
-                bool is_vec>
-      struct greater {
-        static bool check(const char* function,
-                          const T_y& y,
-                          const T_low& low,
-                          const char* name,  
-                          T_result* result,
-                          const Policy&) {
-          using stan::length;
-          VectorView<const T_low> low_vec(low);
-          for (size_t n = 0; n < length(low); n++) {
-            if (!(y > low_vec[n]))
-              return dom_err(function,y,name,
-                             " is %1%, but must be greater than ",
-                             low_vec[n],result,Policy());
-          }
-          return true;
-        }
-      };
-    
-      template <typename T_y,
-                typename T_low,
-                typename T_result,
-                class Policy>
-      struct greater<T_y, T_low, T_result, Policy, true> {
-        static bool check(const char* function,
-                          const T_y& y,
-                          const T_low& low,
-                          const char* name,
-                          T_result* result,
-                          const Policy&) {
-          using stan::length;
-          VectorView<const T_low> low_vec(low);
-          for (size_t n = 0; n < length(y); n++) {
-            if (!(stan::get(y,n) > low_vec[n])) {
-              return dom_err_vec(n,function,y,name,
-                                 " is %1%, but must be greater than ",
-                                 low_vec[n],result,Policy());
-            }
-          }
-          return true;
-        }
-      };
-    }
-    template <typename T_y, typename T_low, typename T_result, class Policy>
-    inline bool check_greater(const char* function,
-                              const T_y& y,
-                              const T_low& low,
-                              const char* name,  
-                              T_result* result,
-                              const Policy&) {
-      return greater<T_y,T_low,T_result,Policy,
-        is_vector_like<T_y>::value>::check(function,y,low,name,result,Policy());
-    }
-    template <typename T_y, typename T_low, typename T_result>
-    inline bool check_greater(const char* function,
-                              const T_y& y,
-                              const T_low& low,
-                              const char* name,  
-                              T_result* result) {
-      return check_greater(function,y,low,name,result,default_policy());
-    }
-    template <typename T_y, typename T_low>
-    inline bool check_greater(const char* function,
-                              const T_y& y,
-                              const T_low& low,
-                              const char* name) {
-      return check_greater<T_y,T_low,typename scalar_type<T_y>::type *>
-        (function,y,low,name,0,default_policy());
-    }
 
     namespace {
       template <typename T_y,
