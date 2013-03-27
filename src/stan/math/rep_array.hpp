@@ -28,7 +28,7 @@ namespace stan {
     }
 
     template <typename T>
-    inline std::vector<T>
+    inline std::vector<std::vector<T> >
     rep_array(const T& x, int m, int n) {
       using std::vector;
       validate_non_negative_rep(m,"rep_array 2D rows");
@@ -37,7 +37,7 @@ namespace stan {
     }
 
     template <typename T>
-    inline std::vector<T>
+    inline std::vector<std::vector<std::vector<T> > >
     rep_array(const T& x, int k, int m, int n) {
       using std::vector;
       validate_non_negative_rep(k,"rep_array 2D shelfs");
