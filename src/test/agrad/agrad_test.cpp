@@ -2,8 +2,6 @@
 #include <stan/agrad/agrad.hpp>
 #include <test/agrad/util.hpp>
 
-
-
 TEST(AgradRev, multiple_grads) {
   for (int i = 0; i < 100; ++i) {
     AVAR a = 2.0;
