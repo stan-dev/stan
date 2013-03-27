@@ -2,9 +2,6 @@
 #include <stan/agrad/agrad.hpp>
 #include <test/agrad/util.hpp>
 
-
-
-
 TEST(AgradRev,floor_var) {
   AVAR a = 1.2;
   AVAR f = floor(a);
