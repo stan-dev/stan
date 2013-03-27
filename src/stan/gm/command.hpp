@@ -176,8 +176,6 @@ namespace stan {
       
       if (do_print(m, refresh)) {
         
-        std::cout << "Printing! m = " << m << ", refresh = " << refresh << std::endl;
-          
         std::cout << "Iteration: ";
         std::cout << std::setw(it_print_width) << (m + 1)
                   << " / " << num_iterations;
@@ -226,11 +224,7 @@ namespace stan {
       
         print_progress(m, num_iterations, refresh, warmup);
       
-        std::cout << "Testing transition in run_markov_chains function" << std::endl;
-        std::cout << "Before calling transition, address of sampler = " << &sampler << std::endl;
-        sampler.transition(init_s);
-        std::cout << "After calling transition address of sampler = " << &sampler << std::endl << std::endl;
-        //init_s = s;
+        init_s = sampler.transition(init_s);
           
         if ( save && ( (m % num_thin) == 0) ) {
           print_sample<Sampler, Model, RNG>(sample_file_stream, init_s, 
@@ -281,78 +275,484 @@ namespace stan {
     int nuts_command(int argc, const char* argv[]) {
 
       stan::io::cmd_line command(argc,argv);
-
+      
+      // Call help
       if (command.has_flag("help")) {
         print_help(argv[0]);
         return 0;
       }
-
+      
+      // Format data file
       std::string data_file;
       command.val("data",data_file);
       std::fstream data_stream(data_file.c_str(),
                                std::fstream::in);
       stan::io::dump data_var_context(data_stream);
       data_stream.close();
-
-      Model model(data_var_context, &std::cout);
-
-      //stan::model::prob_grad model(data_var_context, &std::cout);
       
-      typedef boost::ecuyer1988 rng_t;
+      // Input arguments
+      bool point_estimate = command.has_flag("point_estimate");
+      bool point_estimate_newton = command.has_flag("point_estimate_newton");
+      
+      std::string sample_file = "samples.csv";
+      command.val("samples", sample_file);
+      
+      unsigned int num_iterations = 2000U;
+      command.val("iter", num_iterations);
+      
+      unsigned int num_warmup = num_iterations / 2;
+      command.val("warmup", num_warmup);
+      
+      unsigned int num_thin = 1U;
+      command.val("thin", num_thin);
+
+      int leapfrog_steps = -1;
+      command.val("leapfrog_steps", leapfrog_steps);
+      
+      double epsilon = -1.0;
+      command.val("epsilon", epsilon);
+      
+      int max_treedepth = 10;
+      command.val("max_treedepth", max_treedepth);
+      
+      double epsilon_pm = 0.0;
+      command.val("epsilon_pm",epsilon_pm);
+      if (epsilon_pm < 0.0 || epsilon_pm > 1.0) {
+        std::stringstream ss;
+        ss << "epsilon_pm must be between 0 and 1"
+           << "; found epsilon_pm = " << epsilon_pm;
+        throw std::invalid_argument(ss.str());
+      }
+      
+      bool equal_step_sizes = command.has_flag("equal_step_sizes");
+      
+      double delta = 0.651;
+      command.val("delta", delta);
+      
+      double gamma = 0.05;
+      command.val("gamma", gamma);
+      
+      int refresh = num_iterations / 200;
+      refresh = refresh <= 0 ? 1 : refresh;
+      command.val("refresh", refresh);
+      
+      bool nondiag_mass = command.has_flag("nondiag_mass");
+      
+      std::string cov_file = "";
+      command.val("cov_matrix", cov_file);
       
       unsigned int random_seed = 0;
+      if (command.has_key("seed")) {
+        bool well_formed = command.val("seed",random_seed);
+        if (!well_formed) {
+          std::string seed_val;
+          command.val("seed", seed_val);
+          std::cerr << "value for seed must be integer"
+                    << "; found value = " << seed_val << std::endl;
+          return -1;
+        }
+      } else {
+        random_seed = (boost::posix_time::microsec_clock::universal_time() -
+                       boost::posix_time::ptime(boost::posix_time::min_date_time))
+                      .total_milliseconds();
+      }
+      
+      int chain_id = 1;
+      if (command.has_key("chain_id")) {
+        bool well_formed = command.val("chain_id", chain_id);
+        if (!well_formed || chain_id < 0) {
+          std::string chain_id_val;
+          command.val("chain_id", chain_id_val);
+          std::cerr << "value for chain_id must be positive integer"
+                    << "; found chain_id = " << chain_id_val
+                    << std::endl;
+          return -1;
+        }
+      }
+      
+      bool save_warmup = command.has_flag("save_warmup");
+      
+      bool append_samples = command.has_flag("append_samples");
+      std::ios_base::openmode samples_append_mode 
+        = append_samples
+          ? (std::fstream::out | std::fstream::app)
+          : std::fstream::out;
+
+      // Instatitate random number generator and model
+      
+      // (2**50 = 1T samples, 1000 chains)
+      typedef boost::ecuyer1988 rng_t;
       rng_t base_rng(random_seed);
       
-      /*
-      // (2**50 = 1T samples, 1000 chains)
-      //static boost::uintmax_t DISCARD_STRIDE = static_cast<boost::uintmax_t>(1) << 50;
-      
       // DISCARD_STRIDE <<= 50;
-      //base_rng.discard(DISCARD_STRIDE * (chain_id - 1));
-      */
+      static boost::uintmax_t DISCARD_STRIDE = static_cast<boost::uintmax_t>(1) << 50;
+      base_rng.discard(DISCARD_STRIDE * (chain_id - 1));
       
-      std::vector<double> q(model.num_params_r(), 1.0);
-      std::vector<int> r;
       
-      stan::mcmc::sample s(q, r, 0, 0);
-      //std::cout << "Before: " << s.cont_params(0) << std::endl;
+      Model model(data_var_context, &std::cout);
       
-      std::fstream sample_stream("out.txt", std::fstream::out);
+      std::vector<double> cont_params(model.num_params_r());
+      std::vector<int> disc_params(model.num_params_i());
       
-      //typedef stan::mcmc::adapt_unit_metric_hmc<Model, rng_t> a_um_hmc;
-      typedef stan::mcmc::unit_metric_hmc<Model, rng_t> a_um_hmc;
+      int num_init_tries = -1;
+      
+      std::string init_val;
+      
+      if (command.has_key("init")) {
+        command.val("init", init_val);
+        if (init_val == "0") {
+          cont_params = std::vector<double>(model.num_params_r(), 0.0);
+          disc_params = std::vector<int>(model.num_params_i(), 0);
+        } else {
+          
+          try {
+            std::fstream init_stream(init_val.c_str(), std::fstream::in);
+            if (init_stream.fail()) {
+              std::string msg("ERROR: specified init file does not exist: ");
+              msg += init_val;
+              throw std::invalid_argument(msg);
+            }
+            stan::io::dump init_var_context(init_stream);
+            init_stream.close();
+            model.transform_inits(init_var_context, disc_params, cont_params);
+          } catch (const std::exception& e) {
+            std::cerr << "Error during user-specified initialization:" 
+                      << std::endl
+                      << e.what() 
+                      << std::endl;
+            return -5;
+          }
+          
+        }
+      } else {
+        init_val = "random initialization";
+        
+        boost::random::uniform_real_distribution<double> 
+          init_range_distribution(-2.0, 2.0);
+        
+        boost::variate_generator<rng_t&, 
+                                boost::random::uniform_real_distribution<double> >
+          init_rng(base_rng, init_range_distribution);
+
+        cont_params = std::vector<double>(model.num_params_r());
+        disc_params = std::vector<int>(model.num_params_i(), 0);
+        
+        // Try random initializations until log_prob is finite
+        std::vector<double> init_grad;
+        static int MAX_INIT_TRIES = 100;
+        
+        for (num_init_tries = 1; num_init_tries <= MAX_INIT_TRIES; ++num_init_tries) {
+          
+          for (size_t i = 0; i < cont_params.size(); ++i)
+            cont_params[i] = init_rng();
+          
+          // FIXME: allow config vs. std::cout
+          double init_log_prob;
+          try {
+            init_log_prob = model.grad_log_prob(cont_params, disc_params, init_grad, &std::cout);
+          } catch (std::domain_error e) {
+            stan::mcmc::write_error_msgs(&std::cout, e);
+            init_log_prob = -std::numeric_limits<double>::infinity();
+          }
+          
+          if (!boost::math::isfinite(init_log_prob))
+            continue;
+          for (size_t i = 0; i < init_grad.size(); ++i)
+            if (!boost::math::isfinite(init_grad[i]))
+              continue;
+          break;
+          
+          if (num_init_tries == MAX_INIT_TRIES) {
+            std::cout << std::endl << std::endl
+                      << "Initialization failed after " << MAX_INIT_TRIES 
+                      << " attempts. " << std::endl;
+            std::cout << " Try specifying initial values,"
+                      << " reducing ranges of constrained values,"
+                      << " or reparameterizing the model."
+                      << std::endl;
+            return -1;
+          }
+          
+        }
+
+      }
+      
+      if (command.has_flag("test_grad")) {
+        std::cout << std::endl << "TEST GRADIENT MODE" << std::endl;
+        return model.test_gradients(cont_params, disc_params);
+      }
+      
+      //////////////////////////////////////////////////
+      //           Optimization Algorithms            //
+      //////////////////////////////////////////////////
+      
+      if (point_estimate_newton) {
+        
+        std::cout << "STAN OPTIMIZATION COMMAND" << std::endl;
+        if (data_file == "")
+          std::cout << "data = (specified model requires no data)" << std::endl;
+        else 
+          std::cout << "data = " << data_file << std::endl;
+        
+        std::cout << "init = " << init_val << std::endl;
+        if (num_init_tries > 0)
+          std::cout << "init tries = " << num_init_tries << std::endl;
+        
+        std::cout << "output = " << sample_file << std::endl;
+        std::cout << "save_warmup = " << save_warmup<< std::endl;
+        
+        std::cout << "seed = " << random_seed 
+                  << " (" << (command.has_key("seed") 
+                    ? "user specified"
+                    : "randomly generated") << ")"
+                  << std::endl;
+        
+        std::fstream sample_stream(sample_file.c_str(), 
+                                   samples_append_mode);
+        
+        write_comment(sample_stream,"Point Estimate Generated by Stan");
+        write_comment(sample_stream);
+        write_comment_property(sample_stream, "stan_version_major", stan::MAJOR_VERSION);
+        write_comment_property(sample_stream, "stan_version_minor", stan::MINOR_VERSION);
+        write_comment_property(sample_stream, "stan_version_patch", stan::PATCH_VERSION);
+        write_comment_property(sample_stream, "data", data_file);
+        write_comment_property(sample_stream, "init", init_val);
+        write_comment_property(sample_stream, "save_warmup", save_warmup);
+        write_comment_property(sample_stream, "seed", random_seed);
+        write_comment(sample_stream);
+        
+        sample_stream << "lp__,";
+        model.write_csv_header(sample_stream);
+        
+        std::vector<double> gradient;
+        double lp;
+        try {
+          lp = model.grad_log_prob(cont_params, disc_params, gradient);
+        } catch (std::domain_error e) {
+          stan::mcmc::write_error_msgs(&std::cout, e);
+          lp = -std::numeric_limits<double>::infinity();
+        }
+        
+        double lastlp = lp - 1;
+        std::cout << "initial log joint probability = " << lp << std::endl;
+        int m = 0;
+        while ((lp - lastlp) / fabs(lp) > 1e-8) {
+          lastlp = lp;
+          lp = stan::optimization::newton_step(model, cont_params, disc_params);
+          std::cout << "Iteration ";
+          std::cout << std::setw(2) << (m + 1) << ". ";
+          std::cout << "Log joint probability = " << std::setw(10) << lp;
+          std::cout << ". Improved by " << (lp - lastlp) << ".";
+          std::cout << std::endl;
+          std::cout.flush();
+          m++;
+          //           for (size_t i = 0; i < params_r.size(); i++)
+          //             fprintf(stderr, "%f ", params_r[i]);
+          //           fprintf(stderr, "   %f  (last = %f)\n", lp, lastlp);
+          if (save_warmup) {
+            sample_stream << lp << ',';
+            model.write_csv(base_rng, cont_params, disc_params, sample_stream);
+          }
+        }
+        
+        sample_stream << lp << ',';
+        model.write_csv(base_rng, cont_params, disc_params, sample_stream);
+        
+        return 0;
+        
+      }
+      
+      if (point_estimate) {
+        
+        std::cout << "STAN OPTIMIZATION COMMAND" << std::endl;
+        if (data_file == "")
+          std::cout << "data = (specified model requires no data)" << std::endl;
+        else 
+          std::cout << "data = " << data_file << std::endl;
+        
+        std::cout << "init = " << init_val << std::endl;
+        if (num_init_tries > 0)
+          std::cout << "init tries = " << num_init_tries << std::endl;
+        
+        std::cout << "output = " << sample_file << std::endl;
+        std::cout << "save_warmup = " << save_warmup<< std::endl;
+        
+        std::cout << "seed = " << random_seed 
+                  << " (" << (command.has_key("seed") 
+                    ? "user specified"
+                    : "randomly generated") << ")"
+                  << std::endl;
+        
+        std::fstream sample_stream(sample_file.c_str(), 
+                                   samples_append_mode);
+        
+        write_comment(sample_stream,"Point Estimate Generated by Stan");
+        write_comment(sample_stream);
+        write_comment_property(sample_stream, "stan_version_major", stan::MAJOR_VERSION);
+        write_comment_property(sample_stream, "stan_version_minor", stan::MINOR_VERSION);
+        write_comment_property(sample_stream, "stan_version_patch", stan::PATCH_VERSION);
+        write_comment_property(sample_stream, "data", data_file);
+        write_comment_property(sample_stream, "init", init_val);
+        write_comment_property(sample_stream, "save_warmup", save_warmup);
+        write_comment_property(sample_stream, "seed", random_seed);
+        write_comment(sample_stream);
+        
+        sample_stream << "lp__,";
+        model.write_csv_header(sample_stream);
+        
+        stan::optimization::NesterovGradient ng(model, cont_params, disc_params,
+                                                -1.0, &std::cout);
+        double lp = ng.logp();
+        
+        double lastlp = lp - 1;
+        std::cout << "initial log joint probability = " << lp << std::endl;
+        int m = 0;
+        for (size_t i = 0; i < num_iterations; i++) {
+          lastlp = lp;
+          lp = ng.step();
+          ng.params_r(cont_params);
+          if (do_print(i, refresh)) {
+            std::cout << "Iteration ";
+            std::cout << std::setw(2) << (m + 1) << ". ";
+            std::cout << "Log joint probability = " << std::setw(10) << lp;
+            std::cout << ". Improved by " << (lp - lastlp) << ".";
+            std::cout << std::endl;
+            std::cout.flush();
+          }
+          m++;
+          if (save_warmup) {
+            sample_stream << lp << ',';
+            model.write_csv(base_rng, cont_params, disc_params, sample_stream);
+          }
+        }
+        
+        sample_stream << lp << ',';
+        model.write_csv(base_rng, cont_params, disc_params, sample_stream);
+        
+        return 0;
+        
+      }
+      
+      //////////////////////////////////////////////////
+      //             Sampling Algorithms              // 
+      //////////////////////////////////////////////////
+      
+      std::cout << "STAN SAMPLING COMMAND" << std::endl;
+      if (data_file == "")
+        std::cout << "data = (specified model requires no data)" << std::endl;
+      else 
+        std::cout << "data = " << data_file << std::endl;
+      
+      std::cout << "init = " << init_val << std::endl;
+      if (num_init_tries > 0)
+        std::cout << "init tries = " << num_init_tries << std::endl;
+      
+      std::cout << "samples = " << sample_file << std::endl;
+      std::cout << "append_samples = " << append_samples << std::endl;
+      std::cout << "save_warmup = " << save_warmup<< std::endl;
+      
+      std::cout << "seed = " << random_seed 
+                << " (" << (command.has_key("seed") 
+                  ? "user specified"
+                  : "randomly generated") << ")"
+                << std::endl;
+      std::cout << "chain_id = " << chain_id
+                << " (" << (command.has_key("chain_id")
+                  ? "user specified"
+                  : "default") << ")"
+                << std::endl;
+      
+      std::cout << "iter = " << num_iterations << std::endl;
+      std::cout << "warmup = " << num_warmup << std::endl;
+      std::cout << "thin = " << num_thin << std::endl;
+      
+      std::cout << "equal_step_sizes = " << equal_step_sizes << std::endl;
+      std::cout << "nondiag_mass = " << nondiag_mass << std::endl;
+      std::cout << "leapfrog_steps = " << leapfrog_steps << std::endl;
+      std::cout << "max_treedepth = " << max_treedepth << std::endl;;
+      std::cout << "epsilon = " << epsilon << std::endl;;
+      std::cout << "epsilon_pm = " << epsilon_pm << std::endl;;
+      std::cout << "delta = " << delta << std::endl;
+      std::cout << "gamma = " << gamma << std::endl;
+      
+      std::fstream sample_stream(sample_file.c_str(), 
+                                 samples_append_mode);
+      
+      write_comment(sample_stream,"Samples Generated by Stan");
+      write_comment(sample_stream);
+      write_comment_property(sample_stream, "stan_version_major", stan::MAJOR_VERSION);
+      write_comment_property(sample_stream, "stan_version_minor", stan::MINOR_VERSION);
+      write_comment_property(sample_stream, "stan_version_patch", stan::PATCH_VERSION);
+      write_comment_property(sample_stream, "data", data_file);
+      write_comment_property(sample_stream, "init", init_val);
+      write_comment_property(sample_stream, "append_samples", append_samples);
+      write_comment_property(sample_stream, "save_warmup", save_warmup);
+      write_comment_property(sample_stream, "seed", random_seed);
+      write_comment_property(sample_stream, "chain_id", chain_id);
+      write_comment_property(sample_stream, "iter", num_iterations);
+      write_comment_property(sample_stream, "warmup", num_warmup);
+      write_comment_property(sample_stream, "thin", num_thin);
+      write_comment_property(sample_stream, "nondiag_mass", nondiag_mass);
+      write_comment_property(sample_stream, "equal_step_sizes", equal_step_sizes);
+      write_comment_property(sample_stream, "leapfrog_steps", leapfrog_steps);
+      write_comment_property(sample_stream, "max_treedepth", max_treedepth);
+      write_comment_property(sample_stream, "epsilon", epsilon);
+      write_comment_property(sample_stream, "epsilon_pm", epsilon_pm);
+      write_comment_property(sample_stream, "delta", delta);
+      write_comment_property(sample_stream, "gamma", gamma);
+      write_comment(sample_stream);
+      
+
+      // Unit Metric HMC with Static Integration Time
+      stan::mcmc::sample s(cont_params, disc_params, 0, 0);
+      
+      typedef stan::mcmc::adapt_unit_metric_hmc<Model, rng_t> a_um_hmc;
       a_um_hmc sampler(model, base_rng);
       
-      std::cout << "Testing transition in main function (1)" << std::endl;
-      std::cout << "Before calling transition, address of sampler = " << &sampler << std::endl;
-      sampler.transition(s);
-      std::cout << "After calling transition address of sampler = " << &sampler << std::endl << std::endl;
+      if (!append_samples) {
+        sample_stream << "lp__,";
+        sampler.write_sampler_param_names(sample_stream);
+        model.write_csv_header(sample_stream);
+      }
       
-      std::cout << "Testing transition in main function (2)" << std::endl;
-      std::cout << "Before calling transition, address of sampler = " << &sampler << std::endl;
-      sampler.transition(s);
-      std::cout << "After calling transition address of sampler = " << &sampler << std::endl << std::endl;
+      // Warm-Up
+      epsilon = 0.1;
+      sampler.set_stepsize_and_T(epsilon, 100);
+            
+      sampler.set_adapt_mu(10 * epsilon);
+      sampler.engage_adaptation();
       
-      std::cout << "Testing transition in main function (3)" << std::endl;
-      std::cout << "Before calling transition, address of sampler = " << &sampler << std::endl;
-      sampler.transition(s);
-      std::cout << "After calling transition address of sampler = " << &sampler << std::endl << std::endl;
+      clock_t start = clock();
       
-      std::cout << "Testing transition in main function (4)" << std::endl;
-      std::cout << "Before calling transition, address of sampler = " << &sampler << std::endl;
-      sampler.transition(s);
-      std::cout << "After calling transition address of sampler = " << &sampler << std::endl << std::endl;
+      warmup<a_um_hmc, Model, rng_t>(sampler, num_warmup, num_thin, 
+                                     refresh, save_warmup, sample_stream, 
+                                     s, model, base_rng); 
       
-      //sampler.engage_adaptation();
+      clock_t end = clock();
+      double warmDeltaT = (double)(end - start) / CLOCKS_PER_SEC;
       
-      warmup<a_um_hmc, Model, rng_t>(sampler, 10, 1, 2, true, sample_stream, s, model, base_rng); 
-      
-      //sampler.disengage_adaptation();
+      sampler.disengage_adaptation();
       sampler.write_sampler_params(sample_stream);
       
-      //sample<a_um_hmc, Model, rng_t>(sampler, 10, 1, 2, true, sample_stream, s, model, base_rng); 
+      // Sampling
+      start = clock();
       
-      //std::cout << "After: " << s.cont_params(0) << std::endl;
+      sample<a_um_hmc, Model, rng_t>(sampler, num_iterations - num_warmup, num_thin, 
+                                     refresh, true, sample_stream, 
+                                     s, model, base_rng); 
+      
+
+      end = clock();
+      double sampleDeltaT = (double)(end - start) / CLOCKS_PER_SEC;
+      
+      std::cout << std::endl
+                << "Elapsed Time: " << warmDeltaT 
+                << " seconds (Warm Up)"  << std::endl
+                << "              " << sampleDeltaT 
+                << " seconds (Sampling)"  << std::endl
+                << "              " << warmDeltaT + sampleDeltaT 
+                << " seconds (Total)"  << std::endl
+                << std::endl << std::endl;
       
       sample_stream.close();
       
