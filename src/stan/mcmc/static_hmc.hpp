@@ -31,7 +31,7 @@ namespace stan {
       
     public:
       
-      unit_metric_hmc(M &m, BaseRNG rng);
+      unit_metric_hmc(M &m, BaseRNG& rng);
       ~unit_metric_hmc() {};
       
       sample transition(sample& init_sample);
@@ -45,7 +45,7 @@ namespace stan {
         _epsilon = e; _T = t; _update_L();
       }
       
-      void set_stepsize_and_L(const double e, const double l) {
+      void set_stepsize_and_L(const double e, const int l) {
         _epsilon = e; _L = l; _T = _epsilon * _L;
       }
       
@@ -53,21 +53,21 @@ namespace stan {
       void set_stepsize(const double e) { _epsilon = e; _update_L(); }
       
       double get_stepsize() { return this->_epsilon; }
-      double get_L() { return this->_L; }
       double get_T() { return this->_T; }
+      int get_L() { return this->_L; }
       
     protected:
       
       double _epsilon;
-      double _L;
       double _T;
+      int _L;
       
       void _update_L() { _L = static_cast<int>(_T / _epsilon); }
                         
     };
     
     template <typename M, class BaseRNG>
-    unit_metric_hmc<M, BaseRNG>::unit_metric_hmc(M& m, BaseRNG rng):
+    unit_metric_hmc<M, BaseRNG>::unit_metric_hmc(M& m, BaseRNG& rng):
     hmc_base<M, unit_metric, expl_leapfrog, BaseRNG>(m, rng),
     _epsilon(0.1),
     _T(1)
@@ -76,14 +76,12 @@ namespace stan {
     template <typename M, class BaseRNG>
     sample unit_metric_hmc<M, BaseRNG>::transition(sample& init_sample) {
       
-      std::cout << "unit_metric_hmc::transition, this at beginning = " << this << std::endl;
-      
       ps_point z(init_sample.size_cont(), init_sample.size_disc());
       z.q = init_sample.cont_params();
       z.r = init_sample.disc_params();
       
       Eigen::VectorXd u(init_sample.size_cont());
-      for (int i = 0; i < u.size(); ++i) u(i) = this->_rand_unit_gaus();
+      for (size_t i = 0; i < u.size(); ++i) u(i) = this->_rand_unit_gaus();
       
       this->_hamiltonian.sampleP(z, u);
       this->_hamiltonian.init(z);
@@ -102,11 +100,7 @@ namespace stan {
         accept = false;
       }
       
-      sample s(z.q, z.r, - this->_hamiltonian.V(z), acceptProb);
-      
-      std::cout << "unit_metric_hmc::transition, this at end = " << this << std::endl;
-      
-      return s;
+      return sample(z.q, z.r, - this->_hamiltonian.V(z), acceptProb);
       
     }
     
@@ -139,7 +133,7 @@ namespace stan {
       
     public:
       
-      adapt_unit_metric_hmc(M &m, BaseRNG rng);
+      adapt_unit_metric_hmc(M &m, BaseRNG& rng);
       ~adapt_unit_metric_hmc() {};
       
       sample transition(sample& init_sample);
@@ -147,7 +141,7 @@ namespace stan {
     };
 
     template <typename M, class BaseRNG>
-    adapt_unit_metric_hmc<M, BaseRNG>::adapt_unit_metric_hmc(M& m, BaseRNG rng):
+    adapt_unit_metric_hmc<M, BaseRNG>::adapt_unit_metric_hmc(M& m, BaseRNG& rng):
     unit_metric_hmc<M, BaseRNG>(m, rng),
     stepsize_adapter()
     {};

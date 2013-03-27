@@ -72,7 +72,7 @@ namespace stan {
       _adapt_s_bar = (1.0 - eta) * _adapt_s_bar + eta * (_adapt_delta - adapt_stat);
       
       const double x = _adapt_mu - _adapt_s_bar * sqrt(_adapt_counter) / _adapt_gamma;
-      const double x_eta = pow(_adapt_counter, _adapt_kappa);
+      const double x_eta = pow(_adapt_counter, - _adapt_kappa);
       
       _adapt_x_bar = (1.0 - x_eta) * _adapt_x_bar + x_eta * x;
       

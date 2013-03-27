@@ -14,7 +14,7 @@ namespace stan {
       
     public:
       
-      virtual void evolve(ps_point& z, H hamiltonian, const double epsilon) = 0;
+      virtual void evolve(ps_point& z, H& hamiltonian, const double epsilon) = 0;
       
     };
     
@@ -23,8 +23,8 @@ namespace stan {
       
     public:
       
-      void evolve(ps_point& z, H hamiltonian, const double epsilon) {
-        
+      void evolve(ps_point& z, H& hamiltonian, const double epsilon) {
+
         begin_update_p(z, hamiltonian, 0.5 * epsilon);
         
         update_q(z, hamiltonian, epsilon);
@@ -48,7 +48,7 @@ namespace stan {
     public:
       
       void begin_update_p(ps_point& z, H hamiltonian, double epsilon) { 
-        z.p += epsilon * hamiltonian.dphi_dq(z); 
+        z.p -= epsilon * hamiltonian.dphi_dq(z); 
       }
       
       void update_q(ps_point& z, H hamiltonian, double epsilon) { 
@@ -57,7 +57,7 @@ namespace stan {
       }
       
       void end_update_p(ps_point& z, H hamiltonian, double epsilon) { 
-        z.p += epsilon * hamiltonian.dphi_dq(z); 
+        z.p -= epsilon * hamiltonian.dphi_dq(z); 
       }
       
     private:

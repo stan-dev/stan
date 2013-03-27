@@ -29,8 +29,6 @@ namespace stan {
         _accept_stat(stat) {}
       
       virtual ~sample() {} // No-op
-      
-      sample& operator = (const sample& s);
 
       inline int size_cont() const { 
         return _cont_params.size(); 

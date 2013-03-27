@@ -28,11 +28,11 @@ namespace stan {
       double H(ps_point& z) { return T(z) + V(z); }
       
       // tau = 0.5 p_{i} p_{j} Lambda^{ij} (q) 
-      virtual Eigen::VectorXd dtau_dq(ps_point& z) = 0;
-      virtual Eigen::VectorXd dtau_dp(ps_point& z) = 0;
+      virtual const Eigen::VectorXd dtau_dq(ps_point& z) = 0;
+      virtual const Eigen::VectorXd dtau_dp(ps_point& z) = 0;
       
       // phi = 0.5 * log | Lambda (q) | + V(q)
-      virtual Eigen::VectorXd dphi_dq(ps_point& z) = 0;
+      virtual const Eigen::VectorXd dphi_dq(ps_point& z) = 0;
       
       virtual void sampleP(ps_point& z, Eigen::VectorXd& rand_unit_gaus) = 0;
       
@@ -60,10 +60,10 @@ namespace stan {
       double tau(ps_point& z) { return T(z); }
       double phi(ps_point& z) { return this->V(z); }
       
-      Eigen::VectorXd dtau_dq(ps_point& z);
-      Eigen::VectorXd dtau_dp(ps_point& z);
+      const Eigen::VectorXd dtau_dq(ps_point& z);
+      const Eigen::VectorXd dtau_dp(ps_point& z);
       
-      Eigen::VectorXd dphi_dq(ps_point& z);
+      const Eigen::VectorXd dphi_dq(ps_point& z);
       
       void sampleP(ps_point& z, Eigen::VectorXd& rand_unit_gaus);   
       
@@ -82,17 +82,17 @@ namespace stan {
     }
     
     template <typename M>
-    Eigen::VectorXd unit_metric<M>::dtau_dq(ps_point& z) {
+    const Eigen::VectorXd unit_metric<M>::dtau_dq(ps_point& z) {
       return Eigen::VectorXd::Zero(this->_model.num_params_r());
     }
     
     template <typename M>
-    Eigen::VectorXd unit_metric<M>::dtau_dp(ps_point& z) {
+    const Eigen::VectorXd unit_metric<M>::dtau_dp(ps_point& z) {
       return z.p;
     }
     
     template <typename M>
-    Eigen::VectorXd unit_metric<M>::dphi_dq(ps_point& z) {
+    const Eigen::VectorXd unit_metric<M>::dphi_dq(ps_point& z) {
       return _g;
     }
     
@@ -103,9 +103,9 @@ namespace stan {
     
     template <typename M>
     void unit_metric<M>::update(ps_point& z) {
-      std::vector<double> g(this->_model.num_params_r());
-      _V = this-> _model.grad_log_prob(z.q, z.r, g);
-      Eigen::Map<Eigen::VectorXd> eigen_g(&g[0], g.size());
+      std::vector<double> grad_lp(this->_model.num_params_r());
+      _V = this->_model.grad_log_prob(z.q, z.r, grad_lp);
+      Eigen::Map<Eigen::VectorXd> eigen_g(&(grad_lp[0]), grad_lp.size());
       _g = - eigen_g;
     }
     

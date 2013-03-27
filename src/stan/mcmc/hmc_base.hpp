@@ -33,14 +33,14 @@ namespace stan {
     
     public:
     
-      hmc_base(M &m, BaseRNG rng = BaseRNG(std::time(0)));
+      hmc_base(M &m, BaseRNG& rng);
       
     protected:
     
       I<H<M> > _integrator;
       H<M> _hamiltonian;
       
-      BaseRNG _rng;
+      BaseRNG& _rand_int;
       
       // Normal(0, 1) RNG
       boost::variate_generator<BaseRNG&, boost::normal_distribution<> > _rand_unit_gaus;
@@ -53,12 +53,12 @@ namespace stan {
     template <class M, template<class> class H, template<class> class I, class BaseRNG>
     hmc_base<M, H, I, BaseRNG>::hmc_base(
                                          M &m, 
-                                         BaseRNG rng)
+                                         BaseRNG& rng)
     : mcmc_sampler(),
     _hamiltonian(m), 
-    _rng(rng),
-    _rand_unit_gaus(rng, boost::normal_distribution<>()),
-    _rand_uniform(rng)
+    _rand_int(rng),
+    _rand_unit_gaus(_rand_int, boost::normal_distribution<>()),
+    _rand_uniform(_rand_int)
     {};
     
   } // mcmc
