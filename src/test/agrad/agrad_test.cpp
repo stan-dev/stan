@@ -2,27 +2,6 @@
 #include <stan/agrad/agrad.hpp>
 #include <test/agrad/util.hpp>
 
-TEST(AgradRev,exp_a) {
-  AVAR a(6.0);
-  AVAR f = exp(a); // mix exp() functs w/o namespace
-  EXPECT_FLOAT_EQ(exp(6.0),f.val());
-  AVEC x = createAVEC(a);
-  VEC g;
-  f.grad(x,g);
-  EXPECT_FLOAT_EQ(exp(6.0),g[0]);
-}
-TEST(AgradRev,a_ostream) {
-  AVAR a = 6.0;
-  std::ostringstream os;
-  
-  os << a;
-  EXPECT_EQ ("6:0", os.str());
-
-  os.str("");
-  a = 10.5;
-  os << a;
-  EXPECT_EQ ("10.5:0", os.str());
-}
 
 TEST(AgradRev,log_a) {
   AVAR a(5.0);

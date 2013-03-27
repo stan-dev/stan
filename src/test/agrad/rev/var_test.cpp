@@ -26,3 +26,16 @@ TEST(AgradRev,eq_a) {
   f.grad(x,dx);
   EXPECT_FLOAT_EQ(1.0,dx[0]);
 }
+
+TEST(AgradRev,a_ostream) {
+  AVAR a = 6.0;
+  std::ostringstream os;
+  
+  os << a;
+  EXPECT_EQ ("6:0", os.str());
+
+  os.str("");
+  a = 10.5;
+  os << a;
+  EXPECT_EQ ("10.5:0", os.str());
+}
