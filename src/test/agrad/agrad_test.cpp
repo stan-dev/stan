@@ -4,12 +4,6 @@
 
 
 
-TEST(AgradRev,not_a) {
-  AVAR a(6.0);
-  EXPECT_EQ(0, !a);
-  AVAR b(0.0);
-  EXPECT_EQ(1, !b);
-}
 
 TEST(AgradRev,exp_a) {
   AVAR a(6.0);
