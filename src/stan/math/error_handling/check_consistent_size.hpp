@@ -2,6 +2,7 @@
 #define __STAN__MATH__ERROR_HANDLING__CHECK_CONSISTENT_SIZE_HPP__
 
 #include <stan/math/error_handling/dom_err.hpp>
+#include <stan/meta/traits.hpp>
 
 namespace stan {
   namespace math {
