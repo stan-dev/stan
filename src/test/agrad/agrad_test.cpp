@@ -2,9 +2,6 @@
 #include <stan/agrad/agrad.hpp>
 #include <test/agrad/util.hpp>
 
-
-
-
 TEST(AgradRev,exp_a) {
   AVAR a(6.0);
   AVAR f = exp(a); // mix exp() functs w/o namespace
