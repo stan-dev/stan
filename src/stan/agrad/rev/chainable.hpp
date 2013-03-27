@@ -1,6 +1,7 @@
 #ifndef __STAN__AGRAD__REV__CHAINABLE_HPP__
 #define __STAN__AGRAD__REV__CHAINABLE_HPP__
 
+#include <vector>
 #include <stan/agrad/rev/var_stack.hpp>
 
 namespace stan {
