@@ -2,27 +2,7 @@
 #include <stan/agrad/agrad.hpp>
 #include <test/agrad/util.hpp>
 
-TEST(AgradRev,floor_var) {
-  AVAR a = 1.2;
-  AVAR f = floor(a);
-  EXPECT_FLOAT_EQ(1.0, f.val());
 
-  AVEC x = createAVEC(a);
-  VEC g;
-  f.grad(x,g);
-  EXPECT_FLOAT_EQ(0.0, g[0]);
-}
-
-TEST(AgradRev,ceil_var) {
-  AVAR a = 1.9;
-  AVAR f = ceil(a);
-  EXPECT_FLOAT_EQ(2.0, f.val());
-
-  AVEC x = createAVEC(a);
-  VEC g;
-  f.grad(x,g);
-  EXPECT_FLOAT_EQ(0.0, g[0]);
-}
 
 TEST(AgradRev,fmod_var_var) {
   AVAR a = 2.7;
