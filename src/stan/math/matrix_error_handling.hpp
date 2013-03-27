@@ -74,7 +74,6 @@ namespace stan {
          const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
          T* result = 0) {
       return check_cov_matrix(function,Sigma,result,default_policy());
-      
     }
 
 

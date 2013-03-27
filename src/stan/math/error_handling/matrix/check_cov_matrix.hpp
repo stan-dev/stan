@@ -54,13 +54,56 @@ namespace stan {
       return check_cov_matrix(function,y,name,result,default_policy());
     }
 
-
     template <typename T>
     inline bool check_cov_matrix(const char* function,
                  const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& y,
                  const char* name,
                  T* result = 0) {
       return check_cov_matrix(function,y,name,result,default_policy());
+    }
+
+
+    // FIXME: this looks redundant
+    /**
+     * Return <code>true</code> if the specified matrix is a valid
+     * covariance matrix.  A valid covariance matrix must be symmetric
+     * and positive definite.
+     *
+     * @param function
+     * @param Sigma Matrix to test.
+     * @param result
+     * @return <code>true</code> if the matrix is a valid covariance matrix.
+     * @tparam T Type of scalar.
+     */
+    // FIXME: update warnings
+    template <typename T_covar, typename T_result, class Policy>
+    inline bool check_cov_matrix(const char* function,
+         const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
+         T_result* result,
+         const Policy&) {
+      if (!check_size_match(function, 
+          Sigma.rows(), "Rows of covariance matrix",
+          Sigma.cols(), "columns of covariance matrix",
+                            result, Policy())) 
+        return false;
+      if (!check_positive(function, Sigma.rows(), "rows", result, Policy()))
+        return false;
+      if (!check_symmetric(function, Sigma, "Sigma", result, Policy()))
+        return false;
+      return true;
+    }
+    template <typename T_covar, typename T_result>
+    inline bool check_cov_matrix(const char* function,
+         const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
+         T_result* result) {
+      return check_cov_matrix(function,Sigma,result,default_policy());
+      
+    }
+    template <typename T>
+    inline bool check_cov_matrix(const char* function,
+         const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
+         T* result = 0) {
+      return check_cov_matrix(function,Sigma,result,default_policy());
     }
 
   }
