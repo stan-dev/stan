@@ -65,21 +65,4 @@
 
 #include <stan/agrad/rev/numeric_limits.hpp>
 
-#include <stan/memory/stack_alloc.hpp>
-
-namespace stan {
-
-  namespace agrad {
-
-    template <typename T>
-    inline bool is_uninitialized(T x) {
-      return false;
-    }
-    inline bool is_uninitialized(var x) {
-      return x.is_uninitialized();
-    }
-
-
-  }
-}
 #endif
