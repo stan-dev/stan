@@ -2,27 +2,7 @@
 #include <stan/agrad/agrad.hpp>
 #include <test/agrad/util.hpp>
 
-TEST(AgradRev,cos_var) {
-  AVAR a = 0.43;
-  AVAR f = cos(a);
-  EXPECT_FLOAT_EQ(cos(0.43), f.val());
 
-  AVEC x = createAVEC(a);
-  VEC g;
-  f.grad(x,g);
-  EXPECT_FLOAT_EQ(-sin(0.43),g[0]);
-}
-
-TEST(AgradRev,sin_var) {
-  AVAR a = 0.49;
-  AVAR f = sin(a);
-  EXPECT_FLOAT_EQ(sin(0.49), f.val());
-
-  AVEC x = createAVEC(a);
-  VEC g;
-  f.grad(x,g);
-   EXPECT_FLOAT_EQ(cos(0.49),g[0]);
-}
 
 TEST(AgradRev,tan_var) {
   AVAR a = 0.68;
