@@ -6,6 +6,8 @@
 #include <stan/agrad/rev/op/vv_vari.hpp>
 #include <stan/agrad/rev/op/vd_vari.hpp>
 #include <stan/agrad/rev/op/dv_vari.hpp>
+#include <stan/agrad/rev/sqrt.hpp>
+#include <stan/agrad/rev/operator_multiplication.hpp>
 
 namespace stan {
   namespace agrad {

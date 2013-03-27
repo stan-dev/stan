@@ -64,5 +64,6 @@
 #include <stan/agrad/rev/operator_divide_equal.hpp>
 
 #include <stan/agrad/rev/numeric_limits.hpp>
+#include <stan/agrad/rev/is_uninitialized.hpp>
 
 #endif
