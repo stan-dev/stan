@@ -7,8 +7,6 @@ typedef boost::math::policies::policy<
 using namespace stan::math;
 
 
-
-
 // ---------- check_bounded tests ----------
 TEST(MathErrorHandling,CheckBoundedDefaultPolicyX) {
   const char* function = "check_bounded (%1%)";
