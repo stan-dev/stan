@@ -1,6 +1,13 @@
 #include <stan/math/error_handling/check_bounded.hpp>
 #include <gtest/gtest.h>
 
+using stan::math::default_policy;
+typedef boost::math::policies::policy<
+  boost::math::policies::domain_error<boost::math::policies::errno_on_error>
+  > errno_policy;
+
+using stan::math::check_bounded;
+
 TEST(MathErrorHandling,CheckBoundedDefaultPolicyX) {
   const char* function = "check_bounded (%1%)";
   const char* name = "x";
