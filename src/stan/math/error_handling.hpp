@@ -11,7 +11,7 @@
 #include <boost/type_traits/is_unsigned.hpp>
 
 #include <stan/meta/traits.hpp>
-#include <stan/math/functions/error_handling/boost_error_handling.hpp>
+#include <stan/math/functions/error_handling/raise_domain_error.hpp>
 
 namespace stan { 
 
