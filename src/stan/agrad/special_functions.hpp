@@ -13,7 +13,7 @@
 #include <stan/math/functions/log_sum_exp.hpp>
 #include <stan/math/functions/multiply_log.hpp>
 
-#include <boost/math/special_functions/acosh.hpp>
+
 #include <boost/math/special_functions/asinh.hpp>
 #include <boost/math/special_functions/atanh.hpp>
 #include <boost/math/special_functions/digamma.hpp>
@@ -187,15 +187,6 @@ namespace stan {
         }
       };
 
-      class acosh_vari : public op_v_vari {
-      public:
-        acosh_vari(vari* avi) :
-          op_v_vari(boost::math::acosh(avi->val_),avi) {
-        }
-        void chain() {
-          avi_->adj_ += adj_ / std::sqrt(avi_->val_ * avi_->val_ - 1.0);
-        }
-      };
 
       class asinh_vari : public op_v_vari {
       public:
@@ -655,21 +646,7 @@ namespace stan {
     using stan::math::check_not_nan;
     using stan::math::check_greater_or_equal;
 
-    /**
-     * The inverse hyperbolic cosine function for variables (C99).
-     * 
-     * For non-variable function, see boost::math::acosh().
-     *
-     * The derivative is defined by
-     *
-     * \f$\frac{d}{dx} \mbox{acosh}(x) = \frac{x}{x^2 - 1}\f$.
-     *
-     * @param a The variable.
-     * @return Inverse hyperbolic cosine of the variable.
-     */
-    inline var acosh(const stan::agrad::var& a) {
-      return var(new acosh_vari(a.vi_));
-    }
+
 
     /**
      * The inverse hyperbolic sine function for variables (C99).

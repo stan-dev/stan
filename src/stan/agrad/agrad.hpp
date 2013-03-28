@@ -66,4 +66,6 @@
 #include <stan/agrad/rev/numeric_limits.hpp>
 #include <stan/agrad/rev/is_uninitialized.hpp>
 
+#include <stan/agrad/rev/acosh.hpp>
+
 #endif
