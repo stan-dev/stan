@@ -3,7 +3,7 @@
 #include <stan/math/matrix/typedefs.hpp>
 #include <stdexcept>
 
-TEST(stanMathMatrixErrorHandling, checkNotNanEigenRow) {
+TEST(MathErrorHandlingMatrix, checkNotNanEigenRow) {
   stan::math::vector_d y;
   double result;
   y.resize(3);
