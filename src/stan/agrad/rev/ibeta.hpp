@@ -1,7 +1,16 @@
 #ifndef __STAN__AGRAD__REV__IBETA_HPP__
 #define __STAN__AGRAD__REV__IBETA_HPP__
 
+#include <boost/math/special_functions/digamma.hpp>
+#include <boost/math/special_functions/gamma.hpp>
 #include <stan/agrad/rev/var.hpp>
+#include <stan/agrad/rev/op/vvv_vari.hpp>
+#include <stan/agrad/rev/op/vvd_vari.hpp>
+#include <stan/agrad/rev/op/vdv_vari.hpp>
+#include <stan/agrad/rev/op/vdd_vari.hpp>
+#include <stan/agrad/rev/op/dvv_vari.hpp>
+#include <stan/agrad/rev/op/dvd_vari.hpp>
+#include <stan/agrad/rev/op/ddv_vari.hpp>
 #include <stan/math/functions/ibeta.hpp>
 
 namespace stan {
