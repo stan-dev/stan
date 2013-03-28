@@ -82,5 +82,6 @@
 #include <stan/agrad/rev/hypot.hpp>
 #include <stan/agrad/rev/log2.hpp>
 #include <stan/agrad/rev/cbrt.hpp>
+#include <stan/agrad/rev/round.hpp>
 
 #endif
