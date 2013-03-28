@@ -5,7 +5,6 @@
 #include <stan/math/error_handling.hpp>
 #include <stan/math/matrix.hpp>
 #include <stan/agrad/agrad.hpp>
-#include <stan/agrad/special_functions.hpp>
 #include <test/agrad/distributions/utility.hpp>
 
 using std::vector;

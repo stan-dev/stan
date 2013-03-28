@@ -11,7 +11,7 @@
 #include <stan/math/matrix/validate_vector.hpp>
 
 
-#include <stan/agrad/special_functions.hpp>
+#include <stan/agrad/agrad.hpp>
 
 namespace stan {
   namespace agrad {

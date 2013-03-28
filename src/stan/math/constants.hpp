@@ -152,6 +152,12 @@ namespace stan {
       return NEGATIVE_EPSILON;
     }
 
+    const double TWO_OVER_SQRT_PI = 2.0 / std::sqrt(boost::math::constants::pi<double>());
+    
+    const double NEG_TWO_OVER_SQRT_PI = -TWO_OVER_SQRT_PI;
+    
+    const double INV_SQRT_TWO_PI = 1.0 / std::sqrt(2.0 * boost::math::constants::pi<double>());
+    
   }
 }
 
