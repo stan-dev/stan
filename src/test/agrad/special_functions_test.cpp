@@ -56,20 +56,6 @@ TEST(AgradRev,log_loss_one) {
   EXPECT_FLOAT_EQ(-1.0 / 0.2, grad_f[0]);
 }
 
-TEST(AgradRev,log2_defaultpolicy) {
-  AVAR a = 3.0;
-  AVAR f = log2(a);
-  EXPECT_FLOAT_EQ(std::log(3.0)/std::log(2.0), f.val());
-  
-  AVEC x = createAVEC(a);
-  VEC grad_f;
-  f.grad(x,grad_f);
-  EXPECT_FLOAT_EQ(1.0 / 3.0 / std::log(2.0), grad_f[0]);
-
-  a = std::numeric_limits<AVAR>::infinity();
-  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(),
-                  stan::math::log2(a).val());
-}
 
 
 
