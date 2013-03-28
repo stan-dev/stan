@@ -5,6 +5,8 @@
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/op/v_vari.hpp>
 #include <stan/math/constants.hpp>
+#include <boost/math/special_functions/digamma.hpp>
+#include <boost/math/special_functions/gamma.hpp>
 
 namespace stan {
   namespace agrad {
