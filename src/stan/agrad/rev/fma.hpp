@@ -3,11 +3,11 @@
 
 #include <valarray>
 #include <stan/agrad/rev/var.hpp>
+#include <stan/agrad/rev/op/v_vari.hpp>
+#include <stan/agrad/rev/op/vv_vari.hpp>
+#include <stan/agrad/rev/op/vd_vari.hpp>
 #include <stan/agrad/rev/op/vvv_vari.hpp>
-#include <stan/agrad/rev/op/vvd_vari.hpp>
 #include <stan/agrad/rev/op/vdv_vari.hpp>
-#include <stan/agrad/rev/op/vdd_vari.hpp>
-#include <stan/agrad/rev/op/ddv_vari.hpp>
 #include <stan/math/constants.hpp>
 
 namespace stan {
