@@ -3,9 +3,11 @@
 
 #include <stan/agrad/boost_fpclassify.hpp>
 #include <stan/agrad/rev/op/vector_vari.hpp>
+#include <stan/agrad/rev/numeric_limits.hpp>
 #include <stan/agrad/rev/operator_greater_than.hpp>
 
 #include <stan/math.hpp>
+#include <stan/math/error_handling.hpp>
 #include <stan/math/functions/Phi.hpp>
 #include <stan/math/functions/inv_cloglog.hpp>
 #include <stan/math/functions/log_sum_exp.hpp>
