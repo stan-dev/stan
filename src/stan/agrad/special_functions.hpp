@@ -190,15 +190,6 @@ namespace stan {
 
       const double LOG_2 = std::log(2.0);
 
-      class exp2_vari : public op_v_vari {
-      public:
-        exp2_vari(vari* avi) :
-          op_v_vari(std::pow(2.0,avi->val_),avi) {
-        }
-        void chain() {
-          avi_->adj_ += adj_ * val_ * LOG_2;
-        }
-      };
 
       class expm1_vari : public op_v_vari {
       public:
@@ -608,21 +599,6 @@ namespace stan {
 
 
 
-    /**
-     * Exponentiation base 2 function for variables (C99).
-     *
-     * For non-variable function, see boost::math::exp2().
-     *
-     * The derivatie is
-     *
-     * \f$\frac{d}{dx} 2^x = (\log 2) 2^x\f$.
-     * 
-     * @param a The variable.
-     * @return Two to the power of the specified variable.
-     */
-    inline var exp2(const stan::agrad::var& a) {
-      return var(new exp2_vari(a.vi_));
-    }
 
     /**
      * The exponentiation of the specified variable minus 1 (C99).
