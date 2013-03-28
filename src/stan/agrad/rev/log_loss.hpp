@@ -29,6 +29,7 @@ namespace stan {
         }
       };
     }
+
     /**
      * The log loss function for variables (stan).
      *
