@@ -18,5 +18,4 @@ TEST(stanMathMatrixErrorHandling, checkNotNanEigenRow) {
                std::domain_error);
   EXPECT_THROW(stan::math::check_not_nan("checkNotNanEigenRow(%1%)", y, "y"), 
                std::domain_error);
-  
 }

@@ -8,23 +8,7 @@
 using stan::math::default_policy;
 
 
-TEST(stanMathMatrixErrorHandling, checkUnitVector) {
-  Eigen::Matrix<double,Eigen::Dynamic,1> y(2);
-  double result;
-  y << sqrt(0.5), sqrt(0.5);
-  
-  EXPECT_TRUE(stan::math::check_unit_vector("checkUnitVector(%1%)",
-                                        y, "y", &result));
-  EXPECT_TRUE(stan::math::check_unit_vector("checkUnitVector(%1%)",
-                                        y, "y"));
-                  
-  y[1] = 0.55;
-  EXPECT_THROW(stan::math::check_unit_vector("checkUnitVector(%1%)", y, "y", &result), 
-               std::domain_error);
-  EXPECT_THROW(stan::math::check_unit_vector("checkUnitVector(%1%)", y, "y"),
-               std::domain_error);
-}
-TEST(stanMathMatrixErrorHandling, checkSimplex) {
+TEST(MathErrorHandlingMatrix, checkSimplex) {
   Eigen::Matrix<double,Eigen::Dynamic,1> y(2);
   double result;
   y << 0.5, 0.5;
@@ -40,7 +24,7 @@ TEST(stanMathMatrixErrorHandling, checkSimplex) {
   EXPECT_THROW(stan::math::check_simplex("checkSimplex(%1%)", y, "y"),
                std::domain_error);
 }
-TEST(stanMathMatrixErrorHandling, checkSymmetric) {
+TEST(MathErrorHandlingMatrix, checkSymmetric) {
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
   double result;
   
@@ -57,7 +41,7 @@ TEST(stanMathMatrixErrorHandling, checkSymmetric) {
   EXPECT_THROW(stan::math::check_symmetric("checkSymmetric(%1%)", y, "y"),
                std::domain_error);
 }
-TEST(stanMathMatrixErrorHandling, checkCovMatrix) {
+TEST(MathErrorHandlingMatrix, checkCovMatrix) {
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y;
   double result;
   
