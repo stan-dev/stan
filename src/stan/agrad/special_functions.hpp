@@ -13,11 +13,7 @@
 #include <stan/math/functions/log_sum_exp.hpp>
 #include <stan/math/functions/multiply_log.hpp>
 
-
-
-
 #include <boost/math/special_functions/digamma.hpp>
-#include <boost/math/special_functions/hypot.hpp>
 
 namespace stan {
 
@@ -104,15 +100,6 @@ namespace stan {
 
       const double LOG2 = std::log(2.0);
 
-      class log2_vari : public op_v_vari {
-      public:
-        log2_vari(vari* avi) :
-          op_v_vari(stan::math::log2(avi->val_),avi) {
-        }
-        void chain() {
-          avi_->adj_ += adj_ / (LOG2 * avi_->val_); 
-        }
-      };
 
       class cbrt_vari : public op_v_vari {
       public:
@@ -488,21 +475,6 @@ namespace stan {
 
 
 
-    /**
-     * Returns the base 2 logarithm of the specified variable (C99).
-     *
-     * See stan::math::log2() for the double-based version.
-     *
-     * The derivative is
-     *
-     * \f$\frac{d}{dx} \log_2 x = \frac{1}{x \log 2}\f$.
-     *
-     * @param a Specified variable.
-     * @return Base 2 logarithm of the variable.
-     */
-    inline var log2(const stan::agrad::var& a) {
-      return var(new log2_vari(a.vi_));
-    }
 
     /**
      * Returns the cube root of the specified variable (C99).

@@ -80,5 +80,6 @@
 #include <stan/agrad/rev/fmax.hpp>
 #include <stan/agrad/rev/fmin.hpp>
 #include <stan/agrad/rev/hypot.hpp>
+#include <stan/agrad/rev/log2.hpp>
 
 #endif
