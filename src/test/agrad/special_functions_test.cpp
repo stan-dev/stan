@@ -226,16 +226,6 @@ TEST(AgradRev,step_3) {
   EXPECT_FLOAT_EQ(0.0,grad_f[0]);
 }  
  
-TEST(AgradRev,inv_cloglog) {
-  AVAR a = 2.7;
-  AVAR f = inv_cloglog(a);
-  EXPECT_FLOAT_EQ(std::exp(-std::exp(2.7)),f.val());
-
-  AVEC x = createAVEC(a);
-  VEC grad_f;
-  f.grad(x,grad_f);
-  EXPECT_FLOAT_EQ(-std::exp(2.7 - std::exp(2.7)),grad_f[0]);
-}
 
 TEST(AgradRev,log_sum_exp_vv) {
   AVAR a = 5.0;
