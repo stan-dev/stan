@@ -5,6 +5,7 @@
 #include <stan/agrad/rev/op/vv_vari.hpp>
 #include <stan/agrad/rev/op/vd_vari.hpp>
 #include <stan/agrad/rev/op/dv_vari.hpp>
+#include <stan/agrad/rev/log.hpp>
 #include <stan/math/functions/multiply_log.hpp>
 
 namespace stan {
