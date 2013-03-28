@@ -1,7 +1,7 @@
 #ifndef __STAN__AGRAD__AGRAD_SPECIAL_FUNCTIONS_HPP__
 #define __STAN__AGRAD__AGRAD_SPECIAL_FUNCTIONS_HPP__
 
-#include <stan/agrad/error_handling.hpp>
+#include <stan/agrad/boost_fpclassify.hpp>
 #include <stan/agrad/rev/op/vector_vari.hpp>
 #include <stan/agrad/rev/operator_greater_than.hpp>
 

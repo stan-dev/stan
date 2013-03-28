@@ -1,7 +1,7 @@
-#ifndef __STAN__AGRAD__ERROR_HANDLING_HPP__
-#define __STAN__AGRAD__ERROR_HANDLING_HPP__
+#ifndef __STAN__AGRAD__BOOST_FPCLASSIFY_HPP__
+#define __STAN__AGRAD__BOOST_FPCLASSIFY_HPP__
 
-#include <stan/math/error_handling.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
 #include <stan/agrad/agrad.hpp>
 
 namespace boost {
@@ -21,8 +21,8 @@ namespace boost {
      */
     template <>
     inline
-    int fpclassify(const stan::agrad::var v) {
-      return boost::math::fpclassify(v.val());
+    int fpclassify(const stan::agrad::var& v) {
+      return (boost::math::fpclassify)(v.val());
     }
 
     /**
@@ -36,8 +36,8 @@ namespace boost {
      */
     template <>
     inline
-    bool isfinite(const stan::agrad::var v) {
-      return boost::math::isfinite(v.val());
+    bool isfinite(const stan::agrad::var& v) {
+      return (boost::math::isfinite)(v.val());
     }
 
     /**
@@ -51,8 +51,8 @@ namespace boost {
      */
     template <>
     inline
-    bool isinf(const stan::agrad::var v) {
-      return boost::math::isinf(v.val());
+    bool isinf(const stan::agrad::var& v) {
+      return (boost::math::isinf)(v.val());
     }
 
     /**
@@ -66,8 +66,8 @@ namespace boost {
      */
     template <>
     inline
-    bool isnan(const stan::agrad::var v) {
-      return boost::math::isnan(v.val());
+    bool isnan(const stan::agrad::var& v) {
+      return (boost::math::isnan)(v.val());
     }
 
     /**
@@ -81,12 +81,11 @@ namespace boost {
      */
     template <>
     inline
-    bool isnormal(const stan::agrad::var v) {
-      return boost::math::isnormal(v.val());
+    bool isnormal(const stan::agrad::var& v) {
+      return (boost::math::isnormal)(v.val());
     }
 
   }
 }
-  
 #endif
 
