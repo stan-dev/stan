@@ -1,6 +1,7 @@
 #ifndef __STAN__AGRAD__REV__ROUND_HPP__
 #define __STAN__AGRAD__REV__ROUND_HPP__
 
+#include <boost/math/special_functions/round.hpp>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/vari.hpp>
 
