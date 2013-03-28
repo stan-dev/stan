@@ -1,6 +1,7 @@
 #ifndef __STAN__MATH__FUNCTIONS__LOG2_HPP__
 #define __STAN__MATH__FUNCTIONS__LOG2_HPP__
 
+#include <stdexcept>
 #include <boost/math/tools/promotion.hpp>
 #include <stan/math/constants.hpp>
 
