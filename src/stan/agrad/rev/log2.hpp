@@ -3,6 +3,7 @@
 
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/op/v_vari.hpp>
+#include <stan/math/functions/log2.hpp>
 #include <stan/math/constants.hpp>
 
 namespace stan {

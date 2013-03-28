@@ -81,5 +81,6 @@
 #include <stan/agrad/rev/fmin.hpp>
 #include <stan/agrad/rev/hypot.hpp>
 #include <stan/agrad/rev/log2.hpp>
+#include <stan/agrad/rev/cbrt.hpp>
 
 #endif
