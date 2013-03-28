@@ -84,5 +84,6 @@
 #include <stan/agrad/rev/cbrt.hpp>
 #include <stan/agrad/rev/round.hpp>
 #include <stan/agrad/rev/trunc.hpp>
+#include <stan/agrad/rev/fdim.hpp>
 
 #endif
