@@ -3,6 +3,7 @@
 
 #include <stan/agrad/rev/matrix/fill.hpp>
 #include <stan/agrad/rev/matrix/Eigen_NumTraits.hpp>
+#include <stan/agrad/rev/matrix/typedefs.hpp>
 
 #include <stan/math/functions/Phi.hpp>
 #include <stan/math/functions/logit.hpp>
@@ -16,41 +17,11 @@
 
 #include <stan/agrad/agrad.hpp>
 
-namespace stan {
-  namespace agrad {
-    typedef Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>::size_type size_type;
-
-  }
-}
 
 
 namespace stan {
 
   namespace agrad {
-
-    /**
-     * The type of a matrix holding <code>stan::agrad::var</code>
-     * values.
-     */
-    typedef 
-    Eigen::Matrix<var,Eigen::Dynamic,Eigen::Dynamic>
-    matrix_v;
-
-    /**
-     * The type of a (column) vector holding <code>stan::agrad::var</code>
-     * values.
-     */
-    typedef 
-    Eigen::Matrix<var,Eigen::Dynamic,1>
-    vector_v;
-
-    /**
-     * The type of a row vector holding <code>stan::agrad::var</code>
-     * values.
-     */
-    typedef 
-    Eigen::Matrix<var,1,Eigen::Dynamic>
-    row_vector_v;
 
     /**
      * Initialize variable to value.  (Function may look pointless, but
