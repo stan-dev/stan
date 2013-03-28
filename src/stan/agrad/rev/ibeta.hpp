@@ -2,6 +2,7 @@
 #define __STAN__AGRAD__REV__IBETA_HPP__
 
 #include <stan/agrad/rev/var.hpp>
+#include <stan/math/functions/ibeta.hpp>
 
 namespace stan {
   namespace agrad {
