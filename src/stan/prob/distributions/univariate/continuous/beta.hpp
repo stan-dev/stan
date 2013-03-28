@@ -6,6 +6,8 @@
 
 #include <stan/agrad.hpp>
 #include <stan/math/error_handling.hpp>
+#include <stan/math/functions/log1m.hpp>
+#include <stan/math/functions/value_of.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
