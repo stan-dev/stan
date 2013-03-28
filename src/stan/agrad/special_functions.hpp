@@ -21,20 +21,6 @@ namespace stan {
     
     namespace {
 
-
-
-
-
-      class square_vari : public op_v_vari {
-      public:
-        square_vari(vari* avi) :
-          op_v_vari(avi->val_ * avi->val_,avi) {
-        }
-        void chain() {
-          avi_->adj_ += adj_ * 2.0 * avi_->val_;
-        }
-      };
-
       class multiply_log_vv_vari : public op_vv_vari {
       public:
         multiply_log_vv_vari(vari* avi, vari* bvi) :
@@ -260,52 +246,6 @@ namespace stan {
 
     using stan::math::check_not_nan;
     using stan::math::check_greater_or_equal;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-
-
-    /**
-     * Return the square of the input variable.
-     *
-     * <p>Using <code>square(x)</code> is more efficient
-     * than using <code>x * x</code>.
-     *
-     * @param x Variable to square.
-     * @return Square of variable.
-     */
-    inline var square(const var& x) {
-      return var(new square_vari(x.vi_));
-    }
 
     // OTHER FUNCTIONS: stan/math/special_functions.hpp implementations
     /**
