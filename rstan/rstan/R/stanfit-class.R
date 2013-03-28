@@ -19,10 +19,12 @@ print.stanfit <- function(x, pars = x@sim$pars_oi,
   } 
 
   s <- summary(x, pars, probs, ...)  
+  n_kept <- x@sim$n_save - x@sim$warmup2
   cat("Inference for Stan model: ", x@model_name, '.\n', sep = '')
-  cat(x@sim$chains, " chains: each with iter=", x@sim$iter, 
-      "; warmup=", x@sim$warmup, "; thin=", x@sim$thin, "; ", 
-      x@sim$n_save[1], " iterations saved.\n\n", sep = '') 
+  cat(x@sim$chains, " chains, each with iter=", x@sim$iter, 
+      "; warmup=", x@sim$warmup, "; thin=", x@sim$thin, "; \n", 
+      "post-warmup draws per chain=", n_kept[1], ", ", 
+      "total post-warmup draws=", sum(n_kept), ".\n\n", sep = '')
 
   # round n_eff to integers
   s$summary[, 'n_eff'] <- round(s$summary[, 'n_eff'], 0)
@@ -523,21 +525,22 @@ if (!isGeneric("constrain_pars")) {
 } 
 
 setMethod("constrain_pars", signature = "stanfit", 
-          function(object, pars) {
-            # pars is a list as specifying inits for a chain
+          function(object, upars) {
+            # upars is a vector on the unconstrained space (R^N*), 
+            # where N* is the number of unconstrained parameters. 
             if (!is_sfinstance_valid(object)) 
               stop("the model object is not created or not valid")
-            p <- object@.MISC$stan_fit_instance$constrain_pars(pars)
+            p <- object@.MISC$stan_fit_instance$constrain_pars(upars)
             par_vector2list(p, object@model_pars[which(object@model_pars != 'lp__')],
                             object@par_dims)
           })
 
 
 setMethod("log_prob", signature = "stanfit", 
-          function(object, pars) {
+          function(object, upars) {
             if (!is_sfinstance_valid(object)) 
               stop("the model object is not created or not valid")
-            object@.MISC$stan_fit_instance$log_prob(pars) 
+            object@.MISC$stan_fit_instance$log_prob(upars) 
           }) 
 
 if (!isGeneric("get_num_upars")) {
@@ -546,7 +549,7 @@ if (!isGeneric("get_num_upars")) {
 } 
 
 setMethod("get_num_upars", signature = "stanfit", 
-          function(object, pars) {
+          function(object) {
             if (!is_sfinstance_valid(object)) 
               stop("the model object is not created or not valid")
             object@.MISC$stan_fit_instance$num_pars_unconstrained()
@@ -558,10 +561,10 @@ if (!isGeneric("grad_log_prob")) {
 } 
 
 setMethod("grad_log_prob", signature = "stanfit", 
-          function(object, pars) {
+          function(object, upars) {
             if (!is_sfinstance_valid(object)) 
               stop("the model object is not created or not valid")
-            object@.MISC$stan_fit_instance$grad_log_prob(pars) 
+            object@.MISC$stan_fit_instance$grad_log_prob(upars) 
           }) 
 
 setMethod("traceplot", signature = "stanfit", 

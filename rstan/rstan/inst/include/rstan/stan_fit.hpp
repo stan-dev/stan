@@ -882,7 +882,6 @@ namespace rstan {
      *  space. 
      */
     SEXP grad_log_prob(SEXP upar) {
-      // TODO: add the log_prob as well since it's a byproduct
       BEGIN_RCPP;
       std::vector<double> par_r = Rcpp::as<std::vector<double> >(upar);
       if (par_r.size() != model_.num_params_r()) {
@@ -896,9 +895,9 @@ namespace rstan {
       } 
       std::vector<int> par_i(model_.num_params_i(), 0);
       std::vector<double> gradient; 
-      model_.grad_log_prob(par_r, par_i, gradient, &rstan::io::rcout);
+      double lp = model_.grad_log_prob(par_r, par_i, gradient, &rstan::io::rcout);
       Rcpp::NumericVector grad = Rcpp::wrap(gradient); 
-      // grad.attr("log_prob") = 0; // FIXME
+      grad.attr("log_prob") = lp;
       return grad;
       END_RCPP;
     } 

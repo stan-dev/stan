@@ -34,7 +34,7 @@ cat("n=", n, "\n")
 print(p)
 
 K <- 5
-fit <- stan(model_code = mcode)
+fit <- stan(model_code = mcode, chains = 0)
 lp <- log_prob(fit, rep(0, K - 1))
 gr <- grad_log_prob(fit, rep(0, K- 1))
 
@@ -66,3 +66,14 @@ tfun <- function(y) log_prob(opfit, y)
 tgrfun <- function(y) grad_log_prob(opfit, y)
 or <- optim(1, tfun, tgrfun, method = 'BFGS')
 print(or)
+
+# return the gradient as an attribute
+tfun2 <- function(y) { 
+  g <- grad_log_prob(opfit, y) 
+  lp <- attr(g, "log_prob")
+  attr(lp, "gradient") <- g
+  lp
+} 
+
+or2 <- nlm(tfun2, 10)
+or2 
