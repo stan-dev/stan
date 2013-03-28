@@ -86,5 +86,6 @@
 #include <stan/agrad/rev/trunc.hpp>
 #include <stan/agrad/rev/fdim.hpp>
 #include <stan/agrad/rev/tgamma.hpp>
+#include <stan/agrad/rev/step.hpp>
 
 #endif
