@@ -96,5 +96,6 @@
 #include <stan/agrad/rev/log_sum_exp.hpp>
 #include <stan/agrad/rev/square.hpp>
 #include <stan/agrad/rev/multiply_log.hpp>
+#include <stan/agrad/rev/if_else.hpp>
 
 #endif
