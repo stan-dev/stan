@@ -5,6 +5,7 @@
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/error_handling/default_policy.hpp>
 #include <stan/math/error_handling/raise_domain_error.hpp>
+#include <stan/math/error_handling/matrix/constraint_tolerance.hpp>
 
 namespace stan {
   namespace math {
