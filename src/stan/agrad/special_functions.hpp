@@ -61,18 +61,6 @@ namespace stan {
 
 
 
-      class Phi_vari : public op_v_vari {
-      public:
-        Phi_vari(vari* avi) :
-          op_v_vari(stan::math::Phi(avi->val_), avi) {
-        }
-        void chain() {
-          static const double NEG_HALF = -0.5;
-          static const double INV_SQRT_TWO_PI 
-            = 1.0 / std::sqrt(2.0 * boost::math::constants::pi<double>());
-          avi_->adj_ += adj_ * INV_SQRT_TWO_PI * std::exp(NEG_HALF * avi_->val_ * avi_->val_);
-        }
-      };
 
       inline double calculate_chain(const double& x, const double& val) {
         return std::exp(x - val); // works out to inv_logit(x)
@@ -409,21 +397,6 @@ namespace stan {
 
 
 
-    /**
-     * The unit normal cumulative density function for variables (stan).
-     *
-     * See stan::math::Phi() for the double-based version.
-     *
-     * The derivative is the unit normal density function,
-     *
-     * \f$\frac{d}{dx} \Phi(x) = \mbox{\sf Norm}(x|0,1) = \frac{1}{\sqrt{2\pi}} \exp(-\frac{1}{2} x^2)\f$.
-     *
-     * @param a Variable argument.
-     * @return The unit normal cdf evaluated at the specified argument.
-     */
-    inline var Phi(const stan::agrad::var& a) {
-      return var(new Phi_vari(a.vi_));
-    }
 
     /**
      * The inverse logit function for variables (stan).

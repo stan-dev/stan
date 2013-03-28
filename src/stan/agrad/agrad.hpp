@@ -88,5 +88,6 @@
 #include <stan/agrad/rev/tgamma.hpp>
 #include <stan/agrad/rev/step.hpp>
 #include <stan/agrad/rev/inv_cloglog.hpp>
+#include <stan/agrad/rev/Phi.hpp>
 
 #endif
