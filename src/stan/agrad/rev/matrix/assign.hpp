@@ -9,6 +9,7 @@
 #include <stan/agrad/rev/matrix/typedefs.hpp>
 #include <stan/agrad/rev/matrix/dot_product.hpp>
 #include <stan/agrad/rev/matrix/dot_self.hpp>
+#include <stan/meta/traits.hpp>
 
 namespace stan {
   namespace agrad {
