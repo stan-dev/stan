@@ -187,28 +187,13 @@ namespace stan {
         }
       };
 
-
-      const double TWO_OVER_SQRT_PI = 2.0 / std::sqrt(boost::math::constants::pi<double>());
-
-      class erf_vari : public op_v_vari {
-      public:
-        erf_vari(vari* avi) :
-          op_v_vari(boost::math::erf(avi->val_),avi) {
-        }
-        void chain() {
-          avi_->adj_ += adj_ * TWO_OVER_SQRT_PI * std::exp(- avi_->val_ * avi_->val_);
-        }
-      };
-
-      const double NEG_TWO_OVER_SQRT_PI = - TWO_OVER_SQRT_PI;
-
       class erfc_vari : public op_v_vari {
       public:
         erfc_vari(vari* avi) :
           op_v_vari(boost::math::erfc(avi->val_),avi) {
         }
         void chain() {
-          avi_->adj_ += adj_ * NEG_TWO_OVER_SQRT_PI * std::exp(- avi_->val_ * avi_->val_);
+          avi_->adj_ += adj_ * stan::math::NEG_TWO_OVER_SQRT_PI * std::exp(- avi_->val_ * avi_->val_);
         }
       };
 
@@ -630,21 +615,6 @@ namespace stan {
 
 
 
-    /**
-     * The error function for variables (C99).
-     *
-     * For non-variable function, see boost::math::erf()
-     *
-     * The derivative is
-     *
-     * \f$\frac{d}{dx} \mbox{erf}(x) = \frac{2}{\sqrt{\pi}} \exp(-x^2)\f$.
-     * 
-     * @param a The variable.
-     * @return Error function applied to the variable.
-     */
-    inline var erf(const stan::agrad::var& a) {
-      return var(new erf_vari(a.vi_));
-    }
 
     /**
      * The complementary error function for variables (C99).

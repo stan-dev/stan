@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__REV__ASINH_HPP__
-#define __STAN__AGRAD__REV__ASINH_HPP__
+#ifndef __STAN__AGRAD__REV__ATANH_HPP__
+#define __STAN__AGRAD__REV__ATANH_HPP__
 
 #include <valarray>
 #include <stan/agrad/rev/var.hpp>
