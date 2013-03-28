@@ -4,6 +4,7 @@
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/op/v_vari.hpp>
 #include <stan/math/functions/log1p_exp.hpp>
+#include <stan/agrad/rev/calculate_chain.hpp>
 
 namespace stan {
   namespace agrad {

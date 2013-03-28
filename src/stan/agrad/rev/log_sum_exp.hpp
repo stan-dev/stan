@@ -2,6 +2,7 @@
 #define __STAN__AGRAD__REV__LOG_SUM_EXP_HPP__
 
 #include <stan/agrad/rev/var.hpp>
+#include <stan/agrad/rev/calculate_chain.hpp>
 #include <stan/agrad/rev/op/v_vari.hpp>
 #include <stan/math/functions/log_sum_exp.hpp>
 
@@ -9,10 +10,6 @@ namespace stan {
   namespace agrad {
 
     namespace {
-      inline double calculate_chain(const double& x, const double& val) {
-        return std::exp(x - val); // works out to inv_logit(x)
-      }
-
       class log_sum_exp_vv_vari : public op_vv_vari {
       public:
         log_sum_exp_vv_vari(vari* avi, vari* bvi) :
