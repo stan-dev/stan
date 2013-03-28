@@ -23,20 +23,6 @@ namespace stan {
 
 
 
-      double log_sum_exp_as_double(const std::vector<var>& x) {
-        using std::numeric_limits;
-        using std::exp;
-        using std::log;
-        double max = -numeric_limits<double>::infinity();
-        for (size_t i = 0; i < x.size(); ++i) 
-          if (x[i] > max) 
-            max = x[i].val();
-        double sum = 0.0;
-        for (size_t i = 0; i < x.size(); ++i) 
-          if (x[i] != -numeric_limits<double>::infinity()) 
-            sum += exp(x[i].val() - max);
-        return max + log(sum);
-      }
 
 
       class square_vari : public op_v_vari {

@@ -3,13 +3,31 @@
 
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/calculate_chain.hpp>
-#include <stan/agrad/rev/op/v_vari.hpp>
+#include <stan/agrad/rev/op/vv_vari.hpp>
+#include <stan/agrad/rev/op/vd_vari.hpp>
+#include <stan/agrad/rev/op/dv_vari.hpp>
+#include <stan/agrad/rev/op/vector_vari.hpp>
 #include <stan/math/functions/log_sum_exp.hpp>
 
 namespace stan {
   namespace agrad {
 
     namespace {
+      double log_sum_exp_as_double(const std::vector<var>& x) {
+        using std::numeric_limits;
+        using std::exp;
+        using std::log;
+        double max = -numeric_limits<double>::infinity();
+        for (size_t i = 0; i < x.size(); ++i) 
+          if (x[i] > max) 
+            max = x[i].val();
+        double sum = 0.0;
+        for (size_t i = 0; i < x.size(); ++i) 
+          if (x[i] != -numeric_limits<double>::infinity()) 
+            sum += exp(x[i].val() - max);
+        return max + log(sum);
+      }
+
       class log_sum_exp_vv_vari : public op_vv_vari {
       public:
         log_sum_exp_vv_vari(vari* avi, vari* bvi) :
