@@ -8,6 +8,7 @@
 #include <stan/math/error_handling/check_positive.hpp>
 #include <stan/math/error_handling/matrix/check_pos_definite.hpp>
 #include <stan/math/error_handling/matrix/check_symmetric.hpp>
+#include <stan/math/error_handling/matrix/check_size_match.hpp>
 
 
 namespace stan {
