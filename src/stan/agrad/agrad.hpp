@@ -85,5 +85,6 @@
 #include <stan/agrad/rev/round.hpp>
 #include <stan/agrad/rev/trunc.hpp>
 #include <stan/agrad/rev/fdim.hpp>
+#include <stan/agrad/rev/tgamma.hpp>
 
 #endif
