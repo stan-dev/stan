@@ -11,7 +11,8 @@
 #include <stan/io/cmd_line.hpp>
 #include <stan/io/dump.hpp>
 
-#include <stan/mcmc/static_hmc.hpp>
+#include <stan/mcmc/adapt_unit_e_static_hmc.hpp>
+#include <stan/mcmc/util.hpp>
 
 #include <stan/optimization/newton.hpp>
 #include <stan/optimization/nesterov_gradient.hpp>
@@ -706,7 +707,7 @@ namespace stan {
       // Unit Metric HMC with Static Integration Time
       stan::mcmc::sample s(cont_params, disc_params, 0, 0);
       
-      typedef stan::mcmc::adapt_unit_metric_hmc<Model, rng_t> a_um_hmc;
+      typedef stan::mcmc::adapt_unit_e_static_hmc<Model, rng_t> a_um_hmc;
       a_um_hmc sampler(model, base_rng);
       
       if (!append_samples) {
@@ -732,7 +733,7 @@ namespace stan {
       double warmDeltaT = (double)(end - start) / CLOCKS_PER_SEC;
       
       sampler.disengage_adaptation();
-      sampler.write_sampler_params(sample_stream);
+      //sampler.write_sampler_params(sample_stream);
       
       // Sampling
       start = clock();
