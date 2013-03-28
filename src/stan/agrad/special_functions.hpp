@@ -25,15 +25,6 @@ namespace stan {
     
     namespace {
       
-      class lgamma_vari : public op_v_vari {
-      public:
-        lgamma_vari(double value, vari* avi) :
-          op_v_vari(value, avi) {
-        }
-        void chain() {
-          avi_->adj_ += adj_ * boost::math::digamma(avi_->val_);
-        }
-      };
 
       class tgamma_vari : public op_v_vari {
       public:
@@ -45,15 +36,6 @@ namespace stan {
         }
       };
 
-      class log1p_vari : public op_v_vari {
-      public:
-        log1p_vari(vari* avi) :
-          op_v_vari(stan::math::log1p(avi->val_),avi) {
-        }
-        void chain() {
-          avi_->adj_ += adj_ / (1 + avi_->val_);
-        }
-      };
 
       class log1m_vari : public op_v_vari {
       public:
@@ -184,20 +166,6 @@ namespace stan {
         }
         void chain() {
           avi_->adj_ +=  adj_ * val_ * (1.0 - val_);
-        }
-      };
-
-
-      const double LOG_2 = std::log(2.0);
-
-
-      class expm1_vari : public op_v_vari {
-      public:
-        expm1_vari(vari* avi) :
-          op_v_vari(std::exp(avi->val_) - 1.0,avi) {
-        }
-        void chain() {
-          avi_->adj_ += adj_ * val_;
         }
       };
 
@@ -600,50 +568,8 @@ namespace stan {
 
 
 
-    /**
-     * The exponentiation of the specified variable minus 1 (C99).
-     *
-     * For non-variable function, see boost::math::expm1().
-     * 
-     * The derivative is given by
-     *
-     * \f$\frac{d}{dx} \exp(a) - 1 = \exp(a)\f$.
-     * 
-     * @param a The variable.
-     * @return Two to the power of the specified variable.
-     */
-    inline var expm1(const stan::agrad::var& a) {
-      return var(new expm1_vari(a.vi_));
-    }
 
-    /**
-     * The log gamma function for variables (C99).  
-     *
-     * The derivatie is the digamma function,
-     *
-     * \f$\frac{d}{dx} \Gamma(x) = \psi^{(0)}(x)\f$.
-     * 
-     * @param a The variable.
-     * @return Log gamma of the variable.
-     */
-    inline var lgamma(const stan::agrad::var& a) {
-      double lgamma_a = boost::math::lgamma(a.val());
-      return var(new lgamma_vari(lgamma_a, a.vi_));
-    }
 
-    /**
-     * The log (1 + x) function for variables (C99).
-     *
-     * The derivative is given by
-     *
-     * \f$\frac{d}{dx} \log (1 + x) = \frac{1}{1 + x}\f$.
-     *
-     * @param a The variable.
-     * @return The log of 1 plus the variable.
-     */
-    inline var log1p(const stan::agrad::var& a) {
-      return var(new log1p_vari(a.vi_));
-    }
 
     /**
      * The log (1 - x) function for variables.

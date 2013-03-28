@@ -73,5 +73,7 @@
 #include <stan/agrad/rev/erfc.hpp>
 #include <stan/agrad/rev/exp2.hpp>
 #include <stan/agrad/rev/expm1.hpp>
+#include <stan/agrad/rev/lgamma.hpp>
+#include <stan/agrad/rev/log1p.hpp>
 
 #endif
