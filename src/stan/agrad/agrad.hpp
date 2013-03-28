@@ -98,5 +98,7 @@
 #include <stan/agrad/rev/multiply_log.hpp>
 #include <stan/agrad/rev/if_else.hpp>
 #include <stan/agrad/rev/ibeta.hpp>
+#include <stan/agrad/rev/value_of.hpp>
+#include <stan/agrad/rev/as_bool.hpp>
 
 #endif
