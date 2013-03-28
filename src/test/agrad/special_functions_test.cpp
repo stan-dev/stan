@@ -27,7 +27,7 @@ AVEC createAVEC(AVAR x1, AVAR x2, AVAR x3) {
 }
 // end cut-and-paste
 
-TEST(AgradSpecialFunctions,lgamma) {
+TEST(AgradRev,lgamma) {
   AVAR a = 3.0;
   AVAR f = lgamma(a);
   EXPECT_FLOAT_EQ(lgamma(3.0),f.val());
@@ -38,7 +38,7 @@ TEST(AgradSpecialFunctions,lgamma) {
   EXPECT_FLOAT_EQ(boost::math::digamma(3.0),grad_f[0]);
 }
 
-TEST(AgradSpecialFunctions,fma_vvv_defaultpolicy) {
+TEST(AgradRev,fma_vvv_defaultpolicy) {
   AVAR a = 3.0;
   AVAR b = 5.0;
   AVAR c = 7.0;
@@ -52,7 +52,7 @@ TEST(AgradSpecialFunctions,fma_vvv_defaultpolicy) {
   EXPECT_FLOAT_EQ(3.0,grad_f[1]);
   EXPECT_FLOAT_EQ(1.0,grad_f[2]);
 }
-TEST(AgradSpecialFunctions,fma_vvd_defaultpolicy) {
+TEST(AgradRev,fma_vvd_defaultpolicy) {
   AVAR a = 3.0;
   AVAR b = 5.0;
   double c = 7.0;
@@ -65,7 +65,7 @@ TEST(AgradSpecialFunctions,fma_vvd_defaultpolicy) {
   EXPECT_FLOAT_EQ(5.0,grad_f[0]);
   EXPECT_FLOAT_EQ(3.0,grad_f[1]);
 }  
-TEST(AgradSpecialFunctions,fma_vdv_defaultpolicy) {
+TEST(AgradRev,fma_vdv_defaultpolicy) {
   AVAR a = 3.0;
   double b = 5.0;
   AVAR c = 7.0;
@@ -78,7 +78,7 @@ TEST(AgradSpecialFunctions,fma_vdv_defaultpolicy) {
   EXPECT_FLOAT_EQ(5.0,grad_f[0]);
   EXPECT_FLOAT_EQ(1.0,grad_f[1]);
 } 
-TEST(AgradSpecialFunctions,fma_vdd_defaultpolicy) {
+TEST(AgradRev,fma_vdd_defaultpolicy) {
   AVAR a = 3.0;
   double b = 5.0;
   double c = 7.0;
@@ -90,7 +90,7 @@ TEST(AgradSpecialFunctions,fma_vdd_defaultpolicy) {
   f.grad(x,grad_f);
   EXPECT_FLOAT_EQ(5.0,grad_f[0]);
 }  
-TEST(AgradSpecialFunctions,fma_dvv_defaultpolicy) {
+TEST(AgradRev,fma_dvv_defaultpolicy) {
   double a = 3.0;
   AVAR b = 5.0;
   AVAR c = 7.0;
@@ -103,7 +103,7 @@ TEST(AgradSpecialFunctions,fma_dvv_defaultpolicy) {
   EXPECT_FLOAT_EQ(3.0,grad_f[0]);
   EXPECT_FLOAT_EQ(1.0,grad_f[1]);
 }
-TEST(AgradSpecialFunctions,fma_dvd_defaultpolicy) {
+TEST(AgradRev,fma_dvd_defaultpolicy) {
   double a = 3.0;
   AVAR b = 5.0;
   double c = 7.0;
@@ -115,7 +115,7 @@ TEST(AgradSpecialFunctions,fma_dvd_defaultpolicy) {
   f.grad(x,grad_f);
   EXPECT_FLOAT_EQ(3.0,grad_f[0]);
 }  
-TEST(AgradSpecialFunctions,fma_ddv_defaultpolicy) {
+TEST(AgradRev,fma_ddv_defaultpolicy) {
   double a = 3.0;
   double b = 5.0;
   AVAR c = 7.0;
@@ -128,7 +128,7 @@ TEST(AgradSpecialFunctions,fma_ddv_defaultpolicy) {
   EXPECT_FLOAT_EQ(1.0,grad_f[0]);
 }  
 
-TEST(AgradSpecialFunctions,inv_logit) {
+TEST(AgradRev,inv_logit) {
   AVAR a = 2.0;
   AVAR f = inv_logit(a);
   EXPECT_FLOAT_EQ(1.0 / (1.0 + exp(-2.0)),f.val());
@@ -140,7 +140,7 @@ TEST(AgradSpecialFunctions,inv_logit) {
                   grad_f[0]);
 }
 
-TEST(AgradSpecialFunctions,log1p) {
+TEST(AgradRev,log1p) {
   AVAR a = 0.1;
   AVAR f = log1p(a);
   EXPECT_FLOAT_EQ(log(1 + 0.1), f.val());
@@ -151,7 +151,7 @@ TEST(AgradSpecialFunctions,log1p) {
   EXPECT_FLOAT_EQ(1.0 / (1.0 + 0.1), grad_f[0]);
 }
 
-TEST(AgradSpecialFunctions,log1m) {
+TEST(AgradRev,log1m) {
   AVAR a = 0.1;
   AVAR f = log1m(a);
   EXPECT_FLOAT_EQ(log(1 - 0.1), f.val());
@@ -162,7 +162,7 @@ TEST(AgradSpecialFunctions,log1m) {
   EXPECT_FLOAT_EQ(-1.0/(1.0 - 0.1), grad_f[0]);
 }
 
-TEST(AgradSpecialFunctions,log_loss_zero) {
+TEST(AgradRev,log_loss_zero) {
   AVAR y_hat = 0.2;
   int y = 0;
   AVAR f = log_loss(y,y_hat);
@@ -174,7 +174,7 @@ TEST(AgradSpecialFunctions,log_loss_zero) {
   EXPECT_FLOAT_EQ((1.0 / (1.0 - 0.2)), grad_f[0]);
 }
 
-TEST(AgradSpecialFunctions,log_loss_one) {
+TEST(AgradRev,log_loss_one) {
   AVAR y_hat = 0.2;
   int y = 1;
   AVAR f = log_loss(y,y_hat);
@@ -186,7 +186,7 @@ TEST(AgradSpecialFunctions,log_loss_one) {
   EXPECT_FLOAT_EQ(-1.0 / 0.2, grad_f[0]);
 }
 
-TEST(AgradSpecialFunctions,acosh) {
+TEST(AgradRev,acosh) {
   AVAR a = 1.3;
   AVAR f = acosh(a);
   EXPECT_FLOAT_EQ(acosh(1.3), f.val());
@@ -197,7 +197,7 @@ TEST(AgradSpecialFunctions,acosh) {
   EXPECT_FLOAT_EQ(1.0/sqrt(1.3 * 1.3  - 1.0), grad_f[0]);
 }
 
-TEST(AgradSpecialFunctions,asinh) {
+TEST(AgradRev,asinh) {
   AVAR a = 0.2;
   AVAR f = asinh(a);
   EXPECT_FLOAT_EQ(asinh(0.2), f.val());
@@ -208,7 +208,7 @@ TEST(AgradSpecialFunctions,asinh) {
   EXPECT_FLOAT_EQ(1.0/sqrt(0.2 * 0.2  + 1.0), grad_f[0]);
 }
 
-TEST(AgradSpecialFunctions,atanh) {
+TEST(AgradRev,atanh) {
   AVAR a = 0.3;
   AVAR f = atanh(a);
   EXPECT_FLOAT_EQ(atanh(0.3), f.val());
@@ -219,7 +219,7 @@ TEST(AgradSpecialFunctions,atanh) {
   EXPECT_FLOAT_EQ(1.0/(1.0 - 0.3 * 0.3), grad_f[0]);
 }
 
-TEST(AgradSpecialFunctions,erf) {
+TEST(AgradRev,erf) {
   AVAR a = 1.3;
   AVAR f = erf(a);
   EXPECT_FLOAT_EQ(boost::math::erf(1.3), f.val());
@@ -230,7 +230,7 @@ TEST(AgradSpecialFunctions,erf) {
   EXPECT_FLOAT_EQ(2.0 / std::sqrt(boost::math::constants::pi<double>()) * std::exp(- 1.3 * 1.3), grad_f[0]);
 }
 
-TEST(AgradSpecialFunctions,erfc) {
+TEST(AgradRev,erfc) {
   AVAR a = 1.3;
   AVAR f = erfc(a);
   EXPECT_FLOAT_EQ(boost::math::erfc(1.3), f.val());
@@ -242,7 +242,7 @@ TEST(AgradSpecialFunctions,erfc) {
 }
   
 
-TEST(AgradSpecialFunctions,exp2_defaultpolicy) {
+TEST(AgradRev,exp2_defaultpolicy) {
   AVAR a = 1.3;
   AVAR f = exp2(a);
   EXPECT_FLOAT_EQ(std::pow(2.0,1.3), f.val());
@@ -257,7 +257,7 @@ TEST(AgradSpecialFunctions,exp2_defaultpolicy) {
                   stan::math::exp2(a).val());
 }
 
-TEST(AgradSpecialFunctions,expm1) {
+TEST(AgradRev,expm1) {
   AVAR a = 1.3;
   AVAR f = expm1(a);
   EXPECT_FLOAT_EQ(boost::math::expm1(1.3), f.val());
@@ -269,7 +269,7 @@ TEST(AgradSpecialFunctions,expm1) {
 }  
 
 
-TEST(AgradSpecialFunctions,fmax_vv) {
+TEST(AgradRev,fmax_vv) {
   AVAR a = 1.3;
   AVAR b = 2.0;
   AVAR f = fmax(a,b);
@@ -282,7 +282,7 @@ TEST(AgradSpecialFunctions,fmax_vv) {
   EXPECT_FLOAT_EQ(1.0,grad_f[1]);
 }  
 
-TEST(AgradSpecialFunctions,fmax_vv_2) {
+TEST(AgradRev,fmax_vv_2) {
   AVAR a = 2.3;
   AVAR b = 2.0;
   AVAR f = fmax(a,b);
@@ -295,7 +295,7 @@ TEST(AgradSpecialFunctions,fmax_vv_2) {
   EXPECT_FLOAT_EQ(0.0,grad_f[1]);
 }  
 
-TEST(AgradSpecialFunctions,fmax_vv_3) {
+TEST(AgradRev,fmax_vv_3) {
   AVAR a = 2.0;
   AVAR b = 2.0;
   AVAR f = fmax(a,b);
@@ -309,7 +309,7 @@ TEST(AgradSpecialFunctions,fmax_vv_3) {
   EXPECT_FLOAT_EQ(1.0,grad_f[1]);
 }  
 
-TEST(AgradSpecialFunctions,fmax_vd) {
+TEST(AgradRev,fmax_vd) {
   AVAR a = 1.3;
   double b = 2.0;
   AVAR f = fmax(a,b);
@@ -321,7 +321,7 @@ TEST(AgradSpecialFunctions,fmax_vd) {
   EXPECT_FLOAT_EQ(0.0,grad_f[0]);
 }  
 
-TEST(AgradSpecialFunctions,fmax_vd_2) {
+TEST(AgradRev,fmax_vd_2) {
   AVAR a = 2.3;
   double b = 2.0;
   AVAR f = fmax(a,b);
@@ -333,7 +333,7 @@ TEST(AgradSpecialFunctions,fmax_vd_2) {
   EXPECT_FLOAT_EQ(1.0,grad_f[0]);
 }  
 
-TEST(AgradSpecialFunctions,fmax_vd_3) {
+TEST(AgradRev,fmax_vd_3) {
   AVAR a = 2.0;
   double b = 2.0;
   AVAR f = fmax(a,b);
@@ -345,7 +345,7 @@ TEST(AgradSpecialFunctions,fmax_vd_3) {
   EXPECT_FLOAT_EQ(1.0,grad_f[0]);
 }  
 
-TEST(AgradSpecialFunctions,fmax_dv) {
+TEST(AgradRev,fmax_dv) {
   double a = 1.3;
   AVAR b = 2.0;
   AVAR f = fmax(a,b);
@@ -357,7 +357,7 @@ TEST(AgradSpecialFunctions,fmax_dv) {
   EXPECT_FLOAT_EQ(1.0,grad_f[0]);
 }  
 
-TEST(AgradSpecialFunctions,fmax_dv_2) {
+TEST(AgradRev,fmax_dv_2) {
   double a = 2.3;
   AVAR b = 2.0;
   AVAR f = fmax(a,b);
@@ -369,7 +369,7 @@ TEST(AgradSpecialFunctions,fmax_dv_2) {
   EXPECT_FLOAT_EQ(0.0,grad_f[0]);
 }  
 
-TEST(AgradSpecialFunctions,fmax_dv_3) {
+TEST(AgradRev,fmax_dv_3) {
   double a = 2.0;
   AVAR b = 2.0;
   AVAR f = fmax(a,b);
@@ -382,7 +382,7 @@ TEST(AgradSpecialFunctions,fmax_dv_3) {
   EXPECT_FLOAT_EQ(1.0,grad_f[0]);
 }  
 
-TEST(AgradSpecialFunctions,fmin_vv) {
+TEST(AgradRev,fmin_vv) {
   AVAR a = 1.3;
   AVAR b = 2.0;
   AVAR f = fmin(a,b);
@@ -395,7 +395,7 @@ TEST(AgradSpecialFunctions,fmin_vv) {
   EXPECT_FLOAT_EQ(0.0,grad_f[1]);
 }  
 
-TEST(AgradSpecialFunctions,fmin_vv_2) {
+TEST(AgradRev,fmin_vv_2) {
   AVAR a = 2.3;
   AVAR b = 2.0;
   AVAR f = fmin(a,b);
@@ -408,7 +408,7 @@ TEST(AgradSpecialFunctions,fmin_vv_2) {
   EXPECT_FLOAT_EQ(1.0,grad_f[1]);
 }  
 
-TEST(AgradSpecialFunctions,fmin_vv_3) {
+TEST(AgradRev,fmin_vv_3) {
   AVAR a = 2.0;
   AVAR b = 2.0;
   AVAR f = fmin(a,b);
@@ -422,7 +422,7 @@ TEST(AgradSpecialFunctions,fmin_vv_3) {
   EXPECT_FLOAT_EQ(1.0,grad_f[1]);
 }  
 
-TEST(AgradSpecialFunctions,fmin_vd) {
+TEST(AgradRev,fmin_vd) {
   AVAR a = 1.3;
   double b = 2.0;
   AVAR f = fmin(a,b);
@@ -434,7 +434,7 @@ TEST(AgradSpecialFunctions,fmin_vd) {
   EXPECT_FLOAT_EQ(1.0,grad_f[0]);
 }  
 
-TEST(AgradSpecialFunctions,fmin_vd_2) {
+TEST(AgradRev,fmin_vd_2) {
   AVAR a = 2.3;
   double b = 2.0;
   AVAR f = fmin(a,b);
@@ -446,7 +446,7 @@ TEST(AgradSpecialFunctions,fmin_vd_2) {
   EXPECT_FLOAT_EQ(0.0,grad_f[0]);
 }  
 
-TEST(AgradSpecialFunctions,fmin_vd_3) {
+TEST(AgradRev,fmin_vd_3) {
   AVAR a = 2.0;
   double b = 2.0;
   AVAR f = fmin(a,b);
@@ -458,7 +458,7 @@ TEST(AgradSpecialFunctions,fmin_vd_3) {
   EXPECT_FLOAT_EQ(1.0,grad_f[0]);
 }  
 
-TEST(AgradSpecialFunctions,fmin_dv) {
+TEST(AgradRev,fmin_dv) {
   double a = 1.3;
   AVAR b = 2.0;
   AVAR f = fmin(a,b);
@@ -470,7 +470,7 @@ TEST(AgradSpecialFunctions,fmin_dv) {
   EXPECT_FLOAT_EQ(0.0,grad_f[0]);
 }  
 
-TEST(AgradSpecialFunctions,fmin_dv_2) {
+TEST(AgradRev,fmin_dv_2) {
   double a = 2.3;
   AVAR b = 2.0;
   AVAR f = fmin(a,b);
@@ -482,7 +482,7 @@ TEST(AgradSpecialFunctions,fmin_dv_2) {
   EXPECT_FLOAT_EQ(1.0,grad_f[0]);
 }  
 
-TEST(AgradSpecialFunctions,fmin_dv_3) {
+TEST(AgradRev,fmin_dv_3) {
   double a = 2.0;
   AVAR b = 2.0;
   AVAR f = fmin(a,b);
@@ -495,7 +495,7 @@ TEST(AgradSpecialFunctions,fmin_dv_3) {
   EXPECT_FLOAT_EQ(1.0,grad_f[0]);
 }  
 
-TEST(AgradSpecialFunctions,hypot_vv) {
+TEST(AgradRev,hypot_vv) {
   AVAR a = 3.0;
   AVAR b = 4.0;
   AVAR f = hypot(a,b);
@@ -509,7 +509,7 @@ TEST(AgradSpecialFunctions,hypot_vv) {
   EXPECT_FLOAT_EQ(4.0/5.0,grad_f[1]);
 }  
 
-TEST(AgradSpecialFunctions,hypot_vd) {
+TEST(AgradRev,hypot_vd) {
   AVAR a = 3.0;
   double b = 4.0;
   AVAR f = hypot(a,b);
@@ -522,7 +522,7 @@ TEST(AgradSpecialFunctions,hypot_vd) {
   EXPECT_FLOAT_EQ(3.0/5.0,grad_f[0]);
 }  
 
-TEST(AgradSpecialFunctions,hypot_dv) {
+TEST(AgradRev,hypot_dv) {
   double a = 3.0;
   AVAR b = 4.0;
   AVAR f = hypot(a,b);
@@ -535,7 +535,7 @@ TEST(AgradSpecialFunctions,hypot_dv) {
   EXPECT_FLOAT_EQ(4.0/5.0,grad_f[0]);
 }  
 
-TEST(AgradSpecialFunctions,log2_defaultpolicy) {
+TEST(AgradRev,log2_defaultpolicy) {
   AVAR a = 3.0;
   AVAR f = log2(a);
   EXPECT_FLOAT_EQ(std::log(3.0)/std::log(2.0), f.val());
@@ -551,7 +551,7 @@ TEST(AgradSpecialFunctions,log2_defaultpolicy) {
 }
 
 
-TEST(AgradSpecialFunctions,cbrt) {
+TEST(AgradRev,cbrt) {
   AVAR a = 27.0;
   AVAR f = cbrt(a);
   EXPECT_FLOAT_EQ(3.0, f.val());
@@ -562,7 +562,7 @@ TEST(AgradSpecialFunctions,cbrt) {
   EXPECT_FLOAT_EQ(1.0 / 3.0 / std::pow(27.0,2.0/3.0), grad_f[0]);
 }
 
-TEST(AgradSpecialFunctions,trunc) {
+TEST(AgradRev,trunc) {
   AVAR a = 1.2;
   AVAR f = trunc(a);
   EXPECT_FLOAT_EQ(1.0, f.val());
@@ -573,7 +573,7 @@ TEST(AgradSpecialFunctions,trunc) {
   EXPECT_FLOAT_EQ(0.0, grad_f[0]);
 }
 
-TEST(AgradSpecialFunctions,trunc_2) {
+TEST(AgradRev,trunc_2) {
   AVAR a = -1.2;
   AVAR f = trunc(a);
   EXPECT_FLOAT_EQ(-1.0, f.val());
@@ -584,7 +584,7 @@ TEST(AgradSpecialFunctions,trunc_2) {
   EXPECT_FLOAT_EQ(0.0, grad_f[0]);
 }
 
-TEST(AgradSpecialFunctions,round) {
+TEST(AgradRev,round) {
   AVAR a = 1.2;
   AVAR f = round(a);
   EXPECT_FLOAT_EQ(1.0, f.val());
@@ -595,7 +595,7 @@ TEST(AgradSpecialFunctions,round) {
   EXPECT_FLOAT_EQ(0.0, grad_f[0]);
 }
 
-TEST(AgradSpecialFunctions,round_2) {
+TEST(AgradRev,round_2) {
   AVAR a = -1.2;
   AVAR f = round(a);
   EXPECT_FLOAT_EQ(-1.0, f.val());
@@ -606,7 +606,7 @@ TEST(AgradSpecialFunctions,round_2) {
   EXPECT_FLOAT_EQ(0.0, grad_f[0]);
 }
 
-TEST(AgradSpecialFunctions,round_3) {
+TEST(AgradRev,round_3) {
   AVAR a = 1.7;
   AVAR f = round(a);
   EXPECT_FLOAT_EQ(2.0, f.val());
@@ -618,7 +618,7 @@ TEST(AgradSpecialFunctions,round_3) {
 }
 
 
-TEST(AgradSpecialFunctions,round_4) {
+TEST(AgradRev,round_4) {
   AVAR a = -1.7;
   AVAR f = round(a);
   EXPECT_FLOAT_EQ(-2.0, f.val());
@@ -629,7 +629,7 @@ TEST(AgradSpecialFunctions,round_4) {
   EXPECT_FLOAT_EQ(0.0, grad_f[0]);
 }
 
-TEST(AgradSpecialFunctions,fdim_vv_defaultpolicy) {
+TEST(AgradRev,fdim_vv_defaultpolicy) {
   AVAR a = 3.0;
   AVAR b = 4.0;
   AVAR f = fdim(a,b);
@@ -646,7 +646,7 @@ TEST(AgradSpecialFunctions,fdim_vv_defaultpolicy) {
   EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fdim(a,b).val());
   EXPECT_FLOAT_EQ(0.0, stan::math::fdim(b,a).val());
 }  
-TEST(AgradSpecialFunctions,fdim_vv_2_defaultpolicy) {
+TEST(AgradRev,fdim_vv_2_defaultpolicy) {
   AVAR a = 7.0;
   AVAR b = 2.0;
   AVAR f = fdim(a,b);
@@ -663,7 +663,7 @@ TEST(AgradSpecialFunctions,fdim_vv_2_defaultpolicy) {
   EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fdim(a,b).val());
   EXPECT_FLOAT_EQ(0.0, stan::math::fdim(b,a).val());
 }  
-TEST(AgradSpecialFunctions,fdim_vd_defaultpolicy) {
+TEST(AgradRev,fdim_vd_defaultpolicy) {
   AVAR a = 3.0;
   double b = 4.0;
   AVAR f = fdim(a,b);
@@ -681,7 +681,7 @@ TEST(AgradSpecialFunctions,fdim_vd_defaultpolicy) {
   EXPECT_FLOAT_EQ(0.0, stan::math::fdim(a,infinitydouble).val());
 }  
 
-TEST(AgradSpecialFunctions,fdim_vd_2_defaultpolicy) {
+TEST(AgradRev,fdim_vd_2_defaultpolicy) {
   AVAR a = 7.0;
   double b = 2.0;
   AVAR f = fdim(a,b);
@@ -698,7 +698,7 @@ TEST(AgradSpecialFunctions,fdim_vd_2_defaultpolicy) {
   EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fdim(infinityavar,b).val());
   EXPECT_FLOAT_EQ(0.0, stan::math::fdim(a,infinitydouble).val());
 }  
-TEST(AgradSpecialFunctions,fdim_dv_defaultpolicy) {
+TEST(AgradRev,fdim_dv_defaultpolicy) {
   double a = 3.0;
   AVAR b = 4.0;
   AVAR f = fdim(a,b);
@@ -715,7 +715,7 @@ TEST(AgradSpecialFunctions,fdim_dv_defaultpolicy) {
   EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fdim(infinitydouble,b).val());
   EXPECT_FLOAT_EQ(0.0, stan::math::fdim(a,infinityavar).val());
 }
-TEST(AgradSpecialFunctions,fdim_dv_2_defaultpolicy) {
+TEST(AgradRev,fdim_dv_2_defaultpolicy) {
   double a = 7.0;
   AVAR b = 2.0;
   AVAR f = fdim(a,b);
@@ -733,7 +733,7 @@ TEST(AgradSpecialFunctions,fdim_dv_2_defaultpolicy) {
   EXPECT_FLOAT_EQ(0.0, stan::math::fdim(a,infinityavar).val());
 }  
 
-TEST(AgradSpecialFunctions,tgamma) {
+TEST(AgradRev,tgamma) {
   AVAR a = 3.5;
   AVAR f = tgamma(a);
   EXPECT_FLOAT_EQ(boost::math::tgamma(3.5),f.val());
@@ -744,7 +744,7 @@ TEST(AgradSpecialFunctions,tgamma) {
   EXPECT_FLOAT_EQ(boost::math::digamma(3.5) * boost::math::tgamma(3.5),grad_f[0]);
 }  
 
-TEST(AgradSpecialFunctions,step) {
+TEST(AgradRev,step) {
   AVAR a = 3.5;
   AVAR f = step(a);
   EXPECT_FLOAT_EQ(1.0,f.val());
@@ -755,7 +755,7 @@ TEST(AgradSpecialFunctions,step) {
   EXPECT_FLOAT_EQ(0.0,grad_f[0]);
 }  
 
-TEST(AgradSpecialFunctions,step_2) {
+TEST(AgradRev,step_2) {
   AVAR a = 0.0;
   AVAR f = step(a);
   EXPECT_FLOAT_EQ(1.0,f.val());
@@ -766,7 +766,7 @@ TEST(AgradSpecialFunctions,step_2) {
   EXPECT_FLOAT_EQ(0.0,grad_f[0]);
 }  
 
-TEST(AgradSpecialFunctions,step_3) {
+TEST(AgradRev,step_3) {
   AVAR a = -18765.3;
   AVAR f = step(a);
   EXPECT_FLOAT_EQ(0.0,f.val());
@@ -777,7 +777,7 @@ TEST(AgradSpecialFunctions,step_3) {
   EXPECT_FLOAT_EQ(0.0,grad_f[0]);
 }  
  
-TEST(AgradSpecialFunctions,inv_cloglog) {
+TEST(AgradRev,inv_cloglog) {
   AVAR a = 2.7;
   AVAR f = inv_cloglog(a);
   EXPECT_FLOAT_EQ(std::exp(-std::exp(2.7)),f.val());
@@ -788,7 +788,7 @@ TEST(AgradSpecialFunctions,inv_cloglog) {
   EXPECT_FLOAT_EQ(-std::exp(2.7 - std::exp(2.7)),grad_f[0]);
 }
 
-TEST(AgradSpecialFunctions,log_sum_exp_vv) {
+TEST(AgradRev,log_sum_exp_vv) {
   AVAR a = 5.0;
   AVAR b = 2.0;
   AVAR f = log_sum_exp(a, b);
@@ -811,7 +811,7 @@ TEST(AgradSpecialFunctions,log_sum_exp_vv) {
   EXPECT_FLOAT_EQ (std::exp (1000.0 - (std::log(std::exp(0.0) + std::exp(-999.0)) + 1000)), grad_f[0]);
   EXPECT_FLOAT_EQ (std::exp (10.0 - (std::log(std::exp(0.0) + std::exp(-999.0)) + 1000)), grad_f[1]);
 }
-TEST(AgradSpecialFunctions,log_sum_exp_vd) {
+TEST(AgradRev,log_sum_exp_vd) {
   AVAR a = 5.0;
   double b = 2.0;
   AVAR f = log_sum_exp(a, b);
@@ -832,7 +832,7 @@ TEST(AgradSpecialFunctions,log_sum_exp_vd) {
   f.grad(x,grad_f);
   EXPECT_FLOAT_EQ (std::exp (1000.0 - (std::log(std::exp(0.0) + std::exp(-999.0)) + 1000)), grad_f[0]);
 }
-TEST(AgradSpecialFunctions,log_sum_exp_dv) {
+TEST(AgradRev,log_sum_exp_dv) {
   double a = 5.0;
   AVAR b = 2.0;
   AVAR f = log_sum_exp(a, b);
@@ -853,7 +853,7 @@ TEST(AgradSpecialFunctions,log_sum_exp_dv) {
   f.grad(x,grad_f);
   EXPECT_FLOAT_EQ (std::exp (1000.0 - (std::log(std::exp(0.0) + std::exp(-999.0)) + 1000)), grad_f[0]);
 }
-TEST(AgradSpecialFunctions,log_sum_exp_vector) {
+TEST(AgradRev,log_sum_exp_vector) {
   // simple test
   AVEC x;
   x.push_back (5.0);
@@ -918,7 +918,7 @@ TEST(AgradSpecialFunctions,log_sum_exp_vector) {
   EXPECT_FLOAT_EQ (std::exp (-100.0 - expected_log_sum_exp), grad_f[4]);
 }
 
-TEST(AgradSpecialFunctions,square) {
+TEST(AgradRev,square) {
   AVAR a = 7.0;
   AVEC x = createAVEC(a);
   AVAR f = square(a);
@@ -931,7 +931,7 @@ TEST(AgradSpecialFunctions,square) {
 }
 
 
-TEST(AgradSpecialFunctions,multiplyLogChainVV) {
+TEST(AgradRev,multiplyLogChainVV) {
   AVAR a = 19.7;
   AVAR b = 1299.1;
   AVAR f = 2.0 * multiply_log(a,b);
@@ -943,7 +943,7 @@ TEST(AgradSpecialFunctions,multiplyLogChainVV) {
   EXPECT_FLOAT_EQ(2.0 * log(b.val()), grad_f[0]);
   EXPECT_FLOAT_EQ(2.0 * a.val() / b.val(), grad_f[1]);
 }
-TEST(AgradSpecialFunctions,multiplyLogChainDV) {
+TEST(AgradRev,multiplyLogChainDV) {
   double a = 19.7;
   AVAR b = 1299.1;
   AVAR f = 2.0 * multiply_log(a,b);
@@ -954,7 +954,7 @@ TEST(AgradSpecialFunctions,multiplyLogChainDV) {
 
   EXPECT_FLOAT_EQ(2.0 * a / b.val(), grad_f[0]);
 }
-TEST(AgradSpecialFunctions,multiplyLogChainVD) {
+TEST(AgradRev,multiplyLogChainVD) {
   AVAR a = 19.7;
   double b = 1299.1;
   AVAR f = 2.0 * multiply_log(a,b);
@@ -965,7 +965,7 @@ TEST(AgradSpecialFunctions,multiplyLogChainVD) {
 
   EXPECT_FLOAT_EQ(2.0 * log(b), grad_f[0]);
 }
-TEST(AgradSpecialFunctions,multiply_log_var_var) {
+TEST(AgradRev,multiply_log_var_var) {
   AVAR a = 2.2;
   AVAR b = 3.3;
   AVAR f = multiply_log(a,b);
@@ -989,7 +989,7 @@ TEST(AgradSpecialFunctions,multiply_log_var_var) {
   EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(),g[1]);
 }
 
-TEST(AgradSpecialFunctions,multiply_log_var_double){
+TEST(AgradRev,multiply_log_var_double){
   AVAR a = 2.2;
   double b = 3.3;
   AVAR f = multiply_log(a,b);
@@ -1010,7 +1010,7 @@ TEST(AgradSpecialFunctions,multiply_log_var_double){
   f.grad(x,g);
   EXPECT_FLOAT_EQ(log(b),g[0]);
 }
-TEST(AgradSpecialFunctions,multiply_log_double_var){
+TEST(AgradRev,multiply_log_double_var){
   double a = 2.2;
   AVAR b = 3.3;
   AVAR f = multiply_log(a,b);
@@ -1120,7 +1120,7 @@ void test_log_sum_exp_2(double a, double b) {
   test_log_sum_exp_2_dv(a,b);
 }
 
-TEST(AgradSpecialFunctions,log_sum_exp_2) {
+TEST(AgradRev,log_sum_exp_2) {
   test_log_sum_exp_2(0.0,0.0);
   test_log_sum_exp_2(1.0,2.0);
   test_log_sum_exp_2(2.0,1.0);
@@ -1152,7 +1152,7 @@ void test_log1p_exp(double val) {
   EXPECT_FLOAT_EQ(f2.val(),f_val);
 }
 
-TEST(AgradSpecialFunctions, log1p_exp) {
+TEST(AgradRev, log1p_exp) {
   test_log1p_exp(-15.0);
   test_log1p_exp(-5.0);
   test_log1p_exp(-1.0);
@@ -1163,7 +1163,7 @@ TEST(AgradSpecialFunctions, log1p_exp) {
 }
 
 
-TEST(AgradSpecialFunctions, log_sum_exp_vec_1) {
+TEST(AgradRev, log_sum_exp_vec_1) {
   using stan::math::log_sum_exp;
   using stan::agrad::log_sum_exp;
   AVAR a(5.0);
@@ -1178,7 +1178,7 @@ TEST(AgradSpecialFunctions, log_sum_exp_vec_1) {
 }
 
 
-TEST(AgradSpecialFunctions, log_sum_exp_vec_2) {
+TEST(AgradRev, log_sum_exp_vec_2) {
   using stan::math::log_sum_exp;
   using stan::agrad::log_sum_exp;
   AVAR a(5.0);
@@ -1207,7 +1207,7 @@ TEST(AgradSpecialFunctions, log_sum_exp_vec_2) {
   EXPECT_FLOAT_EQ(g[1],g2[1]);
 }
 
-TEST(AgradSpecialFunctions, log_sum_exp_vec_3) {
+TEST(AgradRev, log_sum_exp_vec_3) {
   using stan::math::log_sum_exp;
   using stan::agrad::log_sum_exp;
   AVAR a(5.0);
@@ -1239,7 +1239,7 @@ TEST(AgradSpecialFunctions, log_sum_exp_vec_3) {
   EXPECT_FLOAT_EQ(g[2],g2[2]);
 }
 
-TEST(AgradSpecialFunctions,int_step) {
+TEST(AgradRev,int_step) {
   using stan::math::int_step;
 
   AVAR a(5.0);
@@ -1251,7 +1251,7 @@ TEST(AgradSpecialFunctions,int_step) {
   EXPECT_EQ(0U,int_step(c));
 }
 
-TEST(AgradSpecialFunctions,if_else) {
+TEST(AgradRev,if_else) {
   using stan::agrad::var;
   using stan::math::if_else;
   using stan::agrad::if_else;
@@ -1266,7 +1266,7 @@ TEST(AgradSpecialFunctions,if_else) {
   EXPECT_FLOAT_EQ(2.0,if_else(false,var(1.0),2.0).val());
 }
 
-TEST(AgradSpecialFunctions,ibeta_vvv) {
+TEST(AgradRev,ibeta_vvv) {
   using stan::agrad::var;
   using stan::math::ibeta;
   using stan::agrad::ibeta;
@@ -1297,7 +1297,7 @@ TEST(AgradSpecialFunctions,ibeta_vvv) {
   EXPECT_FLOAT_EQ(0.02507405,grad_f[1]);
   EXPECT_FLOAT_EQ(ibeta_derivative(a.val(), b.val(), c.val()),grad_f[2]);
 }
-TEST(AgradSpecialFunctions,ibeta_vvd) {
+TEST(AgradRev,ibeta_vvd) {
   using stan::agrad::var;
   using stan::math::ibeta;
   using stan::agrad::ibeta;
@@ -1326,7 +1326,7 @@ TEST(AgradSpecialFunctions,ibeta_vvd) {
   EXPECT_FLOAT_EQ(-0.03737671,grad_f[0]);
   EXPECT_FLOAT_EQ(0.02507405,grad_f[1]);
 }
-TEST(AgradSpecialFunctions,ibeta_vdv) {
+TEST(AgradRev,ibeta_vdv) {
   using stan::agrad::var;
   using stan::math::ibeta;
   using stan::agrad::ibeta;
@@ -1355,7 +1355,7 @@ TEST(AgradSpecialFunctions,ibeta_vdv) {
   EXPECT_FLOAT_EQ(-0.03737671,grad_f[0]);
   EXPECT_FLOAT_EQ(ibeta_derivative(a.val(), b, c.val()),grad_f[1]);
 }
-TEST(AgradSpecialFunctions,ibeta_vdd) {
+TEST(AgradRev,ibeta_vdd) {
   using stan::agrad::var;
   using stan::math::ibeta;
   using stan::agrad::ibeta;
@@ -1382,7 +1382,7 @@ TEST(AgradSpecialFunctions,ibeta_vdd) {
   f.grad(x,grad_f);
   EXPECT_FLOAT_EQ(-0.03737671,grad_f[0]);
 }
-TEST(AgradSpecialFunctions,ibeta_dvv) {
+TEST(AgradRev,ibeta_dvv) {
   using stan::agrad::var;
   using stan::math::ibeta;
   using stan::agrad::ibeta;
@@ -1411,7 +1411,7 @@ TEST(AgradSpecialFunctions,ibeta_dvv) {
   EXPECT_FLOAT_EQ(0.02507405,grad_f[0]);
   EXPECT_FLOAT_EQ(ibeta_derivative(a, b.val(), c.val()),grad_f[1]);
 }
-TEST(AgradSpecialFunctions,ibeta_dvd) {
+TEST(AgradRev,ibeta_dvd) {
   using stan::agrad::var;
   using stan::math::ibeta;
   using stan::agrad::ibeta;
@@ -1438,7 +1438,7 @@ TEST(AgradSpecialFunctions,ibeta_dvd) {
   f.grad(x,grad_f);
   EXPECT_FLOAT_EQ(0.02507405,grad_f[0]);
 }
-TEST(AgradSpecialFunctions,ibeta_ddv) {
+TEST(AgradRev,ibeta_ddv) {
   using stan::agrad::var;
   using stan::math::ibeta;
   using stan::agrad::ibeta;
@@ -1466,7 +1466,7 @@ TEST(AgradSpecialFunctions,ibeta_ddv) {
   EXPECT_FLOAT_EQ(ibeta_derivative(a, b, c.val()),grad_f[0]);
 }
 
-TEST(AgradSpecialFunctions,value_of) {
+TEST(AgradRev,value_of) {
   using stan::agrad::var;
   using stan::math::value_of;
 
@@ -1476,38 +1476,8 @@ TEST(AgradSpecialFunctions,value_of) {
   EXPECT_FLOAT_EQ(5.0, value_of(5));
 }
 
-TEST(AgradSpecialFunctions, Phi) {
-  using stan::agrad::var;
-  using stan::math::value_of;
-  using std::exp;
-  
 
-  std::vector<double> y_values;
-  y_values.push_back(0.0);
-  y_values.push_back(0.9);
-  y_values.push_back(-5.0);
-
-  // d/dy = exp(normal_log(value_of(y), 0.0, 1.0))
-  std::vector<double> dy_values;
-  dy_values.push_back(0.3989423);
-  dy_values.push_back(0.2660852);
-  dy_values.push_back(1.4867195e-06);
-
-  for (size_t i = 0; i < y_values.size(); i++) {
-    var y, phi_y;
-    AVEC x;
-    VEC dy;
-    y = y_values[i];
-    phi_y = stan::agrad::Phi(y);
-    x = createAVEC(y);
-    phi_y.grad(x,dy);
-    EXPECT_FLOAT_EQ(stan::math::Phi(value_of(y)), value_of(phi_y));
-    EXPECT_FLOAT_EQ(dy_values[i], dy[0])
-      << "y = " << y;
-  }
-}
-
-TEST(AgradSpecialFunctions, Phi_approx) {
+TEST(AgradRev, Phi_approx) {
   using stan::agrad::var;
   using stan::math::value_of;
   using std::abs;
@@ -1575,7 +1545,7 @@ void test_log_inv_logit(const double x) {
                   log_inv_logit(var(x)).val());
 
 }
-TEST(AgradSpecialFunctions, log_inv_logit) {
+TEST(AgradRev, log_inv_logit) {
   test_log_inv_logit(-7.2);
   test_log_inv_logit(0.0);
   test_log_inv_logit(1.9);
@@ -1606,7 +1576,7 @@ void test_log1m_inv_logit(const double x) {
   EXPECT_FLOAT_EQ(log(1.0 - inv_logit(x)),
                   log1m_inv_logit(var(x)).val());
 }
-TEST(AgradSpecialFunctions, log1m_inv_logit) {
+TEST(AgradRev, log1m_inv_logit) {
   test_log1m_inv_logit(-7.2);
   test_log1m_inv_logit(0.0);
   test_log1m_inv_logit(1.9);
