@@ -62,38 +62,6 @@ TEST(AgradRev,tgamma) {
   EXPECT_FLOAT_EQ(boost::math::digamma(3.5) * boost::math::tgamma(3.5),grad_f[0]);
 }  
 
-TEST(AgradRev,step) {
-  AVAR a = 3.5;
-  AVAR f = step(a);
-  EXPECT_FLOAT_EQ(1.0,f.val());
-
-  AVEC x = createAVEC(a);
-  VEC grad_f;
-  f.grad(x,grad_f);
-  EXPECT_FLOAT_EQ(0.0,grad_f[0]);
-}  
-
-TEST(AgradRev,step_2) {
-  AVAR a = 0.0;
-  AVAR f = step(a);
-  EXPECT_FLOAT_EQ(1.0,f.val());
-
-  AVEC x = createAVEC(a);
-  VEC grad_f;
-  f.grad(x,grad_f);
-  EXPECT_FLOAT_EQ(0.0,grad_f[0]);
-}  
-
-TEST(AgradRev,step_3) {
-  AVAR a = -18765.3;
-  AVAR f = step(a);
-  EXPECT_FLOAT_EQ(0.0,f.val());
-
-  AVEC x = createAVEC(a);
-  VEC grad_f;
-  f.grad(x,grad_f);
-  EXPECT_FLOAT_EQ(0.0,grad_f[0]);
-}  
  
 
 
