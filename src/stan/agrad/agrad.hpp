@@ -83,5 +83,6 @@
 #include <stan/agrad/rev/log2.hpp>
 #include <stan/agrad/rev/cbrt.hpp>
 #include <stan/agrad/rev/round.hpp>
+#include <stan/agrad/rev/trunc.hpp>
 
 #endif
