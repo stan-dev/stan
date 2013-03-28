@@ -27,8 +27,8 @@ namespace stan {
 
     };
 
-    template <class M, template<class> class H, template<class> class I, 
-              class BaseRNG = boost::mt19937>
+    template <class M, class P, template<class> class H, 
+              template<class, class> class I, class BaseRNG>
     class hmc_base: public mcmc_sampler {
     
     public:
@@ -37,7 +37,7 @@ namespace stan {
       
     protected:
     
-      I<H<M> > _integrator;
+      I<H<M>, P> _integrator;
       H<M> _hamiltonian;
       
       BaseRNG& _rand_int;
@@ -50,8 +50,9 @@ namespace stan {
     
     };
 
-    template <class M, template<class> class H, template<class> class I, class BaseRNG>
-    hmc_base<M, H, I, BaseRNG>::hmc_base(
+    template <class M, class P, template<class> class H, 
+              template<class, class> class I, class BaseRNG>
+    hmc_base<M, P, H, I, BaseRNG>::hmc_base(
                                          M &m, 
                                          BaseRNG& rng)
     : mcmc_sampler(),

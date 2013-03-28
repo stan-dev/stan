@@ -98,7 +98,7 @@ namespace stan {
       Eigen::VectorXd _sum_x;
       Eigen::VectorXd _sum_x2;
 
-      void _learn_variance(Eigen::VectorXd& var, ps_point& z);
+      void _learn_variance(Eigen::VectorXd& var, std::vector<double>& q);
       
     };
     
@@ -115,11 +115,10 @@ namespace stan {
       
     }
     
-    void var_adapter::_learn_variance(Eigen::VectorXd& var, ps_point& z) {
+    void var_adapter::_learn_variance(Eigen::VectorXd& var, std::vector<double>& q) {
 
       ++_adapt_var_counter;
 
-      std::vector<double>& q = z.q;
       Eigen::Map<Eigen::VectorXd> x(&q[0], q.size());
       
       ++_sum_n;
@@ -169,7 +168,7 @@ namespace stan {
       Eigen::VectorXd _sum_x;
       Eigen::MatrixXd _sum_xxt;
       
-      void _learn_covariance(Eigen::MatrixXd& covar, ps_point& z);
+      void _learn_covariance(Eigen::MatrixXd& covar, std::vector<double>& q);
       
     };
     
@@ -186,11 +185,10 @@ namespace stan {
       
     }
     
-    void covar_adapter::_learn_covariance(Eigen::MatrixXd& covar, ps_point& z) {
+    void covar_adapter::_learn_covariance(Eigen::MatrixXd& covar, std::vector<double>& q) {
 
       ++_adapt_covar_counter;
 
-      std::vector<double>& q = z.q;
       Eigen::Map<Eigen::VectorXd> x(&q[0], q.size());
 
       ++_sum_n;

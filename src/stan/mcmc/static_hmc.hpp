@@ -23,8 +23,9 @@ namespace stan {
     
     // Unit metric
     
-    template <typename M, class BaseRNG = boost::mt19937>
+    template <typename M, class BaseRNG>
     class unit_metric_hmc: public hmc_base<M, 
+                                           unit_e_point,
                                            unit_metric, 
                                            expl_leapfrog, 
                                            BaseRNG> {
@@ -68,7 +69,7 @@ namespace stan {
     
     template <typename M, class BaseRNG>
     unit_metric_hmc<M, BaseRNG>::unit_metric_hmc(M& m, BaseRNG& rng):
-    hmc_base<M, unit_metric, expl_leapfrog, BaseRNG>(m, rng),
+    hmc_base<M, unit_e_point, unit_metric, expl_leapfrog, BaseRNG>(m, rng),
     _epsilon(0.1),
     _T(1)
     { _update_L(); }
@@ -76,7 +77,7 @@ namespace stan {
     template <typename M, class BaseRNG>
     sample unit_metric_hmc<M, BaseRNG>::transition(sample& init_sample) {
       
-      ps_point z(init_sample.size_cont(), init_sample.size_disc());
+      unit_e_point z(init_sample.size_cont(), init_sample.size_disc());
       z.q = init_sample.cont_params();
       z.r = init_sample.disc_params();
       
@@ -128,7 +129,7 @@ namespace stan {
       values.push_back(this->_T);
     }
     
-    template <typename M, class BaseRNG = boost::mt19937>
+    template <typename M, class BaseRNG>
     class adapt_unit_metric_hmc: public unit_metric_hmc<M, BaseRNG>, public stepsize_adapter {
       
     public:
