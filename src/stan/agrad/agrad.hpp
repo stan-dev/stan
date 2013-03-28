@@ -79,5 +79,6 @@
 #include <stan/agrad/rev/fma.hpp>
 #include <stan/agrad/rev/fmax.hpp>
 #include <stan/agrad/rev/fmin.hpp>
+#include <stan/agrad/rev/hypot.hpp>
 
 #endif
