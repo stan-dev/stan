@@ -72,5 +72,6 @@
 #include <stan/agrad/rev/erf.hpp>
 #include <stan/agrad/rev/erfc.hpp>
 #include <stan/agrad/rev/exp2.hpp>
+#include <stan/agrad/rev/expm1.hpp>
 
 #endif
