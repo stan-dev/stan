@@ -7,6 +7,8 @@
 #include <stan/agrad/rev/op/vd_vari.hpp>
 #include <stan/agrad/rev/op/dv_vari.hpp>
 #include <stan/agrad/rev/op/vector_vari.hpp>
+#include <stan/agrad/rev/operator_greater_than.hpp>
+#include <stan/agrad/rev/operator_not_equal.hpp>
 #include <stan/math/functions/log_sum_exp.hpp>
 
 namespace stan {
