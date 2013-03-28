@@ -2,6 +2,7 @@
 #define __STAN__AGRAD__PARTIALS_VARI_HPP__
 
 #include <stan/meta/traits.hpp>
+#include <stan/agrad/rev/vari.hpp>
 
 namespace stan {
 
