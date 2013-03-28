@@ -1,5 +1,6 @@
-#include <gtest/gtest.h>
 #include <stan/agrad/agrad.hpp>
+#include <gtest/gtest.h>
+#include <stan/math.hpp>
 
 // cut and paste helpers and typedefs from agrad_test.cpp
 typedef stan::agrad::var AVAR;
