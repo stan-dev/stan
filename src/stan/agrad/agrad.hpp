@@ -75,5 +75,6 @@
 #include <stan/agrad/rev/expm1.hpp>
 #include <stan/agrad/rev/lgamma.hpp>
 #include <stan/agrad/rev/log1p.hpp>
+#include <stan/agrad/rev/log1m.hpp>
 
 #endif
