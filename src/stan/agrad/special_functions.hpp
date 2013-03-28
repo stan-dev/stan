@@ -20,10 +20,6 @@ namespace stan {
   namespace agrad {
     
     namespace {
-      
-
-
-
 
       class binary_log_loss_1_vari : public op_v_vari {
       public:
