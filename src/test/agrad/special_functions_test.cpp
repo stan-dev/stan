@@ -30,16 +30,6 @@ AVEC createAVEC(AVAR x1, AVAR x2, AVAR x3) {
 
 
 
-TEST(AgradRev,log1p) {
-  AVAR a = 0.1;
-  AVAR f = log1p(a);
-  EXPECT_FLOAT_EQ(log(1 + 0.1), f.val());
-
-  AVEC x = createAVEC(a);
-  VEC grad_f;
-  f.grad(x,grad_f);
-  EXPECT_FLOAT_EQ(1.0 / (1.0 + 0.1), grad_f[0]);
-}
 
 
 TEST(AgradRev,log_loss_zero) {
