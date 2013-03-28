@@ -5,6 +5,7 @@
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/math/matrix/validate_vector.hpp>
+#include <stan/math/matrix/validate_matching_sizes.hpp>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/vari.hpp>
 #include <stan/agrad/rev/matrix/typedefs.hpp>
