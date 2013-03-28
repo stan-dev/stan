@@ -188,16 +188,6 @@ TEST(AgradRev,log_loss_one) {
 
 
 
-TEST(AgradRev,atanh) {
-  AVAR a = 0.3;
-  AVAR f = atanh(a);
-  EXPECT_FLOAT_EQ(atanh(0.3), f.val());
-
-  AVEC x = createAVEC(a);
-  VEC grad_f;
-  f.grad(x,grad_f);
-  EXPECT_FLOAT_EQ(1.0/(1.0 - 0.3 * 0.3), grad_f[0]);
-}
 
 TEST(AgradRev,erf) {
   AVAR a = 1.3;
