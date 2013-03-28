@@ -1,6 +1,8 @@
 #ifndef __STAN__AGRAD__MATRIX_HPP__
 #define __STAN__AGRAD__MATRIX_HPP__
 
+#include <stan/agrad/rev/matrix/fill.hpp>
+
 #include <stan/math/functions/Phi.hpp>
 #include <stan/math/functions/logit.hpp>
 #include <stan/math/matrix.hpp>
@@ -16,22 +18,6 @@
 namespace stan {
   namespace agrad {
     typedef Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>::size_type size_type;
-
-    template <typename T, typename S>
-    void fill(T& x, const S& y) {
-      x = y;
-    }
-    template <typename T, int R, int C, typename S>
-    void fill(Eigen::Matrix<T,R,C>& x, const S& y) {
-      x.fill(y);
-    }
-    template <typename T, typename S>
-    void fill(std::vector<T>& x, const S& y) {
-      for (size_t i = 0; i < x.size(); ++i)
-        fill(x[i],y);
-    }
-
-
 
     class gevv_vvv_vari : public stan::agrad::vari {
     protected:
