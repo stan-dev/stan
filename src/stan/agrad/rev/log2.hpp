@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__REV__HYPOT_HPP__
-#define __STAN__AGRAD__REV__HYPOT_HPP__
+#ifndef __STAN__AGRAD__REV__LOG2_HPP__
+#define __STAN__AGRAD__REV__LOG2_HPP__
 
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/op/v_vari.hpp>
@@ -15,7 +15,7 @@ namespace stan {
           op_v_vari(stan::math::log2(avi->val_),avi) {
         }
         void chain() {
-          avi_->adj_ += adj_ / (LOG2 * avi_->val_); 
+          avi_->adj_ += adj_ / (stan::math::LOG_2 * avi_->val_); 
         }
       };
     }
