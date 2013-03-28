@@ -70,5 +70,6 @@
 #include <stan/agrad/rev/atanh.hpp>
 #include <stan/agrad/rev/asinh.hpp>
 #include <stan/agrad/rev/erf.hpp>
+#include <stan/agrad/rev/erfc.hpp>
 
 #endif

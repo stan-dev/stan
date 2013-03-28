@@ -187,15 +187,6 @@ namespace stan {
         }
       };
 
-      class erfc_vari : public op_v_vari {
-      public:
-        erfc_vari(vari* avi) :
-          op_v_vari(boost::math::erfc(avi->val_),avi) {
-        }
-        void chain() {
-          avi_->adj_ += adj_ * stan::math::NEG_TWO_OVER_SQRT_PI * std::exp(- avi_->val_ * avi_->val_);
-        }
-      };
 
       const double LOG_2 = std::log(2.0);
 
@@ -616,21 +607,6 @@ namespace stan {
 
 
 
-    /**
-     * The complementary error function for variables (C99).
-     *
-     * For non-variable function, see boost::math::erfc().
-     *
-     * The derivative is
-     * 
-     * \f$\frac{d}{dx} \mbox{erfc}(x) = - \frac{2}{\sqrt{\pi}} \exp(-x^2)\f$.
-     *
-     * @param a The variable.
-     * @return Complementary error function applied to the variable.
-     */
-    inline var erfc(const stan::agrad::var& a) {
-      return var(new erfc_vari(a.vi_));
-    }
 
     /**
      * Exponentiation base 2 function for variables (C99).
