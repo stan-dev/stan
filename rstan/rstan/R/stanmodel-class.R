@@ -76,7 +76,7 @@ setMethod("optimizing", "stanmodel",
                 }
               } else data <- list()
             } 
-            sampler <- try(new(stan_fit_cpp_module, data)) 
+            sampler <- try(new(stan_fit_cpp_module, data, object@dso@.CXXDSOMISC$cxxfun)) 
             if (is(sampler, "try-error")) {
               message('failed to create the optimizer; optimization not done') 
               return(invisible(list(stanmodel = object)))
