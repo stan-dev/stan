@@ -11,7 +11,6 @@
 #include <stan/math/error_handling/matrix/check_simplex.hpp>
 #include <stan/math/error_handling/matrix/check_ordered.hpp>
 #include <stan/math/error_handling/matrix/check_positive_ordered.hpp>
-#include <stan/math/error_handling/matrix/check_not_nan.hpp>
 #include <stan/math/error_handling/matrix/validate_non_negative_index.hpp>
 
 #endif
