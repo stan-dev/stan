@@ -5,6 +5,7 @@
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/op/v_vari.hpp>
 #include <stan/math/constants.hpp>
+#include <stan/math/functions/log1p.hpp>
 
 namespace stan {
   namespace agrad {
