@@ -27,38 +27,6 @@ AVEC createAVEC(AVAR x1, AVAR x2, AVAR x3) {
 }
 // end cut-and-paste
 
-
-
-
-
-
-TEST(AgradRev,log_loss_zero) {
-  AVAR y_hat = 0.2;
-  int y = 0;
-  AVAR f = log_loss(y,y_hat);
-  EXPECT_FLOAT_EQ(-log(1.0 - 0.2), f.val());
-
-  AVEC x = createAVEC(y_hat);
-  VEC grad_f;
-  f.grad(x,grad_f);
-  EXPECT_FLOAT_EQ((1.0 / (1.0 - 0.2)), grad_f[0]);
-}
-
-TEST(AgradRev,log_loss_one) {
-  AVAR y_hat = 0.2;
-  int y = 1;
-  AVAR f = log_loss(y,y_hat);
-  EXPECT_FLOAT_EQ(-log(0.2), f.val());
-
-  AVEC x = createAVEC(y_hat);
-  VEC grad_f;
-  f.grad(x,grad_f);
-  EXPECT_FLOAT_EQ(-1.0 / 0.2, grad_f[0]);
-}
-
-
-
-
 TEST(AgradRev,trunc) {
   AVAR a = 1.2;
   AVAR f = trunc(a);
