@@ -67,5 +67,7 @@
 #include <stan/agrad/rev/is_uninitialized.hpp>
 
 #include <stan/agrad/rev/acosh.hpp>
+#include <stan/agrad/rev/atanh.hpp>
+#include <stan/agrad/rev/asinh.hpp>
 
 #endif
