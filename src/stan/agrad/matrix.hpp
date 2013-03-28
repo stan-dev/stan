@@ -36,6 +36,44 @@ namespace stan {
 
   namespace agrad {
     
+    /**
+     * Returns the result of post-multiplying a matrix by its
+     * own transpose.
+     * @param M Matrix to multiply.
+     * @return M times its transpose.
+     */
+    inline matrix_v
+    tcrossprod(const matrix_v& M) {
+      if (M.rows() == 0)
+        return matrix_v(0,0);
+      if (M.rows() == 1)
+        return M * M.transpose();
+
+      // WAS JUST THIS
+      // matrix_v result(M.rows(),M.rows());
+      // return result.setZero().selfadjointView<Eigen::Upper>().rankUpdate(M);
+
+      matrix_v MMt(M.rows(),M.rows());
+
+      vari** vs 
+        = (vari**)memalloc_.alloc((M.rows() * M.cols() ) * sizeof(vari*));
+      int pos = 0;
+      for (int m = 0; m < M.rows(); ++m)
+        for (int n = 0; n < M.cols(); ++n)
+          vs[pos++] = M(m,n).vi_;
+      for (int m = 0; m < M.rows(); ++m)
+        MMt(m,m) = var(new dot_self_vari(vs + m * M.cols(),M.cols()));
+      for (int m = 0; m < M.rows(); ++m) {
+        for (int n = 0; n < m; ++n) {
+          MMt(m,n) = var(new dot_product_vv_vari(vs + m * M.cols(),
+                                                 vs + n * M.cols(),
+                                                 M.cols()));
+          MMt(n,m) = MMt(m,n);
+        }
+      }
+      return MMt;
+    }
+
 
     /**
      * Returns the result of pre-multiplying a matrix by its
@@ -49,45 +87,7 @@ namespace stan {
     }
 
 
-    // FIXME:  double val?
-    inline void assign_to_var(stan::agrad::var& var, const double& val) {
-      var = val;
-    }
-    inline void assign_to_var(stan::agrad::var& var, const stan::agrad::var& val) {
-      var = val;
-    }
-    // FIXME:  int val?
-    inline void assign_to_var(int& n_lhs, const int& n_rhs) {
-      n_lhs = n_rhs;  // FIXME: no call -- just filler to instantiate
-    }
-    // FIXME:  double val?
-    inline void assign_to_var(double& n_lhs, const double& n_rhs) {
-      n_lhs = n_rhs;  // FIXME: no call -- just filler to instantiate
-    }
-    
-    template <typename LHS, typename RHS>
-    inline void assign_to_var(std::vector<LHS>& x, const std::vector<RHS>& y) {
-      stan::math::validate_matching_sizes(x,y,"assign_to_var");
-      for (size_t i = 0; i < x.size(); ++i)
-        assign_to_var(x[i],y[i]);
-    }
-    template <typename LHS, typename RHS, int R, int C>
-    inline void assign_to_var(Eigen::Matrix<LHS,R,C>& x, 
-                              const Eigen::Matrix<RHS,R,C>& y) {
-      stan::math::validate_matching_sizes(x,y,"assign_to_var");
-      for (size_type n = 0; n < x.cols(); ++n)
-        for (size_type m = 0; m < x.rows(); ++m)
-          assign_to_var(x(m,n),y(m,n));
-    }
 
-    template <typename LHS, typename RHS, int R, int C>
-    inline void assign_to_var(Eigen::Block<LHS>& x,
-                              const Eigen::Matrix<RHS,R,C>& y) {
-      stan::math::validate_matching_sizes(x,y,"assign_to_var");
-      for (size_type n = 0; n < y.cols(); ++n)
-        for (size_type m = 0; m < y.rows(); ++m)
-          assign_to_var(x(m,n),y(m,n));
-    }
     
     template <typename LHS, typename RHS>
     struct needs_promotion {
