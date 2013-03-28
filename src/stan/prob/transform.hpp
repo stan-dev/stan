@@ -10,13 +10,11 @@
 #include <boost/throw_exception.hpp>
 #include <boost/math/tools/promotion.hpp>
 #include <stan/agrad/matrix.hpp>
-#include <stan/math/constants.hpp>
+#include <stan/math.hpp>
 #include <stan/math/matrix.hpp>
 #include <stan/math/matrix/validate_less.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/matrix_error_handling.hpp>
-#include <stan/math/functions/logit.hpp>
-#include <stan/math/functions/Phi.hpp>
 
 #include <stan/math/matrix/multiply_lower_tri_self_transpose.hpp>
 
