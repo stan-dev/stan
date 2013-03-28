@@ -90,5 +90,6 @@
 #include <stan/agrad/rev/inv_cloglog.hpp>
 #include <stan/agrad/rev/Phi.hpp>
 #include <stan/agrad/rev/inv_logit.hpp>
+#include <stan/agrad/rev/Phi_approx.hpp>
 
 #endif
