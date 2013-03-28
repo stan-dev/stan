@@ -87,5 +87,6 @@
 #include <stan/agrad/rev/fdim.hpp>
 #include <stan/agrad/rev/tgamma.hpp>
 #include <stan/agrad/rev/step.hpp>
+#include <stan/agrad/rev/inv_cloglog.hpp>
 
 #endif
