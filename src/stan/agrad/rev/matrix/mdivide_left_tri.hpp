@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__REV__MATRIX__COLUMNS_MDIVIDE_LEFT_TRI_HPP__
-#define __STAN__AGRAD__REV__MATRIX__COLUMNS_MDIVIDE_LEFT_TRI_HPP__
+#ifndef __STAN__AGRAD__REV__MATRIX__MDIVIDE_LEFT_TRI_HPP__
+#define __STAN__AGRAD__REV__MATRIX__MDIVIDE_LEFT_TRI_HPP__
 
 #include <vector>
 #include <stan/math/matrix/Eigen.hpp>

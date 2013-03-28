@@ -24,8 +24,7 @@
 #include <stan/agrad/rev/matrix/dot_product.hpp>
 #include <stan/agrad/rev/matrix/sum.hpp>
 #include <stan/agrad/rev/matrix/mdivide_left.hpp>
-
-
+#include <stan/agrad/rev/matrix/mdivide_left_tri.hpp>
 
 namespace stan {
 
