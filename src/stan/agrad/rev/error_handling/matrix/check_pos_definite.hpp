@@ -1,8 +1,11 @@
-#ifndef __STAN__AGRAD__MATRIX_ERROR_HANDLING_HPP__
-#define __STAN__AGRAD__MATRIX_ERROR_HANDLING_HPP__
+#ifndef __STAN__AGRAD__REV__ERROR_HANDLING__MATRIX__CHECK_POS_DEFINITE_HPP__
+#define __STAN__AGRAD__REV__ERROR_HANDLING__MATRIX__CHECK_POS_DEFINITE_HPP__
 
 // global include
-#include <stan/agrad/matrix.hpp>
+#include <stan/math/error_handling/matrix/check_pos_definite.hpp>
+#include <stan/math/matrix/Eigen.hpp>
+#include <stan/agrad/rev/var.hpp>
+#include <stan/agrad/rev/numeric_limits.hpp>
 
 namespace stan {
   namespace agrad {
