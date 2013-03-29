@@ -1,6 +1,8 @@
 #ifndef __STAN__MCMC__UNIT_E_METRIC__BETA__
 #define __STAN__MCMC__UNIT_E_METRIC__BETA__
 
+#include <boost/random/normal_distribution.hpp>
+
 #include <stan/mcmc/base_hamiltonian.hpp>
 #include <stan/mcmc/unit_e_point.hpp>
 
@@ -9,12 +11,12 @@ namespace stan {
   namespace mcmc {
     
     // Euclidean manifold with unit metric
-    template <typename M>
-    class unit_e_metric: public base_hamiltonian<M, unit_e_point> {
+    template <typename M, typename BaseRNG>
+    class unit_e_metric: public base_hamiltonian<M, unit_e_point, BaseRNG> {
       
     public:
       
-      unit_e_metric(M& m): base_hamiltonian<M, unit_e_point>(m) {};
+      unit_e_metric(M& m): base_hamiltonian<M, unit_e_point, BaseRNG>(m) {};
       ~unit_e_metric() {};
       
       double T(unit_e_point& z) {
@@ -36,8 +38,13 @@ namespace stan {
         return z.g;
       }
       
-      void sampleP(unit_e_point& z, Eigen::VectorXd& rand_unit_gaus) {
-        z.p = rand_unit_gaus;
+      void sample_p(unit_e_point& z, BaseRNG& rng) {
+        
+        boost::variate_generator<BaseRNG&, boost::normal_distribution<> > 
+          _rand_unit_gaus(rng, boost::normal_distribution<>());
+        
+        for (size_t i = 0; i < z.p.size(); ++i) z.p(i) = _rand_unit_gaus();
+
       }
       
       void update(unit_e_point& z) {

@@ -10,6 +10,7 @@ namespace stan {
   namespace mcmc {
     
     class base_mcmc {
+      
     public:
       
       virtual sample transition(sample& init_sample) = 0;

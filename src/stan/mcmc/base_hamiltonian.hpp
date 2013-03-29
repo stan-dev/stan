@@ -7,7 +7,7 @@ namespace stan {
 
   namespace mcmc {
 
-    template <typename M, typename P>
+    template <typename M, typename P, typename BaseRNG>
     class base_hamiltonian {
       
     public:
@@ -30,7 +30,7 @@ namespace stan {
       // phi = 0.5 * log | Lambda (q) | + V(q)
       virtual const Eigen::VectorXd dphi_dq(P& z) = 0;
       
-      virtual void sampleP(P& z, Eigen::VectorXd& rand_unit_gaus) = 0;
+      virtual void sample_p(P& z, BaseRNG& rng) = 0;
       
       virtual void init(P& z) { this->update(z); }
       

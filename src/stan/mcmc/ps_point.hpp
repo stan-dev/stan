@@ -13,7 +13,8 @@ namespace stan {
       
     public:
       
-      ps_point(int n, int m): q(n), r(m), p(Eigen::VectorXd::Zero(n)) {};
+      ps_point(int n, int m): q(n), r(m), p(Eigen::VectorXd::Zero(n)) 
+        {};
       
       std::vector<double> q;
       std::vector<int> r;

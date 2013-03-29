@@ -17,32 +17,26 @@ namespace stan {
       
     public:
       
-      adapt_unit_e_static_hmc(M &m, BaseRNG& rng);
+      adapt_unit_e_static_hmc(M &m, BaseRNG& rng): unit_e_static_hmc<M, BaseRNG>(m, rng),
+                                                   stepsize_adapter()
+      {};
+      
       ~adapt_unit_e_static_hmc() {};
       
-      sample transition(sample& init_sample);
-      
-    };
-    
-    template <typename M, class BaseRNG>
-    adapt_unit_e_static_hmc<M, BaseRNG>::adapt_unit_e_static_hmc(M& m, BaseRNG& rng):
-    unit_e_static_hmc<M, BaseRNG>(m, rng),
-    stepsize_adapter()
-    {};
-    
-    template <typename M, class BaseRNG>
-    sample adapt_unit_e_static_hmc<M, BaseRNG>::transition(sample& init_sample) {
-      
-      sample s = unit_e_static_hmc<M, BaseRNG>::transition(init_sample);
-      
-      if (this->_adapt_flag) {
-        this->_learn_stepsize(this->_epsilon, s.accept_stat());
-        this->_update_L();
+      sample transition(sample& init_sample) {
+        
+        sample s = unit_e_static_hmc<M, BaseRNG>::transition(init_sample);
+        
+        if (this->_adapt_flag) {
+          this->_learn_stepsize(this->_epsilon, s.accept_stat());
+          this->_update_L();
+        }
+        
+        return s;
+        
       }
       
-      return s;
-      
-    }
+    };
     
   } // mcmc
   

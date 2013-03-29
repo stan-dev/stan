@@ -25,9 +25,9 @@ namespace stan {
       _cont_params(q), 
       _disc_params(r),
       _log_prob(log_prob),
-      _accept_stat(stat) {}
+      _accept_stat(stat) {};
       
-      virtual ~sample() {} // No-op
+      virtual ~sample() {}; // No-op
       
       inline int size_cont() const { 
         return _cont_params.size(); 
