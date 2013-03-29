@@ -1,6 +1,5 @@
 // Arguments: Ints, Doubles
 #include <stan/prob/distributions/univariate/discrete/poisson.hpp>
-#include <stan/agrad/special_functions.hpp>
 
 using std::vector;
 using std::numeric_limits;

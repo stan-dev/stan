@@ -4,8 +4,7 @@
 #include <stdexcept>
 #include <vector>
 
-#define EIGEN_DENSEBASE_PLUGIN "stan/math/EigenDenseBaseAddons.hpp"
-#include <Eigen/Dense>
+#include <stan/math/matrix/Eigen.hpp>
 
 #include <stan/math/rep_array.hpp>
 

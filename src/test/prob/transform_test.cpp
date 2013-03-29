@@ -4,8 +4,8 @@
 #include <gtest/gtest.h>
 
 #include <stan/agrad/agrad.hpp>
-#include <stan/agrad/special_functions.hpp>
 #include <stan/prob/transform.hpp>
+#include <stan/math/matrix/determinant.hpp>
 
 using Eigen::Matrix;
 using Eigen::Dynamic;

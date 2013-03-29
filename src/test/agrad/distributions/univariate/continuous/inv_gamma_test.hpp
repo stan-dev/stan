@@ -1,6 +1,8 @@
 // Arguments: Doubles, Doubles, Doubles
 #include <stan/prob/distributions/univariate/continuous/inv_gamma.hpp>
 
+#include <stan/math/functions/multiply_log.hpp>
+
 using std::vector;
 using std::numeric_limits;
 using stan::agrad::var;

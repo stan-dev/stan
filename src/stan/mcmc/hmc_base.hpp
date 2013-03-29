@@ -10,8 +10,8 @@
 
 #include <stan/mcmc/adaptive_sampler.hpp>
 #include <stan/mcmc/dualaverage.hpp>
-#include <stan/model/prob_grad.hpp>
 #include <stan/mcmc/util.hpp>
+#include <stan/model/prob_grad.hpp>
 
 
 namespace stan {

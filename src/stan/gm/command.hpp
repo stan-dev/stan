@@ -1,13 +1,15 @@
 #ifndef __STAN__GM__COMMAND_HPP__
 #define __STAN__GM__COMMAND_HPP__
 
-#include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <fstream>
+#include <boost/date_time/posix_time/posix_time_types.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/random/additive_combine.hpp> // L'Ecuyer RNG
 #include <boost/random/uniform_real_distribution.hpp>
 #include <stan/version.hpp>
 #include <stan/io/cmd_line.hpp>
 #include <stan/io/dump.hpp>
+#include <stan/math/functions/dot.hpp>
 #include <stan/mcmc/adaptive_hmc.hpp>
 #include <stan/mcmc/nuts.hpp>
 #include <stan/mcmc/nuts_diag.hpp>

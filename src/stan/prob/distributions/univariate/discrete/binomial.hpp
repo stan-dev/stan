@@ -6,10 +6,14 @@
 
 #include <stan/agrad.hpp>
 #include <stan/math/error_handling.hpp>
-#include <stan/math/special_functions.hpp>
+#include <stan/math/functions/log1m.hpp>
+#include <stan/math/functions/log_inv_logit.hpp>
+#include <stan/math/functions/value_of.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/traits.hpp>
 #include <stan/prob/constants.hpp>
+
+#include <stan/math/functions/binomial_coefficient_log.hpp>
 
 namespace stan {
 

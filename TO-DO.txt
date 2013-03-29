@@ -32,6 +32,9 @@ The to-do list is organized into the following sections:
 * fix truncated distributions to return 1 rather than 0
   in degenerate cases  
 
+* fixed handling of invalid degrees of freedom parameter
+  for wishart and inv_wishart
+
 PRIORITIES?
 ======================================================================
 + (name): actively assigned
@@ -122,6 +125,24 @@ C++ API
 * (from Frederic Bois): put simulated annealing or tempering in stan...
 
 * broadcast ./ operation for real / vector and vector / real.
+
+* Refactor math library:
+ - src/stan/math/functions/ibeta.hpp
+   all doubles for now. If I template it, conflicts with var definition.
+ - Needs tests. Currently not tested: src/stan/math/matrix/...
+   + stan_print.hpp
+   + singular_values.hpp
+   + cholesky_decompose.hpp
+   + eigenvalues_sym.hpp
+   + inverse.hpp
+   + diag_matrix.hpp
+   + transpose.hpp
+   + diagonal.hpp
+   + block.hpp
+   + diag_post/pre_multiply.hpp
+   + dot_product.hpp
+   + columns_dot_product.hpp
+   + log_determiant.hpp
 
 * new vector views
  

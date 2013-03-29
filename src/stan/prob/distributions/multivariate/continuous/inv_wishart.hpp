@@ -4,12 +4,12 @@
 #include <stan/prob/constants.hpp>
 #include <stan/math/matrix_error_handling.hpp>
 #include <stan/math/error_handling.hpp>
-#include <stan/math/special_functions.hpp>
 #include <stan/prob/traits.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/agrad/agrad.hpp>
 #include <stan/agrad/matrix.hpp>
 #include "stan/prob/distributions/multivariate/continuous/wishart.hpp"
+#include <stan/math/matrix/log_determinant.hpp>
 
 namespace stan {
   namespace prob {
@@ -53,14 +53,14 @@ namespace stan {
                 const Policy&) {
       static const char* function = "stan::prob::inv_wishart_log(%1%)";
       
-      using stan::math::check_greater_or_equal;
+      using stan::math::check_greater;
       using stan::math::check_size_match;
       using boost::math::tools::promote_args;
 
       typename Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic>::size_type k = S.rows();
       typename promote_args<T_y,T_dof,T_scale>::type lp(0.0);
-      if(!check_greater_or_equal(function, nu, k-1, "Degrees of freedom parameter", 
-                                 &lp, Policy()))
+      if(!check_greater(function, nu, k-1, "Degrees of freedom parameter", 
+                        &lp, Policy()))
         return lp;
       if (!check_size_match(function, 
           W.rows(), "Rows of random variable",

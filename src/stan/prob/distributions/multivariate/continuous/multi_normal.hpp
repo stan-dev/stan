@@ -6,12 +6,22 @@
 
 #include <stan/math/matrix_error_handling.hpp>
 #include <stan/math/error_handling.hpp>
-#include <stan/math/special_functions.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
 #include <stan/agrad/agrad.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/agrad/matrix.hpp>
+#include <stan/math/matrix/columns_dot_product.hpp>
+#include <stan/math/matrix/columns_dot_self.hpp>
+#include <stan/math/matrix/dot_product.hpp>
+#include <stan/math/matrix/dot_self.hpp>
+#include <stan/math/matrix/log.hpp>
+#include <stan/math/matrix/log_determinant.hpp>
+#include <stan/math/matrix/mdivide_left_tri_low.hpp>
+#include <stan/math/matrix/mdivide_left.hpp>
+#include <stan/math/matrix/multiply.hpp>
+#include <stan/math/matrix/subtract.hpp>
+#include <stan/math/matrix/sum.hpp>
 
 namespace stan {
   namespace prob {

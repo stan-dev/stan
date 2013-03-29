@@ -1,6 +1,8 @@
 // Arguments: Ints, Doubles
 #include <stan/prob/distributions/univariate/discrete/bernoulli.hpp>
 
+#include <stan/math/functions/log1m.hpp>
+
 using std::vector;
 using std::numeric_limits;
 using stan::agrad::var;

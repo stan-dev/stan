@@ -5,8 +5,8 @@
 #include <boost/random/variate_generator.hpp>
 
 #include <stan/agrad.hpp>
+#include <stan/math.hpp>
 #include <stan/math/error_handling.hpp>
-#include <stan/math/special_functions.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>

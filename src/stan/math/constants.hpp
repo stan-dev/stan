@@ -19,6 +19,12 @@ namespace stan {
      */
     const double SQRT_2 = std::sqrt(2.0);
 
+    /** 
+     * The value of 1 over the square root of 2, 
+     * \f$ 1 / \sqrt{2} \f$. 
+     */
+    const double INV_SQRT_2 = 1.0 / SQRT_2;
+
     /**
      * The natural logarithm of 2, 
      * \f$ \log 2 \f$.
@@ -56,6 +62,102 @@ namespace stan {
      */
     const double NEGATIVE_EPSILON = - std::numeric_limits<double>::epsilon();
 
+
+    /*
+     * Log pi divided by 4
+     * \f$ \log \pi / 4 \f$
+     */
+    const double LOG_PI_OVER_FOUR = std::log(boost::math::constants::pi<double>()) / 4.0;
+
+    /**
+     * Return the value of pi.
+     * 
+     * @return Pi.
+     */
+    inline double pi() {
+      return boost::math::constants::pi<double>();
+    }
+
+    /**
+     * Return the base of the natural logarithm.
+     *
+     * @return Base of natural logarithm.
+     */
+    inline double e() {
+      return E;
+    }
+
+    /**
+     * Return the square root of two.
+     *
+     * @return Square root of two. 
+     */
+    inline double sqrt2() {
+      return SQRT_2;
+    }
+
+
+    /**
+     * Return natural logarithm of ten.
+     *
+     * @return Natural logarithm of ten.
+     */
+    inline double log10() {
+      return LOG_10;
+    }
+
+    /**
+     * Return positive infinity.
+     *
+     * @return Positive infinity.
+     */
+    inline double positive_infinity() {
+      return INFTY;
+    }
+
+    /**
+     * Return negative infinity.
+     *
+     * @return Negative infinity.
+     */
+    inline double negative_infinity() {
+      return NEGATIVE_INFTY;
+    }
+
+    /**
+     * Return (quiet) not-a-number.
+     *
+     * @return Quiet not-a-number.
+     */
+    inline double not_a_number() {
+      return NOT_A_NUMBER;
+    }
+
+    /**
+     * Return minimum positive number representable.
+     *
+     * @return Minimum positive number.
+     */
+    inline double epsilon() {
+      return EPSILON;
+    }
+
+    /**
+     * Return maximum negative number (i.e., negative
+     * number with smallest absolute value).
+     *
+     * @return Maximum negative number.
+     */
+    inline double negative_epsilon() {
+      return NEGATIVE_EPSILON;
+    }
+
+    const double TWO_OVER_SQRT_PI = 2.0 / std::sqrt(boost::math::constants::pi<double>());
+    
+    const double NEG_TWO_OVER_SQRT_PI = -TWO_OVER_SQRT_PI;
+    
+    const double INV_SQRT_TWO_PI = 1.0 / std::sqrt(2.0 * boost::math::constants::pi<double>());
+    
   }
 }
 

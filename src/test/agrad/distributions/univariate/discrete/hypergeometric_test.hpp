@@ -1,6 +1,8 @@
 // Arguments: Ints, Ints, Ints, Ints
 #include <stan/prob/distributions/univariate/discrete/hypergeometric.hpp>
 
+#include <stan/math/functions/binomial_coefficient_log.hpp>
+
 using std::vector;
 using std::numeric_limits;
 using stan::agrad::var;
