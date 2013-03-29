@@ -9,6 +9,7 @@
 #include <stan/math/matrix/validate_matching_sizes.hpp>
 #include <stan/math/matrix/validate_square.hpp>
 #include <stan/agrad/rev/var.hpp>
+#include <stan/agrad/rev/numeric_limits.hpp>
 #include <stan/agrad/rev/matrix/typedefs.hpp>
 #include <stan/agrad/rev/matrix/dot_product.hpp>
 #include <stan/agrad/rev/matrix/dot_self.hpp>

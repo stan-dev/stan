@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 #include <test/agrad/util.hpp>
 
-TEST(AgradMatrix, fill) {
+TEST(AgradRevMatrix, fill) {
   using stan::agrad::fill;
   using std::vector;
   using Eigen::Matrix;
@@ -42,7 +42,7 @@ TEST(AgradMatrix, fill) {
     for (size_t j = 0; j < 2; ++j)
       EXPECT_FLOAT_EQ(54, d[i][j].val());
 }
-TEST(AgradMatrix, fillDouble) {
+TEST(AgradRevMatrix, fillDouble) {
   using Eigen::Matrix;
   using Eigen::Dynamic;
   using stan::agrad::fill;
