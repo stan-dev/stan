@@ -1,5 +1,5 @@
-#ifndef __STAN__MCMC__UNIT_E_METRIC__BETA__
-#define __STAN__MCMC__UNIT_E_METRIC__BETA__
+#ifndef __STAN__MCMC__UNIT__E__METRIC__BETA__
+#define __STAN__MCMC__UNIT__E__METRIC__BETA__
 
 #include <boost/random/normal_distribution.hpp>
 
