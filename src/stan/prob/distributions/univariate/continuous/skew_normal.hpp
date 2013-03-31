@@ -2,13 +2,13 @@
 #define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__SKEW__NORMAL__HPP__
 
 #include <boost/random/variate_generator.hpp>
-#include <boost/math/special_functions/owens_t.hpp>
 #include <boost/math/distributions.hpp>
 #include <stan/prob/distributions/univariate/continuous/uniform.hpp>
 
 #include <stan/agrad.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/special_functions.hpp>
+#include <stan/agrad/special_functions.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
@@ -143,66 +143,68 @@ namespace stan {
       return skew_normal_log<false>(y,mu,sigma,alpha,stan::math::default_policy());
     }
 
-    // template <typename T_y, typename T_loc, typename T_scale, typename T_shape,
-    //           class Policy>
-    // typename return_type<T_y,T_loc,T_scale,T_shape>::type
-    // skew_normal_cdf(const T_y& y, const T_loc& mu, const T_scale& sigma, const T_shape& alpha,
-    //          const Policy&) {
-    //   static const char* function = "stan::prob::skew_normal_cdf(%1%)";
+    template <typename T_y, typename T_loc, typename T_scale, typename T_shape,
+              class Policy>
+    typename return_type<T_y,T_loc,T_scale,T_shape>::type
+    skew_normal_cdf(const T_y& y, const T_loc& mu, const T_scale& sigma, const T_shape& alpha,
+             const Policy&) {
+      static const char* function = "stan::prob::skew_normal_cdf(%1%)";
 
-    //   using stan::math::check_positive;
-    //   using stan::math::check_finite;
-    //   using stan::math::check_not_nan;
-    //   using stan::math::check_consistent_sizes;
+      using stan::math::check_positive;
+      using stan::math::check_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_consistent_sizes;
+      using stan::agrad::owenst;
+      using stan::math::owenst;
 
 
-    //   typename return_type<T_y, T_loc, T_scale, T_shape>::type cdf(1);
-    //   // check if any vectors are zero length
-    //   if (!(stan::length(y) 
-    //         && stan::length(mu) 
-    //         && stan::length(sigma)
-    // 	    && stan::length(alpha)))
-    //     return cdf;
+      typename return_type<T_y, T_loc, T_scale, T_shape>::type cdf(1);
+      // check if any vectors are zero length
+      if (!(stan::length(y) 
+            && stan::length(mu) 
+            && stan::length(sigma)
+    	    && stan::length(alpha)))
+        return cdf;
 
-    //   if (!check_not_nan(function, y, "Random variable", &cdf, Policy()))
-    //     return cdf;
-    //   if (!check_finite(function, mu, "Location parameter", &cdf, Policy()))
-    //     return cdf;
-    //   if (!check_not_nan(function, sigma, "Scale parameter", 
-    //                      &cdf, Policy()))
-    //     return cdf;
-    //   if (!check_positive(function, sigma, "Scale parameter", 
-    //                       &cdf, Policy()))
-    //     return cdf;
-    //   if (!check_finite(function, alpha, "Shape parameter", &cdf, Policy()))
-    //     return cdf;
-    //   if (!check_not_nan(function, alpha, "Shape parameter", 
-    //                      &cdf, Policy()))
-    //     return cdf;
-    //   if (!(check_consistent_sizes(function,
-    //                                y,mu,sigma,alpha,
-    //                                "Random variable","Location parameter","Scale parameter","Shape paramter",
-    //                                &cdf, Policy())))
-    //     return cdf;
+      if (!check_not_nan(function, y, "Random variable", &cdf, Policy()))
+        return cdf;
+      if (!check_finite(function, mu, "Location parameter", &cdf, Policy()))
+        return cdf;
+      if (!check_not_nan(function, sigma, "Scale parameter", 
+                         &cdf, Policy()))
+        return cdf;
+      if (!check_positive(function, sigma, "Scale parameter", 
+                          &cdf, Policy()))
+        return cdf;
+      if (!check_finite(function, alpha, "Shape parameter", &cdf, Policy()))
+        return cdf;
+      if (!check_not_nan(function, alpha, "Shape parameter", 
+                         &cdf, Policy()))
+        return cdf;
+      if (!(check_consistent_sizes(function,
+                                   y,mu,sigma,alpha,
+                                   "Random variable","Location parameter","Scale parameter","Shape paramter",
+                                   &cdf, Policy())))
+        return cdf;
 
-    //   VectorView<const T_y> y_vec(y);
-    //   VectorView<const T_loc> mu_vec(mu);
-    //   VectorView<const T_scale> sigma_vec(sigma);
-    //   VectorView<const T_shape> alpha_vec(alpha);
-    //   size_t N = max_size(y, mu, sigma, alpha);
+      VectorView<const T_y> y_vec(y);
+      VectorView<const T_loc> mu_vec(mu);
+      VectorView<const T_scale> sigma_vec(sigma);
+      VectorView<const T_shape> alpha_vec(alpha);
+      size_t N = max_size(y, mu, sigma, alpha);
       
-    //   for (size_t n = 0; n < N; n++) {
-    //     cdf *= 0.5 * (boost::math::erfc(-(y_vec[n] - mu_vec[n]) / (std::sqrt(2) * sigma_vec[n]))) - 2 * boost::math::owens_t((y_vec[n] - mu_vec[n]) / sigma_vec[n], alpha_vec[n]);
-    //   }
-    //   return cdf;
-    // }
+      for (size_t n = 0; n < N; n++) {
+        cdf *= 0.5 * erfc(-(y_vec[n] - mu_vec[n]) / (std::sqrt(2) * sigma_vec[n])) - 2 * owenst((y_vec[n] - mu_vec[n]) / sigma_vec[n], alpha_vec[n]);
+      }
+      return cdf;
+    }
 
-    // template <typename T_y, typename T_loc, typename T_scale, typename T_shape>
-    // inline
-    // typename return_type<T_y, T_loc, T_scale, T_shape>::type
-    // skew_normal_cdf(const T_y& y, const T_loc& mu, const T_scale& sigma, const T_shape& alpha) {
-    //   return skew_normal_cdf(y,mu,sigma,alpha,stan::math::default_policy());
-    // }
+    template <typename T_y, typename T_loc, typename T_scale, typename T_shape>
+    inline
+    typename return_type<T_y, T_loc, T_scale, T_shape>::type
+    skew_normal_cdf(const T_y& y, const T_loc& mu, const T_scale& sigma, const T_shape& alpha) {
+      return skew_normal_cdf(y,mu,sigma,alpha,stan::math::default_policy());
+    }
 
     template <class RNG>
     inline double
