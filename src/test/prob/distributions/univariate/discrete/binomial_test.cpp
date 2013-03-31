@@ -3,7 +3,7 @@
 #include <boost/random/mersenne_twister.hpp>
 #include<boost/math/distributions.hpp>
 
-TEST(ProbDistributionBinomiali, random) {
+TEST(ProbDistributionBinomial, random) {
   boost::random::mt19937 rng;
   EXPECT_NO_THROW(stan::prob::binomial_rng(4,0.6,rng));
 }
