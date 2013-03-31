@@ -1,6 +1,8 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__HYPERGEOMETRIC_HPP__
 #define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__HYPERGEOMETRIC_HPP__
 
+#include <boost/math/distributions.hpp>
+#include <stan/prob/distributions/univariate/continuous/uniform.hpp>
 #include <stan/agrad.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/special_functions.hpp>
@@ -121,7 +123,25 @@ namespace stan {
       return hypergeometric_log<false>(n,N,a,b,stan::math::default_policy());
     }
 
+    template <class RNG>
+    inline int
+    hypergeometric_rng(int N,
+		       int a,
+		       int b,
+		       RNG& rng) {
+      using boost::variate_generator;
+      
+      boost::math::hypergeometric_distribution<>dist (b, N, a + b);
+      Eigen::VectorXd index(a);
+      for(int i = 0; i < a; i++)
+	index(i) = cdf(dist, i + 1);
 
+      double c = uniform_rng(0.0, 1.0, rng);
+      int d = 0;
+      while(c > index(d,0))
+	d++;
+      return d + 1;
+    }
   }
 }
 #endif
