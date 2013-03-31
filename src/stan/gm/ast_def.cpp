@@ -568,7 +568,7 @@ namespace stan {
       else if (vo == transformed_parameter_origin)
         o << "transformed parameter";
       else if (vo == derived_origin)
-        o << "derived";
+        o << "generated quantities";
       else if (vo == local_origin)
         o << "local";
       else 
@@ -921,6 +921,15 @@ namespace stan {
     expression& expression::operator/=(expression const& rhs) {
       expr_ = binary_op(expr_, "/", rhs);
       return *this;
+    }
+
+    bool has_rng_suffix(const std::string& s) {
+      int n = s.size();
+      return n > 4
+        && s[n-1] == 'g' 
+        && s[n-2] == 'n'
+        && s[n-3] == 'r'
+        && s[n-4] == '_';
     }
 
 
