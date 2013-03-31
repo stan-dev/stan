@@ -10,8 +10,9 @@ namespace stan {
     
     // Hamiltonian Monte Carlo
     // with static integration time
-    
-    template <typename M, typename P, typename H, typename I, class BaseRNG>
+        
+    template <class M, class P, template<class, class> class H, 
+              template<class, class> class I, class BaseRNG>
     class base_static_hmc: public base_hmc<M, P, H, I, BaseRNG> {
       
     public:
@@ -20,32 +21,30 @@ namespace stan {
                                            _epsilon(0.1), _T(1)
       { _update_L(); }
       
-      ~diag_e_static_hmc() {};
+      ~base_static_hmc() {};
       
       sample transition(sample& init_sample) {
         
-        P z(init_sample.size_cont(), init_sample.size_disc());
-        z.q = init_sample.cont_params();
-        z.r = init_sample.disc_params();
+        this->seed(init_sample.cont_params(), init_sample.disc_params());
         
-        this->_hamiltonian.sample_p(z, this->_rand_int);
-        this->_hamiltonian.init(z);
+        this->_hamiltonian.sample_p(this->_z, this->_rand_int);
+        this->_hamiltonian.init(this->_z);
         
-        double H0 = this->_hamiltonian.H(z);
+        double H0 = this->_hamiltonian.H(this->_z);
         
         for (int i = 0; i < _L; ++i) {
-          this->_integrator.evolve(z, this->_hamiltonian, _epsilon);
+          this->_integrator.evolve(this->_z, this->_hamiltonian, _epsilon);
         }
         
-        double acceptProb = exp(H0 - this->_hamiltonian.H(z));
+        double acceptProb = exp(H0 - this->_hamiltonian.H(this->_z));
         
         double accept = true;
         if (acceptProb < 1 && this->_rand_uniform() > acceptProb) {
-          z.q = init_sample.cont_params();
+          this->_z.q = init_sample.cont_params();
           accept = false;
         }
         
-        return sample(z.q, z.r, - this->_hamiltonian.V(z), acceptProb);
+        return sample(this->_z.q, this->_z.r, - this->_hamiltonian.V(this->_z), acceptProb);
         
       }
       

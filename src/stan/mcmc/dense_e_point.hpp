@@ -13,15 +13,11 @@ namespace stan {
       
     public:
       
-      dense_e_point(int n, int m): ps_point(n, m), V(0), 
-                                   g(Eigen::VectorXd::Zero(n)),
+      dense_e_point(int n, int m): ps_point(n, m),
                                    mInv(Eigen::VectorXd::Ones(n, n)) 
       {};
       
-      double V;
-      Eigen::VectorXd g;
-      
-      static Eigen::MatrixXd mInv;
+      Eigen::MatrixXd mInv;
       
     };
     

@@ -69,10 +69,10 @@ namespace stan {
           _sum_x2.setZero();
           
         }
+        
+      }
       
     };
-      
-    }
     
   } // mcmc
   

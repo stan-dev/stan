@@ -19,7 +19,7 @@ namespace stan {
     public:
       
       adapt_dense_e_static_hmc(M &m, BaseRNG& rng): dense_e_static_hmc<M, BaseRNG>(m, rng),
-                                                   stepsize_adapter()
+                                                    stepsize_adapter()
       {};
       
       ~adapt_dense_e_static_hmc() {};
@@ -33,7 +33,7 @@ namespace stan {
           this->_learn_stepsize(this->_epsilon, s.accept_stat());
           this->_update_L();
           
-          this->_learn_covar(z.mInv, z.q);
+          this->_learn_covar(this->_z.mInv, this->_z.q);
           
         }
         

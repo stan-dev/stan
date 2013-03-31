@@ -1,7 +1,7 @@
 #ifndef __STAN__MCMC__ADAPT__UNIT__E__STATIC__HMC__BETA__
 #define __STAN__MCMC__ADAPT__UNIT__E__STATIC__HMC__BETA__
 
-#include <stepsize_adapter.hpp>
+#include <stan/mcmc/stepsize_adapter.hpp>
 #include <stan/mcmc/unit_e_static_hmc.hpp>
 
 namespace stan {

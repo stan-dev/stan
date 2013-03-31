@@ -77,7 +77,6 @@ namespace stan {
       
     };
     
-    
   } // mcmc
   
 } // stan

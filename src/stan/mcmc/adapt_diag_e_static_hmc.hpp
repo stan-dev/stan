@@ -33,7 +33,7 @@ namespace stan {
           this->_learn_stepsize(this->_epsilon, s.accept_stat());
           this->_update_L();
           
-          this->_learn_var(z.mInv, z.q);
+          this->_learn_var(this->_z.mInv, this->_z.q);
           
         }
         

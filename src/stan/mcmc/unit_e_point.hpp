@@ -13,11 +13,8 @@ namespace stan {
       
     public:
       
-      unit_e_point(int n, int m): ps_point(n, m), V(0), g(Eigen::VectorXd::Zero(n)) {};
-      
-      double V;
-      Eigen::VectorXd g;
-      
+      unit_e_point(int n, int m): ps_point(n, m) {};
+
     };
     
   } // mcmc

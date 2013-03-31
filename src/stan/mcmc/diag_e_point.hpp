@@ -13,15 +13,11 @@ namespace stan {
       
     public:
       
-      diag_e_point(int n, int m): ps_point(n, m), V(0), 
-                                  g(Eigen::VectorXd::Zero(n)),
+      diag_e_point(int n, int m): ps_point(n, m),
                                   mInv(Eigen::VectorXd::Ones(n)) 
       {};
       
-      double V;
-      Eigen::VectorXd g;
-      
-      static Eigen::VectorXd mInv;
+      Eigen::VectorXd mInv;
       
     };
     
