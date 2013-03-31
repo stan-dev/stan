@@ -45,4 +45,3 @@ TEST(ProbDistributionsHypergeometric, chiSquareGoodnessFitTest) {
 
   EXPECT_TRUE(chi < quantile(complement(mydist, 1e-6)));
 }
-
