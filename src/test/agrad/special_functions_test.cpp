@@ -1467,13 +1467,12 @@ TEST(AgradSpecialFunctions,ibeta_ddv) {
 }
 TEST(AgradSpecialFunctions,owenst_vv) {
   using stan::agrad::var;
-  using stan::math::owenst;
   using stan::agrad::owenst;
   using boost::math::owens_t;
 
-  AVAR h = 1.0;
-  AVAR a = 2.0;
-  AVAR f = owenst(h,a);
+  var h = 1.0;
+  var a = 2.0;
+  var f = owenst(h,a);
   EXPECT_FLOAT_EQ(owens_t(1.0, 2.0), f.val());
 
   AVEC x = createAVEC(h,a);
@@ -1484,7 +1483,6 @@ TEST(AgradSpecialFunctions,owenst_vv) {
 }
 TEST(AgradSpecialFunctions,owenst_vd) {
   using stan::agrad::var;
-  using stan::math::owenst;
   using stan::agrad::owenst;
   using boost::math::owens_t;
 
@@ -1501,7 +1499,6 @@ TEST(AgradSpecialFunctions,owenst_vd) {
 }
 TEST(AgradSpecialFunctions,owenst_dv) {
   using stan::agrad::var;
-  using stan::math::owenst;
   using stan::agrad::owenst;
   using boost::math::owens_t;
 
