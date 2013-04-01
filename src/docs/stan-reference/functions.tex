@@ -1966,6 +1966,27 @@ reals \farg{sigma}}{ The logistic cumulative distribution function of \farg{y} g
 location \farg{mu} and scale \farg{sigma}}
 \end{description}
 
+\subsection{Gumbel Distribution}
+
+if $\mu \in \reals$ and $\beta \in \posreals$, then for $y \in \reals$,
+\[
+\distro{Gumbel}(y|\mu,\beta)
+=
+\frac{1}{\beta}
+\
+\exp\left(-\frac{y-\mu}{\beta}-\exp\left(-\frac{y-\mu}{\beta}\right)\right)
+.
+\]
+
+\begin{description}
+  \fitem{real}{gumbel\_log}{reals \farg{y}, reals \farg{mu}, reals
+    \farg{beta}}{The log of the exponential normal density of \farg{y} given location \farg{mu} and scale \farg{beta}}
+%
+\fitem{real}{gumbel\_cdf}{reals \farg{y}, reals \farg{mu}, reals
+  \farg{beta}}{The cumulative skew normal distribution of \farg{y}
+  given location \farg{mu} and scale \farg{beta}}
+\end{description}
+
 \section{Positive Continuous Probabilities}
 
 The positive continuous probability functions have support on the
