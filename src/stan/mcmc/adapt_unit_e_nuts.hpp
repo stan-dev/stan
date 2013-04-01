@@ -27,10 +27,8 @@ namespace stan {
         
         sample s = unit_e_nuts<M, BaseRNG>::transition(init_sample);
         
-        if (this->_adapt_flag) {
+        if (this->_adapt_flag)
           this->_learn_stepsize(this->_epsilon, s.accept_stat());
-          this->_update_L();
-        }
         
         return s;
         

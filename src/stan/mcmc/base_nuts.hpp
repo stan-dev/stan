@@ -68,10 +68,10 @@ namespace stan {
         this->_hamiltonian.sample_p(this->_z, this->_rand_int);
         this->_hamiltonian.init(this->_z);
 
-        ps_point z_plus(dynamic_cast<ps_point>(this->_z));
-        ps_point z_minus(dynamic_cast<ps_point>(this->_z));
+        ps_point z_plus(static_cast<ps_point>(this->_z));
+        ps_point z_minus(static_cast<ps_point>(this->_z));
 
-        ps_point z_propose(dynamic_cast<ps_point>(this->_z));
+        ps_point z_propose(static_cast<ps_point>(this->_z));
         
         int n_cont = init_sample.cont_params().size();
         int n_disc = init_sample.disc_params().size();
@@ -127,7 +127,8 @@ namespace stan {
           
           this->_z.copy_base(z_plus);
           
-          util.criterion = _compute_criterion(z_minus, this->_z, rho_plus - rho_minus);
+          Eigen::VectorXd delta_rho = rho_plus - rho_minus;
+          util.criterion = _compute_criterion(z_minus, this->_z, delta_rho);
           
           // Metropolis-Hastings sample the fresh subtree
           if(util.n_valid)
@@ -170,7 +171,7 @@ namespace stan {
       }
 
       
-    private:
+    protected:
       
       virtual bool _compute_criterion(ps_point& start, P& finish, Eigen::VectorXd& rho) = 0;
       
@@ -191,7 +192,7 @@ namespace stan {
           double h = this->_hamiltonian.H(this->_z); 
           if(h != h) h = std::numeric_limits<double>::infinity();
           
-          util.criterion = util.log_u + h > this->_delta_max;
+          util.criterion = util.log_u + h > this->_max_delta;
           
           util.sum_prob += stan::math::min(1, exp(util.H0 - h));
           util.n_tree += 1;
@@ -210,7 +211,7 @@ namespace stan {
           
           build_tree(depth - 1, rho, z_propose, n_valid_step_local, util);
           
-          if(depth == 1) util.z_init.at(depth) = dynamic_cast<ps_point>(this->_z);
+          if(depth == 1) util.z_init.at(depth) = static_cast<ps_point>(this->_z);
           else           util.z_init.at(depth) = util.z_init.at(depth - 1);
           
           if (util.criterion) 
