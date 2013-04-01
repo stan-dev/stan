@@ -1,5 +1,5 @@
-#ifndef __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__EXP__NORMAL__HPP__
-#define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__EXP__NORMAL__HPP__
+#ifndef __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__EXPONENTIAL__NORMAL__HPP__
+#define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__EXPONENTIAL__NORMAL__HPP__
 
 #include <boost/random/normal_distribution.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
@@ -21,7 +21,7 @@ namespace stan {
     template <bool propto, 
               typename T_y, typename T_loc, typename T_scale,typename T_inv_scale, class Policy>
     typename return_type<T_y,T_loc,T_scale, T_inv_scale>::type
-    exp_normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma, 
+    exponential_normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma, 
     			 const T_inv_scale& lambda, const Policy& /*policy*/) {
       static const char* function = "stan::prob::exp_normal_log(%1%)";
 
@@ -113,29 +113,29 @@ namespace stan {
               typename T_y, typename T_loc, typename T_scale, typename T_inv_scale>
     inline
     typename return_type<T_y,T_loc,T_scale, T_inv_scale>::type
-    exp_normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma, const T_inv_scale& lambda) {
-      return exp_normal_log<propto>(y,mu,sigma,lambda,stan::math::default_policy());
+    exponential_normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma, const T_inv_scale& lambda) {
+      return exponential_normal_log<propto>(y,mu,sigma,lambda,stan::math::default_policy());
     }
 
     template <typename T_y, typename T_loc, typename T_scale, typename T_inv_scale,
               class Policy>
     inline
     typename return_type<T_y,T_loc,T_scale, T_inv_scale>::type
-    exp_normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma, const T_inv_scale& lambda, const Policy&) {
-      return exp_normal_log<false>(y,mu,sigma,lambda,Policy());
+    exponential_normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma, const T_inv_scale& lambda, const Policy&) {
+      return exponential_normal_log<false>(y,mu,sigma,lambda,Policy());
     }
 
     template <typename T_y, typename T_loc, typename T_scale, typename T_inv_scale>
     inline
     typename return_type<T_y,T_loc,T_scale, T_inv_scale>::type
-    exp_normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma, const T_inv_scale& lambda) {
-      return exp_normal_log<false>(y,mu,sigma,lambda,stan::math::default_policy());
+    exponential_normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma, const T_inv_scale& lambda) {
+      return exponential_normal_log<false>(y,mu,sigma,lambda,stan::math::default_policy());
     }
 
     template <typename T_y, typename T_loc, typename T_scale, typename T_inv_scale,
               class Policy>
     typename return_type<T_y,T_loc,T_scale,T_inv_scale>::type
-    exp_normal_cdf(const T_y& y, const T_loc& mu, const T_scale& sigma, const T_inv_scale& lambda,
+    exponential_normal_cdf(const T_y& y, const T_loc& mu, const T_scale& sigma, const T_inv_scale& lambda,
              const Policy&) {
       static const char* function = "stan::prob::exp_normal_cdf(%1%)";
 
@@ -197,13 +197,13 @@ namespace stan {
     template <typename T_y, typename T_loc, typename T_scale, typename T_inv_scale>
     inline
     typename return_type<T_y, T_loc, T_scale, T_inv_scale>::type
-    exp_normal_cdf(const T_y& y, const T_loc& mu, const T_scale& sigma, const T_inv_scale& lambda) {
-      return exp_normal_cdf(y,mu,sigma,lambda,stan::math::default_policy());
+    exponential_normal_cdf(const T_y& y, const T_loc& mu, const T_scale& sigma, const T_inv_scale& lambda) {
+      return exponential_normal_cdf(y,mu,sigma,lambda,stan::math::default_policy());
     }
 
     template <class RNG>
     inline double
-    exp_normal_rng(double mu,
+    exponential_normal_rng(double mu,
 		    double sigma,
 		    double lambda,
 		    RNG& rng) {
