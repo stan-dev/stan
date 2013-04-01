@@ -1818,6 +1818,33 @@ If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in
 \end{description}
 
 
+\subsection{Skew Normal Distribution}
+
+if $\mu \in \reals$, $\sigma \in \posreals$, and $\alpha \in \reals$, then for $y \in \reals$,
+\[
+\distro{SkewNormal}(y|\mu,\sigma,\alpha)
+=
+\frac{1}{\sigma \pi}
+\
+\exp\left( - \, \frac{1}{2}
+           \left(  \frac{y - \mu}{\sigma} \right)^2
+    \right)
+\
+\int_{-\infty}^{\alpha \left( \frac{y - \mu}{\sigma}\right)}
+\exp \left(-\frac{t^2}{2}\right)dt
+\!.
+\]
+
+\begin{description}
+  \fitem{real}{skew\_normal\_log}{reals \farg{y}, reals \farg{mu}, reals
+    \farg{sigma}, reals \farg{alpha}}{The log of the skew normal density of \farg{y} given
+    location \farg{mu}, scale \farg{sigma}, and shape \farg{alpha}}
+%
+\fitem{real}{skew\_normal\_cdf}{reals \farg{y}, reals \farg{mu}, reals
+  \farg{sigma}, reals \farg{sigma}}{The cumulative skew normal distribution of \farg{y}
+  given location \farg{mu}, scale \farg{sigma}, and shape \farg{alpha}}
+\end{description}
+
 \subsection{Student-$t$ Distribution}
 
 If $\nu \in \posreals$, $\mu \in \reals$, and $\sigma \in \posreals$,
