@@ -101,7 +101,10 @@ namespace stan {
       double _T;
       int _L;
       
-      void _update_L() { _L = static_cast<int>(_T / _epsilon); }
+      void _update_L() { 
+        _L = static_cast<int>(_T / _epsilon); 
+        _L = _L < 1 ? 1 : _L;
+      }
       
     };
     
