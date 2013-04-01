@@ -1,8 +1,8 @@
 #ifndef __STAN__MCMC__BASE__STATIC__HMC__BETA__
 #define __STAN__MCMC__BASE__STATIC__HMC__BETA__
 
+#include <stan/mcmc/ps_point.hpp>
 #include <stan/mcmc/base_hmc.hpp>
-#include <stan/mcmc/expl_leapfrog.hpp>
 
 namespace stan {
   
@@ -30,17 +30,19 @@ namespace stan {
         this->_hamiltonian.sample_p(this->_z, this->_rand_int);
         this->_hamiltonian.init(this->_z);
         
+        ps_point z_init(static_cast<ps_point>(this->_z));
+        
         double H0 = this->_hamiltonian.H(this->_z);
         
         for (int i = 0; i < _L; ++i) {
-          this->_integrator.evolve(this->_z, this->_hamiltonian, _epsilon);
+          this->_integrator.evolve(this->_z, this->_hamiltonian, this->_epsilon);
         }
         
         double acceptProb = exp(H0 - this->_hamiltonian.H(this->_z));
         
         double accept = true;
         if (acceptProb < 1 && this->_rand_uniform() > acceptProb) {
-          this->_z.q = init_sample.cont_params();
+          this->_z.copy_base(z_init);
           accept = false;
         }
         

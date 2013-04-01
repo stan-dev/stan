@@ -26,6 +26,14 @@ namespace stan {
       double V;
       Eigen::VectorXd g;
       
+      void copy_base(ps_point& z) {
+        q = z.q;
+        r = z.r;
+        p = z.p;
+        V = z.V;
+        g = z.g;
+      }
+      
       void write_header(std::ostream& o) {
         o << q.size() << " continuous, unconstrained parameters" << std::endl;
         o << r.size() << " discrete parameters" << std::endl;
