@@ -17,9 +17,6 @@ vector_types.push_back(ROW_VECTOR_T);              // Eigen row vector
 std::vector<expr_type> int_vector_types;
 int_vector_types.push_back(INT_T);                  // scalar
 int_vector_types.push_back(expr_type(INT_T,1U));    // std vector
-// FIXME:  these next two don't look like int
-// int_vector_types.push_back(VECTOR_T);               // Eigen vector
-// int_vector_types.push_back(ROW_VECTOR_T);           // Eigen row vector
 
 std::vector<expr_type> primitive_types;
 primitive_types.push_back(INT_T);
@@ -49,9 +46,11 @@ for (size_t i = 0; i < int_vector_types.size(); ++i)
 for (size_t i = 0; i < int_vector_types.size(); ++i) 
   for (size_t j = 0; j < vector_types.size(); ++j)
     add("bernoulli_cdf",DOUBLE_T,int_vector_types[i],vector_types[j]);
+add("bernoulli_rng",INT_T,DOUBLE_T);
 for (size_t i = 0; i < int_vector_types.size(); ++i) 
   for (size_t j = 0; j < vector_types.size(); ++j)
     add("bernoulli_logit_log",DOUBLE_T,int_vector_types[i],vector_types[j]);
+// FIXME: add("bernoulli_logit_rng",INT_T,DOUBLE_T);
 for (size_t i = 0; i < int_vector_types.size(); i++) 
   for (size_t j = 0; j < int_vector_types.size(); j++)
     for (size_t k = 0; k < vector_types.size(); k++)
