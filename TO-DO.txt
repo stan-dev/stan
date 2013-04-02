@@ -99,7 +99,7 @@ Doc
 * C++ manual for API and auto-dif
 * C++ code cleanup (API doc, privates, consts, doc, split files, 
   long long)
-* more example models, complete/improve BUGS models
+* more example models, complete/improve BUGS models, vectorize BUGS models.
 * fancier web site graphics
 
 
