@@ -56,8 +56,8 @@ generated quantities {
   v <- multi_student_t_rng(3.0,mu,Sigma);
   Sigma <- wishart_rng(3.0,Sigma);
   Sigma <- inv_wishart_rng(3.0,Sigma);
-  // Sigma <- lkj_corr_rng(2.5);
-  // Sigma <- lkj_corr_cholesky_rng(3.0);
+  Sigma <- lkj_corr_rng(3,2.5);
+  L <- lkj_corr_cholesky_rng(3,3.0);
   // DEPRECATE:  Sigma <- lkj_cov_rng(Sigma, mu, alpha, 2.0);
   
  

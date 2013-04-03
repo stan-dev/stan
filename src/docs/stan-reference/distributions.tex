@@ -1363,6 +1363,11 @@ definitions.
     \farg{y} given nonnegative shape \farg{eta}.}
 %
 \end{description}
+\begin{description}
+\fitem{matrix}{lkj\_corr\_rng}{int \farg{K}, real \farg{eta}}{Generate a
+  LKJ random correlation matrix of order \farg{K} with shape \farg{eta};
+  may only be used in generated quantities block}
+\end{description}
 
 
 \section{Cholesky LKJ Correlation Distribution}
@@ -1388,6 +1393,12 @@ parameter $\eta$.
     Cholesky factor \farg{L} of a correlation matrix given shape
     \farg{eta}.}
 %
+\end{description}
+\begin{description}
+\fitem{matrix}{lkj\_corr\_cholesky\_rng}{int \farg{K}, real \farg{eta}}{
+  Generate a random Cholesky factor of a LKJ random correlation matrix
+  of order \farg{K} with shape \farg{eta}; may only be used in 
+  generated quantities block}
 \end{description}
 
 
