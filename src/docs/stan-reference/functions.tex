@@ -1505,7 +1505,7 @@ Suppose $N \in \nats$ and $\theta \in [0,1]$, and $n \in
 \end{description}
 %
 \begin{description}
-\fitem{int}{binomial\_rng}{ints \farg{N}, reals \farg{theta}}{Generate a binomial
+\fitem{int}{binomial\_rng}{int \farg{N}, real \farg{theta}}{Generate a binomial
   variate with \farg{N} trials and chance of success \farg{theta}; may only be used in
   generated quantities block}
 \end{description}
@@ -1594,7 +1594,7 @@ where the beta function $\Betafun(x,y)$ is defined for $x \in
 \end{description}
 %
 \begin{description}
-\fitem{int}{beta\_binomial\_rng}{ints \farg{N}, reals \farg{alpha}, reals \farg{beta}}{Generate a beta-binomial variate with \farg{N} trials, prior success count
+\fitem{int}{beta\_binomial\_rng}{int \farg{N}, real \farg{alpha}, real \farg{beta}}{Generate a beta-binomial variate with \farg{N} trials, prior success count
   (plus one) of \farg{alpha}, and prior failure count (plus one) of; may only be used in
   generated quantities block}
 \end{description}
@@ -1621,7 +1621,7 @@ then for $n \in \setlist{\max(0,N-b),\ldots,\min(a,N)}$,
 \end{description}
 %
 \begin{description}
-\fitem{int}{hypergeometric\_rng}{ints \farg{N}, reals \farg{a}, reals \farg{b}}{Generate a hypergeometric variate with \farg{N} trials, total success count of
+\fitem{int}{hypergeometric\_rng}{int \farg{N}, real \farg{a}, real \farg{b}}{Generate a hypergeometric variate with \farg{N} trials, total success count of
     \farg{a}, and total failure count of \farg{b}; may only be used in
   generated quantities block}
 \end{description}
@@ -1638,6 +1638,12 @@ If $N \in \nats$ and $\theta \in \mbox{$N$-simplex}$, then for $y \in
 \fitem{real}{categorical\_log}{int \farg{y}, vector \farg{theta}}{The
   log categorical probability mass function with outcome \farg{y} in 
 $1:N$ given $N$-simplex distribution parameter \farg{theta}}
+\end{description}
+%
+\begin{description}
+\fitem{int}{categorical\_rng}{vector \farg{theta}}{Generate a
+  categorical variate with $N$-simplex distribution parameter 
+\farg{theta}; may only be used in generated quantities block}
 \end{description}
 
 \subsection{Ordered Logistic Distribution}
@@ -1672,7 +1678,12 @@ $\mbox{logit}^{-1}(-\infty) = 0$ and $\mbox{logit}^{-1}(\infty) = 1$.
     \farg{k} given linear predictor \farg{eta} and cutpoints
     \farg{c}.}
 \end{description}
-
+%
+\begin{description}
+\fitem{int}{ordered\_logistic\_rng}{real \farg{eta}, vector \farg{c}}{Generate an
+  ordered logistic variate with linear predictor \farg{eta} and cutpoints
+    \farg{c}; may only be used in generated quantities block}
+\end{description}
 
 \section{Unbounded Discrete Distributions}
 
@@ -1730,7 +1741,12 @@ where $\Psi$ is the digamma function, defined as
    \farg{alpha}, reals \farg{beta}}{The negative binomial cumulative
    distribution function
    of \farg{n} given shape \farg{alpha} and inverse scale \farg{beta}}
-
+\end{description}
+%
+\begin{description}
+\fitem{int}{neg\_binomial\_rng}{real \farg{alpha}, real \farg{beta}}{Generate a
+  negative binomial variate with shape \farg{alpha} and inverse scale
+  \farg{beta}; may only be used in generated quantities block}
 \end{description}
 
 
@@ -1750,12 +1766,16 @@ If $\lambda \in \posreals$, then for $n \in \nats$,
 \begin{description}
 \fitem{real}{poisson\_log}{ints \farg{n}, reals \farg{lambda}}{The
   log Poisson probability mass of \farg{n} given rate \farg{lambda}}
-
+%
 \fitem{real}{poisson\_cdf}{ints \farg{n}, reals \farg{lambda}}{The
   Poisson cumulative distribution function of \farg{n} given rate \farg{lambda}}
-
+%
 \end{description}
-
+%
+\begin{description}
+\fitem{int}{poisson\_rng}{real \farg{lambda}}{Generate a
+  poisson variate with rate \farg{lambda}; may only be used in generated quantities block}
+\end{description}
 
 Stan also provides a parameterization of the Poisson using the log
 rate $\alpha = \log \lambda$ as a parameter.  This is useful for
@@ -1800,10 +1820,15 @@ where the multinomial coefficient is defined by
 
 \begin{description}
  \fitem{real}{multinomial\_log}{int[] \farg{y}, vector
-    \farg{theta}}{The log multinomial probability mass function with
+    \farg{theta}, int \farg{N}}{The log multinomial probability mass function with
     outcome array \code{y} of size $K$ given the $K$-simplex
     distribution parameter \farg{theta} and (implicit) total count
     \code{N = sum(\farg{y})}}
+\end{description}
+%
+\begin{description}
+\fitem{vector}{multinomial\_rng}{vector \farg{theta}, int \farg{N}}{Generate a
+  multinomial variate with simplex distribution parameter \farg{theta} and (implicit) total count $N$; may only be used in generated quantities block}
 \end{description}
 
 
