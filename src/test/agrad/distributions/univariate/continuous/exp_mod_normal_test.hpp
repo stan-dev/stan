@@ -1,6 +1,5 @@
 // Arguments: Doubles, Doubles, Doubles, Doubles
 #include <stan/prob/distributions/univariate/continuous/exp_mod_normal.hpp>
-#include <stan/agrad/special_functions.hpp>
 
 using std::vector;
 using std::numeric_limits;
@@ -124,7 +123,7 @@ public:
     if (include_summand<true, T_inv_scale>::value)
       lp += log(lambda);
     if (include_summand<true,T_y,T_loc,T_scale,T_inv_scale>::value)
-      lp += lambda * (mu + 0.5 * lambda * sigma * sigma - y) + log(stan::agrad::erfc((mu + lambda * sigma * sigma - y) / (sqrt(2.0) * sigma)));
+      lp += lambda * (mu + 0.5 * lambda * sigma * sigma - y) + log(erfc((mu + lambda * sigma * sigma - y) / (sqrt(2.0) * sigma)));
     return lp;
   }
 };
