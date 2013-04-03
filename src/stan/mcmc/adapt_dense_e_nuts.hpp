@@ -18,7 +18,7 @@ namespace stan {
     public:
       
       adapt_dense_e_nuts(M &m, BaseRNG& rng): dense_e_nuts<M, BaseRNG>(m, rng),
-                                              stepsize_adapter()
+                                              covar_adapter(m.num_params_r())
       {};
       
       ~adapt_dense_e_nuts() {};
@@ -30,9 +30,8 @@ namespace stan {
         if (this->_adapt_flag) {
           
           this->_learn_stepsize(this->_epsilon, s.accept_stat());
-          this->_update_L();
           
-          this->_learn_covar(this->_z.mInv, this->_z.q);
+          this->_learn_covariance(this->_z.mInv, this->_z.q);
           
         }
         

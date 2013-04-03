@@ -18,7 +18,7 @@ namespace stan {
     public:
       
       adapt_diag_e_nuts(M &m, BaseRNG& rng): diag_e_nuts<M, BaseRNG>(m, rng),
-                                             stepsize_adapter()
+                                             var_adapter(m.num_params_r())
       {};
       
       ~adapt_diag_e_nuts() {};
@@ -30,9 +30,8 @@ namespace stan {
         if (this->_adapt_flag) {
           
           this->_learn_stepsize(this->_epsilon, s.accept_stat());
-          this->_update_L();
           
-          this->_learn_var(this->_z.mInv, this->_z.q);
+          this->_learn_variance(this->_z.mInv, this->_z.q);
           
         }
         

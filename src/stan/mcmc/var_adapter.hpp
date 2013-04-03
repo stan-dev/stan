@@ -67,7 +67,7 @@ namespace stan {
           _sum_n = 0;
           _sum_x.setZero();
           _sum_x2.setZero();
-          
+         
         }
         
       }
