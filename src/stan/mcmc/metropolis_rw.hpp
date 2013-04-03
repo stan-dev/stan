@@ -22,7 +22,6 @@ namespace stan {
       stan::model::prob_grad *_model;
       BaseRNG base_rng;
       double epsilon;
-      double delta;
 
     public:
     metropolis(stan::model::prob_grad& model,
@@ -30,11 +29,10 @@ namespace stan {
 	       const std::vector<int>& par_i,
 	       bool adapt,
 	       double eps = 1,
-	       double del = 0.651,
 	       std::ostream* error_msgs = 0,
 	       std::ostream* output_msgs = 0)
       : adaptive_sampler(adapt, error_msgs, output_msgs),
-	params_r(par_r.size()), params_i(par_i.size()), _model(&model), base_rng(BaseRNG(std::time(0))), epsilon(eps), delta(del) {
+	params_r(par_r.size()), params_i(par_i.size()), _model(&model), base_rng(BaseRNG(std::time(0))), epsilon(eps) {
       set_params(par_r, par_i);
     }
 
@@ -68,8 +66,13 @@ namespace stan {
       sample next_impl() {
       
       std::vector<double> new_params_r(params_r.size());
+
       for(size_t i = 0; i < new_params_r.size(); i++)
 	new_params_r[i] = stan::prob::normal_rng(params_r[i], epsilon, base_rng);
+
+      if (!this->adapting()) { 
+	epsilon = this->mean_stat();
+      }
 
       double new_log_prob = _model->log_prob(new_params_r, params_i, _error_msgs);
 
@@ -83,18 +86,8 @@ namespace stan {
 	  log_prob = new_log_prob;  
 	}
 
-        if (adapting()) {
-          double adapt_g = adapt_stat - delta;
-          std::vector<double> gvec(1, -adapt_g);
-          std::vector<double> result;
-          _da.update(gvec, result);
-          epsilon = exp(result[0]);
-        }
-        std::vector<double> result;
-        _da.xbar(result);
-//         fprintf(stderr, "xbar = %f\n", exp(result[0]));
-        double avg_eta = 1.0 / n_steps();
-        update_mean_stat(avg_eta,adapt_stat);
+        double avg_eta = 1.0 / this->n_steps();
+        this->update_mean_stat(avg_eta,adapt_stat);
 
 	return mcmc::sample (params_r, params_i, log_prob);
     }
