@@ -1,12 +1,12 @@
 // Arguments: Doubles, Doubles, Doubles, Doubles
-#include <stan/prob/distributions/univariate/continuous/exp_normal.hpp>
+#include <stan/prob/distributions/univariate/continuous/exp_mod_normal.hpp>
 #include <stan/agrad/special_functions.hpp>
 
 using std::vector;
 using std::numeric_limits;
 using stan::agrad::var;
 
-class AgradDistributionExpNormal : public AgradDistributionTest {
+class AgradDistributionExpModNormal : public AgradDistributionTest {
 public:
   void valid_values(vector<vector<double> >& parameters,
                     vector<double>& log_prob) {
@@ -83,7 +83,7 @@ public:
   typename stan::return_type<T_y, T_loc, T_scale,T_inv_scale>::type 
   log_prob(const T_y& y, const T_loc& mu, const T_scale& sigma,
      const T_inv_scale& lambda, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
-    return stan::prob::exp_normal_log(y, mu, sigma, lambda);
+    return stan::prob::exp_mod_normal_log(y, mu, sigma, lambda);
   }
 
   template <bool propto, 
@@ -94,7 +94,7 @@ public:
   typename stan::return_type<T_y, T_loc, T_scale, T_inv_scale>::type 
   log_prob(const T_y& y, const T_loc& mu, const T_scale& sigma,
      const T_inv_scale& lambda, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
-    return stan::prob::exp_normal_log<propto>(y, mu, sigma, lambda);
+    return stan::prob::exp_mod_normal_log<propto>(y, mu, sigma, lambda);
   }
   
   template <bool propto, 
@@ -106,7 +106,7 @@ public:
   typename stan::return_type<T_y, T_loc, T_scale,T_inv_scale>::type 
   log_prob(const T_y& y, const T_loc& mu, const T_scale& sigma,
      const T_inv_scale& lambda, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
-    return stan::prob::exp_normal_log<propto>(y, mu, sigma, lambda, Policy());
+    return stan::prob::exp_mod_normal_log<propto>(y, mu, sigma, lambda, Policy());
   }
   
   template <typename T_y, typename T_loc, typename T_scale,
