@@ -16,6 +16,9 @@ The to-do list is organized into the following sections:
 1.2.1
 -------------------------------------------
 
+* add model compilation tests for new distros (with rng and cdfs)
+    gumbel, skew_normal, exp_mod_normal
+
 * change lgamma to use boost and not throw something unexpected
   when it overflows
 
@@ -24,13 +27,7 @@ The to-do list is organized into the following sections:
 * change process so that the manual online on the build bot
   has a different version number
 
-* fix vector_d(0) to be vector_d(Eigen::DenseIndex(0))
-  in generator
- 
-* fix zero-size struct inits in RStan
-
-* fix truncated distributions to return 1 rather than 0
-  in degenerate cases  
+* Jiqiang: fix zero-size struct inits in RStan
 
 * fixed handling of invalid degrees of freedom parameter
   for wishart and inv_wishart
