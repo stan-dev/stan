@@ -2,7 +2,7 @@
 #define __STAN__MCMC__ADAPT__UNIT__E__NUTS__BETA__
 
 #include <stan/mcmc/stepsize_adapter.hpp>
-#include <stan/mcmc/unit_e_nuts.hpp>
+#include <stan/mcmc/hmc/nuts/unit_e_nuts.hpp>
 
 namespace stan {
   

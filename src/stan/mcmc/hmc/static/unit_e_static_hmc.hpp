@@ -1,10 +1,10 @@
 #ifndef __STAN__MCMC__UNIT__E__STATIC__HMC__BETA__
 #define __STAN__MCMC__UNIT__E__STATIC__HMC__BETA__
 
-#include <stan/mcmc/base_static_hmc.hpp>
-#include <stan/mcmc/unit_e_point.hpp>
-#include <stan/mcmc/unit_e_metric.hpp>
-#include <stan/mcmc/expl_leapfrog.hpp>
+#include <stan/mcmc/hmc/static/base_static_hmc.hpp>
+#include <stan/mcmc/hmc/hamiltonians/unit_e_point.hpp>
+#include <stan/mcmc/hmc/hamiltonians/unit_e_metric.hpp>
+#include <stan/mcmc/hmc/integrators/expl_leapfrog.hpp>
 
 namespace stan {
 

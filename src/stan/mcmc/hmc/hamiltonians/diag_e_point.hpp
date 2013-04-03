@@ -1,7 +1,7 @@
 #ifndef __STAN__MCMC__DIAG__E__POINT__BETA__
 #define __STAN__MCMC__DIAG__E__POINT__BETA__
 
-#include <stan/mcmc/ps_point.hpp>
+#include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
 
 namespace stan {
   

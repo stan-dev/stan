@@ -2,7 +2,7 @@
 #define __STAN__MCMC__ADAPT__DIAG__E__NUTS__BETA__
 
 #include <stan/mcmc/var_adapter.hpp>
-#include <stan/mcmc/diag_e_nuts.hpp>
+#include <stan/mcmc/hmc/nuts/diag_e_nuts.hpp>
 
 namespace stan {
   

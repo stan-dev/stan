@@ -5,8 +5,8 @@
 
 #include <Eigen/Cholesky>
 
-#include <stan/mcmc/base_hamiltonian.hpp>
-#include <stan/mcmc/dense_e_point.hpp>
+#include <stan/mcmc/hmc/hamiltonians/base_hamiltonian.hpp>
+#include <stan/mcmc/hmc/hamiltonians/dense_e_point.hpp>
 
 namespace stan {
   

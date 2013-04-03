@@ -2,7 +2,7 @@
 #define __STAN__MCMC__ADAPT__DENSE__E__NUTS__BETA__
 
 #include <stan/mcmc/covar_adapter.hpp>
-#include <stan/mcmc/dense_e_nuts.hpp>
+#include <stan/mcmc/hmc/nuts/dense_e_nuts.hpp>
 
 namespace stan {
   

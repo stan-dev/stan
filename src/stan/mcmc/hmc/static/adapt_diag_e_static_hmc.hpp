@@ -2,7 +2,7 @@
 #define __STAN__MCMC__ADAPT__DIAG__E__STATIC__HMC__BETA__
 
 #include <stan/mcmc/var_adapter.hpp>
-#include <stan/mcmc/diag_e_static_hmc.hpp>
+#include <stan/mcmc/hmc/static/diag_e_static_hmc.hpp>
 
 namespace stan {
   

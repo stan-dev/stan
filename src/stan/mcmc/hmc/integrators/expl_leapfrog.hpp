@@ -1,7 +1,7 @@
 #ifndef __STAN__MCMC__EXPL__LEAPFROG__BETA__
 #define __STAN__MCMC__EXPL__LEAPFROG__BETA__
 
-#include <stan/mcmc/base_leapfrog.hpp>
+#include <stan/mcmc/hmc/integrators/base_leapfrog.hpp>
 
 namespace stan {
   

@@ -3,8 +3,8 @@
 
 #include <boost/random/normal_distribution.hpp>
 
-#include <stan/mcmc/base_hamiltonian.hpp>
-#include <stan/mcmc/unit_e_point.hpp>
+#include <stan/mcmc/hmc/hamiltonians/base_hamiltonian.hpp>
+#include <stan/mcmc/hmc/hamiltonians/unit_e_point.hpp>
 
 namespace stan {
   

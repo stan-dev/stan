@@ -2,7 +2,8 @@
 #define __STAN__MCMC__BASE__NUTS__BETA__
 
 #include <stan/math/util.hpp>
-#include <stan/mcmc/base_hmc.hpp>
+#include <stan/mcmc/hmc/base_hmc.hpp>
+#include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
 
 namespace stan {
   

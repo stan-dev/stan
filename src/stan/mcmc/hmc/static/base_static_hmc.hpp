@@ -1,8 +1,8 @@
 #ifndef __STAN__MCMC__BASE__STATIC__HMC__BETA__
 #define __STAN__MCMC__BASE__STATIC__HMC__BETA__
 
-#include <stan/mcmc/ps_point.hpp>
-#include <stan/mcmc/base_hmc.hpp>
+#include <stan/mcmc/hmc/base_hmc.hpp>
+#include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
 
 namespace stan {
   
