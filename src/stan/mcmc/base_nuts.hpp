@@ -17,15 +17,10 @@ namespace stan {
       
       // Aggregators through each recursion
       int n_tree;
-      int n_valid;
-      int n_valid_subtree;
       double sum_prob;
       bool criterion;
-      
-      // Scratch
-      std::vector<ps_point> z_init;
+
     };
-    
     
     // The No-U-Turn Sampler (NUTS).
     
@@ -69,12 +64,12 @@ namespace stan {
         this->_hamiltonian.init(this->_z);
 
         ps_point z_plus(static_cast<ps_point>(this->_z));
-        ps_point z_minus(static_cast<ps_point>(this->_z));
+        ps_point z_minus(z_plus);
 
-        ps_point z_propose(static_cast<ps_point>(this->_z));
+        ps_point z_sample(z_plus);
+        ps_point z_propose(z_plus);
         
         int n_cont = init_sample.cont_params().size();
-        int n_disc = init_sample.disc_params().size();
         
         Eigen::VectorXd rho_plus = Eigen::VectorXd::Zero(n_cont);
         Eigen::VectorXd rho_minus = Eigen::VectorXd::Zero(n_cont);
@@ -86,17 +81,14 @@ namespace stan {
         
         // Build a balanced binary tree until the NUTS criterion fails
         util.n_tree = 0;
-        util.n_valid = 0;
-        util.n_valid_subtree = 0;
         util.sum_prob = 0;
         util.criterion = true;
+        
+        int n_valid = 0;
         
         this->_depth = 0;
         
         while (util.criterion && (this->_depth <= this->_max_depth) ) {
-          
-          ps_point z_init(n_cont, n_disc);
-          util.z_init.push_back(z_init);
           
           // Randomly sample a direction in time
           ps_point& z = z_plus;
@@ -118,35 +110,36 @@ namespace stan {
           // And build a new subtree in that direction 
           this->_z.copy_base(z);
           
-          util.n_valid_subtree = 0;
-          build_tree(_depth, rho, z_propose, 0, util);
+          int n_valid_subtree = build_tree(_depth, rho, z_propose, util);
           
           z = static_cast<ps_point>(this->_z);
+
+          // Metropolis-Hastings sample the fresh subtree
+          double subtree_prob = static_cast<double>(n_valid_subtree) /
+                                static_cast<double>(n_valid_subtree + n_valid);
           
-          if (!util.criterion) break;
+          if (this->_rand_uniform() < subtree_prob)
+            z_sample = z_propose;
           
+          n_valid += n_valid_subtree;
+          
+          // Check validity of completed tree
           this->_z.copy_base(z_plus);
-          
           Eigen::VectorXd delta_rho = rho_plus - rho_minus;
+          
           util.criterion = _compute_criterion(z_minus, this->_z, delta_rho);
           
-          // Metropolis-Hastings sample the fresh subtree
-          if(util.n_valid)
-          {
-            if (this->_rand_uniform() < float(util.n_valid_subtree) / float(util.n_valid)) 
-              this->_z.copy_base(z_propose);
-          }
-          else this->_z.copy_base(z_propose);
-          
-          util.n_valid += util.n_valid_subtree;
-          
-          ++this->_depth;
+          ++(this->_depth);
           
         }
-                                
-        double acceptProb = util.sum_prob / static_cast<double>(util.n_tree);
         
-        return sample(this->_z.q, this->_z.r, - this->_hamiltonian.V(this->_z), acceptProb);
+        --(this->_depth); // Correct for increment at end of loop
+                          
+        this->_z.copy_base(z_sample);
+        
+        double accept_prob = util.sum_prob / static_cast<double>(util.n_tree);
+        
+        return sample(this->_z.q, this->_z.r, - this->_hamiltonian.V(this->_z), accept_prob);
                                 
       }
       
@@ -175,8 +168,9 @@ namespace stan {
       
       virtual bool _compute_criterion(ps_point& start, P& finish, Eigen::VectorXd& rho) = 0;
       
-      void build_tree(int depth, Eigen::VectorXd& rho, 
-                      ps_point& z_propose, int n_valid_step, nuts_util& util)
+      // Returns number of valid points in the completed subtree
+      int build_tree(int depth, Eigen::VectorXd& rho, 
+                      ps_point& z_propose, nuts_util& util)
       {
         
         // Base case
@@ -192,44 +186,37 @@ namespace stan {
           double h = this->_hamiltonian.H(this->_z); 
           if(h != h) h = std::numeric_limits<double>::infinity();
           
-          util.criterion = util.log_u + h > this->_max_delta;
-          
+          util.criterion = util.log_u + h < this->_max_delta;
+
           util.sum_prob += stan::math::min(1, exp(util.H0 - h));
           util.n_tree += 1;
           
-          n_valid_step = (h < - util.log_u);
-          util.n_valid_subtree += n_valid_step;
+          return (h < - util.log_u);
           
         } 
         // General recursion
         else 
         {
           
-          // Note that the output value of n_valid_step_local
-          // isn't used in the first tree expansion
-          int n_valid_step_local;
+          ps_point z_init(static_cast<ps_point>(this->_z));
           
-          build_tree(depth - 1, rho, z_propose, n_valid_step_local, util);
+          int n1 = build_tree(depth - 1, rho, z_propose, util);
           
-          if(depth == 1) util.z_init.at(depth) = static_cast<ps_point>(this->_z);
-          else           util.z_init.at(depth) = util.z_init.at(depth - 1);
+          if(!util.criterion) return 0;
           
-          if (util.criterion) 
-          {
-            
-            util.n_valid_subtree = 0;
-            
-            build_tree(depth - 1, rho, z_propose, n_valid_step_local, util);
-            
-            if (util.criterion && 
-                (this->_rand_uniform() < static_cast<double>(n_valid_step_local) / 
-                                         static_cast<double>(util.n_valid_subtree))
-                ) 
-              z_propose = static_cast<ps_point>(this->_z);
-            
-          }
+          ps_point z2(z_init);
           
-          util.criterion &= _compute_criterion(util.z_init.at(depth), this->_z, rho);
+          int n2 = build_tree(depth - 1, rho, z2, util);
+          
+          double accept_prob = static_cast<double>(n1) / 
+                               static_cast<double>(n1 + n2);
+          
+          if ( util.criterion && (this->_rand_uniform() < accept_prob) ) 
+            z_propose = z2;
+          
+          util.criterion &= _compute_criterion(z_init, this->_z, rho);
+          
+          return n1 + n2;
           
         }
         
