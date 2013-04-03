@@ -254,5 +254,19 @@ y1star <- constrain_pars(fit, uy)
 
 print(y1)
 print(y1star) # y1start should equal to y1 
-}}
+}
+
+
+# cache of a saved stanfit object 
+# the Stan code for this model is in the example of function stan
+exfit <- rstan:::exfit  
+print(exfit)
+plot(exfit)
+
+adaptinfo <- get_adaptation_info(exfit)
+seed <- get_seed(exfit)
+sp <- get_sampler_params(exfit)
+
+
+}
 \keyword{classes}
