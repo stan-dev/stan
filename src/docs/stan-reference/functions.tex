@@ -1825,28 +1825,24 @@ If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in
   given location \farg{mu} and scale \farg{sigma}}
 \end{description}
 
-\subsection{Exponential Normal Distribution}
+\subsection{Exponentially Modified Normal Distribution}
 
 if $\mu \in \reals$, $\sigma \in \posreals$, and $\lambda \in \posreals$, then for $y \in \reals$,
 \[
-\distro{ExpNormal}(y|\mu,\sigma,\lambda)
+\distro{ExpModNormal}(y|\mu,\sigma,\lambda)
 =
 \frac{\lambda}{\sqrt{\pi}}
 \
-\exp \left(\frac{\lambda}{2} \left(2\mu + \lambda \sigma^2 - 2y\right)\right)
-\
-\int_{\left(\frac{\mu + \lambda\sigma^2 - y}{\sqrt{2}\sigma}\right)}^\infty
-\exp\left(-t^2\right)dt
+\exp \left(\frac{\lambda}{2} \left(2\mu + \lambda \sigma^2 - 2y\right)\right) \erfc\left(\frac{\mu + \lambda\sigma^2 - y}{\sqrt{2}\sigma}\right)
 .
 \]
 
 \begin{description}
-  \fitem{real}{exp\_normal\_log}{reals \farg{y}, reals \farg{mu}, reals
-    \farg{sigma}, reals \farg{lambda}}{The log of the exponential normal density of \farg{y} given location \farg{mu}, scale \farg{sigma}, and shape \farg{lambda}}
+  \fitem{real}{exp\_mod\_normal\_log}{reals \farg{y}, \\ reals \farg{mu}, reals
+    \farg{sigma}, \newline reals \farg{lambda}}{The log of the exponentially modified normal density of \farg{y} given location \farg{mu}, scale \farg{sigma}, and shape \farg{lambda}}
 %
-\fitem{real}{exp\_normal\_cdf}{reals \farg{y}, reals \farg{mu}, reals
-  \farg{sigma}, reals \farg{lambda}}{The cumulative skew normal distribution of \farg{y}
-  given location \farg{mu}, scale \farg{sigma}, and shape \farg{lambda}}
+\fitem{real}{exp\_mod\_normal\_cdf}{reals \farg{y}, reals \farg{mu}, reals
+  \farg{sigma}, reals \farg{lambda}}{The cumulative exponentially modified normal distribution of \farg{y} given location \farg{mu}, scale \farg{sigma}, and shape \farg{lambda}}
 \end{description}
 
 \subsection{Skew Normal Distribution}
@@ -1855,14 +1851,13 @@ if $\mu \in \reals$, $\sigma \in \posreals$, and $\alpha \in \reals$, then for $
 \[
 \distro{SkewNormal}(y|\mu,\sigma,\alpha)
 =
-\frac{1}{\sigma \pi}
+\frac{1}{\sigma\sqrt{2\pi}}
 \
 \exp\left( - \, \frac{1}{2}
            \left(  \frac{y - \mu}{\sigma} \right)^2
     \right)
 \
-\int_{-\infty}^{\alpha \left( \frac{y - \mu}{\sigma}\right)}
-\exp \left(-\frac{t^2}{2}\right)dt
+\left(1 + \erf\left( \alpha\left(\frac{y - \mu}{\sigma\sqrt{2}}\right)\right)\right)
 .
 \]
 
@@ -1988,10 +1983,10 @@ if $\mu \in \reals$ and $\beta \in \posreals$, then for $y \in \reals$,
 
 \begin{description}
   \fitem{real}{gumbel\_log}{reals \farg{y}, reals \farg{mu}, reals
-    \farg{beta}}{The log of the exponential normal density of \farg{y} given location \farg{mu} and scale \farg{beta}}
+    \farg{beta}}{The log of the gumbel density of \farg{y} given location \farg{mu} and scale \farg{beta}}
 %
 \fitem{real}{gumbel\_cdf}{reals \farg{y}, reals \farg{mu}, reals
-  \farg{beta}}{The cumulative skew normal distribution of \farg{y}
+  \farg{beta}}{The cumulative gumbel distribution of \farg{y}
   given location \farg{mu} and scale \farg{beta}}
 \end{description}
 
