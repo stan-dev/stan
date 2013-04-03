@@ -1866,6 +1866,11 @@ If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in
   \farg{sigma}}{The cumulative normal distribution of \farg{y}
   given location \farg{mu} and scale \farg{sigma}}
 \end{description}
+%
+\begin{description}
+\fitem{real}{normal\_rng}{real \farg{mu}, real \farg{sigma}}{Generate a
+  normal variate with location \farg{mu} and scale \farg{sigma}; may only be used in generated quantities block}
+\end{description}
 
 \subsection{Exponentially Modified Normal Distribution}
 
@@ -1881,10 +1886,15 @@ if $\mu \in \reals$, $\sigma \in \posreals$, and $\lambda \in \posreals$, then f
 
 \begin{description}
   \fitem{real}{exp\_mod\_normal\_log}{reals \farg{y}, \\ reals \farg{mu}, reals
-    \farg{sigma}, \newline reals \farg{lambda}}{The log of the exponentially modified normal density of \farg{y} given location \farg{mu}, scale \farg{sigma}, and shape \farg{lambda}}
+    \farg{sigma}, reals \farg{lambda}}{The log of the exponentially modified normal density of \farg{y} given location \farg{mu}, scale \farg{sigma}, and shape \farg{lambda}}
 %
 \fitem{real}{exp\_mod\_normal\_cdf}{reals \farg{y}, reals \farg{mu}, reals
   \farg{sigma}, reals \farg{lambda}}{The cumulative exponentially modified normal distribution of \farg{y} given location \farg{mu}, scale \farg{sigma}, and shape \farg{lambda}}
+\end{description}
+%
+\begin{description}
+\fitem{real}{exp\_mod\_normal\_rng}{real \farg{mu}, real \farg{sigma},
+real \farg{lambda}}{Generate an exponentially modified normal variate with location \farg{mu}, scale \farg{sigma}, and shape \farg{lambda}; may only be used in generated quantities block}
 \end{description}
 
 \subsection{Skew Normal Distribution}
@@ -1911,6 +1921,11 @@ if $\mu \in \reals$, $\sigma \in \posreals$, and $\alpha \in \reals$, then for $
 \fitem{real}{skew\_normal\_cdf}{reals \farg{y}, reals \farg{mu}, reals
   \farg{sigma}, reals \farg{alpha}}{The cumulative skew normal distribution of \farg{y}
   given location \farg{mu}, scale \farg{sigma}, and shape \farg{alpha}}
+\end{description}
+%
+\begin{description}
+\fitem{real}{skew\_normal\_rng}{real \farg{mu}, real \farg{sigma},
+real \farg{alpha}}{Generate a skew normal variate with location \farg{mu}, scale \farg{sigma}, and shape \farg{alpha}; may only be used in generated quantities block}
 \end{description}
 
 \subsection{Student-$t$ Distribution}
