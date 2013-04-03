@@ -60,11 +60,6 @@ namespace stan {
                         "default = samples.csv");
       
       print_help_option(&std::cout,
-                        "diagnostic", "file",
-                        "File into which debug output is written",
-                        "default = diagnostic.csv");
-      
-      print_help_option(&std::cout,
                         "append_samples", "",
                         "Append samples to existing file if it exists",
                         "does not write header in append mode");
@@ -218,8 +213,8 @@ namespace stan {
       model.write_csv(base_rng, cont, disc, 
                       sample_file_stream, &std::cout);
       
-      sampler.z().write(debug_file_stream);
-      debug_file_stream << std::endl;
+      //sampler.z().write(debug_file_stream);
+      //debug_file_stream << std::endl;
       
       
     }
@@ -730,117 +725,215 @@ namespace stan {
       write_comment_property(sample_stream, "gamma", gamma);
       write_comment(sample_stream);
       
-      /*
-      // Unit Metric HMC with Static Integration Time
-      stan::mcmc::sample s(cont_params, disc_params, 0, 0);
+      double warmDeltaT;
+      double sampleDeltaT;
       
-      typedef stan::mcmc::adapt_unit_e_static_hmc<Model, rng_t> a_um_hmc;
-      a_um_hmc sampler(model, base_rng);
-      
-      if (!append_samples) {
-        sample_stream << "lp__,";
-        sampler.write_sampler_param_names(sample_stream);
-        model.write_csv_header(sample_stream);
-        
-        sampler.z().write_header(diagnostic_stream);
-        sampler.z().write_names(diagnostic_stream);
-        diagnostic_stream << std::endl;
-        
-      }
-      
-      // Warm-Up
-      epsilon = 0.1;
-      sampler.set_stepsize_and_T(epsilon, 31.4159);
-            
-      sampler.set_adapt_mu(10 * epsilon);
-      sampler.engage_adaptation();
-      
-      clock_t start = clock();
-      
-      warmup<a_um_hmc, Model, rng_t>(sampler, num_warmup, num_thin, 
-                                     refresh, save_warmup, 
-                                     sample_stream, diagnostic_stream,
-                                     s, model, base_rng); 
-      
-      clock_t end = clock();
-      double warmDeltaT = (double)(end - start) / CLOCKS_PER_SEC;
-      
-      sampler.disengage_adaptation();
-      //sampler.write_sampler_params(sample_stream);
-      
-      // Sampling
-      start = clock();
-      
-      sample<a_um_hmc, Model, rng_t>(sampler, num_iterations - num_warmup, num_thin, 
-                                     refresh, true, 
-                                     sample_stream, diagnostic_stream, 
-                                     s, model, base_rng); 
-      
+      if (nondiag_mass) {
 
-      end = clock();
-      double sampleDeltaT = (double)(end - start) / CLOCKS_PER_SEC;
-      
-      std::cout << std::endl
-                << "Elapsed Time: " << warmDeltaT 
-                << " seconds (Warm Up)"  << std::endl
-                << "              " << sampleDeltaT 
-                << " seconds (Sampling)"  << std::endl
-                << "              " << warmDeltaT + sampleDeltaT 
-                << " seconds (Total)"  << std::endl
-                << std::endl << std::endl;
-      
-      sample_stream.close();
-      */
-      
-      // Euclidean NUTS with Unit Metric
-      stan::mcmc::sample s(cont_params, disc_params, 0, 0);
-      
-      typedef stan::mcmc::adapt_unit_e_nuts<Model, rng_t> a_um_nuts;
-      a_um_nuts sampler(model, base_rng);
-      
-      if (!append_samples) {
-        sample_stream << "lp__,";
-        sampler.write_sampler_param_names(sample_stream);
-        model.write_csv_header(sample_stream);
+        // Euclidean NUTS with Dense Metric
+        stan::mcmc::sample s(cont_params, disc_params, 0, 0);
         
-        sampler.z().write_header(diagnostic_stream);
-        sampler.z().write_names(diagnostic_stream);
-        diagnostic_stream << std::endl;
+        typedef stan::mcmc::adapt_dense_e_nuts<Model, rng_t> a_Dm_nuts;
+        a_Dm_nuts sampler(model, base_rng);
+        
+        if (!append_samples) {
+          sample_stream << "lp__,";
+          sampler.write_sampler_param_names(sample_stream);
+          model.write_csv_header(sample_stream);
+          
+          //sampler.z().write_header(diagnostic_stream);
+          //sampler.z().write_names(diagnostic_stream);
+          //diagnostic_stream << std::endl;
+          
+        }
+        
+        // Warm-Up
+        epsilon = 0.1;
+        sampler.set_stepsize(epsilon);
+        sampler.set_max_depth(max_treedepth);
+        
+        sampler.set_adapt_mu(10 * epsilon);
+        sampler.engage_adaptation();
+        
+        clock_t start = clock();
+        
+        warmup<a_Dm_nuts, Model, rng_t>(sampler, num_warmup, num_thin, 
+                                        refresh, save_warmup, 
+                                        sample_stream, diagnostic_stream,
+                                        s, model, base_rng); 
+        
+        clock_t end = clock();
+        warmDeltaT = (double)(end - start) / CLOCKS_PER_SEC;
+        
+        sampler.disengage_adaptation();
+        //sampler.write_sampler_params(sample_stream);
+        
+        // Sampling
+        start = clock();
+        
+        sample<a_Dm_nuts, Model, rng_t>(sampler, num_iterations - num_warmup, num_thin, 
+                                        refresh, true, 
+                                        sample_stream, diagnostic_stream, 
+                                        s, model, base_rng); 
+        
+        end = clock();
+        sampleDeltaT = (double)(end - start) / CLOCKS_PER_SEC;
         
       }
-      
-      // Warm-Up
-      epsilon = 0.1;
-      sampler.set_stepsize(epsilon);
-      sampler.set_max_depth(max_treedepth);
-      
-      sampler.set_adapt_mu(10 * epsilon);
-      sampler.engage_adaptation();
-      
-      clock_t start = clock();
-      
-      warmup<a_um_nuts, Model, rng_t>(sampler, num_warmup, num_thin, 
-                                     refresh, save_warmup, 
-                                     sample_stream, diagnostic_stream,
-                                     s, model, base_rng); 
-      
-      clock_t end = clock();
-      double warmDeltaT = (double)(end - start) / CLOCKS_PER_SEC;
-      
-      sampler.disengage_adaptation();
-      //sampler.write_sampler_params(sample_stream);
-      
-      // Sampling
-      start = clock();
-      
-      sample<a_um_nuts, Model, rng_t>(sampler, num_iterations - num_warmup, num_thin, 
-                                     refresh, true, 
-                                     sample_stream, diagnostic_stream, 
-                                     s, model, base_rng); 
-      
-      
-      end = clock();
-      double sampleDeltaT = (double)(end - start) / CLOCKS_PER_SEC;
+      else if (leapfrog_steps < 0 && !equal_step_sizes) {
+        
+        // Euclidean NUTS with Diagonal Metric
+        stan::mcmc::sample s(cont_params, disc_params, 0, 0);
+        
+        typedef stan::mcmc::adapt_diag_e_nuts<Model, rng_t> a_dm_nuts;
+        a_dm_nuts sampler(model, base_rng);
+        
+        if (!append_samples) {
+          sample_stream << "lp__,";
+          sampler.write_sampler_param_names(sample_stream);
+          model.write_csv_header(sample_stream);
+          
+          //sampler.z().write_header(diagnostic_stream);
+          //sampler.z().write_names(diagnostic_stream);
+          //diagnostic_stream << std::endl;
+          
+        }
+        
+        // Warm-Up
+        epsilon = 0.1;
+        sampler.set_stepsize(epsilon);
+        sampler.set_max_depth(max_treedepth);
+        
+        sampler.set_adapt_mu(10 * epsilon);
+        sampler.engage_adaptation();
+        
+        clock_t start = clock();
+        
+        warmup<a_dm_nuts, Model, rng_t>(sampler, num_warmup, num_thin, 
+                                        refresh, save_warmup, 
+                                        sample_stream, diagnostic_stream,
+                                        s, model, base_rng); 
+        
+        clock_t end = clock();
+        warmDeltaT = (double)(end - start) / CLOCKS_PER_SEC;
+        
+        sampler.disengage_adaptation();
+        //sampler.write_sampler_params(sample_stream);
+        
+        // Sampling
+        start = clock();
+        
+        sample<a_dm_nuts, Model, rng_t>(sampler, num_iterations - num_warmup, num_thin, 
+                                        refresh, true, 
+                                        sample_stream, diagnostic_stream, 
+                                        s, model, base_rng);
+        
+        end = clock();
+        sampleDeltaT = (double)(end - start) / CLOCKS_PER_SEC;
+
+        
+      } else if (leapfrog_steps < 0 && equal_step_sizes) {
+        
+        // Euclidean NUTS with Unit Metric
+        stan::mcmc::sample s(cont_params, disc_params, 0, 0);
+        
+        typedef stan::mcmc::adapt_unit_e_nuts<Model, rng_t> a_um_nuts;
+        a_um_nuts sampler(model, base_rng);
+        
+        if (!append_samples) {
+          sample_stream << "lp__,";
+          sampler.write_sampler_param_names(sample_stream);
+          model.write_csv_header(sample_stream);
+          
+          sampler.z().write_header(diagnostic_stream);
+          sampler.z().write_names(diagnostic_stream);
+          diagnostic_stream << std::endl;
+          
+        }
+        
+        // Warm-Up
+        epsilon = 0.1;
+        sampler.set_stepsize(epsilon);
+        sampler.set_max_depth(max_treedepth);
+        
+        sampler.set_adapt_mu(10 * epsilon);
+        sampler.engage_adaptation();
+        
+        clock_t start = clock();
+        
+        warmup<a_um_nuts, Model, rng_t>(sampler, num_warmup, num_thin, 
+                                        refresh, save_warmup, 
+                                        sample_stream, diagnostic_stream,
+                                        s, model, base_rng); 
+        
+        clock_t end = clock();
+        warmDeltaT = (double)(end - start) / CLOCKS_PER_SEC;
+        
+        sampler.disengage_adaptation();
+        //sampler.write_sampler_params(sample_stream);
+        
+        // Sampling
+        start = clock();
+        
+        sample<a_um_nuts, Model, rng_t>(sampler, num_iterations - num_warmup, num_thin, 
+                                        refresh, true, 
+                                        sample_stream, diagnostic_stream, 
+                                        s, model, base_rng); 
+        
+        end = clock();
+        sampleDeltaT = (double)(end - start) / CLOCKS_PER_SEC;
+        
+      } else {
+        
+        // Unit Metric HMC with Static Integration Time
+        stan::mcmc::sample s(cont_params, disc_params, 0, 0);
+        
+        typedef stan::mcmc::adapt_unit_e_static_hmc<Model, rng_t> a_um_hmc;
+        a_um_hmc sampler(model, base_rng);
+        
+        if (!append_samples) {
+          sample_stream << "lp__,";
+          sampler.write_sampler_param_names(sample_stream);
+          model.write_csv_header(sample_stream);
+          
+          //sampler.z().write_header(diagnostic_stream);
+          //sampler.z().write_names(diagnostic_stream);
+          //diagnostic_stream << std::endl;
+          
+        }
+        
+        // Warm-Up
+        epsilon = 0.1;
+        sampler.set_stepsize_and_L(epsilon, leapfrog_steps);
+        
+        sampler.set_adapt_mu(10 * epsilon);
+        sampler.engage_adaptation();
+        
+        clock_t start = clock();
+        
+        warmup<a_um_hmc, Model, rng_t>(sampler, num_warmup, num_thin, 
+                                       refresh, save_warmup, 
+                                       sample_stream, diagnostic_stream,
+                                       s, model, base_rng); 
+        
+        clock_t end = clock();
+        warmDeltaT = (double)(end - start) / CLOCKS_PER_SEC;
+        
+        sampler.disengage_adaptation();
+        //sampler.write_sampler_params(sample_stream);
+        
+        // Sampling
+        start = clock();
+        
+        sample<a_um_hmc, Model, rng_t>(sampler, num_iterations - num_warmup, num_thin, 
+                                       refresh, true, 
+                                       sample_stream, diagnostic_stream, 
+                                       s, model, base_rng); 
+        
+        end = clock();
+        sampleDeltaT = (double)(end - start) / CLOCKS_PER_SEC;
+
+      }
       
       std::cout << std::endl
                 << "Elapsed Time: " << warmDeltaT 
