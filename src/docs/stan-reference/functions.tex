@@ -1501,7 +1501,13 @@ Suppose $N \in \nats$ and $\theta \in [0,1]$, and $n \in
   \fitem{real}{binomial\_cdf}{ints \farg{n}, ints \farg{N}, reals
     \farg{theta}}{The binomial cumulative distribution function of \farg{n}
     successes in \farg{N} trials given chance of success \farg{theta}}
-
+%
+\end{description}
+%
+\begin{description}
+\fitem{int}{binomial\_rng}{ints \farg{N}, reals \farg{theta}}{Generate a binomial
+  variate with \farg{N} trials and chance of success \farg{theta}; may only be used in
+  generated quantities block}
 \end{description}
 
 
@@ -1586,7 +1592,12 @@ where the beta function $\Betafun(x,y)$ is defined for $x \in
   (plus one) of \farg{alpha} and prior failure count (plus one) of
   \farg{beta}}
 \end{description}
-
+%
+\begin{description}
+\fitem{int}{beta\_binomial\_rng}{ints \farg{N}, reals \farg{alpha}, reals \farg{beta}}{Generate a beta-binomial variate with \farg{N} trials, prior success count
+  (plus one) of \farg{alpha}, and prior failure count (plus one) of; may only be used in
+  generated quantities block}
+\end{description}
 
 \subsection{Hypergeometric Distribution}
 
@@ -1607,6 +1618,12 @@ then for $n \in \setlist{\max(0,N-b),\ldots,\min(a,N)}$,
     \farg{a} and total failure count of \farg{b}}
 
 %
+\end{description}
+%
+\begin{description}
+\fitem{int}{hypergeometric\_rng}{ints \farg{N}, reals \farg{a}, reals \farg{b}}{Generate a hypergeometric variate with \farg{N} trials, total success count of
+    \farg{a}, and total failure count of \farg{b}; may only be used in
+  generated quantities block}
 \end{description}
 
 \subsection{Categorical Distribution}
