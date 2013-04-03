@@ -1,6 +1,5 @@
 // Arguments: Doubles, Doubles, Doubles, Doubles
 #include <stan/prob/distributions/univariate/continuous/skew_normal.hpp>
-#include <stan/agrad/special_functions.hpp>
 
 using std::vector;
 using std::numeric_limits;
@@ -120,7 +119,7 @@ public:
     if (include_summand<true,T_y, T_loc, T_scale>::value)
       logp -= (y - mu) / sigma * (y - mu) / sigma * 0.5;
     if (include_summand<true,T_y,T_loc,T_scale,T_shape>::value)
-      logp += log(stan::agrad::erfc(-alpha * (y - mu) / (sigma * std::sqrt(2.0))));
+      logp += log(erfc(-alpha * (y - mu) / (sigma * std::sqrt(2.0))));
     return logp;
   }
 };

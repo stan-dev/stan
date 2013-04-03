@@ -1,6 +1,5 @@
 // Arguments: Doubles, Doubles, Doubles, Doubles
 #include <stan/prob/distributions/univariate/continuous/skew_normal.hpp>
-#include <stan/math/special_functions.hpp>
 
 using std::vector;
 using std::numeric_limits;
