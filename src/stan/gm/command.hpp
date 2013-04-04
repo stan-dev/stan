@@ -140,10 +140,6 @@ namespace stan {
                         "Fit point estimate of hidden parameters by maximizing log joint probability using Nesterov's accelerated gradient method");
       
       print_help_option(&std::cout,
-                        "point_estimate_newton", "",
-                        "Fit point estimate of hidden parameters by maximizing log joint probability using Newton's method");
-      
-      print_help_option(&std::cout,
                         "nondiag_mass", "",
                         "Use a nondiagonal matrix to do the sampling");
       
@@ -344,7 +340,7 @@ namespace stan {
       
       bool equal_step_sizes = command.has_flag("equal_step_sizes");
       
-      double delta = 0.651;
+      double delta = 0.5;
       command.val("delta", delta);
       
       double gamma = 0.05;
@@ -746,11 +742,11 @@ namespace stan {
         }
         
         // Warm-Up
-        epsilon = 0.1;
-        sampler.set_stepsize(epsilon);
+        sampler.init_stepsize();
+        
         sampler.set_max_depth(max_treedepth);
         
-        sampler.set_adapt_mu(10 * epsilon);
+        sampler.set_adapt_mu(log(10 * sampler.get_stepsize()));
         sampler.engage_adaptation();
         
         clock_t start = clock();
@@ -764,7 +760,10 @@ namespace stan {
         warmDeltaT = (double)(end - start) / CLOCKS_PER_SEC;
         
         sampler.disengage_adaptation();
-        //sampler.write_sampler_params(sample_stream);
+
+        sample_stream << "# (" << sampler.name() << ") adaptation finished" << std::endl;
+        sample_stream << "# step size= " << sampler.get_stepsize() << std::endl;
+        sampler.z().write_metric(sample_stream);
         
         // Sampling
         start = clock();
@@ -798,11 +797,11 @@ namespace stan {
         }
         
         // Warm-Up
-        epsilon = 0.1;
-        sampler.set_stepsize(epsilon);
+        sampler.init_stepsize();
+        
         sampler.set_max_depth(max_treedepth);
         
-        sampler.set_adapt_mu(10 * epsilon);
+        sampler.set_adapt_mu(log(10 * sampler.get_stepsize()));
         sampler.engage_adaptation();
         
         clock_t start = clock();
@@ -816,7 +815,10 @@ namespace stan {
         warmDeltaT = (double)(end - start) / CLOCKS_PER_SEC;
         
         sampler.disengage_adaptation();
-        //sampler.write_sampler_params(sample_stream);
+        
+        sample_stream << "# (" << sampler.name() << ") adaptation finished" << std::endl;
+        sample_stream << "# step size= " << sampler.get_stepsize() << std::endl;
+        sampler.z().write_metric(sample_stream);
         
         // Sampling
         start = clock();
@@ -850,11 +852,11 @@ namespace stan {
         }
         
         // Warm-Up
-        epsilon = 0.1;
-        sampler.set_stepsize(epsilon);
+        sampler.init_stepsize();
+        
         sampler.set_max_depth(max_treedepth);
         
-        sampler.set_adapt_mu(10 * epsilon);
+        sampler.set_adapt_mu(log(10 * sampler.get_stepsize()));
         sampler.engage_adaptation();
         
         clock_t start = clock();
@@ -868,7 +870,10 @@ namespace stan {
         warmDeltaT = (double)(end - start) / CLOCKS_PER_SEC;
         
         sampler.disengage_adaptation();
-        //sampler.write_sampler_params(sample_stream);
+
+        sample_stream << "# (" << sampler.name() << ") adaptation finished" << std::endl;
+        sample_stream << "# step size= " << sampler.get_stepsize() << std::endl;
+        sampler.z().write_metric(sample_stream);
         
         // Sampling
         start = clock();
@@ -901,10 +906,11 @@ namespace stan {
         }
         
         // Warm-Up
-        epsilon = 0.1;
+        sampler.init_stepsize();
+ 
         sampler.set_stepsize_and_L(epsilon, leapfrog_steps);
         
-        sampler.set_adapt_mu(10 * epsilon);
+        sampler.set_adapt_mu(log(10 * sampler.get_stepsize()));
         sampler.engage_adaptation();
         
         clock_t start = clock();
@@ -918,7 +924,10 @@ namespace stan {
         warmDeltaT = (double)(end - start) / CLOCKS_PER_SEC;
         
         sampler.disengage_adaptation();
-        //sampler.write_sampler_params(sample_stream);
+
+        sample_stream << "# (" << sampler.name() << ") adaptation finished" << std::endl;
+        sample_stream << "# step size= " << sampler.get_stepsize() << std::endl;
+        sampler.z().write_metric(sample_stream);
         
         // Sampling
         start = clock();
