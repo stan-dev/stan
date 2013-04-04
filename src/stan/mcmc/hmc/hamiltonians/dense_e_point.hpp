@@ -19,6 +19,17 @@ namespace stan {
       
       Eigen::MatrixXd mInv;
       
+      void write_metric(std::ostream& o) {
+        //o << "# Inverse mass matrix elements:" << std::endl;
+        o << "# parameter step size multipliers:" << std::endl;
+        for(size_t i = 0; i < mInv.size(); ++i) {
+          o << "# " << std::flush;
+          for(size_t j = 0; j < mInv.size(); ++j)
+            o << mInv(i, j) << "," << std::flush;
+          o << std::endl;
+        }
+      };
+      
     };
     
   } // mcmc

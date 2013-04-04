@@ -58,6 +58,8 @@ namespace stan {
         o << std::flush;
       }
       
+      virtual void write_metric(std::ostream& o) {};
+      
     };
 
   } // mcmc
