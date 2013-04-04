@@ -11,8 +11,8 @@ namespace stan {
       
     public:
       
-      covar_adapter(int n): _sum_x(Eigen::VectorXd::Zero(n)),
-                            _sum_xxt(Eigen::MatrixXd::Zero(n, n)) 
+      covar_adapter(int n): _adapt_m(Eigen::VectorXd::Zero(n)),
+                            _adapt_m2(Eigen::MatrixXd::Zero(n, n)) 
         { init(); }
       
       void init() {
@@ -20,11 +20,11 @@ namespace stan {
         stepsize_adapter::init();
         
         _adapt_covar_counter = 0;
-        _adapt_covar_next = 1;
+        _adapt_covar_next = 10;
         
-        _sum_n = 0;
-        _sum_x.setZero();
-        _sum_xxt.setZero();
+        _adapt_n = 0;
+        _adapt_m.setZero();
+        _adapt_m2.setZero();
         
       }
       
@@ -33,9 +33,9 @@ namespace stan {
       double _adapt_covar_counter;
       double _adapt_covar_next;
       
-      double _sum_n;
-      Eigen::VectorXd _sum_x;
-      Eigen::MatrixXd _sum_xxt;
+      double _adapt_n;
+      Eigen::VectorXd _adapt_m;
+      Eigen::MatrixXd _adapt_m2;
       
       void _learn_covariance(Eigen::MatrixXd& covar, std::vector<double>& q) {
         
@@ -43,33 +43,28 @@ namespace stan {
         
         Eigen::Map<Eigen::VectorXd> x(&q[0], q.size());
         
-        ++_sum_n;
-        _sum_x += x;
-        _sum_xxt += x * x.transpose();
+        // Welford algorithm for online covariance estimate
+        ++_adapt_n;
+        
+        Eigen::VectorXd delta(x - _adapt_m);
+        _adapt_m  += delta / _adapt_n;
+        _adapt_m2 += (x - _adapt_m) * delta.transpose();
         
         if (_adapt_covar_counter == _adapt_covar_next) {
           
           _adapt_covar_next *= 2;
           
-          _sum_x /= _sum_n;
-          _sum_xxt /= _sum_n;
+          covar = _adapt_m2 / (_adapt_n - 1.0);
+
+          covar = (_adapt_n / (_adapt_n + 5.0)) * covar
+                  + (5.0 / (_adapt_n + 5.0)) * Eigen::MatrixXd::Identity(covar.rows(), covar.cols());
           
-          covar = _sum_xxt - _sum_x * _sum_x.transpose();
-          
-          const double norm = covar.trace() / covar.rows();
-          if(norm) {
-            
-            covar *= _sum_n / (norm * (_sum_n + 5)) ;
-            for (size_t i = 0; i < covar.rows(); i++)
-              covar(i, i) =  ( (_sum_n + 2) / _sum_n ) * covar(i, i) + ( 3.0 / (_sum_n + 5) );
-            
-          }
-          else
-            covar = Eigen::MatrixXd::Identity(covar.rows(), covar.cols());
-          
-          _sum_n = 0;
-          _sum_x.setZero();
-          _sum_xxt.setZero();
+          // Enforce scale-free covariance
+          covar *= covar.rows() / covar.trace();
+                     
+          _adapt_n = 0;
+          _adapt_m.setZero();
+          _adapt_m2.setZero();
           
         }
         

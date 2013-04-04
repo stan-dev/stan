@@ -11,8 +11,8 @@ namespace stan {
       
     public:
       
-      var_adapter(int n): _sum_x(Eigen::VectorXd::Zero(n)),
-                          _sum_x2(Eigen::VectorXd::Zero(n)) 
+      var_adapter(int n): _adapt_m(Eigen::VectorXd::Zero(n)),
+                          _adapt_m2(Eigen::VectorXd::Zero(n)) 
       { init(); }
       
       void init() {
@@ -20,11 +20,11 @@ namespace stan {
         stepsize_adapter::init();
         
         _adapt_var_counter = 0;
-        _adapt_var_next = 1;
+        _adapt_var_next = 10;
         
-        _sum_n = 0;
-        _sum_x.setZero();
-        _sum_x2.setZero();
+        _adapt_n = 0;
+        _adapt_m.setZero();
+        _adapt_m2.setZero();
         
       }
       
@@ -33,9 +33,9 @@ namespace stan {
       double _adapt_var_counter;
       double _adapt_var_next;
       
-      double _sum_n;
-      Eigen::VectorXd _sum_x;
-      Eigen::VectorXd _sum_x2;
+      double _adapt_n;
+      Eigen::VectorXd _adapt_m;
+      Eigen::VectorXd _adapt_m2;
       
       void _learn_variance(Eigen::VectorXd& var, std::vector<double>& q) {
         
@@ -43,32 +43,31 @@ namespace stan {
         
         Eigen::Map<Eigen::VectorXd> x(&q[0], q.size());
         
-        ++_sum_n;
-        _sum_x += x;
-        _sum_x2 += x.cwiseAbs2();
+        // Welford algorithm for online variance estimate
+        ++_adapt_n;
+        
+        Eigen::VectorXd delta(x - _adapt_m);
+        _adapt_m  += delta / _adapt_n;
+        _adapt_m2 += delta.cwiseProduct(x - _adapt_m);
         
         if (_adapt_var_counter == _adapt_var_next) {
           
           _adapt_var_next *= 2;
           
-          _sum_x /= _sum_n;
-          _sum_x2 /= _sum_n;
+          var = _adapt_m2 / (_adapt_n - 1.0);
           
-          var = _sum_x2 - _sum_x.cwiseAbs2();
+          var = (_adapt_n / (_adapt_n + 5.0)) * var 
+                + (5.0 / (_adapt_n + 5.0)) * Eigen::VectorXd::Ones(var.size());
+
+          // Enforce scale-free variance
+          var *= var.size() / var.sum();
           
-          const double norm = var.squaredNorm() / static_cast<double>(var.size());
+          _adapt_n = 0;
+          _adapt_m.setZero();
+          _adapt_m2.setZero();
           
-          if (norm) {
-            var /= norm;
-          }
-          else
-            var.setOnes();
-          
-          _sum_n = 0;
-          _sum_x.setZero();
-          _sum_x2.setZero();
-         
         }
+        
         
       }
       

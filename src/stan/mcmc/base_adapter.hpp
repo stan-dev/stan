@@ -8,8 +8,11 @@ namespace stan {
   namespace mcmc {
     
     class base_adapter {
+    
     public:
+      
       virtual void init() = 0;
+
     };
     
   } // mcmc

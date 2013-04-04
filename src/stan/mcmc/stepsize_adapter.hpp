@@ -11,7 +11,7 @@ namespace stan {
       
     public:
       
-      stepsize_adapter(): _adapt_flag(true), _adapt_mu(0.5), _adapt_delta(0.651),
+      stepsize_adapter(): _adapt_flag(true), _adapt_mu(0.5), _adapt_delta(0.5),
                           _adapt_gamma(0.05), _adapt_kappa(0.75), _adapt_t0(10)
       { init(); }
       
