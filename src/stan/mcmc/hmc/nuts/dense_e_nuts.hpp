@@ -24,7 +24,7 @@ namespace stan {
       
     dense_e_nuts(M &m, BaseRNG& rng): base_nuts<M, dense_e_point, dense_e_metric,
                                                expl_leapfrog, BaseRNG>(m, rng)
-    {};
+    { this->_name = "NUTS with a dense Euclidean metric"; }
       
     private:
       

@@ -18,7 +18,7 @@ namespace stan {
     public:
       
       base_static_hmc(M &m, BaseRNG& rng): base_hmc<M, P, H, I, BaseRNG>(m, rng),
-                                           _epsilon(0.1), _T(1)
+                                           _T(1)
       { _update_L(); }
       
       ~base_static_hmc() {};
@@ -31,7 +31,7 @@ namespace stan {
         this->_hamiltonian.init(this->_z);
         
         ps_point z_init(static_cast<ps_point>(this->_z));
-        
+
         double H0 = this->_hamiltonian.H(this->_z);
         
         for (int i = 0; i < _L; ++i) {
@@ -70,15 +70,14 @@ namespace stan {
         values.push_back(this->_T);
       }
       
-      
       void set_stepsize_and_T(const double e, const double t) {
         if(e > 0 && t > 0)
-          _epsilon = e; _T = t; _update_L();
+          this->_epsilon = e; _T = t; _update_L();
       }
       
       void set_stepsize_and_L(const double e, const int l) {
         if(e > 0 && l > 0)
-          _epsilon = e; _L = l; _T = _epsilon * _L;
+          this->_epsilon = e; _L = l; _T = this->_epsilon * _L;
       }
       
       void set_T(const double t) { 
@@ -86,23 +85,22 @@ namespace stan {
           _T = t; _update_L(); 
         
       }
+      
       void set_stepsize(const double e) { 
         if(e > 0)
-          _epsilon = e; _update_L(); 
+          this->_epsilon = e; _update_L(); 
       }
       
-      double get_stepsize() { return this->_epsilon; }
       double get_T() { return this->_T; }
       int get_L() { return this->_L; }
       
     protected:
       
-      double _epsilon;
       double _T;
       int _L;
       
       void _update_L() { 
-        _L = static_cast<int>(_T / _epsilon); 
+        _L = static_cast<int>(_T / this->_epsilon); 
         _L = _L < 1 ? 1 : _L;
       }
       

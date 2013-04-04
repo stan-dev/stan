@@ -33,16 +33,10 @@ namespace stan {
     public:
       
       base_nuts(M &m, BaseRNG& rng): base_hmc<M, P, H, I, BaseRNG>(m, rng),
-                                     _epsilon(0.1), _depth(0), 
-                                     _max_depth(5), _max_delta(1000)
+                                     _depth(0), _max_depth(5), _max_delta(1000)
       {};
       
       ~base_nuts() {};
-      
-      void set_stepsize(const double e) {
-        if(e > 0)
-          _epsilon = e;
-      }
       
       void set_max_depth(const int d) {
         if(d > 0)
@@ -52,6 +46,9 @@ namespace stan {
       void set_max_delta(const double d) {
         _max_delta = d;
       }
+      
+      int get_max_depth() { return this->_max_depth; }
+      double get_max_delta() { return this->_max_delta; }
       
       sample transition(sample& init_sample)
       {
@@ -222,8 +219,7 @@ namespace stan {
         }
         
       }
-      
-      double _epsilon;
+
       int _depth;
       int _max_depth;
       double _max_delta;

@@ -24,7 +24,7 @@ namespace stan {
       
     unit_e_nuts(M &m, BaseRNG& rng): base_nuts<M, unit_e_point, unit_e_metric,
                                                expl_leapfrog, BaseRNG>(m, rng)
-    {};
+    { this->_name = "NUTS with a unit Euclidean metric"; }
       
     private:
       
