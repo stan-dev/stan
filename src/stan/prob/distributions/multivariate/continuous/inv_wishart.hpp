@@ -153,10 +153,10 @@ namespace stan {
     template <class RNG>
     inline Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>
     inv_wishart_rng(double nu,
-		const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
+		const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& S,
 		RNG& rng) {
 
-      return wishart_rng(nu, Sigma.inverse(), rng).inverse();
+      return wishart_rng(nu, S.inverse(), rng).inverse();
     }
   }
 }

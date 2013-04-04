@@ -5,6 +5,8 @@
 #include <stan/math/matrix_error_handling.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/prob/traits.hpp>
+#include <stan/prob/distributions/univariate/continuous/beta.hpp>
+#include <stan/prob/transform.hpp>
 
 namespace stan {
   namespace prob {
@@ -189,6 +191,35 @@ namespace stan {
       return lkj_corr_log<false>(y,eta,stan::math::default_policy());
     }
 
+    template <class RNG>
+    inline Eigen::MatrixXd
+    lkj_corr_cholesky_rng(const size_t K,
+                          const double eta,
+                          RNG& rng) {
+      // Need checks
+      Eigen::ArrayXd CPCs( (K * (K - 1)) / 2 );
+      double alpha = eta + 0.5 * (K - 1);
+      unsigned int count = 0;
+      for (size_t i = 0; i < (K - 1); i++) {
+        alpha -= 0.5;
+        for (size_t j = i + 1; j < K; j++) {
+          CPCs(count) = 2.0 * stan::prob::beta_rng(alpha,alpha,rng) - 1.0;
+          count++;
+        }
+      }
+      return stan::prob::read_corr_L(CPCs, K);
+    }
+
+    template <class RNG>
+    inline Eigen::MatrixXd
+    lkj_corr_rng(const size_t K,
+                 const double eta,
+                 RNG& rng) {
+
+      using stan::math::multiply_lower_tri_self_transpose;
+      return multiply_lower_tri_self_transpose(
+                  lkj_corr_cholesky_rng(K, eta, rng) );
+    }
 
   }
 }

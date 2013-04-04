@@ -205,8 +205,8 @@ namespace stan {
     template <class RNG>
     inline double
     double_exponential_rng(double mu,
-               double sigma,
-               RNG& rng) {
+			   double sigma,
+			   RNG& rng) {
       using boost::variate_generator;
       using boost::random::uniform_01;
       using std::log;

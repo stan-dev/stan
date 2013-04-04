@@ -263,13 +263,13 @@ namespace stan {
     template <class RNG>
     inline double
     logistic_rng(double mu,
-                 double beta,
+                 double sigma,
                  RNG& rng) {
       using boost::variate_generator;
       using boost::random::exponential_distribution;
       variate_generator<RNG&, exponential_distribution<> >
         exp_rng(rng, exponential_distribution<>(1));
-      return mu - beta * std::log(exp_rng() / exp_rng());
+      return mu - sigma * std::log(exp_rng() / exp_rng());
     }
   }
 }

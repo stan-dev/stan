@@ -419,13 +419,13 @@ namespace stan {
 
     template <class RNG>
     inline int
-    binomial_rng(int n,
-                 double prob,
+    binomial_rng(int N,
+                 double theta,
                  RNG& rng) {
       using boost::variate_generator;
       using boost::binomial_distribution;
       variate_generator<RNG&, binomial_distribution<> >
-        binomial_rng(rng, binomial_distribution<>(n, prob));
+        binomial_rng(rng, binomial_distribution<>(N, theta));
       return binomial_rng();
     }
     
