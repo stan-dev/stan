@@ -167,25 +167,25 @@ namespace stan {
     template <class RNG>
     inline Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>
     wishart_rng(double nu,
-		const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
+		const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& S,
 		RNG& rng) {
 
-      Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> B(Sigma.rows(), Sigma.cols());
-      for(int i = 0; i < Sigma.rows(); i++)
+      Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> B(S.rows(), S.cols());
+      for(int i = 0; i < S.rows(); i++)
 	{
-	  for(int j = 0; j < Sigma.rows(); j++)
+	  for(int j = 0; j < S.rows(); j++)
 	    B(i,j) = 0;
 	}
 
-      Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> A(Sigma.rows(), 1);
-      for(int i = 0; i < Sigma.cols(); i++)
+      Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> A(S.rows(), 1);
+      for(int i = 0; i < S.cols(); i++)
 	{
 	  B(i,i) = std::sqrt(chi_square_rng(nu - i, rng));
 	  for(int j = 0; j < i; j++)
 	    B(j,i) = normal_rng(0,1,rng);
 	}
 
-      return Sigma.llt().matrixL() * B * B.transpose() * Sigma.llt().matrixL().transpose();
+      return S.llt().matrixL() * B * B.transpose() * S.llt().matrixL().transpose();
     }
   }
 }

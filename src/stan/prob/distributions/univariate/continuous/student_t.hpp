@@ -445,7 +445,7 @@ namespace stan {
     student_t_rng(double nu,
                   double mu,
                   double sigma,
-                    RNG& rng) {
+		  RNG& rng) {
       using boost::variate_generator;
       using boost::random::student_t_distribution;
       variate_generator<RNG&, student_t_distribution<> >

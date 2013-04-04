@@ -41,7 +41,7 @@ If $\theta \in [0,1]$, then for $y \in \setlist{0,1}$,
   \farg{theta}}
 %
 \end{description}
-
+%
 \begin{description}
 \fitem{int}{bernoulli\_rng}{real \farg{theta}}{Generate a Bernoulli
   variate with chance of success \farg{theta}; may only be used in
@@ -560,7 +560,12 @@ If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in
   \farg{sigma}}{The cumulative normal distribution of \farg{y}
   given location \farg{mu} and scale \farg{sigma}}
 \end{description}
-
+%
+\begin{description}
+\fitem{real}{normal\_rng}{real \farg{mu}, real \farg{sigma}}{Generate a normal
+  variate with location \farg{mu} and scale \farg{sigma}; may only be used in
+  generated quantities block}
+\end{description}
 
 
 \section{Exponentially Modified Normal Distribution}
@@ -591,7 +596,13 @@ If $\mu \in \reals$, $\sigma \in \posreals$, and $\lambda \in
     exponentially modified normal distribution of \farg{y} given
     location \farg{mu}, scale \farg{sigma}, and shape \farg{lambda}}
 \end{description}
-
+%
+\begin{description}
+\fitem{real}{exp\_mod\_normal\_rng}{real \farg{mu}, real \farg{sigma},
+real \farg{lambda}}{Generate a exponentially modified normal variate 
+with location \farg{mu}, scale \farg{sigma}, and shape \farg{lambda}; 
+may only be used in generated quantities block}
+\end{description}
 
 \section{Skew Normal Distribution}
 
@@ -620,10 +631,17 @@ then for $y \in \reals$,
     location \farg{mu}, scale \farg{sigma}, and shape \farg{alpha}}
 %
 \fitem{real}{skew\_normal\_cdf}{reals \farg{y}, reals \farg{mu}, reals
-  \farg{sigma}, reals \farg{alpha}}{The cumulative skew normal distribution of \farg{y}
-  given location \farg{mu}, scale \farg{sigma}, and shape \farg{alpha}}
+  \farg{sigma}, reals \farg{alpha}}{The cumulative skew normal
+  distribution of \farg{y} given location \farg{mu}, scale
+  \farg{sigma}, and shape \farg{alpha}}
 \end{description}
-
+%
+\begin{description}
+\fitem{real}{skew\_normal\_rng}{real \farg{mu}, real \farg{sigma},
+  real \farg{alpha}}{Generate a skew normal variate with location
+  \farg{mu}, scale \farg{sigma}, and shape \farg{alpha}; may only be used in
+  generated quantities block}
+\end{description}
 
 
 \section{Student-$t$ Distribution}
@@ -660,6 +678,13 @@ then for $y \in \reals$,
     given degrees of freedom \farg{nu}, location \farg{mu}, and scale
     \farg{sigma}}
 \end{description}
+%
+\begin{description}
+\fitem{real}{student\_t\_rng}{real \farg{nu}, real \farg{mu}, real
+  \farg{sigma}}{Generate a Student-$t$ variate with degrees of freedom 
+\farg{nu}, location \farg{mu}, and scale \farg{sigma}; may only be used in
+  generated quantities block}
+\end{description}
 
 
 
@@ -690,7 +715,12 @@ If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in \reals$,
  \farg{sigma}}{ The Cauchy cumulative distribution function of \farg{y} given location
  \farg{mu} and scale \farg{sigma}}
 \end{description}
-
+%
+\begin{description}
+\fitem{real}{cauchy\_rng}{real \farg{mu}, real \farg{sigma}}{Generate a Cauchy
+  variate with location \farg{mu} and scale \farg{sigma}; may only be used in
+  generated quantities block}
+\end{description}
 
 
 \section{Double Exponential (Laplace) Distribution}
@@ -712,7 +742,12 @@ If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in \reals$,
 reals \farg{sigma}}{ The log of the double exponential density of \farg{y} given
 location \farg{mu} and scale \farg{sigma}}
 \end{description}
-
+%
+\begin{description}
+\fitem{real}{double\_exponential\_rng}{real \farg{mu}, real
+  \farg{sigma}}{Generate a double exponential variate with location
+  \farg{mu} and scale \farg{sigma}; may only be used in generated quantities block}
+\end{description}
 
 
 \section{Logistic Distribution}
@@ -743,7 +778,12 @@ location \farg{mu} and scale \farg{sigma}}
 reals \farg{sigma}}{ The logistic cumulative distribution function of \farg{y} given
 location \farg{mu} and scale \farg{sigma}}
 \end{description}
-
+%
+\begin{description}
+\fitem{real}{logistic\_rng}{real \farg{mu}, real
+  \farg{sigma}}{Generate a logistic variate with location \farg{mu}
+  and scale \farg{sigma}; may only be used in generated quantities block}
+\end{description}
 
 
 \section{Gumbel Distribution}
@@ -769,6 +809,12 @@ If $\mu \in \reals$ and $\beta \in \posreals$, then for $y \in \reals$,
 \fitem{real}{gumbel\_cdf}{reals \farg{y}, reals \farg{mu}, reals
   \farg{beta}}{The cumulative gumbel distribution of \farg{y}
   given location \farg{mu} and scale \farg{beta}}
+\end{description}
+%
+\begin{description}
+\fitem{real}{gumbel\_rng}{real \farg{mu}, real
+  \farg{beta}}{Generate a gumbel variate with location \farg{mu}
+  and scale \farg{beta}; may only be used in generated quantities block}
 \end{description}
 
 
@@ -812,7 +858,12 @@ If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in
   \farg{sigma}}{The cumulative lognormal distribution of \farg{y}
   given location \farg{mu} and scale \farg{sigma}}
 \end{description}
-
+%
+\begin{description}
+\fitem{real}{lognormal\_rng}{real \farg{mu}, real
+  \farg{beta}}{Generate a lognormal variate with location \farg{mu}
+  and scale \farg{sigma}; may only be used in generated quantities block}
+\end{description}
 
 
 \section{Chi-Square Distribution}
@@ -838,6 +889,12 @@ y^{\nu/2 - 1}
 \fitem{real}{chi\_square\_log}{reals \farg{y}, reals \farg{nu}}{The
   log of the Chi-square density of \farg{y} given degrees of freedom
   \farg{nu}}
+\end{description}
+%
+\begin{description}
+\fitem{real}{chi\_square\_rng}{real \farg{nu}}{Generate a Chi-square
+  variate with degrees of freedom \farg{nu}; may only be used in
+  generated quantities block}
 \end{description}
 
 
@@ -871,7 +928,12 @@ y^{-(\nu/2 - 1)}
   \farg{nu}}{The inverse Chi-squared cumulative distribution function of \farg{y} given
   degrees of freedom \farg{nu}}
 \end{description}
-
+%
+\begin{description}
+\fitem{real}{inv\_chi\_square\_rng}{real \farg{nu}}{Generate an
+  inverse Chi-squared variate with degrees of freedom \farg{nu}; 
+may only be used in generated quantities block}
+\end{description}
 
 
 \section{Scaled Inverse Chi-Square Distribution}
@@ -905,7 +967,7 @@ y^{-(\nu/2 + 1)}
     density of \farg{y} given degrees of freedom \farg{nu} and scale
     \farg{s}}
 \end{description}
-
+%
 \begin{description}
   \fitem{real}{scaled\_inv\_chi\_square\_cdf}{reals \farg{y}, reals
     \farg{nu}, reals \farg{s}}{The scaled inverse Chi-square
@@ -913,7 +975,13 @@ y^{-(\nu/2 + 1)}
     of \farg{y} given degrees of freedom \farg{nu} and scale
     \farg{s}}
 \end{description}
-
+%
+\begin{description}
+\fitem{real}{scaled\_inv\_chi\_square\_rng}{real \farg{nu}, real
+  \farg{s}}{Generate a scaled inverse Chi-squared variate with degrees 
+of freedom \farg{nu} and scale \farg{s}; may only be used in generated 
+quantities block}
+\end{description}
 
 
 \section{Exponential Distribution}
@@ -939,7 +1007,12 @@ If $\beta \in \posreals$, then for $y \in \posreals$,
   cumulative distribution function of \farg{y} given inverse scale
   \farg{beta}}
 \end{description}
-
+%
+\begin{description}
+\fitem{real}{exponential\_rng}{real \farg{beta}}{Generate an
+  exponential variate with inverse scale \farg{beta}; may only be used in generated 
+quantities block}
+\end{description}
 
 
 \section{Gamma Distribution}
@@ -971,7 +1044,13 @@ y^{\alpha - 1}
  %  \farg{beta}}{The cumulative distribution function of \farg{y} given shape
  %  \farg{alpha} and inverse scale \farg{beta}}
 \end{description}
-
+%
+\begin{description}
+\fitem{real}{gamma\_rng}{real \farg{alpha}, real
+  \farg{beta}}{Generate a gamma variate with shape
+  \farg{alpha} and inverse scale \farg{beta}; may only be used in generated 
+quantities block}
+\end{description}
 
 
 \section{Inverse Gamma Distribution}
@@ -1003,7 +1082,13 @@ y^{-(\alpha + 1)}
 \farg{beta}}{The inverse gamma cumulative distribution function of \farg{y} given shape
 \farg{alpha} and scale \farg{beta}}
 \end{description}
-
+%
+\begin{description}
+\fitem{real}{inv\_gamma\_rng}{real \farg{alpha}, real
+  \farg{beta}}{Generate an inverse gamma variate with shape
+  \farg{alpha} and scale \farg{beta}; may only be used in generated 
+quantities block}
+\end{description}
 
 
 \section{Weibull Distribution}
@@ -1035,7 +1120,13 @@ If $\alpha \in \posreals$ and $\sigma \in [0,\infty)$, then for $y \in
 \farg{sigma}}{The Weibull cumulative distribution of \farg{y} given shape
 \farg{alpha} and scale \farg{sigma}}
 \end{description}
-
+%
+\begin{description}
+\fitem{real}{weibull\_rng}{real \farg{alpha}, real
+  \farg{sigma}}{Generate a weibull variate with shape
+  \farg{alpha} and scale \farg{sigma}; may only be used in generated 
+quantities block}
+\end{description}
 
 
 \chapter{Positive Lower-Bounded Probabilities}
@@ -1066,12 +1157,17 @@ $y \in \posreals$,
   \fitem{real}{pareto\_log}{reals \farg{y}, reals \farg{y\_min}, reals
     \farg{alpha}}{The log of the Pareto density of \farg{y} given
     positive minimum value \farg{y\_min} and shape \farg{alpha}}
-
+%
   \fitem{real}{pareto\_cdf}{reals \farg{y}, reals \farg{y\_min}, reals
     \farg{alpha}}{The Pareto cumulative distribution function of \farg{y} given
     positive minimum value \farg{y\_min} and shape \farg{alpha}}
 \end{description}
-
+%
+\begin{description}
+\fitem{real}{pareto\_rng}{real \farg{y\_min}, real
+  \farg{alpha}}{Generate a Pareto variate with positive minimum value \farg{y\_min} and shape \farg{alpha}; may only be used in generated 
+quantities block}
+\end{description}
 
 
 \chapter{Continuous Distributions on $[0,1]$}
@@ -1114,7 +1210,13 @@ where the beta function $\Betafun()$ is as defined in \refsection{betafun}
     given positive prior successes (plus one)
     \farg{alpha} and prior failures (plus one) \farg{beta}}
 \end{description}
-
+%
+\begin{description}
+\fitem{real}{beta\_rng}{real \farg{alpha}, real
+  \farg{beta}}{Generate a beta variate with positive prior successes (plus one)
+    \farg{alpha} and prior failures (plus one) \farg{beta}; may only
+    be used in generated quantities block}
+\end{description}
 
 
 \chapter{Bounded Continuous Probabilities}
@@ -1144,6 +1246,13 @@ If $\alpha \in \reals$ and $\beta \in (\alpha,\infty)$, then for $y
 \fitem{real}{uniform\_log}{reals \farg{y}, reals \farg{alpha}, reals
   \farg{beta}}{The log of the uniform density of \farg{y} given lower bound
   \farg{alpha} and upper bound \farg{beta}}
+\end{description}
+%
+\begin{description}
+\fitem{real}{uniform\_rng}{real \farg{alpha}, real
+  \farg{beta}}{Generate a uniform variate with lower bound
+  \farg{alpha} and upper bound \farg{beta}; may only
+    be used in generated quantities block}
 \end{description}
 
 
@@ -1188,7 +1297,13 @@ where $|\Sigma|$ is the absolute determinant of $\Sigma$.
  given location \farg{mu} and covariance matrix \farg{S}}
 %
 \end{description}
-
+%
+\begin{description}
+\fitem{vector}{multi\_normal\_rng}{vector \farg{mu}, matrix
+  \farg{S}}{Generate a multivariate normal variate with location
+  \farg{mu} and covariance matrix \farg{S}; may only be used in 
+generated quantities block}
+\end{description}
 
 
 \section{Multivariate Normal Distribution, Precision Parameterization}
@@ -1286,7 +1401,13 @@ $y \in \reals^K$,
   location \farg{mu}, and scale matrix \farg{S}}
 %
 \end{description}
-
+%
+\begin{description}
+\fitem{vector}{multi\_student\_t\_rng}{real \farg{nu}, vector \farg{mu}, matrix
+  \farg{S}}{Generate a multivariate Student-$t$ variate with degrees
+  of freedom \farg{nu}, location \farg{mu}, and scale matrix \farg{S}; 
+may only be used in generated quantities block}
+\end{description}
 
 \chapter{Simplex Distributions}
 
@@ -1321,7 +1442,12 @@ $\theta \in \mbox{$K$-simplex}$,
     \farg{alpha}}{ The log of the Dirichlet density for simplex
     \farg{theta} given prior counts (plus one) \farg{alpha}}
 \end{description}
-
+%
+\begin{description}
+\fitem{vector}{dirichlet\_rng}{vector \farg{alpha}}{Generate a
+  Dirichlet variate with prior counts (plus one) \farg{alpha}; 
+may only be used in generated quantities block}
+\end{description}
 
 
 \chapter{Correlation Matrix Distributions}
@@ -1454,7 +1580,12 @@ the multivariate Gamma function,
  \farg{S}}
 %
 \end{description}
-
+%
+\begin{description}
+\fitem{matrix}{wishart\_rng}{real \farg{nu}, matrix \farg{S}}{Generate a
+  Wishart variate with degrees of freedom \farg{nu} and scale matrix
+ \farg{S}; may only be used in generated quantities block}
+\end{description}
 
 
 \section{Inverse Wishart Distribution}
@@ -1493,7 +1624,13 @@ positive-definite $W \in \reals^{K \times K}$,
  \farg{S}}
 %
 \end{description}
-
+%
+\begin{description}
+\fitem{matrix}{inv\_wishart\_rng}{real \farg{nu}, matrix
+  \farg{S}}{Generate an inverse Wishart variate with degrees of 
+freedom \farg{nu} and scale matrix
+ \farg{S}; may only be used in generated quantities block}
+\end{description}
 
 \section{LKJ Covariance Distribution}
 

@@ -764,20 +764,20 @@ namespace stan {
     }
   
     template <class RNG>
-    inline Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>
+    inline Eigen::VectorXd
     multi_normal_rng(const Eigen::Matrix<double,Eigen::Dynamic,1>& mu,
-                     const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
+                     const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& S,
                      RNG& rng) {
       using boost::variate_generator;
       using boost::normal_distribution;
       variate_generator<RNG&, normal_distribution<> >
 	std_normal_rng(rng, normal_distribution<>(0,1));
 
-      Eigen::VectorXd z(Sigma.cols());
-      for(int i = 0; i < Sigma.cols(); i++)
+      Eigen::VectorXd z(S.cols());
+      for(int i = 0; i < S.cols(); i++)
 	z(i) = std_normal_rng();
 
-      return mu + Sigma.llt().matrixL() * z;
+      return mu + S.llt().matrixL() * z;
     }
   }
 }
