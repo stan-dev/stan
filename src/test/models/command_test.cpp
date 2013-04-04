@@ -95,7 +95,7 @@ public:
     expected_output.push_back(make_pair("chain_id", "1 (default)"));
     expected_output.push_back(make_pair("iter", "2000"));
     expected_output.push_back(make_pair("warmup", "1000"));
-    expected_output.push_back(make_pair("thin", "1 (default)"));
+    expected_output.push_back(make_pair("thin", "1"));
     expected_output.push_back(make_pair("equal_step_sizes", "0"));
     expected_output.push_back(make_pair("nondiag_mass", "0"));
     expected_output.push_back(make_pair("leapfrog_steps", "-1"));
@@ -157,7 +157,7 @@ public:
     command_changes[thin] = make_pair("",
                                         " --thin=3");
     output_changes [thin] = make_pair("",
-                                        "3 (user supplied)");
+                                        "3");
 
 
 
