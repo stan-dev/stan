@@ -33,7 +33,15 @@ namespace stan {
           this->_learn_stepsize(this->_epsilon, s.accept_stat());
           this->_update_L();
           
-          this->_learn_variance(this->_z.mInv, this->_z.q);
+          bool update = this->_learn_variance(this->_z.mInv, this->_z.q);
+          
+          if(update) {
+            this->init_stepsize();
+            this->_update_L();
+            
+            this->set_adapt_mu(log(10 * this->_epsilon));
+            this->stepsize_adapter::init();
+          }
           
         }
         
