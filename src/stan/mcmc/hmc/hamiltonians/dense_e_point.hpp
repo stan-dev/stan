@@ -14,7 +14,7 @@ namespace stan {
     public:
       
       dense_e_point(int n, int m): ps_point(n, m),
-                                   mInv(Eigen::VectorXd::Ones(n, n)) 
+                                   mInv(Eigen::MatrixXd::Identity(n, n)) 
       {};
       
       Eigen::MatrixXd mInv;
@@ -22,9 +22,9 @@ namespace stan {
       void write_metric(std::ostream& o) {
         //o << "# Inverse mass matrix elements:" << std::endl;
         o << "# parameter step size multipliers:" << std::endl;
-        for(size_t i = 0; i < mInv.size(); ++i) {
+        for(size_t i = 0; i < mInv.rows(); ++i) {
           o << "# " << std::flush;
-          for(size_t j = 0; j < mInv.size(); ++j)
+          for(size_t j = 0; j < mInv.cols(); ++j)
             o << mInv(i, j) << "," << std::flush;
           o << std::endl;
         }
