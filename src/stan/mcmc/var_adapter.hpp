@@ -37,7 +37,7 @@ namespace stan {
       Eigen::VectorXd _adapt_m;
       Eigen::VectorXd _adapt_m2;
       
-      void _learn_variance(Eigen::VectorXd& var, std::vector<double>& q) {
+      bool _learn_variance(Eigen::VectorXd& var, std::vector<double>& q) {
         
         ++_adapt_var_counter;
         
@@ -59,15 +59,15 @@ namespace stan {
           var = (_adapt_n / (_adapt_n + 5.0)) * var 
                 + (5.0 / (_adapt_n + 5.0)) * Eigen::VectorXd::Ones(var.size());
 
-          // Enforce scale-free variance
-          var *= var.size() / var.sum();
-          
           _adapt_n = 0;
           _adapt_m.setZero();
           _adapt_m2.setZero();
           
+          return true;
+          
         }
         
+        return false;
         
       }
       

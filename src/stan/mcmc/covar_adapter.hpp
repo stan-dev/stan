@@ -37,7 +37,7 @@ namespace stan {
       Eigen::VectorXd _adapt_m;
       Eigen::MatrixXd _adapt_m2;
       
-      void _learn_covariance(Eigen::MatrixXd& covar, std::vector<double>& q) {
+      bool _learn_covariance(Eigen::MatrixXd& covar, std::vector<double>& q) {
         
         ++_adapt_covar_counter;
         
@@ -58,15 +58,16 @@ namespace stan {
 
           covar = (_adapt_n / (_adapt_n + 5.0)) * covar
                   + (5.0 / (_adapt_n + 5.0)) * Eigen::MatrixXd::Identity(covar.rows(), covar.cols());
-          
-          // Enforce scale-free covariance
-          covar *= covar.rows() / covar.trace();
-                     
+ 
           _adapt_n = 0;
           _adapt_m.setZero();
           _adapt_m2.setZero();
           
+          return true;
+          
         }
+        
+        return false;
         
       }
       
