@@ -369,8 +369,8 @@ namespace stan {
 
     template <class RNG>
     inline int
-    neg_binomial_rng(double alpha,
-                     double beta,
+    neg_binomial_rng(const double alpha,
+                     const double beta,
                      RNG& rng) {
       using boost::variate_generator;
       using boost::random::negative_binomial_distribution;

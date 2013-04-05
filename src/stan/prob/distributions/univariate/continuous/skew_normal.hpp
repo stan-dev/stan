@@ -12,6 +12,7 @@
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
+#include <stan/math/functions/value_of.hpp>
 
 namespace stan {
 
@@ -208,9 +209,9 @@ namespace stan {
 
     template <class RNG>
     inline double
-    skew_normal_rng(double mu,
-    		    double sigma,
-    		    double alpha,
+    skew_normal_rng(const double mu,
+    		    const double sigma,
+    		    const double alpha,
     		    RNG& rng) {
       boost::math::skew_normal_distribution<>dist (mu, sigma, alpha);
       return quantile(dist, stan::prob::uniform_rng(0.0,1.0,rng));

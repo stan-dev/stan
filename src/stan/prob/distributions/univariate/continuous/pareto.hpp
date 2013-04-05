@@ -272,8 +272,8 @@ namespace stan {
       
     template <class RNG>
     inline double
-    pareto_rng(double y_min,
-               double alpha,
+    pareto_rng(const double y_min,
+               const double alpha,
                RNG& rng) {
       using boost::variate_generator;
       using boost::exponential_distribution;

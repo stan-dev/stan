@@ -99,8 +99,7 @@ namespace stan {
 
       double sum = 0;
       Eigen::VectorXd y(alpha.rows());
-      for(int i = 0; i < alpha.rows(); i++)
-	{
+      for(int i = 0; i < alpha.rows(); i++) {
         variate_generator<RNG&, gamma_distribution<> >
 	  gamma_rng(rng, gamma_distribution<>(alpha(i,0),1));
 	y(i) = gamma_rng();

@@ -14,6 +14,7 @@
 #include <stan/math/matrix/crossprod.hpp>
 #include <stan/math/matrix/dot_product.hpp>
 #include <stan/math/matrix/mdivide_left_tri_low.hpp>
+#include <stan/math/matrix/multiply_lower_tri_self_transpose.hpp>
 
 namespace stan {
 
@@ -166,26 +167,20 @@ namespace stan {
 
     template <class RNG>
     inline Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>
-    wishart_rng(double nu,
+    wishart_rng(const double nu,
 		const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& S,
 		RNG& rng) {
 
       Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> B(S.rows(), S.cols());
-      for(int i = 0; i < S.rows(); i++)
-	{
-	  for(int j = 0; j < S.rows(); j++)
-	    B(i,j) = 0;
-	}
+      B.setZero();
 
-      Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> A(S.rows(), 1);
-      for(int i = 0; i < S.cols(); i++)
-	{
+      for(int i = 0; i < S.cols(); i++) {
 	  B(i,i) = std::sqrt(chi_square_rng(nu - i, rng));
 	  for(int j = 0; j < i; j++)
 	    B(j,i) = normal_rng(0,1,rng);
 	}
 
-      return S.llt().matrixL() * B * B.transpose() * S.llt().matrixL().transpose();
+      return stan::math::multiply_lower_tri_self_transpose(S.llt().matrixL() * B);
     }
   }
 }

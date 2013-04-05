@@ -143,9 +143,9 @@ namespace stan {
    
     template <class RNG>
     inline double
-    uniform_rng(double alpha,
-               double beta,
-               RNG& rng) {
+    uniform_rng(const double alpha,
+                const double beta,
+                RNG& rng) {
       using boost::variate_generator;
       using boost::random::uniform_real_distribution;
       variate_generator<RNG&, uniform_real_distribution<> >

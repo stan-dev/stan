@@ -367,9 +367,9 @@ namespace stan {
 
     template <class RNG>
     inline int
-    beta_binomial_rng(int N,
-		      double alpha,
-		      double beta,
+    beta_binomial_rng(const int N,
+		      const double alpha,
+		      const double beta,
 		      RNG& rng) {
       double a = stan::prob::beta_rng(alpha, beta, rng);
       while(a > 1 || a < 0) 

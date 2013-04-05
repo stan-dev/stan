@@ -210,9 +210,9 @@ namespace stan {
    
     template <class RNG>
     inline double
-    weibull_rng(double alpha,
-               double sigma,
-               RNG& rng) {
+    weibull_rng(const double alpha,
+                const double sigma,
+                RNG& rng) {
       using boost::variate_generator;
       using boost::random::weibull_distribution;
       variate_generator<RNG&, weibull_distribution<> >

@@ -87,7 +87,7 @@ namespace stan {
     template <class RNG>
     inline std::vector<int>
     multinomial_rng(const Eigen::Matrix<double,Eigen::Dynamic,1>& theta,
-                    int N,
+                    const int N,
                     RNG& rng) {
       std::vector<int> result(N,0);
       double mass_left = 1.0;

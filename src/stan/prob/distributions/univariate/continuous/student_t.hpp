@@ -442,9 +442,9 @@ namespace stan {
     
     template <class RNG>
     inline double
-    student_t_rng(double nu,
-                  double mu,
-                  double sigma,
+    student_t_rng(const double nu,
+                  const double mu,
+                  const double sigma,
 		  RNG& rng) {
       using boost::variate_generator;
       using boost::random::student_t_distribution;

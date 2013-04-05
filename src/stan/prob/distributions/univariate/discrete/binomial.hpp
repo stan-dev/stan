@@ -419,8 +419,8 @@ namespace stan {
 
     template <class RNG>
     inline int
-    binomial_rng(int N,
-                 double theta,
+    binomial_rng(const int N,
+                 const double theta,
                  RNG& rng) {
       using boost::variate_generator;
       using boost::binomial_distribution;

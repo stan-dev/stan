@@ -334,9 +334,9 @@ namespace stan {
 
     template <class RNG>
     inline double
-    inv_gamma_rng(double alpha,
-               double beta,
-               RNG& rng) {
+    inv_gamma_rng(const double alpha,
+		  const double beta,
+		  RNG& rng) {
       using boost::variate_generator;
       using boost::random::gamma_distribution;
       variate_generator<RNG&, gamma_distribution<> >
