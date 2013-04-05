@@ -46,6 +46,8 @@ namespace stan {
           accept = false;
         }
         
+        acceptProb = acceptProb > 1 ? 1 : acceptProb;
+        
         return sample(this->_z.q, this->_z.r, - this->_hamiltonian.V(this->_z), acceptProb);
         
       }
