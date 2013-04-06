@@ -32,8 +32,6 @@ namespace stan {
       
       void init_stepsize() {
   
-        this->_epsilon = 1.0;
-        
         ps_point z_init(static_cast<ps_point>(this->_z));
   
         this->_hamiltonian.sample_p(this->_z, this->_rand_int);
@@ -56,7 +54,7 @@ namespace stan {
           this->_integrator.evolve(this->_z, this->_hamiltonian, this->_epsilon);
           double delta_H = H0 - this->_hamiltonian.H(this->_z);
                    
-          if ((direction == 1) && !(delta_H > log(0.5)))
+          if ((direction == 1) && !(delta_H > log(0.5))) 
             break;
           else if ((direction == -1) && !(delta_H < log(0.5)))
             break;
