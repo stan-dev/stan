@@ -21,10 +21,10 @@ namespace stan {
       
       void write_metric(std::ostream& o) {
         //o << "# Inverse mass matrix diagonal elements:" << std::endl;
-        o << "# parameter step size multipliers:" << std::endl;
-        o << "# " << std::flush;
-        for(size_t i = 0; i < mInv.size(); ++i)
-          o << mInv(i) << "," << std::flush;
+        o << "# Diagonal elements of inverse mass matrix:" << std::endl;
+        o << "# " << mInv(0) << std::flush;
+        for(size_t i = 1; i < mInv.size(); ++i)
+          o << ", " << mInv(i) << std::flush;
         o << std::endl;
       };
       
