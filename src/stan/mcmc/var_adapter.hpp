@@ -42,7 +42,7 @@ namespace stan {
         ++_adapt_var_counter;
         
         Eigen::Map<Eigen::VectorXd> x(&q[0], q.size());
-        
+
         // Welford algorithm for online variance estimate
         ++_adapt_n;
         

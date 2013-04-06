@@ -60,7 +60,7 @@ namespace stan {
         
         this->_hamiltonian.sample_p(this->_z, this->_rand_int);
         this->_hamiltonian.init(this->_z);
-
+        
         ps_point z_plus(static_cast<ps_point>(this->_z));
         ps_point z_minus(z_plus);
 
@@ -75,7 +75,7 @@ namespace stan {
         util.H0 = this->_hamiltonian.H(this->_z);
         
         // Sample the slice variable
-        util.log_u = log(this->_rand_uniform()) - util.H0;
+        util.log_u = log(this->_rand_uniform());
         
         // Build a balanced binary tree until the NUTS criterion fails
         util.n_tree = 0;
@@ -182,14 +182,14 @@ namespace stan {
           z_propose = static_cast<ps_point>(this->_z);
           
           double h = this->_hamiltonian.H(this->_z); 
-          if(h != h) h = std::numeric_limits<double>::infinity();
+          if (h != h) h = std::numeric_limits<double>::infinity();
           
-          util.criterion = util.log_u + h < this->_max_delta;
+          util.criterion = util.log_u + (h - util.H0) < this->_max_delta;
 
           util.sum_prob += stan::math::min(1, exp(util.H0 - h));
           util.n_tree += 1;
           
-          return (h < - util.log_u);
+          return (util.log_u + (h - util.H0) < 0);
           
         } 
         // General recursion
@@ -199,21 +199,21 @@ namespace stan {
           ps_point z_init(static_cast<ps_point>(this->_z));
           
           int n1 = build_tree(depth - 1, rho, z_propose, util);
-          
-          if(!util.criterion) return 0;
+
+          if (!util.criterion) return 0;
           
           ps_point z2(z_init);
           
           int n2 = build_tree(depth - 1, rho, z2, util);
           
-          double accept_prob = static_cast<double>(n1) / 
+          double accept_prob = static_cast<double>(n2) / 
                                static_cast<double>(n1 + n2);
           
           if ( util.criterion && (this->_rand_uniform() < accept_prob) ) 
             z_propose = z2;
           
           util.criterion &= _compute_criterion(z_init, this->_z, rho);
-          
+            
           return n1 + n2;
           
         }

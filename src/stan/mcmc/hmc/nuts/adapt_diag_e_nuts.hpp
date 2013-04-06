@@ -28,7 +28,7 @@ namespace stan {
         sample s = diag_e_nuts<M, BaseRNG>::transition(init_sample);
         
         if (this->_adapt_flag) {
-          
+        
           this->_learn_stepsize(this->_epsilon, s.accept_stat());
           
           bool update = this->_learn_variance(this->_z.mInv, this->_z.q);
