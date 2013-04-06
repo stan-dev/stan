@@ -12,6 +12,8 @@
 #include <stan/io/dump.hpp>
 
 #include <stan/mcmc/hmc/static/adapt_unit_e_static_hmc.hpp>
+#include <stan/mcmc/hmc/static/adapt_diag_e_static_hmc.hpp>
+#include <stan/mcmc/hmc/static/adapt_dense_e_static_hmc.hpp>
 #include <stan/mcmc/hmc/nuts/adapt_unit_e_nuts.hpp>
 #include <stan/mcmc/hmc/nuts/adapt_diag_e_nuts.hpp>
 #include <stan/mcmc/hmc/nuts/adapt_dense_e_nuts.hpp>
@@ -761,8 +763,9 @@ namespace stan {
         
         sampler.disengage_adaptation();
 
-        sample_stream << "# (" << sampler.name() << ") adaptation finished" << std::endl;
-        sample_stream << "# step size= " << sampler.get_stepsize() << std::endl;
+        sample_stream << "# (" << sampler.name() << ")" << std::endl;
+        sample_stream << "# Adaptation terminated" << std::endl;
+        sample_stream << "# Step size = " << sampler.get_stepsize() << std::endl;
         sampler.z().write_metric(sample_stream);
         
         // Sampling
@@ -784,7 +787,7 @@ namespace stan {
         
         typedef stan::mcmc::adapt_diag_e_nuts<Model, rng_t> a_dm_nuts;
         a_dm_nuts sampler(model, base_rng);
-        
+                
         if (!append_samples) {
           sample_stream << "lp__,";
           sampler.write_sampler_param_names(sample_stream);
@@ -816,8 +819,9 @@ namespace stan {
         
         sampler.disengage_adaptation();
         
-        sample_stream << "# (" << sampler.name() << ") adaptation finished" << std::endl;
-        sample_stream << "# step size= " << sampler.get_stepsize() << std::endl;
+        sample_stream << "# (" << sampler.name() << ")" << std::endl;
+        sample_stream << "# Adaptation terminated" << std::endl;
+        sample_stream << "# Step size = " << sampler.get_stepsize() << std::endl;
         sampler.z().write_metric(sample_stream);
         
         // Sampling
@@ -871,8 +875,9 @@ namespace stan {
         
         sampler.disengage_adaptation();
 
-        sample_stream << "# (" << sampler.name() << ") adaptation finished" << std::endl;
-        sample_stream << "# step size= " << sampler.get_stepsize() << std::endl;
+        sample_stream << "# (" << sampler.name() << ")" << std::endl;
+        sample_stream << "# Adaptation terminated" << std::endl;
+        sample_stream << "# Step size = " << sampler.get_stepsize() << std::endl;
         sampler.z().write_metric(sample_stream);
         
         // Sampling
@@ -907,8 +912,11 @@ namespace stan {
         
         // Warm-Up
         sampler.init_stepsize();
+        
+        std::cout << sampler.get_stepsize() << std::endl;
  
         sampler.set_stepsize_and_L(epsilon, leapfrog_steps);
+        //sampler.set_stepsize_and_T(epsilon, 3.14159);
         
         sampler.set_adapt_mu(log(10 * sampler.get_stepsize()));
         sampler.engage_adaptation();
@@ -925,8 +933,9 @@ namespace stan {
         
         sampler.disengage_adaptation();
 
-        sample_stream << "# (" << sampler.name() << ") adaptation finished" << std::endl;
-        sample_stream << "# step size= " << sampler.get_stepsize() << std::endl;
+        sample_stream << "# (" << sampler.name() << ")" << std::endl;
+        sample_stream << "# Adaptation terminated" << std::endl;
+        sample_stream << "# Step size = " << sampler.get_stepsize() << std::endl;
         sampler.z().write_metric(sample_stream);
         
         // Sampling
