@@ -234,8 +234,7 @@ TEST(ProbDistributionOrderedLogistic, chiSquareGoodnessFitTest) {
   for(int i = 0; i < prob.rows(); i++)
     loc(i) = 0;
 
-  for(int i = 0; i < prob.rows(); i++)
-    {
+  for(int i = 0; i < prob.rows(); i++) {
       for(int j = i; j < prob.rows(); j++)
 	loc(j) += prob(i);
     }
@@ -243,8 +242,7 @@ TEST(ProbDistributionOrderedLogistic, chiSquareGoodnessFitTest) {
   int count = 0;
   int bin [K];
   double expect [K];
-  for(int i = 0 ; i < K; i++)
-  {
+  for(int i = 0 ; i < K; i++) {
     bin[i] = 0;
     expect[i] = N * prob(i);
   }

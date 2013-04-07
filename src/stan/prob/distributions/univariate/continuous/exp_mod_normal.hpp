@@ -9,10 +9,10 @@
 
 #include <stan/agrad.hpp>
 #include <stan/math/error_handling.hpp>
-#include <stan/math/functions/owenst.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
+#include <stan/math/functions/value_of.hpp>
 
 namespace stan {
 
@@ -203,9 +203,9 @@ namespace stan {
 
     template <class RNG>
     inline double
-    exp_mod_normal_rng(double mu,
-		       double sigma,
-		       double lambda,
+    exp_mod_normal_rng(const double mu,
+		       const double sigma,
+		       const double lambda,
 		       RNG& rng) {
       return stan::prob::normal_rng(mu, sigma,rng) + stan::prob::exponential_rng(lambda, rng);
     }

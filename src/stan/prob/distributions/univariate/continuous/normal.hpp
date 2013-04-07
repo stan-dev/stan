@@ -229,8 +229,8 @@ namespace stan {
 
     template <class RNG>
     inline double
-    normal_rng(double mu,
-               double sigma,
+    normal_rng(const double mu,
+               const double sigma,
                RNG& rng) {
       using boost::variate_generator;
       using boost::normal_distribution;

@@ -126,9 +126,9 @@ namespace stan {
 
     template <class RNG>
     inline int
-    hypergeometric_rng(int N,
-		       int a,
-		       int b,
+    hypergeometric_rng(const int N,
+		       const int a,
+		       const int b,
 		       RNG& rng) {
       using boost::variate_generator;
       

@@ -95,10 +95,9 @@ namespace stan {
 	uniform01_rng(rng, uniform_01<>());
       
      Eigen::VectorXd index(theta.rows());
-     for(int i = 0; i < theta.rows(); i++)
-       index(i) = 0;
-      for(int i = 0; i < theta.rows(); i++)
-	{
+     index.setZero();
+
+      for(int i = 0; i < theta.rows(); i++) {
 	  for(int j = i; j < theta.rows(); j++)
 	    index(j) += theta(i,0);
 	}

@@ -361,8 +361,8 @@ namespace stan {
 
     template <class RNG>
     inline int
-    bernoulli_rng(double theta,
-                    RNG& rng) {
+    bernoulli_rng(const double theta,
+                  RNG& rng) {
       using boost::variate_generator;
       using boost::bernoulli_distribution;
       variate_generator<RNG&, bernoulli_distribution<> >

@@ -292,8 +292,8 @@ namespace stan {
 
     template <class RNG>
     inline double
-    cauchy_rng(double mu,
-               double sigma,
+    cauchy_rng(const double mu,
+               const double sigma,
                RNG& rng) {
       using boost::variate_generator;
       using boost::random::cauchy_distribution;

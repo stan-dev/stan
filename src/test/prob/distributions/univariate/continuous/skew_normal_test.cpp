@@ -1,18 +1,19 @@
-#include <stan/prob/distributions/univariate/continuous/normal.hpp>
-#include<boost/math/distributions.hpp>
+#include <stan/prob/distributions/univariate/continuous/skew_normal.hpp>
+#include <boost/math/distributions.hpp>
 #include <gtest/gtest.h>
 #include <boost/random/mersenne_twister.hpp>
 
-TEST(ProbDistributionsNormal, random) {
+TEST(ProbDistributionsSkewNormal, random) {
   boost::random::mt19937 rng;
-  EXPECT_NO_THROW(stan::prob::normal_rng(10.0,2.0,rng));
+  EXPECT_NO_THROW(stan::prob::skew_normal_rng(10.0,2.0,1.0,rng));
 }
 
-TEST(ProbDistributionsNormal, chiSquareGoodnessFitTest) {
+
+TEST(ProbDistributionsSkewNormal, chiSquareGoodnessFitTest) {
   boost::random::mt19937 rng;
   int N = 10000;
   int K = boost::math::round(2 * std::pow(N, 0.4));
-  boost::math::normal_distribution<>dist (2.0,1.0);
+  boost::math::skew_normal_distribution<>dist (3.0,2.0,1.0);
   boost::math::chi_squared mydist(K-1);
 
   double loc[K - 1];
@@ -22,13 +23,13 @@ TEST(ProbDistributionsNormal, chiSquareGoodnessFitTest) {
   int count = 0;
   int bin [K];
   double expect [K];
-  for(int i = 0 ; i < K; i++){
+  for(int i = 0 ; i < K; i++) {
     bin[i] = 0;
     expect[i] = N / K;
   }
 
   while (count < N) {
-    double a = stan::prob::normal_rng(2.0,1.0,rng);
+    double a = stan::prob::skew_normal_rng(3.0,2.0,1.0,rng);
     int i = 0;
     while (i < K-1 && a > loc[i]) 
       ++i;

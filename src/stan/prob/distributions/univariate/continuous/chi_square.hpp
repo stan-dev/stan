@@ -200,8 +200,8 @@ namespace stan {
 
     template <class RNG>
     inline double
-    chi_square_rng(double nu,
-                    RNG& rng) {
+    chi_square_rng(const double nu,
+		   RNG& rng) {
       using boost::variate_generator;
       using boost::random::chi_squared_distribution;
       variate_generator<RNG&, chi_squared_distribution<> >

@@ -10,6 +10,7 @@
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
 #include <stan/prob/internal_math.hpp>
+#include <stan/math/functions/value_of.hpp>
 
 namespace stan {
 
@@ -186,8 +187,8 @@ namespace stan {
 
     template <class RNG>
     inline double
-    gumbel_rng(double mu,
-               double beta,
+    gumbel_rng(const double mu,
+               const double beta,
                RNG& rng) {
       using boost::variate_generator;
       using boost::uniform_01;
