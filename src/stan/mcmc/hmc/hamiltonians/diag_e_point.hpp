@@ -20,7 +20,6 @@ namespace stan {
       Eigen::VectorXd mInv;
       
       void write_metric(std::ostream& o) {
-        //o << "# Inverse mass matrix diagonal elements:" << std::endl;
         o << "# Diagonal elements of inverse mass matrix:" << std::endl;
         o << "# " << mInv(0) << std::flush;
         for(size_t i = 1; i < mInv.size(); ++i)

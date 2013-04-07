@@ -58,7 +58,9 @@ namespace stan {
         o << std::flush;
       }
       
-      virtual void write_metric(std::ostream& o) {};
+      virtual void write_metric(std::ostream& o) {
+        o << "# No free parameters for unit metric" << std::endl;
+      };
       
     };
 
