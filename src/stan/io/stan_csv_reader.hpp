@@ -171,63 +171,75 @@ namespace stan {
   return true;
       }
 
-      static bool read_adaptation(std::istream& in, stan_csv_adaptation& adaptation) { 
-  std::stringstream ss;
-  std::string line;
-        int lines = 0;
-
-  if (in.peek() != '#' || in.good() == false)
-    return false;
-  while (in.peek() == '#') {
-    std::getline(in, line);
-    ss << line << '\n';
-          lines++;
-  }
-  ss.seekg(std::ios_base::beg);
+  static bool read_adaptation(std::istream& in, stan_csv_adaptation& adaptation) { 
   
-  char comment;
-  // sampler
-  ss >> comment >> adaptation.sampler;
-  std::getline(ss, line);
-  // clean up sampler field
-  std::replace(adaptation.sampler.begin(), 
-         adaptation.sampler.end(), 
-         '(', ' ');
-  std::replace(adaptation.sampler.begin(), 
-         adaptation.sampler.end(),
-         ')', ' ');
-  boost::trim(adaptation.sampler);  
+    std::stringstream ss;
+    std::string line;
+    int lines = 0;
 
-  // step size
-  ss >> comment;
-  std::getline(ss, line, '=');
-  boost::trim(line);
-  ss >> adaptation.step_size;
-  std::getline(ss, line);
+    if (in.peek() != '#' || in.good() == false)
+      return false;
+    
+    while (in.peek() == '#') {
+      std::getline(in, line);
+      ss << line << std::endl;
+      lines++;
+    }
+    ss.seekg(std::ios_base::beg);
+       
+    char comment; // Buffer for comment indicator, #
+    
+    // Sampler name
+    ss >> comment;
+    std::getline(ss, adaptation.sampler);
   
-  // parameter step size multipliers
-  std::getline(ss, line); // comment line
-  std::getline(ss, line); // step sizes
-        int rows = lines-3;
-        int cols = std::count(line.begin(), line.end(), ',') + 1;
-  adaptation.step_size_multipliers.resize(rows, cols);
+    std::replace(adaptation.sampler.begin(), 
+                 adaptation.sampler.end(), 
+                 '(', ' ');
+    std::replace(adaptation.sampler.begin(), 
+                 adaptation.sampler.end(),
+                 ')', ' ');
+    boost::trim(adaptation.sampler);  
 
-        for (int row = 0; row < rows; row++) {
-          std::stringstream line_ss;
-          line_ss.str(line);
-          line_ss >> comment;
-          for (int col = 0; col < cols; col++) {
-            std::string token;
-            std::getline(line_ss, token, ',');
-            boost::trim(token);
-            adaptation.step_size_multipliers(row,col) = boost::lexical_cast<double>(token);
-          }
-          std::getline(ss, line); // step sizes
-        }
-  if (ss.good())
-    return false;
-  return true;
+    // Stepsize
+    std::getline(ss, line);
+  
+    std::getline(ss, line, '=');
+    boost::trim(line);
+    ss >> adaptation.step_size;
+
+    // Metric parameters
+    std::getline(ss, line);
+    std::getline(ss, line);
+    std::getline(ss, line);
+    
+    int rows = lines - 4;
+    int cols = std::count(line.begin(), line.end(), ',') + 1;
+    adaptation.step_size_multipliers.resize(rows, cols);
+   
+    for (int row = 0; row < rows; row++) {
+      
+      std::stringstream line_ss;
+      line_ss.str(line);
+      line_ss >> comment;
+      
+      for (int col = 0; col < cols; col++) {
+        std::string token;
+        std::getline(line_ss, token, ',');
+        boost::trim(token);
+        adaptation.step_size_multipliers(row, col) = boost::lexical_cast<double>(token);
       }
+      
+      std::getline(ss, line); // Read in next line
+      
+    }
+        
+    if (ss.good())
+      return false;
+    else
+      return true;
+
+  }
       
       static bool read_samples(std::istream& in, Eigen::MatrixXd& samples) { 
   std::stringstream ss;
