@@ -359,7 +359,7 @@ void test_specific_sample_values(const bitset<options_count>& options, stan::mcm
     if (options[data]) {
       expected_first_y = options[init] ? 100.564 : 100.523;
     } else { 
-      expected_first_y = options[init] ? -0.321312 : -0.389503;
+      expected_first_y = options[init] ? -0.321312 : 2.11978;
     }
     
     Eigen::VectorXd sampled_y;
