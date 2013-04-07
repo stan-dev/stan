@@ -42,18 +42,17 @@ PKG_CPPFLAGS_env_fun <- function() {
 }
 
 legitimate_space_in_path <- function(path) {
-  # Add preceding '\\' to spaces on non-windows (this should happen rarely,
-  # and not sure it will work)
   # For windows, use the short path name (8.3 format) 
   # 
-  WINDOWS <- .Platform$OS.type == "windows"
-  if (WINDOWS) { 
-    path2 <- utils::shortPathName(path) 
+  if (.Platform$OS.type == "windows") { 
+    path <- normalizePath(path)
+    if (grepl(" ", path, fixed = TRUE)) 
+      path <- utils::shortPathName(path)
     # it is weird that the '\\' in the path name will be gone
-    # when passed to cxxfunction, so chagne it to '/' 
-    return(gsub('\\\\', '/', path2, perl=TRUE))
+    # when passed to cxxfunction, so change it to '/' 
+    path <- gsub('\\\\', '/', path, perl = TRUE)
   }
-  gsub("([^\\\\])(\\s+)", '\\1\\\\\\2', path, perl = TRUE)
+  path 
 } 
 
 RSTAN_LIBS_fun <- function() {
