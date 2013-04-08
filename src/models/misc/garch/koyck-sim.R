@@ -11,4 +11,4 @@ y[1] <- rnorm(1,alpha + beta * x[1],sigma);
 for (t in 2:T)
   y[t] <- rnorm(1,alpha + beta * x[t] + lambda * y[t-1], sigma);
 
-fit <- stan(file="koyck.stan", data=c("T","y","x"), iter=500, chains=4, fit=fit);
+fit <- stan(file="koyck.stan", data=c("T","y","x"), iter=500, chains=4);
