@@ -39,9 +39,8 @@ namespace stan {
             this->init_stepsize();
             this->_update_L();
             
-            this->set_adapt_mu(log(10 * this->_epsilon));
+            this->set_adapt_mu(log(5 * this->_epsilon));
             this->stepsize_adapter::init();
-            std::cout << "init stepsize = " << this->_epsilon << std::endl;
           }
           
         }
