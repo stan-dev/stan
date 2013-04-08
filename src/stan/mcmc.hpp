@@ -1,7 +1,6 @@
 #ifndef STAN_MCMC_HPP
 #define STAN_MCMC_HPP
 
-#include "stan/mcmc/util.hpp"
 #include "stan/mcmc/chains.hpp"
 #include "stan/mcmc/sample.hpp"
 
