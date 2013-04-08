@@ -17,7 +17,6 @@
 #include <stan/mcmc/hmc/nuts/adapt_unit_e_nuts.hpp>
 #include <stan/mcmc/hmc/nuts/adapt_diag_e_nuts.hpp>
 #include <stan/mcmc/hmc/nuts/adapt_dense_e_nuts.hpp>
-#include <stan/mcmc/util.hpp>
 
 #include <stan/optimization/newton.hpp>
 #include <stan/optimization/nesterov_gradient.hpp>
@@ -155,17 +154,40 @@ namespace stan {
     void write_comment(std::ostream& o) {
       o << "#" << std::endl;
     }
+    
     template <typename M>
     void write_comment(std::ostream& o,
                        const M& msg) {
       o << "# " << msg << std::endl;
     }
+    
     template <typename K, typename V>
     void write_comment_property(std::ostream& o,
                                 const K& key,
                                 const V& val) {
       o << "# " << key << "=" << val << std::endl;
     }
+    
+    void write_error_msg(std::ostream* error_stream,
+                         const std::domain_error& e) {
+      
+      if (!error_stream) return;
+      
+      *error_stream << std::endl
+                    << "Informational Message: The parameter state is about to be Metropolis"
+                    << " rejected due to the following underlying, non-fatal (really)"
+                    << " issue (and please ignore that what comes next might say 'error'): "
+                    << e.what()
+                    << std::endl
+                    << "If the problem persists across multiple draws, you might have"
+                    << " a problem with an initial state or a gradient somewhere."
+                    << std::endl
+                    << " If the problem does not persist, the resulting samples will still"
+                    << " be drawn from the posterior."
+                    << std::endl;
+      
+    }
+    
     
     bool do_print(int n, int refresh) {
       return (refresh > 0) &&
@@ -467,7 +489,7 @@ namespace stan {
           try {
             init_log_prob = model.grad_log_prob(cont_params, disc_params, init_grad, &std::cout);
           } catch (std::domain_error e) {
-            stan::mcmc::write_error_msgs(&std::cout, e);
+            write_error_msg(&std::cout, e);
             init_log_prob = -std::numeric_limits<double>::infinity();
           }
           
@@ -545,7 +567,7 @@ namespace stan {
         try {
           lp = model.grad_log_prob(cont_params, disc_params, gradient);
         } catch (std::domain_error e) {
-          stan::mcmc::write_error_msgs(&std::cout, e);
+          write_error_msg(&std::cout, e);
           lp = -std::numeric_limits<double>::infinity();
         }
         
@@ -748,7 +770,7 @@ namespace stan {
         
         sampler.set_max_depth(max_treedepth);
         
-        sampler.set_adapt_mu(log(10 * sampler.get_stepsize()));
+        sampler.set_adapt_mu(log(5 * sampler.get_stepsize()));
         sampler.engage_adaptation();
         
         clock_t start = clock();
@@ -804,7 +826,7 @@ namespace stan {
         
         sampler.set_max_depth(max_treedepth);
         
-        sampler.set_adapt_mu(log(10 * sampler.get_stepsize()));
+        sampler.set_adapt_mu(log(5 * sampler.get_stepsize()));
         sampler.engage_adaptation();
         
         clock_t start = clock();
@@ -860,7 +882,7 @@ namespace stan {
         
         sampler.set_max_depth(max_treedepth);
         
-        sampler.set_adapt_mu(log(10 * sampler.get_stepsize()));
+        sampler.set_adapt_mu(log(5 * sampler.get_stepsize()));
         sampler.engage_adaptation();
         
         clock_t start = clock();
@@ -918,7 +940,7 @@ namespace stan {
         sampler.set_stepsize_and_L(epsilon, leapfrog_steps);
         //sampler.set_stepsize_and_T(epsilon, 3.14159);
         
-        sampler.set_adapt_mu(log(10 * sampler.get_stepsize()));
+        sampler.set_adapt_mu(log(5 * sampler.get_stepsize()));
         sampler.engage_adaptation();
         
         clock_t start = clock();
