@@ -546,17 +546,20 @@ The Google Test framework is distributed with \Stan.
 \subsection{Install Xcode}
 
 Apple's Xcode contains both the \clang and \gpp compilers and make, all of the tools 
-needed to work with \Stan as a user. The version of Xcode to install depends on the
-version of Mac OS X.
+needed to work with \Stan as a user. 
+The version of Xcode to install depends on the
+version of Mac OS X.  
 
-\begin{description}
-\item[Mac OS X ``Snow Leopard'' or earlier]
-Xcode 3: Good luck; we couldn't find it
-\item[Mac OS X ``Lion'' or later]
+\subsubsection{Official Apple Xcode Distribution}
+
+Xcode 4 may be downloaded for free for Mac OS X 10.7 (``Lion'') or
+later direclty from Apple:
+
+\begin{quote}
 Xcode 4: \url{https://developer.apple.com/xcode/}
-\end{description}
+\end{quote}
 
-Then, once you've installed Xcode, you need to start it, then open
+Once you've installed Xcode, you need to start it, then open
 menu option \code{Xcode}, select \code{Preferences}, then click on the
 \code{Downloads} icon and then click on the \code{Install} button next
 to the option labeled ``Command Line Tools.''
@@ -566,7 +569,28 @@ At this point, you should have the make system \code{make} and the two
 need to run \Stan.  Xcode will also install the \code{git} version
 control system at this point.
 
+\subsubsection{Alternative, GCC-Only Installer}
+
+A stripped down installer for just the GCC package, including the \Cpp
+compilers \code{g++} and \code{clang++}, available for 
+Mac OS X 10.6 (``Snow Leopard'') or later,
+%
+\begin{quote}
+\url{https://github.com/kennethreitz/osx-gcc-installer/}
+\end{quote}
+%
+The fill list of tools in this distribution is available at:
+%
+\begin{quote}
+\url{http://www.opensource.apple.com/release/developer-tools-41/}
+\end{quote}
+
+
+
 \subsection{More Recent Compilers}
+
+Alternative compilers to those distributed by Apple as part of Xcode
+are available at the following locations.
 
 \subsubsection{Homebrew}
 
