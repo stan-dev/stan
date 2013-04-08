@@ -134,6 +134,8 @@ add("divide",DOUBLE_T,DOUBLE_T,DOUBLE_T);
 add("divide",VECTOR_T,VECTOR_T,DOUBLE_T);
 add("divide",ROW_VECTOR_T,ROW_VECTOR_T,DOUBLE_T);
 add("divide",MATRIX_T,MATRIX_T,DOUBLE_T);
+add("columns_dot_product",ROW_VECTOR_T,MATRIX_T,MATRIX_T);
+add("rows_dot_product",VECTOR_T,MATRIX_T,MATRIX_T);
 add("dot_product",DOUBLE_T,VECTOR_T,VECTOR_T);
 add("dot_product",DOUBLE_T,ROW_VECTOR_T,ROW_VECTOR_T);
 add("dot_product",DOUBLE_T,VECTOR_T,ROW_VECTOR_T);

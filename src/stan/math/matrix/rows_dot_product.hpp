@@ -19,7 +19,7 @@ namespace stan {
      */
     template<int R1,int C1,int R2, int C2>
     inline Eigen::Matrix<double, R1, 1>
-    columns_dot_product(const Eigen::Matrix<double, R1, C1>& v1, 
+    rows_dot_product(const Eigen::Matrix<double, R1, C1>& v1, 
                         const Eigen::Matrix<double, R2, C2>& v2) {
       validate_matching_sizes(v1,v2,"rows_dot_product");
       Eigen::Matrix<double, R1, 1> ret(v1.rows(),1);
