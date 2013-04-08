@@ -47,13 +47,6 @@ namespace stan {
 
       }
       
-      void update(diag_e_point& z) {
-        std::vector<double> grad_lp(this->_model.num_params_r());
-        z.V = - this->_model.grad_log_prob(z.q, z.r, grad_lp);
-        Eigen::Map<Eigen::VectorXd> eigen_g(&(grad_lp[0]), grad_lp.size());
-        z.g = - eigen_g;
-      }
-      
     };
     
   } // mcmc

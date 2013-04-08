@@ -1,6 +1,13 @@
 #ifndef __STAN__MCMC__BASE__HAMILTONIAN__BETA__
 #define __STAN__MCMC__BASE__HAMILTONIAN__BETA__
 
+#include <cstddef>
+#include <stdexcept>
+#include <fstream>
+
+#include <boost/exception/diagnostic_information.hpp> 
+#include <boost/exception_ptr.hpp> 
+
 #include <Eigen/Dense>
 
 namespace stan {
@@ -16,7 +23,7 @@ namespace stan {
       ~base_hamiltonian() {}; 
       
       virtual double T(P& z) = 0;
-      double V(P& z) { return - _model.log_prob(z.q, z.r); }
+      double V(P& z) { return z.V; }
       
       virtual double tau(P& z) = 0;
       virtual double phi(P& z) = 0;
@@ -34,11 +41,45 @@ namespace stan {
       
       virtual void init(P& z) { this->update(z); }
       
-      virtual void update(P& z) {}; // Default no-op
+      virtual void update(P& z, std::ostream* error_stream = 0) {
+        
+        std::vector<double> grad_lp(this->_model.num_params_r());
+        
+        try {
+          z.V = - this->_model.grad_log_prob(z.q, z.r, grad_lp);
+        } catch (std::domain_error e) {
+          this->_write_error_msg(error_stream, e);
+          z.V = std::numeric_limits<double>::infinity();
+        }
+        
+        Eigen::Map<Eigen::VectorXd> eigen_g(&(grad_lp[0]), grad_lp.size());
+        z.g = - eigen_g;
+        
+      }
       
     protected: 
       
         M& _model;
+      
+      void _write_error_msg(std::ostream* error_msgs,
+                           const std::domain_error& e) {
+        
+        if (!error_msgs) return;
+        
+        *error_msgs << std::endl
+                    << "Informational Message: The parameter state is about to be Metropolis"
+                    << " rejected due to the following underlying, non-fatal (really)"
+                    << " issue (and please ignore that what comes next might say 'error'): "
+                    << e.what()
+                    << std::endl
+                    << "If the problem persists across multiple draws, you might have"
+                    << " a problem with an initial state or a gradient somewhere."
+                    << std::endl
+                    << " If the problem does not persist, the resulting samples will still"
+                    << " be drawn from the posterior."
+                    << std::endl;
+        
+      }
       
     };
     
