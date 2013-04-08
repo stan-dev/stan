@@ -145,7 +145,7 @@ TEST(AgradRevMatrix,mdivide_left_spd_grad_vd) {
   matrix_d Cd(2,2);
   
   Ad << 2.0, 3.0, 
-  5.0, 7.0;
+  3.0, 7.0;
   Bd << 12.0, 13.0, 
   15.0, 17.0;
   
