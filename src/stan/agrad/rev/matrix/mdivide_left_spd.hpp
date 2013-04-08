@@ -13,12 +13,13 @@ namespace stan {
   namespace agrad {
 
     namespace {
-      template <int R1,int C1>
+      template <int R1,int C1,int R2,int C2>
       class mdivide_left_spd_alloc : public chainable_alloc {
       public:
         virtual ~mdivide_left_spd_alloc() {}
 
         Eigen::LLT< Eigen::Matrix<double,R1,C1> > _llt;
+        Eigen::Matrix<double,R2,C2> _C;
       };
       
       template <int R1,int C1,int R2,int C2>
@@ -26,26 +27,23 @@ namespace stan {
       public:
         int _M; // A.rows() = A.cols() = B.rows()
         int _N; // B.cols()
-        double* _C;
         vari** _variRefA;
         vari** _variRefB;
         vari** _variRefC;
-        mdivide_left_spd_alloc<R1,C1> *_alloc;
+        mdivide_left_spd_alloc<R1,C1,R2,C2> *_alloc;
 
         mdivide_left_spd_vv_vari(const Eigen::Matrix<var,R1,C1> &A,
                                  const Eigen::Matrix<var,R2,C2> &B)
           : vari(0.0),
             _M(A.rows()),
             _N(B.cols()),
-            _C((double*)stan::agrad::memalloc_.alloc(sizeof(double) 
-                                                     * B.rows() * B.cols())),
             _variRefA((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
                                                            * A.rows() * A.cols())),
             _variRefB((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
                                                            * B.rows() * B.cols())),
             _variRefC((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
                                                            * B.rows() * B.cols())),
-            _alloc(new mdivide_left_spd_alloc<R1,C1>())
+            _alloc(new mdivide_left_spd_alloc<R1,C1,R2,C2>())
         {
           using Eigen::Matrix;
           using Eigen::Map;
@@ -62,20 +60,22 @@ namespace stan {
           }
   
           pos = 0;
+          _alloc->_C.resize(_M,_N);
           for (size_type j = 0; j < _N; j++) {
             for (size_type i = 0; i < _M; i++) {
               _variRefB[pos] = B(i,j).vi_;
-              _C[pos++] = B(i,j).val();
+              _alloc->_C(i,j) = B(i,j).val();
+              pos++;
             }
           }
         
           _alloc->_llt = Ad.llt();
-          Map<Matrix<double,R1,C2> >(_C,_M,_N) = _alloc->_llt.solve(Map<Matrix<double,R1,C2> >(_C,_M,_N));
+          _alloc->_llt.solveInPlace(_alloc->_C);
 
           pos = 0;
           for (size_type j = 0; j < _N; j++) {
             for (size_type i = 0; i < _M; i++) {
-              _variRefC[pos] = new vari(_C[pos],false);
+              _variRefC[pos] = new vari(_alloc->_C(i,j),false);
               pos++;
             }
           }
@@ -86,15 +86,14 @@ namespace stan {
           using Eigen::Map;
           Eigen::Matrix<double,R1,C1> adjA(_M,_M);
           Eigen::Matrix<double,R2,C2> adjB(_M,_N);
-          Eigen::Matrix<double,R1,C2> adjC(_M,_N);
 
           size_t pos = 0;
           for (size_type j = 0; j < _N; j++)
             for (size_type i = 0; i < _M; i++)
-              adjC(i,j) = _variRefC[pos++]->adj_;
+              adjB(i,j) = _variRefC[pos++]->adj_;
 
-          adjB = _alloc->_llt.solve(adjC);
-          adjA.noalias() = -adjB * Map<Matrix<double,R1,C2> >(_C,_M,_N).transpose();
+          _alloc->_llt.solveInPlace(adjB);
+          adjA.noalias() = -adjB * _alloc->_C.transpose();
         
           pos = 0;
           for (size_type j = 0; j < _M; j++)
@@ -113,42 +112,41 @@ namespace stan {
       public:
         int _M; // A.rows() = A.cols() = B.rows()
         int _N; // B.cols()
-        double* _C;
         vari** _variRefB;
         vari** _variRefC;
-        mdivide_left_spd_alloc<R1,C1> *_alloc;
+        mdivide_left_spd_alloc<R1,C1,R2,C2> *_alloc;
       
         mdivide_left_spd_dv_vari(const Eigen::Matrix<double,R1,C1> &A,
                                  const Eigen::Matrix<var,R2,C2> &B)
           : vari(0.0),
             _M(A.rows()),
             _N(B.cols()),
-            _C((double*)stan::agrad::memalloc_.alloc(sizeof(double) 
-                                                     * B.rows() * B.cols())),
             _variRefB((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
                                                            * B.rows() * B.cols())),
             _variRefC((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
                                                            * B.rows() * B.cols())),
-            _alloc(new mdivide_left_spd_alloc<R1,C1>())
+            _alloc(new mdivide_left_spd_alloc<R1,C1,R2,C2>())
         {
           using Eigen::Matrix;
           using Eigen::Map;
   
           size_t pos = 0;
+          _alloc->_C.resize(_M,_N);
           for (size_type j = 0; j < _N; j++) {
             for (size_type i = 0; i < _M; i++) {
               _variRefB[pos] = B(i,j).vi_;
-              _C[pos++] = B(i,j).val();
+              _alloc->_C(i,j) = B(i,j).val();
+              pos++;
             }
           }
 
           _alloc->_llt = A.llt();
-          Map<Matrix<double,R1,C2> >(_C,_M,_N) = _alloc->_llt.solve(Map<Matrix<double,R1,C2> >(_C,_M,_N));
+          _alloc->_llt.solveInPlace(_alloc->_C);
           
           pos = 0;
           for (size_type j = 0; j < _N; j++) {
             for (size_type i = 0; i < _M; i++) {
-              _variRefC[pos] = new vari(_C[pos],false);
+              _variRefC[pos] = new vari(_alloc->_C(i,j),false);
               pos++;
             }
           }
@@ -158,14 +156,13 @@ namespace stan {
           using Eigen::Matrix;
           using Eigen::Map;
           Eigen::Matrix<double,R2,C2> adjB(_M,_N);
-          Eigen::Matrix<double,R1,C2> adjC(_M,_N);
 
           size_t pos = 0;
-          for (size_type j = 0; j < adjC.cols(); j++)
-            for (size_type i = 0; i < adjC.rows(); i++)
-              adjC(i,j) = _variRefC[pos++]->adj_;
+          for (size_type j = 0; j < adjB.cols(); j++)
+            for (size_type i = 0; i < adjB.rows(); i++)
+              adjB(i,j) = _variRefC[pos++]->adj_;
 
-          adjB = _alloc->_llt.solve(adjC);
+          _alloc->_llt.solveInPlace(adjB);
 
           pos = 0;
           for (size_type j = 0; j < adjB.cols(); j++)
@@ -179,23 +176,20 @@ namespace stan {
       public:
         int _M; // A.rows() = A.cols() = B.rows()
         int _N; // B.cols()
-        double* _C;
         vari** _variRefA;
         vari** _variRefC;
-        mdivide_left_spd_alloc<R1,C1> *_alloc;
+        mdivide_left_spd_alloc<R1,C1,R2,C2> *_alloc;
       
         mdivide_left_spd_vd_vari(const Eigen::Matrix<var,R1,C1> &A,
                                  const Eigen::Matrix<double,R2,C2> &B)
           : vari(0.0),
             _M(A.rows()),
             _N(B.cols()),
-            _C((double*)stan::agrad::memalloc_.alloc(sizeof(double) 
-                                                     * B.rows() * B.cols())),
             _variRefA((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
                                                            * A.rows() * A.cols())),
             _variRefC((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
                                                            * B.rows() * B.cols())),
-            _alloc(new mdivide_left_spd_alloc<R1,C1>())
+            _alloc(new mdivide_left_spd_alloc<R1,C1,R2,C2>())
         {
           using Eigen::Matrix;
           using Eigen::Map;
@@ -212,12 +206,12 @@ namespace stan {
           }
           
           _alloc->_llt = Ad.llt();
-          Map<Matrix<double,R1,C2> >(_C,_M,_N) = _alloc->_llt.solve(B);
+          _alloc->_C = _alloc->_llt.solve(B);
           
           pos = 0;
           for (size_type j = 0; j < _N; j++) {
             for (size_type i = 0; i < _M; i++) {
-              _variRefC[pos] = new vari(_C[pos],false);
+              _variRefC[pos] = new vari(_alloc->_C(i,j),false);
               pos++;
             }
           }
@@ -234,7 +228,7 @@ namespace stan {
             for (size_type i = 0; i < adjC.rows(); i++)
               adjC(i,j) = _variRefC[pos++]->adj_;
         
-          adjA = -_alloc->_llt.solve(adjC*Map<Matrix<double,R1,C2> >(_C,_M,_N).transpose());
+          adjA = -_alloc->_llt.solve(adjC*_alloc->_C.transpose());
 
           pos = 0;
           for (size_type j = 0; j < adjA.cols(); j++)
