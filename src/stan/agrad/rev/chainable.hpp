@@ -65,6 +65,8 @@ namespace stan {
       }
     };
 
+    
+    
     /**
      * Reset all adjoint values in the stack to zero.
      */

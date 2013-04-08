@@ -9,6 +9,7 @@ namespace stan {
 
     std::vector<chainable*> var_stack_;
     std::vector<chainable*> var_nochain_stack_;
+    std::vector<chainable_alloc*> var_alloc_stack_;
     memory::stack_alloc memalloc_;
 
   }
