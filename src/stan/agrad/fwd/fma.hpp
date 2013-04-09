@@ -27,8 +27,8 @@ namespace stan{
         const fvar<T3>& x3){
       using stan::math::fma;
       return fvar<typename 
-                  stan::return_type<T1,T2,T3>::type>(fma(x1, x2.val_, x3.val_), 
-                        x2.d_ * x1 + x3.d_);
+                  stan::return_type<T1,T2,T3>::type>(fma(x1, x2.val_, x3.val_),
+                                                     x2.d_ * x1 + x3.d_);
     }
 
     template <typename T1, typename T2, typename T3>
@@ -38,8 +38,8 @@ namespace stan{
         const fvar<T3>& x3){
       using stan::math::fma;
       return fvar<typename 
-                  stan::return_type<T1,T2,T3>::type>(fma(x1.val_, x2, x3.val_), 
-                        x1.d_ * x2 + x3.d_);
+                  stan::return_type<T1,T2,T3>::type>(fma(x1.val_, x2, x3.val_),
+                                                     x1.d_ * x2 + x3.d_);
     }
 
     template <typename T1, typename T2, typename T3>
@@ -49,8 +49,8 @@ namespace stan{
         const T3& x3){
       using stan::math::fma;
       return fvar<typename 
-                  stan::return_type<T1,T2,T3>::type>(fma(x1.val_, x2.val_, x3), 
-                        x1.d_ * x2.val_ + x2.d_ * x1.val_);
+                  stan::return_type<T1,T2,T3>::type>(fma(x1.val_, x2.val_, x3),
+                                            x1.d_ * x2.val_ + x2.d_ * x1.val_);
     }
 
     template <typename T1, typename T2, typename T3>

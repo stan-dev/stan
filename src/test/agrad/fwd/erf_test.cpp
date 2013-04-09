@@ -13,9 +13,11 @@ TEST(AgradFvar, erf){
 
   fvar<double> a = erf(x);
   EXPECT_FLOAT_EQ(erf(0.5), a.val_);
-  EXPECT_FLOAT_EQ(2 * exp(-0.5 * 0.5) / sqrt(boost::math::constants::pi<double>()), a.d_);
+  EXPECT_FLOAT_EQ(2 * exp(-0.5 * 0.5) / 
+                  sqrt(boost::math::constants::pi<double>()), a.d_);
 
  fvar<double> b = erf(-x);
   EXPECT_FLOAT_EQ(erf(-0.5), b.val_);
-  EXPECT_FLOAT_EQ(-2 * exp(-0.5 * 0.5) / sqrt(boost::math::constants::pi<double>()), b.d_);
+  EXPECT_FLOAT_EQ(-2 * exp(-0.5 * 0.5) 
+                  / sqrt(boost::math::constants::pi<double>()), b.d_);
 }

@@ -18,7 +18,8 @@ namespace stan{
       using boost::math::tgamma;
       return fvar<typename 
                   stan::return_type<T1,T2>::type>(lbeta(x1.val_, x2.val_), 
-                          x1.d_ / tgamma(x1.val_) + x2.d_ / tgamma(x2.val_)                                    - (x1.d_ + x2.d_) / tgamma(x1.val_ + x2.val_));
+                          x1.d_ / tgamma(x1.val_) + x2.d_ / tgamma(x2.val_)
+                          - (x1.d_ + x2.d_) / tgamma(x1.val_ + x2.val_));
     }
 
     template <typename T1, typename T2>
@@ -40,7 +41,8 @@ namespace stan{
       using boost::math::tgamma;
       return fvar<typename 
                   stan::return_type<T1,T2>::type>(lbeta(x1.val_, x2), 
-                          x1.d_ / tgamma(x1.val_) - x1.d_ / tgamma(x1.val_ + x2));
+                          x1.d_ / tgamma(x1.val_) - x1.d_ 
+                          / tgamma(x1.val_ + x2));
     }
   }
 }

@@ -19,11 +19,14 @@ namespace stan{
       double deriv = 0;
       int count;
       for(count = 1; count < x2.val_ - 1; count++)
-        deriv += (x1.d_  - x2.d_ / 2) * digamma(x1.val_ - (x2.val_ - count) / 2);
+        deriv += (x1.d_  - x2.d_ / 2) * digamma(x1.val_ 
+                                                - (x2.val_ - count) / 2);
       deriv += x1.d_ * digamma(x1.val_);
-      deriv += (2 * x2.val_ - 1) / 2 * log(boost::math::constants::pi<double>()) * x2.d_;
+      deriv += (2 * x2.val_ - 1) / 2 
+        * log(boost::math::constants::pi<double>()) * x2.d_;
       return fvar<typename 
-                  stan::return_type<T1,T2>::type>(lmgamma(x1.val_, x2.val_), deriv);
+                  stan::return_type<T1,T2>::type>(lmgamma(x1.val_, x2.val_), 
+                                                  deriv);
     }
  
     template <typename T1, typename T2>
@@ -38,7 +41,8 @@ namespace stan{
       for(count = 1; count < x2.val_ - 1; count++)
         deriv += (0  - x2.d_ / 2) * digamma(x1 - (x2.val_ - count) / 2);
       deriv += 0 * digamma(x1);
-      deriv += (2 * x2.val_ - 1) / 2 * log(boost::math::constants::pi<double>()) * x2.d_;
+      deriv += (2 * x2.val_ - 1) / 2 
+        * log(boost::math::constants::pi<double>()) * x2.d_;
       return fvar<typename 
                   stan::return_type<T1,T2>::type>(lmgamma(x1, x2.val_), deriv);
     }
@@ -55,7 +59,8 @@ namespace stan{
       for(count = 1; count < x2 - 1; count++)
         deriv += (x1.d_  - 0) * digamma(x1.val_ - (x2 - count) / 2);
       deriv += x1.d_ * digamma(x1.val_);
-      deriv += (2 * x2 - 1) / 2 * log(boost::math::constants::pi<double>()) * 0;
+      deriv += (2 * x2 - 1) / 2 
+        * log(boost::math::constants::pi<double>()) * 0;
       return fvar<typename 
                   stan::return_type<T1,T2>::type>(lmgamma(x1.val_, x2), deriv);
     }

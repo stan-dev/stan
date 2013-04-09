@@ -14,8 +14,7 @@ namespace stan{
     cosh(const fvar<T>& x) {
       using std::sinh;
       using std::cosh;
-      return fvar<T>(cosh(x.val_),
-                     x.d_ * sinh(x.val_));
+      return fvar<T>(cosh(x.val_), x.d_ * sinh(x.val_));
     }
   }
 }

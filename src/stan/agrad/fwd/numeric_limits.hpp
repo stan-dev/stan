@@ -48,7 +48,8 @@ namespace std {
 
     static const bool traps = numeric_limits<T>::traps;
     static const bool tinyness_before = numeric_limits<T>::tinyness_before;
-    static const float_round_style round_style = numeric_limits<T>::round_style;
+    static const float_round_style round_style = 
+      numeric_limits<T>::round_style;
   };
 }
 #endif

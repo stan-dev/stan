@@ -16,7 +16,8 @@ TEST(AgradFvar, log_sum_exp) {
 
   fvar<double> a = log_sum_exp(x, y);
   EXPECT_FLOAT_EQ(log_sum_exp(0.5, 1.2), a.val_);
-  EXPECT_FLOAT_EQ((1.0 * exp(0.5) + 2.0 * exp(1.2)) / (exp(0.5) + exp(1.2)), a.d_);
+  EXPECT_FLOAT_EQ((1.0 * exp(0.5) + 2.0 * exp(1.2)) / (exp(0.5) 
+                                                       + exp(1.2)), a.d_);
 
   fvar<double> b = log_sum_exp(x, z);
   EXPECT_FLOAT_EQ(log_sum_exp(0.5, 1.4), b.val_);

@@ -14,8 +14,7 @@ namespace stan{
     fvar<T>
     atanh(const fvar<T>& x) {
       using boost::math::atanh;
-       return fvar<T>(atanh(x.val_),
-                     x.d_ / (1 - x.val_ * x.val_));
+       return fvar<T>(atanh(x.val_), x.d_ / (1 - x.val_ * x.val_));
     }
   }
 }

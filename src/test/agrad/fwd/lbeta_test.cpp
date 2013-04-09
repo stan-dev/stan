@@ -17,7 +17,8 @@ TEST(AgradFvar, lbeta) {
 
   fvar<double> a = lbeta(x, y);
   EXPECT_FLOAT_EQ(lbeta(0.5, 1.2), a.val_);
-  EXPECT_FLOAT_EQ(1.0 / tgamma(0.5) + 2.0 / tgamma(1.2) - (1.0 + 2.0) / tgamma(0.5 + 1.2), a.d_);
+  EXPECT_FLOAT_EQ(1.0 / tgamma(0.5) + 2.0 / tgamma(1.2) 
+                  - (1.0 + 2.0) / tgamma(0.5 + 1.2), a.d_);
 
   fvar<double> b = lbeta(x, w);
   EXPECT_FLOAT_EQ(lbeta(0.5, 1.3), b.val_);

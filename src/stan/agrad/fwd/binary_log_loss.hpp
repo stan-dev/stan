@@ -16,9 +16,9 @@ namespace stan{
       using stan::math::binary_log_loss;
       using std::log;
       return fvar<typename 
-                  stan::return_type<T1,T2>::type>(binary_log_loss(x1.val_, 
-								  x2.val_),
-		        -x1.d_ * log(x2.val_) + x1.d_ * log(1 - x2.val_)
+                  stan::return_type<T1,T2>::type>(binary_log_loss(x1.val_,
+                                                                  x2.val_),
+                        -x1.d_ * log(x2.val_) + x1.d_ * log(1 - x2.val_)
                         - x2.d_ * x1.val_ / x2.val_ 
                         + x2.d_ * (1 - x1.val_) / (1 - x2.val_));
     } 

@@ -16,7 +16,8 @@ namespace stan{
       using stan::math::multiply_log;
       using std::log;
       return fvar<typename 
-                  stan::return_type<T1,T2>::type>(multiply_log(x1.val_, x2.val_),
+                  stan::return_type<T1,T2>::type>(multiply_log(x1.val_, 
+                                                               x2.val_),
                              x1.d_ * log(x2.val_) + x1.val_ * x2.d_ / x2.val_);
     }
 
