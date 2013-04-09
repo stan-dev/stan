@@ -771,11 +771,11 @@ namespace stan {
       using boost::variate_generator;
       using boost::normal_distribution;
       variate_generator<RNG&, normal_distribution<> >
-	std_normal_rng(rng, normal_distribution<>(0,1));
+  std_normal_rng(rng, normal_distribution<>(0,1));
 
       Eigen::VectorXd z(S.cols());
       for(int i = 0; i < S.cols(); i++)
-	z(i) = std_normal_rng();
+  z(i) = std_normal_rng();
 
       return mu + S.llt().matrixL() * z;
     }

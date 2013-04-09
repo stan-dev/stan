@@ -202,8 +202,8 @@ namespace stan {
     template <class RNG>
     inline double
     lognormal_rng(const double mu,
-		  const double sigma,
-		  RNG& rng) {
+      const double sigma,
+      RNG& rng) {
       using boost::variate_generator;
       using boost::random::lognormal_distribution;
       variate_generator<RNG&, lognormal_distribution<> >

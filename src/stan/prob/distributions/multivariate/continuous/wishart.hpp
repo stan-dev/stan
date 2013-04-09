@@ -168,17 +168,17 @@ namespace stan {
     template <class RNG>
     inline Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>
     wishart_rng(const double nu,
-		const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& S,
-		RNG& rng) {
+    const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& S,
+    RNG& rng) {
 
       Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> B(S.rows(), S.cols());
       B.setZero();
 
       for(int i = 0; i < S.cols(); i++) {
-	  B(i,i) = std::sqrt(chi_square_rng(nu - i, rng));
-	  for(int j = 0; j < i; j++)
-	    B(j,i) = normal_rng(0,1,rng);
-	}
+    B(i,i) = std::sqrt(chi_square_rng(nu - i, rng));
+    for(int j = 0; j < i; j++)
+      B(j,i) = normal_rng(0,1,rng);
+  }
 
       return stan::math::multiply_lower_tri_self_transpose(S.llt().matrixL() * B);
     }

@@ -1,6 +1,7 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__DISCRETE__MULTINOMIAL_HPP__
 #define __STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__DISCRETE__MULTINOMIAL_HPP__
 
+#include <boost/math/special_functions/gamma.hpp>
 #include <boost/random/uniform_01.hpp>
 #include <boost/random/variate_generator.hpp>
 
@@ -31,6 +32,7 @@ namespace stan {
       using stan::math::check_simplex;
       using stan::math::check_size_match;
       using boost::math::tools::promote_args;
+      using boost::math::lgamma;
 
       typename promote_args<T_prob>::type lp(0.0);
       if (!check_nonnegative(function, ns, "Number of trials variable", &lp, Policy()))
