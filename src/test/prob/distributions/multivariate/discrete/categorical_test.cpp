@@ -113,17 +113,15 @@ TEST(ProbDistributionCategorical, chiSquareGoodnessFitTest) {
   for(int i = 0; i < theta.rows(); i++)
     loc(i) = 0;
 
-      for(int i = 0; i < theta.rows(); i++)
-	{
-	  for(int j = i; j < theta.rows(); j++)
-	    loc(j) += theta(i);
-	}
+  for(int i = 0; i < theta.rows(); i++) {
+    for(int j = i; j < theta.rows(); j++)
+      loc(j) += theta(i);
+  }
 
   int count = 0;
   int bin [K];
   double expect [K];
-  for(int i = 0 ; i < K; i++)
-  {
+  for(int i = 0 ; i < K; i++) {
     bin[i] = 0;
     expect[i] = N * theta(i);
   }

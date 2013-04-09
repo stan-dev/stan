@@ -1,7 +1,7 @@
 #include <stan/prob/distributions/univariate/continuous/trunc_normal.hpp>
 #include <gtest/gtest.h>
 #include <boost/random/mersenne_twister.hpp>
-#include<boost/math/distributions.hpp>
+#include <boost/math/distributions.hpp>
 
 TEST(ProbDistributionsTruncNormal, random) {
   boost::random::mt19937 rng;
@@ -22,8 +22,7 @@ TEST(ProbDistributionsTruncNormal, approxChiSquareGoodnessFitTest) {
   int count = 0;
   int bin [K];
   double expect [K];
-  for(int i = 0 ; i < K; i++)
-  {
+  for(int i = 0 ; i < K; i++) {
     bin[i] = 0;
     expect[i] = N / K;
   }
@@ -32,7 +31,7 @@ TEST(ProbDistributionsTruncNormal, approxChiSquareGoodnessFitTest) {
     double a = stan::prob::trunc_normal_rng(0.0,1.0,-100.0,100.0,rng);
     int i = 0;
     while (i < K-1 && a > loc[i]) 
-  ++i;
+      ++i;
     ++bin[i];
     count++;
    }

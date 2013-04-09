@@ -22,8 +22,7 @@ TEST(ProbDistributionsInvChiSquare, chiSquareGoodnessFitTest) {
   int count = 0;
   int bin [K];
   double expect [K];
-  for(int i = 0 ; i < K; i++)
-  {
+  for(int i = 0 ; i < K; i++) {
     bin[i] = 0;
     expect[i] = N / K;
   }
@@ -32,7 +31,7 @@ TEST(ProbDistributionsInvChiSquare, chiSquareGoodnessFitTest) {
     double a = stan::prob::inv_chi_square_rng(4.0,rng);
     int i = 0;
     while (i < K-1 && a > loc[i]) 
-  ++i;
+      ++i;
     ++bin[i];
     count++;
    }

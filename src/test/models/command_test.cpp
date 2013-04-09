@@ -82,6 +82,7 @@ public:
     expected_help_options.push_back("save_warmup");
     expected_help_options.push_back("test_grad");
     expected_help_options.push_back("point_estimate");
+    expected_help_options.push_back("point_estimate_newton\n");
     expected_help_options.push_back("nondiag_mass");
     expected_help_options.push_back("cov_matrix");
 

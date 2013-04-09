@@ -6,7 +6,8 @@
 
 #include <stan/agrad.hpp>
 #include <stan/math/error_handling.hpp>
-#include <stan/math/special_functions.hpp>
+#include <stan/math/functions/square.hpp>
+#include <stan/math/functions/value_of.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
@@ -347,9 +348,9 @@ namespace stan {
       
     template <class RNG>
     inline double
-    scaled_inv_chi_square_rng(double nu,
-               double s,
-               RNG& rng) {
+    scaled_inv_chi_square_rng(const double nu,
+			      const double s,
+			      RNG& rng) {
       using boost::variate_generator;
       using boost::random::chi_squared_distribution;
       variate_generator<RNG&, chi_squared_distribution<> >

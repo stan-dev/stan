@@ -6,10 +6,14 @@
 
 #include <stan/agrad.hpp>
 #include <stan/math/error_handling.hpp>
-#include <stan/math/special_functions.hpp>
+#include <stan/math/functions/log1m.hpp>
+#include <stan/math/functions/log_inv_logit.hpp>
+#include <stan/math/functions/value_of.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/traits.hpp>
 #include <stan/prob/constants.hpp>
+
+#include <stan/math/functions/binomial_coefficient_log.hpp>
 
 namespace stan {
 
@@ -415,13 +419,13 @@ namespace stan {
 
     template <class RNG>
     inline int
-    binomial_rng(int n,
-                 double prob,
+    binomial_rng(const int N,
+                 const double theta,
                  RNG& rng) {
       using boost::variate_generator;
       using boost::binomial_distribution;
       variate_generator<RNG&, binomial_distribution<> >
-        binomial_rng(rng, binomial_distribution<>(n, prob));
+        binomial_rng(rng, binomial_distribution<>(N, theta));
       return binomial_rng();
     }
     

@@ -6,7 +6,7 @@
 
 #include <stan/agrad.hpp>
 #include <stan/math/error_handling.hpp>
-#include <stan/math/special_functions.hpp>
+#include <stan/math/functions/value_of.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
@@ -240,13 +240,13 @@ namespace stan {
 
     template <class RNG>
     inline double
-    gamma_rng(double alpha,
-        double beta,
-                    RNG& rng) {
+    gamma_rng(const double alpha,
+	      const double beta,
+	      RNG& rng) {
       using boost::variate_generator;
       using boost::gamma_distribution;
       variate_generator<RNG&, gamma_distribution<> >
-  gamma_rng(rng, gamma_distribution<>(alpha, beta));
+	gamma_rng(rng, gamma_distribution<>(alpha, beta));
       return gamma_rng();
     }
 

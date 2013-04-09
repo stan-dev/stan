@@ -28,19 +28,19 @@
 \alias{get_adaptation_info,stanfit-method}
 \alias{get_sampler_params}
 \alias{get_sampler_params,stanfit,logical-method}
-\alias{get_num_upars}
-\alias{get_num_upars,stanfit-method}
-\alias{unconstrain_pars}
-\alias{unconstrain_pars,stanfit-method}
+%% \alias{get_num_upars}
+%% \alias{get_num_upars,stanfit-method}
+%% \alias{unconstrain_pars}
+%% \alias{unconstrain_pars,stanfit-method}
 %%\alias{unconstrain_pars,stanfit,list-method}
-\alias{constrain_pars}
-\alias{constrain_pars,stanfit-method}
+%% \alias{constrain_pars}
+%% \alias{constrain_pars,stanfit-method}
 %%\alias{constrain_pars,stanfit,numeric-method}
-\alias{log_prob}
-\alias{log_prob,stanfit-method}
+%%\alias{log_prob}
+%%\alias{log_prob,stanfit-method}
 %% \alias{log_prob,stanfit,numeric-method}
-\alias{grad_log_prob}
-\alias{grad_log_prob,stanfit-method}
+%%\alias{grad_log_prob}
+%%\alias{grad_log_prob,stanfit-method}
 %% \alias{grad_log_prob,stanfit,numeric-method}
 %% \alias{traceplot,stanfit-method}
 
@@ -188,9 +188,10 @@
       the gradient of log probability density function for a set of parameter 
       values (on the \emph{unconstrained} space) up to an additive constant.
       The unconstrained parameters are specified using a numeric vector
-      with the length being the number of unconstrained parameters. .
+      with the length being the number of unconstrained parameters.
       A numeric vector is returned with the length of the number of 
-      unconstrained parameters.} 
+      unconstrained parameters and an attribute named \code{log_prob} being
+      the \code{lp__}.}
     \item{\code{get_num_upars}}{\code{signature(object = "stanfit")}: get the 
       number of unconstrained parameters of the model. The number of parameters 
       for a model is not necessarily equal to this number of unconstrained 
@@ -239,6 +240,7 @@ head(sp[[1]])
 
 lp <- log_prob(fit, c(1, 2))
 grad <- grad_log_prob(fit, c(1, 2))
+lp2 <- attr(grad, "log_prob") # should be the same as "lp"
 
 # get the number of parameters on the unconstrained space
 n <- get_num_upars(fit)
@@ -252,5 +254,19 @@ y1star <- constrain_pars(fit, uy)
 
 print(y1)
 print(y1star) # y1start should equal to y1 
-}}
+}
+
+
+# cache of a saved stanfit object 
+# the Stan code for this model is in the example of function stan
+exfit <- rstan:::exfit  
+print(exfit)
+plot(exfit)
+
+adaptinfo <- get_adaptation_info(exfit)
+seed <- get_seed(exfit)
+sp <- get_sampler_params(exfit)
+
+
+}
 \keyword{classes}

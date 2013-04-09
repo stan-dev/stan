@@ -62,8 +62,7 @@ TEST(ProbDistributionsDirichlet, marginalOneChiSquareGoodnessFitTest) {
   int count = 0;
   int bin [K];
   double expect [K];
-  for(int i = 0 ; i < K; i++)
-  {
+  for(int i = 0 ; i < K; i++) {
     bin[i] = 0;
     expect[i] = N / K;
   }
@@ -106,8 +105,7 @@ TEST(ProbDistributionsDirichlet, marginalTwoChiSquareGoodnessFitTest) {
   int count = 0;
   int bin [K];
   double expect [K];
-  for(int i = 0 ; i < K; i++)
-  {
+  for(int i = 0 ; i < K; i++) {
     bin[i] = 0;
     expect[i] = N / K;
   }

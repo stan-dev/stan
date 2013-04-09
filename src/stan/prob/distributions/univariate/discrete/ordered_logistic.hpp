@@ -7,7 +7,9 @@
 
 #include <stan/prob/traits.hpp>
 #include <stan/math/error_handling.hpp>
-#include <stan/math/special_functions.hpp>
+#include <stan/math/functions/inv_logit.hpp>
+#include <stan/math/functions/log1m.hpp>
+#include <stan/math/functions/log1p_exp.hpp>
 #include <stan/math/matrix_error_handling.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/prob/constants.hpp>
@@ -165,7 +167,7 @@ namespace stan {
 
     template <class RNG>
     inline int
-    ordered_logistic_rng(double eta,
+    ordered_logistic_rng(const double eta,
 			 const Eigen::Matrix<double,Eigen::Dynamic,1>& c,
 			 RNG& rng) {
       using boost::variate_generator;

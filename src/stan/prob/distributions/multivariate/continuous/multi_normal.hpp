@@ -6,12 +6,22 @@
 
 #include <stan/math/matrix_error_handling.hpp>
 #include <stan/math/error_handling.hpp>
-#include <stan/math/special_functions.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
 #include <stan/agrad/agrad.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/agrad/matrix.hpp>
+#include <stan/math/matrix/columns_dot_product.hpp>
+#include <stan/math/matrix/columns_dot_self.hpp>
+#include <stan/math/matrix/dot_product.hpp>
+#include <stan/math/matrix/dot_self.hpp>
+#include <stan/math/matrix/log.hpp>
+#include <stan/math/matrix/log_determinant.hpp>
+#include <stan/math/matrix/mdivide_left_tri_low.hpp>
+#include <stan/math/matrix/mdivide_left_spd.hpp>
+#include <stan/math/matrix/multiply.hpp>
+#include <stan/math/matrix/subtract.hpp>
+#include <stan/math/matrix/sum.hpp>
 
 namespace stan {
   namespace prob {
@@ -299,7 +309,7 @@ namespace stan {
       using stan::math::check_finite;
       using stan::math::check_symmetric;
       using stan::math::dot_product;
-      using stan::math::mdivide_left;
+      using stan::math::mdivide_left_spd;
       using stan::math::log_determinant;
       
       if (!check_size_match(function, 
@@ -351,7 +361,7 @@ namespace stan {
           y_minus_mu(i) = y(i)-mu(i);
         Eigen::Matrix<typename 
             boost::math::tools::promote_args<T_covar,T_loc,T_y>::type,
-            Eigen::Dynamic, 1> Sinv_y_minus_mu(mdivide_left(Sigma,y_minus_mu));
+            Eigen::Dynamic, 1> Sinv_y_minus_mu(mdivide_left_spd(Sigma,y_minus_mu));
         lp -= 0.5 * dot_product(y_minus_mu,Sinv_y_minus_mu);
       }
       return lp;
@@ -410,7 +420,7 @@ namespace stan {
       using stan::math::check_symmetric;
       using stan::math::check_not_nan;
       using stan::math::sum;
-      using stan::math::mdivide_left;
+      using stan::math::mdivide_left_spd;
       using stan::math::log_determinant;
       using stan::math::columns_dot_product;
       
@@ -479,9 +489,9 @@ namespace stan {
         
         Eigen::Matrix<typename 
             boost::math::tools::promote_args<T_covar,T_loc,T_y>::type,
-            Eigen::Dynamic,Eigen::Dynamic> Sinv_y_minus_mu(mdivide_left(Sigma,z));
+            Eigen::Dynamic,Eigen::Dynamic> Sinv_z(mdivide_left_spd(Sigma,z));
         
-        lp -= 0.5 * sum(columns_dot_product(z,Sinv_y_minus_mu));
+        lp -= 0.5 * sum(columns_dot_product(z,Sinv_z));
       }
       return lp;      
     }
@@ -577,7 +587,7 @@ namespace stan {
         lp += NEG_LOG_SQRT_TWO_PI * y.rows();
       
       if (include_summand<propto,T_covar>::value)
-        lp += log_determinant(Sigma);
+        lp += 0.5*log_determinant(Sigma);
       
       if (include_summand<propto,T_y,T_loc,T_covar>::value) {
         Eigen::Matrix<typename 
@@ -688,7 +698,7 @@ namespace stan {
         lp += NEG_LOG_SQRT_TWO_PI * y.cols() * y.rows();
       
       if (include_summand<propto,T_covar>::value) {
-        lp += log_determinant(Sigma) * y.rows();
+        lp += log_determinant(Sigma) * (0.5 * y.rows());
       }
       
       if (include_summand<propto,T_y,T_loc,T_covar>::value) {
@@ -754,20 +764,20 @@ namespace stan {
     }
   
     template <class RNG>
-    inline Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>
+    inline Eigen::VectorXd
     multi_normal_rng(const Eigen::Matrix<double,Eigen::Dynamic,1>& mu,
-                     const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
+                     const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& S,
                      RNG& rng) {
       using boost::variate_generator;
       using boost::normal_distribution;
       variate_generator<RNG&, normal_distribution<> >
 	std_normal_rng(rng, normal_distribution<>(0,1));
 
-      Eigen::VectorXd z(Sigma.cols());
-      for(int i = 0; i < Sigma.cols(); i++)
+      Eigen::VectorXd z(S.cols());
+      for(int i = 0; i < S.cols(); i++)
 	z(i) = std_normal_rng();
 
-      return mu + Sigma.llt().matrixL() * z;
+      return mu + S.llt().matrixL() * z;
     }
   }
 }

@@ -116,10 +116,10 @@ namespace stan {
       
     template <class RNG>
     inline double
-    trunc_normal_rng(double mu,
-         double sigma,
-         double alpha,
-         double beta,
+    trunc_normal_rng(const double mu,
+		     const double sigma,
+		     const double alpha,
+		     const double beta,
                      RNG& rng) {
       using boost::variate_generator;
       double a = stan::prob::normal_rng(mu, sigma, rng);

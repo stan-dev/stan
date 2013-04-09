@@ -672,8 +672,10 @@ namespace stan {
   // from generator.hpp
   void generate_expression(const expression& e, std::ostream& o);
 
+    bool has_rng_suffix(const std::string& s);
 
-}
+
   }
+}
  
 #endif

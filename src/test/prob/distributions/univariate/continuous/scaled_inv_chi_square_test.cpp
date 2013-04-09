@@ -26,7 +26,7 @@ TEST(ProbDistributionsScaledInvChiSquare, chiSquareGoodnessFitTest) {
     double a = stan::prob::scaled_inv_chi_square_rng(2.0,1.0,rng) / (2.0 * 1.0);
     int i = 0;
     while (i < K-1 && a > loc[i]) 
-  ++i;
+      ++i;
     ++bin[i];
     count++;
    }

@@ -42,5 +42,12 @@
 library(rstan) 
 fit <- stan(model_code = "parameters {real y;} model {y ~ normal(0,1);}") 
 traceplot(fit) 
-}} 
+}
+
+# cache of a saved stanfit object 
+# the Stan code for this model is in the example of function stan
+exfit <- rstan:::exfit  
+print(exfit)
+traceplot(exfit)
+} 
 \keyword{methods}

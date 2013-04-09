@@ -7,7 +7,8 @@
 #include <stan/agrad.hpp>
 #include <stan/prob/traits.hpp>
 #include <stan/math/error_handling.hpp>
-#include <stan/math/special_functions.hpp>
+#include <stan/math/functions/square.hpp>
+#include <stan/math/functions/value_of.hpp>
 #include <stan/prob/constants.hpp>
 
 namespace stan {
@@ -291,13 +292,13 @@ namespace stan {
 
     template <class RNG>
     inline double
-    cauchy_rng(double med,
-               double sigma,
+    cauchy_rng(const double mu,
+               const double sigma,
                RNG& rng) {
       using boost::variate_generator;
       using boost::random::cauchy_distribution;
       variate_generator<RNG&, cauchy_distribution<> >
-        cauchy_rng(rng, cauchy_distribution<>(med, sigma));
+        cauchy_rng(rng, cauchy_distribution<>(mu, sigma));
       return cauchy_rng();
     }
   }

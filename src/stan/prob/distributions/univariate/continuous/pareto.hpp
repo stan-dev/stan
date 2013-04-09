@@ -6,7 +6,7 @@
 
 #include <stan/agrad.hpp>
 #include <stan/math/error_handling.hpp>
-#include <stan/math/special_functions.hpp>
+#include <stan/math/functions/value_of.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
@@ -272,8 +272,8 @@ namespace stan {
       
     template <class RNG>
     inline double
-    pareto_rng(double y_min,
-               double alpha,
+    pareto_rng(const double y_min,
+               const double alpha,
                RNG& rng) {
       using boost::variate_generator;
       using boost::exponential_distribution;

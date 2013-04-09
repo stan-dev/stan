@@ -6,7 +6,6 @@
 #include <stan/prob/constants.hpp>
 #include <stan/math/matrix_error_handling.hpp>
 #include <stan/math/error_handling.hpp>
-#include <stan/math/special_functions.hpp>
 #include <stan/prob/traits.hpp>
 #include <stan/prob/distributions/multivariate/continuous/multi_normal.hpp>
 #include <stan/prob/distributions/univariate/continuous/inv_gamma.hpp>
@@ -186,16 +185,15 @@ namespace stan {
 
 
     template <class RNG>
-    inline Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>
-    multi_student_t_rng(double nu,
+    inline Eigen::VectorXd
+    multi_student_t_rng(const double nu,
 			const Eigen::Matrix<double,Eigen::Dynamic,1>& mu,
                      const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& s,
                      RNG& rng) {
 
       Eigen::VectorXd z(s.cols());
-      for(int i = 0; i < s.cols(); i++)
-	z(i) = 0.0;
-
+      z.setZero();
+     
       double w = stan::prob::inv_gamma_rng(nu / 2, nu / 2, rng);
       return mu + std::sqrt(w) * stan::prob::multi_normal_rng(z, s, rng);
     }

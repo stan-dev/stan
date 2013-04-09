@@ -118,7 +118,6 @@ public:
   var log_prob_function(const T_y& y, const T_loc& mu, const T_scale& sigma,
       const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
     using std::log;
-    using stan::math::log;
     using std::fabs;
     using stan::prob::include_summand;
     using stan::prob::NEG_LOG_TWO;

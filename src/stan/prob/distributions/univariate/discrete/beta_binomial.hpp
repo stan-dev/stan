@@ -7,11 +7,14 @@
 
 #include <stan/agrad.hpp>
 #include <stan/math/error_handling.hpp>
-#include <stan/math/special_functions.hpp>
+#include <stan/math/functions/lbeta.hpp>
+#include <stan/math/functions/value_of.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/internal_math.hpp>
+
+#include <stan/math/functions/binomial_coefficient_log.hpp>
 
 namespace stan {
   
@@ -364,9 +367,9 @@ namespace stan {
 
     template <class RNG>
     inline int
-    beta_binomial_rng(int N,
-		      double alpha,
-		      double beta,
+    beta_binomial_rng(const int N,
+		      const double alpha,
+		      const double beta,
 		      RNG& rng) {
       double a = stan::prob::beta_rng(alpha, beta, rng);
       while(a > 1 || a < 0) 

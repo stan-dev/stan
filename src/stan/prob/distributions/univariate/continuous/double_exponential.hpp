@@ -6,7 +6,7 @@
 
 #include <stan/agrad.hpp>
 #include <stan/math/error_handling.hpp>
-#include <stan/math/special_functions.hpp>
+#include <stan/math/functions/value_of.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
@@ -204,9 +204,9 @@ namespace stan {
     
     template <class RNG>
     inline double
-    double_exponential_rng(double mu,
-               double sigma,
-               RNG& rng) {
+    double_exponential_rng(const double mu,
+			   const double sigma,
+			   RNG& rng) {
       using boost::variate_generator;
       using boost::random::uniform_01;
       using std::log;
@@ -216,9 +216,9 @@ namespace stan {
       double a = 0;
       double laplaceRN = rng_unit_01();
       if(0.5 - laplaceRN > 0)
-  a = 1.0;
+	a = 1.0;
       else if(0.5 - laplaceRN < 0)
-  a = -1.0;
+	a = -1.0;
       return mu - sigma * a * log(1 - 2 * abs(0.5 - laplaceRN));
     }
   }

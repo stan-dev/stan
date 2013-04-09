@@ -6,7 +6,7 @@
 
 #include <stan/agrad.hpp>
 #include <stan/math/error_handling.hpp>
-#include <stan/math/special_functions.hpp>
+#include <stan/math/functions/value_of.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
@@ -143,9 +143,9 @@ namespace stan {
    
     template <class RNG>
     inline double
-    uniform_rng(double alpha,
-               double beta,
-               RNG& rng) {
+    uniform_rng(const double alpha,
+                const double beta,
+                RNG& rng) {
       using boost::variate_generator;
       using boost::random::uniform_real_distribution;
       variate_generator<RNG&, uniform_real_distribution<> >

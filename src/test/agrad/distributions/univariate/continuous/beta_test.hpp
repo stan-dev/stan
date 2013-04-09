@@ -1,6 +1,9 @@
 // Arguments: Doubles, Doubles, Doubles
 #include <stan/prob/distributions/univariate/continuous/beta.hpp>
 
+#include <stan/math/functions/log1m.hpp>
+#include <stan/math/functions/value_of.hpp>
+
 using std::vector;
 using std::numeric_limits;
 using stan::agrad::var;
@@ -96,7 +99,6 @@ public:
       const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
     using std::log;
     using stan::math::log1m;
-    using stan::math::log;
     using stan::math::value_of;
     using stan::prob::include_summand;
     

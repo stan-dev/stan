@@ -1,6 +1,8 @@
-#include <gtest/gtest.h>
-
 #include <stan/agrad/partials_vari.hpp>
+#include <gtest/gtest.h>
+#include <stan/agrad/agrad.hpp>
+
+
 
 TEST(AgradPartialsVari, OperandsAndPartials) {
   using stan::agrad::OperandsAndPartials;

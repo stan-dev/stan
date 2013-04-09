@@ -76,12 +76,11 @@ setMethod("optimizing", "stanmodel",
                 }
               } else data <- list()
             } 
-            sampler <- try(new(stan_fit_cpp_module, data)) 
+            sampler <- try(new(stan_fit_cpp_module, data, object@dso@.CXXDSOMISC$cxxfun)) 
             if (is(sampler, "try-error")) {
               message('failed to create the optimizer; optimization not done') 
               return(invisible(list(stanmodel = object)))
             } 
-            # on.exit({rm(sampler); invisible(gc())}) 
             m_pars <- sampler$param_names() 
             idx_of_lp <- which(m_pars == "lp__")
             m_pars <- m_pars[-idx_of_lp]
@@ -179,8 +178,6 @@ setMethod("sampling", "stanmodel",
             mode <- if (!is.null(dots$test_grad) && dots$test_grad) "TESTING GRADIENT" else "SAMPLING"
 
             for (i in 1:chains) {
-              # cat("[sampling:] i=", i, "\n")
-              # print(args_list[[i]])
               if (is.null(dots$refresh) || dots$refresh > 0) 
                 cat(mode, " FOR MODEL '", object@model_name, "' NOW (CHAIN ", i, ").\n", sep = '')
               samples_i <- try(sampler$call_sampler(args_list[[i]])) 

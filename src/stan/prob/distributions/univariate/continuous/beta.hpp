@@ -6,7 +6,8 @@
 
 #include <stan/agrad.hpp>
 #include <stan/math/error_handling.hpp>
-#include <stan/math/special_functions.hpp>
+#include <stan/math/functions/log1m.hpp>
+#include <stan/math/functions/value_of.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
@@ -375,8 +376,8 @@ namespace stan {
 
     template <class RNG>
     inline double
-    beta_rng(double alpha,
-             double beta,
+    beta_rng(const double alpha,
+             const double beta,
              RNG& rng) {
       using boost::variate_generator;
       using boost::random::gamma_distribution;

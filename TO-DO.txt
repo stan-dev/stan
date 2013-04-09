@@ -16,11 +16,21 @@ The to-do list is organized into the following sections:
 1.2.1
 -------------------------------------------
 
-* add user-contrib ARMA(1,1) model to the manual
-  see Wayne Folta's e-mmail of 3/11/13
+* add model compilation tests for new distros (with rng and cdfs)
+    gumbel, skew_normal, exp_mod_normal
 
-* fix truncated distributions to return 1 rather than 0
-  in degenerate cases
+* change lgamma to use boost and not throw something unexpected
+  when it overflows
+
+* fix bug (?) in print() deriving from m.f. jonker's 25 March e-mail
+
+* change process so that the manual online on the build bot
+  has a different version number
+
+* Jiqiang: fix zero-size struct inits in RStan
+
+* fixed handling of invalid degrees of freedom parameter
+  for wishart and inv_wishart
 
 PRIORITIES?
 ======================================================================
@@ -86,7 +96,7 @@ Doc
 * C++ manual for API and auto-dif
 * C++ code cleanup (API doc, privates, consts, doc, split files, 
   long long)
-* more example models, complete/improve BUGS models
+* more example models, complete/improve BUGS models, vectorize BUGS models.
 * fancier web site graphics
 
 
@@ -108,6 +118,28 @@ Diagonal Hessian:
 C++ API
 ======================================================================
 [items go here first, then to RStan/cmd]
+
+* (from Frederic Bois): put simulated annealing or tempering in stan...
+
+* broadcast ./ operation for real / vector and vector / real.
+
+* Refactor math library:
+ - src/stan/math/functions/ibeta.hpp
+   all doubles for now. If I template it, conflicts with var definition.
+ - Needs tests. Currently not tested: src/stan/math/matrix/...
+   + stan_print.hpp
+   + singular_values.hpp
+   + cholesky_decompose.hpp
+   + eigenvalues_sym.hpp
+   + inverse.hpp
+   + diag_matrix.hpp
+   + transpose.hpp
+   + diagonal.hpp
+   + block.hpp
+   + diag_post/pre_multiply.hpp
+   + dot_product.hpp
+   + columns_dot_product.hpp
+   + log_determiant.hpp
 
 * new vector views
  
@@ -562,6 +594,7 @@ Models
 * figure out what's going on with TS's model that's causing
   Eigen to throw an assert failure
 
+* Implementing lasso-like glm and hierarchical glm in stan.
 
 
 Modeling Language
@@ -855,6 +888,50 @@ Testing
 
 RStan / PStan / MStan / Command Line
 ======================================================================
+
+* Doc optimization usage.  Here's Ben's example:
+
+----------------------------------------------------------------
+# example from glm()
+utils::data(anorexia, package = "MASS")
+anorex.1 <- glm(Postwt ~ Prewt + Treat + Prewt,
+                family = gaussian, data = anorexia)
+
+# extract data
+X <- model.matrix(anorex.1)
+y <- anorexia$Postwt
+
+# write a usual stan model
+model_code <-
+"
+data {
+  int<lower=1> K;
+  int<lower=K> N;
+  matrix[N,K]  X;
+  vector[N]    y;
+}
+parameters {
+  vector[K] beta;
+  real<lower=0> sigma;
+}
+model {
+  y ~ normal(X * beta, sigma);
+}
+"
+
+# compile
+fit <- stan(model_code = model_code, chains = 0,
+            data = list(K = ncol(X), N = nrow(X), X = X, y = y))
+
+# wrappers for log-likelihood and gradient
+fn <- function(par) log_prob(fit, par)
+gr <- function(par) grad_log_prob(fit, par)
+
+# optimize
+opt <- optim(c(coef(anorex.1), log_sigma = 2), fn, gr,
+             method = "BFGS", control = list(fnscale = -1), hessian = TRUE)
+print(opt)
+----------------------------------------------------------------
 
 * (RStan) install checklist -- especially the no spaces thing!
 

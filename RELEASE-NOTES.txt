@@ -15,7 +15,7 @@ HOW TO (developer notes on how to release, last column is ordering)
 10.  Announce                                                    > 9
 
 
-v1.2.0 (6 March 2012)
+v1.2.0 (6 March 2013)
 ======================================================================
 
 Enhancements
@@ -54,7 +54,7 @@ Bug Fixes
 * clearer error messages on matrix and other function arguments
 
 
-v1.1.1 (5 February 2012)
+v1.1.1 (5 February 2013)
 ======================================================================
 
 Bug Fixes

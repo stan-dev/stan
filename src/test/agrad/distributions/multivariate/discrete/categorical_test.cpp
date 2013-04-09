@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
 #include <test/agrad/distributions/expect_eq_diffs.hpp>
 #include <stan/agrad/agrad.hpp>
-#include <stan/agrad/special_functions.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/distributions/multivariate/discrete/categorical.hpp>
 

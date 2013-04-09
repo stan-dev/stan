@@ -6,7 +6,7 @@
 
 #include <stan/agrad.hpp>
 #include <stan/math/error_handling.hpp>
-#include <stan/math/special_functions.hpp>
+#include <stan/math/functions/value_of.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
@@ -210,9 +210,9 @@ namespace stan {
    
     template <class RNG>
     inline double
-    weibull_rng(double alpha,
-               double sigma,
-               RNG& rng) {
+    weibull_rng(const double alpha,
+                const double sigma,
+                RNG& rng) {
       using boost::variate_generator;
       using boost::random::weibull_distribution;
       variate_generator<RNG&, weibull_distribution<> >

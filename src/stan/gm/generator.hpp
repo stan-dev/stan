@@ -179,14 +179,8 @@ namespace stan {
           if (i > 0) o_ << ',';
           boost::apply_visitor(*this, fx.args_[i].expr_);
         }
-        size_t n = fx.name_.size();
-        if (n > 4 
-            && fx.name_[n-1] == 'g' 
-            && fx.name_[n-2] == 'n'
-            && fx.name_[n-3] == 'r'
-            && fx.name_[n-4] == '_') {
+        if (has_rng_suffix(fx.name_))
           o_ << ", base_rng__";
-        }
         o_ << ')';
       }
       void operator()(const binary_op& expr) const {

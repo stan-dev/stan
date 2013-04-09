@@ -3,6 +3,7 @@
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/math/special_functions/digamma.hpp>
 #include <boost/math/distributions.hpp>
+#include <stan/math/matrix/determinant.hpp>
 
 
 using Eigen::Dynamic;
@@ -124,9 +125,9 @@ TEST(ProbDistributionsWishart,DefaultPolicy) {
   Sigma.setIdentity();
   Y.resize(3,3);
   Y.setIdentity();
-  nu = 2;
+  nu = 3;
   EXPECT_NO_THROW(wishart_log(Y, nu, Sigma));
-  nu = 1;
+  nu = 2;
   EXPECT_THROW(wishart_log(Y, nu, Sigma), std::domain_error);
 }
 TEST(ProbDistributionsWishart,ErrnoPolicy) {
@@ -164,11 +165,11 @@ TEST(ProbDistributionsWishart,ErrnoPolicy) {
   Sigma << 1,0,0, 0,1,0, 0,0,1;
   Y.resize(3,3);
   Y << 1,0,0, 0,1,0, 0,0,1;
-  nu = 2;
+  nu = 3;
   result = wishart_log(Y, nu, Sigma, errno_policy());
   EXPECT_FALSE(std::isnan(result));
-  
-  nu = 1;
+
+  nu = 2;
   result = wishart_log(Y, nu, Sigma, errno_policy());
   EXPECT_TRUE(std::isnan(result));
 }

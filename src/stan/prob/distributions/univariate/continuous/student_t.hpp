@@ -6,7 +6,8 @@
 
 #include <stan/agrad.hpp>
 #include <stan/math/error_handling.hpp>
-#include <stan/math/special_functions.hpp>
+#include <stan/math/functions/square.hpp>
+#include <stan/math/functions/value_of.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
@@ -441,10 +442,10 @@ namespace stan {
     
     template <class RNG>
     inline double
-    student_t_rng(double nu,
-                  double mu,
-                  double sigma,
-                    RNG& rng) {
+    student_t_rng(const double nu,
+                  const double mu,
+                  const double sigma,
+		  RNG& rng) {
       using boost::variate_generator;
       using boost::random::student_t_distribution;
       variate_generator<RNG&, student_t_distribution<> >
