@@ -1,4 +1,3 @@
-#############################################################
 ###  deal with the optimization level for c++ compilation 
 
 get_makefile_txt <- function() { 
@@ -227,13 +226,6 @@ set_cppo <- function(mode = c("fast", "presentation2", "presentation1", "debug",
   mode = match.arg(mode) 
   level = c('3', '2', '1', '0', 's')[match(mode, c("fast", "presentation2", "presentation1", "debug", "small"))]  
   makefile_txt <- get_makefile_txt() 
-
-  # if (mode == 'system') {
-  #   rm_rstan_makefile_flags() 
-  #   message("compiler flags set by rstan are removed") 
-  #   retrun(invisible(list()))
-  # } 
-
   sys_cxxflags <- get_makefile_flags("CXXFLAGS", makefile_txt, headtotail = TRUE)
   curr_cxxflags <- get_makefile_flags("CXXFLAGS", makefile_txt) 
   curr_r_xtra_cppflags <- get_makefile_flags("R_XTRA_CPPFLAGS", makefile_txt) 

@@ -71,9 +71,6 @@ RSTAN_LIBS_fun <- function() {
   }
 }
 
-# cat(PKG_CPPFLAGS_env, "\n")
-# cat(RSTAN_LIBS_fun(), "\n")
-
 rstanplugin <- function() {
   Rcpp_plugin <- getPlugin("Rcpp")
   rcpp_pkg_libs <- Rcpp_plugin$env$PKG_LIBS

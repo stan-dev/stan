@@ -96,8 +96,3 @@ rstan_options <- function(...) {
   if (len == 1) return(invisible(r[[1]])) 
   invisible(r)
 } 
-
-## test code 
-# o <- rstan_options() 
-# o <- rstan_options(b = 4)
-# ls(o)
