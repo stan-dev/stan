@@ -36,7 +36,7 @@ namespace std {
     static stan::agrad::fvar<T> infinity() { 
       return numeric_limits<T>::infinity(); }
     static stan::agrad::fvar<T> quiet_NaN() { 
-      eturn numeric_limits<T>::quiet_NaN(); }
+      return numeric_limits<T>::quiet_NaN(); }
     static stan::agrad::fvar<T> signaling_NaN() { 
       return numeric_limits<T>::signaling_NaN(); }
     static stan::agrad::fvar<T> denorm_min() { 

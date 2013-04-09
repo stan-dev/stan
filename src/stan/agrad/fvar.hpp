@@ -4,6 +4,9 @@
 //fvar
 #include <stan/agrad/fwd/fvar.hpp>
 
+//numeric limits
+#include <stan/agrad/fwd/numeric_limits.hpp>
+
 //comparison operators
 #include <stan/agrad/fwd/operator_less_than.hpp>
 #include <stan/agrad/fwd/operator_less_than_or_equal.hpp>
