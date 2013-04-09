@@ -770,7 +770,7 @@ namespace stan {
         
         sampler.set_max_depth(max_treedepth);
         
-        sampler.set_adapt_mu(log(5 * sampler.get_stepsize()));
+        sampler.set_adapt_mu(log(10 * sampler.get_stepsize()));
         sampler.engage_adaptation();
         
         clock_t start = clock();
@@ -826,7 +826,7 @@ namespace stan {
         
         sampler.set_max_depth(max_treedepth);
         
-        sampler.set_adapt_mu(log(5 * sampler.get_stepsize()));
+        sampler.set_adapt_mu(log(10 * sampler.get_stepsize()));
         sampler.engage_adaptation();
         
         clock_t start = clock();
@@ -882,7 +882,7 @@ namespace stan {
         
         sampler.set_max_depth(max_treedepth);
         
-        sampler.set_adapt_mu(log(5 * sampler.get_stepsize()));
+        sampler.set_adapt_mu(log(10 * sampler.get_stepsize()));
         sampler.engage_adaptation();
         
         clock_t start = clock();
@@ -940,7 +940,7 @@ namespace stan {
         sampler.set_stepsize_and_L(epsilon, leapfrog_steps);
         //sampler.set_stepsize_and_T(epsilon, 3.14159);
         
-        sampler.set_adapt_mu(log(5 * sampler.get_stepsize()));
+        sampler.set_adapt_mu(log(10 * sampler.get_stepsize()));
         sampler.engage_adaptation();
         
         clock_t start = clock();

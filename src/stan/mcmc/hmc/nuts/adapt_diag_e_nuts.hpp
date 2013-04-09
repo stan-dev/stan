@@ -36,7 +36,7 @@ namespace stan {
           if(update) {
             this->init_stepsize();
             
-            this->set_adapt_mu(log(5 * this->_epsilon));
+            this->set_adapt_mu(log(10 * this->_epsilon));
             this->stepsize_adapter::init();
           }
           
