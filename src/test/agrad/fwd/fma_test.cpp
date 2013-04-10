@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <stan/agrad/fvar.hpp>
-#include <stan/math/special_functions.hpp>
+#include <stan/math/functions/fma.hpp>
 
 TEST(AgradFvar, fma) { 
   using stan::agrad::fvar;

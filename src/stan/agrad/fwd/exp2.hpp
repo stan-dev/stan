@@ -3,7 +3,7 @@
 
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/meta/traits.hpp>
-#include <stan/math/special_functions.hpp>
+#include <stan/math/functions/exp2.hpp>
 
 namespace stan{
 

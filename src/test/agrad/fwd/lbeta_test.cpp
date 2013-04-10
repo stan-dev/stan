@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <stan/agrad/fvar.hpp>
 #include <boost/math/special_functions/digamma.hpp>
-#include <stan/math/special_functions.hpp>
+#include <stan/math/functions/lbeta.hpp>
 
 TEST(AgradFvar, lbeta) {
   using stan::agrad::fvar;

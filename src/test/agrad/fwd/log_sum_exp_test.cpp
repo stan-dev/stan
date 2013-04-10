@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <stan/agrad/fvar.hpp>
-#include <stan/math/special_functions.hpp>
+#include <stan/math/functions/log_sum_exp.hpp>
 
 TEST(AgradFvar, log_sum_exp) {
   using stan::agrad::fvar;

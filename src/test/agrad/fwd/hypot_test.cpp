@@ -27,4 +27,8 @@ TEST(AgradFvar, hypot) {
   fvar<double> c = hypot(x, w);
   isnan(c.val_);
   isnan(c.d_);
+
+  fvar<double> d = hypot(z, x);
+  EXPECT_FLOAT_EQ(0.5, d.val_);
+  EXPECT_FLOAT_EQ(1.0, d.d_);
 }

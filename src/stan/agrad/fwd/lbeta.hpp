@@ -4,7 +4,7 @@
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/meta/traits.hpp>
 #include <boost/math/special_functions/digamma.hpp>
-#include <stan/math/special_functions.hpp>
+#include <stan/math/functions/lbeta.hpp>
 
 namespace stan{
 
