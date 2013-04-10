@@ -13,7 +13,7 @@
 #include <stan/agrad/matrix.hpp>
 #include <stan/math/matrix/dot_product.hpp>
 #include <stan/math/matrix/log.hpp>
-#include <stan/math/matrix/log_determinant.hpp>
+#include <stan/math/matrix/log_determinant_spd.hpp>
 #include <stan/math/matrix/mdivide_right_spd.hpp>
 #include <stan/math/matrix/multiply.hpp>
 #include <stan/math/matrix/rows_dot_product.hpp>
@@ -64,7 +64,7 @@ namespace stan {
       using stan::math::dot_product;
       using stan::math::rows_dot_product;
       using stan::math::mdivide_right_spd;
-      using stan::math::log_determinant;
+      using stan::math::log_determinant_spd;
       
       if (!check_size_match(function, 
                             Sigma.rows(), "Rows of kernel matrix",
@@ -72,6 +72,8 @@ namespace stan {
                             &lp, Policy()))
         return lp;
       if (!check_positive(function, Sigma.rows(), "Kernel matrix rows", &lp, Policy()))
+        return lp;
+      if (!check_finite(function, Sigma, "Kernel", &lp, Policy())) 
         return lp;
       if (!check_symmetric(function, Sigma, "Kernel matrix", &lp, Policy()))
         return lp;
@@ -97,11 +99,12 @@ namespace stan {
       if (y.rows() == 0)
         return lp;
       
-      if (include_summand<propto>::value) 
+      if (include_summand<propto>::value) {
         lp += NEG_LOG_SQRT_TWO_PI * y.rows() * y.cols();
+      }
       
       if (include_summand<propto,T_covar>::value) {
-        lp -= (0.5 * y.rows()) * log_determinant(Sigma);
+        lp -= (0.5 * y.rows()) * log_determinant_spd(Sigma);
       }
 
       if (include_summand<propto,T_w>::value) {
