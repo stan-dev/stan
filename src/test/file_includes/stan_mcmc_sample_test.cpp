@@ -4,3 +4,4 @@
 TEST(stanMcmcSample,headerParses) {
   EXPECT_TRUE(true);
 }
+
