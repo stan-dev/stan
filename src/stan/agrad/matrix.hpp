@@ -11,6 +11,7 @@
 #include <stan/agrad/rev/matrix/dot_product.hpp>
 #include <stan/agrad/rev/matrix/sum.hpp>
 #include <stan/agrad/rev/matrix/mdivide_left.hpp>
+#include <stan/agrad/rev/matrix/mdivide_left_spd.hpp>
 #include <stan/agrad/rev/matrix/mdivide_left_tri.hpp>
 #include <stan/agrad/rev/matrix/determinant.hpp>
 #include <stan/agrad/rev/matrix/log_determinant.hpp>
