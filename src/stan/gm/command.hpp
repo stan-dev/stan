@@ -2,8 +2,10 @@
 #define __STAN__GM__COMMAND_HPP__
 
 #include <fstream>
+#include <stdexcept>
 
 #include <boost/date_time/posix_time/posix_time_types.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/random/additive_combine.hpp> // L'Ecuyer RNG
 #include <boost/random/uniform_real_distribution.hpp>
 

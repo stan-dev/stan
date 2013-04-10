@@ -1,6 +1,7 @@
 #ifndef __STAN__MCMC__DENSE__E__METRIC__BETA__
 #define __STAN__MCMC__DENSE__E__METRIC__BETA__
 
+#include <boost/random/variate_generator.hpp>
 #include <boost/random/normal_distribution.hpp>
 
 #include <Eigen/Cholesky>

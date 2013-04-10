@@ -1,6 +1,8 @@
 #ifndef __STAN__MCMC__BASE__HMC__BETA__
 #define __STAN__MCMC__BASE__HMC__BETA__
 
+#include <stdexcept>
+
 #include <boost/random/variate_generator.hpp>
 #include <boost/random/uniform_01.hpp>
 

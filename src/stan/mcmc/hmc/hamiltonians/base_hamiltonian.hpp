@@ -1,12 +1,10 @@
 #ifndef __STAN__MCMC__BASE__HAMILTONIAN__BETA__
 #define __STAN__MCMC__BASE__HAMILTONIAN__BETA__
 
-#include <cstddef>
 #include <stdexcept>
 #include <fstream>
-
-#include <boost/exception/diagnostic_information.hpp> 
-#include <boost/exception_ptr.hpp> 
+#include <iostream>
+#include <vector>
 
 #include <Eigen/Dense>
 

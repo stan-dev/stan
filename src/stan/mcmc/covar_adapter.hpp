@@ -1,6 +1,8 @@
 #ifndef __STAN__MCMC__STATIC__ADAPTER__COVAR__BETA__
 #define __STAN__MCMC__STATIC__ADAPTER__COVAR__BETA__
 
+#include <vector>
+#include <Eigen/Dense>
 #include <stan/mcmc/stepsize_adapter.hpp>
 
 namespace stan {

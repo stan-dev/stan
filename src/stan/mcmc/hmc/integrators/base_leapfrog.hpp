@@ -1,6 +1,8 @@
 #ifndef __STAN__MCMC__BASE__LEAPFROG__BETA__
 #define __STAN__MCMC__BASE__LEAPFROG__BETA__
 
+#include <iostream>
+#include <iomanip>
 #include <stan/mcmc/hmc/integrators/base_integrator.hpp>
 
 namespace stan {
