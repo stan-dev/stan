@@ -13,13 +13,6 @@ The to-do list is organized into the following sections:
 * C++ API
 
 
-1.3.0
--------------------------------------------
-
-* fix assignment errors that throw seg faults (don't know where
-  they are, though)
-
-
 PRIORITIES?
 ======================================================================
 + (name): actively assigned
