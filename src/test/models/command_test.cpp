@@ -357,10 +357,21 @@ void test_specific_sample_values(const bitset<options_count>& options, stan::mcm
   if (!options[append_samples] 
       && !options[warmup_opt]) {
     double expected_first_y;
+    
+    // options[data] = true
+    // -> --data=src/test/models/command1.data.R
+    // options[data] = false
+    // -> --data=src/test/modles/command2.data.R
+    // options[init] = true
+    // -> --init=src/test/models/command.init.R
+    // options[init = false
+    // -> no init (defaults to random init
+    // All with --seed=100
+    
     if (options[data]) {
-      expected_first_y = options[init] ? 100.564 : 100.523;
+      expected_first_y = options[init] ? 99.4208 : 100.727;
     } else { 
-      expected_first_y = options[init] ? -0.321312 : 2.11978;
+      expected_first_y = options[init] ? -0.0852457 : 1.96045;
     }
     
     Eigen::VectorXd sampled_y;
