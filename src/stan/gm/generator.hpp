@@ -1411,12 +1411,6 @@ namespace stan {
     void generate_log_prob(program const& p,
                            std::ostream& o) {
       o << EOL;
-      o << INDENT << "double log_prob(vector<double>& params_r__," << EOL;
-      o << INDENT << "                vector<int>& params_i__," << EOL;
-      o << INDENT << "                std::ostream* pstream__ = 0) {" << EOL;
-      o << INDENT << "  return log_prob<false,double>(params_r__,params_i__,pstream__);" << EOL;
-      o << INDENT << "}" << EOL;
-      o << EOL;
       o << INDENT << "var log_prob(vector<var>& params_r__," << EOL;
       o << INDENT << "             vector<int>& params_i__," << EOL;
       o << INDENT << "             std::ostream* pstream__ = 0) {" << EOL;
