@@ -13,6 +13,7 @@
 #include <stan/agrad/rev/matrix/mdivide_left_tri.hpp>
 #include <stan/agrad/rev/matrix/determinant.hpp>
 #include <stan/agrad/rev/matrix/log_determinant.hpp>
+#include <stan/agrad/rev/matrix/log_determinant_spd.hpp>
 #include <stan/agrad/rev/matrix/divide.hpp>
 #include <stan/agrad/rev/matrix/multiply.hpp>
 #include <stan/agrad/rev/matrix/multiply_lower_tri_self_transpose.hpp>
