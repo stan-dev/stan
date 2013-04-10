@@ -205,8 +205,8 @@ namespace stan {
     template <class RNG>
     inline double
     double_exponential_rng(const double mu,
-			   const double sigma,
-			   RNG& rng) {
+         const double sigma,
+         RNG& rng) {
       using boost::variate_generator;
       using boost::random::uniform_01;
       using std::log;
@@ -216,9 +216,9 @@ namespace stan {
       double a = 0;
       double laplaceRN = rng_unit_01();
       if(0.5 - laplaceRN > 0)
-	a = 1.0;
+  a = 1.0;
       else if(0.5 - laplaceRN < 0)
-	a = -1.0;
+  a = -1.0;
       return mu - sigma * a * log(1 - 2 * abs(0.5 - laplaceRN));
     }
   }

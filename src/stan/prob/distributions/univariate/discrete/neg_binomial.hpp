@@ -72,6 +72,7 @@ namespace stan {
       using stan::math::multiply_log;
       using stan::math::binomial_coefficient_log;
       using boost::math::digamma;
+      using boost::math::lgamma;
       
       // set up template expressions wrapping scalars into vector views
       VectorView<const T_n> n_vec(n);
@@ -79,10 +80,12 @@ namespace stan {
       VectorView<const T_inv_scale> beta_vec(beta);
       size_t size = max_size(n, alpha, beta);
 
-      agrad::OperandsAndPartials<T_shape,T_inv_scale> operands_and_partials(alpha,beta);
+      agrad::OperandsAndPartials<T_shape,T_inv_scale> 
+        operands_and_partials(alpha,beta);
 
       size_t len_ab = max_size(alpha,beta);
-      DoubleVectorView<true,(is_vector<T_shape>::value || is_vector<T_inv_scale>::value)>
+      DoubleVectorView<true,(is_vector<T_shape>::value 
+                             || is_vector<T_inv_scale>::value)>
         lambda(len_ab);
       for (size_t i = 0; i < len_ab; ++i) 
         lambda[i] = value_of(alpha_vec[i]) / value_of(beta_vec[i]);
@@ -97,7 +100,8 @@ namespace stan {
       for (size_t i = 0; i < length(beta); ++i)
         log_beta_m_log1p_beta[i] = log(value_of(beta_vec[i])) - log1p_beta[i];
 
-      DoubleVectorView<true,(is_vector<T_inv_scale>::value || is_vector<T_shape>::value)>
+      DoubleVectorView<true,(is_vector<T_inv_scale>::value
+                             || is_vector<T_shape>::value)>
         alpha_times_log_beta_over_1p_beta(len_ab);
       for (size_t i = 0; i < len_ab; ++i)
         alpha_times_log_beta_over_1p_beta[i] 
@@ -105,20 +109,23 @@ namespace stan {
           * log(value_of(beta_vec[i]) 
                 / (1.0 + value_of(beta_vec[i])));
 
-      DoubleVectorView<!is_constant_struct<T_shape>::value, is_vector<T_shape>::value>
+      DoubleVectorView<!is_constant_struct<T_shape>::value, 
+                       is_vector<T_shape>::value>
         digamma_alpha(length(alpha));
       if (!is_constant_struct<T_shape>::value)
         for (size_t i = 0; i < length(alpha); ++i)
           digamma_alpha[i] = digamma(value_of(alpha_vec[i]));
 
-      DoubleVectorView<!is_constant_struct<T_shape>::value, is_vector<T_inv_scale>::value>
+      DoubleVectorView<!is_constant_struct<T_shape>::value,
+                       is_vector<T_inv_scale>::value>
         log_beta(length(beta));
       if (!is_constant_struct<T_shape>::value)
         for (size_t i = 0; i < length(beta); ++i)
           log_beta[i] = log(value_of(beta_vec[i]));
 
       DoubleVectorView<!is_constant_struct<T_inv_scale>::value, 
-                       (is_vector<T_shape>::value || is_vector<T_inv_scale>::value)>
+                       (is_vector<T_shape>::value
+                        || is_vector<T_inv_scale>::value)>
         lambda_m_alpha_over_1p_beta(len_ab);
       if (!is_constant_struct<T_inv_scale>::value)
         for (size_t i = 0; i < len_ab; ++i)
@@ -145,7 +152,8 @@ namespace stan {
           if (include_summand<propto,T_shape>::value)
             if (n_vec[i] != 0)
               logp += binomial_coefficient_log<double>(n_vec[i] 
-                                                       + value_of(alpha_vec[i]) - 1.0, 
+                                                       + value_of(alpha_vec[i])
+                                                       - 1.0, 
                                                        n_vec[i]);
           if (include_summand<propto,T_shape,T_inv_scale>::value)
             logp += 
@@ -202,10 +210,12 @@ namespace stan {
     }
 
       // Negative Binomial CDF
-      template <bool propto, typename T_n, typename T_shape, typename T_inv_scale, 
+      template <bool propto, typename T_n, typename T_shape, 
+                typename T_inv_scale, 
                 class Policy>
       typename return_type<T_shape, T_inv_scale>::type
-      neg_binomial_cdf(const T_n& n, const T_shape& alpha, const T_inv_scale& beta, 
+      neg_binomial_cdf(const T_n& n, const T_shape& alpha, 
+                       const T_inv_scale& beta, 
                        const Policy&) {
           
           static const char* function = "stan::prob::neg_binomial_cdf(%1%)";
@@ -240,11 +250,12 @@ namespace stan {
           if (!(check_consistent_sizes(function,
                                        n, alpha, beta,
                                        "Failures variable",
-                                       "Shape parameter","Inverse scale parameter",
+                                       "Shape parameter",
+                                       "Inverse scale parameter",
                                        &P, Policy())))
               return P;
           
-          // Return if everything is constant and only proportionality is required
+          // Return if everything constant & only proportionality required
           if (!include_summand<propto,T_shape,T_inv_scale>::value)
               return 1.0;
           
@@ -265,7 +276,8 @@ namespace stan {
           operands_and_partials(alpha, beta);
           
           std::fill(operands_and_partials.all_partials,
-                    operands_and_partials.all_partials + operands_and_partials.nvaris,
+                    operands_and_partials.all_partials 
+                    + operands_and_partials.nvaris,
                     0.0);
           
           // Explicit return for extreme values
@@ -277,13 +289,17 @@ namespace stan {
           
           // Cache a few expensive function calls if alpha is a parameter
           DoubleVectorView<!is_constant_struct<T_shape>::value,
-                           is_vector<T_shape>::value> digammaN_vec(stan::length(alpha));
+                           is_vector<T_shape>::value> 
+            digammaN_vec(stan::length(alpha));
           DoubleVectorView<!is_constant_struct<T_shape>::value, 
-                           is_vector<T_shape>::value> digammaAlpha_vec(stan::length(alpha));
+                           is_vector<T_shape>::value> 
+            digammaAlpha_vec(stan::length(alpha));
           DoubleVectorView<!is_constant_struct<T_shape>::value, 
-                           is_vector<T_shape>::value> digammaSum_vec(stan::length(alpha));
+                           is_vector<T_shape>::value> 
+            digammaSum_vec(stan::length(alpha));
           DoubleVectorView<!is_constant_struct<T_shape>::value, 
-                           is_vector<T_shape>::value> betaFunc_vec(stan::length(alpha));
+                           is_vector<T_shape>::value> 
+            betaFunc_vec(stan::length(alpha));
           
           if (!is_constant_struct<T_shape>::value) {
               
@@ -302,16 +318,17 @@ namespace stan {
               
               // Explicit results for extreme values
               // The gradients are technically ill-defined, but treated as zero
-              if (value_of(n_vec[i]) == std::numeric_limits<double>::infinity()) {
-                  continue;
-              }
+              if (value_of(n_vec[i]) 
+                  == std::numeric_limits<double>::infinity())
+                continue;
               
               const double n_dbl = value_of(n_vec[i]);
               const double alpha_dbl = value_of(alpha_vec[i]);
               const double beta_dbl = value_of(beta_vec[i]);
               
               const double p_dbl = beta_dbl / (1.0 + beta_dbl);
-              const double d_dbl = 1.0 / ( (1.0 + beta_dbl) * (1.0 + beta_dbl) );
+              const double d_dbl = 1.0 / ( (1.0 + beta_dbl) 
+                                           * (1.0 + beta_dbl) );
               
               const double Pi = ibeta(alpha_dbl, n_dbl + 1.0, p_dbl);
               
@@ -322,9 +339,12 @@ namespace stan {
                   double g1 = 0;
                   double g2 = 0;
 
-                  stan::math::gradRegIncBeta(g1, g2, alpha_dbl, n_dbl + 1, p_dbl, 
-                                             digammaAlpha_vec[i], digammaN_vec[i], 
-                                             digammaSum_vec[i], betaFunc_vec[i]);
+                  stan::math::gradRegIncBeta(g1, g2, alpha_dbl, 
+                                             n_dbl + 1, p_dbl, 
+                                             digammaAlpha_vec[i], 
+                                             digammaN_vec[i], 
+                                             digammaSum_vec[i], 
+                                             betaFunc_vec[i]);
                   
                   operands_and_partials.d_x1[i] 
                     += g1 / Pi;
@@ -332,39 +352,46 @@ namespace stan {
               
               if (!is_constant_struct<T_inv_scale>::value)
                   operands_and_partials.d_x2[i] 
-                    += d_dbl * ibeta_derivative(alpha_dbl, n_dbl + 1, p_dbl) / Pi;
+                    += d_dbl * ibeta_derivative(alpha_dbl, n_dbl + 1, p_dbl)
+                    / Pi;
               
           }
           
-          if (!is_constant_struct<T_shape>::value) {
-              for(size_t i = 0; i < stan::length(alpha); ++i) operands_and_partials.d_x1[i] *= P;
-          }
+          if (!is_constant_struct<T_shape>::value)
+              for(size_t i = 0; i < stan::length(alpha); ++i) 
+                operands_and_partials.d_x1[i] *= P;
           
-          if (!is_constant_struct<T_inv_scale>::value) {
-              for(size_t i = 0; i < stan::length(beta); ++i) operands_and_partials.d_x2[i] *= P;
-          }
+          if (!is_constant_struct<T_inv_scale>::value)
+              for(size_t i = 0; i < stan::length(beta); ++i)
+                operands_and_partials.d_x2[i] *= P;
           
           return operands_and_partials.to_var(P);
           
       }
       
-      template <bool propto, typename T_n, typename T_shape, typename T_inv_scale>
+      template <bool propto, typename T_n, typename T_shape, 
+                typename T_inv_scale>
       inline typename return_type<T_shape, T_inv_scale>::type
-      neg_binomial_cdf(const T_n& n, const T_shape& alpha, const T_inv_scale& beta) {
-          return neg_binomial_cdf<propto>(n, alpha, beta, stan::math::default_policy());
+      neg_binomial_cdf(const T_n& n, const T_shape& alpha, 
+                       const T_inv_scale& beta) {
+          return neg_binomial_cdf<propto>(n, alpha, beta, 
+                                          stan::math::default_policy());
       }
       
-      template <typename T_n, typename T_shape, typename T_inv_scale, class Policy>
+      template <typename T_n, typename T_shape, typename T_inv_scale, 
+                class Policy>
       inline typename return_type<T_shape, T_inv_scale>::type
-      neg_binomial_cdf(const T_n& n, const T_shape& alpha, const T_inv_scale& beta, 
-                       const Policy&) {
+      neg_binomial_cdf(const T_n& n, const T_shape& alpha, 
+                       const T_inv_scale& beta, const Policy&) {
           return neg_binomial_cdf<false>(n, alpha, beta, Policy());
       }
       
       template <typename T_n, typename T_shape, typename T_inv_scale>
       inline typename return_type<T_shape, T_inv_scale>::type
-      neg_binomial_cdf(const T_n& n, const T_shape& alpha, const T_inv_scale& beta) {
-          return neg_binomial_cdf<false>(n, alpha, beta, stan::math::default_policy());
+      neg_binomial_cdf(const T_n& n, const T_shape& alpha,
+                       const T_inv_scale& beta) {
+        return neg_binomial_cdf<false>(n, alpha, beta, 
+                                       stan::math::default_policy());
       }
 
     template <class RNG>
@@ -375,7 +402,9 @@ namespace stan {
       using boost::variate_generator;
       using boost::random::negative_binomial_distribution;
       variate_generator<RNG&, negative_binomial_distribution<> >
-        neg_binomial_rng(rng, negative_binomial_distribution<>(alpha, beta / (beta + 1)));
+        neg_binomial_rng(rng, 
+                         negative_binomial_distribution<>(alpha,
+                                                          beta / (beta + 1)));
       return neg_binomial_rng();
     }
   }

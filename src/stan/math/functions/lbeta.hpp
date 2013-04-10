@@ -2,6 +2,7 @@
 #define __STAN__MATH__FUNCTIONS__LBETA_HPP__
 
 #include <boost/math/tools/promotion.hpp>
+
 #include <boost/math/special_functions/gamma.hpp>
 
 namespace stan {

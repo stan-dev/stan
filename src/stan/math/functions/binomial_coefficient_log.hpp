@@ -1,6 +1,7 @@
 #ifndef __STAN__MATH__FUNCTIONS__BINOMIAL_COEFFICIENT_LOG_HPP__
 #define __STAN__MATH__FUNCTIONS__BINOMIAL_COEFFICIENT_LOG_HPP__
 
+#include <boost/math/special_functions/gamma.hpp>
 #include <boost/math/tools/promotion.hpp>
 
 namespace stan {
@@ -29,6 +30,7 @@ namespace stan {
     inline typename boost::math::tools::promote_args<T_N, T_n>::type
     binomial_coefficient_log(const T_N N, const T_n n) {
       using std::log;
+      using boost::math::lgamma;
 
       const double cutoff = 1000;
       if ((N < cutoff) || (N - n < cutoff)) {

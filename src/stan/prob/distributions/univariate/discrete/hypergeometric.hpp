@@ -127,26 +127,26 @@ namespace stan {
     template <class RNG>
     inline int
     hypergeometric_rng(const int N,
-		       const int a,
-		       const int b,
-		       RNG& rng) {
+           const int a,
+           const int b,
+           RNG& rng) {
       using boost::variate_generator;
       
       boost::math::hypergeometric_distribution<>dist (b, N, a + b);
       std::vector<double> index(a);
       for(int i = 0; i < a; i++)
-	index[i] = cdf(dist, i + 1);
+  index[i] = cdf(dist, i + 1);
 
       double c = uniform_rng(0.0, 1.0, rng);
       int min = 0;
       int max = a - 1;
       int mid = 0;
       while(min < max) {
-	mid = (min + max) / 2;
-	if(index[mid] > c)
-	  max = mid;
-	else
-	  min = mid + 1;
+  mid = (min + max) / 2;
+  if(index[mid] > c)
+    max = mid;
+  else
+    min = mid + 1;
       }
       return min + 1;
     }

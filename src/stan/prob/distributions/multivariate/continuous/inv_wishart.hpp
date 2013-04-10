@@ -153,8 +153,8 @@ namespace stan {
     template <class RNG>
     inline Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>
     inv_wishart_rng(const double nu,
-		const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& S,
-		RNG& rng) {
+    const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& S,
+    RNG& rng) {
 
       Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> S_inv(S.rows(), S.cols());
       S_inv = Eigen::MatrixXd::Identity(S.cols(),S.cols());

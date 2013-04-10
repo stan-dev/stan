@@ -13,24 +13,12 @@ The to-do list is organized into the following sections:
 * C++ API
 
 
-1.2.1
+1.3.0
 -------------------------------------------
 
-* add model compilation tests for new distros (with rng and cdfs)
-    gumbel, skew_normal, exp_mod_normal
+* fix assignment errors that throw seg faults (don't know where
+  they are, though)
 
-* change lgamma to use boost and not throw something unexpected
-  when it overflows
-
-* fix bug (?) in print() deriving from m.f. jonker's 25 March e-mail
-
-* change process so that the manual online on the build bot
-  has a different version number
-
-* Jiqiang: fix zero-size struct inits in RStan
-
-* fixed handling of invalid degrees of freedom parameter
-  for wishart and inv_wishart
 
 PRIORITIES?
 ======================================================================
@@ -58,14 +46,12 @@ Efficiency/Scalability of Code and Sampling
 
 Modeling Language
 -----------------
-+ (Bob) forward sampling (RNG in gen quant, all RNGs for distros)
 + (Bob) new types: lower triangular (+/- strict), diagonal matrix,
   symmetric matrix, Cholesky factor of pos-def matrix
 + (Bob) discrete sampling
 + (Michael B/Daniel) cumulative distributions & truncated prob functions
 * ragged arrays
 * matrix literal-like expressions a la MATLAB
-* matrix slicing and dicing
 * subroutines in modeling language
 * initialization block in model w. randomization
 * (Bob) user-specified language extensions (plug in facility to declare,
@@ -118,6 +104,8 @@ Diagonal Hessian:
 C++ API
 ======================================================================
 [items go here first, then to RStan/cmd]
+
+* agrad for gamma_p function to support gamma_cdf
 
 * (from Frederic Bois): put simulated annealing or tempering in stan...
 
@@ -1035,7 +1023,33 @@ Web Pages
 Manuals
 ======================================================================
 
-* Fix 0--(N-1) range for categorical example and in doc for categorical
+* Explain how to do BUGS-like cut ops in Stan
+  data {
+    int<lower=0> N;
+    real y[N];
+    real x[N];
+    int<lower=0> N_cut;
+    real x_cut[N_cut];
+  }
+  parameters {
+     real alpha;
+     real beta;
+     real<lower=0> sigma;
+  }
+  model {
+    for (n in 1:N)
+      y[n] ~ normal(alpha + beta * x[n], sigma);
+  }
+  generated quantities {
+    real y_cut[N_cut];
+    for (m in 1:M)
+      y_cut[m] <- alpha + beta * x_cut[m] * beta;
+  }
+
+  With our next release, you can replace the last line with
+  this:
+
+    y_cut[m] <- normal_rng(alpha + beta * x_cut[m], sigma);
 
 * Talk about index order and read order for matrix[I,J] a[K];
   -- in section on arrays in language reference

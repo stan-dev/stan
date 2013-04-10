@@ -236,7 +236,7 @@ TEST(ProbDistributionOrderedLogistic, chiSquareGoodnessFitTest) {
 
   for(int i = 0; i < prob.rows(); i++) {
       for(int j = i; j < prob.rows(); j++)
-	loc(j) += prob(i);
+  loc(j) += prob(i);
     }
 
   int count = 0;

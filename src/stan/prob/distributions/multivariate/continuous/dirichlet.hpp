@@ -1,6 +1,7 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__DIRICHLET_HPP__
 #define __STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__DIRICHLET_HPP__
 
+#include <boost/math/special_functions/gamma.hpp>
 #include <boost/random/gamma_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
 
@@ -47,6 +48,7 @@ namespace stan {
               const Eigen::Matrix<T_prior_sample_size,Eigen::Dynamic,1>& alpha,
               const Policy&) {
       // FIXME: parameter check
+      using boost::math::lgamma;
       using boost::math::tools::promote_args;
       typename promote_args<T_prob,T_prior_sample_size>::type lp(0.0);
 
@@ -101,13 +103,13 @@ namespace stan {
       Eigen::VectorXd y(alpha.rows());
       for(int i = 0; i < alpha.rows(); i++) {
         variate_generator<RNG&, gamma_distribution<> >
-	  gamma_rng(rng, gamma_distribution<>(alpha(i,0),1));
-	y(i) = gamma_rng();
-	sum += y(i);
-	}
+          gamma_rng(rng, gamma_distribution<>(alpha(i,0),1));
+        y(i) = gamma_rng();
+        sum += y(i);
+        }
 
       for(int i = 0; i < alpha.rows(); i++)
-	y(i) /= sum;
+        y(i) /= sum;
       return y;
     }
   }

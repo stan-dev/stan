@@ -11,13 +11,9 @@
 namespace stan {
   namespace prob {
 
-    using Eigen::Matrix;
-    using Eigen::Dynamic;
-    using Eigen::LLT;
-    using Eigen::NumericalIssue;    
-    
     template <typename T_shape>
     T_shape do_lkj_constant(const T_shape& eta, const unsigned int& K) {
+
       // Lewandowski, Kurowicka, and Joe (2009) equations 15 and 16
       
       if (stan::is_constant<typename stan::scalar_type<T_shape> >::value
@@ -56,6 +52,7 @@ namespace stan {
              const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L, 
              const T_shape& eta, 
              const Policy&) {
+
       static const char* function 
         = "stan::prob::lkj_corr_cholesky_log(%1%)";
 
@@ -150,7 +147,7 @@ namespace stan {
       if (K == 0)
         return 0.0;
 
-      LLT< Matrix<T_y, Dynamic, Dynamic> > Cholesky = y.llt();
+      Eigen::LLT< Eigen::Matrix<T_y, Eigen::Dynamic, Eigen::Dynamic> > Cholesky = y.llt();
       // FIXME: check_numerical_issue function?
       if (Cholesky.info() == Eigen::NumericalIssue)
         return lp;
