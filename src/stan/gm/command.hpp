@@ -137,8 +137,12 @@ namespace stan {
                         "Test gradient calculations using finite differences");
       
       print_help_option(&std::cout,
-                        "point_estimate", "",
+                        "point_estimate","",
                         "Fit point estimate of hidden parameters by maximizing log joint probability using Nesterov's accelerated gradient method");
+      
+      print_help_option(&std::cout,
+                        "point_estimate_newton","",
+                        "Fit point estimate of hidden parameters by maximizing log joint probability using Newton's method");
       
       print_help_option(&std::cout,
                         "nondiag_mass", "",
@@ -871,9 +875,9 @@ namespace stan {
           sampler.write_sampler_param_names(sample_stream);
           model.write_csv_header(sample_stream);
           
-          sampler.z().write_header(diagnostic_stream);
-          sampler.z().write_names(diagnostic_stream);
-          diagnostic_stream << std::endl;
+          //sampler.z().write_header(diagnostic_stream);
+          //sampler.z().write_names(diagnostic_stream);
+          //diagnostic_stream << std::endl;
           
         }
         
