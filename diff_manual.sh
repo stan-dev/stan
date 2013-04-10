@@ -24,7 +24,7 @@ fi
 
 STAN_HOME=`pwd`
 cd $STAN_HOME/src/docs/stan-reference
-./diff.sh $1 $2
+bash diff.sh $1 $2
 if [ $? != 0 ]; then
         echo "Diffing failed, aborting"
         git reset --hard HEAD
