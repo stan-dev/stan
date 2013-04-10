@@ -28,7 +28,7 @@ namespace stan {
       stan::math::validate_square(A,"mdivide_right_spd");
       stan::math::validate_multiplicable(b,A,"mdivide_right_spd");
       // FIXME: This is nice and general but likely slow.
-      return transpose(mdivide_left_spd(transpose(A),transpose(b)));
+      return transpose(mdivide_left_spd(A,transpose(b)));
 //      return promote_common<Eigen::Matrix<T1,R2,C2>,
 //                            Eigen::Matrix<T2,R2,C2> >(A)
 //        .transpose()
