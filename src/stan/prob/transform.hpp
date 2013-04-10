@@ -10,12 +10,13 @@
 #include <boost/throw_exception.hpp>
 #include <boost/math/tools/promotion.hpp>
 #include <stan/agrad/matrix.hpp>
-#include <stan/math/constants.hpp>
+#include <stan/math.hpp>
 #include <stan/math/matrix.hpp>
+#include <stan/math/matrix/validate_less.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/matrix_error_handling.hpp>
-#include <stan/math/special_functions.hpp>
-// #include <stan/agrad/special_functions.hpp>
+
+#include <stan/math/matrix/multiply_lower_tri_self_transpose.hpp>
 
 namespace stan {
   
@@ -48,25 +49,27 @@ namespace stan {
       sds = Sigma.diagonal().array();
       if( (sds <= 0.0).any() ) return false;
       sds = sds.sqrt();
-  
+
       Eigen::DiagonalMatrix<T,Eigen::Dynamic> D(K);
       D.diagonal() = sds.inverse();
       sds = sds.log(); // now unbounded
-  
+
       Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> R = D * Sigma * D;
       // to hopefully prevent pivoting due to floating point error
       R.diagonal().setOnes(); 
       Eigen::LDLT<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > ldlt;
       ldlt = R.ldlt();
-      if( !ldlt.isPositive() ) return false;
+      if (!ldlt.isPositive()) 
+        return false;
       Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> U = ldlt.matrixU();
 
       size_t position = 0;
       size_t pull = K - 1;
 
-      Eigen::Array<T,Eigen::Dynamic,1> temp = U.row(0).tail(pull);
+      Eigen::Array<T,1,Eigen::Dynamic> temp = U.row(0).tail(pull);
+
       CPCs.head(pull) = temp;
-  
+
       Eigen::Array<T,Eigen::Dynamic,1> acc(K);
       acc(0) = -0.0;
       acc.tail(pull) = 1.0 - temp.square();
@@ -384,7 +387,7 @@ namespace stan {
      */
     template <typename T>
     inline 
-    T identity_constrain(const T x, T& lp) {
+    T identity_constrain(const T x, T& /*lp*/) {
       return x;
     }
     
@@ -970,7 +973,78 @@ namespace stan {
       return atanh(y);
     }
 
-    
+
+    // Unit vector   
+
+    /**
+     * Return the unit length vector corresponding to the free vector y.
+     * The free vector contains K-1 spherical coordinates.
+     *
+     * @param Vector of K - 1 spherical coordinates
+     * @return Unit length vector of dimension K
+     * @tparam T Scalar type.
+     **/
+    template <typename T>
+    Eigen::Matrix<T,Eigen::Dynamic,1> 
+    unit_vector_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& y) {
+      typedef typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type size_type;
+      int Km1 = y.size();
+      Eigen::Matrix<T,Eigen::Dynamic,1> x(Km1 + 1);
+      x(0) = 1.0;
+      const T half_pi = T(M_PI/2.0);
+      for (size_type k = 1; k <= Km1; ++k) {
+        T yk_1 = y(k-1) + half_pi;
+        T sin_yk_1 = sin(yk_1);
+        x(k) = x(k-1)*sin_yk_1; 
+        x(k-1) *= cos(yk_1);
+      }
+      return x;
+    }
+
+    /**
+     * Return the unit length vector corresponding to the free vector y.
+     * The free vector contains K-1 spherical coordinates.
+     *
+     * @param Vector of K - 1 spherical coordinates
+     * @return Unit length vector of dimension K
+     * @param lp Log probability reference to increment.
+     * @tparam T Scalar type.
+     **/
+    template <typename T>
+    Eigen::Matrix<T,Eigen::Dynamic,1> 
+    unit_vector_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& y, T &lp) {
+      typedef typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type size_type;
+      int Km1 = y.size();
+      Eigen::Matrix<T,Eigen::Dynamic,1> x(Km1 + 1);
+      x(0) = 1.0;
+      const T half_pi = T(M_PI/2.0);
+      for (size_type k = 1; k <= Km1; ++k) {
+        T yk_1 = y(k-1) + half_pi;
+        T sin_yk_1 = sin(yk_1);
+        x(k) = x(k-1)*sin_yk_1; 
+        x(k-1) *= cos(yk_1);
+        if (k < Km1)
+          lp += (Km1 - k)*log(fabs(sin_yk_1));
+      }
+      return x;
+    }
+
+    template <typename T>
+    Eigen::Matrix<T,Eigen::Dynamic,1> 
+    unit_vector_free(const Eigen::Matrix<T,Eigen::Dynamic,1>& x) {
+      typedef typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type size_type;
+      stan::math::check_unit_vector("stan::prob::unit_vector_free(%1%)", x, "Unit vector variable");
+      int Km1 = x.size() - 1;
+      Eigen::Matrix<T,Eigen::Dynamic,1> y(Km1);
+      T sumSq = x(Km1)*x(Km1);
+      const T half_pi = T(M_PI/2.0);
+      for (size_type k = Km1; --k >= 0; ) {
+        y(k) = atan2(sqrt(sumSq),x(k)) - half_pi;
+        sumSq += x(k)*x(k);
+      }
+      return y;
+    }
+
     // SIMPLEX
 
 
@@ -1307,7 +1381,6 @@ namespace stan {
       size_type k_choose_2 = (k * (k - 1)) / 2;
       if (k_choose_2 != x.size())
         throw std::invalid_argument ("x is not a valid correlation matrix");
-      
       Eigen::Array<T,Eigen::Dynamic,1> cpcs(k_choose_2);
       for (size_type i = 0; i < k_choose_2; ++i)
         cpcs[i] = corr_constrain(x[i],lp);

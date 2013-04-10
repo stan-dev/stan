@@ -23,12 +23,12 @@ public:
     return false;
     
   }
-  static size_t num_iterations() {
+  static int num_iterations() {
     return iterations;
   }
 
-  static std::vector<size_t> skip_chains_test() {
-    std::vector<size_t> params_to_skip;
+  static std::vector<int> skip_chains_test() {
+    std::vector<int> params_to_skip;
     return params_to_skip;
   }
 
@@ -36,33 +36,31 @@ public:
     default_populate_chains();
   }
 
-  static std::vector<std::pair<size_t, double> >
+  static std::vector<std::pair<int, double> >
   get_expected_values() {
-    std::vector<std::pair<size_t, double> > expected_values;
+    std::vector<std::pair<int, double> > expected_values;
     return expected_values;
   }
-
 };
 
 
 INSTANTIATE_TYPED_TEST_CASE_P(Models_BasicDistributions_OrderedPair,
-			      Model_Test_Fixture,
-			      Models_BasicDistributions_OrderedPair);
-
+            Model_Test_Fixture,
+            Models_BasicDistributions_OrderedPair);
 
 TEST_F(Models_BasicDistributions_OrderedPair,
        Test_Ordered_Pair) {
-  using std::vector;
-  vector<double> a, b;
-  chains->get_samples(0U, a);
-  chains->get_samples(1U, b);
+  Eigen::VectorXd a, b;
+  a = chains->samples(chains->index("a"));
+  b = chains->samples(chains->index("b"));
 
-  for (size_t n = 0; n < chains->num_samples(); n++) {
-    EXPECT_GE(a[n], -5);
-    EXPECT_LE(a[n], 5);
-    EXPECT_GE(b[n], -5);
-    EXPECT_LE(b[n], 5);
-    EXPECT_LT(a[n], b[n])
-      << n << ": expecting " << a[n] << " to be less than " << b[n];
+  for (int n = 0; n < chains->num_kept_samples(); n++) {
+    EXPECT_GE(a(n), -5);
+    EXPECT_LE(a(n), 5);
+    EXPECT_GE(b(n), -5);
+    EXPECT_LE(b(n), 5);
+    EXPECT_LT(a(n), b(n))
+      << n << ": expecting " << a(n) << " to be less than " << b(n);
   }
 }
+

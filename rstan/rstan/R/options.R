@@ -46,7 +46,7 @@ init_rstan_opt_env <- function(e) {
 
   # boost lib path 
   rstan_inc_path  <- system.file('include', package = 'rstan')
-  boost_lib_path <- file.path(rstan_inc_path, '/stanlib/boost_1.52.0') 
+  boost_lib_path <- file.path(rstan_inc_path, '/stanlib/boost_1.53.0') 
   # eigen_lib_path <- system.file('include', package = 'RcppEigen')
   eigen_lib_path <- file.path(rstan_inc_path, '/stanlib/eigen_3.1.2') 
   assign("eigen_lib", eigen_lib_path, e) 
@@ -96,8 +96,3 @@ rstan_options <- function(...) {
   if (len == 1) return(invisible(r[[1]])) 
   invisible(r)
 } 
-
-## test code 
-# o <- rstan_options() 
-# o <- rstan_options(b = 4)
-# ls(o)

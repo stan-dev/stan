@@ -1,69 +1,46 @@
-#define _LOG_PROB_ cauchy_log
 #include <stan/prob/distributions/univariate/continuous/cauchy.hpp>
+#include <gtest/gtest.h>
+#include <boost/random/mersenne_twister.hpp>
+#include<boost/math/distributions.hpp>
 
-#include <test/prob/distributions/distribution_test_fixture.hpp>
-#include <test/prob/distributions/distribution_tests_3_params.hpp>
-using std::vector;
-using std::numeric_limits;
-
-class ProbDistributionsCauchy : public DistributionTest {
-public:
-  void valid_values(vector<vector<double> >& parameters,
-		    vector<double>& log_prob) {
-    vector<double> param(3);
-    
-    param[0] = 1.0;                // y
-    param[1] = 0.0;                // mu
-    param[2] = 1.0;                // sigma
-    parameters.push_back(param);
-    log_prob.push_back(-1.837877); // expected log_prob
-
-    param[0] = -1.5;                // y
-    param[1] = 0.0;                 // mu
-    param[2] = 1.0;                 // sigma
-    parameters.push_back(param);
-    log_prob.push_back(-2.323385); // expected log_prob
-
-    param[0] = -1.5;                // y
-    param[1] = -1.0;                // mu
-    param[2] = 1.0;                 // sigma
-    parameters.push_back(param);
-    log_prob.push_back(-1.367873); // expected log_prob
-  }
-
-  void invalid_values(vector<size_t>& index, 
-		      vector<double>& value) {
-    // y
-    
-    // mu
-    index.push_back(1U);
-    value.push_back(numeric_limits<double>::infinity());
-
-    index.push_back(1U);
-    value.push_back(-numeric_limits<double>::infinity());
-
-    // sigma
-    index.push_back(2U);
-    value.push_back(0.0);
-
-    index.push_back(2U);
-    value.push_back(-1.0);
-
-    index.push_back(2U);
-    value.push_back(numeric_limits<double>::infinity());
-
-    index.push_back(2U);
-    value.push_back(-numeric_limits<double>::infinity());
-  }
-};
-
-INSTANTIATE_TYPED_TEST_CASE_P(ProbDistributionsCauchy,
-			      DistributionTestFixture,
-			      ProbDistributionsCauchy);
-
-TEST(ProbDistributionsCauchy,Cumulative) {
-  using stan::prob::cauchy_cdf;
-  EXPECT_FLOAT_EQ(0.75, cauchy_cdf(1.0, 0.0, 1.0));
-  EXPECT_FLOAT_EQ(0.187167, cauchy_cdf(-1.5, 0.0, 1.0));
-  EXPECT_FLOAT_EQ(0.187167, cauchy_cdf(-2.5, -1.0, 1.0));
+TEST(ProbDistributionsCauchy, random) {
+  boost::random::mt19937 rng;
+  EXPECT_NO_THROW(stan::prob::cauchy_rng(2.0,1.0,rng));
 }
+
+TEST(ProbDistributionsCauchy, chiSquareGoodnessFitTest) {
+  boost::random::mt19937 rng;
+  int N = 10000;
+  int K = boost::math::round(2 * std::pow(N, 0.4));
+  boost::math::cauchy_distribution<>dist (2.0,1.0);
+  boost::math::chi_squared mydist(K-1);
+
+  double loc[K - 1];
+  for(int i = 1; i < K; i++)
+    loc[i - 1] = quantile(dist, i * std::pow(K, -1.0));
+
+  int count = 0;
+  int bin [K];
+  double expect [K];
+  for(int i = 0 ; i < K; i++) {
+    bin[i] = 0;
+    expect[i] = N / K;
+  }
+
+  while (count < N) {
+    double a = stan::prob::cauchy_rng(2.0,1.0,rng);
+    int i = 0;
+    while (i < K-1 && a > loc[i]) 
+      ++i;
+    ++bin[i];
+    count++;
+   }
+
+  double chi = 0;
+
+  for(int j = 0; j < K; j++)
+    chi += ((bin[j] - expect[j]) * (bin[j] - expect[j]) / expect[j]);
+
+  EXPECT_TRUE(chi < quantile(complement(mydist, 1e-6)));
+}
+

@@ -50,13 +50,24 @@ yasp3 <- get_sampler_params(ss3, inc_warmup = FALSE)
 gm3 <- get_posterior_mean(ss3)
 print(gm3)
 
+# Non-diag 
+ss4 <- sampling(m, data = dat, iter = iter, chains = 4, nondiag_mass = TRUE, refresh = 100) 
+ainfo4 <- get_adaptation_info(ss4)
+lp4 <- get_logposterior(ss4)
+yalp4 <- get_logposterior(ss4, inc_warmup = FALSE)
+sp4 <- get_sampler_params(ss4)
+yasp4 <- get_sampler_params(ss4, inc_warmup = FALSE) 
+
+gm4 <- get_posterior_mean(ss4)
+print(gm4)
+
 print(ss1) 
 print(ss2) 
 print(ss3) 
 plot(ss1)
 traceplot(ss1)
 
-ss4 <- sampling(m, data = dat, iter = iter, chains = 4, refresh = 10) 
+ss9 <- sampling(m, data = dat, iter = iter, chains = 4, refresh = 10) 
 
 iter <- 52012
 ss <- stan(sfile, data = dat, iter = iter, chains = 4, sample_file = '8schools.csv')

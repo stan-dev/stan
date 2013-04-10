@@ -1,54 +1,45 @@
-#define _LOG_PROB_ chi_square_log
 #include <stan/prob/distributions/univariate/continuous/chi_square.hpp>
+#include <gtest/gtest.h>
+#include <boost/random/mersenne_twister.hpp>
+#include<boost/math/distributions.hpp>
 
-#include <test/prob/distributions/distribution_test_fixture.hpp>
-#include <test/prob/distributions/distribution_tests_2_params.hpp>
+TEST(ProbDistributionsChiSquare, random) {
+  boost::random::mt19937 rng;
+  EXPECT_NO_THROW(stan::prob::chi_square_rng(2.0,rng));
+}
 
-using std::vector;
-using std::numeric_limits;
+TEST(ProbDistributionsChiSquare, chiSquareGoodnessFitTest) {
+  boost::random::mt19937 rng;
+  int N = 10000;
+  int K = boost::math::round(2 * std::pow(N, 0.4));
+  boost::math::chi_squared_distribution<>dist (2.0);
+  boost::math::chi_squared mydist(K-1);
 
-class ProbDistributionsChiSquare : public DistributionTest {
-public:
-  void valid_values(vector<vector<double> >& parameters,
-		    vector<double>& log_prob) {
-    vector<double> param(2);
+  double loc[K - 1];
+  for(int i = 1; i < K; i++)
+    loc[i - 1] = quantile(dist, i * std::pow(K, -1.0));
 
-    param[0] = 7.9;                 // y
-    param[1] = 3.0;                 // nu
-    parameters.push_back(param);
-    log_prob.push_back(-3.835507);  // expected log_prob
-
-    param[0] = 1.9;                 // y
-    param[1] = 0.5;                 // nu
-    parameters.push_back(param);
-    log_prob.push_back(-2.8927);    // expected log_prob
+  int count = 0;
+  int bin [K];
+  double expect [K];
+  for(int i = 0 ; i < K; i++) {
+    bin[i] = 0;
+    expect[i] = N / K;
   }
- 
-  void invalid_values(vector<size_t>& index, 
-		      vector<double>& value) {
-    // y
-    
-    // nu
-    index.push_back(1U);
-    value.push_back(0.0);
 
-    index.push_back(1U);
-    value.push_back(-1.0);
+  while (count < N) {
+    double a = stan::prob::chi_square_rng(2.0,rng);
+    int i = 0;
+    while (i < K-1 && a > loc[i]) 
+      ++i;
+    ++bin[i];
+    count++;
+   }
 
-    index.push_back(1U);
-    value.push_back(numeric_limits<double>::infinity());
-  }
-};
+  double chi = 0;
 
-INSTANTIATE_TYPED_TEST_CASE_P(ProbDistributionsChiSquare,
-			      DistributionTestFixture,
-			      ProbDistributionsChiSquare);
+  for(int j = 0; j < K; j++)
+    chi += ((bin[j] - expect[j]) * (bin[j] - expect[j]) / expect[j]);
 
-/*
-// FIXME: include when chi_square_cdf is implemented
-TEST(ProbDistributionsChiSquare,Cumulative) {
-  using stan::prob::chi_square_cdf;
-  EXPECT_FLOAT_EQ(0.9518757, chi_square_cdf(7.9,3.0));
-  EXPECT_FLOAT_EQ(0.9267752, chi_square_cdf(1.9,0.5));
-  }
-*/
+  EXPECT_TRUE(chi < quantile(complement(mydist, 1e-6)));
+}

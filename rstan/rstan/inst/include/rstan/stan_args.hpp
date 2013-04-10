@@ -115,32 +115,9 @@ namespace rstan {
     std::string init; 
     SEXP init_list;  
     std::string sampler; // HMC, NUTS1, NUTS2 (not set directy from R now) 
+    bool nondiag_mass; 
 
   public:
-   
-    /**
-    stan_args(): 
-      samples("samples.csv"),  
-      iter(2000), 
-      warmup(1000), 
-      thin(1), 
-      refresh(1), 
-      leapfrog_steps(-1), 
-      epsilon(-1.0), 
-      max_treedepth(10), 
-      epsilon_pm(0.0), 
-      delta(0.5), 
-      gamma(0.05), 
-      random_seed(std::time(0)), 
-      random_seed_src("default"), 
-      chain_id(1), 
-      chain_id_src("default"), 
-      append_samples(false), 
-      test_grad(true), 
-      init("random"),
-      init_list(R_NilValue) {
-    } 
-    */
     stan_args(const Rcpp::List& in) : init_list(R_NilValue) {
       std::vector<std::string> args_names 
         = Rcpp::as<std::vector<std::string> >(in.names()); 
@@ -162,7 +139,6 @@ namespace rstan {
 
       idx = find_index(args_names, std::string("thin")); 
       int calculated_thin = (iter - warmup) / 1000;
-      // rstan::io::rcout << "calculated_thin=" << calculated_thin << std::endl; 
       if (idx == args_names.size()) thin = (calculated_thin > 1) ? calculated_thin : 1;
       else thin = Rcpp::as<int>(in[idx]); 
 
@@ -232,9 +208,6 @@ namespace rstan {
           default: init = "random"; 
         } 
       }
-      // rstan::io::rcout << "init=" << init << std::endl;  
-      // std::string yesorno = Rf_isNull(init_list) ? "yes" : "no";
-      // rstan::io::rcout << "init_list is null: " << yesorno << std::endl; 
 
       idx = find_index(args_names, std::string("append_samples")); 
       if (idx == args_names.size()) append_samples = false; 
@@ -247,6 +220,10 @@ namespace rstan {
       idx = find_index(args_names, std::string("point_estimate"));
       if (idx == args_names.size()) point_estimate = false;
       else point_estimate = Rcpp::as<bool>(in[idx]);
+
+      idx = find_index(args_names, std::string("nondiag_mass"));
+      if (idx == args_names.size()) nondiag_mass = false;
+      else nondiag_mass = Rcpp::as<bool>(in[idx]);
     } 
 
     /**
@@ -280,6 +257,7 @@ namespace rstan {
       lst["sampler"] = sampler; 
       lst["test_grad"] = test_grad;
       lst["point_estimate"] = point_estimate;
+      lst["nondiag_mass"] = nondiag_mass; 
       return lst; 
     } 
 
@@ -365,9 +343,10 @@ namespace rstan {
     bool get_equal_step_sizes() const {
       return equal_step_sizes; 
     } 
+    bool get_nondiag_mass() const {
+      return nondiag_mass;
+    } 
     void write_args_as_comment(std::ostream& ostream) const { 
-      // write_comment(ostream);
-      // write_comment_property(ostream,"data",data_file);
       write_comment_property(ostream,"init",init);
       write_comment_property(ostream,"append_samples",append_samples);
       write_comment_property(ostream,"seed",random_seed);
@@ -384,6 +363,7 @@ namespace rstan {
       write_comment_property(ostream,"epsilon_pm",epsilon_pm);
       write_comment_property(ostream,"delta",delta);
       write_comment_property(ostream,"gamma",gamma);
+      write_comment_property(ostream,"nondiag_mass",nondiag_mass);
       write_comment(ostream);
     }
   }; 

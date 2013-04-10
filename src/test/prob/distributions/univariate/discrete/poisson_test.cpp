@@ -1,60 +1,46 @@
-#define _LOG_PROB_ poisson_log
 #include <stan/prob/distributions/univariate/discrete/poisson.hpp>
+#include <gtest/gtest.h>
+#include <boost/random/mersenne_twister.hpp>
+#include<boost/math/distributions.hpp>
 
-#include <test/prob/distributions/distribution_test_fixture.hpp>
-#include <test/prob/distributions/distribution_tests_1_discrete_1_param.hpp>
+TEST(ProbDistributionsPoisson, random) {
+  boost::random::mt19937 rng;
+  EXPECT_NO_THROW(stan::prob::poisson_rng(6, rng));
+}
 
-using std::vector;
-using std::log;
-using std::numeric_limits;
+TEST(ProbDistributionsPoisson, chiSquareGoodnessFitTest) {
+  boost::random::mt19937 rng;
+  int N = 1000;
+  int K = boost::math::round(2 * std::pow(N, 0.4));
+  boost::math::poisson_distribution<>dist (5);
+  boost::math::chi_squared mydist(K-1);
 
-class ProbDistributionsPoisson : public DistributionTest {
-public:
-  void valid_values(vector<vector<double> >& parameters,
-                    vector<double>& log_prob) {
-    vector<double> param(2);
+  int loc[K - 1];
+  for(int i = 1; i < K; i++)
+    loc[i - 1] = i - 1;
 
-    param[0] = 17;           // n
-    param[1] = 13.0;         // lambda
-    parameters.push_back(param);
-    log_prob.push_back(-2.900934); // expected log_prob
-
-    param[0] = 192;          // n
-    param[1] = 42.0;         // lambda
-    parameters.push_back(param);
-    log_prob.push_back(-145.3547); // expected log_prob
-
-    param[0] = 0;            // n
-    param[1] = 3.0;          // lambda
-    parameters.push_back(param);
-    log_prob.push_back(-3.0); // expected log_prob
-
-    param[0] = 0;            // n
-    param[1] = std::numeric_limits<double>::infinity(); // lambda
-    parameters.push_back(param);
-    log_prob.push_back(log(0.0)); // expected log_prob
-
-    param[0] = 1;            // n
-    param[1] = 0.0;          // lambda
-    parameters.push_back(param);
-    log_prob.push_back(log(0.0)); // expected log_prob
+  int count = 0;
+  double bin [K];
+  double expect [K];
+  for(int i = 0 ; i < K; i++) {
+    bin[i] = 0;
+    expect[i] = N * pdf(dist, i);
   }
- 
-  void invalid_values(vector<size_t>& index, 
-                      vector<double>& value) {
-    // n
-    index.push_back(0U);
-    value.push_back(-1);
+  expect[K-1] = N * (1 - cdf(dist, K - 1));
 
-    // lambda
-    index.push_back(1U);
-    value.push_back(-1e-5);
+  while (count < N) {
+    int a = stan::prob::poisson_rng(5,rng);
+    int i = 0;
+    while (i < K-1 && a > loc[i]) 
+      ++i;
+    ++bin[i];
+    count++;
+   }
 
-    index.push_back(1U);
-    value.push_back(-1);
-  }
-};
+  double chi = 0;
 
-INSTANTIATE_TYPED_TEST_CASE_P(ProbDistributionsPoisson,
-                              DistributionTestFixture,
-                              ProbDistributionsPoisson);
+  for(int j = 0; j < K; j++)
+    chi += ((bin[j] - expect[j]) * (bin[j] - expect[j]) / expect[j]);
+
+  EXPECT_TRUE(chi < quantile(complement(mydist, 1e-6)));
+}

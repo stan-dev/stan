@@ -11,7 +11,10 @@
 #include <boost/random/variate_generator.hpp>
 #include <boost/random/uniform_01.hpp>
 
-#include <stan/math/util.hpp>
+#include <stan/math/functions/dot.hpp>
+#include <stan/math/functions/dot_self.hpp>
+#include <stan/math/functions/min.hpp>
+#include <stan/math/functions/sub.hpp>
 #include <stan/mcmc/adaptive_sampler.hpp>
 #include <stan/mcmc/dualaverage.hpp>
 #include <stan/mcmc/hmc_base.hpp>
@@ -87,24 +90,24 @@ namespace stan {
        * specified, generate new seed based on system time.
        */
       nuts(stan::model::prob_grad& model,
+           const std::vector<double>& params_r,
+           const std::vector<int>& params_i,
            int maxdepth = 10,
            double epsilon = -1,
            double epsilon_pm = 0.0,
            bool epsilon_adapt = true,
            double delta = 0.6, 
            double gamma = 0.05,
-           BaseRNG base_rng = BaseRNG(std::time(0)),
-           const std::vector<double>* params_r = 0,
-           const std::vector<int>* params_i = 0) 
+     BaseRNG base_rng = BaseRNG(std::time(0))) 
         : hmc_base<BaseRNG>(model,
+                            params_r,
+                            params_i,
                             epsilon,
                             epsilon_pm,
                             epsilon_adapt,
                             delta,
                             gamma,
-                            base_rng,
-                            params_r,
-                            params_i),
+                            base_rng),
           _maxchange(-1000),
           _maxdepth(maxdepth),
           _lastdepth(-1)
@@ -165,7 +168,7 @@ namespace stan {
         }
         this->_epsilon_last = epsilon; // use epsilon_last in tree build
 
-        while (criterion && (_maxdepth < 0 || depth <= _maxdepth)) {
+        while (criterion && (_maxdepth < 0 || depth < _maxdepth)) {
           direction = 2 * (this->_rand_uniform_01() > 0.5) - 1;
           if (direction == -1)
             build_tree(xminus, mminus, gradminus, u, direction, depth,

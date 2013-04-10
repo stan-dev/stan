@@ -2,11 +2,12 @@
 #define __STAN__IO__DUMP_HPP__
 
 #include <cctype>
+#include <iostream>
 #include <limits>
 #include <map>
-#include <vector>
-#include <string>
 #include <sstream>
+#include <string>
+#include <vector>
 #include <boost/throw_exception.hpp>
 #include <stan/math/matrix.hpp>
 #include <stan/io/var_context.hpp>
@@ -16,7 +17,7 @@ namespace stan {
   namespace io {
 
     namespace {
-       size_t product(std::vector<size_t> dims) {
+      size_t product(std::vector<size_t> dims) {
          size_t y = 1U;
          for (size_t i = 0; i < dims.size(); ++i)
            y *= dims[i];
@@ -122,11 +123,11 @@ namespace stan {
       }
       
 
-      void dims(double x, std::vector<size_t> ds) {
+      void dims(double /*x*/, std::vector<size_t> /*ds*/) {
         // no op
       }
 
-      void dims(int x, std::vector<size_t> ds) {
+      void dims(int /*x*/, std::vector<size_t> /*ds*/) {
         // no op
       }
 
@@ -311,7 +312,7 @@ namespace stan {
        * @tparam T <code>double</code> or <code>int</code>.
        */
       template <typename T>
-      void dump_structure(std::string name,
+      void dump_structure(std::string /*name*/,
                           std::vector<size_t> dims,
                           std::vector<T> xs) {
         if (xs.size() != product(dims)) 

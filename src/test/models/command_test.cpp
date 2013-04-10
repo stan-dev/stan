@@ -82,6 +82,9 @@ public:
     expected_help_options.push_back("save_warmup");
     expected_help_options.push_back("test_grad");
     expected_help_options.push_back("point_estimate");
+    expected_help_options.push_back("point_estimate_newton\n");
+    expected_help_options.push_back("nondiag_mass");
+    expected_help_options.push_back("cov_matrix");
 
     expected_output.push_back(make_pair("data","(specified model requires no data)"));
     expected_output.push_back(make_pair("init", "random initialization"));
@@ -95,6 +98,7 @@ public:
     expected_output.push_back(make_pair("warmup", "1000"));
     expected_output.push_back(make_pair("thin", "1 (default)"));
     expected_output.push_back(make_pair("equal_step_sizes", "0"));
+    expected_output.push_back(make_pair("nondiag_mass", "0"));
     expected_output.push_back(make_pair("leapfrog_steps", "-1"));
     expected_output.push_back(make_pair("max_treedepth", "10"));
     expected_output.push_back(make_pair("epsilon", "-1"));
@@ -318,7 +322,7 @@ TEST_F(ModelCommand, HelpOptionsMatch) {
 
 void test_sampled_mean(const bitset<options_count>& options, stan::mcmc::chains<>& c) {
   double expected_mean = (options[data])*100.0; // 1: mean = 0, 2: mean = 100
-  EXPECT_NEAR(expected_mean, c.mean(0U), 50)
+  EXPECT_NEAR(expected_mean, c.mean("y"), 50)
     << "Test that data file is being used";
 }
 
@@ -359,10 +363,10 @@ void test_specific_sample_values(const bitset<options_count>& options, stan::mcm
       expected_first_y = options[init] ? -0.321312 : -0.389503;
     }
     
-    vector<double> sampled_y;
-    c.get_samples(0U, 0U, sampled_y);
+    Eigen::VectorXd sampled_y;
+    sampled_y = c.samples(0, "y");
     if (options[chain_id]) {
-      if (expected_first_y == sampled_y[0]) {
+      if (expected_first_y == sampled_y(0)) {
         ADD_FAILURE()
           << "chain_id is not default. "
           << "sampled_y[0] should not be drawn from the same seed";
@@ -372,14 +376,14 @@ void test_specific_sample_values(const bitset<options_count>& options, stan::mcm
           << "The samples are not drawn from the same seed";
       }
     } else {
-      EXPECT_EQ(expected_first_y, sampled_y[0])
+      EXPECT_EQ(expected_first_y, sampled_y(0))
         << "Test for first sample when chain_id == 1";
     }
   }
 }
 
 TEST_P(ModelCommand, OptionsTest) {
-  bitset<options_count> options(GetParam());
+  bitset<options_count> options(1 << GetParam());
   vector<pair<string, string> > changed_options;
   
   std::string command = get_command(options, changed_options);
@@ -415,10 +419,13 @@ TEST_P(ModelCommand, OptionsTest) {
   //std::cout << "options[epsilon_pm]:     " << options[epsilon_pm] << std::endl;
   //std::cout << "skip:                    " << skip << std::endl;
 
-  stan::mcmc::read_variables(model_path+".csv", skip,
-                             names, dimss);
-  stan::mcmc::chains<> c(1U, names, dimss);
-  stan::mcmc::add_chain(c, 0, model_path+".csv", skip);
+  std::ifstream ifstream;
+  std::string file = model_path+".csv";
+  ifstream.open(file.c_str());
+  stan::io::stan_csv stan_csv = stan::io::stan_csv_reader::parse(ifstream);
+  ifstream.close();
+
+  stan::mcmc::chains<> c(stan_csv);
 
   test_sampled_mean(options, c);
   test_number_of_samples(options, c);
@@ -426,5 +433,4 @@ TEST_P(ModelCommand, OptionsTest) {
 }
 INSTANTIATE_TEST_CASE_P(,
                         ModelCommand,
-                        //Range(27648, 27651));
-                        Range(0, 1<<options_count));
+                        Range(-1, int(options_count)));

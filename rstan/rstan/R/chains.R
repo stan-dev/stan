@@ -13,6 +13,20 @@ rstan_splitrhat <- function(sim, n) {
   rhat
 }
 
+rstan_splitrhat2_cpp <- function(sims) {
+  # Args:
+  #   sim: samples of several chains _without_ warmup
+  rhat <- .Call("split_potential_scale_reduction2", sims, PACKAGE = "rstan")
+  rhat
+}
+
+rstan_ess2_cpp <- function(sims) {
+  # Args:
+  #   sim: samples of several chains _without_ warmup
+  ess <- .Call("effective_sample_size2", sims, PACKAGE = "rstan")
+  ess
+} 
+
 rstan_seq_perm <- function(n, chains, seed, chain_id = 1) {
   # Args:
   #   n: length of sequence to be generated 

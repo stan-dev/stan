@@ -112,7 +112,7 @@ restricting it to values between 0 and 1 (inclusive).</p>
 
 <p>A data set of <tt>N=10</tt> observations is availabe as</p>
 <ul>
-  <li><tt>&lt;stan-home&gt;/src/models/basic_estimators/bernoulli.Rdata</tt></li>
+  <li><tt>&lt;stan-home&gt;/src/models/basic_estimators/bernoulli.data.R</tt></li>
 </ul>
 
 <pre>
@@ -163,7 +163,7 @@ form will be placed in the same directory as the model.</p>
 <p>To execute the model under Linux or Mac, use</p>
 
 <pre>
-% ./bernoulli --data=bernoulli.Rdata
+% ./bernoulli --data=bernoulli.data.R
 </pre>
 
 <p>The <tt>./</tt> prefix before the executable is only required
@@ -173,7 +173,7 @@ when executing a model from the directory in which it resides.</p>
 resulting in the command</p>
 
 <pre>
-% bernoulli --data=bernoulli.Rdata
+% bernoulli --data=bernoulli.data.R
 </pre>
 
 <p>Whether the command is run in Windows, Linux, or on the Mac, the
@@ -182,7 +182,7 @@ which shows up on the terminal as</p>
 
 <pre>
 STAN SAMPLING COMMAND
-data = bernoulli.Rdata
+data = bernoulli.data.R
 init = random initialization
 init tries = 1
 samples = samples.csv
@@ -224,7 +224,7 @@ as comments.</p>
 # stan_version_major=1
 # stan_version_minor=0
 # stan_version_patch=0
-# data=bernoulli.Rdata
+# data=bernoulli.data.R
 # init=random initialization
 # append_samples=0
 # save_warmup=0
@@ -349,7 +349,7 @@ full documentation for running Stan from the command line.</p>
 
 <ul>
   <li><a
-  href="http://stan.googlecode.com/files/stan-reference-1.0.1.pdf">Stan
+  href="http://stan.googlecode.com/files/stan-reference-1.3.0.pdf">Stan
   Modeling Language User's Guide and Reference Manual</a>.
   </li>
 </ul>

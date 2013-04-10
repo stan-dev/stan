@@ -54,12 +54,12 @@ Translate Stan model specification to C++ code
   Unlike \R, in which variable identifiers may contain dots (e.g. \code{a.1}),
   Stan prohibits dots from occurring in variable identifiers.
   Further, C++ reserved words and
-  Stan reserved words may not be used for variable names;  see the
+  Stan reserved words may not be used for variable names; see the
   Stan User's Guide for a complete list.  
 } 
 
 \references{
-  The Stan Development Team (2012) 
+  The Stan Development Team (\Sexpr[eval=TRUE,results=text,stage=build]{format(Sys.time(),'\%Y')})
   \emph{Stan Modeling Language User's Guide and Reference Manual}. 
   \url{http://mc-stan.org/}. 
 } 
@@ -85,8 +85,8 @@ model {
 } 
 "
 
-r <- stanc(model_code = "stanmodelcode", "normal1") 
-# r <- stanc(model_code = stanmodelcode, "normal1") 
+r <- stanc(model_code = "stanmodelcode", model_name = "normal1") 
+# r <- stanc(model_code = stanmodelcode, model_name = "normal1") 
 names(r)
 cat(r$cppcode)
 }}

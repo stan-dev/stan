@@ -5,7 +5,6 @@
 #include <stan/math/matrix.hpp>
 #include <stan/math/matrix_error_handling.hpp>
 #include <stan/math/error_handling.hpp>
-#include <stan/math/special_functions.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/traits.hpp>
 
@@ -35,11 +34,20 @@ namespace stan {
       using boost::math::tools::promote_args;
       
       typename promote_args<T_y,T_loc,T_scale,T_shape>::type lp(0.0);
-      if (!check_size_match(function, mu.rows(), sigma.rows(), &lp, Policy()))
+      if (!check_size_match(function, 
+          mu.rows(), "Rows of location parameter",
+          sigma.rows(), "columns of scale parameter",
+          &lp, Policy()))
         return lp;
-      if (!check_size_match(function, y.cols(), y.rows(), &lp, Policy()))
+      if (!check_size_match(function, 
+          y.rows(), "Rows of random variable",
+          y.cols(), "columns of random variable",
+          &lp, Policy()))
       return lp;
-      if (!check_size_match(function, mu.rows(), y.rows(), &lp, Policy()))
+      if (!check_size_match(function, 
+          y.rows(), "Rows of random variable",
+          mu.rows(), "rows of location parameter",
+          &lp, Policy()))
         return lp;
       if (!check_positive(function, eta, "Shape parameter", &lp, Policy()))
         return lp;

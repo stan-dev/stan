@@ -39,6 +39,7 @@ namespace stan {
     struct row_vector_var_decl;
     struct sample;
     struct simplex_var_decl;
+    struct unit_vector_var_decl;
     struct statement;
     struct statements;
     struct unary_op;
@@ -409,6 +410,14 @@ namespace stan {
                     std::vector<expression> const& dims);
   };
 
+  struct unit_vector_var_decl : public base_var_decl {
+    expression K_;
+    unit_vector_var_decl();
+    unit_vector_var_decl(expression const& K,
+                         std::string const& name,
+                         std::vector<expression> const& dims);
+  };
+
   struct simplex_var_decl : public base_var_decl {
     expression K_;
     simplex_var_decl();
@@ -498,6 +507,7 @@ namespace stan {
     std::string operator()(const row_vector_var_decl& x) const;
     std::string operator()(const matrix_var_decl& x) const;
     std::string operator()(const simplex_var_decl& x) const;
+    std::string operator()(const unit_vector_var_decl& x) const;
     std::string operator()(const ordered_var_decl& x) const;
     std::string operator()(const positive_ordered_var_decl& x) const;
     std::string operator()(const cov_matrix_var_decl& x) const;
@@ -515,6 +525,7 @@ namespace stan {
                            boost::recursive_wrapper<row_vector_var_decl>,
                            boost::recursive_wrapper<matrix_var_decl>,
                            boost::recursive_wrapper<simplex_var_decl>,
+                           boost::recursive_wrapper<unit_vector_var_decl>,
                            boost::recursive_wrapper<ordered_var_decl>,
                            boost::recursive_wrapper<positive_ordered_var_decl>,
                            boost::recursive_wrapper<cov_matrix_var_decl>,
@@ -535,6 +546,7 @@ namespace stan {
     var_decl(const row_vector_var_decl& decl);
     var_decl(const matrix_var_decl& decl);
     var_decl(const simplex_var_decl& decl);
+    var_decl(const unit_vector_var_decl& decl);
     var_decl(const ordered_var_decl& decl);
     var_decl(const positive_ordered_var_decl& decl);
     var_decl(const cov_matrix_var_decl& decl);
@@ -660,8 +672,10 @@ namespace stan {
   // from generator.hpp
   void generate_expression(const expression& e, std::ostream& o);
 
+    bool has_rng_suffix(const std::string& s);
 
-}
+
   }
+}
  
 #endif

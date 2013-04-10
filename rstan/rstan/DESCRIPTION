@@ -1,15 +1,17 @@
 Package: rstan
 Type: Package
 Title: RStan: R interface to Stan
-Version: 1.0.3
-Date: 2012-10-24
+Version: 1.3.0
+Date: 2013-04-09
 Author: Jiqiang Guo <guojq28@gmail.com>,   
         Michael Betancourt <betanalpha@gmail.com>,
         Marcus Brubaker <mbrubake@cs.toronto.edu>,  
         Bob Carpenter <carp@alias-i.com>,  
+        Yuanjun Gao <yg2312@columbia.edu>,
         Ben Goodrich <bg2382@columbia.edu>, 
         Matt Hoffman <mdhoffma@cs.princeton.edu>,  
         Daniel Lee <bearlee@alum.mit.edu>, 
+        Peter Li <li.peter94@gmail.com>,
         Michael Malecki <malecki@gmail.com>,  
         Andrew Gelman <gelman@stat.columbia.edu> 
 Maintainer: Jiqiang Guo <guojq28@gmail.com>
@@ -21,7 +23,7 @@ LicenseNote: RStan includes part of unmodified copies of Stan (http://mc-stan.or
   Boost (http://www.boost.org), and Eigen (http://eigen.tuxfamily.org/), which
   are under licenses of "new BSD license", "Boost license", and "MPL2",
   respectively.  These three licenses are compatible with version 3 of the GPL. 
-Depends: methods, Rcpp (>= 0.9.10), inline, stats4, utils
+Depends: R (>= 2.15.1), methods, Rcpp (>= 0.9.10), inline, stats4, utils
 LinkingTo: Rcpp
 Suggests: RUnit
 URL: http://mc-stan.org

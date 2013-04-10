@@ -1,4 +1,3 @@
-#############################################################
 ###  deal with the optimization level for c++ compilation 
 
 get_makefile_txt <- function() { 
@@ -214,26 +213,19 @@ rm_rstan_makefile_flags <- function() {
   invisible(NULL)
 } 
 
-set_cppo <- function(mode = c("fast", "presentation2", "presentation1", "debug")) { 
+set_cppo <- function(mode = c("fast", "presentation2", "presentation1", "debug", "small")) { 
   # set the optimization level for compiling C++ code using R CMD SHLIB
   # Args:
-  #   mode: one of fast, presentation2, presentation1, debug, corresponding
-  #   to level 3, 2, 1, 0. 
+  #   mode: one of fast, presentation2, presentation1, debug, small, corresponding
+  #   to level 3, 2, 1, 0, s. 
   #   In addition, when debug mode is specified, it will add -g to CXXFLAGS. 
   #   In mode other than debug, -g is removed if exists. 
   # Return: 
   #   A list with names CXXFLAGS and R_XTRA_CPPFLAGS that are set 
   # 
   mode = match.arg(mode) 
-  level = c(3, 2, 1, 0)[match(mode, c("fast", "presentation2", "presentation1", "debug"))]  
+  level = c('3', '2', '1', '0', 's')[match(mode, c("fast", "presentation2", "presentation1", "debug", "small"))]  
   makefile_txt <- get_makefile_txt() 
-
-  # if (mode == 'system') {
-  #   rm_rstan_makefile_flags() 
-  #   message("compiler flags set by rstan are removed") 
-  #   retrun(invisible(list()))
-  # } 
-
   sys_cxxflags <- get_makefile_flags("CXXFLAGS", makefile_txt, headtotail = TRUE)
   curr_cxxflags <- get_makefile_flags("CXXFLAGS", makefile_txt) 
   curr_r_xtra_cppflags <- get_makefile_flags("R_XTRA_CPPFLAGS", makefile_txt) 
@@ -276,6 +268,6 @@ get_cppo <- function() {
   curr_cxxflags <- get_makefile_flags("CXXFLAGS", get_makefile_txt())
   l <- get_cxxo_level(curr_cxxflags)  
   if (!nzchar(l)) l <- "0"
-  p <- match(l, c("3", "2", "1", "0")) 
-  c("fast", "presentation2", "presentation1", "debug")[p]
+  p <- match(l, c("3", "2", "1", "0", "s")) 
+  c("fast", "presentation2", "presentation1", "debug", "small")[p]
 } 

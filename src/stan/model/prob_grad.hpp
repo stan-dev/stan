@@ -174,10 +174,12 @@ namespace stan {
        * @param output_stream Stream to which print statements in Stan
        * programs are written, default is 0
        */
-      virtual void write_csv(std::vector<double>& params_r,
-                             std::vector<int>& params_i,
-                             std::ostream& o,
-                             std::ostream* output_stream = 0) {
+      template <typename RNG>
+      void write_csv(std::vector<double>& params_r,
+                     std::vector<int>& params_i,
+                     std::ostream& o,
+                     RNG& /* rng */,
+                     std::ostream* /*output_stream = 0*/) {
         stan::io::csv_writer writer(o);
         for (size_t i = 0; i < params_i.size(); ++i)
           writer.write(params_i[i]);

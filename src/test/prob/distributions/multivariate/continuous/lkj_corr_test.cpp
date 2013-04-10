@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 #include "stan/prob/distributions/multivariate/continuous/lkj_corr.hpp"
+#include <boost/random/mersenne_twister.hpp>
+#include<boost/math/distributions.hpp>
 
 using boost::math::policies::policy;
 using boost::math::policies::evaluation_error;
@@ -76,3 +78,45 @@ TEST(ProbDistributionsLkjCorr,ErrnoPolicySigma) {
   EXPECT_TRUE(std::isnan(result)) << "non-symmetric Sigma should return nan.";
 }
 
+TEST(ProbDistributionsLKJCorr, random) {
+  boost::random::mt19937 rng;
+  EXPECT_NO_THROW(stan::prob::lkj_corr_cholesky_rng(5, 1.0,rng));
+  EXPECT_NO_THROW(stan::prob::lkj_corr_rng(5, 1.0,rng));
+}
+
+TEST(ProbDistributionsLKJCorr, chiSquareGoodnessFitTest) {
+  boost::random::mt19937 rng;
+  int N = 10000;
+  int K = boost::math::round(2 * std::pow(N, 0.4));
+  boost::math::beta_distribution<>dist (2.5,2.5);
+  boost::math::chi_squared mydist(K-1);
+
+  double loc[K - 1];
+  for(int i = 1; i < K; i++)
+    loc[i - 1] = quantile(dist, i * std::pow(K, -1.0));
+
+  int count = 0;
+  int bin [K];
+  double expect [K];
+  for(int i = 0 ; i < K; i++)
+  {
+    bin[i] = 0;
+    expect[i] = N / K;
+  }
+
+  while (count < N) {
+    double a = 0.5 * (1.0 + stan::prob::lkj_corr_rng(5,1.0,rng)(3,4));
+    int i = 0;
+    while (i < K-1 && a > loc[i])
+  ++i;
+    ++bin[i];
+    count++;
+   }
+
+  double chi = 0;
+
+  for(int j = 0; j < K; j++)
+    chi += ((bin[j] - expect[j]) * (bin[j] - expect[j]) / expect[j]);
+
+  EXPECT_TRUE(chi < quantile(complement(mydist, 1e-6)));
+}

@@ -6,7 +6,7 @@
 data {
   int<lower=0> N; 
   int<lower=0> M; 
-  real LRT[N]; 
+  vector[N] LRT;
   int school[N]; 
   int School_denom[N, 3]; 
   int School_gender[N, 2]; 
@@ -38,14 +38,19 @@ parameters {
 } 
 
 model {
+  real Ymu[N]; 
   for(p in 1:N) {
-     Y[p] ~ normal(alpha[school[p], 1] + alpha[school[p], 2] * LRT[p] + 
+    Ymu[p] <- alpha[school[p], 1] + alpha[school[p], 2] * LRT[p] + 
                    alpha[school[p], 3] * VR[p, 1] + beta[1] * LRT[p] * LRT[p] + 
                    beta[2] * VR[p, 2] + beta[3] * Gender[p] + 
                    beta[4] * School_gender[p, 1] + beta[5] * School_gender[p, 2] + 
                    beta[6] * School_denom[p, 1] + beta[7] * School_denom[p, 2] + 
-                   beta[8] * School_denom[p, 3],  exp(-.5 * (theta + phi * LRT[p]))); 
+                   beta[8] * School_denom[p, 3];
   }
+  Y ~ normal(Ymu,  exp(-.5 * (theta + phi * LRT))); 
+//  for(p in 1:N) {
+//     Y[p] ~ normal(,  exp(-.5 * (theta + phi * LRT[p]))); 
+//  }
   // min.var <- exp(-(theta + phi * (-34.6193))) # lowest LRT score = -34.6193
   // max.var <- exp(-(theta + phi * (37.3807)))  # highest LRT score = 37.3807
 

@@ -49,8 +49,8 @@ parameters {
 model {
   # METHOD 3 fit standard Poisson regressions relative to baseline
   beta ~ normal(0, 1000); 
-  for (i in 1:I)  {
-    beta0[i] ~ normal(0, 1000);
-    for (j in 1:J)  Y[i, j] ~ poisson(exp(beta0[i] + beta * est[i, j])); 
-  }
+  beta0 ~ normal(0, 1000);
+  for (i in 1:I) 
+    for (j in 1:J)
+      Y[i, j] ~ poisson_log(beta0[i] + beta * est[i, j]); 
 } 

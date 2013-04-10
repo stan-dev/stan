@@ -24,12 +24,12 @@ public:
     return true;
   }
 
-  static size_t num_iterations() {
-    return 8000U;
+  static int num_iterations() {
+    return 8000;
   }
 
-  static std::vector<size_t> skip_chains_test() {
-    std::vector<size_t> params_to_skip;
+  static std::vector<int> skip_chains_test() {
+    std::vector<int> params_to_skip;
     return params_to_skip;
   }
 
@@ -37,14 +37,27 @@ public:
     default_populate_chains();
   }
 
-  static std::vector<std::pair<size_t, double> >
+  static std::vector<std::pair<int, double> >
   get_expected_values() {
-    std::vector<std::pair<size_t, double> > expected_values;
+    using std::make_pair;
+    int index;
+    std::vector<int> dims;
+    dims.push_back(0);
+
+    std::vector<std::pair<int, double> > expected_values;
+
+    expected_values.push_back(make_pair(chains->index("p1"), 0.6014));
+
+    expected_values.push_back(make_pair(chains->index("lambda[1]"), 536.8));
+    expected_values.push_back(make_pair(chains->index("lambda[2]"), 548.9));
+
+    expected_values.push_back(make_pair(chains->index("sigma"), 3.805));
+    
     return expected_values;
   }
 
 };
 
 INSTANTIATE_TYPED_TEST_CASE_P(Models_BugsExamples_Vol2_Eyes,
-			      Model_Test_Fixture,
-			      Models_BugsExamples_Vol2_Eyes);
+            Model_Test_Fixture,
+            Models_BugsExamples_Vol2_Eyes);

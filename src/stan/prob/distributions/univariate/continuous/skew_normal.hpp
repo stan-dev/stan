@@ -2,16 +2,17 @@
 #define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__SKEW__NORMAL__HPP__
 
 #include <boost/random/variate_generator.hpp>
-#include <boost/math/special_functions/owens_t.hpp>
 #include <boost/math/distributions.hpp>
 #include <stan/prob/distributions/univariate/continuous/uniform.hpp>
 
 #include <stan/agrad.hpp>
 #include <stan/math/error_handling.hpp>
-#include <stan/math/special_functions.hpp>
+#include <stan/math/functions/owenst.hpp>
+#include <stan/agrad/rev/owenst.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
+#include <stan/math/functions/value_of.hpp>
 
 namespace stan {
 
@@ -22,7 +23,7 @@ namespace stan {
               class Policy>
     typename return_type<T_y,T_loc,T_scale,T_shape>::type
     skew_normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma, 
-			 const T_shape& alpha, const Policy& /*policy*/) {
+       const T_shape& alpha, const Policy& /*policy*/) {
       static const char* function = "stan::prob::skew_normal_log(%1%)";
 
       using std::log;
@@ -38,7 +39,7 @@ namespace stan {
       if (!(stan::length(y) 
             && stan::length(mu) 
             && stan::length(sigma)
-	    && stan::length(alpha)))
+      && stan::length(alpha)))
         return 0.0;
 
       // set up return value accumulator
@@ -87,17 +88,17 @@ namespace stan {
         // pull out values of arguments
         const double y_dbl = value_of(y_vec[n]);
         const double mu_dbl = value_of(mu_vec[n]);
-	const double sigma_dbl = value_of(sigma_vec[n]);
-	const double alpha_dbl = value_of(alpha_vec[n]);
+  const double sigma_dbl = value_of(sigma_vec[n]);
+  const double alpha_dbl = value_of(alpha_vec[n]);
 
         // reusable subexpression values
         const double y_minus_mu_over_sigma 
           = (y_dbl - mu_dbl) * inv_sigma[n];
-	const double pi_dbl = boost::math::constants::pi<double>();
+  const double pi_dbl = boost::math::constants::pi<double>();
 
         // log probability
         if (include_summand<propto>::value)
-	  logp -=  0.5 * log(2.0 * pi_dbl);
+    logp -=  0.5 * log(2.0 * pi_dbl);
         if (include_summand<propto, T_scale>::value)
           logp -= log(sigma_dbl);
         if (include_summand<propto,T_y, T_loc, T_scale>::value)
@@ -113,7 +114,7 @@ namespace stan {
           operands_and_partials.d_x2[n] += y_minus_mu_over_sigma / sigma_dbl + deriv_logerf * -alpha_dbl / (sigma_dbl * std::sqrt(2.0));
         if (!is_constant_struct<T_scale>::value)
           operands_and_partials.d_x3[n] += -1.0 / sigma_dbl + y_minus_mu_over_sigma * y_minus_mu_over_sigma / sigma_dbl - deriv_logerf * y_minus_mu_over_sigma * alpha_dbl / (sigma_dbl * std::sqrt(2.0));
-	if (!is_constant_struct<T_shape>::value)
+  if (!is_constant_struct<T_shape>::value)
           operands_and_partials.d_x4[n] += deriv_logerf * y_minus_mu_over_sigma / std::sqrt(2.0);
       }
       return operands_and_partials.to_var(logp);
@@ -154,6 +155,8 @@ namespace stan {
       using stan::math::check_finite;
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
+      using stan::agrad::owenst;
+      using stan::math::owenst;
 
 
       typename return_type<T_y, T_loc, T_scale, T_shape>::type cdf(1);
@@ -161,7 +164,7 @@ namespace stan {
       if (!(stan::length(y) 
             && stan::length(mu) 
             && stan::length(sigma)
-    	    && stan::length(alpha)))
+          && stan::length(alpha)))
         return cdf;
 
       if (!check_not_nan(function, y, "Random variable", &cdf, Policy()))
@@ -192,7 +195,7 @@ namespace stan {
       size_t N = max_size(y, mu, sigma, alpha);
       
       for (size_t n = 0; n < N; n++) {
-        cdf *= 0.5 * (boost::math::erfc(-(y_vec[n] - mu_vec[n]) / (std::sqrt(2) * sigma_vec[n]))) - 2 * boost::math::owens_t((y_vec[n] - mu_vec[n]) / sigma_vec[n], alpha_vec[n]);
+        cdf *= 0.5 * erfc(-(y_vec[n] - mu_vec[n]) / (std::sqrt(2) * sigma_vec[n])) - 2 * owenst((y_vec[n] - mu_vec[n]) / sigma_vec[n], alpha_vec[n]);
       }
       return cdf;
     }
@@ -206,10 +209,10 @@ namespace stan {
 
     template <class RNG>
     inline double
-    skew_normal_rng(double mu,
-    		    double sigma,
-    		    double alpha,
-    		    RNG& rng) {
+    skew_normal_rng(const double mu,
+            const double sigma,
+            const double alpha,
+            RNG& rng) {
       boost::math::skew_normal_distribution<>dist (mu, sigma, alpha);
       return quantile(dist, stan::prob::uniform_rng(0.0,1.0,rng));
     }

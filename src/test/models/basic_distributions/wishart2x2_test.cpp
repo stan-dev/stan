@@ -22,12 +22,12 @@ public:
     return false;
   }
 
-  static size_t num_iterations() {
+  static int num_iterations() {
     return iterations;
   }
 
-  static std::vector<size_t> skip_chains_test() {
-    std::vector<size_t> params_to_skip;
+  static std::vector<int> skip_chains_test() {
+    std::vector<int> params_to_skip;
     return params_to_skip;
   }
 
@@ -35,15 +35,15 @@ public:
     default_populate_chains();
   }
 
-  static std::vector<std::pair<size_t, double> >
+  static std::vector<std::pair<int, double> >
   get_expected_values() {
     using std::make_pair;
-    std::vector<std::pair<size_t, double> > expected_values;
+    std::vector<std::pair<int, double> > expected_values;
 
-    expected_values.push_back(make_pair(5U, 2.0 * 4.0)); // W[1,1]
-    expected_values.push_back(make_pair(6U, 0.0));       // W[1,2]
-    expected_values.push_back(make_pair(7U, 0.0));       // W[2,1]
-    expected_values.push_back(make_pair(8U, 0.5 * 4.0)); // W[2,2]
+    expected_values.push_back(make_pair(chains->index("W[1,1]"), 2.0 * 4.0)); // W[1,1]
+    expected_values.push_back(make_pair(chains->index("W[1,2]"), 0.0));       // W[1,2]
+    expected_values.push_back(make_pair(chains->index("W[2,1]"), 0.0));       // W[2,1]
+    expected_values.push_back(make_pair(chains->index("W[2,2]"), 0.5 * 4.0)); // W[2,2]
 
     return expected_values;
   }
@@ -51,38 +51,38 @@ public:
 };
 
 INSTANTIATE_TYPED_TEST_CASE_P(Models_BasicDistributions_Wishart2x2,
-			      Model_Test_Fixture,
-			      Models_BasicDistributions_Wishart2x2);
+            Model_Test_Fixture,
+            Models_BasicDistributions_Wishart2x2);
 
 TEST_F(Models_BasicDistributions_Wishart2x2,
        Test_Values) {
   populate_chains();
-  std::vector<double> v1, v2;
-  chains->get_samples(1U, v1);  // sd1
-  chains->get_samples(5U, v2);  // W[1,1]
-  for (size_t n = 0; n < chains->num_samples(); n++) {
-    EXPECT_NEAR(v1[n]*v1[n], v2[n], 0.001)
+  Eigen::VectorXd v1, v2;
+  v1 = chains->samples("sd1");  // sd1
+  v2 = chains->samples("W[1,1]");  // W[1,1]
+  for (int n = 0; n < chains->num_samples(); n++) {
+    EXPECT_NEAR(v1(n)*v1(n), v2(n), 0.001)
       << "comparing sd1 to W[1,1]";
   }
 
-  chains->get_samples(2U, v1);  // sd2
-  chains->get_samples(8U, v2);  // W[2,2]
-  for (size_t n = 0; n < chains->num_samples(); n++) {
-    EXPECT_NEAR(v1[n]*v1[n], v2[n], 0.001)
+  v1 = chains->samples("sd2");  // sd2
+  v2 = chains->samples("W[2,2]");  // W[2,2]
+  for (int n = 0; n < chains->num_samples(); n++) {
+    EXPECT_NEAR(v1(n)*v1(n), v2(n), 0.001)
       << "comparing sd2 to W[2,2]";
   }
 
-  chains->get_samples(4U, v1);  // cov
-  chains->get_samples(6U, v2);  // W[1,2]
-  for (size_t n = 0; n < chains->num_samples(); n++) {
-    EXPECT_NEAR(v1[n], v2[n], 0.001)
+  v1 = chains->samples("cov");  // cov
+  v2 = chains->samples("W[1,2]");  // W[1,2]
+  for (int n = 0; n < chains->num_samples(); n++) {
+    EXPECT_NEAR(v1(n), v2(n), 0.001)
       << "comparing cov to W[1,2]";
   }
 
-  chains->get_samples(6U, v1);  // W[1,2]
-  chains->get_samples(7U, v2);  // W[2,1]
-  for (size_t n = 0; n < chains->num_samples(); n++) {
-    EXPECT_NEAR(v1[n], v2[n], 0.00001)
+  v1 = chains->samples("W[1,2]");  // W[1,2]
+  v2 = chains->samples("W[2,1]");  // W[2,1]
+  for (int n = 0; n < chains->num_samples(); n++) {
+    EXPECT_NEAR(v1(n), v2(n), 0.00001)
       << "comparing W[1,2] to W[2,1]";
   }
 

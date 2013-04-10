@@ -4,11 +4,12 @@
 #include <stan/prob/constants.hpp>
 #include <stan/math/matrix_error_handling.hpp>
 #include <stan/math/error_handling.hpp>
-#include <stan/math/special_functions.hpp>
 #include <stan/prob/traits.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/agrad/agrad.hpp>
 #include <stan/agrad/matrix.hpp>
+#include "stan/prob/distributions/multivariate/continuous/wishart.hpp"
+#include <stan/math/matrix/log_determinant.hpp>
 
 namespace stan {
   namespace prob {
@@ -52,20 +53,29 @@ namespace stan {
                 const Policy&) {
       static const char* function = "stan::prob::inv_wishart_log(%1%)";
       
-      using stan::math::check_greater_or_equal;
+      using stan::math::check_greater;
       using stan::math::check_size_match;
       using boost::math::tools::promote_args;
 
       typename Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic>::size_type k = S.rows();
       typename promote_args<T_y,T_dof,T_scale>::type lp(0.0);
-      if(!check_greater_or_equal(function, nu, k-1, "Degrees of freedom parameter", 
-                                 &lp, Policy()))
+      if(!check_greater(function, nu, k-1, "Degrees of freedom parameter", 
+                        &lp, Policy()))
         return lp;
-      if (!check_size_match(function, W.rows(), W.cols(), &lp, Policy()))
+      if (!check_size_match(function, 
+          W.rows(), "Rows of random variable",
+          W.cols(), "columns of random variable",
+          &lp, Policy()))
         return lp;
-      if (!check_size_match(function, S.rows(), S.cols(), &lp, Policy()))
+      if (!check_size_match(function, 
+          S.rows(), "Rows of scale parameter",
+          S.cols(), "columns of scale parameter",
+          &lp, Policy()))
         return lp;
-      if (!check_size_match(function, W.rows(), S.rows(), &lp, Policy()))
+      if (!check_size_match(function, 
+          W.rows(), "Rows of random variable",
+          S.rows(), "columns of scale parameter",
+          &lp, Policy()))
         return lp;
       // FIXME: domain checks
         
@@ -82,11 +92,13 @@ namespace stan {
       using stan::math::mdivide_left_tri_low;
       using stan::math::crossprod;
       using stan::math::lmgamma;
+      using stan::math::log_determinant;
 
       if (include_summand<propto,T_dof>::value)
         lp -= lmgamma(k, 0.5 * nu);
       if (include_summand<propto,T_dof,T_scale>::value) {
-        lp += nu * S.llt().matrixLLT().diagonal().array().log().sum();
+//        lp += nu * S.llt().matrixLLT().diagonal().array().log().sum();
+        lp += 0.5 * nu * log_determinant(S);
       }
       if (include_summand<propto,T_y,T_dof,T_scale>::value) {
         lp -= (nu + k + 1.0) * L.diagonal().array().log().sum();
@@ -102,7 +114,7 @@ namespace stan {
         lp -= 0.5 * dot_product(S_vec, W_inv_vec); // trace(S * W^-1)
       }
       if (include_summand<propto,T_dof,T_scale>::value)
-	lp += nu * k * NEG_LOG_TWO_OVER_TWO;
+  lp += nu * k * NEG_LOG_TWO_OVER_TWO;
       return lp;
     }
 
@@ -138,7 +150,18 @@ namespace stan {
       return inv_wishart_log<false>(W,nu,S,stan::math::default_policy());
     }
 
+    template <class RNG>
+    inline Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>
+    inv_wishart_rng(const double nu,
+    const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& S,
+    RNG& rng) {
 
+      Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> S_inv(S.rows(), S.cols());
+      S_inv = Eigen::MatrixXd::Identity(S.cols(),S.cols());
+      S_inv = S.ldlt().solve(S_inv);
+
+      return wishart_rng(nu, S_inv, rng).inverse();
+    }
   }
 }
 #endif

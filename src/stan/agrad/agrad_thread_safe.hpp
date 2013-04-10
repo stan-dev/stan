@@ -8,6 +8,7 @@
 #include <cstddef>
 #include "stan/memory/stack_alloc.hpp"
 
+// FIXME:  Should include common defs, not this huge cut-and-paste!
 
 namespace stan {
 
@@ -1516,7 +1517,7 @@ namespace stan {
      * from prefix operator.
      * @return Input variable. 
      */
-    inline var operator++(var& a, int dummy) {
+    inline var operator++(var& a, int /*dummy*/) {
       var temp(a);
       a.vi_ = new increment_vari(a.vi_);
       return temp;
@@ -1553,7 +1554,7 @@ namespace stan {
      * from prefix operator.
      * @return Input variable. 
      */
-    inline var operator--(var& a, int dummy) {
+    inline var operator--(var& a, int /*dummy*/) {
       var temp(a);
       a.vi_ = new decrement_vari(a.vi_);
       return temp;

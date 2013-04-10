@@ -1,24 +1,24 @@
 citHeader("To cite Stan in publications use:")
 
 citEntry(entry = "Misc", 
-         title = "Stan: A C++ Library for Probability and Sampling, Version 1.0",
+         title = "Stan: A C++ Library for Probability and Sampling, Version 1.3",
          author = person("Stan Development Team"),
-         year = "2012",
+         year = "2013",
          url = "http://mc-stan.org/",
          textVersion =
-           paste("Stan Development Team (2012).", 
-                 title = "Stan: A C++ Library for Probability and Sampling, Version 1.0.",
+           paste("Stan Development Team (2013).", 
+                 title = "Stan: A C++ Library for Probability and Sampling, Version 1.3.",
                  "URL http://mc-stan.org/.") 
 )
   
 citEntry(entry = "Manual", 
-         title = "Stan Modeling Language User's Guide and Reference Manual, Version 1.0",
+         title = "Stan Modeling Language User's Guide and Reference Manual, Version 1.3",
          author = person("Stan Development Team"),
-         year = "2012", 
+         year = "2013", 
          url = "http://mc-stan.org/",
          textVersion  =
-           paste("Stan Development Team (2012).", 
-                 "Stan Modeling Language User's Guide and Reference Manual, Version 1.0.",
+           paste("Stan Development Team (2013).", 
+                 "Stan Modeling Language User's Guide and Reference Manual, Version 1.3.",
                  "URL http://mc-stan.org/.") 
 )
 

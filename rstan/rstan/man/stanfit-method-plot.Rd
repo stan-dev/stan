@@ -12,7 +12,8 @@
 } 
 
 \usage{
-  \S4method{plot}{stanfit,missing}(x, pars, display_parallel = FALSE)
+  \S4method{plot}{stanfit,missing}(x, pars, display_parallel = FALSE, 
+  ask = TRUE, npars_per_page = 6)
 } 
 
 \section{Methods}{
@@ -31,11 +32,23 @@
     whether to plot the intervals with one line for each chain
     or one line for all chains. The default is \code{FALSE} so
     that only one interval line is drawn for each scalar parameter.} 
+  \item{ask}{\code{TRUE} or \code{FALSE}, to control (for the current device)
+    whether the user is prompted before starting a new page of output in the case
+    there are a lot of parameters (see \code{\link[grDevices]{devAskNewPage}}).}
+  \item{npars_per_page}{An integer to specify the number of parameters 
+    that would be plotted per page.}
 }
 \value{\code{NULL}} 
 \examples{\dontrun{
 library(rstan) 
 fit <- stan(model_code = "parameters {real y;} model {y ~ normal(0,1);}") 
 plot(fit) 
-}} 
+}
+
+# cache of a saved stanfit object 
+# the Stan code for this model is in the example of function stan
+exfit <- rstan:::exfit  
+print(exfit)
+plot(exfit) 
+} 
 \keyword{methods}

@@ -464,6 +464,34 @@ TEST(io_reader, matrix) {
 }
 
 
+TEST(io_reader, unit_vector) {
+  std::vector<int> theta_i(0);
+  std::vector<double> theta(4,sqrt(0.25));
+  stan::io::reader<double> reader(theta,theta_i);
+  Eigen::Matrix<double,Eigen::Dynamic,1> y = reader.unit_vector(4);
+  EXPECT_EQ(4,y.size());
+  EXPECT_FLOAT_EQ(sqrt(0.25),y[0]);
+  EXPECT_FLOAT_EQ(sqrt(0.25),y[1]);
+  EXPECT_FLOAT_EQ(sqrt(0.25),y[2]);
+  EXPECT_FLOAT_EQ(sqrt(0.25),y[3]);
+}
+TEST(io_reader, unit_vector_exception) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  for (int i = 0; i < 100; ++i)
+    theta.push_back(static_cast<double>(i));
+  stan::io::reader<double> reader(theta,theta_i);
+  theta[0] = 0.00;
+  theta[1] = -sqrt(0.29);
+  theta[2] = sqrt(0.70);
+  theta[3] = -sqrt(0.01);
+  theta[4] = sqrt(1.0);
+  theta[5] = sqrt(1.0);
+  EXPECT_NO_THROW (reader.unit_vector(4));
+  EXPECT_THROW (reader.unit_vector(2), std::domain_error);
+  EXPECT_THROW (reader.unit_vector(0), std::domain_error);
+}
+
 TEST(io_reader, simplex) {
   std::vector<int> theta_i(0);
   std::vector<double> theta(4,0.25);

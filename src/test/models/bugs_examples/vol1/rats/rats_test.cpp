@@ -25,12 +25,12 @@ public:
     return true;
   }
 
-  static size_t num_iterations() {
+  static int num_iterations() {
     return iterations;
   }
 
-  static std::vector<size_t> skip_chains_test() {
-    std::vector<size_t> params_to_skip;
+  static std::vector<int> skip_chains_test() {
+    std::vector<int> params_to_skip;
     return params_to_skip;
   }
 
@@ -38,25 +38,16 @@ public:
     default_populate_chains();
   }
 
-  static std::vector<std::pair<size_t, double> >
+  static std::vector<std::pair<int, double> >
   get_expected_values() {
     using std::make_pair;
-    size_t index;
-    std::vector<size_t> idxs;
-    idxs.push_back(0);
-    std::vector<std::pair<size_t, double> > expected_values;
+    std::vector<std::pair<int, double> > expected_values;
     
-    index = chains->get_total_param_index(chains->param_name_to_index("alpha0"),
-					  idxs);
-    expected_values.push_back(make_pair(index, 106.6));
+    expected_values.push_back(make_pair(chains->index("alpha0"), 106.6));
 
-    index = chains->get_total_param_index(chains->param_name_to_index("mu_beta"),
-					  idxs);
-    expected_values.push_back(make_pair(index, 6.185));
+    expected_values.push_back(make_pair(chains->index("mu_beta"), 6.185));
     
-    index = chains->get_total_param_index(chains->param_name_to_index("sigma_y"),
-					  idxs);
-expected_values.push_back(make_pair(index, 6.086));
+    expected_values.push_back(make_pair(chains->index("sigma_y"), 6.086));
     
     return expected_values;
   }
@@ -64,5 +55,5 @@ expected_values.push_back(make_pair(index, 6.086));
 };
 
 INSTANTIATE_TYPED_TEST_CASE_P(Models_BugsExamples_Vol1_Rats,
-			      Model_Test_Fixture,
-			      Models_BugsExamples_Vol1_Rats);
+            Model_Test_Fixture,
+            Models_BugsExamples_Vol1_Rats);

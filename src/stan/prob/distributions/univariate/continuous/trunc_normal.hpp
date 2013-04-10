@@ -5,6 +5,7 @@
 #include <stan/math/error_handling.hpp>
 #include <stan/prob/traits.hpp>
 #include <stan/prob/distributions/univariate/continuous/normal.hpp>
+#include<boost/math/distributions.hpp>
 
 namespace stan {
   
@@ -52,6 +53,7 @@ namespace stan {
       using stan::math::check_not_nan;
       using boost::math::tools::promote_args;
       using boost::math::isinf;
+      using boost::math::isfinite;
       using stan::math::Phi;
       
       typename promote_args<T_y,T_loc,T_scale,T_alpha,T_beta>::type lp(0.0);
@@ -75,7 +77,12 @@ namespace stan {
           if (isinf(sigma)) 
             lp -= log(beta - alpha);
           else
-            lp -= log(Phi((beta - mu)/sigma) - Phi((alpha - mu)/sigma));
+      if (!isinf(beta) && !isinf(alpha)) 
+        lp -= log(Phi((beta - mu)/sigma) - Phi((alpha - mu)/sigma));
+      else if (isfinite(alpha)) 
+        lp -= log(1.0 - Phi((alpha - mu)/sigma));
+      else if (isfinite(beta)) 
+        lp -= log(Phi((beta - mu)/sigma));
         }
       }
       
@@ -105,6 +112,20 @@ namespace stan {
     typename boost::math::tools::promote_args<T_y,T_loc,T_scale,T_alpha,T_beta>::type
     trunc_normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma, const T_alpha& alpha, const T_beta& beta) {
       return trunc_normal_log<false>(y,mu,sigma,alpha,beta,stan::math::default_policy());
+    }
+      
+    template <class RNG>
+    inline double
+    trunc_normal_rng(const double mu,
+         const double sigma,
+         const double alpha,
+         const double beta,
+                     RNG& rng) {
+      using boost::variate_generator;
+      double a = stan::prob::normal_rng(mu, sigma, rng);
+      while(a > beta || a < alpha)
+  a = stan::prob::normal_rng(mu,sigma,rng);
+      return a;
     }
   }
 }

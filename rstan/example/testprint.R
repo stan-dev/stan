@@ -30,3 +30,23 @@ ssp <- stan(model_code = school_code, data = dat, iter = iter, chains = 4, refre
 ssp2 <- stan(fit = ssp, data = dat) 
 print(ssp)
 
+gqtestcode <- '
+parameters {
+  real y;
+}
+model {
+  y ~ normal(0,1);
+  print("model y=",y);
+}
+generated quantities {
+  real z;
+  z <- 2 * y;
+  print("gq z=",z);
+}
+'
+
+gqfit <- stan(model_code = gqtestcode, chains = 1, iter = 10)
+
+
+
+

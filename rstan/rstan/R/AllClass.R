@@ -1,4 +1,4 @@
-
+require(inline)
 setClass(Class = "cxxdso",
          representation = representation(
            sig = "list", # A list of function signature that would be returned by cxxfuncion 
