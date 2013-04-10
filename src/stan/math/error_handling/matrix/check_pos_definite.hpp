@@ -45,7 +45,9 @@ namespace stan {
       }
       Eigen::LDLT< Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic> > cholesky 
         = y.ldlt();
-      if((cholesky.vectorD().array() <= CONSTRAINT_TOLERANCE).any())  {
+      if(cholesky.info() != Eigen::Success || 
+         cholesky.isNegative() ||
+         (cholesky.vectorD().array() <= CONSTRAINT_TOLERANCE).any()) {
         std::ostringstream message;
         message << name << " is not positive definite. " 
                 << name << "(0,0) is %1%.";
