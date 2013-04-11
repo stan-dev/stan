@@ -168,6 +168,7 @@ TEST(AgradFwdMatrix, add_rowvector_rowvector) {
   EXPECT_FLOAT_EQ(1.0, output_v(4).d_);
 
   output_v = add(rvd_1, rvv_2);
+  EXPECT_FLOAT_EQ(expected_output(0), output_v(0).val_);
   EXPECT_FLOAT_EQ(1.0, output_v(0).d_);
   EXPECT_FLOAT_EQ(expected_output(1), output_v(1).val_);
   EXPECT_FLOAT_EQ(1.0, output_v(1).d_);
@@ -179,6 +180,7 @@ TEST(AgradFwdMatrix, add_rowvector_rowvector) {
   EXPECT_FLOAT_EQ(1.0, output_v(4).d_);
 
   output_v = add(rvv_1, rvv_2);
+  EXPECT_FLOAT_EQ(expected_output(0), output_v(0).val_);
   EXPECT_FLOAT_EQ(2.0, output_v(0).d_);
   EXPECT_FLOAT_EQ(expected_output(1), output_v(1).val_);
   EXPECT_FLOAT_EQ(2.0, output_v(1).d_);
