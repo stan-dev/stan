@@ -540,8 +540,16 @@ boolean outcome $y \in \setlist{0,1}$ is defined by
 \]
 }
 %
-\end{description}
 
+\fitem{real}{owens\_t}{real \farg{h}, real \farg{a}}{The Owen's T
+  function for the probability of the event $X > a$ and $0<Y<aX$
+  where \farg{X} and \farg{Y} are independent standard normal random
+  variables, defined by
+\[
+\mbox{owens\_t}(h,a) = \frac{1}{2\pi} \int_0^a \frac{\exp(-\frac{1}{2}h^2(1+x^2))}{1+x^2}dx
+\]
+}
+\end{description}
 
 
 
