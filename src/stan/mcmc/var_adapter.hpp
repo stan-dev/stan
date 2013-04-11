@@ -30,21 +30,12 @@ namespace stan {
         
       }
       
-    protected:
-      
-      double _adapt_var_counter;
-      double _adapt_var_next;
-      
-      double _adapt_n;
-      Eigen::VectorXd _adapt_m;
-      Eigen::VectorXd _adapt_m2;
-      
-      bool _learn_variance(Eigen::VectorXd& var, std::vector<double>& q) {
+      bool learn_variance(Eigen::VectorXd& var, std::vector<double>& q) {
         
         ++_adapt_var_counter;
         
         Eigen::Map<Eigen::VectorXd> x(&q[0], q.size());
-
+        
         // Welford algorithm for online variance estimate
         ++_adapt_n;
         
@@ -58,9 +49,9 @@ namespace stan {
           
           var = _adapt_m2 / (_adapt_n - 1.0);
           
-          var = (_adapt_n / (_adapt_n + 5.0)) * var 
-                + (5.0 / (_adapt_n + 5.0)) * Eigen::VectorXd::Ones(var.size());
-
+          var = (_adapt_n / (_adapt_n + 5.0)) * var
+          + (5.0 / (_adapt_n + 5.0)) * Eigen::VectorXd::Ones(var.size());
+          
           _adapt_n = 0;
           _adapt_m.setZero();
           _adapt_m2.setZero();
@@ -72,6 +63,15 @@ namespace stan {
         return false;
         
       }
+      
+    protected:
+      
+      double _adapt_var_counter;
+      double _adapt_var_next;
+      
+      double _adapt_n;
+      Eigen::VectorXd _adapt_m;
+      Eigen::VectorXd _adapt_m2;
       
     };
     

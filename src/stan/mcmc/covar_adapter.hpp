@@ -30,16 +30,7 @@ namespace stan {
         
       }
       
-    protected:
-      
-      double _adapt_covar_counter;
-      double _adapt_covar_next;
-      
-      double _adapt_n;
-      Eigen::VectorXd _adapt_m;
-      Eigen::MatrixXd _adapt_m2;
-      
-      bool _learn_covariance(Eigen::MatrixXd& covar, std::vector<double>& q) {
+      bool learn_covariance(Eigen::MatrixXd& covar, std::vector<double>& q) {
         
         ++_adapt_covar_counter;
         
@@ -57,10 +48,10 @@ namespace stan {
           _adapt_covar_next *= 2;
           
           covar = _adapt_m2 / (_adapt_n - 1.0);
-
+          
           covar = (_adapt_n / (_adapt_n + 5.0)) * covar
-                  + (5.0 / (_adapt_n + 5.0)) * Eigen::MatrixXd::Identity(covar.rows(), covar.cols());
- 
+          + (5.0 / (_adapt_n + 5.0)) * Eigen::MatrixXd::Identity(covar.rows(), covar.cols());
+          
           _adapt_n = 0;
           _adapt_m.setZero();
           _adapt_m2.setZero();
@@ -72,6 +63,15 @@ namespace stan {
         return false;
         
       }
+      
+    protected:
+      
+      double _adapt_covar_counter;
+      double _adapt_covar_next;
+      
+      double _adapt_n;
+      Eigen::VectorXd _adapt_m;
+      Eigen::MatrixXd _adapt_m2;
       
     };
     

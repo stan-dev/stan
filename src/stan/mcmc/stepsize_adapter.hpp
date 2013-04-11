@@ -38,20 +38,7 @@ namespace stan {
         _adapt_x_bar = 0;
       }
       
-    protected:
-      
-      bool _adapt_flag;
-      
-      double _adapt_counter; // Adaptation iteration
-      double _adapt_s_bar;   // Moving average statistic
-      double _adapt_x_bar;   // Moving average parameter
-      double _adapt_mu;      // Asymptotic mean of parameter
-      double _adapt_delta;   // Target value of statistic
-      double _adapt_gamma;   // Adaptation scaling
-      double _adapt_kappa;   // Adaptation shrinkage
-      double _adapt_t0;      // Effective starting iteration
-      
-      void _learn_stepsize(double& epsilon, double adapt_stat) {
+      void learn_stepsize(double& epsilon, double adapt_stat) {
         
         ++_adapt_counter;
         
@@ -70,6 +57,19 @@ namespace stan {
         epsilon = exp(_adapt_x_bar);
         
       }
+      
+    protected:
+      
+      bool _adapt_flag;
+      
+      double _adapt_counter; // Adaptation iteration
+      double _adapt_s_bar;   // Moving average statistic
+      double _adapt_x_bar;   // Moving average parameter
+      double _adapt_mu;      // Asymptotic mean of parameter
+      double _adapt_delta;   // Target value of statistic
+      double _adapt_gamma;   // Adaptation scaling
+      double _adapt_kappa;   // Adaptation shrinkage
+      double _adapt_t0;      // Effective starting iteration
       
     };
     
