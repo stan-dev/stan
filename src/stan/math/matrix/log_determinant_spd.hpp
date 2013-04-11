@@ -25,7 +25,7 @@ namespace stan {
 //      for (size_t i = 0; i < L.rows(); i++)
 //        ret += log(L(i,i));
 //      return 2*ret;
-      return 2*m.ldlt().vectorD().array().log().sum();
+      return m.ldlt().vectorD().array().log().sum();
     }
     
   }

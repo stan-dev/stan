@@ -76,7 +76,7 @@ namespace stan {
             return -std::numeric_limits<double>::infinity();
           }
           
-          double ret = 2*(ldlt.vectorD().array().log().sum());
+          double ret = ldlt.vectorD().array().log().sum();
           if (!boost::math::isfinite(ret)) {
             std::cerr << ldlt.vectorD() << std::endl;
           }
