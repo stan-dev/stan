@@ -73,17 +73,17 @@ TEST(McmcStepsizeAdapter, disengage_adaption) {
   EXPECT_EQ(false, adapter.adapting());
 }
 
-/*
 TEST(McmcStepsizeAdapter, learn_stepsize) {
   stan::mcmc::stepsize_adapter adapter;
   
   double target_accept = 0.65;
-  double old_epsilon = 1.0;
+  double target_epsilon = 1;
   
+  adapter.set_adapt_mu(log(target_epsilon));
   adapter.set_adapt_delta(target_accept);
-  double new_epsilon = old_epsilon;
-  adapter._learn_stepsize(new_epsilon, target_accept);
   
-  EXPECT_EQ(old_epsilon, new_epsilon);
+  double new_epsilon = 0;
+  adapter.learn_stepsize(new_epsilon, target_accept);
+  
+  EXPECT_EQ(target_epsilon, new_epsilon);
 }
-*/
