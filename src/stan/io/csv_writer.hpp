@@ -90,41 +90,14 @@ namespace stan {
       /**
        * Write a value.
        * 
-       * Write the specified vector to the output stream
-       * on the current line.
-       *
-       * @param v Vector of doubles to write.
-       */
-      void write(const Eigen::Matrix<double,Eigen::Dynamic,1>& v) {
-        typedef Eigen::Matrix<double,Eigen::Dynamic,1>::size_type size_type;
-        for (size_type i = 0; i < v.size(); ++i)
-          write(v[i]);
-      }
-      
-      /**
-       * Write a value.
-       * 
-       * Write the specified row vector to the output stream
-       * on the current line.
-       *
-       * @param rv Row vector of doubles to write.
-       */
-      void write(const Eigen::Matrix<double,1,Eigen::Dynamic>& rv) {
-        typedef Eigen::Matrix<double,1,Eigen::Dynamic>::size_type size_type;
-        for (size_type i = 0; i < rv.size(); ++i)
-          write(rv[i]);
-      }
-
-      /**
-       * Write a value.
-       * 
        * Write the specified matrix to the output stream in
        * row-major order.
        *
        * @param m Matrix to write.
        */
-      void write(const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& m) {
-        typedef Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>::size_type size_type;
+      template<int R, int C>
+      void write(const Eigen::Matrix<double,R,C>& m) {
+        typedef typename Eigen::Matrix<double,R,C>::size_type size_type;
         for (size_type i = 0; i < m.rows(); ++i)
           for (size_type j = 0; j < m.cols(); ++j)
             write(m(i,j));
@@ -138,8 +111,9 @@ namespace stan {
        *
        * @param m Matrix of doubles to write.
        */
-      void write_col_major(const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& m) {
-        typedef Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>::size_type size_type;
+      template<int R, int C>
+      void write_col_major(const Eigen::Matrix<double,R,C>& m) {
+        typedef typename Eigen::Matrix<double,R,C>::size_type size_type;
         for (size_type j = 0; j < m.cols(); ++j)
           for (size_type i = 0; i < m.rows(); ++i)
             write(m(i,j));
