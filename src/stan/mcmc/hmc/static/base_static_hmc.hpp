@@ -73,24 +73,28 @@ namespace stan {
       }
       
       void set_stepsize_and_T(const double e, const double t) {
-        if(e > 0 && t > 0)
+        if(e > 0 && t > 0) {
           this->_epsilon = e; _T = t; _update_L();
+        }
       }
       
       void set_stepsize_and_L(const double e, const int l) {
-        if(e > 0 && l > 0)
+        if(e > 0 && l > 0) {
           this->_epsilon = e; _L = l; _T = this->_epsilon * _L;
+        }
       }
       
       void set_T(const double t) { 
-        if(t > 0)
-          _T = t; _update_L(); 
+        if(t > 0) {
+          _T = t; _update_L();
+        }
         
       }
       
       void set_stepsize(const double e) { 
-        if(e > 0)
-          this->_epsilon = e; _update_L(); 
+        if(e > 0) {
+          this->_epsilon = e; _update_L();
+        }
       }
       
       double get_T() { return this->_T; }
