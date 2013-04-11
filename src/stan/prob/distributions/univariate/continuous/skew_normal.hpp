@@ -7,8 +7,8 @@
 
 #include <stan/agrad.hpp>
 #include <stan/math/error_handling.hpp>
-#include <stan/math/functions/owenst.hpp>
-#include <stan/agrad/rev/owenst.hpp>
+#include <stan/math/functions/owens_t.hpp>
+#include <stan/agrad/rev/owens_t.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
@@ -155,8 +155,8 @@ namespace stan {
       using stan::math::check_finite;
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
-      using stan::agrad::owenst;
-      using stan::math::owenst;
+      using stan::agrad::owens_t;
+      using stan::math::owens_t;
 
 
       typename return_type<T_y, T_loc, T_scale, T_shape>::type cdf(1);
@@ -195,7 +195,7 @@ namespace stan {
       size_t N = max_size(y, mu, sigma, alpha);
       
       for (size_t n = 0; n < N; n++) {
-        cdf *= 0.5 * erfc(-(y_vec[n] - mu_vec[n]) / (std::sqrt(2) * sigma_vec[n])) - 2 * owenst((y_vec[n] - mu_vec[n]) / sigma_vec[n], alpha_vec[n]);
+        cdf *= 0.5 * erfc(-(y_vec[n] - mu_vec[n]) / (std::sqrt(2) * sigma_vec[n])) - 2 * owens_t((y_vec[n] - mu_vec[n]) / sigma_vec[n], alpha_vec[n]);
       }
       return cdf;
     }
