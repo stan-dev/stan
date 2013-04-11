@@ -60,7 +60,7 @@ namespace stan {
     inline Eigen::Matrix<double,R1,C2>
     mdivide_left_ldlt(const stan::math::LDLT_factor<double,R1,C1> &A,
                       const Eigen::Matrix<double,R2,C2> &b) {
-      stan::math::validate_multiplicable(A,b,"mdivide_left_ldlt");
+//      stan::math::validate_multiplicable(A,b,"mdivide_left_ldlt");
       
       return A.solve(b);
     }
@@ -78,7 +78,7 @@ namespace stan {
     inline Eigen::Matrix<double,R1,C2>
     mdivide_right_ldlt(const Eigen::Matrix<double,R1,C1> &b,
                        const stan::math::LDLT_factor<double,R2,C2> &A) {
-      stan::math::validate_multiplicable(b,A,"mdivide_right_ldlt");
+//      stan::math::validate_multiplicable(b,A,"mdivide_right_ldlt");
       return A.solveRight(b);
     }
     

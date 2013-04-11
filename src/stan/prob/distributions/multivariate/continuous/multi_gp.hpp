@@ -13,12 +13,12 @@
 #include <stan/agrad/matrix.hpp>
 #include <stan/math/matrix/dot_product.hpp>
 #include <stan/math/matrix/log.hpp>
-#include <stan/math/matrix/log_determinant_spd.hpp>
-#include <stan/math/matrix/mdivide_right_spd.hpp>
 #include <stan/math/matrix/multiply.hpp>
 #include <stan/math/matrix/rows_dot_product.hpp>
 #include <stan/math/matrix/subtract.hpp>
 #include <stan/math/matrix/sum.hpp>
+
+#include <stan/math/matrix/ldlt.hpp>
 
 namespace stan {
   namespace prob {
@@ -49,7 +49,8 @@ namespace stan {
                  const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
                  const Eigen::Matrix<T_w,Eigen::Dynamic,1>& w) {
       static const char* function = "stan::prob::multi_gp_log(%1%)";
-      typename boost::math::tools::promote_args<T_y,T_w,T_covar>::type lp(0.0);
+      typedef typename boost::math::tools::promote_args<T_y,T_w,T_covar>::type T_lp;
+      T_lp lp(0.0);
       
       using stan::math::log;
       using stan::math::sum;
@@ -61,9 +62,9 @@ namespace stan {
       using stan::math::check_symmetric;
       using stan::math::dot_product;
       using stan::math::rows_dot_product;
-      using stan::math::mdivide_right_spd;
-      using stan::math::log_determinant_spd;
-      
+      using stan::math::mdivide_right_ldlt;
+      using stan::math::LDLT_factor;
+
       if (!check_size_match(function, 
                             Sigma.rows(), "Rows of kernel matrix",
                             Sigma.cols(), "columns of kernel matrix",
@@ -75,8 +76,18 @@ namespace stan {
         return lp;
       if (!check_symmetric(function, Sigma, "Kernel matrix", &lp))
         return lp;
-      if (!check_pos_definite(function, Sigma, "Kernel matrix", &lp))
+      
+      LDLT_factor<T_covar,Eigen::Dynamic,Eigen::Dynamic> ldlt_Sigma(Sigma);
+      if (!ldlt_Sigma.success()) {
+        std::ostringstream message;
+        message << "Kernel matrix is not positive definite. " 
+                << "K(0,0) is %1%.";
+        lp = math::policies::raise_domain_error<T_covar>(function,
+                                                   message.str().c_str(),
+                                                   Sigma(0,0), Policy());
         return lp;
+      }
+
       if (!check_size_match(function, 
                             y.rows(), "Size of random variable",
                             w.size(), "Size of location parameter",
@@ -102,7 +113,7 @@ namespace stan {
       }
       
       if (include_summand<propto,T_covar>::value) {
-        lp -= (0.5 * y.rows()) * log_determinant_spd(Sigma);
+        lp -= (0.5 * y.rows()) * log_determinant_ldlt(ldlt_Sigma);
       }
 
       if (include_summand<propto,T_w>::value) {
@@ -112,7 +123,7 @@ namespace stan {
       if (include_summand<propto,T_y,T_w,T_covar>::value) {
         Eigen::Matrix<typename 
         boost::math::tools::promote_args<T_covar,T_y>::type,
-        Eigen::Dynamic, Eigen::Dynamic> y_Kinv(mdivide_right_spd(y,Sigma));
+        Eigen::Dynamic, Eigen::Dynamic> y_Kinv(mdivide_right_ldlt(y,ldlt_Sigma));
 
         lp -= 0.5 * dot_product(rows_dot_product(y_Kinv,y),w);
       }
