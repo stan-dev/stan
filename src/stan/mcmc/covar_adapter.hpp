@@ -2,7 +2,7 @@
 #define __STAN__MCMC__STATIC__ADAPTER__COVAR__BETA__
 
 #include <vector>
-#include <Eigen/Dense>
+#include <stan/math/matrix/Eigen.hpp>
 #include <stan/mcmc/stepsize_adapter.hpp>
 
 namespace stan {

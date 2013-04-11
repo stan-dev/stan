@@ -4,7 +4,7 @@
 #include <fstream>
 
 #include <vector>
-#include <Eigen/Dense>
+#include <stan/math/matrix/Eigen.hpp>
 
 namespace stan {
   
