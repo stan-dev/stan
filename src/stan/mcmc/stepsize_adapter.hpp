@@ -25,6 +25,12 @@ namespace stan {
       void set_adapt_gamma(double g) { if(g > 0)          _adapt_gamma = g; }
       void set_adapt_kappa(double k) { if(k > 0)          _adapt_kappa = k; }
       void set_adapt_t0(double t)    { if(t > 0)          _adapt_t0 = t; }
+
+      double get_adapt_mu()    { return _adapt_mu; }
+      double get_adapt_delta() { return _adapt_delta; }
+      double get_adapt_gamma() { return _adapt_gamma; }
+      double get_adapt_kappa() { return _adapt_kappa; }
+      double get_adapt_t0()    { return _adapt_t0; }
       
       void init() {
         _adapt_counter = 0;
