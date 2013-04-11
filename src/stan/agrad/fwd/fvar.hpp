@@ -1,7 +1,6 @@
 #ifndef __STAN__AGRAD__FWD__FVAR__HPP__
 #define __STAN__AGRAD__FWD__FVAR__HPP__
 
-#include <stan/agrad/fwd/fvar.hpp>
 #include <stan/meta/traits.hpp>
 
 namespace stan{

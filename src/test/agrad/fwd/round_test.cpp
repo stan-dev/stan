@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <stan/agrad/fvar.hpp>
+#include <boost/math/special_functions/round.hpp>
 
 TEST(AgradFvar, round) {
   using stan::agrad::fvar;
