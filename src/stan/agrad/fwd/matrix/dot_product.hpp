@@ -13,53 +13,53 @@ namespace stan {
   namespace agrad {
 
     //dot_product for vec (in matrix) * vec (in matrix); does all combos of row row, col col, row col, col row
-    template<int R1,int C1, int R2, int C2>
+    template<typename T1, typename T2, int R1,int C1, int R2, int C2>
     inline 
-    fvar<double> 
-    dot_product(const Eigen::Matrix<fvar<double>, R1, C1>& v1, 
-                const Eigen::Matrix<fvar<double>, R2, C2>& v2) {
+    fvar<typename stan::return_type<T1,T2>::type> 
+    dot_product(const Eigen::Matrix<fvar<T1>, R1, C1>& v1, 
+                const Eigen::Matrix<fvar<T2>, R2, C2>& v2) {
       stan::math::validate_vector(v1,"dot_product");
       stan::math::validate_vector(v2,"dot_product");
       stan::math::validate_matching_sizes(v1,v2,"dot_product");
 
-      fvar<double> ret(0,0);
+      fvar<typename stan::return_type<T1,T2>::type> ret(0,0);
       for(unsigned i = 0; i < v1.size(); i++)
         ret += v1(i) * v2(i);
       return ret;
     }
 
-    template<int R1,int C1, int R2, int C2>
+    template<typename T1, int R1,int C1, int R2, int C2>
     inline 
-    fvar<double> 
-    dot_product(const Eigen::Matrix<fvar<double>, R1, C1>& v1, 
+    fvar<typename stan::return_type<T1,double>::type> 
+    dot_product(const Eigen::Matrix<fvar<T1>, R1, C1>& v1, 
                 const Eigen::Matrix<double, R2, C2>& v2) {
       stan::math::validate_vector(v1,"dot_product");
       stan::math::validate_vector(v2,"dot_product");
       stan::math::validate_matching_sizes(v1,v2,"dot_product");
 
-      fvar<double> ret(0,0);
+      fvar<typename stan::return_type<T1,double>::type> ret(0,0);
       for(unsigned i = 0; i < v1.size(); i++)
         ret += v1(i) * v2(i);
       return ret;
     }
 
-    template<int R1,int C1, int R2, int C2>
+    template<typename T2, int R1,int C1, int R2, int C2>
     inline 
-    fvar<double> 
+    fvar<typename stan::return_type<double,T2>::type> 
     dot_product(const Eigen::Matrix<double, R1, C1>& v1, 
-                const Eigen::Matrix<fvar<double>, R2, C2>& v2) {
+                const Eigen::Matrix<fvar<T2>, R2, C2>& v2) {
       stan::math::validate_vector(v1,"dot_product");
       stan::math::validate_vector(v2,"dot_product");
       stan::math::validate_matching_sizes(v1,v2,"dot_product");
 
-      fvar<double> ret(0,0);
+      fvar<typename stan::return_type<double,T2>::type> ret(0,0);
       for(unsigned i = 0; i < v1.size(); i++)
         ret += v1(i) * v2(i);
       return ret;
     }
 
 
-
+    //not sure what this is for..
     // /**
     //  * Returns the dot product.
     //  *
@@ -94,113 +94,114 @@ namespace stan {
     //   return var(new dot_product_vd_vari(v2, v1, length));
     // }
 
-
-
+    template<typename T1, typename T2>
     inline 
-    fvar<double>
-    dot_product(const std::vector<fvar<double> >& v1,
-                const std::vector<fvar<double> >& v2) {
+    fvar<typename stan::return_type<T1,T2>::type>
+    dot_product(const std::vector<fvar<T1> >& v1,
+                const std::vector<fvar<T2> >& v2) {
       stan::math::validate_matching_sizes(v1,v2,"dot_product");
-      fvar<double> ret(0,0);
+      fvar<typename stan::return_type<T1,T2>::type> ret(0,0);
       for(unsigned i = 0; i < v1.size(); i++)
         ret += v1.at(i) * v2.at(i);
       return ret;
     }
 
+    template<typename T2>
     inline 
-    fvar<double>
+    fvar<typename stan::return_type<double,T2>::type>
     dot_product(const std::vector<double>& v1,
-                const std::vector<fvar<double> >& v2) {
+                const std::vector<fvar<T2> >& v2) {
       stan::math::validate_matching_sizes(v1,v2,"dot_product");
-      fvar<double> ret(0,0);
+      fvar<typename stan::return_type<double,T2>::type> ret(0,0);
       for(unsigned i = 0; i < v1.size(); i++)
         ret += v1.at(i) * v2.at(i);
       return ret;
     }
 
+    template<typename T1>
     inline 
-    fvar<double>
+    fvar<typename stan::return_type<T1, double>::type>
     dot_product(const std::vector<fvar<double> >& v1,
                 const std::vector<double>& v2) {
       stan::math::validate_matching_sizes(v1,v2,"dot_product");
-      fvar<double> ret(0,0);
+      fvar<typename stan::return_type<T1,double>::type> ret(0,0);
       for(unsigned i = 0; i < v1.size(); i++)
         ret += v1.at(i) * v2.at(i);
       return ret;
     }
 
-    template<int R1,int C1,int R2, int C2>
+    template<typename T1, typename T2, int R1,int C1,int R2, int C2>
     inline 
-    Eigen::Matrix<fvar<double>, 1, C1>
-    columns_dot_product(const Eigen::Matrix<fvar<double>, R1, C1>& v1, 
-                        const Eigen::Matrix<fvar<double>, R2, C2>& v2) {
+    Eigen::Matrix<fvar<typename stan::return_type<T1,T2>::type>, 1, C1>
+    columns_dot_product(const Eigen::Matrix<fvar<T1>, R1, C1>& v1, 
+                        const Eigen::Matrix<fvar<T2>, R2, C2>& v2) {
       stan::math::validate_matching_sizes(v1,v2,"columns_dot_product");
-      Eigen::Matrix<fvar<double>, 1, C1> ret(1,v1.cols());
+      Eigen::Matrix<fvar<typename stan::return_type<T1,T2>::type>, 1, C1> ret(1,v1.cols());
       for (size_type j = 0; j < v1.cols(); ++j) {
         ret(j) = dot_product(v1.col(j),v2.col(j));
       }
       return ret;
     }
     
-    template<int R1,int C1,int R2, int C2>
+    template<typename T1, int R1,int C1,int R2, int C2>
     inline 
-    Eigen::Matrix<fvar<double>, 1, C1>
-    columns_dot_product(const Eigen::Matrix<fvar<double>, R1, C1>& v1, 
+    Eigen::Matrix<fvar<typename stan::return_type<T1,double>::type>, 1, C1>
+    columns_dot_product(const Eigen::Matrix<fvar<T1>, R1, C1>& v1, 
                         const Eigen::Matrix<double, R2, C2>& v2) {
       stan::math::validate_matching_sizes(v1,v2,"columns_dot_product");
-      Eigen::Matrix<fvar<double>, 1, C1> ret(1,v1.cols());
+      Eigen::Matrix<fvar<typename stan::return_type<T1,double>::type>, 1, C1> ret(1,v1.cols());
       for (size_type j = 0; j < v1.cols(); ++j) {
         ret(j) = dot_product(v1.col(j),v2.col(j));
       }
       return ret;
     }
 
-    template<int R1,int C1,int R2, int C2>
+    template<typename T2, int R1,int C1,int R2, int C2>
     inline 
-    Eigen::Matrix<fvar<double>, 1, C1>
+    Eigen::Matrix<fvar<typename stan::return_type<double,T2>::type>, 1, C1>
     columns_dot_product(const Eigen::Matrix<double, R1, C1>& v1, 
-                        const Eigen::Matrix<fvar<double>, R2, C2>& v2) {
+                        const Eigen::Matrix<fvar<T2>, R2, C2>& v2) {
       stan::math::validate_matching_sizes(v1,v2,"columns_dot_product");
-      Eigen::Matrix<fvar<double>, 1, C1> ret(1,v1.cols());
+      Eigen::Matrix<fvar<typename stan::return_type<double,T2>::type>, 1, C1> ret(1,v1.cols());
       for (size_type j = 0; j < v1.cols(); ++j) {
         ret(j) = dot_product(v1.col(j),v2.col(j));
       }
       return ret;
     }
 
-    template<int R1,int C1,int R2, int C2>
+    template<typename T1, typename T2, int R1,int C1,int R2, int C2>
     inline 
-    Eigen::Matrix<fvar<double>, R1, 1>
-    rows_dot_product(const Eigen::Matrix<fvar<double>, R1, C1>& v1, 
-                     const Eigen::Matrix<fvar<double>, R2, C2>& v2) {
+    Eigen::Matrix<fvar<typename stan::return_type<T1,T2>::type>, R1, 1>
+    rows_dot_product(const Eigen::Matrix<fvar<T1>, R1, C1>& v1, 
+                     const Eigen::Matrix<fvar<T2>, R2, C2>& v2) {
       stan::math::validate_matching_sizes(v1,v2,"rows_dot_product");
-      Eigen::Matrix<fvar<double>, R1, 1> ret(v1.rows(),1);
+      Eigen::Matrix<fvar<typename stan::return_type<T1,T2>::type>, R1, 1> ret(v1.rows(),1);
       for (size_type j = 0; j < v1.rows(); ++j) {
         ret(j) = dot_product(v1.rows(j),v2.rows(j));
       }
       return ret;
     }
     
-    template<int R1,int C1,int R2, int C2>
+    template<typename T2, int R1,int C1,int R2, int C2>
     inline 
-    Eigen::Matrix<fvar<double>, R1, 1>
+    Eigen::Matrix<fvar<typename stan::return_type<double,T2>::type>, R1, 1>
     rows_dot_product(const Eigen::Matrix<double, R1, C1>& v1, 
-                     const Eigen::Matrix<fvar<double>, R2, C2>& v2) {
+                     const Eigen::Matrix<fvar<T2>, R2, C2>& v2) {
       stan::math::validate_matching_sizes(v1,v2,"rows_dot_product");
-      Eigen::Matrix<fvar<double>, R1, 1> ret(v1.rows(),1);
+      Eigen::Matrix<fvar<typename stan::return_type<double,T2>::type>, R1, 1> ret(v1.rows(),1);
       for (size_type j = 0; j < v1.rows(); ++j) {
         ret(j) = dot_product(v1.rows(j),v2.rows(j));
       }
       return ret;
     }
 
-    template<int R1,int C1,int R2, int C2>
+    template<typename T1, int R1,int C1,int R2, int C2>
     inline 
-    Eigen::Matrix<fvar<double>, R1, 1>
-    rows_dot_product(const Eigen::Matrix<fvar<double>, R1, C1>& v1, 
+    Eigen::Matrix<fvar<typename stan::return_type<T1,double>::type>, R1, 1>
+    rows_dot_product(const Eigen::Matrix<fvar<T1>, R1, C1>& v1, 
                      const Eigen::Matrix<double, R2, C2>& v2) {
       stan::math::validate_matching_sizes(v1,v2,"rows_dot_product");
-      Eigen::Matrix<fvar<double>, R1, 1> ret(v1.rows(),1);
+      Eigen::Matrix<fvar<typename stan::return_type<T1,double>::type>, R1, 1> ret(v1.rows(),1);
       for (size_type j = 0; j < v1.rows(); ++j) {
         ret(j) = dot_product(v1.rows(j),v2.rows(j));
       }
