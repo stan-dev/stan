@@ -1,6 +1,7 @@
 #include <stan/agrad/fwd/matrix/dot_product.hpp>
 #include <gtest/gtest.h>
 #include <stan/agrad/fvar.hpp>
+#include <stan/agrad/fwd/matrix/typedefs.hpp>
 
 TEST(AgradFwdMatrix, dot_product_vector_vector) {
   using stan::math::vector_d;
@@ -20,14 +21,12 @@ TEST(AgradFwdMatrix, dot_product_vector_vector) {
    vv_2(1).d_ = 1.0;
    vv_2(2).d_ = 1.0;
 
-  EXPECT_FLOAT_EQ(3, stan::agrad::dot_product(vv_1, vd_2).val_);
-  EXPECT_FLOAT_EQ(1, stan::agrad::dot_product(vv_1, vd_2).d_);
-
-  EXPECT_FLOAT_EQ(3, stan::agrad::dot_product(vd_1, vv_2).val_);
+  EXPECT_FLOAT_EQ( 3, stan::agrad::dot_product(vv_1, vd_2).val_);
+  EXPECT_FLOAT_EQ( 3, stan::agrad::dot_product(vd_1, vv_2).val_);
+  EXPECT_FLOAT_EQ( 3, stan::agrad::dot_product(vv_1, vv_2).val_);  
+  EXPECT_FLOAT_EQ( 1, stan::agrad::dot_product(vv_1, vd_2).d_);
   EXPECT_FLOAT_EQ(-1, stan::agrad::dot_product(vd_1, vv_2).d_);
-
-  EXPECT_FLOAT_EQ(3, stan::agrad::dot_product(vv_1, vv_2).val_);  
-  EXPECT_FLOAT_EQ(0, stan::agrad::dot_product(vv_1, vv_2).d_);
+  EXPECT_FLOAT_EQ( 0, stan::agrad::dot_product(vv_1, vv_2).d_);
 }
 
 TEST(AgradFwdMatrix, dot_product_vector_vector_exception) {
@@ -66,14 +65,12 @@ TEST(AgradFwdMatrix, dot_product_rowvector_vector) {
    v2(1).d_ = 1.0;
    v2(2).d_ = 1.0;
 
-  EXPECT_FLOAT_EQ(3, stan::agrad::dot_product(v1, d2).val_);
-  EXPECT_FLOAT_EQ(1, stan::agrad::dot_product(v1, d2).d_);
-
-  EXPECT_FLOAT_EQ(3, stan::agrad::dot_product(d1, v2).val_);
+  EXPECT_FLOAT_EQ( 3, stan::agrad::dot_product(v1, d2).val_);
+  EXPECT_FLOAT_EQ( 3, stan::agrad::dot_product(d1, v2).val_);
+  EXPECT_FLOAT_EQ( 3, stan::agrad::dot_product(v1, v2).val_);
+  EXPECT_FLOAT_EQ( 1, stan::agrad::dot_product(v1, d2).d_);
   EXPECT_FLOAT_EQ(-1, stan::agrad::dot_product(d1, v2).d_);
-
-  EXPECT_FLOAT_EQ(3, stan::agrad::dot_product(v1, v2).val_);
-  EXPECT_FLOAT_EQ(0, stan::agrad::dot_product(v1, v2).d_);
+  EXPECT_FLOAT_EQ( 0, stan::agrad::dot_product(v1, v2).d_);
 }
 
 TEST(AgradFwdMatrix, dot_product_rowvector_vector_exception) {
@@ -114,14 +111,12 @@ TEST(AgradFwdMatrix, dot_product_vector_rowvector) {
    v2(1).d_ = 1.0;
    v2(2).d_ = 1.0;
 
-  EXPECT_FLOAT_EQ(3, stan::agrad::dot_product(v1, d2).val_);
-  EXPECT_FLOAT_EQ(1, stan::agrad::dot_product(v1, d2).d_);
-
-  EXPECT_FLOAT_EQ(3, stan::agrad::dot_product(d1, v2).val_);
+  EXPECT_FLOAT_EQ( 3, stan::agrad::dot_product(v1, d2).val_);
+  EXPECT_FLOAT_EQ( 3, stan::agrad::dot_product(d1, v2).val_);
+  EXPECT_FLOAT_EQ( 3, stan::agrad::dot_product(v1, v2).val_);
+  EXPECT_FLOAT_EQ( 1, stan::agrad::dot_product(v1, d2).d_);
   EXPECT_FLOAT_EQ(-1, stan::agrad::dot_product(d1, v2).d_);
-
-  EXPECT_FLOAT_EQ(3, stan::agrad::dot_product(v1, v2).val_);
-  EXPECT_FLOAT_EQ(0, stan::agrad::dot_product(v1, v2).d_);
+  EXPECT_FLOAT_EQ( 0, stan::agrad::dot_product(v1, v2).d_);
 }
 
 TEST(AgradFwdMatrix, dot_product_vector_rowvector_exception) {
@@ -149,12 +144,21 @@ TEST(AgradFwdMatrix, dot_product_rowvector_rowvector) {
   
   d1 << 1, 3, -5;
   v1 << 1, 3, -5;
+   v1(0).d_ = 1.0;
+   v1(1).d_ = 1.0;
+   v1(2).d_ = 1.0;
   d2 << 4, -2, -1;
   v2 << 4, -2, -1;
+   v2(0).d_ = 1.0;
+   v2(1).d_ = 1.0;
+   v2(2).d_ = 1.0;
 
-  EXPECT_FLOAT_EQ(3, stan::agrad::dot_product(v1, d2).val_);
-  EXPECT_FLOAT_EQ(3, stan::agrad::dot_product(d1, v2).val_);
-  EXPECT_FLOAT_EQ(3, stan::agrad::dot_product(v1, v2).val_);
+  EXPECT_FLOAT_EQ( 3, stan::agrad::dot_product(v1, d2).val_);
+  EXPECT_FLOAT_EQ( 3, stan::agrad::dot_product(d1, v2).val_);
+  EXPECT_FLOAT_EQ( 3, stan::agrad::dot_product(v1, v2).val_);
+  EXPECT_FLOAT_EQ( 1, stan::agrad::dot_product(v1, d2).d_);
+  EXPECT_FLOAT_EQ(-1, stan::agrad::dot_product(d1, v2).d_);
+  EXPECT_FLOAT_EQ( 0, stan::agrad::dot_product(v1, v2).d_);
 }
 
 TEST(AgradFwdMatrix, dot_product_rowvector_rowvector_exception) {
@@ -169,113 +173,64 @@ TEST(AgradFwdMatrix, dot_product_rowvector_rowvector_exception) {
   EXPECT_THROW(stan::agrad::dot_product(v1, v2), std::domain_error);
 }
 
-// TEST(AgradFwdMatrix, dot_product_vv) {
-//   AVEC a, b;
-//   AVAR c;
-//   for (int i = -1; i < 2; i++) { // a = (-1, 0, 1), b = (1, 2, 3)
-//     a.push_back(i);
-//     b.push_back(i + 2);
-//   }
-//   c = dot_product(&a[0], &b[0], 3);
-//   EXPECT_EQ(2, c);
-//   AVEC ab;
-//   VEC grad;
-//   for (size_t i = 0; i < 3; i++) {
-//     ab.push_back(a[i]);
-//     ab.push_back(b[i]);
-//   }
-//   c.grad(ab, grad);
-//   EXPECT_EQ(grad[0], 1);
-//   EXPECT_EQ(grad[1], -1);
-//   EXPECT_EQ(grad[2], 2);
-//   EXPECT_EQ(grad[3], 0);
-//   EXPECT_EQ(grad[4], 3);
-//   EXPECT_EQ(grad[5], 1);
+TEST(AgradFwdMatrix, dot_product_stdvector_stdvector) {
+  using std::vector;
+  using stan::agrad::fvar;
+
+  vector<fvar<double> > fv1;
+  vector<fvar<double> > fv2;
+  vector<double> dv;
+
+  fvar<double> a = 1.0;
+  fvar<double> b = 3.0;
+  fvar<double> c = 5.0;
+  a.d_ = 1.0;
+  b.d_ = 1.0;
+  c.d_ = 1.0;
+
+  fv1.push_back(a);
+  fv1.push_back(b);
+  fv1.push_back(c); 
+  fv2.push_back(a);
+  fv2.push_back(b);
+  fv2.push_back(c);   
+  dv.push_back(2.0);
+  dv.push_back(4.0);
+  dv.push_back(6.0);
+
+  EXPECT_FLOAT_EQ(44.0, dot_product(fv1, dv).val_);
+  EXPECT_FLOAT_EQ(44.0, dot_product(dv, fv1).val_);
+  EXPECT_FLOAT_EQ(35.0, dot_product(fv1, fv2).val_);
+  EXPECT_FLOAT_EQ(12.0, dot_product(fv1, dv).d_);
+  EXPECT_FLOAT_EQ(12.0, dot_product(dv, fv1).d_);
+  EXPECT_FLOAT_EQ(18.0, dot_product(fv1, fv2).d_);
+}
+// TEST(AgradFwdMatrix, columns_dot_product_vector_vector) {
+//   using stan::math::vector_d;
+//   using stan::agrad::vector_fv;
+
+//   vector_d vd_1(3), vd_2(3);
+//   vector_fv vv_1(3), vv_2(3);
+  
+//   vd_1 << 1, 3, -5;
+//   vv_1 << 1, 3, -5;
+//    vv_1(0).d_ = 1.0;
+//    vv_1(1).d_ = 1.0;
+//    vv_1(2).d_ = 1.0;
+//   vd_2 << 4, -2, -1;
+//   vv_2 << 4, -2, -1;
+//    vv_2(0).d_ = 1.0;
+//    vv_2(1).d_ = 1.0;
+//    vv_2(2).d_ = 1.0;
+
+//   vector_fv output;
+//   output = columns_dot_product(vv_1, vd_2);
+
+//   EXPECT_FLOAT_EQ( 4, output(0).val_);
+//   EXPECT_FLOAT_EQ(-6, output(1).val_);
+//   EXPECT_FLOAT_EQ( 5, output(2).val_);
+//   EXPECT_FLOAT_EQ( 4, output(0).d_);
+//   EXPECT_FLOAT_EQ(-2, output(1).d_);
+//   EXPECT_FLOAT_EQ(-1, output(2).d_);
 // }
-// TEST(AgradRevMatrix, dot_product_dv) {
-//   VEC a;
-//   AVEC b;
-//   AVAR c;
-//   for (int i = -1; i < 2; i++) { // a = (-1, 0, 1), b = (1, 2, 3)
-//     a.push_back(i);
-//     b.push_back(i + 2);
-//   }
-//   c = dot_product(&a[0], &b[0], 3);
-//   EXPECT_EQ(2, c);
-//   VEC grad;
-//   c.grad(b, grad);
-//   EXPECT_EQ(grad[0], -1);
-//   EXPECT_EQ(grad[1], 0);
-//   EXPECT_EQ(grad[2], 1);
-// }
-// TEST(AgradRevMatrix, dot_product_vd) {
-//   AVEC a;
-//   VEC b;
-//   AVAR c;
-//   for (int i = -1; i < 2; i++) { // a = (-1, 0, 1), b = (1, 2, 3)
-//     a.push_back(i);
-//     b.push_back(i + 2);
-//   }
-//   c = dot_product(&a[0], &b[0], 3);
-//   EXPECT_EQ(2, c);
-//   VEC grad;
-//   c.grad(a, grad);
-//   EXPECT_EQ(grad[0], 1);
-//   EXPECT_EQ(grad[1], 2);
-//   EXPECT_EQ(grad[2], 3);
-// }
-// TEST(AgradRevMatrix, dot_product_vv_vec) {
-//   AVEC a, b;
-//   AVAR c;
-//   for (int i = -1; i < 2; i++) { // a = (-1, 0, 1), b = (1, 2, 3)
-//     a.push_back(i);
-//     b.push_back(i + 2);
-//   }
-//   c = dot_product(a, b);
-//   EXPECT_EQ(2, c);
-//   AVEC ab;
-//   VEC grad;
-//   for (size_t i = 0; i < 3; i++) {
-//     ab.push_back(a[i]);
-//     ab.push_back(b[i]);
-//   }
-//   c.grad(ab, grad);
-//   EXPECT_EQ(grad[0], 1);
-//   EXPECT_EQ(grad[1], -1);
-//   EXPECT_EQ(grad[2], 2);
-//   EXPECT_EQ(grad[3], 0);
-//   EXPECT_EQ(grad[4], 3);
-//   EXPECT_EQ(grad[5], 1);
-// }
-// TEST(AgradRevMatrix, dot_product_dv_vec) {
-//   VEC a;
-//   AVEC b;
-//   AVAR c;
-//   for (int i = -1; i < 2; i++) { // a = (-1, 0, 1), b = (1, 2, 3)
-//     a.push_back(i);
-//     b.push_back(i + 2);
-//   }
-//   c = dot_product(a, b);
-//   EXPECT_EQ(2, c);
-//   VEC grad;
-//   c.grad(b, grad);
-//   EXPECT_EQ(grad[0], -1);
-//   EXPECT_EQ(grad[1], 0);
-//   EXPECT_EQ(grad[2], 1);
-// }
-// TEST(AgradRevMatrix, dot_product_vd_vec) {
-//   AVEC a;
-//   VEC b;
-//   AVAR c;
-//   for (int i = -1; i < 2; i++) { // a = (-1, 0, 1), b = (1, 2, 3)
-//     a.push_back(i);
-//     b.push_back(i + 2);
-//   }
-//   c = dot_product(a, b);
-//   EXPECT_EQ(2, c);
-//   VEC grad;
-//   c.grad(a, grad);
-//   EXPECT_EQ(grad[0], 1);
-//   EXPECT_EQ(grad[1], 2);
-//   EXPECT_EQ(grad[2], 3);
-// }
+
