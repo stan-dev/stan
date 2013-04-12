@@ -24,7 +24,7 @@ namespace stan {
       stan::math::validate_matching_sizes(v1,v2,"dot_product");
 
       fvar<typename stan::return_type<T1,T2>::type> ret(0,0);
-      for(unsigned i = 0; i < v1.size(); i++)
+      for(size_type i = 0; i < v1.size(); i++)
         ret += v1(i) * v2(i);
       return ret;
     }
@@ -39,7 +39,7 @@ namespace stan {
       stan::math::validate_matching_sizes(v1,v2,"dot_product");
 
       fvar<typename stan::return_type<T1,T2>::type> ret(0,0);
-      for(unsigned i = 0; i < v1.size(); i++)
+      for(size_type i = 0; i < v1.size(); i++)
         ret += v1(i) * to_fvar(v2(i));
       return ret;
     }
@@ -54,7 +54,7 @@ namespace stan {
       stan::math::validate_matching_sizes(v1,v2,"dot_product");
 
       fvar<typename stan::return_type<T1,T2>::type> ret(0,0);
-      for(unsigned i = 0; i < v1.size(); i++)
+      for(size_type i = 0; i < v1.size(); i++)
         ret += to_fvar(v1(i)) * v2(i);
       return ret;
     }
@@ -102,7 +102,7 @@ namespace stan {
                 const std::vector<fvar<T2> >& v2) {
       stan::math::validate_matching_sizes(v1,v2,"dot_product");
       fvar<typename stan::return_type<T1,T2>::type> ret(0,0);
-      for(unsigned i = 0; i < v1.size(); i++)
+      for(size_type i = 0; i < v1.size(); i++)
         ret += v1.at(i) * v2.at(i);
       return ret;
     }
@@ -114,7 +114,7 @@ namespace stan {
                 const std::vector<fvar<T2> >& v2) {
       stan::math::validate_matching_sizes(v1,v2,"dot_product");
       fvar<typename stan::return_type<T1,T2>::type> ret(0,0);
-      for(unsigned i = 0; i < v1.size(); i++)
+      for(size_type i = 0; i < v1.size(); i++)
         ret += to_fvar(v1.at(i)) * v2.at(i);
       return ret;
     }
@@ -126,7 +126,7 @@ namespace stan {
                 const std::vector<T2>& v2) {
       stan::math::validate_matching_sizes(v1,v2,"dot_product");
       fvar<typename stan::return_type<T1,T2>::type> ret(0,0);
-      for(unsigned i = 0; i < v1.size(); i++)
+      for(size_type i = 0; i < v1.size(); i++)
         ret += v1.at(i) * to_fvar(v2.at(i));
       return ret;
     }

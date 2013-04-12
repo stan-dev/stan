@@ -6,8 +6,6 @@
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/math/matrix/validate_multiplicable.hpp>
-#include <stan/math/matrix/validate_matching_sizes.hpp>
-#include <stan/math/matrix/validate_square.hpp>
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <stan/agrad/fwd/matrix/to_fvar.hpp>
@@ -88,9 +86,9 @@ namespace stan {
              const Eigen::Matrix<fvar<T2>,R2,C2>& m2) {
       stan::math::validate_multiplicable(m1,m2,"multiply");
       Eigen::Matrix<fvar<typename stan::return_type<T1,T2>::type>,R1,C2> result(m1.rows(),m2.cols());
-      for (unsigned i = 0; i < m1.rows(); i++) {
+      for (size_type i = 0; i < m1.rows(); i++) {
         Eigen::Matrix<fvar<T1>,1,C1> crow = m1.row(i);
-        for (unsigned j = 0; j < m2.cols(); j++) {
+        for (size_type j = 0; j < m2.cols(); j++) {
           Eigen::Matrix<fvar<T2>,R2,1> ccol = m2.col(j);
           result(i,j) = stan::agrad::dot_product(crow,ccol);
           }
@@ -105,10 +103,10 @@ namespace stan {
              const Eigen::Matrix<T2,R2,C2>& m2) {
       stan::math::validate_multiplicable(m1,m2,"multiply");
       Eigen::Matrix<fvar<typename stan::return_type<T1,T2>::type>,R1,C2> result(m1.rows(),m2.cols());
-      for (unsigned i = 0; i < m1.rows(); i++) {
+      for (size_type i = 0; i < m1.rows(); i++) {
         Eigen::Matrix<fvar<T1>,1,C1> crow = m1.row(i);
-        for (unsigned j = 0; j < m2.cols(); j++) {
-          Eigen::Matrix<fvar<T2>,R2,1> ccol = to_fvar(m2.col(j));
+        for (size_type j = 0; j < m2.cols(); j++) {
+          Eigen::Matrix<T2,R2,1> ccol = m2.col(j);
           result(i,j) = stan::agrad::dot_product(crow,ccol);
           }
         }
@@ -122,9 +120,9 @@ namespace stan {
              const Eigen::Matrix<fvar<T2>,R2,C2>& m2) {
       stan::math::validate_multiplicable(m1,m2,"multiply");
       Eigen::Matrix<fvar<typename stan::return_type<T1,T2>::type>,R1,C2> result(m1.rows(),m2.cols());
-      for (unsigned i = 0; i < m1.rows(); i++) {
-        Eigen::Matrix<fvar<T1>,1,C1> crow = to_fvar(m1.row(i));
-        for (unsigned j = 0; j < m2.cols(); j++) {
+      for (size_type i = 0; i < m1.rows(); i++) {
+        Eigen::Matrix<T1,1,C1> crow = m1.row(i);
+        for (size_type j = 0; j < m2.cols(); j++) {
           Eigen::Matrix<fvar<T2>,R2,1> ccol = m2.col(j);
           result(i,j) = stan::agrad::dot_product(crow,ccol);
           }
