@@ -213,13 +213,14 @@ rm_rstan_makefile_flags <- function() {
   invisible(NULL)
 } 
 
-set_cppo <- function(mode = c("fast", "presentation2", "presentation1", "debug", "small")) { 
+set_cppo <- function(mode = c("fast", "presentation2", "presentation1", "debug", "small"), NDEBUG = FALSE) { 
   # set the optimization level for compiling C++ code using R CMD SHLIB
   # Args:
   #   mode: one of fast, presentation2, presentation1, debug, small, corresponding
   #   to level 3, 2, 1, 0, s. 
   #   In addition, when debug mode is specified, it will add -g to CXXFLAGS. 
   #   In mode other than debug, -g is removed if exists. 
+  #   For mode other than 'debug', do not add '-DNDEBUG'. 
   # Return: 
   #   A list with names CXXFLAGS and R_XTRA_CPPFLAGS that are set 
   # 
@@ -236,38 +237,62 @@ set_cppo <- function(mode = c("fast", "presentation2", "presentation1", "debug",
   if (!level %in% c('0', '1', '2', '3', 's')) 
     stop(paste(level, " might not be a legal optimization level for C++ compilation", sep = '')) 
   old_olevel <- get_cxxo_level(curr_cxxflags) 
+  withstr <- if (NDEBUG) 'with' else 'without'
+  curr_withndebug <- grepl("-DNDEBUG", curr_r_xtra_cppflags)
+  curr_withdebug <- grepl("-DDEBUG", curr_r_xtra_cppflags)
   if (old_olevel == level)  {
     if ((level == '0' && grepl("-DDEBUG", curr_r_xtra_cppflags) && grepl(" -g", curr_cxxflags)) ||  
-        (level != '0' && grepl("-DNDEBUG", curr_r_xtra_cppflags) && !grepl(" -g", curr_cxxflags))) 
-    message(paste('mode ', mode, ' for compiling C++ code has been set already', sep = ''))
-    return(invisible(list(CXXFLAGS = curr_cxxflags, 
-                          R_XTRA_CPPFLAGS = curr_r_xtra_cppflags))) 
+        (level != '0' && (NDEBUG == curr_withndebug) && !grepl(" -g", curr_cxxflags))) {
+      message(paste('mode ', mode, ' ', withstr, ' NDEBUG for compiling C++ code has been set already', sep = ''))
+      return(invisible(list(CXXFLAGS = curr_cxxflags, 
+                            R_XTRA_CPPFLAGS = curr_r_xtra_cppflags))) 
+    }
   } 
   new_cxxflags <- if (old_olevel == '')  { 
-                   paste(curr_cxxflags, " -O", level, sep = '') 
-                 } else {
-                   sub(paste("-O", old_olevel, sep = ''), 
-                       paste("-O", level, sep = ''), curr_cxxflags, fixed = TRUE) 
-                 } 
+                    paste(curr_cxxflags, " -O", level, sep = '') 
+                  } else {
+                    sub(paste("-O", old_olevel, sep = ''), 
+                        paste("-O", level, sep = ''), curr_cxxflags, fixed = TRUE) 
+                  } 
   if (level == '0') { 
     if (!grepl(" -g", new_cxxflags)) new_cxxflags <- sub("\\s*$", " -g", new_cxxflags) 
-    new_r_xtra_cppflags <- sub("-DNDEBUG", "-DDEBUG", curr_r_xtra_cppflags, fixed = TRUE) 
+    if (curr_withndebug) 
+      new_r_xtra_cppflags <- sub("\\s*-DNDEBUG", " -DDEBUG", curr_r_xtra_cppflags, perl = TRUE) 
+    else if (!curr_withdebug)
+      new_r_xtra_cppflags <- paste(curr_r_xtra_cppflags, " -DDEBUG ")
+    msg <- paste('mode debug with DDEBUG for compiling C++ code is set')
   } else {
     new_cxxflags <- sub("-g", "", new_cxxflags, fixed = TRUE)
-    new_r_xtra_cppflags <- sub("-DDEBUG", "-DNDEBUG", curr_r_xtra_cppflags, fixed = TRUE) 
+    new_r_xtra_cppflags <- sub("\\s*-DDEBUG", " ", curr_r_xtra_cppflags)
+    if (NDEBUG) { 
+      warning("removing NDEBUG flag would turn off some index checking and\n", 
+              "thus cause R to crash if there is index our of range in the model.")
+      if (!curr_withndebug) 
+        new_r_xtra_cppflags <- paste(new_r_xtra_cppflags, " -DNDEBUG ")
+    } else { 
+      new_r_xtra_cppflags <- sub("\\s*-DNDEBUG", " ", new_r_xtra_cppflags, perl = TRUE) 
+    }
+    msg <- paste('mode ', mode, ' ', withstr, ' NDEBUG for compiling C++ code is set', sep = '')
   } 
   flags <- list(CXXFLAGS = new_cxxflags,
                 R_XTRA_CPPFLAGS = new_r_xtra_cppflags) 
   set_makefile_flags(flags) 
-  message(paste('mode ', mode, ' for compiling C++ code is set', sep = ''))
+  message(msg)
   invisible(flags) 
 } 
 
 get_cppo <- function() {
   # get the optimization level as a character 
-  curr_cxxflags <- get_makefile_flags("CXXFLAGS", get_makefile_txt())
-  l <- get_cxxo_level(curr_cxxflags)  
-  if (!nzchar(l)) l <- "0"
-  p <- match(l, c("3", "2", "1", "0", "s")) 
-  c("fast", "presentation2", "presentation1", "debug", "small")[p]
+  makefile_txt <- get_makefile_txt()
+  curr_cxxflags <- get_makefile_flags("CXXFLAGS", makefile_txt)
+  curr_r_xtra_cppflags <- get_makefile_flags("R_XTRA_CPPFLAGS", makefile_txt)
+  o <- get_cxxo_level(curr_cxxflags)  
+  if (!nzchar(o)) o <- "0"
+  p <- match(o, c("3", "2", "1", "0", "s")) 
+  with_ndebug <- grepl("DNDEBUG", curr_r_xtra_cppflags)
+  with_debug <- grepl("DDEBUG", curr_r_xtra_cppflags)
+  l <- list(mode = c("fast", "presentation2", "presentation1", "debug", "small")[p],
+            NDEBUG = with_ndebug, 
+            DEBUG = with_debug) 
+  invisible(l)
 } 

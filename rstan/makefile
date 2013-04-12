@@ -57,7 +57,7 @@ endif
 	$(LINKCMD2)
 	@rm -f $(STANPKG) 
 	@echo "git_head <- function() \"`git rev-parse HEAD`\"" > rstan/R/git_head.R
-	$(R) CMD build rstan --md5  # --no-vignettes
+	$(R) CMD build rstan --md5 # --no-vignettes --no-manual
 
 check: $(STANPKG) 
 	$(R) CMD check --as-cran $(STANPKG) 
