@@ -6,6 +6,7 @@
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
+#include <stan/math/matrix/validate_matching_dims.hpp>
 
 namespace stan {
   namespace agrad {
@@ -70,6 +71,21 @@ namespace stan {
       return rv;
     }
 
+    template<typename T, int R, int C>
+    inline
+    Eigen::Matrix<fvar<T>, R, C>
+    to_fvar(const Eigen::Matrix<T,R,C>& val,
+            const Eigen::Matrix<T,R,C>& deriv) {
+      stan::math::validate_matching_dims(val,deriv, "to_fvar");
+      Eigen::Matrix<fvar<T>,R,C> ret(val.rows(), val.cols());
+      for(size_type i = 0; i < val.rows(); i++) {
+        for(size_type j = 0; j < val.cols(); j++) {
+          ret(i,j).val_ = val(i,j);
+          ret(i,j).d_ = deriv(i,j);
+        }
+      }
+      return ret;
+    }
   }
 }
 #endif
