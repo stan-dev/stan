@@ -15,7 +15,7 @@ HOW TO (developer notes on how to release, last column is ordering)
 10.  Announce                                                    > 9
 
 
-v1.3.0 (11 April 2013)
+v1.3.0 (12 April 2013)
 ======================================================================
 Enhancements
 ----------------------------------
@@ -76,6 +76,7 @@ Bug Fixes
   functions behave properly with 0 length vector arguments
 * fixed error in definition of hypergeometric pmf
 * fixed arguments to nesterov optimization ctor in command 
+* fixed issue with initialization matrices being read improperly 
 * Use fabs() instead of abs() in unit_vector_constrain. 
 * typos in the manual
 * rstan: 

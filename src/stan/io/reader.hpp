@@ -1070,29 +1070,27 @@ namespace stan {
       template <typename TL>
       inline matrix_t matrix_lb(const TL lb, size_t m, size_t n) {
         matrix_t v(m,n);
-        for (size_t i = 0; i < m; ++i)
-          for (size_t j  = 0; j < n; ++j)
+        for (size_t j  = 0; j < n; ++j)
+          for (size_t i = 0; i < m; ++i)
             v(i,j) = scalar_lb(lb);
         return v;
       }
       template <typename TL>
       inline matrix_t matrix_lb_constrain(const TL lb, size_t m, size_t n) {
         matrix_t v(m,n);
-        for (size_t i = 0; i < m; ++i)
-          for (size_t j = 0; j < n; ++j)
+        for (size_t j = 0; j < n; ++j)
+          for (size_t i = 0; i < m; ++i)
             v(i,j) = scalar_lb_constrain(lb);
         return v;
       }
       template <typename TL>
       inline matrix_t matrix_lb_constrain(const TL lb, size_t m, size_t n, T& lp) {
         matrix_t v(m,n);
-        for (size_t i = 0; i < m; ++i)
-          for (size_t j = 0; j < n; ++j)
+        for (size_t j = 0; j < n; ++j)
+          for (size_t i = 0; i < m; ++i)
             v(i,j) = scalar_lb_constrain(lb,lp);
         return v;
       }
-
-
 
       template <typename TU>
       inline vector_t vector_ub(const TU ub, size_t m) {
@@ -1141,24 +1139,24 @@ namespace stan {
       template <typename TU>
       inline matrix_t matrix_ub(const TU ub, size_t m, size_t n) {
         matrix_t v(m,n);
-        for (size_t i = 0; i < m; ++i)
-          for (size_t j  = 0; j < n; ++j)
+        for (size_t j  = 0; j < n; ++j)
+          for (size_t i = 0; i < m; ++i)
             v(i,j) = scalar_ub(ub);
         return v;
       }
       template <typename TU>
       inline matrix_t matrix_ub_constrain(const TU ub, size_t m, size_t n) {
         matrix_t v(m,n);
-        for (size_t i = 0; i < m; ++i)
-          for (size_t j = 0; j < n; ++j)
+        for (size_t j = 0; j < n; ++j)
+          for (size_t i = 0; i < m; ++i)
             v(i,j) = scalar_ub_constrain(ub);
         return v;
       }
       template <typename TU>
       inline matrix_t matrix_ub_constrain(const TU ub, size_t m, size_t n, T& lp) {
         matrix_t v(m,n);
-        for (size_t i = 0; i < m; ++i)
-          for (size_t j = 0; j < n; ++j)
+        for (size_t j = 0; j < n; ++j)
+          for (size_t i = 0; i < m; ++i)
             v(i,j) = scalar_ub_constrain(ub,lp);
         return v;
       }
@@ -1211,24 +1209,24 @@ namespace stan {
       template <typename TL, typename TU>
       inline matrix_t matrix_lub(const TL lb, const TU ub, size_t m, size_t n) {
         matrix_t v(m,n);
-        for (size_t i = 0; i < m; ++i)
-          for (size_t j  = 0; j < n; ++j)
+        for (size_t j  = 0; j < n; ++j)
+          for (size_t i = 0; i < m; ++i)
             v(i,j) = scalar_lub(lb,ub);
         return v;
       }
       template <typename TL, typename TU>
       inline matrix_t matrix_lub_constrain(const TL lb, const TU ub, size_t m, size_t n) {
         matrix_t v(m,n);
-        for (size_t i = 0; i < m; ++i)
-          for (size_t j = 0; j < n; ++j)
+        for (size_t j = 0; j < n; ++j)
+          for (size_t i = 0; i < m; ++i)
             v(i,j) = scalar_lub_constrain(lb,ub);
         return v;
       }
       template <typename TL, typename TU>
       inline matrix_t matrix_lub_constrain(const TL lb, const TU ub, size_t m, size_t n, T& lp) {
         matrix_t v(m,n);
-        for (size_t i = 0; i < m; ++i)
-          for (size_t j = 0; j < n; ++j)
+        for (size_t j = 0; j < n; ++j)
+          for (size_t i = 0; i < m; ++i)
             v(i,j) = scalar_lub_constrain(lb,ub,lp);
         return v;
       }
