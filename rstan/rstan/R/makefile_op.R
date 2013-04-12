@@ -223,7 +223,7 @@ set_cppo <- function(mode = c("fast", "presentation2", "presentation1", "debug",
   #     For modes other than debug, '-DNDEBUG' is included depending on 'NDEBUG'. 
   #     For mode debug, 'NDEBUG' is neglected. 
   #   NDEBUG: indicate whether to incude -DNDEBUG in the flags. This argument 
-  #     is neglected for debu mode.
+  #     is neglected for debug mode.
   # Return: 
   #   A list with names CXXFLAGS and R_XTRA_CPPFLAGS that are set 
   # 
@@ -269,7 +269,8 @@ set_cppo <- function(mode = c("fast", "presentation2", "presentation1", "debug",
     new_r_xtra_cppflags <- sub("\\s*-DDEBUG", " ", curr_r_xtra_cppflags)
     if (NDEBUG) { 
       warning("removing NDEBUG flag would turn off some index checking and\n", 
-              "thus cause R to crash if there is index our of range in the model.")
+              "thus cause R to crash if an index is our of range in the model.",
+              call. = FALSE, immediate. = TRUE)
       if (!curr_withndebug) 
         new_r_xtra_cppflags <- paste(new_r_xtra_cppflags, " -DNDEBUG ")
     } else { 

@@ -65,7 +65,7 @@
   calling \code{set_cppo} again to set the optimization mode back to \code{"fast"} after 
   finishing debugging. 
 
-  In modes other than \code{"debug"}, code{"-DNDEBUG"} is added to the flags
+  In modes other than \code{"debug"}, \code{"-DNDEBUG"} is added to the flags
   for compiling model's C++ code if \code{NDEBUG=TRUE}. By default
   (\code{NDEBUG=FALSE}), there is more index checking in Stan, which might slow
   down the execution. So if it is certain there is no problem with the indices 
@@ -90,5 +90,5 @@
 \examples{\dontrun{
 set_cppo("fast") 
 get_cppo() 
-set_cppo("fast", NDEBUG = FALSE) # warning: this might disable some range-checking 
+set_cppo("fast", NDEBUG = FALSE) # warning: this might disable some index range-checking 
 }} 
