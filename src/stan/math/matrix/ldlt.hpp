@@ -40,11 +40,11 @@ namespace stan {
         _ldlt.solveInPlace(invA);
       }
 
-      inline Eigen::Matrix<double,R,C> solve(Eigen::Matrix<double,R,C> &B) const {
+      inline Eigen::Matrix<double,R,C> solve(const Eigen::Matrix<double,R,C> &B) const {
         return _ldlt.solve(B);
       }
 
-      inline Eigen::Matrix<double,R,C> solveRight(Eigen::Matrix<double,R,C> &B) const {
+      inline Eigen::Matrix<double,R,C> solveRight(const Eigen::Matrix<double,R,C> &B) const {
         return _ldlt.solve(B.transpose()).transpose();
       }
       

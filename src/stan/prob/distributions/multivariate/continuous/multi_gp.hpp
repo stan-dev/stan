@@ -102,7 +102,7 @@ namespace stan {
         return lp;
       if (!check_positive(function, w, "Kernel scales", &lp)) 
         return lp;
-      if (!check_not_nan(function, y, "Random variable", &lp)) 
+      if (!check_finite(function, y, "Random variable", &lp)) 
         return lp;
       
       if (y.rows() == 0)
