@@ -18,22 +18,22 @@ TEST(AgradFwdMatrix,add_scalar) {
 
   result = add(2.0,v);
   EXPECT_FLOAT_EQ(3.0,result(0,0).val_);
-  EXPECT_FLOAT_EQ(1.0,result(0,0).d_);
   EXPECT_FLOAT_EQ(4.0,result(0,1).val_);
-  EXPECT_FLOAT_EQ(1.0,result(0,1).d_);
   EXPECT_FLOAT_EQ(5.0,result(1,0).val_);
-  EXPECT_FLOAT_EQ(1.0,result(1,0).d_);
   EXPECT_FLOAT_EQ(6.0,result(1,1).val_);
+  EXPECT_FLOAT_EQ(1.0,result(0,0).d_);
+  EXPECT_FLOAT_EQ(1.0,result(0,1).d_);
+  EXPECT_FLOAT_EQ(1.0,result(1,0).d_);
   EXPECT_FLOAT_EQ(1.0,result(1,1).d_);
 
   result = add(v,2.0);
   EXPECT_FLOAT_EQ(3.0,result(0,0).val_);
-  EXPECT_FLOAT_EQ(1.0,result(0,0).d_);
   EXPECT_FLOAT_EQ(4.0,result(0,1).val_);
-  EXPECT_FLOAT_EQ(1.0,result(0,1).d_);
   EXPECT_FLOAT_EQ(5.0,result(1,0).val_);
-  EXPECT_FLOAT_EQ(1.0,result(1,0).d_);
   EXPECT_FLOAT_EQ(6.0,result(1,1).val_);
+  EXPECT_FLOAT_EQ(1.0,result(0,0).d_);
+  EXPECT_FLOAT_EQ(1.0,result(0,1).d_);
+  EXPECT_FLOAT_EQ(1.0,result(1,0).d_);
   EXPECT_FLOAT_EQ(1.0,result(1,1).d_);
 }
 
@@ -75,38 +75,38 @@ TEST(AgradFwdMatrix, add_vector_vector) {
 
   vector_fv output_v = add(vv_1, vd_2);
   EXPECT_FLOAT_EQ(expected_output(0), output_v(0).val_);
-  EXPECT_FLOAT_EQ(1.0, output_v(0).d_);
   EXPECT_FLOAT_EQ(expected_output(1), output_v(1).val_);
-  EXPECT_FLOAT_EQ(1.0, output_v(1).d_);
   EXPECT_FLOAT_EQ(expected_output(2), output_v(2).val_);
-  EXPECT_FLOAT_EQ(1.0, output_v(2).d_);
   EXPECT_FLOAT_EQ(expected_output(3), output_v(3).val_);
-  EXPECT_FLOAT_EQ(1.0, output_v(3).d_);
   EXPECT_FLOAT_EQ(expected_output(4), output_v(4).val_); 
+  EXPECT_FLOAT_EQ(1.0, output_v(0).d_);
+  EXPECT_FLOAT_EQ(1.0, output_v(1).d_);
+  EXPECT_FLOAT_EQ(1.0, output_v(2).d_);
+  EXPECT_FLOAT_EQ(1.0, output_v(3).d_);
   EXPECT_FLOAT_EQ(1.0, output_v(4).d_); 
 
   output_v = add(vd_1, vv_2);
   EXPECT_FLOAT_EQ(expected_output(0), output_v(0).val_);
-  EXPECT_FLOAT_EQ(1.0, output_v(0).d_);
   EXPECT_FLOAT_EQ(expected_output(1), output_v(1).val_);
-  EXPECT_FLOAT_EQ(1.0, output_v(1).d_);
   EXPECT_FLOAT_EQ(expected_output(2), output_v(2).val_);
-  EXPECT_FLOAT_EQ(1.0, output_v(2).d_);
   EXPECT_FLOAT_EQ(expected_output(3), output_v(3).val_);
-  EXPECT_FLOAT_EQ(1.0, output_v(3).d_);
   EXPECT_FLOAT_EQ(expected_output(4), output_v(4).val_); 
+  EXPECT_FLOAT_EQ(1.0, output_v(0).d_);
+  EXPECT_FLOAT_EQ(1.0, output_v(1).d_);
+  EXPECT_FLOAT_EQ(1.0, output_v(2).d_);
+  EXPECT_FLOAT_EQ(1.0, output_v(3).d_);
   EXPECT_FLOAT_EQ(1.0, output_v(4).d_);   
 
   output_v = add(vv_1, vv_2);
   EXPECT_FLOAT_EQ(expected_output(0), output_v(0).val_);
-  EXPECT_FLOAT_EQ(2.0, output_v(0).d_);
   EXPECT_FLOAT_EQ(expected_output(1), output_v(1).val_);
-  EXPECT_FLOAT_EQ(2.0, output_v(1).d_);
   EXPECT_FLOAT_EQ(expected_output(2), output_v(2).val_);
-  EXPECT_FLOAT_EQ(2.0, output_v(2).d_);
   EXPECT_FLOAT_EQ(expected_output(3), output_v(3).val_);
-  EXPECT_FLOAT_EQ(2.0, output_v(3).d_);
   EXPECT_FLOAT_EQ(expected_output(4), output_v(4).val_); 
+  EXPECT_FLOAT_EQ(2.0, output_v(0).d_);
+  EXPECT_FLOAT_EQ(2.0, output_v(1).d_);
+  EXPECT_FLOAT_EQ(2.0, output_v(2).d_);
+  EXPECT_FLOAT_EQ(2.0, output_v(3).d_);
   EXPECT_FLOAT_EQ(2.0, output_v(4).d_);  
 }
 TEST(AgradFWDMatrix, add_vector_vector_exception) {
@@ -157,39 +157,39 @@ TEST(AgradFwdMatrix, add_rowvector_rowvector) {
 
   row_vector_fv output_v = add(rvv_1, rvd_2);
   EXPECT_FLOAT_EQ(expected_output(0), output_v(0).val_);
-  EXPECT_FLOAT_EQ(1.0, output_v(0).d_);
   EXPECT_FLOAT_EQ(expected_output(1), output_v(1).val_);
-  EXPECT_FLOAT_EQ(1.0, output_v(1).d_);
   EXPECT_FLOAT_EQ(expected_output(2), output_v(2).val_);
-  EXPECT_FLOAT_EQ(1.0, output_v(2).d_);
   EXPECT_FLOAT_EQ(expected_output(3), output_v(3).val_);
-  EXPECT_FLOAT_EQ(1.0, output_v(3).d_);
   EXPECT_FLOAT_EQ(expected_output(4), output_v(4).val_);  
+  EXPECT_FLOAT_EQ(1.0, output_v(0).d_);
+  EXPECT_FLOAT_EQ(1.0, output_v(1).d_);
+  EXPECT_FLOAT_EQ(1.0, output_v(2).d_);
+  EXPECT_FLOAT_EQ(1.0, output_v(3).d_);
   EXPECT_FLOAT_EQ(1.0, output_v(4).d_);
 
   output_v = add(rvd_1, rvv_2);
   EXPECT_FLOAT_EQ(expected_output(0), output_v(0).val_);
-  EXPECT_FLOAT_EQ(1.0, output_v(0).d_);
   EXPECT_FLOAT_EQ(expected_output(1), output_v(1).val_);
-  EXPECT_FLOAT_EQ(1.0, output_v(1).d_);
   EXPECT_FLOAT_EQ(expected_output(2), output_v(2).val_);
-  EXPECT_FLOAT_EQ(1.0, output_v(2).d_);
   EXPECT_FLOAT_EQ(expected_output(3), output_v(3).val_);
-  EXPECT_FLOAT_EQ(1.0, output_v(3).d_);
   EXPECT_FLOAT_EQ(expected_output(4), output_v(4).val_);  
+  EXPECT_FLOAT_EQ(1.0, output_v(0).d_);
+  EXPECT_FLOAT_EQ(1.0, output_v(1).d_);
+  EXPECT_FLOAT_EQ(1.0, output_v(2).d_);
+  EXPECT_FLOAT_EQ(1.0, output_v(3).d_);
   EXPECT_FLOAT_EQ(1.0, output_v(4).d_);
 
   output_v = add(rvv_1, rvv_2);
   EXPECT_FLOAT_EQ(expected_output(0), output_v(0).val_);
-  EXPECT_FLOAT_EQ(2.0, output_v(0).d_);
   EXPECT_FLOAT_EQ(expected_output(1), output_v(1).val_);
-  EXPECT_FLOAT_EQ(2.0, output_v(1).d_);
   EXPECT_FLOAT_EQ(expected_output(2), output_v(2).val_);
-  EXPECT_FLOAT_EQ(2.0, output_v(2).d_);
   EXPECT_FLOAT_EQ(expected_output(3), output_v(3).val_);
-  EXPECT_FLOAT_EQ(2.0, output_v(3).d_);
   EXPECT_FLOAT_EQ(expected_output(4), output_v(4).val_);  
-  EXPECT_FLOAT_EQ(2.0, output_v(4).d_); 
+  EXPECT_FLOAT_EQ(2.0, output_v(0).d_);
+  EXPECT_FLOAT_EQ(2.0, output_v(1).d_);
+  EXPECT_FLOAT_EQ(2.0, output_v(2).d_);
+  EXPECT_FLOAT_EQ(2.0, output_v(3).d_);
+  EXPECT_FLOAT_EQ(2.0, output_v(4).d_);
 }
 TEST(AgradFwdMatrix, add_rowvector_rowvector_exception) {
   using stan::math::add;
@@ -237,32 +237,32 @@ TEST(AgradFwdMatrix, add_matrix_matrix) {
 
   matrix_fv output_v = add(mv_1, md_2);
   EXPECT_FLOAT_EQ(expected_output(0,0), output_v(0,0).val_);
-  EXPECT_FLOAT_EQ(1.0, output_v(0,0).d_);
   EXPECT_FLOAT_EQ(expected_output(0,1), output_v(0,1).val_);
-  EXPECT_FLOAT_EQ(1.0, output_v(0,1).d_);
   EXPECT_FLOAT_EQ(expected_output(1,0), output_v(1,0).val_);
-  EXPECT_FLOAT_EQ(1.0, output_v(1,0).d_);
   EXPECT_FLOAT_EQ(expected_output(1,1), output_v(1,1).val_);
+  EXPECT_FLOAT_EQ(1.0, output_v(0,0).d_);
+  EXPECT_FLOAT_EQ(1.0, output_v(0,1).d_);
+  EXPECT_FLOAT_EQ(1.0, output_v(1,0).d_);
   EXPECT_FLOAT_EQ(1.0, output_v(1,1).d_);
 
   output_v = add(md_1, mv_2);
   EXPECT_FLOAT_EQ(expected_output(0,0), output_v(0,0).val_);
-  EXPECT_FLOAT_EQ(1.0, output_v(0,0).d_);
   EXPECT_FLOAT_EQ(expected_output(0,1), output_v(0,1).val_);
-  EXPECT_FLOAT_EQ(1.0, output_v(0,1).d_);
   EXPECT_FLOAT_EQ(expected_output(1,0), output_v(1,0).val_);
-  EXPECT_FLOAT_EQ(1.0, output_v(1,0).d_);
   EXPECT_FLOAT_EQ(expected_output(1,1), output_v(1,1).val_);
+  EXPECT_FLOAT_EQ(1.0, output_v(0,0).d_);
+  EXPECT_FLOAT_EQ(1.0, output_v(0,1).d_);
+  EXPECT_FLOAT_EQ(1.0, output_v(1,0).d_);
   EXPECT_FLOAT_EQ(1.0, output_v(1,1).d_);
 
   output_v = add(mv_1, mv_2);
   EXPECT_FLOAT_EQ(expected_output(0,0), output_v(0,0).val_);
-  EXPECT_FLOAT_EQ(2.0, output_v(0,0).d_);
   EXPECT_FLOAT_EQ(expected_output(0,1), output_v(0,1).val_);
-  EXPECT_FLOAT_EQ(2.0, output_v(0,1).d_);
   EXPECT_FLOAT_EQ(expected_output(1,0), output_v(1,0).val_);
-  EXPECT_FLOAT_EQ(2.0, output_v(1,0).d_);
   EXPECT_FLOAT_EQ(expected_output(1,1), output_v(1,1).val_);
+  EXPECT_FLOAT_EQ(2.0, output_v(0,0).d_);
+  EXPECT_FLOAT_EQ(2.0, output_v(0,1).d_);
+  EXPECT_FLOAT_EQ(2.0, output_v(1,0).d_);
   EXPECT_FLOAT_EQ(2.0, output_v(1,1).d_);
 }
 TEST(AgradFwdMatrix, add_matrix_matrix_exception) {
