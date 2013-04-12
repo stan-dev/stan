@@ -24,6 +24,18 @@ namespace stan {
       return v * c;
     }
 
+    template<typename T1, typename T2, int R1,int C1>
+    inline 
+    Eigen::Matrix<fvar<typename stan::return_type<T1,T2>::type>,R1,C1> 
+    multiply(const Eigen::Matrix<fvar<T1>, R1, C1>& m, const fvar<T2>& c) {
+      Eigen::Matrix<fvar<typename stan::return_type<T1,T2>::type>,R1,C1> res(m.rows(),m.cols());
+      for(int i = 0; i < m.rows(); i++) {
+        for(int j = 0; j < m.cols(); j++)
+          res(i,j) = c * m(i,j);
+      }
+      return res;
+    }
+
     template<typename T1,typename T2,int R2,int C2>
     inline 
     Eigen::Matrix<fvar<typename stan::return_type<T1,T2>::type>, R2, C2> 
@@ -51,13 +63,22 @@ namespace stan {
     template<typename T1, typename T2, int R1,int C1>
     inline 
     Eigen::Matrix<fvar<typename stan::return_type<T1,T2>::type>,R1,C1> 
-    multiply(const Eigen::Matrix<fvar<T1>, R1, C1>& m, const fvar<T2>& c) {
-      Eigen::Matrix<fvar<typename stan::return_type<T1,T2>::type>,R1,C1> res(m.rows(),m.cols());
-      for(int i = 0; i < m.rows(); i++) {
-        for(int j = 0; j < m.cols(); j++)
-          res(i,j) = c * m(i,j);
-      }
-      return res;
+    multiply(const fvar<T1>& c, const Eigen::Matrix<fvar<T2>, R1, C1>& m) {
+      return multiply(m, c);
+    }
+
+    template<typename T1, typename T2, int R1,int C1>
+    inline 
+    Eigen::Matrix<fvar<typename stan::return_type<T1,T2>::type>,R1,C1> 
+    multiply(const T1& c, const Eigen::Matrix<fvar<T2>, R1, C1>& m) {
+      return multiply(m, c);
+    }
+
+    template<typename T1, typename T2, int R1,int C1>
+    inline 
+    Eigen::Matrix<fvar<typename stan::return_type<T1,T2>::type>,R1,C1> 
+    multiply(const fvar<T1>& c, const Eigen::Matrix<T2, R1, C1>& m) {
+      return multiply(m, c);
     }
     
     template<typename T1, typename T2, int R1,int C1,int R2,int C2>

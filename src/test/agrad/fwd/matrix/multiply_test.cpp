@@ -57,6 +57,14 @@ TEST(AgradFwdMatrix, multiply_vector_scalar) {
   EXPECT_FLOAT_EQ(   0, output(1).d_);
   EXPECT_FLOAT_EQ(  -3, output(2).d_);
 
+  output = multiply(v2, d1);
+  EXPECT_FLOAT_EQ(-200, output(0).val_);
+  EXPECT_FLOAT_EQ(   0, output(1).val_);
+  EXPECT_FLOAT_EQ(   6, output(2).val_);
+  EXPECT_FLOAT_EQ( 100, output(0).d_);
+  EXPECT_FLOAT_EQ(   0, output(1).d_);
+  EXPECT_FLOAT_EQ(  -3, output(2).d_);
+
   output = multiply(v1, d2);
   EXPECT_FLOAT_EQ(-200, output(0).val_);
   EXPECT_FLOAT_EQ(   0, output(1).val_);
@@ -65,7 +73,23 @@ TEST(AgradFwdMatrix, multiply_vector_scalar) {
   EXPECT_FLOAT_EQ(  -2, output(1).d_);
   EXPECT_FLOAT_EQ(  -2, output(2).d_);
 
+  output = multiply(d2, v1);
+  EXPECT_FLOAT_EQ(-200, output(0).val_);
+  EXPECT_FLOAT_EQ(   0, output(1).val_);
+  EXPECT_FLOAT_EQ(   6, output(2).val_);
+  EXPECT_FLOAT_EQ(  -2, output(0).d_);
+  EXPECT_FLOAT_EQ(  -2, output(1).d_);
+  EXPECT_FLOAT_EQ(  -2, output(2).d_);
+
   output = multiply(v1, v2);
+  EXPECT_FLOAT_EQ(-200, output(0).val_);
+  EXPECT_FLOAT_EQ(   0, output(1).val_);
+  EXPECT_FLOAT_EQ(   6, output(2).val_);
+  EXPECT_FLOAT_EQ(  98, output(0).d_);
+  EXPECT_FLOAT_EQ(  -2, output(1).d_);
+  EXPECT_FLOAT_EQ(  -5, output(2).d_);
+
+  output = multiply(v2, v1);
   EXPECT_FLOAT_EQ(-200, output(0).val_);
   EXPECT_FLOAT_EQ(   0, output(1).val_);
   EXPECT_FLOAT_EQ(   6, output(2).val_);
@@ -116,6 +140,30 @@ TEST(AgradFwdMatrix, multiply_rowvector_scalar) {
   EXPECT_FLOAT_EQ(  98, output(0).d_);
   EXPECT_FLOAT_EQ(  -2, output(1).d_);
   EXPECT_FLOAT_EQ(  -5, output(2).d_);
+
+  output = multiply(v2, d1);
+  EXPECT_FLOAT_EQ(-200, output(0).val_);
+  EXPECT_FLOAT_EQ(   0, output(1).val_);
+  EXPECT_FLOAT_EQ(   6, output(2).val_);
+  EXPECT_FLOAT_EQ( 100, output(0).d_);
+  EXPECT_FLOAT_EQ(   0, output(1).d_);
+  EXPECT_FLOAT_EQ(  -3, output(2).d_);
+
+  output = multiply(d2, v1);
+  EXPECT_FLOAT_EQ(-200, output(0).val_);
+  EXPECT_FLOAT_EQ(   0, output(1).val_);
+  EXPECT_FLOAT_EQ(   6, output(2).val_);
+  EXPECT_FLOAT_EQ(  -2, output(0).d_);
+  EXPECT_FLOAT_EQ(  -2, output(1).d_);
+  EXPECT_FLOAT_EQ(  -2, output(2).d_);
+
+  output = multiply(v2, v1);
+  EXPECT_FLOAT_EQ(-200, output(0).val_);
+  EXPECT_FLOAT_EQ(   0, output(1).val_);
+  EXPECT_FLOAT_EQ(   6, output(2).val_);
+  EXPECT_FLOAT_EQ(  98, output(0).d_);
+  EXPECT_FLOAT_EQ(  -2, output(1).d_);
+  EXPECT_FLOAT_EQ(  -5, output(2).d_);
 }
 TEST(AgradFwdMatrix, multiply_matrix_scalar) {
   using stan::math::matrix_d;
@@ -147,7 +195,6 @@ TEST(AgradFwdMatrix, multiply_matrix_scalar) {
   EXPECT_FLOAT_EQ(  -3, output(1,0).d_);
   EXPECT_FLOAT_EQ(   4, output(1,1).d_);
 
-
   output = multiply(v1, d2);
   EXPECT_FLOAT_EQ(-200, output(0,0).val_);
   EXPECT_FLOAT_EQ(   0, output(0,1).val_);
@@ -159,6 +206,36 @@ TEST(AgradFwdMatrix, multiply_matrix_scalar) {
   EXPECT_FLOAT_EQ(  -2, output(1,1).d_);
  
   output = multiply(v1, v2);
+  EXPECT_FLOAT_EQ(-200, output(0,0).val_);
+  EXPECT_FLOAT_EQ(   0, output(0,1).val_);
+  EXPECT_FLOAT_EQ(   6, output(1,0).val_);
+  EXPECT_FLOAT_EQ(  -8, output(1,1).val_);
+  EXPECT_FLOAT_EQ(  98, output(0,0).d_);
+  EXPECT_FLOAT_EQ(  -2, output(0,1).d_);
+  EXPECT_FLOAT_EQ(  -5, output(1,0).d_);
+  EXPECT_FLOAT_EQ(   2, output(1,1).d_);
+
+  output = multiply(v2, d1);
+  EXPECT_FLOAT_EQ(-200, output(0,0).val_);
+  EXPECT_FLOAT_EQ(   0, output(0,1).val_);
+  EXPECT_FLOAT_EQ(   6, output(1,0).val_);
+  EXPECT_FLOAT_EQ(  -8, output(1,1).val_);
+  EXPECT_FLOAT_EQ( 100, output(0,0).d_);
+  EXPECT_FLOAT_EQ(   0, output(0,1).d_);
+  EXPECT_FLOAT_EQ(  -3, output(1,0).d_);
+  EXPECT_FLOAT_EQ(   4, output(1,1).d_);
+
+  output = multiply(d2, v1);
+  EXPECT_FLOAT_EQ(-200, output(0,0).val_);
+  EXPECT_FLOAT_EQ(   0, output(0,1).val_);
+  EXPECT_FLOAT_EQ(   6, output(1,0).val_);
+  EXPECT_FLOAT_EQ(  -8, output(1,1).val_);
+  EXPECT_FLOAT_EQ(  -2, output(0,0).d_);
+  EXPECT_FLOAT_EQ(  -2, output(0,1).d_);
+  EXPECT_FLOAT_EQ(  -2, output(1,0).d_);
+  EXPECT_FLOAT_EQ(  -2, output(1,1).d_);
+ 
+  output = multiply(v2, v1);
   EXPECT_FLOAT_EQ(-200, output(0,0).val_);
   EXPECT_FLOAT_EQ(   0, output(0,1).val_);
   EXPECT_FLOAT_EQ(   6, output(1,0).val_);
@@ -455,7 +532,6 @@ TEST(AgradFwdMatrix, multiply_matrix_matrix) {
   EXPECT_FLOAT_EQ(  42, output(0,1).d_);
   EXPECT_FLOAT_EQ(  -2, output(1,0).d_);
   EXPECT_FLOAT_EQ(  10, output(1,1).d_);
-
 
   output = multiply(v1, d2);
   EXPECT_EQ(2, output.rows());
