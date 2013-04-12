@@ -643,9 +643,10 @@ namespace stan {
         
         sample_stream << "lp__,";
         model.write_csv_header(sample_stream);
-        
+
         stan::optimization::NesterovGradient ng(model, cont_params, disc_params,
-                                                -1.0, &std::cout);
+                                                epsilon, &std::cout);
+
         double lp = ng.logp();
         
         double lastlp = lp - 1;
