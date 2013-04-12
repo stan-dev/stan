@@ -139,7 +139,9 @@ namespace stan {
       stan::math::validate_matching_sizes(v1,v2,"columns_dot_product");
       Eigen::Matrix<fvar<typename stan::return_type<T1,T2>::type>, 1, C1> ret(1,v1.cols());
       for (size_type j = 0; j < v1.cols(); ++j) {
-        ret(j) = dot_product(v1.col(j),v2.col(j));
+        Eigen::Matrix<fvar<T1>,R1,1> ccol1 = v1.col(j);
+        Eigen::Matrix<fvar<T2>,R2,1> ccol2 = v2.col(j);
+        ret(0,j) = dot_product(ccol1, ccol2);
       }
       return ret;
     }
@@ -152,7 +154,10 @@ namespace stan {
       stan::math::validate_matching_sizes(v1,v2,"columns_dot_product");
       Eigen::Matrix<fvar<typename stan::return_type<T1,T2>::type>, 1, C1> ret(1,v1.cols());
       for (size_type j = 0; j < v1.cols(); ++j) {
-        ret(0,j) = dot_product(v1.col(j),v2.col(j));
+        Eigen::Matrix<fvar<T1>,R1,1> ccol1 = v1.col(j);
+        Eigen::Matrix<T2,R2,1> ccol = v2.col(j);
+        Eigen::Matrix<fvar<T2>,R2,1> ccol2 = to_fvar(ccol);
+        ret(0,j) = dot_product(ccol1, ccol2);
       }
       return ret;
     }
@@ -165,7 +170,10 @@ namespace stan {
       stan::math::validate_matching_sizes(v1,v2,"columns_dot_product");
       Eigen::Matrix<fvar<typename stan::return_type<T1,T2>::type>, 1, C1> ret(1,v1.cols());
       for (size_type j = 0; j < v1.cols(); ++j) {
-        ret(j) = dot_product(v1.col(j),v2.col(j));
+        Eigen::Matrix<T1,R1,1> ccol = v1.col(j);
+        Eigen::Matrix<fvar<T1>,R1,1> ccol1 = to_fvar(ccol);
+        Eigen::Matrix<fvar<T2>,R2,1> ccol2 = v2.col(j);
+        ret(0,j) = dot_product(ccol1, ccol2);
       }
       return ret;
     }
@@ -178,7 +186,9 @@ namespace stan {
       stan::math::validate_matching_sizes(v1,v2,"rows_dot_product");
       Eigen::Matrix<fvar<typename stan::return_type<T1,T2>::type>, R1, 1> ret(v1.rows(),1);
       for (size_type j = 0; j < v1.rows(); ++j) {
-        ret(j) = dot_product(v1.row(j),v2.row(j));
+        Eigen::Matrix<fvar<T1>,1,C1> crow1 = v1.row(j);
+        Eigen::Matrix<fvar<T2>,1,C2> crow2 = v2.row(j);
+        ret(j,0) = dot_product(crow1, crow2);
       }
       return ret;
     }
@@ -191,7 +201,10 @@ namespace stan {
       stan::math::validate_matching_sizes(v1,v2,"rows_dot_product");
       Eigen::Matrix<fvar<typename stan::return_type<T1,T2>::type>, R1, 1> ret(v1.rows(),1);
       for (size_type j = 0; j < v1.rows(); ++j) {
-        ret(j) = dot_product(v1.row(j),v2.row(j));
+        Eigen::Matrix<T1,1,C1> crow = v1.row(j);
+        Eigen::Matrix<fvar<T1>,1,C1> crow1 = to_fvar(crow);
+        Eigen::Matrix<fvar<T2>,1,C2> crow2 = v2.row(j);
+        ret(j,0) = dot_product(crow1, crow2);
       }
       return ret;
     }
@@ -204,7 +217,10 @@ namespace stan {
       stan::math::validate_matching_sizes(v1,v2,"rows_dot_product");
       Eigen::Matrix<fvar<typename stan::return_type<T1,T2>::type>, R1, 1> ret(v1.rows(),1);
       for (size_type j = 0; j < v1.rows(); ++j) {
-        ret(j) = dot_product(v1.row(j),v2.row(j));
+        Eigen::Matrix<fvar<T1>,1,C1> crow1 = v1.row(j);
+        Eigen::Matrix<T2,1,C2> crow = v2.row(j);
+        Eigen::Matrix<fvar<T2>,1,C2> crow2 = to_fvar(crow);
+        ret(j,0) = dot_product(crow1, crow2);
       }
       return ret;
     }
