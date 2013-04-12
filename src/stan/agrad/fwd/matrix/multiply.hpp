@@ -43,7 +43,7 @@ namespace stan {
       Eigen::Matrix<fvar<typename stan::return_type<T1,T2>::type>,R2,C2> res(m.rows(),m.cols());
       for(int i = 0; i < m.rows(); i++) {
         for(int j = 0; j < m.cols(); j++)
-          res(i,j) = c * m(i,j);
+          res(i,j) = to_fvar(c) * m(i,j);
       }
       return res;
     }
@@ -55,7 +55,7 @@ namespace stan {
       Eigen::Matrix<fvar<typename stan::return_type<T1,T2>::type>,R1,C1> res(m.rows(),m.cols());
       for(int i = 0; i < m.rows(); i++) {
         for(int j = 0; j < m.cols(); j++)
-          res(i,j) = c * m(i,j);
+          res(i,j) = c * to_fvar(m(i,j));
       }
       return res;
     }
@@ -108,7 +108,7 @@ namespace stan {
       for (unsigned i = 0; i < m1.rows(); i++) {
         Eigen::Matrix<fvar<T1>,1,C1> crow = m1.row(i);
         for (unsigned j = 0; j < m2.cols(); j++) {
-          Eigen::Matrix<T2,R2,1> ccol = m2.col(j);
+          Eigen::Matrix<fvar<T2>,R2,1> ccol = to_fvar(m2.col(j));
           result(i,j) = stan::agrad::dot_product(crow,ccol);
           }
         }
@@ -123,7 +123,7 @@ namespace stan {
       stan::math::validate_multiplicable(m1,m2,"multiply");
       Eigen::Matrix<fvar<typename stan::return_type<T1,T2>::type>,R1,C2> result(m1.rows(),m2.cols());
       for (unsigned i = 0; i < m1.rows(); i++) {
-        Eigen::Matrix<T1,1,C1> crow = m1.row(i);
+        Eigen::Matrix<fvar<T1>,1,C1> crow = to_fvar(m1.row(i));
         for (unsigned j = 0; j < m2.cols(); j++) {
           Eigen::Matrix<fvar<T2>,R2,1> ccol = m2.col(j);
           result(i,j) = stan::agrad::dot_product(crow,ccol);
