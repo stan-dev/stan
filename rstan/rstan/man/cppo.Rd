@@ -8,7 +8,7 @@
 \description{Set and get the optimization level, defined in 
  CXXFLAGS, for compiling the C++ code. Also flag \code{-DDEBUG} 
  or \code{-DNDEBUG} in \code{R_XTRA_CPPFLAGS} is set depending on the
- optimization mode.  
+ optimization mode and parameter \code{NDEBUG}.  
 }
 
 \usage{
@@ -65,10 +65,10 @@
   calling \code{set_cppo} again to set the optimization mode back to \code{"fast"} after 
   finishing debugging. 
 
-  In modes other than \code{"debug"}, code{"-DNDEBUG"} is added to the 
+  In modes other than \code{"debug"}, code{"-DNDEBUG"} is added to the flags
   for compiling model's C++ code if \code{NDEBUG=TRUE}. By default
   (\code{NDEBUG=FALSE}), there is more index checking in Stan, which might slow
-  down the execution. So if it is sure there is no problem with the indices 
+  down the execution. So if it is certain there is no problem with the indices 
   in the model specification, we can set \code{NDEBUG=TRUE} to recompile the
   model. 
 } 

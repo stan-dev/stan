@@ -217,10 +217,13 @@ set_cppo <- function(mode = c("fast", "presentation2", "presentation1", "debug",
   # set the optimization level for compiling C++ code using R CMD SHLIB
   # Args:
   #   mode: one of fast, presentation2, presentation1, debug, small, corresponding
-  #   to level 3, 2, 1, 0, s. 
-  #   In addition, when debug mode is specified, it will add -g to CXXFLAGS. 
-  #   In mode other than debug, -g is removed if exists. 
-  #   For mode other than 'debug', do not add '-DNDEBUG'. 
+  #     to level 3, 2, 1, 0, s. 
+  #     In addition, when debug mode is specified, it will add -g to CXXFLAGS. 
+  #     In modes other than debug, -g is removed if exists. 
+  #     For modes other than debug, '-DNDEBUG' is included depending on 'NDEBUG'. 
+  #     For mode debug, 'NDEBUG' is neglected. 
+  #   NDEBUG: indicate whether to incude -DNDEBUG in the flags. This argument 
+  #     is neglected for debu mode.
   # Return: 
   #   A list with names CXXFLAGS and R_XTRA_CPPFLAGS that are set 
   # 
