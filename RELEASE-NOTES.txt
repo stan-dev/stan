@@ -15,6 +15,76 @@ HOW TO (developer notes on how to release, last column is ordering)
 10.  Announce                                                    > 9
 
 
+v1.3.0 (11 April 2013)
+======================================================================
+Enhancements
+----------------------------------
+* forward sampling in generated quantities
+* refactored the math and agrad libraries in C++
+* additions to user's guide w. sample models
+    + geometric lag (Koyck) model example with simulation
+    + stochastic volatility example with source, optimized source, 
+      simulation
+    + time series, moving average, standardization for linear 
+      regression, hidden Markov models, with examples
+* manual's index is now hyperlinked
+* added option to display autocorrelations in the command-line program
+  to print output
+* changed default point estimation routine from the command line to
+  use Nesterov's accelerated gradient method, added option for point
+  estimation with Newton's method
+* added broadcast functions
+* better error messages in parser: 
+  added inherited attribute to grammar for block location of expression
+* split unit tests from distribution tests
+* internal: added chainable_alloc class, generalized VectorView with 
+  seq_view
+* added additional acknowledgements to manual
+* rstan: added method as.mcmc.list
+
+
+New Functions
+----------------------------------
+* forward sampling: most of the random number generators are in place
+  (see the documentation index for the full list of supported functions)
+* additional distributions: 
+    + exp_mod_normal
+    + gumbel 
+    + skew_normal
+    + see documentation index for full list of supported distributions
+* additional functions: 
+    + mdivide_right_spd 
+    + mdivide_left_spd
+    + owenst
+    + columns_dot_product
+    + rows_dot_product
+* broadcast functions for 2D and 3D:
+    + rep_arrray
+    + rep_matrix
+    + rep_row_vector
+    + rep_vector    
+
+
+Bug Fixes
+----------------------------------
+* fixed derivative in multi_normal_prec distribution function
+* double-based log_prob functions return the same value as var-based
+  log_prob_grad functions
+* calls to lgamma are now using boost's lgamma function
+* patched transform to work with Eigen 3.2 beta
+* all probability distribution functions and cumulative distribution
+  functions behave properly with 0 length vector arguments
+* fixed error in definition of hypergeometric pmf
+* fixed arguments to nesterov optimization ctor in command 
+* Use fabs() instead of abs() in unit_vector_constrain. 
+* typos in the manual
+* rstan: 
+    + fixed crash in R when index is out of bounds using set_cppo("fast")
+    + io_context fix skipping len=0
+    + fix the typo in manual (dims -> dim)
+    + add require(inline) to fix the problem with loading sysdata.rda
+
+
 v1.2.0 (6 March 2013)
 ======================================================================
 

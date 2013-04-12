@@ -31,10 +31,8 @@ namespace stan {
                      size_t i, 
                      const char* msg,
                      size_t idx) {
-#ifndef NDEBUG
       if (i < 1 || i > max) 
         raise_range_error(max,i,msg,idx);
-#endif
     }
 
 

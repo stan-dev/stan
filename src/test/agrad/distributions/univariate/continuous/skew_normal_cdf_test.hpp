@@ -105,7 +105,7 @@ public:
   typename stan::return_type<T_y, T_loc, T_scale,T_shape>::type 
   cdf_function(const T_y& y, const T_loc& mu, const T_scale& sigma,
          const T_shape& alpha, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
-    using stan::math::owenst;
-    return 0.5 * erfc(-(y - mu) / (sqrt(2.0) * sigma)) - 2.0 * owenst((y - mu) / sigma, alpha);
+    using stan::math::owens_t;
+    return 0.5 * erfc(-(y - mu) / (sqrt(2.0) * sigma)) - 2.0 * owens_t((y - mu) / sigma, alpha);
   }
 };

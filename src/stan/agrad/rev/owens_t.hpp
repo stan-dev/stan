@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__REV__OWENST_HPP__
-#define __STAN__AGRAD__REV__OWENST_HPP__
+#ifndef __STAN__AGRAD__REV__OWENS__T_HPP__
+#define __STAN__AGRAD__REV__OWENS__T_HPP__
 
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/op/vv_vari.hpp>
@@ -14,9 +14,9 @@ namespace stan {
     namespace {
 
       using stan::math::pi;
-      class owenst_vv_vari : public op_vv_vari {
+      class owens_t_vv_vari : public op_vv_vari {
       public:
-        owenst_vv_vari(vari* avi, vari* bvi) :
+        owens_t_vv_vari(vari* avi, vari* bvi) :
           op_vv_vari(boost::math::owens_t(avi->val_, bvi->val_), avi, bvi) {
         }
         void chain() {
@@ -25,9 +25,9 @@ namespace stan {
         }
       };
 
-      class owenst_vd_vari : public op_vd_vari {
+      class owens_t_vd_vari : public op_vd_vari {
       public:
-        owenst_vd_vari(vari* avi, double b) :
+        owens_t_vd_vari(vari* avi, double b) :
           op_vd_vari(boost::math::owens_t(avi->val_, b), avi, b) {
         }
         void chain() {
@@ -35,9 +35,9 @@ namespace stan {
         }
       };
 
-      class owenst_dv_vari : public op_dv_vari {
+      class owens_t_dv_vari : public op_dv_vari {
       public:
-        owenst_dv_vari(double a, vari* bvi) :
+        owens_t_dv_vari(double a, vari* bvi) :
           op_dv_vari(boost::math::owens_t(a, bvi->val_), a, bvi) {
         }
         void chain() {
@@ -57,9 +57,9 @@ namespace stan {
      * 
      * @return The Owen's T function.
      */
-    inline var owenst(const var& h, 
+    inline var owens_t(const var& h, 
           const var& a) {
-      return var(new owenst_vv_vari(h.vi_, a.vi_));
+      return var(new owens_t_vv_vari(h.vi_, a.vi_));
     }
 
     /** 
@@ -73,9 +73,9 @@ namespace stan {
      * 
      * @return The Owen's T function.
      */
-    inline var owenst(const var& h, 
+    inline var owens_t(const var& h, 
           const double& a) {
-      return var(new owenst_vd_vari(h.vi_, a));
+      return var(new owens_t_vd_vari(h.vi_, a));
     }
 
     /** 
@@ -89,9 +89,9 @@ namespace stan {
      * 
      * @return The Owen's T function.
      */
-    inline var owenst(const double& h, 
+    inline var owens_t(const double& h, 
           const var& a) {
-      return var(new owenst_dv_vari(h, a.vi_));
+      return var(new owens_t_dv_vari(h, a.vi_));
     }
 
   }

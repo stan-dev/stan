@@ -20,6 +20,7 @@
 #include <stan/math/matrix/diag_pre_multiply.hpp>
 #include <stan/math/matrix/diagonal.hpp>
 #include <stan/math/matrix/dims.hpp>
+#include <stan/math/matrix/dist.hpp>
 #include <stan/math/matrix/divide.hpp>
 #include <stan/math/matrix/dot_product.hpp>
 #include <stan/math/matrix/dot_self.hpp>

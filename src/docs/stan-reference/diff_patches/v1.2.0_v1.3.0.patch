@@ -1,0 +1,14 @@
+diff --git a/src/docs/stan-reference/distributions.tex b/src/docs/stan-reference/distributions.tex
+index 59c22e5..5045a99 100644
+--- a/src/docs/stan-reference/distributions.tex
++++ b/src/docs/stan-reference/distributions.tex
+@@ -324,8 +324,7 @@ c_{k+1}$ for $k \in \setlist{1,\ldots,K-2}$, and $\eta \in \reals$, then for $k
+ \begin{array}{ll}
+ 1 - \mbox{logit}^{-1}(\eta - c_1) & \mbox{if } k = 1,
+ \\[4pt]
+-\mbox{logit}^{-1}(\eta - c_{k-1}) - \mbox{logit}^{-1}(\eta -
+-\A{c_{k})} \FXA \ 
++\mbox{logit}^{-1}(\eta - c_{k-1}) - \mbox{logit}^{-1}(\eta - c_{k})
+ & \mbox{if } 1 < k < K, \mbox{and}
+ \\[4pt]
+ \mbox{logit}^{-1}(\eta - c_{K-1}) - 0
