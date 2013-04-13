@@ -1,14 +1,17 @@
 #!/bin/bash
 
-OLD_VERSION=$1
-if [ -z "$OLD_VERSION" ]; then
-        echo 'You must specify a tag or SHA or something that git can interpret as a starting point'
-        exit 1
+# from http://stackoverflow.com/questions/1404796/how-to-get-the-latest-tag-name-in-current-branch-in-git
+PreviousAndCurrentGitTag=`git describe --tags \`git rev-list --tags --abbrev=0 --max-count=2\` --abbrev=0`
+PreviousGitTag=`echo $PreviousAndCurrentGitTag | cut -f 2 -d ' '`
+CurrentGitTag=`echo $PreviousAndCurrentGitTag | cut -f 1 -d ' '`
+
+OLDVERSION=$1
+if [ -z "$OLDVERSION" ]; then
+        OLDVERSION=$PreviousGitTag
 fi
-NEW_VERSION=$2
-if [ -z "$NEW_VERSION" ]; then
-        echo 'You must specify a tag or SHA or something that git can interpret as an endpoint (such as HEAD)'
-        exit 2
+NEWVERSION=$2
+if [ -z "$NEWVERSION" ]; then
+        NEWVERSION=$CurrentGitTag
 fi
 
 BRANCH=`git branch | grep ^*`
@@ -24,7 +27,7 @@ fi
 
 STAN_HOME=`pwd`
 cd $STAN_HOME/src/docs/stan-reference
-bash diff.sh $1 $2
+bash diff.sh $OLDVERSION $NEWVERSION
 if [ $? != 0 ]; then
         echo "Diffing failed, aborting"
         git reset --hard HEAD
@@ -32,12 +35,14 @@ if [ $? != 0 ]; then
         exit 5
 fi
 cd $STAN_HOME
-git apply $STAN_HOME/src/docs/stan-reference/diff_patches/$1_$2.patch
-if [ $? != 0 ]; then
-        echo "Applying patch failed, aborting"
-        git reset --hard HEAD
-        git checkout master
-        exit 6
+if [ -e ${STAN_HOME}/src/docs/stan-reference/diff_patches/${OLDVERSION}_${NEWVERSION}.patch ]; then
+        git apply ${STAN_HOME}/src/docs/stan-reference/diff_patches/${OLDVERSION}_${NEWVERSION}.patch
+        if [ $? != 0 ]; then
+                echo "Applying patch failed, aborting"
+                git reset --hard HEAD
+                git checkout master
+                exit 6
+        fi
 fi
 make clean-all && make manual
 if [ $? != 0 ]; then
