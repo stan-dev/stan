@@ -2,6 +2,7 @@
 #define __STAN__MATH__FUNCTIONS__SCALED_ADD_HPP__
 
 #include <vector>
+#include <cstddef>
 
 namespace stan {
   namespace math {
