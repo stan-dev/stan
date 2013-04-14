@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <cstddef>
+#include <cmath>
 
 namespace stan {
   namespace math {
