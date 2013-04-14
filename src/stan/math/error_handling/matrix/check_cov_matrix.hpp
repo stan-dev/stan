@@ -3,7 +3,6 @@
 
 #include <sstream>
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/error_handling/raise_domain_error.hpp>
 #include <stan/math/error_handling/check_positive.hpp>
 #include <stan/math/error_handling/matrix/check_pos_definite.hpp>
 #include <stan/math/error_handling/matrix/check_symmetric.hpp>
