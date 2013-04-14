@@ -15,6 +15,7 @@
 #include <stan/mcmc/dualaverage.hpp>
 #include <stan/mcmc/hmc_base.hpp>
 #include <stan/mcmc/util.hpp>
+#include <stan/math/functions/sub.hpp>
 
 #include <Eigen/Dense>
 
