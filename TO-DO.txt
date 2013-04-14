@@ -68,12 +68,12 @@ Cleanup
 -----------
 * improve special function and prob function behavior at limits
 * (Daniel) simplify error handling by standardizing default policy
-  - Steps:
-    1. remove extraneous calls with explicit policy
+  - remove throw from all files except for 
+    src/stan/math/error_handling/raise_domain_error.hpp
   - Need unit-tests for error handling:
     + check_nonnegative
     + check_positive
-  
+    + matrix/check_corr_matrix
 
 Doc
 ---

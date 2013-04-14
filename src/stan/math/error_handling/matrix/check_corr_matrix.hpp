@@ -3,7 +3,6 @@
 
 #include <sstream>
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/error_handling/default_policy.hpp>
 #include <stan/math/error_handling/raise_domain_error.hpp>
 #include <stan/math/error_handling/check_positive.hpp>
 #include <stan/math/error_handling/matrix/check_pos_definite.hpp>
@@ -29,20 +28,19 @@ namespace stan {
      * @tparam T Type of scalar.
      */
     // FIXME: update warnings
-    template <typename T_y, typename T_result, class Policy>
+    template <typename T_y, typename T_result>
     inline bool check_corr_matrix(const char* function,
                   const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
                   const char* name,
-                  T_result* result,
-                  const Policy&) {
+                  T_result* result) {
       if (!check_size_match(function, 
           y.rows(), "Rows of correlation matrix",
           y.cols(), "columns of correlation matrix",
-          result, Policy())) 
+          result)) 
         return false;
-      if (!check_positive(function, y.rows(), "rows", result, Policy()))
+      if (!check_positive(function, y.rows(), "rows", result))
         return false;
-      if (!check_symmetric(function, y, "y", result, Policy()))
+      if (!check_symmetric(function, y, "y", result))
         return false;
       for (typename Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>::size_type
              k = 0; k < y.rows(); ++k) {
@@ -54,23 +52,15 @@ namespace stan {
           T_result tmp 
             = policies::raise_domain_error<T_y>(function,
                                                 message.str().c_str(),
-                                                y(k,k), Policy());
+                                                y(k,k));
           if (result != 0)
             *result = tmp;
           return false;
         }
       }
-      if (!check_pos_definite(function, y, "y", result, Policy()))
+      if (!check_pos_definite(function, y, "y", result))
         return false;
       return true;
-    }
-
-    template <typename T_y, typename T_result>
-    inline bool check_corr_matrix(const char* function,
-                  const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
-                  const char* name,
-                  T_result* result) {
-      return check_corr_matrix(function,y,name,result,default_policy());
     }
 
     template <typename T>
@@ -78,7 +68,7 @@ namespace stan {
                   const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& y,
                   const char* name,
                   T* result = 0) {
-      return check_corr_matrix(function,y,name,result,default_policy());
+      return check_corr_matrix(function,y,name,result);
     }
 
   }
