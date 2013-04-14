@@ -1,8 +1,5 @@
 #include <stan/math/error_handling/check_consistent_size.hpp>
 #include <gtest/gtest.h>
-#include <stan/math/error_handling/default_policy.hpp>
-
-using stan::math::default_policy;
 
 TEST(MathMatrixErrorHandling, checkConsistentSize) {
   using Eigen::Matrix;
@@ -17,5 +14,6 @@ TEST(MathMatrixErrorHandling, checkConsistentSize) {
 
   Matrix<double,Dynamic,1> v1(4);
   EXPECT_EQ(4U, size_of(v1));
-  EXPECT_TRUE(check_consistent_size(4U, function, v1, name1, &result, default_policy()));
+  EXPECT_TRUE(check_consistent_size(4U, function, v1, name1, &result));
+  EXPECT_THROW(check_consistent_size(2U, function, v1, name1, &result), std::domain_error);
 }

@@ -7,22 +7,20 @@
 namespace stan {
   namespace math {
 
-    template <typename T, typename T_result, class Policy>
+    template <typename T, typename T_result>
     inline bool check_consistent_size(size_t max_size,
                                       const char* function,
                                       const T& x,
                                       const char* name,
-                                      T_result* result,
-                                      const Policy&) {
+                                      T_result* result) {
       size_t x_size = stan::size_of(x);
       if (is_vector<T>::value && x_size == max_size)
         return true;
       if (!is_vector<T>::value && x_size == 1)
         return true;
-      return dom_err(
-                     function,x_size,name,
+      return dom_err(function,x_size,name,
                      " (max size) is %1%, but must be consistent, 1 or max=",max_size,
-                     result,Policy());
+                     result);
     }
 
   }
