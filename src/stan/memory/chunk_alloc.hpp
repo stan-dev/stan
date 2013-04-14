@@ -7,6 +7,7 @@
 #include <stdexcept>
 #include <stdint.h> // FIXME: replace with cstddef?
 #include <vector>
+#include <stan/memory/stack_alloc.hpp>
 
 #define DEFAULT_INITIAL_NCHUNKS (1 << 8)
  
