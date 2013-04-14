@@ -16,6 +16,7 @@
 #include <stan/mcmc/hmc_base.hpp>
 #include <stan/mcmc/util.hpp>
 #include <stan/math/functions/sub.hpp>
+#include <stan/math/functions/dot_self.hpp>
 
 #include <Eigen/Dense>
 
