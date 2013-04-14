@@ -68,7 +68,7 @@ namespace stan {
                   const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& y,
                   const char* name,
                   T* result = 0) {
-      return check_corr_matrix(function,y,name,result);
+      return check_corr_matrix<T,T>(function,y,name,result);
     }
 
   }
