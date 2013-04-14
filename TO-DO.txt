@@ -75,6 +75,7 @@ Cleanup
     + check_positive
     + matrix/check_corr_matrix
     + matrix/check_ordered
+    + matrix/check_pos_definite
 
 Doc
 ---
