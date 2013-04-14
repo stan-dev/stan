@@ -4,7 +4,6 @@
 
 TEST(AgradErrorHandling,CheckBounded_X) {
   using stan::agrad::var;
-  using stan::math::default_policy;
   using stan::math::check_bounded;
  
   const char* function = "check_bounded(%1%)";
@@ -50,7 +49,6 @@ TEST(AgradErrorHandling,CheckBounded_X) {
 
 TEST(AgradErrorHandling,CheckBounded_Low) {
   using stan::agrad::var;
-  using stan::math::default_policy;
   using stan::math::check_bounded;
 
   const char* function = "check_bounded(%1%)";
@@ -77,7 +75,6 @@ TEST(AgradErrorHandling,CheckBounded_Low) {
 }
 TEST(AgradErrorHandling,CheckBounded_High) {
   using stan::agrad::var;
-  using stan::math::default_policy;
   using stan::math::check_bounded;
 
   const char* function = "check_bounded(%1%)";
