@@ -30,13 +30,13 @@ namespace stan {
     // FIXME: update warnings
     template <typename T_y, typename T_result>
     inline bool check_corr_matrix(const char* function,
-                  const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
-                  const char* name,
-                  T_result* result) {
+                                  const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
+                                  const char* name,
+                                  T_result* result) {
       if (!check_size_match(function, 
-          y.rows(), "Rows of correlation matrix",
-          y.cols(), "columns of correlation matrix",
-          result)) 
+                            y.rows(), "Rows of correlation matrix",
+                            y.cols(), "columns of correlation matrix",
+                            result)) 
         return false;
       if (!check_positive(function, y.rows(), "rows", result))
         return false;
@@ -49,7 +49,7 @@ namespace stan {
           message << name << " is not a valid correlation matrix. " 
                   << name << "(" << k << "," << k 
                   << ") is %1%, but should be near 1.0";
-          return dom_err(function,y(k,k),name,message);
+          return dom_err(function,y(k,k),name,message,"",result);
         }
       }
       if (!check_pos_definite(function, y, "y", result))
@@ -59,9 +59,9 @@ namespace stan {
 
     template <typename T>
     inline bool check_corr_matrix(const char* function,
-                  const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& y,
-                  const char* name,
-                  T* result = 0) {
+                                  const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& y,
+                                  const char* name,
+                                  T* result = 0) {
       return check_corr_matrix<T,T>(function,y,name,result);
     }
 

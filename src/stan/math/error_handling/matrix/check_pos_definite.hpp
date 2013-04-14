@@ -3,7 +3,7 @@
 
 #include <sstream>
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/error_handling/raise_domain_error.hpp>
+#include <stan/math/error_handling/dom_err.hpp>
 #include <stan/math/error_handling/matrix/constraint_tolerance.hpp>
 
 namespace stan {
@@ -34,12 +34,7 @@ namespace stan {
         std::ostringstream message;
         message << name << " is not positive definite. " 
                 << name << "(0,0) is %1%.";
-        T_result tmp = policies::raise_domain_error<T_y>(function,
-                                                         message.str().c_str(),
-                                                         y(0,0));
-        if (result != 0)
-          *result = tmp;
-        return false;
+        return dom_err(function,y(0,0),name,message.str().c_str(),"",result);
       }
       Eigen::LDLT< Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic> > cholesky 
         = y.ldlt();
@@ -49,12 +44,7 @@ namespace stan {
         std::ostringstream message;
         message << name << " is not positive definite. " 
                 << name << "(0,0) is %1%.";
-        T_result tmp = policies::raise_domain_error<T_y>(function,
-                                                         message.str().c_str(),
-                                                         y(0,0));
-        if (result != 0)
-          *result = tmp;
-        return false;
+        return dom_err(function,y(0,0),name,message.str().c_str(),"",result);
       }
       return true;
     }
