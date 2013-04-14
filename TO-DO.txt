@@ -72,6 +72,7 @@ Cleanup
     1. remove extraneous calls with explicit policy
   - Need unit-tests for error handling:
     + check_nonnegative
+    + check_positive
   
 
 Doc
