@@ -3,8 +3,8 @@
 
 #include <sstream>
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/error_handling/raise_domain_error.hpp>
 #include <stan/math/error_handling/check_positive.hpp>
+#include <stan/math/error_handling/dom_err.hpp>
 #include <stan/math/error_handling/matrix/check_pos_definite.hpp>
 #include <stan/math/error_handling/matrix/check_symmetric.hpp>
 #include <stan/math/error_handling/matrix/constraint_tolerance.hpp>
@@ -49,13 +49,7 @@ namespace stan {
           message << name << " is not a valid correlation matrix. " 
                   << name << "(" << k << "," << k 
                   << ") is %1%, but should be near 1.0";
-          T_result tmp 
-            = policies::raise_domain_error<T_y>(function,
-                                                message.str().c_str(),
-                                                y(k,k));
-          if (result != 0)
-            *result = tmp;
-          return false;
+          return dom_err(function,y(k,k),name,message);
         }
       }
       if (!check_pos_definite(function, y, "y", result))

@@ -3,7 +3,6 @@
 
 #include <sstream>
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/error_handling/default_policy.hpp>
 #include <stan/math/error_handling/raise_domain_error.hpp>
 #include <stan/math/error_handling/matrix/constraint_tolerance.hpp>
 
@@ -24,14 +23,11 @@ namespace stan {
      * @param result
      * @return <code>true</code> if the vector is a simplex.
      */
-    template <typename T_prob,
-              typename T_result, 
-              class Policy>
+    template <typename T_prob, typename T_result>
     bool check_simplex(const char* function,
                        const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta,
                        const char* name,
-                       T_result* result,
-                       const Policy&) {
+                       T_result* result) {
       typedef typename Eigen::Matrix<T_prob,Eigen::Dynamic,1>::size_type size_t;
       using stan::math::policies::raise_domain_error;
       if (theta.size() == 0) {
@@ -39,8 +35,7 @@ namespace stan {
         message += " is not a valid simplex. %1% elements in the vector.";
         T_result tmp = raise_domain_error<size_t, size_t>(function, 
                                                           message.c_str(), 
-                                                          0, 
-                                                          Policy());
+                                                          0);
         if (result != 0)
           *result = tmp;
         return false;
@@ -53,8 +48,7 @@ namespace stan {
         msg << " The sum of the elements should be 1, but is " << sum;
         T_result tmp = raise_domain_error<T_result,T_prob>(function, 
                                                            msg.str().c_str(), 
-                                                           sum, 
-                                                           Policy());
+                                                           sum);
         if (result != 0)
           *result = tmp;
         return false;
@@ -68,8 +62,7 @@ namespace stan {
           T_result tmp 
             = raise_domain_error<T_result,T_prob>(function, 
                                                   stream.str().c_str(), 
-                                                  theta[n], 
-                                                  Policy());
+                                                  theta[n]);
           if (result != 0)
             *result = tmp;
           return false;
@@ -78,20 +71,12 @@ namespace stan {
       return true;
     }                         
     
-    template <typename T_y,
-              typename T_result> // = typename T_prob_vector::value_type, 
-    inline bool check_simplex(const char* function,
-                              const Eigen::Matrix<T_y,Eigen::Dynamic,1>& theta,
-                              const char* name,
-                              T_result* result) {
-      return check_simplex(function,theta,name,result,default_policy());
-    }
     template <typename T>
     inline bool check_simplex(const char* function,
                               const Eigen::Matrix<T,Eigen::Dynamic,1>& theta,
                               const char* name,
                               T* result = 0) {
-      return check_simplex(function,theta,name,result,default_policy());
+      return check_simplex<T,T>(function,theta,name,result);
     }
 
   }
