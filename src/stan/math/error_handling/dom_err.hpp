@@ -2,6 +2,7 @@
 #define __STAN__MATH__ERROR_HANDLING__DOM_ERR_HPP__
 
 #include <sstream>
+#include <boost/math/policies/policy.hpp>
 #include <stan/math/error_handling/raise_domain_error.hpp>
 
 namespace stan {
@@ -35,7 +36,7 @@ namespace stan {
       T_result tmp = raise_domain_error<T_result,T_y>(function,
                                                       msg_o.str().c_str(),
                                                       y,
-                                                      Policy());
+                                                      boost::math::policies::policy<>());
       if (result != 0)
         *result = tmp;
       return false;

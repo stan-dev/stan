@@ -2,6 +2,7 @@
 #define __STAN__MATH__ERROR_HANDLING__DOM_ERR_VEC_HPP__
 
 #include <sstream>
+#include <boost/math/policies/policy.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/math/error_handling/raise_domain_error.hpp>
 
@@ -28,7 +29,7 @@ namespace stan {
         typename T_y::value_type>(function,
                                   msg_o.str().c_str(),
                                   stan::get(y,i),
-                                  Policy());
+                                  boost::math::policies::policy<>());
       if (result != 0)
         *result = tmp;
       return false;

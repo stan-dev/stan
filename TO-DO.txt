@@ -68,6 +68,7 @@ Cleanup
 -----------
 * improve special function and prob function behavior at limits
 * (Daniel) simplify error handling by standardizing default policy
+  1. remove extraneous calls with explicit policy
 
 Doc
 ---
