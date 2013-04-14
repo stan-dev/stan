@@ -38,6 +38,9 @@ namespace stan {
                  << " The element at " << n 
                  << " is %1%, but should be greater than the previous element, "
                  << y[n-1];
+          return dom_err(function,y[n],name,
+                         stream.str().c_str(),"",
+                         result);
           T_result tmp = raise_domain_error<T_result,T_y>(function, 
                                                           stream.str().c_str(), 
                                                           y[n]);

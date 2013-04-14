@@ -49,7 +49,7 @@ namespace stan {
           message << name << " is not a valid correlation matrix. " 
                   << name << "(" << k << "," << k 
                   << ") is %1%, but should be near 1.0";
-          return dom_err(function,y(k,k),name,message,"",result);
+          return dom_err(function,y(k,k),name,message.str().c_str(),"",result);
         }
       }
       if (!check_pos_definite(function, y, "y", result))
