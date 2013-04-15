@@ -141,8 +141,7 @@ namespace stan {
 
     template <typename T_y, typename T_loc, typename T_scale, typename T_inv_scale>
     typename return_type<T_y,T_loc,T_scale,T_inv_scale>::type
-    exp_mod_normal_cdf(const T_y& y, const T_loc& mu, const T_scale& sigma, const T_inv_scale& lambda,
-                       const Policy&) {
+    exp_mod_normal_cdf(const T_y& y, const T_loc& mu, const T_scale& sigma, const T_inv_scale& lambda) {
       static const char* function = "stan::prob::exp_mod_normal_cdf(%1%)";
 
       using stan::math::check_positive;

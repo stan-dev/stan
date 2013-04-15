@@ -242,8 +242,7 @@ namespace stan {
 
 
     // Binomial CDF
-    template <typename T_n, typename T_N, typename T_prob, 
-              class Policy>
+    template <typename T_n, typename T_N, typename T_prob>
     typename return_type<T_prob>::type
     binomial_cdf(const T_n& n, const T_N& N, const T_prob& theta) {
           
