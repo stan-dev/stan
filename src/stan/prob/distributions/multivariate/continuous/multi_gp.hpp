@@ -6,6 +6,7 @@
 
 #include <stan/math/matrix_error_handling.hpp>
 #include <stan/math/error_handling.hpp>
+#include <stan/math/error_handling/dom_err.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
 #include <stan/agrad/agrad.hpp>
@@ -82,9 +83,8 @@ namespace stan {
         std::ostringstream message;
         message << "Kernel matrix is not positive definite. " 
                 << "K(0,0) is %1%.";
-        lp = math::policies::raise_domain_error<T_covar>(function,
-                                                   message.str().c_str(),
-                                                   Sigma(0,0), Policy());
+        std::string str(message.str());
+        stan::math::dom_err(function,Sigma(0,0),"Kernel",str.c_str(),"",&lp);
         return lp;
       }
 
