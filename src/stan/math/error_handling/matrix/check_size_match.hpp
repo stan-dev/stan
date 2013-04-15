@@ -34,7 +34,10 @@ namespace stan {
                           T_size1 i, const char* name_i,
                           T_size2 j, const char* name_j,
                           T_size1* result = 0) {
-      return check_size_match(function,i,name_i,j,name_j,result);
+      return check_size_match<T_size1,T_size2,T_size1>(function,
+                                                       i,name_i,
+                                                       j,name_j,
+                                                       result);
     }
 
   }

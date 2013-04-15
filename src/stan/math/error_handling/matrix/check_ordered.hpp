@@ -56,7 +56,7 @@ namespace stan {
                        const Eigen::Matrix<T,Eigen::Dynamic,1>& y,
                        const char* name,
                        T* result = 0) {
-      return check_ordered(function,y,name,result);
+      return check_ordered<T,T>(function,y,name,result);
     }
 
   }
