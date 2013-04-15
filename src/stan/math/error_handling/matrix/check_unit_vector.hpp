@@ -40,8 +40,9 @@ namespace stan {
         msg << "in function check_unit_vector(%1%), ";
         msg << name << " is not a valid unit vector.";
         msg << " The sum of the squares of the elements should be 1, but is " << ssq;
+        std::string tmp(msg.str());
         return dom_err(function,ssq,name,
-                       msg.str().c_str(),"",
+                       tmp.c_str(),"",
                        result);
       }
       return true;

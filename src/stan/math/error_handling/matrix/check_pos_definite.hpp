@@ -34,7 +34,8 @@ namespace stan {
         std::ostringstream message;
         message << name << " is not positive definite. " 
                 << name << "(0,0) is %1%.";
-        return dom_err(function,y(0,0),name,message.str().c_str(),"",result);
+        std::string msg(message.str());
+        return dom_err(function,y(0,0),name,msg.c_str(),"",result);
       }
       Eigen::LDLT< Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic> > cholesky 
         = y.ldlt();
@@ -44,7 +45,8 @@ namespace stan {
         std::ostringstream message;
         message << name << " is not positive definite. " 
                 << name << "(0,0) is %1%.";
-        return dom_err(function,y(0,0),name,message.str().c_str(),"",result);
+        std::string msg(message.str());
+        return dom_err(function,y(0,0),name,msg.c_str(),"",result);
       }
       return true;
     }

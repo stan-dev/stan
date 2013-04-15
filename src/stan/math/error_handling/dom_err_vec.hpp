@@ -22,10 +22,11 @@ namespace stan {
       using stan::math::policies::raise_domain_error;
       std::ostringstream msg_o;
       msg_o << name << "[" << i << "] " << error_msg << error_msg2;
+      std::string msg(msg_o.str());
       T_result tmp 
         = raise_domain_error<T_result,
         typename T_y::value_type>(function,
-                                  msg_o.str().c_str(),
+                                  msg.c_str(),
                                   stan::get(y,i),
                                   boost::math::policies::policy<>());
       if (result != 0)

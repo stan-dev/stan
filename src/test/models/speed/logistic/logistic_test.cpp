@@ -89,8 +89,10 @@ public:
     std::stringstream output_filename;
     output_filename << path << get_path_separator() 
                     << "logistic.csv";
-    output_file.open(output_filename.str().c_str());
-    
+    {
+      std::string tmp(output_filename.str());
+      output_file.open(tmp.c_str());
+    }
     output_file << "Program,"
                 << "N,"
                 << "M,"
@@ -164,8 +166,11 @@ public:
   
 
 
-    std::ifstream ifstream;
-    ifstream.open(samples.str().c_str());
+    std::ifstream ifstream; 
+    {
+      std::string tmp(samples.str());
+      ifstream.open(tmp.c_str());
+    }
     stan::io::stan_csv stan_csv = stan::io::stan_csv_reader::parse(ifstream);
     ifstream.close();
     
@@ -174,7 +179,10 @@ public:
       samples.str("");
       samples << path << get_path_separator()
               << filename << ".chain_" << chain << ".csv";
-      ifstream.open(samples.str().c_str());
+      {
+        std::string tmp(samples.str());
+        ifstream.open(tmp.c_str());
+      }
       stan_csv = stan::io::stan_csv_reader::parse(ifstream);
       ifstream.close();
       
@@ -193,7 +201,10 @@ public:
     std::stringstream param_filename;
     param_filename << path << get_path_separator() << filename
                    << "_param.data.R";
-    std::ifstream param_ifstream(param_filename.str().c_str());
+    {
+      std::string tmp(param_filename.str());
+      std::ifstream param_ifstream(tmp.c_str());
+    }
     stan::io::dump param_values(param_ifstream);
   
     beta = param_values.vals_r("beta");

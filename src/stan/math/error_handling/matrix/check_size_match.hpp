@@ -21,8 +21,9 @@ namespace stan {
         std::ostringstream msg;
         msg << name_i << " (%1%) and " 
             << name_j << " (" << j << ") must match in size";
+        std::string tmp(msg.str());
         return dom_err(function,i,name_i,
-                       msg.str().c_str(),"",
+                       tmp.c_str(),"",
                        result);
       }
       return true;

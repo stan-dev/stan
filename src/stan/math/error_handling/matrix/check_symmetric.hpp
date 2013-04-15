@@ -41,9 +41,9 @@ namespace stan {
                     << name << "[" << m << "," << n << "] is %1%, but "
                     << name << "[" << n << "," << m 
                     << "] element is " << y(n,m);
-            
+            std::string msg(message.str());
             return dom_err(function,y(m,n),name,
-                           message.str().c_str(),"",
+                           msg.c_str(),"",
                            result);
           }
         }

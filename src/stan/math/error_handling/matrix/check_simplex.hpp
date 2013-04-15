@@ -43,8 +43,9 @@ namespace stan {
         msg << "in function check_simplex(%1%), ";
         msg << name << " is not a valid simplex.";
         msg << " The sum of the elements should be 1, but is " << sum;
+        std::string tmp(msg.str());
         return dom_err(function,sum,name,
-                       msg.str().c_str(),"",
+                       tmp.c_str(),"",
                        result);
       }
       for (size_t n = 0; n < theta.size(); n++) {
@@ -53,8 +54,9 @@ namespace stan {
           stream << name << " is not a valid simplex."
                  << " The element at " << n 
                  << " is %1%, but should be greater than or equal to 0";
+          std::string tmp(stream.str());
           return dom_err(function,theta[n],name,
-                         stream.str().c_str(),"",
+                         tmp.c_str(),"",
                          result);
         }
       }

@@ -35,8 +35,9 @@ namespace stan {
         std::ostringstream stream;
         stream << name << " is not a valid positive_ordered vector."
                << " The element at 0 is %1%, but should be postive.";
+        std::string msg(stream.str());
         return dom_err(function,y[0],name,
-                       stream.str().c_str(),"",
+                       msg.c_str(),"",
                        result);
       }
       for (size_t n = 1; n < y.size(); n++) {
@@ -46,8 +47,9 @@ namespace stan {
                  << " The element at " << n 
                  << " is %1%, but should be greater than the previous element, "
                  << y[n-1];
+          std::string msg(stream.str());
           return dom_err(function,y[n],name,
-                         stream.str().c_str(),"",
+                         msg.c_str(),"",
                          result);
         }
       }

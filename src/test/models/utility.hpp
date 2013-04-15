@@ -75,7 +75,8 @@ std::string run_command(std::string command) {
     err_msg << "err code: " << err << std::endl;
     err_msg << "Output message: \n";
     err_msg << output;
-    throw std::runtime_error(err_msg.str().c_str());
+    std::string msg(err_msg.str());
+    throw std::runtime_error(msg.c_str());
   }
 
   return output;
