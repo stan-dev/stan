@@ -76,6 +76,8 @@ Cleanup
     + matrix/check_corr_matrix
     + matrix/check_ordered
     + matrix/check_pos_definite
+  - Move src/stan/math/matrix/check_range.hpp to 
+    src/stan/math/error_handling/matrix/
 
 Doc
 ---
