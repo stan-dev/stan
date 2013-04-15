@@ -2,8 +2,8 @@
 #define __STAN__MATH__ERROR_HANDLING__MATRIX__CHECK_SIMPLEX_HPP__
 
 #include <sstream>
+#include <stan/math/error_handling/dom_err.hpp>
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/error_handling/raise_domain_error.hpp>
 #include <stan/math/error_handling/matrix/constraint_tolerance.hpp>
 
 namespace stan {
@@ -33,12 +33,9 @@ namespace stan {
       if (theta.size() == 0) {
         std::string message(name);
         message += " is not a valid simplex. %1% elements in the vector.";
-        T_result tmp = raise_domain_error<size_t, size_t>(function, 
-                                                          message.c_str(), 
-                                                          0);
-        if (result != 0)
-          *result = tmp;
-        return false;
+        return dom_err(function,0,name,
+                       message.c_str(),"",
+                       result);
       }
       if (fabs(1.0 - theta.sum()) > CONSTRAINT_TOLERANCE) {
         std::stringstream msg;
@@ -46,12 +43,9 @@ namespace stan {
         msg << "in function check_simplex(%1%), ";
         msg << name << " is not a valid simplex.";
         msg << " The sum of the elements should be 1, but is " << sum;
-        T_result tmp = raise_domain_error<T_result,T_prob>(function, 
-                                                           msg.str().c_str(), 
-                                                           sum);
-        if (result != 0)
-          *result = tmp;
-        return false;
+        return dom_err(function,sum,name,
+                       msg.str().c_str(),"",
+                       result);
       }
       for (size_t n = 0; n < theta.size(); n++) {
         if (!(theta[n] >= 0)) {
@@ -59,13 +53,9 @@ namespace stan {
           stream << name << " is not a valid simplex."
                  << " The element at " << n 
                  << " is %1%, but should be greater than or equal to 0";
-          T_result tmp 
-            = raise_domain_error<T_result,T_prob>(function, 
-                                                  stream.str().c_str(), 
-                                                  theta[n]);
-          if (result != 0)
-            *result = tmp;
-          return false;
+          return dom_err(function,theta[n],name,
+                         stream.str().c_str(),"",
+                         result);
         }
       }
       return true;
