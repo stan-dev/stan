@@ -2,6 +2,8 @@
 #define __STAN__MATH__FUNCTIONS__DIST_HPP__
 
 #include <vector>
+#include <cstddef>
+#include <cmath>
 
 namespace stan {
   namespace math {
