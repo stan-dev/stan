@@ -52,16 +52,6 @@ public:
     return stan::prob::bernoulli_cdf(n, theta);
   }
 
-  template <typename T_n, typename T_prob, typename T2,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9,
-      typename Policy>
-  typename stan::return_type<T_prob>::type
-  cdf(const T_n& n, const T_prob& theta, const T2&,
-      const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
-    return stan::prob::bernoulli_cdf(n, theta, Policy());
-  }
 
   template <typename T_n, typename T_prob, typename T2,
       typename T3, typename T4, typename T5, 

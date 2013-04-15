@@ -93,18 +93,6 @@ public:
     return stan::prob::trunc_normal_log<propto>(y, mu, sigma, alpha, beta);
   }
   
-  template <bool propto, 
-      typename T_y, typename T_loc, typename T_scale,
-      typename T_alpha, typename T_beta, 
-      typename T5, typename T6, typename T7, 
-      typename T8, typename T9, 
-      class Policy>
-  typename stan::return_type<T_y,T_loc,T_scale,T_alpha,T_beta>::type 
-  log_prob(const T_y& y, const T_loc& mu, const T_scale& sigma,
-     const T_alpha& alpha, const T_beta& beta, 
-     const T5&, const T6&, const T7&, const T8&, const T9&) {
-    return stan::prob::trunc_normal_log<propto>(y, mu, sigma, alpha, beta, Policy());
-  }
   
   template <typename T_y, typename T_loc, typename T_scale,
       typename T_alpha, typename T_beta, 

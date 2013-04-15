@@ -60,17 +60,6 @@ public:
     return stan::prob::uniform_log<propto>(y, alpha, beta);
   }
   
-  template <bool propto, 
-      class T_y, class T_low, class T_high,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9, 
-      class Policy>
-  typename stan::return_type<T_y, T_low, T_high>::type 
-  log_prob(const T_y& y, const T_low& alpha, const T_high& beta,
-     const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
-    return stan::prob::uniform_log<propto>(y, alpha, beta, Policy());
-  }
   
   template <class T_y, class T_low, class T_high,
       typename T3, typename T4, typename T5, 

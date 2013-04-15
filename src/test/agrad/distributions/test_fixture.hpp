@@ -37,7 +37,7 @@ public:
     throw std::runtime_error("invalid_values() not implemented");
   }
 
-  // also include 4 templated functions:
+  // also include 3 templated functions:
   /*
     template <typename T_y, typename T_loc, typename T_scale,
     typename T3, typename T4, typename T5, 
@@ -59,19 +59,7 @@ public:
     const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
     return stan::prob::normal_log<propto>(y, mu, sigma);
     }
-  
-    template <bool propto, 
-    typename T_y, typename T_loc, typename T_scale,
-    typename T3, typename T4, typename T5, 
-    typename T6, typename T7, typename T8, 
-    typename T9, 
-    class Policy>
-    typename stan::return_type<T_y, T_loc, T_scale>::type 
-    log_prob(const T_y& y, const T_loc& mu, const T_scale& sigma,
-    const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
-    return stan::prob::normal_log<propto>(y, mu, sigma, Policy());
-    }
-  
+    
     template <typename T_y, typename T_loc, typename T_scale,
     typename T3, typename T4, typename T5, 
     typename T6, typename T7, typename T8, 
@@ -123,7 +111,7 @@ public:
     return std::numeric_limits<double>::infinity();
   }
 
-  // also include 3 templated functions:
+  // also include 2 templated functions:
   /*
     template <typename T_y, typename T_loc, typename T_scale,
     typename T3, typename T4, typename T5, 
@@ -133,17 +121,6 @@ public:
     cdf(const T_y& y, const T_loc& mu, const T_scale& sigma,
     const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
     return stan::prob::normal_cdf(y, mu, sigma);
-    }
-
-    template <typename T_y, typename T_loc, typename T_scale,
-    typename T3, typename T4, typename T5, 
-    typename T6, typename T7, typename T8, 
-    typename T9,
-    Policy>
-    typename stan::return_type<T_y, T_loc, T_scale>::type 
-    cdf(const T_y& y, const T_loc& mu, const T_scale& sigma,
-    const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
-    return stan::prob::normal_cdf(y, mu, sigma, Policy());
     }
 
     template <typename T_y, typename T_loc, typename T_scale,
@@ -216,16 +193,6 @@ public:
             <false, T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>
             (p0, p1, p2, p3, p4, p5, p6, p7, p8, p9); }))
       << "Calling log_prob throws exception with propto=false";
-    
-    EXPECT_NO_THROW(({ TestClass.template log_prob
-            <true, T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, errno_policy>
-            (p0, p1, p2, p3, p4, p5, p6, p7, p8, p9); }))
-      << "Calling log_prob throws exception with propto=true, errno_policy";
-
-    EXPECT_NO_THROW(({ TestClass.template log_prob
-            <false, T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, errno_policy>
-            (p0, p1, p2, p3, p4, p5, p6, p7, p8, p9); }))
-      << "Calling log_prob throws exception with propto=false, errno_policy";
   }
 
   void test_valid_values() {
@@ -295,16 +262,7 @@ public:
             <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9>
             (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9); }),
       std::domain_error) 
-      << "NaN value at index " << n << " did not fail with the default policy" << std::endl
-      << invalid_params;
-      
-    EXPECT_NO_THROW(({ lp = TestClass.template log_prob
-            <true,Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9,errno_policy>
-            (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9); }))
-      << "NaN value at index " << n << " with the errno_policy throws exception when it should not" << std::endl
-      << invalid_params;
-    EXPECT_TRUE(std::isnan(lp.val())) 
-      << "NaN value at index " << n << " with the errno_policy should return NaN. Returns " << lp << std::endl
+      << "NaN value at index " << n << " should have failed" << std::endl
       << invalid_params;
   }
   
@@ -338,16 +296,7 @@ public:
               <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9>
               (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9); }),
         std::domain_error) 
-        << "Invalid value " << n << " did not fail with the default policy" << std::endl
-        << invalid_params;
-      
-      EXPECT_NO_THROW(({ lp = TestClass.template log_prob
-              <true,Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9,errno_policy>
-              (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9); }))
-        << "Invalid value " << n << " with the errno_policy throws exception when it should not" << std::endl
-        << invalid_params;
-      EXPECT_TRUE(std::isnan(lp.val())) 
-        << "Invalid value " << n << " with the errno_policy should return NaN. Returns " << lp << std::endl
+        << "Invalid value " << n << " should have failed" << std::endl
         << invalid_params;
     }
     if (std::numeric_limits<Scalar0>::has_quiet_NaN && parameters.size() > 0) 
@@ -836,11 +785,6 @@ public:
             <T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>
             (p0, p1, p2, p3, p4, p5, p6, p7, p8, p9); }))
       << "Calling cdf throws exception with default parameters";
-
-    EXPECT_NO_THROW(({ TestClass.template cdf
-            <T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, errno_policy>
-            (p0, p1, p2, p3, p4, p5, p6, p7, p8, p9); }))
-      << "Calling cdf throws exception with errno_policy";
   }
 
   void test_valid_values() {
@@ -900,16 +844,7 @@ public:
             <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9>
             (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9); }),
       std::domain_error) 
-      << "NaN value at index " << n << " did not fail with the default policy" << std::endl
-      << invalid_params;
-      
-    EXPECT_NO_THROW(({ cdf = TestClass.template cdf
-            <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9,errno_policy>
-            (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9); }))
-      << "NaN value at index " << n << " with the errno_policy throws exception when it should not" << std::endl
-      << invalid_params;
-    EXPECT_TRUE(std::isnan(cdf.val())) 
-      << "NaN value at index " << n << " with the errno_policy should return NaN. Returns " << cdf << std::endl
+      << "NaN value at index " << n << " should have failed" << std::endl
       << invalid_params;
   }
 
@@ -940,17 +875,8 @@ public:
               <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9>
               (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9); }),
         std::domain_error) 
-        << "Invalid value " << n << " did not fail with the default policy" << std::endl
-        << invalid_params;
-      
-      EXPECT_NO_THROW(({ cdf = TestClass.template cdf
-              <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9,errno_policy>
-              (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9); }))
-        << "Invalid value " << n << " with the errno_policy throws exception when it should not" << std::endl
-        << invalid_params;
-      EXPECT_TRUE(std::isnan(cdf.val())) 
-        << "Invalid value " << n << " with the errno_policy should return NaN. Returns " << cdf << std::endl
-        << invalid_params;
+        << "Invalid value " << n << " should have failed" << std::endl
+        << invalid_params;      
     }
     if (std::numeric_limits<Scalar0>::has_quiet_NaN && parameters.size() > 0) 
       test_nan_value(parameters, 0);

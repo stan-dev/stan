@@ -1,7 +1,6 @@
 #ifndef __TEST__AGRAD__DISTRIBUTIONS__UTILITY_HPP__
 #define __TEST__AGRAD__DISTRIBUTIONS__UTILITY_HPP__
 
-#include <boost/math/policies/policy.hpp>
 #include <vector>
 #include <stan/agrad/matrix.hpp>
 
@@ -26,14 +25,6 @@ template <>
 struct is_empty<empty> {
   enum { value = true };
 };
-
-//------------------------------------------------------------
-
-typedef stan::math::default_policy default_policy;
-
-typedef boost::math::policies::policy<
-  boost::math::policies::domain_error<boost::math::policies::errno_on_error>
-  > errno_policy;
 
 //------------------------------------------------------------
 
