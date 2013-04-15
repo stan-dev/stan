@@ -2,8 +2,8 @@
 #define __STAN__MATH__ERROR_HANDLING__MATRIX__CHECK_POSITIVE_ORDERED_HPP__
 
 #include <sstream>
+#include <stan/math/error_handling/dom_err.hpp>
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/error_handling/raise_domain_error.hpp>
 
 namespace stan {
   namespace math {
@@ -35,12 +35,9 @@ namespace stan {
         std::ostringstream stream;
         stream << name << " is not a valid positive_ordered vector."
                << " The element at 0 is %1%, but should be postive.";
-        T_result tmp = raise_domain_error<T_result,T_y>(function, 
-                                                        stream.str().c_str(), 
-                                                        y[0]);
-        if (result != 0)
-          *result = tmp;
-        return false;
+        return dom_err(function,y[0],name,
+                       stream.str().c_str(),"",
+                       result);
       }
       for (size_t n = 1; n < y.size(); n++) {
         if (!(y[n] > y[n-1])) {
@@ -49,12 +46,9 @@ namespace stan {
                  << " The element at " << n 
                  << " is %1%, but should be greater than the previous element, "
                  << y[n-1];
-          T_result tmp = raise_domain_error<T_result,T_y>(function, 
-                                                          stream.str().c_str(), 
-                                                          y[n]);
-          if (result != 0)
-            *result = tmp;
-          return false;
+          return dom_err(function,y[n],name,
+                         stream.str().c_str(),"",
+                         result);
         }
       }
       return true;
