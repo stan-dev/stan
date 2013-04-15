@@ -89,8 +89,8 @@ namespace stan {
       }
 
       if (!check_size_match(function, 
-                            y.rows(), "Size of random variable",
-                            w.size(), "Size of location parameter",
+                            y.rows(), "Size of random variable (rows y)",
+                            w.size(), "Size of kernel scales (w)",
                             &lp))
         return lp;
       if (!check_size_match(function, 
