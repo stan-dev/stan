@@ -41,12 +41,10 @@ namespace stan {
      * @tparam T_prior_sample_size Type of prior sample sizes.
      */
     template <bool propto,
-              typename T_prob, typename T_prior_sample_size, 
-              class Policy>
+              typename T_prob, typename T_prior_sample_size>
     typename boost::math::tools::promote_args<T_prob,T_prior_sample_size>::type
     dirichlet_log(const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta,
-              const Eigen::Matrix<T_prior_sample_size,Eigen::Dynamic,1>& alpha,
-              const Policy&) {
+              const Eigen::Matrix<T_prior_sample_size,Eigen::Dynamic,1>& alpha) {
       // FIXME: parameter check
       using boost::math::lgamma;
       using boost::math::tools::promote_args;
@@ -64,32 +62,12 @@ namespace stan {
       return lp;
     }
 
-    template <bool propto,
-              typename T_prob, typename T_prior_sample_size>
-    inline
-    typename boost::math::tools::promote_args<T_prob,T_prior_sample_size>::type
-    dirichlet_log(const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta,
-          const Eigen::Matrix<T_prior_sample_size,Eigen::Dynamic,1>& alpha) {
-      return dirichlet_log<propto>(theta,alpha,stan::math::default_policy());
-    }
-
-
-    template <typename T_prob, typename T_prior_sample_size, 
-              class Policy>
-    inline
-    typename boost::math::tools::promote_args<T_prob,T_prior_sample_size>::type
-    dirichlet_log(const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta,
-              const Eigen::Matrix<T_prior_sample_size,Eigen::Dynamic,1>& alpha,
-              const Policy&) {
-      return dirichlet_log<false>(theta,alpha,Policy());
-    }
-
     template <typename T_prob, typename T_prior_sample_size>
     inline
     typename boost::math::tools::promote_args<T_prob,T_prior_sample_size>::type
     dirichlet_log(const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta,
             const Eigen::Matrix<T_prior_sample_size,Eigen::Dynamic,1>& alpha) {
-      return dirichlet_log<false>(theta,alpha,stan::math::default_policy());
+      return dirichlet_log<false>(theta,alpha);
     }
 
     template <class RNG>

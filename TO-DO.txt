@@ -78,6 +78,8 @@ Cleanup
     + matrix/check_pos_definite
   - Move src/stan/math/matrix/check_range.hpp to 
     src/stan/math/error_handling/matrix/
+  - Change error handling in:
+    + prob/distributions/multivariate/continuous/wishart.hpp
 
 Doc
 ---
