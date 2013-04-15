@@ -177,6 +177,7 @@ namespace stan {
         Scalar _f0, _f1, _alpha;
         size_t _itNum;
         HessianT _B;
+        Eigen::LDLT< HessianT > _ldlt;
         VectorT _gradx0, _gradx1, _x1, _x0;
         VectorT _s;
         
@@ -184,6 +185,8 @@ namespace stan {
         const Scalar &curr_f() const { return _f0; }
         const VectorT &curr_x() const { return _x0; }
         const VectorT &curr_g() const { return _gradx0; }
+        
+        const HessianT &curr_H() const { return _B; }
 
         const Scalar &prev_f() const { return _f1; }
         const VectorT &prev_x() const { return _x1; }
@@ -221,36 +224,36 @@ namespace stan {
           _x0 = x0;
           _func(_x0,_f0,_gradx0);
           
-          _B.setIdentity(x0.size(),x0.size());
-          _B *= (1.0/_opts.alpha0);
-          
           _itNum = 0;
         }
         
         int step() {
-          Eigen::LDLT< HessianT > ldlt(_B);
           Scalar gradNorm, thetak, skyk, skBksk;
           VectorT sk, yk, Bksk, rk;
           int retCode;
+          bool resetB(false);
           
           _itNum++;
           
-          if (ldlt.info() != Eigen::Success || ldlt.isNegative()) {
-            Scalar maxCoeff(_B.diagonal().maxCoeff());
+          if (_itNum == 1 || _ldlt.info() != Eigen::Success || _ldlt.isNegative()) {
+            Scalar Bscale;
+            resetB = true;
+            if (_itNum == 1) {
+              Bscale = 1.0/_opts.alpha0;
+            }
+            else {
+              Bscale = _B.diagonal().maxCoeff();
+            }
             _B.setIdentity(_x0.size(),_x0.size());
-            _B *= maxCoeff;
-            _s = -_gradx0/maxCoeff;
+            _B *= Bscale;
+            _ldlt.compute(_B);
+            _s = -_gradx0/Bscale;
           }
           else {
-            _s = -ldlt.solve(_gradx0);
+            _s = -_ldlt.solve(_gradx0);
           }
           
-          if (_itNum > 1) {
-            _alpha = std::min(1.0, 1.01*2*(_f0 - _f1)/_gradx0.dot(_s));
-          }
-          else {
-            _alpha = 1.0;
-          }
+          _alpha = 1.0;
           if (LineSearchMethod == 0) {
             retCode = BTLineSearch(_func, _alpha, _x1, _f1, _gradx1,
                                    _s, _x0, _f0, _gradx0, _opts.rho, 
@@ -272,7 +275,8 @@ namespace stan {
           _gradx0.swap(_gradx1);
           
           gradNorm = _gradx0.squaredNorm();
-          if ((_x1 - _x0).array().abs().maxCoeff() <= _opts.minStep) {
+          sk.noalias() = _x0 - _x1;
+          if (sk.array().abs().maxCoeff() <= _opts.minStep) {
             if (gradNorm <= _opts.minGradNorm) {
               retCode = 1;
             }
@@ -284,10 +288,17 @@ namespace stan {
             retCode = 0;
           }
           
-          sk.noalias() = _x0 - _x1;
           yk.noalias() = _gradx0 - _gradx1;
-          Bksk.noalias() = _B*sk;
           skyk = yk.dot(sk);
+          if (resetB) {
+            Scalar B0fact = yk.squaredNorm()/skyk;
+            _B.setIdentity(_x0.size(),_x0.size());
+            _B *= B0fact;
+            Bksk.noalias() = B0fact*sk;
+          }
+          else {
+            Bksk.noalias() = _B*sk;
+          }
           skBksk = sk.dot(Bksk);
           if (skyk >= 0.2*skBksk) {
             // Full update
@@ -300,6 +311,8 @@ namespace stan {
             rk = thetak*yk + (1.0 - thetak)*Bksk;
           }
           _B.noalias() += rk*rk.transpose()/sk.dot(rk) - Bksk*Bksk.transpose()/skBksk;
+          _ldlt.rankUpdate(rk,1.0/sk.dot(rk));
+          _ldlt.rankUpdate(Bksk,-1.0/skBksk);
           
           return retCode;
         }
@@ -392,6 +405,7 @@ namespace stan {
         _bfgsOpt.initialize(x);
       }
 
+      double step_size() { return _bfgsOpt.step_size(); }
       double logp() { return -_bfgsOpt.curr_f(); }
       void grad(std::vector<double>& g) { 
         const BFGSMinimizer<ModelAdaptor>::VectorT &cg(_bfgsOpt.curr_g());

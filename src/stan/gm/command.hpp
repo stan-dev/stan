@@ -740,7 +740,7 @@ namespace stan {
             std::cout << std::setw(3) << (m + 1) << ". ";
             std::cout << "Log joint probability = " << std::setw(10) << lp;
             std::cout << ". Improved by " << (lp - lastlp) << ". ";
-            std::cout << "Return code " << ret << ".";
+            std::cout << "Step size " << ng.step_size() << ".";
             std::cout << std::endl;
             std::cout.flush();
           }
