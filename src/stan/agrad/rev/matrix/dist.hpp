@@ -25,7 +25,7 @@ namespace stan {
                                               const Eigen::Matrix<var,R2,C2> &v2) {
           double result = 0;
           for (size_t i = 0; i < v1.size(); i++) {
-            double diff = v1[i].vi_->val_ - v2[i].vi_->val_;
+            double diff = v1(i).vi_->val_ - v2(i).vi_->val_;
             result += diff*diff;
           }
           return result;
@@ -38,11 +38,11 @@ namespace stan {
         {
           v1_ = (vari**)memalloc_.alloc(length_*sizeof(vari*));
           for (size_t i = 0; i < length_; i++)
-            v1_[i] = v1[i].vi_;
+            v1_[i] = v1(i).vi_;
 
           v2_ = (vari**)memalloc_.alloc(length_*sizeof(vari*));
           for (size_t i = 0; i < length_; i++)
-            v2_[i] = v2[i].vi_;
+            v2_[i] = v2(i).vi_;
         }
         virtual void chain() {
           for (size_t i = 0; i < length_; i++) {
@@ -63,7 +63,7 @@ namespace stan {
                                               const Eigen::Matrix<double,R2,C2> &v2) {
           double result = 0;
           for (size_t i = 0; i < v1.size(); i++) {
-            double diff = v1[i].vi_->val_ - v2[i];
+            double diff = v1(i).vi_->val_ - v2(i);
             result += diff*diff;
           }
           return result;
@@ -76,11 +76,11 @@ namespace stan {
         {
           v1_ = (vari**)memalloc_.alloc(length_*sizeof(vari*));
           for (size_t i = 0; i < length_; i++)
-            v1_[i] = v1[i].vi_;
+            v1_[i] = v1(i).vi_;
           
           v2_ = (double*)memalloc_.alloc(length_*sizeof(double));
           for (size_t i = 0; i < length_; i++)
-            v2_[i] = v2[i];
+            v2_[i] = v2(i);
         }
         virtual void chain() {
           for (size_t i = 0; i < length_; i++) {
