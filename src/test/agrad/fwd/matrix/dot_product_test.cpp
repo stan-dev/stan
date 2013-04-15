@@ -273,26 +273,26 @@ TEST(AgradFwdMatrix, columns_dot_product_vector_vector_exception) {
 //   EXPECT_THROW(columns_dot_product(v1,v2), std::domain_error);
 // } NEED TO ADD ANOTHER THING THAT CHECKS THAT BOTH HAVE SAME ROW LENGTH.. (can't have row vec and vec or vec and rowvec
 
-TEST(AgradFwdMatrix, columns_dot_product_rowvector_rowvector) {
-  using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fv;
+// TEST(AgradFwdMatrix, columns_dot_product_rowvector_rowvector) {
+//   using stan::math::row_vector_d;
+//   using stan::agrad::row_vector_fv;
 
-  row_vector_d d1(3), d2(3);
-  row_vector_fv v1(3), v2(3);
+//   row_vector_d d1(3), d2(3);
+//   row_vector_fv v1(3), v2(3);
   
-  d1 << 1, 3, -5;
-  v1 << 1, 3, -5;
-   v1(0).d_ = 1.0;
-   v1(1).d_ = 1.0;
-   v1(2).d_ = 1.0;
-  d2 << 4, -2, -1;
-  v2 << 4, -2, -1;
-   v2(0).d_ = 1.0;
-   v2(1).d_ = 1.0;
-   v2(2).d_ = 1.0;
+//   d1 << 1, 3, -5;
+//   v1 << 1, 3, -5;
+//    v1(0).d_ = 1.0;
+//    v1(1).d_ = 1.0;
+//    v1(2).d_ = 1.0;
+//   d2 << 4, -2, -1;
+//   v2 << 4, -2, -1;
+//    v2(0).d_ = 1.0;
+//    v2(1).d_ = 1.0;
+//    v2(2).d_ = 1.0;
 
-  row_vector_fv output;
-  output = columns_dot_product(v1,d2);
+//   row_vector_fv output;
+//   output = columns_dot_product(v1,d2);
 
-  EXPECT_FLOAT_EQ( 3, output(0).val_);
-}
+//   EXPECT_FLOAT_EQ( 3, output(0).val_);
+// }
