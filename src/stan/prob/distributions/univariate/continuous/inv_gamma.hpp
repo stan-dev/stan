@@ -33,11 +33,9 @@ namespace stan {
      * @tparam T_scale Type of scale.
      */
     template <bool propto,
-              typename T_y, typename T_shape, typename T_scale, 
-              class Policy>
+              typename T_y, typename T_shape, typename T_scale>
     typename return_type<T_y,T_shape,T_scale>::type
-    inv_gamma_log(const T_y& y, const T_shape& alpha, const T_scale& beta, 
-                  const Policy&) {
+    inv_gamma_log(const T_y& y, const T_shape& alpha, const T_scale& beta) {
       static const char* function = "stan::prob::inv_gamma_log(%1%)";
 
       using stan::is_constant_struct;
@@ -57,25 +55,25 @@ namespace stan {
       // set up return value accumulator
       double logp(0.0);
 
-      if (!check_not_nan(function, y, "Random variable", &logp, Policy()))
+      if (!check_not_nan(function, y, "Random variable", &logp))
         return logp;
       if (!check_finite(function, alpha, "Shape parameter", 
-                        &logp, Policy())) 
+                        &logp)) 
         return logp;
       if (!check_positive(function, alpha, "Shape parameter",
-                          &logp, Policy())) 
+                          &logp)) 
         return logp;
       if (!check_finite(function, beta, "Scale parameter",
-                        &logp, Policy())) 
+                        &logp)) 
         return logp;
       if (!check_positive(function, beta, "Scale parameter", 
-                          &logp, Policy())) 
+                          &logp)) 
         return logp;
       if (!(check_consistent_sizes(function,
                                    y,alpha,beta,
                                    "Random variable","Shape parameter",
                                    "Scale parameter",
-                                   &logp, Policy())))
+                                   &logp)))
         return logp;
 
       // check if no variables are involved and prop-to
@@ -162,28 +160,11 @@ namespace stan {
       return operands_and_partials.to_var(logp);
     }
 
-    template <bool propto,
-              typename T_y, typename T_shape, typename T_scale>
-    inline
-    typename return_type<T_y,T_shape,T_scale>::type
-    inv_gamma_log(const T_y& y, const T_shape& alpha, const T_scale& beta) {
-      return inv_gamma_log<propto>(y,alpha,beta,stan::math::default_policy());
-    }
-
-    template <typename T_y, typename T_shape, typename T_scale, 
-              class Policy>
-    inline
-    typename return_type<T_y,T_shape,T_scale>::type
-    inv_gamma_log(const T_y& y, const T_shape& alpha, const T_scale& beta, 
-                  const Policy&) {
-      return inv_gamma_log<false>(y,alpha,beta,Policy());
-    }
-
     template <typename T_y, typename T_shape, typename T_scale>
     inline
     typename return_type<T_y,T_shape,T_scale>::type
     inv_gamma_log(const T_y& y, const T_shape& alpha, const T_scale& beta) {
-      return inv_gamma_log<false>(y,alpha,beta,stan::math::default_policy());
+      return inv_gamma_log<false>(y,alpha,beta);
     }
 
     /**
@@ -202,10 +183,9 @@ namespace stan {
      * @tparam T_scale Type of scale.
      */
       
-    template <typename T_y, typename T_shape, typename T_scale, class Policy>
+    template <typename T_y, typename T_shape, typename T_scale>
     typename return_type<T_y,T_shape,T_scale>::type
-    inv_gamma_cdf(const T_y& y, const T_shape& alpha, const T_scale& beta, 
-                  const Policy&) { 
+    inv_gamma_cdf(const T_y& y, const T_shape& alpha, const T_scale& beta) { 
           
       // Size checks
       if (!(stan::length(y) && stan::length(alpha) && stan::length(beta))) 
@@ -227,28 +207,28 @@ namespace stan {
           
       double P(1.0);
           
-      if (!check_finite(function, alpha, "Shape parameter", &P, Policy())) 
+      if (!check_finite(function, alpha, "Shape parameter", &P)) 
         return P;
           
-      if (!check_positive(function, alpha, "Shape parameter", &P, Policy())) 
+      if (!check_positive(function, alpha, "Shape parameter", &P)) 
         return P;
           
-      if (!check_finite(function, beta, "Scale parameter", &P, Policy())) 
+      if (!check_finite(function, beta, "Scale parameter", &P)) 
         return P;
           
-      if (!check_positive(function, beta, "Scale parameter", &P, Policy())) 
+      if (!check_positive(function, beta, "Scale parameter", &P)) 
         return P;
           
-      if (!check_not_nan(function, y, "Random variable", &P, Policy()))
+      if (!check_not_nan(function, y, "Random variable", &P))
         return P;
           
-      if (!check_nonnegative(function, y, "Random variable", &P, Policy())) 
+      if (!check_nonnegative(function, y, "Random variable", &P)) 
         return P;
           
       if (!(check_consistent_sizes(function, y, alpha, beta,
                                    "Random variable", "Shape parameter", 
                                    "Scale Parameter",
-                                   &P, Policy())))
+                                   &P)))
         return P;
           
       // Wrap arguments in vectors
@@ -346,12 +326,6 @@ namespace stan {
       return operands_and_partials.to_var(P);
     }
       
-    template <typename T_y, typename T_shape, typename T_scale>
-    inline typename return_type<T_y, T_shape, T_scale>::type
-    inv_gamma_cdf(const T_y& y, const T_shape& alpha, const T_scale& beta) {
-      return inv_gamma_cdf(y, alpha, beta, stan::math::default_policy());
-    }
-
     template <class RNG>
     inline double
     inv_gamma_rng(const double alpha,

@@ -36,11 +36,9 @@ namespace stan {
      * @tparam T_dof Type of degrees of freedom.
      */
     template <bool propto,
-              typename T_y, typename T_dof, 
-              class Policy>
+              typename T_y, typename T_dof>
     typename return_type<T_y,T_dof>::type
-    inv_chi_square_log(const T_y& y, const T_dof& nu, 
-                       const Policy&) {
+    inv_chi_square_log(const T_y& y, const T_dof& nu) {
       static const char* function = "stan::prob::inv_chi_square_log(%1%)";
 
       // check if any vectors are zero length
@@ -55,17 +53,17 @@ namespace stan {
       using stan::math::check_consistent_sizes;
 
       double logp(0.0);
-      if (!check_finite(function, nu, "Degrees of freedom parameter", &logp, Policy()))
+      if (!check_finite(function, nu, "Degrees of freedom parameter", &logp))
         return logp;
-      if (!check_positive(function, nu, "Degrees of freedom parameter", &logp, Policy()))
+      if (!check_positive(function, nu, "Degrees of freedom parameter", &logp))
         return logp;
-      if (!check_not_nan(function, y, "Random variable", &logp, Policy()))
+      if (!check_not_nan(function, y, "Random variable", &logp))
         return logp;
 
       if (!(check_consistent_sizes(function,
                                    y,nu,
                                    "Random variable","Degrees of freedom parameter",
-                                   &logp, Policy())))
+                                   &logp)))
         return logp;
 
        
@@ -130,34 +128,16 @@ namespace stan {
       return operands_and_partials.to_var(logp);
     }
 
-    template <bool propto,
-              typename T_y, typename T_dof>
-    inline
-    typename return_type<T_y,T_dof>::type
-    inv_chi_square_log(const T_y& y, const T_dof& nu) {
-      return inv_chi_square_log<propto>(y,nu,stan::math::default_policy());
-    }
-
-    template <typename T_y, typename T_dof, 
-              class Policy>
-    inline
-    typename return_type<T_y,T_dof>::type
-    inv_chi_square_log(const T_y& y, const T_dof& nu, 
-                       const Policy&) {
-      return inv_chi_square_log<false>(y,nu,Policy());
-    }
-      
-
     template <typename T_y, typename T_dof>
     inline
     typename return_type<T_y,T_dof>::type
     inv_chi_square_log(const T_y& y, const T_dof& nu) {
-      return inv_chi_square_log<false>(y,nu,stan::math::default_policy());
+      return inv_chi_square_log<false>(y,nu);
     }
       
-    template <typename T_y, typename T_dof, class Policy>
+    template <typename T_y, typename T_dof>
     typename return_type<T_y,T_dof>::type
-    inv_chi_square_cdf(const T_y& y, const T_dof& nu, const Policy&) {
+    inv_chi_square_cdf(const T_y& y, const T_dof& nu) {
           
       // Size checks
       if ( !( stan::length(y) && stan::length(nu) ) ) return 1.0;
@@ -176,21 +156,21 @@ namespace stan {
           
       double P(1.0);
           
-      if (!check_finite(function, nu, "Degrees of freedom parameter", &P, Policy()))
+      if (!check_finite(function, nu, "Degrees of freedom parameter", &P))
         return P;
           
-      if (!check_positive(function, nu, "Degrees of freedom parameter", &P, Policy()))
+      if (!check_positive(function, nu, "Degrees of freedom parameter", &P))
         return P;
           
-      if (!check_not_nan(function, y, "Random variable", &P, Policy()))
+      if (!check_not_nan(function, y, "Random variable", &P))
         return P;
           
-      if (!check_nonnegative(function, y, "Random variable", &P, Policy()))
+      if (!check_nonnegative(function, y, "Random variable", &P))
         return P;
           
       if (!(check_consistent_sizes(function, y, nu,
                                    "Random variable", "Degrees of freedom parameter",
-                                   &P, Policy())))
+                                   &P)))
         return P;
           
       // Wrap arguments in vectors
@@ -276,12 +256,6 @@ namespace stan {
       return operands_and_partials.to_var(P);
     }
       
-    template <typename T_y, typename T_dof>
-    inline typename return_type<T_y,T_dof>::type
-    inv_chi_square_cdf(const T_y& y, const T_dof& nu) {
-      return inv_chi_square_cdf(y, nu, stan::math::default_policy());
-    }
-
     template <class RNG>
     inline double
     inv_chi_square_rng(const double nu,

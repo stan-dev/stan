@@ -34,11 +34,9 @@ namespace stan {
      *    @li sigma must be positive.
      */
     template <bool propto,
-              typename T_y, typename T_loc, typename T_scale, 
-              class Policy>
+              typename T_y, typename T_loc, typename T_scale>
     typename return_type<T_y,T_loc,T_scale>::type
-    cauchy_log(const T_y& y, const T_loc& mu, const T_scale& sigma, 
-               const Policy&) {
+    cauchy_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
       static const char* function = "stan::prob::cauchy_log(%1%)";
 
       using stan::is_constant_struct;
@@ -58,21 +56,21 @@ namespace stan {
       double logp(0.0);
 
       // validate args (here done over var, which should be OK)
-      if (!check_not_nan(function, y, "Random variable", &logp, Policy()))
+      if (!check_not_nan(function, y, "Random variable", &logp))
         return logp;
       if (!check_finite(function, mu, "Location parameter", 
-                        &logp, Policy()))
+                        &logp))
         return logp;
       if (!check_positive(function, sigma, "Scale parameter", 
-                          &logp, Policy()))
+                          &logp))
         return logp;
       if (!check_finite(function, sigma, "Scale parameter", 
-                        &logp, Policy()))
+                        &logp))
         return logp;
       if (!(check_consistent_sizes(function,
                                    y,mu,sigma,
-           "Random variable","Location parameter","Scale parameter",
-                                   &logp, Policy())))
+                                   "Random variable","Location parameter","Scale parameter",
+                                   &logp)))
         return logp;
 
       // check if no variables are involved and prop-to
@@ -92,42 +90,42 @@ namespace stan {
       DoubleVectorView<true, is_vector<T_scale>::value> sigma_squared(length(sigma));
       DoubleVectorView<include_summand<propto,T_scale>::value,is_vector<T_scale>::value> log_sigma(length(sigma));
       for (size_t i = 0; i < length(sigma); i++) {
-  const double sigma_dbl = value_of(sigma_vec[i]);
+        const double sigma_dbl = value_of(sigma_vec[i]);
         inv_sigma[i] = 1.0 / sigma_dbl;
-  sigma_squared[i] = sigma_dbl * sigma_dbl;
-  if (include_summand<propto,T_scale>::value) {
-    log_sigma[i] = log(sigma_dbl);
-  }
+        sigma_squared[i] = sigma_dbl * sigma_dbl;
+        if (include_summand<propto,T_scale>::value) {
+          log_sigma[i] = log(sigma_dbl);
+        }
       }
 
       agrad::OperandsAndPartials<T_y, T_loc, T_scale> operands_and_partials(y, mu, sigma);
 
       for (size_t n = 0; n < N; n++) {
-  // pull out values of arguments
+        // pull out values of arguments
         const double y_dbl = value_of(y_vec[n]);
         const double mu_dbl = value_of(mu_vec[n]);
   
-  // reusable subexpression values
-  const double y_minus_mu
-    = y_dbl - mu_dbl;
-  const double y_minus_mu_squared
-    = y_minus_mu * y_minus_mu;
+        // reusable subexpression values
+        const double y_minus_mu
+          = y_dbl - mu_dbl;
+        const double y_minus_mu_squared
+          = y_minus_mu * y_minus_mu;
         const double y_minus_mu_over_sigma 
           = y_minus_mu * inv_sigma[n];
         const double y_minus_mu_over_sigma_squared 
           = y_minus_mu_over_sigma * y_minus_mu_over_sigma;
 
-  // log probability
-  if (include_summand<propto>::value)
-    logp += NEG_LOG_PI;
-  if (include_summand<propto,T_scale>::value)
-    logp -= log_sigma[n];
-  if (include_summand<propto,T_y,T_loc,T_scale>::value)
-    logp -= log1p(y_minus_mu_over_sigma_squared);
+        // log probability
+        if (include_summand<propto>::value)
+          logp += NEG_LOG_PI;
+        if (include_summand<propto,T_scale>::value)
+          logp -= log_sigma[n];
+        if (include_summand<propto,T_y,T_loc,T_scale>::value)
+          logp -= log1p(y_minus_mu_over_sigma_squared);
   
         // gradients
-  if (!is_constant_struct<T_y>::value)
-    operands_and_partials.d_x1[n] -= 2 * y_minus_mu / (sigma_squared[n] + y_minus_mu_squared);
+        if (!is_constant_struct<T_y>::value)
+          operands_and_partials.d_x1[n] -= 2 * y_minus_mu / (sigma_squared[n] + y_minus_mu_squared);
         if (!is_constant_struct<T_loc>::value)
           operands_and_partials.d_x2[n] += 2 * y_minus_mu / (sigma_squared[n] + y_minus_mu_squared);
         if (!is_constant_struct<T_scale>::value)
@@ -136,29 +134,11 @@ namespace stan {
       return operands_and_partials.to_var(logp);
     }
 
-
-    template <bool propto,
-              typename T_y, typename T_loc, typename T_scale>
-    inline
-    typename return_type<T_y,T_loc,T_scale>::type
-    cauchy_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
-      return cauchy_log<propto>(y,mu,sigma,stan::math::default_policy());
-    }
-
-    template <typename T_y, typename T_loc, typename T_scale, 
-              class Policy>
-    inline
-    typename return_type<T_y,T_loc,T_scale>::type
-    cauchy_log(const T_y& y, const T_loc& mu, const T_scale& sigma,
-               const Policy&) {
-      return cauchy_log<false>(y,mu,sigma,Policy());
-    }
-
     template <typename T_y, typename T_loc, typename T_scale>
     inline
     typename return_type<T_y,T_loc,T_scale>::type
     cauchy_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
-      return cauchy_log<false>(y,mu,sigma,stan::math::default_policy());
+      return cauchy_log<false>(y,mu,sigma);
     }
 
 
@@ -177,9 +157,9 @@ namespace stan {
      * 
      * @return 
      */
-    template <typename T_y, typename T_loc, typename T_scale, class Policy>
+    template <typename T_y, typename T_loc, typename T_scale>
     typename return_type<T_y,T_loc,T_scale>::type
-    cauchy_cdf(const T_y& y, const T_loc& mu, const T_scale& sigma, const Policy&) {
+    cauchy_cdf(const T_y& y, const T_loc& mu, const T_scale& sigma) {
         
       // Size checks
       if ( !( stan::length(y) && stan::length(mu) && stan::length(sigma) ) ) return 1.0;
@@ -195,21 +175,21 @@ namespace stan {
 
       double P(1.0);
         
-      if(!check_not_nan(function, y, "Random variable", &P, Policy()))
+      if(!check_not_nan(function, y, "Random variable", &P))
         return P;
         
-      if(!check_finite(function, mu, "Location parameter", &P, Policy()))
+      if(!check_finite(function, mu, "Location parameter", &P))
         return P;
         
-      if(!check_finite(function, sigma, "Scale parameter", &P, Policy()))
+      if(!check_finite(function, sigma, "Scale parameter", &P))
         return P;
         
-      if(!check_positive(function, sigma, "Scale parameter", &P, Policy()))
+      if(!check_positive(function, sigma, "Scale parameter", &P))
         return P;
 
       if (!(check_consistent_sizes(function, y, mu, sigma,
                                    "Random variable", "Location parameter", "Scale Parameter",
-           &P, Policy())))
+                                   &P)))
         return P;
         
       // Wrap arguments in vectors
@@ -282,12 +262,6 @@ namespace stan {
       }
         
       return operands_and_partials.to_var(P);
-    }
-
-    template <typename T_y, typename T_loc, typename T_scale>
-    typename return_type<T_y,T_loc,T_scale>::type
-    cauchy_cdf(const T_y& y, const T_loc& mu, const T_scale& sigma) {
-      return cauchy_cdf(y, mu, sigma, stan::math::default_policy());
     }
 
     template <class RNG>

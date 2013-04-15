@@ -38,11 +38,9 @@ namespace stan {
      * @tparam T_inv_scale Type of inverse scale.
      */
     template <bool propto,
-              typename T_y, typename T_shape, typename T_inv_scale, 
-              class Policy>
+              typename T_y, typename T_shape, typename T_inv_scale>
     typename return_type<T_y,T_shape,T_inv_scale>::type
-    gamma_log(const T_y& y, const T_shape& alpha, const T_inv_scale& beta, 
-              const Policy&) {
+    gamma_log(const T_y& y, const T_shape& alpha, const T_inv_scale& beta) {
       static const char* function = "stan::prob::gamma_log(%1%)";
 
       using stan::is_constant_struct;
@@ -63,24 +61,24 @@ namespace stan {
       double logp(0.0);
 
       // validate args (here done over var, which should be OK)
-      if (!check_not_nan(function, y, "Random variable", &logp, Policy()))
+      if (!check_not_nan(function, y, "Random variable", &logp))
         return logp;
       if (!check_finite(function, alpha, "Shape parameter", 
-                        &logp, Policy())) 
+                        &logp)) 
         return logp;
       if (!check_positive(function, alpha, "Shape parameter", 
-                          &logp, Policy())) 
+                          &logp)) 
         return logp;
       if (!check_finite(function, beta, "Inverse scale parameter", 
-                        &logp, Policy())) 
+                        &logp)) 
         return logp;
       if (!check_positive(function, beta, "Inverse scale parameter", 
-                          &logp, Policy())) 
+                          &logp)) 
         return logp;
       if (!(check_consistent_sizes(function,
                                    y,alpha,beta,
                                    "Random variable","Shape parameter","Inverse scale parameter",
-                                   &logp, Policy())))
+                                   &logp)))
         return logp;
 
       // check if no variables are involved and prop-to
@@ -156,28 +154,11 @@ namespace stan {
       return operands_and_partials.to_var(logp);
     }
 
-    template <bool propto,
-              typename T_y, typename T_shape, typename T_inv_scale>
-    inline
-    typename return_type<T_y,T_shape,T_inv_scale>::type
-    gamma_log(const T_y& y, const T_shape& alpha, const T_inv_scale& beta) {
-      return gamma_log<propto>(y,alpha,beta,stan::math::default_policy());
-    }
-
-    template <typename T_y, typename T_shape, typename T_inv_scale, 
-              class Policy>
-    inline
-    typename return_type<T_y,T_shape,T_inv_scale>::type
-    gamma_log(const T_y& y, const T_shape& alpha, const T_inv_scale& beta, 
-              const Policy&) {
-      return gamma_log<false>(y,alpha,beta,Policy());
-    }
-
     template <typename T_y, typename T_shape, typename T_inv_scale>
     inline
     typename return_type<T_y,T_shape,T_inv_scale>::type
     gamma_log(const T_y& y, const T_shape& alpha, const T_inv_scale& beta) {
-      return gamma_log<false>(y,alpha,beta,stan::math::default_policy());
+      return gamma_log<false>(y,alpha,beta);
     }
 
 
@@ -195,11 +176,9 @@ namespace stan {
      * @tparam T_shape Type of shape.
      * @tparam T_inv_scale Type of inverse scale.
      */    
-    /*template <typename T_y, typename T_shape, typename T_inv_scale, 
-      class Policy>
+    /*template <typename T_y, typename T_shape, typename T_inv_scale>
       typename boost::math::tools::promote_args<T_y,T_shape,T_inv_scale>::type
-      gamma_cdf(const T_y& y, const T_shape& alpha, const T_inv_scale& beta, 
-      const Policy&) {
+      gamma_cdf(const T_y& y, const T_shape& alpha, const T_inv_scale& beta) {
       static const char* function = "stan::prob::gamma_cdf(%1%)";
 
       using stan::math::check_finite;
@@ -208,34 +187,25 @@ namespace stan {
       using boost::math::tools::promote_args;
 
       typename promote_args<T_y,T_shape,T_inv_scale>::type result;
-      if (!check_finite(function, y, "Random variable", &result, Policy()))
+      if (!check_finite(function, y, "Random variable", &result))
       return result;
-      if (!check_nonnegative(function, y, "Random variable", &result,
-      Policy()))
+      if (!check_nonnegative(function, y, "Random variable", &result))
       return result;
-      if (!check_finite(function, alpha, "Shape parameter", &result, 
-      Policy())) 
+      if (!check_finite(function, alpha, "Shape parameter", &result)) 
       return result;
-      if (!check_positive(function, alpha, "Shape parameter", &result, 
-      Policy())) 
+      if (!check_positive(function, alpha, "Shape parameter", &result)) 
       return result;
       if (!check_finite(function, beta, "Inverse scale parameter", 
-      &result, Policy())) 
+      &result)) 
       return result;
       if (!check_positive(function, beta, "Inverse scale parameter", 
-      &result, Policy())) 
+      &result)) 
       return result;
       
       // FIXME: implement gamma cdf
       return boost::math::gamma_p(alpha, y*beta);
       }
 
-      template <typename T_y, typename T_shape, typename T_inv_scale>
-      inline
-      typename boost::math::tools::promote_args<T_y,T_shape,T_inv_scale>::type
-      gamma_cdf(const T_y& y, const T_shape& alpha, const T_inv_scale& beta) {
-      return gamma_cdf(y,alpha,beta,stan::math::default_policy());
-      }
     */
 
     template <class RNG>

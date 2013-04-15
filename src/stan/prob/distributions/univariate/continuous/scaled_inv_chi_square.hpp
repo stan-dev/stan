@@ -37,11 +37,9 @@ namespace stan {
      * @tparam T_dof Type of degrees of freedom.
      */
     template <bool propto,
-              typename T_y, typename T_dof, typename T_scale, 
-              class Policy>
+              typename T_y, typename T_dof, typename T_scale>
     typename return_type<T_y,T_dof,T_scale>::type
-    scaled_inv_chi_square_log(const T_y& y, const T_dof& nu, const T_scale& s, 
-                              const Policy&) {
+    scaled_inv_chi_square_log(const T_y& y, const T_dof& nu, const T_scale& s) {
       static const char* function 
         = "stan::prob::scaled_inv_chi_square_log(%1%)";
       
@@ -58,24 +56,24 @@ namespace stan {
         return 0.0;
 
       double logp(0.0);
-      if (!check_not_nan(function, y, "Random variable", &logp, Policy()))
+      if (!check_not_nan(function, y, "Random variable", &logp))
         return logp;
       if (!check_finite(function, nu, "Degrees of freedom parameter",
-                        &logp, Policy()))
+                        &logp))
         return logp;
       if (!check_positive(function, nu, "Degrees of freedom parameter", 
-                          &logp, Policy()))
+                          &logp))
         return logp;
-      if (!check_finite(function, s, "Scale parameter", &logp, Policy()))
+      if (!check_finite(function, s, "Scale parameter", &logp))
         return logp;
-      if (!check_positive(function, s, "Scale parameter", &logp, Policy()))
+      if (!check_positive(function, s, "Scale parameter", &logp))
         return logp;
       if (!(check_consistent_sizes(function,
                                    y,nu,s,
                                    "Random variable",
                                    "Degrees of freedom parameter",
                                    "Scale parameter",
-                                   &logp, Policy())))
+                                   &logp)))
         return logp;
 
       // check if no variables are involved and prop-to
@@ -171,31 +169,11 @@ namespace stan {
       return operands_and_partials.to_var(logp);
     }
 
-    template <bool propto,
-              typename T_y, typename T_dof, typename T_scale>
-    inline
-    typename return_type<T_y,T_dof,T_scale>::type
-    scaled_inv_chi_square_log(const T_y& y, const T_dof& nu, 
-                              const T_scale& s) {
-      return scaled_inv_chi_square_log<propto>(y,nu,s,
-                                               stan::math::default_policy());
-    }
-
-    template <typename T_y, typename T_dof, typename T_scale, 
-              class Policy>
-    inline
-    typename return_type<T_y,T_dof,T_scale>::type
-    scaled_inv_chi_square_log(const T_y& y, const T_dof& nu, const T_scale& s, 
-                              const Policy&) {
-      return scaled_inv_chi_square_log<false>(y,nu,s,Policy());
-    }
-
     template <typename T_y, typename T_dof, typename T_scale>
     inline
     typename return_type<T_y,T_dof,T_scale>::type
     scaled_inv_chi_square_log(const T_y& y, const T_dof& nu, const T_scale& s) {
-      return scaled_inv_chi_square_log<false>(y,nu,s,
-                                              stan::math::default_policy());
+      return scaled_inv_chi_square_log<false>(y,nu,s);
     }
       
     /**
@@ -212,10 +190,9 @@ namespace stan {
      * @tparam T_dof Type of degrees of freedom.
      */
       
-    template <typename T_y, typename T_dof, typename T_scale, class Policy>
+    template <typename T_y, typename T_dof, typename T_scale>
     typename return_type<T_y, T_dof, T_scale>::type
-    scaled_inv_chi_square_cdf(const T_y& y, const T_dof& nu,
-                              const T_scale& s, const Policy&) {
+    scaled_inv_chi_square_cdf(const T_y& y, const T_dof& nu, const T_scale& s) {
       // Size checks
       if (!(stan::length(y) && stan::length(nu) && stan::length(s)))
         return 1.0;
@@ -232,31 +209,31 @@ namespace stan {
           
       double P(1.0);
           
-      if (!check_not_nan(function, y, "Random variable", &P, Policy()))
+      if (!check_not_nan(function, y, "Random variable", &P))
         return P;
           
-      if (!check_nonnegative(function, y, "Random variable", &P, Policy()))
+      if (!check_nonnegative(function, y, "Random variable", &P))
         return P;
           
       if (!check_finite(function, nu, "Degrees of freedom parameter", 
-                        &P, Policy()))
+                        &P))
         return P;
           
       if (!check_positive(function, nu, "Degrees of freedom parameter",
-                          &P, Policy()))
+                          &P))
         return P;
           
-      if (!check_finite(function, s, "Scale parameter", &P, Policy()))
+      if (!check_finite(function, s, "Scale parameter", &P))
         return P;
           
-      if (!check_positive(function, s, "Scale parameter", &P, Policy()))
+      if (!check_positive(function, s, "Scale parameter", &P))
         return P;
           
       if (!(check_consistent_sizes(function, y, nu, s,
                                    "Random variable", 
                                    "Degrees of freedom parameter",
                                    "Scale parameter",
-                                   &P, Policy())))
+                                   &P)))
         return P;
           
       // Wrap arguments in vectors
@@ -359,17 +336,8 @@ namespace stan {
           operands_and_partials.d_x3[n] *= P;
           
       return operands_and_partials.to_var(P);
-          
     }
       
-      
-    template <typename T_y, typename T_dof, typename T_scale>
-    inline typename return_type<T_y, T_dof, T_scale>::type
-    scaled_inv_chi_square_cdf(const T_y& y, const T_dof& nu,
-                              const T_scale& s) {
-      return scaled_inv_chi_square_cdf(y, nu, s, 
-                                       stan::math::default_policy());
-    }
       
     template <class RNG>
     inline double
@@ -384,6 +352,5 @@ namespace stan {
     }    
   }
 }
-
 #endif
 
