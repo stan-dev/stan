@@ -79,9 +79,9 @@ namespace stan {
         
       Eigen::LLT< Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic> > LLT_W = W.llt();
       if (LLT_W.info() != Eigen::Success) {
-        lp = stan::math::policies::raise_domain_error<T_y>(function,
-                                                           "W is not positive definite (%1%)",
-                                                           0);
+        stan::math::dom_err(function,0,"",
+                            "W is not positive definite (%1%)","",
+                            &lp);
         return lp;
       }
       Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic> L = LLT_W.matrixL();
