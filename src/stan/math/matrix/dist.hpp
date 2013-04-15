@@ -2,6 +2,8 @@
 #define __STAN__MATH__MATRIX__DIST_HPP__
 
 #include <stan/math/matrix/Eigen.hpp>
+#include <stan/meta/traits.hpp>
+#include <boost/math/tools/promotion.hpp>
 #include <stan/math/matrix/squared_dist.hpp>
 
 namespace stan {

@@ -174,24 +174,21 @@ namespace stan {
         
       protected:
         FunctorType &_func;
-        Scalar _f0, _f1, _alpha;
-        size_t _itNum;
-        HessianT _B;
+        VectorT _gk, _gk_1, _xk_1, _xk, _s;
+        Scalar _fk, _fk_1, _alpha, _alpha0;
         Eigen::LDLT< HessianT > _ldlt;
-        VectorT _gradx0, _gradx1, _x1, _x0;
-        VectorT _s;
+        size_t _itNum;
         
       public:
-        const Scalar &curr_f() const { return _f0; }
-        const VectorT &curr_x() const { return _x0; }
-        const VectorT &curr_g() const { return _gradx0; }
+        const Scalar &curr_f() const { return _fk; }
+        const VectorT &curr_x() const { return _xk; }
+        const VectorT &curr_g() const { return _gk; }
         
-        const HessianT &curr_H() const { return _B; }
+        const Scalar &prev_f() const { return _fk_1; }
+        const VectorT &prev_x() const { return _xk_1; }
+        const VectorT &prev_g() const { return _gk_1; }
 
-        const Scalar &prev_f() const { return _f1; }
-        const VectorT &prev_x() const { return _x1; }
-        const VectorT &prev_g() const { return _gradx1; }
-
+        const Scalar &init_step_size() const { return _alpha0; }
         const Scalar &step_size() const { return _alpha; }
         
         struct BFGSOptions {
@@ -221,8 +218,8 @@ namespace stan {
         BFGSMinimizer(FunctorType &f) : _func(f) { }
         
         void initialize(const VectorT &x0) {
-          _x0 = x0;
-          _func(_x0,_f0,_gradx0);
+          _xk = x0;
+          _func(_xk,_fk,_gk);
           
           _itNum = 0;
         }
@@ -235,6 +232,11 @@ namespace stan {
           
           _itNum++;
           
+          if (_itNum > 1)
+            _alpha0 = _alpha = std::min(1.0, 1.01*2*(_fk - _fk_1)/_gk_1.dot(_s));
+          else
+            _alpha0 = _alpha = 1.0;
+          
           if (_itNum == 1 || _ldlt.info() != Eigen::Success || _ldlt.isNegative()) {
             Scalar Bscale;
             resetB = true;
@@ -242,26 +244,24 @@ namespace stan {
               Bscale = 1.0/_opts.alpha0;
             }
             else {
-              Bscale = _B.diagonal().maxCoeff();
+              std::cerr << "BFGS Hessian reset" << std::endl;
+              Bscale = _ldlt.vectorD().maxCoeff();
             }
-            _B.setIdentity(_x0.size(),_x0.size());
-            _B *= Bscale;
-            _ldlt.compute(_B);
-            _s = -_gradx0/Bscale;
+            _ldlt.compute(Bscale*HessianT::Identity(_xk.size(),_xk.size()));
+            _s = -_gk/Bscale;
           }
           else {
-            _s = -_ldlt.solve(_gradx0);
+            _s = -_ldlt.solve(_gk);
           }
           
-          _alpha = 1.0;
           if (LineSearchMethod == 0) {
-            retCode = BTLineSearch(_func, _alpha, _x1, _f1, _gradx1,
-                                   _s, _x0, _f0, _gradx0, _opts.rho, 
+            retCode = BTLineSearch(_func, _alpha, _xk_1, _fk_1, _gk_1,
+                                   _s, _xk, _fk, _gk, _opts.rho, 
                                    _opts.c1, _opts.minAlpha);
           }
           else if (LineSearchMethod == 1) {
-            retCode = WolfeLineSearch(_func, _alpha, _x1, _f1, _gradx1,
-                                      _s, _x0, _f0, _gradx0,
+            retCode = WolfeLineSearch(_func, _alpha, _xk_1, _fk_1, _gk_1,
+                                      _s, _xk, _fk, _gk,
                                       _opts.c1, _opts.c2, 
                                       _opts.minAlpha, _opts.maxAlpha);
           }
@@ -270,12 +270,12 @@ namespace stan {
             retCode = 10;
             return retCode;
           }
-          std::swap(_f0,_f1);
-          _x0.swap(_x1);
-          _gradx0.swap(_gradx1);
+          std::swap(_fk,_fk_1);
+          _xk.swap(_xk_1);
+          _gk.swap(_gk_1);
           
-          gradNorm = _gradx0.squaredNorm();
-          sk.noalias() = _x0 - _x1;
+          gradNorm = _gk.squaredNorm();
+          sk.noalias() = _xk - _xk_1;
           if (sk.array().abs().maxCoeff() <= _opts.minStep) {
             if (gradNorm <= _opts.minGradNorm) {
               retCode = 1;
@@ -288,16 +288,15 @@ namespace stan {
             retCode = 0;
           }
           
-          yk.noalias() = _gradx0 - _gradx1;
+          yk.noalias() = _gk - _gk_1;
           skyk = yk.dot(sk);
           if (resetB) {
             Scalar B0fact = yk.squaredNorm()/skyk;
-            _B.setIdentity(_x0.size(),_x0.size());
-            _B *= B0fact;
+            _ldlt.compute(B0fact*HessianT::Identity(_xk.size(),_xk.size()));
             Bksk.noalias() = B0fact*sk;
           }
           else {
-            Bksk.noalias() = _B*sk;
+            Bksk = _ldlt.transpositionsP().transpose()*(_ldlt.matrixL()*(_ldlt.vectorD().asDiagonal()*(_ldlt.matrixU()*(_ldlt.transpositionsP()*sk))));
           }
           skBksk = sk.dot(Bksk);
           if (skyk >= 0.2*skBksk) {
@@ -306,11 +305,11 @@ namespace stan {
             rk = yk;
           }
           else {
-            // Damped update (Proceedure 18.2)
+            // Damped update (Procedure 18.2)
             thetak = 0.8*skBksk/(skBksk - skyk);
             rk = thetak*yk + (1.0 - thetak)*Bksk;
+            std::cerr << "BFGS Damped Hessian update" << std::endl;
           }
-          _B.noalias() += rk*rk.transpose()/sk.dot(rk) - Bksk*Bksk.transpose()/skBksk;
           _ldlt.rankUpdate(rk,1.0/sk.dot(rk));
           _ldlt.rankUpdate(Bksk,-1.0/skBksk);
           
@@ -321,7 +320,7 @@ namespace stan {
           int retcode;
           initialize(x0);
           while (!(retcode = step()));
-          x0 = _x0;
+          x0 = _xk;
           return retcode;
         }
       };
@@ -385,10 +384,9 @@ namespace stan {
       }
     };
     
-    class BFGSLineSearch {
+    class BFGSLineSearch : public BFGSMinimizer<ModelAdaptor> {
     private:
       ModelAdaptor _adaptor;
-      BFGSMinimizer<ModelAdaptor> _bfgsOpt;
       
     public:
       BFGSLineSearch(stan::model::prob_grad& model,
@@ -396,32 +394,27 @@ namespace stan {
                      const std::vector<int>& params_i,
                      std::ostream* output_stream = 0)
       : _adaptor(model,params_i,output_stream),
-        _bfgsOpt(_adaptor) {
+        BFGSMinimizer<ModelAdaptor>(_adaptor) {
 
         Eigen::Matrix<double,Eigen::Dynamic,1> x;
         x.resize(params_r.size());
         for (size_t i = 0; i < params_r.size(); i++)
           x[i] = params_r[i];
-        _bfgsOpt.initialize(x);
+        initialize(x);
       }
 
-      double step_size() { return _bfgsOpt.step_size(); }
-      double logp() { return -_bfgsOpt.curr_f(); }
+      double logp() { return -curr_f(); }
       void grad(std::vector<double>& g) { 
-        const BFGSMinimizer<ModelAdaptor>::VectorT &cg(_bfgsOpt.curr_g());
+        const BFGSMinimizer<ModelAdaptor>::VectorT &cg(curr_g());
         g.resize(cg.size());
         for (size_t i = 0; i < cg.size(); i++)
           g[i] = -cg[i];
       }
       void params_r(std::vector<double>& x) {
-        const BFGSMinimizer<ModelAdaptor>::VectorT &cx(_bfgsOpt.curr_g());
+        const BFGSMinimizer<ModelAdaptor>::VectorT &cx(curr_g());
         x.resize(cx.size());
         for (size_t i = 0; i < cx.size(); i++)
           x[i] = cx[i];
-      }
-
-      int step() {
-        return _bfgsOpt.step();
       }
     };
 
