@@ -674,14 +674,15 @@ namespace stan {
           if (save_warmup) {
             sample_stream << lp << ',';
             model.write_csv(base_rng, cont_params, disc_params, sample_stream);
+            sample_stream.flush();
           }
         }
         
         sample_stream << lp << ',';
         model.write_csv(base_rng, cont_params, disc_params, sample_stream);
-        
+        sample_stream.flush();
+
         return 0;
-        
       }
       
       if (point_estimate_bfgs) {
@@ -728,15 +729,18 @@ namespace stan {
         double lastlp = lp - 1;
         std::cout << "initial log joint probability = " << lp << std::endl;
         int m = 0;
-        for (size_t i = 0; i < num_iterations; i++) {
+        int ret = 0;
+        for (size_t i = 0; i < num_iterations && ret == 0; i++) {
+          ret = ng.step();
           lastlp = lp;
-          lp = ng.step();
+          lp = ng.logp();
           ng.params_r(params_r);
           if (do_print(i, refresh)) {
             std::cout << "Iteration ";
-            std::cout << std::setw(2) << (m + 1) << ". ";
+            std::cout << std::setw(3) << (m + 1) << ". ";
             std::cout << "Log joint probability = " << std::setw(10) << lp;
-            std::cout << ". Improved by " << (lp - lastlp) << ".";
+            std::cout << ". Improved by " << (lp - lastlp) << ". ";
+            std::cout << "Return code " << ret << ".";
             std::cout << std::endl;
             std::cout.flush();
           }
@@ -744,11 +748,13 @@ namespace stan {
           if (save_warmup) {
             sample_stream << lp << ',';
             model.write_csv(base_rng,params_r,params_i,sample_stream);
+            sample_stream.flush();
           }
         }
         
         sample_stream << lp << ',';
         model.write_csv(base_rng,params_r,params_i,sample_stream);
+        sample_stream.flush();
         
         return 0;
       }

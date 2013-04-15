@@ -2,6 +2,8 @@
 #define __STAN__OPTIMIZATION__BFGS_HPP__
 
 #include <stan/model/prob_grad.hpp>
+#include <cstdlib>
+#include <cmath>
 
 namespace stan {
   namespace optimization {
@@ -43,22 +45,35 @@ namespace stan {
                      const Scalar &min_range)
       {
         Scalar d1, d2, newDFp;
+        int itNum(0);
         
         while (1) {
-          if (fabs(alo-ahi) < min_range)
+          itNum++;
+          
+          if (std::abs(alo-ahi) < min_range)
             return 1;
           
-          // Perform cubic interpolation to determine next point to try
-          d1 = aloDFp + ahiDFp - 3*(aloF-ahiF)/(alo-ahi);
-          d2 = sqrt(d1*d1 - aloDFp*ahiDFp);
-          if (ahi < alo)
-            d2 = -d2;
-          alpha = ahi - (ahi - alo)*(ahiDFp + d2 - d1)/(ahiDFp - aloDFp + 2*d2);
-          if (alpha < std::min(alo,ahi) || alpha > std::max(alo,ahi))
+          if (itNum%5 == 0) {
             alpha = 0.5*(alo+ahi);
+          }
+          else {
+            // Perform cubic interpolation to determine next point to try
+            d1 = aloDFp + ahiDFp - 3*(aloF-ahiF)/(alo-ahi);
+            d2 = std::sqrt(d1*d1 - aloDFp*ahiDFp);
+            if (ahi < alo)
+              d2 = -d2;
+            alpha = ahi - (ahi - alo)*(ahiDFp + d2 - d1)/(ahiDFp - aloDFp + 2*d2);
+            if (alpha < std::min(alo,ahi) || alpha > std::max(alo,ahi))
+              alpha = 0.5*(alo+ahi);
+          }
           
           newX = x + alpha*p;
-          func(newX,newF,newDF);
+          while (func(newX,newF,newDF)) {
+            alpha = 0.5*(alpha+std::min(alo,ahi));
+            if (std::abs(alo-alpha) < min_range)
+              return 1;
+            newX = x + alpha*p;
+          }
           newDFp = newDF.dot(p);
           if (newF > (f + alpha*c1dfp) || newF >= aloF) {
             ahi = alpha;
@@ -66,7 +81,7 @@ namespace stan {
             ahiDFp = newDFp;
           }
           else {
-            if (fabs(newDFp) <= -c2dfp)
+            if (std::abs(newDFp) <= -c2dfp)
               break;
             if (newDFp*(ahi-alo) >= 0) {
               ahi = alo;
@@ -105,7 +120,7 @@ namespace stan {
         int retCode = 0, nits = 0, ret;
         
         while (1) {
-          x1 = x0 + alpha1*p;
+          x1.noalias() = x0 + alpha1*p;
           ret = func(x1,f1,gradx1);
           if (ret!=0) {
             alpha1 = 0.5*(alpha0+alpha1);
@@ -159,19 +174,22 @@ namespace stan {
         
       protected:
         FunctorType &_func;
-        Scalar _fx0, _fx1, _alpha;
+        Scalar _f0, _f1, _alpha;
         size_t _itNum;
         HessianT _B;
         VectorT _gradx0, _gradx1, _x1, _x0;
         VectorT _s;
         
       public:
-        const Scalar &f0() const { return _fx0; }
-        const VectorT &x0() const { return _x0; }
-        const VectorT &g0() const { return _gradx0; }
-        const Scalar &f1() const { return _fx1; }
-        const VectorT &x1() const { return _x1; }
-        const VectorT &g1() const { return _gradx1; }
+        const Scalar &curr_f() const { return _f0; }
+        const VectorT &curr_x() const { return _x0; }
+        const VectorT &curr_g() const { return _gradx0; }
+
+        const Scalar &prev_f() const { return _f1; }
+        const VectorT &prev_x() const { return _x1; }
+        const VectorT &prev_g() const { return _gradx1; }
+
+        const Scalar &step_size() const { return _alpha; }
         
         struct BFGSOptions {
           BFGSOptions() {
@@ -181,9 +199,9 @@ namespace stan {
             c2 = 0.9;
             minStep = 1e-16;
             minGradNorm = 1e-6;
-            alpha0 = 1e3;
             minAlpha = 1e-12;
             maxAlpha = 5.0;
+            alpha0 = 1e-3;
           }
           size_t maxIts;
           Scalar rho;
@@ -201,43 +219,46 @@ namespace stan {
         
         void initialize(const VectorT &x0) {
           _x0 = x0;
-          _func(_x0,_fx0,_gradx0);
+          _func(_x0,_f0,_gradx0);
           
           _B.setIdentity(x0.size(),x0.size());
-          _B *= _opts.alpha0;
+          _B *= (1.0/_opts.alpha0);
           
-          _alpha = 1;
           _itNum = 0;
         }
         
         int step() {
-          VectorT sk, yk, Bksk, rk;
+          Eigen::LDLT< HessianT > ldlt(_B);
           Scalar gradNorm, thetak, skyk, skBksk;
+          VectorT sk, yk, Bksk, rk;
           int retCode;
           
           _itNum++;
           
-          Eigen::LDLT< HessianT > ldlt(_B);
           if (ldlt.info() != Eigen::Success || ldlt.isNegative()) {
-            _B.setIdentity();
-            _B *= _opts.alpha0;
-            _s = -_gradx0/_opts.alpha0;
+            Scalar maxCoeff(_B.diagonal().maxCoeff());
+            _B.setIdentity(_x0.size(),_x0.size());
+            _B *= maxCoeff;
+            _s = -_gradx0/maxCoeff;
           }
           else {
             _s = -ldlt.solve(_gradx0);
           }
           
           if (_itNum > 1) {
-            _alpha = std::min(1.0, 1.01*2*(_fx0 - _fx1)/_gradx0.dot(_s));
+            _alpha = std::min(1.0, 1.01*2*(_f0 - _f1)/_gradx0.dot(_s));
+          }
+          else {
+            _alpha = 1.0;
           }
           if (LineSearchMethod == 0) {
-            retCode = BTLineSearch(_func, _alpha, _x1, _fx1, _gradx1,
-                                   _s, _x0, _fx0, _gradx0, _opts.rho, 
+            retCode = BTLineSearch(_func, _alpha, _x1, _f1, _gradx1,
+                                   _s, _x0, _f0, _gradx0, _opts.rho, 
                                    _opts.c1, _opts.minAlpha);
           }
           else if (LineSearchMethod == 1) {
-            retCode = WolfeLineSearch(_func, _alpha, _x1, _fx1, _gradx1,
-                                      _s, _x0, _fx0, _gradx0,
+            retCode = WolfeLineSearch(_func, _alpha, _x1, _f1, _gradx1,
+                                      _s, _x0, _f0, _gradx0,
                                       _opts.c1, _opts.c2, 
                                       _opts.minAlpha, _opts.maxAlpha);
           }
@@ -246,8 +267,8 @@ namespace stan {
             retCode = 10;
             return retCode;
           }
+          std::swap(_f0,_f1);
           _x0.swap(_x1);
-          std::swap(_fx0,_fx1);
           _gradx0.swap(_gradx1);
           
           gradNorm = _gradx0.squaredNorm();
@@ -317,7 +338,10 @@ namespace stan {
           return 1;
         }
 
-        return 0;
+        if (boost::math::isfinite(f))
+          return 0;
+        else
+          return 2;
       }
       int operator()(const Eigen::Matrix<double,Eigen::Dynamic,1> &x, double &f, Eigen::Matrix<double,Eigen::Dynamic,1> &g) {
         _x.resize(x.size());
@@ -331,10 +355,16 @@ namespace stan {
         }
 
         g.resize(_g.size());
-        for (size_t i = 0; i < _g.size(); i++)
+        for (size_t i = 0; i < _g.size(); i++) {
+          if (!boost::math::isfinite(_g[i]))
+            return 3;
           g[i] = -_g[i];
+        }
 
-        return 0;
+        if (boost::math::isfinite(f))
+          return 0;
+        else
+          return 2;
       }
       int df(const Eigen::Matrix<double,Eigen::Dynamic,1> &x, Eigen::Matrix<double,Eigen::Dynamic,1> &g) {
         double f;
@@ -362,23 +392,22 @@ namespace stan {
         _bfgsOpt.initialize(x);
       }
 
-      double logp() { return -_bfgsOpt.f0(); }
+      double logp() { return -_bfgsOpt.curr_f(); }
       void grad(std::vector<double>& g) { 
-        const BFGSMinimizer<ModelAdaptor>::VectorT &cg(_bfgsOpt.g0());
+        const BFGSMinimizer<ModelAdaptor>::VectorT &cg(_bfgsOpt.curr_g());
         g.resize(cg.size());
         for (size_t i = 0; i < cg.size(); i++)
           g[i] = -cg[i];
       }
       void params_r(std::vector<double>& x) {
-        const BFGSMinimizer<ModelAdaptor>::VectorT &cx(_bfgsOpt.g0());
+        const BFGSMinimizer<ModelAdaptor>::VectorT &cx(_bfgsOpt.curr_g());
         x.resize(cx.size());
         for (size_t i = 0; i < cx.size(); i++)
           x[i] = cx[i];
       }
 
-      double step() {
-        _bfgsOpt.step();
-        return logp();
+      int step() {
+        return _bfgsOpt.step();
       }
     };
 
