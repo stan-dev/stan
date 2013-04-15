@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 #include <stan/agrad/rev/numeric_limits.hpp>
 
-TEST(AgradRev,exp2_defaultpolicy) {
+TEST(AgradRev,exp2) {
   AVAR a = 1.3;
   AVAR f = stan::agrad::exp2(a);
   EXPECT_FLOAT_EQ(std::pow(2.0,1.3), f.val());

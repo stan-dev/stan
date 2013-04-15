@@ -2,7 +2,7 @@
 #include <test/agrad/util.hpp>
 #include <gtest/gtest.h>
 
-TEST(AgradRev,fma_vvv_defaultpolicy) {
+TEST(AgradRev,fma_vvv) {
   AVAR a = 3.0;
   AVAR b = 5.0;
   AVAR c = 7.0;
@@ -16,7 +16,7 @@ TEST(AgradRev,fma_vvv_defaultpolicy) {
   EXPECT_FLOAT_EQ(3.0,grad_f[1]);
   EXPECT_FLOAT_EQ(1.0,grad_f[2]);
 }
-TEST(AgradRev,fma_vvd_defaultpolicy) {
+TEST(AgradRev,fma_vvd) {
   AVAR a = 3.0;
   AVAR b = 5.0;
   double c = 7.0;
@@ -29,7 +29,7 @@ TEST(AgradRev,fma_vvd_defaultpolicy) {
   EXPECT_FLOAT_EQ(5.0,grad_f[0]);
   EXPECT_FLOAT_EQ(3.0,grad_f[1]);
 }  
-TEST(AgradRev,fma_vdv_defaultpolicy) {
+TEST(AgradRev,fma_vdv) {
   AVAR a = 3.0;
   double b = 5.0;
   AVAR c = 7.0;
@@ -42,7 +42,7 @@ TEST(AgradRev,fma_vdv_defaultpolicy) {
   EXPECT_FLOAT_EQ(5.0,grad_f[0]);
   EXPECT_FLOAT_EQ(1.0,grad_f[1]);
 } 
-TEST(AgradRev,fma_vdd_defaultpolicy) {
+TEST(AgradRev,fma_vdd) {
   AVAR a = 3.0;
   double b = 5.0;
   double c = 7.0;
@@ -54,7 +54,7 @@ TEST(AgradRev,fma_vdd_defaultpolicy) {
   f.grad(x,grad_f);
   EXPECT_FLOAT_EQ(5.0,grad_f[0]);
 }  
-TEST(AgradRev,fma_dvv_defaultpolicy) {
+TEST(AgradRev,fma_dvv) {
   double a = 3.0;
   AVAR b = 5.0;
   AVAR c = 7.0;
@@ -67,7 +67,7 @@ TEST(AgradRev,fma_dvv_defaultpolicy) {
   EXPECT_FLOAT_EQ(3.0,grad_f[0]);
   EXPECT_FLOAT_EQ(1.0,grad_f[1]);
 }
-TEST(AgradRev,fma_dvd_defaultpolicy) {
+TEST(AgradRev,fma_dvd) {
   double a = 3.0;
   AVAR b = 5.0;
   double c = 7.0;
@@ -79,7 +79,7 @@ TEST(AgradRev,fma_dvd_defaultpolicy) {
   f.grad(x,grad_f);
   EXPECT_FLOAT_EQ(3.0,grad_f[0]);
 }  
-TEST(AgradRev,fma_ddv_defaultpolicy) {
+TEST(AgradRev,fma_ddv) {
   double a = 3.0;
   double b = 5.0;
   AVAR c = 7.0;

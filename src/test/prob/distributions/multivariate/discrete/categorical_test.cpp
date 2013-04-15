@@ -18,20 +18,6 @@ TEST(ProbDistributionsCategorical,Propto) {
   EXPECT_FLOAT_EQ(0.0, stan::prob::categorical_log<true>(1,theta));
   EXPECT_FLOAT_EQ(0.0, stan::prob::categorical_log<true>(2,theta));
 }
-using boost::math::policies::policy;
-using boost::math::policies::evaluation_error;
-using boost::math::policies::domain_error;
-using boost::math::policies::overflow_error;
-using boost::math::policies::domain_error;
-using boost::math::policies::pole_error;
-using boost::math::policies::errno_on_error;
-
-typedef policy<
-  domain_error<errno_on_error>, 
-  pole_error<errno_on_error>,
-  overflow_error<errno_on_error>,
-  evaluation_error<errno_on_error> 
-  > errno_policy;
 
 using stan::prob::categorical_log;
 
@@ -61,42 +47,6 @@ TEST(ProbDistributionsCategorical,DefaultPolicy) {
   theta(1) = 1;
   theta(2) = 0;
   EXPECT_THROW(categorical_log(n, theta), std::domain_error);
-}
-TEST(ProbDistributionsCategorical,ErrnoPolicy) {  
-  double nan = std::numeric_limits<double>::quiet_NaN();
-  double inf = std::numeric_limits<double>::infinity();
-  
-  double result;
-  unsigned int n = 1;
-  unsigned int N = 3;
-  Matrix<double,Dynamic,1> theta(N,1);
-  theta << 0.3, 0.5, 0.2;
-
-  result = categorical_log(N, theta, errno_policy());
-  EXPECT_FALSE(std::isnan(result));
-  result = categorical_log(n, theta, errno_policy());
-  EXPECT_FALSE(std::isnan(result));
-  result = categorical_log(2, theta, errno_policy());
-  EXPECT_FALSE(std::isnan(result));
-  result = categorical_log(N+1, theta, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = categorical_log(0, theta, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
- 
-  theta(0) = nan;
-  result = categorical_log(n, theta, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  theta(0) = inf;
-  result = categorical_log(n, theta, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  theta(0) = -inf;
-  result = categorical_log(n, theta, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  theta(0) = -1;
-  theta(1) = 1;
-  theta(2) = 0;
-  result = categorical_log(n, theta, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
 }
 
 TEST(ProbDistributionCategorical, chiSquareGoodnessFitTest) {
