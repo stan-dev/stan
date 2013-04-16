@@ -416,7 +416,7 @@ namespace stan {
           g[i] = -cg[i];
       }
       void params_r(std::vector<double>& x) {
-        const BFGSMinimizer<ModelAdaptor>::VectorT &cx(curr_g());
+        const BFGSMinimizer<ModelAdaptor>::VectorT &cx(curr_x());
         x.resize(cx.size());
         for (size_t i = 0; i < cx.size(); i++)
           x[i] = cx[i];
