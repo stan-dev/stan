@@ -12,8 +12,7 @@ namespace stan{
     template <typename T1, typename T2>
     inline
     fvar<typename stan::return_type<T1,T2>::type>
-    fmax(const fvar<T1>& x1, 
-              const fvar<T2>& x2) {
+    fmax(const fvar<T1>& x1, const fvar<T2>& x2) {
       using std::max;
       using stan::math::NOT_A_NUMBER;
       if(x1.val_ > x2.val_)
@@ -30,8 +29,7 @@ namespace stan{
     template <typename T1, typename T2>
     inline
     fvar<typename stan::return_type<T1,T2>::type>
-    fmax(const T1& x1, 
-              const fvar<T2>& x2) {
+    fmax(const T1& x1, const fvar<T2>& x2) {
       using std::max;
       using stan::math::NOT_A_NUMBER;
       if(x1 > x2.val_)
@@ -48,8 +46,7 @@ namespace stan{
     template <typename T1, typename T2>
     inline
     fvar<typename stan::return_type<T1,T2>::type>
-    fmax(const fvar<T1>& x1, 
-              const T2& x2) {
+    fmax(const fvar<T1>& x1, const T2& x2) {
       using std::max;
       using stan::math::NOT_A_NUMBER;
       if(x1.val_ > x2)

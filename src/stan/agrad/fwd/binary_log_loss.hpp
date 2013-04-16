@@ -18,9 +18,10 @@ namespace stan{
       return fvar<typename 
                   stan::return_type<T1,T2>::type>(binary_log_loss(x1.val_,
                                                                   x2.val_),
-                        -x1.d_ * log(x2.val_) + x1.d_ * log(1 - x2.val_)
-                        - x2.d_ * x1.val_ / x2.val_ 
-                        + x2.d_ * (1 - x1.val_) / (1 - x2.val_));
+                                      -x1.d_ * log(x2.val_)
+                                      + x1.d_ * log(1 - x2.val_)
+                                      - x2.d_ * x1.val_ / x2.val_ 
+                                      + x2.d_ * (1 - x1.val_) / (1 - x2.val_));
     } 
 
     template <typename T1, typename T2>
@@ -32,7 +33,7 @@ namespace stan{
       return fvar<typename 
                   stan::return_type<T1,T2>::type>(binary_log_loss(x1, x2.val_),
                         - x2.d_ * x1 / x2.val_ 
-                       + x2.d_ * (1 - x1) / (1 - x2.val_));
+                        + x2.d_ * (1 - x1) / (1 - x2.val_));
     } 
 
     template <typename T1, typename T2>
@@ -43,7 +44,8 @@ namespace stan{
       using std::log;
       return fvar<typename 
                   stan::return_type<T1,T2>::type>(binary_log_loss(x1.val_, x2),
-                                       -x1.d_ * log(x2) + x1.d_ * log(1 - x2));
+                                       -x1.d_ * log(x2) 
+                                       + x1.d_ * log(1 - x2));
     } 
   }
 }

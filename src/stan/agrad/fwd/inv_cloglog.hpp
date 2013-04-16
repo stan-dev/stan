@@ -15,7 +15,7 @@ namespace stan{
     inv_cloglog(const fvar<T>& x) {
       using std::exp;
       using stan::math::inv_cloglog;
-      return fvar<T>(inv_cloglog(x.val_), x.d_ * exp(x.val_) * exp(-exp(x.val_)));
+      return fvar<T>(inv_cloglog(x.val_), x.d_ * exp(x.val_ - exp(x.val_)));
     }
   }
 }

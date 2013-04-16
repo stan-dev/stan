@@ -22,7 +22,7 @@ namespace stan{
       else 
         return fvar<typename
                     stan::return_type<T1,T2>::type>(fdim(x1.val_, x2.val_),
-                           x1.d_ * 1.0 - x2.d_ * floor(x1.val_ / x2.val_));
+                           x1.d_ - x2.d_ * floor(x1.val_ / x2.val_));
     }
 
     template <typename T1, typename T2>

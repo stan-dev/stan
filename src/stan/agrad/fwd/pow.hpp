@@ -37,8 +37,8 @@ namespace stan{
       using std::log;
       return fvar<typename 
                   stan::return_type<T1,T2>::type>( pow(x1.val_, x2.val_),
-                           (x2.d_ * log(x1.val_) + x2.val_ * x1.d_ / 
-                              x1.val_) * pow(x1.val_, x2.val_));
+                       (x2.d_ * log(x1.val_) 
+                         + x2.val_ * x1.d_ / x1.val_) * pow(x1.val_, x2.val_));
     }
   }
 }
