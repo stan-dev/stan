@@ -741,6 +741,7 @@ namespace stan {
             std::cout << "Log joint probability = " << std::setw(10) << lp;
             std::cout << ". Improved by " << (lp - lastlp) << ". ";
             std::cout << "Step size " << ng.step_size() << " (initial " << ng.init_step_size() << ").";
+            std::cout << " # grad evals = " << ng.grad_evals();
             std::cout << std::endl;
             std::cout.flush();
           }

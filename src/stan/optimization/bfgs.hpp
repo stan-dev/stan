@@ -233,11 +233,11 @@ namespace stan {
           _itNum++;
           
           if (_itNum > 1)
-            _alpha0 = _alpha = std::min(1.0, 1.01*2*(_fk - _fk_1)/_gk_1.dot(_s));
+            _alpha0 = _alpha = std::min(1.0, 1.01*(2*(_fk - _fk_1)/_gk_1.dot(_s)));
           else
             _alpha0 = _alpha = 1.0;
           
-          if (_itNum == 1 || _ldlt.info() != Eigen::Success || _ldlt.isNegative()) {
+          if (_itNum == 1 || !(_ldlt.info() == Eigen::Success && _ldlt.isPositive())) {
             Scalar Bscale;
             resetB = true;
             if (_itNum == 1) {
@@ -332,13 +332,15 @@ namespace stan {
       std::vector<int> _params_i;
       std::ostream* _output_stream;
       std::vector<double> _x, _g;
+      size_t _fevals;
 
     public:
       ModelAdaptor(stan::model::prob_grad& model,
                    const std::vector<int>& params_i,
                    std::ostream* output_stream)
-      : _model(model), _params_i(params_i), _output_stream(output_stream) {}
-                   
+      : _model(model), _params_i(params_i), _output_stream(output_stream), _fevals(0) {}
+                  
+      size_t fevals() const { return _fevals; }
       int operator()(const Eigen::Matrix<double,Eigen::Dynamic,1> &x, double &f) {
         _x.resize(x.size());
         for (size_t i = 0; i < x.size(); i++)
@@ -359,6 +361,8 @@ namespace stan {
         _x.resize(x.size());
         for (size_t i = 0; i < x.size(); i++)
           _x[i] = x[i];
+        
+        _fevals++;
 
         try {
           f = -_model.grad_log_prob(_x, _params_i, _g, _output_stream);
@@ -403,6 +407,7 @@ namespace stan {
         initialize(x);
       }
 
+      size_t grad_evals() { return _adaptor.fevals(); }
       double logp() { return -curr_f(); }
       void grad(std::vector<double>& g) { 
         const BFGSMinimizer<ModelAdaptor>::VectorT &cg(curr_g());
