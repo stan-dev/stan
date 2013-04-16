@@ -2,7 +2,6 @@
 #define __STAN__AGRAD__FWD__FVAR__HPP__
 
 #include <stan/meta/traits.hpp>
-#include <stan/agrad/fwd/numeric_limits.hpp>
 
 namespace stan{
 

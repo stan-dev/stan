@@ -3,6 +3,7 @@
 
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/agrad/fwd/fvar.hpp>
+#include <stan/agrad/fwd/numeric_limits.hpp>
 
 namespace stan {
   namespace agrad {
