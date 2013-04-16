@@ -15,7 +15,8 @@ namespace stan {
           op_v_vari(stan::math::inv_cloglog(avi->val_), avi) {
         }
         void chain() {
-          avi_->adj_ -= adj_ * std::exp(avi_->val_ - std::exp(avi_->val_));
+          avi_->adj_ += adj_ * std::exp(avi_->val_) 
+            * std::exp(-std::exp(avi_->val_));
         }
       };
     }
