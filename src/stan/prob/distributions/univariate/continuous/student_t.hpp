@@ -43,12 +43,10 @@ namespace stan {
      * @tparam T_scale Type of scale.
      */
     template <bool propto, typename T_y, typename T_dof, 
-              typename T_loc, typename T_scale,
-              class Policy>
+              typename T_loc, typename T_scale>
     typename return_type<T_y,T_dof,T_loc,T_scale>::type
     student_t_log(const T_y& y, const T_dof& nu, const T_loc& mu, 
-                  const T_scale& sigma, 
-                  const Policy&) {
+                  const T_scale& sigma) {
       static const char* function = "stan::prob::student_t_log(%1%)";
 
       using stan::math::check_positive;
@@ -66,22 +64,22 @@ namespace stan {
       double logp(0.0);
 
       // validate args (here done over var, which should be OK)
-      if (!check_not_nan(function, y, "Random variable", &logp, Policy()))
+      if (!check_not_nan(function, y, "Random variable", &logp))
         return logp;
       if(!check_finite(function, nu, "Degrees of freedom parameter", 
-                       &logp, Policy()))
+                       &logp))
         return logp;
       if(!check_positive(function, nu, "Degrees of freedom parameter", 
-                         &logp, Policy()))
+                         &logp))
         return logp;
       if (!check_finite(function, mu, "Location parameter", 
-                        &logp, Policy()))
+                        &logp))
         return logp;
       if (!check_finite(function, sigma, "Scale parameter", 
-                        &logp, Policy()))
+                        &logp))
         return logp;
       if (!check_positive(function, sigma, "Scale parameter", 
-                          &logp, Policy()))
+                          &logp))
         return logp;
 
       
@@ -90,7 +88,7 @@ namespace stan {
                                    "Random variable",
                                    "Degrees of freedom parameter",
                                    "Location parameter","Scale parameter",
-                                   &logp, Policy())))
+                                   &logp)))
         return logp;
 
       // check if no variables are involved and prop-to
@@ -222,38 +220,18 @@ namespace stan {
       return operands_and_partials.to_var(logp);
     }
 
-    template <bool propto, 
-              typename T_y, typename T_dof, typename T_loc, typename T_scale>
-    inline
-    typename return_type<T_y,T_dof,T_loc,T_scale>::type
-    student_t_log(const T_y& y, const T_dof& nu, const T_loc& mu, 
-                  const T_scale& sigma) {
-      return student_t_log<propto>(y,nu,mu,sigma,stan::math::default_policy());
-    }
-
-    template <typename T_y, typename T_dof, typename T_loc, typename T_scale,
-              class Policy>
-    inline
-    typename return_type<T_y,T_dof,T_loc,T_scale>::type
-    student_t_log(const T_y& y, const T_dof& nu, const T_loc& mu, 
-                  const T_scale& sigma, 
-                  const Policy&) {
-      return student_t_log<false>(y,nu,mu,sigma,Policy());
-    }
-
     template <typename T_y, typename T_dof, typename T_loc, typename T_scale>
     inline
     typename return_type<T_y,T_dof,T_loc,T_scale>::type
     student_t_log(const T_y& y, const T_dof& nu, const T_loc& mu, 
                   const T_scale& sigma) {
-      return student_t_log<false>(y,nu,mu,sigma,stan::math::default_policy());
+      return student_t_log<false>(y,nu,mu,sigma);
     }
       
-    template <typename T_y, typename T_dof, typename T_loc, typename T_scale, 
-              class Policy>
+    template <typename T_y, typename T_dof, typename T_loc, typename T_scale>
     typename return_type<T_y, T_dof, T_loc, T_scale>::type
     student_t_cdf(const T_y& y, const T_dof& nu, const T_loc& mu, 
-                  const T_scale& sigma, const Policy&) {
+                  const T_scale& sigma) {
           
       // Size checks
       if (!(stan::length(y) && stan::length(nu) && stan::length(mu) 
@@ -271,24 +249,22 @@ namespace stan {
           
       double P(1.0);
           
-      if (!check_not_nan(function, y, "Random variable", &P, Policy()))
+      if (!check_not_nan(function, y, "Random variable", &P))
         return P;
           
-      if (!check_finite(function, nu, "Degrees of freedom parameter", &P, 
-                        Policy()))
+      if (!check_finite(function, nu, "Degrees of freedom parameter", &P))
         return P;
           
-      if (!check_positive(function, nu, "Degrees of freedom parameter", &P,
-                          Policy()))
+      if (!check_positive(function, nu, "Degrees of freedom parameter", &P))
         return P;
           
-      if (!check_finite(function, mu, "Location parameter", &P, Policy()))
+      if (!check_finite(function, mu, "Location parameter", &P))
         return P;
           
-      if (!check_finite(function, sigma, "Scale parameter", &P, Policy()))
+      if (!check_finite(function, sigma, "Scale parameter", &P))
         return P;
           
-      if (!check_positive(function, sigma, "Scale parameter", &P, Policy()))
+      if (!check_positive(function, sigma, "Scale parameter", &P))
         return P;
           
       // Wrap arguments in vectors
@@ -466,14 +442,7 @@ namespace stan {
       return operands_and_partials.to_var(P);
           
     }
-      
-    template <typename T_y, typename T_dof, typename T_loc, typename T_scale>
-    typename return_type<T_y,T_dof,T_loc,T_scale>::type
-    student_t_cdf(const T_y& y, const T_dof& nu, const T_loc& mu, const T_scale& sigma) {
-      return student_t_cdf(y, nu, mu, sigma, stan::math::default_policy());
-    }
-    
-    
+          
     template <class RNG>
     inline double
     student_t_rng(const double nu,

@@ -136,6 +136,14 @@ add("divide",ROW_VECTOR_T,ROW_VECTOR_T,DOUBLE_T);
 add("divide",MATRIX_T,MATRIX_T,DOUBLE_T);
 add("columns_dot_product",ROW_VECTOR_T,MATRIX_T,MATRIX_T);
 add("rows_dot_product",VECTOR_T,MATRIX_T,MATRIX_T);
+add("dist",DOUBLE_T,VECTOR_T,VECTOR_T);
+add("dist",DOUBLE_T,ROW_VECTOR_T,ROW_VECTOR_T);
+add("dist",DOUBLE_T,VECTOR_T,ROW_VECTOR_T);
+add("dist",DOUBLE_T,ROW_VECTOR_T,VECTOR_T);
+add("squared_dist",DOUBLE_T,VECTOR_T,VECTOR_T);
+add("squared_dist",DOUBLE_T,ROW_VECTOR_T,ROW_VECTOR_T);
+add("squared_dist",DOUBLE_T,VECTOR_T,ROW_VECTOR_T);
+add("squared_dist",DOUBLE_T,ROW_VECTOR_T,VECTOR_T);
 add("dot_product",DOUBLE_T,VECTOR_T,VECTOR_T);
 add("dot_product",DOUBLE_T,ROW_VECTOR_T,ROW_VECTOR_T);
 add("dot_product",DOUBLE_T,VECTOR_T,ROW_VECTOR_T);
@@ -346,6 +354,7 @@ add("minus",DOUBLE_T,DOUBLE_T);
 add("minus",VECTOR_T,VECTOR_T);
 add("minus",ROW_VECTOR_T,ROW_VECTOR_T);
 add("minus",MATRIX_T,MATRIX_T);
+add("multi_gp_log",DOUBLE_T,MATRIX_T,MATRIX_T,VECTOR_T);
 add("multi_normal_cholesky_log",DOUBLE_T, VECTOR_T,VECTOR_T,MATRIX_T);
 add("multi_normal_prec_log",DOUBLE_T, VECTOR_T,VECTOR_T,MATRIX_T);
 add("multi_normal_log",DOUBLE_T, VECTOR_T,VECTOR_T,MATRIX_T);
@@ -392,6 +401,7 @@ for (size_t i = 0; i < vector_types.size(); ++i)
 add_nullary("not_a_number");
 add("ordered_logistic_log",DOUBLE_T,INT_T,DOUBLE_T,VECTOR_T);
 add("ordered_logistic_rng",INT_T,DOUBLE_T,VECTOR_T);
+add_binary("owens_t");
 for (size_t i = 0; i < vector_types.size(); ++i)
   for (size_t j = 0; j < vector_types.size(); ++j)
     for (size_t k = 0; k < vector_types.size(); ++k)

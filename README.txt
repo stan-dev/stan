@@ -1,4 +1,4 @@
-STAN VERSION 1.0.0 README
+STAN VERSION 1.3.0 README
 ======================================================================
 
 Stan is a C++ library for probability, optimization and sampling.

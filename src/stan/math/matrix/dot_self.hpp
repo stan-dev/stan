@@ -17,10 +17,7 @@ namespace stan {
     template <int R, int C>
     inline double dot_self(const Eigen::Matrix<double, R, C>& v) {
       validate_vector(v,"dot_self");
-      double sum = 0.0;
-      for (int i = 0; i < v.size(); ++i)
-        sum += v(i) * v(i);
-      return sum;
+      return v.squaredNorm();
     }    
     
   }

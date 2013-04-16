@@ -1840,7 +1840,8 @@ sampling statement.
 Executing such a statement does not perform any sampling.  In \Stan, a
 sampling statement is merely a notational convenience.  The above
 sampling statement could be written as an assignment statement using
-the reserved variable \code{lp\_\_} as
+the reserved variable \code{lp\_\_} as follows (see
+\refsection{incr-vs-sample.section} for a full explanation).
 %
 \begin{quote}
 \begin{Verbatim}
@@ -1848,6 +1849,7 @@ lp__ <- lp__ + normal_log(y,mu,sigma);
 \end{Verbatim}
 \end{quote}
 %
+
 The variable \code{lp\_\_} acts as an accumulator for the log
 (proportional) probability defined by the model as a function of the
 parameters and data.
@@ -1873,6 +1875,36 @@ lp__ <- lp__ + dist_log(ex0,ex1,...,exN);
 This will be well formed if and only if
 \code{dist\_log(ex0,ex1,...,exN)} is a well-formed function expression
 of type \code{real}.
+
+\subsection{Log Probability Increment vs.\ Sampling Statement}\label{incr-vs-sample.section}
+
+Although both lead to the same sampling behavior in Stan, there is one
+critical difference between using the sampling statement, as in
+%
+\begin{quote}
+\begin{Verbatim}
+y ~ normal(mu,sigma);
+\end{Verbatim}
+\end{quote}
+%
+and explicitly incrementing the log probability function, as in
+%
+\begin{quote}
+\begin{Verbatim}
+lp__ <- lp__ + normal_log(y,mu,sigma);
+\end{Verbatim}
+\end{quote}
+%
+The sampling statement drops all the terms in the log probability
+function that are constant, whereas the explicit call to
+\code{normal\_log} adds all of the terms in the definition of the log
+normal probability function, including all of the constant normalizing
+terms.  Therefore, the explicit increment form can be used to recreate
+the exact log probability values for the model.  Otherwise, the
+sampling statement form will be faster if any of the input expressions,
+\code{y}, \code{mu}, or \code{sigma}, involve only constants, data
+variables or transformed data variables. 
+
 
 \subsection{User-Transformed Variables}
 
@@ -1965,7 +1997,9 @@ y ~ normal(0,1) T[-0.5,];
 \end{quote}
 % 
 The truncation has the same effect as the following direct update to
-the accumulated log probability.
+the accumulated log probability (see \refsection{incr-vs-sample} for
+more information about the relation between incrementing \code{lp\_\_}
+and sampling).
 %
 \begin{quote}
 \begin{Verbatim}

@@ -276,8 +276,8 @@ namespace stan {
        * @param y Matrix to write.
        */
       void matrix_unconstrain(const matrix_t& y) {
-        for (typename matrix_t::size_type i = 0; i < y.rows(); ++i)
-          for (typename matrix_t::size_type j = 0; j < y.cols(); ++j) 
+        for (typename matrix_t::size_type j = 0; j < y.cols(); ++j) 
+          for (typename matrix_t::size_type i = 0; i < y.rows(); ++i)
             data_r_.push_back(y(i,j));
       }
 
@@ -290,8 +290,8 @@ namespace stan {
           scalar_lb_unconstrain(lb,y(i));
       }
       void matrix_lb_unconstrain(double lb, matrix_t& y) {
-        for (int i = 0; i < y.rows(); ++i)
-          for (int j = 0; j < y.cols(); ++j)
+        for (typename matrix_t::size_type j = 0; j < y.cols(); ++j) 
+          for (typename matrix_t::size_type i = 0; i < y.rows(); ++i)
             scalar_lb_unconstrain(lb,y(i,j));
       }
 
@@ -304,8 +304,8 @@ namespace stan {
           scalar_ub_unconstrain(ub,y(i));
       }
       void matrix_ub_unconstrain(double ub, matrix_t& y) {
-        for (int i = 0; i < y.rows(); ++i)
-          for (int j = 0; j < y.cols(); ++j)
+        for (typename matrix_t::size_type j = 0; j < y.cols(); ++j) 
+          for (typename matrix_t::size_type i = 0; i < y.rows(); ++i)
             scalar_ub_unconstrain(ub,y(i,j));
       }
 
@@ -319,8 +319,8 @@ namespace stan {
           scalar_lub_unconstrain(lb,ub,y(i));
       }
       void matrix_lub_unconstrain(double lb, double ub, matrix_t& y) {
-        for (int i = 0; i < y.rows(); ++i)
-          for (int j = 0; j < y.cols(); ++j)
+        for (typename matrix_t::size_type j = 0; j < y.cols(); ++j) 
+          for (typename matrix_t::size_type i = 0; i < y.rows(); ++i)
             scalar_lub_unconstrain(lb,ub,y(i,j));
       }
 

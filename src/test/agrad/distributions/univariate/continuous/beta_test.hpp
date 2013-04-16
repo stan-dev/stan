@@ -79,17 +79,6 @@ public:
     return stan::prob::beta_log<propto>(y, alpha, beta);
   }
   
-  template <bool propto, 
-      typename T_y, typename T_scale1, typename T_scale2,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9, 
-      class Policy>
-  typename stan::return_type<T_y, T_scale1, T_scale2>::type 
-  log_prob(const T_y& y, const T_scale1& alpha, const T_scale2& beta,
-     const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
-    return stan::prob::beta_log<propto>(y, alpha, beta, Policy());
-  }
   
   template <typename T_y, typename T_scale1, typename T_scale2,
       typename T3, typename T4, typename T5, 

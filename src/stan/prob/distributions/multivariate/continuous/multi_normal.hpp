@@ -43,13 +43,11 @@ namespace stan {
      * @tparam T_covar Type of scale.
      */
     template <bool propto,
-              typename T_y, typename T_loc, typename T_covar, 
-              class Policy>
+              typename T_y, typename T_loc, typename T_covar>
     typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
     multi_normal_cholesky_log(const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
-                  const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
-                  const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L,
-                  const Policy&) {
+                              const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
+                              const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L) {
       static const char* function = "stan::prob::multi_normal_cholesky_log(%1%)";
 
       using stan::math::mdivide_left_tri_low;
@@ -67,23 +65,23 @@ namespace stan {
       typename promote_args<T_y,T_loc,T_covar>::type lp(0.0);
 
       if (!check_size_match(function, 
-          y.size(), "Size of random variable",
-          mu.size(), "size of location parameter",
-          &lp, Policy()))
+                            y.size(), "Size of random variable",
+                            mu.size(), "size of location parameter",
+                            &lp))
         return lp;
       if (!check_size_match(function, 
-          y.size(), "Size of random variable",
-          L.rows(), "rows of covariance parameter",
-          &lp, Policy()))
+                            y.size(), "Size of random variable",
+                            L.rows(), "rows of covariance parameter",
+                            &lp))
         return lp;
       if (!check_size_match(function, 
-          y.size(), "Size of random variable",
-          L.cols(), "columns of covariance parameter",
-          &lp, Policy()))
+                            y.size(), "Size of random variable",
+                            L.cols(), "columns of covariance parameter",
+                            &lp))
         return lp;
-      if (!check_finite(function, mu, "Location parameter", &lp, Policy())) 
+      if (!check_finite(function, mu, "Location parameter", &lp)) 
         return lp;
-      if (!check_not_nan(function, y, "Random variable", &lp, Policy())) 
+      if (!check_not_nan(function, y, "Random variable", &lp)) 
         return lp;
 
       if (y.rows() == 0)
@@ -106,7 +104,7 @@ namespace stan {
         Eigen::Matrix<typename 
           boost::math::tools::promote_args<T_covar,T_loc,T_y>::type,
           Eigen::Dynamic, 1> 
-            half(mdivide_left_tri_low(L,y_minus_mu));
+          half(mdivide_left_tri_low(L,y_minus_mu));
         // FIXME: this code does not compile. revert after fixing subtract()
         // Eigen::Matrix<typename 
         //               boost::math::tools::promote_args<T_covar,T_loc,T_y>::type,
@@ -117,48 +115,23 @@ namespace stan {
       return lp;
     }
 
-    template <bool propto,
-              typename T_y, typename T_loc, typename T_covar>
-    inline
-    typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
-    multi_normal_cholesky_log(const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
-              const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
-              const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L) {
-      return multi_normal_cholesky_log<propto>(y,mu,L,
-                                               stan::math::default_policy());
-    }
-
-    template <typename T_y, typename T_loc, typename T_covar, 
-              class Policy>
-    inline
-    typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
-    multi_normal_cholesky_log(const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
-                  const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
-                  const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L,
-                  const Policy&) {
-      return multi_normal_cholesky_log<false>(y,mu,L,Policy());
-    }
-
     template <typename T_y, typename T_loc, typename T_covar>
     inline
     typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
     multi_normal_cholesky_log(const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
-              const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
-              const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L) {
-      return multi_normal_cholesky_log<false>(y,mu,L,
-                                              stan::math::default_policy());
+                              const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
+                              const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L) {
+      return multi_normal_cholesky_log<false>(y,mu,L);
     }
 
     /** y can have multiple rows (observations) and columns (on variables)
      */
     template <bool propto,
-              typename T_y, typename T_loc, typename T_covar, 
-              class Policy>
+              typename T_y, typename T_loc, typename T_covar>
     typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
     multi_normal_cholesky_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
-                  const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
-                  const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L,
-                  const Policy&) {
+                              const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
+                              const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L) {
       static const char* function = "stan::prob::multi_normal_cholesky_log(%1%)";
 
       using stan::math::mdivide_left_tri_low;
@@ -177,23 +150,23 @@ namespace stan {
       typename promote_args<T_y,T_loc,T_covar>::type lp(0.0);
 
       if (!check_size_match(function, 
-          y.cols(), "Columns of random variable",
-          mu.rows(), "rows of location parameter",
-          &lp, Policy()))
+                            y.cols(), "Columns of random variable",
+                            mu.rows(), "rows of location parameter",
+                            &lp))
         return lp;
       if (!check_size_match(function, 
-          y.cols(), "Columns of random variable",
-          L.rows(), "rows of covariance parameter",
-          &lp, Policy()))
+                            y.cols(), "Columns of random variable",
+                            L.rows(), "rows of covariance parameter",
+                            &lp))
         return lp;
       if (!check_size_match(function, 
-          y.cols(), "Columns of random variable",
-          L.cols(), "columns of covariance parameter",
-          &lp, Policy()))
+                            y.cols(), "Columns of random variable",
+                            L.cols(), "columns of covariance parameter",
+                            &lp))
         return lp;
-      if (!check_finite(function, mu, "Location parameter", &lp, Policy())) 
+      if (!check_finite(function, mu, "Location parameter", &lp)) 
         return lp;
-      if (!check_not_nan(function, y, "Random variable", &lp, Policy())) 
+      if (!check_not_nan(function, y, "Random variable", &lp)) 
         return lp;
 
       if (y.cols() == 0)
@@ -213,15 +186,15 @@ namespace stan {
           MU.row(i) = mu;
   
         Eigen::Matrix<typename
-                    boost::math::tools::promote_args<T_loc,T_y>::type,
-                    Eigen::Dynamic,Eigen::Dynamic>
+          boost::math::tools::promote_args<T_loc,T_y>::type,
+          Eigen::Dynamic,Eigen::Dynamic>
           y_minus_MU(y.rows(), y.cols());
         for (int i = 0; i < y.size(); i++)
           y_minus_MU(i) = y(i)-MU(i);
 
         Eigen::Matrix<typename 
-                    boost::math::tools::promote_args<T_loc,T_y>::type,
-                    Eigen::Dynamic,Eigen::Dynamic> 
+          boost::math::tools::promote_args<T_loc,T_y>::type,
+          Eigen::Dynamic,Eigen::Dynamic> 
           z(y_minus_MU.transpose()); // was = 
         
         // FIXME: revert this code when subtract() is fixed.
@@ -231,8 +204,8 @@ namespace stan {
         //   z(subtract(y,MU).transpose()); // was = 
                 
         Eigen::Matrix<typename 
-                      boost::math::tools::promote_args<T_covar,T_loc,T_y>::type,
-                      Eigen::Dynamic,Eigen::Dynamic> 
+          boost::math::tools::promote_args<T_covar,T_loc,T_y>::type,
+          Eigen::Dynamic,Eigen::Dynamic> 
           half(mdivide_left_tri_low(L,z));
           
         lp -= 0.5 * sum(columns_dot_self(half));
@@ -240,36 +213,13 @@ namespace stan {
       return lp;
     }
 
-    template <bool propto,
-              typename T_y, typename T_loc, typename T_covar>
-    inline
-    typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
-    multi_normal_cholesky_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
-              const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
-              const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L) {
-      return multi_normal_cholesky_log<propto>(y,mu,L,
-                                               stan::math::default_policy());
-    }
-
-    template <typename T_y, typename T_loc, typename T_covar, 
-              class Policy>
-    inline
-    typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
-    multi_normal_cholesky_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
-                  const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
-                  const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L,
-                  const Policy&) {
-      return multi_normal_cholesky_log<false>(y,mu,L,Policy());
-    }
-
     template <typename T_y, typename T_loc, typename T_covar>
     inline
     typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
     multi_normal_cholesky_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
-              const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
-              const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L) {
-      return multi_normal_cholesky_log<false>(y,mu,L,
-                                              stan::math::default_policy());
+                              const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
+                              const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L) {
+      return multi_normal_cholesky_log<false>(y,mu,L);
     }
     
     // MultiNormal(y|mu,Sigma)   [y.rows() = mu.rows() = Sigma.rows();
@@ -292,13 +242,11 @@ namespace stan {
      * @tparam T_covar Type of scale.
      */
     template <bool propto,
-    typename T_y, typename T_loc, typename T_covar, 
-    class Policy>
+              typename T_y, typename T_loc, typename T_covar>
     typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
     multi_normal_log(const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
                      const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
-                     const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
-                     const Policy&) {
+                     const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma) {
       static const char* function = "stan::prob::multi_normal_log(%1%)";
       typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type lp(0.0);
       
@@ -315,32 +263,32 @@ namespace stan {
       if (!check_size_match(function, 
                             Sigma.rows(), "Rows of covariance parameter",
                             Sigma.cols(), "columns of covariance parameter",
-                            &lp, Policy()))
+                            &lp))
         return lp;
-      if (!check_positive(function, Sigma.rows(), "Covariance matrix rows", &lp, Policy()))
+      if (!check_positive(function, Sigma.rows(), "Covariance matrix rows", &lp))
         return lp;
-      if (!check_symmetric(function, Sigma, "Covariance matrix", &lp, Policy()))
+      if (!check_symmetric(function, Sigma, "Covariance matrix", &lp))
         return lp;
-      if (!check_pos_definite(function, Sigma, "Covariance matrix", &lp, Policy()))
+      if (!check_pos_definite(function, Sigma, "Covariance matrix", &lp))
         return lp;
       if (!check_size_match(function, 
                             y.size(), "Size of random variable",
                             mu.size(), "size of location parameter",
-                            &lp, Policy()))
+                            &lp))
         return lp;
       if (!check_size_match(function, 
                             y.size(), "Size of random variable",
                             Sigma.rows(), "rows of covariance parameter",
-                            &lp, Policy()))
+                            &lp))
         return lp;
       if (!check_size_match(function, 
                             y.size(), "Size of random variable",
                             Sigma.cols(), "columns of covariance parameter",
-                            &lp, Policy()))
+                            &lp))
         return lp;
-      if (!check_finite(function, mu, "Location parameter", &lp, Policy())) 
+      if (!check_finite(function, mu, "Location parameter", &lp)) 
         return lp;
-      if (!check_not_nan(function, y, "Random variable", &lp, Policy())) 
+      if (!check_not_nan(function, y, "Random variable", &lp)) 
         return lp;
       
       if (y.rows() == 0)
@@ -355,61 +303,36 @@ namespace stan {
 
       if (include_summand<propto,T_y,T_loc,T_covar>::value) {
         Eigen::Matrix<typename 
-            boost::math::tools::promote_args<T_y,T_loc>::type,
-            Eigen::Dynamic, 1> y_minus_mu(y.size());
+          boost::math::tools::promote_args<T_y,T_loc>::type,
+          Eigen::Dynamic, 1> y_minus_mu(y.size());
         for (int i = 0; i < y.size(); i++)
           y_minus_mu(i) = y(i)-mu(i);
         Eigen::Matrix<typename 
-            boost::math::tools::promote_args<T_covar,T_loc,T_y>::type,
-            Eigen::Dynamic, 1> Sinv_y_minus_mu(mdivide_left_spd(Sigma,y_minus_mu));
+          boost::math::tools::promote_args<T_covar,T_loc,T_y>::type,
+          Eigen::Dynamic, 1> Sinv_y_minus_mu(mdivide_left_spd(Sigma,y_minus_mu));
         lp -= 0.5 * dot_product(y_minus_mu,Sinv_y_minus_mu);
       }
       return lp;
     }
 
-    template <bool propto,
-              typename T_y, typename T_loc, typename T_covar>
-    inline
-    typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
-    multi_normal_log(const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
-         const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
-         const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma) {
-      return multi_normal_log<propto>(y,mu,Sigma,stan::math::default_policy());
-    }
-
-
-    template <typename T_y, typename T_loc, typename T_covar, 
-              class Policy>
-    inline
-    typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
-    multi_normal_log(const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
-             const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
-             const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
-             const Policy&){
-      return multi_normal_log<false>(y,mu,Sigma,Policy());
-    }
-
-
     template <typename T_y, typename T_loc, typename T_covar>
     inline
     typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
     multi_normal_log(const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
-         const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
-         const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma) {
-      return multi_normal_log<false>(y,mu,Sigma,stan::math::default_policy());
+                     const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
+                     const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma) {
+      return multi_normal_log<false>(y,mu,Sigma);
     }
     
     /**
      * y can have multiple rows (observations) and columns (on variables)
      */
     template <bool propto,
-    typename T_y, typename T_loc, typename T_covar, 
-    class Policy>
+              typename T_y, typename T_loc, typename T_covar>
     typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
     multi_normal_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
                      const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
-                     const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
-                     const Policy&) {
+                     const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma) {
       static const char* function = "stan::prob::multi_normal_log(%1%)";
       typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type lp(0.0);
       
@@ -427,32 +350,32 @@ namespace stan {
       if (!check_size_match(function, 
                             Sigma.rows(), "Rows of covariance matrix",
                             Sigma.cols(), "columns of covariance matrix",
-                            &lp, Policy()))
+                            &lp))
         return lp;
-      if (!check_positive(function, Sigma.rows(), "Covariance matrix rows", &lp, Policy()))
+      if (!check_positive(function, Sigma.rows(), "Covariance matrix rows", &lp))
         return lp;
-      if (!check_symmetric(function, Sigma, "Covariance matrix", &lp, Policy()))
+      if (!check_symmetric(function, Sigma, "Covariance matrix", &lp))
         return lp;
-      if (!check_pos_definite(function, Sigma, "Covariance matrix", &lp, Policy()))
+      if (!check_pos_definite(function, Sigma, "Covariance matrix", &lp))
         return lp;
       if (!check_size_match(function, 
                             y.cols(), "Columns of random variable",
                             mu.rows(), "rows of location parameter",
-                            &lp, Policy()))
+                            &lp))
         return lp;
       if (!check_size_match(function, 
                             y.cols(), "Columns of random variable",
                             Sigma.rows(), "rows of covariance parameter",
-                            &lp, Policy()))
+                            &lp))
         return lp;
       if (!check_size_match(function, 
                             y.cols(), "Columns of random variable",
                             Sigma.cols(), "columns of covariance parameter",
-                            &lp, Policy()))
+                            &lp))
         return lp;
-      if (!check_finite(function, mu, "Location parameter", &lp, Policy())) 
+      if (!check_finite(function, mu, "Location parameter", &lp)) 
         return lp;
-      if (!check_not_nan(function, y, "Random variable", &lp, Policy())) 
+      if (!check_not_nan(function, y, "Random variable", &lp)) 
         return lp;
       
       if (y.cols() == 0)
@@ -471,15 +394,15 @@ namespace stan {
           MU.row(i) = mu;
         
         Eigen::Matrix<typename
-            boost::math::tools::promote_args<T_loc,T_y>::type,
-            Eigen::Dynamic,Eigen::Dynamic> y_minus_MU(y.rows(), y.cols());
+          boost::math::tools::promote_args<T_loc,T_y>::type,
+          Eigen::Dynamic,Eigen::Dynamic> y_minus_MU(y.rows(), y.cols());
 
         for (int i = 0; i < y.size(); i++)
           y_minus_MU(i) = y(i)-MU(i);
         
         Eigen::Matrix<typename 
-            boost::math::tools::promote_args<T_loc,T_y>::type,
-            Eigen::Dynamic,Eigen::Dynamic> z(y_minus_MU.transpose()); // was = 
+          boost::math::tools::promote_args<T_loc,T_y>::type,
+          Eigen::Dynamic,Eigen::Dynamic> z(y_minus_MU.transpose()); // was = 
         
         // FIXME: revert this code when subtract() is fixed.
         // Eigen::Matrix<typename 
@@ -488,53 +411,29 @@ namespace stan {
         //   z(subtract(y,MU).transpose()); // was = 
         
         Eigen::Matrix<typename 
-            boost::math::tools::promote_args<T_covar,T_loc,T_y>::type,
-            Eigen::Dynamic,Eigen::Dynamic> Sinv_z(mdivide_left_spd(Sigma,z));
+          boost::math::tools::promote_args<T_covar,T_loc,T_y>::type,
+          Eigen::Dynamic,Eigen::Dynamic> Sinv_z(mdivide_left_spd(Sigma,z));
         
         lp -= 0.5 * sum(columns_dot_product(z,Sinv_z));
       }
       return lp;      
     }
 
-    template <bool propto,
-              typename T_y, typename T_loc, typename T_covar>
-    inline
-    typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
-    multi_normal_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
-         const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
-         const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma) {
-      return multi_normal_log<propto>(y,mu,Sigma,stan::math::default_policy());
-    }
-
-
-    template <typename T_y, typename T_loc, typename T_covar, 
-              class Policy>
-    inline
-    typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
-    multi_normal_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
-             const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
-             const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
-             const Policy&){
-      return multi_normal_log<false>(y,mu,Sigma,Policy());
-    }
-
     template <typename T_y, typename T_loc, typename T_covar>
     inline
     typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
     multi_normal_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
-         const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
-         const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma) {
-      return multi_normal_log<false>(y,mu,Sigma,stan::math::default_policy());
+                     const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
+                     const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma) {
+      return multi_normal_log<false>(y,mu,Sigma);
     }
     
     template <bool propto,
-    typename T_y, typename T_loc, typename T_covar, 
-    class Policy>
+              typename T_y, typename T_loc, typename T_covar>
     typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
     multi_normal_prec_log(const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
                           const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
-                          const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
-                          const Policy&) {
+                          const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma) {
       static const char* function = "stan::prob::multi_normal_prec_log(%1%)";
       typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type lp(0.0);
       
@@ -552,32 +451,32 @@ namespace stan {
       if (!check_size_match(function, 
                             Sigma.rows(), "Rows of covariance parameter",
                             Sigma.cols(), "columns of covariance parameter",
-                            &lp, Policy()))
+                            &lp))
         return lp;
-      if (!check_positive(function, Sigma.rows(), "Covariance matrix rows", &lp, Policy()))
+      if (!check_positive(function, Sigma.rows(), "Covariance matrix rows", &lp))
         return lp;
-      if (!check_symmetric(function, Sigma, "Covariance matrix", &lp, Policy()))
+      if (!check_symmetric(function, Sigma, "Covariance matrix", &lp))
         return lp;
-      if (!check_pos_definite(function, Sigma, "Covariance matrix", &lp, Policy()))
+      if (!check_pos_definite(function, Sigma, "Covariance matrix", &lp))
         return lp;
       if (!check_size_match(function, 
                             y.size(), "Size of random variable",
                             mu.size(), "size of location parameter",
-                            &lp, Policy()))
+                            &lp))
         return lp;
       if (!check_size_match(function, 
                             y.size(), "Size of random variable",
                             Sigma.rows(), "rows of covariance parameter",
-                            &lp, Policy()))
+                            &lp))
         return lp;
       if (!check_size_match(function, 
                             y.size(), "Size of random variable",
                             Sigma.cols(), "columns of covariance parameter",
-                            &lp, Policy()))
+                            &lp))
         return lp;
-      if (!check_finite(function, mu, "Location parameter", &lp, Policy())) 
+      if (!check_finite(function, mu, "Location parameter", &lp)) 
         return lp;
-      if (!check_not_nan(function, y, "Random variable", &lp, Policy())) 
+      if (!check_not_nan(function, y, "Random variable", &lp)) 
         return lp;
       
       if (y.rows() == 0)
@@ -591,61 +490,36 @@ namespace stan {
       
       if (include_summand<propto,T_y,T_loc,T_covar>::value) {
         Eigen::Matrix<typename 
-            boost::math::tools::promote_args<T_y,T_loc>::type,
-            Eigen::Dynamic, 1> y_minus_mu(y.size());
+          boost::math::tools::promote_args<T_y,T_loc>::type,
+          Eigen::Dynamic, 1> y_minus_mu(y.size());
         for (int i = 0; i < y.size(); i++)
           y_minus_mu(i) = y(i)-mu(i);
         Eigen::Matrix<typename 
-            boost::math::tools::promote_args<T_covar,T_loc,T_y>::type,
-            Eigen::Dynamic, 1> Sinv_y_minus_mu(multiply(Sigma,y_minus_mu));
+          boost::math::tools::promote_args<T_covar,T_loc,T_y>::type,
+          Eigen::Dynamic, 1> Sinv_y_minus_mu(multiply(Sigma,y_minus_mu));
         lp -= 0.5 * dot_product(y_minus_mu,Sinv_y_minus_mu);
       }
       return lp;
     }
     
-    template <bool propto,
-    typename T_y, typename T_loc, typename T_covar>
-    inline
-    typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
-    multi_normal_prec_log(const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
-                     const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
-                     const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma) {
-      return multi_normal_prec_log<propto>(y,mu,Sigma,stan::math::default_policy());
-    }
-    
-    
-    template <typename T_y, typename T_loc, typename T_covar, 
-    class Policy>
-    inline
-    typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
-    multi_normal_prec_log(const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
-                     const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
-                     const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
-                     const Policy&){
-      return multi_normal_prec_log<false>(y,mu,Sigma,Policy());
-    }
-    
-    
     template <typename T_y, typename T_loc, typename T_covar>
     inline
     typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
     multi_normal_prec_log(const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
-                     const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
-                     const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma) {
-      return multi_normal_prec_log<false>(y,mu,Sigma,stan::math::default_policy());
+                          const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
+                          const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma) {
+      return multi_normal_prec_log<false>(y,mu,Sigma);
     }
 
     /**
      * y can have multiple rows (observations) and columns (on variables)
      */
     template <bool propto,
-    typename T_y, typename T_loc, typename T_covar, 
-    class Policy>
+              typename T_y, typename T_loc, typename T_covar>
     typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
     multi_normal_prec_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
-                     const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
-                     const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
-                     const Policy&) {
+                          const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
+                          const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma) {
       static const char* function = "stan::prob::multi_normal_prec_log(%1%)";
       typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type lp(0.0);
       
@@ -663,32 +537,32 @@ namespace stan {
       if (!check_size_match(function, 
                             Sigma.rows(), "Rows of covariance matrix",
                             Sigma.cols(), "columns of covariance matrix",
-                            &lp, Policy()))
+                            &lp))
         return lp;
-      if (!check_positive(function, Sigma.rows(), "Covariance matrix rows", &lp, Policy()))
+      if (!check_positive(function, Sigma.rows(), "Covariance matrix rows", &lp))
         return lp;
-      if (!check_symmetric(function, Sigma, "Covariance matrix", &lp, Policy()))
+      if (!check_symmetric(function, Sigma, "Covariance matrix", &lp))
         return lp;
-      if (!check_pos_definite(function, Sigma, "Covariance matrix", &lp, Policy()))
+      if (!check_pos_definite(function, Sigma, "Covariance matrix", &lp))
         return lp;
       if (!check_size_match(function, 
                             y.cols(), "Columns of random variable",
                             mu.rows(), "rows of location parameter",
-                            &lp, Policy()))
+                            &lp))
         return lp;
       if (!check_size_match(function, 
                             y.cols(), "Columns of random variable",
                             Sigma.rows(), "rows of covariance parameter",
-                            &lp, Policy()))
+                            &lp))
         return lp;
       if (!check_size_match(function, 
                             y.cols(), "Columns of random variable",
                             Sigma.cols(), "columns of covariance parameter",
-                            &lp, Policy()))
+                            &lp))
         return lp;
-      if (!check_finite(function, mu, "Location parameter", &lp, Policy())) 
+      if (!check_finite(function, mu, "Location parameter", &lp)) 
         return lp;
-      if (!check_not_nan(function, y, "Random variable", &lp, Policy())) 
+      if (!check_not_nan(function, y, "Random variable", &lp)) 
         return lp;
       
       if (y.cols() == 0)
@@ -707,15 +581,15 @@ namespace stan {
           MU.row(i) = mu;
         
         Eigen::Matrix<typename
-        boost::math::tools::promote_args<T_loc,T_y>::type,
-        Eigen::Dynamic,Eigen::Dynamic> y_minus_MU(y.rows(), y.cols());
+          boost::math::tools::promote_args<T_loc,T_y>::type,
+          Eigen::Dynamic,Eigen::Dynamic> y_minus_MU(y.rows(), y.cols());
         
         for (int i = 0; i < y.size(); i++)
           y_minus_MU(i) = y(i)-MU(i);
         
         Eigen::Matrix<typename 
-        boost::math::tools::promote_args<T_loc,T_y>::type,
-        Eigen::Dynamic,Eigen::Dynamic> z(y_minus_MU.transpose()); // was = 
+          boost::math::tools::promote_args<T_loc,T_y>::type,
+          Eigen::Dynamic,Eigen::Dynamic> z(y_minus_MU.transpose()); // was = 
         
         // FIXME: revert this code when subtract() is fixed.
         // Eigen::Matrix<typename 
@@ -724,43 +598,21 @@ namespace stan {
         //   z(subtract(y,MU).transpose()); // was = 
         
         Eigen::Matrix<typename 
-        boost::math::tools::promote_args<T_covar,T_loc,T_y>::type,
-        Eigen::Dynamic,Eigen::Dynamic> Sinv_y_minus_mu(multiply(Sigma,z));
+          boost::math::tools::promote_args<T_covar,T_loc,T_y>::type,
+          Eigen::Dynamic,Eigen::Dynamic> Sinv_y_minus_mu(multiply(Sigma,z));
         
         lp -= 0.5 * sum(columns_dot_product(z,Sinv_y_minus_mu));
       }
       return lp;      
     }
     
-    template <bool propto,
-    typename T_y, typename T_loc, typename T_covar>
-    inline
-    typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
-    multi_normal_prec_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
-                     const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
-                     const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma) {
-      return multi_normal_prec_log<propto>(y,mu,Sigma,stan::math::default_policy());
-    }
-    
-    
-    template <typename T_y, typename T_loc, typename T_covar, 
-    class Policy>
-    inline
-    typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
-    multi_normal_prec_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
-                     const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
-                     const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
-                     const Policy&){
-      return multi_normal_prec_log<false>(y,mu,Sigma,Policy());
-    }
-    
     template <typename T_y, typename T_loc, typename T_covar>
     inline
     typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
     multi_normal_prec_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
-                     const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
-                     const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma) {
-      return multi_normal_prec_log<false>(y,mu,Sigma,stan::math::default_policy());
+                          const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
+                          const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma) {
+      return multi_normal_prec_log<false>(y,mu,Sigma);
     }
   
     template <class RNG>
@@ -771,11 +623,11 @@ namespace stan {
       using boost::variate_generator;
       using boost::normal_distribution;
       variate_generator<RNG&, normal_distribution<> >
-  std_normal_rng(rng, normal_distribution<>(0,1));
+        std_normal_rng(rng, normal_distribution<>(0,1));
 
       Eigen::VectorXd z(S.cols());
       for(int i = 0; i < S.cols(); i++)
-  z(i) = std_normal_rng();
+        z(i) = std_normal_rng();
 
       return mu + S.llt().matrixL() * z;
     }

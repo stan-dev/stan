@@ -22,17 +22,13 @@ namespace stan {
 
     // BetaBinomial(n|alpha,beta) [alpha > 0;  beta > 0;  n >= 0]
     template <bool propto,
-              typename T_n,
-              typename T_N,
-              typename T_size1, 
-              typename T_size2, 
-              class Policy>
+              typename T_n, typename T_N,
+              typename T_size1, typename T_size2>
     typename return_type<T_size1,T_size2>::type
     beta_binomial_log(const T_n& n, 
                       const T_N& N, 
                       const T_size1& alpha, 
-                      const T_size2& beta, 
-                      const Policy&) {
+                      const T_size2& beta) {
       static const char* function = "stan::prob::beta_binomial_log(%1%)";
 
       using stan::math::check_finite;
@@ -51,19 +47,19 @@ namespace stan {
       
       double logp(0.0);
       if (!check_nonnegative(function, N, "Population size parameter",
-                             &logp, Policy()))
+                             &logp))
         return logp;
       if (!check_finite(function, alpha, "First prior sample size parameter",
-                        &logp, Policy()))
+                        &logp))
         return logp;
       if (!check_positive(function, alpha, "First prior sample size parameter", 
-                          &logp, Policy()))
+                          &logp))
         return logp;
       if (!check_finite(function, beta, "Second prior sample size parameter",
-                        &logp, Policy()))
+                        &logp))
         return logp;
       if (!check_positive(function, beta, "Second prior sample size parameter", 
-                          &logp, Policy()))
+                          &logp))
         return logp;
       if (!(check_consistent_sizes(function,
                                    n,N,alpha,beta,
@@ -71,7 +67,7 @@ namespace stan {
                                    "Population size parameter",
                                    "First prior sample size parameter",
                                    "Second prior sample size parameter",
-                                   &logp, Policy())))
+                                   &logp)))
         return logp;
 
       // check if no variables are involved and prop-to
@@ -188,31 +184,6 @@ DoubleVectorView<!is_constant_struct<T_size2>::value,
  return operands_and_partials.to_var(logp);
     }
 
-    template <bool propto,
-              typename T_n,
-              typename T_N,
-              typename T_size1,
-              typename T_size2>
-    typename return_type<T_size1,T_size2>::type
-    beta_binomial_log(const T_n& n, const T_N& N, 
-                      const T_size1& alpha, const T_size2& beta) {
-      return beta_binomial_log<propto>(n,N,alpha,beta,
-                                       stan::math::default_policy());
-    }
-
-    template <typename T_n,
-              typename T_N,
-              typename T_size1,
-              typename T_size2, 
-              class Policy>
-    typename return_type<T_size1,T_size2>::type
-    inline
-    beta_binomial_log(const T_n& n, const T_N& N, 
-                      const T_size1& alpha, const T_size2& beta, 
-                      const Policy&) {
-      return beta_binomial_log<false>(n,N,alpha,beta,Policy());
-    }
-
     template <typename T_n,
               typename T_N,
               typename T_size1,
@@ -220,16 +191,15 @@ DoubleVectorView<!is_constant_struct<T_size2>::value,
     typename return_type<T_size1,T_size2>::type
     beta_binomial_log(const T_n& n, const T_N& N, 
                       const T_size1& alpha, const T_size2& beta) {
-      return beta_binomial_log<false>(n,N,alpha,beta,
-                                      stan::math::default_policy());
+      return beta_binomial_log<false>(n,N,alpha,beta);
     }
 
     // Beta-Binomial CDF
-    template <bool propto, typename T_n, typename T_N, typename T_size1,
-              typename T_size2, class Policy>
+    template <typename T_n, typename T_N, 
+              typename T_size1, typename T_size2>
     typename return_type<T_size1,T_size2>::type
     beta_binomial_cdf(const T_n& n, const T_N& N, const T_size1& alpha, 
-                      const T_size2& beta, const Policy&) {
+                      const T_size2& beta) {
           
       static const char* function = "stan::prob::beta_binomial_cdf(%1%)";
           
@@ -249,23 +219,23 @@ DoubleVectorView<!is_constant_struct<T_size2>::value,
           
       // Validate arguments
       if (!check_nonnegative(function, N, "Population size parameter",
-                             &P, Policy()))
+                             &P))
         return P;
           
       if (!check_finite(function, alpha, "First prior sample size parameter",
-                        &P, Policy()))
+                        &P))
         return P;
           
       if (!check_positive(function, alpha, "First prior sample size parameter", 
-                          &P, Policy()))
+                          &P))
         return P;
           
       if (!check_finite(function, beta, "Second prior sample size parameter",
-                        &P, Policy()))
+                        &P))
         return P;
           
       if (!check_positive(function, beta, "Second prior sample size parameter", 
-                          &P, Policy()))
+                          &P))
         return P;
           
       if (!(check_consistent_sizes(function,
@@ -274,12 +244,8 @@ DoubleVectorView<!is_constant_struct<T_size2>::value,
                                    "Population size parameter",
                                    "First prior sample size parameter",
                                    "Second prior sample size parameter",
-                                   &P, Policy())))
+                                   &P)))
         return P;
-          
-      // Return if everything is constant and only proportionality is required
-      if (!include_summand<propto, T_size1, T_size2>::value)
-        return 1.0;
           
       // Wrap arguments in vector views
       VectorView<const T_n> n_vec(n);
@@ -384,31 +350,6 @@ DoubleVectorView<!is_constant_struct<T_size2>::value,
       return operands_and_partials.to_var(P);
     }
       
-    template <bool propto, typename T_n, typename T_N, typename T_size1, 
-              typename T_size2>
-    inline typename return_type<T_size1,T_size2>::type
-    beta_binomial_cdf(const T_n& n, const T_N& N, const T_size1& alpha, 
-                      const T_size2& beta) {
-      return beta_binomial_cdf<propto>(n, N, alpha, beta, 
-                                       stan::math::default_policy());
-    }
-
-    template <typename T_n, typename T_N, typename T_size1, typename T_size2, 
-              class Policy>
-    inline typename return_type<T_size1,T_size2>::type
-    beta_binomial_cdf(const T_n& n, const T_N& N, const T_size1& alpha,
-                      const T_size2& beta, const Policy&) {
-      return beta_binomial_cdf<false>(n, N, alpha, beta, Policy());
-    }
-      
-    template <typename T_n, typename T_N, typename T_size1, typename T_size2>
-    typename return_type<T_size1,T_size2>::type
-    beta_binomial_cdf(const T_n& n, const T_N& N, const T_size1& alpha,
-                      const T_size2& beta) {
-      return beta_binomial_cdf<false>(n, N, alpha, beta, 
-                                      stan::math::default_policy());
-    }
-
     template <class RNG>
     inline int
     beta_binomial_rng(const int N,

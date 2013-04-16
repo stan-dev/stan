@@ -15,6 +15,8 @@
 #include <stan/mcmc/dualaverage.hpp>
 #include <stan/mcmc/hmc_base.hpp>
 #include <stan/mcmc/util.hpp>
+#include <stan/math/functions/sub.hpp>
+#include <stan/math/functions/dot_self.hpp>
 
 #include <Eigen/Dense>
 
@@ -386,7 +388,9 @@ namespace stan {
             newH = -std::numeric_limits<double>::infinity();
           nvalid = newH > u;
           criterion = newH - u > _maxchange;
-          prob_sum = stan::math::min(1, exp(newH - H0));
+          prob_sum = exp(newH - H0);
+          if(prob_sum > 1)
+            prob_sum = 1;
           n_considered = 1;
           this->nfevals_plus_eq(1);
           // Update running statistics if point is in slice

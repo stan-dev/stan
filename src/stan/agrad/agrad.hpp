@@ -101,5 +101,6 @@
 #include <stan/agrad/rev/ibeta.hpp>
 #include <stan/agrad/rev/value_of.hpp>
 #include <stan/agrad/rev/as_bool.hpp>
+#include <stan/agrad/rev/owens_t.hpp>
 
 #endif

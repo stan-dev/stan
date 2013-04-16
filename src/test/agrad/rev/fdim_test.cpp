@@ -4,7 +4,7 @@
 #include <stan/agrad/agrad.hpp>
 #include <stan/math/functions/fdim.hpp>
 
-TEST(AgradRev,fdim_vv_defaultpolicy) {
+TEST(AgradRev,fdim_vv) {
   AVAR a = 3.0;
   AVAR b = 4.0;
   AVAR f = fdim(a,b);
@@ -21,7 +21,7 @@ TEST(AgradRev,fdim_vv_defaultpolicy) {
   EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fdim(a,b).val());
   EXPECT_FLOAT_EQ(0.0, stan::math::fdim(b,a).val());
 }  
-TEST(AgradRev,fdim_vv_2_defaultpolicy) {
+TEST(AgradRev,fdim_vv_2) {
   AVAR a = 7.0;
   AVAR b = 2.0;
   AVAR f = fdim(a,b);
@@ -38,7 +38,7 @@ TEST(AgradRev,fdim_vv_2_defaultpolicy) {
   EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fdim(a,b).val());
   EXPECT_FLOAT_EQ(0.0, stan::math::fdim(b,a).val());
 }  
-TEST(AgradRev,fdim_vd_defaultpolicy) {
+TEST(AgradRev,fdim_vd) {
   AVAR a = 3.0;
   double b = 4.0;
   AVAR f = fdim(a,b);
@@ -56,7 +56,7 @@ TEST(AgradRev,fdim_vd_defaultpolicy) {
   EXPECT_FLOAT_EQ(0.0, stan::math::fdim(a,infinitydouble).val());
 }  
 
-TEST(AgradRev,fdim_vd_2_defaultpolicy) {
+TEST(AgradRev,fdim_vd_2) {
   AVAR a = 7.0;
   double b = 2.0;
   AVAR f = fdim(a,b);
@@ -73,7 +73,7 @@ TEST(AgradRev,fdim_vd_2_defaultpolicy) {
   EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fdim(infinityavar,b).val());
   EXPECT_FLOAT_EQ(0.0, stan::math::fdim(a,infinitydouble).val());
 }  
-TEST(AgradRev,fdim_dv_defaultpolicy) {
+TEST(AgradRev,fdim_dv) {
   double a = 3.0;
   AVAR b = 4.0;
   AVAR f = fdim(a,b);
@@ -90,7 +90,7 @@ TEST(AgradRev,fdim_dv_defaultpolicy) {
   EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), stan::math::fdim(infinitydouble,b).val());
   EXPECT_FLOAT_EQ(0.0, stan::math::fdim(a,infinityavar).val());
 }
-TEST(AgradRev,fdim_dv_2_defaultpolicy) {
+TEST(AgradRev,fdim_dv_2) {
   double a = 7.0;
   AVAR b = 2.0;
   AVAR f = fdim(a,b);

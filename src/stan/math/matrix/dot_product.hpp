@@ -24,10 +24,7 @@ namespace stan {
       validate_vector(v1,"dot_product");
       validate_vector(v2,"dot_product");
       validate_matching_sizes(v1,v2,"dot_product");
-      double sum = 0.0;
-      for (int i = 0; i < v1.size(); ++i)
-        sum += v1[i] * v2[i]; 
-      return sum;
+      return v1.dot(v2);
     }
     /**
      * Returns the dot product of the specified arrays of doubles.

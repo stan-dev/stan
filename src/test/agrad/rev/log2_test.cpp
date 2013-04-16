@@ -4,7 +4,7 @@
 #include <valarray>
 #include <stan/agrad/rev/numeric_limits.hpp>
 
-TEST(AgradRev,log2_defaultpolicy) {
+TEST(AgradRev,log2) {
   AVAR a = 3.0;
   AVAR f = stan::agrad::log2(a);
   EXPECT_FLOAT_EQ(std::log(3.0)/std::log(2.0), f.val());

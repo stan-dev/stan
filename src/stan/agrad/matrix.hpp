@@ -6,13 +6,16 @@
 #include <stan/agrad/rev/matrix/initialize_variable.hpp>
 #include <stan/agrad/rev/matrix/typedefs.hpp>
 #include <stan/agrad/rev/matrix/to_var.hpp>
+#include <stan/agrad/rev/matrix/dist.hpp>
 #include <stan/agrad/rev/matrix/dot_self.hpp>
 #include <stan/agrad/rev/matrix/dot_product.hpp>
 #include <stan/agrad/rev/matrix/sum.hpp>
 #include <stan/agrad/rev/matrix/mdivide_left.hpp>
+#include <stan/agrad/rev/matrix/mdivide_left_spd.hpp>
 #include <stan/agrad/rev/matrix/mdivide_left_tri.hpp>
 #include <stan/agrad/rev/matrix/determinant.hpp>
 #include <stan/agrad/rev/matrix/log_determinant.hpp>
+#include <stan/agrad/rev/matrix/log_determinant_spd.hpp>
 #include <stan/agrad/rev/matrix/divide.hpp>
 #include <stan/agrad/rev/matrix/multiply.hpp>
 #include <stan/agrad/rev/matrix/multiply_lower_tri_self_transpose.hpp>
