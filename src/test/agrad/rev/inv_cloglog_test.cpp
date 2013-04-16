@@ -3,6 +3,8 @@
 #include <stan/agrad/rev/operator_unary_negative.hpp>
 #include <stan/agrad/rev/operator_subtraction.hpp>
 
+#include <stan/math/functions/inv_cloglog.hpp>
+
 #include <test/agrad/util.hpp>
 #include <gtest/gtest.h>
 
@@ -11,7 +13,7 @@ TEST(AgradRev,inv_cloglog) {
   using stan::agrad::exp;
   AVAR a = 2.7;
   AVAR f = inv_cloglog(a);
-  EXPECT_FLOAT_EQ(1 - exp(-exp(2.7)),f.val());
+  EXPECT_FLOAT_EQ(stan::math::inv_cloglog(2.7),f.val());
 
   AVEC x = createAVEC(a);
   VEC grad_f;
