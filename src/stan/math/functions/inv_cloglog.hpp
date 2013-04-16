@@ -11,7 +11,7 @@ namespace stan {
      *
      * The function is defined by
      *
-     * <code>inv_cloglog(x) = -exp(-exp(x))</code>.
+     * <code>inv_cloglog(x) = 1 -exp(-exp(x))</code>.
      *
      * This function can be used to implement the inverse link
      * function for complementary-log-log regression.
@@ -23,7 +23,7 @@ namespace stan {
     inline typename boost::math::tools::promote_args<T>::type
     inv_cloglog(T x) {
       using std::exp;
-      return exp(-exp(x));
+      return 1 - exp(-exp(x));
     }
 
   }
