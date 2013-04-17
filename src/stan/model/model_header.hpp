@@ -81,7 +81,6 @@
 #include <stan/math/matrix/transpose.hpp>
 #include <stan/math/matrix/variance.hpp>
 
-#include <stan/mcmc/sampler.hpp>
 #include <stan/model/prob_grad_ad.hpp>
 #include <stan/prob/distributions.hpp>
 
