@@ -114,13 +114,13 @@ namespace stan {
         
         const LDLT_alloc<R,C> *_alloc_ldlt;
       };
-      template <int R,int C>
+      template <int R1,int C1,int R2,int C2>
       class mdivide_left_ldlt_alloc : public chainable_alloc {
       public:
         virtual ~mdivide_left_ldlt_alloc() {}
         
-        Eigen::LDLT< Eigen::Matrix<double,R,C> > _ldlt_Ad;
-        Eigen::Matrix<double,R,C> _C;
+        boost::shared_ptr< Eigen::LDLT< Eigen::Matrix<double,R1,C1> > > _ldltP;
+        Eigen::Matrix<double,R2,C2> _C;
       };
       
       template <int R1,int C1,int R2,int C2>
@@ -130,7 +130,7 @@ namespace stan {
         int _N; // B.cols()
         vari** _variRefB;
         vari** _variRefC;
-        mdivide_left_ldlt_alloc<R2,C2> *_alloc;
+        mdivide_left_ldlt_alloc<R1,C1,R2,C2> *_alloc;
         const LDLT_alloc<R1,C1> *_alloc_ldlt;
         
         mdivide_left_ldlt_vv_vari(const stan::math::LDLT_factor<var,R1,C1> &A,
@@ -142,7 +142,7 @@ namespace stan {
                                                        * B.rows() * B.cols())),
         _variRefC((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
                                                        * B.rows() * B.cols())),
-        _alloc(new mdivide_left_ldlt_alloc<R2,C2>()),
+        _alloc(new mdivide_left_ldlt_alloc<R1,C1,R2,C2>()),
         _alloc_ldlt(A._alloc)
         {
           size_t pos = 0;
@@ -197,7 +197,7 @@ namespace stan {
         int _N; // B.cols()
         vari** _variRefB;
         vari** _variRefC;
-        mdivide_left_ldlt_alloc<R2,C2> *_alloc;
+        mdivide_left_ldlt_alloc<R1,C1,R2,C2> *_alloc;
         
         mdivide_left_ldlt_dv_vari(const stan::math::LDLT_factor<double,R1,C1> &A,
                                   const Eigen::Matrix<var,R2,C2> &B)
@@ -208,7 +208,7 @@ namespace stan {
                                                        * B.rows() * B.cols())),
         _variRefC((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
                                                        * B.rows() * B.cols())),
-        _alloc(new mdivide_left_ldlt_alloc<R2,C2>())
+        _alloc(new mdivide_left_ldlt_alloc<R1,C1,R2,C2>())
         {
           using Eigen::Matrix;
           using Eigen::Map;
@@ -223,10 +223,8 @@ namespace stan {
             }
           }
           
-          // FIXME: Avoiding this copy would probably require a smart pointer or something like that.
-          (void)new((void*)&_alloc->_ldlt_Ad) Eigen::LDLT< Eigen::Matrix<double,R1,C1> >(A._ldlt);
-//          _alloc->_ldlt_Ad = A._ldlt;
-          _alloc->_ldlt_Ad.solveInPlace(_alloc->_C);
+          _alloc->_ldltP = A._ldltP;
+          _alloc->_ldltP->solveInPlace(_alloc->_C);
           
           pos = 0;
           for (size_type j = 0; j < _N; j++) {
@@ -245,7 +243,7 @@ namespace stan {
             for (size_type i = 0; i < adjB.rows(); i++)
               adjB(i,j) = _variRefC[pos++]->adj_;
           
-          _alloc->_ldlt_Ad.solveInPlace(adjB);
+          _alloc->_ldltP->solveInPlace(adjB);
           
           pos = 0;
           for (size_type j = 0; j < adjB.cols(); j++)
@@ -260,7 +258,7 @@ namespace stan {
         int _M; // A.rows() = A.cols() = B.rows()
         int _N; // B.cols()
         vari** _variRefC;
-        mdivide_left_ldlt_alloc<R2,C2> *_alloc;
+        mdivide_left_ldlt_alloc<R1,C1,R2,C2> *_alloc;
         const LDLT_alloc<R1,C1> *_alloc_ldlt;
       
         mdivide_left_ldlt_vd_vari(const stan::math::LDLT_factor<var,R1,C1> &A,
@@ -270,7 +268,7 @@ namespace stan {
             _N(B.cols()),
             _variRefC((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
                                                            * B.rows() * B.cols())),
-            _alloc(new mdivide_left_ldlt_alloc<R2,C2>()),
+            _alloc(new mdivide_left_ldlt_alloc<R1,C1,R2,C2>()),
             _alloc_ldlt(A._alloc)
         {
           _alloc->_C = B;
