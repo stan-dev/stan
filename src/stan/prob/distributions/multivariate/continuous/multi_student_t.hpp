@@ -40,10 +40,12 @@ namespace stan {
       using stan::math::check_not_nan;
       using stan::math::check_symmetric;
       using stan::math::check_positive;      
-      using stan::math::check_pos_definite;
       using boost::math::tools::promote_args;
       using boost::math::lgamma;
-
+      using stan::math::log_determinant_ldlt;
+      using stan::math::mdivide_left_ldlt;
+      using stan::math::LDLT_factor;
+      
       typename promote_args<T_y,T_dof,T_loc,T_scale>::type lp(0.0);
       if (!check_size_match(function, 
           y.size(), "Size of random variable",
@@ -66,8 +68,16 @@ namespace stan {
         return lp;
       if (!check_symmetric(function, Sigma, "Scale parameter", &lp))
         return lp;
-      if (!check_pos_definite(function, Sigma, "Scale parameter", &lp))
+
+      LDLT_factor<T_covar,Eigen::Dynamic,Eigen::Dynamic> ldlt_Sigma(Sigma);
+      if (!ldlt_Sigma.success()) {
+        std::ostringstream message;
+        message << "Scale matrix is not positive definite. " 
+        << "Sigma(0,0) is %1%.";
+        std::string str(message.str());
+        stan::math::dom_err(function,Sigma(0,0),"Scale matrix",str.c_str(),"",&lp);
         return lp;
+      }
 
       // allows infinities
       if (!check_not_nan(function, nu, 
@@ -97,12 +107,10 @@ namespace stan {
       using stan::math::dot_product;
       using stan::math::subtract;
       using Eigen::Array;
-      using stan::math::mdivide_left;
-      using stan::math::log_determinant;
 
 
       if (include_summand<propto,T_scale>::value) {
-        lp -= 0.5*log_determinant(Sigma);
+        lp -= 0.5*log_determinant_ldlt(ldlt_Sigma);
       }
 
       if (include_summand<propto,T_y,T_dof,T_loc,T_scale>::value) {
@@ -112,7 +120,7 @@ namespace stan {
                       1> y_minus_mu = subtract(y,mu);
         Eigen::Matrix<typename promote_args<T_scale,T_y,T_loc>::type,
                       Eigen::Dynamic,
-                      1> invSigma_dy = mdivide_left(Sigma, y_minus_mu);
+                      1> invSigma_dy = mdivide_left_ldlt(ldlt_Sigma, y_minus_mu);
         lp -= 0.5 
           * (nu + d)
           * log(1.0 + dot_product(y_minus_mu,invSigma_dy) / nu);
