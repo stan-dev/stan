@@ -1,8 +1,7 @@
 #include <gtest/gtest.h>
-#include <stan/agrad/fwd/binomial_coefficient_log.hpp>
+#include <stan/agrad/fvar.hpp>
 #include <boost/math/special_functions/digamma.hpp>
 #include <stan/math/functions/binomial_coefficient_log.hpp>
-#include <stan/agrad/fwd/fvar.hpp>
 
 TEST(AgradFvar, binom_coeff_log) {
   using stan::agrad::fvar;
