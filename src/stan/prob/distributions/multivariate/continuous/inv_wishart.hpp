@@ -97,6 +97,7 @@ namespace stan {
       using stan::math::lmgamma;
       using stan::math::log_determinant_ldlt;
       using stan::math::mdivide_left_ldlt;
+      using stan::math::trace;
       using stan::math::LDLT_factor;
       
       if (include_summand<propto,T_dof>::value)
