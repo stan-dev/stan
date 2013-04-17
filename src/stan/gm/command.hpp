@@ -724,7 +724,7 @@ namespace stan {
         sample_stream << "lp__,"; // log probability first
         model.write_csv_header(sample_stream);
         
-        stan::optimization::BFGSLineSearch ng(model, params_r, params_i,
+        stan::optimization::BFGSLineSearch ng(model, cont_params, disc_params,
                                               &std::cout);
         double lp = ng.logp();
         
@@ -736,7 +736,7 @@ namespace stan {
           ret = ng.step();
           lastlp = lp;
           lp = ng.logp();
-          ng.params_r(params_r);
+          ng.params_r(cont_params);
           if (do_print(i, refresh)) {
             std::cout << "Iteration ";
             std::cout << std::setw(3) << (m + 1) << ". ";
