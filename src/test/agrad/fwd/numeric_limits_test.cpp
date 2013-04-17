@@ -14,9 +14,8 @@ TEST(AgradFvar, numeric_limits) {
   EXPECT_FLOAT_EQ(31, std::numeric_limits<stan::agrad::fvar<int> >::digits);
 
   fvar<int> a = std::numeric_limits<stan::agrad::fvar<int> >::min();
-  a.val_ = -(a.val_ + 1);
   fvar<double> b = std::numeric_limits<stan::agrad::fvar<double> >::min();
-  EXPECT_FLOAT_EQ(2.147483647e+009, a.val_);
+  EXPECT_EQ(-2.147483648e+009, a.val_);
   EXPECT_FLOAT_EQ(2.22507e-308, b.val_);
 
   fvar<int> c = std::numeric_limits<stan::agrad::fvar<int> >::max();
