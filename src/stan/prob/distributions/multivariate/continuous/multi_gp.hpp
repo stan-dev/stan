@@ -63,6 +63,7 @@ namespace stan {
       using stan::math::check_symmetric;
       using stan::math::dot_product;
       using stan::math::rows_dot_product;
+      using stan::math::log_determinant_ldlt;
       using stan::math::mdivide_right_ldlt;
       using stan::math::LDLT_factor;
 
