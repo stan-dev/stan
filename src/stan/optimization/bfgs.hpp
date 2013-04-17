@@ -398,8 +398,9 @@ namespace stan {
                      const std::vector<double>& params_r,
                      const std::vector<int>& params_i,
                      std::ostream* output_stream = 0)
-      : _adaptor(model,params_i,output_stream),
-        BFGSMinimizer<ModelAdaptor>(_adaptor) {
+      : BFGSMinimizer<ModelAdaptor>(_adaptor),
+       _adaptor(model,params_i,output_stream)
+      {
 
         Eigen::Matrix<double,Eigen::Dynamic,1> x;
         x.resize(params_r.size());
