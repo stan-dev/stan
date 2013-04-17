@@ -678,9 +678,11 @@ namespace stan {
           }
         }
         
-        sample_stream << lp << ',';
-        model.write_csv(base_rng, cont_params, disc_params, sample_stream);
-        sample_stream.flush();
+        if (!save_warmup) {
+          sample_stream << lp << ',';
+          model.write_csv(base_rng,cont_params,disc_params,sample_stream);
+          sample_stream.flush();
+        }
 
         return 0;
       }
