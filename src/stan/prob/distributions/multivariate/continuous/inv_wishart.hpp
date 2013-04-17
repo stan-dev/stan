@@ -9,7 +9,7 @@
 #include <stan/agrad/agrad.hpp>
 #include <stan/agrad/matrix.hpp>
 #include "stan/prob/distributions/multivariate/continuous/wishart.hpp"
-#include <stan/math/matrix/log_determinant.hpp>
+#include <stan/math/matrix/ldlt.hpp>
 
 namespace stan {
   namespace prob {
@@ -77,39 +77,48 @@ namespace stan {
         return lp;
       // FIXME: domain checks
         
-      Eigen::LLT< Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic> > LLT_W = W.llt();
-      if (LLT_W.info() != Eigen::Success) {
-        stan::math::dom_err<T_y>(function,0,"",
-                                 "W is not positive definite (%1%)","",
-                                 &lp);
+      using stan::math::lmgamma;
+      using stan::math::log_determinant_ldlt;
+      using stan::math::mdivide_left_ldlt;
+      using stan::math::trace;
+      using stan::math::LDLT_factor;
+      
+      LDLT_factor<T_y,Eigen::Dynamic,Eigen::Dynamic> ldlt_W(W);
+      if (!ldlt_W.success()) {
+        std::ostringstream message;
+        message << "W is not positive definite (%1%).";
+        std::string str(message.str());
+        stan::math::dom_err(function,W(0,0),"W",str.c_str(),"",&lp);
         return lp;
       }
-      Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic> L = LLT_W.matrixL();
-
-      using stan::math::dot_product;
-      using stan::math::mdivide_left_tri_low;
-      using stan::math::crossprod;
-      using stan::math::lmgamma;
-      using stan::math::log_determinant;
-
+      LDLT_factor<T_scale,Eigen::Dynamic,Eigen::Dynamic> ldlt_S(S);
+      if (!ldlt_S.success()) {
+        std::ostringstream message;
+        message << "S is not positive definite (%1%).";
+        std::string str(message.str());
+        stan::math::dom_err(function,S(0,0),"S",str.c_str(),"",&lp);
+        return lp;
+      }
+      
       if (include_summand<propto,T_dof>::value)
         lp -= lmgamma(k, 0.5 * nu);
       if (include_summand<propto,T_dof,T_scale>::value) {
-        //        lp += nu * S.llt().matrixLLT().diagonal().array().log().sum();
-        lp += 0.5 * nu * log_determinant(S);
+        lp += 0.5 * nu * log_determinant_ldlt(ldlt_S);
       }
       if (include_summand<propto,T_y,T_dof,T_scale>::value) {
-        lp -= (nu + k + 1.0) * L.diagonal().array().log().sum();
+        lp -= 0.5 * (nu + k + 1.0) * log_determinant_ldlt(ldlt_W);
       }
       if (include_summand<propto,T_y,T_scale>::value) {
-        L = crossprod(mdivide_left_tri_low(L));
-        Eigen::Matrix<T_y,Eigen::Dynamic,1> W_inv_vec = Eigen::Map<
-          const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic> >(
-                                                                   &L(0), L.size(), 1);
-        Eigen::Matrix<T_scale,Eigen::Dynamic,1> S_vec = Eigen::Map<
-          const Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic> >(
-                                                                       &S(0), S.size(), 1);
-        lp -= 0.5 * dot_product(S_vec, W_inv_vec); // trace(S * W^-1)
+//        L = crossprod(mdivide_left_tri_low(L));
+//        Eigen::Matrix<T_y,Eigen::Dynamic,1> W_inv_vec = Eigen::Map<
+//          const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic> >(
+//                                                                   &L(0), L.size(), 1);
+//        Eigen::Matrix<T_scale,Eigen::Dynamic,1> S_vec = Eigen::Map<
+//          const Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic> >(
+//                                                                       &S(0), S.size(), 1);
+//        lp -= 0.5 * dot_product(S_vec, W_inv_vec); // trace(S * W^-1)
+        Eigen::Matrix<typename promote_args<T_y,T_scale>::type,Eigen::Dynamic,Eigen::Dynamic> Winv_S(mdivide_left_ldlt(ldlt_W,S));
+        lp -= 0.5*trace(Winv_S);
       }
       if (include_summand<propto,T_dof,T_scale>::value)
         lp += nu * k * NEG_LOG_TWO_OVER_TWO;

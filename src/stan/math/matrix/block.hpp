@@ -3,6 +3,7 @@
 
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/validate_row_index.hpp>
+#include <stan/math/matrix/validate_column_index.hpp>
 
 namespace stan {
   namespace math {

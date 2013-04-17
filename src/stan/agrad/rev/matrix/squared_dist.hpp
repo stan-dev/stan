@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__REV__MATRIX__DIST_HPP__
-#define __STAN__AGRAD__REV__MATRIX__DIST_HPP__
+#ifndef __STAN__AGRAD__REV__MATRIX__SQUARED_DIST_HPP__
+#define __STAN__AGRAD__REV__MATRIX__SQUARED_DIST_HPP__
 
 #include <vector>
 #include <stan/math/matrix/Eigen.hpp>
@@ -25,7 +25,7 @@ namespace stan {
                                               const Eigen::Matrix<var,R2,C2> &v2) {
           double result = 0;
           for (size_t i = 0; i < v1.size(); i++) {
-            double diff = v1[i].vi_->val_ - v2[i].vi_->val_;
+            double diff = v1(i).vi_->val_ - v2(i).vi_->val_;
             result += diff*diff;
           }
           return result;
@@ -38,11 +38,11 @@ namespace stan {
         {
           v1_ = (vari**)memalloc_.alloc(length_*sizeof(vari*));
           for (size_t i = 0; i < length_; i++)
-            v1_[i] = v1[i].vi_;
-
+            v1_[i] = v1(i).vi_;
+          
           v2_ = (vari**)memalloc_.alloc(length_*sizeof(vari*));
           for (size_t i = 0; i < length_; i++)
-            v2_[i] = v2[i].vi_;
+            v2_[i] = v2(i).vi_;
         }
         virtual void chain() {
           for (size_t i = 0; i < length_; i++) {
@@ -63,7 +63,7 @@ namespace stan {
                                               const Eigen::Matrix<double,R2,C2> &v2) {
           double result = 0;
           for (size_t i = 0; i < v1.size(); i++) {
-            double diff = v1[i].vi_->val_ - v2[i];
+            double diff = v1(i).vi_->val_ - v2(i);
             result += diff*diff;
           }
           return result;
@@ -76,11 +76,11 @@ namespace stan {
         {
           v1_ = (vari**)memalloc_.alloc(length_*sizeof(vari*));
           for (size_t i = 0; i < length_; i++)
-            v1_[i] = v1[i].vi_;
+            v1_[i] = v1(i).vi_;
           
           v2_ = (double*)memalloc_.alloc(length_*sizeof(double));
           for (size_t i = 0; i < length_; i++)
-            v2_[i] = v2[i];
+            v2_[i] = v2(i);
         }
         virtual void chain() {
           for (size_t i = 0; i < length_; i++) {
@@ -89,7 +89,7 @@ namespace stan {
         }
       };
     }
-
+    
     template<int R1,int C1,int R2, int C2>
     inline var squared_dist(const Eigen::Matrix<var, R1, C1>& v1, 
                             const Eigen::Matrix<var, R2, C2>& v2) {
@@ -113,31 +113,6 @@ namespace stan {
       stan::math::validate_vector(v2,"squared_dist");
       stan::math::validate_matching_sizes(v1,v2,"squared_dist");
       return var(new squared_dist_vd_vari(v2,v1));
-    }
-    
-    template<int R1,int C1,int R2, int C2>
-    inline var dist(const Eigen::Matrix<var, R1, C1>& v1, 
-                            const Eigen::Matrix<var, R2, C2>& v2) {
-      stan::math::validate_vector(v1,"dist");
-      stan::math::validate_vector(v2,"dist");
-      stan::math::validate_matching_sizes(v1,v2,"dist");
-      return sqrt(var(new squared_dist_vv_vari(v1,v2)));
-    }
-    template<int R1,int C1,int R2, int C2>
-    inline var dist(const Eigen::Matrix<var, R1, C1>& v1, 
-                            const Eigen::Matrix<double, R2, C2>& v2) {
-      stan::math::validate_vector(v1,"dist");
-      stan::math::validate_vector(v2,"dist");
-      stan::math::validate_matching_sizes(v1,v2,"dist");
-      return sqrt(var(new squared_dist_vd_vari(v1,v2)));
-    }
-    template<int R1,int C1,int R2, int C2>
-    inline var dist(const Eigen::Matrix<double, R1, C1>& v1, 
-                            const Eigen::Matrix<var, R2, C2>& v2) {
-      stan::math::validate_vector(v1,"dist");
-      stan::math::validate_vector(v2,"dist");
-      stan::math::validate_matching_sizes(v1,v2,"dist");
-      return sqrt(var(new squared_dist_vd_vari(v2,v1)));
     }
   }
 }

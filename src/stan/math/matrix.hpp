@@ -21,6 +21,7 @@
 #include <stan/math/matrix/diagonal.hpp>
 #include <stan/math/matrix/dims.hpp>
 #include <stan/math/matrix/dist.hpp>
+#include <stan/math/matrix/squared_dist.hpp>
 #include <stan/math/matrix/divide.hpp>
 #include <stan/math/matrix/dot_product.hpp>
 #include <stan/math/matrix/dot_self.hpp>
@@ -32,8 +33,10 @@
 #include <stan/math/matrix/get_base1.hpp>
 #include <stan/math/matrix/get_base1_lhs.hpp>
 #include <stan/math/matrix/inverse.hpp>
+#include <stan/math/matrix/ldlt.hpp>
 #include <stan/math/matrix/log.hpp>
 #include <stan/math/matrix/log_determinant.hpp>
+#include <stan/math/matrix/log_determinant_spd.hpp>
 #include <stan/math/matrix/max.hpp>
 #include <stan/math/matrix/mdivide_left.hpp>
 #include <stan/math/matrix/mdivide_left_tri.hpp>

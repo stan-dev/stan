@@ -18,10 +18,12 @@
 #include <stan/math/matrix/log.hpp>
 #include <stan/math/matrix/log_determinant.hpp>
 #include <stan/math/matrix/mdivide_left_tri_low.hpp>
-#include <stan/math/matrix/mdivide_left_spd.hpp>
 #include <stan/math/matrix/multiply.hpp>
 #include <stan/math/matrix/subtract.hpp>
 #include <stan/math/matrix/sum.hpp>
+
+#include <stan/math/matrix/ldlt.hpp>
+
 
 namespace stan {
   namespace prob {
@@ -253,12 +255,12 @@ namespace stan {
       using stan::math::check_not_nan;
       using stan::math::check_size_match;
       using stan::math::check_positive;
-      using stan::math::check_pos_definite;
       using stan::math::check_finite;
       using stan::math::check_symmetric;
       using stan::math::dot_product;
-      using stan::math::mdivide_left_spd;
-      using stan::math::log_determinant;
+      using stan::math::log_determinant_ldlt;
+      using stan::math::mdivide_left_ldlt;
+      using stan::math::LDLT_factor;
       
       if (!check_size_match(function, 
                             Sigma.rows(), "Rows of covariance parameter",
@@ -269,8 +271,17 @@ namespace stan {
         return lp;
       if (!check_symmetric(function, Sigma, "Covariance matrix", &lp))
         return lp;
-      if (!check_pos_definite(function, Sigma, "Covariance matrix", &lp))
+      
+      LDLT_factor<T_covar,Eigen::Dynamic,Eigen::Dynamic> ldlt_Sigma(Sigma);
+      if (!ldlt_Sigma.success()) {
+        std::ostringstream message;
+        message << "Covariance matrix is not positive definite. " 
+        << "Sigma(0,0) is %1%.";
+        std::string str(message.str());
+        stan::math::dom_err(function,Sigma(0,0),"Covariance matrix",str.c_str(),"",&lp);
         return lp;
+      }
+      
       if (!check_size_match(function, 
                             y.size(), "Size of random variable",
                             mu.size(), "size of location parameter",
@@ -298,7 +309,7 @@ namespace stan {
         lp += NEG_LOG_SQRT_TWO_PI * y.rows();
       
       if (include_summand<propto,T_covar>::value) {
-        lp -= 0.5 * log_determinant(Sigma);
+        lp -= 0.5 * log_determinant_ldlt(ldlt_Sigma);
       }
 
       if (include_summand<propto,T_y,T_loc,T_covar>::value) {
@@ -309,7 +320,7 @@ namespace stan {
           y_minus_mu(i) = y(i)-mu(i);
         Eigen::Matrix<typename 
           boost::math::tools::promote_args<T_covar,T_loc,T_y>::type,
-          Eigen::Dynamic, 1> Sinv_y_minus_mu(mdivide_left_spd(Sigma,y_minus_mu));
+          Eigen::Dynamic, 1> Sinv_y_minus_mu(mdivide_left_ldlt(ldlt_Sigma,y_minus_mu));
         lp -= 0.5 * dot_product(y_minus_mu,Sinv_y_minus_mu);
       }
       return lp;
@@ -338,14 +349,14 @@ namespace stan {
       
       using stan::math::check_size_match;
       using stan::math::check_positive;
-      using stan::math::check_pos_definite;
       using stan::math::check_finite;
       using stan::math::check_symmetric;
       using stan::math::check_not_nan;
       using stan::math::sum;
-      using stan::math::mdivide_left_spd;
-      using stan::math::log_determinant;
       using stan::math::columns_dot_product;
+      using stan::math::log_determinant_ldlt;
+      using stan::math::mdivide_left_ldlt;
+      using stan::math::LDLT_factor;
       
       if (!check_size_match(function, 
                             Sigma.rows(), "Rows of covariance matrix",
@@ -356,8 +367,17 @@ namespace stan {
         return lp;
       if (!check_symmetric(function, Sigma, "Covariance matrix", &lp))
         return lp;
-      if (!check_pos_definite(function, Sigma, "Covariance matrix", &lp))
+      
+      LDLT_factor<T_covar,Eigen::Dynamic,Eigen::Dynamic> ldlt_Sigma(Sigma);
+      if (!ldlt_Sigma.success()) {
+        std::ostringstream message;
+        message << "Covariance matrix is not positive definite. " 
+        << "Sigma(0,0) is %1%.";
+        std::string str(message.str());
+        stan::math::dom_err(function,Sigma(0,0),"Covariance matrix",str.c_str(),"",&lp);
         return lp;
+      }
+
       if (!check_size_match(function, 
                             y.cols(), "Columns of random variable",
                             mu.rows(), "rows of location parameter",
@@ -385,7 +405,7 @@ namespace stan {
         lp += NEG_LOG_SQRT_TWO_PI * y.cols() * y.rows();
       
       if (include_summand<propto,T_covar>::value) {
-        lp -= 0.5 * log_determinant(Sigma) * y.rows();
+        lp -= 0.5 * log_determinant_ldlt(ldlt_Sigma) * y.rows();
       }
       
       if (include_summand<propto,T_y,T_loc,T_covar>::value) {
@@ -412,7 +432,7 @@ namespace stan {
         
         Eigen::Matrix<typename 
           boost::math::tools::promote_args<T_covar,T_loc,T_y>::type,
-          Eigen::Dynamic,Eigen::Dynamic> Sinv_z(mdivide_left_spd(Sigma,z));
+          Eigen::Dynamic,Eigen::Dynamic> Sinv_z(mdivide_left_ldlt(ldlt_Sigma,z));
         
         lp -= 0.5 * sum(columns_dot_product(z,Sinv_z));
       }
@@ -441,24 +461,33 @@ namespace stan {
       using stan::math::check_symmetric;
       using stan::math::check_size_match;
       using stan::math::check_positive;
-      using stan::math::check_pos_definite;
       using stan::math::check_finite;
-      using stan::math::log_determinant;
       using stan::math::sum;
       using stan::math::dot_product;
       using stan::math::multiply;
+      using stan::math::log_determinant_ldlt;
+      using stan::math::LDLT_factor;
       
       if (!check_size_match(function, 
                             Sigma.rows(), "Rows of covariance parameter",
                             Sigma.cols(), "columns of covariance parameter",
                             &lp))
         return lp;
-      if (!check_positive(function, Sigma.rows(), "Covariance matrix rows", &lp))
+      if (!check_positive(function, Sigma.rows(), "Precision matrix rows", &lp))
         return lp;
-      if (!check_symmetric(function, Sigma, "Covariance matrix", &lp))
+      if (!check_symmetric(function, Sigma, "Precision matrix", &lp))
         return lp;
-      if (!check_pos_definite(function, Sigma, "Covariance matrix", &lp))
+      
+      LDLT_factor<T_covar,Eigen::Dynamic,Eigen::Dynamic> ldlt_Sigma(Sigma);
+      if (!ldlt_Sigma.success()) {
+        std::ostringstream message;
+        message << "Precision matrix is not positive definite. " 
+        << "Sigma(0,0) is %1%.";
+        std::string str(message.str());
+        stan::math::dom_err(function,Sigma(0,0),"Precision matrix",str.c_str(),"",&lp);
         return lp;
+      }
+
       if (!check_size_match(function, 
                             y.size(), "Size of random variable",
                             mu.size(), "size of location parameter",
@@ -486,7 +515,7 @@ namespace stan {
         lp += NEG_LOG_SQRT_TWO_PI * y.rows();
       
       if (include_summand<propto,T_covar>::value)
-        lp += 0.5*log_determinant(Sigma);
+        lp += 0.5*log_determinant_ldlt(ldlt_Sigma);
       
       if (include_summand<propto,T_y,T_loc,T_covar>::value) {
         Eigen::Matrix<typename 
@@ -527,24 +556,33 @@ namespace stan {
       using stan::math::check_symmetric;
       using stan::math::check_size_match;
       using stan::math::check_positive;
-      using stan::math::check_pos_definite;
       using stan::math::check_finite;
-      using stan::math::log_determinant;
       using stan::math::sum;
       using stan::math::columns_dot_product;
       using stan::math::multiply;
+      using stan::math::log_determinant_ldlt;
+      using stan::math::LDLT_factor;
       
       if (!check_size_match(function, 
                             Sigma.rows(), "Rows of covariance matrix",
                             Sigma.cols(), "columns of covariance matrix",
                             &lp))
         return lp;
-      if (!check_positive(function, Sigma.rows(), "Covariance matrix rows", &lp))
+      if (!check_positive(function, Sigma.rows(), "Precision matrix rows", &lp))
         return lp;
-      if (!check_symmetric(function, Sigma, "Covariance matrix", &lp))
+      if (!check_symmetric(function, Sigma, "Precision matrix", &lp))
         return lp;
-      if (!check_pos_definite(function, Sigma, "Covariance matrix", &lp))
+      
+      LDLT_factor<T_covar,Eigen::Dynamic,Eigen::Dynamic> ldlt_Sigma(Sigma);
+      if (!ldlt_Sigma.success()) {
+        std::ostringstream message;
+        message << "Covariance matrix is not positive definite. " 
+        << "Sigma(0,0) is %1%.";
+        std::string str(message.str());
+        stan::math::dom_err(function,Sigma(0,0),"Covariance matrix",str.c_str(),"",&lp);
         return lp;
+      }
+      
       if (!check_size_match(function, 
                             y.cols(), "Columns of random variable",
                             mu.rows(), "rows of location parameter",
@@ -572,7 +610,7 @@ namespace stan {
         lp += NEG_LOG_SQRT_TWO_PI * y.cols() * y.rows();
       
       if (include_summand<propto,T_covar>::value) {
-        lp += log_determinant(Sigma) * (0.5 * y.rows());
+        lp += log_determinant_ldlt(ldlt_Sigma) * (0.5 * y.rows());
       }
       
       if (include_summand<propto,T_y,T_loc,T_covar>::value) {
