@@ -3,6 +3,7 @@
 
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/meta/traits.hpp>
+#include <stan/math/constants.hpp>
 #include <boost/math/special_functions/acosh.hpp>
 
 namespace stan{
