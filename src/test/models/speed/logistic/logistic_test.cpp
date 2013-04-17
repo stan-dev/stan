@@ -204,8 +204,8 @@ public:
     {
       std::string tmp(param_filename.str());
       std::ifstream param_ifstream(tmp.c_str());
+      stan::io::dump param_values(param_ifstream);
     }
-    stan::io::dump param_values(param_ifstream);
   
     beta = param_values.vals_r("beta");
   }
