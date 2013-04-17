@@ -133,7 +133,7 @@ int main(int argc, const char* argv[]) {
   values.setZero();
   Eigen::VectorXd probs(5);
   probs << 0.025, 0.25, 0.5, 0.75, 0.975;
-
+  
   for (int i = 0; i < chains.num_params(); i++) {
     double sd = chains.sd(i);
     double n_eff = chains.effective_sample_size(i);
@@ -156,8 +156,14 @@ int main(int argc, const char* argv[]) {
   Eigen::VectorXi digits(n);
   digits.setConstant(1);
   digits(8) = 0;
-
+  
+  // Want per row:
+  //   scientific vs floating point
+  // Want per column:
+  //   length
+  
   Eigen::VectorXi column_lengths(n);
+  // Formats should be a vector of length chains.num_params()
   Eigen::Matrix<std::ios_base::fmtflags, Eigen::Dynamic, 1> formats(n);
   column_lengths = calculate_sizes(values, headers, digits, formats);
   

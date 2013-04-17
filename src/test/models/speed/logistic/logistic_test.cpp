@@ -201,15 +201,13 @@ public:
     std::stringstream param_filename;
     param_filename << path << get_path_separator() << filename
                    << "_param.data.R";
-    {
-      std::string tmp(param_filename.str());
-      std::ifstream param_ifstream(tmp.c_str());
-      stan::io::dump param_values(param_ifstream);
-    }
-  
+    std::string tmp(param_filename.str());
+    std::ifstream param_ifstream(tmp.c_str());
+    stan::io::dump param_values(param_ifstream);
+    
     beta = param_values.vals_r("beta");
   }
-
+  
   /** 
    * Runs the test case.
    * 
