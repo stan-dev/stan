@@ -77,6 +77,12 @@ namespace stan {
         return lp;
       // FIXME: domain checks
         
+      using stan::math::lmgamma;
+      using stan::math::log_determinant_ldlt;
+      using stan::math::mdivide_left_ldlt;
+      using stan::math::trace;
+      using stan::math::LDLT_factor;
+      
       LDLT_factor<T_y,Eigen::Dynamic,Eigen::Dynamic> ldlt_W(W);
       if (!ldlt_W.success()) {
         std::ostringstream message;
@@ -93,12 +99,6 @@ namespace stan {
         stan::math::dom_err(function,S(0,0),"S",str.c_str(),"",&lp);
         return lp;
       }
-      
-      using stan::math::lmgamma;
-      using stan::math::log_determinant_ldlt;
-      using stan::math::mdivide_left_ldlt;
-      using stan::math::trace;
-      using stan::math::LDLT_factor;
       
       if (include_summand<propto,T_dof>::value)
         lp -= lmgamma(k, 0.5 * nu);
