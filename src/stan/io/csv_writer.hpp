@@ -3,6 +3,7 @@
 
 #include <ostream>
 #include <limits>
+#include <iomanip>
 #include <stan/math/matrix.hpp>
 
 namespace stan {
