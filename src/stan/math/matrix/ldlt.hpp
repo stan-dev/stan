@@ -51,7 +51,6 @@ namespace stan {
       inline size_t rows() const { return _N; }
       inline size_t cols() const { return _N; }
       
-    private:
       size_t _N;
       Eigen::LDLT< Eigen::Matrix<double,R,C> > _ldlt;
     };

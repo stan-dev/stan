@@ -224,7 +224,8 @@ namespace stan {
           }
           
           // FIXME: Avoiding this copy would probably require a smart pointer or something like that.
-          _alloc->_ldlt_Ad = A._ldlt;
+          (void)new((void*)&_alloc->_ldlt_Ad) Eigen::LDLT< Eigen::Matrix<double,R1,C1> >(A._ldlt);
+//          _alloc->_ldlt_Ad = A._ldlt;
           _alloc->_ldlt_Ad.solveInPlace(_alloc->_C);
           
           pos = 0;
@@ -244,7 +245,7 @@ namespace stan {
             for (size_type i = 0; i < adjB.rows(); i++)
               adjB(i,j) = _variRefC[pos++]->adj_;
           
-          _alloc->_ldlt.solveInPlace(adjB);
+          _alloc->_ldlt_Ad.solveInPlace(adjB);
           
           pos = 0;
           for (size_type j = 0; j < adjB.cols(); j++)
