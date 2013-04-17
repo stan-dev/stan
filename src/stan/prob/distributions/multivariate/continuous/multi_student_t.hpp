@@ -69,7 +69,7 @@ namespace stan {
       if (!check_symmetric(function, Sigma, "Scale parameter", &lp))
         return lp;
 
-      LDLT_factor<T_covar,Eigen::Dynamic,Eigen::Dynamic> ldlt_Sigma(Sigma);
+      LDLT_factor<T_scale,Eigen::Dynamic,Eigen::Dynamic> ldlt_Sigma(Sigma);
       if (!ldlt_Sigma.success()) {
         std::ostringstream message;
         message << "Scale matrix is not positive definite. " 
