@@ -237,7 +237,7 @@ namespace stan {
           else
             _alpha0 = _alpha = 1.0;
           
-          if (_itNum == 1 || !(_ldlt.info() == Eigen::Success && _ldlt.isPositive())) {
+          if (_itNum == 1 || !(_ldlt.info() == Eigen::Success && _ldlt.isPositive() && (_ldlt.vectorD().array() > 0).all())) {
             Scalar Bscale;
             resetB = true;
             if (_itNum == 1) {
@@ -247,7 +247,8 @@ namespace stan {
               std::cerr << "BFGS Hessian reset" << std::endl;
               Bscale = _ldlt.vectorD().maxCoeff();
             }
-            _ldlt.compute(Bscale*HessianT::Identity(_xk.size(),_xk.size()));
+            // Not needed, as ldlt is never used if resetB == true
+//            _ldlt.compute(Bscale*HessianT::Identity(_xk.size(),_xk.size()));
             _s = -_gk/Bscale;
           }
           else {
