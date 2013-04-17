@@ -58,7 +58,6 @@ namespace stan {
       using stan::math::check_not_nan;
       using stan::math::check_size_match;
       using stan::math::check_positive;
-      using stan::math::check_pos_definite;
       using stan::math::check_finite;
       using stan::math::check_symmetric;
       using stan::math::dot_product;
