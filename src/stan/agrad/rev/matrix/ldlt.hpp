@@ -314,7 +314,15 @@ namespace stan {
       Eigen::Matrix<var,R1,C2> res(b.rows(),b.cols());
 
 //      stan::math::validate_multiplicable(A,b,"mdivide_left_ldlt");
-
+      if (A.cols() != b.rows()) {
+        std::stringstream ss;
+        ss << "error in call to " << "mdivide_left_ldlt"
+        << "; require cols of arg1 to match rows of arg2, but found "
+        << " arg1 rows=" << A.rows() << " arg1 cols=" << A.cols()
+        << " arg2 rows=" << b.rows() << " arg2 cols=" << b.cols();
+        throw std::domain_error(ss.str());
+      }
+      
       mdivide_left_ldlt_vv_vari<R1,C1,R2,C2> *baseVari = new mdivide_left_ldlt_vv_vari<R1,C1,R2,C2>(A,b);
       
       size_t pos = 0;
@@ -332,6 +340,14 @@ namespace stan {
       Eigen::Matrix<var,R1,C2> res(b.rows(),b.cols());
       
 //      stan::math::validate_multiplicable(A,b,"mdivide_left_ldlt");
+      if (A.cols() != b.rows()) {
+        std::stringstream ss;
+        ss << "error in call to " << "mdivide_left_ldlt"
+        << "; require cols of arg1 to match rows of arg2, but found "
+        << " arg1 rows=" << A.rows() << " arg1 cols=" << A.cols()
+        << " arg2 rows=" << b.rows() << " arg2 cols=" << b.cols();
+        throw std::domain_error(ss.str());
+      }
       
       mdivide_left_ldlt_vd_vari<R1,C1,R2,C2> *baseVari = new mdivide_left_ldlt_vd_vari<R1,C1,R2,C2>(A,b);
       
@@ -350,6 +366,14 @@ namespace stan {
       Eigen::Matrix<var,R1,C2> res(b.rows(),b.cols());
       
 //      stan::math::validate_multiplicable(A,b,"mdivide_left_ldlt");
+      if (A.cols() != b.rows()) {
+        std::stringstream ss;
+        ss << "error in call to " << "mdivide_left_ldlt"
+        << "; require cols of arg1 to match rows of arg2, but found "
+        << " arg1 rows=" << A.rows() << " arg1 cols=" << A.cols()
+        << " arg2 rows=" << b.rows() << " arg2 cols=" << b.cols();
+        throw std::domain_error(ss.str());
+      }
       
       mdivide_left_ldlt_dv_vari<R1,C1,R2,C2> *baseVari = new mdivide_left_ldlt_dv_vari<R1,C1,R2,C2>(A,b);
       
