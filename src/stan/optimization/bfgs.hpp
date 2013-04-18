@@ -218,8 +218,12 @@ namespace stan {
         BFGSMinimizer(FunctorType &f) : _func(f) { }
         
         void initialize(const VectorT &x0) {
+          int ret;
           _xk = x0;
-          _func(_xk,_fk,_gk);
+          ret = _func(_xk,_fk,_gk);
+          if (ret) {
+            throw std::runtime_error("Error evaluating initial BFGS point.");
+          }
           
           _itNum = 0;
         }
@@ -350,13 +354,18 @@ namespace stan {
         try {
           f = -_model.log_prob(_x, _params_i, _output_stream);
         } catch (const std::exception& e) {
+          std::cerr << "Error evaluating model log probability:" << std::endl
+                    << e.what() << std::endl;
           return 1;
         }
 
         if (boost::math::isfinite(f))
           return 0;
-        else
+        else {
+          std::cerr << "Error evaluating model log probability:" << std::endl
+                    << "Non-finite function evaluation." << std::endl;
           return 2;
+        }
       }
       int operator()(const Eigen::Matrix<double,Eigen::Dynamic,1> &x, double &f, Eigen::Matrix<double,Eigen::Dynamic,1> &g) {
         _x.resize(x.size());
@@ -368,20 +377,28 @@ namespace stan {
         try {
           f = -_model.grad_log_prob(_x, _params_i, _g, _output_stream);
         } catch (const std::exception& e) {
+          std::cerr << "Error evaluating model log probability:" << std::endl
+                    << e.what() << std::endl;
           return 1;
         }
 
         g.resize(_g.size());
         for (size_t i = 0; i < _g.size(); i++) {
-          if (!boost::math::isfinite(_g[i]))
+          if (!boost::math::isfinite(_g[i])) {
+            std::cerr << "Error evaluating model log probability:" << std::endl
+                      << "Non-finite gradient." << std::endl;
             return 3;
+          }
           g[i] = -_g[i];
         }
 
         if (boost::math::isfinite(f))
           return 0;
-        else
+        else {
+          std::cerr << "Error evaluating model log probability:" << std::endl
+                    << "Non-finite function evaluation." << std::endl;
           return 2;
+        }
       }
       int df(const Eigen::Matrix<double,Eigen::Dynamic,1> &x, Eigen::Matrix<double,Eigen::Dynamic,1> &g) {
         double f;
