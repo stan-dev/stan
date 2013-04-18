@@ -674,3 +674,106 @@ TEST(AgradFwdMatrix, columns_dot_product_rowvector_rowvector) {
   EXPECT_FLOAT_EQ(-2, output(1).d_);
   EXPECT_FLOAT_EQ(-1, output(2).d_);
 }
+TEST(AgradFwdMatrix, columns_dot_product_matrix_matrix) {
+  using stan::math::matrix_d;
+  using stan::agrad::matrix_fv;
+  using stan::agrad::row_vector_fv;
+
+  matrix_d d1(3,3), d2(3,3);
+  matrix_fv v1(3,3), v2(3,3);
+  
+  d1 << 1, 1, 1, 3, 3, 3, -5, -5, -5;
+  v1 << 1, 1, 1, 3, 3, 3, -5, -5, -5;
+   v1(0,0).d_ = 1.0;
+   v1(0,1).d_ = 1.0;
+   v1(0,2).d_ = 1.0;
+   v1(1,0).d_ = 1.0;
+   v1(1,1).d_ = 1.0;
+   v1(1,2).d_ = 1.0;
+   v1(2,0).d_ = 1.0;
+   v1(2,1).d_ = 1.0;
+   v1(2,2).d_ = 1.0;
+  d2 << 4, 4, 4, -2, -2, -2, -1, -1, -1;
+  v2 << 4, 4, 4, -2, -2, -2, -1, -1, -1;
+   v2(0,0).d_ = 1.0;
+   v2(0,1).d_ = 1.0;
+   v2(0,2).d_ = 1.0;
+   v2(1,0).d_ = 1.0;
+   v2(1,1).d_ = 1.0;
+   v2(1,2).d_ = 1.0;
+   v2(2,0).d_ = 1.0;
+   v2(2,1).d_ = 1.0;
+   v2(2,2).d_ = 1.0;
+
+  row_vector_fv output;
+  output = columns_dot_product(v1,d2);
+  EXPECT_FLOAT_EQ( 3, output(0).val_);
+  EXPECT_FLOAT_EQ( 3, output(1).val_);
+  EXPECT_FLOAT_EQ( 3, output(2).val_);
+  EXPECT_FLOAT_EQ( 1, output(0).d_);
+  EXPECT_FLOAT_EQ( 1, output(1).d_);
+  EXPECT_FLOAT_EQ( 1, output(2).d_);
+
+  output = columns_dot_product(d1, v2);
+  EXPECT_FLOAT_EQ( 3, output(0).val_);
+  EXPECT_FLOAT_EQ( 3, output(1).val_);
+  EXPECT_FLOAT_EQ( 3, output(2).val_);
+  EXPECT_FLOAT_EQ(-1, output(0).d_);
+  EXPECT_FLOAT_EQ(-1, output(1).d_);
+  EXPECT_FLOAT_EQ(-1, output(2).d_);
+
+  output = columns_dot_product(v1, v2);
+  EXPECT_FLOAT_EQ( 3, output(0).val_);
+  EXPECT_FLOAT_EQ( 3, output(1).val_);
+  EXPECT_FLOAT_EQ( 3, output(2).val_);
+  EXPECT_FLOAT_EQ( 0, output(0).d_);
+  EXPECT_FLOAT_EQ( 0, output(1).d_);
+  EXPECT_FLOAT_EQ( 0, output(2).d_);
+}
+TEST(AgradFwdMatrix, columns_dot_product_matrix_matrix_exception) {
+  using stan::math::matrix_d;
+  using stan::agrad::matrix_fv;
+  using stan::agrad::columns_dot_product;
+
+  matrix_d d1(3,3);
+  matrix_d d2(3,2);
+  matrix_d d3(2,3);
+  matrix_fv v1(3,3);
+  matrix_fv v2(3,3);
+  matrix_fv v3(3,2);
+  matrix_fv v4(3,2);
+  matrix_fv v5(2,3);
+  matrix_fv v6(2,3);
+
+  d1 << 1, 3, -5, 1, 3, -5, 1, 3, -5;
+  d2 << 1, 3, -5, 1, 3, -5;
+  d2 << 1, 3, -5, 1, 3, -5;
+  v1 << 1, 3, -5, 1, 3, -5, 1, 3, -5;
+  v2 << 4, -2, -1, 2, 1, 2, 1, 3, -5;
+  v3 << 4, -2, -1, 2, 1, 2;
+  v4 << 4, -2, -1, 2, 1, 2;
+  v5 << 4, -2, -1, 2, 1, 2;
+  v6 << 4, -2, -1, 2, 1, 2;
+
+  EXPECT_THROW(columns_dot_product(v1,d2), std::domain_error);
+  EXPECT_THROW(columns_dot_product(v1,d3), std::domain_error);
+  EXPECT_THROW(columns_dot_product(v1,v3), std::domain_error);
+  EXPECT_THROW(columns_dot_product(v1,v4), std::domain_error);
+  EXPECT_THROW(columns_dot_product(v1,v5), std::domain_error);
+  EXPECT_THROW(columns_dot_product(v1,v6), std::domain_error);
+
+  EXPECT_THROW(columns_dot_product(d1,v3), std::domain_error);
+  EXPECT_THROW(columns_dot_product(d1,v4), std::domain_error);
+  EXPECT_THROW(columns_dot_product(d1,v5), std::domain_error);
+  EXPECT_THROW(columns_dot_product(d1,v6), std::domain_error);
+
+  EXPECT_THROW(columns_dot_product(d2,v1), std::domain_error);
+  EXPECT_THROW(columns_dot_product(d2,v2), std::domain_error);
+  EXPECT_THROW(columns_dot_product(d2,v5), std::domain_error);
+  EXPECT_THROW(columns_dot_product(d2,v6), std::domain_error);
+
+  EXPECT_THROW(columns_dot_product(d3,v1), std::domain_error);
+  EXPECT_THROW(columns_dot_product(d3,v2), std::domain_error);
+  EXPECT_THROW(columns_dot_product(d3,v3), std::domain_error);
+  EXPECT_THROW(columns_dot_product(d3,v4), std::domain_error);
+}
