@@ -23,6 +23,7 @@ namespace stan {
       }
       
       inline void compute(const Eigen::Matrix<double,R,C> &A) {
+        stan::math::validate_square(A,"LDLT_factor<double>::compute");
         _N = A.rows();
         _ldltP->compute(A);
       }
@@ -63,15 +64,7 @@ namespace stan {
     inline Eigen::Matrix<double,R1,C2>
     mdivide_left_ldlt(const stan::math::LDLT_factor<double,R1,C1> &A,
                       const Eigen::Matrix<double,R2,C2> &b) {
-//      stan::math::validate_multiplicable(A,b,"mdivide_left_ldlt");
-      if (A.cols() != b.rows()) {
-        std::stringstream ss;
-        ss << "error in call to " << "mdivide_left_ldlt"
-           << "; require cols of arg1 to match rows of arg2, but found "
-           << " arg1 rows=" << A.rows() << " arg1 cols=" << A.cols()
-           << " arg2 rows=" << b.rows() << " arg2 cols=" << b.cols();
-        throw std::domain_error(ss.str());
-      }
+      stan::math::validate_multiplicable(A,b,"mdivide_left_ldlt");
       
       return A.solve(b);
     }
@@ -81,15 +74,8 @@ namespace stan {
     Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type,R1,C2>
     mdivide_right_ldlt(const Eigen::Matrix<T1,R1,C1> &b,
                        const stan::math::LDLT_factor<T2,R2,C2> &A) {
-//      stan::math::validate_multiplicable(b,A,"mdivide_right_ldlt");
-      if (A.rows() != b.cols()) {
-        std::stringstream ss;
-        ss << "error in call to " << "mdivide_right_ldlt"
-        << "; require cols of arg1 to match rows of arg2, but found "
-        << " arg1 rows=" << b.rows() << " arg1 cols=" << b.cols()
-        << " arg2 rows=" << A.rows() << " arg2 cols=" << A.cols();
-        throw std::domain_error(ss.str());
-      }
+      stan::math::validate_multiplicable(b,A,"mdivide_right_ldlt");
+
       return transpose(mdivide_left_ldlt(A,transpose(b)));
     }
     
@@ -97,20 +83,14 @@ namespace stan {
     inline Eigen::Matrix<double,R1,C2>
     mdivide_right_ldlt(const Eigen::Matrix<double,R1,C1> &b,
                        const stan::math::LDLT_factor<double,R2,C2> &A) {
-//      stan::math::validate_multiplicable(b,A,"mdivide_right_ldlt");
-      if (A.rows() != b.cols()) {
-        std::stringstream ss;
-        ss << "error in call to " << "mdivide_right_ldlt"
-        << "; require cols of arg1 to match rows of arg2, but found "
-        << " arg1 rows=" << b.rows() << " arg1 cols=" << b.cols()
-        << " arg2 rows=" << A.rows() << " arg2 cols=" << A.cols();
-        throw std::domain_error(ss.str());
-      }
+      stan::math::validate_multiplicable(b,A,"mdivide_right_ldlt");
+
       return A.solveRight(b);
     }
     
     template<int R, int C>
-    double log_determinant_ldlt(stan::math::LDLT_factor<double,R,C> &A) {
+    inline double
+    log_determinant_ldlt(stan::math::LDLT_factor<double,R,C> &A) {
       return A.log_abs_det();
     }
     

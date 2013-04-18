@@ -72,6 +72,7 @@ namespace stan {
       LDLT_factor(const Eigen::Matrix<stan::agrad::var,R,C> &A) : _alloc(new stan::agrad::LDLT_alloc<R,C>(A)) { }
       
       inline void compute(const Eigen::Matrix<stan::agrad::var,R,C> &A) {
+        stan::math::validate_square(A,"LDLT_factor<var>::compute");
         _alloc->compute(A);
       }
       
@@ -177,7 +178,7 @@ namespace stan {
           
           _alloc_ldlt->_ldlt.solveInPlace(adjB);
           adjA.noalias() = -adjB * _alloc->_C.transpose();
-          
+
           pos = 0;
           for (size_type j = 0; j < _M; j++)
             for (size_type i = 0; i < _M; i++)
@@ -313,15 +314,7 @@ namespace stan {
                       const Eigen::Matrix<var,R2,C2> &b) {
       Eigen::Matrix<var,R1,C2> res(b.rows(),b.cols());
 
-//      stan::math::validate_multiplicable(A,b,"mdivide_left_ldlt");
-      if (A.cols() != b.rows()) {
-        std::stringstream ss;
-        ss << "error in call to " << "mdivide_left_ldlt"
-        << "; require cols of arg1 to match rows of arg2, but found "
-        << " arg1 rows=" << A.rows() << " arg1 cols=" << A.cols()
-        << " arg2 rows=" << b.rows() << " arg2 cols=" << b.cols();
-        throw std::domain_error(ss.str());
-      }
+      stan::math::validate_multiplicable(A,b,"mdivide_left_ldlt");
       
       mdivide_left_ldlt_vv_vari<R1,C1,R2,C2> *baseVari = new mdivide_left_ldlt_vv_vari<R1,C1,R2,C2>(A,b);
       
@@ -339,15 +332,7 @@ namespace stan {
                       const Eigen::Matrix<double,R2,C2> &b) {
       Eigen::Matrix<var,R1,C2> res(b.rows(),b.cols());
       
-//      stan::math::validate_multiplicable(A,b,"mdivide_left_ldlt");
-      if (A.cols() != b.rows()) {
-        std::stringstream ss;
-        ss << "error in call to " << "mdivide_left_ldlt"
-        << "; require cols of arg1 to match rows of arg2, but found "
-        << " arg1 rows=" << A.rows() << " arg1 cols=" << A.cols()
-        << " arg2 rows=" << b.rows() << " arg2 cols=" << b.cols();
-        throw std::domain_error(ss.str());
-      }
+      stan::math::validate_multiplicable(A,b,"mdivide_left_ldlt");
       
       mdivide_left_ldlt_vd_vari<R1,C1,R2,C2> *baseVari = new mdivide_left_ldlt_vd_vari<R1,C1,R2,C2>(A,b);
       
@@ -365,15 +350,7 @@ namespace stan {
                       const Eigen::Matrix<var,R2,C2> &b) {
       Eigen::Matrix<var,R1,C2> res(b.rows(),b.cols());
       
-//      stan::math::validate_multiplicable(A,b,"mdivide_left_ldlt");
-      if (A.cols() != b.rows()) {
-        std::stringstream ss;
-        ss << "error in call to " << "mdivide_left_ldlt"
-        << "; require cols of arg1 to match rows of arg2, but found "
-        << " arg1 rows=" << A.rows() << " arg1 cols=" << A.cols()
-        << " arg2 rows=" << b.rows() << " arg2 cols=" << b.cols();
-        throw std::domain_error(ss.str());
-      }
+      stan::math::validate_multiplicable(A,b,"mdivide_left_ldlt");
       
       mdivide_left_ldlt_dv_vari<R1,C1,R2,C2> *baseVari = new mdivide_left_ldlt_dv_vari<R1,C1,R2,C2>(A,b);
       
