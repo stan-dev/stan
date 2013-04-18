@@ -6,7 +6,7 @@
 TEST(AgradFwdMatrix,row_v) {
   using stan::math::row;
   using stan::agrad::matrix_fv;
-  using stan::agrad::vector_fv;
+  using stan::agrad::row_vector_fv;
 
   matrix_fv y(2,3);
   y << 1, 2, 3, 4, 5, 6;
@@ -16,13 +16,13 @@ TEST(AgradFwdMatrix,row_v) {
    y(1,0).d_ = 1.0;
    y(1,1).d_ = 1.0;
    y(1,2).d_ = 1.0;
-  vector_fv z = row(y,1);
+  row_vector_fv z = row(y,1);
   EXPECT_EQ(3,z.size());
   EXPECT_FLOAT_EQ(1.0,z[0].val_);
   EXPECT_FLOAT_EQ(2.0,z[1].val_);
   EXPECT_FLOAT_EQ(3.0,z[2].val_);
 
-  vector_fv w = row(y,2);
+  row_vector_fv w = row(y,2);
   EXPECT_EQ(3,w.size());
   EXPECT_EQ(4.0,w[0].val_);
   EXPECT_EQ(5.0,w[1].val_);
