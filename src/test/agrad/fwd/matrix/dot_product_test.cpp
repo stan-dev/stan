@@ -204,7 +204,62 @@ TEST(AgradFwdMatrix, dot_product_stdvector_stdvector) {
   EXPECT_FLOAT_EQ(12.0, dot_product(dv, fv1).d_);
   EXPECT_FLOAT_EQ(18.0, dot_product(fv1, fv2).d_);
 }
+TEST(AgradFwdMatrix, dot_product_matrix_matrix_exception) {
+  using stan::math::matrix_d;
+  using stan::agrad::matrix_fv;
+  using stan::agrad::dot_product;
+  matrix_d d1(3,3);
+  matrix_d d2(3,2);
+  matrix_d d3(2,3);
+  matrix_fv v1(3,3);
+  matrix_fv v2(3,3);
+  matrix_fv v3(3,2);
+  matrix_fv v4(3,2);
+  matrix_fv v5(2,3);
+  matrix_fv v6(2,3);
 
+  d1 << 1, 3, -5, 1, 3, -5, 1, 3, -5;
+  d2 << 1, 3, -5, 1, 3, -5;
+  d2 << 1, 3, -5, 1, 3, -5;
+  v1 << 1, 3, -5, 1, 3, -5, 1, 3, -5;
+  v2 << 4, -2, -1, 2, 1, 2, 1, 3, -5;
+  v3 << 4, -2, -1, 2, 1, 2;
+  v4 << 4, -2, -1, 2, 1, 2;
+  v5 << 4, -2, -1, 2, 1, 2;
+  v6 << 4, -2, -1, 2, 1, 2;
+
+  EXPECT_THROW(dot_product(v1,d1), std::domain_error);
+  EXPECT_THROW(dot_product(v1,d2), std::domain_error);
+  EXPECT_THROW(dot_product(v1,d3), std::domain_error);
+  EXPECT_THROW(dot_product(v1,v2), std::domain_error);
+  EXPECT_THROW(dot_product(v1,v3), std::domain_error);
+  EXPECT_THROW(dot_product(v1,v4), std::domain_error);
+  EXPECT_THROW(dot_product(v1,v5), std::domain_error);
+  EXPECT_THROW(dot_product(v1,v6), std::domain_error);
+
+  EXPECT_THROW(dot_product(v2,d1), std::domain_error);
+  EXPECT_THROW(dot_product(v2,d2), std::domain_error);
+  EXPECT_THROW(dot_product(v2,d3), std::domain_error);
+  EXPECT_THROW(dot_product(v2,v1), std::domain_error);
+  EXPECT_THROW(dot_product(v2,v3), std::domain_error);
+  EXPECT_THROW(dot_product(v2,v4), std::domain_error);
+  EXPECT_THROW(dot_product(v2,v5), std::domain_error);
+  EXPECT_THROW(dot_product(v2,v6), std::domain_error);
+
+  EXPECT_THROW(dot_product(d1,v1), std::domain_error);
+  EXPECT_THROW(dot_product(d1,v2), std::domain_error);
+  EXPECT_THROW(dot_product(d1,v3), std::domain_error);
+  EXPECT_THROW(dot_product(d1,v4), std::domain_error);
+  EXPECT_THROW(dot_product(d1,v5), std::domain_error);
+  EXPECT_THROW(dot_product(d1,v6), std::domain_error);
+
+  EXPECT_THROW(dot_product(d2,v1), std::domain_error);
+  EXPECT_THROW(dot_product(d2,v2), std::domain_error);
+  EXPECT_THROW(dot_product(d2,v3), std::domain_error);
+  EXPECT_THROW(dot_product(d2,v4), std::domain_error);
+  EXPECT_THROW(dot_product(d2,v5), std::domain_error);
+  EXPECT_THROW(dot_product(d2,v6), std::domain_error);
+}
 TEST(AgradFwdMatrix, dot_product_vector_vector_length) {
   using stan::math::vector_d;
   using stan::agrad::vector_fv;
@@ -465,6 +520,63 @@ TEST(AgradFwdMatrix, dot_product_stdvector_stdvector_length) {
   EXPECT_FLOAT_EQ( 6.0, dot_product(fv1, dv, length).d_);
   EXPECT_FLOAT_EQ( 6.0, dot_product(dv, fv1, length).d_);
   EXPECT_FLOAT_EQ( 8.0, dot_product(fv1, fv2, length).d_);
+}
+TEST(AgradFwdMatrix, dot_product_matrix_matrix_exception_length) {
+  using stan::math::matrix_d;
+  using stan::agrad::matrix_fv;
+  using stan::agrad::dot_product;
+  stan::agrad::size_type length = 3;
+  matrix_d d1(3,3);
+  matrix_d d2(3,2);
+  matrix_d d3(2,3);
+  matrix_fv v1(3,3);
+  matrix_fv v2(3,3);
+  matrix_fv v3(3,2);
+  matrix_fv v4(3,2);
+  matrix_fv v5(2,3);
+  matrix_fv v6(2,3);
+
+  d1 << 1, 3, -5, 1, 3, -5, 1, 3, -5;
+  d2 << 1, 3, -5, 1, 3, -5;
+  d2 << 1, 3, -5, 1, 3, -5;
+  v1 << 1, 3, -5, 1, 3, -5, 1, 3, -5;
+  v2 << 4, -2, -1, 2, 1, 2, 1, 3, -5;
+  v3 << 4, -2, -1, 2, 1, 2;
+  v4 << 4, -2, -1, 2, 1, 2;
+  v5 << 4, -2, -1, 2, 1, 2;
+  v6 << 4, -2, -1, 2, 1, 2;
+
+  EXPECT_THROW(dot_product(v1,d1,length), std::domain_error);
+  EXPECT_THROW(dot_product(v1,d2,length), std::domain_error);
+  EXPECT_THROW(dot_product(v1,d3,length), std::domain_error);
+  EXPECT_THROW(dot_product(v1,v2,length), std::domain_error);
+  EXPECT_THROW(dot_product(v1,v3,length), std::domain_error);
+  EXPECT_THROW(dot_product(v1,v4,length), std::domain_error);
+  EXPECT_THROW(dot_product(v1,v5,length), std::domain_error);
+  EXPECT_THROW(dot_product(v1,v6,length), std::domain_error);
+
+  EXPECT_THROW(dot_product(v2,d1,length), std::domain_error);
+  EXPECT_THROW(dot_product(v2,d2,length), std::domain_error);
+  EXPECT_THROW(dot_product(v2,d3,length), std::domain_error);
+  EXPECT_THROW(dot_product(v2,v1,length), std::domain_error);
+  EXPECT_THROW(dot_product(v2,v3,length), std::domain_error);
+  EXPECT_THROW(dot_product(v2,v4,length), std::domain_error);
+  EXPECT_THROW(dot_product(v2,v5,length), std::domain_error);
+  EXPECT_THROW(dot_product(v2,v6,length), std::domain_error);
+
+  EXPECT_THROW(dot_product(d1,v1,length), std::domain_error);
+  EXPECT_THROW(dot_product(d1,v2,length), std::domain_error);
+  EXPECT_THROW(dot_product(d1,v3,length), std::domain_error);
+  EXPECT_THROW(dot_product(d1,v4,length), std::domain_error);
+  EXPECT_THROW(dot_product(d1,v5,length), std::domain_error);
+  EXPECT_THROW(dot_product(d1,v6,length), std::domain_error);
+
+  EXPECT_THROW(dot_product(d2,v1,length), std::domain_error);
+  EXPECT_THROW(dot_product(d2,v2,length), std::domain_error);
+  EXPECT_THROW(dot_product(d2,v3,length), std::domain_error);
+  EXPECT_THROW(dot_product(d2,v4,length), std::domain_error);
+  EXPECT_THROW(dot_product(d2,v5,length), std::domain_error);
+  EXPECT_THROW(dot_product(d2,v6,length), std::domain_error);
 }
 TEST(AgradFwdMatrix, columns_dot_product_vector_vector) {
   using stan::math::vector_d;
