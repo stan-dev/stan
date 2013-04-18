@@ -8,9 +8,9 @@
 namespace stan {
   namespace math {
     
-    template <typename T1, int R1, int C1, typename T2, int R2, int C2>
-    inline void validate_multiplicable(const Eigen::Matrix<T1,R1,C1>& x1,
-                                       const Eigen::Matrix<T2,R2,C2>& x2,
+    template <typename T1, typename T2>
+    inline void validate_multiplicable(const T1& x1,
+                                       const T2& x2,
                                        const char* msg) {
       if (x1.cols() == x2.rows()) return;
       std::stringstream ss;
