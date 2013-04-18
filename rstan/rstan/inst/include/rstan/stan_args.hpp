@@ -91,7 +91,9 @@ namespace rstan {
   class stan_args {
   private:
     bool sample_file_flag; // true: write out to a file; false, do not 
+    bool diagnostic_file_flag; // 
     std::string sample_file; // the file for outputting the samples    // 1
+    std::string diagnostic_file; 
     int iter;   // number of iterations                       // 2 
     int warmup; // number of warmup
     int thin; 
@@ -129,6 +131,8 @@ namespace rstan {
         sample_file = Rcpp::as<std::string>(in[idx]); 
         sample_file_flag = true; 
       }
+
+      diagnostic_file_flag = false; // TODO: add this option 
 
       idx = find_index(args_names, std::string("iter")); 
       if (idx == args_names.size()) iter = 2000;  
@@ -241,6 +245,10 @@ namespace rstan {
         lst["sample_file"] = sample_file;
       else 
         lst["sample_file_flag"] = false;
+      if (diagnostic_file_flag) 
+        lst["diagnostic_file"] = diagnostic_file;
+      else 
+        lst["diagnostic_file"] = R_NilValue;
       lst["iter"] = iter;                     // 2 
       lst["warmup"] = warmup;                 // 3 
       lst["thin"] = thin;                     // 4 
@@ -289,9 +297,18 @@ namespace rstan {
     const std::string& get_sample_file() const {
       return sample_file;
     } 
+    bool get_save_warmup() const {
+      return true;
+    }
     bool get_sample_file_flag() const { 
       return sample_file_flag; 
     }
+    bool get_dianositic_file_flag() const {
+      return diagnostic_file_flag;
+    } 
+    const std::string& get_dianositic_file() const {
+      return diagnostic_file;
+    } 
     int get_warmup() const {
       return warmup; 
     } 
