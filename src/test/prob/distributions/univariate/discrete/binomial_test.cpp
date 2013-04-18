@@ -22,8 +22,7 @@ TEST(ProbDistributionsBinomial, chiSquareGoodnessFitTest) {
   int count = 0;
   int bin [K];
   double expect [K];
-  for(int i = 0 ; i < K; i++)
-  {
+  for(int i = 0 ; i < K; i++) {
     bin[i] = 0;
     expect[i] = N * pdf(dist, i);
   }
@@ -33,7 +32,7 @@ TEST(ProbDistributionsBinomial, chiSquareGoodnessFitTest) {
     int a = stan::prob::binomial_rng(100,0.6,rng);
     int i = 0;
     while (i < K-1 && a > loc[i]) 
-  ++i;
+      ++i;
     ++bin[i];
     count++;
    }

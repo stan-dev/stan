@@ -27,6 +27,7 @@
 #include <boost/random/additive_combine.hpp>
 
 #include <stan/math/matrix.hpp>
+#include <stan/math/matrix/variance.hpp>
 #include <stan/prob/autocorrelation.hpp>
 #include <stan/prob/autocovariance.hpp>
 
@@ -633,21 +634,4 @@ namespace stan {
   }
 }
 
-
 #endif
-
-
-/*
-
-
-  pair<double,double> smallest_interval(size_t n,
-  double prob);
-
-  double potential_scale_reduction(size_t n)
-
-  double mcmc_error_mean(size_t n);
-                   
-  void print(ostream&);
-
-  ostream& operator<<(ostream&, const chains&);
-*/

@@ -1,7 +1,8 @@
 // Arguments: Ints, Ints, Doubles, Doubles
 #include <stan/prob/distributions/univariate/discrete/beta_binomial.hpp>
-#include <stan/math/special_functions.hpp>
 #include <boost/math/special_functions/binomial.hpp>
+
+#include <stan/math/functions/lbeta.hpp>
 
 using std::vector;
 using std::numeric_limits;
@@ -55,15 +56,6 @@ public:
     return stan::prob::beta_binomial_cdf(n, N, alpha, beta);
   }
 
-  template <typename T_n, typename T_N, typename T_size1, typename T_size2, 
-        typename T4, typename T5, typename T6, 
-        typename T7, typename T8, typename T9,
-      typename Policy>
-  typename stan::return_type<T_size1,T_size2>::type
-  cdf(const T_n& n, const T_N& N, const T_size1& alpha, const T_size2& beta, 
-      const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
-    return stan::prob::beta_binomial_cdf(n, N, alpha, beta, Policy());
-  }
 
   template <typename T_n, typename T_N, typename T_size1, typename T_size2, 
         typename T4, typename T5, typename T6, 

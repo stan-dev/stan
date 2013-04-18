@@ -1,6 +1,5 @@
 // Arguments: Ints, Ints, Doubles
 #include <stan/prob/distributions/univariate/discrete/binomial.hpp>
-#include <stan/math/special_functions.hpp>
 #include <boost/math/special_functions/binomial.hpp>
 
 using std::vector;
@@ -53,16 +52,6 @@ public:
     return stan::prob::binomial_cdf(n, N, theta);
   }
 
-  template <typename T_n, typename T_N, typename T_prob,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9,
-      typename Policy>
-  typename stan::return_type<T_prob>::type
-  cdf(const T_n& n, const T_N& N, const T_prob& theta,
-      const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
-    return stan::prob::binomial_cdf(n, N, theta, Policy());
-  }
 
   template <typename T_n, typename T_N, typename T_prob,
       typename T3, typename T4, typename T5, 

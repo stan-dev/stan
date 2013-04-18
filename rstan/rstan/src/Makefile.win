@@ -8,7 +8,7 @@ LIBSTAN = ../inst/libstan
 USERLIB = libstan.a
 SHLIB = rstan.dll
 
-LIBSTANOBJECTS = agrad__agrad.o agrad__matrix.o math__matrix.o
+LIBSTANOBJECTS = agrad__rev__var_stack.o agrad__matrix.o math__matrix.o
 
 OBJECTS = stanc.o chains.o misc.o
 OBJECTS += $(patsubst %.cpp,%.o,$(wildcard gm__*.cpp))

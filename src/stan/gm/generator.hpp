@@ -179,14 +179,8 @@ namespace stan {
           if (i > 0) o_ << ',';
           boost::apply_visitor(*this, fx.args_[i].expr_);
         }
-        size_t n = fx.name_.size();
-        if (n > 4 
-            && fx.name_[n-1] == 'g' 
-            && fx.name_[n-2] == 'n'
-            && fx.name_[n-3] == 'r'
-            && fx.name_[n-4] == '_') {
+        if (has_rng_suffix(fx.name_))
           o_ << ", base_rng__";
-        }
         o_ << ')';
       }
       void operator()(const binary_op& expr) const {
@@ -1249,7 +1243,7 @@ namespace stan {
       void operator()(sample const& x) const {
         if (!include_sampling_) return;
         generate_indent(indent_,o_);
-        o_ << "lp__ += stan::prob::" << x.dist_.family_ << "_log<propto__>(";
+        o_ << "lp__ += stan::prob::" << x.dist_.family_ << "_log<true>(";
         generate_expression(x.expr_,o_);
         for (size_t i = 0; i < x.dist_.args_.size(); ++i) {
           o_ << ", ";
@@ -1417,22 +1411,16 @@ namespace stan {
     void generate_log_prob(program const& p,
                            std::ostream& o) {
       o << EOL;
-      o << INDENT << "double log_prob(vector<double>& params_r__," << EOL;
-      o << INDENT << "                vector<int>& params_i__," << EOL;
-      o << INDENT << "                std::ostream* pstream__ = 0) {" << EOL;
-      o << INDENT << "  return log_prob<false,double>(params_r__,params_i__,pstream__);" << EOL;
-      o << INDENT << "}" << EOL;
-      o << EOL;
       o << INDENT << "var log_prob(vector<var>& params_r__," << EOL;
       o << INDENT << "             vector<int>& params_i__," << EOL;
       o << INDENT << "             std::ostream* pstream__ = 0) {" << EOL;
-      o << INDENT << "  return log_prob<true,var>(params_r__,params_i__,pstream__);" << EOL;
+      o << INDENT << "  return log_prob_poly<true,var>(params_r__,params_i__,pstream__);" << EOL;
       o << INDENT << "}" << EOL;
       o << EOL;
       o << INDENT << "template <bool propto__, typename T__>" << EOL;
-      o << INDENT << "T__ log_prob(vector<T__>& params_r__," << EOL;
-      o << INDENT << "             vector<int>& params_i__," << EOL;
-      o << INDENT << "             std::ostream* pstream__ = 0) {" << EOL2;
+      o << INDENT << "T__ log_prob_poly(vector<T__>& params_r__," << EOL;
+      o << INDENT << "                  vector<int>& params_i__," << EOL;
+      o << INDENT << "                  std::ostream* pstream__ = 0) {" << EOL2;
 
       // use this dummy for inits
       o << INDENT2 << "T__ DUMMY_VAR__(std::numeric_limits<double>::quiet_NaN());" << EOL;

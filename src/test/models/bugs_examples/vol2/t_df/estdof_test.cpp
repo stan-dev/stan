@@ -39,7 +39,10 @@ public:
 
   static std::vector<std::pair<int, double> >
   get_expected_values() {
+    using std::make_pair;
     std::vector<std::pair<int, double> > expected_values;
+
+    expected_values.push_back(make_pair(chains->index("d"), 4.204));
     return expected_values;
   }
 

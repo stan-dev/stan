@@ -1,11 +1,11 @@
 #ifndef __STAN__AGRAD__PARTIALS_VARI_HPP__
 #define __STAN__AGRAD__PARTIALS_VARI_HPP__
 
-#include <stan/agrad/special_functions.hpp>
 #include <stan/meta/traits.hpp>
+#include <stan/agrad/rev/var.hpp>
+#include <stan/agrad/rev/vari.hpp>
 
 namespace stan {
-
   namespace agrad {
 
     class partials_vari : public vari {
@@ -36,8 +36,8 @@ namespace stan {
       }
       template<>
       var partials_to_var<var>(double logp, size_t nvaris,
-                        agrad::vari** all_varis,
-                        double* all_partials) {
+                               agrad::vari** all_varis,
+                               double* all_partials) {
         return var(new agrad::partials_vari(logp, nvaris, all_varis, all_partials));
       }
 

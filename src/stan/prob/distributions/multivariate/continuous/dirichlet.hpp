@@ -1,14 +1,15 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__DIRICHLET_HPP__
 #define __STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__DIRICHLET_HPP__
 
+#include <boost/math/special_functions/gamma.hpp>
 #include <boost/random/gamma_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
 
 #include <stan/prob/constants.hpp>
 #include <stan/math/matrix_error_handling.hpp>
 #include <stan/math/error_handling.hpp>
-#include <stan/math/special_functions.hpp>
 #include <stan/prob/traits.hpp>
+#include <stan/math/functions/multiply_log.hpp>
 
 namespace stan {
 
@@ -40,13 +41,12 @@ namespace stan {
      * @tparam T_prior_sample_size Type of prior sample sizes.
      */
     template <bool propto,
-              typename T_prob, typename T_prior_sample_size, 
-              class Policy>
+              typename T_prob, typename T_prior_sample_size>
     typename boost::math::tools::promote_args<T_prob,T_prior_sample_size>::type
     dirichlet_log(const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta,
-              const Eigen::Matrix<T_prior_sample_size,Eigen::Dynamic,1>& alpha,
-              const Policy&) {
+              const Eigen::Matrix<T_prior_sample_size,Eigen::Dynamic,1>& alpha) {
       // FIXME: parameter check
+      using boost::math::lgamma;
       using boost::math::tools::promote_args;
       typename promote_args<T_prob,T_prior_sample_size>::type lp(0.0);
 
@@ -62,32 +62,12 @@ namespace stan {
       return lp;
     }
 
-    template <bool propto,
-              typename T_prob, typename T_prior_sample_size>
-    inline
-    typename boost::math::tools::promote_args<T_prob,T_prior_sample_size>::type
-    dirichlet_log(const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta,
-          const Eigen::Matrix<T_prior_sample_size,Eigen::Dynamic,1>& alpha) {
-      return dirichlet_log<propto>(theta,alpha,stan::math::default_policy());
-    }
-
-
-    template <typename T_prob, typename T_prior_sample_size, 
-              class Policy>
-    inline
-    typename boost::math::tools::promote_args<T_prob,T_prior_sample_size>::type
-    dirichlet_log(const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta,
-              const Eigen::Matrix<T_prior_sample_size,Eigen::Dynamic,1>& alpha,
-              const Policy&) {
-      return dirichlet_log<false>(theta,alpha,Policy());
-    }
-
     template <typename T_prob, typename T_prior_sample_size>
     inline
     typename boost::math::tools::promote_args<T_prob,T_prior_sample_size>::type
     dirichlet_log(const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta,
             const Eigen::Matrix<T_prior_sample_size,Eigen::Dynamic,1>& alpha) {
-      return dirichlet_log<false>(theta,alpha,stan::math::default_policy());
+      return dirichlet_log<false>(theta,alpha);
     }
 
     template <class RNG>
@@ -99,16 +79,15 @@ namespace stan {
 
       double sum = 0;
       Eigen::VectorXd y(alpha.rows());
-      for(int i = 0; i < alpha.rows(); i++)
-	{
+      for(int i = 0; i < alpha.rows(); i++) {
         variate_generator<RNG&, gamma_distribution<> >
-	  gamma_rng(rng, gamma_distribution<>(alpha(i,0),1));
-	y(i) = gamma_rng();
-	sum += y(i);
-	}
+          gamma_rng(rng, gamma_distribution<>(alpha(i,0),1));
+        y(i) = gamma_rng();
+        sum += y(i);
+        }
 
       for(int i = 0; i < alpha.rows(); i++)
-	y(i) /= sum;
+        y(i) /= sum;
       return y;
     }
   }

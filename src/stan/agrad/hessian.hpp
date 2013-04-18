@@ -6,8 +6,7 @@
 #include <stan/agrad/agrad.hpp>
 #include <stan/agrad/fvar.hpp>
 
-#define EIGEN_DENSEBASE_PLUGIN "stan/math/EigenDenseBaseAddons.hpp"
-#include <Eigen/Dense>
+#include <stan/math/matrix/Eigen.hpp>
 
 namespace stan {
 

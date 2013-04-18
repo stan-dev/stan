@@ -82,6 +82,7 @@ public:
     expected_help_options.push_back("save_warmup");
     expected_help_options.push_back("test_grad");
     expected_help_options.push_back("point_estimate");
+    expected_help_options.push_back("point_estimate_newton\n");
     expected_help_options.push_back("nondiag_mass");
     expected_help_options.push_back("cov_matrix");
 
@@ -95,7 +96,7 @@ public:
     expected_output.push_back(make_pair("chain_id", "1 (default)"));
     expected_output.push_back(make_pair("iter", "2000"));
     expected_output.push_back(make_pair("warmup", "1000"));
-    expected_output.push_back(make_pair("thin", "1 (default)"));
+    expected_output.push_back(make_pair("thin", "1"));
     expected_output.push_back(make_pair("equal_step_sizes", "0"));
     expected_output.push_back(make_pair("nondiag_mass", "0"));
     expected_output.push_back(make_pair("leapfrog_steps", "-1"));
@@ -157,7 +158,7 @@ public:
     command_changes[thin] = make_pair("",
                                         " --thin=3");
     output_changes [thin] = make_pair("",
-                                        "3 (user supplied)");
+                                        "3");
 
 
 
@@ -356,10 +357,21 @@ void test_specific_sample_values(const bitset<options_count>& options, stan::mcm
   if (!options[append_samples] 
       && !options[warmup_opt]) {
     double expected_first_y;
+    
+    // options[data] = true
+    // -> --data=src/test/models/command1.data.R
+    // options[data] = false
+    // -> --data=src/test/modles/command2.data.R
+    // options[init] = true
+    // -> --init=src/test/models/command.init.R
+    // options[init = false
+    // -> no init (defaults to random init
+    // All with --seed=100
+    
     if (options[data]) {
-      expected_first_y = options[init] ? 100.564 : 100.523;
+      expected_first_y = options[init] ? 99.4208 : 100.727;
     } else { 
-      expected_first_y = options[init] ? -0.321312 : -0.389503;
+      expected_first_y = options[init] ? -0.0852457 : 1.96045;
     }
     
     Eigen::VectorXd sampled_y;

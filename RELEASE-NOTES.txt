@@ -15,7 +15,89 @@ HOW TO (developer notes on how to release, last column is ordering)
 10.  Announce                                                    > 9
 
 
-v1.2.0 (6 March 2012)
+v1.3.0 (12 April 2013)
+======================================================================
+Enhancements
+----------------------------------
+
+Modeling Language
+* forward sampling (random draws from distributions)
+  in generated quantities
+* added broadcast (repetition) functions for initializing
+  matrices, vectors, and arrays
+* better error messages in parser
+* additional distributions: 
+    + exp_mod_normal
+    + gumbel 
+    + skew_normal
+* additional functions: 
+    + mdivide_right_spd 
+    + mdivide_left_spd
+    + owenst
+    + columns_dot_product
+    + rows_dot_product
+* broadcast (repetition) functions for vectors, arrays, matrices
+    + rep_arrray
+    + rep_matrix
+    + rep_row_vector
+    + rep_vector    
+
+Command-Line
+* added option to display autocorrelations in the command-line program
+  to print output
+* changed default point estimation routine from the command line to
+  use Nesterov's accelerated gradient method, added option for point
+  estimation with Newton's method
+
+RStan
+* added method as.mcmc.list()
+* compatibility with R 3.0.0
+
+C++/Internal
+* refactored math/agrad libs in C++ to separate files/includes,
+  remove redundant code, more unit tests for existing code
+* added chainable_alloc class for caching solver results
+* generalized VectorView with seq_view
+* templated out generated code for efficient double-only operation
+  on model log probs w/o gradients
+
+Doc
+* additions to user's guide w. sample models
+    + stochastic volatility example with source, optimized source, 
+      simulation
+    + time series, moving average, standardization for linear 
+      regression, hidden Markov models, with examples
+* manual's index is now hyperlinked
+* added additional acknowledgements to manual
+* added full description of differences between sampling
+  statement and lp__
+* fixed general normal mixture model example
+
+Testing
+* split unit tests from distribution tests
+
+Bug Fixes
+----------------------------------
+* fixed derivative in multi_normal_prec distribution function
+* double-based log_prob functions return the same value as var-based
+  log_prob_grad functions
+* calls to lgamma are now using boost's lgamma function
+* patched transform to work with Eigen 3.2 beta
+* all probability distribution functions and cumulative distribution
+  functions behave properly with 0 length vector arguments
+* fixed error in definition of hypergeometric pmf
+* fixed arguments to nesterov optimization ctor in command 
+* fixed issue with initialization matrices being read improperly 
+* Use fabs() instead of abs() in unit_vector_constrain. 
+* typos in the manual
+* rstan: 
+  + fixed crash in R when index is out of bounds using set_cppo("fast")
+  + io_context fix skipping len=0
+  + fix the typo in manual (dims -> dim)
+  + add require(inline) to fix the problem with loading sysdata.rda
+
+
+v1.2.0 (6 March 2013)
 ======================================================================
 
 Enhancements
@@ -54,7 +136,7 @@ Bug Fixes
 * clearer error messages on matrix and other function arguments
 
 
-v1.1.1 (5 February 2012)
+v1.1.1 (5 February 2013)
 ======================================================================
 
 Bug Fixes

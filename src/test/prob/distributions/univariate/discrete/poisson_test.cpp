@@ -22,8 +22,7 @@ TEST(ProbDistributionsPoisson, chiSquareGoodnessFitTest) {
   int count = 0;
   double bin [K];
   double expect [K];
-  for(int i = 0 ; i < K; i++)
-  {
+  for(int i = 0 ; i < K; i++) {
     bin[i] = 0;
     expect[i] = N * pdf(dist, i);
   }
@@ -33,7 +32,7 @@ TEST(ProbDistributionsPoisson, chiSquareGoodnessFitTest) {
     int a = stan::prob::poisson_rng(5,rng);
     int i = 0;
     while (i < K-1 && a > loc[i]) 
-  ++i;
+      ++i;
     ++bin[i];
     count++;
    }

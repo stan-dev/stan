@@ -123,6 +123,7 @@ transformed data {
   transformed_data_real <- Phi(d_real);
   transformed_data_real <- Phi_approx(d_real);
   transformed_data_real <- binary_log_loss(d_int, d_real);
+  transformed_data_real <- owens_t(d_real, d_real);
 
   //   combinatorial functions
   transformed_data_real <- tgamma(d_real);
@@ -466,6 +467,10 @@ transformed parameters {
   transformed_param_real <- Phi_approx(p_real);
   transformed_param_real <- binary_log_loss(d_int, d_real);
   transformed_param_real <- binary_log_loss(d_int, p_real);
+  transformed_param_real <- owens_t(d_real, d_real);
+  transformed_param_real <- owens_t(d_real, p_real);
+  transformed_param_real <- owens_t(p_real, d_real);
+  transformed_param_real <- owens_t(p_real, p_real);
 
   //   combinatorial functions
   transformed_param_real <- tgamma(d_real);

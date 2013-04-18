@@ -1,6 +1,8 @@
 // Arguments: Doubles, Doubles, Doubles
 #include <stan/prob/distributions/univariate/continuous/logistic.hpp>
 
+#include <stan/math/functions/log1p.hpp>
+
 using std::vector;
 using std::numeric_limits;
 using stan::agrad::var;
@@ -70,17 +72,6 @@ public:
     return stan::prob::logistic_log<propto>(y, mu, sigma);
   }
   
-  template <bool propto, 
-      typename T_y, typename T_loc, typename T_scale,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9, 
-      class Policy>
-  typename stan::return_type<T_y, T_loc, T_scale>::type 
-  log_prob(const T_y& y, const T_loc& mu, const T_scale& sigma,
-     const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
-    return stan::prob::logistic_log<propto>(y, mu, sigma, Policy());
-  }
   
   template <typename T_y, typename T_loc, typename T_scale,
       typename T3, typename T4, typename T5, 

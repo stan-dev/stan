@@ -1,6 +1,12 @@
 // Arguments: Ints, Ints, Doubles
 #include <stan/prob/distributions/univariate/discrete/binomial.hpp>
 
+#include <stan/math/functions/logit.hpp>
+#include <stan/math/functions/binomial_coefficient_log.hpp>
+#include <stan/math/functions/log1m.hpp>
+#include <stan/math/functions/multiply_log.hpp>
+#include <stan/math/functions/inv_logit.hpp>
+
 using std::vector;
 using std::numeric_limits;
 using stan::agrad::var;
@@ -65,19 +71,6 @@ public:
     return stan::prob::binomial_logit_log<propto>(n, N, alpha);
   }
   
-  template <bool propto, 
-      class T_n, class T_N, class T_prob,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9, 
-      class Policy>
-  typename stan::return_type<T_prob>::type 
-  log_prob(const T_n& n, const T_N& N, const T_prob& alpha,
-     const T3&, const T4&, const T5&,
-     const T6&, const T7&, const T8&,
-     const T9&) {
-    return stan::prob::binomial_logit_log<propto>(n, N, alpha, Policy());
-  }
   
   template <class T_n, class T_N, class T_prob,
       typename T3, typename T4, typename T5, 

@@ -10,18 +10,6 @@ filename_rm_ext <- function(x) {
   sub("\\.[^.]*$", "", x)
 } 
 
-#   is_whole_number <- function(x) {
-#     all.equal(x, round(x), check.attributes = FALSE) 
-#   } 
-
-#   as_integer_if_doable <- function(y) {
-#     if (!is.numeric(y)) return(y) 
-#     if (is.integer(y)) return(y) 
-#     if (isTRUE(all.equal(y, round(y), check.attributes = FALSE))) 
-#       storage.mode(y) <- "integer"  
-#     return(y) 
-#   } 
- 
 list_as_integer_if_doable <- function(x) {
   # change the storage mode from 'real' to 'integer' 
   # if applicable since by default R use real.
@@ -431,14 +419,6 @@ function(file, warn = TRUE,
 } 
 
 
-#   probs2str <- function(probs, digits = 1) {
-#     paste(formatC(probs * 100,  
-#                   digits = digits, 
-#                   format = 'f', 
-#                   drop0trailing = TRUE), 
-#           "%", sep = '')
-#   } 
-
 stan_rdump <- function(list, file = "", append = FALSE, 
                        envir = parent.frame(),
                        width = options("width")$width, quiet = FALSE) {
@@ -527,13 +507,6 @@ stan_rdump <- function(list, file = "", append = FALSE,
   invisible(l2) 
 } 
 
-## test stan_rdump simply
-# a <- 1:3
-# b <- 3
-# c <- matrix(1:9, ncol = 3)
-# d <- array(1:90, dim = c(9, 2, 5))
-# stan_rdump(c('a', 'b', 'c', 'd'), file = 'a.txt')
-
 get_rhat_cols <- function(rhats) {
   # 
   # Args:
@@ -550,7 +523,6 @@ get_rhat_cols <- function(rhats) {
            if (is.na(x) || is.nan(x) || is.infinite(x))
              return(rhat_nan_col)           
            for (i in 1:length(rhat_breaks)) {
-             # cat("i=", i, "\n")
              if (x >= rhat_breaks[i]) next
              return(rhat_colors[i])
            }  
@@ -793,7 +765,7 @@ pars_total_indexes <- function(names, dims, fnames, pars) {
     #
     p <- match(par, fnames)
     # note that here when `par' is a scalar, it would
-    # match to one of `fnames'
+    # match one of `fnames'
     if (!is.na(p)) {
       names(p) <- par 
       attr(p, "row_major_idx") <- p 
@@ -810,24 +782,6 @@ pars_total_indexes <- function(names, dims, fnames, pars) {
   idx 
 } 
 
-## simple test for pars_total_indexes 
-#  names <- c('alpha', 'beta', 'gamma')
-#  dims <- list(c(2,3), c(3,4,5), c(5))
-#  fnames <- flatnames(names, dims, col_major = TRUE) 
-#  pars_total_indexes(names, dims, fnames, c('gamma', 'alpha', 'beta')) 
-
-#### temporary test code 
-#  a <- config_argss(3, c(100, 200), 10, 1, "user", NULL, seed = 3) 
-#  print(a) 
-#  
-#  fun1 <- function(chain_id) {
-#    cat("chain_id=", chain_id)
-#    return(list(mu = chain_id))
-#  } 
-#  b <- config_argss(3, c(100, 200), 10, 1, c("user", 1), fun1, seed = 3) 
-#  print(b)
-#  
-#  
 rstancolgrey <- rgb(matrix(c(247, 247, 247, 204, 204, 204, 150, 150, 150, 82, 82, 82),  
                            byrow = TRUE, ncol = 3), 
                     alpha = 100, 

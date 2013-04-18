@@ -13,17 +13,6 @@ The to-do list is organized into the following sections:
 * C++ API
 
 
-1.2.1
--------------------------------------------
-
-* fix vector_d(0) to be vector_d(Eigen::DenseIndex(0))
-  in generator
- 
-* fix zero-size struct inits in RStan
-
-* fix truncated distributions to return 1 rather than 0
-  in degenerate cases  
-
 PRIORITIES?
 ======================================================================
 + (name): actively assigned
@@ -38,26 +27,26 @@ Efficiency/Scalability of Code and Sampling
 -------------------------------------------
 + (Daniel) replace tests with doubles
 + (Daniel) full multivariate probability function tests
-+ (Yuanjun) adapting fixed covariance matrix during warmup
 + (Daniel) vectorized derivatives for prob functions
-+ (Marcus) vectorization of multivariate prob functions
-+ (Bob) replace std::vector with Eigen constructs in models
++ (Marcus, Bob, Daniel) vectorization of multivariate prob functions
++ (Michael) replace std::vector with Eigen constructs in models
 * special function vectorization
-* (Ben) covariance matrix w. caching (inverse, determinant, Cholesky)
+* (Ben, Marcus) matrix solver caching
 * multi-threading
-* ensemble samplers: DREAM, differential evolution, stretch/walk
-* higher-order auto-dif and RM-HMC
+* (Peter, Bob) ensemble samplers: DREAM, differential evolution, 
+  stretch/walk
+* (Peter, Bob, Michael) higher-order auto-diff and RM-HMC
 
 Modeling Language
 -----------------
-+ (Bob) forward sampling (RNG in gen quant, all RNGs for distros)
 + (Bob) new types: lower triangular (+/- strict), diagonal matrix,
   symmetric matrix, Cholesky factor of pos-def matrix
 + (Bob) discrete sampling
-+ (Michael B/Daniel) cumulative distributions & truncated prob functions
++ (Michael B/Daniel) complementary CDF and log CDF, log CCDF,
+  plus gamma distribution CDF
 * ragged arrays
+* sparse vectors, matrices, arrays
 * matrix literal-like expressions a la MATLAB
-* matrix slicing and dicing
 * subroutines in modeling language
 * initialization block in model w. randomization
 * (Bob) user-specified language extensions (plug in facility to declare,
@@ -70,48 +59,94 @@ Modeling Language
 
 Command and Interfaces
 ----------------------
-
-* command for multiple chains + report like print(fit) in RStan
 * Python, MATLAB, Julia, Stata, ??? interfaces
-* convergence diagnostics (basic I/O of leapfrog/gradients + evals)
+* (Michael, Daniel) convergence diagnostics
 * I/O from CSV files
 * (contributed OK?) compiler for R's linear model notation
 
 Cleanup
 -----------
 * improve special function and prob function behavior at limits
-* (Daniel) simplify error handling by removing policies
+* (Daniel) simplify error handling by standardizing default policy
+  - remove throw from all files except for 
+    src/stan/math/error_handling/raise_domain_error.hpp
+  - Need unit-tests for error handling:
+    + check_nonnegative
+    + check_positive
+    + matrix/check_corr_matrix
+    + matrix/check_ordered
+    + matrix/check_pos_definite
+  - Move src/stan/math/matrix/check_range.hpp to 
+    src/stan/math/error_handling/matrix/
+  - Change error handling in:
+    + prob/distributions/multivariate/continuous/wishart.hpp
 
 Doc
 ---
 * intro applied Bayes book with RStan
-* C++ manual for API and auto-dif
+* (Bob) C++ manual for API and auto-dif
 * C++ code cleanup (API doc, privates, consts, doc, split files, 
   long long)
-* more example models, complete/improve BUGS models
+* more example models, complete/improve BUGS models, 
+  vectorize BUGS models.
 * fancier web site graphics
-
-
-
-RM-HMC
-======================================================================
-Need a model that produces:
-
-Full:
-  - Hessian (dense) [symmetric view in Eigen]
-  - grad Tr[M * Hessian];  // M symmetric and fixed
-  - Note: Tr[M * Hessian] == dot_product(vec(M), vec(Hessian))
-
-Diagonal Hessian:
-  - diagonal of Hessian
-  - grad (Hessian * vector)
 
 
 C++ API
 ======================================================================
 [items go here first, then to RStan/cmd]
 
+* allow only some inits to be specified in a data file (var_context)
+  and let the rest be randomly generated
+
+* bound error in inits (and discuss in manual)
+  init file:  
+    x <- structure(c(1,1,1), .Dim=c(3))
+  model: 
+    parameters {
+      vector<lower=0,upper=1e50>[3] x;
+    }
+    model {
+      print("x = ", x);
+      x ~ normal(0,1);
+    }
+  problem is overflow with initial value of x being 1e35
+  due to huge bounds.
+
+
+
+* fix Eigen (3.0) indexes to use size_t to match vector.
+    http://eigen.tuxfamily.org/dox-devel/classEigen_1_1DenseBase.html#a4d4873e91be950c079f067fa97fd5c40
+  which refers to
+    http://eigen.tuxfamily.org/dox-devel/TopicPreprocessorDirectives.html
+  which says:
+    EIGEN_DEFAULT_DENSE_INDEX_TYPE - the type for column and row indices in matrices, vectors and array (DenseBase::Index). Set to std::ptrdiff_t by default.
+
+* merge forward-mode and higher-order derivative functionals
+
+* agrad for gamma_p function to support gamma_cdf
+
+* (from Frederic Bois): put simulated annealing or tempering in stan...
+
 * broadcast ./ operation for real / vector and vector / real.
+
+* Refactor math library:
+ - src/stan/math/functions/ibeta.hpp
+   all doubles for now. If I template it, conflicts with var definition.
+ - Needs tests. Currently not tested: src/stan/math/matrix/...
+   + stan_print.hpp
+   + singular_values.hpp
+   + cholesky_decompose.hpp
+   + eigenvalues_sym.hpp
+   + inverse.hpp
+   + diag_matrix.hpp
+   + transpose.hpp
+   + diagonal.hpp
+   + block.hpp
+   + diag_post/pre_multiply.hpp
+   + dot_product.hpp
+   + columns_dot_product.hpp
+   + log_determiant.hpp
 
 * new vector views
  
@@ -165,9 +200,6 @@ C++ API
   dims[1] = N;
   View<double, Matrix<double,Dynamic,Dynamic> >(x,dims);
   
-
-
-
 * deprecate lkj_cov
   - work out general framework for deprecated functions
     with warning messages
@@ -566,6 +598,7 @@ Models
 * figure out what's going on with TS's model that's causing
   Eigen to throw an assert failure
 
+* Implementing lasso-like glm and hierarchical glm in stan.
 
 
 Modeling Language
@@ -860,6 +893,50 @@ Testing
 RStan / PStan / MStan / Command Line
 ======================================================================
 
+* Doc optimization usage.  Here's Ben's example:
+
+----------------------------------------------------------------
+# example from glm()
+utils::data(anorexia, package = "MASS")
+anorex.1 <- glm(Postwt ~ Prewt + Treat + Prewt,
+                family = gaussian, data = anorexia)
+
+# extract data
+X <- model.matrix(anorex.1)
+y <- anorexia$Postwt
+
+# write a usual stan model
+model_code <-
+"
+data {
+  int<lower=1> K;
+  int<lower=K> N;
+  matrix[N,K]  X;
+  vector[N]    y;
+}
+parameters {
+  vector[K] beta;
+  real<lower=0> sigma;
+}
+model {
+  y ~ normal(X * beta, sigma);
+}
+"
+
+# compile
+fit <- stan(model_code = model_code, chains = 0,
+            data = list(K = ncol(X), N = nrow(X), X = X, y = y))
+
+# wrappers for log-likelihood and gradient
+fn <- function(par) log_prob(fit, par)
+gr <- function(par) grad_log_prob(fit, par)
+
+# optimize
+opt <- optim(c(coef(anorex.1), log_sigma = 2), fn, gr,
+             method = "BFGS", control = list(fnscale = -1), hessian = TRUE)
+print(opt)
+----------------------------------------------------------------
+
 * (RStan) install checklist -- especially the no spaces thing!
 
 * (RStan) Run the examples rather than dontrun;  see Ben's e-mail
@@ -870,21 +947,6 @@ RStan / PStan / MStan / Command Line
 
 * (RStan) Add RStan doc to reference manual
 
-* (RStan) Expose to R for a model:
-    -- log prob and gradient functions
-    -- inits -> unconstrained param transform
-    -- results -> constrained param transform
-  Then users could do all sorts of things just with our models,
-  like run optimizers, Metropolis, etc.
-
-* (Rstan) I/O functions to read in the output produced by
-  command-line Stan (or write-to file RStan)
-
-* (Rstan) expose transform and inverse transform functions
-  -- danger is that the transforms may change over time
-
-* (Rstan) propagate debug error messages to R
-  see: http://lists.r-forge.r-project.org/pipermail/rcpp-devel/2011-October/003006.html
 
 * (cmd) more RStan like behavior
   -- add --chains=N argument to command-line to run multiple chains
@@ -896,17 +958,9 @@ RStan / PStan / MStan / Command Line
 
 * (MStan) interface to MATLAB
 
-* (RStan/cmd) --functions option in stanc to print out
-  signatures of all available functions for current version
-
 * (R/cmd) Convergence monitoring of higher moments
   -- at least squared for variance, which being non-linear
      function, isn't same as convergence of basic param
-
-* (R/cmd) add chain ID to output as first column
-
-* (R/cmd) add draw ID to output as second column
-  -- plus need something for DE/DREAM with ensemble
 
 * (R/cmd) track rejection rate by testing equality of
   samples; e.g., sum(a[1:(N-1)] == a[2:N])
@@ -929,31 +983,12 @@ RStan / PStan / MStan / Command Line
 
 * (R/cmd) write model text into output in a comment
 
-* (R/cmd) catch +inf, -inf values of unconstrained params and let
-  users know they have an improper posterior
-
-* (R) catch errors/exceptions generated by Stan and trap
-  so they don't percolate through to R
-
 * (R) group dimensions of multivariate params on output plots
 
 * (R/cmd) have output digits depend on se?
 
 * (R/cmd) check initial vals and gradients for finiteness and
   return error message if not
-
-* (R) switch n_chains to chains
-
-* (R/cmd) order of plots/output variables should match declaration
-
-* (R) variable-at-time traceplot
-  -- traceplot(fit) -- array of traceplots for all vals (truncated)
-  -- traceplot(fit,"a") -- array of traceplots for a (truncated)
-  -- traceplot(fit,"a[5,3]") -- traceplot for a[5,3]
-
-* (R) structured data access 
-  - via getters
-  - attach.stan(?)  [does this need a corresponding detach.stan()?]
 
 
 Web Pages
@@ -962,7 +997,33 @@ Web Pages
 Manuals
 ======================================================================
 
-* Fix 0--(N-1) range for categorical example and in doc for categorical
+* Explain how to do BUGS-like cut ops in Stan
+  data {
+    int<lower=0> N;
+    real y[N];
+    real x[N];
+    int<lower=0> N_cut;
+    real x_cut[N_cut];
+  }
+  parameters {
+     real alpha;
+     real beta;
+     real<lower=0> sigma;
+  }
+  model {
+    for (n in 1:N)
+      y[n] ~ normal(alpha + beta * x[n], sigma);
+  }
+  generated quantities {
+    real y_cut[N_cut];
+    for (m in 1:M)
+      y_cut[m] <- alpha + beta * x_cut[m] * beta;
+  }
+
+  With our next release, you can replace the last line with
+  this:
+
+    y_cut[m] <- normal_rng(alpha + beta * x_cut[m], sigma);
 
 * Talk about index order and read order for matrix[I,J] a[K];
   -- in section on arrays in language reference

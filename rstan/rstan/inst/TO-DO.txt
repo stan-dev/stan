@@ -1,3 +1,0 @@
-2. examples using Ben's idea 
-3. short print 
-4. checklist for installing rstan on windows

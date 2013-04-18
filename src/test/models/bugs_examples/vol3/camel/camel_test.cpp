@@ -38,7 +38,16 @@ public:
 
   static std::vector<std::pair<int, double> >
   get_expected_values() {
+    using std::make_pair;
     std::vector<std::pair<int, double> > expected_values;
+
+    expected_values.push_back(make_pair(chains->index("Sigma[1,1]"), 3.193));
+    expected_values.push_back(make_pair(chains->index("Sigma[1,2]"), 0.04932));
+    expected_values.push_back(make_pair(chains->index("Sigma[2,1]"), 0.04932));
+    expected_values.push_back(make_pair(chains->index("Sigma[1,2]"), 2.164));
+
+    expected_values.push_back(make_pair(chains->index("rho"), 0.01742));
+
     return expected_values;
   }
 

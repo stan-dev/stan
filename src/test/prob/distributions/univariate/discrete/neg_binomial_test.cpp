@@ -22,8 +22,7 @@ TEST(ProbDistributionsNegBinomial, chiSquareGoodnessFitTest) {
   int count = 0;
   double bin [K];
   double expect [K];
-  for(int i = 0 ; i < K; i++)
-  {
+  for(int i = 0 ; i < K; i++)  {
     bin[i] = 0;
     expect[i] = N * pdf(dist, i);
   }
@@ -33,7 +32,7 @@ TEST(ProbDistributionsNegBinomial, chiSquareGoodnessFitTest) {
     int a = stan::prob::neg_binomial_rng(5,1.5,rng);
     int i = 0;
     while (i < K-1 && a > loc[i]) 
-  ++i;
+      ++i;
     ++bin[i];
     count++;
    }

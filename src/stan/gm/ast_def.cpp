@@ -249,6 +249,17 @@ namespace stan {
       }
       for (size_t i = 0; i < args.size(); ++i)
         error_msgs << "    arg " << i << " type=" << args[i] << std::endl;
+
+      error_msgs << "available function signatures for "
+                 << name << ":" << std::endl;
+      for (size_t i = 0; i < signatures.size(); ++i) {
+        error_msgs << i << ".  " << name << "(";
+        for (size_t j = 0; j < signatures[i].second.size(); ++j) {
+          if (j > 0) error_msgs << ", ";
+          error_msgs << signatures[i].second[j];
+        }
+        error_msgs << ") : " << signatures[i].first << std::endl;
+      }
       return expr_type(); // ill-formed dummy
     }
     function_signatures::function_signatures() { 
@@ -557,7 +568,7 @@ namespace stan {
       else if (vo == transformed_parameter_origin)
         o << "transformed parameter";
       else if (vo == derived_origin)
-        o << "derived";
+        o << "generated quantities";
       else if (vo == local_origin)
         o << "local";
       else 
@@ -910,6 +921,15 @@ namespace stan {
     expression& expression::operator/=(expression const& rhs) {
       expr_ = binary_op(expr_, "/", rhs);
       return *this;
+    }
+
+    bool has_rng_suffix(const std::string& s) {
+      int n = s.size();
+      return n > 4
+        && s[n-1] == 'g' 
+        && s[n-2] == 'n'
+        && s[n-3] == 'r'
+        && s[n-4] == '_';
     }
 
 

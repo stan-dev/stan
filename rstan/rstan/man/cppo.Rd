@@ -8,22 +8,30 @@
 \description{Set and get the optimization level, defined in 
  CXXFLAGS, for compiling the C++ code. Also flag \code{-DDEBUG} 
  or \code{-DNDEBUG} in \code{R_XTRA_CPPFLAGS} is set depending on the
- optimization mode.  
+ optimization mode and parameter \code{NDEBUG}.  
 }
 
 \usage{
-  set_cppo(mode = c("fast", "presentation2", "presentation1", "debug", "small"))
+  set_cppo(mode = c("fast", "presentation2", "presentation1", "debug", "small"), NDEBUG = FALSE)
   get_cppo() 
 } 
  
 \arguments{
   \item{mode}{A character specifying the optimization level: one of 
-              \code{"fast"}, \code{"presentation2"}, \code{"presentation1"}, \code{"debug"}, \code{"small"},
-              corresponding to optimization level 
-              \code{"3"}, \code{"2"}, \code{"1"}, \code{"0"}, \code{"s"}; defaults to \code{"fast"}.
-              The order from \code{"fast"} to \code{"debug"} generally means
-              that the generated code runs from the fastest to the slowest; \code{"small"}
-              means optimizing for size. See the notes below.}
+    \code{"fast"}, \code{"presentation2"}, \code{"presentation1"}, \code{"debug"}, \code{"small"},
+    corresponding to optimization level 
+    \code{"3"}, \code{"2"}, \code{"1"}, \code{"0"}, \code{"s"}; defaults to \code{"fast"}.
+    The order from \code{"fast"} to \code{"debug"} generally means
+    that the generated code runs from the fastest to the slowest; \code{"small"}
+    means optimizing for size. See the notes below.}
+  \item{NDEBUG}{Logical (defaults to \code{FALSE}). If \code{TRUE}, "-DNDEBUG"
+    would be added to compile the generated C++ file (this is the default in R
+    as well).  However, if this is set, some index checking in Stan would be turned
+    off, which would crash R if some indices are out of range in the model
+    specification.  In \code{"debug"} mode, the option is neglected (no "-DNDEBUG"
+    is set). When \code{NDEBUG=FALSE} is specified for calling this function,
+    a warning is issued. 
+  } 
 } 
 
 
@@ -33,8 +41,10 @@
   is the desired flag that is set if the operation is successful; 
   if any problems is encountered, this function will stop and report an error.  
 
-  \code{get_cppo} returns a character string indicating the optimization mode (that is,  
-   one of \code{"fast"}, \code{"presentation2"}, \code{"presentation1"}, \code{"debug"}).   
+  \code{get_cppo} returns a list. The fist element is string indicating the
+  optimization mode (that is,  one of \code{"fast"}, \code{"presentation2"},
+  \code{"presentation1"}, \code{"debug"}). The second element indicates if
+  "NDEBUG" is set. The third element indicates if "DEBUG" is set.
 }
 
 
@@ -54,6 +64,13 @@
   case \code{-g} flag is also set in \code{CXXFLAGS}. And we recommend 
   calling \code{set_cppo} again to set the optimization mode back to \code{"fast"} after 
   finishing debugging. 
+
+  In modes other than \code{"debug"}, \code{"-DNDEBUG"} is added to the flags
+  for compiling model's C++ code if \code{NDEBUG=TRUE}. By default
+  (\code{NDEBUG=FALSE}), there is more index checking in Stan, which might slow
+  down the execution. So if it is certain there is no problem with the indices 
+  in the model specification, we can set \code{NDEBUG=TRUE} to recompile the
+  model. 
 } 
 
 \references{
@@ -73,4 +90,5 @@
 \examples{\dontrun{
 set_cppo("fast") 
 get_cppo() 
+set_cppo("fast", NDEBUG = FALSE) # warning: this might disable some index range-checking 
 }} 

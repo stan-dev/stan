@@ -1,6 +1,9 @@
 // Arguments: Doubles, Doubles, Doubles
 #include <stan/prob/distributions/univariate/continuous/scaled_inv_chi_square.hpp>
 
+#include <stan/math/functions/multiply_log.hpp>
+#include <stan/math/functions/square.hpp>
+
 using std::vector;
 using std::numeric_limits;
 using stan::agrad::var;
@@ -74,17 +77,6 @@ public:
     return stan::prob::scaled_inv_chi_square_log<propto>(y, nu, s);
   }
   
-  template <bool propto, 
-      class T_y, class T_dof, class T_scale,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9, 
-      class Policy>
-  typename stan::return_type<T_y, T_dof, T_scale>::type 
-  log_prob(const T_y& y, const T_dof& nu, const T_scale& s,
-     const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
-    return stan::prob::scaled_inv_chi_square_log<propto>(y, nu, s, Policy());
-  }
   
   template <class T_y, class T_dof, class T_scale,
       typename T3, typename T4, typename T5, 
@@ -93,7 +85,6 @@ public:
   var log_prob_function(const T_y& y, const T_dof& nu, const T_scale& s,
       const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
     using std::log;
-    using stan::math::log;
     using stan::prob::include_summand;
     using stan::math::multiply_log;
     using stan::math::square;

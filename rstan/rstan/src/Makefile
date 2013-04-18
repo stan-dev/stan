@@ -7,7 +7,7 @@ USERLIB = libstan.a
 OBJECTS = stanc.o chains.o misc.o
 OBJECTS += $(patsubst %.cpp,%.o,$(wildcard gm__*.cpp))
 
-LIBSTANOBJECTS = agrad__agrad.o agrad__matrix.o math__matrix.o
+LIBSTANOBJECTS = agrad__rev__var_stack.o agrad__matrix.o math__matrix.o
 
 # EIGEN_PATH := $(shell $(R_HOME)/bin/Rscript -e "cat(system.file('include', package = 'RcppEigen'))")
 EIGEN_PATH = ../inst/include/stanlib/eigen_3.1.2

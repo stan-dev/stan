@@ -1,6 +1,9 @@
 // Arguments: Doubles, Doubles, Doubles, Doubles
 #include <stan/prob/distributions/univariate/continuous/student_t.hpp>
 
+#include <stan/math/functions/square.hpp>
+#include <stan/math/functions/log1p.hpp>
+
 using std::vector;
 using std::numeric_limits;
 using stan::agrad::var;
@@ -90,16 +93,6 @@ public:
     return stan::prob::student_t_log<propto>(y, nu, mu, sigma);
   }
   
-  template <bool propto, 
-      class T_y, class T_dof, class T_loc, class T_scale,
-      typename T4, typename T5, typename T6, 
-      typename T7, typename T8, typename T9,
-      class Policy>
-  typename stan::return_type<T_y, T_dof, T_loc, T_scale>::type 
-  log_prob(const T_y& y, const T_dof& nu, const T_loc& mu, const T_scale& sigma,
-     const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
-    return stan::prob::student_t_log<propto>(y, nu, mu, sigma, Policy());
-  }
   
   template <class T_y, class T_dof, class T_loc, class T_scale,
       typename T4, typename T5, typename T6, 

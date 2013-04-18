@@ -285,22 +285,65 @@ model {
 %
 The model assumes the binary observed data \code{y[1],...,y[N]}
 are i.i.d.\ with Bernoulli chance-of-success \code{theta}.  The
-prior on \code{theta} is \code{beta(1,1)} (i.e., uniform).%
+prior on \code{theta} is \code{beta(1,1)} (i.e., uniform).
+
+\subsubsection{Implicit Uniform Priors}
+
+If no prior is specified for a parameter, it is implicitly given a
+uniform prior on its support.  For parameters such as \code{theta} in
+the example, which are constrained to fall between 0 and 1, this
+produces a proper uniform distribution on the support of \code{theta}.
+Because $\distro{Beta}(1,1)$ is the uniform distribution, the
+following sampling statement can be eliminated from the model without
+changing the log probability calculation.
 %
-\footnote{If no prior is specified for a parameter, it is implicitly
-  given a uniform prior on its support.  For parameters such as
-  \code{theta} in the example, which are constrained to fall between 0
-  and 1, this produces a proper uniform distribution on the support of
-  \code{theta}.  For parameters with unbounded support, the implicit
-  uniform prior is improper.  Stan allows improper priors to be
-  specified in models, but posteriors must be proper in order for
-  sampling to succeed.}
-%
+\begin{quote}
+\begin{Verbatim}
+  theta ~ beta(1,1);
+\end{Verbatim}
+\end{quote}
+
+For parameters with unbounded support, the implicit uniform prior is
+improper.  Stan allows improper priors to be specified in models, but
+posteriors must be proper in order for sampling to succeed.
+
+
+\subsubsection{Constraints on Parameters}
+
 The variable \code{theta} is defined with lower and upper bounds,
 which constrain its value.  Parameters with constrained support should
 always specify appropriate constraints in the parameter declaration;
 if the constraints are absent, sampling will either slow down or stop
 altogether based on whether the initial values satisfy the constraints.
+
+\subsubsection{Vectorizing Sampling Statements}
+
+Iterations of the model will be faster if the loop over sampling
+statements is vectorized, replacing
+%
+\begin{quote}
+\begin{Verbatim}
+  for (n in 1:N) 
+    y[n] ~ bernoulli(theta);
+\end{Verbatim}
+\end{quote}
+%
+with the equivalent vectorized form,
+%
+\begin{quote}
+\begin{Verbatim}
+  y ~ bernoulli(theta);
+\end{Verbatim}
+\end{quote}
+%
+Performance gains from vectorization are not because loops are slow in
+Stan, but because calls to sampling statements are slow.
+Vectorization allows multiple calls to a sampling statement to be
+replaced with a single call that can share common calculations for the
+log probability function, its gradients, and error checking.  For more
+tips on optimizing the performance of Stan models, see
+\refchapter{optimization}.
+
 
 \subsection{Data Set}
 
@@ -540,9 +583,10 @@ This ends the output.
 
 \subsection{Summarizing Output}
 
-\code{bin/print} will display summary information about the
-run. To run \code{print} on the output file generated for
-\code{bernoulli} on Linux or Mac use
+The command-line program \code{bin/print} will display summary
+information about the run (for more information, see
+\refchapter{print-command}). To run \code{print} on the output file
+generated for \code{bernoulli} on Linux or Mac use
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
@@ -592,16 +636,16 @@ number of effective samples, and $\hat{R}$ value are displayed
 These quantities and their uses are described in detail in 
 \refchapter{mcmc}.
 
-\code{print} can be called with more than one csv file by separating
-filenames with spaces. It will also take wildcards in specifying
-filenames. A typical usage of Stan from the command line would first
-create one or more Markov chains by calling the model executable,
-typically in parallel, writing the output CSV file for each into its
-own directory.  Next, after all of the processes are finished, the
-results would be analyzed using \code{print} to assess convergence and
-inspect the means and quantiles of the fitted variables.
-Additionally, downstream inferences may be performed using the
-samples (e.g., to make decisions or predictions for unseen data).
+The command \code{bin/print} can be called with more than one csv file
+by separating filenames with spaces. It will also take wildcards in
+specifying filenames. A typical usage of Stan from the command line
+would first create one or more Markov chains by calling the model
+executable, typically in parallel, writing the output CSV file for
+each into its own directory.  Next, after all of the processes are
+finished, the results would be analyzed using \code{print} to assess
+convergence and inspect the means and quantiles of the fitted
+variables.  Additionally, downstream inferences may be performed using
+the samples (e.g., to make decisions or predictions for unseen data).
 
 \subsection{Configuring Command-Line Options}
 
@@ -634,15 +678,23 @@ file named \code{makefile}).
 \begin{Verbatim}[fontshape=sl]
 > cd <stan-home>
 > make O=0 test-unit
+> make O=0 test-distributions
+> make O=3 test-models
 \end{Verbatim}
 \end{quote}
 %
-That's the letter `O' followed by an equal sign followed by the digit
-`0', which sets the tests to run at the lowest optimization level.
+Warnings can be safely ignored if the tests complete without a
+\code{FAIL} error.
 
-\emph{Warning}: The \code{make} program may take 20+ minutes 
-and consume 3+ GB of memory to run the unit tests.  Warnings can
-be safely ignored if the tests complete without a \code{FAIL} error.
+Code optimization is specified by the letter `O' followed by an equal
+sign followed by the digit `0' for no optimization and `3' for more
+optimization; optimization slows down compilation of the executable
+but reduces its execution time.
+
+\emph{Warning}: The unit test can take 30+ minutes and consume 3+ GB
+of memory with the default compiler, \code{g++}.  It is faster
+to run the Clang compiler (option \code{CC=clang++}), and to run in
+multiple threads (option \code{-j4} for four threads).
 
 
 % \section{User-Defined Distributions and Functions}

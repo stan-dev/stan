@@ -3,8 +3,7 @@
 
 #include <vector>
 
-#define EIGEN_DENSEBASE_PLUGIN "stan/math/EigenDenseBaseAddons.hpp"
-#include <Eigen/Dense>
+#include <stan/math/matrix/Eigen.hpp>
 
 namespace stan {
 
@@ -174,13 +173,12 @@ namespace stan {
     template <>
     class seq_view<double, std::vector<int> > {
     private:
-      typename store_type<std::vector<int> >::type x_;
+      store_type<std::vector<int> >::type x_;
     public:
-      seq_view(typename pass_type<std::vector<int> >::type x)
+      seq_view(pass_type<std::vector<int> >::type x)
         : x_(x) {
       }
-      inline typename pass_type<double>::type
-      operator[](int n) const {
+      inline pass_type<double>::type operator[](int n) const {
         return x_[n];
       }
       int size() const {

@@ -1,0 +1,104 @@
+#include <test/mcmc/mock_hmc.hpp>
+#include <stan/mcmc/hmc/base_hmc.hpp>
+
+#include <boost/random/additive_combine.hpp>
+
+#include <gtest/gtest.h>
+
+typedef boost::ecuyer1988 rng_t;
+
+
+namespace stan {
+  
+  namespace mcmc {
+    
+    class mock_hmc: public base_hmc<mock_model,
+                                    ps_point,
+                                    mock_hamiltonian,
+                                    mock_integrator,
+                                    rng_t> {
+      
+    public:
+      
+      mock_hmc(mock_model& m, rng_t& rng): base_hmc<mock_model,
+                                           ps_point,
+                                           mock_hamiltonian,
+                                           mock_integrator,
+                                           rng_t>(m, rng)
+      { this->_name = "Mock HMC"; }
+      
+      
+      sample transition(sample& init_sample) {
+        this->seed(init_sample.cont_params(), init_sample.disc_params());
+        return sample(this->_z.q, this->_z.r, - this->_hamiltonian.V(this->_z), 0);
+      }
+      
+      void write_sampler_param_names(std::ostream& o) {};
+      
+      void write_sampler_params(std::ostream& o) {};
+      
+      void get_sampler_param_names(std::vector<std::string>& names) {};
+      
+      void get_sampler_params(std::vector<double>& values) {};
+      
+    };
+    
+  }
+  
+}
+
+TEST(McmcBaseHMC, point_construction) {
+  
+  rng_t base_rng(0);
+  
+  std::vector<double> q(5, 1.0);
+  std::vector<int> r(2, 2);
+  
+  stan::mcmc::mock_model model(q.size());
+  
+  stan::mcmc::mock_hmc sampler(model, base_rng);
+
+  EXPECT_EQ(q.size(), sampler.z().q.size());
+  EXPECT_EQ(q.size(), sampler.z().g.size());
+  
+}
+
+TEST(McmcBaseHMC, seed) {
+  
+  rng_t base_rng(0);
+  
+  std::vector<double> q(5, 1.0);
+  std::vector<int> r;
+  
+  stan::mcmc::mock_model model(q.size());
+  
+  stan::mcmc::mock_hmc sampler(model, base_rng);
+  
+  std::vector<double> q_seed(q.size(), -1.0);
+  
+  sampler.seed(q_seed, r);
+  
+  for (int i = 0; i < q.size(); ++i)
+    EXPECT_EQ(q_seed.at(i), sampler.z().q.at(i));
+  
+}
+
+TEST(McmcBaseHMC, set_stepsize) {
+  
+  rng_t base_rng(0);
+  
+  std::vector<double> q(5, 1.0);
+  std::vector<int> r(2, 2);
+  
+  stan::mcmc::mock_model model(q.size());
+  
+  stan::mcmc::mock_hmc sampler(model, base_rng);
+  
+  double old_epsilon = 1.0;
+  sampler.set_stepsize(old_epsilon);
+  EXPECT_EQ(old_epsilon, sampler.get_stepsize());
+  
+  sampler.set_stepsize(-0.1);
+  EXPECT_EQ(old_epsilon, sampler.get_stepsize());
+  
+}

@@ -1,12 +1,14 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__BETA_HPP__
 #define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__BETA_HPP__
 
+#include <boost/math/special_functions/gamma.hpp>
 #include <boost/random/gamma_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
 
 #include <stan/agrad.hpp>
 #include <stan/math/error_handling.hpp>
-#include <stan/math/special_functions.hpp>
+#include <stan/math/functions/log1m.hpp>
+#include <stan/math/functions/value_of.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
@@ -38,24 +40,24 @@ namespace stan {
      *    @li beta must be positive and finite.
      */
     template <bool propto,
-              typename T_y, typename T_scale_succ, typename T_scale_fail,
-              class Policy>
+              typename T_y, typename T_scale_succ, typename T_scale_fail>
     typename return_type<T_y,T_scale_succ,T_scale_fail>::type
-    beta_log(const T_y& y, const T_scale_succ& alpha, const T_scale_fail& beta, 
-             const Policy&) {
+    beta_log(const T_y& y, 
+             const T_scale_succ& alpha, const T_scale_fail& beta) {
       static const char* function = "stan::prob::beta_log(%1%)";
 
+      using boost::math::digamma;
+      using boost::math::lgamma;
       using stan::is_constant_struct;
       using stan::is_vector;
       using stan::math::check_positive;
       using stan::math::check_finite;
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
-      using stan::math::multiply_log;
-      using stan::math::log1m;
-      using stan::math::value_of;
       using stan::prob::include_summand;
-      using boost::math::digamma;
+      using stan::math::log1m;
+      using stan::math::multiply_log;
+      using stan::math::value_of;
 
       // check if any vectors are zero length
       if (!(stan::length(y) 
@@ -69,31 +71,32 @@ namespace stan {
       // validate args (here done over var, which should be OK)
       if (!check_finite(function, alpha,
                         "First shape parameter",
-                        &logp, Policy()))
+                        &logp))
         return logp;
       if (!check_positive(function, alpha, 
                           "First shape parameter",
-                          &logp, Policy()))
+                          &logp))
         return logp;
       if (!check_finite(function, beta, 
-                          "Second shape parameter",
-                          &logp, Policy()))
+                        "Second shape parameter",
+                        &logp))
         return logp;
       if (!check_positive(function, beta, 
                           "Second shape parameter",
-                          &logp, Policy()))
+                          &logp))
         return logp;
-      if (!check_not_nan(function, y, "Random variable", &logp, Policy()))
+      if (!check_not_nan(function, y, "Random variable", &logp))
         return logp;
       if (!(check_consistent_sizes(function,
                                    y,alpha,beta,
-           "Random variable","First shape parameter","Second shape parameter",
-                                   &logp, Policy())))
+                                   "Random variable","First shape parameter",
+                                   "Second shape parameter",
+                                   &logp)))
         return logp;
 
       // check if no variables are involved and prop-to
       if (!include_summand<propto,T_y,T_scale_succ,T_scale_fail>::value)
-  return 0.0;
+        return 0.0;
 
       VectorView<const T_y> y_vec(y);
       VectorView<const T_scale_succ> alpha_vec(alpha);
@@ -101,108 +104,105 @@ namespace stan {
       size_t N = max_size(y, alpha, beta);
 
       for (size_t n = 0; n < N; n++) {
-  const double y_dbl = value_of(y_vec[n]);
-  if (y_dbl < 0 || y_dbl > 1)
-    return LOG_ZERO;
+        const double y_dbl = value_of(y_vec[n]);
+        if (y_dbl < 0 || y_dbl > 1)
+          return LOG_ZERO;
       }
 
       // set up template expressions wrapping scalars into vector views
-      agrad::OperandsAndPartials<T_y, T_scale_succ, T_scale_fail> operands_and_partials(y, alpha, beta);
+      agrad::OperandsAndPartials<T_y, T_scale_succ, T_scale_fail>
+        operands_and_partials(y, alpha, beta);
 
-
-      DoubleVectorView<include_summand<propto,T_y,T_scale_succ>::value,is_vector<T_y>::value> log_y(length(y));
-      DoubleVectorView<include_summand<propto,T_y,T_scale_fail>::value,is_vector<T_y>::value> log1m_y(length(y));
+      DoubleVectorView<include_summand<propto,T_y,T_scale_succ>::value,
+        is_vector<T_y>::value> log_y(length(y));
+      DoubleVectorView<include_summand<propto,T_y,T_scale_fail>::value,
+        is_vector<T_y>::value> log1m_y(length(y));
       
       for (size_t n = 0; n < length(y); n++) {
-  if (include_summand<propto,T_y,T_scale_succ>::value)
-    log_y[n] = log(value_of(y_vec[n]));
-  if (include_summand<propto,T_y,T_scale_fail>::value)
-    log1m_y[n] = log1m(value_of(y_vec[n]));
+        if (include_summand<propto,T_y,T_scale_succ>::value)
+          log_y[n] = log(value_of(y_vec[n]));
+        if (include_summand<propto,T_y,T_scale_fail>::value)
+          log1m_y[n] = log1m(value_of(y_vec[n]));
       }
 
-      DoubleVectorView<include_summand<propto,T_scale_succ>::value,is_vector<T_scale_succ>::value> lgamma_alpha(length(alpha));
-      DoubleVectorView<!is_constant_struct<T_scale_succ>::value,is_vector<T_scale_succ>::value> digamma_alpha(length(alpha));
+      DoubleVectorView<include_summand<propto,T_scale_succ>::value,
+        is_vector<T_scale_succ>::value> lgamma_alpha(length(alpha));
+      DoubleVectorView<!is_constant_struct<T_scale_succ>::value,
+        is_vector<T_scale_succ>::value> digamma_alpha(length(alpha));
       for (size_t n = 0; n < length(alpha); n++) {
-  if (include_summand<propto,T_scale_succ>::value) 
-    lgamma_alpha[n] = lgamma(value_of(alpha_vec[n]));
-  if (!is_constant_struct<T_scale_succ>::value)
-    digamma_alpha[n] = digamma(value_of(alpha_vec[n]));
+        if (include_summand<propto,T_scale_succ>::value) 
+          lgamma_alpha[n] = lgamma(value_of(alpha_vec[n]));
+        if (!is_constant_struct<T_scale_succ>::value)
+          digamma_alpha[n] = digamma(value_of(alpha_vec[n]));
       }
 
+      DoubleVectorView<include_summand<propto,T_scale_fail>::value,
+        is_vector<T_scale_fail>::value> lgamma_beta(length(beta));
+      DoubleVectorView<!is_constant_struct<T_scale_fail>::value,
+        is_vector<T_scale_fail>::value> digamma_beta(length(beta));
 
-      DoubleVectorView<include_summand<propto,T_scale_fail>::value,is_vector<T_scale_fail>::value> lgamma_beta(length(beta));
-      DoubleVectorView<!is_constant_struct<T_scale_fail>::value,is_vector<T_scale_fail>::value> digamma_beta(length(beta));
       for (size_t n = 0; n < length(beta); n++) {
-  if (include_summand<propto,T_scale_fail>::value) 
-    lgamma_beta[n] = lgamma(value_of(beta_vec[n]));
-  if (!is_constant_struct<T_scale_fail>::value)
-    digamma_beta[n] = digamma(value_of(beta_vec[n]));
+        if (include_summand<propto,T_scale_fail>::value) 
+          lgamma_beta[n] = lgamma(value_of(beta_vec[n]));
+        if (!is_constant_struct<T_scale_fail>::value)
+          digamma_beta[n] = digamma(value_of(beta_vec[n]));
       }
 
       DoubleVectorView<include_summand<propto,T_scale_succ,T_scale_fail>::value,
-  is_vector<T_scale_succ>::value||is_vector<T_scale_fail>::value>
-  lgamma_alpha_beta(max_size(alpha,beta));
-      DoubleVectorView<!is_constant_struct<T_scale_succ>::value||!is_constant_struct<T_scale_fail>::value,
-  is_vector<T_scale_succ>::value||is_vector<T_scale_fail>::value>
-  digamma_alpha_beta(max_size(alpha,beta));
+        is_vector<T_scale_succ>::value 
+        || is_vector<T_scale_fail>::value>
+        lgamma_alpha_beta(max_size(alpha,beta));
+    
+      DoubleVectorView<!is_constant_struct<T_scale_succ>::value 
+        || !is_constant_struct<T_scale_fail>::value,
+        is_vector<T_scale_succ>::value 
+        || is_vector<T_scale_fail>::value>
+        digamma_alpha_beta(max_size(alpha,beta));
+  
       for (size_t n = 0; n < max_size(alpha,beta); n++) {
-  const double alpha_beta = value_of(alpha_vec[n]) + value_of(beta_vec[n]);
-  if (include_summand<propto,T_scale_succ,T_scale_fail>::value)
-    lgamma_alpha_beta[n] = lgamma(alpha_beta);
-  if (!is_constant_struct<T_scale_succ>::value||!is_constant_struct<T_scale_fail>::value)
-    digamma_alpha_beta[n] = digamma(alpha_beta);
+        const double alpha_beta = value_of(alpha_vec[n]) + value_of(beta_vec[n]);
+        if (include_summand<propto,T_scale_succ,T_scale_fail>::value)
+          lgamma_alpha_beta[n] = lgamma(alpha_beta);
+        if (!is_constant_struct<T_scale_succ>::value
+            || !is_constant_struct<T_scale_fail>::value)
+          digamma_alpha_beta[n] = digamma(alpha_beta);
       }
 
       for (size_t n = 0; n < N; n++) {
-  // pull out values of arguments
-  const double y_dbl = value_of(y_vec[n]);
-  const double alpha_dbl = value_of(alpha_vec[n]);
-  const double beta_dbl = value_of(beta_vec[n]);
+        // pull out values of arguments
+        const double y_dbl = value_of(y_vec[n]);
+        const double alpha_dbl = value_of(alpha_vec[n]);
+        const double beta_dbl = value_of(beta_vec[n]);
 
-  // log probability
-  if (include_summand<propto,T_scale_succ,T_scale_fail>::value)
-    logp += lgamma_alpha_beta[n];
-  if (include_summand<propto,T_scale_succ>::value)
-    logp -= lgamma_alpha[n];
-  if (include_summand<propto,T_scale_fail>::value)
-    logp -= lgamma_beta[n];
-  if (include_summand<propto,T_y,T_scale_succ>::value)
-    logp += (alpha_dbl-1.0) * log_y[n];
-  if (include_summand<propto,T_y,T_scale_fail>::value)
-    logp += (beta_dbl-1.0) * log1m_y[n];
+        // log probability
+        if (include_summand<propto,T_scale_succ,T_scale_fail>::value)
+          logp += lgamma_alpha_beta[n];
+        if (include_summand<propto,T_scale_succ>::value)
+          logp -= lgamma_alpha[n];
+        if (include_summand<propto,T_scale_fail>::value)
+          logp -= lgamma_beta[n];
+        if (include_summand<propto,T_y,T_scale_succ>::value)
+          logp += (alpha_dbl-1.0) * log_y[n];
+        if (include_summand<propto,T_y,T_scale_fail>::value)
+          logp += (beta_dbl-1.0) * log1m_y[n];
 
-  // gradients
-  if (!is_constant_struct<T_y>::value)
-    operands_and_partials.d_x1[n] += (alpha_dbl-1)/y_dbl + (beta_dbl-1)/(y_dbl-1);
-  if (!is_constant_struct<T_scale_succ>::value)
-    operands_and_partials.d_x2[n] += log_y[n] + digamma_alpha_beta[n] - digamma_alpha[n];
-  if (!is_constant_struct<T_scale_fail>::value)
-    operands_and_partials.d_x3[n] += log1m_y[n] + digamma_alpha_beta[n] - digamma_beta[n];
+        // gradients
+        if (!is_constant_struct<T_y>::value)
+          operands_and_partials.d_x1[n] += (alpha_dbl-1)/y_dbl + (beta_dbl-1)/(y_dbl-1);
+        if (!is_constant_struct<T_scale_succ>::value)
+          operands_and_partials.d_x2[n]
+            += log_y[n] + digamma_alpha_beta[n] - digamma_alpha[n];
+        if (!is_constant_struct<T_scale_fail>::value)
+          operands_and_partials.d_x3[n] 
+            += log1m_y[n] + digamma_alpha_beta[n] - digamma_beta[n];
       }
       return operands_and_partials.to_var(logp);
     }
 
-    template <bool propto,
-              typename T_y, typename T_scale_succ, typename T_scale_fail>
-    inline 
-    typename return_type<T_y,T_scale_succ,T_scale_fail>::type
-    beta_log(const T_y& y, const T_scale_succ& alpha, const T_scale_fail& beta) {
-      return beta_log<propto>(y,alpha,beta,stan::math::default_policy());
-    }
-
-    template <typename T_y, typename T_scale_succ, typename T_scale_fail,
-              class Policy>
-    typename return_type<T_y,T_scale_succ,T_scale_fail>::type
-    beta_log(const T_y& y, const T_scale_succ& alpha, const T_scale_fail& beta, 
-             const Policy&) {
-      return beta_log<false>(y,alpha,beta,Policy());
-    }
-
     template <typename T_y, typename T_scale_succ, typename T_scale_fail>
-    inline 
-    typename return_type<T_y,T_scale_succ,T_scale_fail>::type
+    inline typename return_type<T_y,T_scale_succ,T_scale_fail>::type
     beta_log(const T_y& y, const T_scale_succ& alpha, const T_scale_fail& beta) {
-      return beta_log<false>(y,alpha,beta,stan::math::default_policy());
+      return beta_log<false>(y,alpha,beta);
     }
 
     
@@ -217,11 +217,10 @@ namespace stan {
      * @tparam T_y Type of y.
      * @tparam T_scale_succ Type of alpha.
      * @tparam T_scale_fail Type of beta.
-     * @tparam Policy Error-handling policy.
      */
-    template <typename T_y, typename T_scale_succ, typename T_scale_fail, class Policy>
+    template <typename T_y, typename T_scale_succ, typename T_scale_fail>
     typename return_type<T_y,T_scale_succ,T_scale_fail>::type
-    beta_cdf(const T_y& y, const T_scale_succ& alpha, const T_scale_fail& beta, const Policy&) {
+    beta_cdf(const T_y& y, const T_scale_succ& alpha, const T_scale_fail& beta) {
       
       // Size checks
       if ( !( stan::length(y) && stan::length(alpha) && stan::length(beta) ) ) return 1.0;
@@ -238,24 +237,24 @@ namespace stan {
       
       double P(1.0);
         
-      if (!check_finite(function, alpha, "First shape parameter", &P, Policy()))
+      if (!check_finite(function, alpha, "First shape parameter", &P))
         return P;
         
-      if (!check_positive(function, alpha, "First shape parameter", &P, Policy()))
+      if (!check_positive(function, alpha, "First shape parameter", &P))
         return P;
         
-      if (!check_finite(function, beta, "Second shape parameter", &P, Policy()))
+      if (!check_finite(function, beta, "Second shape parameter", &P))
         return P;
         
-      if (!check_positive(function, beta, "Second shape parameter", &P, Policy()))
+      if (!check_positive(function, beta, "Second shape parameter", &P))
         return P;
         
-      if (!check_not_nan(function, y, "Random variable", &P, Policy()))
+      if (!check_not_nan(function, y, "Random variable", &P))
         return P;
         
       if (!(check_consistent_sizes(function, y, alpha, beta,
                                    "Random variable", "Shape parameter", "Scale Parameter",
-                                   &P, Policy())))
+                                   &P)))
         return P;
       
       // Wrap arguments in vectors
@@ -264,7 +263,8 @@ namespace stan {
       VectorView<const T_scale_fail> beta_vec(beta);
       size_t N = max_size(y, alpha, beta);
 
-      agrad::OperandsAndPartials<T_y, T_scale_succ, T_scale_fail> operands_and_partials(y, alpha, beta);
+      agrad::OperandsAndPartials<T_y, T_scale_succ, T_scale_fail> 
+        operands_and_partials(y, alpha, beta);
 
       std::fill(operands_and_partials.all_partials,
                 operands_and_partials.all_partials + operands_and_partials.nvaris, 0.0);
@@ -282,23 +282,28 @@ namespace stan {
       using boost::math::digamma;
         
       // Cache a few expensive function calls if alpha or beta is a parameter
-      DoubleVectorView<!is_constant_struct<T_scale_succ>::value || !is_constant_struct<T_scale_fail>::value,
-                       is_vector<T_scale_succ>::value || is_vector<T_scale_fail>::value>
-                       digamma_alpha_vec(max_size(alpha, beta));
+      DoubleVectorView<!is_constant_struct<T_scale_succ>::value 
+                       || !is_constant_struct<T_scale_fail>::value,
+        is_vector<T_scale_succ>::value || is_vector<T_scale_fail>::value>
+        digamma_alpha_vec(max_size(alpha, beta));
         
-      DoubleVectorView<!is_constant_struct<T_scale_succ>::value || !is_constant_struct<T_scale_fail>::value,
-                       is_vector<T_scale_succ>::value || is_vector<T_scale_fail>::value>
-                       digamma_beta_vec(max_size(alpha, beta));
+      DoubleVectorView<!is_constant_struct<T_scale_succ>::value 
+                       || !is_constant_struct<T_scale_fail>::value,
+        is_vector<T_scale_succ>::value || is_vector<T_scale_fail>::value>
+        digamma_beta_vec(max_size(alpha, beta));
         
-      DoubleVectorView<!is_constant_struct<T_scale_succ>::value || !is_constant_struct<T_scale_fail>::value,
-                       is_vector<T_scale_succ>::value || is_vector<T_scale_fail>::value>
-                       digamma_sum_vec(max_size(alpha, beta));
+      DoubleVectorView<!is_constant_struct<T_scale_succ>::value
+                       || !is_constant_struct<T_scale_fail>::value,
+        is_vector<T_scale_succ>::value || is_vector<T_scale_fail>::value>
+        digamma_sum_vec(max_size(alpha, beta));
         
-      DoubleVectorView<!is_constant_struct<T_scale_succ>::value || !is_constant_struct<T_scale_fail>::value,
-                       is_vector<T_scale_succ>::value || is_vector<T_scale_fail>::value>
-                       betafunc_vec(max_size(alpha, beta));
+      DoubleVectorView<!is_constant_struct<T_scale_succ>::value
+                       || !is_constant_struct<T_scale_fail>::value,
+        is_vector<T_scale_succ>::value || is_vector<T_scale_fail>::value>
+        betafunc_vec(max_size(alpha, beta));
         
-      if (!is_constant_struct<T_scale_succ>::value || !is_constant_struct<T_scale_fail>::value) {
+      if (!is_constant_struct<T_scale_succ>::value 
+          || !is_constant_struct<T_scale_fail>::value) {
             
         for (size_t i = 0; i < N; i++) {
 
@@ -337,10 +342,12 @@ namespace stan {
         double g1 = 0;
         double g2 = 0;
               
-        if (!is_constant_struct<T_scale_succ>::value || !is_constant_struct<T_scale_fail>::value)
-        {
-          stan::math::gradRegIncBeta(g1, g2, alpha_dbl, beta_dbl, y_dbl, digamma_alpha_vec[n], 
-                                     digamma_beta_vec[n], digamma_sum_vec[n], betafunc_vec[n]);
+        if (!is_constant_struct<T_scale_succ>::value
+            || !is_constant_struct<T_scale_fail>::value) {
+          stan::math::gradRegIncBeta(g1, g2, alpha_dbl, beta_dbl, y_dbl, 
+                                     digamma_alpha_vec[n], 
+                                     digamma_beta_vec[n], digamma_sum_vec[n], 
+                                     betafunc_vec[n]);
         }
 
         if (!is_constant_struct<T_scale_succ>::value)
@@ -348,7 +355,6 @@ namespace stan {
                   
         if (!is_constant_struct<T_scale_fail>::value)
           operands_and_partials.d_x3[n]  += g2 / Pn;
-                
       }
             
       if (!is_constant_struct<T_y>::value) {
@@ -364,19 +370,12 @@ namespace stan {
       }
         
       return operands_and_partials.to_var(P);
-
-    }
-
-    template <typename T_y, typename T_scale_succ, typename T_scale_fail>
-    typename return_type<T_y,T_scale_succ,T_scale_fail>::type
-    beta_cdf(const T_y& y, const T_scale_succ& alpha, const T_scale_fail& beta) {
-      return beta_cdf(y, alpha, beta, stan::math::default_policy());
     }
 
     template <class RNG>
     inline double
-    beta_rng(double alpha,
-             double beta,
+    beta_rng(const double alpha,
+             const double beta,
              RNG& rng) {
       using boost::variate_generator;
       using boost::random::gamma_distribution;
@@ -388,6 +387,7 @@ namespace stan {
       double b = rng_gamma_beta();
       return a / (a + b);
     }
+
   }
 }
 #endif

@@ -306,6 +306,7 @@ namespace stan {
         reserve("transformed"); 
         reserve("generated");
         
+        reserve("var");
         
         reserve("alignas"); 
         reserve("alignof"); 

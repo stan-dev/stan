@@ -165,6 +165,21 @@ p(\tilde{y}|\theta) p(\theta|y) \, d\tilde{y} \, d\theta.
 \]
 
 
+\subsection{Posterior Predictive Checking}
+
+After the parameters are fit to data, they can be used to simulate a
+new data set by running the model inferences in the forward
+direction.  These replicated data sets can then be compared to the
+original data either visually or statistically to assess model fit 
+\citep[Chapter 6]{GelmanCarlinSternRubin:2003}.  
+
+In Stan, posterior simulations can be generated in two ways.  The
+first approach is to treat the predicted variables as parameters and
+then define their distributions in the model block.  The second
+approach, which also works for discrete variables, is to generate
+replicated data using random-number generators in the generated
+quantities block.
+
 
 
 \chapter{Markov Chain Monte Carlo Sampling}\label{mcmc.chapter}

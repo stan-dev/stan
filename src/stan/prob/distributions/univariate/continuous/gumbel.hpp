@@ -6,22 +6,19 @@
 
 #include <stan/agrad.hpp>
 #include <stan/math/error_handling.hpp>
-#include <stan/math/special_functions.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
 #include <stan/prob/internal_math.hpp>
+#include <stan/math/functions/value_of.hpp>
 
 namespace stan {
 
   namespace prob {
 
-    template <bool propto, 
-              typename T_y, typename T_loc, typename T_scale,
-              class Policy>
+    template <bool propto, typename T_y, typename T_loc, typename T_scale>
     typename return_type<T_y,T_loc,T_scale>::type
-    gumbel_log(const T_y& y, const T_loc& mu, const T_scale& beta,
-               const Policy& /*policy*/) {
+    gumbel_log(const T_y& y, const T_loc& mu, const T_scale& beta) {
       static const char* function = "stan::prob::gumbel_log(%1%)";
 
       using std::log;
@@ -44,18 +41,18 @@ namespace stan {
       double logp(0.0);
 
       // validate args (here done over var, which should be OK)
-      if (!check_not_nan(function, y, "Random variable", &logp, Policy()))
+      if (!check_not_nan(function, y, "Random variable", &logp))
         return logp;
       if (!check_finite(function, mu, "Location parameter", 
-                        &logp, Policy()))
+                        &logp))
         return logp;
       if (!check_positive(function, beta, "Scale parameter", 
-                          &logp, Policy()))
+                          &logp))
         return logp;
       if (!(check_consistent_sizes(function,
                                    y,mu,beta,
                                    "Random variable","Location parameter","Scale parameter",
-                                   &logp, Policy())))
+                                   &logp)))
         return logp;
 
       // check if no variables are involved and prop-to
@@ -106,35 +103,16 @@ namespace stan {
       return operands_and_partials.to_var(logp);
     }
 
-    template <bool propto,
-              typename T_y, typename T_loc, typename T_scale>
-    inline
-    typename return_type<T_y,T_loc,T_scale>::type
-    gumbel_log(const T_y& y, const T_loc& mu, const T_scale& beta) {
-      return gumbel_log<propto>(y,mu,beta,stan::math::default_policy());
-    }
-
-    template <typename T_y, typename T_loc, typename T_scale, 
-              class Policy>
-    inline
-    typename return_type<T_y,T_loc,T_scale>::type
-    gumbel_log(const T_y& y, const T_loc& mu, const T_scale& beta, 
-               const Policy&) {
-      return gumbel_log<false>(y,mu,beta,Policy());
-    }
-
     template <typename T_y, typename T_loc, typename T_scale>
     inline
     typename return_type<T_y,T_loc,T_scale>::type
     gumbel_log(const T_y& y, const T_loc& mu, const T_scale& beta) {
-      return gumbel_log<false>(y,mu,beta,stan::math::default_policy());
+      return gumbel_log<false>(y,mu,beta);
     }
 
-    template <typename T_y, typename T_loc, typename T_scale,
-              class Policy>
+    template <typename T_y, typename T_loc, typename T_scale>
     typename return_type<T_y,T_loc,T_scale>::type
-    gumbel_cdf(const T_y& y, const T_loc& mu, const T_scale& beta, 
-             const Policy&) {
+    gumbel_cdf(const T_y& y, const T_loc& mu, const T_scale& beta) {
       static const char* function = "stan::prob::gumbel_cdf(%1%)";
 
       using stan::math::check_positive;
@@ -149,20 +127,20 @@ namespace stan {
             && stan::length(beta)))
         return cdf;
 
-      if (!check_not_nan(function, y, "Random variable", &cdf, Policy()))
+      if (!check_not_nan(function, y, "Random variable", &cdf))
         return cdf;
-      if (!check_finite(function, mu, "Location parameter", &cdf, Policy()))
+      if (!check_finite(function, mu, "Location parameter", &cdf))
         return cdf;
       if (!check_not_nan(function, beta, "Scale parameter", 
-                         &cdf, Policy()))
+                         &cdf))
         return cdf;
       if (!check_positive(function, beta, "Scale parameter", 
-                          &cdf, Policy()))
+                          &cdf))
         return cdf;
       if (!(check_consistent_sizes(function,
                                    y,mu,beta,
                                    "Random variable","Location parameter","Scale parameter",
-                                   &cdf, Policy())))
+                                   &cdf)))
         return cdf;
 
       VectorView<const T_y> y_vec(y);
@@ -177,18 +155,10 @@ namespace stan {
       return cdf;
     }
 
-    template <typename T_y, typename T_loc, typename T_scale>
-    inline
-    typename return_type<T_y, T_loc, T_scale>::type
-    gumbel_cdf(const T_y& y, const T_loc& mu, const T_scale& beta) {
-      return gumbel_cdf(y,mu,beta,stan::math::default_policy());
-    }
-
-
     template <class RNG>
     inline double
-    gumbel_rng(double mu,
-               double beta,
+    gumbel_rng(const double mu,
+               const double beta,
                RNG& rng) {
       using boost::variate_generator;
       using boost::uniform_01;

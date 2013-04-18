@@ -6,10 +6,14 @@
 
 #include <stan/agrad.hpp>
 #include <stan/math/error_handling.hpp>
-#include <stan/math/special_functions.hpp>
+#include <stan/math/functions/log1m.hpp>
+#include <stan/math/functions/log_inv_logit.hpp>
+#include <stan/math/functions/value_of.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/traits.hpp>
 #include <stan/prob/constants.hpp>
+
+#include <stan/math/functions/binomial_coefficient_log.hpp>
 
 namespace stan {
 
@@ -19,13 +23,11 @@ namespace stan {
     template <bool propto,
               typename T_n,
               typename T_N,
-              typename T_prob, 
-              class Policy>
+              typename T_prob>
     typename return_type<T_prob>::type
     binomial_log(const T_n& n, 
                  const T_N& N, 
-                 const T_prob& theta, 
-                 const Policy&) {
+                 const T_prob& theta) {
 
       static const char* function = "stan::prob::binomial_log(%1%)";
       
@@ -45,26 +47,26 @@ namespace stan {
       double logp = 0;
       if (!check_bounded(function, n, 0, N,
                          "Successes variable",
-                         &logp, Policy()))
+                         &logp))
         return logp;
       if (!check_nonnegative(function, N,
                              "Population size parameter",
-                             &logp, Policy()))
+                             &logp))
         return logp;
       if (!check_finite(function, theta,
                         "Probability parameter",
-                        &logp, Policy()))
+                        &logp))
         return logp;
       if (!check_bounded(function, theta, 0.0, 1.0,
                          "Probability parameter",
-                         &logp, Policy()))
+                         &logp))
         return logp;
       if (!(check_consistent_sizes(function,
                                    n,N,theta,
                                    "Successes variable",
                                    "Population size parameter",
                                    "Probability parameter",
-                                   &logp, Policy())))
+                                   &logp)))
         return logp;
 
 
@@ -117,33 +119,6 @@ namespace stan {
       return operands_and_partials.to_var(logp);
     }
 
-    template <bool propto,
-              typename T_n,
-              typename T_N,
-              typename T_prob>
-    inline
-    typename return_type<T_prob>::type
-    binomial_log(const T_n& n, 
-                 const T_N& N, 
-                 const T_prob& theta) {
-      return binomial_log<propto>(n,N,theta,stan::math::default_policy());
-    }
-
-
-    template <typename T_n,
-              typename T_N,
-              typename T_prob, 
-              class Policy>
-    inline
-    typename return_type<T_prob>::type
-    binomial_log(const T_n& n, 
-                 const T_N& N, 
-                 const T_prob& theta, 
-                 const Policy&) {
-      return binomial_log<false>(n,N,theta,Policy());
-    }
-
-
     template <typename T_n, 
               typename T_N,
               typename T_prob>
@@ -152,7 +127,7 @@ namespace stan {
     binomial_log(const T_n& n, 
                  const T_N& N, 
                  const T_prob& theta) {
-      return binomial_log<false>(n,N,theta,stan::math::default_policy());
+      return binomial_log<false>(n,N,theta);
     }
 
     // BinomialLogit(n|N,alpha)  [N >= 0;  0 <= n <= N]
@@ -160,13 +135,11 @@ namespace stan {
     template <bool propto,
               typename T_n,
               typename T_N,
-              typename T_prob, 
-              class Policy>
+              typename T_prob>
     typename return_type<T_prob>::type
     binomial_logit_log(const T_n& n, 
-                 const T_N& N, 
-                 const T_prob& alpha, 
-                 const Policy&) {
+                       const T_N& N, 
+                       const T_prob& alpha) {
 
       static const char* function = "stan::prob::binomial_logit_log(%1%)";
       
@@ -186,22 +159,22 @@ namespace stan {
       double logp = 0;
       if (!check_bounded(function, n, 0, N,
                          "Successes variable",
-                         &logp, Policy()))
+                         &logp))
         return logp;
       if (!check_nonnegative(function, N,
                              "Population size parameter",
-                             &logp, Policy()))
+                             &logp))
         return logp;
       if (!check_finite(function, alpha,
                         "Probability parameter",
-                        &logp, Policy()))
+                        &logp))
         return logp;
       if (!(check_consistent_sizes(function,
                                    n,N,alpha,
                                    "Successes variable",
                                    "Population size parameter",
                                    "Probability parameter",
-                                   &logp, Policy())))
+                                   &logp)))
         return logp;
 
       // check if no variables are involved and prop-to
@@ -256,33 +229,6 @@ namespace stan {
       return operands_and_partials.to_var(logp);
     }
 
-    template <bool propto,
-              typename T_n,
-              typename T_N,
-              typename T_prob>
-    inline
-    typename return_type<T_prob>::type
-    binomial_logit_log(const T_n& n, 
-                       const T_N& N, 
-                       const T_prob& alpha) {
-      return binomial_logit_log<propto>(n,N,alpha,stan::math::default_policy());
-    }
-
-
-    template <typename T_n,
-              typename T_N,
-              typename T_prob, 
-              class Policy>
-    inline
-    typename return_type<T_prob>::type
-    binomial_logit_log(const T_n& n, 
-                       const T_N& N, 
-                       const T_prob& alpha, 
-                       const Policy&) {
-      return binomial_logit_log<false>(n,N,alpha,Policy());
-    }
-
-
     template <typename T_n, 
               typename T_N,
               typename T_prob>
@@ -291,16 +237,14 @@ namespace stan {
     binomial_logit_log(const T_n& n, 
                        const T_N& N, 
                        const T_prob& alpha) {
-      return binomial_logit_log<false>(n,N,alpha,stan::math::default_policy());
+      return binomial_logit_log<false>(n,N,alpha);
     }
 
 
     // Binomial CDF
-    template <bool propto, typename T_n, typename T_N, typename T_prob, 
-              class Policy>
+    template <typename T_n, typename T_N, typename T_prob>
     typename return_type<T_prob>::type
-    binomial_cdf(const T_n& n, const T_N& N, const T_prob& theta, 
-                 const Policy&) {
+    binomial_cdf(const T_n& n, const T_N& N, const T_prob& theta) {
           
       static const char* function = "stan::prob::binomial_cdf(%1%)";
           
@@ -318,26 +262,20 @@ namespace stan {
       double P(1.0);
           
       // Validate arguments
-      if (!check_nonnegative(function, N, "Population size parameter", &P,
-                             Policy()))
+      if (!check_nonnegative(function, N, "Population size parameter", &P))
         return P;
           
-      if (!check_finite(function, theta, "Probability parameter", &P, 
-                        Policy()))
+      if (!check_finite(function, theta, "Probability parameter", &P))
         return P;
           
       if (!check_bounded(function, theta, 0.0, 1.0, 
-                         "Probability parameter", &P, Policy()))
+                         "Probability parameter", &P))
         return P;
           
       if (!(check_consistent_sizes(function, n, N, theta, 
                                    "Successes variable", "Population size parameter", "Probability parameter",
-                                   &P, Policy())))
+                                   &P)))
         return P;
-          
-      // Return if everything constant and propto
-      if (!include_summand<propto, T_prob>::value)
-        return 1.0;
           
       // Wrap arguments in vector views
       VectorView<const T_n> n_vec(n);
@@ -393,35 +331,16 @@ namespace stan {
       return operands_and_partials.to_var(P);
         
     }
-      
-    template <bool propto, typename T_n, typename T_N, typename T_prob>
-    inline typename return_type<T_prob>::type
-    binomial_cdf(const T_n& n, const T_N& N, const T_prob& theta) {
-      return binomial_cdf<propto>(n, N, theta,stan::math::default_policy());
-    }
-      
-      
-    template <typename T_n, typename T_N, typename T_prob, class Policy>
-    inline typename return_type<T_prob>::type
-    binomial_cdf(const T_n& n, const T_N& N, const T_prob& theta, const Policy&) {
-      return binomial_cdf<false>(n, N, theta,Policy());
-    }
-      
-    template <typename T_n, typename T_N, typename T_prob>
-    inline typename return_type<T_prob>::type
-    binomial_cdf(const T_n& n, const T_N& N, const T_prob& theta) {
-      return binomial_cdf<false>(n, N, theta, stan::math::default_policy());
-    }
 
     template <class RNG>
     inline int
-    binomial_rng(int n,
-                 double prob,
+    binomial_rng(const int N,
+                 const double theta,
                  RNG& rng) {
       using boost::variate_generator;
       using boost::binomial_distribution;
       variate_generator<RNG&, binomial_distribution<> >
-        binomial_rng(rng, binomial_distribution<>(n, prob));
+        binomial_rng(rng, binomial_distribution<>(N, theta));
       return binomial_rng();
     }
     

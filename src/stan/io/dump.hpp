@@ -2,11 +2,12 @@
 #define __STAN__IO__DUMP_HPP__
 
 #include <cctype>
+#include <iostream>
 #include <limits>
 #include <map>
-#include <vector>
-#include <string>
 #include <sstream>
+#include <string>
+#include <vector>
 #include <boost/throw_exception.hpp>
 #include <stan/math/matrix.hpp>
 #include <stan/io/var_context.hpp>

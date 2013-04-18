@@ -1,6 +1,9 @@
 // Arguments: Doubles, Doubles, Doubles
 #include <stan/prob/distributions/univariate/continuous/weibull.hpp>
 
+#include <stan/math/functions/multiply_log.hpp>
+#include <stan/math/functions/value_of.hpp>
+
 using std::vector;
 using std::numeric_limits;
 using stan::agrad::var;
@@ -70,17 +73,6 @@ public:
     return stan::prob::weibull_log<propto>(y, alpha, sigma);
   }
   
-  template <bool propto, 
-      typename T_y, typename T_shape, typename T_scale,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9, 
-      class Policy>
-  typename stan::return_type<T_y, T_shape, T_scale>::type 
-  log_prob(const T_y& y, const T_shape& alpha, const T_scale& sigma,
-     const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
-    return stan::prob::weibull_log<propto>(y, alpha, sigma, Policy());
-  }
   
   template <typename T_y, typename T_shape, typename T_scale,
       typename T3, typename T4, typename T5, 
@@ -91,7 +83,6 @@ public:
     using std::log;
     using std::pow;
     using stan::math::multiply_log;
-    using stan::math::log;
     using stan::math::value_of;
     using stan::prob::include_summand;
     

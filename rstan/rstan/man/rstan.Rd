@@ -14,7 +14,7 @@
   \tabular{ll}{
     Package: \tab rstan\cr
     Type: \tab Package\cr
-    Version: \tab 1.2.0\cr
+    Version: \tab 1.3.0\cr
     Date: \tab \Sexpr[eval=TRUE,results=rd,stage=build]{date()}\cr
     License: \tab GPL-3 \cr
   }

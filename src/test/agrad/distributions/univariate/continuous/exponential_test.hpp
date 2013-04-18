@@ -1,6 +1,8 @@
 // Arguments: Doubles, Doubles
 #include <stan/prob/distributions/univariate/continuous/exponential.hpp>
 
+#include <stan/math/functions/multiply_log.hpp>
+
 using std::vector;
 using std::numeric_limits;
 using stan::agrad::var;
@@ -63,18 +65,6 @@ public:
     return stan::prob::exponential_log<propto>(y, beta);
   }
   
-  template <bool propto, 
-      typename T_y, typename T_inv_scale, typename T2,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9, 
-      class Policy>
-  typename stan::return_type<T_y, T_inv_scale>::type 
-  log_prob(const T_y& y, const T_inv_scale& beta, 
-       const T2&,const T3&, const T4&, const T5&, 
-       const T6&, const T7&, const T8&, const T9&) {
-    return stan::prob::exponential_log<propto>(y, beta, Policy());
-  }
   
   template <typename T_y, typename T_inv_scale, typename T2,
       typename T3, typename T4, typename T5, 

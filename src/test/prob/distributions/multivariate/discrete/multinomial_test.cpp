@@ -25,21 +25,6 @@ TEST(ProbDistributions,MultinomialPropto) {
   EXPECT_FLOAT_EQ(0.0, stan::prob::multinomial_log<true>(ns,theta));
 }
 
-using boost::math::policies::policy;
-using boost::math::policies::evaluation_error;
-using boost::math::policies::domain_error;
-using boost::math::policies::overflow_error;
-using boost::math::policies::domain_error;
-using boost::math::policies::pole_error;
-using boost::math::policies::errno_on_error;
-
-typedef policy<
-  domain_error<errno_on_error>, 
-  pole_error<errno_on_error>,
-  overflow_error<errno_on_error>,
-  evaluation_error<errno_on_error> 
-  > errno_policy;
-
 using stan::prob::multinomial_log;
 
 TEST(ProbDistributionsMultinomial,DefaultPolicy) {
@@ -102,98 +87,36 @@ TEST(ProbDistributionsMultinomial, zeros) {
   EXPECT_FLOAT_EQ(0.0, result2);
 }
 
-TEST(ProbDistributionsMultinomial,ErrnoPolicy) {
-  double nan = std::numeric_limits<double>::quiet_NaN();
-  double inf = std::numeric_limits<double>::infinity();
-
-  double result;
-  std::vector<int> ns;
-  ns.push_back(1);
-  ns.push_back(2);
-  ns.push_back(3);
-  Matrix<double,Dynamic,1> theta(3,1);
-  theta << 0.2, 0.3, 0.5;
-  
-  result = multinomial_log(ns, theta, errno_policy());
-  EXPECT_FALSE(std::isnan(result));
-  
-  ns[1] = 0;
-  result = multinomial_log(ns, theta, errno_policy());
-  EXPECT_FALSE(std::isnan(result));
-  ns[1] = -1;
-  result = multinomial_log(ns, theta, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  ns[1] = 1;
-
-  theta(0) = 0.0;
-  result = multinomial_log(ns, theta, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  theta(0) = nan;
-  result = multinomial_log(ns, theta, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  theta(0) = inf;
-  result = multinomial_log(ns, theta, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  theta(0) = -inf;
-  result = multinomial_log(ns, theta, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  theta(0) = -1;
-  theta(1) = 1.5;
-  theta(2) = 0.5;
-  result = multinomial_log(ns, theta, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  theta(0) = 0.2;
-  theta(1) = 0.3;
-  theta(2) = 0.5;
-  
-  ns.resize(2);
-  result = multinomial_log(ns, theta, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-}
 
 TEST(ProbDistributionMultinomial, chiSquareGoodnessFitTest) {
   boost::random::mt19937 rng;
-  int trials = 10;
-  int N = 10000 * trials;
-  Matrix<double,Dynamic,Dynamic> theta(3,1);
-  theta << 0.15, 
-    0.45,
-    0.40;
-  int K = theta.rows();
+  int M = 10;
+  int trials = 1000;
+  int N = M * trials;
+
+  int K = 3;
+  Matrix<double,Dynamic,1> theta(K);
+  theta << 0.15, 0.45, 0.40;
   boost::math::chi_squared mydist(K-1);
 
-  Eigen::Matrix<double,Eigen::Dynamic,1> loc(theta.rows(),1);
-  for(int i = 0; i < theta.rows(); i++)
-    loc(i) = 0;
-
-      for(int i = 0; i < theta.rows(); i++)
-	{
-	  for(int j = i; j < theta.rows(); j++)
-	    loc(j) += theta(i);
-	}
-
-  int count = 0;
-  int bin [K];
-  double expect [K];
-  for(int i = 0 ; i < K; i++)
-  {
-    bin[i] = 0;
+  double expect[K];
+  for (int i = 0 ; i < K; ++i)
     expect[i] = N * theta(i);
+
+  int bin[K];
+  for (int i = 0; i < K; ++i)
+    bin[i] = 0;
+
+  for (int count = 0; count < M; ++count) {
+    std::vector<int> a = stan::prob::multinomial_rng(theta,trials,rng);
+    for (int i = 0; i < K; ++i)
+      bin[i] += a[i];
   }
 
-  while (count < N / trials) {
-    Eigen::VectorXd a(3);
-    a = stan::prob::multinomial_rng(theta,trials,rng);
-    for(int i = 0; i < theta.rows(); i++)
-      bin[i] += a[i];
-    count++;
-   }
-
   double chi = 0;
-
-  for(int j = 0; j < K; j++)
-    chi += ((bin[j] - expect[j]) * (bin[j] - expect[j]) / expect[j]);
-
+  for (int j = 0; j < K; j++)
+    chi += ((bin[j] - expect[j]) * (bin[j] - expect[j])) / expect[j];
+  
   EXPECT_TRUE(chi < quantile(complement(mydist, 1e-6)));
 }
 

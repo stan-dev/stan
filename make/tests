@@ -17,7 +17,7 @@ MISSING_MODEL_TESTS := $(shell find src/models -type f -name '*.stan')
 MISSING_MODEL_TESTS := $(MISSING_MODEL_TESTS:src/models/%.stan=models/%)
 MISSING_MODEL_TESTS := $(filter-out $(MODEL_TESTS:test/%=%),$(MISSING_MODEL_TESTS))
 .PHONY: test-models
-test-models: $(addprefix runtest_no_fail/,$(MODEL_TESTS))
+test-models: runtest/test/models/command $(addprefix runtest_no_fail/,$(MODEL_TESTS))
 ifneq ($(MISSING_MODEL_TESTS),)
 	@echo 
 	@echo '-------------------- Missing $(words $(MISSING_MODEL_TESTS)) tests --------------------'

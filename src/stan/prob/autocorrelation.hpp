@@ -2,6 +2,7 @@
 #define __STAN__PROB__AUTOCORRELATION_HPP__
 
 #include <stan/math/matrix.hpp>
+#include <stan/math/matrix/mean.hpp>
 
 #include <vector>
 #include <complex>

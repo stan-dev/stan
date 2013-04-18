@@ -1,7 +1,4 @@
-.onLoad <- function(libname, pkgname) {
-    # require("methods", character = TRUE, quietly = TRUE)
-    # loadRcppModules()
-}
+.onLoad <- function(libname, pkgname) { }
 
 .onAttach <- function(...) {
   rstanLib <- dirname(system.file(package = "rstan"))

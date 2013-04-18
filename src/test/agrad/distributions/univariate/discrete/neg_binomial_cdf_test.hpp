@@ -1,7 +1,8 @@
 // Arguments: Ints, Doubles, Doubles
 #include <stan/prob/distributions/univariate/discrete/neg_binomial.hpp>
-#include <stan/math/special_functions.hpp>
 #include <boost/math/special_functions/binomial.hpp>
+
+#include <stan/math/functions/binomial_coefficient_log.hpp>
 
 using std::vector;
 using std::numeric_limits;
@@ -51,16 +52,6 @@ public:
     return stan::prob::neg_binomial_cdf(n, alpha, beta);
   }
 
-  template <typename T_n, typename T_shape, typename T_inv_scale,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9,
-      typename Policy>
-  typename stan::return_type<T_shape, T_inv_scale>::type
-  cdf(const T_n& n, const T_shape& alpha, const T_inv_scale& beta,
-      const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
-    return stan::prob::neg_binomial_cdf(n, alpha, beta, Policy());
-  }
 
   template <typename T_n, typename T_shape, typename T_inv_scale,
       typename T3, typename T4, typename T5, 
