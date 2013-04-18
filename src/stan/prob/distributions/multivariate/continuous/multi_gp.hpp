@@ -84,7 +84,7 @@ namespace stan {
         message << "Kernel matrix is not positive definite. " 
                 << "K(0,0) is %1%.";
         std::string str(message.str());
-        stan::math::dom_err(function,Sigma(0,0),"Kernel",str.c_str(),"",&lp);
+        stan::math::dom_err(function,Sigma(0,0),"",str.c_str(),"",&lp);
         return lp;
       }
 
@@ -111,7 +111,7 @@ namespace stan {
       if (include_summand<propto>::value) {
         lp += NEG_LOG_SQRT_TWO_PI * y.rows() * y.cols();
       }
-      
+
       if (include_summand<propto,T_covar>::value) {
         lp -= (0.5 * y.rows()) * log_determinant_ldlt(ldlt_Sigma);
       }
@@ -127,6 +127,7 @@ namespace stan {
 
         lp -= 0.5 * dot_product(rows_dot_product(y_Kinv,y),w);
       }
+
       return lp;
     }
     
