@@ -741,8 +741,50 @@ transformed parameters {
   transformed_param_real <- dot_product(d_row_vector, p_row_vector);
   transformed_param_real <- dot_product(p_row_vector, p_row_vector);
 
+  transformed_param_real <- columns_dot_product(d_vector, d_vector);
+  transformed_param_real <- columns_dot_product(p_vector, d_vector);
+  transformed_param_real <- columns_dot_product(d_vector, p_vector);
+  transformed_param_real <- columns_dot_product(p_vector, p_vector);
+  transformed_param_real <- columns_dot_product(d_matrix, d_matrix);
+  transformed_param_real <- columns_dot_product(p_matrix, d_matrix);
+  transformed_param_real <- columns_dot_product(d_matrix, p_matrix);
+  transformed_param_real <- columns_dot_product(p_matrix, p_matrix);
+  transformed_param_real <- columns_dot_product(d_row_vector, d_row_vector);
+  transformed_param_real <- columns_dot_product(p_row_vector, d_row_vector);
+  transformed_param_real <- columns_dot_product(d_row_vector, p_row_vector);
+  transformed_param_real <- columns_dot_product(p_row_vector, p_row_vector);
+
+  transformed_param_real <- rows_dot_product(d_vector, d_vector);
+  transformed_param_real <- rows_dot_product(p_vector, d_vector);
+  transformed_param_real <- rows_dot_product(d_vector, p_vector);
+  transformed_param_real <- rows_dot_product(p_vector, p_vector);
+  transformed_param_real <- rows_dot_product(d_matrix, d_matrix);
+  transformed_param_real <- rows_dot_product(p_matrix, d_matrix);
+  transformed_param_real <- rows_dot_product(d_matrix, p_matrix);
+  transformed_param_real <- rows_dot_product(p_matrix, p_matrix);
+  transformed_param_real <- rows_dot_product(d_row_vector, d_row_vector);
+  transformed_param_real <- rows_dot_product(p_row_vector, d_row_vector);
+  transformed_param_real <- rows_dot_product(d_row_vector, p_row_vector);
+  transformed_param_real <- rows_dot_product(p_row_vector, p_row_vector);
+
   transformed_param_real <- dot_self(p_vector);
-  transformed_param_real <- dot_self(p_row_vector);
+  transformed_param_real <- dot_self(d_vector);
+  transformed_param_real <- dot_self(p_row_vector);  
+  transformed_param_real <- dot_self(d_row_vector);  
+ 
+  transformed_param_real <- columns_dot_self(p_vector);
+  transformed_param_real <- columns_dot_self(d_vector);
+  transformed_param_real <- columns_dot_self(p_row_vector);
+  transformed_param_real <- columns_dot_self(d_row_vector);
+  transformed_param_real <- columns_dot_self(p_matrix);
+  transformed_param_real <- columns_dot_self(d_matrix);
+
+  transformed_param_real <- rows_dot_self(p_vector);
+  transformed_param_real <- rows_dot_self(d_vector);
+  transformed_param_real <- rows_dot_self(p_row_vector);
+  transformed_param_real <- rows_dot_self(d_row_vector);
+  transformed_param_real <- rows_dot_self(p_matrix);
+  transformed_param_real <- rows_dot_self(d_matrix);
 
   //  reductions
   transformed_param_real <- min(d_vector);
