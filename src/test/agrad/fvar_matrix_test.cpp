@@ -33,7 +33,11 @@
 
 //Dot Products -- DONE
 #include <test/agrad/fwd/matrix/dot_product_test.cpp>       
+#include <test/agrad/fwd/matrix/columns_dot_product_test.cpp>       
+#include <test/agrad/fwd/matrix/rows_dot_product_test.cpp>       
 #include <test/agrad/fwd/matrix/dot_self_test.cpp>     
+#include <test/agrad/fwd/matrix/rows_dot_self_test.cpp>     
+#include <test/agrad/fwd/matrix/columns_dot_self_test.cpp>     
 
 //Specialized Products -- DONE
 #include <test/agrad/fwd/matrix/tcrossprod_test.cpp>       
