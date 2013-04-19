@@ -3,6 +3,7 @@
 
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/transpose.hpp>
+#include <stan/math/matrix/validate_multiplicable.hpp>
 
 #include <boost/shared_ptr.hpp>
 
