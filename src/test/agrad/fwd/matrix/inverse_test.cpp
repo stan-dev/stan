@@ -28,5 +28,5 @@ TEST(AgradFwdMatrix,inverse) {
   EXPECT_NEAR( 6,a_inv(1,0).d_,1.0E-12);
   EXPECT_NEAR(-3,a_inv(1,1).d_,1.0E-12);
 
-  EXPECT_THROW(inverse(matrix_fv(2,3)), std::domain_error);
+  EXPECT_THROW(stan::agrad::inverse(matrix_fv(2,3)), std::domain_error);
 }

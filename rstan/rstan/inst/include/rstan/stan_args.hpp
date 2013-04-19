@@ -91,7 +91,9 @@ namespace rstan {
   class stan_args {
   private:
     bool sample_file_flag; // true: write out to a file; false, do not 
+    bool diagnostic_file_flag; // 
     std::string sample_file; // the file for outputting the samples    // 1
+    std::string diagnostic_file; 
     int iter;   // number of iterations                       // 2 
     int warmup; // number of warmup
     int thin; 
@@ -112,6 +114,7 @@ namespace rstan {
     bool append_samples; 
     bool test_grad; 
     bool point_estimate;
+    bool point_estimate_newton;
     std::string init; 
     SEXP init_list;  
     std::string sampler; // HMC, NUTS1, NUTS2 (not set directy from R now) 
@@ -128,6 +131,8 @@ namespace rstan {
         sample_file = Rcpp::as<std::string>(in[idx]); 
         sample_file_flag = true; 
       }
+
+      diagnostic_file_flag = false; // TODO: add this option 
 
       idx = find_index(args_names, std::string("iter")); 
       if (idx == args_names.size()) iter = 2000;  
@@ -221,6 +226,10 @@ namespace rstan {
       if (idx == args_names.size()) point_estimate = false;
       else point_estimate = Rcpp::as<bool>(in[idx]);
 
+      idx = find_index(args_names, std::string("point_estimate_newton"));
+      if (idx == args_names.size()) point_estimate_newton = false;
+      else point_estimate_newton = Rcpp::as<bool>(in[idx]);
+
       idx = find_index(args_names, std::string("nondiag_mass"));
       if (idx == args_names.size()) nondiag_mass = false;
       else nondiag_mass = Rcpp::as<bool>(in[idx]);
@@ -236,6 +245,10 @@ namespace rstan {
         lst["sample_file"] = sample_file;
       else 
         lst["sample_file_flag"] = false;
+      if (diagnostic_file_flag) 
+        lst["diagnostic_file"] = diagnostic_file;
+      else 
+        lst["diagnostic_file"] = R_NilValue;
       lst["iter"] = iter;                     // 2 
       lst["warmup"] = warmup;                 // 3 
       lst["thin"] = thin;                     // 4 
@@ -257,6 +270,7 @@ namespace rstan {
       lst["sampler"] = sampler; 
       lst["test_grad"] = test_grad;
       lst["point_estimate"] = point_estimate;
+      lst["point_estimate_newton"] = point_estimate_newton;
       lst["nondiag_mass"] = nondiag_mass; 
       return lst; 
     } 
@@ -283,9 +297,18 @@ namespace rstan {
     const std::string& get_sample_file() const {
       return sample_file;
     } 
+    bool get_save_warmup() const {
+      return true;
+    }
     bool get_sample_file_flag() const { 
       return sample_file_flag; 
     }
+    bool get_dianositic_file_flag() const {
+      return diagnostic_file_flag;
+    } 
+    const std::string& get_dianositic_file() const {
+      return diagnostic_file;
+    } 
     int get_warmup() const {
       return warmup; 
     } 
@@ -331,6 +354,9 @@ namespace rstan {
     inline bool get_point_estimate() const {
       return point_estimate;
     }
+    inline bool get_point_estimate_newton() const {
+      return point_estimate_newton;
+    } 
     unsigned int get_random_seed() const {
       return random_seed; 
     } 
