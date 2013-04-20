@@ -341,10 +341,6 @@ http://www.boost.org/doc/libs/1_53_0/doc/html/property_tree/reference.html#heade
         beta  <- (1 - phi) * k
     determinant = k  (det [[a,b],[c,d]] = ad - bc)
 
-* Gumbel distribtuion
-
-* Exponentially-modified Normal distribution
-
 * von Mises distribution (with location and concentration params?)
   -- requires modified/hyperbolic Bessel function of first kind of order 0 and 1
 
@@ -372,12 +368,6 @@ http://www.boost.org/doc/libs/1_53_0/doc/html/property_tree/reference.html#heade
 * signed sqrt
   signed_sqrt(x) = -sqrt(-x) if x < 0
                  = sqrt(x)   if x > 0
-
-* Skew normal distribution
-  -- involves Phi() in its *density* function like
-     the truncated normal
-  -- hack for now using 
-     normal_log(x|mu,sigma) + log(Phi(alpha * (x - mu) / sigma))
 
 * More matrix functions from Eigen:
   - singular vectors in addition to values
