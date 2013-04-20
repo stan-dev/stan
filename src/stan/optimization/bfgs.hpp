@@ -2,6 +2,7 @@
 #define __STAN__OPTIMIZATION__BFGS_HPP__
 
 #include <stan/model/prob_grad.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
 #include <cstdlib>
 #include <cmath>
 
