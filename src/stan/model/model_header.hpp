@@ -69,6 +69,8 @@
 #include <stan/math/matrix/multiply_lower_tri_self_transpose.hpp>
 #include <stan/math/matrix/prod.hpp>
 #include <stan/math/matrix/row.hpp>
+#include <stan/math/matrix/rows_dot_product.hpp>
+#include <stan/math/matrix/rows_dot_self.hpp>
 #include <stan/math/matrix/sd.hpp>
 #include <stan/math/matrix/singular_values.hpp>
 #include <stan/math/matrix/size.hpp>

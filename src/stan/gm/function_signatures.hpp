@@ -120,6 +120,12 @@ add("col",VECTOR_T,MATRIX_T,INT_T);
 add("cols",INT_T,VECTOR_T);
 add("cols",INT_T,ROW_VECTOR_T);
 add("cols",INT_T,MATRIX_T);
+add("columns_dot_product",ROW_VECTOR_T,VECTOR_T,VECTOR_T);
+add("columns_dot_product",ROW_VECTOR_T,ROW_VECTOR_T,ROW_VECTOR_T);
+add("columns_dot_product",ROW_VECTOR_T,MATRIX_T,MATRIX_T);
+add("columns_dot_self",ROW_VECTOR_T,VECTOR_T);
+add("columns_dot_self",ROW_VECTOR_T,ROW_VECTOR_T);
+add("columns_dot_self",ROW_VECTOR_T,MATRIX_T);
 add_unary("cos");
 add_unary("cosh");
 add("cumulative_sum", expr_type(DOUBLE_T,1U), expr_type(DOUBLE_T,1U));
@@ -134,8 +140,6 @@ add("divide",DOUBLE_T,DOUBLE_T,DOUBLE_T);
 add("divide",VECTOR_T,VECTOR_T,DOUBLE_T);
 add("divide",ROW_VECTOR_T,ROW_VECTOR_T,DOUBLE_T);
 add("divide",MATRIX_T,MATRIX_T,DOUBLE_T);
-add("columns_dot_product",ROW_VECTOR_T,MATRIX_T,MATRIX_T);
-add("rows_dot_product",VECTOR_T,MATRIX_T,MATRIX_T);
 add("dist",DOUBLE_T,VECTOR_T,VECTOR_T);
 add("dist",DOUBLE_T,ROW_VECTOR_T,ROW_VECTOR_T);
 add("dist",DOUBLE_T,VECTOR_T,ROW_VECTOR_T);
@@ -456,6 +460,12 @@ add("row",ROW_VECTOR_T,MATRIX_T,INT_T);
 add("rows",INT_T,VECTOR_T);
 add("rows",INT_T,ROW_VECTOR_T);
 add("rows",INT_T,MATRIX_T);
+add("rows_dot_product",VECTOR_T,VECTOR_T,VECTOR_T);
+add("rows_dot_product",VECTOR_T,ROW_VECTOR_T,ROW_VECTOR_T);
+add("rows_dot_product",VECTOR_T,MATRIX_T,MATRIX_T);
+add("rows_dot_self",VECTOR_T,VECTOR_T);
+add("rows_dot_self",VECTOR_T,ROW_VECTOR_T);
+add("rows_dot_self",VECTOR_T,MATRIX_T);
 for (size_t i = 0; i < vector_types.size(); ++i)
   for (size_t j = 0; j < vector_types.size(); ++j)
     for (size_t k = 0; k < vector_types.size(); ++k)

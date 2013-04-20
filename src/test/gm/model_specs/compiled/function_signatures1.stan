@@ -742,7 +742,7 @@ transformed parameters {
   transformed_param_real <- dot_product(p_row_vector, p_row_vector);
 
   transformed_param_real <- dot_self(p_vector);
-  transformed_param_real <- dot_self(p_row_vector);
+  transformed_param_real <- dot_self(p_row_vector);  
 
   //  reductions
   transformed_param_real <- min(d_vector);

@@ -971,6 +971,19 @@ subtracting \farg{y} from every entry in the matrix \farg{x}}
 adding \farg{x} to every entry in negation of the matrix \farg{y}}
 %
 \end{description}
+\vspace*{-4pt}
+\begin{description}
+%
+\fitem{vector}{operator/}{vector \farg{x}, real \farg{y}}{The result of
+dividing each entry in the vector \farg{x} by \farg{y}}
+%
+\fitem{row\_vector}{operator/}{row\_vector \farg{x}, real \farg{y}}{The result of
+dividing each entry in the row vector \farg{x} by \farg{y}}
+%
+\fitem{matrix}{operator/}{matrix \farg{x}, real \farg{y}}{The result of
+dividing each entry in the matrix \farg{x} by \farg{y}}
+%
+\end{description}
 
 \subsection{Elementwise Products}
 
@@ -1063,11 +1076,48 @@ The dot product of \farg{x} and \farg{y}}
 \fitem{real}{dot\_product}{row\_vector \farg{x}, row\_vector \farg{y}}{
 The dot product of \farg{x} and \farg{y}}
 %
+\fitem{vector}{columns\_dot\_product}{vector \farg{x}, vector \farg{y}}{
+The dot product of the columns of \farg{x} and \farg{y}}
+%
+\fitem{row\_vector}{columns\_dot\_product}{row\_vector \farg{x}, row\_vector \farg{y}}{
+The dot product of the columns of \farg{x} and \farg{y}}
+%
+\fitem{vector}{columns\_dot\_product}{matrix \farg{x}, matrix \farg{y}}{
+The dot product of the columns of \farg{x} and \farg{y}}
+%
+\fitem{vector}{rows\_dot\_product}{vector \farg{x}, vector \farg{y}}{
+The dot product of the rows of \farg{x} and \farg{y}}
+%
+\fitem{row\_vector}{rows\_dot\_product}{row\_vector \farg{x}, row\_vector \farg{y}}{
+The dot product of the rows of \farg{x} and \farg{y}}
+%
+\fitem{vector}{rows\_dot\_product}{matrix \farg{x}, matrix \farg{y}}{
+The dot product of the rows of \farg{x} and \farg{y}}
+%
 \fitem{real}{dot\_self}{vector \farg{x}}{
 The dot product of the vector \farg{x} with itself}
 %
 \fitem{real}{dot\_self}{row\_vector \farg{x}}{
 The dot product of the row vector \farg{x} with itself}
+%
+\fitem{vector}{columns\_dot\_self}{vector \farg{x}}{
+The dot product of the columns of \farg{x} with themselves}
+%
+\fitem{row\_vector}{columns\_dot\_self}{row\_vector \farg{x}}{
+The dot product of the columns of \farg{x} with themselves}
+%
+\fitem{row\_vector}{columns\_dot\_self}{matrix \farg{x}}{
+The dot product of the columns of \farg{x} with themselves}
+%
+\fitem{vector}{rows\_dot\_self}{vector \farg{x}}{
+The dot product of the rows of \farg{x} with themselves}
+%
+\fitem{row\_vector}{rows\_dot\_self}{row\_vector \farg{x}}{
+The dot product of the rows of \farg{x} with themselves}
+%
+\fitem{vector}{rows\_dot\_self}{matrix \farg{x}}{
+The dot product of the rows of \farg{x} with themselves}
+%
 \end{description}
 
 \subsection{Specialized Products}
