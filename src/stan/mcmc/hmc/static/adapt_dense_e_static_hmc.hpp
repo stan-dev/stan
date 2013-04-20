@@ -30,7 +30,7 @@ namespace stan {
         
         if (this->_adapt_flag) {
           
-          this->learn_stepsize(this->_epsilon, s.accept_stat());
+          this->learn_stepsize(this->_nom_epsilon, s.accept_stat());
           this->_update_L();
           
           bool update = this->learn_covariance(this->_z.mInv, this->_z.q);
@@ -39,7 +39,7 @@ namespace stan {
             this->init_stepsize();
             this->_update_L();
             
-            this->set_adapt_mu(log(10 * this->_epsilon));
+            this->set_adapt_mu(log(10 * this->_nom_epsilon));
             this->stepsize_adapter::init();
           }
           

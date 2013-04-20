@@ -99,6 +99,7 @@ namespace rstan {
     int thin; 
     int iter_save; // number of iterations saved 
     int iter_save_wo_warmup; // number of iterations saved wo warmup
+    bool save_warmup; // weather to save warmup samples (always true now)
     int refresh;  // 
     int leapfrog_steps; 
     double epsilon; 
@@ -132,6 +133,7 @@ namespace rstan {
         sample_file_flag = true; 
       }
 
+      save_warmup = true;
       diagnostic_file_flag = false; // TODO: add this option 
 
       idx = find_index(args_names, std::string("iter")); 
@@ -244,7 +246,7 @@ namespace rstan {
       if (sample_file_flag) 
         lst["sample_file"] = sample_file;
       else 
-        lst["sample_file_flag"] = false;
+        lst["sample_file"] = R_NilValue;
       if (diagnostic_file_flag) 
         lst["diagnostic_file"] = diagnostic_file;
       else 
@@ -298,7 +300,7 @@ namespace rstan {
       return sample_file;
     } 
     bool get_save_warmup() const {
-      return true;
+      return save_warmup;
     }
     bool get_sample_file_flag() const { 
       return sample_file_flag; 

@@ -6,7 +6,8 @@
 namespace stan {
   namespace math {
 
-    typedef Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>::size_type size_type;
+    // typedef Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>::size_type size_type;
+    typedef Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>::Index size_type;
 
     /**
      * Type for matrix of double values.

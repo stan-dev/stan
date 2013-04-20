@@ -83,7 +83,7 @@ TEST(McmcBaseHMC, seed) {
   
 }
 
-TEST(McmcBaseHMC, set_stepsize) {
+TEST(McmcBaseHMC, set_nominal_stepsize) {
   
   rng_t base_rng(0);
   
@@ -95,10 +95,30 @@ TEST(McmcBaseHMC, set_stepsize) {
   stan::mcmc::mock_hmc sampler(model, base_rng);
   
   double old_epsilon = 1.0;
-  sampler.set_stepsize(old_epsilon);
-  EXPECT_EQ(old_epsilon, sampler.get_stepsize());
+  sampler.set_nominal_stepsize(old_epsilon);
+  EXPECT_EQ(old_epsilon, sampler.get_nominal_stepsize());
   
-  sampler.set_stepsize(-0.1);
-  EXPECT_EQ(old_epsilon, sampler.get_stepsize());
+  sampler.set_nominal_stepsize(-0.1);
+  EXPECT_EQ(old_epsilon, sampler.get_nominal_stepsize());
+  
+}
+
+TEST(McmcBaseHMC, set_stepsize_jitter) {
+  
+  rng_t base_rng(0);
+  
+  std::vector<double> q(5, 1.0);
+  std::vector<int> r(2, 2);
+  
+  stan::mcmc::mock_model model(q.size());
+  
+  stan::mcmc::mock_hmc sampler(model, base_rng);
+  
+  double old_jitter = 0.1;
+  sampler.set_stepsize_jitter(old_jitter);
+  EXPECT_EQ(old_jitter, sampler.get_stepsize_jitter());
+  
+  sampler.set_nominal_stepsize(-0.1);
+  EXPECT_EQ(old_jitter, sampler.get_stepsize_jitter());
   
 }

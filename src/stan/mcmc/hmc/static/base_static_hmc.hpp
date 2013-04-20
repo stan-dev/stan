@@ -25,6 +25,8 @@ namespace stan {
       
       sample transition(sample& init_sample) {
         
+        this->_sample_stepsize();
+        
         this->seed(init_sample.cont_params(), init_sample.disc_params());
         
         this->_hamiltonian.sample_p(this->_z, this->_rand_int);
@@ -72,15 +74,15 @@ namespace stan {
         values.push_back(this->_T);
       }
       
-      void set_stepsize_and_T(const double e, const double t) {
+      void set_nominal_stepsize_and_T(const double e, const double t) {
         if(e > 0 && t > 0) {
-          this->_epsilon = e; _T = t; _update_L();
+          this->_nom_epsilon = e; _T = t; _update_L();
         }
       }
       
-      void set_stepsize_and_L(const double e, const int l) {
+      void set_nominal_stepsize_and_L(const double e, const int l) {
         if(e > 0 && l > 0) {
-          this->_epsilon = e; _L = l; _T = this->_epsilon * _L;
+          this->_nom_epsilon = e; _L = l; _T = this->_nom_epsilon * _L;
         }
       }
       
@@ -91,9 +93,9 @@ namespace stan {
         
       }
       
-      void set_stepsize(const double e) { 
+      void set_nominal_stepsize(const double e) {
         if(e > 0) {
-          this->_epsilon = e; _update_L();
+          this->_nom_epsilon = e; _update_L();
         }
       }
       
@@ -106,7 +108,7 @@ namespace stan {
       int _L;
       
       void _update_L() { 
-        _L = static_cast<int>(_T / this->_epsilon); 
+        _L = static_cast<int>(_T / this->_nom_epsilon);
         _L = _L < 1 ? 1 : _L;
       }
       

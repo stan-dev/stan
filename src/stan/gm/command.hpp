@@ -495,7 +495,7 @@ namespace stan {
           
           for (size_t i = 0; i < cont_params.size(); ++i)
             cont_params[i] = init_rng();
-          
+            
           // FIXME: allow config vs. std::cout
           double init_log_prob;
           try {
@@ -511,20 +511,19 @@ namespace stan {
             if (!boost::math::isfinite(init_grad[i]))
               continue;
           break;
-          
-          if (num_init_tries == MAX_INIT_TRIES) {
-            std::cout << std::endl << std::endl
-                      << "Initialization failed after " << MAX_INIT_TRIES 
-                      << " attempts. " << std::endl;
-            std::cout << " Try specifying initial values,"
-                      << " reducing ranges of constrained values,"
-                      << " or reparameterizing the model."
-                      << std::endl;
-            return -1;
-          }
-          
         }
-
+        
+        if (num_init_tries > MAX_INIT_TRIES) {
+          std::cout << std::endl << std::endl
+                    << "Initialization failed after " << MAX_INIT_TRIES 
+                    << " attempts. " << std::endl;
+          std::cout << " Try specifying initial values,"
+                    << " reducing ranges of constrained values,"
+                    << " or reparameterizing the model."
+                    << std::endl;
+          return -1;
+        }
+        
       }
       
       if (command.has_flag("test_grad")) {
@@ -859,11 +858,14 @@ namespace stan {
         }
         
         // Warm-Up
-        sampler.init_stepsize();
+        if (epsilon < 0) sampler.init_stepsize();
+        else             sampler.set_nominal_stepsize(epsilon);
+        
+        sampler.set_stepsize_jitter(epsilon_pm);
         
         sampler.set_max_depth(max_treedepth);
         
-        sampler.set_adapt_mu(log(10 * sampler.get_stepsize()));
+        sampler.set_adapt_mu(log(10 * sampler.get_nominal_stepsize()));
         sampler.engage_adaptation();
         
         clock_t start = clock();
@@ -880,7 +882,7 @@ namespace stan {
 
         sample_stream << "# (" << sampler.name() << ")" << std::endl;
         sample_stream << "# Adaptation terminated" << std::endl;
-        sample_stream << "# Step size = " << sampler.get_stepsize() << std::endl;
+        sample_stream << "# Step size = " << sampler.get_nominal_stepsize() << std::endl;
         sampler.z().write_metric(sample_stream);
         
         // Sampling
@@ -915,11 +917,14 @@ namespace stan {
         }
         
         // Warm-Up
-        sampler.init_stepsize();
+        if (epsilon < 0) sampler.init_stepsize();
+        else             sampler.set_nominal_stepsize(epsilon);
+        
+        sampler.set_stepsize_jitter(epsilon_pm);
         
         sampler.set_max_depth(max_treedepth);
         
-        sampler.set_adapt_mu(log(10 * sampler.get_stepsize()));
+        sampler.set_adapt_mu(log(10 * sampler.get_nominal_stepsize()));
         sampler.engage_adaptation();
         
         clock_t start = clock();
@@ -936,7 +941,7 @@ namespace stan {
         
         sample_stream << "# (" << sampler.name() << ")" << std::endl;
         sample_stream << "# Adaptation terminated" << std::endl;
-        sample_stream << "# Step size = " << sampler.get_stepsize() << std::endl;
+        sample_stream << "# Step size = " << sampler.get_nominal_stepsize() << std::endl;
         sampler.z().write_metric(sample_stream);
         
         // Sampling
@@ -971,11 +976,14 @@ namespace stan {
         }
         
         // Warm-Up
-        sampler.init_stepsize();
+        if (epsilon < 0) sampler.init_stepsize();
+        else             sampler.set_nominal_stepsize(epsilon);
+        
+        sampler.set_stepsize_jitter(epsilon_pm);
         
         sampler.set_max_depth(max_treedepth);
         
-        sampler.set_adapt_mu(log(10 * sampler.get_stepsize()));
+        sampler.set_adapt_mu(log(10 * sampler.get_nominal_stepsize()));
         sampler.engage_adaptation();
         
         clock_t start = clock();
@@ -992,7 +1000,7 @@ namespace stan {
 
         sample_stream << "# (" << sampler.name() << ")" << std::endl;
         sample_stream << "# Adaptation terminated" << std::endl;
-        sample_stream << "# Step size = " << sampler.get_stepsize() << std::endl;
+        sample_stream << "# Step size = " << sampler.get_nominal_stepsize() << std::endl;
         sampler.z().write_metric(sample_stream);
         
         // Sampling
@@ -1026,14 +1034,15 @@ namespace stan {
         }
         
         // Warm-Up
-        sampler.init_stepsize();
+        if (epsilon < 0) sampler.init_stepsize();
+        else             sampler.set_nominal_stepsize(epsilon);
         
-        std::cout << sampler.get_stepsize() << std::endl;
- 
-        sampler.set_stepsize_and_L(epsilon, leapfrog_steps);
+        sampler.set_stepsize_jitter(epsilon_pm);
+        
+        sampler.set_nominal_stepsize_and_L(epsilon, leapfrog_steps);
         //sampler.set_stepsize_and_T(epsilon, 3.14159);
         
-        sampler.set_adapt_mu(log(10 * sampler.get_stepsize()));
+        sampler.set_adapt_mu(log(10 * sampler.get_nominal_stepsize()));
         sampler.engage_adaptation();
         
         clock_t start = clock();
@@ -1050,7 +1059,7 @@ namespace stan {
 
         sample_stream << "# (" << sampler.name() << ")" << std::endl;
         sample_stream << "# Adaptation terminated" << std::endl;
-        sample_stream << "# Step size = " << sampler.get_stepsize() << std::endl;
+        sample_stream << "# Step size = " << sampler.get_nominal_stepsize() << std::endl;
         sampler.z().write_metric(sample_stream);
         
         // Sampling
