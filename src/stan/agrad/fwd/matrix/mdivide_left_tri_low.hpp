@@ -19,11 +19,11 @@ namespace stan {
     inline
     Eigen::Matrix<fvar<typename stan::return_type<T1,T2>::type>,R1,C1> 
     mdivide_left_tri_low(const Eigen::Matrix<fvar<T1>, R1, C1>& m, 
-                          const Eigen::Matrix<fvar<T2>, R2, C2>& n) {
+                         const Eigen::Matrix<fvar<T2>, R2, C2>& n) {
       stan::math::validate_square(m, "mdivide_right_tri_low");
       stan::math::validate_multiplicable(m,n,"mdivide_right_tri_low");
 
-      Eigen::Matrix<fvar<T2>,R1,C1> L(m.rows(),m.cols());
+      Eigen::Matrix<fvar<T1>,R1,C1> L(m.rows(),m.cols());
       L.setZero();
 
       for(size_type i = 0; i < m.rows(); i++) {
@@ -31,14 +31,14 @@ namespace stan {
           L(i,j) = m(i,j);
       }
 
-      return stan::agrad::multiply(stan::agrad::inverse(L),n);
+      return stan::agrad::multiply(stan::agrad::inverse(L), n);
     }
 
     template<typename T1, typename T2,int R1, int C1, int R2, int C2>
     inline
     Eigen::Matrix<fvar<typename stan::return_type<T1,T2>::type>,R1,C1> 
     mdivide_left_tri_low(const Eigen::Matrix<T1, R1, C1>& m, 
-                          const Eigen::Matrix<fvar<T2>, R2, C2>& n) {
+                         const Eigen::Matrix<fvar<T2>, R2, C2>& n) {
       stan::math::validate_square(m, "mdivide_right_tri_low");
       stan::math::validate_multiplicable(m,n,"mdivide_right_tri_low");
 
@@ -57,7 +57,7 @@ namespace stan {
     inline
     Eigen::Matrix<fvar<typename stan::return_type<T1,T2>::type>,R1,C1> 
     mdivide_left_tri_low(const Eigen::Matrix<fvar<T1>, R1, C1>& m, 
-                          const Eigen::Matrix<T2, R2, C2>& n) {
+                         const Eigen::Matrix<T2, R2, C2>& n) {
       stan::math::validate_square(m, "mdivide_right_tri_low");
       stan::math::validate_multiplicable(m,n,"mdivide_right_tri_low");
 
