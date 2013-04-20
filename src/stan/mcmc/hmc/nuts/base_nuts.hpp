@@ -54,6 +54,8 @@ namespace stan {
       {
         
         // Initialize the algorithm
+        this->_sample_stepsize();
+        
         nuts_util util;
         
         this->seed(init_sample.cont_params(), init_sample.disc_params());

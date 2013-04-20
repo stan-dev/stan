@@ -29,7 +29,7 @@ namespace stan {
         sample s = unit_e_static_hmc<M, BaseRNG>::transition(init_sample);
         
         if (this->_adapt_flag) {
-          this->learn_stepsize(this->_epsilon, s.accept_stat());
+          this->learn_stepsize(this->_nom_epsilon, s.accept_stat());
           this->_update_L();
         }
         
