@@ -696,9 +696,11 @@ namespace rstan {
           model.write_csv_header(sample_stream);
         } 
         // Warm-Up
-        sampler.init_stepsize();
+        if (epsilon <= 0) sampler.init_stepsize();
+        else sampler.set_nominal_stepsize(epsilon);
+        sampler.set_stepsize_jitter(epsilon_pm);
         sampler.set_max_depth(max_treedepth);
-        sampler.set_adapt_mu(log(10 * sampler.get_stepsize()));
+        sampler.set_adapt_mu(log(10 * sampler.get_nominal_stepsize()));
         sampler.engage_adaptation();
         clock_t start = clock();
         warmup_phase<a_Dm_nuts, Model, RNG>(sampler, num_warmup, num_thin, 
@@ -714,7 +716,7 @@ namespace rstan {
         std::stringstream ainfo_ss;
         ainfo_ss << "# (" << sampler.name() << ")" << std::endl;
         ainfo_ss << "# Adaptation terminated" << std::endl;
-        ainfo_ss << "# Step size = " << sampler.get_stepsize() << std::endl;
+        ainfo_ss << "# Step size = " << sampler.get_nominal_stepsize() << std::endl;
         sampler.z().write_metric(ainfo_ss);
         adaptation_info = ainfo_ss.str();
         if (sample_file_flag) sample_stream <<  adaptation_info; 
@@ -745,9 +747,11 @@ namespace rstan {
           model.write_csv_header(sample_stream);
         } 
         // Warm-Up
-        sampler.init_stepsize();
+        if (epsilon <= 0) sampler.init_stepsize();
+        else sampler.set_nominal_stepsize(epsilon);
+        sampler.set_stepsize_jitter(epsilon_pm);
         sampler.set_max_depth(max_treedepth);
-        sampler.set_adapt_mu(log(10 * sampler.get_stepsize()));
+        sampler.set_adapt_mu(log(10 * sampler.get_nominal_stepsize()));
         sampler.engage_adaptation();
         clock_t start = clock();
         warmup_phase<a_dm_nuts, Model, RNG>(sampler, num_warmup, num_thin, 
@@ -764,7 +768,7 @@ namespace rstan {
         std::stringstream ainfo_ss;
         ainfo_ss << "# (" << sampler.name() << ")" << std::endl;
         ainfo_ss << "# Adaptation terminated" << std::endl;
-        ainfo_ss << "# Step size = " << sampler.get_stepsize() << std::endl;
+        ainfo_ss << "# Step size = " << sampler.get_nominal_stepsize() << std::endl;
         sampler.z().write_metric(ainfo_ss);
         adaptation_info = ainfo_ss.str();
         if (sample_file_flag) sample_stream <<  adaptation_info; 
@@ -796,9 +800,11 @@ namespace rstan {
           model.write_csv_header(sample_stream);
         } 
         // Warm-Up
-        sampler.init_stepsize();
+        if (epsilon <= 0) sampler.init_stepsize();
+        else sampler.set_nominal_stepsize(epsilon);
+        sampler.set_stepsize_jitter(epsilon_pm);
         sampler.set_max_depth(max_treedepth);
-        sampler.set_adapt_mu(log(10 * sampler.get_stepsize()));
+        sampler.set_adapt_mu(log(10 * sampler.get_nominal_stepsize()));
         sampler.engage_adaptation();
         clock_t start = clock();
         warmup_phase<a_um_nuts, Model, RNG>(sampler, num_warmup, num_thin, 
@@ -814,7 +820,7 @@ namespace rstan {
         std::stringstream ainfo_ss;
         ainfo_ss << "# (" << sampler.name() << ")" << std::endl;
         ainfo_ss << "# Adaptation terminated" << std::endl;
-        ainfo_ss << "# Step size = " << sampler.get_stepsize() << std::endl;
+        ainfo_ss << "# Step size = " << sampler.get_nominal_stepsize() << std::endl;
         sampler.z().write_metric(ainfo_ss);
         adaptation_info = ainfo_ss.str();
         if (sample_file_flag) sample_stream <<  adaptation_info; 
@@ -843,9 +849,12 @@ namespace rstan {
           sampler.write_sampler_param_names(sample_stream);
           model.write_csv_header(sample_stream);
         } 
-        sampler.init_stepsize();
-        sampler.set_stepsize_and_L(epsilon, leapfrog_steps);
-        sampler.set_adapt_mu(log(10 * sampler.get_stepsize()));
+        // Warm-Up
+        if (epsilon <= 0) sampler.init_stepsize();
+        else sampler.set_nominal_stepsize(epsilon);
+        sampler.set_stepsize_jitter(epsilon_pm);
+        sampler.set_nominal_stepsize_and_L(epsilon, leapfrog_steps);
+        sampler.set_adapt_mu(log(10 * sampler.get_nominal_stepsize()));
         sampler.engage_adaptation();
         clock_t start = clock();
         warmup_phase<a_um_hmc, Model, RNG>(sampler, num_warmup, num_thin, 
@@ -861,7 +870,7 @@ namespace rstan {
         std::stringstream ainfo_ss;
         ainfo_ss << "# (" << sampler.name() << ")" << std::endl;
         ainfo_ss << "# Adaptation terminated" << std::endl;
-        ainfo_ss << "# Step size = " << sampler.get_stepsize() << std::endl;
+        ainfo_ss << "# Step size = " << sampler.get_nominal_stepsize() << std::endl;
         sampler.z().write_metric(ainfo_ss);
         adaptation_info = ainfo_ss.str();
         if (sample_file_flag) sample_stream <<  adaptation_info; 
