@@ -90,5 +90,5 @@
 
 //Linear Algebra Functions
 #include <test/agrad/fwd/matrix/trace_test.cpp>     
-#include <test/agrad/fwd/matrix/determinant_test.cpp>     
+// #include <test/agrad/fwd/matrix/determinant_test.cpp>     
  //#include <test/agrad/fwd/matrix/inverse_test.cpp> breaks when included
