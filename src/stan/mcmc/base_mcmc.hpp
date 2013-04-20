@@ -26,6 +26,8 @@ namespace stan {
       
       virtual void get_sampler_params(std::vector<double>& values) {};
       
+      virtual void write_sampler_state(std::ostream* o) {};
+      
     protected:
       
       std::string _name;
