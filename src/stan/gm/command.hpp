@@ -754,6 +754,8 @@ namespace stan {
             sample_stream.flush();
           }
         }
+        if (ret != 0)
+          std::cout << "Optimization terminated with code " << ret << std::endl;
         
         sample_stream << lp << ',';
         model.write_csv(base_rng,cont_params,disc_params,sample_stream);
