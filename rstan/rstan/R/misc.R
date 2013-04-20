@@ -351,6 +351,7 @@ config_argss <- function(chains, iter, warmup, thin,
 
   dotlist <- list(...)
   dotlist$point_estimate <- FALSE # not to do point estimation
+  dotlist$point_estimate_newton <- FALSE
 
   # use chain_id argument if specified
   if (is.null(dotlist$chain_id)) { 
