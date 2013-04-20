@@ -510,21 +510,18 @@ namespace stan {
           for (size_t i = 0; i < init_grad.size(); ++i)
             if (!boost::math::isfinite(init_grad[i]))
               continue;
-          break;
-          
-          if (num_init_tries == MAX_INIT_TRIES) {
-            std::cout << std::endl << std::endl
-                      << "Initialization failed after " << MAX_INIT_TRIES 
-                      << " attempts. " << std::endl;
-            std::cout << " Try specifying initial values,"
-                      << " reducing ranges of constrained values,"
-                      << " or reparameterizing the model."
-                      << std::endl;
-            return -1;
-          }
-          
         }
-
+          
+        if (num_init_tries > MAX_INIT_TRIES) {
+          std::cout << std::endl << std::endl
+                    << "Initialization failed after " << MAX_INIT_TRIES 
+                    << " attempts. " << std::endl;
+          std::cout << " Try specifying initial values,"
+                    << " reducing ranges of constrained values,"
+                    << " or reparameterizing the model."
+                    << std::endl;
+          return -1;
+        }
       }
       
       if (command.has_flag("test_grad")) {
