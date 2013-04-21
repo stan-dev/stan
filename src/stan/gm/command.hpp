@@ -13,6 +13,9 @@
 #include <stan/io/cmd_line.hpp>
 #include <stan/io/dump.hpp>
 
+#include <stan/gm/arguments/argument_reader.hpp>
+#include <stan/gm/arguments/arg_static_hmc.hpp>
+
 #include <stan/mcmc/hmc/static/adapt_unit_e_static_hmc.hpp>
 #include <stan/mcmc/hmc/static/adapt_diag_e_static_hmc.hpp>
 #include <stan/mcmc/hmc/static/adapt_dense_e_static_hmc.hpp>
@@ -319,6 +322,16 @@ namespace stan {
     template <class Model>
     int nuts_command(int argc, const char* argv[]) {
 
+      std::vector<argument*> valid_arguments;
+      valid_arguments.push_back(new arg_static_hmc());
+      
+      argument_reader reader(valid_arguments);
+      
+      reader.parse_arguments(argc, argv);
+      reader.print_arguments(&std::cout);
+      
+      return 0;
+      
       stan::io::cmd_line command(argc,argv);
       
       // Call help
