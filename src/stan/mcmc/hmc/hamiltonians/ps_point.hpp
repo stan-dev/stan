@@ -2,6 +2,8 @@
 #define __STAN__MCMC__PS_POINT__BETA__
 
 #include <fstream>
+#include <string>
+#include <boost/lexical_cast.hpp>
 
 #include <vector>
 #include <stan/math/matrix/Eigen.hpp>
@@ -33,29 +35,27 @@ namespace stan {
         V = z.V;
         g = z.g;
       }
-      
-      void write_header(std::ostream& o) {
-        o << q.size() << " continuous, unconstrained parameters" << std::endl;
-        o << r.size() << " discrete parameters" << std::endl;
-        o << std::endl;
-      }
         
-      virtual void write_names(std::ostream& o) {
-        o << "V";
-        for(size_t i = 0; i < r.size(); ++i) o << ",disc_" << i;
-        for(size_t i = 0; i < q.size(); ++i) o << ",cont_" << i;
-        for(size_t i = 0; i < q.size(); ++i) o << ",p_cont_" << i;
-        for(size_t i = 0; i < q.size(); ++i) o << ",g_cont_" << i;
-        o << std::flush;
+      virtual void get_param_names(std::vector<std::string>& names) {
+        for(size_t i = 0; i < r.size(); ++i)
+          names.push_back(std::string("disc") + boost::lexical_cast<std::string>(i));
+        for(size_t i = 0; i < q.size(); ++i)
+          names.push_back(std::string("cont") + boost::lexical_cast<std::string>(i));
+        for(size_t i = 0; i < q.size(); ++i)
+          names.push_back(std::string("p_cont") + boost::lexical_cast<std::string>(i));
+        for(size_t i = 0; i < q.size(); ++i)
+          names.push_back(std::string("g_cont") + boost::lexical_cast<std::string>(i));
       }
 
-      virtual void write(std::ostream& o) {
-        o << V;
-        for(size_t i = 0; i < r.size(); ++i) o << "," << r.at(i);
-        for(size_t i = 0; i < q.size(); ++i) o << "," << q.at(i);
-        for(size_t i = 0; i < q.size(); ++i) o << "," << p(i);
-        for(size_t i = 0; i < q.size(); ++i) o << "," << g(i);
-        o << std::flush;
+      virtual void get_params(std::vector<double>& values) {
+        for(size_t i = 0; i < r.size(); ++i)
+          values.push_back(r.at(i));
+        for(size_t i = 0; i < q.size(); ++i)
+          values.push_back(q.at(i));
+        for(size_t i = 0; i < q.size(); ++i)
+          values.push_back(p(i));
+        for(size_t i = 0; i < q.size(); ++i)
+          values.push_back(g(i));
       }
       
       virtual void write_metric(std::ostream* o) {
