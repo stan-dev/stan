@@ -2,6 +2,7 @@
 #define __STAN__OPTIMIZATION__BFGS_HPP__
 
 #include <stan/model/prob_grad.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
 #include <cstdlib>
 #include <cmath>
 
@@ -157,7 +158,7 @@ namespace stan {
           std::swap(prevDF,gradx1);
           prevDFp = newDFp;
           
-          alpha1 = std::min(1.25*alpha0,maxAlpha);
+          alpha1 = std::min(2.0*alpha0,maxAlpha);
           
           nits++;
         }
@@ -232,48 +233,65 @@ namespace stan {
           Scalar gradNorm, thetak, skyk, skBksk;
           VectorT sk, yk, Bksk, rk;
           int retCode;
-          bool resetB(false);
+          int resetB(0);
           
           _itNum++;
           
           if (_itNum > 1)
-            _alpha0 = _alpha = std::min(1.0, 1.01*(2*(_fk - _fk_1)/_gk_1.dot(_s)));
+            _alpha0 = _alpha = std::min(1.0, 1.1*(2*(_fk - _fk_1)/_gk_1.dot(_s)));
           else
             _alpha0 = _alpha = 1.0;
+
+          if (_itNum == 1 || !(_ldlt.info() == Eigen::Success && _ldlt.isPositive() && (_ldlt.vectorD().array() > 0).all()))
+            resetB = 1;
+          else
+            resetB = 0;
           
-          if (_itNum == 1 || !(_ldlt.info() == Eigen::Success && _ldlt.isPositive() && (_ldlt.vectorD().array() > 0).all())) {
-            Scalar Bscale;
-            resetB = true;
-            if (_itNum == 1) {
-              Bscale = 1.0/_opts.alpha0;
+          while (true) {
+            if (resetB) {
+              Scalar Bscale;
+              if (_itNum == 1 || resetB == 2) {
+                Bscale = 1.0/_opts.alpha0;
+              }
+              else {
+                std::cerr << "BFGS Hessian reset" << std::endl;
+                Bscale = _ldlt.vectorD().maxCoeff();
+              }
+              // Not needed, as ldlt is never used if resetB == true
+  //            _ldlt.compute(Bscale*HessianT::Identity(_xk.size(),_xk.size()));
+              _s = -_gk/Bscale;
             }
             else {
-              std::cerr << "BFGS Hessian reset" << std::endl;
-              Bscale = _ldlt.vectorD().maxCoeff();
+              _s = -_ldlt.solve(_gk);
             }
-            // Not needed, as ldlt is never used if resetB == true
-//            _ldlt.compute(Bscale*HessianT::Identity(_xk.size(),_xk.size()));
-            _s = -_gk/Bscale;
-          }
-          else {
-            _s = -_ldlt.solve(_gk);
-          }
-          
-          if (LineSearchMethod == 0) {
-            retCode = BTLineSearch(_func, _alpha, _xk_1, _fk_1, _gk_1,
-                                   _s, _xk, _fk, _gk, _opts.rho, 
-                                   _opts.c1, _opts.minAlpha);
-          }
-          else if (LineSearchMethod == 1) {
-            retCode = WolfeLineSearch(_func, _alpha, _xk_1, _fk_1, _gk_1,
-                                      _s, _xk, _fk, _gk,
-                                      _opts.c1, _opts.c2, 
-                                      _opts.minAlpha, _opts.maxAlpha);
-          }
-          if (retCode) {
-            // Line-search failed
-            retCode = 10;
-            return retCode;
+            
+            if (LineSearchMethod == 0) {
+              retCode = BTLineSearch(_func, _alpha, _xk_1, _fk_1, _gk_1,
+                                     _s, _xk, _fk, _gk, _opts.rho, 
+                                     _opts.c1, _opts.minAlpha);
+            }
+            else if (LineSearchMethod == 1) {
+              retCode = WolfeLineSearch(_func, _alpha, _xk_1, _fk_1, _gk_1,
+                                        _s, _xk, _fk, _gk,
+                                        _opts.c1, _opts.c2, 
+                                        _opts.minAlpha, _opts.maxAlpha);
+            }
+            if (retCode) {
+              if (resetB) {
+                // Line-search failed and nothing left to try
+                retCode = -1;
+                return retCode;
+              }
+              else {
+                // Line-search failed, try ditching the Hessian approximation
+                resetB = 2;
+                _alpha0 = _alpha = 1.0;
+                continue;
+              }
+            }
+            else {
+              break;
+            }
           }
           std::swap(_fk,_fk_1);
           _xk.swap(_xk_1);

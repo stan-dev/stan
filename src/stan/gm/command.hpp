@@ -753,6 +753,8 @@ namespace stan {
             sample_stream.flush();
           }
         }
+        if (ret != 0)
+          std::cout << "Optimization terminated with code " << ret << std::endl;
         
         sample_stream << lp << ',';
         model.write_csv(base_rng,cont_params,disc_params,sample_stream);
@@ -863,6 +865,8 @@ namespace stan {
         
         sampler.set_max_depth(max_treedepth);
         
+        sampler.set_adapt_delta(delta);
+        sampler.set_adapt_gamma(gamma);
         sampler.set_adapt_mu(log(10 * sampler.get_nominal_stepsize()));
         sampler.engage_adaptation();
         
@@ -922,6 +926,8 @@ namespace stan {
         
         sampler.set_max_depth(max_treedepth);
         
+        sampler.set_adapt_delta(delta);
+        sampler.set_adapt_gamma(gamma);
         sampler.set_adapt_mu(log(10 * sampler.get_nominal_stepsize()));
         sampler.engage_adaptation();
         
@@ -981,6 +987,8 @@ namespace stan {
         
         sampler.set_max_depth(max_treedepth);
         
+        sampler.set_adapt_delta(delta);
+        sampler.set_adapt_gamma(gamma);
         sampler.set_adapt_mu(log(10 * sampler.get_nominal_stepsize()));
         sampler.engage_adaptation();
         
@@ -1040,6 +1048,8 @@ namespace stan {
         sampler.set_nominal_stepsize_and_L(epsilon, leapfrog_steps);
         //sampler.set_stepsize_and_T(epsilon, 3.14159);
         
+        sampler.set_adapt_delta(delta);
+        sampler.set_adapt_gamma(gamma);
         sampler.set_adapt_mu(log(10 * sampler.get_nominal_stepsize()));
         sampler.engage_adaptation();
         
