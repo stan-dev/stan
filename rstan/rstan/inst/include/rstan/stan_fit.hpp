@@ -700,6 +700,8 @@ namespace rstan {
         else sampler.set_nominal_stepsize(epsilon);
         sampler.set_stepsize_jitter(epsilon_pm);
         sampler.set_max_depth(max_treedepth);
+        sampler.set_adapt_delta(delta);
+        sampler.set_adapt_gamma(gamma);
         sampler.set_adapt_mu(log(10 * sampler.get_nominal_stepsize()));
         sampler.engage_adaptation();
         clock_t start = clock();
@@ -751,6 +753,8 @@ namespace rstan {
         else sampler.set_nominal_stepsize(epsilon);
         sampler.set_stepsize_jitter(epsilon_pm);
         sampler.set_max_depth(max_treedepth);
+        sampler.set_adapt_delta(delta);
+        sampler.set_adapt_gamma(gamma);
         sampler.set_adapt_mu(log(10 * sampler.get_nominal_stepsize()));
         sampler.engage_adaptation();
         clock_t start = clock();
@@ -804,6 +808,8 @@ namespace rstan {
         else sampler.set_nominal_stepsize(epsilon);
         sampler.set_stepsize_jitter(epsilon_pm);
         sampler.set_max_depth(max_treedepth);
+        sampler.set_adapt_delta(delta);
+        sampler.set_adapt_gamma(gamma);
         sampler.set_adapt_mu(log(10 * sampler.get_nominal_stepsize()));
         sampler.engage_adaptation();
         clock_t start = clock();
@@ -854,6 +860,8 @@ namespace rstan {
         else sampler.set_nominal_stepsize(epsilon);
         sampler.set_stepsize_jitter(epsilon_pm);
         sampler.set_nominal_stepsize_and_L(epsilon, leapfrog_steps);
+        sampler.set_adapt_delta(delta);
+        sampler.set_adapt_gamma(gamma);
         sampler.set_adapt_mu(log(10 * sampler.get_nominal_stepsize()));
         sampler.engage_adaptation();
         clock_t start = clock();
