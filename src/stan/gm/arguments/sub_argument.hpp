@@ -1,6 +1,7 @@
 #ifndef __STAN__GM__ARGUMENTS__SUB__ARGUMENT__HPP__
 #define __STAN__GM__ARGUMENTS__SUB__ARGUMENT__HPP__
 
+#include <fstream>
 #include <string>
 
 namespace stan {
@@ -28,6 +29,8 @@ namespace stan {
           _default = false;
         }
       }
+      
+      virtual void print_help(std::ostream* s) {};
       
     protected:
       

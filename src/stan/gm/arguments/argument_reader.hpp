@@ -84,6 +84,15 @@ namespace stan {
         
       }
       
+      void print_help(std::ostream* s) {
+        if(!s) return;
+        
+        for (int i = 0; i < _valid_arguments.size(); ++i) {
+          _valid_arguments.at(i)->print_help(s);
+        }
+        
+      }
+      
     protected:
       
       std::vector<argument*>& _valid_arguments;

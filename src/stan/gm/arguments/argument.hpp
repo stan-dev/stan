@@ -58,6 +58,8 @@ namespace stan {
         }
       }
       
+      virtual void print_help(std::ostream* s) {};
+      
     protected:
       
       std::string _name;

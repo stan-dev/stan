@@ -23,6 +23,19 @@ namespace stan {
         _valid_subarguments.push_back(new sarg_stepsize());
         
       }
+      
+      void print_help(std::ostream* s) {
+        if(!s) return;
+        
+        *s << "static_hmc - Hamiltonian Monte Carlo with a static integration time" << std::endl;
+        *s << "Valid subarguments:" << std::endl;
+        
+        for (std::vector<sub_argument*>::iterator it = _valid_subarguments.begin();
+             it != _valid_subarguments.end(); ++it) {
+          (*it)->print_help(s);
+        }
+        
+      }
  
     };
     

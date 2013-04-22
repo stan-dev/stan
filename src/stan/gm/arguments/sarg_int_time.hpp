@@ -28,7 +28,14 @@ namespace stan {
         
       }
       
-    protected:
+      void print_help(std::ostream* s) {
+        if(!s) return;
+        
+        *s << "int_time - Total integration time" << std::endl;
+        *s << "Valid for int_time > 0" << std::endl;
+        *s << "Defaults to 2 * pi" << std::endl;
+        
+      }
       
     };
     

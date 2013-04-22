@@ -28,6 +28,15 @@ namespace stan {
         
       }
       
+      void print_help(std::ostream* s) {
+        if(!s) return;
+        
+        *s << "stepsize - Discretization step size" << std::endl;
+        *s << "Valid for stepsize > 0" << std::endl;
+        *s << "Defaults to 1" << std::endl;
+        
+      }
+      
     protected:
       
     };
