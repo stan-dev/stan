@@ -327,6 +327,7 @@ namespace stan {
       
       argument_reader reader(valid_arguments);
       
+      reader.print_help(&std::cout);
       reader.parse_arguments(argc, argv);
       reader.print_arguments(&std::cout);
       
