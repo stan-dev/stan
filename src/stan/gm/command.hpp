@@ -850,11 +850,6 @@ namespace stan {
           sample_stream << "lp__,";
           sampler.write_sampler_param_names(sample_stream);
           model.write_csv_header(sample_stream);
-          
-          //sampler.z().write_header(diagnostic_stream);
-          //sampler.z().write_names(diagnostic_stream);
-          //diagnostic_stream << std::endl;
-          
         }
         
         // Warm-Up
@@ -865,9 +860,9 @@ namespace stan {
         
         sampler.set_max_depth(max_treedepth);
         
-        sampler.set_adapt_delta(delta);
-        sampler.set_adapt_gamma(gamma);
-        sampler.set_adapt_mu(log(10 * sampler.get_nominal_stepsize()));
+        sampler.get_stepsize_adaptation().set_delta(delta);
+        sampler.get_stepsize_adaptation().set_gamma(gamma);
+        sampler.get_stepsize_adaptation().set_mu(log(10 * sampler.get_nominal_stepsize()));
         sampler.engage_adaptation();
         
         clock_t start = clock();
@@ -910,12 +905,7 @@ namespace stan {
         if (!append_samples) {
           sample_stream << "lp__,";
           sampler.write_sampler_param_names(sample_stream);
-          model.write_csv_header(sample_stream);
-          
-          //sampler.z().write_header(diagnostic_stream);
-          //sampler.z().write_names(diagnostic_stream);
-          //diagnostic_stream << std::endl;
-          
+          model.write_csv_header(sample_stream);          
         }
         
         // Warm-Up
@@ -926,9 +916,9 @@ namespace stan {
         
         sampler.set_max_depth(max_treedepth);
         
-        sampler.set_adapt_delta(delta);
-        sampler.set_adapt_gamma(gamma);
-        sampler.set_adapt_mu(log(10 * sampler.get_nominal_stepsize()));
+        sampler.get_stepsize_adaptation().set_delta(delta);
+        sampler.get_stepsize_adaptation().set_gamma(gamma);
+        sampler.get_stepsize_adaptation().set_mu(log(10 * sampler.get_nominal_stepsize()));
         sampler.engage_adaptation();
         
         clock_t start = clock();
@@ -972,11 +962,6 @@ namespace stan {
           sample_stream << "lp__,";
           sampler.write_sampler_param_names(sample_stream);
           model.write_csv_header(sample_stream);
-          
-          //sampler.z().write_header(diagnostic_stream);
-          //sampler.z().write_names(diagnostic_stream);
-          //diagnostic_stream << std::endl;
-          
         }
         
         // Warm-Up
@@ -987,9 +972,9 @@ namespace stan {
         
         sampler.set_max_depth(max_treedepth);
         
-        sampler.set_adapt_delta(delta);
-        sampler.set_adapt_gamma(gamma);
-        sampler.set_adapt_mu(log(10 * sampler.get_nominal_stepsize()));
+        sampler.get_stepsize_adaptation().set_delta(delta);
+        sampler.get_stepsize_adaptation().set_gamma(gamma);
+        sampler.get_stepsize_adaptation().set_mu(log(10 * sampler.get_nominal_stepsize()));
         sampler.engage_adaptation();
         
         clock_t start = clock();
@@ -1032,11 +1017,6 @@ namespace stan {
           sample_stream << "lp__,";
           sampler.write_sampler_param_names(sample_stream);
           model.write_csv_header(sample_stream);
-          
-          //sampler.z().write_header(diagnostic_stream);
-          //sampler.z().write_names(diagnostic_stream);
-          //diagnostic_stream << std::endl;
-          
         }
         
         // Warm-Up
@@ -1048,9 +1028,9 @@ namespace stan {
         sampler.set_nominal_stepsize_and_L(epsilon, leapfrog_steps);
         //sampler.set_stepsize_and_T(epsilon, 3.14159);
         
-        sampler.set_adapt_delta(delta);
-        sampler.set_adapt_gamma(gamma);
-        sampler.set_adapt_mu(log(10 * sampler.get_nominal_stepsize()));
+        sampler.get_stepsize_adaptation().set_delta(delta);
+        sampler.get_stepsize_adaptation().set_gamma(gamma);
+        sampler.get_stepsize_adaptation().set_mu(log(10 * sampler.get_nominal_stepsize()));
         sampler.engage_adaptation();
         
         clock_t start = clock();
