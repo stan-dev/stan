@@ -128,7 +128,7 @@ read_stan_csv <- function(csvfiles) {
   iter <- sapply(cs_lst2, function(i) i$iter)
   if (!all_int_eq(warmup) || !all_int_eq(thin) || !all_int_eq(iter)) 
     stop("not all iter/warmups/thin are the same in all CSV files")
-  n_kept0 <- (iter[1] - 1) %/% thin[1] - (warmup[1] - 1) %/% thin[1]
+  n_kept0 <- 1 + (iter - warmup - 1) %/% thin
   warmup2 <- 0
   if (max(save_warmup) == 0L) { # all equal to 0L
     n_kept <- n_save
@@ -137,7 +137,7 @@ read_stan_csv <- function(csvfiles) {
     n_kept <- n_save - warmup2 
   } 
   
-  if (n_kept0 != n_kept) 
+  if (n_kept0[1] != n_kept) 
     stop("the number of iterations after warmup found (", n_kept, 
          ") does not match iter/warmup/thin from CSV comments (", n_kept0, ")")
 
