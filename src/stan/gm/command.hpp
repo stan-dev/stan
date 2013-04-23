@@ -853,7 +853,7 @@ namespace stan {
         }
         
         // Warm-Up
-        if (epsilon < 0) sampler.init_stepsize();
+        if (epsilon <= 0) sampler.init_stepsize();
         else             sampler.set_nominal_stepsize(epsilon);
         
         sampler.set_stepsize_jitter(epsilon_pm);
@@ -909,7 +909,7 @@ namespace stan {
         }
         
         // Warm-Up
-        if (epsilon < 0) sampler.init_stepsize();
+        if (epsilon <= 0) sampler.init_stepsize();
         else             sampler.set_nominal_stepsize(epsilon);
         
         sampler.set_stepsize_jitter(epsilon_pm);
@@ -965,7 +965,7 @@ namespace stan {
         }
         
         // Warm-Up
-        if (epsilon < 0) sampler.init_stepsize();
+        if (epsilon <= 0) sampler.init_stepsize();
         else             sampler.set_nominal_stepsize(epsilon);
         
         sampler.set_stepsize_jitter(epsilon_pm);
@@ -1020,7 +1020,7 @@ namespace stan {
         }
         
         // Warm-Up
-        if (epsilon < 0) sampler.init_stepsize();
+        if (epsilon <= 0) sampler.init_stepsize();
         else             sampler.set_nominal_stepsize(epsilon);
         
         sampler.set_stepsize_jitter(epsilon_pm);
