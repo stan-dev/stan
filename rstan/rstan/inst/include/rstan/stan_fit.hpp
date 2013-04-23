@@ -700,9 +700,9 @@ namespace rstan {
         else sampler.set_nominal_stepsize(epsilon);
         sampler.set_stepsize_jitter(epsilon_pm);
         sampler.set_max_depth(max_treedepth);
-        sampler.set_adapt_delta(delta);
-        sampler.set_adapt_gamma(gamma);
-        sampler.set_adapt_mu(log(10 * sampler.get_nominal_stepsize()));
+        sampler.get_stepsize_adaptation().set_delta(delta);
+        sampler.get_stepsize_adaptation().set_gamma(gamma);
+        sampler.get_stepsize_adaptation().set_mu(log(10 * sampler.get_nominal_stepsize()));
         sampler.engage_adaptation();
         clock_t start = clock();
         warmup_phase<a_Dm_nuts, Model, RNG>(sampler, num_warmup, num_thin, 
@@ -753,9 +753,9 @@ namespace rstan {
         else sampler.set_nominal_stepsize(epsilon);
         sampler.set_stepsize_jitter(epsilon_pm);
         sampler.set_max_depth(max_treedepth);
-        sampler.set_adapt_delta(delta);
-        sampler.set_adapt_gamma(gamma);
-        sampler.set_adapt_mu(log(10 * sampler.get_nominal_stepsize()));
+        sampler.get_stepsize_adaptation().set_delta(delta);
+        sampler.get_stepsize_adaptation().set_gamma(gamma);
+        sampler.get_stepsize_adaptation().set_mu(log(10 * sampler.get_nominal_stepsize()));
         sampler.engage_adaptation();
         clock_t start = clock();
         warmup_phase<a_dm_nuts, Model, RNG>(sampler, num_warmup, num_thin, 
@@ -808,9 +808,9 @@ namespace rstan {
         else sampler.set_nominal_stepsize(epsilon);
         sampler.set_stepsize_jitter(epsilon_pm);
         sampler.set_max_depth(max_treedepth);
-        sampler.set_adapt_delta(delta);
-        sampler.set_adapt_gamma(gamma);
-        sampler.set_adapt_mu(log(10 * sampler.get_nominal_stepsize()));
+        sampler.get_stepsize_adaptation().set_delta(delta);
+        sampler.get_stepsize_adaptation().set_gamma(gamma);
+        sampler.get_stepsize_adaptation().set_mu(log(10 * sampler.get_nominal_stepsize()));
         sampler.engage_adaptation();
         clock_t start = clock();
         warmup_phase<a_um_nuts, Model, RNG>(sampler, num_warmup, num_thin, 
@@ -860,9 +860,9 @@ namespace rstan {
         else sampler.set_nominal_stepsize(epsilon);
         sampler.set_stepsize_jitter(epsilon_pm);
         sampler.set_nominal_stepsize_and_L(epsilon, leapfrog_steps);
-        sampler.set_adapt_delta(delta);
-        sampler.set_adapt_gamma(gamma);
-        sampler.set_adapt_mu(log(10 * sampler.get_nominal_stepsize()));
+        sampler.get_stepsize_adaptation().set_delta(delta);
+        sampler.get_stepsize_adaptation().set_gamma(gamma);
+        sampler.get_stepsize_adaptation().set_mu(log(10 * sampler.get_nominal_stepsize()));
         sampler.engage_adaptation();
         clock_t start = clock();
         warmup_phase<a_um_hmc, Model, RNG>(sampler, num_warmup, num_thin, 
