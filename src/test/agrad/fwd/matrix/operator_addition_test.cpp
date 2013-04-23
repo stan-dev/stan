@@ -4,7 +4,7 @@
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <stan/agrad/fvar.hpp>
 
-TEST(AgradFwdMatrix,add_scalar) {
+TEST(AgradFwdMatrix,add_scalar_matrix) {
   using stan::agrad::matrix_fv;
   using stan::math::add;
 
@@ -36,7 +36,70 @@ TEST(AgradFwdMatrix,add_scalar) {
   EXPECT_FLOAT_EQ(1.0,result(1,0).d_);
   EXPECT_FLOAT_EQ(1.0,result(1,1).d_);
 }
+TEST(AgradFwdMatrix,add_scalar_vector) {
+  using stan::agrad::vector_fv;
+  using stan::math::add;
 
+  vector_fv v(4);
+  v << 1, 2, 3, 4;
+   v(0).d_ = 1.0;
+   v(1).d_ = 1.0;
+   v(2).d_ = 1.0;
+   v(3).d_ = 1.0;
+  vector_fv result;
+
+  result = add(2.0,v);
+  EXPECT_FLOAT_EQ(3.0,result(0).val_);
+  EXPECT_FLOAT_EQ(4.0,result(1).val_);
+  EXPECT_FLOAT_EQ(5.0,result(2).val_);
+  EXPECT_FLOAT_EQ(6.0,result(3).val_);
+  EXPECT_FLOAT_EQ(1.0,result(0).d_);
+  EXPECT_FLOAT_EQ(1.0,result(1).d_);
+  EXPECT_FLOAT_EQ(1.0,result(2).d_);
+  EXPECT_FLOAT_EQ(1.0,result(3).d_);
+
+  result = add(v,2.0);
+  EXPECT_FLOAT_EQ(3.0,result(0).val_);
+  EXPECT_FLOAT_EQ(4.0,result(1).val_);
+  EXPECT_FLOAT_EQ(5.0,result(2).val_);
+  EXPECT_FLOAT_EQ(6.0,result(3).val_);
+  EXPECT_FLOAT_EQ(1.0,result(0).d_);
+  EXPECT_FLOAT_EQ(1.0,result(1).d_);
+  EXPECT_FLOAT_EQ(1.0,result(2).d_);
+  EXPECT_FLOAT_EQ(1.0,result(3).d_);
+}
+TEST(AgradFwdMatrix,add_scalar_rowvector) {
+  using stan::agrad::row_vector_fv;
+  using stan::math::add;
+
+  row_vector_fv v(4);
+  v << 1, 2, 3, 4;
+   v(0).d_ = 1.0;
+   v(1).d_ = 1.0;
+   v(2).d_ = 1.0;
+   v(3).d_ = 1.0;
+  row_vector_fv result;
+
+  result = add(2.0,v);
+  EXPECT_FLOAT_EQ(3.0,result(0).val_);
+  EXPECT_FLOAT_EQ(4.0,result(1).val_);
+  EXPECT_FLOAT_EQ(5.0,result(2).val_);
+  EXPECT_FLOAT_EQ(6.0,result(3).val_);
+  EXPECT_FLOAT_EQ(1.0,result(0).d_);
+  EXPECT_FLOAT_EQ(1.0,result(1).d_);
+  EXPECT_FLOAT_EQ(1.0,result(2).d_);
+  EXPECT_FLOAT_EQ(1.0,result(3).d_);
+
+  result = add(v,2.0);
+  EXPECT_FLOAT_EQ(3.0,result(0).val_);
+  EXPECT_FLOAT_EQ(4.0,result(1).val_);
+  EXPECT_FLOAT_EQ(5.0,result(2).val_);
+  EXPECT_FLOAT_EQ(6.0,result(3).val_);
+  EXPECT_FLOAT_EQ(1.0,result(0).d_);
+  EXPECT_FLOAT_EQ(1.0,result(1).d_);
+  EXPECT_FLOAT_EQ(1.0,result(2).d_);
+  EXPECT_FLOAT_EQ(1.0,result(3).d_);
+}
 TEST(AgradFwdMatrix, add_vector_vector) {
   using stan::math::add;
   using stan::math::vector_d;
@@ -109,7 +172,7 @@ TEST(AgradFwdMatrix, add_vector_vector) {
   EXPECT_FLOAT_EQ(2.0, output_v(3).d_);
   EXPECT_FLOAT_EQ(2.0, output_v(4).d_);  
 }
-TEST(AgradFWDMatrix, add_vector_vector_exception) {
+TEST(AgradFwdMatrix, add_vector_vector_exception) {
   using stan::math::add;
   using stan::math::vector_d;
   using stan::agrad::vector_fv;

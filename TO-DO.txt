@@ -96,6 +96,13 @@ C++ API
 ======================================================================
 [items go here first, then to RStan/cmd]
 
+* add "multi_logit_log(int|vec,vec)" with derivs so that
+     y ~ multi_logit(beta,x);
+  behaves as:
+     y ~ categorical(softmax(dot_product(beta,x)));
+
+* expose all the groovy special functions Michael/Daniel added for CDFs
+
 * allow only some inits to be specified in a data file (var_context)
   and let the rest be randomly generated
 
@@ -112,8 +119,6 @@ C++ API
     }
   problem is overflow with initial value of x being 1e35
   due to huge bounds.
-
-
 
 * fix Eigen (3.0) indexes to use size_t to match vector.
     http://eigen.tuxfamily.org/dox-devel/classEigen_1_1DenseBase.html#a4d4873e91be950c079f067fa97fd5c40
@@ -336,10 +341,6 @@ http://www.boost.org/doc/libs/1_53_0/doc/html/property_tree/reference.html#heade
         beta  <- (1 - phi) * k
     determinant = k  (det [[a,b],[c,d]] = ad - bc)
 
-* Gumbel distribtuion
-
-* Exponentially-modified Normal distribution
-
 * von Mises distribution (with location and concentration params?)
   -- requires modified/hyperbolic Bessel function of first kind of order 0 and 1
 
@@ -367,12 +368,6 @@ http://www.boost.org/doc/libs/1_53_0/doc/html/property_tree/reference.html#heade
 * signed sqrt
   signed_sqrt(x) = -sqrt(-x) if x < 0
                  = sqrt(x)   if x > 0
-
-* Skew normal distribution
-  -- involves Phi() in its *density* function like
-     the truncated normal
-  -- hack for now using 
-     normal_log(x|mu,sigma) + log(Phi(alpha * (x - mu) / sigma))
 
 * More matrix functions from Eigen:
   - singular vectors in addition to values

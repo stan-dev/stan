@@ -34,7 +34,7 @@ namespace stan {
   
 }
 
-TEST(McmcBaseStaticHMC, set_stepsize) {
+TEST(McmcBaseStaticHMC, set_nominal_stepsize) {
   
   rng_t base_rng(0);
   
@@ -47,12 +47,12 @@ TEST(McmcBaseStaticHMC, set_stepsize) {
   
   double old_epsilon = 1.0;
   
-  sampler.set_stepsize(old_epsilon);
-  EXPECT_EQ(old_epsilon, sampler.get_stepsize());
+  sampler.set_nominal_stepsize(old_epsilon);
+  EXPECT_EQ(old_epsilon, sampler.get_nominal_stepsize());
   EXPECT_EQ(true, sampler.get_L() > 0);
   
-  sampler.set_stepsize(-0.1);
-  EXPECT_EQ(old_epsilon, sampler.get_stepsize());
+  sampler.set_nominal_stepsize(-0.1);
+  EXPECT_EQ(old_epsilon, sampler.get_nominal_stepsize());
   
 }
 
@@ -78,7 +78,7 @@ TEST(McmcBaseStaticHMC, set_T) {
   
 }
 
-TEST(McmcBaseStaticHMC, set_stepsize_and_T) {
+TEST(McmcBaseStaticHMC, set_nominal_stepsize_and_T) {
   
   rng_t base_rng(0);
   
@@ -92,22 +92,22 @@ TEST(McmcBaseStaticHMC, set_stepsize_and_T) {
   double old_epsilon = 1.0;
   double old_T = 3.0;
   
-  sampler.set_stepsize_and_T(old_epsilon, old_T);
-  EXPECT_EQ(old_epsilon, sampler.get_stepsize());
+  sampler.set_nominal_stepsize_and_T(old_epsilon, old_T);
+  EXPECT_EQ(old_epsilon, sampler.get_nominal_stepsize());
   EXPECT_EQ(old_T, sampler.get_T());
   EXPECT_EQ(true, sampler.get_L() > 0);
   
-  sampler.set_stepsize_and_T(-0.1, 5.0);
-  EXPECT_EQ(old_epsilon, sampler.get_stepsize());
+  sampler.set_nominal_stepsize_and_T(-0.1, 5.0);
+  EXPECT_EQ(old_epsilon, sampler.get_nominal_stepsize());
   EXPECT_EQ(old_T, sampler.get_T());
   
-  sampler.set_stepsize_and_T(5.0, -0.1);
-  EXPECT_EQ(old_epsilon, sampler.get_stepsize());
+  sampler.set_nominal_stepsize_and_T(5.0, -0.1);
+  EXPECT_EQ(old_epsilon, sampler.get_nominal_stepsize());
   EXPECT_EQ(old_T, sampler.get_T());
   
 }
 
-TEST(McmcBaseStaticHMC, set_stepsize_and_L) {
+TEST(McmcBaseStaticHMC, set_nominal_stepsize_and_L) {
   
   rng_t base_rng(0);
   
@@ -121,17 +121,17 @@ TEST(McmcBaseStaticHMC, set_stepsize_and_L) {
   double old_epsilon = 1.0;
   int old_L = 10;
   
-  sampler.set_stepsize_and_L(old_epsilon, old_L);
-  EXPECT_EQ(old_epsilon, sampler.get_stepsize());
+  sampler.set_nominal_stepsize_and_L(old_epsilon, old_L);
+  EXPECT_EQ(old_epsilon, sampler.get_nominal_stepsize());
   EXPECT_EQ(old_L, sampler.get_L());
   EXPECT_EQ(true, sampler.get_T() > 0);
   
-  sampler.set_stepsize_and_L(-0.1, 5);
-  EXPECT_EQ(old_epsilon, sampler.get_stepsize());
+  sampler.set_nominal_stepsize_and_L(-0.1, 5);
+  EXPECT_EQ(old_epsilon, sampler.get_nominal_stepsize());
   EXPECT_EQ(old_L, sampler.get_L());
   
-  sampler.set_stepsize_and_T(5.0, -1);
-  EXPECT_EQ(old_epsilon, sampler.get_stepsize());
+  sampler.set_nominal_stepsize_and_T(5.0, -1);
+  EXPECT_EQ(old_epsilon, sampler.get_nominal_stepsize());
   EXPECT_EQ(old_L, sampler.get_L());
   
 }

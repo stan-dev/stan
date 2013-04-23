@@ -14,13 +14,12 @@ namespace stan {
     // and adaptive stepsize
     
     template <typename M, class BaseRNG>
-    class adapt_unit_e_static_hmc: public unit_e_static_hmc<M, BaseRNG>, public stepsize_adapter {
+    class adapt_unit_e_static_hmc: public unit_e_static_hmc<M, BaseRNG>,
+                                   public stepsize_adapter {
       
     public:
       
-      adapt_unit_e_static_hmc(M &m, BaseRNG& rng): unit_e_static_hmc<M, BaseRNG>(m, rng),
-                                                   stepsize_adapter()
-      {};
+      adapt_unit_e_static_hmc(M &m, BaseRNG& rng): unit_e_static_hmc<M, BaseRNG>(m, rng) {};
       
       ~adapt_unit_e_static_hmc() {};
       
@@ -29,7 +28,7 @@ namespace stan {
         sample s = unit_e_static_hmc<M, BaseRNG>::transition(init_sample);
         
         if (this->_adapt_flag) {
-          this->learn_stepsize(this->_epsilon, s.accept_stat());
+          this->_stepsize_adaptation.learn_stepsize(this->_nom_epsilon, s.accept_stat());
           this->_update_L();
         }
         

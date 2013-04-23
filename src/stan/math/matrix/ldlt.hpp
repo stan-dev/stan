@@ -3,8 +3,11 @@
 
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/transpose.hpp>
+#include <stan/math/matrix/validate_multiplicable.hpp>
+#include <stan/math/matrix/validate_square.hpp>
 
 #include <boost/shared_ptr.hpp>
+#include <boost/math/tools/promotion.hpp>
 
 namespace stan {
   namespace math {
@@ -23,6 +26,7 @@ namespace stan {
       }
       
       inline void compute(const Eigen::Matrix<double,R,C> &A) {
+        stan::math::validate_square(A,"LDLT_factor<double>::compute");
         _N = A.rows();
         _ldltP->compute(A);
       }
@@ -63,7 +67,7 @@ namespace stan {
     inline Eigen::Matrix<double,R1,C2>
     mdivide_left_ldlt(const stan::math::LDLT_factor<double,R1,C1> &A,
                       const Eigen::Matrix<double,R2,C2> &b) {
-//      stan::math::validate_multiplicable(A,b,"mdivide_left_ldlt");
+      stan::math::validate_multiplicable(A,b,"mdivide_left_ldlt");
       
       return A.solve(b);
     }
@@ -73,7 +77,8 @@ namespace stan {
     Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type,R1,C2>
     mdivide_right_ldlt(const Eigen::Matrix<T1,R1,C1> &b,
                        const stan::math::LDLT_factor<T2,R2,C2> &A) {
-//      stan::math::validate_multiplicable(b,A,"mdivide_right_ldlt");
+      stan::math::validate_multiplicable(b,A,"mdivide_right_ldlt");
+
       return transpose(mdivide_left_ldlt(A,transpose(b)));
     }
     
@@ -81,12 +86,14 @@ namespace stan {
     inline Eigen::Matrix<double,R1,C2>
     mdivide_right_ldlt(const Eigen::Matrix<double,R1,C1> &b,
                        const stan::math::LDLT_factor<double,R2,C2> &A) {
-//      stan::math::validate_multiplicable(b,A,"mdivide_right_ldlt");
+      stan::math::validate_multiplicable(b,A,"mdivide_right_ldlt");
+
       return A.solveRight(b);
     }
     
     template<int R, int C>
-    double log_determinant_ldlt(stan::math::LDLT_factor<double,R,C> &A) {
+    inline double
+    log_determinant_ldlt(stan::math::LDLT_factor<double,R,C> &A) {
       return A.log_abs_det();
     }
     

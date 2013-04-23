@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__FWD__MATRIX__INVERSE_HPP__
-#define __STAN__AGRAD__FWD__MATRIX__INVERSE_HPP__
+#ifndef __STAN__AGRAD__FWD__MATRIX__DETERMINANT_HPP__
+#define __STAN__AGRAD__FWD__MATRIX__DETERMINANT_HPP__
 
 #include <vector>
 #include <boost/math/tools/promotion.hpp>

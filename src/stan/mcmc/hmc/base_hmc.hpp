@@ -24,7 +24,9 @@ namespace stan {
                                     _hamiltonian(m), 
                                     _rand_int(rng),
                                     _rand_uniform(_rand_int),
-                                    _epsilon(0.1)
+                                    _nom_epsilon(0.1),
+                                    _epsilon(_nom_epsilon),
+                                    _epsilon_jitter(0.0)
       {};
       
       void seed(const std::vector<double>& q, const std::vector<int>& r) {
@@ -40,7 +42,7 @@ namespace stan {
         this->_hamiltonian.init(this->_z);
         
         double H0 = this->_hamiltonian.H(this->_z);
-        this->_integrator.evolve(this->_z, this->_hamiltonian, this->_epsilon);
+        this->_integrator.evolve(this->_z, this->_hamiltonian, this->_nom_epsilon);
         double delta_H = H0 - this->_hamiltonian.H(this->_z);
         
         int direction = delta_H > log(0.5) ? 1 : -1;
@@ -53,7 +55,7 @@ namespace stan {
           this->_hamiltonian.init(this->_z);
           
           double H0 = this->_hamiltonian.H(this->_z);
-          this->_integrator.evolve(this->_z, this->_hamiltonian, this->_epsilon);
+          this->_integrator.evolve(this->_z, this->_hamiltonian, this->_nom_epsilon);
           double delta_H = H0 - this->_hamiltonian.H(this->_z);
                    
           if ((direction == 1) && !(delta_H > log(0.5))) 
@@ -61,13 +63,13 @@ namespace stan {
           else if ((direction == -1) && !(delta_H < log(0.5)))
             break;
           else
-            this->_epsilon = ( (direction == 1) 
-                              ? 2.0 * this->_epsilon 
-                              : 0.5 * this->_epsilon );
+            this->_nom_epsilon = ( (direction == 1)
+                                   ? 2.0 * this->_nom_epsilon
+                                   : 0.5 * this->_nom_epsilon );
           
-          if (this->_epsilon > 1e300)
+          if (this->_nom_epsilon > 1e300)
             throw std::runtime_error("Posterior is improper. Please check your model.");
-          if (this->_epsilon == 0)
+          if (this->_nom_epsilon == 0)
             throw std::runtime_error("No acceptably small step size could be found. Perhaps the posterior is not continuous?");
           
         }
@@ -77,12 +79,20 @@ namespace stan {
       }
       
       P& z() { return _z; }
-      
-      virtual void set_stepsize(const double e) { 
-        if(e > 0) _epsilon = e;
+
+      virtual void set_nominal_stepsize(const double e) {
+        if(e > 0) _nom_epsilon = e;
       }
       
-      double get_stepsize() { return this->_epsilon; }
+      double get_nominal_stepsize() { return this->_nom_epsilon; }
+      
+      double get_current_stepsize() { return this->_epsilon; }
+      
+      virtual void set_stepsize_jitter(const double j) {
+        if(j > 0 && j < 1) _epsilon_jitter = j;
+      }
+      
+      double get_stepsize_jitter() { return this->_epsilon_jitter; }
       
     protected:
     
@@ -95,7 +105,15 @@ namespace stan {
       // Uniform(0, 1) RNG
       boost::uniform_01<BaseRNG&> _rand_uniform;                
       
+      double _nom_epsilon;
       double _epsilon;
+      double _epsilon_jitter;
+      
+      void _sample_stepsize() {
+        this->_epsilon = this->_nom_epsilon;
+        if(this->_epsilon_jitter)
+          this->_epsilon *= ( 1.0 + this->_epsilon_jitter * (2.0 * this->_rand_uniform() - 1.0) );
+      }
     
     };
     

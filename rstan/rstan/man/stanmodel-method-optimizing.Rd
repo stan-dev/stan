@@ -15,7 +15,9 @@
   %% optimizing(object, \dots)  
   \S4method{optimizing}{stanmodel}(object, data = list(), 
     seed = sample.int(.Machine$integer.max, 1), init = 'random', 
-    check_data = TRUE, sample_file, verbose = FALSE, \dots)   
+    check_data = TRUE, sample_file, 
+    method = c("newton", "nesterov"),
+    verbose = FALSE, \dots)   
 } 
 
 \section{Methods}{
@@ -57,6 +59,8 @@
     write samples for \emph{all} parameters and other saved quantities. 
     If not provided, files are not created. When the folder specified 
     is not writable, \code{tempdir()} is used.}
+  \item{method}{One of "newton" or "nesterov" indicating which optimization 
+    method is used.} 
   \item{verbose}{\code{TRUE} or \code{FALSE}: flag indicating whether 
      to print intermediate output from Stan on the console.}
   \item{\dots}{Other optional parameters (none currently).}

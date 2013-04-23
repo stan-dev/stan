@@ -16,8 +16,8 @@ namespace stan {
       template<int R, int C>
       class LDLT_alloc : public chainable_alloc {
       public:
-        LDLT_alloc() : _N(0), _invA_computed(false) {}
-        LDLT_alloc(const Eigen::Matrix<var,R,C> &A) : _N(0), _invA_computed(false) {
+        LDLT_alloc() : _N(0) {}
+        LDLT_alloc(const Eigen::Matrix<var,R,C> &A) : _N(0) {
           compute(A);
         }
         
@@ -37,27 +37,14 @@ namespace stan {
           }
           
           _ldlt.compute(Ad);
-
-          _invA_computed = false;
         }
         inline double log_abs_det() const {
           return _ldlt.vectorD().array().log().sum();
         }
         
-        inline void compute_invA() const {
-          if (!_invA_computed) {
-            _invA.setIdentity(_N,_N);
-            _ldlt.solveInPlace(_invA);
-            _invA_computed = true;
-          }
-        }
-        
         size_t _N;
         Eigen::LDLT< Eigen::Matrix<double,R,C> > _ldlt;
         vari** _variARef;
-        
-        mutable Eigen::Matrix<double,R,C> _invA;
-        mutable bool _invA_computed;
       };
     }
   }
@@ -72,6 +59,7 @@ namespace stan {
       LDLT_factor(const Eigen::Matrix<stan::agrad::var,R,C> &A) : _alloc(new stan::agrad::LDLT_alloc<R,C>(A)) { }
       
       inline void compute(const Eigen::Matrix<stan::agrad::var,R,C> &A) {
+        stan::math::validate_square(A,"LDLT_factor<var>::compute");
         _alloc->compute(A);
       }
       
@@ -99,21 +87,26 @@ namespace stan {
       public:
         log_det_ldlt_vari(const stan::math::LDLT_factor<var,R,C> &A)
         : vari(A._alloc->log_abs_det()), _alloc_ldlt(A._alloc)
-        {
-          _alloc_ldlt->compute_invA();
-        }
+        { }
 
         virtual void chain() {
+          Eigen::Matrix<double,R,C> invA;
+          
+          // If we start computing Jacobians, this may be a bit inefficient
+          invA.setIdentity(_alloc_ldlt->_N, _alloc_ldlt->_N);
+          _alloc_ldlt->_ldlt.solveInPlace(invA);
+
           size_t pos = 0;
           for (size_type j = 0; j < _alloc_ldlt->_N; j++) {
             for (size_type i = 0; i < _alloc_ldlt->_N; i++) {
-              _alloc_ldlt->_variARef[pos++]->adj_ += adj_ * _alloc_ldlt->_invA(i,j);
+              _alloc_ldlt->_variARef[pos++]->adj_ += adj_ * invA(i,j);
             }
           }
         }
         
         const LDLT_alloc<R,C> *_alloc_ldlt;
       };
+
       template <int R1,int C1,int R2,int C2>
       class mdivide_left_ldlt_alloc : public chainable_alloc {
       public:
@@ -177,7 +170,7 @@ namespace stan {
           
           _alloc_ldlt->_ldlt.solveInPlace(adjB);
           adjA.noalias() = -adjB * _alloc->_C.transpose();
-          
+
           pos = 0;
           for (size_type j = 0; j < _M; j++)
             for (size_type i = 0; i < _M; i++)
@@ -313,8 +306,8 @@ namespace stan {
                       const Eigen::Matrix<var,R2,C2> &b) {
       Eigen::Matrix<var,R1,C2> res(b.rows(),b.cols());
 
-//      stan::math::validate_multiplicable(A,b,"mdivide_left_ldlt");
-
+      stan::math::validate_multiplicable(A,b,"mdivide_left_ldlt");
+      
       mdivide_left_ldlt_vv_vari<R1,C1,R2,C2> *baseVari = new mdivide_left_ldlt_vv_vari<R1,C1,R2,C2>(A,b);
       
       size_t pos = 0;
@@ -331,7 +324,7 @@ namespace stan {
                       const Eigen::Matrix<double,R2,C2> &b) {
       Eigen::Matrix<var,R1,C2> res(b.rows(),b.cols());
       
-//      stan::math::validate_multiplicable(A,b,"mdivide_left_ldlt");
+      stan::math::validate_multiplicable(A,b,"mdivide_left_ldlt");
       
       mdivide_left_ldlt_vd_vari<R1,C1,R2,C2> *baseVari = new mdivide_left_ldlt_vd_vari<R1,C1,R2,C2>(A,b);
       
@@ -349,7 +342,7 @@ namespace stan {
                       const Eigen::Matrix<var,R2,C2> &b) {
       Eigen::Matrix<var,R1,C2> res(b.rows(),b.cols());
       
-//      stan::math::validate_multiplicable(A,b,"mdivide_left_ldlt");
+      stan::math::validate_multiplicable(A,b,"mdivide_left_ldlt");
       
       mdivide_left_ldlt_dv_vari<R1,C1,R2,C2> *baseVari = new mdivide_left_ldlt_dv_vari<R1,C1,R2,C2>(A,b);
       

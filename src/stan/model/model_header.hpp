@@ -22,14 +22,14 @@
 #include <stan/io/reader.hpp>
 #include <stan/io/writer.hpp>
 #include <stan/io/csv_writer.hpp>
+
+#include <stan/math/matrix.hpp>
 #include <stan/math.hpp>
+// FIXME: these should go in matrix.hpp
 #include <stan/math/rep_array.hpp>
 #include <stan/math/rep_vector.hpp>
 #include <stan/math/rep_row_vector.hpp>
 #include <stan/math/rep_matrix.hpp>
-
-#include <stan/math/matrix.hpp>
-// FIXME: these should go in matrix.hpp
 #include <stan/math/matrix/add.hpp>
 #include <stan/math/matrix/block.hpp>
 #include <stan/math/matrix/cholesky_decompose.hpp>
@@ -69,6 +69,8 @@
 #include <stan/math/matrix/multiply_lower_tri_self_transpose.hpp>
 #include <stan/math/matrix/prod.hpp>
 #include <stan/math/matrix/row.hpp>
+#include <stan/math/matrix/rows_dot_product.hpp>
+#include <stan/math/matrix/rows_dot_self.hpp>
 #include <stan/math/matrix/sd.hpp>
 #include <stan/math/matrix/singular_values.hpp>
 #include <stan/math/matrix/size.hpp>
