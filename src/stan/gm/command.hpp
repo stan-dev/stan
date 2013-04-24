@@ -20,6 +20,8 @@
 #include <stan/mcmc/hmc/nuts/adapt_diag_e_nuts.hpp>
 #include <stan/mcmc/hmc/nuts/adapt_dense_e_nuts.hpp>
 
+#include <stan/mcmc/metro/unit_metro.hpp>
+
 #include <stan/optimization/newton.hpp>
 #include <stan/optimization/nesterov_gradient.hpp>
 #include <stan/optimization/bfgs.hpp>
@@ -158,6 +160,10 @@ namespace stan {
       print_help_option(&std::cout,
                         "cov_matrix", "file",
                         "Preset an estimated covariance matrix");
+      
+      print_help_option(&std::cout,
+                        "unit_metro", "",
+                        "Use unit metropolis-hastings sampling algorithm");
       
       std::cout << std::endl;
     }
@@ -526,11 +532,13 @@ namespace stan {
         
       }
       
+      bool unit_metro = command.has_flag("unit_metro");
+
       if (command.has_flag("test_grad")) {
         std::cout << std::endl << "TEST GRADIENT MODE" << std::endl;
         return model.test_gradients(cont_params, disc_params);
       }
-      
+
       //////////////////////////////////////////////////
       //           Optimization Algorithms            //
       //////////////////////////////////////////////////
@@ -762,7 +770,7 @@ namespace stan {
         
         return 0;
       }
-      
+
       //////////////////////////////////////////////////
       //             Sampling Algorithms              // 
       //////////////////////////////////////////////////
@@ -837,7 +845,32 @@ namespace stan {
       
       double warmDeltaT;
       double sampleDeltaT;
-      
+    
+if (unit_metro) {
+       std::cout<<"run metropolis"<< std::endl;
+
+        stan::mcmc::sample s(cont_params, disc_params, 0, 0);
+
+        typedef stan::mcmc::unit_metro<Model, rng_t> metro;
+        metro sampler(model, base_rng);
+
+        if (!append_samples) {
+          sample_stream << "lp__,"; // log probability first
+          sampler.write_sampler_param_names(sample_stream);
+          model.write_csv_header(sample_stream);
+        }
+
+        sample<metro, Model, rng_t>(sampler, num_iterations, num_thin, 
+                                        refresh, true, 
+                                        sample_stream, diagnostic_stream, 
+                                        s, model, base_rng);
+
+        sample_stream.close();
+
+        return 0;
+        
+      }
+
       if (nondiag_mass) {
 
         // Euclidean NUTS with Dense Metric
