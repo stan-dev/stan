@@ -36,6 +36,61 @@ namespace stan {
         return 0;
       }
       
+      template<typename Scalar>
+      Scalar CubicInterp(const Scalar &df0,
+                         const Scalar &x1, const Scalar &f1, const Scalar &df1,
+                         const Scalar &loX, const Scalar &hiX)
+      {
+        const Scalar c3((-12*f1 + 6*x1*(df0 + df1))/(x1*x1*x1));
+        const Scalar c2(-(4*df0 + 2*df1)/x1 + 6*f1/(x1*x1));
+        const Scalar &c1(df0);
+        
+        const Scalar t_s = std::sqrt(c2*c2 - 2.0*c1*c3);
+        const Scalar s1 = - (c2 + t_s)/c3;
+        const Scalar s2 = - (c2 - t_s)/c3;
+        
+        Scalar tmpF;
+        Scalar minF, minX;
+        
+        // Check value at lower bound
+        minF = loX*(loX*(loX*c3/3.0 + c2)/2.0 + c1);
+        minX = loX;
+        
+        // Check value at upper bound
+        tmpF = hiX*(hiX*(hiX*c3/3.0 + c2)/2.0 + c1);
+        if (tmpF < minF) {
+          minF = tmpF;
+          minX = hiX;
+        }
+        
+        // Check value of first root
+        if (loX < s1 && s1 < hiX) {
+          tmpF = s1*(s1*(s1*c3/3.0 + c2)/2.0 + c1);
+          if (tmpF < minF) {
+            minF = tmpF;
+            minX = s1;
+          }
+        }
+        
+        // Check value of second root
+        if (loX < s2 && s2 < hiX) {
+          tmpF = s2*(s2*(s2*c3/3.0 + c2)/2.0 + c1);
+          if (tmpF < minF) {
+            minF = tmpF;
+            minX = s2;
+          }
+        }
+        
+        return minX;
+      }
+      template<typename Scalar>
+      Scalar CubicInterp(const Scalar &x0, const Scalar &f0, const Scalar &df0,
+                         const Scalar &x1, const Scalar &f1, const Scalar &df1,
+                         const Scalar &loX, const Scalar &hiX)
+      {
+        return x0 + CubicInterp(df0,x1-x0,f1-f0,df1,loX-x0,hiX-x0);
+      }
+      
       template<typename FunctorType, typename Scalar, typename XType>
       int WolfLSZoom(Scalar &alpha, XType &newX, Scalar &newF, XType &newDF,
                      FunctorType &func,
@@ -175,7 +230,7 @@ namespace stan {
         
       protected:
         FunctorType &_func;
-        VectorT _gk, _gk_1, _xk_1, _xk, _s;
+        VectorT _gk, _gk_1, _xk_1, _xk, _sk, _sk_1;
         Scalar _fk, _fk_1, _alpha, _alpha0;
         Eigen::LDLT< HessianT > _ldlt;
         size_t _itNum;
@@ -237,11 +292,6 @@ namespace stan {
           
           _itNum++;
           
-          if (_itNum > 1)
-            _alpha0 = _alpha = std::min(1.0, 1.1*(2*(_fk - _fk_1)/_gk_1.dot(_s)));
-          else
-            _alpha0 = _alpha = 1.0;
-
           if (_itNum == 1 || !(_ldlt.info() == Eigen::Success && _ldlt.isPositive() && (_ldlt.vectorD().array() > 0).all()))
             resetB = 1;
           else
@@ -249,30 +299,37 @@ namespace stan {
           
           while (true) {
             if (resetB) {
-              Scalar Bscale;
               if (_itNum == 1 || resetB == 2) {
-                Bscale = 1.0/_opts.alpha0;
+                _sk = -_gk;
               }
               else {
                 std::cerr << "BFGS Hessian reset" << std::endl;
-                Bscale = _ldlt.vectorD().maxCoeff();
+                _sk = -_gk/_ldlt.vectorD().maxCoeff();
               }
-              // Not needed, as ldlt is never used if resetB == true
-  //            _ldlt.compute(Bscale*HessianT::Identity(_xk.size(),_xk.size()));
-              _s = -_gk/Bscale;
             }
             else {
-              _s = -_ldlt.solve(_gk);
+              _sk = -_ldlt.solve(_gk);
+            }
+            
+            if (_itNum > 1 && resetB != 2) {
+              _alpha0 = _alpha = std::min(1.0,
+                                          1.01*CubicInterp(_gk_1.dot(_sk_1),
+                                                           _alpha, _fk - _fk_1, _gk.dot(_sk_1),
+                                                           0.0, 1.0));
+//              _alpha0 = _alpha = std::min(1.0, 1.01*(2*(_fk - _fk_1)/_gk_1.dot(_sk_1)));
+            }
+            else {
+              _alpha0 = _alpha = _opts.alpha0;
             }
             
             if (LineSearchMethod == 0) {
               retCode = BTLineSearch(_func, _alpha, _xk_1, _fk_1, _gk_1,
-                                     _s, _xk, _fk, _gk, _opts.rho, 
+                                     _sk, _xk, _fk, _gk, _opts.rho, 
                                      _opts.c1, _opts.minAlpha);
             }
             else if (LineSearchMethod == 1) {
               retCode = WolfeLineSearch(_func, _alpha, _xk_1, _fk_1, _gk_1,
-                                        _s, _xk, _fk, _gk,
+                                        _sk, _xk, _fk, _gk,
                                         _opts.c1, _opts.c2, 
                                         _opts.minAlpha, _opts.maxAlpha);
             }
@@ -285,7 +342,6 @@ namespace stan {
               else {
                 // Line-search failed, try ditching the Hessian approximation
                 resetB = 2;
-                _alpha0 = _alpha = 1.0;
                 continue;
               }
             }
@@ -296,6 +352,7 @@ namespace stan {
           std::swap(_fk,_fk_1);
           _xk.swap(_xk_1);
           _gk.swap(_gk_1);
+          _sk.swap(_sk_1);
           
           gradNorm = _gk.squaredNorm();
           sk.noalias() = _xk - _xk_1;
@@ -317,6 +374,7 @@ namespace stan {
             Scalar B0fact = yk.squaredNorm()/skyk;
             _ldlt.compute(B0fact*HessianT::Identity(_xk.size(),_xk.size()));
             Bksk.noalias() = B0fact*sk;
+            _sk_1 *= B0fact;
           }
           else {
             Bksk = _ldlt.transpositionsP().transpose()*(_ldlt.matrixL()*(_ldlt.vectorD().asDiagonal()*(_ldlt.matrixU()*(_ldlt.transpositionsP()*sk))));
@@ -335,7 +393,7 @@ namespace stan {
           }
           _ldlt.rankUpdate(rk,1.0/sk.dot(rk));
           _ldlt.rankUpdate(Bksk,-1.0/skBksk);
-          
+
           return retCode;
         }
         
