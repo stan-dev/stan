@@ -20,15 +20,17 @@ namespace stan {
       
     public:
       
-      base_metro(M& m, BaseRNG& rng): base_mcmc(), 
-                                      _params_r(m.num_params_r()),
-                                      _params_i(m.num_params_i()),
-                                      _rand_int(rng),
-                                      _rand_uniform(_rand_int),
-                                      _nom_epsilon(0.1),
-                                      _epsilon(_nom_epsilon),
-                                      _epsilon_jitter(0.0),
-                                      _model(m) {};  
+      base_metro(M& m, BaseRNG& rng, std::ostream* error_msg)
+        : base_mcmc(), 
+          _model(m),
+          _params_r(m.num_params_r()),
+          _params_i(m.num_params_i()),
+          _rand_int(rng),
+          _rand_uniform(_rand_int),
+          _nom_epsilon(0.1),
+          _epsilon(_nom_epsilon),
+          _epsilon_jitter(0.0),
+          _error_msg(error_msg) {};  
  
       ~base_metro() {};
 
@@ -48,11 +50,12 @@ namespace stan {
        std::vector<double> init_point(_params_r.size());
        init_point = _params_r;
 
-       double logp0 = this->_model.log_prob(_params_r, _params_i);
+       double logp0 = log_prob(_params_r, _params_i);
 
        this->_propose(_params_r, _rand_int);
 
-       double accept_prob = exp(this->_model.log_prob(_params_r, _params_i) - logp0);
+       double accept_prob = exp(log_prob(_params_r, _params_i) 
+                                - logp0);
 
        bool accept = true;
        if (accept_prob < 1 && this->_rand_uniform() > accept_prob) {
@@ -62,16 +65,23 @@ namespace stan {
 
        accept_prob = accept_prob > 1 ? 1 : accept_prob;
 
-       return sample(this->_params_r, this->_params_i, this->_model.log_prob(_params_r, _params_i), accept_prob);
+       return sample(_params_r, 
+                     _params_i,
+                     log_prob(_params_r, _params_i),
+                     accept_prob);
      }
-
+      double log_prob(std::vector<double>& q, std::vector<int>& r) {
+        return _model.stan::model::prob_grad_ad::log_prob(q, r, _error_msg);
+        //        return _model.log_prob_poly<false>(q,r);
+      }
       void init_stepsize() {
-       this->seed(this->cont_params(), this->disc_params());
 
-        double log_p0 = _model.log_prob(_params_r, _params_i);
+        this->seed(this->cont_params(), this->disc_params());
+
+        double log_p0 = log_prob(_params_r, _params_i);
         transition(sample(_params_r, _params_i, log_p0, this->_accept_stat));
         
-        double log_p = this->_model.log_prob(_params_r, _params_i);
+        double log_p = log_prob(_params_r, _params_i);
         double delta_log_p = log_p0 - log_p;
 
         int direction = delta_log_p > log(0.5) ? 1 : -1;
@@ -147,6 +157,7 @@ namespace stan {
       double _nom_epsilon;
       double _epsilon;
       double _epsilon_jitter;
+      std::ostream* _error_msg;
 
       void _write_error_msg(std::ostream* error_msgs,
                            const std::domain_error& e) {
@@ -155,7 +166,8 @@ namespace stan {
       void _sample_stepsize() {
         this->_epsilon = this->_nom_epsilon;
         if(this->_epsilon_jitter)
-          this->_epsilon *= ( 1.0 + this->_epsilon_jitter * (2.0 * this->_rand_uniform() - 1.0) );
+          this->_epsilon *= ( 1.0 + this->_epsilon_jitter 
+                                      * (2.0 * this->_rand_uniform() - 1.0) );
       }
     };
     
