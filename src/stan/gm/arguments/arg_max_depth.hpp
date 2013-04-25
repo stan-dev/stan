@@ -1,0 +1,30 @@
+#ifndef __STAN__GM__ARGUMENTS__MAX_DEPTH__HPP__
+#define __STAN__GM__ARGUMENTS__MAX_DEPTH__HPP__
+
+#include <stan/gm/arguments/singleton_argument.hpp>
+
+namespace stan {
+  
+  namespace gm {
+    
+    class arg_max_depth: public int_argument {
+      
+    public:
+      
+      arg_max_depth(): int_argument() {
+        _name = "max_depth";
+        _description = "Maximum tree depth";
+        _validity = "0 < max_depth";
+        _default = "10";
+      };
+      
+      bool is_valid(int value) { return value > 0; }
+      
+    };
+    
+  } // gm
+  
+} // stan
+
+#endif
+

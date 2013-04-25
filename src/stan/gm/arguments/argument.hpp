@@ -1,69 +1,46 @@
-#ifndef __STAN__GM__ARGUMENTS__ARGUMENT__HPP__
-#define __STAN__GM__ARGUMENTS__ARGUMENT__HPP__
+#ifndef __STAN__GM__ARGUMENTS__ARGUMENT__BETA__
+#define __STAN__GM__ARGUMENTS__ARGUMENT__BETA__
 
 #include <string>
-#include <vector>
 #include <fstream>
 
-#include <stan/gm/arguments/sub_argument.hpp>
-
 namespace stan {
-  
+
   namespace gm {
     
     class argument {
       
     public:
       
-      argument(): _name() {};
+      argument(): indent_width(2) {};
+      virtual ~argument() {};
+
+      std::string name() { return _name; }
+
+      virtual void print(std::ostream* s, int depth) = 0;
+      virtual void print_help(std::ostream* s, int depth) = 0;
       
-      ~argument() {
+      virtual bool parse_args(std::vector<std::string>& args, std::ostream* err) { return true; }
+      
+      static void split_arg(std::string arg, std::string& name, std::string& value) {
         
-        for (std::vector<sub_argument*>::iterator it = _valid_subarguments.begin();
-             it != _valid_subarguments.end(); ++it) {
-          delete *it;
+        size_t pos = arg.find('=');
+        
+        if (pos != std::string::npos) {
+          name = arg.substr(0, pos);
+          value = arg.substr(pos + 1, arg.size() - pos);
         }
-        
-        _valid_subarguments.clear();
         
       }
       
-      std::string get_name() { return _name; }
-      
-      void parse_subargument(std::string s, double v) {
-        
-        for (std::vector<sub_argument*>::iterator it = _valid_subarguments.begin();
-             it != _valid_subarguments.end(); ++it) {
-          if (s == (*it)->get_name()) {
-            (*it)->set_value(v);
-            return;
-          }
-        }
-        
-        std::cout << "WARNING: " << s << " is not a valid subcommand for "
-                  << _name << std::endl;
-        std::cout << "         and will be ignored" << std::endl;
-                               
-      }
-      
-      void print_subarguments(std::ostream* s) {
-        if(!s) return;
-        
-        for (std::vector<sub_argument*>::iterator it = _valid_subarguments.begin();
-             it != _valid_subarguments.end(); ++it) {
-          *s << "\t" << (*it)->get_name() << "\t" << (*it)->get_value();
-          if((*it)->is_default()) *s << " (Default)";
-          *s << std::endl;
-          
-        }
-      }
-      
-      virtual void print_help(std::ostream* s) {};
+      virtual argument* arg(std::string name) { return 0; }
       
     protected:
       
       std::string _name;
-      std::vector<sub_argument*> _valid_subarguments;
+      std::string _description;
+    
+      int indent_width;
       
     };
     
