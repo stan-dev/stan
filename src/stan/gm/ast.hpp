@@ -206,20 +206,7 @@ namespace stan {
       expression_t expr_;
     };
 
-    // struct contains_var : public boost::static_visitor<bool> {
-    //   const variable_map& var_map_;
-    //   contains_var(const variable_map& var_map);
-    //   bool operator()(const nil& e) const;
-    //   bool operator()(const int_literal& e) const;
-    //   bool operator()(const double_literal& e) const;
-    //   bool operator()(const array_literal& e) const;
-    //   bool operator()(const variable& e) const;
-    //   bool operator()(const fun& e) const;
-    //   bool operator()(const index_op& e) const;
-    //   bool operator()(const binary_op& e) const;
-    //   bool operator()(const unary_op& e) const;
-    // };
-
+   
     struct printable {
       typedef boost::variant<boost::recursive_wrapper<std::string>,
                              boost::recursive_wrapper<expression> >
@@ -668,11 +655,29 @@ namespace stan {
                expression& expr);
   };
   
-  // FIXME:  is this next necessary dependency?
-  // from generator.hpp
-  void generate_expression(const expression& e, std::ostream& o);
+    // FIXME:  is this next necessary dependency?
+    // from generator.hpp
+    void generate_expression(const expression& e, std::ostream& o);
 
     bool has_rng_suffix(const std::string& s);
+
+
+    struct contains_nonparam_var : public boost::static_visitor<bool> {
+      const variable_map& var_map_;
+      contains_nonparam_var(const variable_map& var_map);
+      bool operator()(const nil& e) const;
+      bool operator()(const int_literal& e) const;
+      bool operator()(const double_literal& e) const;
+      bool operator()(const array_literal& e) const;
+      bool operator()(const variable& e) const;
+      bool operator()(const fun& e) const;
+      bool operator()(const index_op& e) const;
+      bool operator()(const binary_op& e) const;
+      bool operator()(const unary_op& e) const;
+    };
+
+    bool has_non_param_var(const expression& e,
+                           const variable_map& var_map);
 
 
   }
