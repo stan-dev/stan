@@ -70,29 +70,39 @@ namespace stan {
                      log_prob(_params_r, _params_i),
                      accept_prob);
      }
+
       double log_prob(std::vector<double>& q, std::vector<int>& r) {
         return _model.stan::model::prob_grad_ad::log_prob(q, r, _error_msg);
         //        return _model.log_prob_poly<false>(q,r);
       }
-      void init_stepsize() {
 
-        this->seed(this->cont_params(), this->disc_params());
+      void init_stepsize() {
+        std::vector<double> params_r0(_params_r);
+        std::vector<int> params_i0(_params_i);
 
         double log_p0 = log_prob(_params_r, _params_i);
-        transition(sample(_params_r, _params_i, log_p0, this->_accept_stat));
-        
-        double log_p = log_prob(_params_r, _params_i);
+
+        sample smp = sample(_params_r, _params_i, log_p0, _rand_uniform());
+        sample smp2 = transition(smp);        
+
+        std::vector<double> smp2_params_r(smp2.cont_params());
+        std::vector<int> smp2_params_i(smp2.disc_params());
+
+        double log_p = log_prob(smp2_params_r, smp2_params_i);
         double delta_log_p = log_p0 - log_p;
 
         int direction = delta_log_p > log(0.5) ? 1 : -1;
         
-        while (1) {
-                    
-          this->seed(this->cont_params(), this->disc_params());
+        while (1) {                  
+          this->seed(params_r0, params_i0);
+          std::cout<<_nom_epsilon<<std::endl;
+          sample smp = sample(_params_r, _params_i, log_p0, _rand_uniform());
+          sample smp2 = transition(smp);        
 
-          transition(sample(_params_r, _params_i, log_p0, this->_accept_stat));
-        
-          double log_p = _model.log_prob(_params_r, _params_i);
+          std::vector<double> smp2_params_r(smp2.cont_params());
+          std::vector<int> smp2_params_i(smp2.disc_params());
+
+          double log_p = log_prob(smp2_params_r, smp2_params_i);
           double delta_log_p = log_p0 - log_p;
                 
           if ((direction == 1) && !(delta_log_p > log(0.5)))
@@ -108,7 +118,6 @@ namespace stan {
             throw std::runtime_error("Posterior is improper. Please check your model.");
           if (this->_nom_epsilon == 0)
             throw std::runtime_error("No acceptably small step size could be found. Perhaps the posterior is not continuous?");
-          
         }        
       }      
       

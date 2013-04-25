@@ -17,7 +17,7 @@ namespace stan {
         : base_metro<M, BaseRNG>(m, rng, error_msg)
       { this->_name = "Metropolis with a unit metric"; }
 
-      void _propose(std::vector<double>& q,
+      void propose(std::vector<double>& q,
                     BaseRNG& rng) {
         for (size_t i = 0; i < q.size(); ++i) 
           q[i] = stan::prob::normal_rng(0,this->_nom_epsilon,this->_rand_int);
