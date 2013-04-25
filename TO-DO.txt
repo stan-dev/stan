@@ -1,6 +1,19 @@
 STAN TO-DO LIST
 ======================================================================
 
+FOR NEXT RELEASE (1.3.1, 1.4.0)
+-------------------------------------------
+- (Daniel) fix order of include issues for model header, etc.
+  in new refactor (see Jiqiang's e-mail 4/19/13, 9:20 PM to stan-dev,
+  and rest of that thread)
+
+- Get in more contributed code, such as R regression syntax
+  compiler and DIC and ...
+
+
+
+
+
 The to-do list is organized into the following sections:
 
 * next release to-do and change list
@@ -31,7 +44,6 @@ Efficiency/Scalability of Code and Sampling
 + (Marcus, Bob, Daniel) vectorization of multivariate prob functions
 + (Michael) replace std::vector with Eigen constructs in models
 * special function vectorization
-* (Ben, Marcus) matrix solver caching
 * multi-threading
 * (Peter, Bob) ensemble samplers: DREAM, differential evolution, 
   stretch/walk
@@ -96,10 +108,23 @@ C++ API
 ======================================================================
 [items go here first, then to RStan/cmd]
 
+* vector slicing with block()
+
+* to_vector(matrix):vector  function in row-major order
+
+* Add model methods:
+  x  string model_name()
+  x  void constrained_param_names(vector<string>& v)
+  ?  void constrained_values(vector<double>& v, const vector<double>& r, const vector<int>& i)
+  -  void unconstrained_param_names(vector<string>& v)
+
+
 * add "multi_logit_log(int|vec,vec)" with derivs so that
      y ~ multi_logit(beta,x);
   behaves as:
      y ~ categorical(softmax(dot_product(beta,x)));
+  c.f. MCMCmln in MCMCpack for speed comparison using their
+       data set
 
 * expose all the groovy special functions Michael/Daniel added for CDFs
 
