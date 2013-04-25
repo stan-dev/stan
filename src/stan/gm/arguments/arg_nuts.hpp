@@ -4,7 +4,6 @@
 #include <stan/gm/arguments/categorical_argument.hpp>
 
 #include <stan/gm/arguments/arg_max_depth.hpp>
-#include <stan/gm/arguments/arg_stepsize.hpp>
 
 namespace stan {
   
@@ -20,7 +19,6 @@ namespace stan {
         _description = "The No-U-Turn Sampler";
         
         _subarguments.push_back(new arg_max_depth());
-        _subarguments.push_back(new arg_stepsize());
         
       }
       

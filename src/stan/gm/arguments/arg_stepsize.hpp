@@ -16,6 +16,8 @@ namespace stan {
         _description = "Step size for discrete evolution";
         _validity = "0 < stepsize";
         _default = "1";
+        _default_value = 1.0;
+        _value = _default_value;
       };
       
       bool is_valid(double value) { return value > 0; }

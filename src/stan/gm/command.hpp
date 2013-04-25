@@ -14,7 +14,8 @@
 #include <stan/io/dump.hpp>
 
 #include <stan/gm/arguments/argument_parser.hpp>
-#include <stan/gm/arguments/arg_hmc.hpp>
+#include <stan/gm/arguments/arg_method.hpp>
+#include <stan/gm/arguments/arg_output.hpp>
 
 #include <stan/mcmc/hmc/static/adapt_unit_e_static_hmc.hpp>
 #include <stan/mcmc/hmc/static/adapt_diag_e_static_hmc.hpp>
@@ -323,9 +324,13 @@ namespace stan {
     int nuts_command(int argc, const char* argv[]) {
 
       std::vector<argument*> valid_arguments;
-      valid_arguments.push_back(new arg_hmc());
+      valid_arguments.push_back(new arg_output());
+      valid_arguments.push_back(new arg_method());
       
       argument_parser parser(valid_arguments);
+      
+      parser.print(&std::cout);
+      std::cout << std::endl;
       
       parser.print_help(&std::cout);
       std::cout << std::endl;
@@ -335,8 +340,8 @@ namespace stan {
       
       //real_argument* arg = dynamic_cast<real_argument*>(
       //                     parser.arg("hmc")->arg("engine")->arg("nuts")->arg("stepsize"));
-      std::cout << arg->print_value() << std::endl;
-      std::cout << std::endl;
+      //std::cout << arg->print_value() << std::endl;
+      //std::cout << std::endl;
       
       parser.print(&std::cout);
       

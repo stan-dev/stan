@@ -12,6 +12,8 @@ namespace stan {
       
     public:
       
+      singleton_argument(): _validity("All") {};
+      
       bool parse_args(std::vector<std::string>& args, std::ostream* err) {
         
         if(args.size() == 0) return true;

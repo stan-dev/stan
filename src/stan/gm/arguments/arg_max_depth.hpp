@@ -16,6 +16,8 @@ namespace stan {
         _description = "Maximum tree depth";
         _validity = "0 < max_depth";
         _default = "10";
+        _default_value = 10;
+        _value = _default_value;
       };
       
       bool is_valid(int value) { return value > 0; }

@@ -1,5 +1,5 @@
-#ifndef __STAN__GM__ARGUMENTS__INT_TIME__HPP__
-#define __STAN__GM__ARGUMENTS__INT_TIME__HPP__
+#ifndef __STAN__GM__ARGUMENTS__INT__TIME__HPP__
+#define __STAN__GM__ARGUMENTS__INT__TIME__HPP__
 
 #include <stan/gm/arguments/singleton_argument.hpp>
 
@@ -16,6 +16,8 @@ namespace stan {
         _description = "Total integration time for Hamiltonian evolution";
         _validity = "0 < int_time";
         _default = "2 * pi";
+        _default_value = 6.28318530717959;
+        _value = _default_value;
       };
       
       bool is_valid(double value) { return value > 0; }
