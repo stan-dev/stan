@@ -20,7 +20,9 @@
 #include <stan/mcmc/hmc/nuts/adapt_diag_e_nuts.hpp>
 #include <stan/mcmc/hmc/nuts/adapt_dense_e_nuts.hpp>
 
+#include <stan/mcmc/metro/adapt_unit_metro.hpp>
 #include <stan/mcmc/metro/adapt_diag_metro.hpp>
+#include <stan/mcmc/metro/adapt_dense_metro.hpp>
 
 #include <stan/optimization/newton.hpp>
 #include <stan/optimization/nesterov_gradient.hpp>
@@ -851,7 +853,7 @@ if (unit_metro) {
 
         stan::mcmc::sample s(cont_params, disc_params, 0, 0);
 
-        typedef stan::mcmc::adapt_diag_metro<Model, rng_t> metro;
+        typedef stan::mcmc::adapt_dense_metro<Model, rng_t> metro;
         metro sampler(model, base_rng, &std::cout);
 
         if (!append_samples) {

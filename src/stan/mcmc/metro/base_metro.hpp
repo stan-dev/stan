@@ -34,7 +34,7 @@ namespace stan {
  
       ~base_metro() {};
 
-      virtual void _propose(std::vector<double>& q, BaseRNG& rng) = 0;
+      virtual void propose(std::vector<double>& q, BaseRNG& rng) = 0;
 
       void seed(const std::vector<double>& q, const std::vector<int>& r) {
         _params_r = q;
@@ -52,7 +52,7 @@ namespace stan {
 
        double logp0 = log_prob(_params_r, _params_i);
 
-       this->_propose(_params_r, _rand_int);
+       this->propose(_params_r, _rand_int);
 
        double accept_prob = exp(log_prob(_params_r, _params_i) 
                                 - logp0);
@@ -73,22 +73,18 @@ namespace stan {
 
       double log_prob(std::vector<double>& q, std::vector<int>& r) {
         return _model.stan::model::prob_grad_ad::log_prob(q, r, _error_msg);
-        //        return _model.log_prob_poly<false>(q,r);
       }
 
       void init_stepsize() {
         std::vector<double> params_r0(_params_r);
         std::vector<int> params_i0(_params_i);
 
+        this->propose(_params_r, _rand_int);
         double log_p0 = log_prob(_params_r, _params_i);
 
-        sample smp = sample(_params_r, _params_i, log_p0, _rand_uniform());
-        sample smp2 = transition(smp);        
+        this->propose(_params_r, _rand_int);        
 
-        std::vector<double> smp2_params_r(smp2.cont_params());
-        std::vector<int> smp2_params_i(smp2.disc_params());
-
-        double log_p = log_prob(smp2_params_r, smp2_params_i);
+        double log_p = log_prob(_params_r, _params_i);
         double delta_log_p = log_p0 - log_p;
 
         int direction = delta_log_p > log(0.5) ? 1 : -1;
@@ -96,13 +92,12 @@ namespace stan {
         while (1) {                  
           this->seed(params_r0, params_i0);
           std::cout<<_nom_epsilon<<std::endl;
-          sample smp = sample(_params_r, _params_i, log_p0, _rand_uniform());
-          sample smp2 = transition(smp);        
+          this->propose(_params_r, _rand_int);
+          double log_p0 = log_prob(_params_r, _params_i);
 
-          std::vector<double> smp2_params_r(smp2.cont_params());
-          std::vector<int> smp2_params_i(smp2.disc_params());
+          this->propose(_params_r, _rand_int);        
 
-          double log_p = log_prob(smp2_params_r, smp2_params_i);
+          double log_p = log_prob(_params_r, _params_i);
           double delta_log_p = log_p0 - log_p;
                 
           if ((direction == 1) && !(delta_log_p > log(0.5)))
