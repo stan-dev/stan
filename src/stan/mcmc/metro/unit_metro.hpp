@@ -22,6 +22,10 @@ namespace stan {
         for (size_t i = 0; i < q.size(); ++i) 
           q[i] = stan::prob::normal_rng(0,this->_nom_epsilon,this->_rand_int);
       }
+
+      void write_metric(std::ostream& o) {
+        o << "# No free parameters for unit metric" << std::endl;
+      };
                         
     };
 

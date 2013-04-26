@@ -36,6 +36,8 @@ namespace stan {
 
       virtual void propose(std::vector<double>& q, BaseRNG& rng) = 0;
 
+      virtual void write_metric(std::ostream& o) = 0;
+
       void seed(const std::vector<double>& q, const std::vector<int>& r) {
         _params_r = q;
         _params_i = r;
@@ -91,7 +93,7 @@ namespace stan {
         
         while (1) {                  
           this->seed(params_r0, params_i0);
-          std::cout<<_nom_epsilon<<std::endl;
+
           this->propose(_params_r, _rand_int);
           double log_p0 = log_prob(_params_r, _params_i);
 
