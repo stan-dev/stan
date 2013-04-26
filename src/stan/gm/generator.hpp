@@ -2508,7 +2508,7 @@ namespace stan {
           combo_dims.push_back(matrix_dims[i]);
 
         generate_indent(1 + combo_dims.size(),o_);
-        o_ << "std::stringstream param_name_stream__;" << EOL;
+        o_ << "param_name_stream__.str(std::string());" << EOL;
 
 
        for (size_t i = 0; i < combo_dims.size(); ++i) {
@@ -2542,7 +2542,9 @@ namespace stan {
     void generate_constrained_param_names_method(const program& prog,
                                                  std::ostream& o) {
       o << EOL 
-        << INDENT << "void constrained_param_names(std::vector<std::string>& param_names__) {" << EOL;
+        << INDENT << "void constrained_param_names(std::vector<std::string>& param_names__) {" 
+        << EOL
+        << INDENT2 << "std::stringstream param_name_stream__;" << EOL;
 
       constrained_param_names_visgen vis(o);
       // parameters
