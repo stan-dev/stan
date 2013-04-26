@@ -14,6 +14,9 @@
 #include <stan/io/dump.hpp>
 
 #include <stan/gm/arguments/argument_parser.hpp>
+#include <stan/gm/arguments/arg_id.hpp>
+#include <stan/gm/arguments/arg_data.hpp>
+#include <stan/gm/arguments/arg_random.hpp>
 #include <stan/gm/arguments/arg_method.hpp>
 #include <stan/gm/arguments/arg_output.hpp>
 
@@ -31,157 +34,6 @@
 namespace stan {
 
   namespace gm {
-
-    void print_help(std::string cmd) {
-      
-      using stan::io::print_help_option;
-      
-      std::cout << std::endl;
-      std::cout << "Compiled Stan Graphical Model Command" << std::endl;
-      std::cout << std::endl;
-      
-      std::cout << "USAGE:  " << cmd << " [options]" << std::endl;
-      std::cout << std::endl;
-      
-      std::cout << "OPTIONS:" << std::endl;
-      std::cout << std::endl;
-      
-      print_help_option(&std::cout,
-                        "help", "",
-                        "Display this information");
-      
-      print_help_option(&std::cout,
-                        "data", "file",
-                        "Read data from specified dump-format file",
-                        "required if model declares data");
-      
-      print_help_option(&std::cout,
-                        "init", "file",
-                        "Use initial values from specified file or zero values if <file>=0",
-                        "default is random initialization");
-      
-      print_help_option(&std::cout,
-                        "samples", "file",
-                        "File into which samples are written",
-                        "default = samples.csv");
-      
-      print_help_option(&std::cout,
-                        "append_samples", "",
-                        "Append samples to existing file if it exists",
-                        "does not write header in append mode");
-      
-      print_help_option(&std::cout,
-                        "seed", "int",
-                        "Random number generation seed",
-                        "default = randomly generated from time");
-      
-      print_help_option(&std::cout,
-                        "chain_id", "int",
-                        "Markov chain identifier",
-                        "default = 1");
-      
-      print_help_option(&std::cout,
-                        "iter", "+int",
-                        "Total number of iterations, including warmup",
-                        "default = 2000");
-      
-      print_help_option(&std::cout,
-                        "warmup", "+int",
-                        "Discard the specified number of initial samples",
-                        "default = iter / 2");
-      
-      print_help_option(&std::cout,
-                        "thin", "+int",
-                        "Period between saved samples after warm up",
-                        "default = max(1, floor(iter - warmup) / 1000)");
-      
-      print_help_option(&std::cout,
-                        "refresh", "int",
-                        "Period between samples updating progress report print (0 for no printing)",
-                        "default = max(1,iter/200))");
-      
-      print_help_option(&std::cout,
-                        "leapfrog_steps", "int",
-                        "Number of leapfrog steps; -1 for no-U-turn adaptation",
-                        "default = -1");
-      
-      print_help_option(&std::cout,
-                        "max_treedepth", "int",
-                        "Limit NUTS leapfrog steps to 2^max_tree_depth; -1 for no limit",
-                        "default = 10");
-      
-      print_help_option(&std::cout,
-                        "epsilon", "float",
-                        "Initial value for step size, or -1 to set automatically",
-                        "default = -1");
-      
-      print_help_option(&std::cout,
-                        "epsilon_pm", "[0,1]",
-                        "Sample epsilon +/- epsilon * epsilon_pm",
-                        "default = 0.0");
-      
-      print_help_option(&std::cout,
-                        "equal_step_sizes", "",
-                        "Use same step size for every parameter with NUTS",
-                        "default is to estimate varying step sizes during warmup");
-      
-      print_help_option(&std::cout,
-                        "delta", "[0,1]",
-                        "Accuracy target for step-size adaptation (higher means smaller step sizes)",
-                        "default = 0.5");
-      
-      print_help_option(&std::cout,
-                        "gamma", "+float",
-                        "Gamma parameter for dual averaging step-size adaptation",
-                        "default = 0.05");
-      
-      print_help_option(&std::cout,
-                        "save_warmup", "",
-                        "Save the warmup samples");
-      
-      print_help_option(&std::cout,
-                        "test_grad", "",
-                        "Test gradient calculations using finite differences");
-      
-      print_help_option(&std::cout,
-                        "point_estimate","",
-                        "Fit point estimate of hidden parameters by maximizing log joint probability using Nesterov's accelerated gradient method");
-      
-      print_help_option(&std::cout,
-                        "point_estimate_newton","",
-                        "Fit point estimate of hidden parameters by maximizing log joint probability using Newton's method");
-
-      print_help_option(&std::cout,
-                        "point_estimate_bfgs","",
-                        "Fit point estimate of hidden parameters by maximizing log joint probability using the BFGS method with line search");
-      
-      print_help_option(&std::cout,
-                        "nondiag_mass", "",
-                        "Use a nondiagonal matrix to do the sampling");
-      
-      print_help_option(&std::cout,
-                        "cov_matrix", "file",
-                        "Preset an estimated covariance matrix");
-      
-      std::cout << std::endl;
-    }
-    
-    void write_comment(std::ostream& o) {
-      o << "#" << std::endl;
-    }
-    
-    template <typename M>
-    void write_comment(std::ostream& o,
-                       const M& msg) {
-      o << "# " << msg << std::endl;
-    }
-    
-    template <typename K, typename V>
-    void write_comment_property(std::ostream& o,
-                                const K& key,
-                                const V& val) {
-      o << "# " << key << "=" << val << std::endl;
-    }
     
     void write_error_msg(std::ostream* error_stream,
                          const std::domain_error& e) {
@@ -202,7 +54,6 @@ namespace stan {
                     << std::endl;
       
     }
-    
     
     bool do_print(int n, int refresh) {
       return (refresh > 0) &&
@@ -324,24 +175,88 @@ namespace stan {
     int nuts_command(int argc, const char* argv[]) {
 
       std::vector<argument*> valid_arguments;
+      valid_arguments.push_back(new arg_id());
+      valid_arguments.push_back(new arg_data());
+      valid_arguments.push_back(new arg_random());
       valid_arguments.push_back(new arg_output());
       valid_arguments.push_back(new arg_method());
       
       argument_parser parser(valid_arguments);
       
-      parser.print(&std::cout);
-      std::cout << std::endl;
-      
-      parser.print_help(&std::cout);
-      std::cout << std::endl;
-      
       parser.parse_args(argc, argv, &std::cout);
-      std::cout << std::endl;
+
+      // Identification
+      unsigned int id = dynamic_cast<int_argument*>(parser.arg("id"))->value();
       
-      //real_argument* arg = dynamic_cast<real_argument*>(
-      //                     parser.arg("hmc")->arg("engine")->arg("nuts")->arg("stepsize"));
-      //std::cout << arg->print_value() << std::endl;
-      //std::cout << std::endl;
+      //////////////////////////////////////////////////
+      //            Random number generator           //
+      //////////////////////////////////////////////////
+      
+      unsigned int random_seed = dynamic_cast<int_argument*>(
+                                 parser.arg("random")->arg("seed"))->value();
+      if (random_seed < 0) {
+        random_seed = (boost::posix_time::microsec_clock::universal_time() -
+                       boost::posix_time::ptime(boost::posix_time::min_date_time))
+                      .total_milliseconds();
+      }
+      
+      typedef boost::ecuyer1988 rng_t; // (2**50 = 1T samples, 1000 chains)
+      rng_t base_rng(random_seed);
+      
+      // Advance generator to avoid process conflicts
+      static boost::uintmax_t DISCARD_STRIDE = static_cast<boost::uintmax_t>(1) << 50;
+      base_rng.discard(DISCARD_STRIDE * (id - 1));
+      
+      //////////////////////////////////////////////////
+      //                  Input/Output                //
+      //////////////////////////////////////////////////
+      
+      // Data input
+      std::string data_file = dynamic_cast<string_argument*>(parser.arg("data"))->value();
+      
+      std::fstream data_stream(data_file.c_str(),
+                               std::fstream::in);
+      stan::io::dump data_var_context(data_stream);
+      data_stream.close();
+      
+      // Sample output
+      std::string sample_file = dynamic_cast<string_argument*>(
+                                parser.arg("output")->arg("sample"))->value();
+
+      
+      bool append_samples = dynamic_cast<bool_argument*>(
+                            parser.arg("output")->arg("append_sample"))->value();
+      
+      std::ios_base::openmode samples_append_mode
+        = append_samples
+          ? (std::fstream::out | std::fstream::app)
+          : std::fstream::out;
+      
+      std::fstream* sample_stream = 0;
+      if(sample_file != "") {
+        std::fstream sample(sample_file.c_str(),
+                            samples_append_mode);
+        sample_stream = &sample;
+      }
+      
+      // Diagnostic output
+      std::string diagnostic_file = dynamic_cast<string_argument*>(
+                                    parser.arg("output")->arg("diagnostic"))->value();
+      
+      bool append_diagnostic = dynamic_cast<bool_argument*>(
+                               parser.arg("output")->arg("append_diagnostic"))->value();
+      
+      std::ios_base::openmode diagnostic_append_mode
+        = append_diagnostic
+          ? (std::fstream::out | std::fstream::app)
+          : std::fstream::out;
+      
+      std::fstream* diagnostic_stream = 0;
+      if(diagnostic_file != "") {
+        std::fstream diagnostic(diagnostic_file.c_str(),
+                                diagnostic_append_mode);
+        diagnostic_stream = &diagnostic;
+      }
       
       parser.print(&std::cout);
       

@@ -1,0 +1,30 @@
+#ifndef __STAN__GM__ARGUMENTS__SEED__HPP__
+#define __STAN__GM__ARGUMENTS__SEED__HPP__
+
+#include <stan/gm/arguments/singleton_argument.hpp>
+
+namespace stan {
+  
+  namespace gm {
+    
+    class arg_seed: public int_argument {
+      
+    public:
+      
+      arg_seed(): int_argument() {
+        _name = "seed";
+        _description = "Random number generator seed";
+        _validity = "seed > 0, if negative seed is generated from time";
+        _default = "-1";
+        _default_value = -1;
+        _value = _default_value;
+      };
+      
+    };
+    
+  } // gm
+  
+} // stan
+
+#endif
+
