@@ -16,10 +16,7 @@ namespace stan {
       
       adapt_diag_metro(M &m, BaseRNG& rng, std::ostream* error_msg)
         : diag_metro<M, BaseRNG>(m, rng, error_msg),
-          stepsize_var_adapter(m.num_params_r()) {
-        this->_prop_cov_diag.resize(m.num_params_r());
-        this->_prop_cov_diag.setIdentity();
-      };
+          stepsize_var_adapter(m.num_params_r()) {};
       
       ~adapt_diag_metro() {};
       

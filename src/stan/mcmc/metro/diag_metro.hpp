@@ -16,7 +16,8 @@ namespace stan {
       diag_metro(M& m, 
                  BaseRNG& rng, 
                  std::ostream* error_msg)
-        : base_metro<M, BaseRNG>(m, rng, error_msg) { 
+        : base_metro<M, BaseRNG>(m, rng, error_msg),
+          _prop_cov_diag(Eigen::VectorXd::Ones(m.num_params_r())) { 
         this->_name = "Metropolis with a diagonal Euclidean metric"; 
         this->_nom_epsilon = 1;
       }
@@ -27,6 +28,14 @@ namespace stan {
           q[i] = stan::prob::normal_rng(0,this->_nom_epsilon * _prop_cov_diag(i),
                                         this->_rand_int);
       }
+
+      void write_metric(std::ostream& o) {
+        o << "# Diagonal elements of inverse covariance matrix:" << std::endl;
+        o << "# " << _prop_cov_diag(0) << std::flush;
+        for(size_t i = 1; i < _prop_cov_diag.size(); ++i)
+          o << ", " << _prop_cov_diag(i) << std::flush;
+        o << std::endl;
+      };
              
     protected:
 
