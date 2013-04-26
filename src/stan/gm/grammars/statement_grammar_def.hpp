@@ -1,6 +1,10 @@
 #ifndef __STAN__GM__PARSER__STATEMENT_GRAMMAR_DEF__HPP__
 #define __STAN__GM__PARSER__STATEMENT_GRAMMAR_DEF__HPP__
 
+// Suppress Clang error: multiple unsequenced
+// modifications to _pass and/or _val.
+#pragma GCC diagnostic ignored "-Wunsequenced"
+
 #include <cstddef>
 #include <iomanip>
 #include <iostream>
