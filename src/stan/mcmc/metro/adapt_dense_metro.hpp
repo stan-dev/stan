@@ -17,10 +17,7 @@ namespace stan {
       adapt_dense_metro(M &m, BaseRNG& rng, std::ostream* error_msg)
         : dense_metro<M, BaseRNG>(m, rng, error_msg),
           stepsize_covar_adapter(m.num_params_r())
-      {
-        this->_prop_cov.resize(m.num_params_r(), m.num_params_r());
-        this->_prop_cov.setIdentity();
-      };
+      {};
       
       ~adapt_dense_metro() {};
       
