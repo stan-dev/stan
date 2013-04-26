@@ -1386,7 +1386,15 @@ The softmax of \farg{x}}
 The right division of \farg{b} by \farg{A}; equivalently
 \code{\farg{b} * inverse(\farg{A})}}
 %
+\fitem{matrix}{operator/}{matrix \farg{b}, matrix \farg{A}}{
+The right division of \farg{b} by \farg{A}; equivalently
+\code{\farg{b} * inverse(\farg{A})}}
+%
 \fitem{vector}{operator\textbackslash}{matrix \farg{A}, vector \farg{b}}
+The left division of \farg{b} by \farg{A}; equivalently
+\code{inverse(\farg{A}) * \farg{b}}
+%
+\fitem{matrix}{operator\textbackslash}{matrix \farg{A}, matrix \farg{b}}
 The left division of \farg{b} by \farg{A}; equivalently
 \code{inverse(\farg{A}) * \farg{b}}
 %
