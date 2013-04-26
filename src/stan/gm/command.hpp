@@ -165,7 +165,15 @@ namespace stan {
       
       print_help_option(&std::cout,
                         "unit_metro", "",
-                        "Use unit metropolis-hastings sampling algorithm");
+                        "Use adaptive unit metropolis-hastings sampling algorithm");
+
+      print_help_option(&std::cout,
+                        "diag_metro", "",
+                        "Use adaptive diagonal metropolis-hastings sampling algorithm");
+
+      print_help_option(&std::cout,
+                        "dense_metro", "",
+                        "Use adaptive dense metropolis-hastings sampling algorithm");
       
       std::cout << std::endl;
     }
@@ -535,6 +543,8 @@ namespace stan {
       }
       
       bool unit_metro = command.has_flag("unit_metro");
+      bool diag_metro = command.has_flag("diag_metro");
+      bool dense_metro = command.has_flag("dense_metro");
 
       if (command.has_flag("test_grad")) {
         std::cout << std::endl << "TEST GRADIENT MODE" << std::endl;
@@ -848,8 +858,58 @@ namespace stan {
       double warmDeltaT;
       double sampleDeltaT;
     
-if (unit_metro) {
-       std::cout<<"run metropolis"<< std::endl;
+      if (unit_metro) {
+        std::cout<<"run metropolis"<< std::endl;
+
+        stan::mcmc::sample s(cont_params, disc_params, 0, 0);
+
+        typedef stan::mcmc::adapt_unit_metro<Model, rng_t> metro;
+        metro sampler(model, base_rng, &std::cout);
+
+        if (!append_samples) {
+          sample_stream << "lp__,"; // log probability first
+          sampler.write_sampler_param_names(sample_stream);
+          model.write_csv_header(sample_stream);
+        }
+
+        sample<metro, Model, rng_t>(sampler, num_iterations, num_thin, 
+                                        refresh, true, 
+                                        sample_stream, diagnostic_stream, 
+                                        s, model, base_rng);
+
+        sample_stream.close();
+
+        return 0;
+        
+      }
+
+      if (diag_metro) {
+        std::cout<<"run metropolis"<< std::endl;
+
+        stan::mcmc::sample s(cont_params, disc_params, 0, 0);
+
+        typedef stan::mcmc::adapt_diag_metro<Model, rng_t> metro;
+        metro sampler(model, base_rng, &std::cout);
+
+        if (!append_samples) {
+          sample_stream << "lp__,"; // log probability first
+          sampler.write_sampler_param_names(sample_stream);
+          model.write_csv_header(sample_stream);
+        }
+
+        sample<metro, Model, rng_t>(sampler, num_iterations, num_thin, 
+                                        refresh, true, 
+                                        sample_stream, diagnostic_stream, 
+                                        s, model, base_rng);
+
+        sample_stream.close();
+
+        return 0;
+        
+      }
+
+      if (dense_metro) {
+        std::cout<<"run metropolis"<< std::endl;
 
         stan::mcmc::sample s(cont_params, disc_params, 0, 0);
 
