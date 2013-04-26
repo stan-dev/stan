@@ -116,6 +116,8 @@ for (size_t i = 0; i < vector_types.size(); ++i)
           vector_types[i], vector_types[j]); // args
 add_unary("chi_square_rng");
 add("block",MATRIX_T,MATRIX_T,INT_T,INT_T,INT_T,INT_T);
+add("sub_column",VECTOR_T,MATRIX_T,INT_T,INT_T,INT_T);
+add("sub_row",ROW_VECTOR_T,MATRIX_T,INT_T,INT_T,INT_T);
 add("col",VECTOR_T,MATRIX_T,INT_T);
 add("cols",INT_T,VECTOR_T);
 add("cols",INT_T,ROW_VECTOR_T);
