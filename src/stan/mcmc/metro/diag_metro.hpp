@@ -15,10 +15,8 @@ namespace stan {
       
       diag_metro(M& m, 
                  BaseRNG& rng, 
-                 Eigen::VectorXd& propCovDiag, 
                  std::ostream* error_msg)
-        : base_metro<M, BaseRNG>(m, rng, error_msg),
-          _propCovDiag(propCovDiag) { 
+        : base_metro<M, BaseRNG>(m, rng, error_msg) { 
         this->_name = "Metropolis with a diagonal Euclidean metric"; 
         this->_nom_epsilon = 1;
       }
@@ -26,13 +24,13 @@ namespace stan {
       void propose(std::vector<double>& q,
                     BaseRNG& rng) {
         for (size_t i = 0; i < q.size(); ++i) 
-          q[i] = stan::prob::normal_rng(0,this->_nom_epsilon * _propCovDiag(i),
+          q[i] = stan::prob::normal_rng(0,this->_nom_epsilon * _prop_cov_diag(i),
                                         this->_rand_int);
       }
              
     protected:
 
-      Eigen::VectorXd _propCovDiag;           
+      Eigen::VectorXd _prop_cov_diag;           
     };
 
   } // mcmc

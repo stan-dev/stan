@@ -15,10 +15,8 @@ namespace stan {
       
       dense_metro(M& m, 
                   BaseRNG& rng, 
-                  Eigen::MatrixXd& propCov, 
                   std::ostream* error_msg)
-        : base_metro<M, BaseRNG>(m, rng, error_msg),
-          _propCov(propCov) { 
+        : base_metro<M, BaseRNG>(m, rng, error_msg) { 
         this->_name = "Metropolis with a dense Euclidean metric"; 
         this->_nom_epsilon = 1;
       }
@@ -30,7 +28,7 @@ namespace stan {
 
         Eigen::VectorXd prop(q.size());
         prop = this->_nom_epsilon 
-          * stan::prob::multi_normal_rng(zer, _propCov, this->_rand_int);
+          * stan::prob::multi_normal_rng(zer, _prop_cov, this->_rand_int);
 
         for(size_t i = 0; i < q.size(); i++)
           q[i] = prop(i);
@@ -38,7 +36,7 @@ namespace stan {
                         
     protected:
 
-      Eigen::MatrixXd _propCov;
+      Eigen::MatrixXd _prop_cov;
     };
 
   } // mcmc

@@ -15,10 +15,10 @@ namespace stan {
     public:
       
       adapt_diag_metro(M &m, BaseRNG& rng, std::ostream* error_msg)
-        : diag_metro<M, BaseRNG>(m, rng, this->_propCovDiag, error_msg),
+        : diag_metro<M, BaseRNG>(m, rng, error_msg),
           stepsize_var_adapter(m.num_params_r()) {
-        this->_propCovDiag.resize(m.num_params_r());
-        this->_propCovDiag.setIdentity();
+        this->_prop_cov_diag.resize(m.num_params_r());
+        this->_prop_cov_diag.setIdentity();
       };
       
       ~adapt_diag_metro() {};
@@ -30,7 +30,7 @@ namespace stan {
           
           this->_stepsize_adaptation.learn_stepsize(this->_nom_epsilon, 
                                                     s.accept_stat());
-          bool update = this->_var_adaptation.learn_variance(this->_propCovDiag, 
+          bool update = this->_var_adaptation.learn_variance(this->_prop_cov_diag, 
                                                              this->_params_r);
           
           if(update) {
