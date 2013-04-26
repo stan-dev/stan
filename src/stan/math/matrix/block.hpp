@@ -40,7 +40,7 @@ namespace stan {
     template <typename T>
     inline
     Eigen::Matrix<T,Eigen::Dynamic,1>
-    sub_column(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& m,
+    sub_col(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& m,
           size_t i, size_t j, size_t nrows) {
       validate_row_index(m,i,"sub_column");
       validate_row_index(m,i+nrows-1,"sub_column");
