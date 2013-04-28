@@ -106,7 +106,7 @@ namespace stan {
         while (1) {
           itNum++;
           
-          if (std::abs(alo-ahi) < min_range)
+          if (std::fabs(alo-ahi) < min_range)
             return 1;
           
           if (itNum%5 == 0) {
@@ -126,7 +126,7 @@ namespace stan {
           newX = x + alpha*p;
           while (func(newX,newF,newDF)) {
             alpha = 0.5*(alpha+std::min(alo,ahi));
-            if (std::abs(alo-alpha) < min_range)
+            if (std::fabs(alo-alpha) < min_range)
               return 1;
             newX = x + alpha*p;
           }
@@ -137,7 +137,7 @@ namespace stan {
             ahiDFp = newDFp;
           }
           else {
-            if (std::abs(newDFp) <= -c2dfp)
+            if (std::fabs(newDFp) <= -c2dfp)
               break;
             if (newDFp*(ahi-alo) >= 0) {
               ahi = alo;
@@ -193,7 +193,7 @@ namespace stan {
                                  1e-16);
             break;
           }
-          if (std::abs(newDFp) <= -c2dfp) {
+          if (std::fabs(newDFp) <= -c2dfp) {
             alpha = alpha1;
             break;
           }
