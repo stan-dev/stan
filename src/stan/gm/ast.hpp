@@ -662,6 +662,24 @@ namespace stan {
     bool has_rng_suffix(const std::string& s);
 
 
+    struct contains_var : public boost::static_visitor<bool> {
+      const variable_map& var_map_;
+      contains_var(const variable_map& var_map);
+      bool operator()(const nil& e) const;
+      bool operator()(const int_literal& e) const;
+      bool operator()(const double_literal& e) const;
+      bool operator()(const array_literal& e) const;
+      bool operator()(const variable& e) const;
+      bool operator()(const fun& e) const;
+      bool operator()(const index_op& e) const;
+      bool operator()(const binary_op& e) const;
+      bool operator()(const unary_op& e) const;
+    };
+
+    bool has_var(const expression& e,
+                 const variable_map& var_map);
+
+
     struct contains_nonparam_var : public boost::static_visitor<bool> {
       const variable_map& var_map_;
       contains_nonparam_var(const variable_map& var_map);
