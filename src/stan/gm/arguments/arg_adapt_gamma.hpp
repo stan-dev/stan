@@ -13,7 +13,7 @@ namespace stan {
       
       arg_adapt_gamma(): real_argument() {
         _name = "gamma";
-        _description = "Adaptation relaxation scale";
+        _description = "Adaptation regularization scale";
         _validity = "0 < gamma";
         _default = "0.05";
         _default_value = 0.05;

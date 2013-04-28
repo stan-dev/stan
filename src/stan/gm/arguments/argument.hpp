@@ -16,6 +16,7 @@ namespace stan {
       virtual ~argument() {};
 
       std::string name() { return _name; }
+      std::string description() { return _description; }
 
       virtual void print(std::ostream* s, int depth) = 0;
       virtual void print_help(std::ostream* s, int depth) = 0;

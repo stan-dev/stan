@@ -5,6 +5,7 @@
 
 #include <stan/gm/arguments/arg_iter.hpp>
 #include <stan/gm/arguments/arg_warmup.hpp>
+#include <stan/gm/arguments/arg_save_warmup.hpp>
 #include <stan/gm/arguments/arg_thin.hpp>
 #include <stan/gm/arguments/arg_adapt.hpp>
 #include <stan/gm/arguments/arg_sample_algo.hpp>
@@ -24,6 +25,7 @@ namespace stan {
         
         _subarguments.push_back(new arg_iter());
         _subarguments.push_back(new arg_warmup());
+        _subarguments.push_back(new arg_save_warmup());
         _subarguments.push_back(new arg_thin());
         _subarguments.push_back(new arg_adapt());
         _subarguments.push_back(new arg_sample_algo());

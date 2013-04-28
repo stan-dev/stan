@@ -13,7 +13,7 @@ namespace stan {
       
       arg_iter(): int_argument() {
         _name = "iter";
-        _description = "Total number of sampling iterations";
+        _description = "Total number of iterations";
         _validity = "0 < iter";
         _default = "2000";
         _default_value = 2000;

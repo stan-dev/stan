@@ -8,6 +8,7 @@
 #include <stan/gm/arguments/arg_diagnostic_file.hpp>
 #include <stan/gm/arguments/arg_append_diagnostic.hpp>
 #include <stan/gm/arguments/arg_refresh.hpp>
+#include <stan/gm/arguments/arg_save_warmup.hpp>
 
 namespace stan {
   
@@ -27,6 +28,7 @@ namespace stan {
         _subarguments.push_back(new arg_diagnostic_file());
         _subarguments.push_back(new arg_append_diagnostic());
         _subarguments.push_back(new arg_refresh());
+        _subarguments.push_back(new arg_save_warmup());
         
       }
       

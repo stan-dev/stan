@@ -3,9 +3,9 @@
 
 #include <stan/gm/arguments/categorical_argument.hpp>
 
-#include <stan/gm/arguments/arg_nesterov.hpp>
-#include <stan/gm/arguments/arg_bfgs.hpp>
-#include <stan/gm/arguments/arg_newton.hpp>
+#include <stan/gm/arguments/arg_optimize_algo.hpp>
+#include <stan/gm/arguments/arg_iter.hpp>
+#include <stan/gm/arguments/arg_save_iterations.hpp>
 
 namespace stan {
   
@@ -20,9 +20,9 @@ namespace stan {
         _name = "optimize";
         _description = "Point estimation";
         
-        _subarguments.push_back(new arg_nesterov());
-        _subarguments.push_back(new arg_bfgs());
-        _subarguments.push_back(new arg_newton());
+        _subarguments.push_back(new arg_optimize_algo());
+        _subarguments.push_back(new arg_iter());
+        _subarguments.push_back(new arg_save_iterations());
         
       }
       

@@ -3,8 +3,11 @@
 
 #include <stan/gm/arguments/categorical_argument.hpp>
 
+#include <stan/gm/arguments/arg_adapt_engaged.hpp>
 #include <stan/gm/arguments/arg_adapt_gamma.hpp>
 #include <stan/gm/arguments/arg_adapt_delta.hpp>
+#include <stan/gm/arguments/arg_adapt_kappa.hpp>
+#include <stan/gm/arguments/arg_adapt_t0.hpp>
 
 namespace stan {
   
@@ -19,8 +22,11 @@ namespace stan {
         _name = "adapt";
         _description = "Warmup Adaptation";
         
+        _subarguments.push_back(new arg_adapt_engaged());
         _subarguments.push_back(new arg_adapt_gamma());
         _subarguments.push_back(new arg_adapt_delta());
+        _subarguments.push_back(new arg_adapt_kappa());
+        _subarguments.push_back(new arg_adapt_t0());
         
       }
       

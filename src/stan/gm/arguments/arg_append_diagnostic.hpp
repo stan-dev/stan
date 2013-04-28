@@ -14,8 +14,8 @@ namespace stan {
       arg_append_diagnostic(): bool_argument() {
         _name = "append_diagnostic";
         _description = "Append diagnostic output to existing file?";
-        _validity = "[true, false]";
-        _default = "false";
+        _validity = "[0, 1]";
+        _default = "0";
         _default_value = false;
         _value = _default_value;
       };
