@@ -502,6 +502,7 @@ namespace stan {
             init_log_prob = model.grad_log_prob(cont_params, disc_params, init_grad, &std::cout);
           } catch (std::domain_error e) {
             write_error_msg(&std::cout, e);
+            std::cout << "Rejecting proposed initial value with zero density." << std::endl;
             init_log_prob = -std::numeric_limits<double>::infinity();
           }
           
