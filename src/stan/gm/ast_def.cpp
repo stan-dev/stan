@@ -340,6 +340,54 @@ namespace stan {
     printable::printable(const printable& printable)
       : printable_(printable.printable_) { }
 
+    contains_var::contains_var(const variable_map& var_map) 
+      : var_map_(var_map) {
+    }
+    bool contains_var::operator()(const nil& e) const {
+      return false;
+    }
+    bool contains_var::operator()(const int_literal& e) const {
+      return false;
+    }
+    bool contains_var::operator()(const double_literal& e) const {
+      return false;
+    }
+    bool contains_var::operator()(const array_literal& e) const {
+      for (size_t i = 0; i < e.args_.size(); ++i)
+        if (boost::apply_visitor(*this,e.args_[i].expr_))
+          return true;
+      return false;
+    }
+    bool contains_var::operator()(const variable& e) const {
+      var_origin vo = var_map_.get_origin(e.name_);
+      return ( vo == parameter_origin
+               || vo == transformed_parameter_origin
+               || vo == local_origin );
+    }
+    bool contains_var::operator()(const fun& e) const {
+      for (size_t i = 0; i < e.args_.size(); ++i)
+        if (boost::apply_visitor(*this,e.args_[i].expr_))
+          return true;
+      return false;
+    }
+    bool contains_var::operator()(const index_op& e) const {
+      return boost::apply_visitor(*this,e.expr_.expr_);
+    }
+    bool contains_var::operator()(const binary_op& e) const {
+      return boost::apply_visitor(*this,e.left.expr_)
+        || boost::apply_visitor(*this,e.right.expr_);
+    }
+    bool contains_var::operator()(const unary_op& e) const {
+        return boost::apply_visitor(*this,e.subject.expr_);
+    }
+
+    bool has_var(const expression& e,
+                           const variable_map& var_map) {
+      contains_var vis(var_map);
+      return boost::apply_visitor(vis,e.expr_);
+    }
+
+
     contains_nonparam_var::contains_nonparam_var(const variable_map& var_map) 
       : var_map_(var_map) {
     }
@@ -360,9 +408,8 @@ namespace stan {
     }
     bool contains_nonparam_var::operator()(const variable& e) const {
       var_origin vo = var_map_.get_origin(e.name_);
-      return vo != parameter_origin 
-        || vo == transformed_parameter_origin
-        || vo == local_origin;
+      return ( vo == transformed_parameter_origin
+               || vo == local_origin );
     }
     bool contains_nonparam_var::operator()(const fun& e) const {
       for (size_t i = 0; i < e.args_.size(); ++i)
@@ -371,21 +418,13 @@ namespace stan {
       return false;
     }
     bool contains_nonparam_var::operator()(const index_op& e) const {
-      if (boost::apply_visitor(*this,e.expr_.expr_))
-        return true;
-
-      for (size_t i = 0; i < e.dimss_.size(); ++i)
-        for (size_t j = 0; j < e.dimss_[i].size(); ++j)
-          if (boost::apply_visitor(*this,e.dimss_[i][j].expr_))
-            return true;
-      return false;
+      return boost::apply_visitor(*this,e.expr_.expr_);
     }
     bool contains_nonparam_var::operator()(const binary_op& e) const {
-      return boost::apply_visitor(*this,e.left.expr_)
-        || apply_visitor(*this,e.right.expr_);
+      return has_var(e,var_map_);
     }
     bool contains_nonparam_var::operator()(const unary_op& e) const {
-      return boost::apply_visitor(*this,e.subject.expr_);
+      return has_var(e,var_map_);
     }
 
     bool has_non_param_var(const expression& e,
