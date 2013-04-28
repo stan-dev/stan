@@ -312,11 +312,11 @@ namespace stan {
             }
             
             if (_itNum > 1 && resetB != 2) {
-              _alpha0 = _alpha = std::min(1.0,
-                                          1.01*CubicInterp(_gk_1.dot(_sk_1),
-                                                           _alpha, _fk - _fk_1, _gk.dot(_sk_1),
-                                                           0.0, 1.0));
-//              _alpha0 = _alpha = std::min(1.0, 1.01*(2*(_fk - _fk_1)/_gk_1.dot(_sk_1)));
+//              _alpha0 = _alpha = std::min(1.0,
+//                                          1.01*CubicInterp(_gk_1.dot(_sk_1),
+//                                                           _alpha, _fk - _fk_1, _gk.dot(_sk_1),
+//                                                           0.0, 1.0));
+              _alpha0 = _alpha = std::min(1.0, 1.01*(2*(_fk - _fk_1)/_gk_1.dot(_sk_1)));
             }
             else {
               _alpha0 = _alpha = _opts.alpha0;
