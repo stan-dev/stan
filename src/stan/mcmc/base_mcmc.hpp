@@ -14,7 +14,7 @@ namespace stan {
       
     public:
       
-      virtual ~base_mcmc();
+      virtual ~base_mcmc() {};
       
       virtual sample transition(sample& init_sample) = 0;
       
