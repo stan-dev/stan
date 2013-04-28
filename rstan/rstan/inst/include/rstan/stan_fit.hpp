@@ -449,7 +449,7 @@ namespace rstan {
       int leapfrog_steps = args.get_leapfrog_steps(); 
       unsigned int random_seed = args.get_random_seed();
       double epsilon = args.get_epsilon(); 
-      bool epsilon_adapt = (epsilon <= 0.0); 
+      // bool epsilon_adapt = (epsilon <= 0.0); 
       bool equal_step_sizes = args.get_equal_step_sizes();
       int max_treedepth = args.get_max_treedepth(); 
       double epsilon_pm = args.get_epsilon_pm(); 
@@ -692,7 +692,7 @@ namespace rstan {
         args.set_sampler("NUTS(nondiag)");
         stan::mcmc::sample s(cont_params, disc_params, 0, 0);
         typedef stan::mcmc::adapt_dense_e_nuts<Model, RNG> a_Dm_nuts;
-        a_Dm_nuts sampler(model, base_rng);
+        a_Dm_nuts sampler(model, base_rng, num_warmup);
         sampler.get_sampler_param_names(sampler_param_names);
         for (size_t i = 0; i < sampler_param_names.size(); i++) 
           sampler_params.push_back(Rcpp::NumericVector(iter_save));
@@ -745,7 +745,7 @@ namespace rstan {
         args.set_sampler("NUTS2"); 
         stan::mcmc::sample s(cont_params, disc_params, 0, 0);
         typedef stan::mcmc::adapt_diag_e_nuts<Model, RNG> a_dm_nuts;
-        a_dm_nuts sampler(model, base_rng);
+        a_dm_nuts sampler(model, base_rng, num_warmup);
         sampler.get_sampler_param_names(sampler_param_names);
         for (size_t i = 0; i < sampler_param_names.size(); i++) 
           sampler_params.push_back(Rcpp::NumericVector(iter_save));

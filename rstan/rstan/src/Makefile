@@ -10,7 +10,7 @@ OBJECTS += $(patsubst %.cpp,%.o,$(wildcard gm__*.cpp))
 LIBSTANOBJECTS = agrad__rev__var_stack.o agrad__matrix.o math__matrix.o
 
 # EIGEN_PATH := $(shell $(R_HOME)/bin/Rscript -e "cat(system.file('include', package = 'RcppEigen'))")
-EIGEN_PATH = ../inst/include/stanlib/eigen_3.1.2
+EIGEN_PATH = ../inst/include/stanlib/eigen_3.1.3
 
 PKG_LIBS = $(shell  $(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()") 
 PKG_CPPFLAGS += -I"../inst/include/stansrc"  
@@ -47,5 +47,5 @@ include $(R_SHARE_DIR)/make/shlib.mk
 clean: 
 	rm -f $(OBJECTS) $(SHLIB) $(USERLIB) $(LIBSTANOBJECTS) 
 
-# P.S. While Makefile is used, only one platform binary is installed 
-# for example on Mac and Windows. 
+# P.S. While Makefile is used, only the binary of one platform (32bits or
+# 64bits) is installed, for example on Mac and Windows. 
