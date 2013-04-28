@@ -504,6 +504,7 @@ namespace stan {
 
       size_t grad_evals() { return _adaptor.fevals(); }
       double logp() { return -curr_f(); }
+      double grad_norm() { return curr_g().norm(); }
       void grad(std::vector<double>& g) { 
         const BFGSMinimizer<ModelAdaptor>::VectorT &cg(curr_g());
         g.resize(cg.size());

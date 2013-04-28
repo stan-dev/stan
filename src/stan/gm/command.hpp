@@ -730,6 +730,9 @@ namespace stan {
         
         double lastlp = lp - 1;
         std::cout << "initial log joint probability = " << lp << std::endl;
+        std::cout << "   Iteration " << " # grad evals "
+                  << "     log prob " << " ||grad logp|| "
+                  << "        alpha " << std::endl;
         int m = 0;
         int ret = 0;
         for (size_t i = 0; i < num_iterations && ret == 0; i++) {
@@ -738,12 +741,11 @@ namespace stan {
           lp = ng.logp();
           ng.params_r(cont_params);
           if (do_print(i, refresh)) {
-            std::cout << "Iteration ";
-            std::cout << std::setw(3) << (m + 1) << ". ";
-            std::cout << "Log joint probability = " << std::setw(10) << lp;
-            std::cout << ". Improved by " << (lp - lastlp) << ". ";
-            std::cout << "Step size " << ng.step_size() << " (initial " << ng.init_step_size() << ").";
-            std::cout << " # grad evals = " << ng.grad_evals();
+            std::cout << " " << std::setw(11) << (m + 1) << " ";
+            std::cout << " " << std::setw(12) << ng.grad_evals() << " ";
+            std::cout << " " << std::setw(12) << lp << " ";
+            std::cout << " " << std::setw(13) << ng.grad_norm() << " ";
+            std::cout << " " << std::setw(12) << ng.step_size() << " ";
             std::cout << std::endl;
             std::cout.flush();
           }
