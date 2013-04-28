@@ -844,7 +844,7 @@ namespace stan {
         stan::mcmc::sample s(cont_params, disc_params, 0, 0);
         
         typedef stan::mcmc::adapt_dense_e_nuts<Model, rng_t> a_Dm_nuts;
-        a_Dm_nuts sampler(model, base_rng);
+        a_Dm_nuts sampler(model, base_rng, num_warmup);
         
         if (!append_samples) {
           sample_stream << "lp__,";
@@ -900,7 +900,7 @@ namespace stan {
         stan::mcmc::sample s(cont_params, disc_params, 0, 0);
         
         typedef stan::mcmc::adapt_diag_e_nuts<Model, rng_t> a_dm_nuts;
-        a_dm_nuts sampler(model, base_rng);
+        a_dm_nuts sampler(model, base_rng, num_warmup);
                 
         if (!append_samples) {
           sample_stream << "lp__,";
@@ -1021,12 +1021,11 @@ namespace stan {
         
         // Warm-Up
         if (epsilon <= 0) sampler.init_stepsize();
-        else             sampler.set_nominal_stepsize(epsilon);
+        else              sampler.set_nominal_stepsize(epsilon);
         
         sampler.set_stepsize_jitter(epsilon_pm);
         
         sampler.set_nominal_stepsize_and_L(epsilon, leapfrog_steps);
-        //sampler.set_stepsize_and_T(epsilon, 3.14159);
         
         sampler.get_stepsize_adaptation().set_delta(delta);
         sampler.get_stepsize_adaptation().set_gamma(gamma);

@@ -15,7 +15,8 @@ namespace stan {
       
     public:
       
-      covar_adaptation(int n): _estimator(n) { restart(); }
+      covar_adaptation(int n, int max_adapt): _adapt_max_adapt(max_adapt), _estimator(n)
+      { restart(); }
       
       void restart() {
         _adapt_covar_counter = 0;
@@ -32,6 +33,12 @@ namespace stan {
         if (_adapt_covar_counter == _adapt_covar_next) {
           
           _adapt_covar_next *= 2;
+          
+          // If the following window would straddle the total
+          // number of adaptive iterations then stetch the
+          // current window to meet the total number of iterations
+          if (_adapt_max_adapt && 2 * _adapt_covar_next > _adapt_max_adapt)
+            _adapt_covar_next = _adapt_max_adapt;
           
           _estimator.sample_covariance(covar);
           
@@ -53,6 +60,7 @@ namespace stan {
       
       double _adapt_covar_counter;
       double _adapt_covar_next;
+      int _adapt_max_adapt;
       
       prob::welford_covar_estimator _estimator;
       
