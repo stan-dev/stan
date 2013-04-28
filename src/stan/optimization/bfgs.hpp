@@ -234,6 +234,7 @@ namespace stan {
         Scalar _fk, _fk_1, _alpha, _alpha0;
         Eigen::LDLT< HessianT > _ldlt;
         size_t _itNum;
+        std::string _note;
         
       public:
         const Scalar &curr_f() const { return _fk; }
@@ -246,6 +247,8 @@ namespace stan {
 
         const Scalar &init_step_size() const { return _alpha0; }
         const Scalar &step_size() const { return _alpha; }
+        
+        const std::string &note() const { return _note; }
         
         struct BFGSOptions {
           BFGSOptions() {
@@ -282,6 +285,7 @@ namespace stan {
           }
           
           _itNum = 0;
+          _note = "";
         }
         
         int step() {
@@ -291,7 +295,8 @@ namespace stan {
           int resetB(0);
           
           _itNum++;
-          
+          _note = "";
+
           if (_itNum == 1 || !(_ldlt.info() == Eigen::Success && _ldlt.isPositive() && (_ldlt.vectorD().array() > 0).all()))
             resetB = 1;
           else
@@ -303,7 +308,7 @@ namespace stan {
                 _sk = -_gk;
               }
               else {
-                std::cerr << "BFGS Hessian reset" << std::endl;
+                _note += "Hessian reset; ";
                 _sk = -_gk/_ldlt.vectorD().maxCoeff();
               }
             }
@@ -389,7 +394,7 @@ namespace stan {
             // Damped update (Procedure 18.2)
             thetak = 0.8*skBksk/(skBksk - skyk);
             rk = thetak*yk + (1.0 - thetak)*Bksk;
-            std::cerr << "BFGS Damped Hessian update" << std::endl;
+            _note += "Damped Hessian update";
           }
           _ldlt.rankUpdate(rk,1.0/sk.dot(rk));
           _ldlt.rankUpdate(Bksk,-1.0/skBksk);
@@ -430,16 +435,17 @@ namespace stan {
         try {
           f = -_model.log_prob(_x, _params_i, _output_stream);
         } catch (const std::exception& e) {
-          std::cerr << "Error evaluating model log probability:" << std::endl
-                    << e.what() << std::endl;
+          if (_output_stream)
+            (*_output_stream) << e.what() << std::endl;
           return 1;
         }
 
         if (boost::math::isfinite(f))
           return 0;
         else {
-          std::cerr << "Error evaluating model log probability:" << std::endl
-                    << "Non-finite function evaluation." << std::endl;
+          if (_output_stream)
+            *_output_stream << "Error evaluating model log probability: " 
+                               "Non-finite function evaluation." << std::endl;
           return 2;
         }
       }
@@ -453,16 +459,17 @@ namespace stan {
         try {
           f = -_model.grad_log_prob(_x, _params_i, _g, _output_stream);
         } catch (const std::exception& e) {
-          std::cerr << "Error evaluating model log probability:" << std::endl
-                    << e.what() << std::endl;
+          if (_output_stream)
+            (*_output_stream) << e.what() << std::endl;
           return 1;
         }
 
         g.resize(_g.size());
         for (size_t i = 0; i < _g.size(); i++) {
           if (!boost::math::isfinite(_g[i])) {
-            std::cerr << "Error evaluating model log probability:" << std::endl
-                      << "Non-finite gradient." << std::endl;
+            if (_output_stream)
+              *_output_stream << "Error evaluating model log probability: " 
+                                 "Non-finite gradient." << std::endl;
             return 3;
           }
           g[i] = -_g[i];
@@ -471,8 +478,9 @@ namespace stan {
         if (boost::math::isfinite(f))
           return 0;
         else {
-          std::cerr << "Error evaluating model log probability:" << std::endl
-                    << "Non-finite function evaluation." << std::endl;
+          if (_output_stream)
+            *_output_stream << "Error evaluating model log probability: " 
+                               "Non-finite function evaluation." << std::endl;
           return 2;
         }
       }
