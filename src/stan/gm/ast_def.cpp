@@ -360,9 +360,8 @@ namespace stan {
     }
     bool contains_nonparam_var::operator()(const variable& e) const {
       var_origin vo = var_map_.get_origin(e.name_);
-      return vo != parameter_origin 
-        || vo == transformed_parameter_origin
-        || vo == local_origin;
+      return ( vo == transformed_parameter_origin
+               || vo == local_origin );
     }
     bool contains_nonparam_var::operator()(const fun& e) const {
       for (size_t i = 0; i < e.args_.size(); ++i)
@@ -371,14 +370,7 @@ namespace stan {
       return false;
     }
     bool contains_nonparam_var::operator()(const index_op& e) const {
-      if (boost::apply_visitor(*this,e.expr_.expr_))
-        return true;
-
-      for (size_t i = 0; i < e.dimss_.size(); ++i)
-        for (size_t j = 0; j < e.dimss_[i].size(); ++j)
-          if (boost::apply_visitor(*this,e.dimss_[i][j].expr_))
-            return true;
-      return false;
+      return boost::apply_visitor(*this,e.expr_.expr_);
     }
     bool contains_nonparam_var::operator()(const binary_op& e) const {
       return boost::apply_visitor(*this,e.left.expr_)
