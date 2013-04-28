@@ -12,7 +12,7 @@ TEST(McmcCovarAdaptation, learn_covariance) {
   Eigen::MatrixXd target_covar(Eigen::MatrixXd::Identity(n, n));
   target_covar *= 5.0 / (n_learn + 5.0);
   
-  stan::mcmc::covar_adaptation adapter(n, n);
+  stan::mcmc::covar_adaptation adapter(n, 0);
   
   for (int i = 0; i < n_learn; ++i)
     adapter.learn_covariance(covar, q);
