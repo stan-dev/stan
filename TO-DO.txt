@@ -1,8 +1,24 @@
 STAN TO-DO LIST
 ======================================================================
 
-FOR NEXT RELEASE (1.3.1, 1.4.0)
+FOR NEXT RELEASE (1.3.0++)
 -------------------------------------------
+
+- int vs. size_t and error handling in indexing;  with size_t,
+  get cast of negative int to large positive size_t, which will
+  confuse users in error msgs
+
+- Figure out how to return error messages safely
+  - e.g., math/matrix/validate_std_vector_index.hpp
+
+      std::stringstream ss;
+      ss << "require 0 < index <= vector size" << msg;
+      ss << "; found vector size=" << m.cols()
+         << "; index j=" << j;
+      throw std::domain_error(ss.str());
+
+      cf., http://stackoverflow.com/questions/10644910/does-stdruntime-error-copy-the-string-passed-in-the-constructor
+
 - (Daniel) fix order of include issues for model header, etc.
   in new refactor (see Jiqiang's e-mail 4/19/13, 9:20 PM to stan-dev,
   and rest of that thread)
@@ -18,8 +34,8 @@ FOR NEXT RELEASE (1.3.1, 1.4.0)
 - fix remaining template functions in stan/math to ensure
   they match int better than var matches int
 
-
-
+- remove warning message on transform OR declare a set of
+  function names to ignore
 
 The to-do list is organized into the following sections:
 
@@ -114,6 +130,9 @@ Doc
 C++ API
 ======================================================================
 [items go here first, then to RStan/cmd]
+
+* plain old expression print (as input, not as generated in C++)
+  -- clearer error messages for users
 
 * to_vector(matrix):vector  function in row-major order
 
