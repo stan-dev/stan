@@ -5,6 +5,7 @@
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <cstdlib>
 #include <cmath>
+#include <string>
 
 namespace stan {
   namespace optimization {
@@ -159,7 +160,7 @@ namespace stan {
                           const XType &p,
                           const XType &x0, const Scalar &f0, const XType &gradx0,
                           const Scalar &c1, const Scalar &c2,
-                          const Scalar &minAlpha, const Scalar &maxAlpha)
+                          const Scalar &minAlpha)
       {
         const Scalar dfp(gradx0.dot(p));
         const Scalar c1dfp(c1*dfp);
@@ -179,7 +180,8 @@ namespace stan {
           x1.noalias() = x0 + alpha1*p;
           ret = func(x1,f1,gradx1);
           if (ret!=0) {
-            alpha1 = 0.5*(alpha0+alpha1);
+//            alpha1 = 0.5*(alpha0+alpha1);
+            alpha1 = std::exp(0.5*(std::log(alpha0) + std::log(alpha1)));
             continue;
           }
           newDFp = gradx1.dot(p);
@@ -213,7 +215,8 @@ namespace stan {
           std::swap(prevDF,gradx1);
           prevDFp = newDFp;
           
-          alpha1 = std::min(2.0*alpha0,maxAlpha);
+//          alpha1 = std::min(2.0*alpha0,maxAlpha);
+          alpha1 *= 10.0;
           
           nits++;
         }
@@ -240,10 +243,12 @@ namespace stan {
         const Scalar &curr_f() const { return _fk; }
         const VectorT &curr_x() const { return _xk; }
         const VectorT &curr_g() const { return _gk; }
+        const VectorT &curr_s() const { return _sk; }
         
         const Scalar &prev_f() const { return _fk_1; }
         const VectorT &prev_x() const { return _xk_1; }
         const VectorT &prev_g() const { return _gk_1; }
+        const VectorT &prev_s() const { return _sk_1; }
 
         const Scalar &init_step_size() const { return _alpha0; }
         const Scalar &step_size() const { return _alpha; }
@@ -259,7 +264,6 @@ namespace stan {
             minStep = 1e-16;
             minGradNorm = 1e-6;
             minAlpha = 1e-12;
-            maxAlpha = 5.0;
             alpha0 = 1e-3;
           }
           size_t maxIts;
@@ -270,7 +274,6 @@ namespace stan {
           Scalar minGradNorm;
           Scalar alpha0;
           Scalar minAlpha;
-          Scalar maxAlpha;
         } _opts;
         
         
@@ -295,12 +298,19 @@ namespace stan {
           int resetB(0);
           
           _itNum++;
-          _note = "";
 
-          if (_itNum == 1 || !(_ldlt.info() == Eigen::Success && _ldlt.isPositive() && (_ldlt.vectorD().array() > 0).all()))
+          if (_itNum == 1) {
             resetB = 1;
-          else
+            _note = "";
+          }
+          else if (!(_ldlt.info() == Eigen::Success && _ldlt.isPositive() && (_ldlt.vectorD().array() > 0).all())) {
+            resetB = 1;
+            _note = "LDLT failed Hessian reset; ";
+          }
+          else {
             resetB = 0;
+            _note = "";
+          }
           
           while (true) {
             if (resetB) {
@@ -308,7 +318,6 @@ namespace stan {
                 _sk = -_gk;
               }
               else {
-                _note += "Hessian reset; ";
                 _sk = -_gk/_ldlt.vectorD().maxCoeff();
               }
             }
@@ -336,7 +345,7 @@ namespace stan {
               retCode = WolfeLineSearch(_func, _alpha, _xk_1, _fk_1, _gk_1,
                                         _sk, _xk, _fk, _gk,
                                         _opts.c1, _opts.c2, 
-                                        _opts.minAlpha, _opts.maxAlpha);
+                                        _opts.minAlpha);
             }
             if (retCode) {
               if (resetB) {
@@ -347,6 +356,7 @@ namespace stan {
               else {
                 // Line-search failed, try ditching the Hessian approximation
                 resetB = 2;
+                _note += "LS failed Hessian reset; ";
                 continue;
               }
             }

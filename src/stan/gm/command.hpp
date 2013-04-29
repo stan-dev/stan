@@ -730,9 +730,6 @@ namespace stan {
         
         double lastlp = lp - 1;
         std::cout << "initial log joint probability = " << lp << std::endl;
-        std::cout << "    Iteration " << " # grad evals "
-                  << "     log prob " << " ||grad logp|| "
-                  << "    alpha " << "   alpha0 " << " Notes " << std::endl;
         int m = 0;
         int ret = 0;
         for (size_t i = 0; i < num_iterations && ret == 0; i++) {
@@ -740,13 +737,22 @@ namespace stan {
           lastlp = lp;
           lp = ng.logp();
           ng.params_r(cont_params);
+          if (do_print(i, 100*refresh)) {
+            std::cout << "    Iter ";
+            std::cout << "     log prob ";
+            std::cout << "     ||grad|| ";
+            std::cout << "      alpha ";
+            std::cout << "     alpha0 ";
+            std::cout << " # evals ";
+            std::cout << " Notes " << std::endl;
+          }
           if (do_print(i, refresh)) {
-            std::cout << " " << std::setw(12) << (m + 1) << " ";
-            std::cout << " " << std::setw(12) << ng.grad_evals() << " ";
-            std::cout << " " << std::setw(12) << lp << " ";
-            std::cout << " " << std::setw(13) << ng.curr_g().norm() << " ";
-            std::cout << " " << std::setw(8) << ng.step_size() << " ";
-            std::cout << " " << std::setw(8) << ng.init_step_size() << " ";
+            std::cout << " " << std::setw(7) << (m + 1) << " ";
+            std::cout << " " << std::setw(12) << std::setprecision(6) << lp << " ";
+            std::cout << " " << std::setw(12) << std::setprecision(6) << ng.curr_g().norm() << " ";
+            std::cout << " " << std::setw(10) << std::setprecision(4) << ng.step_size() << " ";
+            std::cout << " " << std::setw(10) << std::setprecision(4) << ng.init_step_size() << " ";
+            std::cout << " " << std::setw(7) << ng.grad_evals() << " ";
             std::cout << " " << ng.note() << " ";
             std::cout << std::endl;
             std::cout.flush();
