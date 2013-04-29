@@ -1336,6 +1336,8 @@ of matrix \farg{x}}
 
 \subsection{Block Operations}
 
+\subsubsection{Matrix Slicing Operations}
+
 Block operations may be used to extract a sub-block of a matrix.
 
 \begin{description}
@@ -1344,10 +1346,10 @@ Block operations may be used to extract a sub-block of a matrix.
   starts at row \farg{i} and column \farg{j} and extends \farg{n\_rows}
   rows and \farg{n\_cols} columns.}
 \end{description}
-
+%
 The sub-row and sub-column operations may be used to extract a
-sub-block of a vector or row vector.
-
+slice of row or column from a matrix
+%
 \begin{description}
 %
 \fitem{vector}{sub\_col}{matrix \farg{x}, int \farg{i}, int \farg{j}, 
@@ -1362,6 +1364,8 @@ sub-block of a vector or row vector.
 %
 \end{description}
 
+\subsubsection{Vector and Array Slicing Operations}
+
 The head operation extracts the first $n$ elements of a vector and
 the tail operation the last.  The segment operation extracts an
 arbitrary subvector.
@@ -1375,12 +1379,22 @@ arbitrary subvector.
     the row vector consisting of the first \farg{n} elements of
     \farg{rv}.}
 %
+  \fitem{T[]}{head}{T[] \farg{sv}, int \farg{n}}{Return
+    the standard vector consisting of the first \farg{n} elements of
+    \farg{sv}; applies to up to three-dimensional arrays containing
+    any type of elements \code{T}.}
+%
   \fitem{vector}{tail}{vector \farg{v}, int \farg{n}}{Return the
     vector consisting of the last \farg{n} elements of \farg{v}.}
 %
   \fitem{row\_vector}{tail}{row\_vector \farg{rv}, int \farg{n}}{Return
     the row vector consisting of the last \farg{n} elements of
     \farg{rv}.}
+%
+  \fitem{T[]}{tail}{T[] \farg{sv}, int \farg{n}}{Return
+    the standard vector consisting of the last \farg{n} elements of
+    \farg{sv}; applies to up to three-dimensional arrays containing
+    any type of elements \code{T}.}
 %
   \fitem{vector}{segment}{vector \farg{v}, int \farg{i}, int
     \farg{n}}{Return the vector consisting of the \farg{n} elements of \farg{v}
@@ -1391,6 +1405,13 @@ arbitrary subvector.
     \farg{n}}{Return the row vector consisting of the \farg{n}
     elements of \farg{rv} starting at \farg{i}; i.e., elements
     \farg{i} through through \farg{i} + \farg{n} - 1.}
+%
+  \fitem{T[]}{segment}{T[] \farg{sv}, int \farg{i}, int
+    \farg{n}}{Return the standard vector consisting of the \farg{n}
+    elements of \farg{sv} starting at \farg{i}; i.e., elements
+    \farg{i} through through \farg{i} + \farg{n} - 1. Applies to up to
+    three-dimensional arrays containing any type of elements
+    \code{T}.}
 %
 \end{description}
 
