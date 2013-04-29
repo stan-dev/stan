@@ -180,8 +180,7 @@ namespace stan {
           x1.noalias() = x0 + alpha1*p;
           ret = func(x1,f1,gradx1);
           if (ret!=0) {
-//            alpha1 = 0.5*(alpha0+alpha1);
-            alpha1 = std::exp(0.5*(std::log(alpha0) + std::log(alpha1)));
+            alpha1 = 0.5*(alpha0+alpha1);
             continue;
           }
           newDFp = gradx1.dot(p);
