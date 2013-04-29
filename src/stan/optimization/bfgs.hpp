@@ -120,7 +120,8 @@ namespace stan {
             if (ahi < alo)
               d2 = -d2;
             alpha = ahi - (ahi - alo)*(ahiDFp + d2 - d1)/(ahiDFp - aloDFp + 2*d2);
-            if (alpha < std::min(alo,ahi) || alpha > std::max(alo,ahi))
+            if (alpha < std::min(alo,ahi)+0.01*std::fabs(alo-ahi) ||
+                alpha > std::max(alo,ahi)-0.01*std::fabs(alo-ahi))
               alpha = 0.5*(alo+ahi);
           }
           
