@@ -410,7 +410,7 @@ namespace stan {
       int chain_id = 1;
       if (command.has_key("chain_id")) {
         bool well_formed = command.val("chain_id", chain_id);
-        if (!well_formed || chain_id < 0) {
+        if (!well_formed || chain_id <= 0) {
           std::string chain_id_val;
           command.val("chain_id", chain_id_val);
           std::cerr << "value for chain_id must be positive integer"
