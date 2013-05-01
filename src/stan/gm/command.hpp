@@ -737,7 +737,7 @@ namespace stan {
           lastlp = lp;
           lp = ng.logp();
           ng.params_r(cont_params);
-          if (do_print(i, 100*refresh)) {
+          if (do_print(i, 50*refresh)) {
             std::cout << "    Iter ";
             std::cout << "     log prob ";
             std::cout << "     ||grad|| ";
