@@ -19,14 +19,15 @@ namespace stan {
     
     public:
     
-      base_hmc(M &m, BaseRNG& rng): base_mcmc(),
-                                    _z(m.num_params_r(), m.num_params_i()),
-                                    _hamiltonian(m), 
-                                    _rand_int(rng),
-                                    _rand_uniform(_rand_int),
-                                    _nom_epsilon(0.1),
-                                    _epsilon(_nom_epsilon),
-                                    _epsilon_jitter(0.0)
+      base_hmc(M &m, BaseRNG& rng, std::ofstream* e):
+      base_mcmc(e),
+      _z(m.num_params_r(), m.num_params_i()),
+      _hamiltonian(m, this->_err_stream),
+      _rand_int(rng),
+      _rand_uniform(_rand_int),
+      _nom_epsilon(0.1),
+      _epsilon(_nom_epsilon),
+      _epsilon_jitter(0.0)
       {};
       
       void seed(const std::vector<double>& q, const std::vector<int>& r) {
