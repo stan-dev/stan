@@ -449,7 +449,7 @@ namespace rstan {
       int leapfrog_steps = args.get_leapfrog_steps(); 
       unsigned int random_seed = args.get_random_seed();
       double epsilon = args.get_epsilon(); 
-      bool epsilon_adapt = (epsilon <= 0.0); 
+      // bool epsilon_adapt = (epsilon <= 0.0); 
       bool equal_step_sizes = args.get_equal_step_sizes();
       int max_treedepth = args.get_max_treedepth(); 
       double epsilon_pm = args.get_epsilon_pm(); 
@@ -505,7 +505,13 @@ namespace rstan {
         for (; num_init_tries < MAX_INIT_TRIES; ++num_init_tries) {
           for (size_t i = 0; i < cont_params.size(); ++i)
             cont_params[i] = init_rng();
-          double init_log_prob = model.grad_log_prob(cont_params,disc_params,init_grad,&rstan::io::rcout);
+          double init_log_prob;
+          try {
+            init_log_prob = model.grad_log_prob(cont_params,disc_params,init_grad,&rstan::io::rcout);
+          } catch (const std::domain_error& e) {
+            write_error_msg(&rstan::io::rcout, e);
+            continue;
+          } 
           if (!boost::math::isfinite(init_log_prob))
             continue;
           for (size_t i = 0; i < init_grad.size(); ++i)
@@ -686,7 +692,7 @@ namespace rstan {
         args.set_sampler("NUTS(nondiag)");
         stan::mcmc::sample s(cont_params, disc_params, 0, 0);
         typedef stan::mcmc::adapt_dense_e_nuts<Model, RNG> a_Dm_nuts;
-        a_Dm_nuts sampler(model, base_rng);
+        a_Dm_nuts sampler(model, base_rng, num_warmup);
         sampler.get_sampler_param_names(sampler_param_names);
         for (size_t i = 0; i < sampler_param_names.size(); i++) 
           sampler_params.push_back(Rcpp::NumericVector(iter_save));
@@ -700,9 +706,9 @@ namespace rstan {
         else sampler.set_nominal_stepsize(epsilon);
         sampler.set_stepsize_jitter(epsilon_pm);
         sampler.set_max_depth(max_treedepth);
-        sampler.set_adapt_delta(delta);
-        sampler.set_adapt_gamma(gamma);
-        sampler.set_adapt_mu(log(10 * sampler.get_nominal_stepsize()));
+        sampler.get_stepsize_adaptation().set_delta(delta);
+        sampler.get_stepsize_adaptation().set_gamma(gamma);
+        sampler.get_stepsize_adaptation().set_mu(log(10 * sampler.get_nominal_stepsize()));
         sampler.engage_adaptation();
         clock_t start = clock();
         warmup_phase<a_Dm_nuts, Model, RNG>(sampler, num_warmup, num_thin, 
@@ -739,7 +745,7 @@ namespace rstan {
         args.set_sampler("NUTS2"); 
         stan::mcmc::sample s(cont_params, disc_params, 0, 0);
         typedef stan::mcmc::adapt_diag_e_nuts<Model, RNG> a_dm_nuts;
-        a_dm_nuts sampler(model, base_rng);
+        a_dm_nuts sampler(model, base_rng, num_warmup);
         sampler.get_sampler_param_names(sampler_param_names);
         for (size_t i = 0; i < sampler_param_names.size(); i++) 
           sampler_params.push_back(Rcpp::NumericVector(iter_save));
@@ -753,9 +759,9 @@ namespace rstan {
         else sampler.set_nominal_stepsize(epsilon);
         sampler.set_stepsize_jitter(epsilon_pm);
         sampler.set_max_depth(max_treedepth);
-        sampler.set_adapt_delta(delta);
-        sampler.set_adapt_gamma(gamma);
-        sampler.set_adapt_mu(log(10 * sampler.get_nominal_stepsize()));
+        sampler.get_stepsize_adaptation().set_delta(delta);
+        sampler.get_stepsize_adaptation().set_gamma(gamma);
+        sampler.get_stepsize_adaptation().set_mu(log(10 * sampler.get_nominal_stepsize()));
         sampler.engage_adaptation();
         clock_t start = clock();
         warmup_phase<a_dm_nuts, Model, RNG>(sampler, num_warmup, num_thin, 
@@ -808,9 +814,9 @@ namespace rstan {
         else sampler.set_nominal_stepsize(epsilon);
         sampler.set_stepsize_jitter(epsilon_pm);
         sampler.set_max_depth(max_treedepth);
-        sampler.set_adapt_delta(delta);
-        sampler.set_adapt_gamma(gamma);
-        sampler.set_adapt_mu(log(10 * sampler.get_nominal_stepsize()));
+        sampler.get_stepsize_adaptation().set_delta(delta);
+        sampler.get_stepsize_adaptation().set_gamma(gamma);
+        sampler.get_stepsize_adaptation().set_mu(log(10 * sampler.get_nominal_stepsize()));
         sampler.engage_adaptation();
         clock_t start = clock();
         warmup_phase<a_um_nuts, Model, RNG>(sampler, num_warmup, num_thin, 
@@ -860,9 +866,9 @@ namespace rstan {
         else sampler.set_nominal_stepsize(epsilon);
         sampler.set_stepsize_jitter(epsilon_pm);
         sampler.set_nominal_stepsize_and_L(epsilon, leapfrog_steps);
-        sampler.set_adapt_delta(delta);
-        sampler.set_adapt_gamma(gamma);
-        sampler.set_adapt_mu(log(10 * sampler.get_nominal_stepsize()));
+        sampler.get_stepsize_adaptation().set_delta(delta);
+        sampler.get_stepsize_adaptation().set_gamma(gamma);
+        sampler.get_stepsize_adaptation().set_mu(log(10 * sampler.get_nominal_stepsize()));
         sampler.engage_adaptation();
         clock_t start = clock();
         warmup_phase<a_um_hmc, Model, RNG>(sampler, num_warmup, num_thin, 
@@ -901,13 +907,16 @@ namespace rstan {
              ++it) 
           (*it) /= iter_save_wo_warmup;
       } 
-      rstan::io::rcout << std::endl
-                       << "Elapsed Time: " << warmDeltaT 
-                       << " seconds (Warm Up)"  << std::endl
-                       << "              " << sampleDeltaT 
-                       << " seconds (Sampling)"  << std::endl
-                       << "              " << warmDeltaT + sampleDeltaT 
-                       << " seconds (Total)"  << std::endl;
+      if (refresh > 0) { 
+        rstan::io::rcout << std::endl
+                         << "Elapsed Time: " << warmDeltaT 
+                         << " seconds (Warm Up)"  << std::endl
+                         << "              " << sampleDeltaT 
+                         << " seconds (Sampling)"  << std::endl
+                         << "              " << warmDeltaT + sampleDeltaT 
+                         << " seconds (Total)"  << std::endl
+                         << std::endl;
+      }
       
       if (sample_file_flag) {
         rstan::io::rcout << "Sample of chain " 
@@ -918,8 +927,6 @@ namespace rstan {
       }
       if (diagnostic_file_flag) 
         diagnostic_stream.close();
-      if (refresh > 0) 
-        rstan::io::rcout << std::endl; 
       
       holder = Rcpp::List(chains.begin(), chains.end());
       holder.attr("test_grad") = Rcpp::wrap(false); 

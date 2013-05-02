@@ -14,6 +14,8 @@ namespace stan {
       
     public:
       
+      virtual ~base_mcmc() {};
+      
       virtual sample transition(sample& init_sample) = 0;
       
       std::string name() { return _name; }

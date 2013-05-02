@@ -25,7 +25,7 @@ namespace stan {
        * Chainables are not destructible and should go on the function
        * call stack or be allocated with operator new.
        */
-      ~chainable() { 
+      virtual ~chainable() {
         // handled automatically
       }
 

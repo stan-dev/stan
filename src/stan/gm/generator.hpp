@@ -2437,6 +2437,132 @@ namespace stan {
       o << INDENT << "}" << EOL2;
     }
 
+   // see write_csv_visgen for similar structure
+    struct constrained_param_names_visgen : public visgen {
+      constrained_param_names_visgen(std::ostream& o)
+        : visgen(o) {
+      }
+      void operator()(const nil& /*x*/) const  { }
+      void operator()(const int_var_decl& x) const {
+        generate_param_names_array(EMPTY_EXP_VECTOR,x.name_,x.dims_);
+      }
+      void operator()(const double_var_decl& x) const {
+        generate_param_names_array(EMPTY_EXP_VECTOR,x.name_,x.dims_);
+      }
+      void operator()(const vector_var_decl& x) const {
+        std::vector<expression> matrix_args;
+        matrix_args.push_back(x.M_);
+        generate_param_names_array(matrix_args,x.name_,x.dims_);
+      }
+      void operator()(const row_vector_var_decl& x) const {
+        std::vector<expression> matrix_args;
+        matrix_args.push_back(x.N_);
+        generate_param_names_array(matrix_args,x.name_,x.dims_);
+      }
+      void operator()(const matrix_var_decl& x) const {
+        std::vector<expression> matrix_args;
+        matrix_args.push_back(x.M_);
+        matrix_args.push_back(x.N_);
+        generate_param_names_array(matrix_args,x.name_,x.dims_);
+      }
+      void operator()(const unit_vector_var_decl& x) const {
+        std::vector<expression> matrix_args;
+        matrix_args.push_back(x.K_);
+        generate_param_names_array(matrix_args,x.name_,x.dims_);
+      }
+      void operator()(const simplex_var_decl& x) const {
+        std::vector<expression> matrix_args;
+        matrix_args.push_back(x.K_);
+        generate_param_names_array(matrix_args,x.name_,x.dims_);
+      }
+      void operator()(const ordered_var_decl& x) const {
+        std::vector<expression> matrix_args;
+        matrix_args.push_back(x.K_);
+        generate_param_names_array(matrix_args,x.name_,x.dims_);
+      }
+      void operator()(const positive_ordered_var_decl& x) const {
+        std::vector<expression> matrix_args;
+        matrix_args.push_back(x.K_);
+        generate_param_names_array(matrix_args,x.name_,x.dims_);
+      }
+      void operator()(const cov_matrix_var_decl& x) const {
+        std::vector<expression> matrix_args;
+        matrix_args.push_back(x.K_);
+        matrix_args.push_back(x.K_);
+        generate_param_names_array(matrix_args,x.name_,x.dims_);
+      }
+      void operator()(const corr_matrix_var_decl& x) const {
+        std::vector<expression> matrix_args;
+        matrix_args.push_back(x.K_);
+        matrix_args.push_back(x.K_);
+        generate_param_names_array(matrix_args,x.name_,x.dims_);
+      }
+      void 
+      generate_param_names_array(const std::vector<expression>& matrix_dims, 
+                                 const std::string& name,
+                                 const std::vector<expression>& dims) const {
+
+        // begin for loop dims
+        std::vector<expression> combo_dims(dims);
+        for (size_t i = 0; i < matrix_dims.size(); ++i)
+          combo_dims.push_back(matrix_dims[i]);
+
+        generate_indent(1 + combo_dims.size(),o_);
+        o_ << "param_name_stream__.str(std::string());" << EOL;
+
+
+       for (size_t i = 0; i < combo_dims.size(); ++i) {
+          generate_indent(2 + i,o_);
+          o_ << "for (int k_" << i << "__ = 1;"
+             << " k_" << i << "__ <= ";
+          generate_expression(combo_dims[i].expr_,o_);
+          o_ << "; ++k_" << i << "__) {" << EOL; // begin (1)
+        }
+
+        generate_indent(2 + combo_dims.size(),o_);
+        o_ << "param_name_stream__ << \"" << name << '"';
+        for (size_t i = 0; i < combo_dims.size(); ++i)
+          o_ << " << '.' << k_" << i << "__";
+        o_ << ';' << EOL;
+
+        // end for loop dims
+        for (size_t i = 0; i < combo_dims.size(); ++i) {
+          generate_indent(1 + combo_dims.size() - i,o_);
+          o_ << "}" << EOL; // end (1)
+        }
+        
+        
+        o_ << INDENT2 << "param_names__.push_back(param_name_stream__.str());" 
+           << EOL;
+
+      }
+    };
+
+
+    void generate_constrained_param_names_method(const program& prog,
+                                                 std::ostream& o) {
+      o << EOL 
+        << INDENT << "void constrained_param_names(std::vector<std::string>& param_names__) {" 
+        << EOL
+        << INDENT2 << "std::stringstream param_name_stream__;" << EOL;
+
+      constrained_param_names_visgen vis(o);
+      // parameters
+      for (size_t i = 0; i < prog.parameter_decl_.size(); ++i) {
+        boost::apply_visitor(vis,prog.parameter_decl_[i].decl_);
+      }
+      // transformed parameters
+      for (size_t i = 0; i < prog.derived_decl_.first.size(); ++i) {
+        boost::apply_visitor(vis,prog.derived_decl_.first[i].decl_);
+      }
+      // generated quantities
+      for (size_t i = 0; i < prog.generated_decl_.first.size(); ++i) {
+        boost::apply_visitor(vis,prog.generated_decl_.first[i].decl_);
+      }
+
+      o << INDENT << "}" << EOL2;
+    }
+
     // see init_member_var_visgen for cut & paste
     struct write_csv_visgen : public visgen {
       write_csv_visgen(std::ostream& o)
@@ -3227,6 +3353,13 @@ namespace stan {
       out << "}" << EOL2;
     }
 
+    void generate_model_name_method(const std::string& model_name,
+                                    std::ostream& out) {
+      out << INDENT << "std::string model_name() {" << EOL
+          << INDENT2 << "return \"" << model_name << "\";" << EOL
+          << INDENT << "}" << EOL2;
+    }
+
     void generate_cpp(const program& prog, 
                       const std::string& model_name,
                       std::ostream& out,
@@ -3250,6 +3383,8 @@ namespace stan {
       generate_write_array_method(prog,model_name,out);
       generate_write_csv_header_method(prog,out);
       generate_write_csv_method(prog,model_name,out);
+      generate_model_name_method(model_name,out);
+      generate_constrained_param_names_method(prog,out);
       generate_end_class_decl(out);
       generate_end_namespace(out);
       if (include_main) 

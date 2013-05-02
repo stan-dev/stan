@@ -1076,19 +1076,19 @@ The dot product of \farg{x} and \farg{y}}
 \fitem{real}{dot\_product}{row\_vector \farg{x}, row\_vector \farg{y}}{
 The dot product of \farg{x} and \farg{y}}
 %
-\fitem{vector}{columns\_dot\_product}{vector \farg{x}, vector \farg{y}}{
+\fitem{row\_vector}{columns\_dot\_product}{vector \farg{x}, vector \farg{y}}{
 The dot product of the columns of \farg{x} and \farg{y}}
 %
 \fitem{row\_vector}{columns\_dot\_product}{row\_vector \farg{x}, row\_vector \farg{y}}{
 The dot product of the columns of \farg{x} and \farg{y}}
 %
-\fitem{vector}{columns\_dot\_product}{matrix \farg{x}, matrix \farg{y}}{
+\fitem{row\_vector}{columns\_dot\_product}{matrix \farg{x}, matrix \farg{y}}{
 The dot product of the columns of \farg{x} and \farg{y}}
 %
 \fitem{vector}{rows\_dot\_product}{vector \farg{x}, vector \farg{y}}{
 The dot product of the rows of \farg{x} and \farg{y}}
 %
-\fitem{row\_vector}{rows\_dot\_product}{row\_vector \farg{x}, row\_vector \farg{y}}{
+\fitem{vector}{rows\_dot\_product}{row\_vector \farg{x}, row\_vector \farg{y}}{
 The dot product of the rows of \farg{x} and \farg{y}}
 %
 \fitem{vector}{rows\_dot\_product}{matrix \farg{x}, matrix \farg{y}}{
@@ -1100,7 +1100,7 @@ The dot product of the vector \farg{x} with itself}
 \fitem{real}{dot\_self}{row\_vector \farg{x}}{
 The dot product of the row vector \farg{x} with itself}
 %
-\fitem{vector}{columns\_dot\_self}{vector \farg{x}}{
+\fitem{row\_vector}{columns\_dot\_self}{vector \farg{x}}{
 The dot product of the columns of \farg{x} with themselves}
 %
 \fitem{row\_vector}{columns\_dot\_self}{row\_vector \farg{x}}{
@@ -1112,7 +1112,7 @@ The dot product of the columns of \farg{x} with themselves}
 \fitem{vector}{rows\_dot\_self}{vector \farg{x}}{
 The dot product of the rows of \farg{x} with themselves}
 %
-\fitem{row\_vector}{rows\_dot\_self}{row\_vector \farg{x}}{
+\fitem{vector}{rows\_dot\_self}{row\_vector \farg{x}}{
 The dot product of the rows of \farg{x} with themselves}
 %
 \fitem{vector}{rows\_dot\_self}{matrix \farg{x}}{
@@ -1320,6 +1320,12 @@ of the matrix \farg{x}}
 \fitem{matrix}{diag\_matrix}{vector \farg{x}}{The diagonal
 matrix with diagonal \farg{x}}
 %
+\end{description}
+
+\subsection{Columns and Rows}
+%
+\begin{description}
+%
 \fitem{vector}{col}{matrix \farg{x}, int \farg{n}}{The \farg{n}-th column
 of matrix \farg{x}}
 %
@@ -1330,6 +1336,8 @@ of matrix \farg{x}}
 
 \subsection{Block Operations}
 
+\subsubsection{Matrix Slicing Operations}
+
 Block operations may be used to extract a sub-block of a matrix.
 
 \begin{description}
@@ -1338,7 +1346,74 @@ Block operations may be used to extract a sub-block of a matrix.
   starts at row \farg{i} and column \farg{j} and extends \farg{n\_rows}
   rows and \farg{n\_cols} columns.}
 \end{description}
+%
+The sub-row and sub-column operations may be used to extract a
+slice of row or column from a matrix
+%
+\begin{description}
+%
+\fitem{vector}{sub\_col}{matrix \farg{x}, int \farg{i}, int \farg{j}, 
+  int \farg{n\_rows}}{Return the sub-column of \farg{x} that
+  starts at row \farg{i} and column \farg{j} and extends
+  \farg{n\_rows} rows and 1 column.}
+%
+\fitem{row\_vector}{sub\_row}{matrix \farg{x}, int \farg{i}, int \farg{j}, 
+  int \farg{n\_cols}}{Return the sub-row of \farg{x} that
+  starts at row \farg{i} and column \farg{j} and extends 1
+  row and \farg{n\_cols} columns.}
+%
+\end{description}
 
+\subsubsection{Vector and Array Slicing Operations}
+
+The head operation extracts the first $n$ elements of a vector and
+the tail operation the last.  The segment operation extracts an
+arbitrary subvector.
+
+\begin{description}
+%
+  \fitem{vector}{head}{vector \farg{v}, int \farg{n}}{Return the
+    vector consisting of the first \farg{n} elements of \farg{v}.}
+%
+  \fitem{row\_vector}{head}{row\_vector \farg{rv}, int \farg{n}}{Return
+    the row vector consisting of the first \farg{n} elements of
+    \farg{rv}.}
+%
+  \fitem{T[]}{head}{T[] \farg{sv}, int \farg{n}}{Return
+    the standard vector consisting of the first \farg{n} elements of
+    \farg{sv}; applies to up to three-dimensional arrays containing
+    any type of elements \code{T}.}
+%
+  \fitem{vector}{tail}{vector \farg{v}, int \farg{n}}{Return the
+    vector consisting of the last \farg{n} elements of \farg{v}.}
+%
+  \fitem{row\_vector}{tail}{row\_vector \farg{rv}, int \farg{n}}{Return
+    the row vector consisting of the last \farg{n} elements of
+    \farg{rv}.}
+%
+  \fitem{T[]}{tail}{T[] \farg{sv}, int \farg{n}}{Return
+    the standard vector consisting of the last \farg{n} elements of
+    \farg{sv}; applies to up to three-dimensional arrays containing
+    any type of elements \code{T}.}
+%
+  \fitem{vector}{segment}{vector \farg{v}, int \farg{i}, int
+    \farg{n}}{Return the vector consisting of the \farg{n} elements of \farg{v}
+    starting at \farg{i}; i.e., elements \farg{i} through 
+    through \farg{i} + \farg{n} - 1.}
+%
+  \fitem{row\_vector}{segment}{row\_vector \farg{v}, int \farg{i}, int
+    \farg{n}}{Return the row vector consisting of the \farg{n}
+    elements of \farg{rv} starting at \farg{i}; i.e., elements
+    \farg{i} through through \farg{i} + \farg{n} - 1.}
+%
+  \fitem{T[]}{segment}{T[] \farg{sv}, int \farg{i}, int
+    \farg{n}}{Return the standard vector consisting of the \farg{n}
+    elements of \farg{sv} starting at \farg{i}; i.e., elements
+    \farg{i} through through \farg{i} + \farg{n} - 1. Applies to up to
+    three-dimensional arrays containing any type of elements
+    \code{T}.}
+%
+\end{description}
 
 
 \subsection{Transposition Postfix Operator}
@@ -1386,7 +1461,15 @@ The softmax of \farg{x}}
 The right division of \farg{b} by \farg{A}; equivalently
 \code{\farg{b} * inverse(\farg{A})}}
 %
+\fitem{matrix}{operator/}{matrix \farg{b}, matrix \farg{A}}{
+The right division of \farg{b} by \farg{A}; equivalently
+\code{\farg{b} * inverse(\farg{A})}}
+%
 \fitem{vector}{operator\textbackslash}{matrix \farg{A}, vector \farg{b}}
+The left division of \farg{b} by \farg{A}; equivalently
+\code{inverse(\farg{A}) * \farg{b}}
+%
+\fitem{matrix}{operator\textbackslash}{matrix \farg{A}, matrix \farg{b}}
 The left division of \farg{b} by \farg{A}; equivalently
 \code{inverse(\farg{A}) * \farg{b}}
 %

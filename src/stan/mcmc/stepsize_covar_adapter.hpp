@@ -13,7 +13,8 @@ namespace stan {
       
     public:
       
-      stepsize_covar_adapter(int n): _covar_adaptation(n) {};
+      stepsize_covar_adapter(int n, int max_adapt): _covar_adaptation(n, max_adapt)
+      {};
       
       stepsize_adaptation& get_stepsize_adaptation() {
         return _stepsize_adaptation;

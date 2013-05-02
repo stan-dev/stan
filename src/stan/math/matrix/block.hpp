@@ -9,7 +9,7 @@ namespace stan {
   namespace math {
 
     /**
-     * Return a nrows x ncols submatrix starting at (i,j).
+     * Return a nrows x ncols submatrix starting at (i-1,j-1).
      *
      * @param m Matrix
      * @param i Starting row
@@ -29,6 +29,10 @@ namespace stan {
       return m.block(i - 1,j - 1,nrows,ncols);
     }
 
+
+
+    
+    
   }
 }
 #endif

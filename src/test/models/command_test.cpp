@@ -83,6 +83,7 @@ public:
     expected_help_options.push_back("test_grad");
     expected_help_options.push_back("point_estimate");
     expected_help_options.push_back("point_estimate_newton\n");
+    expected_help_options.push_back("point_estimate_bfgs\n");
     expected_help_options.push_back("nondiag_mass");
     expected_help_options.push_back("cov_matrix");
 
@@ -371,7 +372,7 @@ void test_specific_sample_values(const bitset<options_count>& options, stan::mcm
     if (options[data]) {
       expected_first_y = options[init] ? 99.4208 : 100.727;
     } else { 
-      expected_first_y = options[init] ? -0.0852457 : 1.96045;
+      expected_first_y = options[init] ? -0.0852457 : 0.3504832;
     }
     
     Eigen::VectorXd sampled_y;
@@ -387,7 +388,7 @@ void test_specific_sample_values(const bitset<options_count>& options, stan::mcm
           << "The samples are not drawn from the same seed";
       }
     } else {
-      EXPECT_EQ(expected_first_y, sampled_y(0))
+      EXPECT_NEAR(expected_first_y, sampled_y(0), 1e-3)
         << "Test for first sample when chain_id == 1";
     }
   }

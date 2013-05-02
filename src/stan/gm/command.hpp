@@ -426,7 +426,7 @@ namespace stan {
       int chain_id = 1;
       if (command.has_key("chain_id")) {
         bool well_formed = command.val("chain_id", chain_id);
-        if (!well_formed || chain_id < 0) {
+        if (!well_formed || chain_id <= 0) {
           std::string chain_id_val;
           command.val("chain_id", chain_id_val);
           std::cerr << "value for chain_id must be positive integer"
@@ -518,6 +518,7 @@ namespace stan {
             init_log_prob = model.grad_log_prob(cont_params, disc_params, init_grad, &std::cout);
           } catch (std::domain_error e) {
             write_error_msg(&std::cout, e);
+            std::cout << "Rejecting proposed initial value with zero density." << std::endl;
             init_log_prob = -std::numeric_limits<double>::infinity();
           }
           
@@ -756,13 +757,23 @@ namespace stan {
           lastlp = lp;
           lp = ng.logp();
           ng.params_r(cont_params);
+          if (do_print(i, 50*refresh)) {
+            std::cout << "    Iter ";
+            std::cout << "     log prob ";
+            std::cout << "     ||grad|| ";
+            std::cout << "      alpha ";
+            std::cout << "     alpha0 ";
+            std::cout << " # evals ";
+            std::cout << " Notes " << std::endl;
+          }
           if (do_print(i, refresh)) {
-            std::cout << "Iteration ";
-            std::cout << std::setw(3) << (m + 1) << ". ";
-            std::cout << "Log joint probability = " << std::setw(10) << lp;
-            std::cout << ". Improved by " << (lp - lastlp) << ". ";
-            std::cout << "Step size " << ng.step_size() << " (initial " << ng.init_step_size() << ").";
-            std::cout << " # grad evals = " << ng.grad_evals();
+            std::cout << " " << std::setw(7) << (m + 1) << " ";
+            std::cout << " " << std::setw(12) << std::setprecision(6) << lp << " ";
+            std::cout << " " << std::setw(12) << std::setprecision(6) << ng.curr_g().norm() << " ";
+            std::cout << " " << std::setw(10) << std::setprecision(4) << ng.step_size() << " ";
+            std::cout << " " << std::setw(10) << std::setprecision(4) << ng.init_step_size() << " ";
+            std::cout << " " << std::setw(7) << ng.grad_evals() << " ";
+            std::cout << " " << ng.note() << " ";
             std::cout << std::endl;
             std::cout.flush();
           }
@@ -1032,7 +1043,7 @@ namespace stan {
         stan::mcmc::sample s(cont_params, disc_params, 0, 0);
         
         typedef stan::mcmc::adapt_dense_e_nuts<Model, rng_t> a_Dm_nuts;
-        a_Dm_nuts sampler(model, base_rng);
+        a_Dm_nuts sampler(model, base_rng, num_warmup);
         
         if (!append_samples) {
           sample_stream << "lp__,";
@@ -1088,7 +1099,7 @@ namespace stan {
         stan::mcmc::sample s(cont_params, disc_params, 0, 0);
         
         typedef stan::mcmc::adapt_diag_e_nuts<Model, rng_t> a_dm_nuts;
-        a_dm_nuts sampler(model, base_rng);
+        a_dm_nuts sampler(model, base_rng, num_warmup);
                 
         if (!append_samples) {
           sample_stream << "lp__,";
@@ -1209,12 +1220,11 @@ namespace stan {
         
         // Warm-Up
         if (epsilon <= 0) sampler.init_stepsize();
-        else             sampler.set_nominal_stepsize(epsilon);
+        else              sampler.set_nominal_stepsize(epsilon);
         
         sampler.set_stepsize_jitter(epsilon_pm);
         
         sampler.set_nominal_stepsize_and_L(epsilon, leapfrog_steps);
-        //sampler.set_stepsize_and_T(epsilon, 3.14159);
         
         sampler.get_stepsize_adaptation().set_delta(delta);
         sampler.get_stepsize_adaptation().set_gamma(gamma);

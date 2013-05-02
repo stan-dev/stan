@@ -76,7 +76,7 @@ namespace stan {
        *
        * @throw Logic exception always.
        */
-      ~vari() { 
+      virtual ~vari() {
         // throw std::logic_error("vari destruction handled automatically");
       }
 

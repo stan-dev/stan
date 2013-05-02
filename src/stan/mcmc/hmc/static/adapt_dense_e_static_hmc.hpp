@@ -19,8 +19,9 @@ namespace stan {
       
     public:
       
-      adapt_dense_e_static_hmc(M &m, BaseRNG& rng): dense_e_static_hmc<M, BaseRNG>(m, rng),
-                                                    stepsize_covar_adapter(m.num_params_r())
+      adapt_dense_e_static_hmc(M &m, BaseRNG& rng, int max_adapt):
+        dense_e_static_hmc<M, BaseRNG>(m, rng),
+        stepsize_covar_adapter(m.num_params_r(), max_adapt)
       {};
       
       ~adapt_dense_e_static_hmc() {};

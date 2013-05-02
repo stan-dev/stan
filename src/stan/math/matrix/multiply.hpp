@@ -24,6 +24,14 @@ namespace stan {
              double c) {
       return c * m;
     }
+    template <int R, int C>
+    inline
+    Eigen::Matrix<double,R,C>
+    multiply(const Eigen::Matrix<double,R,C>& m,
+             int c) {
+      return c * m;
+    }
+
     /**
      * Return specified scalar multiplied by specified matrix.
      * @tparam R Row type for matrix.
@@ -36,6 +44,13 @@ namespace stan {
     inline
     Eigen::Matrix<double,R,C>
     multiply(double c,
+             const Eigen::Matrix<double,R,C>& m) {
+      return c * m;
+    }
+    template <int R, int C>
+    inline
+    Eigen::Matrix<double,R,C>
+    multiply(int c,
              const Eigen::Matrix<double,R,C>& m) {
       return c * m;
     }
