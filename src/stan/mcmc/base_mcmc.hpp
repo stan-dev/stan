@@ -14,6 +14,8 @@ namespace stan {
       
     public:
       
+      base_mcmc(std::ofstream* e): _err_stream(e) {};
+      
       virtual ~base_mcmc() {};
       
       virtual sample transition(sample& init_sample) = 0;
@@ -31,6 +33,8 @@ namespace stan {
     protected:
       
       std::string _name;
+        
+      std::ofstream* _err_stream;
       
     };
 

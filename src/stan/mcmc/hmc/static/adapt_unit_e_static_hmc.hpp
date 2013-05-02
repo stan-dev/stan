@@ -19,7 +19,8 @@ namespace stan {
       
     public:
       
-      adapt_unit_e_static_hmc(M &m, BaseRNG& rng): unit_e_static_hmc<M, BaseRNG>(m, rng) {};
+      adapt_unit_e_static_hmc(M &m, BaseRNG& rng, std::ofstream* e = 0):
+      unit_e_static_hmc<M, BaseRNG>(m, rng, e) {};
       
       ~adapt_unit_e_static_hmc() {};
       

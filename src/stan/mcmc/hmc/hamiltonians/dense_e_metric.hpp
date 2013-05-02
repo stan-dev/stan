@@ -19,7 +19,8 @@ namespace stan {
       
     public:
       
-      dense_e_metric(M& m): base_hamiltonian<M, dense_e_point, BaseRNG>(m) {};
+      dense_e_metric(M& m, std::ofstream* e):
+      base_hamiltonian<M, dense_e_point, BaseRNG>(m, e) {};
       ~dense_e_metric() {};
       
       double T(dense_e_point& z) {
