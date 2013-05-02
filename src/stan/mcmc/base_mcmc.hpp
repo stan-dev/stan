@@ -14,7 +14,7 @@ namespace stan {
       
     public:
       
-      base_mcmc(std::ofstream* e): _err_stream(e) {};
+      base_mcmc(std::ostream* e): _err_stream(e) {};
       
       virtual ~base_mcmc() {};
       
@@ -34,7 +34,7 @@ namespace stan {
       
       std::string _name;
         
-      std::ofstream* _err_stream;
+      std::ostream* _err_stream;
       
     };
 

@@ -19,7 +19,7 @@ namespace stan {
       
     public:
       
-      mock_nuts(mock_model &m, rng_t& rng, std::ofstream* e): base_nuts<mock_model,
+      mock_nuts(mock_model &m, rng_t& rng, std::ostream* e): base_nuts<mock_model,
                                                       ps_point,
                                                       mock_hamiltonian,
                                                       mock_integrator,

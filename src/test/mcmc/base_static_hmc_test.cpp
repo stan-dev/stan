@@ -21,7 +21,7 @@ namespace stan {
       
     public:
       
-      mock_static_hmc(mock_model &m, rng_t& rng, std::ofstream* e): base_static_hmc<mock_model,
+      mock_static_hmc(mock_model &m, rng_t& rng, std::ostream* e): base_static_hmc<mock_model,
                                                                   ps_point,
                                                                   mock_hamiltonian,
                                                                   mock_integrator,
