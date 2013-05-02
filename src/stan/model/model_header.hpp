@@ -69,6 +69,7 @@
 #include <stan/math/matrix/multiply.hpp>
 #include <stan/math/matrix/multiply_lower_tri_self_transpose.hpp>
 #include <stan/math/matrix/prod.hpp>
+#include <stan/math/matrix/rank.hpp>
 #include <stan/math/matrix/row.hpp>
 #include <stan/math/matrix/rows_dot_product.hpp>
 #include <stan/math/matrix/rows_dot_self.hpp>
@@ -77,6 +78,7 @@
 #include <stan/math/matrix/singular_values.hpp>
 #include <stan/math/matrix/size.hpp>
 #include <stan/math/matrix/softmax.hpp>
+#include <stan/math/matrix/sort.hpp>
 #include <stan/math/matrix/stan_print.hpp>
 #include <stan/math/matrix/sub_col.hpp>
 #include <stan/math/matrix/sub_row.hpp>
