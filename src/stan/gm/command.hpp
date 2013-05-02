@@ -699,7 +699,8 @@ namespace stan {
           std::cout << "init tries = " << num_init_tries << std::endl;
         
         std::cout << "output = " << sample_file << std::endl;
-        std::cout << "save_warmup = " << save_warmup<< std::endl;
+        std::cout << "save_warmup = " << save_warmup << std::endl;
+        std::cout << "epsilon = " << epsilon << std::endl;
         
         std::cout << "seed = " << random_seed 
         << " (" << (command.has_key("seed") 
@@ -719,6 +720,7 @@ namespace stan {
         write_comment_property(sample_stream,"init",init_val);
         write_comment_property(sample_stream,"save_warmup",save_warmup);
         write_comment_property(sample_stream,"seed",random_seed);
+        write_comment_property(sample_stream,"epsilon",epsilon);
         write_comment(sample_stream);
         
         sample_stream << "lp__,"; // log probability first
@@ -726,6 +728,9 @@ namespace stan {
         
         stan::optimization::BFGSLineSearch ng(model, cont_params, disc_params,
                                               &std::cout);
+        if (epsilon > 0)
+          ng._opts.alpha0 = epsilon;
+        
         double lp = ng.logp();
         
         double lastlp = lp - 1;
@@ -740,6 +745,7 @@ namespace stan {
           if (do_print(i, 50*refresh)) {
             std::cout << "    Iter ";
             std::cout << "     log prob ";
+            std::cout << "       ||dx|| ";
             std::cout << "     ||grad|| ";
             std::cout << "      alpha ";
             std::cout << "     alpha0 ";
@@ -749,9 +755,10 @@ namespace stan {
           if (do_print(i, refresh)) {
             std::cout << " " << std::setw(7) << (m + 1) << " ";
             std::cout << " " << std::setw(12) << std::setprecision(6) << lp << " ";
+            std::cout << " " << std::setw(12) << std::setprecision(6) << ng.prev_step_size() << " ";
             std::cout << " " << std::setw(12) << std::setprecision(6) << ng.curr_g().norm() << " ";
-            std::cout << " " << std::setw(10) << std::setprecision(4) << ng.step_size() << " ";
-            std::cout << " " << std::setw(10) << std::setprecision(4) << ng.init_step_size() << " ";
+            std::cout << " " << std::setw(10) << std::setprecision(4) << ng.alpha() << " ";
+            std::cout << " " << std::setw(10) << std::setprecision(4) << ng.alpha0() << " ";
             std::cout << " " << std::setw(7) << ng.grad_evals() << " ";
             std::cout << " " << ng.note() << " ";
             std::cout << std::endl;
