@@ -15,7 +15,7 @@ namespace stan {
       
       diag_metro(M& m, 
                  BaseRNG& rng, 
-                 std::ostream* error_msg)
+                 std::ofstream* error_msg)
         : base_metro<M, BaseRNG>(m, rng, error_msg),
           _prop_cov_diag(Eigen::VectorXd::Ones(m.num_params_r())) { 
         this->_name = "Metropolis with a diagonal Euclidean metric"; 

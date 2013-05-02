@@ -15,7 +15,7 @@ namespace stan {
       
       dense_metro(M& m, 
                   BaseRNG& rng, 
-                  std::ostream* error_msg)
+                  std::ofstream* error_msg)
         : base_metro<M, BaseRNG>(m, rng, error_msg),
           _prop_cov(Eigen::MatrixXd::Identity(m.num_params_r(), m.num_params_r())) { 
         this->_name = "Metropolis with a dense Euclidean metric"; 

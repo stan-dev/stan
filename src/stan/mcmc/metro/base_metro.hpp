@@ -20,8 +20,8 @@ namespace stan {
       
     public:
       
-      base_metro(M& m, BaseRNG& rng, std::ostream* error_msg)
-        : base_mcmc(), 
+      base_metro(M& m, BaseRNG& rng, std::ofstream* error_msg)
+        : base_mcmc(error_msg), 
           _model(m),
           _params_r(m.num_params_r()),
           _params_i(m.num_params_i()),
@@ -29,8 +29,7 @@ namespace stan {
           _rand_uniform(_rand_int),
           _nom_epsilon(0.1),
           _epsilon(_nom_epsilon),
-          _epsilon_jitter(0.0),
-          _error_msg(error_msg) {};  
+          _epsilon_jitter(0.0) {};  
  
       ~base_metro() {};
 
@@ -74,7 +73,7 @@ namespace stan {
      }
 
       double log_prob(std::vector<double>& q, std::vector<int>& r) {
-        return _model.stan::model::prob_grad_ad::log_prob(q, r, _error_msg);
+        return _model.stan::model::prob_grad_ad::log_prob(q, r, this->_err_stream);
       }
 
       void init_stepsize() {

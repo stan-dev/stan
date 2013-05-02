@@ -880,7 +880,7 @@ namespace stan {
         stan::mcmc::sample s(cont_params, disc_params, 0, 0);
 
         typedef stan::mcmc::adapt_unit_metro<Model, rng_t> metro;
-        metro sampler(model, base_rng, &std::cout);
+        metro sampler(model, base_rng);
 
         if (!append_samples) {
           sample_stream << "lp__,"; // log probability first
@@ -901,7 +901,7 @@ namespace stan {
         
         clock_t start = clock();
 
-        warmup<metro, Model, rng_t>(sampler, num_warmup, num_thin, 
+        warmup<metro, Model, rng_t>(sampler, num_warmup, num_iterations - num_warmup, num_thin, 
                                         refresh, save_warmup, 
                                         sample_stream, diagnostic_stream,
                                         s, model, base_rng); 
@@ -919,7 +919,7 @@ namespace stan {
         // Sampling
         start = clock();
 
-        sample<metro, Model, rng_t>(sampler, num_iterations - num_warmup, num_thin, 
+        sample<metro, Model, rng_t>(sampler, num_warmup, num_iterations - num_warmup, num_thin, 
                                         refresh, true, 
                                         sample_stream, diagnostic_stream, 
                                         s, model, base_rng); 
@@ -936,7 +936,7 @@ namespace stan {
         stan::mcmc::sample s(cont_params, disc_params, 0, 0);
 
         typedef stan::mcmc::adapt_diag_metro<Model, rng_t> metro;
-        metro sampler(model, base_rng, &std::cout);
+        metro sampler(model, base_rng, num_warmup);
 
         if (!append_samples) {
           sample_stream << "lp__,"; // log probability first
@@ -957,7 +957,7 @@ namespace stan {
         
         clock_t start = clock();
         
-        warmup<metro, Model, rng_t>(sampler, num_warmup, num_thin, 
+        warmup<metro, Model, rng_t>(sampler, num_warmup, num_iterations - num_warmup, num_thin, 
                                         refresh, save_warmup, 
                                         sample_stream, diagnostic_stream,
                                         s, model, base_rng); 
@@ -975,7 +975,7 @@ namespace stan {
         // Sampling
         start = clock();
         
-        sample<metro, Model, rng_t>(sampler, num_iterations - num_warmup, num_thin, 
+        sample<metro, Model, rng_t>(sampler, num_warmup, num_iterations - num_warmup, num_thin, 
                                         refresh, true, 
                                         sample_stream, diagnostic_stream, 
                                         s, model, base_rng); 
@@ -992,7 +992,7 @@ namespace stan {
         stan::mcmc::sample s(cont_params, disc_params, 0, 0);
 
         typedef stan::mcmc::adapt_dense_metro<Model, rng_t> metro;
-        metro sampler(model, base_rng, &std::cout);
+        metro sampler(model, base_rng, num_warmup);
 
         if (!append_samples) {
           sample_stream << "lp__,"; // log probability first
@@ -1013,7 +1013,7 @@ namespace stan {
         
         clock_t start = clock();
         
-        warmup<metro, Model, rng_t>(sampler, num_warmup, num_thin, 
+        warmup<metro, Model, rng_t>(sampler, num_warmup, num_iterations - num_warmup, num_thin, 
                                         refresh, save_warmup, 
                                         sample_stream, diagnostic_stream,
                                         s, model, base_rng); 
@@ -1031,7 +1031,7 @@ namespace stan {
         // Sampling
         start = clock();
         
-        sample<metro, Model, rng_t>(sampler, num_iterations - num_warmup, num_thin, 
+        sample<metro, Model, rng_t>(sampler, num_warmup, num_iterations - num_warmup, num_thin, 
                                         refresh, true, 
                                         sample_stream, diagnostic_stream, 
                                         s, model, base_rng); 
