@@ -77,22 +77,22 @@ namespace stan {
           typename Eigen::Matrix<var,R2,C2>::ConstColXpr ccol(m2.col(j));
           if (j == 0) {
             if (i == 0) {
-              result(i,j) = var(new dot_product_vv_vari(crow,ccol));
+              result(i,j) = var(new dot_product_vari<var,var>(crow,ccol));
             }
             else {
-              dot_product_vv_vari *v2 = static_cast<dot_product_vv_vari*>(result(0,j).vi_);
-              result(i,j) = var(new dot_product_vv_vari(crow,ccol,NULL,v2));
+              dot_product_vari<var,var> *v2 = static_cast<dot_product_vari<var,var>*>(result(0,j).vi_);
+              result(i,j) = var(new dot_product_vari<var,var>(crow,ccol,NULL,v2));
             }
           }
           else { 
             if (i == 0) {
-              dot_product_vv_vari *v1 = static_cast<dot_product_vv_vari*>(result(i,0).vi_);
-              result(i,j) = var(new dot_product_vv_vari(crow,ccol,v1));
+              dot_product_vari<var,var> *v1 = static_cast<dot_product_vari<var,var>*>(result(i,0).vi_);
+              result(i,j) = var(new dot_product_vari<var,var>(crow,ccol,v1));
             }
             else /* if (i != 0 && j != 0) */ {
-              dot_product_vv_vari *v1 = static_cast<dot_product_vv_vari*>(result(i,0).vi_);
-              dot_product_vv_vari *v2 = static_cast<dot_product_vv_vari*>(result(0,j).vi_);
-              result(i,j) = var(new dot_product_vv_vari(crow,ccol,v1,v2));
+              dot_product_vari<var,var> *v1 = static_cast<dot_product_vari<var,var>*>(result(i,0).vi_);
+              dot_product_vari<var,var> *v2 = static_cast<dot_product_vari<var,var>*>(result(0,j).vi_);
+              result(i,j) = var(new dot_product_vari<var,var>(crow,ccol,v1,v2));
             }
           }
         }
@@ -122,22 +122,22 @@ namespace stan {
           //          result(i,j) = dot_product(crow,ccol);
           if (j == 0) {
             if (i == 0) {
-              result(i,j) = var(new dot_product_vd_vari(ccol,crow));
+              result(i,j) = var(new dot_product_vari<var,double>(ccol,crow));
             }
             else {
-              dot_product_vd_vari *v2 = static_cast<dot_product_vd_vari*>(result(0,j).vi_);
-              result(i,j) = var(new dot_product_vd_vari(ccol,crow,v2,NULL));
+              dot_product_vari<var,double> *v2 = static_cast<dot_product_vari<var,double>*>(result(0,j).vi_);
+              result(i,j) = var(new dot_product_vari<var,double>(ccol,crow,v2,NULL));
             }
           }
           else { 
             if (i == 0) {
-              dot_product_vd_vari *v1 = static_cast<dot_product_vd_vari*>(result(i,0).vi_);
-              result(i,j) = var(new dot_product_vd_vari(ccol,crow,NULL,v1));
+              dot_product_vari<var,double> *v1 = static_cast<dot_product_vari<var,double>*>(result(i,0).vi_);
+              result(i,j) = var(new dot_product_vari<var,double>(ccol,crow,NULL,v1));
             }
             else /* if (i != 0 && j != 0) */ {
-              dot_product_vd_vari *v1 = static_cast<dot_product_vd_vari*>(result(i,0).vi_);
-              dot_product_vd_vari *v2 = static_cast<dot_product_vd_vari*>(result(0,j).vi_);
-              result(i,j) = var(new dot_product_vd_vari(ccol,crow,v2,v1));
+              dot_product_vari<var,double> *v1 = static_cast<dot_product_vari<var,double>*>(result(i,0).vi_);
+              dot_product_vari<var,double> *v2 = static_cast<dot_product_vari<var,double>*>(result(0,j).vi_);
+              result(i,j) = var(new dot_product_vari<var,double>(ccol,crow,v2,v1));
             }
           }
         }
@@ -167,22 +167,22 @@ namespace stan {
           //          result(i,j) = dot_product(crow,ccol);
           if (j == 0) {
             if (i == 0) {
-              result(i,j) = var(new dot_product_vd_vari(crow,ccol));
+              result(i,j) = var(new dot_product_vari<var,double>(crow,ccol));
             }
             else {
-              dot_product_vd_vari *v2 = static_cast<dot_product_vd_vari*>(result(0,j).vi_);
-              result(i,j) = var(new dot_product_vd_vari(crow,ccol,NULL,v2));
+              dot_product_vari<var,double> *v2 = static_cast<dot_product_vari<var,double>*>(result(0,j).vi_);
+              result(i,j) = var(new dot_product_vari<var,double>(crow,ccol,NULL,v2));
             }
           }
           else { 
             if (i == 0) {
-              dot_product_vd_vari *v1 = static_cast<dot_product_vd_vari*>(result(i,0).vi_);
-              result(i,j) = var(new dot_product_vd_vari(crow,ccol,v1,NULL));
+              dot_product_vari<var,double> *v1 = static_cast<dot_product_vari<var,double>*>(result(i,0).vi_);
+              result(i,j) = var(new dot_product_vari<var,double>(crow,ccol,v1,NULL));
             }
             else /* if (i != 0 && j != 0) */ {
-              dot_product_vd_vari *v1 = static_cast<dot_product_vd_vari*>(result(i,0).vi_);
-              dot_product_vd_vari *v2 = static_cast<dot_product_vd_vari*>(result(0,j).vi_);
-              result(i,j) = var(new dot_product_vd_vari(crow,ccol,v1,v2));
+              dot_product_vari<var,double> *v1 = static_cast<dot_product_vari<var,double>*>(result(i,0).vi_);
+              dot_product_vari<var,double> *v2 = static_cast<dot_product_vari<var,double>*>(result(0,j).vi_);
+              result(i,j) = var(new dot_product_vari<var,double>(crow,ccol,v1,v2));
             }
           }
         }
