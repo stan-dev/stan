@@ -17,7 +17,7 @@ namespace stan {
       
     public:
       
-      base_static_hmc(M &m, BaseRNG& rng, std::ofstream* e):
+      base_static_hmc(M &m, BaseRNG& rng, std::ostream* e):
       base_hmc<M, P, H, I, BaseRNG>(m, rng, e), _T(1)
       { _update_L(); }
       

@@ -1,7 +1,7 @@
 #ifndef __STAN__MCMC__BASE_MCMC__HPP__
 #define __STAN__MCMC__BASE_MCMC__HPP__
 
-#include <fstream>
+#include <ostream>
 #include <string>
 
 #include <stan/mcmc/sample.hpp>

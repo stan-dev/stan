@@ -116,7 +116,7 @@ TEST(McmcBaseStaticHMC, set_nominal_stepsize_and_L) {
   
   stan::mcmc::mock_model model(q.size());
   
-  stan::mcmc::mock_static_hmc sampler(model, base_rng);
+  stan::mcmc::mock_static_hmc sampler(model, base_rng, &std::cout);
   
   double old_epsilon = 1.0;
   int old_L = 10;
