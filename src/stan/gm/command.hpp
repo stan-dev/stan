@@ -205,18 +205,18 @@ namespace stan {
       (n == 0 || ((n + 1) % refresh == 0) );
     }
 
-    void print_progress(int m, int num_iterations, int refresh, bool warmup) {
+    void print_progress(int m, int start, int finish, int refresh, bool warmup) {
       
-      int it_print_width = std::ceil(std::log10(num_iterations));
+      int it_print_width = std::ceil(std::log10(finish));
       
       if (do_print(m, refresh)) {
         
         std::cout << "Iteration: ";
-        std::cout << std::setw(it_print_width) << (m + 1)
-                  << " / " << num_iterations;
+        std::cout << std::setw(it_print_width) << m + 1 + start
+                  << " / " << finish;
           
         std::cout << " [" << std::setw(3) 
-                  << static_cast<int>( (100.0 * (m + 1)) / num_iterations )
+                  << static_cast<int>( (100.0 * (m + 1 + start)) / finish )
                   << "%] ";
         std::cout << (warmup ? " (Warmup)" : " (Sampling)");
         std::cout << std::endl;
@@ -251,6 +251,8 @@ namespace stan {
     template <class Sampler, class Model, class RNG>
     void run_markov_chain(Sampler& sampler,
                           int num_iterations,
+                          int start,
+                          int finish,
                           int num_thin,
                           int refresh,
                           bool save,
@@ -263,7 +265,7 @@ namespace stan {
       
       for (size_t m = 0; m < num_iterations; ++m) {
       
-        print_progress(m, num_iterations, refresh, warmup);
+        print_progress(m, start, finish, refresh, warmup);
       
         init_s = sampler.transition(init_s);
           
@@ -278,7 +280,8 @@ namespace stan {
 
     template <class Sampler, class Model, class RNG>
     void warmup(Sampler& sampler,
-                int num_iterations,
+                int num_warmup,
+                int num_samples,
                 int num_thin,
                 int refresh,
                 bool save,
@@ -288,7 +291,7 @@ namespace stan {
                 Model& model,
                 RNG& base_rng) {
       
-      run_markov_chain<Sampler, Model, RNG>(sampler, num_iterations, num_thin, 
+      run_markov_chain<Sampler, Model, RNG>(sampler, num_warmup, 0, num_warmup + num_samples, num_thin,
                                             refresh, save, true,
                                             sample_file_stream,
                                             debug_file_stream,
@@ -298,7 +301,8 @@ namespace stan {
 
     template <class Sampler, class Model, class RNG>
     void sample(Sampler& sampler,
-                int num_iterations,
+                int num_warmup,
+                int num_samples,
                 int num_thin,
                 int refresh,
                 bool save,
@@ -308,7 +312,7 @@ namespace stan {
                 Model& model,
                 RNG& base_rng) {
       
-      run_markov_chain<Sampler, Model, RNG>(sampler, num_iterations, num_thin, 
+      run_markov_chain<Sampler, Model, RNG>(sampler, num_samples, num_warmup, num_warmup + num_samples, num_thin,
                                             refresh, save, false,
                                             sample_file_stream,
                                             debug_file_stream,
@@ -353,7 +357,8 @@ namespace stan {
       unsigned int num_warmup = num_iterations / 2;
       command.val("warmup", num_warmup);
       
-      unsigned int num_thin = 1U;
+      unsigned int calculated_thin = (num_iterations - num_warmup) / 1000U;
+      unsigned int num_thin = (calculated_thin > 1) ? calculated_thin : 1U;
       command.val("thin", num_thin);
 
       int leapfrog_steps = -1;
@@ -699,7 +704,8 @@ namespace stan {
           std::cout << "init tries = " << num_init_tries << std::endl;
         
         std::cout << "output = " << sample_file << std::endl;
-        std::cout << "save_warmup = " << save_warmup<< std::endl;
+        std::cout << "save_warmup = " << save_warmup << std::endl;
+        std::cout << "epsilon = " << epsilon << std::endl;
         
         std::cout << "seed = " << random_seed 
         << " (" << (command.has_key("seed") 
@@ -719,6 +725,7 @@ namespace stan {
         write_comment_property(sample_stream,"init",init_val);
         write_comment_property(sample_stream,"save_warmup",save_warmup);
         write_comment_property(sample_stream,"seed",random_seed);
+        write_comment_property(sample_stream,"epsilon",epsilon);
         write_comment(sample_stream);
         
         sample_stream << "lp__,"; // log probability first
@@ -726,6 +733,9 @@ namespace stan {
         
         stan::optimization::BFGSLineSearch ng(model, cont_params, disc_params,
                                               &std::cout);
+        if (epsilon > 0)
+          ng._opts.alpha0 = epsilon;
+        
         double lp = ng.logp();
         
         double lastlp = lp - 1;
@@ -740,6 +750,7 @@ namespace stan {
           if (do_print(i, 50*refresh)) {
             std::cout << "    Iter ";
             std::cout << "     log prob ";
+            std::cout << "       ||dx|| ";
             std::cout << "     ||grad|| ";
             std::cout << "      alpha ";
             std::cout << "     alpha0 ";
@@ -749,9 +760,10 @@ namespace stan {
           if (do_print(i, refresh)) {
             std::cout << " " << std::setw(7) << (m + 1) << " ";
             std::cout << " " << std::setw(12) << std::setprecision(6) << lp << " ";
+            std::cout << " " << std::setw(12) << std::setprecision(6) << ng.prev_step_size() << " ";
             std::cout << " " << std::setw(12) << std::setprecision(6) << ng.curr_g().norm() << " ";
-            std::cout << " " << std::setw(10) << std::setprecision(4) << ng.step_size() << " ";
-            std::cout << " " << std::setw(10) << std::setprecision(4) << ng.init_step_size() << " ";
+            std::cout << " " << std::setw(10) << std::setprecision(4) << ng.alpha() << " ";
+            std::cout << " " << std::setw(10) << std::setprecision(4) << ng.alpha0() << " ";
             std::cout << " " << std::setw(7) << ng.grad_evals() << " ";
             std::cout << " " << ng.note() << " ";
             std::cout << std::endl;
@@ -878,7 +890,7 @@ namespace stan {
         
         clock_t start = clock();
         
-        warmup<a_Dm_nuts, Model, rng_t>(sampler, num_warmup, num_thin, 
+        warmup<a_Dm_nuts, Model, rng_t>(sampler, num_warmup, num_iterations - num_warmup, num_thin,
                                         refresh, save_warmup, 
                                         sample_stream, diagnostic_stream,
                                         s, model, base_rng); 
@@ -896,7 +908,7 @@ namespace stan {
         // Sampling
         start = clock();
         
-        sample<a_Dm_nuts, Model, rng_t>(sampler, num_iterations - num_warmup, num_thin, 
+        sample<a_Dm_nuts, Model, rng_t>(sampler, num_warmup, num_iterations - num_warmup, num_thin,
                                         refresh, true, 
                                         sample_stream, diagnostic_stream, 
                                         s, model, base_rng); 
@@ -934,7 +946,7 @@ namespace stan {
         
         clock_t start = clock();
         
-        warmup<a_dm_nuts, Model, rng_t>(sampler, num_warmup, num_thin, 
+        warmup<a_dm_nuts, Model, rng_t>(sampler, num_warmup, num_iterations - num_warmup, num_thin, 
                                         refresh, save_warmup, 
                                         sample_stream, diagnostic_stream,
                                         s, model, base_rng); 
@@ -952,7 +964,7 @@ namespace stan {
         // Sampling
         start = clock();
         
-        sample<a_dm_nuts, Model, rng_t>(sampler, num_iterations - num_warmup, num_thin, 
+        sample<a_dm_nuts, Model, rng_t>(sampler, num_warmup, num_iterations - num_warmup, num_thin,
                                         refresh, true, 
                                         sample_stream, diagnostic_stream, 
                                         s, model, base_rng);
@@ -990,7 +1002,7 @@ namespace stan {
         
         clock_t start = clock();
         
-        warmup<a_um_nuts, Model, rng_t>(sampler, num_warmup, num_thin, 
+        warmup<a_um_nuts, Model, rng_t>(sampler, num_warmup, num_iterations - num_warmup, num_thin, 
                                         refresh, save_warmup, 
                                         sample_stream, diagnostic_stream,
                                         s, model, base_rng); 
@@ -1008,7 +1020,7 @@ namespace stan {
         // Sampling
         start = clock();
         
-        sample<a_um_nuts, Model, rng_t>(sampler, num_iterations - num_warmup, num_thin, 
+        sample<a_um_nuts, Model, rng_t>(sampler, num_warmup, num_iterations - num_warmup, num_thin,
                                         refresh, true, 
                                         sample_stream, diagnostic_stream, 
                                         s, model, base_rng); 
@@ -1045,7 +1057,7 @@ namespace stan {
         
         clock_t start = clock();
         
-        warmup<a_um_hmc, Model, rng_t>(sampler, num_warmup, num_thin, 
+        warmup<a_um_hmc, Model, rng_t>(sampler, num_warmup, num_iterations - num_warmup, num_thin, 
                                        refresh, save_warmup, 
                                        sample_stream, diagnostic_stream,
                                        s, model, base_rng); 
@@ -1063,7 +1075,7 @@ namespace stan {
         // Sampling
         start = clock();
         
-        sample<a_um_hmc, Model, rng_t>(sampler, num_iterations - num_warmup, num_thin, 
+        sample<a_um_hmc, Model, rng_t>(sampler, num_warmup, num_iterations - num_warmup, num_thin,
                                        refresh, true, 
                                        sample_stream, diagnostic_stream, 
                                        s, model, base_rng); 

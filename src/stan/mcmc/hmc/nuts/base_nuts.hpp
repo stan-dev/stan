@@ -32,8 +32,9 @@ namespace stan {
       
     public:
       
-      base_nuts(M &m, BaseRNG& rng): base_hmc<M, P, H, I, BaseRNG>(m, rng),
-                                     _depth(0), _max_depth(5), _max_delta(1000)
+      base_nuts(M &m, BaseRNG& rng, std::ostream* e):
+      base_hmc<M, P, H, I, BaseRNG>(m, rng, e),
+      _depth(0), _max_depth(5), _max_delta(1000)
       {};
       
       ~base_nuts() {};

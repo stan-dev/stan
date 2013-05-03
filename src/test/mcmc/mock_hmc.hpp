@@ -40,9 +40,9 @@ namespace stan {
       
     public:
       
-      mock_hamiltonian(M& m): base_hamiltonian<M,
+      mock_hamiltonian(M& m, std::ostream *e): base_hamiltonian<M,
                                                ps_point,
-                                               BaseRNG> (m) {};
+                                               BaseRNG> (m,e) {};
       
       double T(ps_point& z) { return 0; }
       
