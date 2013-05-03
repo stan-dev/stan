@@ -17,7 +17,7 @@ namespace stan {
      * @tparam T Type of elements of the vector.
      */
     template <typename T>
-    inline T sort_asc(std::vector<T> xs)
+    inline typename std::vector<T> sort_asc(std::vector<T> xs)
     {
 	std::sort (xs.begin(), xs.end());
       return xs;
@@ -31,7 +31,7 @@ namespace stan {
      * @tparam T Type of elements of the vector.
      */
     template <typename T>
-    inline T sort_desc(std::vector<T> xs)
+    inline typename std::vector<T> sort_desc(std::vector<T> xs)
     {
 	std::sort (xs.begin(), xs.end(), std::greater<T>());
       return xs;
@@ -45,7 +45,7 @@ namespace stan {
      * @tparam T Type of elements of the vector.
      */
  template <typename T, int R, int C>
-    inline T sort_asc(Eigen::Matrix<T,R,C> xs)
+    inline typename Eigen::Matrix<T,R,C> sort_asc(Eigen::Matrix<T,R,C> xs)
     {
 	std::sort (xs.data(), xs.data()+xs.size());
       return xs;
@@ -59,7 +59,7 @@ namespace stan {
      * @tparam T Type of elements of the vector.
      */
  template <typename T, int R, int C>
-    inline T sort_desc(Eigen::Matrix<T,R,C> xs)
+    inline typename Eigen::Matrix<T,R,C> sort_desc(Eigen::Matrix<T,R,C> xs)
     {
 	std::sort (xs.data(), xs.data()+xs.size(), std::greater<T>());
       return xs;
