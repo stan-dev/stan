@@ -16,7 +16,7 @@ TEST(McmcDiagEMetric, sample_p) {
   
   stan::mcmc::mock_model model(q.size());
   
-  stan::mcmc::diag_e_metric<stan::mcmc::mock_model, rng_t> metric(model);
+  stan::mcmc::diag_e_metric<stan::mcmc::mock_model, rng_t> metric(model,&std::cout);
   stan::mcmc::diag_e_point z(q.size(), r.size());
   
   int n_samples = 1000;
