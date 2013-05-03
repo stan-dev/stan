@@ -26,8 +26,8 @@ namespace stan {
      */
     template <typename T1, typename T2>
     inline typename
-    boost::enable_if_c< (boost::is_scalar<T1>::value || boost::is_same<T1,var>) &&
-                        (boost::is_scalar<T2>::value || boost::is_same<T2,var>),
+    boost::enable_if_c< (boost::is_scalar<T1>::value || boost::is_same<T1,var>::value) &&
+                        (boost::is_scalar<T2>::value || boost::is_same<T2,var>::value),
                         typename boost::math::tools::promote_args<T1,T2>::type>::type
     multiply(const T1& v, const T2& c) {
       return v * c;
