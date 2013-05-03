@@ -14,7 +14,7 @@ namespace stan {
       
     public:
       
-      adapt_diag_metro(M &m, BaseRNG& rng, int max_adapt, std::ofstream* error_msg = 0)
+      adapt_diag_metro(M &m, BaseRNG& rng, int max_adapt, std::ostream* error_msg = 0)
         : diag_metro<M, BaseRNG>(m, rng, error_msg),
           stepsize_var_adapter(m.num_params_r(), max_adapt) {};
       
