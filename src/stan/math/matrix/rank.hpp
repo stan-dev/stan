@@ -9,10 +9,9 @@ namespace stan {
   namespace math {
    
     /**
-     * Return the specified standard vector in ascending order.
+     * Return the number of components of v less than v[s].
      *
-     * @param xs Standard vector to sum.
-     * @return Standard vector ordered.
+     * @return Number of components of v less than v[s].
      * @tparam T Type of elements of the vector.
      */
     template <typename T>
@@ -29,10 +28,9 @@ namespace stan {
     }
 
     /**
-     * Return the specified eigen vector in descending order.
+     * Return the number of components of v less than v[s].
      *
-     * @param xs Eigen vector to sum.
-     * @return Eigen vector ordered.
+     * @return Number of components of v less than v[s].
      * @tparam T Type of elements of the vector.
      */
  template <typename T, int R, int C>
