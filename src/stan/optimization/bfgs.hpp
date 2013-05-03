@@ -128,7 +128,7 @@ namespace stan {
           newX = x + alpha*p;
           while (func(newX,newF,newDF)) {
             alpha = 0.5*(alpha+std::min(alo,ahi));
-            if (std::fabs(alo-alpha) < min_range)
+            if (std::fabs(std::min(alo,ahi)-alpha) < min_range)
               return 1;
             newX = x + alpha*p;
           }
@@ -234,7 +234,8 @@ namespace stan {
       protected:
         FunctorType &_func;
         VectorT _gk, _gk_1, _xk_1, _xk, _sk, _sk_1;
-        Scalar _fk, _fk_1, _alpha, _alpha0;
+        Scalar _fk, _fk_1, _alphak_1;
+        Scalar _alpha, _alpha0;
         Eigen::LDLT< HessianT > _ldlt;
         size_t _itNum;
         std::string _note;
@@ -249,9 +250,10 @@ namespace stan {
         const VectorT &prev_x() const { return _xk_1; }
         const VectorT &prev_g() const { return _gk_1; }
         const VectorT &prev_s() const { return _sk_1; }
+        Scalar prev_step_size() const { return _sk_1.norm()*_alphak_1; }
 
-        const Scalar &init_step_size() const { return _alpha0; }
-        const Scalar &step_size() const { return _alpha; }
+        const Scalar &alpha0() const { return _alpha0; }
+        const Scalar &alpha() const { return _alpha; }
         
         const std::string &note() const { return _note; }
         
@@ -305,7 +307,7 @@ namespace stan {
           }
           else if (!(_ldlt.info() == Eigen::Success && _ldlt.isPositive() && (_ldlt.vectorD().array() > 0).all())) {
             resetB = 1;
-            _note = "LDLT failed Hessian reset; ";
+            _note = "LDLT failed, BFGS reset; ";
           }
           else {
             resetB = 0;
@@ -314,23 +316,23 @@ namespace stan {
           
           while (true) {
             if (resetB) {
-              if (_itNum == 1 || resetB == 2) {
+//              if (_itNum == 1 || resetB == 2) {
                 _sk = -_gk;
-              }
-              else {
-                _sk = -_gk/_ldlt.vectorD().maxCoeff();
-              }
+//              }
+//              else {
+//                _sk = -_gk/_ldlt.vectorD().maxCoeff();
+//              }
             }
             else {
               _sk = -_ldlt.solve(_gk);
             }
             
             if (_itNum > 1 && resetB != 2) {
-//              _alpha0 = _alpha = std::min(1.0,
-//                                          1.01*CubicInterp(_gk_1.dot(_sk_1),
-//                                                           _alpha, _fk - _fk_1, _gk.dot(_sk_1),
-//                                                           0.0, 1.0));
-              _alpha0 = _alpha = std::min(1.0, 1.01*(2*(_fk - _fk_1)/_gk_1.dot(_sk_1)));
+              _alpha0 = _alpha = std::min(1.0,
+                                          1.01*CubicInterp(_gk_1.dot(_sk_1),
+                                                           _alphak_1, _fk - _fk_1, _gk.dot(_sk_1),
+                                                           _opts.minAlpha, 1.0));
+//              _alpha0 = _alpha = std::min(1.0, 1.01*(2*(_fk - _fk_1)/_gk_1.dot(_sk_1)));
             }
             else {
               _alpha0 = _alpha = _opts.alpha0;
@@ -356,7 +358,7 @@ namespace stan {
               else {
                 // Line-search failed, try ditching the Hessian approximation
                 resetB = 2;
-                _note += "LS failed Hessian reset; ";
+                _note += "LS failed, BFGS reset; ";
                 continue;
               }
             }
@@ -389,10 +391,12 @@ namespace stan {
             Scalar B0fact = yk.squaredNorm()/skyk;
             _ldlt.compute(B0fact*HessianT::Identity(_xk.size(),_xk.size()));
             Bksk.noalias() = B0fact*sk;
-            _sk_1 *= B0fact;
+            _sk_1 = -_gk_1/B0fact;
+            _alphak_1 = B0fact*_alpha;
           }
           else {
             Bksk = _ldlt.transpositionsP().transpose()*(_ldlt.matrixL()*(_ldlt.vectorD().asDiagonal()*(_ldlt.matrixU()*(_ldlt.transpositionsP()*sk))));
+            _alphak_1 = _alpha;
           }
           skBksk = sk.dot(Bksk);
           if (skyk >= 0.2*skBksk) {
@@ -403,8 +407,8 @@ namespace stan {
           else {
             // Damped update (Procedure 18.2)
             thetak = 0.8*skBksk/(skBksk - skyk);
-            rk = thetak*yk + (1.0 - thetak)*Bksk;
-            _note += "Damped Hessian update";
+            rk.noalias() = thetak*yk + (1.0 - thetak)*Bksk;
+            _note += "Damped BFGS update";
           }
           _ldlt.rankUpdate(rk,1.0/sk.dot(rk));
           _ldlt.rankUpdate(Bksk,-1.0/skBksk);

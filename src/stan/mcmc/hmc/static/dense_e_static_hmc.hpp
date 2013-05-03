@@ -23,8 +23,8 @@ namespace stan {
       
     public:
       
-      dense_e_static_hmc(M &m, BaseRNG& rng): base_static_hmc<M, dense_e_point, dense_e_metric, 
-                                                              expl_leapfrog, BaseRNG>(m, rng)
+      dense_e_static_hmc(M &m, BaseRNG& rng, std::ostream* e = 0):
+      base_static_hmc<M, dense_e_point, dense_e_metric, expl_leapfrog, BaseRNG>(m, rng, e)
       { this->_name = "Static HMC with a dense Euclidean metric"; }
                                             
                         

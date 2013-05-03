@@ -17,7 +17,7 @@ namespace stan {
       
     public:
       
-      base_hamiltonian(M& m): _model(m) {};
+      base_hamiltonian(M& m, std::ostream* e): _model(m), _err_stream(e) {};
       ~base_hamiltonian() {}; 
       
       virtual double T(P& z) = 0;
@@ -39,14 +39,14 @@ namespace stan {
       
       virtual void init(P& z) { this->update(z); }
       
-      virtual void update(P& z, std::ostream* error_stream = 0) {
+      virtual void update(P& z) {
         
         std::vector<double> grad_lp(this->_model.num_params_r());
         
         try {
-          z.V = - this->_model.grad_log_prob(z.q, z.r, grad_lp);
+          z.V = - this->_model.grad_log_prob(z.q, z.r, grad_lp, _err_stream);
         } catch (std::domain_error e) {
-          this->_write_error_msg(error_stream, e);
+          this->_write_error_msg(_err_stream, e);
           z.V = std::numeric_limits<double>::infinity();
         }
         
@@ -59,24 +59,26 @@ namespace stan {
       
         M& _model;
       
-      void _write_error_msg(std::ostream* error_msgs,
-                           const std::domain_error& e) {
-        
-        if (!error_msgs) return;
-        
-        *error_msgs << std::endl
-                    << "Informational Message: The parameter state is about to be Metropolis"
-                    << " rejected due to the following underlying, non-fatal (really)"
-                    << " issue (and please ignore that what comes next might say 'error'): "
-                    << e.what()
-                    << std::endl
-                    << "If the problem persists across multiple draws, you might have"
-                    << " a problem with an initial state or a gradient somewhere."
-                    << std::endl
-                    << " If the problem does not persist, the resulting samples will still"
-                    << " be drawn from the posterior."
-                    << std::endl;
-        
+        std::ostream* _err_stream;
+      
+        void _write_error_msg(std::ostream* error_msgs,
+                             const std::domain_error& e) {
+          
+          if (!error_msgs) return;
+          
+          *error_msgs << std::endl
+                      << "Informational Message: The parameter state is about to be Metropolis"
+                      << " rejected due to the following underlying, non-fatal (really)"
+                      << " issue (and please ignore that what comes next might say 'error'): "
+                      << e.what()
+                      << std::endl
+                      << "If the problem persists across multiple draws, you might have"
+                      << " a problem with an initial state or a gradient somewhere."
+                      << std::endl
+                      << " If the problem does not persist, the resulting samples will still"
+                      << " be drawn from the posterior."
+                      << std::endl;
+          
       }
       
     };
