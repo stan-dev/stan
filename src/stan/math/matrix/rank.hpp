@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <stan/math/matrix/Eigen.hpp>
+#include <stan/math/matrix/check_range.hpp>
 
 namespace stan {
   namespace math {
@@ -15,16 +16,12 @@ namespace stan {
      * @tparam T Type of elements of the vector.
      */
     template <typename T>
-    inline int rank(const std::vector<T> & v, int s)
+    inline size_t rank(const std::vector<T> & v, int s)
     {
-	s--;
 	size_t size = v.size();
-      if (s >= size)
-	{
-	  //FIXME issue warning
-        return 0;
-	}
-	int count(0);
+	check_range(size,s,"in the function rank(v,s)",s);
+	s--;
+	size_t count(0);
 	T compare(v[s]);
       for (size_t i = 0; i < size; ++i)
 	  if (v[i]<compare) count++;
@@ -39,17 +36,13 @@ namespace stan {
      * @tparam T Type of elements of the vector.
      */
  template <typename T, int R, int C>
-    inline int rank(const Eigen::Matrix<T,R,C> & v, s)
+    inline size_t rank(const Eigen::Matrix<T,R,C> & v, int s)
     {
-	s--;
 	size_t size = v.size();
-	const T * vv = v.data(); 
-      if (s >= size)
-	{
-	  //FIXME issue warning	  
-        return 0;
-	}
-	int count(0);
+	check_range(size,s,"in the function rank(v,s)",s);
+	s--;
+	const T * vv = v.data();
+	size_t count(0);
 	T compare(vv[s]);
       for (size_t i = 0; i < size; ++i)
 	  if (vv[i]<compare) count++;
