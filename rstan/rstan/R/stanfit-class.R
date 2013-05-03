@@ -193,7 +193,7 @@ get_samples2 <- function(n, sim, inc_warmup = TRUE) {
   lst
 } 
 
-par_traceplot <- function(sim, n, par_name, inc_warmup = TRUE) {
+par_traceplot <- function(sim, n, par_name, inc_warmup = TRUE, ...) {
   # same thin, n_save, warmup2 for all the chains
   thin <- sim$thin
   warmup2 <- sim$warmup2[1] 
@@ -208,13 +208,13 @@ par_traceplot <- function(sim, n, par_name, inc_warmup = TRUE) {
     for (i in 1:sim$chains) {
       yrange <- range(yrange, sim$samples[[i]][[n]]) 
     }
-    plot(c(1, id[length(id)]), yrange, type = 'n', 
-         xlab = 'Iterations', ylab = "", main = main)
+    plot(c(1, id[length(id)]), yrange, type = 'n', bty = 'l',
+         xlab = 'Iterations', ylab = "", main = main, ...)
     rect(par("usr")[1], par("usr")[3], warmup2 * thin, par("usr")[4], 
          col = warmup_col, border = NA)
     for (i in 1:sim$chains) {
       lines(id, sim$samples[[i]][[n]], xlab = '', ylab = '', 
-            lwd = 1, col = chain_cols[(i-1) %% 6 + 1]) 
+            lwd = 1, col = chain_cols[(i-1) %% 6 + 1], ...) 
     }
   } else {  
     idx <- warmup2 + 1:n_kept
@@ -222,11 +222,11 @@ par_traceplot <- function(sim, n, par_name, inc_warmup = TRUE) {
     for (i in 1:sim$chains) {
       yrange <- range(yrange, sim$samples[[i]][[n]][idx]) 
     }
-    plot(c((warmup2 + 1), id[length(id)]), yrange, type = 'n', 
-         xlab = 'Iterations (without warmup)', ylab = "", main = main)
+    plot(c((warmup2 + 1), id[length(id)]), yrange, type = 'n', bty = 'l',
+         xlab = 'Iterations (without warmup)', ylab = "", main = main, ...)
     for (i in 1:sim$chains)  
       lines(id, sim$samples[[i]][[n]][idx], lwd = 1, 
-            xlab = '', ylab = '', col = chain_cols[(i-1) %% 6 + 1]) 
+            xlab = '', ylab = '', col = chain_cols[(i-1) %% 6 + 1], ...) 
   } 
 } 
 
@@ -568,7 +568,7 @@ setMethod("grad_log_prob", signature = "stanfit",
           }) 
 
 setMethod("traceplot", signature = "stanfit", 
-          function(object, pars, inc_warmup = TRUE, ask = FALSE, ...) { 
+          function(object, pars, inc_warmup = TRUE, ask = FALSE, nrow = 4, ncol = 2, ...) { 
             # Args:
             #  ..., nrow, defaults to 4
             #  ..., ncol, defaults to 2 
@@ -584,10 +584,6 @@ setMethod("traceplot", signature = "stanfit",
               return(invisible(NULL)) 
             } 
 
-            dotlst <- list(...)
-            nrow <- if (hasArg(nrow)) as.integer(dotlst$nrow) else 4 
-            ncol <- if (hasArg(ncol)) as.integer(dotlst$ncol) else 2 
-
             pars <- if (missing(pars)) object@sim$pars_oi else check_pars_second(object@sim, pars) 
             tidx <- pars_total_indexes(object@sim$pars_oi, 
                                        object@sim$dims_oi, 
@@ -597,17 +593,18 @@ setMethod("traceplot", signature = "stanfit",
             tidx <- unlist(tidx, use.names = FALSE)
             mfrow_old <- par('mfrow')
             on.exit(par(mfrow = mfrow_old))
+            par(mgp = c(1.5, 0.5, 0), mar = c(2.5, 2, 2, 1) + 0.1, tcl = -0.03)
             num_plots <- length(tidx) 
             if (num_plots %in% 2:nrow) par(mfrow = c(num_plots, 1)) 
             if (num_plots > nrow) par(mfrow = c(nrow, ncol)) 
             par_traceplot(object@sim, tidx[1], object@sim$fnames_oi[tidx[1]], 
-                          inc_warmup = inc_warmup)
+                          inc_warmup = inc_warmup, ...)
             if (num_plots > nrow * ncol && ask) ask_old <- devAskNewPage(ask = TRUE)
             on.exit({if (ask) devAskNewPage(ask = ask_old); par(mfrow = mfrow_old)})
             if (num_plots > 1) { 
               for (n in 2:num_plots)
                 par_traceplot(object@sim, tidx[n], object@sim$fnames_oi[tidx[n]], 
-                              inc_warmup = inc_warmup)
+                              inc_warmup = inc_warmup, ...)
             }
             invisible(NULL) 
           })  
