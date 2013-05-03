@@ -42,7 +42,7 @@ namespace stan {
       for (int m = 0, mpos=0; m < K; ++m, mpos += (J < m)?J:m) {
         LLt(m,m) = var(new dot_self_vari(vs + mpos, (J < (m+1))?J:(m+1)));
         for (int n = 0, npos = 0; n < m; ++n, npos += (J < n)?J:n) {
-          LLt(m,n) = LLt(n,m) = var(new dot_product_vv_vari(vs + mpos, vs + npos, (J < (n+1))?J:(n+1)));
+          LLt(m,n) = LLt(n,m) = var(new dot_product_vari<var,var>(vs + mpos, vs + npos, (J < (n+1))?J:(n+1)));
         }
       }
       return LLt;
