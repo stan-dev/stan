@@ -17,7 +17,7 @@ namespace stan {
       
     public:
       
-      diag_e_metric(M& m, std::ofstream* e):
+      diag_e_metric(M& m, std::ostream* e):
       base_hamiltonian<M, diag_e_point, BaseRNG>(m, e) {};
       ~diag_e_metric() {};
       

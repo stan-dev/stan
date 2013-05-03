@@ -22,7 +22,7 @@ namespace stan {
       
     public:
       
-    dense_e_nuts(M &m, BaseRNG& rng, std::ofstream* e = 0):
+    dense_e_nuts(M &m, BaseRNG& rng, std::ostream* e = 0):
     base_nuts<M, dense_e_point, dense_e_metric, expl_leapfrog, BaseRNG>(m, rng, e)
     { this->_name = "NUTS with a dense Euclidean metric"; }
       

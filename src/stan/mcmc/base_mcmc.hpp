@@ -1,7 +1,7 @@
 #ifndef __STAN__MCMC__BASE_MCMC__HPP__
 #define __STAN__MCMC__BASE_MCMC__HPP__
 
-#include <fstream>
+#include <ostream>
 #include <string>
 
 #include <stan/mcmc/sample.hpp>
@@ -14,7 +14,7 @@ namespace stan {
       
     public:
       
-      base_mcmc(std::ofstream* e): _err_stream(e) {};
+      base_mcmc(std::ostream* e): _err_stream(e) {};
       
       virtual ~base_mcmc() {};
       
@@ -34,7 +34,7 @@ namespace stan {
       
       std::string _name;
         
-      std::ofstream* _err_stream;
+      std::ostream* _err_stream;
       
     };
 

@@ -22,7 +22,7 @@ namespace stan {
       
     public:
       
-    unit_e_nuts(M &m, BaseRNG& rng, std::ofstream* e = 0):
+    unit_e_nuts(M &m, BaseRNG& rng, std::ostream* e = 0):
     base_nuts<M, unit_e_point, unit_e_metric, expl_leapfrog, BaseRNG>(m, rng, e)
     { this->_name = "NUTS with a unit Euclidean metric"; }
       

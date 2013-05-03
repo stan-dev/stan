@@ -17,7 +17,7 @@ namespace stan {
       
     public:
       
-      base_hamiltonian(M& m, std::ofstream* e): _model(m), _err_stream(e) {};
+      base_hamiltonian(M& m, std::ostream* e): _model(m), _err_stream(e) {};
       ~base_hamiltonian() {}; 
       
       virtual double T(P& z) = 0;
@@ -59,7 +59,7 @@ namespace stan {
       
         M& _model;
       
-        std::ofstream* _err_stream;
+        std::ostream* _err_stream;
       
         void _write_error_msg(std::ostream* error_msgs,
                              const std::domain_error& e) {

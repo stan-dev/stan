@@ -22,7 +22,7 @@ namespace stan {
       
     public:
       
-    diag_e_nuts(M &m, BaseRNG& rng, std::ofstream* e = 0):
+    diag_e_nuts(M &m, BaseRNG& rng, std::ostream* e = 0):
     base_nuts<M, diag_e_point, diag_e_metric, expl_leapfrog, BaseRNG>(m, rng, e)
     { this->_name = "NUTS with a diagonal Euclidean metric"; }
       

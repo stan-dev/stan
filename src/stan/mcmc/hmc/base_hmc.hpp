@@ -19,7 +19,7 @@ namespace stan {
     
     public:
     
-      base_hmc(M &m, BaseRNG& rng, std::ofstream* e):
+      base_hmc(M &m, BaseRNG& rng, std::ostream* e):
       base_mcmc(e),
       _z(m.num_params_r(), m.num_params_i()),
       _hamiltonian(m, this->_err_stream),
