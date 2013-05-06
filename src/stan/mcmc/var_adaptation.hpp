@@ -15,8 +15,16 @@ namespace stan {
       
     public:
       
-      var_adaptation(int n, int max_adapt): _adapt_max_adapt(max_adapt), _estimator(n)
-      { restart(); }
+      var_adaptation(int n, int max_adapt): _estimator(n) {
+        
+        restart();
+        
+        int delta = 0.1 * max_adapt;
+        delta = delta > 100 ? 100 : delta;
+        
+        _adapt_max_adapt = max_adapt - delta;
+      
+      }
       
       void restart() {
         _adapt_var_counter = 0;
