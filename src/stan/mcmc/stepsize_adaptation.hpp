@@ -45,16 +45,16 @@ namespace stan {
         _s_bar = (1.0 - eta) * _s_bar + eta * (_delta - adapt_stat);
         
         const double x = _mu - _s_bar * sqrt(_counter) / _gamma;
-        const double x_eta = pow(_counter, - _kappa);
+        const double x_eta = std::pow(_counter, - _kappa);
         
         _x_bar = (1.0 - x_eta) * _x_bar + x_eta * x;
         
-        epsilon = exp(x);
+        epsilon = std::exp(x);
         
       }
       
       void complete_adaptation(double& epsilon) {
-        epsilon = exp(_x_bar);
+        epsilon = std::exp(_x_bar);
       }
       
     protected:
