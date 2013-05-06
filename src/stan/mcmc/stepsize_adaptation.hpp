@@ -49,8 +49,12 @@ namespace stan {
         
         _x_bar = (1.0 - x_eta) * _x_bar + x_eta * x;
         
-        epsilon = exp(_x_bar);
+        epsilon = exp(x);
         
+      }
+      
+      void complete_adaptation(double& epsilon) {
+        epsilon = exp(_x_bar);
       }
       
     protected:

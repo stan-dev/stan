@@ -47,6 +47,11 @@ namespace stan {
         return s;
         
       }
+                               
+      void disengage_adaptation() {
+        base_adapter::disengage_adaptation();
+        this->_stepsize_adaptation.complete_adaptation(this->_nom_epsilon);
+      }
 
     };
     
