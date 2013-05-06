@@ -10,7 +10,7 @@ CFLAGS_GTEST += -I $(GTEST)/include -I $(GTEST)
 # Target to build all models and test them. This needs to be before 
 # the test-unit target.
 ##
-MODEL_TESTS := $(shell find src/test/models -type f -name '*_test.cpp')
+MODEL_TESTS := $(shell shuf -e `find src/test/models -type f -name '*_test.cpp'`)
 MODEL_TESTS := $(MODEL_TESTS:src/test/%_test.cpp=test/%)
 
 MISSING_MODEL_TESTS := $(shell find src/models -type f -name '*.stan')
@@ -28,7 +28,7 @@ endif
 ##
 # Target to build bugs models
 ##
-BUGS_TESTS := $(shell find src/test/models/bugs_examples -type f -name '*_test.cpp')
+BUGS_TESTS := $(shell shuf -e `find src/test/models/bugs_examples -type f -name '*_test.cpp'`)
 BUGS_TESTS := $(BUGS_TESTS:src/test/%_test.cpp=test/%)
 .PHONY: test-bugs
 test-bugs: $(addprefix runtest_no_fail/,$(BUGS_TESTS))
@@ -37,7 +37,7 @@ test-bugs: $(addprefix runtest_no_fail/,$(BUGS_TESTS))
 # Target to build unit tests. All unit tests are in src/test 
 # and are named *_test.cpp
 ##
-UNIT_TESTS := $(shell find src/test -type f -name '*_test.cpp')
+UNIT_TESTS := $(shell shuf -e `find src/test -type f -name '*_test.cpp'`)
 UNIT_TESTS := $(UNIT_TESTS:src/test/%_test.cpp=test/%)
 UNIT_TESTS := $(filter-out $(MODEL_TESTS),$(UNIT_TESTS))
 
