@@ -47,10 +47,10 @@ namespace stan {
         
         this->_integrator.evolve(this->_z, this->_hamiltonian, this->_nom_epsilon);
         
-        double H = this->_hamiltonian.H(this->_z);
-        if (H != H) H = std::numeric_limits<double>::infinity();
+        double h = this->_hamiltonian.H(this->_z);
+        if (h != h) h = std::numeric_limits<double>::infinity();
         
-        double delta_H = H0 - H;
+        double delta_H = H0 - h;
         
         int direction = delta_H > std::log(0.5) ? 1 : -1;
         
@@ -64,11 +64,11 @@ namespace stan {
           double H0 = this->_hamiltonian.H(this->_z);
           
           this->_integrator.evolve(this->_z, this->_hamiltonian, this->_nom_epsilon);
-
-          double H = this->_hamiltonian.H(this->_z);
-          if (H != H) H = std::numeric_limits<double>::infinity();
           
-          double delta_H = H0 - H;
+          double h = this->_hamiltonian.H(this->_z);
+          if (h != h) h = std::numeric_limits<double>::infinity();
+          
+          double delta_H = H0 - h;
           
           if ((direction == 1) && !(delta_H > std::log(0.5)))
             break;
