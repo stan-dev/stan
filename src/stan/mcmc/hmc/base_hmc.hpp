@@ -1,6 +1,7 @@
 #ifndef __STAN__MCMC__BASE__HMC__BETA__
 #define __STAN__MCMC__BASE__HMC__BETA__
 
+#include <math.h>
 #include <stdexcept>
 
 #include <boost/random/variate_generator.hpp>
@@ -46,7 +47,7 @@ namespace stan {
         this->_integrator.evolve(this->_z, this->_hamiltonian, this->_nom_epsilon);
         double delta_H = H0 - this->_hamiltonian.H(this->_z);
         
-        int direction = delta_H > log(0.5) ? 1 : -1;
+        int direction = delta_H > std::log(0.5) ? 1 : -1;
         
         while (1) {
           
@@ -59,9 +60,9 @@ namespace stan {
           this->_integrator.evolve(this->_z, this->_hamiltonian, this->_nom_epsilon);
           double delta_H = H0 - this->_hamiltonian.H(this->_z);
                    
-          if ((direction == 1) && !(delta_H > log(0.5))) 
+          if ((direction == 1) && !(delta_H > std::log(0.5)))
             break;
-          else if ((direction == -1) && !(delta_H < log(0.5)))
+          else if ((direction == -1) && !(delta_H < std::log(0.5)))
             break;
           else
             this->_nom_epsilon = ( (direction == 1)

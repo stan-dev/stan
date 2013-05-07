@@ -1,6 +1,7 @@
 #ifndef __STAN__MCMC__BASE__NUTS__BETA__
 #define __STAN__MCMC__BASE__NUTS__BETA__
 
+#include <math.h>
 #include <stan/math/functions/min.hpp>
 #include <stan/mcmc/hmc/base_hmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
@@ -78,7 +79,7 @@ namespace stan {
         util.H0 = this->_hamiltonian.H(this->_z);
         
         // Sample the slice variable
-        util.log_u = log(this->_rand_uniform());
+        util.log_u = std::log(this->_rand_uniform());
         
         // Build a balanced binary tree until the NUTS criterion fails
         util.criterion = true;

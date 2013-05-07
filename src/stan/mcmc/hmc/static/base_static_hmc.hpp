@@ -1,6 +1,7 @@
 #ifndef __STAN__MCMC__BASE__STATIC__HMC__BETA__
 #define __STAN__MCMC__BASE__STATIC__HMC__BETA__
 
+#include <math.h>
 #include <stan/mcmc/hmc/base_hmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
 

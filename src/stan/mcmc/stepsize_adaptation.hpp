@@ -1,6 +1,7 @@
 #ifndef __STAN__MCMC__STEPSIZE__ADAPTATION__BETA__
 #define __STAN__MCMC__STEPSIZE__ADAPTATION__BETA__
 
+#include <math.h>
 #include <stan/mcmc/base_adaptation.hpp>
 
 namespace stan {
