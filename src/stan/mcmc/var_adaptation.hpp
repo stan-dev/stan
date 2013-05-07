@@ -50,7 +50,7 @@ namespace stan {
           
           _estimator.sample_variance(var);
           
-          int n = _estimator.num_samples();
+          double n = static_cast<double>(_estimator.num_samples());
           var = (n / (n + 5.0)) * var
                 + (5.0 / (n + 5.0)) * Eigen::VectorXd::Ones(var.size());
           

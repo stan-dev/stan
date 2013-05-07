@@ -9,7 +9,7 @@ namespace stan {
       
     public:
       
-      base_adapter(): _adapt_flag(true) {};
+      base_adapter(): _adapt_flag(false) {};
       
       virtual void engage_adaptation()    { _adapt_flag = true; }
       virtual void disengage_adaptation() { _adapt_flag = false; }

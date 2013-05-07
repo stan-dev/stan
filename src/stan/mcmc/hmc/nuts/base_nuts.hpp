@@ -1,6 +1,7 @@
 #ifndef __STAN__MCMC__BASE__NUTS__BETA__
 #define __STAN__MCMC__BASE__NUTS__BETA__
 
+#include <math.h>
 #include <stan/math/functions/min.hpp>
 #include <stan/mcmc/hmc/base_hmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
@@ -78,11 +79,9 @@ namespace stan {
         util.H0 = this->_hamiltonian.H(this->_z);
         
         // Sample the slice variable
-        util.log_u = log(this->_rand_uniform());
+        util.log_u = std::log(this->_rand_uniform());
         
         // Build a balanced binary tree until the NUTS criterion fails
-        util.n_tree = 0;
-        util.sum_prob = 0;
         util.criterion = true;
         
         int n_valid = 0;
@@ -91,33 +90,44 @@ namespace stan {
         
         while (util.criterion && (this->_depth <= this->_max_depth) ) {
           
+          util.n_tree = 0;
+          util.sum_prob = 0;
+          
           // Randomly sample a direction in time
-          ps_point& z = z_plus;
-          Eigen::VectorXd& rho = rho_plus;
+          ps_point* z = 0;
+          Eigen::VectorXd* rho = 0;
           
           if (this->_rand_uniform() > 0.5)
           {
-            z = z_plus;
-            rho = rho_plus;
+            z = &z_plus;
+            rho = &rho_plus;
             util.sign = 1;
           }
           else
           {
-            z = z_minus;
-            rho = rho_minus;
+            z = &z_minus;
+            rho = &rho_minus;
             util.sign = -1;
           }
           
           // And build a new subtree in that direction 
-          this->_z.copy_base(z);
+          this->_z.copy_base(*z);
           
-          int n_valid_subtree = build_tree(_depth, rho, z_propose, util);
+          int n_valid_subtree = build_tree(_depth, *rho, z_propose, util);
           
-          z = static_cast<ps_point>(this->_z);
+          *z = static_cast<ps_point>(this->_z);
 
           // Metropolis-Hastings sample the fresh subtree
-          double subtree_prob = static_cast<double>(n_valid_subtree) /
-                                static_cast<double>(n_valid_subtree + n_valid);
+          if (!util.criterion) break;
+          
+          double subtree_prob = 0;
+          
+          if (n_valid) {
+            subtree_prob = static_cast<double>(n_valid_subtree) /
+                           static_cast<double>(n_valid);
+          } else {
+            subtree_prob = n_valid_subtree ? 1 : 0;
+          }
           
           if (this->_rand_uniform() < subtree_prob)
             z_sample = z_propose;
