@@ -43,9 +43,14 @@ namespace stan {
         this->_hamiltonian.sample_p(this->_z, this->_rand_int);
         this->_hamiltonian.init(this->_z);
         
-        double H0 = this->_hamiltonian.H(this->_z);
+        double H0 = this->_hamiltonian.H(this->_z); // Guaranteed to be finite if randomly initialized
+        
         this->_integrator.evolve(this->_z, this->_hamiltonian, this->_nom_epsilon);
-        double delta_H = H0 - this->_hamiltonian.H(this->_z);
+        
+        double H = this->_hamiltonian.H(this->_z);
+        if (H != H) H = std::numeric_limits<double>::infinity();
+        
+        double delta_H = H0 - H;
         
         int direction = delta_H > std::log(0.5) ? 1 : -1;
         
@@ -57,9 +62,14 @@ namespace stan {
           this->_hamiltonian.init(this->_z);
           
           double H0 = this->_hamiltonian.H(this->_z);
+          
           this->_integrator.evolve(this->_z, this->_hamiltonian, this->_nom_epsilon);
-          double delta_H = H0 - this->_hamiltonian.H(this->_z);
-                   
+
+          double H = this->_hamiltonian.H(this->_z);
+          if (H != H) H = std::numeric_limits<double>::infinity();
+          
+          double delta_H = H0 - H;
+          
           if ((direction == 1) && !(delta_H > std::log(0.5)))
             break;
           else if ((direction == -1) && !(delta_H < std::log(0.5)))
