@@ -100,7 +100,7 @@ endif
 ##
 # Builds a single test
 ##
-test/gm/compile_models$(EXE) : test/gm/compile_models.o bin/libstan.a $(shell shuf -e $(patsubst %.stan,%$(EXE),$(wildcard src/test/gm/model_specs/compiled/*.stan)))
+test/gm/compile_models$(EXE) : test/gm/compile_models.o bin/libstan.a $(patsubst %.stan,%$(EXE),$(wildcard src/test/gm/model_specs/compiled/*.stan))
 	@mkdir -p $(dir $@)
 	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS) $(LDLIBS_STANC)
 ifeq ($(findstring test-,$(MAKECMDGOALS))$(findstring runtest/,$(MAKECMDGOALS)),)
