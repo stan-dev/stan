@@ -253,8 +253,8 @@ TEST(McmcHmcIntegratorsExplLeapfrog,begin_update_p) {
   double epsilon = 0.1;
   
   integrator.begin_update_p(z, hamiltonian, 0.5 * epsilon);
-  EXPECT_NEAR(z.V,     1.99974742955684, 1e-15);
-  EXPECT_NEAR(z.q[0],  1.99987371079118, 1e-15);
-  EXPECT_NEAR(z.p(0), -1.68611660683688, 1e-15);
-  EXPECT_NEAR(z.g(0),  1.99987371079118, 1e-15);
+  EXPECT_NEAR(z.V,     1.99974742955684, 5e-14);
+  EXPECT_NEAR(z.q[0],  1.99987371079118, 5e-14);
+  EXPECT_NEAR(z.p(0), -1.68611660683688, 5e-14);
+  EXPECT_NEAR(z.g(0),  1.99987371079118, 5e-14);
 }
