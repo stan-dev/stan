@@ -1,7 +1,7 @@
 #ifndef __STAN__MCMC__STEPSIZE__ADAPTATION__BETA__
 #define __STAN__MCMC__STEPSIZE__ADAPTATION__BETA__
 
-#include <math.h>
+#include <cmath>
 #include <stan/mcmc/base_adaptation.hpp>
 
 namespace stan {
@@ -45,7 +45,7 @@ namespace stan {
         
         _s_bar = (1.0 - eta) * _s_bar + eta * (_delta - adapt_stat);
         
-        const double x = _mu - _s_bar * sqrt(_counter) / _gamma;
+        const double x = _mu - _s_bar * std::sqrt(_counter) / _gamma;
         const double x_eta = std::pow(_counter, - _kappa);
         
         _x_bar = (1.0 - x_eta) * _x_bar + x_eta * x;
