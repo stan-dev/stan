@@ -220,14 +220,37 @@ namespace command_model_namespace {
 //************************************************************
 
 
-TEST(McmcHmcIntegratorsExplLeapfrog,begin_update_p) {
-  typedef boost::ecuyer1988 rng_t;
+class McmcHmcIntegratorsExplLeapfrog : public testing::Test {
+public:
+  
+  void SetUp() {
+    // setup hamiltonian
+    std::fstream data_stream("src/test/models/command1.data.R",
+                             std::fstream::in);
+    stan::io::dump data_var_context(data_stream);
+    data_stream.close();
 
+    model = new command_model_namespace::command_model(data_var_context);
+  }
+  
+  void TearDown() {
+    delete(model);
+  }  
+  
+  typedef boost::ecuyer1988 rng_t;
+  
   // integrator under test
   stan::mcmc::expl_leapfrog<
     stan::mcmc::unit_e_metric<command_model_namespace::command_model,rng_t>, 
-      stan::mcmc::unit_e_point> integrator;
+    stan::mcmc::unit_e_point> integrator;
   
+  // model
+  command_model_namespace::command_model *model;
+};
+
+
+
+TEST_F(McmcHmcIntegratorsExplLeapfrog,begin_update_p) {
   // setup z
   stan::mcmc::unit_e_point z(1,0);
   z.V    = 1.99974742955684;
@@ -238,23 +261,24 @@ TEST(McmcHmcIntegratorsExplLeapfrog,begin_update_p) {
   EXPECT_NEAR(z.q[0],  1.99987371079118, 1e-15);
   EXPECT_NEAR(z.p(0), -1.58612292129732, 1e-15);
   EXPECT_NEAR(z.g(0),  1.99987371079118, 1e-15);
+  
 
   // setup hamiltonian
-  std::fstream data_stream("src/test/models/command1.data.R",
-                           std::fstream::in);
-  stan::io::dump data_var_context(data_stream);
-  data_stream.close();
-  
-  command_model_namespace::command_model model(data_var_context);
-  stan::mcmc::unit_e_metric<command_model_namespace::command_model,rng_t>
-    hamiltonian(model, &std::cout);
+  stan::mcmc::unit_e_metric<command_model_namespace::command_model,
+    rng_t> hamiltonian(*model, &std::cout);
 
   // setup epsilon
   double epsilon = 0.1;
-  
+
   integrator.begin_update_p(z, hamiltonian, 0.5 * epsilon);
   EXPECT_NEAR(z.V,     1.99974742955684, 5e-14);
   EXPECT_NEAR(z.q[0],  1.99987371079118, 5e-14);
   EXPECT_NEAR(z.p(0), -1.68611660683688, 5e-14);
   EXPECT_NEAR(z.g(0),  1.99987371079118, 5e-14);
+}
+
+TEST_F(McmcHmcIntegratorsExplLeapfrog,DISABLED_update_q) {
+}
+
+TEST_F(McmcHmcIntegratorsExplLeapfrog,DISABLED_end_update_p) {
 }
