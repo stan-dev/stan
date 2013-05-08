@@ -75,3 +75,41 @@ TEST(McmcStepsizeAdaptation, learn_stepsize) {
   
   EXPECT_EQ(target_epsilon, new_epsilon);
 }
+
+class exposed_adaptation : public stan::mcmc::stepsize_adaptation {
+public:
+  exposed_adaptation(const double counter,
+                     const double s_bar,
+                     const double x_bar,
+                     const double mu,
+                     const double delta,
+                     const double gamma,
+                     const double kappa,
+                     const double t0)  {
+    _counter = counter;
+    _s_bar = s_bar;
+    _x_bar = x_bar;
+    _mu = mu;
+    _delta = delta;
+    _gamma = gamma;
+    _kappa = kappa;
+    _t0 = t0;
+  }
+};
+
+
+TEST(McmcStepsizeAdaptation, learn_stepsize_1) {
+  exposed_adaptation adaptation(273,
+                                0.00513820936953773,
+                                0.886351350781597,
+                                2.488109515349,
+                                0.5,
+                                0.05,
+                                0.75,
+                                10);
+  double epsilon, adapt_stat;
+  epsilon = 2.2037632781885;
+  adapt_stat = 1.0;
+  adaptation.learn_stepsize(epsilon, adapt_stat);
+  EXPECT_NEAR(3.95863527373545, epsilon, 1e-14);
+}
