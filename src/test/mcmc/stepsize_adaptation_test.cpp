@@ -95,6 +95,31 @@ public:
     _kappa = kappa;
     _t0 = t0;
   }
+
+  double counter() const {
+    return _counter;
+  }
+  double s_bar() const {
+    return _s_bar;
+  }
+  double x_bar() const {
+    return _x_bar;
+  }
+  double mu() const {
+    return _mu;
+  }
+  double delta() const {
+    return _delta;
+  }
+  double gamma() const {
+    return _gamma;
+  }
+  double kappa() const {
+    return _kappa;
+  }
+  double t0() const {
+    return _t0;
+  }
 };
 
 
@@ -112,4 +137,52 @@ TEST(McmcStepsizeAdaptation, learn_stepsize_1) {
   adapt_stat = 1.0;
   adaptation.learn_stepsize(epsilon, adapt_stat);
   EXPECT_NEAR(3.95863527373545, epsilon, 1e-14);
+}
+
+TEST(McmcStepsizeAdaptation, learn_stepsize_2) {
+  exposed_adaptation adaptation(79,
+                                0.0209457573689391,
+                                0.821976337071218,
+                                4.13018724667137,
+                                0.5,
+                                0.05,
+                                0.75,
+                                10);
+  double epsilon, adapt_stat;
+  epsilon = 1.50198560950968;
+  adapt_stat = 0.728285153733299;
+  adaptation.learn_stepsize(epsilon, adapt_stat);
+  EXPECT_NEAR(2.40769920051673, epsilon, 1e-14);
+  EXPECT_NEAR(80, adaptation.counter(), 1e-14);
+  EXPECT_NEAR(0.0181765250233587, adaptation.s_bar(), 1e-14);
+  EXPECT_NEAR(0.824095816988227, adaptation.x_bar(), 1e-14);
+  EXPECT_NEAR(4.13018724667137, adaptation.mu(), 1e-14);
+  EXPECT_NEAR(0.5, adaptation.delta(), 1e-14);
+  EXPECT_NEAR(0.05, adaptation.gamma(), 1e-14);
+  EXPECT_NEAR(0.75, adaptation.kappa(), 1e-14);
+  EXPECT_NEAR(10, adaptation.t0(), 1e-14);
+}
+
+TEST(McmcStepsizeAdaptation, learn_stepsize_3) {
+  exposed_adaptation adaptation(79,
+                                0.0206811620891896,
+                                0.825842987938587,
+                                4.13018305456267,
+                                0.5,
+                                0.05,
+                                0.75,
+                                10);
+  double epsilon, adapt_stat;
+  epsilon = 1.574313439903;
+  adapt_stat = 0.684248188546772;
+  adaptation.learn_stepsize(epsilon, adapt_stat);
+  EXPECT_NEAR(2.31161210908631, epsilon, 5e-14);
+  EXPECT_NEAR(80, adaptation.counter(), 1e-14);
+  EXPECT_NEAR(0.0184041693043455, adaptation.s_bar(), 1e-14);
+  EXPECT_NEAR(0.826295412288499, adaptation.x_bar(), 1e-14);
+  EXPECT_NEAR(4.13018305456267, adaptation.mu(), 1e-14);
+  EXPECT_NEAR(0.5, adaptation.delta(), 1e-14);
+  EXPECT_NEAR(0.05, adaptation.gamma(), 1e-14);
+  EXPECT_NEAR(0.75, adaptation.kappa(), 1e-14);
+  EXPECT_NEAR(10, adaptation.t0(), 1e-14);
 }
