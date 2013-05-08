@@ -13,7 +13,7 @@ namespace stan {
       
     public:
       
-      expl_leapfrog(std::ostream* o): base_leapfrog<H, P>(o) {};
+      expl_leapfrog(std::ostream* o=0): base_leapfrog<H, P>(o) {};
       
       void begin_update_p(P& z, H& hamiltonian, double epsilon) { 
         z.p -= epsilon * hamiltonian.dphi_dq(z); 
