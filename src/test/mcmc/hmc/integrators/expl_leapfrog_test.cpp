@@ -250,19 +250,18 @@ public:
 
 
 
-TEST_F(McmcHmcIntegratorsExplLeapfrog,begin_update_p) {
+TEST_F(McmcHmcIntegratorsExplLeapfrog, begin_update_p) {
   // setup z
   stan::mcmc::unit_e_point z(1,0);
-  z.V    = 1.99974742955684;
-  z.q[0] = 1.99987371079118;
+  z.V    =  1.99974742955684;
+  z.q[0] =  1.99987371079118;
   z.p(0) = -1.58612292129732;
-  z.g(0) = 1.99987371079118;
+  z.g(0) =  1.99987371079118;
   EXPECT_NEAR(z.V,     1.99974742955684, 1e-15);
   EXPECT_NEAR(z.q[0],  1.99987371079118, 1e-15);
   EXPECT_NEAR(z.p(0), -1.58612292129732, 1e-15);
   EXPECT_NEAR(z.g(0),  1.99987371079118, 1e-15);
   
-
   // setup hamiltonian
   stan::mcmc::unit_e_metric<command_model_namespace::command_model,
     rng_t> hamiltonian(*model, &std::cout);
@@ -277,7 +276,30 @@ TEST_F(McmcHmcIntegratorsExplLeapfrog,begin_update_p) {
   EXPECT_NEAR(z.g(0),  1.99987371079118, 5e-14);
 }
 
-TEST_F(McmcHmcIntegratorsExplLeapfrog,DISABLED_update_q) {
+TEST_F(McmcHmcIntegratorsExplLeapfrog, update_q) {
+  // setup z
+  stan::mcmc::unit_e_point z(1,0);
+  z.V    =  1.99974742955684;
+  z.q[0] =  1.99987371079118;
+  z.p(0) = -1.68611660683688;
+  z.g(0) =  1.99987371079118;
+  EXPECT_NEAR(z.V,     1.99974742955684, 1e-15);
+  EXPECT_NEAR(z.q[0],  1.99987371079118, 1e-15);
+  EXPECT_NEAR(z.p(0), -1.68611660683688, 1e-15);
+  EXPECT_NEAR(z.g(0),  1.99987371079118, 1e-15);
+
+  // setup hamiltonian
+  stan::mcmc::unit_e_metric<command_model_namespace::command_model,
+    rng_t> hamiltonian(*model, &std::cout);
+
+  // setup epsilon
+  double epsilon = 0.1;
+
+  integrator.update_q(z, hamiltonian, epsilon);
+  EXPECT_NEAR(z.V,     1.99974742955684, 5e-14);
+  EXPECT_NEAR(z.q[0],  1.83126205010749, 5e-14);
+  EXPECT_NEAR(z.p(0), -1.68611660683688, 5e-14);
+  EXPECT_NEAR(z.g(0),  1.99987371079118, 5e-14);
 }
 
 TEST_F(McmcHmcIntegratorsExplLeapfrog,DISABLED_end_update_p) {
