@@ -30,12 +30,14 @@
     whether the user is prompted before starting a new page of output in the case
     there are a lot of parameters (see \code{\link[grDevices]{devAskNewPage}}).}
   \item{nrow}{To specify the layout for the traceplots for multiple quantities: 
-    number of rows on every page. With \code{ncol}, the layout would be nrow * ncol.
-    These specification only takes effects when the total number is larger than
-    nrow * ncol.} 
+    number of rows on every page. Together with \code{ncol}, the layout would
+    be nrow * ncol. The layout by specifying \code{nrow} and \code{ncol} takes
+    effects only when the total number is larger than \code{nrow} times
+    \code{ncol}.} 
   \item{ncol}{To specify the layout for the traceplots for multiple quantities: 
     number of columns on every page.} 
-  \item{\dots}{Additional parameters passed to the underlying plot function.} 
+  \item{\dots}{Additional parameters passed to the underlying function
+    \code{plot}.} 
 }
 \value{\code{NULL}} 
 

@@ -570,8 +570,8 @@ setMethod("grad_log_prob", signature = "stanfit",
 setMethod("traceplot", signature = "stanfit", 
           function(object, pars, inc_warmup = TRUE, ask = FALSE, nrow = 4, ncol = 2, ...) { 
             # Args:
-            #  ..., nrow, defaults to 4
-            #  ..., ncol, defaults to 2 
+            #  nrow, defaults to 4
+            #  ncol, defaults to 2 
             #  nrow and ncol are used to define mfrow for the whole plot area
             #  when there are many parameters. 
 
@@ -593,7 +593,7 @@ setMethod("traceplot", signature = "stanfit",
             tidx <- unlist(tidx, use.names = FALSE)
             mfrow_old <- par('mfrow')
             on.exit(par(mfrow = mfrow_old))
-            par(mgp = c(1.5, 0.5, 0), mar = c(2.5, 2, 2, 1) + 0.1, tcl = -0.03)
+            par(mgp = c(1.5, 0.5, 0), mar = c(2.5, 2, 2, 1) + 0.1, tck = -0.02)
             num_plots <- length(tidx) 
             if (num_plots %in% 2:nrow) par(mfrow = c(num_plots, 1)) 
             if (num_plots > nrow) par(mfrow = c(nrow, ncol)) 
