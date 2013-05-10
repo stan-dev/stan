@@ -1,8 +1,6 @@
 #ifndef __STAN__MCMC__BASE__ADAPTER__BETA__
 #define __STAN__MCMC__BASE__ADAPTER__BETA__
 
-#include <stan/math/matrix/Eigen.hpp>
-
 namespace stan {
   
   namespace mcmc {
@@ -11,10 +9,10 @@ namespace stan {
       
     public:
       
-      base_adapter(): _adapt_flag(true) {};
+      base_adapter(): _adapt_flag(false) {};
       
-      void engage_adaptation()    { _adapt_flag = true; }
-      void disengage_adaptation() { _adapt_flag = false; }
+      virtual void engage_adaptation()    { _adapt_flag = true; }
+      virtual void disengage_adaptation() { _adapt_flag = false; }
       
       bool adapting() { return _adapt_flag; }
       

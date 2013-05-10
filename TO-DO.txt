@@ -4,6 +4,27 @@ STAN TO-DO LIST
 FOR NEXT RELEASE (1.3.0++)
 -------------------------------------------
 
+- (Daniel/Michael) instrument tests for new algorithms to isolate
+  floating point divergence
+
+- (everyone) remove std::cout from API
+
+- (Daniel) fix bin/print spacing
+
+- (Daniel) validate shuffling tests is OK w. Jenkins
+  [see Ben's e-mail of 5/4/13 at 6:09 PM]
+
+- sort out low ESS in new diagonal adaptation
+
+- sort out rank, etc. from Marco
+
+- go through include-what-you-use output from Ben to
+  mailing list (early May)
+
+- sort out why log_prob_poly<>() isn't working for Metropolis with double
+
+- redundant model_header.hpp includes --- why not just include matrix.hpp?
+
 - int vs. size_t and error handling in indexing;  with size_t,
   get cast of negative int to large positive size_t, which will
   confuse users in error msgs
@@ -130,6 +151,17 @@ Doc
 C++ API
 ======================================================================
 [items go here first, then to RStan/cmd]
+
+* matrix normal distribution (Marcus suggested)
+  http://en.wikipedia.org/wiki/Matrix_normal_distribution
+  -- useful for GeoBUGS type models
+
+* clean up assign_to_var location & namespaces for auto-diff
+  -- work through use case from C++ API
+  -- intro namespaces stan::diff::fwd & stan::diff:rev
+  -- base instances in stan::math
+  -- fwd-mode instances in stan::diff::fwd
+  -- rev in diff::rev
 
 * plain old expression print (as input, not as generated in C++)
   -- clearer error messages for users

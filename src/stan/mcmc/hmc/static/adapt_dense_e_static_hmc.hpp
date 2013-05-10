@@ -19,8 +19,9 @@ namespace stan {
       
     public:
       
-        adapt_dense_e_static_hmc(M &m, BaseRNG& rng, int max_adapt, std::ostream* e = 0):
-        dense_e_static_hmc<M, BaseRNG>(m, rng, e),
+        adapt_dense_e_static_hmc(M &m, BaseRNG& rng, int max_adapt,
+                                 std::ostream* o = &std::cout, std::ostream* e = 0):
+        dense_e_static_hmc<M, BaseRNG>(m, rng, o, e),
         stepsize_covar_adapter(m.num_params_r(), max_adapt)
       {};
       
@@ -49,6 +50,11 @@ namespace stan {
         
         return s;
         
+      }
+                                      
+      void disengage_adaptation() {
+        base_adapter::disengage_adaptation();
+        this->_stepsize_adaptation.complete_adaptation(this->_nom_epsilon);
       }
       
     };

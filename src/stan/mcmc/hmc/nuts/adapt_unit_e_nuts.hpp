@@ -18,8 +18,9 @@ namespace stan {
       
     public:
       
-      adapt_unit_e_nuts(M &m, BaseRNG& rng, std::ostream* e = 0):
-      unit_e_nuts<M, BaseRNG>(m, rng, e) {};
+      adapt_unit_e_nuts(M &m, BaseRNG& rng,
+                        std::ostream* o = &std::cout, std::ostream* e = 0):
+      unit_e_nuts<M, BaseRNG>(m, rng, o, e) {};
       
       ~adapt_unit_e_nuts() {};
       
@@ -32,6 +33,11 @@ namespace stan {
         
         return s;
         
+      }
+                               
+      void disengage_adaptation() {
+        base_adapter::disengage_adaptation();
+        this->_stepsize_adaptation.complete_adaptation(this->_nom_epsilon);
       }
 
     };
