@@ -33,7 +33,7 @@ namespace stan {
      * @return Number of components of v less than v[s].
      * @tparam T Type of elements of the vector.
      */
- template <typename T, int R, int C>
+    template <typename T, int R, int C>
     inline size_t rank(const Eigen::Matrix<T,R,C> & v, int s)
     {
 	size_t size = v.size();
