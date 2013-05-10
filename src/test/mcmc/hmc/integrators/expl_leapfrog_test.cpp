@@ -3,6 +3,8 @@
 
 #include <stan/mcmc/hmc/hamiltonians/unit_e_metric.hpp>
 #include <stan/mcmc/hmc/hamiltonians/unit_e_point.hpp>
+#include <stan/mcmc/hmc/hamiltonians/diag_e_metric.hpp>
+#include <stan/mcmc/hmc/hamiltonians/diag_e_point.hpp>
 #include <boost/random/additive_combine.hpp> // L'Ecuyer RNG
 
 //************************************************************
@@ -243,6 +245,10 @@ public:
   stan::mcmc::expl_leapfrog<
     stan::mcmc::unit_e_metric<command_model_namespace::command_model,rng_t>, 
     stan::mcmc::unit_e_point> unit_e_integrator;
+
+  stan::mcmc::expl_leapfrog<
+    stan::mcmc::diag_e_metric<command_model_namespace::command_model,rng_t>, 
+    stan::mcmc::diag_e_point> diag_e_integrator;
   
   // model
   command_model_namespace::command_model *model;
@@ -533,4 +539,30 @@ TEST_F(McmcHmcIntegratorsExplLeapfrog, evolve_8) {
   EXPECT_NEAR(z.q[0],  3.73124965311523, 5e-14);
   EXPECT_NEAR(z.p(0),  0.134248884233563, 5e-14);
   EXPECT_NEAR(z.g(0),  3.73124965311523, 5e-14);
+}
+
+TEST_F(McmcHmcIntegratorsExplLeapfrog, DISABLED_evolve_9) {
+  // setup z
+  stan::mcmc::diag_e_point z(1,0);
+  z.V    =  0.807684865121721;
+  z.q[0] =  1.27097196280777;
+  z.p(0) = -0.159996782671291;
+  z.g(0) =  1.27097196280777;
+  EXPECT_NEAR(z.V,     0.807684865121721, 1e-15);
+  EXPECT_NEAR(z.q[0],  1.27097196280777, 1e-15);
+  EXPECT_NEAR(z.p(0), -0.159996782671291, 1e-15);
+  EXPECT_NEAR(z.g(0),  1.27097196280777, 1e-15);
+
+  // setup hamiltonian
+  stan::mcmc::diag_e_metric<command_model_namespace::command_model,
+    rng_t> hamiltonian(*model, &std::cout);
+
+  // setup epsilon
+  double epsilon = 2.40769920051673;
+
+  diag_e_integrator.evolve(z, hamiltonian, epsilon);
+  EXPECT_NEAR(z.V,     1.46626604258356, 5e-14);
+  EXPECT_NEAR(z.q[0], -1.71246374711032, 5e-14);
+  EXPECT_NEAR(z.p(0),  0.371492925378682, 5e-14);
+  EXPECT_NEAR(z.g(0), -1.71246374711032, 5e-14);
 }
