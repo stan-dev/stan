@@ -541,13 +541,14 @@ TEST_F(McmcHmcIntegratorsExplLeapfrog, evolve_8) {
   EXPECT_NEAR(z.g(0),  3.73124965311523, 5e-14);
 }
 
-TEST_F(McmcHmcIntegratorsExplLeapfrog, DISABLED_evolve_9) {
+TEST_F(McmcHmcIntegratorsExplLeapfrog, evolve_9) {
   // setup z
   stan::mcmc::diag_e_point z(1,0);
   z.V    =  0.807684865121721;
   z.q[0] =  1.27097196280777;
   z.p(0) = -0.159996782671291;
   z.g(0) =  1.27097196280777;
+  z.mInv(0) = 0.733184698671436;
   EXPECT_NEAR(z.V,     0.807684865121721, 1e-15);
   EXPECT_NEAR(z.q[0],  1.27097196280777, 1e-15);
   EXPECT_NEAR(z.p(0), -0.159996782671291, 1e-15);
