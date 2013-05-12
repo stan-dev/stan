@@ -1,8 +1,11 @@
 #ifndef __STAN__MATH__FUNCTIONS__LOG1P_HPP__
 #define __STAN__MATH__FUNCTIONS__LOG1P_HPP__
 
+#include <limits>
+
 #include <boost/math/tools/promotion.hpp>
-#include <stdexcept>
+
+#include<stdexcept>
 #include <boost/throw_exception.hpp>
 
 namespace stan {
@@ -21,8 +24,8 @@ namespace stan {
     inline typename boost::math::tools::promote_args<T>::type
     log1p(const T x) {
       using std::log;
-      if (x < -1.0)
-        BOOST_THROW_EXCEPTION(std::domain_error ("x can not be less than -1"));
+      if (!(x >= -1.0))
+        return std::numeric_limits<double>::quiet_NaN();
 
       if (x > 1e-9 || x < -1e-9)
         return log(1.0 + x);     // direct, if distant from 1
