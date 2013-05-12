@@ -100,7 +100,10 @@ endif
 ##
 # Builds a single test
 ##
-test/gm/compile_models$(EXE) : test/gm/compile_models.o bin/libstan.a $(patsubst %.stan,%$(EXE),$(wildcard src/test/gm/model_specs/compiled/*.stan))
+$(shell Rscript -e "cat(paste(fp <- file.path('src', 'test', 'gm', 'model_specs', 'compiled'), sample(dir(fp, pattern = 'stan', recursive = TRUE)), sep = '/'), file = 'files.txt')")
+LS := $(shell cat files.txt)
+$(shell rm files.txt)
+test/gm/compile_models$(EXE) : test/gm/compile_models.o bin/libstan.a $(patsubst %.stan,%$(EXE),$(LS))
 	@mkdir -p $(dir $@)
 	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS) $(LDLIBS_STANC)
 ifeq ($(findstring test-,$(MAKECMDGOALS))$(findstring runtest/,$(MAKECMDGOALS)),)
