@@ -1,6 +1,4 @@
-library("MCMCpack")
-library("rstan")
-
+require(MCMCpack)
 # CONSTANTS
 K <- 3;
 V <- 10;
