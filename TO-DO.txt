@@ -152,6 +152,37 @@ C++ API
 ======================================================================
 [items go here first, then to RStan/cmd]
 
+* fix log1m bug --- see Sebastian Weber's e-mail 5/10/13 4:55 AM
+  : isolated issue to ctor(var) throwing exception; so
+  fix remaining places where vari ctors may throw, like lgamma
+    /functions/inverse_softmax.hpp:#include <boost/throw_exception.hpp>
+    /functions/inverse_softmax.hpp:     * @throw std::invalid_argument if size of the input and output vectors differ.
+    /functions/lgamma.hpp:    // throws domain_error if x is at pole
+    /functions/log1p.hpp:#include <boost/throw_exception.hpp>
+    /functions/log1p.hpp:        throw std::runtime_error("foo");
+    /functions/softmax.hpp:#include <boost/throw_exception.hpp>
+    /functions/softmax.hpp:     * @throw std::invalid_argument if size of the input and output vectors differ.
+ 
+* log_minus_exp(x,y)
+      = log(exp(x) * (exp(x)/exp(x) - exp(y)/exp(x)))
+      = log(exp(x)) + log(1 - exp(y)/exp(x))
+      = x + log(1 - exp(y - x))
+      = x + log1m(exp(y-x)) 
+  or, following http://snipplr.com/view/12707/,
+    double diff = x - y;
+    diff /= 2.0;
+    return (x + y) / 2.0 + log(exp(diff) - exp(-diff)); 
+ definitely check x >> y and return x (do this in log_sum_exp, too?)
+ see: http://cran.r-project.org/web/packages/Rmpfr/vignettes/log1mexp-note.pdf
+      for log(1-exp(x))
+
+* Chebyshev polynomials of the first kind
+  -- with some kind of regression application example
+  -- Boost has very parameterized Chebyshev polynomials, so figure
+     out which ones in which parameterizations we need
+  -- lm(a ~ poly(x,n)...) 
+  -- see 9 May 2013 post to stan-dev from dlakelan
+
 * matrix normal distribution (Marcus suggested)
   http://en.wikipedia.org/wiki/Matrix_normal_distribution
   -- useful for GeoBUGS type models
