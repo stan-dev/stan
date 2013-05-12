@@ -9,7 +9,7 @@ fit_sim <- stan(file="gp-sim.stan", data=list(x=x,N=N), iter=200, chains=3);
 fit_sim_ss <- extract(fit_sim, permuted=TRUE);
 
 print(fit_sim);
-df <- data.frame(x=x,y_sim=y);
+df <- data.frame(x=x,y_sim=colMeans(fit_sim_ss$y));
 plot <- qplot(x,y_sim, data=df, xlim=c(-5,5), ylim=c(-4,4));
 
 # DUMP DATA: gp-sim.stan
