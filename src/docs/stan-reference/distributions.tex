@@ -469,16 +469,14 @@ If $\alpha \in \reals$, then for $n \in \nats$,
 = 
 \frac{1}{n!}
 \,
-\frac{1}{\alpha}
-\,
-(\log \alpha)^n.
+\exp \left(n\alpha - \exp(\alpha) \right).
 \]
 
 \subsubsection{Stan Functions}
 
 \begin{description}
 \fitem{real}{poisson\_log\_log}{ints \farg{n}, reals \farg{alpha}}{The
-  log Poisson probability mass of \farg{n} given log rate \farg{lambda}}
+  log Poisson probability mass of \farg{n} given log rate \farg{alpha}}
 \end{description}
 
 
