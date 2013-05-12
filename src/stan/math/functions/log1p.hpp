@@ -2,11 +2,7 @@
 #define __STAN__MATH__FUNCTIONS__LOG1P_HPP__
 
 #include <limits>
-
 #include <boost/math/tools/promotion.hpp>
-
-#include<stdexcept>
-#include <boost/throw_exception.hpp>
 
 namespace stan {
   namespace math {
