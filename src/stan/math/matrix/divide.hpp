@@ -1,6 +1,8 @@
 #ifndef __STAN__MATH__MATRIX__DIVIDE_HPP__
 #define __STAN__MATH__MATRIX__DIVIDE_HPP__
 
+#include <boost/type_traits/is_arithmetic.hpp> 
+#include <boost/utility/enable_if.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 
 namespace stan {
@@ -14,11 +16,12 @@ namespace stan {
      * @param c Scalar.
      * @return Matrix divided by scalar.
      */
-    template <int R, int C>
+    template <int R, int C, typename T>
     inline
-    Eigen::Matrix<double,R,C>
+    typename boost::enable_if_c<boost::is_arithmetic<T>::value, 
+                                Eigen::Matrix<double, R, C> >::type
     divide(const Eigen::Matrix<double,R,C>& m,
-           double c) {
+           T c) {
       return m / c;
     }
 
