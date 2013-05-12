@@ -26,7 +26,7 @@ stan_demo <- function(model = character(0), ...) {
   MODEL_HOME <- dirname(MODELS)
   STAN_ENV <- new.env()
   if(file.exists(fp <- file.path(MODEL_HOME, paste0(model, ".data.R")))) {
-    source(fp, local = STAN_ENV, verbose = FALSE)
+    source(fp, local = STAN_ENV, verbose = FALSE, echo = TRUE)
   }
   return(stan(MODELS, model_name = model, data = STAN_ENV, ...))
 }
