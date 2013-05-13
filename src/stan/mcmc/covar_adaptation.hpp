@@ -52,7 +52,7 @@ namespace stan {
           
           double n = static_cast<double>(_estimator.num_samples());
           covar = (n / (n + 5.0)) * covar
-                  + (5.0 / (n + 5.0)) * Eigen::MatrixXd::Identity(covar.rows(), covar.cols());
+                  + 1e-3 * (5.0 / (n + 5.0)) * Eigen::MatrixXd::Identity(covar.rows(), covar.cols());
           
           _estimator.restart();
           
