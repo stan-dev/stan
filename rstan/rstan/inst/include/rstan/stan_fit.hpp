@@ -18,6 +18,10 @@
 
 #include <stan/agrad/agrad.hpp>
 
+#include <stan/mcmc/metro/adapt_unit_metro.hpp>
+#include <stan/mcmc/metro/adapt_diag_metro.hpp>
+#include <stan/mcmc/metro/adapt_dense_metro.hpp>
+
 #include <stan/optimization/newton.hpp>
 #include <stan/optimization/nesterov_gradient.hpp>
 #include <stan/optimization/bfgs.hpp>
@@ -462,6 +466,11 @@ namespace rstan {
       bool point_estimate_newton = args.get_point_estimate_newton();
       bool nondiag_mass = args.get_nondiag_mass();
       bool save_warmup = args.get_save_warmup();
+      bool unit_metro = args.get_unit_metro();
+      bool diag_metro = args.get_diag_metro();
+      bool dense_metro = args.get_dense_metro();
+      bool equal_diag_metro = args.get_diag_metro();
+      bool equal_dense_metro = args.get_dense_metro();
 
       base_rng.seed(random_seed);
       // (2**50 = 1T samples, 1000 chains)
@@ -688,7 +697,193 @@ namespace rstan {
       double warmDeltaT;
       double sampleDeltaT;
       int iter_save_i = 0;
-      if (nondiag_mass) { 
+	
+	
+
+      if (unit_metro) {
+        // Unit Metropolis
+        args.set_sampler("UnitMetro"); 
+
+        stan::mcmc::sample s(cont_params, disc_params, 0, 0);
+
+        typedef stan::mcmc::adapt_unit_metro<Model, RNG> metro;
+        metro sampler(model, base_rng);
+
+        sampler.get_sampler_param_names(sampler_param_names);
+        for (size_t i = 0; i < sampler_param_names.size(); i++) 
+          sampler_params.push_back(Rcpp::NumericVector(iter_save));
+        if (sample_file_flag && !append_samples) {
+          sample_stream << "lp__,"; // log probability first
+          sampler.write_sampler_param_names(sample_stream);
+          model.write_csv_header(sample_stream);
+        }
+
+       // Warm-Up
+        if (epsilon <= 0) sampler.init_stepsize();
+        else             sampler.set_nominal_stepsize(epsilon);
+        
+        sampler.set_stepsize_jitter(epsilon_pm);
+                
+        sampler.get_stepsize_adaptation().set_delta(delta);
+        sampler.get_stepsize_adaptation().set_gamma(gamma);
+        sampler.get_stepsize_adaptation().set_mu(log(10 * sampler.get_nominal_stepsize()));
+        sampler.engage_adaptation();
+        
+        clock_t start = clock();
+
+        warmup_phase<metro, Model, RNG>(sampler, num_warmup, num_thin, 
+                                            refresh, save_warmup, 
+                                            p_sample_file_stream, p_diagnostic_file_stream,
+                                            s, model, chains, iter_save_i, 
+                                            qoi_idx, mean_pars, mean_lp, 
+                                            sampler_params, adaptation_info,
+                                            base_rng);
+        
+        clock_t end = clock();
+        warmDeltaT = (double)(end - start) / CLOCKS_PER_SEC;
+        
+        sampler.disengage_adaptation();
+        std::stringstream ainfo_ss;
+        ainfo_ss << "# (" << sampler.name() << ")" << std::endl;
+        ainfo_ss << "# Adaptation terminated" << std::endl;
+        ainfo_ss << "# Step size = " << sampler.get_nominal_stepsize() << std::endl;
+        sampler.write_metric(ainfo_ss);
+        adaptation_info = ainfo_ss.str();
+        if (sample_file_flag) sample_stream <<  adaptation_info; 
+        // Sampling
+        start = clock();
+        sample_phase<metro, Model, RNG>(sampler, num_iterations - num_warmup, num_thin, 
+                                            refresh, true, 
+                                            p_sample_file_stream, p_diagnostic_file_stream,
+                                            s, model, chains, iter_save_i, 
+                                            qoi_idx, mean_pars, mean_lp, 
+                                            sampler_params, adaptation_info,
+                                            base_rng); 
+        end = clock();
+        sampleDeltaT = (double)(end - start) / CLOCKS_PER_SEC;
+      } else if (diag_metro) {
+        // Diagonal Metropolis
+        args.set_sampler("DiagMetro"); 
+
+        stan::mcmc::sample s(cont_params, disc_params, 0, 0);
+
+        typedef stan::mcmc::adapt_diag_metro<Model, RNG> metro;
+        metro sampler(model, base_rng, num_warmup);
+
+        sampler.get_sampler_param_names(sampler_param_names);
+        for (size_t i = 0; i < sampler_param_names.size(); i++) 
+          sampler_params.push_back(Rcpp::NumericVector(iter_save));
+        if (sample_file_flag && !append_samples) {
+          sample_stream << "lp__,"; // log probability first
+          sampler.write_sampler_param_names(sample_stream);
+          model.write_csv_header(sample_stream);
+        }
+
+       // Warm-Up
+        if (epsilon <= 0) sampler.init_stepsize();
+        else             sampler.set_nominal_stepsize(epsilon);
+        
+        sampler.set_stepsize_jitter(epsilon_pm);
+                
+        sampler.get_stepsize_adaptation().set_delta(delta);
+        sampler.get_stepsize_adaptation().set_gamma(gamma);
+        sampler.get_stepsize_adaptation().set_mu(log(10 * sampler.get_nominal_stepsize()));
+        sampler.engage_adaptation();
+        
+        clock_t start = clock();
+
+        warmup_phase<metro, Model, RNG>(sampler, num_warmup, num_thin, 
+                                            refresh, save_warmup, 
+                                            p_sample_file_stream, p_diagnostic_file_stream,
+                                            s, model, chains, iter_save_i, 
+                                            qoi_idx, mean_pars, mean_lp, 
+                                            sampler_params, adaptation_info,
+                                            base_rng);
+        
+        clock_t end = clock();
+        warmDeltaT = (double)(end - start) / CLOCKS_PER_SEC;
+        
+        sampler.disengage_adaptation();
+        std::stringstream ainfo_ss;
+        ainfo_ss << "# (" << sampler.name() << ")" << std::endl;
+        ainfo_ss << "# Adaptation terminated" << std::endl;
+        ainfo_ss << "# Step size = " << sampler.get_nominal_stepsize() << std::endl;
+        sampler.write_metric(ainfo_ss);
+        adaptation_info = ainfo_ss.str();
+        if (sample_file_flag) sample_stream <<  adaptation_info; 
+        // Sampling
+        start = clock();
+        sample_phase<metro, Model, RNG>(sampler, num_iterations - num_warmup, num_thin, 
+                                            refresh, true, 
+                                            p_sample_file_stream, p_diagnostic_file_stream,
+                                            s, model, chains, iter_save_i, 
+                                            qoi_idx, mean_pars, mean_lp, 
+                                            sampler_params, adaptation_info,
+                                            base_rng); 
+        end = clock();
+        sampleDeltaT = (double)(end - start) / CLOCKS_PER_SEC;
+      } else if (dense_metro) {
+        // Dense Metropolis
+        args.set_sampler("DenseMetro"); 
+
+        stan::mcmc::sample s(cont_params, disc_params, 0, 0);
+
+        typedef stan::mcmc::adapt_dense_metro<Model, RNG> metro;
+        metro sampler(model, base_rng, num_warmup);
+
+        sampler.get_sampler_param_names(sampler_param_names);
+        for (size_t i = 0; i < sampler_param_names.size(); i++) 
+          sampler_params.push_back(Rcpp::NumericVector(iter_save));
+        if (sample_file_flag && !append_samples) {
+          sample_stream << "lp__,"; // log probability first
+          sampler.write_sampler_param_names(sample_stream);
+          model.write_csv_header(sample_stream);
+        }
+
+       // Warm-Up
+        if (epsilon <= 0) sampler.init_stepsize();
+        else             sampler.set_nominal_stepsize(epsilon);
+        
+        sampler.set_stepsize_jitter(epsilon_pm);
+                
+        sampler.get_stepsize_adaptation().set_delta(delta);
+        sampler.get_stepsize_adaptation().set_gamma(gamma);
+        sampler.get_stepsize_adaptation().set_mu(log(10 * sampler.get_nominal_stepsize()));
+        sampler.engage_adaptation();
+        
+        clock_t start = clock();
+
+        warmup_phase<metro, Model, RNG>(sampler, num_warmup, num_thin, 
+                                            refresh, save_warmup, 
+                                            p_sample_file_stream, p_diagnostic_file_stream,
+                                            s, model, chains, iter_save_i, 
+                                            qoi_idx, mean_pars, mean_lp, 
+                                            sampler_params, adaptation_info,
+                                            base_rng);
+        
+        clock_t end = clock();
+        warmDeltaT = (double)(end - start) / CLOCKS_PER_SEC;
+        
+        sampler.disengage_adaptation();
+        std::stringstream ainfo_ss;
+        ainfo_ss << "# (" << sampler.name() << ")" << std::endl;
+        ainfo_ss << "# Adaptation terminated" << std::endl;
+        ainfo_ss << "# Step size = " << sampler.get_nominal_stepsize() << std::endl;
+        sampler.write_metric(ainfo_ss);
+        adaptation_info = ainfo_ss.str();
+        if (sample_file_flag) sample_stream <<  adaptation_info; 
+        // Sampling
+        start = clock();
+        sample_phase<metro, Model, RNG>(sampler, num_iterations - num_warmup, num_thin, 
+                                            refresh, true, 
+                                            p_sample_file_stream, p_diagnostic_file_stream,
+                                            s, model, chains, iter_save_i, 
+                                            qoi_idx, mean_pars, mean_lp, 
+                                            sampler_params, adaptation_info,
+                                            base_rng); 
+        end = clock();
+        sampleDeltaT = (double)(end - start) / CLOCKS_PER_SEC;
+      } else if (nondiag_mass) { 
         args.set_sampler("NUTS(nondiag)");
         stan::mcmc::sample s(cont_params, disc_params, 0, 0);
         typedef stan::mcmc::adapt_dense_e_nuts<Model, RNG> a_Dm_nuts;
