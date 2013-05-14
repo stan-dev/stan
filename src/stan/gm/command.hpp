@@ -456,8 +456,28 @@ namespace stan {
       if (command.has_key("init")) {
         command.val("init", init_val);
         if (init_val == "0") {
+          
           cont_params = std::vector<double>(model.num_params_r(), 0.0);
           disc_params = std::vector<int>(model.num_params_i(), 0);
+
+          double init_log_prob;
+          std::vector<double> init_grad;
+          
+          try {
+            init_log_prob = model.grad_log_prob(cont_params, disc_params, init_grad, &std::cout);
+          } catch (std::domain_error e) {
+            write_error_msg(&std::cout, e);
+            std::cout << "Rejecting inititialization at zero because of vanishing density." << std::endl;
+            return 0;
+          }
+          
+          for (size_t i = 0; i < init_grad.size(); ++i) {
+            if (!boost::math::isfinite(init_grad[i])) {
+              std::cout << "Rejecting inititialization at zero because of divergent gradient." << std::endl;
+              return 0;
+            }
+          }
+          
         } else {
           
           try {
