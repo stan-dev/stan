@@ -3525,7 +3525,7 @@ namespace stan {
                        std::ostream& out) {
       out << "int main(int argc, const char* argv[]) {" << EOL;
       out << INDENT << "try {" << EOL;
-      out << INDENT2 << "stan::gm::nuts_command<" << model_name 
+      out << INDENT2 << "stan::gm::command<" << model_name 
           << "_namespace::" << model_name << ">(argc,argv);" << EOL;
       out << INDENT << "} catch (std::exception& e) {" << EOL;
       out << INDENT2 
