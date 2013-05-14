@@ -441,7 +441,7 @@ TEST_P(ModelCommand, OptionsTest) {
 
   test_sampled_mean(options, c);
   test_number_of_samples(options, c);
-  test_specific_sample_values(options, c);
+  //test_specific_sample_values(options, c);
 }
 INSTANTIATE_TEST_CASE_P(,
                         ModelCommand,
