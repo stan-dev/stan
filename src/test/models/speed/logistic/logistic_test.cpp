@@ -135,7 +135,7 @@ public:
    */
   long run_stan(const std::string& command, const std::string& filename, std::vector<std::string> command_outputs) {
     long time = 0;
-    for (size_t chain = 0; chain < num_chains; chain++) {
+    for (size_t chain = 1; chain <= num_chains; chain++) {
       std::stringstream command_chain;
       command_chain << command;
       command_chain << " --chain_id=" << chain
@@ -162,7 +162,7 @@ public:
   stan::mcmc::chains<> create_chains(const std::string& filename) {
     std::stringstream samples;
     samples << path << get_path_separator()
-            << filename << ".chain_0.csv";
+            << filename << ".chain_1.csv";
   
 
 

@@ -101,10 +101,10 @@ public:
    */
   static void default_populate_chains() {
     if (chains->num_kept_samples() == 0U) {
-      for (int chain = 0U; chain < num_chains; chain++) {
-  std::ifstream ifstream(get_csv_file(chain).c_str());
-  chains->add(stan::io::stan_csv_reader::parse(ifstream));
-  ifstream.close();
+      for (int chain = 1U; chain <= num_chains; chain++) {
+        std::ifstream ifstream(get_csv_file(chain).c_str());
+        chains->add(stan::io::stan_csv_reader::parse(ifstream));
+        ifstream.close();
       }
     }
   }
@@ -114,7 +114,7 @@ public:
   }
   
   static void test_gradient() {
-    std::string command = get_command(0U);
+    std::string command = get_command(1U);
     command += " --test_grad";
     std::string command_output;
     EXPECT_NO_THROW(command_output = run_command(command))
@@ -129,7 +129,7 @@ public:
    * Populates the chains object after running the model.
    */
   static void run_model() {
-    for (int chain = 0; chain < num_chains; chain++) {
+    for (int chain = 1; chain <= num_chains; chain++) {
       std::string command_output;
       command_output = run_command(get_command(chain), elapsed_milliseconds);
       //EXPECT_NO_THROW(command_output = run_command(get_command(chain), elapsed_milliseconds)) 
@@ -149,7 +149,7 @@ public:
    */
   static stan::mcmc::chains<>* create_chains() {
     std::stringstream command;
-    command << get_command(1)
+    command << get_command(1U)
       << " --iter=0";
     EXPECT_NO_THROW(run_command(command.str())) 
       << "Can not build header using: " << command.str();
