@@ -343,7 +343,7 @@ void test_number_of_samples(const bitset<options_count>& options, stan::mcmc::ch
   }
 }
 
-void test_specific_sample_values(const bitset<options_count>& options, stan::mcmc::chains<>& c) {
+/*void test_specific_sample_values(const bitset<options_count>& options, stan::mcmc::chains<>& c) {
   if (options[iter] || 
       options[leapfrog_steps] || 
       options[epsilon] ||
@@ -392,7 +392,7 @@ void test_specific_sample_values(const bitset<options_count>& options, stan::mcm
         << "Test for first sample when chain_id == 1";
     }
   }
-}
+  }*/
 
 TEST_P(ModelCommand, OptionsTest) {
   bitset<options_count> options(1 << GetParam());
