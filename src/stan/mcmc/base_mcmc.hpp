@@ -1,7 +1,7 @@
 #ifndef __STAN__MCMC__BASE_MCMC__HPP__
 #define __STAN__MCMC__BASE_MCMC__HPP__
 
-#include <fstream>
+#include <ostream>
 #include <string>
 
 #include <stan/mcmc/sample.hpp>
@@ -13,6 +13,10 @@ namespace stan {
     class base_mcmc {
       
     public:
+      
+      base_mcmc(std::ostream* o, std::ostream* e): _out_stream(o), _err_stream(e) {};
+      
+      virtual ~base_mcmc() {};
       
       virtual sample transition(sample& init_sample) = 0;
       
@@ -35,6 +39,9 @@ namespace stan {
     protected:
       
       std::string _name;
+      
+      std::ostream* _out_stream;
+      std::ostream* _err_stream;
       
     };
 

@@ -1,17 +1,18 @@
 #ifndef __STAN__AGRAD__FWD__FVAR__HPP__
 #define __STAN__AGRAD__FWD__FVAR__HPP__
 
-#include <stan/meta/traits.hpp>
+namespace stan {
 
-namespace stan{
-
-  namespace agrad{
+  namespace agrad {
 
     template <typename T>
     struct fvar {
 
       T val_;  // value
       T d_;    // tangent (aka derivative)
+
+      T val() { return val_; }
+      T tangent() { return d_; }
 
       // TV and TD must be assignable to T
       template <typename TV, typename TD>

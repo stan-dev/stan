@@ -39,6 +39,7 @@ namespace stan {
           for (size_t i = 0; i < length_; i++)
             v2_[i] = v2[i*stride2].vi_;
         }
+        virtual ~gevv_vvv_vari() {}
         void chain() {
           const double adj_alpha = adj_ * alpha_->val_;
           for (size_t i = 0; i < length_; i++) {
@@ -60,8 +61,8 @@ namespace Eigen {
    * Numerical traits template override for Eigen for automatic
    * gradient variables.
    */
-  template <> struct NumTraits<stan::agrad::var>
-  {
+  template <>
+  struct NumTraits<stan::agrad::var> {
     /**
      * Real-valued variables.
      *
@@ -146,8 +147,9 @@ namespace Eigen {
       static inline int run()
       {
         using std::ceil;
-        return cast<double,int>(ceil(-log(NumTraits<stan::agrad::var>::epsilon().val())
-                                     /log(10.0)));
+        using std::log;
+        return cast<double,int>(ceil(-log(std::numeric_limits<double>::epsilon())
+                                     / log(10.0)));
       }
     };
 

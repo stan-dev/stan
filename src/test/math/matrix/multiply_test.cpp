@@ -108,3 +108,34 @@ TEST(MathMatrix, multiply) {
   EXPECT_NO_THROW(multiply(2.0,rv0));
   EXPECT_NO_THROW(multiply(2.0,m0));
 }
+
+
+#include <stan/agrad/rev/matrix/assign.hpp>
+TEST(AgradRevMatrix,multiply_int) {
+  using stan::math::multiply;
+  using stan::agrad::assign;
+
+  typedef Eigen::Matrix<double,Eigen::Dynamic,1> vector_d;
+  
+  int d_int = 2;
+  vector_d vec(4);
+  vec << 1, 2, 3, 4;
+  vector_d t_vec(4);
+  assign(t_vec, multiply(vec,d_int));
+
+}
+
+TEST(AgradRevMatrix,multiply_vector_int) {
+  using stan::math::multiply;
+  using stan::math::vector_d;
+  using stan::agrad::vector_v;
+
+  vector_d dvec(3);
+  dvec << 1, 2, 3;
+  int a = 2;
+  vector_d prod_vec = multiply(dvec,a);
+  EXPECT_EQ(3,prod_vec.size());
+  EXPECT_EQ(2.0, prod_vec[0]);
+  EXPECT_EQ(4.0, prod_vec[1]);
+  EXPECT_EQ(6.0, prod_vec[2]);
+}

@@ -490,3 +490,20 @@ TEST(AgradRevMatrix,multiply_scalar_matrix_vc) {
   VEC g = cgradvec(y(1,0),x_ind);
   EXPECT_FLOAT_EQ(4.0,g[0]);
 }
+
+TEST(AgradRevMatrix,multiply_vector_int) {
+  using stan::agrad::multiply; // test namespace resolution
+  using stan::math::multiply;
+  using stan::math::vector_d;
+  using stan::agrad::vector_v;
+
+  vector_d dvec(3);
+  dvec << 1, 2, 3;
+  int a = 2;
+  vector_d prod_vec = multiply(dvec,a);
+  EXPECT_EQ(3,prod_vec.size());
+  EXPECT_EQ(2.0, prod_vec[0]);
+  EXPECT_EQ(4.0, prod_vec[1]);
+  EXPECT_EQ(6.0, prod_vec[2]);
+}
+

@@ -46,9 +46,9 @@ namespace stan {
         MMt(m,m) = var(new dot_self_vari(vs + m * M.cols(),M.cols()));
       for (int m = 0; m < M.rows(); ++m) {
         for (int n = 0; n < m; ++n) {
-          MMt(m,n) = var(new dot_product_vv_vari(vs + m * M.cols(),
-                                                 vs + n * M.cols(),
-                                                 M.cols()));
+          MMt(m,n) = var(new dot_product_vari<var,var>(vs + m * M.cols(),
+                                                       vs + n * M.cols(),
+                                                       M.cols()));
           MMt(n,m) = MMt(m,n);
         }
       }

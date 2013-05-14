@@ -20,11 +20,9 @@ namespace stan {
       
     public:
       
-      mock_hmc(mock_model& m, rng_t& rng): base_hmc<mock_model,
-                                           ps_point,
-                                           mock_hamiltonian,
-                                           mock_integrator,
-                                           rng_t>(m, rng)
+      mock_hmc(mock_model& m, rng_t& rng, std::ostream* o, std::ostream* e) : 
+        base_hmc<mock_model,ps_point,mock_hamiltonian,mock_integrator,rng_t>
+        (m, rng, o, e)
       { this->_name = "Mock HMC"; }
       
       
@@ -56,7 +54,7 @@ TEST(McmcBaseHMC, point_construction) {
   
   stan::mcmc::mock_model model(q.size());
   
-  stan::mcmc::mock_hmc sampler(model, base_rng);
+  stan::mcmc::mock_hmc sampler(model, base_rng, &std::cout, &std::cerr);
 
   EXPECT_EQ(q.size(), sampler.z().q.size());
   EXPECT_EQ(q.size(), sampler.z().g.size());
@@ -72,7 +70,7 @@ TEST(McmcBaseHMC, seed) {
   
   stan::mcmc::mock_model model(q.size());
   
-  stan::mcmc::mock_hmc sampler(model, base_rng);
+  stan::mcmc::mock_hmc sampler(model, base_rng, &std::cout, &std::cerr);
   
   std::vector<double> q_seed(q.size(), -1.0);
   
@@ -92,7 +90,7 @@ TEST(McmcBaseHMC, set_nominal_stepsize) {
   
   stan::mcmc::mock_model model(q.size());
   
-  stan::mcmc::mock_hmc sampler(model, base_rng);
+  stan::mcmc::mock_hmc sampler(model, base_rng, &std::cout, &std::cerr);
   
   double old_epsilon = 1.0;
   sampler.set_nominal_stepsize(old_epsilon);
@@ -112,7 +110,7 @@ TEST(McmcBaseHMC, set_stepsize_jitter) {
   
   stan::mcmc::mock_model model(q.size());
   
-  stan::mcmc::mock_hmc sampler(model, base_rng);
+  stan::mcmc::mock_hmc sampler(model, base_rng, &std::cout, &std::cerr);
   
   double old_jitter = 0.1;
   sampler.set_stepsize_jitter(old_jitter);
