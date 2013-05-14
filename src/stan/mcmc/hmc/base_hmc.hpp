@@ -38,8 +38,9 @@ namespace stan {
         _z.write_metric(o);
       }
       
-      void get_sampler_diagnostic_names(std::vector<std::string>& names) {
-        _z.get_param_names(names);
+      void get_sampler_diagnostic_names(std::vector<std::string>& model_names,
+                                        std::vector<std::string>& names) {
+        _z.get_param_names(model_names, names);
       };
       
       void get_sampler_diagnostics(std::vector<double>& values) {
