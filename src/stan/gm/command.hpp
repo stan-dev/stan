@@ -467,6 +467,11 @@ namespace stan {
             init_log_prob = model.grad_log_prob(cont_params, disc_params, init_grad, &std::cout);
           } catch (std::domain_error e) {
             write_error_msg(&std::cout, e);
+            std::cout << "Rejecting inititialization at zero because of grad_log_prob failure." << std::endl;
+            return 0;
+          }
+
+          if (!boost::math::isfinite(init_log_prob)) {
             std::cout << "Rejecting inititialization at zero because of vanishing density." << std::endl;
             return 0;
           }
