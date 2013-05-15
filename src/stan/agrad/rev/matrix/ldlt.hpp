@@ -74,6 +74,8 @@ namespace stan {
       inline size_t rows() const { return _alloc->_N; }
       inline size_t cols() const { return _alloc->_N; }
       
+      typedef size_t size_type;
+
       stan::agrad::LDLT_alloc<R,C> *_alloc;
     };
   }
