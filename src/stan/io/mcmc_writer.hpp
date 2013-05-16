@@ -139,7 +139,8 @@ namespace stan {
                 << std::string(prefix.size(), ' ') << sampleDeltaT
                 << " seconds (Sampling)"  << std::endl
                 << std::string(prefix.size(), ' ') << warmDeltaT + sampleDeltaT
-                << " seconds (Total)"  << std::endl;
+                << " seconds (Total)"  << std::endl
+                << std::endl;
       }
       
       void print_timing(double warmDeltaT, double sampleDeltaT) {
