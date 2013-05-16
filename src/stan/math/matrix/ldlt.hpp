@@ -59,6 +59,8 @@ namespace stan {
       inline size_t rows() const { return _N; }
       inline size_t cols() const { return _N; }
       
+      typedef size_t size_type;
+
       size_t _N;
       boost::shared_ptr< Eigen::LDLT< Eigen::Matrix<double,R,C> > > _ldltP;
     };
