@@ -1,6 +1,7 @@
 #ifndef __STAN__MCMC__BASE__HMC__BETA__
 #define __STAN__MCMC__BASE__HMC__BETA__
 
+#include <math.h>
 #include <stdexcept>
 
 #include <boost/random/variate_generator.hpp>
@@ -19,14 +20,16 @@ namespace stan {
     
     public:
     
-      base_hmc(M &m, BaseRNG& rng): base_mcmc(),
-                                    _z(m.num_params_r(), m.num_params_i()),
-                                    _hamiltonian(m), 
-                                    _rand_int(rng),
-                                    _rand_uniform(_rand_int),
-                                    _nom_epsilon(0.1),
-                                    _epsilon(_nom_epsilon),
-                                    _epsilon_jitter(0.0)
+      base_hmc(M &m, BaseRNG& rng, std::ostream* o, std::ostream* e):
+      base_mcmc(o, e),
+      _z(m.num_params_r(), m.num_params_i()),
+      _integrator(this->_out_stream),
+      _hamiltonian(m, this->_err_stream),
+      _rand_int(rng),
+      _rand_uniform(_rand_int),
+      _nom_epsilon(0.1),
+      _epsilon(_nom_epsilon),
+      _epsilon_jitter(0.0)
       {};
       
       void write_sampler_state(std::ostream* o) {
@@ -35,8 +38,9 @@ namespace stan {
         _z.write_metric(o);
       }
       
-      void get_sampler_diagnostic_names(std::vector<std::string>& names) {
-        _z.get_param_names(names);
+      void get_sampler_diagnostic_names(std::vector<std::string>& model_names,
+                                        std::vector<std::string>& names) {
+        _z.get_param_names(model_names, names);
       };
       
       void get_sampler_diagnostics(std::vector<double>& values) {
@@ -55,11 +59,16 @@ namespace stan {
         this->_hamiltonian.sample_p(this->_z, this->_rand_int);
         this->_hamiltonian.init(this->_z);
         
-        double H0 = this->_hamiltonian.H(this->_z);
-        this->_integrator.evolve(this->_z, this->_hamiltonian, this->_nom_epsilon);
-        double delta_H = H0 - this->_hamiltonian.H(this->_z);
+        double H0 = this->_hamiltonian.H(this->_z); // Guaranteed to be finite if randomly initialized
         
-        int direction = delta_H > log(0.5) ? 1 : -1;
+        this->_integrator.evolve(this->_z, this->_hamiltonian, this->_nom_epsilon);
+        
+        double h = this->_hamiltonian.H(this->_z);
+        if (h != h) h = std::numeric_limits<double>::infinity();
+        
+        double delta_H = H0 - h;
+        
+        int direction = delta_H > std::log(0.5) ? 1 : -1;
         
         while (1) {
           
@@ -69,12 +78,17 @@ namespace stan {
           this->_hamiltonian.init(this->_z);
           
           double H0 = this->_hamiltonian.H(this->_z);
+          
           this->_integrator.evolve(this->_z, this->_hamiltonian, this->_nom_epsilon);
-          double delta_H = H0 - this->_hamiltonian.H(this->_z);
-                   
-          if ((direction == 1) && !(delta_H > log(0.5))) 
+          
+          double h = this->_hamiltonian.H(this->_z);
+          if (h != h) h = std::numeric_limits<double>::infinity();
+          
+          double delta_H = H0 - h;
+          
+          if ((direction == 1) && !(delta_H > std::log(0.5)))
             break;
-          else if ((direction == -1) && !(delta_H < log(0.5)))
+          else if ((direction == -1) && !(delta_H < std::log(0.5)))
             break;
           else
             this->_nom_epsilon = ( (direction == 1)

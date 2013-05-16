@@ -15,31 +15,43 @@ int calculate_size(const Eigen::VectorXd& x,
   
   double padding = 0;
   if (digits > 0)
-    padding = digits + 1;
-
+    padding = digits + 2;
+  
   double fixed_size = 0.0;
+  
   if (x.maxCoeff() > 0)
-    fixed_size = ceil(log10(x.maxCoeff()+0.001)) + padding;
+    fixed_size = ceil(log10(x.maxCoeff() + 0.001)) + padding;
   if (x.minCoeff() < 0)
-    fixed_size = max(fixed_size, ceil(log10(-x.minCoeff()+0.01))+(padding+1));
+    fixed_size = max(fixed_size, ceil(log10(-x.minCoeff() + 0.01)) + (padding + 1));
+  
   format = std::ios_base::fixed;
+  
   if (fixed_size < 7) {
     return max(fixed_size,
-               max(name.length(), std::string("-0.0").length())+0.0);
+               max(name.length(), std::string("-0.0").length()) + 0.0);
   }
-
-  double scientific_size = 0;
-  scientific_size += 4.0;   // "-0.0" has four digits
-  scientific_size += 1.0;   // e
+  
+  double scientific_size = digits + 2;
+  
+  if (x.minCoeff() < 0) scientific_size += 1.0;
+  scientific_size += 2.0;   // decimal (.) and exponent (e)
+  
   double exponent_size = 0;
-  if (x.maxCoeff() > 0)
-    exponent_size = ceil(log10(log10(x.maxCoeff())));
-  if (x.minCoeff() < 0)
+  if (x.maxCoeff() > 0) {
+    exponent_size = ceil(fabs(log10(fabs(log10(x.maxCoeff())))));
+  }
+  if (x.minCoeff() < 0) {
     exponent_size = max(exponent_size,
-                        ceil(log10(log10(-x.minCoeff()))));
+                        ceil(fabs(log10(fabs(log10(-x.minCoeff()))))));
+  }
+  
+  exponent_size = exponent_size > 2 ? exponent_size : 2;
+  
   scientific_size += fmin(exponent_size, 3);
   format = std::ios_base::scientific;
-  return scientific_size;
+  
+  return scientific_size > name.length() ? scientific_size : name.length();
+  
 }
 
 Eigen::VectorXi calculate_sizes(const Eigen::MatrixXd& values, 
@@ -65,11 +77,14 @@ void print_usage() {
   std::cout << "  --autocorr=<chain_index>\tAppend the autocorrelations for the given chain"
             << std::endl
             << std::endl;
+  std::cout << "  --precision=<int>\tSet output precision"
+            << std::endl
+            << std::endl;
   
 }
 
 
-/** 
+/**
  * The Stan print function.
  *
  * @param argc Number of arguments
@@ -79,47 +94,78 @@ void print_usage() {
  *         non-zero otherwise
  */
 int main(int argc, const char* argv[]) {
+  
   if (argc == 1) {
     print_usage();
     return 0;
   }
   
+  std::ifstream ifstream;
   std::vector<std::string> filenames;
+  
   for (int i = 1; i < argc; i++) {
     
     if (std::string(argv[i]).find("--autocorr=") != std::string::npos)
       continue;
     
-    filenames.push_back(argv[i]);
+    if (std::string(argv[i]).find("--precision=") != std::string::npos)
+      continue;
     
     if (std::string("--help") == std::string(argv[i])) {
       print_usage();
       return 0;
-      
     }
+    
+    ifstream.open(argv[i]);
+    
+    if (ifstream.good()) {
+      filenames.push_back(argv[i]);
+      ifstream.close();
+    } else {
+      std::cout << "File " << argv[i] << " not found" << std::endl;
+    }
+    
   }
+  
+  if (!filenames.size()) {
+    std::cout << "No valid input files, exiting." << std::endl;
+    return 0;
+  }
+  
+  Eigen::VectorXd warmup_times(filenames.size());
+  Eigen::VectorXd sampling_times(filenames.size());
   
   Eigen::VectorXi thin(filenames.size());
   
-  std::ifstream ifstream;
   ifstream.open(filenames[0].c_str());
+
   stan::io::stan_csv stan_csv = stan::io::stan_csv_reader::parse(ifstream);
+  warmup_times(0) = stan_csv.timing.warmup;
+  sampling_times(0) = stan_csv.timing.sampling;
+  
   stan::mcmc::chains<> chains(stan_csv);
   ifstream.close();
+  
   thin(0) = stan_csv.metadata.thin;
   
-
   for (int chain = 1; chain < filenames.size(); chain++) {
     ifstream.open(filenames[chain].c_str());
     stan_csv = stan::io::stan_csv_reader::parse(ifstream);
     chains.add(stan_csv);
     ifstream.close();
     thin(chain) = stan_csv.metadata.thin;
+    
+    warmup_times(chain) = stan_csv.timing.warmup;
+    sampling_times(chain) = stan_csv.timing.sampling;
+    
   }
+  
+  double total_warmup_time = warmup_times.sum();
+  double total_sampling_time = sampling_times.sum();
 
   // print  
-  const int skip = 3;
-  std::string model_name = ""; // FIXME: put in model name
+  const int skip = 4;
+  std::string model_name = stan_csv.metadata.model;
   int max_name_length = 0;
   for (int i = skip; i < chains.num_params(); i++) 
     if (chains.param_name(i).length() > max_name_length)
@@ -129,7 +175,9 @@ int main(int argc, const char* argv[]) {
       max_name_length = chains.param_name(i).length();
 
 
-  Eigen::MatrixXd values(chains.num_params(),10);
+  int n = 11;
+  
+  Eigen::MatrixXd values(chains.num_params(), n);
   values.setZero();
   Eigen::VectorXd probs(5);
   probs << 0.025, 0.25, 0.5, 0.75, 0.975;
@@ -144,18 +192,24 @@ int main(int argc, const char* argv[]) {
     for (int j = 0; j < 5; j++)
       values(i,3+j) = quantiles(j);
     values(i,8) = n_eff;
-    values(i,9) = chains.split_potential_scale_reduction(i);
+    values(i,9) = n_eff / total_sampling_time;
+    values(i,10) = chains.split_potential_scale_reduction(i);
   }
   
-  int n = 10;
   Eigen::Matrix<std::string, Eigen::Dynamic, 1> headers(n);
   headers << 
     "mean", "se_mean", "sd", 
     "2.5%", "25%", "50%", "75%", "97.5%", 
-    "n_eff", "Rhat";
+    "n_eff", "n_eff/time", "Rhat";
   Eigen::VectorXi digits(n);
-  digits.setConstant(1);
-  digits(8) = 0;
+  
+  int precision = 1;
+  
+  for (int k = 1; k < argc; k++)
+    if (std::string(argv[k]).find("--precision=") != std::string::npos)
+      precision = atoi(std::string(argv[k]).substr(12).c_str());
+  
+  digits.setConstant(precision);
   
   // Want per row:
   //   scientific vs floating point
@@ -172,16 +226,53 @@ int main(int argc, const char* argv[]) {
   for (int chain = 1; chain < chains.num_chains(); chain++)
     std::cout << "," << chains.num_kept_samples(chain);
   std::cout << ")";
+                          
   std::cout << "; warmup=(" << chains.warmup(0);
   for (int chain = 1; chain < chains.num_chains(); chain++)
     std::cout << "," << chains.warmup(chain);
   std::cout << ")";
+                          
   std::cout << "; thin=(" << thin(0);
+  
   for (int chain = 1; chain < chains.num_chains(); chain++)
     std::cout << "," << thin(chain);
   std::cout << ")";
-  std::cout << "; " << chains.num_samples() << " iterations saved." 
+                          
+  std::cout << "; " << chains.num_samples() << " iterations saved."
             << std::endl << std::endl;
+
+  std::string warmup_unit = "seconds";
+  
+  if (total_warmup_time / 3600 > 1) {
+    total_warmup_time /= 3600;
+    warmup_unit = "hours";
+  } else if (total_warmup_time / 60 > 1) {
+    total_warmup_time /= 60;
+    warmup_unit = "minutes";
+  }
+
+  std::cout << "Warmup took (" << warmup_times(0);
+  for (int chain = 1; chain < chains.num_chains(); chain++)
+    std::cout << ", " << warmup_times(chain);
+  std::cout << ") seconds, ";
+  std::cout << total_warmup_time << " " << warmup_unit << " total" << std::endl;
+
+  std::string sampling_unit = "seconds";
+  
+  if (total_sampling_time / 3600 > 1) {
+    total_sampling_time /= 3600;
+    sampling_unit = "hours";
+  } else if (total_sampling_time / 60 > 1) {
+    total_sampling_time /= 60;
+    sampling_unit = "minutes";
+  }
+  
+  std::cout << "Sampling took (" << sampling_times(0);
+  for (int chain = 1; chain < chains.num_chains(); chain++)
+    std::cout << ", " << sampling_times(chain);
+  std::cout << ") seconds, ";
+  std::cout << total_sampling_time << " " << sampling_unit << " total" << std::endl;
+  std::cout << std::endl;
   
   using std::setprecision;
   using std::setw;
@@ -203,7 +294,7 @@ int main(int argc, const char* argv[]) {
     std::cout << std::endl;
   }
   // lp__, treedepth__
-  for (int i = 0; i < 2; i++) {
+  for (int i = 0; i < 4; i++) {
     std::cout << setw(max_name_length+1) << std::left << chains.param_name(i);
     std::cout << std::right;
     for (int j = 0; j < n; j++) {
@@ -214,7 +305,7 @@ int main(int argc, const char* argv[]) {
   }
     
   std::cout << std::endl;
-  std::cout << "Samples were drawn using " << stan_csv.adaptation.sampler << "." << std::endl
+  std::cout << "Samples were drawn using " << stan_csv.metadata.algorithm << "." << std::endl
             << "For each parameter, n_eff is a crude measure of effective sample size," << std::endl
             << "and Rhat is the potential scale reduction factor on split chains (at " << std::endl
             << "convergence, Rhat=1)." << std::endl

@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <boost/type_traits.hpp>
 #include <stan/agrad/agrad.hpp>
+#include <stan/agrad/fwd/fvar.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/math/matrix.hpp>
 
@@ -539,4 +540,28 @@ TEST(MetaTraits,VectorView) {
       ++pos;
     }
   }
+}
+
+TEST(MetaTraits,isFvar) {
+  using stan::agrad::var;
+  using stan::agrad::fvar;
+  using stan::is_fvar;
+  
+  EXPECT_FALSE(is_fvar<double>::value);
+  EXPECT_TRUE(is_fvar<fvar<double> >::value);
+  EXPECT_TRUE(is_fvar<fvar<fvar<double> > >::value);
+  EXPECT_FALSE(is_fvar<var>::value);
+}
+
+TEST(MetaTraits,containsFvar) {
+  using stan::agrad::var;
+  using stan::agrad::fvar;
+  using stan::contains_fvar;
+  EXPECT_FALSE(contains_fvar<double>::value);
+  EXPECT_FALSE((contains_fvar<double,int,var>::value));
+  EXPECT_TRUE((contains_fvar<fvar<double> >::value));
+  EXPECT_TRUE((contains_fvar<double, fvar<double> >::value));
+  EXPECT_TRUE((contains_fvar<double, fvar<var>, int >::value));
+  EXPECT_TRUE((contains_fvar<fvar<double>, fvar<var> >::value));
+  EXPECT_TRUE((contains_fvar<fvar<fvar<double> > >::value));
 }

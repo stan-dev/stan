@@ -40,9 +40,9 @@ namespace stan {
       
     public:
       
-      mock_hamiltonian(M& m): base_hamiltonian<M,
+      mock_hamiltonian(M& m, std::ostream *e): base_hamiltonian<M,
                                                ps_point,
-                                               BaseRNG> (m) {};
+                                               BaseRNG> (m,e) {};
       
       double T(ps_point& z) { return 0; }
       
@@ -69,6 +69,10 @@ namespace stan {
     template <typename H, typename P>
     class mock_integrator: public base_integrator<H, P> {
     public:
+      mock_integrator(std::ostream* o) 
+      : base_integrator<H,P>(o)
+      { }
+      
       void evolve(P& z, H& hamiltonian, const double epsilon) {};
     };
     

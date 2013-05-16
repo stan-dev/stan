@@ -14,7 +14,7 @@ namespace stan {
                                const char* msg) {
       if (j > 0 && j <=  static_cast<size_t>(m.cols())) return;
       std::stringstream ss;
-      ss << "require 0 < column index <= number of columns in" << msg;
+      ss << "require 0 < column index <= number of columns in " << msg;
       ss << " found cols()=" << m.cols()
          << "; index j=" << j;
       throw std::domain_error(ss.str());

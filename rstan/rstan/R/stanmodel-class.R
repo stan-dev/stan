@@ -175,10 +175,11 @@ setMethod("sampling", "stanmodel",
               return(invisible(new_empty_stanfit(object, miscenv = sfmiscenv, m_pars, p_dims, 2L))) 
             }
 
-            n_save <- 1 + (iter - 1) %/% thin 
             # number of samples saved after thinning
             warmup2 <- 1 + (warmup - 1) %/% thin 
-            n_kept <- n_save - warmup2 
+            n_kept <- 1 + (iter - warmup - 1) %/% thin
+            n_save <- n_kept + warmup2 
+
             samples <- vector("list", chains)
             dots <- list(...)
             mode <- if (!is.null(dots$test_grad) && dots$test_grad) "TESTING GRADIENT" else "SAMPLING"

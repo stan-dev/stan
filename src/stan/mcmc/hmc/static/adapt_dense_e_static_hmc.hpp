@@ -1,7 +1,7 @@
 #ifndef __STAN__MCMC__ADAPT__DENSE__E__STATIC__HMC__BETA__
 #define __STAN__MCMC__ADAPT__DENSE__E__STATIC__HMC__BETA__
 
-#include <stan/mcmc/covar_adapter.hpp>
+#include <stan/mcmc/stepsize_covar_adapter.hpp>
 #include <stan/mcmc/hmc/static/dense_e_static_hmc.hpp>
 
 namespace stan {
@@ -14,12 +14,15 @@ namespace stan {
     // and adaptive stepsize
     
     template <typename M, class BaseRNG>
-    class adapt_dense_e_static_hmc: public dense_e_static_hmc<M, BaseRNG>, public covar_adapter {
+    class adapt_dense_e_static_hmc: public dense_e_static_hmc<M, BaseRNG>,
+                                    public stepsize_covar_adapter {
       
     public:
       
-      adapt_dense_e_static_hmc(M &m, BaseRNG& rng): dense_e_static_hmc<M, BaseRNG>(m, rng),
-                                                    covar_adapter(m.num_params_r())
+        adapt_dense_e_static_hmc(M &m, BaseRNG& rng, int max_adapt,
+                                 std::ostream* o = &std::cout, std::ostream* e = 0):
+        dense_e_static_hmc<M, BaseRNG>(m, rng, o, e),
+        stepsize_covar_adapter(m.num_params_r(), max_adapt)
       {};
       
       ~adapt_dense_e_static_hmc() {};
@@ -30,23 +33,28 @@ namespace stan {
         
         if (this->_adapt_flag) {
           
-          this->learn_stepsize(this->_nom_epsilon, s.accept_stat());
+          this->_stepsize_adaptation.learn_stepsize(this->_nom_epsilon, s.accept_stat());
           this->_update_L();
           
-          bool update = this->learn_covariance(this->_z.mInv, this->_z.q);
+          bool update = this->_covar_adaptation.learn_covariance(this->_z.mInv, this->_z.q);
           
           if(update) {
             this->init_stepsize();
             this->_update_L();
             
-            this->set_adapt_mu(log(10 * this->_nom_epsilon));
-            this->stepsize_adapter::init();
+            this->stepsize_adaptation.set_mu(log(10 * this->_nom_epsilon));
+            this->stepsize_adaptation.restart();
           }
           
         }
         
         return s;
         
+      }
+                                      
+      void disengage_adaptation() {
+        base_adapter::disengage_adaptation();
+        this->_stepsize_adaptation.complete_adaptation(this->_nom_epsilon);
       }
       
     };

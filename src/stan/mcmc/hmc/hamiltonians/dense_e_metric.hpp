@@ -4,6 +4,7 @@
 #include <boost/random/variate_generator.hpp>
 #include <boost/random/normal_distribution.hpp>
 
+#include <stan/math/matrix/Eigen.hpp>
 #include <Eigen/Cholesky>
 
 #include <stan/mcmc/hmc/hamiltonians/base_hamiltonian.hpp>
@@ -19,7 +20,8 @@ namespace stan {
       
     public:
       
-      dense_e_metric(M& m): base_hamiltonian<M, dense_e_point, BaseRNG>(m) {};
+      dense_e_metric(M& m, std::ostream* e):
+      base_hamiltonian<M, dense_e_point, BaseRNG>(m, e) {};
       ~dense_e_metric() {};
       
       double T(dense_e_point& z) {

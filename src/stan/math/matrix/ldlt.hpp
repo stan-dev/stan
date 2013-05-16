@@ -4,8 +4,10 @@
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/transpose.hpp>
 #include <stan/math/matrix/validate_multiplicable.hpp>
+#include <stan/math/matrix/validate_square.hpp>
 
 #include <boost/shared_ptr.hpp>
+#include <boost/math/tools/promotion.hpp>
 
 namespace stan {
   namespace math {
