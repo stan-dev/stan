@@ -35,8 +35,8 @@ namespace stan {
 
     private:
 
-      const std::vector<T>& data_r_;
-      const std::vector<int>& data_i_;
+      std::vector<T>& data_r_;
+      std::vector<int>& data_i_;
       size_t pos_;
       size_t int_pos_;
       
@@ -80,8 +80,8 @@ namespace stan {
        * @param data_r Sequence of scalar values.
        * @param data_i Sequence of integer values.
        */
-      reader(const std::vector<T>& data_r,
-             const std::vector<int>& data_i)
+      reader(std::vector<T>& data_r,
+             std::vector<int>& data_i)
         : data_r_(data_r),
           data_i_(data_i),
           pos_(0),

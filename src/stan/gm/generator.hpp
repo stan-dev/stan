@@ -2508,9 +2508,6 @@ namespace stan {
         for (size_t i = 0; i < matrix_dims.size(); ++i)
           combo_dims.push_back(matrix_dims[i]);
 
-        o_ << INDENT2 << "param_name_stream__.str(std::string());" << EOL;
-
-
        for (size_t i = 0; i < combo_dims.size(); ++i) {
           generate_indent(2 + i,o_);
           o_ << "for (int k_" << i << "__ = 1;"
@@ -2520,10 +2517,17 @@ namespace stan {
         }
 
         generate_indent(2 + combo_dims.size(),o_);
+        o_ << "param_name_stream__.str(std::string());" << EOL;
+        
+        generate_indent(2 + combo_dims.size(),o_);
         o_ << "param_name_stream__ << \"" << name << '"';
+        
         for (size_t i = 0; i < combo_dims.size(); ++i)
           o_ << " << '.' << k_" << i << "__";
         o_ << ';' << EOL;
+        
+        generate_indent(2 + combo_dims.size(),o_);
+        o_ << "param_names__.push_back(param_name_stream__.str());" << EOL;
 
         // end for loop dims
         for (size_t i = 0; i < combo_dims.size(); ++i) {
@@ -2531,9 +2535,6 @@ namespace stan {
           o_ << "}" << EOL; // end (1)
         }
         
-        
-        o_ << INDENT2 << "param_names__.push_back(param_name_stream__.str());" 
-           << EOL;
 
       }
     };
@@ -2660,22 +2661,26 @@ namespace stan {
         for (size_t i = 0; i < matrix_dims.size(); ++i)
           combo_dims.push_back(matrix_dims[i]);
 
-        o_ << INDENT2 << "param_name_stream__.str(std::string());" << EOL;
-
-
-       for (size_t i = 0; i < combo_dims.size(); ++i) {
+        for (size_t i = 0; i < combo_dims.size(); ++i) {
           generate_indent(2 + i,o_);
           o_ << "for (int k_" << i << "__ = 1;"
-             << " k_" << i << "__ <= ";
+          << " k_" << i << "__ <= ";
           generate_expression(combo_dims[i].expr_,o_);
           o_ << "; ++k_" << i << "__) {" << EOL; // begin (1)
         }
-
+        
+        generate_indent(2 + combo_dims.size(),o_);
+        o_ << "param_name_stream__.str(std::string());" << EOL;
+        
         generate_indent(2 + combo_dims.size(),o_);
         o_ << "param_name_stream__ << \"" << name << '"';
+        
         for (size_t i = 0; i < combo_dims.size(); ++i)
           o_ << " << '.' << k_" << i << "__";
         o_ << ';' << EOL;
+        
+        generate_indent(2 + combo_dims.size(),o_);
+        o_ << "param_names__.push_back(param_name_stream__.str());" << EOL;
 
         // end for loop dims
         for (size_t i = 0; i < combo_dims.size(); ++i) {
@@ -3279,8 +3284,8 @@ namespace stan {
                                      std::ostream& o) {
       o << INDENT << "template <typename RNG>" << EOL;
       o << INDENT << "void write_array(RNG& base_rng__," << EOL;
-      o << INDENT << "                 const std::vector<double>& params_r__," << EOL;
-      o << INDENT << "                 const std::vector<int>& params_i__," << EOL;
+      o << INDENT << "                 std::vector<double>& params_r__," << EOL;
+      o << INDENT << "                 std::vector<int>& params_i__," << EOL;
       o << INDENT << "                 std::vector<double>& vars__," << EOL;
       o << INDENT << "                 bool include_tparams__ = true," << EOL;
       o << INDENT << "                 bool include_gqs__ = true," << EOL;
@@ -3346,9 +3351,9 @@ namespace stan {
 
       o << INDENT << "}" << EOL2;
 
-      o << INDENT << "void write_array_params(const std::vector<double>& params_r__,"
+      o << INDENT << "void write_array_params(std::vector<double>& params_r__,"
         << EOL
-        << INDENT << "                        const std::vector<int>& params_i__,"
+        << INDENT << "                        std::vector<int>& params_i__,"
         << EOL
         << INDENT << "                        std::vector<double>& vars__,"
         << EOL
