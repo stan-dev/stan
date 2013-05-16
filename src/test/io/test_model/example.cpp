@@ -137,8 +137,8 @@ public:
 
     template <typename RNG>
     void write_array(RNG& base_rng__,
-                     const std::vector<double>& params_r__,
-                     const std::vector<int>& params_i__,
+                     std::vector<double>& params_r__,
+                     std::vector<int>& params_i__,
                      std::vector<double>& vars__,
                      bool include_tparams__ = true,
                      bool include_gqs__ = true,
@@ -172,8 +172,8 @@ public:
         // write generated quantities
     }
 
-    void write_array_params(const std::vector<double>& params_r__,
-                            const std::vector<int>& params_i__,
+    void write_array_params(std::vector<double>& params_r__,
+                            std::vector<int>& params_i__,
                             std::vector<double>& vars__,
                             std::ostream* pstream__ = 0) {
         boost::random::minstd_rand base_rng; // dummy
