@@ -254,7 +254,7 @@ namespace stan {
           
         if ( save && ( (m % num_thin) == 0) ) {
           writer.print_sample_params(init_s, sampler, model);
-          writer.print_diagnostics(init_s, sampler);
+          writer.print_diagnostic_params(init_s, sampler);
         }
 
       }

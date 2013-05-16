@@ -110,8 +110,8 @@ namespace stan {
         
       }
       
-      void print_diagnostics(stan::mcmc::sample& sample,
-                             stan::mcmc::base_mcmc& sampler) {
+      void print_diagnostic_params(stan::mcmc::sample& sample,
+                                    stan::mcmc::base_mcmc& sampler) {
         
         if(!_diagnostic_stream) return;
         
@@ -140,8 +140,7 @@ namespace stan {
                 << std::string(prefix.size(), ' ') << sampleDeltaT
                 << " seconds (Sampling)"  << std::endl
                 << std::string(prefix.size(), ' ') << warmDeltaT + sampleDeltaT
-                << " seconds (Total)"  << std::endl
-                << std::endl << std::endl;
+                << " seconds (Total)"  << std::endl;
       }
       
       void print_timing(double warmDeltaT, double sampleDeltaT) {
