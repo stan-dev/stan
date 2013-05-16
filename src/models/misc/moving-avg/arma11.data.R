@@ -12,5 +12,5 @@ y[1] <- err[1] + mu + phi * mu;
 for (t in 2:T)
   y[t] <- err[t] + (mu + phi * y[t-1] + theta * err[t-1]);
 
-library('rstan')
+#library('rstan')
 # fit <- stan('arma11.stan', data=list(T=T, y=y), iter=2000, chains=4);

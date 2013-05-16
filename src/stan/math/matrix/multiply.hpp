@@ -1,10 +1,11 @@
 #ifndef __STAN__MATH__MATRIX__MULTIPLY_HPP__
 #define __STAN__MATH__MATRIX__MULTIPLY_HPP__
 
-#include <stdexcept>
+#include <boost/type_traits/is_arithmetic.hpp> 
+#include <boost/utility/enable_if.hpp>
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/matrix/validate_multiplicable.hpp>
 #include <stan/math/matrix/validate_matching_sizes.hpp>
+#include <stan/math/matrix/validate_multiplicable.hpp>
 
 namespace stan {
   namespace math {
@@ -17,20 +18,17 @@ namespace stan {
      * @param c Scalar.
      * @return Product of matrix and scalar.
      */
-    template <int R, int C>
+    template <int R, int C, typename T>
     inline
-    Eigen::Matrix<double,R,C>
-    multiply(const Eigen::Matrix<double,R,C>& m,
-             double c) {
+    typename boost::enable_if_c<boost::is_arithmetic<T>::value, 
+                                Eigen::Matrix<double, R, C> >::type
+    multiply(const Eigen::Matrix<double, R, C>& m,
+             T c) {
       return c * m;
     }
-    template <int R, int C>
-    inline
-    Eigen::Matrix<double,R,C>
-    multiply(const Eigen::Matrix<double,R,C>& m,
-             int c) {
-      return c * m;
-    }
+
+    // FIXME:  apply above pattern everywhere below to remove
+    //         extra defs, etc.
 
     /**
      * Return specified scalar multiplied by specified matrix.
@@ -40,21 +38,14 @@ namespace stan {
      * @param m Matrix.
      * @return Product of scalar and matrix.
      */
-    template <int R, int C>
+    template <int R, int C, typename T>
     inline
-    Eigen::Matrix<double,R,C>
-    multiply(double c,
+    typename boost::enable_if_c<boost::is_arithmetic<T>::value, 
+                                Eigen::Matrix<double, R, C> >::type
+    multiply(T c,
              const Eigen::Matrix<double,R,C>& m) {
-      return c * m;
+         return c * m;
     }
-    template <int R, int C>
-    inline
-    Eigen::Matrix<double,R,C>
-    multiply(int c,
-             const Eigen::Matrix<double,R,C>& m) {
-      return c * m;
-    }
-
 
     /**
      * Return the product of the specified matrices.  The number of

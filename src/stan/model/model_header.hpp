@@ -11,6 +11,7 @@
 #include <vector>
 
 #include <boost/exception/all.hpp>
+#include <boost/random/linear_congruential.hpp>
 
 #include <stan/agrad/agrad.hpp>
 #include <stan/agrad/matrix.hpp>

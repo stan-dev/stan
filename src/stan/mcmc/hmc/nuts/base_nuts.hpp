@@ -64,7 +64,7 @@ namespace stan {
         
         this->_hamiltonian.sample_p(this->_z, this->_rand_int);
         this->_hamiltonian.init(this->_z);
-        
+
         ps_point z_plus(static_cast<ps_point>(this->_z));
         ps_point z_minus(z_plus);
 
@@ -73,6 +73,7 @@ namespace stan {
         
         int n_cont = init_sample.cont_params().size();
         
+        Eigen::VectorXd rho_init = this->_z.p;
         Eigen::VectorXd rho_plus = Eigen::VectorXd::Zero(n_cont);
         Eigen::VectorXd rho_minus = Eigen::VectorXd::Zero(n_cont);
         
@@ -83,7 +84,6 @@ namespace stan {
         
         // Build a balanced binary tree until the NUTS criterion fails
         util.criterion = true;
-        
         int n_valid = 0;
         
         this->_depth = 0;
@@ -113,12 +113,13 @@ namespace stan {
           // And build a new subtree in that direction 
           this->_z.copy_base(*z);
           
-          int n_valid_subtree = build_tree(_depth, *rho, z_propose, util);
+          int n_valid_subtree = build_tree(_depth, *rho, 0, z_propose, util);
           
           *z = static_cast<ps_point>(this->_z);
 
           // Metropolis-Hastings sample the fresh subtree
-          if (!util.criterion) break;
+          if (!util.criterion)
+            break;
           
           double subtree_prob = 0;
           
@@ -136,7 +137,7 @@ namespace stan {
           
           // Check validity of completed tree
           this->_z.copy_base(z_plus);
-          Eigen::VectorXd delta_rho = rho_plus - rho_minus;
+          Eigen::VectorXd delta_rho = rho_minus + rho_init + rho_plus;
           
           util.criterion = _compute_criterion(z_minus, this->_z, delta_rho);
           
@@ -181,7 +182,7 @@ namespace stan {
       
       // Returns number of valid points in the completed subtree
       int build_tree(int depth, Eigen::VectorXd& rho, 
-                      ps_point& z_propose, nuts_util& util)
+                     ps_point* z_init, ps_point& z_propose, nuts_util& util)
       {
         
         // Base case
@@ -192,6 +193,8 @@ namespace stan {
                                    util.sign * this->_epsilon);
           
           rho += this->_z.p;
+          
+          if (z_init) *z_init = this->_z;
           z_propose = static_cast<ps_point>(this->_z);
           
           double h = this->_hamiltonian.H(this->_z); 
@@ -209,24 +212,30 @@ namespace stan {
         else 
         {
           
-          ps_point z_init(static_cast<ps_point>(this->_z));
+          Eigen::VectorXd subtree_rho = Eigen::VectorXd::Zero(rho.size());
+          ps_point z_init(this->_z);
           
-          int n1 = build_tree(depth - 1, rho, z_propose, util);
+          int n1 = build_tree(depth - 1, subtree_rho, &z_init, z_propose, util);
 
+          rho += subtree_rho;
+          
           if (!util.criterion) return 0;
           
-          ps_point z2(z_init);
+          subtree_rho.setZero();
+          ps_point z_propose_right(z_init);
           
-          int n2 = build_tree(depth - 1, rho, z2, util);
+          int n2 = build_tree(depth - 1, subtree_rho, 0, z_propose_right, util);
           
-          double accept_prob = static_cast<double>(n2) / 
+          rho += subtree_rho;
+          
+          double accept_prob = static_cast<double>(n2) /
                                static_cast<double>(n1 + n2);
           
-          if ( util.criterion && (this->_rand_uniform() < accept_prob) ) 
-            z_propose = z2;
+          if ( util.criterion && (this->_rand_uniform() < accept_prob) )
+            z_propose = z_propose_right;
           
           util.criterion &= _compute_criterion(z_init, this->_z, rho);
-            
+          
           return n1 + n2;
           
         }
