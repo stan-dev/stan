@@ -11,6 +11,7 @@
 #include <vector>
 
 #include <boost/exception/all.hpp>
+#include <boost/random/linear_congruential.hpp>
 
 #include <stan/agrad/agrad.hpp>
 #include <stan/agrad/matrix.hpp>
@@ -52,6 +53,7 @@
 #include <stan/math/matrix/elt_divide.hpp>
 #include <stan/math/matrix/elt_multiply.hpp>
 #include <stan/math/matrix/exp.hpp>
+#include <stan/math/matrix/head.hpp>
 #include <stan/math/matrix/inverse.hpp>
 #include <stan/math/matrix/log.hpp>
 #include <stan/math/matrix/log_determinant.hpp>
@@ -72,12 +74,16 @@
 #include <stan/math/matrix/rows_dot_product.hpp>
 #include <stan/math/matrix/rows_dot_self.hpp>
 #include <stan/math/matrix/sd.hpp>
+#include <stan/math/matrix/segment.hpp>
 #include <stan/math/matrix/singular_values.hpp>
 #include <stan/math/matrix/size.hpp>
 #include <stan/math/matrix/softmax.hpp>
 #include <stan/math/matrix/stan_print.hpp>
+#include <stan/math/matrix/sub_col.hpp>
+#include <stan/math/matrix/sub_row.hpp>
 #include <stan/math/matrix/subtract.hpp>
 #include <stan/math/matrix/sum.hpp>
+#include <stan/math/matrix/tail.hpp>
 #include <stan/math/matrix/tcrossprod.hpp>
 #include <stan/math/matrix/trace.hpp>
 #include <stan/math/matrix/transpose.hpp>

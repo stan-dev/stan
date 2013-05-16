@@ -19,11 +19,8 @@ namespace stan {
       
     public:
       
-      mock_nuts(mock_model &m, rng_t& rng): base_nuts<mock_model,
-                                                      ps_point,
-                                                      mock_hamiltonian,
-                                                      mock_integrator,
-                                                      rng_t>(m, rng)
+      mock_nuts(mock_model &m, rng_t& rng, std::ostream* o, std::ostream* e)
+        : base_nuts<mock_model,ps_point,mock_hamiltonian,mock_integrator,rng_t>(m, rng, o, e)
       { this->_name = "Mock NUTS"; }
       
     private:
@@ -47,7 +44,7 @@ TEST(McmcBaseNuts, set_max_depth) {
   
   stan::mcmc::mock_model model(q.size());
   
-  stan::mcmc::mock_nuts sampler(model, base_rng);
+  stan::mcmc::mock_nuts sampler(model, base_rng, &std::cout, &std::cerr);
   
   int old_max_depth = 1;
   sampler.set_max_depth(old_max_depth);
@@ -67,7 +64,7 @@ TEST(McmcBaseNuts, set_max_delta) {
   
   stan::mcmc::mock_model model(q.size());
   
-  stan::mcmc::mock_nuts sampler(model, base_rng);
+  stan::mcmc::mock_nuts sampler(model, base_rng, &std::cout, &std::cerr);
   
   double old_max_delta = 10;
   sampler.set_max_delta(old_max_delta);

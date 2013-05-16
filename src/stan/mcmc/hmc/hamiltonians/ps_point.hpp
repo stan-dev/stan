@@ -36,20 +36,17 @@ namespace stan {
         g = z.g;
       }
         
-      virtual void get_param_names(std::vector<std::string>& names) {
-        for(size_t i = 0; i < r.size(); ++i)
-          names.push_back(std::string("disc") + boost::lexical_cast<std::string>(i));
+      virtual void get_param_names(std::vector<std::string>& model_names,
+                                   std::vector<std::string>& names) {
         for(size_t i = 0; i < q.size(); ++i)
-          names.push_back(std::string("cont") + boost::lexical_cast<std::string>(i));
+          names.push_back(model_names.at(i));
         for(size_t i = 0; i < q.size(); ++i)
-          names.push_back(std::string("p_cont") + boost::lexical_cast<std::string>(i));
+          names.push_back(std::string("p_") + model_names.at(i));
         for(size_t i = 0; i < q.size(); ++i)
-          names.push_back(std::string("g_cont") + boost::lexical_cast<std::string>(i));
+          names.push_back(std::string("g_") + model_names.at(i));
       }
 
       virtual void get_params(std::vector<double>& values) {
-        for(size_t i = 0; i < r.size(); ++i)
-          values.push_back(r.at(i));
         for(size_t i = 0; i < q.size(); ++i)
           values.push_back(q.at(i));
         for(size_t i = 0; i < q.size(); ++i)

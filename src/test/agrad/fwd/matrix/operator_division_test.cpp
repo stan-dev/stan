@@ -115,9 +115,9 @@ TEST(AgradFwdMatrix, divide_vector) {
   EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), output(0).val_);
   EXPECT_TRUE (std::isnan(output(1).val_));
   EXPECT_FLOAT_EQ(-std::numeric_limits<double>::infinity(), output(2).val_);
-  EXPECT_TRUE (std::isnan(output(0).d_));
-  EXPECT_TRUE (std::isnan(output(1).d_));
-  EXPECT_TRUE (std::isnan(output(2).d_));
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), output(0).d_);
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), output(1).d_);
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), output(2).d_);
 
   output = divide(v1, v2);
   EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), output(0).val_);
@@ -195,9 +195,9 @@ TEST(AgradFwdMatrix, divide_rowvector) {
   EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), output(0).val_);
   EXPECT_TRUE (std::isnan(output(1).val_));
   EXPECT_FLOAT_EQ(-std::numeric_limits<double>::infinity(), output(2).val_);
-  EXPECT_TRUE(std::isnan(output(0).d_));
-  EXPECT_TRUE(std::isnan(output(1).d_));
-  EXPECT_TRUE(std::isnan(output(2).d_));
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), output(0).d_);
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), output(1).d_);
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), output(2).d_);
 
   output = divide(v1, v2);
   EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), output(0).val_);
@@ -287,10 +287,10 @@ TEST(AgradFwdMatrix, divide_matrix) {
   EXPECT_TRUE (std::isnan(output(0,1).val_));
   EXPECT_FLOAT_EQ(-std::numeric_limits<double>::infinity(), output(1,0).val_);
   EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), output(1,1).val_);
-  EXPECT_TRUE (std::isnan(output(0,0).d_));
-  EXPECT_TRUE (std::isnan(output(0,1).d_));
-  EXPECT_TRUE (std::isnan(output(1,0).d_));
-  EXPECT_TRUE (std::isnan(output(1,1).d_));
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), output(0,0).d_);
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), output(0,1).d_);
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), output(1,0).d_);
+  EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), output(1,1).d_);
 
   output = divide(v1, v2);
   EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), output(0,0).val_);

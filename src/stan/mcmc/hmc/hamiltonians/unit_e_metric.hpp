@@ -17,7 +17,8 @@ namespace stan {
       
     public:
       
-      unit_e_metric(M& m): base_hamiltonian<M, unit_e_point, BaseRNG>(m) {};
+      unit_e_metric(M& m, std::ostream* e):
+      base_hamiltonian<M, unit_e_point, BaseRNG>(m, e) {};
       ~unit_e_metric() {};
       
       double T(unit_e_point& z) {

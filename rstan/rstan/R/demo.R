@@ -25,20 +25,8 @@ stan_demo <- function(model = character(0), ...) {
   }
   MODEL_HOME <- dirname(MODELS)
   STAN_ENV <- new.env()
-  if(file.exists(gdr <- file.path(MODEL_HOME, paste0(model, "_generate_data.R")))) {
-    dir.create(MODEL_HOME <- file.path(tempdir(), model), showWarnings = FALSE)
-    stopifnot(file.copy(from = gdr, to = MODEL_HOME, overwrite = TRUE))
-    current_wd <- getwd()
-    on.exit(setwd(current_wd))
-    setwd(MODEL_HOME)
-    source(file.path(MODEL_HOME, paste0(model, "_generate_data.R")), 
-           local = STAN_ENV, verbose = FALSE)
-    }
   if(file.exists(fp <- file.path(MODEL_HOME, paste0(model, ".data.R")))) {
-    source(fp, local = STAN_ENV, verbose = FALSE)
-  }
-  else if(!is.na(fp <- dir(MODEL_HOME, ".data.R$", full.names = TRUE)[1])) {
-    source(file.path(fp), local = STAN_ENV, verbose = FALSE)
+    source(fp, local = STAN_ENV, verbose = FALSE, echo = TRUE)
   }
   return(stan(MODELS, model_name = model, data = STAN_ENV, ...))
 }

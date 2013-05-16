@@ -1,5 +1,7 @@
+#include <boost/math/special_functions/fpclassify.hpp>
 #include "stan/math/functions/log1p.hpp"
 #include <gtest/gtest.h>
+
 
 TEST(MathFunctions, log1p) {
   double x;
@@ -25,14 +27,12 @@ TEST(MathFunctions, log1p) {
   EXPECT_FLOAT_EQ(-0.1053605, stan::math::log1p(x));
   x = -0.999;
   EXPECT_FLOAT_EQ(-6.907755, stan::math::log1p(x));
-  x = -1;
-  EXPECT_FLOAT_EQ(-std::numeric_limits<double>::infinity(), stan::math::log1p(x));
+  EXPECT_FLOAT_EQ(-std::numeric_limits<double>::infinity(), stan::math::log1p(-1.0));
 }
 
 TEST(MathFunctions, log1p_exception) {
-  double x;
-
-  x = -2;
-  EXPECT_THROW(stan::math::log1p(x), std::domain_error);
+  using boost::math::isnan;
+  using stan::math::log1p;
+  EXPECT_TRUE(isnan(log1p(-10.0)));
 }
 

@@ -64,6 +64,11 @@ namespace stan {
                         "default = samples.csv");
       
       print_help_option(&std::cout,
+                        "diagnostics", "file",
+                        "File into which diagnostics are written",
+                        "default = no diagnostic output");
+      
+      print_help_option(&std::cout,
                         "append_samples", "",
                         "Append samples to existing file if it exists",
                         "does not write header in append mode");
@@ -207,18 +212,18 @@ namespace stan {
       (n == 0 || ((n + 1) % refresh == 0) );
     }
 
-    void print_progress(int m, int num_iterations, int refresh, bool warmup) {
+    void print_progress(int m, int start, int finish, int refresh, bool warmup) {
       
-      int it_print_width = std::ceil(std::log10(num_iterations));
+      int it_print_width = std::ceil(std::log10(finish));
       
       if (do_print(m, refresh)) {
         
         std::cout << "Iteration: ";
-        std::cout << std::setw(it_print_width) << (m + 1)
-                  << " / " << num_iterations;
+        std::cout << std::setw(it_print_width) << m + 1 + start
+                  << " / " << finish;
           
         std::cout << " [" << std::setw(3) 
-                  << static_cast<int>( (100.0 * (m + 1)) / num_iterations )
+                  << static_cast<int>( (100.0 * (m + 1 + start)) / finish )
                   << "%] ";
         std::cout << (warmup ? " (Warmup)" : " (Sampling)");
         std::cout << std::endl;
@@ -226,55 +231,30 @@ namespace stan {
       }
     
     }
-
-    /*
-    template <class Sampler, class Model, class RNG>
-    void print_sample(std::ostream& sample_file_stream,
-                      std::ostream& debug_file_stream,
-                      stan::mcmc::sample& s, 
-                      Sampler& sampler,
-                      Model& model,
-                      RNG& base_rng) {
-      
-      // Temporary as model::write_csv isn't a const method
-      std::vector<double> cont(s.cont_params());
-      std::vector<int> disc(s.disc_params());
-      
-      sample_file_stream << s.log_prob() << ",";
-      sampler.write_sampler_params(sample_file_stream);
-      model.write_csv(base_rng, cont, disc, 
-                      sample_file_stream, &std::cout);
-      
-      //sampler.z().write(debug_file_stream);
-      //debug_file_stream << std::endl;
-      
-      
-    }
-     */
     
     template <class Sampler, class Model, class RNG>
     void run_markov_chain(Sampler& sampler,
                           int num_iterations,
+                          int start,
+                          int finish,
                           int num_thin,
                           int refresh,
                           bool save,
                           bool warmup,
-                          stan::io::mcmc_writer& writer,
+                          stan::io::mcmc_writer<Model>& writer,
                           stan::mcmc::sample& init_s,
                           Model& model,
                           RNG& base_rng) {
       
       for (size_t m = 0; m < num_iterations; ++m) {
       
-        print_progress(m, num_iterations, refresh, warmup);
+        print_progress(m, start, finish, refresh, warmup);
       
         init_s = sampler.transition(init_s);
           
         if ( save && ( (m % num_thin) == 0) ) {
-          //print_sample<Sampler, Model, RNG>(sample_file_stream, debug_file_stream,
-          //                                  init_s, sampler, model, base_rng);
           writer.print_sample_params(init_s, sampler, model);
-          writer.print_diagnostics(init_s, sampler);
+          writer.print_diagnostic_params(init_s, sampler);
         }
 
       }
@@ -283,40 +263,44 @@ namespace stan {
 
     template <class Sampler, class Model, class RNG>
     void warmup(Sampler& sampler,
-                int num_iterations,
+                int num_warmup,
+                int num_samples,
                 int num_thin,
                 int refresh,
                 bool save,
-                stan::io::mcmc_writer& writer,
+                stan::io::mcmc_writer<Model>& writer,
                 stan::mcmc::sample& init_s,
                 Model& model,
                 RNG& base_rng) {
       
-      run_markov_chain<Sampler, Model, RNG>(sampler, num_iterations, num_thin, 
-                                            refresh, save, true, writer,
+      run_markov_chain<Sampler, Model, RNG>(sampler, num_warmup, 0, num_warmup + num_samples, num_thin,
+                                            refresh, save, true,
+                                            writer,
                                             init_s, model, base_rng);
       
     }
 
     template <class Sampler, class Model, class RNG>
     void sample(Sampler& sampler,
-                int num_iterations,
+                int num_warmup,
+                int num_samples,
                 int num_thin,
                 int refresh,
                 bool save,
-                stan::io::mcmc_writer& writer,
+                stan::io::mcmc_writer<Model>& writer,
                 stan::mcmc::sample& init_s,
                 Model& model,
                 RNG& base_rng) {
       
-      run_markov_chain<Sampler, Model, RNG>(sampler, num_iterations, num_thin, 
-                                            refresh, save, false, writer,
+      run_markov_chain<Sampler, Model, RNG>(sampler, num_samples, num_warmup, num_warmup + num_samples, num_thin,
+                                            refresh, save, false,
+                                            writer,
                                             init_s, model, base_rng);
       
     }
     
     template <class Model>
-    int nuts_command(int argc, const char* argv[]) {
+    int command(int argc, const char* argv[]) {
 
       stan::io::cmd_line command(argc,argv);
       
@@ -341,10 +325,9 @@ namespace stan {
 
       std::string sample_file = "samples.csv";
       command.val("samples", sample_file);
-      
-      // Fix so that default somehow does not produce output
-      std::string diagnostic_file = "diagnostic.csv";
-      command.val("diagnostic", diagnostic_file);
+ 
+      std::string diagnostic_file = "";
+      command.val("diagnostics", diagnostic_file);
       
       unsigned int num_iterations = 2000U;
       command.val("iter", num_iterations);
@@ -352,7 +335,8 @@ namespace stan {
       unsigned int num_warmup = num_iterations / 2;
       command.val("warmup", num_warmup);
       
-      unsigned int num_thin = 1U;
+      unsigned int calculated_thin = (num_iterations - num_warmup) / 1000U;
+      unsigned int num_thin = (calculated_thin > 1) ? calculated_thin : 1U;
       command.val("thin", num_thin);
 
       int leapfrog_steps = -1;
@@ -409,7 +393,7 @@ namespace stan {
       int chain_id = 1;
       if (command.has_key("chain_id")) {
         bool well_formed = command.val("chain_id", chain_id);
-        if (!well_formed || chain_id < 0) {
+        if (!well_formed || chain_id <= 0) {
           std::string chain_id_val;
           command.val("chain_id", chain_id_val);
           std::cerr << "value for chain_id must be positive integer"
@@ -501,6 +485,7 @@ namespace stan {
             init_log_prob = model.grad_log_prob(cont_params, disc_params, init_grad, &std::cout);
           } catch (std::domain_error e) {
             write_error_msg(&std::cout, e);
+            std::cout << "Rejecting proposed initial value with zero density." << std::endl;
             init_log_prob = -std::numeric_limits<double>::infinity();
           }
           
@@ -697,7 +682,8 @@ namespace stan {
           std::cout << "init tries = " << num_init_tries << std::endl;
         
         std::cout << "output = " << sample_file << std::endl;
-        std::cout << "save_warmup = " << save_warmup<< std::endl;
+        std::cout << "save_warmup = " << save_warmup << std::endl;
+        std::cout << "epsilon = " << epsilon << std::endl;
         
         std::cout << "seed = " << random_seed 
         << " (" << (command.has_key("seed") 
@@ -717,6 +703,7 @@ namespace stan {
         write_comment_property(sample_stream,"init",init_val);
         write_comment_property(sample_stream,"save_warmup",save_warmup);
         write_comment_property(sample_stream,"seed",random_seed);
+        write_comment_property(sample_stream,"epsilon",epsilon);
         write_comment(sample_stream);
         
         sample_stream << "lp__,"; // log probability first
@@ -724,6 +711,9 @@ namespace stan {
         
         stan::optimization::BFGSLineSearch ng(model, cont_params, disc_params,
                                               &std::cout);
+        if (epsilon > 0)
+          ng._opts.alpha0 = epsilon;
+        
         double lp = ng.logp();
         
         double lastlp = lp - 1;
@@ -735,13 +725,25 @@ namespace stan {
           lastlp = lp;
           lp = ng.logp();
           ng.params_r(cont_params);
+          if (do_print(i, 50*refresh)) {
+            std::cout << "    Iter ";
+            std::cout << "     log prob ";
+            std::cout << "       ||dx|| ";
+            std::cout << "     ||grad|| ";
+            std::cout << "      alpha ";
+            std::cout << "     alpha0 ";
+            std::cout << " # evals ";
+            std::cout << " Notes " << std::endl;
+          }
           if (do_print(i, refresh)) {
-            std::cout << "Iteration ";
-            std::cout << std::setw(3) << (m + 1) << ". ";
-            std::cout << "Log joint probability = " << std::setw(10) << lp;
-            std::cout << ". Improved by " << (lp - lastlp) << ". ";
-            std::cout << "Step size " << ng.step_size() << " (initial " << ng.init_step_size() << ").";
-            std::cout << " # grad evals = " << ng.grad_evals();
+            std::cout << " " << std::setw(7) << (m + 1) << " ";
+            std::cout << " " << std::setw(12) << std::setprecision(6) << lp << " ";
+            std::cout << " " << std::setw(12) << std::setprecision(6) << ng.prev_step_size() << " ";
+            std::cout << " " << std::setw(12) << std::setprecision(6) << ng.curr_g().norm() << " ";
+            std::cout << " " << std::setw(10) << std::setprecision(4) << ng.alpha() << " ";
+            std::cout << " " << std::setw(10) << std::setprecision(4) << ng.alpha0() << " ";
+            std::cout << " " << std::setw(7) << ng.grad_evals() << " ";
+            std::cout << " " << ng.note() << " ";
             std::cout << std::endl;
             std::cout.flush();
           }
@@ -752,6 +754,8 @@ namespace stan {
             sample_stream.flush();
           }
         }
+        if (ret != 0)
+          std::cout << "Optimization terminated with code " << ret << std::endl;
         
         sample_stream << lp << ',';
         model.write_csv(base_rng,cont_params,disc_params,sample_stream);
@@ -806,16 +810,22 @@ namespace stan {
       std::fstream sample_stream(sample_file.c_str(), 
                                  samples_append_mode);
       
-      std::fstream diagnostic_stream(diagnostic_file.c_str(), 
-                                 std::fstream::out);
+      std::fstream* diagnostic_stream = 0;
       
-      stan::io::mcmc_writer writer(&sample_stream, &diagnostic_stream);
+      if (diagnostic_file.size() != 0) {
+      
+        diagnostic_stream = new std::fstream(diagnostic_file.c_str(),
+                                             std::fstream::out);
+      }
+      
+      stan::io::mcmc_writer<Model> writer(&sample_stream, diagnostic_stream);
       
       write_comment(sample_stream,"Samples Generated by Stan");
       write_comment(sample_stream);
       write_comment_property(sample_stream, "stan_version_major", stan::MAJOR_VERSION);
       write_comment_property(sample_stream, "stan_version_minor", stan::MINOR_VERSION);
       write_comment_property(sample_stream, "stan_version_patch", stan::PATCH_VERSION);
+      write_comment_property(sample_stream, "model", model.model_name());
       write_comment_property(sample_stream, "data", data_file);
       write_comment_property(sample_stream, "init", init_val);
       write_comment_property(sample_stream, "append_samples", append_samples);
@@ -833,119 +843,76 @@ namespace stan {
       write_comment_property(sample_stream, "epsilon_pm", epsilon_pm);
       write_comment_property(sample_stream, "delta", delta);
       write_comment_property(sample_stream, "gamma", gamma);
-      write_comment(sample_stream);
 
-      write_comment_property(diagnostic_stream, "stan_version_major", stan::MAJOR_VERSION);
-      write_comment_property(diagnostic_stream, "stan_version_minor", stan::MINOR_VERSION);
-      write_comment_property(diagnostic_stream, "stan_version_patch", stan::PATCH_VERSION);
-      write_comment_property(diagnostic_stream, "data", data_file);
-      write_comment_property(diagnostic_stream, "init", init_val);
-      write_comment_property(diagnostic_stream, "append_samples", append_samples);
-      write_comment_property(diagnostic_stream, "save_warmup", save_warmup);
-      write_comment_property(diagnostic_stream, "seed", random_seed);
-      write_comment_property(diagnostic_stream, "chain_id", chain_id);
-      write_comment_property(diagnostic_stream, "iter", num_iterations);
-      write_comment_property(diagnostic_stream, "warmup", num_warmup);
-      write_comment_property(diagnostic_stream, "thin", num_thin);
-      write_comment_property(diagnostic_stream, "nondiag_mass", nondiag_mass);
-      write_comment_property(diagnostic_stream, "equal_step_sizes", equal_step_sizes);
-      write_comment_property(diagnostic_stream, "leapfrog_steps", leapfrog_steps);
-      write_comment_property(diagnostic_stream, "max_treedepth", max_treedepth);
-      write_comment_property(diagnostic_stream, "epsilon", epsilon);
-      write_comment_property(diagnostic_stream, "epsilon_pm", epsilon_pm);
-      write_comment_property(diagnostic_stream, "delta", delta);
-      write_comment_property(diagnostic_stream, "gamma", gamma);
+      if(diagnostic_stream) {
+      
+        write_comment_property(*diagnostic_stream, "stan_version_major", stan::MAJOR_VERSION);
+        write_comment_property(*diagnostic_stream, "stan_version_minor", stan::MINOR_VERSION);
+        write_comment_property(*diagnostic_stream, "stan_version_patch", stan::PATCH_VERSION);
+        write_comment_property(*diagnostic_stream, "model", model.model_name());
+        write_comment_property(*diagnostic_stream, "data", data_file);
+        write_comment_property(*diagnostic_stream, "init", init_val);
+        write_comment_property(*diagnostic_stream, "append_samples", append_samples);
+        write_comment_property(*diagnostic_stream, "save_warmup", save_warmup);
+        write_comment_property(*diagnostic_stream, "seed", random_seed);
+        write_comment_property(*diagnostic_stream, "chain_id", chain_id);
+        write_comment_property(*diagnostic_stream, "iter", num_iterations);
+        write_comment_property(*diagnostic_stream, "warmup", num_warmup);
+        write_comment_property(*diagnostic_stream, "thin", num_thin);
+        write_comment_property(*diagnostic_stream, "nondiag_mass", nondiag_mass);
+        write_comment_property(*diagnostic_stream, "equal_step_sizes", equal_step_sizes);
+        write_comment_property(*diagnostic_stream, "leapfrog_steps", leapfrog_steps);
+        write_comment_property(*diagnostic_stream, "max_treedepth", max_treedepth);
+        write_comment_property(*diagnostic_stream, "epsilon", epsilon);
+        write_comment_property(*diagnostic_stream, "epsilon_pm", epsilon_pm);
+        write_comment_property(*diagnostic_stream, "delta", delta);
+        write_comment_property(*diagnostic_stream, "gamma", gamma);
+        
+      }
       
       double warmDeltaT = 0;
       double sampleDeltaT = 0;
       
       if (nondiag_mass) {
-        /*
+        
         // Euclidean NUTS with Dense Metric
         stan::mcmc::sample s(cont_params, disc_params, 0, 0);
         
         typedef stan::mcmc::adapt_dense_e_nuts<Model, rng_t> a_Dm_nuts;
-        a_Dm_nuts sampler(model, base_rng);
+        a_Dm_nuts sampler(model, base_rng, num_warmup);
+        sampler.seed(cont_params, disc_params);
         
+        write_comment_property(sample_stream, "algorithm", sampler.name());
+        write_comment(sample_stream);
+
+        if (diagnostic_stream) {
+          write_comment_property(*diagnostic_stream, "algorithm", sampler.name());
+          write_comment(*diagnostic_stream);
+        }
+
         if (!append_samples) {
-          sample_stream << "lp__,";
-          sampler.write_sampler_param_names(sample_stream);
-          model.write_csv_header(sample_stream);
-          
-          //sampler.z().write_header(diagnostic_stream);
-          //sampler.z().write_names(diagnostic_stream);
-          //diagnostic_stream << std::endl;
-          
+          writer.print_sample_names(s, sampler, model);
+          writer.print_diagnostic_names(s, sampler, model);
         }
         
         // Warm-Up
-        if (epsilon < 0) sampler.init_stepsize();
+        if (epsilon <= 0) sampler.init_stepsize();
         else             sampler.set_nominal_stepsize(epsilon);
         
         sampler.set_stepsize_jitter(epsilon_pm);
         
         sampler.set_max_depth(max_treedepth);
         
-        sampler.set_adapt_mu(log(10 * sampler.get_nominal_stepsize()));
+        sampler.get_stepsize_adaptation().set_delta(delta);
+        sampler.get_stepsize_adaptation().set_gamma(gamma);
+        sampler.get_stepsize_adaptation().set_mu(log(10 * sampler.get_nominal_stepsize()));
         sampler.engage_adaptation();
         
         clock_t start = clock();
         
-        warmup<a_Dm_nuts, Model, rng_t>(sampler, num_warmup, num_thin, 
+        warmup<a_Dm_nuts, Model, rng_t>(sampler, num_warmup, num_iterations - num_warmup, num_thin,
                                         refresh, save_warmup, 
-                                        sample_stream, diagnostic_stream,
-                                        s, model, base_rng); 
-        
-        clock_t end = clock();
-        warmDeltaT = (double)(end - start) / CLOCKS_PER_SEC;
-        
-        sampler.disengage_adaptation();
-
-        sample_stream << "# (" << sampler.name() << ")" << std::endl;
-        sample_stream << "# Adaptation terminated" << std::endl;
-        sample_stream << "# Step size = " << sampler.get_nominal_stepsize() << std::endl;
-        sampler.z().write_metric(sample_stream);
-        
-        // Sampling
-        start = clock();
-        
-        sample<a_Dm_nuts, Model, rng_t>(sampler, num_iterations - num_warmup, num_thin, 
-                                        refresh, true, 
-                                        sample_stream, diagnostic_stream, 
-                                        s, model, base_rng); 
-        
-        end = clock();
-        sampleDeltaT = (double)(end - start) / CLOCKS_PER_SEC;
-        */
-      }
-      else if (leapfrog_steps < 0 && !equal_step_sizes) {
-        
-        // Euclidean NUTS with Diagonal Metric
-        stan::mcmc::sample s(cont_params, disc_params, 0, 0);
-        
-        typedef stan::mcmc::adapt_diag_e_nuts<Model, rng_t> a_dm_nuts;
-        a_dm_nuts sampler(model, base_rng);
-        
-        if (!append_samples)
-          writer.print_sample_names(s, sampler, model);
-          writer.print_diagnostic_names(s, sampler);
-        
-        // Warm-Up
-        if (epsilon < 0) sampler.init_stepsize();
-        else             sampler.set_nominal_stepsize(epsilon);
-        
-        sampler.set_stepsize_jitter(epsilon_pm);
-        
-        sampler.set_max_depth(max_treedepth);
-        
-        sampler.set_adapt_mu(log(10 * sampler.get_nominal_stepsize()));
-        sampler.engage_adaptation();
-        
-        clock_t start = clock();
-        
-        warmup<a_dm_nuts, Model, rng_t>(sampler, num_warmup, num_thin, 
-                                        refresh, save_warmup, writer,
-                                        s, model, base_rng); 
+                                        writer, s, model, base_rng); 
         
         clock_t end = clock();
         warmDeltaT = (double)(end - start) / CLOCKS_PER_SEC;
@@ -956,9 +923,68 @@ namespace stan {
         // Sampling
         start = clock();
         
-        sample<a_dm_nuts, Model, rng_t>(sampler, num_iterations - num_warmup, num_thin, 
-                                        refresh, true, writer,
-                                        s, model, base_rng);
+        sample<a_Dm_nuts, Model, rng_t>(sampler, num_warmup, num_iterations - num_warmup, num_thin,
+                                        refresh, true, 
+                                        writer, s, model, base_rng);
+        
+        end = clock();
+        sampleDeltaT = (double)(end - start) / CLOCKS_PER_SEC;
+        
+      }
+      else if (leapfrog_steps < 0 && !equal_step_sizes) {
+        
+        // Euclidean NUTS with Diagonal Metric
+        stan::mcmc::sample s(cont_params, disc_params, 0, 0);
+        
+        typedef stan::mcmc::adapt_diag_e_nuts<Model, rng_t> a_dm_nuts;
+
+        a_dm_nuts sampler(model, base_rng, num_warmup);
+        sampler.seed(cont_params, disc_params);
+        
+        write_comment_property(sample_stream, "algorithm", sampler.name());
+        write_comment(sample_stream);
+        
+        if (diagnostic_stream) {
+          write_comment_property(*diagnostic_stream, "algorithm", sampler.name());
+          write_comment(*diagnostic_stream);
+        }
+        
+        if (!append_samples) {
+          writer.print_sample_names(s, sampler, model);
+          writer.print_diagnostic_names(s, sampler, model);
+        }
+      
+        // Warm-Up
+        if (epsilon <= 0) sampler.init_stepsize();
+        else              sampler.set_nominal_stepsize(epsilon);
+        
+        sampler.set_stepsize_jitter(epsilon_pm);
+        
+        sampler.set_max_depth(max_treedepth);
+        
+        sampler.get_stepsize_adaptation().set_delta(delta);
+        sampler.get_stepsize_adaptation().set_gamma(gamma);
+        sampler.get_stepsize_adaptation().set_mu(log(10 * sampler.get_nominal_stepsize()));
+        sampler.engage_adaptation();
+        
+        clock_t start = clock();
+        
+        warmup<a_dm_nuts, Model, rng_t>(sampler, num_warmup, num_iterations - num_warmup, num_thin, 
+                                        refresh, save_warmup, 
+                                        writer, s, model, base_rng); 
+        
+        clock_t end = clock();
+        warmDeltaT = (double)(end - start) / CLOCKS_PER_SEC;
+        
+        sampler.disengage_adaptation();
+        writer.print_adapt_finish(sampler);
+        
+        // Sampling
+        start = clock();
+        
+        sample<a_dm_nuts, Model, rng_t>(sampler, num_warmup, num_iterations - num_warmup, num_thin,
+                                        refresh, true, 
+                                        writer, s, model, base_rng);
         
         end = clock();
         sampleDeltaT = (double)(end - start) / CLOCKS_PER_SEC;
@@ -966,131 +992,130 @@ namespace stan {
         
       } else if (leapfrog_steps < 0 && equal_step_sizes) {
         
-        /*
+        
         // Euclidean NUTS with Unit Metric
         stan::mcmc::sample s(cont_params, disc_params, 0, 0);
         
         typedef stan::mcmc::adapt_unit_e_nuts<Model, rng_t> a_um_nuts;
         a_um_nuts sampler(model, base_rng);
+        sampler.seed(cont_params, disc_params);
+        
+        write_comment_property(sample_stream, "algorithm", sampler.name());
+        write_comment(sample_stream);
+        
+        if (diagnostic_stream) {
+          write_comment_property(*diagnostic_stream, "algorithm", sampler.name());
+          write_comment(*diagnostic_stream);
+        }
         
         if (!append_samples) {
-          sample_stream << "lp__,";
-          sampler.write_sampler_param_names(sample_stream);
-          model.write_csv_header(sample_stream);
-          
-          //sampler.z().write_header(diagnostic_stream);
-          //sampler.z().write_names(diagnostic_stream);
-          //diagnostic_stream << std::endl;
-          
+          writer.print_sample_names(s, sampler, model);
+          writer.print_diagnostic_names(s, sampler, model);
         }
         
         // Warm-Up
-        if (epsilon < 0) sampler.init_stepsize();
+        if (epsilon <= 0) sampler.init_stepsize();
         else             sampler.set_nominal_stepsize(epsilon);
         
         sampler.set_stepsize_jitter(epsilon_pm);
         
         sampler.set_max_depth(max_treedepth);
         
-        sampler.set_adapt_mu(log(10 * sampler.get_nominal_stepsize()));
+        sampler.get_stepsize_adaptation().set_delta(delta);
+        sampler.get_stepsize_adaptation().set_gamma(gamma);
+        sampler.get_stepsize_adaptation().set_mu(log(10 * sampler.get_nominal_stepsize()));
         sampler.engage_adaptation();
         
         clock_t start = clock();
         
-        warmup<a_um_nuts, Model, rng_t>(sampler, num_warmup, num_thin, 
+        warmup<a_um_nuts, Model, rng_t>(sampler, num_warmup, num_iterations - num_warmup, num_thin, 
                                         refresh, save_warmup, 
-                                        sample_stream, diagnostic_stream,
-                                        s, model, base_rng); 
+                                        writer, s, model, base_rng); 
         
         clock_t end = clock();
         warmDeltaT = (double)(end - start) / CLOCKS_PER_SEC;
         
         sampler.disengage_adaptation();
-
-        sample_stream << "# (" << sampler.name() << ")" << std::endl;
-        sample_stream << "# Adaptation terminated" << std::endl;
-        sample_stream << "# Step size = " << sampler.get_nominal_stepsize() << std::endl;
-        sampler.z().write_metric(sample_stream);
+        writer.print_adapt_finish(sampler);
         
         // Sampling
         start = clock();
         
-        sample<a_um_nuts, Model, rng_t>(sampler, num_iterations - num_warmup, num_thin, 
+        sample<a_um_nuts, Model, rng_t>(sampler, num_warmup, num_iterations - num_warmup, num_thin,
                                         refresh, true, 
-                                        sample_stream, diagnostic_stream, 
-                                        s, model, base_rng); 
+                                        writer, s, model, base_rng); 
         
         end = clock();
         sampleDeltaT = (double)(end - start) / CLOCKS_PER_SEC;
-        */
+        
       } else {
         
-        /*
+        
         // Unit Metric HMC with Static Integration Time
         stan::mcmc::sample s(cont_params, disc_params, 0, 0);
         
         typedef stan::mcmc::adapt_unit_e_static_hmc<Model, rng_t> a_um_hmc;
         a_um_hmc sampler(model, base_rng);
+        sampler.seed(cont_params, disc_params);
+        
+        write_comment_property(sample_stream, "algorithm", sampler.name());
+        write_comment(sample_stream);
+        
+        if (diagnostic_stream) {
+          write_comment_property(*diagnostic_stream, "algorithm", sampler.name());
+          write_comment(*diagnostic_stream);
+        }
         
         if (!append_samples) {
-          sample_stream << "lp__,";
-          sampler.write_sampler_param_names(sample_stream);
-          model.write_csv_header(sample_stream);
-          
-          //sampler.z().write_header(diagnostic_stream);
-          //sampler.z().write_names(diagnostic_stream);
-          //diagnostic_stream << std::endl;
-          
+          writer.print_sample_names(s, sampler, model);
+          writer.print_diagnostic_names(s, sampler, model);
         }
         
         // Warm-Up
-        if (epsilon < 0) sampler.init_stepsize();
-        else             sampler.set_nominal_stepsize(epsilon);
+        if (epsilon <= 0) sampler.init_stepsize();
+        else              sampler.set_nominal_stepsize(epsilon);
         
         sampler.set_stepsize_jitter(epsilon_pm);
         
         sampler.set_nominal_stepsize_and_L(epsilon, leapfrog_steps);
-        //sampler.set_stepsize_and_T(epsilon, 3.14159);
         
-        sampler.set_adapt_mu(log(10 * sampler.get_nominal_stepsize()));
+        sampler.get_stepsize_adaptation().set_delta(delta);
+        sampler.get_stepsize_adaptation().set_gamma(gamma);
+        sampler.get_stepsize_adaptation().set_mu(log(10 * sampler.get_nominal_stepsize()));
         sampler.engage_adaptation();
         
         clock_t start = clock();
         
-        warmup<a_um_hmc, Model, rng_t>(sampler, num_warmup, num_thin, 
+        warmup<a_um_hmc, Model, rng_t>(sampler, num_warmup, num_iterations - num_warmup, num_thin, 
                                        refresh, save_warmup, 
-                                       sample_stream, diagnostic_stream,
-                                       s, model, base_rng); 
+                                       writer, s, model, base_rng);
         
         clock_t end = clock();
         warmDeltaT = (double)(end - start) / CLOCKS_PER_SEC;
         
         sampler.disengage_adaptation();
-
-        
-        
-        sample_stream << "# (" << sampler.name() << ")" << std::endl;
-        sample_stream << "# Adaptation terminated" << std::endl;
-        sample_stream << "# Step size = " << sampler.get_nominal_stepsize() << std::endl;
-        sampler.z().write_metric(sample_stream);
+        writer.print_adapt_finish(sampler);
         
         // Sampling
         start = clock();
         
-        sample<a_um_hmc, Model, rng_t>(sampler, num_iterations - num_warmup, num_thin, 
+        sample<a_um_hmc, Model, rng_t>(sampler, num_warmup, num_iterations - num_warmup, num_thin,
                                        refresh, true, 
-                                       sample_stream, diagnostic_stream, 
-                                       s, model, base_rng); 
+                                       writer, s, model, base_rng);
         
         end = clock();
         sampleDeltaT = (double)(end - start) / CLOCKS_PER_SEC;
-        */
+        
       }
       
       writer.print_timing(warmDeltaT, sampleDeltaT);
       
       sample_stream.close();
-      diagnostic_stream.close();
+      
+      if (diagnostic_stream) {
+        diagnostic_stream->close();
+        delete diagnostic_stream;
+      }
       
       return 0;
       

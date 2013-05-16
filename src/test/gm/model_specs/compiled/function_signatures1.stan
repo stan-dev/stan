@@ -235,6 +235,22 @@ transformed data {
   transformed_data_real <- dot_self(d_vector);
   transformed_data_real <- dot_self(d_row_vector);
 
+  transformed_data_row_vector <- columns_dot_product(d_vector, d_vector);
+  transformed_data_row_vector <- columns_dot_product(d_row_vector, d_row_vector);
+  transformed_data_row_vector <- columns_dot_product(d_matrix, d_matrix);
+
+  transformed_data_vector <- rows_dot_product(d_vector, d_vector);
+  transformed_data_vector <- rows_dot_product(d_row_vector, d_row_vector);
+  transformed_data_vector <- rows_dot_product(d_matrix, d_matrix);
+
+  transformed_data_row_vector <- columns_dot_self(d_vector);
+  transformed_data_row_vector <- columns_dot_self(d_row_vector);
+  transformed_data_row_vector <- columns_dot_self(d_matrix);
+
+  transformed_data_vector <- rows_dot_self(d_vector);
+  transformed_data_vector <- rows_dot_self(d_row_vector);
+  transformed_data_vector <- rows_dot_self(d_matrix);
+
   //  reductions
   transformed_data_real <- min(d_vector);
   transformed_data_real <- min(d_row_vector);

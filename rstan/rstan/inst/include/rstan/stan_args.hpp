@@ -149,9 +149,8 @@ namespace rstan {
       if (idx == args_names.size()) thin = (calculated_thin > 1) ? calculated_thin : 1;
       else thin = Rcpp::as<int>(in[idx]); 
 
-      iter_save = 1 + (iter - 1) / thin; 
-      // starting from 0, iterations of 0, thin, 2 * thin, .... are saved. 
-      iter_save_wo_warmup = iter_save - (warmup - 1) / thin - 1;
+      iter_save_wo_warmup = 1 + (iter - warmup - 1) / thin; 
+      iter_save = iter_save_wo_warmup + 1 + (warmup - 1) / thin;
 
       idx = find_index(args_names, std::string("leapfrog_steps"));
       if (idx == args_names.size()) leapfrog_steps = -1; 
