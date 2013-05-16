@@ -265,13 +265,3 @@ public:
 
 } // namespace
 
-int main(int argc, const char* argv[]) {
-    try {
-        stan::gm::command<example_model_namespace::example_model>(argc,argv);
-    } catch (std::exception& e) {
-        std::cerr << std::endl << "Exception: " << e.what() << std::endl;
-        std::cerr << "Diagnostic information: " << std::endl << boost::diagnostic_information(e) << std::endl;
-        return -1;
-    }
-}
-
