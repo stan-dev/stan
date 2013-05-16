@@ -299,6 +299,14 @@ check_seed <- function(seed, warn = 0) {
   seed 
 } 
 
+is_named_list <- function(x) {
+  # tell if list x is a named list
+  if (!is.list(x)) return(FALSE)
+  n <- names(x)
+  if (is.null(n) || "" %in% n) return(FALSE)
+  return(TRUE)
+} 
+
 config_argss <- function(chains, iter, warmup, thin, 
                          init, seed, sample_file, ...) {
 
@@ -333,6 +341,8 @@ config_argss <- function(chains, iter, warmup, thin,
     } else {
       inits <- lapply(1:chains, function(id) init())
     } 
+    if (!is_named_list(inits[[1]])) 
+      stop('the function for specifying initial values need return a named list')
     inits_specified <- TRUE
   } 
   if (!inits_specified && is.list(init)) {
@@ -342,6 +352,10 @@ config_argss <- function(chains, iter, warmup, thin,
       stop("initial value list is not a list of lists") 
     }
     inits <- init; 
+    for (i in 1:chains) {
+      if (!is_named_list(inits[[i]])) 
+        stop('the list for specifying initial values need be a named list')
+    } 
     inits_specified <- TRUE
   }
   if (!inits_specified) stop("wrong specification of initial values")
