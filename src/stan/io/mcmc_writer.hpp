@@ -36,7 +36,6 @@ namespace stan {
         sampler.get_sampler_param_names(names);
         model.constrained_param_names(names);
         
-        
         (*_sample_stream) << names.at(0);
         for (int i = 1; i < names.size(); ++i) {
           (*_sample_stream) << "," << names.at(i);
@@ -58,8 +57,8 @@ namespace stan {
         
         std::vector<double> model_values;
         
-        model.write_array_params(const_cast<std::vector<double>&>(sample.cont_params()),
-                                 const_cast<std::vector<int>&>(sample.disc_params()),
+        model.write_array_params(sample.cont_params(),
+                                 sample.disc_params(),
                                  model_values);
         
         values.insert(values.end(), model_values.begin(), model_values.end());
