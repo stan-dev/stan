@@ -20,5 +20,5 @@ for (t in 3:T) {
   epsilon[t] <- y[t] - predictor;
 }
 
-library('rstan')
+#library('rstan')
 # fit <- stan('ma2.stan', data=list(T=T, y=y), iter=500, chains=2, init=0);

@@ -21,11 +21,11 @@ models/speed/%.stan : src/models/speed/%.stan
 	@echo ''
 	@echo '--- Copying model ---'
 	cp $< $@ 
-	@if test -f $(basename $<)*.R; then \
+	@if test -f $(basename $<)*_generate_data.R; then \
 		echo '';\
 		echo '--- Copying generate script ---';\
-		cp $(wildcard $(basename $<)*.R) $(dir $@);\
-		echo 'cp $(wildcard $(basename $<)*.R) $(dir $@)';\
+		cp $(wildcard $(basename $<)*_generate_data.R) $(dir $@);\
+		echo 'cp $(wildcard $(basename $<)*_generate_data.R) $(dir $@)';\
 	fi;
 	@if test -f $(basename $<)*.data.R; then \
 		echo '';\
@@ -64,12 +64,12 @@ models/%.stan : src/models/%.stan
 $(MODEL_HEADER).gch : $(MODEL_HEADER)
 	@echo ''
 	@echo '--- Precompiling $(MODEL_HEADER) for g++ ---'
-	$(CC) $(CFLAGS) -O$O $(OUTPUT_OPTION) $<
+	$(CC) $(CFLAGS) -O$O -c $(OUTPUT_OPTION) $<
 
 $(MODEL_HEADER).pch : $(MODEL_HEADER)
 	@echo ''
 	@echo '--- Precompiling $(MODEL_HEADER) for clang++ ---'
-	$(CC) $(CFLAGS) -O$O $(OUTPUT_OPTION) $<
+	$(CC) $(CFLAGS) -O$O -c $(OUTPUT_OPTION) $<
 
 $(MODEL_HEADER).d : $(MODEL_HEADER)
 	@if test -d $(dir $@); \

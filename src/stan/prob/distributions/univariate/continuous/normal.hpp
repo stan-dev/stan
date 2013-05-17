@@ -3,6 +3,7 @@
 
 #include <boost/random/normal_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
+#include <boost/utility/enable_if.hpp>
 
 #include <stan/agrad.hpp>
 #include <stan/math.hpp>
@@ -35,7 +36,8 @@ namespace stan {
      */
     template <bool propto, 
               typename T_y, typename T_loc, typename T_scale>
-    typename return_type<T_y,T_loc,T_scale>::type
+    typename boost::enable_if_c<is_var_or_arithmetic<T_y,T_loc,T_scale>::value,
+                                typename return_type<T_y,T_loc,T_scale>::type>::type
     normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
       static const char* function = "stan::prob::normal_log(%1%)";
 

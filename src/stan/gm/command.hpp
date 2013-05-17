@@ -1056,6 +1056,7 @@ namespace stan {
         
         typedef stan::mcmc::adapt_dense_e_nuts<Model, rng_t> a_Dm_nuts;
         a_Dm_nuts sampler(model, base_rng, num_warmup);
+        sampler.seed(cont_params, disc_params);
         
         if (!append_samples) {
           sample_stream << "lp__,";
@@ -1112,7 +1113,8 @@ namespace stan {
         
         typedef stan::mcmc::adapt_diag_e_nuts<Model, rng_t> a_dm_nuts;
         a_dm_nuts sampler(model, base_rng, num_warmup);
-                
+        sampler.seed(cont_params, disc_params);
+        
         if (!append_samples) {
           sample_stream << "lp__,";
           sampler.write_sampler_param_names(sample_stream);
@@ -1168,6 +1170,7 @@ namespace stan {
         
         typedef stan::mcmc::adapt_unit_e_nuts<Model, rng_t> a_um_nuts;
         a_um_nuts sampler(model, base_rng);
+        sampler.seed(cont_params, disc_params);
         
         if (!append_samples) {
           sample_stream << "lp__,";
@@ -1223,6 +1226,7 @@ namespace stan {
         
         typedef stan::mcmc::adapt_unit_e_static_hmc<Model, rng_t> a_um_hmc;
         a_um_hmc sampler(model, base_rng);
+        sampler.seed(cont_params, disc_params);
         
         if (!append_samples) {
           sample_stream << "lp__,";

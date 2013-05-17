@@ -1,10 +1,8 @@
 #ifndef __STAN__AGRAD__REV__LOG1M_HPP__
 #define __STAN__AGRAD__REV__LOG1M_HPP__
 
-#include <valarray>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/op/v_vari.hpp>
-#include <stan/math/constants.hpp>
 #include <stan/math/functions/log1p.hpp>
 
 namespace stan {

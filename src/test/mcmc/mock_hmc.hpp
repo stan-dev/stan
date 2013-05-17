@@ -69,6 +69,10 @@ namespace stan {
     template <typename H, typename P>
     class mock_integrator: public base_integrator<H, P> {
     public:
+      mock_integrator(std::ostream* o) 
+      : base_integrator<H,P>(o)
+      { }
+      
       void evolve(P& z, H& hamiltonian, const double epsilon) {};
     };
     

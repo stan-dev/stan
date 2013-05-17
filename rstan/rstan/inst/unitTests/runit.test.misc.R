@@ -72,6 +72,13 @@ test_is_valid_stan_name <- function() {
   checkTrue(rstan:::is_legal_stan_vname('y'))
 } 
 
+test_is_named_list <- function() {
+  checkTrue(!rstan:::is_named_list(c(2, 3)))
+  checkTrue(!rstan:::is_named_list(list(3, 4)))
+  checkTrue(!rstan:::is_named_list(list(a = 3, 4)))
+  checkTrue(rstan:::is_named_list(list(a = 3, b = 4)))
+} 
+
 test_data_preprocess <- function() {
   lst <- list(z = c(1L, 2L, 4L), 
               a = 1:100, 
