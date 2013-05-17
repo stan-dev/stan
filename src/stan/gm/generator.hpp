@@ -3365,6 +3365,22 @@ namespace stan {
         << EOL
         << INDENT << "}"
         << EOL2;
+      
+      o << INDENT << "void write_array_params_all(std::vector<double>& params_r__,"
+        << EOL
+        << INDENT << "                        std::vector<int>& params_i__,"
+        << EOL
+        << INDENT << "                        std::vector<double>& vars__,"
+        << EOL
+        << INDENT << "                        std::ostream* pstream__ = 0) {"
+        << EOL
+        << INDENT2 << "boost::random::minstd_rand base_rng; // dummy"
+        << EOL
+        << INDENT2 << "write_array(base_rng,params_r__,params_i__,vars__,true,true,pstream__);"
+        << EOL
+        << INDENT << "}"
+        << EOL2;
+      
     }
 
     
