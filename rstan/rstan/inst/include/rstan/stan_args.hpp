@@ -120,6 +120,9 @@ namespace rstan {
     SEXP init_list;  
     std::string sampler; // HMC, NUTS1, NUTS2 (not set directy from R now) 
     bool nondiag_mass; 
+    bool unit_metro;  // default: false 
+    bool diag_metro;  // default: false 
+    bool dense_metro;  // default: false 
 
   public:
     stan_args(const Rcpp::List& in) : init_list(R_NilValue) {
@@ -234,6 +237,18 @@ namespace rstan {
       idx = find_index(args_names, std::string("nondiag_mass"));
       if (idx == args_names.size()) nondiag_mass = false;
       else nondiag_mass = Rcpp::as<bool>(in[idx]);
+	
+      idx = find_index(args_names, std::string("unit_metro")); 
+      if (idx == args_names.size()) unit_metro = false; 
+      else unit_metro = Rcpp::as<bool>(in[idx]); 
+
+      idx = find_index(args_names, std::string("diag_metro")); 
+      if (idx == args_names.size()) diag_metro = false; 
+      else diag_metro = Rcpp::as<bool>(in[idx]); 
+
+      idx = find_index(args_names, std::string("dense_metro")); 
+      if (idx == args_names.size()) dense_metro = false; 
+      else dense_metro = Rcpp::as<bool>(in[idx]); 
     } 
 
     /**
@@ -273,6 +288,9 @@ namespace rstan {
       lst["point_estimate"] = point_estimate;
       lst["point_estimate_newton"] = point_estimate_newton;
       lst["nondiag_mass"] = nondiag_mass; 
+      lst["unit_metro"] = unit_metro;
+      lst["diag_metro"] = diag_metro;
+      lst["dense_metro"] = dense_metro;
       return lst; 
     } 
 
@@ -373,6 +391,15 @@ namespace rstan {
     bool get_nondiag_mass() const {
       return nondiag_mass;
     } 
+    bool get_unit_metro() const {
+      return unit_metro; 
+    }
+    bool get_diag_metro() const {
+      return diag_metro; 
+    } 
+    bool get_dense_metro() const {
+      return dense_metro; 
+    } 
     void write_args_as_comment(std::ostream& ostream) const { 
       write_comment_property(ostream,"init",init);
       write_comment_property(ostream,"append_samples",append_samples);
@@ -391,6 +418,9 @@ namespace rstan {
       write_comment_property(ostream,"delta",delta);
       write_comment_property(ostream,"gamma",gamma);
       write_comment_property(ostream,"nondiag_mass",nondiag_mass);
+      write_comment_property(ostream,"unit_metro",unit_metro); 
+      write_comment_property(ostream,"diag_metro",diag_metro); 
+      write_comment_property(ostream,"dense_metro",dense_metro); 
       write_comment(ostream);
     }
   }; 
