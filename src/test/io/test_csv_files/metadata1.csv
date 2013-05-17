@@ -3,6 +3,7 @@
 # stan_version_major=1
 # stan_version_minor=3
 # stan_version_patch=0
+# model=blocker_model
 # data=src/models/bugs_examples/vol1/blocker/blocker.data.R
 # init=src/models/bugs_examples/vol1/blocker/blocker.init.R
 # append_samples=0
@@ -20,4 +21,5 @@
 # epsilon_pm=0
 # delta=0.5
 # gamma=0.05
+# algorithm=NUTS with a diagonal Euclidean metric
 #
