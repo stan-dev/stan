@@ -1,67 +1,68 @@
-#ifndef __STAN__MATH__MATRIX__SORT_HPP__
-#define __STAN__MATH__MATRIX__SORT_HPP__
+#ifndef __STAN__AGRAD__REV__SORT_HPP__
+#define __STAN__AGRAD__REV__SORT_HPP__
 
+#include <valarray>
+#include <stan/agrad/rev/var.hpp>
+#include <stan/agrad/rev/op/v_vari.hpp>
 #include <vector>
 #include <stan/math/matrix/Eigen.hpp>
 #include <algorithm>    // std::sort
 #include <functional>   // std::greater
 
 namespace stan {
-  namespace math {
+  namespace agrad {
    
     /**
-     * Return the specified standard vector in ascending order.
+     * Return the specified standard vector in ascending order with gradients kept.
      *
      * @param xs Standard vector to order.
      * @return Standard vector ordered.
      * @tparam T Type of elements of the vector.
      */
-    template <typename T>
-    inline typename std::vector<T> sort_asc(std::vector<T> xs) {
+    inline std::vector<var> sort_asc(std::vector<var> xs) {
       if (xs.size() > 1)
         std::sort(xs.begin(), xs.end());
       return xs;
     }
-
+    
     /**
-     * Return the specified standard vector in descending order.
+     * Return the specified standard vector in descending order with gradients kept.
      *
      * @param xs Standard vector to order.
      * @return Standard vector ordered.
      * @tparam T Type of elements of the vector.
      */
-    template <typename T>
-    inline typename std::vector<T> sort_desc(std::vector<T> xs) {
+    inline std::vector<var> sort_desc(std::vector<var> xs) {
       if (xs.size() > 1)
-        std::sort(xs.begin(), xs.end(), std::greater<T>());
+        std::sort(xs.begin(), xs.end(), std::greater<var>());
       return xs;
     }
 
     /**
-     * Return the specified eigen vector in ascending order.
+     * Return the specified eigen vector in ascending order with gradients kept.
      *
      * @param xs Eigen vector to order.
      * @return Eigen vector ordered.
      * @tparam T Type of elements of the vector.
      */
-    template <typename T, int R, int C>
-    inline typename Eigen::Matrix<T,R,C> sort_asc(Eigen::Matrix<T,R,C> xs) {
+    template <int R, int C>
+    inline typename Eigen::Matrix<var,R,C> sort_asc(Eigen::Matrix<var,R,C> xs) {
       if (xs.size() > 1)
         std::sort(xs.data(), xs.data()+xs.size());
       return xs;
     }
 
     /**
-     * Return the specified eigen vector in descending order.
+     * Return the specified eigen vector in descending order with gradients kept.
      *
      * @param xs Eigen vector to order.
      * @return Eigen vector ordered.
      * @tparam T Type of elements of the vector.
      */
- template <typename T, int R, int C>
-    inline typename Eigen::Matrix<T,R,C> sort_desc(Eigen::Matrix<T,R,C> xs) {
+    template <int R, int C>
+    inline typename Eigen::Matrix<var,R,C> sort_desc(Eigen::Matrix<var,R,C> xs) {
       if (xs.size() > 1)
-        std::sort(xs.data(), xs.data()+xs.size(), std::greater<T>());
+        std::sort(xs.data(), xs.data()+xs.size(), std::greater<var>());
       return xs;
     }
     
