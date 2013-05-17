@@ -34,7 +34,7 @@ namespace stan {
         
         sample.get_sample_param_names(names);
         sampler.get_sampler_param_names(names);
-        model.constrained_param_names(names);
+        model.constrained_param_names(names, false, false);
         
         (*_sample_stream) << names.at(0);
         for (int i = 1; i < names.size(); ++i) {
