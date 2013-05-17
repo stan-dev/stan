@@ -171,7 +171,7 @@ setMethod("sampling", "stanmodel",
                                           init = init, seed = seed, sample_file, ...))
    
             if (is(args_list, "try-error")) {
-              message('error specification of arguments; sampling not done') 
+              message('error in specifying arguments; sampling not done') 
               return(invisible(new_empty_stanfit(object, miscenv = sfmiscenv, m_pars, p_dims, 2L))) 
             }
 
