@@ -2,8 +2,9 @@
 #define __STAN__MATH__MATRIX__DIST_HPP__
 
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/matrix/validate_vector.hpp>
-#include <stan/math/matrix/validate_matching_sizes.hpp>
+#include <stan/meta/traits.hpp>
+#include <boost/math/tools/promotion.hpp>
+#include <stan/math/matrix/squared_dist.hpp>
 
 namespace stan {
   namespace math {
@@ -17,31 +18,12 @@ namespace stan {
      * @throw std::domain_error If the vectors are not the same
      * size or if they are both not vector dimensioned.
      */
-    template<int R1,int C1,int R2, int C2>
-    inline double dist(const Eigen::Matrix<double, R1, C1>& v1, 
-                       const Eigen::Matrix<double, R2, C2>& v2) {
-      validate_vector(v1,"dist");
-      validate_vector(v2,"dist");
-      validate_matching_sizes(v1,v2,"dist");
-      return (v1-v2).norm();
-    }
-    
-    /**
-     * Returns the squared distance between the specified vectors.
-     *
-     * @param v1 First vector.
-     * @param v2 Second vector.
-     * @return Dot product of the vectors.
-     * @throw std::domain_error If the vectors are not the same
-     * size or if they are both not vector dimensioned.
-     */
-    template<int R1,int C1,int R2, int C2>
-    inline double squared_dist(const Eigen::Matrix<double, R1, C1>& v1, 
-                               const Eigen::Matrix<double, R2, C2>& v2) {
-      validate_vector(v1,"squared_dist");
-      validate_vector(v2,"squared_dist");
-      validate_matching_sizes(v1,v2,"squared_dist");
-      return (v1-v2).squaredNorm();
+    template<typename T1, int R1,int C1, typename T2, int R2, int C2>
+    inline typename boost::math::tools::promote_args<T1,T1>::type
+    dist(const Eigen::Matrix<T1, R1, C1>& v1,
+         const Eigen::Matrix<T2, R2, C2>& v2) {
+      using std::sqrt;
+      return sqrt(squared_dist(v1,v2));
     }
   }
 }

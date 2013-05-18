@@ -3,8 +3,6 @@
 
 #include <sstream>
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/error_handling/default_policy.hpp>
-#include <stan/math/error_handling/raise_domain_error.hpp>
 #include <stan/math/error_handling/check_positive.hpp>
 #include <stan/math/error_handling/matrix/check_pos_definite.hpp>
 #include <stan/math/error_handling/matrix/check_symmetric.hpp>
@@ -27,40 +25,31 @@ namespace stan {
      * @tparam T Type of scalar.
      */
     // FIXME: update warnings
-    template <typename T_y, typename T_result, class Policy>
-    inline bool check_cov_matrix(const char* function,
-                 const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
-                 const char* name,
-                 T_result* result,
-                 const Policy&) {
-      if (!check_size_match(function, 
-          y.rows(), "Rows of covariance matrix",
-          y.cols(), "columns of covariance matrix",
-          result, Policy())) 
-        return false;
-      if (!check_positive(function, y.rows(), "rows", result, Policy()))
-        return false;
-      if (!check_symmetric(function, y, name, result, Policy()))
-        return false;
-      if (!check_pos_definite(function, y, name, result, Policy()))
-        return false;
-      return true;
-    }
-
     template <typename T_y, typename T_result>
     inline bool check_cov_matrix(const char* function,
                  const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
                  const char* name,
                  T_result* result) {
-      return check_cov_matrix(function,y,name,result,default_policy());
+      if (!check_size_match(function, 
+                            y.rows(), "Rows of covariance matrix",
+                            y.cols(), "columns of covariance matrix",
+                            result)) 
+        return false;
+      if (!check_positive(function, y.rows(), "rows", result))
+        return false;
+      if (!check_symmetric(function, y, name, result))
+        return false;
+      if (!check_pos_definite(function, y, name, result))
+        return false;
+      return true;
     }
 
     template <typename T>
     inline bool check_cov_matrix(const char* function,
-                 const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& y,
-                 const char* name,
-                 T* result = 0) {
-      return check_cov_matrix(function,y,name,result,default_policy());
+                                 const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& y,
+                                 const char* name,
+                                 T* result = 0) {
+      return check_cov_matrix<T,T>(function,y,name,result);
     }
 
 
@@ -77,34 +66,26 @@ namespace stan {
      * @tparam T Type of scalar.
      */
     // FIXME: update warnings
-    template <typename T_covar, typename T_result, class Policy>
+    template <typename T_covar, typename T_result>
     inline bool check_cov_matrix(const char* function,
-         const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
-         T_result* result,
-         const Policy&) {
+                                 const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
+                                 T_result* result) {
       if (!check_size_match(function, 
-          Sigma.rows(), "Rows of covariance matrix",
-          Sigma.cols(), "columns of covariance matrix",
-                            result, Policy())) 
+                            Sigma.rows(), "Rows of covariance matrix",
+                            Sigma.cols(), "columns of covariance matrix",
+                            result)) 
         return false;
-      if (!check_positive(function, Sigma.rows(), "rows", result, Policy()))
+      if (!check_positive(function, Sigma.rows(), "rows", result))
         return false;
-      if (!check_symmetric(function, Sigma, "Sigma", result, Policy()))
+      if (!check_symmetric(function, Sigma, "Sigma", result))
         return false;
       return true;
     }
-    template <typename T_covar, typename T_result>
-    inline bool check_cov_matrix(const char* function,
-         const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
-         T_result* result) {
-      return check_cov_matrix(function,Sigma,result,default_policy());
-      
-    }
     template <typename T>
     inline bool check_cov_matrix(const char* function,
-         const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
-         T* result = 0) {
-      return check_cov_matrix(function,Sigma,result,default_policy());
+                                 const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
+                                 T* result = 0) {
+      return check_cov_matrix<T,T>(function,Sigma,result);
     }
 
   }

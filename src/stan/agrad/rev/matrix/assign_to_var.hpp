@@ -6,7 +6,10 @@
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/agrad/rev/var.hpp>
+#include <stan/agrad/fwd/fvar.hpp>
 #include <stan/agrad/rev/matrix/typedefs.hpp>
+#include <stan/agrad/fwd/matrix/typedefs.hpp>
+#include <stan/agrad/fwd/matrix/assign_to_var.hpp>
 #include <stan/agrad/rev/matrix/dot_product.hpp>
 #include <stan/agrad/rev/matrix/dot_self.hpp>
 

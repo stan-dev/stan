@@ -54,7 +54,8 @@ prep_call_sampler <- function(object) {
 setMethod("optimizing", "stanmodel", 
           function(object, data = list(), 
                    seed = sample.int(.Machine$integer.max, 1), 
-                   init = 'random', check_data = TRUE, sample_file,
+                   init = 'random', check_data = TRUE, sample_file, 
+                   method = c("newton", "nesterov"),
                    verbose = FALSE, ...) {
             prep_call_sampler(object)
             model_cppname <- object@model_cpp$model_cppname 
@@ -94,7 +95,12 @@ setMethod("optimizing", "stanmodel",
             seed <- check_seed(seed, warn = 1)    
             if (is.null(seed))
               return(invisible(list(stanmodel = object)))
-            args <- list(init = init, seed = seed, point_estimate = TRUE)
+            method <- match.arg(method)
+            method_flag <- "point_estimate"
+            if (method == 'newton') method_flag <- 'point_estimate_newton'
+            args <- list(init = init, seed = seed) 
+            args[method_flag] <- TRUE
+         
             if (!missing(sample_file) && is.na(sample_file)) 
               args$sample_file <- writable_sample_file(sample_file) 
             dotlist <- list(...)
@@ -169,10 +175,11 @@ setMethod("sampling", "stanmodel",
               return(invisible(new_empty_stanfit(object, miscenv = sfmiscenv, m_pars, p_dims, 2L))) 
             }
 
-            n_save <- 1 + (iter - 1) %/% thin 
             # number of samples saved after thinning
             warmup2 <- 1 + (warmup - 1) %/% thin 
-            n_kept <- n_save - warmup2 
+            n_kept <- 1 + (iter - warmup - 1) %/% thin
+            n_save <- n_kept + warmup2 
+
             samples <- vector("list", chains)
             dots <- list(...)
             mode <- if (!is.null(dots$test_grad) && dots$test_grad) "TESTING GRADIENT" else "SAMPLING"

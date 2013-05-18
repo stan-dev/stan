@@ -1082,6 +1082,12 @@ nor will they conflict with the names of predefined functions or
 distributions.  Nevertheless, these names should be avoided for the
 sake of program clarity.
 
+Some variable names are reserved because they are used within
+Stan's \Cpp implementation.  These are
+\begin{quote}
+var.
+\end{quote}.
+
 Finally, variable names, including the names of models, should not
 conflict with any of the C++ keywords.
 %
@@ -1835,7 +1841,7 @@ Executing such a statement does not perform any sampling.  In \Stan, a
 sampling statement is merely a notational convenience.  The above
 sampling statement could be written as an assignment statement using
 the reserved variable \code{lp\_\_} as follows (see
-\refsection{incr-vs-sample.section} for a full explanation).
+\refsection{incr-vs-sample} for a full explanation).
 %
 \begin{quote}
 \begin{Verbatim}

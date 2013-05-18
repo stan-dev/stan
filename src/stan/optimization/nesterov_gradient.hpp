@@ -22,33 +22,52 @@ namespace stan {
 
     public:
       void initialize_epsilon() {
-        epsilon_ = 1;
+        if (epsilon_ <= 0)
+          epsilon_ = 1;
         double lastlogp = logp_;
+        bool valid;
         std::vector<double> lastgrad = grad_;
         std::vector<double> lastx = x_;
         for (size_t i = 0; i < x_.size(); i++)
           x_[i] += epsilon_ * grad_[i];
-        logp_ = model_.grad_log_prob(x_, z_, grad_, output_stream_);
-        if (logp_ > lastlogp) {
-          while (logp_ > lastlogp) {
+        try {
+          logp_ = model_.grad_log_prob(x_, z_, grad_, output_stream_);
+          valid = true;
+        }
+        catch (std::exception &ex) {
+          valid = false;
+        }
+        if (valid && logp_ > lastlogp) {
+          while (valid && logp_ > lastlogp) {
             lastlogp = logp_;
             lastgrad = grad_;
             lastx = x_;
             epsilon_ *= 2;
             for (size_t i = 0; i < x_.size(); i++)
               x_[i] += epsilon_ * grad_[i];
-            logp_ = model_.grad_log_prob(x_, z_, grad_, output_stream_);
+            try {
+              logp_ = model_.grad_log_prob(x_, z_, grad_, output_stream_);
+            }
+            catch (std::exception &ex) {
+              valid = false;
+            }
           }
           logp_ = lastlogp;
           grad_ = lastgrad;
           x_ = lastx;
           epsilon_ /= 2;
         } else {
-          while (!(logp_ > lastlogp)) {
+          while (!valid || !(logp_ > lastlogp)) {
             epsilon_ /= 2;
             for (size_t i = 0; i < x_.size(); i++)
               x_[i] = lastx[i] + epsilon_ * lastgrad[i];
-            logp_ = model_.grad_log_prob(x_, z_, grad_, output_stream_);
+            try {
+              logp_ = model_.grad_log_prob(x_, z_, grad_, output_stream_);
+              valid = true;
+            }
+            catch (std::exception &ex) {
+              valid = false;
+            }
           }
         }
         y_ = x_;
@@ -62,8 +81,9 @@ namespace stan {
         model_(model), x_(params_r), y_(params_r), z_(params_i),
         epsilon_(epsilon0), iteration_(0), output_stream_(output_stream) {
         logp_ = model.grad_log_prob(x_, z_, grad_, output_stream_);
-        if (epsilon_ == -1)
+//        if (epsilon_ == -1)
           initialize_epsilon();
+        std::cout << "epsilon = " << epsilon_ << std::endl;
       }
 
       double logp() { return logp_; }
@@ -74,15 +94,22 @@ namespace stan {
         iteration_++;
         std::vector<double> lastx = x_;
         double lastlogp = logp_;
+        bool valid = true;
         double gradnormsq = 0;
         for (size_t i = 0; i < grad_.size(); i++)
           gradnormsq += grad_[i] * grad_[i];
         epsilon_ *= 2;
-        while (!(logp_ > lastlogp + 0.5 * epsilon_ * gradnormsq)) {
+        while (!valid || !(logp_ > lastlogp + 0.5 * epsilon_ * gradnormsq)) {
           epsilon_ /= 2;
           for (size_t i = 0; i < x_.size(); i++)
             x_[i] = y_[i] + epsilon_ * grad_[i];
-          logp_ = model_.log_prob(x_, z_, output_stream_);
+          try {
+            logp_ = model_.log_prob(x_, z_, output_stream_);
+            valid = true;
+          }
+          catch (std::exception &ex) {
+            valid = false;
+          }
         }
         for (size_t i = 0; i < x_.size(); i++)
           y_[i] = x_[i] +

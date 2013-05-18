@@ -79,17 +79,6 @@ public:
     return stan::prob::pareto_log<propto>(y, y_min, alpha);
   }
   
-  template <bool propto, 
-      class T_y, class T_scale, class T_shape,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9, 
-      class Policy>
-  typename stan::return_type<T_y, T_scale, T_shape>::type 
-  log_prob(const T_y& y, const T_scale& y_min, const T_shape& alpha,
-     const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
-    return stan::prob::pareto_log<propto>(y, y_min, alpha, Policy());
-  }
 
   template <class T_y, class T_scale, class T_shape,
       typename T3, typename T4, typename T5, 

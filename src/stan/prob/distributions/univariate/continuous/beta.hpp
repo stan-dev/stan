@@ -40,11 +40,10 @@ namespace stan {
      *    @li beta must be positive and finite.
      */
     template <bool propto,
-              typename T_y, typename T_scale_succ, typename T_scale_fail,
-              class Policy>
+              typename T_y, typename T_scale_succ, typename T_scale_fail>
     typename return_type<T_y,T_scale_succ,T_scale_fail>::type
-    beta_log(const T_y& y, const T_scale_succ& alpha, const T_scale_fail& beta, 
-             const Policy&) {
+    beta_log(const T_y& y, 
+             const T_scale_succ& alpha, const T_scale_fail& beta) {
       static const char* function = "stan::prob::beta_log(%1%)";
 
       using boost::math::digamma;
@@ -72,27 +71,27 @@ namespace stan {
       // validate args (here done over var, which should be OK)
       if (!check_finite(function, alpha,
                         "First shape parameter",
-                        &logp, Policy()))
+                        &logp))
         return logp;
       if (!check_positive(function, alpha, 
                           "First shape parameter",
-                          &logp, Policy()))
+                          &logp))
         return logp;
       if (!check_finite(function, beta, 
                         "Second shape parameter",
-                        &logp, Policy()))
+                        &logp))
         return logp;
       if (!check_positive(function, beta, 
                           "Second shape parameter",
-                          &logp, Policy()))
+                          &logp))
         return logp;
-      if (!check_not_nan(function, y, "Random variable", &logp, Policy()))
+      if (!check_not_nan(function, y, "Random variable", &logp))
         return logp;
       if (!(check_consistent_sizes(function,
                                    y,alpha,beta,
                                    "Random variable","First shape parameter",
                                    "Second shape parameter",
-                                   &logp, Policy())))
+                                   &logp)))
         return logp;
 
       // check if no variables are involved and prop-to
@@ -200,27 +199,10 @@ namespace stan {
       return operands_and_partials.to_var(logp);
     }
 
-    template <bool propto,
-              typename T_y, typename T_scale_succ, typename T_scale_fail>
-    inline 
-    typename return_type<T_y,T_scale_succ,T_scale_fail>::type
-    beta_log(const T_y& y, const T_scale_succ& alpha, const T_scale_fail& beta) {
-      return beta_log<propto>(y,alpha,beta,stan::math::default_policy());
-    }
-
-    template <typename T_y, typename T_scale_succ, typename T_scale_fail,
-              class Policy>
-    typename return_type<T_y,T_scale_succ,T_scale_fail>::type
-    beta_log(const T_y& y, const T_scale_succ& alpha, const T_scale_fail& beta, 
-             const Policy&) {
-      return beta_log<false>(y,alpha,beta,Policy());
-    }
-
     template <typename T_y, typename T_scale_succ, typename T_scale_fail>
-    inline 
-    typename return_type<T_y,T_scale_succ,T_scale_fail>::type
+    inline typename return_type<T_y,T_scale_succ,T_scale_fail>::type
     beta_log(const T_y& y, const T_scale_succ& alpha, const T_scale_fail& beta) {
-      return beta_log<false>(y,alpha,beta,stan::math::default_policy());
+      return beta_log<false>(y,alpha,beta);
     }
 
     
@@ -235,12 +217,10 @@ namespace stan {
      * @tparam T_y Type of y.
      * @tparam T_scale_succ Type of alpha.
      * @tparam T_scale_fail Type of beta.
-     * @tparam Policy Error-handling policy.
      */
-    template <typename T_y, typename T_scale_succ, typename T_scale_fail, class Policy>
+    template <typename T_y, typename T_scale_succ, typename T_scale_fail>
     typename return_type<T_y,T_scale_succ,T_scale_fail>::type
-    beta_cdf(const T_y& y, const T_scale_succ& alpha, const T_scale_fail& beta, 
-             const Policy&) {
+    beta_cdf(const T_y& y, const T_scale_succ& alpha, const T_scale_fail& beta) {
       
       // Size checks
       if ( !( stan::length(y) && stan::length(alpha) && stan::length(beta) ) ) return 1.0;
@@ -257,24 +237,24 @@ namespace stan {
       
       double P(1.0);
         
-      if (!check_finite(function, alpha, "First shape parameter", &P, Policy()))
+      if (!check_finite(function, alpha, "First shape parameter", &P))
         return P;
         
-      if (!check_positive(function, alpha, "First shape parameter", &P, Policy()))
+      if (!check_positive(function, alpha, "First shape parameter", &P))
         return P;
         
-      if (!check_finite(function, beta, "Second shape parameter", &P, Policy()))
+      if (!check_finite(function, beta, "Second shape parameter", &P))
         return P;
         
-      if (!check_positive(function, beta, "Second shape parameter", &P, Policy()))
+      if (!check_positive(function, beta, "Second shape parameter", &P))
         return P;
         
-      if (!check_not_nan(function, y, "Random variable", &P, Policy()))
+      if (!check_not_nan(function, y, "Random variable", &P))
         return P;
         
       if (!(check_consistent_sizes(function, y, alpha, beta,
                                    "Random variable", "Shape parameter", "Scale Parameter",
-                                   &P, Policy())))
+                                   &P)))
         return P;
       
       // Wrap arguments in vectors
@@ -390,12 +370,6 @@ namespace stan {
       }
         
       return operands_and_partials.to_var(P);
-    }
-
-    template <typename T_y, typename T_scale_succ, typename T_scale_fail>
-    typename return_type<T_y,T_scale_succ,T_scale_fail>::type
-    beta_cdf(const T_y& y, const T_scale_succ& alpha, const T_scale_fail& beta) {
-      return beta_cdf(y, alpha, beta, stan::math::default_policy());
     }
 
     template <class RNG>

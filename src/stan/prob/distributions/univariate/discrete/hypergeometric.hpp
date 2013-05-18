@@ -19,17 +19,11 @@ namespace stan {
     // n: #white balls drawn;  N: #balls drawn;  
     // a: #white balls;  b: #black balls
     template <bool propto,
-        typename T_n,
-        typename T_N,
-        typename T_a,
-        typename T_b,
-              class Policy>
+              typename T_n, typename T_N,
+              typename T_a, typename T_b>
     double
-    hypergeometric_log(const T_n& n, 
-                       const T_N& N, 
-                       const T_a& a, 
-                       const T_b& b, 
-                       const Policy&) {
+    hypergeometric_log(const T_n& n, const T_N& N, 
+                       const T_a& a, const T_b& b) {
       static const char* function = "stan::prob::hypergeometric_log(%1%)";
 
       using stan::math::check_finite;      
@@ -40,10 +34,10 @@ namespace stan {
 
       // check if any vectors are zero length
       if (!(stan::length(n)
-      && stan::length(N)
-      && stan::length(a)
-      && stan::length(b)))
-  return 0.0;
+            && stan::length(N)
+            && stan::length(a)
+            && stan::length(b)))
+        return 0.0;
 
 
       VectorView<const T_n> n_vec(n);
@@ -53,25 +47,25 @@ namespace stan {
       size_t size = max_size(n, N, a, b);
       
       double logp(0.0);
-      if (!check_bounded(function, n, 0, a, "Successes variable", &logp, Policy()))
-  return logp;
-      if (!check_greater(function, N, n, "Draws parameter", &logp, Policy()))
-    return logp;
+      if (!check_bounded(function, n, 0, a, "Successes variable", &logp))
+        return logp;
+      if (!check_greater(function, N, n, "Draws parameter", &logp))
+        return logp;
       for (size_t i = 0; i < size; i++) {
-  if (!check_bounded(function, N_vec[i]-n_vec[i], 0, b_vec[i], "Draws parameter minus successes variable", &logp, Policy()))
-    return logp;
-  if (!check_bounded(function, N_vec[i], 0, a_vec[i]+b_vec[i], "Draws parameter", &logp, Policy()))
-    return logp;
+        if (!check_bounded(function, N_vec[i]-n_vec[i], 0, b_vec[i], "Draws parameter minus successes variable", &logp))
+          return logp;
+        if (!check_bounded(function, N_vec[i], 0, a_vec[i]+b_vec[i], "Draws parameter", &logp))
+          return logp;
       }
       if (!(check_consistent_sizes(function,
-           n,N,a,b,
-           "Successes variable","Draws parameter","Successes in population parameter","Failures in population parameter",
-           &logp, Policy())))
-  return logp;
+                                   n,N,a,b,
+                                   "Successes variable","Draws parameter","Successes in population parameter","Failures in population parameter",
+                                   &logp)))
+        return logp;
       
       // check if no variables are involved and prop-to
       if (!include_summand<propto>::value)
-  return 0.0;
+        return 0.0;
 
 
       for (size_t i = 0; i < size; i++)
@@ -81,72 +75,42 @@ namespace stan {
       return logp;
     }
 
-
-    template <bool propto,
-        typename T_n,
-        typename T_N,
-        typename T_a,
-        typename T_b>
+    template <typename T_n,
+              typename T_N,
+              typename T_a,
+              typename T_b>
     inline
     double
     hypergeometric_log(const T_n& n, 
                        const T_N& N, 
                        const T_a& a, 
                        const T_b& b) {
-      return hypergeometric_log<propto>(n,N,a,b,stan::math::default_policy());
-    }
-
-    template <typename T_n,
-        typename T_N,
-        typename T_a,
-        typename T_b,
-        class Policy>
-    inline
-    double
-    hypergeometric_log(const T_n& n, 
-                       const T_N& N, 
-                       const T_a& a, 
-                       const T_b& b, 
-                       const Policy&) {
-      return hypergeometric_log<false>(n,N,a,b,Policy());
-    }
-
-    template <typename T_n,
-        typename T_N,
-        typename T_a,
-        typename T_b>
-    inline
-    double
-    hypergeometric_log(const T_n& n, 
-                       const T_N& N, 
-                       const T_a& a, 
-                       const T_b& b) {
-      return hypergeometric_log<false>(n,N,a,b,stan::math::default_policy());
+      return hypergeometric_log<false>(n,N,a,b);
     }
 
     template <class RNG>
     inline int
     hypergeometric_rng(const int N,
-           const int a,
-           const int b,
-           RNG& rng) {
+                       const int a,
+                       const int b,
+                       RNG& rng) {
       using boost::variate_generator;
       
       boost::math::hypergeometric_distribution<>dist (b, N, a + b);
       std::vector<double> index(a);
       for(int i = 0; i < a; i++)
-  index[i] = cdf(dist, i + 1);
+        index[i] = cdf(dist, i + 1);
 
       double c = uniform_rng(0.0, 1.0, rng);
       int min = 0;
       int max = a - 1;
       int mid = 0;
       while(min < max) {
-  mid = (min + max) / 2;
-  if(index[mid] > c)
-    max = mid;
-  else
-    min = mid + 1;
+        mid = (min + max) / 2;
+        if(index[mid] > c)
+          max = mid;
+        else
+          min = mid + 1;
       }
       return min + 1;
     }

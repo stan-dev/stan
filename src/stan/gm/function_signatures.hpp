@@ -120,6 +120,12 @@ add("col",VECTOR_T,MATRIX_T,INT_T);
 add("cols",INT_T,VECTOR_T);
 add("cols",INT_T,ROW_VECTOR_T);
 add("cols",INT_T,MATRIX_T);
+add("columns_dot_product",ROW_VECTOR_T,VECTOR_T,VECTOR_T);
+add("columns_dot_product",ROW_VECTOR_T,ROW_VECTOR_T,ROW_VECTOR_T);
+add("columns_dot_product",ROW_VECTOR_T,MATRIX_T,MATRIX_T);
+add("columns_dot_self",ROW_VECTOR_T,VECTOR_T);
+add("columns_dot_self",ROW_VECTOR_T,ROW_VECTOR_T);
+add("columns_dot_self",ROW_VECTOR_T,MATRIX_T);
 add_unary("cos");
 add_unary("cosh");
 add("cumulative_sum", expr_type(DOUBLE_T,1U), expr_type(DOUBLE_T,1U));
@@ -134,8 +140,6 @@ add("divide",DOUBLE_T,DOUBLE_T,DOUBLE_T);
 add("divide",VECTOR_T,VECTOR_T,DOUBLE_T);
 add("divide",ROW_VECTOR_T,ROW_VECTOR_T,DOUBLE_T);
 add("divide",MATRIX_T,MATRIX_T,DOUBLE_T);
-add("columns_dot_product",ROW_VECTOR_T,MATRIX_T,MATRIX_T);
-add("rows_dot_product",VECTOR_T,MATRIX_T,MATRIX_T);
 add("dist",DOUBLE_T,VECTOR_T,VECTOR_T);
 add("dist",DOUBLE_T,ROW_VECTOR_T,ROW_VECTOR_T);
 add("dist",DOUBLE_T,VECTOR_T,ROW_VECTOR_T);
@@ -144,6 +148,7 @@ add("squared_dist",DOUBLE_T,VECTOR_T,VECTOR_T);
 add("squared_dist",DOUBLE_T,ROW_VECTOR_T,ROW_VECTOR_T);
 add("squared_dist",DOUBLE_T,VECTOR_T,ROW_VECTOR_T);
 add("squared_dist",DOUBLE_T,ROW_VECTOR_T,VECTOR_T);
+add("squared_dist",DOUBLE_T,MATRIX_T,MATRIX_T);
 add("dot_product",DOUBLE_T,VECTOR_T,VECTOR_T);
 add("dot_product",DOUBLE_T,ROW_VECTOR_T,ROW_VECTOR_T);
 add("dot_product",DOUBLE_T,VECTOR_T,ROW_VECTOR_T);
@@ -232,6 +237,13 @@ for (size_t i = 0; i < vector_types.size(); ++i) {
   }
 }
 add_binary("gumbel_rng");
+add("head",ROW_VECTOR_T, ROW_VECTOR_T,INT_T);
+add("head",VECTOR_T, VECTOR_T,INT_T);
+for (size_t i = 0; i < base_types.size(); ++i) {
+  add("head",expr_type(base_types[i],1U), expr_type(base_types[i],1U),INT_T);
+  add("head",expr_type(base_types[i],2U), expr_type(base_types[i],2U),INT_T);
+  add("head",expr_type(base_types[i],3U), expr_type(base_types[i],3U),INT_T);
+ }
 add("hypergeometric_log",DOUBLE_T, INT_T,INT_T,INT_T,INT_T);
 add("hypergeometric_rng",INT_T, INT_T,INT_T,INT_T);
 add_binary("hypot");
@@ -435,6 +447,10 @@ add("prod",DOUBLE_T,expr_type(DOUBLE_T,1));
 add("prod",DOUBLE_T,VECTOR_T);
 add("prod",DOUBLE_T,ROW_VECTOR_T);
 add("prod",DOUBLE_T,MATRIX_T);
+add("rank",INT_T,expr_type(INT_T,1),INT_T);
+add("rank",INT_T,expr_type(DOUBLE_T,1),INT_T);
+add("rank",INT_T,VECTOR_T,INT_T);
+add("rank",INT_T,ROW_VECTOR_T,INT_T);
 for (size_t i = 0; i < base_types.size(); ++i) {
   add("rep_array",expr_type(base_types[i],1), base_types[i], INT_T);
   add("rep_array",expr_type(base_types[i],2), base_types[i], INT_T,INT_T);
@@ -455,6 +471,12 @@ add("row",ROW_VECTOR_T,MATRIX_T,INT_T);
 add("rows",INT_T,VECTOR_T);
 add("rows",INT_T,ROW_VECTOR_T);
 add("rows",INT_T,MATRIX_T);
+add("rows_dot_product",VECTOR_T,VECTOR_T,VECTOR_T);
+add("rows_dot_product",VECTOR_T,ROW_VECTOR_T,ROW_VECTOR_T);
+add("rows_dot_product",VECTOR_T,MATRIX_T,MATRIX_T);
+add("rows_dot_self",VECTOR_T,VECTOR_T);
+add("rows_dot_self",VECTOR_T,ROW_VECTOR_T);
+add("rows_dot_self",VECTOR_T,MATRIX_T);
 for (size_t i = 0; i < vector_types.size(); ++i)
   for (size_t j = 0; j < vector_types.size(); ++j)
     for (size_t k = 0; k < vector_types.size(); ++k)
@@ -472,6 +494,13 @@ add("sd",DOUBLE_T,expr_type(DOUBLE_T,1));
 add("sd",DOUBLE_T,VECTOR_T);
 add("sd",DOUBLE_T,ROW_VECTOR_T);
 add("sd",DOUBLE_T,MATRIX_T);
+add("segment",ROW_VECTOR_T, ROW_VECTOR_T,INT_T,INT_T);
+add("segment",VECTOR_T, VECTOR_T,INT_T,INT_T);
+for (size_t i = 0; i < base_types.size(); ++i) {
+  add("segment",expr_type(base_types[i],1U), expr_type(base_types[i],1U),INT_T,INT_T);
+  add("segment",expr_type(base_types[i],2U), expr_type(base_types[i],2U),INT_T,INT_T);
+  add("segment",expr_type(base_types[i],3U), expr_type(base_types[i],3U),INT_T,INT_T);
+ }
 add_unary("sin");
 add("singular_values",VECTOR_T,MATRIX_T);
 add_unary("sinh");
@@ -491,6 +520,14 @@ for (size_t i = 0; i < vector_types.size(); ++i) {
 }
 add_ternary("skew_normal_rng");
 add("softmax",VECTOR_T,VECTOR_T);
+add("sort_asc",expr_type(INT_T,1),expr_type(INT_T,1));
+add("sort_asc",expr_type(DOUBLE_T,1),expr_type(DOUBLE_T,1));
+add("sort_asc",VECTOR_T,VECTOR_T);
+add("sort_asc",ROW_VECTOR_T,ROW_VECTOR_T);
+add("sort_desc",expr_type(INT_T,1),expr_type(INT_T,1));
+add("sort_desc",expr_type(DOUBLE_T,1),expr_type(DOUBLE_T,1));
+add("sort_desc",VECTOR_T,VECTOR_T);
+add("sort_desc",ROW_VECTOR_T,ROW_VECTOR_T);
 add_unary("sqrt");
 add_nullary("sqrt2");
 add_unary("square");
@@ -510,6 +547,8 @@ for (size_t i = 0; i < vector_types.size(); ++i) {
   }
 }
 add_ternary("student_t_rng");
+add("sub_col",VECTOR_T,MATRIX_T,INT_T,INT_T,INT_T);
+add("sub_row",ROW_VECTOR_T,MATRIX_T,INT_T,INT_T,INT_T);
 add("subtract",VECTOR_T,VECTOR_T,VECTOR_T);
 add("subtract",ROW_VECTOR_T,ROW_VECTOR_T,ROW_VECTOR_T);
 add("subtract",MATRIX_T,MATRIX_T,MATRIX_T);
@@ -524,6 +563,14 @@ add("sum",DOUBLE_T,expr_type(DOUBLE_T,1));
 add("sum",DOUBLE_T,VECTOR_T);
 add("sum",DOUBLE_T,ROW_VECTOR_T);
 add("sum",DOUBLE_T,MATRIX_T);
+// see head() and segment()
+add("tail",ROW_VECTOR_T, ROW_VECTOR_T,INT_T);
+add("tail",VECTOR_T, VECTOR_T,INT_T);
+for (size_t i = 0; i < base_types.size(); ++i) {
+  add("tail",expr_type(base_types[i],1U), expr_type(base_types[i],1U),INT_T);
+  add("tail",expr_type(base_types[i],2U), expr_type(base_types[i],2U),INT_T);
+  add("tail",expr_type(base_types[i],3U), expr_type(base_types[i],3U),INT_T);
+ }
 add_unary("tan");
 add_unary("tanh");
 add_unary("tgamma");

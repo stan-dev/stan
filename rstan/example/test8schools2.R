@@ -84,7 +84,7 @@ ss@stanmodel@dso
 
 samples <- extract(ss) 
 
-lapply(get_adaptation_info(ss), function(x) cat(x, '\n')) 
+do.call(cat, get_adaptation_info(ss))
 ss8 <- stan(fit = ss, data = dat, test_grad = TRUE)
 print(ss8)
 summary(ss8)
