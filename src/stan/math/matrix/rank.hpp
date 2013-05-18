@@ -20,9 +20,9 @@ namespace stan {
       size_t size = v.size();
       check_range(size,s,"in the function rank(v,s)",s);
       s--;
-      size_t count(0);
+      size_t count(0U);
       T compare(v[s]);
-      for (size_t i = 0; i < size; ++i)
+      for (size_t i = 0U; i < size; ++i)
         if (v[i]<compare) count++;
       return count;
     }
@@ -40,9 +40,9 @@ namespace stan {
       check_range(size,s,"in the function rank(v,s)",s);
       s--;
       const T * vv = v.data();
-      size_t count(0);
+      size_t count(0U);
       T compare(vv[s]);
-      for (size_t i = 0; i < size; ++i)
+      for (size_t i = 0U; i < size; ++i)
         if (vv[i]<compare) count++;
       return count;
     }
