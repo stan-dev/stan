@@ -985,6 +985,7 @@ Testing
      - varying model shapes (step up exponentially)
         + number of data items
         + number of parameters
+
         + correlation of parameters (multi-variate Cauchy or Normal)
         + interaction of params (? need this with correlation ?)
         + conjugate vs. non-conjugate priors
