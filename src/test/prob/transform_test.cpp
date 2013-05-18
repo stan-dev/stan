@@ -483,9 +483,7 @@ TEST(prob_transform,corr_matrix_j) {
   x << -1.0, 2.0, 0.0, 1.0, 3.0, -1.5;
   double lp = -12.9;
   Matrix<double,Dynamic,Dynamic> y = stan::prob::corr_matrix_constrain(x,K,lp);
-  std::cout << "HELLO THERE" << std::endl;
   Matrix<double,Dynamic,1> xrt = stan::prob::corr_matrix_free(y);
-  std::cout << "GOT IT!!!" << std::endl;
   EXPECT_EQ(x.size(), xrt.size());
   for (Matrix<double,Dynamic,1>::size_type i = 0; i < x.size(); ++i) {
     EXPECT_FLOAT_EQ(x[i], xrt[i]);

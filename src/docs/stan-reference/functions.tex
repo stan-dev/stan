@@ -487,23 +487,38 @@ The inverse hyperbolic tangent (in radians) of \farg{x}}
 \section{Link Functions}
 
 The following functions are commonly used as link functions in
-generalized linear models (see \refsection{logistic-probit-regression}).
+generalized linear models (see
+\refsection{logistic-probit-regression}).  The function $\Phi$ is also
+commonly used as a link function (see \refsection{Phi-function}).
 %
 \begin{description}
 %
 \fitem{real}{logit}{real \farg{x}}{
-The log odds, or logit, function applied to \farg{x}}
+The log odds, or logit, function applied to \farg{x}, defined by
+$
+\mbox{logit}(x) = \log \left( \frac{x}{1 - x} \right).
+$
+}
 %
-\fitem{real}{inv\_logit}{real \farg{x}}{
-The logistic sigmoid function applied to \farg{x}}
+\fitem{real}{inv\_logit}{real \farg{y}}{
+The logistic sigmoid function applied to \farg{y}, defined by
+$
+\mbox{logit}^{-1}(y) = \frac{1}{1 + \exp(-y)}.
+$
+}
 %
-\fitem{real}{inv\_cloglog}{real \farg{x}}{
-The inverse of the complement log-log function applied to \farg{x}}
+\fitem{real}{inv\_cloglog}{real \farg{y}}{
+The inverse of the complementary log-log function applied to \farg{y},
+defined by
+$
+\mbox{cloglog}^{-1}(y) = 1 - \exp \left( - \exp(y) \right).
+$
+}
 %
 \end{description}
 
 
-\section{Probability-Related Functions}
+\section{Probability-Related Functions}\label{Phi-function.section}
 %
 \begin{description}
 %
@@ -956,6 +971,19 @@ subtracting \farg{y} from every entry in the matrix \farg{x}}
 adding \farg{x} to every entry in negation of the matrix \farg{y}}
 %
 \end{description}
+\vspace*{-4pt}
+\begin{description}
+%
+\fitem{vector}{operator/}{vector \farg{x}, real \farg{y}}{The result of
+dividing each entry in the vector \farg{x} by \farg{y}}
+%
+\fitem{row\_vector}{operator/}{row\_vector \farg{x}, real \farg{y}}{The result of
+dividing each entry in the row vector \farg{x} by \farg{y}}
+%
+\fitem{matrix}{operator/}{matrix \farg{x}, real \farg{y}}{The result of
+dividing each entry in the matrix \farg{x} by \farg{y}}
+%
+\end{description}
 
 \subsection{Elementwise Products}
 
@@ -1048,11 +1076,48 @@ The dot product of \farg{x} and \farg{y}}
 \fitem{real}{dot\_product}{row\_vector \farg{x}, row\_vector \farg{y}}{
 The dot product of \farg{x} and \farg{y}}
 %
+\fitem{row\_vector}{columns\_dot\_product}{vector \farg{x}, vector \farg{y}}{
+The dot product of the columns of \farg{x} and \farg{y}}
+%
+\fitem{row\_vector}{columns\_dot\_product}{row\_vector \farg{x}, row\_vector \farg{y}}{
+The dot product of the columns of \farg{x} and \farg{y}}
+%
+\fitem{row\_vector}{columns\_dot\_product}{matrix \farg{x}, matrix \farg{y}}{
+The dot product of the columns of \farg{x} and \farg{y}}
+%
+\fitem{vector}{rows\_dot\_product}{vector \farg{x}, vector \farg{y}}{
+The dot product of the rows of \farg{x} and \farg{y}}
+%
+\fitem{vector}{rows\_dot\_product}{row\_vector \farg{x}, row\_vector \farg{y}}{
+The dot product of the rows of \farg{x} and \farg{y}}
+%
+\fitem{vector}{rows\_dot\_product}{matrix \farg{x}, matrix \farg{y}}{
+The dot product of the rows of \farg{x} and \farg{y}}
+%
 \fitem{real}{dot\_self}{vector \farg{x}}{
 The dot product of the vector \farg{x} with itself}
 %
 \fitem{real}{dot\_self}{row\_vector \farg{x}}{
 The dot product of the row vector \farg{x} with itself}
+%
+\fitem{row\_vector}{columns\_dot\_self}{vector \farg{x}}{
+The dot product of the columns of \farg{x} with themselves}
+%
+\fitem{row\_vector}{columns\_dot\_self}{row\_vector \farg{x}}{
+The dot product of the columns of \farg{x} with themselves}
+%
+\fitem{row\_vector}{columns\_dot\_self}{matrix \farg{x}}{
+The dot product of the columns of \farg{x} with themselves}
+%
+\fitem{vector}{rows\_dot\_self}{vector \farg{x}}{
+The dot product of the rows of \farg{x} with themselves}
+%
+\fitem{vector}{rows\_dot\_self}{row\_vector \farg{x}}{
+The dot product of the rows of \farg{x} with themselves}
+%
+\fitem{vector}{rows\_dot\_self}{matrix \farg{x}}{
+The dot product of the rows of \farg{x} with themselves}
+%
 \end{description}
 
 \subsection{Specialized Products}
@@ -1255,6 +1320,12 @@ of the matrix \farg{x}}
 \fitem{matrix}{diag\_matrix}{vector \farg{x}}{The diagonal
 matrix with diagonal \farg{x}}
 %
+\end{description}
+
+\subsection{Columns and Rows}
+%
+\begin{description}
+%
 \fitem{vector}{col}{matrix \farg{x}, int \farg{n}}{The \farg{n}-th column
 of matrix \farg{x}}
 %
@@ -1265,6 +1336,8 @@ of matrix \farg{x}}
 
 \subsection{Block Operations}
 
+\subsubsection{Matrix Slicing Operations}
+
 Block operations may be used to extract a sub-block of a matrix.
 
 \begin{description}
@@ -1273,7 +1346,74 @@ Block operations may be used to extract a sub-block of a matrix.
   starts at row \farg{i} and column \farg{j} and extends \farg{n\_rows}
   rows and \farg{n\_cols} columns.}
 \end{description}
+%
+The sub-row and sub-column operations may be used to extract a
+slice of row or column from a matrix
+%
+\begin{description}
+%
+\fitem{vector}{sub\_col}{matrix \farg{x}, int \farg{i}, int \farg{j}, 
+  int \farg{n\_rows}}{Return the sub-column of \farg{x} that
+  starts at row \farg{i} and column \farg{j} and extends
+  \farg{n\_rows} rows and 1 column.}
+%
+\fitem{row\_vector}{sub\_row}{matrix \farg{x}, int \farg{i}, int \farg{j}, 
+  int \farg{n\_cols}}{Return the sub-row of \farg{x} that
+  starts at row \farg{i} and column \farg{j} and extends 1
+  row and \farg{n\_cols} columns.}
+%
+\end{description}
 
+\subsubsection{Vector and Array Slicing Operations}
+
+The head operation extracts the first $n$ elements of a vector and
+the tail operation the last.  The segment operation extracts an
+arbitrary subvector.
+
+\begin{description}
+%
+  \fitem{vector}{head}{vector \farg{v}, int \farg{n}}{Return the
+    vector consisting of the first \farg{n} elements of \farg{v}.}
+%
+  \fitem{row\_vector}{head}{row\_vector \farg{rv}, int \farg{n}}{Return
+    the row vector consisting of the first \farg{n} elements of
+    \farg{rv}.}
+%
+  \fitem{T[]}{head}{T[] \farg{sv}, int \farg{n}}{Return
+    the standard vector consisting of the first \farg{n} elements of
+    \farg{sv}; applies to up to three-dimensional arrays containing
+    any type of elements \code{T}.}
+%
+  \fitem{vector}{tail}{vector \farg{v}, int \farg{n}}{Return the
+    vector consisting of the last \farg{n} elements of \farg{v}.}
+%
+  \fitem{row\_vector}{tail}{row\_vector \farg{rv}, int \farg{n}}{Return
+    the row vector consisting of the last \farg{n} elements of
+    \farg{rv}.}
+%
+  \fitem{T[]}{tail}{T[] \farg{sv}, int \farg{n}}{Return
+    the standard vector consisting of the last \farg{n} elements of
+    \farg{sv}; applies to up to three-dimensional arrays containing
+    any type of elements \code{T}.}
+%
+  \fitem{vector}{segment}{vector \farg{v}, int \farg{i}, int
+    \farg{n}}{Return the vector consisting of the \farg{n} elements of \farg{v}
+    starting at \farg{i}; i.e., elements \farg{i} through 
+    through \farg{i} + \farg{n} - 1.}
+%
+  \fitem{row\_vector}{segment}{row\_vector \farg{v}, int \farg{i}, int
+    \farg{n}}{Return the row vector consisting of the \farg{n}
+    elements of \farg{rv} starting at \farg{i}; i.e., elements
+    \farg{i} through through \farg{i} + \farg{n} - 1.}
+%
+  \fitem{T[]}{segment}{T[] \farg{sv}, int \farg{i}, int
+    \farg{n}}{Return the standard vector consisting of the \farg{n}
+    elements of \farg{sv} starting at \farg{i}; i.e., elements
+    \farg{i} through through \farg{i} + \farg{n} - 1. Applies to up to
+    three-dimensional arrays containing any type of elements
+    \code{T}.}
+%
+\end{description}
 
 
 \subsection{Transposition Postfix Operator}
@@ -1321,7 +1461,15 @@ The softmax of \farg{x}}
 The right division of \farg{b} by \farg{A}; equivalently
 \code{\farg{b} * inverse(\farg{A})}}
 %
+\fitem{matrix}{operator/}{matrix \farg{b}, matrix \farg{A}}{
+The right division of \farg{b} by \farg{A}; equivalently
+\code{\farg{b} * inverse(\farg{A})}}
+%
 \fitem{vector}{operator\textbackslash}{matrix \farg{A}, vector \farg{b}}
+The left division of \farg{b} by \farg{A}; equivalently
+\code{inverse(\farg{A}) * \farg{b}}
+%
+\fitem{matrix}{operator\textbackslash}{matrix \farg{A}, matrix \farg{b}}
 The left division of \farg{b} by \farg{A}; equivalently
 \code{inverse(\farg{A}) * \farg{b}}
 %

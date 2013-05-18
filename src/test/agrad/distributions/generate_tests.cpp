@@ -238,7 +238,8 @@ int main(int argc, const char* argv[]) {
     out_name << out_name_base;
     out_name << "_" << std::setw(5) << std::setfill('0') << n;
     out_name << "_generated_test.cpp";
-    outs.push_back(new std::ofstream(out_name.str().c_str()));
+    std::string tmp(out_name.str());
+    outs.push_back(new std::ofstream(tmp.c_str()));
   }
 
   write_includes(outs, in_name);

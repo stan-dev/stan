@@ -6,6 +6,7 @@
 
 #include <stan/math/matrix_error_handling.hpp>
 #include <stan/math/error_handling.hpp>
+#include <stan/math/error_handling/dom_err.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
 #include <stan/agrad/agrad.hpp>
@@ -13,12 +14,12 @@
 #include <stan/agrad/matrix.hpp>
 #include <stan/math/matrix/dot_product.hpp>
 #include <stan/math/matrix/log.hpp>
-#include <stan/math/matrix/log_determinant_spd.hpp>
-#include <stan/math/matrix/mdivide_right_spd.hpp>
 #include <stan/math/matrix/multiply.hpp>
 #include <stan/math/matrix/rows_dot_product.hpp>
 #include <stan/math/matrix/subtract.hpp>
 #include <stan/math/matrix/sum.hpp>
+
+#include <stan/math/matrix/ldlt.hpp>
 
 namespace stan {
   namespace prob {
@@ -43,57 +44,65 @@ namespace stan {
      * @tparam T_w Type of weight.
      */
     template <bool propto,
-    typename T_y, typename T_covar, typename T_w,
-    class Policy>
+              typename T_y, typename T_covar, typename T_w>
     typename boost::math::tools::promote_args<T_y,T_w,T_covar>::type
     multi_gp_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
                  const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
-                 const Eigen::Matrix<T_w,Eigen::Dynamic,1>& w,
-                 const Policy&) {
+                 const Eigen::Matrix<T_w,Eigen::Dynamic,1>& w) {
       static const char* function = "stan::prob::multi_gp_log(%1%)";
-      typename boost::math::tools::promote_args<T_y,T_w,T_covar>::type lp(0.0);
+      typedef typename boost::math::tools::promote_args<T_y,T_w,T_covar>::type T_lp;
+      T_lp lp(0.0);
       
       using stan::math::log;
       using stan::math::sum;
       using stan::math::check_not_nan;
       using stan::math::check_size_match;
       using stan::math::check_positive;
-      using stan::math::check_pos_definite;
       using stan::math::check_finite;
       using stan::math::check_symmetric;
       using stan::math::dot_product;
       using stan::math::rows_dot_product;
-      using stan::math::mdivide_right_spd;
-      using stan::math::log_determinant_spd;
-      
+      using stan::math::log_determinant_ldlt;
+      using stan::math::mdivide_right_ldlt;
+      using stan::math::LDLT_factor;
+
       if (!check_size_match(function, 
                             Sigma.rows(), "Rows of kernel matrix",
                             Sigma.cols(), "columns of kernel matrix",
-                            &lp, Policy()))
+                            &lp))
         return lp;
-      if (!check_positive(function, Sigma.rows(), "Kernel matrix rows", &lp, Policy()))
+      if (!check_positive(function, Sigma.rows(), "Kernel matrix rows", &lp))
         return lp;
-      if (!check_finite(function, Sigma, "Kernel", &lp, Policy())) 
+      if (!check_finite(function, Sigma, "Kernel", &lp)) 
         return lp;
-      if (!check_symmetric(function, Sigma, "Kernel matrix", &lp, Policy()))
+      if (!check_symmetric(function, Sigma, "Kernel matrix", &lp))
         return lp;
-      if (!check_pos_definite(function, Sigma, "Kernel matrix", &lp, Policy()))
+      
+      LDLT_factor<T_covar,Eigen::Dynamic,Eigen::Dynamic> ldlt_Sigma(Sigma);
+      if (!ldlt_Sigma.success()) {
+        std::ostringstream message;
+        message << "Kernel matrix is not positive definite. " 
+                << "K(0,0) is %1%.";
+        std::string str(message.str());
+        stan::math::dom_err(function,Sigma(0,0),"",str.c_str(),"",&lp);
         return lp;
+      }
+
       if (!check_size_match(function, 
-                            y.rows(), "Size of random variable",
-                            w.size(), "Size of location parameter",
-                            &lp, Policy()))
+                            y.rows(), "Size of random variable (rows y)",
+                            w.size(), "Size of kernel scales (w)",
+                            &lp))
         return lp;
       if (!check_size_match(function, 
                             y.cols(), "Size of random variable",
                             Sigma.rows(), "rows of covariance parameter",
-                            &lp, Policy()))
+                            &lp))
         return lp;
-      if (!check_finite(function, w, "Kernel scales", &lp, Policy())) 
+      if (!check_finite(function, w, "Kernel scales", &lp)) 
         return lp;
-      if (!check_positive(function, w, "Kernel scales", &lp, Policy())) 
+      if (!check_positive(function, w, "Kernel scales", &lp)) 
         return lp;
-      if (!check_not_nan(function, y, "Random variable", &lp, Policy())) 
+      if (!check_finite(function, y, "Random variable", &lp)) 
         return lp;
       
       if (y.rows() == 0)
@@ -102,9 +111,9 @@ namespace stan {
       if (include_summand<propto>::value) {
         lp += NEG_LOG_SQRT_TWO_PI * y.rows() * y.cols();
       }
-      
+
       if (include_summand<propto,T_covar>::value) {
-        lp -= (0.5 * y.rows()) * log_determinant_spd(Sigma);
+        lp -= (0.5 * y.rows()) * log_determinant_ldlt(ldlt_Sigma);
       }
 
       if (include_summand<propto,T_w>::value) {
@@ -114,35 +123,13 @@ namespace stan {
       if (include_summand<propto,T_y,T_w,T_covar>::value) {
         Eigen::Matrix<typename 
         boost::math::tools::promote_args<T_covar,T_y>::type,
-        Eigen::Dynamic, Eigen::Dynamic> y_Kinv(mdivide_right_spd(y,Sigma));
+        Eigen::Dynamic, Eigen::Dynamic> y_Kinv(mdivide_right_ldlt(y,ldlt_Sigma));
 
         lp -= 0.5 * dot_product(rows_dot_product(y_Kinv,y),w);
       }
+
       return lp;
     }
-    
-    template <bool propto,
-    typename T_y, typename T_loc, typename T_covar>
-    inline
-    typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
-    multi_gp_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
-                 const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
-                 const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& w) {
-      return multi_gp_log<propto>(y,Sigma,w,stan::math::default_policy());
-    }
-    
-    
-    template <typename T_y, typename T_loc, typename T_covar, 
-    class Policy>
-    inline
-    typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
-    multi_gp_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
-                 const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
-                 const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& w,
-                 const Policy&){
-      return multi_gp_log<false>(y,Sigma,w,Policy());
-    }
-    
     
     template <typename T_y, typename T_loc, typename T_covar>
     inline
@@ -150,7 +137,7 @@ namespace stan {
     multi_gp_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
                  const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma,
                  const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& w) {
-      return multi_gp_log<false>(y,Sigma,w,stan::math::default_policy());
+      return multi_gp_log<false>(y,Sigma,w);
     }
   }    
 }

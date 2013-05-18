@@ -15,7 +15,7 @@ namespace stan {
                             const char* msg) {
       if (i > 0 && i <=  static_cast<size_t>(m.rows())) return;
       std::stringstream ss;
-      ss << "require 0 < row index <= number of rows in" << msg;
+      ss << "require 0 < row index <= number of rows in " << msg;
       ss << " found rows()=" << m.rows()
          << "; index i=" << i;
       throw std::domain_error(ss.str());

@@ -25,16 +25,14 @@ namespace stan {
      * @tparam propto Carry out calculations up to a proportion
      */
     template <bool propto,
-              typename T_y, typename T_dof, typename T_loc, typename T_scale, 
-              class Policy>
+              typename T_y, typename T_dof, typename T_loc, typename T_scale>
     typename boost::math::tools::promote_args<T_y,T_dof,T_loc,T_scale>::type
     multi_student_t_log(const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
                         const T_dof& nu,
                         const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
                         const 
                         Eigen::Matrix<T_scale,
-                                      Eigen::Dynamic,Eigen::Dynamic>& Sigma,
-                        const Policy&) {
+                                      Eigen::Dynamic,Eigen::Dynamic>& Sigma) {
       static const char* function = "stan::prob::multi_student_t(%1%)";
 
       using stan::math::check_size_match;
@@ -42,49 +40,57 @@ namespace stan {
       using stan::math::check_not_nan;
       using stan::math::check_symmetric;
       using stan::math::check_positive;      
-      using stan::math::check_pos_definite;
       using boost::math::tools::promote_args;
       using boost::math::lgamma;
-
+      using stan::math::log_determinant_ldlt;
+      using stan::math::mdivide_left_ldlt;
+      using stan::math::LDLT_factor;
+      
       typename promote_args<T_y,T_dof,T_loc,T_scale>::type lp(0.0);
       if (!check_size_match(function, 
           y.size(), "Size of random variable",
           mu.size(), "size of location parameter",
-          &lp, Policy()))
+          &lp))
         return lp;
       if (!check_size_match(function, 
           y.size(), "Size of random variable",
           Sigma.rows(), "rows of scale parameter",
-          &lp, Policy()))
+          &lp))
         return lp;
       if (!check_size_match(function, 
           y.size(), "Size of random variable",
           Sigma.cols(), "columns of scale parameter",
-          &lp, Policy()))
+          &lp))
         return lp;
-      if (!check_finite(function, mu, "Location parameter", &lp, Policy()))
+      if (!check_finite(function, mu, "Location parameter", &lp))
         return lp;
-      if (!check_not_nan(function, y, "Random variable", &lp, Policy())) 
+      if (!check_not_nan(function, y, "Random variable", &lp)) 
         return lp;
-      if (!check_symmetric(function, Sigma, "Scale parameter", &lp, Policy()))
+      if (!check_symmetric(function, Sigma, "Scale parameter", &lp))
         return lp;
-      if (!check_pos_definite(function, Sigma, "Scale parameter", &lp, Policy()))
+
+      LDLT_factor<T_scale,Eigen::Dynamic,Eigen::Dynamic> ldlt_Sigma(Sigma);
+      if (!ldlt_Sigma.success()) {
+        std::ostringstream message;
+        message << "Scale matrix is not positive definite. " 
+        << "Sigma(0,0) is %1%.";
+        std::string str(message.str());
+        stan::math::dom_err(function,Sigma(0,0),"Scale matrix",str.c_str(),"",&lp);
         return lp;
+      }
 
       // allows infinities
       if (!check_not_nan(function, nu, 
-                         "Degrees of freedom parameter", &lp,
-                         Policy()))
+                         "Degrees of freedom parameter", &lp))
         return lp;
       if (!check_positive(function, nu, 
-                          "Degrees of freedom parameter", &lp,
-                          Policy()))
+                          "Degrees of freedom parameter", &lp))
         return lp;
       
       using std::isinf;
 
       if (isinf(nu)) // already checked nu > 0
-        return multi_normal_log(y,mu,Sigma,Policy());
+        return multi_normal_log(y,mu,Sigma);
 
       double d = y.size();
 
@@ -101,12 +107,10 @@ namespace stan {
       using stan::math::dot_product;
       using stan::math::subtract;
       using Eigen::Array;
-      using stan::math::mdivide_left;
-      using stan::math::log_determinant;
 
 
       if (include_summand<propto,T_scale>::value) {
-        lp -= 0.5*log_determinant(Sigma);
+        lp -= 0.5*log_determinant_ldlt(ldlt_Sigma);
       }
 
       if (include_summand<propto,T_y,T_dof,T_loc,T_scale>::value) {
@@ -116,43 +120,13 @@ namespace stan {
                       1> y_minus_mu = subtract(y,mu);
         Eigen::Matrix<typename promote_args<T_scale,T_y,T_loc>::type,
                       Eigen::Dynamic,
-                      1> invSigma_dy = mdivide_left(Sigma, y_minus_mu);
+                      1> invSigma_dy = mdivide_left_ldlt(ldlt_Sigma, y_minus_mu);
         lp -= 0.5 
           * (nu + d)
           * log(1.0 + dot_product(y_minus_mu,invSigma_dy) / nu);
       }
       return lp;
     }
-
-    template <bool propto,
-              typename T_y, typename T_dof, typename T_loc, typename T_scale>
-    inline 
-    typename boost::math::tools::promote_args<T_y,T_dof,T_loc,T_scale>::type
-    multi_student_t_log(const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
-                        const T_dof& nu,
-                        const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
-                        const 
-                        Eigen::Matrix<T_scale,
-                                      Eigen::Dynamic,Eigen::Dynamic>& Sigma) {
-      return multi_student_t_log<propto>(y,nu,mu,Sigma,
-                                         stan::math::default_policy());
-    }
-
-    template <typename T_y, typename T_dof, typename T_loc, typename T_scale, 
-              class Policy>
-    inline 
-    typename boost::math::tools::promote_args<T_y,T_dof,T_loc,T_scale>::type
-    multi_student_t_log(const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
-                        const T_dof& nu,
-                        const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
-                        const 
-                        Eigen::Matrix<T_scale,
-                                      Eigen::Dynamic,Eigen::Dynamic>& Sigma,
-                        const Policy&) {
-      return multi_student_t_log<false>(y,nu,mu,Sigma,Policy());
-    }
-
-
 
     template <typename T_y, typename T_dof, typename T_loc, typename T_scale>
     inline 
@@ -163,8 +137,7 @@ namespace stan {
                         const 
                         Eigen::Matrix<T_scale,
                                       Eigen::Dynamic,Eigen::Dynamic>& Sigma) {
-      return multi_student_t_log<false>(y,nu,mu,Sigma,
-                                         stan::math::default_policy());
+      return multi_student_t_log<false>(y,nu,mu,Sigma);
     }
 
 

@@ -16,12 +16,10 @@ namespace stan {
 
     // Categorical(n|theta)  [0 < n <= N;   0 <= theta[n] <= 1;  SUM theta = 1]
     template <bool propto,
-              typename T_prob, 
-              class Policy>
+              typename T_prob>
     typename boost::math::tools::promote_args<T_prob>::type
     categorical_log(int n, 
-                    const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta, 
-                    const Policy&) {
+                    const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta) {
       static const char* function = "stan::prob::categorical_log(%1%)";
 
       using stan::math::check_bounded;
@@ -34,7 +32,7 @@ namespace stan {
       double lp = 0.0;
       if (!check_bounded(function, n, lb, theta.size(),
                          "Number of categories",
-                         &lp, Policy()))
+                         &lp))
         return lp;
       
       if (!stan::is_constant_struct<T_prob>::value) {
@@ -43,12 +41,12 @@ namespace stan {
           theta_dbl(i) = value_of(theta(i));
         if (!check_simplex(function, theta,
                            "Probabilities parameter",
-                           &lp, Policy()))
+                           &lp))
           return lp;
       } else {
         if (!check_simplex(function, theta,
                            "Probabilities parameter",
-                           &lp, Policy()))
+                           &lp))
           return lp;
       }
 
@@ -57,55 +55,35 @@ namespace stan {
       return 0.0;
     }
 
-    template <bool propto,
-              typename T_prob>
-    inline
-    typename boost::math::tools::promote_args<T_prob>::type
-    categorical_log(const typename Eigen::Matrix<T_prob,Eigen::Dynamic,1>::size_type n, 
-                    const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta) {
-      return categorical_log<propto>(n,theta,stan::math::default_policy());
-    }
-
-
-    template <typename T_prob, 
-              class Policy>
-    inline
-    typename boost::math::tools::promote_args<T_prob>::type
-    categorical_log(const typename Eigen::Matrix<T_prob,Eigen::Dynamic,1>::size_type n, 
-                    const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta, 
-                    const Policy&) {
-      return categorical_log<false>(n,theta,Policy());
-    }
-
     template <typename T_prob>
     inline
     typename boost::math::tools::promote_args<T_prob>::type
     categorical_log(const typename Eigen::Matrix<T_prob,Eigen::Dynamic,1>::size_type n, 
                     const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta) {
-      return categorical_log<false>(n,theta,stan::math::default_policy());
+      return categorical_log<false>(n,theta);
     }
 
-   template <class RNG>
+    template <class RNG>
     inline int
     categorical_rng(const Eigen::Matrix<double,Eigen::Dynamic,1>& theta,
-        RNG& rng) {
+                    RNG& rng) {
       using boost::variate_generator;
       using boost::uniform_01;
       variate_generator<RNG&, uniform_01<> >
-  uniform01_rng(rng, uniform_01<>());
+        uniform01_rng(rng, uniform_01<>());
       
-     Eigen::VectorXd index(theta.rows());
-     index.setZero();
+      Eigen::VectorXd index(theta.rows());
+      index.setZero();
 
       for(int i = 0; i < theta.rows(); i++) {
-    for(int j = i; j < theta.rows(); j++)
-      index(j) += theta(i,0);
-  }
+        for(int j = i; j < theta.rows(); j++)
+          index(j) += theta(i,0);
+      }
 
       double c = uniform01_rng();
       int b = 0;
       while(c > index(b,0))
-  b++;
+        b++;
       return b + 1;
     }
   }

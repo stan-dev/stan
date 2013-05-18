@@ -64,17 +64,6 @@ public:
     return stan::prob::poisson_log<propto>(n, lambda);
   }
   
-  template <bool propto, 
-      class T_n, class T_rate, typename T2,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9, 
-      class Policy>
-  typename stan::return_type<T_n, T_rate>::type 
-  log_prob(const T_n& n, const T_rate& lambda, const T2&,
-     const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
-    return stan::prob::poisson_log<propto>(n, lambda, Policy());
-  }
   
   template <class T_n, class T_rate, typename T2,
       typename T3, typename T4, typename T5, 

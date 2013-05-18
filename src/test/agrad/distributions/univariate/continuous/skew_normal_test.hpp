@@ -90,17 +90,6 @@ public:
     return stan::prob::skew_normal_log<propto>(y, mu, sigma, alpha);
   }
   
-  template <bool propto, 
-      typename T_y, typename T_loc, typename T_scale,
-      typename T_shape, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9, 
-      class Policy>
-  typename stan::return_type<T_y, T_loc, T_scale,T_shape>::type 
-  log_prob(const T_y& y, const T_loc& mu, const T_scale& sigma,
-     const T_shape& alpha, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
-    return stan::prob::skew_normal_log<propto>(y, mu, sigma, alpha, Policy());
-  }
   
   template <typename T_y, typename T_loc, typename T_scale,
       typename T_shape, typename T4, typename T5, 

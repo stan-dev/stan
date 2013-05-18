@@ -41,7 +41,14 @@ namespace stan {
           agrad::var var_i(params_r[i]);
           ad_params_r[i] = var_i;
         }
-        agrad::var adLogProb = log_prob(ad_params_r,params_i,output_stream);
+        agrad::var adLogProb;
+        try {
+          adLogProb = log_prob(ad_params_r,params_i,output_stream);
+        }
+        catch (std::exception &ex) {
+          agrad::recover_memory();
+          throw;
+        }
         double val = adLogProb.val();
         adLogProb.grad(ad_params_r,gradient);
         return val;

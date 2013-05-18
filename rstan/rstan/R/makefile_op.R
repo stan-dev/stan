@@ -295,8 +295,7 @@ get_cppo <- function() {
   p <- match(o, c("3", "2", "1", "0", "s")) 
   with_ndebug <- grepl("DNDEBUG", curr_r_xtra_cppflags)
   with_debug <- grepl("DDEBUG", curr_r_xtra_cppflags)
-  l <- list(mode = c("fast", "presentation2", "presentation1", "debug", "small")[p],
-            NDEBUG = with_ndebug, 
-            DEBUG = with_debug) 
-  invisible(l)
+  list(mode = c("fast", "presentation2", "presentation1", "debug", "small")[p],
+       NDEBUG = with_ndebug, 
+       DEBUG = with_debug) 
 } 

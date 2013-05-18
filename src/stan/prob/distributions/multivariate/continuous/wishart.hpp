@@ -11,7 +11,8 @@
 #include "stan/prob/distributions/univariate/continuous/chi_square.hpp"
 #include <stan/math/functions/lmgamma.hpp>
 #include <stan/math/matrix/columns_dot_product.hpp>
-#include <stan/math/matrix/crossprod.hpp>
+#include <stan/math/matrix/trace.hpp>
+#include <stan/math/matrix/ldlt.hpp>
 #include <stan/math/matrix/dot_product.hpp>
 #include <stan/math/matrix/mdivide_left_tri_low.hpp>
 #include <stan/math/matrix/multiply_lower_tri_self_transpose.hpp>
@@ -51,13 +52,11 @@ namespace stan {
      * @tparam T_scale Type of scale.
      */
     template <bool propto,
-              typename T_y, typename T_dof, typename T_scale, 
-              class Policy>
+              typename T_y, typename T_dof, typename T_scale>
     typename boost::math::tools::promote_args<T_y,T_dof,T_scale>::type
     wishart_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& W,
                 const T_dof& nu,
-                const Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic>& S,
-                const Policy&) {
+                const Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic>& S) {
       static const char* function = "stan::prob::wishart_log(%1%)";
 
       using stan::math::check_greater;
@@ -67,46 +66,47 @@ namespace stan {
       typename Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic>::size_type k = W.rows();
       typename promote_args<T_y,T_dof,T_scale>::type lp(0.0);
       if (!check_greater(function, nu, k-1, 
-                         "Degrees of freedom parameter", &lp, Policy()))
+                         "Degrees of freedom parameter", &lp))
         return lp;
       if (!check_size_match(function, 
-          W.rows(), "Rows of random variable",
-          W.cols(), "columns of random variable",
-          &lp, Policy()))
+                            W.rows(), "Rows of random variable",
+                            W.cols(), "columns of random variable",
+                            &lp))
         return lp;
       if (!check_size_match(function, 
-          S.rows(), "Rows of scale parameter",
-          S.cols(), "columns of scale parameter",
-          &lp, Policy()))
+                            S.rows(), "Rows of scale parameter",
+                            S.cols(), "columns of scale parameter",
+                            &lp))
         return lp;
       if (!check_size_match(function, 
-          W.rows(), "Rows of random variable",
-          S.rows(), "columns of scale parameter",
-          &lp, Policy()))
+                            W.rows(), "Rows of random variable",
+                            S.rows(), "columns of scale parameter",
+                            &lp))
         return lp;
       // FIXME: domain checks
 
-      Eigen::LLT< Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic> > LLT_W = W.llt();
-      if (LLT_W.info() != Eigen::Success) {
-        lp = stan::math::policies::raise_domain_error<T_y>(function,
-                                              "W is not positive definite (%1%)",
-                                              0,Policy());
+      using stan::math::log_determinant_ldlt;
+      using stan::math::mdivide_left_ldlt;
+      using stan::math::LDLT_factor;
+      
+      LDLT_factor<T_y,Eigen::Dynamic,Eigen::Dynamic> ldlt_W(W);
+      if (!ldlt_W.success()) {
+        std::ostringstream message;
+        message << "W is not positive definite (%1%).";
+        std::string str(message.str());
+        stan::math::dom_err(function,W(0,0),"W",str.c_str(),"",&lp);
         return lp;
       }
-      Eigen::LLT< Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic> > LLT_S = S.llt();
-      if (LLT_S.info() != Eigen::Success) {
-        lp = stan::math::policies::raise_domain_error<T_scale>(function,
-                                              "S is not positive definite (%1%)",
-                                              0,Policy());
+      LDLT_factor<T_scale,Eigen::Dynamic,Eigen::Dynamic> ldlt_S(S);
+      if (!ldlt_S.success()) {
+        std::ostringstream message;
+        message << "S is not positive definite (%1%).";
+        std::string str(message.str());
+        stan::math::dom_err(function,S(0,0),"S",str.c_str(),"",&lp);
         return lp;
       }
-
-      Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic> L_W = LLT_W.matrixL();
-      Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic> L_S = LLT_S.matrixL();
-
-      using stan::math::dot_product;
-      using stan::math::mdivide_left_tri_low;
-      using stan::math::crossprod;
+      
+      using stan::math::trace;
       using stan::math::lmgamma;
       if (include_summand<propto,T_dof>::value)
         lp += nu * k * NEG_LOG_TWO_OVER_TWO;
@@ -115,46 +115,25 @@ namespace stan {
         lp -= lmgamma(k, 0.5 * nu);
 
       if (include_summand<propto,T_dof,T_scale>::value)
-        lp -= nu * L_S.diagonal().array().log().sum();
+        lp -= 0.5 * nu * log_determinant_ldlt(ldlt_S);
 
       if (include_summand<propto,T_scale,T_y>::value) {
-        L_S = crossprod(mdivide_left_tri_low(L_S));
-        Eigen::Matrix<T_scale,Eigen::Dynamic,1> S_inv_vec = Eigen::Map<
-          const Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic> >(
-                                &L_S(0), L_S.size(), 1);
-        Eigen::Matrix<T_y,Eigen::Dynamic,1> W_vec = Eigen::Map<
-          const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic> >(
-                                &W(0), W.size(), 1);
-        lp -= 0.5 * dot_product(S_inv_vec, W_vec); // trace(S^-1 * W)
+//        L_S = crossprod(mdivide_left_tri_low(L_S));
+//        Eigen::Matrix<T_scale,Eigen::Dynamic,1> S_inv_vec = Eigen::Map<
+//          const Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic> >(
+//                                                                       &L_S(0), L_S.size(), 1);
+//        Eigen::Matrix<T_y,Eigen::Dynamic,1> W_vec = Eigen::Map<
+//          const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic> >(
+//                                                                   &W(0), W.size(), 1);
+//        lp -= 0.5 * dot_product(S_inv_vec, W_vec); // trace(S^-1 * W)
+        Eigen::Matrix<typename promote_args<T_y,T_scale>::type,Eigen::Dynamic,Eigen::Dynamic> Sinv_W(mdivide_left_ldlt(ldlt_S,W));
+        lp -= 0.5*trace(Sinv_W);
       }
 
       if (include_summand<propto,T_y,T_dof>::value && nu != (k + 1))
-        lp += (nu - k - 1.0) * L_W.diagonal().array().log().sum();
+        lp += 0.5*(nu - k - 1.0) * log_determinant_ldlt(ldlt_W);
       return lp;
     }
-
-    template <bool propto,
-              typename T_y, typename T_dof, typename T_scale>
-    inline
-    typename boost::math::tools::promote_args<T_y,T_dof,T_scale>::type
-    wishart_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& W,
-                const T_dof& nu,
-                const Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic>& S) {
-      return wishart_log<propto>(W,nu,S,stan::math::default_policy());
-    }
-
-
-    template <typename T_y, typename T_dof, typename T_scale, 
-              class Policy>
-    inline
-    typename boost::math::tools::promote_args<T_y,T_dof,T_scale>::type
-    wishart_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& W,
-                const T_dof& nu,
-                const Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic>& S,
-                const Policy&) {
-      return wishart_log<false>(W,nu,S,Policy());
-    }
-
 
     template <typename T_y, typename T_dof, typename T_scale>
     inline
@@ -162,23 +141,23 @@ namespace stan {
     wishart_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& W,
                 const T_dof& nu,
                 const Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic>& S) {
-      return wishart_log<false>(W,nu,S,stan::math::default_policy());
+      return wishart_log<false>(W,nu,S);
     }
 
     template <class RNG>
     inline Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>
     wishart_rng(const double nu,
-    const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& S,
-    RNG& rng) {
+                const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& S,
+                RNG& rng) {
 
       Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> B(S.rows(), S.cols());
       B.setZero();
 
       for(int i = 0; i < S.cols(); i++) {
-    B(i,i) = std::sqrt(chi_square_rng(nu - i, rng));
-    for(int j = 0; j < i; j++)
-      B(j,i) = normal_rng(0,1,rng);
-  }
+        B(i,i) = std::sqrt(chi_square_rng(nu - i, rng));
+        for(int j = 0; j < i; j++)
+          B(j,i) = normal_rng(0,1,rng);
+      }
 
       return stan::math::multiply_lower_tri_self_transpose(S.llt().matrixL() * B);
     }

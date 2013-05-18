@@ -1,6 +1,70 @@
 STAN TO-DO LIST
 ======================================================================
 
+FOR NEXT RELEASE (1.3.0++)
+-------------------------------------------
+
+- (Bob/Marcus/Daniel) look at add(), etc. operations for instantiation
+     -- already did multiply/divide in stan/math
+     -- now need to worry about agrad / int, etc. to make sure
+        there's no auto promotion to agrad
+     -- look at add/subtract where there's broadcast function
+     -- need tests for int in all the relevant positions
+
+- (Daniel/Michael) instrument tests for new algorithms to isolate
+  floating point divergence
+
+- (everyone) remove std::cout from API
+
+- (Daniel) fix bin/print spacing
+
+- (Daniel) validate shuffling tests is OK w. Jenkins
+  [see Ben's e-mail of 5/4/13 at 6:09 PM]
+
+- sort out low ESS in new diagonal adaptation
+
+- sort out rank, etc. from Marco
+
+- go through include-what-you-use output from Ben to
+  mailing list (early May)
+
+- sort out why log_prob_poly<>() isn't working for Metropolis with double
+
+- redundant model_header.hpp includes --- why not just include matrix.hpp?
+
+- int vs. size_t and error handling in indexing;  with size_t,
+  get cast of negative int to large positive size_t, which will
+  confuse users in error msgs
+
+- Figure out how to return error messages safely
+  - e.g., math/matrix/validate_std_vector_index.hpp
+
+      std::stringstream ss;
+      ss << "require 0 < index <= vector size" << msg;
+      ss << "; found vector size=" << m.cols()
+         << "; index j=" << j;
+      throw std::domain_error(ss.str());
+
+      cf., http://stackoverflow.com/questions/10644910/does-stdruntime-error-copy-the-string-passed-in-the-constructor
+
+- (Daniel) fix order of include issues for model header, etc.
+  in new refactor (see Jiqiang's e-mail 4/19/13, 9:20 PM to stan-dev,
+  and rest of that thread)
+
+- Get in more contributed code, such as R regression syntax
+  compiler and DIC and ...
+
+- fix error message in Stan when an error is encountered
+  during initialization --- currently says "about to be
+  Metropolis rejected";  at very least, change the message
+  to qualify when rejection happens
+
+- fix remaining template functions in stan/math to ensure
+  they match int better than var matches int
+
+- remove warning message on transform OR declare a set of
+  function names to ignore
+
 The to-do list is organized into the following sections:
 
 * next release to-do and change list
@@ -31,7 +95,6 @@ Efficiency/Scalability of Code and Sampling
 + (Marcus, Bob, Daniel) vectorization of multivariate prob functions
 + (Michael) replace std::vector with Eigen constructs in models
 * special function vectorization
-* (Ben, Marcus) matrix solver caching
 * multi-threading
 * (Peter, Bob) ensemble samplers: DREAM, differential evolution, 
   stretch/walk
@@ -68,6 +131,18 @@ Cleanup
 -----------
 * improve special function and prob function behavior at limits
 * (Daniel) simplify error handling by standardizing default policy
+  - remove throw from all files except for 
+    src/stan/math/error_handling/raise_domain_error.hpp
+  - Need unit-tests for error handling:
+    + check_nonnegative
+    + check_positive
+    + matrix/check_corr_matrix
+    + matrix/check_ordered
+    + matrix/check_pos_definite
+  - Move src/stan/math/matrix/check_range.hpp to 
+    src/stan/math/error_handling/matrix/
+  - Change error handling in:
+    + prob/distributions/multivariate/continuous/wishart.hpp
 
 Doc
 ---
@@ -83,6 +158,95 @@ Doc
 C++ API
 ======================================================================
 [items go here first, then to RStan/cmd]
+
+* fix log1m bug --- see Sebastian Weber's e-mail 5/10/13 4:55 AM
+  : isolated issue to ctor(var) throwing exception; so
+  fix remaining places where vari ctors may throw, like lgamma
+    /functions/inverse_softmax.hpp:#include <boost/throw_exception.hpp>
+    /functions/inverse_softmax.hpp:     * @throw std::invalid_argument if size of the input and output vectors differ.
+    /functions/lgamma.hpp:    // throws domain_error if x is at pole
+    /functions/log1p.hpp:#include <boost/throw_exception.hpp>
+    /functions/log1p.hpp:        throw std::runtime_error("foo");
+    /functions/softmax.hpp:#include <boost/throw_exception.hpp>
+    /functions/softmax.hpp:     * @throw std::invalid_argument if size of the input and output vectors differ.
+ 
+* log_minus_exp(x,y)
+      = log(exp(x) * (exp(x)/exp(x) - exp(y)/exp(x)))
+      = log(exp(x)) + log(1 - exp(y)/exp(x))
+      = x + log(1 - exp(y - x))
+      = x + log1m(exp(y-x)) 
+  or, following http://snipplr.com/view/12707/,
+    double diff = x - y;
+    diff /= 2.0;
+    return (x + y) / 2.0 + log(exp(diff) - exp(-diff)); 
+ definitely check x >> y and return x (do this in log_sum_exp, too?)
+ see: http://cran.r-project.org/web/packages/Rmpfr/vignettes/log1mexp-note.pdf
+      for log(1-exp(x))
+
+* Chebyshev polynomials of the first kind
+  -- with some kind of regression application example
+  -- Boost has very parameterized Chebyshev polynomials, so figure
+     out which ones in which parameterizations we need
+  -- lm(a ~ poly(x,n)...) 
+  -- see 9 May 2013 post to stan-dev from dlakelan
+
+* matrix normal distribution (Marcus suggested)
+  http://en.wikipedia.org/wiki/Matrix_normal_distribution
+  -- useful for GeoBUGS type models
+
+* clean up assign_to_var location & namespaces for auto-diff
+  -- work through use case from C++ API
+  -- intro namespaces stan::diff::fwd & stan::diff:rev
+  -- base instances in stan::math
+  -- fwd-mode instances in stan::diff::fwd
+  -- rev in diff::rev
+
+* plain old expression print (as input, not as generated in C++)
+  -- clearer error messages for users
+
+* to_vector(matrix):vector  function in row-major order
+
+* kronecker product function
+
+* Add model methods:
+  x  string model_name()
+  x  void constrained_param_names(vector<string>& v)
+  ?  void constrained_values(vector<double>& v, const vector<double>& r, const vector<int>& i)
+  -  void unconstrained_param_names(vector<string>& v)
+
+
+* add "multi_logit_log(int|vec,vec)" with derivs so that
+     y ~ multi_logit(beta,x);
+  behaves as:
+     y ~ categorical(softmax(dot_product(beta,x)));
+  c.f. MCMCmln in MCMCpack for speed comparison using their
+       data set
+
+* expose all the groovy special functions Michael/Daniel added for CDFs
+
+* allow only some inits to be specified in a data file (var_context)
+  and let the rest be randomly generated
+
+* bound error in inits (and discuss in manual)
+  init file:  
+    x <- structure(c(1,1,1), .Dim=c(3))
+  model: 
+    parameters {
+      vector<lower=0,upper=1e50>[3] x;
+    }
+    model {
+      print("x = ", x);
+      x ~ normal(0,1);
+    }
+  problem is overflow with initial value of x being 1e35
+  due to huge bounds.
+
+* fix Eigen (3.0) indexes to use size_t to match vector.
+    http://eigen.tuxfamily.org/dox-devel/classEigen_1_1DenseBase.html#a4d4873e91be950c079f067fa97fd5c40
+  which refers to
+    http://eigen.tuxfamily.org/dox-devel/TopicPreprocessorDirectives.html
+  which says:
+    EIGEN_DEFAULT_DENSE_INDEX_TYPE - the type for column and row indices in matrices, vectors and array (DenseBase::Index). Set to std::ptrdiff_t by default.
 
 * merge forward-mode and higher-order derivative functionals
 
@@ -162,9 +326,6 @@ C++ API
   dims[1] = N;
   View<double, Matrix<double,Dynamic,Dynamic> >(x,dims);
   
-
-
-
 * deprecate lkj_cov
   - work out general framework for deprecated functions
     with warning messages
@@ -301,10 +462,6 @@ http://www.boost.org/doc/libs/1_53_0/doc/html/property_tree/reference.html#heade
         beta  <- (1 - phi) * k
     determinant = k  (det [[a,b],[c,d]] = ad - bc)
 
-* Gumbel distribtuion
-
-* Exponentially-modified Normal distribution
-
 * von Mises distribution (with location and concentration params?)
   -- requires modified/hyperbolic Bessel function of first kind of order 0 and 1
 
@@ -332,12 +489,6 @@ http://www.boost.org/doc/libs/1_53_0/doc/html/property_tree/reference.html#heade
 * signed sqrt
   signed_sqrt(x) = -sqrt(-x) if x < 0
                  = sqrt(x)   if x > 0
-
-* Skew normal distribution
-  -- involves Phi() in its *density* function like
-     the truncated normal
-  -- hack for now using 
-     normal_log(x|mu,sigma) + log(Phi(alpha * (x - mu) / sigma))
 
 * More matrix functions from Eigen:
   - singular vectors in addition to values
@@ -912,21 +1063,6 @@ print(opt)
 
 * (RStan) Add RStan doc to reference manual
 
-* (RStan) Expose to R for a model:
-    -- log prob and gradient functions
-    -- inits -> unconstrained param transform
-    -- results -> constrained param transform
-  Then users could do all sorts of things just with our models,
-  like run optimizers, Metropolis, etc.
-
-* (Rstan) I/O functions to read in the output produced by
-  command-line Stan (or write-to file RStan)
-
-* (Rstan) expose transform and inverse transform functions
-  -- danger is that the transforms may change over time
-
-* (Rstan) propagate debug error messages to R
-  see: http://lists.r-forge.r-project.org/pipermail/rcpp-devel/2011-October/003006.html
 
 * (cmd) more RStan like behavior
   -- add --chains=N argument to command-line to run multiple chains
@@ -938,17 +1074,9 @@ print(opt)
 
 * (MStan) interface to MATLAB
 
-* (RStan/cmd) --functions option in stanc to print out
-  signatures of all available functions for current version
-
 * (R/cmd) Convergence monitoring of higher moments
   -- at least squared for variance, which being non-linear
      function, isn't same as convergence of basic param
-
-* (R/cmd) add chain ID to output as first column
-
-* (R/cmd) add draw ID to output as second column
-  -- plus need something for DE/DREAM with ensemble
 
 * (R/cmd) track rejection rate by testing equality of
   samples; e.g., sum(a[1:(N-1)] == a[2:N])
@@ -971,31 +1099,12 @@ print(opt)
 
 * (R/cmd) write model text into output in a comment
 
-* (R/cmd) catch +inf, -inf values of unconstrained params and let
-  users know they have an improper posterior
-
-* (R) catch errors/exceptions generated by Stan and trap
-  so they don't percolate through to R
-
 * (R) group dimensions of multivariate params on output plots
 
 * (R/cmd) have output digits depend on se?
 
 * (R/cmd) check initial vals and gradients for finiteness and
   return error message if not
-
-* (R) switch n_chains to chains
-
-* (R/cmd) order of plots/output variables should match declaration
-
-* (R) variable-at-time traceplot
-  -- traceplot(fit) -- array of traceplots for all vals (truncated)
-  -- traceplot(fit,"a") -- array of traceplots for a (truncated)
-  -- traceplot(fit,"a[5,3]") -- traceplot for a[5,3]
-
-* (R) structured data access 
-  - via getters
-  - attach.stan(?)  [does this need a corresponding detach.stan()?]
 
 
 Web Pages

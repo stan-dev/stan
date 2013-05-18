@@ -22,7 +22,7 @@ namespace stan {
     inline double value_of(const agrad::var& v) {
       return v.vi_->val_;
     }
-
+    
   }
 }
 #endif

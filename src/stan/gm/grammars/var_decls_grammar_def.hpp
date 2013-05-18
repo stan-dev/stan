@@ -1,6 +1,10 @@
 #ifndef __STAN__GM__PARSER__VAR_DECLS_GRAMMAR_DEF__HPP__
 #define __STAN__GM__PARSER__VAR_DECLS_GRAMMAR_DEF__HPP__
 
+// Suppress Clang error: multiple unsequenced
+// modifications to _pass and/or _val.
+#pragma GCC diagnostic ignored "-Wunsequenced"
+
 #include <boost/spirit/include/qi.hpp>
 // FIXME: get rid of unused include
 #include <boost/spirit/include/phoenix_core.hpp>
@@ -306,6 +310,7 @@ namespace stan {
         reserve("transformed"); 
         reserve("generated");
         
+        reserve("var");
         
         reserve("alignas"); 
         reserve("alignof"); 

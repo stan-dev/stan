@@ -3,12 +3,13 @@
 
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/validate_row_index.hpp>
+#include <stan/math/matrix/validate_column_index.hpp>
 
 namespace stan {
   namespace math {
 
     /**
-     * Return a nrows x ncols submatrix starting at (i,j).
+     * Return a nrows x ncols submatrix starting at (i-1,j-1).
      *
      * @param m Matrix
      * @param i Starting row
@@ -28,6 +29,10 @@ namespace stan {
       return m.block(i - 1,j - 1,nrows,ncols);
     }
 
+
+
+    
+    
   }
 }
 #endif

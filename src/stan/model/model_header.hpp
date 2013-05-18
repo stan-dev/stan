@@ -11,6 +11,7 @@
 #include <vector>
 
 #include <boost/exception/all.hpp>
+#include <boost/random/linear_congruential.hpp>
 
 #include <stan/agrad/agrad.hpp>
 #include <stan/agrad/matrix.hpp>
@@ -22,14 +23,14 @@
 #include <stan/io/reader.hpp>
 #include <stan/io/writer.hpp>
 #include <stan/io/csv_writer.hpp>
+
+#include <stan/math/matrix.hpp>
 #include <stan/math.hpp>
+// FIXME: these should go in matrix.hpp
 #include <stan/math/rep_array.hpp>
 #include <stan/math/rep_vector.hpp>
 #include <stan/math/rep_row_vector.hpp>
 #include <stan/math/rep_matrix.hpp>
-
-#include <stan/math/matrix.hpp>
-// FIXME: these should go in matrix.hpp
 #include <stan/math/matrix/add.hpp>
 #include <stan/math/matrix/block.hpp>
 #include <stan/math/matrix/cholesky_decompose.hpp>
@@ -52,6 +53,7 @@
 #include <stan/math/matrix/elt_divide.hpp>
 #include <stan/math/matrix/elt_multiply.hpp>
 #include <stan/math/matrix/exp.hpp>
+#include <stan/math/matrix/head.hpp>
 #include <stan/math/matrix/inverse.hpp>
 #include <stan/math/matrix/log.hpp>
 #include <stan/math/matrix/log_determinant.hpp>
@@ -69,19 +71,24 @@
 #include <stan/math/matrix/multiply_lower_tri_self_transpose.hpp>
 #include <stan/math/matrix/prod.hpp>
 #include <stan/math/matrix/row.hpp>
+#include <stan/math/matrix/rows_dot_product.hpp>
+#include <stan/math/matrix/rows_dot_self.hpp>
 #include <stan/math/matrix/sd.hpp>
+#include <stan/math/matrix/segment.hpp>
 #include <stan/math/matrix/singular_values.hpp>
 #include <stan/math/matrix/size.hpp>
 #include <stan/math/matrix/softmax.hpp>
 #include <stan/math/matrix/stan_print.hpp>
+#include <stan/math/matrix/sub_col.hpp>
+#include <stan/math/matrix/sub_row.hpp>
 #include <stan/math/matrix/subtract.hpp>
 #include <stan/math/matrix/sum.hpp>
+#include <stan/math/matrix/tail.hpp>
 #include <stan/math/matrix/tcrossprod.hpp>
 #include <stan/math/matrix/trace.hpp>
 #include <stan/math/matrix/transpose.hpp>
 #include <stan/math/matrix/variance.hpp>
 
-#include <stan/mcmc/sampler.hpp>
 #include <stan/model/prob_grad_ad.hpp>
 #include <stan/prob/distributions.hpp>
 

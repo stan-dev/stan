@@ -14,7 +14,7 @@ OBJECTS = stanc.o chains.o misc.o
 OBJECTS += $(patsubst %.cpp,%.o,$(wildcard gm__*.cpp))
 
 # EIGEN_PATH := $(shell "${R_HOME}/bin${R_ARCH_BIN}/Rscript" -e "cat(system.file('include', package = 'RcppEigen'))")
-EIGEN_PATH = ../inst/include/stanlib/eigen_3.1.2
+EIGEN_PATH = ../inst/include/stanlib/eigen_3.1.3
 
 # PKG_LIBS = `$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"` 
 PKG_LIBS_ORG := $(shell "${R_HOME}/bin${R_ARCH_BIN}/Rscript" -e "cat(gsub('\\x5C\\x5C', '/', utils::shortPathName(Rcpp:::RcppLdFlags(TRUE))))")

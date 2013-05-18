@@ -75,19 +75,6 @@ public:
     return stan::prob::neg_binomial_log<propto>(n, alpha, beta);
   }
   
-  template <bool propto, 
-      class T_n, class T_shape, class T_inv_scale,
-            typename T3, typename T4, typename T5, 
-            typename T6, typename T7, typename T8, 
-            typename T9, 
-      class Policy>
-  typename stan::return_type<T_shape,T_inv_scale>::type 
-  log_prob(const T_n& n, const T_shape& alpha, const T_inv_scale& beta,
-     const T3&, const T4&, const T5&, 
-     const T6&, const T7&, const T8&, 
-     const T9&) {
-    return stan::prob::neg_binomial_log<propto>(n, alpha, beta, Policy());
-  }
 
   template <class T_n, class T_shape, class T_inv_scale,
             typename T3, typename T4, typename T5, 

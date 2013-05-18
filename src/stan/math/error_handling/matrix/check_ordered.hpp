@@ -3,7 +3,6 @@
 
 #include <sstream>
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/error_handling/default_policy.hpp>
 #include <stan/math/error_handling/raise_domain_error.hpp>
 
 namespace stan {
@@ -19,17 +18,14 @@ namespace stan {
      * @param y Vector to test.
      * @param name
      * @param result
-     * @tparam Policy Only the policy's type matters.
      * @return <code>true</code> if the vector has positive, ordered
      * values.
      */
-    template <typename T_y, typename T_result, class Policy>
+    template <typename T_y, typename T_result>
     bool check_ordered(const char* function,
                        const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
                        const char* name,
-                       T_result* result,
-                       const Policy&) {
-      using stan::math::policies::raise_domain_error;
+                       T_result* result) {
       typedef typename Eigen::Matrix<T_y,Eigen::Dynamic,1>::size_type size_t;
       if (y.size() == 0) {
         return true;
@@ -41,30 +37,21 @@ namespace stan {
                  << " The element at " << n 
                  << " is %1%, but should be greater than the previous element, "
                  << y[n-1];
-          T_result tmp = raise_domain_error<T_result,T_y>(function, 
-                                                          stream.str().c_str(), 
-                                                          y[n], 
-                                                          Policy());
-          if (result != 0)
-            *result = tmp;
+          std::string msg(stream.str());
+          return dom_err(function,y[n],name,
+                         msg.c_str(),"",
+                         result);
           return false;
         }
       }
       return true;
     }                         
-    template <typename T_y, typename T_result>
-    bool check_ordered(const char* function,
-                       const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
-                       const char* name,
-                           T_result* result) {
-      return check_ordered(function,y,name,result,default_policy());
-    }
     template <typename T>
     bool check_ordered(const char* function,
                        const Eigen::Matrix<T,Eigen::Dynamic,1>& y,
                        const char* name,
                        T* result = 0) {
-      return check_ordered(function,y,name,result,default_policy());
+      return check_ordered<T,T>(function,y,name,result);
     }
 
   }

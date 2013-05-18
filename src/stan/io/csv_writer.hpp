@@ -2,6 +2,8 @@
 #define __STAN__IO__CSV_WRITER_HPP__
 
 #include <ostream>
+#include <limits>
+#include <iomanip>
 #include <stan/math/matrix.hpp>
 
 namespace stan {
@@ -84,7 +86,7 @@ namespace stan {
        */
       void write(double x) {
         comma();
-        o_ << x;
+        o_ << std::setprecision (std::numeric_limits<double>::digits10 + 1) << x;
       }
 
       /**
