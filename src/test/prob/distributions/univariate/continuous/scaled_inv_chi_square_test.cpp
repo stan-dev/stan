@@ -11,7 +11,7 @@ TEST(ProbDistributionsScaledInvChiSquare, random) {
 TEST(ProbDistributionsScaledInvChiSquare, chiSquareGoodnessFitTest) {
   boost::random::mt19937 rng;
   int N = 10000;
-  int K = 5;
+  double K = 5;
   boost::math::inverse_chi_squared_distribution<>dist (2.0);
   boost::math::chi_squared mydist(K-1);
 
