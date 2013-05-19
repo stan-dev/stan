@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 template <typename T>
-void test_sort_asc(){
+void test_sort_asc() {
   using stan::math::sort_asc;
 
   T c(1);
@@ -32,7 +32,7 @@ void test_sort_asc(){
 
 }
 
-TEST(MathMatrix,sort_asc){
+TEST(MathMatrix,sort_asc) {
   using stan::math::sort_asc;
 
   EXPECT_FLOAT_EQ(0, sort_asc(std::vector<int>(0)).size());
@@ -45,7 +45,7 @@ TEST(MathMatrix,sort_asc){
 
 
 template <typename T>
-void test_sort_desc(){
+void test_sort_desc() {
   using stan::math::sort_desc;
 
   T c(1);
@@ -73,7 +73,7 @@ void test_sort_desc(){
   EXPECT_FLOAT_EQ(0, z.size());
 }
 
-TEST(MathMatrix,sort_desc){
+TEST(MathMatrix,sort_desc) {
   using stan::math::sort_desc;    
 
   EXPECT_FLOAT_EQ(0, sort_desc(std::vector<int>(0)).size());

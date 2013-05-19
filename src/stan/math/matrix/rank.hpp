@@ -15,7 +15,7 @@ namespace stan {
      * @tparam T Type of elements of the vector.
      */
     template <typename T>
-    inline size_t rank(const std::vector<T> & v, int s){
+    inline size_t rank(const std::vector<T> & v, int s) {
       size_t size = v.size();
       check_range(size,s,"in the function rank(v,s)",s);
       s--;
@@ -33,7 +33,7 @@ namespace stan {
      * @tparam T Type of elements of the vector.
      */
     template <typename T, int R, int C>
-    inline size_t rank(const Eigen::Matrix<T,R,C> & v, int s){
+    inline size_t rank(const Eigen::Matrix<T,R,C> & v, int s) {
       size_t size = v.size();
       check_range(size,s,"in the function rank(v,s)",s);
       s--;
