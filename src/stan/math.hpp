@@ -33,6 +33,7 @@
 #include "stan/math/functions/log1p.hpp"
 #include "stan/math/functions/log1p_exp.hpp"
 #include "stan/math/functions/log2.hpp"
+#include "stan/math/functions/log_diff_exp.hpp"
 #include "stan/math/functions/log_inv_logit.hpp"
 #include "stan/math/functions/log_sum_exp.hpp"
 #include "stan/math/functions/logical_and.hpp"
