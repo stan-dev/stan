@@ -1,8 +1,16 @@
-#include <stan/agrad/rev/matrix/sort.hpp>
-#include <test/agrad/util.hpp>
 #include <gtest/gtest.h>
-#include <stan/agrad/agrad.hpp>
+
+#include <stan/agrad/fwd/matrix/sort.hpp>
 #include <stan/math/matrix/sort.hpp>
+
+#include <stan/math/matrix/typedefs.hpp>
+#include <stan/agrad/fwd/matrix/typedefs.hpp>
+#include <stan/agrad/fvar.hpp>
+#include <stan/agrad/fwd/fvar.hpp>
+
+typedef stan::agrad::fvar<double> AVAR;
+typedef std::vector<AVAR> AVEC;
+typedef std::vector<double> VEC;
 
 void test_sort_asc(VEC val){
   using stan::math::sort_asc;
@@ -106,7 +114,8 @@ void test_sort_desc(Eigen::Matrix<T,R,C> val){
 
 
 
-TEST(AgradRev, sort){
+
+TEST(AgradFvar, sort){
   VEC a;
   a.push_back(1); a.push_back(2); a.push_back(2); a.push_back(3);
   test_sort_asc(a);
@@ -149,4 +158,5 @@ TEST(AgradRev, sort){
   Eigen::VectorXd vec6 = Eigen::VectorXd::Random(20,1);
   test_sort_asc(vec6);
   test_sort_desc(vec6);
+
 }

@@ -19,7 +19,7 @@ namespace stan {
      * @return Standard vector ordered.
      * @tparam T Type of elements of the vector.
      */
-    inline std::vector<var> sort_asc(std::vector<var> xs) {
+    inline std::vector<var> sort_asc(std::vector<var> xs){
       if (xs.size() > 1U)
         std::sort(xs.begin(), xs.end());
       return xs;
@@ -32,7 +32,7 @@ namespace stan {
      * @return Standard vector ordered.
      * @tparam T Type of elements of the vector.
      */
-    inline std::vector<var> sort_desc(std::vector<var> xs) {
+    inline std::vector<var> sort_desc(std::vector<var> xs){
       if (xs.size() > 1U)
         std::sort(xs.begin(), xs.end(), std::greater<var>());
       return xs;
@@ -46,7 +46,7 @@ namespace stan {
      * @tparam T Type of elements of the vector.
      */
     template <int R, int C>
-    inline typename Eigen::Matrix<var,R,C> sort_asc(Eigen::Matrix<var,R,C> xs) {
+    inline typename Eigen::Matrix<var,R,C> sort_asc(Eigen::Matrix<var,R,C> xs){
       if (xs.size() > 1U)
         std::sort(xs.data(), xs.data()+xs.size());
       return xs;
@@ -60,7 +60,7 @@ namespace stan {
      * @tparam T Type of elements of the vector.
      */
     template <int R, int C>
-    inline typename Eigen::Matrix<var,R,C> sort_desc(Eigen::Matrix<var,R,C> xs) {
+    inline typename Eigen::Matrix<var,R,C> sort_desc(Eigen::Matrix<var,R,C> xs){
       if (xs.size() > 1U)
         std::sort(xs.data(), xs.data()+xs.size(), std::greater<var>());
       return xs;
