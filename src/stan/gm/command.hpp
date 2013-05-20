@@ -934,6 +934,15 @@ namespace stan {
         end = clock();
         sampleDeltaT = (double)(end - start) / CLOCKS_PER_SEC;
 
+      std::cout << std::endl
+                << "Elapsed Time: " << warmDeltaT 
+                << " seconds (Warm Up)"  << std::endl
+                << "              " << sampleDeltaT 
+                << " seconds (Sampling)"  << std::endl
+                << "              " << warmDeltaT + sampleDeltaT 
+                << " seconds (Total)"  << std::endl
+                << std::endl << std::endl;
+
         return 0;
       }
 
@@ -990,6 +999,15 @@ namespace stan {
         end = clock();
         sampleDeltaT = (double)(end - start) / CLOCKS_PER_SEC;
 
+      std::cout << std::endl
+                << "Elapsed Time: " << warmDeltaT 
+                << " seconds (Warm Up)"  << std::endl
+                << "              " << sampleDeltaT 
+                << " seconds (Sampling)"  << std::endl
+                << "              " << warmDeltaT + sampleDeltaT 
+                << " seconds (Total)"  << std::endl
+                << std::endl << std::endl;
+
         return 0;
       }
 
@@ -1045,6 +1063,15 @@ namespace stan {
         
         end = clock();
         sampleDeltaT = (double)(end - start) / CLOCKS_PER_SEC;
+
+      std::cout << std::endl
+                << "Elapsed Time: " << warmDeltaT 
+                << " seconds (Warm Up)"  << std::endl
+                << "              " << sampleDeltaT 
+                << " seconds (Sampling)"  << std::endl
+                << "              " << warmDeltaT + sampleDeltaT 
+                << " seconds (Total)"  << std::endl
+                << std::endl << std::endl;
 
         return 0;
       }
