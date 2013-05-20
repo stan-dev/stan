@@ -153,6 +153,7 @@ add("quad_form",DOUBLE_T,MATRIX_T,VECTOR_T);
 add("quad_form",MATRIX_T,MATRIX_T,MATRIX_T);
 add("quad_form_sym",DOUBLE_T,MATRIX_T,VECTOR_T);
 add("quad_form_sym",MATRIX_T,MATRIX_T,MATRIX_T);
+add("trace_quad_form",DOUBLE_T,MATRIX_T,VECTOR_T);
 add("trace_quad_form",DOUBLE_T,MATRIX_T,MATRIX_T);
 add("trace_gen_quad_form",DOUBLE_T,MATRIX_T,MATRIX_T,MATRIX_T);
 add("dot_product",DOUBLE_T,VECTOR_T,VECTOR_T);
