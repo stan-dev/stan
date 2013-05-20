@@ -226,14 +226,14 @@ namespace rstan {
       return (n == 0) || ((n + 1) % refresh == 0);
     }
 
-    void print_progress(int m, int num_iterations, int refresh, bool warmup) {
-      int it_print_width = std::ceil(std::log10(num_iterations));
+    void print_progress(int m, int finish, int refresh, bool warmup) {
+      int it_print_width = std::ceil(std::log10(finish));
       if (do_print(m, refresh)) {
         rstan::io::rcout << "\rIteration: ";
         rstan::io::rcout << std::setw(it_print_width) << (m + 1)
-                         << " / " << num_iterations;
+                         << " / " << finish;
         rstan::io::rcout << " [" << std::setw(3) 
-                         << static_cast<int>((100.0 * (m + 1)) / num_iterations)
+                         << static_cast<int>((100.0 * (m + 1)) / finish)
                          << "%] ";
         rstan::io::rcout << (warmup ? " (Warmup)" : " (Sampling)");
         // rstan::io::rcout << std::endl;
@@ -279,7 +279,7 @@ namespace rstan {
 
     template <class Sampler, class Model, class RNG>
     void run_markov_chain(Sampler& sampler,
-                          int num_iterations,
+                          int num_warmup, int num_iterations,
                           int num_thin,
                           int refresh,
                           bool save,
@@ -298,11 +298,17 @@ namespace rstan {
                           RNG& base_rng) {
       std::vector<double> params_inr_etc;
       double lp__;
-      for (size_t m = 0; m < num_iterations; ++m) {
+      int start = 0;
+      int end = num_warmup; 
+      if (!warmup) { 
+        start = num_warmup;
+        end = num_iterations;
+      } 
+      for (size_t m = start; m < end; ++m) {
         print_progress(m, num_iterations, refresh, warmup);
         R_CheckUserInterrupt();
         init_s = sampler.transition(init_s);
-        if (save && ((m % num_thin) == 0)) {
+        if (save && (((m - start) % num_thin) == 0)) {
           std::vector<double> cont(init_s.cont_params());
           std::vector<int> disc(init_s.disc_params());
           lp__ = init_s.log_prob();
@@ -335,6 +341,7 @@ namespace rstan {
 
     template <class Sampler, class Model, class RNG>
     void warmup_phase(Sampler& sampler,
+                      int num_warmup,
                       int num_iterations,
                       int num_thin,
                       int refresh,
@@ -351,18 +358,19 @@ namespace rstan {
                       std::vector<Rcpp::NumericVector>& sampler_params, 
                       std::string& adaptation_info, 
                       RNG& base_rng) {
-      run_markov_chain<Sampler, Model, RNG>(sampler, num_iterations, num_thin, 
+      run_markov_chain<Sampler, Model, RNG>(sampler, num_warmup, num_iterations, 
+                                            num_thin,
                                             refresh, save, true,
                                             p_sample_file_stream,
                                             p_diagnostic_file_stream,
                                             init_s, model, chains, iter_save_i, qoi_idx,
                                             sum_pars, sum_lp, sampler_params,
                                             adaptation_info, base_rng);
-      rstan::io::rcout << std::endl;
     }
 
     template <class Sampler, class Model, class RNG>
     void sample_phase(Sampler& sampler,
+                      int num_warmup,
                       int num_iterations,
                       int num_thin,
                       int refresh,
@@ -379,7 +387,7 @@ namespace rstan {
                       std::vector<Rcpp::NumericVector>& sampler_params, 
                       std::string& adaptation_info, 
                       RNG& base_rng) {
-      run_markov_chain<Sampler, Model, RNG>(sampler, num_iterations, num_thin, 
+      run_markov_chain<Sampler, Model, RNG>(sampler, num_warmup, num_iterations, num_thin,
                                             refresh, save, false,
                                             p_sample_file_stream,
                                             p_diagnostic_file_stream,
@@ -711,7 +719,7 @@ namespace rstan {
         sampler.get_stepsize_adaptation().set_mu(log(10 * sampler.get_nominal_stepsize()));
         sampler.engage_adaptation();
         clock_t start = clock();
-        warmup_phase<a_Dm_nuts, Model, RNG>(sampler, num_warmup, num_thin, 
+        warmup_phase<a_Dm_nuts, Model, RNG>(sampler, num_warmup, num_iterations, num_thin, 
                                             refresh, save_warmup, 
                                             p_sample_file_stream, p_diagnostic_file_stream,
                                             s, model, chains, iter_save_i,
@@ -730,7 +738,7 @@ namespace rstan {
         if (sample_file_flag) sample_stream <<  adaptation_info; 
         // Sampling
         start = clock();
-        sample_phase<a_Dm_nuts, Model, RNG>(sampler, num_iterations - num_warmup, num_thin, 
+        sample_phase<a_Dm_nuts, Model, RNG>(sampler, num_warmup, num_iterations, num_thin, 
                                             refresh, true, 
                                             p_sample_file_stream,
                                             p_diagnostic_file_stream,
@@ -764,7 +772,7 @@ namespace rstan {
         sampler.get_stepsize_adaptation().set_mu(log(10 * sampler.get_nominal_stepsize()));
         sampler.engage_adaptation();
         clock_t start = clock();
-        warmup_phase<a_dm_nuts, Model, RNG>(sampler, num_warmup, num_thin, 
+        warmup_phase<a_dm_nuts, Model, RNG>(sampler, num_warmup, num_iterations, num_thin,
                                             refresh, save_warmup, 
                                             p_sample_file_stream, 
                                             p_diagnostic_file_stream,
@@ -785,7 +793,7 @@ namespace rstan {
         
         // Sampling
         start = clock();
-        sample_phase<a_dm_nuts, Model, RNG>(sampler, num_iterations - num_warmup, 
+        sample_phase<a_dm_nuts, Model, RNG>(sampler, num_warmup, num_iterations,
                                             num_thin, refresh, true, 
                                             p_sample_file_stream, 
                                             p_diagnostic_file_stream,
@@ -819,7 +827,7 @@ namespace rstan {
         sampler.get_stepsize_adaptation().set_mu(log(10 * sampler.get_nominal_stepsize()));
         sampler.engage_adaptation();
         clock_t start = clock();
-        warmup_phase<a_um_nuts, Model, RNG>(sampler, num_warmup, num_thin, 
+        warmup_phase<a_um_nuts, Model, RNG>(sampler, num_warmup, num_iterations, num_thin, 
                                             refresh, save_warmup, 
                                             p_sample_file_stream, p_diagnostic_file_stream,
                                             s, model, chains, iter_save_i, 
@@ -838,7 +846,7 @@ namespace rstan {
         if (sample_file_flag) sample_stream <<  adaptation_info; 
         // Sampling
         start = clock();
-        sample_phase<a_um_nuts, Model, RNG>(sampler, num_iterations - num_warmup, num_thin, 
+        sample_phase<a_um_nuts, Model, RNG>(sampler, num_warmup, num_iterations, num_thin, 
                                             refresh, true, 
                                             p_sample_file_stream, p_diagnostic_file_stream,
                                             s, model, chains, iter_save_i, 
@@ -871,7 +879,7 @@ namespace rstan {
         sampler.get_stepsize_adaptation().set_mu(log(10 * sampler.get_nominal_stepsize()));
         sampler.engage_adaptation();
         clock_t start = clock();
-        warmup_phase<a_um_hmc, Model, RNG>(sampler, num_warmup, num_thin, 
+        warmup_phase<a_um_hmc, Model, RNG>(sampler, num_warmup, num_iterations, num_thin, 
                                            refresh, save_warmup, 
                                            p_sample_file_stream, p_diagnostic_file_stream,
                                            s, model, chains, iter_save_i, 
@@ -890,7 +898,7 @@ namespace rstan {
         if (sample_file_flag) sample_stream <<  adaptation_info; 
         // Sampling
         start = clock();
-        sample_phase<a_um_hmc, Model, RNG>(sampler, num_iterations - num_warmup, num_thin, 
+        sample_phase<a_um_hmc, Model, RNG>(sampler, num_warmup, num_iterations, num_thin, 
                                            refresh, true, 
                                            p_sample_file_stream, p_diagnostic_file_stream,
                                            s, model, chains, iter_save_i, 

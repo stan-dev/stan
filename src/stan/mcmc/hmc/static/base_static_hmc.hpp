@@ -1,6 +1,7 @@
 #ifndef __STAN__MCMC__BASE__STATIC__HMC__BETA__
 #define __STAN__MCMC__BASE__STATIC__HMC__BETA__
 
+#include <math.h>
 #include <stan/mcmc/hmc/base_hmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
 
@@ -17,8 +18,8 @@ namespace stan {
       
     public:
       
-      base_static_hmc(M &m, BaseRNG& rng, std::ostream* e):
-      base_hmc<M, P, H, I, BaseRNG>(m, rng, e), _T(1)
+      base_static_hmc(M &m, BaseRNG& rng, std::ostream* o, std::ostream* e):
+      base_hmc<M, P, H, I, BaseRNG>(m, rng, o, e), _T(1)
       { _update_L(); }
       
       ~base_static_hmc() {};
@@ -40,7 +41,7 @@ namespace stan {
           this->_integrator.evolve(this->_z, this->_hamiltonian, this->_epsilon);
         }
         
-        double acceptProb = exp(H0 - this->_hamiltonian.H(this->_z));
+        double acceptProb = std::exp(H0 - this->_hamiltonian.H(this->_z));
         
         double accept = true;
         if (acceptProb < 1 && this->_rand_uniform() > acceptProb) {
