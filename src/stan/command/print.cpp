@@ -109,7 +109,8 @@ int main(int argc, const char* argv[]) {
   thin(0) = stan_csv.metadata.thin;
   
 
-  for (int chain = 1; chain < filenames.size(); chain++) {
+  for (typename std::vector<std::string>::size_type chain = 1; 
+       chain < filenames.size(); chain++) {
     ifstream.open(filenames[chain].c_str());
     stan_csv = stan::io::stan_csv_reader::parse(ifstream);
     chains.add(stan_csv);
@@ -120,7 +121,7 @@ int main(int argc, const char* argv[]) {
   // print  
   const int skip = 3;
   std::string model_name = ""; // FIXME: put in model name
-  int max_name_length = 0;
+  size_t max_name_length = 0;
   for (int i = skip; i < chains.num_params(); i++) 
     if (chains.param_name(i).length() > max_name_length)
       max_name_length = chains.param_name(i).length();
