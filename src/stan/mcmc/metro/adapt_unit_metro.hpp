@@ -14,8 +14,10 @@ namespace stan {
       
     public:
       
-      adapt_unit_metro(M &m, BaseRNG& rng, std::ostream* error_msg = 0)
-        : unit_metro<M, BaseRNG>(m, rng, error_msg) {};
+      adapt_unit_metro(M &m, BaseRNG& rng,
+                       std::ostream* o = &std::cout, 
+                       std::ostream* e = 0)
+        : unit_metro<M, BaseRNG>(m, rng, o, e) {};
       
       ~adapt_unit_metro() {};
       

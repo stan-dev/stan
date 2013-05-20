@@ -58,7 +58,7 @@ namespace stan {
        double accept_prob = exp(log_prob(_params_r, _params_i) 
                                 - logp0);
 
-       bool accept = true;
+       double accept = true;
        if (accept_prob < 1 && this->_rand_uniform() > accept_prob) {
          _params_r = init_point;
          accept = false;

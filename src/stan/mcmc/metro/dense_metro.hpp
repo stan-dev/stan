@@ -27,6 +27,8 @@ namespace stan {
                    BaseRNG& rng) {
         Eigen::VectorXd zer(q.size());
         zer.setZero();
+        // for(size_t i = 0; i < q.size(); i++)
+        //   zer(i) = q[i];
 
         Eigen::VectorXd prop(q.size());
         prop = this->_nom_epsilon 
