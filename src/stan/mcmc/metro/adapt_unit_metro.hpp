@@ -26,12 +26,17 @@ namespace stan {
         sample s = unit_metro<M, BaseRNG>::transition(init_sample);
         
         if (_adapt_flag) {      
-          _stepsize_adaptation.learn_stepsize(this->_nom_epsilon, 
+          this->_stepsize_adaptation.learn_stepsize(this->_nom_epsilon, 
                                               s.accept_stat());
         }
         
         return s;
         
+      }
+
+      void disengage_adaptation() {
+        base_adapter::disengage_adaptation();
+        this->_stepsize_adaptation.complete_adaptation(this->_nom_epsilon);
       }
       
     };
