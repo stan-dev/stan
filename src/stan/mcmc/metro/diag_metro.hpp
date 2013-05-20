@@ -26,7 +26,7 @@ namespace stan {
       void propose(std::vector<double>& q,
                     BaseRNG& rng) {
         for (size_t i = 0; i < q.size(); ++i) 
-          q[i] = stan::prob::normal_rng(0,this->_nom_epsilon * _prop_cov_diag(i),
+          q[i] = stan::prob::normal_rng(q[i],this->_nom_epsilon * _prop_cov_diag(i),
                                         this->_rand_int);
       }
 

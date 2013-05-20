@@ -25,14 +25,13 @@ namespace stan {
 
       void propose(std::vector<double>& q,
                    BaseRNG& rng) {
-        Eigen::VectorXd zer(q.size());
-        zer.setZero();
-        // for(size_t i = 0; i < q.size(); i++)
-        //   zer(i) = q[i];
+        Eigen::VectorXd init(q.size());
+        for(size_t i = 0; i < q.size(); i++)
+           init(i) = q[i];
 
         Eigen::VectorXd prop(q.size());
         prop = this->_nom_epsilon 
-          * stan::prob::multi_normal_rng(zer, _prop_cov, this->_rand_int);
+          * stan::prob::multi_normal_rng(init, _prop_cov, this->_rand_int);
 
         for(size_t i = 0; i < q.size(); i++)
           q[i] = prop(i);
