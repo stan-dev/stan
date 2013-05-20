@@ -17,15 +17,15 @@ int calculate_size(const Eigen::VectorXd& x,
   if (digits > 0)
     padding = digits + 2;
   
-  double fixed_size = 0.0;
+  double fixed_size = padding;
   
   if (x.maxCoeff() > 0)
-    fixed_size = ceil(log10(x.maxCoeff() + 0.001)) + padding;
+    fixed_size += ceil(log10(x.maxCoeff() + 0.001));
   if (x.minCoeff() < 0)
-    fixed_size = max(fixed_size, ceil(log10(-x.minCoeff() + 0.01)) + (padding + 1));
+    fixed_size += max(fixed_size, ceil(log10(-x.minCoeff() + 0.01)) + 1);
   
   format = std::ios_base::fixed;
-  
+
   if (fixed_size < 7) {
     return max(fixed_size,
                max(name.length(), std::string("-0.0").length()) + 0.0);
