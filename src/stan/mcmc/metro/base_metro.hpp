@@ -20,8 +20,8 @@ namespace stan {
       
     public:
       
-      base_metro(M& m, BaseRNG& rng, std::ostream* error_msg)
-        : base_mcmc(error_msg), 
+      base_metro(M& m, BaseRNG& rng, std::ostream* o, std::ostream* e)
+        : base_mcmc(o,e), 
           _model(m),
           _params_r(m.num_params_r()),
           _params_i(m.num_params_i()),
