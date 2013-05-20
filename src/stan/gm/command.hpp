@@ -888,6 +888,7 @@ namespace stan {
 
         typedef stan::mcmc::adapt_unit_metro<Model, rng_t> metro;
         metro sampler(model, base_rng);
+        sampler.seed(cont_params, disc_params);
 
         if (!append_samples) {
           sample_stream << "lp__,"; // log probability first
@@ -953,6 +954,7 @@ namespace stan {
 
         typedef stan::mcmc::adapt_diag_metro<Model, rng_t> metro;
         metro sampler(model, base_rng, num_warmup);
+        sampler.seed(cont_params, disc_params);
 
         if (!append_samples) {
           sample_stream << "lp__,"; // log probability first
@@ -1018,6 +1020,7 @@ namespace stan {
 
         typedef stan::mcmc::adapt_dense_metro<Model, rng_t> metro;
         metro sampler(model, base_rng, num_warmup);
+        sampler.seed(cont_params, disc_params);
 
         if (!append_samples) {
           sample_stream << "lp__,"; // log probability first
