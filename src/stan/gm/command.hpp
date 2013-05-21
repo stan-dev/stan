@@ -263,7 +263,7 @@ namespace stan {
                           Model& model,
                           RNG& base_rng) {
       
-      for (size_t m = 0; m < num_iterations; ++m) {
+      for (int m = 0; m < num_iterations; ++m) {
       
         print_progress(m, start, finish, refresh, warmup);
       
