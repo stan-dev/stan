@@ -24,6 +24,7 @@
 #include <stan/agrad/rev/matrix/multiply_lower_tri_self_transpose.hpp>
 #include <stan/agrad/rev/matrix/tcrossprod.hpp>
 #include <stan/agrad/rev/matrix/trace_quad_form.hpp>
+#include <stan/agrad/rev/matrix/trace_gen_quad_form.hpp>
 #include <stan/agrad/rev/matrix/crossprod.hpp>
 #include <stan/agrad/rev/matrix/assign_to_var.hpp>
 #include <stan/agrad/rev/matrix/assign.hpp>

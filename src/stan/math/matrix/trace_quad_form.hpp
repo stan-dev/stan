@@ -21,22 +21,6 @@ namespace stan {
       validate_multiplicable(A,B,"trace_quad_form");
       return (B.transpose()*A*B).trace();
     }
-    
-    /**
-     * Compute trace(D B^T A B).
-     **/
-    template<int RD,int CD,int RA,int CA,int RB,int CB>
-    inline double
-    trace_gen_quad_form(const Eigen::Matrix<double,RD,CD> &D,
-                        const Eigen::Matrix<double,RA,CA> &A,
-                        const Eigen::Matrix<double,RB,CB> &B)
-    {
-      validate_square(A,"trace_gen_quad_form");
-      validate_square(D,"trace_gen_quad_form");
-      validate_multiplicable(A,B,"trace_gen_quad_form");
-      validate_multiplicable(B,D,"trace_gen_quad_form");
-      return (D*B.transpose()*A*B).trace();
-    }
   }
 }
 

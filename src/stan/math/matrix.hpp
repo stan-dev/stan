@@ -74,6 +74,7 @@
 #include <stan/math/matrix/tcrossprod.hpp>
 #include <stan/math/matrix/trace.hpp>
 #include <stan/math/matrix/trace_quad_form.hpp>
+#include <stan/math/matrix/trace_gen_quad_form.hpp>
 #include <stan/math/matrix/transpose.hpp>
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/math/matrix/validate_column_index.hpp>

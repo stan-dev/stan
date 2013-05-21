@@ -1,8 +1,10 @@
 #include <stan/agrad/rev/matrix/trace_quad_form.hpp>
+#include <stan/agrad/rev/matrix/trace_gen_quad_form.hpp>
 #include <stan/agrad/rev/matrix/sum.hpp>
 #include <gtest/gtest.h>
 #include <test/agrad/util.hpp>
 #include <stan/math/matrix/trace_quad_form.hpp>
+#include <stan/math/matrix/trace_gen_quad_form.hpp>
 #include <stan/math/matrix/sum.hpp>
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/agrad/rev/matrix/typedefs.hpp>
