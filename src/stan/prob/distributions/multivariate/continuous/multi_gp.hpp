@@ -83,7 +83,7 @@ namespace stan {
       if (!ldlt_Sigma.success()) {
         std::ostringstream message;
         message << "Kernel matrix is not positive definite. " 
-                << "K(0,0) is %1%.";
+                << "K[1,1] is %1%.";
         std::string str(message.str());
         stan::math::dom_err(function,Sigma(0,0),"",str.c_str(),"",&lp);
         return lp;
@@ -122,11 +122,6 @@ namespace stan {
       }
       
       if (include_summand<propto,T_y,T_w,T_covar>::value) {
-//        Eigen::Matrix<typename 
-//        boost::math::tools::promote_args<T_covar,T_y>::type,
-//        Eigen::Dynamic, Eigen::Dynamic> y_Kinv(mdivide_right_ldlt(y,ldlt_Sigma));
-//
-//        lp -= 0.5 * dot_product(rows_dot_product(y_Kinv,y),w);
         Eigen::Matrix<T_w,Eigen::Dynamic,Eigen::Dynamic> w_mat(w.asDiagonal());
         Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic> yT(y.transpose());
         lp -= 0.5 * trace_inv_quad_form_ldlt(w_mat,ldlt_Sigma,yT);
