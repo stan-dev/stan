@@ -310,6 +310,7 @@ add_binary("log_sum_exp");
 add_nullary("log10");
 add_unary("log10");
 add_unary("log1m");
+add_unary("log1m_exp");
 add_unary("log1p");
 add_unary("log1p_exp");
 add_unary("log_inv_logit");

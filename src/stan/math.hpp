@@ -28,6 +28,7 @@
 #include "stan/math/functions/lbeta.hpp"
 #include "stan/math/functions/lmgamma.hpp"
 #include "stan/math/functions/log1m.hpp"
+#include "stan/math/functions/log1m_exp.hpp"
 #include "stan/math/functions/log1m_inv_logit.hpp"
 #include "stan/math/functions/log1p.hpp"
 #include "stan/math/functions/log1p_exp.hpp"

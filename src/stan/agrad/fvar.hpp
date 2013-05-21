@@ -93,8 +93,9 @@
 //composed functions
 #include <stan/agrad/fwd/expm1.hpp>
 #include <stan/agrad/fwd/fma.hpp>
-#include <stan/agrad/fwd/log1p.hpp>
 #include <stan/agrad/fwd/log1m.hpp>
+#include <stan/agrad/fwd/log1p.hpp>
+#include <stan/agrad/fwd/log1m_exp.hpp>
 #include <stan/agrad/fwd/log1p_exp.hpp>
 #include <stan/agrad/fwd/log_sum_exp.hpp>
 #include <stan/agrad/fwd/log_inv_logit.hpp>
