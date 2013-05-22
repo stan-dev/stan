@@ -24,6 +24,6 @@ TEST(AgradRev,inv_cloglog) {
   VEC grad_f2;
   f2.grad(x2,grad_f2);
 
-  EXPECT_EQ(1,grad_f.size());
+  EXPECT_EQ(1U,grad_f.size());
   EXPECT_FLOAT_EQ(grad_f2[0],grad_f[0]);
 }

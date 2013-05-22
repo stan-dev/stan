@@ -12,7 +12,8 @@ namespace stan {
     inline void validate_multiplicable(const T1& x1,
                                        const T2& x2,
                                        const char* msg) {
-      if (x1.cols() == x2.rows()) return;
+      if (x1.cols() == static_cast<typename T1::size_type>(x2.rows()))
+        return;
       std::stringstream ss;
       ss << "error in call to " << msg
          << "; require cols of arg1 to match rows of arg2, but found "
