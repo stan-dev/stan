@@ -25,12 +25,13 @@ class Model_Test_Fixture : public ::testing::Test {
 public:
   static char path_separator;
   static std::string model_path;
-  static stan::mcmc::chains<> *chains;
+  static std::vector<stan::mcmc::chains<> *> chains;
   static int num_chains;
   static std::vector<std::string> command_outputs;
   static const int skip;
-  static int iterations;
   static long elapsed_milliseconds;
+  static std::vector<std::string> sampler_names;
+  static int sampler_n;
 
   /** 
    * SetUpTestCase() called by google test once
@@ -43,11 +44,17 @@ public:
    *                    the header of a csv file
    */
   static void SetUpTestCase() {
+    sampler_names.push_back(""); //nuts default
+    sampler_names.push_back(" --unit_metro");
+    sampler_names.push_back(" --diag_metro");
+    sampler_names.push_back(" --dense_metro");
+
     model_path = convert_model_path(get_model_path());
 
-    iterations = num_iterations();
-
-    chains = create_chains();
+    chains.push_back(create_chains(0));
+    chains.push_back(create_chains(1));
+    chains.push_back(create_chains(2));
+    chains.push_back(create_chains(3));
   }
     
   /** 
@@ -57,7 +64,8 @@ public:
    * Deletes chains. 
    */
   static void TearDownTestCase() {
-    delete chains;
+    for(int i = 0; i < 4; i++)
+      delete chains[i];
   }
 
   /** 
@@ -80,7 +88,7 @@ public:
    * 
    * @return a string command that can be run from a shell.
    */
-  static std::string get_command(int chain) {
+  static std::string get_command(int chain, int sampl_n) {
     std::stringstream command;
     command << model_path;
     command << " --samples=" << get_csv_file(chain);
@@ -91,30 +99,31 @@ public:
     if (has_init()) {
       command << " --init=" << model_path << ".init.R";
     }
-    command << " --iter=" << iterations;
-    command << " --refresh=" << iterations;
+    command << " --iter=" << num_iterations(sampl_n);
+    command << " --refresh=" << num_iterations(sampl_n);
+    command << sampler_names[sampl_n];
     return command.str();
   }
 
   /** 
    * Populates the chains object with data from csv files.
    */
-  static void default_populate_chains() {
-    if (chains->num_kept_samples() == 0U) {
+  static void default_populate_chains(int i) {
+    if (chains[i]->num_kept_samples() == 0U) {
       for (int chain = 1U; chain <= num_chains; chain++) {
         std::ifstream ifstream(get_csv_file(chain).c_str());
-        chains->add(stan::io::stan_csv_reader::parse(ifstream));
+        chains[i]->add(stan::io::stan_csv_reader::parse(ifstream));
         ifstream.close();
       }
     }
   }
 
-  static void populate_chains() {
-    Derived::populate_chains();
+  static void populate_chains(int i) {
+    Derived::populate_chains(i);
   }
   
-  static void test_gradient() {
-    std::string command = get_command(1U);
+  static void test_gradient(int i) {
+    std::string command = get_command(1U, i);
     command += " --test_grad";
     std::string command_output;
     EXPECT_NO_THROW(command_output = run_command(command))
@@ -128,15 +137,15 @@ public:
    * Runs the model num_chains times.
    * Populates the chains object after running the model.
    */
-  static void run_model() {
+  static void run_model(int i) {
     for (int chain = 1; chain <= num_chains; chain++) {
       std::string command_output;
-      command_output = run_command(get_command(chain), elapsed_milliseconds);
+      command_output = run_command(get_command(chain, i), elapsed_milliseconds);
       //EXPECT_NO_THROW(command_output = run_command(get_command(chain), elapsed_milliseconds)) 
       //<< "Can not execute command: " << get_command(chain) << std::endl;
       command_outputs.push_back(command_output);
     }
-    populate_chains();
+    populate_chains(i);
   }
     
   /** 
@@ -147,9 +156,9 @@ public:
    * 
    * @return An initialized chains object.
    */
-  static stan::mcmc::chains<>* create_chains() {
+  static stan::mcmc::chains<>* create_chains(int i) {
     std::stringstream command;
-    command << get_command(1U)
+    command << get_command(1U, i)
       << " --iter=0";
     EXPECT_NO_THROW(run_command(command.str())) 
       << "Can not build header using: " << command.str();
@@ -197,8 +206,12 @@ public:
     return Derived::skip_chains_test();
   } 
 
-  static int num_iterations() {
-    return Derived::num_iterations();
+  static int num_iterations(int i) {
+    return Derived::num_iterations(i);
+  }
+
+  static int sampler_num() {
+    return Derived::sampler_num();
   }
 
   static std::vector<std::pair<int, double> >
@@ -233,14 +246,14 @@ public:
     results.close();
   }
   
-  static void write_results() {
+  static void write_results(int i) {
     write_header();
     std::ofstream results("models/timing.csv", std::ios_base::app);
     
-    int N = chains->num_params() - skip;
+    int N = chains[i]->num_params() - skip;
     std::vector<double> n_eff(N);
     for (int n = 0; n < N; n++)
-      n_eff[n] = chains->effective_sample_size(n+skip-1);
+      n_eff[n] = chains[i]->effective_sample_size(n+skip-1);
     std::sort(n_eff.begin(), n_eff.end());
     double n_eff_median;
     if (N % 2 == 0)
@@ -249,9 +262,9 @@ public:
       n_eff_median = n_eff[N/2];
 
     results << "\"" << model_path << ".stan\"" << ","
-      << chains->num_chains() << ","
-      << num_iterations() << ","
-      << chains->num_kept_samples() << ","
+      << chains[i]->num_chains() << ","
+      << num_iterations(i) << ","
+      << chains[i]->num_kept_samples() << ","
       << N << ","
       << elapsed_milliseconds << ","
       << *(std::min_element(n_eff.begin(), n_eff.end())) << ","
@@ -266,47 +279,12 @@ public:
     results.close();
   }
 
-};
-  
-template<class Derived> 
-stan::mcmc::chains<> *Model_Test_Fixture<Derived>::chains;
-
-template<class Derived>
-int Model_Test_Fixture<Derived>::num_chains = 4;
-
-template<class Derived>
-std::string Model_Test_Fixture<Derived>::model_path;
-
-template<class Derived>
-std::vector<std::string> Model_Test_Fixture<Derived>::command_outputs;
-
-template<class Derived>
-const int Model_Test_Fixture<Derived>::skip = 3;
-
-template<class Derived>
-int Model_Test_Fixture<Derived>::iterations = 2000;
-
-template<class Derived>
-long Model_Test_Fixture<Derived>::elapsed_milliseconds = 0;
-
-
-TYPED_TEST_CASE_P(Model_Test_Fixture);
-
-TYPED_TEST_P(Model_Test_Fixture, TestGradient) {
-  TypeParam::test_gradient();
-}
-
-TYPED_TEST_P(Model_Test_Fixture, RunModel) {
-  TypeParam::run_model();
-  TypeParam::write_results();
-}
-
-TYPED_TEST_P(Model_Test_Fixture, ChainsTest) {
+static void chains_test(int i) {
   std::vector<std::string> err_message;
-  for (int chain = 0; chain < TypeParam::num_chains; chain++) {
+  for (int chain = 0; chain < num_chains; chain++) {
     std::vector<std::pair<std::string, std::string> > options = 
-      parse_command_output(TypeParam::command_outputs[chain]);
-    parse_command_output(TypeParam::command_outputs[chain]);
+      parse_command_output(command_outputs[chain]);
+    parse_command_output(command_outputs[chain]);
 
     std::string msg = "Seed is : ";
     for (int option = 0; option < options.size(); option++) {
@@ -316,14 +294,14 @@ TYPED_TEST_P(Model_Test_Fixture, ChainsTest) {
     err_message.push_back(msg);
   }
 
-  stan::mcmc::chains<> *c = TypeParam::chains;
+  stan::mcmc::chains<> *c = chains[i];
   int num_chains = c->num_chains();
   int num_params = c->num_params();
-  std::vector<int> params_to_skip = TypeParam::skip_chains_test();
+  std::vector<int> params_to_skip = skip_chains_test();
   std::sort(params_to_skip.begin(), params_to_skip.end());
   
   for (int chain = 0; chain < num_chains; chain++) {
-    for (int param = TypeParam::skip; param < num_params; param++) {
+    for (int param = skip; param < num_params; param++) {
       if (!std::binary_search(params_to_skip.begin(), params_to_skip.end(), param)) {
   EXPECT_GT(c->variance(chain, param), 0)
     << "Chain " << chain << ", param " << param << ", name " << c->param_name(param)
@@ -333,7 +311,7 @@ TYPED_TEST_P(Model_Test_Fixture, ChainsTest) {
     }
   }
 
-  for (int param = TypeParam::skip; param < num_params; param++) {
+  for (int param = skip; param < num_params; param++) {
     if (std::find(params_to_skip.begin(), params_to_skip.end(), param) == params_to_skip.end()) {
       // made this 1.5 to fail less often
       EXPECT_LT(c->split_potential_scale_reduction(param), 1.5) 
@@ -343,8 +321,7 @@ TYPED_TEST_P(Model_Test_Fixture, ChainsTest) {
   }
 }
 
-
-TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTest) {
+static void test_expected_values(int i) {
   using std::vector;
   using std::pair;
   using std::sqrt;
@@ -355,19 +332,19 @@ TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTest) {
   using boost::math::binomial;
   using boost::math::quantile;
   
-  vector<pair<int, double> > expected_values = TypeParam::get_expected_values();
+  vector<pair<int, double> > expected_values = get_expected_values();
   int n = expected_values.size();
   if (n == 0)
     return;
 
-  stan::mcmc::chains<> *c = TypeParam::chains;
+  stan::mcmc::chains<> *c = chains[i];
   double alpha = 0.05;
   if (n == 1) 
     alpha = 0.0005;
   
   int failed = 0;
   std::stringstream err_message;
-  for (int i = TypeParam::skip; i < n; i++) {
+  for (int i = skip; i < n; i++) {
     int index = expected_values[i].first;
     double expected_mean = expected_values[i].second;
 
@@ -416,9 +393,9 @@ TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTest) {
   // (if all the parameters are failing independently... ha)
   if (p < 0.001) {
     err_message << "------------------------------------------------------------\n";
-    for (int chain = 0; chain < TypeParam::num_chains; chain++) {
+    for (int chain = 0; chain < num_chains; chain++) {
       std::vector<std::pair<std::string, std::string> > options = 
-        parse_command_output(TypeParam::command_outputs[chain]);
+        parse_command_output(command_outputs[chain]);
 
       for (int option = 0; option < options.size(); option++) {
         if (options[option].first == "seed")
@@ -436,10 +413,115 @@ TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTest) {
   }
 }
 
+};
+  
+template<class Derived> 
+std::vector<stan::mcmc::chains<> *>Model_Test_Fixture<Derived>::chains;
+
+template<class Derived>
+int Model_Test_Fixture<Derived>::num_chains = 4;
+
+template<class Derived>
+std::string Model_Test_Fixture<Derived>::model_path;
+
+template<class Derived>
+std::vector<std::string> Model_Test_Fixture<Derived>::command_outputs;
+
+template<class Derived>
+const int Model_Test_Fixture<Derived>::skip = 3;
+
+template<class Derived>
+long Model_Test_Fixture<Derived>::elapsed_milliseconds = 0;
+
+template<class Derived>
+int Model_Test_Fixture<Derived>::sampler_n = 0;
+
+template<class Derived>
+std::vector<std::string> Model_Test_Fixture<Derived>::sampler_names;
+
+
+TYPED_TEST_CASE_P(Model_Test_Fixture);
+
+TYPED_TEST_P(Model_Test_Fixture, TestGradientNUTS) {
+  TypeParam::sampler_n = 0;
+  TypeParam::test_gradient(0);
+}
+TYPED_TEST_P(Model_Test_Fixture, RunModelNUTS) {
+  TypeParam::run_model(0);
+  TypeParam::write_results(0);
+}
+TYPED_TEST_P(Model_Test_Fixture, ChainsTestNUTS) {
+  TypeParam::chains_test(0);
+}
+TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTestNUTS) {
+  TypeParam::test_expected_values(0);
+}
+
+
+TYPED_TEST_P(Model_Test_Fixture, TestGradientUnitMetro) {
+  TypeParam::sampler_n = 1;
+  TypeParam::test_gradient(1);
+}
+TYPED_TEST_P(Model_Test_Fixture, RunModelUnitMetro) {
+  TypeParam::run_model(1);
+  TypeParam::write_results(1);
+}
+TYPED_TEST_P(Model_Test_Fixture, ChainsTestUnitMetro) {
+  TypeParam::chains_test(1);
+}
+TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTestUnitMetro) {
+  TypeParam::test_expected_values(1);
+}
+
+
+TYPED_TEST_P(Model_Test_Fixture, TestGradientDiagMetro) {
+  TypeParam::sampler_n = 2;
+  TypeParam::test_gradient(2);
+}
+TYPED_TEST_P(Model_Test_Fixture, RunModelDiagMetro) {
+  TypeParam::run_model(2);
+  TypeParam::write_results(2);
+}
+TYPED_TEST_P(Model_Test_Fixture, ChainsTestDiagMetro) {
+  TypeParam::chains_test(2);
+}
+TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTestDiagMetro) {
+  TypeParam::test_expected_values(2);
+}
+
+
+
+TYPED_TEST_P(Model_Test_Fixture, TestGradientDenseMetro) {
+  TypeParam::sampler_n = 3;
+  TypeParam::test_gradient(3);
+}
+TYPED_TEST_P(Model_Test_Fixture, RunModelDenseMetro) {
+  TypeParam::run_model(3);
+  TypeParam::write_results(3);
+}
+TYPED_TEST_P(Model_Test_Fixture, ChainsTestDenseMetro) {
+  TypeParam::chains_test(3);
+}
+TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTestDenseMetro) {
+  TypeParam::test_expected_values(3);
+}
+
 REGISTER_TYPED_TEST_CASE_P(Model_Test_Fixture,
-                           TestGradient,
-                           RunModel,
-                           ChainsTest,
-                           ExpectedValuesTest);
+                           TestGradientNUTS,
+                           RunModelNUTS,
+                           ChainsTestNUTS,
+                           ExpectedValuesTestNUTS,
+                           TestGradientUnitMetro,
+                           RunModelUnitMetro,
+                           ChainsTestUnitMetro,
+                           ExpectedValuesTestUnitMetro,
+                           TestGradientDiagMetro,
+                           RunModelDiagMetro,
+                           ChainsTestDiagMetro,
+                           ExpectedValuesTestDiagMetro,
+                           TestGradientDenseMetro,
+                           RunModelDenseMetro,
+                           ChainsTestDenseMetro,
+                           ExpectedValuesTestDenseMetro);
 
 #endif
