@@ -27,7 +27,7 @@ namespace stan {
 
         sample s = dense_metro<M, BaseRNG>::transition(init_sample);
         
-        if (this->_adapt_flag) {
+        if (_adapt_flag) {
           
           this->_stepsize_adaptation.learn_stepsize(this->_nom_epsilon, 
                                                     s.accept_stat());

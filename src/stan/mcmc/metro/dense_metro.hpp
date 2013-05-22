@@ -26,16 +26,14 @@ namespace stan {
 
       void propose(std::vector<double>& q,
                    BaseRNG& rng) {
-        Eigen::VectorXd init(q.size());
-        for(size_t i = 0; i < q.size(); i++)
-           init(i) = q[i];
+        Eigen::VectorXd ze(q.size());
+        ze.setZero();
 
         Eigen::VectorXd prop(q.size());
-        prop = this->_nom_epsilon 
-          * stan::prob::multi_normal_rng(init, _prop_cov, this->_rand_int);
+        prop = stan::prob::multi_normal_rng(ze, _prop_cov, rng);
 
         for(size_t i = 0; i < q.size(); i++)
-          q[i] = prop(i);
+          q[i] = q[i] + this->_nom_epsilon * prop(i);
 
         try {
           this->_log_prob = this->log_prob(q, this->_params_i);
@@ -43,13 +41,10 @@ namespace stan {
           this->_write_error_msg(this->_err_stream, e);
           this->_log_prob = std::numeric_limits<double>::infinity();
         }
-
-          // std::cout<<"covariance matrix:" <<_prop_cov(0, 0)<<","<<_prop_cov(0,1) << std::endl;
-          // std::cout<<_prop_cov(1, 0)<<","<<_prop_cov(1,1) << std::endl;
       }                                  
                    
       void write_metric(std::ostream& o) {
-        //o << "# Inverse covariance matrix elements:" << std::endl;
+        //o << "# covariance matrix elements:" << std::endl;
         o << "# Elements of inverse covariance matrix:" << std::endl;
         for(size_t i = 0; i < _prop_cov.rows(); ++i) {
           o << "# " << _prop_cov(i, 0) << std::flush;

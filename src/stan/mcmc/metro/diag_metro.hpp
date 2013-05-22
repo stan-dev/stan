@@ -27,8 +27,8 @@ namespace stan {
                     BaseRNG& rng) {
 
         for (size_t i = 0; i < q.size(); ++i) 
-          q[i] = stan::prob::normal_rng(q[i],this->_nom_epsilon * _prop_cov_diag(i),
-                                        this->_rand_int);
+          q[i] = stan::prob::normal_rng(q[i],this->_nom_epsilon 
+                                        * _prop_cov_diag(i), this->_rand_int);
 
         try {
           this->_log_prob = this->log_prob(q, this->_params_i);
@@ -36,13 +36,10 @@ namespace stan {
           this->_write_error_msg(this->_err_stream, e);
           this->_log_prob = -std::numeric_limits<double>::infinity();
         }
-
-        std::cout<<"step_size:"<<this->_nom_epsilon<<std::endl;
-        std::cout<<"diags of covariance:" <<_prop_cov_diag(0)<<","<<_prop_cov_diag(1) << std::endl;
       }
 
       void write_metric(std::ostream& o) {
-        o << "# Diagonal elements of inverse covariance matrix:" << std::endl;
+        o << "# Diagonal elements of covariance matrix:" << std::endl;
         o << "# " << _prop_cov_diag(0) << std::flush;
         for(size_t i = 1; i < _prop_cov_diag.size(); ++i)
           o << ", " << _prop_cov_diag(i) << std::flush;

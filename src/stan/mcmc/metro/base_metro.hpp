@@ -52,18 +52,15 @@ namespace stan {
 
        this->propose(_params_r, _rand_int);
 
-       double accept_prob = exp(_log_prob - logp0);
+       double accept_prob = std::exp(_log_prob - logp0);
 
-       double accept = true;
        if (accept_prob < 1 && this->_rand_uniform() > accept_prob) {
          _params_r = init_sample.cont_params();
          _log_prob = logp0;
-         accept = false;
        }
 
        accept_prob = accept_prob > 1 ? 1 : accept_prob;
-       std::cout<<"step_size:"<<this->_nom_epsilon<<std::endl;
-       std::cout<<"logp:"<<log_prob(_params_r,_params_i)<<std::endl;
+
        return sample(_params_r, 
                      _params_i,
                      _log_prob,
@@ -82,7 +79,6 @@ namespace stan {
         double log_p0 = _log_prob;
 
         this->propose(_params_r, _rand_int);        
-          
         double delta_log_p = _log_prob - log_p0;
 
         int direction = delta_log_p > std::log(0.5) ? 1 : -1;
@@ -91,11 +87,10 @@ namespace stan {
           this->seed(params_r0, params_i0);
 
           this->propose(_params_r, _rand_int);
-          double log_p0 = _log_prob;
+          log_p0 = _log_prob;
 
           this->propose(_params_r, _rand_int);        
-
-          double delta_log_p = _log_prob - log_p0;
+          delta_log_p = _log_prob - log_p0;
 
           if ((direction == 1) && !(delta_log_p > std::log(0.5)))
             break;
@@ -161,11 +156,23 @@ namespace stan {
 
       double _log_prob;
 
-      std::ostream* _error_msg;
-
       void _write_error_msg(std::ostream* error_msgs,
                            const std::domain_error& e) {
-    }
+          if (!error_msgs) return;
+          
+          *error_msgs << std::endl
+                      << "Informational Message: The parameter state is about to be Metropolis"
+                      << " rejected due to the following underlying, non-fatal (really)"
+                      << " issue (and please ignore that what comes next might say 'error'): "
+                      << e.what()
+                      << std::endl
+                      << "If the problem persists across multiple draws, you might have"
+                      << " a problem with an initial state."
+                      << std::endl
+                      << " If the problem does not persist, the resulting samples will still"
+                      << " be drawn from the posterior."
+                      << std::endl;
+      }
 
       void _sample_stepsize() {
         this->_epsilon = this->_nom_epsilon;
