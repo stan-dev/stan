@@ -18,9 +18,6 @@ FOR NEXT RELEASE (1.3.0++)
 
 - (Daniel) fix bin/print spacing
 
-- (Daniel) validate shuffling tests is OK w. Jenkins
-  [see Ben's e-mail of 5/4/13 at 6:09 PM]
-
 - sort out low ESS in new diagonal adaptation
 
 - sort out rank, etc. from Marco

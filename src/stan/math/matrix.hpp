@@ -53,6 +53,7 @@
 #include <stan/math/matrix/prod.hpp>
 #include <stan/math/matrix/promote_common.hpp>
 #include <stan/math/matrix/promoter.hpp>
+#include <stan/math/matrix/rank.hpp>
 #include <stan/math/matrix/resize.hpp>
 #include <stan/math/matrix/row.hpp>
 #include <stan/math/matrix/rows.hpp>
@@ -63,6 +64,7 @@
 #include <stan/math/matrix/singular_values.hpp>
 #include <stan/math/matrix/size.hpp>
 #include <stan/math/matrix/softmax.hpp>
+#include <stan/math/matrix/sort.hpp>
 #include <stan/math/matrix/stan_print.hpp>
 #include <stan/math/matrix/sub_col.hpp>
 #include <stan/math/matrix/sub_row.hpp>
