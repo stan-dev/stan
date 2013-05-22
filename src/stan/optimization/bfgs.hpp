@@ -443,7 +443,7 @@ namespace stan {
       size_t fevals() const { return _fevals; }
       int operator()(const Eigen::Matrix<double,Eigen::Dynamic,1> &x, double &f) {
         _x.resize(x.size());
-        for (size_t i = 0; i < x.size(); i++)
+        for (Eigen::Matrix<double,Eigen::Dynamic,1>::size_type i = 0; i < x.size(); i++)
           _x[i] = x[i];
 
         try {
@@ -465,7 +465,7 @@ namespace stan {
       }
       int operator()(const Eigen::Matrix<double,Eigen::Dynamic,1> &x, double &f, Eigen::Matrix<double,Eigen::Dynamic,1> &g) {
         _x.resize(x.size());
-        for (size_t i = 0; i < x.size(); i++)
+        for (Eigen::Matrix<double,Eigen::Dynamic,1>::size_type i = 0; i < x.size(); i++)
           _x[i] = x[i];
         
         _fevals++;
@@ -530,13 +530,15 @@ namespace stan {
       void grad(std::vector<double>& g) { 
         const BFGSMinimizer<ModelAdaptor>::VectorT &cg(curr_g());
         g.resize(cg.size());
-        for (size_t i = 0; i < cg.size(); i++)
+        for (BFGSMinimizer<ModelAdaptor>::VectorT::size_type i = 0;
+             i < cg.size(); i++)
           g[i] = -cg[i];
       }
       void params_r(std::vector<double>& x) {
         const BFGSMinimizer<ModelAdaptor>::VectorT &cx(curr_x());
         x.resize(cx.size());
-        for (size_t i = 0; i < cx.size(); i++)
+        for (BFGSMinimizer<ModelAdaptor>::VectorT::size_type i = 0; 
+             i < cx.size(); i++)
           x[i] = cx[i];
       }
     };

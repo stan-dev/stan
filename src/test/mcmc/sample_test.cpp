@@ -11,7 +11,7 @@ TEST(McmcSample, size_cont) {
   
   stan::mcmc::sample s(q, r, log_prob, accept_stat);
   
-  EXPECT_EQ(q.size(), s.size_cont());
+  EXPECT_EQ(static_cast<int>(q.size()), s.size_cont());
   
 }
 
@@ -54,7 +54,7 @@ TEST(McmcSample, size_disc) {
   
   stan::mcmc::sample s(q, r, log_prob, accept_stat);
   
-  EXPECT_EQ(r.size(), s.size_disc());
+  EXPECT_EQ(static_cast<int>(r.size()), s.size_disc());
   
 }
 

@@ -29,8 +29,8 @@ namespace stan {
           _N = A.rows();
           
           size_t pos = 0;
-          for (size_type j = 0; j < _N; j++) {
-            for (size_type i = 0; i < _N; i++) {
+          for (size_t j = 0; j < _N; j++) {
+            for (size_t i = 0; i < _N; i++) {
               Ad(i,j) = A(i,j).val();
               _variARef[pos++] = A(i,j).vi_;
             }
@@ -99,8 +99,8 @@ namespace stan {
           _alloc_ldlt->_ldlt.solveInPlace(invA);
 
           size_t pos = 0;
-          for (size_type j = 0; j < _alloc_ldlt->_N; j++) {
-            for (size_type i = 0; i < _alloc_ldlt->_N; i++) {
+          for (size_t j = 0; j < _alloc_ldlt->_N; j++) {
+            for (size_t i = 0; i < _alloc_ldlt->_N; i++) {
               _alloc_ldlt->_variARef[pos++]->adj_ += adj_ * invA(i,j);
             }
           }

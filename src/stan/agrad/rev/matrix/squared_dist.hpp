@@ -24,7 +24,8 @@ namespace stan {
         inline static double var_squared_dist(const Eigen::Matrix<var,R1,C1> &v1,
                                               const Eigen::Matrix<var,R2,C2> &v2) {
           double result = 0;
-          for (size_t i = 0; i < v1.size(); i++) {
+          for (typename Eigen::Matrix<var,R1,C1>::size_type i = 0;
+               i < v1.size(); i++) {
             double diff = v1(i).vi_->val_ - v2(i).vi_->val_;
             result += diff*diff;
           }
@@ -62,7 +63,8 @@ namespace stan {
         inline static double var_squared_dist(const Eigen::Matrix<var,R1,C1> &v1,
                                               const Eigen::Matrix<double,R2,C2> &v2) {
           double result = 0;
-          for (size_t i = 0; i < v1.size(); i++) {
+          for (typename Eigen::Matrix<var,R1,C1>::size_type i = 0; 
+               i < v1.size(); i++) {
             double diff = v1(i).vi_->val_ - v2(i);
             result += diff*diff;
           }

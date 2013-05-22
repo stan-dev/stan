@@ -66,13 +66,13 @@ TEST(MathMatrixBlock,HeadStdVector1) {
   using stan::math::head;
   std::vector<int> v;
   v.push_back(1); v.push_back(2); v.push_back(3);
-  EXPECT_EQ(0, head(v,0).size());
+  EXPECT_EQ(0U, head(v,0).size());
 }
 TEST(MathMatrixBlock,HeadStdVector2) {
   using stan::math::head;
   std::vector<int> v;
   v.push_back(1); v.push_back(2); v.push_back(3);
-  EXPECT_EQ(3, head(v,3).size());
+  EXPECT_EQ(3U, head(v,3).size());
 }
 TEST(MathMatrixBlock,HeadStdVector3) {
   using stan::math::head;
@@ -85,7 +85,7 @@ TEST(MathMatrixBlock,HeadStdVector4) {
   std::vector<int> v;
   v.push_back(1); v.push_back(2); v.push_back(3);
   std::vector<int> v01 = head(v,2);
-  EXPECT_EQ(2,v01.size());
+  EXPECT_EQ(2U, v01.size());
   for (int n = 0; n < 2; ++n)
     EXPECT_FLOAT_EQ(v[n],v01[n]);
 }
