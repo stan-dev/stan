@@ -45,7 +45,8 @@ namespace stan {
         boost::variate_generator<BaseRNG&, boost::normal_distribution<> > 
           _rand_diag_gaus(rng, boost::normal_distribution<>());
         
-        for (size_t i = 0; i < z.p.size(); ++i) z.p(i) = _rand_diag_gaus() / sqrt(z.mInv(i));
+        for (int i = 0; i < z.p.size(); ++i) 
+          z.p(i) = _rand_diag_gaus() / sqrt(z.mInv(i));
 
       }
       

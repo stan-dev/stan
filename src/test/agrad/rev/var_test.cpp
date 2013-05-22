@@ -66,7 +66,7 @@ TEST(AgradRev, stackAllocation) {
   VEC g;
   f.grad(x,g);
   
-  EXPECT_EQ(2,g.size());
+  EXPECT_EQ(2U,g.size());
   EXPECT_FLOAT_EQ(2.0,g[0]);
   EXPECT_FLOAT_EQ(1.0,g[1]);
 }

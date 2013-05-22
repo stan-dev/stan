@@ -29,8 +29,9 @@ namespace stan {
           _N = A.rows();
           _variA.resize(A.rows(),A.cols());
           
-          for (size_type j = 0; j < _N; j++) {
-            for (size_type i = 0; i < _N; i++) {
+          size_t pos = 0;
+          for (size_t j = 0; j < _N; j++) {
+            for (size_t i = 0; i < _N; i++) {
               Ad(i,j) = A(i,j).val();
               _variA(i,j) = A(i,j).vi_;
             }
@@ -105,8 +106,8 @@ namespace stan {
           invA.setIdentity(_alloc_ldlt->_N, _alloc_ldlt->_N);
           _alloc_ldlt->_ldlt.solveInPlace(invA);
 
-          for (size_type j = 0; j < _alloc_ldlt->_N; j++) {
-            for (size_type i = 0; i < _alloc_ldlt->_N; i++) {
+          for (size_t j = 0; j < _alloc_ldlt->_N; j++) {
+            for (size_t i = 0; i < _alloc_ldlt->_N; i++) {
               _alloc_ldlt->_variA(i,j)->adj_ += adj_ * invA(i,j);
             }
           }

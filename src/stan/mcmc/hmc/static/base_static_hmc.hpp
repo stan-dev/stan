@@ -43,10 +43,8 @@ namespace stan {
         
         double acceptProb = std::exp(H0 - this->_hamiltonian.H(this->_z));
         
-        double accept = true;
         if (acceptProb < 1 && this->_rand_uniform() > acceptProb) {
           this->_z.copy_base(z_init);
-          accept = false;
         }
         
         acceptProb = acceptProb > 1 ? 1 : acceptProb;
