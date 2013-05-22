@@ -109,7 +109,7 @@ int main(int argc, const char* argv[]) {
   thin(0) = stan_csv.metadata.thin;
   
 
-  for (typename std::vector<std::string>::size_type chain = 1; 
+  for (std::vector<std::string>::size_type chain = 1; 
        chain < filenames.size(); chain++) {
     ifstream.open(filenames[chain].c_str());
     stan_csv = stan::io::stan_csv_reader::parse(ifstream);

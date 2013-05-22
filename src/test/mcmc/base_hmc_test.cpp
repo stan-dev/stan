@@ -74,7 +74,7 @@ TEST(McmcBaseHMC, seed) {
   
   sampler.seed(q_seed, r);
   
-  for (typename std::vector<double>::size_type i = 0; i < q.size(); ++i)
+  for (std::vector<double>::size_type i = 0; i < q.size(); ++i)
     EXPECT_EQ(q_seed.at(i), sampler.z().q.at(i));
   
 }
