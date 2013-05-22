@@ -804,6 +804,28 @@ equal to \code{a[m,n]} where it is defined, for \code{j} in \code{1:3},
 \code{k} in \code{1:4}, \code{m} in \code{1:5}, and \code{n} in
 \code{1:6}.
 
+\section{Other functions}
+\begin{description}
+%
+\fitem{real[]}{sort\_asc}{real[] \farg{v}}{
+Sort the elements of \farg{v} in ascending order}
+%
+\fitem{int[]}{sort\_asc}{int[] \farg{v}}{
+Sort the elements of \farg{v} in ascending order}
+%
+\fitem{real[]}{sort\_desc}{real[] \farg{v}}{
+Sort the elements of \farg{v} in descending order}
+%
+\fitem{int[]}{sort\_desc}{int[] \farg{v}}{
+Sort the elements of \farg{v} in descending order}
+%
+\fitem{int}{rank}{real[] \farg{v}, int \farg{s}}{
+Number of components of \farg{v} less than \farg{v[s]}}
+%
+\fitem{int}{rank}{int[] \farg{v}, int \farg{s}}{
+Number of components of \farg{v} less than \farg{v[s]}}
+%
+\end{description}
 
 \chapter{Matrix Operations}\label{matrix-operations.chapter}
 \noindent
@@ -1584,3 +1606,26 @@ The singular values of \farg{A} in descending order}
 
 \end{description}
 
+
+\section{Other functions}
+\begin{description}
+%
+\fitem{vector}{sort\_asc}{vector \farg{v}}{
+Sort the elements of \farg{v} in ascending order}
+%
+\fitem{row\_vector}{sort\_asc}{row\_vector \farg{v}}{
+Sort the elements of \farg{v} in ascending order}
+%
+\fitem{vector}{sort\_desc}{vector \farg{v}}{
+Sort the elements of \farg{v} in descending order}
+%
+\fitem{row\_vector}{sort\_desc}{row\_vector \farg{v}}{
+Sort the elements of \farg{v} in descending order}
+%
+\fitem{int}{rank}{vector \farg{v}, int \farg{s}}{
+Number of components of \farg{v} less than \farg{v[s]}}
+%
+\fitem{int}{rank}{row\_vector \farg{v}, int \farg{s}}{
+Number of components of \farg{v} less than \farg{v[s]}}
+%
+\end{description}

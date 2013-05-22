@@ -456,6 +456,10 @@ add("prod",DOUBLE_T,expr_type(DOUBLE_T,1));
 add("prod",DOUBLE_T,VECTOR_T);
 add("prod",DOUBLE_T,ROW_VECTOR_T);
 add("prod",DOUBLE_T,MATRIX_T);
+add("rank",INT_T,expr_type(INT_T,1),INT_T);
+add("rank",INT_T,expr_type(DOUBLE_T,1),INT_T);
+add("rank",INT_T,VECTOR_T,INT_T);
+add("rank",INT_T,ROW_VECTOR_T,INT_T);
 for (size_t i = 0; i < base_types.size(); ++i) {
   add("rep_array",expr_type(base_types[i],1), base_types[i], INT_T);
   add("rep_array",expr_type(base_types[i],2), base_types[i], INT_T,INT_T);
@@ -525,6 +529,14 @@ for (size_t i = 0; i < vector_types.size(); ++i) {
 }
 add_ternary("skew_normal_rng");
 add("softmax",VECTOR_T,VECTOR_T);
+add("sort_asc",expr_type(INT_T,1),expr_type(INT_T,1));
+add("sort_asc",expr_type(DOUBLE_T,1),expr_type(DOUBLE_T,1));
+add("sort_asc",VECTOR_T,VECTOR_T);
+add("sort_asc",ROW_VECTOR_T,ROW_VECTOR_T);
+add("sort_desc",expr_type(INT_T,1),expr_type(INT_T,1));
+add("sort_desc",expr_type(DOUBLE_T,1),expr_type(DOUBLE_T,1));
+add("sort_desc",VECTOR_T,VECTOR_T);
+add("sort_desc",ROW_VECTOR_T,ROW_VECTOR_T);
 add_unary("sqrt");
 add_nullary("sqrt2");
 add_unary("square");
