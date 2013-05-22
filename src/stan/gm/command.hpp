@@ -738,13 +738,11 @@ namespace stan {
         
         double lp = ng.logp();
         
-        double lastlp = lp - 1;
         std::cout << "initial log joint probability = " << lp << std::endl;
         int m = 0;
         int ret = 0;
         for (size_t i = 0; i < num_iterations && ret == 0; i++) {
           ret = ng.step();
-          lastlp = lp;
           lp = ng.logp();
           ng.params_r(cont_params);
           if (do_print(i, 50*refresh)) {
