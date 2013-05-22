@@ -215,8 +215,8 @@ public:
   }
 
   static std::vector<std::pair<int, double> >
-  get_expected_values() {
-    return Derived::get_expected_values();
+  get_expected_values(int i) {
+    return Derived::get_expected_values(i);
   }
 
   static bool is_results_empty() {
@@ -332,7 +332,7 @@ static void test_expected_values(int i) {
   using boost::math::binomial;
   using boost::math::quantile;
   
-  vector<pair<int, double> > expected_values = get_expected_values();
+  vector<pair<int, double> > expected_values = get_expected_values(i);
   int n = expected_values.size();
   if (n == 0)
     return;
