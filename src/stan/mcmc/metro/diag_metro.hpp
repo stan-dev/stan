@@ -27,15 +27,7 @@ namespace stan {
                     BaseRNG& rng) {
 
         for (size_t i = 0; i < q.size(); ++i) 
-          q[i] = stan::prob::normal_rng(q[i],this->_nom_epsilon 
-                                        * _prop_cov_diag(i), this->_rand_int);
-
-        try {
-          this->_log_prob = this->log_prob(q, this->_params_i);
-        } catch (std::domain_error e) {
-          this->_write_error_msg(this->_err_stream, e);
-          this->_log_prob = -std::numeric_limits<double>::infinity();
-        }
+          q[i] = q[i] + this->_nom_epsilon * stan::prob::normal_rng(0,_prop_cov_diag(i), this->_rand_int);
       }
 
       void write_metric(std::ostream& o) {

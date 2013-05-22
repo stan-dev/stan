@@ -24,13 +24,6 @@ namespace stan {
         for (size_t i = 0; i < q.size(); ++i) 
           q[i] = stan::prob::normal_rng(q[i],this->_nom_epsilon,
                                         this->_rand_int);
-
-        try {
-          this->_log_prob = this->log_prob(q, this->_params_i);
-        } catch (std::domain_error e) {
-          this->_write_error_msg(this->_err_stream, e);
-          this->_log_prob = std::numeric_limits<double>::infinity();
-        }
       }
 
       void write_metric(std::ostream& o) {
