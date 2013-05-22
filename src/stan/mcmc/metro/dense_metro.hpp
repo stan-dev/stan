@@ -18,8 +18,9 @@ namespace stan {
                   std::ostream* o = &std::cout, 
                   std::ostream* e = 0)
         : base_metro<M, BaseRNG>(m, rng, o, e),
-          _prop_cov(Eigen::MatrixXd::Identity(m.num_params_r(), m.num_params_r())) { 
-        this->_name = "Metropolis with a dense Euclidean metric"; 
+          _prop_cov(Eigen::MatrixXd::Identity(m.num_params_r(), 
+                                              m.num_params_r())) { 
+        this->_name = "Metropolis with a dense metric"; 
         this->_nom_epsilon = 1;
       }
 
@@ -35,6 +36,16 @@ namespace stan {
 
         for(size_t i = 0; i < q.size(); i++)
           q[i] = prop(i);
+
+        try {
+          this->_log_prob = this->log_prob(q, this->_params_i);
+        } catch (std::domain_error e) {
+          this->_write_error_msg(this->_err_stream, e);
+          this->_log_prob = std::numeric_limits<double>::infinity();
+        }
+
+          // std::cout<<"covariance matrix:" <<_prop_cov(0, 0)<<","<<_prop_cov(0,1) << std::endl;
+          // std::cout<<_prop_cov(1, 0)<<","<<_prop_cov(1,1) << std::endl;
       }                                  
                    
       void write_metric(std::ostream& o) {

@@ -48,27 +48,25 @@ namespace stan {
 
        this->seed(init_sample.cont_params(), init_sample.disc_params());
 
-       std::vector<double> init_point(_params_r.size());
-       init_point = _params_r;
-
        double logp0 = log_prob(_params_r, _params_i);
 
        this->propose(_params_r, _rand_int);
 
-       double accept_prob = exp(log_prob(_params_r, _params_i) 
-                                - logp0);
+       double accept_prob = exp(_log_prob - logp0);
 
        double accept = true;
        if (accept_prob < 1 && this->_rand_uniform() > accept_prob) {
-         _params_r = init_point;
+         _params_r = init_sample.cont_params();
+         _log_prob = logp0;
          accept = false;
        }
 
        accept_prob = accept_prob > 1 ? 1 : accept_prob;
-
+       std::cout<<"step_size:"<<this->_nom_epsilon<<std::endl;
+       std::cout<<"logp:"<<log_prob(_params_r,_params_i)<<std::endl;
        return sample(_params_r, 
                      _params_i,
-                     log_prob(_params_r, _params_i),
+                     _log_prob,
                      accept_prob);
      }
 
@@ -81,29 +79,27 @@ namespace stan {
         std::vector<int> params_i0(_params_i);
 
         this->propose(_params_r, _rand_int);
-        double log_p0 = log_prob(_params_r, _params_i);
+        double log_p0 = _log_prob;
 
         this->propose(_params_r, _rand_int);        
+          
+        double delta_log_p = _log_prob - log_p0;
 
-        double log_p = log_prob(_params_r, _params_i);
-        double delta_log_p = log_p0 - log_p;
-
-        int direction = delta_log_p > log(0.5) ? 1 : -1;
-        
-        while (1) {                  
+        int direction = delta_log_p > std::log(0.5) ? 1 : -1;
+        while (1) {    
+              
           this->seed(params_r0, params_i0);
 
           this->propose(_params_r, _rand_int);
-          double log_p0 = log_prob(_params_r, _params_i);
+          double log_p0 = _log_prob;
 
           this->propose(_params_r, _rand_int);        
 
-          double log_p = log_prob(_params_r, _params_i);
-          double delta_log_p = log_p0 - log_p;
-                
-          if ((direction == 1) && !(delta_log_p > log(0.5)))
+          double delta_log_p = _log_prob - log_p0;
+
+          if ((direction == 1) && !(delta_log_p > std::log(0.5)))
             break;
-          else if ((direction == -1) && !(delta_log_p < log(0.5)))
+          else if ((direction == -1) && !(delta_log_p < std::log(0.5)))
             break;
           else
             this->_nom_epsilon = ( (direction == 1)
@@ -162,6 +158,9 @@ namespace stan {
       double _nom_epsilon;
       double _epsilon;
       double _epsilon_jitter;
+
+      double _log_prob;
+
       std::ostream* _error_msg;
 
       void _write_error_msg(std::ostream* error_msgs,

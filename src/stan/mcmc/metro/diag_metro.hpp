@@ -19,15 +19,26 @@ namespace stan {
                  std::ostream* e = 0)
         : base_metro<M, BaseRNG>(m, rng, o, e),
           _prop_cov_diag(Eigen::VectorXd::Ones(m.num_params_r())) { 
-        this->_name = "Metropolis with a diagonal Euclidean metric"; 
+        this->_name = "Metropolis with a diagonal metric"; 
         this->_nom_epsilon = 1;
       }
 
       void propose(std::vector<double>& q,
                     BaseRNG& rng) {
+
         for (size_t i = 0; i < q.size(); ++i) 
           q[i] = stan::prob::normal_rng(q[i],this->_nom_epsilon * _prop_cov_diag(i),
                                         this->_rand_int);
+
+        try {
+          this->_log_prob = this->log_prob(q, this->_params_i);
+        } catch (std::domain_error e) {
+          this->_write_error_msg(this->_err_stream, e);
+          this->_log_prob = -std::numeric_limits<double>::infinity();
+        }
+
+        std::cout<<"step_size:"<<this->_nom_epsilon<<std::endl;
+        std::cout<<"diags of covariance:" <<_prop_cov_diag(0)<<","<<_prop_cov_diag(1) << std::endl;
       }
 
       void write_metric(std::ostream& o) {
