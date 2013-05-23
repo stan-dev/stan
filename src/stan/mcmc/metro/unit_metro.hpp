@@ -16,8 +16,10 @@ namespace stan {
       unit_metro(M& m, BaseRNG& rng,
                  std::ostream* o = &std::cout, 
                  std::ostream* e = 0)
-        : base_metro<M, BaseRNG>(m, rng, o, e)
-      { this->_name = "Metropolis with a unit metric"; }
+        : base_metro<M, BaseRNG>(m, rng, o, e) { 
+        this->_name = "Metropolis with a unit metric"; 
+        this->_nom_epsilon = 1;
+      }
 
       void propose(std::vector<double>& q,
                     BaseRNG& rng) {
