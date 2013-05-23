@@ -23,25 +23,30 @@ public:
     return false;
   }
 
-  static int num_iterations() {
-    return 8000;
+  static int num_iterations(int i) {
+    std::vector<int> num_iter;
+    num_iter.push_back(8000); //iterations for nuts
+    num_iter.push_back(80000); //iterations for unit_metro
+    num_iter.push_back(80000); //iterations for diag_metro
+    num_iter.push_back(80000); //iterations for dense_metro
+    return num_iter[i];
   }
 
-  static std::vector<int> skip_chains_test() {
+  static std::vector<int> skip_chains_test(int i) {
     std::vector<int> params_to_skip;
     return params_to_skip;
   }
 
-  static void populate_chains() {
-    default_populate_chains();
+  static void populate_chains(int i) {
+    default_populate_chains(i);
   }
 
   static std::vector<std::pair<int, double> >
-  get_expected_values() {
+  get_expected_values(int i) {
     using std::make_pair;
     std::vector<std::pair<int, double> > expected_values;
     
-    expected_values.push_back(make_pair(chains->index("y"), 
+    expected_values.push_back(make_pair(chains[i]->index("y"), 
           0.25*0.0 + 0.75*4));
     
     return expected_values;

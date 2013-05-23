@@ -22,41 +22,46 @@ public:
     return false;
   }
 
-  static int num_iterations() {
-    return 8000;
+  static int num_iterations(int i) {
+    std::vector<int> num_iter;
+    num_iter.push_back(2000); //iterations for nuts
+    num_iter.push_back(100000); //iterations for unit_metro
+    num_iter.push_back(100000); //iterations for diag_metro
+    num_iter.push_back(100000); //iterations for dense_metro
+    return num_iter[i];
   }
 
-  static std::vector<int> skip_chains_test() {
+  static std::vector<int> skip_chains_test(int i) {
     std::vector<int> params_to_skip;
     return params_to_skip;
   }
 
-  static void populate_chains() {
-    default_populate_chains();
+  static void populate_chains(int i) {
+    default_populate_chains(i);
   }
 
   static std::vector<std::pair<int, double> >
-  get_expected_values() {
+  get_expected_values(int i) {
     using std::make_pair;
     std::vector<std::pair<int, double> > expected_values;
     double nu = 10;
     
-    expected_values.push_back(make_pair(chains->index("W[1,1]"), 2.9983662 * nu)); // W[1,1]
-    expected_values.push_back(make_pair(chains->index("W[1,2]"), 0.2898776 * nu)); // W[1,2]
-    expected_values.push_back(make_pair(chains->index("W[1,3]"), -2.650523 * nu)); // W[1,3]
-    expected_values.push_back(make_pair(chains->index("W[1,4]"), 0.1055911 * nu)); // W[1,4]
-    expected_values.push_back(make_pair(chains->index("W[2,1]"), 0.2898776 * nu)); // W[2,1]
-    expected_values.push_back(make_pair(chains->index("W[2,2]"), 11.4803610 * nu));// W[2,2]
-    expected_values.push_back(make_pair(chains->index("W[2,3]"), 7.157993 * nu));  // W[2,3]
-    expected_values.push_back(make_pair(chains->index("W[2,4]"), -3.1129955 * nu));// W[2,4]
-    expected_values.push_back(make_pair(chains->index("W[3,1]"), -2.650523 * nu)); // W[3,1]
-    expected_values.push_back(make_pair(chains->index("W[3,2]"), 7.157993 * nu));  // W[3,2]
-    expected_values.push_back(make_pair(chains->index("W[3,3]"), 11.676181 * nu)); // W[3,3]
-    expected_values.push_back(make_pair(chains->index("W[3,4]"), -3.5866852 * nu));// W[3,4]
-    expected_values.push_back(make_pair(chains->index("W[4,1]"), 0.1055911 * nu)); // W[4,1]
-    expected_values.push_back(make_pair(chains->index("W[4,2]"), -3.1129955 * nu));// W[4,2]
-    expected_values.push_back(make_pair(chains->index("W[4,3]"), -3.5866852 * nu));// W[4,3]
-    expected_values.push_back(make_pair(chains->index("W[4,4]"), 1.4482736 * nu)); // W[4,4]
+    expected_values.push_back(make_pair(chains[i]->index("W[1,1]"), 2.9983662 * nu)); // W[1,1]
+    expected_values.push_back(make_pair(chains[i]->index("W[1,2]"), 0.2898776 * nu)); // W[1,2]
+    expected_values.push_back(make_pair(chains[i]->index("W[1,3]"), -2.650523 * nu)); // W[1,3]
+    expected_values.push_back(make_pair(chains[i]->index("W[1,4]"), 0.1055911 * nu)); // W[1,4]
+    expected_values.push_back(make_pair(chains[i]->index("W[2,1]"), 0.2898776 * nu)); // W[2,1]
+    expected_values.push_back(make_pair(chains[i]->index("W[2,2]"), 11.4803610 * nu));// W[2,2]
+    expected_values.push_back(make_pair(chains[i]->index("W[2,3]"), 7.157993 * nu));  // W[2,3]
+    expected_values.push_back(make_pair(chains[i]->index("W[2,4]"), -3.1129955 * nu));// W[2,4]
+    expected_values.push_back(make_pair(chains[i]->index("W[3,1]"), -2.650523 * nu)); // W[3,1]
+    expected_values.push_back(make_pair(chains[i]->index("W[3,2]"), 7.157993 * nu));  // W[3,2]
+    expected_values.push_back(make_pair(chains[i]->index("W[3,3]"), 11.676181 * nu)); // W[3,3]
+    expected_values.push_back(make_pair(chains[i]->index("W[3,4]"), -3.5866852 * nu));// W[3,4]
+    expected_values.push_back(make_pair(chains[i]->index("W[4,1]"), 0.1055911 * nu)); // W[4,1]
+    expected_values.push_back(make_pair(chains[i]->index("W[4,2]"), -3.1129955 * nu));// W[4,2]
+    expected_values.push_back(make_pair(chains[i]->index("W[4,3]"), -3.5866852 * nu));// W[4,3]
+    expected_values.push_back(make_pair(chains[i]->index("W[4,4]"), 1.4482736 * nu)); // W[4,4]
 
     return expected_values;
   }

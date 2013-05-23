@@ -24,38 +24,43 @@ public:
     return true;
   }
 
-  static int num_iterations() {
-    return 8000;
+  static int num_iterations(int i) {
+    std::vector<int> num_iter;
+    num_iter.push_back(8000); //iterations for nuts
+    num_iter.push_back(200000); //iterations for unit_metro
+    num_iter.push_back(200000); //iterations for diag_metro
+    num_iter.push_back(200000); //iterations for dense_metro
+    return num_iter[i];
   }
 
-  static std::vector<int> skip_chains_test() {
+  static std::vector<int> skip_chains_test(int i) {
     std::vector<int> params_to_skip;
-    params_to_skip.push_back(chains->index("logRR[5]"));
+    params_to_skip.push_back(chains[i]->index("logRR[5]"));
     return params_to_skip;
   }
 
-  static void populate_chains() {
-    default_populate_chains();
+  static void populate_chains(int i) {
+    default_populate_chains(i);
   }
 
   static std::vector<std::pair<int, double> >
-  get_expected_values() {
+  get_expected_values(int i) {
     using std::make_pair;
     std::vector<std::pair<int, double> > expected_values;
 
-    expected_values.push_back(make_pair(chains->index("logRR[1]"), -1.075));
-    expected_values.push_back(make_pair(chains->index("logRR[2]"), -0.7717));
-    expected_values.push_back(make_pair(chains->index("logRR[3]"), -0.4721));
-    expected_values.push_back(make_pair(chains->index("logRR[4]"), -0.2016));
+    expected_values.push_back(make_pair(chains[i]->index("logRR[1]"), -1.075));
+    expected_values.push_back(make_pair(chains[i]->index("logRR[2]"), -0.7717));
+    expected_values.push_back(make_pair(chains[i]->index("logRR[3]"), -0.4721));
+    expected_values.push_back(make_pair(chains[i]->index("logRR[4]"), -0.2016));
     
-    expected_values.push_back(make_pair(chains->index("logRR[6]"), 0.1588));
-    expected_values.push_back(make_pair(chains->index("logRR[7]"), 0.319));
-    expected_values.push_back(make_pair(chains->index("logRR[8]"), 0.4829));
-    expected_values.push_back(make_pair(chains->index("logRR[9]"), 0.6512));
-    expected_values.push_back(make_pair(chains->index("logRR[10]"), 0.8466));
-    expected_values.push_back(make_pair(chains->index("logRR[11]"), 1.059));
+    expected_values.push_back(make_pair(chains[i]->index("logRR[6]"), 0.1588));
+    expected_values.push_back(make_pair(chains[i]->index("logRR[7]"), 0.319));
+    expected_values.push_back(make_pair(chains[i]->index("logRR[8]"), 0.4829));
+    expected_values.push_back(make_pair(chains[i]->index("logRR[9]"), 0.6512));
+    expected_values.push_back(make_pair(chains[i]->index("logRR[10]"), 0.8466));
+    expected_values.push_back(make_pair(chains[i]->index("logRR[11]"), 1.059));
 
-    expected_values.push_back(make_pair(chains->index("sigma"), 0.05286));
+    expected_values.push_back(make_pair(chains[i]->index("sigma"), 0.05286));
     
     return expected_values;
   }

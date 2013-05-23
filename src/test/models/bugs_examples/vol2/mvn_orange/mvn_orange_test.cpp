@@ -24,33 +24,38 @@ public:
     return true;
   }
 
-  static int num_iterations() {
-    return 10000;
+  static int num_iterations(int i) {
+    std::vector<int> num_iter;
+    num_iter.push_back(10000); //iterations for nuts
+    num_iter.push_back(500000); //iterations for unit_metro
+    num_iter.push_back(500000); //iterations for diag_metro
+    num_iter.push_back(500000); //iterations for dense_metro
+    return num_iter[i];
   }
 
-  static std::vector<int> skip_chains_test() {
+  static std::vector<int> skip_chains_test(int i) {
     std::vector<int> params_to_skip;
     return params_to_skip;
   }
 
-  static void populate_chains() {
-    default_populate_chains();
+  static void populate_chains(int i) {
+    default_populate_chains(i);
   }
 
   static std::vector<std::pair<int, double> >
-  get_expected_values() {
+  get_expected_values(int i) {
     using std::make_pair;
     std::vector<std::pair<int, double> > expected_values;
 
-    expected_values.push_back(make_pair(chains->index("mu[1]"), 5.265));
-    expected_values.push_back(make_pair(chains->index("mu[2]"), 2.2));    
-    expected_values.push_back(make_pair(chains->index("mu[3]"), -5.88));
+    expected_values.push_back(make_pair(chains[i]->index("mu[1]"), 5.265));
+    expected_values.push_back(make_pair(chains[i]->index("mu[2]"), 2.2));    
+    expected_values.push_back(make_pair(chains[i]->index("mu[3]"), -5.88));
 
-    expected_values.push_back(make_pair(chains->index("sigma[1]"), 0.2581));
-    expected_values.push_back(make_pair(chains->index("sigma[2]"), 0.2679));
-    expected_values.push_back(make_pair(chains->index("sigma[3]"), 0.2296));
+    expected_values.push_back(make_pair(chains[i]->index("sigma[1]"), 0.2581));
+    expected_values.push_back(make_pair(chains[i]->index("sigma[2]"), 0.2679));
+    expected_values.push_back(make_pair(chains[i]->index("sigma[3]"), 0.2296));
 
-    expected_values.push_back(make_pair(chains->index("sigma_C"), 7.853));
+    expected_values.push_back(make_pair(chains[i]->index("sigma_C"), 7.853));
     
     return expected_values;
   }

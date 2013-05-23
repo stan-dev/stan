@@ -24,21 +24,26 @@ public:
     return true;
   }
 
-  static int num_iterations() {
-    return 8000;
+  static int num_iterations(int i) {
+    std::vector<int> num_iter;
+    num_iter.push_back(8000); //iterations for nuts
+    num_iter.push_back(50000); //iterations for unit_metro
+    num_iter.push_back(50000); //iterations for diag_metro
+    num_iter.push_back(50000); //iterations for dense_metro
+    return num_iter[i];
   }
 
-  static std::vector<int> skip_chains_test() {
+  static std::vector<int> skip_chains_test(int i) {
     std::vector<int> params_to_skip;
     return params_to_skip;
   }
 
-  static void populate_chains() {
-    default_populate_chains();
+  static void populate_chains(int i) {
+    default_populate_chains(i);
   }
 
   static std::vector<std::pair<int, double> >
-  get_expected_values() {
+  get_expected_values(int i) {
     using std::make_pair;
     int index;
     std::vector<int> dims;
@@ -46,12 +51,12 @@ public:
 
     std::vector<std::pair<int, double> > expected_values;
 
-    expected_values.push_back(make_pair(chains->index("p1"), 0.6014));
+    expected_values.push_back(make_pair(chains[i]->index("p1"), 0.6014));
 
-    expected_values.push_back(make_pair(chains->index("lambda[1]"), 536.8));
-    expected_values.push_back(make_pair(chains->index("lambda[2]"), 548.9));
+    expected_values.push_back(make_pair(chains[i]->index("lambda[1]"), 536.8));
+    expected_values.push_back(make_pair(chains[i]->index("lambda[2]"), 548.9));
 
-    expected_values.push_back(make_pair(chains->index("sigma"), 3.805));
+    expected_values.push_back(make_pair(chains[i]->index("sigma"), 3.805));
     
     return expected_values;
   }

@@ -25,38 +25,43 @@ public:
     return false;
   }
 
-  static int num_iterations() {
-    return 20000;
+  static int num_iterations(int i) {
+    std::vector<int> num_iter;
+    num_iter.push_back(20000); //iterations for nuts
+    num_iter.push_back(700000); //iterations for unit_metro
+    num_iter.push_back(700000); //iterations for diag_metro
+    num_iter.push_back(700000); //iterations for dense_metro
+    return num_iter[i];
   }
 
-  static std::vector<int> skip_chains_test() {
+  static std::vector<int> skip_chains_test(int i) {
     std::vector<int> params_to_skip;
-    params_to_skip.push_back(chains->index("yabeta_disease[1]"));
+    params_to_skip.push_back(chains[i]->index("yabeta_disease[1]"));
     return params_to_skip;
   }
 
-  static void populate_chains() {
-    default_populate_chains();
+  static void populate_chains(int i) {
+    default_populate_chains(i);
   }
 
   static std::vector<std::pair<int, double> >
-  get_expected_values() {
+  get_expected_values(int i) {
     using std::make_pair;
     std::vector<std::pair<int, double> > expected_values;
 
-    expected_values.push_back(make_pair(chains->index("alpha"), -5.529));
+    expected_values.push_back(make_pair(chains[i]->index("alpha"), -5.529));
 
-    expected_values.push_back(make_pair(chains->index("beta_disease2"), 0.1265));
+    expected_values.push_back(make_pair(chains[i]->index("beta_disease2"), 0.1265));
 
-    expected_values.push_back(make_pair(chains->index("beta_disease3"), 0.5995));
+    expected_values.push_back(make_pair(chains[i]->index("beta_disease3"), 0.5995));
 
-    expected_values.push_back(make_pair(chains->index("beta_disease4"), -1.198));
+    expected_values.push_back(make_pair(chains[i]->index("beta_disease4"), -1.198));
 
-    expected_values.push_back(make_pair(chains->index("beta_sex"), -1.945));
+    expected_values.push_back(make_pair(chains[i]->index("beta_sex"), -1.945));
 
-    expected_values.push_back(make_pair(chains->index("r"), 1.205));
+    expected_values.push_back(make_pair(chains[i]->index("r"), 1.205));
 
-    expected_values.push_back(make_pair(chains->index("sigma"), 0.6367));
+    expected_values.push_back(make_pair(chains[i]->index("sigma"), 0.6367));
 
     return expected_values;
   }

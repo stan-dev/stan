@@ -86,6 +86,9 @@ public:
     expected_help_options.push_back("point_estimate_bfgs\n");
     expected_help_options.push_back("nondiag_mass");
     expected_help_options.push_back("cov_matrix");
+    expected_help_options.push_back("unit_metro");
+    expected_help_options.push_back("diag_metro");
+    expected_help_options.push_back("dense_metro");
 
     expected_output.push_back(make_pair("data","(specified model requires no data)"));
     expected_output.push_back(make_pair("init", "random initialization"));

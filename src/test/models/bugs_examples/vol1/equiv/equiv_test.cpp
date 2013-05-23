@@ -25,32 +25,37 @@ public:
     return true;
   }
 
-  static int num_iterations() {
-    return 8000;
+  static int num_iterations(int i) {
+    std::vector<int> num_iter;
+    num_iter.push_back(8000); //iterations for nuts
+    num_iter.push_back(200000); //iterations for unit_metro
+    num_iter.push_back(200000); //iterations for diag_metro
+    num_iter.push_back(200000); //iterations for dense_metro
+    return num_iter[i];
   }
 
-  static std::vector<int> skip_chains_test() {
+  static std::vector<int> skip_chains_test(int i) {
     std::vector<int> params_to_skip;
-    params_to_skip.push_back(chains->index("equiv"));
+    params_to_skip.push_back(chains[i]->index("equiv"));
     return params_to_skip;
   }
 
-  static void populate_chains() {
-    default_populate_chains();
+  static void populate_chains(int i) {
+    default_populate_chains(i);
   }
 
   static std::vector<std::pair<int, double> >
-  get_expected_values() {
+  get_expected_values(int i) {
     using std::make_pair;
     std::vector<std::pair<int, double> > expected_values;
     
-    expected_values.push_back(make_pair(chains->index("equiv"), 0.9976));
-    expected_values.push_back(make_pair(chains->index("mu"), 1.437));
-    expected_values.push_back(make_pair(chains->index("phi"), -0.008338));
-    expected_values.push_back(make_pair(chains->index("pi"), -0.1802));
-    expected_values.push_back(make_pair(chains->index("sigma1"), 0.1106));
-    expected_values.push_back(make_pair(chains->index("sigma2"), 0.1399));
-    expected_values.push_back(make_pair(chains->index("theta"), 0.993));
+    expected_values.push_back(make_pair(chains[i]->index("equiv"), 0.9976));
+    expected_values.push_back(make_pair(chains[i]->index("mu"), 1.437));
+    expected_values.push_back(make_pair(chains[i]->index("phi"), -0.008338));
+    expected_values.push_back(make_pair(chains[i]->index("pi"), -0.1802));
+    expected_values.push_back(make_pair(chains[i]->index("sigma1"), 0.1106));
+    expected_values.push_back(make_pair(chains[i]->index("sigma2"), 0.1399));
+    expected_values.push_back(make_pair(chains[i]->index("theta"), 0.993));
 
     return expected_values;
   }

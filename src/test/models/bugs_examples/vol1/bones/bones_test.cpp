@@ -24,37 +24,42 @@ public:
     return false;
   }
 
-  static int num_iterations() {
-    return iterations;
+  static int num_iterations(int i) {
+    std::vector<int> num_iter;
+    num_iter.push_back(2000); //iterations for nuts
+    num_iter.push_back(2000); //iterations for unit_metro
+    num_iter.push_back(20000); //iterations for diag_metro
+    num_iter.push_back(10000); //iterations for dense_metro
+    return num_iter[i];
   }
 
-  static std::vector<int> skip_chains_test() {
+  static std::vector<int> skip_chains_test(int i) {
     std::vector<int> params_to_skip;
     return params_to_skip;
   }
 
-  static void populate_chains() {
-    default_populate_chains();
+  static void populate_chains(int i) {
+    default_populate_chains(i);
   }
 
   static std::vector<std::pair<int, double> >
-  get_expected_values() {
+  get_expected_values(int i) {
     using std::make_pair;
 
     std::vector<std::pair<int, double> > expected_values;
-    expected_values.push_back(make_pair(chains->index("theta[1]"), 0.3244));
-    expected_values.push_back(make_pair(chains->index("theta[2]"), 1.366));
-    expected_values.push_back(make_pair(chains->index("theta[3]"), 2.357));
-    expected_values.push_back(make_pair(chains->index("theta[4]"), 2.902));
-    expected_values.push_back(make_pair(chains->index("theta[5]"), 5.535));
-    expected_values.push_back(make_pair(chains->index("theta[6]"), 6.751));
-    expected_values.push_back(make_pair(chains->index("theta[7]"), 6.451));
-    expected_values.push_back(make_pair(chains->index("theta[8]"), 8.93));
-    expected_values.push_back(make_pair(chains->index("theta[9]"), 8.981));
-    expected_values.push_back(make_pair(chains->index("theta[10]"), 11.94));
-    expected_values.push_back(make_pair(chains->index("theta[11]"), 11.58));
-    expected_values.push_back(make_pair(chains->index("theta[12]"), 15.79));
-    expected_values.push_back(make_pair(chains->index("theta[13]"), 16.96));
+    expected_values.push_back(make_pair(chains[i]->index("theta[1]"), 0.3244));
+    expected_values.push_back(make_pair(chains[i]->index("theta[2]"), 1.366));
+    expected_values.push_back(make_pair(chains[i]->index("theta[3]"), 2.357));
+    expected_values.push_back(make_pair(chains[i]->index("theta[4]"), 2.902));
+    expected_values.push_back(make_pair(chains[i]->index("theta[5]"), 5.535));
+    expected_values.push_back(make_pair(chains[i]->index("theta[6]"), 6.751));
+    expected_values.push_back(make_pair(chains[i]->index("theta[7]"), 6.451));
+    expected_values.push_back(make_pair(chains[i]->index("theta[8]"), 8.93));
+    expected_values.push_back(make_pair(chains[i]->index("theta[9]"), 8.981));
+    expected_values.push_back(make_pair(chains[i]->index("theta[10]"), 11.94));
+    expected_values.push_back(make_pair(chains[i]->index("theta[11]"), 11.58));
+    expected_values.push_back(make_pair(chains[i]->index("theta[12]"), 15.79));
+    expected_values.push_back(make_pair(chains[i]->index("theta[13]"), 16.96));
 
     return expected_values;
   }

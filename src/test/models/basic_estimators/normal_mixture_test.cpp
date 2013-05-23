@@ -22,18 +22,23 @@ public:
     return false;
     
   }
-  static int num_iterations() {
-    //return 8000;
-    return 200;
+
+  static int num_iterations(int i) {
+    std::vector<int> num_iter;
+    num_iter.push_back(200); //iterations for nuts
+    num_iter.push_back(2000); //iterations for unit_metro
+    num_iter.push_back(2000); //iterations for diag_metro
+    num_iter.push_back(2000); //iterations for dense_metro
+    return num_iter[i];
   }
 
-  static std::vector<int> skip_chains_test() {
+  static std::vector<int> skip_chains_test(int i) {
     std::vector<int> params_to_skip;
     return params_to_skip;
   }
 
-  static void populate_chains() {
-    if (chains->num_kept_samples() == 0) {
+  static void populate_chains(int i) {
+    if (chains[i]->num_kept_samples() == 0) {
       for (int chain = 0; chain < num_chains; chain++) {
   std::ifstream ifstream;
   stan::io::stan_csv stan_csv;
@@ -61,19 +66,19 @@ public:
     stan_csv.samples.col(log_1mtheta) = tmp;
   }
 
-  chains->add(stan_csv);
+  chains[i]->add(stan_csv);
       }
     }
   }
 
   static std::vector<std::pair<int, double> >
-  get_expected_values() {
+  get_expected_values(int i) {
     using std::make_pair;
     std::vector<std::pair<int, double> > expected_values;
 
-    expected_values.push_back(make_pair(chains->index("theta"), 0.2916));
-    expected_values.push_back(make_pair(chains->index("mu[1]"), -10.001));
-    expected_values.push_back(make_pair(chains->index("mu[2]"), 10.026));
+    expected_values.push_back(make_pair(chains[i]->index("theta"), 0.2916));
+    expected_values.push_back(make_pair(chains[i]->index("mu[1]"), -10.001));
+    expected_values.push_back(make_pair(chains[i]->index("mu[2]"), 10.026));
     
     return expected_values;
   }
