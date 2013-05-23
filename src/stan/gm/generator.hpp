@@ -2508,9 +2508,6 @@ namespace stan {
         for (size_t i = 0; i < matrix_dims.size(); ++i)
           combo_dims.push_back(matrix_dims[i]);
 
-        o_ << INDENT2 << "param_name_stream__.str(std::string());" << EOL;
-
-
        for (size_t i = 0; i < combo_dims.size(); ++i) {
           generate_indent(2 + i,o_);
           o_ << "for (int k_" << i << "__ = 1;"
@@ -2520,10 +2517,17 @@ namespace stan {
         }
 
         generate_indent(2 + combo_dims.size(),o_);
+        o_ << "param_name_stream__.str(std::string());" << EOL;
+        
+        generate_indent(2 + combo_dims.size(),o_);
         o_ << "param_name_stream__ << \"" << name << '"';
+        
         for (size_t i = 0; i < combo_dims.size(); ++i)
           o_ << " << '.' << k_" << i << "__";
         o_ << ';' << EOL;
+        
+        generate_indent(2 + combo_dims.size(),o_);
+        o_ << "param_names__.push_back(param_name_stream__.str());" << EOL;
 
         // end for loop dims
         for (size_t i = 0; i < combo_dims.size(); ++i) {
@@ -2531,9 +2535,6 @@ namespace stan {
           o_ << "}" << EOL; // end (1)
         }
         
-        
-        o_ << INDENT2 << "param_names__.push_back(param_name_stream__.str());" 
-           << EOL;
 
       }
     };
@@ -2660,22 +2661,26 @@ namespace stan {
         for (size_t i = 0; i < matrix_dims.size(); ++i)
           combo_dims.push_back(matrix_dims[i]);
 
-        o_ << INDENT2 << "param_name_stream__.str(std::string());" << EOL;
-
-
-       for (size_t i = 0; i < combo_dims.size(); ++i) {
+        for (size_t i = 0; i < combo_dims.size(); ++i) {
           generate_indent(2 + i,o_);
           o_ << "for (int k_" << i << "__ = 1;"
-             << " k_" << i << "__ <= ";
+          << " k_" << i << "__ <= ";
           generate_expression(combo_dims[i].expr_,o_);
           o_ << "; ++k_" << i << "__) {" << EOL; // begin (1)
         }
-
+        
+        generate_indent(2 + combo_dims.size(),o_);
+        o_ << "param_name_stream__.str(std::string());" << EOL;
+        
         generate_indent(2 + combo_dims.size(),o_);
         o_ << "param_name_stream__ << \"" << name << '"';
+        
         for (size_t i = 0; i < combo_dims.size(); ++i)
           o_ << " << '.' << k_" << i << "__";
         o_ << ';' << EOL;
+        
+        generate_indent(2 + combo_dims.size(),o_);
+        o_ << "param_names__.push_back(param_name_stream__.str());" << EOL;
 
         // end for loop dims
         for (size_t i = 0; i < combo_dims.size(); ++i) {
@@ -3346,7 +3351,7 @@ namespace stan {
 
       o << INDENT << "}" << EOL2;
 
-      o << INDENT << "void write_array_params(std::vector<double>& params_r__,"  
+      o << INDENT << "void write_array_params(std::vector<double>& params_r__,"
         << EOL
         << INDENT << "                        std::vector<int>& params_i__,"
         << EOL
@@ -3360,6 +3365,22 @@ namespace stan {
         << EOL
         << INDENT << "}"
         << EOL2;
+      
+      o << INDENT << "void write_array_params_all(std::vector<double>& params_r__,"
+        << EOL
+        << INDENT << "                        std::vector<int>& params_i__,"
+        << EOL
+        << INDENT << "                        std::vector<double>& vars__,"
+        << EOL
+        << INDENT << "                        std::ostream* pstream__ = 0) {"
+        << EOL
+        << INDENT2 << "boost::random::minstd_rand base_rng; // dummy"
+        << EOL
+        << INDENT2 << "write_array(base_rng,params_r__,params_i__,vars__,true,true,pstream__);"
+        << EOL
+        << INDENT << "}"
+        << EOL2;
+      
     }
 
     
@@ -3525,7 +3546,7 @@ namespace stan {
                        std::ostream& out) {
       out << "int main(int argc, const char* argv[]) {" << EOL;
       out << INDENT << "try {" << EOL;
-      out << INDENT2 << "stan::gm::nuts_command<" << model_name 
+      out << INDENT2 << "stan::gm::command<" << model_name 
           << "_namespace::" << model_name << ">(argc,argv);" << EOL;
       out << INDENT << "} catch (std::exception& e) {" << EOL;
       out << INDENT2 
