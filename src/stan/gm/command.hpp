@@ -779,7 +779,7 @@ namespace stan {
             std::cout << " # evals ";
             std::cout << " Notes " << std::endl;
           }
-          if (do_print(i, refresh)) {
+          if (do_print(i, refresh) || ret != 0 || !ng.note().empty()) {
             std::cout << " " << std::setw(7) << (m + 1) << " ";
             std::cout << " " << std::setw(12) << std::setprecision(6) << lp << " ";
             std::cout << " " << std::setw(12) << std::setprecision(6) << ng.prev_step_size() << " ";
@@ -800,6 +800,8 @@ namespace stan {
         }
         if (ret != 0)
           std::cout << "Optimization terminated with code " << ret << std::endl;
+        else
+          std::cout << "Maximum number of iterations hit, optimization terminated." << std::endl;
         
         sample_stream << lp << ',';
         model.write_csv(base_rng,cont_params,disc_params,sample_stream);
