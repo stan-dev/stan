@@ -28,8 +28,7 @@ namespace stan {
 
           _N = A.rows();
           _variA.resize(A.rows(),A.cols());
-          
-          size_t pos = 0;
+
           for (size_t j = 0; j < _N; j++) {
             for (size_t i = 0; i < _N; i++) {
               Ad(i,j) = A(i,j).val();
