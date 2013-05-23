@@ -20,7 +20,7 @@ TEST(StanGmCommand, zero_init_value_fail) {
   } catch(...) {
     ADD_FAILURE() << "Failed running command: " << command;
   }
-  EXPECT_EQ("Rejecting inititialization at zero because of vanishing density.",
+  EXPECT_EQ("Rejecting inititialization at zero because of vanishing density.\n",
             command_output);
 }
 
@@ -43,6 +43,6 @@ TEST(StanGmCommand, zero_init_domain_fail) {
     ADD_FAILURE() << "Failed running command: " << command;
   }
   
-  EXPECT_EQ("Rejecting inititialization at zero because of grad_log_prob failure.",
+  EXPECT_EQ("Rejecting inititialization at zero because of grad_log_prob failure.\n",
             command_output);
 }
