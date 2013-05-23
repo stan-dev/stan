@@ -28,7 +28,7 @@ public:
   static std::vector<stan::mcmc::chains<> *> chains;
   static int num_chains;
   static std::vector<std::string> command_outputs;
-  static const int skip;
+  static std::vector<int> skip;
   static long elapsed_milliseconds;
   static std::vector<std::string> sampler_names;
   static int sampler_n;
@@ -48,6 +48,11 @@ public:
     sampler_names.push_back(" --unit_metro");
     sampler_names.push_back(" --diag_metro");
     sampler_names.push_back(" --dense_metro");
+
+    skip.push_back(3);
+    skip.push_back(2);
+    skip.push_back(2);
+    skip.push_back(2);
 
     model_path = convert_model_path(get_model_path());
 
@@ -202,8 +207,8 @@ public:
     return Derived::has_init();
   }
 
-  static std::vector<int> skip_chains_test() {
-    return Derived::skip_chains_test();
+  static std::vector<int> skip_chains_test(int i) {
+    return Derived::skip_chains_test(i);
   } 
 
   static int num_iterations(int i) {
@@ -250,10 +255,10 @@ public:
     write_header();
     std::ofstream results("models/timing.csv", std::ios_base::app);
     
-    int N = chains[i]->num_params() - skip;
+    int N = chains[i]->num_params() - skip[i];
     std::vector<double> n_eff(N);
     for (int n = 0; n < N; n++)
-      n_eff[n] = chains[i]->effective_sample_size(n+skip-1);
+      n_eff[n] = chains[i]->effective_sample_size(n+skip[i]-1);
     std::sort(n_eff.begin(), n_eff.end());
     double n_eff_median;
     if (N % 2 == 0)
@@ -269,7 +274,7 @@ public:
       << elapsed_milliseconds << ","
       << *(std::min_element(n_eff.begin(), n_eff.end())) << ","
       << *(std::max_element(n_eff.begin(), n_eff.end())) << ","
-            << stan::math::mean(n_eff) << ","
+           << stan::math::mean(n_eff) << ","
       << n_eff_median << ","
       << elapsed_milliseconds / *(std::min_element(n_eff.begin(), n_eff.end())) << ","
       << elapsed_milliseconds / *(std::max_element(n_eff.begin(), n_eff.end())) << ","
@@ -297,11 +302,11 @@ static void chains_test(int i) {
   stan::mcmc::chains<> *c = chains[i];
   int num_chains = c->num_chains();
   int num_params = c->num_params();
-  std::vector<int> params_to_skip = skip_chains_test();
+  std::vector<int> params_to_skip = skip_chains_test(i);
   std::sort(params_to_skip.begin(), params_to_skip.end());
   
   for (int chain = 0; chain < num_chains; chain++) {
-    for (int param = skip; param < num_params; param++) {
+    for (int param = skip[i]; param < num_params; param++) {
       if (!std::binary_search(params_to_skip.begin(), params_to_skip.end(), param)) {
   EXPECT_GT(c->variance(chain, param), 0)
     << "Chain " << chain << ", param " << param << ", name " << c->param_name(param)
@@ -311,7 +316,7 @@ static void chains_test(int i) {
     }
   }
 
-  for (int param = skip; param < num_params; param++) {
+  for (int param = skip[i]; param < num_params; param++) {
     if (std::find(params_to_skip.begin(), params_to_skip.end(), param) == params_to_skip.end()) {
       // made this 1.5 to fail less often
       EXPECT_LT(c->split_potential_scale_reduction(param), 1.5) 
@@ -344,7 +349,7 @@ static void test_expected_values(int i) {
   
   int failed = 0;
   std::stringstream err_message;
-  for (int i = skip; i < n; i++) {
+  for (int i = skip[i]; i < n; i++) {
     int index = expected_values[i].first;
     double expected_mean = expected_values[i].second;
 
@@ -428,7 +433,7 @@ template<class Derived>
 std::vector<std::string> Model_Test_Fixture<Derived>::command_outputs;
 
 template<class Derived>
-const int Model_Test_Fixture<Derived>::skip = 3;
+std::vector<int> Model_Test_Fixture<Derived>::skip;
 
 template<class Derived>
 long Model_Test_Fixture<Derived>::elapsed_milliseconds = 0;
@@ -474,20 +479,20 @@ TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTestUnitMetro) {
 }
 
 
-TYPED_TEST_P(Model_Test_Fixture, TestGradientDiagMetro) {
-  TypeParam::sampler_n = 2;
-  TypeParam::test_gradient(2);
-}
-TYPED_TEST_P(Model_Test_Fixture, RunModelDiagMetro) {
-  TypeParam::run_model(2);
-  TypeParam::write_results(2);
-}
-TYPED_TEST_P(Model_Test_Fixture, ChainsTestDiagMetro) {
-  TypeParam::chains_test(2);
-}
-TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTestDiagMetro) {
-  TypeParam::test_expected_values(2);
-}
+// TYPED_TEST_P(Model_Test_Fixture, TestGradientDiagMetro) {
+//   TypeParam::sampler_n = 2;
+//   TypeParam::test_gradient(2);
+// }
+// TYPED_TEST_P(Model_Test_Fixture, RunModelDiagMetro) {
+//   TypeParam::run_model(2);
+//   TypeParam::write_results(2);
+// }
+// TYPED_TEST_P(Model_Test_Fixture, ChainsTestDiagMetro) {
+//   TypeParam::chains_test(2);
+// }
+// TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTestDiagMetro) {
+//   TypeParam::test_expected_values(2);
+// }
 
 
 
@@ -515,13 +520,14 @@ REGISTER_TYPED_TEST_CASE_P(Model_Test_Fixture,
                            RunModelUnitMetro,
                            ChainsTestUnitMetro,
                            ExpectedValuesTestUnitMetro,
-                           TestGradientDiagMetro,
-                           RunModelDiagMetro,
-                           ChainsTestDiagMetro,
-                           ExpectedValuesTestDiagMetro,
+                           // TestGradientDiagMetro,
+                           // RunModelDiagMetro,
+                           // ChainsTestDiagMetro,
+                           // ExpectedValuesTestDiagMetro,
                            TestGradientDenseMetro,
                            RunModelDenseMetro,
                            ChainsTestDenseMetro,
-                           ExpectedValuesTestDenseMetro);
+                           ExpectedValuesTestDenseMetro
+                                                   );
 
 #endif
