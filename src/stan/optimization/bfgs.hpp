@@ -263,19 +263,19 @@ namespace stan {
             rho = 0.75;
             c1 = 1e-4;
             c2 = 0.9;
-            minStep = 1e-16;
-            minGradNorm = 1e-6;
             minAlpha = 1e-12;
             alpha0 = 1e-3;
+            tolX = 1e-8;
+            tolF = 1e-8;
           }
           size_t maxIts;
           Scalar rho;
           Scalar c1;
           Scalar c2;
-          Scalar minStep;
-          Scalar minGradNorm;
           Scalar alpha0;
           Scalar minAlpha;
+          Scalar tolX;
+          Scalar tolF;
         } _opts;
         
         
@@ -316,12 +316,8 @@ namespace stan {
           
           while (true) {
             if (resetB) {
-//              if (_itNum == 1 || resetB == 2) {
-                _sk = -_gk;
-//              }
-//              else {
-//                _sk = -_gk/_ldlt.vectorD().maxCoeff();
-//              }
+              // Reset the Hessian approximation
+              _sk = -_gk;
             }
             else {
               _sk = -_ldlt.solve(_gk);
@@ -371,15 +367,17 @@ namespace stan {
           _gk.swap(_gk_1);
           _sk.swap(_sk_1);
           
-          gradNorm = _gk.squaredNorm();
+          gradNorm = _gk.norm();
           sk.noalias() = _xk - _xk_1;
-          if (sk.array().abs().maxCoeff() <= _opts.minStep) {
-            if (gradNorm <= _opts.minGradNorm) {
-              retCode = 1;
-            }
-            else {
-              retCode = 2;
-            }
+          // Check for convergence
+          if (std::fabs(_fk - _fk_1) < _opts.tolF) {
+            retCode = 1;
+          }
+          else if (gradNorm < _opts.tolF) {
+            retCode = 2;
+          }
+          else if (sk.norm() < _opts.tolX) {
+            retCode = 3;
           }
           else {
             retCode = 0;
