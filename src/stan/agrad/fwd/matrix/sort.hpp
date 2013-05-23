@@ -16,8 +16,7 @@ namespace stan {
     inline
     std::vector< fvar<T> >
     sort_asc(std::vector< fvar<T> > xs) {
-      if (xs.size() > 1U)
-        std::sort(xs.begin(), xs.end());      
+      std::sort(xs.begin(), xs.end());      
       return xs;      
     }
 
@@ -25,8 +24,7 @@ namespace stan {
     inline
     std::vector< fvar<T> >
     sort_desc(std::vector< fvar<T> > xs) {
-      if (xs.size() > 1U)
-        std::sort(xs.begin(), xs.end(), std::greater< fvar<T> >());      
+      std::sort(xs.begin(), xs.end(), std::greater< fvar<T> >());      
       return xs;      
     }
     
@@ -34,8 +32,7 @@ namespace stan {
     inline
     typename Eigen::Matrix<fvar<T>,R,C>
     sort_asc(Eigen::Matrix<fvar<T>,R,C> xs) {
-      if (xs.size() > 1U)
-        std::sort(xs.data(), xs.data()+xs.size());      
+      std::sort(xs.data(), xs.data()+xs.size());      
       return xs;      
     }
 
@@ -43,8 +40,7 @@ namespace stan {
     inline
     typename Eigen::Matrix<fvar<T>,R,C>
     sort_desc(Eigen::Matrix<fvar<T>,R,C> xs) {
-      if (xs.size() > 1U)
-        std::sort(xs.data(), xs.data()+xs.size(), std::greater< fvar<T> >());      
+      std::sort(xs.data(), xs.data()+xs.size(), std::greater< fvar<T> >());      
       return xs;      
     }
         
