@@ -25,6 +25,10 @@ else
   RSCRIPT = Rscript
 endif
 
+# not to use ~/.R/Makevars, supported by R (>=3.0.1).
+R_MAKEVARS_USER =
+export R_MAKEVARS_USER
+
 ifeq ($(OS), win)
   LINKCMD1 = @cmd /c mklink /D ".^\rstan^\inst^\include^\stanlib"  "..^\..^\..^\..^\lib"
   LINKCMD2 = @cmd /c mklink /D ".^\rstan^\inst^\include^\stansrc"  "..^\..^\..^\..^\src"
