@@ -9,6 +9,7 @@
 #include <stan/agrad/rev/matrix/squared_dist.hpp>
 #include <stan/agrad/rev/matrix/dot_self.hpp>
 #include <stan/agrad/rev/matrix/dot_product.hpp>
+#include <stan/agrad/rev/matrix/sort.hpp>
 #include <stan/agrad/rev/matrix/sum.hpp>
 #include <stan/agrad/rev/matrix/mdivide_left.hpp>
 #include <stan/agrad/rev/matrix/mdivide_left_spd.hpp>

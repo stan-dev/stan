@@ -42,7 +42,7 @@ namespace stan {
       validate_std_vector_index(sv, i, "segment");
       if (n != 0) validate_std_vector_index(sv, i + n - 1, "segment");
       std::vector<T> s;
-      for (int j = 0; j < n; ++j)
+      for (size_t j = 0; j < n; ++j)
         s.push_back(sv[i + j - 1]);
       return s;
     }

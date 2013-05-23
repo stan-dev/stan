@@ -45,7 +45,7 @@ namespace stan {
       if (n != 0)
         validate_std_vector_index(sv, sv.size() - n + 1, "tail");
       std::vector<T> s;
-      for (int i = sv.size() - n; i < sv.size(); ++i)
+      for (typename std::vector<T>::size_type i = sv.size() - n; i < sv.size(); ++i)
         s.push_back(sv[i]);
       return s;
     }
