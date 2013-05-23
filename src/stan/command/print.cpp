@@ -294,16 +294,6 @@ int main(int argc, const char* argv[]) {
     }
     std::cout << std::endl;
   }
-  // lp__, treedepth__
-  for (int i = 0; i < 4; i++) {
-    std::cout << setw(max_name_length+1) << std::left << chains.param_name(i);
-    std::cout << std::right;
-    for (int j = 0; j < n; j++) {
-      std::cout.setf(formats(j), std::ios::floatfield);
-      std::cout << setprecision(digits(j)) << setw(column_lengths(j)) << values(i,j);
-    }
-    std::cout << std::endl;
-  }
     
   std::cout << std::endl;
   std::cout << "Samples were drawn using " << stan_csv.metadata.algorithm << "." << std::endl
