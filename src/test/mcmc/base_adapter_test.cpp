@@ -4,11 +4,11 @@
 TEST(McmcBaseAdapter, engage_adaptation) {
   stan::mcmc::base_adapter adapter;
   adapter.engage_adaptation();
-  EXPECT_EQ(true, adapter.adapting());
+  EXPECT_TRUE(adapter.adapting());
 }
 
 TEST(McmcBaseAdapter, disengage_adaptation) {
   stan::mcmc::base_adapter adapter;
   adapter.disengage_adaptation();
-  EXPECT_EQ(false, adapter.adapting());
+  EXPECT_FALSE(adapter.adapting());
 }

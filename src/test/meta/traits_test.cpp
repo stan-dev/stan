@@ -121,7 +121,7 @@ TEST(MetaTraits, length) {
 
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> m(2,3);
   m << 1, 2, 3, 4, 5, 6;
-  EXPECT_EQ(6, length(m));
+  EXPECT_EQ(6U, length(m));
 
   Eigen::Matrix<double,Eigen::Dynamic,1> rv(2);
   rv << 1, 2;
