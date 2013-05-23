@@ -28,16 +28,16 @@ public:
   static int num_iterations(int i) {
     std::vector<int> num_iter;
     num_iter.push_back(4000); //iterations for nuts
-    num_iter.push_back(500000); //iterations for unit_metro
+    num_iter.push_back(300000); //iterations for unit_metro
     num_iter.push_back(500000); //iterations for diag_metro
-    num_iter.push_back(500000); //iterations for dense_metro
+    num_iter.push_back(400000); //iterations for dense_metro
     return num_iter[i];
   }
 
-  static std::vector<int> skip_chains_test() {
+  static std::vector<int> skip_chains_test(int i) {
     std::vector<int> params_to_skip;
     // FIXME: remove this when forward sampling is available
-    params_to_skip.push_back(chains[0]->index("delta_new")); //chains[0] so all chains have same params_to_skip
+    params_to_skip.push_back(chains[i]->index("delta_new")); //chains[0] so all chains have same params_to_skip
     return params_to_skip;
   }
 
@@ -46,12 +46,12 @@ public:
   }
 
   static std::vector<std::pair<int, double> >
-  get_expected_values() {
+  get_expected_values(int i) {
     using std::make_pair;
     std::vector<std::pair<int, double> > expected_values;
-    expected_values.push_back(make_pair(chains[0]->index("d"), -0.2492));
-    expected_values.push_back(make_pair(chains[0]->index("delta_new"), -0.2499));
-    expected_values.push_back(make_pair(chains[0]->index("sigma_delta"), 0.1189)); //chains[0] so all chains have same expected_values
+    expected_values.push_back(make_pair(chains[i]->index("d"), -0.2492));
+    expected_values.push_back(make_pair(chains[i]->index("delta_new"), -0.2499));
+    expected_values.push_back(make_pair(chains[i]->index("sigma_delta"), 0.1189)); //chains[0] so all chains have same expected_values
     return expected_values;
   }
 
