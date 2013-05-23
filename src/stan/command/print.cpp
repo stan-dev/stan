@@ -148,7 +148,8 @@ int main(int argc, const char* argv[]) {
   
   thin(0) = stan_csv.metadata.thin;
   
-  for (int chain = 1; chain < filenames.size(); chain++) {
+  for (std::vector<std::string>::size_type chain = 1; 
+       chain < filenames.size(); chain++) {
     ifstream.open(filenames[chain].c_str());
     stan_csv = stan::io::stan_csv_reader::parse(ifstream);
     chains.add(stan_csv);
@@ -164,7 +165,7 @@ int main(int argc, const char* argv[]) {
   double total_sampling_time = sampling_times.sum();
 
   // print  
-  const int skip = 4;
+  const int skip = 0;
   std::string model_name = stan_csv.metadata.model;
   int max_name_length = 0;
   for (int i = skip; i < chains.num_params(); i++) 

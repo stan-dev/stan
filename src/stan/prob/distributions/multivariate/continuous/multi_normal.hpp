@@ -184,7 +184,8 @@ namespace stan {
 
       if (include_summand<propto,T_y,T_loc,T_covar>::value) {
         Eigen::Matrix<T_loc, Eigen::Dynamic, Eigen::Dynamic> MU(y.rows(),y.cols());
-        for(typename Eigen::Matrix<T_loc, Eigen::Dynamic, Eigen::Dynamic>::size_type i = 0; i < y.rows(); i++)
+        for (typename Eigen::Matrix<T_loc, Eigen::Dynamic, Eigen::Dynamic>::size_type i = 0; 
+             i < y.rows(); i++)
           MU.row(i) = mu;
   
         Eigen::Matrix<typename
@@ -410,7 +411,8 @@ namespace stan {
       
       if (include_summand<propto,T_y,T_loc,T_covar>::value) {
         Eigen::Matrix<T_loc, Eigen::Dynamic, Eigen::Dynamic> MU(y.rows(),y.cols());
-        for(typename Eigen::Matrix<T_loc, Eigen::Dynamic, Eigen::Dynamic>::size_type i = 0; i < y.rows(); i++)
+        for (typename Eigen::Matrix<T_loc, Eigen::Dynamic, Eigen::Dynamic>::size_type i = 0; 
+             i < y.rows(); i++)
           MU.row(i) = mu;
         
         Eigen::Matrix<typename
@@ -615,7 +617,8 @@ namespace stan {
       
       if (include_summand<propto,T_y,T_loc,T_covar>::value) {
         Eigen::Matrix<T_loc, Eigen::Dynamic, Eigen::Dynamic> MU(y.rows(),y.cols());
-        for(typename Eigen::Matrix<T_loc, Eigen::Dynamic, Eigen::Dynamic>::size_type i = 0; i < y.rows(); i++)
+        for (typename Eigen::Matrix<T_loc, Eigen::Dynamic, Eigen::Dynamic>::size_type i = 0; 
+             i < y.rows(); i++)
           MU.row(i) = mu;
         
         Eigen::Matrix<typename
