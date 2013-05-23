@@ -147,7 +147,7 @@ namespace stan {
                         "Test gradient calculations using finite differences");
       
       print_help_option(&std::cout,
-                        "point_estimate","",
+                        "point_estimate_nesterov","",
                         "Fit point estimate of hidden parameters by maximizing log joint probability using Nesterov's accelerated gradient method");
       
       print_help_option(&std::cout,
@@ -155,7 +155,7 @@ namespace stan {
                         "Fit point estimate of hidden parameters by maximizing log joint probability using Newton's method");
 
       print_help_option(&std::cout,
-                        "point_estimate_bfgs","",
+                        "point_estimate","",
                         "Fit point estimate of hidden parameters by maximizing log joint probability using the BFGS method with line search");
       
       print_help_option(&std::cout,
@@ -319,9 +319,9 @@ namespace stan {
       data_stream.close();
       
       // Input arguments
-      bool point_estimate = command.has_flag("point_estimate");
+      bool point_estimate_nesterov = command.has_flag("point_estimate_nesterov");
       bool point_estimate_newton = command.has_flag("point_estimate_newton");
-      bool point_estimate_bfgs = command.has_flag("point_estimate_bfgs");
+      bool point_estimate = command.has_flag("point_estimate");
 
       std::string sample_file = "samples.csv";
       command.val("samples", sample_file);
@@ -641,7 +641,7 @@ namespace stan {
         
       }
       
-      if (point_estimate) {
+      if (point_estimate_nesterov) {
         
         std::cout << "STAN OPTIMIZATION COMMAND" << std::endl;
         if (data_file == "")
@@ -716,7 +716,7 @@ namespace stan {
         return 0;
       }
       
-      if (point_estimate_bfgs) {
+      if (point_estimate) {
         std::cout << "STAN OPTIMIZATION COMMAND" << std::endl;
         if (data_file == "")
           std::cout << "data = (specified model requires no data)" << std::endl;
