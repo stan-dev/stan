@@ -21,7 +21,7 @@ namespace stan{
         return fvar<T>(NOT_A_NUMBER, NOT_A_NUMBER);
       else 
         return fvar<T>(acosh(x.val_),
-                     x.d_ /(sqrt(x.val_ * x.val_ - 1)));
+                     x.d_ / sqrt(x.val_ * x.val_ - 1));
     }
   }
 }

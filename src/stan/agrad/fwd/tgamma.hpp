@@ -15,7 +15,8 @@ namespace stan{
     tgamma(const fvar<T>& x) {
       using boost::math::digamma;
       using boost::math::tgamma;
-      return fvar<T>(tgamma(x.val_), x.d_ * tgamma(x.val_) * digamma(x.val_));
+      T u = tgamma(x.val_);
+      return fvar<T>(u, x.d_ * u * digamma(x.val_));
     }
   }
 }
