@@ -6,6 +6,7 @@ TEST(AgradFvar, pow) {
   using std::pow;
   using std::log;
   using std::isnan;
+  using stan::agrad::inv;
 
   fvar<double> x(0.5);
   x.d_ = 1.0;
@@ -30,4 +31,9 @@ TEST(AgradFvar, pow) {
   fvar<double> d = pow(w, x);
   isnan(d.val_);
   isnan(d.d_);
+
+  fvar<double> e = pow(w, -1);
+  fvar<double> f = inv(w);
+  EXPECT_FLOAT_EQ(f.val_, e.val_);
+  EXPECT_FLOAT_EQ(f.d_, e.d_);
 }
