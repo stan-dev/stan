@@ -180,6 +180,14 @@ public:
         write_array(base_rng,params_r__,params_i__,vars__,false,false,pstream__);
     }
 
+    void write_array_params_all(std::vector<double>& params_r__,
+                            std::vector<int>& params_i__,
+                            std::vector<double>& vars__,
+                            std::ostream* pstream__ = 0) {
+        boost::random::minstd_rand base_rng; // dummy
+        write_array(base_rng,params_r__,params_i__,vars__,true,true,pstream__);
+    }
+
 
     void write_csv_header(std::ostream& o__) {
         stan::io::csv_writer writer__(o__);
