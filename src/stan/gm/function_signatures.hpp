@@ -278,6 +278,7 @@ add_binary("inv_gamma_rng");
 add_unary("inv_logit");
 add("inv_wishart_log",DOUBLE_T, MATRIX_T,DOUBLE_T,MATRIX_T);
 add("inv_wishart_rng",MATRIX_T,DOUBLE_T,MATRIX_T);
+add_unary("inv");
 add("inverse",MATRIX_T,MATRIX_T);
 add_binary("lbeta");
 add_unary("lgamma");

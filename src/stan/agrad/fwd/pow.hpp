@@ -3,6 +3,7 @@
 
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/meta/traits.hpp>
+#include <stan/agrad/fwd/inv.hpp>
 
 namespace stan{
 
@@ -13,6 +14,9 @@ namespace stan{
     fvar<typename stan::return_type<T1,T2>::type>
     pow(const fvar<T1>& x1, const T2& x2) {
       using std::pow;
+      using stan::agrad::inv;
+      if (x2 == -1)
+        return inv(x1);
       return fvar<typename 
                   stan::return_type<T1,T2>::type>( pow(x1.val_, x2),
                                            x1.d_ * x2 * pow(x1.val_, x2 - 1));
