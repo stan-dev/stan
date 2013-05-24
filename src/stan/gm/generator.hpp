@@ -2682,10 +2682,6 @@ namespace stan {
           generate_indent(1 + combo_dims.size() - i,o_);
           o_ << "}" << EOL; // end (1)
         }
-        
-        
-        o_ << INDENT2 << "param_names__.push_back(param_name_stream__.str());" 
-           << EOL;
 
       }
     };
