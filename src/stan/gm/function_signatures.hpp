@@ -276,6 +276,7 @@ for (size_t i = 0; i < vector_types.size(); ++i)
           vector_types[i], vector_types[j], vector_types[k]); // args
 add_binary("inv_gamma_rng");
 add_unary("inv_logit");
+add_unary("inv_square");
 add_unary("inv_sqrt");
 add("inv_wishart_log",DOUBLE_T, MATRIX_T,DOUBLE_T,MATRIX_T);
 add("inv_wishart_rng",MATRIX_T,DOUBLE_T,MATRIX_T);
