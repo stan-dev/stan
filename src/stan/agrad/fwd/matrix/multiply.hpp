@@ -14,13 +14,6 @@
 
 namespace stan {
   namespace agrad {
-    
-    template <typename T1, typename T2>
-    inline
-    typename stan::return_type<T1,T2>::type
-    multiply(const T1& v, const T2& c) {
-      return v * c;
-    }
 
     template<typename T1, typename T2, int R1,int C1>
     inline 
