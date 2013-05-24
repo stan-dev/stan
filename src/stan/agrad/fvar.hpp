@@ -53,6 +53,7 @@
 #include <stan/agrad/fwd/log10.hpp>
 #include <stan/agrad/fwd/pow.hpp>
 #include <stan/agrad/fwd/inv.hpp>
+#include <stan/agrad/fwd/inv_sqrt.hpp>
 
 //trig functions
 #include <stan/agrad/fwd/hypot.hpp>

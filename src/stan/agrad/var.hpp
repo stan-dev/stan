@@ -43,6 +43,7 @@
 #include <stan/agrad/rev/sqrt.hpp>
 #include <stan/agrad/rev/pow.hpp>
 #include <stan/agrad/rev/inv.hpp>
+#include <stan/agrad/rev/inv_sqrt.hpp>
 #include <stan/agrad/rev/cos.hpp>
 #include <stan/agrad/rev/sin.hpp>
 #include <stan/agrad/rev/tan.hpp>
