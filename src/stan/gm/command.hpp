@@ -459,8 +459,7 @@ namespace stan {
           
           cont_params = std::vector<double>(model.num_params_r(), 0.0);
           disc_params = std::vector<int>(model.num_params_i(), 0);
-          
-          
+                    
           double init_log_prob;
           std::vector<double> init_grad;
           
@@ -501,6 +500,28 @@ namespace stan {
                       << e.what() 
                       << std::endl;
             return -5;
+          }
+          
+          double init_log_prob;
+          std::vector<double> init_grad;
+          
+          try {
+            init_log_prob = model.grad_log_prob(cont_params, disc_params, init_grad, &std::cout);
+          } catch (std::domain_error e) {
+            std::cout << "Rejecting user-specified inititialization because of grad_log_prob failure." << std::endl;
+            return 0;
+          }
+          
+          if (!boost::math::isfinite(init_log_prob)) {
+            std::cout << "Rejecting user-specified inititialization because of vanishing density." << std::endl;
+            return 0;
+          }
+          
+          for (size_t i = 0; i < init_grad.size(); ++i) {
+            if (!boost::math::isfinite(init_grad[i])) {
+              std::cout << "Rejecting user-specified inititialization because of divergent gradient." << std::endl;
+              return 0;
+            }
           }
           
         }
