@@ -32,21 +32,6 @@ namespace stan {
       _epsilon_jitter(0.0)
       {};
       
-      void write_sampler_state(std::ostream* o) {
-        if(!o) return;
-        *o << "# Step size = " << get_nominal_stepsize() << std::endl;
-        _z.write_metric(o);
-      }
-      
-      void get_sampler_diagnostic_names(std::vector<std::string>& model_names,
-                                        std::vector<std::string>& names) {
-        _z.get_param_names(model_names, names);
-      };
-      
-      void get_sampler_diagnostics(std::vector<double>& values) {
-        _z.get_params(values);
-      };
-      
       void seed(const std::vector<double>& q, const std::vector<int>& r) {
         _z.q = q;
         _z.r = r;
