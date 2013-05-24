@@ -65,7 +65,6 @@ public:
     expected_help_options.push_back("data");
     expected_help_options.push_back("init");
     expected_help_options.push_back("samples");
-    expected_help_options.push_back("diagnostics");
     expected_help_options.push_back("append_samples");
     expected_help_options.push_back("seed");
     expected_help_options.push_back("chain_id");
