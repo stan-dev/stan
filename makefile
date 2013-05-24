@@ -3,12 +3,11 @@
 # make 3.81.
 ##
 
+# Disables SUFFIX rules, which are redefined in make/tests
+.SUFFIXES:
 
 # The default target of this Makefile is...
 help:
-
-## Disable implicit rules.
-SUFFIXES:
 
 ##
 # Users should only need to set these three variables for use.
@@ -146,9 +145,12 @@ help:
 	@echo '                     Stan model.'
 	@echo '  - *$(EXE)        : If a Stan model exists at *.stan, this target will build'
 	@echo '                     the Stan model as an executable.'
+	@echo '  - *$(PCH)          : If a .hpp file exists after substituting .hpp for $(PCH)'
+	@echo '                     the .hpp file is precompiled and the result is discarded.'
 	@echo '  Tests:'
+	@echo '  - test-headers   : Runs tests that all relevant headers can be precompiled'
 	@echo '  - test-unit      : Runs unit tests.'
-	@echo '  - test-distributions : Runs unit tests for the distributions (subset of test-unit)'
+	@echo '  - test-distributions : Runs unit tests for the distributions'
 	@echo '  - test-models    : Runs diagnostic models.'
 	@echo '  - test-bugs      : Runs the bugs examples (subset of test-models).'
 	@echo '  - test-all       : Runs all tests.'
