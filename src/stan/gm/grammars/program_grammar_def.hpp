@@ -130,8 +130,8 @@ namespace stan {
 
         derived_data_var_decls_r.name("transformed data block");
         derived_data_var_decls_r
-          %= lit("transformed")
-          >> lit("data")
+          %= ( lit("transformed")
+               >> lit("data") )
           > lit('{')
           > var_decls_g(true,transformed_data_origin)  // -constraints
           > *statement_g(false,transformed_data_origin) // -sampling
@@ -146,8 +146,8 @@ namespace stan {
 
         derived_var_decls_r.name("derived variable declarations");
         derived_var_decls_r
-          %= lit("transformed")
-          >> lit("parameters")
+          %= ( lit("transformed")
+               >> lit("parameters") )
           > lit('{')
           > var_decls_g(true,transformed_parameter_origin) // -constraints
           > *statement_g(false,transformed_parameter_origin) // -sampling

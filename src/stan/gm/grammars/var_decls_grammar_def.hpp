@@ -607,8 +607,8 @@ namespace stan {
 
       int_decl_r.name("integer declaration");
       int_decl_r 
-        %= lit("int")
-        >> no_skip[!char_("a-zA-Z0-9_")]
+        %= ( lit("int")
+             >> no_skip[!char_("a-zA-Z0-9_")] )
         > -range_brackets_int_r(_r1)
         // >> (lit(' ') | lit('\n') | lit('\t') | lit('\r'))
         > identifier_r 
@@ -617,8 +617,8 @@ namespace stan {
 
       double_decl_r.name("real declaration");
       double_decl_r 
-        %= lit("real")
-        >> no_skip[!char_("a-zA-Z0-9_")]
+        %= ( lit("real")
+             >> no_skip[!char_("a-zA-Z0-9_")] )
         > -range_brackets_double_r(_r1)
         > identifier_r
         > opt_dims_r(_r1)
