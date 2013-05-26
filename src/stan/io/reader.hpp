@@ -81,7 +81,7 @@ namespace stan {
        * @param data_i Sequence of integer values.
        */
       reader(std::vector<T>& data_r,
-             std::vector<int>& data_i) 
+             std::vector<int>& data_i)
         : data_r_(data_r),
           data_i_(data_i),
           pos_(0),
