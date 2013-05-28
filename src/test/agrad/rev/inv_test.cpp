@@ -12,4 +12,12 @@ TEST(AgradRev,inv) {
   f.grad(x,grad_f);
   EXPECT_EQ(1U,grad_f.size());
   EXPECT_FLOAT_EQ(-1 / 49.0, grad_f[0]);
+
+  a = 0.0;
+  x = createAVEC(a);
+  f = inv(a);
+  std::isnan(f.val());
+
+  f.grad(x,grad_f);
+  std::isnan(grad_f[0]);
 }

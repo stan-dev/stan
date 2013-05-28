@@ -3,16 +3,19 @@
 
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/meta/traits.hpp>
+#include <stan/math/functions/square.hpp>
 
-namespace stan{
+namespace stan {
 
-  namespace agrad{
+  namespace agrad {
 
     template <typename T>
     inline
     fvar<T>
     inv_square(const fvar<T>& x) {
-      return fvar<T>(1 / (x.val_ * x.val_), -2 * x.d_ / (x.val_ * x.val_ * x.val_));
+      using stan::math::square;
+
+      return fvar<T>(1 / square(x.val_), -2 * x.d_ / (square(x.val_) * x.val_));
     }
   }
 }

@@ -5,15 +5,14 @@
 #include <stan/meta/traits.hpp>
 #include <boost/math/tools/promotion.hpp>
 
-namespace stan{
+namespace stan {
 
-  namespace agrad{
+  namespace agrad {
 
     template <typename T>
     inline
     fvar<T>
     inv_sqrt(const fvar<T>& x) {
-      using stan::agrad::sqrt;
       using std::sqrt;
       return fvar<T>(1 / sqrt(x.val_), -0.5 * x.d_ / (x.val_ * sqrt(x.val_)));
     }

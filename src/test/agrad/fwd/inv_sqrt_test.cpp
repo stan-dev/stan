@@ -13,9 +13,10 @@ TEST(AgradFvar, inv_sqrt) {
   EXPECT_FLOAT_EQ(inv_sqrt(0.5), a.val_);
   EXPECT_FLOAT_EQ(-0.5 / (0.5 * std::sqrt(0.5)), a.d_);
 
-  fvar<double> z(0.0);
+  fvar<double> z(-5.0);
   z.d_ = 1.0;
   fvar<double> g = inv_sqrt(z);
-  EXPECT_FLOAT_EQ(inv_sqrt(0.0), g.val_);
-  EXPECT_FLOAT_EQ(-0.5 / (0.0 * std::sqrt(0.0)), g.d_);
+
+  std::isnan(g.val_);
+  std::isnan(g.d_);
 }   

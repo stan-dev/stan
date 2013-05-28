@@ -7,4 +7,10 @@ TEST(MathsSpecialFunctions, inv_square) {
 
   y = 25.0;
   EXPECT_FLOAT_EQ(1 / 5.0, stan::math::inv_sqrt(y));
+
+  y = 0.0;
+  std::isnan(stan::math::inv_sqrt(y));
+
+  y = -50.0;
+  std::isnan(stan::math::inv_sqrt(y));
 }
