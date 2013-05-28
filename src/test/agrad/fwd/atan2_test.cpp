@@ -36,21 +36,23 @@ TEST(AgradFvarVar, atan2) {
   x.d_ = 1.3;
 
   fvar<var> z;
-  x.val_ = 1.5;
-  x.d_ = 1.0;
+  z.val_ = 1.5;
+  z.d_ = 1.0;
   fvar<var> a = atan2(x,z);
 
-  EXPECT_FLOAT_EQ(1.5707964, a.val_.val()); //???
-  EXPECT_FLOAT_EQ(0, a.d_.val());
+  EXPECT_FLOAT_EQ(atan2(1.5,1.5), a.val_.val());
+  EXPECT_FLOAT_EQ(0.1, a.d_.val());
 
   AVEC y = createAVEC(x.val_);
   VEC g;
   a.val_.grad(y,g);
-  EXPECT_FLOAT_EQ(0, g[0]);
+  EXPECT_FLOAT_EQ(1.0 / 3.0, g[0]);
+  std::isnan(g[1]);
 
   y = createAVEC(x.d_);
   a.d_.grad(y,g);
   EXPECT_FLOAT_EQ(0, g[0]);
+  std::isnan(g[1]);
 }
 
 TEST(AgradFvarFvar, atan2) {

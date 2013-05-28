@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 #include <stan/agrad/fvar.hpp>
 #include <stan/math/functions/fma.hpp>
+#include <stan/agrad/var.hpp>
+#include <test/agrad/util.hpp>
 
 TEST(AgradFvar, fma) { 
   using stan::agrad::fvar;
@@ -42,4 +44,69 @@ TEST(AgradFvar, fma) {
   fvar<double> g = fma(q, y, p);
   EXPECT_FLOAT_EQ(fma(2.3, 1.2, 1.4), g.val_);
   EXPECT_FLOAT_EQ(2.0 * 2.3, g.d_);
+}
+
+TEST(AgradFvarVar, fma) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;  
+  using stan::math::fma;
+
+  fvar<var> x;
+  x.val_ = 2.5;
+  x.d_ = 1.3;
+
+  fvar<var> y;
+  y.val_ = 1.7;
+  y.d_ = 1.5;
+
+  fvar<var> z;
+  z.val_ = 1.5;
+  z.d_ = 1.0;
+  fvar<var> a = fma(x,y,z);
+
+  EXPECT_FLOAT_EQ(fma(2.5,1.7,1.5), a.val_.val());
+  EXPECT_FLOAT_EQ(2.5 * 1.5 + 1.3 * 1.7 + 1.0, a.d_.val());
+
+  AVEC w = createAVEC(x.val_);
+  VEC g;
+  a.val_.grad(w,g);
+  EXPECT_FLOAT_EQ(1.7, g[0]);
+  std::isnan(g[1]);
+  std::isnan(g[2]);
+
+  w = createAVEC(x.d_);
+  a.d_.grad(w,g);
+  EXPECT_FLOAT_EQ(0, g[0]);
+  std::isnan(g[1]);
+  std::isnan(g[2]);
+}
+
+TEST(AgradFvarFvar, fma) {
+  using stan::agrad::fvar;
+  using stan::math::fma;
+
+  fvar<fvar<double> > x;
+  x.val_.val_ = 2.5;
+  x.val_.d_ = 1.0;
+  x.d_.val_ = 0.0;
+  x.d_.d_ = 0.0;
+
+  fvar<fvar<double> > y;
+  y.val_.val_ = 1.5;
+  y.val_.d_ = 0.0;
+  y.d_.val_ = 1.0;
+  y.d_.d_ = 0.0;
+
+  fvar<fvar<double> > z;
+  z.val_.val_ = 1.7;
+  z.val_.d_ = 0.0;
+  z.d_.val_ = 0.0;
+  z.d_.d_ = 0.0;
+
+  fvar<fvar<double> > a = fma(x,y,z);
+
+  EXPECT_FLOAT_EQ(fma(2.5,1.5,1.7), a.val_.val_);
+  EXPECT_FLOAT_EQ(1.5, a.val_.d_);
+  EXPECT_FLOAT_EQ(2.5, a.d_.val_);
+  EXPECT_FLOAT_EQ(1, a.d_.d_);
 }
