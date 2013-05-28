@@ -29,7 +29,6 @@ TEST(AgradFvar, log_inv_logit){
   EXPECT_FLOAT_EQ(3.0 * exp(0.0) / (1 + exp(0.0)), c.d_);
 }
 
-
 TEST(AgradFvarVar, log_inv_logit) {
   using stan::agrad::fvar;
   using stan::agrad::var;
