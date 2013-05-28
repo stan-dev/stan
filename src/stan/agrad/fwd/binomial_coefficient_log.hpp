@@ -6,14 +6,14 @@
 #include <boost/math/special_functions/digamma.hpp>
 #include <stan/math/functions/binomial_coefficient_log.hpp>
 
-namespace stan{
+namespace stan {
 
-  namespace agrad{
+  namespace agrad {
 
     template <typename T1, typename T2>
     inline
     fvar<typename stan::return_type<T1,T2>::type>
-    binomial_coefficient_log(const fvar<T1>& x1, const fvar<T2>& x2){
+    binomial_coefficient_log(const fvar<T1>& x1, const fvar<T2>& x2) {
       using boost::math::digamma;
       using std::log;
       using stan::math::binomial_coefficient_log;
@@ -44,7 +44,7 @@ namespace stan{
     template <typename T1, typename T2>
     inline
     fvar<typename stan::return_type<T1,T2>::type>
-    binomial_coefficient_log(const fvar<T1>& x1, const T2& x2){
+    binomial_coefficient_log(const fvar<T1>& x1, const T2& x2) {
       using boost::math::digamma;
       using std::log;
       using stan::math::binomial_coefficient_log;
@@ -70,7 +70,7 @@ namespace stan{
     template <typename T1, typename T2>
     inline
     fvar<typename stan::return_type<T1,T2>::type>
-    binomial_coefficient_log(const T1& x1, const fvar<T2>& x2){
+    binomial_coefficient_log(const T1& x1, const fvar<T2>& x2) {
       using boost::math::digamma;
       using std::log;
       using stan::math::binomial_coefficient_log;

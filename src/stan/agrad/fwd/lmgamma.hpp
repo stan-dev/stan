@@ -6,14 +6,14 @@
 #include <boost/math/special_functions/digamma.hpp>
 #include <stan/math/functions/lmgamma.hpp>
 
-namespace stan{
+namespace stan {
 
-  namespace agrad{
+  namespace agrad {
 
     template <typename T1, typename T2>
     inline
     fvar<typename stan::return_type<T1,T2>::type>
-    lmgamma(const fvar<T1>& x1, const fvar<T2>& x2){
+    lmgamma(const fvar<T1>& x1, const fvar<T2>& x2) {
       using stan::math::lmgamma;
       using boost::math::digamma;
       using std::log;
@@ -33,7 +33,7 @@ namespace stan{
     template <typename T1, typename T2>
     inline
     fvar<typename stan::return_type<T1,T2>::type>
-    lmgamma(const T1& x1, const fvar<T2>& x2){
+    lmgamma(const T1& x1, const fvar<T2>& x2) {
       using stan::math::lmgamma;
       using boost::math::digamma;
       using std::log;
@@ -50,7 +50,7 @@ namespace stan{
     template <typename T1, typename T2>
     inline
     fvar<typename stan::return_type<T1,T2>::type>
-    lmgamma(const fvar<T1>& x1, const T2& x2){
+    lmgamma(const fvar<T1>& x1, const T2& x2) {
       using stan::math::lmgamma;
       using boost::math::digamma;
       using std::log;

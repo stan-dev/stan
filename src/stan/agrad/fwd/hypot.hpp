@@ -6,9 +6,9 @@
 #include <boost/math/special_functions/hypot.hpp>
 
 
-namespace stan{
+namespace stan {
 
-  namespace agrad{
+  namespace agrad {
 
     template <typename T1, typename T2>
     inline

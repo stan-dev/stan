@@ -5,9 +5,9 @@
 #include <stan/meta/traits.hpp>
 #include <stan/math/functions/log1p_exp.hpp>
 
-namespace stan{
+namespace stan {
 
-  namespace agrad{
+  namespace agrad {
 
     template <typename T>
     inline

@@ -6,9 +6,9 @@
 #include <stan/math/functions/logit.hpp>
 #include <stan/math/constants.hpp>
 
-namespace stan{
+namespace stan {
 
-  namespace agrad{
+  namespace agrad {
 
     template <typename T>
     inline

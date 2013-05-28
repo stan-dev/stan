@@ -6,9 +6,9 @@
 #include <stan/math/constants.hpp>
 #include <boost/math/special_functions/acosh.hpp>
 
-namespace stan{
+namespace stan {
 
-  namespace agrad{
+  namespace agrad {
 
     template <typename T>
     inline

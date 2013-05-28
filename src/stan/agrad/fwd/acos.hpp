@@ -4,9 +4,9 @@
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/meta/traits.hpp>
 
-namespace stan{
+namespace stan {
 
-  namespace agrad{
+  namespace agrad {
 
     template <typename T>
     inline
