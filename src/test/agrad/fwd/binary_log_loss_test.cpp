@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 #include <stan/agrad/fvar.hpp>
 #include <stan/math/functions/binary_log_loss.hpp>
+#include <stan/agrad/var.hpp>
+#include <test/agrad/util.hpp>
 
 TEST(AgradFvar, binary_log_loss) {
   using stan::agrad::fvar;
@@ -15,9 +17,6 @@ TEST(AgradFvar, binary_log_loss) {
   fvar<double> y(0.4);
   y.d_ = 3.0;
 
-  double p = 0.0;
-  double r = 0.4;
-
   fvar<double> a = binary_log_loss(w, y);
   EXPECT_FLOAT_EQ(binary_log_loss(0.0, 0.4), a.val_);
   EXPECT_FLOAT_EQ(-1.0 * log(0.4) + 1.0 * log(1 - 0.4) + 3.0 / 0.6, a.d_);
@@ -25,22 +24,57 @@ TEST(AgradFvar, binary_log_loss) {
   fvar<double> b = binary_log_loss(x, y);
   EXPECT_FLOAT_EQ(binary_log_loss(1.0, 0.4), b.val_);
   EXPECT_FLOAT_EQ(-2.0 * log(0.4) + 2.0 * log(1 - 0.4) - 3.0 * 1.0 / 0.4, b.d_);
+}
 
-  fvar<double> c = binary_log_loss(p, y);
-  EXPECT_FLOAT_EQ(binary_log_loss(0.0, 0.4), c.val_);
-  EXPECT_FLOAT_EQ(3.0 * 1 / (1 - 0.4), c.d_);
+// TEST(AgradFvarVar, binary_log_loss) {
+//   using stan::agrad::fvar;
+//   using stan::agrad::var;
+//   using stan::math::binary_log_loss;
 
-  fvar<double> d = binary_log_loss(w, r);
-  EXPECT_FLOAT_EQ(binary_log_loss(0.0, 0.4), d.val_);
-  EXPECT_FLOAT_EQ(-1.0 * log(0.4) + 1.0 * log(0.6), d.d_);
+//   fvar<var> x;
+//   x.val_ = 0.0;
+//   x.d_ = 1.0;
 
-  fvar<double> e = binary_log_loss(y, r);
-  isnan(e.val_);
-  isnan(e.d_);
+//   fvar<var> z;
+//   z.val_ = 0.4;
+//   z.d_ = 3.0;
+//   fvar<var> a = binary_log_loss(x,z);
 
-  double s = 1.2;
+//   EXPECT_FLOAT_EQ(binary_log_loss(0.0, 0.4), a.val_.val());
+//   EXPECT_FLOAT_EQ(-1.0 * log(0.4) + 1.0 * log(1 - 0.4) + 3.0 / 0.6, a.d_.val());
 
-  fvar<double> f = binary_log_loss(s, y);
-  isnan(f.val_);
-  isnan(f.d_);
+//   AVEC y = createAVEC(x.val_);
+//   VEC g;
+//   a.val_.grad(y,g);
+//   EXPECT_FLOAT_EQ(0, g[0]);
+//  EXPECT_FLOAT_EQ(0, g[1]);
+
+//   y = createAVEC(x.d_);
+//   a.d_.grad(y,g);
+//   EXPECT_FLOAT_EQ(0, g[0]);
+//  EXPECT_FLOAT_EQ(0, g[1]);
+// }
+
+TEST(AgradFvarFvar, binary_log_loss) {
+  using stan::agrad::fvar;
+  using stan::math::binary_log_loss;
+
+  fvar<fvar<double> > x;
+  x.val_.val_ = 0.0;
+  x.val_.d_ = 1.0;
+  x.d_.val_ = 0.0;
+  x.d_.d_ = 0.0;
+
+  fvar<fvar<double> > y;
+  y.val_.val_ = 0.4;
+  y.val_.d_ = 0.0;
+  y.d_.val_ = 1.0;
+  y.d_.d_ = 0.0;
+
+  fvar<fvar<double> > a = binary_log_loss(x,y);
+
+  EXPECT_FLOAT_EQ(binary_log_loss(0.0,0.4), a.val_.val_);
+  EXPECT_FLOAT_EQ(-1.0 * log(0.4) + 1.0 * log(0.6), a.val_.d_);
+  EXPECT_FLOAT_EQ(3.0 * 1 / (1 - 0.4), a.d_.val_);
+  EXPECT_FLOAT_EQ((1.5 * 1.5 - 1.5 * 1.5) / ((1.5 * 1.5 + 1.5 * 1.5) * (1.5 * 1.5 + 1.5 * 1.5)), a.d_.d_);
 }

@@ -4,7 +4,7 @@
 #include <stan/agrad/var.hpp>
 #include <test/agrad/util.hpp>
 
-TEST(AgradFvar, log1p_exp){
+TEST(AgradFvar, log1p_exp) {
   using stan::agrad::fvar;
   using stan::math::log1p_exp;
   using std::exp;

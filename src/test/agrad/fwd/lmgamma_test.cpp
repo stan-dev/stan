@@ -1,8 +1,10 @@
 #include <gtest/gtest.h>
 #include <stan/agrad/fvar.hpp>
 #include <boost/math/special_functions/digamma.hpp>
+#include <stan/agrad/var.hpp>
+#include <test/agrad/util.hpp>
 
-TEST(AgradFvar, lmgamma){
+TEST(AgradFvar, lmgamma) {
   using stan::agrad::fvar;
   using stan::math::lmgamma;
 

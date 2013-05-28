@@ -4,7 +4,7 @@
 #include <stan/agrad/var.hpp>
 #include <test/agrad/util.hpp>
 
-TEST(AgradFvar, erf){
+TEST(AgradFvar, erf) {
   using stan::agrad::fvar;
   using std::exp;
   using std::sqrt;

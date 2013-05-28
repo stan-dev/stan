@@ -3,7 +3,7 @@
 #include <stan/agrad/var.hpp>
 #include <test/agrad/util.hpp>
 
-TEST(AgradFvar, operatorPlusEqual){
+TEST(AgradFvar, operatorPlusEqual) {
   using stan::agrad::fvar;
 
   fvar<double> a(0.5);

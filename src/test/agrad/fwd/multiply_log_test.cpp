@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 #include <stan/agrad/fvar.hpp>
 #include <stan/math/functions/multiply_log.hpp>
+#include <stan/agrad/var.hpp>
+#include <test/agrad/util.hpp>
 
 TEST(AgradFvar,multiply_log) {
   using stan::agrad::fvar;

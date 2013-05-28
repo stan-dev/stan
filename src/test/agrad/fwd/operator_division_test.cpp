@@ -3,7 +3,7 @@
 #include <stan/agrad/var.hpp>
 #include <test/agrad/util.hpp>
 
-TEST(AgradFvar, operatorDivision){
+TEST(AgradFvar, operatorDivision) {
   using stan::agrad::fvar;
   using std::isnan;
 
