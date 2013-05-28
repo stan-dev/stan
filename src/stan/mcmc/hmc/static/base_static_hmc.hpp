@@ -62,13 +62,11 @@ namespace stan {
       }
       
       void get_sampler_param_names(std::vector<std::string>& names) {
-        names.clear();
         names.push_back("stepsize__");
         names.push_back("int_time__");
       }
       
       void get_sampler_params(std::vector<double>& values) {
-        values.clear();
         values.push_back(this->_epsilon);
         values.push_back(this->_T);
       }
