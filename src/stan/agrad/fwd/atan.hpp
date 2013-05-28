@@ -3,6 +3,7 @@
 
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/meta/traits.hpp>
+#include <stan/math/functions/square.hpp>
 
 namespace stan {
 
@@ -13,7 +14,8 @@ namespace stan {
     fvar<T>
     atan(const fvar<T>& x) {
       using std::atan;
-      return fvar<T>(atan(x.val_), x.d_ / (1 + x.val_ * x.val_));
+      using stan::math::square;
+      return fvar<T>(atan(x.val_), x.d_ / (1 + square(x.val_)));
     }
   }
 }

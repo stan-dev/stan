@@ -3,6 +3,7 @@
 
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/meta/traits.hpp>
+#include <stan/math/functions/square.hpp>
 
 namespace stan {
 
@@ -14,7 +15,8 @@ namespace stan {
     asin(const fvar<T>& x) {
       using std::asin;
       using std::sqrt;
-      return fvar<T>(asin(x.val_), x.d_ / sqrt(1 - x.val_ * x.val_));
+      using stan::math::square;
+      return fvar<T>(asin(x.val_), x.d_ / sqrt(1 - square(x.val_)));
     }
   }
 }

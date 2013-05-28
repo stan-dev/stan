@@ -3,6 +3,7 @@
 
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/meta/traits.hpp>
+#include <stan/math/functions/square.hpp>
 
 namespace stan {
 
@@ -14,7 +15,9 @@ namespace stan {
     acos(const fvar<T>& x) {
       using std::acos;
       using std::sqrt;
-      return fvar<T>(acos(x.val_), x.d_ / -sqrt(1 - x.val_ * x.val_));
+      using stan::math::square;
+
+      return fvar<T>(acos(x.val_), x.d_ / -sqrt(1 - square(x.val_)));
     }
   }
 }
