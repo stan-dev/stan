@@ -30,7 +30,7 @@ namespace stan {
         ze.setZero();
 
         Eigen::VectorXd prop(q.size());
-        prop = stan::prob::multi_normal_rng(ze, _prop_cov, rng);
+        prop = stan::prob::multi_normal_rng(ze, _prop_cov.inverse(), rng);
 
         for(size_t i = 0; i < q.size(); i++)
           q[i] = q[i] + this->_nom_epsilon * prop(i);
