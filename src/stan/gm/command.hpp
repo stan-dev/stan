@@ -579,12 +579,13 @@ namespace stan {
         
         std::cout << "output = " << sample_file << std::endl;
         std::cout << "save_warmup = " << save_warmup<< std::endl;
-        
+
         std::cout << "seed = " << random_seed 
                   << " (" << (command.has_key("seed") 
                     ? "user specified"
                     : "randomly generated") << ")"
                   << std::endl;
+        std::cout << "algorithm = Newton" << std::endl;
         
         std::fstream sample_stream(sample_file.c_str(), 
                                    samples_append_mode);
@@ -598,6 +599,7 @@ namespace stan {
         write_comment_property(sample_stream, "init", init_val);
         write_comment_property(sample_stream, "save_warmup", save_warmup);
         write_comment_property(sample_stream, "seed", random_seed);
+        write_comment_property(sample_stream, "algorithm","Newton");
         write_comment(sample_stream);
         
         sample_stream << "lp__,";
@@ -662,6 +664,8 @@ namespace stan {
                     : "randomly generated") << ")"
                   << std::endl;
         
+        std::cout << "algorithm = Nesterov" << std::endl;
+
         std::fstream sample_stream(sample_file.c_str(), 
                                    samples_append_mode);
         
@@ -674,6 +678,7 @@ namespace stan {
         write_comment_property(sample_stream, "init", init_val);
         write_comment_property(sample_stream, "save_warmup", save_warmup);
         write_comment_property(sample_stream, "seed", random_seed);
+        write_comment_property(sample_stream, "algorithm","Nesterov");
         write_comment(sample_stream);
         
         sample_stream << "lp__,";
@@ -737,6 +742,8 @@ namespace stan {
                     : "randomly generated") << ")"
         << std::endl;
         
+        std::cout << "algorithm = BFGS" << std::endl;
+
         std::fstream sample_stream(sample_file.c_str(), 
                                    samples_append_mode);
         
@@ -750,6 +757,7 @@ namespace stan {
         write_comment_property(sample_stream,"save_warmup",save_warmup);
         write_comment_property(sample_stream,"seed",random_seed);
         write_comment_property(sample_stream,"epsilon",epsilon);
+        write_comment_property(sample_stream,"algorithm","BFGS");
         write_comment(sample_stream);
         
         sample_stream << "lp__,"; // log probability first
