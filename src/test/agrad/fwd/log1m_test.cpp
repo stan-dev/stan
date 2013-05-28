@@ -29,7 +29,6 @@ TEST(AgradFvar, log1m){
   isnan(c.d_);
 }
 
-
 TEST(AgradFvarVar, log1m) {
   using stan::agrad::fvar;
   using stan::agrad::var;
