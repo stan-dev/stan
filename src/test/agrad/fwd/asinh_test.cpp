@@ -58,13 +58,25 @@ TEST(AgradFvarFvar, asinh) {
   fvar<fvar<double> > x;
   x.val_.val_ = 1.5;
   x.val_.d_ = 2.0;
-  x.d_.val_ = 3.0;
-  x.d_.d_ = 4.0;
+  x.d_.val_ = 0.0;
+  x.d_.d_ = 0.0;
 
   fvar<fvar<double> > a = asinh(x);
 
   EXPECT_FLOAT_EQ(asinh(1.5), a.val_.val_);
   EXPECT_FLOAT_EQ(2.0 / sqrt(1.0 + 1.5 * 1.5), a.val_.d_);
-  EXPECT_FLOAT_EQ(3.0 / sqrt(1.0 + 1.5 * 1.5), a.d_.val_);
-  //EXPECT_FLOAT_EQ(1.2 / sqrt(1.0 + 1.5 * 1.5), a.d_.d_);
+  EXPECT_FLOAT_EQ(0, a.d_.val_);
+  EXPECT_FLOAT_EQ(0, a.d_.d_);
+
+  fvar<fvar<double> > y;
+  y.val_.val_ = 1.5;
+  y.val_.d_ = 0.0;
+  y.d_.val_ = 2.0;
+  y.d_.d_ = 0.0;
+
+  a = asinh(y);
+  EXPECT_FLOAT_EQ(asinh(1.5), a.val_.val_);
+  EXPECT_FLOAT_EQ(0, a.val_.d_);
+  EXPECT_FLOAT_EQ(2.0 / sqrt(1.0 + 1.5 * 1.5), a.d_.val_);
+  EXPECT_FLOAT_EQ(0, a.d_.d_);
 }

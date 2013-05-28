@@ -67,14 +67,12 @@ TEST(AgradFvarFvar, abs) {
 
   fvar<fvar<double> > x;
   x.val_.val_ = 4.0;
-  x.val_.d_ = 3.0;
-  x.d_.val_ = 2.0;
-  x.d_.d_ = 1.0;
+  x.val_.d_ = 1.0;
 
   fvar<fvar<double> > a = abs(x);
 
   EXPECT_FLOAT_EQ(4.0, a.val_.val_);
-  EXPECT_FLOAT_EQ(3.0, a.val_.d_);
-  EXPECT_FLOAT_EQ(2.0, a.d_.val_);
-  EXPECT_FLOAT_EQ(1.0, a.d_.d_);
+  EXPECT_FLOAT_EQ(1.0, a.val_.d_);
+  EXPECT_FLOAT_EQ(0.0, a.d_.val_);
+  EXPECT_FLOAT_EQ(0.0, a.d_.d_);
 }
