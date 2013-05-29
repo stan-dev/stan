@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <stan/agrad/fvar.hpp>
 #include <stan/math/functions/inv_square.hpp>
+#include <stan/math/constants.hpp>
 
 TEST(AgradFvar, inv_square) {
   using stan::agrad::fvar;
@@ -16,6 +17,6 @@ TEST(AgradFvar, inv_square) {
   fvar<double> z(0.0);
   z.d_ = 1.0;
   fvar<double> g = inv_square(z);
-  std::isnan(g.val_);
-  std::isnan(g.d_);
+  EXPECT_FLOAT_EQ(stan::math::positive_infinity(), g.val_);
+  EXPECT_FLOAT_EQ(stan::math::negative_infinity(), g.d_);
 }   

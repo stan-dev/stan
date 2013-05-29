@@ -1,5 +1,6 @@
 #include "stan/math/functions/inv_sqrt.hpp"
 #include <gtest/gtest.h>
+#include <stan/math/constants.hpp>
 
 TEST(MathsSpecialFunctions, inv_square) {
   double y = 4.0;
@@ -9,7 +10,7 @@ TEST(MathsSpecialFunctions, inv_square) {
   EXPECT_FLOAT_EQ(1 / 5.0, stan::math::inv_sqrt(y));
 
   y = 0.0;
-  std::isnan(stan::math::inv_sqrt(y));
+  EXPECT_FLOAT_EQ(stan::math::positive_infinity(),stan::math::inv_sqrt(y));
 
   y = -50.0;
   std::isnan(stan::math::inv_sqrt(y));

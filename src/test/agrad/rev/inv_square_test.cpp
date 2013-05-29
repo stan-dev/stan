@@ -1,6 +1,7 @@
 #include <stan/agrad/rev/inv_square.hpp>
 #include <test/agrad/util.hpp>
 #include <gtest/gtest.h>
+#include <stan/math/constants.hpp>
 
 TEST(AgradRev,inv_square) {
   AVAR a = 7.0;
@@ -16,8 +17,8 @@ TEST(AgradRev,inv_square) {
   a = 0.0;
   x = createAVEC(a);
   f = inv_square(a);
-  std::isnan(f.val());
+  EXPECT_FLOAT_EQ(stan::math::positive_infinity(),f.val());
 
   f.grad(x,grad_f);
-  std::isnan(grad_f[0]);
+  EXPECT_FLOAT_EQ(stan::math::negative_infinity(),grad_f[0]);
 }
