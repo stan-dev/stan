@@ -75,6 +75,6 @@ TEST(AgradFvarFvar, binary_log_loss) {
 
   EXPECT_FLOAT_EQ(binary_log_loss(0.0,0.4), a.val_.val_);
   EXPECT_FLOAT_EQ(-1.0 * log(0.4) + 1.0 * log(0.6), a.val_.d_);
-  EXPECT_FLOAT_EQ(3.0 * 1 / (1 - 0.4), a.d_.val_);
-  EXPECT_FLOAT_EQ((1.5 * 1.5 - 1.5 * 1.5) / ((1.5 * 1.5 + 1.5 * 1.5) * (1.5 * 1.5 + 1.5 * 1.5)), a.d_.d_);
+  EXPECT_FLOAT_EQ(1.0 * 1 / (1 - 0.4), a.d_.val_);
+  EXPECT_FLOAT_EQ(-25.0 / 6.0, a.d_.d_);
 }
