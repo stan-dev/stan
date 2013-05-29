@@ -77,10 +77,10 @@ TEST_F(StanIoStanCsvReader,read_header1) {
   EXPECT_TRUE(stan::io::stan_csv_reader::read_header(header1_stream, header));
   
   ASSERT_EQ(52, header.size());
-  EXPECT_EQ("log_post", header(0));
-  EXPECT_EQ("accept_stat", header(1));
+  EXPECT_EQ("lp__", header(0));
+  EXPECT_EQ("accept_stat__", header(1));
   EXPECT_EQ("stepsize__", header(2));
-  EXPECT_EQ("depth__", header(3));
+  EXPECT_EQ("treedepth__", header(3));
   EXPECT_EQ("d", header(4));
   EXPECT_EQ("sigmasq_delta", header(5));
   EXPECT_EQ("mu[1]", header(6));
@@ -190,9 +190,8 @@ TEST_F(StanIoStanCsvReader,read_adaptation1) {
 TEST_F(StanIoStanCsvReader,read_samples1) {
   
   Eigen::MatrixXd samples;
-  stan::io::stan_csv_timing timing;
   
-  EXPECT_TRUE(stan::io::stan_csv_reader::read_samples(samples1_stream, samples, timing));
+  EXPECT_TRUE(stan::io::stan_csv_reader::read_samples(samples1_stream, samples));
   
   ASSERT_EQ(5, samples.rows());
   ASSERT_EQ(52, samples.cols());
@@ -209,12 +208,21 @@ TEST_F(StanIoStanCsvReader,read_samples1) {
     for (int j = 0; j < 52; j++)
       EXPECT_FLOAT_EQ(expected_samples(i,j), samples(i,j));
   
+}
+
+TEST_F(StanIoStanCsvReader,read_timing1) {
+  
+  stan::io::stan_csv_timing timing;
+  
+  EXPECT_TRUE(stan::io::stan_csv_reader::read_timing(samples1_stream, timing));
+  
   EXPECT_FLOAT_EQ(0.307221, timing.warmup);
   EXPECT_FLOAT_EQ(0.350392, timing.sampling);
   
 }
 
 TEST_F(StanIoStanCsvReader,ParseBlocker) {
+  
   stan::io::stan_csv blocker0;
   blocker0 = stan::io::stan_csv_reader::parse(blocker0_stream);
   
@@ -245,10 +253,10 @@ TEST_F(StanIoStanCsvReader,ParseBlocker) {
   
   // header
   ASSERT_EQ(52, blocker0.header.size());
-  EXPECT_EQ("log_post", blocker0.header(0));
-  EXPECT_EQ("accept_stat", blocker0.header(1));
+  EXPECT_EQ("lp__", blocker0.header(0));
+  EXPECT_EQ("accept_stat__", blocker0.header(1));
   EXPECT_EQ("stepsize__", blocker0.header(2));
-  EXPECT_EQ("depth__", blocker0.header(3));
+  EXPECT_EQ("treedepth__", blocker0.header(3));
   EXPECT_EQ("d", blocker0.header(4));
   EXPECT_EQ("sigmasq_delta", blocker0.header(5));
   EXPECT_EQ("mu[1]", blocker0.header(6));
@@ -404,10 +412,10 @@ TEST_F(StanIoStanCsvReader,read_header2) {
   EXPECT_TRUE(stan::io::stan_csv_reader::read_header(header2_stream, header));
   
   ASSERT_EQ(310, header.size());
-  EXPECT_EQ("log_post", header(0));
-  EXPECT_EQ("accept_stat", header(1));
+  EXPECT_EQ("lp__", header(0));
+  EXPECT_EQ("accept_stat__", header(1));
   EXPECT_EQ("stepsize__", header(2));
-  EXPECT_EQ("depth__", header(3));
+  EXPECT_EQ("treedepth__", header(3));
   EXPECT_EQ("a0", header(4));
   EXPECT_EQ("alpha_Base", header(5));
   EXPECT_EQ("alpha_Trt", header(6));
@@ -447,9 +455,8 @@ TEST_F(StanIoStanCsvReader,read_adaptation2) {
 TEST_F(StanIoStanCsvReader,read_samples2) {
   
   Eigen::MatrixXd samples;
-  stan::io::stan_csv_timing timing;
   
-  EXPECT_TRUE(stan::io::stan_csv_reader::read_samples(samples2_stream, samples, timing));
+  EXPECT_TRUE(stan::io::stan_csv_reader::read_samples(samples2_stream, samples));
   
   ASSERT_EQ(3, samples.rows());
   ASSERT_EQ(310, samples.cols());
@@ -464,6 +471,14 @@ TEST_F(StanIoStanCsvReader,read_samples2) {
     for (int j = 0; j < 310; j++)
       EXPECT_FLOAT_EQ(expected_samples(i,j), samples(i,j));
   
+}
+
+TEST_F(StanIoStanCsvReader,read_timing2) {
+  
+  stan::io::stan_csv_timing timing;
+  
+  EXPECT_TRUE(stan::io::stan_csv_reader::read_timing(samples2_stream, timing));
+    
   EXPECT_FLOAT_EQ(4.60978, timing.warmup);
   EXPECT_FLOAT_EQ(6.02445, timing.sampling);
   
@@ -499,10 +514,10 @@ TEST_F(StanIoStanCsvReader,ParseEpil) {
   
   // header
   ASSERT_EQ(310, epil0.header.size());
-  EXPECT_EQ("log_post", epil0.header(0));
-  EXPECT_EQ("accept_stat", epil0.header(1));
+  EXPECT_EQ("lp__", epil0.header(0));
+  EXPECT_EQ("accept_stat__", epil0.header(1));
   EXPECT_EQ("stepsize__", epil0.header(2));
-  EXPECT_EQ("depth__", epil0.header(3));
+  EXPECT_EQ("treedepth__", epil0.header(3));
   EXPECT_EQ("a0", epil0.header(4));
   EXPECT_EQ("alpha_Base", epil0.header(5));
   EXPECT_EQ("alpha_Trt", epil0.header(6));
@@ -580,10 +595,10 @@ TEST_F(StanIoStanCsvReader,ParseBlockerNondiag) {
   
   // header
   ASSERT_EQ(52, blocker_nondiag.header.size());
-  EXPECT_EQ("log_post", blocker_nondiag.header(0));
-  EXPECT_EQ("accept_stat", blocker_nondiag.header(1));
+  EXPECT_EQ("lp__", blocker_nondiag.header(0));
+  EXPECT_EQ("accept_stat__", blocker_nondiag.header(1));
   EXPECT_EQ("stepsize__", blocker_nondiag.header(2));
-  EXPECT_EQ("depth__", blocker_nondiag.header(3));
+  EXPECT_EQ("treedepth__", blocker_nondiag.header(3));
   EXPECT_EQ("d", blocker_nondiag.header(4));
   EXPECT_EQ("sigmasq_delta", blocker_nondiag.header(5));
   EXPECT_EQ("mu[1]", blocker_nondiag.header(6));
