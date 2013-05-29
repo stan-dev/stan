@@ -100,4 +100,5 @@
 #include <stan/agrad/fwd/log_inv_logit.hpp>
 #include <stan/agrad/fwd/log1m_inv_logit.hpp>
 
+#include <stan/agrad/fwd/bessel_first_kind.hpp>
 #endif
