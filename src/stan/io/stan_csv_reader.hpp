@@ -246,7 +246,7 @@ namespace stan {
 
       }
       
-      static bool read_samples(std::istream& in, Eigen::MatrixXd& samples, stan_csv_timing& timing) {
+      static bool read_samples(std::istream& in, Eigen::MatrixXd& samples) {
         std::stringstream ss;
         std::string line;
 
@@ -260,43 +260,26 @@ namespace stan {
           
           bool comment_line = (in.peek() == '#');
           bool empty_line   = (in.peek() == '\n');
-          bool timing_line  = (in.peek() == ' ') || (in.peek() == 'E');
 
           std::getline(in, line);
           
           if (!comment_line && !empty_line) {
             
-            if (!timing_line) {
+            ss << line << '\n';
             
-              ss << line << '\n';
-              
-              int current_cols = std::count(line.begin(), line.end(), ',') + 1;
-              if (cols == -1) {
-                cols = current_cols;
-              } else if (cols != current_cols) {
-                std::cout << "Error: expected " << cols << " columns, but found " 
-                          << current_cols << " instead for row " << rows + 1 << std::endl;
-                return false;
-              }
-              rows++;
-              
+            int current_cols = std::count(line.begin(), line.end(), ',') + 1;
+            if (cols == -1) {
+              cols = current_cols;
+            } else if (cols != current_cols) {
+              std::cout << "Error: expected " << cols << " columns, but found " 
+                        << current_cols << " instead for row " << rows + 1 << std::endl;
+              return false;
             }
-            else {
-              
-              ss << line;
-              
-              if (line.find("(Warm Up)") != std::string::npos) {
-                int left = 14;
-                int right = line.find(" seconds");
-                timing.warmup += boost::lexical_cast<double>(line.substr(left, right - left));
-              } else if (line.find("(Sampling)") != std::string::npos) {
-                int left = 14;
-                int right = line.find(" seconds");
-                timing.sampling += boost::lexical_cast<double>(line.substr(left, right - left));
-              }
-                
-            }
+            rows++;
             
+          }
+          else {
+            break;
           }
           
           in.peek();
@@ -318,6 +301,38 @@ namespace stan {
         return true;
       }
 
+      static bool read_timing(std::istream& in, stan_csv_timing& timing) {
+        
+        std::string line;
+        
+        if (in.good() == false)
+          return false;
+        
+        while (in.good()) {
+          
+          std::getline(in, line);
+          
+          if (in.peek() == '\n') continue;
+              
+          if (line.find("(Warm-up)") != std::string::npos) {
+            int left = 16;
+            int right = line.find(" seconds");
+            timing.warmup += boost::lexical_cast<double>(line.substr(left, right - left));
+          } else if (line.find("(Sampling)") != std::string::npos) {
+            int left = 16;
+            int right = line.find(" seconds");
+            timing.sampling += boost::lexical_cast<double>(line.substr(left, right - left));
+          }
+          
+          in.peek();
+          
+        }
+        
+        return true;
+        
+      }
+
+      
       /** 
        * Parses the file.
        * 
@@ -339,11 +354,15 @@ namespace stan {
           std::cout << "Warning: non-fatal error reading adapation data" << std::endl;
         }
         
+        if (!read_samples(in, data.samples)) {
+          std::cout << "Warning: non-fatal error reading samples" << std::endl;
+        }
+        
         data.timing.warmup = 0;
         data.timing.sampling = 0;
         
-        if (!read_samples(in, data.samples, data.timing)) {
-          std::cout << "Warning: non-fatal error reading samples" << std::endl;
+        if (!read_timing(in, data.timing)) {
+          std::cout << "Warning: non-fatal error reading timing" << std::endl;
         }
         
         return data;
