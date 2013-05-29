@@ -79,7 +79,7 @@ TEST(AgradFvarFvar, round) {
   y.d_.val_ = 2.0;
   y.d_.d_ = 0.0;
 
-  a = ceil(y);
+  a = round(y);
   EXPECT_FLOAT_EQ(round(1.5), a.val_.val_);
   EXPECT_FLOAT_EQ(0, a.val_.d_);
   EXPECT_FLOAT_EQ(0, a.d_.val_);

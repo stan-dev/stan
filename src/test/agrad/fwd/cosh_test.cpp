@@ -81,5 +81,3 @@ TEST(AgradFvarFvar, cosh) {
   EXPECT_FLOAT_EQ(2.0 * sinh(1.5), a.d_.val_);
   EXPECT_FLOAT_EQ(0, a.d_.d_);
 }
-
-
