@@ -56,6 +56,8 @@ for (size_t i = 0; i < int_vector_types.size(); i++)
       for (size_t l = 0; l < vector_types.size(); l++) 
         add("beta_binomial_log",DOUBLE_T, // result
             int_vector_types[i],int_vector_types[j],vector_types[k],vector_types[l]);
+add_binary("bessel_first_kind");
+add_binary("bessel_second_kind");
 add("beta_binomial_rng",INT_T,INT_T,DOUBLE_T,DOUBLE_T);
 for (size_t i = 0; i < int_vector_types.size(); i++) 
   for (size_t j = 0; j < int_vector_types.size(); j++)
