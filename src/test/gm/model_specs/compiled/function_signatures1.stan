@@ -133,6 +133,8 @@ transformed data {
   transformed_data_real <- binomial_coefficient_log(d_real, d_real);
   transformed_data_real <- bessel_first_kind(d_real, d_real);
   transformed_data_real <- bessel_second_kind(d_real, d_real);
+  transformed_data_real <- falling_factorial(d_real, d_real);
+  transformed_data_real <- rising_factorial(d_real, d_real);
 
   //   composed functions
   transformed_data_real <- expm1(d_real);
@@ -517,6 +519,10 @@ transformed parameters {
   transformed_param_real <- bessel_first_kind(d_real, p_real);
   transformed_param_real <- bessel_second_kind(d_real, d_real);
   transformed_param_real <- bessel_second_kind(d_real, p_real);
+  transformed_param_real <- falling_factorial(d_real, d_real);
+  transformed_param_real <- falling_factorial(p_real, d_real);  
+  transformed_param_real <- rising_factorial(d_real, d_real);
+  transformed_param_real <- rising_factorial(p_real, d_real);
 
 
   //   composed functions

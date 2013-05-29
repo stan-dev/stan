@@ -89,6 +89,10 @@
 #include <stan/agrad/fwd/lmgamma.hpp>
 #include <stan/agrad/fwd/lbeta.hpp>
 #include <stan/agrad/fwd/binomial_coefficient_log.hpp>
+#include <stan/agrad/fwd/bessel_first_kind.hpp>
+#include <stan/agrad/fwd/bessel_second_kind.hpp>
+#include <stan/agrad/fwd/falling_factorial.hpp>
+#include <stan/agrad/fwd/rising_factorial.hpp>
 
 //composed functions
 #include <stan/agrad/fwd/expm1.hpp>
@@ -100,6 +104,4 @@
 #include <stan/agrad/fwd/log_inv_logit.hpp>
 #include <stan/agrad/fwd/log1m_inv_logit.hpp>
 
-#include <stan/agrad/fwd/bessel_first_kind.hpp>
-#include <stan/agrad/fwd/bessel_second_kind.hpp>
 #endif

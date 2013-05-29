@@ -219,6 +219,7 @@ for (size_t i = 0; i < vector_types.size(); ++i) {
 }
 add_ternary("exp_mod_normal_rng");
 add_unary("fabs");
+add_binary("falling_factorial");
 add_binary("fdim");
 add_unary("floor");
 add_ternary("fma");
@@ -477,6 +478,7 @@ add("rep_matrix", MATRIX_T, VECTOR_T, INT_T);
 add("rep_matrix", MATRIX_T, ROW_VECTOR_T, INT_T);
 add("rep_row_vector", ROW_VECTOR_T, DOUBLE_T, INT_T);
 add("rep_vector", VECTOR_T, DOUBLE_T, INT_T);
+add_binary("rising_factorial");
 add_unary("round");
 add("row",ROW_VECTOR_T,MATRIX_T,INT_T);
 add("rows",INT_T,VECTOR_T);

@@ -104,4 +104,6 @@
 #include <stan/agrad/rev/owens_t.hpp>
 #include <stan/agrad/rev/bessel_first_kind.hpp>
 #include <stan/agrad/rev/bessel_second_kind.hpp>
+#include <stan/agrad/fwd/falling_factorial.hpp>
+#include <stan/agrad/fwd/rising_factorial.hpp>
 #endif
