@@ -4,6 +4,7 @@
 #include <boost/random/additive_combine.hpp>
 
 #include <gtest/gtest.h>
+#include <test/models/utility.hpp>
 
 typedef boost::ecuyer1988 rng_t;
 
@@ -116,5 +117,31 @@ TEST(McmcBaseHMC, set_stepsize_jitter) {
   
   sampler.set_nominal_stepsize(-0.1);
   EXPECT_EQ(old_jitter, sampler.get_stepsize_jitter());
+  
+}
+
+TEST(McmcBaseHMC, init_stepsize) {
+  
+  std::vector<std::string> model_path;
+  model_path.push_back("src");
+  model_path.push_back("test");
+  model_path.push_back("mcmc");
+  model_path.push_back("models");
+  model_path.push_back("improper");
+  
+  std::string command = convert_model_path(model_path);
+  std::string command_output;
+  long time;
+  
+  try {
+    command_output = run_command(command, time);
+  } catch(...) {
+    ADD_FAILURE() << "Failed running command: " << command;
+  }
+  
+  command_output.erase(command_output.length() - 1);
+  
+  EXPECT_EQ("Posterior is improper. Please check your model.",
+            command_output.substr(command_output.rfind('\n')).erase(0, 1) );
   
 }
