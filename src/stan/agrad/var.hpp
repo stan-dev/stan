@@ -103,4 +103,5 @@
 #include <stan/agrad/rev/as_bool.hpp>
 #include <stan/agrad/rev/owens_t.hpp>
 
+#include <stan/agrad/rev/bessel_first_kind.hpp>
 #endif
