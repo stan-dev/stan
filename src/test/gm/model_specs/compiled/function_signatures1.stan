@@ -251,6 +251,13 @@ transformed data {
   transformed_data_vector <- rows_dot_self(d_row_vector);
   transformed_data_vector <- rows_dot_self(d_matrix);
 
+  // quadratic forms
+  transformed_data_real <- quad_form(d_matrix,d_vector);
+  transformed_data_matrix <- quad_form(d_matrix,d_matrix);
+  transformed_data_real <- trace_quad_form(d_matrix,d_vector);
+  transformed_data_real <- trace_quad_form(d_matrix,d_matrix);
+  transformed_data_real <- trace_gen_quad_form(d_matrix,d_matrix,d_matrix);
+
   //  reductions
   transformed_data_real <- min(d_vector);
   transformed_data_real <- min(d_row_vector);
@@ -303,6 +310,7 @@ transformed data {
   transformed_data_real <- determinant(d_matrix);
   transformed_data_real <- log_determinant(d_matrix);
   transformed_data_matrix <- inverse(d_matrix);
+  transformed_data_matrix <- inverse_spd(d_matrix);
   transformed_data_vector <- eigenvalues_sym(d_matrix);
   transformed_data_matrix <- eigenvectors_sym(d_matrix);
   transformed_data_matrix <- cholesky_decompose(d_matrix);
@@ -760,6 +768,33 @@ transformed parameters {
   transformed_param_real <- dot_self(p_vector);
   transformed_param_real <- dot_self(p_row_vector);  
 
+  // quadratic forms
+  transformed_param_real <- quad_form(d_matrix,d_vector);
+  transformed_param_real <- quad_form(d_matrix,p_vector);
+  transformed_param_real <- quad_form(p_matrix,d_vector);
+  transformed_param_real <- quad_form(p_matrix,p_vector);
+  transformed_param_matrix <- quad_form(d_matrix,d_matrix);
+  transformed_param_matrix <- quad_form(d_matrix,p_matrix);
+  transformed_param_matrix <- quad_form(p_matrix,d_matrix);
+  transformed_param_matrix <- quad_form(p_matrix,p_matrix);
+  transformed_param_real <- trace_quad_form(d_matrix,d_vector);
+  transformed_param_real <- trace_quad_form(d_matrix,p_vector);
+  transformed_param_real <- trace_quad_form(p_matrix,d_vector);
+  transformed_param_real <- trace_quad_form(p_matrix,p_vector);
+  transformed_param_real <- trace_quad_form(d_matrix,d_matrix);
+  transformed_param_real <- trace_quad_form(d_matrix,p_matrix);
+  transformed_param_real <- trace_quad_form(p_matrix,d_matrix);
+  transformed_param_real <- trace_quad_form(p_matrix,p_matrix);
+  transformed_param_real <- trace_gen_quad_form(d_matrix,d_matrix,d_matrix);
+  transformed_param_real <- trace_gen_quad_form(d_matrix,d_matrix,p_matrix);
+  transformed_param_real <- trace_gen_quad_form(d_matrix,p_matrix,d_matrix);
+  transformed_param_real <- trace_gen_quad_form(p_matrix,d_matrix,d_matrix);
+  transformed_param_real <- trace_gen_quad_form(p_matrix,p_matrix,d_matrix);
+  transformed_param_real <- trace_gen_quad_form(p_matrix,d_matrix,p_matrix);
+  transformed_param_real <- trace_gen_quad_form(d_matrix,p_matrix,p_matrix);
+  transformed_param_real <- trace_gen_quad_form(p_matrix,p_matrix,p_matrix);
+
+
   //  reductions
   transformed_param_real <- min(d_vector);
   transformed_param_real <- min(p_vector);
@@ -851,6 +886,8 @@ transformed parameters {
   transformed_param_real <- log_determinant(p_matrix);
   transformed_param_matrix <- inverse(d_matrix);
   transformed_param_matrix <- inverse(p_matrix);
+  transformed_param_matrix <- inverse_spd(d_matrix);
+  transformed_param_matrix <- inverse_spd(p_matrix);
   transformed_param_vector <- eigenvalues_sym(d_matrix);
   transformed_param_vector <- eigenvalues_sym(p_matrix);
   transformed_param_matrix <- eigenvectors_sym(d_matrix);

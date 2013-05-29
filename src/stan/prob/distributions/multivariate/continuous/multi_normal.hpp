@@ -21,6 +21,7 @@
 #include <stan/math/matrix/multiply.hpp>
 #include <stan/math/matrix/subtract.hpp>
 #include <stan/math/matrix/sum.hpp>
+#include <stan/math/matrix/trace_quad_form.hpp>
 
 #include <stan/math/matrix/ldlt.hpp>
 
@@ -261,6 +262,7 @@ namespace stan {
       using stan::math::dot_product;
       using stan::math::log_determinant_ldlt;
       using stan::math::mdivide_left_ldlt;
+      using stan::math::trace_inv_quad_form_ldlt;
       using stan::math::LDLT_factor;
       
       if (!check_size_match(function, 
@@ -319,10 +321,7 @@ namespace stan {
           Eigen::Dynamic, 1> y_minus_mu(y.size());
         for (int i = 0; i < y.size(); i++)
           y_minus_mu(i) = y(i)-mu(i);
-        Eigen::Matrix<typename 
-          boost::math::tools::promote_args<T_covar,T_loc,T_y>::type,
-          Eigen::Dynamic, 1> Sinv_y_minus_mu(mdivide_left_ldlt(ldlt_Sigma,y_minus_mu));
-        lp -= 0.5 * dot_product(y_minus_mu,Sinv_y_minus_mu);
+        lp -= 0.5 * trace_inv_quad_form_ldlt(ldlt_Sigma,y_minus_mu);
       }
       return lp;
     }
@@ -426,12 +425,6 @@ namespace stan {
           boost::math::tools::promote_args<T_loc,T_y>::type,
           Eigen::Dynamic,Eigen::Dynamic> z(y_minus_MU.transpose()); // was = 
         
-        // FIXME: revert this code when subtract() is fixed.
-        // Eigen::Matrix<typename 
-        //               boost::math::tools::promote_args<T_loc,T_y>::type,
-        //               Eigen::Dynamic,Eigen::Dynamic> 
-        //   z(subtract(y,MU).transpose()); // was = 
-        
         Eigen::Matrix<typename 
           boost::math::tools::promote_args<T_covar,T_loc,T_y>::type,
           Eigen::Dynamic,Eigen::Dynamic> Sinv_z(mdivide_left_ldlt(ldlt_Sigma,z));
@@ -465,8 +458,7 @@ namespace stan {
       using stan::math::check_positive;
       using stan::math::check_finite;
       using stan::math::sum;
-      using stan::math::dot_product;
-      using stan::math::multiply;
+      using stan::math::trace_quad_form;
       using stan::math::log_determinant_ldlt;
       using stan::math::LDLT_factor;
       
@@ -484,9 +476,9 @@ namespace stan {
       if (!ldlt_Sigma.success()) {
         std::ostringstream message;
         message << "Precision matrix is not positive definite. " 
-        << "Sigma(0,0) is %1%.";
+        << "Sigma[1,1] is %1%.";
         std::string str(message.str());
-        stan::math::dom_err(function,Sigma(0,0),"Precision matrix",str.c_str(),"",&lp);
+        stan::math::dom_err(function,Sigma(0,0),"",str.c_str(),"",&lp);
         return lp;
       }
 
@@ -525,10 +517,7 @@ namespace stan {
           Eigen::Dynamic, 1> y_minus_mu(y.size());
         for (int i = 0; i < y.size(); i++)
           y_minus_mu(i) = y(i)-mu(i);
-        Eigen::Matrix<typename 
-          boost::math::tools::promote_args<T_covar,T_loc,T_y>::type,
-          Eigen::Dynamic, 1> Sinv_y_minus_mu(multiply(Sigma,y_minus_mu));
-        lp -= 0.5 * dot_product(y_minus_mu,Sinv_y_minus_mu);
+        lp -= 0.5 * trace_quad_form(Sigma,y_minus_mu);
       }
       return lp;
     }
@@ -560,8 +549,7 @@ namespace stan {
       using stan::math::check_positive;
       using stan::math::check_finite;
       using stan::math::sum;
-      using stan::math::columns_dot_product;
-      using stan::math::multiply;
+      using stan::math::trace_quad_form;
       using stan::math::log_determinant_ldlt;
       using stan::math::LDLT_factor;
       
@@ -578,10 +566,10 @@ namespace stan {
       LDLT_factor<T_covar,Eigen::Dynamic,Eigen::Dynamic> ldlt_Sigma(Sigma);
       if (!ldlt_Sigma.success()) {
         std::ostringstream message;
-        message << "Covariance matrix is not positive definite. " 
-        << "Sigma(0,0) is %1%.";
+        message << "Precision matrix is not positive definite. " 
+        << "Sigma[1,1] is %1%.";
         std::string str(message.str());
-        stan::math::dom_err(function,Sigma(0,0),"Covariance matrix",str.c_str(),"",&lp);
+        stan::math::dom_err(function,Sigma(0,0),"",str.c_str(),"",&lp);
         return lp;
       }
       
@@ -612,7 +600,7 @@ namespace stan {
         lp += NEG_LOG_SQRT_TWO_PI * y.cols() * y.rows();
       
       if (include_summand<propto,T_covar>::value) {
-        lp += log_determinant_ldlt(ldlt_Sigma) * (0.5 * y.rows());
+        lp += log_determinant_ldlt(ldlt_Sigma) * (0.5 * y.cols());
       }
       
       if (include_summand<propto,T_y,T_loc,T_covar>::value) {
@@ -632,17 +620,7 @@ namespace stan {
           boost::math::tools::promote_args<T_loc,T_y>::type,
           Eigen::Dynamic,Eigen::Dynamic> z(y_minus_MU.transpose()); // was = 
         
-        // FIXME: revert this code when subtract() is fixed.
-        // Eigen::Matrix<typename 
-        //               boost::math::tools::promote_args<T_loc,T_y>::type,
-        //               Eigen::Dynamic,Eigen::Dynamic> 
-        //   z(subtract(y,MU).transpose()); // was = 
-        
-        Eigen::Matrix<typename 
-          boost::math::tools::promote_args<T_covar,T_loc,T_y>::type,
-          Eigen::Dynamic,Eigen::Dynamic> Sinv_y_minus_mu(multiply(Sigma,z));
-        
-        lp -= 0.5 * sum(columns_dot_product(z,Sinv_y_minus_mu));
+        lp -= 0.5 * trace_quad_form(Sigma,z);
       }
       return lp;      
     }

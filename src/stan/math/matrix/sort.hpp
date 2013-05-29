@@ -18,8 +18,7 @@ namespace stan {
      */
     template <typename T>
     inline typename std::vector<T> sort_asc(std::vector<T> xs) {
-      if (xs.size() > 1)
-        std::sort(xs.begin(), xs.end());
+      std::sort(xs.begin(), xs.end());
       return xs;
     }
 
@@ -32,8 +31,7 @@ namespace stan {
      */
     template <typename T>
     inline typename std::vector<T> sort_desc(std::vector<T> xs) {
-      if (xs.size() > 1U)
-        std::sort(xs.begin(), xs.end(), std::greater<T>());
+      std::sort(xs.begin(), xs.end(), std::greater<T>());
       return xs;
     }
 
@@ -46,8 +44,7 @@ namespace stan {
      */
     template <typename T, int R, int C>
     inline typename Eigen::Matrix<T,R,C> sort_asc(Eigen::Matrix<T,R,C> xs) {
-      if (xs.size() > 1U)
-        std::sort(xs.data(), xs.data()+xs.size());
+      std::sort(xs.data(), xs.data()+xs.size());
       return xs;
     }
 
@@ -60,8 +57,7 @@ namespace stan {
      */
  template <typename T, int R, int C>
     inline typename Eigen::Matrix<T,R,C> sort_desc(Eigen::Matrix<T,R,C> xs) {
-      if (xs.size() > 1U)
-        std::sort(xs.data(), xs.data()+xs.size(), std::greater<T>());
+      std::sort(xs.data(), xs.data()+xs.size(), std::greater<T>());
       return xs;
     }
     
