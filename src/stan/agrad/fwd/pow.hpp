@@ -17,9 +17,10 @@ namespace stan{
     pow(const fvar<T>& x1, const fvar<T>& x2) {
       using std::pow;
       using std::log;
-      return fvar<T>(pow(x1.val_, x2.val_),
+      T pow_x1_x2(pow(x1.val_,x2.val_));
+      return fvar<T>(pow_x1_x2,
                        (x2.d_ * log(x1.val_) 
-                         + x2.val_ * x1.d_ / x1.val_) * pow(x1.val_, x2.val_));
+                         + x2.val_ * x1.d_ / x1.val_) * pow_x1_x2);
     }
   }
 }
