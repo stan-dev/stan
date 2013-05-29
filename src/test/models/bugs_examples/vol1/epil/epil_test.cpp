@@ -27,7 +27,7 @@ public:
   static int num_iterations(int i) {
     std::vector<int> num_iter;
     num_iter.push_back(2000); //iterations for nuts
-    num_iter.push_back(200000); //iterations for unit_metro
+    num_iter.push_back(250000); //iterations for unit_metro
     num_iter.push_back(200000); //iterations for diag_metro
     num_iter.push_back(200000); //iterations for dense_metro
     return num_iter[i];

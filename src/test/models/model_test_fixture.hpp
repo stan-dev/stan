@@ -447,20 +447,20 @@ std::vector<std::string> Model_Test_Fixture<Derived>::sampler_names;
 
 TYPED_TEST_CASE_P(Model_Test_Fixture);
 
-TYPED_TEST_P(Model_Test_Fixture, TestGradientNUTS) {
-  TypeParam::sampler_n = 0;
-  TypeParam::test_gradient(0);
-}
-TYPED_TEST_P(Model_Test_Fixture, RunModelNUTS) {
-  TypeParam::run_model(0);
-  TypeParam::write_results(0);
-}
-TYPED_TEST_P(Model_Test_Fixture, ChainsTestNUTS) {
-  TypeParam::chains_test(0);
-}
-TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTestNUTS) {
-  TypeParam::test_expected_values(0);
-}
+// TYPED_TEST_P(Model_Test_Fixture, TestGradientNUTS) {
+//   TypeParam::sampler_n = 0;
+//   TypeParam::test_gradient(0);
+// }
+// TYPED_TEST_P(Model_Test_Fixture, RunModelNUTS) {
+//   TypeParam::run_model(0);
+//   TypeParam::write_results(0);
+// }
+// TYPED_TEST_P(Model_Test_Fixture, ChainsTestNUTS) {
+//   TypeParam::chains_test(0);
+// }
+// TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTestNUTS) {
+//   TypeParam::test_expected_values(0);
+// }
 
 
 TYPED_TEST_P(Model_Test_Fixture, TestGradientUnitMetro) {
@@ -494,40 +494,38 @@ TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTestUnitMetro) {
 //   TypeParam::test_expected_values(2);
 // }
 
-
-
-TYPED_TEST_P(Model_Test_Fixture, TestGradientDenseMetro) {
-  TypeParam::sampler_n = 3;
-  TypeParam::test_gradient(3);
-}
-TYPED_TEST_P(Model_Test_Fixture, RunModelDenseMetro) {
-  TypeParam::run_model(3);
-  TypeParam::write_results(3);
-}
-TYPED_TEST_P(Model_Test_Fixture, ChainsTestDenseMetro) {
-  TypeParam::chains_test(3);
-}
-TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTestDenseMetro) {
-  TypeParam::test_expected_values(3);
-}
+// TYPED_TEST_P(Model_Test_Fixture, TestGradientDenseMetro) {
+//   TypeParam::sampler_n = 3;
+//   TypeParam::test_gradient(3);
+// }
+// TYPED_TEST_P(Model_Test_Fixture, RunModelDenseMetro) {
+//   TypeParam::run_model(3);
+//   TypeParam::write_results(3);
+// }
+// TYPED_TEST_P(Model_Test_Fixture, ChainsTestDenseMetro) {
+//   TypeParam::chains_test(3);
+// }
+// TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTestDenseMetro) {
+//   TypeParam::test_expected_values(3);
+// }
 
 REGISTER_TYPED_TEST_CASE_P(Model_Test_Fixture,
-                           TestGradientNUTS,
-                           RunModelNUTS,
-                           ChainsTestNUTS,
-                           ExpectedValuesTestNUTS,
+                           // TestGradientNUTS,
+                           // RunModelNUTS,
+                           // ChainsTestNUTS,
+                           // ExpectedValuesTestNUTS,
                            TestGradientUnitMetro,
                            RunModelUnitMetro,
                            ChainsTestUnitMetro,
-                           ExpectedValuesTestUnitMetro,
+                           ExpectedValuesTestUnitMetro);
                            // TestGradientDiagMetro,
                            // RunModelDiagMetro,
                            // ChainsTestDiagMetro,
                            // ExpectedValuesTestDiagMetro,
-                           TestGradientDenseMetro,
-                           RunModelDenseMetro,
-                           ChainsTestDenseMetro,
-                           ExpectedValuesTestDenseMetro
-                                                   );
+                           // TestGradientDenseMetro,
+                           // RunModelDenseMetro,
+                           // ChainsTestDenseMetro,
+                           // ExpectedValuesTestDenseMetro
+                           //                         );
 
 #endif
