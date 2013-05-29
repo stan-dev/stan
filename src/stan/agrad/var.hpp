@@ -102,6 +102,6 @@
 #include <stan/agrad/rev/value_of.hpp>
 #include <stan/agrad/rev/as_bool.hpp>
 #include <stan/agrad/rev/owens_t.hpp>
-
 #include <stan/agrad/rev/bessel_first_kind.hpp>
+#include <stan/agrad/rev/bessel_second_kind.hpp>
 #endif
