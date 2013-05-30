@@ -9,8 +9,7 @@ TEST(AgradFvar, expm1) {
   using boost::math::expm1;
   using std::exp;
 
-  fvar<double> x(0.5);
-  x.d_ = 1.0;   // derivatives w.r.t. x
+  fvar<double> x(0.5,1.0);
   
   fvar<double> a = expm1(x);
   EXPECT_FLOAT_EQ(expm1(0.5), a.val_);
@@ -28,14 +27,12 @@ TEST(AgradFvar, expm1) {
   EXPECT_FLOAT_EQ(-3 * expm1(-0.5) + 5 * 0.5, d.val_);
   EXPECT_FLOAT_EQ(3 * exp(-0.5) + 5, d.d_);
 
-  fvar<double> y(-0.5);
-  y.d_ = 1.0;
+  fvar<double> y(-0.5,1.0);
   fvar<double> e = expm1(y);
   EXPECT_FLOAT_EQ(expm1(-0.5), e.val_);
   EXPECT_FLOAT_EQ(exp(-0.5), e.d_);
 
-  fvar<double> z(0.0);
-  z.d_ = 1.0;
+  fvar<double> z(0.0,1.0);
   fvar<double> f = expm1(z);
   EXPECT_FLOAT_EQ(expm1(0.0), f.val_);
   EXPECT_FLOAT_EQ(exp(0.0), f.d_);
@@ -47,9 +44,7 @@ TEST(AgradFvarVar, expm1) {
   using boost::math::expm1;
   using std::exp;
 
-  fvar<var> x;
-  x.val_ = 0.5;
-  x.d_ = 1.3;
+  fvar<var> x(0.5,1.3);
   fvar<var> a = expm1(x);
 
   EXPECT_FLOAT_EQ(expm1(0.5), a.val_.val());
@@ -73,8 +68,6 @@ TEST(AgradFvarFvar, expm1) {
   fvar<fvar<double> > x;
   x.val_.val_ = 0.5;
   x.val_.d_ = 1.0;
-  x.d_.val_ = 0.0;
-  x.d_.d_ = 0.0;
 
   fvar<fvar<double> > a = expm1(x);
 
@@ -85,9 +78,7 @@ TEST(AgradFvarFvar, expm1) {
 
   fvar<fvar<double> > y;
   y.val_.val_ = 0.5;
-  y.val_.d_ = 0.0;
   y.d_.val_ = 1.0;
-  y.d_.d_ = 0.0;
 
   a = expm1(y);
   EXPECT_FLOAT_EQ(expm1(0.5), a.val_.val_);

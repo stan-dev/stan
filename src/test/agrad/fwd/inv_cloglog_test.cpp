@@ -8,22 +8,19 @@ TEST(AgradFvar, invCLogLog) {
   using stan::agrad::fvar;
   using stan::math::inv_cloglog;
 
-  fvar<double> x(0.5);
-  x.d_ = 1.0;
+  fvar<double> x(0.5,1.0);
 
   fvar<double> a = inv_cloglog(x);
   EXPECT_FLOAT_EQ(inv_cloglog(0.5), a.val_);
   EXPECT_FLOAT_EQ(exp(0.5 -exp(0.5)), a.d_);
 
-  fvar<double> y(-1.2);
-  y.d_ = 1.0;
+  fvar<double> y(-1.2,1.0);
 
   fvar<double> b = inv_cloglog(y);
   EXPECT_FLOAT_EQ(inv_cloglog(-1.2), b.val_);
   EXPECT_FLOAT_EQ(exp(-1.2 -exp(-1.2)), b.d_);
 
-  fvar<double> z(1.5);
-  z.d_ = 2.0;
+  fvar<double> z(1.5,2.0);
 
   fvar<double> c = inv_cloglog(z);
   EXPECT_FLOAT_EQ(inv_cloglog(1.5), c.val_);
@@ -36,9 +33,7 @@ TEST(AgradFvarVar, inv_cloglog) {
   using stan::math::inv_cloglog;
   using std::exp;
 
-  fvar<var> x;
-  x.val_ = 0.5;
-  x.d_ = 1.3;
+  fvar<var> x(0.5,1.3);
   fvar<var> a = inv_cloglog(x);
 
   EXPECT_FLOAT_EQ(inv_cloglog(0.5), a.val_.val());
@@ -62,8 +57,6 @@ TEST(AgradFvarFvar, inv_cloglog) {
   fvar<fvar<double> > x;
   x.val_.val_ = 0.5;
   x.val_.d_ = 1.0;
-  x.d_.val_ = 0.0;
-  x.d_.d_ = 0.0;
 
   fvar<fvar<double> > a = inv_cloglog(x);
 
@@ -74,9 +67,7 @@ TEST(AgradFvarFvar, inv_cloglog) {
 
   fvar<fvar<double> > y;
   y.val_.val_ = 0.5;
-  y.val_.d_ = 0.0;
   y.d_.val_ = 1.0;
-  y.d_.d_ = 0.0;
 
   a = inv_cloglog(y);
   EXPECT_FLOAT_EQ(inv_cloglog(0.5), a.val_.val_);

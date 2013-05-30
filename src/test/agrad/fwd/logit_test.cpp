@@ -9,22 +9,19 @@ TEST(AgradFvar, logit) {
   using stan::math::logit;
   using std::isnan;
 
-  fvar<double> x(0.5);
-  x.d_ = 1.0;
+  fvar<double> x(0.5,1.0);
 
   fvar<double> a = logit(x);
   EXPECT_FLOAT_EQ(logit(0.5), a.val_);
   EXPECT_FLOAT_EQ(1 / (0.5 - 0.5 * 0.5), a.d_);
 
-  fvar<double> y(-1.2);
-  y.d_ = 1.0;
+  fvar<double> y(-1.2,1.0);
 
   fvar<double> b = logit(y);
   isnan(b.val_);
   isnan(b.d_);
 
-  fvar<double> z(1.5);
-  z.d_ = 1.0;
+  fvar<double> z(1.5,1.0);
 
   fvar<double> c = logit(z);
   isnan(c.val_);
@@ -36,9 +33,7 @@ TEST(AgradFvarVar, logit) {
   using stan::agrad::var;
   using stan::math::logit;
 
-  fvar<var> x;
-  x.val_ = 0.5;
-  x.d_ = 1.3;
+  fvar<var> x(0.5,1.3);
   fvar<var> a = logit(x);
 
   EXPECT_FLOAT_EQ(logit(0.5), a.val_.val());
@@ -61,8 +56,6 @@ TEST(AgradFvarFvar, log) {
   fvar<fvar<double> > x;
   x.val_.val_ = 0.5;
   x.val_.d_ = 1.0;
-  x.d_.val_ = 0.0;
-  x.d_.d_ = 0.0;
 
   fvar<fvar<double> > a = logit(x);
 
@@ -73,9 +66,7 @@ TEST(AgradFvarFvar, log) {
 
   fvar<fvar<double> > y;
   y.val_.val_ = 0.5;
-  y.val_.d_ = 0.0;
   y.d_.val_ = 1.0;
-  y.d_.d_ = 0.0;
 
   a = logit(y);
   EXPECT_FLOAT_EQ(logit(0.5), a.val_.val_);

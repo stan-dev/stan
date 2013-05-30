@@ -7,10 +7,8 @@ TEST(AgradFvar, floor) {
   using stan::agrad::fvar;
   using std::floor;
 
-  fvar<double> x(0.5);
-  fvar<double> y(2.0);
-  y.d_ = 2.0;
-  x.d_ = 1.0;
+  fvar<double> x(0.5,1.0);
+  fvar<double> y(2.0,2.0);
 
   fvar<double> a = floor(x);
   EXPECT_FLOAT_EQ(floor(0.5), a.val_);
@@ -30,9 +28,7 @@ TEST(AgradFvarVar, floor) {
   using stan::agrad::var;
   using std::floor;
 
-  fvar<var> x;
-  x.val_ = 1.5;
-  x.d_ = 1.3;
+  fvar<var> x(1.5,1.3);
   fvar<var> a = floor(x);
 
   EXPECT_FLOAT_EQ(floor(1.5), a.val_.val());
@@ -55,8 +51,6 @@ TEST(AgradFvarFvar, floor) {
   fvar<fvar<double> > x;
   x.val_.val_ = 1.5;
   x.val_.d_ = 2.0;
-  x.d_.val_ = 0.0;
-  x.d_.d_ = 0.0;
 
   fvar<fvar<double> > a = floor(x);
 
@@ -67,9 +61,7 @@ TEST(AgradFvarFvar, floor) {
 
   fvar<fvar<double> > y;
   y.val_.val_ = 1.5;
-  y.val_.d_ = 0.0;
   y.d_.val_ = 2.0;
-  y.d_.d_ = 0.0;
 
   a = floor(y);
   EXPECT_FLOAT_EQ(floor(1.5), a.val_.val_);

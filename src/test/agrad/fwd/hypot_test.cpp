@@ -9,20 +9,17 @@ TEST(AgradFvar, hypot) {
   using boost::math::hypot;
   using std::isnan;
 
-  fvar<double> x(0.5);
-  fvar<double> y(2.3);
-  x.d_ = 1.0;
-  y.d_ = 2.0;
+  fvar<double> x(0.5,1.0);
+  fvar<double> y(2.3,2.0);
 
   fvar<double> a = hypot(x, y);
   EXPECT_FLOAT_EQ(hypot(0.5, 2.3), a.val_);
   EXPECT_FLOAT_EQ((0.5 * 1.0 + 2.3 * 2.0) / hypot(0.5, 2.3), a.d_);
 
-  fvar<double> z(0.0);
-  fvar<double> w(-2.3);
-  z.d_ = 1.0;
-  w.d_ = 2.0;
+  fvar<double> z(0.0,1.0);
+  fvar<double> w(-2.3,2.0);
   fvar<double> b = hypot(x, z);
+
   EXPECT_FLOAT_EQ(0.5, b.val_);
   EXPECT_FLOAT_EQ(1.0, b.d_);
 
@@ -40,13 +37,9 @@ TEST(AgradFvarVar, hypot) {
   using stan::agrad::var;
   using boost::math::hypot;
 
-  fvar<var> x;
-  x.val_ = 3.0;
-  x.d_ = 1.3;
+  fvar<var> x(3.0,1.3);
 
-  fvar<var> z;
-  z.val_ = 6.0;
-  z.d_ = 1.0;
+  fvar<var> z(6.0,1.0);
   fvar<var> a = hypot(x,z);
 
   EXPECT_FLOAT_EQ(hypot(3.0,6.0), a.val_.val());
@@ -71,14 +64,10 @@ TEST(AgradFvarFvar, hypot) {
   fvar<fvar<double> > x;
   x.val_.val_ = 3.0;
   x.val_.d_ = 1.0;
-  x.d_.val_ = 0.0;
-  x.d_.d_ = 0.0;
 
   fvar<fvar<double> > y;
   y.val_.val_ = 6.0;
-  y.val_.d_ = 0.0;
   y.d_.val_ = 1.0;
-  y.d_.d_ = 0.0;
 
   fvar<fvar<double> > a = hypot(x,y);
 

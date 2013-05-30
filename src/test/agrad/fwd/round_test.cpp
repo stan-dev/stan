@@ -8,10 +8,8 @@ TEST(AgradFvar, round) {
   using stan::agrad::fvar;
   using boost::math::round;
 
-  fvar<double> x(0.5);
-  fvar<double> y(2.4);
-  y.d_ = 2.0;
-  x.d_ = 1.0;
+  fvar<double> x(0.5,1.0);
+  fvar<double> y(2.4,2.0);
 
   fvar<double> a = round(x);
   EXPECT_FLOAT_EQ(round(0.5), a.val_);
@@ -25,8 +23,7 @@ TEST(AgradFvar, round) {
   EXPECT_FLOAT_EQ(round(2 * 0.5), c.val_);
   EXPECT_FLOAT_EQ(0.0, c.d_);
 
-  fvar<double> z(1.25);
-  z.d_ = 1.0;
+  fvar<double> z(1.25,1.0);
 
   fvar<double> d = round(2 * z);
   EXPECT_FLOAT_EQ(round(2 * 1.25), d.val_);
@@ -38,9 +35,7 @@ TEST(AgradFvarVar, round) {
   using stan::agrad::var;
   using boost::math::round;
 
-  fvar<var> x;
-  x.val_ = 1.5;
-  x.d_ = 1.3;
+  fvar<var> x(1.5,1.3);
   fvar<var> a = round(x);
 
   EXPECT_FLOAT_EQ(round(1.5), a.val_.val());
@@ -63,8 +58,6 @@ TEST(AgradFvarFvar, round) {
   fvar<fvar<double> > x;
   x.val_.val_ = 1.5;
   x.val_.d_ = 2.0;
-  x.d_.val_ = 0.0;
-  x.d_.d_ = 0.0;
 
   fvar<fvar<double> > a = round(x);
 
@@ -75,9 +68,7 @@ TEST(AgradFvarFvar, round) {
 
   fvar<fvar<double> > y;
   y.val_.val_ = 1.5;
-  y.val_.d_ = 0.0;
   y.d_.val_ = 2.0;
-  y.d_.d_ = 0.0;
 
   a = round(y);
   EXPECT_FLOAT_EQ(round(1.5), a.val_.val_);

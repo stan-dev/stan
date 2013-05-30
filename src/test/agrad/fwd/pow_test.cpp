@@ -9,8 +9,7 @@ TEST(AgradFvar, pow) {
   using std::log;
   using std::isnan;
 
-  fvar<double> x(0.5);
-  x.d_ = 1.0;
+  fvar<double> x(0.5,1.0);
   double y = 5.0;
 
   fvar<double> a = pow(x, y);
@@ -21,14 +20,12 @@ TEST(AgradFvar, pow) {
   EXPECT_FLOAT_EQ(pow(5.0, 0.5), b.val_);
   EXPECT_FLOAT_EQ(log(5.0) * pow(5.0, 0.5), b.d_);
 
-  fvar<double> z(1.2);
-  z.d_ = 2.0;
+  fvar<double> z(1.2,2.0);
   fvar<double> c = pow(x, z);
   EXPECT_FLOAT_EQ(pow(0.5, 1.2), c.val_);
   EXPECT_FLOAT_EQ((2.0 * log(0.5) + 1.2 * 1.0 / 0.5) * pow(0.5, 1.2), c.d_);
 
-  fvar<double> w(-0.4);
-  w.d_ = 1.0;
+  fvar<double> w(-0.4,1.0);
   fvar<double> d = pow(w, x);
   isnan(d.val_);
   isnan(d.d_);
@@ -40,13 +37,8 @@ TEST(AgradFvarVar, pow) {
   using std::log;
   using std::pow;
 
-  fvar<var> x;
-  x.val_ = 0.5;
-  x.d_ = 1.0;
-
-  fvar<var> z;
-  z.val_ = 1.2;
-  z.d_ = 2.0;
+  fvar<var> x(0.5,1.0);
+  fvar<var> z(1.2,2.0);
   fvar<var> a = pow(x,z);
 
   EXPECT_FLOAT_EQ(pow(0.5,1.2), a.val_.val());
@@ -72,14 +64,10 @@ TEST(AgradFvarFvar, pow) {
   fvar<fvar<double> > x;
   x.val_.val_ = 0.5;
   x.val_.d_ = 1.0;
-  x.d_.val_ = 0.0;
-  x.d_.d_ = 0.0;
 
   fvar<fvar<double> > y;
   y.val_.val_ = 0.5;
-  y.val_.d_ = 0.0;
   y.d_.val_ = 1.0;
-  y.d_.d_ = 0.0;
 
   fvar<fvar<double> > a = pow(x,y);
 

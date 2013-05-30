@@ -10,8 +10,7 @@ TEST(AgradFvar, erf) {
   using std::sqrt;
   using boost::math::erf;
 
-  fvar<double> x(0.5);
-  x.d_ = 1.0;
+  fvar<double> x(0.5,1.0);
 
   fvar<double> a = erf(x);
   EXPECT_FLOAT_EQ(erf(0.5), a.val_);
@@ -31,9 +30,7 @@ TEST(AgradFvarVar, erf) {
   using std::sqrt;
   using boost::math::erf;
 
-  fvar<var> x;
-  x.val_ = 0.5;
-  x.d_ = 1.3;
+  fvar<var> x(0.5,1.3);
   fvar<var> a = erf(x);
 
   EXPECT_FLOAT_EQ(erf(0.5), a.val_.val());
@@ -60,8 +57,6 @@ TEST(AgradFvarFvar, erf) {
   fvar<fvar<double> > x;
   x.val_.val_ = 0.5;
   x.val_.d_ = 1.0;
-  x.d_.val_ = 0.0;
-  x.d_.d_ = 0.0;
 
   fvar<fvar<double> > a = erf(x);
 
@@ -73,9 +68,7 @@ TEST(AgradFvarFvar, erf) {
 
   fvar<fvar<double> > y;
   y.val_.val_ = 0.5;
-  y.val_.d_ = 0.0;
   y.d_.val_ = 1.0;
-  y.d_.d_ = 0.0;
 
   a = erf(y);
   EXPECT_FLOAT_EQ(erf(0.5), a.val_.val_);

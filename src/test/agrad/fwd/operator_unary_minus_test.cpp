@@ -6,10 +6,7 @@
 TEST(AgradFvar, operatorUnaryMinus) {
   using stan::agrad::fvar;
 
-  fvar<double> x1(0.5);
-  fvar<double> x2(0.4);
-  x1.d_ = 1.0;
-  
+  fvar<double> x1(0.5,1.0);
   fvar<double> a = -x1;
   EXPECT_FLOAT_EQ(-0.5, a.val_);
   EXPECT_FLOAT_EQ(-1.0, a.d_);
@@ -19,10 +16,7 @@ TEST(AgradFvarVar, operatorUnaryMinus) {
   using stan::agrad::fvar;
   using stan::agrad::var;
 
-  fvar<var> x;
-  x.val_ = 0.5;
-  x.d_ = 1.3;
-
+  fvar<var> x(0.5,1.3);
   fvar<var> a = -x;
 
   EXPECT_FLOAT_EQ(-0.5, a.val_.val());
@@ -44,8 +38,6 @@ TEST(AgradFvarFvar, operatorUnaryMinus) {
   fvar<fvar<double> > x;
   x.val_.val_ = 0.5;
   x.val_.d_ = 1.0;
-  x.d_.val_ = 0.0;
-  x.d_.d_ = 0.0;
 
   fvar<fvar<double> > z = -x;
   EXPECT_FLOAT_EQ(-0.5, z.val_.val_);

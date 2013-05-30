@@ -10,12 +10,9 @@ TEST(AgradFvar,multiply_log) {
   using std::log;
   using stan::math::multiply_log;
 
-  fvar<double> x(0.5);
-  fvar<double> y(1.2);
-  fvar<double> z(-0.4);
-  x.d_ = 1.0;
-  y.d_ = 2.0;
-  z.d_ = 3.0;
+  fvar<double> x(0.5,1.0);
+  fvar<double> y(1.2,2.0);
+  fvar<double> z(-0.4,3.0);
 
   double w = 0.0;
   double v = 1.3;
@@ -77,14 +74,10 @@ TEST(AgradFvarFvar, multiply_log) {
   fvar<fvar<double> > x;
   x.val_.val_ = 1.5;
   x.val_.d_ = 1.3;
-  x.d_.val_ = 0.0;
-  x.d_.d_ = 0.0;
 
   fvar<fvar<double> > y;
   y.val_.val_ = 1.8;
-  y.val_.d_ = 0;
   y.d_.val_ = 1.1;
-  y.d_.d_ = 0.0;
 
   fvar<fvar<double> > a = multiply_log(x,y);
 

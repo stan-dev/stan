@@ -30,17 +30,9 @@ TEST(AgradFvarVar, lt) {
   using stan::agrad::fvar;
   using stan::agrad::var;
 
-  fvar<var> x;
-  x.val_ = 0.5;
-  x.d_ = 1.3;
-
-  fvar<var> y;
-  y.val_ = 1.5;
-  y.d_ = 1.0;
-
-  fvar<var> z;
-  z.val_ = 0.5;
-  z.d_ = 1.3;
+  fvar<var> x(0.5,1.3);
+  fvar<var> y(1.5,1.0);
+  fvar<var> z(0.5,1.3);
 
   EXPECT_FALSE(z < x);
   EXPECT_FALSE(y < x);
@@ -53,20 +45,14 @@ TEST(AgradFvarFvar, lt) {
   fvar<fvar<double> > x;
   x.val_.val_ = 1.5;
   x.val_.d_ = 1.0;
-  x.d_.val_ = 0.0;
-  x.d_.d_ = 0.0;
 
   fvar<fvar<double> > y;
   y.val_.val_ = 0.5;
-  y.val_.d_ = 0.0;
   y.d_.val_ = 1.0;
-  y.d_.d_ = 0.0;
 
   fvar<fvar<double> > z;
   z.val_.val_ = 0.5;
-  z.val_.d_ = 0.0;
   z.d_.val_ = 1.0;
-  z.d_.d_ = 0.0;
 
   EXPECT_TRUE(y < x);
   EXPECT_TRUE(z < x);

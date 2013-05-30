@@ -8,8 +8,7 @@ TEST(AgradFvar, square) {
   using stan::agrad::fvar;
   using stan::math::square;
 
-  fvar<double> x(0.5);
-  x.d_ = 1.0;   // derivatives w.r.t. x
+  fvar<double> x(0.5,1.0);
   fvar<double> a = square(x);
 
   EXPECT_FLOAT_EQ(square(0.5), a.val_);
@@ -31,14 +30,12 @@ TEST(AgradFvar, square) {
   EXPECT_FLOAT_EQ(-3 * square(-0.5) + 5 * 0.5, e.val_);
   EXPECT_FLOAT_EQ(-3 * 2 * 0.5 + 5, e.d_);
 
-  fvar<double> y(-0.5);
-  y.d_ = 1.0;
+  fvar<double> y(-0.5,1.0);
   fvar<double> f = square(y);
   EXPECT_FLOAT_EQ(square(-0.5), f.val_);
   EXPECT_FLOAT_EQ(2 * -0.5, f.d_);
 
-  fvar<double> z(0.0);
-  z.d_ = 1.0;
+  fvar<double> z(0.0,1.0);
   fvar<double> g = square(z);
   EXPECT_FLOAT_EQ(square(0.0), g.val_);
   EXPECT_FLOAT_EQ(2 * 0.0, g.d_);
@@ -49,9 +46,7 @@ TEST(AgradFvarVar, square) {
   using stan::agrad::var;
   using stan::math::square;
 
-  fvar<var> x;
-  x.val_ = 1.5;
-  x.d_ = 1.3;
+  fvar<var> x(1.5,1.3);
   fvar<var> a = square(x);
 
   EXPECT_FLOAT_EQ(square(1.5), a.val_.val());
@@ -74,8 +69,6 @@ TEST(AgradFvarFvar, square) {
   fvar<fvar<double> > x;
   x.val_.val_ = 1.5;
   x.val_.d_ = 2.0;
-  x.d_.val_ = 0.0;
-  x.d_.d_ = 0.0;
 
   fvar<fvar<double> > a = square(x);
 
@@ -86,9 +79,7 @@ TEST(AgradFvarFvar, square) {
 
   fvar<fvar<double> > y;
   y.val_.val_ = 1.5;
-  y.val_.d_ = 0.0;
   y.d_.val_ = 2.0;
-  y.d_.d_ = 0.0;
 
   a = square(y);
   EXPECT_FLOAT_EQ(square(1.5), a.val_.val_);
