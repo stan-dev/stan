@@ -2,6 +2,7 @@
 #define __STAN__GM__AST_HPP__
 
 #include <map>
+#include <string>
 #include <vector>
 
 #include <boost/variant/recursive_variant.hpp>
