@@ -93,6 +93,8 @@
 #include <stan/agrad/fwd/bessel_second_kind.hpp>
 #include <stan/agrad/fwd/falling_factorial.hpp>
 #include <stan/agrad/fwd/rising_factorial.hpp>
+#include <stan/agrad/fwd/log_rising_factorial.hpp>
+#include <stan/agrad/fwd/log_falling_factorial.hpp>
 
 //composed functions
 #include <stan/agrad/fwd/expm1.hpp>

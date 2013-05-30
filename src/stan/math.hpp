@@ -39,7 +39,6 @@
 #include "stan/math/functions/log_inv_logit.hpp"
 #include "stan/math/functions/log_rising_factorial.hpp"
 #include "stan/math/functions/log_sum_exp.hpp"
-#include "stan/math/functions/log_rising_factorial.hpp"
 #include "stan/math/functions/logical_and.hpp"
 #include "stan/math/functions/logical_eq.hpp"
 #include "stan/math/functions/logical_gt.hpp"

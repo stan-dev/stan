@@ -16,10 +16,10 @@ namespace stan {
       using stan::math::falling_factorial;
       using boost::math::digamma;
 
-      typename stan::return_type<T1,T2>::type falling_fact(
+      typename boost::math::tools::promote_args<T1,T2>::type falling_fact(
                                           falling_factorial(x.val_,n.val_));
       return fvar<typename stan::return_type<T1,T2>::type>(falling_fact, 
-        falling_fact, falling_fact * digamma(x.val_ + 1) * x.d_ 
+        falling_fact * digamma(x.val_ + 1) * x.d_ 
           - falling_fact * digamma(n.val_ + 1) * n.d_);
     }
 
@@ -29,7 +29,7 @@ namespace stan {
       using stan::math::falling_factorial;
       using boost::math::digamma;
 
-      typename stan::return_type<T1,T2>::type falling_fact(
+      typename boost::math::tools::promote_args<T1,T2>::type falling_fact(
                                                  falling_factorial(x.val_,n));
       return fvar<typename stan::return_type<T1,T2>::type>(falling_fact, 
         falling_fact * digamma(x.val_ + 1) * x.d_);
@@ -41,7 +41,7 @@ namespace stan {
       using stan::math::falling_factorial;
       using boost::math::digamma;
 
-      typename stan::return_type<T1,T2>::type falling_fact(falling_factorial(x,
+      typename boost::math::tools::promote_args<T1,T2>::type falling_fact(falling_factorial(x,
                                                                     n.val_));
       return fvar<typename stan::return_type<T1,T2>::type>(falling_fact, 
         -falling_fact * digamma(n.val_ + 1) * n.d_);
