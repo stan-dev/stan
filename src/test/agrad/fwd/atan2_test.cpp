@@ -7,10 +7,8 @@ TEST(AgradFvar, atan2) {
   using stan::agrad::fvar;
   using std::atan2;
 
-  fvar<double> x(0.5);
-  fvar<double> y(2.3);
-  x.d_ = 1.0;
-  y.d_ = 2.0;
+  fvar<double> x(0.5,1.0);
+  fvar<double> y(2.3,2.0);
   double w = 2.1;
 
   fvar<double> a = atan2(x, y);
@@ -31,13 +29,9 @@ TEST(AgradFvarVar, atan2) {
   using stan::agrad::var;
   using std::atan2;
 
-  fvar<var> x;
-  x.val_ = 1.5;
-  x.d_ = 1.3;
+  fvar<var> x(1.5,1.3);
 
-  fvar<var> z;
-  z.val_ = 1.5;
-  z.d_ = 1.0;
+  fvar<var> z(1.5,1.0);
   fvar<var> a = atan2(x,z);
 
   EXPECT_FLOAT_EQ(atan2(1.5,1.5), a.val_.val());
@@ -62,14 +56,10 @@ TEST(AgradFvarFvar, atan2) {
   fvar<fvar<double> > x;
   x.val_.val_ = 1.5;
   x.val_.d_ = 1.0;
-  x.d_.val_ = 0.0;
-  x.d_.d_ = 0.0;
 
   fvar<fvar<double> > y;
   y.val_.val_ = 1.5;
-  y.val_.d_ = 0.0;
   y.d_.val_ = 1.0;
-  y.d_.d_ = 0.0;
 
   fvar<fvar<double> > a = atan2(x,y);
 

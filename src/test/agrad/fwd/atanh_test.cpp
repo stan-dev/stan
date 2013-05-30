@@ -8,15 +8,13 @@ TEST(AgradFvar, atanh) {
   using stan::agrad::fvar;
   using boost::math::atanh;
 
-  fvar<double> x(0.5);
-  x.d_ = 1.0;
+  fvar<double> x(0.5,1.0);
 
   fvar<double> a = atanh(x);
   EXPECT_FLOAT_EQ(atanh(0.5), a.val_);
   EXPECT_FLOAT_EQ(1 / (1 - 0.5 * 0.5), a.d_);
 
-  fvar<double> y(-0.9);
-  y.d_ = 1.0;
+  fvar<double> y(-0.9,1.0);
 
   fvar<double> b = atanh(y);
   EXPECT_FLOAT_EQ(atanh(-0.9), b.val_);
@@ -28,9 +26,7 @@ TEST(AgradFvarVar, atanh) {
   using stan::agrad::var;
   using boost::math::atanh;
 
-  fvar<var> x;
-  x.val_ = 0.5;
-  x.d_ = 1.3;
+  fvar<var> x(0.5,1.3);
   fvar<var> a = atanh(x);
 
   EXPECT_FLOAT_EQ(atanh(0.5), a.val_.val()); 
@@ -53,8 +49,6 @@ TEST(AgradFvarFvar, atanh) {
   fvar<fvar<double> > x;
   x.val_.val_ = 0.5;
   x.val_.d_ = 1.0;
-  x.d_.val_ = 0.0;
-  x.d_.d_ = 0.0;
   fvar<fvar<double> > a = atanh(x);
 
   EXPECT_FLOAT_EQ(atanh(0.5), a.val_.val_);
@@ -64,9 +58,7 @@ TEST(AgradFvarFvar, atanh) {
 
   fvar<fvar<double> > y;
   y.val_.val_ = 0.5;
-  y.val_.d_ = 0.0;
   y.d_.val_ = 1.0;
-  y.d_.d_ = 0.0;
 
   a = atanh(y);
 

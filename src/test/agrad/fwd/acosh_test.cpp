@@ -10,22 +10,19 @@ TEST(AgradFvar, acosh) {
   using std::sqrt;
   using std::isnan;
 
-  fvar<double> x(1.5);
-  x.d_ = 1.0;
+  fvar<double> x(1.5,1.0);
 
   fvar<double> a = acosh(x);
   EXPECT_FLOAT_EQ(acosh(1.5), a.val_);
   EXPECT_FLOAT_EQ(1 / sqrt(-1 + (1.5) * (1.5)), a.d_);
 
-  fvar<double> y(-1.2);
-  y.d_ = 1.0;
+  fvar<double> y(-1.2,1.0);
 
   fvar<double> b = acosh(y);
   isnan(b.val_);
   isnan(b.d_);
 
-  fvar<double> z(0.5);
-  z.d_ = 1.0;
+  fvar<double> z(0.5,1.0);
 
   fvar<double> c = acosh(z);
   isnan(c.val_);
@@ -37,9 +34,7 @@ TEST(AgradFvarVar, acosh) {
   using stan::agrad::var;
   using boost::math::acosh;
 
-  fvar<var> x;
-  x.val_ = 1.5;
-  x.d_ = 1.3;
+  fvar<var> x(1.5,1.3);
   fvar<var> a = acosh(x);
 
   EXPECT_FLOAT_EQ(acosh(1.5), a.val_.val());
@@ -62,8 +57,6 @@ TEST(AgradFvarFvar, acosh) {
   fvar<fvar<double> > x;
   x.val_.val_ = 1.5;
   x.val_.d_ = 2.0;
-  x.d_.val_ = 0.0;
-  x.d_.d_ = 0.0;
 
   fvar<fvar<double> > a = acosh(x);
 
@@ -74,9 +67,7 @@ TEST(AgradFvarFvar, acosh) {
 
   fvar<fvar<double> > y;
   y.val_.val_ = 1.5;
-  y.val_.d_ = 0.0;
   y.d_.val_ = 2.0;
-  y.d_.d_ = 0.0;
 
   a = acosh(y);
   EXPECT_FLOAT_EQ(acosh(1.5), a.val_.val_);

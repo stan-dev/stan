@@ -8,10 +8,8 @@ TEST(AgradFvar, abs) {
   using std::abs;
   using std::isnan;
 
-  fvar<int> x(2);
-  fvar<int> y(-3);
-  x.d_ = 1.0;
-  y.d_ = 2.0;
+  fvar<int> x(2.0,1.0);
+  fvar<int> y(-3.0,2.0);
 
   fvar<int> a = abs(x);
   EXPECT_FLOAT_EQ(abs(2), a.val_);
@@ -43,9 +41,7 @@ TEST(AgradFvarVar, abs) {
   using stan::agrad::var;
   using std::abs;
 
-  fvar<var> x;
-  x.val_ = 2.0;
-  x.d_ = 1.0;
+  fvar<var> x(2.0,1.0);
   fvar<var> a = abs(x);
 
   EXPECT_FLOAT_EQ(2.0, a.val_.val());

@@ -10,10 +10,8 @@ TEST(AgradFvar, binom_coeff_log) {
   using stan::math::binomial_coefficient_log;
   using boost::math::digamma;
 
-  fvar<double> x(2004.0);
-  x.d_ = 1.0;
-  fvar<double> y(1002.0);
-  y.d_ = 2.0;
+  fvar<double> x(2004.0,1.0);
+  fvar<double> y(1002.0,2.0);
 
   fvar<double> a = stan::agrad::binomial_coefficient_log(x, y);
   EXPECT_FLOAT_EQ(binomial_coefficient_log(2004.0, 1002.0), a.val_);
@@ -32,14 +30,10 @@ TEST(AgradFvarVar, binomial_coefficient_log) {
   using stan::agrad::var;
   using stan::math::binomial_coefficient_log;
 
-  fvar<var> x;
-  x.val_ = 2004.0;
-  x.d_ = 1.0;
+  fvar<var> x(2004.0,1.0);
 
-  fvar<var> z;
-  z.val_ = 1002.0;
-  z.d_ = 2.0;
-  fvar<var> a = atan2(x,z);
+  fvar<var> z(1002.0,2.0);
+  fvar<var> a = binomial_coefficient_log(x,z);
 
   EXPECT_FLOAT_EQ(binomial_coefficient_log(2004.0,1002.0), a.val_.val());
   EXPECT_FLOAT_EQ(2.0 * log(2004.0 - 1002.0) + (1002.0 * (1.0 - 2.0))
@@ -71,14 +65,10 @@ TEST(AgradFvarFvar, binomial_coefficient_log) {
   fvar<fvar<double> > x;
   x.val_.val_ = 2004.0;
   x.val_.d_ = 1.0;
-  x.d_.val_ = 0.0;
-  x.d_.d_ = 0.0;
 
   fvar<fvar<double> > y;
   y.val_.val_ = 1002.0;
-  y.val_.d_ = 0.0;
   y.d_.val_ = 1.0;
-  y.d_.d_ = 0.0;
 
   fvar<fvar<double> > a = binomial_coefficient_log(x,y);
 

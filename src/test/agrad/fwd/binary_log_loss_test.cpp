@@ -10,12 +10,9 @@ TEST(AgradFvar, binary_log_loss) {
   using std::log;
   using std::isnan;
 
-  fvar<double> w(0.0);
-  fvar<double> x(1.0);
-  w.d_ = 1.0;
-  x.d_ = 2.0;
-  fvar<double> y(0.4);
-  y.d_ = 3.0;
+  fvar<double> w(0.0,1.0);
+  fvar<double> x(1.0,2.0);
+  fvar<double> y(0.4,3.0);
 
   fvar<double> a = binary_log_loss(w, y);
   EXPECT_FLOAT_EQ(binary_log_loss(0.0, 0.4), a.val_);
@@ -62,14 +59,10 @@ TEST(AgradFvarFvar, binary_log_loss) {
   fvar<fvar<double> > x;
   x.val_.val_ = 0.0;
   x.val_.d_ = 1.0;
-  x.d_.val_ = 0.0;
-  x.d_.d_ = 0.0;
 
   fvar<fvar<double> > y;
   y.val_.val_ = 0.4;
-  y.val_.d_ = 0.0;
   y.d_.val_ = 1.0;
-  y.d_.d_ = 0.0;
 
   fvar<fvar<double> > a = binary_log_loss(x,y);
 

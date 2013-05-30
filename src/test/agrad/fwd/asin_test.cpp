@@ -11,8 +11,7 @@ TEST(AgradFvar, asin) {
   using std::sqrt;
   using stan::math::INFTY;
 
-  fvar<double> x(0.5);
-  x.d_ = 1.0;   // derivatives w.r.t. x
+  fvar<double> x(0.5,1.0);
   
   fvar<double> a = asin(x);
   EXPECT_FLOAT_EQ(asin(0.5), a.val_);
@@ -30,14 +29,12 @@ TEST(AgradFvar, asin) {
   EXPECT_FLOAT_EQ(-3 * asin(0.5) + 5 * 0.5, d.val_);
   EXPECT_FLOAT_EQ(-3 / sqrt(1 - 0.5 * 0.5) + 5, d.d_);
 
-  fvar<double> y(3.4);
-  y.d_ = 1.0;
+  fvar<double> y(3.4,1.0);
   fvar<double> e = asin(y);
   isnan(e.val_);
   isnan(e.d_);
 
-  fvar<double> z(1.0);
-  z.d_ = 1.0;
+  fvar<double> z(1.0,1.0);
   fvar<double> f = asin(z);
   EXPECT_FLOAT_EQ(asin(1.0), f.val_);
   EXPECT_FLOAT_EQ(INFTY, f.d_);
@@ -48,9 +45,7 @@ TEST(AgradFvarVar, asin) {
   using stan::agrad::var;
   using std::asin;
 
-  fvar<var> x;
-  x.val_ = 0.5;
-  x.d_ = 0.3;
+  fvar<var> x(0.5,0.3);
   fvar<var> a = asin(x);
 
   EXPECT_FLOAT_EQ(asin(0.5), a.val_.val());
@@ -73,8 +68,6 @@ TEST(AgradFvarFvar, asin) {
   fvar<fvar<double> > x;
   x.val_.val_ = 0.5;
   x.val_.d_ = 2.0;
-  x.d_.val_ = 0.0;
-  x.d_.d_ = 0.0;
 
   fvar<fvar<double> > a = asin(x);
 
@@ -85,9 +78,7 @@ TEST(AgradFvarFvar, asin) {
 
   fvar<fvar<double> > y;
   y.val_.val_ = 0.5;
-  y.val_.d_ = 0.0;
   y.d_.val_ = 2.0;
-  y.d_.d_ = 0.0;
 
   a = asin(y);
   EXPECT_FLOAT_EQ(asin(0.5), a.val_.val_);
