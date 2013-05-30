@@ -9,8 +9,8 @@ namespace stan {
     template<typename T>
     inline T
     rising_factorial(const T x, const int n) { 
-      using boost::math::tgamma;
-      return tgamma(x + n) / tgamma(x); 
+      using boost::math::lgamma;
+      return std::exp(lgamma(x + n) - lgamma(x)); 
     }
 
   }
