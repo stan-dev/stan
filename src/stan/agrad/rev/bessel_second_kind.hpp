@@ -15,7 +15,7 @@ namespace stan {
 
       class bessel_second_kind_dv_vari : public op_dv_vari {
       public:
-        bessel_second_kind_dv_vari(double a, vari* bvi) :
+        bessel_second_kind_dv_vari(int a, vari* bvi) :
           op_dv_vari(stan::math::bessel_second_kind(a, bvi->val_), a, bvi) {
         }
         void chain() {
@@ -24,7 +24,7 @@ namespace stan {
       };
     }
 
-    inline var bessel_second_kind(const double& v, 
+    inline var bessel_second_kind(const int& v, 
                                   const var& a) {
       return var(new bessel_second_kind_dv_vari(v, a.vi_));
     }

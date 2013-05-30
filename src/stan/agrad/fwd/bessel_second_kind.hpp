@@ -12,7 +12,7 @@ namespace stan{
     template <typename T>
     inline
     fvar<T>
-    bessel_second_kind(const double v, const fvar<T>& z) {
+    bessel_second_kind(const int v, const fvar<T>& z) {
       using stan::math::bessel_second_kind;
 
       T bessel_second_kind_z(bessel_second_kind(v, z.val_));

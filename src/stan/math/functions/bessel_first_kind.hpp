@@ -6,9 +6,9 @@
 namespace stan {
   namespace math {
 
-    template<typename T1, typename T2>
-    inline typename boost::math::tools::promote_args<T1,T2>::type 
-    bessel_first_kind(const T1 v, const T2 z) { 
+    template<typename T2>
+    inline T2 
+    bessel_first_kind(const int v, const T2 z) { 
       return boost::math::cyl_bessel_j(v,z); 
     }
 

@@ -2,8 +2,8 @@
 #include <test/agrad/util.hpp>
 #include <gtest/gtest.h>
 
-TEST(AgradRev,bessel_second_kind_double_var) {
-  double a(0);
+TEST(AgradRev,bessel_second_kind_int_var) {
+  int a(0);
   AVAR b(4.0);
   AVAR f = stan::agrad::bessel_second_kind(a,b);
   EXPECT_FLOAT_EQ(-0.01694073932506499190363513444715321824049258989801,f.val());
