@@ -1,16 +1,15 @@
 #ifndef __STAN__MATH__FUNCTIONS__RISING_FACTORIAL_HPP__
 #define __STAN__MATH__FUNCTIONS__RISING_FACTORIAL_HPP__
 
-#include <boost/math/special_functions/gamma.hpp>
+#include <stan/math/functions/log_rising_factorial.hpp>
 
 namespace stan {
   namespace math {
 
-    template<typename T>
-    inline T
-    rising_factorial(const T x, const int n) { 
-      using boost::math::lgamma;
-      return std::exp(lgamma(x + n) - lgamma(x)); 
+    template<typename T1, typename T2>
+    inline typename boost::math::tools::promote_args<T1,T2>::type
+    rising_factorial(const T1 x, const T2 n) { 
+      return std::exp(stan::math::log_rising_factorial(x,n)); 
     }
 
   }

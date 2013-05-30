@@ -6,14 +6,14 @@
 #include <stan/math/functions/rising_factorial.hpp>
 #include <boost/math/special_functions/digamma.hpp>
 
-namespace stan{
+namespace stan {
 
-  namespace agrad{
+  namespace agrad {
 
     template <typename T>
     inline
     fvar<T>
-    rising_factorial(const fvar<T> x, const int & n) {
+    rising_factorial(const fvar<T>& x, double n) {
       using stan::math::rising_factorial;
       using boost::math::digamma;
 

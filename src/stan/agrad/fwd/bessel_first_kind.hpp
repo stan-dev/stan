@@ -5,14 +5,14 @@
 #include <stan/meta/traits.hpp>
 #include <stan/math/functions/bessel_first_kind.hpp>
 
-namespace stan{
+namespace stan {
 
-  namespace agrad{
+  namespace agrad {
 
     template <typename T>
     inline
     fvar<T>
-    bessel_first_kind(const int v, const fvar<T>& z) {
+    bessel_first_kind(int v, const fvar<T>& z) {
       using stan::math::bessel_first_kind;
 
       T bessel_first_kind_z(bessel_first_kind(v, z.val_));
