@@ -940,8 +940,18 @@ namespace stan {
         }
         
         // Warm-Up
-        if (epsilon <= 0) sampler.init_stepsize();
-        else             sampler.set_nominal_stepsize(epsilon);
+        if (epsilon <= 0) {
+
+          try {
+            sampler.init_stepsize();
+          } catch (std::runtime_error e) {
+            std::cout << e.what() << std::endl;
+            return 0;
+          }
+        }
+        else {
+          sampler.set_nominal_stepsize(epsilon);
+        }
         
         sampler.set_stepsize_jitter(epsilon_pm);
         
@@ -999,8 +1009,18 @@ namespace stan {
         }
       
         // Warm-Up
-        if (epsilon <= 0) sampler.init_stepsize();
-        else              sampler.set_nominal_stepsize(epsilon);
+        if (epsilon <= 0) {
+          
+          try {
+            sampler.init_stepsize();
+          } catch (std::runtime_error e) {
+            std::cout << e.what() << std::endl;
+            return 0;
+          }
+        }
+        else {
+          sampler.set_nominal_stepsize(epsilon);
+        }
         
         sampler.set_stepsize_jitter(epsilon_pm);
         
@@ -1058,8 +1078,18 @@ namespace stan {
         }
         
         // Warm-Up
-        if (epsilon <= 0) sampler.init_stepsize();
-        else             sampler.set_nominal_stepsize(epsilon);
+        if (epsilon <= 0) {
+          
+          try {
+            sampler.init_stepsize();
+          } catch (std::runtime_error e) {
+            std::cout << e.what() << std::endl;
+            return 0;
+          }
+        }
+        else {
+          sampler.set_nominal_stepsize(epsilon);
+        }
         
         sampler.set_stepsize_jitter(epsilon_pm);
         
@@ -1116,8 +1146,18 @@ namespace stan {
         }
         
         // Warm-Up
-        if (epsilon <= 0) sampler.init_stepsize();
-        else              sampler.set_nominal_stepsize(epsilon);
+        if (epsilon <= 0) {
+          
+          try {
+            sampler.init_stepsize();
+          } catch (std::runtime_error e) {
+            std::cout << e.what() << std::endl;
+            return 0;
+          }
+        }
+        else {
+          sampler.set_nominal_stepsize(epsilon);
+        }
         
         sampler.set_stepsize_jitter(epsilon_pm);
         
