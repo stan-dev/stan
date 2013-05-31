@@ -172,6 +172,20 @@ TEST(gm_parser,parsable_test_bad_trunc) {
   EXPECT_THROW(is_parsable("src/test/gm/model_specs/bad_trunc3.stan"),
                std::invalid_argument);
 }
+TEST(gmParser,parsableBadPeriods) {
+  EXPECT_THROW(is_parsable("src/test/gm/model_specs/bad_periods_data.stan"),
+               std::invalid_argument);
+  EXPECT_THROW(is_parsable("src/test/gm/model_specs/bad_periods_tdata.stan"),
+               std::invalid_argument);
+  EXPECT_THROW(is_parsable("src/test/gm/model_specs/bad_periods_params.stan"),
+               std::invalid_argument);
+  EXPECT_THROW(is_parsable("src/test/gm/model_specs/bad_periods_tparams.stan"),
+               std::invalid_argument);
+  EXPECT_THROW(is_parsable("src/test/gm/model_specs/bad_periods_gqs.stan"),
+               std::invalid_argument);
+  EXPECT_THROW(is_parsable("src/test/gm/model_specs/bad_periods_local.stan"),
+               std::invalid_argument);
+}
 TEST(gm_parser,function_signatures) {
   EXPECT_TRUE(is_parsable("src/test/gm/model_specs/compiled/function_signatures1.stan"));
   EXPECT_TRUE(is_parsable("src/test/gm/model_specs/compiled/function_signatures6.stan"));
