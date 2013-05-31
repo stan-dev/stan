@@ -51,6 +51,8 @@
 #include "stan/math/functions/logit.hpp"
 #include "stan/math/functions/max.hpp"
 #include "stan/math/functions/min.hpp"
+#include "stan/math/functions/modified_bessel_first_kind.hpp"
+#include "stan/math/functions/modified_bessel_second_kind.hpp"
 #include "stan/math/functions/multiply_log.hpp"
 #include "stan/math/functions/rising_factorial.hpp"
 #include "stan/math/functions/scaled_add.hpp"
