@@ -247,6 +247,7 @@ namespace stan {
       }
       
       static bool read_samples(std::istream& in, Eigen::MatrixXd& samples, stan_csv_timing& timing) {
+        
         std::stringstream ss;
         std::string line;
 
@@ -265,7 +266,6 @@ namespace stan {
           
           if (empty_line) continue;
           if (!line.length()) break;
-          
           
           if (comment_line) {
 
@@ -293,10 +293,10 @@ namespace stan {
               return false;
             }
             rows++;
+            
+          }
           
           in.peek();
-          
-          }
         
         }
           
@@ -315,59 +315,6 @@ namespace stan {
         }
         return true;
       }
-
-      /*
-      static bool read_timing(std::istream& in, stan_csv_timing& timing) {
-        
-        std::string line;
-        
-        std::cout << in.good() << std::endl;
-        
-        in.seekg(std::ios_base::beg);
-
-        std::cout << in.good() << std::endl;
-        
-        if (in.good() == false) return false;
-      
-        // Skip metadata
-        while (in.good()) {
-          std::getline(in, line);
-          if (in.peek() != '#') break;
-        }
-        
-        // Skip header
-        std::getline(in, line);
-
-        // Skip adaptation info
-        while (in.good()) {
-          std::getline(in, line);
-          if (in.peek() != '#') break;
-        }
-        
-        while (in.good()) {
-          
-          std::getline(in, line);
-          
-          if (in.peek() != '#') continue;
-              
-          if (line.find("(Warm-up)") != std::string::npos) {
-            int left = 16;
-            int right = line.find(" seconds");
-            timing.warmup += boost::lexical_cast<double>(line.substr(left, right - left));
-          } else if (line.find("(Sampling)") != std::string::npos) {
-            int left = 16;
-            int right = line.find(" seconds");
-            timing.sampling += boost::lexical_cast<double>(line.substr(left, right - left));
-          }
-          
-          in.peek();
-          
-        }
-        
-        return true;
-       
-      }
-       */
       
       /** 
        * Parses the file.
@@ -389,7 +336,7 @@ namespace stan {
         if (!read_adaptation(in, data.adaptation)) {
           std::cout << "Warning: non-fatal error reading adapation data" << std::endl;
         }
-        
+
         data.timing.warmup = 0;
         data.timing.sampling = 0;
         

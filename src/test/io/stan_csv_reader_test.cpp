@@ -212,7 +212,6 @@ TEST_F(StanIoStanCsvReader,read_samples1) {
   EXPECT_FLOAT_EQ(0.307221, timing.warmup);
   EXPECT_FLOAT_EQ(0.350392, timing.sampling);
   
-  
 }
 
 TEST_F(StanIoStanCsvReader,ParseBlocker) {
