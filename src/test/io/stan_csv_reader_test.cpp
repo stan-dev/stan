@@ -190,8 +190,9 @@ TEST_F(StanIoStanCsvReader,read_adaptation1) {
 TEST_F(StanIoStanCsvReader,read_samples1) {
   
   Eigen::MatrixXd samples;
+  stan::io::stan_csv_timing timing;
   
-  EXPECT_TRUE(stan::io::stan_csv_reader::read_samples(samples1_stream, samples));
+  EXPECT_TRUE(stan::io::stan_csv_reader::read_samples(samples1_stream, samples, timing));
   
   ASSERT_EQ(5, samples.rows());
   ASSERT_EQ(52, samples.cols());
@@ -208,16 +209,9 @@ TEST_F(StanIoStanCsvReader,read_samples1) {
     for (int j = 0; j < 52; j++)
       EXPECT_FLOAT_EQ(expected_samples(i,j), samples(i,j));
   
-}
-
-TEST_F(StanIoStanCsvReader,read_timing1) {
-  
-  stan::io::stan_csv_timing timing;
-  
-  EXPECT_TRUE(stan::io::stan_csv_reader::read_timing(samples1_stream, timing));
-  
   EXPECT_FLOAT_EQ(0.307221, timing.warmup);
   EXPECT_FLOAT_EQ(0.350392, timing.sampling);
+  
   
 }
 
@@ -455,8 +449,9 @@ TEST_F(StanIoStanCsvReader,read_adaptation2) {
 TEST_F(StanIoStanCsvReader,read_samples2) {
   
   Eigen::MatrixXd samples;
+  stan::io::stan_csv_timing timing;
   
-  EXPECT_TRUE(stan::io::stan_csv_reader::read_samples(samples2_stream, samples));
+  EXPECT_TRUE(stan::io::stan_csv_reader::read_samples(samples2_stream, samples, timing));
   
   ASSERT_EQ(3, samples.rows());
   ASSERT_EQ(310, samples.cols());
@@ -471,14 +466,6 @@ TEST_F(StanIoStanCsvReader,read_samples2) {
     for (int j = 0; j < 310; j++)
       EXPECT_FLOAT_EQ(expected_samples(i,j), samples(i,j));
   
-}
-
-TEST_F(StanIoStanCsvReader,read_timing2) {
-  
-  stan::io::stan_csv_timing timing;
-  
-  EXPECT_TRUE(stan::io::stan_csv_reader::read_timing(samples2_stream, timing));
-    
   EXPECT_FLOAT_EQ(4.60978, timing.warmup);
   EXPECT_FLOAT_EQ(6.02445, timing.sampling);
   
