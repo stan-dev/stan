@@ -17,9 +17,16 @@ namespace stan {
       
     public:
       
-      ps_point(int n, int m): q(n), r(m), p(Eigen::VectorXd::Zero(n)),
-                              V(0), g(Eigen::VectorXd::Zero(n))
-      {};
+      ps_point(int n, int m): q(n), r(m), p(n), V(0), g(n) {
+        p.setZero();
+        g.setZero();
+      };
+  
+      ps_point(const ps_point& z): q(z.q), r(z.r), p(z.p.size()), V(z.V), g(z.g.size())
+      {
+        std::memcpy(&p(0), &(z.p(0)), z.p.size() * sizeof(double));
+        std::memcpy(&g(0), &(z.g(0)), z.g.size() * sizeof(double));
+      }
       
       std::vector<double> q;
       std::vector<int> r;

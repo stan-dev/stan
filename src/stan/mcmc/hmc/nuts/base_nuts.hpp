@@ -65,7 +65,7 @@ namespace stan {
         this->_hamiltonian.sample_p(this->_z, this->_rand_int);
         this->_hamiltonian.init(this->_z);
 
-        ps_point z_plus(static_cast<ps_point>(this->_z));
+        ps_point z_plus(this->_z);
         ps_point z_minus(z_plus);
 
         ps_point z_sample(z_plus);
@@ -74,8 +74,8 @@ namespace stan {
         int n_cont = init_sample.cont_params().size();
         
         Eigen::VectorXd rho_init = this->_z.p;
-        Eigen::VectorXd rho_plus = Eigen::VectorXd::Zero(n_cont);
-        Eigen::VectorXd rho_minus = Eigen::VectorXd::Zero(n_cont);
+        Eigen::VectorXd rho_plus(n_cont); rho_plus.setZero();
+        Eigen::VectorXd rho_minus(n_cont); rho_minus.setZero();
         
         util.H0 = this->_hamiltonian.H(this->_z);
         
@@ -210,7 +210,7 @@ namespace stan {
         else 
         {
           
-          Eigen::VectorXd subtree_rho = Eigen::VectorXd::Zero(rho.size());
+          Eigen::VectorXd subtree_rho(rho.size()); subtree_rho.setZero();
           ps_point z_init(this->_z);
           
           int n1 = build_tree(depth - 1, subtree_rho, &z_init, z_propose, util);
