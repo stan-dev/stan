@@ -20,7 +20,7 @@ namespace stan {
         }
         void chain() {
           avi_->adj_ += adj_ * stan::math::falling_factorial(avi_->val_, bvi_->val_) * boost::math::digamma(avi_->val_ + 1);
-          bvi_->adj_ += adj_ * stan::math::falling_factorial(avi_->val_, bvi_->val_) * -boost::math::digamma(bvi_->val_ + 1);
+          bvi_->adj_ -= adj_ * stan::math::falling_factorial(avi_->val_, bvi_->val_) * boost::math::digamma(bvi_->val_ + 1);
         }
       };
 
