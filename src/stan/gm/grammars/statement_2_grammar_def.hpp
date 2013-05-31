@@ -122,8 +122,8 @@ namespace stan {
         > lit(')')
         > statement_g(_r1,_r2)
         [add_conditional_body_f(_val,_1)]
-        > * (lit("else")
-             >> lit("if")
+        > * (( lit("else")
+               >> lit("if") )
              > lit('(')
              > expression_g(_r2)
                [_pass = add_conditional_condition_f(_val,_1,
