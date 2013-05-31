@@ -147,16 +147,16 @@ namespace stan {
                         "Test gradient calculations using finite differences");
       
       print_help_option(&std::cout,
-                        "point_estimate_nesterov","",
-                        "Fit point estimate of hidden parameters by maximizing log joint probability using Nesterov's accelerated gradient method");
+                        "point_estimate","",
+                        "Fit point estimate of hidden parameters by maximizing log joint probability using the BFGS method with line search");
       
       print_help_option(&std::cout,
                         "point_estimate_newton","",
                         "Fit point estimate of hidden parameters by maximizing log joint probability using Newton's method");
 
       print_help_option(&std::cout,
-                        "point_estimate","",
-                        "Fit point estimate of hidden parameters by maximizing log joint probability using the BFGS method with line search");
+                        "point_estimate_nesterov","",
+                        "Fit point estimate of hidden parameters by maximizing log joint probability using Nesterov's accelerated gradient method");
       
       print_help_option(&std::cout,
                         "nondiag_mass", "",
