@@ -52,6 +52,9 @@
 #include <stan/agrad/fwd/log2.hpp>
 #include <stan/agrad/fwd/log10.hpp>
 #include <stan/agrad/fwd/pow.hpp>
+#include <stan/agrad/fwd/inv.hpp>
+#include <stan/agrad/fwd/inv_sqrt.hpp>
+#include <stan/agrad/fwd/inv_square.hpp>
 
 //trig functions
 #include <stan/agrad/fwd/hypot.hpp>
@@ -93,9 +96,11 @@
 //composed functions
 #include <stan/agrad/fwd/expm1.hpp>
 #include <stan/agrad/fwd/fma.hpp>
-#include <stan/agrad/fwd/log1p.hpp>
 #include <stan/agrad/fwd/log1m.hpp>
+#include <stan/agrad/fwd/log1p.hpp>
+#include <stan/agrad/fwd/log1m_exp.hpp>
 #include <stan/agrad/fwd/log1p_exp.hpp>
+#include <stan/agrad/fwd/log_diff_exp.hpp>
 #include <stan/agrad/fwd/log_sum_exp.hpp>
 #include <stan/agrad/fwd/log_inv_logit.hpp>
 #include <stan/agrad/fwd/log1m_inv_logit.hpp>
