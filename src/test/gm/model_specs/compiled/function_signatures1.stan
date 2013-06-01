@@ -93,6 +93,10 @@ transformed data {
   transformed_data_real <- log2(d_real);
   transformed_data_real <- log10(d_real);
   transformed_data_real <- pow(d_real, d_real);
+  transformed_data_real <- inv(d_real);
+  transformed_data_real <- inv_square(d_real);
+  transformed_data_real <- inv_sqrt(d_real);
+
 
   //   trigonometric functions
   transformed_data_real <- hypot(d_real, d_real);
@@ -435,6 +439,13 @@ transformed parameters {
   transformed_param_real <- pow(p_real, d_real);
   transformed_param_real <- pow(d_real, p_real);
   transformed_param_real <- pow(p_real, p_real);
+  transformed_param_real <- inv(d_real);
+  transformed_param_real <- inv(p_real);
+  transformed_param_real <- inv_square(d_real);
+  transformed_param_real <- inv_square(p_real);
+  transformed_param_real <- inv_sqrt(d_real);
+  transformed_param_real <- inv_sqrt(p_real);
+
 
   //   trigonometric functions
   transformed_param_real <- hypot(d_real, d_real);
