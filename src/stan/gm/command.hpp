@@ -148,15 +148,15 @@ namespace stan {
       
       print_help_option(&std::cout,
                         "point_estimate","",
-                        "Fit point estimate of hidden parameters by maximizing log joint probability using Nesterov's accelerated gradient method");
+                        "Fit point estimate of hidden parameters by maximizing log joint probability using the BFGS method with line search");
       
       print_help_option(&std::cout,
                         "point_estimate_newton","",
                         "Fit point estimate of hidden parameters by maximizing log joint probability using Newton's method");
 
       print_help_option(&std::cout,
-                        "point_estimate_bfgs","",
-                        "Fit point estimate of hidden parameters by maximizing log joint probability using the BFGS method with line search");
+                        "point_estimate_nesterov","",
+                        "Fit point estimate of hidden parameters by maximizing log joint probability using Nesterov's accelerated gradient method");
       
       print_help_option(&std::cout,
                         "nondiag_mass", "",
@@ -319,9 +319,9 @@ namespace stan {
       data_stream.close();
       
       // Input arguments
-      bool point_estimate = command.has_flag("point_estimate");
+      bool point_estimate_nesterov = command.has_flag("point_estimate_nesterov");
       bool point_estimate_newton = command.has_flag("point_estimate_newton");
-      bool point_estimate_bfgs = command.has_flag("point_estimate_bfgs");
+      bool point_estimate = command.has_flag("point_estimate");
 
       std::string sample_file = "samples.csv";
       command.val("samples", sample_file);
@@ -579,12 +579,13 @@ namespace stan {
         
         std::cout << "output = " << sample_file << std::endl;
         std::cout << "save_warmup = " << save_warmup<< std::endl;
-        
+
         std::cout << "seed = " << random_seed 
                   << " (" << (command.has_key("seed") 
                     ? "user specified"
                     : "randomly generated") << ")"
                   << std::endl;
+        std::cout << "algorithm = Newton" << std::endl;
         
         std::fstream sample_stream(sample_file.c_str(), 
                                    samples_append_mode);
@@ -598,6 +599,7 @@ namespace stan {
         write_comment_property(sample_stream, "init", init_val);
         write_comment_property(sample_stream, "save_warmup", save_warmup);
         write_comment_property(sample_stream, "seed", random_seed);
+        write_comment_property(sample_stream, "algorithm","Newton");
         write_comment(sample_stream);
         
         sample_stream << "lp__,";
@@ -641,7 +643,7 @@ namespace stan {
         
       }
       
-      if (point_estimate) {
+      if (point_estimate_nesterov) {
         
         std::cout << "STAN OPTIMIZATION COMMAND" << std::endl;
         if (data_file == "")
@@ -662,6 +664,8 @@ namespace stan {
                     : "randomly generated") << ")"
                   << std::endl;
         
+        std::cout << "algorithm = Nesterov" << std::endl;
+
         std::fstream sample_stream(sample_file.c_str(), 
                                    samples_append_mode);
         
@@ -674,6 +678,7 @@ namespace stan {
         write_comment_property(sample_stream, "init", init_val);
         write_comment_property(sample_stream, "save_warmup", save_warmup);
         write_comment_property(sample_stream, "seed", random_seed);
+        write_comment_property(sample_stream, "algorithm","Nesterov");
         write_comment(sample_stream);
         
         sample_stream << "lp__,";
@@ -716,7 +721,7 @@ namespace stan {
         return 0;
       }
       
-      if (point_estimate_bfgs) {
+      if (point_estimate) {
         std::cout << "STAN OPTIMIZATION COMMAND" << std::endl;
         if (data_file == "")
           std::cout << "data = (specified model requires no data)" << std::endl;
@@ -737,6 +742,8 @@ namespace stan {
                     : "randomly generated") << ")"
         << std::endl;
         
+        std::cout << "algorithm = BFGS" << std::endl;
+
         std::fstream sample_stream(sample_file.c_str(), 
                                    samples_append_mode);
         
@@ -750,6 +757,7 @@ namespace stan {
         write_comment_property(sample_stream,"save_warmup",save_warmup);
         write_comment_property(sample_stream,"seed",random_seed);
         write_comment_property(sample_stream,"epsilon",epsilon);
+        write_comment_property(sample_stream,"algorithm","BFGS");
         write_comment(sample_stream);
         
         sample_stream << "lp__,"; // log probability first
@@ -779,7 +787,7 @@ namespace stan {
             std::cout << " # evals ";
             std::cout << " Notes " << std::endl;
           }
-          if (do_print(i, refresh)) {
+          if (do_print(i, refresh) || ret != 0 || !ng.note().empty()) {
             std::cout << " " << std::setw(7) << (m + 1) << " ";
             std::cout << " " << std::setw(12) << std::setprecision(6) << lp << " ";
             std::cout << " " << std::setw(12) << std::setprecision(6) << ng.prev_step_size() << " ";
@@ -800,6 +808,8 @@ namespace stan {
         }
         if (ret != 0)
           std::cout << "Optimization terminated with code " << ret << std::endl;
+        else
+          std::cout << "Maximum number of iterations hit, optimization terminated." << std::endl;
         
         sample_stream << lp << ',';
         model.write_csv(base_rng,cont_params,disc_params,sample_stream);
