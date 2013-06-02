@@ -1127,6 +1127,37 @@ If $\alpha \in \posreals$ and $\sigma \in [0,\infty)$, then for $y \in
 quantities block}
 \end{description}
 
+\chapter{Non-negative Continuous Distributions}
+\noindent
+The non-negative continuous probability functions have support on the
+non-negative real numbers.
+
+\section{Rayleigh Distribution}
+
+\subsection{Probability Density Function}
+ If $\sigma \in \posreals$, then for $y \in [0,\infty)$,
+\[
+\distro{Rayleigh}(y|\sigma)
+=
+\frac{y}{\sigma^2} \exp(-y^2 / 2\sigma^2)
+\!.
+\]
+
+\subsection{Stan Functions}
+\begin{description}
+\fitem{real}{rayleigh\_log}{reals \farg{y}, reals \farg{sigma}}{The log of the Rayleigh
+ ensity of \farg{y} given scale \farg{sigma}}
+%
+\fitem{real}{rayleigh\_cdf}{real \farg{y}, real
+\farg{sigma}}{The Rayleigh cumulative distribution of \farg{y} given scale \farg{sigma}}
+\end{description}
+%
+\begin{description}
+\fitem{real}{rayleigh\_rng}{real
+  \farg{sigma}}{Generate a Rayleigh variate with scale
+  \farg{sigma}; may only be used in generated 
+quantities block}
+\end{description}
 
 \chapter{Positive Lower-Bounded Probabilities}
 
