@@ -17,15 +17,30 @@ namespace stan {
       
     public:
       
-      ps_point(int n, int m): q(n), r(m), p(n), V(0), g(n) {
-        p.setZero();
-        g.setZero();
-      };
+      ps_point(int n, int m): q(n), r(m), p(n), V(0), g(n) {};
   
       ps_point(const ps_point& z): q(z.q), r(z.r), p(z.p.size()), V(z.V), g(z.g.size())
       {
         std::memcpy(&p(0), &(z.p(0)), z.p.size() * sizeof(double));
         std::memcpy(&g(0), &(z.g(0)), z.g.size() * sizeof(double));
+      }
+      
+      
+      ps_point& operator= (const ps_point& z)
+      {
+        
+        if(this == &z) return *this;
+        
+        q = z.q;
+        r = z.r;
+        
+        V = z.V;
+        
+        std::memcpy(&p(0), &(z.p(0)), z.p.size() * sizeof(double));
+        std::memcpy(&g(0), &(z.g(0)), z.g.size() * sizeof(double));
+        
+        return *this;
+        
       }
       
       std::vector<double> q;
@@ -34,14 +49,6 @@ namespace stan {
       
       double V;
       Eigen::VectorXd g;
-      
-      void copy_base(ps_point& z) {
-        q = z.q;
-        r = z.r;
-        p = z.p;
-        V = z.V;
-        g = z.g;
-      }
         
       virtual void get_param_names(std::vector<std::string>& model_names,
                                    std::vector<std::string>& names) {

@@ -33,7 +33,7 @@ namespace stan {
         this->_hamiltonian.sample_p(this->_z, this->_rand_int);
         this->_hamiltonian.init(this->_z);
         
-        ps_point z_init(static_cast<ps_point>(this->_z));
+        ps_point z_init(this->_z);
 
         double H0 = this->_hamiltonian.H(this->_z);
         
@@ -44,7 +44,7 @@ namespace stan {
         double acceptProb = std::exp(H0 - this->_hamiltonian.H(this->_z));
         
         if (acceptProb < 1 && this->_rand_uniform() > acceptProb) {
-          this->_z.copy_base(z_init);
+          this->_z.ps_point::operator=(z_init);
         }
         
         acceptProb = acceptProb > 1 ? 1 : acceptProb;

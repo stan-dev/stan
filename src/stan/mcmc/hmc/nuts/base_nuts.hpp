@@ -111,11 +111,11 @@ namespace stan {
           }
           
           // And build a new subtree in that direction 
-          this->_z.copy_base(*z);
+          this->_z.ps_point::operator=(*z);
           
           int n_valid_subtree = build_tree(_depth, *rho, 0, z_propose, util);
           
-          *z = static_cast<ps_point>(this->_z);
+          *z = this->_z;
 
           // Metropolis-Hastings sample the fresh subtree
           if (!util.criterion)
@@ -136,7 +136,7 @@ namespace stan {
           n_valid += n_valid_subtree;
           
           // Check validity of completed tree
-          this->_z.copy_base(z_plus);
+          this->_z.ps_point::operator=(z_plus);
           Eigen::VectorXd delta_rho = rho_minus + rho_init + rho_plus;
           
           util.criterion = _compute_criterion(z_minus, this->_z, delta_rho);
@@ -146,13 +146,12 @@ namespace stan {
         }
         
         --(this->_depth); // Correct for increment at end of loop
-                          
-        this->_z.copy_base(z_sample);
         
         double accept_prob = util.sum_prob / static_cast<double>(util.n_tree);
         
-        return sample(this->_z.q, this->_z.r, - this->_hamiltonian.V(this->_z), accept_prob);
-                                
+        this->_z.ps_point::operator=(z_sample);
+        return sample(this->_z.q, this->_z.r, - this->_z.V, accept_prob);
+        
       }
       
       void write_sampler_param_names(std::ostream& o) {
@@ -193,7 +192,7 @@ namespace stan {
           rho += this->_z.p;
           
           if (z_init) *z_init = this->_z;
-          z_propose = static_cast<ps_point>(this->_z);
+          z_propose = this->_z;
           
           double h = this->_hamiltonian.H(this->_z); 
           if (h != h) h = std::numeric_limits<double>::infinity();
