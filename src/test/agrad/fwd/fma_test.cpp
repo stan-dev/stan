@@ -52,27 +52,19 @@ TEST(AgradFvarVar, fma) {
   using stan::math::fma;
 
   fvar<var> x(2.5,1.3);
-
   fvar<var> y(1.7,1.5);
-
   fvar<var> z(1.5,1.0);
   fvar<var> a = fma(x,y,z);
 
   EXPECT_FLOAT_EQ(fma(2.5,1.7,1.5), a.val_.val());
   EXPECT_FLOAT_EQ(2.5 * 1.5 + 1.3 * 1.7 + 1.0, a.d_.val());
 
-  AVEC w = createAVEC(x.val_);
+  AVEC w = createAVEC(x.val_,y.val_,z.val_);
   VEC g;
   a.val_.grad(w,g);
   EXPECT_FLOAT_EQ(1.7, g[0]);
-  std::isnan(g[1]);
-  std::isnan(g[2]);
-
-  w = createAVEC(x.d_);
-  a.d_.grad(w,g);
-  EXPECT_FLOAT_EQ(0, g[0]);
-  std::isnan(g[1]);
-  std::isnan(g[2]);
+  EXPECT_FLOAT_EQ(2.5,g[1]);
+  EXPECT_FLOAT_EQ(1.0,g[2]);
 }
 
 TEST(AgradFvarFvar, fma) {

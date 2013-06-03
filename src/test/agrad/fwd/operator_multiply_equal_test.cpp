@@ -42,16 +42,11 @@ TEST(AgradFvarVar, operatorMultiplyEqual) {
   EXPECT_FLOAT_EQ(0.25, x.val_.val());
   EXPECT_FLOAT_EQ(1.3, x.d_.val());
 
-  AVEC y = createAVEC(x.val_);
+  AVEC y = createAVEC(x.val_,z.val_);
   VEC g;
   x.val_.grad(y,g);
   EXPECT_FLOAT_EQ(1, g[0]);
-  std::isnan(g[1]);
-
-  y = createAVEC(x.d_);
-  x.d_.grad(y,g);
-  EXPECT_FLOAT_EQ(1, g[0]);
-  std::isnan(g[1]);
+  EXPECT_FLOAT_EQ(0.5, g[1]);
 }
 
 TEST(AgradFvarFvar, operatorMultiplyEqual) {

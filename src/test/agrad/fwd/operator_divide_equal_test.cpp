@@ -45,10 +45,6 @@ TEST(AgradFvarVar, operatorDivideEqual) {
   VEC g;
   x.val_.grad(y,g);
   EXPECT_FLOAT_EQ(1.0, g[0]);
-
-  y = createAVEC(x.d_);
-  x.d_.grad(y,g);
-  EXPECT_FLOAT_EQ(1, g[0]);
 }
 
 TEST(AgradFvarFvar, operatorAddition) {

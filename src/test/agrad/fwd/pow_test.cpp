@@ -44,16 +44,11 @@ TEST(AgradFvarVar, pow) {
   EXPECT_FLOAT_EQ(pow(0.5,1.2), a.val_.val());
   EXPECT_FLOAT_EQ((2.0 * log(0.5) + 1.2 * 1.0 / 0.5) * pow(0.5, 1.2), a.d_.val());
 
-  AVEC y = createAVEC(x.val_);
+  AVEC y = createAVEC(x.val_,z.val_);
   VEC g;
   a.val_.grad(y,g);
   EXPECT_FLOAT_EQ(1.2 / 0.5 * pow(0.5, 1.2), g[0]);
-  std::isnan(g[1]);
-
-  y = createAVEC(x.d_);
-  a.d_.grad(y,g);
-  EXPECT_FLOAT_EQ(0, g[0]);
-  std::isnan(g[1]);
+  EXPECT_FLOAT_EQ(log(0.5) * pow(0.5, 1.2), g[1]);
 }
 
 TEST(AgradFvarFvar, pow) {

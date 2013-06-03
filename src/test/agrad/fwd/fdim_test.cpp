@@ -47,21 +47,15 @@ TEST(AgradFvarVar, fdim) {
   using std::isnan;
 
   fvar<var> x(2.5,1.3);
-
   fvar<var> z(1.5,1.0);
   fvar<var> a = fdim(x,z);
 
   EXPECT_FLOAT_EQ(fdim(2.5,1.5), a.val_.val());
   isnan(a.d_.val());
 
-  AVEC y = createAVEC(x.val_);
+  AVEC y = createAVEC(x.val_,z.val_);
   VEC g;
   a.val_.grad(y,g);
-  isnan(g[0]);
-  isnan(g[1]);
-
-  y = createAVEC(x.d_);
-  a.d_.grad(y,g);
   isnan(g[0]);
   isnan(g[1]);
 }

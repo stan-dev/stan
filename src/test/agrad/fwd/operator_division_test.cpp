@@ -8,7 +8,7 @@ TEST(AgradFvar, operatorDivision) {
   using std::isnan;
 
   fvar<double> x1(0.5,1.0);
-  fvar<double> x2(0.4,1.0);
+  fvar<double> x2(0.4,2.0);
   fvar<double> a = x1 / x2;
 
   EXPECT_FLOAT_EQ(0.5 / 0.4, a.val_);
@@ -50,16 +50,11 @@ TEST(AgradFvarVar, operatorDivision) {
   EXPECT_FLOAT_EQ(1.0, a.val_.val());
   EXPECT_FLOAT_EQ(0, a.d_.val());
 
-  AVEC y = createAVEC(x.val_);
+  AVEC y = createAVEC(x.val_,z.val_);
   VEC g;
   a.val_.grad(y,g);
   EXPECT_FLOAT_EQ(2, g[0]);
-  std::isnan(g[1]);
-
-  y = createAVEC(x.d_);
-  a.d_.grad(y,g);
-  EXPECT_FLOAT_EQ(0, g[0]);
-  std::isnan(g[1]);
+  EXPECT_FLOAT_EQ(-0.5 / 0.25, g[1]);
 }
 
 TEST(AgradFvarFvar, operatorDivision) {

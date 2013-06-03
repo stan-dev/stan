@@ -42,10 +42,6 @@ TEST(AgradFvarVar, erfc) {
   a.val_.grad(y,g);
   EXPECT_FLOAT_EQ(-2 * exp(-0.5 * 0.5) / 
                   sqrt(boost::math::constants::pi<double>()), g[0]);
-
-  y = createAVEC(x.d_);
-  a.d_.grad(y,g);
-  EXPECT_FLOAT_EQ(0, g[0]);
 }
 
 TEST(AgradFvarFvar, erfc) {

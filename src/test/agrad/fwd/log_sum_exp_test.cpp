@@ -40,16 +40,11 @@ TEST(AgradFvarVar, log_sum_exp) {
   EXPECT_FLOAT_EQ(log_sum_exp(3.0,6.0), a.val_.val());
   EXPECT_FLOAT_EQ((1.3 * exp(3.0) + 1.0 * exp(6.0)) / (exp(3.0) + exp(6.0)), a.d_.val());
 
-  AVEC y = createAVEC(x.val_);
+  AVEC y = createAVEC(x.val_,z.val_);
   VEC g;
   a.val_.grad(y,g);
   EXPECT_FLOAT_EQ(exp(3.0) / (exp(3.0) + exp(6.0)),g[0]);
-  std::isnan(g[1]);
-
-  y = createAVEC(x.d_);
-  a.d_.grad(y,g);
-  EXPECT_FLOAT_EQ(0,g[0]);
-  std::isnan(g[1]);
+  EXPECT_FLOAT_EQ(exp(6.0) / (exp(3.0) + exp(6.0)),g[1]);
 }
 
 TEST(AgradFvarFvar, log_sum_exp) {

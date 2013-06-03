@@ -51,10 +51,6 @@ TEST(AgradFvarVar, abs) {
   VEC g;
   a.val_.grad(y,g);
   EXPECT_FLOAT_EQ(1.0, g[0]);
-
-  y = createAVEC(x.d_);
-  a.d_.grad(y,g);
-  EXPECT_FLOAT_EQ(1.0, g[0]);
 }
 
 TEST(AgradFvarFvar, abs) {

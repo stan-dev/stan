@@ -32,10 +32,6 @@ TEST(AgradFvarVar, digamma) {
   VEC g;
   a.val_.grad(y,g);
   EXPECT_FLOAT_EQ(zeta(2.0) - (0.57721566490153286 + digamma(0.5)), g[0]);
-
-  y = createAVEC(x.d_);
-  a.d_.grad(y,g);
-  EXPECT_FLOAT_EQ(0, g[0]);
 }
 
 TEST(AgradFvarFvar, digamma) {
