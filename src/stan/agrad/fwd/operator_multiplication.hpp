@@ -8,34 +8,31 @@ namespace stan {
 
   namespace agrad {
 
-    template <typename T1, typename T2>
+    template <typename T>
     inline
-    fvar<typename stan::return_type<T1,T2>::type>
-    operator*(const fvar<T1>& x1, 
-              const fvar<T2>& x2) {
-      return fvar<typename 
-                  stan::return_type<T1,T2>::type>(x1.val_ * x2.val_, 
-                                                  x1.d_ * x2.val_ 
-                                                  + x1.val_ * x2.d_);
+    fvar<T>
+    operator*(const fvar<T>& x1, 
+              const fvar<T>& x2) {
+      return fvar<T>(x1.val_ * x2.val_, x1.d_ * x2.val_ + x1.val_ * x2.d_);
     }
 
-    template <typename T1, typename T2>
+    template <typename T>
     inline
-    fvar<typename stan::return_type<T1,T2>::type>
-    operator*(const T1& x1, 
-              const fvar<T2>& x2) {
+    fvar<typename stan::return_type<T,double>::type>
+    operator*(double x1, 
+              const fvar<T>& x2) {
       return fvar<typename 
-                  stan::return_type<T1,T2>::type>(x1 * x2.val_, 
-                                                  x1 * x2.d_);
+                  stan::return_type<T,double>::type>(x1 * x2.val_, 
+                                                     x1 * x2.d_);
     }
 
-    template <typename T1, typename T2>
+    template <typename T>
     inline
-    fvar<typename stan::return_type<T1,T2>::type>
-    operator*(const fvar<T1>& x1, 
-              const T2& x2) {
+    fvar<typename stan::return_type<T,double>::type>
+    operator*(const fvar<T>& x1, 
+              double x2) {
       return fvar<typename 
-                  stan::return_type<T1,T2>::type>(x1.val_ * x2,
+                  stan::return_type<T,double>::type>(x1.val_ * x2,
                                                   x1.d_ * x2);
     }
   }

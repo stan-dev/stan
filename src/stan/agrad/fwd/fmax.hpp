@@ -9,54 +9,54 @@ namespace stan {
 
   namespace agrad {
 
-    template <typename T1, typename T2>
+    template <typename T>
     inline
-    fvar<typename stan::return_type<T1,T2>::type>
-    fmax(const fvar<T1>& x1, const fvar<T2>& x2) {
+    fvar<T>
+    fmax(const fvar<T>& x1, const fvar<T>& x2) {
       using std::max;
       using stan::math::NOT_A_NUMBER;
       if(x1.val_ > x2.val_)
-        return fvar<typename stan::return_type<T1,T2>::type>(
+        return fvar<typename stan::return_type<T>::type>(
           max(x1.val_, x2.val_), x1.d_ * 1.0);
       else if(x1.val_ == x2.val_)
-        return fvar<typename stan::return_type<T1,T2>::type>(
+        return fvar<typename stan::return_type<T>::type>(
           max(x1.val_, x2.val_), NOT_A_NUMBER);
       else 
-        return fvar<typename stan::return_type<T1,T2>::type>(
+        return fvar<typename stan::return_type<T>::type>(
           max(x1.val_, x2.val_), x2.d_ * 1.0);      
     }
 
-    template <typename T1, typename T2>
+    template <typename T>
     inline
-    fvar<typename stan::return_type<T1,T2>::type>
-    fmax(const T1& x1, const fvar<T2>& x2) {
+    fvar<typename stan::return_type<T,double>::type>
+    fmax(double x1, const fvar<T>& x2) {
       using std::max;
       using stan::math::NOT_A_NUMBER;
       if(x1 > x2.val_)
-        return fvar<typename stan::return_type<T1,T2>::type>(
+        return fvar<typename stan::return_type<T,double>::type>(
           max(x1, x2.val_), 0.0);
       else if(x1 == x2.val_)
-        return fvar<typename stan::return_type<T1,T2>::type>(
+        return fvar<typename stan::return_type<T,double>::type>(
           max(x1, x2.val_), NOT_A_NUMBER);
       else 
-        return fvar<typename stan::return_type<T1,T2>::type>(
+        return fvar<typename stan::return_type<T,double>::type>(
           max(x1, x2.val_), x2.d_ * 1.0);    
     }
 
-    template <typename T1, typename T2>
+    template <typename T>
     inline
-    fvar<typename stan::return_type<T1,T2>::type>
-    fmax(const fvar<T1>& x1, const T2& x2) {
+    fvar<typename stan::return_type<T,double>::type>
+    fmax(const fvar<T>& x1, double x2) {
       using std::max;
       using stan::math::NOT_A_NUMBER;
       if(x1.val_ > x2)
-        return fvar<typename stan::return_type<T1,T2>::type>(
+        return fvar<typename stan::return_type<T,double>::type>(
           max(x1.val_, x2), x1.d_ * 1.0);
       else if(x1.val_ == x2)
-       return fvar<typename stan::return_type<T1,T2>::type>(
+        return fvar<typename stan::return_type<T,double>::type>(
          max(x1.val_, x2), NOT_A_NUMBER);
       else 
-        return fvar<typename stan::return_type<T1,T2>::type>(
+        return fvar<typename stan::return_type<T,double>::type>(
           max(x1.val_, x2), 0.0);
      }
   }

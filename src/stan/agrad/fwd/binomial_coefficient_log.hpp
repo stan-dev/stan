@@ -10,23 +10,21 @@ namespace stan {
 
   namespace agrad {
 
-    template <typename T1, typename T2>
+    template <typename T>
     inline
-    fvar<typename stan::return_type<T1,T2>::type>
-    binomial_coefficient_log(const fvar<T1>& x1, const fvar<T2>& x2) {
+    fvar<T>
+    binomial_coefficient_log(const fvar<T>& x1, const fvar<T>& x2) {
       using boost::math::digamma;
       using std::log;
       using stan::math::binomial_coefficient_log;
       const double cutoff = 1000;
       if ((x1.val_ < cutoff) || (x1.val_ - x2.val_ < cutoff)) {
-        return fvar<typename stan::return_type<T1,T2>::type>(
-            binomial_coefficient_log(x1.val_, x2.val_),
-                 x1.d_ * digamma(x1.val_ + 1)
-               - x2.d_ * digamma(x2.val_ + 1)
-               + (x1.d_ - x2.d_) * digamma(x1.val_ - x2.val_ + 1));
+        return fvar<T>(binomial_coefficient_log(x1.val_, x2.val_),
+                       x1.d_ * digamma(x1.val_ + 1)
+                       - x2.d_ * digamma(x2.val_ + 1)
+                       + (x1.d_ - x2.d_) * digamma(x1.val_ - x2.val_ + 1));
       } else {
-        return fvar<typename stan::return_type<T1,T2>::type>(
-            binomial_coefficient_log(x1.val_, x2.val_), 
+        return fvar<T>(binomial_coefficient_log(x1.val_, x2.val_), 
                x2.d_ * log(x1.val_ - x2.val_) 
             + x2.val_ * (x1.d_ - x2.d_) / (x1.val_ - x2.val_) 
             + x1.d_ * log(x1.val_ / (x1.val_ - x2.val_))
@@ -41,21 +39,21 @@ namespace stan {
       }
     }
 
-    template <typename T1, typename T2>
+    template <typename T>
     inline
-    fvar<typename stan::return_type<T1,T2>::type>
-    binomial_coefficient_log(const fvar<T1>& x1, const T2& x2) {
+    fvar<typename stan::return_type<T,double>::type>
+    binomial_coefficient_log(const fvar<T>& x1, double x2) {
       using boost::math::digamma;
       using std::log;
       using stan::math::binomial_coefficient_log;
       const double cutoff = 1000;
       if ((x1.val_ < cutoff) || (x1.val_ - x2 < cutoff)) {
-        return fvar<typename stan::return_type<T1,T2>::type>(
+        return fvar<typename stan::return_type<T,double>::type>(
                         binomial_coefficient_log(x1.val_, x2),
                           x1.d_ * digamma(x1.val_ + 1)
                         + x1.d_ * digamma(x1.val_ - x2 + 1));
       } else {
-        return fvar<typename stan::return_type<T1,T2>::type>( 
+        return fvar<typename stan::return_type<T,double>::type>( 
             binomial_coefficient_log(x1.val_, x2), 
               x2 * x1.d_ / (x1.val_ - x2) 
             + x1.d_ * log(x1.val_ / (x1.val_ - x2))
@@ -67,21 +65,21 @@ namespace stan {
       }
     }
 
-    template <typename T1, typename T2>
+    template <typename T>
     inline
-    fvar<typename stan::return_type<T1,T2>::type>
-    binomial_coefficient_log(const T1& x1, const fvar<T2>& x2) {
+    fvar<typename stan::return_type<T,double>::type>
+    binomial_coefficient_log(double x1, const fvar<T>& x2) {
       using boost::math::digamma;
       using std::log;
       using stan::math::binomial_coefficient_log;
       const double cutoff = 1000;
       if ((x1 < cutoff) || (x1 - x2.val_ < cutoff)) {
-        return fvar<typename stan::return_type<T1,T2>::type>(
+        return fvar<typename stan::return_type<T,double>::type>(
                    binomial_coefficient_log(x1, x2.val_),
                    - x2.d_ * digamma(x2.val_ + 1) 
                    - x2.d_ * digamma(x1 - x2.val_ + 1));
       } else {
-        return fvar<typename stan::return_type<T1,T2>::type>(
+        return fvar<typename stan::return_type<T,double>::type>(
             binomial_coefficient_log(x1, x2.val_), 
                x2.d_ * log(x1 - x2.val_) 
             + x2.val_ * -x2.d_ / (x1 - x2.val_) 

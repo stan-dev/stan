@@ -42,7 +42,8 @@ TEST(AgradFvarVar, pow) {
   fvar<var> a = pow(x,z);
 
   EXPECT_FLOAT_EQ(pow(0.5,1.2), a.val_.val());
-  EXPECT_FLOAT_EQ((2.0 * log(0.5) + 1.2 * 1.0 / 0.5) * pow(0.5, 1.2), a.d_.val());
+  EXPECT_FLOAT_EQ((2.0 * log(0.5) + 1.2 * 1.0 / 0.5) * pow(0.5, 1.2), 
+                  a.d_.val());
 
   AVEC y = createAVEC(x.val_,z.val_);
   VEC g;
