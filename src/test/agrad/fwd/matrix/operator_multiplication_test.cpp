@@ -8,28 +8,6 @@
 using stan::agrad::fvar;  
 using stan::agrad::multiply;
 
-TEST(AgradFwdMatrix, multiply_scalar_scalar) {
-  double d1, d2;
-  fvar<double>   v1, v2;
-
-  d1 = 10;
-  v1 = 10.0;
-  d2 = -2;
-  v2 = -2.0;
-  
-  EXPECT_FLOAT_EQ(-20.0, multiply(d1,d2));
-  EXPECT_FLOAT_EQ(-20.0, multiply(d1, v2).val_);
-  EXPECT_FLOAT_EQ(-20.0, multiply(v1, d2).val_);
-  EXPECT_FLOAT_EQ(-20.0, multiply(v1, v2).val_);
-
-  EXPECT_FLOAT_EQ(6.0, multiply(fvar<double>(3),fvar<double>(2)).val_);
-  EXPECT_FLOAT_EQ(6.0, multiply(3.0,fvar<double>(2)).val_);
-  EXPECT_FLOAT_EQ(6.0, multiply(fvar<double>(3),2.0).val_);
-  EXPECT_FLOAT_EQ(5.0, multiply(fvar<double>(3,1),fvar<double>(2,1)).d_);
-  EXPECT_FLOAT_EQ(3.0, multiply(3.0,fvar<double>(2,1)).d_);
-  EXPECT_FLOAT_EQ(2.0, multiply(fvar<double>(3,1),2.0).d_);
-}
-
 TEST(AgradFwdMatrix, multiply_vector_scalar) {
   using stan::math::vector_d;
   using stan::agrad::vector_fv;
