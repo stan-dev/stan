@@ -3,42 +3,24 @@
 
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/meta/traits.hpp>
+#include <stan/agrad/fwd/inv.hpp>
+#include <stan/agrad/fwd/inv_sqrt.hpp>
+#include <stan/agrad/fwd/inv_square.hpp>
 
 namespace stan{
 
   namespace agrad{
 
-    template <typename T1, typename T2>
+    template <typename T>
     inline
-    fvar<typename stan::return_type<T1,T2>::type>
-    pow(const fvar<T1>& x1, const T2& x2) {
-      using std::pow;
-      return fvar<typename 
-                  stan::return_type<T1,T2>::type>( pow(x1.val_, x2),
-                                           x1.d_ * x2 * pow(x1.val_, x2 - 1));
-    }
-
-    template <typename T1, typename T2>
-    inline
-    fvar<typename stan::return_type<T1,T2>::type>
-    pow(const T1& x1, const fvar<T2>& x2) {
+    fvar<T>
+    pow(const fvar<T>& x1, const fvar<T>& x2) {
       using std::pow;
       using std::log;
-      return fvar<typename 
-                  stan::return_type<T1,T2>::type>( pow(x1, x2.val_),
-                                          x2.d_ * log(x1) * pow(x1, x2.val_));
-    }
-
-    template <typename T1, typename T2>
-    inline
-    fvar<typename stan::return_type<T1,T2>::type>
-    pow(const fvar<T1>& x1, const fvar<T2>& x2) {
-      using std::pow;
-      using std::log;
-      return fvar<typename 
-                  stan::return_type<T1,T2>::type>( pow(x1.val_, x2.val_),
+      T pow_x1_x2(pow(x1.val_,x2.val_));
+      return fvar<T>(pow_x1_x2,
                        (x2.d_ * log(x1.val_) 
-                         + x2.val_ * x1.d_ / x1.val_) * pow(x1.val_, x2.val_));
+                         + x2.val_ * x1.d_ / x1.val_) * pow_x1_x2);
     }
   }
 }
