@@ -128,6 +128,7 @@ transformed data {
   //   combinatorial functions
   transformed_data_real <- tgamma(d_real);
   transformed_data_real <- lgamma(d_real);
+  transformed_data_real <- digamma(d_real);
   transformed_data_real <- lmgamma(d_int, d_real);
   transformed_data_real <- lbeta(d_real, d_real);
   transformed_data_real <- binomial_coefficient_log(d_real, d_real);
@@ -493,6 +494,8 @@ transformed parameters {
   transformed_param_real <- tgamma(p_real);
   transformed_param_real <- lgamma(d_real);
   transformed_param_real <- lgamma(p_real);
+  transformed_param_real <- digamma(d_real);
+  transformed_param_real <- digamma(p_real);
   transformed_param_real <- lmgamma(d_int, d_real);
   transformed_param_real <- lmgamma(d_int, p_real);
   transformed_param_real <- lbeta(d_real, d_real);

@@ -134,6 +134,7 @@ add("cumulative_sum", ROW_VECTOR_T, ROW_VECTOR_T);
 add("determinant",DOUBLE_T,MATRIX_T);
 add("diagonal",VECTOR_T,MATRIX_T);
 add("diag_matrix",MATRIX_T,VECTOR_T);
+add_unary("digamma");
 add("dirichlet_log",DOUBLE_T,VECTOR_T,VECTOR_T);
 add("dirichlet_rng",VECTOR_T,VECTOR_T);
 add("divide",DOUBLE_T,DOUBLE_T,DOUBLE_T);

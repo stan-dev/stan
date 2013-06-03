@@ -85,6 +85,7 @@
 
 //combinatorial functions
 #include <stan/agrad/fwd/tgamma.hpp>
+#include <stan/agrad/fwd/digamma.hpp>
 #include <stan/agrad/fwd/lgamma.hpp>
 #include <stan/agrad/fwd/lmgamma.hpp>
 #include <stan/agrad/fwd/lbeta.hpp>
