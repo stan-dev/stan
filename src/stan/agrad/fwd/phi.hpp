@@ -17,7 +17,7 @@ namespace stan {
       using std::sqrt;
       T xv = x.val_;
       return fvar<T>(Phi(xv),
-                     exp(xv * xv / -2.0) / sqrt(2.0 * stan::math::pi()));
+                     x.d_ * exp(xv * xv / -2.0) / sqrt(2.0 * stan::math::pi()));
     }
   }
 }

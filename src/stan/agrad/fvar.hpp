@@ -80,7 +80,7 @@
 //probability related functions
 #include <stan/agrad/fwd/erf.hpp>
 #include <stan/agrad/fwd/erfc.hpp>
-#include <stan/agrad/fwd/phi.hpp>
+#include <stan/agrad/fwd/Phi.hpp>
 #include <stan/agrad/fwd/binary_log_loss.hpp>
 
 //combinatorial functions

@@ -9,6 +9,7 @@ TEST(AgradFvar,Phi) {
   using stan::agrad::fvar;
   using stan::math::Phi;
   fvar<double> x = 1.0;
+  x.d_ = 1.0;
   
   fvar<double> Phi_x = Phi(x);
 
@@ -26,7 +27,8 @@ TEST(AgradFvarVar, Phi) {
   fvar<var> a = Phi(x);
 
   EXPECT_FLOAT_EQ(Phi(1.0), a.val_.val());
-  EXPECT_FLOAT_EQ(exp(stan::prob::normal_log<false>(1.0,0.0,1.0)), a.d_.val());
+  EXPECT_FLOAT_EQ(1.3 * exp(stan::prob::normal_log<false>(1.0,0.0,1.0)), 
+                  a.d_.val());
 
   AVEC y = createAVEC(x.val_);
   VEC g;
