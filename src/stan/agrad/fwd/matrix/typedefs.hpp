@@ -9,7 +9,7 @@ namespace stan {
   namespace agrad {
     
     typedef 
-    Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>::size_type 
+    Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>::Index 
     size_type;
 
     typedef 

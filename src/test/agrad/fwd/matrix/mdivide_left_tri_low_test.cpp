@@ -31,7 +31,7 @@ TEST(AgradFwdMatrix, mdivide_left_tri_low_vector_fv_matrix_fv) {
   EXPECT_NEAR(1.0,output(0,0).val_,1.0E-08);
   EXPECT_NEAR(0,output(1,0).val_, 1.0E-08);
   EXPECT_NEAR(-1.0 / 6.0,output(2,0).val_,1.0E-08);
-  EXPECT_NEAR( 0,output(0,0).d_, 1.0E-08);
+  EXPECT_NEAR(0,output(0,0).d_, 1.0E-08);
   EXPECT_NEAR(0,output(1,0).d_, 1.0E-08);
   EXPECT_NEAR(5.0 / 90.0,output(2,0).d_,1.0E-08);
 }
