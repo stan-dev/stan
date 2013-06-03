@@ -94,7 +94,8 @@ namespace stan {
       inv_A_mult_b = mdivide_left(val_A, val_b);
       inv_A_mult_deriv_b = mdivide_left(val_A, deriv_b);
 
-      Eigen::Matrix<typename stan::return_type<T, double>::type,R1,C2> deriv(A.rows(), b.cols());
+      Eigen::Matrix<typename stan::return_type<T, double>::type,R1,C2> 
+        deriv(A.rows(), b.cols());
       deriv = inv_A_mult_deriv_b;
 
       return stan::agrad::to_fvar(inv_A_mult_b, deriv);
