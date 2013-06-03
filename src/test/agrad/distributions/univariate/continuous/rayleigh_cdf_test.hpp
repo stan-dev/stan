@@ -16,17 +16,17 @@ public:
     param[0] = 1;           // y
     param[1] = 1;           // sigma
     parameters.push_back(param);
-    cdf.push_back(0.3934693402873665763962004650088195465580818645128130443171078412649434805862515760013523884920105440);     // expected cdf
+    cdf.push_back(0.393469340287367);     // expected cdf
 
     param[0] = 2;           // y
     param[1] = 1;           // sigma
     parameters.push_back(param);
-    cdf.push_back(0.8646647167633873081060005050275155965923684540904241185318411273459266258985123100629018775093429512); // expected cdf
+    cdf.push_back(0.864664716763387); // expected cdf
 
     param[0] = 3;          // y
     param[1] = 1;           // sigma
     parameters.push_back(param);
-    cdf.push_back(0.9888910034617576935038568657130694722284607324942286697735853118666295316914616486334024421584919787); // expected cdf
+    cdf.push_back(0.988891003461758); // expected cdf
 
     param[0] = 3.5;          // y
     param[1] = 7.2;           // sigma

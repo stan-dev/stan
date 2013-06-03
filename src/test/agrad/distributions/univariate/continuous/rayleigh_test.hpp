@@ -17,7 +17,7 @@ public:
     param[0] = 4;           // y
     param[1] = 1;           // sigma
     parameters.push_back(param);
-    log_prob.push_back(-6.613705638880109381165535759); // expected log_prob
+    log_prob.push_back(-6.613705639); // expected log_prob
 
     param[0] = 1;           // y
     param[1] = 1;           // sigma
@@ -27,7 +27,7 @@ public:
     param[0] = 2;          // y
     param[1] = 1;           // sigma
     parameters.push_back(param);
-    log_prob.push_back(-1.30685281944005469058276787854182343192449986563974474587931); // expected log_prob
+    log_prob.push_back(-1.306852819); // expected log_prob
 
     param[0] = 3.5;          // y
     param[1] = 7.2;           // sigma
