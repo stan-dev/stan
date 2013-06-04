@@ -10,34 +10,33 @@ namespace stan {
 
   namespace agrad {
 
-    template<typename T1, typename T2>
-    inline fvar<typename stan::return_type<T1,T2>::type>
-    log_falling_factorial(const fvar<T1>& x, const fvar<T2>& n) {
+    template<typename T>
+    inline fvar<T>
+    log_falling_factorial(const fvar<T>& x, const fvar<T>& n) {
       using stan::math::log_falling_factorial;
       using boost::math::digamma;
 
-      return fvar<typename stan::return_type<T1,T2>::type>(
-        log_falling_factorial(x.val_, n.val_), digamma(x.val_ + 1) 
-          * x.d_ - digamma(n.val_ + 1) * n.d_);
+      return fvar<T>(log_falling_factorial(x.val_, n.val_), digamma(x.val_ + 1) 
+                     * x.d_ - digamma(n.val_ + 1) * n.d_);
     }
 
-    template<typename T1, typename T2>
-    inline fvar<typename stan::return_type<T1,T2>::type>
-    log_falling_factorial(T1 x, const fvar<T2>& n) {
+    template<typename T>
+    inline fvar<typename stan::return_type<T,double>::type>
+    log_falling_factorial(double x, const fvar<T>& n) {
       using stan::math::log_falling_factorial;
       using boost::math::digamma;
 
-      return fvar<typename stan::return_type<T1,T2>::type>(
+      return fvar<typename stan::return_type<T,double>::type>(
         log_falling_factorial(x, n.val_), -digamma(n.val_ + 1) * n.d_);
     }
 
-    template<typename T1, typename T2>
-    inline fvar<typename stan::return_type<T1,T2>::type>
-    log_falling_factorial(const fvar<T1>& x, T2 n) {
+    template<typename T>
+    inline fvar<typename stan::return_type<T,double>::type>
+    log_falling_factorial(const fvar<T>& x, double n) {
       using stan::math::log_falling_factorial;
       using boost::math::digamma;
 
-      return fvar<typename stan::return_type<T1,T2>::type>(
+      return fvar<typename stan::return_type<T,double>::type>(
         log_falling_factorial(x.val_, n), digamma(x.val_ + 1) 
           * x.d_);
     }
