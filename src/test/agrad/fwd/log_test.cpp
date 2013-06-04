@@ -36,7 +36,7 @@ TEST(AgradFvar, log) {
   isnan(f.val_);
   isnan(f.d_);
 }
-r
+
 TEST(AgradFvarVar, log) {
   using stan::agrad::fvar;
   using stan::agrad::var;
