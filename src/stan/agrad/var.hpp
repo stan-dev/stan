@@ -73,6 +73,7 @@
 #include <stan/agrad/rev/acosh.hpp>
 #include <stan/agrad/rev/atanh.hpp>
 #include <stan/agrad/rev/asinh.hpp>
+#include <stan/agrad/rev/binary_log_loss.hpp>
 #include <stan/agrad/rev/erf.hpp>
 #include <stan/agrad/rev/erfc.hpp>
 #include <stan/agrad/rev/exp2.hpp>
