@@ -56,8 +56,8 @@ for (size_t i = 0; i < int_vector_types.size(); i++)
       for (size_t l = 0; l < vector_types.size(); l++) 
         add("beta_binomial_log",DOUBLE_T, // result
             int_vector_types[i],int_vector_types[j],vector_types[k],vector_types[l]);
-add_binary("bessel_first_kind");
-add_binary("bessel_second_kind");
+add("bessel_first_kind",DOUBLE_T,INT_T,DOUBLE_T);
+add("bessel_second_kind",DOUBLE_T,INT_T,DOUBLE_T);
 add("beta_binomial_rng",INT_T,INT_T,DOUBLE_T,DOUBLE_T);
 for (size_t i = 0; i < int_vector_types.size(); i++) 
   for (size_t j = 0; j < int_vector_types.size(); j++)
@@ -380,8 +380,8 @@ add("minus",VECTOR_T,VECTOR_T);
 add("minus",ROW_VECTOR_T,ROW_VECTOR_T);
 add("minus",MATRIX_T,MATRIX_T);
 add("matrix_normal_prec_log",DOUBLE_T,MATRIX_T,MATRIX_T,MATRIX_T,MATRIX_T);
-add_binary("modified_bessel_first_kind");
-add_binary("modified_bessel_second_kind");
+add("modified_bessel_first_kind",DOUBLE_T,INT_T,DOUBLE_T);
+add("modified_bessel_second_kind",DOUBLE_T,INT_T,DOUBLE_T);
 add("multi_gp_log",DOUBLE_T,MATRIX_T,MATRIX_T,VECTOR_T);
 add("multi_normal_cholesky_log",DOUBLE_T, VECTOR_T,VECTOR_T,MATRIX_T);
 add("multi_normal_prec_log",DOUBLE_T, VECTOR_T,VECTOR_T,MATRIX_T);
