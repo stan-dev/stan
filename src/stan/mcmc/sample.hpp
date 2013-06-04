@@ -71,8 +71,8 @@ namespace stan {
       }
       
       void get_sample_param_names(std::vector<std::string>& names) {
-        names.push_back("log_post");
-        names.push_back("accept_stat");
+        names.push_back("lp__");
+        names.push_back("accept_stat__");
       }
       
       void get_sample_params(std::vector<double>& values) {
