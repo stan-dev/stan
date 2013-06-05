@@ -12,7 +12,7 @@ class AgradDistributionRayleigh : public AgradDistributionTest {
 public:
   void valid_values(vector<vector<double> >& parameters,
                     vector<double>& log_prob) {
-    vector<double> param(3);
+    vector<double> param(2);
 
     param[0] = 4;           // y
     param[1] = 1;           // sigma

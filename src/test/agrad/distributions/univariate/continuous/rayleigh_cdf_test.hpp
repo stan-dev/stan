@@ -11,7 +11,7 @@ class AgradCdfRayleigh : public AgradCdfTest {
 public:
   void valid_values(vector<vector<double> >& parameters,
         vector<double>& cdf) {
-    vector<double> param(3);
+    vector<double> param(2);
 
     param[0] = 1;           // y
     param[1] = 1;           // sigma
@@ -78,9 +78,13 @@ public:
       typename T3, typename T4, typename T5, 
       typename T6, typename T7, typename T8, 
       typename T9>
-  typename stan::return_type<T_y, T_scale>::type 
-  cdf_function(const T_y& y, const T_scale& sigma, const T2&,
+var  cdf_function(const T_y& y, const T_scale& sigma, const T2&,
          const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
-    return 1.0 - exp(-y * y / (2.0 * sigma * sigma));
+    using stan::prob::include_summand;
+
+    var cdf(1.0);
+    if (include_summand<true,T_y,T_scale>::value)
+      cdf *= (1.0 - exp(-0.5 * y * y / (sigma * sigma)));
+    return cdf;
   }
 };

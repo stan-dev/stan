@@ -66,7 +66,8 @@ namespace stan {
       size_t N = max_size(y, sigma);
 
       DoubleVectorView<true,is_vector<T_scale>::value> inv_sigma(length(sigma));
-      DoubleVectorView<include_summand<propto,T_scale>::value,is_vector<T_scale>::value> log_sigma(length(sigma));
+      DoubleVectorView<include_summand<propto,T_scale>::value,
+                       is_vector<T_scale>::value> log_sigma(length(sigma));
       for (size_t i = 0; i < length(sigma); i++) {
         inv_sigma[i] = 1.0 / value_of(sigma_vec[i]);
         if (include_summand<propto,T_scale>::value)
@@ -87,8 +88,8 @@ namespace stan {
           logp -= 2.0 * log_sigma[n];        
         if (include_summand<propto,T_y>::value)
           logp += log(y_dbl);
-        if (include_summand<propto,T_y,T_scale>::value)
-          logp += NEGATIVE_HALF * y_over_sigma * y_over_sigma;
+        // if (include_summand<propto,T_y,T_scale>::value)
+        logp += NEGATIVE_HALF * y_over_sigma * y_over_sigma;
 
         // gradients
         double scaled_diff = inv_sigma[n] * y_over_sigma;
@@ -118,9 +119,11 @@ namespace stan {
       using stan::math::check_finite;
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
+      using stan::prob::include_summand;
+      using stan::is_constant_struct;
+      using stan::math::square;
 
-
-      typename return_type<T_y, T_scale>::type cdf(1);
+      double cdf(1.0);
       // check if any vectors are zero length
       if (!(stan::length(y) 
             && stan::length(sigma)))
@@ -143,14 +146,46 @@ namespace stan {
                                    &cdf)))
         return cdf;
 
+
+      // set up template expressions wrapping scalars into vector views
+      agrad::OperandsAndPartials<T_y, T_scale> operands_and_partials(y, sigma);
+
       VectorView<const T_y> y_vec(y);
       VectorView<const T_scale> sigma_vec(sigma);
       size_t N = max_size(y, sigma);
       
-      for (size_t n = 0; n < N; n++) {
-        cdf *= 1.0 - exp(-y_vec[n] * y_vec[n] / (2.0 * sigma_vec[n] * sigma_vec[n]));
+      DoubleVectorView<true,is_vector<T_scale>::value> inv_sigma(length(sigma));
+      for (size_t i = 0; i < length(sigma); i++) {
+        inv_sigma[i] = 1.0 / value_of(sigma_vec[i]);
       }
-      return cdf;
+
+      for (size_t n = 0; n < N; n++) {
+        const double y_dbl = value_of(y_vec[n]);
+        const double y_sqr = y_dbl * y_dbl;
+        const double inv_sigma_sqr = inv_sigma[n] * inv_sigma[n];
+        const double exp_val = exp(-0.5 * y_sqr * inv_sigma_sqr);
+
+        if (include_summand<false,T_y,T_scale>::value)
+          cdf *= (1.0 - exp_val);
+      }
+
+      //gradients
+      for (size_t n = 0; n < N; n++) {
+        const double y_dbl = value_of(y_vec[n]);
+        const double y_sqr = square(y_dbl);
+        const double inv_sigma_sqr = square(inv_sigma[n]);
+        const double exp_val = exp(-0.5 * y_sqr * inv_sigma_sqr);
+        const double exp_div_1m_exp = exp_val / (1.0 - exp_val);
+
+        if (!is_constant_struct<T_y>::value)
+          operands_and_partials.d_x1[n] += y_dbl * inv_sigma_sqr 
+            * exp_div_1m_exp * cdf;
+        if (!is_constant_struct<T_scale>::value)
+          operands_and_partials.d_x2[n] -= y_sqr * inv_sigma_sqr
+            * inv_sigma[n] * exp_div_1m_exp * cdf;
+      }
+
+      return operands_and_partials.to_var(cdf);
     }
 
     template <class RNG>
