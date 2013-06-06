@@ -111,7 +111,7 @@ namespace stan {
                 const std::vector<fvar<T> >& v2) {
       stan::math::validate_matching_sizes(v1,v2,"dot_product");
       fvar<T> ret(0,0);
-      for (typename std::vector<fvar<T> >::size_type i = 0; i < v1.size(); i++)
+      for (size_t i = 0; i < v1.size(); i++)
         ret += v1.at(i) * v2.at(i);
       return ret;
     }
@@ -123,7 +123,7 @@ namespace stan {
                 const std::vector<fvar<T> >& v2) {
       stan::math::validate_matching_sizes(v1,v2,"dot_product");
       fvar<typename stan::return_type<T,double>::type> ret(0,0);
-      for (typename std::vector<double>::size_type i = 0; i < v1.size(); i++)
+      for (size_t i = 0; i < v1.size(); i++)
         ret += v1.at(i) * v2.at(i);
       return ret;
     }
@@ -135,7 +135,7 @@ namespace stan {
                 const std::vector<double>& v2) {
       stan::math::validate_matching_sizes(v1,v2,"dot_product");
       fvar<typename stan::return_type<T,double>::type> ret(0,0);
-      for (typename std::vector<fvar<T> >::size_type i = 0; i < v1.size(); i++)
+      for (size_t i = 0; i < v1.size(); i++)
         ret += v1.at(i) * v2.at(i);
       return ret;
     }
@@ -147,7 +147,7 @@ namespace stan {
                 const std::vector<fvar<T> >& v2,
                 size_type& length) {
       fvar<T> ret(0,0);
-      for(size_type i = 0; i < length; i++)
+      for(size_t i = 0; i < length; i++)
         ret += v1.at(i) * v2.at(i);
       return ret;
     }
@@ -159,7 +159,7 @@ namespace stan {
                 const std::vector<fvar<T> >& v2,
                 size_type& length) {
       fvar<typename stan::return_type<T,double>::type> ret(0,0);
-      for(size_type i = 0; i < length; i++)
+      for(size_t i = 0; i < length; i++)
         ret += v1.at(i) * v2.at(i);
       return ret;
     }
@@ -171,7 +171,7 @@ namespace stan {
                 const std::vector<double>& v2,
                 size_type& length) {
       fvar<typename stan::return_type<T,double>::type> ret(0,0);
-      for(size_type i = 0; i < length; i++)
+      for(size_t i = 0; i < length; i++)
         ret += v1.at(i) * v2.at(i);
       return ret;
     }
