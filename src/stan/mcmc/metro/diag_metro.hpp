@@ -24,14 +24,16 @@ namespace stan {
       }
 
       void propose(std::vector<double>& q,
-                    BaseRNG& rng) {
+                   BaseRNG& rng) {
 
         for (size_t i = 0; i < q.size(); ++i) 
-          q[i] = q[i] + this->_nom_epsilon * stan::prob::normal_rng(0,_prop_cov_diag(i), this->_rand_int);
+          q[i] += stan::prob::normal_rng(0,
+                                         this->_nom_epsilon, 
+                                         rng) / std::sqrt(_prop_cov_diag(i)) ;
       }
 
       void write_metric(std::ostream& o) {
-        o << "# Diagonal elements of covariance matrix:" << std::endl;
+        o << "# Diagonal elements of inverse covariance matrix:" << std::endl;
         o << "# " << _prop_cov_diag(0) << std::flush;
         for(size_t i = 1; i < _prop_cov_diag.size(); ++i)
           o << ", " << _prop_cov_diag(i) << std::flush;

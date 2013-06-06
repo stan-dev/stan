@@ -19,25 +19,29 @@ namespace stan {
                   std::ostream* e = 0)
         : base_metro<M, BaseRNG>(m, rng, o, e),
           _prop_cov(Eigen::MatrixXd::Identity(m.num_params_r(), 
-                                              m.num_params_r())) { 
+                                              m.num_params_r())),
+          _prop_cov_inv(Eigen::MatrixXd::Identity(m.num_params_r(), 
+                                                  m.num_params_r())) { 
         this->_name = "Metropolis with a dense metric"; 
         this->_nom_epsilon = 1;
       }
 
       void propose(std::vector<double>& q,
                    BaseRNG& rng) {
-        Eigen::VectorXd ze(q.size());
-        ze.setZero();
-
         Eigen::VectorXd prop(q.size());
-        prop = stan::prob::multi_normal_rng(ze, _prop_cov.inverse(), rng);
+ 
+        for(size_t  i = 0; i < q.size(); i++)
+          prop(i) = stan::prob::normal_rng(0,
+                                           this->_nom_epsilon, 
+                                           rng);
+
+        prop = _prop_cov_inv.llt().matrixL() * prop;
 
         for(size_t i = 0; i < q.size(); i++)
-          q[i] = q[i] + this->_nom_epsilon * prop(i);
+          q[i] += prop(i);
       }                                  
                    
       void write_metric(std::ostream& o) {
-        //o << "# covariance matrix elements:" << std::endl;
         o << "# Elements of inverse covariance matrix:" << std::endl;
         for(size_t i = 0; i < _prop_cov.rows(); ++i) {
           o << "# " << _prop_cov(i, 0) << std::flush;
@@ -50,6 +54,7 @@ namespace stan {
     protected:
 
       Eigen::MatrixXd _prop_cov;
+      Eigen::MatrixXd _prop_cov_inv;
     };
 
   } // mcmc

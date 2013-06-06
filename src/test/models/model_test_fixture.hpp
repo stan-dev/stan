@@ -464,18 +464,24 @@ TYPED_TEST_CASE_P(Model_Test_Fixture);
 
 
 TYPED_TEST_P(Model_Test_Fixture, TestGradientUnitMetro) {
-  TypeParam::sampler_n = 1;
-  TypeParam::test_gradient(1);
+  if(TypeParam::num_iterations(1) < 500000) {
+    TypeParam::sampler_n = 1;
+    TypeParam::test_gradient(1);
+  }
 }
 TYPED_TEST_P(Model_Test_Fixture, RunModelUnitMetro) {
-  TypeParam::run_model(1);
-  TypeParam::write_results(1);
+  if(TypeParam::num_iterations(1) < 500000) {
+    TypeParam::run_model(1);
+    TypeParam::write_results(1);
+  }
 }
 TYPED_TEST_P(Model_Test_Fixture, ChainsTestUnitMetro) {
-  TypeParam::chains_test(1);
+  if(TypeParam::num_iterations(1) < 500000)
+    TypeParam::chains_test(1);
 }
 TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTestUnitMetro) {
-  TypeParam::test_expected_values(1);
+  if(TypeParam::num_iterations(1) < 500000)
+    TypeParam::test_expected_values(1);
 }
 
 
@@ -521,11 +527,11 @@ REGISTER_TYPED_TEST_CASE_P(Model_Test_Fixture,
                            // TestGradientDiagMetro,
                            // RunModelDiagMetro,
                            // ChainsTestDiagMetro,
-                           // ExpectedValuesTestDiagMetro,
+                           // ExpectedValuesTestDiagMetro);
                            // TestGradientDenseMetro,
                            // RunModelDenseMetro,
                            // ChainsTestDenseMetro,
                            // ExpectedValuesTestDenseMetro
-                           //                         );
+                           //);
 
 #endif

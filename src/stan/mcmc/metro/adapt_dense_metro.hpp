@@ -34,7 +34,8 @@ namespace stan {
           
           bool update = this->_covar_adaptation.learn_covariance(this->_prop_cov, 
                                                                  this->_params_r);
-  
+          this->_prop_cov_inv = this->_prop_cov.inverse();
+
           if(update) {
             this->init_stepsize();
             

@@ -31,7 +31,7 @@ namespace stan {
                                                     s.accept_stat());
           bool update = this->_var_adaptation.learn_variance(this->_prop_cov_diag, 
                                                              this->_params_r);
-          
+
           if(update) {
             this->init_stepsize();
             

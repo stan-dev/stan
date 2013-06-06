@@ -24,8 +24,8 @@ namespace stan {
       void propose(std::vector<double>& q,
                     BaseRNG& rng) {
         for (size_t i = 0; i < q.size(); ++i) 
-          q[i] = stan::prob::normal_rng(q[i],this->_nom_epsilon,
-                                        this->_rand_int);
+          q[i] += this->_nom_epsilon * stan::prob::normal_rng(0.0,1.0,
+                                                              this->_rand_int);
       }
 
       void write_metric(std::ostream& o) {
