@@ -19,7 +19,6 @@ namespace stan {
     fvar<T>
     determinant(const Eigen::Matrix<fvar<T>, R, C>& m) {
       using stan::math::multiply;
-      using stan::math::inverse;
 
       stan::math::validate_square(m, "determinant");
       Eigen::Matrix<T,R,C> m_deriv(m.rows(), m.cols());
@@ -34,7 +33,7 @@ namespace stan {
         }
       }
 
-      m_inv = inverse(m_val);
+      m_inv = stan::math::inverse(m_val);
       m_deriv = multiply(m_inv, m_deriv);
 
       result.val_ = m_val.determinant();
