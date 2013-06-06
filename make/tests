@@ -59,7 +59,7 @@ test-distributions: $(GENERATED_AGRAD_TESTS)
 	@$(MAKE) $(patsubst src/%_test.cpp,runtest/%,$(shell find src/test/agrad/distributions -type f -name '*_generated_test.cpp'))
 
 .PHONY: test-unit
-test-unit: $(addprefix runtest/,$(UNIT_TESTS)) runtest/test/models/command$(EXE)
+test-unit: $(addprefix runtest/,$(UNIT_TESTS)) runtest/test/models/command
 
 ##
 # Target to build all tests
