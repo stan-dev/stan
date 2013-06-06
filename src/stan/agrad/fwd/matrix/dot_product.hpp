@@ -40,7 +40,7 @@ namespace stan {
 
       fvar<typename stan::return_type<T,double>::type> ret(0,0);
       for(size_type i = 0; i < v1.size(); i++)
-        ret += v1(i) * to_fvar(v2(i));
+        ret += v1(i) * v2(i);
       return ret;
     }
 
@@ -55,7 +55,7 @@ namespace stan {
 
       fvar<typename stan::return_type<T,double>::type> ret(0,0);
       for(size_type i = 0; i < v1.size(); i++)
-        ret += to_fvar(v1(i)) * v2(i);
+        ret += v1(i) * v2(i);
       return ret;
     }
 
@@ -85,7 +85,7 @@ namespace stan {
 
       fvar<typename stan::return_type<T,double>::type> ret(0,0);
       for(size_type i = 0; i < length; i++)
-        ret += v1(i) * to_fvar(v2(i));
+        ret += v1(i) * v2(i);
       return ret;
     }
 
@@ -100,7 +100,7 @@ namespace stan {
 
       fvar<typename stan::return_type<T,double>::type> ret(0,0);
       for(size_type i = 0; i < length; i++)
-        ret += to_fvar(v1(i)) * v2(i);
+        ret += v1(i) * v2(i);
       return ret;
     }
 
@@ -124,7 +124,7 @@ namespace stan {
       stan::math::validate_matching_sizes(v1,v2,"dot_product");
       fvar<typename stan::return_type<T,double>::type> ret(0,0);
       for (typename std::vector<double>::size_type i = 0; i < v1.size(); i++)
-        ret += to_fvar(v1.at(i)) * v2.at(i);
+        ret += v1.at(i) * v2.at(i);
       return ret;
     }
 
@@ -136,7 +136,7 @@ namespace stan {
       stan::math::validate_matching_sizes(v1,v2,"dot_product");
       fvar<typename stan::return_type<T,double>::type> ret(0,0);
       for (typename std::vector<fvar<T> >::size_type i = 0; i < v1.size(); i++)
-        ret += v1.at(i) * to_fvar(v2.at(i));
+        ret += v1.at(i) * v2.at(i);
       return ret;
     }
 
@@ -160,7 +160,7 @@ namespace stan {
                 size_type& length) {
       fvar<typename stan::return_type<T,double>::type> ret(0,0);
       for(size_type i = 0; i < length; i++)
-        ret += to_fvar(v1.at(i)) * v2.at(i);
+        ret += v1.at(i) * v2.at(i);
       return ret;
     }
 
@@ -172,7 +172,7 @@ namespace stan {
                 size_type& length) {
       fvar<typename stan::return_type<T,double>::type> ret(0,0);
       for(size_type i = 0; i < length; i++)
-        ret += v1.at(i) * to_fvar(v2.at(i));
+        ret += v1.at(i) * v2.at(i);
       return ret;
     }
   }
