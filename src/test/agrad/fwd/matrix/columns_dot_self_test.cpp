@@ -3,7 +3,6 @@
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/math/matrix.hpp>
 #include <stan/agrad/var.hpp>
-#include <test/agrad/util.hpp>
 
 TEST(AgradFwdMatrix,columns_dot_self) {
   using stan::math::columns_dot_self;

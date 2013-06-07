@@ -2,7 +2,6 @@
 #include <stan/math/matrix/block.hpp>
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <stan/agrad/var.hpp>
-#include <test/agrad/util.hpp>
 
 TEST(AgradFwdMatrix,block_matrix) {
   using stan::math::block;

@@ -3,7 +3,6 @@
 #include <stan/agrad/fvar.hpp>
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <stan/agrad/var.hpp>
-#include <test/agrad/util.hpp>
 
 TEST(AgradFwdMatrix,elt_divide_vec_vv) {
   using stan::math::elt_divide;

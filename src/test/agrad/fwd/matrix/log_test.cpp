@@ -4,7 +4,6 @@
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <stan/agrad/fvar.hpp>
 #include <stan/agrad/var.hpp>
-#include <test/agrad/util.hpp>
 
 TEST(AgradFwdMatrix, log_matrix) {
   using stan::math::log;

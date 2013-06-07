@@ -4,7 +4,6 @@
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <stan/agrad/fwd/exp.hpp>
 #include <stan/agrad/var.hpp>
-#include <test/agrad/util.hpp>
 
 TEST(AgradFwdMatrix, exp_matrix) {
   using stan::math::exp;

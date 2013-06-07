@@ -3,7 +3,6 @@
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <stan/math/matrix/diag_matrix.hpp>
 #include <stan/agrad/var.hpp>
-#include <test/agrad/util.hpp>
 
 TEST(AgradFwdMatrix,diagMatrix) {
   using stan::math::diag_matrix;

@@ -4,7 +4,6 @@
 #include <stan/agrad/rev/matrix/multiply.hpp>
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/agrad/var.hpp>
-#include <test/agrad/util.hpp>
 
 TEST(AgradFwdMatrix,log_determinant) {
   using stan::agrad::matrix_fv;

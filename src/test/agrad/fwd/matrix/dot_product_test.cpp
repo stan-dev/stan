@@ -3,7 +3,6 @@
 #include <stan/agrad/fvar.hpp>
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <stan/agrad/var.hpp>
-#include <test/agrad/util.hpp>
 
 TEST(AgradFwdMatrix, dot_product_vector_vector) {
   using stan::math::vector_d;

@@ -4,7 +4,6 @@
 #include <stan/agrad/fwd/matrix/multiply.hpp>
 #include <stan/math/matrix/transpose.hpp>
 #include <stan/agrad/var.hpp>
-#include <test/agrad/util.hpp>
 
 TEST(AgradFwdMatrix, crossprod_3x3_matrix) {
   using stan::agrad::matrix_fv;

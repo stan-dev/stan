@@ -3,7 +3,6 @@
 #include <stan/agrad/fwd/matrix/multiply.hpp>
 #include <stan/math/matrix/diag_post_multiply.hpp>
 #include <stan/agrad/var.hpp>
-#include <test/agrad/util.hpp>
 
 TEST(AgradFwdMatrix, diag_post_multiply_vector) {
   using stan::agrad::matrix_fv;

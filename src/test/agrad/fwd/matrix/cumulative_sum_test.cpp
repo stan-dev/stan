@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
 #include <stan/agrad/fvar.hpp>
 #include <stan/agrad/var.hpp>
-#include <test/agrad/util.hpp>
 
 template <typename T>
 void test_cumulative_sum() {
