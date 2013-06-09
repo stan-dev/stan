@@ -423,6 +423,15 @@ The base-10 logarithm of \farg{x}}
 \fitem{real}{pow}{real \farg{x}, real \farg{y}}{
 \farg{x} raised to the power of \farg{y}}
 %
+\fitem{real}{inv}{real \farg{x}}{
+The inverse of \farg{x}}
+%
+\fitem{real}{inv\_sqrt}{real \farg{x}}{
+The inverse of the square root of \farg{x}}
+%
+\fitem{real}{inv\_square}{real \farg{x}}{
+The inverse of the square of \farg{x}}
+%
 \end{description}
 
 
@@ -652,6 +661,14 @@ The natural logarithm of 1 minus \farg{x}}
 The natural logarithm of one plus the natural exponentiation of
 \farg{x}}
 %
+\fitem{real}{log1m\_exp}{real \farg{x}}{ 
+The natural logarithm of one minus the natural exponentiation of
+\farg{x}.}
+%
+\fitem{real}{log\_diff\_exp}{real \farg{x}, real \farg{y}}{ 
+The natural logarithm of the difference of the natural exponentiation
+of \farg{x} and the natural exponentiation of \farg{y}}
+%
 \fitem{real}{log\_sum\_exp}{real \farg{x}, real \farg{y}}{ 
 The natural logarithm of the sum of the natural exponentiation
 of \farg{x} and the natural exponentiation of \farg{y}}
@@ -746,7 +763,7 @@ reals, matrices, vectors, and row vectors.
 \end{description}
 
 
-\section{Array Broadcasting}
+\section{Array Broadcasting}\label{array-broadcasting.section}
 
 The following operations create arrays by repeating elements to fill
 an array of a specified size.  These operations work for all input
@@ -768,11 +785,32 @@ matrices, or arrays.
 \end{description}
 %
 For example, \code{rep\_array(1.0,5)} produces a real array (type
-\code{real[]}) of size 5 with all values set to 1.0; if \code{v} is a
-vector, then \code{rep\_array(v,27)} is a size 27 array consisting of
-27 copies of the vector \code{v}.  They are copies in the sense that
-changing elements of the returned array does not change the value in
-\code{v}.  
+\code{real[]}) of size 5 with all values set to 1.0.  On the other
+hand, \code{rep\_array(1,5)} produces an integer array (type
+\code{int[]}) of size 5 with all values set to 1.  This distinction is
+important because it is not possible to assign an integer array to a
+real array.  For example, the following example contrasts legal with
+illegal array creation and assignment
+%
+\begin{quote}
+\begin{Verbatim}
+real y[5];
+int x[5];
+
+x <- rep_array(1,5);     // ok
+y <- rep_array(1.0,5);   // ok
+
+x <- rep_array(1.0,5);   // illegal 
+y <- rep_array(1,5);     // illegal
+
+x <- y;                  // illegal
+y <- x;                  // illegal
+\end{Verbatim}
+\end{quote}
+
+If the value being repeated \code{v} is a vector (i.e., \code{T} is
+\code{vector}), then \code{rep\_array(v,27)} is a size 27 array
+consisting of 27 copies of the vector \code{v}.
 %
 \begin{quote}
 \begin{Verbatim}
@@ -804,6 +842,28 @@ equal to \code{a[m,n]} where it is defined, for \code{j} in \code{1:3},
 \code{k} in \code{1:4}, \code{m} in \code{1:5}, and \code{n} in
 \code{1:6}.
 
+\section{Other functions}
+\begin{description}
+%
+\fitem{real[]}{sort\_asc}{real[] \farg{v}}{
+Sort the elements of \farg{v} in ascending order}
+%
+\fitem{int[]}{sort\_asc}{int[] \farg{v}}{
+Sort the elements of \farg{v} in ascending order}
+%
+\fitem{real[]}{sort\_desc}{real[] \farg{v}}{
+Sort the elements of \farg{v} in descending order}
+%
+\fitem{int[]}{sort\_desc}{int[] \farg{v}}{
+Sort the elements of \farg{v} in descending order}
+%
+\fitem{int}{rank}{real[] \farg{v}, int \farg{s}}{
+Number of components of \farg{v} less than \farg{v[s]}}
+%
+\fitem{int}{rank}{int[] \farg{v}, int \farg{s}}{
+Number of components of \farg{v} less than \farg{v[s]}}
+%
+\end{description}
 
 \chapter{Matrix Operations}\label{matrix-operations.chapter}
 \noindent
@@ -1076,19 +1136,19 @@ The dot product of \farg{x} and \farg{y}}
 \fitem{real}{dot\_product}{row\_vector \farg{x}, row\_vector \farg{y}}{
 The dot product of \farg{x} and \farg{y}}
 %
-\fitem{vector}{columns\_dot\_product}{vector \farg{x}, vector \farg{y}}{
+\fitem{row\_vector}{columns\_dot\_product}{vector \farg{x}, vector \farg{y}}{
 The dot product of the columns of \farg{x} and \farg{y}}
 %
 \fitem{row\_vector}{columns\_dot\_product}{row\_vector \farg{x}, row\_vector \farg{y}}{
 The dot product of the columns of \farg{x} and \farg{y}}
 %
-\fitem{vector}{columns\_dot\_product}{matrix \farg{x}, matrix \farg{y}}{
+\fitem{row\_vector}{columns\_dot\_product}{matrix \farg{x}, matrix \farg{y}}{
 The dot product of the columns of \farg{x} and \farg{y}}
 %
 \fitem{vector}{rows\_dot\_product}{vector \farg{x}, vector \farg{y}}{
 The dot product of the rows of \farg{x} and \farg{y}}
 %
-\fitem{row\_vector}{rows\_dot\_product}{row\_vector \farg{x}, row\_vector \farg{y}}{
+\fitem{vector}{rows\_dot\_product}{row\_vector \farg{x}, row\_vector \farg{y}}{
 The dot product of the rows of \farg{x} and \farg{y}}
 %
 \fitem{vector}{rows\_dot\_product}{matrix \farg{x}, matrix \farg{y}}{
@@ -1100,7 +1160,7 @@ The dot product of the vector \farg{x} with itself}
 \fitem{real}{dot\_self}{row\_vector \farg{x}}{
 The dot product of the row vector \farg{x} with itself}
 %
-\fitem{vector}{columns\_dot\_self}{vector \farg{x}}{
+\fitem{row\_vector}{columns\_dot\_self}{vector \farg{x}}{
 The dot product of the columns of \farg{x} with themselves}
 %
 \fitem{row\_vector}{columns\_dot\_self}{row\_vector \farg{x}}{
@@ -1112,7 +1172,7 @@ The dot product of the columns of \farg{x} with themselves}
 \fitem{vector}{rows\_dot\_self}{vector \farg{x}}{
 The dot product of the rows of \farg{x} with themselves}
 %
-\fitem{row\_vector}{rows\_dot\_self}{row\_vector \farg{x}}{
+\fitem{vector}{rows\_dot\_self}{row\_vector \farg{x}}{
 The dot product of the rows of \farg{x} with themselves}
 %
 \fitem{vector}{rows\_dot\_self}{matrix \farg{x}}{
@@ -1132,7 +1192,6 @@ $\mbox{\code{x}}\,\mbox{\code{x}}^{\top}$.}
 %
 \end{description}
 
-
 \begin{description}
 %
 \fitem{matrix}{crossprod}{matrix \farg{x}}{
@@ -1141,6 +1200,27 @@ similar to the crossprod(x) function in R. The result is a symmetric matrix
 $\mbox{\code{x}}^{\top}\,\mbox{\code{x}}$.}
 %
 \end{description}
+
+\begin{description}
+%
+\fitem{matrix}{quad\_form}{matrix \farg{A}, matrix \farg{B}}{
+The quadratic form $B^T*A*B$.  Using this function is much more efficient than
+doing it directly.}
+%
+\fitem{real}{quad\_form}{matrix \farg{A}, vector \farg{B}}{
+The quadratic form $B^T*A*B$.  Using this function is much more efficient than
+doing it directly.}
+%
+\fitem{real}{trace\_quad\_form}{matrix \farg{A}, matrix \farg{B}}{
+The trace of a quadratic form, i.e., $trace(B^T*A*B)$.  Using this function is
+much more efficient than doing it directly.}
+%
+\fitem{real}{trace\_gen\_quad\_form}{matrix \farg{D},matrix \farg{A}, matrix \farg{B}}{
+The trace of a generalized quadratic form, i.e., $trace(D*B^T*A*B)$.  Using this
+function is much more efficient than doing it directly.}
+%
+\end{description}
+
 
 \begin{description}
 %
@@ -1303,9 +1383,25 @@ vertically or stacking copies of column vectors horizontally.
   \fitem{matrix}{rep\_matrix}{row\_vector \farg{rv}, int
     \farg{m}}{Return the \farg{m} by \farg{n} matrix consisting of
     \farg{m} copies of the row vector \farg{rv} of size \farg{n}.}
-
 %
 \end{description}
+%
+
+Unlike the situation with array broadcasting (see \refsection{array-broadcasting}), where there is a
+distinction between integer and real arguments, the following two
+statements produce the same result for vector broadcasting;  row vector
+and matrix broadcasting behave similarly.
+%
+\begin{quote}
+\begin{Verbatim}
+vector[3] x;
+x <- rep_vector(1, 3);
+x <- rep_vector(1.0, 3);  
+\end{Verbatim}
+\end{quote}
+%
+There are no integer vector or matrix types, so integer values are
+automatically promoted.
 
 
 \section{Slice and Package Functions}
@@ -1320,6 +1416,12 @@ of the matrix \farg{x}}
 \fitem{matrix}{diag\_matrix}{vector \farg{x}}{The diagonal
 matrix with diagonal \farg{x}}
 %
+\end{description}
+
+\subsection{Columns and Rows}
+%
+\begin{description}
+%
 \fitem{vector}{col}{matrix \farg{x}, int \farg{n}}{The \farg{n}-th column
 of matrix \farg{x}}
 %
@@ -1330,6 +1432,8 @@ of matrix \farg{x}}
 
 \subsection{Block Operations}
 
+\subsubsection{Matrix Slicing Operations}
+
 Block operations may be used to extract a sub-block of a matrix.
 
 \begin{description}
@@ -1338,7 +1442,74 @@ Block operations may be used to extract a sub-block of a matrix.
   starts at row \farg{i} and column \farg{j} and extends \farg{n\_rows}
   rows and \farg{n\_cols} columns.}
 \end{description}
+%
+The sub-row and sub-column operations may be used to extract a
+slice of row or column from a matrix
+%
+\begin{description}
+%
+\fitem{vector}{sub\_col}{matrix \farg{x}, int \farg{i}, int \farg{j}, 
+  int \farg{n\_rows}}{Return the sub-column of \farg{x} that
+  starts at row \farg{i} and column \farg{j} and extends
+  \farg{n\_rows} rows and 1 column.}
+%
+\fitem{row\_vector}{sub\_row}{matrix \farg{x}, int \farg{i}, int \farg{j}, 
+  int \farg{n\_cols}}{Return the sub-row of \farg{x} that
+  starts at row \farg{i} and column \farg{j} and extends 1
+  row and \farg{n\_cols} columns.}
+%
+\end{description}
 
+\subsubsection{Vector and Array Slicing Operations}
+
+The head operation extracts the first $n$ elements of a vector and
+the tail operation the last.  The segment operation extracts an
+arbitrary subvector.
+
+\begin{description}
+%
+  \fitem{vector}{head}{vector \farg{v}, int \farg{n}}{Return the
+    vector consisting of the first \farg{n} elements of \farg{v}.}
+%
+  \fitem{row\_vector}{head}{row\_vector \farg{rv}, int \farg{n}}{Return
+    the row vector consisting of the first \farg{n} elements of
+    \farg{rv}.}
+%
+  \fitem{T[]}{head}{T[] \farg{sv}, int \farg{n}}{Return
+    the standard vector consisting of the first \farg{n} elements of
+    \farg{sv}; applies to up to three-dimensional arrays containing
+    any type of elements \code{T}.}
+%
+  \fitem{vector}{tail}{vector \farg{v}, int \farg{n}}{Return the
+    vector consisting of the last \farg{n} elements of \farg{v}.}
+%
+  \fitem{row\_vector}{tail}{row\_vector \farg{rv}, int \farg{n}}{Return
+    the row vector consisting of the last \farg{n} elements of
+    \farg{rv}.}
+%
+  \fitem{T[]}{tail}{T[] \farg{sv}, int \farg{n}}{Return
+    the standard vector consisting of the last \farg{n} elements of
+    \farg{sv}; applies to up to three-dimensional arrays containing
+    any type of elements \code{T}.}
+%
+  \fitem{vector}{segment}{vector \farg{v}, int \farg{i}, int
+    \farg{n}}{Return the vector consisting of the \farg{n} elements of \farg{v}
+    starting at \farg{i}; i.e., elements \farg{i} through 
+    through \farg{i} + \farg{n} - 1.}
+%
+  \fitem{row\_vector}{segment}{row\_vector \farg{v}, int \farg{i}, int
+    \farg{n}}{Return the row vector consisting of the \farg{n}
+    elements of \farg{rv} starting at \farg{i}; i.e., elements
+    \farg{i} through through \farg{i} + \farg{n} - 1.}
+%
+  \fitem{T[]}{segment}{T[] \farg{sv}, int \farg{i}, int
+    \farg{n}}{Return the standard vector consisting of the \farg{n}
+    elements of \farg{sv} starting at \farg{i}; i.e., elements
+    \farg{i} through through \farg{i} + \farg{n} - 1. Applies to up to
+    three-dimensional arrays containing any type of elements
+    \code{T}.}
+%
+\end{description}
 
 
 \subsection{Transposition Postfix Operator}
@@ -1386,7 +1557,15 @@ The softmax of \farg{x}}
 The right division of \farg{b} by \farg{A}; equivalently
 \code{\farg{b} * inverse(\farg{A})}}
 %
+\fitem{matrix}{operator/}{matrix \farg{b}, matrix \farg{A}}{
+The right division of \farg{b} by \farg{A}; equivalently
+\code{\farg{b} * inverse(\farg{A})}}
+%
 \fitem{vector}{operator\textbackslash}{matrix \farg{A}, vector \farg{b}}
+The left division of \farg{b} by \farg{A}; equivalently
+\code{inverse(\farg{A}) * \farg{b}}
+%
+\fitem{matrix}{operator\textbackslash}{matrix \farg{A}, matrix \farg{b}}
 The left division of \farg{b} by \farg{A}; equivalently
 \code{inverse(\farg{A}) * \farg{b}}
 %
@@ -1449,6 +1628,9 @@ The log of the absolute value of the determinant of \farg{A}}
 \fitem{matrix}{inverse}{matrix \farg{A}}{
 The inverse of \farg{A}}
 %
+\fitem{matrix}{inverse\_spd}{matrix \farg{A}}{
+The inverse of \farg{A} where A is symmetric, positive definite}
+%
 \fitem{vector}{eigenvalues\_sym}{matrix \farg{A}}{
 The vector of eigenvalues of a symmetric matrix \farg{A} 
 in descending order}
@@ -1478,3 +1660,26 @@ The singular values of \farg{A} in descending order}
 
 \end{description}
 
+
+\section{Other functions}
+\begin{description}
+%
+\fitem{vector}{sort\_asc}{vector \farg{v}}{
+Sort the elements of \farg{v} in ascending order}
+%
+\fitem{row\_vector}{sort\_asc}{row\_vector \farg{v}}{
+Sort the elements of \farg{v} in ascending order}
+%
+\fitem{vector}{sort\_desc}{vector \farg{v}}{
+Sort the elements of \farg{v} in descending order}
+%
+\fitem{row\_vector}{sort\_desc}{row\_vector \farg{v}}{
+Sort the elements of \farg{v} in descending order}
+%
+\fitem{int}{rank}{vector \farg{v}, int \farg{s}}{
+Number of components of \farg{v} less than \farg{v[s]}}
+%
+\fitem{int}{rank}{row\_vector \farg{v}, int \farg{s}}{
+Number of components of \farg{v} less than \farg{v[s]}}
+%
+\end{description}

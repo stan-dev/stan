@@ -82,13 +82,16 @@
 #include <test/agrad/fwd/matrix/softmax_test.cpp>     
 
 //LINEAR ALGEBRA FUNCTIONS AND SOLVERS
-//Matrix Division Infix Operators
+//Matrix Division Infix Operators -- DONE
+#include <test/agrad/fwd/matrix/mdivide_right_test.cpp>     
+#include <test/agrad/fwd/matrix/mdivide_left_test.cpp>   
 
-//Lower-Triangular Matrix-Division Functions -- DONE
+//Lower-Triangular Matrix-Division Functions -- DONE  
 #include <test/agrad/fwd/matrix/mdivide_right_tri_low_test.cpp>     
 #include <test/agrad/fwd/matrix/mdivide_left_tri_low_test.cpp>     
 
 //Linear Algebra Functions
 #include <test/agrad/fwd/matrix/trace_test.cpp>     
 // #include <test/agrad/fwd/matrix/determinant_test.cpp>     
+#include <test/agrad/fwd/matrix/log_determinant_test.cpp>     
  //#include <test/agrad/fwd/matrix/inverse_test.cpp> breaks when included

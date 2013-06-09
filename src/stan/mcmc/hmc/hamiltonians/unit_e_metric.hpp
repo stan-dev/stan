@@ -17,7 +17,8 @@ namespace stan {
       
     public:
       
-      unit_e_metric(M& m): base_hamiltonian<M, unit_e_point, BaseRNG>(m) {};
+      unit_e_metric(M& m, std::ostream* e):
+      base_hamiltonian<M, unit_e_point, BaseRNG>(m, e) {};
       ~unit_e_metric() {};
       
       double T(unit_e_point& z) {
@@ -44,7 +45,8 @@ namespace stan {
         boost::variate_generator<BaseRNG&, boost::normal_distribution<> > 
           _rand_unit_gaus(rng, boost::normal_distribution<>());
         
-        for (size_t i = 0; i < z.p.size(); ++i) z.p(i) = _rand_unit_gaus();
+        for (int i = 0; i < z.p.size(); ++i) 
+          z.p(i) = _rand_unit_gaus();
 
       }
       

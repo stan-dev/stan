@@ -181,7 +181,7 @@ namespace stan {
         stan::prob::autocorrelation(sample, ac);
 
         Eigen::VectorXd ac2(ac.size());
-        for (int i = 0; i < ac.size(); i++)
+        for (std::vector<double>::size_type i = 0; i < ac.size(); i++)
           ac2(i) = ac[i];
         return ac2;
       }
@@ -194,7 +194,7 @@ namespace stan {
         stan::prob::autocovariance(sample, ac);
 
         Eigen::VectorXd ac2(ac.size());
-        for (int i = 0; i < ac.size(); i++)
+        for (std::vector<double>::size_type i = 0; i < ac.size(); i++)
           ac2(i) = ac[i];
         return ac2;
       }

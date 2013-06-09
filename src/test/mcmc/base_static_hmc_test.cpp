@@ -21,11 +21,8 @@ namespace stan {
       
     public:
       
-      mock_static_hmc(mock_model &m, rng_t& rng): base_static_hmc<mock_model,
-                                                                  ps_point,
-                                                                  mock_hamiltonian,
-                                                                  mock_integrator,
-                                                                  rng_t>(m, rng)
+      mock_static_hmc(mock_model &m, rng_t& rng, std::ostream* o, std::ostream* e)
+        : base_static_hmc<mock_model,ps_point,mock_hamiltonian,mock_integrator,rng_t>(m, rng, o, e)
       { this->_name = "Mock Static HMC"; }
       
     };
@@ -43,7 +40,7 @@ TEST(McmcBaseStaticHMC, set_nominal_stepsize) {
   
   stan::mcmc::mock_model model(q.size());
   
-  stan::mcmc::mock_static_hmc sampler(model, base_rng);
+  stan::mcmc::mock_static_hmc sampler(model, base_rng, &std::cout, &std::cout);
   
   double old_epsilon = 1.0;
   
@@ -65,7 +62,7 @@ TEST(McmcBaseStaticHMC, set_T) {
   
   stan::mcmc::mock_model model(q.size());
   
-  stan::mcmc::mock_static_hmc sampler(model, base_rng);
+  stan::mcmc::mock_static_hmc sampler(model, base_rng, &std::cout, &std::cerr);
   
   double old_T = 3.0;
   
@@ -87,7 +84,7 @@ TEST(McmcBaseStaticHMC, set_nominal_stepsize_and_T) {
   
   stan::mcmc::mock_model model(q.size());
   
-  stan::mcmc::mock_static_hmc sampler(model, base_rng);
+  stan::mcmc::mock_static_hmc sampler(model, base_rng, &std::cout, &std::cerr);
   
   double old_epsilon = 1.0;
   double old_T = 3.0;
@@ -116,7 +113,7 @@ TEST(McmcBaseStaticHMC, set_nominal_stepsize_and_L) {
   
   stan::mcmc::mock_model model(q.size());
   
-  stan::mcmc::mock_static_hmc sampler(model, base_rng);
+  stan::mcmc::mock_static_hmc sampler(model, base_rng, &std::cout, &std::cerr);
   
   double old_epsilon = 1.0;
   int old_L = 10;

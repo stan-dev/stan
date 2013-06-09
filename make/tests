@@ -100,7 +100,44 @@ endif
 ##
 # Builds a single test
 ##
-test/gm/compile_models$(EXE) : test/gm/compile_models.o bin/libstan.a $(patsubst %.stan,%$(EXE),$(wildcard src/test/gm/model_specs/compiled/*.stan))
+FILES := $(wildcard src/test/gm/model_specs/compiled/*.stan)
+ifeq ($(OS),win)
+  WH := where
+else
+  WH := which
+endif
+
+ifneq ($(shell $(WH) shuf),)
+  FILES := $(shell shuf -e $(FILES))
+else
+ifneq ($(shell $(WH) Rscript),)
+  FILES := $(shell Rscript -e "cat(sample(commandArgs(trailingOnly=TRUE)))" $(FILES))
+else
+ifneq ($(shell $(WH) python),)
+  FILES := $(shell python -c "import random; import os; import sys; sys.argv.remove('-'); s = sys.argv; random.shuffle(s); print ' '.join(s)" - $(FILES))
+else
+ifneq ($(shell $(WH) perl),)
+  FILES := $(shell perl -MList::Util=shuffle -le'print for shuffle @ARGV' $(FILES))
+endif
+endif
+endif
+endif
+
+test/gm/command$(EXE) : test/gm/command.o bin/libstan.a src/test/gm/model_specs/compiled/domain_fail$(EXE) src/test/gm/model_specs/compiled/value_fail$(EXE) 
+	@mkdir -p $(dir $@)
+	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS) $(LDLIBS_STANC)
+ifeq ($(findstring test-,$(MAKECMDGOALS))$(findstring runtest/,$(MAKECMDGOALS)),)
+	$@ --gtest_output="xml:$(basename $@).xml"
+endif
+
+test/mcmc/base_hmc$(EXE) : test/mcmc/base_hmc.o bin/libstan.a src/test/mcmc/models/improper$(EXE)
+	@mkdir -p $(dir $@)
+	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS) $(LDLIBS_STANC)
+ifeq ($(findstring test-,$(MAKECMDGOALS))$(findstring runtest/,$(MAKECMDGOALS)),)
+	$@ --gtest_output="xml:$(basename $@).xml"
+endif
+
+test/gm/compile_models$(EXE) : test/gm/compile_models.o bin/libstan.a $(patsubst %.stan,%$(EXE),$(FILES))
 	@mkdir -p $(dir $@)
 	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS) $(LDLIBS_STANC)
 ifeq ($(findstring test-,$(MAKECMDGOALS))$(findstring runtest/,$(MAKECMDGOALS)),)

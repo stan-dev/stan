@@ -53,6 +53,10 @@ namespace stan {
       assigner<needs_promotion<LHS,RHS>::value, LHS, RHS>::assign(var,val);
     }
 
+    inline void assign(std::vector<double>& x, const std::vector<double>& y) {
+      x = y;
+    }
+
   }
 }
 #endif

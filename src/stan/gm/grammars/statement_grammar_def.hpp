@@ -155,7 +155,7 @@ namespace stan {
     boost::phoenix::function<validate_assignment> validate_assignment_f;
 
     struct validate_sample {
-      template <typename T1, typename T2>
+      template <typename T1, typename T2, typename T3>
       struct result { typedef bool type; };
 
       bool is_double_return(const std::string& function_name,
@@ -166,6 +166,7 @@ namespace stan {
           .is_primitive_double();
       }
       bool operator()(const sample& s,
+                      const variable_map& var_map,
                       std::ostream& error_msgs) const {
         std::vector<expr_type> arg_types;
         arg_types.push_back(s.expr_.expression_type());
@@ -180,6 +181,23 @@ namespace stan {
         if (!is_double_return(function_name,arg_types,error_msgs)) {
           error_msgs << "unknown distribution=" << s.dist_.family_ << std::endl;
           return false;
+        }
+        // test for LHS not being purely a variable
+        if (has_non_param_var(s.expr_,var_map)) {
+          // FIXME:  really want to get line numbers in here too
+          error_msgs << "Warning (non-fatal):"
+                     << "     sampling statement (~) contains a transformed parameter or local variable."
+                     << std::endl
+                     << "     You must increment lp__ with the log absolute determinant"
+                     << " of the Jacobian of the transform."
+                     << std::endl
+                     << "     Sampling Statement left-hand-side expression:"
+                     << std::endl
+                     << "          ";
+          generate_expression(s.expr_,error_msgs);
+          error_msgs << " ~ ";
+          error_msgs << function_name << "(...)";
+          error_msgs << std::endl;
         }
         if (s.truncation_.has_low()) {
           std::vector<expr_type> arg_types_trunc(arg_types);
@@ -388,7 +406,8 @@ namespace stan {
             = validate_assignment_f(_1,_r2,boost::phoenix::ref(var_map_),
                                      boost::phoenix::ref(error_msgs_))]
         | sample_r(_r1,_r2) [_pass = validate_sample_f(_1,
-                                                   boost::phoenix::ref(error_msgs_))]
+                                               boost::phoenix::ref(var_map_),
+                                               boost::phoenix::ref(error_msgs_))]
         | no_op_statement_r
         ;
 
@@ -468,8 +487,8 @@ namespace stan {
 
       assignment_r.name("variable assignment by expression");
       assignment_r
-        %= var_lhs_r(_r1)
-        >> lit("<-")
+        %= ( var_lhs_r(_r1)
+             >> lit("<-") )
         > expression_g(_r1)
         > lit(';') 
         ;
@@ -495,8 +514,8 @@ namespace stan {
       // inherited  _r1 = true if samples allowed as statements
       sample_r.name("distribution of expression");
       sample_r 
-        %= expression_g(_r2)
-        >> lit('~')
+        %= ( expression_g(_r2)
+             >> lit('~') )
         > eps
         [_pass 
          = validate_allow_sample_f(_r1,boost::phoenix::ref(error_msgs_))] 
@@ -506,9 +525,9 @@ namespace stan {
 
       distribution_r.name("distribution and parameters");
       distribution_r
-        %= identifier_r
-        >> lit('(')
-        >> -(expression_g(_r1) % ',')
+        %= ( identifier_r
+             >> lit('(')
+             >> -(expression_g(_r1) % ',') )
         > lit(')');
 
       truncation_range_r.name("range pair");

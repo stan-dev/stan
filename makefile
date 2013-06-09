@@ -26,7 +26,7 @@ AR = ar
 # Library locations
 ##
 STAN_HOME := $(dir $(firstword $(MAKEFILE_LIST)))
-EIGEN ?= lib/eigen_3.1.2
+EIGEN ?= lib/eigen_3.1.3
 BOOST ?= lib/boost_1.53.0
 GTEST ?= lib/gtest_1.6.0
 
@@ -34,6 +34,7 @@ GTEST ?= lib/gtest_1.6.0
 # Set default compiler options.
 ## 
 CFLAGS = -I src -I $(EIGEN) -I $(BOOST) -Wall -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS
+CFLAGS_GTEST = -DGTEST_USE_OWN_TR1_TUPLE
 LDLIBS = -Lbin -lstan
 LDLIBS_STANC = -Lbin -lstanc
 EXE = 
@@ -208,7 +209,7 @@ clean-models:
 	$(RM) -r models $(MODEL_HEADER).gch $(MODEL_HEADER).pch $(MODEL_HEADER).d
 
 clean-all: clean clean-dox clean-manual clean-models
-	$(RM) -r test bin doc
+	$(RM) -r test/* bin doc
 	$(RM) $(wildcard *.d) $(wildcard *.o)
 	$(RM) src/test/gm/model_specs/compiled/*.cpp src/test/gm/model_specs/compiled/*.o $(patsubst %.stan,%$(EXE),$(wildcard src/test/gm/model_specs/compiled/*.stan))
 	cd src/test/agrad/distributions/univariate/continuous; $(RM) *_generated_test.cpp

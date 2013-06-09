@@ -30,13 +30,13 @@ namespace stan {
                        const Eigen::Matrix<T,Eigen::Dynamic,1>& x,
                        int n,
                        T& fx,
-                       T& dfx_dxi) {
+                       T& dfx_dxn) {
       Eigen::Matrix<fvar<T>,Eigen::Dynamic,1> x_fvar(x.size());
       for (int i = 0; i < x.size(); ++i)
         x_fvar(i) = fvar<T>(x(i),i==n);
       fvar<T> fx_fvar = f(x_fvar);
       fx = fx_fvar.val_;
-      dfx_dxi = fx_fvar.d_;
+      dfx_dxn = fx_fvar.d_;
     }
 
     /**

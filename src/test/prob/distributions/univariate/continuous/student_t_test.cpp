@@ -12,7 +12,7 @@ TEST(ProbDistributionsStudentT, chiSquareGoodnessFitTest) {
   boost::random::mt19937 rng;
   boost::math::students_t_distribution<>dist (3.0);
   int N = 10000;
-  int K = 5;
+  double K = 5;
   boost::math::chi_squared mydist(K-1);
 
   double loc[4];

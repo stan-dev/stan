@@ -25,7 +25,7 @@ namespace stan {
        * Chainables are not destructible and should go on the function
        * call stack or be allocated with operator new.
        */
-      ~chainable() { 
+      virtual ~chainable() {
         // handled automatically
       }
 
@@ -62,6 +62,20 @@ namespace stan {
        */
       static inline void* operator new(size_t nbytes) {
         return memalloc_.alloc(nbytes);
+      }
+
+      /**
+       * Delete a pointer from the underlying memory pool.  This no-op
+       * implementation enables a subclass to throw exceptions in its
+       * constructor.  An exception thrown in the constructor of a
+       * subclass will result in an error being raised, which is in
+       * turn caught and calls delete().
+       *
+       * See the discussion of "plugging the memory leak" in:  
+       *   http://www.parashift.com/c++-faq/memory-pools.html
+       */
+      static inline void operator delete(void* /* ignore arg */) {
+        /* no op */
       }
     };
 
