@@ -18,7 +18,7 @@ namespace stan {
       std::string name() { return _name; }
       std::string description() { return _description; }
 
-      virtual void print(std::ostream* s, int depth) = 0;
+      virtual void print(std::ostream* s, int depth, const char prefix) = 0;
       virtual void print_help(std::ostream* s, int depth) = 0;
       
       virtual bool parse_args(std::vector<std::string>& args, std::ostream* err) { return true; }
@@ -35,6 +35,8 @@ namespace stan {
       }
       
       virtual argument* arg(std::string name) { return 0; }
+      
+      int compute_indent(int depth) { return indent_width * depth + 1; }
       
     protected:
       

@@ -15,8 +15,8 @@ namespace stan {
         _name = "engaged";
         _description = "Adaptation engaged?";
         _validity = "[0, 1]";
-        _default = "0";
-        _default_value = false;
+        _default = "1";
+        _default_value = true;
         _value = _default_value;
       };
       

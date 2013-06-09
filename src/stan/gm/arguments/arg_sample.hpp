@@ -3,8 +3,8 @@
 
 #include <stan/gm/arguments/categorical_argument.hpp>
 
-#include <stan/gm/arguments/arg_iter.hpp>
-#include <stan/gm/arguments/arg_warmup.hpp>
+#include <stan/gm/arguments/arg_num_samples.hpp>
+#include <stan/gm/arguments/arg_num_warmup.hpp>
 #include <stan/gm/arguments/arg_save_warmup.hpp>
 #include <stan/gm/arguments/arg_thin.hpp>
 #include <stan/gm/arguments/arg_adapt.hpp>
@@ -23,8 +23,8 @@ namespace stan {
         _name = "sample";
         _description = "Bayesian inference with Markov Chain Monte Carlo";
         
-        _subarguments.push_back(new arg_iter());
-        _subarguments.push_back(new arg_warmup());
+        _subarguments.push_back(new arg_num_samples());
+        _subarguments.push_back(new arg_num_warmup());
         _subarguments.push_back(new arg_save_warmup());
         _subarguments.push_back(new arg_thin());
         _subarguments.push_back(new arg_adapt());

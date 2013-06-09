@@ -1,5 +1,5 @@
-#ifndef __STAN__GM__ARGUMENTS__ITER__HPP__
-#define __STAN__GM__ARGUMENTS__ITER__HPP__
+#ifndef __STAN__GM__ARGUMENTS__NUM__SAMPLES__HPP__
+#define __STAN__GM__ARGUMENTS__NUM__SAMPLES__HPP__
 
 #include <stan/gm/arguments/singleton_argument.hpp>
 
@@ -7,16 +7,16 @@ namespace stan {
   
   namespace gm {
     
-    class arg_iter: public int_argument {
+    class arg_num_samples: public int_argument {
       
     public:
       
-      arg_iter(): int_argument() {
-        _name = "iter";
-        _description = "Total number of iterations";
-        _validity = "0 < iter";
-        _default = "2000";
-        _default_value = 2000;
+      arg_num_samples(): int_argument() {
+        _name = "num_samples";
+        _description = "Total number of samples";
+        _validity = "0 < num_samples";
+        _default = "1000";
+        _default_value = 1000;
         _value = _default_value;
       };
       

@@ -4,7 +4,6 @@
 #include <stan/gm/arguments/categorical_argument.hpp>
 
 #include <stan/gm/arguments/arg_int_time.hpp>
-#include <stan/gm/arguments/arg_stepsize.hpp>
 
 namespace stan {
   
@@ -20,7 +19,6 @@ namespace stan {
         _description = "Static integration time";
         
         _subarguments.push_back(new arg_int_time());
-        _subarguments.push_back(new arg_stepsize());
         
       }
  

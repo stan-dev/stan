@@ -22,7 +22,7 @@ namespace stan {
         _values.push_back(new arg_static());
         _values.push_back(new arg_nuts());
         
-        _default_cursor = 0;
+        _default_cursor = 1;
         _cursor = _default_cursor;
         
       }

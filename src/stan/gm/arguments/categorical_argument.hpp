@@ -23,14 +23,14 @@ namespace stan {
         
       }
       
-      void print(std::ostream* s, int depth) {
+      void print(std::ostream* s, int depth, const char prefix) {
         if(!s) return;
-        std::string indent(indent_width * depth, ' ');
-        *s << indent << _name << std::endl;
+        std::string indent(compute_indent(depth), ' ');
+        *s << prefix << indent << _name << std::endl;
         
         for (std::vector<argument*>::iterator it = _subarguments.begin();
              it != _subarguments.end(); ++it)
-          (*it)->print(s, depth + 1);
+          (*it)->print(s, depth + 1, prefix);
       }
       
       void print_help(std::ostream* s, int depth) {

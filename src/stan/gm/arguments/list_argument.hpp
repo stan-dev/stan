@@ -22,9 +22,9 @@ namespace stan {
         
       }
 
-      void print(std::ostream* s, int depth) {
-        valued_argument::print(s, depth);
-        _values.at(_cursor)->print(s, depth + 1);
+      void print(std::ostream* s, int depth, const char prefix) {
+        valued_argument::print(s, depth, prefix);
+        _values.at(_cursor)->print(s, depth + 1, prefix);
       }
       
       void print_help(std::ostream* s, int depth) {

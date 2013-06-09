@@ -26,10 +26,9 @@ namespace stan {
           args.pop_back();
           
           T proposed_value = boost::lexical_cast<T>(value);
-          if (is_valid(proposed_value)) {
-            _value = proposed_value;
-          } else {
-            
+          
+          if (!set_value(boost::lexical_cast<T>(value))) {
+
             if(err) {
               *err << proposed_value << " is not a valid value for \"" << _name << "\"" << std::endl;
               *err << std::string(indent_width, ' ') << "Valid values:" << print_valid() << std::endl;
@@ -39,6 +38,7 @@ namespace stan {
             return false;
             
           }
+          
         }
         
         return true;
@@ -46,14 +46,24 @@ namespace stan {
       };
       
       T value() { return _value; }
+      
+      bool set_value(T value) {
+        
+        if (is_valid(value)) {
+          _value = value;
+          return true;
+        }
+        
+        return false;
+      
+      }
+
       std::string print_value() { return boost::lexical_cast<std::string>(_value); }
       std::string print_valid() { return " " + _validity; }
       bool is_default() { return _value == _default_value; }
       
 
     protected:
-      
-      void _set_value(T value) { _value = value; }
       
       std::string _validity;
       virtual bool is_valid(T value) { return true; }

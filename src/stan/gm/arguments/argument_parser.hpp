@@ -65,11 +65,11 @@ namespace stan {
         
       }
       
-      void print(std::ostream* s) {
+      void print(std::ostream* s, const char prefix = '\0') {
         if(!s) return;
         
         for (int i = 0; i < _arguments.size(); ++i) {
-          _arguments.at(i)->print(s, 0);
+          _arguments.at(i)->print(s, 0, prefix);
         }
         
       }

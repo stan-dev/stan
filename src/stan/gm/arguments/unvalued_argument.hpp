@@ -14,7 +14,7 @@ namespace stan {
       
       unvalued_argument(): _is_present(false) {};
       
-      void print(std::ostream* s, int depth) {};
+      void print(std::ostream* s, int depth, const char prefix) {};
       
       void print_help(std::ostream* s, int depth) {
         

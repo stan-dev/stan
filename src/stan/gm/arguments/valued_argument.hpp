@@ -11,13 +11,13 @@ namespace stan {
       
     public:
       
-      virtual void print(std::ostream* s, int depth) {
+      virtual void print(std::ostream* s, int depth, const char prefix) {
         
         if(!s) return;
         
-        std::string indent(indent_width * depth, ' ');
+        std::string indent(compute_indent(depth), ' ');
         
-        *s << indent << _name << " = " << print_value();
+        *s << prefix << indent << _name << " = " << print_value();
         if(is_default())
           *s << " (Default)";
         *s << std::endl;

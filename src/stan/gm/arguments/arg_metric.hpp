@@ -24,7 +24,7 @@ namespace stan {
         _values.push_back(new arg_diag_e());
         _values.push_back(new arg_dense_e());
         
-        _default_cursor = 0;
+        _default_cursor = 1;
         _cursor = _default_cursor;
         
       }
