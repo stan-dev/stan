@@ -1,6 +1,7 @@
 #include <stan/math/matrix/rows.hpp>
 #include <gtest/gtest.h>
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
+#include <stan/agrad/var.hpp>
 
 TEST(AgradFwdMatrix,rows_vector) {
   using stan::agrad::vector_fv;
@@ -30,6 +31,74 @@ TEST(AgradFwdMatrix,rows_matrix) {
   using stan::math::rows;
 
   matrix_fv m(2,3);
+  m << 0, 1, 2, 3, 4, 5;
+  EXPECT_EQ(2U, rows(m));
+  
+  m.resize(0,2);
+  EXPECT_EQ(0U, rows(m));
+}
+TEST(AgradFwdFvarVarMatrix,rows_vector) {
+  using stan::agrad::vector_fvv;
+  using stan::agrad::row_vector_fvv;
+  using stan::math::rows;
+
+  vector_fvv v(5);
+  v << 0, 1, 2, 3, 4;
+  EXPECT_EQ(5U, rows(v));
+  
+  v.resize(0);
+  EXPECT_EQ(0U, rows(v));
+}
+TEST(AgradFwdFvarVarMatrix,rows_rowvector) {
+  using stan::agrad::row_vector_fvv;
+  using stan::math::rows;
+
+  row_vector_fvv rv(5);
+  rv << 0, 1, 2, 3, 4;
+  EXPECT_EQ(1U, rows(rv));
+
+  rv.resize(0);
+  EXPECT_EQ(1U, rows(rv));
+}
+TEST(AgradFwdFvarVarMatrix,rows_matrix) {
+  using stan::agrad::matrix_fvv;
+  using stan::math::rows;
+
+  matrix_fvv m(2,3);
+  m << 0, 1, 2, 3, 4, 5;
+  EXPECT_EQ(2U, rows(m));
+  
+  m.resize(0,2);
+  EXPECT_EQ(0U, rows(m));
+}
+TEST(AgradFwdFvarFvarMatrix,rows_vector) {
+  using stan::agrad::vector_ffv;
+  using stan::agrad::row_vector_ffv;
+  using stan::math::rows;
+
+  vector_ffv v(5);
+  v << 0, 1, 2, 3, 4;
+  EXPECT_EQ(5U, rows(v));
+  
+  v.resize(0);
+  EXPECT_EQ(0U, rows(v));
+}
+TEST(AgradFwdFvarFvarMatrix,rows_rowvector) {
+  using stan::agrad::row_vector_ffv;
+  using stan::math::rows;
+
+  row_vector_ffv rv(5);
+  rv << 0, 1, 2, 3, 4;
+  EXPECT_EQ(1U, rows(rv));
+
+  rv.resize(0);
+  EXPECT_EQ(1U, rows(rv));
+}
+TEST(AgradFwdFvarFvarMatrix,rows_matrix) {
+  using stan::agrad::matrix_ffv;
+  using stan::math::rows;
+
+  matrix_ffv m(2,3);
   m << 0, 1, 2, 3, 4, 5;
   EXPECT_EQ(2U, rows(m));
   

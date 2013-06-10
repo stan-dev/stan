@@ -2,7 +2,9 @@
 #include <stan/math/rep_matrix.hpp>
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <stan/agrad/fwd/fvar.hpp>
+#include <stan/agrad/var.hpp>
 
+using stan::agrad::var;
 TEST(AgradFwdMatrix,rep_matrix_real) {
   using stan::math::rep_matrix;
   using stan::agrad::matrix_fv;
@@ -116,6 +118,240 @@ TEST(AgradFwdMatrix,rep_matrix_exception_vector) {
   using stan::agrad::vector_fv;
 
   vector_fv a(3);
+  a<<3.0, 3.0, 3.0;
+
+  EXPECT_THROW(rep_matrix(a,-3), std::domain_error);
+}
+TEST(AgradFvarVarMatrix,rep_matrix_real) {
+  using stan::math::rep_matrix;
+  using stan::agrad::matrix_fvv;
+  using stan::agrad::fvar;
+  fvar<var> a;
+  a.val_ = 3.0;
+  a.d_ = 2.0;
+  matrix_fvv output;
+  output = rep_matrix(a, 2,3);
+
+  EXPECT_EQ(3,output(0,0).val_.val());
+  EXPECT_EQ(3,output(0,1).val_.val());
+  EXPECT_EQ(3,output(0,2).val_.val());
+  EXPECT_EQ(3,output(1,0).val_.val());
+  EXPECT_EQ(3,output(1,1).val_.val());
+  EXPECT_EQ(3,output(1,2).val_.val());
+  EXPECT_EQ(2,output(0,0).d_.val());
+  EXPECT_EQ(2,output(0,1).d_.val());
+  EXPECT_EQ(2,output(0,2).d_.val());
+  EXPECT_EQ(2,output(1,0).d_.val());
+  EXPECT_EQ(2,output(1,1).d_.val());
+  EXPECT_EQ(2,output(1,2).d_.val());
+}
+TEST(AgradFvarVarMatrix,rep_matrix_exception_real) {
+  using stan::math::rep_matrix;
+  using stan::agrad::matrix_fvv;
+  using stan::agrad::fvar;
+  fvar<var> a;
+  a.val_ = 3.0;
+  a.d_ = 2.0;
+
+  EXPECT_THROW(rep_matrix(a,-2,-1), std::domain_error);
+}
+TEST(AgradFvarVarMatrix,rep_matrix_rowvector) {
+  using stan::math::rep_matrix;
+  using stan::agrad::matrix_fvv;
+  using stan::agrad::row_vector_fvv;
+  
+  row_vector_fvv a(3);
+  a<<3.0, 3.0, 3.0;
+   a(0).d_ = 2.0;
+   a(1).d_ = 2.0;
+   a(2).d_ = 2.0;
+  matrix_fvv output;
+  output = rep_matrix(a, 3);
+
+  EXPECT_EQ(3,output(0,0).val_.val());
+  EXPECT_EQ(3,output(0,1).val_.val());
+  EXPECT_EQ(3,output(0,2).val_.val());
+  EXPECT_EQ(3,output(1,0).val_.val());
+  EXPECT_EQ(3,output(1,1).val_.val());
+  EXPECT_EQ(3,output(1,2).val_.val());
+  EXPECT_EQ(3,output(2,0).val_.val());
+  EXPECT_EQ(3,output(2,1).val_.val());
+  EXPECT_EQ(3,output(2,2).val_.val());
+  EXPECT_EQ(2,output(0,0).d_.val());
+  EXPECT_EQ(2,output(0,1).d_.val());
+  EXPECT_EQ(2,output(0,2).d_.val());
+  EXPECT_EQ(2,output(1,0).d_.val());
+  EXPECT_EQ(2,output(1,1).d_.val());
+  EXPECT_EQ(2,output(1,2).d_.val());
+  EXPECT_EQ(2,output(2,0).d_.val());
+  EXPECT_EQ(2,output(2,1).d_.val());
+  EXPECT_EQ(2,output(2,2).d_.val());
+}
+TEST(AgradFvarVarMatrix,rep_matrix_exception_rowvector) {
+  using stan::math::rep_matrix;
+  using stan::agrad::matrix_fvv;
+  using stan::agrad::row_vector_fvv;
+
+  row_vector_fvv a(3);
+  a<<3.0, 3.0, 3.0;
+
+  EXPECT_THROW(rep_matrix(a,-3), std::domain_error);
+}
+TEST(AgradFvarVarMatrix,rep_matrix_vector) {
+  using stan::math::rep_matrix;
+  using stan::agrad::matrix_fvv;
+  using stan::agrad::vector_fvv;
+  
+  vector_fvv a(3);
+  a<<3.0, 3.0, 3.0;
+   a(0).d_ = 2.0;
+   a(1).d_ = 2.0;
+   a(2).d_ = 2.0;
+  matrix_fvv output;
+  output = rep_matrix(a, 3);
+
+  EXPECT_EQ(3,output(0,0).val_.val());
+  EXPECT_EQ(3,output(0,1).val_.val());
+  EXPECT_EQ(3,output(0,2).val_.val());
+  EXPECT_EQ(3,output(1,0).val_.val());
+  EXPECT_EQ(3,output(1,1).val_.val());
+  EXPECT_EQ(3,output(1,2).val_.val());
+  EXPECT_EQ(3,output(2,0).val_.val());
+  EXPECT_EQ(3,output(2,1).val_.val());
+  EXPECT_EQ(3,output(2,2).val_.val());
+  EXPECT_EQ(2,output(0,0).d_.val());
+  EXPECT_EQ(2,output(0,1).d_.val());
+  EXPECT_EQ(2,output(0,2).d_.val());
+  EXPECT_EQ(2,output(1,0).d_.val());
+  EXPECT_EQ(2,output(1,1).d_.val());
+  EXPECT_EQ(2,output(1,2).d_.val());
+  EXPECT_EQ(2,output(2,0).d_.val());
+  EXPECT_EQ(2,output(2,1).d_.val());
+  EXPECT_EQ(2,output(2,2).d_.val());
+}
+TEST(AgradFvarVarMatrix,rep_matrix_exception_vector) {
+  using stan::math::rep_matrix;
+  using stan::agrad::matrix_fvv;
+  using stan::agrad::vector_fvv;
+
+  vector_fvv a(3);
+  a<<3.0, 3.0, 3.0;
+
+  EXPECT_THROW(rep_matrix(a,-3), std::domain_error);
+}
+TEST(AgradFvarFvarMatrix,rep_matrix_real) {
+  using stan::math::rep_matrix;
+  using stan::agrad::matrix_ffv;
+  using stan::agrad::fvar;
+  fvar<fvar<double> > a;
+  a.val_ = 3.0;
+  a.d_ = 2.0;
+  matrix_ffv output;
+  output = rep_matrix(a, 2,3);
+
+  EXPECT_EQ(3,output(0,0).val_.val());
+  EXPECT_EQ(3,output(0,1).val_.val());
+  EXPECT_EQ(3,output(0,2).val_.val());
+  EXPECT_EQ(3,output(1,0).val_.val());
+  EXPECT_EQ(3,output(1,1).val_.val());
+  EXPECT_EQ(3,output(1,2).val_.val());
+  EXPECT_EQ(2,output(0,0).d_.val());
+  EXPECT_EQ(2,output(0,1).d_.val());
+  EXPECT_EQ(2,output(0,2).d_.val());
+  EXPECT_EQ(2,output(1,0).d_.val());
+  EXPECT_EQ(2,output(1,1).d_.val());
+  EXPECT_EQ(2,output(1,2).d_.val());
+}
+TEST(AgradFvarFvarMatrix,rep_matrix_exception_real) {
+  using stan::math::rep_matrix;
+  using stan::agrad::matrix_ffv;
+  using stan::agrad::fvar;
+  fvar<fvar<double> > a;
+  a.val_ = 3.0;
+  a.d_ = 2.0;
+
+  EXPECT_THROW(rep_matrix(a,-2,-1), std::domain_error);
+}
+TEST(AgradFvarFvarMatrix,rep_matrix_rowvector) {
+  using stan::math::rep_matrix;
+  using stan::agrad::matrix_ffv;
+  using stan::agrad::row_vector_ffv;
+  
+  row_vector_ffv a(3);
+  a<<3.0, 3.0, 3.0;
+   a(0).d_ = 2.0;
+   a(1).d_ = 2.0;
+   a(2).d_ = 2.0;
+  matrix_ffv output;
+  output = rep_matrix(a, 3);
+
+  EXPECT_EQ(3,output(0,0).val_.val());
+  EXPECT_EQ(3,output(0,1).val_.val());
+  EXPECT_EQ(3,output(0,2).val_.val());
+  EXPECT_EQ(3,output(1,0).val_.val());
+  EXPECT_EQ(3,output(1,1).val_.val());
+  EXPECT_EQ(3,output(1,2).val_.val());
+  EXPECT_EQ(3,output(2,0).val_.val());
+  EXPECT_EQ(3,output(2,1).val_.val());
+  EXPECT_EQ(3,output(2,2).val_.val());
+  EXPECT_EQ(2,output(0,0).d_.val());
+  EXPECT_EQ(2,output(0,1).d_.val());
+  EXPECT_EQ(2,output(0,2).d_.val());
+  EXPECT_EQ(2,output(1,0).d_.val());
+  EXPECT_EQ(2,output(1,1).d_.val());
+  EXPECT_EQ(2,output(1,2).d_.val());
+  EXPECT_EQ(2,output(2,0).d_.val());
+  EXPECT_EQ(2,output(2,1).d_.val());
+  EXPECT_EQ(2,output(2,2).d_.val());
+}
+TEST(AgradFvarFvarMatrix,rep_matrix_exception_rowvector) {
+  using stan::math::rep_matrix;
+  using stan::agrad::matrix_ffv;
+  using stan::agrad::row_vector_ffv;
+
+  row_vector_ffv a(3);
+  a<<3.0, 3.0, 3.0;
+
+  EXPECT_THROW(rep_matrix(a,-3), std::domain_error);
+}
+TEST(AgradFvarFvarMatrix,rep_matrix_vector) {
+  using stan::math::rep_matrix;
+  using stan::agrad::matrix_ffv;
+  using stan::agrad::vector_ffv;
+  
+  vector_ffv a(3);
+  a<<3.0, 3.0, 3.0;
+   a(0).d_ = 2.0;
+   a(1).d_ = 2.0;
+   a(2).d_ = 2.0;
+  matrix_ffv output;
+  output = rep_matrix(a, 3);
+
+  EXPECT_EQ(3,output(0,0).val_.val());
+  EXPECT_EQ(3,output(0,1).val_.val());
+  EXPECT_EQ(3,output(0,2).val_.val());
+  EXPECT_EQ(3,output(1,0).val_.val());
+  EXPECT_EQ(3,output(1,1).val_.val());
+  EXPECT_EQ(3,output(1,2).val_.val());
+  EXPECT_EQ(3,output(2,0).val_.val());
+  EXPECT_EQ(3,output(2,1).val_.val());
+  EXPECT_EQ(3,output(2,2).val_.val());
+  EXPECT_EQ(2,output(0,0).d_.val());
+  EXPECT_EQ(2,output(0,1).d_.val());
+  EXPECT_EQ(2,output(0,2).d_.val());
+  EXPECT_EQ(2,output(1,0).d_.val());
+  EXPECT_EQ(2,output(1,1).d_.val());
+  EXPECT_EQ(2,output(1,2).d_.val());
+  EXPECT_EQ(2,output(2,0).d_.val());
+  EXPECT_EQ(2,output(2,1).d_.val());
+  EXPECT_EQ(2,output(2,2).d_.val());
+}
+TEST(AgradFvarFvarMatrix,rep_matrix_exception_vector) {
+  using stan::math::rep_matrix;
+  using stan::agrad::matrix_ffv;
+  using stan::agrad::vector_ffv;
+
+  vector_ffv a(3);
   a<<3.0, 3.0, 3.0;
 
   EXPECT_THROW(rep_matrix(a,-3), std::domain_error);
