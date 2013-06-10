@@ -59,6 +59,7 @@
 #include "stan/math/functions/step.hpp"
 #include "stan/math/functions/sub.hpp"
 #include "stan/math/functions/sum.hpp"
+#include "stan/math/functions/trigamma.hpp"
 #include "stan/math/functions/value_of.hpp"
 
 #endif

@@ -12,7 +12,7 @@ TEST(AgradFvar, digamma) {
   fvar<double> x(0.5,1.0);
   fvar<double> a = digamma(x);
   EXPECT_FLOAT_EQ(digamma(0.5), a.val_);
-  EXPECT_FLOAT_EQ((zeta(2.0) - (0.57721566490153286 + digamma(0.5))), a.d_);
+  EXPECT_FLOAT_EQ(4.9348022005446793094, a.d_);
 }
 
 TEST(AgradFvarVar, digamma) {
@@ -25,13 +25,12 @@ TEST(AgradFvarVar, digamma) {
   fvar<var> a = digamma(x);
 
   EXPECT_FLOAT_EQ(digamma(0.5), a.val_.val());
-  EXPECT_FLOAT_EQ(1.3 * (zeta(2.0) - (0.57721566490153286 + digamma(0.5))), 
-                  a.d_.val());
+  EXPECT_FLOAT_EQ(1.3 * 4.9348022005446793094, a.d_.val());
 
   AVEC y = createAVEC(x.val_);
   VEC g;
   a.val_.grad(y,g);
-  EXPECT_FLOAT_EQ(zeta(2.0) - (0.57721566490153286 + digamma(0.5)), g[0]);
+  EXPECT_FLOAT_EQ(4.9348022005446793094, g[0]);
 }
 
 TEST(AgradFvarFvar, digamma) {
@@ -46,8 +45,7 @@ TEST(AgradFvarFvar, digamma) {
   fvar<fvar<double> > a = digamma(x);
 
   EXPECT_FLOAT_EQ(digamma(0.5), a.val_.val_);
-  EXPECT_FLOAT_EQ(zeta(2.0) - (0.57721566490153286 + digamma(0.5)), 
-                  a.val_.d_);
+  EXPECT_FLOAT_EQ(4.9348022005446793094, a.val_.d_);
   EXPECT_FLOAT_EQ(0, a.d_.val_);
   EXPECT_FLOAT_EQ(0, a.d_.d_);
 
@@ -58,7 +56,6 @@ TEST(AgradFvarFvar, digamma) {
   a = digamma(y);
   EXPECT_FLOAT_EQ(digamma(0.5), a.val_.val_);
   EXPECT_FLOAT_EQ(0, a.val_.d_);
-  EXPECT_FLOAT_EQ(zeta(2.0) - (0.57721566490153286 + digamma(0.5)), 
-                  a.d_.val_);
+  EXPECT_FLOAT_EQ(4.9348022005446793094, a.d_.val_);
   EXPECT_FLOAT_EQ(0, a.d_.d_);
 }

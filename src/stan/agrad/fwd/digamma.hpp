@@ -4,7 +4,7 @@
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/meta/traits.hpp>
 #include <boost/math/special_functions/digamma.hpp>
-#include <boost/math/special_functions/zeta.hpp>
+#include <stan/math/functions/trigamma.hpp>
 
 namespace stan {
 
@@ -15,9 +15,8 @@ namespace stan {
     fvar<T>
     digamma(const fvar<T>& x) {
       using boost::math::digamma;
-      using boost::math::zeta;
-      T u = digamma(x.val_);
-      return fvar<T>(u, x.d_ * (zeta(2.0) - (0.57721566490153286 + u)));
+      using stan::math::trigamma;
+      return fvar<T>(digamma(x.val_), x.d_ * trigamma(x.val_));
     }
   }
 }

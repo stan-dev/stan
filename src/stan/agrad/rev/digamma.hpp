@@ -5,6 +5,7 @@
 #include <boost/math/special_functions/zeta.hpp>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/op/v_vari.hpp>
+#include <stan/math/functions/trigamma.hpp>
 
 namespace stan {
   namespace agrad {
@@ -16,8 +17,7 @@ namespace stan {
           op_v_vari(boost::math::digamma(avi->val_), avi) {
         }
         void chain() {
-          avi_->adj_ += adj_ * (boost::math::zeta(2.0) - (0.57721566490153286 
-                                          + boost::math::digamma(avi_->val_)));
+          avi_->adj_ += adj_ * stan::math::trigamma(avi_->val_);
         }
       };
     }

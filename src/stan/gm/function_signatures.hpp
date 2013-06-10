@@ -594,6 +594,7 @@ add("transpose",ROW_VECTOR_T,VECTOR_T);
 add("transpose",VECTOR_T,ROW_VECTOR_T);
 add("transpose",MATRIX_T,MATRIX_T);
 add_unary("trunc");
+add_unary("trigamma");
 for (size_t i = 0; i < vector_types.size(); ++i)
   for (size_t j = 0; j < vector_types.size(); ++j)
     for (size_t k = 0; k < vector_types.size(); ++k)

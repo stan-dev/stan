@@ -5,13 +5,12 @@
 #include <boost/math/special_functions/zeta.hpp>
 
 TEST(AgradRev,digamma) {
-  AVAR a = 3.5;
+  AVAR a = 0.5;
   AVAR f = digamma(a);
-  EXPECT_FLOAT_EQ(boost::math::digamma(3.5),f.val());
+  EXPECT_FLOAT_EQ(boost::math::digamma(0.5),f.val());
 
   AVEC x = createAVEC(a);
   VEC grad_f;
   f.grad(x,grad_f);
-  EXPECT_FLOAT_EQ(boost::math::zeta(2.0) - (0.57721566490153286 
-                                       + boost::math::digamma(3.5)),grad_f[0]);
+  EXPECT_FLOAT_EQ(4.9348022005446793094, grad_f[0]);
 }  
