@@ -18,27 +18,6 @@ namespace stan {
       return v / c;
     }
 
-    template <typename T>
-    inline 
-    fvar<T>
-    divide(const fvar<T>& v, const fvar<T>& c) {
-      return to_fvar(v) / to_fvar(c);
-    }
-
-    template <typename T>
-    inline 
-    fvar<typename stan::return_type<T,double>::type>
-    divide(double v, const fvar<T>& c) {
-      return to_fvar(v) / c;
-    }
-
-    template <typename T>
-    inline 
-    fvar<typename stan::return_type<T,double>::type>
-    divide(const fvar<T>& v, double c) {
-      return v / to_fvar(c);
-    }
-
     template <typename T, int R, int C>
     inline Eigen::Matrix<fvar<T>,R,C>
     divide(const Eigen::Matrix<fvar<T>, R,C>& v, const fvar<T>& c) {
@@ -69,7 +48,7 @@ namespace stan {
         res(v.rows(),v.cols());
       for(int i = 0; i < v.rows(); i++) {
         for(int j = 0; j < v.cols(); j++)
-          res(i,j) = to_fvar(v(i,j)) / c;
+          res(i,j) = v(i,j) / c;
       }
       return res;
     }
