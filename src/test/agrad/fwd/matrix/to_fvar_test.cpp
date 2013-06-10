@@ -1,6 +1,7 @@
 #include <stan/agrad/fwd/matrix/to_fvar.hpp>
 #include <stan/agrad/fvar.hpp>
 #include <gtest/gtest.h>
+#include <stan/agrad/var.hpp>
 
 TEST(AgradFwdMatrix,to_fvar_scalar) {
   using stan::agrad::fvar;
@@ -142,4 +143,164 @@ TEST(AgradFwdMatrix,to_fvar_matrix_matrix) {
   matrix_d val1(4,4);
   EXPECT_THROW(stan::agrad::to_fvar(val1, d), std::domain_error);
 }
+TEST(AgradFwdFvarVarMatrix,to_fvar_vector) {
+  using stan::math::vector_d;
+  using stan::agrad::vector_fvv;
 
+  vector_fvv v(5);
+  v << 1, 2, 3, 4, 5;
+   v(0).d_ = 1.0;
+   v(1).d_ = 1.0;
+   v(2).d_ = 1.0;
+   v(3).d_ = 1.0;
+   v(4).d_ = 1.0;
+
+  vector_fvv out = stan::agrad::to_fvar(v);
+  EXPECT_FLOAT_EQ(1, out(0).val_.val());
+  EXPECT_FLOAT_EQ(2, out(1).val_.val());
+  EXPECT_FLOAT_EQ(3, out(2).val_.val());
+  EXPECT_FLOAT_EQ(4, out(3).val_.val());
+  EXPECT_FLOAT_EQ(5, out(4).val_.val());  
+  EXPECT_FLOAT_EQ(1, out(0).d_.val());
+  EXPECT_FLOAT_EQ(1, out(1).d_.val());
+  EXPECT_FLOAT_EQ(1, out(2).d_.val());
+  EXPECT_FLOAT_EQ(1, out(3).d_.val());
+  EXPECT_FLOAT_EQ(1, out(4).d_.val());
+}
+TEST(AgradFwdFvarVarMatrix,to_fvar_rowvector) {
+  using stan::math::row_vector_d;
+  using stan::agrad::row_vector_fvv;
+
+  row_vector_fvv v(5);
+  v << 1, 2, 3, 4, 5;
+   v(0).d_ = 1.0;
+   v(1).d_ = 1.0;
+   v(2).d_ = 1.0;
+   v(3).d_ = 1.0;
+   v(4).d_ = 1.0;
+
+  row_vector_fvv output = stan::agrad::to_fvar(v);
+  EXPECT_FLOAT_EQ(1, output(0).val_.val());
+  EXPECT_FLOAT_EQ(2, output(1).val_.val());
+  EXPECT_FLOAT_EQ(3, output(2).val_.val());
+  EXPECT_FLOAT_EQ(4, output(3).val_.val());
+  EXPECT_FLOAT_EQ(5, output(4).val_.val());
+  EXPECT_FLOAT_EQ(1, output(0).d_.val());
+  EXPECT_FLOAT_EQ(1, output(1).d_.val());
+  EXPECT_FLOAT_EQ(1, output(2).d_.val());
+  EXPECT_FLOAT_EQ(1, output(3).d_.val());
+  EXPECT_FLOAT_EQ(1, output(4).d_.val());
+}
+TEST(AgradFwdFvarVarMatrix,to_fvar_matrix_matrix) {
+  using stan::math::matrix_d;
+  using stan::agrad::matrix_fv;
+  using stan::agrad::matrix_fvv;
+  using stan::agrad::var;
+
+  Eigen::Matrix<var,Eigen::Dynamic,Eigen::Dynamic> val(3,3);
+  Eigen::Matrix<var,Eigen::Dynamic,Eigen::Dynamic> d(3,3);
+  
+  val <<1,2,3,4,5,6,7,8,9;
+  d <<10,11,12,13,14,15,16,17,18;
+  
+  matrix_fvv output = stan::agrad::to_fvar(val,d);
+  EXPECT_FLOAT_EQ(1, output(0,0).val_.val());
+  EXPECT_FLOAT_EQ(2, output(0,1).val_.val());
+  EXPECT_FLOAT_EQ(3, output(0,2).val_.val());
+  EXPECT_FLOAT_EQ(4, output(1,0).val_.val());
+  EXPECT_FLOAT_EQ(5, output(1,1).val_.val());
+  EXPECT_FLOAT_EQ(6, output(1,2).val_.val());
+  EXPECT_FLOAT_EQ(7, output(2,0).val_.val());
+  EXPECT_FLOAT_EQ(8, output(2,1).val_.val());
+  EXPECT_FLOAT_EQ(9, output(2,2).val_.val());
+  EXPECT_FLOAT_EQ(10, output(0,0).d_.val());
+  EXPECT_FLOAT_EQ(11, output(0,1).d_.val());
+  EXPECT_FLOAT_EQ(12, output(0,2).d_.val());
+  EXPECT_FLOAT_EQ(13, output(1,0).d_.val());
+  EXPECT_FLOAT_EQ(14, output(1,1).d_.val());
+  EXPECT_FLOAT_EQ(15, output(1,2).d_.val());
+  EXPECT_FLOAT_EQ(16, output(2,0).d_.val());
+  EXPECT_FLOAT_EQ(17, output(2,1).d_.val());
+  EXPECT_FLOAT_EQ(18, output(2,2).d_.val());
+}
+TEST(AgradFwdFvarFvarMatrix,to_fvar_vector) {
+  using stan::math::vector_d;
+  using stan::agrad::vector_ffv;
+
+  vector_ffv v(5);
+  
+  v << 1, 2, 3, 4, 5;
+   v(0).d_ = 1.0;
+   v(1).d_ = 1.0;
+   v(2).d_ = 1.0;
+   v(3).d_ = 1.0;
+   v(4).d_ = 1.0;
+
+  vector_ffv out = stan::agrad::to_fvar(v);
+  EXPECT_FLOAT_EQ(1, out(0).val_.val());
+  EXPECT_FLOAT_EQ(2, out(1).val_.val());
+  EXPECT_FLOAT_EQ(3, out(2).val_.val());
+  EXPECT_FLOAT_EQ(4, out(3).val_.val());
+  EXPECT_FLOAT_EQ(5, out(4).val_.val());  
+  EXPECT_FLOAT_EQ(1, out(0).d_.val());
+  EXPECT_FLOAT_EQ(1, out(1).d_.val());
+  EXPECT_FLOAT_EQ(1, out(2).d_.val());
+  EXPECT_FLOAT_EQ(1, out(3).d_.val());
+  EXPECT_FLOAT_EQ(1, out(4).d_.val());
+}
+TEST(AgradFwdFvarFvarMatrix,to_fvar_rowvector) {
+  using stan::math::row_vector_d;
+  using stan::agrad::row_vector_ffv;
+
+  row_vector_ffv v(5);
+  
+  v << 1, 2, 3, 4, 5;
+   v(0).d_ = 1.0;
+   v(1).d_ = 1.0;
+   v(2).d_ = 1.0;
+   v(3).d_ = 1.0;
+   v(4).d_ = 1.0;
+
+  row_vector_ffv output = stan::agrad::to_fvar(v);
+  EXPECT_FLOAT_EQ(1, output(0).val_.val());
+  EXPECT_FLOAT_EQ(2, output(1).val_.val());
+  EXPECT_FLOAT_EQ(3, output(2).val_.val());
+  EXPECT_FLOAT_EQ(4, output(3).val_.val());
+  EXPECT_FLOAT_EQ(5, output(4).val_.val());
+  EXPECT_FLOAT_EQ(1, output(0).d_.val());
+  EXPECT_FLOAT_EQ(1, output(1).d_.val());
+  EXPECT_FLOAT_EQ(1, output(2).d_.val());
+  EXPECT_FLOAT_EQ(1, output(3).d_.val());
+  EXPECT_FLOAT_EQ(1, output(4).d_.val());
+}
+TEST(AgradFwdFvarFvarMatrix,to_fvar_matrix_matrix) {
+  using stan::math::matrix_d;
+  using stan::agrad::matrix_ffv;
+  using stan::agrad::matrix_fv;
+
+  matrix_fv val(3,3);
+  matrix_fv d(3,3);
+  
+  val <<1,2,3,4,5,6,7,8,9;
+  d <<10,11,12,13,14,15,16,17,18;
+  
+  matrix_ffv output = stan::agrad::to_fvar(val,d);
+  EXPECT_FLOAT_EQ(1, output(0,0).val_.val());
+  EXPECT_FLOAT_EQ(2, output(0,1).val_.val());
+  EXPECT_FLOAT_EQ(3, output(0,2).val_.val());
+  EXPECT_FLOAT_EQ(4, output(1,0).val_.val());
+  EXPECT_FLOAT_EQ(5, output(1,1).val_.val());
+  EXPECT_FLOAT_EQ(6, output(1,2).val_.val());
+  EXPECT_FLOAT_EQ(7, output(2,0).val_.val());
+  EXPECT_FLOAT_EQ(8, output(2,1).val_.val());
+  EXPECT_FLOAT_EQ(9, output(2,2).val_.val());
+  EXPECT_FLOAT_EQ(10, output(0,0).d_.val());
+  EXPECT_FLOAT_EQ(11, output(0,1).d_.val());
+  EXPECT_FLOAT_EQ(12, output(0,2).d_.val());
+  EXPECT_FLOAT_EQ(13, output(1,0).d_.val());
+  EXPECT_FLOAT_EQ(14, output(1,1).d_.val());
+  EXPECT_FLOAT_EQ(15, output(1,2).d_.val());
+  EXPECT_FLOAT_EQ(16, output(2,0).d_.val());
+  EXPECT_FLOAT_EQ(17, output(2,1).d_.val());
+  EXPECT_FLOAT_EQ(18, output(2,2).d_.val());
+}

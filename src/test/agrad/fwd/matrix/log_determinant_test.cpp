@@ -1,9 +1,9 @@
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <gtest/gtest.h>
 #include <stan/agrad/fwd/matrix/log_determinant.hpp>
-#include <stan/agrad/rev/matrix/multiply.hpp>
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/agrad/var.hpp>
+#include <stan/agrad/rev/matrix/multiply.hpp>
 
 TEST(AgradFwdMatrix,log_determinant) {
   using stan::agrad::matrix_fv;

@@ -41,6 +41,18 @@ namespace stan {
       return m;
     }
 
+    inline 
+    matrix_fvv 
+    to_fvar(const matrix_fvv& m) {
+      return m;
+    }
+
+    inline 
+    matrix_ffv 
+    to_fvar(const matrix_ffv& m) {
+      return m;
+    }
+
     inline
     vector_fv 
     to_fvar(const stan::math::vector_d& v) {
@@ -57,6 +69,18 @@ namespace stan {
     }
 
     inline 
+    vector_fvv 
+    to_fvar(const vector_fvv& v) {
+      return v;
+    }
+
+    inline 
+    vector_ffv 
+    to_fvar(const vector_ffv& v) {
+      return v;
+    }
+
+    inline 
     row_vector_fv 
     to_fvar(const stan::math::row_vector_d& rv) {
       row_vector_fv rv_v(rv.size());
@@ -68,6 +92,18 @@ namespace stan {
     inline 
     row_vector_fv 
     to_fvar(const row_vector_fv& rv) {
+      return rv;
+    }
+
+    inline 
+    row_vector_fvv 
+    to_fvar(const row_vector_fvv& rv) {
+      return rv;
+    }
+
+    inline 
+    row_vector_ffv 
+    to_fvar(const row_vector_ffv& rv) {
       return rv;
     }
 

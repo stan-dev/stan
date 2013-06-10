@@ -3,6 +3,7 @@
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <stan/agrad/fvar.hpp>
+#include <stan/agrad/var.hpp>
 
 TEST(AgradFwdMatrix,mv_trace) {
   using stan::math::trace;
@@ -20,4 +21,39 @@ TEST(AgradFwdMatrix,mv_trace) {
   fvar<double> s = trace(a);
   EXPECT_FLOAT_EQ(9.0,s.val_);
   EXPECT_FLOAT_EQ(2.0,s.d_);
+}  
+TEST(AgradFwdFvarVarMatrix,mv_trace) {
+  using stan::math::trace;
+  using stan::agrad::matrix_fvv;
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+
+  matrix_fvv a(2,2);
+  a << -1.0, 2.0, 
+    5.0, 10.0;
+   a(0,0).d_ = 1.0;
+   a(0,1).d_ = 1.0;
+   a(1,0).d_ = 1.0;
+   a(1,1).d_ = 1.0;
+  
+  fvar<var> s = trace(a);
+  EXPECT_FLOAT_EQ(9.0,s.val_.val());
+  EXPECT_FLOAT_EQ(2.0,s.d_.val());
+}
+TEST(AgradFwdFvarFvarMatrix,mv_trace) {
+  using stan::math::trace;
+  using stan::agrad::matrix_ffv;
+  using stan::agrad::fvar;
+
+  matrix_ffv a(2,2);
+  a << -1.0, 2.0, 
+    5.0, 10.0;
+  a(0,0).d_ = 1.0;
+  a(0,1).d_ = 1.0;
+  a(1,0).d_ = 1.0;
+  a(1,1).d_ = 1.0;
+  
+  fvar<fvar<double> > s = trace(a);
+  EXPECT_FLOAT_EQ(9.0,s.val_.val());
+  EXPECT_FLOAT_EQ(2.0,s.d_.val());
 }  
