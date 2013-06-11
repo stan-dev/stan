@@ -36,14 +36,18 @@ namespace stan {
 
       //negative integers and zero return postiive infinity
       //see http://mathworld.wolfram.com/PolygammaFunction.html
-      if ((x <= 0.0) && (floor(x) == x))
-        return positive_infinity();
+      if ((x <= 0.0) && (floor(x) == x)) {
+        value = positive_infinity();
+        return value;
+      }
 
       //negative non-integers: use the reflection formula 
       //see http://mathworld.wolfram.com/PolygammaFunction.html
-      if((x <= 0) && (floor(x) != x))
-        return -trigamma(-x + 1.0) + (pi() / sin(-pi() * x)) 
+      if((x <= 0) && (floor(x) != x)) {
+        value = -trigamma(-x + 1.0) + (pi() / sin(-pi() * x)) 
           * (pi() / sin(-pi() * x));
+        return value;
+      }
 
       //small value approximation if x <= small.
       if (x <= small)
@@ -55,7 +59,7 @@ namespace stan {
       value = 0.0;  
       while (z < large) {
         value += 1.0 / (z * z);
-        z++;
+        z += 1.0;
       }
 
       //asymptotic expansion as a Laurent series if x >= large

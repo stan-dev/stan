@@ -68,5 +68,5 @@ TEST(AgradFvarFvar, lbeta) {
   EXPECT_FLOAT_EQ(lbeta(3.0,6.0), a.val_.val_);
   EXPECT_FLOAT_EQ(digamma(3.0) - digamma(9.0), a.val_.d_);
   EXPECT_FLOAT_EQ(digamma(6.0) - digamma(9.0), a.d_.val_);
-  EXPECT_FLOAT_EQ(1.0729231, a.d_.d_);
+  EXPECT_FLOAT_EQ(-0.11751202, a.d_.d_);
 }
