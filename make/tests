@@ -42,27 +42,19 @@ UNIT_TESTS := $(UNIT_TESTS:src/test/%_test.cpp=test/%)
 UNIT_TESTS := $(filter-out $(MODEL_TESTS),$(UNIT_TESTS))
 
 ##
-# Target to precompile all headers that are under src/stan 
-# and end with *.hpp. Headers ending with *.h are ignored.
+# Target to compile all headers that are under src/stan 
+# and end with *.hpp.
 ##
-HEADER_TESTS := $(shell find src/stan -name '*.hpp' -type f)
+HEADER_TESTS := $(addsuffix -test,$(shell find src/stan -name '*.hpp' -type f))
 ifeq ($(OS),win)
-	BITBUCKET = nul
+	DEV_NULL = nul
 else
-	BITBUCKET = /dev/null
+	DEV_NULL = /dev/null
 endif
 
-.PHONY: test-headers
-test-headers: $(HEADER_TESTS)
-	@echo
-	@echo 'Testing whether all relevant headers can be precompiled'
-	@$(MAKE) $(patsubst src/stan/%.hpp,src/stan/%$(PCH),$(HEADER_TESTS))
-	@echo
-	@echo 'All relevant headers do precompile'
+%.hpp-test : %.hpp
+	$(COMPILE.c) -O$O $< -o $(DEV_NULL)
 
-.SUFFIXES: $(PCH) .hpp
-.hpp$(PCH):
-	$(CC) -x c++-header -c $(CFLAGS) -O$(O) -o $(BITBUCKET) $<
 
 
 GENERATED_AGRAD_TESTS := $(shell find src/test/agrad/distributions -type f -name '*_test.hpp')
@@ -82,8 +74,11 @@ src/test/agrad/distributions/%_00000_generated_test.cpp : test/agrad/distributio
 test-distributions: $(GENERATED_AGRAD_TESTS)
 	@$(MAKE) $(patsubst src/%_test.cpp,runtest/%,$(shell find src/test/agrad/distributions -type f -name '*_generated_test.cpp'))
 
+.PHONY: test-headers
+test-headers: $(HEADER_TESTS)
+
 .PHONY: test-unit
-test-unit: test-headers $(addprefix runtest/,$(UNIT_TESTS))
+test-unit: $(addprefix runtest/,$(UNIT_TESTS))
 
 ##
 # Target to build all tests
