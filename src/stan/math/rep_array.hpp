@@ -1,23 +1,13 @@
 #ifndef __STAN__MATH__REP_ARRAY_HPP__
 #define __STAN__MATH__REP_ARRAY_HPP__
 
-#include <stdexcept>
 #include <vector>
 
-#include <stan/math/matrix/Eigen.hpp>
+#include <stan/math/validate_non_negative_rep.hpp>
 
 namespace stan {
 
   namespace math {
-
-    inline void validate_non_negative_rep(int n, const std::string& fun) {
-      if (n >= 0) return;
-      std::stringstream msg;
-      msg << "error in " << fun
-          << "; number of replications must be positive"
-          << "; found n=" << n;
-      throw std::domain_error(msg.str());
-    }
 
     template <typename T>
     inline std::vector<T>

@@ -131,14 +131,14 @@ namespace stan {
       void print_timing(double warmDeltaT, double sampleDeltaT, std::ostream* stream) {
         if(!stream) return;
         
-        std::string prefix("Elapsed Time: ");
+        std::string prefix("# Elapsed Time: ");
         
         *stream << std::endl
                 << prefix << warmDeltaT
-                << " seconds (Warm Up)"  << std::endl
-                << std::string(prefix.size(), ' ') << sampleDeltaT
+                << " seconds (Warm-up)"  << std::endl
+                << "#" << std::string(prefix.size() - 1, ' ') << sampleDeltaT
                 << " seconds (Sampling)"  << std::endl
-                << std::string(prefix.size(), ' ') << warmDeltaT + sampleDeltaT
+                << "#" << std::string(prefix.size() - 1, ' ') << warmDeltaT + sampleDeltaT
                 << " seconds (Total)"  << std::endl
                 << std::endl;
       }
