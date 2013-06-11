@@ -17,7 +17,9 @@ namespace stan {
       using boost::spirit::qi::char_;
       using boost::spirit::qi::eol;
       whitespace 
-        = ( omit["/*"] >> *(char_ - "*/") > omit["*/"] )
+        = ( ( omit["/*"] 
+              >> *(char_ - "*/") )
+            > omit["*/"] )
         | ( omit["//"] >> *(char_ - eol) )
         | ( omit["#"] >> *(char_ - eol) )
         | boost::spirit::ascii::space_type()

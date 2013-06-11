@@ -160,3 +160,20 @@ TEST(AgradFvar, sort) {
   test_sort_desc(vec6);
 
 }
+
+TEST(AgradFvar, sort_no_thrown) {
+  AVEC vec0;
+  EXPECT_EQ(0, vec0.size());
+  EXPECT_NO_THROW(sort_asc(vec0));
+  EXPECT_NO_THROW(sort_desc(vec0));
+  
+  Eigen::Matrix<AVAR,Eigen::Dynamic,1> vec1;
+  EXPECT_EQ(0, vec1.size());
+  EXPECT_NO_THROW(sort_asc(vec1));
+  EXPECT_NO_THROW(sort_desc(vec1));
+
+  Eigen::Matrix<AVAR,1,Eigen::Dynamic> vec2;
+  EXPECT_EQ(0, vec2.size());
+  EXPECT_NO_THROW(sort_asc(vec2));
+  EXPECT_NO_THROW(sort_desc(vec2));
+}

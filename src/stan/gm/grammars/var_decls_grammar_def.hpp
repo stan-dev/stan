@@ -400,13 +400,26 @@ namespace stan {
         if (len >= 2
             && identifier[len-1] == '_'
             && identifier[len-2] == '_') {
-          error_msgs << "variable identifier (name) cannot end in double underscore (__)"
-                     << "; found identifer=" << identifier;
+          error_msgs << "variable identifier (name) may not end in double underscore (__)"
+                     << std::endl
+                     << "    found identifer=" << identifier << std::endl;
+          return false;
+        }
+        size_t period_position = identifier.find('.');
+        if (period_position != std::string::npos) {
+          error_msgs << "variable identifier may not contain a period (.)"
+                     << std::endl
+                     << "    found period at position (indexed from 0)=" << period_position
+                     << std::endl
+                     << "    found identifier=" << identifier 
+                     << std::endl;
           return false;
         }
         if (reserved_word_set_.find(identifier) != reserved_word_set_.end()) {
-          error_msgs << "variable identifier (name) cannot be reserved word"
-                     << "; found identifier=" << identifier;
+          error_msgs << "variable identifier (name) may not be reserved word"
+                     << std::endl
+                     << "    found identifier=" << identifier 
+                     << std::endl;
           return false;
         }
         return true;
@@ -607,8 +620,8 @@ namespace stan {
 
       int_decl_r.name("integer declaration");
       int_decl_r 
-        %= lit("int")
-        >> no_skip[!char_("a-zA-Z0-9_")]
+        %= ( lit("int")
+             >> no_skip[!char_("a-zA-Z0-9_")] )
         > -range_brackets_int_r(_r1)
         // >> (lit(' ') | lit('\n') | lit('\t') | lit('\r'))
         > identifier_r 
@@ -617,8 +630,8 @@ namespace stan {
 
       double_decl_r.name("real declaration");
       double_decl_r 
-        %= lit("real")
-        >> no_skip[!char_("a-zA-Z0-9_")]
+        %= ( lit("real")
+             >> no_skip[!char_("a-zA-Z0-9_")] )
         > -range_brackets_double_r(_r1)
         > identifier_r
         > opt_dims_r(_r1)

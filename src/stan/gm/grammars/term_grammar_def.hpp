@@ -514,8 +514,8 @@ namespace stan {
       args_r.name("function argument expressions");
       args_r 
         %= (lit('(') >> lit(')'))
-        | ( lit('(')
-            >> (expression_g(_r1) % ',')
+        | ( ( lit('(')
+              >> (expression_g(_r1) % ',') )
             > lit(')') )
         ;
 

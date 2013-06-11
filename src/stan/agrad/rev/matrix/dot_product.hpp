@@ -40,19 +40,23 @@ namespace stan {
         
         inline static double var_dot(vari** v1, vari** v2,
                                      size_t length) {
-          double result = 0;
-          for (size_t i = 0; i < length; i++)
-            result += v1[i]->val_ * v2[i]->val_;
-          return result;
+          Eigen::VectorXd vd1(length), vd2(length);
+          for (size_t i = 0; i < length; i++) {
+            vd1[i] = v1[i]->val_;
+            vd2[i] = v2[i]->val_;
+          }
+          return vd1.dot(vd2);
         }
 
         inline static double var_dot(const T1* v1, const T2* v2,
                                      size_t length) {
           using stan::math::value_of;
-          double result = 0;
-          for (size_t i = 0; i < length; i++)
-            result += value_of(v1[i]) * value_of(v2[i]);
-          return result;
+          Eigen::VectorXd vd1(length), vd2(length);
+          for (size_t i = 0; i < length; i++) {
+            vd1[i] = value_of(v1[i]);
+            vd2[i] = value_of(v2[i]);
+          }
+          return vd1.dot(vd2);
         }
         
         template<typename Derived1,typename Derived2>
@@ -60,10 +64,12 @@ namespace stan {
                                      const Eigen::DenseBase<Derived2> &v2) {
           using stan::agrad::value_of;
           using stan::math::value_of;
-          double result = 0;
-          for (int i = 0; i < v1.size(); i++)
-            result += value_of(v1[i]) * value_of(v2[i]);
-          return result;
+          Eigen::VectorXd vd1(v1.size()), vd2(v1.size());
+          for (size_t i = 0; i < v1.size(); i++) {
+            vd1[i] = value_of(v1[i]);
+            vd2[i] = value_of(v2[i]);
+          }
+          return vd1.dot(vd2);
         }
         inline void chain(vari** v1, vari** v2) {
           for (size_t i = 0; i < length_; i++) {

@@ -487,8 +487,8 @@ namespace stan {
 
       assignment_r.name("variable assignment by expression");
       assignment_r
-        %= var_lhs_r(_r1)
-        >> lit("<-")
+        %= ( var_lhs_r(_r1)
+             >> lit("<-") )
         > expression_g(_r1)
         > lit(';') 
         ;
@@ -514,8 +514,8 @@ namespace stan {
       // inherited  _r1 = true if samples allowed as statements
       sample_r.name("distribution of expression");
       sample_r 
-        %= expression_g(_r2)
-        >> lit('~')
+        %= ( expression_g(_r2)
+             >> lit('~') )
         > eps
         [_pass 
          = validate_allow_sample_f(_r1,boost::phoenix::ref(error_msgs_))] 
@@ -525,9 +525,9 @@ namespace stan {
 
       distribution_r.name("distribution and parameters");
       distribution_r
-        %= identifier_r
-        >> lit('(')
-        >> -(expression_g(_r1) % ',')
+        %= ( identifier_r
+             >> lit('(')
+             >> -(expression_g(_r1) % ',') )
         > lit(')');
 
       truncation_range_r.name("range pair");

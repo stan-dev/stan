@@ -211,7 +211,7 @@ clean-models:
 	$(RM) -r models $(MODEL_HEADER).gch $(MODEL_HEADER).pch $(MODEL_HEADER).d
 
 clean-all: clean clean-dox clean-manual clean-models
-	$(RM) -r test bin doc
+	$(RM) -r test/* bin doc
 	$(RM) $(wildcard *.d) $(wildcard *.o)
 	$(RM) src/test/gm/model_specs/compiled/*.cpp src/test/gm/model_specs/compiled/*.o $(patsubst %.stan,%$(EXE),$(wildcard src/test/gm/model_specs/compiled/*.stan))
 	cd src/test/agrad/distributions/univariate/continuous; $(RM) *_generated_test.cpp

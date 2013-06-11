@@ -65,6 +65,7 @@ public:
     expected_help_options.push_back("data");
     expected_help_options.push_back("init");
     expected_help_options.push_back("samples");
+    expected_help_options.push_back("diagnostics");
     expected_help_options.push_back("append_samples");
     expected_help_options.push_back("seed");
     expected_help_options.push_back("chain_id");
@@ -83,7 +84,7 @@ public:
     expected_help_options.push_back("test_grad");
     expected_help_options.push_back("point_estimate");
     expected_help_options.push_back("point_estimate_newton\n");
-    expected_help_options.push_back("point_estimate_bfgs\n");
+    expected_help_options.push_back("point_estimate_nesterov\n");
     expected_help_options.push_back("nondiag_mass");
     expected_help_options.push_back("cov_matrix");
 

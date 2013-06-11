@@ -9,15 +9,6 @@ TEST(AgradFvar, pow) {
 
   fvar<double> x(0.5);
   x.d_ = 1.0;
-  double y = 5.0;
-
-  fvar<double> a = pow(x, y);
-  EXPECT_FLOAT_EQ(pow(0.5, 5.0), a.val_);
-  EXPECT_FLOAT_EQ(5.0 * pow(0.5, 5.0 - 1.0), a.d_);
-
-  fvar<double> b = pow(y, x);
-  EXPECT_FLOAT_EQ(pow(5.0, 0.5), b.val_);
-  EXPECT_FLOAT_EQ(log(5.0) * pow(5.0, 0.5), b.d_);
 
   fvar<double> z(1.2);
   z.d_ = 2.0;
