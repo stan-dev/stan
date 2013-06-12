@@ -9,6 +9,7 @@
 #include <stan/math/error_handling.hpp>
 #include <stan/math/functions/inv_logit.hpp>
 #include <stan/math/functions/log1m.hpp>
+#include <stan/math/functions/log1m_exp.hpp>
 #include <stan/math/functions/log1p_exp.hpp>
 #include <stan/math/matrix_error_handling.hpp>
 #include <stan/math/error_handling.hpp>
@@ -23,9 +24,9 @@ namespace stan {
     template <typename T>
     inline T log_inv_logit_diff(const T& alpha, const T& beta) {
       using std::exp;
-      using stan::math::log1m;
+      using stan::math::log1m_exp;
       using stan::math::log1p_exp;
-      return beta + log1m(exp(alpha - beta)) - log1p_exp(alpha) - log1p_exp(beta);
+      return beta + log1m_exp(alpha - beta) - log1p_exp(alpha) - log1p_exp(beta);
     }
  
     // y in 0,...,K-1;   c.size()==K-2,  c increasing,  lambda finite

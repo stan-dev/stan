@@ -34,6 +34,7 @@
 #include <stan/math/matrix/get_base1_lhs.hpp>
 #include <stan/math/matrix/head.hpp>
 #include <stan/math/matrix/inverse.hpp>
+#include <stan/math/matrix/inverse_spd.hpp>
 #include <stan/math/matrix/ldlt.hpp>
 #include <stan/math/matrix/log.hpp>
 #include <stan/math/matrix/log_determinant.hpp>
@@ -53,6 +54,7 @@
 #include <stan/math/matrix/prod.hpp>
 #include <stan/math/matrix/promote_common.hpp>
 #include <stan/math/matrix/promoter.hpp>
+#include <stan/math/matrix/quad_form.hpp>
 #include <stan/math/matrix/rank.hpp>
 #include <stan/math/matrix/resize.hpp>
 #include <stan/math/matrix/row.hpp>
@@ -73,6 +75,8 @@
 #include <stan/math/matrix/tail.hpp>
 #include <stan/math/matrix/tcrossprod.hpp>
 #include <stan/math/matrix/trace.hpp>
+#include <stan/math/matrix/trace_quad_form.hpp>
+#include <stan/math/matrix/trace_gen_quad_form.hpp>
 #include <stan/math/matrix/transpose.hpp>
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/math/matrix/validate_column_index.hpp>

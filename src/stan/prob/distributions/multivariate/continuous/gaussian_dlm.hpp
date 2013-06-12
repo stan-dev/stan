@@ -12,14 +12,11 @@
 #include <stan/agrad/agrad.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/agrad/matrix.hpp>
-#include <stan/math/matrix/dot_product.hpp>
 #include <stan/math/matrix/log.hpp>
-#include <stan/math/matrix/multiply.hpp>
-#include <stan/math/matrix/rows_dot_product.hpp>
 #include <stan/math/matrix/subtract.hpp>
 #include <stan/math/matrix/sum.hpp>
-
-#include <stan/math/matrix/ldlt.hpp>
+#include <stan/math/matrix/multiply.hpp>
+#include <stan/math/matrix/row.hpp>
 
 // TODO: y as vector of vectors or matrix?
 
@@ -32,13 +29,13 @@ namespace stan {
      * have a scaled kernel matrix with a different scale for each output dimension.
      * This distribution is equivalent to, for \f$t = 1:N$,
      * \f{eqnarray*}{
-     * y_t & \sim N(F' \theta_t, V) \\
+     * y_t & \sim N(F \theta_t, V) \\
      * \theta_t & \sim N(G \theta_{t-1}, W) \\
      * \theta_0 & \sim N(0, diag(10^{6}))
      * }
      *
      * @param y A r x T matrix of observations.
-     * @param F A n x r matrix. The design matrix.
+     * @param F A r x n matrix. The design matrix.
      * @param G A n x n matrix. The transition matrix.
      * @param V A r x r matrix. The observation covariance matrix.
      * @param W A n x n matrix. The state covariance matrix.
@@ -74,11 +71,7 @@ namespace stan {
       using stan::math::check_positive;
       using stan::math::check_finite;
       using stan::math::check_symmetric;
-      using stan::math::dot_product;
-      using stan::math::rows_dot_product;
-      using stan::math::log_determinant_ldlt;
-      using stan::math::mdivide_right_ldlt;
-      using stan::math::LDLT_factor;
+      using stan::math::multiply;
 
       int r = y.rows(); // number of variables
       int T = y.cols(); // number of observations
@@ -86,12 +79,12 @@ namespace stan {
 
       // check F
       if (!check_size_match(function,
-                            F.cols(), "columns of F",
-                            y.cols(), "rows of y",
+                            F.rows(), "rows of F",
+                            y.rows(), "rows of y",
                             &lp))
         return lp;
       if (!check_size_match(function,
-                            F.rows(), "rows of F",
+                            F.cols(), "columns of F",
                             G.rows(), "rows of G",
                             &lp))
         return lp;
@@ -117,10 +110,46 @@ namespace stan {
       
       if (include_summand<propto,T_y,T_F,T_G,T_V,T_W>::value) {
         // TODO: make arguments
-        Eigen::VectorXd m0 = Eigen::VectorXd::Zero(r);
-        Eigen::MatrixXd C0 = Eigen::MatrixXd::Identity(r, r) * 10e6;
+        Eigen::Matrix<typename 
+                      boost::math::tools::promote_args<T_y,T_F,T_G,T_V,T_W>::type,
+                      Eigen::Dynamic, 1> m(n);
+        for (int i = 0; i < y.size(); i ++)
+          m(i) = 0.0;
+        Eigen::Matrix<typename 
+                      boost::math::tools::promote_args<T_y,T_F,T_G,T_V,T_W>::type,
+                      Eigen::Dynamic, Eigen::Dynamic> C(n, n);
+        for (int i = 0; i < y.rows(); i ++)
+          for (int j = 0; j < y.cols(); i ++)
+            if (i == j)
+              C(i, j) = 1.0;
+            else
+              C(i, j) = 0.0;
+
+        Eigen::Matrix<typename 
+                      boost::math::tools::promote_args<T_y,T_F,T_G,T_V,T_W>::type,
+                      Eigen::Dynamic, 1> a(n);
+        Eigen::Matrix<typename
+                      boost::math::tools::promote_args<T_y,T_F,T_G,T_V,T_W>::type,
+                      Eigen::Dynamic, Eigen::Dynamic> R(n, n);
+        // Eigen::VectorXd f;
+        // Eigen::VectorXd e;
+        // Eigen::MatrixXd Q;
+        // Eigen::MatrixXd A;
 
         for (int i = 0; i < n; ++i) {
+          // Predict
+          a = G * m;
+          R = G * C * G.transpose() + W;
+          // R = 0.5 * (R + transpose(R));
+          // // one set ahead
+          // f = F * a;          
+          // Q = F * R * transpose(F) + V;
+          // // filter
+          // e = row(y, i + 1) - f;
+          // A = R * transpose(F) * invserse(Q);
+          // m = a + A * e;
+          // C = R - A * Q * transpose(A);
+          // C = 0.5 * (C + transpose(C));
           lp += 1;
         }
       }

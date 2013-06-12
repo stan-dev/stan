@@ -13,7 +13,7 @@ namespace stan {
      *
      * This function is related to other special functions by:
      *
-     * <code>log_1p_exp(x) </code>
+     * <code>log1p_exp(x) </code>
      *
      * <code> = log1p(exp(a))</code>
      *
