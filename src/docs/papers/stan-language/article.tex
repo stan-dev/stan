@@ -1,0 +1,796 @@
+\documentclass[article]{jss}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% declarations for jss.cls %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% almost as usual
+\author{{\bf\large Bob Carpenter}
+        \\ Columbia University
+        %
+        \\[9pt]
+        %
+        {\bf\large Daniel Lee}
+        \\ Columbia University
+        %
+        \\[9pt]
+        %
+        {\bf\large Marcus Brubaker}
+        \\ Toyota Technological Institute
+        %
+    \And
+        %
+        {\bf\large Andrew Gelman}
+        \\ Columbia University
+        %
+        \\[9pt]
+        %
+        {\bf\large Ben Goodrich}
+        \\ Columbia University
+        %
+        \\[9pt]
+        %
+        {\bf\large Jiqiang Guo}
+        \\ Columbia Univesity
+        %
+     \And
+        %
+        {\bf\large Matt Hoffman}
+        \\ Adobe Research Labs
+        %
+        \\[9pt]
+        %
+        {\bf\large Michael Betancourt}
+        \\ University College London
+        %
+        \\[9pt]
+        %
+        {\bf\large Peter Li}
+        \\ Columbia University
+}
+\title{\proglang{Stan}: A Probabilistic Programming Language}
+
+%% for pretty printing and a nice hypersummary also set:
+\Plainauthor{Bob Carpenter, Andrew Gelman, Matt Hoffman, 
+  Daniel Lee, Ben Goodrich, Michael Betancourt, 
+  Marcus Brubaker, Jiqiang Guo, Peter Li} %% comma-separated
+\Plaintitle{Stan: A Probabilistic Programming Language} %% without formatting
+\Shorttitle{Stan: A Probabilistic Programming Language} %% a short title (if necessary)
+
+%% an abstract and keywords
+\Abstract{ \proglang{Stan} is a probabilistic programming language for
+  specifying statistical models. A \proglang{Stan} program defines a
+  log probability function over parameters.  Other variable types
+  include (transformed) data, transformed parameters, and generated
+  quantities. Variables in \proglang{Stan} programs are strongly typed
+  and may be declared with constraints, such as positivity for a
+  scalar or positive definiteness for a matrix. Statements, such 
+  as assignment, sampling, conditionals, and loops, are executed
+  imperatively in the order they are written.
+  %
+  % Constrained variables
+  % are automatically transformed and the log Jacobian adjustment made
+  % to the probability function.
+  % 
+
+  Full Bayesian inference is supported through Markov chain Monte
+  Carlo (MCMC) methods such as the no-U-turn Hamiltonian Monte
+  Carlo sampler (NUTS).  Penalized maximum likelihood estimates
+  are calculated using optimization methods such as BFGS.
+  % 
+  % \proglang{Stan} programs are translated to \proglang{C++}
+  % and compiled.  The target \proglang{C++} code includes an
+  % extensible
+  % custom library of special functions, matrix and linear algebra
+  % operations, and probability mass, density and cumulative
+  % distribution functions.  Functions are vectorized and support
+  % higher-order algorithmic
+  % differentiation to calculate gradients, Hessians, and
+  % Hessian-vector products efficiently up to machine precision.
+  % 
+  % There is an extensive I/O library to deal with constrained
+  % variable input for data, initialization for parameters, and output
+  % for samples or point estimates.  
+  %
+  \proglang{Stan} can be called from the command line or through \proglang{R} using
+  the \pkg{RStan} package.  Both interfaces support running samplers
+  or optimizers and analyzing the resulting inferences.
+}
+
+\Keywords{
+  probabilistic programming,
+%  Bayesian inference,
+%  Markov chain Monte Carlo (MCMC), 
+%  Hamiltonian Monte Carlo (HMC), 
+  no-U-turn sampler (NUTS),
+%  penalized maximum likelihood, 
+%  BFGS, 
+%  \proglang{C++}
+  \proglang{Stan}} %% at least one keyword must be supplied
+%
+\Plainkeywords{
+  probabilistic programming,
+%  Bayesian inference,
+%  Markov chain Monte Carlo (MCMC), 
+%  Hamiltonian Monte Carlo (HMC), 
+  no-U-turn sampler(NUTS),
+%  penalized maximum likelihood, 
+%  BFGS, 
+%  C++
+  Stan}  %% without formatting
+
+%% publication information
+%% NOTE: Typically, this can be left commented and will be filled out by the technical editor
+%% \Volume{50}
+%% \Issue{9}
+%% \Month{June}
+%% \Year{2012}
+%% \Submitdate{2012-06-04}
+%% \Acceptdate{2012-06-04}
+
+%% The address of (at least) one author should be given
+%% in the following format:
+\Address{
+  Bob Carpenter
+  \\
+  Department of Statistics
+  \\ 
+  Columbia University
+  \\ 
+  1255 Amsterdam Avenue
+  \\ 
+  New York, NY 10027
+  \\
+  U.S.A.
+  \\
+  E-mail: \email{carp@stat.columbia.edu}
+  \\ 
+  URL: \url{http://mc-stan.org/}
+}
+%% It is also possible to add a telephone and fax number
+%% before the e-mail in the following format:
+%% Telephone: +43/512/507-7103
+%% Fax: +43/512/507-2851
+
+%% for those who use Sweave please include the following line (with % symbols):
+%% need no \usepackage{Sweave.sty}
+
+%% end of declarations %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{document}
+
+%% include your article here, just as usual
+%% Note that you should use the \pkg{}, \proglang{} and \code{} commands.
+
+\section[Why Stan?]{Why \proglang{Stan}?}
+%% Note: If there is markup in \(sub)section, then it has to be escape as above.
+
+We did not set out to build \proglang{Stan} as it currently exists.
+We set out to apply full Bayesian inference to the sort of multilevel
+generalized linear models discussed in Part~II of
+\citep{GelmanHill:2007}.  These models are structured with grouped and
+interacted predictors at multiple levels, hierarchical covariance
+priors, nonconjugate coefficient priors, latent effects as in
+item-response models, and varying output link functions and
+distributions.
+
+The models we wanted to fit turned out to be a challenge for existing
+general-purpose software to fit.  A direct encoding in \proglang{BUGS}
+or \proglang{JAGS} can grind these tools to a halt.  We added custom
+vectorized logistic regressions to \proglang{JAGS} using
+\proglang{C++} to overcome the cost of interpretation.  Although this
+is much faster than looping in \proglang{JAGS}, the root of the
+problem was that conditional sampling took to long to converge when
+parameters were highly correlated in the posterior, as for time-series
+models and hierarchical models with interacted predictors.  We finally
+realized we needed a better sampler, not a more efficient
+implementation.
+
+We briefly considered trying to tune proposals for a random-walk
+Metropolis-Hastings sampler, but that seemed too problem specific and
+not even necessarily possible without some kind of adaptation rather
+than tuning of the proposals. 
+
+We were hearing more about HMC (Hamiltonian Monte Carlo), which
+appeared promising but was also problematic in that the Hamiltonian
+dynamics simulation requires the gradient of the log posterior.
+Although it is possible to do this by hand on a model-by-model basis,
+it is very tedious and error prone.  That is when we discovered
+reverse-mode algorithmic differentiation, which lets you write down a
+templated \proglang{C++} function for the log posterior and
+automatically compute a proper analytic gradient up to machine
+precision accuracy in only a few multiples of the cost to evaluate the
+log probability function itself.  We explored existing algorithmic
+differentiation packages with open licenses such as {\sc rad}
+\citep{Gay:2005} and its repackaging in the Sacado module of the
+Trilinos toolkit and the {\small CppAD} package in the {\sc coin-or}
+toolkit.  But neither package supported very many special functions
+(e.g., probability functions, log gamma, inverse logit) or linear
+algebra operations (e.g., Cholesky decomposition) and were not easily
+and modularly extensible.
+
+So we built our own reverse-mode algorithmic differentiation package.
+At that point, we ran into the problem problem that we could not just
+plug in the probability functions from a package like \pkg{Boost} because
+they weren't templated generally enough across all the arguments.
+Rather than pay the price of promoting floating point values to
+automatic differentiation variables, we wrote our own fully templated
+probability functions and other special functions.
+
+Next, we integrated the \proglang{C++} package \pkg{Eigen} for matrix
+operations and linear algebra functions.  \pkg{Eigen} makes extensive use of
+expression templates for lazy evaluation and the CRTP (curiously
+recurring template pattern) to implement concepts without virtual
+function calls.  But we ran into the same problem with Eigen as with
+the existing probability libraries --- it doesn't support mixed
+operations of algorithmic differentiation variables and primitives
+like \code{double}.  Although we initially begain by promoting
+floating-point vectors to automatic differentiation variables, we
+later completely rewrote our matrix library to efficiently compute
+derivatives using rules described in \citep{Giles:??,book:??}.
+
+At this point, we could fit models coded directly in \proglang{C++} on
+top of the pre-release versions of the \proglang{Stan} API
+(application programming interface).  Seeing how well this all worked,
+we set our sights on the generality and ease of use of
+\proglang{BUGS}.  So we designed a modeling language in which
+statisticians could write their models in familiar notation that could
+be transformed to efficient \proglang{C++} code and then compiled into
+an efficient executable program.  This paper is primarily about this
+language and how it describes models.
+ 
+The next problem we ran into as we started implementing richer models
+is variables with constrained support, such as simplexes and
+covariance matrices.  Although it is possible to implement HMC with
+bouncing for simple boundary constraints (e.g., positive scale or
+precision parameters), it is not so easy with more complex
+multivariate constraints.  To get around this problem, we introduced
+typed variables and automatically transformed them to unconstrained
+support with suitable adjustments to the log probability from the log
+absolute Jacobian determinant of the inverse transforms.
+
+Even with the prototype compiler generating models, we still faced a
+major hurdle to ease of use. The efficiency of HMC is very sensitive
+to two tuning parameters, discretization interval and a total
+simulation time (equivalently for simple HMC, step size and number of
+steps).  The step size parameter could be tuned during warm-up based
+on Metropolis rejection rates, but the number of steps was not so easy
+to tune while maintaining detailed balance in the sampler.  This led
+to the development of the NUTS (no U-turn) sampler
+\citep{Hoffman-Gelman:2012}.  Roughly speaking, NUTS extends the
+trajectory along which the Metropolis proposal for the next state is
+calculated randomly in both direction until the path makes a U-turn
+and begins retracing its steps.
+
+We thought we were home free at this point.  But when we measured the
+speed of some \proglang{BUGS} examples versus \proglang{Stan}, we were
+very disappointed.  \proglang{BUGS}'s very first example model, Rats,
+ran more than an order of magnitude faster in \proglang{JAGS} than in
+\proglang{Stan}.  Rats is a tough test case because the conjugate
+priors and lack of posterior correlations make it an ideal candidate
+for efficient Gibbs sampling.  
+
+We realized we were doing redundant calculations, so we wrote a
+vectorized form of the normal distribution for multiple variates with
+the same mean and scale, which sped things up a bit. At the same time,
+we introduced some simple template metaprograms to remove the
+calculation of constant terms in the log probability.  This also
+improved speed, but not enough.  Finally, we figured out how to both
+vectorize and partially evaluate the gradients of the densities using
+a combination of expression templates and metaprogramming. 
+
+Later, when we were trying to fit a time-series model, we found that
+normalizing the data to unit sample mean and variance sped up the fits
+by an order of magnitude.  Although basic HMC and NUTS are rotation
+invariant (explaining why they can sample effectively from
+multivariate densities with high correlations), they are not scale
+invariant.  Gibbs sampling, on the other hand, is scale invariant, but
+not rotation invariant.
+
+We were still using a unit mass matrix in the simulated Hamiltonian
+dynamics.  The last tweak to \proglang{Stan} before version 1.0 was to estimate
+a diagonal mass matrix during warmup; this has since been upgraded to
+a full mass matrix in \proglang{Stan} version 1.2.  Using a mass
+matrix sped up the unscaled data models by an order of magnitude,
+though it breaks the nice theoretical property of rotation invariance.
+The full mass matrix estimation has rotational invariance as well, but
+scales less well because of the need to invert the mass matrix once
+and then do matrix multiplications every leapfrog step.
+
+\section{Overview}
+
+This section describes a simple use of \proglang{Stan} from the
+command line following a simple running example. 
+
+\subsection{Model for estimating a Bernoulli parameter}
+
+Consider estimating the chance of success parameter for a Bernoulli
+distribution based on a sequence of observed binary outcomes.  The
+\proglang{Stan} model in Figure~\ref{bernoulli-model.fig} suffices.
+%
+\begin{figure}
+\begin{Code}
+data { 
+  int<lower=0> N; 
+  int<lower=0,upper=1> y[N];
+} 
+parameters {
+  real<lower=0,upper=1> theta;
+} 
+model {
+  theta ~ beta(1,1);  // prior
+  for (n in 1:N) 
+    y[n] ~ bernoulli(theta);  // likelihood
+}
+\end{Code}
+\caption{Model for estimating a Bernoulli parameter.}\label{bernoulli-model.fig}
+\end{figure}
+%
+The model assumes the binary observed data \code{y[1],...,y[N]} are
+i.i.d.\ with Bernoulli chance-of-success \code{theta}.  The prior on
+\code{theta} is \code{beta(1,1)} (i.e., uniform).
+
+\subsubsection{Semicolons, whitespace and comments}
+
+Unlike in \proglang{R}, \proglang{BUGS}, and \proglang{JAGS}, the form
+of whitespace does not matter in \proglang{Stan}.  This allows an
+arithmetic expression such as \code{a + b} to be broken so that the
+plus sign starts a new line.  To achieve this goal, semicolons are
+used to indicate statement boundaries.
+
+Two forward slashes (\code{//}) or a single hash mark (\code{\#})
+indicate the start of a comment that continues to the end of a line.
+Longer comments may be included between the \proglang{C++} style
+comment indicators (\code{/*} and \code{*/}).
+
+\subsubsection{Implicit uniform priors}
+
+If no prior is specified for a parameter, it is implicitly given a
+uniform prior on its support.  For parameters such as \code{theta} in
+the example, which are constrained to fall between 0 and 1, this
+produces a proper uniform distribution on the support of \code{theta}.
+For parameters with unbounded support, the implicit uniform prior is
+improper.  Stan allows improper priors to be specified in models, but
+posteriors must be proper in order for sampling to succeed.  In the
+model in Figure~\ref{bernoulli-model.fig}, the sampling statement for
+\code{theta ~ beta(1,1)} could be removed becuase \code{beta(1,1)} is
+a uniform distribution.
+
+\subsubsection{Vectorizings sampling statements}
+
+Iterations of the model will be faster if the loop over sampling
+statements is vectorized, replacing the loop with the vectorized
+statement \code{y ~ bernoulli(theta)}.  Performance gains from
+vectorization are not because loops are slow in Stan, but because
+calls to sampling statements are slow.  Vectorization allows multiple
+calls to a sampling statement to be replaced with a single call that
+can share common calculations for the log probability function, its
+gradients, and error checking.  
+
+\subsection{Data format}
+
+Data for running \proglang{Stan} from the command line can be included
+in \proglang{R} dump format.  For example, 10 observations for the
+model in Figure~\ref{bernoulli-model.fig} could be encoded as follows.
+%
+\begin{Code}
+N <- 10
+y <- c(0,1,0,0,0,0,0,0,0,1)
+\end{Code}
+%
+This defines the contents of two variables, an integer \code{N} and a
+10-element integer array \code{y}.  In \pkg{RStan}, data can be passed
+directly through memory without the need to write to a file.
+
+\subsection{Compling a model}
+
+After a \proglang{C++} toolchain is installed,%
+%
+\footnote{A \proglang{C++} toolchain is built into Linux.  The 
+  \pkg{RTools} package suffices for Windows and \pkg{Xcode} for the
+  Mac.}
+%
+the Bernoulli model in Figure~\ref{bernoulli-model.fig} can be
+translated to \proglang{C++} and compiled with a single command.%
+%
+\footnote{The first time it is run it needs to build the entire
+  \proglang{Stan} translator and library with high levels of
+  optimization, so please be patient (and consider \code{make} option
+  \code{-j2} or \code{-j4} if two or four cores are available).}
+%
+\begin{CodeChunk}
+\begin{CodeInput}
+> make src/models/basic_estimators/bernoulli 
+\end{CodeInput}
+\end{CodeChunk}
+%
+This produces an executable file \code{bernoulli}
+(\code{bernoulli.exe} on Windows) on the specified path (yes, forward
+slashes are OK on Windows).
+
+\subsection{Running the model}
+
+The executable can be run as specified given a path to the data file
+(here \code{bernoulli.data.R} in the current directory; for
+Windows, reverse the slashes in the path).
+%
+\begin{CodeChunk}
+\begin{CodeInput}
+> src/models/basic_estimators/bernoulli --data=bernoulli.data.R
+\end{CodeInput}
+\end{CodeChunk}
+%
+The command-line options used, including defaults, are output to the
+terminal and written into the output CSV file.
+%
+\begin{Code}
+# Samples Generated by Stan
+#
+# stan_version_major=1
+# stan_version_minor=2
+# stan_version_patch=0
+# data=bernoulli.data.R
+# init=random initialization
+# append_samples=0
+# save_warmup=0
+# seed=1845979644
+# chain_id=1
+# iter=2000
+# warmup=1000
+# thin=1
+# equal_step_sizes=0
+# leapfrog_steps=-1
+# max_treedepth=10
+# epsilon=-1
+# epsilon_pm=0
+# delta=0.5
+# gamma=0.05
+\end{Code}
+%
+A description of all parameters is available with the \code{--help}
+option.  These allow HMC to be configured to use a unit mass matrix,
+diagonal mass matrix, or full mass matrix; these may be specified or
+tuned during warmup. The number of leapfrog steps in HMC may be
+specified; otherwise, NUTS will be used by default to adaptively
+choose the number of steps (i.e., the Hamiltonian simulation time
+interval).
+
+The usual MCMC parameters such as number of chains, number of warmup
+iterations, and thinning are also specified as options.  One option
+that is particularly helpful for debugging is to forego sampling and
+simply print the initial parameters on the unconstrained scale along
+with their gradients.  
+
+The file from which data is read can be specified, as in the example.
+Model parameters can be initialized with values specified in a file in
+the same format as data; otherwise, diffuse random initialization will
+be used.  The random number generation seed may be provided or
+generated based on clock time; reusing the same seed recreates exactly
+the same sequence of samples in the future to aid in debugging.  A
+Markov chain identifier may be specified; advancing it in the options
+for multiple chains skips the random number generator ahead to avoid
+correlation among random number sequences across different chains.
+
+After printing the command-line options, the current state of sampling
+is updated on the terminal (this will be too fast to see for this
+example).  The output CSV file continues with a header indicating what
+is printed for each sample.
+%
+\begin{Code}
+lp__,treedepth__,stepsize__,theta
+\end{Code}
+%
+The values for \code{lp\_\_} indicate the log probability (up to an
+additive constant), the tree depth and step sizes for the NUTS sampler
+(this output varies by sampler), and finally the parameter values.
+It then reports the results of adaptation.
+%
+\begin{Code}
+# step size=1.43707
+# parameter step size multipliers:
+# 1
+\end{Code}
+%
+There is one multiplier per parameter, and they are standardized to
+identify theproduct of step size and parameter size used for sampling.
+
+The rest of the file contains lines corresponding to the
+samples from each iteration.%
+%
+\footnote{There are repeated entries due to the Metropolis accept step
+in the No-U-Turn sampling algorithm.}
+%
+%
+\begin{Code}
+-7.07769,1,1.43707,0.158674
+-7.07769,1,1.43707,0.158674
+-7.37289,1,1.43707,0.130089
+-7.09254,1,1.43707,0.361906
+-7.09254,1,1.43707,0.361906
+-7.09254,1,1.43707,0.361906
+-6.96213,1,1.43707,0.337061
+...
+\end{Code}
+%
+Repeated examples occur due to Metropolis rejection in the no-U-turn
+sampler.  In each sample, a tree depth of only 1 is used and the step
+size remains constant (it may be varied uniformly at random within an
+interval).
+
+\subsection{Output analysis}
+
+\proglang{Stan} supplies a command-line program (and \pkg{RStan} an
+\proglang{R} \code{print} function) to summarize the output of one or
+more MCMC chains.  Convergence analysis includes conservative
+$\hat{R}$ convergence monitoring statistics and conservative effective
+sample size calculations on a per-parameter basis calculated using a
+combination of within-chain and across-chain statistics.  Further
+analysis includes posterior quantiles, means and and standard
+deviations per parameters, along with MCMC error estimates for the
+means.
+
+Suppose a directory contains the output of three MCMC chains for the
+same model.
+%
+\begin{CodeChunk}
+\begin{CodeInput}
+> ls samples*.csv
+\end{CodeInput}
+\begin{CodeOutput}
+samples1.csv	samples2.csv	samples3.csv
+\end{CodeOutput}
+\end{CodeChunk}
+%
+
+\begin{CodeChunk}
+\begin{CodeInput}
+> bin/print samples*.csv
+\end{CodeInput}
+\begin{CodeOutput}
+Inference for Stan model: 
+3 chains: each with iter=(1000,1000,1000); warmup=(0,0,0); 
+thin=(1,1,1); 3000 iterations saved.
+
+       mean se_mean   sd 2.5%  25%  50%  75% 97.5% n_eff Rhat
+alpha  16.2     2.0 41.5  1.4  5.2  9.7 17.6  59.2   435  1.0
+beta   10.0     1.1 22.8  0.8  3.3  6.2 11.2  37.5   405  1.0
+
+Samples were drawn using mcmc::nuts_diag.
+For each parameter, n_eff is a crude measure of effective 
+sample size, and Rhat is the potential scale reduction factor 
+on split chains (at convergence, Rhat=1).
+\end{CodeOutput}
+\end{CodeChunk}
+%
+The estimated \code{Rhat} values of 1.0 are consistent with
+convergence and the estimated number of effective samples per
+parameter (\code{n\_eff}) is in an acceptable range for inference.
+The posterior standard deviation estimate is very high compared to
+that of ethe posterior mean, indicating a great deal of posterior
+uncertainty.  Also note that the the estimated posterior medians (50\%
+column) indicate skew to the high side.  Finally, the MCMC error
+(\code{se\_mean}), which is estimated by \code{sd / sqrt(n\_eff)}, 
+is reasonable compared to the scale of the means.
+
+\section[Stan models in C++]{\proglang{Stan} models in \proglang{C++}}
+
+A Stan model is translated to a \proglang{C++} class that implements a
+number of I/O (input/output), log probability, and derivative methods.
+
+\subsection{Constructors: data input and transformation} 
+
+The constructor for the class reads and stores the data and calculates
+and stores the transformed data.  The data in a class can be safely
+used by concurrent threads.
+
+\subsection{Log probability function}
+
+Based on the data stored by the constructor, the model defines a log
+probability function (up to a constant).  This probability function
+operates on transforms of the parameters defined in the program.  The
+transform takes potentially constrained variables to unconstrained
+variables.  For example, positive-constrained variables are
+log-transformed to have support on all real numbers and
+$K$-dimensional covariance matrices are transformed to a
+Cholesky-factor representation with log-transformed diagonal involving
+a total of $K + {K \choose 2}$ parameters.
+
+\subsection{Parameter transformation}
+
+A model's class also provides methods to convert the data between
+unconstrained and constrained spaces and to validate that constrained
+input satisfies the declared constraints.  The class also implements a
+method to write the parameter names to a standard vector of strings.
+
+\subsection{Derivatives}
+
+In addition to computing the probability function, a model class
+provides efficient and accurate implementations of derivatives through
+algorithmic differentiation of the log probability function.  Using
+reverse-mode algorithmic differentiation, gradients can be calculated
+to machine precision within a small multiple of the time taken to
+calculate the log probability function, independently of
+dimensionality.  With forward-mode algorithmic differentation, a model
+class can also efficiently calculate gradient-vector products (i.e.,
+directional derivatives) and Jacobians. By combining forward- and
+reverse-mode algorithmic differentation, it is also possible to
+compute Hessians, Hessian-vector products, and even the gradient of
+the trace of a matrix-Hessian product required for RM-HMC
+(Riemann-manifold Hamiltonian Monte Carlo)
+\citep{Betancourt-softabs:??}.
+
+
+\section[Program execution]{Program execution}
+
+This section describes how \proglang{Stan} probabilistic programs are
+executed via sampling.  Execution for optimization is similar.  
+
+\subsection{Read data}
+
+The first step of execution is to read data into memory.  All of the
+variables declared in the \code{data} block will be read and their
+constraints validated.  
+
+\subsection{Define transformed data}
+
+After data is read into the model, the transformed data variable
+statements are executed in order to define the transformed data
+variables.  As the statements execute, declared constraints on
+variables are not enforced.  After the statements are executed, all
+declared constraints on transformed data variables are validated.
+
+\subsection{Initialization}
+
+If there are user-supplied initial values for parameters, these are
+read using the same input mechanism and same file format as data
+reads.  Any constraints declared on the parameters are validated for
+the initial values.  After being read, initial values are transformed
+to unconstrained values that will be used to initialize the sampler.
+
+If there are no user-supplied initial values, the unconstrained
+initial values are generated uniformly at random from the interval
+$(-2,2)$.
+
+\subsection{Generating a sample with NUTS}
+
+Although \proglang{Stan} provides other samplers, the default and
+recommended sampling option is to use NUTS with automatically tuned
+parameters for the Hamiltonian simulation.
+
+Sampling is HMC in general, and in NUTS in particular, is based on
+simulating the Hamiltonian of a particle with a starting position
+equal to the current parameter values.  The particle has a mass given
+by a positive-definite mass matrix.  An initial momentum is generated
+randomly based on this mass matrix by transforming randomly generated
+draws from a unit normal distribution.  The potential energy at work
+on the particle is subject is defined byt he negative logarithm of the
+probability function defined by the model.  The path of the particle
+is then simulated for an amount of time (i.e., number of steps)
+determined by NUTS.  This involves solving a differential equation for
+the position of the particle given an initial position and momentum
+subject to the specified potential energy field.
+
+Stan follows the usual practice in HMC of solving for the particle's
+position by simulating the path of the particle by simulating the
+evolution of the Hamiltonian, defined as the sum of the potential and
+kinetic energies, over discrete time steps.  
+
+\subsubsection{Leapfrog integrator}
+
+Stan also follows standard practice for HMC of using the leapfrog
+integrator, which is specifically designed for prolbems like
+Hamiltonian simulation.
+
+For each leapfrog step, the negative log probability function and its
+gradient need to be evaluated at the position corresponding to the
+current parameter values.  These are used to update the momentum based
+on the gradient and the position based on the momentum.
+
+Shorter steps more accurate, longer steps move further.  For simple
+models, only a few leapfrog steps will be needed.  For models with
+complex posterior geometries, many small leapfrog steps may be needed
+to accurately model the path of the parameters.
+
+If the user specifies the number of leapfrog steps (i.e., chooses to
+use standard HMC), that number of leapfrog steps are simulated.  If
+the user has not specified the number of leapfrog steps, NUTS (the No-U-Turn
+sampler) will determine the number of leapfrog steps adaptively
+\citep{Hoffman-Gelman:2011}.
+
+\subsubsection{Log Probability and Gradient Calculation}
+
+During each leapfrog step, the log probability function and its
+gradient must be calculated.  This is where most of the time in the
+\proglang{Stan} algorithm is spent.  This log probability function, which is
+used by the sampling algorithm, is defined over the unconstrained
+parameters.
+
+The first step of the calculation requires the inverse transform of
+the unconstrained parameter values back to the constrained parameters
+in terms of which the model is defined.  There is no error checking
+required because the inverse transform is a total function on every point
+in whose range satisfies the constraints.
+
+Because the probability statements in the model are defined in terms
+of constrained parameters, the log Jacobian of the inverse transform
+must be added to the accumulated log probability.
+
+Next, the transformed parameter statements are executed.  After they
+complete, any constraints declared for the transformed parameters are
+checked.  If the constraints are violated, the model will halt with a
+diagnostic error message.
+
+The final step in the log probability function calculation is to
+execute the statements defined in the model block.  
+
+As the log probability function executes, it accumulates an in-memory
+representation of the expression tree used to calculate the log
+probability.  This includes all of the transformed parameter
+operations and all of the Jacobian adjustments.  This tree is then
+used to evaluate the gradients by propagating partial derivatives
+backward along the expression graph.  The gradient calculations
+account for the majority of the cycles consumed by a \proglang{Stan} program.
+
+\subsubsection{Metropolis Accept/Reject}
+
+A standard Metropolis accept/reject step is required to retain detailed
+balance and ensure samples are marginally distributed according to the
+probability function defined by the model.  This Metropolis adjustment
+is based on comparing log probabilities, here defined by the
+Hamiltonian, which is the sum of the potential (negative log
+probability) and kinetic (squared momentum) energies.  In theory, the
+Hamiltonian is invariant over the path of the particle and rejection
+should never occur.  In practice, the probability of rejection is
+determined by the accuracy of the leapfrog approximation to the true
+trajectory of the parameters.
+
+If step sizes are small, very few updates will be rejected, but many
+steps will be required to move the same distance.  If step sizes are
+large, more updates will be rejected, but fewer steps will be required
+to move the same distance.  Thus a balance between effort and
+rejection rate is required.  If the user has not specified a step
+size, \proglang{Stan} will tune the step size during warmup sampling to achieve
+a desired rejection rate (thus balancing rejection versus number of
+steps).
+
+If the proposal is accepted, the parameters are updated to their new
+values.  Otherwise, the sample is the current set of parameter values.
+
+
+\subsection{Generated Quantities} 
+
+Before generating any output, the statements in the generated quantities 
+block are executed.  This can be used for any forward simulation based
+on parameters of the model.  Or it may be used to transform parameters
+to an appropriate form for output.  
+
+After the generated quantities statements execute, the constraints
+declared on generated quantities variables are validated.   If these
+constraints are violated, the program will terminate with a diagnostic message.
+
+\subsection{Output}
+
+The final step is to write the actual values.  The values of all
+variables declared as parameters, transformed parameters, or generated
+quantities are written.  Local variables are not written, nor is the
+data or transformed data.  All values are written in their constrained
+forms, that is the form that is used in the model definitions.
+
+In the executable form of a \proglang{Stan} models, parameters,
+transformed parameters, and generated quantities are written to a file
+in CSV notation with a header defining the names of the parameters
+(including indices for multivariate parameters).  In \pkg{RStan},
+values may be written to a CSV file or directly into \proglang{R}'s
+memory.
+
+
+
+
+
+
+
+%\bibliographystyle{jss}
+\bibliography{stan-paper}
+
+\end{document}
