@@ -125,16 +125,16 @@ namespace stan {
                       boost::math::tools::promote_args<T_y,T_F,T_G,T_V,T_W>::type,
                       Eigen::Dynamic, 1> m(n);
         for (int i = 0; i < m.size(); i ++)
-          m(i) = 0;
+          m(i) = 0.0;
         Eigen::Matrix<typename 
                       boost::math::tools::promote_args<T_y,T_F,T_G,T_V,T_W>::type,
                       Eigen::Dynamic, Eigen::Dynamic> C(n, n);
         for (int i = 0; i < C.rows(); i ++) {
           for (int j = 0; j < C.cols(); j ++) {          
             if (i == j) {
-              C(i, j) == 10e6;
+              C(i, j) = 10e6;
             } else {
-              C(i, j) == 0.0;
+              C(i, j) = 0.0;
             }
           }
         }
@@ -166,7 +166,6 @@ namespace stan {
 
         for (int i = 0; i < T; ++i) {
           yi = y.col(i);
-          std::cout << yi << std::endl;
           // Predict
           a = multiply(G, m);
           R = quad_form_sym(C, transpose(G)) + W;
