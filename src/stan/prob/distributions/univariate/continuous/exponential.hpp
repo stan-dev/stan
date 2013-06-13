@@ -181,7 +181,53 @@ namespace stan {
       return operands_and_partials.to_var(cdf);
     }
 
-      return 1.0 - exp(-beta * y);
+    template <typename T_y, typename T_inv_scale>
+    typename return_type<T_y,T_inv_scale>::type
+    exponential_cdf_log(const T_y& y, const T_inv_scale& beta) {
+
+      static const char* function = "stan::prob::exponential_cdf_log(%1%)";
+
+      using stan::math::check_finite;
+      using stan::math::check_positive;
+      using stan::math::check_nonnegative;
+      using stan::math::check_not_nan;
+      using boost::math::tools::promote_args;
+
+     double cdf_log(0.0);
+      // check if any vectors are zero length
+      if (!(stan::length(y) 
+            && stan::length(beta)))
+        return cdf_log;
+
+      if(!check_not_nan(function, y, "Random variable", &cdf_log))
+        return cdf_log;
+      if(!check_nonnegative(function, y, "Random variable", &cdf_log))
+        return cdf_log;
+      if(!check_finite(function, beta, "Inverse scale parameter", &cdf_log))
+        return cdf_log;
+      if(!check_positive(function, beta, "Inverse scale parameter", &cdf_log))
+        return cdf_log;
+
+      agrad::OperandsAndPartials<T_y, T_inv_scale> operands_and_partials(y, beta);
+
+      VectorView<const T_y> y_vec(y);
+      VectorView<const T_inv_scale> beta_vec(beta);
+      size_t N = max_size(y, beta);
+      for (size_t n = 0; n < N; n++) { 
+        const double beta_dbl = value_of(beta_vec[n]);     
+        const double y_dbl = value_of(y_vec[n]);            
+        double one_m_exp = 1.0 - exp(-beta_dbl * y_dbl);
+        // log cdf
+        cdf_log += log(one_m_exp);
+
+        // gradients
+        double rep_deriv = -exp(-beta_dbl * y_dbl) / one_m_exp;
+        if (!is_constant_struct<T_y>::value)
+          operands_and_partials.d_x1[n] -= rep_deriv * beta_dbl;
+        if (!is_constant_struct<T_inv_scale>::value)
+          operands_and_partials.d_x2[n] -= rep_deriv * y_dbl;
+      }
+      return operands_and_partials.to_var(cdf_log);
     }
 
     template <class RNG>
