@@ -13,7 +13,7 @@ namespace stan {
       
       arg_num_samples(): int_argument() {
         _name = "num_samples";
-        _description = "Total number of samples";
+        _description = "Number of sampling iterations";
         _validity = "0 < num_samples";
         _default = "1000";
         _default_value = 1000;

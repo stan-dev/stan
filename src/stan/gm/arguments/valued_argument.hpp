@@ -24,7 +24,7 @@ namespace stan {
         
       }
       
-      virtual void print_help(std::ostream* s, int depth) {
+      virtual void print_help(std::ostream* s, int depth, bool recurse = false) {
         
         if(!s) return;
         

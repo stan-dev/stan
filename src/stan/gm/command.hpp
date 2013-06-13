@@ -15,7 +15,6 @@
 #include <stan/io/mcmc_writer.hpp>
 
 #include <stan/gm/arguments/argument_parser.hpp>
-#include <stan/gm/arguments/arg_help.hpp>
 #include <stan/gm/arguments/arg_id.hpp>
 #include <stan/gm/arguments/arg_data.hpp>
 #include <stan/gm/arguments/arg_init.hpp>
@@ -242,7 +241,6 @@ namespace stan {
     int command(int argc, const char* argv[]) {
 
       std::vector<argument*> valid_arguments;
-      valid_arguments.push_back(new arg_help());
       valid_arguments.push_back(new arg_id());
       valid_arguments.push_back(new arg_data());
       valid_arguments.push_back(new arg_init());
@@ -253,17 +251,13 @@ namespace stan {
       
       argument_parser parser(valid_arguments);
       
-      if (!parser.parse_args(argc, argv, &std::cout)) {
+      if (!parser.parse_args(argc, argv, &std::cout, &std::cout)) {
         std::cout << "Failed to parse arguments, terminating Stan" << std::endl;
         return 0;
       }
       
-      // Help
-      if (dynamic_cast<unvalued_argument*>(parser.arg("help"))->is_present()) {
-        parser.print_help(&std::cout);
-        return 0;
-      }
-
+      if (parser.help_printed()) return 0;
+      
       // Identification
       unsigned int id = dynamic_cast<int_argument*>(parser.arg("id"))->value();
       

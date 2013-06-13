@@ -19,9 +19,12 @@ namespace stan {
       std::string description() { return _description; }
 
       virtual void print(std::ostream* s, int depth, const char prefix) = 0;
-      virtual void print_help(std::ostream* s, int depth) = 0;
+      virtual void print_help(std::ostream* s, int depth, bool recurse) = 0;
       
-      virtual bool parse_args(std::vector<std::string>& args, std::ostream* err) { return true; }
+      virtual bool parse_args(std::vector<std::string>& args,
+                              std::ostream* out,
+                              std::ostream* err,
+                              bool& help_flag) { return true; }
       
       static void split_arg(std::string arg, std::string& name, std::string& value) {
         

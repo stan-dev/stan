@@ -13,7 +13,7 @@ namespace stan {
       
       arg_num_warmup(): int_argument() {
         _name = "num_warmup";
-        _description = "Number of sampling iterations reserved for warmup";
+        _description = "Number of warmup iterations";
         _validity = "0 < warmup";
         _default = "1000";
         _default_value = 1000;

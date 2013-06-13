@@ -14,7 +14,8 @@ namespace stan {
       
       singleton_argument(): _validity("All") {};
       
-      bool parse_args(std::vector<std::string>& args, std::ostream* err) {
+      bool parse_args(std::vector<std::string>& args, std::ostream* out,
+                      std::ostream* err, bool& help_flag) {
         
         if(args.size() == 0) return true;
         
@@ -39,6 +40,12 @@ namespace stan {
             
           }
           
+        }
+        
+        if ( (args.back() == "help") || (args.back() == "help-all") ) {
+          print_help(out, 0);
+          help_flag |= true;
+          args.clear();
         }
         
         return true;

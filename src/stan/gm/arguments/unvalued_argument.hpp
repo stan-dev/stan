@@ -16,7 +16,7 @@ namespace stan {
       
       void print(std::ostream* s, int depth, const char prefix) {};
       
-      void print_help(std::ostream* s, int depth) {
+      void print_help(std::ostream* s, int depth, bool recurse = false) {
         
         if(!s) return;
         
@@ -29,7 +29,16 @@ namespace stan {
         
       }
       
-      bool parse_args(std::vector<std::string>& args, std::ostream* err) {
+      bool parse_args(std::vector<std::string>& args, std::ostream* out,
+                      std::ostream* err, bool& help_flag) {
+        
+        if ( (args.back() == "help") || (args.back() == "help-all") ) {
+          print_help(out, 0);
+          help_flag |= true;
+          args.clear();
+          return true;
+        }
+        
         _is_present = true;
         return true;
       };

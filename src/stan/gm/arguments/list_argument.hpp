@@ -27,17 +27,20 @@ namespace stan {
         _values.at(_cursor)->print(s, depth + 1, prefix);
       }
       
-      void print_help(std::ostream* s, int depth) {
+      void print_help(std::ostream* s, int depth, bool recurse) {
         _default = _values.at(_default_cursor)->name();
 
         valued_argument::print_help(s, depth);
         
-        for (std::vector<argument*>::iterator it = _values.begin();
-             it != _values.end(); ++it)
-          (*it)->print_help(s, depth + 1);
+        if (recurse) {
+          for (std::vector<argument*>::iterator it = _values.begin();
+               it != _values.end(); ++it)
+            (*it)->print_help(s, depth + 1, true);
+        }
       }
       
-      bool parse_args(std::vector<std::string>& args, std::ostream* err) {
+      bool parse_args(std::vector<std::string>& args, std::ostream* out,
+                      std::ostream* err, bool& help_flag) {
         
         if(args.size() == 0) return true;
         
@@ -45,7 +48,19 @@ namespace stan {
         std::string value;
         split_arg(args.back(), name, value);
         
-        if(_name == name) {
+        if(_name == "help") {
+          print_help(out, 0, false);
+          help_flag |= true;
+          args.clear();
+          return false;
+        }
+        else if(_name == "help-all") {
+          print_help(out, 0, true);
+          help_flag |= true;
+          args.clear();
+          return false;
+        }
+        else if(_name == name) {
           
           args.pop_back();
           
@@ -54,7 +69,7 @@ namespace stan {
             if( _values.at(i)->name() != value) continue;
             
             _cursor = i;
-            _values.at(_cursor)->parse_args(args, err);
+            _values.at(_cursor)->parse_args(args, out, err, help_flag);
             good_arg = true;
             break;
           }

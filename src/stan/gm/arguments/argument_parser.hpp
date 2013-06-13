@@ -15,9 +15,9 @@ namespace stan {
       
     public:
       
-      argument_parser(std::vector<argument*>& valid_args): _arguments(valid_args) {};
+      argument_parser(std::vector<argument*>& valid_args): _arguments(valid_args), _help_flag(false) {};
 
-      bool parse_args(int argc, const char* argv[], std::ostream* err = 0) {
+      bool parse_args(int argc, const char* argv[], std::ostream* out = 0, std::ostream* err = 0) {
         
         if(argc == 1) return true;
         
@@ -29,6 +29,7 @@ namespace stan {
 
         bool good_arg = true;
         bool valid_arg = true;
+        _help_flag = false;
         
         while(good_arg) {
           
@@ -47,14 +48,40 @@ namespace stan {
             
             if( (*it)->name() == cat_name) {
               args.pop_back();
-              valid_arg &= (*it)->parse_args(args, err);
+              valid_arg &= (*it)->parse_args(args, out, err, _help_flag);
               good_arg = true;
             }
             else if( (*it)->name() == val_name ) {
-              valid_arg &= (*it)->parse_args(args, err);
+              valid_arg &= (*it)->parse_args(args, out, err, _help_flag);
               good_arg = true;
             }
             
+          }
+          
+          if(cat_name == "help") {
+            
+            *out << "Usage: model <arg1> <subarg1_1> ... <subarg1_m>"
+                 << " ... <arg_n> <subarg_n_1> ... <subarg_n_m>"
+                 << std::endl << std::endl;
+            *out << "Valid arguments to Stan:" << std::endl << std::endl;
+            
+            print_help(out, false);
+            
+            *out << "See 'model' <arg1> [ help | help-all ]"
+                 << " for argument specific information" << std::endl;
+            *out << " or 'model' help-all for all argument information" << std::endl;
+            
+            _help_flag |= true;
+            
+            args.clear();
+            return 0;
+            
+          }
+          else if(cat_name == "help-all") {
+            print_help(out, true);
+            _help_flag |= true;
+            args.clear();
+            return 0;
           }
           
           if(!good_arg && err) *err << cat_name << " is either mistyped or misplaced." << std::endl;
@@ -74,11 +101,11 @@ namespace stan {
         
       }
       
-      void print_help(std::ostream* s) {
+      void print_help(std::ostream* s, bool recurse) {
         if(!s) return;
         
         for (int i = 0; i < _arguments.size(); ++i) {
-          _arguments.at(i)->print_help(s, 0);
+          _arguments.at(i)->print_help(s, 0, recurse);
         }
         
       }
@@ -93,6 +120,8 @@ namespace stan {
         
       }
       
+      bool help_printed() { return _help_flag; }
+      
     protected:
       
       std::vector<argument*>& _arguments;
@@ -100,6 +129,8 @@ namespace stan {
       // We can also check for, and warn the user of, deprecated arguments
       //std::vector<argument*> deprecated_arguments;
       // check_arg_conflict // Ensure non-zero intersection of valid and deprecated argumentss
+      
+      bool _help_flag;
       
     };
     
