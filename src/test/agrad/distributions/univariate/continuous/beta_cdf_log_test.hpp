@@ -5,22 +5,22 @@ using std::vector;
 using std::numeric_limits;
 using stan::agrad::var;
 
-class AgradCdfBeta : public AgradCdfTest {
+class AgradCdfLogBeta : public AgradCdfLogTest {
 public:
   void valid_values(vector<vector<double> >& parameters,
-        vector<double>& cdf) {
+        vector<double>& log_cdf) {
     vector<double> param(3);
 
     param[0] = 0.5;           // y
     param[1] = 4.4;           // alpha (Success Scale)
     param[2] = 3.2;           // beta  (Faiulre Scale)
     parameters.push_back(param);
-    cdf.push_back(0.3223064740892);  // expected CDF
+    log_cdf.push_back(std::log(0.3223064740892));  // expected Log_CDF
 
   }
   
   void invalid_values(vector<size_t>& index, 
-          vector<double>& value) {
+                      vector<double>& value) {
 
     // y
     index.push_back(0U);
@@ -72,21 +72,19 @@ public:
       typename T6, typename T7, typename T8, 
       typename T9>
   typename stan::return_type<T_y, T_scale_succ, T_scale_fail>::type 
-  cdf(const T_y& y, const T_scale_succ& alpha, const T_scale_fail& beta,
+  cdf_log(const T_y& y, const T_scale_succ& alpha, const T_scale_fail& beta,
       const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
-    return stan::prob::beta_cdf(y, alpha, beta);
+    return stan::prob::beta_cdf_log(y, alpha, beta);
   }
-
-
   
   template <typename T_y, typename T_scale_succ, typename T_scale_fail,
       typename T3, typename T4, typename T5, 
       typename T6, typename T7, typename T8, 
       typename T9>
   typename stan::return_type<T_y, T_scale_succ, T_scale_fail>::type 
-  cdf_function(const T_y& y, const T_scale_succ& alpha, const T_scale_fail& beta,
+  cdf_log_function(const T_y& y, const T_scale_succ& alpha, const T_scale_fail& beta,
          const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
-    return stan::prob::beta_cdf(y, alpha, beta);
+    return stan::prob::beta_cdf_log(y, alpha, beta);
       
   }
     

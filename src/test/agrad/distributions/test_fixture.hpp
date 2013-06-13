@@ -107,7 +107,7 @@ public:
   }
   
   virtual double upper_bound() {
-    return 0;
+    return std::numeric_limits<double>::infinity();
   }
 
   // also include 2 templated functions:
