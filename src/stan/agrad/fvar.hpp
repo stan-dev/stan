@@ -85,6 +85,7 @@
 #include <stan/agrad/fwd/erfc.hpp>
 #include <stan/agrad/fwd/Phi.hpp>
 #include <stan/agrad/fwd/binary_log_loss.hpp>
+#include <stan/agrad/fwd/owens_t.hpp>
 
 //combinatorial functions
 #include <stan/agrad/fwd/tgamma.hpp>
