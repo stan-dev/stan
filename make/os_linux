@@ -30,6 +30,7 @@ ifeq (clang++,$(CC_TYPE))
   CFLAGS_GTEST += -DGTEST_HAS_PTHREAD=0
   CFLAGS += -Wno-unused-function
   CFLAGS += -Wno-uninitialized
+  CFLAGS += -Wno-c++11-long-long
   #PCH = .pch
 endif
 
