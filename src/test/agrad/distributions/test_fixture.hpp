@@ -1864,7 +1864,7 @@ public:
         <T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>
         (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
       EXPECT_FLOAT_EQ(stan::math::negative_infinity(), cdf_log_at_lower_bound.val())
-        << "cdf_log evaluated at lower bound should equal 0";
+        << "cdf_log evaluated at lower bound should equal negative infinity";
     }
   }
   
