@@ -1933,7 +1933,7 @@ public:
       (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
 
     EXPECT_FLOAT_EQ(0.0, cdf_log.val())
-      << "cdf_log with an empty vector should return 1.0";
+      << "cdf_log with an empty vector should return 0.0";
   }
 
   vector<double> first_valid_params() {
