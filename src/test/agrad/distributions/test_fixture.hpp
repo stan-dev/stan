@@ -1464,11 +1464,11 @@ public:
               (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9); }))
         << "Valid parameters failed at index: " << n << " -- " 
         << parameters[n];
-      EXPECT_TRUE(cdf_log.val() <= 1)
-        << "cdf_log value must be less than or equal to 1. cdf_log value: " 
+      EXPECT_TRUE(cdf_log.val() <= 0)
+        << "cdf_log value must be less than or equal to 0. cdf_log value: " 
         << cdf_log;
-      EXPECT_TRUE(cdf_log.val() <= 1)
-        << "cdf_log value must be less than or equal to 1. cdf_log value: "
+      EXPECT_TRUE(cdf_log.val() <= 0)
+        << "cdf_log value must be less than or equal to 0. cdf_log value: "
         << cdf_log;
 
       if (all_scalar<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {

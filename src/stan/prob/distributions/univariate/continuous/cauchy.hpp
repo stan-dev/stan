@@ -163,7 +163,9 @@ namespace stan {
     cauchy_cdf(const T_y& y, const T_loc& mu, const T_scale& sigma) {
         
       // Size checks
-      if ( !( stan::length(y) && stan::length(mu) && stan::length(sigma) ) ) return 1.0;
+      if ( !( stan::length(y) && stan::length(mu) 
+              && stan::length(sigma) ) ) 
+        return 1.0;
         
       static const char* function = "stan::prob::cauchy_cdf(%1%)";
       
@@ -178,16 +180,12 @@ namespace stan {
         
       if(!check_not_nan(function, y, "Random variable", &P))
         return P;
-        
       if(!check_finite(function, mu, "Location parameter", &P))
         return P;
-        
       if(!check_finite(function, sigma, "Scale parameter", &P))
         return P;
-        
       if(!check_positive(function, sigma, "Scale parameter", &P))
         return P;
-
       if (!(check_consistent_sizes(function, y, mu, sigma,
                                    "Random variable", "Location parameter", 
                                    "Scale Parameter",
@@ -288,16 +286,12 @@ namespace stan {
         
       if(!check_not_nan(function, y, "Random variable", &cdf_log))
         return cdf_log;
-        
       if(!check_finite(function, mu, "Location parameter", &cdf_log))
         return cdf_log;
-        
       if(!check_finite(function, sigma, "Scale parameter", &cdf_log))
         return cdf_log;
-        
       if(!check_positive(function, sigma, "Scale parameter", &cdf_log))
         return cdf_log;
-
       if (!(check_consistent_sizes(function, y, mu, sigma,
                                    "Random variable", "Location parameter", 
                                    "Scale Parameter", &cdf_log)))
