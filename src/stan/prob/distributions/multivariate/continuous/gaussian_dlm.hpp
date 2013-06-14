@@ -12,16 +12,20 @@
 #include <stan/agrad/agrad.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/agrad/matrix.hpp>
-#include <stan/math/matrix/log.hpp>
-#include <stan/math/matrix/subtract.hpp>
+
 #include <stan/math/matrix/add.hpp>
-#include <stan/math/matrix/multiply.hpp>
-#include <stan/math/matrix/transpose.hpp>
+#include <stan/math/matrix/dot_product.hpp>
 #include <stan/math/matrix/inverse.hpp>
 #include <stan/math/matrix/ldlt.hpp>
-#include <stan/math/matrix/trace_quad_form.hpp>
+#include <stan/math/matrix/log.hpp>
+#include <stan/math/matrix/log_determinant.hpp>
+#include <stan/math/matrix/log_determinant_spd.hpp>
+#include <stan/math/matrix/multiply.hpp>
 #include <stan/math/matrix/quad_form.hpp>
+#include <stan/math/matrix/subtract.hpp>
 #include <stan/math/matrix/tcrossprod.hpp>
+#include <stan/math/matrix/trace_quad_form.hpp>
+#include <stan/math/matrix/transpose.hpp>
 
 namespace stan {
   namespace prob {
@@ -74,6 +78,7 @@ namespace stan {
       using stan::math::inverse;
       using stan::math::subtract;
       using stan::math::quad_form_sym;
+      using stan::math::log_determinant_spd;
       // using stan::math::LDLT_factor;
       // using stan::math::trace_inv_quad_form_ldlt;
       // using stan::math::mdivide_right_ldlt;
@@ -136,7 +141,7 @@ namespace stan {
         for (int i = 0; i < C.rows(); i ++) {
           for (int j = 0; j < C.cols(); j ++) {          
             if (i == j) {
-              C(i, j) = 10e6;
+              C(i, j) = 1e7;
             } else {
               C(i, j) = 0.0;
             }
@@ -155,29 +160,28 @@ namespace stan {
 
         for (int i = 0; i < T; ++i) {
           yi = y.col(i);
-          // Predict
+          // // Predict state
+          // a_t = G_t m_{t-1}
           a = multiply(G, m);
-          R = quad_form_sym(C, transpose(G)) + W;
-          // filter
+          // R_t = G_t C_{t-1} G_t' + W_t
+          R = add(quad_form_sym(C, transpose(G)), W);
+          // // predict observation 
+          // f_t = F_t' a_t
           f = multiply(transpose(F), a);
-          Q = quad_form_sym(R, F) + V;
+          // Q_t = F'_t R_t F_t + V_t
+          Q = add(quad_form_sym(R, F), V);
           Q_inv = inverse(Q);
-          // LDLT weirdly seems to be going slower.
-          // LDLT_factor<T_lp,Eigen::Dynamic,Eigen::Dynamic> ldlt_Q(Q);
-          // if (!ldlt_Q.success()) {
-          //   std::ostringstream message;
-          //   message << "Q is not positive definite (%1%).";
-          //   std::string str(message.str());
-          //   stan::math::dom_err(function,Q(0,0),"Q",str.c_str(),"",&lp);
-          //   return lp;
-          // }
+          // // filtered state
+          // e_t = y_t - f_t
           e = subtract(yi, f);
-          // A = mdivide_right_ldlt(multiply(R, F), ldlt_Q);
+          // A_t = R_t F_t Q^{-1}_t
           A = multiply(multiply(R, F), Q_inv);
+          // m_t = a_t + A_t e_t
           m = add(a, multiply(A, e));
+          // C = R_t - A_t Q_t A_t'
           C = subtract(R, quad_form_sym(Q, transpose(A)));
-          // lp -= 0.5 * (log_determinant_ldlt(ldlt_Q) + trace_inv_quad_form_ldlt(ldlt_Q, e));
-          lp -= 0.5 * (log_determinant(Q) + trace_quad_form(Q_inv, e));
+          //C = subtract(R, multiply(multiply(multiply(A, transpose(F)), R)));
+          lp -= 0.5 * (log_determinant_spd(Q) + transpose(e) * Q_inv * e);
         }
       }
       return lp;
@@ -207,28 +211,29 @@ namespace stan {
               typename T_V, typename T_W
               >
     typename boost::math::tools::promote_args<T_y,T_F,T_G,T_V,T_W>::type
-    gaussian_dlm_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
-                     const Eigen::Matrix<T_F,Eigen::Dynamic,Eigen::Dynamic>& F,
-                     const Eigen::Matrix<T_G,Eigen::Dynamic,Eigen::Dynamic>& G,
-                     const Eigen::Matrix<T_V,Eigen::Dynamic,1>& V,
-                     const Eigen::Matrix<T_W,Eigen::Dynamic,Eigen::Dynamic>& W) {
+    gaussian_dlm_seq_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
+                         const Eigen::Matrix<T_F,Eigen::Dynamic,Eigen::Dynamic>& F,
+                         const Eigen::Matrix<T_G,Eigen::Dynamic,Eigen::Dynamic>& G,
+                         const Eigen::Matrix<T_V,Eigen::Dynamic,1>& V,
+                         const Eigen::Matrix<T_W,Eigen::Dynamic,Eigen::Dynamic>& W) {
       static const char* function = "stan::prob::dlm_log(%1%)";
       typedef typename boost::math::tools::promote_args<T_y,T_F,T_G,T_V,T_W>::type T_lp;
       T_lp lp(0.0);
       
-      using stan::math::check_not_nan;
-      using stan::math::check_size_match;
-      using stan::math::check_finite;
-      using stan::math::check_cov_matrix;
-      using stan::math::check_positive;
       using stan::math::add;
-      using stan::math::multiply;
-      using stan::math::transpose;
+      using stan::math::check_cov_matrix;
+      using stan::math::check_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_positive;
+      using stan::math::check_size_match;
+      using stan::math::dot_product;
       using stan::math::inverse;
-      using stan::math::subtract;
-      using stan::math::trace_quad_form;
+      using stan::math::multiply;
       using stan::math::quad_form_sym;
+      using stan::math::subtract;
       using stan::math::tcrossprod;
+      using stan::math::trace_quad_form;
+      using stan::math::transpose;
 
       int r = y.rows(); // number of variables
       int T = y.cols(); // number of observations
@@ -288,7 +293,7 @@ namespace stan {
         for (int i = 0; i < C.rows(); i ++) {
           for (int j = 0; j < C.cols(); j ++) {          
             if (i == j) {
-              C(i, j) = 10e6;
+              C(i, j) = 1e7;
             } else {
               C(i, j) = 0.0;
             }
@@ -300,27 +305,42 @@ namespace stan {
         T_lp Q_inv;
         T_lp e;
         Eigen::Matrix<T_lp, Eigen::Dynamic, 1> A(n);
+        Eigen::Matrix<T_lp, Eigen::Dynamic, 1> Fj(n);
+        Eigen::Matrix<T_lp, Eigen::Dynamic, 1> m1(n);
+        Eigen::Matrix<T_lp, Eigen::Dynamic, Eigen::Dynamic> C1(n, n);
         
         for (int i = 0; i < y.cols(); ++i) {
-          // Predict (reuse m and C)
-          m = multiply(G, m);
-          C = quad_form_sym(C, transpose(G)) + W;
+          // Predict state
+          // reuse m and C instead of using a and R
+          // eval to avoid any aliasing issues with Eigen (?)
+          m1 = multiply(G, m); 
+          m = m1;
+          C1 = add(quad_form_sym(C, transpose(G)), W);
+          C = C1;
           for (int j = 0; j < y.rows(); ++j) {
+            // predict observation
             T_lp yij(y(j, i));
-            Eigen::Matrix<T_lp, Eigen::Dynamic, 1> Fj = F.col(j);
-            // one step forecast of y(i, j)
+            // dim Fj = (n, 1)
+            for (int k = 0; k < F.rows(); ++k) {
+              Fj(k) = F(k, j);
+            }
+            // // f_{t,i} = F_{t,i}' m_{t,i-1}
             f = dot_product(Fj, m);
             Q = trace_quad_form(C, Fj) + V(j);
             Q_inv = 1.0 / Q;
-            // posterior after observing y(i, j)
+            // // filtered observation
+            // // e_{t,i} = y_{t,i} - f_{t,i}
             e = yij - f;
-            // A = multiply(multiply(C, Fj), Q_inv);            
-            A = C * Fj * Q_inv;
-            m += A * e;
-            // tcrossprod throws an error (ambiguous)
-            // C -= Q * tcrossprod(A);
-            C -= Q * transpose(A) * A;
-            lp -= 0.5 * (abs(Q) + pow(e, 2) * Q_inv);
+            // // A_{t,i} = C_{t,i-1} F_{t,i} Q_{t,i}^{-1}
+            A = multiply(multiply(C, Fj), Q_inv);
+            // // m_{t,i} = m_{t,i-1} + A_{t,i} e_{t,i}
+            m += multiply(A, e);
+            // // c_{t,i} = C_{t,i-1} - Q_{t,i} A_{t,i} A_{t,i}'
+            // // // tcrossprod throws an error (ambiguous)
+            // C = subtract(C, multiply(Q, tcrossprod(A)));
+            C -= multiply(Q, multiply(A, transpose(A)));
+            C = 0.5 * add(C, transpose(C)).eval();
+            lp -= 0.5 * (log(Q) + pow(e, 2) * Q_inv);
           }
         }
       }
@@ -333,12 +353,12 @@ namespace stan {
               >
     inline
     typename boost::math::tools::promote_args<T_y,T_F,T_G,T_V,T_W>::type
-    gaussian_dlm_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
-                     const Eigen::Matrix<T_F,Eigen::Dynamic,Eigen::Dynamic>& F,
-                     const Eigen::Matrix<T_G,Eigen::Dynamic,Eigen::Dynamic>& G,
-                     const Eigen::Matrix<T_V,Eigen::Dynamic,1>& V,
-                     const Eigen::Matrix<T_W,Eigen::Dynamic,Eigen::Dynamic>& W) {
-      return gaussian_dlm_log<false>(y, F, G, V, W);
+    gaussian_dlm_seq_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
+                         const Eigen::Matrix<T_F,Eigen::Dynamic,Eigen::Dynamic>& F,
+                         const Eigen::Matrix<T_G,Eigen::Dynamic,Eigen::Dynamic>& G,
+                         const Eigen::Matrix<T_V,Eigen::Dynamic,1>& V,
+                         const Eigen::Matrix<T_W,Eigen::Dynamic,Eigen::Dynamic>& W) {
+      return gaussian_dlm_seq_log<false>(y, F, G, V, W);
     }
   }    
 
