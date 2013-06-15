@@ -42,10 +42,13 @@ add_binary("atan2");
 add_unary("atanh");
 for (size_t i = 0; i < int_vector_types.size(); ++i) 
   for (size_t j = 0; j < vector_types.size(); ++j)
-    add("bernoulli_log",DOUBLE_T,int_vector_types[i],vector_types[j]);
+    add("bernoulli_cdf",DOUBLE_T,int_vector_types[i],vector_types[j]);
 for (size_t i = 0; i < int_vector_types.size(); ++i) 
   for (size_t j = 0; j < vector_types.size(); ++j)
-    add("bernoulli_cdf",DOUBLE_T,int_vector_types[i],vector_types[j]);
+    add("bernoulli_cdf_log",DOUBLE_T,int_vector_types[i],vector_types[j]);
+for (size_t i = 0; i < int_vector_types.size(); ++i) 
+  for (size_t j = 0; j < vector_types.size(); ++j)
+    add("bernoulli_log",DOUBLE_T,int_vector_types[i],vector_types[j]);
 add("bernoulli_rng",INT_T,DOUBLE_T);
 for (size_t i = 0; i < int_vector_types.size(); ++i) 
   for (size_t j = 0; j < vector_types.size(); ++j)
@@ -54,15 +57,21 @@ for (size_t i = 0; i < int_vector_types.size(); i++)
   for (size_t j = 0; j < int_vector_types.size(); j++)
     for (size_t k = 0; k < vector_types.size(); k++)
       for (size_t l = 0; l < vector_types.size(); l++) 
-        add("beta_binomial_log",DOUBLE_T, // result
+        add("beta_binomial_cdf",DOUBLE_T, // result
             int_vector_types[i],int_vector_types[j],vector_types[k],vector_types[l]);
-add("beta_binomial_rng",INT_T,INT_T,DOUBLE_T,DOUBLE_T);
 for (size_t i = 0; i < int_vector_types.size(); i++) 
   for (size_t j = 0; j < int_vector_types.size(); j++)
     for (size_t k = 0; k < vector_types.size(); k++)
       for (size_t l = 0; l < vector_types.size(); l++) 
-        add("beta_binomial_cdf",DOUBLE_T, // result
+        add("beta_binomial_cdf_log",DOUBLE_T, // result
             int_vector_types[i],int_vector_types[j],vector_types[k],vector_types[l]);
+for (size_t i = 0; i < int_vector_types.size(); i++) 
+  for (size_t j = 0; j < int_vector_types.size(); j++)
+    for (size_t k = 0; k < vector_types.size(); k++)
+      for (size_t l = 0; l < vector_types.size(); l++) 
+        add("beta_binomial_log",DOUBLE_T, // result
+            int_vector_types[i],int_vector_types[j],vector_types[k],vector_types[l]);
+add("beta_binomial_rng",INT_T,INT_T,DOUBLE_T,DOUBLE_T);
 for (size_t i = 0; i < vector_types.size(); ++i)
   for (size_t j = 0; j < vector_types.size(); ++j)
     for (size_t k = 0; k < vector_types.size(); ++k)
@@ -87,16 +96,24 @@ add_binary("binomial_coefficient_log");
 for (size_t i = 0; i < int_vector_types.size(); ++i)
   for (size_t j = 0; j < int_vector_types.size(); ++j)
     for (size_t k = 0; k < vector_types.size(); ++k)
-      add("binomial_log",DOUBLE_T,int_vector_types[i],int_vector_types[j],vector_types[k]);
+      add("binomial_cdf",DOUBLE_T,
+          int_vector_types[i],int_vector_types[j],vector_types[k]);
+for (size_t i = 0; i < int_vector_types.size(); ++i)
+  for (size_t j = 0; j < int_vector_types.size(); ++j)
+    for (size_t k = 0; k < vector_types.size(); ++k)
+      add("binomial_cdf_log",DOUBLE_T,
+          int_vector_types[i],int_vector_types[j],vector_types[k]);
+for (size_t i = 0; i < int_vector_types.size(); ++i)
+  for (size_t j = 0; j < int_vector_types.size(); ++j)
+    for (size_t k = 0; k < vector_types.size(); ++k)
+      add("binomial_log",DOUBLE_T,
+          int_vector_types[i],int_vector_types[j],vector_types[k]);
 add("binomial_rng",INT_T,INT_T,DOUBLE_T);
 for (size_t i = 0; i < int_vector_types.size(); ++i)
   for (size_t j = 0; j < int_vector_types.size(); ++j)
     for (size_t k = 0; k < vector_types.size(); ++k)
-      add("binomial_cdf",DOUBLE_T,int_vector_types[i],int_vector_types[j],vector_types[k]);
-for (size_t i = 0; i < int_vector_types.size(); ++i)
-  for (size_t j = 0; j < int_vector_types.size(); ++j)
-    for (size_t k = 0; k < vector_types.size(); ++k)
-      add("binomial_logit_log",DOUBLE_T,int_vector_types[i],int_vector_types[j],vector_types[k]);
+      add("binomial_logit_log",DOUBLE_T,
+          int_vector_types[i],int_vector_types[j],vector_types[k]);
 add("categorical_log",DOUBLE_T,INT_T,VECTOR_T);
 add("categorical_rng",INT_T,VECTOR_T);
 add_binary("cauchy_rng");
@@ -475,12 +492,19 @@ add_binary("multiply_log");
 for (size_t i = 0; i < int_vector_types.size(); ++i) 
   for (size_t j = 0; j < vector_types.size(); ++j)
     for (size_t k = 0; k < vector_types.size(); ++k)
-      add("neg_binomial_log",DOUBLE_T,int_vector_types[i],vector_types[j],vector_types[k]);
-add("neg_binomial_rng",INT_T,DOUBLE_T,DOUBLE_T);
+      add("neg_binomial_cdf",DOUBLE_T,
+          int_vector_types[i],vector_types[j],vector_types[k]);
 for (size_t i = 0; i < int_vector_types.size(); ++i) 
   for (size_t j = 0; j < vector_types.size(); ++j)
     for (size_t k = 0; k < vector_types.size(); ++k)
-      add("neg_binomial_cdf",DOUBLE_T,int_vector_types[i],vector_types[j],vector_types[k]);
+      add("neg_binomial_cdf_log",DOUBLE_T,
+          int_vector_types[i],vector_types[j],vector_types[k]);
+for (size_t i = 0; i < int_vector_types.size(); ++i) 
+  for (size_t j = 0; j < vector_types.size(); ++j)
+    for (size_t k = 0; k < vector_types.size(); ++k)
+      add("neg_binomial_log",DOUBLE_T,
+          int_vector_types[i],vector_types[j],vector_types[k]);
+add("neg_binomial_rng",INT_T,DOUBLE_T,DOUBLE_T);
 add_nullary("negative_epsilon");
 add_nullary("negative_infinity");
 for (size_t i = 0; i < vector_types.size(); ++i)
@@ -530,14 +554,17 @@ add_unary("Phi_approx");
 add_nullary("pi");
 for (size_t i = 0; i < int_vector_types.size(); ++i) 
   for (size_t j = 0; j < vector_types.size(); ++j) 
-    add("poisson_log",DOUBLE_T, int_vector_types[i],vector_types[j]);
-add("poisson_rng",INT_T,DOUBLE_T);
-for (size_t i = 0; i < int_vector_types.size(); ++i) 
-  for (size_t j = 0; j < vector_types.size(); ++j) 
     add("poisson_cdf",DOUBLE_T, int_vector_types[i],vector_types[j]);
 for (size_t i = 0; i < int_vector_types.size(); ++i) 
   for (size_t j = 0; j < vector_types.size(); ++j) 
+    add("poisson_cdf_log",DOUBLE_T, int_vector_types[i],vector_types[j]);
+for (size_t i = 0; i < int_vector_types.size(); ++i) 
+  for (size_t j = 0; j < vector_types.size(); ++j) 
+    add("poisson_log",DOUBLE_T, int_vector_types[i],vector_types[j]);
+for (size_t i = 0; i < int_vector_types.size(); ++i) 
+  for (size_t j = 0; j < vector_types.size(); ++j) 
     add("poisson_log_log",DOUBLE_T, int_vector_types[i],vector_types[j]);
+add("poisson_rng",INT_T,DOUBLE_T);
 add_nullary("positive_infinity");
 add_binary("pow");
 add("prod",INT_T,expr_type(INT_T,1));
