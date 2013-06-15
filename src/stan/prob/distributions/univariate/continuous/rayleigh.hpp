@@ -15,7 +15,6 @@ namespace stan {
 
   namespace prob {
 
-
     template <bool propto, 
               typename T_y, typename T_scale>
     typename return_type<T_y,T_scale>::type
@@ -32,8 +31,7 @@ namespace stan {
       using stan::prob::include_summand;
 
       // check if any vectors are zero length
-      if (!(stan::length(y) 
-            && stan::length(sigma)))
+      if (!(stan::length(y) && stan::length(sigma)))
         return 0.0;
 
       // set up return value accumulator
@@ -42,11 +40,9 @@ namespace stan {
       // validate args (here done over var, which should be OK)
       if (!check_not_nan(function, y, "Random variable", &logp))
         return logp;
-      if (!check_positive(function, sigma, "Scale parameter", 
-                          &logp))
+      if (!check_positive(function, sigma, "Scale parameter", &logp))
         return logp;
-      if (!check_positive(function, y, "Random variable", 
-                          &logp))
+      if (!check_positive(function, y, "Random variable", &logp))
         return logp;
       if (!(check_consistent_sizes(function,
                                    y,sigma,
@@ -122,23 +118,21 @@ namespace stan {
       using stan::prob::include_summand;
       using stan::is_constant_struct;
       using stan::math::square;
+      using stan::math::value_of;
 
       double cdf(1.0);
+
       // check if any vectors are zero length
-      if (!(stan::length(y) 
-            && stan::length(sigma)))
+      if (!(stan::length(y) && stan::length(sigma)))
         return cdf;
 
       if (!check_not_nan(function, y, "Random variable", &cdf))
         return cdf;
-      if (!check_nonnegative(function, y, "Random variable", 
-                          &cdf))
+      if (!check_nonnegative(function, y, "Random variable", &cdf))
         return cdf;
-      if (!check_not_nan(function, sigma, "Scale parameter", 
-                         &cdf))
+      if (!check_not_nan(function, sigma, "Scale parameter", &cdf))
         return cdf;
-      if (!check_positive(function, sigma, "Scale parameter", 
-                          &cdf))
+      if (!check_positive(function, sigma, "Scale parameter", &cdf))
         return cdf;
       if (!(check_consistent_sizes(function,
                                    y,sigma,
