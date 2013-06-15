@@ -245,7 +245,7 @@ namespace stan {
     template <typename T_y, typename T_loc, typename T_scale, typename T_shape>
     typename return_type<T_y,T_loc,T_scale,T_shape>::type
     skew_normal_cdf_log(const T_y& y, const T_loc& mu, const T_scale& sigma, 
-                    const T_shape& alpha) {
+                        const T_shape& alpha) {
       static const char* function = "stan::prob::skew_normal_cdf_log(%1%)";
 
       using stan::math::check_positive;
@@ -254,6 +254,7 @@ namespace stan {
       using stan::math::check_consistent_sizes;
       using stan::agrad::owens_t;
       using stan::math::owens_t;
+      using stan::math::value_of;
 
       double cdf_log(0.0);
       
