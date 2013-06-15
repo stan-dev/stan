@@ -135,6 +135,7 @@ namespace stan {
       using stan::math::check_nonnegative;
       using stan::math::check_not_nan;
       using boost::math::tools::promote_args;
+      using stan::math::value_of;
 
      double cdf(1.0);
       // check if any vectors are zero length
@@ -192,6 +193,7 @@ namespace stan {
       using stan::math::check_nonnegative;
       using stan::math::check_not_nan;
       using boost::math::tools::promote_args;
+      using stan::math::value_of;
 
      double cdf_log(0.0);
       // check if any vectors are zero length

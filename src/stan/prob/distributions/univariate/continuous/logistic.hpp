@@ -143,7 +143,6 @@ namespace stan {
       using stan::math::check_finite;
       using stan::math::check_consistent_sizes;
       using stan::math::value_of;
-
       using boost::math::tools::promote_args;
           
       double P(1.0);
@@ -242,7 +241,6 @@ namespace stan {
       using stan::math::check_finite;
       using stan::math::check_consistent_sizes;
       using stan::math::value_of;
-
       using boost::math::tools::promote_args;
           
       double P(0.0);

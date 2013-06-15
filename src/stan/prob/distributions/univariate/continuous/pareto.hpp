@@ -28,7 +28,6 @@ namespace stan {
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
 
-      
       // check if any vectors are zero length
       if (!(stan::length(y) 
             && stan::length(y_min) 
@@ -41,17 +40,13 @@ namespace stan {
       // validate args (here done over var, which should be OK)
       if (!check_not_nan(function, y, "Random variable", &logp))
         return logp;
-      if (!check_finite(function, y_min, "Scale parameter",
-                        &logp))
+      if (!check_finite(function, y_min, "Scale parameter", &logp))
         return logp;
-      if (!check_positive(function, y_min, "Scale parameter", 
-                          &logp))
+      if (!check_positive(function, y_min, "Scale parameter", &logp))
         return logp;
-      if (!check_finite(function, alpha, "Shape parameter", 
-                        &logp))
+      if (!check_finite(function, alpha, "Shape parameter", &logp))
         return logp;
-      if (!check_positive(function, alpha, "Shape parameter", 
-                          &logp))
+      if (!check_positive(function, alpha, "Shape parameter", &logp))
         return logp;
       if (!(check_consistent_sizes(function,
                                    y,y_min,alpha,
@@ -147,7 +142,6 @@ namespace stan {
       using stan::math::check_greater_or_equal;
       using stan::math::check_consistent_sizes;
       using stan::math::check_nonnegative;
-          
       using stan::math::value_of;
           
       double P(1.0);
@@ -256,7 +250,6 @@ namespace stan {
       using stan::math::check_greater_or_equal;
       using stan::math::check_consistent_sizes;
       using stan::math::check_nonnegative;
-          
       using stan::math::value_of;
           
       double P(0.0);

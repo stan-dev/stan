@@ -202,7 +202,6 @@ namespace stan {
       using stan::math::check_less_or_equal;
       using stan::math::check_nonnegative;
       using stan::math::value_of;
-
       using boost::math::tools::promote_args;
           
       double P(1.0);
@@ -291,28 +290,23 @@ namespace stan {
             += beta_dbl * y_inv_dbl * y_inv_dbl 
             * gamma_p_derivative(alpha_dbl, beta_dbl * y_inv_dbl) 
             / Pn;
-              
         if (!is_constant_struct<T_shape>::value)
           operands_and_partials.d_x2[n] 
             += stan::math::gradRegIncGamma(alpha_dbl, beta_dbl
                                            * y_inv_dbl, gamma_vec[n],
                                            digamma_vec[n]) / Pn;
-              
         if (!is_constant_struct<T_scale>::value)
           operands_and_partials.d_x3[n] 
             += - y_inv_dbl * gamma_p_derivative(alpha_dbl, 
                                                 beta_dbl * y_inv_dbl) / Pn;
-              
       }
           
       if (!is_constant_struct<T_y>::value)
         for (size_t n = 0; n < stan::length(y); ++n) 
           operands_and_partials.d_x1[n] *= P;
-          
       if (!is_constant_struct<T_shape>::value)
         for (size_t n = 0; n < stan::length(alpha); ++n) 
           operands_and_partials.d_x2[n] *= P;
-          
       if (!is_constant_struct<T_scale>::value)
         for (size_t n = 0; n < stan::length(beta); ++n) 
           operands_and_partials.d_x3[n] *= P;
@@ -339,7 +333,6 @@ namespace stan {
       using stan::math::check_less_or_equal;
       using stan::math::check_nonnegative;
       using stan::math::value_of;
-
       using boost::math::tools::promote_args;
           
       double P(0.0);
@@ -437,7 +430,6 @@ namespace stan {
           operands_and_partials.d_x3[n] 
             += - y_inv_dbl * gamma_p_derivative(alpha_dbl, 
                                                 beta_dbl * y_inv_dbl) / Pn;
-              
       }
           
       return operands_and_partials.to_var(P);

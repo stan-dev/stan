@@ -155,6 +155,7 @@ namespace stan {
       using stan::math::check_finite;
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
+      using stan::math::value_of;
 
       double cdf(1.0);
       //check if any vectors are zero length
@@ -273,6 +274,7 @@ namespace stan {
       using stan::math::check_finite;
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
+      using stan::math::value_of;
 
       double cdf_log(0.0);
       //check if any vectors are zero length

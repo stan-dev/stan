@@ -151,6 +151,7 @@ namespace stan {
       using stan::math::check_consistent_sizes;
       using stan::agrad::owens_t;
       using stan::math::owens_t;
+      using stan::math::value_of;
 
       double cdf(1.0);
       
