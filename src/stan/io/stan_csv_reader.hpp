@@ -48,6 +48,9 @@ namespace stan {
     struct stan_csv_timing {
       double warmup;
       double sampling;
+      
+      stan_csv_timing() 
+        : warmup(0), sampling(0) { }
     };
 
     struct stan_csv {
@@ -310,7 +313,9 @@ namespace stan {
             for (int col = 0; col < cols; col++) {
               std::getline(ls, line, ',');
               boost::trim(line);
+              //std::cout << "line: !" << line << "@" << std::endl;
               samples(row, col) = boost::lexical_cast<double>(line);
+              //std::cout << "after" << std::endl << std::endl;
             }
           }
         }
