@@ -245,9 +245,9 @@ namespace stan {
 
     template <typename T_y, typename T_loc, typename T_scale, typename T_shape>
     typename return_type<T_y,T_loc,T_scale,T_shape>::type
-    skew_normal_cdf_log(const T_y& y, const T_loc& mu, const T_scale& sigma, 
-                        const T_shape& alpha) {
-      static const char* function = "stan::prob::skew_normal_cdf_log(%1%)";
+    skew_normal_ccdf_log(const T_y& y, const T_loc& mu, const T_scale& sigma, 
+                         const T_shape& alpha) {
+      static const char* function = "stan::prob::skew_normal_ccdf_log(%1%)";
 
       using stan::math::check_positive;
       using stan::math::check_finite;
@@ -257,33 +257,33 @@ namespace stan {
       using stan::math::owens_t;
       using stan::math::value_of;
 
-      double cdf_log(0.0);
+      double ccdf_log(0.0);
       
       // check if any vectors are zero length
       if (!(stan::length(y) 
             && stan::length(mu) 
             && stan::length(sigma)
             && stan::length(alpha)))
-        return cdf_log;
+        return ccdf_log;
 
-      if (!check_not_nan(function, y, "Random variable", &cdf_log))
-        return cdf_log;
-      if (!check_finite(function, mu, "Location parameter", &cdf_log))
-        return cdf_log;
-      if (!check_not_nan(function, sigma, "Scale parameter", &cdf_log))
-        return cdf_log;
-      if (!check_positive(function, sigma, "Scale parameter", &cdf_log))
-        return cdf_log;
-      if (!check_finite(function, alpha, "Shape parameter", &cdf_log))
-        return cdf_log;
-      if (!check_not_nan(function, alpha, "Shape parameter", &cdf_log))
-        return cdf_log;
+      if (!check_not_nan(function, y, "Random variable", &ccdf_log))
+        return ccdf_log;
+      if (!check_finite(function, mu, "Location parameter", &ccdf_log))
+        return ccdf_log;
+      if (!check_not_nan(function, sigma, "Scale parameter", &ccdf_log))
+        return ccdf_log;
+      if (!check_positive(function, sigma, "Scale parameter", &ccdf_log))
+        return ccdf_log;
+      if (!check_finite(function, alpha, "Shape parameter", &ccdf_log))
+        return ccdf_log;
+      if (!check_not_nan(function, alpha, "Shape parameter", &ccdf_log))
+        return ccdf_log;
       if (!(check_consistent_sizes(function,
                                    y,mu,sigma,alpha,
                                    "Random variable","Location parameter",
                                    "Scale parameter","Shape paramter",
-                                   &cdf_log)))
-        return cdf_log;
+                                   &ccdf_log)))
+        return ccdf_log;
 
       agrad::OperandsAndPartials<T_y, T_loc, T_scale, T_shape> 
         operands_and_partials(y, mu, sigma, alpha);
@@ -308,30 +308,30 @@ namespace stan {
         const double diff_sq = diff * diff;
         const double scaled_diff =  diff / SQRT_2;
         const double scaled_diff_sq =  diff_sq * 0.5;
-        const double cdf_log_ = 0.5 * erfc(-scaled_diff) - 2 * owens_t(diff, 
+        const double ccdf_log_ = 1.0 - 0.5 * erfc(-scaled_diff) + 2 * owens_t(diff, 
                                                                  alpha_dbl);
-        //cdf_log
-        cdf_log += log(cdf_log_);
+        //ccdf_log
+        ccdf_log += log(ccdf_log_);
 
         //gradients
         const double deriv_erfc = SQRT_TWO_OVER_PI * 0.5 * exp(-scaled_diff_sq)
           / sigma_dbl;
         const double deriv_owens = erf(alpha_dbl * scaled_diff) 
           * exp(-scaled_diff_sq) / SQRT_TWO_OVER_PI / (-2.0 * pi()) / sigma_dbl;
-        const double rep_deriv = (-2.0 * deriv_owens + deriv_erfc) / cdf_log_;
+        const double rep_deriv = (-2.0 * deriv_owens + deriv_erfc) / ccdf_log_;
 
         if (!is_constant_struct<T_y>::value)
-          operands_and_partials.d_x1[n] += rep_deriv;
+          operands_and_partials.d_x1[n] -= rep_deriv;
         if (!is_constant_struct<T_loc>::value)
-          operands_and_partials.d_x2[n] -= rep_deriv;
+          operands_and_partials.d_x2[n] += rep_deriv;
         if (!is_constant_struct<T_scale>::value)
-          operands_and_partials.d_x3[n] -= rep_deriv * diff;
+          operands_and_partials.d_x3[n] += rep_deriv * diff;
         if (!is_constant_struct<T_shape>::value)
-          operands_and_partials.d_x4[n] += -2.0 * exp(-0.5 * diff_sq * (1.0 
-                   + alpha_dbl_sq)) / ((1 + alpha_dbl_sq) * 2.0 * pi()) / cdf_log_;
+          operands_and_partials.d_x4[n] -= -2.0 * exp(-0.5 * diff_sq * (1.0 
+                   + alpha_dbl_sq)) / ((1 + alpha_dbl_sq) * 2.0 * pi()) / ccdf_log_;
       }
 
-      return operands_and_partials.to_var(cdf_log);    
+      return operands_and_partials.to_var(ccdf_log);    
     }
 
     template <class RNG>
