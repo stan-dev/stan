@@ -78,6 +78,7 @@ namespace stan {
       using stan::math::inverse;
       using stan::math::subtract;
       using stan::math::quad_form_sym;
+      using stan::math::trace_quad_form;
       using stan::math::log_determinant_spd;
       // using stan::math::LDLT_factor;
       // using stan::math::trace_inv_quad_form_ldlt;
@@ -125,7 +126,7 @@ namespace stan {
         return lp;
 
       if (include_summand<propto>::value) {
-        lp += 0.5 * NEG_LOG_SQRT_TWO_PI * r * T;
+        lp -= 0.5 * LOG_TWO_PI * r * T;
       }
       
       if (include_summand<propto,T_y,T_F,T_G,T_V,T_W>::value) {
@@ -158,11 +159,13 @@ namespace stan {
         Eigen::Matrix<T_lp,Eigen::Dynamic, 1> e(r);
         Eigen::Matrix<T_lp,Eigen::Dynamic, Eigen::Dynamic> A(n, r);
 
-        for (int i = 0; i < T; ++i) {
+        for (int i = 0; i < y.cols(); i++) {
           yi = y.col(i);
+          // std::cout << "y = " << yi << std::endl;
           // // Predict state
           // a_t = G_t m_{t-1}
           a = multiply(G, m);
+          // std::cout  << "a = " << a << std::endl;
           // R_t = G_t C_{t-1} G_t' + W_t
           R = add(quad_form_sym(C, transpose(G)), W);
           // // predict observation 
@@ -180,8 +183,7 @@ namespace stan {
           m = add(a, multiply(A, e));
           // C = R_t - A_t Q_t A_t'
           C = subtract(R, quad_form_sym(Q, transpose(A)));
-          //C = subtract(R, multiply(multiply(multiply(A, transpose(F)), R)));
-          lp -= 0.5 * (log_determinant_spd(Q) + transpose(e) * Q_inv * e);
+          lp -= 0.5 * (log_determinant_spd(Q) + trace_quad_form(Q_inv, e));
         }
       }
       return lp;
@@ -277,7 +279,7 @@ namespace stan {
         return lp;
 
       if (include_summand<propto>::value) {
-        lp += 0.5 * NEG_LOG_SQRT_TWO_PI * r * T;
+        lp += 0.5 * NEG_LOG_TWO_PI * r * T;
       }
       
       if (include_summand<propto,T_y,T_F,T_G,T_V,T_W>::value) {
@@ -309,7 +311,7 @@ namespace stan {
         Eigen::Matrix<T_lp, Eigen::Dynamic, 1> m1(n);
         Eigen::Matrix<T_lp, Eigen::Dynamic, Eigen::Dynamic> C1(n, n);
         
-        for (int i = 0; i < y.cols(); ++i) {
+        for (int i = 0; i < y.cols(); i++) {
           // Predict state
           // reuse m and C instead of using a and R
           // eval to avoid any aliasing issues with Eigen (?)

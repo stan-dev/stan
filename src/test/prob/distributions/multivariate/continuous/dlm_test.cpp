@@ -21,32 +21,27 @@ typedef policy<
   evaluation_error<errno_on_error> 
   > errno_policy;
 
+TEST(ProbDistributionsMultiGP,LoglikeUU) {
+  Matrix<double, 1, 1> FF;
+  Matrix<double, 1, 1> GG;
+  Matrix<double, 1, 1> V;
+  Matrix<double, 1, 1> W;
 
-TEST(ProbDistributionsMultiGP,MultiGP) {
-  // Matrix<double,Dynamic,1> mu(5,1);
-  // mu.setZero();
-  
-  // Matrix<double,Dynamic,Dynamic> y(3,5);
-  // y << 2.0, -2.0, 11.0, 4.0, -2.0, 11.0, 2.0, -5.0, 11.0, 0.0, -2.0, 11.0, 2.0, -2.0, -11.0;
+  FF << 0.585528817843856;
+  GG << -0.109303314681054;
+  V << 2.25500747900521;
+  W << 0.461487989960454;
 
-  // Matrix<double,Dynamic,Dynamic> Sigma(5,5);
-  // Sigma << 9.0, -3.0, 0.0,  0.0, 0.0,
-  //         -3.0,  4.0, 0.0,  0.0, 0.0,
-  //          0.0,  0.0, 5.0,  1.0, 0.0,
-  //          0.0,  0.0, 1.0, 10.0, 0.0,
-  //          0.0,  0.0, 0.0,  0.0, 2.0;
+  Matrix<double,Dynamic,1> y(10);
+  y << -191.283411318882, 19.2723905416, -1.43621233172613, -1.59717406907683, 
+    0.66578474366854, 0.21545711451668, -1.3710009374748, -3.11525241456936, 
+    -0.193395632057508, 0.714053334632461;
 
-  // Matrix<double,Dynamic,1> w(3,1);
-  // w << 1.0, 0.5, 1.5;
-  
-  // double lp_ref(0);
-  // for (size_t i = 0; i < 3; i++) {
-  //   Matrix<double,Dynamic,1> cy(y.row(i).transpose());
-  //   Matrix<double,Dynamic,Dynamic> cSigma((1.0/w[i])*Sigma);
-  //   lp_ref += stan::prob::multi_normal_log(cy,mu,cSigma);
-  // }
-  
-  // EXPECT_FLOAT_EQ(lp_ref, stan::prob::multi_gp_log(y,Sigma,w));
+  double expected = 13.1327101955358;
+
+  lp_ref = gaussian_dlm_log(y, FF, GG, V, W);
+
+  EXPECT_FLOAT_EQ(lp_ref, expected);
 }
 
 // TEST(ProbDistributionsMultiGP,DefaultPolicySigma) {
