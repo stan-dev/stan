@@ -309,6 +309,7 @@ namespace stan {
             std::stringstream ls(line);
             for (int col = 0; col < cols; col++) {
               std::getline(ls, line, ',');
+              boost::trim(line);
               samples(row, col) = boost::lexical_cast<double>(line);
             }
           }
