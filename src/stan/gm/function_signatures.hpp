@@ -45,6 +45,9 @@ for (size_t i = 0; i < int_vector_types.size(); ++i)
     add("bernoulli_cdf",DOUBLE_T,int_vector_types[i],vector_types[j]);
 for (size_t i = 0; i < int_vector_types.size(); ++i) 
   for (size_t j = 0; j < vector_types.size(); ++j)
+    add("bernoulli_ccdf_log",DOUBLE_T,int_vector_types[i],vector_types[j]);
+for (size_t i = 0; i < int_vector_types.size(); ++i) 
+  for (size_t j = 0; j < vector_types.size(); ++j)
     add("bernoulli_cdf_log",DOUBLE_T,int_vector_types[i],vector_types[j]);
 for (size_t i = 0; i < int_vector_types.size(); ++i) 
   for (size_t j = 0; j < vector_types.size(); ++j)
@@ -63,6 +66,12 @@ for (size_t i = 0; i < int_vector_types.size(); i++)
   for (size_t j = 0; j < int_vector_types.size(); j++)
     for (size_t k = 0; k < vector_types.size(); k++)
       for (size_t l = 0; l < vector_types.size(); l++) 
+        add("beta_binomial_ccdf_log",DOUBLE_T, // result
+            int_vector_types[i],int_vector_types[j],vector_types[k],vector_types[l]);
+for (size_t i = 0; i < int_vector_types.size(); i++) 
+  for (size_t j = 0; j < int_vector_types.size(); j++)
+    for (size_t k = 0; k < vector_types.size(); k++)
+      for (size_t l = 0; l < vector_types.size(); l++) 
         add("beta_binomial_cdf_log",DOUBLE_T, // result
             int_vector_types[i],int_vector_types[j],vector_types[k],vector_types[l]);
 for (size_t i = 0; i < int_vector_types.size(); i++) 
@@ -76,6 +85,12 @@ for (size_t i = 0; i < vector_types.size(); ++i)
   for (size_t j = 0; j < vector_types.size(); ++j)
     for (size_t k = 0; k < vector_types.size(); ++k)
       add("beta_cdf",
+          DOUBLE_T, // result
+          vector_types[i], vector_types[j], vector_types[k]); // args
+for (size_t i = 0; i < vector_types.size(); ++i)
+  for (size_t j = 0; j < vector_types.size(); ++j)
+    for (size_t k = 0; k < vector_types.size(); ++k)
+      add("beta_ccdf_log",
           DOUBLE_T, // result
           vector_types[i], vector_types[j], vector_types[k]); // args
 for (size_t i = 0; i < vector_types.size(); ++i)
@@ -101,6 +116,11 @@ for (size_t i = 0; i < int_vector_types.size(); ++i)
 for (size_t i = 0; i < int_vector_types.size(); ++i)
   for (size_t j = 0; j < int_vector_types.size(); ++j)
     for (size_t k = 0; k < vector_types.size(); ++k)
+      add("binomial_ccdf_log",DOUBLE_T,
+          int_vector_types[i],int_vector_types[j],vector_types[k]);
+for (size_t i = 0; i < int_vector_types.size(); ++i)
+  for (size_t j = 0; j < int_vector_types.size(); ++j)
+    for (size_t k = 0; k < vector_types.size(); ++k)
       add("binomial_cdf_log",DOUBLE_T,
           int_vector_types[i],int_vector_types[j],vector_types[k]);
 for (size_t i = 0; i < int_vector_types.size(); ++i)
@@ -121,6 +141,12 @@ for (size_t i = 0; i < vector_types.size(); ++i)
   for (size_t j = 0; j < vector_types.size(); ++j)
     for (size_t k = 0; k < vector_types.size(); ++k)
       add("cauchy_cdf",
+          DOUBLE_T, // result
+          vector_types[i], vector_types[j], vector_types[k]); // args
+for (size_t i = 0; i < vector_types.size(); ++i)
+  for (size_t j = 0; j < vector_types.size(); ++j)
+    for (size_t k = 0; k < vector_types.size(); ++k)
+      add("cauchy_ccdf_log",
           DOUBLE_T, // result
           vector_types[i], vector_types[j], vector_types[k]); // args
 for (size_t i = 0; i < vector_types.size(); ++i)
@@ -200,6 +226,12 @@ for (size_t i = 0; i < vector_types.size(); ++i)
 for (size_t i = 0; i < vector_types.size(); ++i)
   for (size_t j = 0; j < vector_types.size(); ++j)
     for (size_t k = 0; k < vector_types.size(); ++k)
+      add("double_exponential_ccdf_log",
+          DOUBLE_T, // result
+          vector_types[i], vector_types[j], vector_types[k]); // args
+for (size_t i = 0; i < vector_types.size(); ++i)
+  for (size_t j = 0; j < vector_types.size(); ++j)
+    for (size_t k = 0; k < vector_types.size(); ++k)
       add("double_exponential_cdf_log",
           DOUBLE_T, // result
           vector_types[i], vector_types[j], vector_types[k]); // args
@@ -242,6 +274,11 @@ for (size_t i = 0; i < vector_types.size(); ++i)
           vector_types[i], vector_types[j]); // args
 for (size_t i = 0; i < vector_types.size(); ++i)
   for (size_t j = 0; j < vector_types.size(); ++j)
+      add("exponential_ccdf_log",
+          DOUBLE_T, // result
+          vector_types[i], vector_types[j]); // args
+for (size_t i = 0; i < vector_types.size(); ++i)
+  for (size_t j = 0; j < vector_types.size(); ++j)
       add("exponential_cdf_log",
           DOUBLE_T, // result
           vector_types[i], vector_types[j]); // args
@@ -256,6 +293,9 @@ for (size_t i = 0; i < vector_types.size(); ++i) {
     for (size_t k = 0; k < vector_types.size(); ++k) {
       for (size_t l = 0; l < vector_types.size(); ++l) {
         add("exp_mod_normal_cdf",
+            DOUBLE_T, // result
+            vector_types[i], vector_types[j], vector_types[k], vector_types[l]); // args
+        add("exp_mod_normal_ccdf_log",
             DOUBLE_T, // result
             vector_types[i], vector_types[j], vector_types[k], vector_types[l]); // args
         add("exp_mod_normal_cdf_log",
@@ -287,13 +327,16 @@ add_binary("gamma_rng");
 for (size_t i = 0; i < vector_types.size(); ++i) {
   for (size_t j = 0; j < vector_types.size(); ++j) {
     for (size_t k = 0; k < vector_types.size(); ++k) {
-      add("gumbel_log",
-          DOUBLE_T, // result
-          vector_types[i], vector_types[j], vector_types[k]); // args
       add("gumbel_cdf",
           DOUBLE_T, // result
           vector_types[i], vector_types[j], vector_types[k]); // args
+      add("gumbel_ccdf_log",
+          DOUBLE_T, // result
+          vector_types[i], vector_types[j], vector_types[k]); // args
       add("gumbel_cdf_log",
+          DOUBLE_T, // result
+          vector_types[i], vector_types[j], vector_types[k]); // args
+      add("gumbel_log",
           DOUBLE_T, // result
           vector_types[i], vector_types[j], vector_types[k]); // args
     }
@@ -320,6 +363,11 @@ for (size_t i = 0; i < vector_types.size(); ++i)
           vector_types[i], vector_types[j]); // args
 for (size_t i = 0; i < vector_types.size(); ++i)
   for (size_t j = 0; j < vector_types.size(); ++j)
+      add("inv_chi_square_ccdf_log",
+          DOUBLE_T, // result
+          vector_types[i], vector_types[j]); // args
+for (size_t i = 0; i < vector_types.size(); ++i)
+  for (size_t j = 0; j < vector_types.size(); ++j)
       add("inv_chi_square_cdf_log",
           DOUBLE_T, // result
           vector_types[i], vector_types[j]); // args
@@ -334,6 +382,12 @@ for (size_t i = 0; i < vector_types.size(); ++i)
   for (size_t j = 0; j < vector_types.size(); ++j)
     for (size_t k = 0; k < vector_types.size(); ++k)
       add("inv_gamma_cdf",
+          DOUBLE_T, // result
+          vector_types[i], vector_types[j], vector_types[k]); // args
+for (size_t i = 0; i < vector_types.size(); ++i)
+  for (size_t j = 0; j < vector_types.size(); ++j)
+    for (size_t k = 0; k < vector_types.size(); ++k)
+      add("inv_gamma_ccdf_log",
           DOUBLE_T, // result
           vector_types[i], vector_types[j], vector_types[k]); // args
 for (size_t i = 0; i < vector_types.size(); ++i)
@@ -405,6 +459,12 @@ for (size_t i = 0; i < vector_types.size(); ++i)
 for (size_t i = 0; i < vector_types.size(); ++i)
   for (size_t j = 0; j < vector_types.size(); ++j)
     for (size_t k = 0; k < vector_types.size(); ++k)
+      add("logistic_ccdf_log",
+          DOUBLE_T, // result
+          vector_types[i], vector_types[j], vector_types[k]); // args
+for (size_t i = 0; i < vector_types.size(); ++i)
+  for (size_t j = 0; j < vector_types.size(); ++j)
+    for (size_t k = 0; k < vector_types.size(); ++k)
       add("logistic_cdf_log",
           DOUBLE_T, // result
           vector_types[i], vector_types[j], vector_types[k]); // args
@@ -420,6 +480,12 @@ for (size_t i = 0; i < vector_types.size(); ++i)
   for (size_t j = 0; j < vector_types.size(); ++j)
     for (size_t k = 0; k < vector_types.size(); ++k)
       add("lognormal_cdf",
+          DOUBLE_T, // result
+          vector_types[i], vector_types[j], vector_types[k]); // args
+for (size_t i = 0; i < vector_types.size(); ++i)
+  for (size_t j = 0; j < vector_types.size(); ++j)
+    for (size_t k = 0; k < vector_types.size(); ++k)
+      add("lognormal_ccdf_log",
           DOUBLE_T, // result
           vector_types[i], vector_types[j], vector_types[k]); // args
 for (size_t i = 0; i < vector_types.size(); ++i)
@@ -497,6 +563,11 @@ for (size_t i = 0; i < int_vector_types.size(); ++i)
 for (size_t i = 0; i < int_vector_types.size(); ++i) 
   for (size_t j = 0; j < vector_types.size(); ++j)
     for (size_t k = 0; k < vector_types.size(); ++k)
+      add("neg_binomial_ccdf_log",DOUBLE_T,
+          int_vector_types[i],vector_types[j],vector_types[k]);
+for (size_t i = 0; i < int_vector_types.size(); ++i) 
+  for (size_t j = 0; j < vector_types.size(); ++j)
+    for (size_t k = 0; k < vector_types.size(); ++k)
       add("neg_binomial_cdf_log",DOUBLE_T,
           int_vector_types[i],vector_types[j],vector_types[k]);
 for (size_t i = 0; i < int_vector_types.size(); ++i) 
@@ -511,6 +582,12 @@ for (size_t i = 0; i < vector_types.size(); ++i)
   for (size_t j = 0; j < vector_types.size(); ++j)
     for (size_t k = 0; k < vector_types.size(); ++k)
       add("normal_cdf",
+          DOUBLE_T, // result
+          vector_types[i], vector_types[j], vector_types[k]); // args
+for (size_t i = 0; i < vector_types.size(); ++i)
+  for (size_t j = 0; j < vector_types.size(); ++j)
+    for (size_t k = 0; k < vector_types.size(); ++k)
+      add("normal_ccdf_log",
           DOUBLE_T, // result
           vector_types[i], vector_types[j], vector_types[k]); // args
 for (size_t i = 0; i < vector_types.size(); ++i)
@@ -539,6 +616,12 @@ for (size_t i = 0; i < vector_types.size(); ++i)
 for (size_t i = 0; i < vector_types.size(); ++i)
   for (size_t j = 0; j < vector_types.size(); ++j)
     for (size_t k = 0; k < vector_types.size(); ++k)
+      add("pareto_ccdf_log",
+          DOUBLE_T, // result
+          vector_types[i], vector_types[j], vector_types[k]); // args
+for (size_t i = 0; i < vector_types.size(); ++i)
+  for (size_t j = 0; j < vector_types.size(); ++j)
+    for (size_t k = 0; k < vector_types.size(); ++k)
       add("pareto_cdf_log",
           DOUBLE_T, // result
           vector_types[i], vector_types[j], vector_types[k]); // args
@@ -555,6 +638,9 @@ add_nullary("pi");
 for (size_t i = 0; i < int_vector_types.size(); ++i) 
   for (size_t j = 0; j < vector_types.size(); ++j) 
     add("poisson_cdf",DOUBLE_T, int_vector_types[i],vector_types[j]);
+for (size_t i = 0; i < int_vector_types.size(); ++i) 
+  for (size_t j = 0; j < vector_types.size(); ++j) 
+    add("poisson_ccdf_log",DOUBLE_T, int_vector_types[i],vector_types[j]);
 for (size_t i = 0; i < int_vector_types.size(); ++i) 
   for (size_t j = 0; j < vector_types.size(); ++j) 
     add("poisson_cdf_log",DOUBLE_T, int_vector_types[i],vector_types[j]);
@@ -611,6 +697,12 @@ for (size_t i = 0; i < vector_types.size(); ++i)
 for (size_t i = 0; i < vector_types.size(); ++i)
   for (size_t j = 0; j < vector_types.size(); ++j)
     for (size_t k = 0; k < vector_types.size(); ++k)
+      add("scaled_inv_chi_square_ccdf_log",
+          DOUBLE_T, // result
+          vector_types[i], vector_types[j], vector_types[k]); // args
+for (size_t i = 0; i < vector_types.size(); ++i)
+  for (size_t j = 0; j < vector_types.size(); ++j)
+    for (size_t k = 0; k < vector_types.size(); ++k)
       add("scaled_inv_chi_square_cdf_log",
           DOUBLE_T, // result
           vector_types[i], vector_types[j], vector_types[k]); // args
@@ -642,6 +734,9 @@ for (size_t i = 0; i < vector_types.size(); ++i) {
         add("skew_normal_cdf",
             DOUBLE_T, // result
             vector_types[i], vector_types[j], vector_types[k], vector_types[l]); // args
+   add("skew_normal_ccdf_log",
+            DOUBLE_T, // result
+            vector_types[i], vector_types[j], vector_types[k], vector_types[l]); // args
         add("skew_normal_cdf_log",
             DOUBLE_T, // result
             vector_types[i], vector_types[j], vector_types[k], vector_types[l]); // args
@@ -671,6 +766,9 @@ for (size_t i = 0; i < vector_types.size(); ++i) {
     for (size_t k = 0; k < vector_types.size(); ++k) {
       for (size_t l = 0; l < vector_types.size(); ++l) {
         add("student_t_cdf",
+            DOUBLE_T, // result
+            vector_types[i], vector_types[j], vector_types[k], vector_types[l]); // args
+        add("student_t_ccdf_log",
             DOUBLE_T, // result
             vector_types[i], vector_types[j], vector_types[k], vector_types[l]); // args
         add("student_t_cdf_log",
@@ -725,6 +823,12 @@ for (size_t i = 0; i < vector_types.size(); ++i)
 for (size_t i = 0; i < vector_types.size(); ++i)
   for (size_t j = 0; j < vector_types.size(); ++j)
     for (size_t k = 0; k < vector_types.size(); ++k)
+        add("uniform_ccdf_log",
+            DOUBLE_T, // result
+            vector_types[i], vector_types[j], vector_types[k]); // args
+for (size_t i = 0; i < vector_types.size(); ++i)
+  for (size_t j = 0; j < vector_types.size(); ++j)
+    for (size_t k = 0; k < vector_types.size(); ++k)
         add("uniform_cdf_log",
             DOUBLE_T, // result
             vector_types[i], vector_types[j], vector_types[k]); // args
@@ -743,6 +847,12 @@ for (size_t i = 0; i < vector_types.size(); ++i)
   for (size_t j = 0; j < vector_types.size(); ++j)
     for (size_t k = 0; k < vector_types.size(); ++k)
         add("weibull_cdf",
+            DOUBLE_T, // result
+            vector_types[i], vector_types[j], vector_types[k]); // args
+for (size_t i = 0; i < vector_types.size(); ++i)
+  for (size_t j = 0; j < vector_types.size(); ++j)
+    for (size_t k = 0; k < vector_types.size(); ++k)
+        add("weibull_ccdf_log",
             DOUBLE_T, // result
             vector_types[i], vector_types[j], vector_types[k]); // args
 for (size_t i = 0; i < vector_types.size(); ++i)
