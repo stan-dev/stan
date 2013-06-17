@@ -207,7 +207,7 @@ namespace stan {
       return operands_and_partials.to_var(cdf);
     }
    
-  template <typename T_y, typename T_low, typename T_high>
+    template <typename T_y, typename T_low, typename T_high>
     typename return_type<T_y,T_low,T_high>::type
     uniform_cdf_log(const T_y& y, const T_low& alpha, const T_high& beta) {
       static const char* function = "stan::prob::uniform_cdf_log(%1%)";
@@ -276,6 +276,77 @@ namespace stan {
       }
 
       return operands_and_partials.to_var(cdf_log);
+    }
+
+  template <typename T_y, typename T_low, typename T_high>
+    typename return_type<T_y,T_low,T_high>::type
+    uniform_ccdf_log(const T_y& y, const T_low& alpha, const T_high& beta) {
+      static const char* function = "stan::prob::uniform_ccdf_log(%1%)";
+      
+      using stan::math::check_not_nan;
+      using stan::math::check_finite;
+      using stan::math::check_greater;
+      using stan::math::value_of;
+      using stan::math::check_consistent_sizes;
+
+      // check if any vectors are zero length
+      if (!(stan::length(y) 
+            && stan::length(alpha) 
+            && stan::length(beta)))
+        return 0.0;
+
+      // set up return value accumulator
+      double ccdf_log(0.0);
+      if(!check_not_nan(function, y, "Random variable", &ccdf_log))
+        return ccdf_log;
+      if (!check_finite(function, alpha, "Lower bound parameter", &ccdf_log))
+        return ccdf_log;
+      if (!check_finite(function, beta, "Upper bound parameter", &ccdf_log))
+        return ccdf_log;
+      if (!check_greater(function, beta, alpha, "Upper bound parameter", &ccdf_log))
+        return ccdf_log;
+      if (!(check_consistent_sizes(function,
+                                   y,alpha,beta,
+                                   "Random variable","Lower bound parameter",
+                                   "Upper bound parameter",
+                                   &ccdf_log)))
+        return ccdf_log;
+
+      VectorView<const T_y> y_vec(y);
+      VectorView<const T_low> alpha_vec(alpha);
+      VectorView<const T_high> beta_vec(beta);
+      size_t N = max_size(y, alpha, beta);
+
+      for (size_t n = 0; n < N; n++) {
+        const double y_dbl = value_of(y_vec[n]);
+        if (y_dbl < value_of(alpha_vec[n]) 
+            || y_dbl > value_of(beta_vec[n]))
+          return 0.0;
+      }
+   
+      agrad::OperandsAndPartials<T_y,T_low,T_high> 
+        operands_and_partials(y,alpha,beta);
+      for (size_t n = 0; n < N; n++) {
+        const double y_dbl = value_of(y_vec[n]);
+        const double alpha_dbl = value_of(alpha_vec[n]);
+        const double beta_dbl = value_of(beta_vec[n]);
+        const double b_min_a = beta_dbl - alpha_dbl;
+        const double ccdf_log_ = 1.0 - (y_dbl - alpha_dbl) / b_min_a;
+
+        //ccdf_log
+        ccdf_log += log(ccdf_log_);
+
+        //gradients
+        if (!is_constant_struct<T_y>::value)
+          operands_and_partials.d_x1[n] -= 1.0 / b_min_a / ccdf_log_;
+        if (!is_constant_struct<T_low>::value)
+          operands_and_partials.d_x2[n] -= (y_dbl - beta_dbl) / b_min_a / b_min_a
+            / ccdf_log_;
+        if (!is_constant_struct<T_high>::value)
+          operands_and_partials.d_x3[n] += (y_dbl - alpha_dbl) / b_min_a / b_min_a / ccdf_log_;
+      }
+
+      return operands_and_partials.to_var(ccdf_log);
     }
 
     template <class RNG>
