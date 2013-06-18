@@ -12,8 +12,8 @@ TEST(AgradRev,gamma_q_var_var) {
   AVEC x = createAVEC(a,b);
   VEC g;
   f.grad(x,g);
-  EXPECT_FLOAT_EQ(1.7356299, g[0]);
-  EXPECT_FLOAT_EQ(boost::math::gamma_p_derivative(0.5,1.0), g[1]);
+  EXPECT_FLOAT_EQ(0.38983709, g[0]);
+  EXPECT_FLOAT_EQ(-boost::math::gamma_p_derivative(0.5,1.0), g[1]);
   
   a = -0.5;
   EXPECT_THROW(gamma_q(a,b), std::domain_error);
@@ -30,7 +30,7 @@ TEST(AgradRev,gamma_q_double_var) {
   AVEC x = createAVEC(b);
   VEC g;
   f.grad(x,g);
-  EXPECT_FLOAT_EQ(boost::math::gamma_p_derivative(0.5,1.0), g[0]);
+  EXPECT_FLOAT_EQ(-boost::math::gamma_p_derivative(0.5,1.0), g[0]);
 
   a = -0.5;
   EXPECT_THROW(gamma_q(a,b), std::domain_error);
@@ -47,7 +47,7 @@ TEST(AgradRev,gamma_q_var_double) {
   AVEC x = createAVEC(a);
   VEC g;
   f.grad(x,g);
-  EXPECT_FLOAT_EQ(1.7356299, g[0]);
+  EXPECT_FLOAT_EQ(0.38983709, g[0]);
 
   a = -0.5;
   EXPECT_THROW(gamma_q(a,b), std::domain_error);

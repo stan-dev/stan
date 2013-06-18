@@ -80,7 +80,9 @@ public:
   ccdf_log_function(const T_y& y, const T_shape& alpha, const T_scale& beta,
                    const T3&, const T4&, const T5&, const T6&, const T7&, 
                    const T8&, const T9&) {
-      return stan::prob::inv_gamma_ccdf_log(y, alpha, beta);
-  }
+    using stan::agrad::gamma_q;
+    using stan::math::gamma_q;
+
+    return log(1.0 - gamma_q(alpha, beta / y));  }
     
 };

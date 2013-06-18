@@ -41,8 +41,8 @@ namespace stan {
           }
           
 
-          avi_->adj_ += adj_ * (u * ( dig - l ) + std::exp( avi_->val_ * l ) * S / g);
-          bvi_->adj_ += adj_ * (std::exp(-bvi_->val_) * std::pow(bvi_->val_, avi_->val_ - 1.0) / g);
+          avi_->adj_ += adj_ * ((1.0 - u) * ( dig - l ) + std::exp( avi_->val_ * l ) * S / g);
+          bvi_->adj_ -= adj_ * (std::exp(-bvi_->val_) * std::pow(bvi_->val_, avi_->val_ - 1.0) / g);
         }
       };
 
@@ -72,7 +72,7 @@ namespace stan {
             delta = s / ((k + avi_->val_) * (k + avi_->val_));
           }
 
-          avi_->adj_ += adj_ * (u * ( dig - l ) + std::exp( avi_->val_ * l ) * S / g);
+          avi_->adj_ += adj_ * ((1.0 - u) * ( dig - l ) + std::exp( avi_->val_ * l ) * S / g);
         }
       };
 
@@ -83,7 +83,7 @@ namespace stan {
                      a,bvi) {
         }
         void chain() {
-          bvi_->adj_ += adj_ * (std::exp(-bvi_->val_) * std::pow(bvi_->val_, ad_ - 1.0) / boost::math::tgamma(ad_));     
+          bvi_->adj_ -= adj_ * (std::exp(-bvi_->val_) * std::pow(bvi_->val_, ad_ - 1.0) / boost::math::tgamma(ad_));     
         }
       };
     }

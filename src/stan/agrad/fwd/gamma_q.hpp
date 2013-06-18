@@ -39,8 +39,8 @@ namespace stan{
         delta = s / ((k + x1.val_) * (k + x1.val_));
       }
       
-      T der1 = u * ( dig - l ) + exp( x1.val_ * l ) * S / g;
-      T der2 = exp(-x2.val_) * pow(x2.val_, x1.val_ - 1.0) / g;
+      T der1 = (1.0 - u) * ( dig - l ) + exp( x1.val_ * l ) * S / g;
+      T der2 = -exp(-x2.val_) * pow(x2.val_, x1.val_ - 1.0) / g;
       
       return fvar<T>(u,x1.d_ * der1 + x2.d_ * der2);
     }
@@ -75,7 +75,7 @@ namespace stan{
         delta = s / ((k + x1.val_) * (k + x1.val_));
       }
       
-      T der1 = u * ( dig - l ) + exp( x1.val_ * l ) * S / g;
+      T der1 = (1.0 - u) * ( dig - l ) + exp( x1.val_ * l ) * S / g;
       
       return fvar<typename 
                   stan::return_type<T,double>::type>(u,x1.d_ * der1);
@@ -93,7 +93,7 @@ namespace stan{
       
       double g = boost::math::tgamma(x1);
       
-      T der2 = exp(-x2.val_) * pow(x2.val_, x1 - 1.0) / g;
+      T der2 = -exp(-x2.val_) * pow(x2.val_, x1 - 1.0) / g;
       
       return fvar<typename 
                   stan::return_type<T,double>::type>(u,x2.d_ * der2);

@@ -17,18 +17,18 @@ TEST(AgradFvar, gamma_q){
 
   fvar<double> a = gamma_q(x,y);
   EXPECT_FLOAT_EQ(gamma_q(0.5,1.0), a.val_);
-  EXPECT_FLOAT_EQ(1.9431838, a.d_);
+  EXPECT_FLOAT_EQ(0.18228334, a.d_);
 
   double z = 1.0;
   double w = 0.5;
 
   a = gamma_q(x,z);
   EXPECT_FLOAT_EQ(gamma_q(0.5,1.0), a.val_);
-  EXPECT_FLOAT_EQ(1.7356299, a.d_);
+  EXPECT_FLOAT_EQ(0.38983709, a.d_);
 
   a = gamma_q(w,y);
   EXPECT_FLOAT_EQ(gamma_q(0.5,1.0), a.val_);
-  EXPECT_FLOAT_EQ(boost::math::gamma_p_derivative(0.5,1.0), a.d_);
+  EXPECT_FLOAT_EQ(-boost::math::gamma_p_derivative(0.5,1.0), a.d_);
 
   EXPECT_THROW(gamma_q(-x,y), std::domain_error);
   EXPECT_THROW(gamma_q(x,-y), std::domain_error);
