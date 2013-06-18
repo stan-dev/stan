@@ -155,7 +155,7 @@ namespace stan {
       }
       
       void write_sampler_param_names(std::ostream& o) {
-        o << "stepsize__,depth__,";
+        o << "stepsize__,treedepth__,";
       }
       
       void write_sampler_params(std::ostream& o) {
@@ -164,7 +164,7 @@ namespace stan {
       
       void get_sampler_param_names(std::vector<std::string>& names) {
         names.push_back("stepsize__");
-        names.push_back("depth__");
+        names.push_back("treedepth__");
       }
       
       void get_sampler_params(std::vector<double>& values) {

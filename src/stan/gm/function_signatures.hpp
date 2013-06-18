@@ -283,8 +283,11 @@ for (size_t i = 0; i < vector_types.size(); ++i)
           vector_types[i], vector_types[j], vector_types[k]); // args
 add_binary("inv_gamma_rng");
 add_unary("inv_logit");
+add_unary("inv_square");
+add_unary("inv_sqrt");
 add("inv_wishart_log",DOUBLE_T, MATRIX_T,DOUBLE_T,MATRIX_T);
 add("inv_wishart_rng",MATRIX_T,DOUBLE_T,MATRIX_T);
+add_unary("inv");
 add("inverse",MATRIX_T,MATRIX_T);
 add("inverse_spd",MATRIX_T,MATRIX_T);
 add_binary("lbeta");
@@ -318,8 +321,10 @@ add_binary("log_sum_exp");
 add_nullary("log10");
 add_unary("log10");
 add_unary("log1m");
+add_unary("log1m_exp");
 add_unary("log1p");
 add_unary("log1p_exp");
+add_binary("log_diff_exp");
 add_unary("log_inv_logit");
 add_unary("log1m_inv_logit");
 add_nullary("log2");
@@ -583,6 +588,8 @@ for (size_t i = 0; i < base_types.size(); ++i) {
 add_unary("tan");
 add_unary("tanh");
 add_unary("tgamma");
+add("to_vector", VECTOR_T, ROW_VECTOR_T);
+add("to_vector", VECTOR_T, MATRIX_T);
 add("trace",DOUBLE_T,MATRIX_T);
 add("transpose",ROW_VECTOR_T,VECTOR_T);
 add("transpose",VECTOR_T,ROW_VECTOR_T);
