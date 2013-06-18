@@ -82,7 +82,6 @@ transformed data {
   transformed_data_real <- binomial_ccdf_log(d_int_array, d_int_array, d_row_vector);
   transformed_data_real <- binomial_ccdf_log(d_int_array, d_int_array, d_real_array);
 }
-}
 parameters {
   real p_real;
   real p_real_array[d_int];
