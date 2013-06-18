@@ -2,6 +2,7 @@
 #define __STAN__MCMC__BASE__STATIC__HMC__BETA__
 
 #include <math.h>
+#include <boost/math/special_functions/fpclassify.hpp>
 #include <stan/mcmc/hmc/base_hmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
 
@@ -42,7 +43,7 @@ namespace stan {
         }
         
         double h = this->_hamiltonian.H(this->_z);
-        if (h != h) h = std::numeric_limits<double>::infinity();
+        if (boost::math::isnan(h)) h = std::numeric_limits<double>::infinity();
         
         double acceptProb = std::exp(H0 - h);
         

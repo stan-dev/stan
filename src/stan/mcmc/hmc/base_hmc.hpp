@@ -4,6 +4,7 @@
 #include <math.h>
 #include <stdexcept>
 
+#include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/random/variate_generator.hpp>
 #include <boost/random/uniform_01.hpp>
 
@@ -64,7 +65,7 @@ namespace stan {
         this->_integrator.evolve(this->_z, this->_hamiltonian, this->_nom_epsilon);
         
         double h = this->_hamiltonian.H(this->_z);
-        if (h != h) h = std::numeric_limits<double>::infinity();
+        if (boost::math::isnan(h)) h = std::numeric_limits<double>::infinity();
         
         double delta_H = H0 - h;
         
@@ -82,7 +83,7 @@ namespace stan {
           this->_integrator.evolve(this->_z, this->_hamiltonian, this->_nom_epsilon);
           
           double h = this->_hamiltonian.H(this->_z);
-          if (h != h) h = std::numeric_limits<double>::infinity();
+          if (boost::math::isnan(h)) h = std::numeric_limits<double>::infinity();
           
           double delta_H = H0 - h;
           
