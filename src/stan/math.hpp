@@ -19,6 +19,7 @@
 #include "stan/math/functions/exp2.hpp"
 #include "stan/math/functions/fdim.hpp"
 #include "stan/math/functions/fma.hpp"
+#include "stan/math/functions/gamma_q.hpp"
 #include "stan/math/functions/ibeta.hpp"
 #include "stan/math/functions/if_else.hpp"
 #include "stan/math/functions/int_step.hpp"

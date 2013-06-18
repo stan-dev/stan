@@ -90,6 +90,7 @@
 #include <stan/agrad/fwd/tgamma.hpp>
 #include <stan/agrad/fwd/lgamma.hpp>
 #include <stan/agrad/fwd/lmgamma.hpp>
+#include <stan/agrad/fwd/gamma_q.hpp>
 #include <stan/agrad/fwd/lbeta.hpp>
 #include <stan/agrad/fwd/binomial_coefficient_log.hpp>
 
