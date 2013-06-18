@@ -41,7 +41,10 @@ namespace stan {
           this->_integrator.evolve(this->_z, this->_hamiltonian, this->_epsilon);
         }
         
-        double acceptProb = std::exp(H0 - this->_hamiltonian.H(this->_z));
+        double h = this->_hamiltonian.H(this->_z);
+        if (h != h) h = std::numeric_limits<double>::infinity();
+        
+        double acceptProb = std::exp(H0 - h);
         
         if (acceptProb < 1 && this->_rand_uniform() > acceptProb) {
           this->_z.copy_base(z_init);
