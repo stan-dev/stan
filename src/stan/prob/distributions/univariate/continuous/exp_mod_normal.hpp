@@ -169,21 +169,17 @@ namespace stan {
         return cdf;
       if (!check_finite(function, mu, "Location parameter", &cdf))
         return cdf;
-      if (!check_not_nan(function, sigma, "Scale parameter", 
-                         &cdf))
+      if (!check_not_nan(function, sigma, "Scale parameter", &cdf))
         return cdf;      
       if (!check_finite(function, sigma, "Scale parameter", &cdf))
         return cdf;
-      if (!check_positive(function, sigma, "Scale parameter", 
-                          &cdf))
+      if (!check_positive(function, sigma, "Scale parameter", &cdf))
         return cdf;
       if (!check_finite(function, lambda, "Inv_scale parameter", &cdf))
         return cdf;
-      if (!check_positive(function, lambda, "Inv_scale parameter", 
-                          &cdf))
+      if (!check_positive(function, lambda, "Inv_scale parameter", &cdf))
         return cdf;
-      if (!check_not_nan(function, lambda, "Inv_scale parameter", 
-                         &cdf))
+      if (!check_not_nan(function, lambda, "Inv_scale parameter", &cdf))
         return cdf;
       if (!(check_consistent_sizes(function,
                                    y,mu,sigma,lambda,
@@ -225,9 +221,11 @@ namespace stan {
                                                             - (scaled_diff 
                                 - (v / SQRT_2)) * (scaled_diff 
                                 - (v / SQRT_2)) - u) / sigma_dbl;
-        const double deriv_3 = SQRT_2 / sqrt_pi * 0.5 * exp(-scaled_diff_sq) / sigma_dbl;
+        const double deriv_3 = SQRT_2 / sqrt_pi * 0.5 * exp(-scaled_diff_sq) 
+          / sigma_dbl;
 
-        const double cdf_ = 0.5 * (1 + erf(u / (v * SQRT_2))) - exp(-u + v_sq * 0.5) * (erf_calc);
+        const double cdf_ = 0.5 * (1 + erf(u / (v * SQRT_2))) 
+          - exp(-u + v_sq * 0.5) * (erf_calc);
 
           cdf *= cdf_;
 
@@ -238,9 +236,15 @@ namespace stan {
           operands_and_partials.d_x2[n] += (-deriv_1 + deriv_2 - deriv_3) 
             / cdf_;
         if (!is_constant_struct<T_scale>::value)
-          operands_and_partials.d_x3[n] += (-deriv_1 * v - deriv_3 * scaled_diff * SQRT_2 - deriv_2 * sigma_dbl * SQRT_2 * (-SQRT_2 * 0.5 * (-lambda_dbl + scaled_diff * SQRT_2 / sigma_dbl) - SQRT_2 * lambda_dbl)) / cdf_;
+          operands_and_partials.d_x3[n] += (-deriv_1 * v - deriv_3 
+            * scaled_diff * SQRT_2 - deriv_2 * sigma_dbl * SQRT_2 * (-SQRT_2 
+            * 0.5 * (-lambda_dbl + scaled_diff * SQRT_2 / sigma_dbl) - SQRT_2 
+            * lambda_dbl)) / cdf_;
         if (!is_constant_struct<T_inv_scale>::value)
-          operands_and_partials.d_x4[n] += exp(0.5 * v_sq - u) * (SQRT_2 / sqrt_pi * 0.5 * sigma_dbl * exp(-(v / SQRT_2 - scaled_diff) * (v / SQRT_2 - scaled_diff)) - (v * sigma_dbl + mu_dbl - y_dbl) * erf_calc) / cdf_;
+          operands_and_partials.d_x4[n] += exp(0.5 * v_sq - u) * (SQRT_2 
+            / sqrt_pi * 0.5 * sigma_dbl * exp(-(v / SQRT_2 - scaled_diff) * (v
+            / SQRT_2 - scaled_diff)) - (v * sigma_dbl + mu_dbl - y_dbl) 
+            * erf_calc) / cdf_;
       }
 
       if (!is_constant_struct<T_y>::value) {
@@ -345,7 +349,8 @@ namespace stan {
                                                             - (-scaled_diff 
                                 + (v / SQRT_2)) * (-scaled_diff 
                                 + (v / SQRT_2)) - u) / sigma_dbl;
-        const double deriv_3 = SQRT_2 / sqrt_pi * 0.5 * exp(-scaled_diff_sq) / sigma_dbl;
+        const double deriv_3 = SQRT_2 / sqrt_pi * 0.5 * exp(-scaled_diff_sq) 
+          / sigma_dbl;
 
         const double denom = erf_calc1 - erf_calc2 * exp(0.5 * v_sq - u);
         const double cdf_ = erf_calc1 - exp(-u + v_sq * 0.5) * (erf_calc2);

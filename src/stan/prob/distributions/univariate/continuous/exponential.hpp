@@ -152,7 +152,8 @@ namespace stan {
       if(!check_positive(function, beta, "Inverse scale parameter", &cdf))
         return cdf;
 
-      agrad::OperandsAndPartials<T_y, T_inv_scale> operands_and_partials(y, beta);
+      agrad::OperandsAndPartials<T_y, T_inv_scale> 
+        operands_and_partials(y, beta);
 
       VectorView<const T_y> y_vec(y);
       VectorView<const T_inv_scale> beta_vec(beta);
@@ -210,7 +211,8 @@ namespace stan {
       if(!check_positive(function, beta, "Inverse scale parameter", &cdf_log))
         return cdf_log;
 
-      agrad::OperandsAndPartials<T_y, T_inv_scale> operands_and_partials(y, beta);
+      agrad::OperandsAndPartials<T_y, T_inv_scale> 
+        operands_and_partials(y, beta);
 
       VectorView<const T_y> y_vec(y);
       VectorView<const T_inv_scale> beta_vec(beta);
@@ -260,7 +262,8 @@ namespace stan {
       if(!check_positive(function, beta, "Inverse scale parameter", &ccdf_log))
         return ccdf_log;
 
-      agrad::OperandsAndPartials<T_y, T_inv_scale> operands_and_partials(y, beta);
+      agrad::OperandsAndPartials<T_y, T_inv_scale> 
+        operands_and_partials(y, beta);
 
       VectorView<const T_y> y_vec(y);
       VectorView<const T_inv_scale> beta_vec(beta);

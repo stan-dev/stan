@@ -195,7 +195,8 @@ namespace stan {
         const double sigma_inv_vec = 1.0 / value_of(sigma_vec[n]);
               
         // Compute
-        const double Pn = 1.0 / ( 1.0 + exp( - (y_dbl - mu_dbl) * sigma_inv_vec ) );
+        const double Pn = 1.0 / ( 1.0 + exp( - (y_dbl - mu_dbl) 
+                                             * sigma_inv_vec ) );
                     
         P *= Pn;
               
@@ -206,8 +207,8 @@ namespace stan {
           operands_and_partials.d_x2[n] 
             += - exp(logistic_log(y_dbl, mu_dbl, sigma_dbl)) / Pn;
         if (!is_constant_struct<T_scale>::value)
-          operands_and_partials.d_x3[n] 
-            += - (y_dbl - mu_dbl) * sigma_inv_vec * exp(logistic_log(y_dbl, mu_dbl, sigma_dbl)) / Pn;
+          operands_and_partials.d_x3[n] += - (y_dbl - mu_dbl) * sigma_inv_vec 
+            * exp(logistic_log(y_dbl, mu_dbl, sigma_dbl)) / Pn;
               
       }
 
@@ -306,8 +307,8 @@ namespace stan {
           operands_and_partials.d_x2[n] 
             += - exp(logistic_log(y_dbl, mu_dbl, sigma_dbl)) / Pn;
         if (!is_constant_struct<T_scale>::value)
-          operands_and_partials.d_x3[n] 
-            += - (y_dbl - mu_dbl) * sigma_inv_vec * exp(logistic_log(y_dbl, mu_dbl, sigma_dbl)) / Pn;
+          operands_and_partials.d_x3[n]  += - (y_dbl - mu_dbl) * sigma_inv_vec 
+            * exp(logistic_log(y_dbl, mu_dbl, sigma_dbl)) / Pn;
               
       }
           
@@ -395,8 +396,8 @@ namespace stan {
           operands_and_partials.d_x2[n] 
             -= - exp(logistic_log(y_dbl, mu_dbl, sigma_dbl)) / Pn;
         if (!is_constant_struct<T_scale>::value)
-          operands_and_partials.d_x3[n] 
-            -= - (y_dbl - mu_dbl) * sigma_inv_vec * exp(logistic_log(y_dbl, mu_dbl, sigma_dbl)) / Pn;
+          operands_and_partials.d_x3[n] -= - (y_dbl - mu_dbl) * sigma_inv_vec 
+            * exp(logistic_log(y_dbl, mu_dbl, sigma_dbl)) / Pn;
               
       }
           

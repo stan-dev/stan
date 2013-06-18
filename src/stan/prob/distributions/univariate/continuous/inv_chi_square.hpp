@@ -164,7 +164,8 @@ namespace stan {
       if (!check_nonnegative(function, y, "Random variable", &P))
         return P;
       if (!(check_consistent_sizes(function, y, nu,
-                                   "Random variable", "Degrees of freedom parameter",
+                                   "Random variable", 
+                                   "Degrees of freedom parameter",
                                    &P)))
         return P;
           
@@ -228,20 +229,17 @@ namespace stan {
           operands_and_partials.d_x1[n] 
             += 0.5 * y_inv_dbl * y_inv_dbl
             * gamma_p_derivative(0.5 * nu_dbl, 0.5 * y_inv_dbl) / Pn;
-                  
         if (!is_constant_struct<T_dof>::value)
           operands_and_partials.d_x2[n] 
             += 0.5 * stan::math::gradRegIncGamma(0.5 * nu_dbl, 
                                                  0.5 * y_inv_dbl, 
                                                  gamma_vec[n], 
                                                  digamma_vec[n]) / Pn;
-                  
       }
               
       if (!is_constant_struct<T_y>::value)
         for (size_t n = 0; n < stan::length(y); ++n) 
           operands_and_partials.d_x1[n] *= P;
-                  
       if (!is_constant_struct<T_dof>::value)
         for (size_t n = 0; n < stan::length(nu); ++n) 
           operands_and_partials.d_x2[n] *= P;
@@ -342,14 +340,12 @@ namespace stan {
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] += 0.5 * y_inv_dbl * y_inv_dbl
             * gamma_p_derivative(0.5 * nu_dbl, 0.5 * y_inv_dbl) / Pn;
-                  
         if (!is_constant_struct<T_dof>::value)
           operands_and_partials.d_x2[n] 
             += 0.5 * stan::math::gradRegIncGamma(0.5 * nu_dbl, 
                                                  0.5 * y_inv_dbl, 
                                                  gamma_vec[n], 
                                                  digamma_vec[n]) / Pn;
-                  
       }
               
       return operands_and_partials.to_var(P);
@@ -448,14 +444,12 @@ namespace stan {
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] -= 0.5 * y_inv_dbl * y_inv_dbl
             * gamma_p_derivative(0.5 * nu_dbl, 0.5 * y_inv_dbl) / Pn;
-                  
         if (!is_constant_struct<T_dof>::value)
           operands_and_partials.d_x2[n] 
             -= 0.5 * stan::math::gradRegIncGamma(0.5 * nu_dbl, 
                                                  0.5 * y_inv_dbl, 
                                                  gamma_vec[n], 
                                                  digamma_vec[n]) / Pn;
-                  
       }
               
       return operands_and_partials.to_var(P);

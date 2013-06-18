@@ -58,14 +58,11 @@ namespace stan {
       // validate args (here done over var, which should be OK)
       if (!check_not_nan(function, y, "Random variable", &logp))
         return logp;
-      if (!check_finite(function, mu, "Location parameter", 
-                        &logp))
+      if (!check_finite(function, mu, "Location parameter", &logp))
         return logp;
-      if (!check_positive(function, sigma, "Scale parameter", 
-                          &logp))
+      if (!check_positive(function, sigma, "Scale parameter", &logp))
         return logp;
-      if (!check_finite(function, sigma, "Scale parameter", 
-                        &logp))
+      if (!check_finite(function, sigma, "Scale parameter", &logp))
         return logp;
       if (!(check_consistent_sizes(function,
                                    y,mu,sigma,
@@ -198,10 +195,12 @@ namespace stan {
       VectorView<const T_scale> sigma_vec(sigma);
       size_t N = max_size(y, mu, sigma);
         
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale> operands_and_partials(y, mu, sigma);
+      agrad::OperandsAndPartials<T_y, T_loc, T_scale>
+        operands_and_partials(y, mu, sigma);
         
       std::fill(operands_and_partials.all_partials,
-                operands_and_partials.all_partials + operands_and_partials.nvaris, 0.0);
+                operands_and_partials.all_partials
+                + operands_and_partials.nvaris, 0.0);
         
       // Explicit return for extreme values
       // The gradients are technically ill-defined, but treated as zero
@@ -238,11 +237,9 @@ namespace stan {
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] 
             += sigma_inv_dbl / (pi() * (1.0 + z * z) * Pn);
-            
         if (!is_constant_struct<T_loc>::value)
           operands_and_partials.d_x2[n] 
             += - sigma_inv_dbl / (pi() * (1.0 + z * z) * Pn);
-            
         if (!is_constant_struct<T_scale>::value)
           operands_and_partials.d_x3[n] 
             += - z * sigma_inv_dbl / (pi() * (1.0 + z * z) * Pn);
@@ -250,15 +247,16 @@ namespace stan {
       }
         
       if (!is_constant_struct<T_y>::value) {
-        for(size_t n = 0; n < stan::length(y); ++n) operands_and_partials.d_x1[n] *= P;
+        for(size_t n = 0; n < stan::length(y); ++n) 
+          operands_and_partials.d_x1[n] *= P;
       }
-        
       if (!is_constant_struct<T_loc>::value) {
-        for(size_t n = 0; n < stan::length(mu); ++n) operands_and_partials.d_x2[n] *= P;
+        for(size_t n = 0; n < stan::length(mu); ++n)
+          operands_and_partials.d_x2[n] *= P;
       }
-        
       if (!is_constant_struct<T_scale>::value) {
-        for(size_t n = 0; n < stan::length(sigma); ++n) operands_and_partials.d_x3[n] *= P;
+        for(size_t n = 0; n < stan::length(sigma); ++n) 
+          operands_and_partials.d_x3[n] *= P;
       }
         
       return operands_and_partials.to_var(P);
