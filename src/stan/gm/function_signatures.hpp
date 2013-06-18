@@ -810,6 +810,8 @@ for (size_t i = 0; i < base_types.size(); ++i) {
 add_unary("tan");
 add_unary("tanh");
 add_unary("tgamma");
+add("to_vector", VECTOR_T, ROW_VECTOR_T);
+add("to_vector", VECTOR_T, MATRIX_T);
 add("trace",DOUBLE_T,MATRIX_T);
 add("transpose",ROW_VECTOR_T,VECTOR_T);
 add("transpose",VECTOR_T,ROW_VECTOR_T);

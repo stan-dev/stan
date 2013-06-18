@@ -1410,7 +1410,15 @@ x <- rep_vector(1.0, 3);
 %
 There are no integer vector or matrix types, so integer values are
 automatically promoted.
-
+%
+\begin{description}
+%
+\fitem{vector}{to\_vector}{matrix \farg{m}}{
+Return the matrix \farg{m} as a vector in column-major order.}
+%
+\fitem{vector}{to\_vector}{row\_vector \farg{m}}{
+Return the row vector \farg{m} as a vector in column-major order.}
+\end{description}
 
 \section{Slice and Package Functions}
 

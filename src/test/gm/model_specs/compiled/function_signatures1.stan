@@ -290,6 +290,15 @@ transformed data {
   transformed_data_real <- sd(d_row_vector);
   transformed_data_real <- sd(d_matrix);
   
+  //Broadcast Functions
+  transformed_data_vector <- rep_vector(d_real, d_int);
+  transformed_data_row_vector <- rep_row_vector(d_real, d_int);
+  transformed_data_matrix <- rep_matrix(d_real, d_int, d_int);
+  transformed_data_matrix <- rep_matrix(d_vector, d_int);
+  transformed_data_matrix <- rep_matrix(d_row_vector, d_int);
+  transformed_data_vector <- to_vector(d_row_vector);
+  transformed_data_vector <- to_vector(d_matrix);
+
   // Slice and Package Functions
   //   diagonal matrices
   transformed_data_vector <- diagonal(d_matrix);
@@ -858,6 +867,23 @@ transformed parameters {
   transformed_param_real <- sd(p_row_vector);
   transformed_param_real <- sd(d_matrix);
   transformed_param_real <- sd(p_matrix);
+
+  //Broadcast Functions
+  transformed_param_vector <- rep_vector(d_real, d_int);
+  transformed_param_vector <- rep_vector(p_real, d_int);
+  transformed_param_row_vector <- rep_row_vector(d_real, d_int);
+  transformed_param_row_vector <- rep_row_vector(p_real, d_int);
+  transformed_param_matrix <- rep_matrix(d_real, d_int, d_int);
+  transformed_param_matrix <- rep_matrix(p_real, d_int, d_int);
+  transformed_param_matrix <- rep_matrix(d_vector, d_int);
+  transformed_param_matrix <- rep_matrix(p_vector, d_int);
+  transformed_param_matrix <- rep_matrix(d_row_vector, d_int);
+  transformed_param_matrix <- rep_matrix(p_row_vector, d_int);
+
+  transformed_param_vector <- to_vector(d_row_vector);
+  transformed_param_vector <- to_vector(p_row_vector);
+  transformed_param_vector <- to_vector(d_matrix);
+  transformed_param_vector <- to_vector(p_matrix);
 
   // Slice and Package Functions
   //   diagonal matrices
