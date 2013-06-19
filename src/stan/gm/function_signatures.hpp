@@ -323,6 +323,7 @@ for (size_t i = 0; i < vector_types.size(); ++i)
           DOUBLE_T, // result
           vector_types[i], vector_types[j], vector_types[k]); // args
 //FIXME: add_ternary("gamma_cdf");
+add_binary("gamma_p");
 add_binary("gamma_q");
 add_binary("gamma_rng");
 for (size_t i = 0; i < vector_types.size(); ++i) {
