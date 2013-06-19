@@ -94,9 +94,9 @@ namespace stan {
       using stan::math::quad_form_sym;
       using stan::math::trace_quad_form;
       using stan::math::log_determinant_spd;
-      // using stan::math::LDLT_factor;
-      // using stan::math::trace_inv_quad_form_ldlt;
-      // using stan::math::mdivide_right_ldlt;
+      using stan::math::LDLT_factor;
+      using stan::math::trace_inv_quad_form_ldlt;
+      using stan::math::mdivide_right_ldlt;
 
       int r = y.rows(); // number of variables
       int T = y.cols(); // number of observations
@@ -169,7 +169,6 @@ namespace stan {
         Eigen::Matrix<T_lp,Eigen::Dynamic, Eigen::Dynamic> R(n, n);
         Eigen::Matrix<T_lp,Eigen::Dynamic, 1> f(r);
         Eigen::Matrix<T_lp,Eigen::Dynamic, Eigen::Dynamic> Q(r, r);
-        Eigen::Matrix<T_lp,Eigen::Dynamic, Eigen::Dynamic> Q_inv(r, r);
         Eigen::Matrix<T_lp,Eigen::Dynamic, 1> e(r);
         Eigen::Matrix<T_lp,Eigen::Dynamic, Eigen::Dynamic> A(n, r);
 
@@ -187,17 +186,26 @@ namespace stan {
           f = multiply(transpose(F), a);
           // Q_t = F'_t R_t F_t + V_t
           Q = add(quad_form_sym(R, F), V);
-          Q_inv = inverse(Q);
+          LDLT_factor<T_lp,Eigen::Dynamic,Eigen::Dynamic> ldlt_Q(Q);
+          if (!ldlt_Q.success()) {
+            std::ostringstream message;
+            message << "Forecast covariance matrix is not positive definite."
+                    << "Q[1,1] is %1%.";
+            std::string str(message.str());
+            stan::math::dom_err(function,Q(0,0),"",str.c_str(),"",&lp);
+            // should lp be set back to 0;
+            return lp;
+          }
           // // filtered state
           // e_t = y_t - f_t
           e = subtract(yi, f);
           // A_t = R_t F_t Q^{-1}_t
-          A = multiply(multiply(R, F), Q_inv);
+          A = mdivide_right_ldlt(multiply(R, F), ldlt_Q);
           // m_t = a_t + A_t e_t
           m = add(a, multiply(A, e));
           // C = R_t - A_t Q_t A_t'
           C = subtract(R, quad_form_sym(Q, transpose(A)));
-          lp -= 0.5 * (log_determinant_spd(Q) + trace_quad_form(Q_inv, e));
+          lp -= 0.5 * (log_determinant_ldlt(ldlt_Q) + trace_inv_quad_form_ldlt(ldlt_Q, e));
         }
       }
       return lp;
