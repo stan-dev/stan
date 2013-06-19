@@ -169,8 +169,6 @@ TEST(gm_parser,parsable_test_bad_trunc) {
                std::invalid_argument);
   EXPECT_THROW(is_parsable("src/test/gm/model_specs/bad_trunc2.stan"),
                std::invalid_argument);
-  EXPECT_THROW(is_parsable("src/test/gm/model_specs/bad_trunc3.stan"),
-               std::invalid_argument);
 }
 TEST(gmParser,parsableBadPeriods) {
   EXPECT_THROW(is_parsable("src/test/gm/model_specs/bad_periods_data.stan"),

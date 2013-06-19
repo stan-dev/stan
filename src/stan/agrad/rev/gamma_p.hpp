@@ -66,8 +66,6 @@ namespace stan {
           double delta = s / (avi_->val_ * avi_->val_);
       
           while (std::fabs(delta) > 1e-6) {
-            std::cout<<s<<std::endl;
-
             S += delta;
             ++k;
             s *= -bd_ / k;

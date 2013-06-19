@@ -188,8 +188,8 @@ namespace stan {
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] += 1.0 / b_min_a / cdf_;
         if (!is_constant_struct<T_low>::value)
-          operands_and_partials.d_x2[n] += (y_dbl - beta_dbl) / b_min_a / b_min_a
-            / cdf_;
+          operands_and_partials.d_x2[n] += (y_dbl - beta_dbl) / b_min_a 
+            / b_min_a / cdf_;
         if (!is_constant_struct<T_high>::value)
           operands_and_partials.d_x3[n] -= 1.0 / b_min_a;
       }
@@ -232,7 +232,8 @@ namespace stan {
         return cdf_log;
       if (!check_finite(function, beta, "Upper bound parameter", &cdf_log))
         return cdf_log;
-      if (!check_greater(function, beta, alpha, "Upper bound parameter", &cdf_log))
+      if (!check_greater(function, beta, alpha, "Upper bound parameter", 
+                         &cdf_log))
         return cdf_log;
       if (!(check_consistent_sizes(function,
                                    y,alpha,beta,
@@ -269,8 +270,8 @@ namespace stan {
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] += 1.0 / b_min_a / cdf_log_;
         if (!is_constant_struct<T_low>::value)
-          operands_and_partials.d_x2[n] += (y_dbl - beta_dbl) / b_min_a / b_min_a
-            / cdf_log_;
+          operands_and_partials.d_x2[n] += (y_dbl - beta_dbl) / b_min_a
+            / b_min_a / cdf_log_;
         if (!is_constant_struct<T_high>::value)
           operands_and_partials.d_x3[n] -= 1.0 / b_min_a;
       }
@@ -303,7 +304,8 @@ namespace stan {
         return ccdf_log;
       if (!check_finite(function, beta, "Upper bound parameter", &ccdf_log))
         return ccdf_log;
-      if (!check_greater(function, beta, alpha, "Upper bound parameter", &ccdf_log))
+      if (!check_greater(function, beta, alpha, "Upper bound parameter", 
+                         &ccdf_log))
         return ccdf_log;
       if (!(check_consistent_sizes(function,
                                    y,alpha,beta,
@@ -340,10 +342,11 @@ namespace stan {
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] -= 1.0 / b_min_a / ccdf_log_;
         if (!is_constant_struct<T_low>::value)
-          operands_and_partials.d_x2[n] -= (y_dbl - beta_dbl) / b_min_a / b_min_a
-            / ccdf_log_;
+          operands_and_partials.d_x2[n] -= (y_dbl - beta_dbl) / b_min_a 
+            / b_min_a / ccdf_log_;
         if (!is_constant_struct<T_high>::value)
-          operands_and_partials.d_x3[n] += (y_dbl - alpha_dbl) / b_min_a / b_min_a / ccdf_log_;
+          operands_and_partials.d_x3[n] += (y_dbl - alpha_dbl) / b_min_a 
+            / b_min_a / ccdf_log_;
       }
 
       return operands_and_partials.to_var(ccdf_log);

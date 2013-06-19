@@ -395,7 +395,7 @@ namespace stan {
         // Explicit results for extreme values
         // The gradients are technically ill-defined, but treated as zero
         if (value_of(y_vec[n]) == std::numeric_limits<double>::infinity()) {
-          continue;
+          return operands_and_partials.to_var(stan::math::negative_infinity());
         }
               
         // Pull out values

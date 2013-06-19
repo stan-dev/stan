@@ -1,8 +1,9 @@
-// doesn't work because no CDF for uniform
+// doesn't work because truncation not vectorized
 
 parameters {
     real y;
+    real mu[10];
 }
 model { 
-    y ~ uniform(0.0,1.0) T[0.0,1.1];
+    y ~ normal(mu,1.0) T[0.0,1.1];
 }
