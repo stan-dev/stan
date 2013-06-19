@@ -165,10 +165,20 @@ add_unary("cbrt");
 add_unary("ceil");
 add("cholesky_decompose",MATRIX_T,MATRIX_T);
 for (size_t i = 0; i < vector_types.size(); ++i)
-  for (size_t j = 0; j < vector_types.size(); ++j)
+  for (size_t j = 0; j < vector_types.size(); ++j) {
+      add("chi_square_cdf",
+          DOUBLE_T, // result
+          vector_types[i], vector_types[j]); // args
+      add("chi_square_ccdf_log",
+          DOUBLE_T, // result
+          vector_types[i], vector_types[j]); // args
+      add("chi_square_cdf_log",
+          DOUBLE_T, // result
+          vector_types[i], vector_types[j]); // args
       add("chi_square_log",
           DOUBLE_T, // result
           vector_types[i], vector_types[j]); // args
+  }
 add_unary("chi_square_rng");
 add("block",MATRIX_T,MATRIX_T,INT_T,INT_T,INT_T,INT_T);
 add("col",VECTOR_T,MATRIX_T,INT_T);
@@ -318,11 +328,20 @@ add_binary("fmin");
 add_binary("fmod");
 for (size_t i = 0; i < vector_types.size(); ++i)
   for (size_t j = 0; j < vector_types.size(); ++j)
-    for (size_t k = 0; k < vector_types.size(); ++k)
+    for (size_t k = 0; k < vector_types.size(); ++k) {
+      add("gamma_cdf",
+          DOUBLE_T, // result
+          vector_types[i], vector_types[j], vector_types[k]); // args
+      add("gamma_ccdf_log",
+          DOUBLE_T, // result
+          vector_types[i], vector_types[j], vector_types[k]); // args
+      add("gamma_cdf_log",
+          DOUBLE_T, // result
+          vector_types[i], vector_types[j], vector_types[k]); // args
       add("gamma_log",
           DOUBLE_T, // result
           vector_types[i], vector_types[j], vector_types[k]); // args
-//FIXME: add_ternary("gamma_cdf");
+    }
 add_binary("gamma_p");
 add_binary("gamma_q");
 add_binary("gamma_rng");

@@ -1022,6 +1022,18 @@ y^{\nu/2 - 1}
 \fitem{real}{chi\_square\_log}{reals \farg{y}, reals \farg{nu}}{The
   log of the Chi-square density of \farg{y} given degrees of freedom
   \farg{nu}}
+%
+\fitem{real}{chi\_square\_cdf}{reals \farg{y}, reals \farg{nu}}{The
+   Chi-square cumulative distribution function of \farg{y} given degrees 
+   of freedom \farg{nu}}
+%
+\fitem{real}{chi\_square\_cdf\_log}{reals \farg{y}, reals \farg{nu}}{The 
+   log of the Chi-square cumulative distribution function of 
+   \farg{y} given degrees of freedom \farg{nu}}
+%
+\fitem{real}{chi\_square\_ccdf\_log}{reals \farg{y}, reals \farg{nu}}{The 
+   log of the complementary Chi-square cumulative distribution 
+   function of \farg{y} given degrees of freedom \farg{nu}}
 \end{description}
 %
 \begin{description}
@@ -1201,9 +1213,17 @@ y^{\alpha - 1}
   \farg{beta}}{The log of the gamma density of \farg{y} given shape
   \farg{alpha} and inverse scale \farg{beta}}
 %
-%  \fitem{real}{gamma\_cdf}{real \farg{y}, real \farg{alpha}, real
- %  \farg{beta}}{The cumulative distribution function of \farg{y} given shape
- %  \farg{alpha} and inverse scale \farg{beta}}
+ \fitem{real}{gamma\_cdf}{reals \farg{y}, reals \farg{alpha}, reals
+   \farg{beta}}{The cumulative gamma distribution function of \farg{y} given shape
+   \farg{alpha} and inverse scale \farg{beta}}
+%
+ \fitem{real}{gamma\_cdf\_log}{reals \farg{y}, reals \farg{alpha}, reals
+   \farg{beta}}{The log of the cumulative gamma distribution function of \farg{y} given shape
+   \farg{alpha} and inverse scale \farg{beta}}
+%
+ \fitem{real}{gamma\_ccdf\_log}{reals \farg{y}, reals \farg{alpha}, reals
+   \farg{beta}}{The log of the complementary cumulative gamma distribution function of 
+   \farg{y} given shape \farg{alpha} and inverse scale \farg{beta}}
 \end{description}
 %
 \begin{description}
