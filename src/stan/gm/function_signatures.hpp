@@ -736,7 +736,7 @@ for (size_t i = 0; i < vector_types.size(); ++i) {
         add("skew_normal_cdf",
             DOUBLE_T, // result
             vector_types[i], vector_types[j], vector_types[k], vector_types[l]); // args
-   add("skew_normal_ccdf_log",
+        add("skew_normal_ccdf_log",
             DOUBLE_T, // result
             vector_types[i], vector_types[j], vector_types[k], vector_types[l]); // args
         add("skew_normal_cdf_log",
