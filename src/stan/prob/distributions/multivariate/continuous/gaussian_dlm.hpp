@@ -27,6 +27,17 @@
 #include <stan/math/matrix/trace_quad_form.hpp>
 #include <stan/math/matrix/transpose.hpp>
 
+/* 
+   
+   TODO: add initial state, m0, C0. Problem is that both 
+   boost::math::tools::promote_args and the definitions of functions
+   in stan::gm do not support that many arguments.
+   TODO: add constant terms. Problem is the same as the initial values.
+   TODO: use sequential processing even for non-diagonal obs covariance.
+   TODO: time-varying system matrices
+ */
+
+
 namespace stan {
   namespace prob {
     /**
@@ -37,6 +48,9 @@ namespace stan {
      * \theta_t & \sim N(G \theta_{t-1}, W) \\
      * \theta_0 & \sim N(0, diag(10^{6}))
      * \f}
+     *
+     * If V is a vector, then the Kalman filter is applied
+     * sequentially.
      *
      * @param y A r x T matrix of observations. Rows are variables,
      * columns are observations.
@@ -213,11 +227,11 @@ namespace stan {
               typename T_V, typename T_W
               >
     typename boost::math::tools::promote_args<T_y,T_F,T_G,T_V,T_W>::type
-    gaussian_dlm_seq_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
-                         const Eigen::Matrix<T_F,Eigen::Dynamic,Eigen::Dynamic>& F,
-                         const Eigen::Matrix<T_G,Eigen::Dynamic,Eigen::Dynamic>& G,
-                         const Eigen::Matrix<T_V,Eigen::Dynamic,1>& V,
-                         const Eigen::Matrix<T_W,Eigen::Dynamic,Eigen::Dynamic>& W) {
+    gaussian_dlm_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
+                     const Eigen::Matrix<T_F,Eigen::Dynamic,Eigen::Dynamic>& F,
+                     const Eigen::Matrix<T_G,Eigen::Dynamic,Eigen::Dynamic>& G,
+                     const Eigen::Matrix<T_V,Eigen::Dynamic,1>& V,
+                     const Eigen::Matrix<T_W,Eigen::Dynamic,Eigen::Dynamic>& W) {
       static const char* function = "stan::prob::dlm_log(%1%)";
       typedef typename boost::math::tools::promote_args<T_y,T_F,T_G,T_V,T_W>::type T_lp;
       T_lp lp(0.0);
@@ -355,11 +369,11 @@ namespace stan {
               >
     inline
     typename boost::math::tools::promote_args<T_y,T_F,T_G,T_V,T_W>::type
-    gaussian_dlm_seq_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
-                         const Eigen::Matrix<T_F,Eigen::Dynamic,Eigen::Dynamic>& F,
-                         const Eigen::Matrix<T_G,Eigen::Dynamic,Eigen::Dynamic>& G,
-                         const Eigen::Matrix<T_V,Eigen::Dynamic,1>& V,
-                         const Eigen::Matrix<T_W,Eigen::Dynamic,Eigen::Dynamic>& W) {
+    gaussian_dlm_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
+                     const Eigen::Matrix<T_F,Eigen::Dynamic,Eigen::Dynamic>& F,
+                     const Eigen::Matrix<T_G,Eigen::Dynamic,Eigen::Dynamic>& G,
+                     const Eigen::Matrix<T_V,Eigen::Dynamic,1>& V,
+                     const Eigen::Matrix<T_W,Eigen::Dynamic,Eigen::Dynamic>& W) {
       return gaussian_dlm_seq_log<false>(y, F, G, V, W);
     }
   }    
