@@ -374,7 +374,7 @@ namespace stan {
                      const Eigen::Matrix<T_G,Eigen::Dynamic,Eigen::Dynamic>& G,
                      const Eigen::Matrix<T_V,Eigen::Dynamic,1>& V,
                      const Eigen::Matrix<T_W,Eigen::Dynamic,Eigen::Dynamic>& W) {
-      return gaussian_dlm_seq_log<false>(y, F, G, V, W);
+      return gaussian_dlm_log<false>(y, F, G, V, W);
     }
   }    
 
