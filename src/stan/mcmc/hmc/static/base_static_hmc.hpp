@@ -2,6 +2,7 @@
 #define __STAN__MCMC__BASE__STATIC__HMC__BETA__
 
 #include <math.h>
+#include <boost/math/special_functions/fpclassify.hpp>
 #include <stan/mcmc/hmc/base_hmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
 
@@ -41,7 +42,10 @@ namespace stan {
           this->_integrator.evolve(this->_z, this->_hamiltonian, this->_epsilon);
         }
         
-        double acceptProb = std::exp(H0 - this->_hamiltonian.H(this->_z));
+        double h = this->_hamiltonian.H(this->_z);
+        if (boost::math::isnan(h)) h = std::numeric_limits<double>::infinity();
+        
+        double acceptProb = std::exp(H0 - h);
         
         if (acceptProb < 1 && this->_rand_uniform() > acceptProb) {
           this->_z.copy_base(z_init);
