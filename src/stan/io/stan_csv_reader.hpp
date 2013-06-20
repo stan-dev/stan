@@ -322,12 +322,15 @@ namespace stan {
 
         if (rows > 0) {
           samples.resize(rows, cols);
-          char comma;
           for (int row = 0; row < rows; row++) {
+            std::getline(ss, line);
+            std::stringstream ls(line);
             for (int col = 0; col < cols; col++) {
-              ss >> samples(row,col);
-              if (col != cols-1)
-                ss >> comma;
+              std::getline(ls, line, ',');
+              boost::trim(line);
+              //std::cout << "line: !" << line << "@" << std::endl;
+              samples(row, col) = boost::lexical_cast<double>(line);
+              //std::cout << "after" << std::endl << std::endl;
             }
           }
         }
