@@ -54,7 +54,7 @@ TEST(ProbDistributionsGaussianDLM,LoglikeMM) {
   
   // the error adds up in the multivariate version due to the inversion
   double lp_ref = gaussian_dlm_log(y, FF, GG, V, W);
-  EXPECT_NEAR(lp_ref, ll_expected, 0.01);
+  EXPECT_NEAR(lp_ref, ll_expected, 1e-4);
 }
 
 TEST(ProbDistributionsGaussianDLM,LoglikeUUSeq) {
