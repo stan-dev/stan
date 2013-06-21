@@ -13,18 +13,17 @@ namespace stan {
     public:
       
       virtual ~categorical_argument() {
-        
         for (std::vector<argument*>::iterator it = _subarguments.begin();
              it != _subarguments.end(); ++it) {
           delete *it;
         }
         
         _subarguments.clear();
-        
       }
       
-      void print(std::ostream* s, int depth, const char prefix) {
-        if(!s) return;
+      void print(std::ostream* s, const int depth, const char prefix) {
+        if (!s)
+          return;
         std::string indent(compute_indent(depth), ' ');
         *s << prefix << indent << _name << std::endl;
         
@@ -33,28 +32,29 @@ namespace stan {
           (*it)->print(s, depth + 1, prefix);
       }
       
-      void print_help(std::ostream* s, int depth, bool recurse) {
-        
-        if(!s) return;
+      void print_help(std::ostream* s, const int depth, const bool recurse) {
+        if (!s) 
+          return;
         
         std::string indent(indent_width * depth, ' ');
         std::string subindent(indent_width, ' ');
         
         *s << indent << _name << std::endl;
         *s << indent << subindent << _description << std::endl;
-        *s << indent << subindent << "Valid subarguments:";
-        
-        for (std::vector<argument*>::iterator it = _subarguments.begin();
-             it != _subarguments.end(); ++it)
-          *s << " " << (*it)->name();
-        *s << std::endl << std::endl;
-        
-        if (recurse) {
+        if (_subarguments.size() > 0) {
+          *s << indent << subindent << "Valid subarguments:";
+          
           for (std::vector<argument*>::iterator it = _subarguments.begin();
                it != _subarguments.end(); ++it)
-            (*it)->print_help(s, depth + 1, true);
-        }
+            *s << " " << (*it)->name();
+          *s << std::endl << std::endl;
         
+          if (recurse) {
+            for (std::vector<argument*>::iterator it = _subarguments.begin();
+                 it != _subarguments.end(); ++it)
+              (*it)->print_help(s, depth + 1, true);
+          }
+        }
       }
       
       bool parse_args(std::vector<std::string>& args, std::ostream* out,
@@ -64,8 +64,8 @@ namespace stan {
         bool valid_arg = true;
         
         while(good_arg) {
-          
-          if(args.size() == 0) return valid_arg;
+          if (args.size() == 0) 
+            return valid_arg;
           
           good_arg = false;
           
@@ -76,8 +76,7 @@ namespace stan {
             help_flag |= true;
             args.clear();
             return true;
-          }
-          else if(cat_name == "help-all") {
+          } else if (cat_name == "help-all") {
             print_help(out, 0, true);
             help_flag |= true;
             args.clear();
@@ -91,32 +90,26 @@ namespace stan {
           for (std::vector<argument*>::iterator it = _subarguments.begin();
                it != _subarguments.end(); ++it) {
             
-            if( (*it)->name() == cat_name) {
+            if ( (*it)->name() == cat_name) {
               args.pop_back();
               valid_arg &= (*it)->parse_args(args, out, err, help_flag);
               good_arg = true;
-            }
-            else if( (*it)->name() == val_name ) {
+            } else if ( (*it)->name() == val_name ) {
               valid_arg &= (*it)->parse_args(args, out, err, help_flag);
               good_arg = true;
-            }
-            
+            }             
           }
-          
         }
         
-        return valid_arg;
-        
+        return valid_arg & good_arg;
       };
       
-      argument* arg(std::string name) {
-        
+      argument* arg(const std::string name) {
         for (std::vector<argument*>::iterator it = _subarguments.begin();
              it != _subarguments.end(); ++it)
-          if( name == (*it)->name() ) return (*it);
-        
+          if ( name == (*it)->name() ) 
+            return (*it);
         return 0;
-        
       }
       
     protected:
