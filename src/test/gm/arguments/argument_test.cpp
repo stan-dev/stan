@@ -58,6 +58,5 @@ TEST_F(StanGmArgumentsArgument,split_arg) {
   arg->split_arg(arg_string, name, value);
   EXPECT_EQ("\nfoo", name);
   EXPECT_EQ("\rbar\t", value);
-
 }
 
