@@ -81,8 +81,6 @@ namespace stan {
       if (!check_positive(function, sigma, "Scale parameter", 
                           &logp))
         return logp;
-
-      
       if (!(check_consistent_sizes(function,
                                    y,nu,mu,sigma,
                                    "Random variable",
@@ -341,7 +339,6 @@ namespace stan {
             if (!is_constant_struct<T_y>::value)
               operands_and_partials.d_x1[n] 
                 += - zJacobian * d_ibeta * J * sigma_inv / Pn;
-                      
             if (!is_constant_struct<T_dof>::value) {
                           
               double g1 = 0;
@@ -378,7 +375,6 @@ namespace stan {
             if (!is_constant_struct<T_y>::value)
               operands_and_partials.d_x1[n] 
                 += zJacobian * d_ibeta * J * sigma_inv / Pn;
-                  
             if (!is_constant_struct<T_dof>::value) {
                       
               double g1 = 0;
@@ -392,7 +388,6 @@ namespace stan {
               operands_and_partials.d_x2[n] 
                 += zJacobian * ( - d_ibeta * (r / t) * (r / t) + 0.5 * g2 ) / Pn;
             }
-                  
             if (!is_constant_struct<T_loc>::value)
               operands_and_partials.d_x3[n] 
                 += - zJacobian * d_ibeta * J * sigma_inv / Pn;

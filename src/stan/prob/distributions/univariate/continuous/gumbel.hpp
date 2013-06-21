@@ -60,7 +60,8 @@ namespace stan {
         return 0.0;
       
       // set up template expressions wrapping scalars into vector views
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale> operands_and_partials(y, mu, beta);
+      agrad::OperandsAndPartials<T_y, T_loc, T_scale> 
+        operands_and_partials(y, mu, beta);
 
       VectorView<const T_y> y_vec(y);
       VectorView<const T_loc> mu_vec(mu);
@@ -68,7 +69,8 @@ namespace stan {
       size_t N = max_size(y, mu, beta);
 
       DoubleVectorView<true,is_vector<T_scale>::value> inv_beta(length(beta));
-      DoubleVectorView<include_summand<propto,T_scale>::value,is_vector<T_scale>::value> log_beta(length(beta));
+      DoubleVectorView<include_summand<propto,T_scale>::value,
+                       is_vector<T_scale>::value> log_beta(length(beta));
       for (size_t i = 0; i < length(beta); i++) {
         inv_beta[i] = 1.0 / value_of(beta_vec[i]);
         if (include_summand<propto,T_scale>::value)
@@ -98,7 +100,8 @@ namespace stan {
           operands_and_partials.d_x2[n] += inv_beta[n] - scaled_diff;
         if (!is_constant_struct<T_scale>::value)
           operands_and_partials.d_x3[n] 
-            += -inv_beta[n] + y_minus_mu_over_beta * inv_beta[n] - scaled_diff * y_minus_mu_over_beta;
+            += -inv_beta[n] + y_minus_mu_over_beta * inv_beta[n] 
+            - scaled_diff * y_minus_mu_over_beta;
       }
       return operands_and_partials.to_var(logp);
     }

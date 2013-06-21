@@ -279,7 +279,7 @@ namespace stan {
               
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] 
-            -= beta_dbl * gamma_p_derivative(alpha_dbl, beta_dbl * y_dbl) 
+            += beta_dbl * gamma_p_derivative(alpha_dbl, beta_dbl * y_dbl) 
             / Pn;
         if (!is_constant_struct<T_shape>::value)
           operands_and_partials.d_x2[n] 
@@ -406,7 +406,7 @@ namespace stan {
               
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] 
-            -= beta_dbl * gamma_p_derivative(alpha_dbl, beta_dbl * y_dbl) 
+            += beta_dbl * gamma_p_derivative(alpha_dbl, beta_dbl * y_dbl) 
             / Pn;
         if (!is_constant_struct<T_shape>::value)
           operands_and_partials.d_x2[n] 
@@ -523,7 +523,7 @@ namespace stan {
               
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] 
-            += beta_dbl * gamma_p_derivative(alpha_dbl, beta_dbl * y_dbl) 
+            -= beta_dbl * gamma_p_derivative(alpha_dbl, beta_dbl * y_dbl) 
             / Pn;
         if (!is_constant_struct<T_shape>::value)
           operands_and_partials.d_x2[n] 

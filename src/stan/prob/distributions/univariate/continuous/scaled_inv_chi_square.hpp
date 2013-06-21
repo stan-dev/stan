@@ -192,7 +192,8 @@ namespace stan {
       
     template <typename T_y, typename T_dof, typename T_scale>
     typename return_type<T_y, T_dof, T_scale>::type
-    scaled_inv_chi_square_cdf(const T_y& y, const T_dof& nu, const T_scale& s) {
+    scaled_inv_chi_square_cdf(const T_y& y, const T_dof& nu, 
+                              const T_scale& s) {
       // Size checks
       if (!(stan::length(y) && stan::length(nu) && stan::length(s)))
         return 1.0;
@@ -262,13 +263,11 @@ namespace stan {
                        is_vector<T_dof>::value> digamma_vec(stan::length(nu));
           
       if (!is_constant_struct<T_dof>::value) {
-              
         for (size_t i = 0; i < stan::length(nu); i++) {
           const double half_nu_dbl = 0.5 * value_of(nu_vec[i]);
           gamma_vec[i] = tgamma(half_nu_dbl);
           digamma_vec[i] = digamma(half_nu_dbl);
         }
-              
       }
           
       // Compute vectorized CDF and gradient
@@ -318,11 +317,9 @@ namespace stan {
       if (!is_constant_struct<T_y>::value)
         for(size_t n = 0; n < stan::length(y); ++n) 
           operands_and_partials.d_x1[n] *= P;
-          
       if (!is_constant_struct<T_dof>::value)
         for(size_t n = 0; n < stan::length(nu); ++n) 
           operands_and_partials.d_x2[n] *= P;
-          
       if (!is_constant_struct<T_scale>::value)
         for(size_t n = 0; n < stan::length(s); ++n) 
           operands_and_partials.d_x3[n] *= P;
@@ -332,7 +329,8 @@ namespace stan {
       
     template <typename T_y, typename T_dof, typename T_scale>
     typename return_type<T_y, T_dof, T_scale>::type
-    scaled_inv_chi_square_cdf_log(const T_y& y, const T_dof& nu, const T_scale& s) {
+    scaled_inv_chi_square_cdf_log(const T_y& y, const T_dof& nu, 
+                                  const T_scale& s) {
       // Size checks
       if (!(stan::length(y) && stan::length(nu) && stan::length(s)))
         return 0.0;
@@ -454,7 +452,8 @@ namespace stan {
 
     template <typename T_y, typename T_dof, typename T_scale>
     typename return_type<T_y, T_dof, T_scale>::type
-    scaled_inv_chi_square_ccdf_log(const T_y& y, const T_dof& nu, const T_scale& s) {
+    scaled_inv_chi_square_ccdf_log(const T_y& y, const T_dof& nu, 
+                                   const T_scale& s) {
       // Size checks
       if (!(stan::length(y) && stan::length(nu) && stan::length(s)))
         return 0.0;

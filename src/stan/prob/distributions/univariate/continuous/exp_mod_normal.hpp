@@ -343,12 +343,10 @@ namespace stan {
         const double scaled_diff_sq = scaled_diff * scaled_diff;
         const double erf_calc1 = 0.5 * (1 + erf(u / (v * SQRT_2)));
         const double erf_calc2 = 0.5 * (1 + erf(u / (v * SQRT_2) - v / SQRT_2));
-
         const double deriv_1 = lambda_dbl * exp(0.5 * v_sq - u) * erf_calc2;
-        const double deriv_2 = SQRT_2 / sqrt_pi * 0.5 * exp(0.5 * v_sq 
-                                                            - (-scaled_diff 
-                                + (v / SQRT_2)) * (-scaled_diff 
-                                + (v / SQRT_2)) - u) / sigma_dbl;
+        const double deriv_2 = SQRT_2 / sqrt_pi * 0.5 
+          * exp(0.5 * v_sq - (-scaled_diff + (v / SQRT_2)) 
+                * (-scaled_diff + (v / SQRT_2)) - u) / sigma_dbl;
         const double deriv_3 = SQRT_2 / sqrt_pi * 0.5 * exp(-scaled_diff_sq) 
           / sigma_dbl;
 
@@ -358,13 +356,27 @@ namespace stan {
         cdf_log += log(cdf_);
 
         if (!is_constant_struct<T_y>::value)
-          operands_and_partials.d_x1[n] += (deriv_1 - deriv_2 + deriv_3) / denom;
+          operands_and_partials.d_x1[n] += (deriv_1 - deriv_2 + deriv_3) 
+                                             / denom;
         if (!is_constant_struct<T_loc>::value)
-          operands_and_partials.d_x2[n] += (-deriv_1 + deriv_2 - deriv_3) / denom;
+          operands_and_partials.d_x2[n] += (-deriv_1 + deriv_2 - deriv_3) 
+                                             / denom;
         if (!is_constant_struct<T_scale>::value)
-          operands_and_partials.d_x3[n] += (-deriv_1 * v - deriv_3 * scaled_diff * SQRT_2 - deriv_2 * sigma_dbl * SQRT_2 * (-SQRT_2 * 0.5 * (-lambda_dbl + scaled_diff * SQRT_2 / sigma_dbl) - SQRT_2 * lambda_dbl)) / denom;
+          operands_and_partials.d_x3[n] 
+            += (-deriv_1 * v - deriv_3 * scaled_diff 
+                * SQRT_2 - deriv_2 * sigma_dbl * SQRT_2 
+                * (-SQRT_2 * 0.5 * (-lambda_dbl + scaled_diff * SQRT_2
+                                    / sigma_dbl) 
+                   - SQRT_2 * lambda_dbl))
+            / denom;
         if (!is_constant_struct<T_inv_scale>::value)
-          operands_and_partials.d_x4[n] += exp(0.5 * v_sq - u) * (SQRT_2 / sqrt_pi * 0.5 * sigma_dbl * exp(-(v / SQRT_2 - scaled_diff) * (v / SQRT_2 - scaled_diff)) - (v * sigma_dbl + mu_dbl - y_dbl) * erf_calc2) / denom;
+          operands_and_partials.d_x4[n] 
+            += exp(0.5 * v_sq - u) 
+            * (SQRT_2 / sqrt_pi * 0.5 * sigma_dbl 
+               * exp(-(v / SQRT_2 - scaled_diff) 
+                     * (v / SQRT_2 - scaled_diff)) 
+               - (v * sigma_dbl + mu_dbl - y_dbl) * erf_calc2) 
+            / denom;
       }
 
       return operands_and_partials.to_var(cdf_log);
@@ -448,10 +460,11 @@ namespace stan {
         const double erf_calc2 = 0.5 * (1 + erf(u / (v * SQRT_2) - v / SQRT_2));
 
         const double deriv_1 = lambda_dbl * exp(0.5 * v_sq - u) * erf_calc2;
-        const double deriv_2 = SQRT_2 / sqrt_pi * 0.5 * exp(0.5 * v_sq 
-                                                            - (-scaled_diff 
-                                + (v / SQRT_2)) * (-scaled_diff 
-                                + (v / SQRT_2)) - u) / sigma_dbl;
+        const double deriv_2 = SQRT_2 / sqrt_pi * 0.5 
+          * exp(0.5 * v_sq 
+                - (-scaled_diff + (v / SQRT_2)) * (-scaled_diff  
+                                                   + (v / SQRT_2)) - u) 
+          / sigma_dbl;
         const double deriv_3 = SQRT_2 / sqrt_pi * 0.5 * exp(-scaled_diff_sq) / sigma_dbl;
 
         const double ccdf_ = 1.0 - erf_calc1 + exp(-u + v_sq * 0.5) * (erf_calc2);
@@ -459,13 +472,25 @@ namespace stan {
         ccdf_log += log(ccdf_);
 
         if (!is_constant_struct<T_y>::value)
-          operands_and_partials.d_x1[n] -= (deriv_1 - deriv_2 + deriv_3) / ccdf_;
+          operands_and_partials.d_x1[n]
+            -= (deriv_1 - deriv_2 + deriv_3) / ccdf_;
         if (!is_constant_struct<T_loc>::value)
-          operands_and_partials.d_x2[n] -= (-deriv_1 + deriv_2 - deriv_3) / ccdf_;
+          operands_and_partials.d_x2[n] 
+            -= (-deriv_1 + deriv_2 - deriv_3) / ccdf_;
         if (!is_constant_struct<T_scale>::value)
-          operands_and_partials.d_x3[n] -= (-deriv_1 * v - deriv_3 * scaled_diff * SQRT_2 - deriv_2 * sigma_dbl * SQRT_2 * (-SQRT_2 * 0.5 * (-lambda_dbl + scaled_diff * SQRT_2 / sigma_dbl) - SQRT_2 * lambda_dbl)) / ccdf_;
+          operands_and_partials.d_x3[n] 
+            -= (-deriv_1 * v - deriv_3 * scaled_diff * SQRT_2 - deriv_2 
+                * sigma_dbl * SQRT_2 
+                * (-SQRT_2 * 0.5 * (-lambda_dbl + scaled_diff * SQRT_2 
+                                    / sigma_dbl)
+                   - SQRT_2 * lambda_dbl)) 
+            / ccdf_;
         if (!is_constant_struct<T_inv_scale>::value)
-          operands_and_partials.d_x4[n] -= exp(0.5 * v_sq - u) * (SQRT_2 / sqrt_pi * 0.5 * sigma_dbl * exp(-(v / SQRT_2 - scaled_diff) * (v / SQRT_2 - scaled_diff)) - (v * sigma_dbl + mu_dbl - y_dbl) * erf_calc2) / ccdf_;
+          operands_and_partials.d_x4[n] -= exp(0.5 * v_sq - u) 
+            * (SQRT_2 / sqrt_pi * 0.5 * sigma_dbl 
+               * exp(-(v / SQRT_2 - scaled_diff) * (v / SQRT_2 - scaled_diff)) 
+               - (v * sigma_dbl + mu_dbl - y_dbl) * erf_calc2) 
+            / ccdf_;
       }
 
       return operands_and_partials.to_var(ccdf_log);

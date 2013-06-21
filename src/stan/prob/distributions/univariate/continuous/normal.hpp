@@ -161,6 +161,7 @@ namespace stan {
       using stan::math::check_positive;
       using stan::math::check_finite;
       using stan::math::check_not_nan;
+      using stan::math::value_of;
       using stan::math::check_consistent_sizes;
 
       double cdf(1.0);
@@ -208,7 +209,8 @@ namespace stan {
         cdf *= cdf_;
 
         // gradients
-        const double rep_deriv = SQRT_TWO_OVER_PI * 0.5 * exp(-scaled_diff * scaled_diff) / cdf_ / sigma_dbl;
+        const double rep_deriv = SQRT_TWO_OVER_PI * 0.5 
+          * exp(-scaled_diff * scaled_diff) / cdf_ / sigma_dbl;
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] += rep_deriv;
         if (!is_constant_struct<T_loc>::value)
@@ -286,7 +288,8 @@ namespace stan {
         cdf_log += log_half + log(one_p_erf);
 
         // gradients
-        const double rep_deriv = SQRT_TWO_OVER_PI * exp(-scaled_diff * scaled_diff) / one_p_erf;
+        const double rep_deriv = SQRT_TWO_OVER_PI 
+          * exp(-scaled_diff * scaled_diff) / one_p_erf;
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] += rep_deriv / sigma_dbl;
         if (!is_constant_struct<T_loc>::value)
@@ -332,7 +335,8 @@ namespace stan {
                                    "Scale parameter", &ccdf_log)))
         return ccdf_log;
 
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale> operands_and_partials(y, mu, sigma);
+      agrad::OperandsAndPartials<T_y, T_loc, T_scale>
+        operands_and_partials(y, mu, sigma);
 
       VectorView<const T_y> y_vec(y);
       VectorView<const T_loc> mu_vec(mu);
@@ -353,7 +357,8 @@ namespace stan {
         ccdf_log += log_half + log(one_m_erf);
 
         // gradients
-        const double rep_deriv = SQRT_TWO_OVER_PI * exp(-scaled_diff * scaled_diff) / one_m_erf;
+        const double rep_deriv = SQRT_TWO_OVER_PI 
+          * exp(-scaled_diff * scaled_diff) / one_m_erf;
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] -= rep_deriv / sigma_dbl;
         if (!is_constant_struct<T_loc>::value)

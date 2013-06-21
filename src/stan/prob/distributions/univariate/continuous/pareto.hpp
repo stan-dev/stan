@@ -69,27 +69,37 @@ namespace stan {
       }
 
       // set up template expressions wrapping scalars into vector views
-      agrad::OperandsAndPartials<T_y,T_scale,T_shape> operands_and_partials(y, y_min, alpha);
+      agrad::OperandsAndPartials<T_y,T_scale,T_shape> 
+        operands_and_partials(y, y_min, alpha);
       
-      DoubleVectorView<include_summand<propto,T_y,T_shape>::value,is_vector<T_y>::value> log_y(length(y));
+      DoubleVectorView<include_summand<propto,T_y,T_shape>::value,
+                       is_vector<T_y>::value> log_y(length(y));
       if (include_summand<propto,T_y,T_shape>::value)
         for (size_t n = 0; n < length(y); n++)
           log_y[n] = log(value_of(y_vec[n]));
-      DoubleVectorView<!is_constant_struct<T_y>::value||!is_constant_struct<T_shape>::value,is_vector<T_y>::value> inv_y(length(y));
+
+      DoubleVectorView<!is_constant_struct<T_y>::value
+                       ||!is_constant_struct<T_shape>::value,
+                       is_vector<T_y>::value> inv_y(length(y));
       if (!is_constant_struct<T_y>::value||!is_constant_struct<T_shape>::value)
         for (size_t n = 0; n < length(y); n++)
           inv_y[n] = 1 / value_of(y_vec[n]);
-      DoubleVectorView<include_summand<propto,T_scale,T_shape>::value,is_vector<T_scale>::value> 
+
+      DoubleVectorView<include_summand<propto,T_scale,T_shape>::value,
+                       is_vector<T_scale>::value> 
         log_y_min(length(y_min));
       if (include_summand<propto,T_scale,T_shape>::value)
         for (size_t n = 0; n < length(y_min); n++)
           log_y_min[n] = log(value_of(y_min_vec[n]));
-      DoubleVectorView<include_summand<propto,T_shape>::value,is_vector<T_shape>::value> log_alpha(length(alpha));
+
+      DoubleVectorView<include_summand<propto,T_shape>::value,
+                       is_vector<T_shape>::value> log_alpha(length(alpha));
       if (include_summand<propto,T_shape>::value)
         for (size_t n = 0; n < length(alpha); n++)
           log_alpha[n] = log(value_of(alpha_vec[n]));
       
-      DoubleVectorView<!is_constant_struct<T_shape>::value,is_vector<T_shape>::value> inv_alpha(length(alpha));
+      DoubleVectorView<!is_constant_struct<T_shape>::value,
+                       is_vector<T_shape>::value> inv_alpha(length(alpha));
       if (!is_constant_struct<T_shape>::value)
         for (size_t n = 0; n < length(alpha); n++)
           inv_alpha[n] = 1 / value_of(alpha_vec[n]);
@@ -112,7 +122,8 @@ namespace stan {
         if (!is_constant_struct<T_scale>::value)
           operands_and_partials.d_x2[n] += alpha_dbl / value_of(y_min_vec[n]);
         if (!is_constant_struct<T_shape>::value)
-          operands_and_partials.d_x3[n] += 1 / alpha_dbl + log_y_min[n] - log_y[n];
+          operands_and_partials.d_x3[n] 
+            += 1 / alpha_dbl + log_y_min[n] - log_y[n];
       }
       return operands_and_partials.to_var(logp);
     }
@@ -130,7 +141,7 @@ namespace stan {
           
       // Check sizes
       // Size checks
-      if ( !( stan::length(y) && stan::length(y_min) && stan::length(alpha) ) ) 
+      if ( !( stan::length(y) && stan::length(y_min) && stan::length(alpha) ) )
         return 1.0;
           
       // Check errors
@@ -207,7 +218,7 @@ namespace stan {
               
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] 
-            += alpha_dbl * y_min_inv_dbl * exp( (alpha_dbl + 1) * log_dbl ) 
+            += alpha_dbl * y_min_inv_dbl * exp( (alpha_dbl + 1) * log_dbl )
             / Pn;
         if (!is_constant_struct<T_scale>::value)
           operands_and_partials.d_x2[n] 
@@ -217,17 +228,17 @@ namespace stan {
             += - exp( alpha_dbl * log_dbl ) * log_dbl / Pn;
       }
           
-          
       if (!is_constant_struct<T_y>::value) {
-        for(size_t n = 0; n < stan::length(y); ++n) operands_and_partials.d_x1[n] *= P;
+        for(size_t n = 0; n < stan::length(y); ++n) 
+          operands_and_partials.d_x1[n] *= P;
       }
-          
       if (!is_constant_struct<T_scale>::value) {
-        for(size_t n = 0; n < stan::length(y_min); ++n) operands_and_partials.d_x2[n] *= P;
+        for(size_t n = 0; n < stan::length(y_min); ++n) 
+          operands_and_partials.d_x2[n] *= P;
       }
-          
       if (!is_constant_struct<T_shape>::value) {
-        for(size_t n = 0; n < stan::length(alpha); ++n) operands_and_partials.d_x3[n] *= P;
+        for(size_t n = 0; n < stan::length(alpha); ++n)
+          operands_and_partials.d_x3[n] *= P;
       }
           
       return operands_and_partials.to_var(P);
@@ -315,14 +326,13 @@ namespace stan {
               
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] 
-            += alpha_dbl * y_min_inv_dbl * exp( (alpha_dbl + 1) * log_dbl ) 
-            / Pn;
+            += alpha_dbl * y_min_inv_dbl * exp((alpha_dbl + 1) * log_dbl) / Pn;
         if (!is_constant_struct<T_scale>::value)
           operands_and_partials.d_x2[n] 
-            += - alpha_dbl * y_min_inv_dbl * exp( alpha_dbl * log_dbl ) / Pn;
+            -= alpha_dbl * y_min_inv_dbl * exp( alpha_dbl * log_dbl ) / Pn;
         if (!is_constant_struct<T_shape>::value)
           operands_and_partials.d_x3[n] 
-            += - exp( alpha_dbl * log_dbl ) * log_dbl / Pn;
+            -= exp( alpha_dbl * log_dbl ) * log_dbl / Pn;
       }
           
       return operands_and_partials.to_var(P);
@@ -417,7 +427,6 @@ namespace stan {
           
       return operands_and_partials.to_var(P);
     }
-      
       
     template <class RNG>
     inline double

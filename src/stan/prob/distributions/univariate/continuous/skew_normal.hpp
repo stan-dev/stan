@@ -106,13 +106,16 @@ namespace stan {
         if (include_summand<propto,T_y, T_loc, T_scale>::value)
           logp -= y_minus_mu_over_sigma * y_minus_mu_over_sigma / 2.0;
         if (include_summand<propto,T_y,T_loc,T_scale,T_shape>::value)
-          logp += log(boost::math::erfc(-alpha_dbl * y_minus_mu_over_sigma / std::sqrt(2.0)));
+          logp += log(boost::math::erfc(-alpha_dbl * y_minus_mu_over_sigma 
+                                        / std::sqrt(2.0)));
 
         // gradients
         double deriv_logerf 
           = 2.0 / std::sqrt(pi_dbl) 
-          * exp(-alpha_dbl * y_minus_mu_over_sigma / std::sqrt(2.0) * alpha_dbl * y_minus_mu_over_sigma / std::sqrt(2.0))
-          / (1 + boost::math::erf(alpha_dbl * y_minus_mu_over_sigma / std::sqrt(2.0)));
+          * exp(-alpha_dbl * y_minus_mu_over_sigma / std::sqrt(2.0) 
+                * alpha_dbl * y_minus_mu_over_sigma / std::sqrt(2.0))
+          / (1 + boost::math::erf(alpha_dbl * y_minus_mu_over_sigma 
+                                  / std::sqrt(2.0)));
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] 
             += -y_minus_mu_over_sigma / sigma_dbl 
@@ -125,9 +128,11 @@ namespace stan {
           operands_and_partials.d_x3[n] 
             += -1.0 / sigma_dbl 
             + y_minus_mu_over_sigma * y_minus_mu_over_sigma / sigma_dbl 
-            - deriv_logerf * y_minus_mu_over_sigma * alpha_dbl / (sigma_dbl * std::sqrt(2.0));
+            - deriv_logerf * y_minus_mu_over_sigma * alpha_dbl 
+              / (sigma_dbl * std::sqrt(2.0));
         if (!is_constant_struct<T_shape>::value)
-          operands_and_partials.d_x4[n] += deriv_logerf * y_minus_mu_over_sigma / std::sqrt(2.0);
+          operands_and_partials.d_x4[n] 
+            += deriv_logerf * y_minus_mu_over_sigma / std::sqrt(2.0);
       }
       return operands_and_partials.to_var(logp);
     }
@@ -135,7 +140,8 @@ namespace stan {
     template <typename T_y, typename T_loc, typename T_scale, typename T_shape>
     inline
     typename return_type<T_y,T_loc,T_scale, T_shape>::type
-    skew_normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma, const T_shape& alpha) {
+    skew_normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma,
+                    const T_shape& alpha) {
       return skew_normal_log<false>(y,mu,sigma,alpha);
     }
 

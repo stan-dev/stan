@@ -72,19 +72,23 @@ namespace stan {
         if (value_of(y_vec[n]) <= 0)
           return LOG_ZERO;
       
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale> operands_and_partials(y, mu, sigma);
+      agrad::OperandsAndPartials<T_y, T_loc, T_scale> 
+        operands_and_partials(y, mu, sigma);
  
       using stan::math::square;
       using std::log;
       using stan::prob::NEG_LOG_SQRT_TWO_PI;
       
 
-      DoubleVectorView<include_summand<propto,T_scale>::value,is_vector<T_scale>::value> log_sigma(length(sigma));
+      DoubleVectorView<include_summand<propto,T_scale>::value,
+                       is_vector<T_scale>::value> log_sigma(length(sigma));
       if (include_summand<propto, T_scale>::value)
         for (size_t n = 0; n < length(sigma); n++)
           log_sigma[n] = log(value_of(sigma_vec[n]));
-      DoubleVectorView<include_summand<propto,T_y,T_loc,T_scale>::value,is_vector<T_scale>::value> inv_sigma(length(sigma));
-      DoubleVectorView<include_summand<propto,T_y,T_loc,T_scale>::value,is_vector<T_scale>::value> inv_sigma_sq(length(sigma));
+      DoubleVectorView<include_summand<propto,T_y,T_loc,T_scale>::value,
+                       is_vector<T_scale>::value> inv_sigma(length(sigma));
+      DoubleVectorView<include_summand<propto,T_y,T_loc,T_scale>::value,
+                       is_vector<T_scale>::value> inv_sigma_sq(length(sigma));
       if (include_summand<propto,T_y,T_loc,T_scale>::value)
         for (size_t n = 0; n < length(sigma); n++)
           inv_sigma[n] = 1 / value_of(sigma_vec[n]);
@@ -92,11 +96,13 @@ namespace stan {
         for (size_t n = 0; n < length(sigma); n++)
           inv_sigma_sq[n] = inv_sigma[n] * inv_sigma[n];
       
-      DoubleVectorView<include_summand<propto,T_y,T_loc,T_scale>::value,is_vector<T_y>::value> log_y(length(y));
+      DoubleVectorView<include_summand<propto,T_y,T_loc,T_scale>::value,
+                       is_vector<T_y>::value> log_y(length(y));
       if (include_summand<propto,T_y,T_loc,T_scale>::value)
         for (size_t n = 0; n < length(y); n++)
           log_y[n] = log(value_of(y_vec[n]));
-      DoubleVectorView<!is_constant_struct<T_y>::value,is_vector<T_y>::value> inv_y(length(y));
+      DoubleVectorView<!is_constant_struct<T_y>::value,
+                       is_vector<T_y>::value> inv_y(length(y));
       if (!is_constant_struct<T_y>::value)
         for (size_t n = 0; n < length(y); n++)
           inv_y[n] = 1 / value_of(y_vec[n]);
@@ -130,11 +136,12 @@ namespace stan {
 
         // gradients
         if (!is_constant_struct<T_y>::value)
-          operands_and_partials.d_x1[n] -=  (1 + logy_m_mu_div_sigma) * inv_y[n];
+          operands_and_partials.d_x1[n] -= (1 + logy_m_mu_div_sigma) * inv_y[n];
         if (!is_constant_struct<T_loc>::value)
           operands_and_partials.d_x2[n] += logy_m_mu_div_sigma;
         if (!is_constant_struct<T_scale>::value)
-          operands_and_partials.d_x3[n] += (logy_m_mu_div_sigma * logy_m_mu - 1) * inv_sigma[n];
+          operands_and_partials.d_x3[n] 
+            += (logy_m_mu_div_sigma * logy_m_mu - 1) * inv_sigma[n];
       }
       return operands_and_partials.to_var(logp);
     }

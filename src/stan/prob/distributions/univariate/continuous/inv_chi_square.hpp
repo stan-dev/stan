@@ -59,7 +59,6 @@ namespace stan {
         return logp;
       if (!check_not_nan(function, y, "Random variable", &logp))
         return logp;
-
       if (!(check_consistent_sizes(function,
                                    y,nu,
                                    "Random variable","Degrees of freedom parameter",
@@ -122,7 +121,8 @@ namespace stan {
         }
         if (!is_constant_struct<T_dof>::value) {
           operands_and_partials.d_x2[n]
-            += NEG_LOG_TWO_OVER_TWO - digamma_half_nu_over_two[n] - 0.5*log_y[n];
+            += NEG_LOG_TWO_OVER_TWO - digamma_half_nu_over_two[n]
+            - 0.5*log_y[n];
         }
       }
       return operands_and_partials.to_var(logp);
@@ -177,7 +177,8 @@ namespace stan {
       agrad::OperandsAndPartials<T_y, T_dof> operands_and_partials(y, nu);
           
       std::fill(operands_and_partials.all_partials,
-                operands_and_partials.all_partials + operands_and_partials.nvaris, 0.0);
+                operands_and_partials.all_partials 
+                + operands_and_partials.nvaris, 0.0);
         
       // Explicit return for extreme values
       // The gradients are technically ill-defined, but treated as zero

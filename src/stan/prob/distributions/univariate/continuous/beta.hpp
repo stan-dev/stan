@@ -205,7 +205,6 @@ namespace stan {
              const T_scale_fail& beta) {
       return beta_log<false>(y,alpha,beta);
     }
-
     
     /**
      * Calculates the beta cumulative distribution function for the given
@@ -360,7 +359,7 @@ namespace stan {
         if (!is_constant_struct<T_scale_succ>::value)
           operands_and_partials.d_x2[n] += g1 / Pn;
         if (!is_constant_struct<T_scale_fail>::value)
-          operands_and_partials.d_x3[n]  += g2 / Pn;
+          operands_and_partials.d_x3[n] += g2 / Pn;
       }
             
       if (!is_constant_struct<T_y>::value) {

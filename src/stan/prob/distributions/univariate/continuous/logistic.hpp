@@ -51,7 +51,8 @@ namespace stan {
         return logp;
       if (!(check_consistent_sizes(function,
                                    y,mu,sigma,
-                                   "Random variable","Location parameter","Scale parameter",
+                                   "Random variable","Location parameter",
+                                   "Scale parameter",
                                    &logp)))
         return logp;
 
@@ -61,30 +62,37 @@ namespace stan {
 
 
       // set up template expressions wrapping scalars into vector views
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale> operands_and_partials(y, mu, sigma);
+      agrad::OperandsAndPartials<T_y, T_loc, T_scale> 
+        operands_and_partials(y, mu, sigma);
 
       VectorView<const T_y> y_vec(y);
       VectorView<const T_loc> mu_vec(mu);
       VectorView<const T_scale> sigma_vec(sigma);
       size_t N = max_size(y, mu, sigma);
 
-      DoubleVectorView<true,is_vector<T_scale>::value> inv_sigma(length(sigma));
-      DoubleVectorView<include_summand<propto,T_scale>::value,is_vector<T_scale>::value> log_sigma(length(sigma));
+      DoubleVectorView<true,is_vector<T_scale>::value> 
+        inv_sigma(length(sigma));
+      DoubleVectorView<include_summand<propto,T_scale>::value,
+                       is_vector<T_scale>::value> log_sigma(length(sigma));
       for (size_t i = 0; i < length(sigma); i++) {
         inv_sigma[i] = 1.0 / value_of(sigma_vec[i]);
         if (include_summand<propto,T_scale>::value)
           log_sigma[i] = log(value_of(sigma_vec[i]));
       }
 
-      DoubleVectorView<!is_constant_struct<T_loc>::value, is_vector<T_loc>::value || is_vector<T_scale>::value> 
+      DoubleVectorView<!is_constant_struct<T_loc>::value, 
+                       is_vector<T_loc>::value || is_vector<T_scale>::value> 
         exp_mu_div_sigma(max_size(mu,sigma));
-      DoubleVectorView<!is_constant_struct<T_loc>::value, is_vector<T_y>::value || is_vector<T_scale>::value> 
+      DoubleVectorView<!is_constant_struct<T_loc>::value, 
+                       is_vector<T_y>::value || is_vector<T_scale>::value> 
         exp_y_div_sigma(max_size(y,sigma));
       if (!is_constant_struct<T_loc>::value) {
         for (size_t n = 0; n < max_size(mu,sigma); n++) 
-          exp_mu_div_sigma[n] = exp(value_of(mu_vec[n]) / value_of(sigma_vec[n]));
+          exp_mu_div_sigma[n] = exp(value_of(mu_vec[n]) 
+                                    / value_of(sigma_vec[n]));
         for (size_t n = 0; n < max_size(y,sigma); n++) 
-          exp_y_div_sigma[n] = exp(value_of(y_vec[n]) / value_of(sigma_vec[n]));
+          exp_y_div_sigma[n] = exp(value_of(y_vec[n])
+                                   / value_of(sigma_vec[n]));
       }
 
       using stan::math::log1p;
@@ -98,7 +106,8 @@ namespace stan {
         if (include_summand<propto,T_y,T_loc,T_scale>::value)
           exp_m_y_minus_mu_div_sigma = exp(-y_minus_mu_div_sigma);
         double inv_1p_exp_y_minus_mu_div_sigma(0);
-        if (!is_constant_struct<T_y>::value || !is_constant_struct<T_scale>::value)
+        if (!is_constant_struct<T_y>::value 
+            || !is_constant_struct<T_scale>::value)
           inv_1p_exp_y_minus_mu_div_sigma = 1 / (1 + exp(y_minus_mu_div_sigma));
 
         if (include_summand<propto,T_y,T_loc,T_scale>::value)
@@ -109,13 +118,17 @@ namespace stan {
           logp -= 2.0 * log1p(exp_m_y_minus_mu_div_sigma);
 
         if (!is_constant_struct<T_y>::value)
-          operands_and_partials.d_x1[n] += (2 * inv_1p_exp_y_minus_mu_div_sigma - 1) * inv_sigma[n];
+          operands_and_partials.d_x1[n] 
+            += (2 * inv_1p_exp_y_minus_mu_div_sigma - 1) * inv_sigma[n];
         if (!is_constant_struct<T_loc>::value)
           operands_and_partials.d_x2[n] +=
-            (1 - 2 * exp_mu_div_sigma[n] / (exp_mu_div_sigma[n] + exp_y_div_sigma[n])) * inv_sigma[n];
+            (1 - 2 * exp_mu_div_sigma[n] / (exp_mu_div_sigma[n] 
+                                            + exp_y_div_sigma[n]))
+            * inv_sigma[n];
         if (!is_constant_struct<T_scale>::value)
           operands_and_partials.d_x3[n] += 
-            ((1 - 2 * inv_1p_exp_y_minus_mu_div_sigma)*y_minus_mu*inv_sigma[n] - 1) * inv_sigma[n];
+            ((1 - 2 * inv_1p_exp_y_minus_mu_div_sigma)
+             *y_minus_mu*inv_sigma[n] - 1) * inv_sigma[n];
       }
       return operands_and_partials.to_var(logp);
     }
@@ -133,7 +146,9 @@ namespace stan {
     logistic_cdf(const T_y& y, const T_loc& mu, const T_scale& sigma) {
           
       // Size checks
-      if ( !( stan::length(y) && stan::length(mu) && stan::length(sigma) ) ) return 1.0;
+      if ( !( stan::length(y) && stan::length(mu) 
+              && stan::length(sigma) ) ) 
+        return 1.0;
           
       // Error checks
       static const char* function = "stan::prob::logistic_cdf(%1%)";
@@ -166,10 +181,12 @@ namespace stan {
       VectorView<const T_scale> sigma_vec(sigma);
       size_t N = max_size(y, mu, sigma);
           
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale> operands_and_partials(y, mu, sigma);
+      agrad::OperandsAndPartials<T_y, T_loc, T_scale>
+        operands_and_partials(y, mu, sigma);
           
       std::fill(operands_and_partials.all_partials,
-                operands_and_partials.all_partials + operands_and_partials.nvaris, 0.0);
+                operands_and_partials.all_partials
+                + operands_and_partials.nvaris, 0.0);
           
       // Explicit return for extreme values
       // The gradients are technically ill-defined, but treated as zero
@@ -209,17 +226,19 @@ namespace stan {
         if (!is_constant_struct<T_scale>::value)
           operands_and_partials.d_x3[n] += - (y_dbl - mu_dbl) * sigma_inv_vec 
             * exp(logistic_log(y_dbl, mu_dbl, sigma_dbl)) / Pn;
-              
       }
 
       if (!is_constant_struct<T_y>::value) {
-        for(size_t n = 0; n < stan::length(y); ++n) operands_and_partials.d_x1[n] *= P;
+        for(size_t n = 0; n < stan::length(y); ++n) 
+          operands_and_partials.d_x1[n] *= P;
       }
       if (!is_constant_struct<T_loc>::value) {
-        for(size_t n = 0; n < stan::length(mu); ++n) operands_and_partials.d_x2[n] *= P;
+        for(size_t n = 0; n < stan::length(mu); ++n) 
+          operands_and_partials.d_x2[n] *= P;
       }
       if (!is_constant_struct<T_scale>::value) {
-        for(size_t n = 0; n < stan::length(sigma); ++n) operands_and_partials.d_x3[n] *= P;
+        for(size_t n = 0; n < stan::length(sigma); ++n) 
+          operands_and_partials.d_x3[n] *= P;
       }
           
       return operands_and_partials.to_var(P);
@@ -231,7 +250,7 @@ namespace stan {
     logistic_cdf_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
           
       // Size checks
-      if ( !( stan::length(y) && stan::length(mu) && stan::length(sigma) ) ) 
+      if ( !( stan::length(y) && stan::length(mu) && stan::length(sigma) ) )
         return 0.0;
           
       // Error checks
@@ -309,7 +328,6 @@ namespace stan {
         if (!is_constant_struct<T_scale>::value)
           operands_and_partials.d_x3[n]  += - (y_dbl - mu_dbl) * sigma_inv_vec 
             * exp(logistic_log(y_dbl, mu_dbl, sigma_dbl)) / Pn;
-              
       }
           
       return operands_and_partials.to_var(P);
@@ -398,7 +416,6 @@ namespace stan {
         if (!is_constant_struct<T_scale>::value)
           operands_and_partials.d_x3[n] -= - (y_dbl - mu_dbl) * sigma_inv_vec 
             * exp(logistic_log(y_dbl, mu_dbl, sigma_dbl)) / Pn;
-              
       }
           
       return operands_and_partials.to_var(P);
