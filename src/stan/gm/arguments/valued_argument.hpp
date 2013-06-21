@@ -86,19 +86,3 @@ namespace stan {
   } // gm
 } // stan
 #endif
-
-
-      
-      virtual std::string print_value() = 0;
-      virtual std::string print_valid() = 0;
-      virtual bool is_default() = 0;
-      
-    protected:
-      
-      std::string _default;
-    };
-    
-  } // gm
-} // stan
-#endif
-
