@@ -97,42 +97,47 @@ TEST(ProbDistributionsGaussianDLM,Sizing) {
   Matrix<double, Dynamic, Dynamic> W = MatrixXd::Identity(2, 2);
   Matrix<double, Dynamic, Dynamic> y = MatrixXd::Identity(3, 5);
 
+  // Check F
   Matrix<double, Dynamic, Dynamic> bad_FF_1 = MatrixXd::Random(4, 3);  
-  EXPECT_ANY_THROW(gaussian_dlm_log(y, bad_FF_1, GG, V, W));
+  EXPECT_THROW(gaussian_dlm_log(y, bad_FF_1, GG, V, W), std::domain_error);
   
   Matrix<double, Dynamic, Dynamic> bad_FF_2 = MatrixXd::Random(2, 4);
-  EXPECT_ANY_THROW(gaussian_dlm_log(y, bad_FF_2, GG, V, W));
+  EXPECT_THROW(gaussian_dlm_log(y, bad_FF_2, GG, V, W), std::domain_error);
   
+  // Check G
   Matrix<double, Dynamic, Dynamic> bad_GG_1 = MatrixXd::Random(3, 3);
-  EXPECT_ANY_THROW(gaussian_dlm_log(y, FF, bad_GG_1, V, W));
+  EXPECT_THROW(gaussian_dlm_log(y, FF, bad_GG_1, V, W), std::domain_error);
   Matrix<double, Dynamic, Dynamic> bad_GG_2 = MatrixXd::Random(2, 3);
-  EXPECT_ANY_THROW(gaussian_dlm_log(y, FF, bad_GG_2, V, W));
+  EXPECT_THROW(gaussian_dlm_log(y, FF, bad_GG_2, V, W), std::domain_error);
   
+  // Check V
   //Not symmetric
   V(0, 2) = 1;
-  EXPECT_ANY_THROW(gaussian_dlm_log(y, FF, GG, V, W));
+  EXPECT_THROW(gaussian_dlm_log(y, FF, GG, V, W), std::domain_error);
   // negative
   V(0, 2) = -1;
-  EXPECT_ANY_THROW(gaussian_dlm_log(y, FF, GG, V, W));
-
+  EXPECT_THROW(gaussian_dlm_log(y, FF, GG, V, W), std::domain_error);
   // wrong size
   Matrix<double, Dynamic, Dynamic> V1 = MatrixXd::Identity(2, 2);
-  EXPECT_ANY_THROW(gaussian_dlm_log(y, FF, GG, V1, W));
+  EXPECT_THROW(gaussian_dlm_log(y, FF, GG, V1, W), std::domain_error);
+  // wrong size vector
+  Matrix<double, Dynamic, 1L> V2(4);
+  EXPECT_THROW(gaussian_dlm_log(y, FF, GG, V2, W), std::domain_error);  
   // not square
-  Matrix<double, Dynamic, Dynamic> V2 = MatrixXd::Identity(2, 3);
-  EXPECT_ANY_THROW(gaussian_dlm_log(y, FF, GG, V2, W));
+  Matrix<double, Dynamic, Dynamic> V3 = MatrixXd::Identity(2, 3);
+  EXPECT_THROW(gaussian_dlm_log(y, FF, GG, V3, W), std::domain_error);
 
   //Not symmetric
   W(0, 1) = 1;
-  EXPECT_ANY_THROW(gaussian_dlm_log(y, FF, GG, V, W));
+  EXPECT_THROW(gaussian_dlm_log(y, FF, GG, V, W), std::domain_error);
   // negative
   W(0, 1) = -1;
-  EXPECT_ANY_THROW(gaussian_dlm_log(y, FF, GG, V, W));
+  EXPECT_THROW(gaussian_dlm_log(y, FF, GG, V, W), std::domain_error);
   // wrong size
   Matrix<double, Dynamic, Dynamic> W1 = MatrixXd::Identity(3, 3);
-  EXPECT_ANY_THROW(gaussian_dlm_log(y, FF, GG, V, W1));
+  EXPECT_THROW(gaussian_dlm_log(y, FF, GG, V, W1), std::domain_error);
   // not square
   Matrix<double, Dynamic, Dynamic> W2 = MatrixXd::Identity(2, 3);
-  // EXPECT_ANY_THROW(gaussian_dlm_log(y, FF, GG, V, W2));
+  EXPECT_THROW(gaussian_dlm_log(y, FF, GG, V, W2), std::domain_error);
 
 }
