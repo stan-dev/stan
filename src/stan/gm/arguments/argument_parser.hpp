@@ -15,11 +15,12 @@ namespace stan {
       
     public:
       
-      argument_parser(std::vector<argument*>& valid_args): _arguments(valid_args), _help_flag(false) {};
-
-      bool parse_args(int argc, const char* argv[], std::ostream* out = 0, std::ostream* err = 0) {
-        
-        if(argc == 1) return true;
+      argument_parser(std::vector<argument*>& valid_args)
+        : _arguments(valid_args), _help_flag(false) {}
+      
+      bool parse_args(int argc,const char* argv[],std::ostream* out = 0,std::ostream* err = 0) {
+        if(argc == 1) 
+          return true;
         
         std::vector<std::string> args;
         
@@ -32,34 +33,28 @@ namespace stan {
         _help_flag = false;
         
         while(good_arg) {
-          
-          if(args.size() == 0) return valid_arg;
+          if(args.size() == 0) 
+            return valid_arg;
           
           good_arg = false;
-          
           std::string cat_name = args.back();
-          
           std::string val_name;
           std::string val;
           argument::split_arg(cat_name, val_name, val);
           
           for (std::vector<argument*>::iterator it = _arguments.begin();
                it != _arguments.end(); ++it) {
-            
             if( (*it)->name() == cat_name) {
               args.pop_back();
               valid_arg &= (*it)->parse_args(args, out, err, _help_flag);
               good_arg = true;
-            }
-            else if( (*it)->name() == val_name ) {
+            } else if( (*it)->name() == val_name ) {
               valid_arg &= (*it)->parse_args(args, out, err, _help_flag);
               good_arg = true;
             }
-            
           }
           
           if(cat_name == "help") {
-            
             *out << "Usage: model <arg1> <subarg1_1> ... <subarg1_m>"
                  << " ... <arg_n> <subarg_n_1> ... <subarg_n_m>"
                  << std::endl << std::endl;
@@ -75,25 +70,22 @@ namespace stan {
             
             args.clear();
             return 0;
-            
-          }
-          else if(cat_name == "help-all") {
+          } else if(cat_name == "help-all") {
             print_help(out, true);
             _help_flag |= true;
             args.clear();
             return 0;
           }
           
-          if(!good_arg && err) *err << cat_name << " is either mistyped or misplaced." << std::endl;
-          
+          if(!good_arg && err) 
+            *err << cat_name << " is either mistyped or misplaced." << std::endl;
         }
-        
         return valid_arg && good_arg;
-        
       }
       
       void print(std::ostream* s, const char prefix = '\0') {
-        if(!s) return;
+        if (!s) 
+          return;
         
         for (int i = 0; i < _arguments.size(); ++i) {
           _arguments.at(i)->print(s, 0, prefix);
@@ -102,25 +94,24 @@ namespace stan {
       }
       
       void print_help(std::ostream* s, bool recurse) {
-        if(!s) return;
-        
+        if (!s) 
+          return;
         for (int i = 0; i < _arguments.size(); ++i) {
           _arguments.at(i)->print_help(s, 0, recurse);
         }
-        
       }
-      
+    
       argument* arg(std::string name) {
-        
         for (std::vector<argument*>::iterator it = _arguments.begin();
              it != _arguments.end(); ++it)
-          if( name == (*it)->name() ) return (*it);
-        
+          if( name == (*it)->name() ) 
+            return (*it);
         return 0;
-        
       }
       
-      bool help_printed() { return _help_flag; }
+      bool help_printed() { 
+        return _help_flag; 
+      }
       
     protected:
       
