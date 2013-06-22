@@ -1408,6 +1408,41 @@ $y \in \reals^K$,
 may only be used in generated quantities block}
 \end{description}
 
+
+\section{Guassian Dynamic Linear Models}
+\label{sec:guass-dynam-line}
+
+A Gaussian Dynamic Linear model is defined as follows,
+For $t \in 1, \dots, T$,
+\[
+  \begin{aligned}[t]
+    y_{t} &\sim N(F' \theta_{t}, V) \\
+    \theta_{t} &\sim N(G \theta_{t - 1}, W)
+  \end{aligned}
+\]
+The log-likelihood of this system is calculated using the the Kalman Filter.
+If $V$ is diagonal, then a more numerically stable algorithm that processes each observation sequentially can be used.
+
+\subsubsection{Stan Functions}
+
+\begin{description}
+%
+\fitem{real}{gaussian\_dlm\_log}{vector \farg{y}, matrix
+  \farg{F}, matrix \farg{G}, matrix \farg{V}, matrix \farg{W}}
+  {The log of the density of the Gaussian Dynamic Linear model with
+    observation matrix \farg{y}, design matrix \farg{F}, transition matrix \farg{G},
+    obsrvation covariance matrix \farg{V}, and system covariance matrix \farg{W}.}
+%
+%
+\fitem{real}{gaussian\_dlm\_log}{vector \farg{y}, matrix
+  \farg{F}, matrix \farg{G}, vector \farg{V}, matrix \farg{W}}
+  {The log of the density of the Gaussian Dynamic Linear model with
+    observation matrix \farg{y}, design matrix \farg{F}, transition matrix \farg{G},
+    diagonal of the obsrvation covariance matrix \farg{V}, and system covariance matrix \farg{W}.}
+%
+\end{description}
+
+
 \chapter{Simplex Distributions}
 
 \noindent
