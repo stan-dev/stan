@@ -23,5 +23,4 @@ transformed parameters {
 }
 model {
   y ~ gaussian_dlm(F, G, V, W);
-  print(lp__);
 }

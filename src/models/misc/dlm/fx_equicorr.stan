@@ -31,7 +31,5 @@ transformed parameters {
   }
 }
 model {
-  real ll;
-  ll <- gaussian_dlm_log(y, F, G, V, W);
-  lp__ <- lp__ + ll;
+  y ~ gaussian_dlm_log(F, G, V, W);
 }
