@@ -1,9 +1,16 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__ORDERED_LOGISTIC_HPP__
 #define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__ORDERED_LOGISTIC_HPP__
 
+#include <boost/random/uniform_01.hpp>
+#include <boost/random/variate_generator.hpp>
+#include <stan/prob/distributions/multivariate/discrete/categorical.hpp>
+
 #include <stan/prob/traits.hpp>
 #include <stan/math/error_handling.hpp>
-#include <stan/math/special_functions.hpp>
+#include <stan/math/functions/inv_logit.hpp>
+#include <stan/math/functions/log1m.hpp>
+#include <stan/math/functions/log1m_exp.hpp>
+#include <stan/math/functions/log1p_exp.hpp>
 #include <stan/math/matrix_error_handling.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/prob/constants.hpp>
@@ -17,9 +24,9 @@ namespace stan {
     template <typename T>
     inline T log_inv_logit_diff(const T& alpha, const T& beta) {
       using std::exp;
-      using stan::math::log1m;
+      using stan::math::log1m_exp;
       using stan::math::log1p_exp;
-      return beta + log1m(exp(alpha - beta)) - log1p_exp(alpha) - log1p_exp(beta);
+      return beta + log1m_exp(alpha - beta) - log1p_exp(alpha) - log1p_exp(beta);
     }
  
     // y in 0,...,K-1;   c.size()==K-2,  c increasing,  lambda finite
@@ -49,16 +56,10 @@ namespace stan {
      * non-finite value; or if the cutpoint vector is not sorted in
      * ascending order.
      */
-    template <bool propto,
-              typename T_lambda,
-              typename T_cut,
-              class Policy>
+    template <bool propto, typename T_lambda, typename T_cut>
     typename boost::math::tools::promote_args<T_lambda,T_cut>::type
-    ordered_logistic_log(int y,  
-                         const T_lambda& lambda,  
-                         const Eigen::Matrix<T_cut,Eigen::Dynamic,1>& c, 
-                         const Policy&) {
-
+    ordered_logistic_log(int y, const T_lambda& lambda,  
+                         const Eigen::Matrix<T_cut,Eigen::Dynamic,1>& c) {
       using std::exp;
       using std::log;
       using stan::math::inv_logit;
@@ -80,34 +81,34 @@ namespace stan {
       typename boost::math::tools::promote_args<T_lambda,T_cut>::type lp(0.0);
       if (!check_bounded(function, y, 1, K,
                          "Random variable", 
-                         &lp, Policy()))
+                         &lp))
         return lp;
 
       if (!check_finite(function, lambda, 
-                        "Location parameter", &lp, Policy()))
+                        "Location parameter", &lp))
         return lp;
 
       if (!check_greater(function, c.size(), 0,
                          "Size of cut points parameter",
-                         &lp, Policy()))
+                         &lp))
         return lp;
 
 
       for (int i = 1; i < c.size(); ++i) {
         if (!check_greater(function, c(i), c(i - 1),
                            "Cut points parameter",
-                           &lp, Policy()))
+                           &lp))
           return lp;
       }
 
       if (!check_finite(function, c(c.size()-1), 
                         "Cut points parameter",
-                        &lp, Policy()))
+                        &lp))
         return lp;
       
       if (!check_finite(function, c(0),
                         "Cut points parameter",
-                        &lp, Policy())) 
+                        &lp)) 
         return lp;
 
       // log(1 - inv_logit(lambda))
@@ -126,39 +127,28 @@ namespace stan {
 
     }
 
-
-    template <bool propto,
-              typename T_lambda,
-              typename T_cut>
+    template <typename T_lambda, typename T_cut>
     typename boost::math::tools::promote_args<T_lambda,T_cut>::type
-    ordered_logistic_log(int y,  
-                         const T_lambda& lambda,  
+    ordered_logistic_log(int y, const T_lambda& lambda,  
                          const Eigen::Matrix<T_cut,Eigen::Dynamic,1>& c) {
-      return ordered_logistic_log<propto>(y,lambda,c,stan::math::default_policy());
+      return ordered_logistic_log<false>(y,lambda,c);
     }
 
+    template <class RNG>
+    inline int
+    ordered_logistic_rng(const double eta,
+       const Eigen::Matrix<double,Eigen::Dynamic,1>& c,
+       RNG& rng) {
+      using boost::variate_generator;
+      using stan::math::inv_logit;
+      Eigen::VectorXd cut(c.rows());
+      cut(0) = 1 - inv_logit(eta - c(0));
+      for(int j = 1; j < c.rows() - 1; j++)
+  cut(j) = inv_logit(eta - c(j - 1)) - inv_logit(eta - c(j));
+      cut(c.rows() - 1) = inv_logit(eta - c(c.rows() - 2));
 
-    template <typename T_lambda,
-              typename T_cut,
-              class Policy>
-    typename boost::math::tools::promote_args<T_lambda,T_cut>::type
-    ordered_logistic_log(int y,  
-                         const T_lambda& lambda,  
-                         const Eigen::Matrix<T_cut,Eigen::Dynamic,1>& c,
-                         const Policy&) {
-      return ordered_logistic_log<false>(y,lambda,c,Policy());
+      return stan::prob::categorical_rng(cut, rng);
     }
-
-
-    template <typename T_lambda,
-              typename T_cut>
-    typename boost::math::tools::promote_args<T_lambda,T_cut>::type
-    ordered_logistic_log(int y,  
-                         const T_lambda& lambda,  
-                         const Eigen::Matrix<T_cut,Eigen::Dynamic,1>& c) {
-      return ordered_logistic_log<false>(y,lambda,c,stan::math::default_policy());
-    }
-
   }
 }
 

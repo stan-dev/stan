@@ -21,15 +21,15 @@ public:
   }
 
   static bool has_init() {
-    return false;
+    return true;
   }
 
-  static size_t num_iterations() {
+  static int num_iterations() {
     return iterations;
   }
 
-  static std::vector<size_t> skip_chains_test() {
-    std::vector<size_t> params_to_skip;
+  static std::vector<int> skip_chains_test() {
+    std::vector<int> params_to_skip;
     return params_to_skip;
   }
 
@@ -37,14 +37,28 @@ public:
     default_populate_chains();
   }
 
-  static std::vector<std::pair<size_t, double> >
+  static std::vector<std::pair<int, double> >
   get_expected_values() {
-    std::vector<std::pair<size_t, double> > expected_values;
+    using std::make_pair;
+    std::vector<std::pair<int, double> > expected_values;
+
+    expected_values.push_back(make_pair(chains->index("alpha"), -39.77));
+    expected_values.push_back(make_pair(chains->index("beta"), 22.15));
+
+    expected_values.push_back(make_pair(chains->index("rhat[1]"), 5.623));
+    expected_values.push_back(make_pair(chains->index("rhat[2]"), 11.28));
+    expected_values.push_back(make_pair(chains->index("rhat[3]"), 20.91));
+    expected_values.push_back(make_pair(chains->index("rhat[4]"), 30.32));
+    expected_values.push_back(make_pair(chains->index("rhat[5]"), 47.74));
+    expected_values.push_back(make_pair(chains->index("rhat[6]"), 54.08));
+    expected_values.push_back(make_pair(chains->index("rhat[7]"), 61.02));
+    expected_values.push_back(make_pair(chains->index("rhat[8]"), 59.92));
+    
     return expected_values;
   }
 
 };
 
 INSTANTIATE_TYPED_TEST_CASE_P(Models_BugsExamples_Vol2_BeetlesCloglog,
-			      Model_Test_Fixture,
-			      Models_BugsExamples_Vol2_BeetlesCloglog);
+            Model_Test_Fixture,
+            Models_BugsExamples_Vol2_BeetlesCloglog);

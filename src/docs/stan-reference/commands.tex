@@ -149,7 +149,7 @@ system execution path.
 
 \subsubsection{Optimization Option}
 
-The option \code{O=0} (that's letter 'O', equal sign, digit '0'),
+The option \code{O=0} (that's letter `O', equal sign, digit `0'),
 specifies optimization level 0 (no optimization), whereas \code{O=3}
 specifies optimization level 3 (effectively full optimization), with
 levels 1 and 2 in between.
@@ -235,7 +235,7 @@ and Mac, and \code{bin/stanc.exe} under Windows.  The invocation of
 \code{make}, including the forward slash, is the same on both platforms.
 
 The default compiler option is \code{CC=g++} and the default
-optimization level is \code{O=3} (the letter 'O');  to see how to
+optimization level is \code{O=3} (the letter `O');  to see how to
 change these, see the previous section in this chapter on \code{make}.
 
 
@@ -270,12 +270,12 @@ For Windows:
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
 > cd <stan-home>
-> bin\stanc --name=bernoulli --o=bernoulli.cpp
-  src/models/basic_estimators/bernoulli.stan 
+> bin\stanc --name=bernoulli --o=bernoulli.cpp ^
+>   src/models/basic_estimators/bernoulli.stan 
 \end{Verbatim}
 \end{quote}
 %
-The second command must be typed on a single line in Windows. 
+The caret (\Verb|^|) indicates continuation on Windows.
 
 This call specifies the name of the model, here {\tt bernoulli}.
 This will determine the name of the class implementing the model in
@@ -442,8 +442,8 @@ The following commands will produce an executable in the file
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
 > cd <stan-home>
-> g++ -O3 -Lbin -Isrc -Ilib/boost_1.51.0 \
-  -Ilib/eigen_3.1.0 my_model.cpp -o my_model -lstan
+> g++ -O3 -Lbin -Isrc -Ilib/boost_1.53.0 \
+  -Ilib/eigen_3.1.2 my_model.cpp -o my_model -lstan
 \end{Verbatim}
 \end{quote} %
 The backslash (\Verb|\|) is used to indicate that the command is
@@ -457,9 +457,9 @@ The options used here are as follows.
   directory,
 \item[\code{-Isrc}] specifies that the directory \code{src} should be
   searched for code (it contains the top-level \Stan headers),
-\item[\code{-Ilib/eigen\_3.1.0}] specifies the directory for
+\item[\code{-Ilib/eigen\_3.1.2}] specifies the directory for
   the Eigen library,
-\item[\code{-Ilib/boost\_1.51.0}] specifies the directory for the 
+\item[\code{-Ilib/boost\_1.53.0}] specifies the directory for the 
   Boost library,
 \item[\code{my\_model.cpp}] specifies the name of the source file to
   compile, and 
@@ -513,7 +513,7 @@ program compiled to a platform-specific executable (see
 
 Suppose the executable is in file \code{my\_model} and the data
 is in file \code{my\_data}, both in the current working directory.
-Then the \Stan executable may be run using
+Then the \Stan executable may be run on Windows using
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
@@ -526,8 +526,59 @@ This will read the data from file \code{my\_data}, run warmup tuning for
 \NUTS sampler for 1000 iterations, writing the parameter (and other)
 values to the file \code{samples.csv} in the current working
 directory.  A random number generation seed will be derived from
-the system time automatically.
+the system time automatically. Note that on Mac or Linux, it is 
+necessary to instead execute
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> ./my_model --data=my_data
+\end{Verbatim}
+\end{quote}
+%
+\section{Parallel Example}
 
+The previous example executes one chain, which can be repeated to 
+generate multiple chains. However, users may want to execute chains
+in parallel on a multicore machine. To do so with four chains using
+a Bash shell on Mac or Linux execute
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> for i in {1..4}
+> do
+>   ./my_model --refresh=0 --seed=12345 --chain_id=$i \
+>     --samples=samples$i.csv --data=my_data &
+> done
+>
+\end{Verbatim}
+\end{quote}
+%
+Note that there is blank line at the end that returns control to the
+prompt. The \& at the end pushes each process into the background, so
+that the loop can continue without waiting for the previous chain to 
+finish. This example requires several command-line options that are
+explained in further detail in the next subsection. 
+
+On Windows, the following is functionally equivalent to the Bash
+snippet above
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> for /l %x in (1, 1, 4) do start /b model --refresh=0 ^
+>   --seed=12345 --chain_id=%x  --samples=samples%x.csv
+\end{Verbatim}
+\end{quote}
+%
+If the grep and sed programs are installed, then the following will
+combine the four csv files into a single csv file
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> grep lp__ samples1.csv > combined.csv
+> sed '/^[#l]/d' samples*.csv >> combined.csv 
+\end{Verbatim}
+\end{quote}
+%
 \section{Command-Line Options}\label{stan-command-line-options.section}
 
 The executable \Stan program is highly configurable.  At the highest
@@ -556,7 +607,8 @@ some typical use-case examples.
 {default is random initialization}
 %
 \cmdarg{samples}{file}
-{File into which samples are written}
+{File into which samples are written. Be sure to distinguish the
+file when executing multiple chains simultaneously.}
 {default = \code{samples.csv}}
 %
 \cmdflag{append\_samples}
@@ -564,7 +616,9 @@ some typical use-case examples.
 {default is to overwrite specified file}
 %
 \cmdarg{seed}{int}
-{Random number generation seed}
+{Random number generation seed. When executing multiple chains
+simultaneously, it is best to give all of them the same seed
+but different values for chain\_id (see below).}
 {default is to randomly generate from time}
 %
 \cmdarg{chain\_id}{int}
@@ -590,7 +644,7 @@ some typical use-case examples.
 {default = \code{max(1, iter / 200)}}
 %
 \cmdarg{leapfrog\_steps}{int}
-{Number of leapfrog steps; \code{-1} for no-U-turn adaptation}
+{Number of leapfrog steps; \code{-1} for No-U-Turn adaptation}
 {default = \code{-1}}
 %
 \cmdarg{max\_treedepth}{int}
@@ -607,15 +661,21 @@ some typical use-case examples.
 \code{[epsilon * (1 - epsilon\_pm),\ epsilon * (1 + epsilon\_pm)]}}
 {default = \code{0.0}}
 %
-\cmdflag{equal\_step\_sizes} {Use unit mass matrix for \NUTS; see
-  related parameter \code{epsilon}} {\NUTS default is to estimate 
-  step sizes that vary by parameter}%
+\cmdflag{equal\_step\_sizes} {Use unit mass matrix for \NUTS; either
+  \code{equal\_step\_sizes} or \code{nondiag\_mass} may be set, but
+  not both; see related parameter \code{epsilon}} {\NUTS default is
+  to estimate step sizes that vary by parameter}%
 \footnote{\Stan's implementation of \NUTS follows the approach in
   \citep[section 5.4.2.4]{Neal:2011}, which is equivalent to having
   different step sizes for each parameter.  Varying step sizes are
   acceptable for \HMC even though they vary the time scale of each
   parameter and thus depart from the Hamiltonian interpretation of the
   trajectory.}
+%
+\cmdflag{nondiag\_mass}{Use full mass matrix estimation with \NUTS;
+  either \code{equal\_step\_sizes} or \code{nondiag\_mass} may be set,
+  but not both; see related parameter \code{epsilon} }{\NUTS default
+  is to estimate step sizes that vary by parameter}
 %
 \cmdarg{delta}{+float}
 {Initial step size for step-size adaptation}
@@ -655,12 +715,103 @@ following table summarizes.
 \NUTS + tuned step size & \Verb|--equal_step_sizes|
 \\
 \NUTS + tuned varying step sizes & (default configuration)
+\\
+\NUTS + full mass matrix & \Verb|--nondiag_mass|
 \end{tabular}
 \end{center}
 %
 For an overview of Hamiltonian Monte Carlo (\HMC), see
-\citep{Neal:2011}.  For details concerning the no-U-turn sampler
+\citep{Neal:2011}.  For details concerning the No-U-Turn sampler
 (\NUTS), see \citep{Hoffman-Gelman:2011,Hoffman-Gelman:2012}.
+
+
+
+\chapter{Print Command for Output Analysis}\label{print-command.chapter}
+
+Stan is distributed with a print command that is able to read in the
+output of one or more Markov chains and summarize the posterior fits.
+This operation mimics the \code{print(fit)} command in RStan, which
+itself was modeled on the print functions from R2WinBUGS and R2jags.
+
+\section{Building the Print Command}
+
+Stan's \code{print} command is built along with \code{stanc} into the
+\code{bin} directory.  It can be compiled directly using the makefile
+as follows from the home directory into which Stan was unpacked (here
+written as \code{<stan-home>}).
+%
+\begin{quote}
+\begin{Verbatim}
+> cd <stan-home>
+> make bin/print
+\end{Verbatim}
+\end{quote}
+%
+All the usual compiler options from Stan's makefile apply, such as
+\code{O=\farg{N}} to set optimization level to \farg{N}, and
+\code{CC=clang++} to set the compilation to use clang. 
+
+\section{Running the Print Command}
+
+The print command is executed on one or more samples.csv files.  These
+files may be provided as command-line arguments separated by spaces.
+That means that wildcards may be used, as they will be replaced by
+space-separated file names by the operating system's command-line
+interpreter. 
+
+Suppose there are three samples files in a directory generated by
+fitting a negative binomial model to a small data set.
+%
+\begin{quote}
+\begin{Verbatim}
+> ls samples*.csv
+\end{Verbatim}
+\begin{Verbatim}[fontshape=sl]
+samples1.csv	samples2.csv	samples3.csv
+\end{Verbatim}
+\end{quote}
+
+\begin{quote}
+\begin{Verbatim}
+> bin/print samples*.csv
+\end{Verbatim}
+{\small
+\begin{Verbatim}[fontshape=sl]
+Inference for Stan model: 
+3 chains: each with iter=(1000,1000,1000); warmup=(0,0,0); 
+thin=(1,1,1); 3000 iterations saved.
+
+       mean se_mean   sd 2.5%  25%  50%  75% 97.5% n_eff Rhat
+alpha  16.2     2.0 41.5  1.4  5.2  9.7 17.6  59.2   435  1.0
+beta   10.0     1.1 22.8  0.8  3.3  6.2 11.2  37.5   405  1.0
+
+Samples were drawn using mcmc::nuts_diag.
+For each parameter, n_eff is a crude measure of effective 
+sample size, and Rhat is the potential scale reduction factor 
+on split chains (at convergence, Rhat=1).
+\end{Verbatim}
+}
+\end{quote}
+%
+The posterior is skewed to the high side, resulting in posterior means
+($\alpha=16.2$ and $\beta=10.0$) that are a long way away from the posterior
+medians ($\alpha=9.7$ and $\beta=6.2$);  the posterior median is the
+value listed under \code{50\%}, which is the 50th percentile of the
+posterior values.
+
+For Windows, the forward slash in paths need to be converted to backslashes.
+
+\section{Command-line Options}
+
+There is only a single command-line option for \code{print}, namely
+\code{--help}, which prints usage information.
+
+In a forthcoming release, there will be controls for the number of
+significant digits in the output;  as is, the print errs on the side
+of using too few digits.
+
+
+
 
 
 
@@ -752,8 +903,8 @@ order, meaning the values for \code{y} will be as follows.
 %
 \begin{quote}
 \begin{Verbatim}
-y[1,1] = 1     y[2,1] = 3     y[3,1] = 5    
-y[2,1] = 2     y[2,2] = 4     y[3,2] = 6
+y[1,1] = 1     y[1,2] = 3     y[1,3] = 5    
+y[2,1] = 2     y[2,2] = 4     y[2,3] = 6
 \end{Verbatim}
 \end{quote}
 %
@@ -762,22 +913,45 @@ dimensionality declaration, which is itself just a sequence of
 non-negative integer values.  The product of the dimensions must equal
 the length of the array.
 
-If the dimensions happen to form a contiguous sequence of integers,
+If the values happen to form a contiguous sequence of integers,
 they may be written with colon notation.  Thus the example above is
 equivalent to the following.
 %
 \begin{quote}
 \begin{verbatim}
-y <- structure(c(1,2,3,4,5,6), .Dim = 2:3)
+y <- structure(1:6, .Dim = c(2,3))
 \end{verbatim}
 \end{quote}
 %
-Similarly, the values may also be written with colon notation.  Thus
-the following is equivalent to the last two variable definitions.
+The same applies to the specification of dimensions, though it is
+perhaps less likely to be used. In the above example,
+c(2,3) could be written as \code{2:3}.
+
+Arrays of more than two dimensions are written in a last-index major form.
+For example, 
 %
 \begin{quote}
 \begin{verbatim}
-y <- structure(1:6, .Dim = 2:3)
+z <- structure(1:24, .Dim = c(2,3,4))
+\end{verbatim}
+\end{quote}
+%
+produces a three-dimensional \code{int} (assignable to \code{real})
+array \code{z} with values
+%
+\begin{quote}
+\begin{verbatim}
+z[1,1,1] =  1   z[1,2,1] =  3   z[1,3,1] =  5
+z[2,1,1] =  2   z[2,2,1] =  4   z[2,3,1] =  6
+
+z[1,1,2] =  7   z[1,2,2] =  9   z[1,3,2] = 11
+z[2,1,2] =  8   z[2,2,2] = 10   z[2,3,2] = 12
+
+z[1,1,3] = 13   z[1,2,3] = 15   z[1,3,3] = 17
+z[2,1,3] = 14   z[2,2,3] = 16   z[2,3,3] = 18
+
+z[1,1,4] = 19   z[1,2,4] = 21   z[1,3,4] = 23
+z[2,1,4] = 20   z[2,2,4] = 22   z[2,3,4] = 24
 \end{verbatim}
 \end{quote}
 
@@ -834,6 +1008,29 @@ point in the value, \code{2.0}, causes \Stan to infer that \code{y} is
 real valued.  This dump file may only be used for variables \code{y}
 declared as real in \Stan.
 
+
+\subsection{Infinite and Not-a-Number Values}
+
+Stan's reader supports infinite and not-a-number values for scalar
+quantities (see \refsection{real-data-type} for more information).
+Both infinite and not-a-number values are supported by Stan's
+dump-format readers.  
+%
+\begin{center}
+\begin{tabular}{r||c|c}
+{\it Value} & {\it Preferred Form} & {\it Alternative Forms} \\ \hline \hline
+positive infinity & \code{Inf} & \code{Infinity},
+\code{infinity}
+\\
+negative infinity & \code{-Inf} & \code{-Infinity},
+\code{-infinity}
+\\
+not a number & \code{NaN} & 
+\end{tabular}
+\end{center}
+%
+These strings are not case sensitive, so \code{inf} may also be used
+for positive infinity, or \code{NAN} for not-a-number.
 
 \section{Quoted Variable Names}
 
@@ -928,6 +1125,9 @@ The template parameters \code{T} will be set to either \code{int} or
 \code{real}.  Because \Stan allows promotion of integer values to real
 values, an integer sequence specification in the dump data format may
 be assigned to either an integer- or real-based variable in \Stan.
+
+
+
 
 
 

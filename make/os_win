@@ -19,16 +19,24 @@ PATH_SEPARATOR = '\'
 ifeq (g++,$(CC_TYPE))
   CFLAGS += -Wno-unused-function
   CFLAGS += -Wno-uninitialized
-  LDLIBS += -static-libgcc 
+#  CFLAGS_GTEST += -std=c++0x
+  LDLIBS += -static-libgcc
+  LDLIBS += -static-libstdc++
   PCH = .gch
 endif
 ifeq (mingw32-g++,$(CC_TYPE))
   CFLAGS += -Wno-unused-function
   CFLAGS += -Wno-uninitialized
+#  CFLAGS_GTEST += -std=c++0x
   LDLIBS += -static-libgcc
-  LDLIBS += -static-libstdc++
+#  LDLIBS += -static-libstdc++
   #PCH = .gch
 endif
 ifeq (clang++,$(CC_TYPE))
   #PCH = .pch
 endif
+
+## adding target that maps targets without extensions
+## to targets with .exe at the end.
+% : %.exe
+	@# this is an intentional blank line

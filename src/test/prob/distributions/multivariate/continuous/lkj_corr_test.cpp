@@ -1,20 +1,7 @@
 #include <gtest/gtest.h>
 #include "stan/prob/distributions/multivariate/continuous/lkj_corr.hpp"
-
-using boost::math::policies::policy;
-using boost::math::policies::evaluation_error;
-using boost::math::policies::domain_error;
-using boost::math::policies::overflow_error;
-using boost::math::policies::domain_error;
-using boost::math::policies::pole_error;
-using boost::math::policies::errno_on_error;
-
-typedef policy<
-  domain_error<errno_on_error>, 
-  pole_error<errno_on_error>,
-  overflow_error<errno_on_error>,
-  evaluation_error<errno_on_error> 
-  > errno_policy;
+#include <boost/random/mersenne_twister.hpp>
+#include<boost/math/distributions.hpp>
 
 TEST(ProbDistributionsLkjCorr,testIdentity) {
   unsigned int K = 4;
@@ -44,7 +31,7 @@ TEST(ProbDistributionsLkjCorr,testHalf) {
   EXPECT_FLOAT_EQ(f, stan::prob::lkj_corr_log(Sigma, eta));
 }
 
-TEST(ProbDistributionsLkjCorr,DefaultPolicySigma) {
+TEST(ProbDistributionsLkjCorr,Sigma) {
   unsigned int K = 4;
   Eigen::MatrixXd Sigma(K,K);
   Sigma.setZero();
@@ -60,19 +47,45 @@ TEST(ProbDistributionsLkjCorr,DefaultPolicySigma) {
   EXPECT_THROW (stan::prob::lkj_corr_log(Sigma, eta), std::domain_error);
 }
 
-TEST(ProbDistributionsLkjCorr,ErrnoPolicySigma) {
-  unsigned int K = 4;
-  Eigen::MatrixXd Sigma(K,K);
-  Sigma.setZero();
-  Sigma.diagonal().setOnes();
-  double eta = rand() / double(RAND_MAX) + 0.5;
-    
-  double result(0);
-  EXPECT_NO_THROW (result=stan::prob::lkj_corr_log(Sigma, eta, errno_policy()));
-
-  // non-symmetric
-  Sigma(0, 1) = .5;
-  EXPECT_NO_THROW (result=stan::prob::lkj_corr_log(Sigma, eta, errno_policy()));
-  EXPECT_TRUE(std::isnan(result)) << "non-symmetric Sigma should return nan.";
+TEST(ProbDistributionsLKJCorr, random) {
+  boost::random::mt19937 rng;
+  EXPECT_NO_THROW(stan::prob::lkj_corr_cholesky_rng(5, 1.0,rng));
+  EXPECT_NO_THROW(stan::prob::lkj_corr_rng(5, 1.0,rng));
 }
 
+TEST(ProbDistributionsLKJCorr, chiSquareGoodnessFitTest) {
+  boost::random::mt19937 rng;
+  int N = 10000;
+  int K = boost::math::round(2 * std::pow(N, 0.4));
+  boost::math::beta_distribution<>dist (2.5,2.5);
+  boost::math::chi_squared mydist(K-1);
+
+  double loc[K - 1];
+  for(int i = 1; i < K; i++)
+    loc[i - 1] = quantile(dist, i * std::pow(K, -1.0));
+
+  int count = 0;
+  int bin [K];
+  double expect [K];
+  for(int i = 0 ; i < K; i++)
+  {
+    bin[i] = 0;
+    expect[i] = N / K;
+  }
+
+  while (count < N) {
+    double a = 0.5 * (1.0 + stan::prob::lkj_corr_rng(5,1.0,rng)(3,4));
+    int i = 0;
+    while (i < K-1 && a > loc[i])
+  ++i;
+    ++bin[i];
+    count++;
+   }
+
+  double chi = 0;
+
+  for(int j = 0; j < K; j++)
+    chi += ((bin[j] - expect[j]) * (bin[j] - expect[j]) / expect[j]);
+
+  EXPECT_TRUE(chi < quantile(complement(mydist, 1e-6)));
+}

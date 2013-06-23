@@ -1,77 +1,46 @@
-#include <gtest/gtest.h>
 #include <stan/prob/distributions/univariate/discrete/poisson.hpp>
+#include <gtest/gtest.h>
+#include <boost/random/mersenne_twister.hpp>
+#include<boost/math/distributions.hpp>
 
-TEST(ProbDistributionsPoisson,PoissonZero) {
-  EXPECT_FLOAT_EQ(0.0, stan::prob::poisson_log(0,0.0));
+TEST(ProbDistributionsPoisson, random) {
+  boost::random::mt19937 rng;
+  EXPECT_NO_THROW(stan::prob::poisson_rng(6, rng));
 }
 
+TEST(ProbDistributionsPoisson, chiSquareGoodnessFitTest) {
+  boost::random::mt19937 rng;
+  int N = 1000;
+  int K = boost::math::round(2 * std::pow(N, 0.4));
+  boost::math::poisson_distribution<>dist (5);
+  boost::math::chi_squared mydist(K-1);
 
-TEST(ProbDistributionsPoisson,Poisson) {
-  EXPECT_FLOAT_EQ(-2.900934, stan::prob::poisson_log(17,13.0));
-  EXPECT_FLOAT_EQ(-145.3547, stan::prob::poisson_log(192,42.0));
-  EXPECT_FLOAT_EQ(-3.0, stan::prob::poisson_log(0, 3.0));
-  EXPECT_FLOAT_EQ(log(0.0), stan::prob::poisson_log(0, std::numeric_limits<double>::infinity()));
-  EXPECT_FLOAT_EQ(log(0.0), stan::prob::poisson_log(1, 0.0));
-}
-TEST(ProbDistributionsPoisson,Propto) {
-  EXPECT_FLOAT_EQ(0.0, stan::prob::poisson_log<true>(17,13.0));
-  EXPECT_FLOAT_EQ(0.0, stan::prob::poisson_log<true>(192,42.0));
-  EXPECT_FLOAT_EQ(0.0, stan::prob::poisson_log<true>(0, 3.0));
-  EXPECT_FLOAT_EQ(0.0, stan::prob::poisson_log<true>(0, 0.0));
-  EXPECT_FLOAT_EQ(log(0.0), stan::prob::poisson_log<true>(1, 0.0));
-}
+  int loc[K - 1];
+  for(int i = 1; i < K; i++)
+    loc[i - 1] = i - 1;
 
-using boost::math::policies::policy;
-using boost::math::policies::evaluation_error;
-using boost::math::policies::domain_error;
-using boost::math::policies::overflow_error;
-using boost::math::policies::domain_error;
-using boost::math::policies::pole_error;
-using boost::math::policies::errno_on_error;
+  int count = 0;
+  double bin [K];
+  double expect [K];
+  for(int i = 0 ; i < K; i++) {
+    bin[i] = 0;
+    expect[i] = N * pdf(dist, i);
+  }
+  expect[K-1] = N * (1 - cdf(dist, K - 1));
 
-typedef policy<
-  domain_error<errno_on_error>, 
-  pole_error<errno_on_error>,
-  overflow_error<errno_on_error>,
-  evaluation_error<errno_on_error> 
-  > errno_policy;
+  while (count < N) {
+    int a = stan::prob::poisson_rng(5,rng);
+    int i = 0;
+    while (i < K-1 && a > loc[i]) 
+      ++i;
+    ++bin[i];
+    count++;
+   }
 
-using stan::prob::poisson_log;
+  double chi = 0;
 
-TEST(ProbDistributionsPossion,DefaultPolicy) {
-  double nan = std::numeric_limits<double>::quiet_NaN();
-  double inf = std::numeric_limits<double>::infinity();
+  for(int j = 0; j < K; j++)
+    chi += ((bin[j] - expect[j]) * (bin[j] - expect[j]) / expect[j]);
 
-  unsigned int n = 4;
-  double lambda = 3.0;
-  
-  EXPECT_NO_THROW(poisson_log(n, lambda)); 
-  EXPECT_NO_THROW(poisson_log(n, 0.0));
-  EXPECT_NO_THROW(poisson_log(n, inf));
-  
-  EXPECT_THROW(poisson_log(n, nan), std::domain_error);
-  EXPECT_THROW(poisson_log(n, -1.0), std::domain_error);
-  EXPECT_THROW(poisson_log(n, -inf), std::domain_error);
-}
-TEST(ProbDistributionsPossion,ErrnoPolicy) {
-  double nan = std::numeric_limits<double>::quiet_NaN();
-  double inf = std::numeric_limits<double>::infinity();
-
-  double result;
-  unsigned int n = 4;
-  double lambda = 3.0;
-  
-  result = poisson_log(n, lambda, errno_policy());
-  EXPECT_FALSE(std::isnan(result));
-  result = poisson_log(n, 0.0, errno_policy());
-  EXPECT_FALSE(std::isnan(result));
-  result = poisson_log(n, inf, errno_policy());
-  EXPECT_FALSE(std::isnan(result));
-  
-  result = poisson_log(n, nan, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = poisson_log(n, -1.0, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  result = poisson_log(n, -inf, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
+  EXPECT_TRUE(chi < quantile(complement(mydist, 1e-6)));
 }

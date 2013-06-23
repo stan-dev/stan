@@ -19,19 +19,22 @@ SUFFIXES:
 ##
 CC = g++
 O = 3
+O_STANC = 0
 AR = ar
 
 ##
 # Library locations
 ##
-EIGEN ?= lib/eigen_3.1.1
-BOOST ?= lib/boost_1.51.0
+STAN_HOME := $(dir $(firstword $(MAKEFILE_LIST)))
+EIGEN ?= lib/eigen_3.1.3
+BOOST ?= lib/boost_1.53.0
 GTEST ?= lib/gtest_1.6.0
 
 ##
 # Set default compiler options.
 ## 
-CFLAGS = -I src -I $(EIGEN) -I $(BOOST) -O$O -Wall
+CFLAGS = -I src -I $(EIGEN) -I $(BOOST) -Wall -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS
+CFLAGS_GTEST = -DGTEST_USE_OWN_TR1_TUPLE
 LDLIBS = -Lbin -lstan
 LDLIBS_STANC = -Lbin -lstanc
 EXE = 
@@ -59,20 +62,20 @@ PATH_SEPARATOR = /
 -include make/os_detect
 
 %$(EXE) : %.o %.cpp bin/libstan.a
-	$(LINK.c) $(OUTPUT_OPTION) $< $(LDLIBS)
+	$(LINK.c) -O$O $(OUTPUT_OPTION) $< $(LDLIBS)
 
 ##
 # Tell make the default way to compile a .o file.
 ##
 %.o : %.cpp
-	$(COMPILE.c) $(OUTPUT_OPTION) $<
+	$(COMPILE.c) -O$O $(OUTPUT_OPTION) $<
 
 ##
 # Tell make the default way to compile a .o file.
 ##
 bin/%.o : src/%.cpp
 	@mkdir -p $(dir $@)
-	$(COMPILE.c) $(OUTPUT_OPTION) $<
+	$(COMPILE.c) -O$O $(OUTPUT_OPTION) $<
 
 ##
 # Rule for generating dependencies.
@@ -84,7 +87,7 @@ bin/%.d : src/%.cpp
 	then \
 	(set -e; \
 	rm -f $@; \
-	$(CC) $(CFLAGS) $(TARGET_ARCH) -MM $< > $@.$$$$; \
+	$(CC) $(CFLAGS) -O$O $(TARGET_ARCH) -MM $< > $@.$$$$; \
 	sed -e 's,\($(notdir $*)\)\.o[ :]*,$(dir $@)\1.o $@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$);\
 	fi
@@ -94,7 +97,7 @@ bin/%.d : src/%.cpp
 	then \
 	(set -e; \
 	rm -f $@; \
-	$(CC) $(CFLAGS) $(TARGET_ARCH) -MM $< > $@.$$$$; \
+	$(CC) $(CFLAGS) -O$O $(TARGET_ARCH) -MM $< > $@.$$$$; \
 	sed -e 's,\($(notdir $*)\)\.o[ :]*,$(dir $@)\1.o $@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$);\
 	fi
@@ -107,7 +110,9 @@ help:
 	@echo '  Current configuration:'
 	@echo '  - OS (Operating System):   ' $(OS)
 	@echo '  - CC (Compiler):           ' $(CC)
-	@echo '  - O (Optimize Level):      ' $(O)
+	@echo '  - O (Optimization Level):  ' $(O)
+	@echo '  - O_STANC (Opt for stanc): ' $(O_STANC)
+	@echo '  - STAN_HOME                ' $(STAN_HOME)
 	@echo ''
 	@echo 'Build a Stan model:'
 	@echo '  Given a Stan model at foo/bar.stan, the make target is:'
@@ -132,6 +137,7 @@ help:
 	@echo 'Common targets:'
 	@echo '  Model related:'
 	@echo '  - bin/stanc$(EXE): Build the Stan compiler.'
+	@echo '  - bin/print$(EXE): Build the print utility.'
 	@echo '  - bin/libstan.a  : Build the Stan static library (used in linking models).'
 	@echo '  - bin/libstanc.a : Build the Stan compiler static library (used in linking'
 	@echo '                     bin/stanc$(EXE))'
@@ -142,6 +148,7 @@ help:
 	@echo '                     the Stan model as an executable.'
 	@echo '  Tests:'
 	@echo '  - test-unit      : Runs unit tests.'
+	@echo '  - test-distributions : Runs unit tests for the distributions (subset of test-unit)'
 	@echo '  - test-models    : Runs diagnostic models.'
 	@echo '  - test-bugs      : Runs the bugs examples (subset of test-models).'
 	@echo '  - test-all       : Runs all tests.'
@@ -161,7 +168,7 @@ help:
 -include make/libstan  # libstan.a
 -include make/tests    # tests: test-all, test-unit, test-models
 -include make/models   # models
--include make/command  # bin/stanc
+-include make/command  # bin/stanc, bin/print
 -include make/doxygen  # doxygen
 -include make/dist     # dist: for distribution
 -include make/manual   # manual: manual, doc/stan-reference.pdf
@@ -196,15 +203,17 @@ clean-dox:
 	$(RM) -r doc/api
 
 clean-manual:
-	cd src/docs/stan-reference; $(RM) *.aux *.bbl *.blg *.log *.toc *.pdf *.out *.idx *.ilg *.ind *.cb *.cb2 *.upa
+	cd src/docs/stan-reference; $(RM) *.brf *.aux *.bbl *.blg *.log *.toc *.pdf *.out *.idx *.ilg *.ind *.cb *.cb2 *.upa
 
 clean-models:
 	$(RM) -r models $(MODEL_HEADER).gch $(MODEL_HEADER).pch $(MODEL_HEADER).d
 
-clean-demo:
-	$(RM) -r demo
-
-clean-all: clean clean-models clean-dox clean-manual clean-models clean-demo
-	$(RM) -r test bin doc
+clean-all: clean clean-dox clean-manual clean-models
+	$(RM) -r test/* bin doc
 	$(RM) $(wildcard *.d) $(wildcard *.o)
+	$(RM) src/test/gm/model_specs/compiled/*.cpp src/test/gm/model_specs/compiled/*.o $(patsubst %.stan,%$(EXE),$(wildcard src/test/gm/model_specs/compiled/*.stan))
+	cd src/test/agrad/distributions/univariate/continuous; $(RM) *_generated_test.cpp
+	cd src/test/agrad/distributions/univariate/discrete; $(RM) *_generated_test.cpp
+	cd src/test/agrad/distributions/multivariate/continuous; $(RM) *_generated_test.cpp
+	cd src/test/agrad/distributions/multivariate/discrete; $(RM) *_generated_test.cpp
 

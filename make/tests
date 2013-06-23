@@ -17,7 +17,7 @@ MISSING_MODEL_TESTS := $(shell find src/models -type f -name '*.stan')
 MISSING_MODEL_TESTS := $(MISSING_MODEL_TESTS:src/models/%.stan=models/%)
 MISSING_MODEL_TESTS := $(filter-out $(MODEL_TESTS:test/%=%),$(MISSING_MODEL_TESTS))
 .PHONY: test-models
-test-models: $(addprefix runtest_no_fail/,$(MODEL_TESTS))
+test-models: runtest/test/models/command $(addprefix runtest_no_fail/,$(MODEL_TESTS))
 ifneq ($(MISSING_MODEL_TESTS),)
 	@echo 
 	@echo '-------------------- Missing $(words $(MISSING_MODEL_TESTS)) tests --------------------'
@@ -40,14 +40,32 @@ test-bugs: $(addprefix runtest_no_fail/,$(BUGS_TESTS))
 UNIT_TESTS := $(shell find src/test -type f -name '*_test.cpp')
 UNIT_TESTS := $(UNIT_TESTS:src/test/%_test.cpp=test/%)
 UNIT_TESTS := $(filter-out $(MODEL_TESTS),$(UNIT_TESTS))
+
+GENERATED_AGRAD_TESTS := $(shell find src/test/agrad/distributions -type f -name '*_test.hpp')
+GENERATED_AGRAD_TESTS := $(GENERATED_AGRAD_TESTS:%_test.hpp=%_00000_generated_test.cpp)
+##
+# Agrad distributions test generator
+##
+test/agrad/distributions/generate_tests$(EXE) : src/test/agrad/distributions/generate_tests.cpp
+	@mkdir -p $(dir $@)
+	$(LINK.c) -O$(O_STANC) $(CFLAGS) $< $(OUTPUT_OPTION)
+
+src/test/agrad/distributions/%_00000_generated_test.cpp : test/agrad/distributions/generate_tests$(EXE) src/test/agrad/distributions/%_test.hpp
+	@echo "--- Generating tests for $(word 2,$^) ---"
+	test/agrad/distributions/generate_tests$(EXE) $(word 2,$^)
+
+.PHONY: test-distributions
+test-distributions: $(GENERATED_AGRAD_TESTS)
+	@$(MAKE) $(patsubst src/%_test.cpp,runtest/%,$(shell find src/test/agrad/distributions -type f -name '*_generated_test.cpp'))
+
 .PHONY: test-unit
-test-unit: $(addprefix runtest/,$(UNIT_TESTS))
+test-unit: $(addprefix runtest/,$(UNIT_TESTS)) test/models/command$(EXE)
 
 ##
 # Target to build all tests
 ##
 .PHONY: test-all
-test-all: test-unit test-models
+test-all: test-unit test-distributions test-models
 
 ##
 # Build the google test library.
@@ -56,7 +74,7 @@ $(LIBGTEST): $(LIBGTEST)(test/gtest.o)
 
 test/gtest.o: $(GTEST)/src/gtest-all.cc
 	@mkdir -p test
-	$(COMPILE.c) $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
+	$(COMPILE.c) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
 
 ##
 # Generate autodependencies for test files.
@@ -71,10 +89,10 @@ test/gtest.o: $(GTEST)/src/gtest-all.cc
 # missing models.
 ##
 .PRECIOUS: test/models/%.o models/%$(EXE)
-$(addsuffix $(EXE),$(MODEL_TESTS)): test/models/%$(EXE): test/models/%.o models/%$(EXE) bin/libstan.a
+$(addsuffix $(EXE),$(MODEL_TESTS)): test/models/%$(EXE): test/models/%.o models/%$(EXE) bin/libstan.a bin/libstanc.a
 	@mkdir -p $(dir $@)
 	@echo '------------------------------------------------------------'
-	$(LINK.c) $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS)
+	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS) $(LDLIBS_STANC)
 ifeq ($(findstring test-,$(MAKECMDGOALS))$(findstring runtest_no_fail/,$(MAKECMDGOALS)),)
 	-$@ --gtest_output="xml:$(basename $@).xml"
 endif
@@ -82,25 +100,62 @@ endif
 ##
 # Builds a single test
 ##
-test/gm/compile_models$(EXE) : test/gm/compile_models.o bin/libstan.a $(patsubst %.stan,%$(EXE),$(wildcard src/test/gm/model_specs/function_signatures*.stan))
+FILES := $(wildcard src/test/gm/model_specs/compiled/*.stan)
+ifeq ($(OS),win)
+  WH := where
+else
+  WH := which
+endif
+
+ifneq ($(shell $(WH) shuf),)
+  FILES := $(shell shuf -e $(FILES))
+else
+ifneq ($(shell $(WH) Rscript),)
+  FILES := $(shell Rscript -e "cat(sample(commandArgs(trailingOnly=TRUE)))" $(FILES))
+else
+ifneq ($(shell $(WH) python),)
+  FILES := $(shell python -c "import random; import os; import sys; sys.argv.remove('-'); s = sys.argv; random.shuffle(s); print ' '.join(s)" - $(FILES))
+else
+ifneq ($(shell $(WH) perl),)
+  FILES := $(shell perl -MList::Util=shuffle -le'print for shuffle @ARGV' $(FILES))
+endif
+endif
+endif
+endif
+
+test/gm/command$(EXE) : test/gm/command.o bin/libstan.a src/test/gm/model_specs/compiled/domain_fail$(EXE) src/test/gm/model_specs/compiled/value_fail$(EXE) 
 	@mkdir -p $(dir $@)
-	$(LINK.c) $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS)
+	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS) $(LDLIBS_STANC)
+ifeq ($(findstring test-,$(MAKECMDGOALS))$(findstring runtest/,$(MAKECMDGOALS)),)
+	$@ --gtest_output="xml:$(basename $@).xml"
+endif
+
+test/mcmc/base_hmc$(EXE) : test/mcmc/base_hmc.o bin/libstan.a src/test/mcmc/models/improper$(EXE)
+	@mkdir -p $(dir $@)
+	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS) $(LDLIBS_STANC)
+ifeq ($(findstring test-,$(MAKECMDGOALS))$(findstring runtest/,$(MAKECMDGOALS)),)
+	$@ --gtest_output="xml:$(basename $@).xml"
+endif
+
+test/gm/compile_models$(EXE) : test/gm/compile_models.o bin/libstan.a $(patsubst %.stan,%$(EXE),$(FILES))
+	@mkdir -p $(dir $@)
+	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS) $(LDLIBS_STANC)
 ifeq ($(findstring test-,$(MAKECMDGOALS))$(findstring runtest/,$(MAKECMDGOALS)),)
 	$@ --gtest_output="xml:$(basename $@).xml"
 endif
 
 
 .PRECIOUS: test/%.o
-test/%$(EXE) : test/%.o bin/libstan.a
+test/%$(EXE) : test/%.o bin/libstan.a bin/libstanc.a
 	@mkdir -p $(dir $@)
-	$(LINK.c) $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS)
+	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS) $(LDLIBS_STANC)
 ifeq ($(findstring test-,$(MAKECMDGOALS))$(findstring runtest/,$(MAKECMDGOALS)),)
 	$@ --gtest_output="xml:$(basename $@).xml"
 endif
 
 test/%.o : src/test/%_test.cpp $(LIBGTEST)
 	@mkdir -p $(dir $@)
-	$(COMPILE.c) $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
+	$(COMPILE.c) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
 
 
 ##
@@ -111,7 +166,7 @@ test/%.d : src/test/%_test.cpp
 	then \
 	(set -e; \
 	rm -f $@; \
-	$(CC) $(CFLAGS) $(CFLAGS_GTEST) $(TARGET_ARCH) -MM $< > $@.$$$$; \
+	$(CC) $(CFLAGS) -O$O $(CFLAGS_GTEST) $(TARGET_ARCH) -MM $< > $@.$$$$; \
 	sed -e 's,\($(notdir $*)\)\(_test\)\.o[ :]*,$(dir $@)\1.o $@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$ ); \
 	fi

@@ -24,12 +24,12 @@ public:
     return true;
   }
 
-  static size_t num_iterations() {
-    return 8000U;
+  static int num_iterations() {
+    return 8000;
   }
 
-  static std::vector<size_t> skip_chains_test() {
-    std::vector<size_t> params_to_skip;
+  static std::vector<int> skip_chains_test() {
+    std::vector<int> params_to_skip;
     return params_to_skip;
   }
 
@@ -37,36 +37,45 @@ public:
     default_populate_chains();
   }
 
-  static std::vector<std::pair<size_t, double> >
+  static std::vector<std::pair<int, double> >
   get_expected_values() {
     using std::make_pair;
-    size_t index;
-    std::vector<size_t> dims;
-    dims.push_back(0);
+    std::vector<std::pair<int, double> > expected_values;
 
-    std::vector<std::pair<size_t, double> > expected_values;
+    expected_values.push_back(make_pair(chains->index("mu[1]"), 5.257));
+    expected_values.push_back(make_pair(chains->index("mu[2]"), 2.211));    
+    expected_values.push_back(make_pair(chains->index("mu[3]"), -5.869));
 
-    index = chains->get_total_param_index(chains->param_name_to_index("mu"),
-					  dims);
-    expected_values.push_back(make_pair(index + 0U, 5.257));
-    expected_values.push_back(make_pair(index + 1U, 2.211));    
-    expected_values.push_back(make_pair(index + 2U, -5.869));
+    expected_values.push_back(make_pair(chains->index("sigma[1]"), 0.2332));
+    expected_values.push_back(make_pair(chains->index("sigma[2]"), 0.1383));
+    expected_values.push_back(make_pair(chains->index("sigma[3]"), 0.1012));
 
-    index = chains->get_total_param_index(chains->param_name_to_index("sigma"),
-					  dims);
-    expected_values.push_back(make_pair(index + 0U, 0.2332));
-    expected_values.push_back(make_pair(index + 1U, 0.1383));
-    expected_values.push_back(make_pair(index + 2U, 0.1012));
+    expected_values.push_back(make_pair(chains->index("sigma_C"), 8.065));
 
-    index = chains->get_total_param_index(chains->param_name_to_index("sigma_C"),
-					  dims);
-    expected_values.push_back(make_pair(index, 8.065));
+    expected_values.push_back(make_pair(chains->index("theta[1,1]"), 5.079));  // theta[1,1]
+    expected_values.push_back(make_pair(chains->index("theta[1,2]"), 2.134));  // theta[1,2]
+    expected_values.push_back(make_pair(chains->index("theta[1,3]"), -5.851)); // theta[1,3]
+
+    expected_values.push_back(make_pair(chains->index("theta[2,1]"), 5.395));  // theta[2,1]
+    expected_values.push_back(make_pair(chains->index("theta[2,2]"), 2.207));  // theta[2,2]
+    expected_values.push_back(make_pair(chains->index("theta[2,3]"), -5.825)); // theta[2,3]
+
+    expected_values.push_back(make_pair(chains->index("theta[3,1]"), 5.079));  // theta[3,1]
+    expected_values.push_back(make_pair(chains->index("theta[3,2]"), 2.187));  // theta[3,2]
+    expected_values.push_back(make_pair(chains->index("theta[3,3]"), -5.908)); // theta[3,3]
+
+    expected_values.push_back(make_pair(chains->index("theta[4,1]"), 5.441));  // theta[4,1]
+    expected_values.push_back(make_pair(chains->index("theta[4,2]"), 2.269));  // theta[4,2]
+    expected_values.push_back(make_pair(chains->index("theta[4,3]"), -5.816)); // theta[4,3]
+
+    expected_values.push_back(make_pair(chains->index("theta[5,1]"), 5.291));  // theta[5,1]
+    expected_values.push_back(make_pair(chains->index("theta[5,2]"), 2.299));  // theta[5,2]
+    expected_values.push_back(make_pair(chains->index("theta[5,3]"), -5.907)); // theta[5,3]
     
     return expected_values;
   }
-
 };
 
 INSTANTIATE_TYPED_TEST_CASE_P(Models_BugsExamples_Vol2_Orange,
-			      Model_Test_Fixture,
-			      Models_BugsExamples_Vol2_Orange);
+            Model_Test_Fixture,
+            Models_BugsExamples_Vol2_Orange);

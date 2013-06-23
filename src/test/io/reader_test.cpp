@@ -1,8 +1,5 @@
-#include <vector>
-#include <stdexcept>
-#include <gtest/gtest.h>
 #include <stan/io/reader.hpp>
-#include <stan/math/special_functions.hpp>
+#include <gtest/gtest.h>
 
 TEST(io_reader, scalar) {
   std::vector<int> theta_i;
@@ -219,6 +216,11 @@ TEST(io_reader, scalar_lub_exception) {
   EXPECT_NO_THROW (reader.scalar_lub(-2.0, 2.0));
   EXPECT_THROW (reader.scalar_lub(-1.0, 1.0), std::domain_error);
 }
+const double inv_logit_m2 = 0.1192029; //stan::math::inv_logit(-2.0)
+const double inv_logit_m1 = 0.2689414; //stan::math::inv_logit(-1.0)
+const double inv_logit_0 = 0.5;        //stan::math::inv_logit(0)
+const double inv_logit_3 = 0.9525741;  //stan::math::inv_logit(3.0)
+
 TEST(io_reader, scalar_lub_constrain) {
   std::vector<int> theta_i;
   std::vector<double> theta;
@@ -227,13 +229,12 @@ TEST(io_reader, scalar_lub_constrain) {
   theta.push_back(-1.0);
   theta.push_back(0.0);
   stan::io::reader<double> reader(theta,theta_i);
-  EXPECT_FLOAT_EQ(stan::math::inv_logit(-2.0), reader.scalar_lub_constrain(0.0,1.0));
-  EXPECT_FLOAT_EQ(3.0 + 2.0 * stan::math::inv_logit(3.0), reader.scalar_lub_constrain(3.0,5.0));
-  EXPECT_FLOAT_EQ(-3.0 + 5.0 * stan::math::inv_logit(-1.0), reader.scalar_lub_constrain(-3.0,2.0));
-  EXPECT_FLOAT_EQ(-15.0 + 30.0 * stan::math::inv_logit(0.0), reader.scalar_lub_constrain(-15.0,15.0));
+  EXPECT_FLOAT_EQ(inv_logit_m2, reader.scalar_lub_constrain(0.0,1.0));
+  EXPECT_FLOAT_EQ(3.0 + 2.0 * inv_logit_3, reader.scalar_lub_constrain(3.0,5.0));
+  EXPECT_FLOAT_EQ(-3.0 + 5.0 * inv_logit_m1, reader.scalar_lub_constrain(-3.0,2.0));
+  EXPECT_FLOAT_EQ(-15.0 + 30.0 * inv_logit_0, reader.scalar_lub_constrain(-15.0,15.0));
 }
 TEST(io_reader, scalar_lub_constrain_jacobian) {
-  using stan::math::inv_logit;
   std::vector<int> theta_i;
   std::vector<double> theta;
   theta.push_back(-2.0);
@@ -242,15 +243,15 @@ TEST(io_reader, scalar_lub_constrain_jacobian) {
   theta.push_back(0.0);
   stan::io::reader<double> reader(theta,theta_i);
   double lp = -7.2;
-  EXPECT_FLOAT_EQ(0.0 + 1.0 * stan::math::inv_logit(-2.0), reader.scalar_lub_constrain(0.0,1.0,lp));
-  EXPECT_FLOAT_EQ(3.0 + 2.0 * stan::math::inv_logit(3.0), reader.scalar_lub_constrain(3.0,5.0,lp));
-  EXPECT_FLOAT_EQ(-3.0 + 5.0 * stan::math::inv_logit(-1.0), reader.scalar_lub_constrain(-3.0,2.0,lp));
-  EXPECT_FLOAT_EQ(-15.0 + 30.0 * stan::math::inv_logit(0.0), reader.scalar_lub_constrain(-15.0,15.0,lp));
+  EXPECT_FLOAT_EQ(0.0 + 1.0 * inv_logit_m2, reader.scalar_lub_constrain(0.0,1.0,lp));
+  EXPECT_FLOAT_EQ(3.0 + 2.0 * inv_logit_3, reader.scalar_lub_constrain(3.0,5.0,lp));
+  EXPECT_FLOAT_EQ(-3.0 + 5.0 * inv_logit_m1, reader.scalar_lub_constrain(-3.0,2.0,lp));
+  EXPECT_FLOAT_EQ(-15.0 + 30.0 * inv_logit_0, reader.scalar_lub_constrain(-15.0,15.0,lp));
   double expected_lp = -7.2 
-    + log((1.0 - 0.0) * inv_logit(-2.0) * (1 - inv_logit(-2.0))) 
-    + log((5.0 - 3.0) * inv_logit(3.0) * (1 - inv_logit(3.0)))
-    + log((2.0 - -3.0) * inv_logit(-1.0) * (1 - inv_logit(-1.0)))
-    + log((15.0 - -15.0) * inv_logit(0.0) * (1 - inv_logit(0.0)));
+    + log((1.0 - 0.0) * inv_logit_m2 * (1 - inv_logit_m2)) 
+    + log((5.0 - 3.0) * inv_logit_3 * (1 - inv_logit_3))
+    + log((2.0 - -3.0) * inv_logit_m1 * (1 - inv_logit_m1))
+    + log((15.0 - -15.0) * inv_logit_0 * (1 - inv_logit_0));
   EXPECT_FLOAT_EQ(expected_lp,lp);
 }
 
@@ -278,13 +279,12 @@ TEST(io_reader, prob_constrain) {
   theta.push_back(-1.0);
   theta.push_back(0.0);
   stan::io::reader<double> reader(theta,theta_i);
-  EXPECT_FLOAT_EQ(stan::math::inv_logit(-2.0), reader.prob_constrain());
-  EXPECT_FLOAT_EQ(stan::math::inv_logit(3.0), reader.prob_constrain());
-  EXPECT_FLOAT_EQ(stan::math::inv_logit(-1.0), reader.prob_constrain());
-  EXPECT_FLOAT_EQ(stan::math::inv_logit(0.0), reader.prob_constrain());
+  EXPECT_FLOAT_EQ(inv_logit_m2, reader.prob_constrain());
+  EXPECT_FLOAT_EQ(inv_logit_3, reader.prob_constrain());
+  EXPECT_FLOAT_EQ(inv_logit_m1, reader.prob_constrain());
+  EXPECT_FLOAT_EQ(inv_logit_0, reader.prob_constrain());
 }
 TEST(io_reader, prob_constrain_jacobian) {
-  using stan::math::inv_logit;
   std::vector<int> theta_i;
   std::vector<double> theta;
   theta.push_back(-2.0);
@@ -293,15 +293,15 @@ TEST(io_reader, prob_constrain_jacobian) {
   theta.push_back(0.0);
   stan::io::reader<double> reader(theta,theta_i);
   double lp = -0.88;
-  EXPECT_FLOAT_EQ(stan::math::inv_logit(-2.0), reader.prob_constrain(lp));
-  EXPECT_FLOAT_EQ(stan::math::inv_logit(3.0), reader.prob_constrain(lp));
-  EXPECT_FLOAT_EQ(stan::math::inv_logit(-1.0), reader.prob_constrain(lp));
-  EXPECT_FLOAT_EQ(stan::math::inv_logit(0.0), reader.prob_constrain(lp));
+  EXPECT_FLOAT_EQ(inv_logit_m2, reader.prob_constrain(lp));
+  EXPECT_FLOAT_EQ(inv_logit_3, reader.prob_constrain(lp));
+  EXPECT_FLOAT_EQ(inv_logit_m1, reader.prob_constrain(lp));
+  EXPECT_FLOAT_EQ(inv_logit_0, reader.prob_constrain(lp));
   double expected_lp = -0.88
-    + log(inv_logit(-2.0) * (1.0 - inv_logit(-2.0)))
-    + log(inv_logit(3.0) * (1.0 - inv_logit(3.0)))
-    + log(inv_logit(-1.0) * (1.0 - inv_logit(-1.0)))
-    + log(inv_logit(0.0) * (1.0 - inv_logit(0.0)));
+    + log(inv_logit_m2 * (1.0 - inv_logit_m2))
+    + log(inv_logit_3 * (1.0 - inv_logit_3))
+    + log(inv_logit_m1 * (1.0 - inv_logit_m1))
+    + log(inv_logit_0 * (1.0 - inv_logit_0));
   EXPECT_FLOAT_EQ(expected_lp,lp);
 }
 
@@ -463,6 +463,58 @@ TEST(io_reader, matrix) {
   EXPECT_FLOAT_EQ(13.0,a);
 }
 
+TEST(io_reader, matrix_constrain) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  for (size_t i = 0; i < 100.0; ++i)
+    theta.push_back(static_cast<double>(i));
+  stan::io::reader<double> reader(theta,theta_i);
+  for (int i = 0; i < 7; ++i) {
+    double x = reader.scalar();
+    EXPECT_FLOAT_EQ(static_cast<double>(i),x);
+  }
+  Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y = reader.matrix_constrain(3,2);
+  EXPECT_EQ(3,y.rows());
+  EXPECT_EQ(2,y.cols());
+  EXPECT_EQ(7.0,y(0,0));
+  EXPECT_EQ(8.0,y(1,0));
+  EXPECT_EQ(9.0,y(2,0));
+  EXPECT_EQ(10.0,y(0,1));
+  EXPECT_EQ(11.0,y(1,1));
+  EXPECT_EQ(12.0,y(2,1));
+  
+  double a = reader.scalar();
+  EXPECT_FLOAT_EQ(13.0,a);
+}
+
+
+TEST(io_reader, unit_vector) {
+  std::vector<int> theta_i(0);
+  std::vector<double> theta(4,sqrt(0.25));
+  stan::io::reader<double> reader(theta,theta_i);
+  Eigen::Matrix<double,Eigen::Dynamic,1> y = reader.unit_vector(4);
+  EXPECT_EQ(4,y.size());
+  EXPECT_FLOAT_EQ(sqrt(0.25),y[0]);
+  EXPECT_FLOAT_EQ(sqrt(0.25),y[1]);
+  EXPECT_FLOAT_EQ(sqrt(0.25),y[2]);
+  EXPECT_FLOAT_EQ(sqrt(0.25),y[3]);
+}
+TEST(io_reader, unit_vector_exception) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  for (int i = 0; i < 100; ++i)
+    theta.push_back(static_cast<double>(i));
+  stan::io::reader<double> reader(theta,theta_i);
+  theta[0] = 0.00;
+  theta[1] = -sqrt(0.29);
+  theta[2] = sqrt(0.70);
+  theta[3] = -sqrt(0.01);
+  theta[4] = sqrt(1.0);
+  theta[5] = sqrt(1.0);
+  EXPECT_NO_THROW (reader.unit_vector(4));
+  EXPECT_THROW (reader.unit_vector(2), std::domain_error);
+  EXPECT_THROW (reader.unit_vector(0), std::domain_error);
+}
 
 TEST(io_reader, simplex) {
   std::vector<int> theta_i(0);
@@ -841,4 +893,237 @@ TEST(io_reader,lub_exception) {
   EXPECT_THROW(reader.integer_lub(-20,-18),std::runtime_error);
   EXPECT_THROW(reader.integer_lub(-18,-20),std::runtime_error);
   EXPECT_EQ(4, reader.integer());
+}
+
+
+TEST(io_reader, matrix_lb) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  for (size_t i = 0; i < 100.0; ++i)
+    theta.push_back(static_cast<double>(i));
+  stan::io::reader<double> reader(theta,theta_i);
+  for (int i = 0; i < 7; ++i) {
+    double x = reader.scalar();
+    EXPECT_FLOAT_EQ(static_cast<double>(i),x);
+  }
+  double lb = -1.5;
+  Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y = reader.matrix_lb(lb,3,2);
+  EXPECT_EQ(3,y.rows());
+  EXPECT_EQ(2,y.cols());
+  EXPECT_EQ(7.0,y(0,0));
+  EXPECT_EQ(8.0,y(1,0));
+  EXPECT_EQ(9.0,y(2,0));
+  EXPECT_EQ(10.0,y(0,1));
+  EXPECT_EQ(11.0,y(1,1));
+  EXPECT_EQ(12.0,y(2,1));
+  
+  double a = reader.scalar();
+  EXPECT_FLOAT_EQ(13.0,a);
+}
+
+TEST(io_reader, matrix_lb_constrain) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  for (size_t i = 0; i < 100.0; ++i)
+    theta.push_back(static_cast<double>(i));
+  stan::io::reader<double> reader(theta,theta_i);
+  for (int i = 0; i < 7; ++i) {
+    double x = reader.scalar();
+    EXPECT_FLOAT_EQ(static_cast<double>(i),x);
+  }
+  double lb = -1.5;
+  Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y = reader.matrix_lb_constrain(lb,3,2);
+  EXPECT_EQ(3,y.rows());
+  EXPECT_EQ(2,y.cols());
+  EXPECT_EQ(stan::prob::lb_constrain(7.0,lb),y(0,0));
+  EXPECT_EQ(stan::prob::lb_constrain(8.0,lb),y(1,0));
+  EXPECT_EQ(stan::prob::lb_constrain(9.0,lb),y(2,0));
+  EXPECT_EQ(stan::prob::lb_constrain(10.0,lb),y(0,1));
+  EXPECT_EQ(stan::prob::lb_constrain(11.0,lb),y(1,1));
+  EXPECT_EQ(stan::prob::lb_constrain(12.0,lb),y(2,1));
+  
+  double a = reader.scalar();
+  EXPECT_FLOAT_EQ(13.0,a);
+}
+
+TEST(io_reader, matrix_lb_constrain_lp) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  for (size_t i = 0; i < 100.0; ++i)
+    theta.push_back(static_cast<double>(i));
+  stan::io::reader<double> reader(theta,theta_i);
+  for (int i = 0; i < 7; ++i) {
+    double x = reader.scalar();
+    EXPECT_FLOAT_EQ(static_cast<double>(i),x);
+  }
+  double lb = -1.5;
+  double lp = -5.0;
+  Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y = reader.matrix_lb_constrain(lb,3,2,lp);
+  EXPECT_EQ(3,y.rows());
+  EXPECT_EQ(2,y.cols());
+  EXPECT_EQ(stan::prob::lb_constrain(7.0,lb,lp),y(0,0));
+  EXPECT_EQ(stan::prob::lb_constrain(8.0,lb,lp),y(1,0));
+  EXPECT_EQ(stan::prob::lb_constrain(9.0,lb,lp),y(2,0));
+  EXPECT_EQ(stan::prob::lb_constrain(10.0,lb,lp),y(0,1));
+  EXPECT_EQ(stan::prob::lb_constrain(11.0,lb,lp),y(1,1));
+  EXPECT_EQ(stan::prob::lb_constrain(12.0,lb,lp),y(2,1));
+  
+  double a = reader.scalar();
+  EXPECT_FLOAT_EQ(13.0,a);
+}
+
+
+TEST(io_reader, matrix_ub) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  for (size_t i = 0; i < 100.0; ++i)
+    theta.push_back(static_cast<double>(i));
+  stan::io::reader<double> reader(theta,theta_i);
+  for (int i = 0; i < 7; ++i) {
+    double x = reader.scalar();
+    EXPECT_FLOAT_EQ(static_cast<double>(i),x);
+  }
+  double ub = 12.5;
+  Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y = reader.matrix_ub(ub,3,2);
+  EXPECT_EQ(3,y.rows());
+  EXPECT_EQ(2,y.cols());
+  EXPECT_EQ(7.0,y(0,0));
+  EXPECT_EQ(8.0,y(1,0));
+  EXPECT_EQ(9.0,y(2,0));
+  EXPECT_EQ(10.0,y(0,1));
+  EXPECT_EQ(11.0,y(1,1));
+  EXPECT_EQ(12.0,y(2,1));
+  
+  double a = reader.scalar();
+  EXPECT_FLOAT_EQ(13.0,a);
+}
+
+TEST(io_reader, matrix_ub_constrain) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  for (size_t i = 0; i < 100.0; ++i)
+    theta.push_back(static_cast<double>(i));
+  stan::io::reader<double> reader(theta,theta_i);
+  for (int i = 0; i < 7; ++i) {
+    double x = reader.scalar();
+    EXPECT_FLOAT_EQ(static_cast<double>(i),x);
+  }
+  double ub = 14.1;
+  Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y = reader.matrix_ub_constrain(ub,3,2);
+  EXPECT_EQ(3,y.rows());
+  EXPECT_EQ(2,y.cols());
+  EXPECT_EQ(stan::prob::ub_constrain(7.0,ub),y(0,0));
+  EXPECT_EQ(stan::prob::ub_constrain(8.0,ub),y(1,0));
+  EXPECT_EQ(stan::prob::ub_constrain(9.0,ub),y(2,0));
+  EXPECT_EQ(stan::prob::ub_constrain(10.0,ub),y(0,1));
+  EXPECT_EQ(stan::prob::ub_constrain(11.0,ub),y(1,1));
+  EXPECT_EQ(stan::prob::ub_constrain(12.0,ub),y(2,1));
+  
+  double a = reader.scalar();
+  EXPECT_FLOAT_EQ(13.0,a);
+}
+
+TEST(io_reader, matrix_ub_constrain_lp) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  for (size_t i = 0; i < 100.0; ++i)
+    theta.push_back(static_cast<double>(i));
+  stan::io::reader<double> reader(theta,theta_i);
+  for (int i = 0; i < 7; ++i) {
+    double x = reader.scalar();
+    EXPECT_FLOAT_EQ(static_cast<double>(i),x);
+  }
+  double ub = 12.1;
+  double lp = -5.0;
+  Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y = reader.matrix_ub_constrain(ub,3,2,lp);
+  EXPECT_EQ(3,y.rows());
+  EXPECT_EQ(2,y.cols());
+  EXPECT_EQ(stan::prob::ub_constrain(7.0,ub,lp),y(0,0));
+  EXPECT_EQ(stan::prob::ub_constrain(8.0,ub,lp),y(1,0));
+  EXPECT_EQ(stan::prob::ub_constrain(9.0,ub,lp),y(2,0));
+  EXPECT_EQ(stan::prob::ub_constrain(10.0,ub,lp),y(0,1));
+  EXPECT_EQ(stan::prob::ub_constrain(11.0,ub,lp),y(1,1));
+  EXPECT_EQ(stan::prob::ub_constrain(12.0,ub,lp),y(2,1));
+  
+  double a = reader.scalar();
+  EXPECT_FLOAT_EQ(13.0,a);
+}
+
+TEST(io_reader, matrix_lub) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  for (size_t i = 0; i < 100.0; ++i)
+    theta.push_back(static_cast<double>(i));
+  stan::io::reader<double> reader(theta,theta_i);
+  for (int i = 0; i < 7; ++i) {
+    double x = reader.scalar();
+    EXPECT_FLOAT_EQ(static_cast<double>(i),x);
+  }
+  double lb = 6.9;
+  double ub = 12.5;
+  Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y = reader.matrix_lub(lb,ub,3,2);
+  EXPECT_EQ(3,y.rows());
+  EXPECT_EQ(2,y.cols());
+  EXPECT_EQ(7.0,y(0,0));
+  EXPECT_EQ(8.0,y(1,0));
+  EXPECT_EQ(9.0,y(2,0));
+  EXPECT_EQ(10.0,y(0,1));
+  EXPECT_EQ(11.0,y(1,1));
+  EXPECT_EQ(12.0,y(2,1));
+  
+  double a = reader.scalar();
+  EXPECT_FLOAT_EQ(13.0,a);
+}
+
+TEST(io_reader, matrix_lub_constrain) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  for (size_t i = 0; i < 100.0; ++i)
+    theta.push_back(static_cast<double>(i));
+  stan::io::reader<double> reader(theta,theta_i);
+  for (int i = 0; i < 7; ++i) {
+    double x = reader.scalar();
+    EXPECT_FLOAT_EQ(static_cast<double>(i),x);
+  }
+  double lb = 3.5;
+  double ub = 14.1;
+  Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y = reader.matrix_lub_constrain(lb,ub,3,2);
+  EXPECT_EQ(3,y.rows());
+  EXPECT_EQ(2,y.cols());
+  EXPECT_EQ(stan::prob::lub_constrain(7.0,lb,ub),y(0,0));
+  EXPECT_EQ(stan::prob::lub_constrain(8.0,lb,ub),y(1,0));
+  EXPECT_EQ(stan::prob::lub_constrain(9.0,lb,ub),y(2,0));
+  EXPECT_EQ(stan::prob::lub_constrain(10.0,lb,ub),y(0,1));
+  EXPECT_EQ(stan::prob::lub_constrain(11.0,lb,ub),y(1,1));
+  EXPECT_EQ(stan::prob::lub_constrain(12.0,lb,ub),y(2,1));
+  
+  double a = reader.scalar();
+  EXPECT_FLOAT_EQ(13.0,a);
+}
+
+TEST(io_reader, matrix_lub_constrain_lp) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  for (size_t i = 0; i < 100.0; ++i)
+    theta.push_back(static_cast<double>(i));
+  stan::io::reader<double> reader(theta,theta_i);
+  for (int i = 0; i < 7; ++i) {
+    double x = reader.scalar();
+    EXPECT_FLOAT_EQ(static_cast<double>(i),x);
+  }
+  double lb = 4.1;
+  double ub = 12.1;
+  double lp = -5.0;
+  Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> y = reader.matrix_lub_constrain(lb,ub,3,2,lp);
+  EXPECT_EQ(3,y.rows());
+  EXPECT_EQ(2,y.cols());
+  EXPECT_EQ(stan::prob::lub_constrain(7.0,lb,ub,lp),y(0,0));
+  EXPECT_EQ(stan::prob::lub_constrain(8.0,lb,ub,lp),y(1,0));
+  EXPECT_EQ(stan::prob::lub_constrain(9.0,lb,ub,lp),y(2,0));
+  EXPECT_EQ(stan::prob::lub_constrain(10.0,lb,ub,lp),y(0,1));
+  EXPECT_EQ(stan::prob::lub_constrain(11.0,lb,ub,lp),y(1,1));
+  EXPECT_EQ(stan::prob::lub_constrain(12.0,lb,ub,lp),y(2,1));
+  
+  double a = reader.scalar();
+  EXPECT_FLOAT_EQ(13.0,a);
 }

@@ -24,12 +24,12 @@ public:
     return true;
   }
 
-  static size_t num_iterations() {
-    return iterations;
+  static int num_iterations() {
+    return 10000;
   }
 
-  static std::vector<size_t> skip_chains_test() {
-    std::vector<size_t> params_to_skip;
+  static std::vector<int> skip_chains_test() {
+    std::vector<int> params_to_skip;
     return params_to_skip;
   }
 
@@ -37,14 +37,25 @@ public:
     default_populate_chains();
   }
 
-  static std::vector<std::pair<size_t, double> >
+  static std::vector<std::pair<int, double> >
   get_expected_values() {
-    std::vector<std::pair<size_t, double> > expected_values;
+    using std::make_pair;
+    std::vector<std::pair<int, double> > expected_values;
+
+    expected_values.push_back(make_pair(chains->index("mu[1]"), 5.265));
+    expected_values.push_back(make_pair(chains->index("mu[2]"), 2.2));    
+    expected_values.push_back(make_pair(chains->index("mu[3]"), -5.88));
+
+    expected_values.push_back(make_pair(chains->index("sigma[1]"), 0.2581));
+    expected_values.push_back(make_pair(chains->index("sigma[2]"), 0.2679));
+    expected_values.push_back(make_pair(chains->index("sigma[3]"), 0.2296));
+
+    expected_values.push_back(make_pair(chains->index("sigma_C"), 7.853));
+    
     return expected_values;
   }
-
 };
 
 INSTANTIATE_TYPED_TEST_CASE_P(Models_BugsExamples_Vol2_MvnOrange,
-			      Model_Test_Fixture,
-			      Models_BugsExamples_Vol2_MvnOrange);
+            Model_Test_Fixture,
+            Models_BugsExamples_Vol2_MvnOrange);

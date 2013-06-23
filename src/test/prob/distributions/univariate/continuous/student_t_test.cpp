@@ -1,80 +1,41 @@
-#define _LOG_PROB_ student_t_log
 #include <stan/prob/distributions/univariate/continuous/student_t.hpp>
+#include <gtest/gtest.h>
+#include <boost/random/mersenne_twister.hpp>
+#include<boost/math/distributions.hpp>
 
-#include <test/prob/distributions/distribution_test_fixture.hpp>
-#include <test/prob/distributions/distribution_tests_4_params.hpp>
+TEST(ProbDistributionsStudentT, random) {
+  boost::random::mt19937 rng;
+  EXPECT_NO_THROW(stan::prob::student_t_rng(3.0, 2.0, 2.0, rng));
+}
 
-using std::vector;
-using std::numeric_limits;
+TEST(ProbDistributionsStudentT, chiSquareGoodnessFitTest) {
+  boost::random::mt19937 rng;
+  boost::math::students_t_distribution<>dist (3.0);
+  int N = 10000;
+  double K = 5;
+  boost::math::chi_squared mydist(K-1);
 
-class ProbDistributionsStudentT : public DistributionTest {
-public:
-  void valid_values(vector<vector<double> >& parameters,
-		    vector<double>& log_prob) {
-    vector<double> param(4);
+  double loc[4];
+  for(int i = 1; i < K; i++)
+    loc[i - 1] = quantile(dist, 0.2 * i);
 
-    param[0] = 1.0;           // y
-    param[1] = 1.0;           // nu
-    param[2] = 0.0;           // mu
-    param[3] = 1.0;           // sigma
-    parameters.push_back(param);
-    log_prob.push_back(-1.837877); // expected log_prob
+  int count = 0;
+  int bin [5] = {0, 0, 0, 0, 0};
 
-    param[0] = -3.0;          // y
-    param[1] = 2.0;           // nu
-    param[2] = 0.0;           // mu
-    param[3] = 1.0;           // sigma
-    parameters.push_back(param);
-    log_prob.push_back(-3.596843); // expected log_prob
+  while (count < N) {
+    double a = (stan::prob::student_t_rng(3.0,2.0,2.0,rng) - 2.0) / 2.0;
+    int i = 0;
+    while (i < K-1 && a > loc[i]) 
+      ++i;
+    ++bin[i];
+    count++;
+   }
 
-    param[0] = 2.0;           // y
-    param[1] = 1.0;           // nu
-    param[2] = 0.0;           // mu
-    param[3] = 2.0;           // sigma
-    parameters.push_back(param);
-    log_prob.push_back(-2.531024); // expected log_prob
-  }
- 
-  void invalid_values(vector<size_t>& index, 
-		      vector<double>& value) {
-    // y
-    
-    // nu
-    index.push_back(1U);
-    value.push_back(0.0);
+  double chi = 0;
+  double expect [5] = {N / K, N / K, N / K, N / K, N / K};
 
-    index.push_back(1U);
-    value.push_back(-1.0);
+  for(int j = 0; j < K; j++)
+    chi += ((bin[j] - expect[j]) * (bin[j] - expect[j]) / expect[j]);
 
-    index.push_back(1U);
-    value.push_back(numeric_limits<double>::infinity());
-
-    index.push_back(1U);
-    value.push_back(-numeric_limits<double>::infinity());
-
-    // mu
-    index.push_back(2U);
-    value.push_back(numeric_limits<double>::infinity());
-
-    index.push_back(2U);
-    value.push_back(-numeric_limits<double>::infinity());
-
-    // sigma
-    index.push_back(3U);
-    value.push_back(0.0);
-
-    index.push_back(3U);
-    value.push_back(-1.0);
-
-    index.push_back(3U);
-    value.push_back(numeric_limits<double>::infinity());
-
-    index.push_back(3U);
-    value.push_back(-numeric_limits<double>::infinity());
-  }
-
-};
-
-INSTANTIATE_TYPED_TEST_CASE_P(ProbDistributionsStudentT,
-			      DistributionTestFixture,
-			      ProbDistributionsStudentT);
+  EXPECT_TRUE(chi < quantile(complement(mydist, 1e-6)));
+}

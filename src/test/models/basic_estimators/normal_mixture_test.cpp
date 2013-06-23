@@ -22,69 +22,65 @@ public:
     return false;
     
   }
-  static size_t num_iterations() {
-    return 8000U;
+  static int num_iterations() {
+    //return 8000;
+    return 200;
   }
 
-  static std::vector<size_t> skip_chains_test() {
-    std::vector<size_t> params_to_skip;
+  static std::vector<int> skip_chains_test() {
+    std::vector<int> params_to_skip;
     return params_to_skip;
   }
 
-  static void populate_chains() {
-    if (chains->num_kept_samples() == 0U) {
-      stan::mcmc::chains<> *tmp_chains = create_chains();
-      for (size_t chain = 0U; chain < num_chains; chain++) {
-        stan::mcmc::add_chain(*tmp_chains, chain, get_csv_file(chain), skip);
-      }
+  static int find(const Eigen::Matrix<std::string,Eigen::Dynamic,1>& header,
+                  const std::string& var) {
+    for (int i = 0; i < header.size(); i++)
+      if (header(i) == var)
+        return i;
+    return -1;
+  }
 
-      chains = create_chains();
-      for (size_t chain = 0; chain < num_chains; chain++) {
-	std::vector<double> theta, mu1, mu2, log_theta, log_one_minus_theta;
-	tmp_chains->get_samples(chain, 0U, theta);
-	tmp_chains->get_samples(chain, 1U, mu1);
-	tmp_chains->get_samples(chain, 2U, mu2);
-	tmp_chains->get_samples(chain, 3U, log_theta);
-	tmp_chains->get_samples(chain, 4U, log_one_minus_theta);
-	
-	// if theta is > 0.5, swap values
-	if (stan::math::mean(theta) > 0.5) {
-	  for (size_t n = 0; n < theta.size(); n++) {
-	    theta[n] = 1 - theta[n];
-	  }
-	  std::vector<double> tmp;
-	  tmp = mu1;
-	  mu1 = mu2;
-	  mu2 = tmp;
-	  
-	  tmp = log_theta;
-	  log_theta = log_one_minus_theta;
-	  log_one_minus_theta = tmp;
-	}
-	
-	std::vector<double> params(5, 0);
-	for (size_t n = 0; n < theta.size(); n++) {
-	  params[0] = theta[n];
-	  params[1] = mu1[n];
-	  params[2] = mu2[n];
-	  params[3] = log_theta[n];
-	  params[4] = log_one_minus_theta[n];
-	  
-	  chains->add(chain, params);
-	}
+  static void populate_chains() {
+    if (chains->num_kept_samples() == 0) {
+      for (int chain = 1; chain <= num_chains; chain++) {
+        std::ifstream ifstream;
+        stan::io::stan_csv stan_csv;
+        ifstream.open(get_csv_file(chain).c_str());
+        stan_csv = stan::io::stan_csv_reader::parse(ifstream);
+        ifstream.close();
+        
+        int theta = find(stan_csv.header, "theta");
+        int mu1 = find(stan_csv.header, "mu[1]");
+        int mu2 = find(stan_csv.header, "mu[2]");
+        int log_theta = find(stan_csv.header, "log_theta");
+        int log_1mtheta = find(stan_csv.header, "log_one_minus_theta");
+
+        // if theta > 0.5, swap values
+        if (stan_csv.samples.col(theta).mean() > 0.5) {
+          stan_csv.samples.col(theta) = 1.0 - stan_csv.samples.col(theta).array();
+
+          Eigen::VectorXd tmp;
+          tmp = stan_csv.samples.col(mu1);
+          stan_csv.samples.col(mu1) = stan_csv.samples.col(mu2);
+          stan_csv.samples.col(mu2) = tmp;
+    
+          tmp = stan_csv.samples.col(log_theta);
+          stan_csv.samples.col(log_theta) = stan_csv.samples.col(log_1mtheta);
+          stan_csv.samples.col(log_1mtheta) = tmp;
+        }
+        chains->add(stan_csv);
       }
-      delete(tmp_chains);
     }
   }
 
-  static std::vector<std::pair<size_t, double> >
+  static std::vector<std::pair<int, double> >
   get_expected_values() {
     using std::make_pair;
-    std::vector<std::pair<size_t, double> > expected_values;
+    std::vector<std::pair<int, double> > expected_values;
 
-    expected_values.push_back(make_pair(0U, 0.2916));
-    expected_values.push_back(make_pair(1U, -10.001));
-    expected_values.push_back(make_pair(2U, 10.026));
+    expected_values.push_back(make_pair(chains->index("theta"), 0.2916));
+    expected_values.push_back(make_pair(chains->index("mu[1]"), -10.001));
+    expected_values.push_back(make_pair(chains->index("mu[2]"), 10.026));
     
     return expected_values;
   }
@@ -92,5 +88,5 @@ public:
 };
 
 INSTANTIATE_TYPED_TEST_CASE_P(Models_BasicEstimators_NormalMixture,
-			      Model_Test_Fixture,
-			      Models_BasicEstimators_NormalMixture);
+                              Model_Test_Fixture,
+                              Models_BasicEstimators_NormalMixture);

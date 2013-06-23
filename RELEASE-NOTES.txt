@@ -15,36 +15,239 @@ HOW TO (developer notes on how to release, last column is ordering)
 10.  Announce                                                    > 9
 
 
-v1.0.0
-----------------------------------------------------------------------
-First release.
+v1.3.0 (12 April 2013)
+======================================================================
+Enhancements
+----------------------------------
 
-v1.0.1
-----------------------------------------------------------------------
-Patch release.
+Modeling Language
+* forward sampling (random draws from distributions)
+  in generated quantities
+* added broadcast (repetition) functions for initializing
+  matrices, vectors, and arrays
+* better error messages in parser
+* additional distributions: 
+    + exp_mod_normal
+    + gumbel 
+    + skew_normal
+* additional functions: 
+    + mdivide_right_spd 
+    + mdivide_left_spd
+    + owenst
+    + columns_dot_product
+    + rows_dot_product
+* broadcast (repetition) functions for vectors, arrays, matrices
+    + rep_arrray
+    + rep_matrix
+    + rep_row_vector
+    + rep_vector    
+
+Command-Line
+* added option to display autocorrelations in the command-line program
+  to print output
+* changed default point estimation routine from the command line to
+  use Nesterov's accelerated gradient method, added option for point
+  estimation with Newton's method
+
+RStan
+* added method as.mcmc.list()
+* compatibility with R 3.0.0
+
+C++/Internal
+* refactored math/agrad libs in C++ to separate files/includes,
+  remove redundant code, more unit tests for existing code
+* added chainable_alloc class for caching solver results
+* generalized VectorView with seq_view
+* templated out generated code for efficient double-only operation
+  on model log probs w/o gradients
+
+Doc
+* additions to user's guide w. sample models
+    + stochastic volatility example with source, optimized source, 
+      simulation
+    + time series, moving average, standardization for linear 
+      regression, hidden Markov models, with examples
+* manual's index is now hyperlinked
+* added additional acknowledgements to manual
+* added full description of differences between sampling
+  statement and lp__
+* fixed general normal mixture model example
+
+Testing
+* split unit tests from distribution tests
+
+Bug Fixes
+----------------------------------
+* fixed derivative in multi_normal_prec distribution function
+* double-based log_prob functions return the same value as var-based
+  log_prob_grad functions
+* calls to lgamma are now using boost's lgamma function
+* patched transform to work with Eigen 3.2 beta
+* all probability distribution functions and cumulative distribution
+  functions behave properly with 0 length vector arguments
+* fixed error in definition of hypergeometric pmf
+* fixed arguments to nesterov optimization ctor in command 
+* fixed issue with initialization matrices being read improperly 
+* Use fabs() instead of abs() in unit_vector_constrain. 
+* typos in the manual
+* rstan: 
+  + fixed crash in R when index is out of bounds using set_cppo("fast")
+  + io_context fix skipping len=0
+  + fix the typo in manual (dims -> dim)
+  + add require(inline) to fix the problem with loading sysdata.rda
 
 
-V 1.0.2 Release Notes (28 Sep 2012)
-----------------------------------------------------------------------
-Bug Fixes:
-  -- check ranges for LHS of assignment to prevent seg faults
-  -- added matrix size and shape tests to avoid seg faults
-  -- changed matrix to throw domain_error rather than illegal_argument
-  -- removed template variable names from distribution error msgs
-  -- indexing fixed for arrays of matrix/vector/row_vector
-  -- fixed sd() and variance() to return 0.0 for sequences of size 1
-  -- fixed void return type in auto_covariance
-  -- patch truncation to return -inf for variates out of range
-  -- upgraded BUGS ring model to use constraints plus tan2()
-New Features:
-  -- print statements
-  -- multiply_lower_tri_self_transpose function
-  -- vectorized several probability functions (see the manual)
-Manual Additions:
-  -- programming guide: IRT models 
-  -- new appendix: style guide
-  -- new appendix: migrating from Stan
-  -- new index: function and distribution index
+v1.2.0 (6 March 2013)
+======================================================================
+
+Enhancements
+----------------------------------
+* full mass matrix estimation during warmup
+* expose model log_prob and gradient functions in RStan for use
+  in other packages (such as optimizers)
+* command-line program to display output from multiple chains
+  with parameter-by-parameter mean, se, sd, quantiles, and R-hat
+* probability function speed improvements with vectorization
+* created Stan contributed repositories for user-contributed
+  and experimental features (first entry is an emacs mode)
+* modified makefiles so targets are the same under Windows,
+  Linux, and Mac
+
+New Functions
+----------------------------------
+* most of the cumulative distribution functions (see the documentation
+  index for the full list of supported functions)
+* added monitor() function in RStan
+
+Bug Fixes
+----------------------------------
+* disabled Boost asserts in parser to quiet R's warnings
+* enabled prints in generated quantities block
+* various documentation patches
+* fixed memory leak in matrix operations leading to leaks in 
+  multivariate probability function use
+* wrapped call to gradient log prob to catch unexpected exceptions
+* fixed matrix resize issue on Windows that caused models to fail
+  at optimization levels above 0
+* fixed bug in print preventing hyphens or grave accents from 
+  priting
+* fixed issue preventing matrix rows from being assigned on the
+  left side of an assignment statement
+* clearer error messages on matrix and other function arguments
+
+
+v1.1.1 (5 February 2013)
+======================================================================
+
+Bug Fixes
+----------------------------------
+* fixed bug in comparison operators, which swapped operator< with
+  operator<= and swapped operator> with operator>= semantics
+* auto-initialize all variables to prevent segfaults
+* atan2 gradient propagation fixed
+* fixed off-by-one in NUTS treedepth bound so NUTS goes
+  at most to specified tree depth rather than specified depth + 1
+* various compiler compatibility and minor consistency issues
+* fixed bug in metaprogram preventing lower/upper bound constraints 
+  on matrices
+* fixed print error for number of kept samples
+* fixed floating point literal precision issue in code generation
+* fixed bug in bernoulli_log for boundary chance of success 
+  theta=0 or theta=1
+* many doc patches (mostly due to user comments -- thanks!)
+* replace boost sign() to avoid compiler conflicts
+* trapping mismatched dimension assignments in arrays, 
+  matrices, and vectors
+
+Enhancements
+----------------------------------
+* user's guide chapters w. sample models
+    + gaussian processes
+    + measurement error and meta-analysis
+    + clustering (soft k-means, LDA, naive Bayes)
+    + ARCH, GARCH model section in regression chapter
+* sample models
+    + hidden Markov models (HMMs)
+    + non-negative matrix factorization (NNMF)
+* speed improvements to multivariate models and matrix solvers
+    + mdivide_left, mdivide_left_tri_low, mdivide_right,
+      mdivide_right_tri_low
+    + determinant, log determinant
+    + inverse
+* much more extensive probability tests
+* unstacked vari for multivariate auto-diff unfolding
+* faster multiply self transpose / columns_dot_self
+* cleaned up error messages for size mismatches in accessors
+* simplified vector view expression template parameterization
+* cleaned up many --pedantic compiler warnings
+
+New Functions
+----------------------------------
+* log absolute determinant, with optimized gradients
+* probability functions
+    + multivariate normal, precision parameterization
+* model timing and n_eff output in CSV for all test models
+* ongoing vectorizations and reparameterizations 
+  of probability functions
+* faster Phi_approx computing an approximate cumulative unit
+  normal density
+* added dims() function to extract dimensions of arrays of scalars,
+  vectors, and matrices  
+* added size()  function to extract the number of elements in an array
+
+
+v1.1.0  (17 Dec 2012)
+======================================================================
+-- Backward Compatibility Issue
+   * Categorical distribution recoded to match documentation;  it
+     now has support {1,...,K} rather than {0,...,K-1}.  
+   * (RStan) change default value of permuted flag from FALSE to TRUE for
+     Stan fit S4 extract() method
+-- New Features
+   * Conditional (if-then-else) statements
+   * While statements
+-- New Functions
+   * generalized multiply_lower_tri_self_transpose() to non-square
+     matrices
+   * special functions: log_inv_logit(), log1m_inv_logit()
+   * matrix special functions: cumulative_sum()
+   * probability functions: poisson_log_log() for log-rate 
+     parameterized Poisson
+   * matrix functions: block(), diag_pre_multiply(), diag_post_multiply()
+   * comparison operators (<, >, <=, >=, ==, !=)
+   * boolean operators (!, ||, &&)
+   * allow +/- inf values in variable declaration constraints
+-- RStan Improvements
+   * get_posterior_mean() method for Stan fit objects
+   * replaced RcppEigen dependency with include of Eigen source
+   * added read_stan_csv() to create Stan fit object from CSV files of
+     the form written to disk by the command-line version of Stan
+   * as.data.frame() S3 method for Stan fit objects
+-- Bug Fixes
+   * fixed bug in NUTS diagonal resulting in too small step sizes
+   * fixed bug introduced in 1.0.3 that hid line and column number
+     bug reporting
+   * added checks that data dimensions match as well as sizes
+   * removed non-symmetric versions of eigenvalues() and eigenvectors()
+   * testing identifiers are not reserved words in C++/Stan
+   * trapping/reporting locations of errors in data and init reads
+   * improvements in dump data format reader for more R compatibility
+     and more generality
+   * fix bug in bernoulli logit distro tail density
+-- Code Improvements
+   * templated out matrix libs to reduce code duplication
+   * vectorized auto-dif for tcrossprod() and crossprod()
+   * optimizations in Wishart
+   * vectorization with efficiency improvements in probability distributions
+-- Libraries Updated
+   * Eigen version 3.1.1 replaced with version 3.1.2
+   * Boost version 1.51.0 replaced with version 1.52.0
+-- Manual Improvements
+   * New chapter on univariate and multivariate variable transforms
+   * Many consistency improvements and typo corrections
+   * Information on running command line in parallel from shell
+
+
 
 v 1.0.3 Release Notes (25 Oct 2012)
 ======================================================================
@@ -97,3 +300,81 @@ RStan New Features:
  -- turn off refresh if value <= 0
 
 
+V 1.0.2 Release Notes (28 Sep 2012)
+----------------------------------------------------------------------
+Bug Fixes:
+  -- check ranges for LHS of assignment to prevent seg faults
+  -- added matrix size and shape tests to avoid seg faults
+  -- changed matrix to throw domain_error rather than illegal_argument
+  -- removed template variable names from distribution error msgs
+  -- indexing fixed for arrays of matrix/vector/row_vector
+  -- fixed sd() and variance() to return 0.0 for sequences of size 1
+  -- fixed void return type in auto_covariance
+  -- patch truncation to return -inf for variates out of range
+  -- upgraded BUGS ring model to use constraints plus tan2()
+New Features:
+  -- print statements
+  -- multiply_lower_tri_self_transpose function
+  -- vectorized several probability functions (see the manual)
+Manual Additions:
+  -- programming guide: IRT models 
+  -- new appendix: style guide
+  -- new appendix: migrating from Stan
+  -- new index: function and distribution index
+
+
+v1.0.1
+----------------------------------------------------------------------
+Patch release.
+
+
+v1.0.0
+----------------------------------------------------------------------
+First release.
+
+
+
+
+
+
+Sync between RStan and Stan Command-line
+========================================
+
+Top-Level Command
+Cmd:    stan/gm/command.hpp
+RStan:  rstan/rstan/inst/include/rstan/stan_fit.hpp
+        rstan/rstan/inst/include/rstan/stan_args.hpp
+        rstan/rstan/R/rstan.R
+
+libstan.a
+Cmd:    any XXX.cpp file added to makefile
+RStan:  rstan/rstan/src/YYY__XXX.cpp
+
+
+stanc translator
+Cmd:    stan/command/stanc.cpp
+R:      rstan/rstan/src/stanc.cpp
+
+
+output analysis
+Cmd:    stan/mcmc/chains.hpp
+R:      rstan/rstan/src/chains.cpp
+
+var_context impl
+Cmd: 
+R: rstan/rstan/inst/include/rstan/io/rlist_ref_var_context.hpp 
+
+makefiles
+Cmd:    add .cpp files, makefile,  make/make*
+R:      rstan/rstan/src/Makefile{,.win}
+
+
+boost/eigen version 
+Cmd:    lib/boost_x.xx.x/, lib/eigen_x.x.x, etc.
+R:      rstan/rstan/src/Makefile{,.win} 
+        rstan/rstan/R/options.R
+
+author list 
+Cmd:   web/mc-stan.org/development-team.html
+R:     rstan/rstan/DESCRIPTION
+       rstan/rstan/man/rstan.Rd

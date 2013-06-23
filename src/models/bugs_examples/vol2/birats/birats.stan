@@ -28,16 +28,15 @@ transformed parameters {
 } 
 model {
   sigmasq_y ~ inv_gamma(0.001, 0.001);
-  mu_beta[1] ~ normal(0, 100); 
-  mu_beta[2] ~ normal(0, 100); 
-  // mu_beta ~ normal(0, 100);  # vectorize?? 
+  mu_beta ~ normal(0, 100);
   Sigma_beta ~ inv_wishart(2, Omega); 
-  for (n in 1:N) beta[n] ~ multi_normal(mu_beta, Sigma_beta);
+  for (n in 1:N) 
+    beta[n] ~ multi_normal(mu_beta, Sigma_beta);
   for (n in 1:N)
     for (t in 1:T) 
       # centeralize x[] 
       // y[n,t] ~ normal(beta[n, 1] + beta[n, 2] * (x[t] - xbar), sqrt(sigmasq_y));
  
       # NOT-centeralize x[] 
-      y[n, t] ~ normal(beta[n, 1] + beta[n, 2] * (x[t]),  sigma_y); 
+      y[n, t] ~ normal(beta[n, 1] + beta[n, 2] * x[t],  sigma_y); 
 }

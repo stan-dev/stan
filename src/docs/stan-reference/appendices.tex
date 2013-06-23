@@ -257,7 +257,7 @@ tarball was downloaded, say \code{<download-dir>}, with
 \end{Verbatim}
 \end{quote}
 %
-where \code{<download-dir>} is replaced with the actual path to the diretory.
+where \code{<download-dir>} is replaced with the actual path to the directory.
 
 Then, unpack the distribution into the subdirectory
 \begin{quote}
@@ -352,7 +352,7 @@ a Windows user name.
 %
 \begin{itemize}
 \item \emph{Windows XP}: \ From the default starting directory, use
-the followith commands (quotes and all):
+the following commands (quotes and all):
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
 > cd "My Documents"
@@ -362,7 +362,7 @@ the followith commands (quotes and all):
 The full path (including quotes) will work from anywhere,
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-> cd cd "c:\Documents and Settings\<username>\My Documents"
+> cd "c:\Documents and Settings\<username>\My Documents"
 \end{Verbatim}
 \end{quote}
 \item \emph{Windows 7}:  \  From the default starting directory, use
@@ -430,7 +430,7 @@ template metaprogramming facilities are implemented with the Boost
 \begin{itemize}
 \item Home: http://www.boost.org/users/license.html
 \item License: Boost Software License
-\item Tested Version: 1.51.0
+\item Tested Version: 1.53.0
 \end{itemize}
 %
 The Boost source code is distributed with \Stan.
@@ -444,7 +444,7 @@ algebra library.
 \begin{itemize}
 \item Home: \url{http://eigen.tuxfamily.org}
 \item License: Mozilla Public License, version 2.0
-\item Tested Version: 3.1.1
+\item Tested Version: 3.1.2
 \end{itemize}
 %
 The Eigen source code is distributed with \Stan.
@@ -546,17 +546,20 @@ The Google Test framework is distributed with \Stan.
 \subsection{Install Xcode}
 
 Apple's Xcode contains both the \clang and \gpp compilers and make, all of the tools 
-needed to work with \Stan as a user. The version of Xcode to install depends on the
-version of Mac OS X.
+needed to work with \Stan as a user. 
+The version of Xcode to install depends on the
+version of Mac OS X.  
 
-\begin{description}
-\item[Mac OS X ``Snow Leopard'' or earlier]
-Xcode 3: Good luck; we couldn't find it
-\item[Mac OS X ``Lion'' or later]
+\subsubsection{Official Apple Xcode Distribution}
+
+Xcode 4 may be downloaded for free for Mac OS X 10.7 (``Lion'') or
+later direclty from Apple:
+
+\begin{quote}
 Xcode 4: \url{https://developer.apple.com/xcode/}
-\end{description}
+\end{quote}
 
-Then, once you've installed Xcode, you need to start it, then open
+Once you've installed Xcode, you need to start it, then open
 menu option \code{Xcode}, select \code{Preferences}, then click on the
 \code{Downloads} icon and then click on the \code{Install} button next
 to the option labeled ``Command Line Tools.''
@@ -566,7 +569,28 @@ At this point, you should have the make system \code{make} and the two
 need to run \Stan.  Xcode will also install the \code{git} version
 control system at this point.
 
+\subsubsection{Alternative, GCC-Only Installer}
+
+A stripped down installer for just the GCC package, including the \Cpp
+compilers \code{g++} and \code{clang++}, available for 
+Mac OS X 10.6 (``Snow Leopard'') or later,
+%
+\begin{quote}
+\url{https://github.com/kennethreitz/osx-gcc-installer/}
+\end{quote}
+%
+The fill list of tools in this distribution is available at:
+%
+\begin{quote}
+\url{http://www.opensource.apple.com/release/developer-tools-41/}
+\end{quote}
+
+
+
 \subsection{More Recent Compilers}
+
+Alternative compilers to those distributed by Apple as part of Xcode
+are available at the following locations.
 
 \subsubsection{Homebrew}
 
@@ -853,7 +877,7 @@ highlights the potential error of using \code{mu} in the first
 statement.
 \\[8pt]
 To trap these kinds of errors, variables are initialized to the
-specail not-a-number (\code{NaN}) value.  If \code{NaN} is passed to a
+special not-a-number (\code{NaN}) value.  If \code{NaN} is passed to a
 log probability function, it will raise a domain exception, which will
 in turn be reported by the sampler.  The sampler will reject the
 sample out of hand as if it had zero probability.
@@ -877,7 +901,7 @@ sample out of hand as if it had zero probability.
   example where \BUGS would require 100,000 for good mixing.  We 
   recommend monitoring potential scale reduction statistics ($\hat{R}$)
   and the effective sample size to judge when to stop (stopping when
-  $\hat{R}$ values do not counterindicate convergence and when enough
+  $\hat{R}$ values do not counter-indicate convergence and when enough
   effective samples have been collected).
 \item WinBUGS is closed source.  OpenBUGS and JAGS are both licensed
   under the Gnu Public License (GPL), otherwise known as copyleft due
@@ -946,6 +970,11 @@ brackets indicating the body of the for loop.
   deviation 2 is \code{normal(1,2)}, not \code{normal(1,4)} or
   \code{normal(1,0.25)}.
 %
+\item Similarly, the second argument to the "multivariate normal" 
+  function is the covariance matrix and not the inverse covariance matrix
+  (i.e., the precision matrix) (as in \BUGS). The same is true for
+  the "multivariate student" distribution.
+%  
 \item
 The distributions have slightly different names:
 %
@@ -997,8 +1026,8 @@ executed in order, so \code{total} is overwritten in each step.
   operations which can make Stan models more compact.  For example,
   arguments to probability functions may be vectorized,%
 %
-\footnote{So far, very few distributions have been vectorized, but
-eventually all of them will be vectorized.}
+\footnote{Most distributions have been vectorized, but currently the
+truncated versions may not exist and may not be vectorized.}
 %
 allowing
 %
@@ -1057,7 +1086,91 @@ used to convert the row vector \code{theta[j]} to a (column) vector.
 Column vector and row vector types are not interchangeable everywhere
 in Stan; see the function signature declarations in the programming
 language section of this manual.
+%
+\item Stan supports general conditional statements using a standard
+  if-else syntax.  For example, a zero-inflated (or -deflated) Poisson
+  mixture model of the form defined by \citet{Lambert:1992} 
+  may be defined as follows, where there is a probability $\theta$ of
+  drawing a zero, and a probability $1 - \theta$ of drawing from
+  $\distro{Poisson}(\lambda)$.  The probability function is thus
+\[
+p(y_n|\theta,\lambda) 
+= 
+\left\{
+\begin{array}{ll}
+\theta + (1 - \theta) \times \distro{Poisson}(0|\lambda) & \mbox{ if } y_n = 0, \mbox{ and}
+\\[3pt]
+(1-\theta) \times \distro{Poisson}(y_n|\lambda) & \mbox{ if } y_n > 0.
+\end{array}
+\right.
+\] 
+%
+The log probability function can be implemented directly in Stan as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+  int<lower=0> N;
+  int<lower=0> y[N];
+  ...
+}
+model {
+  for (n in 1:N) {
+    if (y[n] == 0) {
+      lp__ <- lp__ + log_sum_exp(bernoulli_log(1,theta),
+                                 bernoulli_log(0,theta) 
+                                    + poisson_log(0));
+    } else {
+      0 ~ bernoulli(theta);
+      y[n] ~ poisson(lambda);
+    }
+  }
+  ...
+}
+\end{Verbatim}
+\end{quote}
+%
+The \code{log\_sum\_exp(lp1,lp2)} function adds log probabilities, and
+is defined to be equal to \code{log(exp(lp1) + exp(lp2))}, but is more
+arithmetically stable. 
+%
+\item Stan supports general while loops using a standard syntax.  
+While loops give Stan full Turing equivalent computational power.
+They are useful for defining iterative functions with complex
+termination conditions.  As an illustration of their syntax,
+the for-loop
+%
+\begin{quote}
+\begin{Verbatim}
+model {
+    ....
+    for (n in 1:N) {
+        ... do something with n ....
+    }
+}
+\end{Verbatim}
+\end{quote}
+%
+may be recoded using the following while loop.
+%
+\begin{quote}
+\begin{Verbatim}
+model {
+    int n;
+    ...
+    n <- 1;
+    while (n <= N) {
+        ... do something with n ...
+        n <- n + 1;
+    }
+}
+\end{Verbatim}
+\end{quote}
+%
+
+
 \end{itemize}
+
 
 \section{Some Differences in the Statistical Models that are Allowed}
 
@@ -1256,13 +1369,7 @@ sacrificed is laying out expressions on a single line.
 
 The recommended file extension for Stan model files is \code{.stan}.  
 For Stan data dump files, the recommended extension is \code{.R}, or
-\code{.dump.R}.%
-%
-\footnote{Stan still uses the \code{.Rdata} extension in its examples,
-  but this is misleading because R itself uses the extension
-  \code{.Rdata} for the binary file produced by its \code{save()}
-  function, not the ASCII file produced by its \code{dump()} function.}
-
+more informatively, \code{.data.R}.
 
 \section{Variable Naming}
 
@@ -1402,6 +1509,8 @@ style if the statement is very simple, as in this example.  Unless
 there are many similar cases, it's almost always clearer to put
 each sampling statement on its own line.
 
+Conditional and looping statements may also be written without brackets.
+
 The use of for loops without brackets can be dangerous.  For instance,
 consider this program.
 %
@@ -1428,6 +1537,18 @@ y[n] ~ normal(mu,1);
 %
 
 
+\subsection{Parentheses in Nested Operator Expressions}
+
+The preferred style for operators minimizes parentheses.  This reduces
+clutter in code that can actually make it harder to read expressions.
+For example, the expression \code{a~+~b~*~c} is preferred to the
+equivalent \code{a~+~(b~*~c)} or \code{(a~+~(b~*~c))}.  The operator
+precedences and associativities are given in
+\reffigure{operator-precedence}.
+
+Similarly, comparison operators can usually be written with minimal
+bracketing, with the form \code{y[n] > 0 || x[n] != 0} preferred to
+the bracketed form \code{(y[n] > 0) || (x[n] != 0)}.  
 
 \subsection{No Open Brackets on Own Line}
 
@@ -1458,7 +1579,57 @@ transformed parameters {
 %
 
 
+\section{Conditionals}
 
+Stan supports the full \Cpp-style conditional syntax,
+allowing real or integer values to act as conditions, as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+real x;
+...
+if (x) {
+   // executes if x not equal to 0
+   ...
+}
+\end{Verbatim}
+\end{quote}
+%
+
+\subsection{Explicit Comparisons of Non-Boolean Conditions}
+
+The preferred form is to write the condition out explicitly for
+integer or real values that are not produced as the result of a
+comparison or boolean operation, as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+if (x != 0) ...
+\end{Verbatim}
+\end{quote}
+
+% \subsection{Functional \code{ifelse} versus Conditionals}
+% don't actually want this until we get proper short-circuiting conditionals!
+
+% If possible, the functional form \code{ifelse} is preferred to full
+% conditionals.  For example, the following block
+% %
+% \begin{quote}
+% \begin{Verbatim}
+% if (cond)
+%   x <- foo(y);
+% else 
+%   x <- bar(z);
+% \end{Verbatim}
+% \end{quote}
+% %
+% should be recoded as follows.
+% %
+% \begin{quote}
+% \begin{Verbatim}
+% x <- ifelse(foo(y), bar(z));
+% \end{Verbatim}
+% \end{quote}
 
 \section{White Space}
 
@@ -1498,11 +1669,10 @@ program is doing the rendering and how it is configured.
 
 \subsection{Two-Character Indents}
 
-Stan has standardized on two-spaces of indentation, like the
-usual standard used for C/C++ (and unlike the usual standard
-for Java, which is four spaces, or Python, which is one or more tabs
-depending on indent level).   The other sensible choice is four
-characters.  Just be consistent.  
+Stan has standardized on two space characters of indentation, which is
+the standard convention for C/C++ code.  Another sensible choice is
+four spaces, which is the convention for Java and Python.  Just be
+consistent.  
 
 \subsection{Space Between \code{if} and Condition}
 
@@ -1511,7 +1681,7 @@ Use a space after \code{if}s.  For instance, use \code{if (x < y) ...}, not
 
 \subsection{No Space For Function Calls}
 
-There is no space between a funtion name and the function it applies
+There is no space between a function name and the function it applies
 to.  For instance, use \code{normal(0,1)}, not \code{normal (0,1)}.
 
 \subsection{Spaces Around Operators}
@@ -1578,13 +1748,5 @@ Mac OS X with a single line-feed (LF) character (ASCII code point
 \code{0x0A}).  Newlines are signaled in Windows using two characters,
 a carriage return (CR) character (ASCII code point \code{0x0D})
 followed by a line-feed (LF) character.
-
-
-
-
-
-% \chapter{User-Defined Functions and Gradients}\label{user-defined-functions.appendix}
-
-
 
 

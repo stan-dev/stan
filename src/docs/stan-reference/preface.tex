@@ -9,10 +9,16 @@ We%
   crew of Ph.D.\ students (Wei Wang and Vince Dorie), postdocs (Ben
   Goodrich, Matt Hoffman and Michael Malecki), and research staff (Bob
   Carpenter and Daniel Lee).  Previous postdocs whose work directly
-  influenced \Stan included Matt Schofield, Kenny Shirley, and
-  Aleks Jakulin.  Jiqiang Guo joined as a postdoc in Fall 2011.
-  Marcus Brubaker, a computer science postdoc at University of
-  Toronto, joined the development team in early 2012.}
+  influenced \Stan included Matt Schofield, Kenny Shirley, and Aleks
+  Jakulin.  Jiqiang Guo joined as a postdoc in Fall 2011.  Marcus
+  Brubaker, a computer science postdoc at Toyota Technical Institute
+  at Chicago, joined the development team in early 2012.  Michael
+  Betancourt, a physics Ph.D.\ about to start a postdoc at University
+  College London, joined the development team in late 2012 after
+  months of providing useful feedback on geometry and debugging
+  samplers at our meetings. Yuanjun Gao, a statistics graduate student at
+  Columbia, and Peter Li, an undergraduate student at Columbia,
+  joined the development team in the Fall semester of 2012.}
 %
 did not set out to build \Stan as it currently exists.  We set out to
 apply full Bayesian inference to the sort of multilevel generalized
@@ -82,7 +88,7 @@ pattern to implement concepts without virtual function calls.  But we
 ran into the same problem with Eigen as with the existing probability
 libraries --- it doesn't support mixed operations of algorithmic
 differentiation variables and primitives like \code{double}.  This is
-a problem we have yet to optimize away as of \Stan version 1.0, but we
+a problem we have yet to optimize away as of \Stan version 1.3, but we
 have plans to extend Eigen itself to support heterogeneous 
 matrix operator types.
 
@@ -110,7 +116,7 @@ major hurdle to ease of use.  \HMC requires two tuning parameters
 set.  The step size parameter could be tuned during warmup based on
 Metropolis rejection rates, but the number of steps was not so easy to
 tune while maintaining detailed balance in the sampler.  This led to
-the development of the no-U-turn sampler (\NUTS)
+the development of the No-U-Turn sampler (\NUTS)
 \citep{Hoffman-Gelman:2012}, which takes an ever increasing number of
 steps until the direction of the simulation turns around, then uses
 slice sampling to select a point on the simulated trajectory.
@@ -145,10 +151,14 @@ not rotation invariant.
 
 We were still using a unit mass matrix in the simulated Hamiltonian
 dynamics.  The last tweak to \Stan before version 1.0 was to estimate
-a diagonal mass matrix during warmup.  This is beyond the \NUTS paper
-on {\it arXiv}, so we've been calling it \NUTS~{\sc ii}.  Using a mass
-matrix sped up the unscaled data models by an order of magnitude,
-though it breaks the nice theoretical property of rotation invariance.
+a diagonal mass matrix during warmup; this has since been upgraded to
+a full mass matrix in version 1.2.  Both these extensions go a bit
+beyond the \NUTS paper on {\it arXiv}.  Using a mass matrix sped up
+the unscaled data models by an order of magnitude, though it breaks
+the nice theoretical property of rotation invariance.  The full mass
+matrix estimation has rotational invariance as well, but scales less
+well because of the need to invert the mass matrix once and then do matrix
+multiplications every leapfrog step.
 
 \section*{\Stan's Future}
 
@@ -172,7 +182,7 @@ For reporting bugs or requesting features, \Stan's issue tracker is at
 the following location.
 %
 \begin{quote}
-\url{http://code.google.com/p/stan/issues/list}
+\url{https://github.com/stan-dev/stan/issues}
 \end{quote}
 
 One of the main reasons \Stan is freedom-respecting, open-source

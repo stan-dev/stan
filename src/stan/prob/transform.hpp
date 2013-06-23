@@ -9,12 +9,14 @@
 #include <boost/multi_array.hpp>
 #include <boost/throw_exception.hpp>
 #include <boost/math/tools/promotion.hpp>
-#include <stan/math/constants.hpp>
+#include <stan/agrad/matrix.hpp>
+#include <stan/math.hpp>
 #include <stan/math/matrix.hpp>
+#include <stan/math/matrix/validate_less.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/matrix_error_handling.hpp>
-#include <stan/math/special_functions.hpp>
-// #include <stan/agrad/special_functions.hpp>
+
+#include <stan/math/matrix/multiply_lower_tri_self_transpose.hpp>
 
 namespace stan {
   
@@ -47,25 +49,27 @@ namespace stan {
       sds = Sigma.diagonal().array();
       if( (sds <= 0.0).any() ) return false;
       sds = sds.sqrt();
-  
+
       Eigen::DiagonalMatrix<T,Eigen::Dynamic> D(K);
       D.diagonal() = sds.inverse();
       sds = sds.log(); // now unbounded
-  
+
       Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> R = D * Sigma * D;
       // to hopefully prevent pivoting due to floating point error
       R.diagonal().setOnes(); 
       Eigen::LDLT<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > ldlt;
       ldlt = R.ldlt();
-      if( !ldlt.isPositive() ) return false;
+      if (!ldlt.isPositive()) 
+        return false;
       Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> U = ldlt.matrixU();
 
       size_t position = 0;
       size_t pull = K - 1;
 
-      Eigen::Array<T,Eigen::Dynamic,1> temp = U.row(0).tail(pull);
+      Eigen::Array<T,1,Eigen::Dynamic> temp = U.row(0).tail(pull);
+
       CPCs.head(pull) = temp;
-  
+
       Eigen::Array<T,Eigen::Dynamic,1> acc(K);
       acc(0) = -0.0;
       acc.tail(pull) = 1.0 - temp.square();
@@ -152,8 +156,8 @@ namespace stan {
                      const size_t K) {
       Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> L 
         = read_corr_L(CPCs, K);
-      return L.template triangularView<Eigen::Lower>() 
-        * L.matrix().transpose();
+      using stan::math::multiply_lower_tri_self_transpose;
+      return multiply_lower_tri_self_transpose(L);
     }
     
     /**
@@ -240,8 +244,8 @@ namespace stan {
 
       Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> L 
         = read_corr_L(CPCs, K, log_prob);
-      return L.template triangularView<Eigen::Lower>()
-        * L.matrix().transpose();
+      using stan::math::multiply_lower_tri_self_transpose;
+      return multiply_lower_tri_self_transpose(L);
     }
     
     /** 
@@ -282,8 +286,8 @@ namespace stan {
 
       Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> L 
         = read_cov_L(CPCs, sds, log_prob);
-      return L.template triangularView<Eigen::Lower>() 
-        * L.matrix().transpose();
+      using stan::math::multiply_lower_tri_self_transpose;
+      return multiply_lower_tri_self_transpose(L);
     }
 
     /** 
@@ -303,8 +307,8 @@ namespace stan {
       D.diagonal() = sds;
       Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> L 
         = D * read_corr_L(CPCs, K);
-      return L.template triangularView<Eigen::Lower>() 
-        * L.matrix().transpose();
+      using stan::math::multiply_lower_tri_self_transpose;
+      return multiply_lower_tri_self_transpose(L);
     }
 
 
@@ -383,7 +387,7 @@ namespace stan {
      */
     template <typename T>
     inline 
-    T identity_constrain(const T x, T& lp) {
+    T identity_constrain(const T x, T& /*lp*/) {
       return x;
     }
     
@@ -481,6 +485,9 @@ namespace stan {
      *
      * <p>where \f$L\f$ is the constant lower bound.
      *
+     * <p>If the lower bound is negative infinity, this function
+     * reduces to <code>identity_constrain(x)</code>.
+     *
      * @param x Unconstrained scalar input.
      * @param lb Lower-bound on constrained ouptut.
      * @return Lower-bound constrained value correspdonding to inputs.
@@ -490,6 +497,8 @@ namespace stan {
     template <typename T, typename TL>
     inline
     T lb_constrain(const T x, const TL lb) {
+      if (lb == -std::numeric_limits<double>::infinity())
+        return identity_constrain(x);
       return exp(x) + lb;
     }
 
@@ -498,6 +507,9 @@ namespace stan {
      * input and specified lower bound, incrementing the specified
      * reference with the log absolute Jacobian determinant of the
      * transform.
+     *
+     * If the lower bound is negative infinity, this function
+     * reduces to <code>identity_constraint(x,lp)</code>.
      *
      * @param x Unconstrained scalar input.
      * @param lb Lower-bound on output.
@@ -510,6 +522,8 @@ namespace stan {
     inline
     typename boost::math::tools::promote_args<T,TL>::type
     lb_constrain(const T x, const TL lb, T& lp) {
+      if (lb == -std::numeric_limits<double>::infinity())
+        return identity_constrain(x,lp);
       lp += x;
       return exp(x) + lb;
     }
@@ -517,6 +531,9 @@ namespace stan {
     /**
      * Return the unconstrained value that produces the specified
      * lower-bound constrained value.
+     *
+     * If the lower bound is negative infinity, it is ignored and
+     * the function reduces to <code>identity_free(y)</code>.
      * 
      * @param y Input scalar.
      * @param lb Lower bound.
@@ -530,6 +547,8 @@ namespace stan {
     inline
     typename boost::math::tools::promote_args<T,TL>::type
     lb_free(const T y, const TL lb) {
+      if (lb == -std::numeric_limits<double>::infinity())
+        return identity_free(y);
       stan::math::check_greater_or_equal("stan::prob::lb_free(%1%)",
                                          y, lb, "Lower bounded variable");
       return log(y - lb);
@@ -548,6 +567,9 @@ namespace stan {
      *
      * <p>where \f$U\f$ is the upper bound.  
      * 
+     * If the upper bound is positive infinity, this function
+     * reduces to <code>identity_constrain(x)</code>.
+     * 
      * @param x Free scalar.
      * @param ub Upper bound.
      * @return Transformed scalar with specified upper bound.
@@ -558,6 +580,8 @@ namespace stan {
     inline
     typename boost::math::tools::promote_args<T,TU>::type
     ub_constrain(const T x, const TU ub) {
+      if (ub == std::numeric_limits<double>::infinity())
+        return identity_constrain(x);
       return ub - exp(x);
     }
 
@@ -574,6 +598,9 @@ namespace stan {
      * <p>\f$ \log | \frac{d}{dx} -\mbox{exp}(x) + U | 
      *     = \log | -\mbox{exp}(x) + 0 | = x\f$.
      *
+     * If the upper bound is positive infinity, this function
+     * reduces to <code>identity_constrain(x,lp)</code>.
+     *
      * @param x Free scalar.
      * @param ub Upper bound.
      * @param lp Log probability reference.
@@ -585,6 +612,8 @@ namespace stan {
     inline
     typename boost::math::tools::promote_args<T,TU>::type
     ub_constrain(const T x, const TU ub, T& lp) {
+      if (ub == std::numeric_limits<double>::infinity())
+        return identity_constrain(x,lp);
       lp += x;
       return ub - exp(x);
     }
@@ -600,6 +629,9 @@ namespace stan {
      *
      * <p>where \f$U\f$ is the upper bound.
      *
+     * If the upper bound is positive infinity, this function
+     * reduces to <code>identity_free(y)</code>.
+     *
      * @param y Upper-bounded scalar.
      * @param ub Upper bound.
      * @return Free scalar corresponding to upper-bounded scalar.
@@ -612,6 +644,8 @@ namespace stan {
     inline
     typename boost::math::tools::promote_args<T,TU>::type
     ub_free(const T y, const TU ub) {
+      if (ub == std::numeric_limits<double>::infinity())
+        return identity_free(y);
       stan::math::check_less_or_equal("stan::prob::ub_free(%1%)",
                                       y, ub, "Upper bounded variable");
       return log(ub - y);
@@ -628,6 +662,14 @@ namespace stan {
      * <p>The transform is the transformed and scaled inverse logit,
      *
      * <p>\f$f(x) = L + (U - L) \mbox{logit}^{-1}(x)\f$
+     *
+     * If the lower bound is negative infinity and upper bound finite,
+     * this function reduces to <code>ub_constrain(x,ub)</code>.  If
+     * the upper bound is positive infinity and the lower bound
+     * finite, this function reduces to
+     * <code>lb_constrain(x,lb)</code>.  If the upper bound is
+     * positive infinity and the lower bound negative infinity, 
+     * this function reduces to <code>identity_constrain(x)</code>.
      * 
      * @param x Free scalar to transform.
      * @param lb Lower bound.
@@ -643,12 +685,13 @@ namespace stan {
     inline
     typename boost::math::tools::promote_args<T,TL,TU>::type
     lub_constrain(const T x, TL lb, TU ub) {
-       if (!(lb < ub)) {
-        std::stringstream s;
-        s << "domain error in lub_constrain;  lower bound = " << lb
-          << " must be strictly less than upper bound = " << ub;
-        throw std::domain_error(s.str());
-      }
+      stan::math::validate_less(lb,ub,"lb","ub","lub_constrain/3");
+
+      if (lb == -std::numeric_limits<double>::infinity())
+        return ub_constrain(x,ub);
+      if (ub == std::numeric_limits<double>::infinity())
+        return lb_constrain(x,lb);
+
       T inv_logit_x;
       if (x > 0) {
         T exp_minus_x = exp(-x);
@@ -688,7 +731,15 @@ namespace stan {
      *         \, (1 - \mbox{logit}^{-1}(x)) |\f$
      *
      * <p>\f$ {} = \log (U - L) + \log (\mbox{logit}^{-1}(x)) 
-                                        + \log (1 - \mbox{logit}^{-1}(x))\f$
+     *                          + \log (1 - \mbox{logit}^{-1}(x))\f$
+     *
+     * <p>If the lower bound is negative infinity and upper bound finite,
+     * this function reduces to <code>ub_constrain(x,ub,lp)</code>.  If
+     * the upper bound is positive infinity and the lower bound
+     * finite, this function reduces to
+     * <code>lb_constrain(x,lb,lp)</code>.  If the upper bound is
+     * positive infinity and the lower bound negative infinity, 
+     * this function reduces to <code>identity_constrain(x,lp)</code>.
      *
      * @param x Free scalar to transform.
      * @param lb Lower bound.
@@ -710,6 +761,10 @@ namespace stan {
           << " must be strictly less than upper bound = " << ub;
         throw std::domain_error(s.str());
       }
+      if (lb == -std::numeric_limits<double>::infinity())
+        return ub_constrain(x,ub,lp);
+      if (ub == std::numeric_limits<double>::infinity())
+        return lb_constrain(x,lb,lp);
       T inv_logit_x;
       if (x > 0) {
         T exp_minus_x = exp(-x);
@@ -743,6 +798,14 @@ namespace stan {
      *
      * where \f$U\f$ and \f$L\f$ are the lower and upper bounds.
      *
+     * <p>If the lower bound is negative infinity and upper bound finite,
+     * this function reduces to <code>ub_free(y,ub)</code>.  If
+     * the upper bound is positive infinity and the lower bound
+     * finite, this function reduces to
+     * <code>lb_free(x,lb)</code>.  If the upper bound is
+     * positive infinity and the lower bound negative infinity, 
+     * this function reduces to <code>identity_free(y)</code>.
+     *
      * @tparam T Type of scalar.
      * @param y Scalar input.
      * @param lb Lower bound.
@@ -760,6 +823,10 @@ namespace stan {
       using stan::math::logit;
       stan::math::check_bounded("stan::prob::lub_free(%1%)",
                                 y, lb, ub, "Bounded variable");
+      if (lb == -std::numeric_limits<double>::infinity())
+        return ub_free(y,ub);
+      if (ub == std::numeric_limits<double>::infinity())
+        return lb_free(y,lb);
       return logit((y - lb) / (ub - lb));
     }
 
@@ -906,7 +973,78 @@ namespace stan {
       return atanh(y);
     }
 
-    
+
+    // Unit vector   
+
+    /**
+     * Return the unit length vector corresponding to the free vector y.
+     * The free vector contains K-1 spherical coordinates.
+     *
+     * @param Vector of K - 1 spherical coordinates
+     * @return Unit length vector of dimension K
+     * @tparam T Scalar type.
+     **/
+    template <typename T>
+    Eigen::Matrix<T,Eigen::Dynamic,1> 
+    unit_vector_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& y) {
+      typedef typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type size_type;
+      int Km1 = y.size();
+      Eigen::Matrix<T,Eigen::Dynamic,1> x(Km1 + 1);
+      x(0) = 1.0;
+      const T half_pi = T(M_PI/2.0);
+      for (size_type k = 1; k <= Km1; ++k) {
+        T yk_1 = y(k-1) + half_pi;
+        T sin_yk_1 = sin(yk_1);
+        x(k) = x(k-1)*sin_yk_1; 
+        x(k-1) *= cos(yk_1);
+      }
+      return x;
+    }
+
+    /**
+     * Return the unit length vector corresponding to the free vector y.
+     * The free vector contains K-1 spherical coordinates.
+     *
+     * @param Vector of K - 1 spherical coordinates
+     * @return Unit length vector of dimension K
+     * @param lp Log probability reference to increment.
+     * @tparam T Scalar type.
+     **/
+    template <typename T>
+    Eigen::Matrix<T,Eigen::Dynamic,1> 
+    unit_vector_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& y, T &lp) {
+      typedef typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type size_type;
+      int Km1 = y.size();
+      Eigen::Matrix<T,Eigen::Dynamic,1> x(Km1 + 1);
+      x(0) = 1.0;
+      const T half_pi = T(M_PI/2.0);
+      for (size_type k = 1; k <= Km1; ++k) {
+        T yk_1 = y(k-1) + half_pi;
+        T sin_yk_1 = sin(yk_1);
+        x(k) = x(k-1)*sin_yk_1; 
+        x(k-1) *= cos(yk_1);
+        if (k < Km1)
+          lp += (Km1 - k)*log(fabs(sin_yk_1));
+      }
+      return x;
+    }
+
+    template <typename T>
+    Eigen::Matrix<T,Eigen::Dynamic,1> 
+    unit_vector_free(const Eigen::Matrix<T,Eigen::Dynamic,1>& x) {
+      typedef typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type size_type;
+      stan::math::check_unit_vector("stan::prob::unit_vector_free(%1%)", x, "Unit vector variable");
+      int Km1 = x.size() - 1;
+      Eigen::Matrix<T,Eigen::Dynamic,1> y(Km1);
+      T sumSq = x(Km1)*x(Km1);
+      const T half_pi = T(M_PI/2.0);
+      for (size_type k = Km1; --k >= 0; ) {
+        y(k) = atan2(sqrt(sumSq),x(k)) - half_pi;
+        sumSq += x(k)*x(k);
+      }
+      return y;
+    }
+
     // SIMPLEX
 
 
@@ -1243,7 +1381,6 @@ namespace stan {
       size_type k_choose_2 = (k * (k - 1)) / 2;
       if (k_choose_2 != x.size())
         throw std::invalid_argument ("x is not a valid correlation matrix");
-      
       Eigen::Array<T,Eigen::Dynamic,1> cpcs(k_choose_2);
       for (size_type i = 0; i < k_choose_2; ++i)
         cpcs[i] = corr_constrain(x[i],lp);

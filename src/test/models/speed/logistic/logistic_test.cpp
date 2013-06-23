@@ -89,8 +89,10 @@ public:
     std::stringstream output_filename;
     output_filename << path << get_path_separator() 
                     << "logistic.csv";
-    output_file.open(output_filename.str().c_str());
-    
+    {
+      std::string tmp(output_filename.str());
+      output_file.open(tmp.c_str());
+    }
     output_file << "Program,"
                 << "N,"
                 << "M,"
@@ -133,7 +135,7 @@ public:
    */
   long run_stan(const std::string& command, const std::string& filename, std::vector<std::string> command_outputs) {
     long time = 0;
-    for (size_t chain = 0; chain < num_chains; chain++) {
+    for (size_t chain = 1; chain <= num_chains; chain++) {
       std::stringstream command_chain;
       command_chain << command;
       command_chain << " --chain_id=" << chain
@@ -160,19 +162,31 @@ public:
   stan::mcmc::chains<> create_chains(const std::string& filename) {
     std::stringstream samples;
     samples << path << get_path_separator()
-            << filename << ".chain_0.csv";
+            << filename << ".chain_1.csv";
   
-    std::vector<std::string> names;
-    std::vector<std::vector<size_t> > dimss;
-    stan::mcmc::read_variables(samples.str(), 3U,
-                               names, dimss);
 
-    stan::mcmc::chains<> chains(num_chains, names, dimss);
-    for (size_t chain = 0; chain < num_chains; chain++) {
+
+    std::ifstream ifstream; 
+    {
+      std::string tmp(samples.str());
+      ifstream.open(tmp.c_str());
+    }
+    stan::io::stan_csv stan_csv = stan::io::stan_csv_reader::parse(ifstream);
+    ifstream.close();
+    
+    stan::mcmc::chains<> chains(stan_csv);
+    for (size_t chain = 1; chain < num_chains; chain++) {
       samples.str("");
       samples << path << get_path_separator()
               << filename << ".chain_" << chain << ".csv";
-      stan::mcmc::add_chain(chains, chain, samples.str(), 3U);
+      {
+        std::string tmp(samples.str());
+        ifstream.open(tmp.c_str());
+      }
+      stan_csv = stan::io::stan_csv_reader::parse(ifstream);
+      ifstream.close();
+      
+      chains.add(stan_csv);
     }
     return chains;
   }
@@ -186,13 +200,14 @@ public:
   void get_beta(const std::string& filename, std::vector<double>& beta) {
     std::stringstream param_filename;
     param_filename << path << get_path_separator() << filename
-                   << "_param.Rdata";
-    std::ifstream param_ifstream(param_filename.str().c_str());
+                   << "_param.data.R";
+    std::string tmp(param_filename.str());
+    std::ifstream param_ifstream(tmp.c_str());
     stan::io::dump param_values(param_ifstream);
-  
+    
     beta = param_values.vals_r("beta");
   }
-
+  
   /** 
    * Runs the test case.
    * 
@@ -205,7 +220,7 @@ public:
    * @param iterations 
    */
   void test_logistic_speed_stan(const std::string& filename, 
-				const size_t iterations,
+        const size_t iterations,
                                 const TestInfo& info) {
     if (!has_R)
       return;
@@ -222,7 +237,7 @@ public:
     // 2) Run Stan num_chains times
     std::stringstream command;
     command << path << get_path_separator() << "logistic"
-            << " --data=" << path << get_path_separator() << filename << ".Rdata"
+            << " --data=" << path << get_path_separator() << filename << ".data.R"
             << " --iter=" << iterations
             << " --refresh=" << iterations;
     vector<std::string> command_outputs;  
@@ -311,7 +326,7 @@ public:
   }
 
   void test_logistic_speed_jags(const std::string& filename, 
-				const size_t iterations,
+        const size_t iterations,
                                 const TestInfo& info) {
     if (!has_R)
       return;
@@ -328,7 +343,7 @@ public:
     // 2) Run JAGS num_chains times
     std::stringstream command;
     //command << path << get_path_separator() << "logistic"
-    //<< " --data=" << path << get_path_separator() << filename << ".Rdata"
+    //<< " --data=" << path << get_path_separator() << filename << ".data.R"
     //<< " --iter=" << iterations
     //<< " --refresh=" << iterations;
     //vector<std::string> command_outputs;  
@@ -385,7 +400,7 @@ TEST_F(LogisticSpeedTest,GenerateData) {
     std::string data_file = path;
     data_file += get_path_separator();
     data_file += data_files[i];
-    data_file += ".Rdata";
+    data_file += ".data.R";
     std::ifstream file(data_file.c_str());
     if (!file)
       has_data = false;

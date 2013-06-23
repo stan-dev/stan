@@ -5,6 +5,7 @@
 #include <stan/math/error_handling.hpp>
 #include <stan/prob/traits.hpp>
 #include <stan/prob/distributions/univariate/continuous/normal.hpp>
+#include<boost/math/distributions.hpp>
 
 namespace stan {
   
@@ -38,73 +39,77 @@ namespace stan {
      * @tparam T_beta Type of upperbound.
      * @tparam Policy Error-handling policy.
      */
-    template <bool propto,
-    typename T_y, typename T_loc, typename T_scale, typename T_alpha, typename T_beta, 
-    class Policy>
-    typename boost::math::tools::promote_args<T_y,T_loc,T_scale,T_alpha,T_beta>::type
+    template <bool propto, typename T_y, 
+              typename T_loc, typename T_scale, 
+              typename T_alpha, typename T_beta>
+    typename boost::math::tools::promote_args<T_y,T_loc,T_scale,
+                                              T_alpha,T_beta>::type
     trunc_normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma, 
-                     const T_alpha& alpha, const T_beta& beta,
-                     const Policy&) {
+                     const T_alpha& alpha, const T_beta& beta) {
       static const char* function = "stan::prob::trunc_normal_log(%1%)";
-      
       
       using stan::math::check_greater;
       using stan::math::check_not_nan;
       using boost::math::tools::promote_args;
       using boost::math::isinf;
+      using boost::math::isfinite;
       using stan::math::Phi;
       
       typename promote_args<T_y,T_loc,T_scale,T_alpha,T_beta>::type lp(0.0);
 
       if (!check_not_nan(function, alpha, "Lower bound", 
-                         &lp, Policy()))
+                         &lp))
         return lp;
       if (!check_not_nan(function, beta, "Upper bound", 
-                         &lp, Policy()))
+                         &lp))
         return lp;
       if (!check_greater(function, beta, alpha, "Upper bound", 
-                         &lp, Policy()))
+                         &lp))
         return lp;
       
       if (y < alpha || y > beta) {
         lp = LOG_ZERO;
       }
       else {
-        lp = normal_log<propto>(y,mu,sigma,Policy());
+        lp = normal_log<propto>(y,mu,sigma);
         if (include_summand<propto,T_loc,T_scale,T_alpha,T_beta>::value) {
           if (isinf(sigma)) 
             lp -= log(beta - alpha);
           else
-            lp -= log(Phi((beta - mu)/sigma) - Phi((alpha - mu)/sigma));
+            if (!isinf(beta) && !isinf(alpha)) 
+              lp -= log(Phi((beta - mu)/sigma) - Phi((alpha - mu)/sigma));
+            else if (isfinite(alpha)) 
+              lp -= log(1.0 - Phi((alpha - mu)/sigma));
+            else if (isfinite(beta)) 
+              lp -= log(Phi((beta - mu)/sigma));
         }
       }
       
       return lp;
     }
     
-    
-    template <bool propto,
-    typename T_y, typename T_loc, typename T_scale, typename T_alpha, typename T_beta>
+    template <typename T_y, typename T_loc, typename T_scale, 
+              typename T_alpha, typename T_beta>
     inline
-    typename boost::math::tools::promote_args<T_y,T_loc,T_scale,T_alpha,T_beta>::type
-    trunc_normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma, const T_alpha& alpha, const T_beta& beta) {
-      return trunc_normal_log<propto>(y,mu,sigma,alpha,beta,stan::math::default_policy());
+    typename boost::math::tools::promote_args<T_y,T_loc,T_scale,
+                                              T_alpha,T_beta>::type
+    trunc_normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma, 
+                     const T_alpha& alpha, const T_beta& beta) {
+      return trunc_normal_log<false>(y,mu,sigma,alpha,beta);
     }
-    
-    template <typename T_y, typename T_loc, typename T_scale, typename T_alpha, typename T_beta,
-    class Policy>
-    inline
-    typename boost::math::tools::promote_args<T_y,T_loc,T_scale,T_alpha,T_beta>::type
-    trunc_normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma, const T_alpha& alpha, const T_beta& beta,
-                     const Policy&) {
-      return trunc_normal_log<false>(y,mu,sigma,alpha,beta,Policy());
-    }
-    
-    template <typename T_y, typename T_loc, typename T_scale, typename T_alpha, typename T_beta>
-    inline
-    typename boost::math::tools::promote_args<T_y,T_loc,T_scale,T_alpha,T_beta>::type
-    trunc_normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma, const T_alpha& alpha, const T_beta& beta) {
-      return trunc_normal_log<false>(y,mu,sigma,alpha,beta,stan::math::default_policy());
+      
+    template <class RNG>
+    inline double
+    trunc_normal_rng(const double mu,
+                     const double sigma,
+                     const double alpha,
+                     const double beta,
+                     RNG& rng) {
+      using boost::variate_generator;
+      double a = stan::prob::normal_rng(mu, sigma, rng);
+      while(a > beta || a < alpha)
+        a = stan::prob::normal_rng(mu,sigma,rng);
+      return a;
     }
   }
 }

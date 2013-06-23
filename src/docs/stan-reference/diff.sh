@@ -16,9 +16,20 @@ IGNORE_COMMENT_LINES='/%/d'
 DELETE_BRACEPLUS='s/^{+//g'
 DELETE_PLUSBRACE='s/+}$//g'
 IGNORE_LINES_WITH_LEADING_SLASH='/^\\.*$/d'
+IGNORE_LINES_WITH_LEADING_GREATER_THAN='/^>.*$/d'
+IGNORE_LINES_WITH_LEADING_LEFT_BRACE='/^{/d'
+IGNORE_LINES_WITH_LEADING_RIGHT_BRACE='/^}/d'
+IGNORE_LINES_WITH_RIGHT_BRACKET='/^.*\[.*/d'
+IGNORE_LINES_THAT_START_WITH_DATA='/^data\s*{\s*$/d'
+IGNORE_LINES_THAT_START_WITH_TRANSFORMED_DATA='/^transformed\sdata\s*{\s*$/d'
+IGNORE_LINES_THAT_START_WITH_PARAMETERS='/^parameters\s*{\s*$/d'
+IGNORE_LINES_THAT_START_WITH_TRANSFORMED_PARAMETERS='/^transformed\sparameters\s*{\s*$/d'
+IGNORE_LINES_THAT_START_WITH_MODEL='/^model\s*{\s*$/d'
+IGNORE_LINES_THAT_START_WITH_GENERATED_QUANTITIES='/^generated\squantities\s*{\s*$/d'
+IGNORE_LINES_THAT_START_WITH_CODE_COMMENTS='/^[#/].*$/d'
 
 TEX_FILES=`ls *.tex`
-#TEX_FILES=functions.tex
+#TEX_FILES=commands.tex
 UNIQUE_LINES=0
 for TEX_FILE in $TEX_FILES; do
 	if [ "stan-reference.tex" = "$TEX_FILE" ]; then
@@ -29,15 +40,28 @@ for TEX_FILE in $TEX_FILES; do
 	sed ${IGNORE_COMMENT_LINES} | \
         sed ${DELETE_BRACEPLUS} | \
         sed ${DELETE_PLUSBRACE} | \
-        sed ${IGNORE_LINES_WITH_LEADING_SLASH} > \
+        sed ${IGNORE_LINES_WITH_LEADING_SLASH} | \
+        sed ${IGNORE_LINES_WITH_LEADING_GREATER_THAN} | \
+	sed ${IGNORE_LINES_WITH_LEADING_LEFT_BRACE} | \
+        sed ${IGNORE_LINES_WITH_LEADING_RIGHT_BRACE} | \
+        sed ${IGNORE_LINES_WITH_RIGHT_BRACKET} | \
+        sed ${IGNORE_LINES_THAT_START_WITH_DATA} | \
+        sed ${IGNORE_LINES_THAT_START_WITH_TRANSFORMED_DATA} | \
+        sed ${IGNORE_LINES_THAT_START_WITH_PARAMETERS} | \
+        sed ${IGNORE_LINES_THAT_START_WITH_TRANSFORMED_PARAMETERS} | \
+        sed ${IGNORE_LINES_THAT_START_WITH_MODEL} | \
+        sed ${IGNORE_LINES_THAT_START_WITH_GENERATED_QUANTITIES} | \
+        sed ${IGNORE_LINES_THAT_START_WITH_CODE_COMMENTS} > \
 	additions.sh
 	echo 'Processing additions to' $TEX_FILE
 	exec <additions.sh
 	while read -r line; do
-		UNIQUE_LINES=`grep  -F -w "${line}" ${TEX_FILE} | wc -l`
+		grep  -F -w -n -- "${line}" ${TEX_FILE} > search.txt || true
+                UNIQUE_LINES=`wc -l -- search.txt | sed 's/[^[0-9]//g'`
 		if  [ $UNIQUE_LINES -eq "1" ]; then
-#			replace -s "${line}" "\A{$line} \FXA " -- $TEX_FILE
-			sed -i "s@^${line}@\\\\A{${line}} \\\\FXA \\\\ @" $TEX_FILE
+                        LINE_NUM=`sed 's/[^0-9]//g' search.txt`
+			sed "${LINE_NUM}s@^${line}@\\\\A{${line}} \\\\FXA \\\\ @" $TEX_FILE > temp.tex
+                        mv temp.tex $TEX_FILE
 		else
 			echo "In ${TEX_FILE}, no unique match for:" "${line}"
 		fi
@@ -60,15 +84,28 @@ for TEX_FILE in $TEX_FILES; do
         sed ${IGNORE_COMMENT_LINES} | \
         sed ${DELETE_BRACEPLUS} | \
         sed ${DELETE_PLUSBRACE} | \
-        sed ${IGNORE_LINES_WITH_LEADING_SLASH} > \
+        sed ${IGNORE_LINES_WITH_LEADING_SLASH} | \
+        sed ${IGNORE_LINES_WITH_LEADING_GREATER_THAN} | \
+        sed ${IGNORE_LINES_WITH_LEADING_LEFT_BRACE} | \
+        sed ${IGNORE_LINES_WITH_LEADING_RIGHT_BRACE} | \
+        sed ${IGNORE_LINES_WITH_RIGHT_BRACKET} | \
+        sed ${IGNORE_LINES_THAT_START_WITH_DATA} | \
+        sed ${IGNORE_LINES_THAT_START_WITH_TRANSFORMED_DATA} | \
+        sed ${IGNORE_LINES_THAT_START_WITH_PARAMETERS} | \
+        sed ${IGNORE_LINES_THAT_START_WITH_TRANSFORMED_PARAMETERS} | \
+        sed ${IGNORE_LINES_THAT_START_WITH_MODEL} | \
+        sed ${IGNORE_LINES_THAT_START_WITH_GENERATED_QUANTITIES} | \
+        sed ${IGNORE_LINES_THAT_START_WITH_CODE_COMMENTS} > \
         changes.sh
         echo 'Processing changes to' $TEX_FILE
         exec <changes.sh
         while read -r line; do
-                UNIQUE_LINES=`grep -F -w "${line}" ${TEX_FILE} | wc -l`
+                grep  -F -w -n -- "${line}" ${TEX_FILE} > search.txt || true
+                UNIQUE_LINES=`wc -l -- search.txt | sed 's/[^[0-9]//g'`
                 if  [ $UNIQUE_LINES -eq "1" ]; then
-#                        replace -s "${line}" "\A{$line} \FXC " -- $TEX_FILE
-			sed -i "s@^${line}@\\\\A{${line}} \\\\FXC \\\\ @" $TEX_FILE
+                        LINE_NUM=`sed 's/[^0-9]//g' search.txt`
+                        sed "${LINE_NUM}s@^${line}@\\\\A{${line}} \\\\FXA \\\\ @" $TEX_FILE > temp.tex
+                        mv temp.tex $TEX_FILE
                 else
                         echo "In ${TEX_FILE}, no unique match for:" "${line}"
                 fi
@@ -76,11 +113,11 @@ for TEX_FILE in $TEX_FILES; do
         rm changes.sh
 done
 
-sed -i 's@^%\\listoffixmes$@\\listoffixmes@' stan-reference.tex
-sed -i 's@final,author@draft,author@' stan-manuals.sty
-sed -i "s@List of changes@List of changes since ${OLD_VERSION}@" stan-manuals.sty
+rm search.txt
+sed 's@^%\\listoffixmes$@\\listoffixmes@' stan-reference.tex > temp.tex
+mv temp.tex stan-reference.tex
+sed 's@final,author@draft,author@' stan-manuals.sty > temp.sty
+sed "s@List of changes@List of changes since ${OLD_VERSION}@" temp.sty > stan-manuals.sty
 echo ''
-echo 'Steps from here:'
-echo '1) Apply --- but do not commit --- patches (if any)'
-echo '2) make manual'
-echo '3) git reset --hard HEAD'
+exit 0
+

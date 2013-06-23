@@ -53,8 +53,8 @@
 
 \usepackage{color}
 \definecolor{linkcolor}{RGB}{0,0,128}
-\usepackage[colorlinks=true,linkcolor=linkcolor,anchorcolor=linkcolor,citecolor=linkcolor,filecolor=linkcolor,menucolor=linkcolor,runcolor=linkcolor,urlcolor=linkcolor,pdfborder={0
-  0 0}]{hyperref}
+\usepackage[pagebackref,pdfpagelabels,plainpages=false,hypertexnames=true,colorlinks=true,linkcolor=linkcolor,anchorcolor=linkcolor,citecolor=linkcolor,filecolor=linkcolor,menucolor=linkcolor,runcolor=linkcolor,urlcolor=linkcolor,pdfborder={0 0 0}]{hyperref}
+
 
 % BG: Stuff for changed text
 \usepackage[final,author=]{fixme}
@@ -98,6 +98,8 @@
 \newcommand{\posreals}{\mathbb{R}^+}
 \newcommand{\nats}{\mathbb{N}}
 \newcommand{\bigo}[1]{{\mathcal{O}}(#1)}
+\newcommand{\erfc}[1]{\operatorname{erfc}#1}
+\newcommand{\erf}[1]{\operatorname{erf}#1}
 
 \newcommand{\refappendix}[1]{Appendix~\ref{#1.appendix}}
 \newcommand{\refpart}[1]{Part~\ref{#1.part}}
@@ -107,7 +109,12 @@
 \newcommand{\refnote}[1]{Footnote~\ref{#1.footnote}}
 
 \newcommand{\fitem}[4]{\item[{\tt #1 {\bfseries #2}(#3)}]\mbox{ }
-  \\[4pt] #4\index{\tt {\bfseries #2 }!(#3):#1}}
+ \\[4pt] #4\index{{\tt\bfseries #2 }!{\tt (#3):\,#1}|hyperpage}}
+% need special command for items requiring escapes in index
+\newcommand{\fitemindex}[5]{\item[{\tt #1 {\bfseries #2}(#3)}]\mbox{ }
+  \\[4pt] #4\index{{\tt\bfseries #5 }!{\tt (#3):\,#1}|hyperpage}}
+\newcommand{\fitemindexsort}[6]{\item[{\tt #1 {\bfseries #2}(#3)}]\mbox{ }
+  \\[4pt] #4\index{{\tt\bfseries #6 }@{\tt\bfseries #5 }!{\tt (#3):\,#1}|hyperpage}}
 \newcommand{\farg}[1]{{\tt\slshape #1}}
 
 \newcommand{\cmdflag}[3]{\item[\tt {-}-#1] \mbox{ } \\ #2 \\ \hspace*{24pt}(#3)}

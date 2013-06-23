@@ -25,14 +25,14 @@ public:
     return true;
   }
 
-  static size_t num_iterations() {
-    return 8000U;
+  static int num_iterations() {
+    return 4000;
   }
 
-  static std::vector<size_t> skip_chains_test() {
-    std::vector<size_t> params_to_skip;
+  static std::vector<int> skip_chains_test() {
+    std::vector<int> params_to_skip;
     // FIXME: remove this when forward sampling is available
-    params_to_skip.push_back(47U);  // delta_new
+    params_to_skip.push_back(chains->index("delta_new"));
     return params_to_skip;
   }
 
@@ -40,26 +40,13 @@ public:
     default_populate_chains();
   }
 
-  static std::vector<std::pair<size_t, double> >
+  static std::vector<std::pair<int, double> >
   get_expected_values() {
     using std::make_pair;
-    size_t index;
-    std::vector<size_t> dims;
-    dims.push_back(0U);
-
-    std::vector<std::pair<size_t, double> > expected_values;
-
-    index = chains->get_total_param_index(chains->param_name_to_index("d"),
-					  dims);
-    expected_values.push_back(make_pair(index, -0.2492));
-
-    index = chains->get_total_param_index(chains->param_name_to_index("delta_new"),
-					  dims);
-    expected_values.push_back(make_pair(index, -0.2499));
-
-    index = chains->get_total_param_index(chains->param_name_to_index("sigma_delta"),
-					  dims);
-    expected_values.push_back(make_pair(index, 0.1189));
+    std::vector<std::pair<int, double> > expected_values;
+    expected_values.push_back(make_pair(chains->index("d"), -0.2492));
+    expected_values.push_back(make_pair(chains->index("delta_new"), -0.2499));
+    expected_values.push_back(make_pair(chains->index("sigma_delta"), 0.1189));
     
     return expected_values;
   }
@@ -67,5 +54,5 @@ public:
 };
 
 INSTANTIATE_TYPED_TEST_CASE_P(Models_BugsExamples_Vol1_Blocker,
-			      Model_Test_Fixture,
-			      Models_BugsExamples_Vol1_Blocker);
+            Model_Test_Fixture,
+            Models_BugsExamples_Vol1_Blocker);

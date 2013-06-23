@@ -25,12 +25,12 @@ public:
     return true;
   }
 
-  static size_t num_iterations() {
-    return 8000U;
+  static int num_iterations() {
+    return 20000;
   }
 
-  static std::vector<size_t> skip_chains_test() {
-    std::vector<size_t> params_to_skip;
+  static std::vector<int> skip_chains_test() {
+    std::vector<int> params_to_skip;
     return params_to_skip;
   }
 
@@ -38,16 +38,16 @@ public:
     default_populate_chains();
   }
 
-  static std::vector<std::pair<size_t, double> >
+  static std::vector<std::pair<int, double> >
   get_expected_values() {
     using std::make_pair;
-    std::vector<std::pair<size_t, double> > expected_values;
+    std::vector<std::pair<int, double> > expected_values;
 
-    expected_values.push_back(make_pair(0U, -0.5525));  // alpha0
-    expected_values.push_back(make_pair(1U, 0.08382));  // alpha1
-    expected_values.push_back(make_pair(2U, -0.8165));  // alpha12
-    expected_values.push_back(make_pair(3U, 1.346));    // alpha2
-    expected_values.push_back(make_pair(26U, 0.267));   // sigma
+    expected_values.push_back(make_pair(chains->index("alpha0"), -0.5525));  // alpha0
+    expected_values.push_back(make_pair(chains->index("alpha1"), 0.08382));  // alpha1
+    expected_values.push_back(make_pair(chains->index("alpha12"), -0.8165));  // alpha12
+    expected_values.push_back(make_pair(chains->index("alpha2"), 1.346));    // alpha2
+    expected_values.push_back(make_pair(chains->index("sigma"), 0.267));   // sigma
 
     return expected_values;
   }
@@ -55,5 +55,5 @@ public:
 };
 
 INSTANTIATE_TYPED_TEST_CASE_P(Models_BugsExamples_Vol1_Seeds,
-			      Model_Test_Fixture,
-			      Models_BugsExamples_Vol1_Seeds);
+            Model_Test_Fixture,
+            Models_BugsExamples_Vol1_Seeds);

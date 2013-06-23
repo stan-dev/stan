@@ -155,7 +155,7 @@ namespace stan {
     boost::phoenix::function<validate_assignment> validate_assignment_f;
 
     struct validate_sample {
-      template <typename T1, typename T2>
+      template <typename T1, typename T2, typename T3>
       struct result { typedef bool type; };
 
       bool is_double_return(const std::string& function_name,
@@ -166,6 +166,7 @@ namespace stan {
           .is_primitive_double();
       }
       bool operator()(const sample& s,
+                      const variable_map& var_map,
                       std::ostream& error_msgs) const {
         std::vector<expr_type> arg_types;
         arg_types.push_back(s.expr_.expression_type());
@@ -180,6 +181,23 @@ namespace stan {
         if (!is_double_return(function_name,arg_types,error_msgs)) {
           error_msgs << "unknown distribution=" << s.dist_.family_ << std::endl;
           return false;
+        }
+        // test for LHS not being purely a variable
+        if (has_non_param_var(s.expr_,var_map)) {
+          // FIXME:  really want to get line numbers in here too
+          error_msgs << "Warning (non-fatal):"
+                     << "     sampling statement (~) contains a transformed parameter or local variable."
+                     << std::endl
+                     << "     You must increment lp__ with the log absolute determinant"
+                     << " of the Jacobian of the transform."
+                     << std::endl
+                     << "     Sampling Statement left-hand-side expression:"
+                     << std::endl
+                     << "          ";
+          generate_expression(s.expr_,error_msgs);
+          error_msgs << " ~ ";
+          error_msgs << function_name << "(...)";
+          error_msgs << std::endl;
         }
         if (s.truncation_.has_low()) {
           std::vector<expr_type> arg_types_trunc(arg_types);
@@ -232,6 +250,60 @@ namespace stan {
     };
     boost::phoenix::function<unscope_locals> unscope_locals_f;
 
+    // struct add_conditional_condition {
+    //   template <typename T1, typename T2, typename T3>
+    //   struct result { typedef bool type; };
+    //   bool operator()(conditional_statement& cs,
+    //                   const expression& e,
+    //                   std::stringstream& error_msgs) const {
+    //     if (!e.expression_type().is_primitive()) {
+    //       error_msgs << "conditions in if-else statement must be primitive int or real;"
+    //                  << " found type=" << e.expression_type() << std::endl;
+    //       return false;
+    //     }
+    //     cs.conditions_.push_back(e);
+    //     return true;
+    //   }               
+    // };
+    // boost::phoenix::function<add_conditional_condition> add_conditional_condition_f;
+
+    // struct add_conditional_body {
+    //   template <typename T1, typename T2>
+    //   struct result { typedef void type; };
+    //   void operator()(conditional_statement& cs,
+    //                   const statement& s) const {
+    //     cs.bodies_.push_back(s);
+    //   }
+    // };
+    // boost::phoenix::function<add_conditional_body> add_conditional_body_f;
+
+    struct add_while_condition {
+      template <typename T1, typename T2, typename T3>
+      struct result { typedef bool type; };
+      bool operator()(while_statement& ws,
+                      const expression& e,
+                      std::stringstream& error_msgs) const {
+        if (!e.expression_type().is_primitive()) {
+          error_msgs << "conditions in while statement must be primitive int or real;"
+                     << " found type=" << e.expression_type() << std::endl;
+          return false;
+        }
+        ws.condition_ = e;
+        return true;
+      }               
+    };
+    boost::phoenix::function<add_while_condition> add_while_condition_f;
+
+    struct add_while_body {
+      template <typename T1, typename T2>
+      struct result { typedef void type; };
+      void operator()(while_statement& ws,
+                      const statement& s) const {
+        ws.body_ = s;
+      }
+    };
+    boost::phoenix::function<add_while_body> add_while_body_f;
+    
     struct add_loop_identifier {
       template <typename T1, typename T2, typename T3, typename T4>
       struct result { typedef bool type; };
@@ -297,7 +369,6 @@ namespace stan {
     boost::phoenix::function<validate_allow_sample> validate_allow_sample_f;
 
 
-
     template <typename Iterator>
     statement_grammar<Iterator>::statement_grammar(variable_map& var_map,
                                                    std::stringstream& error_msgs)
@@ -305,7 +376,8 @@ namespace stan {
         var_map_(var_map),
         error_msgs_(error_msgs),
         expression_g(var_map,error_msgs),
-        var_decls_g(var_map,error_msgs) 
+        var_decls_g(var_map,error_msgs),
+        statement_2_g(var_map,error_msgs,*this)
     {
       using boost::spirit::qi::_1;
       using boost::spirit::qi::char_;
@@ -326,13 +398,16 @@ namespace stan {
       statement_r
         %= statement_seq_r(_r1,_r2)
         | for_statement_r(_r1,_r2)
-        | print_statement_r
-        | assignment_r 
-        [_pass 
-         = validate_assignment_f(_1,_r2,boost::phoenix::ref(var_map_),
-                                 boost::phoenix::ref(error_msgs_))]
-        | sample_r(_r1) [_pass = validate_sample_f(_1,
-                                                   boost::phoenix::ref(error_msgs_))]
+        | while_statement_r(_r1,_r2)
+        | statement_2_g(_r1,_r2)
+        | print_statement_r(_r2)
+        | assignment_r(_r2)
+          [_pass 
+            = validate_assignment_f(_1,_r2,boost::phoenix::ref(var_map_),
+                                     boost::phoenix::ref(error_msgs_))]
+        | sample_r(_r1,_r2) [_pass = validate_sample_f(_1,
+                                               boost::phoenix::ref(var_map_),
+                                               boost::phoenix::ref(error_msgs_))]
         | no_op_statement_r
         ;
 
@@ -349,6 +424,18 @@ namespace stan {
       local_var_decls_r
         %= var_decls_g(false,local_origin); // - constants
 
+      while_statement_r.name("while statement");
+      while_statement_r
+        = lit("while")
+        > lit('(')
+        > expression_g(_r2)
+          [_pass = add_while_condition_f(_val,_1,
+                                         boost::phoenix::ref(error_msgs_))]
+        > lit(')')
+        > statement_r(_r1,_r2)
+          [add_while_body_f(_val,_1)]
+        ;
+      
 
       // _r1, _r2 same as statement_r
       for_statement_r.name("for statement");
@@ -360,7 +447,7 @@ namespace stan {
                                                 boost::phoenix::ref(var_map_),
                                                 boost::phoenix::ref(error_msgs_))]
         > lit("in")
-        > range_r
+        > range_r(_r2)
         > lit(')')
         > statement_r(_r1,_r2)
         > eps 
@@ -371,19 +458,18 @@ namespace stan {
       print_statement_r
         %= lit("print")
         > lit('(')
-        > (printable_r % ',')
-        // > (expression_g % ',')
+        > (printable_r(_r1) % ',')
         > lit(')');
 
       printable_r.name("printable");
       printable_r
         %= printable_string_r 
-        | expression_g;
+        | expression_g(_r1);
 
       printable_string_r.name("printable quoted string");
       printable_string_r
         %= lit('"')
-        > lexeme[*char_("a-zA-Z0-9/~!@#$%^&*()_+`-={}|[]:;'<>?,./ ")]
+        > lexeme[*char_("a-zA-Z0-9/~!@#$%^&*()`_+-={}|[]:;'<>?,./ ")]
         > lit('"');
       
       identifier_r.name("identifier");
@@ -393,33 +479,33 @@ namespace stan {
 
       range_r.name("range expression pair, colon");
       range_r 
-        %= expression_g
+        %= expression_g(_r1)
         [_pass = validate_int_expr2_f(_1,boost::phoenix::ref(error_msgs_))]
         >> lit(':') 
-        >> expression_g
+        >> expression_g(_r1)
         [_pass = validate_int_expr2_f(_1,boost::phoenix::ref(error_msgs_))];
 
       assignment_r.name("variable assignment by expression");
       assignment_r
-        %= var_lhs_r
-        >> lit("<-")
-        > expression_g
+        %= ( var_lhs_r(_r1)
+             >> lit("<-") )
+        > expression_g(_r1)
         > lit(';') 
         ;
 
       var_lhs_r.name("variable and array dimensions");
       var_lhs_r 
         %= identifier_r 
-        >> opt_dims_r;
+        >> opt_dims_r(_r1);
 
       opt_dims_r.name("array dimensions (optional)");
       opt_dims_r 
-        %=  - dims_r;
+        %=  - dims_r(_r1);
 
       dims_r.name("array dimensions");
       dims_r 
         %= lit('[') 
-        > (expression_g
+        > (expression_g(_r1)
            [_pass = validate_int_expr2_f(_1,boost::phoenix::ref(error_msgs_))]
            % ',')
         > lit(']')
@@ -428,29 +514,29 @@ namespace stan {
       // inherited  _r1 = true if samples allowed as statements
       sample_r.name("distribution of expression");
       sample_r 
-        %= expression_g
-        >> lit('~')
+        %= ( expression_g(_r2)
+             >> lit('~') )
         > eps
         [_pass 
          = validate_allow_sample_f(_r1,boost::phoenix::ref(error_msgs_))] 
-        > distribution_r
-        > -truncation_range_r
+        > distribution_r(_r2)
+        > -truncation_range_r(_r2)
         > lit(';');
 
       distribution_r.name("distribution and parameters");
       distribution_r
-        %= identifier_r
-        >> lit('(')
-        >> -(expression_g % ',')
+        %= ( identifier_r
+             >> lit('(')
+             >> -(expression_g(_r1) % ',') )
         > lit(')');
 
       truncation_range_r.name("range pair");
       truncation_range_r
         %= lit('T')
         > lit('[') 
-        > -expression_g
+        > -expression_g(_r1)
         > lit(',')
-        > -expression_g
+        > -expression_g(_r1)
         > lit(']');
 
       no_op_statement_r.name("no op statement");

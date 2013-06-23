@@ -19,10 +19,10 @@
 data {
   int<lower=0> nChild; 
   int<lower=0> nInd; 
-  real gamma[nInd, 4];  // -1 indicates NA in original R dump data (bones.Rdata.0)
+  real gamma[nInd, 4];  // -1 indicates NA in original R dump data (bones.data.R.0)
   real delta[nInd]; 
   int<lower=0> ncat[nInd]; 
-  int grade[nChild, nInd];  // -1 indicates NA in original R dump data (bones.Rdata.0)
+  int grade[nChild, nInd];  // -1 indicates NA in original R dump data (bones.data.R.0)
 } 
 
 
@@ -50,14 +50,10 @@ model {
       
       // We use lp__ instead, since grade[i, j] has categorical distribution
       // with varying dimension. 
-      // if grade[i, j] = -1, it is missing, zero term then for the 
-      // log-posterior. 
-
-      // when grade[i, j] = -1, however, log(...) still needs to be 
-      // evaluated. So I am adding the following term: 
-      // 2 * int_step(-1 * grade[i, j]) 
-
-      lp__ <- lp__ + if_else(grade[i, j] + 1, log(p[i, j, grade[i, j] + 2 * int_step(-1 * grade[i, j])]), 0); 
+      // If grade[i, j] = -1, it is missing, no contribution for lp__ then. 
+      if (grade[i, j] != -1) {
+        lp__ <- lp__ + log(p[i, j, grade[i, j]]);  
+      } 
     }
   }
 }

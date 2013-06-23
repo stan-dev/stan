@@ -1,4 +1,3 @@
-
 # Cervix: case - control study with errors in covariates 
 #  http://www.openbugs.info/Examples/Cervix.html
 
@@ -12,8 +11,6 @@
 
 ## In this version, the binary missing x's are integrated out. 
 
-
-
 data {
   int<lower=0> Nc; 
   int<lower=0> Ni; 
@@ -25,8 +22,8 @@ data {
 } 
 
 parameters {
-  real<lower=0,upper= 1> phi[2, 2];
-  real<lower=0,upper= 1> q; 
+  real<lower=0,upper=1> phi[2, 2];
+  real<lower=0,upper=1> q; 
   real beta0C; 
   real beta; 
   # note that xi is discrete parameters with support {0, 1} 
@@ -47,9 +44,10 @@ model {
   } 
   q ~ uniform(0, 1); 
   beta0C ~ normal(0, 320); 
-  beta ~ normal(0, 320); 
-  for (i in 1:2) for (j in 1:2) 
-    phi[i, j] ~ uniform(0, 1); 
+  beta ~ normal(0, 320);
+  for (i in 1:2) 
+    for (j in 1:2) 
+      phi[i, j] ~ uniform(0, 1); 
 } 
 
 generated quantities {

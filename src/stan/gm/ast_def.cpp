@@ -249,6 +249,17 @@ namespace stan {
       }
       for (size_t i = 0; i < args.size(); ++i)
         error_msgs << "    arg " << i << " type=" << args[i] << std::endl;
+
+      error_msgs << "available function signatures for "
+                 << name << ":" << std::endl;
+      for (size_t i = 0; i < signatures.size(); ++i) {
+        error_msgs << i << ".  " << name << "(";
+        for (size_t j = 0; j < signatures[i].second.size(); ++j) {
+          if (j > 0) error_msgs << ", ";
+          error_msgs << signatures[i].second[j];
+        }
+        error_msgs << ") : " << signatures[i].first << std::endl;
+      }
       return expr_type(); // ill-formed dummy
     }
     function_signatures::function_signatures() { 
@@ -265,7 +276,7 @@ namespace stan {
         statements_(stmts) {
     }
 
-    expr_type expression_type_vis::operator()(const nil& e) const {
+    expr_type expression_type_vis::operator()(const nil& /*e*/) const {
       return expr_type();
     }
     // template <typename T>
@@ -276,6 +287,9 @@ namespace stan {
       return e.type_;
     }
     expr_type expression_type_vis::operator()(const double_literal& e) const {
+      return e.type_;
+    }
+    expr_type expression_type_vis::operator()(const array_literal& e) const {
       return e.type_;
     }
     expr_type expression_type_vis::operator()(const variable& e) const {
@@ -311,6 +325,7 @@ namespace stan {
     expression::expression(const nil& expr) : expr_(expr) { }
     expression::expression(const int_literal& expr) : expr_(expr) { }
     expression::expression(const double_literal& expr) : expr_(expr) { }
+    expression::expression(const array_literal& expr) : expr_(expr) { }
     expression::expression(const variable& expr) : expr_(expr) { }
     expression::expression(const fun& expr) : expr_(expr) { }
     expression::expression(const index_op& expr) : expr_(expr) { }
@@ -325,17 +340,111 @@ namespace stan {
     printable::printable(const printable& printable)
       : printable_(printable.printable_) { }
 
-    bool is_nil_op::operator()(const nil& x) const { return true; }
-    bool is_nil_op::operator()(const int_literal& x) const { return false; }
-    bool is_nil_op::operator()(const double_literal& x) const { return false; }
-    bool is_nil_op::operator()(const variable& x) const { return false; }
-    bool is_nil_op::operator()(const fun& x) const { return false; }
-    bool is_nil_op::operator()(const index_op& x) const { return false; }
-    bool is_nil_op::operator()(const binary_op& x) const { return false; }
-    bool is_nil_op::operator()(const unary_op& x) const { return false; }
+    contains_var::contains_var(const variable_map& var_map) 
+      : var_map_(var_map) {
+    }
+    bool contains_var::operator()(const nil& e) const {
+      return false;
+    }
+    bool contains_var::operator()(const int_literal& e) const {
+      return false;
+    }
+    bool contains_var::operator()(const double_literal& e) const {
+      return false;
+    }
+    bool contains_var::operator()(const array_literal& e) const {
+      for (size_t i = 0; i < e.args_.size(); ++i)
+        if (boost::apply_visitor(*this,e.args_[i].expr_))
+          return true;
+      return false;
+    }
+    bool contains_var::operator()(const variable& e) const {
+      var_origin vo = var_map_.get_origin(e.name_);
+      return ( vo == parameter_origin
+               || vo == transformed_parameter_origin
+               || vo == local_origin );
+    }
+    bool contains_var::operator()(const fun& e) const {
+      for (size_t i = 0; i < e.args_.size(); ++i)
+        if (boost::apply_visitor(*this,e.args_[i].expr_))
+          return true;
+      return false;
+    }
+    bool contains_var::operator()(const index_op& e) const {
+      return boost::apply_visitor(*this,e.expr_.expr_);
+    }
+    bool contains_var::operator()(const binary_op& e) const {
+      return boost::apply_visitor(*this,e.left.expr_)
+        || boost::apply_visitor(*this,e.right.expr_);
+    }
+    bool contains_var::operator()(const unary_op& e) const {
+        return boost::apply_visitor(*this,e.subject.expr_);
+    }
+
+    bool has_var(const expression& e,
+                           const variable_map& var_map) {
+      contains_var vis(var_map);
+      return boost::apply_visitor(vis,e.expr_);
+    }
+
+
+    contains_nonparam_var::contains_nonparam_var(const variable_map& var_map) 
+      : var_map_(var_map) {
+    }
+    bool contains_nonparam_var::operator()(const nil& e) const {
+      return false;
+    }
+    bool contains_nonparam_var::operator()(const int_literal& e) const {
+      return false;
+    }
+    bool contains_nonparam_var::operator()(const double_literal& e) const {
+      return false;
+    }
+    bool contains_nonparam_var::operator()(const array_literal& e) const {
+      for (size_t i = 0; i < e.args_.size(); ++i)
+        if (boost::apply_visitor(*this,e.args_[i].expr_))
+          return true;
+      return false;
+    }
+    bool contains_nonparam_var::operator()(const variable& e) const {
+      var_origin vo = var_map_.get_origin(e.name_);
+      return ( vo == transformed_parameter_origin
+               || vo == local_origin );
+    }
+    bool contains_nonparam_var::operator()(const fun& e) const {
+      for (size_t i = 0; i < e.args_.size(); ++i)
+        if (boost::apply_visitor(*this,e.args_[i].expr_))
+          return true;
+      return false;
+    }
+    bool contains_nonparam_var::operator()(const index_op& e) const {
+      return boost::apply_visitor(*this,e.expr_.expr_);
+    }
+    bool contains_nonparam_var::operator()(const binary_op& e) const {
+      return has_var(e,var_map_);
+    }
+    bool contains_nonparam_var::operator()(const unary_op& e) const {
+      return has_var(e,var_map_);
+    }
+
+    bool has_non_param_var(const expression& e,
+                           const variable_map& var_map) {
+      contains_nonparam_var vis(var_map);
+      return boost::apply_visitor(vis,e.expr_);
+    }
+
+    bool is_nil_op::operator()(const nil& /*x*/) const { return true; }
+    bool is_nil_op::operator()(const int_literal& /*x*/) const { return false; }
+    bool is_nil_op::operator()(const double_literal& /* x */) const { return false; }
+    bool is_nil_op::operator()(const array_literal& /* x */) const { return false; }
+    bool is_nil_op::operator()(const variable& /* x */) const { return false; }
+    bool is_nil_op::operator()(const fun& /* x */) const { return false; }
+    bool is_nil_op::operator()(const index_op& /* x */) const { return false; }
+    bool is_nil_op::operator()(const binary_op& /* x */) const { return false; }
+    bool is_nil_op::operator()(const unary_op& /* x */) const { return false; }
       
     // template <typename T>
-    // bool is_nil_op::operator()(const T& x) const { return false; }
+    // bool is_nil_op::operator()(const T& /* x */) const { return false; }
 
     bool is_nil(const expression& e) {
       is_nil_op ino;
@@ -381,6 +490,20 @@ namespace stan {
       return *this;
     }
 
+
+    array_literal::array_literal() 
+      : args_(),
+        type_(DOUBLE_T,1U) {
+    }
+    array_literal::array_literal(const std::vector<expression>& args) 
+      : args_(args),
+        type_() { // ill-formed w/o help
+    }
+    array_literal& array_literal::operator=(const array_literal& al) {
+      args_ = al.args_;
+      type_ = al.type_;
+      return *this;
+    }
 
     variable::variable() { }
     variable::variable(std::string name) : name_(name) { }
@@ -450,7 +573,7 @@ namespace stan {
 
     binary_op::binary_op() { }
     binary_op::binary_op(const expression& left,
-                         char op,
+                         const std::string& op,
                          const expression& right)
       : op(op), 
         left(left), 
@@ -491,7 +614,7 @@ namespace stan {
       else if (vo == transformed_parameter_origin)
         o << "transformed parameter";
       else if (vo == derived_origin)
-        o << "derived";
+        o << "generated quantities";
       else if (vo == local_origin)
         o << "local";
       else 
@@ -561,6 +684,17 @@ namespace stan {
                                      std::vector<expression> const& dims)
       : base_var_decl(name,dims,DOUBLE_T),
         range_(range) 
+    { }
+
+    unit_vector_var_decl::unit_vector_var_decl() 
+      : base_var_decl(VECTOR_T) 
+    { }
+
+    unit_vector_var_decl::unit_vector_var_decl(expression const& K,
+                                       std::string const& name,
+                                       std::vector<expression> const& dims)
+      : base_var_decl(name,dims,VECTOR_T),
+        K_(K) 
     { }
 
     simplex_var_decl::simplex_var_decl() 
@@ -651,7 +785,7 @@ namespace stan {
 
 
     name_vis::name_vis() { }
-    std::string name_vis::operator()(const nil& x) const { 
+    std::string name_vis::operator()(const nil& /* x */) const { 
       return ""; // fail if arises
     } 
     std::string name_vis::operator()(const int_var_decl& x) const {
@@ -667,6 +801,9 @@ namespace stan {
       return x.name_;
     }
     std::string name_vis::operator()(const matrix_var_decl& x) const {
+      return x.name_;
+    }
+    std::string name_vis::operator()(const unit_vector_var_decl& x) const {
       return x.name_;
     }
     std::string name_vis::operator()(const simplex_var_decl& x) const {
@@ -698,6 +835,7 @@ namespace stan {
     var_decl::var_decl(const vector_var_decl& decl) : decl_(decl) { }
     var_decl::var_decl(const row_vector_var_decl& decl) : decl_(decl) { }
     var_decl::var_decl(const matrix_var_decl& decl) : decl_(decl) { }
+    var_decl::var_decl(const unit_vector_var_decl& decl) : decl_(decl) { }
     var_decl::var_decl(const simplex_var_decl& decl) : decl_(decl) { }
     var_decl::var_decl(const ordered_var_decl& decl) : decl_(decl) { }
     var_decl::var_decl(const positive_ordered_var_decl& decl) : decl_(decl) { }
@@ -714,13 +852,16 @@ namespace stan {
     }
 
     statement::statement() : statement_(nil()) { }
+
+    // FIXME:  template these out
     statement::statement(const statement_t& st) : statement_(st) { }
-    
     statement::statement(const nil& st) : statement_(st) { }
     statement::statement(const assignment& st) : statement_(st) { }
     statement::statement(const sample& st) : statement_(st) { }
     statement::statement(const statements& st) : statement_(st) { }
     statement::statement(const for_statement& st) : statement_(st) { }
+    statement::statement(const while_statement& st) : statement_(st) { }
+    statement::statement(const conditional_statement& st) : statement_(st) { }
     statement::statement(const print_statement& st) : statement_(st) { }
     statement::statement(const no_op_statement& st) : statement_(st) { }
 
@@ -733,13 +874,30 @@ namespace stan {
 
 
     for_statement::for_statement() {
-      }
+    }
     for_statement::for_statement(std::string& variable,
                                  range& range,
                                  statement& stmt)
       : variable_(variable),
         range_(range),
         statement_(stmt) {
+    }
+
+    while_statement::while_statement() { 
+    }
+    while_statement::while_statement(const expression& condition,
+                                     const statement& body) 
+      : condition_(condition),
+        body_(body) {
+    }
+
+    conditional_statement::conditional_statement() {
+    }
+    conditional_statement
+    ::conditional_statement(const std::vector<expression>& conditions,
+                            const std::vector<statement>& bodies)
+      : conditions_(conditions),
+        bodies_(bodies) {
     }
 
     print_statement::print_statement() { }
@@ -792,23 +950,32 @@ namespace stan {
     }
       
     expression& expression::operator+=(const expression& rhs) {
-      expr_ = binary_op(expr_, '+', rhs);
+      expr_ = binary_op(expr_, "+", rhs);
       return *this;
     }
 
     expression& expression::operator-=(const expression& rhs) {
-      expr_ = binary_op(expr_, '-', rhs);
+      expr_ = binary_op(expr_, "-", rhs);
       return *this;
     }
 
     expression& expression::operator*=(expression const& rhs) {
-      expr_ = binary_op(expr_, '*', rhs);
+      expr_ = binary_op(expr_, "*", rhs);
       return *this;
     }
 
     expression& expression::operator/=(expression const& rhs) {
-      expr_ = binary_op(expr_, '/', rhs);
+      expr_ = binary_op(expr_, "/", rhs);
       return *this;
+    }
+
+    bool has_rng_suffix(const std::string& s) {
+      int n = s.size();
+      return n > 4
+        && s[n-1] == 'g' 
+        && s[n-2] == 'n'
+        && s[n-3] == 'r'
+        && s[n-4] == '_';
     }
 
 

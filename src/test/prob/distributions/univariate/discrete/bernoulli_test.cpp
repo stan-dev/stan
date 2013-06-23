@@ -1,59 +1,37 @@
-#define _LOG_PROB_ bernoulli_log
 #include <stan/prob/distributions/univariate/discrete/bernoulli.hpp>
+#include <gtest/gtest.h>
+#include <boost/random/mersenne_twister.hpp>
+#include<boost/math/distributions.hpp>
 
-#include <test/prob/distributions/distribution_test_fixture.hpp>
-#include <test/prob/distributions/discrete_distribution_tests_2_params.hpp>
+TEST(ProbDistributionsBernoulli, random) {
+  boost::random::mt19937 rng;
+  EXPECT_NO_THROW(stan::prob::bernoulli_rng(0.6,rng));
+}
 
-using std::vector;
-using std::log;
-using std::numeric_limits;
-
-class ProbDistributionsBernoulli : public DistributionTest {
-public:
-  void valid_values(vector<vector<double> >& parameters,
-		    vector<double>& log_prob) {
-    vector<double> param(2);
-
-    param[0] = 1;           // n
-    param[1] = 0.25;        // theta
-    parameters.push_back(param);
-    log_prob.push_back(log(0.25)); // expected log_prob
-
-    param[0] = 0;           // n
-    param[1] = 0.25;        // theta
-    parameters.push_back(param);
-    log_prob.push_back(log(0.75)); // expected log_prob
-
-    param[0] = 1;           // n
-    param[1] = 0.01;        // theta
-    parameters.push_back(param);
-    log_prob.push_back(log(0.01)); // expected log_prob
-
-    param[0] = 0;           // n
-    param[1] = 0.01;        // theta
-    parameters.push_back(param);
-    log_prob.push_back(log(0.99)); // expected log_prob
-  }
+TEST(ProbDistributionsBernoulli, chiSquareGoodnessFitTest) {
+  boost::random::mt19937 rng;
+  int N = 10000;
+  boost::math::bernoulli_distribution<>dist (0.4);
+  boost::math::chi_squared mydist(1);
  
-  void invalid_values(vector<size_t>& index, 
-		      vector<double>& value) {
-    // y
-    index.push_back(0U);
-    value.push_back(-1);
+  int bin[2] = {0, 0};
+  double expect [2] = {N * (1 - 0.4), N * (0.4)};
 
-    index.push_back(0U);
-    value.push_back(2);
+  int count = 0;
 
-    // theta
-    index.push_back(1U);
-    value.push_back(-0.001);
+  while (count < N) {
+    int a = stan::prob::bernoulli_rng(0.4,rng);
+    if(a == 1)
+      ++bin[1];
+    else
+      ++bin[0];
+    count++;
+   }
 
-    index.push_back(1U);
-    value.push_back(1.001);
-  }
-};
+  double chi = 0;
 
-INSTANTIATE_TYPED_TEST_CASE_P(ProbDistributionsBernoulli,
-			      DistributionTestFixture,
-			      ProbDistributionsBernoulli);
+  for(int j = 0; j < 2; j++)
+    chi += ((bin[j] - expect[j]) * (bin[j] - expect[j]) / expect[j]);
 
+  EXPECT_TRUE(chi < quantile(complement(mydist, 1e-6)));
+}

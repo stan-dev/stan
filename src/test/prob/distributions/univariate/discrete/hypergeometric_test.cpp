@@ -1,59 +1,46 @@
-#include <gtest/gtest.h>
 #include <stan/prob/distributions/univariate/discrete/hypergeometric.hpp>
+#include <gtest/gtest.h>
+#include <boost/random/mersenne_twister.hpp>
+#include<boost/math/distributions.hpp>
 
-TEST(ProbDistributionsHypergeometric,Hypergeometric) {
-  EXPECT_FLOAT_EQ(-4.119424, stan::prob::hypergeometric_log(5,15,10,10));
-  //EXPECT_FLOAT_EQ(-2.302585, stan::prob::hypergeometric_log(0,2,3,2));
+TEST(ProbDistributionHypergeometric, random) {
+  boost::random::mt19937 rng;
+  EXPECT_NO_THROW(stan::prob::hypergeometric_rng(10, 10, 15,rng));
 }
-TEST(ProbDistributionsHypergeometric,Propto) {
-  EXPECT_FLOAT_EQ(0.0, stan::prob::hypergeometric_log<true>(5,15,10,10));
-  EXPECT_FLOAT_EQ(0.0, stan::prob::hypergeometric_log<true>(0,2,3,2));
-}
 
+TEST(ProbDistributionsHypergeometric, chiSquareGoodnessFitTest) {
+  boost::random::mt19937 rng;
+  int N = 10000;
+  int num_draws = 10;
+  int K = num_draws;
+  boost::math::hypergeometric_distribution<>dist (15, num_draws, 25);
+  boost::math::chi_squared mydist(K-1);
 
-using boost::math::policies::policy;
-using boost::math::policies::evaluation_error;
-using boost::math::policies::domain_error;
-using boost::math::policies::overflow_error;
-using boost::math::policies::domain_error;
-using boost::math::policies::pole_error;
-using boost::math::policies::errno_on_error;
+  int loc[K - 1];
+  for(int i = 1; i < K; i++)
+    loc[i - 1] = i - 1;
 
-typedef policy<
-  domain_error<errno_on_error>, 
-  pole_error<errno_on_error>,
-  overflow_error<errno_on_error>,
-  evaluation_error<errno_on_error> 
-  > errno_policy;
+  int count = 0;
+  int bin [K];
+  double expect [K];
+  for(int i = 0 ; i < K; i++) {
+    bin[i] = 0;
+    expect[i] = N * pdf(dist, i);
+  }
 
-using stan::prob::hypergeometric_log;
+  while (count < N) {
+    int a = stan::prob::hypergeometric_rng(num_draws, 10, 15,rng);
+    int i = 0;
+    while (i < K-1 && a > loc[i]) 
+      ++i;
+    ++bin[i];
+    count++;
+   }
 
-TEST(ProbDistributionsHypergeometric,DefaultPolicy) {
-  int n = 2;
-  int N = 10;
-  int a = 5;
-  int b = 11;
-    
-  EXPECT_NO_THROW(hypergeometric_log(n,N,a,b));
+  double chi = 0;
 
-  EXPECT_THROW(hypergeometric_log(6,N,a,b), std::domain_error) << "n > a";
-  EXPECT_THROW(hypergeometric_log(n,N,a,7), std::domain_error) << "N-n > b";
-  EXPECT_THROW(hypergeometric_log(n,17,a,b), std::domain_error) << "N > a+b";
-}
-TEST(ProbDistributionsHypergeometric,ErrnoPolicy) {
-  int n = 2;
-  int N = 10;
-  int a = 5;
-  int b = 11;
-  double result;
-  
-  result = hypergeometric_log(n,N,a,b, errno_policy());
-  EXPECT_FALSE(std::isnan(result));
+  for(int j = 0; j < K; j++)
+    chi += ((bin[j] - expect[j]) * (bin[j] - expect[j]) / expect[j]);
 
-  result = hypergeometric_log(6,N,a,b, errno_policy());
-  EXPECT_TRUE(std::isnan(result)) << "n > a";
-  result = hypergeometric_log(n,N,a,7, errno_policy());
-  EXPECT_TRUE(std::isnan(result)) << "N-n > b";
-  result = hypergeometric_log(n,17,a,b, errno_policy());
-  EXPECT_TRUE(std::isnan(result)) << "N > a+b";
+  EXPECT_TRUE(chi < quantile(complement(mydist, 1e-6)));
 }

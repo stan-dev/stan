@@ -1,8 +1,13 @@
 #ifndef __STAN__META__TRAITS_HPP__
 #define __STAN__META__TRAITS_HPP__
 
+#include <stan/agrad/fwd/fvar.hpp>
+// #include <stan/agrad.hpp>
+#include <stan/agrad/rev/var.hpp>
 #include <vector>
 #include <boost/type_traits.hpp>
+#include <boost/type_traits/is_arithmetic.hpp> 
+
 #include <boost/math/tools/promotion.hpp>
 #include <stan/math/matrix.hpp>
 
@@ -50,6 +55,13 @@ namespace stan {
   struct is_constant_struct<Eigen::Matrix<T,R,C> > {
     enum { value = is_constant_struct<T>::value };
   };
+
+  template <typename T>
+  struct is_constant_struct<Eigen::Block<T> > {
+    enum { value = is_constant_struct<T>::value };
+  };
+
+
 
 
   // FIXME: use boost::type_traits::remove_all_extents to extend to array/ptr types
@@ -105,28 +117,38 @@ namespace stan {
     typedef typename scalar_type_helper<is_vector<T>::value, T>::type type;
   };
 
+  template <typename T>
+  inline T get(const T& x, size_t n) {
+    return x;
+  }
+  template <typename T>
+  inline T get(const std::vector<T>& x, size_t n) {
+    return x[n];
+  }
+  template <typename T, int R, int C>
+  inline T get(const Eigen::Matrix<T,R,C>& m, size_t n) {
+    return m(static_cast<int>(n));
+  }
+
+  
+
   // length() should only be applied to primitive or std vector or Eigen vector
   template <typename T>
-  size_t length(const T& x) {
+  size_t length(const T& /*x*/) {
     return 1U;
   }
   template <typename T>
   size_t length(const std::vector<T>& x) {
     return x.size();
   }
-  
-  template <typename T>
-  size_t length(const Eigen::Matrix<T,Eigen::Dynamic,1>& v) {
-    return v.size();
-  }
-  template <typename T>
-  size_t length(const Eigen::Matrix<T,1,Eigen::Dynamic>& rv) {
-    return rv.size();
+  template <typename T, int R, int C>
+  size_t length(const Eigen::Matrix<T,R,C>& m) {
+    return m.size();
   }
 
   template<typename T, bool is_vec>
   struct size_of_helper {
-    static size_t size_of(const T& x) {
+    static size_t size_of(const T& /*x*/) {
       return 1U;
     }
   };
@@ -167,89 +189,122 @@ namespace stan {
     return result;
   }
 
-  
-  template<typename T, 
-           bool is_vec = stan::is_vector<T>::value>
+  // ****************** additions for new VV *************************
+  template <typename T>
+  struct scalar_type<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > {
+    typedef typename scalar_type<T>::type type;
+  };
+
+  template <typename T>
+  struct scalar_type<T*> {
+    typedef typename scalar_type<T>::type type;
+  };
+
+
+  // handles scalar, eigen vec, eigen row vec, std vec
+  template <typename T>
+  struct is_vector_like {
+    enum { value = stan::is_vector<T>::value };  
+  };
+  template <typename T>
+  struct is_vector_like<T*> {
+    enum { value = true };
+  };
+  // handles const
+  template <typename T>
+  struct is_vector_like<const T> {
+    enum { value = stan::is_vector_like<T>::value };  
+  };
+  // handles eigen matrix
+  template <typename T>
+  struct is_vector_like<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > {
+    enum { value = true };
+  };
+
+
+  template <typename T,
+            bool is_array = stan::is_vector_like<T>::value>
   class VectorView {
-  private:
-    T* x_;
-  public:
-    VectorView(T& x) : x_(&x) { }
-    typename scalar_type<T>::type& operator[](int /*i*/) {
-      return *x_;
+  public: 
+    typedef typename scalar_type<T>::type scalar_t;
+
+    VectorView(scalar_t& c) : x_(&c) { }
+
+    VectorView(std::vector<scalar_t>& v) : x_(&v[0]) { }
+
+    template <int R, int C>
+    VectorView(Eigen::Matrix<scalar_t,R,C>& m) : x_(&m(0)) { }
+
+    VectorView(scalar_t* x) : x_(x) { }
+
+    scalar_t& operator[](int i) {
+      if (is_array) return x_[i];
+      else return x_[0];
     }
-  };
-  
-  template<typename T>
-  class VectorView<T*,false> {
   private:
-    T* x_;
-  public:
-    VectorView(T* x) : x_(x) { }
-    typename scalar_type<T>::type& operator[](int i) {
-      return *x_;
-    }
-  };
-  
-  template<typename T>
-  class VectorView<T,true> {
-  private:
-    T* x_;
-  public:
-    VectorView(T& x) : x_(&x) { }
-    typename scalar_type<T>::type& operator[](int i) {
-      return (*x_)[i];
-    }
-  };
-  
-  template<typename T>
-  class VectorView<T*,true> {
-  private:
-    T* x_;
-  public:
-    VectorView(T* x) : x_(x) { }
-    typename scalar_type<T>::type& operator[](int i) {
-      return x_[i];
-    }
+    scalar_t* x_;
   };
 
-  template<typename T>
-  class VectorView<const T,true> {
-  private:
-    const T* x_;
+  template <typename T, bool is_array>
+  class VectorView<const T, is_array> {
   public:
-    VectorView(const T& x) : x_(&x) { }
-    typename scalar_type<T>::type operator[](int i) {
-      return (*x_)[i];
+    typedef typename scalar_type<T>::type scalar_t;
+
+    VectorView(const scalar_t& c) : x_(&c) { }
+
+    VectorView(const scalar_t* x) : x_(x) { }
+
+    VectorView(const std::vector<scalar_t>& v) : x_(&v[0]) { }
+
+    template <int R, int C>
+    VectorView(const Eigen::Matrix<scalar_t,R,C>& m) : x_(&m(0)) { }
+
+    const scalar_t operator[](int i) const {
+      if (is_array) return x_[i];
+      else return x_[0];
     }
+  private:
+    const scalar_t* x_;
   };
 
-  template<bool used, typename T = double, bool is_vec = stan::is_vector<T>::value>
+  // simplify to hold value in common case where it's more efficient
+  template <>
+  class VectorView<const double, false> {
+  public:
+    VectorView(double x) : x_(x) { }
+    double operator[](int /* i */)  const {
+      return x_;
+    }
+  private:
+    const double x_;
+  };
+
+  template<bool used, bool is_vec>
   class DoubleVectorView {
   public:
-    DoubleVectorView(const size_t /* n */) { }
+    DoubleVectorView(size_t /* n */) { }
     double& operator[](size_t /* i */) {
       throw std::runtime_error("used is false. this should never be called");
     }
   };
 
-  template<typename T>
-  class DoubleVectorView<true, T, false> {
+  template<>
+  class DoubleVectorView<true, false> {
   private:
     double x_;
   public:
-    DoubleVectorView(const size_t /* n */) : x_(0.0) { }
+    DoubleVectorView(size_t /* n */) : x_(0.0) { }
     double& operator[](size_t /* i */) {
       return x_;
     }
   };
 
-  template<typename T>
-  class DoubleVectorView<true, T, true> {
+  template<>
+  class DoubleVectorView<true, true> {
   private:
     std::vector<double> x_;
   public:
-    DoubleVectorView(const size_t n) : x_(n) { }
+    DoubleVectorView(size_t n) : x_(n) { }
     double& operator[](size_t i) {
       return x_[i];
     }
@@ -275,6 +330,70 @@ namespace stan {
                                        typename scalar_type<T6>::type>::type
       type;
     };
+
+
+  template <typename T>
+  struct is_fvar {
+    enum { value = false };
+  };
+  template <typename T>
+  struct is_fvar<stan::agrad::fvar<T> > {
+    enum { value = true };
+  };
+
+
+  template <typename T>
+  struct is_var {
+    enum { value = false };
+  };
+  template <>
+  struct is_var<stan::agrad::var> {
+    enum { value = true };
+  };
+
+
+
+  // FIXME:  pull out scalar types
+
+  /**
+   * Metaprogram to calculate the base scalar return type resulting
+   * from promoting all the scalar types of the template parameters.
+   */
+    template <typename T1, 
+              typename T2 = double, 
+              typename T3 = double, 
+              typename T4 = double, 
+              typename T5 = double, 
+              typename T6 = double>
+    struct contains_fvar {
+      enum {
+        value = is_fvar<typename scalar_type<T1>::type>::value
+        || is_fvar<typename scalar_type<T2>::type>::value
+        || is_fvar<typename scalar_type<T3>::type>::value
+        || is_fvar<typename scalar_type<T4>::type>::value
+        || is_fvar<typename scalar_type<T5>::type>::value
+        || is_fvar<typename scalar_type<T6>::type>::value
+      };
+    };
+
+
+    template <typename T1, 
+              typename T2 = double, 
+              typename T3 = double, 
+              typename T4 = double, 
+              typename T5 = double, 
+              typename T6 = double>
+    struct is_var_or_arithmetic {
+      enum {
+        value = (is_var<typename scalar_type<T1>::type>::value || boost::is_arithmetic<typename scalar_type<T1>::type>::value)
+        && (is_var<typename scalar_type<T2>::type>::value || boost::is_arithmetic<typename scalar_type<T2>::type>::value)
+        && (is_var<typename scalar_type<T3>::type>::value || boost::is_arithmetic<typename scalar_type<T3>::type>::value)
+        && (is_var<typename scalar_type<T4>::type>::value || boost::is_arithmetic<typename scalar_type<T4>::type>::value)
+        && (is_var<typename scalar_type<T5>::type>::value || boost::is_arithmetic<typename scalar_type<T5>::type>::value)
+        && (is_var<typename scalar_type<T6>::type>::value || boost::is_arithmetic<typename scalar_type<T6>::type>::value)
+      };
+    };
+
 
 
 

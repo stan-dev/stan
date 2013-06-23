@@ -1,9 +1,6 @@
 #include <gtest/gtest.h>
 #include <test/agrad/distributions/expect_eq_diffs.hpp>
 #include <stan/prob/distributions/multivariate/continuous/multi_normal.hpp>
-#include <stan/agrad/agrad.hpp>
-#include <stan/meta/traits.hpp>
-#include <stan/agrad/matrix.hpp>
 
 using Eigen::Dynamic;
 using Eigen::Matrix;
@@ -16,6 +13,11 @@ void expect_propto(T_y y1, T_loc mu1, T_scale sigma1,
                   stan::prob::multi_normal_log<false>(y2,mu2,sigma2),
                   stan::prob::multi_normal_log<true>(y1,mu1,sigma1),
                   stan::prob::multi_normal_log<true>(y2,mu2,sigma2),
+                  message);
+  expect_eq_diffs(stan::prob::multi_normal_prec_log<false>(y1,mu1,sigma1),
+                  stan::prob::multi_normal_prec_log<false>(y2,mu2,sigma2),
+                  stan::prob::multi_normal_prec_log<true>(y1,mu1,sigma1),
+                  stan::prob::multi_normal_prec_log<true>(y2,mu2,sigma2),
                   message);
 }
 

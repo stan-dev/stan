@@ -70,8 +70,14 @@ $p(\theta|y;x)$.
 
 For continuous parameters, \Stan uses Hamiltonian Monte Carlo (\HMC)
 sampling \citep{Duane:1987, Neal:1994, Neal:2011}, a form of Markov chain Monte
-Carlo (\MCMC) sampling \citep{Metropolis:1953}.  \Stan 1.0 can only sample discrete parameters
-on which no other parameters depend, such as simulated values.
+Carlo (\MCMC) sampling \citep{Metropolis:1953}.  \Stan 1.0 does not do
+discrete sampling.%
+%
+\footnote{Plans are in place to add full discrete sampling in \Stan
+  2.0.  An intermediate step will be to allow forward sampling of
+  discrete variables in the generated quantities block for predictive
+  modeling and model checking.}
+%
 \refchapter{mixture-modeling} discusses how finite discrete parameters
 can be summed out of models.
 
@@ -94,25 +100,34 @@ Standard \HMC involves three ``tuning'' parameters to which its
 behavior is quite sensitive.  \Stan's samplers allow these parameters
 to be set by hand or set automatically without user intervention.
 
-The first tuning parameter is a mass matrix for the fictional
-particle.  \Stan can be configured to use a unit mass matrix or to
-estimate a diagonal mass matrix during warmup; in the future, it will
-also support a user-defined diagonal mass matrix.  Estimating the mass
-matrix normalizes the scale of each element $\theta_k$ of the unknown
-variable sequence $\theta$.
-
-The other two tuning parameters set the temporal step size of the
+The first two tuning parameters set the temporal step size of the
 discretization of the Hamiltonian and the total number of steps taken
-per iteration.  \Stan can be configured with a user-specified step
-size or it can estimate an optimal step size during warmup using dual
-averaging \citep{Nesterov:2009, Hoffman-Gelman:2012}.  In either case, additional
-randomization may be applied to draw the step size from an interval of
-possible step sizes \citep{Neal:2011}.
+per iteration (with their product determining total simulation time).
+\Stan can be configured with a user-specified step size or it can
+estimate an optimal step size during warmup using dual averaging
+\citep{Nesterov:2009, Hoffman-Gelman:2012}.  In either case,
+additional randomization may be applied to draw the step size from an
+interval of possible step sizes \citep{Neal:2011}.
 
 \Stan can be set to use a specified number of steps, or it can
 automatically adapt the number of steps during sampling using the
-no-U-turn (\NUTS) sampler \citep{Hoffman-Gelman:2012}.  
+No-U-Turn (\NUTS) sampler \citep{Hoffman-Gelman:2012}.  
 
+The third tuning parameter is a mass matrix for the fictional
+particle.  \Stan can be configured to estimate a diagonal mass matrix
+or a full mass matrix during warmup; Stan will support user-specified
+mass matrices in the future.  Estimating a diagonal mass matrix
+normalizes the scale of each element $\theta_k$ of the unknown
+variable sequence $\theta$, whereas estimating a full mass matrix
+accounts for both scaling and rotation,%
+%
+\footnote{These estimated mass matrices are global, meaning they are
+  applied to every point in the parameter space being sampled.
+  Riemann-manifold HMC generalizes this to allow the curvature implied
+  by the mass matrix to vary by position.}
+%
+but is more memory and computation intensive per leapfrog step due to
+the underlying matrix operations.
 
 \section{Convergence Monitoring and Effective Sample Size}
 
@@ -199,40 +214,41 @@ directory containing the file named \code{makefile}).
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-% cd <stan-home>
+> cd <stan-home>
 \end{Verbatim}
 \end{quote}
 %
-Then make the library with the folloiwng make command.
+Then make the library with the following make command
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-% make bin/libstan.a
+> make bin/libstan.a
 \end{Verbatim}
 \end{quote}
 %
-and then make the model parser and code generator with the following
-call on Unix-like systems (i.e., linux, Mac):
+then make the model parser and code generator with the following call
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-% make bin/stanc
-\end{Verbatim}
-\end{quote}
-%
-The following variant is required for Windows:
-%
-\begin{quote}
-\begin{Verbatim}[fontshape=sl]
-% make bin/stanc.exe
+> make bin/stanc
 \end{Verbatim}
 \end{quote}
 %
 \emph{Warning}: The \code{make} program may take 10+ minutes and
-consume 2+GB of memory to build \code{libstan} and \code{stanc}.
+consume 2+ GB of memory to build \code{libstan.a} and \code{stanc}.
 Compiler warnings, including \code{uname: not found}, may be safely ignored.
+ 
+Finally, make the Stan output summary program with the following
+make command
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> make bin/print
+\end{Verbatim}
+\end{quote}
+%
 
-Building \code{libstan.a} and \code{bin/stanc} need only be done once.
+Building \code{libstan.a}, \code{bin/stanc}, and \code{bin/print} need only be done once.
 
 \section{Compiling and Executing a Model}
 
@@ -269,21 +285,72 @@ model {
 %
 The model assumes the binary observed data \code{y[1],...,y[N]}
 are i.i.d.\ with Bernoulli chance-of-success \code{theta}.  The
-prior on \code{theta} is \code{beta(1,1)} (i.e., uniform).%
+prior on \code{theta} is \code{beta(1,1)} (i.e., uniform).
+
+\subsubsection{Implicit Uniform Priors}
+
+If no prior is specified for a parameter, it is implicitly given a
+uniform prior on its support.  For parameters such as \code{theta} in
+the example, which are constrained to fall between 0 and 1, this
+produces a proper uniform distribution on the support of \code{theta}.
+Because $\distro{Beta}(1,1)$ is the uniform distribution, the
+following sampling statement can be eliminated from the model without
+changing the log probability calculation.
 %
-\footnote{If no prior were specified in the model block, the
-constraints on \code{theta} ensure it falls between 0 and 1,
-providing \code{theta} an implicit uniform prior.  For parameters
-with no prior specified and unbounded support, the result is an
-improper prior.  Stan accepts improper priors, but posteriors must
-be proper in order for sampling to succeed.}
+\begin{quote}
+\begin{Verbatim}
+  theta ~ beta(1,1);
+\end{Verbatim}
+\end{quote}
+
+For parameters with unbounded support, the implicit uniform prior is
+improper.  Stan allows improper priors to be specified in models, but
+posteriors must be proper in order for sampling to succeed.
+
+
+\subsubsection{Constraints on Parameters}
+
+The variable \code{theta} is defined with lower and upper bounds,
+which constrain its value.  Parameters with constrained support should
+always specify appropriate constraints in the parameter declaration;
+if the constraints are absent, sampling will either slow down or stop
+altogether based on whether the initial values satisfy the constraints.
+
+\subsubsection{Vectorizing Sampling Statements}
+
+Iterations of the model will be faster if the loop over sampling
+statements is vectorized, replacing
+%
+\begin{quote}
+\begin{Verbatim}
+  for (n in 1:N) 
+    y[n] ~ bernoulli(theta);
+\end{Verbatim}
+\end{quote}
+%
+with the equivalent vectorized form,
+%
+\begin{quote}
+\begin{Verbatim}
+  y ~ bernoulli(theta);
+\end{Verbatim}
+\end{quote}
+%
+Performance gains from vectorization are not because loops are slow in
+Stan, but because calls to sampling statements are slow.
+Vectorization allows multiple calls to a sampling statement to be
+replaced with a single call that can share common calculations for the
+log probability function, its gradients, and error checking.  For more
+tips on optimizing the performance of Stan models, see
+\refchapter{optimization}.
+
 
 \subsection{Data Set}
 
-A data set of $\mbox{\code{N}}=10$ observations is availabe in the file
+A data set of $\mbox{\code{N}}=10$ observations is available in the file
 %
 \begin{quote}
-\nolinkurl{src/models/basic_estimators/bernoulli.Rdata}
+\nolinkurl{src/models/basic_estimators/bernoulli.data.R}
 \end{quote}
 %
 The content of the file is as follows.
@@ -318,23 +385,13 @@ a subdirectory called \code{src/}.
 \end{Verbatim}
 \end{quote}
 %
-Then issue the following command for Unix-like (Linux or Mac)
-operating systems:
+Then issue the following command:
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
 > make src/models/basic_estimators/bernoulli 
 \end{Verbatim}
 \end{quote}
-%
-and the following command in Windows:
-%
-\begin{quote}
-\begin{Verbatim}[fontshape=sl]
-> make src/models/basic_estimators/bernoulli.exe
-\end{Verbatim}
-\end{quote}
-%
 And yes, those are forward slashes in the make target for Windows.
 
 The \code{make} command may be applied to files in locations
@@ -360,7 +417,7 @@ To execute the model under Linux or Mac, use
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-> ./bernoulli --data=bernoulli.Rdata
+> ./bernoulli --data=bernoulli.data.R
 \end{Verbatim}
 \end{quote}
 %
@@ -373,7 +430,7 @@ resulting in the following command.
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-> bernoulli --data=bernoulli.Rdata
+> bernoulli --data=bernoulli.data.R
 \end{Verbatim}
 \end{quote}
 %
@@ -384,7 +441,7 @@ which shows up on the terminal as follows.
 \begin{quote}
 \begin{Verbatim}
 STAN SAMPLING COMMAND
-data = bernoulli.Rdata
+data = bernoulli.data.R
 init = random initialization
 init tries = 1
 samples = samples.csv
@@ -396,6 +453,7 @@ iter = 2000
 warmup = 1000
 thin = 1 (default)
 equal_step_sizes = 0
+nondiag_mass = 0
 leapfrog_steps = -1
 max_treedepth = 10
 epsilon = -1
@@ -424,7 +482,7 @@ Iteration: 2000 / 2000 [100%]  (Sampling)
 
 Each execution of the model results in the samples from a single
 Markov chain being written to a file in comma-separated value (CSV) format.
-The default name of the output file is \nolinkurl{samples.csv}.</p>
+The default name of the output file is \nolinkurl{samples.csv}.
 
 The first part of the output file just repeats the parameters
 as comments (i.e., lines beginning with the pound sign (\Verb|#|)).
@@ -435,9 +493,9 @@ as comments (i.e., lines beginning with the pound sign (\Verb|#|)).
 # Samples Generated by Stan
 #
 # stan_version_major=1
-# stan_version_minor=0
+# stan_version_minor=2
 # stan_version_patch=0
-# data=bernoulli.Rdata
+# data=bernoulli.data.R
 # init=random initialization
 # append_samples=0
 # save_warmup=0
@@ -495,7 +553,7 @@ The rest of the file contains lines corresponding to the
 samples from each iteration.%
 %
 \footnote{There are repeated entries due to the Metropolis accept step
-in the no-U-turn sampling algorithm.}
+in the No-U-Turn sampling algorithm.}
 %
 %
 \begin{quote}
@@ -522,6 +580,72 @@ in the no-U-turn sampling algorithm.}
 \end{quote}
 %
 This ends the output.  
+
+\subsection{Summarizing Output}
+
+The command-line program \code{bin/print} will display summary
+information about the run (for more information, see
+\refchapter{print-command}). To run \code{print} on the output file
+generated for \code{bernoulli} on Linux or Mac use
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> <stan-home>/bin/print samples.csv
+\end{Verbatim}
+\end{quote}
+%
+For Windows use backslashes for the executable
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> <stan-home>\bin\print samples.csv
+\end{Verbatim}
+\end{quote}
+%
+The output of the command will display information about the run
+followed by information for each parameter and generated quantity. For
+\code{bernoulli}, we ran 1 chain and saved 1000 iterations. The information is
+echoed to the standard output:
+%
+\begin{quote}
+{\small
+\begin{Verbatim}[fontshape=sl]
+Inference for Stan model:
+1 chains: each with iter=(1000); warmup=(0); thin=(1); 
+1000 iterations saved.
+
+       mean se_mean   sd 2.5%  25%  50%  75% 97.5% n_eff Rhat
+theta   0.2     0.0  0.1  0.1  0.2  0.2  0.3   0.5   478  1.0
+
+Samples were drawn using mcmc::nuts_diag.
+For each parameter, n_eff is a crude measure of effective 
+sample size, and Rhat is the potential scale reduction factor 
+on split chains (at convergence, Rhat=1).
+\end{Verbatim}
+}
+\end{quote}
+%
+In addition to the general information about the runs, \code{print}
+displays summary statistics for each parameter and generated
+quantity.
+
+In the \code{bernoulli} model, there is a single parameter,
+\code{theta}. The mean, standard error of the mean, standard
+deviation, the 2.5\%, 25\%, 50\%, 75\%, and 97.5\% quantiles,
+number of effective samples, and $\hat{R}$ value are displayed
+These quantities and their uses are described in detail in 
+\refchapter{mcmc}.
+
+The command \code{bin/print} can be called with more than one csv file
+by separating filenames with spaces. It will also take wildcards in
+specifying filenames. A typical usage of Stan from the command line
+would first create one or more Markov chains by calling the model
+executable, typically in parallel, writing the output CSV file for
+each into its own directory.  Next, after all of the processes are
+finished, the results would be analyzed using \code{print} to assess
+convergence and inspect the means and quantiles of the fitted
+variables.  Additionally, downstream inferences may be performed using
+the samples (e.g., to make decisions or predictions for unseen data).
 
 \subsection{Configuring Command-Line Options}
 
@@ -554,15 +678,23 @@ file named \code{makefile}).
 \begin{Verbatim}[fontshape=sl]
 > cd <stan-home>
 > make O=0 test-unit
+> make O=0 test-distributions
+> make O=3 test-models
 \end{Verbatim}
 \end{quote}
 %
-That's the letter 'O' followed by an equal sign followed by the digit
-'0', which sets the tests to run at the lowest optimization level.
+Warnings can be safely ignored if the tests complete without a
+\code{FAIL} error.
 
-\emph{Warning}: The \code{make} program may take 20+ minutes 
-and consume 3+GB of memory to run the unit tests.  Warnings can
-be safely ignored if the tests complete without a \code{FAIL} error.
+Code optimization is specified by the letter `O' followed by an equal
+sign followed by the digit `0' for no optimization and `3' for more
+optimization; optimization slows down compilation of the executable
+but reduces its execution time.
+
+\emph{Warning}: The unit test can take 30+ minutes and consume 3+ GB
+of memory with the default compiler, \code{g++}.  It is faster
+to run the Clang compiler (option \code{CC=clang++}), and to run in
+multiple threads (option \code{-j4} for four threads).
 
 
 % \section{User-Defined Distributions and Functions}

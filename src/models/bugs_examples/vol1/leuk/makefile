@@ -1,13 +1,15 @@
 STAN_HOME = ../../../../..
 PGM = leuk
 CXX = clang++ 
-CPPFLAGS = -I $(STAN_HOME)/lib/boost_1.51.0 -I$(STAN_HOME)/lib/eigen_3.1.1 -I$(STAN_HOME)/lib/eigen_3.1.1/unsupported  -I $(STAN_HOME)/src
+BOOSTPATH = $(shell find $(STAN_HOME)/lib -path '*lib/boost_*' -regex '.*lib\/boost_[^/]*')
+EIGENPATH = $(shell find $(STAN_HOME)/lib -path '*lib/eigen_*' -regex '.*lib\/eigen_[^/]*')
+CPPFLAGS = -I $(BOOSTPATH)  -I$(EIGENPATH) -I $(STAN_HOME)/src
 LIBFLAGS = -L$(STAN_HOME)/bin -lstan 
 
 $(PGM) :
 	$(STAN_HOME)/bin/stanc  --name=$(PGM)  $(PGM).stan
 	$(CXX)   -O3  -DNDEBUG $(CPPFLAGS) $(PGM).cpp -o $(PGM) $(LIBFLAGS) 
-	./$(PGM) --data=$(PGM).Rdata # --iters=2000
+	./$(PGM) --data=$(PGM).data.R # --iters=2000
 
 clean :
 	rm -rf $(PGM).cpp samples.csv $(PGM) 

@@ -85,7 +85,7 @@ parameters.
 
 If the user specifies the number of leapfrog steps (i.e., chooses to
 use standard \HMC), that number of leapfrog steps are simulated.  If
-the user has not specified the number of leapfrog steps, the no-U-turn
+the user has not specified the number of leapfrog steps, the No-U-Turn
 sampler (\NUTS) will determine the number of leapfrog steps adaptively
 \citep{Hoffman-Gelman:2011}.
 
@@ -250,10 +250,11 @@ real values), and \code{matrix} (of real values).
 \subsection{Constrained Data Types}
 
 Integer or real types may be constrained with lower bounds, upper
-bounds, or both.  There are three constrained vector data types,
-\code{simplex} for unit simplexes and \code{ordered} for ordered
-vectors of scalars and \code{positive\_ordered} for vectors of positive
-ordered scalars.  There are two specialized matrix data types,
+bounds, or both.  There are four constrained vector data types,
+\code{simplex} for unit simplexes, \code{unit\_vector} for unit-length
+vectors, \code{ordered} for ordered vectors of scalars and
+\code{positive\_ordered} for vectors of positive ordered scalars.
+There are two specialized matrix data types,
 \code{corr\_matrix} and \code{cov\_matrix}, for correlation matrices
 (symmetric, positive definite, unit diagonal) and covariance matrices
 (symmetric, positive definite).
@@ -422,6 +423,14 @@ real<lower=-1,upper=1> rho;
 \end{quote}
 %
 
+\subsubsection{Infinite Constraints}
+
+Lower bounds that are negative infinity or upper bounds that are
+positive infinity are ignored.  Stan provides constants
+\code{positive\_infinity()} and \code{negative\_infinity()} which may
+be used for this purpose, or they may be read as data in the dump
+format.  
+
 
 \subsection{Expressions as Bounds}
 
@@ -537,6 +546,27 @@ simplexes, this is only done up to a statically specified accuracy
 threshold $\epsilon$ to account for errors arising from floating-point
 imprecision.
 
+\subsection{Unit Vectors}
+
+A unit vector is a vector with a norm of one.  For instance,
+$(0.5,0.5,0.5,0.5)^{\top}$ is a unit 4-vector.
+Unit vectors are sometimes used in directional statistics.
+Unit vectors are declared with their full
+dimensionality.  For instance, \code{theta} is declared to
+be a unit $5$-vector by
+%
+\begin{quote}
+\begin{Verbatim} 
+unit_vector[5] theta;
+\end{Verbatim}
+\end{quote}
+% 
+Unit vectors are implemented as vectors and may be assigned to other
+vectors and vice-versa.  Unit vector variables, like other constrained
+variables, are validated to ensure that they are indeed unit length; for
+unit vectors, this is only done up to a statically specified accuracy
+threshold $\epsilon$ to account for errors arising from floating-point
+imprecision.
 
 \subsection{Ordered Vectors}
 
@@ -664,7 +694,7 @@ cov_matrix[K] Omega;
 \end{Verbatim}
 \end{quote}
 % 
-declares \code{Omega} to be a $K \times K$ correlation matrix, where
+declares \code{Omega} to be a $K \times K$ covariance matrix, where
 $K$ is the value of the data variable \code{K}.  
 
 \subsection{Assigning Constrained Variables}
@@ -838,6 +868,70 @@ z <- y[3];  // z == w[5][4][3] == w[5,4,3]
 \end{quote}
 %
 
+
+\subsection{Arrays of Matrices and Vectors}
+
+Arrays of vectors and matrices are accessed in the same way as arrays
+of doubles.  Consider the following vector and scalar declarations.
+%
+\begin{quote}
+\begin{Verbatim}
+vector[5] a[4,3];
+vector[5] b[4];
+vector[5] c;
+real x;
+\end{Verbatim}
+\end{quote}
+%
+With these declarations, the following assignments are legal.
+%
+\begin{quote}
+\begin{Verbatim}
+b <- a[1];      // result is array of vectors
+c <- a[1,3];    // result is vector
+c <- b[3];      //   same result as above
+x <- a[1,3,5];  // result is scalar
+x <- b[3,5];    //   same result as above
+x <- c[5];      //   same result as above
+\end{Verbatim}
+\end{quote}
+%
+Row vectors and other derived vector types (simplex and ordered)
+behave the same way in terms of indexing.
+
+Consider the following matrix, vector and scalar declarations.
+%
+\begin{quote}
+\begin{Verbatim}
+matrix[6,5] d[4,3];
+matrix[6,5] e[4];
+matrix[6,5] f;
+row_vector[5] g;
+real x;
+\end{Verbatim}
+\end{quote}
+%
+With these declarations, the following definitions are legal.
+%
+\begin{quote}
+\begin{Verbatim}
+e <- d[1];        // result is array of matrices
+f <- d[1,3];      // result is matrix
+f <- e[3];        //   same result as above
+g <- d[1,3,2];    // result is row vector
+g <- e[3,2];      //   same result as above
+g <- f[2];        //   same result as above
+x <- d[4,3,5,2];  // result is scalar
+x <- e[3,5,2];    //   same result as above
+x <- f[5,2];      //   same result as above
+x <- g[2];        //   same result as above
+\end{Verbatim}
+\end{quote}
+%
+As shown, the result \code{f[2]} of supplying a single index to a
+matrix is the indexed row, here row 2 of matrix \code{f}.
+
+
 \section{Types versus Sizes}
 
 The size associated with a given variable is not part of its data
@@ -964,6 +1058,7 @@ any of the following.
 \code{real},
 \code{vector},
 \code{simplex},
+\code{unit\_vector},
 \code{ordered},
 \code{positive\_ordered},
 \code{row\_vector},
@@ -986,6 +1081,12 @@ Variable names will not conflict with the following block identifiers,
 nor will they conflict with the names of predefined functions or
 distributions.  Nevertheless, these names should be avoided for the
 sake of program clarity.
+
+Some variable names are reserved because they are used within
+Stan's \Cpp implementation.  These are
+\begin{quote}
+var.
+\end{quote}.
 
 Finally, variable names, including the names of models, should not
 conflict with any of the C++ keywords.
@@ -1175,35 +1276,73 @@ multiplied by a (column) vector, which produces a \code{real} value.
 
 \subsection{Operator Precedence and Associativity}\label{operator-precedence.section}
 
-The arithmetic operators have the following precedence and
-associativity.
+The precedence and associativity of operators, as well as built-in
+syntax such as array indexing and function application is given in
+tabular form in \reffigure{operator-precedence}.
 %
+\begin{figure}
 \begin{center}
 \begin{tabular}{c|ccl|l}
 {\it Op.} & {\it Prec.} & {\it Assoc.} & {\it
   Placement} & {\it Description}
 \\ \hline \hline
-\code{+} & 0 & left & binary infix & addition
+\code{||} & 9 & left & binary infix & logical or
+\\ \hline
+\Verb|&&| & 8 & left & binary infix & logical and
+\\ \hline
+\Verb|==| & 7 & left & binary infix & equality
 \\
-\code{-} & 0 & left & binary infix & subtraction
+\Verb|!=| & 7 & left & binary infix & inequality
 \\ \hline
-\code{*} & 1 & left & binary infix & multiplication
+\Verb|<| & 6 & left & binary infix & less than
 \\
-\code{/} & 1 & left & binary infix & (right) division
-\\ \hline
-\Verb|\| & 1 & left & binary infix & left division
-\\ \hline
-\code{.*} & 1 & left & binary infix & elementwise multiplication
+\Verb|<=| & 6 & left & binary infix & less than or equal
 \\
-\code{./} & 1 & left & binary infix & elementwise division
+\Verb|>| & 6 & left & binary infix & greater than 
+\\
+\Verb|>=| & 6 & left & binary infix & greater than or equal
 \\ \hline
-\code{-} & 2 & n/a & unary prefix & negation
+\code{+} & 5 & left & binary infix & addition
+\\
+\code{-} & 5 & left & binary infix & subtraction
+\\ \hline
+\code{*} & 4 & left & binary infix & multiplication
+\\
+\code{/} & 4 & left & binary infix & (right) division
+\\ \hline
+\Verb|\| & 3 & left & binary infix & left division
+\\ \hline
+\code{.*} & 2 & left & binary infix & elementwise multiplication
+\\
+\code{./} & 2 & left & binary infix & elementwise division
+\\ \hline
+\code{!} & 1 & n/a & unary prefix & logical negation
+\\
+\code{-} & 1 & n/a & unary prefix & negation
 \\ 
-\code{+} & 2 & n/a & unary prefix & promotion (no-op in \Stan)
+\code{+} & 1 & n/a & unary prefix & promotion (no-op in \Stan)
 \\ \hline
-\code{'} & 3 & n/a & unary postfix & transposition
+\code{'} & 0 & n/a & unary postfix & transposition
+\\ \hline \hline
+\code{()} & 0 & n/a & prefix, wrap & function application
+\\
+\code{[]} & 0 & left & prefix, wrap & array, matrix indexing
 \end{tabular}
 \end{center}
+\caption{\it Stan's unary and binary operators, with their
+  precedences, associativities, place in an expression, and a
+  description.  The last two lines list the precedence of function
+  application and array, matrix, and vector indexing. The operators are
+  listed in order of precedence, from least tightly binded to most
+  tightly binding.  The full set of legal arguments and corresponding
+  result types are provided in the function documentation in
+  \refpart{built-in-functions} prefaced with \code{operator} (i.e.,
+  \code{operator*(int,int):int} indicates the application of the
+  multiplication operator to two integers, which returns an integer).
+  Parentheses may be used to group expressions explicitly rather than
+  relying on precedence and
+  associativity.}\label{operator-precedence.figure}
+\end{figure}
 %
 Other expression-forming operations, such as function application and
 subscripting bind more tightly than any of the arithmetic operations.  
@@ -1324,7 +1463,7 @@ functions.  For instance, the mathematical constants $\pi$ and $e$ are
 represented as nullary functions named \code{pi()} and \code{e()}.
 See \refsection{built-in-constants} for a list of built-in constants.
 
-\subsection{Type Promotion and Function Resolution}
+\subsection{Type Promotion and Function Resolution}\label{type-promotion.section}
 
 Because of integer to real type promotion, rules must be established
 for which function is called given a sequence of argument types.  The
@@ -1382,6 +1521,174 @@ If there is not a unique function requiring fewer promotions than all
 others, as with \code{bar(1,1)} given the two declarations above, 
 the \Stan compiler will flag the expression as illegal. 
 
+\subsection{Random-Number Generating Functions}
+
+For most of the distributions supported by Stan, there is a
+corresponding random-number generating function.  These random number
+generators are named by the distribution with the suffix \code{\_rng}.
+For example, a univariate normal random number can be generated by
+\code{normal\_rng(0,1)};  only the parameters of the distribution,
+here a location (0) and scale (1) are specified because the variate is
+generated.  
+
+\subsubsection{Random-Number Generators Restricted to Generated Quantities Block}
+
+The use of random-number generating functions is restricted to the
+generated quantities block; attempts to use them elsewhere will result
+in a parsing error with a diagnostic message.  
+
+This allows the random number generating functions to be used for
+simulation in general, and for Bayesian posterior predictive checking
+in particular. 
+
+\subsubsection{Posterior Predictive Checking}
+
+Posterior predictive checks typically use the parameters of the model
+to generate simulated data (at the individual and optionally at the
+group level for hierarchical models), which can then be compared
+informally using plots and formally by means of test statistics, to
+the actual data in order to assess the suitability of the model; see
+\citep[Chapter~6]{GelmanCarlinSternRubin:2003} for more information on
+posterior predictive checks.
+
+\section{Type Inference}
+
+Stan is strongly statically typed, meaning that the implementation
+type of an expression can be resolved at compile time.
+
+\subsection{Implementation Types}
+
+The primitive implementation types for Stan are 
+%
+\code{int},
+\code{real},
+\code{vector},
+\code{row\_vector}, and
+\code{matrix}.
+%
+Every basic declared type corresponds to a primitive type;  see
+\reffigure{primitive-type} for the mapping from types to their
+primitive types.
+%
+\begin{figure}
+\begin{center}
+\begin{tabular}{c|c}
+{\it Type} & {\it Primitive Type} \\ \hline \hline
+\code{int} & \code{int} \\
+\code{real} & \code{real} \\[6pt]
+\code{matrix} & \code{matrix} \\
+\code{cov\_matrix} & \code{matrix} \\
+\code{corr\_matrix} & \code{matrix} \\
+\end{tabular}
+\hspace{0.4in}
+\begin{tabular}{c|c}
+{\it Type} & {\it Primitive Type} \\ \hline \hline
+\code{vector} & \code{vector} \\
+\code{simplex} & \code{vector} \\
+\code{unit\_vector} & \code{vector} \\
+\code{ordered} & \code{vector} \\
+\code{positive\_ordered} & \code{vector} \\[6pt]
+\code{row\_vector} & \code{row\_vector}
+\end{tabular}
+\end{center}
+\caption{\it The table shows the variable declaration types of Stan
+  and their corresponding primitive implementation type.  Stan
+  functions, operators and probability functions have argument and
+  result types declared in terms of primitive types.
+}\label{primitive-type.figure}
+\end{figure}
+%
+A full implementation type consists of a primitive implementation type
+and an integer array dimensionality greater than or equal to zero.
+These will be written to emphasize their array-like nature.  For
+example, \code{int[]} has an array dimensionality of 1, \code{int} an
+array dimensionality of 0, and \code{int[,,]} an array dimensionality
+of 3. The implementation type \code{matrix[,,]} has a total of five
+dimensions and takes up to five indices, three from the array and two
+from the matrix.  
+
+Recall that the array dimensions come before the matrix or vector
+dimensions in an expression such as the following declaration of a
+three-dimensional array of matrices.
+%
+\begin{quote}
+\begin{Verbatim}
+matrix[M,N] a[I,J,K];
+\end{Verbatim}
+\end{quote}
+%
+The matrix \code{a} is indexed as \code{a[i,j,k,m,n]} with the array
+indices first, followed by the matrix indices, with \code{a[i,j,k]}
+being a matrix and \code{a[i,j,k,m]} being a row vector.
+
+\subsection{Type Inference Rules}
+
+Stan's type inference rules define the implementation type of an
+expression based on a background set of variable declarations.  The
+rules work bottom up from primitive literal and variable expressions
+to complex expressions.
+
+\subsubsection{Literals}
+
+An integer literal expression such as \code{42} is of type \code{int}.
+Real literals such as \code{42.0} are of type \code{real}.
+
+\subsubsection{Variables}
+
+The type of a variable declared locally or in a previous block is
+determined by its declaration.  The type of a loop variable is
+\code{int}.  
+
+There is always a unique declaration for each variable because Stan
+prohibits the redeclaration of an already-declared variables.%
+%
+\footnote{Languages such as \Cpp and R allow the declaration of a
+  variable of a given name in a narrower scope to hide (take
+  precedence over for evaluation) a variable defined in a containing
+  scope.  Stan will have to introduce this behavior eventually for
+  user-defined functions written in Stan.}
+
+\subsubsection{Indexing}
+
+If \code{x} is an expression of total dimensionality greater than or
+equal to $N$, then the type of expression \code{e[i1,...,iN]} is the
+same as that of \code{e[i1]...[iN]}, so it suffices to define the type
+of a singly-indexed function.  Suppose \code{e} is an expression and
+\code{i} is an expression of primitive type \code{int}.  Then
+%
+\begin{itemize}
+\item if \code{e} is an expression of array dimensionality $K > 0$,
+  then \code{e[i]} has array dimensionality $K-1$ and the same
+  primitive implementation type as \code{e},
+%
+\item if \code{e} has implementation type \code{vector} or
+  \code{row\_vector} of array dimensionality 0, then \code{e[i]} has
+  implementation type \code{real}, and
+%
+\item if \code{e} has implementation type \code{matrix}, then
+  \code{e[i]} has type \code{row\_vector}.
+\end{itemize}
+
+\subsubsection{Function Application}
+
+If \code{f} is the name of a function and \code{e1,...,eN} are
+expressions for $N \geq 0$, then \code{f(e1,...,eN)} is an expression
+whose type is determined by the return type in the function signature
+for \code{f} given \code{e1} through \code{eN}.  Recall that a
+function signature is a declaration of the argument types and the
+result type.  
+
+In looking up functions, binary operators like \code{real~*~real} are
+defined as \code{operator*(real,real)} in the documentation and index.
+
+In matching a function definition, arguments of type \code{int} may be
+promoted to type \code{real} if necessary (see \refsection{type-promotion} for an
+exact specification of Stan's integer-to-real type-promotion rule).
+
+In general, matrix operations return the lowest inferrable type.  For
+example, \code{row\_vector~*~vector} returns a value of type
+\code{real}, which is declared in the function documentation and index
+as \code{real~operator*(row\_vector,vector)}.
 
 % \subsection{Extending \Stan with User-Defined Functions}
 
@@ -1533,7 +1840,8 @@ sampling statement.
 Executing such a statement does not perform any sampling.  In \Stan, a
 sampling statement is merely a notational convenience.  The above
 sampling statement could be written as an assignment statement using
-the reserved variable \code{lp\_\_} as
+the reserved variable \code{lp\_\_} as follows (see
+\refsection{incr-vs-sample} for a full explanation).
 %
 \begin{quote}
 \begin{Verbatim}
@@ -1541,6 +1849,7 @@ lp__ <- lp__ + normal_log(y,mu,sigma);
 \end{Verbatim}
 \end{quote}
 %
+
 The variable \code{lp\_\_} acts as an accumulator for the log
 (proportional) probability defined by the model as a function of the
 parameters and data.
@@ -1566,6 +1875,36 @@ lp__ <- lp__ + dist_log(ex0,ex1,...,exN);
 This will be well formed if and only if
 \code{dist\_log(ex0,ex1,...,exN)} is a well-formed function expression
 of type \code{real}.
+
+\subsection{Log Probability Increment vs.\ Sampling Statement}\label{incr-vs-sample.section}
+
+Although both lead to the same sampling behavior in Stan, there is one
+critical difference between using the sampling statement, as in
+%
+\begin{quote}
+\begin{Verbatim}
+y ~ normal(mu,sigma);
+\end{Verbatim}
+\end{quote}
+%
+and explicitly incrementing the log probability function, as in
+%
+\begin{quote}
+\begin{Verbatim}
+lp__ <- lp__ + normal_log(y,mu,sigma);
+\end{Verbatim}
+\end{quote}
+%
+The sampling statement drops all the terms in the log probability
+function that are constant, whereas the explicit call to
+\code{normal\_log} adds all of the terms in the definition of the log
+normal probability function, including all of the constant normalizing
+terms.  Therefore, the explicit increment form can be used to recreate
+the exact log probability values for the model.  Otherwise, the
+sampling statement form will be faster if any of the input expressions,
+\code{y}, \code{mu}, or \code{sigma}, involve only constants, data
+variables or transformed data variables. 
+
 
 \subsection{User-Transformed Variables}
 
@@ -1658,7 +1997,9 @@ y ~ normal(0,1) T[-0.5,];
 \end{quote}
 % 
 The truncation has the same effect as the following direct update to
-the accumulated log probability.
+the accumulated log probability (see \refsection{incr-vs-sample} for
+more information about the relation between incrementing \code{lp\_\_}
+and sampling).
 %
 \begin{quote}
 \begin{Verbatim}
@@ -1699,8 +2040,8 @@ appropriate cumulative distribution function defined.%
   computational challenges because they lack simple, analytic forms.
   More cumulative distributions will be added in future releases.}
 %
-\refchapter{discrete-prob-functions} and
-\refchapter{continuous-prob-functions} document the available discrete
+\refpart{discrete-prob-functions} and
+\refpart{continuous-prob-functions} document the available discrete
 and continuous cumulative distribution functions.
 
 For continuous distributions, truncation points must be expressions of
@@ -1836,19 +2177,73 @@ total <- sum(x);
 \end{Verbatim}
 \end{quote}
 
-% A variable inside (or outside) a loop may even be reassigned multiple
-% times, as in the following legal code.
-% %
-% \begin{quote}
-% \begin{Verbatim}
-% for (n in 1:100) {
-%     y <- y + y * epsilon;
-%     epsilon <- epsilon / 2.0;
-%     y <- y + y * epsilon;
-% }
-% \end{Verbatim}
-% \end{quote}
+A variable inside (or outside) a loop may even be reassigned multiple
+times, as in the following legal code.
 %
+\begin{quote}
+\begin{Verbatim}
+for (n in 1:100) {
+    y <- y + y * epsilon;
+    epsilon <- epsilon / 2.0;
+    y <- y + y * epsilon;
+}
+\end{Verbatim}
+\end{quote}
+
+\section{Conditional Statements}
+
+Stan supports full conditional statements using
+the same if-then-else syntax as \Cpp.  The general format is
+%
+\begin{quote}
+\begin{Verbatim}
+if (condition1)
+  statement1
+else if (condition2)
+  statement2
+...
+else if (conditionN-1)
+  statementN-1
+else
+  statementN
+\end{Verbatim}
+\end{quote}
+%
+There must be a single leading \code{if} clause, which may be followed
+by any number of \code{else if} clauses, all of which may be
+optionally followed by an \code{else} clause.  Each condition must be
+a real or integer value, with non-zero values interpreted as true and
+the zero value as false.
+
+The entire sequence of if-then-else clauses forms a single conditional
+statement for evaluation.  The conditions are evaluated in order
+until one of the conditions evaluates to a non-zero value, at which
+point its corresponding statement is executed and the conditional
+statement finishes execution.  If none of the conditions evaluates to
+a non-zero value and there is a final else clause, its statement is
+executed.  
+
+\section{While Statements}
+
+Stan supports standard while loops using the same syntax as \Cpp.  The
+general format is as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+while (condition)
+  body
+\end{Verbatim}
+\end{quote}
+%
+The condition must be an integer or real expression and the body can
+be any statement (or sequence of statements in curly braces).  
+
+Evaluation of a while loop starts by evaluating the condition.  If the
+condition evaluates to a false (zero) value, the execution of the loop
+terminates and control moves to the position after the loop.  If the
+loop's condition evaluates to a true (non-zero) value, the body statement is
+executed, then the whole loop is executed again.  Thus the loop is
+continually executed as long as the condition evaluates to a true value.
 
 
 \section{Statement Blocks and Local Variable Declarations}
@@ -2077,7 +2472,7 @@ u[2] = [9,16]
 
 \subsection{Print Frequency}
 
-Printing for a print statement happens every time it is exectued.  The
+Printing for a print statement happens every time it is executed.  The
 \code{transformed data} block is executed once per chain, the
 \code{transformed parameter} and \code{model} blocks once per leapfrog
 step, and the \code{generated quantities} block once per iteration.
@@ -2108,6 +2503,8 @@ program.  They are particularly useful for spotting problematic
 not-a-number of infinite values, both of which will be printed.
 
 
+
+
 \chapter{Program Blocks}\label{blocks.chapter}
 
 \noindent
@@ -2123,7 +2520,7 @@ may be used anywhere whitespace is allowed in a Stan program.
 \subsection{Line-Based Comments}
 
 In line-based comments, any text on a line following
-two forward slahses (\Verb|//|) or the pound sign (\Verb|#|)
+two forward slashes (\Verb|//|) or the pound sign (\Verb|#|)
 is ignored (along with the slashes or pound sign).  
 
 \subsection{Bracketed Comments}
@@ -2547,7 +2944,7 @@ involved for saving the parameter values corresponding to a sample.
 \subsection{Constraining Inverse Transform}
 
 Stan's two samplers, standard Hamiltonian Monte Carlo (\HMC) and the
-adaptive no-U-turn sampler (\NUTS), are most easily (and often most
+adaptive No-U-Turn sampler (\NUTS), are most easily (and often most
 effectively) implemented over a multivariate probability density that
 has support on all of $\reals^n$.  To do this, the parameters
 defined in the \code{parameters} block must be transformed so they are
@@ -2727,6 +3124,7 @@ var_type ::= 'int' range_constraint
            | 'ordered' '[' expression ']'
            | 'positive_ordered' '[' expression ']'
            | 'simplex' '[' expression ']'
+           | 'unit_vector' '[' expression ']'
            | 'row_vector' range_constraint '[' expression ']'
            | 'matrix' range_constraint '[' expression ',' expression ']'
            | 'corr_matrix' '[' expression ']'
@@ -2783,6 +3181,10 @@ function_literal ::= identifier
 statement 
 ::= lhs '<-' expression ';'
   | expression '~' identifier '(' ?expressions ')' ?truncation ';'
+  | 'if' '(' expression ')' statement
+    ('else' 'if' '(' expression ')' statement)*
+    ?('else' statement)
+  | 'while' '(' expression ')' statement
   | 'for' '(' identifier 'in' expression ':' expression ')' statement
   | '{' var_decl* statement+ '}'
   | 'print' '(' (expression | string_literal)* ')'
@@ -2818,9 +3220,15 @@ In the \Stan grammar provided in this chapter, the expression \code{1
   + 2 * 3} has two parses.  As described in
 \refsection{operator-precedence}, \Stan disambiguates between the
 meaning $1 + (2 \times 3)$ and the meaning $(1 + 2) \times 3$ based on
-operator precedences and associativities.
+operator precedences and associativities. 
 
 \subsection{Forms of Numbers}
 
 Integer literals longer than one digit may not start with 0 and real
 literals cannot consist of only a period or only an exponent.
+
+\subsection{Conditional Arguments}
+
+Both the conditional if-then-else statement and while-loop statement
+require the expression denoting the condition to be a primitive type,
+integer or real.

@@ -1,9 +1,10 @@
 #ifndef __STAN__IO__VAR_CONTEXT_HPP__
 #define __STAN__IO__VAR_CONTEXT_HPP__
 
-#include <cstddef>
-#include <vector>
+#include <sstream>
+#include <stdexcept>
 #include <string>
+#include <vector>
 
 namespace stan {
 
@@ -108,6 +109,153 @@ namespace stan {
        * @param names Vector to store the list of names in.
        */
       virtual void names_i(std::vector<std::string>& names) const = 0;
+
+      void add_vec(std::stringstream& msg,
+                   const std::vector<size_t>& dims) const {
+        msg << '(';
+        for (size_t i = 0; i < dims.size(); ++i) {
+          if (i > 0) msg << ',';
+          msg << dims[i];
+        }
+        msg << ')';
+      }
+
+      void validate_dims(const std::string& stage,
+                         const std::string& name,
+                         const std::string& base_type,
+                         const std::vector<size_t>& dims_declared) const {
+        bool is_int_type = base_type == "int";
+        if (is_int_type) {
+          if (!contains_i(name)) {
+            std::stringstream msg;
+            msg << (contains_r(name) 
+                    ? "int variable contained non-int values"
+                    : "variable does not exist" )
+                << "; processing stage=" << stage
+                << "; variable name=" << name
+                << "; base type=" << base_type;
+            throw std::runtime_error(msg.str());
+          }
+        } else {
+          if (!contains_r(name)) {
+            std::stringstream msg;
+            msg << "variable does not exist"
+                << "; processing stage=" << stage
+                << "; variable name=" << name
+                << "; base type=" << base_type;
+            throw std::runtime_error(msg.str());
+          }
+        }
+        std::vector<size_t> dims = dims_r(name);
+        if (dims.size() != dims_declared.size()) {
+          std::stringstream msg;
+          msg << "mismatch in number dimensions declared and found in context"
+              << "; processing stage=" << stage
+              << "; dims declared=";
+          add_vec(msg,dims_declared);
+          msg << "; dims found=";
+          add_vec(msg,dims);
+          throw std::runtime_error(msg.str());
+        }
+        for (size_t i = 0; i < dims.size(); ++i) {
+          if (dims_declared[i] != dims[i]) {
+            std::stringstream msg;
+            msg << "mismatch in dimension declared and found in context"
+                << "; processing stage=" << stage
+                << "; position="
+                << i
+                << "; dims declared=";
+            add_vec(msg,dims_declared);
+            msg << "; dims found=";
+            add_vec(msg,dims);
+            throw std::runtime_error(msg.str());
+          }
+        }
+      }
+
+      static std::vector<size_t> to_vec() {
+        return std::vector<size_t>();
+      }
+      static std::vector<size_t> to_vec(size_t n1) {
+        std::vector<size_t> v(1);
+        v[0] = n1;
+        return v;
+      }
+      static std::vector<size_t> to_vec(size_t n1, size_t n2) {
+        std::vector<size_t> v(2);
+        v[0] = n1;
+        v[1] = n2;
+        return v;
+      }
+      static std::vector<size_t> to_vec(size_t n1, size_t n2,
+                                        size_t n3) {
+        std::vector<size_t> v(3);
+        v[0] = n1;
+        v[1] = n2;
+        v[2] = n3;
+        return v;
+      }
+      static std::vector<size_t> to_vec(size_t n1, size_t n2,
+                                        size_t n3, size_t n4) {
+        std::vector<size_t> v(4);
+        v[0] = n1;
+        v[1] = n2;
+        v[2] = n3;
+        v[3] = n4;
+        return v;
+      }
+      static std::vector<size_t> to_vec(size_t n1, size_t n2,
+                                        size_t n3, size_t n4,
+                                        size_t n5) {
+        std::vector<size_t> v(5);
+        v[0] = n1;
+        v[1] = n2;
+        v[2] = n3;
+        v[3] = n4;
+        v[4] = n5;
+        return v;
+      }
+      static std::vector<size_t> to_vec(size_t n1, size_t n2,
+                                        size_t n3, size_t n4,
+                                        size_t n5, size_t n6) {
+        std::vector<size_t> v(6);
+        v[0] = n1;
+        v[1] = n2;
+        v[2] = n3;
+        v[3] = n4;
+        v[4] = n5;
+        v[5] = n6;
+        return v;
+      }
+      static std::vector<size_t> to_vec(size_t n1, size_t n2,
+                                        size_t n3, size_t n4,
+                                        size_t n5, size_t n6,
+                                        size_t n7) {
+        std::vector<size_t> v(7);
+        v[0] = n1;
+        v[1] = n2;
+        v[2] = n3;
+        v[3] = n4;
+        v[4] = n5;
+        v[5] = n6;
+        v[6] = n7;
+        return v;
+      }
+      static std::vector<size_t> to_vec(size_t n1, size_t n2,
+                                        size_t n3, size_t n4,
+                                        size_t n5, size_t n6,
+                                        size_t n7, size_t n8) {
+        std::vector<size_t> v(8);
+        v[0] = n1;
+        v[1] = n2;
+        v[2] = n3;
+        v[3] = n4;
+        v[4] = n5;
+        v[5] = n6;
+        v[6] = n7;
+        v[7] = n8;
+        return v;
+      }
     };
     
 

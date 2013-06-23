@@ -1,73 +1,45 @@
-#define _LOG_PROB_ weibull_log
 #include <stan/prob/distributions/univariate/continuous/weibull.hpp>
+#include <gtest/gtest.h>
+#include <boost/random/mersenne_twister.hpp>
+#include<boost/math/distributions.hpp>
 
-#include <test/prob/distributions/distribution_test_fixture.hpp>
-#include <test/prob/distributions/distribution_tests_3_params.hpp>
+TEST(ProbDistributionsWeibull, random) {
+  boost::random::mt19937 rng;
+  EXPECT_NO_THROW(stan::prob::weibull_rng(2.0,3.0,rng));
+}
 
-using std::vector;
-using std::numeric_limits;
+TEST(ProbDistributionsWeibull, chiSquareGoodnessFitTest) {
+  boost::random::mt19937 rng;
+  int N = 10000;
+  int K = boost::math::round(2 * std::pow(N, 0.4));
+  boost::math::weibull_distribution<>dist (2.0,1.0);
+  boost::math::chi_squared mydist(K-1);
 
-class ProbDistributionsWeibull : public DistributionTest {
-public:
-  void valid_values(vector<vector<double> >& parameters,
-		    vector<double>& log_prob) {
-    vector<double> param(3);
+  double loc[K - 1];
+  for(int i = 1; i < K; i++)
+    loc[i - 1] = quantile(dist, i * std::pow(K, -1.0));
 
-    param[0] = 2.0;                 // y
-    param[1] = 1.0;                 // alpha
-    param[2] = 1.0;                 // sigma
-    parameters.push_back(param);
-    log_prob.push_back(-2.0);       // expected log_prob
-
-    param[0] = 0.25;                // y
-    param[1] = 2.9;                 // alpha
-    param[2] = 1.8;                 // sigma
-    parameters.push_back(param);
-    log_prob.push_back(-3.277094);  // expected log_prob
-
-    param[0] = 3.9;                 // y
-    param[1] = 1.7;                 // alpha
-    param[2] = 0.25;                // sigma
-    parameters.push_back(param);
-    log_prob.push_back(-102.8962);  // expected log_prob
+  int count = 0;
+  int bin [K];
+  double expect [K];
+  for(int i = 0 ; i < K; i++) {
+    bin[i] = 0;
+    expect[i] = N / K;
   }
- 
-  void invalid_values(vector<size_t>& index, 
-		      vector<double>& value) {
-    // y
-    
-    // alpha
-    index.push_back(1U);
-    value.push_back(numeric_limits<double>::infinity());
 
-    index.push_back(1U);
-    value.push_back(-numeric_limits<double>::infinity());
+  while (count < N) {
+    double a = stan::prob::weibull_rng(2.0,1.0,rng);
+    int i = 0;
+    while (i < K-1 && a > loc[i]) 
+      ++i;
+    ++bin[i];
+    count++;
+   }
 
-    // sigma
-    index.push_back(2U);
-    value.push_back(0.0);
+  double chi = 0;
 
-    index.push_back(2U);
-    value.push_back(-1.0);
-  }
-};
+  for(int j = 0; j < K; j++)
+    chi += ((bin[j] - expect[j]) * (bin[j] - expect[j]) / expect[j]);
 
-INSTANTIATE_TYPED_TEST_CASE_P(ProbDistributionsWeibull,
-			      DistributionTestFixture,
-			      ProbDistributionsWeibull);
-
-TEST(ProbDistributionsWeibull,Cumulative) {
-  using stan::prob::weibull_cdf;
-  using std::numeric_limits;
-  EXPECT_FLOAT_EQ(0.86466472, weibull_cdf(2.0,1.0,1.0));
-  EXPECT_FLOAT_EQ(0.0032585711, weibull_cdf(0.25,2.9,1.8));
-  EXPECT_FLOAT_EQ(1.0, weibull_cdf(3.9,1.7,0.25));
-
-  // ??
-  EXPECT_FLOAT_EQ(0.0,
-                  weibull_cdf(-numeric_limits<double>::infinity(),
-                              1.0,1.0));
-  EXPECT_FLOAT_EQ(0.0, weibull_cdf(0.0,1.0,1.0));
-  EXPECT_FLOAT_EQ(1.0, weibull_cdf(numeric_limits<double>::infinity(),
-                                   1.0,1.0));
+  EXPECT_TRUE(chi < quantile(complement(mydist, 1e-6)));
 }

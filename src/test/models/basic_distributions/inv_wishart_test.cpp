@@ -23,12 +23,12 @@ public:
     return false;
   }
 
-  static size_t num_iterations() {
+  static int num_iterations() {
     return 10000U;
   }
 
-  static std::vector<size_t> skip_chains_test() {
-    std::vector<size_t> params_to_skip;
+  static std::vector<int> skip_chains_test() {
+    std::vector<int> params_to_skip;
     return params_to_skip;
   }
 
@@ -36,10 +36,10 @@ public:
     default_populate_chains();
   }
 
-  static std::vector<std::pair<size_t, double> >
+  static std::vector<std::pair<int, double> >
   get_expected_values() {
     using std::make_pair;
-    std::vector<std::pair<size_t, double> > expected_values;
+    std::vector<std::pair<int, double> > expected_values;
     
     expected_values.push_back(make_pair(0U, 2));  // W[1,1]
     expected_values.push_back(make_pair(1U, 0));  // W[1,2]
@@ -57,5 +57,5 @@ public:
 };
 
 INSTANTIATE_TYPED_TEST_CASE_P(Models_BasicDistributions_InvWishart,
-			      Model_Test_Fixture,
-			      Models_BasicDistributions_InvWishart);
+            Model_Test_Fixture,
+            Models_BasicDistributions_InvWishart);

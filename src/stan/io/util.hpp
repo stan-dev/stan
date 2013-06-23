@@ -16,9 +16,22 @@ namespace stan {
      * @return String representation of current UTC.
      */
     std::string utc_time_string() {
-      std::time_t rawtime = time(0);
-      std::tm *time = gmtime(&rawtime);
-      return std::string(asctime(time));
+      // FIXME:  use std::strftime
+
+      // original with asctime
+      // std::time_t rawtime = time(0);
+      // std::tm *time = gmtime(&rawtime);
+      // return std::string(asctime(time));
+
+      // new with strfitime
+      time_t rawtime;
+      std::time(&rawtime);
+
+      char cbuf[80];
+      std::strftime(cbuf,80,"%a %b %d %Y %H:%M:%S",
+                    std::localtime(&rawtime));
+
+      return std::string(cbuf);
     }
 
   }

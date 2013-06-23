@@ -1,5 +1,3 @@
-#include <string>
-#include <iostream>
 #include <stan/io/cmd_line.hpp>
 #include <gtest/gtest.h>
 

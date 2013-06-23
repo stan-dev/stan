@@ -47,3 +47,9 @@ model {
   for (i in 1:N)  
     cases[i] ~ poisson(exp(log(pyr[i]) + yaalpha[age[i]] + beta[year[i]]));
 } 
+
+generated quantities {
+  real logRR[K];
+  for (k in 1:K) 
+    logRR[k] <- beta[k] - beta[5];
+}

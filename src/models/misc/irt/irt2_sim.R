@@ -29,6 +29,6 @@ for (j in 1:J) {
   }
 }
 
-dump(c("J","K","N","jj","kk","y"), "irt2.Rdata");
+dump(c("J","K","N","jj","kk","y"), "irt2.data.R");
 
 

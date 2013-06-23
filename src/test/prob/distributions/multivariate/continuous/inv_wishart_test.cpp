@@ -1,27 +1,14 @@
 #include <gtest/gtest.h>
 #include <stan/prob/distributions/multivariate/continuous/inv_wishart.hpp>
+#include <boost/random/mersenne_twister.hpp>
+#include <boost/math/distributions.hpp>
+#include <boost/math/special_functions/digamma.hpp>
+#include <stan/math/matrix/determinant.hpp>
 
 using Eigen::Dynamic;
 using Eigen::Matrix;
 
-using boost::math::policies::policy;
-using boost::math::policies::evaluation_error;
-using boost::math::policies::domain_error;
-using boost::math::policies::overflow_error;
-using boost::math::policies::domain_error;
-using boost::math::policies::pole_error;
-using boost::math::policies::errno_on_error;
-
-typedef policy<
-  domain_error<errno_on_error>, 
-  pole_error<errno_on_error>,
-  overflow_error<errno_on_error>,
-  evaluation_error<errno_on_error> 
-  > errno_policy;
-
 using stan::prob::inv_wishart_log;
-
-
 
 TEST(ProbDistributionsInvWishart,InvWishart) {
   Matrix<double,Dynamic,Dynamic> Y(3,3);
@@ -84,51 +71,46 @@ TEST(ProbDistributionsInvWishart,DefaultPolicy) {
   Sigma.setIdentity();
   Y.resize(3,3);
   Y.setIdentity();
-  nu = 2;
+  nu = 3;
   EXPECT_NO_THROW(inv_wishart_log(Y, nu, Sigma));
-  nu = 1;
+  nu = 2;
   EXPECT_THROW(inv_wishart_log(Y, nu, Sigma), std::domain_error);
 }
-TEST(ProbDistributionsInvWishart,ErrnoPolicy) {
-  Matrix<double,Dynamic,Dynamic> Sigma;
-  Matrix<double,Dynamic,Dynamic> Y;
-  double nu;
-  double result;
-  
-  Sigma.resize(1,1);
-  Y.resize(1,1);
-  Sigma << 1;
-  Y << 1;
-  nu = 1;
-  result = inv_wishart_log(Y, nu, Sigma, errno_policy());
-  EXPECT_FALSE(std::isnan(result));
 
-  nu = 5;
-  Sigma.resize(2,1);
-  result = inv_wishart_log(Y, nu, Sigma, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
+TEST(ProbDistributionsInvWishart, random) {
+  boost::random::mt19937 rng;
 
-  nu = 5;
-  Sigma.resize(2,2);
-  Y.resize(2,1);
-  result = inv_wishart_log(Y, nu, Sigma, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
-  
-  nu = 5;
-  Sigma.resize(2,2);
-  Y.resize(3,3);
-  result = inv_wishart_log(Y, nu, Sigma, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
+  Matrix<double,Dynamic,Dynamic> sigma(3,3);
+  sigma << 9.0, -3.0, 0.0,
+    -3.0,  4.0, 0.0,
+    2.0, 1.0, 3.0;
+  EXPECT_NO_THROW(stan::prob::inv_wishart_rng(3.0, sigma,rng));
+}
 
-  Sigma.resize(3,3);
-  Sigma << 1,0,0, 0,1,0, 0,0,1;
-  Y.resize(3,3);
-  Y << 1,0,0, 0,1,0, 0,0,1;
-  nu = 2;
-  result = inv_wishart_log(Y, nu, Sigma, errno_policy());
-  EXPECT_FALSE(std::isnan(result));
-  
-  nu = 1;
-  result = inv_wishart_log(Y, nu, Sigma, errno_policy());
-  EXPECT_TRUE(std::isnan(result));
+TEST(ProbDistributionsInvWishart, chiSquareGoodnessFitTest) {
+  boost::random::mt19937 rng;
+  Matrix<double,Dynamic,Dynamic> sigma(3,3);
+  sigma << 9.0, -3.0, 0.0,
+    -3.0,  4.0, 0.0,
+    2.0, 1.0, 3.0;
+  int N = 10000;
+  boost::math::chi_squared mydist(1);
+
+  Matrix<double,Dynamic,Dynamic> siginv(3,3);
+  siginv = sigma.inverse();
+
+  int count = 0;
+  double avg = 0;
+  double expect = sigma.rows() * std::log(2.0) + std::log(stan::math::determinant(siginv)) + boost::math::digamma(5.0 / 2.0) + boost::math::digamma(4.0 / 2.0) + boost::math::digamma(3.0 / 2.0);
+
+  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> a(sigma.rows(),sigma.rows());
+  while (count < N) {
+    a = stan::prob::inv_wishart_rng(5.0, sigma, rng);
+    avg += std::log(stan::math::determinant(a)) / N;
+    count++;
+   }
+ 
+  double chi = (expect - avg) * (expect - avg) / expect;
+
+  EXPECT_TRUE(chi < quantile(complement(mydist, 1e-6)));
 }

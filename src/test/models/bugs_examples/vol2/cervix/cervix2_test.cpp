@@ -21,15 +21,15 @@ public:
   }
 
   static bool has_init() {
-    return false;
+    return true;
   }
 
-  static size_t num_iterations() {
+  static int num_iterations() {
     return iterations;
   }
 
-  static std::vector<size_t> skip_chains_test() {
-    std::vector<size_t> params_to_skip;
+  static std::vector<int> skip_chains_test() {
+    std::vector<int> params_to_skip;
     return params_to_skip;
   }
 
@@ -37,14 +37,28 @@ public:
     default_populate_chains();
   }
 
-  static std::vector<std::pair<size_t, double> >
+  static std::vector<std::pair<int, double> >
   get_expected_values() {
-    std::vector<std::pair<size_t, double> > expected_values;
+    using std::make_pair;
+    std::vector<std::pair<int, double> > expected_values;
+
+    expected_values.push_back(make_pair(chains->index("beta0C"), -0.921));
+
+    expected_values.push_back(make_pair(chains->index("gamma1"), 0.4389));
+    expected_values.push_back(make_pair(chains->index("gamma2"), 0.5964));
+
+    expected_values.push_back(make_pair(chains->index("phi[1,1]"), 0.318));  // phi[1,1]
+    expected_values.push_back(make_pair(chains->index("phi[1,2]"), 0.221));  // phi[1,2]
+    expected_values.push_back(make_pair(chains->index("phi[2,1]"), 0.5664)); // phi[2,1]
+    expected_values.push_back(make_pair(chains->index("phi[2,2]"), 0.7585)); // phi[2,2]
+
+    expected_values.push_back(make_pair(chains->index("q"), 0.4953));
+    
     return expected_values;
   }
 
 };
 
 INSTANTIATE_TYPED_TEST_CASE_P(Models_BugsExamples_Vol2_Cervix2,
-			      Model_Test_Fixture,
-			      Models_BugsExamples_Vol2_Cervix2);
+            Model_Test_Fixture,
+            Models_BugsExamples_Vol2_Cervix2);

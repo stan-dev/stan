@@ -1,61 +1,41 @@
-#define _LOG_PROB_ scaled_inv_chi_square_log
 #include <stan/prob/distributions/univariate/continuous/scaled_inv_chi_square.hpp>
+#include <gtest/gtest.h>
+#include <boost/random/mersenne_twister.hpp>
+#include<boost/math/distributions.hpp>
 
-#include <test/prob/distributions/distribution_test_fixture.hpp>
-#include <test/prob/distributions/distribution_tests_3_params.hpp>
+TEST(ProbDistributionsScaledInvChiSquare, random) {
+  boost::random::mt19937 rng;
+  EXPECT_NO_THROW(stan::prob::scaled_inv_chi_square_rng(2.0,1.0,rng));
+}
 
-using std::vector;
-using std::numeric_limits;
+TEST(ProbDistributionsScaledInvChiSquare, chiSquareGoodnessFitTest) {
+  boost::random::mt19937 rng;
+  int N = 10000;
+  double K = 5;
+  boost::math::inverse_chi_squared_distribution<>dist (2.0);
+  boost::math::chi_squared mydist(K-1);
 
-class ProbDistributionsScaledChiSquare : public DistributionTest {
-public:
-  void valid_values(vector<vector<double> >& parameters,
-		    vector<double>& log_prob) {
-    vector<double> param(3);
+  double loc[4];
+  for(int i = 1; i < K; i++)
+    loc[i - 1] = quantile(dist, 0.2 * i);
 
-    param[0] = 12.7;          // y
-    param[1] = 6.1;           // nu
-    param[2] = 3.0;           // s
-    parameters.push_back(param);
-    log_prob.push_back(-3.091965); // expected log_prob
+  int count = 0;
+  int bin [5] = {0, 0, 0, 0, 0};
 
-    param[0] = 1.0;           // y
-    param[1] = 1.0;           // nu
-    param[2] = 0.5;           // s
-    parameters.push_back(param);
-    log_prob.push_back(-1.737086); // expected log_prob
-  }
- 
-  void invalid_values(vector<size_t>& index, 
-		      vector<double>& value) {
-    // y
-    
-    // nu
-    index.push_back(1U);
-    value.push_back(0.0);
+  while (count < N) {
+    double a = stan::prob::scaled_inv_chi_square_rng(2.0,1.0,rng) / (2.0 * 1.0);
+    int i = 0;
+    while (i < K-1 && a > loc[i]) 
+      ++i;
+    ++bin[i];
+    count++;
+   }
 
-    index.push_back(1U);
-    value.push_back(-1.0);
+  double chi = 0;
+  double expect [5] = {N / K, N / K, N / K, N / K, N / K};
 
-    index.push_back(1U);
-    value.push_back(numeric_limits<double>::infinity());
+  for(int j = 0; j < K; j++)
+    chi += ((bin[j] - expect[j]) * (bin[j] - expect[j]) / expect[j]);
 
-    index.push_back(1U);
-    value.push_back(-numeric_limits<double>::infinity());
-
-    // s
-    index.push_back(2U);
-    value.push_back(0.0);
-
-    index.push_back(2U);
-    value.push_back(-1.0);
-
-    index.push_back(2U);
-    value.push_back(-numeric_limits<double>::infinity());
-  }
-
-};
-
-INSTANTIATE_TYPED_TEST_CASE_P(ProbDistributionsScaledChiSquare,
-			      DistributionTestFixture,
-			      ProbDistributionsScaledChiSquare);
+  EXPECT_TRUE(chi < quantile(complement(mydist, 1e-6)));
+}

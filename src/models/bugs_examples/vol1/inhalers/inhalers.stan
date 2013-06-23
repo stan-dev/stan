@@ -86,7 +86,7 @@ model {
         p[i, t, j] <- Q[i, t, j - 1] - Q[i, t, j]; 
       p[i, t, (Ncut + 1)] <- Q[i, t, Ncut];
       
-      response[i, t] - 1 ~ categorical(p[i, t]);
+      response[i, t] ~ categorical(p[i, t]);
      }
   }
   b ~ normal(0, sigma);

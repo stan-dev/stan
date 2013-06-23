@@ -1,16 +1,6 @@
 #ifndef __STAN__IO__WRITER_HPP__
 #define __STAN__IO__WRITER_HPP__
 
-#include <cstddef>
-#include <stdexcept>
-#include <vector>
-
-#include <boost/multi_array.hpp>
-#include <boost/throw_exception.hpp>
-
-#include <stan/math/matrix.hpp>
-#include <stan/math/special_functions.hpp>
-
 #include <stan/prob/transform.hpp>
 
 namespace stan {
@@ -36,10 +26,10 @@ namespace stan {
       std::vector<int> data_i_;
     public:
 
-      typedef typename stan::math::EigenType<T>::matrix matrix_t;
-      typedef typename stan::math::EigenType<T>::vector vector_t;
-      typedef typename stan::math::EigenType<T>::row_vector row_vector_t;
-      
+      typedef Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> matrix_t;
+      typedef Eigen::Matrix<T,Eigen::Dynamic,1> vector_t;
+      typedef Eigen::Matrix<T,1,Eigen::Dynamic> row_vector_t;
+
       typedef Eigen::Array<T,Eigen::Dynamic,1> array_vec_t;
 
       /**
@@ -60,6 +50,8 @@ namespace stan {
         : data_r_(data_r),
           data_i_(data_i),
           CONSTRAINT_TOLERANCE(1E-8) {
+        data_r_.clear();
+        data_i_.clear();
       }
 
       /**
@@ -284,8 +276,8 @@ namespace stan {
        * @param y Matrix to write.
        */
       void matrix_unconstrain(const matrix_t& y) {
-        for (typename matrix_t::size_type i = 0; i < y.rows(); ++i)
-          for (typename matrix_t::size_type j = 0; j < y.cols(); ++j) 
+        for (typename matrix_t::size_type j = 0; j < y.cols(); ++j) 
+          for (typename matrix_t::size_type i = 0; i < y.rows(); ++i)
             data_r_.push_back(y(i,j));
       }
 
@@ -298,8 +290,8 @@ namespace stan {
           scalar_lb_unconstrain(lb,y(i));
       }
       void matrix_lb_unconstrain(double lb, matrix_t& y) {
-        for (int i = 0; i < y.rows(); ++i)
-          for (int j = 0; j < y.cols(); ++j)
+        for (typename matrix_t::size_type j = 0; j < y.cols(); ++j) 
+          for (typename matrix_t::size_type i = 0; i < y.rows(); ++i)
             scalar_lb_unconstrain(lb,y(i,j));
       }
 
@@ -312,8 +304,8 @@ namespace stan {
           scalar_ub_unconstrain(ub,y(i));
       }
       void matrix_ub_unconstrain(double ub, matrix_t& y) {
-        for (int i = 0; i < y.rows(); ++i)
-          for (int j = 0; j < y.cols(); ++j)
+        for (typename matrix_t::size_type j = 0; j < y.cols(); ++j) 
+          for (typename matrix_t::size_type i = 0; i < y.rows(); ++i)
             scalar_ub_unconstrain(ub,y(i,j));
       }
 
@@ -327,12 +319,34 @@ namespace stan {
           scalar_lub_unconstrain(lb,ub,y(i));
       }
       void matrix_lub_unconstrain(double lb, double ub, matrix_t& y) {
-        for (int i = 0; i < y.rows(); ++i)
-          for (int j = 0; j < y.cols(); ++j)
+        for (typename matrix_t::size_type j = 0; j < y.cols(); ++j) 
+          for (typename matrix_t::size_type i = 0; i < y.rows(); ++i)
             scalar_lub_unconstrain(lb,ub,y(i,j));
       }
 
       
+
+      /**
+       * Write the unconstrained vector corresponding to the specified unit_vector 
+       * value.  If the specified constrained unit_vector is of size <code>K</code>,
+       * the returned unconstrained vector is of size <code>K-1</code>.
+       *
+       * <p>The transform takes <code>y = y[1],...,y[K]</code> and
+       * produces the unconstrained vector. This inverts
+       * the constraining transform of
+       * <code>unit_vector_constrain(size_t)</code>.
+       *
+       * @param y Simplex constrained value.
+       * @return Unconstrained value.
+       * @throw std::runtime_error if the vector is not a unit_vector.
+       */
+      void unit_vector_unconstrain(vector_t& y) {
+        stan::math::check_unit_vector("stan::io::unit_vector_unconstrain(%1%)", y, "Vector");
+        vector_t uy = stan::prob::unit_vector_free(y);
+        for (typename vector_t::size_type i = 0; i < uy.size(); ++i) 
+          data_r_.push_back(uy[i]);
+      }
+ 
 
       /**
        * Write the unconstrained vector corresponding to the specified simplex 
@@ -340,8 +354,7 @@ namespace stan {
        * the returned unconstrained vector is of size <code>K-1</code>.
        *
        * <p>The transform takes <code>y = y[1],...,y[K]</code> and
-       * produces the unconstrained vector <code>x = log(y[1]) -
-       * log(y[K]), ..., log(y[K-1]) - log(y[K])</code>.  This inverts
+       * produces the unconstrained vector. This inverts
        * the constraining transform of
        * <code>simplex_constrain(size_t)</code>.
        *
@@ -351,11 +364,9 @@ namespace stan {
        */
       void simplex_unconstrain(vector_t& y) {
         stan::math::check_simplex("stan::io::simplex_unconstrain(%1%)", y, "Vector");
-        typename vector_t::size_type k_minus_1 = y.size() - 1;
-        double log_y_k = log(y[k_minus_1]);
-        for (typename vector_t::size_type i = 0; i < k_minus_1; ++i) {
-          data_r_.push_back(log(y[i]) - log_y_k);
-        }
+        vector_t uy = stan::prob::simplex_free(y);
+        for (typename vector_t::size_type i = 0; i < uy.size(); ++i) 
+          data_r_.push_back(uy[i]);
       }
 
       /**

@@ -1,4 +1,4 @@
-source('hepatitis.Rdata') 
+source('hepatitis.data.R') 
 # Yvec <- c(Y[, 1], Y[, 2], Y[, 3]) 
 Yvec <- as.vector(Y) 
 # tvec <- c(t[, 1], t[, 2], t[, 3]) 
@@ -15,4 +15,4 @@ tvec1 <- tvec[-naidx];
 N1 <- length(Yvec1) 
 
 
-dump(c("N", "Yvec1", "idxn1", "tvec1", "N1", "y0"), file = 'hepatitis2.Rdata');
+dump(c("N", "Yvec1", "idxn1", "tvec1", "N1", "y0"), file = 'hepatitis2.data.R');

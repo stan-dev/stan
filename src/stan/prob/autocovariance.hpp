@@ -2,6 +2,7 @@
 #define __STAN__PROB__AUTOCOVARIANCE_HPP__
 
 #include <stan/prob/autocorrelation.hpp>
+#include <stan/math/matrix/variance.hpp>
 
 namespace stan {
   

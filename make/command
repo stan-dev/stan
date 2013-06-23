@@ -1,7 +1,12 @@
-.PRECIOUS: bin/stanc$(EXE)
-bin/stanc$(EXE) : bin/stan/command/stanc.o bin/libstanc.a bin/libstan.a
+.PRECIOUS: bin/print$(EXE)
+bin/print$(EXE) : bin/stan/command/print.o bin/libstan.a
 	@mkdir -p $(dir $@)
-	$(LINK.c) $(OUTPUT_OPTION) $< $(LDLIBS_STANC)
+	$(LINK.c) -O$(O_STANC) $(OUTPUT_OPTION) $< $(LDLIBS)
+
+.PRECIOUS: bin/stanc$(EXE)
+bin/stanc$(EXE) : bin/stan/command/stanc.o bin/libstanc.a bin/print$(EXE)
+	@mkdir -p $(dir $@)
+	$(LINK.c) -O$(O_STANC) $(OUTPUT_OPTION) $< $(LDLIBS_STANC)
 
 ##
 # Generate dependencies for bin/stanc
@@ -9,5 +14,3 @@ bin/stanc$(EXE) : bin/stan/command/stanc.o bin/libstanc.a bin/libstan.a
 ifneq (,$(filter-out clean%,$(MAKECMDGOALS)))
   -include bin/stan/command/stanc.d
 endif
-
-

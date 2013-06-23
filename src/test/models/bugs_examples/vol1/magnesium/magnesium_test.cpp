@@ -25,12 +25,12 @@ public:
     return true;
   }
 
-  static size_t num_iterations() {
-    return 8000U;
+  static int num_iterations() {
+    return 8000;
   }
 
-  static std::vector<size_t> skip_chains_test() {
-    std::vector<size_t> params_to_skip;
+  static std::vector<int> skip_chains_test() {
+    std::vector<int> params_to_skip;
     return params_to_skip;
   }
 
@@ -38,36 +38,28 @@ public:
     default_populate_chains();
   }
 
-  static std::vector<std::pair<size_t, double> >
+  static std::vector<std::pair<int, double> >
   get_expected_values() {
     using std::make_pair;
-    size_t OR_index,
-      tau_index;
-    std::vector<size_t> dims;
-    dims.push_back(0);
-    OR_index = chains->get_total_param_index(chains->param_name_to_index("OR"),
-					     dims);
-    tau_index = chains->get_total_param_index(chains->param_name_to_index("tau"),
-					      dims);
-    std::vector<std::pair<size_t, double> > expected_values;
+    std::vector<std::pair<int, double> > expected_values;
     
-    expected_values.push_back(make_pair(OR_index + 0U, 0.4591));
-    expected_values.push_back(make_pair(tau_index + 0U, 0.5845));
+    expected_values.push_back(make_pair(chains->index("OR[1]"), 0.4591));
+    expected_values.push_back(make_pair(chains->index("tau[1]"), 0.5845));
 
-    expected_values.push_back(make_pair(OR_index + 1U, 0.4179));
-    expected_values.push_back(make_pair(tau_index + 1U, 1.081));
+    expected_values.push_back(make_pair(chains->index("OR[2]"), 0.4179));
+    expected_values.push_back(make_pair(chains->index("tau[2]"), 1.081));
     
-    expected_values.push_back(make_pair(OR_index + 2U, 0.4368));
-    expected_values.push_back(make_pair(tau_index + 2U, 0.8119));
+    expected_values.push_back(make_pair(chains->index("OR[3]"), 0.4368));
+    expected_values.push_back(make_pair(chains->index("tau[3]"), 0.8119));
 
-    expected_values.push_back(make_pair(OR_index + 3U, 0.4639));
-    expected_values.push_back(make_pair(tau_index + 3U, 0.5084));
+    expected_values.push_back(make_pair(chains->index("OR[4]"), 0.4639));
+    expected_values.push_back(make_pair(chains->index("tau[4]"), 0.5084));
 
-    expected_values.push_back(make_pair(OR_index + 4U, 0.483));
-    expected_values.push_back(make_pair(tau_index + 4U, 0.5245));
+    expected_values.push_back(make_pair(chains->index("OR[5]"), 0.483));
+    expected_values.push_back(make_pair(chains->index("tau[5]"), 0.5245));
 
-    expected_values.push_back(make_pair(OR_index + 5U, 0.4347));
-    expected_values.push_back(make_pair(tau_index + 5U, 0.5736));
+    expected_values.push_back(make_pair(chains->index("OR[6]"), 0.4347));
+    expected_values.push_back(make_pair(chains->index("tau[6]"), 0.5736));
     
     return expected_values;
   }
@@ -75,5 +67,5 @@ public:
 };
 
 INSTANTIATE_TYPED_TEST_CASE_P(Models_BugsExamples_Vol1_Magnesium,
-			      Model_Test_Fixture,
-			      Models_BugsExamples_Vol1_Magnesium);
+            Model_Test_Fixture,
+            Models_BugsExamples_Vol1_Magnesium);

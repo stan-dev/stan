@@ -65,15 +65,18 @@ std::string run_command(std::string command) {
   std::string output;
   char buf[1024];
   size_t count;
-  while ((count =  fread(&buf, 1, 1024, in)) > 0)
+  while ((count = fread(&buf, 1, 1024, in)) > 0)
     output += std::string(&buf[0], &buf[count]);
   
-  if (pclose(in) != 0) {
-    std::string err_msg;
-    err_msg = "Could not run: \"";
-    err_msg+= command;
-    err_msg+= "\"";
-    throw std::runtime_error(err_msg.c_str());
+  int err;
+  if ((err=pclose(in)) != 0) {
+    std::stringstream err_msg;
+    err_msg << "Run of command: \"" << command << std::endl;
+    err_msg << "err code: " << err << std::endl;
+    err_msg << "Output message: \n";
+    err_msg << output;
+    std::string msg(err_msg.str());
+    throw std::runtime_error(msg.c_str());
   }
 
   return output;

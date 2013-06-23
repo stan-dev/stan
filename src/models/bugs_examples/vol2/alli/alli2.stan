@@ -3,8 +3,6 @@
 
 ## specify the model using Poisson distribution 
 
-## status (works)
-
 data {
   int I; // 4 
   int J; // 2 
@@ -13,42 +11,80 @@ data {
 } 
 
 parameters {
-  real alpha[K - 1]; 
-  real beta[I - 1, K - 1]; 
-  real gamma[J - 1, K - 1]; 
-  real lambda[I, J]; 
+  vector[K-1] alpha0;
+  matrix[I-1, K-1] beta0;
+  matrix[J-1, K-1] gamma0; 
+  matrix[I, J] lambda;
+
+}
+
+transformed parameters {
+  vector[K] alpha; 
+  matrix[I, K] beta;
+  matrix[J, K] gamma; 
+
+  alpha[1] <- 0;
+  for (k in 1:(K-1))
+    alpha[k+1] <- alpha0[k];
+
+  for (i in 1:I)
+    beta[i,1] <- 0;
+  for (k in 1:K)
+    beta[1,k] <- 0;
+
+  for (i in 1:(I-1))
+    for (k in 1:(K-1))
+      beta[i+1,k+1] <- beta0[i,k];
+
+  for (j in 1:J)
+    gamma[j,1] <- 0;
+  for (k in 1:K)
+    gamma[1,k] <- 0;
+
+  for (j in 1:(J-1))
+    for (k in 1:(K-1))
+      gamma[j+1,k+1] <- gamma0[j,k];
+
 }
 
 model {
-  real yaalpha[K]; 
-  real yabeta[I, K];
-  real yagamma[J, K];
-  yaalpha[1] <- 0; 
-  for (k in 2:K)  yaalpha[k] <- alpha[k - 1];
-  for (k in 1:K) {
-    yabeta[1, k] <- 0;
-    yagamma[1, k] <- 0;
-  }
-  for (i in 2:I) yabeta[i, 1] <- 0;
-  for (j in 2:J) yagamma[j, 1] <- 0;
-  for (k in 2:K) {
-    for (i in 2:I)  yabeta[i, k] <- beta[i - 1, k - 1];
-    for (j in 2:J)  yagamma[j, k] <- gamma[j - 1, k - 1];
-  }
- 
-  for (k in 1:(K - 1)) { 
+  for (k in 2:K) { 
     alpha[k] ~ normal(0, 320);
-    for (i in 1:(I - 1)) beta[i, k] ~ normal(0, 320);
-    for (i in 1:(J - 1)) gamma[i, k] ~ normal(0, 320);
+    for (i in 2:I) 
+      beta[i, k] ~ normal(0, 320);
+    for (j in 2:J) 
+      gamma[j, k] ~ normal(0, 320);
   } 
 
-  # LIKELIHOOD    
+  # LIKELIHOOD  
   for (i in 1:I) {   
     for (j in 1:J) {   
       lambda[i, j] ~ normal(0, 320);
       for (k in 1:K)       
-        X[i, j, k] ~ poisson(exp(lambda[i, j] + yaalpha[k] + yabeta[i, k]  + yagamma[j, k]));
+        X[i, j, k] ~ poisson_log(lambda[i, j] + alpha[k] + beta[i, k]  + gamma[j, k]);
     }  
   }
 }
 
+generated quantities {
+  real b[I, K];
+  real g[J, K];
+
+  for (k in 1:K) {
+    real mean_beta_k;
+    mean_beta_k <- mean(col(beta, k));
+    print("mean_beta_k: ", mean_beta_k);
+    for (i in 1:I) {
+      b[i,k] <- beta[i,k] - mean_beta_k;
+    }
+  }
+
+  for (k in 1:K) {
+    real mean_gamma_k;
+    mean_gamma_k <- mean(col(gamma, k));
+    for (j in 1:J) {
+      g[j,k] <- gamma[j,k] - mean_gamma_k;
+    }
+  }
+
+}

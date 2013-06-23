@@ -1,13 +1,18 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__DISCRETE__MULTINOMIAL_HPP__
 #define __STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__DISCRETE__MULTINOMIAL_HPP__
 
-#include <stan/prob/traits.hpp>
-#include <stan/math/error_handling.hpp>
-#include <stan/math/matrix_error_handling.hpp>
-#include <stan/math/error_handling.hpp>
-#include <stan/prob/constants.hpp>
-#include <stan/math/special_functions.hpp>
+#include <boost/math/special_functions/gamma.hpp>
+#include <boost/random/uniform_01.hpp>
+#include <boost/random/variate_generator.hpp>
 
+#include <stan/math/error_handling.hpp>
+#include <stan/math/error_handling.hpp>
+#include <stan/math/functions/multiply_log.hpp>
+#include <stan/math/matrix_error_handling.hpp>
+#include <stan/prob/constants.hpp>
+#include <stan/prob/distributions/univariate/discrete/binomial.hpp>
+#include <stan/prob/distributions/multivariate/discrete/categorical.hpp>
+#include <stan/prob/traits.hpp>
 
 namespace stan {
 
@@ -15,26 +20,28 @@ namespace stan {
     // Multinomial(ns|N,theta)   [0 <= n <= N;  SUM ns = N;   
     //                            0 <= theta[n] <= 1;  SUM theta = 1]
     template <bool propto,
-              typename T_prob, 
-              class Policy>
+              typename T_prob>
     typename boost::math::tools::promote_args<T_prob>::type
     multinomial_log(const std::vector<int>& ns,
-                    const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta, 
-                    const Policy&) {
+                    const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta) {
       static const char* function = "stan::prob::multinomial_log(%1%)";
 
       using stan::math::check_nonnegative;
       using stan::math::check_simplex;
       using stan::math::check_size_match;
       using boost::math::tools::promote_args;
+      using boost::math::lgamma;
 
       typename promote_args<T_prob>::type lp(0.0);
-      if (!check_nonnegative(function, ns, "Number of trials variable", &lp, Policy()))
+      if (!check_nonnegative(function, ns, "Number of trials variable", &lp))
         return lp;
       if (!check_simplex(function, theta, "Probabilites parameter", 
-                         &lp, Policy()))
+                         &lp))
         return lp;
-      if (!check_size_match(function, ns.size(), theta.rows(), &lp, Policy()))
+      if (!check_size_match(function, 
+          ns.size(), "Size of number of trials variable",
+          theta.rows(), "rows of probabilities parameter",
+          &lp))
         return lp;
       using stan::math::multiply_log;
 
@@ -52,31 +59,31 @@ namespace stan {
       return lp;
     }
 
-
-    template <bool propto,
-              typename T_prob>
-    typename boost::math::tools::promote_args<T_prob>::type
-    multinomial_log(const std::vector<int>& ns,
-                    const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta) {
-      return multinomial_log<propto>(ns,theta,stan::math::default_policy());
-    }
-
-    template <typename T_prob, 
-              class Policy>
-    typename boost::math::tools::promote_args<T_prob>::type
-    multinomial_log(const std::vector<int>& ns,
-                    const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta, 
-                    const Policy&) {
-      return multinomial_log<false>(ns,theta,Policy());
-    }
-
-
     template <typename T_prob>
     typename boost::math::tools::promote_args<T_prob>::type
     multinomial_log(const std::vector<int>& ns,
                     const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta) {
-      return multinomial_log<false>(ns,theta,stan::math::default_policy());
+      return multinomial_log<false>(ns,theta);
     }
+
+    template <class RNG>
+    inline std::vector<int>
+    multinomial_rng(const Eigen::Matrix<double,Eigen::Dynamic,1>& theta,
+                    const int N,
+                    RNG& rng) {
+      std::vector<int> result(N,0);
+      double mass_left = 1.0;
+      int n_left = N;
+      for (int k = 0; n_left > 0 && k < theta.size(); ++k) {
+        result[k] = binomial_rng(n_left,theta[k] / mass_left,rng);
+        n_left -= result[k];
+        mass_left -= theta[k];
+      }
+      // for (int n = 0; n < N; ++n)
+      //   ++result[categorical_rng(theta,rng) - 1];
+      return result;
+    }
+
 
   }
 }

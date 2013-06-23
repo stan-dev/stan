@@ -1,18 +1,14 @@
 #ifndef __STAN__IO__DUMP_HPP__
 #define __STAN__IO__DUMP_HPP__
 
-#include <cstddef>
-#include <stdexcept>
-#include <map>
-#include <vector>
-#include <utility>
-#include <string>
-#include <sstream>
+#include <cctype>
 #include <iostream>
-#include <locale>
-
+#include <limits>
+#include <map>
+#include <sstream>
+#include <string>
+#include <vector>
 #include <boost/throw_exception.hpp>
-
 #include <stan/math/matrix.hpp>
 #include <stan/io/var_context.hpp>
 
@@ -21,7 +17,7 @@ namespace stan {
   namespace io {
 
     namespace {
-       size_t product(std::vector<size_t> dims) {
+      size_t product(std::vector<size_t> dims) {
          size_t y = 1U;
          for (size_t i = 0; i < dims.size(); ++i)
            y *= dims[i];
@@ -127,11 +123,11 @@ namespace stan {
       }
       
 
-      void dims(double x, std::vector<size_t> ds) {
+      void dims(double /*x*/, std::vector<size_t> /*ds*/) {
         // no op
       }
 
-      void dims(int x, std::vector<size_t> ds) {
+      void dims(int /*x*/, std::vector<size_t> /*ds*/) {
         // no op
       }
 
@@ -316,7 +312,7 @@ namespace stan {
        * @tparam T <code>double</code> or <code>int</code>.
        */
       template <typename T>
-      void dump_structure(std::string name,
+      void dump_structure(std::string /*name*/,
                           std::vector<size_t> dims,
                           std::vector<T> xs) {
         if (xs.size() != product(dims)) 
@@ -435,6 +431,7 @@ namespace stan {
       std::vector<double> stack_r_;
       std::vector<size_t> dims_;
       std::istream& in_;
+      // stan::io::buffered_stream in_;
 
       bool scan_single_char(char c_expected) {
         int c = in_.peek();
@@ -493,7 +490,8 @@ namespace stan {
         return true;
       }
 
-      bool scan_chars(std::string s) {
+
+      bool scan_chars(std::string s, bool case_sensitive = true) {
         for (size_t i = 0; i < s.size(); ++i) {
           char c;
           if (!(in_ >> c)) {
@@ -501,7 +499,9 @@ namespace stan {
               in_.putback(s[i-j]);
             return false;
           }
-          if (c != s[i]) {
+          // all ASCII, so toupper is OK
+          if ((case_sensitive && c != s[i])
+              || (!case_sensitive && ::toupper(c) != ::toupper(s[i]))) {
             in_.putback(c);
             for (size_t j = 1; j < i; ++j) 
               in_.putback(s[i-j]);
@@ -511,25 +511,35 @@ namespace stan {
         return true;
       }
 
-      bool scan_number() {
-        std::string buf;
-        bool is_double = false;
-        char c;
-        while (in_.get(c)) {
-          if (std::isspace(c)) continue;
-          in_.putback(c);
-          break;
+      bool scan_number(bool negate_val) {
+
+        // must take longest first!
+        if (scan_chars("Inf")) { 
+          scan_chars("inity"); // read past if there
+          stack_r_.push_back(negate_val
+                             ? -std::numeric_limits<double>::infinity()
+                             : std::numeric_limits<double>::infinity());
+          return true;
         }
+        if (scan_chars("NaN",false)) {
+          stack_r_.push_back(std::numeric_limits<double>::quiet_NaN());
+          return true;
+        }
+
+        char c;
+        bool is_double = false;
+        std::string buf;
         while (in_.get(c)) {
-          if (std::isdigit(c) || c == '-') {
+          if (std::isdigit(c)) { // before pre-scan || c == '-' || c == '+') {
             buf.push_back(c);
           } else if (c == '.'
                      || c == 'e'
-                     || c == 'E') {
+                     || c == 'E'
+                     || c == '-'
+                     || c == '+') {
             is_double = true;
             buf.push_back(c);
-          }
-          else {
+          } else {
             in_.putback(c);
             break;
           }
@@ -538,30 +548,34 @@ namespace stan {
           int n;
           if (!(std::stringstream(buf) >> n))
             return false;
-          stack_i_.push_back(n);
+          stack_i_.push_back(negate_val ? -n : n);
           scan_optional_long();
         } else {
           for (size_t j = 0; j < stack_i_.size(); ++j)
-            stack_r_.push_back(static_cast<double>(stack_i_[j]));
+            stack_r_.push_back(negate_val 
+                               ? -static_cast<double>(stack_i_[j])
+                               : static_cast<double>(stack_i_[j]));
           stack_i_.clear();
           double x;
           if (!(std::stringstream(buf) >> x))
             return false;
-          stack_r_.push_back(x);
+          stack_r_.push_back(negate_val ? -x : x);
         }
         return true;
       }
 
-      void print_next_char() {
+      bool scan_number() {
         char c;
-        bool ok = in_.get(c);
-        if (ok) {
-          std::cout << "next char=" << c << std::endl;
+        while (in_.get(c)) {
+          if (std::isspace(c)) continue;
           in_.putback(c);
-        } else {
-          std::cout << "next char=<EOS>" << std::endl;
+          break;
         }
+        bool negate_val = scan_char('-'); 
+        if (!negate_val) scan_char('+'); // flush leading +
+        return scan_number(negate_val);
       }
+
 
       bool scan_seq_value() {
         if (!scan_char('(')) return false;

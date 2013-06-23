@@ -165,9 +165,24 @@ p(\tilde{y}|\theta) p(\theta|y) \, d\tilde{y} \, d\theta.
 \]
 
 
+\subsection{Posterior Predictive Checking}
+
+After the parameters are fit to data, they can be used to simulate a
+new data set by running the model inferences in the forward
+direction.  These replicated data sets can then be compared to the
+original data either visually or statistically to assess model fit 
+\citep[Chapter 6]{GelmanCarlinSternRubin:2003}.  
+
+In Stan, posterior simulations can be generated in two ways.  The
+first approach is to treat the predicted variables as parameters and
+then define their distributions in the model block.  The second
+approach, which also works for discrete variables, is to generate
+replicated data using random-number generators in the generated
+quantities block.
 
 
-\chapter{Markov Chain Monte Carlo Sampling}
+
+\chapter{Markov Chain Monte Carlo Sampling}\label{mcmc.chapter}
 
 \noindent
 Like \BUGS, \Stan uses Markov chain Monte Carlo (\MCMC) techniques to
@@ -189,7 +204,7 @@ defined by the integral
 For even a moderately complex Bayesian model, the posterior density
 $p(\theta|y)$ leads to an integral that is impossible to evaluate
 analytically.  The posterior also depends on the constants and
-predictors $x$, but from here, they will just be ellided and taken as
+predictors $x$, but from here, they will just be elided and taken as
 given.
 
 Now suppose it is possible to draw independent samples from
@@ -649,7 +664,7 @@ The rest of the chapter details the transforms used by \Stan.
 
 
 
-\subsection{Univariate Changes of Variables}
+\subsection{Univariate Changes of Variables}\label{uni-change-of-variables.section}
 
 Suppose $X$ is one dimensional and $f: \mbox{supp}(X) \rightarrow
 \reals$ is a one-to-one, monotonic function with a differentiable
@@ -665,7 +680,7 @@ scale of the transformed variable changes with respect to the
 underlying variable.
 
 
-\subsection{Multivariate Changes of Variables}
+\subsection{Multivariate Changes of Variables}\label{multi-change-of-variables.section}
 
 The multivariate generalization of an absolute derivative is a
 Jacobian, or more fully the absolute value of the determinant of the
@@ -1038,12 +1053,14 @@ step $k$, is defined elementwise for $1 \leq k < K$ by
 %
 \[
 z_k = \mbox{logit}^{-1} \left( y_k 
-                             - \log \left( \frac{1}{K - k}
+                             + \log \left( \frac{1}{K - k}
                                             \right)
                        \right).
 \]
 %
-The logit term in the above definition adjusts the transform so that a
+The logit term
+$\log\left(\frac{1}{K-k}\right) (i.e., \mbox{logit}\left(\frac{1}{K-k+1}\right)$) in
+the above definition adjusts the transform so that a
 zero vector $y$ is mapped to the simplex $x = (1/K,\ldots,1/K)$.  For instance, if
 $y_1 = 0$, then $z_1 = 1/K$; if $y_2 = 0$, then $z_2 = 1/(K-1)$; and
 if $y_{K-1} = 0$, then $z_{K-1} = 1/2$.  
@@ -1084,7 +1101,7 @@ where
 \frac{\partial z_k}{\partial y_k} 
 = \frac{\partial}{\partial y_k} 
    \mbox{logit}^{-1} \left(
-                       y_k - \log \left( \frac{1}{K-k}
+                       y_k + \log \left( \frac{1}{K-k}
                                           \right)
                     \right)
 = z_k (1 - z_k),
@@ -1155,7 +1172,7 @@ $z$, $y$ is defined elementwise by
 \[
 y_k 
 = \mbox{logit}(z_k)
-+ \mbox{log}\left(
+- \mbox{log}\left(
    \frac{1}{K-k}
    \right)
 .
@@ -1171,6 +1188,44 @@ z_k
        {1 - \sum_{k' = 1}^{k-1} x_{k'}}
 .
 \]
+
+\section{Unit Vector}
+Unit vectors show up in directional statistics.
+
+The $n$-sphere is the set of points $x \in \reals^n$ such that 
+\[
+\Vert x \Vert^2 = \sum_{i=1}^n x_i^2 = 1\ .
+\]
+
+\subsection{Unit Vector Inverse Transform}
+
+To parametrize unit length vectors, we use hyperspherical coordinates.
+The unconstrained vector $y \in \reals^{n-1}$ is a set of angles which
+relates to the unit vector as follows:
+\begin{eqnarray*}
+x_1 & = & \cos(y_1) \\
+x_2 & = & \cos(y_2) \sin(y_1) \\
+x_3 & = & \cos(y_3) \sin(y_1) \sin(y_2) \\
+& \vdots & \\
+x_i & = & \cos(y_i) \prod_{j=1}^{i-1} \sin(y_j) \\
+& \vdots & \\
+x_n & = & \prod_{j=1}^{n-1} \sin(y_j).
+\end{eqnarray*}
+Note that, in practice, we use $y_i = \hat{y}_i + \frac{\pi}{2}$ and use $\hat{y}_i$ as the unconstrained parameters to avoid a singularity at
+$y_i = 0$.
+
+
+\subsection{Absolute Jacobian Determinant of the Unit Vector
+  Inverse Transform}
+To derive the determinant of the Jacobian we first add a radius coordinate
+$r=1$ which multiplies the vector $x$.
+The Jacobian, $J$, can be shown to be lower triangular, so its
+determinant is just the product of diagonal entries and the 
+absolute value of the determinant is
+\[
+\left| \, \det J \, \right| = \left|r^{n-1} \sin^{n-2}(y_1) \sin^{n-3}(y_2) ... \sin(y_{n-2})\right| .
+\]
+
 
 \section{Correlation Matrices}
 

@@ -1,8 +1,11 @@
 #include <gtest/gtest.h>
 #include <boost/type_traits.hpp>
 #include <stan/agrad/agrad.hpp>
+#include <stan/agrad/fwd/fvar.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/math/matrix.hpp>
+
+using stan::length;
 
 TEST(MetaTraits, isConstant) {
   using stan::is_constant;
@@ -12,6 +15,8 @@ TEST(MetaTraits, isConstant) {
   EXPECT_TRUE(is_constant<int>::value);
   EXPECT_FALSE(is_constant<stan::agrad::var>::value);
 }
+
+
 
 TEST(MetaTraits, is_vector) {
   using stan::is_vector;
@@ -113,7 +118,47 @@ TEST(MetaTraits, length) {
   EXPECT_EQ(1U, length(3));
   std::vector<double> x(10);
   EXPECT_EQ(10U, length(x));
+
+  Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> m(2,3);
+  m << 1, 2, 3, 4, 5, 6;
+  EXPECT_EQ(6U, length(m));
+
+  Eigen::Matrix<double,Eigen::Dynamic,1> rv(2);
+  rv << 1, 2;
+  EXPECT_EQ(2, length(rv));
+
+  Eigen::Matrix<double,1,Eigen::Dynamic> v(2);
+  v << 1, 2;
+  EXPECT_EQ(2, length(v));
 }
+
+TEST(MetaTraits, get) {
+  using stan::get;
+
+  EXPECT_FLOAT_EQ(2.0, get(2.0,1));
+
+  std::vector<double> x(3);
+  x[1] = 5.0;
+  EXPECT_EQ(5.0, get(x,1));
+
+  Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> m(2,3);
+  m << 1, 3, 5, 
+       2, 4, 6;
+  EXPECT_EQ(1.0, get(m,0));
+  EXPECT_EQ(3.0, get(m,2));
+  EXPECT_EQ(6.0, get(m,5));
+
+  Eigen::Matrix<double,Eigen::Dynamic,1> rv(2);
+  rv << 1, 2;
+  EXPECT_EQ(1.0, get(rv,0));
+  EXPECT_EQ(2.0, get(rv,1));
+
+  Eigen::Matrix<double,1,Eigen::Dynamic> v(2);
+  v << 1, 2;
+  EXPECT_EQ(1.0, get(v,0));
+  EXPECT_EQ(2.0, get(v,1));
+}
+
 TEST(MetaTraits, VectorView_double)  {
   using stan::VectorView;
 
@@ -225,7 +270,8 @@ TEST(MetaTraits, VectorView_matrix_double) {
   }
 
   const Matrix<double,1,Dynamic> d(c);
-  VectorView<const Matrix<double,Dynamic,1> > dv(d);
+  VectorView<const Matrix<double,1,Dynamic>, 
+          stan::is_vector<Matrix<double,1,Dynamic> >::value > dv(d);
   for (size_t n = 0; n < 10; ++n)
     EXPECT_FLOAT_EQ(d[n], dv[n]);
 }
@@ -267,7 +313,7 @@ TEST(MetaTraits, VectorView_matrix_var) {
   }
 
   const Matrix<var,1,Dynamic> d(c);
-  VectorView<const Matrix<var,Dynamic,1> > dv(d);
+  VectorView<const Matrix<var,1,Dynamic> > dv(d);
   for (size_t n = 0; n < 10; ++n)
     EXPECT_FLOAT_EQ(d[n].val(), dv[n].val());
 }
@@ -296,8 +342,7 @@ TEST(MetaTraits, VectorView_double_star) {
   EXPECT_FLOAT_EQ(10, bv[0]);
   EXPECT_FLOAT_EQ(10, b);
 }
-using stan::length;
-TEST(MetaTraits, DoubleVectorView_false_double) {
+TEST(MetaTraits, DoubleVectorView_false_false) {
   using std::vector;
   using stan::DoubleVectorView;
   using Eigen::Matrix;
@@ -309,21 +354,21 @@ TEST(MetaTraits, DoubleVectorView_false_double) {
   Matrix<double,Dynamic,1> a_vector(4);
   Matrix<double,1,Dynamic> a_row_vector(5);
 
-  DoubleVectorView<false,double> dvv1(length(a_double));
+  DoubleVectorView<false,false> dvv1(length(a_double));
   EXPECT_THROW(dvv1[0], std::runtime_error);
 
-  DoubleVectorView<false,std::vector<double> > dvv2(length(a_std_vector));
+  DoubleVectorView<false,false> dvv2(length(a_std_vector));
   EXPECT_THROW(dvv2[0], std::runtime_error);
   
-  DoubleVectorView<false,Matrix<double,Dynamic,1> > dvv3(length(a_vector));
+  DoubleVectorView<false,false> dvv3(length(a_vector));
   EXPECT_THROW(dvv3[0], std::runtime_error);
   
-  DoubleVectorView<false,Matrix<double,1,Dynamic> > dvv4(length(a_row_vector));
+  DoubleVectorView<false,false> dvv4(length(a_row_vector));
   EXPECT_THROW(dvv4[0], std::runtime_error);
 }
 
 
-TEST(MetaTraits, DoubleVectorView_true_double) {
+TEST(MetaTraits, DoubleVectorView_true_false) {
   using std::vector;
   using stan::DoubleVectorView;
   using Eigen::Matrix;
@@ -334,29 +379,28 @@ TEST(MetaTraits, DoubleVectorView_true_double) {
   Matrix<double,Dynamic,1> a_vector(4);
   Matrix<double,1,Dynamic> a_row_vector(5);
 
-  DoubleVectorView<true,double> dvv1(length(a_double));
+  DoubleVectorView<true,false> dvv1(length(a_double));
   EXPECT_FLOAT_EQ(0.0, dvv1[0]);
   EXPECT_FLOAT_EQ(0.0, dvv1[1]);
   EXPECT_FLOAT_EQ(0.0, dvv1[100]);
 
-  DoubleVectorView<true,std::vector<double> > dvv2(length(a_std_vector));
+  DoubleVectorView<true,false> dvv2(length(a_std_vector));
   EXPECT_FLOAT_EQ(0.0, dvv2[0]);
   EXPECT_FLOAT_EQ(0.0, dvv2[1]);
   EXPECT_FLOAT_EQ(0.0, dvv2[2]);  
   
-  DoubleVectorView<true,Matrix<double,Dynamic,1> > dvv3(length(a_vector));
+  DoubleVectorView<true,false> dvv3(length(a_vector));
   EXPECT_FLOAT_EQ(0.0, dvv3[0]);
   EXPECT_FLOAT_EQ(0.0, dvv3[1]);
   EXPECT_FLOAT_EQ(0.0, dvv3[2]);  
   
-  DoubleVectorView<true,Matrix<double,1,Dynamic> > dvv4(length(a_row_vector));
+  DoubleVectorView<true,false> dvv4(length(a_row_vector));
   EXPECT_FLOAT_EQ(0.0, dvv4[0]);
   EXPECT_FLOAT_EQ(0.0, dvv4[1]);
   EXPECT_FLOAT_EQ(0.0, dvv4[2]);
 }
 
-
-TEST(MetaTraits, DoubleVectorView_false_var) {
+TEST(MetaTraits, DoubleVectorView_false_true) {
   using std::vector;
   using stan::DoubleVectorView;
   using Eigen::Matrix;
@@ -368,21 +412,20 @@ TEST(MetaTraits, DoubleVectorView_false_var) {
   Matrix<var,Dynamic,1> a_vector(4);
   Matrix<var,1,Dynamic> a_row_vector(5);
 
-  DoubleVectorView<false,var> dvv1(length(a_var));
+  DoubleVectorView<false,true> dvv1(length(a_var));
   EXPECT_THROW(dvv1[0], std::runtime_error);
 
-  DoubleVectorView<false,std::vector<var> > dvv2(length(a_std_vector));
+  DoubleVectorView<false,true> dvv2(length(a_std_vector));
   EXPECT_THROW(dvv2[0], std::runtime_error);
   
-  DoubleVectorView<false,Matrix<var,Dynamic,1> > dvv3(length(a_vector));
+  DoubleVectorView<false,true> dvv3(length(a_vector));
   EXPECT_THROW(dvv3[0], std::runtime_error);
   
-  DoubleVectorView<false,Matrix<var,1,Dynamic> > dvv4(length(a_row_vector));
+  DoubleVectorView<false,true> dvv4(length(a_row_vector));
   EXPECT_THROW(dvv4[0], std::runtime_error);
 }
 
-
-TEST(MetaTraits, DoubleVectorView_true_var) {
+TEST(MetaTraits, DoubleVectorView_true_true) {
   using std::vector;
   using stan::DoubleVectorView;
   using Eigen::Matrix;
@@ -394,144 +437,33 @@ TEST(MetaTraits, DoubleVectorView_true_var) {
   Matrix<var,Dynamic,1> a_vector(4);
   Matrix<var,1,Dynamic> a_row_vector(5);
 
-  DoubleVectorView<true,var> dvv1(length(a_var));
+  DoubleVectorView<true,true> dvv1(length(a_var));
+  dvv1[0] = 0.0;
   EXPECT_FLOAT_EQ(0.0, dvv1[0]);
-  EXPECT_FLOAT_EQ(0.0, dvv1[1]);
-  EXPECT_FLOAT_EQ(0.0, dvv1[100]);
 
-  DoubleVectorView<true,std::vector<var> > dvv2(length(a_std_vector));
+  DoubleVectorView<true,true> dvv2(length(a_std_vector));
+  dvv2[0] = 0.0;
+  dvv2[1] = 1.0;
+  dvv2[2] = 2.0;
   EXPECT_FLOAT_EQ(0.0, dvv2[0]);
-  EXPECT_FLOAT_EQ(0.0, dvv2[1]);
-  EXPECT_FLOAT_EQ(0.0, dvv2[2]);  
+  EXPECT_FLOAT_EQ(1.0, dvv2[1]);
+  EXPECT_FLOAT_EQ(2.0, dvv2[2]);  
   
-  DoubleVectorView<true,Matrix<var,Dynamic,1> > dvv3(length(a_vector));
+  DoubleVectorView<true,true> dvv3(length(a_vector));
+  dvv3[0] = 0.0;
+  dvv3[1] = 1.0;
+  dvv3[2] = 2.0;
   EXPECT_FLOAT_EQ(0.0, dvv3[0]);
-  EXPECT_FLOAT_EQ(0.0, dvv3[1]);
-  EXPECT_FLOAT_EQ(0.0, dvv3[2]);  
+  EXPECT_FLOAT_EQ(1.0, dvv3[1]);
+  EXPECT_FLOAT_EQ(2.0, dvv3[2]);  
   
-  DoubleVectorView<true,Matrix<var,1,Dynamic> > dvv4(length(a_row_vector));
+  DoubleVectorView<true,true> dvv4(length(a_row_vector));
+  dvv4[0] = 0.0;
+  dvv4[1] = 1.0;
+  dvv4[2] = 2.0;
   EXPECT_FLOAT_EQ(0.0, dvv4[0]);
-  EXPECT_FLOAT_EQ(0.0, dvv4[1]);
-  EXPECT_FLOAT_EQ(0.0, dvv4[2]);
-}
-
-
-TEST(MetaTraits, DoubleVectorView_false_double_const) {
-  using std::vector;
-  using stan::DoubleVectorView;
-  using Eigen::Matrix;
-  using Eigen::Dynamic;
-  using stan::agrad::var;
-
-  const double a_double(1);
-  const std::vector<double> a_std_vector(3);
-  const Matrix<double,Dynamic,1> a_vector(4);
-  const Matrix<double,1,Dynamic> a_row_vector(5);
-
-  DoubleVectorView<false,const double> dvv1(length(a_double));
-  EXPECT_THROW(dvv1[0], std::runtime_error);
-
-  DoubleVectorView<false,const std::vector<double> > dvv2(length(a_std_vector));
-  EXPECT_THROW(dvv2[0], std::runtime_error);
-  
-  DoubleVectorView<false,const Matrix<double,Dynamic,1> > dvv3(length(a_vector));
-  EXPECT_THROW(dvv3[0], std::runtime_error);
-  
-  DoubleVectorView<false,const Matrix<double,1,Dynamic> > dvv4(length(a_row_vector));
-  EXPECT_THROW(dvv4[0], std::runtime_error);
-}
-
-
-TEST(MetaTraits, DoubleVectorView_true_double_const) {
-  using std::vector;
-  using stan::DoubleVectorView;
-  using Eigen::Matrix;
-  using Eigen::Dynamic;
-
-  const double a_double(1);
-  const std::vector<double> a_std_vector(3);
-  const Matrix<double,Dynamic,1> a_vector(4);
-  const Matrix<double,1,Dynamic> a_row_vector(5);
-
-  DoubleVectorView<true,const double> dvv1(length(a_double));
-  EXPECT_FLOAT_EQ(0.0, dvv1[0]);
-  EXPECT_FLOAT_EQ(0.0, dvv1[1]);
-  EXPECT_FLOAT_EQ(0.0, dvv1[100]);
-
-  DoubleVectorView<true,const std::vector<double> > dvv2(length(a_std_vector));
-  EXPECT_FLOAT_EQ(0.0, dvv2[0]);
-  EXPECT_FLOAT_EQ(0.0, dvv2[1]);
-  EXPECT_FLOAT_EQ(0.0, dvv2[2]);  
-  
-  DoubleVectorView<true,const Matrix<double,Dynamic,1> > dvv3(length(a_vector));
-  EXPECT_FLOAT_EQ(0.0, dvv3[0]);
-  EXPECT_FLOAT_EQ(0.0, dvv3[1]);
-  EXPECT_FLOAT_EQ(0.0, dvv3[2]);  
-  
-  DoubleVectorView<true,const Matrix<double,1,Dynamic> > dvv4(length(a_row_vector));
-  EXPECT_FLOAT_EQ(0.0, dvv4[0]);
-  EXPECT_FLOAT_EQ(0.0, dvv4[1]);
-  EXPECT_FLOAT_EQ(0.0, dvv4[2]);
-}
-
-
-TEST(MetaTraits, DoubleVectorView_false_var_const) {
-  using std::vector;
-  using stan::DoubleVectorView;
-  using Eigen::Matrix;
-  using Eigen::Dynamic;
-  using stan::agrad::var;
-
-  const var a_var(1);
-  const std::vector<var> a_std_vector(3);
-  const Matrix<var,Dynamic,1> a_vector(4);
-  const Matrix<var,1,Dynamic> a_row_vector(5);
-
-  DoubleVectorView<false,const var> dvv1(length(a_var));
-  EXPECT_THROW(dvv1[0], std::runtime_error);
-
-  DoubleVectorView<false,const std::vector<var> > dvv2(length(a_std_vector));
-  EXPECT_THROW(dvv2[0], std::runtime_error);
-  
-  DoubleVectorView<false,const Matrix<var,Dynamic,1> > dvv3(length(a_vector));
-  EXPECT_THROW(dvv3[0], std::runtime_error);
-  
-  DoubleVectorView<false,const Matrix<var,1,Dynamic> > dvv4(length(a_row_vector));
-  EXPECT_THROW(dvv4[0], std::runtime_error);
-}
-
-
-TEST(MetaTraits, DoubleVectorView_true_var_const) {
-  using std::vector;
-  using stan::DoubleVectorView;
-  using Eigen::Matrix;
-  using Eigen::Dynamic;
-  using stan::agrad::var;
-
-  const var a_var(1);
-  const std::vector<var> a_std_vector(3);
-  const Matrix<var,Dynamic,1> a_vector(4);
-  const Matrix<var,1,Dynamic> a_row_vector(5);
-
-  DoubleVectorView<true,const var> dvv1(length(a_var));
-  EXPECT_FLOAT_EQ(0.0, dvv1[0]);
-  EXPECT_FLOAT_EQ(0.0, dvv1[1]);
-  EXPECT_FLOAT_EQ(0.0, dvv1[100]);
-
-  DoubleVectorView<true,const std::vector<var> > dvv2(length(a_std_vector));
-  EXPECT_FLOAT_EQ(0.0, dvv2[0]);
-  EXPECT_FLOAT_EQ(0.0, dvv2[1]);
-  EXPECT_FLOAT_EQ(0.0, dvv2[2]);  
-  
-  DoubleVectorView<true,const Matrix<var,Dynamic,1> > dvv3(length(a_vector));
-  EXPECT_FLOAT_EQ(0.0, dvv3[0]);
-  EXPECT_FLOAT_EQ(0.0, dvv3[1]);
-  EXPECT_FLOAT_EQ(0.0, dvv3[2]);  
-  
-  DoubleVectorView<true,const Matrix<var,1,Dynamic> > dvv4(length(a_row_vector));
-  EXPECT_FLOAT_EQ(0.0, dvv4[0]);
-  EXPECT_FLOAT_EQ(0.0, dvv4[1]);
-  EXPECT_FLOAT_EQ(0.0, dvv4[2]);
+  EXPECT_FLOAT_EQ(1.0, dvv4[1]);
+  EXPECT_FLOAT_EQ(2.0, dvv4[2]);
 }
 
 
@@ -561,4 +493,75 @@ TEST(MetaTraits, scalar_type) {
 
   bool b5 = is_same<int, scalar_type<double>::type>::value;
   EXPECT_FALSE(b5);
+}
+
+TEST(MetaTraits,VectorView) {
+  using stan::VectorView;
+  using std::vector;
+  using Eigen::Matrix;
+  using Eigen::Dynamic;
+
+  double x = 5;
+  VectorView<const double> x_VectorView(x);
+  EXPECT_FLOAT_EQ(x,x_VectorView[0]);
+  EXPECT_FLOAT_EQ(x,x_VectorView[1]);
+  EXPECT_FLOAT_EQ(x,x_VectorView[2]);
+
+  vector<double> sv;
+  sv.push_back(1.0);
+  sv.push_back(4.0);
+  sv.push_back(9.0);
+  VectorView<const vector<double> > sv_VectorView(sv);
+  EXPECT_FLOAT_EQ(1.0,sv_VectorView[0]);
+  EXPECT_FLOAT_EQ(4.0,sv_VectorView[1]);
+  EXPECT_FLOAT_EQ(9.0,sv_VectorView[2]);
+
+  Matrix<double,Dynamic,1> v(3);
+  v << 1.0, 4.0, 9.0;
+  VectorView<const Matrix<double,Dynamic,1> > v_VectorView(v);
+  EXPECT_FLOAT_EQ(1.0,v_VectorView[0]);
+  EXPECT_FLOAT_EQ(4.0,v_VectorView[1]);
+  EXPECT_FLOAT_EQ(9.0,v_VectorView[2]);
+
+  Matrix<double,1,Dynamic> rv(3);
+  rv << 1.0, 4.0, 9.0;
+  VectorView<const Matrix<double,1,Dynamic> > rv_VectorView(rv);
+  EXPECT_FLOAT_EQ(1.0,rv_VectorView[0]);
+  EXPECT_FLOAT_EQ(4.0,rv_VectorView[1]);
+  EXPECT_FLOAT_EQ(9.0,rv_VectorView[2]);
+
+  Matrix<double,Dynamic,Dynamic> m(2,3);
+  m << 1.0, 2.0, 3.0, -100.0, -200.0, -300.0;
+  VectorView<const Matrix<double,Dynamic,Dynamic> > m_VectorView(m);
+  int pos = 0;
+  for (int j = 0; j < 3; ++j) {
+    for (int i = 0; i < 2; ++i) {
+      EXPECT_FLOAT_EQ(m(i,j),m_VectorView[pos]);
+      ++pos;
+    }
+  }
+}
+
+TEST(MetaTraits,isFvar) {
+  using stan::agrad::var;
+  using stan::agrad::fvar;
+  using stan::is_fvar;
+  
+  EXPECT_FALSE(is_fvar<double>::value);
+  EXPECT_TRUE(is_fvar<fvar<double> >::value);
+  EXPECT_TRUE(is_fvar<fvar<fvar<double> > >::value);
+  EXPECT_FALSE(is_fvar<var>::value);
+}
+
+TEST(MetaTraits,containsFvar) {
+  using stan::agrad::var;
+  using stan::agrad::fvar;
+  using stan::contains_fvar;
+  EXPECT_FALSE(contains_fvar<double>::value);
+  EXPECT_FALSE((contains_fvar<double,int,var>::value));
+  EXPECT_TRUE((contains_fvar<fvar<double> >::value));
+  EXPECT_TRUE((contains_fvar<double, fvar<double> >::value));
+  EXPECT_TRUE((contains_fvar<double, fvar<var>, int >::value));
+  EXPECT_TRUE((contains_fvar<fvar<double>, fvar<var> >::value));
+  EXPECT_TRUE((contains_fvar<fvar<fvar<double> > >::value));
 }
