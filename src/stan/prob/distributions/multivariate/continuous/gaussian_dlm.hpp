@@ -151,7 +151,7 @@ namespace stan {
                             G.rows(), "rows of G",
                             &lp))
         return lp;
-      // check W
+      // check C0
       if (!check_cov_matrix(function, C0, "C0", &lp))
         return lp;
       if (!check_size_match(function,
@@ -314,6 +314,21 @@ namespace stan {
                             G.rows(), "rows of G",
                             &lp))
         return lp;
+      // check m0
+      if (!check_size_match(function,
+                            m0.size(), "size of m0",
+                            G.rows(), "rows of G",
+                            &lp))
+        return lp;
+      // check C0
+      if (!check_cov_matrix(function, C0, "C0", &lp))
+        return lp;
+      if (!check_size_match(function,
+                            C0.rows(), "rows of C0",
+                            G.rows(), "rows of G",
+                            &lp))
+        return lp;
+
 
       if (y.cols() == 0 || y.rows() == 0)
         return lp;
