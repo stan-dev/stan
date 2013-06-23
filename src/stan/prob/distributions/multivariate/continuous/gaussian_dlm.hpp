@@ -26,16 +26,15 @@
 #include <stan/math/matrix/trace_quad_form.hpp>
 #include <stan/math/matrix/transpose.hpp>
 
-/* 
-   
-   TODO: add initial state, m0, C0. Problem is that both 
-   boost::math::tools::promote_args and the definitions of functions
+/*
+
+   TODO: add initial state, m0, C0. Problem is that both
+   boost::math::tools::boost::math::tools::promote_args and the definitions of functions
    in stan::gm do not support that many arguments.
    TODO: add constant terms. Problem is the same as the initial values.
    TODO: use sequential processing even for non-diagonal obs covariance.
    TODO: time-varying system matrices
  */
-
 
 namespace stan {
   namespace prob {
@@ -45,7 +44,7 @@ namespace stan {
      * \f{eqnarray*}{
      * y_t & \sim N(F' \theta_t, V) \\
      * \theta_t & \sim N(G \theta_{t-1}, W) \\
-     * \theta_0 & \sim N(0, diag(10^{6}))
+     * \theta_0 & \sim N(m_0, C_0)
      * \f}
      *
      * If V is a vector, then the Kalman filter is applied
@@ -57,6 +56,10 @@ namespace stan {
      * @param G A n x n matrix. The transition matrix.
      * @param V A r x r matrix. The observation covariance matrix.
      * @param W A n x n matrix. The state covariance matrix.
+     * @param m0 A n x 1 matrix. The mean vector of the distribution
+     * of the initial state.
+     * @param C0 A n x n matrix. The covariance matrix of the
+     * distribution of the initial state.
      * @return The log of the joint density of the GDLM.
      * @throw std::domain_error if a matrix in the Kalman filter is
      * not semi-positive definite.
@@ -67,20 +70,27 @@ namespace stan {
      * @tparam T_W Type of state covariance matrix.
      */
     template <bool propto,
-              typename T_y, 
+              typename T_y,
               typename T_F, typename T_G,
-              typename T_V, typename T_W
+              typename T_V, typename T_W,
+              typename T_m0, typename T_C0
               >
-    typename boost::math::tools::promote_args<T_y,T_F,T_G,T_V,T_W>::type
+    typename boost::math::tools::promote_args<
+      T_y,
+      typename boost::math::tools::promote_args<T_F,T_G,T_V,T_W,T_m0,T_C0>::type >::type
     gaussian_dlm_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
                      const Eigen::Matrix<T_F,Eigen::Dynamic,Eigen::Dynamic>& F,
                      const Eigen::Matrix<T_G,Eigen::Dynamic,Eigen::Dynamic>& G,
                      const Eigen::Matrix<T_V,Eigen::Dynamic,Eigen::Dynamic>& V,
-                     const Eigen::Matrix<T_W,Eigen::Dynamic,Eigen::Dynamic>& W) {
+                     const Eigen::Matrix<T_W,Eigen::Dynamic,Eigen::Dynamic>& W,
+                     const Eigen::Matrix<T_m0,Eigen::Dynamic,1>& m0,
+                     const Eigen::Matrix<T_C0,Eigen::Dynamic,Eigen::Dynamic>& C0) {
       static const char* function = "stan::prob::dlm_log(%1%)";
-      typedef typename boost::math::tools::promote_args<T_y,T_F,T_G,T_V,T_W>::type T_lp;
+      typedef typename boost::math::tools::promote_args<
+        T_y,
+        typename boost::math::tools::promote_args<T_F,T_G,T_V,T_W,T_m0,T_C0>::type  >::type T_lp;
       T_lp lp(0.0);
-      
+
       using stan::math::check_not_nan;
       using stan::math::check_size_match;
       using stan::math::check_finite;
@@ -135,27 +145,36 @@ namespace stan {
       if (y.cols() == 0 || y.rows() == 0)
         return lp;
 
+      // check m0
+      if (!check_size_match(function,
+                            m0.size(), "size of m0",
+                            G.rows(), "rows of G",
+                            &lp))
+        return lp;
+      // check W
+      if (!check_cov_matrix(function, C0, "C0", &lp))
+        return lp;
+      if (!check_size_match(function,
+                            C0.rows(), "rows of C0",
+                            G.rows(), "rows of G",
+                            &lp))
+        return lp;
+
       if (include_summand<propto>::value) {
         lp -= 0.5 * LOG_TWO_PI * r * T;
       }
-      
-      if (include_summand<propto,T_y,T_F,T_G,T_V,T_W>::value) {
-        // TODO: initial values of m and C should be arguments.
-        // however that would create too many args for
-        // boost::math::tools::promote_args (max 6)
-        // and would require altering function signatures in the
-        // parser to accept more arguments.
-        Eigen::Matrix<T_lp,Eigen::Dynamic,1> m(n);
-        for (int i = 0; i < m.size(); i ++)
-          m(i) = 0.0;
+
+      if (include_summand<propto,T_y,T_F,T_G,T_V,T_W,T_m0,T_C0>::value) {
+        Eigen::Matrix<T_lp,Eigen::Dynamic, 1> m(n);
         Eigen::Matrix<T_lp,Eigen::Dynamic, Eigen::Dynamic> C(n, n);
-        for (int i = 0; i < C.rows(); i ++) {
-          for (int j = 0; j < C.cols(); j ++) {          
-            if (i == j) {
-              C(i, j) = 1e7;
-            } else {
-              C(i, j) = 0.0;
-            }
+
+        // TODO: how to recast matrices
+        for (int i = 0; i < m.size(); i ++ ) {
+          m(i) = m0(i);
+        }
+        for (int i = 0; i < C0.rows(); i ++ ) {
+          for (int j = 0; j < C0.cols(); j ++ ) {
+            C(i, j) = C0(i, j);
           }
         }
 
@@ -178,7 +197,7 @@ namespace stan {
           // std::cout  << "a = " << a << std::endl;
           // R_t = G_t C_{t-1} G_t' + W_t
           R = add(quad_form_sym(C, transpose(G)), W);
-          // // predict observation 
+          // // predict observation
           // f_t = F_t' a_t
           f = multiply(transpose(F), a);
           // Q_t = F'_t R_t F_t + V_t
@@ -199,39 +218,51 @@ namespace stan {
       return lp;
     }
 
-    template <typename T_y, 
+    template <typename T_y,
               typename T_F, typename T_G,
-              typename T_V, typename T_W
+              typename T_V, typename T_W,
+              typename T_m0, typename T_C0
               >
     inline
-    typename boost::math::tools::promote_args<T_y,T_F,T_G,T_V,T_W>::type
+    typename boost::math::tools::promote_args<
+      T_y,
+      typename boost::math::tools::promote_args<T_F,T_G,T_V,T_W,T_m0,T_C0>::type >::type
     gaussian_dlm_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
                      const Eigen::Matrix<T_F,Eigen::Dynamic,Eigen::Dynamic>& F,
                      const Eigen::Matrix<T_G,Eigen::Dynamic,Eigen::Dynamic>& G,
                      const Eigen::Matrix<T_V,Eigen::Dynamic,Eigen::Dynamic>& V,
-                     const Eigen::Matrix<T_W,Eigen::Dynamic,Eigen::Dynamic>& W) {
-      return gaussian_dlm_log<false>(y, F, G, V, W);
+                     const Eigen::Matrix<T_W,Eigen::Dynamic,Eigen::Dynamic>& W,
+                     const Eigen::Matrix<T_m0,Eigen::Dynamic,1>& m0,
+                     const Eigen::Matrix<T_C0,Eigen::Dynamic,Eigen::Dynamic>& C0) {
+      return gaussian_dlm_log<false>(y, F, G, V, W, m0, C0);
     }
 
     /**
-     * If V is a vector, then the sequential version of the Kalman
-     * filter is used.
+     * If V is a vector, then the Kalman filter processes the
+     * observations sequentially.
      **/
     template <bool propto,
-              typename T_y, 
+              typename T_y,
               typename T_F, typename T_G,
-              typename T_V, typename T_W
+              typename T_V, typename T_W,
+              typename T_m0, typename T_C0
               >
-    typename boost::math::tools::promote_args<T_y,T_F,T_G,T_V,T_W>::type
+    typename boost::math::tools::promote_args<
+      T_y,
+      typename boost::math::tools::promote_args<T_F,T_G,T_V,T_W,T_m0,T_C0>::type >::type
     gaussian_dlm_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
                      const Eigen::Matrix<T_F,Eigen::Dynamic,Eigen::Dynamic>& F,
                      const Eigen::Matrix<T_G,Eigen::Dynamic,Eigen::Dynamic>& G,
                      const Eigen::Matrix<T_V,Eigen::Dynamic,1>& V,
-                     const Eigen::Matrix<T_W,Eigen::Dynamic,Eigen::Dynamic>& W) {
+                     const Eigen::Matrix<T_W,Eigen::Dynamic,Eigen::Dynamic>& W,
+                     const Eigen::Matrix<T_m0,Eigen::Dynamic,1>& m0,
+                     const Eigen::Matrix<T_C0,Eigen::Dynamic,Eigen::Dynamic>& C0) {
       static const char* function = "stan::prob::dlm_log(%1%)";
-      typedef typename boost::math::tools::promote_args<T_y,T_F,T_G,T_V,T_W>::type T_lp;
+      typedef typename boost::math::tools::promote_args<
+        T_y,
+        typename boost::math::tools::promote_args<T_F,T_G,T_V,T_W,T_m0,T_C0>::type  >::type T_lp;
       T_lp lp(0.0);
-      
+
       using stan::math::add;
       using stan::math::check_cov_matrix;
       using stan::math::check_finite;
@@ -290,26 +321,13 @@ namespace stan {
       if (include_summand<propto>::value) {
         lp += 0.5 * NEG_LOG_TWO_PI * r * T;
       }
-      
-      if (include_summand<propto,T_y,T_F,T_G,T_V,T_W>::value) {
+
+      if (include_summand<propto,T_y,T_F,T_G,T_V,T_W,T_m0,T_C0>::value) {
         // TODO: initial values of m and C should be arguments.
         // however that would create too many args for
         // boost::math::tools::promote_args (max 6)
         // and would require altering function signatures in the
         // parser to accept more arguments.
-        Eigen::Matrix<T_lp, Eigen::Dynamic, 1> m(n);
-        for (int i = 0; i < m.size(); i ++)
-          m(i) = 0.0;
-        Eigen::Matrix<T_lp, Eigen::Dynamic, Eigen::Dynamic> C(n, n);
-        for (int i = 0; i < C.rows(); i ++) {
-          for (int j = 0; j < C.cols(); j ++) {          
-            if (i == j) {
-              C(i, j) = 1e7;
-            } else {
-              C(i, j) = 0.0;
-            }
-          }
-        }
 
         T_lp f;
         T_lp Q;
@@ -317,17 +335,25 @@ namespace stan {
         T_lp e;
         Eigen::Matrix<T_lp, Eigen::Dynamic, 1> A(n);
         Eigen::Matrix<T_lp, Eigen::Dynamic, 1> Fj(n);
-        Eigen::Matrix<T_lp, Eigen::Dynamic, 1> m1(n);
-        Eigen::Matrix<T_lp, Eigen::Dynamic, Eigen::Dynamic> C1(n, n);
-        
+        Eigen::Matrix<T_lp, Eigen::Dynamic, 1> m(n);
+        Eigen::Matrix<T_lp, Eigen::Dynamic, Eigen::Dynamic> C(n,n);
+
+        // TODO: how to recast matrices
+        for (int i = 0; i < m.size(); i ++ ) {
+          m(i) = m0(i);
+        }
+        for (int i = 0; i < C0.rows(); i ++ ) {
+          for (int j = 0; j < C0.cols(); j ++ ) {
+            C(i, j) = C0(i, j);
+          }
+        }
+
         for (int i = 0; i < y.cols(); i++) {
           // Predict state
           // reuse m and C instead of using a and R
           // eval to avoid any aliasing issues with Eigen (?)
-          m1 = multiply(G, m); 
-          m = m1;
-          C1 = add(quad_form_sym(C, transpose(G)), W);
-          C = C1;
+          m = multiply(G, m).eval();
+          C = add(quad_form_sym(C, transpose(G)), W).eval();
           for (int j = 0; j < y.rows(); ++j) {
             // predict observation
             T_lp yij(y(j, i));
@@ -358,20 +384,26 @@ namespace stan {
       return lp;
     }
 
-    template <typename T_y, 
+    template <typename T_y,
               typename T_F, typename T_G,
-              typename T_V, typename T_W
+              typename T_V, typename T_W,
+              typename T_m0, typename T_C0
               >
     inline
-    typename boost::math::tools::promote_args<T_y,T_F,T_G,T_V,T_W>::type
+    typename boost::math::tools::promote_args<
+      T_y,
+      typename boost::math::tools::promote_args<T_F,T_G,T_V,T_W,T_m0,T_C0>::type
+      >::type
     gaussian_dlm_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
                      const Eigen::Matrix<T_F,Eigen::Dynamic,Eigen::Dynamic>& F,
                      const Eigen::Matrix<T_G,Eigen::Dynamic,Eigen::Dynamic>& G,
                      const Eigen::Matrix<T_V,Eigen::Dynamic,1>& V,
-                     const Eigen::Matrix<T_W,Eigen::Dynamic,Eigen::Dynamic>& W) {
-      return gaussian_dlm_log<false>(y, F, G, V, W);
+                     const Eigen::Matrix<T_W,Eigen::Dynamic,Eigen::Dynamic>& W,
+                     const Eigen::Matrix<T_m0,Eigen::Dynamic,1>& m0,
+                     const Eigen::Matrix<T_C0,Eigen::Dynamic,Eigen::Dynamic>& C0) {
+      return gaussian_dlm_log<false>(y, F, G, V, W, m0, C0);
     }
-  }    
+  }
 
 }
 

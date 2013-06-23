@@ -5,6 +5,8 @@ data {
   int r;
   int T;
   matrix[r, T] y;
+  vector[1] m0;
+  cov_matrix[1] C0;
 }
 transformed data {
   matrix[1, 1] G;
@@ -22,5 +24,5 @@ transformed parameters {
   }
 }
 model {
-  y ~ gaussian_dlm(F, G, V, W);
+  y ~ gaussian_dlm(F, G, V, W, m0, C0);
 }

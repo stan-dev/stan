@@ -181,6 +181,42 @@ namespace stan {
       arg_types.push_back(arg_type5);
       add(name,result_type,arg_types);
     }
+    void function_signatures::add(const std::string& name,
+                                  const expr_type& result_type,
+                                  const expr_type& arg_type1,
+                                  const expr_type& arg_type2,
+                                  const expr_type& arg_type3,
+                                  const expr_type& arg_type4,
+                                  const expr_type& arg_type5,
+                                  const expr_type& arg_type6) {
+      std::vector<expr_type> arg_types;
+      arg_types.push_back(arg_type1);
+      arg_types.push_back(arg_type2);
+      arg_types.push_back(arg_type3);
+      arg_types.push_back(arg_type4);
+      arg_types.push_back(arg_type5);
+      arg_types.push_back(arg_type6);
+      add(name,result_type,arg_types);
+    }
+    void function_signatures::add(const std::string& name,
+                                  const expr_type& result_type,
+                                  const expr_type& arg_type1,
+                                  const expr_type& arg_type2,
+                                  const expr_type& arg_type3,
+                                  const expr_type& arg_type4,
+                                  const expr_type& arg_type5,
+                                  const expr_type& arg_type6,
+                                  const expr_type& arg_type7) {
+      std::vector<expr_type> arg_types;
+      arg_types.push_back(arg_type1);
+      arg_types.push_back(arg_type2);
+      arg_types.push_back(arg_type3);
+      arg_types.push_back(arg_type4);
+      arg_types.push_back(arg_type5);
+      arg_types.push_back(arg_type6);
+      arg_types.push_back(arg_type7);
+      add(name,result_type,arg_types);
+    }
     void function_signatures::add_nullary(const::std::string& name) {
       add(name,DOUBLE_T);
     }

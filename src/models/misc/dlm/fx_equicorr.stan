@@ -1,13 +1,15 @@
 data {
-  int n;
+  int r;
   int T;
-  matrix[n, T] y;
+  matrix[r, T] y;
+  vector[r] m0;
+  cov_matrix[r] C0;
 }
 transformed data {
-  vector[n] ones;
-  matrix[n, n] G;
-  matrix[n, n] F;
-  for (i in 1:n) {
+  vector[r] ones;
+  matrix[r, r] G;
+  matrix[r, r] F;
+  for (i in 1:r) {
     ones[i] <- 1.0;
   }
   G <- diag_matrix(ones);
@@ -15,14 +17,14 @@ transformed data {
 }
 parameters {
   real<lower=-1.0, upper=1.0> rho;
-  vector<lower=0.0>[n] sigma;
-  vector<lower=0.0>[n] W_diag;
+  vector<lower=0.0>[r] sigma;
+  vector<lower=0.0>[r] W_diag;
 }
 transformed parameters {
-  cov_matrix[n] V;
-  cov_matrix[n] W;
+  cov_matrix[r] V;
+  cov_matrix[r] W;
   W <- diag_matrix(W_diag);
-  for (i in 1:n) {
+  for (i in 1:r) {
     V[i, i] <- pow(sigma[i], 2);
     for (j in 1:(i - 1)) {
       V[i, j] <- sigma[i] * sigma[j] * rho;
@@ -31,5 +33,5 @@ transformed parameters {
   }
 }
 model {
-  y ~ gaussian_dlm_log(F, G, V, W);
+  y ~ gaussian_dlm_log(F, G, V, W, m0, C0);
 }
