@@ -1417,29 +1417,41 @@ For $t \in 1, \dots, T$,
 \[
   \begin{aligned}[t]
     y_{t} &\sim N(F' \theta_{t}, V) \\
-    \theta_{t} &\sim N(G \theta_{t - 1}, W),
+    \theta_{t} &\sim N(G \theta_{t - 1}, W) \\
+    \theta_{0} &\sim N(m_{0}, C_{0}) 
   \end{aligned}
 \]
-where $y$ is $n \times T$ matrix where rows are variables and $T$ are observations.
-The log-likelihood of this system is calculated using the the Kalman Filter.
-If $V$ is diagonal, then a more numerically stable algorithm that processes each observation sequentially can be used.
+where $y$ is $n \times T$ matrix where rows are variables and columns
+are observations. The log-likelihood of this system is calculated
+using the the Kalman Filter. If $V$ is diagonal, then a more efficient
+algorithm which sequentially processes observations can be used
+\citep[Sec~6.4]{DurbinKoopman:2001}.
 
 \subsubsection{Stan Functions}
 
 \begin{description}
 %
-\fitem{real}{gaussian\_dlm\_log}{vector \farg{y}, matrix
-  \farg{F}, matrix \farg{G}, matrix \farg{V}, matrix \farg{W}}
-  {The log of the density of the Gaussian Dynamic Linear model with
-    observation matrix \farg{y} in which rows are variables and columns are observations, design matrix \farg{F}, transition matrix \farg{G},
-    obsrvation covariance matrix \farg{V}, and system covariance matrix \farg{W}.}
+\fitem{real}{gaussian\_dlm\_log}{vector \farg{y}, matrix \farg{F},
+  matrix \farg{G}, matrix \farg{V}, matrix \farg{W}, vector
+  \farg{m0}, matrix \farg{C0}} {The log of the density of the
+  Gaussian Dynamic Linear model with observation matrix \farg{y} in
+  which rows are variables and columns are observations, design
+  matrix \farg{F}, transition matrix \farg{G}, observation
+  covariance matrix \farg{V}, system covariance matrix \farg{W}, and
+  the initial state is distributed normal with mean \farg{m0} and
+  covariance \farg{C0}.}
+% 
 %
+\fitem{real}{gaussian\_dlm\_log}{vector \farg{y}, matrix \farg{F},
+  matrix \farg{G}, vector \farg{V}, matrix \farg{W}, vector \farg{m0},
+  matrix \farg{C0}} {The log of the density of the Gaussian Dynamic
+  Linear model with observation matrix \farg{y} in which rows are
+  variables and columns are observations, design matrix \farg{F},
+  transition matrix \farg{G}, observation covariance matrix with
+  diagonal \farg{V}, system covariance matrix \farg{W}, and the
+  initial state is distributed normal with mean \farg{m0} and
+  covariance \farg{C0}.}
 %
-\fitem{real}{gaussian\_dlm\_log}{vector \farg{y}, matrix
-  \farg{F}, matrix \farg{G}, vector \farg{V}, matrix \farg{W}}
-  {The log of the density of the Gaussian Dynamic Linear model with
-    observation matrix \farg{y} in which rows are variables and columns are observations, design matrix \farg{F}, transition matrix \farg{G},
-    diagonal of the obsrvation covariance matrix \farg{V}, and system covariance matrix \farg{W}.}
 %
 \end{description}
 

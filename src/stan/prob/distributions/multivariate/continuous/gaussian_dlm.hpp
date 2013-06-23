@@ -27,20 +27,18 @@
 #include <stan/math/matrix/transpose.hpp>
 
 /*
-
-   TODO: add initial state, m0, C0. Problem is that both
-   boost::math::tools::boost::math::tools::promote_args and the definitions of functions
-   in stan::gm do not support that many arguments.
-   TODO: add constant terms. Problem is the same as the initial values.
-   TODO: use sequential processing even for non-diagonal obs covariance.
-   TODO: time-varying system matrices
+  TODO: ensure that V and W can have 0 entries.
+  TODO: time-varying system matrices  
+  TODO: use sequential processing even for non-diagonal obs
+  covariance.
+  TODO: add constant terms in observation.
  */
 
 namespace stan {
   namespace prob {
     /**
      * The log of a Gaussian dynamic linear model (GDLM).
-     * This distribution is equivalent to, for \f$t = 1:N\f$,
+     * This distribution is equivalent to, for \f$t = 1:T\f$,
      * \f{eqnarray*}{
      * y_t & \sim N(F' \theta_t, V) \\
      * \theta_t & \sim N(G \theta_{t-1}, W) \\
@@ -68,6 +66,8 @@ namespace stan {
      * @tparam T_G Type of transition matrix.
      * @tparam T_V Type of observation covariance matrix.
      * @tparam T_W Type of state covariance matrix.
+     * @tparam T_m0 Type of initial state mean vector.
+     * @tparam T_C0 Type of initial state covariance matrix.
      */
     template <bool propto,
               typename T_y,
@@ -238,9 +238,40 @@ namespace stan {
     }
 
     /**
-     * If V is a vector, then the Kalman filter processes the
-     * observations sequentially.
-     **/
+     * The log of a Gaussian dynamic linear model (GDLM) with 
+     * uncorrelated observation disturbances.
+     * This distribution is equivalent to, for \f$t = 1:T\f$,
+     * \f{eqnarray*}{
+     * y_t & \sim N(F' \theta_t, diag(V)) \\
+     * \theta_t & \sim N(G \theta_{t-1}, W) \\
+     * \theta_0 & \sim N(m_0, C_0)
+     * \f}
+     *
+     * If V is a vector, then the Kalman filter is applied
+     * sequentially.
+     *
+     * @param y A r x T matrix of observations. Rows are variables,
+     * columns are observations.
+     * @param F A n x r matrix. The design matrix.
+     * @param G A n x n matrix. The transition matrix.
+     * @param V A size r vector. The diagonal of the observation
+     * covariance matrix.
+     * @param W A n x n matrix. The state covariance matrix.
+     * @param m0 A n x 1 matrix. The mean vector of the distribution
+     * of the initial state.
+     * @param C0 A n x n matrix. The covariance matrix of the
+     * distribution of the initial state.
+     * @return The log of the joint density of the GDLM.
+     * @throw std::domain_error if a matrix in the Kalman filter is
+     * not semi-positive definite.
+     * @tparam T_y Type of scalar.
+     * @tparam T_F Type of design matrix.
+     * @tparam T_G Type of transition matrix.
+     * @tparam T_V Type of observation variances
+     * @tparam T_W Type of state covariance matrix.
+     * @tparam T_m0 Type of initial state mean vector.
+     * @tparam T_C0 Type of initial state covariance matrix.
+     */
     template <bool propto,
               typename T_y,
               typename T_F, typename T_G,
