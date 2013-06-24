@@ -12,6 +12,7 @@
 #include <stan/agrad/agrad.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/agrad/matrix.hpp>
+#include <stan/agrad/rev/matrix/to_var.hpp>
 
 #include <stan/math/matrix/add.hpp>
 #include <stan/math/matrix/dot_product.hpp>
@@ -27,8 +28,7 @@
 #include <stan/math/matrix/transpose.hpp>
 
 /*
-  TODO: ensure that V and W can have 0 entries.
-  TODO: time-varying system matrices  
+  TODO: time-varying system matrices
   TODO: use sequential processing even for non-diagonal obs
   covariance.
   TODO: add constant terms in observation.
@@ -60,7 +60,7 @@ namespace stan {
      * distribution of the initial state.
      * @return The log of the joint density of the GDLM.
      * @throw std::domain_error if a matrix in the Kalman filter is
-     * not semi-positive definite.
+     * not positive semi-definite.
      * @tparam T_y Type of scalar.
      * @tparam T_F Type of design matrix.
      * @tparam T_G Type of transition matrix.
@@ -85,24 +85,25 @@ namespace stan {
                      const Eigen::Matrix<T_W,Eigen::Dynamic,Eigen::Dynamic>& W,
                      const Eigen::Matrix<T_m0,Eigen::Dynamic,1>& m0,
                      const Eigen::Matrix<T_C0,Eigen::Dynamic,Eigen::Dynamic>& C0) {
-      static const char* function = "stan::prob::dlm_log(%1%)";
+      static const char* function = "stan::prob::gaussian_dlm_log(%1%)";
       typedef typename boost::math::tools::promote_args<
         T_y,
         typename boost::math::tools::promote_args<T_F,T_G,T_V,T_W,T_m0,T_C0>::type  >::type T_lp;
       T_lp lp(0.0);
 
+      using stan::math::add;
+      using stan::math::check_cov_matrix;
+      using stan::math::check_finite;
       using stan::math::check_not_nan;
       using stan::math::check_size_match;
-      using stan::math::check_finite;
-      using stan::math::check_cov_matrix;
-      using stan::math::add;
-      using stan::math::multiply;
-      using stan::math::transpose;
+      using stan::math::check_spsd_matrix;
       using stan::math::inverse_spd;
-      using stan::math::subtract;
-      using stan::math::quad_form_sym;
-      using stan::math::trace_quad_form;
       using stan::math::log_determinant_spd;
+      using stan::math::multiply;
+      using stan::math::quad_form_sym;
+      using stan::math::subtract;
+      using stan::math::trace_quad_form;
+      using stan::math::transpose;
 
       int r = y.rows(); // number of variables
       int T = y.cols(); // number of observations
@@ -126,7 +127,7 @@ namespace stan {
                             &lp))
         return lp;
       // check V
-      if (!check_cov_matrix(function, V, "V", &lp))
+      if (!check_spsd_matrix(function, V, "V", &lp))
         return lp;
       if (!check_size_match(function,
                             V.rows(), "rows of V",
@@ -134,7 +135,7 @@ namespace stan {
                             &lp))
         return lp;
       // check W
-      if (!check_cov_matrix(function, W, "W", &lp))
+      if (!check_spsd_matrix(function, W, "W", &lp))
         return lp;
       if (!check_size_match(function,
                             W.rows(), "rows of W",
@@ -169,7 +170,7 @@ namespace stan {
         Eigen::Matrix<T_lp,Eigen::Dynamic, Eigen::Dynamic> C(n, n);
 
         // TODO: how to recast matrices
-        for (int i = 0; i < m.size(); i ++ ) {
+        for (int i = 0; i < m0.size(); i ++ ) {
           m(i) = m0(i);
         }
         for (int i = 0; i < C0.rows(); i ++ ) {
@@ -297,9 +298,10 @@ namespace stan {
       using stan::math::add;
       using stan::math::check_cov_matrix;
       using stan::math::check_finite;
+      using stan::math::check_nonnegative;
       using stan::math::check_not_nan;
-      using stan::math::check_positive;
       using stan::math::check_size_match;
+      using stan::math::check_spsd_matrix;
       using stan::math::dot_product;
       using stan::math::multiply;
       using stan::math::quad_form_sym;
@@ -330,15 +332,14 @@ namespace stan {
                             &lp))
         return lp;
       // check V
-      if (!check_positive(function, V, "V", &lp))
+      if (!check_nonnegative(function, V, "V", &lp))
         return lp;
       if (!check_size_match(function,
                             V.size(), "size of V",
                             y.rows(), "rows of y",
                             &lp))
         return lp;
-      // check W
-      if (!check_cov_matrix(function, W, "W", &lp))
+      if (!check_spsd_matrix(function, W, "W", &lp))
         return lp;
       if (!check_size_match(function,
                             W.rows(), "rows of W",
@@ -382,10 +383,10 @@ namespace stan {
         Eigen::Matrix<T_lp, Eigen::Dynamic, 1> A(n);
         Eigen::Matrix<T_lp, Eigen::Dynamic, 1> Fj(n);
         Eigen::Matrix<T_lp, Eigen::Dynamic, 1> m(n);
-        Eigen::Matrix<T_lp, Eigen::Dynamic, Eigen::Dynamic> C(n,n);
+        Eigen::Matrix<T_lp, Eigen::Dynamic, Eigen::Dynamic> C(n, n);
 
         // TODO: how to recast matrices
-        for (int i = 0; i < m.size(); i ++ ) {
+        for (int i = 0; i < m0.size(); i ++ ) {
           m(i) = m0(i);
         }
         for (int i = 0; i < C0.rows(); i ++ ) {

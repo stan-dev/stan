@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "stan/prob/distributions/multivariate/continuous/gaussian_dlm.hpp"
+#include <stan/prob/distributions/multivariate/continuous/gaussian_dlm.hpp>
 
 using Eigen::Dynamic;
 using Eigen::Matrix;
@@ -180,6 +180,7 @@ TEST(ProbDistributionsGaussianDLM,InputMatrixV) {
 
 }
 
+
 // test inputs when V is a matrix
 TEST(ProbDistributionsGaussianDLM,InputVectorV) {
   // consistent matrices
@@ -242,4 +243,29 @@ TEST(ProbDistributionsGaussianDLM,InputVectorV) {
   Matrix<double, Dynamic, Dynamic> C0_2 = MatrixXd::Identity(2, 3);
   EXPECT_THROW(gaussian_dlm_log(y, FF, GG, V, W1, m0, C0_2), std::domain_error);
 
+}
+
+// Test that semi-positive definite matrices can be used.
+TEST(ProbDistributionsGaussianDLM,SemiDefiniteCovMatrices) {
+  // consistent matrices
+  Matrix<double, Dynamic, Dynamic> FF = MatrixXd::Random(2, 3);
+  Matrix<double, Dynamic, Dynamic> GG = MatrixXd::Random(2, 2);
+  Matrix<double, Dynamic, Dynamic> V = MatrixXd::Identity(3, 3);
+  Matrix<double, Dynamic, 1> V_vec = Matrix<double, Dynamic, 1>::Constant(3, 1.0);
+  Matrix<double, Dynamic, Dynamic> W = MatrixXd::Identity(2, 2);
+  Matrix<double, Dynamic, Dynamic> y = MatrixXd::Random(3, 5);
+  Matrix<double, Dynamic, 1> m0 = Matrix<double, Dynamic, 1>::Random(2);
+  Matrix<double, Dynamic, Dynamic> C0 = MatrixXd::Identity(2, 2) * 100;
+
+  Matrix<double, Dynamic, Dynamic> V_psd = MatrixXd::Zero(3,3);
+  V_psd(0,0) = 1.0; // if all zeros, then in the function inverse_spd
+                   // throws error.
+  EXPECT_NO_THROW(gaussian_dlm_log(y, FF, GG, V_psd, W, m0, C0));
+
+  Matrix<double, Dynamic, 1> V_psd_vec = Matrix<double, Dynamic, 1>::Zero(3);
+  EXPECT_NO_THROW(gaussian_dlm_log(y, FF, GG, V_psd_vec, W, m0, C0));
+
+  Matrix<double, Dynamic, Dynamic> W_psd = MatrixXd::Zero(2, 2);
+  EXPECT_NO_THROW(gaussian_dlm_log(y, FF, GG, V, W_psd, m0, C0));
+  EXPECT_NO_THROW(gaussian_dlm_log(y, FF, GG, V_vec, W_psd, m0, C0));
 }
