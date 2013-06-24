@@ -29,12 +29,15 @@ transformed data {
 
   // rep_vector
   v0 <- rep_vector(3.7,5);
+  v0 <- rep_vector(2,5);  // test ints for issue #104
 
   // rep_row_vector
   rv0 <- rep_row_vector(9.8,5);
+  rv0 <- rep_row_vector(9,5);
 
   // rep_matrix (2D)
   m0 <- rep_matrix(-1.8, 5, 6);
+  m0 <- rep_matrix(-1, 5, 6);
 
   // rep_array 1D
   n1 <- rep_array(n0,2);
@@ -44,6 +47,9 @@ transformed data {
   x1 <- rep_array(x0,2);
   x2 <- rep_array(x1,3);
   x3 <- rep_array(x2,4);
+
+  // should allow integer array assign to double array?
+  // x1 <- rep_array(1,2);
 
   v1 <- rep_array(v0,6);
   v2 <- rep_array(v1,7);
@@ -62,6 +68,7 @@ transformed data {
 
   // rep_array 3D
   x3 <- rep_array(-128.676, 4, 3, 2);
+
 
 }
 parameters {
