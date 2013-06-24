@@ -12,13 +12,14 @@ namespace stan {
       
     public:
       
-      unvalued_argument(): _is_present(false) {};
+      unvalued_argument()
+        : _is_present(false) {}
       
-      void print(std::ostream* s, int depth, const char prefix) {};
+      void print(std::ostream* s, const int depth, const char prefix) {}
       
-      void print_help(std::ostream* s, int depth, bool recurse = false) {
-        
-        if(!s) return;
+      void print_help(std::ostream* s, const int depth, const bool recurse = false) {
+        if (!s)
+          return;
         
         std::string indent(indent_width * depth, ' ');
         std::string subindent(indent_width, ' ');
@@ -26,7 +27,6 @@ namespace stan {
         *s << indent << _name << std::endl;
         *s << indent << subindent << _description << std::endl;
         *s << std::endl;
-        
       }
       
       bool parse_args(std::vector<std::string>& args, std::ostream* out,
@@ -43,16 +43,14 @@ namespace stan {
         return true;
       };
       
-      bool is_present() { return _is_present; }
+      bool is_present() { 
+        return _is_present; 
+      }
       
     protected:
-      
       bool _is_present;
-      
     };
-    
-  } // gm
-  
-} // stan
 
+  } // gm
+} // stan
 #endif
