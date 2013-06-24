@@ -21,7 +21,7 @@ namespace stan {
       Eigen::VectorXd mInv;
       
       diag_e_point(const diag_e_point& z): ps_point(z), mInv(z.mInv.size()) {
-        std::memcpy(&mInv(0), &(z.mInv(0)), z.mInv.size() * sizeof(double));
+        _fast_vector_copy<double>(mInv, z.mInv);
       }
       
       void write_metric(std::ostream* o) {

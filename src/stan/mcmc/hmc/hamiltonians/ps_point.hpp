@@ -21,8 +21,8 @@ namespace stan {
   
       ps_point(const ps_point& z): q(z.q), r(z.r), p(z.p.size()), V(z.V), g(z.g.size())
       {
-        std::memcpy(&p(0), &(z.p(0)), z.p.size() * sizeof(double));
-        std::memcpy(&g(0), &(z.g(0)), z.g.size() * sizeof(double));
+        _fast_vector_copy<double>(p, z.p);
+        _fast_vector_copy<double>(g, z.g);
       }
       
       
@@ -36,8 +36,8 @@ namespace stan {
         
         V = z.V;
         
-        std::memcpy(&p(0), &(z.p(0)), z.p.size() * sizeof(double));
-        std::memcpy(&g(0), &(z.g(0)), z.g.size() * sizeof(double));
+        _fast_vector_copy<double>(p, z.p);
+        _fast_vector_copy<double>(g, z.g);
         
         return *this;
         
@@ -72,7 +72,22 @@ namespace stan {
       virtual void write_metric(std::ostream* o) {
         if(!o) return;
         *o << "# No free parameters for unit metric" << std::endl;
-      };
+      }
+      
+    protected:
+      
+      template <typename T>
+      inline void _fast_vector_copy(Eigen::Matrix<T, Eigen::Dynamic, 1>& v_to, const Eigen::Matrix<T, Eigen::Dynamic, 1>& v_from) {
+        v_to.resize(v_from.size());
+        std::memcpy(&v_to(0), &v_from(0), v_from.size() * sizeof(double));
+      }
+
+      template <typename T>
+      inline void _fast_matrix_copy(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& v_to,
+                                    const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& v_from) {
+        v_to.resize(v_from.rows(), v_from.cols());
+        std::memcpy(&v_to(0), &v_from(0), v_from.size() * sizeof(double));
+      }
       
     };
 

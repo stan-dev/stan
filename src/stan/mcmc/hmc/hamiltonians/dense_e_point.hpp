@@ -21,7 +21,7 @@ namespace stan {
       Eigen::MatrixXd mInv;
       
       dense_e_point(const dense_e_point& z): ps_point(z), mInv(z.mInv.rows(), z.mInv.cols()) {
-        std::memcpy(&mInv(0), &(z.mInv(0)), z.mInv.size() * sizeof(double));
+        _fast_matrix_copy<double>(mInv, z.mInv);
       }
       
       void write_metric(std::ostream* o) {
