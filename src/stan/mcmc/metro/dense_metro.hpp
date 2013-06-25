@@ -37,15 +37,17 @@ namespace stan {
           q[i] += this->_nom_epsilon * prop(i);
       }                 
                    
-      void write_metric(std::ostream& o) {
-        o << "# Elements of inverse covariance matrix:" << std::endl;
+      void write_metric(std::ostream* o) {
+        if(!o) return;
+        *o << "# Elements of inverse covariance matrix:" << std::endl;
         for(size_t i = 0; i < _prop_cov.rows(); ++i) {
-          o << "# " << _prop_cov(i, 0) << std::flush;
+          *o << "# " << _prop_cov(i, 0) << std::flush;
           for(size_t j = 1; j < _prop_cov.cols(); ++j)
-            o << ", " << _prop_cov(i, j) << std::flush;
-          o << std::endl;
-        }     
+            *o << ", " << _prop_cov(i, j) << std::flush;
+          *o << std::endl;
+        }
       };
+      
 
     protected:
 

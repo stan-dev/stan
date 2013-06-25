@@ -34,8 +34,22 @@ namespace stan {
       ~base_metro() {};
 
       virtual void propose(std::vector<double>& q, BaseRNG& rng) = 0;
+      virtual void write_metric(std::ostream* o) = 0;
 
-      virtual void write_metric(std::ostream& o) = 0;
+      void write_sampler_state(std::ostream* o) {
+        if(!o) return;
+        *o << "# Step size = " << get_nominal_stepsize() << std::endl;
+        this->write_metric(o);
+      }
+      
+      void get_sampler_diagnostic_names(std::vector<std::string>& model_names,
+                                        std::vector<std::string>& names) {
+        this->get_param_names(model_names, names);
+      };
+      
+      void get_sampler_diagnostics(std::vector<double>& values) {
+        this->get_params(values);
+      };
 
       void seed(const std::vector<double>& q, const std::vector<int>& r) {
         _params_r = q;
@@ -53,14 +67,16 @@ namespace stan {
        this->propose(_params_r, _rand_int);
        double log_p = log_prob(_params_r,_params_i);
 
-       double accept_prob = std::exp(log_p - logp0);
+       if (boost::math::isnan(log_p)) 
+         log_p = std::numeric_limits<double>::infinity();
 
-       if (accept_prob < 1 && this->_rand_uniform() > accept_prob) {
+       double accept_prob = std::exp(log_p - logp0);
+       accept_prob = accept_prob > 1 ? 1 : accept_prob;
+
+       if (this->_rand_uniform() > accept_prob) {
          _params_r = init_sample.cont_params();
          log_p = logp0;
        }
-
-       accept_prob = accept_prob > 1 ? 1 : accept_prob;
 
        return sample(_params_r, 
                      _params_i,
@@ -79,29 +95,27 @@ namespace stan {
       }
 
       void init_stepsize() {
-        std::vector<double> params_r0(_params_r);
+        std::vector<double> params_r0(this->_params_r);
         std::vector<int> params_i0(_params_i);
 
-        this->propose(_params_r, _rand_int);
-        double log_p0 = log_prob(_params_r,_params_i);
+        double log_p0 = log_prob(this->_params_r,_params_i);
 
-        this->propose(_params_r, _rand_int); 
-        double log_p = log_prob(_params_r,_params_i);
-       
+        this->propose(this->_params_r, _rand_int); 
+        double log_p = log_prob(this->_params_r,_params_i);
+
+        if (boost::math::isnan(log_p)) 
+          log_p = std::numeric_limits<double>::infinity();
+
         double delta_log_p = log_p - log_p0;
 
         int direction = delta_log_p > std::log(0.5) ? 1 : -1;
         while (1) {    
-              
           this->seed(params_r0, params_i0);
-
-          this->propose(_params_r, _rand_int);
-          double log_p0 = log_prob(_params_r,_params_i);
           
-          this->propose(_params_r, _rand_int); 
-          double log_p = log_prob(_params_r,_params_i);
+          this->propose(this->_params_r, _rand_int); 
+          log_p = log_prob(this->_params_r,_params_i);
                
-          double delta_log_p = log_p - log_p0;
+          delta_log_p = log_p - log_p0;
 
           if ((direction == 1) && !(delta_log_p > std::log(0.5)))
             break;
@@ -110,15 +124,26 @@ namespace stan {
           else
             this->_nom_epsilon = ( (direction == 1)
                                    ? 2.0 * this->_nom_epsilon
-                                   : 0.5 * this->_nom_epsilon );
+                                   : 0.5 * this->_nom_epsilon);
           
-          if (this->_nom_epsilon > 1e300)
+          if (this->_nom_epsilon > 1e7)
             throw std::runtime_error("Posterior is improper. Please check your model.");
           if (this->_nom_epsilon == 0)
             throw std::runtime_error("No acceptably small step size could be found. Perhaps the posterior is not continuous?");
         }        
       }      
+
+      virtual void get_params(std::vector<double>& values) {
+        for(size_t i = 0; i < _params_r.size(); ++i)
+          values.push_back(_params_r.at(i));
+       }
       
+      virtual void get_param_names(std::vector<std::string>& model_names,
+                                   std::vector<std::string>& names) {
+        for(size_t i = 0; i < _params_r.size(); ++i)
+          names.push_back(model_names.at(i));
+       }
+
       void write_sampler_param_names(std::ostream& o) {
         o << "stepsize__,";
       }
@@ -128,12 +153,10 @@ namespace stan {
       }
       
       void get_sampler_param_names(std::vector<std::string>& names) {
-        names.clear();
         names.push_back("stepsize__");
       }
       
       void get_sampler_params(std::vector<double>& values) {
-        values.clear();
         values.push_back(this->_epsilon);
       }
       

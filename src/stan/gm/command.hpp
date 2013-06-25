@@ -944,97 +944,120 @@ namespace stan {
         
       }
       
-<<<<<<< HEAD
-      double warmDeltaT;
-      double sampleDeltaT;
+      double warmDeltaT = 0.0;
+      double sampleDeltaT = 0.0;
     
       if (unit_metro) {
-        std::cout<<"run metropolis with unit metric"<< std::endl;
-
         stan::mcmc::sample s(cont_params, disc_params, 0, 0);
-
-        typedef stan::mcmc::adapt_unit_metro<Model, rng_t> metro;
-        metro sampler(model, base_rng);
+        
+        typedef stan::mcmc::adapt_unit_metro<Model, rng_t> unit_metro;
+        unit_metro sampler(model, base_rng);
         sampler.seed(cont_params, disc_params);
+        
+        write_comment_property(sample_stream, "algorithm", sampler.name());
+        write_comment(sample_stream);
 
-        if (!append_samples) {
-          sample_stream << "lp__,"; // log probability first
-          sampler.write_sampler_param_names(sample_stream);
-          model.write_csv_header(sample_stream);
+        if (diagnostic_stream) {
+          write_comment_property(*diagnostic_stream, "algorithm", sampler.name());
+          write_comment(*diagnostic_stream);
         }
 
-       // Warm-Up
-        if (epsilon <= 0) sampler.init_stepsize();
-        else             sampler.set_nominal_stepsize(epsilon);
+        if (!append_samples) {
+          writer.print_sample_names(s, sampler, model);
+          writer.print_diagnostic_names(s, sampler, model);
+        }
+        
+        // Warm-Up
+        if (epsilon <= 0) {
+
+          try {
+            sampler.init_stepsize();
+          } catch (std::runtime_error e) {
+            std::cout << e.what() << std::endl;
+            return 0;
+          }
+        }
+        else {
+          sampler.set_nominal_stepsize(epsilon);
+        }
         
         sampler.set_stepsize_jitter(epsilon_pm);
-                
+        
         sampler.get_stepsize_adaptation().set_delta(delta);
         sampler.get_stepsize_adaptation().set_gamma(gamma);
         sampler.get_stepsize_adaptation().set_mu(log(10 * sampler.get_nominal_stepsize()));
         sampler.engage_adaptation();
         
         clock_t start = clock();
-
-        warmup<metro, Model, rng_t>(sampler, num_warmup, num_iterations - num_warmup, num_thin, 
+        
+        warmup<unit_metro, Model, rng_t>(sampler, num_warmup, num_iterations - num_warmup, num_thin,
                                         refresh, save_warmup, 
-                                        sample_stream, diagnostic_stream,
-                                        s, model, base_rng); 
+                                        writer, s, model, base_rng); 
         
         clock_t end = clock();
         warmDeltaT = (double)(end - start) / CLOCKS_PER_SEC;
         
         sampler.disengage_adaptation();
-
-        sample_stream << "# (" << sampler.name() << ")" << std::endl;
-        sample_stream << "# Adaptation terminated" << std::endl;
-        sample_stream << "# Step size = " << sampler.get_nominal_stepsize() << std::endl;
-        sampler.write_metric(sample_stream);
+        writer.print_adapt_finish(sampler);
         
         // Sampling
         start = clock();
-
-        sample<metro, Model, rng_t>(sampler, num_warmup, num_iterations - num_warmup, num_thin, 
+        
+        sample<unit_metro, Model, rng_t>(sampler, num_warmup, num_iterations - num_warmup, num_thin,
                                         refresh, true, 
-                                        sample_stream, diagnostic_stream, 
-                                        s, model, base_rng); 
+                                        writer, s, model, base_rng);
         
         end = clock();
         sampleDeltaT = (double)(end - start) / CLOCKS_PER_SEC;
 
-      std::cout << std::endl
-                << "Elapsed Time: " << warmDeltaT 
-                << " seconds (Warm Up)"  << std::endl
-                << "              " << sampleDeltaT 
-                << " seconds (Sampling)"  << std::endl
-                << "              " << warmDeltaT + sampleDeltaT 
-                << " seconds (Total)"  << std::endl
-                << std::endl << std::endl;
-
+        writer.print_timing(warmDeltaT, sampleDeltaT);
+      
+        sample_stream.close();
+      
+        if (diagnostic_stream) {
+          diagnostic_stream->close();
+          delete diagnostic_stream;
+        }
+        
         return 0;
       }
 
       if (diag_metro) {
-        std::cout<<"run metropolis with diagonal metric"<< std::endl;
-
         stan::mcmc::sample s(cont_params, disc_params, 0, 0);
-
-        typedef stan::mcmc::adapt_diag_metro<Model, rng_t> metro;
-        metro sampler(model, base_rng, num_warmup);
+        
+        typedef stan::mcmc::adapt_diag_metro<Model, rng_t> diag_metro;
+        diag_metro sampler(model, base_rng, num_warmup);
         sampler.seed(cont_params, disc_params);
+        
+        write_comment_property(sample_stream, "algorithm", sampler.name());
+        write_comment(sample_stream);
 
-        if (!append_samples) {
-          sample_stream << "lp__,"; // log probability first
-          sampler.write_sampler_param_names(sample_stream);
-          model.write_csv_header(sample_stream);
+        if (diagnostic_stream) {
+          write_comment_property(*diagnostic_stream, "algorithm", sampler.name());
+          write_comment(*diagnostic_stream);
         }
 
-       // Warm-Up
-        if (epsilon <= 0) sampler.init_stepsize();
-        else             sampler.set_nominal_stepsize(epsilon);
+        if (!append_samples) {
+          writer.print_sample_names(s, sampler, model);
+          writer.print_diagnostic_names(s, sampler, model);
+        }
+        
+        // Warm-Up
+        if (epsilon <= 0) {
+
+          try {
+            sampler.init_stepsize();
+          } catch (std::runtime_error e) {
+            std::cout << e.what() << std::endl;
+            return 0;
+          }
+        }
+        else {
+          sampler.set_nominal_stepsize(epsilon);
+        }
         
         sampler.set_stepsize_jitter(epsilon_pm);
-                
+        
         sampler.get_stepsize_adaptation().set_delta(delta);
         sampler.get_stepsize_adaptation().set_gamma(gamma);
         sampler.get_stepsize_adaptation().set_mu(log(10 * sampler.get_nominal_stepsize()));
@@ -1042,65 +1065,74 @@ namespace stan {
         
         clock_t start = clock();
         
-        warmup<metro, Model, rng_t>(sampler, num_warmup, num_iterations - num_warmup, num_thin, 
+        warmup<diag_metro, Model, rng_t>(sampler, num_warmup, num_iterations - num_warmup, num_thin,
                                         refresh, save_warmup, 
-                                        sample_stream, diagnostic_stream,
-                                        s, model, base_rng); 
+                                        writer, s, model, base_rng); 
         
         clock_t end = clock();
         warmDeltaT = (double)(end - start) / CLOCKS_PER_SEC;
         
         sampler.disengage_adaptation();
-
-        sample_stream << "# (" << sampler.name() << ")" << std::endl;
-        sample_stream << "# Adaptation terminated" << std::endl;
-        sample_stream << "# Step size = " << sampler.get_nominal_stepsize() << std::endl;
-        sampler.write_metric(sample_stream);
+        writer.print_adapt_finish(sampler);
         
         // Sampling
         start = clock();
         
-        sample<metro, Model, rng_t>(sampler, num_warmup, num_iterations - num_warmup, num_thin, 
+        sample<diag_metro, Model, rng_t>(sampler, num_warmup, num_iterations - num_warmup, num_thin,
                                         refresh, true, 
-                                        sample_stream, diagnostic_stream, 
-                                        s, model, base_rng); 
+                                        writer, s, model, base_rng);
         
         end = clock();
         sampleDeltaT = (double)(end - start) / CLOCKS_PER_SEC;
 
-      std::cout << std::endl
-                << "Elapsed Time: " << warmDeltaT 
-                << " seconds (Warm Up)"  << std::endl
-                << "              " << sampleDeltaT 
-                << " seconds (Sampling)"  << std::endl
-                << "              " << warmDeltaT + sampleDeltaT 
-                << " seconds (Total)"  << std::endl
-                << std::endl << std::endl;
-
+        writer.print_timing(warmDeltaT, sampleDeltaT);
+      
+        sample_stream.close();
+      
+        if (diagnostic_stream) {
+          diagnostic_stream->close();
+          delete diagnostic_stream;
+        }
+        
         return 0;
       }
 
       if (dense_metro) {
-        std::cout<<"run metropolis with dense metric"<< std::endl;
-
         stan::mcmc::sample s(cont_params, disc_params, 0, 0);
-
-        typedef stan::mcmc::adapt_dense_metro<Model, rng_t> metro;
-        metro sampler(model, base_rng, num_warmup);
+        
+        typedef stan::mcmc::adapt_dense_metro<Model, rng_t> dense_metro;
+        dense_metro sampler(model, base_rng, num_warmup);
         sampler.seed(cont_params, disc_params);
+        
+        write_comment_property(sample_stream, "algorithm", sampler.name());
+        write_comment(sample_stream);
 
-        if (!append_samples) {
-          sample_stream << "lp__,"; // log probability first
-          sampler.write_sampler_param_names(sample_stream);
-          model.write_csv_header(sample_stream);
+        if (diagnostic_stream) {
+          write_comment_property(*diagnostic_stream, "algorithm", sampler.name());
+          write_comment(*diagnostic_stream);
         }
 
-       // Warm-Up
-        if (epsilon <= 0) sampler.init_stepsize();
-        else             sampler.set_nominal_stepsize(epsilon);
+        if (!append_samples) {
+          writer.print_sample_names(s, sampler, model);
+          writer.print_diagnostic_names(s, sampler, model);
+        }
+        
+        // Warm-Up
+        if (epsilon <= 0) {
+
+          try {
+            sampler.init_stepsize();
+          } catch (std::runtime_error e) {
+            std::cout << e.what() << std::endl;
+            return 0;
+          }
+        }
+        else {
+          sampler.set_nominal_stepsize(epsilon);
+        }
         
         sampler.set_stepsize_jitter(epsilon_pm);
-                
+        
         sampler.get_stepsize_adaptation().set_delta(delta);
         sampler.get_stepsize_adaptation().set_gamma(gamma);
         sampler.get_stepsize_adaptation().set_mu(log(10 * sampler.get_nominal_stepsize()));
@@ -1108,49 +1140,38 @@ namespace stan {
         
         clock_t start = clock();
         
-        warmup<metro, Model, rng_t>(sampler, num_warmup, num_iterations - num_warmup, num_thin, 
+        warmup<dense_metro, Model, rng_t>(sampler, num_warmup, num_iterations - num_warmup, num_thin,
                                         refresh, save_warmup, 
-                                        sample_stream, diagnostic_stream,
-                                        s, model, base_rng); 
+                                        writer, s, model, base_rng); 
         
         clock_t end = clock();
         warmDeltaT = (double)(end - start) / CLOCKS_PER_SEC;
         
         sampler.disengage_adaptation();
-
-        sample_stream << "# (" << sampler.name() << ")" << std::endl;
-        sample_stream << "# Adaptation terminated" << std::endl;
-        sample_stream << "# Step size = " << sampler.get_nominal_stepsize() << std::endl;
-        sampler.write_metric(sample_stream);
+        writer.print_adapt_finish(sampler);
         
         // Sampling
         start = clock();
         
-        sample<metro, Model, rng_t>(sampler, num_warmup, num_iterations - num_warmup, num_thin, 
+        sample<dense_metro, Model, rng_t>(sampler, num_warmup, num_iterations - num_warmup, num_thin,
                                         refresh, true, 
-                                        sample_stream, diagnostic_stream, 
-                                        s, model, base_rng); 
+                                        writer, s, model, base_rng);
         
         end = clock();
         sampleDeltaT = (double)(end - start) / CLOCKS_PER_SEC;
 
-      std::cout << std::endl
-                << "Elapsed Time: " << warmDeltaT 
-                << " seconds (Warm Up)"  << std::endl
-                << "              " << sampleDeltaT 
-                << " seconds (Sampling)"  << std::endl
-                << "              " << warmDeltaT + sampleDeltaT 
-                << " seconds (Total)"  << std::endl
-                << std::endl << std::endl;
-
+        writer.print_timing(warmDeltaT, sampleDeltaT);
+      
+        sample_stream.close();
+      
+        if (diagnostic_stream) {
+          diagnostic_stream->close();
+          delete diagnostic_stream;
+        }
+      
         return 0;
       }
-
-=======
-      double warmDeltaT = 0;
-      double sampleDeltaT = 0;
       
->>>>>>> develop
       if (nondiag_mass) {
         
         // Euclidean NUTS with Dense Metric

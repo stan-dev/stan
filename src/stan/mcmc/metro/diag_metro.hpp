@@ -27,17 +27,17 @@ namespace stan {
                    BaseRNG& rng) {
 
         for (size_t i = 0; i < q.size(); ++i) 
-          q[i] += stan::prob::normal_rng(0,
-                                         this->_nom_epsilon, 
-                                         rng) / std::sqrt(_prop_cov_diag(i)) ;
+          q[i] += this->_nom_epsilon / std::sqrt(_prop_cov_diag(i)) 
+            * stan::prob::normal_rng(0.0,1.0,rng);
       }
 
-      void write_metric(std::ostream& o) {
-        o << "# Diagonal elements of inverse covariance matrix:" << std::endl;
-        o << "# " << _prop_cov_diag(0) << std::flush;
+      void write_metric(std::ostream* o) {
+        if(!o) return;
+        *o << "# Diagonal elements of inverse mass matrix:" << std::endl;
+        *o << "# " << _prop_cov_diag(0) << std::flush;
         for(size_t i = 1; i < _prop_cov_diag.size(); ++i)
-          o << ", " << _prop_cov_diag(i) << std::flush;
-        o << std::endl;
+          *o << ", " << _prop_cov_diag(i) << std::flush;
+        *o << std::endl;
       };
              
     protected:

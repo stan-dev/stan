@@ -49,10 +49,10 @@ public:
     sampler_names.push_back(" --diag_metro");
     sampler_names.push_back(" --dense_metro");
 
+    skip.push_back(4);
     skip.push_back(3);
-    skip.push_back(2);
-    skip.push_back(2);
-    skip.push_back(2);
+    skip.push_back(3);
+    skip.push_back(3);
 
     model_path = convert_model_path(get_model_path());
 
@@ -485,20 +485,20 @@ TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTestUnitMetro) {
 }
 
 
-// TYPED_TEST_P(Model_Test_Fixture, TestGradientDiagMetro) {
-//   TypeParam::sampler_n = 2;
-//   TypeParam::test_gradient(2);
-// }
-// TYPED_TEST_P(Model_Test_Fixture, RunModelDiagMetro) {
-//   TypeParam::run_model(2);
-//   TypeParam::write_results(2);
-// }
-// TYPED_TEST_P(Model_Test_Fixture, ChainsTestDiagMetro) {
-//   TypeParam::chains_test(2);
-// }
-// TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTestDiagMetro) {
-//   TypeParam::test_expected_values(2);
-// }
+TYPED_TEST_P(Model_Test_Fixture, TestGradientDiagMetro) {
+  TypeParam::sampler_n = 2;
+  TypeParam::test_gradient(2);
+}
+TYPED_TEST_P(Model_Test_Fixture, RunModelDiagMetro) {
+  TypeParam::run_model(2);
+  TypeParam::write_results(2);
+}
+TYPED_TEST_P(Model_Test_Fixture, ChainsTestDiagMetro) {
+  TypeParam::chains_test(2);
+}
+TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTestDiagMetro) {
+  TypeParam::test_expected_values(2);
+}
 
 TYPED_TEST_P(Model_Test_Fixture, TestGradientDenseMetro) {
   TypeParam::sampler_n = 3;
@@ -524,10 +524,10 @@ REGISTER_TYPED_TEST_CASE_P(Model_Test_Fixture,
                            RunModelUnitMetro,
                            ChainsTestUnitMetro,
                            ExpectedValuesTestUnitMetro,
-                           // TestGradientDiagMetro,
-                           // RunModelDiagMetro,
-                           // ChainsTestDiagMetro,
-                           // ExpectedValuesTestDiagMetro);
+                           TestGradientDiagMetro,
+                           RunModelDiagMetro,
+                           ChainsTestDiagMetro,
+                           ExpectedValuesTestDiagMetro,
                            TestGradientDenseMetro,
                            RunModelDenseMetro,
                            ChainsTestDenseMetro,

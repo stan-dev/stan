@@ -28,9 +28,10 @@ namespace stan {
                                                               this->_rand_int);
       }
 
-      void write_metric(std::ostream& o) {
-        o << "# No free parameters for unit metric" << std::endl;
-      };
+      void write_metric(std::ostream* o) {
+        if(!o) return;
+        *o << "# No free parameters for unit metric" << std::endl;
+      }
                         
     };
 
