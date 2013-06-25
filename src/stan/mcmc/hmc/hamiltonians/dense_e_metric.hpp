@@ -50,7 +50,8 @@ namespace stan {
         
         Eigen::VectorXd u(z.p.size());
         
-        for (size_t i = 0; i < u.size(); ++i) u(i) = _rand_dense_gaus();
+        for (Eigen::VectorXd::size_type i = 0; i < u.size(); ++i) 
+          u(i) = _rand_dense_gaus();
 
         z.p = z.mInv.llt().matrixL().solve(u);
         

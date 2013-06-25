@@ -30,6 +30,13 @@ namespace stan {
       
       virtual void get_sampler_params(std::vector<double>& values) {};
       
+      virtual void write_sampler_state(std::ostream* o) {};
+      
+      virtual void get_sampler_diagnostic_names(std::vector<std::string>& model_names,
+                                                std::vector<std::string>& names) {};
+      
+      virtual void get_sampler_diagnostics(std::vector<double>& values) {};
+      
     protected:
       
       std::string _name;

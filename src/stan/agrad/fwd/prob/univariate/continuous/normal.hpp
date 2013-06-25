@@ -21,6 +21,7 @@ namespace stan {
                                 typename return_type<T_y,T_loc,T_scale>::type>::type
     normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
       static const char* function = "stan::prob::normal_log(%1%)";
+      // FIXME: add input checks -- that will supress warning here.
 
       using std::log;
       using stan::is_constant_struct;

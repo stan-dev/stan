@@ -2,6 +2,7 @@
 #define __STAN__MCMC__BASE__NUTS__BETA__
 
 #include <math.h>
+#include <boost/math/special_functions/fpclassify.hpp>
 #include <stan/math/functions/min.hpp>
 #include <stan/mcmc/hmc/base_hmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
@@ -156,7 +157,7 @@ namespace stan {
       }
       
       void write_sampler_param_names(std::ostream& o) {
-        o << "stepsize__,depth__,";
+        o << "stepsize__,treedepth__,";
       }
       
       void write_sampler_params(std::ostream& o) {
@@ -164,13 +165,11 @@ namespace stan {
       }
       
       void get_sampler_param_names(std::vector<std::string>& names) {
-        names.clear();
         names.push_back("stepsize__");
-        names.push_back("depth__");
+        names.push_back("treedepth__");
       }
       
       void get_sampler_params(std::vector<double>& values) {
-        values.clear();
         values.push_back(this->_epsilon);
         values.push_back(this->_depth);
       }
@@ -198,7 +197,7 @@ namespace stan {
           z_propose = static_cast<ps_point>(this->_z);
           
           double h = this->_hamiltonian.H(this->_z); 
-          if (h != h) h = std::numeric_limits<double>::infinity();
+          if (boost::math::isnan(h)) h = std::numeric_limits<double>::infinity();
           
           util.criterion = util.log_u + (h - util.H0) < this->_max_delta;
 

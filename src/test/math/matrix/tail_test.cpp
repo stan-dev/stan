@@ -65,13 +65,13 @@ TEST(MathMatrixBlock,TailStdVector1) {
   using stan::math::tail;
   std::vector<int> v;
   v.push_back(1); v.push_back(2); v.push_back(3);
-  EXPECT_EQ(0, tail(v,0).size());
+  EXPECT_EQ(0U, tail(v,0).size());
 }
 TEST(MathMatrixBlock,TailStdVector2) {
   using stan::math::tail;
   std::vector<int> v;
   v.push_back(1); v.push_back(2); v.push_back(3);
-  EXPECT_EQ(3, tail(v,3).size());
+  EXPECT_EQ(3U, tail(v,3).size());
 }
 TEST(MathMatrixBlock,TailStdVector3) {
   using stan::math::tail;
@@ -84,7 +84,7 @@ TEST(MathMatrixBlock,TailStdVector4) {
   std::vector<int> v;
   v.push_back(1); v.push_back(2); v.push_back(3);
   std::vector<int> v12 = tail(v,2);
-  EXPECT_EQ(2,v12.size());
+  EXPECT_EQ(2U,v12.size());
   for (int n = 0; n < 2; ++n)
     EXPECT_FLOAT_EQ(v[n+1],v12[n]);
 }

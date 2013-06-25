@@ -1,10 +1,6 @@
 #ifndef __STAN__GM__PARSER__STATEMENT_2_GRAMMAR_DEF__HPP__
 #define __STAN__GM__PARSER__STATEMENT_2_GRAMMAR_DEF__HPP__
 
-// Suppress Clang error: multiple unsequenced
-// modifications to _pass and/or _val.
-#pragma GCC diagnostic ignored "-Wunsequenced"
-
 #include <cstddef>
 #include <iomanip>
 #include <iostream>
@@ -126,8 +122,8 @@ namespace stan {
         > lit(')')
         > statement_g(_r1,_r2)
         [add_conditional_body_f(_val,_1)]
-        > * (lit("else")
-             >> lit("if")
+        > * (( lit("else")
+               >> lit("if") )
              > lit('(')
              > expression_g(_r2)
                [_pass = add_conditional_condition_f(_val,_1,

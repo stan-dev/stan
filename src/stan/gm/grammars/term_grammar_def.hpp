@@ -1,10 +1,6 @@
 #ifndef __STAN__GM__PARSER__TERM_GRAMMAR_DEF__HPP__
 #define __STAN__GM__PARSER__TERM_GRAMMAR_DEF__HPP__
 
-// Suppress Clang error: multiple unsequenced
-// modifications to _pass and/or _val.
-#pragma GCC diagnostic ignored "-Wunsequenced"
-
 #include <cstddef>
 #include <iomanip>
 #include <iostream>
@@ -518,8 +514,8 @@ namespace stan {
       args_r.name("function argument expressions");
       args_r 
         %= (lit('(') >> lit(')'))
-        | ( lit('(')
-            >> (expression_g(_r1) % ',')
+        | ( ( lit('(')
+              >> (expression_g(_r1) % ',') )
             > lit(')') )
         ;
 
