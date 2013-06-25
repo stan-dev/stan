@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 #include <test/models/model_test_fixture.hpp>
 
-class Models_BugsExamples_Vol3_Parallelagram : 
-  public Model_Test_Fixture<Models_BugsExamples_Vol3_Parallelagram> {
+class Models_BugsExamples_Vol3_Ring : 
+  public Model_Test_Fixture<Models_BugsExamples_Vol3_Ring> {
 protected:
   virtual void SetUp() {}
 public:
@@ -12,11 +12,11 @@ public:
     model_path.push_back("bugs_examples");
     model_path.push_back("vol3");
     model_path.push_back("funshapes");
-    model_path.push_back("parallelagram");
+    model_path.push_back("ring");
     return model_path;
   }
   static bool has_data() {
-    return true;
+    return false;
   }
 
   static bool has_init() {
@@ -44,6 +44,6 @@ public:
 
 };
 
-INSTANTIATE_TYPED_TEST_CASE_P(Models_BugsExamples_Vol3_Parallelagram,
+INSTANTIATE_TYPED_TEST_CASE_P(Models_BugsExamples_Vol3_Ring,
             Model_Test_Fixture,
-            Models_BugsExamples_Vol3_Parallelagram);
+            Models_BugsExamples_Vol3_Ring);

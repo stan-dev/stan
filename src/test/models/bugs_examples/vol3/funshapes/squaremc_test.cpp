@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 #include <test/models/model_test_fixture.hpp>
 
-class Models_BugsExamples_Vol3_Circle : 
-  public Model_Test_Fixture<Models_BugsExamples_Vol3_Circle> {
+class Models_BugsExamples_Vol3_SquareMC : 
+  public Model_Test_Fixture<Models_BugsExamples_Vol3_SquareMC> {
 protected:
   virtual void SetUp() {}
 public:
@@ -12,7 +12,7 @@ public:
     model_path.push_back("bugs_examples");
     model_path.push_back("vol3");
     model_path.push_back("funshapes");
-    model_path.push_back("circle");
+    model_path.push_back("squaremc");
     return model_path;
   }
   static bool has_data() {
@@ -44,6 +44,6 @@ public:
 
 };
 
-INSTANTIATE_TYPED_TEST_CASE_P(Models_BugsExamples_Vol3_Circle,
+INSTANTIATE_TYPED_TEST_CASE_P(Models_BugsExamples_Vol3_SquareMC,
             Model_Test_Fixture,
-            Models_BugsExamples_Vol3_Circle);
+            Models_BugsExamples_Vol3_SquareMC);
