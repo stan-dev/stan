@@ -78,7 +78,7 @@ test-distributions: $(GENERATED_AGRAD_TESTS)
 test-headers: $(HEADER_TESTS)
 
 .PHONY: test-unit
-test-unit: $(addprefix runtest/,$(UNIT_TESTS))
+test-unit: $(addprefix runtest/,$(UNIT_TESTS)) test/models/command$(EXE)
 
 ##
 # Target to build all tests
