@@ -41,6 +41,22 @@ UNIT_TESTS := $(shell find src/test -type f -name '*_test.cpp')
 UNIT_TESTS := $(UNIT_TESTS:src/test/%_test.cpp=test/%)
 UNIT_TESTS := $(filter-out $(MODEL_TESTS),$(UNIT_TESTS))
 
+##
+# Target to compile all headers that are under src/stan 
+# and end with *.hpp.
+##
+HEADER_TESTS := $(addsuffix -test,$(shell find src/stan -name '*.hpp' -type f))
+ifeq ($(OS),win)
+	DEV_NULL = nul
+else
+	DEV_NULL = /dev/null
+endif
+
+%.hpp-test : %.hpp
+	$(COMPILE.c) -O$O $< -o $(DEV_NULL)
+
+
+
 GENERATED_AGRAD_TESTS := $(shell find src/test/agrad/distributions -type f -name '*_test.hpp')
 GENERATED_AGRAD_TESTS := $(GENERATED_AGRAD_TESTS:%_test.hpp=%_00000_generated_test.cpp)
 ##
@@ -57,6 +73,9 @@ src/test/agrad/distributions/%_00000_generated_test.cpp : test/agrad/distributio
 .PHONY: test-distributions
 test-distributions: $(GENERATED_AGRAD_TESTS)
 	@$(MAKE) $(patsubst src/%_test.cpp,runtest/%,$(shell find src/test/agrad/distributions -type f -name '*_generated_test.cpp'))
+
+.PHONY: test-headers
+test-headers: $(HEADER_TESTS)
 
 .PHONY: test-unit
 test-unit: $(addprefix runtest/,$(UNIT_TESTS)) test/models/command$(EXE)

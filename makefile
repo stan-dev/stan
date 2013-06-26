@@ -3,12 +3,8 @@
 # make 3.81.
 ##
 
-
 # The default target of this Makefile is...
 help:
-
-## Disable implicit rules.
-SUFFIXES:
 
 ##
 # Users should only need to set these three variables for use.
@@ -147,8 +143,9 @@ help:
 	@echo '  - *$(EXE)        : If a Stan model exists at *.stan, this target will build'
 	@echo '                     the Stan model as an executable.'
 	@echo '  Tests:'
+	@echo '  - test-headers   : Verifies all header files can be compiled.'
 	@echo '  - test-unit      : Runs unit tests.'
-	@echo '  - test-distributions : Runs unit tests for the distributions (subset of test-unit)'
+	@echo '  - test-distributions : Runs unit tests for the distributions'
 	@echo '  - test-models    : Runs diagnostic models.'
 	@echo '  - test-bugs      : Runs the bugs examples (subset of test-models).'
 	@echo '  - test-all       : Runs all tests.'
