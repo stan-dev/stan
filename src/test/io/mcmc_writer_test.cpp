@@ -263,6 +263,10 @@ TEST(StanIoMcmcWriter, print_diagnostic_params) {
   
   stan::mcmc::adapt_diag_e_nuts<example_model_namespace::example_model, rng_t> sampler(model, base_rng, 0);
   sampler.seed(real, discrete);
+  sampler.z().p(0) = 0;
+  sampler.z().p(1) = 0;
+  sampler.z().g(0) = 0;
+  sampler.z().g(1) = 0;
   
   // Writer
   std::stringstream sample_stream;
