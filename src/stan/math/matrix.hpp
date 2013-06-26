@@ -33,6 +33,7 @@
 #include <stan/math/matrix/get_base1.hpp>
 #include <stan/math/matrix/get_base1_lhs.hpp>
 #include <stan/math/matrix/head.hpp>
+#include <stan/math/matrix/initialize.hpp>
 #include <stan/math/matrix/inverse.hpp>
 #include <stan/math/matrix/inverse_spd.hpp>
 #include <stan/math/matrix/ldlt.hpp>
