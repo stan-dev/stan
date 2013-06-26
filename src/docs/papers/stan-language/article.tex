@@ -41,7 +41,7 @@
         \\[9pt]
         %
         {\bf\large Michael Betancourt}
-        \\ University College London
+        \\ University of Warwick
         %
         \\[9pt]
         %
@@ -59,65 +59,56 @@
 
 %% an abstract and keywords
 \Abstract{ \proglang{Stan} is a probabilistic programming language for
-  specifying statistical models. A \proglang{Stan} program defines a
-  log probability function over parameters.  Other variable types
-  include (transformed) data, transformed parameters, and generated
-  quantities. Variables in \proglang{Stan} programs are strongly typed
-  and may be declared with constraints, such as positivity for a
-  scalar or positive definiteness for a matrix. Statements, such 
-  as assignment, sampling, conditionals, and loops, are executed
-  imperatively in the order they are written.
-  %
-  % Constrained variables
-  % are automatically transformed and the log Jacobian adjustment made
-  % to the probability function.
-  % 
+  specifying statistical models. A \proglang{Stan} program
+  imperatively defines a log probability function over parameters
+  conditioned on specified data and constants.  This may be contrasted
+  with the \proglang{BUGS} language, in which a program declaratively
+  defines a directed acyclic graphical model.
+
+  Variables are declared for dimensionality and as to whether they
+  represent data, transformed data, parameters, transformed
+  parameters, or generated quantities; local variables are also
+  supported.  There are unconstrained and constrained scalar,
+  discrete, vector, matrix, and array types.  There is a library of
+  mathematical functions, probability-related functions, and matrix
+  and linear algebra functions.  Statements, such as assignment,
+  sampling, conditionals, and loops are executed imperatively in the
+  order they are written.
 
   Full Bayesian inference is supported through Markov chain Monte
   Carlo (MCMC) methods such as the no-U-turn Hamiltonian Monte
   Carlo sampler (NUTS).  Penalized maximum likelihood estimates
   are calculated using optimization methods such as BFGS.
-  % 
-  % \proglang{Stan} programs are translated to \proglang{C++}
-  % and compiled.  The target \proglang{C++} code includes an
-  % extensible
-  % custom library of special functions, matrix and linear algebra
-  % operations, and probability mass, density and cumulative
-  % distribution functions.  Functions are vectorized and support
-  % higher-order algorithmic
-  % differentiation to calculate gradients, Hessians, and
-  % Hessian-vector products efficiently up to machine precision.
-  % 
-  % There is an extensive I/O library to deal with constrained
-  % variable input for data, initialization for parameters, and output
-  % for samples or point estimates.  
-  %
-  \proglang{Stan} can be called from the command line or through \proglang{R} using
-  the \pkg{RStan} package.  Both interfaces support running samplers
-  or optimizers and analyzing the resulting inferences.
-}
+  
+  \proglang{Stan} programs are translated to \proglang{C++} and
+  compiled.  The target \proglang{C++} code includes forward- and
+  reverse-mode algorithmic differentiation to support samplers and
+  optimizers requiring gradients, Hessians, Hessian-vector products,
+  and other higher-order derivatives.  There is an extensive I/O
+  library to deal with constrained variable input for data,
+  initialization for parameters, and output for samples or point
+  estimates.  There are also a range of tools to monitor convergence
+  and mixing, summarize the posterior, perform Bayesian inference, and
+  carry out posterior predictive checks.
+
+  \proglang{Stan} can be called from the command line, through
+  \proglang{R} using the \pkg{RStan} package, or through
+  \proglang{Python} using the \pkg{PyStan} package.  All three
+  interfaces support sampling or optimization-based inference and
+  analysis.}
 
 \Keywords{
   probabilistic programming,
-%  Bayesian inference,
-%  Markov chain Monte Carlo (MCMC), 
-%  Hamiltonian Monte Carlo (HMC), 
-  no-U-turn sampler (NUTS),
-%  penalized maximum likelihood, 
-%  BFGS, 
-%  \proglang{C++}
-  \proglang{Stan}} %% at least one keyword must be supplied
+  Bayesian inference,
+  algorithmic differentiation,
+  \proglang{Stan}}
 %
 \Plainkeywords{
   probabilistic programming,
-%  Bayesian inference,
-%  Markov chain Monte Carlo (MCMC), 
-%  Hamiltonian Monte Carlo (HMC), 
-  no-U-turn sampler(NUTS),
-%  penalized maximum likelihood, 
-%  BFGS, 
-%  C++
-  Stan}  %% without formatting
+  Bayesian inference,
+  algorithmic differentiation,
+  Stan}
+
 
 %% publication information
 %% NOTE: Typically, this can be left commented and will be filled out by the technical editor
@@ -251,7 +242,7 @@ support with suitable adjustments to the log probability from the log
 absolute Jacobian determinant of the inverse transforms.
 
 Even with the prototype compiler generating models, we still faced a
-major hurdle to ease of use. The efficiency of HMC is very sensitive
+major hurdle for ease of use. The efficiency of HMC is very sensitive
 to two tuning parameters, discretization interval and a total
 simulation time (equivalently for simple HMC, step size and number of
 steps).  The step size parameter could be tuned during warm-up based
@@ -301,7 +292,7 @@ and then do matrix multiplications every leapfrog step.
 \section{Overview}
 
 This section describes a simple use of \proglang{Stan} from the
-command line following a simple running example. 
+command line to estimate a very simple Bernoulli model.
 
 \subsection{Model for estimating a Bernoulli parameter}
 
@@ -328,45 +319,9 @@ model {
 \end{figure}
 %
 The model assumes the binary observed data \code{y[1],...,y[N]} are
-i.i.d.\ with Bernoulli chance-of-success \code{theta}.  The prior on
-\code{theta} is \code{beta(1,1)} (i.e., uniform).
+i.i.d.\ with chance-of-success \code{theta}.  The prior on
+\code{theta} is \code{beta(1,1)} (i.e., uniform).  This model is available
 
-\subsubsection{Semicolons, whitespace and comments}
-
-Unlike in \proglang{R}, \proglang{BUGS}, and \proglang{JAGS}, the form
-of whitespace does not matter in \proglang{Stan}.  This allows an
-arithmetic expression such as \code{a + b} to be broken so that the
-plus sign starts a new line.  To achieve this goal, semicolons are
-used to indicate statement boundaries.
-
-Two forward slashes (\code{//}) or a single hash mark (\code{\#})
-indicate the start of a comment that continues to the end of a line.
-Longer comments may be included between the \proglang{C++} style
-comment indicators (\code{/*} and \code{*/}).
-
-\subsubsection{Implicit uniform priors}
-
-If no prior is specified for a parameter, it is implicitly given a
-uniform prior on its support.  For parameters such as \code{theta} in
-the example, which are constrained to fall between 0 and 1, this
-produces a proper uniform distribution on the support of \code{theta}.
-For parameters with unbounded support, the implicit uniform prior is
-improper.  Stan allows improper priors to be specified in models, but
-posteriors must be proper in order for sampling to succeed.  In the
-model in Figure~\ref{bernoulli-model.fig}, the sampling statement for
-\code{theta ~ beta(1,1)} could be removed becuase \code{beta(1,1)} is
-a uniform distribution.
-
-\subsubsection{Vectorizings sampling statements}
-
-Iterations of the model will be faster if the loop over sampling
-statements is vectorized, replacing the loop with the vectorized
-statement \code{y ~ bernoulli(theta)}.  Performance gains from
-vectorization are not because loops are slow in Stan, but because
-calls to sampling statements are slow.  Vectorization allows multiple
-calls to a sampling statement to be replaced with a single call that
-can share common calculations for the log probability function, its
-gradients, and error checking.  
 
 \subsection{Data format}
 
@@ -383,46 +338,51 @@ This defines the contents of two variables, an integer \code{N} and a
 10-element integer array \code{y}.  In \pkg{RStan}, data can be passed
 directly through memory without the need to write to a file.
 
-\subsection{Compling a model}
+\subsection{Compling the model}
 
-After a \proglang{C++} toolchain is installed,%
+After a \proglang{C++} compiler and \code{make} are installed,%
 %
-\footnote{A \proglang{C++} toolchain is built into Linux.  The 
-  \pkg{RTools} package suffices for Windows and \pkg{Xcode} for the
-  Mac.}
+\footnote{Appropriate versions are built into Linux. The \pkg{RTools}
+  package suffices for Windows and \pkg{Xcode} for the Mac.}
 %
 the Bernoulli model in Figure~\ref{bernoulli-model.fig} can be
-translated to \proglang{C++} and compiled with a single command.%
+translated to \proglang{C++} and compiled with a single command.
+First, the directory must be changed to \code{$stan}, which we use as
+a shorthand for the directory in which \proglang{Stan} is installed.%
 %
-\footnote{The first time it is run it needs to build the entire
-  \proglang{Stan} translator and library with high levels of
-  optimization, so please be patient (and consider \code{make} option
-  \code{-j2} or \code{-j4} if two or four cores are available).}
+\footnote{Before the first model is built, \code{make} must build the
+  model translator (\code{bin/stanc}) and the \proglang{C++} library
+  (\code{bin/libstan.a}) with high levels of optimization, so please
+  be patient (and consider \code{make} option \code{-j2} or \code{-j4}
+  to run in the specified number of processes if two, four, or more
+  computational cores are available).}
 %
 \begin{CodeChunk}
 \begin{CodeInput}
+> cd $stan
 > make src/models/basic_estimators/bernoulli 
 \end{CodeInput}
 \end{CodeChunk}
 %
 This produces an executable file \code{bernoulli}
-(\code{bernoulli.exe} on Windows) on the specified path (yes, forward
-slashes are OK on Windows).
+(\code{bernoulli.exe} on Windows) on the specified path; forward
+slashes can be used with \code{make} on Windows).
 
 \subsection{Running the model}
 
 The executable can be run as specified given a path to the data file
 (here \code{bernoulli.data.R} in the current directory; for
-Windows, reverse the slashes in the path).
+Windows, the \code{./} before the command is not necessary).
 %
 \begin{CodeChunk}
 \begin{CodeInput}
-> src/models/basic_estimators/bernoulli --data=bernoulli.data.R
+> cd $stan/src/models/basic_estimators
+> ./bernoulli --bernoulli.data.R
 \end{CodeInput}
 \end{CodeChunk}
 %
 The command-line options used, including defaults, are output to the
-terminal and written into the output CSV file.
+terminal and written into the output CSV file in the current directory.
 %
 \begin{Code}
 # Samples Generated by Stan
@@ -542,7 +502,10 @@ samples1.csv	samples2.csv	samples3.csv
 \end{CodeOutput}
 \end{CodeChunk}
 %
-
+Then the \code{bin/print} command can be used to output summary
+statistics for the posterior along with convergence diagnostics and
+effective sample-size estimates.
+%
 \begin{CodeChunk}
 \begin{CodeInput}
 > bin/print samples*.csv
@@ -794,3 +757,4 @@ memory.
 \bibliography{stan-paper}
 
 \end{document}
+

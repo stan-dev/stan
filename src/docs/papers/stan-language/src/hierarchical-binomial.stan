@@ -6,7 +6,7 @@ data {
 parameters {
   real<lower=0,upper=1> theta[J];
   real<lower=0,upper=1> lambda;
-  real<lower=0> kappa;
+  real<lower=0.1> kappa;
 
 }
 transformed parameters {
@@ -16,14 +16,15 @@ transformed parameters {
   beta <- (1 - lambda) * kappa;
 }
 model {
+  lambda ~ uniform(0,1);     // priors
   kappa ~ pareto(0.1,2.5);
   theta ~ beta(alpha,beta);
-  y ~ binomial(n,theta);
+  y ~ binomial(n,theta);     // likelihood
 }
-// generated quantities {
-//   real avg;
-//   int<lower=0,upper=1> above_avg[J];
-//   avg <- mean(theta);
-//   for (j in 1:J)
-//     above_avg[j] <- (theta[j] > avg);
-// }
+generated quantities {
+  real avg;
+  int<lower=0,upper=1> above_avg[J];
+  avg <- mean(theta);
+  for (j in 1:J)
+    above_avg[j] <- (theta[j] > avg);
+}
