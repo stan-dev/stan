@@ -201,7 +201,7 @@ int main(int argc, const char* argv[]) {
   headers << 
     "mean", "se_mean", "sd", 
     "2.5%", "25%", "50%", "75%", "97.5%", 
-    "n_eff", "n_eff/time", "Rhat";
+    "n_eff", "n_eff/s", "Rhat";
   Eigen::VectorXi digits(n);
   
   int precision = 1;
@@ -251,12 +251,13 @@ int main(int argc, const char* argv[]) {
     total_warmup_time /= 60;
     warmup_unit = "minutes";
   }
-
-  std::cout << "Warmup took (" << warmup_times(0);
+  
+  std::cout << "Warmup took (" << std::setprecision(precision) << warmup_times(0);
   for (int chain = 1; chain < chains.num_chains(); chain++)
-    std::cout << ", " << warmup_times(chain);
+    std::cout << ", " << std::setprecision(precision) << warmup_times(chain);
   std::cout << ") seconds, ";
-  std::cout << total_warmup_time << " " << warmup_unit << " total" << std::endl;
+  std::cout << std::setprecision(precision)
+            << total_warmup_time << " " << warmup_unit << " total" << std::endl;
 
   std::string sampling_unit = "seconds";
   
@@ -267,12 +268,13 @@ int main(int argc, const char* argv[]) {
     total_sampling_time /= 60;
     sampling_unit = "minutes";
   }
-  
-  std::cout << "Sampling took (" << sampling_times(0);
+
+  std::cout << "Sampling took (" << std::setprecision(precision) << sampling_times(0);
   for (int chain = 1; chain < chains.num_chains(); chain++)
-    std::cout << ", " << sampling_times(chain);
+    std::cout << ", " << std::setprecision(precision) << sampling_times(chain);
   std::cout << ") seconds, ";
-  std::cout << total_sampling_time << " " << sampling_unit << " total" << std::endl;
+  std::cout << std::setprecision(precision)
+            << total_sampling_time << " " << sampling_unit << " total" << std::endl;
   std::cout << std::endl;
   
   using std::setprecision;
