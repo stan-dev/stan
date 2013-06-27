@@ -49,18 +49,24 @@ for (size_t i = 0; i < int_vector_types.size(); ++i)
     add("bernoulli_logit_log",DOUBLE_T,int_vector_types[i],vector_types[j]);
   }
 add("bernoulli_rng",INT_T,DOUBLE_T);
+add("bessel_first_kind",DOUBLE_T,INT_T,DOUBLE_T);
+add("bessel_second_kind",DOUBLE_T,INT_T,DOUBLE_T);
 for (size_t i = 0; i < int_vector_types.size(); i++) {
   for (size_t j = 0; j < int_vector_types.size(); j++) {
     for (size_t k = 0; k < vector_types.size(); k++) {
       for (size_t l = 0; l < vector_types.size(); l++) {
         add("beta_binomial_cdf",DOUBLE_T, // result
-            int_vector_types[i],int_vector_types[j],vector_types[k],vector_types[l]);
+            int_vector_types[i],int_vector_types[j],vector_types[k],
+            vector_types[l]);
         add("beta_binomial_ccdf_log",DOUBLE_T, // result
-            int_vector_types[i],int_vector_types[j],vector_types[k],vector_types[l]);
+            int_vector_types[i],int_vector_types[j],vector_types[k],
+            vector_types[l]);
         add("beta_binomial_cdf_log",DOUBLE_T, // result
-            int_vector_types[i],int_vector_types[j],vector_types[k],vector_types[l]);
+            int_vector_types[i],int_vector_types[j],vector_types[k],
+            vector_types[l]);
         add("beta_binomial_log",DOUBLE_T, // result
-            int_vector_types[i],int_vector_types[j],vector_types[k],vector_types[l]);
+            int_vector_types[i],int_vector_types[j],vector_types[k],
+            vector_types[l]);
       }
     }
   }
@@ -259,22 +265,27 @@ for (size_t i = 0; i < vector_types.size(); ++i) {
       for (size_t l = 0; l < vector_types.size(); ++l) {
         add("exp_mod_normal_cdf",
             DOUBLE_T, // result
-            vector_types[i], vector_types[j], vector_types[k], vector_types[l]); // args
+            vector_types[i], vector_types[j], vector_types[k], 
+            vector_types[l]); // args
         add("exp_mod_normal_ccdf_log",
             DOUBLE_T, // result
-            vector_types[i], vector_types[j], vector_types[k], vector_types[l]); // args
+            vector_types[i], vector_types[j], vector_types[k], 
+            vector_types[l]); // args
         add("exp_mod_normal_cdf_log",
             DOUBLE_T, // result
-            vector_types[i], vector_types[j], vector_types[k], vector_types[l]); // args
+            vector_types[i], vector_types[j], vector_types[k], 
+            vector_types[l]); // args
         add("exp_mod_normal_log",
             DOUBLE_T, // result
-            vector_types[i], vector_types[j], vector_types[k], vector_types[l]); // args
+            vector_types[i], vector_types[j], vector_types[k], 
+            vector_types[l]); // args
       }
     }
   }
 }
 add_ternary("exp_mod_normal_rng");
 add_unary("fabs");
+add_binary("falling_factorial");
 add_binary("fdim");
 add_unary("floor");
 add_ternary("fma");
@@ -405,6 +416,8 @@ add("log",VECTOR_T,VECTOR_T);
 add("log",ROW_VECTOR_T,ROW_VECTOR_T);
 add("log",MATRIX_T,MATRIX_T);
 add("log_determinant",DOUBLE_T,MATRIX_T);
+add_binary("log_falling_factorial");
+add_binary("log_rising_factorial");
 add("log_sum_exp",DOUBLE_T, expr_type(DOUBLE_T,1U));
 add_binary("log_sum_exp");
 add_nullary("log10");
@@ -486,6 +499,8 @@ add("minus",VECTOR_T,VECTOR_T);
 add("minus",ROW_VECTOR_T,ROW_VECTOR_T);
 add("minus",MATRIX_T,MATRIX_T);
 add("matrix_normal_prec_log",DOUBLE_T,MATRIX_T,MATRIX_T,MATRIX_T,MATRIX_T);
+add("modified_bessel_first_kind",DOUBLE_T,INT_T,DOUBLE_T);
+add("modified_bessel_second_kind",DOUBLE_T,INT_T,DOUBLE_T);
 add("multi_gp_log",DOUBLE_T,MATRIX_T,MATRIX_T,VECTOR_T);
 add("multi_normal_cholesky_log",DOUBLE_T, VECTOR_T,VECTOR_T,MATRIX_T);
 add("multi_normal_prec_log",DOUBLE_T, VECTOR_T,VECTOR_T,MATRIX_T);
@@ -609,6 +624,7 @@ add("rep_matrix", MATRIX_T, VECTOR_T, INT_T);
 add("rep_matrix", MATRIX_T, ROW_VECTOR_T, INT_T);
 add("rep_row_vector", ROW_VECTOR_T, DOUBLE_T, INT_T);
 add("rep_vector", VECTOR_T, DOUBLE_T, INT_T);
+add_binary("rising_factorial");
 add_unary("round");
 add("row",ROW_VECTOR_T,MATRIX_T,INT_T);
 add("rows",INT_T,VECTOR_T);
