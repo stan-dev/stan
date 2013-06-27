@@ -781,9 +781,9 @@ Inference for Stan model:
 3 chains: each with iter=(1000,1000,1000); warmup=(0,0,0); 
 thin=(1,1,1); 3000 iterations saved.
 
-       mean se_mean   sd 2.5%  25%  50%  75% 97.5% n_eff Rhat
-alpha  16.2     2.0 41.5  1.4  5.2  9.7 17.6  59.2   435  1.0
-beta   10.0     1.1 22.8  0.8  3.3  6.2 11.2  37.5   405  1.0
+       mean se_mean   sd 2.5%  25%  50%  75% 97.5% n_eff n_eff/s Rhat
+alpha  16.2     2.0 41.5  1.4  5.2  9.7 17.6  59.2   435     2.3  1.0
+beta   10.0     1.1 22.8  0.8  3.3  6.2 11.2  37.5   405     2.1  1.0
 
 Samples were drawn using mcmc::nuts_diag.
 For each parameter, n_eff is a crude measure of effective 
@@ -803,20 +803,22 @@ For Windows, the forward slash in paths need to be converted to backslashes.
 
 \section{Command-line Options}
 
-There is only a single command-line option for \code{print}, namely
-\code{--help}, which prints usage information.
+In addition to the filenames, \code{print} includes three flags to customize the output.  
 
-In a forthcoming release, there will be controls for the number of
-significant digits in the output;  as is, the print errs on the side
-of using too few digits.
-
-
-
-
-
-
-
-
+\begin{description}
+\cmdflag{help}
+{Prints usage information.}
+{No help output by default}
+%
+\cmdarg{precision}{+int}
+{Set the output precision, namely the number of digits past the decimal place.}
+{default = \code{1}}
+%
+\cmdarg{autocorr=}{+int}
+{Calculates and then displays the autocorrelation of the specified chain at various lags.}
+{No autocorrelation output by default}
+%
+\end{description}
 
 \chapter{Dump Data Format}\label{dump.chapter}
 
