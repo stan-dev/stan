@@ -617,6 +617,12 @@ add("variance",DOUBLE_T,MATRIX_T);
 for (size_t i = 0; i < vector_types.size(); ++i)
   for (size_t j = 0; j < vector_types.size(); ++j)
     for (size_t k = 0; k < vector_types.size(); ++k)
+      add("von_mises_log",
+          DOUBLE_T, // result
+          vector_types[i], vector_types[j], vector_types[k]); // args
+for (size_t i = 0; i < vector_types.size(); ++i)
+  for (size_t j = 0; j < vector_types.size(); ++j)
+    for (size_t k = 0; k < vector_types.size(); ++k)
         add("weibull_log",
             DOUBLE_T, // result
             vector_types[i], vector_types[j], vector_types[k]); // args

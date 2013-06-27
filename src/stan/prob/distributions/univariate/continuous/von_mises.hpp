@@ -28,7 +28,7 @@ namespace stan {
       using stan::math::check_finite;
       using stan::math::check_positive;
       using stan::math::check_greater;
-      using stan::math::check_less;
+      using stan::math::check_nonnegative;
       using stan::math::check_consistent_sizes;
       using stan::math::value_of;
 
@@ -40,16 +40,8 @@ namespace stan {
       // Validate arguments.
       if (!check_finite(function, y, "Random variable", &logp))
         return logp;
-      if(!check_less(function, y, pi, "Random variable", &logp))
-        return logp;
-      if(!check_greater(function, y, -pi, "Random variable", &logp))
-        return logp;
       if(!check_finite(function, mu, "Location paramter", &logp))
         return logp;
-      if(!check_less(function, mu, pi, "Location paramter", &logp))
-        return logp;            
-      if(!check_greater(function, mu, -pi, "Location paramter", &logp))
-        return logp;  
       if(!check_finite(function, kappa, "Scale parameter", &logp))
         return logp;
       if(!check_positive(function, kappa, "Scale parameter", &logp))
@@ -72,6 +64,7 @@ namespace stan {
       const bool compute_bessel0 = include_summand<propto,T_scale>::value ||
         !kappa_const;
       const bool compute_bessel1 = !kappa_const;
+      const double TWO_PI = 2.0 * stan::math::pi();
       
       // Wrap scalars into vector views.
       VectorView<const T_y> y_vec(y);
@@ -84,7 +77,8 @@ namespace stan {
 
       for (size_t n = 0; n < N; n++) {
         // Extract argument values.
-        const double y_dbl = value_of(y_vec[n]);
+        const double y_ = value_of(y_vec[n]);
+        const double y_dbl =  y_ - std::floor(y_ / TWO_PI) * TWO_PI;
         const double mu_dbl = value_of(mu_vec[n]);
         const double kappa_dbl = value_of(kappa_vec[n]);
         

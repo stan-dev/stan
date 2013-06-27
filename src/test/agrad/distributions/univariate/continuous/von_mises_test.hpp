@@ -44,17 +44,17 @@ public:
 
     // y
     index.push_back(0U);
-    value.push_back(-boost::math::constants::pi<double>() - 1.0);
+    value.push_back(-numeric_limits<double>::infinity());
 
     index.push_back(0U);
-    value.push_back(boost::math::constants::pi<double>() + 1.0);
+    value.push_back(numeric_limits<double>::infinity());
 
     // mu
     index.push_back(1U);
-    value.push_back(-boost::math::constants::pi<double>() - 1.0);
+    value.push_back(-numeric_limits<double>::infinity());
 
     index.push_back(1U);
-    value.push_back(boost::math::constants::pi<double>() + 1.0);
+    value.push_back(numeric_limits<double>::infinity());
 
     // kappa
     index.push_back(2U);
