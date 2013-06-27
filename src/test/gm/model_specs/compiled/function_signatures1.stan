@@ -135,6 +135,15 @@ transformed data {
   transformed_data_real <- lmgamma(d_int, d_real);
   transformed_data_real <- lbeta(d_real, d_real);
   transformed_data_real <- binomial_coefficient_log(d_real, d_real);
+  transformed_data_real <- bessel_first_kind(d_int, d_real);
+  transformed_data_real <- bessel_second_kind(d_int, d_real);
+  transformed_data_real <- modified_bessel_first_kind(d_int, d_real);
+  transformed_data_real <- modified_bessel_second_kind(d_int, d_real);
+  transformed_data_real <- falling_factorial(d_real, d_real);
+  transformed_data_real <- rising_factorial(d_real, d_real);
+  transformed_data_real <- log_falling_factorial(d_real, d_real);
+  transformed_data_real <- log_rising_factorial(d_real, d_real);
+
 
   //   composed functions
   transformed_data_real <- expm1(d_real);
@@ -531,6 +540,31 @@ transformed parameters {
   transformed_param_real <- binomial_coefficient_log(p_real, d_real);
   transformed_param_real <- binomial_coefficient_log(d_real, p_real);
   transformed_param_real <- binomial_coefficient_log(p_real, p_real);
+  transformed_param_real <- bessel_first_kind(d_int, d_real);
+  transformed_param_real <- bessel_first_kind(d_int, p_real);
+  transformed_param_real <- bessel_second_kind(d_int, d_real);
+  transformed_param_real <- bessel_second_kind(d_int, p_real);
+  transformed_param_real <- modified_bessel_first_kind(d_int, d_real);
+  transformed_param_real <- modified_bessel_first_kind(d_int, p_real);
+  transformed_param_real <- modified_bessel_second_kind(d_int, d_real);
+  transformed_param_real <- modified_bessel_second_kind(d_int, p_real);
+  transformed_param_real <- falling_factorial(d_real, d_real);
+  transformed_param_real <- falling_factorial(p_real, d_real);  
+  transformed_param_real <- falling_factorial(d_real, p_real);  
+  transformed_param_real <- falling_factorial(p_real, p_real);  
+  transformed_param_real <- rising_factorial(d_real, d_real);
+  transformed_param_real <- rising_factorial(p_real, d_real);
+  transformed_param_real <- rising_factorial(d_real, p_real);
+  transformed_param_real <- rising_factorial(p_real, p_real);
+  transformed_param_real <- log_falling_factorial(d_real, d_real);
+  transformed_param_real <- log_falling_factorial(p_real, d_real); 
+  transformed_param_real <- log_falling_factorial(d_real, p_real); 
+  transformed_param_real <- log_falling_factorial(p_real, p_real); 
+  transformed_param_real <- log_rising_factorial(d_real, d_real);
+  transformed_param_real <- log_rising_factorial(p_real, d_real);  
+  transformed_param_real <- log_rising_factorial(d_real, p_real);  
+  transformed_param_real <- log_rising_factorial(p_real, p_real);  
+
 
   //   composed functions
   transformed_param_real <- expm1(d_real);
