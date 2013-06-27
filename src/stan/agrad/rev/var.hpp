@@ -408,6 +408,8 @@ namespace stan {
        * @return Reference to the specified output stream.
        */
       friend std::ostream& operator<<(std::ostream& os, const var& v) {
+        if (v.vi_ == 0)
+          return os << "uninitialized";
         return os << v.val() << ':' << v.adj();
       }
     };
