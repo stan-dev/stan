@@ -3,7 +3,7 @@ PGM = circle#
 PGM2 = squaremc#
 PGM3 = ring#
 PGM4 = hsquare#
-PGM5 = parallelagram#
+PGM5 = parallelogram#
 
 CXX = g++
 CXX = clang++
@@ -12,31 +12,32 @@ EIGENPATH = $(shell find $(STAN_HOME)/lib -path '*lib/eigen_*' -regex '.*lib\/ei
 CPPFLAGS = -I $(BOOSTPATH)  -I$(EIGENPATH) -I $(STAN_HOME)/src
 LIBFLAGS = -L$(STAN_HOME)/bin -lstan 
 
+all : $(PGM) $(PGM2) $(PGM3) $(PGM4) $(PGM5)
+
 $(PGM) :
 	$(STAN_HOME)/bin/stanc --name=$(PGM)  $(PGM).stan 
 	$(CXX) -Wall -O3 -DNDEBUG $(CPPFLAGS) $(PGM).cpp -o $(PGM) $(LIBFLAGS)
-	./$(PGM) # --data=$(PGM).data.R
+	./$(PGM)
 
 $(PGM2) :
 	$(STAN_HOME)/bin/stanc --name=$(PGM2)  $(PGM2).stan
 	$(CXX) -Wall -O3 -DNDEBUG $(CPPFLAGS) $(PGM2).cpp -o $(PGM2) $(LIBFLAGS)
-	./$(PGM2) --iter=10000 --warmup=1000  # --data=$(PGM2).data.R
-
+	./$(PGM2)
 
 $(PGM3) :
 	$(STAN_HOME)/bin/stanc --name=$(PGM3)  $(PGM3).stan
 	$(CXX) -Wall -O3 -DNDEBUG $(CPPFLAGS) $(PGM3).cpp -o $(PGM3) $(LIBFLAGS)
-	./$(PGM3) --iter=10000 --warmup=1000 --thin=1# --data=$(PGM3).data.R
+	./$(PGM3)
 
 $(PGM4) :
-	$(STAN_HOME)/bin/stanc --name=$(PGM4)  $(PGM4).stan.0 
+	$(STAN_HOME)/bin/stanc --name=$(PGM4)  $(PGM4).stan
 	$(CXX) -Wall -O3 -DNDEBUG $(CPPFLAGS) $(PGM4).cpp -o $(PGM4) $(LIBFLAGS)
-	./$(PGM4) # --data=$(PGM4).data.R
+	./$(PGM4)
 
 $(PGM5) :
 	$(STAN_HOME)/bin/stanc --name=$(PGM5)  $(PGM5).stan
 	$(CXX) -Wall -O3 -DNDEBUG $(CPPFLAGS) $(PGM5).cpp -o $(PGM5) $(LIBFLAGS)
-	./$(PGM5) # --data=$(PGM5).data.R
+	./$(PGM5)
 
 
 clean :
