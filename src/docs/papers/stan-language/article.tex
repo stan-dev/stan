@@ -339,9 +339,10 @@ y <- c(0,1,0,0,0,0,0,0,0,1)
 \end{Code}
 %
 This defines the contents of two variables, an integer \code{N} and a
-10-element integer array \code{y}.  In \pkg{RStan}, data can be passed
-directly through memory without the need to write to a file.  This
-data file is provided with the distrbution in file
+10-element integer array \code{y}.  In \pkg{RStan} and \pkg{PyStan},
+data can also be passed directly through memory without the need to
+read or write to a file.  This data file is provided with the
+\proglang{Stan} distrbution in file
 \code{src/models/basic\_estimators/bernoulli.R.stan}.
 
 \subsection{Compling the model}
@@ -630,13 +631,12 @@ divided by the square root of the number of effective samples
 standard deviation.
 
 
-\section[Stan models]{\proglang{Stan} models}
+\section{Models}
 
 In the rest of this paper, we will concentrate on the modeling
-language itself and how it is executed.  For more details on
-Hamiltonian Monte Carlo, see \citep{Duane:1987, Neal:1994, Neal:2011}; for more information
-on the no-U-turn sampler used by default in \proglang{Stan}, see
-\citep{HoffmanGelman:2011}.
+language and how compiled models are executed.  These details are the
+same whether a \proglang{Stan} model is being used by a built-in or
+externally supplied sampler or optimizer.
 
 \subsection{Example: hierarchical model, with inference}
 
@@ -674,11 +674,14 @@ generated quantities {
   real<lower=0,upper=1> avg;
   int<lower=0,upper=1> above_avg[J];
   int<lower=1,upper=J> rnk[J];
+  int<lower=0,upper=1> best[J];
   avg <- mean(theta);
   for (j in 1:J)
     above_avg[j] <- (theta[j] > avg);
-  for (j in 1:J)
+  for (j in 1:J) {
     rnk[j] <- rank(theta,j) + 1;
+    best[j] <- rnk[j] == 1;
+  }
 }
 \end{Code}
   \caption{Hierarchical binomial model with posterior inferences,
@@ -863,15 +866,25 @@ rate \code{theta[j]}.  The ranks are extracted using the \code{rank}
 function. The posterior summary will print average rank and deviation,
 but the values can also be extracted in order to plot posterior rank
 histograms by institution as done in \citep[Examples, Volume
-1]{LunnEtAl:2000,LunnEtAl:2009}.
+1]{LunnEtAl:2000,LunnEtAl:2009}.  
 
-As a second illustration, we calculate the (posterior) probability
-that a given institution is above-average in terms of mortality rate.
-This is done for each institution \code{j} with the usual plug-in
-estimate of \code{theta[j] > mean(theta)}, which returns a binary (0
-or 1) value.  The posterior mean of \code{above\_avg[j]} calculates
-the posterior probability $\mbox{Pr}[\theta_j > \bar{\theta}|y,n]$
-according to the model.
+Posterior comparisons can be carried out directly or using rankings.
+For instance, the model in Figure~\ref{hier-binom.fig} sets
+\code{best[j]} to 1 if hospital \code{j} has the lowest estimated
+mortality rate.  Applying a hierarchical model then considering
+posterior inference appropriately adjusts for mulitple comparisons
+\citep{GelmanEtAl:2012}.  Pairwise comparisons of posterior quantities
+can also be made and are are automatically ``adjusted'' for multiple
+comparisons \citep{Efron:2010}.
+
+
+As a second illustration, the generated quantities block calculate the
+(posterior) probability that a given institution is above-average in
+terms of mortality rate.  This is done for each institution \code{j}
+with the usual plug-in estimate of \code{theta[j] > mean(theta)},
+which returns a binary (0 or 1) value.  The posterior mean of
+\code{above\_avg[j]} calculates the posterior probability
+$\mbox{Pr}[\theta_j > \bar{\theta}|y,n]$ according to the model.
 
 \subsection{Initialization}
 
@@ -1387,6 +1400,202 @@ For example, in the example above, \code{normal\_log(y,X *
 once, and if \code{y} is an $N$-vector, it reduces the number of
 virtual function calls from $N$ to 1.
 
+\section{Built-in inference engines}
+
+Using a model's log probability and its derivatives, a wide range of
+optimization strategies can be implemented within \proglang{Stan}.
+\proglang{Stan} includes several Markov chain Monte Carlo (MCMC)
+samplers and optimizers.  Others may be straightforwardly implemented
+within \proglang{Stan}'s \proglang{C++} framework for sampling and
+optimization using the log probability and derivative information
+supplied by a model.
+
+\subsection{Markov chain Monte Carlo samplers}
+
+\subsubsection{Hamiltonian Monte Carlo}
+
+The MCMC samplers provided include Euclidean-manifold Hamiltonian
+Monte Carlo (EM-HMC) \citep{DuaneEtAl:1987, Neal:1994, Neal:2011} and the
+no-U-turn smapler (NUTS) \citep{HoffmanGelman:2011}.  Both versions of
+HMC allow estimation or specification of unit, diagonal, or full mass
+matrices.  NUTS automatically adapts the number of leapfrog steps,
+eliminating the need for user-specified tuning parameters.  NUTS is
+the default sampler for \proglang{Stan}.
+
+
+\subsubsection{Metropolis-Hastings}
+
+\proglang{Stan} supports random-walk Metropolis-Hastings samplers with
+multivariate normal proposals.  The covariance matrix used can be
+adapted during warmup, assuming either equal diagonal covariance,
+diagonal covariance, or a full covariance matrix.
+
+
+\subsubsection{Riemann-Manifold Hamiltonian Monte Carlo}
+
+\proglang{Stan} will soon have two forms of Riemann-Manifold
+Hamiltonian Monte Carlo (RM-HMC) \citep{GirolamiCalderhead:2011}.  The
+first will employ the soft-abs metric \citep{Betancourt:2012}.  The
+second version of RM-HMC generalizes NUTS to Riemann manifold, and
+will also employ the soft-abs metric \citep{Betancourt:2013}.  Both
+support adapting step sizes during warmup.  \proglang{Stan}'s MCMC and
+HMC framework make it straightforward to configure with new metrics.
+
+\subsubsection{Ensemble Samplers}
+
+Two flavors of ensemble samplers are in the works, an affine invariant
+ensemble sampler \citep{GoodmanWeare:2010} and a differential
+evolution sampler \cite{TerBraak:2006}.
+
+\subsection{Optimizers}
+
+\subsubsection{BFGS}
+
+The default optimizer in \proglang{Stan} is the
+Broyden–Fletcher–Goldfarb-–Shannon-Boyd (BFGS) optimizer.  BFGS is a
+quasi-Newton optimizer that evaluates gradients directly, then uses
+the gradients to update an approximation to the Hessian.  See
+\citep{NocedalWright:2006} for details.  Plans are in the works to
+also include the more involved, but more scalable limited-memory BFGS
+(L-BFGS) scheme.
+
+\subsubsection{Conjugate gradient}
+
+\proglang{Stan} provides a standard form of conjugate gradient
+optimization; see \citep{NocedalWright:2006}.  As its name implies,
+conjugate gradient optimization requires gradient evaluations.
+
+\subsubsection{Dual averaging}
+
+The dual averaging scheme of \cite{Nesterov:2009} is built in.  Dual
+averaging is also used during warmup to estimate covariance matrices
+for HMC and Metropolis sampling.
+
+
+\section{Library dependencies}
+
+\proglang{Stan}'s modeling language is only dependent on two external
+libraries.  
+
+\subsection{Boost} 
+
+\proglang{Stan} depends on several of the \pkg{Boost} \proglang{C++}
+libraries \citep{Boost:2011}.  \proglang{Stan} makes extensive use of
+\pkg{Boost}'s template metaprogramming facilities including the
+\pkg{Enable if} package, the \pkg{Type Traits} library, and the
+\pkg{Lexical Cast} library.  The \proglang{Stan} language is parsed
+using the \pkg{Boost}'s \pkg{Spirit} parser, which itself depends on
+the binding libraries \pkg{Phoenix}, \pkg{Bind}, and \pkg{Lambda},
+the variant type library \pkg{Variant}, and the container library
+\pkg{Fusion}.  Exceptions are largely handled and configured through
+the error checking facilities in the \pkg{Math} and the
+\pkg{Exception} package.  Output formatting and ad-hoc input parsing
+for various formats is facilitated with the \pkg{Format} library.
+\proglang{Stan} relies heavily on the special functions defined in the
+\pkg{Math} subpackages \pkg{Special Functions} and \pkg{Statistical
+  Distributions}.  Random number generation is carried out using the
+\pkg{Random} package.  The posterior analysis framework and some
+built-in functions depend on the \pkg{Accumulators} package.
+
+\subsection{Eigen}
+
+\proglang{Stan}'s handling of matrices and linear algebra is
+implemented through the \pkg{Eigen} \proglang{C++} template library
+\citep{Eigen:2012}.  Eigen uses template metaprogramming to achieve
+state-of-the-art performance for matrix and linear algebra operations
+with a great deal of flexiblity with respect to input types.
+Unfortunately, many of the expression templates that Eigen uses for
+efficient static anaysis and lazy evaluation are short-circuited
+because of \proglang{Stan}'s need to have mixed type operations (i.e.,
+multiplying a constant predictor matrix of double values by a
+parameter vector of automatic differentiation values).  To make up for
+this in some important cases, \proglang{Stan} has provided compound
+functions such as the quadratic form, which allow speedups of both the
+matrix operations and their derivatives compared to a direct
+implementation using \proglang{Stan}'s built-in operators.
+
+
+\section{Developer process}
+
+\subsection{Version control and source repository}
+
+\proglang{Stan}'s source code is hosted on GitHub and managed using
+the \pkg{Git} version control system \citep{Chacon:2009}.  To manage
+the workflow with so many developers working at any given time, the
+project follows the GitFlow process \citep{Driessen:2010}.  All
+developer submissions are managed through pull requests and we have
+gratefully received patches from numerous sources outside the core
+development team.
+
+
+\subsection{Testing and continuous integration}
+
+This includes extensive unit tests for low-level \proglang{C++} code.
+These unit tests evaluate every function for both appropriate values
+and appropriate derivatives.  This requires an extensive meta-testing
+framework for the probability distributions due to their high degree
+of configurability as to argument types.  The testing portion of the
+makefile also runs tests of all of the built-in models, including
+almost all of the \proglang{BUGS} sample models.  Models are tested
+for both convergence and getting the right answer to within MCMC
+standard error.  
+
+
+\subsection{Builds}
+
+The build process for \proglang{Stan} is highly automated through a
+cross-platform series of \code{make} files.  The top-level makefile
+builds the \proglang{Stan}-to-\proglang{C++} translator command
+\code{bin/stanc} and posterior analysis command \code{bin/print}.  It
+also builds the library archive \code{bin/libstan.a}.  Great care was
+taken to avoid complicated platform-dependent configuration
+requirements that place a high burden on user system knowledge for
+installation.  All that is needed is a relatively recent
+\proglang{C++} compiler and version of \code{make}.
+
+As exemplified in the introduction, the makefile is automated enough
+to build an executable form of a \proglang{Stan} model in a single
+command.  All libraries and other executables will be built as a side
+effect.  
+
+The top-level makefile also supplies targets to build all of the
+documentation, including both the \proglang{C++} application
+programmer interface (API) documentation using the \pkg{doxygen}
+package and the manual using the \LaTeX package.
+
+The makefile also has targets for all of the unit and functional
+testing, for building the source-level distribution, and for cleaning
+any temporary files that it creates.
+
+\section*{Acknowledgments}
+
+First and foremost, we would like to thank all of the users of
+\proglang{Stan} for taking a chance on a new package and sticking with
+it as we iron out the details.  We'd like to particularly single out
+the students in Andrew Gelman's computation Bayesian data analysis
+courses at Columbia Univesity and Harvard University, who did not have
+a choice in the matter.
+
+Stan was and continues to be supported largely through grants from the
+U.~S. government.  Grants which indirectly supported the initial
+research and development included Department of Energy (DE-SC0002099),
+National Science Foundation (ATM-0934516), Department of Education
+Institute of Education Sciences (ED-GRANTS-032309-005 and
+R305D090006-09A).  The high-performance computing facility on which we
+ran evaluations was made possible through a grant from the National
+Institutes of Health (1G20RR030893-01).  Stan is currently supported
+in part by a grant from the National Science Foundation (CNS-1205516).
+
+Finally, we would like to thank all those who contributed
+documentation corrections and code patches, Jeffrey Arnold, David
+R. Blair, Eric C. Brown, Eric N. Brown, Devin Caughey, Wayne Folta,
+Andrew Hunter, Marco Inacio, Louis Luangkesorn, Jeffrey Oldham, Mike
+Ross, Terrance Savitsky, Yajuan Si, Dan Stowell, Zhenming Su, and
+Dougal Sutherland.
+
+And a special thanks to those who have contributed code for new
+features, Jeffrey Arnold, Yuanjun Gao, and Marco Inacio. 
+
 \begin{figure}
 \begin{center}
 \begin{tabular}{c|ccl|l}
@@ -1541,9 +1750,9 @@ virtual function calls from $N$ to 1.
 {\it function} & {\it description} \\ \hline \hline
 \code{log\_diff\_exp} & natural logarithm of difference of
 exponentials \\ 
-\code{log\_falling\_factorial} & falling factorial (Pochhamer) \\
+\code{log\_falling\_factorial} & falling factorial (Pochhammer) \\
 \code{log\_inv\_logit} &  natural logarithm of the logistic sigmoid \\ 
-\code{log\_rising\_factorial} & falling factorial (Pochhamer) \\
+\code{log\_rising\_factorial} & falling factorial (Pochhammer) \\
 \code{log\_sum\_exp} &  logarithm of the sum of exponentials of arguments \\ 
 \code{logit} &  log-odds \\ 
 \code{max} &  integer maximum \\ 

@@ -1,3 +1,4 @@
+
 data {
   int<lower=0> J;
   int<lower=0> y[J];
@@ -21,12 +22,16 @@ model {
   y ~ binomial(n,theta);     // likelihood
 }
 generated quantities {
-  real<lower=0,upper=1> avg;
-  int<lower=0,upper=1> above_avg[J];
+  real avg;
+  int<lower=0, upper=1> above_avg[J];
   int<lower=1,upper=J> rnk[J];
+  int<lower=0,upper=1> best[J];
+  avg <- mean(theta);
   avg <- mean(theta);
   for (j in 1:J)
     above_avg[j] <- (theta[j] > avg);
-  for (j in 1:J)
+  for (j in 1:J) {
     rnk[j] <- rank(theta,j) + 1;
+    best[j] <- rnk[j] == J;
+  }
 }
