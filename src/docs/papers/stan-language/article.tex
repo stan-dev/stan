@@ -221,7 +221,7 @@ operations of algorithmic differentiation variables and primitives
 like \code{double}.  Although we initially begain by promoting
 floating-point vectors to automatic differentiation variables, we
 later completely rewrote our matrix library to efficiently compute
-derivatives using rules described in \citep{Giles:??,book:??}.
+derivatives using rules described in \citep{Giles:2008,Griewank:2008}.
 
 At this point, we could fit models coded directly in \proglang{C++} on
 top of the pre-release versions of the \proglang{Stan} API
@@ -251,7 +251,7 @@ steps).  The step size parameter could be tuned during warm-up based
 on Metropolis rejection rates, but the number of steps was not so easy
 to tune while maintaining detailed balance in the sampler.  This led
 to the development of the NUTS (no U-turn) sampler
-\citep{Hoffman-Gelman:2012}.  Roughly speaking, NUTS extends the
+\citep{HoffmanGelman:2011}.  Roughly speaking, NUTS extends the
 trajectory along which the Metropolis proposal for the next state is
 calculated randomly in both direction until the path makes a U-turn
 and begins retracing its steps.
@@ -474,10 +474,18 @@ lp__,accept_stat__,stepsize__,treedepth__,theta
 \end{Code}
 %
 The values for \code{lp\_\_} indicate the log probability (up to an
-additive constant), the Metropolis acceptance statistic (which is
-complicated by the NUTS sampler), the tree depth for NUTS (log base 2
-of number of leapfrog steps in HMC), and step sizes and inverse mass
-matrix for HMC.  The rest of the header will be the names of parameters.
+additive constant).  The column headed by \code{accept\_stat\_\_}
+provides the Metropolis acceptance statistic for each iteration.%
+\footnote{Acceptance is the usual notion for Metropolis-Hastings
+  sampling, but is complicated for NUTS and other path-based samplers.
+  For NUTS, the acceptance statistic is the average of the acceptance
+  probabilities along the path defined by the leapfrog integrator.}
+The column \code{stepsize\_\_} indicates the step size (i.e., time
+interval) for the discretization of the Hamiltonian in the leapfrog
+integrator.  The column \code{treedepth\_\_} is the tree depth for
+NUTS, which is the log base 2 of number of leapfrog steps.  
+The rest of the header will be the names of parameters; in this
+example, \code{theta} is the only parameter.
 
 Next, the results of adaptation are printed.
 %
@@ -558,7 +566,17 @@ samp1.csv	samp2.csv	samp3.csv	samp4.csv
 %
 Then the \code{bin/print} command can be used to output summary
 statistics for the posterior along with convergence diagnostics and
-effective sample-size estimates.
+effective sample-size estimates.%
+%
+\footnote{Aligning columns when printing rows of varying scales
+  presents a challenge.  For each column, the program calculates the
+  the maximum number of digits required to print an entry in that
+  column with the specified precision. For example, a precision of 2
+  for the number -0.000012 requires nine characters (\code{-0.000012})
+  to print without scientific notation versus seven digits with
+  (\code{-1.2e-5}).  If the discrepancy is above a fixed threshold,
+  scientific notation is used.  Compare the results in the \code{mean}
+  column versus the \code{sd} column.}
 %
 \begin{CodeChunk}
 \begin{CodeInput}
@@ -574,9 +592,9 @@ Warmup took (0.012, 0.010, 0.011, 0.011) seconds, 0.046 seconds total
 Sampling took (0.016, 0.014, 0.014, 0.015) seconds, 0.060 seconds total
 
                    mean   se   sd     2.5%      50%    97.5%   n_eff n_eff/s    Rhat
-lp__           -7.3e+00  0.0  0.7 -9.3e+00 -7.0e+00 -6.7e+00 1.1e+03 1.9e+04 1.0e+00
-accept_stat__   5.3e-01  0.0  0.4  1.1e-06  5.2e-01  1.0e+00 3.7e+03 6.1e+04 1.0e+00
-stepsize__      2.1e+00  0.0  0.0  2.0e+00  2.1e+00  2.1e+00 2.0e+00 3.3e+01 1.3e+13
+lp__           -7.3e+00  0.0  0.8 -9.3e+00 -7.0e+00 -6.7e+00 1.1e+03 1.9e+04 1.0e+00
+accept_stat__   5.3e-01  0.1  0.4  1.1e-06  5.2e-01  1.0e+00 3.7e+03 6.1e+04 1.0e+00
+stepsize__      2.1e+00  0.1  0.2  2.0e+00  2.1e+00  2.1e+00 2.0e+00 3.3e+01 1.3e+13
 treedepth__     3.6e-02  0.0  0.2  0.0e+00  0.0e+00  1.0e+00 2.9e+03 4.9e+04 1.0e+00
 theta           2.5e-01  0.0  0.1  6.0e-02  2.4e-01  4.9e-01 2.1e+03 3.5e+04 1.0e+00
 
@@ -591,7 +609,7 @@ The estimated potential scale reduction statistic $\hat{R}$
 (\code{Rhat}) value of 1.0 for the parameter of interest \code{theta}
 is consistent with convergence.  \proglang{Stan} uses a more
 conservative version of $\hat{R}$ than is usual in packages such as
-\pkg{Coda}, first splitting each chain in half to diagnose
+\pkg{Coda} \citep{PlummerEtAl:2006}, first splitting each chain in half to diagnose
 montonically increasing or decreasing samples; \citep{GelmanEtAl:2013}
 and the reference manual provide detailed definitions.
 
@@ -616,16 +634,16 @@ standard deviation.
 
 In the rest of this paper, we will concentrate on the modeling
 language itself and how it is executed.  For more details on
-Hamiltonian Monte Carlo, see \citep{Neal:2011}; for more information
+Hamiltonian Monte Carlo, see \citep{Duane:1987, Neal:1994, Neal:2011}; for more information
 on the no-U-turn sampler used by default in \proglang{Stan}, see
-\citep{Hoffman-Gelman:2011}.
+\citep{HoffmanGelman:2011}.
 
 \subsection{Example: hierarchical model, with inference}
 
 \cite[Section 5.1]{GelmanEtAl:2013} define a hierarchical model of the
 incidence of tumors in rats in control groups across trials; a very
 similiar model is defined for mortality rates in pediatric surgeries
-across hospitals in \citep[Examples, Volume 1]{LunnEtAl:2000}.%  
+across hospitals in \citep[Examples, Volume 1]{LunnEtAl:2000,LunnEtAl:2009}.%  
 
 
 \begin{figure}
@@ -664,7 +682,7 @@ generated quantities {
 }
 \end{Code}
   \caption{Hierarchical binomial model with posterior inferences,
-    coded in \proglang{Stan}.}
+    coded in \proglang{Stan}.}\label{hier-binom.fig}
 \end{figure}
 %
 A \proglang{Stan} implementation is provided in
@@ -737,10 +755,10 @@ evaluated.  This may be multiple times per iteration of a sampling or
 optimization algorithm.  Furthermore, different samplers and
 optimizers use different complexities of calls to the log probability
 function.  HMC and NUTS require gradients and Riemann-Manifold HMC
-requires up to third-order derivatives, whereas Metropolis-Hastings
-sampling requires no derivatives.  Various gradients and higher-order
-derivatives can also be used in conjugate gradient optimization or
-quasi-Newton methods.
+\cite{GirolamiCalderhead:2011,Betancourt:2012} requires up to third-order derivatives,
+whereas Metropolis-Hastings sampling requires no derivatives.  Various
+gradients and higher-order derivatives can also be used in conjugate
+gradient optimization or quasi-Newton methods.
 
 The probability distribution defined by a \proglang{Stan} program is
 intended to have unconstrained support (i.e., no points of zero
@@ -845,7 +863,7 @@ rate \code{theta[j]}.  The ranks are extracted using the \code{rank}
 function. The posterior summary will print average rank and deviation,
 but the values can also be extracted in order to plot posterior rank
 histograms by institution as done in \citep[Examples, Volume
-1]{LunnEtAl:2000}.
+1]{LunnEtAl:2000,LunnEtAl:2009}.
 
 As a second illustration, we calculate the (posterior) probability
 that a given institution is above-average in terms of mortality rate.
@@ -960,7 +978,7 @@ A modeled parameter is given a distribution by the model (usually
 dependent on data and correlated with other parameters).  This can be
 done either by placing it (or a variable that depends on it) on the
 left-hand side of a sampling statement or by declaring the variable
-with a constraint (see Section~\label{implicit-prior.section}).
+with a constraint (see Section~\ref{implicit-prior.section}).
 
 Any variable that occurs in a (transformed) data block can also be
 provided instead as a constant.  So a user may decide to write \code{y
@@ -1096,7 +1114,7 @@ positive definite) or correlation matrices (symmetric, positive
 definite, unit diagonal), using the types \code{cov_matrix[K]} and
 \code{corr_matrix[K]}.
 
-\section{Expressions and Type Inference}
+\section{Expressions and type inference}
 
 The syntax of \code{Stan} is defined in terms of expressions, which
 denote values of a particular type, and statements, which represent
@@ -1109,7 +1127,7 @@ programming languages.  This includes variables, literals denoting
 integers, real values or strings, binary and unary operators over
 expressions, and function application.  
 
-\subsubsection{Type Inference}
+\subsubsection{Type inference}
 
 The type of each variable is declared and cannot change.  
 
@@ -1125,7 +1143,7 @@ signature that maps two \code{int} arguments to a \code{real} and two
 \code{real} arguments to a \code{real} result.  Another signature maps
 a \code{row\_vector} and a \code{vector} to a \code{real} result.
 
-\subsubsection{Type Promotion}
+\subsubsection{Type promotion}
 
 If necessary, an integer type will be promoted to a \code{real} value.
 For example, multipling an \code{int} by a \code{real} produces a
@@ -1136,7 +1154,7 @@ where arrays of \code{real} values are specified.
 
 \section{Statements}
 
-\subsection{Assignment and Sampling}
+\subsection{Assignment and sampling}
 
 \proglang{Stan} supports the same two basic statements as
 \proglang{BUGS}, assignment and sampling, examples of which we
@@ -1220,16 +1238,566 @@ These statements may be used for debugging purposes to report on
 intermediate states of variables or to indicate how far execution has
 proceeded before an error.
 
-\section[The Stan library]{The \proglang{Stan} library}
+\section{Function and distribution library}
+
+In order to support the algorithmic differentiation required to
+calculate gradients, Hessians, and higher-order derivatives in
+\proglang{Stan}, we require \proglang{C++} functions that are 
+templated separately on all of their arguments.  In order for these
+functions to be efficient in computing both values and derivatives,
+they need to be vectorized so that shared computations can be reused
+and virtual function calls eliminated.
+
+\subsection{Basic operators}
+
+\proglang{Stan} supports all of the basic \proglang{C++} arithmetic
+operators, boolean operators, comparison operators  In addition, it
+extends the arithmetic operators to matrices and includes pointwise
+matrix operators.%
+%
+\footnote{This is in contrast to \proglang{R} and \proglang{BUGS}, who
+  treat the basic multiplication and division operators pointwise and
+  use special symbols for matrix operations.}
+%
+The full set of operators is listed in Figure~\ref{operators.fig}.
+
+\subsection{Special functions}
+
+\proglang{Stan} provides an especially rich set of special functions.
+This includes all of the \proglang{C++} math library functions, as
+well as numberous more specialized functions such as Bessel functions,
+gamma and digamma functions, and generalized linear model link functions
+and their inverses.  There are also many compound functions, such as
+\code{log1m(x)}, which is more stable arithmetically for values of x
+near 0 than \code{log(1 - x)}.
+
+
+\subsection{Matrix and linear algebra functions}
+
+Following the usual convention in mathematics, matrix and array
+indexing uses the usual square brackets (\code{[ ]}) operator, and
+begins from 1.  \proglang{R}, \proglang{MATLAB}, and \proglang{BUGS},
+but not of \proglang{C++}, \proglang{Python}, or \proglang{Java}.
+If \code{Sigma} is a matrix, then \code{Sigma[n]} is the \code{n}-th
+row of \code{Sigma}.
+
+Various reductions are provided for arrays and matrices, such as sums,
+means, standard deviations and norm.  Replications are also available
+to copy a value into ever cell of a matrix.  Slices of matrices and
+vectors may be accessed by row, column, or general subblock
+operations.
+
+Matrix operators use the types of their operands to determine the type
+of the result.  For instance, multiplying a vector by a row vector
+returns a matrix, whereas multiplying a row vector by a vector returns
+a real.  A postfix apostrophe (\code{'}) is used for matrix
+transposition.  For example, if \code{y} and \code{mu} are vectors and
+\code{Sigma} is a square matrix, all of the same dimensionality, then
+\code{y - mu} is a vector, \code{(y - mu)'} is a row vector, \code{(y
+  - mu)' * Sigma} is a row vector, and \code{(y - mu)' * Sigma * (y -
+  mu)} will be a real value.  Matrix division is provided, which is
+much more arithmetically stable than inversion, e.g., \code{Sigma \ (y
+  - mu)} computes the same function as \code{inverse(Sigma) * y}.
+\proglang{Stan} also supports elementwise multiplication (\code{.*})
+and division (\code{./}).
+
+Linear algebra functions are provided for trace, left and right
+division, Cholesky factorization, determinants and log determinants,
+inverses, eigenvalues and eigenvectors, and singular value
+decomposition.  All of these operations may be applied to matrices of
+parameters or constants.  Various functions are specialized for speed,
+such as quadratic products, diagonal specializations, multiply by self
+transposed, e.g., the previous example could be written as
+\code{quad_form(Sigma, y - mu)}.
+
+\subsection{Probability functions}
+
+Stan has a large collection of built-in univariate and multivariate
+probability functions built in (compared to base \proglang{R} or
+\proglang{BUGS}).  The probability functions all share various
+features of their declarations and behavior.  
+
+All probability functions are defined on the log scale to avoid
+underflow.  They are all named with the suffix \code{\_log}, e.g.,
+\code{normal\_log()} is the log-scale normal distribution density
+function.
+
+All probability functions check that their arguments are within the
+appropriate constrained support and may be configured to throw
+exceptions or return $-\infty$ for out-of-domain arguments.  For
+example, \code{normal\_log(y,mu,sigma)} requires the scale parameter
+\code{sigma} to be non-negative.
+
+\subsubsection{Up to a proportion calculations}
+
+All probability functions support calculating results up to a constant
+proportion, which becomes an additive constant on the log scale.
+Constancy here refers to being a numeric literal such as \code{1}, a
+constant such as \code{pi()}, a variable declared as data or
+transformed data, or an expression involving only other constants.
+Non-constants include parameters, transformed parameters, local
+variables declared in the transformed parameters or model statements,
+as well as any expression involving a non-constant. 
+
+Constant terms are dropped from calculations efficiently at the time
+the model is compiled (i.e., there is no run-time overhead to decide
+which expressions denote constants dynamically).%
+%
+\footnote{Both vectorization and dropping constant terms are
+  implemented in \proglang{C++} through template metaprograms that
+  infer traits of template arguments to the probability functions.
+  Whether to drop constants is configurable through a boolean template
+  parameter on the log probability and derivative functions generated
+  in \proglang{C++} for a model.}
+%
+For example, calling \code{normal\_log(y,0,1)}, where \code{y} is a
+parameter and \code{0} and \code{1} are constants, does not bother
+computing the $\log \sigma$ term in the log density because $\sigma=1$
+is a constant.  On the other hand, the $y - 0$ term is calculated and
+is not a constant because $y$ is not a constant.
+
+\subsubsection{Vectorization}
+
+All of the univariate%
+%
+\footnote{We are in the process of vectorizing the multivariate
+  probability functions, but they are not all available in
+  \proglang{Stan} 2.0.  We are also in the process of vectorizing
+  all of the special functions.}
+%
+probability functions in \proglang{Stan} share vectorized so that they
+accept arrays (or vectors) of arguments.  For example, although the
+basic type of \code{normal\_log(y,mu,sigma)} is that \code{y},
+\code{mu} and \code{sigma} are all real, it supports calls in which
+any any or all of \code{y}, \code{mu} and \code{sigma} contain more
+than one element. A typical use case would be for linear regression,
+where \code{normal\_log(y,X * beta,sigma)}, where \code{y} is a vector
+of observed data, \code{X} is a predictor matrix, \code{beta} is a
+coefficient vector, and \code{sigma} is a real value for the noise
+scale.
+
+The advantage of using vectorization is twofold.  First, the models
+are more concise and closer to mathematical notation.  Second, the
+vectorized versions are much faster.  They reduce the number of times
+expensive operations need to be evaluated and also reduce the number
+of virtual calls and required in the compiled \proglang{C++}
+executable for calculating gradients and higher-order derivatives.
+For example, in the example above, \code{normal\_log(y,X *
+  beta,sigma)}, the logarithm of \code{sigma} need only be computed
+once, and if \code{y} is an $N$-vector, it reduces the number of
+virtual function calls from $N$ to 1.
+
+\begin{figure}
+\begin{center}
+\begin{tabular}{c|ccl|l}
+{\it op.} & {\it prec.} & {\it assoc.} & {\it
+  placement} & {\it description}
+\\ \hline \hline
+\code{||} & 9 & left & binary infix & logical or
+\\ \hline
+\Verb|&&| & 8 & left & binary infix & logical and
+\\ \hline
+\Verb|==| & 7 & left & binary infix & equality
+\\
+\Verb|!=| & 7 & left & binary infix & inequality
+\\ \hline
+\Verb|<| & 6 & left & binary infix & less than
+\\
+\Verb|<=| & 6 & left & binary infix & less than or equal
+\\
+\Verb|>| & 6 & left & binary infix & greater than 
+\\
+\Verb|>=| & 6 & left & binary infix & greater than or equal
+\\ \hline
+\code{+} & 5 & left & binary infix & addition
+\\
+\code{-} & 5 & left & binary infix & subtraction
+\\ \hline
+\code{*} & 4 & left & binary infix & multiplication
+\\
+\code{/} & 4 & left & binary infix & (right) division
+\\ \hline
+\Verb|\| & 3 & left & binary infix & left division
+\\ \hline
+\code{.*} & 2 & left & binary infix & elementwise multiplication
+\\
+\code{./} & 2 & left & binary infix & elementwise division
+\\ \hline
+\code{!} & 1 & n/a & unary prefix & logical negation
+\\
+\code{-} & 1 & n/a & unary prefix & negation
+\\ 
+\code{+} & 1 & n/a & unary prefix & promotion (no-op in \proglang{Stan})
+\\ \hline
+\code{'} & 0 & n/a & unary postfix & transposition
+\\ \hline \hline
+\code{()} & 0 & n/a & prefix, wrap & function application
+\\
+\code{[]} & 0 & left & prefix, wrap & array, matrix indexing
+\end{tabular}
+\end{center}
+\caption{\proglang{Stan}'s unary and binary operators, with their
+  precedences, associativities, place in an expression, and a
+  description.  The last two lines list the precedence of function
+  application along with array, matrix, and vector indexing. The
+  operators are listed in order of precedence, from least tightly
+  binded to most tightly binding.}\label{operators.fig}
+\end{figure}
+%
+
+
+\begin{figure}
+\begin{center}
+\begin{tabular}{l|l}
+{\it function} & {\it description} \\ \hline \hline
+\code{e} &  base of natural logarithm \\ 
+\code{epsilon} &  smallest positive number \\ 
+\code{negative\_epsilon} &  largest negative value \\ 
+\code{negative\_infinity} &  negative infinity \\ 
+\code{not\_a\_number} &  not-a-number \\ 
+\code{pi} &  $\pi$ \\
+\code{positive\_infinity} &  positive infinity \\  
+\code{sqrt2} &  square root of two \\ 
+\end{tabular}
+\end{center}
+\caption{Constants}\label{constants.fig}
+\end{figure}
+
+\begin{figure}
+\begin{center}
+\begin{tabular}{l|l}
+{\it function} & {\it description} \\ \hline \hline
+\code{acos} &  arc cosine \\ 
+\code{acosh} &  arc hyperbolic cosine \\ 
+\code{asin} &  arc sine \\ 
+\code{asinh} &  arc hyperbolic sine \\ 
+\code{atan} &  arc tangent \\ 
+\code{atan2} &  arc ratio tangent \\ 
+\code{atanh} &  arc hyperbolic tangent \\ 
+\code{cos} &  cosine \\ 
+\code{cosh} &  hyperbolic cosine\\ 
+\code{hypot} &  hypoteneuse \\ 
+\code{sin} &  sine \\ 
+\code{sinh} &  hyperbolic sine \\ 
+\code{tan} &  tangent \\ 
+\code{tanh} &  hyperbolic tangent \\ 
+\end{tabular}
+\end{center}
+\caption{Trigonometric functions}\label{trig-functions-cont.fig}
+\end{figure}
+
+
+\begin{figure}
+\begin{center}
+\begin{tabular}{l|l}
+{\it function} & {\it description}  \\ \hline \hline
+\code{abs} &  double absolute value \\ 
+\code{abs} &  integer absolute value \\ 
+\code{binary\_log\_loss} &  log loss \\ 
+\code{bessel\_first\_kind} & Bessel function of the first kind \\
+\code{bessel\_second\_kind} & Bessel function of the second kind \\
+\code{binomial\_coefficient\_log} & log binomial coefficient \\ 
+\code{cbrt} &  cube root \\ 
+\code{ceil} &  ceiling \\ 
+\code{cumulative\_sum} &  cumulative sum \\ 
+\code{erf} &  error function \\ 
+\code{erfc} &  complementary error function \\ 
+\code{exp} &  base-$e$ exponential \\ 
+\code{exp2} &  base-2 exponential \\ 
+\code{expm1} &  exponential of quantity minus one \\
+\code{fabs} &  real absolute value \\ 
+\code{fdim} &  positive difference \\ 
+\code{floor} &  floor \\ 
+\code{fma} &  fused multiply-add \\ 
+\code{fmax} &  floating-point maximum \\ 
+\code{fmin} &  floating-point minimum \\ 
+\code{fmod} &  floating-point modulus \\ 
+\code{if\_else} &  conditional \\ 
+\code{int\_step} &  Heaviside step function \\ 
+\code{inv} &  inverse (one over argument) \\ 
+\code{inv\_cloglog} &  inverse of complementary log-log \\ 
+\code{inv\_logit} &  logistic sigmoid \\ 
+\code{inv\_sqrt} &  inverse square root \\ 
+\code{inv\_square} &  inverse square \\ 
+\code{lbeta} & log beta function \\ 
+\code{lgamma} &  log $\Gamma$ function \\ 
+\code{lmgamma} &  log multi-$\Gamma$ function \\ 
+\code{log} &  natural (base-$e$) logarithm \\ 
+\code{log10} &  base-10 logarithm \\ 
+\code{log1m} &  natural logarithm of one minus argument \\ 
+\code{log1m\_exp} &  natural logarithm of one minus natural exponential \\ 
+\code{log1m\_inv\_logit} &  natural logarithm of logistic sigmoid \\ 
+\code{log1p} &  natural logarithm of one plus argument \\ 
+\code{log1p\_exp} &  natural logarithm of one plus natural exponential \\ 
+\code{log2} &  base-2 logarithm \\ 
+\end{tabular}
+\end{center}
+\caption{Special functions}\label{special-functions.fig}
+\end{figure}
+
+\begin{figure}
+\begin{center}
+\begin{tabular}{l|l}
+{\it function} & {\it description} \\ \hline \hline
+\code{log\_diff\_exp} & natural logarithm of difference of
+exponentials \\ 
+\code{log\_falling\_factorial} & falling factorial (Pochhamer) \\
+\code{log\_inv\_logit} &  natural logarithm of the logistic sigmoid \\ 
+\code{log\_rising\_factorial} & falling factorial (Pochhamer) \\
+\code{log\_sum\_exp} &  logarithm of the sum of exponentials of arguments \\ 
+\code{logit} &  log-odds \\ 
+\code{max} &  integer maximum \\ 
+\code{max} &  real maximum \\ 
+\code{mean} &  sample average \\ 
+\code{min} &  integer minimum \\ 
+\code{min} &  real minimum \\ 
+\code{modified\_bessel\_first\_kind} & modified Bessel function of the first kind \\
+\code{modified\_bessel\_second\_kind} & modified Bessel function of the second kind \\
+\code{multiply\_log} &  multiply linear by log \\ 
+\code{owens\_t} &  Owens-t \\ 
+\code{phi} &  $\Phi$ function (cumulative unit normal) \\ 
+\code{phi\_approx} &  efficient, approximate $\Phi$ \\ 
+\code{pow} &  power (i.e., exponentiatiation) \\
+\code{prod} &  product of sequence \\
+\code{rank} &  rank of element in array or vector \\ 
+\code{rep\_array} &  fill array with value \\
+\code{round} &  round to nearest integer \\ 
+\code{sd} &  sample standard deviation \\ 
+\code{softmax} &  softmax (multi-logit link) \\ 
+\code{sort\_asc} &  sort in ascending order \\ 
+\code{sort\_desc} &  sort in descending order \\ 
+\code{sqrt} &  square root \\ 
+\code{square} &  square \\ 
+\code{step} &  Heaviside step function \\ 
+\code{sum} &  sum of sequence \\ 
+\code{tgamma} &  $\Gamma$ function \\ 
+\code{trunc} & truncate real to integer \\ 
+\code{variance} &  sample variance \\ 
+\end{tabular}
+\end{center}
+\caption{Special functions (continued)}\label{special-functions-cont.fig}
+\end{figure}
 
 
 
+\begin{figure}
+\begin{center}
+\begin{tabular}{l|l}
+{\it function} & {\it description} \\ \hline \hline
+\code{block} &  sub-block of matrix \\
+\code{cholesky\_decompose} &  Cholesky decomposition \\ 
+\code{col} &  column of matrix \\ 
+\code{cols} &  number of columns in matrix \\ 
+\code{columns\_dot\_product} &  dot product of matrix columns \\ 
+\code{columns\_dot\_self} &  dot product of matrix columns with self \\ 
+\code{crossprod} &  cross-product \\ 
+\code{determinant} &  matrix determinant \\ 
+\code{diag\_matrix} &  vector to diagonal matrix \\ 
+\code{diag\_post\_multiply} &  post-multiply matrix by diagonal matrix \\ 
+\code{diag\_post\_multiply} &  pre-multiply matrix by diagonal matrix \\ 
+\code{diagonal} &  diagonal of matrix as vector \\ 
+\code{dims} &  dimensions of matrix \\ 
+\code{dot\_product} &  dot product \\ 
+\code{dot\_self} &  dot product with self \\ 
+\code{eigenvalues\_sym} &  eigenvalues of symmetric matrix \\ 
+\code{eigenvectors\_sym} &  eigenvectors of symmetric matrix \\ 
+\code{head} &  head of vector \\
+\code{inverse} &  matrix inverse \\ 
+\code{inverse\_spd} & symmetric, positive-definite matrix inverse \\ 
+\code{log\_determinant} &  natural logarithm of determinant \\ 
+\code{mdivide\_left\_tri\_low} &  lower-triangular matrix left division \\ 
+\code{mdivide\_right\_tri\_low} &  lower-triangular matrix right division \\
+\code{multiply\_lower\_tri\_self\_transpose} &  multiply lower-triangular matrix by transpose \\ 
+\code{quad\_form} &  quadratic form vector-matrix multiplication \\ 
+\code{rep\_matrix} &  replicate scalar to matrix \\ 
+\code{rep\_matrix} &  replicate row vector to matrix \\ 
+\code{rep\_matrix} &  replicate column vector to matrix \\ 
+\code{rep\_row\_vector} &  replicate scalar to row vector \\ 
+\code{rep\_vector} &  replicate scalar to vector \\ 
+\code{row} &  row of matrix \\ 
+\code{rows} &  number of rows in matrix \\ 
+\code{rows\_dot\_product} &  dot-product of rows of matrices \\ 
+\code{rows\_dot\_self} &  dot-product of matrix with itself \\ 
+\code{segment} &  sub-vector \\ 
+\code{singular\_values} &  singular values of matrix \\ 
+\code{size} &  number of entries in array or vector \\ 
+\code{sub\_col} &  sub-column of matrix \\ 
+\code{sub\_row} &  sub-row of matrix \\ 
+\code{tail} &  tail of vector \\ 
+\code{tcrossprod} &  matrix post-multiply by own transpose \\ 
+\code{trace} &  trace of matrix \\ 
+\code{trace\_gen\_quad\_form} & trace of generalized quadratic form \\ 
+\code{trace\_quad\_form} &  trace of quadratic form \\ 
+\end{tabular}
+\end{center}
+\caption{Matrix functions}\label{matrix-functions.fig}
+\end{figure}
 
 
+\begin{figure}
+\begin{center}
+\begin{tabular}{l|l}
+{\it function} & {\it description} \\ \hline \hline
+\code{bernoulli\_cdf} &  Bernoulli cdf \\ 
+\code{bernoulli\_log} &  log Bernoulli pmf \\ 
+\code{bernoulli\_logit\_log} &  logit-scale log Bernoulli pmf \\ 
+\code{bernoulli\_rng} &  Bernoulli RNG \\ 
+\code{beta\_binomial\_cdf} &  beta-binomial cdf \\ 
+\code{beta\_binomial\_log} &  log beta-binomial pmf \\ 
+\code{beta\_binomial\_rng} &  beta-binomial rng \\ 
+\code{beta\_cdf} &  beta cdf \\ 
+\code{beta\_log} &  log beta pdf \\ 
+\code{beta\_rng} &  beta RNG \\ 
+\code{binomial\_cdf} &  binomial cdf n \\ 
+\code{binomial\_log} &  log binomial pmf \\ 
+\code{binomial\_logit\_log} &  log logit-scaled binomial pmf \\ 
+\code{binomial\_rng} &  binomail RNG \\ 
+\code{categorical\_log} &  log categorical pmf \\ 
+\code{categorical\_rng} &  categorical RNG \\ 
+\code{cauchy\_cdf} &  Cauchy cdf \\ 
+\code{cauchy\_log} &  log Cauchy pdf \\ 
+\code{cauchy\_rng} &  Cauchy RNG \\ 
+\code{chi\_square\_log} &  log chi-square pdf \\ 
+\code{chi\_square\_rng} &  chi-square RNG \\ 
+\code{dirichlet\_log} &  log Dirichlet pdf \\ 
+\code{dirichlet\_rng} &  Dirichlet RNG \\ 
+\code{double\_exponential\_log} &  log double-exponential (Laplace) pdf \\ 
+\code{double\_exponential\_rng} &  double-exponential (Laplace) RNG \\ 
+\code{exp\_mod\_normal\_cdf} &  exponentially modified normal cdf \\
+\code{exp\_mod\_normal\_log} &  log exponentially modified normal pdf \\ 
+\code{exp\_mod\_normal\_rng} &  exponentially modified normal RNG \\ 
+\code{exponential\_cdf} &  exponentia cdf \\ 
+\code{exponential\_log} &  log of exponential pdf \\ 
+\code{exponential\_rng} &  exponential RNG \\ 
+\code{gamma\_log} &  log gamma pdf \\ 
+\code{gamma\_rng} &  gamma RNG \\ 
+\code{gumbel\_cdf} &  Gumbel cdf \\ 
+\code{gumbel\_log} &  log Gumbel pdf \\ 
+\code{gumbel\_rng} &  Gumbel RNG\\ 
+\code{hypergeometric\_log} &  log hypergeometric pmf \\ 
+\code{hypergeometric\_rng} &  hypergeometric RNG \\ 
+\code{inv\_chi\_square\_cdf} &  inverse chi-square cdf \\ 
+\code{inv\_chi\_square\_log} &  log inverse chi-square pdf \\ 
+\code{inv\_chi\_square\_rng} &  inverse chi-square RNG \\ 
+\end{tabular}
+\end{center}
+\caption{Probability functions}\label{prob-functions.fig}
+\end{figure}
+
+\begin{figure}
+\begin{center}
+\begin{tabular}{l|l}
+{\it function} & {\it description} \\ \hline \hline
+\code{inv\_gamma\_cdf} & inverse gamma cdf \\ 
+\code{inv\_gamma\_log} &  log inverse gamma pdf \\ 
+\code{inv\_gamma\_rng} &  inverse gamma RNG \\ 
+\code{inv\_wishart\_log} &  log inverse Wishart pdf \\ 
+\code{inv\_wishart\_rng} &  inverse Wishart RNG \\ 
+\code{lkj\_corr\_cholesky\_log} &  log LKJ correlation, Cholesky-variate pdf \\ 
+\code{lkj\_corr\_cholesky\_rng} &  LKJ correlation, Cholesky-variate RNG \\
+\code{lkj\_corr\_log} &  log of LKJ correlation pdf \\ 
+\code{lkj\_corr\_rng} &  LKJ correlation RNG \\ 
+% \code{lkj\_cov\_log} &  {\it deprecated} \\ 
+\code{logistic\_cdf} &  logistic cdf \\ 
+\code{logistic\_log} &  log logistic pdf \\ 
+\code{logistic\_rng} &  logistic RNG \\ 
+\code{lognormal\_cdf} &  lognormal cdf \\ 
+\code{lognormal\_log} &  log of lognormal pdf \\ 
+\code{lognormal\_rng} &  lognormal RNG \\ 
+\code{multi\_normal\_cholesky\_log} & log multi-normal Cholesky-parameterized pdf  \\ 
+\code{multi\_normal\_log} &  log multi-normal pdf \\ 
+\code{multi\_normal\_prec\_log} & log multi-normal precision-parameterized pdf \\ 
+\code{multi\_normal\_rng} &  multi-normal RNG \\ 
+\code{multi\_student\_t\_log} & log multi student-t pdf \\
+\code{multi\_student\_t\_rng} &  multi student-t RNG \\ 
+\code{multinomial\_log} &  log multinomial pmf \\ 
+\code{multinomial\_rng} &  multinomial RNG \\ 
+\code{neg\_binomial\_cdf} &  negative binomial cdf \\ 
+\code{neg\_binomial\_log} &  log negative binomial pmf \\ 
+\code{neg\_binomial\_rng} &  negative biomial RNG \\ 
+\code{normal\_cdf} &  normal cdf \\ 
+\code{normal\_log} &  log normal pdf (c.f. log lognormal pdf) \\ 
+\code{normal\_rng} &  normal RNG \\ 
+\code{ordered\_logistic\_log} &  log ordinal logistic pmf \\ 
+\code{ordered\_logistic\_rng} &  ordinal logistic RNG \\ 
+\code{pareto\_cdf} &  Pareto cdf \\ 
+\code{pareto\_log} &  log Pareto pdf \\ 
+\code{pareto\_rng} &  Pareto RNG \\ 
+\code{poisson\_cdf} &  Poisson cdf \\ 
+\code{poisson\_log} &  log Poisson pmf \\ 
+\code{poisson\_log\_log} &  log Poisson log-parameter pdf \\ 
+\code{poisson\_rng} &  Poisson RNG \\ 
+\end{tabular}
+\end{center}
+\caption{Probability functions (continued)}\label{prob-functions-cont.fig}
+\end{figure}
 
 
+\begin{figure}
+\begin{center}
+\begin{tabular}{l|l}
+{\it function} & {\it description} \\ \hline \hline
+\code{rayleigh\_log} & log Rayleigh pdf \\
+\code{rayleigh\_rng} & Rayleigh RNG \\
+\code{rayleigh\_cdf} & Rayleigh cdf \\
+\code{scaled\_inv\_chi\_square\_cdf} &  scaled inverse-chi-square cdf \\ 
+\code{scaled\_inv\_chi\_square\_log} &  log scaled inverse-chi-square pdf \\ 
+\code{scaled\_inv\_chi\_square\_rng} &  scaled inverse-chi-square RNG \\ 
+\code{skew\_normal\_cdf} &  skew-normal cdf \\
+\code{skew\_normal\_log} &  log of skew-normal pdf \\
+\code{skew\_normal\_rng} &  skew-normal RNG \\ 
+\code{student\_t\_cdf} &  Student-t cdf \\
+\code{student\_t\_log} &  log of Student-t pdf \\
+\code{student\_t\_rng} &  Student-t RNG \\ 
+\code{uniform\_log} &  log of uniform pdf \\ 
+\code{uniform\_rng} &  uniform RNG \\ 
+\code{weibull\_cdf} &  Weibull cdf \\ 
+\code{weibull\_log} &  log of Weibull pdf \\ 
+\code{weibull\_rng} &  Weibull RNG \\ 
+\code{wishart\_log} &  log of Wishart pdf \\ 
+\code{wishart\_rng} &  Wishart RNG \\ 
+\end{tabular}
+\end{center}
+\caption{Probability functions (continued 2)}\label{prob-functions-cont-2.fig}
+\end{figure}
+
+\nocite{NocedalWright:2006}
+\nocite{WainwrightJordan:2008}
+\nocite{Nesterov:2009}
+\nocite{GoogleTest:2011}
+\nocite{Eigen:2012}
+\nocite{R:2013}
+\clearpage
 %\bibliographystyle{jss}
 \bibliography{stan-paper}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
 
 \end{document}
 
