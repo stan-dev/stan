@@ -109,6 +109,11 @@ namespace stan {
       int T = y.cols(); // number of observations
       int n = G.rows(); // number of states
 
+      // check y
+      if (!check_finite(function, y, "y", &lp))
+        return lp;
+      if (!check_not_nan(function, y, "y", &lp))
+        return lp;
       // check F
       if (!check_size_match(function,
                             F.cols(), "columns of F",
@@ -120,45 +125,70 @@ namespace stan {
                             G.rows(), "rows of G",
                             &lp))
         return lp;
+      if (!check_finite(function, F, "F", &lp))
+        return lp;
+      if (!check_not_nan(function, F, "F", &lp))
+        return lp;
       // check G
       if (!check_size_match(function,
                             G.rows(), "rows of G",
                             G.cols(), "columns of G",
                             &lp))
         return lp;
-      // check V
-      if (!check_spsd_matrix(function, V, "V", &lp))
+      if (!check_finite(function, G, "G", &lp))
         return lp;
+      if (!check_not_nan(function, G, "G", &lp))
+        return lp;
+      // check V
       if (!check_size_match(function,
                             V.rows(), "rows of V",
                             y.rows(), "rows of y",
                             &lp))
         return lp;
-      // check W
-      if (!check_spsd_matrix(function, W, "W", &lp))
+      // TODO: incorporate support for infinite V
+      if (!check_finite(function, V, "V", &lp))
         return lp;
+      if (!check_not_nan(function, V, "V", &lp))
+        return lp;
+      if (!check_spsd_matrix(function, V, "V", &lp))
+        return lp;
+      // check W
       if (!check_size_match(function,
                             W.rows(), "rows of W",
                             G.rows(), "rows of G",
                             &lp))
         return lp;
-
-      if (y.cols() == 0 || y.rows() == 0)
+      // TODO: incorporate support for infinite W
+      if (!check_finite(function, W, "W", &lp))
         return lp;
-
+      if (!check_not_nan(function, W, "W", &lp))
+        return lp;
+      if (!check_spsd_matrix(function, W, "W", &lp))
+        return lp;
       // check m0
       if (!check_size_match(function,
                             m0.size(), "size of m0",
                             G.rows(), "rows of G",
                             &lp))
         return lp;
-      // check C0
-      if (!check_cov_matrix(function, C0, "C0", &lp))
+      if (!check_finite(function, m0, "m0", &lp))
         return lp;
+      if (!check_not_nan(function, m0, "m0", &lp))
+        return lp;
+      // check C0
       if (!check_size_match(function,
                             C0.rows(), "rows of C0",
                             G.rows(), "rows of G",
                             &lp))
+        return lp;
+      if (!check_cov_matrix(function, C0, "C0", &lp))
+        return lp;
+      if (!check_finite(function, C0, "C0", &lp))
+        return lp;
+      if (!check_not_nan(function, C0, "C0", &lp))
+        return lp;
+
+      if (y.cols() == 0 || y.rows() == 0)
         return lp;
 
       if (include_summand<propto>::value) {
@@ -239,7 +269,7 @@ namespace stan {
     }
 
     /**
-     * The log of a Gaussian dynamic linear model (GDLM) with 
+     * The log of a Gaussian dynamic linear model (GDLM) with
      * uncorrelated observation disturbances.
      * This distribution is equivalent to, for \f$t = 1:T\f$,
      * \f{eqnarray*}{
@@ -314,6 +344,11 @@ namespace stan {
       int T = y.cols(); // number of observations
       int n = G.rows(); // number of states
 
+      // check y
+      if (!check_finite(function, y, "y", &lp))
+        return lp;
+      if (!check_not_nan(function, y, "y", &lp))
+        return lp;
       // check F
       if (!check_size_match(function,
                             F.cols(), "columns of F",
@@ -325,11 +360,19 @@ namespace stan {
                             G.rows(), "rows of G",
                             &lp))
         return lp;
+      if (!check_finite(function, F, "F", &lp))
+        return lp;
+      if (!check_not_nan(function, F, "F", &lp))
+        return lp;
       // check G
       if (!check_size_match(function,
                             G.rows(), "rows of G",
                             G.cols(), "columns of G",
                             &lp))
+        return lp;
+      if (!check_finite(function, G, "G", &lp))
+        return lp;
+      if (!check_not_nan(function, G, "G", &lp))
         return lp;
       // check V
       if (!check_nonnegative(function, V, "V", &lp))
@@ -339,6 +382,12 @@ namespace stan {
                             y.rows(), "rows of y",
                             &lp))
         return lp;
+      // TODO: support infinite V
+      if (!check_finite(function, V, "V", &lp))
+        return lp;
+      if (!check_not_nan(function, V, "V", &lp))
+        return lp;
+      // check W
       if (!check_spsd_matrix(function, W, "W", &lp))
         return lp;
       if (!check_size_match(function,
@@ -346,11 +395,20 @@ namespace stan {
                             G.rows(), "rows of G",
                             &lp))
         return lp;
+      // TODO: support infinite W
+      if (!check_finite(function, W, "W", &lp))
+        return lp;
+      if (!check_not_nan(function, W, "W", &lp))
+        return lp;
       // check m0
       if (!check_size_match(function,
                             m0.size(), "size of m0",
                             G.rows(), "rows of G",
                             &lp))
+        return lp;
+      if (!check_finite(function, m0, "m0", &lp))
+        return lp;
+      if (!check_not_nan(function, m0, "m0", &lp))
         return lp;
       // check C0
       if (!check_cov_matrix(function, C0, "C0", &lp))
@@ -360,7 +418,10 @@ namespace stan {
                             G.rows(), "rows of G",
                             &lp))
         return lp;
-
+      if (!check_finite(function, C0, "C0", &lp))
+        return lp;
+      if (!check_not_nan(function, C0, "C0", &lp))
+        return lp;
 
       if (y.cols() == 0 || y.rows() == 0)
         return lp;
