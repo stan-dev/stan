@@ -75,9 +75,9 @@ namespace stan {
               typename T_V, typename T_W,
               typename T_m0, typename T_C0
               >
-    typename boost::math::tools::promote_args<
+    typename return_type<
       T_y,
-      typename boost::math::tools::promote_args<T_F,T_G,T_V,T_W,T_m0,T_C0>::type >::type
+      typename return_type<T_F,T_G,T_V,T_W,T_m0,T_C0>::type >::type
     gaussian_dlm_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
                      const Eigen::Matrix<T_F,Eigen::Dynamic,Eigen::Dynamic>& F,
                      const Eigen::Matrix<T_G,Eigen::Dynamic,Eigen::Dynamic>& G,
@@ -86,9 +86,9 @@ namespace stan {
                      const Eigen::Matrix<T_m0,Eigen::Dynamic,1>& m0,
                      const Eigen::Matrix<T_C0,Eigen::Dynamic,Eigen::Dynamic>& C0) {
       static const char* function = "stan::prob::gaussian_dlm_log(%1%)";
-      typedef typename boost::math::tools::promote_args<
+      typedef typename return_type<
         T_y,
-        typename boost::math::tools::promote_args<T_F,T_G,T_V,T_W,T_m0,T_C0>::type  >::type T_lp;
+        typename return_type<T_F,T_G,T_V,T_W,T_m0,T_C0>::type  >::type T_lp;
       T_lp lp(0.0);
 
       using stan::math::add;
@@ -209,7 +209,7 @@ namespace stan {
           }
         }
 
-        Eigen::Matrix<typename boost::math::tools::promote_args<T_y>::type,
+        Eigen::Matrix<typename return_type<T_y>::type,
                       Eigen::Dynamic, 1> yi(r);
         Eigen::Matrix<T_lp,Eigen::Dynamic, 1> a(n);
         Eigen::Matrix<T_lp,Eigen::Dynamic, Eigen::Dynamic> R(n, n);
@@ -253,9 +253,9 @@ namespace stan {
               typename T_m0, typename T_C0
               >
     inline
-    typename boost::math::tools::promote_args<
+    typename return_type<
       T_y,
-      typename boost::math::tools::promote_args<T_F,T_G,T_V,T_W,T_m0,T_C0>::type >::type
+      typename return_type<T_F,T_G,T_V,T_W,T_m0,T_C0>::type >::type
     gaussian_dlm_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
                      const Eigen::Matrix<T_F,Eigen::Dynamic,Eigen::Dynamic>& F,
                      const Eigen::Matrix<T_G,Eigen::Dynamic,Eigen::Dynamic>& G,
@@ -307,9 +307,9 @@ namespace stan {
               typename T_V, typename T_W,
               typename T_m0, typename T_C0
               >
-    typename boost::math::tools::promote_args<
+    typename return_type<
       T_y,
-      typename boost::math::tools::promote_args<T_F,T_G,T_V,T_W,T_m0,T_C0>::type >::type
+      typename return_type<T_F,T_G,T_V,T_W,T_m0,T_C0>::type >::type
     gaussian_dlm_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
                      const Eigen::Matrix<T_F,Eigen::Dynamic,Eigen::Dynamic>& F,
                      const Eigen::Matrix<T_G,Eigen::Dynamic,Eigen::Dynamic>& G,
@@ -318,9 +318,9 @@ namespace stan {
                      const Eigen::Matrix<T_m0,Eigen::Dynamic,1>& m0,
                      const Eigen::Matrix<T_C0,Eigen::Dynamic,Eigen::Dynamic>& C0) {
       static const char* function = "stan::prob::dlm_log(%1%)";
-      typedef typename boost::math::tools::promote_args<
+      typedef typename return_type<
         T_y,
-        typename boost::math::tools::promote_args<T_F,T_G,T_V,T_W,T_m0,T_C0>::type  >::type T_lp;
+        typename return_type<T_F,T_G,T_V,T_W,T_m0,T_C0>::type  >::type T_lp;
       T_lp lp(0.0);
 
       using stan::math::add;
@@ -429,12 +429,6 @@ namespace stan {
       }
 
       if (include_summand<propto,T_y,T_F,T_G,T_V,T_W,T_m0,T_C0>::value) {
-        // TODO: initial values of m and C should be arguments.
-        // however that would create too many args for
-        // boost::math::tools::promote_args (max 6)
-        // and would require altering function signatures in the
-        // parser to accept more arguments.
-
         T_lp f;
         T_lp Q;
         T_lp Q_inv;
@@ -495,9 +489,9 @@ namespace stan {
               typename T_m0, typename T_C0
               >
     inline
-    typename boost::math::tools::promote_args<
+    typename return_type<
       T_y,
-      typename boost::math::tools::promote_args<T_F,T_G,T_V,T_W,T_m0,T_C0>::type
+      typename return_type<T_F,T_G,T_V,T_W,T_m0,T_C0>::type
       >::type
     gaussian_dlm_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
                      const Eigen::Matrix<T_F,Eigen::Dynamic,Eigen::Dynamic>& F,
