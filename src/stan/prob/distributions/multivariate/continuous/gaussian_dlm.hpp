@@ -457,9 +457,8 @@ namespace stan {
         for (int i = 0; i < y.cols(); i++) {
           // Predict state
           // reuse m and C instead of using a and R
-          // eval to avoid any aliasing issues with Eigen (?)
-          m = multiply(G, m).eval();
-          C = add(quad_form_sym(C, transpose(G)), W).eval();
+          m = multiply(G, m);
+          C = add(quad_form_sym(C, transpose(G)), W);
           for (int j = 0; j < y.rows(); ++j) {
             // predict observation
             T_lp yij(y(j, i));
@@ -482,7 +481,7 @@ namespace stan {
             // // // tcrossprod throws an error (ambiguous)
             // C = subtract(C, multiply(Q, tcrossprod(A)));
             C -= multiply(Q, multiply(A, transpose(A)));
-            C = 0.5 * add(C, transpose(C)).eval();
+            C = 0.5 * add(C, transpose(C));
             lp -= 0.5 * (log(Q) + pow(e, 2) * Q_inv);
           }
         }
