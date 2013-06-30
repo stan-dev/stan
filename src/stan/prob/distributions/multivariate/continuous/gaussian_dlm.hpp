@@ -221,11 +221,9 @@ namespace stan {
 
         for (int i = 0; i < y.cols(); i++) {
           yi = y.col(i);
-          // std::cout << "y = " << yi << std::endl;
           // // Predict state
           // a_t = G_t m_{t-1}
           a = multiply(G, m);
-          // std::cout  << "a = " << a << std::endl;
           // R_t = G_t C_{t-1} G_t' + W_t
           R = add(quad_form_sym(C, transpose(G)), W);
           // // predict observation
