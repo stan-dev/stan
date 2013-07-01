@@ -60,18 +60,30 @@ TEST_F(StanGmArgumentsUnvaluedArgument,parse_args) {
   EXPECT_TRUE(return_value);
   EXPECT_FALSE(help_flag);
   EXPECT_EQ(0, args.size());
-
   
-  // return_value = false;
-  // args.clear();
-  // args.push_back("help");
-  // help_flag = false;
-  // return_value = arg->parse_args(args,0,0,help_flag);
   
-  // EXPECT_TRUE(return_value);
-  // EXPECT_FALSE(help_flag);
-  // EXPECT_EQ(0, args.size());
-  //EXPECT_FALSE(static_cast<test_arg_impl*>(arg)->is_present());
+  return_value = false;
+  args.clear();
+  args.push_back("help");
+  help_flag = false;
+  return_value = arg->parse_args(args,0,0,help_flag);
+  
+  EXPECT_TRUE(return_value);
+  EXPECT_TRUE(help_flag);
+  EXPECT_EQ(0, args.size());
+  EXPECT_FALSE(static_cast<test_arg_impl*>(arg)->is_present());
+  
+  
+  return_value = false;
+  args.clear();
+  args.push_back("help-all");
+  help_flag = false;
+  return_value = arg->parse_args(args,0,0,help_flag);
+  
+  EXPECT_TRUE(return_value);
+  EXPECT_TRUE(help_flag);
+  EXPECT_EQ(0, args.size());
+  EXPECT_FALSE(static_cast<test_arg_impl*>(arg)->is_present());
 }
 
 TEST_F(StanGmArgumentsUnvaluedArgument,parse_args_unexpected) {
@@ -88,7 +100,7 @@ TEST_F(StanGmArgumentsUnvaluedArgument,parse_args_unexpected) {
   EXPECT_TRUE(return_value);
   EXPECT_FALSE(help_flag);
   EXPECT_EQ(1, args.size());
-  //EXPECT_TRUE(static_cast<test_arg_impl*>(arg)->is_present());
+  EXPECT_TRUE(static_cast<test_arg_impl*>(arg)->is_present());
 }
 
 TEST_F(StanGmArgumentsUnvaluedArgument,arg) {

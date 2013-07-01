@@ -1,5 +1,6 @@
 #ifndef __STAN__GM__ARGUMENTS__UNVALUED__ARGUMENT__BETA__
 #define __STAN__GM__ARGUMENTS__UNVALUED__ARGUMENT__BETA__
+#include <iostream>
 
 #include <vector>
 #include <stan/gm/arguments/argument.hpp>
@@ -31,8 +32,10 @@ namespace stan {
       
       bool parse_args(std::vector<std::string>& args, std::ostream* out,
                       std::ostream* err, bool& help_flag) {
+        if (args.size() == 0)
+          return true;
         
-        if ( (args.back() == "help") || (args.back() == "help-all") ) {
+        if ((args.back() == "help") || (args.back() == "help-all")) {
           print_help(out, 0);
           help_flag |= true;
           args.clear();
