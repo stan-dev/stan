@@ -13,49 +13,58 @@ namespace stan {
       
     public:
       
-      singleton_argument(): _validity("All") {};
+      singleton_argument()
+        : _validity("All") { 
+        _name = "";
+      }
       
+      singleton_argument(const std::string name)
+        : _validity("All") {
+        _name = name;
+      }
+
+
       bool parse_args(std::vector<std::string>& args, std::ostream* out,
                       std::ostream* err, bool& help_flag) {
-        
-        if(args.size() == 0) return true;
+        if (args.size() == 0) 
+          return true;
+
+        if ( (args.back() == "help") || (args.back() == "help-all") ) {
+          print_help(out, 0);
+          help_flag |= true;
+          args.clear();
+          return true;
+        }
         
         std::string name;
         std::string value;
         split_arg(args.back(), name, value);
         
-        if(_name == name) {
+        if (_name == name) {
           args.pop_back();
           
           T proposed_value = boost::lexical_cast<T>(value);
           
           if (!set_value(boost::lexical_cast<T>(value))) {
-
-            if(err) {
-              *err << proposed_value << " is not a valid value for \"" << _name << "\"" << std::endl;
-              *err << std::string(indent_width, ' ') << "Valid values:" << print_valid() << std::endl;
+            
+            if (err) {
+              *err << proposed_value << " is not a valid value for "
+                   << "\"" << _name << "\"" << std::endl;
+              *err << std::string(indent_width, ' ') 
+                   << "Valid values:" << print_valid() << std::endl;
             }
             
             args.clear();
             return false;
-            
           }
           
         }
-        
-        if ( (args.back() == "help") || (args.back() == "help-all") ) {
-          print_help(out, 0);
-          help_flag |= true;
-          args.clear();
-        }
-        
         return true;
-        
-      };
+      }
       
       T value() { return _value; }
       
-      bool set_value(T value) {
+      bool set_value(const T& value) {
         
         if (is_valid(value)) {
           _value = value;
@@ -63,12 +72,19 @@ namespace stan {
         }
         
         return false;
-      
       }
 
-      std::string print_value() { return boost::lexical_cast<std::string>(_value); }
-      std::string print_valid() { return " " + _validity; }
-      bool is_default() { return _value == _default_value; }
+      std::string print_value() { 
+        return boost::lexical_cast<std::string>(_value); 
+      }
+      
+      std::string print_valid() { 
+        return " " + _validity; 
+      }
+      
+      bool is_default() { 
+        return _value == _default_value; 
+      }
       
 
     protected:
