@@ -15,6 +15,7 @@
 #include <stan/prob/distributions/univariate/continuous/lognormal.hpp>
 #include <stan/prob/distributions/univariate/continuous/normal.hpp>
 #include <stan/prob/distributions/univariate/continuous/pareto.hpp>
+#include <stan/prob/distributions/univariate/continuous/rayleigh.hpp>
 #include <stan/prob/distributions/univariate/continuous/scaled_inv_chi_square.hpp>
 #include <stan/prob/distributions/univariate/continuous/skew_normal.hpp>
 #include <stan/prob/distributions/univariate/continuous/student_t.hpp>
