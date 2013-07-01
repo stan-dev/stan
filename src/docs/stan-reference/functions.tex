@@ -628,6 +628,61 @@ $\Gamma$ function, defining
 \]
 }
 %
+\fitem{real}{bessel\_first\_kind}{real \farg{v}, real \farg{z}}{The Bessel function of the first kind with order \farg{v} applied to \farg{z} defined for all \farg{z} and \farg{v} by
+\[
+{J_v}(z) = \left(\frac{1}{2}z\right)^v\sum_{k=0}^\infty \frac{\left(-\frac{1}{4}z^2\right)^k}{k!\Gamma(v+k+1)}
+\]
+}
+%
+\fitem{real}{bessel\_second\_kind}{real \farg{v}, real \farg{z}}{
+The Bessel function of the second kind with order \farg{v} applied to \farg{z} defined for  positive \farg{z} and \farg{v} by
+\[
+{Y_v}(z)
+=
+\frac{J_v(z)\cos(v\pi) - J_{-v}(z)}{\sin(v\pi)}
+\]
+}
+%
+\fitem{real}{modified\_bessel\_first\_kind}{real \farg{v}, real \farg{z}}{The modified Bessel function of the first kind with order \farg{v} applied to \farg{z} defined for all \farg{z} and \farg{v} by
+\[
+{I_v}(z) = \left(\frac{1}{2}z\right)^v\sum_{k=0}^\infty \frac{\left(\frac{1}{4}z^2\right)^k}{k!\Gamma(v+k+1)}
+\]
+}
+%
+\fitem{real}{modified\_bessel\_second\_kind}{real \farg{v}, real \farg{z}}{
+The modified Bessel function of the second kind with order \farg{v} applied to \farg{z} defined for  positive \farg{z} and \farg{v} by
+\[
+{K_v}(z)
+=
+\frac{\pi}{2}\cdot\frac{I_{-v}(z) - I_{v}(z)}{\sin(v\pi)}
+\]
+}
+%
+\fitem{real}{falling\_factorial}{real \farg{x}, real \farg{n}}{
+The falling factorial of \farg{x} with power \farg{n} defined for positive \farg{x} and real \farg{n} by
+\[
+\mbox{falling\_factorial}(x,n)
+=
+\frac{x!}{n!}
+\]
+}
+%
+\fitem{real}{log\_falling\_factorial}{real \farg{x}, real \farg{n}}{
+The log of the falling factorial of \farg{x} with power \farg{n} defined for positive \farg{x} and real \farg{n}.
+}
+%
+\fitem{real}{rising\_factorial}{real \farg{x}, real \farg{n}}{
+The rising factorial of \farg{x} with power \farg{n} defined for positive \farg{x} and real \farg{n} by
+\[
+\mbox{rising\_factorial}(x,n)
+=
+\frac{(x+n-1)!}{(x-1)!}
+\]
+}
+%
+\fitem{real}{log\_rising\_factorial}{real \farg{x}, real \farg{n}}{
+The log of the rising factorial of \farg{x} with power \farg{n} defined for positive \farg{x} and real \farg{n}.
+}
 \end{description}
 
 
@@ -1402,7 +1457,15 @@ x <- rep_vector(1.0, 3);
 %
 There are no integer vector or matrix types, so integer values are
 automatically promoted.
-
+%
+\begin{description}
+%
+\fitem{vector}{to\_vector}{matrix \farg{m}}{
+Return the matrix \farg{m} as a vector in column-major order.}
+%
+\fitem{vector}{to\_vector}{row\_vector \farg{m}}{
+Return the row vector \farg{m} as a vector in column-major order.}
+\end{description}
 
 \section{Slice and Package Functions}
 
