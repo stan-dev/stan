@@ -775,20 +775,24 @@ samples1.csv	samples2.csv	samples3.csv
 \begin{Verbatim}
 > bin/print samples*.csv
 \end{Verbatim}
-{\small
+{\scriptsize
 \begin{Verbatim}[fontshape=sl]
-Inference for Stan model: 
+
+Inference for Stan model: example_model
 3 chains: each with iter=(1000,1000,1000); warmup=(0,0,0); 
 thin=(1,1,1); 3000 iterations saved.
 
-       mean se_mean   sd 2.5%  25%  50%  75% 97.5% n_eff n_eff/s Rhat
-alpha  16.2     2.0 41.5  1.4  5.2  9.7 17.6  59.2   435     2.3  1.0
-beta   10.0     1.1 22.8  0.8  3.3  6.2 11.2  37.5   405     2.1  1.0
+Warmup took (1.1, 1.2, 1.1) seconds, 3.4 seconds total
+Sampling took (1.2, 1.1, 1.1) seconds, 3.4 seconds total
 
-Samples were drawn using mcmc::nuts_diag.
-For each parameter, n_eff is a crude measure of effective 
-sample size, and Rhat is the potential scale reduction factor 
-on split chains (at convergence, Rhat=1).
+       mean se_mean   sd 2.5%  25%  50%  75% 97.5% n_eff n_eff/s Rhat
+alpha  16.2     2.0 41.5  1.4  5.2  9.7 17.6  59.2   435   127.9  1.0
+beta   10.0     1.1 22.8  0.8  3.3  6.2 11.2  37.5   405   119.1  1.0
+
+Samples were drawn using NUTS with a diagonal Euclidean metric.
+For each parameter, n_eff is a crude measure of effective sample size,
+and Rhat is the potential scale reduction factor on split chains (at 
+convergence, Rhat=1).
 \end{Verbatim}
 }
 \end{quote}
@@ -811,11 +815,11 @@ In addition to the filenames, \code{print} includes three flags to customize the
 {No help output by default}
 %
 \cmdarg{precision}{+int}
-{Set the output precision, namely the number of digits past the decimal place.}
+{Sets the mantissa precision, i.e. the number of digits past the decimal place.}
 {default = \code{1}}
 %
 \cmdarg{autocorr=}{+int}
-{Calculates and then displays the autocorrelation of the specified chain at various lags.}
+{Calculates and then displays the autocorrelation of the specified chain.}
 {No autocorrelation output by default}
 %
 \end{description}
