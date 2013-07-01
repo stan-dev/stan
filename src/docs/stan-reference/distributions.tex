@@ -1453,6 +1453,27 @@ algorithm which sequentially processes observations can be used
   covariance \farg{C0}.}
 %
 %
+\fitem{real}{gaussian\_dlm\_log}{vector \farg{y}, matrix \farg{F},
+  matrix \farg{G}, matrix \farg{V}, matrix \farg{W}}{The log of the
+  density of the Gaussian Dynamic Linear model with observation matrix
+  \farg{y} in which rows are variables and columns are observations,
+  design matrix \farg{F}, transition matrix \farg{G}, observation
+  covariance matrix \farg{V}, system covariance matrix \farg{W}. The
+  initial state is distributed with mean 0 and a diagonal covariance
+  matrix in which the diagonal elements are 1e7.}
+%
+%
+\fitem{real}{gaussian\_dlm\_log}{vector \farg{y}, matrix \farg{F},
+  matrix \farg{G}, vector \farg{V}, matrix \farg{W}}{The log of the density of the Gaussian Dynamic
+  Linear model with observation matrix \farg{y} in which rows are
+  variables and columns are observations, design matrix \farg{F},
+  transition matrix \farg{G}, observation covariance matrix with
+  diagonal \farg{V}, system covariance matrix \farg{W}. The initial
+  state is distributed with mean 0 and a diagonal covariance matrix
+  in which the diagonal elements are 1e7.}
+%
+%
+
 \end{description}
 
 

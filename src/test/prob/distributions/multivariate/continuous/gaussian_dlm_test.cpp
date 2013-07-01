@@ -304,3 +304,10 @@ TEST_F(ProbDistributionsGaussianDLMInputs, PoliciesC0) {
   EXPECT_THROW(gaussian_dlm_log(y, FF, GG, V, W, m0, C0_notsq), std::domain_error);
   EXPECT_THROW(gaussian_dlm_log(y, FF, GG, V_vec, W, m0, C0_notsq), std::domain_error);
 }
+
+TEST_F(ProbDistributionsGaussianDLMInputs, ImproperPriors) {
+  EXPECT_NO_THROW(gaussian_dlm_log(y, FF, GG, V, W));
+  EXPECT_NO_THROW(gaussian_dlm_log(y, FF, GG, V_vec, W));
+}
+
+
