@@ -1,6 +1,7 @@
 #ifndef __STAN__GM__ARGUMENTS__SINGLETON__ARGUMENT__BETA__
 #define __STAN__GM__ARGUMENTS__SINGLETON__ARGUMENT__BETA__
 
+#include <boost/lexical_cast.hpp>
 #include <stan/gm/arguments/valued_argument.hpp>
 
 namespace stan {
