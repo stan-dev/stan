@@ -24,5 +24,5 @@ transformed parameters {
   }
 }
 model {
-  y ~ gaussian_dlm(F, G, V, W, m0, C0);
+  y ~ gaussian_dlm_obs(F, G, V, W, m0, C0);
 }

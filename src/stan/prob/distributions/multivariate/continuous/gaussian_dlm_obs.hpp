@@ -1,5 +1,5 @@
-#ifndef __STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__GAUSSIAN_DLM_HPP__
-#define __STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__GAUSSIAN_DLM_HPP__
+#ifndef __STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__GAUSSIAN_DLM_OBS_HPP__
+#define __STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__GAUSSIAN_DLM_OBS_HPP__
 
 #include <boost/random/normal_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
@@ -78,14 +78,14 @@ namespace stan {
     typename return_type<
       T_y,
       typename return_type<T_F,T_G,T_V,T_W,T_m0,T_C0>::type >::type
-    gaussian_dlm_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
+    gaussian_dlm_obs_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
                      const Eigen::Matrix<T_F,Eigen::Dynamic,Eigen::Dynamic>& F,
                      const Eigen::Matrix<T_G,Eigen::Dynamic,Eigen::Dynamic>& G,
                      const Eigen::Matrix<T_V,Eigen::Dynamic,Eigen::Dynamic>& V,
                      const Eigen::Matrix<T_W,Eigen::Dynamic,Eigen::Dynamic>& W,
                      const Eigen::Matrix<T_m0,Eigen::Dynamic,1>& m0,
                      const Eigen::Matrix<T_C0,Eigen::Dynamic,Eigen::Dynamic>& C0) {
-      static const char* function = "stan::prob::gaussian_dlm_log(%1%)";
+      static const char* function = "stan::prob::gaussian_dlm_obs_log(%1%)";
       typedef typename return_type<
         T_y,
         typename return_type<T_F,T_G,T_V,T_W,T_m0,T_C0>::type  >::type T_lp;
@@ -255,7 +255,7 @@ namespace stan {
               >
     inline
     typename return_type<T_y, T_F,T_G,T_V,T_W>::type
-    gaussian_dlm_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
+    gaussian_dlm_obs_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
                      const Eigen::Matrix<T_F,Eigen::Dynamic,Eigen::Dynamic>& F,
                      const Eigen::Matrix<T_G,Eigen::Dynamic,Eigen::Dynamic>& G,
                      const Eigen::Matrix<T_V,Eigen::Dynamic,Eigen::Dynamic>& V,
@@ -264,7 +264,7 @@ namespace stan {
         m0 = Eigen::VectorXd::Zero(G.rows());
       Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>
         C0 = Eigen::MatrixXd::Identity(G.rows(), G.cols()) * 1e7;
-      return gaussian_dlm_log<propto>(y, F, G, V, W, m0, C0);
+      return gaussian_dlm_obs_log<propto>(y, F, G, V, W, m0, C0);
     }
 
     template <typename T_y,
@@ -276,14 +276,14 @@ namespace stan {
     typename return_type<
       T_y,
       typename return_type<T_F,T_G,T_V,T_W,T_m0,T_C0>::type >::type
-    gaussian_dlm_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
+    gaussian_dlm_obs_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
                      const Eigen::Matrix<T_F,Eigen::Dynamic,Eigen::Dynamic>& F,
                      const Eigen::Matrix<T_G,Eigen::Dynamic,Eigen::Dynamic>& G,
                      const Eigen::Matrix<T_V,Eigen::Dynamic,Eigen::Dynamic>& V,
                      const Eigen::Matrix<T_W,Eigen::Dynamic,Eigen::Dynamic>& W,
                      const Eigen::Matrix<T_m0,Eigen::Dynamic,1>& m0,
                      const Eigen::Matrix<T_C0,Eigen::Dynamic,Eigen::Dynamic>& C0) {
-      return gaussian_dlm_log<false>(y, F, G, V, W, m0, C0);
+      return gaussian_dlm_obs_log<false>(y, F, G, V, W, m0, C0);
     }
 
     template <typename T_y,
@@ -292,12 +292,12 @@ namespace stan {
               >
     inline
     typename return_type<T_y, T_F,T_G,T_V,T_W>::type
-    gaussian_dlm_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
+    gaussian_dlm_obs_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
                      const Eigen::Matrix<T_F,Eigen::Dynamic,Eigen::Dynamic>& F,
                      const Eigen::Matrix<T_G,Eigen::Dynamic,Eigen::Dynamic>& G,
                      const Eigen::Matrix<T_V,Eigen::Dynamic,Eigen::Dynamic>& V,
                      const Eigen::Matrix<T_W,Eigen::Dynamic,Eigen::Dynamic>& W) {
-      return gaussian_dlm_log<false>(y, F, G, V, W);
+      return gaussian_dlm_obs_log<false>(y, F, G, V, W);
     }
 
     /**
@@ -344,14 +344,14 @@ namespace stan {
     typename return_type<
       T_y,
       typename return_type<T_F,T_G,T_V,T_W,T_m0,T_C0>::type >::type
-    gaussian_dlm_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
+    gaussian_dlm_obs_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
                      const Eigen::Matrix<T_F,Eigen::Dynamic,Eigen::Dynamic>& F,
                      const Eigen::Matrix<T_G,Eigen::Dynamic,Eigen::Dynamic>& G,
                      const Eigen::Matrix<T_V,Eigen::Dynamic,1>& V,
                      const Eigen::Matrix<T_W,Eigen::Dynamic,Eigen::Dynamic>& W,
                      const Eigen::Matrix<T_m0,Eigen::Dynamic,1>& m0,
                      const Eigen::Matrix<T_C0,Eigen::Dynamic,Eigen::Dynamic>& C0) {
-      static const char* function = "stan::prob::dlm_log(%1%)";
+      static const char* function = "stan::prob::gaussian_dlm_obs_log(%1%)";
       typedef typename return_type<
         T_y,
         typename return_type<T_F,T_G,T_V,T_W,T_m0,T_C0>::type  >::type T_lp;
@@ -524,7 +524,7 @@ namespace stan {
               >
     inline
     typename return_type<T_y, T_F,T_G,T_V,T_W>::type
-    gaussian_dlm_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
+    gaussian_dlm_obs_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
                      const Eigen::Matrix<T_F,Eigen::Dynamic,Eigen::Dynamic>& F,
                      const Eigen::Matrix<T_G,Eigen::Dynamic,Eigen::Dynamic>& G,
                      const Eigen::Matrix<T_V,Eigen::Dynamic,1>& V,
@@ -533,7 +533,7 @@ namespace stan {
         m0 = Eigen::VectorXd::Zero(G.rows());
       Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>
         C0 = Eigen::MatrixXd::Identity(G.rows(), G.cols()) * 1e7;
-      return gaussian_dlm_log<propto>(y, F, G, V, W, m0, C0);
+      return gaussian_dlm_obs_log<propto>(y, F, G, V, W, m0, C0);
     }
 
     template <typename T_y,
@@ -546,14 +546,14 @@ namespace stan {
       T_y,
       typename return_type<T_F,T_G,T_V,T_W,T_m0,T_C0>::type
       >::type
-    gaussian_dlm_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
+    gaussian_dlm_obs_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
                      const Eigen::Matrix<T_F,Eigen::Dynamic,Eigen::Dynamic>& F,
                      const Eigen::Matrix<T_G,Eigen::Dynamic,Eigen::Dynamic>& G,
                      const Eigen::Matrix<T_V,Eigen::Dynamic,1>& V,
                      const Eigen::Matrix<T_W,Eigen::Dynamic,Eigen::Dynamic>& W,
                      const Eigen::Matrix<T_m0,Eigen::Dynamic,1>& m0,
                      const Eigen::Matrix<T_C0,Eigen::Dynamic,Eigen::Dynamic>& C0) {
-      return gaussian_dlm_log<false>(y, F, G, V, W, m0, C0);
+      return gaussian_dlm_obs_log<false>(y, F, G, V, W, m0, C0);
     }
 
     template <typename T_y,
@@ -565,12 +565,12 @@ namespace stan {
       T_y,
       typename return_type<T_F,T_G,T_V,T_W>::type
       >::type
-    gaussian_dlm_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
+    gaussian_dlm_obs_log(const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
                      const Eigen::Matrix<T_F,Eigen::Dynamic,Eigen::Dynamic>& F,
                      const Eigen::Matrix<T_G,Eigen::Dynamic,Eigen::Dynamic>& G,
                      const Eigen::Matrix<T_V,Eigen::Dynamic,1>& V,
                      const Eigen::Matrix<T_W,Eigen::Dynamic,Eigen::Dynamic>& W) {
-      return gaussian_dlm_log<false>(y, F, G, V, W);
+      return gaussian_dlm_obs_log<false>(y, F, G, V, W);
     }
 
   }
