@@ -30,7 +30,7 @@ namespace stan {
         std::string indent(indent_width * depth, ' ');
         std::string subindent(indent_width, ' ');
         
-        *s << indent << _name << std::endl;
+        *s << indent << _name << "=<>" << std::endl;
         *s << indent << subindent << _description << std::endl;
         *s << indent << subindent << "Valid values:" << print_valid() << std::endl;
         *s << indent << subindent << "Defaults to " << _default << std::endl;
