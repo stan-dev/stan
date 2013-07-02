@@ -176,12 +176,12 @@ int main(int argc, const char* argv[]) {
       max_name_length = chains.param_name(i).length();
 
 
-  int n = 11;
+  int n = 9;
   
   Eigen::MatrixXd values(chains.num_params(), n);
   values.setZero();
-  Eigen::VectorXd probs(5);
-  probs << 0.025, 0.25, 0.5, 0.75, 0.975;
+  Eigen::VectorXd probs(3);
+  probs << 0.05, 0.5, 0.95;
   
   for (int i = 0; i < chains.num_params(); i++) {
     double sd = chains.sd(i);
@@ -190,18 +190,18 @@ int main(int argc, const char* argv[]) {
     values(i,1) = sd / sqrt(n_eff);
     values(i,2) = sd;
     Eigen::VectorXd quantiles = chains.quantiles(i,probs);
-    for (int j = 0; j < 5; j++)
+    for (int j = 0; j < 3; j++)
       values(i,3+j) = quantiles(j);
-    values(i,8) = n_eff;
-    values(i,9) = n_eff / total_sampling_time;
-    values(i,10) = chains.split_potential_scale_reduction(i);
+    values(i,6) = n_eff;
+    values(i,7) = n_eff / total_sampling_time;
+    values(i,8) = chains.split_potential_scale_reduction(i);
   }
   
   Eigen::Matrix<std::string, Eigen::Dynamic, 1> headers(n);
   headers << 
     "mean", "se_mean", "sd", 
-    "2.5%", "25%", "50%", "75%", "97.5%", 
-    "n_eff", "n_eff/s", "Rhat";
+    "5%", "50%", "95%", 
+    "n_eff", "n_eff/s", "R_hat";
   Eigen::VectorXi digits(n);
   
   int precision = 1;
