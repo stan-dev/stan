@@ -13,6 +13,7 @@ namespace stan {
       
       arg_data(): string_argument() {
         _name = "data";
+        _short_description = "Input data file";
         _description = "Input data file";
         _default = "\"\"";
         _default_value = "";

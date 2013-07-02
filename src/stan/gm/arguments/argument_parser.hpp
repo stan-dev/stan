@@ -18,7 +18,10 @@ namespace stan {
       argument_parser(std::vector<argument*>& valid_args)
         : _arguments(valid_args), _help_flag(false) {}
       
-      bool parse_args(int argc,const char* argv[],std::ostream* out = 0,std::ostream* err = 0) {
+      bool parse_args(int argc,
+                      const char* argv[],
+                      std::ostream* out = 0,
+                      std::ostream* err = 0) {
         if (argc == 1) 
           return true;
         
@@ -62,6 +65,7 @@ namespace stan {
             
             print_help(out, false);
             
+            *out << std::endl;
             *out << "See 'model' <arg1> [ help | help-all ]"
                  << " for argument specific information" << std::endl;
             *out << " or 'model' help-all for all argument information" << std::endl;
@@ -97,7 +101,7 @@ namespace stan {
         if (!s) 
           return;
         for (int i = 0; i < _arguments.size(); ++i) {
-          _arguments.at(i)->print_help(s, 0, recurse);
+          _arguments.at(i)->print_help(s, 1, recurse);
         }
       }
     

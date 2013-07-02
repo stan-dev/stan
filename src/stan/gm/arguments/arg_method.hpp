@@ -17,6 +17,7 @@ namespace stan {
       arg_method() {
         
         _name = "method";
+        _short_description = "Analysis method";
         _description = "Analysis method";
         
         _values.push_back(new arg_sample());

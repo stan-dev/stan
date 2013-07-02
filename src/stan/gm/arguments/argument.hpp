@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <fstream>
+#include <iomanip>
 
 namespace stan {
   namespace gm {
@@ -12,13 +13,23 @@ namespace stan {
     public:
       
       argument()
-        : indent_width(2) { }
+        : indent_width(2),
+          help_width(20) { }
       
+      argument(const std::string name) 
+        : _name(name),
+          indent_width(2),
+          help_width(20) { }
+
       virtual ~argument() { }
 
       std::string name() const { 
         return _name; 
       }
+      std::string short_description() const {
+        return _short_description;
+      }
+      
       std::string description() const { 
         return _description; 
       }
@@ -52,9 +63,11 @@ namespace stan {
       
     protected:
       std::string _name;
+      std::string _short_description;
       std::string _description;
     
       int indent_width;
+      int help_width;
     };
 
   } // gm

@@ -39,6 +39,12 @@ namespace stan {
         std::string indent(indent_width * depth, ' ');
         std::string subindent(indent_width, ' ');
         
+        *s << std::setiosflags(std::ios_base::left) << std::setw(help_width)
+           << (indent + _name);
+        *s << _short_description << std::endl;
+        
+        /*
+        
         *s << indent << _name << std::endl;
         *s << indent << subindent << _description << std::endl;
         if (_subarguments.size() > 0) {
@@ -55,6 +61,7 @@ namespace stan {
               (*it)->print_help(s, depth + 1, true);
           }
         }
+        */
       }
       
       bool parse_args(std::vector<std::string>& args, std::ostream* out,

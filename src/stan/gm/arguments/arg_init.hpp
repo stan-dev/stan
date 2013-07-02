@@ -13,6 +13,7 @@ namespace stan {
       
       arg_init(): string_argument() {
         _name = "init";
+        _short_description = "Initialization method";
         _description = std::string("Initialization method:")
           + std::string("\"0\" initializes to zero,")
           + std::string("\"random\" initializes randomly,")

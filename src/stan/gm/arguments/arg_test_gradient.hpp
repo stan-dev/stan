@@ -14,6 +14,7 @@ namespace stan {
       arg_test_gradient() {
         
         _name = "test_gradient";
+        _short_description = "Check model gradient against finite differences";
         _description = "Check model gradient against finite differences";
         
       }
