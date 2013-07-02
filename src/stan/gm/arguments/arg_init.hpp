@@ -15,11 +15,11 @@ namespace stan {
         _name = "init";
         _short_description = "Initialization method";
         _description = std::string("Initialization method:")
-          + std::string("\"0\" initializes to zero,")
-          + std::string("\"random\" initializes randomly,")
-          + std::string("anything else identifies a file");
-        _default = "\"random\"";
-        _default_value = "random";
+          + std::string("\"x\" initializes randomly beween [-x, x],")
+          + std::string("\"0\" initializes to 0,")
+          + std::string("anything else identifies a file of values");
+        _default = "\"2\"";
+        _default_value = "2";
         _value = _default_value;
       };
       

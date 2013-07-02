@@ -349,85 +349,92 @@ namespace stan {
       std::string init = dynamic_cast<string_argument*>(
                          parser.arg("init"))->value();
       
-      if (init == "0") {
+      try {
         
-        cont_params = std::vector<double>(model.num_params_r(), 0.0);
-        disc_params = std::vector<int>(model.num_params_i(), 0);
+        double R = boost::lexical_cast<double>(init);
         
-        double init_log_prob;
-        std::vector<double> init_grad;
+        if (R == 0) {
         
-        try {
-          init_log_prob = model.grad_log_prob(cont_params, disc_params, init_grad, &std::cout);
-        } catch (std::domain_error e) {
-          std::cout << "Rejecting inititialization at zero because of grad_log_prob failure." << std::endl;
-          return 0;
-        }
-        
-        if (!boost::math::isfinite(init_log_prob)) {
-          std::cout << "Rejecting inititialization at zero because of vanishing density." << std::endl;
-          return 0;
-        }
-        
-        for (size_t i = 0; i < init_grad.size(); ++i) {
-          if (!boost::math::isfinite(init_grad[i])) {
-            std::cout << "Rejecting inititialization at zero because of divergent gradient." << std::endl;
-            return 0;
-          }
-        }
-        
-      } else if (init == "random") {
-
-        boost::random::uniform_real_distribution<double>
-        init_range_distribution(-2.0, 2.0);
-        
-        boost::variate_generator<rng_t&,
-        boost::random::uniform_real_distribution<double> >
-        init_rng(base_rng, init_range_distribution);
-        
-        cont_params = std::vector<double>(model.num_params_r());
-        disc_params = std::vector<int>(model.num_params_i(), 0);
-        
-        // Random initializations until log_prob is finite
-        std::vector<double> init_grad;
-        static int MAX_INIT_TRIES = 100;
-        
-        for (num_init_tries = 1; num_init_tries <= MAX_INIT_TRIES; ++num_init_tries) {
+          cont_params = std::vector<double>(model.num_params_r(), 0.0);
+          disc_params = std::vector<int>(model.num_params_i(), 0);
           
-          for (size_t i = 0; i < cont_params.size(); ++i)
-            cont_params[i] = init_rng();
-          
-          // FIXME: allow config vs. std::cout
           double init_log_prob;
+          std::vector<double> init_grad;
+          
           try {
             init_log_prob = model.grad_log_prob(cont_params, disc_params, init_grad, &std::cout);
           } catch (std::domain_error e) {
-            write_error_msg(&std::cout, e);
-            std::cout << "Rejecting proposed initial value with zero density." << std::endl;
-            init_log_prob = -std::numeric_limits<double>::infinity();
+            std::cout << "Rejecting inititialization at zero because of grad_log_prob failure." << std::endl;
+            return 0;
           }
           
-          if (!boost::math::isfinite(init_log_prob))
-            continue;
-          for (size_t i = 0; i < init_grad.size(); ++i)
-            if (!boost::math::isfinite(init_grad[i]))
+          if (!boost::math::isfinite(init_log_prob)) {
+            std::cout << "Rejecting inititialization at zero because of vanishing density." << std::endl;
+            return 0;
+          }
+          
+          for (size_t i = 0; i < init_grad.size(); ++i) {
+            if (!boost::math::isfinite(init_grad[i])) {
+              std::cout << "Rejecting inititialization at zero because of divergent gradient." << std::endl;
+              return 0;
+            }
+          }
+
+        } else {
+          
+          boost::random::uniform_real_distribution<double>
+          init_range_distribution(-R, R);
+          
+          boost::variate_generator<rng_t&,
+          boost::random::uniform_real_distribution<double> >
+          init_rng(base_rng, init_range_distribution);
+          
+          cont_params = std::vector<double>(model.num_params_r());
+          disc_params = std::vector<int>(model.num_params_i(), 0);
+          
+          // Random initializations until log_prob is finite
+          std::vector<double> init_grad;
+          static int MAX_INIT_TRIES = 100;
+          
+          for (num_init_tries = 1; num_init_tries <= MAX_INIT_TRIES; ++num_init_tries) {
+            
+            for (size_t i = 0; i < cont_params.size(); ++i)
+              cont_params[i] = init_rng();
+            
+            // FIXME: allow config vs. std::cout
+            double init_log_prob;
+            try {
+              init_log_prob = model.grad_log_prob(cont_params, disc_params, init_grad, &std::cout);
+            } catch (std::domain_error e) {
+              write_error_msg(&std::cout, e);
+              std::cout << "Rejecting proposed initial value with zero density." << std::endl;
+              init_log_prob = -std::numeric_limits<double>::infinity();
+            }
+            
+            if (!boost::math::isfinite(init_log_prob))
               continue;
-          break;
+            for (size_t i = 0; i < init_grad.size(); ++i)
+              if (!boost::math::isfinite(init_grad[i]))
+                continue;
+            break;
+            
+          }
+          
+          if (num_init_tries > MAX_INIT_TRIES) {
+            std::cout << std::endl << std::endl
+                      << "Initialization between (" << -R << ", " << R << ") failed after "
+                      << MAX_INIT_TRIES << " attempts. " << std::endl;
+            std::cout << " Try specifying initial values,"
+                      << " reducing ranges of constrained values,"
+                      << " or reparameterizing the model."
+                      << std::endl;
+            return -1;
+          }
+          
         }
         
-        if (num_init_tries > MAX_INIT_TRIES) {
-          std::cout << std::endl << std::endl
-                    << "Initialization failed after " << MAX_INIT_TRIES
-                    << " attempts. " << std::endl;
-          std::cout << " Try specifying initial values,"
-                    << " reducing ranges of constrained values,"
-                    << " or reparameterizing the model."
-                    << std::endl;
-          return -1;
-        }
-        
-      } else if (init != "") {
-        
+      } catch(...) {
+      
         try {
         
           std::fstream init_stream(init.c_str(), std::fstream::in);
