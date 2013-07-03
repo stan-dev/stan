@@ -340,9 +340,9 @@ int main(int argc, const char* argv[]) {
   /// Footer output
   std::cout << std::endl;
   std::cout << "Samples were drawn using " << stan_csv.metadata.algorithm << "." << std::endl
-            << "For each parameter, n_eff is a crude measure of effective sample size," << std::endl
-            << "and Rhat is the potential scale reduction factor on split chains (at " << std::endl
-            << "convergence, Rhat=1)." << std::endl
+            << "For each parameter, N_Eff is a crude measure of effective sample size," << std::endl
+            << "and R_hat is the potential scale reduction factor on split chains (at " << std::endl
+            << "convergence, R_hat=1)." << std::endl
             << std::endl;
   
   // Print autocorrelation, if desired
