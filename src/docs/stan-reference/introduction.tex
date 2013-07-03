@@ -632,8 +632,9 @@ followed by information for each parameter and generated quantity. For
 \code{bernoulli}, we ran 1 chain and saved 1000 iterations. The information is
 echoed to the standard output:
 %
+\begin{landscape}
 \begin{quote}
-{\tiny
+{ \footnotesize
 \begin{Verbatim}[fontshape=sl]
 Inference for Stan model: bernoulli_model
 1 chains: each with iter=(1000); warmup=(0); thin=(1); 1000 iterations saved.
@@ -641,20 +642,27 @@ Inference for Stan model: bernoulli_model
 Warmup took (0.01) seconds, 0.01 seconds total
 Sampling took (0.02) seconds, 0.02 seconds total
 
-                   mean se_mean   sd     2.5%      25%      50%      75%    97.5%   n_eff n_eff/s Rhat
-lp__           -7.3e+00     0.0  0.7 -9.5e+00 -7.5e+00 -7.0e+00 -6.8e+00 -6.7e+00 3.0e+02 1.8e+04  1.0
-accept_stat__   5.9e-01     0.0  0.4  1.3e-05  2.1e-01  6.7e-01  1.0e+00  1.0e+00 1.0e+03 5.9e+04  1.0
-stepsize__      2.0e+00     0.0  0.0  2.0e+00  2.0e+00  2.0e+00  2.0e+00  2.0e+00 5.0e-01 3.0e+01  1.0
-treedepth__     3.1e-02     0.0  0.2  0.0e+00  0.0e+00  0.0e+00  0.0e+00  1.0e+00 1.0e+03 5.9e+04  1.0
-theta           2.5e-01     0.0  0.1  6.1e-02  1.7e-01  2.3e-01  3.2e-01  5.2e-01 5.8e+02 3.5e+04  1.0
+Inference for Stan model: bernoulli_model
+1 chains: each with iter=(1000); warmup=(0); thin=(1); 1000 iterations saved.
+
+Warmup took (0.010) seconds, 0.010 seconds total
+Sampling took (0.014) seconds, 0.014 seconds total
+
+                 Mean     MCSE   StdDev        5%   50%   95%  N_Eff  N_Eff/s  R_hat
+lp__             -7.3  4.1e-02  7.2e-01  -8.7e+00  -7.0  -6.8    313    22185   1.00
+accept_stat__    0.60  1.2e-02  3.8e-01   1.1e-03  0.66   1.0   1000    70867   1.00
+stepsize__        1.7  5.0e-15  3.6e-15   1.7e+00   1.7   1.7   0.50       35   1.00
+treedepth__     0.078  8.8e-03  2.7e-01   0.0e+00  0.00   1.0    927    65678   1.00
+theta            0.26  4.8e-03  1.2e-01   8.1e-02  0.24  0.48    643    45584   1.00
 
 Samples were drawn using NUTS with a diagonal Euclidean metric.
-For each parameter, n_eff is a crude measure of effective sample size,
-and Rhat is the potential scale reduction factor on split chains (at 
-convergence, Rhat=1).
+For each parameter, N_Eff is a crude measure of effective sample size,
+and R_hat is the potential scale reduction factor on split chains (at 
+convergence, R_hat=1).
 \end{Verbatim}
 }
 \end{quote}
+\end{landscape}
 %
 In addition to the general information about the runs, \code{print}
 displays summary statistics for each parameter and generated
@@ -662,7 +670,7 @@ quantity.
 
 In the \code{bernoulli} model, there is a single parameter,
 \code{theta}. The mean, standard error of the mean, standard
-deviation, the 2.5\%, 25\%, 50\%, 75\%, and 97.5\% quantiles,
+deviation, the 5\%, 50\%, and 95\% quantiles,
 number of effective samples, and $\hat{R}$ value are displayed
 These quantities and their uses are described in detail in 
 \refchapter{mcmc}.
