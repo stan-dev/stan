@@ -202,13 +202,31 @@ namespace stan {
       boost::apply_visitor(vis, e.expr_);
     }
 
+    static void print_string_literal(std::ostream& o,
+                                     const std::string& s) {
+      o << '"';
+      for (size_t i = 0; i < s.size(); ++i) {
+        if (s[i] == '"' || s[i] == '\\' || s[i] == '\'' )
+          o << '\\'; // escape
+        o << s[i];
+      }
+      o << '"';
+    }
+
+    static void print_quoted_expression(std::ostream& o,
+                                        const expression& e) {
+      std::stringstream ss;
+      generate_expression(e,ss);
+      print_string_literal(o,ss.str());
+    }
+
     struct printable_visgen : public visgen {
       printable_visgen(std::ostream& o) : visgen(o) {  }
       void operator()(const std::string& s) const { 
-        o_ << '"' << s << '"';
+        print_string_literal(o_,s);
       }
       void operator()(const expression& e) const { 
-        generate_expression(e,o_);
+        print_quoted_expression(o_,e);
       }
     };
 
@@ -387,9 +405,9 @@ namespace stan {
                                     const expression& expr,
                                     std::ostream& o) {
       o << INDENT2;
-      o << "stan::math::validate_non_negative_index(\"" << var_name << "\", \"";
-      generate_expression(expr,o);
-      o << "\", ";
+      o << "stan::math::validate_non_negative_index(\"" << var_name << "\", ";
+      print_quoted_expression(o,expr);
+      o << ", ";
       generate_expression(expr,o);
       o << ");" << EOL;
 
