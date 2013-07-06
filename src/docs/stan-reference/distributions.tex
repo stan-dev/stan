@@ -1217,6 +1217,34 @@ where the beta function $\Betafun()$ is as defined in \refsection{betafun}
 \end{description}
 
 
+\chapter{Circular Distributions}
+
+\noindent
+Circular distributions are defined for finite values \farg{y} in any interval of length $2\pi$.
+
+
+\section{Von Mises Distribution}
+
+\subsubsection{Probability Density Function}
+
+If $\mu \in \reals$ and $\kappa \in \posreals$, then for $y \in
+\reals$,
+\[
+\distro{VonMises}(y|\mu,\kappa)
+=
+\frac{\exp(\kappa\cos(y-\mu))}{2\pi I_0(\kappa)}
+\!.
+\]
+
+\subsubsection{Stan Functions}
+
+\begin{description}
+  \fitem{real}{von\_mises\_log}{reals \farg{y}, reals \farg{mu}, reals
+    \farg{kappa}}{The log of the von mises density of \farg{y} given
+    location \farg{mu} and scale \farg{kappa}}
+\end{description}
+
+
 \chapter{Bounded Continuous Probabilities}
 
 \noindent
@@ -1644,33 +1672,6 @@ freedom \farg{nu} and scale matrix
     section for details on the lkj\_corr density.}
 \end{description}
 
-
-\chapter{Circular Distributions}
-
-\noindent
-Circular distributions are defined for finite values \farg{y} in any interval of length $2\pi$.
-
-
-\section{Von Mises Distribution}
-
-\subsubsection{Probability Density Function}
-
-If $\mu \in \reals$ and $\kappa \in \posreals$, then for $y \in
-\reals$,
-\[
-\distro{VonMises}(y|\mu,\kappa)
-=
-\frac{\exp(\kappa\cos(y-\mu))}{2\pi I_0(\kappa)}
-\!.
-\]
-
-\subsubsection{Stan Functions}
-
-\begin{description}
-  \fitem{real}{von\_mises\_log}{reals \farg{y}, reals \farg{mu}, reals
-    \farg{kappa}}{The log of the von mises density of \farg{y} given
-    location \farg{mu} and scale \farg{kappa}}
-\end{description}
 
 
 
