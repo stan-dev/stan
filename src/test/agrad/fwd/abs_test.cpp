@@ -3,7 +3,7 @@
 #include <stan/agrad/var.hpp>
 #include <test/agrad/util.hpp>
 
-TEST(AgradFvar, abs) {
+TEST(abs,AgradFvar) {
   using stan::agrad::fvar;
   using std::abs;
   using std::isnan;
@@ -36,7 +36,7 @@ TEST(AgradFvar, abs) {
   isnan(f.d_);
  }
 
-TEST(AgradFvarVar, abs) {
+TEST(abs,AgradFvarVar_1stderiv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::abs;
@@ -53,7 +53,21 @@ TEST(AgradFvarVar, abs) {
   EXPECT_FLOAT_EQ(1.0, g[0]);
 }
 
-TEST(AgradFvarFvar, abs) {
+TEST(abs,AgradFvarVar_2ndderiv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using std::abs;
+
+  fvar<var> x(2.0,1.0);
+  fvar<var> a = abs(x);
+
+  AVEC z = createAVEC(x.val_);
+  VEC h;
+  a.d_.grad(z,h);
+  EXPECT_FLOAT_EQ(0.0, h[0]);
+}
+
+TEST(abs,AgradFvarFvarDouble) {
   using stan::agrad::fvar;
   using std::abs;
 
@@ -67,4 +81,46 @@ TEST(AgradFvarFvar, abs) {
   EXPECT_FLOAT_EQ(1.0, a.val_.d_);
   EXPECT_FLOAT_EQ(0.0, a.d_.val_);
   EXPECT_FLOAT_EQ(0.0, a.d_.d_);
+}
+
+TEST(abs,AgradFvarFvarVar_1stderiv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using std::abs;
+
+  fvar<fvar<var> > y;
+  y.val_ = fvar<var>(4.0,1.0);
+
+  fvar<fvar<var> > b = abs(y);
+
+  EXPECT_FLOAT_EQ(4.0, b.val_.val_.val());
+  EXPECT_FLOAT_EQ(1.0, b.val_.d_.val());
+  EXPECT_FLOAT_EQ(0.0, b.d_.val_.val());
+  EXPECT_FLOAT_EQ(0.0, b.d_.d_.val());
+
+  AVEC z = createAVEC(y.val_.val_);
+  VEC h;
+  b.val_.val_.grad(z,h);
+  EXPECT_FLOAT_EQ(1.0, h[0]);
+}
+
+TEST(abs,AgradFvarFvarVar_2ndderiv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using std::abs;
+
+  fvar<fvar<var> > y;
+  y.val_ = fvar<var>(4.0,1.0);
+
+  fvar<fvar<var> > b = abs(y);
+
+  EXPECT_FLOAT_EQ(4.0, b.val_.val_.val());
+  EXPECT_FLOAT_EQ(1.0, b.val_.d_.val());
+  EXPECT_FLOAT_EQ(0.0, b.d_.val_.val());
+  EXPECT_FLOAT_EQ(0.0, b.d_.d_.val());
+
+  AVEC z = createAVEC(y.val_.val_);
+  VEC h;
+  b.val_.d_.grad(z,h);
+  EXPECT_FLOAT_EQ(0.0, h[0]);
 }
