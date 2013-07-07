@@ -4,7 +4,7 @@
 #include <stan/agrad/var.hpp>
 #include <test/agrad/util.hpp>
 
-TEST(AgradFvar, erfc) {
+TEST(erfc,AgradFvar) {
   using stan::agrad::fvar;
   using std::exp;
   using std::sqrt;
@@ -23,7 +23,7 @@ TEST(AgradFvar, erfc) {
                   / sqrt(boost::math::constants::pi<double>()), b.d_);
 }
 
-TEST(AgradFvarVar, erfc) {
+TEST(erfc,AgradFvarVar_1stderiv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::exp;
@@ -43,8 +43,24 @@ TEST(AgradFvarVar, erfc) {
   EXPECT_FLOAT_EQ(-2 * exp(-0.5 * 0.5) / 
                   sqrt(boost::math::constants::pi<double>()), g[0]);
 }
+TEST(erfc,AgradFvarVar_2ndderiv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using std::exp;
+  using std::sqrt;
+  using boost::math::erfc;
 
-TEST(AgradFvarFvar, erfc) {
+  fvar<var> x(0.5,1.3);
+  fvar<var> a = erfc(x);
+
+  AVEC y = createAVEC(x.val_);
+  VEC g;
+  a.d_.grad(y,g);
+  EXPECT_FLOAT_EQ(1.3 * 2 * exp(-0.5 * 0.5) / 
+                  sqrt(boost::math::constants::pi<double>()), g[0]);
+}
+
+TEST(erfc,AgradFvarFvarDouble) {
   using stan::agrad::fvar;
   using std::exp;
   using std::sqrt;
@@ -72,4 +88,80 @@ TEST(AgradFvarFvar, erfc) {
   EXPECT_FLOAT_EQ(-2 * exp(-0.5 * 0.5) / 
                   sqrt(boost::math::constants::pi<double>()), a.d_.val_);
   EXPECT_FLOAT_EQ(0, a.d_.d_);
+}
+
+TEST(erfc,AgradFvarFvarVar_1stderiv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using std::exp;
+  using std::sqrt;
+  using boost::math::erfc;
+
+  fvar<fvar<var> > x;
+  x.val_.val_ = 0.5;
+  x.val_.d_ = 1.0;
+
+  fvar<fvar<var> > a = erfc(x);
+
+  EXPECT_FLOAT_EQ(erfc(0.5), a.val_.val_.val());
+  EXPECT_FLOAT_EQ(-2 * exp(-0.5 * 0.5) / 
+                  sqrt(boost::math::constants::pi<double>()), a.val_.d_.val());
+  EXPECT_FLOAT_EQ(0, a.d_.val_.val());
+  EXPECT_FLOAT_EQ(0, a.d_.d_.val());
+
+  AVEC p = createAVEC(x.val_.val_);
+  VEC g;
+  a.val_.val_.grad(p,g);
+  EXPECT_FLOAT_EQ(-2 * exp(-0.5 * 0.5) / 
+                  sqrt(boost::math::constants::pi<double>()), g[0]);
+
+  fvar<fvar<var> > y;
+  y.val_.val_ = 0.5;
+  y.d_.val_ = 1.0;
+
+  fvar<fvar<var> > b = erfc(y);
+  EXPECT_FLOAT_EQ(erfc(0.5), b.val_.val_.val());
+  EXPECT_FLOAT_EQ(0, b.val_.d_.val());
+  EXPECT_FLOAT_EQ(-2 * exp(-0.5 * 0.5) / 
+                  sqrt(boost::math::constants::pi<double>()), b.d_.val_.val());
+  EXPECT_FLOAT_EQ(0, b.d_.d_.val());
+
+
+  AVEC q = createAVEC(y.val_.val_);
+  VEC r;
+  b.val_.val_.grad(q,r);
+  EXPECT_FLOAT_EQ(-2 * exp(-0.5 * 0.5) / 
+                  sqrt(boost::math::constants::pi<double>()), r[0]);
+}
+
+TEST(erfc,AgradFvarFvarVar_2ndderiv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using std::exp;
+  using std::sqrt;
+  using boost::math::erfc;
+
+  fvar<fvar<var> > x;
+  x.val_.val_ = 0.5;
+  x.val_.d_ = 1.0;
+
+  fvar<fvar<var> > a = erfc(x);
+
+  AVEC p = createAVEC(x.val_.val_);
+  VEC g;
+  a.val_.d_.grad(p,g);
+  EXPECT_FLOAT_EQ(2 * exp(-0.5 * 0.5) / 
+                  sqrt(boost::math::constants::pi<double>()), g[0]);
+
+  fvar<fvar<var> > y;
+  y.val_.val_ = 0.5;
+  y.d_.val_ = 1.0;
+
+  fvar<fvar<var> > b = erfc(y);
+
+  AVEC q = createAVEC(y.val_.val_);
+  VEC r;
+  b.d_.val_.grad(q,r);
+  EXPECT_FLOAT_EQ(2 * exp(-0.5 * 0.5) / 
+                  sqrt(boost::math::constants::pi<double>()), r[0]);
 }
