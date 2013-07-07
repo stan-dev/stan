@@ -4,7 +4,7 @@
 #include <stan/agrad/var.hpp>
 #include <test/agrad/util.hpp>
 
-TEST(AgradFvar, digamma) {
+TEST(digamma,AgradFvar) {
   using stan::agrad::fvar;
   using boost::math::digamma;
   using boost::math::zeta;
@@ -15,7 +15,7 @@ TEST(AgradFvar, digamma) {
   EXPECT_FLOAT_EQ(4.9348022005446793094, a.d_);
 }
 
-TEST(AgradFvarVar, digamma) {
+TEST(digamma,AgradFvarVar_1stderiv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using boost::math::digamma;  
@@ -33,10 +33,23 @@ TEST(AgradFvarVar, digamma) {
   EXPECT_FLOAT_EQ(4.9348022005446793094, g[0]);
 }
 
-TEST(AgradFvarFvar, digamma) {
+TEST(digamma,AgradFvarVar_2ndderiv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using boost::math::digamma;  
+  using boost::math::zeta;
+  
+  fvar<var> x(0.5,1.3);
+  fvar<var> a = digamma(x);
+
+  AVEC y = createAVEC(x.val_);
+  VEC g;
+  a.d_.grad(y,g);
+  EXPECT_FLOAT_EQ(1.3 * -16.8288, g[0]);
+}
+TEST(digamma,AgradFvarFvarDouble) {
   using stan::agrad::fvar;
   using boost::math::digamma;
-  using boost::math::zeta;
 
   fvar<fvar<double> > x;
   x.val_.val_ = 0.5;
@@ -58,4 +71,69 @@ TEST(AgradFvarFvar, digamma) {
   EXPECT_FLOAT_EQ(0, a.val_.d_);
   EXPECT_FLOAT_EQ(4.9348022005446793094, a.d_.val_);
   EXPECT_FLOAT_EQ(0, a.d_.d_);
+}
+
+TEST(digamma,AgradFvarFvarVar_1stderiv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using boost::math::digamma;
+
+  fvar<fvar<var> > x;
+  x.val_.val_ = 0.5;
+  x.val_.d_ = 1.0;
+
+  fvar<fvar<var> > a = digamma(x);
+
+  EXPECT_FLOAT_EQ(digamma(0.5), a.val_.val_.val());
+  EXPECT_FLOAT_EQ(4.9348022005446793094, a.val_.d_.val());
+  EXPECT_FLOAT_EQ(0, a.d_.val_.val());
+  EXPECT_FLOAT_EQ(0, a.d_.d_.val());
+
+  AVEC p = createAVEC(x.val_.val_);
+  VEC g;
+  a.val_.val_.grad(p,g);
+  EXPECT_FLOAT_EQ(4.9348022005446793094, g[0]);
+
+  fvar<fvar<var> > y;
+  y.val_.val_ = 0.5;
+  y.d_.val_ = 1.0;
+
+  fvar<fvar<var> > b = digamma(y);
+  EXPECT_FLOAT_EQ(digamma(0.5), b.val_.val_.val());
+  EXPECT_FLOAT_EQ(0, b.val_.d_.val());
+  EXPECT_FLOAT_EQ(4.9348022005446793094, b.d_.val_.val());
+  EXPECT_FLOAT_EQ(0, b.d_.d_.val());
+
+  AVEC q = createAVEC(y.val_.val_);
+  VEC r;
+  b.val_.val_.grad(q,r);
+  EXPECT_FLOAT_EQ(4.9348022005446793094, r[0]);
+}
+
+TEST(digamma,AgradFvarFvarVar_2ndderiv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using boost::math::digamma;
+
+  fvar<fvar<var> > x;
+  x.val_.val_ = 0.5;
+  x.val_.d_ = 1.0;
+
+  fvar<fvar<var> > a = digamma(x);
+
+  AVEC p = createAVEC(x.val_.val_);
+  VEC g;
+  a.val_.d_.grad(p,g);
+  EXPECT_FLOAT_EQ(-16.8288, g[0]);
+
+  fvar<fvar<var> > y;
+  y.val_.val_ = 0.5;
+  y.d_.val_ = 1.0;
+
+  fvar<fvar<var> > b = digamma(y);
+
+  AVEC q = createAVEC(y.val_.val_);
+  VEC r;
+  b.d_.val_.grad(q,r);
+  EXPECT_FLOAT_EQ(-16.8288, r[0]);
 }
