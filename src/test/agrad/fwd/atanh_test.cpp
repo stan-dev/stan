@@ -4,7 +4,7 @@
 #include <stan/agrad/var.hpp>
 #include <test/agrad/util.hpp>
 
-TEST(AgradFvar, atanh) {
+TEST(atanh,AgradFvar) {
   using stan::agrad::fvar;
   using boost::math::atanh;
 
@@ -21,7 +21,7 @@ TEST(AgradFvar, atanh) {
   EXPECT_FLOAT_EQ(1 / (1 - 0.9 * 0.9), b.d_);
 }
 
-TEST(AgradFvarVar, atanh) {
+TEST(atanh,AgradFvarVar_1stderiv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using boost::math::atanh;
@@ -38,7 +38,21 @@ TEST(AgradFvarVar, atanh) {
   EXPECT_FLOAT_EQ(1.0 / (1.0 - 0.5 * 0.5), g[0]);
 }
 
-TEST(AgradFvarFvar, atanh) {
+TEST(atanh,AgradFvarVar_2ndderiv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using boost::math::atanh;
+
+  fvar<var> x(0.5,1.3);
+  fvar<var> a = atanh(x);
+
+  AVEC y = createAVEC(x.val_);
+  VEC g;
+  a.d_.grad(y,g);
+  EXPECT_FLOAT_EQ(1.3 * 1.7777778, g[0]);
+}
+
+TEST(atanh,AgradFvarFvarDouble) {
   using stan::agrad::fvar;
   using boost::math::atanh;
 
@@ -62,4 +76,78 @@ TEST(AgradFvarFvar, atanh) {
   EXPECT_FLOAT_EQ(0, a.val_.d_);
   EXPECT_FLOAT_EQ(1.0 / (1.0 - 0.5 * 0.5), a.d_.val_);
   EXPECT_FLOAT_EQ(0, a.d_.d_);
+}
+
+TEST(atanh,AgradFvarFvarVar_1stderiv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using boost::math::atanh;
+
+  fvar<fvar<var> > x;
+  x.val_.val_ = 0.5;
+  x.val_.d_ = 1.0;
+  fvar<fvar<var> > a = atanh(x);
+
+  EXPECT_FLOAT_EQ(atanh(0.5), a.val_.val_.val());
+  EXPECT_FLOAT_EQ(1.0 / (1.0 - 0.5 * 0.5), a.val_.d_.val());
+  EXPECT_FLOAT_EQ(0, a.d_.val_.val());
+  EXPECT_FLOAT_EQ(0, a.d_.d_.val());
+
+  AVEC p = createAVEC(x.val_.val_);
+  VEC g;
+  a.val_.val_.grad(p,g);
+  EXPECT_FLOAT_EQ(1.0 / (1.0 - 0.5 * 0.5), g[0]);
+
+  fvar<fvar<var> > y;
+  y.val_.val_ = 0.5;
+  y.d_.val_ = 1.0;
+
+  fvar<fvar<var> > b = atanh(y);
+
+  EXPECT_FLOAT_EQ(atanh(0.5), b.val_.val_.val());
+  EXPECT_FLOAT_EQ(0, b.val_.d_.val());
+  EXPECT_FLOAT_EQ(1.0 / (1.0 - 0.5 * 0.5), b.d_.val_.val());
+  EXPECT_FLOAT_EQ(0, b.d_.d_.val());
+
+  AVEC q = createAVEC(y.val_.val_);
+  VEC r;
+  b.val_.val_.grad(q,r);
+  EXPECT_FLOAT_EQ(1.0 / (1.0 - 0.5 * 0.5), r[0]);
+}
+
+TEST(atanh,AgradFvarFvarVar_2ndderiv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using boost::math::atanh;
+
+  fvar<fvar<var> > x;
+  x.val_.val_ = 0.5;
+  x.val_.d_ = 1.0;
+  fvar<fvar<var> > a = atanh(x);
+
+  EXPECT_FLOAT_EQ(atanh(0.5), a.val_.val_.val());
+  EXPECT_FLOAT_EQ(1.0 / (1.0 - 0.5 * 0.5), a.val_.d_.val());
+  EXPECT_FLOAT_EQ(0, a.d_.val_.val());
+  EXPECT_FLOAT_EQ(0, a.d_.d_.val());
+
+  AVEC p = createAVEC(x.val_.val_);
+  VEC g;
+  a.val_.d_.grad(p,g);
+  EXPECT_FLOAT_EQ(1.7777778, g[0]);
+
+  fvar<fvar<var> > y;
+  y.val_.val_ = 0.5;
+  y.d_.val_ = 1.0;
+
+  fvar<fvar<var> > b = atanh(y);
+
+  EXPECT_FLOAT_EQ(atanh(0.5), b.val_.val_.val());
+  EXPECT_FLOAT_EQ(0, b.val_.d_.val());
+  EXPECT_FLOAT_EQ(1.0 / (1.0 - 0.5 * 0.5), b.d_.val_.val());
+  EXPECT_FLOAT_EQ(0, b.d_.d_.val());
+
+  AVEC q = createAVEC(y.val_.val_);
+  VEC r;
+  b.d_.val_.grad(q,r);
+  EXPECT_FLOAT_EQ(1.7777778, r[0]);
 }
