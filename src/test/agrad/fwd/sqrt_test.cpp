@@ -3,7 +3,7 @@
 #include <stan/agrad/var.hpp>
 #include <test/agrad/util.hpp>
 
-TEST(AgradFvar, sqrt) {
+TEST(Agrad_Fwd_Sqrt, Fvar) {
   using stan::agrad::fvar;
   using std::sqrt;
   using std::isnan;
@@ -41,7 +41,7 @@ TEST(AgradFvar, sqrt) {
   isnan(g.d_); 
 }
 
-TEST(AgradFvarVar, sqrt) {
+TEST(Agrad_Fwd_Sqrt, FvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::sqrt;
@@ -57,8 +57,21 @@ TEST(AgradFvarVar, sqrt) {
   a.val_.grad(y,g);
   EXPECT_FLOAT_EQ(0.5 / sqrt(1.5), g[0]);
 }
+TEST(Agrad_Fwd_Sqrt, FvarVar_2ndDeriv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using std::sqrt;
 
-TEST(AgradFvarFvar, sqrt) {
+  fvar<var> x(1.5,1.3);
+  fvar<var> a = sqrt(x);
+
+  AVEC y = createAVEC(x.val_);
+  VEC g;
+  a.d_.grad(y,g);
+  EXPECT_FLOAT_EQ(0.5 * -0.5 * 1.3 / sqrt(1.5) / 1.5, g[0]);
+}
+
+TEST(Agrad_Fwd_Sqrt, FvarFvarDouble) {
   using stan::agrad::fvar;
   using std::sqrt;
 
@@ -83,3 +96,68 @@ TEST(AgradFvarFvar, sqrt) {
   EXPECT_FLOAT_EQ(2.0 * 0.5 / sqrt(1.5), a.d_.val_);
   EXPECT_FLOAT_EQ(0, a.d_.d_);
 }
+
+TEST(Agrad_Fwd_Sqrt, FvarFvarVar_1stDeriv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using std::sqrt;
+
+  fvar<fvar<var> > x;
+  x.val_.val_ = 1.5;
+  x.val_.d_ = 2.0;
+
+  fvar<fvar<var> > a = sqrt(x);
+
+  EXPECT_FLOAT_EQ(sqrt(1.5), a.val_.val_.val());
+  EXPECT_FLOAT_EQ(2.0 * 0.5 / sqrt(1.5), a.val_.d_.val());
+  EXPECT_FLOAT_EQ(0, a.d_.val_.val());
+  EXPECT_FLOAT_EQ(0, a.d_.d_.val());
+
+  AVEC p = createAVEC(x.val_.val_);
+  VEC g;
+  a.val_.val_.grad(p,g);
+  EXPECT_FLOAT_EQ(0.5 / sqrt(1.5), g[0]);
+
+  fvar<fvar<var> > y;
+  y.val_.val_ = 1.5;
+  y.d_.val_ = 2.0;
+
+  fvar<fvar<var> > b = sqrt(y);
+  EXPECT_FLOAT_EQ(sqrt(1.5), b.val_.val_.val());
+  EXPECT_FLOAT_EQ(0, b.val_.d_.val());
+  EXPECT_FLOAT_EQ(2.0 * 0.5 / sqrt(1.5), b.d_.val_.val());
+  EXPECT_FLOAT_EQ(0, b.d_.d_.val());
+
+  AVEC q = createAVEC(y.val_.val_);
+  VEC r;
+  b.val_.val_.grad(q,r);
+  EXPECT_FLOAT_EQ(0.5 / sqrt(1.5), r[0]);
+}
+TEST(Agrad_Fwd_Sqrt, FvarFvarVar_2ndDeriv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using std::sqrt;
+
+  fvar<fvar<var> > x;
+  x.val_.val_ = 1.5;
+  x.val_.d_ = 2.0;
+
+  fvar<fvar<var> > a = sqrt(x);
+
+  AVEC p = createAVEC(x.val_.val_);
+  VEC g;
+  a.val_.d_.grad(p,g);
+  EXPECT_FLOAT_EQ(0.5 * 2.0 * -0.5 / 1.5 / sqrt(1.5), g[0]);
+
+  fvar<fvar<var> > y;
+  y.val_.val_ = 1.5;
+  y.d_.val_ = 2.0;
+
+  fvar<fvar<var> > b = sqrt(y);
+
+  AVEC q = createAVEC(y.val_.val_);
+  VEC r;
+  b.d_.val_.grad(q,r);
+  EXPECT_FLOAT_EQ(0.5 * -2.0 * 0.5 / 1.5 / sqrt(1.5), r[0]);
+}
+

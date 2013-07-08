@@ -3,7 +3,7 @@
 #include <stan/agrad/var.hpp>
 #include <test/agrad/util.hpp>
 
-TEST(AgradFvar,owens_t) {
+TEST(Agrad_Fwd_OwensT,Fvar) {
   using stan::agrad::fvar;
   using stan::agrad::owens_t;
   using boost::math::owens_t;
@@ -22,7 +22,7 @@ TEST(AgradFvar,owens_t) {
   EXPECT_FLOAT_EQ(owens_t(1.0, 2.0), f.val_);
   EXPECT_FLOAT_EQ(-0.1154804963, f.d_);
 }
-TEST(AgradFvarVar,owens_t) {
+TEST(Agrad_Fwd_OwensT,FvarVar_FvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::agrad::owens_t;
@@ -40,7 +40,87 @@ TEST(AgradFvarVar,owens_t) {
   EXPECT_FLOAT_EQ(0.0026128467,grad_f[1]);
   EXPECT_FLOAT_EQ(-0.1154804963,grad_f[0]);
 }
-TEST(AgradFvarFvar,owens_t) {
+TEST(Agrad_Fwd_OwensT,FvarVar_Double_1stDeriv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using stan::agrad::owens_t;
+  using boost::math::owens_t;
+
+  fvar<var> h(1.0,1.0);
+  double a(2.0);
+  fvar<var> f = owens_t(h,a);
+  EXPECT_FLOAT_EQ(owens_t(1.0, 2.0), f.val_.val());
+  EXPECT_FLOAT_EQ(-0.1154804963, f.d_.val());
+
+  AVEC x = createAVEC(h.val_);
+  VEC grad_f;
+  f.val_.grad(x,grad_f);
+  EXPECT_FLOAT_EQ(-0.1154804963,grad_f[0]);
+}
+TEST(Agrad_Fwd_OwensT,Double_FvarVar_1stDeriv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using stan::agrad::owens_t;
+  using boost::math::owens_t;
+
+  double h(1.0);
+  fvar<var> a(2.0,1.0);
+  fvar<var> f = owens_t(h,a);
+  EXPECT_FLOAT_EQ(owens_t(1.0, 2.0), f.val_.val());
+  EXPECT_FLOAT_EQ(0.0026128467, f.d_.val());
+
+  AVEC x = createAVEC(a.val_);
+  VEC grad_f;
+  f.val_.grad(x,grad_f);
+  EXPECT_FLOAT_EQ(0.0026128467,grad_f[0]);
+}
+TEST(Agrad_Fwd_OwensT,FvarVar_FvarVar_2ndDeriv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using stan::agrad::owens_t;
+  using boost::math::owens_t;
+
+  fvar<var> h(1.0,1.0);
+  fvar<var> a(2.0,1.0);
+  fvar<var> f = owens_t(h,a);
+
+  AVEC x = createAVEC(h.val_,a.val_);
+  VEC grad_f;
+  f.d_.grad(x,grad_f);
+  EXPECT_FLOAT_EQ(-0.020380205,grad_f[1]);
+  EXPECT_FLOAT_EQ(0.076287799,grad_f[0]);
+}
+TEST(Agrad_Fwd_OwensT,FvarVar_Double_2ndDeriv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using stan::agrad::owens_t;
+  using boost::math::owens_t;
+
+  fvar<var> h(1.0,1.0);
+  double a(2.0);
+  fvar<var> f = owens_t(h,a);
+
+  AVEC x = createAVEC(h.val_);
+  VEC grad_f;
+  f.d_.grad(x,grad_f);
+  EXPECT_FLOAT_EQ(0.089352027,grad_f[0]);
+}
+TEST(Agrad_Fwd_OwensT,Double_FvarVar_2ndDeriv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using stan::agrad::owens_t;
+  using boost::math::owens_t;
+
+  double h(1.0);
+  fvar<var> a(2.0,1.0);
+  fvar<var> f = owens_t(h,a);
+
+  AVEC x = createAVEC(a.val_);
+  VEC grad_f;
+  f.d_.grad(x,grad_f);
+  EXPECT_FLOAT_EQ(-0.0073159705,grad_f[0]);
+}
+TEST(Agrad_Fwd_OwensT,FvarFvarDouble) {
   using stan::agrad::fvar;
   using stan::agrad::owens_t;
   using boost::math::owens_t;
@@ -57,4 +137,153 @@ TEST(AgradFvarFvar,owens_t) {
   EXPECT_FLOAT_EQ(-0.1154804963, f.val_.d_);
   EXPECT_FLOAT_EQ(0.0026128467, f.d_.val_);
   EXPECT_FLOAT_EQ(-0.013064234,f.d_.d_);
+}
+TEST(Agrad_Fwd_OwensT,FvarFvarVar_FvarFvarVar_1stDeriv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using stan::agrad::owens_t;
+  using boost::math::owens_t;
+
+  fvar<fvar<var> > h,a;
+  h.val_.val_ = 1.0;
+  h.val_.d_ = 1.0;
+  a.val_.val_ = 2.0;
+  a.d_.val_ = 1.0;
+
+  fvar<fvar<var> > f = owens_t(h,a);
+
+  EXPECT_FLOAT_EQ(owens_t(1.0, 2.0), f.val_.val_.val());
+  EXPECT_FLOAT_EQ(-0.1154804963, f.val_.d_.val());
+  EXPECT_FLOAT_EQ(0.0026128467, f.d_.val_.val());
+  EXPECT_FLOAT_EQ(-0.013064234,f.d_.d_.val());
+
+  AVEC p = createAVEC(h.val_.val_,a.val_.val_);
+  VEC g;
+  f.val_.val_.grad(p,g);
+  EXPECT_FLOAT_EQ(-0.1154804963, g[0]);
+  EXPECT_FLOAT_EQ(0.0026128467, g[1]);
+}
+TEST(Agrad_Fwd_OwensT,FvarFvarVar_Double_1stDeriv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using stan::agrad::owens_t;
+  using boost::math::owens_t;
+
+  fvar<fvar<var> > h;
+  h.val_.val_ = 1.0;
+  h.val_.d_ = 1.0;
+  double a(2.0);
+
+  fvar<fvar<var> > f = owens_t(h,a);
+
+  EXPECT_FLOAT_EQ(owens_t(1.0, 2.0), f.val_.val_.val());
+  EXPECT_FLOAT_EQ(-0.1154804963, f.val_.d_.val());
+  EXPECT_FLOAT_EQ(0, f.d_.val_.val());
+  EXPECT_FLOAT_EQ(0,f.d_.d_.val());
+
+  AVEC p = createAVEC(h.val_.val_);
+  VEC g;
+  f.val_.val_.grad(p,g);
+  EXPECT_FLOAT_EQ(-0.1154804963, g[0]);
+}
+
+TEST(Agrad_Fwd_OwensT,Double_FvarFvarVar_1stDeriv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using stan::agrad::owens_t;
+  using boost::math::owens_t;
+
+  double h(1.0);
+  fvar<fvar<var> > a;
+  a.val_.val_ = 2.0;
+  a.d_.val_ = 1.0;
+
+  fvar<fvar<var> > f = owens_t(h,a);
+
+  EXPECT_FLOAT_EQ(owens_t(1.0, 2.0), f.val_.val_.val());
+  EXPECT_FLOAT_EQ(0, f.val_.d_.val());
+  EXPECT_FLOAT_EQ(0.0026128467, f.d_.val_.val());
+  EXPECT_FLOAT_EQ(0,f.d_.d_.val());
+
+  AVEC p = createAVEC(a.val_.val_);
+  VEC g;
+  f.val_.val_.grad(p,g);
+  EXPECT_FLOAT_EQ(0.0026128467, g[0]);
+}
+TEST(Agrad_Fwd_OwensT,FvarFvarVar_FvarFvarVar_2ndDeriv_h) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using stan::agrad::owens_t;
+  using boost::math::owens_t;
+
+  fvar<fvar<var> > h,a;
+  h.val_.val_ = 1.0;
+  h.val_.d_ = 1.0;
+  a.val_.val_ = 2.0;
+  a.d_.val_ = 1.0;
+
+  fvar<fvar<var> > f = owens_t(h,a);
+
+  AVEC p = createAVEC(h.val_.val_,a.val_.val_);
+  VEC g;
+  f.val_.d_.grad(p,g);
+  EXPECT_FLOAT_EQ(0.089352027, g[0]);
+  EXPECT_FLOAT_EQ(-0.013064234, g[1]);
+}
+TEST(Agrad_Fwd_OwensT,FvarFvarVar_FvarFvarVar_2ndDeriv_a) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using stan::agrad::owens_t;
+  using boost::math::owens_t;
+
+  fvar<fvar<var> > h,a;
+  h.val_.val_ = 1.0;
+  h.val_.d_ = 1.0;
+  a.val_.val_ = 2.0;
+  a.d_.val_ = 1.0;
+
+  fvar<fvar<var> > f = owens_t(h,a);
+
+  AVEC p = createAVEC(h.val_.val_,a.val_.val_);
+  VEC g;
+  f.d_.val_.grad(p,g);
+  EXPECT_FLOAT_EQ(-0.013064234, g[0]);
+  EXPECT_FLOAT_EQ(-0.0073159705, g[1]);
+}
+TEST(Agrad_Fwd_OwensT,FvarFvarVar_Double_2ndDeriv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using stan::agrad::owens_t;
+  using boost::math::owens_t;
+
+  fvar<fvar<var> > h;
+  h.val_.val_ = 1.0;
+  h.val_.d_ = 1.0;
+  double a(2.0);
+
+  fvar<fvar<var> > f = owens_t(h,a);
+
+  AVEC p = createAVEC(h.val_.val_);
+  VEC g;
+  f.val_.d_.grad(p,g);
+  EXPECT_FLOAT_EQ(0.089352027, g[0]);
+}
+
+TEST(Agrad_Fwd_OwensT,Double_FvarFvarVar_2ndDeriv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using stan::agrad::owens_t;
+  using boost::math::owens_t;
+
+  double h(1.0);
+  fvar<fvar<var> > a;
+  a.val_.val_ = 2.0;
+  a.d_.val_ = 1.0;
+
+  fvar<fvar<var> > f = owens_t(h,a);
+
+  AVEC p = createAVEC(a.val_.val_);
+  VEC g;
+  f.d_.val_.grad(p,g);
+  EXPECT_FLOAT_EQ(-0.0073159705, g[0]);
 }
