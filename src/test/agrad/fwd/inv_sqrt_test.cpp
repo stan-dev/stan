@@ -5,7 +5,7 @@
 #include <stan/agrad/var.hpp>
 #include <test/agrad/util.hpp>
 
-TEST(AgradFvar, inv_sqrt) {
+TEST(inv_sqrt,AgradFvar) {
   using stan::agrad::fvar;
   using stan::math::inv_sqrt;
 
@@ -31,7 +31,7 @@ TEST(AgradFvar, inv_sqrt) {
   std::isnan(g.d_);
 }   
 
-TEST(AgradFvarVar, inv_sqrt) {
+TEST(inv_sqrt,AgradFvarVar_1stderiv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::inv_sqrt;
@@ -47,8 +47,22 @@ TEST(AgradFvarVar, inv_sqrt) {
   a.val_.grad(y,g);
   EXPECT_FLOAT_EQ(-0.5 / (0.5 * std::sqrt(0.5)), g[0]);
 }
+TEST(inv_sqrt,AgradFvarVar_2ndderiv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using stan::math::inv_sqrt;
 
-TEST(AgradFvarFvar, inv_sqrt) {
+  fvar<var> x(0.5,1.0);
+  fvar<var> a = inv_sqrt(x);
+
+  EXPECT_FLOAT_EQ(-0.5 * inv_sqrt(0.5) / (0.5), a.d_.val());
+
+  AVEC y = createAVEC(x.val_);
+  VEC g;
+  a.d_.grad(y,g);
+  EXPECT_FLOAT_EQ(-0.5 * -1.5 / (0.25 * std::sqrt(0.5)), g[0]);
+}
+TEST(inv_sqrt,AgradFvarFvarDouble) {
   using stan::agrad::fvar;
   using stan::math::inv_sqrt;
   using std::log;
@@ -64,3 +78,46 @@ TEST(AgradFvarFvar, inv_sqrt) {
   EXPECT_FLOAT_EQ(0, a.d_.val_);
   EXPECT_FLOAT_EQ(0, a.d_.d_);
 }
+TEST(inv_sqrt,AgradFvarFvarVar_1stderiv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using stan::math::inv_sqrt;
+
+  fvar<fvar<var> > x;
+  x.val_.val_ = 0.5;
+  x.val_.d_ = 1.0;
+
+  fvar<fvar<var> > a = inv_sqrt(x);
+
+  EXPECT_FLOAT_EQ(inv_sqrt(0.5), a.val_.val_.val());
+  EXPECT_FLOAT_EQ(-0.5 * inv_sqrt(0.5) / (0.5), a.val_.d_.val());
+  EXPECT_FLOAT_EQ(0, a.d_.val_.val());
+  EXPECT_FLOAT_EQ(0, a.d_.d_.val());
+
+  AVEC p = createAVEC(x.val_.val_);
+  VEC g;
+  a.val_.val_.grad(p,g);
+  EXPECT_FLOAT_EQ(-0.5 * inv_sqrt(0.5) / (0.5), g[0]);
+}
+TEST(inv_sqrt,AgradFvarFvarVar_2ndderiv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using stan::math::inv_sqrt;
+
+  fvar<fvar<var> > x;
+  x.val_.val_ = 0.5;
+  x.val_.d_ = 1.0;
+
+  fvar<fvar<var> > a = inv_sqrt(x);
+
+  EXPECT_FLOAT_EQ(inv_sqrt(0.5), a.val_.val_.val());
+  EXPECT_FLOAT_EQ(-0.5 * inv_sqrt(0.5) / (0.5), a.val_.d_.val());
+  EXPECT_FLOAT_EQ(0, a.d_.val_.val());
+  EXPECT_FLOAT_EQ(0, a.d_.d_.val());
+
+  AVEC p = createAVEC(x.val_.val_);
+  VEC g;
+  a.val_.d_.grad(p,g);
+  EXPECT_FLOAT_EQ(-0.5 * -1.5 / (0.25 * std::sqrt(0.5)), g[0]);
+}
+
