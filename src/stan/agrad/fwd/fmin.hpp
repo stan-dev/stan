@@ -17,13 +17,13 @@ namespace stan {
       using stan::math::NOT_A_NUMBER;
       if(x1.val_ < x2.val_)
         return fvar<typename stan::return_type<T,double>::type>(
-          min(x1.val_, x2.val_), x1.d_ * 1.0);
+          x1.val_, x1.d_ * 1.0);
       else if(x1.val_ == x2.val_)
         return fvar<typename stan::return_type<T,double>::type>(
-          min(x1.val_, x2.val_), NOT_A_NUMBER);
+          x1.val_, NOT_A_NUMBER);
       else 
         return fvar<typename stan::return_type<T,double>::type>(
-          min(x1.val_, x2.val_), x2.d_ * 1.0);              
+          x2.val_, x2.d_ * 1.0);              
     }
 
     template <typename T>
@@ -34,13 +34,13 @@ namespace stan {
       using stan::math::NOT_A_NUMBER;
       if(x1 < x2.val_)
         return fvar<typename stan::return_type<T,double>::type>(
-          min(x1, x2.val_), 0.0);
+          x1, 0.0);
       else if(x1 == x2.val_)
         return fvar<typename stan::return_type<T,double>::type>(
-          min(x1, x2.val_), NOT_A_NUMBER);
+          x2.val_, NOT_A_NUMBER);
       else 
         return fvar<typename stan::return_type<T,double>::type>(
-          min(x1, x2.val_), x2.d_ * 1.0);               
+          x2.val_, x2.d_ * 1.0);               
     }
 
     template <typename T>
@@ -51,13 +51,13 @@ namespace stan {
       using stan::math::NOT_A_NUMBER;
       if(x1.val_ < x2)
         return fvar<typename stan::return_type<T,double>::type>(
-          min(x1.val_, x2), x1.d_ * 1.0);
+          x1.val_, x1.d_ * 1.0);
       else if(x1.val_ == x2)
         return fvar<typename stan::return_type<T,double>::type>(
-          min(x1.val_, x2), NOT_A_NUMBER);
+          x1.val_, NOT_A_NUMBER);
       else 
         return fvar<typename stan::return_type<T,double>::type>(
-          min(x1.val_, x2), 0.0);
+          x2, 0.0);
      }
   }
 }

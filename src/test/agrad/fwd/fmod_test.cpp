@@ -3,7 +3,7 @@
 #include <stan/agrad/var.hpp>
 #include <test/agrad/util.hpp>
 
-TEST(AgradFvar, fmod) {
+TEST(fmod,AgradFvar) {
   using stan::agrad::fvar;
   using std::fmod;
   using std::floor;
@@ -26,8 +26,7 @@ TEST(AgradFvar, fmod) {
   EXPECT_FLOAT_EQ(fmod(3.0, 2.0), f.val_);
   EXPECT_FLOAT_EQ(1.0 * -floor(3.0 / 2.0), f.d_);
  }
-
-TEST(AgradFvarVar, fmod) {
+TEST(fmod,AgradFvarVar_FvarVar_1stderiv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::fmod;
@@ -45,8 +44,93 @@ TEST(AgradFvarVar, fmod) {
   EXPECT_FLOAT_EQ(1,g[0]);
   std::isnan(g[1]);
 }
+TEST(fmod,AgradFvarVar_Double_1stderiv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using std::fmod;
 
-TEST(AgradFvarFvar, fmod) {
+  fvar<var> x(3.0,1.3);
+  double z(6.0);
+  fvar<var> a = fmod(x,z);
+
+  EXPECT_FLOAT_EQ(fmod(3.0,6.0), a.val_.val());
+  EXPECT_FLOAT_EQ(13.0 / 60.0, a.d_.val());
+
+  AVEC y = createAVEC(x.val_);
+  VEC g;
+  a.val_.grad(y,g);
+  EXPECT_FLOAT_EQ(1,g[0]);
+}
+TEST(fmod,AgradDouble_FvarVar_1stderiv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using std::fmod;
+
+  double x(3.0);
+  fvar<var> z(6.0,1.0);
+  fvar<var> a = fmod(x,z);
+
+  EXPECT_FLOAT_EQ(fmod(3.0,6.0), a.val_.val());
+  EXPECT_FLOAT_EQ(0, a.d_.val());
+
+  AVEC y = createAVEC(z.val_);
+  VEC g;
+  a.val_.grad(y,g);
+  std::isnan(g[0]);
+}
+TEST(fmod,AgradFvarVar_FvarVar_2ndderiv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using std::fmod;
+
+  fvar<var> x(3.0,1.3);
+  fvar<var> z(6.0,1.0);
+  fvar<var> a = fmod(x,z);
+
+  EXPECT_FLOAT_EQ(fmod(3.0,6.0), a.val_.val());
+  EXPECT_FLOAT_EQ(1.3, a.d_.val());
+
+  AVEC y = createAVEC(x.val_,z.val_);
+  VEC g;
+  a.d_.grad(y,g);
+  EXPECT_FLOAT_EQ(0,g[0]);
+  std::isnan(g[1]);
+}
+TEST(fmod,AgradFvarVar_Double_2ndderiv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using std::fmod;
+
+  fvar<var> x(3.0,1.3);
+  double z(6.0);
+  fvar<var> a = fmod(x,z);
+
+  EXPECT_FLOAT_EQ(fmod(3.0,6.0), a.val_.val());
+  EXPECT_FLOAT_EQ(13.0 / 60.0, a.d_.val());
+
+  AVEC y = createAVEC(x.val_);
+  VEC g;
+  a.d_.grad(y,g);
+  EXPECT_FLOAT_EQ(0,g[0]);
+}
+TEST(fmod,AgradDouble_FvarVar_2ndderiv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using std::fmod;
+
+  double x(3.0);
+  fvar<var> z(6.0,1.0);
+  fvar<var> a = fmod(x,z);
+
+  EXPECT_FLOAT_EQ(fmod(3.0,6.0), a.val_.val());
+  EXPECT_FLOAT_EQ(0, a.d_.val());
+
+  AVEC y = createAVEC(z.val_);
+  VEC g;
+  a.d_.grad(y,g);
+  std::isnan(g[0]);
+}
+TEST(fmod,AgradFvarFvarDouble) {
   using stan::agrad::fvar;
   using std::fmod;
 
@@ -65,3 +149,158 @@ TEST(AgradFvarFvar, fmod) {
   EXPECT_FLOAT_EQ(0, a.d_.val_);
   EXPECT_FLOAT_EQ(0, a.d_.d_);
 }
+TEST(fmod,AgradFvarFvarVar_FvarFvarVar_1stderiv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using std::fmod;
+
+  fvar<fvar<var> > x;
+  x.val_.val_ = 3.0;
+  x.val_.d_ = 1.0;
+
+  fvar<fvar<var> > y;
+  y.val_.val_ = 6.0;
+  y.d_.val_ = 1.0;
+
+  fvar<fvar<var> > a = fmod(x,y);
+
+  EXPECT_FLOAT_EQ(fmod(3.0,6.0), a.val_.val_.val());
+  EXPECT_FLOAT_EQ(1, a.val_.d_.val());
+  EXPECT_FLOAT_EQ(0, a.d_.val_.val());
+  EXPECT_FLOAT_EQ(0, a.d_.d_.val());
+
+  AVEC q = createAVEC(x.val_.val_,y.val_.val_);
+  VEC r;
+  a.val_.val_.grad(q,r);
+  EXPECT_FLOAT_EQ(1, r[0]);
+  EXPECT_FLOAT_EQ(0, r[1]);
+}
+TEST(fmod,AgradFvarFvarVar_Double_1stderiv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using std::fmod;
+
+  fvar<fvar<var> > x;
+  x.val_.val_ = 3.0;
+  x.val_.d_ = 1.0;
+
+  double y(6.0);
+
+  fvar<fvar<var> > a = fmod(x,y);
+
+  EXPECT_FLOAT_EQ(fmod(3.0,6.0), a.val_.val_.val());
+  EXPECT_FLOAT_EQ(1.0 / 6.0, a.val_.d_.val());
+  EXPECT_FLOAT_EQ(0, a.d_.val_.val());
+  EXPECT_FLOAT_EQ(0, a.d_.d_.val());
+
+  AVEC q = createAVEC(x.val_.val_);
+  VEC r;
+  a.val_.val_.grad(q,r);
+  EXPECT_FLOAT_EQ(1, r[0]);
+}
+TEST(fmod,AgradDouble_FvarFvarVar_1stderiv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using std::fmod;
+
+  double x(3.0);
+  fvar<fvar<var> > y;
+  y.val_.val_ = 6.0;
+  y.d_.val_ = 1.0;
+
+  fvar<fvar<var> > a = fmod(x,y);
+
+  EXPECT_FLOAT_EQ(fmod(3.0,6.0), a.val_.val_.val());
+  EXPECT_FLOAT_EQ(0, a.val_.d_.val());
+  EXPECT_FLOAT_EQ(0, a.d_.val_.val());
+  EXPECT_FLOAT_EQ(0, a.d_.d_.val());
+
+  AVEC q = createAVEC(y.val_.val_);
+  VEC r;
+  a.val_.val_.grad(q,r);
+  EXPECT_FLOAT_EQ(0, r[0]);
+}
+TEST(fmod,AgradFvarFvarVar_FvarFvarVar_2ndderiv_x) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using std::fmod;
+
+  fvar<fvar<var> > x;
+  x.val_.val_ = 3.0;
+  x.val_.d_ = 1.0;
+
+  fvar<fvar<var> > y;
+  y.val_.val_ = 6.0;
+  y.d_.val_ = 1.0;
+
+  fvar<fvar<var> > a = fmod(x,y);
+
+  EXPECT_FLOAT_EQ(fmod(3.0,6.0), a.val_.val_.val());
+  EXPECT_FLOAT_EQ(1, a.val_.d_.val());
+  EXPECT_FLOAT_EQ(0, a.d_.val_.val());
+  EXPECT_FLOAT_EQ(0, a.d_.d_.val());
+
+  AVEC q = createAVEC(x.val_.val_,y.val_.val_);
+  VEC r;
+  a.val_.d_.grad(q,r);
+  EXPECT_FLOAT_EQ(0, r[0]);
+  EXPECT_FLOAT_EQ(0, r[1]);
+}
+TEST(fmod,AgradFvarFvarVar_FvarFvarVar_2ndderiv_y) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using std::fmod;
+
+  fvar<fvar<var> > x;
+  x.val_.val_ = 3.0;
+  x.val_.d_ = 1.0;
+  fvar<fvar<var> > y;
+  y.val_.val_ = 6.0;
+  y.d_.val_ = 1.0;
+
+  fvar<fvar<var> > a = fmod(x,y);
+
+  AVEC q = createAVEC(x.val_.val_,y.val_.val_);
+  VEC r;
+  a.d_.val_.grad(q,r);
+  EXPECT_FLOAT_EQ(0, r[0]);
+  EXPECT_FLOAT_EQ(0, r[1]);
+}
+TEST(fmod,AgradFvarFvarVar_Double_2ndderiv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using std::fmod;
+
+  fvar<fvar<var> > x;
+  x.val_.val_ = 3.0;
+  x.val_.d_ = 1.0;
+
+  double y(6.0);
+
+  fvar<fvar<var> > a = fmod(x,y);
+
+  AVEC q = createAVEC(x.val_.val_);
+  VEC r;
+  a.val_.d_.grad(q,r);
+  EXPECT_FLOAT_EQ(0, r[0]);
+}
+TEST(fmod,AgradDouble_FvarFvarVar_2ndderiv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using std::fmod;
+
+  double x(3.0);
+  fvar<fvar<var> > y;
+  y.val_.val_ = 6.0;
+  y.d_.val_ = 1.0;
+
+  fvar<fvar<var> > a = fmod(x,y);
+
+  AVEC q = createAVEC(y.val_.val_);
+  VEC r;
+  a.d_.val_.grad(q,r);
+  EXPECT_FLOAT_EQ(0, r[0]);
+}
+
+
+
