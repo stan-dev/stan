@@ -22,7 +22,7 @@ namespace stan {
         return fvar<T>(binomial_coefficient_log(x1.val_, x2.val_),
                        x1.d_ * digamma(x1.val_ + 1)
                        - x2.d_ * digamma(x2.val_ + 1)
-                       + (x1.d_ - x2.d_) * digamma(x1.val_ - x2.val_ + 1));
+                       - (x1.d_ - x2.d_) * digamma(x1.val_ - x2.val_ + 1));
       } else {
         return fvar<T>(binomial_coefficient_log(x1.val_, x2.val_), 
                x2.d_ * log(x1.val_ - x2.val_) 
@@ -51,7 +51,7 @@ namespace stan {
         return fvar<typename stan::return_type<T,double>::type>(
                         binomial_coefficient_log(x1.val_, x2),
                           x1.d_ * digamma(x1.val_ + 1)
-                        + x1.d_ * digamma(x1.val_ - x2 + 1));
+                        - x1.d_ * digamma(x1.val_ - x2 + 1));
       } else {
         return fvar<typename stan::return_type<T,double>::type>( 
             binomial_coefficient_log(x1.val_, x2), 
@@ -76,7 +76,7 @@ namespace stan {
       if ((x1 < cutoff) || (x1 - x2.val_ < cutoff)) {
         return fvar<typename stan::return_type<T,double>::type>(
                    binomial_coefficient_log(x1, x2.val_),
-                   - x2.d_ * digamma(x2.val_ + 1) 
+                   -x2.d_ * digamma(x2.val_ + 1) 
                    - x2.d_ * digamma(x1 - x2.val_ + 1));
       } else {
         return fvar<typename stan::return_type<T,double>::type>(
@@ -84,7 +84,8 @@ namespace stan {
                x2.d_ * log(x1 - x2.val_) 
             + x2.val_ * -x2.d_ / (x1 - x2.val_) 
             - x2.d_ 
-            - x2.d_ / (12.0 * (x1 - x2.val_) * (x1 - x2.val_)) 
+            - x2.d_ / (12.0 * (x1 - x2.val_) * (x1 - x2.val_))
+            + x2.d_ * (x1 + 0.5) / (x1 - x2.val_) 
             - digamma(x2.val_ + 1) * x2.d_);
       }
     }
