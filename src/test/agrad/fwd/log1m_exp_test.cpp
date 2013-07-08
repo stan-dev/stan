@@ -4,7 +4,7 @@
 #include <stan/agrad/var.hpp>
 #include <test/agrad/util.hpp>
 
-TEST(AgradFvar, log1m_exp) {
+TEST(log1m_exp,AgradFvar) {
   using stan::agrad::fvar;
   using stan::math::log1m_exp;
   using std::exp;
@@ -32,14 +32,14 @@ TEST(AgradFvar, log1m_exp) {
   EXPECT_FLOAT_EQ(b.d_, b2.d_);
 }
 
-TEST(AgradFvar, log1m_exp_exception) {
+TEST(log1m_exp,AgradFvar_exception) {
   using stan::agrad::fvar;
   using stan::math::log1m_exp;
   EXPECT_NO_THROW(log1m_exp(fvar<double>(-3)));
   EXPECT_NO_THROW(log1m_exp(fvar<double>(3)));
 }
 
-TEST(AgradFvarVar, log1m_exp) {
+TEST(log1m_exp,AgradFvarVar_1stderiv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::log1m_exp;
@@ -56,8 +56,21 @@ TEST(AgradFvarVar, log1m_exp) {
   a.val_.grad(y,g);
   EXPECT_FLOAT_EQ(-exp(-0.2) / (1.0 - exp(-0.2)),g[0]);
 }
+TEST(log1m_exp,AgradFvarVar_2ndderiv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using stan::math::log1m_exp;
+  using std::exp;
 
-TEST(AgradFvarFvar, log1m_exp) {
+  fvar<var> x(-0.2,1.3);
+  fvar<var> a = log1m_exp(x);
+
+  AVEC y = createAVEC(x.val_);
+  VEC g;
+  a.d_.grad(y,g);
+  EXPECT_FLOAT_EQ(1.3 * -exp(-0.2) / (1.0 - exp(-0.2)) / (1.0 - exp(-0.2)),g[0]);
+}
+TEST(log1m_exp,AgradFvarFvarDouble) {
   using stan::agrad::fvar;
   using stan::math::log1m_exp;
   using std::exp;
@@ -71,4 +84,41 @@ TEST(AgradFvarFvar, log1m_exp) {
   EXPECT_FLOAT_EQ(-exp(-0.2) / (1.0 - exp(-0.2)), a.val_.d_);
   EXPECT_FLOAT_EQ(0, a.d_.val_);
   EXPECT_FLOAT_EQ(0, a.d_.d_);
+}
+TEST(log1m_exp,AgradFvarFvarVar_1stderiv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using stan::math::log1m_exp;
+  using std::exp;
+
+  fvar<fvar<var> > x;
+  x.val_.val_ = -0.2;
+  x.val_.d_ = 1.0;
+  fvar<fvar<var> > a = log1m_exp(x);
+
+  EXPECT_FLOAT_EQ(log1m_exp(-0.2), a.val_.val_.val());
+  EXPECT_FLOAT_EQ(-exp(-0.2) / (1.0 - exp(-0.2)), a.val_.d_.val());
+  EXPECT_FLOAT_EQ(0, a.d_.val_.val());
+  EXPECT_FLOAT_EQ(0, a.d_.d_.val());
+
+  AVEC p = createAVEC(x.val_.val_);
+  VEC g;
+  a.val_.val_.grad(p,g);
+  EXPECT_FLOAT_EQ(-exp(-0.2) / (1.0 - exp(-0.2)), g[0]);
+}
+TEST(log1m_exp,AgradFvarFvarVar_2ndderiv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using stan::math::log1m_exp;
+  using std::exp;
+
+  fvar<fvar<var> > x;
+  x.val_.val_ = -0.2;
+  x.val_.d_ = 1.0;
+  fvar<fvar<var> > a = log1m_exp(x);
+
+  AVEC p = createAVEC(x.val_.val_);
+  VEC g;
+  a.val_.d_.grad(p,g);
+  EXPECT_FLOAT_EQ(-exp(-0.2) / (1.0 - exp(-0.2)) / (1.0 - exp(-0.2)),g[0]);
 }

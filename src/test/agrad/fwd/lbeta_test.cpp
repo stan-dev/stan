@@ -5,7 +5,7 @@
 #include <stan/agrad/var.hpp>
 #include <test/agrad/util.hpp>
 
-TEST(AgradFvar, lbeta) {
+TEST(lbeta,AgradFvar) {
   using stan::agrad::fvar;
   using boost::math::digamma;
   using stan::math::lbeta;
@@ -29,7 +29,7 @@ TEST(AgradFvar, lbeta) {
   EXPECT_FLOAT_EQ(1.0 * digamma(0.5) - 1.0 * digamma(1.3 + 0.5), c.d_);
 }
 
-TEST(AgradFvarVar, lbeta) {
+TEST(lbeta,AgradFvarVar_FvarVar_1stderiv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using boost::math::digamma;
@@ -49,8 +49,101 @@ TEST(AgradFvarVar, lbeta) {
   EXPECT_FLOAT_EQ(digamma(3.0) - digamma(9.0),g[0]);
   EXPECT_FLOAT_EQ(digamma(6.0) - digamma(9.0),g[1]);
 }
+TEST(lbeta,AgradFvarVar_Double_1stderiv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using boost::math::digamma;
+  using stan::math::lbeta;
 
-TEST(AgradFvarFvar, lbeta) {
+  fvar<var> x(3.0,1.3);
+  double z(6.0);
+  fvar<var> a = lbeta(x,z);
+
+  EXPECT_FLOAT_EQ(lbeta(3.0,6.0), a.val_.val());
+  EXPECT_FLOAT_EQ(1.3 * digamma(3.0) - (1.3) * 
+                  digamma(3.0 + 6.0), a.d_.val());
+
+  AVEC y = createAVEC(x.val_);
+  VEC g;
+  a.val_.grad(y,g);
+  EXPECT_FLOAT_EQ(digamma(3.0) - digamma(9.0),g[0]);
+}
+TEST(lbeta,AgradDouble_FvarVar_1stderiv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using boost::math::digamma;
+  using stan::math::lbeta;
+
+  double x(3.0);
+  fvar<var> z(6.0,1.0);
+  fvar<var> a = lbeta(x,z);
+
+  EXPECT_FLOAT_EQ(lbeta(3.0,6.0), a.val_.val());
+  EXPECT_FLOAT_EQ(digamma(6.0) - digamma(3.0 + 6.0), a.d_.val());
+
+  AVEC y = createAVEC(z.val_);
+  VEC g;
+  a.val_.grad(y,g);
+  EXPECT_FLOAT_EQ(digamma(6.0) - digamma(9.0),g[0]);
+}
+TEST(lbeta,AgradFvarVar_FvarVar_2ndderiv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using boost::math::digamma;
+  using stan::math::lbeta;
+
+  fvar<var> x(3.0,1.3);
+  fvar<var> z(6.0,1.0);
+  fvar<var> a = lbeta(x,z);
+
+  EXPECT_FLOAT_EQ(lbeta(3.0,6.0), a.val_.val());
+  EXPECT_FLOAT_EQ(1.3 * digamma(3.0) + digamma(6.0) - (1.0 + 1.3) * 
+                  digamma(3.0 + 6.0), a.d_.val());
+
+  AVEC y = createAVEC(x.val_,z.val_);
+  VEC g;
+  a.d_.grad(y,g);
+  EXPECT_FLOAT_EQ(1.3 * 0.39493407 - 2.3 * 0.11751201,g[0]);
+  EXPECT_FLOAT_EQ(0.18132296 - 2.3 * 0.11751201,g[1]);
+}
+TEST(lbeta,AgradFvarVar_Double_2ndderiv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using boost::math::digamma;
+  using stan::math::lbeta;
+
+  fvar<var> x(3.0,1.3);
+  double z(6.0);
+  fvar<var> a = lbeta(x,z);
+
+  EXPECT_FLOAT_EQ(lbeta(3.0,6.0), a.val_.val());
+  EXPECT_FLOAT_EQ(1.3 * digamma(3.0) - (1.3) * 
+                  digamma(3.0 + 6.0), a.d_.val());
+
+  AVEC y = createAVEC(x.val_);
+  VEC g;
+  a.d_.grad(y,g);
+  EXPECT_FLOAT_EQ(1.3 * 0.39493407 - 1.3 * 0.11751201,g[0]);
+}
+TEST(lbeta,AgradDouble_FvarVar_2ndderiv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using boost::math::digamma;
+  using stan::math::lbeta;
+
+  double x(3.0);
+  fvar<var> z(6.0,1.0);
+  fvar<var> a = lbeta(x,z);
+
+  EXPECT_FLOAT_EQ(lbeta(3.0,6.0), a.val_.val());
+  EXPECT_FLOAT_EQ(digamma(6.0) - digamma(3.0 + 6.0), a.d_.val());
+
+  AVEC y = createAVEC(z.val_);
+  VEC g;
+  a.d_.grad(y,g);
+  EXPECT_FLOAT_EQ(0.18132296 - 0.11751201,g[0]);
+}
+TEST(lbeta,AgradFvarFvarDouble) {
   using stan::agrad::fvar;
   using boost::math::digamma;
   using stan::math::lbeta;
@@ -69,4 +162,181 @@ TEST(AgradFvarFvar, lbeta) {
   EXPECT_FLOAT_EQ(digamma(3.0) - digamma(9.0), a.val_.d_);
   EXPECT_FLOAT_EQ(digamma(6.0) - digamma(9.0), a.d_.val_);
   EXPECT_FLOAT_EQ(-0.11751202, a.d_.d_);
+}
+TEST(lbeta,AgradFvarFvarVar_FvarFvarVar_1stderiv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using boost::math::digamma;
+  using stan::math::lbeta;
+
+  fvar<fvar<var> > x;
+  x.val_.val_ = 3.0;
+  x.val_.d_ = 1.0;
+
+  fvar<fvar<var> > y;
+  y.val_.val_ = 6.0;
+  y.d_.val_ = 1.0;
+
+  fvar<fvar<var> > a = lbeta(x,y);
+
+  EXPECT_FLOAT_EQ(lbeta(3.0,6.0), a.val_.val_.val());
+  EXPECT_FLOAT_EQ(digamma(3.0) - digamma(9.0), a.val_.d_.val());
+  EXPECT_FLOAT_EQ(digamma(6.0) - digamma(9.0), a.d_.val_.val());
+  EXPECT_FLOAT_EQ(-0.11751202, a.d_.d_.val());
+
+  AVEC p = createAVEC(x.val_.val_,y.val_.val_);
+  VEC g;
+  a.val_.val_.grad(p,g);
+  EXPECT_FLOAT_EQ(digamma(3.0) - digamma(9.0), g[0]);
+  EXPECT_FLOAT_EQ(digamma(6.0) - digamma(9.0), g[1]);
+}
+TEST(lbeta,AgradFvarFvarVar_Double_1stderiv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using boost::math::digamma;
+  using stan::math::lbeta;
+
+  fvar<fvar<var> > x;
+  x.val_.val_ = 3.0;
+  x.val_.d_ = 1.0;
+
+  double y(6.0);
+
+  fvar<fvar<var> > a = lbeta(x,y);
+
+  EXPECT_FLOAT_EQ(lbeta(3.0,6.0), a.val_.val_.val());
+  EXPECT_FLOAT_EQ(digamma(3.0) - digamma(9.0), a.val_.d_.val());
+  EXPECT_FLOAT_EQ(0, a.d_.val_.val());
+  EXPECT_FLOAT_EQ(0, a.d_.d_.val());
+
+  AVEC p = createAVEC(x.val_.val_);
+  VEC g;
+  a.val_.val_.grad(p,g);
+  EXPECT_FLOAT_EQ(digamma(3.0) - digamma(9.0), g[0]);
+}
+TEST(lbeta,AgradDouble_FvarFvarVar_1stderiv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using boost::math::digamma;
+  using stan::math::lbeta;
+
+  double x(3.0);
+
+  fvar<fvar<var> > y;
+  y.val_.val_ = 6.0;
+  y.d_.val_ = 1.0;
+
+  fvar<fvar<var> > a = lbeta(x,y);
+
+  EXPECT_FLOAT_EQ(lbeta(3.0,6.0), a.val_.val_.val());
+  EXPECT_FLOAT_EQ(0, a.val_.d_.val());
+  EXPECT_FLOAT_EQ(digamma(6.0) - digamma(9.0), a.d_.val_.val());
+  EXPECT_FLOAT_EQ(0, a.d_.d_.val());
+
+  AVEC p = createAVEC(y.val_.val_);
+  VEC g;
+  a.val_.val_.grad(p,g);
+  EXPECT_FLOAT_EQ(digamma(6.0) - digamma(9.0), g[0]);
+}
+TEST(lbeta,AgradFvarFvarVar_FvarFvarVar_2ndderiv_x) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using boost::math::digamma;
+  using stan::math::lbeta;
+
+  fvar<fvar<var> > x;
+  x.val_.val_ = 3.0;
+  x.val_.d_ = 1.0;
+
+  fvar<fvar<var> > y;
+  y.val_.val_ = 6.0;
+  y.d_.val_ = 1.0;
+
+  fvar<fvar<var> > a = lbeta(x,y);
+
+  EXPECT_FLOAT_EQ(lbeta(3.0,6.0), a.val_.val_.val());
+  EXPECT_FLOAT_EQ(digamma(3.0) - digamma(9.0), a.val_.d_.val());
+  EXPECT_FLOAT_EQ(digamma(6.0) - digamma(9.0), a.d_.val_.val());
+  EXPECT_FLOAT_EQ(-0.11751202, a.d_.d_.val());
+
+  AVEC p = createAVEC(x.val_.val_,y.val_.val_);
+  VEC g;
+  a.val_.d_.grad(p,g);
+  EXPECT_FLOAT_EQ(0.39493407 - 0.11751201, g[0]);
+  EXPECT_FLOAT_EQ(-0.11751202, g[1]);
+}
+TEST(lbeta,AgradFvarFvarVar_FvarFvarVar_2ndderiv_y) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using boost::math::digamma;
+  using stan::math::lbeta;
+
+  fvar<fvar<var> > x;
+  x.val_.val_ = 3.0;
+  x.val_.d_ = 1.0;
+
+  fvar<fvar<var> > y;
+  y.val_.val_ = 6.0;
+  y.d_.val_ = 1.0;
+
+  fvar<fvar<var> > a = lbeta(x,y);
+
+  EXPECT_FLOAT_EQ(lbeta(3.0,6.0), a.val_.val_.val());
+  EXPECT_FLOAT_EQ(digamma(3.0) - digamma(9.0), a.val_.d_.val());
+  EXPECT_FLOAT_EQ(digamma(6.0) - digamma(9.0), a.d_.val_.val());
+  EXPECT_FLOAT_EQ(-0.11751202, a.d_.d_.val());
+
+  AVEC p = createAVEC(x.val_.val_,y.val_.val_);
+  VEC g;
+  a.d_.val_.grad(p,g);
+  EXPECT_FLOAT_EQ(-0.11751202, g[0]);
+  EXPECT_FLOAT_EQ(0.18132296 - 0.11751201, g[1]);
+}
+TEST(lbeta,AgradFvarFvarVar_Double_2ndderiv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using boost::math::digamma;
+  using stan::math::lbeta;
+
+  fvar<fvar<var> > x;
+  x.val_.val_ = 3.0;
+  x.val_.d_ = 1.0;
+
+  double y(6.0);
+
+  fvar<fvar<var> > a = lbeta(x,y);
+
+  EXPECT_FLOAT_EQ(lbeta(3.0,6.0), a.val_.val_.val());
+  EXPECT_FLOAT_EQ(digamma(3.0) - digamma(9.0), a.val_.d_.val());
+  EXPECT_FLOAT_EQ(0, a.d_.val_.val());
+  EXPECT_FLOAT_EQ(0, a.d_.d_.val());
+
+  AVEC p = createAVEC(x.val_.val_);
+  VEC g;
+  a.val_.d_.grad(p,g);
+  EXPECT_FLOAT_EQ(0.39493407 - 0.11751201, g[0]);
+}
+TEST(lbeta,AgradDouble_FvarFvarVar_2ndderiv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using boost::math::digamma;
+  using stan::math::lbeta;
+
+  double x(3.0);
+
+  fvar<fvar<var> > y;
+  y.val_.val_ = 6.0;
+  y.d_.val_ = 1.0;
+
+  fvar<fvar<var> > a = lbeta(x,y);
+
+  EXPECT_FLOAT_EQ(lbeta(3.0,6.0), a.val_.val_.val());
+  EXPECT_FLOAT_EQ(0, a.val_.d_.val());
+  EXPECT_FLOAT_EQ(digamma(6.0) - digamma(9.0), a.d_.val_.val());
+  EXPECT_FLOAT_EQ(0, a.d_.d_.val());
+
+  AVEC p = createAVEC(y.val_.val_);
+  VEC g;
+  a.d_.val_.grad(p,g);
+  EXPECT_FLOAT_EQ(0.18132296 - 0.11751201, g[0]);
 }
