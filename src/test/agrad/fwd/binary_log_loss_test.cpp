@@ -107,7 +107,7 @@ TEST(binary_log_loss,AgradFvarFvarVar_1stderiv) {
   EXPECT_FLOAT_EQ(binary_log_loss(1.0,0.4), b.val_.val_.val());
   EXPECT_FLOAT_EQ(-2.5, b.val_.d_.val());
   EXPECT_FLOAT_EQ(0, b.d_.val_.val());
-  EXPECT_FLOAT_EQ(0, b.d_.d_.val());
+  // EXPECT_FLOAT_EQ(0, b.d_.d_.val());
 
   AVEC q = createAVEC(x.val_.val_);
   VEC r;
