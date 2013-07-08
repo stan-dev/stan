@@ -4,7 +4,7 @@
 #include <stan/agrad/var.hpp>
 #include <test/agrad/util.hpp>
 
-TEST(erf,AgradFvar) {
+TEST(Agrad_Fwd_Erf,Fvar) {
   using stan::agrad::fvar;
   using std::exp;
   using std::sqrt;
@@ -23,7 +23,7 @@ TEST(erf,AgradFvar) {
                   / sqrt(boost::math::constants::pi<double>()), b.d_);
 }
 
-TEST(erf,AgradFvarVar_1stderiv) {
+TEST(Agrad_Fwd_Erf,FvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::exp;
@@ -43,7 +43,7 @@ TEST(erf,AgradFvarVar_1stderiv) {
   EXPECT_FLOAT_EQ(2 * exp(-0.5 * 0.5) / 
                   sqrt(boost::math::constants::pi<double>()), g[0]);
 }
-TEST(erf,AgradFvarVar_2ndderiv) {
+TEST(Agrad_Fwd_Erf,FvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::exp;
@@ -60,7 +60,7 @@ TEST(erf,AgradFvarVar_2ndderiv) {
                   sqrt(boost::math::constants::pi<double>()), g[0]);
 }
 
-TEST(erf,AgradFvarFvarDouble) {
+TEST(Agrad_Fwd_Erf,FvarFvarDouble) {
   using stan::agrad::fvar;
   using std::exp;
   using std::sqrt;
@@ -90,7 +90,7 @@ TEST(erf,AgradFvarFvarDouble) {
   EXPECT_FLOAT_EQ(0, a.d_.d_);
 }
 
-TEST(erf,AgradFvarFvarVar_1stderiv) {
+TEST(Agrad_Fwd_Erf,FvarFvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::exp;
@@ -133,7 +133,7 @@ TEST(erf,AgradFvarFvarVar_1stderiv) {
                   sqrt(boost::math::constants::pi<double>()), r[0]);
 }
 
-TEST(erf,AgradFvarFvarVar_2ndderiv) {
+TEST(Agrad_Fwd_Erf,FvarFvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::exp;

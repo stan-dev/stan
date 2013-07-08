@@ -3,7 +3,7 @@
 #include <stan/agrad/var.hpp>
 #include <test/agrad/util.hpp>
 
-TEST(modified_bessel_first_kind,AgradFvar) {
+TEST(Agrad_Fwd_ModifiedBesselFirstKind,Fvar) {
   using stan::agrad::fvar;
   using stan::agrad::modified_bessel_first_kind;
 
@@ -24,7 +24,7 @@ TEST(modified_bessel_first_kind,AgradFvar) {
   EXPECT_FLOAT_EQ(2.0 * 3.5630025133974876, x.d_);
 }
 
-TEST(modified_bessel_first_kind,AgradFvarVar_1stderiv) {
+TEST(Agrad_Fwd_ModifiedBesselFirstKind,FvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::modified_bessel_first_kind;
@@ -40,7 +40,7 @@ TEST(modified_bessel_first_kind,AgradFvarVar_1stderiv) {
   a.val_.grad(y,g);
   EXPECT_FLOAT_EQ(8.8620556637102180189, g[0]);
 }
-TEST(modified_bessel_first_kind,AgradFvarVar_2ndderiv) {
+TEST(Agrad_Fwd_ModifiedBesselFirstKind,FvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::modified_bessel_first_kind;
@@ -53,7 +53,7 @@ TEST(modified_bessel_first_kind,AgradFvarVar_2ndderiv) {
   a.d_.grad(y,g);
   EXPECT_FLOAT_EQ(2.0 * 8.1539183, g[0]);
 }
-TEST(modified_bessel_first_kind,AgradFvarFvarDouble) {
+TEST(Agrad_Fwd_ModifiedBesselFirstKind,FvarFvarDouble) {
   using stan::agrad::fvar;
   using stan::math::modified_bessel_first_kind;
 
@@ -79,7 +79,7 @@ TEST(modified_bessel_first_kind,AgradFvarFvarDouble) {
   EXPECT_FLOAT_EQ(0, b.d_.val_);
   EXPECT_FLOAT_EQ(0, b.d_.d_);
 }
-TEST(modified_bessel_first_kind,AgradFvarFvarVar_1stderiv) {
+TEST(Agrad_Fwd_ModifiedBesselFirstKind,FvarFvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::modified_bessel_first_kind;
@@ -116,7 +116,7 @@ TEST(modified_bessel_first_kind,AgradFvarFvarVar_1stderiv) {
   b.val_.val_.grad(q,r);
   EXPECT_FLOAT_EQ(8.8620556637102180189, r[0]);
 }
-TEST(modified_bessel_first_kind,AgradFvarFvarVar_2ndderiv) {
+TEST(Agrad_Fwd_ModifiedBesselFirstKind,FvarFvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::modified_bessel_first_kind;

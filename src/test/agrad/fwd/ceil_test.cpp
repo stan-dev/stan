@@ -3,7 +3,7 @@
 #include <stan/agrad/var.hpp>
 #include <test/agrad/util.hpp>
 
-TEST(ceil,AgradFvar) {
+TEST(Agrad_Fwd_Ceil,Fvar) {
   using stan::agrad::fvar;
   using std::ceil;
 
@@ -23,7 +23,7 @@ TEST(ceil,AgradFvar) {
    EXPECT_FLOAT_EQ(0.0, c.d_);
 }
 
-TEST(ceil,AgradFvarVar_1stderiv) {
+TEST(Agrad_Fwd_Ceil,FvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::ceil;
@@ -40,7 +40,7 @@ TEST(ceil,AgradFvarVar_1stderiv) {
   EXPECT_FLOAT_EQ(0, g[0]);
 }
 
-TEST(ceil,AgradFvarVar_2ndderiv) {
+TEST(Agrad_Fwd_Ceil,FvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::ceil;
@@ -54,7 +54,7 @@ TEST(ceil,AgradFvarVar_2ndderiv) {
   EXPECT_FLOAT_EQ(0, g[0]);
 }
 
-TEST(ceil,AgradFvarFvarDouble) {
+TEST(Agrad_Fwd_Ceil,FvarFvarDouble) {
   using stan::agrad::fvar;
   using std::ceil;
 
@@ -80,7 +80,7 @@ TEST(ceil,AgradFvarFvarDouble) {
   EXPECT_FLOAT_EQ(0, a.d_.d_);
 }
 
-TEST(ceil,AgradFvarFvarVar_1stderiv) {
+TEST(Agrad_Fwd_Ceil,FvarFvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::ceil;
@@ -117,7 +117,7 @@ TEST(ceil,AgradFvarFvarVar_1stderiv) {
   EXPECT_FLOAT_EQ(0.0, r[0]);
 }
 
-TEST(ceil,AgradFvarFvarVar_2ndderiv) {
+TEST(Agrad_Fwd_Ceil,FvarFvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::ceil;

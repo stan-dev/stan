@@ -3,7 +3,7 @@
 #include <stan/agrad/var.hpp>
 #include <test/agrad/util.hpp>
 
-TEST(AgradFvar,gt) {
+TEST(Agrad_Fwd_OperatorGreaterThan,Fvar) {
   using stan::agrad::fvar;
   fvar<double> v4 = 4;
   fvar<double> v5 = 5;
@@ -26,7 +26,7 @@ TEST(AgradFvar,gt) {
   EXPECT_TRUE(i5 > d4);
 }
 
-TEST(AgradFvarVar, gt) {
+TEST(Agrad_Fwd_OperatorGreaterThan, FvarVar) {
   using stan::agrad::fvar;
   using stan::agrad::var;
 
@@ -39,7 +39,7 @@ TEST(AgradFvarVar, gt) {
   EXPECT_FALSE(z > y);
 }
 
-TEST(AgradFvarFvar, gt) {
+TEST(Agrad_Fwd_OperatorGreaterThan, FvarFvarDouble) {
   using stan::agrad::fvar;
 
   fvar<fvar<double> > x;
@@ -58,4 +58,23 @@ TEST(AgradFvarFvar, gt) {
   EXPECT_TRUE(x > z);
   EXPECT_FALSE(z > y);
 }
+TEST(Agrad_Fwd_OperatorGreaterThan, FvarFvarVar) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
 
+  fvar<fvar<var> > x;
+  x.val_.val_ = 1.5;
+  x.val_.d_ = 1.0;
+
+  fvar<fvar<var> > y;
+  y.val_.val_ = 0.5;
+  y.d_.val_ = 1.0;
+
+  fvar<fvar<var> > z;
+  z.val_.val_ = 0.5;
+  z.d_.val_ = 1.0;
+
+  EXPECT_TRUE(x > y);
+  EXPECT_TRUE(x > z);
+  EXPECT_FALSE(z > y);
+}

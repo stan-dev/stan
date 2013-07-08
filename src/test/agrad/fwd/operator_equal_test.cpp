@@ -3,7 +3,7 @@
 #include <stan/agrad/var.hpp>
 #include <test/agrad/util.hpp>
 
-TEST(AgradFvar, eq) {
+TEST(Agrad_Fwd_OperatorEqual, Fvar) {
   using stan::agrad::fvar;
   fvar<double> v4 = 4;
   fvar<double> v5 = 5;
@@ -28,7 +28,7 @@ TEST(AgradFvar, eq) {
   EXPECT_TRUE(i6 == v5);
 }
 
-TEST(AgradFvarVar, eq) {
+TEST(Agrad_Fwd_OperatorEqual, FvarVar) {
   using stan::agrad::fvar;
   using stan::agrad::var;
 
@@ -41,7 +41,7 @@ TEST(AgradFvarVar, eq) {
   EXPECT_FALSE(z == y);
 }
 
-TEST(AgradFvarFvar, eq) {
+TEST(Agrad_Fwd_OperatorEqual, FvarFvarDouble) {
   using stan::agrad::fvar;
 
   fvar<fvar<double> > x;
@@ -53,6 +53,27 @@ TEST(AgradFvarFvar, eq) {
   y.d_.val_ = 1.0;
 
   fvar<fvar<double> > z;
+  z.val_.val_ = 0.5;
+  z.d_.val_ = 1.0;
+
+  EXPECT_FALSE(x == y);
+  EXPECT_FALSE(x == z);
+  EXPECT_TRUE(z == y);
+}
+
+TEST(Agrad_Fwd_OperatorEqual, FvarFvarVar) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+
+  fvar<fvar<var> > x;
+  x.val_.val_ = 1.5;
+  x.val_.d_ = 1.0;
+
+  fvar<fvar<var> > y;
+  y.val_.val_ = 0.5;
+  y.d_.val_ = 1.0;
+
+  fvar<fvar<var> > z;
   z.val_.val_ = 0.5;
   z.d_.val_ = 1.0;
 

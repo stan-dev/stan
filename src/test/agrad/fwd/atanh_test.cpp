@@ -4,7 +4,7 @@
 #include <stan/agrad/var.hpp>
 #include <test/agrad/util.hpp>
 
-TEST(atanh,AgradFvar) {
+TEST(Agrad_Fwd_Atanh,Fvar) {
   using stan::agrad::fvar;
   using boost::math::atanh;
 
@@ -21,7 +21,7 @@ TEST(atanh,AgradFvar) {
   EXPECT_FLOAT_EQ(1 / (1 - 0.9 * 0.9), b.d_);
 }
 
-TEST(atanh,AgradFvarVar_1stderiv) {
+TEST(Agrad_Fwd_Atanh,FvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using boost::math::atanh;
@@ -38,7 +38,7 @@ TEST(atanh,AgradFvarVar_1stderiv) {
   EXPECT_FLOAT_EQ(1.0 / (1.0 - 0.5 * 0.5), g[0]);
 }
 
-TEST(atanh,AgradFvarVar_2ndderiv) {
+TEST(Agrad_Fwd_Atanh,FvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using boost::math::atanh;
@@ -52,7 +52,7 @@ TEST(atanh,AgradFvarVar_2ndderiv) {
   EXPECT_FLOAT_EQ(1.3 * 1.7777778, g[0]);
 }
 
-TEST(atanh,AgradFvarFvarDouble) {
+TEST(Agrad_Fwd_Atanh,FvarFvarDouble) {
   using stan::agrad::fvar;
   using boost::math::atanh;
 
@@ -78,7 +78,7 @@ TEST(atanh,AgradFvarFvarDouble) {
   EXPECT_FLOAT_EQ(0, a.d_.d_);
 }
 
-TEST(atanh,AgradFvarFvarVar_1stderiv) {
+TEST(Agrad_Fwd_Atanh,FvarFvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using boost::math::atanh;
@@ -115,7 +115,7 @@ TEST(atanh,AgradFvarFvarVar_1stderiv) {
   EXPECT_FLOAT_EQ(1.0 / (1.0 - 0.5 * 0.5), r[0]);
 }
 
-TEST(atanh,AgradFvarFvarVar_2ndderiv) {
+TEST(Agrad_Fwd_Atanh,FvarFvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using boost::math::atanh;

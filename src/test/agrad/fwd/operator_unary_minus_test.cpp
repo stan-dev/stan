@@ -3,7 +3,7 @@
 #include <stan/agrad/var.hpp>
 #include <test/agrad/util.hpp>
 
-TEST(AgradFvar, operatorUnaryMinus) {
+TEST(Agrad_Fwd_OperatorUnaryMinus, Fvar) {
   using stan::agrad::fvar;
 
   fvar<double> x1(0.5,1.0);
@@ -12,7 +12,7 @@ TEST(AgradFvar, operatorUnaryMinus) {
   EXPECT_FLOAT_EQ(-1.0, a.d_);
 }
 
-TEST(AgradFvarVar, operatorUnaryMinus) {
+TEST(Agrad_Fwd_OperatorUnaryMinus, FvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
 
@@ -27,8 +27,19 @@ TEST(AgradFvarVar, operatorUnaryMinus) {
   a.val_.grad(y,g);
   EXPECT_FLOAT_EQ(-1, g[0]);
 }
+TEST(Agrad_Fwd_OperatorUnaryMinus, FvarVar_2ndDeriv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
 
-TEST(AgradFvarFvar, operatorUnaryMinus) {
+  fvar<var> x(0.5,1.3);
+  fvar<var> a = -x;
+
+  AVEC y = createAVEC(x.val_);
+  VEC g;
+  a.d_.grad(y,g);
+  EXPECT_FLOAT_EQ(0, g[0]);
+}
+TEST(Agrad_Fwd_OperatorUnaryMinus, FvarFvarDouble) {
   using stan::agrad::fvar;
 
   fvar<fvar<double> > x;
@@ -40,4 +51,38 @@ TEST(AgradFvarFvar, operatorUnaryMinus) {
   EXPECT_FLOAT_EQ(-1.0, z.val_.d_);
   EXPECT_FLOAT_EQ(0, z.d_.val_);
   EXPECT_FLOAT_EQ(0, z.d_.d_);
+}
+TEST(Agrad_Fwd_OperatorUnaryMinus, FvarFvarVar_1stDeriv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+
+  fvar<fvar<var> > x;
+  x.val_.val_ = 0.5;
+  x.val_.d_ = 1.0;
+
+  fvar<fvar<var> > z = -x;
+  EXPECT_FLOAT_EQ(-0.5, z.val_.val_.val());
+  EXPECT_FLOAT_EQ(-1.0, z.val_.d_.val());
+  EXPECT_FLOAT_EQ(0, z.d_.val_.val());
+  EXPECT_FLOAT_EQ(0, z.d_.d_.val());
+
+  AVEC p = createAVEC(x.val_.val_);
+  VEC g;
+  z.val_.val_.grad(p,g);
+  EXPECT_FLOAT_EQ(-1.0, g[0]);
+}
+TEST(Agrad_Fwd_OperatorUnaryMinus, FvarFvarVar_2ndDeriv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+
+  fvar<fvar<var> > x;
+  x.val_.val_ = 0.5;
+  x.val_.d_ = 1.0;
+
+  fvar<fvar<var> > z = -x;
+
+  AVEC p = createAVEC(x.val_.val_);
+  VEC g;
+  z.val_.d_.grad(p,g);
+  EXPECT_FLOAT_EQ(0, g[0]);
 }

@@ -18,7 +18,7 @@ TEST(Agrad_Fwd_ModifiedBesselSecondKind,Fvar) {
   EXPECT_THROW(modified_bessel_second_kind(-1, c), std::domain_error);
 }
 
-TEST(Agrad_Fwd_ModifiedBesselSecondKind,FvarVar_1stderiv) {
+TEST(Agrad_Fwd_ModifiedBesselSecondKind,FvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::modified_bessel_second_kind;
@@ -34,7 +34,7 @@ TEST(Agrad_Fwd_ModifiedBesselSecondKind,FvarVar_1stderiv) {
   a.val_.grad(y,g);
   EXPECT_FLOAT_EQ(-0.014280550807670132, g[0]);
 }
-TEST(Agrad_Fwd_ModifiedBesselSecondKind,FvarVar_2ndderiv) {
+TEST(Agrad_Fwd_ModifiedBesselSecondKind,FvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::modified_bessel_second_kind;
@@ -73,7 +73,7 @@ TEST(Agrad_Fwd_ModifiedBesselSecondKind,FvarFvarDouble) {
   EXPECT_FLOAT_EQ(0, b.d_.val_);
   EXPECT_FLOAT_EQ(0, b.d_.d_);
 }
-TEST(Agrad_Fwd_ModifiedBesselSecondKind,FvarFvarVar_1stderiv) {
+TEST(Agrad_Fwd_ModifiedBesselSecondKind,FvarFvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::modified_bessel_second_kind;
@@ -110,7 +110,7 @@ TEST(Agrad_Fwd_ModifiedBesselSecondKind,FvarFvarVar_1stderiv) {
   b.val_.val_.grad(q,r);
   EXPECT_FLOAT_EQ(-0.014280550807670132, r[0]);
 }
-TEST(Agrad_Fwd_ModifiedBesselSecondKind,FvarFvarVar_2ndderiv) {
+TEST(Agrad_Fwd_ModifiedBesselSecondKind,FvarFvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::modified_bessel_second_kind;

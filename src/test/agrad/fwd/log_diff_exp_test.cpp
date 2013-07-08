@@ -4,7 +4,7 @@
 #include <stan/agrad/var.hpp>
 #include <test/agrad/util.hpp>
 
-TEST(log_diff_exp,AgradFvar) {
+TEST(Agrad_Fwd_LogDiffExp,Fvar) {
   using stan::agrad::fvar;
   using stan::math::log_diff_exp;
   using std::exp;
@@ -29,14 +29,14 @@ TEST(log_diff_exp,AgradFvar) {
   EXPECT_FLOAT_EQ(2 / (1 - exp(1.1 - 0.5) ), c.d_);
 }
 
-TEST(log_diff_exp, AgradFvar_exception) {
+TEST(Agrad_Fwd_LogDiffExp, AgradFvar_exception) {
   using stan::agrad::fvar;
   EXPECT_NO_THROW(log_diff_exp(fvar<double>(3), fvar<double>(4)));
   EXPECT_NO_THROW(log_diff_exp(fvar<double>(3), 4));
   EXPECT_NO_THROW(log_diff_exp(3, fvar<double>(4)));
 }
 
-TEST(log_diff_exp,AgradFvarVar_FvarVar_1stderiv) {
+TEST(Agrad_Fwd_LogDiffExp,FvarVar_FvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::log_diff_exp;
@@ -55,7 +55,7 @@ TEST(log_diff_exp,AgradFvarVar_FvarVar_1stderiv) {
   EXPECT_FLOAT_EQ(exp(9.0) / (exp(9.0) - exp(6.0)),g[0]);
   EXPECT_FLOAT_EQ(-exp(6.0) / (exp(9.0) - exp(6.0)),g[1]);
 }
-TEST(log_diff_exp,AgradFvarVar_Double_1stderiv) {
+TEST(Agrad_Fwd_LogDiffExp,FvarVar_Double_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::log_diff_exp;
@@ -73,7 +73,7 @@ TEST(log_diff_exp,AgradFvarVar_Double_1stderiv) {
   a.val_.grad(y,g);
   EXPECT_FLOAT_EQ(exp(9.0) / (exp(9.0) - exp(6.0)),g[0]);
 }
-TEST(log_diff_exp,AgradDouble_FvarVar_1stderiv) {
+TEST(Agrad_Fwd_LogDiffExp,Double_FvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::log_diff_exp;
@@ -91,7 +91,7 @@ TEST(log_diff_exp,AgradDouble_FvarVar_1stderiv) {
   a.val_.grad(y,g);
   EXPECT_FLOAT_EQ(-exp(6.0) / (exp(9.0) - exp(6.0)),g[0]);
 }
-TEST(log_diff_exp,AgradFvarVar_FvarVar_2ndderiv) {
+TEST(Agrad_Fwd_LogDiffExp,FvarVar_FvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::log_diff_exp;
@@ -110,7 +110,7 @@ TEST(log_diff_exp,AgradFvarVar_FvarVar_2ndderiv) {
   EXPECT_FLOAT_EQ((-exp(6.0) * (exp(9.0) - exp(6.0)) + exp(6.0) 
                    * (1.3 * exp(9.0) - exp(6.0))) / (exp(9.0) - exp(6.0)) 
                   / (exp(9.0) - exp(6.0)) ,g[1]);}
-TEST(log_diff_exp,AgradFvarVar_Double_2ndderiv) {
+TEST(Agrad_Fwd_LogDiffExp,FvarVar_Double_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::log_diff_exp;
@@ -127,7 +127,7 @@ TEST(log_diff_exp,AgradFvarVar_Double_2ndderiv) {
                    * exp(9.0)) / (exp(9.0) - exp(6.0)) / (exp(9.0) - exp(6.0))
                   ,g[0]);
 }
-TEST(log_diff_exp,AgradDouble_FvarVar_2ndderiv) {
+TEST(Agrad_Fwd_LogDiffExp,Double_FvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::log_diff_exp;
@@ -143,7 +143,7 @@ TEST(log_diff_exp,AgradDouble_FvarVar_2ndderiv) {
   EXPECT_FLOAT_EQ((-exp(6.0) * (exp(9.0) - exp(6.0)) + exp(6.0) * -exp(6.0))
                   / (exp(9.0) - exp(6.0)) / (exp(9.0) - exp(6.0)),g[0]);
 }
-TEST(log_diff_exp,AgradFvarFvarDouble) {
+TEST(Agrad_Fwd_LogDiffExp,FvarFvarDouble) {
   using stan::agrad::fvar;
   using stan::math::log_diff_exp;
   using std::exp;
@@ -163,7 +163,7 @@ TEST(log_diff_exp,AgradFvarFvarDouble) {
   EXPECT_FLOAT_EQ(-exp(6.0) / (exp(9.0) - exp(6.0)), a.d_.val_);
   EXPECT_FLOAT_EQ(0.055141006, a.d_.d_);
 }
-TEST(log_diff_exp,AgradFvarFvarVar_FvarFvarVar_1stderiv) {
+TEST(Agrad_Fwd_LogDiffExp,FvarFvarVar_FvarFvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::log_diff_exp;
@@ -190,7 +190,7 @@ TEST(log_diff_exp,AgradFvarFvarVar_FvarFvarVar_1stderiv) {
   EXPECT_FLOAT_EQ(exp(9.0) / (exp(9.0) - exp(6.0)), g[0]);
   EXPECT_FLOAT_EQ(-exp(6.0) / (exp(9.0) - exp(6.0)), g[1]);
 }
-TEST(log_diff_exp,AgradFvarFvarVar_Double_1stderiv) {
+TEST(Agrad_Fwd_LogDiffExp,FvarFvarVar_Double_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::log_diff_exp;
@@ -215,7 +215,7 @@ TEST(log_diff_exp,AgradFvarFvarVar_Double_1stderiv) {
   EXPECT_FLOAT_EQ(exp(9.0) / (exp(9.0) - exp(6.0)), g[0]);
 }
 
-TEST(log_diff_exp,AgradDouble_FvarFvarVar_1stderiv) {
+TEST(Agrad_Fwd_LogDiffExp,Double_FvarFvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::log_diff_exp;
@@ -238,7 +238,7 @@ TEST(log_diff_exp,AgradDouble_FvarFvarVar_1stderiv) {
   a.val_.val_.grad(p,g);
   EXPECT_FLOAT_EQ(-exp(6.0) / (exp(9.0) - exp(6.0)), g[0]);
 }
-TEST(log_diff_exp,AgradFvarFvarVar_FvarFvarVar_2ndderiv_x) {
+TEST(Agrad_Fwd_LogDiffExp,FvarFvarVar_FvarFvarVar_2ndDeriv_x) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::log_diff_exp;
@@ -262,7 +262,7 @@ TEST(log_diff_exp,AgradFvarFvarVar_FvarFvarVar_2ndderiv_x) {
                   ,g[0]);
   EXPECT_FLOAT_EQ(0.055141006, g[1]);
 }
-TEST(log_diff_exp,AgradFvarFvarVar_FvarFvarVar_2ndderiv_y) {
+TEST(Agrad_Fwd_LogDiffExp,FvarFvarVar_FvarFvarVar_2ndDeriv_y) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::log_diff_exp;
@@ -285,7 +285,7 @@ TEST(log_diff_exp,AgradFvarFvarVar_FvarFvarVar_2ndderiv_y) {
   EXPECT_FLOAT_EQ((-exp(6.0) * (exp(9.0) - exp(6.0)) + exp(6.0) * -exp(6.0))
                   / (exp(9.0) - exp(6.0)) / (exp(9.0) - exp(6.0)),g[1]);
 }
-TEST(log_diff_exp,AgradFvarFvarVar_Double_2ndderiv) {
+TEST(Agrad_Fwd_LogDiffExp,FvarFvarVar_Double_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::log_diff_exp;
@@ -307,7 +307,7 @@ TEST(log_diff_exp,AgradFvarFvarVar_Double_2ndderiv) {
                   ,g[0]);
 }
 
-TEST(log_diff_exp,AgradDouble_FvarFvarVar_2ndderiv) {
+TEST(Agrad_Fwd_LogDiffExp,Double_FvarFvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::log_diff_exp;

@@ -5,12 +5,12 @@
 #include <stan/agrad/var.hpp>
 #include <test/agrad/util.hpp>
 
-TEST(inv,AgradFvar) {
+TEST(Agrad_Fwd_Inv,Fvar) {
   using stan::agrad::fvar;
   using stan::math::inv;
 
   fvar<double> x(0.5);
-  x.d_ = 1.0;   // derivatives w.r.t. x
+  x.d_ = 1.0;   // Derivatives w.r.t. x
   fvar<double> a = inv(x);
 
   EXPECT_FLOAT_EQ(inv(0.5), a.val_);
@@ -45,7 +45,7 @@ TEST(inv,AgradFvar) {
   EXPECT_FLOAT_EQ(stan::math::negative_infinity(), g.d_);
 }   
 
-TEST(inv,AgradFvarVar_1stderiv) {
+TEST(Agrad_Fwd_Inv,FvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::inv;
@@ -61,7 +61,7 @@ TEST(inv,AgradFvarVar_1stderiv) {
   a.val_.grad(y,g);
   EXPECT_FLOAT_EQ(-1.0 / (0.5 * 0.5), g[0]);
 }
-TEST(inv,AgradFvarVar_2ndderiv) {
+TEST(Agrad_Fwd_Inv,FvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::inv;
@@ -74,7 +74,7 @@ TEST(inv,AgradFvarVar_2ndderiv) {
   a.d_.grad(y,g);
   EXPECT_FLOAT_EQ(-1.0 * -2.0 / (0.5 * 0.5 * 0.5), g[0]);
 }
-TEST(inv,AgradFvarFvarDouble) {
+TEST(Agrad_Fwd_Inv,FvarFvarDouble) {
   using stan::agrad::fvar;
   using stan::math::inv;
   using std::log;
@@ -90,7 +90,7 @@ TEST(inv,AgradFvarFvarDouble) {
   EXPECT_FLOAT_EQ(0, a.d_.val_);
   EXPECT_FLOAT_EQ(0, a.d_.d_);
 }
-TEST(inv,AgradFvarFvarVar_1stderiv) {
+TEST(Agrad_Fwd_Inv,FvarFvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::inv;
@@ -112,7 +112,7 @@ TEST(inv,AgradFvarFvarVar_1stderiv) {
   a.val_.val_.grad(p,g);
   EXPECT_FLOAT_EQ(-inv(0.5) * inv(0.5), g[0]);
 }
-TEST(inv,AgradFvarFvarVar_2ndderiv) {
+TEST(Agrad_Fwd_Inv,FvarFvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::inv;

@@ -4,7 +4,7 @@
 #include <stan/agrad/var.hpp>
 #include <test/agrad/util.hpp>
 
-TEST(lmgamma,AgradFvar) {
+TEST(Agrad_Fwd_Lmgamma,Fvar) {
   using stan::agrad::fvar;
   using stan::math::lmgamma;
 
@@ -16,7 +16,7 @@ TEST(lmgamma,AgradFvar) {
   EXPECT_FLOAT_EQ(4.9138227, a.d_);
 }
 
-TEST(lmgamma,AgradFvarVar_1stderiv) {
+TEST(Agrad_Fwd_Lmgamma,FvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::lmgamma;
@@ -32,7 +32,7 @@ TEST(lmgamma,AgradFvarVar_1stderiv) {
   a.val_.grad(y,g);
   EXPECT_FLOAT_EQ(4.9138227 / 2.1, g[0]);
 }
-TEST(lmgamma,AgradFvarVar_2ndderiv) {
+TEST(Agrad_Fwd_Lmgamma,FvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::lmgamma;
@@ -45,7 +45,7 @@ TEST(lmgamma,AgradFvarVar_2ndderiv) {
   a.d_.grad(y,g);
   EXPECT_FLOAT_EQ(2.9115787, g[0]);
 }
-TEST(lmgamma,AgradFvarFvarDouble) {
+TEST(Agrad_Fwd_Lmgamma,FvarFvarDouble) {
   using stan::agrad::fvar;
   using stan::math::lmgamma;
 
@@ -70,7 +70,7 @@ TEST(lmgamma,AgradFvarFvarDouble) {
   EXPECT_FLOAT_EQ(4.9138227, a.d_.val_);
   EXPECT_FLOAT_EQ(0, a.d_.d_);
 }
-TEST(lmgamma,AgradFvarFvarVar_1stderiv) {
+TEST(Agrad_Fwd_Lmgamma,FvarFvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::lmgamma;
@@ -106,7 +106,7 @@ TEST(lmgamma,AgradFvarFvarVar_1stderiv) {
   b.val_.val_.grad(q,r);
   EXPECT_FLOAT_EQ(4.9138227 / 2.1, r[0]);
 }
-TEST(lmgamma,AgradFvarFvarVar_2ndderiv) {
+TEST(Agrad_Fwd_Lmgamma,FvarFvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::lmgamma;

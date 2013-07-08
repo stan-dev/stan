@@ -3,7 +3,7 @@
 #include <stan/agrad/var.hpp>
 #include <test/agrad/util.hpp>
 
-TEST(fmod,AgradFvar) {
+TEST(Agrad_Fwd_Fmod,Fvar) {
   using stan::agrad::fvar;
   using std::fmod;
   using std::floor;
@@ -26,7 +26,7 @@ TEST(fmod,AgradFvar) {
   EXPECT_FLOAT_EQ(fmod(3.0, 2.0), f.val_);
   EXPECT_FLOAT_EQ(1.0 * -floor(3.0 / 2.0), f.d_);
  }
-TEST(fmod,AgradFvarVar_FvarVar_1stderiv) {
+TEST(Agrad_Fwd_Fmod,FvarVar_FvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::fmod;
@@ -44,7 +44,7 @@ TEST(fmod,AgradFvarVar_FvarVar_1stderiv) {
   EXPECT_FLOAT_EQ(1,g[0]);
   std::isnan(g[1]);
 }
-TEST(fmod,AgradFvarVar_Double_1stderiv) {
+TEST(Agrad_Fwd_Fmod,FvarVar_Double_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::fmod;
@@ -61,7 +61,7 @@ TEST(fmod,AgradFvarVar_Double_1stderiv) {
   a.val_.grad(y,g);
   EXPECT_FLOAT_EQ(1,g[0]);
 }
-TEST(fmod,AgradDouble_FvarVar_1stderiv) {
+TEST(Agrad_Fwd_Fmod,Double_FvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::fmod;
@@ -78,7 +78,7 @@ TEST(fmod,AgradDouble_FvarVar_1stderiv) {
   a.val_.grad(y,g);
   std::isnan(g[0]);
 }
-TEST(fmod,AgradFvarVar_FvarVar_2ndderiv) {
+TEST(Agrad_Fwd_Fmod,FvarVar_FvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::fmod;
@@ -96,7 +96,7 @@ TEST(fmod,AgradFvarVar_FvarVar_2ndderiv) {
   EXPECT_FLOAT_EQ(0,g[0]);
   std::isnan(g[1]);
 }
-TEST(fmod,AgradFvarVar_Double_2ndderiv) {
+TEST(Agrad_Fwd_Fmod,FvarVar_Double_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::fmod;
@@ -113,7 +113,7 @@ TEST(fmod,AgradFvarVar_Double_2ndderiv) {
   a.d_.grad(y,g);
   EXPECT_FLOAT_EQ(0,g[0]);
 }
-TEST(fmod,AgradDouble_FvarVar_2ndderiv) {
+TEST(Agrad_Fwd_Fmod,Double_FvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::fmod;
@@ -130,7 +130,7 @@ TEST(fmod,AgradDouble_FvarVar_2ndderiv) {
   a.d_.grad(y,g);
   std::isnan(g[0]);
 }
-TEST(fmod,AgradFvarFvarDouble) {
+TEST(Agrad_Fwd_Fmod,FvarFvarDouble) {
   using stan::agrad::fvar;
   using std::fmod;
 
@@ -149,7 +149,7 @@ TEST(fmod,AgradFvarFvarDouble) {
   EXPECT_FLOAT_EQ(0, a.d_.val_);
   EXPECT_FLOAT_EQ(0, a.d_.d_);
 }
-TEST(fmod,AgradFvarFvarVar_FvarFvarVar_1stderiv) {
+TEST(Agrad_Fwd_Fmod,FvarFvarVar_FvarFvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::fmod;
@@ -175,7 +175,7 @@ TEST(fmod,AgradFvarFvarVar_FvarFvarVar_1stderiv) {
   EXPECT_FLOAT_EQ(1, r[0]);
   EXPECT_FLOAT_EQ(0, r[1]);
 }
-TEST(fmod,AgradFvarFvarVar_Double_1stderiv) {
+TEST(Agrad_Fwd_Fmod,FvarFvarVar_Double_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::fmod;
@@ -198,7 +198,7 @@ TEST(fmod,AgradFvarFvarVar_Double_1stderiv) {
   a.val_.val_.grad(q,r);
   EXPECT_FLOAT_EQ(1, r[0]);
 }
-TEST(fmod,AgradDouble_FvarFvarVar_1stderiv) {
+TEST(Agrad_Fwd_Fmod,Double_FvarFvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::fmod;
@@ -220,7 +220,7 @@ TEST(fmod,AgradDouble_FvarFvarVar_1stderiv) {
   a.val_.val_.grad(q,r);
   EXPECT_FLOAT_EQ(0, r[0]);
 }
-TEST(fmod,AgradFvarFvarVar_FvarFvarVar_2ndderiv_x) {
+TEST(Agrad_Fwd_Fmod,FvarFvarVar_FvarFvarVar_2ndDeriv_x) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::fmod;
@@ -246,7 +246,7 @@ TEST(fmod,AgradFvarFvarVar_FvarFvarVar_2ndderiv_x) {
   EXPECT_FLOAT_EQ(0, r[0]);
   EXPECT_FLOAT_EQ(0, r[1]);
 }
-TEST(fmod,AgradFvarFvarVar_FvarFvarVar_2ndderiv_y) {
+TEST(Agrad_Fwd_Fmod,FvarFvarVar_FvarFvarVar_2ndDeriv_y) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::fmod;
@@ -266,7 +266,7 @@ TEST(fmod,AgradFvarFvarVar_FvarFvarVar_2ndderiv_y) {
   EXPECT_FLOAT_EQ(0, r[0]);
   EXPECT_FLOAT_EQ(0, r[1]);
 }
-TEST(fmod,AgradFvarFvarVar_Double_2ndderiv) {
+TEST(Agrad_Fwd_Fmod,FvarFvarVar_Double_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::fmod;
@@ -284,7 +284,7 @@ TEST(fmod,AgradFvarFvarVar_Double_2ndderiv) {
   a.val_.d_.grad(q,r);
   EXPECT_FLOAT_EQ(0, r[0]);
 }
-TEST(fmod,AgradDouble_FvarFvarVar_2ndderiv) {
+TEST(Agrad_Fwd_Fmod,Double_FvarFvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::fmod;
@@ -301,6 +301,3 @@ TEST(fmod,AgradDouble_FvarFvarVar_2ndderiv) {
   a.d_.val_.grad(q,r);
   EXPECT_FLOAT_EQ(0, r[0]);
 }
-
-
-

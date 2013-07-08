@@ -4,7 +4,7 @@
 #include <stan/agrad/var.hpp>
 #include <test/agrad/util.hpp>
 
-TEST(lgamma,AgradFvar) {
+TEST(Agrad_Fwd_Lgamma,Fvar) {
   using stan::agrad::fvar;
   using boost::math::lgamma;
   using boost::math::digamma;
@@ -16,7 +16,7 @@ TEST(lgamma,AgradFvar) {
   EXPECT_FLOAT_EQ(digamma(0.5), a.d_);
 }
 
-TEST(lgamma,AgradFvarVar_1stderiv) {
+TEST(Agrad_Fwd_Lgamma,FvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using boost::math::lgamma;
@@ -33,7 +33,7 @@ TEST(lgamma,AgradFvarVar_1stderiv) {
   a.val_.grad(y,g);
   EXPECT_FLOAT_EQ(digamma(0.5), g[0]);
 }
-TEST(lgamma,AgradFvarVar_2ndderiv) {
+TEST(Agrad_Fwd_Lgamma,FvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using boost::math::lgamma;
@@ -47,10 +47,10 @@ TEST(lgamma,AgradFvarVar_2ndderiv) {
 
   AVEC y = createAVEC(x.val_);
   VEC g;
-  a.val_.grad(y,g);
+  a.d_.grad(y,g);
   EXPECT_FLOAT_EQ(1.3 * 4.9348022, g[0]);
 }
-TEST(lgamma,AgradFvarFvarDouble) {
+TEST(Agrad_Fwd_Lgamma,FvarFvarDouble) {
   using stan::agrad::fvar;
   using boost::math::lgamma;
   using boost::math::digamma;
@@ -76,7 +76,7 @@ TEST(lgamma,AgradFvarFvarDouble) {
   EXPECT_FLOAT_EQ(digamma(0.5), a.d_.val_);
   EXPECT_FLOAT_EQ(0, a.d_.d_);
 }
-TEST(lgamma,AgradFvarFvarVar_1stderiv) {
+TEST(Agrad_Fwd_Lgamma,FvarFvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using boost::math::lgamma;
@@ -113,7 +113,7 @@ TEST(lgamma,AgradFvarFvarVar_1stderiv) {
   b.val_.val_.grad(q,r);
   EXPECT_FLOAT_EQ(digamma(0.5), r[0]);
 }
-TEST(lgamma,AgradFvarFvarVar_2ndderiv) {
+TEST(Agrad_Fwd_Lgamma,FvarFvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using boost::math::lgamma;

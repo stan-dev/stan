@@ -3,7 +3,7 @@
 #include <stan/agrad/var.hpp>
 #include <test/agrad/util.hpp>
 
-TEST(AgradFvar, operatorMultiplyEqual) {
+TEST(Agrad_Fwd_OperatorMultiplyEqual, Fvar) {
   using stan::agrad::fvar;
 
   fvar<double> a(0.5,1.0);
@@ -31,7 +31,7 @@ TEST(AgradFvar, operatorMultiplyEqual) {
   EXPECT_FLOAT_EQ(1.0 * -0.4 + 2.0 * 0.5, d.d_);
 }
 
-TEST(AgradFvarVar, operatorMultiplyEqual) {
+TEST(Agrad_Fwd_OperatorMultiplyEqual, FvarVar_FvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
 
@@ -48,8 +48,51 @@ TEST(AgradFvarVar, operatorMultiplyEqual) {
   EXPECT_FLOAT_EQ(1, g[0]);
   EXPECT_FLOAT_EQ(0.5, g[1]);
 }
+TEST(Agrad_Fwd_OperatorMultiplyEqual, FvarVar_Double_1stDeriv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
 
-TEST(AgradFvarFvar, operatorMultiplyEqual) {
+  fvar<var> x(0.5,1.3);
+  double z(0.5);
+  x *= z;
+
+  EXPECT_FLOAT_EQ(0.25, x.val_.val());
+  EXPECT_FLOAT_EQ(1.3, x.d_.val());
+
+  AVEC y = createAVEC(x.val_);
+  VEC g;
+  x.val_.grad(y,g);
+  EXPECT_FLOAT_EQ(1, g[0]);
+}
+TEST(Agrad_Fwd_OperatorMultiplyEqual, FvarVar_2ndDeriv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+
+  fvar<var> x(0.5,1.3);
+  fvar<var> z(0.5,1.3);
+  x *= z;
+
+  AVEC y = createAVEC(x.val_,z.val_);
+  VEC g;
+  x.d_.grad(y,g);
+  EXPECT_FLOAT_EQ(0, g[0]);
+  EXPECT_FLOAT_EQ(1.3, g[1]);
+}
+TEST(Agrad_Fwd_OperatorMultiplyEqual, FvarVar_Double_2ndDeriv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+
+  fvar<var> x(0.5,1.3);
+  double z(0.5);
+  x *= z;
+
+  AVEC y = createAVEC(x.val_);
+  VEC g;
+  x.d_.grad(y,g);
+  EXPECT_FLOAT_EQ(0, g[0]);
+}
+
+TEST(Agrad_Fwd_OperatorMultiplyEqual, FvarFvarDouble) {
   using stan::agrad::fvar;
 
   fvar<fvar<double> > x;
@@ -66,3 +109,101 @@ TEST(AgradFvarFvar, operatorMultiplyEqual) {
   EXPECT_FLOAT_EQ(0.5, x.d_.val_);
   EXPECT_FLOAT_EQ(1, x.d_.d_);
 }
+TEST(Agrad_Fwd_OperatorMultiplyEqual, FvarFvarVar_FvarFvarVar_1stDeriv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+
+  fvar<fvar<var> > x;
+  x.val_.val_ = 0.5;
+  x.val_.d_ = 1.0;
+  fvar<fvar<var> > y;
+  y.val_.val_ = 0.5;
+  y.d_.val_ = 1.0;
+
+  x *= y;
+  EXPECT_FLOAT_EQ(0.25, x.val_.val_.val());
+  EXPECT_FLOAT_EQ(0.5, x.val_.d_.val());
+  EXPECT_FLOAT_EQ(0.5, x.d_.val_.val());
+  EXPECT_FLOAT_EQ(1, x.d_.d_.val());
+
+  AVEC p = createAVEC(x.val_.val_,y.val_.val_);
+  VEC g;
+  x.val_.val_.grad(p,g);
+  EXPECT_FLOAT_EQ(1.0, g[0]);
+  EXPECT_FLOAT_EQ(0.5, g[1]);
+}
+TEST(Agrad_Fwd_OperatorMultiplyEqual, FvarFvarVar_Double_1stDeriv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+
+  fvar<fvar<var> > x;
+  x.val_.val_ = 0.5;
+  x.val_.d_ = 1.0;
+  double y(0.5);
+
+  x *= y;
+  EXPECT_FLOAT_EQ(0.25, x.val_.val_.val());
+  EXPECT_FLOAT_EQ(1, x.val_.d_.val());
+  EXPECT_FLOAT_EQ(0, x.d_.val_.val());
+  EXPECT_FLOAT_EQ(0, x.d_.d_.val());
+
+  AVEC p = createAVEC(x.val_.val_);
+  VEC g;
+  x.val_.val_.grad(p,g);
+  EXPECT_FLOAT_EQ(1.0, g[0]);
+}
+TEST(Agrad_Fwd_OperatorMultiplyEqual, FvarFvarVar_FvarFvarVar_2ndDeriv_x) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+
+  fvar<fvar<var> > x;
+  x.val_.val_ = 0.5;
+  x.val_.d_ = 1.0;
+  fvar<fvar<var> > y;
+  y.val_.val_ = 0.5;
+  y.d_.val_ = 1.0;
+
+  x *= y;
+
+  AVEC p = createAVEC(x.val_.val_,y.val_.val_);
+  VEC g;
+  x.val_.d_.grad(p,g);
+  EXPECT_FLOAT_EQ(0, g[0]);
+  EXPECT_FLOAT_EQ(1, g[1]);
+}
+TEST(Agrad_Fwd_OperatorMultiplyEqual, FvarFvarVar_FvarFvarVar_2ndDeriv_y) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+
+  fvar<fvar<var> > x;
+  x.val_.val_ = 0.5;
+  x.val_.d_ = 1.0;
+  fvar<fvar<var> > y;
+  y.val_.val_ = 0.5;
+  y.d_.val_ = 1.0;
+
+  x *= y;
+
+  AVEC p = createAVEC(x.val_.val_,y.val_.val_);
+  VEC g;
+  x.d_.val_.grad(p,g);
+  EXPECT_FLOAT_EQ(0, g[0]);
+  EXPECT_FLOAT_EQ(0, g[1]);
+}
+TEST(Agrad_Fwd_OperatorMultiplyEqual, FvarFvarVar_Double_2ndDeriv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+
+  fvar<fvar<var> > x;
+  x.val_.val_ = 0.5;
+  x.val_.d_ = 1.0;
+  double y(0.5);
+
+  x *= y;
+
+  AVEC p = createAVEC(x.val_.val_);
+  VEC g;
+  x.val_.d_.grad(p,g);
+  EXPECT_FLOAT_EQ(0, g[0]);
+}
+

@@ -4,7 +4,7 @@
 #include <stan/agrad/var.hpp>
 #include <test/agrad/util.hpp>
 
-TEST(log_falling_factorial,AgradFvar) {
+TEST(Agrad_Fwd_LogFallingFactorial,Fvar) {
   using stan::agrad::fvar;
   using stan::agrad::log_falling_factorial;
   using boost::math::digamma;
@@ -28,7 +28,7 @@ TEST(log_falling_factorial,AgradFvar) {
   EXPECT_FLOAT_EQ(std::log(5.0), x.val_);
   EXPECT_FLOAT_EQ(-digamma(5.0),x.d_);
 }
-TEST(log_falling_factorial,AgradFvarVar_FvarVar_1stderiv) {
+TEST(Agrad_Fwd_LogFallingFactorial,FvarVar_FvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::agrad::log_falling_factorial;
@@ -46,7 +46,7 @@ TEST(log_falling_factorial,AgradFvarVar_FvarVar_1stderiv) {
   EXPECT_FLOAT_EQ(1.5061177, g[0]);
   EXPECT_FLOAT_EQ(-1.2561177, g[1]);
 }
-TEST(log_falling_factorial,AgradFvarVar_Double_1stderiv) {
+TEST(Agrad_Fwd_LogFallingFactorial,FvarVar_Double_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::agrad::log_falling_factorial;
@@ -63,7 +63,7 @@ TEST(log_falling_factorial,AgradFvarVar_Double_1stderiv) {
   c.val_.grad(y,g);
   EXPECT_FLOAT_EQ(1.5061177, g[0]);
 }
-TEST(log_falling_factorial,AgradDouble_FvarVar_1stderiv) {
+TEST(Agrad_Fwd_LogFallingFactorial,Double_FvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::agrad::log_falling_factorial;
@@ -80,7 +80,7 @@ TEST(log_falling_factorial,AgradDouble_FvarVar_1stderiv) {
   c.val_.grad(y,g);
   EXPECT_FLOAT_EQ(-1.2561177, g[0]);
 }
-TEST(log_falling_factorial,AgradFvarVar_FvarVar_2ndderiv) {
+TEST(Agrad_Fwd_LogFallingFactorial,FvarVar_FvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::agrad::log_falling_factorial;
@@ -95,7 +95,7 @@ TEST(log_falling_factorial,AgradFvarVar_FvarVar_2ndderiv) {
   EXPECT_FLOAT_EQ(0.22132295, g[0]);
   EXPECT_FLOAT_EQ(-0.28382295, g[1]);
 }
-TEST(log_falling_factorial,AgradFvarVar_Double_2ndderiv) {
+TEST(Agrad_Fwd_LogFallingFactorial,FvarVar_Double_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::agrad::log_falling_factorial;
@@ -109,7 +109,7 @@ TEST(log_falling_factorial,AgradFvarVar_Double_2ndderiv) {
   c.d_.grad(y,g);
   EXPECT_FLOAT_EQ(0.22132295, g[0]);
 }
-TEST(log_falling_factorial,AgradDouble_FvarVar_2ndderiv) {
+TEST(Agrad_Fwd_LogFallingFactorial,Double_FvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::agrad::log_falling_factorial;
@@ -123,7 +123,7 @@ TEST(log_falling_factorial,AgradDouble_FvarVar_2ndderiv) {
   c.d_.grad(y,g);
   EXPECT_FLOAT_EQ(-0.28382295, g[0]);
 }
-TEST(log_falling_factorial,AgradFvarFvarDouble) {
+TEST(Agrad_Fwd_LogFallingFactorial,FvarFvarDouble) {
   using stan::agrad::fvar;
   using stan::math::log_falling_factorial;
 
@@ -142,7 +142,7 @@ TEST(log_falling_factorial,AgradFvarFvarDouble) {
   EXPECT_FLOAT_EQ(-1.2561177, a.d_.val_);
   EXPECT_FLOAT_EQ(0, a.d_.d_);
 }
-TEST(log_falling_factorial,AgradFvarFvarVar_FvarFvarVar_1stderiv) {
+TEST(Agrad_Fwd_LogFallingFactorial,FvarFvarVar_FvarFvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::log_falling_factorial;
@@ -168,7 +168,7 @@ TEST(log_falling_factorial,AgradFvarFvarVar_FvarFvarVar_1stderiv) {
   EXPECT_FLOAT_EQ(1.5061177, g[0]);
   EXPECT_FLOAT_EQ(-1.2561177, g[1]);
 }
-TEST(log_falling_factorial,AgradFvarFvarVar_Double_1stderiv) {
+TEST(Agrad_Fwd_LogFallingFactorial,FvarFvarVar_Double_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::log_falling_factorial;
@@ -192,7 +192,7 @@ TEST(log_falling_factorial,AgradFvarFvarVar_Double_1stderiv) {
 }
 
 
-TEST(log_falling_factorial,AgradDouble_FvarFvarVar_1stderiv) {
+TEST(Agrad_Fwd_LogFallingFactorial,Double_FvarFvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::log_falling_factorial;
@@ -214,7 +214,7 @@ TEST(log_falling_factorial,AgradDouble_FvarFvarVar_1stderiv) {
   a.val_.val_.grad(p,g);
   EXPECT_FLOAT_EQ(-1.2561177, g[0]);
 }
-TEST(log_falling_factorial,AgradFvarFvarVar_FvarFvarVar_2ndderiv_x) {
+TEST(Agrad_Fwd_LogFallingFactorial,FvarFvarVar_FvarFvarVar_2ndDeriv_x) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::log_falling_factorial;
@@ -235,7 +235,7 @@ TEST(log_falling_factorial,AgradFvarFvarVar_FvarFvarVar_2ndderiv_x) {
   EXPECT_FLOAT_EQ(0.22132295, g[0]);
   EXPECT_FLOAT_EQ(0, g[1]);
 }
-TEST(log_falling_factorial,AgradFvarFvarVar_FvarFvarVar_2ndderiv_y) {
+TEST(Agrad_Fwd_LogFallingFactorial,FvarFvarVar_FvarFvarVar_2ndDeriv_y) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::log_falling_factorial;
@@ -256,7 +256,7 @@ TEST(log_falling_factorial,AgradFvarFvarVar_FvarFvarVar_2ndderiv_y) {
   EXPECT_FLOAT_EQ(0, g[0]);
   EXPECT_FLOAT_EQ(-0.28382295, g[1]);
 }
-TEST(log_falling_factorial,AgradFvarFvarVar_Double_2ndderiv) {
+TEST(Agrad_Fwd_LogFallingFactorial,FvarFvarVar_Double_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::log_falling_factorial;
@@ -273,7 +273,7 @@ TEST(log_falling_factorial,AgradFvarFvarVar_Double_2ndderiv) {
   a.val_.d_.grad(p,g);
   EXPECT_FLOAT_EQ(0.22132295, g[0]);
 }
-TEST(log_falling_factorial,AgradDouble_FvarFvarVar_2ndderiv) {
+TEST(Agrad_Fwd_LogFallingFactorial,Double_FvarFvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::log_falling_factorial;
