@@ -637,6 +637,61 @@ $\Gamma$ function, defining
 \]
 }
 %
+\fitem{real}{bessel\_first\_kind}{real \farg{v}, real \farg{z}}{The Bessel function of the first kind with order \farg{v} applied to \farg{z} defined for all \farg{z} and \farg{v} by
+\[
+{J_v}(z) = \left(\frac{1}{2}z\right)^v\sum_{k=0}^\infty \frac{\left(-\frac{1}{4}z^2\right)^k}{k!\Gamma(v+k+1)}
+\]
+}
+%
+\fitem{real}{bessel\_second\_kind}{real \farg{v}, real \farg{z}}{
+The Bessel function of the second kind with order \farg{v} applied to \farg{z} defined for  positive \farg{z} and \farg{v} by
+\[
+{Y_v}(z)
+=
+\frac{J_v(z)\cos(v\pi) - J_{-v}(z)}{\sin(v\pi)}
+\]
+}
+%
+\fitem{real}{modified\_bessel\_first\_kind}{real \farg{v}, real \farg{z}}{The modified Bessel function of the first kind with order \farg{v} applied to \farg{z} defined for all \farg{z} and \farg{v} by
+\[
+{I_v}(z) = \left(\frac{1}{2}z\right)^v\sum_{k=0}^\infty \frac{\left(\frac{1}{4}z^2\right)^k}{k!\Gamma(v+k+1)}
+\]
+}
+%
+\fitem{real}{modified\_bessel\_second\_kind}{real \farg{v}, real \farg{z}}{
+The modified Bessel function of the second kind with order \farg{v} applied to \farg{z} defined for  positive \farg{z} and \farg{v} by
+\[
+{K_v}(z)
+=
+\frac{\pi}{2}\cdot\frac{I_{-v}(z) - I_{v}(z)}{\sin(v\pi)}
+\]
+}
+%
+\fitem{real}{falling\_factorial}{real \farg{x}, real \farg{n}}{
+The falling factorial of \farg{x} with power \farg{n} defined for positive \farg{x} and real \farg{n} by
+\[
+\mbox{falling\_factorial}(x,n)
+=
+\frac{x!}{n!}
+\]
+}
+%
+\fitem{real}{log\_falling\_factorial}{real \farg{x}, real \farg{n}}{
+The log of the falling factorial of \farg{x} with power \farg{n} defined for positive \farg{x} and real \farg{n}.
+}
+%
+\fitem{real}{rising\_factorial}{real \farg{x}, real \farg{n}}{
+The rising factorial of \farg{x} with power \farg{n} defined for positive \farg{x} and real \farg{n} by
+\[
+\mbox{rising\_factorial}(x,n)
+=
+\frac{(x+n-1)!}{(x-1)!}
+\]
+}
+%
+\fitem{real}{log\_rising\_factorial}{real \farg{x}, real \farg{n}}{
+The log of the rising factorial of \farg{x} with power \farg{n} defined for positive \farg{x} and real \farg{n}.
+}
 \end{description}
 
 
@@ -772,7 +827,7 @@ reals, matrices, vectors, and row vectors.
 \end{description}
 
 
-\section{Array Broadcasting}
+\section{Array Broadcasting}\label{array-broadcasting.section}
 
 The following operations create arrays by repeating elements to fill
 an array of a specified size.  These operations work for all input
@@ -794,11 +849,32 @@ matrices, or arrays.
 \end{description}
 %
 For example, \code{rep\_array(1.0,5)} produces a real array (type
-\code{real[]}) of size 5 with all values set to 1.0; if \code{v} is a
-vector, then \code{rep\_array(v,27)} is a size 27 array consisting of
-27 copies of the vector \code{v}.  They are copies in the sense that
-changing elements of the returned array does not change the value in
-\code{v}.  
+\code{real[]}) of size 5 with all values set to 1.0.  On the other
+hand, \code{rep\_array(1,5)} produces an integer array (type
+\code{int[]}) of size 5 with all values set to 1.  This distinction is
+important because it is not possible to assign an integer array to a
+real array.  For example, the following example contrasts legal with
+illegal array creation and assignment
+%
+\begin{quote}
+\begin{Verbatim}
+real y[5];
+int x[5];
+
+x <- rep_array(1,5);     // ok
+y <- rep_array(1.0,5);   // ok
+
+x <- rep_array(1.0,5);   // illegal 
+y <- rep_array(1,5);     // illegal
+
+x <- y;                  // illegal
+y <- x;                  // illegal
+\end{Verbatim}
+\end{quote}
+
+If the value being repeated \code{v} is a vector (i.e., \code{T} is
+\code{vector}), then \code{rep\_array(v,27)} is a size 27 array
+consisting of 27 copies of the vector \code{v}.
 %
 \begin{quote}
 \begin{Verbatim}
@@ -1371,10 +1447,34 @@ vertically or stacking copies of column vectors horizontally.
   \fitem{matrix}{rep\_matrix}{row\_vector \farg{rv}, int
     \farg{m}}{Return the \farg{m} by \farg{n} matrix consisting of
     \farg{m} copies of the row vector \farg{rv} of size \farg{n}.}
-
 %
 \end{description}
+%
 
+Unlike the situation with array broadcasting (see \refsection{array-broadcasting}), where there is a
+distinction between integer and real arguments, the following two
+statements produce the same result for vector broadcasting;  row vector
+and matrix broadcasting behave similarly.
+%
+\begin{quote}
+\begin{Verbatim}
+vector[3] x;
+x <- rep_vector(1, 3);
+x <- rep_vector(1.0, 3);  
+\end{Verbatim}
+\end{quote}
+%
+There are no integer vector or matrix types, so integer values are
+automatically promoted.
+%
+\begin{description}
+%
+\fitem{vector}{to\_vector}{matrix \farg{m}}{
+Return the matrix \farg{m} as a vector in column-major order.}
+%
+\fitem{vector}{to\_vector}{row\_vector \farg{m}}{
+Return the row vector \farg{m} as a vector in column-major order.}
+\end{description}
 
 \section{Slice and Package Functions}
 
