@@ -6,13 +6,13 @@
 #include <stan/agrad/var.hpp>
 
 TEST(AgradFwdMatrix, crossprod_3x3_matrix) {
-  using stan::agrad::matrix_fv;
+  using stan::agrad::matrix_fd;
   using stan::math::matrix_d;
   matrix_d Z(3,3);
   Z << 1, 0, 0,
     2, 3, 0,
     4, 5, 6;
-  matrix_fv Y(3,3);
+  matrix_fd Y(3,3);
   Y << 1, 0, 0,
     2, 3, 0,
     4, 5, 6;
@@ -26,7 +26,7 @@ TEST(AgradFwdMatrix, crossprod_3x3_matrix) {
    Y(2,1).d_ = 2.0;
    Y(2,2).d_ = 2.0;
   matrix_d X = Z.transpose() * Z;
-  matrix_fv output = stan::agrad::crossprod(Y);
+  matrix_fd output = stan::agrad::crossprod(Y);
   for(int i = 0; i < 3; i++) {
     for(int j = 0; j < 3; j++)
       EXPECT_FLOAT_EQ(X(i,j), output(i,j).val_);
@@ -43,12 +43,12 @@ TEST(AgradFwdMatrix, crossprod_3x3_matrix) {
   EXPECT_FLOAT_EQ(24,output(2,2).d_);
 }
 TEST(AgradFwdMatrix, crossprod_2x2_matrix) {
-  using stan::agrad::matrix_fv;
+  using stan::agrad::matrix_fd;
   using stan::math::matrix_d;
   matrix_d Z(2,2);
   Z <<3, 0,
      4, -3;
-  matrix_fv Y(2,2);
+  matrix_fd Y(2,2);
   Y << 3, 0,
      4, -3;
    Y(0,0).d_ = 2.0;
@@ -56,7 +56,7 @@ TEST(AgradFwdMatrix, crossprod_2x2_matrix) {
    Y(1,0).d_ = 2.0;
    Y(1,1).d_ = 2.0;
   matrix_d X = Z.transpose() * Z;
-  matrix_fv output = stan::agrad::crossprod(Y);
+  matrix_fd output = stan::agrad::crossprod(Y);
   for(int i = 0; i < 2; i++) {
     for(int j = 0; j < 2; j++)
       EXPECT_FLOAT_EQ(X(i,j), output(i,j).val_);
@@ -68,34 +68,34 @@ TEST(AgradFwdMatrix, crossprod_2x2_matrix) {
   EXPECT_FLOAT_EQ(-12,output(1,1).d_);
 }
 TEST(AgradFwdMatrix, crossprod_1x1_matrix) {
-  using stan::agrad::matrix_fv;
+  using stan::agrad::matrix_fd;
 
-  matrix_fv Y(1,1);
+  matrix_fd Y(1,1);
   Y << 3;
    Y(0,0).d_ = 2.0;
-  matrix_fv output = stan::agrad::crossprod(Y);
+  matrix_fd output = stan::agrad::crossprod(Y);
   EXPECT_FLOAT_EQ( 9, output(0,0).val_);
   EXPECT_FLOAT_EQ(12, output(0,0).d_);
 }
 TEST(AgradFwdMatrix, crossprod_1x3_matrix) {
-  using stan::agrad::matrix_fv;
+  using stan::agrad::matrix_fd;
   using stan::math::matrix_d;
 
-  matrix_fv Y(1,3);
+  matrix_fd Y(1,3);
   Y << 1, 2,3;
    Y(0,0).d_ = 2.0;
    Y(0,1).d_ = 2.0;
    Y(0,2).d_ = 2.0;
-  matrix_fv output = stan::agrad::crossprod(Y);
+  matrix_fd output = stan::agrad::crossprod(Y);
 
   EXPECT_FLOAT_EQ(1, output(0,0).val_); 
   EXPECT_FLOAT_EQ(4,output(0,0).d_);
 }
 TEST(AgradFwdMatrix, crossprod_2x3_matrix) {
-  using stan::agrad::matrix_fv;
+  using stan::agrad::matrix_fd;
   using stan::math::matrix_d;
 
-  matrix_fv Y(2,3);
+  matrix_fd Y(2,3);
   Y << 1, 2,3,
     -1, 4, -9;
    Y(0,0).d_ = 2.0;
@@ -104,7 +104,7 @@ TEST(AgradFwdMatrix, crossprod_2x3_matrix) {
    Y(1,0).d_ = 2.0;
    Y(1,1).d_ = 2.0;
    Y(1,2).d_ = 2.0;
-  matrix_fv output = stan::agrad::crossprod(Y);
+  matrix_fd output = stan::agrad::crossprod(Y);
 
   EXPECT_FLOAT_EQ( 2, output(0,0).val_); 
   EXPECT_FLOAT_EQ(-2, output(0,1).val_); 
@@ -116,10 +116,10 @@ TEST(AgradFwdMatrix, crossprod_2x3_matrix) {
   EXPECT_FLOAT_EQ(24, output(1,1).d_); 
 }
 TEST(AgradFwdMatrix, crossprod_3x2_matrix) {
-  using stan::agrad::matrix_fv;
+  using stan::agrad::matrix_fd;
   using stan::math::matrix_d;
 
-  matrix_fv Y(3,2);
+  matrix_fd Y(3,2);
   Y << 1, 2,3,
     -1, 4, -9;
    Y(0,0).d_ = 2.0;
@@ -128,7 +128,7 @@ TEST(AgradFwdMatrix, crossprod_3x2_matrix) {
    Y(1,1).d_ = 2.0;
    Y(2,0).d_ = 2.0;
    Y(2,1).d_ = 2.0;
-  matrix_fv output = stan::agrad::crossprod(Y);
+  matrix_fd output = stan::agrad::crossprod(Y);
 
   EXPECT_FLOAT_EQ( 26, output(0,0).val_); 
   EXPECT_FLOAT_EQ(-37, output(0,1).val_); 
@@ -140,7 +140,7 @@ TEST(AgradFwdMatrix, crossprod_3x2_matrix) {
   EXPECT_FLOAT_EQ(-32, output(1,1).d_); 
 }
 TEST(AgradFwdFvarVarMatrix, crossprod_3x3_matrix) {
-  using stan::agrad::matrix_fvv;
+  using stan::agrad::matrix_fv;
   using stan::math::matrix_d;
   using stan::agrad::fvar;
   using stan::agrad::var;
@@ -157,11 +157,11 @@ TEST(AgradFwdFvarVarMatrix, crossprod_3x3_matrix) {
   fvar<var> e(5.0,2.0);
   fvar<var> f(6.0,2.0);
   fvar<var> g(0.0,2.0);
-  matrix_fvv Y(3,3);
+  matrix_fv Y(3,3);
   Y << a,g,g,b,c,g,d,e,f;
 
   matrix_d X = Z.transpose() * Z;
-  matrix_fvv output = stan::agrad::crossprod(Y);
+  matrix_fv output = stan::agrad::crossprod(Y);
   for(int i = 0; i < 3; i++) {
     for(int j = 0; j < 3; j++)
       EXPECT_FLOAT_EQ(X(i,j), output(i,j).val_.val());
@@ -178,7 +178,7 @@ TEST(AgradFwdFvarVarMatrix, crossprod_3x3_matrix) {
   EXPECT_FLOAT_EQ(24,output(2,2).d_.val());
 }
 TEST(AgradFwdFvarVarMatrix, crossprod_2x2_matrix) {
-  using stan::agrad::matrix_fvv;
+  using stan::agrad::matrix_fv;
   using stan::math::matrix_d;
   using stan::agrad::fvar;
   using stan::agrad::var;
@@ -192,10 +192,10 @@ TEST(AgradFwdFvarVarMatrix, crossprod_2x2_matrix) {
   fvar<var> c(4.0,2.0);
   fvar<var> d(-3.0,2.0);
 
-  matrix_fvv Y(2,2);
+  matrix_fv Y(2,2);
   Y << a,b,c,d;
   matrix_d X = Z.transpose() * Z;
-  matrix_fvv output = stan::agrad::crossprod(Y);
+  matrix_fv output = stan::agrad::crossprod(Y);
   for(int i = 0; i < 2; i++) {
     for(int j = 0; j < 2; j++)
       EXPECT_FLOAT_EQ(X(i,j), output(i,j).val_.val());
@@ -207,20 +207,20 @@ TEST(AgradFwdFvarVarMatrix, crossprod_2x2_matrix) {
   EXPECT_FLOAT_EQ(-12,output(1,1).d_.val());
 }
 TEST(AgradFwdFvarVarMatrix, crossprod_1x1_matrix) {
-  using stan::agrad::matrix_fvv;
+  using stan::agrad::matrix_fv;
   using stan::agrad::fvar;
   using stan::agrad::var;
 
   fvar<var> a(3.0,2.0);
 
-  matrix_fvv Y(1,1);
+  matrix_fv Y(1,1);
   Y << a;
-  matrix_fvv output = stan::agrad::crossprod(Y);
+  matrix_fv output = stan::agrad::crossprod(Y);
   EXPECT_FLOAT_EQ( 9, output(0,0).val_.val());
   EXPECT_FLOAT_EQ(12, output(0,0).d_.val());
 }
 TEST(AgradFwdFvarVarMatrix, crossprod_1x3_matrix) {
-  using stan::agrad::matrix_fvv;
+  using stan::agrad::matrix_fv;
   using stan::math::matrix_d;
   using stan::agrad::fvar;
   using stan::agrad::var;
@@ -229,15 +229,15 @@ TEST(AgradFwdFvarVarMatrix, crossprod_1x3_matrix) {
   fvar<var> b(2.0,2.0);
   fvar<var> c(3.0,2.0);
 
-  matrix_fvv Y(1,3);
+  matrix_fv Y(1,3);
   Y << a,b,c;
-  matrix_fvv output = stan::agrad::crossprod(Y);
+  matrix_fv output = stan::agrad::crossprod(Y);
 
   EXPECT_FLOAT_EQ(1, output(0,0).val_.val()); 
   EXPECT_FLOAT_EQ(4,output(0,0).d_.val());
 }
 TEST(AgradFwdFvarVarMatrix, crossprod_2x3_matrix) {
-  using stan::agrad::matrix_fvv;
+  using stan::agrad::matrix_fv;
   using stan::math::matrix_d;
   using stan::agrad::fvar;
   using stan::agrad::var;
@@ -249,9 +249,9 @@ TEST(AgradFwdFvarVarMatrix, crossprod_2x3_matrix) {
   fvar<var> e(4.0,2.0);
   fvar<var> f(-9.0,2.0);
 
-  matrix_fvv Y(2,3);
+  matrix_fv Y(2,3);
   Y << a,b,c,d,e,f;
-  matrix_fvv output = stan::agrad::crossprod(Y);
+  matrix_fv output = stan::agrad::crossprod(Y);
 
   EXPECT_FLOAT_EQ( 2, output(0,0).val_.val()); 
   EXPECT_FLOAT_EQ(-2, output(0,1).val_.val()); 
@@ -263,7 +263,7 @@ TEST(AgradFwdFvarVarMatrix, crossprod_2x3_matrix) {
   EXPECT_FLOAT_EQ(24, output(1,1).d_.val()); 
 }
 TEST(AgradFwdFvarVarMatrix, crossprod_3x2_matrix) {
-  using stan::agrad::matrix_fvv;
+  using stan::agrad::matrix_fv;
   using stan::math::matrix_d;
   using stan::agrad::fvar;
   using stan::agrad::var;
@@ -275,9 +275,9 @@ TEST(AgradFwdFvarVarMatrix, crossprod_3x2_matrix) {
   fvar<var> e(4.0,2.0);
   fvar<var> f(-9.0,2.0);
 
-  matrix_fvv Y(3,2);
+  matrix_fv Y(3,2);
   Y << a,b,c,d,e,f;
-  matrix_fvv output = stan::agrad::crossprod(Y);
+  matrix_fv output = stan::agrad::crossprod(Y);
 
   EXPECT_FLOAT_EQ( 26, output(0,0).val_.val()); 
   EXPECT_FLOAT_EQ(-37, output(0,1).val_.val()); 
@@ -289,7 +289,7 @@ TEST(AgradFwdFvarVarMatrix, crossprod_3x2_matrix) {
   EXPECT_FLOAT_EQ(-32, output(1,1).d_.val()); 
 }
 TEST(AgradFwdFvarFvarMatrix, crossprod_3x3_matrix) {
-  using stan::agrad::matrix_ffv;
+  using stan::agrad::matrix_ffd;
   using stan::math::matrix_d;
   using stan::agrad::fvar;
 
@@ -320,11 +320,11 @@ TEST(AgradFwdFvarFvarMatrix, crossprod_3x3_matrix) {
   g.val_.val_ = 0.0;
   g.d_.val_ = 2.0;
 
-  matrix_ffv Y(3,3);
+  matrix_ffd Y(3,3);
   Y << a,g,g,b,c,g,d,e,f;
 
   matrix_d X = Z.transpose() * Z;
-  matrix_ffv output = stan::agrad::crossprod(Y);
+  matrix_ffd output = stan::agrad::crossprod(Y);
   for(int i = 0; i < 3; i++) {
     for(int j = 0; j < 3; j++)
       EXPECT_FLOAT_EQ(X(i,j), output(i,j).val_.val());
@@ -341,7 +341,7 @@ TEST(AgradFwdFvarFvarMatrix, crossprod_3x3_matrix) {
   EXPECT_FLOAT_EQ(24,output(2,2).d_.val());
 }
 TEST(AgradFwdFvarFvarMatrix, crossprod_2x2_matrix) {
-  using stan::agrad::matrix_ffv;
+  using stan::agrad::matrix_ffd;
   using stan::math::matrix_d;
   using stan::agrad::fvar;
 
@@ -362,10 +362,10 @@ TEST(AgradFwdFvarFvarMatrix, crossprod_2x2_matrix) {
   d.val_.val_ = -3.0;
   d.d_.val_ = 2.0;
 
-  matrix_ffv Y(2,2);
+  matrix_ffd Y(2,2);
   Y << a,b,c,d;
   matrix_d X = Z.transpose() * Z;
-  matrix_ffv output = stan::agrad::crossprod(Y);
+  matrix_ffd output = stan::agrad::crossprod(Y);
   for(int i = 0; i < 2; i++) {
     for(int j = 0; j < 2; j++)
       EXPECT_FLOAT_EQ(X(i,j), output(i,j).val_.val());
@@ -377,21 +377,21 @@ TEST(AgradFwdFvarFvarMatrix, crossprod_2x2_matrix) {
   EXPECT_FLOAT_EQ(-12,output(1,1).d_.val());
 }
 TEST(AgradFwdFvarFvarMatrix, crossprod_1x1_matrix) {
-  using stan::agrad::matrix_ffv;
+  using stan::agrad::matrix_ffd;
   using stan::agrad::fvar;
 
   fvar<fvar<double> > a;
   a.val_.val_ = 3.0;
   a.d_.val_ = 2.0;
 
-  matrix_ffv Y(1,1);
+  matrix_ffd Y(1,1);
   Y << a;
-  matrix_ffv output = stan::agrad::crossprod(Y);
+  matrix_ffd output = stan::agrad::crossprod(Y);
   EXPECT_FLOAT_EQ( 9, output(0,0).val_.val());
   EXPECT_FLOAT_EQ(12, output(0,0).d_.val());
 }
 TEST(AgradFwdFvarFvarMatrix, crossprod_1x3_matrix) {
-  using stan::agrad::matrix_ffv;
+  using stan::agrad::matrix_ffd;
   using stan::math::matrix_d;
   using stan::agrad::fvar;
 
@@ -405,15 +405,15 @@ TEST(AgradFwdFvarFvarMatrix, crossprod_1x3_matrix) {
   c.val_.val_ = 3.0;
   c.d_.val_ = 2.0;
 
-  matrix_ffv Y(1,3);
+  matrix_ffd Y(1,3);
   Y << a,b,c;
-  matrix_ffv output = stan::agrad::crossprod(Y);
+  matrix_ffd output = stan::agrad::crossprod(Y);
 
   EXPECT_FLOAT_EQ(1, output(0,0).val_.val()); 
   EXPECT_FLOAT_EQ(4,output(0,0).d_.val());
 }
 TEST(AgradFwdFvarFvarMatrix, crossprod_2x3_matrix) {
-  using stan::agrad::matrix_ffv;
+  using stan::agrad::matrix_ffd;
   using stan::math::matrix_d;
   using stan::agrad::fvar;
 
@@ -436,9 +436,9 @@ TEST(AgradFwdFvarFvarMatrix, crossprod_2x3_matrix) {
   f.val_.val_ = -9.0;
   f.d_.val_ = 2.0;
 
-  matrix_ffv Y(2,3);
+  matrix_ffd Y(2,3);
   Y << a,b,c,d,e,f;
-  matrix_ffv output = stan::agrad::crossprod(Y);
+  matrix_ffd output = stan::agrad::crossprod(Y);
 
   EXPECT_FLOAT_EQ( 2, output(0,0).val_.val()); 
   EXPECT_FLOAT_EQ(-2, output(0,1).val_.val()); 
@@ -450,7 +450,7 @@ TEST(AgradFwdFvarFvarMatrix, crossprod_2x3_matrix) {
   EXPECT_FLOAT_EQ(24, output(1,1).d_.val()); 
 }
 TEST(AgradFwdFvarFvarMatrix, crossprod_3x2_matrix) {
-  using stan::agrad::matrix_ffv;
+  using stan::agrad::matrix_ffd;
   using stan::math::matrix_d;
   using stan::agrad::fvar;
 
@@ -473,9 +473,9 @@ TEST(AgradFwdFvarFvarMatrix, crossprod_3x2_matrix) {
   f.val_.val_ = -9.0;
   f.d_.val_ = 2.0;
 
-  matrix_ffv Y(3,2);
+  matrix_ffd Y(3,2);
   Y << a,b,c,d,e,f;
-  matrix_ffv output = stan::agrad::crossprod(Y);
+  matrix_ffd output = stan::agrad::crossprod(Y);
 
   EXPECT_FLOAT_EQ( 26, output(0,0).val_.val()); 
   EXPECT_FLOAT_EQ(-37, output(0,1).val_.val()); 

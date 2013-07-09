@@ -5,10 +5,10 @@
 #include <stan/agrad/rev/matrix/multiply.hpp>
 
 TEST(AgradFwdMatrix,inverse) {
-  using stan::agrad::matrix_fv;
+  using stan::agrad::matrix_fd;
   using stan::math::matrix_d;
 
-  matrix_fv a(2,2);
+  matrix_fd a(2,2);
   a << 2.0, 3.0, 5.0, 7.0;
    a(0,0).d_ = 1.0;
    a(0,1).d_ = 1.0;
@@ -19,7 +19,7 @@ TEST(AgradFwdMatrix,inverse) {
    b << 2.0, 3.0, 5.0,7.0;
    b = b.inverse();
 
-  matrix_fv a_inv = stan::agrad::inverse(a);
+  matrix_fd a_inv = stan::agrad::inverse(a);
 
   EXPECT_NEAR(b(0,0),a_inv(0,0).val_,1.0E-12);
   EXPECT_NEAR(b(0,1),a_inv(0,1).val_,1.0E-12);
@@ -30,10 +30,10 @@ TEST(AgradFwdMatrix,inverse) {
   EXPECT_NEAR( 6,a_inv(1,0).d_,1.0E-12);
   EXPECT_NEAR(-3,a_inv(1,1).d_,1.0E-12);
 
-  EXPECT_THROW(stan::agrad::inverse(matrix_fv(2,3)), std::domain_error);
+  EXPECT_THROW(stan::agrad::inverse(matrix_fd(2,3)), std::domain_error);
 }
 TEST(AgradFwdFvarVarMatrix,inverse) {
-  using stan::agrad::matrix_fvv;
+  using stan::agrad::matrix_fv;
   using stan::math::matrix_d;
   using stan::agrad::fvar;
   using stan::agrad::var;
@@ -43,14 +43,14 @@ TEST(AgradFwdFvarVarMatrix,inverse) {
   fvar<var> f(5.0,1.0);
   fvar<var> g(7.0,1.0);
 
-  matrix_fvv a(2,2);
+  matrix_fv a(2,2);
   a << d,e,f,g;
 
    matrix_d b(2,2);
    b << 2.0, 3.0, 5.0,7.0;
    b = b.inverse();
 
-  matrix_fvv a_inv = stan::agrad::inverse(a);
+  matrix_fv a_inv = stan::agrad::inverse(a);
 
   EXPECT_NEAR(b(0,0),a_inv(0,0).val_.val(),1.0E-12);
   EXPECT_NEAR(b(0,1),a_inv(0,1).val_.val(),1.0E-12);
@@ -61,10 +61,10 @@ TEST(AgradFwdFvarVarMatrix,inverse) {
   EXPECT_NEAR( 6,a_inv(1,0).d_.val(),1.0E-12);
   EXPECT_NEAR(-3,a_inv(1,1).d_.val(),1.0E-12);
 
-  EXPECT_THROW(stan::agrad::inverse(matrix_fvv(2,3)), std::domain_error);
+  EXPECT_THROW(stan::agrad::inverse(matrix_fv(2,3)), std::domain_error);
 }
 TEST(AgradFwdFvarFvarMatrix,inverse) {
-  using stan::agrad::matrix_ffv;
+  using stan::agrad::matrix_ffd;
   using stan::math::matrix_d;
   using stan::agrad::fvar;
 
@@ -78,14 +78,14 @@ TEST(AgradFwdFvarFvarMatrix,inverse) {
   g.val_.val_ = 7.0;
   g.d_.val_ = 1.0;  
 
-  matrix_ffv a(2,2);
+  matrix_ffd a(2,2);
   a << d,e,f,g;
 
    matrix_d b(2,2);
    b << 2.0, 3.0, 5.0,7.0;
    b = b.inverse();
 
-  matrix_ffv a_inv = stan::agrad::inverse(a);
+  matrix_ffd a_inv = stan::agrad::inverse(a);
 
   EXPECT_NEAR(b(0,0),a_inv(0,0).val_.val(),1.0E-12);
   EXPECT_NEAR(b(0,1),a_inv(0,1).val_.val(),1.0E-12);
@@ -96,5 +96,5 @@ TEST(AgradFwdFvarFvarMatrix,inverse) {
   EXPECT_NEAR( 6,a_inv(1,0).d_.val(),1.0E-12);
   EXPECT_NEAR(-3,a_inv(1,1).d_.val(),1.0E-12);
 
-  EXPECT_THROW(stan::agrad::inverse(matrix_ffv(2,3)), std::domain_error);
+  EXPECT_THROW(stan::agrad::inverse(matrix_ffd(2,3)), std::domain_error);
 }

@@ -12,14 +12,14 @@
 TEST(AgradFwdMatrix, sd_vector) {
   using stan::math::sd;
   using stan::math::vector_d;
-  using stan::agrad::vector_fv;
+  using stan::agrad::vector_fd;
 
   vector_d v(1);
   v << 1.0;
   EXPECT_FLOAT_EQ(0.0, sd(v));
 
   vector_d d1(6);
-  vector_fv v1(6);
+  vector_fd v1(6);
   
   d1 << 1, 2, 3, 4, 5, 6;
   v1 << 1, 2, 3, 4, 5, 6;
@@ -44,17 +44,17 @@ TEST(AgradFwdMatrix, sd_vector) {
 TEST(AgradFwdMatrix, sd_vector_exception) {
   using stan::math::sd;
   using stan::math::vector_d;
-  using stan::agrad::vector_fv;
+  using stan::agrad::vector_fd;
 
   vector_d d1;
-  vector_fv v1;
+  vector_fd v1;
   EXPECT_THROW(sd(d1), std::domain_error);
   EXPECT_THROW(sd(v1), std::domain_error);
 }
 TEST(AgradFwdMatrix, sd_rowvector) {
   using stan::math::sd;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fv;
+  using stan::agrad::row_vector_fd;
 
   row_vector_d v(1);
   v << 1.0;
@@ -62,7 +62,7 @@ TEST(AgradFwdMatrix, sd_rowvector) {
 
 
   row_vector_d d1(6);
-  row_vector_fv v1(6);
+  row_vector_fd v1(6);
   
   d1 << 1, 2, 3, 4, 5, 6;
   v1 << 1, 2, 3, 4, 5, 6;
@@ -87,10 +87,10 @@ TEST(AgradFwdMatrix, sd_rowvector) {
 TEST(AgradFwdMatrix, sd_rowvector_exception) {
   using stan::math::sd;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fv;
+  using stan::agrad::row_vector_fd;
 
   row_vector_d d;
-  row_vector_fv v;
+  row_vector_fd v;
   
   EXPECT_THROW(sd(d), std::domain_error);
   EXPECT_THROW(sd(v), std::domain_error);
@@ -98,14 +98,14 @@ TEST(AgradFwdMatrix, sd_rowvector_exception) {
 TEST(AgradFwdMatrix, sd_matrix) {
   using stan::math::sd;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fv;
+  using stan::agrad::matrix_fd;
 
   matrix_d v(1,1);
   v << 1.0;
   EXPECT_FLOAT_EQ(0.0, sd(v));
 
   matrix_d d1(2, 3);
-  matrix_fv v1(2, 3);
+  matrix_fd v1(2, 3);
   
   d1 << 1, 2, 3, 4, 5, 6;
   v1 << 1, 2, 3, 4, 5, 6;
@@ -129,10 +129,10 @@ TEST(AgradFwdMatrix, sd_matrix) {
 TEST(AgradFwdMatrix, sd_matrix_exception) {
   using stan::math::sd;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fv;
+  using stan::agrad::matrix_fd;
 
   matrix_d d;
-  matrix_fv v;
+  matrix_fd v;
 
   EXPECT_THROW(sd(d), std::domain_error);
   EXPECT_THROW(sd(v), std::domain_error);
@@ -150,14 +150,14 @@ TEST(AgradFwdMatrix, sd_matrix_exception) {
 TEST(AgradFwdFvarVarMatrix, sd_vector) {
   using stan::math::sd;
   using stan::math::vector_d;
-  using stan::agrad::vector_fvv;
+  using stan::agrad::vector_fv;
 
   vector_d v(1);
   v << 1.0;
   EXPECT_FLOAT_EQ(0.0, sd(v));
 
   vector_d d1(6);
-  vector_fvv v1(6);
+  vector_fv v1(6);
   
   d1 << 1, 2, 3, 4, 5, 6;
   v1 << 1, 2, 3, 4, 5, 6;
@@ -182,17 +182,17 @@ TEST(AgradFwdFvarVarMatrix, sd_vector) {
 TEST(AgradFwdFvarVarMatrix, sd_vector_exception) {
   using stan::math::sd;
   using stan::math::vector_d;
-  using stan::agrad::vector_fvv;
+  using stan::agrad::vector_fv;
 
   vector_d d1;
-  vector_fvv v1;
+  vector_fv v1;
   EXPECT_THROW(sd(d1), std::domain_error);
   EXPECT_THROW(sd(v1), std::domain_error);
 }
 TEST(AgradFwdFvarVarMatrix, sd_rowvector) {
   using stan::math::sd;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fvv;
+  using stan::agrad::row_vector_fv;
 
   row_vector_d v(1);
   v << 1.0;
@@ -200,7 +200,7 @@ TEST(AgradFwdFvarVarMatrix, sd_rowvector) {
 
 
   row_vector_d d1(6);
-  row_vector_fvv v1(6);
+  row_vector_fv v1(6);
   
   d1 << 1, 2, 3, 4, 5, 6;
   v1 << 1, 2, 3, 4, 5, 6;
@@ -225,10 +225,10 @@ TEST(AgradFwdFvarVarMatrix, sd_rowvector) {
 TEST(AgradFwdFvarVarMatrix, sd_rowvector_exception) {
   using stan::math::sd;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fvv;
+  using stan::agrad::row_vector_fv;
 
   row_vector_d d;
-  row_vector_fvv v;
+  row_vector_fv v;
   
   EXPECT_THROW(sd(d), std::domain_error);
   EXPECT_THROW(sd(v), std::domain_error);
@@ -236,14 +236,14 @@ TEST(AgradFwdFvarVarMatrix, sd_rowvector_exception) {
 TEST(AgradFwdFvarVarMatrix, sd_matrix) {
   using stan::math::sd;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fvv;
+  using stan::agrad::matrix_fv;
 
   matrix_d v(1,1);
   v << 1.0;
   EXPECT_FLOAT_EQ(0.0, sd(v));
 
   matrix_d d1(2, 3);
-  matrix_fvv v1(2, 3);
+  matrix_fv v1(2, 3);
   
   d1 << 1, 2, 3, 4, 5, 6;
   v1 << 1, 2, 3, 4, 5, 6;
@@ -267,10 +267,10 @@ TEST(AgradFwdFvarVarMatrix, sd_matrix) {
 TEST(AgradFwdFvarVarMatrix, sd_matrix_exception) {
   using stan::math::sd;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fvv;
+  using stan::agrad::matrix_fv;
 
   matrix_d d;
-  matrix_fvv v;
+  matrix_fv v;
 
   EXPECT_THROW(sd(d), std::domain_error);
   EXPECT_THROW(sd(v), std::domain_error);
@@ -288,14 +288,14 @@ TEST(AgradFwdFvarVarMatrix, sd_matrix_exception) {
 TEST(AgradFwdFvarFvarMatrix, sd_vector) {
   using stan::math::sd;
   using stan::math::vector_d;
-  using stan::agrad::vector_ffv;
+  using stan::agrad::vector_ffd;
 
   vector_d v(1);
   v << 1.0;
   EXPECT_FLOAT_EQ(0.0, sd(v));
 
   vector_d d1(6);
-  vector_ffv v1(6);
+  vector_ffd v1(6);
   
   d1 << 1, 2, 3, 4, 5, 6;
   v1 << 1, 2, 3, 4, 5, 6;
@@ -320,17 +320,17 @@ TEST(AgradFwdFvarFvarMatrix, sd_vector) {
 TEST(AgradFwdFvarFvarMatrix, sd_vector_exception) {
   using stan::math::sd;
   using stan::math::vector_d;
-  using stan::agrad::vector_ffv;
+  using stan::agrad::vector_ffd;
 
   vector_d d1;
-  vector_ffv v1;
+  vector_ffd v1;
   EXPECT_THROW(sd(d1), std::domain_error);
   EXPECT_THROW(sd(v1), std::domain_error);
 }
 TEST(AgradFwdFvarFvarMatrix, sd_rowvector) {
   using stan::math::sd;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_ffv;
+  using stan::agrad::row_vector_ffd;
 
   row_vector_d v(1);
   v << 1.0;
@@ -338,7 +338,7 @@ TEST(AgradFwdFvarFvarMatrix, sd_rowvector) {
 
 
   row_vector_d d1(6);
-  row_vector_ffv v1(6);
+  row_vector_ffd v1(6);
   
   d1 << 1, 2, 3, 4, 5, 6;
   v1 << 1, 2, 3, 4, 5, 6;
@@ -363,10 +363,10 @@ TEST(AgradFwdFvarFvarMatrix, sd_rowvector) {
 TEST(AgradFwdFvarFvarMatrix, sd_rowvector_exception) {
   using stan::math::sd;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_ffv;
+  using stan::agrad::row_vector_ffd;
 
   row_vector_d d;
-  row_vector_ffv v;
+  row_vector_ffd v;
   
   EXPECT_THROW(sd(d), std::domain_error);
   EXPECT_THROW(sd(v), std::domain_error);
@@ -374,14 +374,14 @@ TEST(AgradFwdFvarFvarMatrix, sd_rowvector_exception) {
 TEST(AgradFwdFvarFvarMatrix, sd_matrix) {
   using stan::math::sd;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffv;
+  using stan::agrad::matrix_ffd;
 
   matrix_d v(1,1);
   v << 1.0;
   EXPECT_FLOAT_EQ(0.0, sd(v));
 
   matrix_d d1(2, 3);
-  matrix_ffv v1(2, 3);
+  matrix_ffd v1(2, 3);
   
   d1 << 1, 2, 3, 4, 5, 6;
   v1 << 1, 2, 3, 4, 5, 6;
@@ -405,10 +405,10 @@ TEST(AgradFwdFvarFvarMatrix, sd_matrix) {
 TEST(AgradFwdFvarFvarMatrix, sd_matrix_exception) {
   using stan::math::sd;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffv;
+  using stan::agrad::matrix_ffd;
 
   matrix_d d;
-  matrix_ffv v;
+  matrix_ffd v;
 
   EXPECT_THROW(sd(d), std::domain_error);
   EXPECT_THROW(sd(v), std::domain_error);

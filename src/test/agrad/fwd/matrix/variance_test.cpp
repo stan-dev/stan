@@ -8,14 +8,14 @@
 TEST(AgradFwdMatrix, variance_vector) {
   using stan::math::variance;
   using stan::math::vector_d;
-  using stan::agrad::vector_fv;
+  using stan::agrad::vector_fd;
 
   vector_d d(1);
   d << 12.9;
   EXPECT_FLOAT_EQ(0.0,variance(d));
 
   vector_d d1(6);
-  vector_fv v1(6);
+  vector_fd v1(6);
   
   d1 << 1, 2, 3, 4, 5, 6;
   v1 << 1, 2, 3, 4, 5, 6;
@@ -40,24 +40,24 @@ TEST(AgradFwdMatrix, variance_vector) {
 TEST(AgradFwdMatrix, variance_vector_exception) {
   using stan::math::variance;
   using stan::math::vector_d;
-  using stan::agrad::vector_fv;
+  using stan::agrad::vector_fd;
 
   vector_d d1;
-  vector_fv v1;
+  vector_fd v1;
   EXPECT_THROW(variance(d1), std::domain_error);
   EXPECT_THROW(variance(v1), std::domain_error);
 }
 TEST(AgradFwdMatrix, variance_rowvector) {
   using stan::math::variance;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fv;
+  using stan::agrad::row_vector_fd;
 
   row_vector_d d(1);
   d << 12.9;
   EXPECT_FLOAT_EQ(0.0,variance(d));
 
   row_vector_d d1(6);
-  row_vector_fv v1(6);
+  row_vector_fd v1(6);
   
   d1 << 1, 2, 3, 4, 5, 6;
   v1 << 1, 2, 3, 4, 5, 6;
@@ -82,24 +82,24 @@ TEST(AgradFwdMatrix, variance_rowvector) {
 TEST(AgradFwdMatrix, variance_rowvector_exception) {
   using stan::math::variance;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fv;
+  using stan::agrad::row_vector_fd;
 
   row_vector_d d1;
-  row_vector_fv v1;
+  row_vector_fd v1;
   EXPECT_THROW(variance(d1), std::domain_error);
   EXPECT_THROW(variance(v1), std::domain_error);
 }
 TEST(AgradFwdMatrix, variance_matrix) {
   using stan::math::variance;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fv;
+  using stan::agrad::matrix_fd;
   
   matrix_d m(1,1);
   m << 12.9;
   EXPECT_FLOAT_EQ(0.0,variance(m));
 
   matrix_d d1(2, 3);
-  matrix_fv v1(2, 3);
+  matrix_fd v1(2, 3);
   
   d1 << 1, 2, 3, 4, 5, 6;
   v1 << 1, 2, 3, 4, 5, 6;
@@ -124,10 +124,10 @@ TEST(AgradFwdMatrix, variance_matrix) {
 TEST(AgradFwdMatrix, variance_matrix_exception) {
   using stan::math::variance;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fv;
+  using stan::agrad::matrix_fd;
 
   matrix_d d1;
-  matrix_fv v1;
+  matrix_fd v1;
   EXPECT_THROW(variance(d1), std::domain_error);
   EXPECT_THROW(variance(v1), std::domain_error);
 
@@ -163,14 +163,14 @@ TEST(AgradFwdMatrix, varianceStdVector) {
 TEST(AgradFwdFvarVarMatrix, variance_vector) {
   using stan::math::variance;
   using stan::math::vector_d;
-  using stan::agrad::vector_fvv;
+  using stan::agrad::vector_fv;
 
   vector_d d(1);
   d << 12.9;
   EXPECT_FLOAT_EQ(0.0,variance(d));
 
   vector_d d1(6);
-  vector_fvv v1(6);
+  vector_fv v1(6);
   
   d1 << 1, 2, 3, 4, 5, 6;
   v1 << 1, 2, 3, 4, 5, 6;
@@ -195,24 +195,24 @@ TEST(AgradFwdFvarVarMatrix, variance_vector) {
 TEST(AgradFwdFvarVarMatrix, variance_vector_exception) {
   using stan::math::variance;
   using stan::math::vector_d;
-  using stan::agrad::vector_fvv;
+  using stan::agrad::vector_fv;
 
   vector_d d1;
-  vector_fvv v1;
+  vector_fv v1;
   EXPECT_THROW(variance(d1), std::domain_error);
   EXPECT_THROW(variance(v1), std::domain_error);
 }
 TEST(AgradFwdFvarVarMatrix, variance_rowvector) {
   using stan::math::variance;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fvv;
+  using stan::agrad::row_vector_fv;
 
   row_vector_d d(1);
   d << 12.9;
   EXPECT_FLOAT_EQ(0.0,variance(d));
 
   row_vector_d d1(6);
-  row_vector_fvv v1(6);
+  row_vector_fv v1(6);
   
   d1 << 1, 2, 3, 4, 5, 6;
   v1 << 1, 2, 3, 4, 5, 6;
@@ -237,24 +237,24 @@ TEST(AgradFwdFvarVarMatrix, variance_rowvector) {
 TEST(AgradFwdFvarVarMatrix, variance_rowvector_exception) {
   using stan::math::variance;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fvv;
+  using stan::agrad::row_vector_fv;
 
   row_vector_d d1;
-  row_vector_fvv v1;
+  row_vector_fv v1;
   EXPECT_THROW(variance(d1), std::domain_error);
   EXPECT_THROW(variance(v1), std::domain_error);
 }
 TEST(AgradFwdFvarVarMatrix, variance_matrix) {
   using stan::math::variance;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fvv;
+  using stan::agrad::matrix_fv;
   
   matrix_d m(1,1);
   m << 12.9;
   EXPECT_FLOAT_EQ(0.0,variance(m));
 
   matrix_d d1(2, 3);
-  matrix_fvv v1(2, 3);
+  matrix_fv v1(2, 3);
   
   d1 << 1, 2, 3, 4, 5, 6;
   v1 << 1, 2, 3, 4, 5, 6;
@@ -279,10 +279,10 @@ TEST(AgradFwdFvarVarMatrix, variance_matrix) {
 TEST(AgradFwdFvarVarMatrix, variance_matrix_exception) {
   using stan::math::variance;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fvv;
+  using stan::agrad::matrix_fv;
 
   matrix_d d1;
-  matrix_fvv v1;
+  matrix_fv v1;
   EXPECT_THROW(variance(d1), std::domain_error);
   EXPECT_THROW(variance(v1), std::domain_error);
 
@@ -319,14 +319,14 @@ TEST(AgradFwdFvarVarMatrix, varianceStdVector) {
 TEST(AgradFwdFvarFvarMatrix, variance_vector) {
   using stan::math::variance;
   using stan::math::vector_d;
-  using stan::agrad::vector_ffv;
+  using stan::agrad::vector_ffd;
 
   vector_d d(1);
   d << 12.9;
   EXPECT_FLOAT_EQ(0.0,variance(d));
 
   vector_d d1(6);
-  vector_ffv v1(6);
+  vector_ffd v1(6);
   
   d1 << 1, 2, 3, 4, 5, 6;
   v1 << 1, 2, 3, 4, 5, 6;
@@ -351,24 +351,24 @@ TEST(AgradFwdFvarFvarMatrix, variance_vector) {
 TEST(AgradFwdFvarFvarMatrix, variance_vector_exception) {
   using stan::math::variance;
   using stan::math::vector_d;
-  using stan::agrad::vector_ffv;
+  using stan::agrad::vector_ffd;
 
   vector_d d1;
-  vector_ffv v1;
+  vector_ffd v1;
   EXPECT_THROW(variance(d1), std::domain_error);
   EXPECT_THROW(variance(v1), std::domain_error);
 }
 TEST(AgradFwdFvarFvarMatrix, variance_rowvector) {
   using stan::math::variance;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_ffv;
+  using stan::agrad::row_vector_ffd;
 
   row_vector_d d(1);
   d << 12.9;
   EXPECT_FLOAT_EQ(0.0,variance(d));
 
   row_vector_d d1(6);
-  row_vector_ffv v1(6);
+  row_vector_ffd v1(6);
   
   d1 << 1, 2, 3, 4, 5, 6;
   v1 << 1, 2, 3, 4, 5, 6;
@@ -393,24 +393,24 @@ TEST(AgradFwdFvarFvarMatrix, variance_rowvector) {
 TEST(AgradFwdFvarFvarMatrix, variance_rowvector_exception) {
   using stan::math::variance;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_ffv;
+  using stan::agrad::row_vector_ffd;
 
   row_vector_d d1;
-  row_vector_ffv v1;
+  row_vector_ffd v1;
   EXPECT_THROW(variance(d1), std::domain_error);
   EXPECT_THROW(variance(v1), std::domain_error);
 }
 TEST(AgradFwdFvarFvarMatrix, variance_matrix) {
   using stan::math::variance;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffv;
+  using stan::agrad::matrix_ffd;
   
   matrix_d m(1,1);
   m << 12.9;
   EXPECT_FLOAT_EQ(0.0,variance(m));
 
   matrix_d d1(2, 3);
-  matrix_ffv v1(2, 3);
+  matrix_ffd v1(2, 3);
   
   d1 << 1, 2, 3, 4, 5, 6;
   v1 << 1, 2, 3, 4, 5, 6;
@@ -435,10 +435,10 @@ TEST(AgradFwdFvarFvarMatrix, variance_matrix) {
 TEST(AgradFwdFvarFvarMatrix, variance_matrix_exception) {
   using stan::math::variance;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffv;
+  using stan::agrad::matrix_ffd;
 
   matrix_d d1;
-  matrix_ffv v1;
+  matrix_ffd v1;
   EXPECT_THROW(variance(d1), std::domain_error);
   EXPECT_THROW(variance(v1), std::domain_error);
 

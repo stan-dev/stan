@@ -6,21 +6,21 @@
 
 TEST(AgradFwdMatrix,diagMatrix) {
   using stan::math::diag_matrix;
-  using stan::agrad::matrix_fv;
+  using stan::agrad::matrix_fd;
   using stan::math::vector_d;
-  using stan::agrad::vector_fv;
+  using stan::agrad::vector_fd;
 
-  EXPECT_EQ(0,diag_matrix(vector_fv()).size());
-  EXPECT_EQ(4,diag_matrix(vector_fv(2)).size());
+  EXPECT_EQ(0,diag_matrix(vector_fd()).size());
+  EXPECT_EQ(4,diag_matrix(vector_fd(2)).size());
   EXPECT_EQ(0,diag_matrix(vector_d()).size());
   EXPECT_EQ(4,diag_matrix(vector_d(2)).size());
 
-  vector_fv v(3);
+  vector_fd v(3);
   v << 1, 4, 9;
    v(0).d_ = 1.0;
    v(1).d_ = 1.0;
    v(2).d_ = 1.0;
-  matrix_fv m = diag_matrix(v);
+  matrix_fd m = diag_matrix(v);
   EXPECT_EQ(1,m(0,0).val_);
   EXPECT_EQ(4,m(1,1).val_);
   EXPECT_EQ(9,m(2,2).val_);
@@ -30,14 +30,14 @@ TEST(AgradFwdMatrix,diagMatrix) {
 }
 TEST(AgradFwdFvarVarMatrix,diagMatrix) {
   using stan::math::diag_matrix;
-  using stan::agrad::matrix_fvv;
+  using stan::agrad::matrix_fv;
   using stan::math::vector_d;
-  using stan::agrad::vector_fvv;
+  using stan::agrad::vector_fv;
   using stan::agrad::fvar;
   using stan::agrad::var;
 
-  EXPECT_EQ(0,diag_matrix(vector_fvv()).size());
-  EXPECT_EQ(4,diag_matrix(vector_fvv(2)).size());
+  EXPECT_EQ(0,diag_matrix(vector_fv()).size());
+  EXPECT_EQ(4,diag_matrix(vector_fv(2)).size());
   EXPECT_EQ(0,diag_matrix(vector_d()).size());
   EXPECT_EQ(4,diag_matrix(vector_d(2)).size());
 
@@ -45,9 +45,9 @@ TEST(AgradFwdFvarVarMatrix,diagMatrix) {
   fvar<var> b(4.0,1.0);
   fvar<var> c(9.0,1.0);
 
-  vector_fvv v(3);
+  vector_fv v(3);
   v << a,b,c;
-  matrix_fvv m = diag_matrix(v);
+  matrix_fv m = diag_matrix(v);
   EXPECT_EQ(1,m(0,0).val_.val());
   EXPECT_EQ(4,m(1,1).val_.val());
   EXPECT_EQ(9,m(2,2).val_.val());
@@ -57,13 +57,13 @@ TEST(AgradFwdFvarVarMatrix,diagMatrix) {
 }
 TEST(AgradFwdFvarFvarMatrix,diagMatrix) {
   using stan::math::diag_matrix;
-  using stan::agrad::matrix_ffv;
+  using stan::agrad::matrix_ffd;
   using stan::math::vector_d;
-  using stan::agrad::vector_ffv;
+  using stan::agrad::vector_ffd;
   using stan::agrad::fvar;
 
-  EXPECT_EQ(0,diag_matrix(vector_ffv()).size());
-  EXPECT_EQ(4,diag_matrix(vector_ffv(2)).size());
+  EXPECT_EQ(0,diag_matrix(vector_ffd()).size());
+  EXPECT_EQ(4,diag_matrix(vector_ffd(2)).size());
   EXPECT_EQ(0,diag_matrix(vector_d()).size());
   EXPECT_EQ(4,diag_matrix(vector_d(2)).size());
 
@@ -77,9 +77,9 @@ TEST(AgradFwdFvarFvarMatrix,diagMatrix) {
   c.val_.val_ = 9.0;
   c.d_.val_ = 1.0;
 
-  vector_ffv v(3);
+  vector_ffd v(3);
   v << a,b,c;
-  matrix_ffv m = diag_matrix(v);
+  matrix_ffd m = diag_matrix(v);
   EXPECT_EQ(1,m(0,0).val_.val());
   EXPECT_EQ(4,m(1,1).val_.val());
   EXPECT_EQ(9,m(2,2).val_.val());

@@ -8,10 +8,10 @@
 TEST(AgradFwdMatrix, log_matrix) {
   using stan::math::log;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fv;
+  using stan::agrad::matrix_fd;
 
   matrix_d expected_output(2,2);
-  matrix_fv mv(2,2), output;
+  matrix_fd mv(2,2), output;
   int i,j;
 
   mv << 1, 2, 3, 4;
@@ -34,10 +34,10 @@ TEST(AgradFwdMatrix, log_matrix) {
 TEST(AgradFwdMatrix, log_vector) {
   using stan::math::log;
   using stan::math::vector_d;
-  using stan::agrad::vector_fv;
+  using stan::agrad::vector_fd;
 
   vector_d expected_output(4);
-  vector_fv mv(4), output;
+  vector_fd mv(4), output;
 
   mv << 1, 2, 3, 4;
    mv(0).d_ = 1.0;
@@ -58,10 +58,10 @@ TEST(AgradFwdMatrix, log_vector) {
 TEST(AgradFwdMatrix, log_rowvector) {
   using stan::math::log;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fv;
+  using stan::agrad::row_vector_fd;
 
   row_vector_d expected_output(4);
-  row_vector_fv mv(4), output;
+  row_vector_fd mv(4), output;
 
   mv << 1, 2, 3, 4;
    mv(0).d_ = 1.0;
@@ -81,7 +81,7 @@ TEST(AgradFwdMatrix, log_rowvector) {
 TEST(AgradFwdFvarVarMatrix, log_matrix) {
   using stan::math::log;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fvv;
+  using stan::agrad::matrix_fv;
   using stan::agrad::fvar;
   using stan::agrad::var;
 
@@ -91,7 +91,7 @@ TEST(AgradFwdFvarVarMatrix, log_matrix) {
   fvar<var> d(4.0,1.0);
 
   matrix_d expected_output(2,2);
-  matrix_fvv mv(2,2), output;
+  matrix_fv mv(2,2), output;
   int i,j;
 
   mv << a,b,c,d;
@@ -110,7 +110,7 @@ TEST(AgradFwdFvarVarMatrix, log_matrix) {
 TEST(AgradFwdFvarVarMatrix, log_vector) {
   using stan::math::log;
   using stan::math::vector_d;
-  using stan::agrad::vector_fvv;
+  using stan::agrad::vector_fv;
   using stan::agrad::fvar;
   using stan::agrad::var;
 
@@ -120,7 +120,7 @@ TEST(AgradFwdFvarVarMatrix, log_vector) {
   fvar<var> d(4.0,1.0);
 
   vector_d expected_output(4);
-  vector_fvv mv(4), output;
+  vector_fv mv(4), output;
 
   mv << a,b,c,d;
   expected_output << std::log(1), std::log(2), std::log(3), std::log(4);
@@ -137,7 +137,7 @@ TEST(AgradFwdFvarVarMatrix, log_vector) {
 TEST(AgradFwdFvarVarMatrix, log_rowvector) {
   using stan::math::log;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fvv;
+  using stan::agrad::row_vector_fv;
   using stan::agrad::fvar;
   using stan::agrad::var;
 
@@ -147,7 +147,7 @@ TEST(AgradFwdFvarVarMatrix, log_rowvector) {
   fvar<var> d(4.0,1.0);
 
   row_vector_d expected_output(4);
-  row_vector_fvv mv(4), output;
+  row_vector_fv mv(4), output;
 
   mv << a,b,c,d;
   expected_output << std::log(1), std::log(2), std::log(3), std::log(4);
@@ -163,7 +163,7 @@ TEST(AgradFwdFvarVarMatrix, log_rowvector) {
 TEST(AgradFwdFvarFvarMatrix, log_matrix) {
   using stan::math::log;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffv;
+  using stan::agrad::matrix_ffd;
   using stan::agrad::fvar;
 
   fvar<fvar<double> > a,b,c,d;
@@ -177,7 +177,7 @@ TEST(AgradFwdFvarFvarMatrix, log_matrix) {
   d.d_.val_ = 1.0; 
 
   matrix_d expected_output(2,2);
-  matrix_ffv mv(2,2), output;
+  matrix_ffd mv(2,2), output;
   int i,j;
 
   mv << a,b,c,d;
@@ -196,7 +196,7 @@ TEST(AgradFwdFvarFvarMatrix, log_matrix) {
 TEST(AgradFwdFvarFvarMatrix, log_vector) {
   using stan::math::log;
   using stan::math::vector_d;
-  using stan::agrad::vector_ffv;
+  using stan::agrad::vector_ffd;
   using stan::agrad::fvar;
 
   fvar<fvar<double> > a,b,c,d;
@@ -210,7 +210,7 @@ TEST(AgradFwdFvarFvarMatrix, log_vector) {
   d.d_.val_ = 1.0; 
 
   vector_d expected_output(4);
-  vector_ffv mv(4), output;
+  vector_ffd mv(4), output;
 
   mv << a,b,c,d;
   expected_output << std::log(1), std::log(2), std::log(3), std::log(4);
@@ -227,7 +227,7 @@ TEST(AgradFwdFvarFvarMatrix, log_vector) {
 TEST(AgradFwdFvarFvarMatrix, log_rowvector) {
   using stan::math::log;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_ffv;
+  using stan::agrad::row_vector_ffd;
   using stan::agrad::fvar;
 
   fvar<fvar<double> > a,b,c,d;
@@ -241,7 +241,7 @@ TEST(AgradFwdFvarFvarMatrix, log_rowvector) {
   d.d_.val_ = 1.0; 
 
   row_vector_d expected_output(4);
-  row_vector_ffv mv(4), output;
+  row_vector_ffd mv(4), output;
 
   mv << a,b,c,d;
   expected_output << std::log(1), std::log(2), std::log(3), std::log(4);

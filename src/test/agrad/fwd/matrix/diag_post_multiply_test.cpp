@@ -5,16 +5,16 @@
 #include <stan/agrad/var.hpp>
 
 TEST(AgradFwdMatrix, diag_post_multiply_vector) {
-  using stan::agrad::matrix_fv;
+  using stan::agrad::matrix_fd;
   using stan::math::matrix_d;
-  using stan::agrad::vector_fv;
+  using stan::agrad::vector_fd;
   using stan::math::vector_d;
 
   matrix_d Z(3,3);
   Z << 1, 2, 3,
     2, 3, 4,
     4, 5, 6;
-  matrix_fv Y(3,3);
+  matrix_fd Y(3,3);
   Y << 1, 2, 3,
     2, 3, 4,
     4, 5, 6;
@@ -30,14 +30,14 @@ TEST(AgradFwdMatrix, diag_post_multiply_vector) {
 
   vector_d A(3);
   A << 1, 2, 3;
-  vector_fv B(3);
+  vector_fd B(3);
   B << 1, 2, 3;
    B(0).d_ = 2.0;
    B(1).d_ = 2.0;
    B(2).d_ = 2.0;
 
   matrix_d W = stan::math::diag_post_multiply(Z,A);
-  matrix_fv output = stan::math::diag_post_multiply(Y,B);
+  matrix_fd output = stan::math::diag_post_multiply(Y,B);
 
   for(int i = 0; i < 3; i++) {
     for(int j = 0; j < 3; j++)
@@ -55,13 +55,13 @@ TEST(AgradFwdMatrix, diag_post_multiply_vector) {
   EXPECT_FLOAT_EQ(18,output(2,2).d_);
 }
 TEST(AgradFwdMatrix, diag_post_multiply_vector_exception) {
-  using stan::agrad::matrix_fv;
-  using stan::agrad::vector_fv;
+  using stan::agrad::matrix_fd;
+  using stan::agrad::vector_fd;
 
-  matrix_fv Y(3,3);
-  matrix_fv Z(2,3);
-  vector_fv B(3);
-  vector_fv C(4);
+  matrix_fd Y(3,3);
+  matrix_fd Z(2,3);
+  vector_fd B(3);
+  vector_fd C(4);
 
   EXPECT_THROW(stan::math::diag_post_multiply(B,Y), std::domain_error);
   EXPECT_THROW(stan::math::diag_post_multiply(Y,C), std::domain_error);
@@ -69,16 +69,16 @@ TEST(AgradFwdMatrix, diag_post_multiply_vector_exception) {
   EXPECT_THROW(stan::math::diag_post_multiply(Y,Z), std::domain_error);
 }
 TEST(AgradFwdMatrix, diag_post_multiply_rowvector) {
-  using stan::agrad::matrix_fv;
+  using stan::agrad::matrix_fd;
   using stan::math::matrix_d;
-  using stan::agrad::row_vector_fv;
+  using stan::agrad::row_vector_fd;
   using stan::math::row_vector_d;
 
   matrix_d Z(3,3);
   Z << 1, 2, 3,
     2, 3, 4,
     4, 5, 6;
-  matrix_fv Y(3,3);
+  matrix_fd Y(3,3);
   Y << 1, 2, 3,
     2, 3, 4,
     4, 5, 6;
@@ -94,14 +94,14 @@ TEST(AgradFwdMatrix, diag_post_multiply_rowvector) {
 
   row_vector_d A(3);
   A << 1, 2, 3;
-  row_vector_fv B(3);
+  row_vector_fd B(3);
   B << 1, 2, 3;
    B(0).d_ = 2.0;
    B(1).d_ = 2.0;
    B(2).d_ = 2.0;
 
   matrix_d W = stan::math::diag_post_multiply(Z,A);
-  matrix_fv output = stan::math::diag_post_multiply(Y,B);
+  matrix_fd output = stan::math::diag_post_multiply(Y,B);
 
   for(int i = 0; i < 3; i++) {
     for(int j = 0; j < 3; j++)
@@ -119,13 +119,13 @@ TEST(AgradFwdMatrix, diag_post_multiply_rowvector) {
   EXPECT_FLOAT_EQ(18,output(2,2).d_);
 }
 TEST(AgradFwdMatrix, diag_post_multiply_rowvector_exception) {
-  using stan::agrad::matrix_fv;
-  using stan::agrad::row_vector_fv;
+  using stan::agrad::matrix_fd;
+  using stan::agrad::row_vector_fd;
 
-  matrix_fv Y(3,3);
-  matrix_fv Z(2,3);
-  row_vector_fv B(3);
-  row_vector_fv C(4);
+  matrix_fd Y(3,3);
+  matrix_fd Z(2,3);
+  row_vector_fd B(3);
+  row_vector_fd C(4);
 
   EXPECT_THROW(stan::math::diag_post_multiply(B,Y), std::domain_error);
   EXPECT_THROW(stan::math::diag_post_multiply(Y,C), std::domain_error);
@@ -133,9 +133,9 @@ TEST(AgradFwdMatrix, diag_post_multiply_rowvector_exception) {
   EXPECT_THROW(stan::math::diag_post_multiply(Y,Z), std::domain_error);
 }
 TEST(AgradFwdFvarVarMatrix, diag_post_multiply_vector) {
-  using stan::agrad::matrix_fvv;
+  using stan::agrad::matrix_fv;
   using stan::math::matrix_d;
-  using stan::agrad::vector_fvv;
+  using stan::agrad::vector_fv;
   using stan::math::vector_d;
   using stan::agrad::fvar;
   using stan::agrad::var;
@@ -152,16 +152,16 @@ TEST(AgradFwdFvarVarMatrix, diag_post_multiply_vector) {
   fvar<var> e(5.0,2.0);
   fvar<var> f(6.0,2.0);
 
-  matrix_fvv Y(3,3);
+  matrix_fv Y(3,3);
   Y << a,b,c,b,c,d,d,e,f;
 
   vector_d A(3);
   A << 1, 2, 3;
-  vector_fvv B(3);
+  vector_fv B(3);
   B << a,b,c;
 
   matrix_d W = stan::math::diag_post_multiply(Z,A);
-  matrix_fvv output = stan::math::diag_post_multiply(Y,B);
+  matrix_fv output = stan::math::diag_post_multiply(Y,B);
 
   for(int i = 0; i < 3; i++) {
     for(int j = 0; j < 3; j++)
@@ -179,15 +179,15 @@ TEST(AgradFwdFvarVarMatrix, diag_post_multiply_vector) {
   EXPECT_FLOAT_EQ(18,output(2,2).d_.val());
 }
 TEST(AgradFwdFvarVarMatrix, diag_post_multiply_vector_exception) {
-  using stan::agrad::matrix_fvv;
-  using stan::agrad::vector_fvv;
+  using stan::agrad::matrix_fv;
+  using stan::agrad::vector_fv;
   using stan::agrad::fvar;
   using stan::agrad::var;
 
-  matrix_fvv Y(3,3);
-  matrix_fvv Z(2,3);
-  vector_fvv B(3);
-  vector_fvv C(4);
+  matrix_fv Y(3,3);
+  matrix_fv Z(2,3);
+  vector_fv B(3);
+  vector_fv C(4);
 
   EXPECT_THROW(stan::math::diag_post_multiply(B,Y), std::domain_error);
   EXPECT_THROW(stan::math::diag_post_multiply(Y,C), std::domain_error);
@@ -195,9 +195,9 @@ TEST(AgradFwdFvarVarMatrix, diag_post_multiply_vector_exception) {
   EXPECT_THROW(stan::math::diag_post_multiply(Y,Z), std::domain_error);
 }
 TEST(AgradFwdFvarVarMatrix, diag_post_multiply_rowvector) {
-  using stan::agrad::matrix_fvv;
+  using stan::agrad::matrix_fv;
   using stan::math::matrix_d;
-  using stan::agrad::row_vector_fvv;
+  using stan::agrad::row_vector_fv;
   using stan::math::row_vector_d;
   using stan::agrad::fvar;
   using stan::agrad::var;
@@ -214,16 +214,16 @@ TEST(AgradFwdFvarVarMatrix, diag_post_multiply_rowvector) {
   fvar<var> e(5.0,2.0);
   fvar<var> f(6.0,2.0);
 
-  matrix_fvv Y(3,3);
+  matrix_fv Y(3,3);
   Y << a,b,c,b,c,d,d,e,f;
 
   row_vector_d A(3);
   A << 1, 2, 3;
-  row_vector_fvv B(3);
+  row_vector_fv B(3);
   B << a,b,c;
 
   matrix_d W = stan::math::diag_post_multiply(Z,A);
-  matrix_fvv output = stan::math::diag_post_multiply(Y,B);
+  matrix_fv output = stan::math::diag_post_multiply(Y,B);
 
   for(int i = 0; i < 3; i++) {
     for(int j = 0; j < 3; j++)
@@ -241,15 +241,15 @@ TEST(AgradFwdFvarVarMatrix, diag_post_multiply_rowvector) {
   EXPECT_FLOAT_EQ(18,output(2,2).d_.val());
 }
 TEST(AgradFwdFvarVarMatrix, diag_post_multiply_rowvector_exception) {
-  using stan::agrad::matrix_fvv;
-  using stan::agrad::row_vector_fvv;
+  using stan::agrad::matrix_fv;
+  using stan::agrad::row_vector_fv;
   using stan::agrad::fvar;
   using stan::agrad::var;
 
-  matrix_fvv Y(3,3);
-  matrix_fvv Z(2,3);
-  row_vector_fvv B(3);
-  row_vector_fvv C(4);
+  matrix_fv Y(3,3);
+  matrix_fv Z(2,3);
+  row_vector_fv B(3);
+  row_vector_fv C(4);
 
   EXPECT_THROW(stan::math::diag_post_multiply(B,Y), std::domain_error);
   EXPECT_THROW(stan::math::diag_post_multiply(Y,C), std::domain_error);
@@ -257,9 +257,9 @@ TEST(AgradFwdFvarVarMatrix, diag_post_multiply_rowvector_exception) {
   EXPECT_THROW(stan::math::diag_post_multiply(Y,Z), std::domain_error);
 }
 TEST(AgradFwdFvarFvarMatrix, diag_post_multiply_vector) {
-  using stan::agrad::matrix_ffv;
+  using stan::agrad::matrix_ffd;
   using stan::math::matrix_d;
-  using stan::agrad::vector_ffv;
+  using stan::agrad::vector_ffd;
   using stan::math::vector_d;
   using stan::agrad::fvar;
 
@@ -287,16 +287,16 @@ TEST(AgradFwdFvarFvarMatrix, diag_post_multiply_vector) {
   f.val_.val_ = 6.0;
   f.d_.val_ = 2.0;
 
-  matrix_ffv Y(3,3);
+  matrix_ffd Y(3,3);
   Y << a,b,c,b,c,d,d,e,f;
 
   vector_d A(3);
   A << 1, 2, 3;
-  vector_ffv B(3);
+  vector_ffd B(3);
   B << a,b,c;
 
   matrix_d W = stan::math::diag_post_multiply(Z,A);
-  matrix_ffv output = stan::math::diag_post_multiply(Y,B);
+  matrix_ffd output = stan::math::diag_post_multiply(Y,B);
 
   for(int i = 0; i < 3; i++) {
     for(int j = 0; j < 3; j++)
@@ -314,14 +314,14 @@ TEST(AgradFwdFvarFvarMatrix, diag_post_multiply_vector) {
   EXPECT_FLOAT_EQ(18,output(2,2).d_.val());
 }
 TEST(AgradFwdFvarFvarMatrix, diag_post_multiply_vector_exception) {
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::vector_ffv;
+  using stan::agrad::matrix_ffd;
+  using stan::agrad::vector_ffd;
   using stan::agrad::fvar;
 
-  matrix_ffv Y(3,3);
-  matrix_ffv Z(2,3);
-  vector_ffv B(3);
-  vector_ffv C(4);
+  matrix_ffd Y(3,3);
+  matrix_ffd Z(2,3);
+  vector_ffd B(3);
+  vector_ffd C(4);
 
   EXPECT_THROW(stan::math::diag_post_multiply(B,Y), std::domain_error);
   EXPECT_THROW(stan::math::diag_post_multiply(Y,C), std::domain_error);
@@ -329,9 +329,9 @@ TEST(AgradFwdFvarFvarMatrix, diag_post_multiply_vector_exception) {
   EXPECT_THROW(stan::math::diag_post_multiply(Y,Z), std::domain_error);
 }
 TEST(AgradFwdFvarFvarMatrix, diag_post_multiply_rowvector) {
-  using stan::agrad::matrix_ffv;
+  using stan::agrad::matrix_ffd;
   using stan::math::matrix_d;
-  using stan::agrad::row_vector_ffv;
+  using stan::agrad::row_vector_ffd;
   using stan::math::row_vector_d;
   using stan::agrad::fvar;
 
@@ -359,16 +359,16 @@ TEST(AgradFwdFvarFvarMatrix, diag_post_multiply_rowvector) {
   f.val_.val_ = 6.0;
   f.d_.val_ = 2.0;
 
-  matrix_ffv Y(3,3);
+  matrix_ffd Y(3,3);
   Y << a,b,c,b,c,d,d,e,f;
 
   row_vector_d A(3);
   A << 1, 2, 3;
-  row_vector_ffv B(3);
+  row_vector_ffd B(3);
   B << a,b,c;
 
   matrix_d W = stan::math::diag_post_multiply(Z,A);
-  matrix_ffv output = stan::math::diag_post_multiply(Y,B);
+  matrix_ffd output = stan::math::diag_post_multiply(Y,B);
 
   for(int i = 0; i < 3; i++) {
     for(int j = 0; j < 3; j++)
@@ -386,14 +386,14 @@ TEST(AgradFwdFvarFvarMatrix, diag_post_multiply_rowvector) {
   EXPECT_FLOAT_EQ(18,output(2,2).d_.val());
 }
 TEST(AgradFwdFvarFvarMatrix, diag_post_multiply_rowvector_exception) {
-  using stan::agrad::matrix_ffv;
-  using stan::agrad::row_vector_ffv;
+  using stan::agrad::matrix_ffd;
+  using stan::agrad::row_vector_ffd;
   using stan::agrad::fvar;
 
-  matrix_ffv Y(3,3);
-  matrix_ffv Z(2,3);
-  row_vector_ffv B(3);
-  row_vector_ffv C(4);
+  matrix_ffd Y(3,3);
+  matrix_ffd Z(2,3);
+  row_vector_ffd B(3);
+  row_vector_ffd C(4);
 
   EXPECT_THROW(stan::math::diag_post_multiply(B,Y), std::domain_error);
   EXPECT_THROW(stan::math::diag_post_multiply(Y,C), std::domain_error);

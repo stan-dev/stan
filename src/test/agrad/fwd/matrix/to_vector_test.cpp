@@ -7,8 +7,8 @@
 TEST(AgradFwdMatrix, to_vector) {
   using stan::math::to_vector;
 
-  stan::agrad::matrix_fv a(3,3);
-  stan::agrad::vector_fv b(9);
+  stan::agrad::matrix_fd a(3,3);
+  stan::agrad::vector_fd b(9);
   for(int i = 0; i < 3; i++) {
     for(int j = 0; j < 3; j++) {
       a(j,i).val_ = j + i;

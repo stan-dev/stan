@@ -9,10 +9,10 @@ using stan::agrad::fvar;
 TEST(AgradFwdMatrix, max_vector) {
   using stan::math::max;
   using stan::math::vector_d;
-  using stan::agrad::vector_fv;
+  using stan::agrad::vector_fd;
 
   vector_d d1(3);
-  vector_fv v1(3);
+  vector_fd v1(3);
   
   d1 << 100, 0, -3;
   v1 << 100, 0, -3;
@@ -31,19 +31,19 @@ TEST(AgradFwdMatrix, max_vector) {
 }
 TEST(AgradFwdMatrix, max_vector_exception) {
   using stan::math::max;
-  using stan::agrad::vector_fv;
+  using stan::agrad::vector_fd;
 
-  vector_fv v;
+  vector_fd v;
   EXPECT_EQ(-std::numeric_limits<double>::infinity(), max(v).val_);
   EXPECT_EQ(0, max(v).d_);
 }
 TEST(AgradFwdMatrix, max_rowvector) {
   using stan::math::max;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fv;
+  using stan::agrad::row_vector_fd;
 
   row_vector_d d1(3);
-  row_vector_fv v1(3);
+  row_vector_fd v1(3);
   
   d1 << 100, 0, -3;
   v1 << 100, 0, -3;
@@ -62,19 +62,19 @@ TEST(AgradFwdMatrix, max_rowvector) {
 }
 TEST(AgradFwdMatrix, max_rowvector_exception) {
   using stan::math::max;
-  using stan::agrad::row_vector_fv;
+  using stan::agrad::row_vector_fd;
 
-  row_vector_fv v;
+  row_vector_fd v;
   EXPECT_EQ(-std::numeric_limits<double>::infinity(), max(v).val_);
   EXPECT_EQ(0, max(v).d_);
 }
 TEST(AgradFwdMatrix, max_matrix) {
   using stan::math::max;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fv;
+  using stan::agrad::matrix_fd;
 
   matrix_d d1(3,1);
-  matrix_fv v1(1,3);
+  matrix_fd v1(1,3);
   
   d1 << 100, 0, -3;
   v1 << 100, 0, -3;
@@ -93,21 +93,21 @@ TEST(AgradFwdMatrix, max_matrix) {
 }
 TEST(AgradFwdMatrix, max_matrix_exception) {
   using stan::math::max;
-  using stan::agrad::matrix_fv;
+  using stan::agrad::matrix_fd;
   
-  matrix_fv v;
+  matrix_fd v;
   EXPECT_EQ(-std::numeric_limits<double>::infinity(), max(v).val_);
   EXPECT_EQ(0, max(v).d_);
 }
 TEST(AgradFwdFvarVarMatrix, max_vector) {
   using stan::math::max;
   using stan::math::vector_d;
-  using stan::agrad::vector_fvv;
+  using stan::agrad::vector_fv;
   using stan::agrad::fvar;
   using stan::agrad::var;
 
   vector_d d1(3);
-  vector_fvv v1(3);
+  vector_fv v1(3);
   
   fvar<var> a(100.0,1.0);
   fvar<var> b(0.0,1.0);
@@ -127,21 +127,21 @@ TEST(AgradFwdFvarVarMatrix, max_vector) {
 }
 TEST(AgradFwdFvarVarMatrix, max_vector_exception) {
   using stan::math::max;
-  using stan::agrad::vector_fvv;
+  using stan::agrad::vector_fv;
 
-  vector_fvv v;
+  vector_fv v;
   EXPECT_EQ(-std::numeric_limits<double>::infinity(), max(v).val_.val());
   EXPECT_EQ(0, max(v).d_.val());
 }
 TEST(AgradFwdFvarVarMatrix, max_rowvector) {
   using stan::math::max;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fvv;
+  using stan::agrad::row_vector_fv;
   using stan::agrad::fvar;
   using stan::agrad::var;
 
   row_vector_d d1(3);
-  row_vector_fvv v1(3);
+  row_vector_fv v1(3);
   
   fvar<var> a(100.0,1.0);
   fvar<var> b(0.0,1.0);
@@ -161,21 +161,21 @@ TEST(AgradFwdFvarVarMatrix, max_rowvector) {
 }
 TEST(AgradFwdFvarVarMatrix, max_rowvector_exception) {
   using stan::math::max;
-  using stan::agrad::row_vector_fvv;
+  using stan::agrad::row_vector_fv;
 
-  row_vector_fvv v;
+  row_vector_fv v;
   EXPECT_EQ(-std::numeric_limits<double>::infinity(), max(v).val_.val());
   EXPECT_EQ(0, max(v).d_.val());
 }
 TEST(AgradFwdFvarVarMatrix, max_matrix) {
   using stan::math::max;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fvv;
+  using stan::agrad::matrix_fv;
   using stan::agrad::fvar;
   using stan::agrad::var;
 
   matrix_d d1(3,1);
-  matrix_fvv v1(1,3);
+  matrix_fv v1(1,3);
   
   fvar<var> a(100.0,1.0);
   fvar<var> b(0.0,1.0);
@@ -195,20 +195,20 @@ TEST(AgradFwdFvarVarMatrix, max_matrix) {
 }
 TEST(AgradFwdFvarVarMatrix, max_matrix_exception) {
   using stan::math::max;
-  using stan::agrad::matrix_fvv;
+  using stan::agrad::matrix_fv;
   
-  matrix_fvv v;
+  matrix_fv v;
   EXPECT_EQ(-std::numeric_limits<double>::infinity(), max(v).val_.val());
   EXPECT_EQ(0, max(v).d_.val());
 }
 TEST(AgradFwdFvarFvarMatrix, max_vector) {
   using stan::math::max;
   using stan::math::vector_d;
-  using stan::agrad::vector_ffv;
+  using stan::agrad::vector_ffd;
   using stan::agrad::fvar;
 
   vector_d d1(3);
-  vector_ffv v1(3);
+  vector_ffd v1(3);
   
   fvar<fvar<double> > a,b,c;
   a.val_.val_ = 100.0;
@@ -232,20 +232,20 @@ TEST(AgradFwdFvarFvarMatrix, max_vector) {
 }
 TEST(AgradFwdFvarFvarMatrix, max_vector_exception) {
   using stan::math::max;
-  using stan::agrad::vector_ffv;
+  using stan::agrad::vector_ffd;
 
-  vector_ffv v;
+  vector_ffd v;
   EXPECT_EQ(-std::numeric_limits<double>::infinity(), max(v).val_.val());
   EXPECT_EQ(0, max(v).d_.val());
 }
 TEST(AgradFwdFvarFvarMatrix, max_rowvector) {
   using stan::math::max;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_ffv;
+  using stan::agrad::row_vector_ffd;
   using stan::agrad::fvar;
 
   row_vector_d d1(3);
-  row_vector_ffv v1(3);
+  row_vector_ffd v1(3);
   
   fvar<fvar<double> > a,b,c;
   a.val_.val_ = 100.0;
@@ -269,20 +269,20 @@ TEST(AgradFwdFvarFvarMatrix, max_rowvector) {
 }
 TEST(AgradFwdFvarFvarMatrix, max_rowvector_exception) {
   using stan::math::max;
-  using stan::agrad::row_vector_ffv;
+  using stan::agrad::row_vector_ffd;
 
-  row_vector_ffv v;
+  row_vector_ffd v;
   EXPECT_EQ(-std::numeric_limits<double>::infinity(), max(v).val_.val());
   EXPECT_EQ(0, max(v).d_.val());
 }
 TEST(AgradFwdFvarFvarMatrix, max_matrix) {
   using stan::math::max;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffv;
+  using stan::agrad::matrix_ffd;
   using stan::agrad::fvar;
 
   matrix_d d1(3,1);
-  matrix_ffv v1(1,3);
+  matrix_ffd v1(1,3);
   
   fvar<fvar<double> > a,b,c;
   a.val_.val_ = 100.0;
@@ -306,9 +306,9 @@ TEST(AgradFwdFvarFvarMatrix, max_matrix) {
 }
 TEST(AgradFwdFvarFvarMatrix, max_matrix_exception) {
   using stan::math::max;
-  using stan::agrad::matrix_ffv;
+  using stan::agrad::matrix_ffd;
   
-  matrix_ffv v;
+  matrix_ffd v;
   EXPECT_EQ(-std::numeric_limits<double>::infinity(), max(v).val_.val());
   EXPECT_EQ(0, max(v).d_.val());
 }

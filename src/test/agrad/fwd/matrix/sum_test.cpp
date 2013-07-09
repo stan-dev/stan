@@ -11,10 +11,10 @@ using stan::agrad::var;
 TEST(AgradFwdMatrix, sum_vector) {
   using stan::math::sum;
   using stan::math::vector_d;
-  using stan::agrad::vector_fv;
+  using stan::agrad::vector_fd;
 
   vector_d d(6);
-  vector_fv v(6);
+  vector_fd v(6);
   
   d << 1, 2, 3, 4, 5, 6;
   v << 1, 2, 3, 4, 5, 6;
@@ -43,10 +43,10 @@ TEST(AgradFwdMatrix, sum_vector) {
 TEST(AgradFwdMatrix, sum_rowvector) {
   using stan::math::sum;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fv;
+  using stan::agrad::row_vector_fd;
 
   row_vector_d d(6);
-  row_vector_fv v(6);
+  row_vector_fd v(6);
   
   d << 1, 2, 3, 4, 5, 6;
   v << 1, 2, 3, 4, 5, 6;
@@ -75,10 +75,10 @@ TEST(AgradFwdMatrix, sum_rowvector) {
 TEST(AgradFwdMatrix, sum_matrix) {
   using stan::math::sum;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fv;
+  using stan::agrad::matrix_fd;
 
   matrix_d d(2, 3);
-  matrix_fv v(2, 3);
+  matrix_fd v(2, 3);
   
   d << 1, 2, 3, 4, 5, 6;
   v << 1, 2, 3, 4, 5, 6;
@@ -107,10 +107,10 @@ TEST(AgradFwdMatrix, sum_matrix) {
 TEST(AgradFwdFvarVarMatrix, sum_vector) {
   using stan::math::sum;
   using stan::math::vector_d;
-  using stan::agrad::vector_fvv;
+  using stan::agrad::vector_fv;
 
   vector_d d(6);
-  vector_fvv v(6);
+  vector_fv v(6);
   
   d << 1, 2, 3, 4, 5, 6;
   v << 1, 2, 3, 4, 5, 6;
@@ -139,10 +139,10 @@ TEST(AgradFwdFvarVarMatrix, sum_vector) {
 TEST(AgradFwdFvarVarMatrix, sum_rowvector) {
   using stan::math::sum;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fvv;
+  using stan::agrad::row_vector_fv;
 
   row_vector_d d(6);
-  row_vector_fvv v(6);
+  row_vector_fv v(6);
   
   d << 1, 2, 3, 4, 5, 6;
   v << 1, 2, 3, 4, 5, 6;
@@ -171,10 +171,10 @@ TEST(AgradFwdFvarVarMatrix, sum_rowvector) {
 TEST(AgradFwdFvarVarMatrix, sum_matrix) {
   using stan::math::sum;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fvv;
+  using stan::agrad::matrix_fv;
 
   matrix_d d(2, 3);
-  matrix_fvv v(2, 3);
+  matrix_fv v(2, 3);
   
   d << 1, 2, 3, 4, 5, 6;
   v << 1, 2, 3, 4, 5, 6;
@@ -203,10 +203,10 @@ TEST(AgradFwdFvarVarMatrix, sum_matrix) {
 TEST(AgradFwdFvarFvarMatrix, sum_vector) {
   using stan::math::sum;
   using stan::math::vector_d;
-  using stan::agrad::vector_ffv;
+  using stan::agrad::vector_ffd;
 
   vector_d d(6);
-  vector_ffv v(6);
+  vector_ffd v(6);
   
   d << 1, 2, 3, 4, 5, 6;
   v << 1, 2, 3, 4, 5, 6;
@@ -235,10 +235,10 @@ TEST(AgradFwdFvarFvarMatrix, sum_vector) {
 TEST(AgradFwdFvarFvarMatrix, sum_rowvector) {
   using stan::math::sum;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_ffv;
+  using stan::agrad::row_vector_ffd;
 
   row_vector_d d(6);
-  row_vector_ffv v(6);
+  row_vector_ffd v(6);
   
   d << 1, 2, 3, 4, 5, 6;
   v << 1, 2, 3, 4, 5, 6;
@@ -267,10 +267,10 @@ TEST(AgradFwdFvarFvarMatrix, sum_rowvector) {
 TEST(AgradFwdFvarFvarMatrix, sum_matrix) {
   using stan::math::sum;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffv;
+  using stan::agrad::matrix_ffd;
 
   matrix_d d(2, 3);
-  matrix_ffv v(2, 3);
+  matrix_ffd v(2, 3);
   
   d << 1, 2, 3, 4, 5, 6;
   v << 1, 2, 3, 4, 5, 6;

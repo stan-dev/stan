@@ -7,10 +7,10 @@ TEST(AgradFwdMatrix,softmax) {
   using stan::math::softmax;
   using Eigen::Matrix;
   using Eigen::Dynamic;
-  using stan::agrad::vector_fv;
+  using stan::agrad::vector_fd;
   using stan::agrad::fvar;
 
-  EXPECT_THROW(softmax(vector_fv()),std::domain_error);
+  EXPECT_THROW(softmax(vector_fd()),std::domain_error);
   
   Matrix<fvar<double>,Dynamic,1> x(1);
   x << 0.0;
@@ -52,11 +52,11 @@ TEST(AgradFwdFvarVarMatrix,softmax) {
   using stan::math::softmax;
   using Eigen::Matrix;
   using Eigen::Dynamic;
-  using stan::agrad::vector_fvv;
+  using stan::agrad::vector_fv;
   using stan::agrad::fvar;
   using stan::agrad::var;
 
-  EXPECT_THROW(softmax(vector_fvv()),std::domain_error);
+  EXPECT_THROW(softmax(vector_fv()),std::domain_error);
   
   Matrix<fvar<var>,Dynamic,1> x(1);
   x << 0.0;
@@ -98,10 +98,10 @@ TEST(AgradFwdFvarFvarMatrix,softmax) {
   using stan::math::softmax;
   using Eigen::Matrix;
   using Eigen::Dynamic;
-  using stan::agrad::vector_ffv;
+  using stan::agrad::vector_ffd;
   using stan::agrad::fvar;
 
-  EXPECT_THROW(softmax(vector_ffv()),std::domain_error);
+  EXPECT_THROW(softmax(vector_ffd()),std::domain_error);
   
   Matrix<fvar<fvar<double> >,Dynamic,1> x(1);
   x << 0.0;

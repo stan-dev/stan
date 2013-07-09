@@ -6,10 +6,10 @@
 
 TEST(AgradFwdMatrix, dot_product_vector_vector) {
   using stan::math::vector_d;
-  using stan::agrad::vector_fv;
+  using stan::agrad::vector_fd;
 
   vector_d vd_1(3), vd_2(3);
-  vector_fv vv_1(3), vv_2(3);
+  vector_fd vv_1(3), vv_2(3);
   
   vd_1 << 1, 3, -5;
   vv_1 << 1, 3, -5;
@@ -32,12 +32,12 @@ TEST(AgradFwdMatrix, dot_product_vector_vector) {
 
 TEST(AgradFwdMatrix, dot_product_vector_vector_exception) {
   using stan::math::vector_d;
-  using stan::agrad::vector_fv;
+  using stan::agrad::vector_fd;
 
   vector_d d1(3);
-  vector_fv v1(3);
+  vector_fd v1(3);
   vector_d d2(2);
-  vector_fv v2(4);
+  vector_fd v2(4);
 
   EXPECT_THROW(stan::agrad::dot_product(v1, d2), std::domain_error);
   EXPECT_THROW(stan::agrad::dot_product(d1, v2), std::domain_error);
@@ -45,14 +45,14 @@ TEST(AgradFwdMatrix, dot_product_vector_vector_exception) {
 }
 TEST(AgradFwdMatrix, dot_product_rowvector_vector) {
   using stan::math::vector_d;
-  using stan::agrad::vector_fv;
+  using stan::agrad::vector_fd;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fv;
+  using stan::agrad::row_vector_fd;
 
   row_vector_d d1(3);
-  row_vector_fv v1(3);
+  row_vector_fd v1(3);
   vector_d d2(3);
-  vector_fv v2(3);
+  vector_fd v2(3);
   
   d1 << 1, 3, -5;
   v1 << 1, 3, -5;
@@ -75,14 +75,14 @@ TEST(AgradFwdMatrix, dot_product_rowvector_vector) {
 
 TEST(AgradFwdMatrix, dot_product_rowvector_vector_exception) {
   using stan::math::vector_d;
-  using stan::agrad::vector_fv;
+  using stan::agrad::vector_fd;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fv;
+  using stan::agrad::row_vector_fd;
 
   row_vector_d d1(3);
-  row_vector_fv v1(3);
+  row_vector_fd v1(3);
   vector_d d2(2);
-  vector_fv v2(4);
+  vector_fd v2(4);
 
   EXPECT_THROW(stan::agrad::dot_product(v1, d2), std::domain_error);
   EXPECT_THROW(stan::agrad::dot_product(d1, v2), std::domain_error);
@@ -91,14 +91,14 @@ TEST(AgradFwdMatrix, dot_product_rowvector_vector_exception) {
 
 TEST(AgradFwdMatrix, dot_product_vector_rowvector) {
   using stan::math::vector_d;
-  using stan::agrad::vector_fv;
+  using stan::agrad::vector_fd;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fv;
+  using stan::agrad::row_vector_fd;
 
   vector_d d1(3);
-  vector_fv v1(3);
+  vector_fd v1(3);
   row_vector_d d2(3);
-  row_vector_fv v2(3);
+  row_vector_fd v2(3);
   
   d1 << 1, 3, -5;
   v1 << 1, 3, -5;
@@ -121,14 +121,14 @@ TEST(AgradFwdMatrix, dot_product_vector_rowvector) {
 
 TEST(AgradFwdMatrix, dot_product_vector_rowvector_exception) {
   using stan::math::vector_d;
-  using stan::agrad::vector_fv;
+  using stan::agrad::vector_fd;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fv;
+  using stan::agrad::row_vector_fd;
 
   vector_d d1(3);
-  vector_fv v1(3);
+  vector_fd v1(3);
   row_vector_d d2(2);
-  row_vector_fv v2(4);
+  row_vector_fd v2(4);
 
   EXPECT_THROW(stan::agrad::dot_product(v1, d2), std::domain_error);
   EXPECT_THROW(stan::agrad::dot_product(d1, v2), std::domain_error);
@@ -137,10 +137,10 @@ TEST(AgradFwdMatrix, dot_product_vector_rowvector_exception) {
 
 TEST(AgradFwdMatrix, dot_product_rowvector_rowvector) {
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fv;
+  using stan::agrad::row_vector_fd;
 
   row_vector_d d1(3), d2(3);
-  row_vector_fv v1(3), v2(3);
+  row_vector_fd v1(3), v2(3);
   
   d1 << 1, 3, -5;
   v1 << 1, 3, -5;
@@ -163,10 +163,10 @@ TEST(AgradFwdMatrix, dot_product_rowvector_rowvector) {
 
 TEST(AgradFwdMatrix, dot_product_rowvector_rowvector_exception) {
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fv;
+  using stan::agrad::row_vector_fd;
 
   row_vector_d d1(3), d2(2);
-  row_vector_fv v1(3), v2(4);
+  row_vector_fd v1(3), v2(4);
 
   EXPECT_THROW(stan::agrad::dot_product(v1, d2), std::domain_error);
   EXPECT_THROW(stan::agrad::dot_product(d1, v2), std::domain_error);
@@ -207,17 +207,17 @@ TEST(AgradFwdMatrix, dot_product_stdvector_stdvector) {
 }
 TEST(AgradFwdMatrix, dot_product_matrix_matrix_exception) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fv;
+  using stan::agrad::matrix_fd;
   using stan::agrad::dot_product;
   matrix_d d1(3,3);
   matrix_d d2(3,2);
   matrix_d d3(2,3);
-  matrix_fv v1(3,3);
-  matrix_fv v2(3,3);
-  matrix_fv v3(3,2);
-  matrix_fv v4(3,2);
-  matrix_fv v5(2,3);
-  matrix_fv v6(2,3);
+  matrix_fd v1(3,3);
+  matrix_fd v2(3,3);
+  matrix_fd v3(3,2);
+  matrix_fd v4(3,2);
+  matrix_fd v5(2,3);
+  matrix_fd v6(2,3);
 
   d1 << 1, 3, -5, 1, 3, -5, 1, 3, -5;
   d2 << 1, 3, -5, 1, 3, -5;
@@ -263,10 +263,10 @@ TEST(AgradFwdMatrix, dot_product_matrix_matrix_exception) {
 }
 TEST(AgradFwdMatrix, dot_product_vector_vector_length) {
   using stan::math::vector_d;
-  using stan::agrad::vector_fv;
+  using stan::agrad::vector_fd;
 
   vector_d vd_1(3), vd_2(3);
-  vector_fv vv_1(3), vv_2(3);
+  vector_fd vv_1(3), vv_2(3);
   stan::agrad::size_type length = 2;
   vd_1 << 1, 3, -5;
   vv_1 << 1, 3, -5;
@@ -288,12 +288,12 @@ TEST(AgradFwdMatrix, dot_product_vector_vector_length) {
 }
 TEST(AgradFwdMatrix, dot_product_vector_vector_no_exception_length) {
   using stan::math::vector_d;
-  using stan::agrad::vector_fv;
+  using stan::agrad::vector_fd;
 
   vector_d d1(3);
-  vector_fv v1(3);
+  vector_fd v1(3);
   vector_d d2(2);
-  vector_fv v2(4);
+  vector_fd v2(4);
   stan::agrad::size_type length = 2;
 
   d1 << 1, 3, -5;
@@ -317,14 +317,14 @@ TEST(AgradFwdMatrix, dot_product_vector_vector_no_exception_length) {
 }
 TEST(AgradFwdMatrix, dot_product_rowvector_vector_length) {
   using stan::math::vector_d;
-  using stan::agrad::vector_fv;
+  using stan::agrad::vector_fd;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fv;
+  using stan::agrad::row_vector_fd;
 
   row_vector_d d1(3);
-  row_vector_fv v1(3);
+  row_vector_fd v1(3);
   vector_d d2(3);
-  vector_fv v2(3);
+  vector_fd v2(3);
   stan::agrad::size_type length = 2;
 
   d1 << 1, 3, -5;
@@ -347,14 +347,14 @@ TEST(AgradFwdMatrix, dot_product_rowvector_vector_length) {
 }
 TEST(AgradFwdMatrix, dot_product_rowvector_vector_no_exception_length) {
   using stan::math::vector_d;
-  using stan::agrad::vector_fv;
+  using stan::agrad::vector_fd;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fv;
+  using stan::agrad::row_vector_fd;
 
   row_vector_d d1(3);
-  row_vector_fv v1(3);
+  row_vector_fd v1(3);
   vector_d d2(2);
-  vector_fv v2(4);
+  vector_fd v2(4);
   stan::agrad::size_type length = 2;
 
   d1 << 1, 3, -5;
@@ -378,14 +378,14 @@ TEST(AgradFwdMatrix, dot_product_rowvector_vector_no_exception_length) {
 }
 TEST(AgradFwdMatrix, dot_product_vector_rowvector_length) {
   using stan::math::vector_d;
-  using stan::agrad::vector_fv;
+  using stan::agrad::vector_fd;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fv;
+  using stan::agrad::row_vector_fd;
 
   vector_d d1(3);
-  vector_fv v1(3);
+  vector_fd v1(3);
   row_vector_d d2(3);
-  row_vector_fv v2(3);
+  row_vector_fd v2(3);
   stan::agrad::size_type length = 2;
 
   d1 << 1, 3, -5;
@@ -408,14 +408,14 @@ TEST(AgradFwdMatrix, dot_product_vector_rowvector_length) {
 }
 TEST(AgradFwdMatrix, dot_product_vector_rowvector_no_exception_length) {
   using stan::math::vector_d;
-  using stan::agrad::vector_fv;
+  using stan::agrad::vector_fd;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fv;
+  using stan::agrad::row_vector_fd;
 
   vector_d d1(3);
-  vector_fv v1(3);
+  vector_fd v1(3);
   row_vector_d d2(2);
-  row_vector_fv v2(4);
+  row_vector_fd v2(4);
   stan::agrad::size_type length = 2;
 
   d1 << 1, 3, -5;
@@ -439,10 +439,10 @@ TEST(AgradFwdMatrix, dot_product_vector_rowvector_no_exception_length) {
 }
 TEST(AgradFwdMatrix, dot_product_rowvector_rowvector_length) {
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fv;
+  using stan::agrad::row_vector_fd;
 
   row_vector_d d1(3), d2(3);
-  row_vector_fv v1(3), v2(3);
+  row_vector_fd v1(3), v2(3);
   stan::agrad::size_type length = 2;
 
   d1 << 1, 3, -5;
@@ -465,10 +465,10 @@ TEST(AgradFwdMatrix, dot_product_rowvector_rowvector_length) {
 }
 TEST(AgradFwdMatrix, dot_product_rowvector_rowvector_no_exception_length) {
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fv;
+  using stan::agrad::row_vector_fd;
 
   row_vector_d d1(3), d2(2);
-  row_vector_fv v1(3), v2(4);
+  row_vector_fd v1(3), v2(4);
   stan::agrad::size_type length = 2;
 
   d1 << 1, 3, -5;
@@ -524,18 +524,18 @@ TEST(AgradFwdMatrix, dot_product_stdvector_stdvector_length) {
 }
 TEST(AgradFwdMatrix, dot_product_matrix_matrix_exception_length) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fv;
+  using stan::agrad::matrix_fd;
   using stan::agrad::dot_product;
   stan::agrad::size_type length = 3;
   matrix_d d1(3,3);
   matrix_d d2(3,2);
   matrix_d d3(2,3);
-  matrix_fv v1(3,3);
-  matrix_fv v2(3,3);
-  matrix_fv v3(3,2);
-  matrix_fv v4(3,2);
-  matrix_fv v5(2,3);
-  matrix_fv v6(2,3);
+  matrix_fd v1(3,3);
+  matrix_fd v2(3,3);
+  matrix_fd v3(3,2);
+  matrix_fd v4(3,2);
+  matrix_fd v5(2,3);
+  matrix_fd v6(2,3);
 
   d1 << 1, 3, -5, 1, 3, -5, 1, 3, -5;
   d2 << 1, 3, -5, 1, 3, -5;
@@ -581,12 +581,12 @@ TEST(AgradFwdMatrix, dot_product_matrix_matrix_exception_length) {
 }
 TEST(AgradFwdFvarVarMatrix, dot_product_vector_vector) {
   using stan::math::vector_d;
-  using stan::agrad::vector_fvv;
+  using stan::agrad::vector_fv;
   using stan::agrad::fvar;
   using stan::agrad::var;
 
   vector_d vd_1(3), vd_2(3);
-  vector_fvv vv_1(3), vv_2(3);
+  vector_fv vv_1(3), vv_2(3);
 
   fvar<var> a(1.0,1.0);
   fvar<var> b(3.0,1.0);
@@ -610,12 +610,12 @@ TEST(AgradFwdFvarVarMatrix, dot_product_vector_vector) {
 
 TEST(AgradFwdFvarVarMatrix, dot_product_vector_vector_exception) {
   using stan::math::vector_d;
-  using stan::agrad::vector_fvv;
+  using stan::agrad::vector_fv;
 
   vector_d d1(3);
-  vector_fvv v1(3);
+  vector_fv v1(3);
   vector_d d2(2);
-  vector_fvv v2(4);
+  vector_fv v2(4);
 
   EXPECT_THROW(stan::agrad::dot_product(v1, d2), std::domain_error);
   EXPECT_THROW(stan::agrad::dot_product(d1, v2), std::domain_error);
@@ -623,16 +623,16 @@ TEST(AgradFwdFvarVarMatrix, dot_product_vector_vector_exception) {
 }
 TEST(AgradFwdFvarVarMatrix, dot_product_rowvector_vector) {
   using stan::math::vector_d;
-  using stan::agrad::vector_fvv;
+  using stan::agrad::vector_fv;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fvv;
+  using stan::agrad::row_vector_fv;
   using stan::agrad::fvar;
   using stan::agrad::var;
 
   row_vector_d d1(3);
-  row_vector_fvv v1(3);
+  row_vector_fv v1(3);
   vector_d d2(3);
-  vector_fvv v2(3);
+  vector_fv v2(3);
   
   fvar<var> a(1.0,1.0);
   fvar<var> b(3.0,1.0);
@@ -656,14 +656,14 @@ TEST(AgradFwdFvarVarMatrix, dot_product_rowvector_vector) {
 
 TEST(AgradFwdFvarVarMatrix, dot_product_rowvector_vector_exception) {
   using stan::math::vector_d;
-  using stan::agrad::vector_fvv;
+  using stan::agrad::vector_fv;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fvv;
+  using stan::agrad::row_vector_fv;
 
   row_vector_d d1(3);
-  row_vector_fvv v1(3);
+  row_vector_fv v1(3);
   vector_d d2(2);
-  vector_fvv v2(4);
+  vector_fv v2(4);
 
   EXPECT_THROW(stan::agrad::dot_product(v1, d2), std::domain_error);
   EXPECT_THROW(stan::agrad::dot_product(d1, v2), std::domain_error);
@@ -672,16 +672,16 @@ TEST(AgradFwdFvarVarMatrix, dot_product_rowvector_vector_exception) {
 
 TEST(AgradFwdFvarVarMatrix, dot_product_vector_rowvector) {
   using stan::math::vector_d;
-  using stan::agrad::vector_fvv;
+  using stan::agrad::vector_fv;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fvv;
+  using stan::agrad::row_vector_fv;
   using stan::agrad::fvar;
   using stan::agrad::var;
 
   vector_d d1(3);
-  vector_fvv v1(3);
+  vector_fv v1(3);
   row_vector_d d2(3);
-  row_vector_fvv v2(3);
+  row_vector_fv v2(3);
 
   fvar<var> a(1.0,1.0);
   fvar<var> b(3.0,1.0);
@@ -705,14 +705,14 @@ TEST(AgradFwdFvarVarMatrix, dot_product_vector_rowvector) {
 
 TEST(AgradFwdFvarVarMatrix, dot_product_vector_rowvector_exception) {
   using stan::math::vector_d;
-  using stan::agrad::vector_fvv;
+  using stan::agrad::vector_fv;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fvv;
+  using stan::agrad::row_vector_fv;
 
   vector_d d1(3);
-  vector_fvv v1(3);
+  vector_fv v1(3);
   row_vector_d d2(2);
-  row_vector_fvv v2(4);
+  row_vector_fv v2(4);
 
   EXPECT_THROW(stan::agrad::dot_product(v1, d2), std::domain_error);
   EXPECT_THROW(stan::agrad::dot_product(d1, v2), std::domain_error);
@@ -721,12 +721,12 @@ TEST(AgradFwdFvarVarMatrix, dot_product_vector_rowvector_exception) {
 
 TEST(AgradFwdFvarVarMatrix, dot_product_rowvector_rowvector) {
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fvv;
+  using stan::agrad::row_vector_fv;
   using stan::agrad::fvar;
   using stan::agrad::var;
 
   row_vector_d d1(3), d2(3);
-  row_vector_fvv v1(3), v2(3);
+  row_vector_fv v1(3), v2(3);
 
   fvar<var> a(1.0,1.0);
   fvar<var> b(3.0,1.0);
@@ -750,10 +750,10 @@ TEST(AgradFwdFvarVarMatrix, dot_product_rowvector_rowvector) {
 
 TEST(AgradFwdFvarVarMatrix, dot_product_rowvector_rowvector_exception) {
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fvv;
+  using stan::agrad::row_vector_fv;
 
   row_vector_d d1(3), d2(2);
-  row_vector_fvv v1(3), v2(4);
+  row_vector_fv v1(3), v2(4);
 
   EXPECT_THROW(stan::agrad::dot_product(v1, d2), std::domain_error);
   EXPECT_THROW(stan::agrad::dot_product(d1, v2), std::domain_error);
@@ -792,7 +792,7 @@ TEST(AgradFwdFvarVarMatrix, dot_product_stdvector_stdvector) {
 }
 TEST(AgradFwdFvarVarMatrix, dot_product_matrix_matrix_exception) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fvv;
+  using stan::agrad::matrix_fv;
   using stan::agrad::dot_product;
   using stan::agrad::fvar;
   using stan::agrad::var;
@@ -800,12 +800,12 @@ TEST(AgradFwdFvarVarMatrix, dot_product_matrix_matrix_exception) {
   matrix_d d1(3,3);
   matrix_d d2(3,2);
   matrix_d d3(2,3);
-  matrix_fvv v1(3,3);
-  matrix_fvv v2(3,3);
-  matrix_fvv v3(3,2);
-  matrix_fvv v4(3,2);
-  matrix_fvv v5(2,3);
-  matrix_fvv v6(2,3);
+  matrix_fv v1(3,3);
+  matrix_fv v2(3,3);
+  matrix_fv v3(3,2);
+  matrix_fv v4(3,2);
+  matrix_fv v5(2,3);
+  matrix_fv v6(2,3);
 
   fvar<var> a(1.0,1.0);
   fvar<var> b(3.0,1.0);
@@ -858,12 +858,12 @@ TEST(AgradFwdFvarVarMatrix, dot_product_matrix_matrix_exception) {
 }
 TEST(AgradFwdFvarVarMatrix, dot_product_vector_vector_length) {
   using stan::math::vector_d;
-  using stan::agrad::vector_fvv;
+  using stan::agrad::vector_fv;
   using stan::agrad::fvar;
   using stan::agrad::var;
 
   vector_d vd_1(3), vd_2(3);
-  vector_fvv vv_1(3), vv_2(3);
+  vector_fv vv_1(3), vv_2(3);
   stan::agrad::size_type length = 2;
 
   fvar<var> a(1.0,1.0);
@@ -887,14 +887,14 @@ TEST(AgradFwdFvarVarMatrix, dot_product_vector_vector_length) {
 }
 TEST(AgradFwdFvarVarMatrix, dot_product_vector_vector_no_exception_length) {
   using stan::math::vector_d;
-  using stan::agrad::vector_fvv;
+  using stan::agrad::vector_fv;
   using stan::agrad::fvar;
   using stan::agrad::var;
 
   vector_d d1(3);
-  vector_fvv v1(3);
+  vector_fv v1(3);
   vector_d d2(2);
-  vector_fvv v2(4);
+  vector_fv v2(4);
   stan::agrad::size_type length = 2;
 
   fvar<var> a(1.0,1.0);
@@ -918,16 +918,16 @@ TEST(AgradFwdFvarVarMatrix, dot_product_vector_vector_no_exception_length) {
 }
 TEST(AgradFwdFvarVarMatrix, dot_product_rowvector_vector_length) {
   using stan::math::vector_d;
-  using stan::agrad::vector_fvv;
+  using stan::agrad::vector_fv;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fvv;
+  using stan::agrad::row_vector_fv;
   using stan::agrad::fvar;
   using stan::agrad::var;
 
   row_vector_d d1(3);
-  row_vector_fvv v1(3);
+  row_vector_fv v1(3);
   vector_d d2(3);
-  vector_fvv v2(3);
+  vector_fv v2(3);
   stan::agrad::size_type length = 2;
 
   fvar<var> a(1.0,1.0);
@@ -951,16 +951,16 @@ TEST(AgradFwdFvarVarMatrix, dot_product_rowvector_vector_length) {
 }
 TEST(AgradFwdFvarVarMatrix, dot_product_rowvector_vector_no_exception_length) {
   using stan::math::vector_d;
-  using stan::agrad::vector_fvv;
+  using stan::agrad::vector_fv;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fvv;
+  using stan::agrad::row_vector_fv;
   using stan::agrad::fvar;
   using stan::agrad::var;
 
   row_vector_d d1(3);
-  row_vector_fvv v1(3);
+  row_vector_fv v1(3);
   vector_d d2(2);
-  vector_fvv v2(4);
+  vector_fv v2(4);
   stan::agrad::size_type length = 2;
 
   fvar<var> a(1.0,1.0);
@@ -984,16 +984,16 @@ TEST(AgradFwdFvarVarMatrix, dot_product_rowvector_vector_no_exception_length) {
 }
 TEST(AgradFwdFvarVarMatrix, dot_product_vector_rowvector_length) {
   using stan::math::vector_d;
-  using stan::agrad::vector_fvv;
+  using stan::agrad::vector_fv;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fvv;
+  using stan::agrad::row_vector_fv;
   using stan::agrad::fvar;
   using stan::agrad::var;
 
   vector_d d1(3);
-  vector_fvv v1(3);
+  vector_fv v1(3);
   row_vector_d d2(3);
-  row_vector_fvv v2(3);
+  row_vector_fv v2(3);
   stan::agrad::size_type length = 2;
 
   fvar<var> a(1.0,1.0);
@@ -1017,16 +1017,16 @@ TEST(AgradFwdFvarVarMatrix, dot_product_vector_rowvector_length) {
 }
 TEST(AgradFwdFvarVarMatrix, dot_product_vector_rowvector_no_exception_length) {
   using stan::math::vector_d;
-  using stan::agrad::vector_fvv;
+  using stan::agrad::vector_fv;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fvv;
+  using stan::agrad::row_vector_fv;
   using stan::agrad::fvar;
   using stan::agrad::var;
 
   vector_d d1(3);
-  vector_fvv v1(3);
+  vector_fv v1(3);
   row_vector_d d2(2);
-  row_vector_fvv v2(4);
+  row_vector_fv v2(4);
   stan::agrad::size_type length = 2;
 
   fvar<var> a(1.0,1.0);
@@ -1050,12 +1050,12 @@ TEST(AgradFwdFvarVarMatrix, dot_product_vector_rowvector_no_exception_length) {
 }
 TEST(AgradFwdFvarVarMatrix, dot_product_rowvector_rowvector_length) {
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fvv;
+  using stan::agrad::row_vector_fv;
   using stan::agrad::fvar;
   using stan::agrad::var;
 
   row_vector_d d1(3), d2(3);
-  row_vector_fvv v1(3), v2(3);
+  row_vector_fv v1(3), v2(3);
   stan::agrad::size_type length = 2;
 
   fvar<var> a(1.0,1.0);
@@ -1079,12 +1079,12 @@ TEST(AgradFwdFvarVarMatrix, dot_product_rowvector_rowvector_length) {
 }
 TEST(AgradFwdFvarVarMatrix, dot_product_rowvector_rowvector_no_exception_length) {
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fvv;
+  using stan::agrad::row_vector_fv;
   using stan::agrad::fvar;
   using stan::agrad::var;
 
   row_vector_d d1(3), d2(2);
-  row_vector_fvv v1(3), v2(4);
+  row_vector_fv v1(3), v2(4);
   stan::agrad::size_type length = 2;
 
   fvar<var> a(1.0,1.0);
@@ -1138,14 +1138,14 @@ TEST(AgradFwdFvarVarMatrix, dot_product_stdvector_stdvector_length) {
 }
 TEST(AgradFwdFvarVarMatrix, dot_product_matrix_matrix_exception_length) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fvv;
+  using stan::agrad::matrix_fv;
   using stan::agrad::dot_product;
   using stan::agrad::fvar;
   using stan::agrad::var;
 
   stan::agrad::size_type length = 3;
   matrix_d d1(3,3), d2(3,2), d3(2,3);
-  matrix_fvv v1(3,3),v2(3,3),v3(3,2),v4(3,2),v5(2,3),v6(2,3);
+  matrix_fv v1(3,3),v2(3,3),v3(3,2),v4(3,2),v5(2,3),v6(2,3);
 
   fvar<var> a(1.0,1.0);
   fvar<var> b(3.0,1.0);
@@ -1198,11 +1198,11 @@ TEST(AgradFwdFvarVarMatrix, dot_product_matrix_matrix_exception_length) {
 }
 TEST(AgradFwdFvarFvarMatrix, dot_product_vector_vector) {
   using stan::math::vector_d;
-  using stan::agrad::vector_ffv;
+  using stan::agrad::vector_ffd;
   using stan::agrad::fvar;
 
   vector_d vd_1(3), vd_2(3);
-  vector_ffv vv_1(3), vv_2(3);
+  vector_ffd vv_1(3), vv_2(3);
   
   fvar<fvar<double> > a,b,c,d,e,f;
   a.val_.val_ = 1.0;
@@ -1233,10 +1233,10 @@ TEST(AgradFwdFvarFvarMatrix, dot_product_vector_vector) {
 
 TEST(AgradFwdFvarFvarMatrix, dot_product_vector_vector_exception) {
   using stan::math::vector_d;
-  using stan::agrad::vector_ffv;
+  using stan::agrad::vector_ffd;
 
   vector_d d1(3),d2(2);
-  vector_ffv v1(3),v2(4);
+  vector_ffd v1(3),v2(4);
 
   EXPECT_THROW(stan::agrad::dot_product(v1, d2), std::domain_error);
   EXPECT_THROW(stan::agrad::dot_product(d1, v2), std::domain_error);
@@ -1244,15 +1244,15 @@ TEST(AgradFwdFvarFvarMatrix, dot_product_vector_vector_exception) {
 }
 TEST(AgradFwdFvarFvarMatrix, dot_product_rowvector_vector) {
   using stan::math::vector_d;
-  using stan::agrad::vector_ffv;
+  using stan::agrad::vector_ffd;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_ffv;
+  using stan::agrad::row_vector_ffd;
   using stan::agrad::fvar;
 
   row_vector_d d1(3);
-  row_vector_ffv v1(3);
+  row_vector_ffd v1(3);
   vector_d d2(3);
-  vector_ffv v2(3);
+  vector_ffd v2(3);
   
   fvar<fvar<double> > a,b,c,d,e,f;
   a.val_.val_ = 1.0;
@@ -1283,14 +1283,14 @@ TEST(AgradFwdFvarFvarMatrix, dot_product_rowvector_vector) {
 
 TEST(AgradFwdFvarFvarMatrix, dot_product_rowvector_vector_exception) {
   using stan::math::vector_d;
-  using stan::agrad::vector_ffv;
+  using stan::agrad::vector_ffd;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_ffv;
+  using stan::agrad::row_vector_ffd;
 
   row_vector_d d1(3);
-  row_vector_ffv v1(3);
+  row_vector_ffd v1(3);
   vector_d d2(2);
-  vector_ffv v2(4);
+  vector_ffd v2(4);
 
   EXPECT_THROW(stan::agrad::dot_product(v1, d2), std::domain_error);
   EXPECT_THROW(stan::agrad::dot_product(d1, v2), std::domain_error);
@@ -1299,15 +1299,15 @@ TEST(AgradFwdFvarFvarMatrix, dot_product_rowvector_vector_exception) {
 
 TEST(AgradFwdFvarFvarMatrix, dot_product_vector_rowvector) {
   using stan::math::vector_d;
-  using stan::agrad::vector_ffv;
+  using stan::agrad::vector_ffd;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_ffv;
+  using stan::agrad::row_vector_ffd;
   using stan::agrad::fvar;
 
   vector_d d1(3);
-  vector_ffv v1(3);
+  vector_ffd v1(3);
   row_vector_d d2(3);
-  row_vector_ffv v2(3);
+  row_vector_ffd v2(3);
   
   fvar<fvar<double> > a,b,c,d,e,f;
   a.val_.val_ = 1.0;
@@ -1338,14 +1338,14 @@ TEST(AgradFwdFvarFvarMatrix, dot_product_vector_rowvector) {
 
 TEST(AgradFwdFvarFvarMatrix, dot_product_vector_rowvector_exception) {
   using stan::math::vector_d;
-  using stan::agrad::vector_ffv;
+  using stan::agrad::vector_ffd;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_ffv;
+  using stan::agrad::row_vector_ffd;
 
   vector_d d1(3);
-  vector_ffv v1(3);
+  vector_ffd v1(3);
   row_vector_d d2(2);
-  row_vector_ffv v2(4);
+  row_vector_ffd v2(4);
 
   EXPECT_THROW(stan::agrad::dot_product(v1, d2), std::domain_error);
   EXPECT_THROW(stan::agrad::dot_product(d1, v2), std::domain_error);
@@ -1354,11 +1354,11 @@ TEST(AgradFwdFvarFvarMatrix, dot_product_vector_rowvector_exception) {
 
 TEST(AgradFwdFvarFvarMatrix, dot_product_rowvector_rowvector) {
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_ffv;
+  using stan::agrad::row_vector_ffd;
   using stan::agrad::fvar;
 
   row_vector_d d1(3), d2(3);
-  row_vector_ffv v1(3), v2(3);
+  row_vector_ffd v1(3), v2(3);
   
   fvar<fvar<double> > a,b,c,d,e,f;
   a.val_.val_ = 1.0;
@@ -1389,10 +1389,10 @@ TEST(AgradFwdFvarFvarMatrix, dot_product_rowvector_rowvector) {
 
 TEST(AgradFwdFvarFvarMatrix, dot_product_rowvector_rowvector_exception) {
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_ffv;
+  using stan::agrad::row_vector_ffd;
 
   row_vector_d d1(3), d2(2);
-  row_vector_ffv v1(3), v2(4);
+  row_vector_ffd v1(3), v2(4);
 
   EXPECT_THROW(stan::agrad::dot_product(v1, d2), std::domain_error);
   EXPECT_THROW(stan::agrad::dot_product(d1, v2), std::domain_error);
@@ -1433,12 +1433,12 @@ TEST(AgradFwdFvarFvarMatrix, dot_product_stdvector_stdvector) {
 }
 TEST(AgradFwdFvarFvarMatrix, dot_product_matrix_matrix_exception) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffv;
+  using stan::agrad::matrix_ffd;
   using stan::agrad::dot_product;
   using stan::agrad::fvar;
 
   matrix_d d1(3,3),d2(3,2),d3(2,3);
-  matrix_ffv v1(3,3),v2(3,3),v3(3,2),v4(3,2),v5(2,3),v6(2,3);
+  matrix_ffd v1(3,3),v2(3,3),v3(3,2),v4(3,2),v5(2,3),v6(2,3);
 
   fvar<fvar<double> > a,b,c,d,e,f;
   a.val_.val_ = 1.0;
@@ -1498,11 +1498,11 @@ TEST(AgradFwdFvarFvarMatrix, dot_product_matrix_matrix_exception) {
 }
 TEST(AgradFwdFvarFvarMatrix, dot_product_vector_vector_length) {
   using stan::math::vector_d;
-  using stan::agrad::vector_ffv;
+  using stan::agrad::vector_ffd;
   using stan::agrad::fvar;
 
   vector_d vd_1(3), vd_2(3);
-  vector_ffv vv_1(3), vv_2(3);
+  vector_ffd vv_1(3), vv_2(3);
   stan::agrad::size_type length = 2;
 
   fvar<fvar<double> > a,b,c,d,e,f;
@@ -1533,11 +1533,11 @@ TEST(AgradFwdFvarFvarMatrix, dot_product_vector_vector_length) {
 }
 TEST(AgradFwdFvarFvarMatrix, dot_product_vector_vector_no_exception_length) {
   using stan::math::vector_d;
-  using stan::agrad::vector_ffv;
+  using stan::agrad::vector_ffd;
   using stan::agrad::fvar;
 
   vector_d d1(3),d2(2);
-  vector_ffv v1(3),v2(4);
+  vector_ffd v1(3),v2(4);
   stan::agrad::size_type length = 2;
 
   fvar<fvar<double> > a,b,c,d,e,f;
@@ -1568,15 +1568,15 @@ TEST(AgradFwdFvarFvarMatrix, dot_product_vector_vector_no_exception_length) {
 }
 TEST(AgradFwdFvarFvarMatrix, dot_product_rowvector_vector_length) {
   using stan::math::vector_d;
-  using stan::agrad::vector_ffv;
+  using stan::agrad::vector_ffd;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_ffv;
+  using stan::agrad::row_vector_ffd;
   using stan::agrad::fvar;
 
   row_vector_d d1(3);
-  row_vector_ffv v1(3);
+  row_vector_ffd v1(3);
   vector_d d2(3);
-  vector_ffv v2(3);
+  vector_ffd v2(3);
   stan::agrad::size_type length = 2;
 
   fvar<fvar<double> > a,b,c,d,e,f;
@@ -1607,15 +1607,15 @@ TEST(AgradFwdFvarFvarMatrix, dot_product_rowvector_vector_length) {
 }
 TEST(AgradFwdFvarFvarMatrix, dot_product_rowvector_vector_no_exception_length) {
   using stan::math::vector_d;
-  using stan::agrad::vector_ffv;
+  using stan::agrad::vector_ffd;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_ffv;
+  using stan::agrad::row_vector_ffd;
   using stan::agrad::fvar;
 
   row_vector_d d1(3);
-  row_vector_ffv v1(3);
+  row_vector_ffd v1(3);
   vector_d d2(2);
-  vector_ffv v2(4);
+  vector_ffd v2(4);
   stan::agrad::size_type length = 2;
 
   fvar<fvar<double> > a,b,c,d,e,f;
@@ -1646,15 +1646,15 @@ TEST(AgradFwdFvarFvarMatrix, dot_product_rowvector_vector_no_exception_length) {
 }
 TEST(AgradFwdFvarFvarMatrix, dot_product_vector_rowvector_length) {
   using stan::math::vector_d;
-  using stan::agrad::vector_ffv;
+  using stan::agrad::vector_ffd;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_ffv;
+  using stan::agrad::row_vector_ffd;
   using stan::agrad::fvar;
 
   vector_d d1(3);
-  vector_ffv v1(3);
+  vector_ffd v1(3);
   row_vector_d d2(3);
-  row_vector_ffv v2(3);
+  row_vector_ffd v2(3);
   stan::agrad::size_type length = 2;
 
   fvar<fvar<double> > a,b,c,d,e,f;
@@ -1685,15 +1685,15 @@ TEST(AgradFwdFvarFvarMatrix, dot_product_vector_rowvector_length) {
 }
 TEST(AgradFwdFvarFvarMatrix, dot_product_vector_rowvector_no_exception_length) {
   using stan::math::vector_d;
-  using stan::agrad::vector_ffv;
+  using stan::agrad::vector_ffd;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_ffv;
+  using stan::agrad::row_vector_ffd;
   using stan::agrad::fvar;
 
   vector_d d1(3);
-  vector_ffv v1(3);
+  vector_ffd v1(3);
   row_vector_d d2(2);
-  row_vector_ffv v2(4);
+  row_vector_ffd v2(4);
   stan::agrad::size_type length = 2;
 
   fvar<fvar<double> > a,b,c,d,e,f;
@@ -1724,11 +1724,11 @@ TEST(AgradFwdFvarFvarMatrix, dot_product_vector_rowvector_no_exception_length) {
 }
 TEST(AgradFwdFvarFvarMatrix, dot_product_rowvector_rowvector_length) {
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_ffv;
+  using stan::agrad::row_vector_ffd;
   using stan::agrad::fvar;
 
   row_vector_d d1(3), d2(3);
-  row_vector_ffv v1(3), v2(3);
+  row_vector_ffd v1(3), v2(3);
   stan::agrad::size_type length = 2;
 
   fvar<fvar<double> > a,b,c,d,e,f;
@@ -1759,11 +1759,11 @@ TEST(AgradFwdFvarFvarMatrix, dot_product_rowvector_rowvector_length) {
 }
 TEST(AgradFwdFvarFvarMatrix, dot_product_rowvector_rowvector_no_exception_length) {
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_ffv;
+  using stan::agrad::row_vector_ffd;
   using stan::agrad::fvar;
 
   row_vector_d d1(3), d2(2);
-  row_vector_ffv v1(3), v2(4);
+  row_vector_ffd v1(3), v2(4);
   stan::agrad::size_type length = 2;
 
   fvar<fvar<double> > a,b,c,d,e,f;
@@ -1827,12 +1827,12 @@ TEST(AgradFwdFvarFvarMatrix, dot_product_stdvector_stdvector_length) {
 }
 TEST(AgradFwdFvarFvarMatrix, dot_product_matrix_matrix_exception_length) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffv;
+  using stan::agrad::matrix_ffd;
   using stan::agrad::dot_product;
   using stan::agrad::fvar;
   stan::agrad::size_type length = 3;
   matrix_d d1(3,3),d2(3,2),d3(2,3);
-  matrix_ffv v1(3,3),v2(3,3),v3(3,2),v4(3,2),v5(2,3),v6(2,3);
+  matrix_ffd v1(3,3),v2(3,3),v3(3,2),v4(3,2),v5(2,3),v6(2,3);
 
   fvar<fvar<double> > a,b,c;
   a.val_.val_ = 1.0;

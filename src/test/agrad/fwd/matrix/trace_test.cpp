@@ -7,10 +7,10 @@
 
 TEST(AgradFwdMatrix,mv_trace) {
   using stan::math::trace;
-  using stan::agrad::matrix_fv;
+  using stan::agrad::matrix_fd;
   using stan::agrad::fvar;
 
-  matrix_fv a(2,2);
+  matrix_fd a(2,2);
   a << -1.0, 2.0, 
     5.0, 10.0;
    a(0,0).d_ = 1.0;
@@ -24,11 +24,11 @@ TEST(AgradFwdMatrix,mv_trace) {
 }  
 TEST(AgradFwdFvarVarMatrix,mv_trace) {
   using stan::math::trace;
-  using stan::agrad::matrix_fvv;
+  using stan::agrad::matrix_fv;
   using stan::agrad::fvar;
   using stan::agrad::var;
 
-  matrix_fvv a(2,2);
+  matrix_fv a(2,2);
   a << -1.0, 2.0, 
     5.0, 10.0;
    a(0,0).d_ = 1.0;
@@ -42,10 +42,10 @@ TEST(AgradFwdFvarVarMatrix,mv_trace) {
 }
 TEST(AgradFwdFvarFvarMatrix,mv_trace) {
   using stan::math::trace;
-  using stan::agrad::matrix_ffv;
+  using stan::agrad::matrix_ffd;
   using stan::agrad::fvar;
 
-  matrix_ffv a(2,2);
+  matrix_ffd a(2,2);
   a << -1.0, 2.0, 
     5.0, 10.0;
   a(0,0).d_ = 1.0;

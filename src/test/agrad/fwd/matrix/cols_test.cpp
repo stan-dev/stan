@@ -4,11 +4,11 @@
 #include <stan/agrad/var.hpp>
 
 TEST(AgradFwdMatrix,cols_vector) {
-  using stan::agrad::vector_fv;
-  using stan::agrad::row_vector_fv;
+  using stan::agrad::vector_fd;
+  using stan::agrad::row_vector_fd;
   using stan::math::cols;
 
-  vector_fv v(5);
+  vector_fd v(5);
   v << 0, 1, 2, 3, 4;
    v(0).d_ = 1.0;
    v(1).d_ = 1.0;
@@ -21,10 +21,10 @@ TEST(AgradFwdMatrix,cols_vector) {
   EXPECT_EQ(1U, cols(v));
 }
 TEST(AgradFwdMatrix,cols_rowvector) {
-  using stan::agrad::row_vector_fv;
+  using stan::agrad::row_vector_fd;
   using stan::math::cols;
 
-  row_vector_fv rv(5);
+  row_vector_fd rv(5);
   rv << 0, 1, 2, 3, 4;
    rv(0).d_ = 1.0;
    rv(1).d_ = 1.0;
@@ -37,10 +37,10 @@ TEST(AgradFwdMatrix,cols_rowvector) {
   EXPECT_EQ(0U, cols(rv));
 }
 TEST(AgradFwdMatrix,cols_matrix) {
-  using stan::agrad::matrix_fv;
+  using stan::agrad::matrix_fd;
   using stan::math::cols;
 
-  matrix_fv m(2,3);
+  matrix_fd m(2,3);
   m << 0, 1, 2, 3, 4, 5;
   m(0,0).d_ = 1.0;
   EXPECT_EQ(3U, cols(m));
@@ -49,8 +49,8 @@ TEST(AgradFwdMatrix,cols_matrix) {
   EXPECT_EQ(0U, cols(m));
 }
 TEST(AgradFwdFvarVarMatrix,cols_vector) {
-  using stan::agrad::vector_fvv;
-  using stan::agrad::row_vector_fvv;
+  using stan::agrad::vector_fv;
+  using stan::agrad::row_vector_fv;
   using stan::math::cols;
   using stan::agrad::fvar;
   using stan::agrad::var;
@@ -61,7 +61,7 @@ TEST(AgradFwdFvarVarMatrix,cols_vector) {
   fvar<var> d(4.0,1.0);
   fvar<var> e(0.0,1.0);
 
-  vector_fvv v(5);
+  vector_fv v(5);
   v << e,a,b,c,d;
   EXPECT_EQ(1U, cols(v));
 
@@ -69,7 +69,7 @@ TEST(AgradFwdFvarVarMatrix,cols_vector) {
   EXPECT_EQ(1U, cols(v));
 }
 TEST(AgradFwdFvarVarMatrix,cols_rowvector) {
-  using stan::agrad::row_vector_fvv;
+  using stan::agrad::row_vector_fv;
   using stan::math::cols;
   using stan::agrad::fvar;
   using stan::agrad::var;
@@ -80,7 +80,7 @@ TEST(AgradFwdFvarVarMatrix,cols_rowvector) {
   fvar<var> d(4.0,1.0);
   fvar<var> e(0.0,1.0);
 
-  row_vector_fvv rv(5);
+  row_vector_fv rv(5);
   rv << e,a,b,c,d;
   EXPECT_EQ(5U, cols(rv));
   
@@ -88,7 +88,7 @@ TEST(AgradFwdFvarVarMatrix,cols_rowvector) {
   EXPECT_EQ(0U, cols(rv));
 }
 TEST(AgradFwdFvarVarMatrix,cols_matrix) {
-  using stan::agrad::matrix_fvv;
+  using stan::agrad::matrix_fv;
   using stan::math::cols;
   using stan::agrad::fvar;
   using stan::agrad::var;
@@ -99,7 +99,7 @@ TEST(AgradFwdFvarVarMatrix,cols_matrix) {
   fvar<var> d(4.0,1.0);
   fvar<var> e(5.0,1.0);
   fvar<var> f(0.0,1.0);
-  matrix_fvv m(2,3);
+  matrix_fv m(2,3);
   m <<f,a,b,c,d,e;
   EXPECT_EQ(3U, cols(m));
   
@@ -107,8 +107,8 @@ TEST(AgradFwdFvarVarMatrix,cols_matrix) {
   EXPECT_EQ(0U, cols(m));
 }
 TEST(AgradFwdFvarFvarMatrix,cols_vector) {
-  using stan::agrad::vector_ffv;
-  using stan::agrad::row_vector_ffv;
+  using stan::agrad::vector_ffd;
+  using stan::agrad::row_vector_ffd;
   using stan::math::cols;
   using stan::agrad::fvar;
   using stan::agrad::var;
@@ -129,7 +129,7 @@ TEST(AgradFwdFvarFvarMatrix,cols_vector) {
   e.val_.val_ = 0.0;
   e.d_.val_ = 1.0;
 
-  vector_ffv v(5);
+  vector_ffd v(5);
   v << e,a,b,c,d;
   EXPECT_EQ(1U, cols(v));
 
@@ -137,7 +137,7 @@ TEST(AgradFwdFvarFvarMatrix,cols_vector) {
   EXPECT_EQ(1U, cols(v));
 }
 TEST(AgradFwdFvarFvarMatrix,cols_rowvector) {
-  using stan::agrad::row_vector_ffv;
+  using stan::agrad::row_vector_ffd;
   using stan::math::cols;
   using stan::agrad::fvar;
   using stan::agrad::var;
@@ -158,7 +158,7 @@ TEST(AgradFwdFvarFvarMatrix,cols_rowvector) {
   e.val_.val_ = 0.0;
   e.d_.val_ = 1.0;
 
-  row_vector_ffv rv(5);
+  row_vector_ffd rv(5);
   rv << e,a,b,c,d;
   EXPECT_EQ(5U, cols(rv));
   
@@ -166,7 +166,7 @@ TEST(AgradFwdFvarFvarMatrix,cols_rowvector) {
   EXPECT_EQ(0U, cols(rv));
 }
 TEST(AgradFwdFvarFvarMatrix,cols_matrix) {
-  using stan::agrad::matrix_ffv;
+  using stan::agrad::matrix_ffd;
   using stan::math::cols;
   using stan::agrad::fvar;
   using stan::agrad::var;
@@ -190,7 +190,7 @@ TEST(AgradFwdFvarFvarMatrix,cols_matrix) {
   f.val_.val_ = 0.0;
   f.d_.val_ = 1.0;
 
-  matrix_ffv m(2,3);
+  matrix_ffd m(2,3);
   m <<f,a,b,c,d,e;
   EXPECT_EQ(3U, cols(m));
   

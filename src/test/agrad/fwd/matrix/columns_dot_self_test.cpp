@@ -6,26 +6,26 @@
 
 TEST(AgradFwdMatrix,columns_dot_self) {
   using stan::math::columns_dot_self;
-  using stan::agrad::matrix_fv;
+  using stan::agrad::matrix_fd;
 
-  matrix_fv m1(1,1);
+  matrix_fd m1(1,1);
   m1 << 2.0;
   m1(0).d_ = 1.0;
   EXPECT_NEAR(4.0,columns_dot_self(m1)(0,0).val_,1E-12);
   EXPECT_NEAR(4.0,columns_dot_self(m1)(0,0).d_,1E-12);
 
-  matrix_fv m2(1,2);
+  matrix_fd m2(1,2);
   m2 << 2.0, 3.0;
   m2(0).d_ = 1.0;
   m2(1).d_ = 1.0;
-  matrix_fv x;
+  matrix_fd x;
   x = columns_dot_self(m2);
   EXPECT_NEAR(4.0,x(0,0).val_,1E-12);
   EXPECT_NEAR(9.0,x(0,1).val_,1E-12);
   EXPECT_NEAR(4.0,x(0,0).d_,1E-12);
   EXPECT_NEAR(6.0,x(0,1).d_,1E-12);
 
-  matrix_fv m3(2,2);
+  matrix_fd m3(2,2);
   m3 << 2.0, 3.0, 4.0, 5.0;
   m3(0,0).d_ = 1.0;
   m3(0,1).d_ = 1.0;
@@ -39,7 +39,7 @@ TEST(AgradFwdMatrix,columns_dot_self) {
 }
 TEST(AgradFwdFvarVarMatrix,columns_dot_self) {
   using stan::math::columns_dot_self;
-  using stan::agrad::matrix_fvv;
+  using stan::agrad::matrix_fv;
   using stan::agrad::fvar;
   using stan::agrad::var;
 
@@ -47,22 +47,22 @@ TEST(AgradFwdFvarVarMatrix,columns_dot_self) {
   fvar<var> b(3.0,1.0);
   fvar<var> c(4.0,1.0);
   fvar<var> d(5.0,1.0);
-  matrix_fvv m1(1,1);
+  matrix_fv m1(1,1);
   m1 << a;
 
   EXPECT_NEAR(4.0,columns_dot_self(m1)(0,0).val_.val(),1E-12);
   EXPECT_NEAR(4.0,columns_dot_self(m1)(0,0).d_.val(),1E-12);
 
-  matrix_fvv m2(1,2);
+  matrix_fv m2(1,2);
   m2 << a,b;
-  matrix_fvv x;
+  matrix_fv x;
   x = columns_dot_self(m2);
   EXPECT_NEAR(4.0,x(0,0).val_.val(),1E-12);
   EXPECT_NEAR(9.0,x(0,1).val_.val(),1E-12);
   EXPECT_NEAR(4.0,x(0,0).d_.val(),1E-12);
   EXPECT_NEAR(6.0,x(0,1).d_.val(),1E-12);
 
-  matrix_fvv m3(2,2);
+  matrix_fv m3(2,2);
   m3 << a,b,c,d;
   x = columns_dot_self(m3);
   EXPECT_NEAR(20.0,x(0,0).val_.val(),1E-12);
@@ -72,7 +72,7 @@ TEST(AgradFwdFvarVarMatrix,columns_dot_self) {
 }
 TEST(AgradFwdFvarFvarMatrix,columns_dot_self) {
   using stan::math::columns_dot_self;
-  using stan::agrad::matrix_ffv;
+  using stan::agrad::matrix_ffd;
   using stan::agrad::fvar;
 
   fvar<fvar<double> > a;
@@ -88,22 +88,22 @@ TEST(AgradFwdFvarFvarMatrix,columns_dot_self) {
   d.val_.val_ = 5.0;
   d.d_.val_ = 1.0;  
 
-  matrix_ffv m1(1,1);
+  matrix_ffd m1(1,1);
   m1 << a;
 
   EXPECT_NEAR(4.0,columns_dot_self(m1)(0,0).val_.val(),1E-12);
   EXPECT_NEAR(4.0,columns_dot_self(m1)(0,0).d_.val(),1E-12);
 
-  matrix_ffv m2(1,2);
+  matrix_ffd m2(1,2);
   m2 << a,b;
-  matrix_ffv x;
+  matrix_ffd x;
   x = columns_dot_self(m2);
   EXPECT_NEAR(4.0,x(0,0).val_.val(),1E-12);
   EXPECT_NEAR(9.0,x(0,1).val_.val(),1E-12);
   EXPECT_NEAR(4.0,x(0,0).d_.val(),1E-12);
   EXPECT_NEAR(6.0,x(0,1).d_.val(),1E-12);
 
-  matrix_ffv m3(2,2);
+  matrix_ffd m3(2,2);
   m3 << a,b,c,d;
   x = columns_dot_self(m3);
   EXPECT_NEAR(20.0,x(0,0).val_.val(),1E-12);

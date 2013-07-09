@@ -8,10 +8,10 @@
 TEST(AgradFwdMatrix, exp_matrix) {
   using stan::math::exp;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fv;
+  using stan::agrad::matrix_fd;
 
   matrix_d expected_output(2,2);
-  matrix_fv mv(2,2), output;
+  matrix_fd mv(2,2), output;
   int i,j;
 
   mv << 1, 2, 3, 4;
@@ -33,10 +33,10 @@ TEST(AgradFwdMatrix, exp_matrix) {
 TEST(AgradFwdMatrix, exp_vector) {
   using stan::math::exp;
   using stan::math::vector_d;
-  using stan::agrad::vector_fv;
+  using stan::agrad::vector_fd;
 
   vector_d expected_output(4);
-  vector_fv mv(4), output;
+  vector_fd mv(4), output;
 
   mv << 1, 2, 3, 4;
    mv(0).d_ = 2.0;
@@ -56,10 +56,10 @@ TEST(AgradFwdMatrix, exp_vector) {
 TEST(AgradFwdMatrix, exp_rowvector) {
   using stan::math::exp;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fv;
+  using stan::agrad::row_vector_fd;
 
   row_vector_d expected_output(4);
-  row_vector_fv mv(4), output;
+  row_vector_fd mv(4), output;
 
   mv << 1, 2, 3, 4;
    mv(0).d_ = 2.0;
@@ -79,12 +79,12 @@ TEST(AgradFwdMatrix, exp_rowvector) {
 TEST(AgradFvarVarMatrix, exp_matrix) {
   using stan::math::exp;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fvv;
+  using stan::agrad::matrix_fv;
   using stan::agrad::fvar;
   using stan::agrad::var;
 
   matrix_d expected_output(2,2);
-  matrix_fvv mv(2,2), output;
+  matrix_fv mv(2,2), output;
   int i,j;
 
   fvar<var> a(1.0,2.0);
@@ -107,12 +107,12 @@ TEST(AgradFvarVarMatrix, exp_matrix) {
 TEST(AgradFvarVarMatrix, exp_vector) {
   using stan::math::exp;
   using stan::math::vector_d;
-  using stan::agrad::vector_fvv;
+  using stan::agrad::vector_fv;
   using stan::agrad::fvar;
   using stan::agrad::var;
 
   vector_d expected_output(4);
-  vector_fvv mv(4), output;
+  vector_fv mv(4), output;
 
   fvar<var> a(1.0,2.0);
   fvar<var> b(2.0,2.0);
@@ -133,12 +133,12 @@ TEST(AgradFvarVarMatrix, exp_vector) {
 TEST(AgradFvarVarMatrix, exp_rowvector) {
   using stan::math::exp;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fvv;
+  using stan::agrad::row_vector_fv;
   using stan::agrad::fvar;
   using stan::agrad::var;
 
   row_vector_d expected_output(4);
-  row_vector_fvv mv(4), output;
+  row_vector_fv mv(4), output;
 
   fvar<var> a(1.0,2.0);
   fvar<var> b(2.0,2.0);
@@ -159,11 +159,11 @@ TEST(AgradFvarVarMatrix, exp_rowvector) {
 TEST(AgradFvarFvarMatrix, exp_matrix) {
   using stan::math::exp;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffv;
+  using stan::agrad::matrix_ffd;
   using stan::agrad::fvar;
 
   matrix_d expected_output(2,2);
-  matrix_ffv mv(2,2), output;
+  matrix_ffd mv(2,2), output;
   int i,j;
 
   fvar<fvar<double> > a,b,c,d;
@@ -191,11 +191,11 @@ TEST(AgradFvarFvarMatrix, exp_matrix) {
 TEST(AgradFvarFvarMatrix, exp_vector) {
   using stan::math::exp;
   using stan::math::vector_d;
-  using stan::agrad::vector_ffv;
+  using stan::agrad::vector_ffd;
   using stan::agrad::fvar;
 
   vector_d expected_output(4);
-  vector_ffv mv(4), output;
+  vector_ffd mv(4), output;
 
   fvar<fvar<double> > a,b,c,d;
   a.val_.val_ = 1.0;
@@ -221,11 +221,11 @@ TEST(AgradFvarFvarMatrix, exp_vector) {
 TEST(AgradFvarFvarMatrix, exp_rowvector) {
   using stan::math::exp;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_ffv;
+  using stan::agrad::row_vector_ffd;
   using stan::agrad::fvar;
 
   row_vector_d expected_output(4);
-  row_vector_ffv mv(4), output;
+  row_vector_ffd mv(4), output;
 
   fvar<fvar<double> > a,b,c,d;
   a.val_.val_ = 1.0;

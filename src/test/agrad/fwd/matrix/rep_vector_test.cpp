@@ -7,12 +7,12 @@
 using stan::agrad::var;
 TEST(AgradFwdMatrix,rep_vector) {
   using stan::math::rep_vector;
-  using stan::agrad::vector_fv;
+  using stan::agrad::vector_fd;
   using stan::agrad::fvar;
   fvar<double> a;
   a.val_ = 3.0;
   a.d_ = 2.0;
-  vector_fv output;
+  vector_fd output;
   output = rep_vector(a, 4);
 
   EXPECT_EQ(3,output(0).val_);
@@ -27,7 +27,7 @@ TEST(AgradFwdMatrix,rep_vector) {
 
 TEST(AgradFwdMatrix,rep_vector_exception) {
   using stan::math::rep_vector;
-  using stan::agrad::vector_fv;
+  using stan::agrad::vector_fd;
   using stan::agrad::fvar;
   fvar<double> a;
   a.val_ = 3.0;
@@ -37,12 +37,12 @@ TEST(AgradFwdMatrix,rep_vector_exception) {
 }
 TEST(AgradFwdFvarVarMatrix,rep_vector) {
   using stan::math::rep_vector;
-  using stan::agrad::vector_fvv;
+  using stan::agrad::vector_fv;
   using stan::agrad::fvar;
   fvar<var> a;
   a.val_ = 3.0;
   a.d_ = 2.0;
-  vector_fvv output;
+  vector_fv output;
   output = rep_vector(a, 4);
 
   EXPECT_EQ(3,output(0).val_.val());
@@ -57,7 +57,7 @@ TEST(AgradFwdFvarVarMatrix,rep_vector) {
 
 TEST(AgradFwdFvarVarMatrix,rep_vector_exception) {
   using stan::math::rep_vector;
-  using stan::agrad::vector_fvv;
+  using stan::agrad::vector_fv;
   using stan::agrad::fvar;
   fvar<var> a;
   a.val_ = 3.0;
@@ -67,12 +67,12 @@ TEST(AgradFwdFvarVarMatrix,rep_vector_exception) {
 }
 TEST(AgradFwdFvarFvarMatrix,rep_vector) {
   using stan::math::rep_vector;
-  using stan::agrad::vector_ffv;
+  using stan::agrad::vector_ffd;
   using stan::agrad::fvar;
   fvar<fvar<double> > a;
   a.val_ = 3.0;
   a.d_ = 2.0;
-  vector_ffv output;
+  vector_ffd output;
   output = rep_vector(a, 4);
 
   EXPECT_EQ(3,output(0).val_.val());
@@ -87,7 +87,7 @@ TEST(AgradFwdFvarFvarMatrix,rep_vector) {
 
 TEST(AgradFwdFvarFvarMatrix,rep_vector_exception) {
   using stan::math::rep_vector;
-  using stan::agrad::vector_ffv;
+  using stan::agrad::vector_ffd;
   using stan::agrad::fvar;
   fvar<fvar<double> > a;
   a.val_ = 3.0;

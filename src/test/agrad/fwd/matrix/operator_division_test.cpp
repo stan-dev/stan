@@ -50,10 +50,10 @@ TEST(AgradFwdMatrix, divide_scalar) {
 TEST(AgradFwdMatrix, divide_vector) {
   using stan::math::divide;
   using stan::math::vector_d;
-  using stan::agrad::vector_fv;
+  using stan::agrad::vector_fd;
 
   vector_d d1(3);
-  vector_fv v1(3);
+  vector_fd v1(3);
   double d2;
   fvar<double> v2;
   
@@ -72,7 +72,7 @@ TEST(AgradFwdMatrix, divide_vector) {
   EXPECT_FLOAT_EQ(  0, output_d(1));
   EXPECT_FLOAT_EQ(1.5, output_d(2));
 
-  vector_fv output;
+  vector_fd output;
   output = divide(d1, v2);
   EXPECT_FLOAT_EQ( -50, output(0).val_);
   EXPECT_FLOAT_EQ(   0, output(1).val_);
@@ -131,10 +131,10 @@ TEST(AgradFwdMatrix, divide_vector) {
 TEST(AgradFwdMatrix, divide_rowvector) {
   using stan::math::divide;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fv;
+  using stan::agrad::row_vector_fd;
 
   row_vector_d d1(3);
-  row_vector_fv v1(3);
+  row_vector_fd v1(3);
   double d2;
   fvar<double> v2;
   
@@ -152,7 +152,7 @@ TEST(AgradFwdMatrix, divide_rowvector) {
   EXPECT_FLOAT_EQ(  0, output_d(1));
   EXPECT_FLOAT_EQ(1.5, output_d(2));
 
-  row_vector_fv output;
+  row_vector_fd output;
   output = divide(d1, v2);
   EXPECT_FLOAT_EQ( -50, output(0).val_);
   EXPECT_FLOAT_EQ(   0, output(1).val_);
@@ -211,10 +211,10 @@ TEST(AgradFwdMatrix, divide_rowvector) {
 TEST(AgradFwdMatrix, divide_matrix) {
   using stan::math::divide;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fv;
+  using stan::agrad::matrix_fd;
 
   matrix_d d1(2,2);
-  matrix_fv v1(2,2);
+  matrix_fd v1(2,2);
   double d2;
   fvar<double> v2;
   
@@ -234,7 +234,7 @@ TEST(AgradFwdMatrix, divide_matrix) {
   EXPECT_FLOAT_EQ(1.5, output_d(1,0));
   EXPECT_FLOAT_EQ( -2, output_d(1,1));
 
-  matrix_fv output;
+  matrix_fd output;
   output = divide(d1, v2);
   EXPECT_FLOAT_EQ( -50, output(0,0).val_);
   EXPECT_FLOAT_EQ(   0, output(0,1).val_);
@@ -351,10 +351,10 @@ TEST(AgradFwdFvarVarMatrix, divide_scalar) {
 TEST(AgradFwdFvarVarMatrix, divide_vector) {
   using stan::math::divide;
   using stan::math::vector_d;
-  using stan::agrad::vector_fvv;
+  using stan::agrad::vector_fv;
 
   vector_d d1(3);
-  vector_fvv v1(3);
+  vector_fv v1(3);
   double d2;
   fvar<var> v2;
   
@@ -373,7 +373,7 @@ TEST(AgradFwdFvarVarMatrix, divide_vector) {
   EXPECT_FLOAT_EQ(  0, output_d(1));
   EXPECT_FLOAT_EQ(1.5, output_d(2));
 
-  vector_fvv output;
+  vector_fv output;
   output = divide(d1, v2);
   EXPECT_FLOAT_EQ( -50, output(0).val_.val());
   EXPECT_FLOAT_EQ(   0, output(1).val_.val());
@@ -438,10 +438,10 @@ TEST(AgradFwdFvarVarMatrix, divide_vector) {
 TEST(AgradFwdFvarVarMatrix, divide_rowvector) {
   using stan::math::divide;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fvv;
+  using stan::agrad::row_vector_fv;
 
   row_vector_d d1(3);
-  row_vector_fvv v1(3);
+  row_vector_fv v1(3);
   double d2;
   fvar<var> v2;
   
@@ -459,7 +459,7 @@ TEST(AgradFwdFvarVarMatrix, divide_rowvector) {
   EXPECT_FLOAT_EQ(  0, output_d(1));
   EXPECT_FLOAT_EQ(1.5, output_d(2));
 
-  row_vector_fvv output;
+  row_vector_fv output;
   output = divide(d1, v2);
   EXPECT_FLOAT_EQ( -50, output(0).val_.val());
   EXPECT_FLOAT_EQ(   0, output(1).val_.val());
@@ -524,10 +524,10 @@ TEST(AgradFwdFvarVarMatrix, divide_rowvector) {
 TEST(AgradFwdFvarVarMatrix, divide_matrix) {
   using stan::math::divide;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fvv;
+  using stan::agrad::matrix_fv;
 
   matrix_d d1(2,2);
-  matrix_fvv v1(2,2);
+  matrix_fv v1(2,2);
   double d2;
   fvar<var> v2;
   
@@ -547,7 +547,7 @@ TEST(AgradFwdFvarVarMatrix, divide_matrix) {
   EXPECT_FLOAT_EQ(1.5, output_d(1,0));
   EXPECT_FLOAT_EQ( -2, output_d(1,1));
 
-  matrix_fvv output;
+  matrix_fv output;
   output = divide(d1, v2);
   EXPECT_FLOAT_EQ( -50, output(0,0).val_.val());
   EXPECT_FLOAT_EQ(   0, output(0,1).val_.val());
@@ -677,10 +677,10 @@ TEST(AgradFwdFvarFvarMatrix, divide_scalar) {
 TEST(AgradFwdFvarFvarMatrix, divide_vector) {
   using stan::math::divide;
   using stan::math::vector_d;
-  using stan::agrad::vector_ffv;
+  using stan::agrad::vector_ffd;
 
   vector_d d1(3);
-  vector_ffv v1(3);
+  vector_ffd v1(3);
   double d2;
   fvar<fvar<double> > v2,a,b,c;
   
@@ -703,7 +703,7 @@ TEST(AgradFwdFvarFvarMatrix, divide_vector) {
   EXPECT_FLOAT_EQ(  0, output_d(1));
   EXPECT_FLOAT_EQ(1.5, output_d(2));
 
-  vector_ffv output;
+  vector_ffd output;
   output = divide(d1, v2);
   EXPECT_FLOAT_EQ( -50, output(0).val_.val());
   EXPECT_FLOAT_EQ(   0, output(1).val_.val());
@@ -766,10 +766,10 @@ TEST(AgradFwdFvarFvarMatrix, divide_vector) {
 TEST(AgradFwdFvarFvarMatrix, divide_rowvector) {
   using stan::math::divide;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_ffv;
+  using stan::agrad::row_vector_ffd;
 
   row_vector_d d1(3);
-  row_vector_ffv v1(3);
+  row_vector_ffd v1(3);
   double d2;
   fvar<fvar<double> > v2,a,b,c;
   a.val_.val_ = 100.0;
@@ -791,7 +791,7 @@ TEST(AgradFwdFvarFvarMatrix, divide_rowvector) {
   EXPECT_FLOAT_EQ(  0, output_d(1));
   EXPECT_FLOAT_EQ(1.5, output_d(2));
 
-  row_vector_ffv output;
+  row_vector_ffd output;
   output = divide(d1, v2);
   EXPECT_FLOAT_EQ( -50, output(0).val_.val());
   EXPECT_FLOAT_EQ(   0, output(1).val_.val());
@@ -856,10 +856,10 @@ TEST(AgradFwdFvarFvarMatrix, divide_rowvector) {
 TEST(AgradFwdFvarFvarMatrix, divide_matrix) {
   using stan::math::divide;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_ffv;
+  using stan::agrad::matrix_ffd;
 
   matrix_d d1(2,2);
-  matrix_ffv v1(2,2);
+  matrix_ffd v1(2,2);
   double d2;
   fvar<fvar<double> > v2,a,b,c,d;
   
@@ -883,7 +883,7 @@ TEST(AgradFwdFvarFvarMatrix, divide_matrix) {
   EXPECT_FLOAT_EQ(1.5, output_d(1,0));
   EXPECT_FLOAT_EQ( -2, output_d(1,1));
 
-  matrix_ffv output;
+  matrix_ffd output;
   output = divide(d1, v2);
   EXPECT_FLOAT_EQ( -50, output(0,0).val_.val());
   EXPECT_FLOAT_EQ(   0, output(0,1).val_.val());
