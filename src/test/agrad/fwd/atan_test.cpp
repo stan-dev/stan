@@ -159,4 +159,3 @@ TEST(Agrad_Fwd_Atan,FvarFvarVar_2ndDeriv) {
   b.d_.val_.grad(q,r);
   EXPECT_FLOAT_EQ(2.0 * -0.28402368, r[0]);
 }
-Deriv
