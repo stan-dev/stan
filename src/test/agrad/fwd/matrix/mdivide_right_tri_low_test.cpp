@@ -5,7 +5,7 @@
 #include <stan/agrad/rev/matrix/multiply.hpp>
 
 using stan::agrad::fvar;
-TEST(AgradFwdMatrix, mdivide_right_tri_low_rowvector_fd_matrix_fd) {
+TEST(AgradFwdMatrixMdivideRightTriLow,fd__rowvector_fd_matrix_fd) {
   using stan::agrad::matrix_fd;
   using stan::agrad::row_vector_fd;
 
@@ -38,7 +38,7 @@ TEST(AgradFwdMatrix, mdivide_right_tri_low_rowvector_fd_matrix_fd) {
   EXPECT_FLOAT_EQ(1.0 / 6.0,output(0,1).d_);
   EXPECT_FLOAT_EQ(1.0 / 6.0,output(0,2).d_);
 }
-TEST(AgradFwdMatrix, mdivide_right_tri_low_rowvector_matrix_fd) {
+TEST(AgradFwdMatrixMdivideRightTriLow,fd__rowvector_matrix_fd) {
   using stan::agrad::matrix_fd;
   using stan::math::row_vector_d;
 
@@ -68,7 +68,7 @@ TEST(AgradFwdMatrix, mdivide_right_tri_low_rowvector_matrix_fd) {
   EXPECT_FLOAT_EQ(5.0 / 90.0,output(0,1).d_);
   EXPECT_FLOAT_EQ(-1.0 / 6.0,output(0,2).d_);
 }
-TEST(AgradFwdMatrix, mdivide_right_tri_low_rowvector_fd_matrix) {
+TEST(AgradFwdMatrixMdivideRightTriLow,fd__rowvector_fd_matrix) {
   using stan::math::matrix_d;
   using stan::agrad::matrix_fd;
   using stan::agrad::row_vector_fd;
@@ -93,7 +93,7 @@ TEST(AgradFwdMatrix, mdivide_right_tri_low_rowvector_fd_matrix) {
   EXPECT_FLOAT_EQ(1.0 / 9.0,output(0,1).d_);
   EXPECT_FLOAT_EQ(3.0 / 9.0,output(0,2).d_);
 }
-TEST(AgradFwdMatrix, mdivide_right_tri_low_matrix_fd_matrix_fd) {
+TEST(AgradFwdMatrixMdivideRightTriLow,fd__matrix_fd_matrix_fd) {
   using stan::agrad::matrix_fd;
   using stan::agrad::row_vector_fd;
 
@@ -146,7 +146,7 @@ TEST(AgradFwdMatrix, mdivide_right_tri_low_matrix_fd_matrix_fd) {
   EXPECT_FLOAT_EQ(-1.0 / 6.0,output(2,1).d_);
   EXPECT_FLOAT_EQ(-1.0 / 6.0,output(2,2).d_);
 }
-TEST(AgradFwdMatrix, mdivide_right_tri_low_matrix_fd_matrix) {
+TEST(AgradFwdMatrixMdivideRightTriLow,fd__matrix_fd_matrix) {
   using stan::agrad::matrix_fd;
   using stan::math::matrix_d;
   using stan::agrad::row_vector_fd;
@@ -191,7 +191,7 @@ TEST(AgradFwdMatrix, mdivide_right_tri_low_matrix_fd_matrix) {
   EXPECT_FLOAT_EQ(1.0 / 9.0,output(2,1).d_);
   EXPECT_FLOAT_EQ(2.0 / 6.0,output(2,2).d_);
 }
-TEST(AgradFwdMatrix, mdivide_right_tri_low_matrix_matrix_fd) {
+TEST(AgradFwdMatrixMdivideRightTriLow,fd__matrix_matrix_fd) {
   using stan::agrad::matrix_fd;
   using stan::math::matrix_d;
   using stan::agrad::row_vector_fd;
@@ -236,7 +236,7 @@ TEST(AgradFwdMatrix, mdivide_right_tri_low_matrix_matrix_fd) {
   EXPECT_FLOAT_EQ(-25.0 / 90.0,output(2,1).d_);
   EXPECT_FLOAT_EQ(-3.0 / 6.0,output(2,2).d_);
 }
-TEST(AgradFwdMatrix, mdivide_right_tri_low_rowvector_matrix_exceptions) {
+TEST(AgradFwdMatrixMdivideRightTriLow,fd__rowvector_matrix_exceptions) {
   using stan::math::matrix_d;
   using stan::agrad::matrix_fd;
   using stan::agrad::row_vector_fd;
@@ -255,7 +255,7 @@ TEST(AgradFwdMatrix, mdivide_right_tri_low_rowvector_matrix_exceptions) {
   EXPECT_THROW(mdivide_right_tri_low(fv2,vm1), std::domain_error);
   EXPECT_THROW(mdivide_right_tri_low(v2,fvm1), std::domain_error);
 }
-TEST(AgradFwdMatrix, mdivide_right_tri_low_matrix_matrix_exceptions) {
+TEST(AgradFwdMatrixMdivideRightTriLow,fd__matrix_matrix_exceptions) {
   using stan::math::matrix_d;
   using stan::agrad::matrix_fd;
   using stan::agrad::mdivide_right_tri_low;
@@ -267,7 +267,7 @@ TEST(AgradFwdMatrix, mdivide_right_tri_low_matrix_matrix_exceptions) {
   EXPECT_THROW(mdivide_right_tri_low(fvm1,vm2), std::domain_error);
   EXPECT_THROW(mdivide_right_tri_low(vm1,fvm2), std::domain_error);
 }
-TEST(AgradFwdFvarVarMatrix, mdivide_right_tri_low_rowvector_fv_matrix_fv) {
+TEST(AgradFwdMatrixMdivideRightTriLow,fv__rowvector_fv_matrix_fv) {
   using stan::agrad::matrix_fv;
   using stan::agrad::row_vector_fv;
 
@@ -300,7 +300,7 @@ TEST(AgradFwdFvarVarMatrix, mdivide_right_tri_low_rowvector_fv_matrix_fv) {
   EXPECT_FLOAT_EQ(1.0 / 6.0,output(0,1).d_.val());
   EXPECT_FLOAT_EQ(1.0 / 6.0,output(0,2).d_.val());
 }
-TEST(AgradFwdFvarVarMatrix, mdivide_right_tri_low_rowvector_matrix_fv) {
+TEST(AgradFwdMatrixMdivideRightTriLow,fv__rowvector_matrix_fv) {
   using stan::agrad::matrix_fv;
   using stan::math::row_vector_d;
 
@@ -330,7 +330,7 @@ TEST(AgradFwdFvarVarMatrix, mdivide_right_tri_low_rowvector_matrix_fv) {
   EXPECT_FLOAT_EQ(5.0 / 90.0,output(0,1).d_.val());
   EXPECT_FLOAT_EQ(-1.0 / 6.0,output(0,2).d_.val());
 }
-TEST(AgradFwdFvarVarMatrix, mdivide_right_tri_low_rowvector_fv_matrix) {
+TEST(AgradFwdMatrixMdivideRightTriLow,fv__rowvector_fv_matrix) {
   using stan::math::matrix_d;
   using stan::agrad::matrix_fv;
   using stan::agrad::row_vector_fv;
@@ -355,7 +355,7 @@ TEST(AgradFwdFvarVarMatrix, mdivide_right_tri_low_rowvector_fv_matrix) {
   EXPECT_FLOAT_EQ(1.0 / 9.0,output(0,1).d_.val());
   EXPECT_FLOAT_EQ(3.0 / 9.0,output(0,2).d_.val());
 }
-TEST(AgradFwdFvarVarMatrix, mdivide_right_tri_low_matrix_fv_matrix_fv) {
+TEST(AgradFwdMatrixMdivideRightTriLow,fv__matrix_fv_matrix_fv) {
   using stan::agrad::matrix_fv;
   using stan::agrad::row_vector_fv;
 
@@ -408,7 +408,7 @@ TEST(AgradFwdFvarVarMatrix, mdivide_right_tri_low_matrix_fv_matrix_fv) {
   EXPECT_FLOAT_EQ(-1.0 / 6.0,output(2,1).d_.val());
   EXPECT_FLOAT_EQ(-1.0 / 6.0,output(2,2).d_.val());
 }
-TEST(AgradFwdFvarVarMatrix, mdivide_right_tri_low_matrix_fv_matrix) {
+TEST(AgradFwdMatrixMdivideRightTriLow,fv__matrix_fv_matrix) {
   using stan::agrad::matrix_fv;
   using stan::math::matrix_d;
   using stan::agrad::row_vector_fv;
@@ -453,7 +453,7 @@ TEST(AgradFwdFvarVarMatrix, mdivide_right_tri_low_matrix_fv_matrix) {
   EXPECT_FLOAT_EQ(1.0 / 9.0,output(2,1).d_.val());
   EXPECT_FLOAT_EQ(2.0 / 6.0,output(2,2).d_.val());
 }
-TEST(AgradFwdFvarVarMatrix, mdivide_right_tri_low_matrix_matrix_fv) {
+TEST(AgradFwdMatrixMdivideRightTriLow,fv__matrix_matrix_fv) {
   using stan::agrad::matrix_fv;
   using stan::math::matrix_d;
   using stan::agrad::row_vector_fv;
@@ -498,7 +498,7 @@ TEST(AgradFwdFvarVarMatrix, mdivide_right_tri_low_matrix_matrix_fv) {
   EXPECT_FLOAT_EQ(-25.0 / 90.0,output(2,1).d_.val());
   EXPECT_FLOAT_EQ(-3.0 / 6.0,output(2,2).d_.val());
 }
-TEST(AgradFwdFvarVarMatrix, mdivide_right_tri_low_rowvector_matrix_exceptions) {
+TEST(AgradFwdMatrixMdivideRightTriLow,fv__rowvector_matrix_exceptions) {
   using stan::math::matrix_d;
   using stan::agrad::matrix_fv;
   using stan::agrad::row_vector_fv;
@@ -517,7 +517,7 @@ TEST(AgradFwdFvarVarMatrix, mdivide_right_tri_low_rowvector_matrix_exceptions) {
   EXPECT_THROW(mdivide_right_tri_low(fv2,vm1), std::domain_error);
   EXPECT_THROW(mdivide_right_tri_low(v2,fvm1), std::domain_error);
 }
-TEST(AgradFwdFvarVarMatrix, mdivide_right_tri_low_matrix_matrix_exceptions) {
+TEST(AgradFwdMatrixMdivideRightTriLow,fv__matrix_matrix_exceptions) {
   using stan::math::matrix_d;
   using stan::agrad::matrix_fv;
   using stan::agrad::mdivide_right_tri_low;
@@ -529,7 +529,7 @@ TEST(AgradFwdFvarVarMatrix, mdivide_right_tri_low_matrix_matrix_exceptions) {
   EXPECT_THROW(mdivide_right_tri_low(fvm1,vm2), std::domain_error);
   EXPECT_THROW(mdivide_right_tri_low(vm1,fvm2), std::domain_error);
 }
-TEST(AgradFwdFvarFvarMatrix, mdivide_right_tri_low_rowvector_ffd_matrix_ffd) {
+TEST(AgradFwdMatrixMdivideRightTriLow,ffd__rowvector_ffd_matrix_ffd) {
   using stan::agrad::matrix_ffd;
   using stan::agrad::row_vector_ffd;
 
@@ -565,7 +565,7 @@ TEST(AgradFwdFvarFvarMatrix, mdivide_right_tri_low_rowvector_ffd_matrix_ffd) {
   EXPECT_FLOAT_EQ(1.0 / 6.0,output(0,1).d_.val());
   EXPECT_FLOAT_EQ(1.0 / 6.0,output(0,2).d_.val());
 }
-TEST(AgradFwdFvarFvarMatrix, mdivide_right_tri_low_rowvector_matrix_ffd) {
+TEST(AgradFwdMatrixMdivideRightTriLow,ffd__rowvector_matrix_ffd) {
   using stan::agrad::matrix_ffd;
   using stan::math::row_vector_d;
 
@@ -601,7 +601,7 @@ TEST(AgradFwdFvarFvarMatrix, mdivide_right_tri_low_rowvector_matrix_ffd) {
   EXPECT_FLOAT_EQ(5.0 / 90.0,output(0,1).d_.val());
   EXPECT_FLOAT_EQ(-1.0 / 6.0,output(0,2).d_.val());
 }
-TEST(AgradFwdFvarFvarMatrix, mdivide_right_tri_low_rowvector_ffd_matrix) {
+TEST(AgradFwdMatrixMdivideRightTriLow,ffd__rowvector_ffd_matrix) {
   using stan::math::matrix_d;
   using stan::agrad::matrix_ffd;
   using stan::agrad::row_vector_ffd;
@@ -633,7 +633,7 @@ TEST(AgradFwdFvarFvarMatrix, mdivide_right_tri_low_rowvector_ffd_matrix) {
   EXPECT_FLOAT_EQ(1.0 / 9.0,output(0,1).d_.val());
   EXPECT_FLOAT_EQ(3.0 / 9.0,output(0,2).d_.val());
 }
-TEST(AgradFwdFvarFvarMatrix, mdivide_right_tri_low_matrix_ffd_matrix_ffd) {
+TEST(AgradFwdMatrixMdivideRightTriLow,ffd__matrix_ffd_matrix_ffd) {
   using stan::agrad::matrix_ffd;
   using stan::agrad::row_vector_ffd;
 
@@ -687,7 +687,7 @@ TEST(AgradFwdFvarFvarMatrix, mdivide_right_tri_low_matrix_ffd_matrix_ffd) {
   EXPECT_FLOAT_EQ(-1.0 / 6.0,output(2,1).d_.val());
   EXPECT_FLOAT_EQ(-1.0 / 6.0,output(2,2).d_.val());
 }
-TEST(AgradFwdFvarFvarMatrix, mdivide_right_tri_low_matrix_ffd_matrix) {
+TEST(AgradFwdMatrixMdivideRightTriLow,ffd__matrix_ffd_matrix) {
   using stan::agrad::matrix_ffd;
   using stan::math::matrix_d;
   using stan::agrad::row_vector_ffd;
@@ -744,7 +744,7 @@ TEST(AgradFwdFvarFvarMatrix, mdivide_right_tri_low_matrix_ffd_matrix) {
   EXPECT_FLOAT_EQ(1.0 / 9.0,output(2,1).d_.val());
   EXPECT_FLOAT_EQ(2.0 / 6.0,output(2,2).d_.val());
 }
-TEST(AgradFwdFvarFvarMatrix, mdivide_right_tri_low_matrix_matrix_ffd) {
+TEST(AgradFwdMatrixMdivideRightTriLow,ffd__matrix_matrix_ffd) {
   using stan::agrad::matrix_ffd;
   using stan::math::matrix_d;
   using stan::agrad::row_vector_ffd;
@@ -795,7 +795,7 @@ TEST(AgradFwdFvarFvarMatrix, mdivide_right_tri_low_matrix_matrix_ffd) {
   EXPECT_FLOAT_EQ(-25.0 / 90.0,output(2,1).d_.val());
   EXPECT_FLOAT_EQ(-3.0 / 6.0,output(2,2).d_.val());
 }
-TEST(AgradFwdFvarFvarMatrix, mdivide_right_tri_low_rowvector_matrix_exceptions) {
+TEST(AgradFwdMatrixMdivideRightTriLow,ffd__rowvector_matrix_exceptions) {
   using stan::math::matrix_d;
   using stan::agrad::matrix_ffd;
   using stan::agrad::row_vector_ffd;
@@ -814,7 +814,7 @@ TEST(AgradFwdFvarFvarMatrix, mdivide_right_tri_low_rowvector_matrix_exceptions) 
   EXPECT_THROW(mdivide_right_tri_low(fv2,vm1), std::domain_error);
   EXPECT_THROW(mdivide_right_tri_low(v2,fvm1), std::domain_error);
 }
-TEST(AgradFwdFvarFvarMatrix, mdivide_right_tri_low_matrix_matrix_exceptions) {
+TEST(AgradFwdMatrixMdivideRightTriLow,ffd__matrix_matrix_exceptions) {
   using stan::math::matrix_d;
   using stan::agrad::matrix_ffd;
   using stan::agrad::mdivide_right_tri_low;

@@ -4,7 +4,7 @@
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <stan/agrad/var.hpp>
 
-TEST(AgradFwdMatrix,transpose_matrix) {
+TEST(AgradFwdMatrixTranspose,fd_matrix) {
   using stan::math::matrix_d;
   using stan::agrad::matrix_fd;
   using stan::math::transpose;
@@ -39,7 +39,7 @@ TEST(AgradFwdMatrix,transpose_matrix) {
   EXPECT_EQ(2,c.cols());
 
 }
-TEST(AgradFwdMatrix,transpose_vector) {
+TEST(AgradFwdMatrixTranspose,fd_vector) {
   using stan::agrad::vector_fd;
   using stan::agrad::row_vector_fd;
   using stan::math::transpose;
@@ -59,7 +59,7 @@ TEST(AgradFwdMatrix,transpose_vector) {
   EXPECT_FLOAT_EQ(1.0, a_tr(1).d_);
   EXPECT_FLOAT_EQ(1.0, a_tr(2).d_);
 }
-TEST(AgradFwdMatrix,transpose_row_vector) {
+TEST(AgradFwdMatrixTranspose,fd_row_vector) {
   using stan::agrad::vector_fd;
   using stan::agrad::row_vector_fd;
   using stan::math::transpose;
@@ -79,7 +79,7 @@ TEST(AgradFwdMatrix,transpose_row_vector) {
   EXPECT_FLOAT_EQ(1.0, a_tr(1).d_);
   EXPECT_FLOAT_EQ(1.0, a_tr(2).d_);
 }
-TEST(AgradFwdFvarVarMatrix,transpose_matrix) {
+TEST(AgradFwdMatrixTranspose,fv_matrix) {
   using stan::math::matrix_d;
   using stan::agrad::matrix_fv;
   using stan::math::transpose;
@@ -114,7 +114,7 @@ TEST(AgradFwdFvarVarMatrix,transpose_matrix) {
   EXPECT_EQ(2,c.cols());
 
 }
-TEST(AgradFwdFvarVarMatrix,transpose_vector) {
+TEST(AgradFwdMatrixTranspose,fv_vector) {
   using stan::agrad::vector_fv;
   using stan::agrad::row_vector_fv;
   using stan::math::transpose;
@@ -134,7 +134,7 @@ TEST(AgradFwdFvarVarMatrix,transpose_vector) {
   EXPECT_FLOAT_EQ(1.0, a_tr(1).d_.val());
   EXPECT_FLOAT_EQ(1.0, a_tr(2).d_.val());
 }
-TEST(AgradFwdFvarVarMatrix,transpose_row_vector) {
+TEST(AgradFwdMatrixTranspose,fv_row_vector) {
   using stan::agrad::vector_fv;
   using stan::agrad::row_vector_fv;
   using stan::math::transpose;
@@ -154,7 +154,7 @@ TEST(AgradFwdFvarVarMatrix,transpose_row_vector) {
   EXPECT_FLOAT_EQ(1.0, a_tr(1).d_.val());
   EXPECT_FLOAT_EQ(1.0, a_tr(2).d_.val());
 }
-TEST(AgradFwdFvarFvarMatrix,transpose_matrix) {
+TEST(AgradFwdMatrixTranspose,ffd_matrix) {
   using stan::math::matrix_d;
   using stan::agrad::matrix_ffd;
   using stan::math::transpose;
@@ -189,7 +189,7 @@ TEST(AgradFwdFvarFvarMatrix,transpose_matrix) {
   EXPECT_EQ(2,c.cols());
 
 }
-TEST(AgradFwdFvarFvarMatrix,transpose_vector) {
+TEST(AgradFwdMatrixTranspose,ffd_vector) {
   using stan::agrad::vector_ffd;
   using stan::agrad::row_vector_ffd;
   using stan::math::transpose;
@@ -209,7 +209,7 @@ TEST(AgradFwdFvarFvarMatrix,transpose_vector) {
   EXPECT_FLOAT_EQ(1.0, a_tr(1).d_.val());
   EXPECT_FLOAT_EQ(1.0, a_tr(2).d_.val());
 }
-TEST(AgradFwdFvarFvarMatrix,transpose_row_vector) {
+TEST(AgradFwdMatrixTranspose,ffd_row_vector) {
   using stan::agrad::vector_ffd;
   using stan::agrad::row_vector_ffd;
   using stan::math::transpose;

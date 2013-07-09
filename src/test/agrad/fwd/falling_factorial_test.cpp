@@ -4,7 +4,7 @@
 #include <stan/agrad/var.hpp>
 #include <test/agrad/util.hpp>
 
-TEST(Agrad_Fwd_FallingFactorial,Fvar) {
+TEST(AgradFwdFallingFactorial,Fvar) {
   using stan::agrad::fvar;
   using stan::agrad::falling_factorial;
   using boost::math::digamma;
@@ -28,7 +28,7 @@ TEST(Agrad_Fwd_FallingFactorial,Fvar) {
   EXPECT_FLOAT_EQ(5.0, x.val_);
   EXPECT_FLOAT_EQ(-5.0 * digamma(5.0),x.d_);
 }
-TEST(Agrad_Fwd_FallingFactorial,FvarVar_1stDeriv) {
+TEST(AgradFwdFallingFactorial,FvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::agrad::falling_factorial;
@@ -46,7 +46,7 @@ TEST(Agrad_Fwd_FallingFactorial,FvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(1.5061177, g[0]);
   EXPECT_FLOAT_EQ(-1.5061177, g[1]);
 }
-TEST(Agrad_Fwd_FallingFactorial,FvarVar_2ndDeriv) {
+TEST(AgradFwdFallingFactorial,FvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::agrad::falling_factorial;
@@ -61,7 +61,7 @@ TEST(Agrad_Fwd_FallingFactorial,FvarVar_2ndDeriv) {
   EXPECT_FLOAT_EQ(0.22132295, g[0]);
   EXPECT_FLOAT_EQ(-0.22132295, g[1]);
 }
-TEST(Agrad_Fwd_FallingFactorial,FvarFvarDouble) {
+TEST(AgradFwdFallingFactorial,FvarFvarDouble) {
   using stan::agrad::fvar;
   using stan::math::falling_factorial;
 
@@ -80,7 +80,7 @@ TEST(Agrad_Fwd_FallingFactorial,FvarFvarDouble) {
   EXPECT_FLOAT_EQ(-1.5061177, a.d_.val_);
   EXPECT_FLOAT_EQ(-2.2683904, a.d_.d_);
 }
-TEST(Agrad_Fwd_FallingFactorial,FvarFvarVar_1stDeriv) {
+TEST(AgradFwdFallingFactorial,FvarFvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::falling_factorial;
@@ -106,7 +106,7 @@ TEST(Agrad_Fwd_FallingFactorial,FvarFvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(1.5061177, g[0]);
   EXPECT_FLOAT_EQ(-1.5061177, g[1]);
 }
-TEST(Agrad_Fwd_FallingFactorial,FvarFvarVar_2ndDeriv_x) {
+TEST(AgradFwdFallingFactorial,FvarFvarVar_2ndDeriv_x) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::falling_factorial;
@@ -127,7 +127,7 @@ TEST(Agrad_Fwd_FallingFactorial,FvarFvarVar_2ndDeriv_x) {
   EXPECT_FLOAT_EQ(2.4897134, g[0]);
   EXPECT_FLOAT_EQ(-2.2683904, g[1]);
 }
-TEST(Agrad_Fwd_FallingFactorial,FvarFvarVar_2ndDeriv_y) {
+TEST(AgradFwdFallingFactorial,FvarFvarVar_2ndDeriv_y) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::falling_factorial;

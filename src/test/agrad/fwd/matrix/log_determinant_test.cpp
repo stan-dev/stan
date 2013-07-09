@@ -5,7 +5,7 @@
 #include <stan/agrad/var.hpp>
 #include <stan/agrad/rev/matrix/multiply.hpp>
 
-TEST(AgradFwdMatrix,log_determinant) {
+TEST(AgradFwdMatrixLogDeterminant,fd) {
   using stan::agrad::matrix_fd;
   using stan::agrad::fvar;
   using stan::agrad::log_determinant;
@@ -23,13 +23,13 @@ TEST(AgradFwdMatrix,log_determinant) {
   EXPECT_FLOAT_EQ(1.5, det.d_);
 }
 
-TEST(AgradFwdMatrix,log_deteriminant_exception) {
+TEST(AgradFwdMatrixLogDeterminant,fd_exception) {
   using stan::agrad::matrix_fd;
   using stan::math::log_determinant;
   
   EXPECT_THROW(log_determinant(matrix_fd(2,3)), std::domain_error);
 }
-TEST(AgradFwdFvarVarMatrix,log_determinant) {
+TEST(AgradFwdMatrixLogDeterminant,fv) {
   using stan::agrad::matrix_fv;
   using stan::agrad::fvar;
   using stan::agrad::var;
@@ -49,13 +49,13 @@ TEST(AgradFwdFvarVarMatrix,log_determinant) {
   EXPECT_FLOAT_EQ(1.5, det.d_.val());
 }
 
-TEST(AgradFwdFvarVarMatrix,log_deteriminant_exception) {
+TEST(AgradFwdMatrixLogDeterminant,fv_exception) {
   using stan::agrad::matrix_fv;
   using stan::math::log_determinant;
   
   EXPECT_THROW(log_determinant(matrix_fv(2,3)), std::domain_error);
 }
-TEST(AgradFwdFvarFvarMatrix,log_determinant) {
+TEST(AgradFwdMatrixLogDeterminant,ffd) {
   using stan::agrad::matrix_ffd;
   using stan::agrad::fvar;
   using stan::agrad::log_determinant;
@@ -79,7 +79,7 @@ TEST(AgradFwdFvarFvarMatrix,log_determinant) {
   EXPECT_FLOAT_EQ(1.5, det.d_.val());
 }
 
-TEST(AgradFwdFvarFvarMatrix,log_deteriminant_exception) {
+TEST(AgradFwdMatrixLogDeterminant,ffd_exception) {
   using stan::agrad::matrix_ffd;
   using stan::math::log_determinant;
   

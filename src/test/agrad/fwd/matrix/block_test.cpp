@@ -4,7 +4,7 @@
 #include <stan/agrad/var.hpp>
 #include <test/agrad/util.hpp>
 
-TEST(Agrad_Fwd_Matrix_Block,matrix_fd) {
+TEST(AgradFwdMatrixBlock,matrix_fd) {
   using stan::math::block;
   using stan::agrad::matrix_fd;
   using stan::agrad::vector_fd;
@@ -50,7 +50,7 @@ TEST(Agrad_Fwd_Matrix_Block,matrix_fd) {
   EXPECT_EQ(2,n(1,0).d_);
   EXPECT_EQ(3,n(1,1).d_);
 }
-TEST(Agrad_Fwd_Matrix_Block,matrix_fd_exception) {
+TEST(AgradFwdMatrixBlock,matrix_fd_exception) {
   using stan::math::block;
   using stan::agrad::matrix_fd;
 
@@ -58,7 +58,7 @@ TEST(Agrad_Fwd_Matrix_Block,matrix_fd_exception) {
   EXPECT_THROW(block(v,0,0,1,1), std::domain_error);
   EXPECT_THROW(block(v,1,1,4,4), std::domain_error);
 }
-TEST(Agrad_Fwd_Matrix_Block,matrix_fv) {
+TEST(AgradFwdMatrixBlock,matrix_fv) {
   using stan::math::block;
   using stan::agrad::matrix_fv;
   using stan::agrad::vector_fv;
@@ -101,7 +101,7 @@ TEST(Agrad_Fwd_Matrix_Block,matrix_fv) {
   EXPECT_EQ(2,n(1,0).d_.val());
   EXPECT_EQ(3,n(1,1).d_.val());
 }
-TEST(Agrad_Fwd_Matrix_Block,matrix_fv_exception) {
+TEST(AgradFwdMatrixBlock,matrix_fv_exception) {
   using stan::math::block;
   using stan::agrad::matrix_fv;
 
@@ -109,7 +109,7 @@ TEST(Agrad_Fwd_Matrix_Block,matrix_fv_exception) {
   EXPECT_THROW(block(v,0,0,1,1), std::domain_error);
   EXPECT_THROW(block(v,1,1,4,4), std::domain_error);
 }
-TEST(Agrad_Fwd_Matrix_Block,matrix_ffd) {
+TEST(AgradFwdMatrixBlock,matrix_ffd) {
   using stan::math::block;
   using stan::agrad::matrix_ffd;
   using stan::agrad::vector_ffd;
@@ -159,7 +159,7 @@ TEST(Agrad_Fwd_Matrix_Block,matrix_ffd) {
   EXPECT_EQ(2,n(1,0).d_.val());
   EXPECT_EQ(3,n(1,1).d_.val());
 }
-TEST(Agrad_Fwd_Matrix_Block,matrix_ffd_exception) {
+TEST(AgradFwdMatrixBlock,matrix_ffd_exception) {
   using stan::math::block;
   using stan::agrad::matrix_ffd;
 
@@ -167,7 +167,7 @@ TEST(Agrad_Fwd_Matrix_Block,matrix_ffd_exception) {
   EXPECT_THROW(block(v,0,0,1,1), std::domain_error);
   EXPECT_THROW(block(v,1,1,4,4), std::domain_error);
 }
-TEST(Agrad_Fwd_Matrix_Block,matrix_ffv) {
+TEST(AgradFwdMatrixBlock,matrix_ffv) {
   using stan::math::block;
   using stan::agrad::matrix_ffv;
   using stan::agrad::vector_ffv;
@@ -218,7 +218,7 @@ TEST(Agrad_Fwd_Matrix_Block,matrix_ffv) {
   EXPECT_EQ(2,n(1,0).d_.val().val());
   EXPECT_EQ(3,n(1,1).d_.val().val());
 }
-TEST(Agrad_Fwd_Matrix_Block,matrix_ffv_exception) {
+TEST(AgradFwdMatrixBlock,matrix_ffv_exception) {
   using stan::math::block;
   using stan::agrad::matrix_ffv;
 

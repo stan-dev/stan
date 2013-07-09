@@ -305,7 +305,7 @@ void test_sort_desc3(Eigen::Matrix<T,R,C> val) {
 }
 
 
-TEST(AgradFvar, sort) {
+TEST(AgradFwdSort, d) {
   VEC a;
   a.push_back(1); a.push_back(2); a.push_back(2); a.push_back(3);
   test_sort_asc(a);
@@ -351,7 +351,7 @@ TEST(AgradFvar, sort) {
 
 }
 
-TEST(AgradFvar, sort_no_thrown) {
+TEST(AgradFwdSort, d_no_thrown) {
   AVEC vec0;
   EXPECT_EQ(0, vec0.size());
   EXPECT_NO_THROW(sort_asc(vec0));
@@ -368,7 +368,7 @@ TEST(AgradFvar, sort_no_thrown) {
   EXPECT_NO_THROW(sort_desc(vec2));
 }
 
-TEST(AgradFvarVar, sort) {
+TEST(AgradFwdSort, var) {
   VEC a;
   a.push_back(1); a.push_back(2); a.push_back(2); a.push_back(3);
   test_sort_asc2(a);
@@ -414,7 +414,7 @@ TEST(AgradFvarVar, sort) {
 
 }
 
-TEST(AgradFvarVar, sort_no_thrown) {
+TEST(AgradFwdSort, fv_no_thrown) {
   AVEC vec0;
   EXPECT_EQ(0, vec0.size());
   EXPECT_NO_THROW(sort_asc(vec0));
@@ -430,7 +430,7 @@ TEST(AgradFvarVar, sort_no_thrown) {
   EXPECT_NO_THROW(sort_asc(vec2));
   EXPECT_NO_THROW(sort_desc(vec2));
 }
-TEST(AgradFvarFvar, sort) {
+TEST(AgradFwdSort, sort) {
   VEC a;
   a.push_back(1); a.push_back(2); a.push_back(2); a.push_back(3);
   test_sort_asc3(a);
@@ -476,7 +476,7 @@ TEST(AgradFvarFvar, sort) {
 
 }
 
-TEST(AgradFvarFvar, sort_no_thrown) {
+TEST(AgradFwdSort, ffd_no_thrown) {
   AVEC vec0;
   EXPECT_EQ(0, vec0.size());
   EXPECT_NO_THROW(sort_asc(vec0));

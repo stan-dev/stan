@@ -4,7 +4,7 @@
 #include <test/agrad/util.hpp>
 #include <stan/math/constants.hpp>
 
-TEST(Agrad_Fwd_Acos,Fvar) {
+TEST(AgradFwdAcos,Fvar) {
   using stan::agrad::fvar;
   using std::acos;
   using std::sqrt;
@@ -41,7 +41,7 @@ TEST(Agrad_Fwd_Acos,Fvar) {
   EXPECT_FLOAT_EQ(acos(1.0), f.val_);
   EXPECT_FLOAT_EQ(NEGATIVE_INFTY, f.d_);
 }
-TEST(Agrad_Fwd_Acos,FvarVar_1stDeriv) {
+TEST(AgradFwdAcos,FvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::acos;
@@ -57,7 +57,7 @@ TEST(Agrad_Fwd_Acos,FvarVar_1stDeriv) {
   a.val_.grad(y,g);
   EXPECT_FLOAT_EQ(-1.0 / sqrt(1.0 - 0.5 * 0.5), g[0]);
 }
-TEST(Agrad_Fwd_Acos,FvarVar_2ndDeriv) {
+TEST(AgradFwdAcos,FvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::acos;
@@ -70,7 +70,7 @@ TEST(Agrad_Fwd_Acos,FvarVar_2ndDeriv) {
   a.d_.grad(z,h);
   EXPECT_FLOAT_EQ(-0.5 * 0.3 / (sqrt(1.0 - 0.5 * 0.5) * 0.75), h[0]);
 }
-TEST(Agrad_Fwd_Acos,FvarFvarDouble) {
+TEST(AgradFwdAcos,FvarFvarDouble) {
   using stan::agrad::fvar;
   using std::acos;
 
@@ -96,7 +96,7 @@ TEST(Agrad_Fwd_Acos,FvarFvarDouble) {
   EXPECT_FLOAT_EQ(0, a.d_.d_);
 }
 
-TEST(Agrad_Fwd_Acos,FvarFvarVar_1stDeriv) {
+TEST(AgradFwdAcos,FvarFvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::acos;
@@ -132,7 +132,7 @@ TEST(Agrad_Fwd_Acos,FvarFvarVar_1stDeriv) {
   b.val_.val_.grad(p,q);
   EXPECT_FLOAT_EQ(-1.0 / sqrt(1.0 - 0.5 * 0.5), q[0]);
 }
-TEST(Agrad_Fwd_Acos,FvarFvarVar_2ndDeriv) {
+TEST(AgradFwdAcos,FvarFvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::acos;

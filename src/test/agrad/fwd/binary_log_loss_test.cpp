@@ -4,7 +4,7 @@
 #include <stan/agrad/var.hpp>
 #include <test/agrad/util.hpp>
 
-TEST(Agrad_Fwd_BinaryLogLoss,Fvar) {
+TEST(AgradFwdBinaryLogLoss,Fvar) {
   using stan::agrad::fvar;
   using stan::math::binary_log_loss;
 
@@ -19,7 +19,7 @@ TEST(Agrad_Fwd_BinaryLogLoss,Fvar) {
   EXPECT_FLOAT_EQ(-3.0 / 0.4, b.d_);
 }
 
-TEST(Agrad_Fwd_BinaryLogLoss,FvarVar_1stDeriv) {
+TEST(AgradFwdBinaryLogLoss,FvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::binary_log_loss;
@@ -36,7 +36,7 @@ TEST(Agrad_Fwd_BinaryLogLoss,FvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(2.5, g[0]);
 }
 
-TEST(Agrad_Fwd_BinaryLogLoss,FvarVar_2ndDeriv) {
+TEST(AgradFwdBinaryLogLoss,FvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::binary_log_loss;
@@ -50,7 +50,7 @@ TEST(Agrad_Fwd_BinaryLogLoss,FvarVar_2ndDeriv) {
   EXPECT_FLOAT_EQ(-18.75, g[0]);
 }
 
-TEST(Agrad_Fwd_BinaryLogLoss,FvarFvarDouble) {
+TEST(AgradFwdBinaryLogLoss,FvarFvarDouble) {
   using stan::agrad::fvar;
   using stan::math::binary_log_loss;
 
@@ -77,7 +77,7 @@ TEST(Agrad_Fwd_BinaryLogLoss,FvarFvarDouble) {
   EXPECT_FLOAT_EQ(0, b.d_.d_);
 }
 
-TEST(Agrad_Fwd_BinaryLogLoss,FvarFvarVar_1stDeriv) {
+TEST(AgradFwdBinaryLogLoss,FvarFvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::binary_log_loss;
@@ -115,7 +115,7 @@ TEST(Agrad_Fwd_BinaryLogLoss,FvarFvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(-2.5, r[0]);
 }
 
-TEST(Agrad_Fwd_BinaryLogLoss,FvarFvarVar_2ndDeriv) {
+TEST(AgradFwdBinaryLogLoss,FvarFvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::binary_log_loss;

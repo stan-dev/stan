@@ -3,7 +3,7 @@
 #include <stan/agrad/var.hpp>
 #include <test/agrad/util.hpp>
 
-TEST(Agrad_Fwd_Tan, Fvar) {
+TEST(AgradFwdTan, Fvar) {
   using stan::agrad::fvar;
   using std::tan;
   using std::cos;
@@ -36,7 +36,7 @@ TEST(Agrad_Fwd_Tan, Fvar) {
   EXPECT_FLOAT_EQ(1 / (cos(0.0) * cos(0.0)), f.d_);
 }
 
-TEST(Agrad_Fwd_Tan, FvarVar_1stDeriv) {
+TEST(AgradFwdTan, FvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::tan;
@@ -53,7 +53,7 @@ TEST(Agrad_Fwd_Tan, FvarVar_1stDeriv) {
   a.val_.grad(y,g);
   EXPECT_FLOAT_EQ(1.0 / (cos(1.5) * cos(1.5)), g[0]);
 }
-TEST(Agrad_Fwd_Tan, FvarVar_2ndDeriv) {
+TEST(AgradFwdTan, FvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::tan;
@@ -67,7 +67,7 @@ TEST(Agrad_Fwd_Tan, FvarVar_2ndDeriv) {
   a.d_.grad(y,g);
   EXPECT_FLOAT_EQ(2.0 / (cos(1.5) * cos(1.5)) * tan(1.5) * 1.3, g[0]);
 }
-TEST(Agrad_Fwd_Tan, FvarFvarDouble) {
+TEST(AgradFwdTan, FvarFvarDouble) {
   using stan::agrad::fvar;
   using std::tan;
   using std::cos;
@@ -93,7 +93,7 @@ TEST(Agrad_Fwd_Tan, FvarFvarDouble) {
   EXPECT_FLOAT_EQ(2.0 / (cos(1.5) * cos(1.5)), a.d_.val_);
   EXPECT_FLOAT_EQ(0, a.d_.d_);
 }
-TEST(Agrad_Fwd_Tan, FvarFvarVar_1stDeriv) {
+TEST(AgradFwdTan, FvarFvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::tan;
@@ -130,7 +130,7 @@ TEST(Agrad_Fwd_Tan, FvarFvarVar_1stDeriv) {
   b.val_.val_.grad(q,r);
   EXPECT_FLOAT_EQ(1.0 / (cos(1.5) * cos(1.5)), r[0]);
 }
-TEST(Agrad_Fwd_Tan, FvarFvarVar_2ndDeriv) {
+TEST(AgradFwdTan, FvarFvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::tan;

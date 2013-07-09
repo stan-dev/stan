@@ -4,7 +4,7 @@
 #include <test/agrad/util.hpp>
 #include <stan/math/functions/bessel_second_kind.hpp>
 
-TEST(Agrad_Fwd_BesselSecondKind,Fvar) {
+TEST(AgradFwdBesselSecondKind,Fvar) {
   using stan::agrad::fvar;
   using stan::agrad::bessel_second_kind;
 
@@ -23,7 +23,7 @@ TEST(Agrad_Fwd_BesselSecondKind,Fvar) {
   EXPECT_THROW(bessel_second_kind(0, -a), std::domain_error);
 }
 
-TEST(Agrad_Fwd_BesselSecondKind,FvarVar_1stDeriv) {
+TEST(AgradFwdBesselSecondKind,FvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::bessel_second_kind;
@@ -39,7 +39,7 @@ TEST(Agrad_Fwd_BesselSecondKind,FvarVar_1stDeriv) {
   a.val_.grad(y,g);
   EXPECT_FLOAT_EQ(0.53725040349771411 / 2.0, g[0]);
 }
-TEST(Agrad_Fwd_BesselSecondKind,FvarVar_2ndDeriv) {
+TEST(AgradFwdBesselSecondKind,FvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::bessel_second_kind;
@@ -52,7 +52,7 @@ TEST(Agrad_Fwd_BesselSecondKind,FvarVar_2ndDeriv) {
   a.d_.grad(y,g);
   EXPECT_FLOAT_EQ(-0.75628245, g[0]);
 }
-TEST(Agrad_Fwd_BesselSecondKind,FvarFvarDouble) {
+TEST(AgradFwdBesselSecondKind,FvarFvarDouble) {
   using stan::agrad::fvar;
   using stan::math::bessel_second_kind;
 
@@ -78,7 +78,7 @@ TEST(Agrad_Fwd_BesselSecondKind,FvarFvarDouble) {
   EXPECT_FLOAT_EQ(0, b.d_.val_);
   EXPECT_FLOAT_EQ(0, b.d_.d_);
 }
-TEST(Agrad_Fwd_BesselSecondKind,FvarFvarVar_1stDeriv) {
+TEST(AgradFwdBesselSecondKind,FvarFvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::bessel_second_kind;
@@ -115,7 +115,7 @@ TEST(Agrad_Fwd_BesselSecondKind,FvarFvarVar_1stDeriv) {
   b.val_.val_.grad(q,r);
   EXPECT_FLOAT_EQ(0.53725040349771411 / 2.0, r[0]);
 }
-TEST(Agrad_Fwd_BesselSecondKind,FvarFvarVar_2ndDeriv) {
+TEST(AgradFwdBesselSecondKind,FvarFvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::bessel_second_kind;

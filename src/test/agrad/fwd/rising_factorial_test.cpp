@@ -4,7 +4,7 @@
 #include <stan/agrad/var.hpp>
 #include <test/agrad/util.hpp>
 
-TEST(Agrad_Fwd_RisingFactorial, Fvar) {
+TEST(AgradFwdRisingFactorial, Fvar) {
   using stan::agrad::fvar;
   using stan::agrad::rising_factorial;
   using boost::math::digamma;
@@ -28,7 +28,7 @@ TEST(Agrad_Fwd_RisingFactorial, Fvar) {
   EXPECT_FLOAT_EQ(1680.0, x.val_);
   EXPECT_FLOAT_EQ(1680.0 * digamma(9), x.d_);
 }
-TEST(Agrad_Fwd_RisingFactorial, FvarVar_FvarVar_1stDeriv) {
+TEST(AgradFwdRisingFactorial, FvarVar_FvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::agrad::rising_factorial;
@@ -47,7 +47,7 @@ TEST(Agrad_Fwd_RisingFactorial, FvarVar_FvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(840. * (digamma(8) - digamma(4)), g[0]);
   EXPECT_FLOAT_EQ(840 * digamma(8), g[1]);
 }
-TEST(Agrad_Fwd_RisingFactorial, FvarVar_Double_1stDeriv) {
+TEST(AgradFwdRisingFactorial, FvarVar_Double_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::agrad::rising_factorial;
@@ -65,7 +65,7 @@ TEST(Agrad_Fwd_RisingFactorial, FvarVar_Double_1stDeriv) {
   c.val_.grad(y,g);
   EXPECT_FLOAT_EQ(840. * (digamma(8) - digamma(4)), g[0]);
 }
-TEST(Agrad_Fwd_RisingFactorial, Double_FvarVar_1stDeriv) {
+TEST(AgradFwdRisingFactorial, Double_FvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::agrad::rising_factorial;
@@ -83,7 +83,7 @@ TEST(Agrad_Fwd_RisingFactorial, Double_FvarVar_1stDeriv) {
   c.val_.grad(y,g);
   EXPECT_FLOAT_EQ(840 * digamma(8), g[0]);
 }
-TEST(Agrad_Fwd_RisingFactorial, FvarVar_FvarVar_2ndDeriv) {
+TEST(AgradFwdRisingFactorial, FvarVar_FvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::agrad::rising_factorial;
@@ -99,7 +99,7 @@ TEST(Agrad_Fwd_RisingFactorial, FvarVar_FvarVar_2ndDeriv) {
   EXPECT_FLOAT_EQ(1755.8143, g[0]);
   EXPECT_FLOAT_EQ(4922.4102, g[1]);
 }
-TEST(Agrad_Fwd_RisingFactorial, FvarVar_Double_2ndDeriv) {
+TEST(AgradFwdRisingFactorial, FvarVar_Double_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::agrad::rising_factorial;
@@ -114,7 +114,7 @@ TEST(Agrad_Fwd_RisingFactorial, FvarVar_Double_2ndDeriv) {
   c.d_.grad(y,g);
   EXPECT_FLOAT_EQ(358, g[0]);
 }
-TEST(Agrad_Fwd_RisingFactorial, Double_FvarVar_2ndDeriv) {
+TEST(AgradFwdRisingFactorial, Double_FvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::agrad::rising_factorial;
@@ -129,7 +129,7 @@ TEST(Agrad_Fwd_RisingFactorial, Double_FvarVar_2ndDeriv) {
   c.d_.grad(y,g);
   EXPECT_FLOAT_EQ(3524.5959, g[0]);
 }
-TEST(Agrad_Fwd_RisingFactorial, FvarFvarDouble) {
+TEST(AgradFwdRisingFactorial, FvarFvarDouble) {
   using stan::agrad::fvar;
   using stan::math::rising_factorial;
   using boost::math::digamma;
@@ -148,7 +148,7 @@ TEST(Agrad_Fwd_RisingFactorial, FvarFvarDouble) {
   EXPECT_FLOAT_EQ(840 * digamma(8), a.d_.val_);
   EXPECT_FLOAT_EQ(1397.8143, a.d_.d_);
 }
-TEST(Agrad_Fwd_RisingFactorial, FvarFvarVar_FvarFvarVar_1stDeriv) {
+TEST(AgradFwdRisingFactorial, FvarFvarVar_FvarFvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::rising_factorial;
@@ -174,7 +174,7 @@ TEST(Agrad_Fwd_RisingFactorial, FvarFvarVar_FvarFvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(840. * (digamma(8) - digamma(4)),g[0]);
   EXPECT_FLOAT_EQ(840 * digamma(8), g[1]);
 }
-TEST(Agrad_Fwd_RisingFactorial, FvarFvarVar_Double_1stDeriv) {
+TEST(AgradFwdRisingFactorial, FvarFvarVar_Double_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::rising_factorial;
@@ -197,7 +197,7 @@ TEST(Agrad_Fwd_RisingFactorial, FvarFvarVar_Double_1stDeriv) {
   a.val_.val_.grad(p,g);
   EXPECT_FLOAT_EQ(840. * (digamma(8) - digamma(4)),g[0]);
 }
-TEST(Agrad_Fwd_RisingFactorial, Double_FvarFvarVar_1stDeriv) {
+TEST(AgradFwdRisingFactorial, Double_FvarFvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::rising_factorial;
@@ -220,7 +220,7 @@ TEST(Agrad_Fwd_RisingFactorial, Double_FvarFvarVar_1stDeriv) {
   a.val_.val_.grad(p,g);
   EXPECT_FLOAT_EQ(840 * digamma(8), g[0]);
 }
-TEST(Agrad_Fwd_RisingFactorial, FvarFvarVar_FvarFvarVar_2ndDeriv_x) {
+TEST(AgradFwdRisingFactorial, FvarFvarVar_FvarFvarVar_2ndDeriv_x) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::rising_factorial;
@@ -241,7 +241,7 @@ TEST(Agrad_Fwd_RisingFactorial, FvarFvarVar_FvarFvarVar_2ndDeriv_x) {
   EXPECT_FLOAT_EQ(358,g[0]);
   EXPECT_FLOAT_EQ(1397.8143, g[1]);
 }
-TEST(Agrad_Fwd_RisingFactorial, FvarFvarVar_FvarFvarVar_2ndDeriv_y) {
+TEST(AgradFwdRisingFactorial, FvarFvarVar_FvarFvarVar_2ndDeriv_y) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::rising_factorial;
@@ -262,7 +262,7 @@ TEST(Agrad_Fwd_RisingFactorial, FvarFvarVar_FvarFvarVar_2ndDeriv_y) {
   EXPECT_FLOAT_EQ(1397.8143, g[0]);
   EXPECT_FLOAT_EQ(3524.5959,g[1]);
 }
-TEST(Agrad_Fwd_RisingFactorial, FvarFvarVar_Double_2ndDeriv) {
+TEST(AgradFwdRisingFactorial, FvarFvarVar_Double_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::rising_factorial;
@@ -280,7 +280,7 @@ TEST(Agrad_Fwd_RisingFactorial, FvarFvarVar_Double_2ndDeriv) {
   a.val_.d_.grad(p,g);
   EXPECT_FLOAT_EQ(358,g[0]);
 }
-TEST(Agrad_Fwd_RisingFactorial, Double_FvarFvarVar_2ndDeriv) {
+TEST(AgradFwdRisingFactorial, Double_FvarFvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::rising_factorial;

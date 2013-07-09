@@ -4,7 +4,7 @@
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <stan/agrad/var.hpp>
 
-TEST(AgradFwdMatrix,elt_multiply_vec_vv) {
+TEST(AgradFwdMatrixEltMultiply,fd_vec_vv) {
   using stan::math::elt_multiply;
   using stan::agrad::vector_fd;
 
@@ -24,7 +24,7 @@ TEST(AgradFwdMatrix,elt_multiply_vec_vv) {
   EXPECT_FLOAT_EQ(105,z(1).d_);
 }
 
-TEST(AgradFwdMatrix,elt_multiply_vec_vd) {
+TEST(AgradFwdMatrixEltMultiply,fd_vec_vd) {
   using stan::math::elt_multiply;
   using stan::math::vector_d;
   using stan::agrad::vector_fd;
@@ -42,7 +42,7 @@ TEST(AgradFwdMatrix,elt_multiply_vec_vd) {
   EXPECT_FLOAT_EQ(10,z(0).d_);
   EXPECT_FLOAT_EQ(100,z(1).d_);
 }
-TEST(AgradFwdMatrix,elt_multiply_vec_dv) {
+TEST(AgradFwdMatrixEltMultiply,fd_vec_dv) {
   using stan::math::elt_multiply;
   using stan::math::vector_d;
   using stan::agrad::vector_fd;
@@ -61,7 +61,7 @@ TEST(AgradFwdMatrix,elt_multiply_vec_dv) {
   EXPECT_FLOAT_EQ(5,z(1).d_);
 }
 
-TEST(AgradFwdMatrix,elt_multiply_row_vec_vv) {
+TEST(AgradFwdMatrixEltMultiply,fd_row_vec_vv) {
   using stan::math::elt_multiply;
   using stan::agrad::row_vector_fd;
 
@@ -80,7 +80,7 @@ TEST(AgradFwdMatrix,elt_multiply_row_vec_vv) {
   EXPECT_FLOAT_EQ(12,z(0).d_);
   EXPECT_FLOAT_EQ(105,z(1).d_);
 }
-TEST(AgradFwdMatrix,elt_multiply_row_vec_vd) {
+TEST(AgradFwdMatrixEltMultiply,fd_row_vec_vd) {
   using stan::math::elt_multiply;
   using stan::math::row_vector_d;
   using stan::agrad::row_vector_fd;
@@ -98,7 +98,7 @@ TEST(AgradFwdMatrix,elt_multiply_row_vec_vd) {
   EXPECT_FLOAT_EQ(10,z(0).d_);
   EXPECT_FLOAT_EQ(100,z(1).d_);
 }
-TEST(AgradFwdMatrix,elt_multiply_row_vec_dv) {
+TEST(AgradFwdMatrixEltMultiply,fd_row_vec_dv) {
   using stan::math::elt_multiply;
   using stan::math::row_vector_d;
   using stan::agrad::row_vector_fd;
@@ -117,7 +117,7 @@ TEST(AgradFwdMatrix,elt_multiply_row_vec_dv) {
   EXPECT_FLOAT_EQ(5,z(1).d_);
 }
 
-TEST(AgradFwdMatrix,elt_multiply_matrix_vv) {
+TEST(AgradFwdMatrixEltMultiply,fd_matrix_vv) {
   using stan::math::elt_multiply;
   using stan::agrad::matrix_fd;
 
@@ -146,7 +146,7 @@ TEST(AgradFwdMatrix,elt_multiply_matrix_vv) {
   EXPECT_FLOAT_EQ(105,z(0,1).d_);
   EXPECT_FLOAT_EQ(1000029,z(1,2).d_);
 }
-TEST(AgradFwdMatrix,elt_multiply_matrix_vd) {
+TEST(AgradFwdMatrixEltMultiply,fd_matrix_vd) {
   using stan::math::elt_multiply;
   using stan::math::matrix_d;
   using stan::agrad::matrix_fd;
@@ -170,7 +170,7 @@ TEST(AgradFwdMatrix,elt_multiply_matrix_vd) {
   EXPECT_FLOAT_EQ(100,z(0,1).d_);
   EXPECT_FLOAT_EQ(1000000,z(1,2).d_);
 }
-TEST(AgradFwdMatrix,elt_multiply_matrix_dv) {
+TEST(AgradFwdMatrixEltMultiply,fd_matrix_dv) {
   using stan::math::elt_multiply;
   using stan::math::matrix_d;
   using stan::agrad::matrix_fd;
@@ -194,7 +194,7 @@ TEST(AgradFwdMatrix,elt_multiply_matrix_dv) {
   EXPECT_FLOAT_EQ(5,z(0,1).d_);
   EXPECT_FLOAT_EQ(29,z(1,2).d_);
 }
-TEST(AgradFvarVarMatrix,elt_multiply_vec_vv) {
+TEST(AgradFwdMatrixEltMultiply,fv_vec_vv) {
   using stan::math::elt_multiply;
   using stan::agrad::vector_fv;
   using stan::agrad::vector_fv;
@@ -218,7 +218,7 @@ TEST(AgradFvarVarMatrix,elt_multiply_vec_vv) {
   EXPECT_FLOAT_EQ(105,z(1).d_.val());
 }
 
-TEST(AgradFvarVarMatrix,elt_multiply_vec_vd) {
+TEST(AgradFwdMatrixEltMultiply,fv_vec_vd) {
   using stan::math::elt_multiply;
   using stan::math::vector_d;
   using stan::agrad::vector_fv;
@@ -239,7 +239,7 @@ TEST(AgradFvarVarMatrix,elt_multiply_vec_vd) {
   EXPECT_FLOAT_EQ(10,z(0).d_.val());
   EXPECT_FLOAT_EQ(100,z(1).d_.val());
 }
-TEST(AgradFvarVarMatrix,elt_multiply_vec_dv) {
+TEST(AgradFwdMatrixEltMultiply,fv_vec_dv) {
   using stan::math::elt_multiply;
   using stan::math::vector_d;
   using stan::agrad::vector_fv;
@@ -261,7 +261,7 @@ TEST(AgradFvarVarMatrix,elt_multiply_vec_dv) {
   EXPECT_FLOAT_EQ(5,z(1).d_.val());
 }
 
-TEST(AgradFvarVarMatrix,elt_multiply_row_vec_vv) {
+TEST(AgradFwdMatrixEltMultiply,fv_row_vec_vv) {
   using stan::math::elt_multiply;
   using stan::agrad::row_vector_fv;
   using stan::agrad::fvar;
@@ -283,7 +283,7 @@ TEST(AgradFvarVarMatrix,elt_multiply_row_vec_vv) {
   EXPECT_FLOAT_EQ(12,z(0).d_.val());
   EXPECT_FLOAT_EQ(105,z(1).d_.val());
 }
-TEST(AgradFvarVarMatrix,elt_multiply_row_vec_vd) {
+TEST(AgradFwdMatrixEltMultiply,fv_row_vec_vd) {
   using stan::math::elt_multiply;
   using stan::math::row_vector_d;
   using stan::agrad::row_vector_fv;
@@ -304,7 +304,7 @@ TEST(AgradFvarVarMatrix,elt_multiply_row_vec_vd) {
   EXPECT_FLOAT_EQ(10,z(0).d_.val());
   EXPECT_FLOAT_EQ(100,z(1).d_.val());
 }
-TEST(AgradFvarVarMatrix,elt_multiply_row_vec_dv) {
+TEST(AgradFwdMatrixEltMultiply,fv_row_vec_dv) {
   using stan::math::elt_multiply;
   using stan::math::row_vector_d;
   using stan::agrad::row_vector_fv;
@@ -326,7 +326,7 @@ TEST(AgradFvarVarMatrix,elt_multiply_row_vec_dv) {
   EXPECT_FLOAT_EQ(5,z(1).d_.val());
 }
 
-TEST(AgradFvarVarMatrix,elt_multiply_matrix_vv) {
+TEST(AgradFwdMatrixEltMultiply,fv_matrix_vv) {
   using stan::math::elt_multiply;
   using stan::agrad::matrix_fv;
   using stan::agrad::fvar;
@@ -358,7 +358,7 @@ TEST(AgradFvarVarMatrix,elt_multiply_matrix_vv) {
   EXPECT_FLOAT_EQ(105,z(0,1).d_.val());
   EXPECT_FLOAT_EQ(1000029,z(1,2).d_.val());
 }
-TEST(AgradFvarVarMatrix,elt_multiply_matrix_vd) {
+TEST(AgradFwdMatrixEltMultiply,fv_matrix_vd) {
   using stan::math::elt_multiply;
   using stan::math::matrix_d;
   using stan::agrad::matrix_fv;
@@ -385,7 +385,7 @@ TEST(AgradFvarVarMatrix,elt_multiply_matrix_vd) {
   EXPECT_FLOAT_EQ(100,z(0,1).d_.val());
   EXPECT_FLOAT_EQ(1000000,z(1,2).d_.val());
 }
-TEST(AgradFvarVarMatrix,elt_multiply_matrix_dv) {
+TEST(AgradFwdMatrixEltMultiply,fv_matrix_dv) {
   using stan::math::elt_multiply;
   using stan::math::matrix_d;
   using stan::agrad::matrix_fv;
@@ -412,7 +412,7 @@ TEST(AgradFvarVarMatrix,elt_multiply_matrix_dv) {
   EXPECT_FLOAT_EQ(5,z(0,1).d_.val());
   EXPECT_FLOAT_EQ(29,z(1,2).d_.val());
 }
-TEST(AgradFvarFvarMatrix,elt_multiply_vec_vv) {
+TEST(AgradFwdMatrixEltMultiply,ffd_vec_vv) {
   using stan::math::elt_multiply;
   using stan::agrad::vector_ffd;
   using stan::agrad::vector_ffd;
@@ -440,7 +440,7 @@ TEST(AgradFvarFvarMatrix,elt_multiply_vec_vv) {
   EXPECT_FLOAT_EQ(105,z(1).d_.val());
 }
 
-TEST(AgradFvarFvarMatrix,elt_multiply_vec_vd) {
+TEST(AgradFwdMatrixEltMultiply,ffd_vec_vd) {
   using stan::math::elt_multiply;
   using stan::math::vector_d;
   using stan::agrad::vector_ffd;
@@ -463,7 +463,7 @@ TEST(AgradFvarFvarMatrix,elt_multiply_vec_vd) {
   EXPECT_FLOAT_EQ(10,z(0).d_.val());
   EXPECT_FLOAT_EQ(100,z(1).d_.val());
 }
-TEST(AgradFvarFvarMatrix,elt_multiply_vec_dv) {
+TEST(AgradFwdMatrixEltMultiply,ffd_vec_dv) {
   using stan::math::elt_multiply;
   using stan::math::vector_d;
   using stan::agrad::vector_ffd;
@@ -487,7 +487,7 @@ TEST(AgradFvarFvarMatrix,elt_multiply_vec_dv) {
   EXPECT_FLOAT_EQ(5,z(1).d_.val());
 }
 
-TEST(AgradFvarFvarMatrix,elt_multiply_row_vec_vv) {
+TEST(AgradFwdMatrixEltMultiply,ffd_row_vec_vv) {
   using stan::math::elt_multiply;
   using stan::agrad::row_vector_ffd;
   using stan::agrad::fvar;
@@ -513,7 +513,7 @@ TEST(AgradFvarFvarMatrix,elt_multiply_row_vec_vv) {
   EXPECT_FLOAT_EQ(12,z(0).d_.val());
   EXPECT_FLOAT_EQ(105,z(1).d_.val());
 }
-TEST(AgradFvarFvarMatrix,elt_multiply_row_vec_vd) {
+TEST(AgradFwdMatrixEltMultiply,ffd_row_vec_vd) {
   using stan::math::elt_multiply;
   using stan::math::row_vector_d;
   using stan::agrad::row_vector_ffd;
@@ -537,7 +537,7 @@ TEST(AgradFvarFvarMatrix,elt_multiply_row_vec_vd) {
   EXPECT_FLOAT_EQ(10,z(0).d_.val());
   EXPECT_FLOAT_EQ(100,z(1).d_.val());
 }
-TEST(AgradFvarFvarMatrix,elt_multiply_row_vec_dv) {
+TEST(AgradFwdMatrixEltMultiply,ffd_row_vec_dv) {
   using stan::math::elt_multiply;
   using stan::math::row_vector_d;
   using stan::agrad::row_vector_ffd;
@@ -561,7 +561,7 @@ TEST(AgradFvarFvarMatrix,elt_multiply_row_vec_dv) {
   EXPECT_FLOAT_EQ(5,z(1).d_.val());
 }
 
-TEST(AgradFvarFvarMatrix,elt_multiply_matrix_vv) {
+TEST(AgradFwdMatrixEltMultiply,ffd_matrix_vv) {
   using stan::math::elt_multiply;
   using stan::agrad::matrix_ffd;
   using stan::agrad::fvar;
@@ -605,7 +605,7 @@ TEST(AgradFvarFvarMatrix,elt_multiply_matrix_vv) {
   EXPECT_FLOAT_EQ(105,z(0,1).d_.val());
   EXPECT_FLOAT_EQ(1000029,z(1,2).d_.val());
 }
-TEST(AgradFvarFvarMatrix,elt_multiply_matrix_vd) {
+TEST(AgradFwdMatrixEltMultiply,ffd_matrix_vd) {
   using stan::math::elt_multiply;
   using stan::math::matrix_d;
   using stan::agrad::matrix_ffd;
@@ -638,7 +638,7 @@ TEST(AgradFvarFvarMatrix,elt_multiply_matrix_vd) {
   EXPECT_FLOAT_EQ(100,z(0,1).d_.val());
   EXPECT_FLOAT_EQ(1000000,z(1,2).d_.val());
 }
-TEST(AgradFvarFvarMatrix,elt_multiply_matrix_dv) {
+TEST(AgradFwdMatrixEltMultiply,ffd_matrix_dv) {
   using stan::math::elt_multiply;
   using stan::math::matrix_d;
   using stan::agrad::matrix_ffd;

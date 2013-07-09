@@ -4,7 +4,7 @@
 #include <stan/agrad/var.hpp>
 #include <gtest/gtest.h>
 
-TEST(AgradFwdMatrix, to_vector) {
+TEST(AgradFwdMatrixToVector, fd_vector) {
   using stan::math::to_vector;
 
   stan::agrad::matrix_fd a(3,3);
@@ -37,7 +37,7 @@ TEST(AgradFwdMatrix, to_vector) {
   EXPECT_FLOAT_EQ(1,b(7).d_);
   EXPECT_FLOAT_EQ(2,b(8).d_);
 }
-TEST(AgradFwdFvarVarMatrix, to_vector) {
+TEST(AgradFwdMatrixToVector, fv_vector) {
   using stan::math::to_vector;
   using stan::agrad::var;
   using stan::agrad::fvar;
@@ -72,7 +72,7 @@ TEST(AgradFwdFvarVarMatrix, to_vector) {
   EXPECT_FLOAT_EQ(1,b(7).d_.val());
   EXPECT_FLOAT_EQ(2,b(8).d_.val());
 }
-TEST(AgradFwdFvarFvarMatrix, to_vector) {
+TEST(AgradFwdMatrixToVector, ffd_vector) {
   using stan::math::to_vector;
   using stan::agrad::fvar;
 

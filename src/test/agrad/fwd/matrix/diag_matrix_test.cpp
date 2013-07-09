@@ -4,7 +4,7 @@
 #include <stan/math/matrix/diag_matrix.hpp>
 #include <stan/agrad/var.hpp>
 
-TEST(AgradFwdMatrix,diagMatrix) {
+TEST(AgradFwdMatrixDiagMatrix,vector_fd) {
   using stan::math::diag_matrix;
   using stan::agrad::matrix_fd;
   using stan::math::vector_d;
@@ -28,7 +28,7 @@ TEST(AgradFwdMatrix,diagMatrix) {
   EXPECT_EQ(1,m(1,1).d_);
   EXPECT_EQ(1,m(2,2).d_);
 }
-TEST(AgradFwdFvarVarMatrix,diagMatrix) {
+TEST(AgradFwdMatrixDiagMatrix,vector_fv) {
   using stan::math::diag_matrix;
   using stan::agrad::matrix_fv;
   using stan::math::vector_d;
@@ -55,7 +55,7 @@ TEST(AgradFwdFvarVarMatrix,diagMatrix) {
   EXPECT_EQ(1,m(1,1).d_.val());
   EXPECT_EQ(1,m(2,2).d_.val());
 }
-TEST(AgradFwdFvarFvarMatrix,diagMatrix) {
+TEST(AgradFwdMatrixDiagMatrix,vector_ffd) {
   using stan::math::diag_matrix;
   using stan::agrad::matrix_ffd;
   using stan::math::vector_d;

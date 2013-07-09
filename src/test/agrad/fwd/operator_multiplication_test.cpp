@@ -3,7 +3,7 @@
 #include <stan/agrad/var.hpp>
 #include <test/agrad/util.hpp>
 
-TEST(Agrad_Fwd_OperatorMultiplication, Fvar) {
+TEST(AgradFwdOperatorMultiplication, Fvar) {
   using stan::agrad::fvar;
 
   fvar<double> x1(0.5,1.0);
@@ -32,7 +32,7 @@ TEST(Agrad_Fwd_OperatorMultiplication, Fvar) {
   EXPECT_FLOAT_EQ(1.0 * -2, f.d_);
 }
 
-TEST(Agrad_Fwd_OperatorMultiplication, FvarVar_Double_1stDeriv) {
+TEST(AgradFwdOperatorMultiplication, FvarVar_Double_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
 
@@ -48,7 +48,7 @@ TEST(Agrad_Fwd_OperatorMultiplication, FvarVar_Double_1stDeriv) {
   a.val_.grad(y,g);
   EXPECT_FLOAT_EQ(0.5, g[0]);
 }
-TEST(Agrad_Fwd_OperatorMultiplication, Double_FvarVar_1stDeriv) {
+TEST(AgradFwdOperatorMultiplication, Double_FvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
 
@@ -64,7 +64,7 @@ TEST(Agrad_Fwd_OperatorMultiplication, Double_FvarVar_1stDeriv) {
   a.val_.grad(y,g);
   EXPECT_FLOAT_EQ(0.5, g[0]);
 }
-TEST(Agrad_Fwd_OperatorMultiplication, FvarVar_FvarVar_1stDeriv) {
+TEST(AgradFwdOperatorMultiplication, FvarVar_FvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
 
@@ -81,7 +81,7 @@ TEST(Agrad_Fwd_OperatorMultiplication, FvarVar_FvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(0.5, g[0]);
   EXPECT_FLOAT_EQ(0.5, g[1]);
 }
-TEST(Agrad_Fwd_OperatorMultiplication, FvarVar_Double_2ndDeriv) {
+TEST(AgradFwdOperatorMultiplication, FvarVar_Double_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
 
@@ -94,7 +94,7 @@ TEST(Agrad_Fwd_OperatorMultiplication, FvarVar_Double_2ndDeriv) {
   a.d_.grad(y,g);
   EXPECT_FLOAT_EQ(0, g[0]);
 }
-TEST(Agrad_Fwd_OperatorMultiplication, Double_FvarVar_2ndDeriv) {
+TEST(AgradFwdOperatorMultiplication, Double_FvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
 
@@ -107,7 +107,7 @@ TEST(Agrad_Fwd_OperatorMultiplication, Double_FvarVar_2ndDeriv) {
   a.d_.grad(y,g);
   EXPECT_FLOAT_EQ(0, g[0]);
 }
-TEST(Agrad_Fwd_OperatorMultiplication, FvarVar_FvarVar_2ndDeriv) {
+TEST(AgradFwdOperatorMultiplication, FvarVar_FvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
 
@@ -122,7 +122,7 @@ TEST(Agrad_Fwd_OperatorMultiplication, FvarVar_FvarVar_2ndDeriv) {
   EXPECT_FLOAT_EQ(1.3, g[1]);
 }
 
-TEST(Agrad_Fwd_OperatorMultiplication, FvarFvarDouble) {
+TEST(AgradFwdOperatorMultiplication, FvarFvarDouble) {
   using stan::agrad::fvar;
 
   fvar<fvar<double> > x;
@@ -139,7 +139,7 @@ TEST(Agrad_Fwd_OperatorMultiplication, FvarFvarDouble) {
   EXPECT_FLOAT_EQ(0.5, z.d_.val_);
   EXPECT_FLOAT_EQ(1, z.d_.d_);
 }
-TEST(Agrad_Fwd_OperatorMultiplication, FvarFvarVar_FvarFvarVar_1stDeriv) {
+TEST(AgradFwdOperatorMultiplication, FvarFvarVar_FvarFvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
 
@@ -163,7 +163,7 @@ TEST(Agrad_Fwd_OperatorMultiplication, FvarFvarVar_FvarFvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(0.5, g[0]);
   EXPECT_FLOAT_EQ(0.5, g[1]);
 }
-TEST(Agrad_Fwd_OperatorMultiplication, FvarFvarVar_Double_1stDeriv) {
+TEST(AgradFwdOperatorMultiplication, FvarFvarVar_Double_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
 
@@ -183,7 +183,7 @@ TEST(Agrad_Fwd_OperatorMultiplication, FvarFvarVar_Double_1stDeriv) {
   z.val_.val_.grad(p,g);
   EXPECT_FLOAT_EQ(0.5, g[0]);
 }
-TEST(Agrad_Fwd_OperatorMultiplication, Double_FvarFvarVar_1stDeriv) {
+TEST(AgradFwdOperatorMultiplication, Double_FvarFvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
 
@@ -203,7 +203,7 @@ TEST(Agrad_Fwd_OperatorMultiplication, Double_FvarFvarVar_1stDeriv) {
   z.val_.val_.grad(p,g);
   EXPECT_FLOAT_EQ(0.5, g[0]);
 }
-TEST(Agrad_Fwd_OperatorMultiplication, FvarFvarVar_FvarFvarVar_2ndDeriv_x) {
+TEST(AgradFwdOperatorMultiplication, FvarFvarVar_FvarFvarVar_2ndDeriv_x) {
   using stan::agrad::fvar;
   using stan::agrad::var;
 
@@ -222,7 +222,7 @@ TEST(Agrad_Fwd_OperatorMultiplication, FvarFvarVar_FvarFvarVar_2ndDeriv_x) {
   EXPECT_FLOAT_EQ(0, g[0]);
   EXPECT_FLOAT_EQ(1, g[1]);
 }
-TEST(Agrad_Fwd_OperatorMultiplication, FvarFvarVar_FvarFvarVar_2ndDeriv_y) {
+TEST(AgradFwdOperatorMultiplication, FvarFvarVar_FvarFvarVar_2ndDeriv_y) {
   using stan::agrad::fvar;
   using stan::agrad::var;
 
@@ -241,7 +241,7 @@ TEST(Agrad_Fwd_OperatorMultiplication, FvarFvarVar_FvarFvarVar_2ndDeriv_y) {
   EXPECT_FLOAT_EQ(1, g[0]);
   EXPECT_FLOAT_EQ(0, g[1]);
 }
-TEST(Agrad_Fwd_OperatorMultiplication, FvarFvarVar_Double_2ndDeriv) {
+TEST(AgradFwdOperatorMultiplication, FvarFvarVar_Double_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
 
@@ -257,7 +257,7 @@ TEST(Agrad_Fwd_OperatorMultiplication, FvarFvarVar_Double_2ndDeriv) {
   z.val_.d_.grad(p,g);
   EXPECT_FLOAT_EQ(0, g[0]);
 }
-TEST(Agrad_Fwd_OperatorMultiplication, Double_FvarFvarVar_2ndDeriv) {
+TEST(AgradFwdOperatorMultiplication, Double_FvarFvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
 

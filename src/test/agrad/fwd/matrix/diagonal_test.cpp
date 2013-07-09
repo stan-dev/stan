@@ -3,7 +3,7 @@
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <stan/agrad/var.hpp>
 
-TEST(AgradFwdMatrix,diagonal_matrix) {
+TEST(AgradFwdMatrixDiagonal,matrix_fd) {
   using stan::math::diagonal;
   using stan::agrad::matrix_fd;
   using stan::math::matrix_d;
@@ -27,7 +27,7 @@ TEST(AgradFwdMatrix,diagonal_matrix) {
   EXPECT_EQ(2,m(1).d_);
   EXPECT_EQ(3,m(2).d_);
 }
-TEST(AgradFwdFvarVarMatrix,diagonal_matrix) {
+TEST(AgradFwdMatrixDiagonal,matrix_fv) {
   using stan::math::diagonal;
   using stan::agrad::matrix_fv;
   using stan::math::matrix_d;
@@ -54,7 +54,7 @@ TEST(AgradFwdFvarVarMatrix,diagonal_matrix) {
   EXPECT_EQ(2,m(1).d_.val());
   EXPECT_EQ(3,m(2).d_.val());
 }
-TEST(AgradFwdFvarFvarMatrix,diagonal_matrix) {
+TEST(AgradFwdMatrixDiagonal,matrix_ffd) {
   using stan::math::diagonal;
   using stan::agrad::matrix_ffd;
   using stan::math::matrix_d;

@@ -4,7 +4,7 @@
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <stan/agrad/var.hpp>
 
-TEST(Agrad_Fwd_Matrix_Col,matrix_fd) {
+TEST(AgradFwdMatrixCol,matrix_fd) {
   using stan::math::col;
   using stan::agrad::matrix_fd;
   using stan::agrad::vector_fd;
@@ -31,7 +31,7 @@ TEST(Agrad_Fwd_Matrix_Col,matrix_fd) {
   EXPECT_EQ(1.0,w[0].d_);
   EXPECT_EQ(1.0,w[1].d_);
 }
-TEST(Agrad_Fwd_Matrix_Col,matrix_fd_exc0) {
+TEST(AgradFwdMatrixCol,matrix_fd_exc0) {
   using stan::math::col;
   using stan::agrad::matrix_fd;
 
@@ -46,7 +46,7 @@ TEST(Agrad_Fwd_Matrix_Col,matrix_fd_exc0) {
   EXPECT_THROW(col(y,0),std::domain_error);
   EXPECT_THROW(col(y,7),std::domain_error);
 }
-TEST(Agrad_Fwd_Matrix_Col,matrix_fd_excHigh) {
+TEST(AgradFwdMatrixCol,matrix_fd_excHigh) {
   using stan::math::col;
   using stan::agrad::matrix_fd;
 
@@ -61,7 +61,7 @@ TEST(Agrad_Fwd_Matrix_Col,matrix_fd_excHigh) {
   EXPECT_THROW(col(y,0),std::domain_error);
   EXPECT_THROW(col(y,5),std::domain_error);
 }
-TEST(Agrad_Fwd_Matrix_Col,matrix_fv) {
+TEST(AgradFwdMatrixCol,matrix_fv) {
   using stan::math::col;
   using stan::agrad::matrix_fv;
   using stan::agrad::vector_fv;
@@ -91,7 +91,7 @@ TEST(Agrad_Fwd_Matrix_Col,matrix_fv) {
   EXPECT_EQ(1.0,w[0].d_.val());
   EXPECT_EQ(1.0,w[1].d_.val());
 }
-TEST(Agrad_Fwd_Matrix_Col,matrix_fv_exc0) {
+TEST(AgradFwdMatrixCol,matrix_fv_exc0) {
   using stan::math::col;
   using stan::agrad::matrix_fv;
   using stan::agrad::fvar;
@@ -109,7 +109,7 @@ TEST(Agrad_Fwd_Matrix_Col,matrix_fv_exc0) {
   EXPECT_THROW(col(y,0),std::domain_error);
   EXPECT_THROW(col(y,7),std::domain_error);
 }
-TEST(Agrad_Fwd_Matrix_Col,matrix_fv_excHigh) {
+TEST(AgradFwdMatrixCol,matrix_fv_excHigh) {
   using stan::math::col;
   using stan::agrad::matrix_fv;
   using stan::agrad::fvar;
@@ -127,7 +127,7 @@ TEST(Agrad_Fwd_Matrix_Col,matrix_fv_excHigh) {
   EXPECT_THROW(col(y,0),std::domain_error);
   EXPECT_THROW(col(y,5),std::domain_error);
 }
-TEST(Agrad_Fwd_Matrix_Col,matrix_ffd) {
+TEST(AgradFwdMatrixCol,matrix_ffd) {
   using stan::math::col;
   using stan::agrad::matrix_ffd;
   using stan::agrad::vector_ffd;
@@ -169,7 +169,7 @@ TEST(Agrad_Fwd_Matrix_Col,matrix_ffd) {
   EXPECT_EQ(1.0,w[0].d_.val());
   EXPECT_EQ(1.0,w[1].d_.val());
 }
-TEST(Agrad_Fwd_Matrix_Col,matrix_ffd_exc0) {
+TEST(AgradFwdMatrixCol,matrix_ffd_exc0) {
   using stan::math::col;
   using stan::agrad::matrix_ffd;
   using stan::agrad::fvar;
@@ -199,7 +199,7 @@ TEST(Agrad_Fwd_Matrix_Col,matrix_ffd_exc0) {
   EXPECT_THROW(col(y,0),std::domain_error);
   EXPECT_THROW(col(y,7),std::domain_error);
 }
-TEST(Agrad_Fwd_Matrix_Col,matrix_ffd_excHigh) {
+TEST(AgradFwdMatrixCol,matrix_ffd_excHigh) {
   using stan::math::col;
   using stan::agrad::matrix_ffd;
   using stan::agrad::fvar;
@@ -229,7 +229,7 @@ TEST(Agrad_Fwd_Matrix_Col,matrix_ffd_excHigh) {
   EXPECT_THROW(col(y,0),std::domain_error);
   EXPECT_THROW(col(y,5),std::domain_error);
 }
-TEST(Agrad_Fwd_Matrix_Col,matrix_ffv) {
+TEST(AgradFwdMatrixCol,matrix_ffv) {
   using stan::math::col;
   using stan::agrad::matrix_ffv;
   using stan::agrad::vector_ffv;
@@ -272,7 +272,7 @@ TEST(Agrad_Fwd_Matrix_Col,matrix_ffv) {
   EXPECT_EQ(1.0,w[0].d_.val().val());
   EXPECT_EQ(1.0,w[1].d_.val().val());
 }
-TEST(Agrad_Fwd_Matrix_Col,matrix_ffv_exc0) {
+TEST(AgradFwdMatrixCol,matrix_ffv_exc0) {
   using stan::math::col;
   using stan::agrad::matrix_ffv;
   using stan::agrad::fvar;
@@ -303,7 +303,7 @@ TEST(Agrad_Fwd_Matrix_Col,matrix_ffv_exc0) {
   EXPECT_THROW(col(y,0),std::domain_error);
   EXPECT_THROW(col(y,7),std::domain_error);
 }
-TEST(Agrad_Fwd_Matrix_Col,matrix_ffv_excHigh) {
+TEST(AgradFwdMatrixCol,matrix_ffv_excHigh) {
   using stan::math::col;
   using stan::agrad::matrix_ffv;
   using stan::agrad::fvar;

@@ -3,7 +3,7 @@
 #include <stan/agrad/var.hpp>
 #include <test/agrad/util.hpp>
 
-TEST(Agrad_Fwd_OperatorGreaterThanOrEqual,Fvar) {
+TEST(AgradFwdOperatorGreaterThanOrEqual,Fvar) {
   using stan::agrad::fvar;
   fvar<double> v4 = 4;
   fvar<double> v5 = 5;
@@ -29,7 +29,7 @@ TEST(Agrad_Fwd_OperatorGreaterThanOrEqual,Fvar) {
   EXPECT_TRUE(i6 >= v5);
 }
 
-TEST(Agrad_Fwd_OperatorGreaterThanOrEqual, FvarVar) {
+TEST(AgradFwdOperatorGreaterThanOrEqual, FvarVar) {
   using stan::agrad::fvar;
   using stan::agrad::var;
 
@@ -42,7 +42,7 @@ TEST(Agrad_Fwd_OperatorGreaterThanOrEqual, FvarVar) {
   EXPECT_FALSE(z >= y);
 }
 
-TEST(Agrad_Fwd_OperatorGreaterThanOrEqual, FvarFvarDouble) {
+TEST(AgradFwdOperatorGreaterThanOrEqual, FvarFvarDouble) {
   using stan::agrad::fvar;
 
   fvar<fvar<double> > x;
@@ -61,7 +61,7 @@ TEST(Agrad_Fwd_OperatorGreaterThanOrEqual, FvarFvarDouble) {
   EXPECT_TRUE(x >= z);
   EXPECT_TRUE(z >= y);
 }
-TEST(Agrad_Fwd_OperatorGreaterThanOrEqual, FvarFvarVar) {
+TEST(AgradFwdOperatorGreaterThanOrEqual, FvarFvarVar) {
   using stan::agrad::fvar;
   using stan::agrad::var;
 

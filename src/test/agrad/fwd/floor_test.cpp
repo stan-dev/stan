@@ -3,7 +3,7 @@
 #include <stan/agrad/var.hpp>
 #include <test/agrad/util.hpp>
 
-TEST(Agrad_Fwd_Floor,Fvar) {
+TEST(AgradFwdFloor,Fvar) {
   using stan::agrad::fvar;
   using std::floor;
 
@@ -23,7 +23,7 @@ TEST(Agrad_Fwd_Floor,Fvar) {
    EXPECT_FLOAT_EQ(0.0, c.d_);
 }
 
-TEST(Agrad_Fwd_Floor,FvarVar_1stDeriv) {
+TEST(AgradFwdFloor,FvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::floor;
@@ -40,7 +40,7 @@ TEST(Agrad_Fwd_Floor,FvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(0, g[0]);
 }
 
-TEST(Agrad_Fwd_Floor,FvarVar_2ndDeriv) {
+TEST(AgradFwdFloor,FvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::floor;
@@ -54,7 +54,7 @@ TEST(Agrad_Fwd_Floor,FvarVar_2ndDeriv) {
   EXPECT_FLOAT_EQ(0, g[0]);
 }
 
-TEST(Agrad_Fwd_Floor,FvarFvarDouble) {
+TEST(AgradFwdFloor,FvarFvarDouble) {
   using stan::agrad::fvar;
   using std::floor;
 
@@ -80,7 +80,7 @@ TEST(Agrad_Fwd_Floor,FvarFvarDouble) {
   EXPECT_FLOAT_EQ(0, a.d_.d_);
 }
 
-TEST(Agrad_Fwd_Floor,FvarFvarVar_1stDeriv) {
+TEST(AgradFwdFloor,FvarFvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::floor;
@@ -118,7 +118,7 @@ TEST(Agrad_Fwd_Floor,FvarFvarVar_1stDeriv) {
 }
 
 
-TEST(Agrad_Fwd_Floor,FvarFvarVar_2ndDeriv) {
+TEST(AgradFwdFloor,FvarFvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::floor;

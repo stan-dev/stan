@@ -5,7 +5,7 @@
 #include <stan/agrad/var.hpp>
 
 using stan::agrad::var;
-TEST(AgradFwdMatrix,rep_matrix_real) {
+TEST(AgradFwdMatrixRepMatrix,fd_real) {
   using stan::math::rep_matrix;
   using stan::agrad::matrix_fd;
   using stan::agrad::fvar;
@@ -28,7 +28,7 @@ TEST(AgradFwdMatrix,rep_matrix_real) {
   EXPECT_EQ(2,output(1,1).d_);
   EXPECT_EQ(2,output(1,2).d_);
 }
-TEST(AgradFwdMatrix,rep_matrix_exception_real) {
+TEST(AgradFwdMatrixRepMatrix,fd_exception_real) {
   using stan::math::rep_matrix;
   using stan::agrad::matrix_fd;
   using stan::agrad::fvar;
@@ -38,7 +38,7 @@ TEST(AgradFwdMatrix,rep_matrix_exception_real) {
 
   EXPECT_THROW(rep_matrix(a,-2,-1), std::domain_error);
 }
-TEST(AgradFwdMatrix,rep_matrix_rowvector) {
+TEST(AgradFwdMatrixRepMatrix,fd_rowvector) {
   using stan::math::rep_matrix;
   using stan::agrad::matrix_fd;
   using stan::agrad::row_vector_fd;
@@ -70,7 +70,7 @@ TEST(AgradFwdMatrix,rep_matrix_rowvector) {
   EXPECT_EQ(2,output(2,1).d_);
   EXPECT_EQ(2,output(2,2).d_);
 }
-TEST(AgradFwdMatrix,rep_matrix_exception_rowvector) {
+TEST(AgradFwdMatrixRepMatrix,fd_exception_rowvector) {
   using stan::math::rep_matrix;
   using stan::agrad::matrix_fd;
   using stan::agrad::row_vector_fd;
@@ -80,7 +80,7 @@ TEST(AgradFwdMatrix,rep_matrix_exception_rowvector) {
 
   EXPECT_THROW(rep_matrix(a,-3), std::domain_error);
 }
-TEST(AgradFwdMatrix,rep_matrix_vector) {
+TEST(AgradFwdMatrixRepMatrix,fd_vector) {
   using stan::math::rep_matrix;
   using stan::agrad::matrix_fd;
   using stan::agrad::vector_fd;
@@ -112,7 +112,7 @@ TEST(AgradFwdMatrix,rep_matrix_vector) {
   EXPECT_EQ(2,output(2,1).d_);
   EXPECT_EQ(2,output(2,2).d_);
 }
-TEST(AgradFwdMatrix,rep_matrix_exception_vector) {
+TEST(AgradFwdMatrixRepMatrix,fd_exception_vector) {
   using stan::math::rep_matrix;
   using stan::agrad::matrix_fd;
   using stan::agrad::vector_fd;
@@ -122,7 +122,7 @@ TEST(AgradFwdMatrix,rep_matrix_exception_vector) {
 
   EXPECT_THROW(rep_matrix(a,-3), std::domain_error);
 }
-TEST(AgradFvarVarMatrix,rep_matrix_real) {
+TEST(AgradFwdMatrixRepMatrix,fv_real) {
   using stan::math::rep_matrix;
   using stan::agrad::matrix_fv;
   using stan::agrad::fvar;
@@ -145,7 +145,7 @@ TEST(AgradFvarVarMatrix,rep_matrix_real) {
   EXPECT_EQ(2,output(1,1).d_.val());
   EXPECT_EQ(2,output(1,2).d_.val());
 }
-TEST(AgradFvarVarMatrix,rep_matrix_exception_real) {
+TEST(AgradFwdMatrixRepMatrix,fv_exception_real) {
   using stan::math::rep_matrix;
   using stan::agrad::matrix_fv;
   using stan::agrad::fvar;
@@ -155,7 +155,7 @@ TEST(AgradFvarVarMatrix,rep_matrix_exception_real) {
 
   EXPECT_THROW(rep_matrix(a,-2,-1), std::domain_error);
 }
-TEST(AgradFvarVarMatrix,rep_matrix_rowvector) {
+TEST(AgradFwdMatrixRepMatrix,fv_rowvector) {
   using stan::math::rep_matrix;
   using stan::agrad::matrix_fv;
   using stan::agrad::row_vector_fv;
@@ -187,7 +187,7 @@ TEST(AgradFvarVarMatrix,rep_matrix_rowvector) {
   EXPECT_EQ(2,output(2,1).d_.val());
   EXPECT_EQ(2,output(2,2).d_.val());
 }
-TEST(AgradFvarVarMatrix,rep_matrix_exception_rowvector) {
+TEST(AgradFwdMatrixRepMatrix,fv_exception_rowvector) {
   using stan::math::rep_matrix;
   using stan::agrad::matrix_fv;
   using stan::agrad::row_vector_fv;
@@ -197,7 +197,7 @@ TEST(AgradFvarVarMatrix,rep_matrix_exception_rowvector) {
 
   EXPECT_THROW(rep_matrix(a,-3), std::domain_error);
 }
-TEST(AgradFvarVarMatrix,rep_matrix_vector) {
+TEST(AgradFwdMatrixRepMatrix,fv_vector) {
   using stan::math::rep_matrix;
   using stan::agrad::matrix_fv;
   using stan::agrad::vector_fv;
@@ -229,7 +229,7 @@ TEST(AgradFvarVarMatrix,rep_matrix_vector) {
   EXPECT_EQ(2,output(2,1).d_.val());
   EXPECT_EQ(2,output(2,2).d_.val());
 }
-TEST(AgradFvarVarMatrix,rep_matrix_exception_vector) {
+TEST(AgradFwdMatrixRepMatrix,fv_exception_vector) {
   using stan::math::rep_matrix;
   using stan::agrad::matrix_fv;
   using stan::agrad::vector_fv;
@@ -239,7 +239,7 @@ TEST(AgradFvarVarMatrix,rep_matrix_exception_vector) {
 
   EXPECT_THROW(rep_matrix(a,-3), std::domain_error);
 }
-TEST(AgradFvarFvarMatrix,rep_matrix_real) {
+TEST(AgradFwdMatrixRepMatrix,ffd_real) {
   using stan::math::rep_matrix;
   using stan::agrad::matrix_ffd;
   using stan::agrad::fvar;
@@ -262,7 +262,7 @@ TEST(AgradFvarFvarMatrix,rep_matrix_real) {
   EXPECT_EQ(2,output(1,1).d_.val());
   EXPECT_EQ(2,output(1,2).d_.val());
 }
-TEST(AgradFvarFvarMatrix,rep_matrix_exception_real) {
+TEST(AgradFwdMatrixRepMatrix,ffd_exception_real) {
   using stan::math::rep_matrix;
   using stan::agrad::matrix_ffd;
   using stan::agrad::fvar;
@@ -272,7 +272,7 @@ TEST(AgradFvarFvarMatrix,rep_matrix_exception_real) {
 
   EXPECT_THROW(rep_matrix(a,-2,-1), std::domain_error);
 }
-TEST(AgradFvarFvarMatrix,rep_matrix_rowvector) {
+TEST(AgradFwdMatrixRepMatrix,ffd_rowvector) {
   using stan::math::rep_matrix;
   using stan::agrad::matrix_ffd;
   using stan::agrad::row_vector_ffd;
@@ -304,7 +304,7 @@ TEST(AgradFvarFvarMatrix,rep_matrix_rowvector) {
   EXPECT_EQ(2,output(2,1).d_.val());
   EXPECT_EQ(2,output(2,2).d_.val());
 }
-TEST(AgradFvarFvarMatrix,rep_matrix_exception_rowvector) {
+TEST(AgradFwdMatrixRepMatrix,ffd_exception_rowvector) {
   using stan::math::rep_matrix;
   using stan::agrad::matrix_ffd;
   using stan::agrad::row_vector_ffd;
@@ -314,7 +314,7 @@ TEST(AgradFvarFvarMatrix,rep_matrix_exception_rowvector) {
 
   EXPECT_THROW(rep_matrix(a,-3), std::domain_error);
 }
-TEST(AgradFvarFvarMatrix,rep_matrix_vector) {
+TEST(AgradFwdMatrixRepMatrix,ffd_vector) {
   using stan::math::rep_matrix;
   using stan::agrad::matrix_ffd;
   using stan::agrad::vector_ffd;
@@ -346,7 +346,7 @@ TEST(AgradFvarFvarMatrix,rep_matrix_vector) {
   EXPECT_EQ(2,output(2,1).d_.val());
   EXPECT_EQ(2,output(2,2).d_.val());
 }
-TEST(AgradFvarFvarMatrix,rep_matrix_exception_vector) {
+TEST(AgradFwdMatrixRepMatrix,ffd_exception_vector) {
   using stan::math::rep_matrix;
   using stan::agrad::matrix_ffd;
   using stan::agrad::vector_ffd;

@@ -5,7 +5,7 @@
 #include <stan/agrad/fvar.hpp>
 #include <stan/agrad/var.hpp>
 
-TEST(AgradFwdMatrix,mv_trace) {
+TEST(AgradFwdMatrixTrace,fd) {
   using stan::math::trace;
   using stan::agrad::matrix_fd;
   using stan::agrad::fvar;
@@ -22,7 +22,7 @@ TEST(AgradFwdMatrix,mv_trace) {
   EXPECT_FLOAT_EQ(9.0,s.val_);
   EXPECT_FLOAT_EQ(2.0,s.d_);
 }  
-TEST(AgradFwdFvarVarMatrix,mv_trace) {
+TEST(AgradFwdMatrixTrace,fv) {
   using stan::math::trace;
   using stan::agrad::matrix_fv;
   using stan::agrad::fvar;
@@ -40,7 +40,7 @@ TEST(AgradFwdFvarVarMatrix,mv_trace) {
   EXPECT_FLOAT_EQ(9.0,s.val_.val());
   EXPECT_FLOAT_EQ(2.0,s.d_.val());
 }
-TEST(AgradFwdFvarFvarMatrix,mv_trace) {
+TEST(AgradFwdMatrixTrace,ffd) {
   using stan::math::trace;
   using stan::agrad::matrix_ffd;
   using stan::agrad::fvar;

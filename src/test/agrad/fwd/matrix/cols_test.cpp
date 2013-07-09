@@ -3,7 +3,7 @@
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <stan/agrad/var.hpp>
 
-TEST(Agrad_Fwd_Matrix_Cols,vector_fd) {
+TEST(AgradFwdMatrixCols,vector_fd) {
   using stan::agrad::vector_fd;
   using stan::agrad::row_vector_fd;
   using stan::math::cols;
@@ -20,7 +20,7 @@ TEST(Agrad_Fwd_Matrix_Cols,vector_fd) {
   v.resize(0);
   EXPECT_EQ(1U, cols(v));
 }
-TEST(Agrad_Fwd_Matrix_Cols,row_vector_fd) {
+TEST(AgradFwdMatrixCols,row_vector_fd) {
   using stan::agrad::row_vector_fd;
   using stan::math::cols;
 
@@ -36,7 +36,7 @@ TEST(Agrad_Fwd_Matrix_Cols,row_vector_fd) {
   rv.resize(0);
   EXPECT_EQ(0U, cols(rv));
 }
-TEST(Agrad_Fwd_Matrix_Cols,matrix_fd) {
+TEST(AgradFwdMatrixCols,matrix_fd) {
   using stan::agrad::matrix_fd;
   using stan::math::cols;
 
@@ -48,7 +48,7 @@ TEST(Agrad_Fwd_Matrix_Cols,matrix_fd) {
   m.resize(5, 0);
   EXPECT_EQ(0U, cols(m));
 }
-TEST(Agrad_Fwd_Matrix_Cols,vector_fv) {
+TEST(AgradFwdMatrixCols,vector_fv) {
   using stan::agrad::vector_fv;
   using stan::agrad::row_vector_fv;
   using stan::math::cols;
@@ -68,7 +68,7 @@ TEST(Agrad_Fwd_Matrix_Cols,vector_fv) {
   v.resize(0);
   EXPECT_EQ(1U, cols(v));
 }
-TEST(Agrad_Fwd_Matrix_Cols,rowvector_fv) {
+TEST(AgradFwdMatrixCols,rowvector_fv) {
   using stan::agrad::row_vector_fv;
   using stan::math::cols;
   using stan::agrad::fvar;
@@ -87,7 +87,7 @@ TEST(Agrad_Fwd_Matrix_Cols,rowvector_fv) {
   rv.resize(0);
   EXPECT_EQ(0U, cols(rv));
 }
-TEST(Agrad_Fwd_Matrix_Cols,matrix_fv) {
+TEST(AgradFwdMatrixCols,matrix_fv) {
   using stan::agrad::matrix_fv;
   using stan::math::cols;
   using stan::agrad::fvar;
@@ -136,7 +136,7 @@ TEST(AgradFwdFvarFvarMatrix,vector_ffd) {
   v.resize(0);
   EXPECT_EQ(1U, cols(v));
 }
-TEST(Agrad_Fwd_Matrix_Cols,rowvector_ffd) {
+TEST(AgradFwdMatrixCols,rowvector_ffd) {
   using stan::agrad::row_vector_ffd;
   using stan::math::cols;
   using stan::agrad::fvar;
@@ -165,7 +165,7 @@ TEST(Agrad_Fwd_Matrix_Cols,rowvector_ffd) {
   rv.resize(0);
   EXPECT_EQ(0U, cols(rv));
 }
-TEST(Agrad_Fwd_Matrix_Cols,matrix_ffd) {
+TEST(AgradFwdMatrixCols,matrix_ffd) {
   using stan::agrad::matrix_ffd;
   using stan::math::cols;
   using stan::agrad::fvar;
@@ -227,7 +227,7 @@ TEST(AgradFwdFvarFvarMatrix,vector_ffv) {
   v.resize(0);
   EXPECT_EQ(1U, cols(v));
 }
-TEST(Agrad_Fwd_Matrix_Cols,rowvector_ffv) {
+TEST(AgradFwdMatrixCols,rowvector_ffv) {
   using stan::agrad::row_vector_ffv;
   using stan::math::cols;
   using stan::agrad::fvar;
@@ -256,7 +256,7 @@ TEST(Agrad_Fwd_Matrix_Cols,rowvector_ffv) {
   rv.resize(0);
   EXPECT_EQ(0U, cols(rv));
 }
-TEST(Agrad_Fwd_Matrix_Cols,matrix_ffv) {
+TEST(AgradFwdMatrixCols,matrix_ffv) {
   using stan::agrad::matrix_ffv;
   using stan::math::cols;
   using stan::agrad::fvar;

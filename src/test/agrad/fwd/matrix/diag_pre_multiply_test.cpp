@@ -4,7 +4,7 @@
 #include <stan/math/matrix/diag_pre_multiply.hpp>
 #include <stan/agrad/var.hpp>
 
-TEST(AgradFwdMatrix, diag_pre_multiply_vector) {
+TEST(AgradFwdMatrixDiagPreMultiply, vector_fd) {
   using stan::agrad::matrix_fd;
   using stan::math::matrix_d;
   using stan::agrad::vector_fd;
@@ -54,7 +54,7 @@ TEST(AgradFwdMatrix, diag_pre_multiply_vector) {
   EXPECT_FLOAT_EQ(16,output(2,1).d_);
   EXPECT_FLOAT_EQ(18,output(2,2).d_);
 }
-TEST(AgradFwdMatrix, diag_pre_multiply_vector_exception) {
+TEST(AgradFwdMatrixDiagPreMultiply, vector_fd_exception) {
   using stan::agrad::matrix_fd;
   using stan::agrad::vector_fd;
 
@@ -68,7 +68,7 @@ TEST(AgradFwdMatrix, diag_pre_multiply_vector_exception) {
   EXPECT_THROW(stan::math::diag_pre_multiply(Z,Y), std::domain_error);
   EXPECT_THROW(stan::math::diag_pre_multiply(Y,Z), std::domain_error);
 }
-TEST(AgradFwdMatrix, diag_pre_multiply_rowvector) {
+TEST(AgradFwdMatrixDiagPreMultiply, rowvector_fd) {
   using stan::agrad::matrix_fd;
   using stan::math::matrix_d;
   using stan::agrad::row_vector_fd;
@@ -118,7 +118,7 @@ TEST(AgradFwdMatrix, diag_pre_multiply_rowvector) {
   EXPECT_FLOAT_EQ(16,output(2,1).d_);
   EXPECT_FLOAT_EQ(18,output(2,2).d_);
 }
-TEST(AgradFwdMatrix, diag_pre_multiply_rowvector_exception) {
+TEST(AgradFwdMatrixDiagPreMultiply, rowvector_fd_exception) {
   using stan::agrad::matrix_fd;
   using stan::agrad::row_vector_fd;
 
@@ -132,7 +132,7 @@ TEST(AgradFwdMatrix, diag_pre_multiply_rowvector_exception) {
   EXPECT_THROW(stan::math::diag_pre_multiply(Z,Y), std::domain_error);
   EXPECT_THROW(stan::math::diag_pre_multiply(Y,Z), std::domain_error);
 }
-TEST(AgradFwdFvarVarMatrix, diag_pre_multiply_vector) {
+TEST(AgradFwdMatrixDiagPreMultiply, vector_fv) {
   using stan::agrad::matrix_fv;
   using stan::math::matrix_d;
   using stan::agrad::row_vector_fv;
@@ -178,7 +178,7 @@ TEST(AgradFwdFvarVarMatrix, diag_pre_multiply_vector) {
   EXPECT_FLOAT_EQ(16,output(2,1).d_.val());
   EXPECT_FLOAT_EQ(18,output(2,2).d_.val());
 }
-TEST(AgradFwdFvarVarMatrix, diag_pre_multiply_vector_exception) {
+TEST(AgradFwdMatrixDiagPreMultiply, vector_fv_exception) {
   using stan::agrad::matrix_fv;
   using stan::agrad::vector_fv;
 
@@ -192,7 +192,7 @@ TEST(AgradFwdFvarVarMatrix, diag_pre_multiply_vector_exception) {
   EXPECT_THROW(stan::math::diag_pre_multiply(Z,Y), std::domain_error);
   EXPECT_THROW(stan::math::diag_pre_multiply(Y,Z), std::domain_error);
 }
-TEST(AgradFwdFvarVarMatrix, diag_pre_multiply_rowvector) {
+TEST(AgradFwdMatrixDiagPreMultiply, rowvector_fv) {
   using stan::agrad::matrix_fv;
   using stan::math::matrix_d;
   using stan::agrad::row_vector_fv;
@@ -238,7 +238,7 @@ TEST(AgradFwdFvarVarMatrix, diag_pre_multiply_rowvector) {
   EXPECT_FLOAT_EQ(16,output(2,1).d_.val());
   EXPECT_FLOAT_EQ(18,output(2,2).d_.val());
 }
-TEST(AgradFwdFvarVarMatrix, diag_pre_multiply_rowvector_exception) {
+TEST(AgradFwdMatrixDiagPreMultiply, rowvector_fv_exception) {
   using stan::agrad::matrix_fv;
   using stan::agrad::row_vector_fv;
 
@@ -252,7 +252,7 @@ TEST(AgradFwdFvarVarMatrix, diag_pre_multiply_rowvector_exception) {
   EXPECT_THROW(stan::math::diag_pre_multiply(Z,Y), std::domain_error);
   EXPECT_THROW(stan::math::diag_pre_multiply(Y,Z), std::domain_error);
 }
-TEST(AgradFwdFvarFvarMatrix, diag_pre_multiply_vector) {
+TEST(AgradFwdMatrixDiagPreMultiply, vector_ffd) {
   using stan::agrad::matrix_ffd;
   using stan::math::matrix_d;
   using stan::agrad::row_vector_ffd;
@@ -310,7 +310,7 @@ TEST(AgradFwdFvarFvarMatrix, diag_pre_multiply_vector) {
   EXPECT_FLOAT_EQ(16,output(2,1).d_.val());
   EXPECT_FLOAT_EQ(18,output(2,2).d_.val());
 }
-TEST(AgradFwdFvarFvarMatrix, diag_pre_multiply_vector_exception) {
+TEST(AgradFwdMatrixDiagPreMultiply, vector_ffd_exception) {
   using stan::agrad::matrix_ffd;
   using stan::agrad::vector_ffd;
 
@@ -324,7 +324,7 @@ TEST(AgradFwdFvarFvarMatrix, diag_pre_multiply_vector_exception) {
   EXPECT_THROW(stan::math::diag_pre_multiply(Z,Y), std::domain_error);
   EXPECT_THROW(stan::math::diag_pre_multiply(Y,Z), std::domain_error);
 }
-TEST(AgradFwdFvarFvarMatrix, diag_pre_multiply_rowvector) {
+TEST(AgradFwdMatrixDiagPreMultiply, rowvector_ffd) {
   using stan::agrad::matrix_ffd;
   using stan::math::matrix_d;
   using stan::agrad::row_vector_ffd;
@@ -382,7 +382,7 @@ TEST(AgradFwdFvarFvarMatrix, diag_pre_multiply_rowvector) {
   EXPECT_FLOAT_EQ(16,output(2,1).d_.val());
   EXPECT_FLOAT_EQ(18,output(2,2).d_.val());
 }
-TEST(AgradFwdFvarFvarMatrix, diag_pre_multiply_rowvector_exception) {
+TEST(AgradFwdMatrixDiagPreMultiply, rowvector_ffd_exception) {
   using stan::agrad::matrix_ffd;
   using stan::agrad::row_vector_ffd;
 

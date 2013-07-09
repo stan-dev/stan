@@ -4,7 +4,7 @@
 #include <stan/agrad/var.hpp>
 
 using stan::agrad::fvar;
-TEST(AgradFwdMatrix, dot_self_vec) {
+TEST(AgradFwdMatrixDotSelf, vec_fd) {
   using stan::math::dot_self;
 
   Eigen::Matrix<fvar<double>,Eigen::Dynamic,1> v1(1);
@@ -26,7 +26,7 @@ TEST(AgradFwdMatrix, dot_self_vec) {
   EXPECT_NEAR(29.0,dot_self(v3).val_,1E-12);  
   EXPECT_NEAR(18.0,dot_self(v3).d_,1E-12);  
 }
-TEST(AgradFwdFvarVarMatrix, dot_self_vec) {
+TEST(AgradFwdMatrixDotSelf, vec_fv) {
   using stan::math::dot_self;
   using stan::agrad::var;
 
@@ -47,7 +47,7 @@ TEST(AgradFwdFvarVarMatrix, dot_self_vec) {
   EXPECT_NEAR(29.0,dot_self(v3).val_.val(),1E-12);  
   EXPECT_NEAR(18.0,dot_self(v3).d_.val(),1E-12);  
 }
-TEST(AgradFwdFvarFvarMatrix, dot_self_vec) {
+TEST(AgradFwdMatrixDotSelf, vec_ffd) {
   using stan::math::dot_self;
 
   fvar<fvar<double> > a;

@@ -4,7 +4,7 @@
 #include <stan/math/matrix.hpp>
 #include <stan/agrad/var.hpp>
 
-TEST(AgradFwdMatrix,rows_dot_self) {
+TEST(AgradFwdMatrixRowsDotSelf,fd) {
   using stan::math::columns_dot_self;
   using stan::agrad::fvar;
 
@@ -35,7 +35,7 @@ TEST(AgradFwdMatrix,rows_dot_self) {
   EXPECT_NEAR(10.0,x(0,0).d_,1E-12);
   EXPECT_NEAR(18.0,x(1,0).d_,1E-12);
 }
-TEST(AgradFwdFvarVarMatrix,rows_dot_self) {
+TEST(AgradFwdMatrixRowsDotSelf,fv) {
   using stan::math::columns_dot_self;
   using stan::agrad::fvar;
   using stan::agrad::var;
@@ -67,7 +67,7 @@ TEST(AgradFwdFvarVarMatrix,rows_dot_self) {
   EXPECT_NEAR(10.0,x(0,0).d_.val(),1E-12);
   EXPECT_NEAR(18.0,x(1,0).d_.val(),1E-12);
 }
-TEST(AgradFwdFvarFvarMatrix,rows_dot_self) {
+TEST(AgradFwdMatrixRowsDotSelf,ffd) {
   using stan::math::columns_dot_self;
   using stan::agrad::fvar;
 

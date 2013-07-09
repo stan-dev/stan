@@ -3,7 +3,7 @@
 #include <stan/agrad/var.hpp>
 #include <test/agrad/util.hpp>
 
-TEST(Agrad_Fwd_Pow, Fvar) {
+TEST(AgradFwdPow, Fvar) {
   using stan::agrad::fvar;
   using std::pow;
   using std::log;
@@ -31,7 +31,7 @@ TEST(Agrad_Fwd_Pow, Fvar) {
   isnan(d.d_);
 }
 
-TEST(Agrad_Fwd_Pow, FvarVar_FvarVar_1stDeriv) {
+TEST(AgradFwdPow, FvarVar_FvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::log;
@@ -51,7 +51,7 @@ TEST(Agrad_Fwd_Pow, FvarVar_FvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(1.2 / 0.5 * pow(0.5, 1.2), g[0]);
   EXPECT_FLOAT_EQ(log(0.5) * pow(0.5, 1.2), g[1]);
 }
-TEST(Agrad_Fwd_Pow, FvarVar_Double_1stDeriv) {
+TEST(AgradFwdPow, FvarVar_Double_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::log;
@@ -70,7 +70,7 @@ TEST(Agrad_Fwd_Pow, FvarVar_Double_1stDeriv) {
   a.val_.grad(y,g);
   EXPECT_FLOAT_EQ(1.2 / 0.5 * pow(0.5, 1.2), g[0]);
 }
-TEST(Agrad_Fwd_Pow, Double_FvarVar_1stDeriv) {
+TEST(AgradFwdPow, Double_FvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::log;
@@ -89,7 +89,7 @@ TEST(Agrad_Fwd_Pow, Double_FvarVar_1stDeriv) {
   a.val_.grad(y,g);
   EXPECT_FLOAT_EQ(log(0.5) * pow(0.5, 1.2), g[0]);
 }
-TEST(Agrad_Fwd_Pow, FvarVar_FvarVar_2ndDeriv) {
+TEST(AgradFwdPow, FvarVar_FvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::log;
@@ -105,7 +105,7 @@ TEST(Agrad_Fwd_Pow, FvarVar_FvarVar_2ndDeriv) {
   EXPECT_FLOAT_EQ(0.56431121, g[0]);
   EXPECT_FLOAT_EQ(0.35557628, g[1]);
 }
-TEST(Agrad_Fwd_Pow, FvarVar_Double_2ndDeriv) {
+TEST(AgradFwdPow, FvarVar_Double_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::log;
@@ -120,7 +120,7 @@ TEST(Agrad_Fwd_Pow, FvarVar_Double_2ndDeriv) {
   a.d_.grad(y,g);
   EXPECT_FLOAT_EQ((1.2 - 1.0) * 1.2 * pow(0.5,1.2 - 2.0), g[0]);
 }
-TEST(Agrad_Fwd_Pow, Double_FvarVar_2ndDeriv) {
+TEST(AgradFwdPow, Double_FvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::log;
@@ -136,7 +136,7 @@ TEST(Agrad_Fwd_Pow, Double_FvarVar_2ndDeriv) {
   EXPECT_FLOAT_EQ(pow(0.5,1.2) * log(0.5) * log(0.5), g[0]);
 }
 
-TEST(Agrad_Fwd_Pow, FvarFvarDouble) {
+TEST(AgradFwdPow, FvarFvarDouble) {
   using stan::agrad::fvar;
   using std::pow;
   using std::log;
@@ -156,7 +156,7 @@ TEST(Agrad_Fwd_Pow, FvarFvarDouble) {
   EXPECT_FLOAT_EQ(log(0.5) * pow(0.5,0.5), a.d_.val_);
   EXPECT_FLOAT_EQ(pow(0.5, -0.5) * (0.5 * log(0.5) + 1.0), a.d_.d_);
 }
-TEST(Agrad_Fwd_Pow, FvarFvarVar_FvarFvarVar_1stDeriv) {
+TEST(AgradFwdPow, FvarFvarVar_FvarFvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::pow;
@@ -182,7 +182,7 @@ TEST(Agrad_Fwd_Pow, FvarFvarVar_FvarFvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(0.5 * pow(0.5,-0.5), g[0]);
   EXPECT_FLOAT_EQ(log(0.5) * pow(0.5,0.5), g[1]);
 }
-TEST(Agrad_Fwd_Pow, FvarFvarVar_Double_1stDeriv) {
+TEST(AgradFwdPow, FvarFvarVar_Double_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::pow;
@@ -205,7 +205,7 @@ TEST(Agrad_Fwd_Pow, FvarFvarVar_Double_1stDeriv) {
   a.val_.val_.grad(p,g);
   EXPECT_FLOAT_EQ(0.5 * pow(0.5,-0.5), g[0]);
 }
-TEST(Agrad_Fwd_Pow, Double_FvarFvarVar_1stDeriv) {
+TEST(AgradFwdPow, Double_FvarFvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::pow;
@@ -228,7 +228,7 @@ TEST(Agrad_Fwd_Pow, Double_FvarFvarVar_1stDeriv) {
   a.val_.val_.grad(p,g);
   EXPECT_FLOAT_EQ(log(0.5) * pow(0.5,0.5), g[0]);
 }
-TEST(Agrad_Fwd_Pow, FvarFvarVar_FvarFvarVar_2ndDeriv_x) {
+TEST(AgradFwdPow, FvarFvarVar_FvarFvarVar_2ndDeriv_x) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::pow;
@@ -249,7 +249,7 @@ TEST(Agrad_Fwd_Pow, FvarFvarVar_FvarFvarVar_2ndDeriv_x) {
   EXPECT_FLOAT_EQ((0.5 - 1.0) * 0.5 * pow(0.5,0.5 - 2.0), g[0]);
   EXPECT_FLOAT_EQ(pow(0.5, -0.5) * (0.5 * log(0.5) + 1.0), g[1]);
 }
-TEST(Agrad_Fwd_Pow, FvarFvarVar_FvarFvarVar_2ndDeriv_y) {
+TEST(AgradFwdPow, FvarFvarVar_FvarFvarVar_2ndDeriv_y) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::pow;
@@ -270,7 +270,7 @@ TEST(Agrad_Fwd_Pow, FvarFvarVar_FvarFvarVar_2ndDeriv_y) {
   EXPECT_FLOAT_EQ(pow(0.5, -0.5) * (0.5 * log(0.5) + 1.0), g[0]);
   EXPECT_FLOAT_EQ(pow(0.5,0.5) * log(0.5) * log(0.5), g[1]);
 }
-TEST(Agrad_Fwd_Pow, FvarFvarVar_Double_2ndDeriv) {
+TEST(AgradFwdPow, FvarFvarVar_Double_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::pow;
@@ -288,7 +288,7 @@ TEST(Agrad_Fwd_Pow, FvarFvarVar_Double_2ndDeriv) {
   a.val_.d_.grad(p,g);
   EXPECT_FLOAT_EQ((1.2 - 1.0) * 1.2 * pow(0.5,1.2 - 2.0), g[0]);
 }
-TEST(Agrad_Fwd_Pow, Double_FvarFvarVar_2ndDeriv) {
+TEST(AgradFwdPow, Double_FvarFvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::pow;

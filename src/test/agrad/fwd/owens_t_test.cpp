@@ -3,7 +3,7 @@
 #include <stan/agrad/var.hpp>
 #include <test/agrad/util.hpp>
 
-TEST(Agrad_Fwd_OwensT,Fvar) {
+TEST(AgradFwdOwensT,Fvar) {
   using stan::agrad::fvar;
   using stan::agrad::owens_t;
   using boost::math::owens_t;
@@ -22,7 +22,7 @@ TEST(Agrad_Fwd_OwensT,Fvar) {
   EXPECT_FLOAT_EQ(owens_t(1.0, 2.0), f.val_);
   EXPECT_FLOAT_EQ(-0.1154804963, f.d_);
 }
-TEST(Agrad_Fwd_OwensT,FvarVar_FvarVar_1stDeriv) {
+TEST(AgradFwdOwensT,FvarVar_FvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::agrad::owens_t;
@@ -40,7 +40,7 @@ TEST(Agrad_Fwd_OwensT,FvarVar_FvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(0.0026128467,grad_f[1]);
   EXPECT_FLOAT_EQ(-0.1154804963,grad_f[0]);
 }
-TEST(Agrad_Fwd_OwensT,FvarVar_Double_1stDeriv) {
+TEST(AgradFwdOwensT,FvarVar_Double_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::agrad::owens_t;
@@ -57,7 +57,7 @@ TEST(Agrad_Fwd_OwensT,FvarVar_Double_1stDeriv) {
   f.val_.grad(x,grad_f);
   EXPECT_FLOAT_EQ(-0.1154804963,grad_f[0]);
 }
-TEST(Agrad_Fwd_OwensT,Double_FvarVar_1stDeriv) {
+TEST(AgradFwdOwensT,Double_FvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::agrad::owens_t;
@@ -74,7 +74,7 @@ TEST(Agrad_Fwd_OwensT,Double_FvarVar_1stDeriv) {
   f.val_.grad(x,grad_f);
   EXPECT_FLOAT_EQ(0.0026128467,grad_f[0]);
 }
-TEST(Agrad_Fwd_OwensT,FvarVar_FvarVar_2ndDeriv) {
+TEST(AgradFwdOwensT,FvarVar_FvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::agrad::owens_t;
@@ -90,7 +90,7 @@ TEST(Agrad_Fwd_OwensT,FvarVar_FvarVar_2ndDeriv) {
   EXPECT_FLOAT_EQ(-0.020380205,grad_f[1]);
   EXPECT_FLOAT_EQ(0.076287799,grad_f[0]);
 }
-TEST(Agrad_Fwd_OwensT,FvarVar_Double_2ndDeriv) {
+TEST(AgradFwdOwensT,FvarVar_Double_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::agrad::owens_t;
@@ -105,7 +105,7 @@ TEST(Agrad_Fwd_OwensT,FvarVar_Double_2ndDeriv) {
   f.d_.grad(x,grad_f);
   EXPECT_FLOAT_EQ(0.089352027,grad_f[0]);
 }
-TEST(Agrad_Fwd_OwensT,Double_FvarVar_2ndDeriv) {
+TEST(AgradFwdOwensT,Double_FvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::agrad::owens_t;
@@ -120,7 +120,7 @@ TEST(Agrad_Fwd_OwensT,Double_FvarVar_2ndDeriv) {
   f.d_.grad(x,grad_f);
   EXPECT_FLOAT_EQ(-0.0073159705,grad_f[0]);
 }
-TEST(Agrad_Fwd_OwensT,FvarFvarDouble) {
+TEST(AgradFwdOwensT,FvarFvarDouble) {
   using stan::agrad::fvar;
   using stan::agrad::owens_t;
   using boost::math::owens_t;
@@ -138,7 +138,7 @@ TEST(Agrad_Fwd_OwensT,FvarFvarDouble) {
   EXPECT_FLOAT_EQ(0.0026128467, f.d_.val_);
   EXPECT_FLOAT_EQ(-0.013064234,f.d_.d_);
 }
-TEST(Agrad_Fwd_OwensT,FvarFvarVar_FvarFvarVar_1stDeriv) {
+TEST(AgradFwdOwensT,FvarFvarVar_FvarFvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::agrad::owens_t;
@@ -163,7 +163,7 @@ TEST(Agrad_Fwd_OwensT,FvarFvarVar_FvarFvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(-0.1154804963, g[0]);
   EXPECT_FLOAT_EQ(0.0026128467, g[1]);
 }
-TEST(Agrad_Fwd_OwensT,FvarFvarVar_Double_1stDeriv) {
+TEST(AgradFwdOwensT,FvarFvarVar_Double_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::agrad::owens_t;
@@ -187,7 +187,7 @@ TEST(Agrad_Fwd_OwensT,FvarFvarVar_Double_1stDeriv) {
   EXPECT_FLOAT_EQ(-0.1154804963, g[0]);
 }
 
-TEST(Agrad_Fwd_OwensT,Double_FvarFvarVar_1stDeriv) {
+TEST(AgradFwdOwensT,Double_FvarFvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::agrad::owens_t;
@@ -210,7 +210,7 @@ TEST(Agrad_Fwd_OwensT,Double_FvarFvarVar_1stDeriv) {
   f.val_.val_.grad(p,g);
   EXPECT_FLOAT_EQ(0.0026128467, g[0]);
 }
-TEST(Agrad_Fwd_OwensT,FvarFvarVar_FvarFvarVar_2ndDeriv_h) {
+TEST(AgradFwdOwensT,FvarFvarVar_FvarFvarVar_2ndDeriv_h) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::agrad::owens_t;
@@ -230,7 +230,7 @@ TEST(Agrad_Fwd_OwensT,FvarFvarVar_FvarFvarVar_2ndDeriv_h) {
   EXPECT_FLOAT_EQ(0.089352027, g[0]);
   EXPECT_FLOAT_EQ(-0.013064234, g[1]);
 }
-TEST(Agrad_Fwd_OwensT,FvarFvarVar_FvarFvarVar_2ndDeriv_a) {
+TEST(AgradFwdOwensT,FvarFvarVar_FvarFvarVar_2ndDeriv_a) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::agrad::owens_t;
@@ -250,7 +250,7 @@ TEST(Agrad_Fwd_OwensT,FvarFvarVar_FvarFvarVar_2ndDeriv_a) {
   EXPECT_FLOAT_EQ(-0.013064234, g[0]);
   EXPECT_FLOAT_EQ(-0.0073159705, g[1]);
 }
-TEST(Agrad_Fwd_OwensT,FvarFvarVar_Double_2ndDeriv) {
+TEST(AgradFwdOwensT,FvarFvarVar_Double_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::agrad::owens_t;
@@ -269,7 +269,7 @@ TEST(Agrad_Fwd_OwensT,FvarFvarVar_Double_2ndDeriv) {
   EXPECT_FLOAT_EQ(0.089352027, g[0]);
 }
 
-TEST(Agrad_Fwd_OwensT,Double_FvarFvarVar_2ndDeriv) {
+TEST(AgradFwdOwensT,Double_FvarFvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::agrad::owens_t;

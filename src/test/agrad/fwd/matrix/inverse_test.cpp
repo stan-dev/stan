@@ -4,7 +4,7 @@
 #include <stan/agrad/var.hpp>
 #include <stan/agrad/rev/matrix/multiply.hpp>
 
-TEST(AgradFwdMatrix,inverse) {
+TEST(AgradFwdMatrixInverse,fd) {
   using stan::agrad::matrix_fd;
   using stan::math::matrix_d;
 
@@ -32,7 +32,7 @@ TEST(AgradFwdMatrix,inverse) {
 
   EXPECT_THROW(stan::agrad::inverse(matrix_fd(2,3)), std::domain_error);
 }
-TEST(AgradFwdFvarVarMatrix,inverse) {
+TEST(AgradFwdMatrixInverse,fv) {
   using stan::agrad::matrix_fv;
   using stan::math::matrix_d;
   using stan::agrad::fvar;
@@ -63,7 +63,7 @@ TEST(AgradFwdFvarVarMatrix,inverse) {
 
   EXPECT_THROW(stan::agrad::inverse(matrix_fv(2,3)), std::domain_error);
 }
-TEST(AgradFwdFvarFvarMatrix,inverse) {
+TEST(AgradFwdMatrixInverse,ffd) {
   using stan::agrad::matrix_ffd;
   using stan::math::matrix_d;
   using stan::agrad::fvar;

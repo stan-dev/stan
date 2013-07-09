@@ -3,7 +3,7 @@
 #include <stan/agrad/var.hpp>
 #include <test/agrad/util.hpp>
 
-TEST(Agrad_Fwd_BesselFirstKind,Fvar) {
+TEST(AgradFwdBesselFirstKind,Fvar) {
   using stan::agrad::fvar;
   using stan::agrad::bessel_first_kind;
 
@@ -20,7 +20,7 @@ TEST(Agrad_Fwd_BesselFirstKind,Fvar) {
   EXPECT_FLOAT_EQ(-0.7461432154878245145319, x.d_);
 }
 
-TEST(Agrad_Fwd_BesselFirstKind,FvarVar_1stDeriv) {
+TEST(AgradFwdBesselFirstKind,FvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::bessel_first_kind;
@@ -36,7 +36,7 @@ TEST(Agrad_Fwd_BesselFirstKind,FvarVar_1stDeriv) {
   a.val_.grad(y,g);
   EXPECT_FLOAT_EQ(-0.7461432154878245145319 / 2.0, g[0]);
 }
-TEST(Agrad_Fwd_BesselFirstKind,FvarVar_2ndDeriv) {
+TEST(AgradFwdBesselFirstKind,FvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::bessel_first_kind;
@@ -49,7 +49,7 @@ TEST(Agrad_Fwd_BesselFirstKind,FvarVar_2ndDeriv) {
   a.d_.grad(y,g);
   EXPECT_FLOAT_EQ(0.35405707, g[0]);
 }
-TEST(Agrad_Fwd_BesselFirstKind,FvarFvarDouble) {
+TEST(AgradFwdBesselFirstKind,FvarFvarDouble) {
   using stan::agrad::fvar;
   using stan::math::bessel_first_kind;
 
@@ -74,7 +74,7 @@ TEST(Agrad_Fwd_BesselFirstKind,FvarFvarDouble) {
   EXPECT_FLOAT_EQ(0, b.d_.val_);
   EXPECT_FLOAT_EQ(0, b.d_.d_);
 }
-TEST(Agrad_Fwd_BesselFirstKind,FvarFvarVar_1stDeriv) {
+TEST(AgradFwdBesselFirstKind,FvarFvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::bessel_first_kind;
@@ -111,7 +111,7 @@ TEST(Agrad_Fwd_BesselFirstKind,FvarFvarVar_1stDeriv) {
   b.val_.val_.grad(q,r);
   EXPECT_FLOAT_EQ(-0.7461432154878245145319 / 2.0, r[0]);
 }
-TEST(Agrad_Fwd_BesselFirstKind,FvarFvarVar_2ndDeriv) {
+TEST(AgradFwdBesselFirstKind,FvarFvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::bessel_first_kind;

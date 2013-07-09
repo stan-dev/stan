@@ -5,7 +5,7 @@
 #include <stan/agrad/var.hpp>
 #include <test/agrad/util.hpp>
 
-TEST(Agrad_Fwd_BinomialCoefficientLog,Fvar) {
+TEST(AgradFwdBinomialCoefficientLog,Fvar) {
   using stan::agrad::fvar;
   using stan::math::binomial_coefficient_log;
   using boost::math::digamma;
@@ -18,7 +18,7 @@ TEST(Agrad_Fwd_BinomialCoefficientLog,Fvar) {
   EXPECT_FLOAT_EQ(0.69289774, a.d_);
 }
 
-// TEST(Agrad_Fwd_BinomialCoefficientLog,FvarVar_1stDeriv) {
+// TEST(AgradFwdBinomialCoefficientLog,FvarVar_1stDeriv) {
 //   using stan::agrad::fvar;
 //   using stan::agrad::var;
 //   using stan::math::binomial_coefficient_log;
@@ -38,7 +38,7 @@ TEST(Agrad_Fwd_BinomialCoefficientLog,Fvar) {
 //   EXPECT_FLOAT_EQ(-7.9936058e-15, g[1]);
 // }
 
-// TEST(Agrad_Fwd_BinomialCoefficientLog,FvarFvarDouble) {
+// TEST(AgradFwdBinomialCoefficientLog,FvarFvarDouble) {
 //   using stan::agrad::fvar;
 //   using stan::math::binomial_coefficient_log;
 //   using stan::agrad::binomial_coefficient_log;

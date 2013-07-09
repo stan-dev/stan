@@ -4,7 +4,7 @@
 #include <stan/agrad/var.hpp>
 #include <test/agrad/util.hpp>
 
-TEST(Agrad_Fwd_Expm1,Fvar) {
+TEST(AgradFwdExpm1,Fvar) {
   using stan::agrad::fvar;
   using boost::math::expm1;
   using std::exp;
@@ -38,7 +38,7 @@ TEST(Agrad_Fwd_Expm1,Fvar) {
   EXPECT_FLOAT_EQ(exp(0.0), f.d_);
 }
 
-TEST(Agrad_Fwd_Expm1,FvarVar_1stDeriv) {
+TEST(AgradFwdExpm1,FvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using boost::math::expm1;
@@ -56,7 +56,7 @@ TEST(Agrad_Fwd_Expm1,FvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(exp(0.5), g[0]);
 }
 
-TEST(Agrad_Fwd_Expm1,FvarVar_2ndDeriv) {
+TEST(AgradFwdExpm1,FvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using boost::math::expm1;
@@ -70,7 +70,7 @@ TEST(Agrad_Fwd_Expm1,FvarVar_2ndDeriv) {
   a.d_.grad(y,g);
   EXPECT_FLOAT_EQ(1.3 * exp(0.5), g[0]);
 }
-TEST(Agrad_Fwd_Expm1,FvarFvarDouble) {
+TEST(AgradFwdExpm1,FvarFvarDouble) {
   using stan::agrad::fvar;
   using boost::math::expm1;
   using std::exp;
@@ -96,7 +96,7 @@ TEST(Agrad_Fwd_Expm1,FvarFvarDouble) {
   EXPECT_FLOAT_EQ(exp(0.5), a.d_.val_);
   EXPECT_FLOAT_EQ(0, a.d_.d_);
 }
-TEST(Agrad_Fwd_Expm1,FvarFvarVar_1stDeriv) {
+TEST(AgradFwdExpm1,FvarFvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using boost::math::expm1;
@@ -135,7 +135,7 @@ TEST(Agrad_Fwd_Expm1,FvarFvarVar_1stDeriv) {
 }
 
 
-TEST(Agrad_Fwd_Expm1,FvarFvarVar_2ndDeriv) {
+TEST(AgradFwdExpm1,FvarFvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using boost::math::expm1;

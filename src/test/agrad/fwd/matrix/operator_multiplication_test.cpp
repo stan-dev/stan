@@ -11,7 +11,7 @@ using stan::agrad::fvar;
 using stan::agrad::var;  
 using stan::agrad::multiply;
 
-TEST(AgradFwdMatrix, multiply_vector_scalar) {
+TEST(AgradFwdMatrixOperatorMultiplication,fd_vector_scalar) {
   using stan::math::vector_d;
   using stan::agrad::vector_fd;
 
@@ -79,7 +79,7 @@ TEST(AgradFwdMatrix, multiply_vector_scalar) {
   EXPECT_FLOAT_EQ(  -5, output(2).d_);
 }
 
-TEST(AgradFwdMatrix, multiply_rowvector_scalar) {
+TEST(AgradFwdMatrixOperatorMultiplication,fd_rowvector_scalar) {
   using stan::math::row_vector_d;
   using stan::agrad::row_vector_fd;
 
@@ -146,7 +146,7 @@ TEST(AgradFwdMatrix, multiply_rowvector_scalar) {
   EXPECT_FLOAT_EQ(  -2, output(1).d_);
   EXPECT_FLOAT_EQ(  -5, output(2).d_);
 }
-TEST(AgradFwdMatrix, multiply_matrix_scalar) {
+TEST(AgradFwdMatrixOperatorMultiplication,fd_matrix_scalar) {
   using stan::math::matrix_d;
   using stan::agrad::matrix_fd;
   
@@ -226,7 +226,7 @@ TEST(AgradFwdMatrix, multiply_matrix_scalar) {
   EXPECT_FLOAT_EQ(  -5, output(1,0).d_);
   EXPECT_FLOAT_EQ(   2, output(1,1).d_);
 }
-TEST(AgradFwdMatrix, multiply_rowvector_vector) {
+TEST(AgradFwdMatrixOperatorMultiplication,fd_rowvector_vector) {
   using stan::math::vector_d;
   using stan::agrad::vector_fd;
   using stan::math::row_vector_d;
@@ -261,7 +261,7 @@ TEST(AgradFwdMatrix, multiply_rowvector_vector) {
   EXPECT_THROW(multiply(v1, d2), std::domain_error);
   EXPECT_THROW(multiply(d1, v2), std::domain_error);
 }
-TEST(AgradFwdMatrix, multiply_vector_rowvector) {
+TEST(AgradFwdMatrixOperatorMultiplication,fd_vector_rowvector) {
   using stan::agrad::matrix_fd;
   using stan::math::vector_d;
   using stan::agrad::vector_fd;
@@ -350,7 +350,7 @@ TEST(AgradFwdMatrix, multiply_vector_rowvector) {
   EXPECT_FLOAT_EQ( -5, output(2,1).d_);
   EXPECT_FLOAT_EQ( -5, output(2,2).d_);
 }
-TEST(AgradFwdMatrix, multiply_matrix_vector) {
+TEST(AgradFwdMatrixOperatorMultiplication,fd_matrix_vector) {
   using stan::math::matrix_d;
   using stan::agrad::matrix_fd;
   using stan::math::vector_d;
@@ -401,7 +401,7 @@ TEST(AgradFwdMatrix, multiply_matrix_vector) {
   EXPECT_FLOAT_EQ(-1, output(1).d_);
   EXPECT_FLOAT_EQ(-3, output(2).d_);
 }
-TEST(AgradFwdMatrix, multiply_matrix_vector_exception) {
+TEST(AgradFwdMatrixOperatorMultiplication,fd_matrix_vector_exception) {
   using stan::math::matrix_d;
   using stan::agrad::matrix_fd;
   using stan::math::vector_d;
@@ -415,7 +415,7 @@ TEST(AgradFwdMatrix, multiply_matrix_vector_exception) {
   EXPECT_THROW(multiply(v1, d2), std::domain_error);
   EXPECT_THROW(multiply(d1, v2), std::domain_error);
 }
-TEST(AgradFwdMatrix, multiply_rowvector_matrix) {
+TEST(AgradFwdMatrixOperatorMultiplication,fd_rowvector_matrix) {
   using stan::math::matrix_d;
   using stan::agrad::matrix_fd;
   using stan::agrad::vector_fd;
@@ -462,7 +462,7 @@ TEST(AgradFwdMatrix, multiply_rowvector_matrix) {
   EXPECT_FLOAT_EQ(  3, output(0).d_);
   EXPECT_FLOAT_EQ(  3, output(1).d_);
 }
-TEST(AgradFwdMatrix, multiply_rowvector_matrix_exception) {
+TEST(AgradFwdMatrixOperatorMultiplication,fd_rowvector_matrix_exception) {
   using stan::math::matrix_d;
   using stan::agrad::matrix_fd;
   using stan::math::row_vector_d;
@@ -476,7 +476,7 @@ TEST(AgradFwdMatrix, multiply_rowvector_matrix_exception) {
   EXPECT_THROW(multiply(v1, d2), std::domain_error);
   EXPECT_THROW(multiply(d1, v2), std::domain_error);
 }
-TEST(AgradFwdMatrix, multiply_matrix_matrix) {
+TEST(AgradFwdMatrixOperatorMultiplication,fd_matrix_matrix) {
   using stan::math::matrix_d;
   using stan::agrad::matrix_fd;
 
@@ -534,7 +534,7 @@ TEST(AgradFwdMatrix, multiply_matrix_matrix) {
   EXPECT_FLOAT_EQ( 157, output(1,0).val_);
   EXPECT_FLOAT_EQ( 135, output(1,1).val_);
 }
-TEST(AgradFwdMatrix, multiply_matrix_matrix_exception) {
+TEST(AgradFwdMatrixOperatorMultiplication,fd_matrix_matrix_exception) {
   using stan::math::matrix_d;
   using stan::agrad::matrix_fd;
 
@@ -547,7 +547,7 @@ TEST(AgradFwdMatrix, multiply_matrix_matrix_exception) {
   EXPECT_THROW(multiply(v1, d2), std::domain_error);
   EXPECT_THROW(multiply(d1, v2), std::domain_error);
 }
-TEST(AgradFwdFvarVarMatrix, multiply_vector_scalar) {
+TEST(AgradFwdMatrixOperatorMultiplication,fv_vector_scalar) {
   using stan::math::vector_d;
   using stan::agrad::vector_fv;
 
@@ -615,7 +615,7 @@ TEST(AgradFwdFvarVarMatrix, multiply_vector_scalar) {
   EXPECT_FLOAT_EQ(  -5, output(2).d_.val());
 }
 
-TEST(AgradFwdFvarVarMatrix, multiply_rowvector_scalar) {
+TEST(AgradFwdMatrixOperatorMultiplication,fv_rowvector_scalar) {
   using stan::math::row_vector_d;
   using stan::agrad::row_vector_fv;
 
@@ -682,7 +682,7 @@ TEST(AgradFwdFvarVarMatrix, multiply_rowvector_scalar) {
   EXPECT_FLOAT_EQ(  -2, output(1).d_.val());
   EXPECT_FLOAT_EQ(  -5, output(2).d_.val());
 }
-TEST(AgradFwdFvarVarMatrix, multiply_matrix_scalar) {
+TEST(AgradFwdMatrixOperatorMultiplication,fv_matrix_scalar) {
   using stan::math::matrix_d;
   using stan::agrad::matrix_fv;
   
@@ -762,7 +762,7 @@ TEST(AgradFwdFvarVarMatrix, multiply_matrix_scalar) {
   EXPECT_FLOAT_EQ(  -5, output(1,0).d_.val());
   EXPECT_FLOAT_EQ(   2, output(1,1).d_.val());
 }
-TEST(AgradFwdFvarVarMatrix, multiply_rowvector_vector) {
+TEST(AgradFwdMatrixOperatorMultiplication,fv_rowvector_vector) {
   using stan::math::vector_d;
   using stan::agrad::vector_fv;
   using stan::math::row_vector_d;
@@ -797,7 +797,7 @@ TEST(AgradFwdFvarVarMatrix, multiply_rowvector_vector) {
   EXPECT_THROW(multiply(v1, d2), std::domain_error);
   EXPECT_THROW(multiply(d1, v2), std::domain_error);
 }
-TEST(AgradFwdFvarVarMatrix, multiply_vector_rowvector) {
+TEST(AgradFwdMatrixOperatorMultiplication,fv_vector_rowvector) {
   using stan::agrad::matrix_fv;
   using stan::math::vector_d;
   using stan::agrad::vector_fv;
@@ -886,7 +886,7 @@ TEST(AgradFwdFvarVarMatrix, multiply_vector_rowvector) {
   EXPECT_FLOAT_EQ( -5, output(2,1).d_.val());
   EXPECT_FLOAT_EQ( -5, output(2,2).d_.val());
 }
-TEST(AgradFwdFvarVarMatrix, multiply_matrix_vector) {
+TEST(AgradFwdMatrixOperatorMultiplication,fv_matrix_vector) {
   using stan::math::matrix_d;
   using stan::agrad::matrix_fv;
   using stan::math::vector_d;
@@ -937,7 +937,7 @@ TEST(AgradFwdFvarVarMatrix, multiply_matrix_vector) {
   EXPECT_FLOAT_EQ(-1, output(1).d_.val());
   EXPECT_FLOAT_EQ(-3, output(2).d_.val());
 }
-TEST(AgradFwdFvarVarMatrix, multiply_matrix_vector_exception) {
+TEST(AgradFwdMatrixOperatorMultiplication,fv_matrix_vector_exception) {
   using stan::math::matrix_d;
   using stan::agrad::matrix_fv;
   using stan::math::vector_d;
@@ -951,7 +951,7 @@ TEST(AgradFwdFvarVarMatrix, multiply_matrix_vector_exception) {
   EXPECT_THROW(multiply(v1, d2), std::domain_error);
   EXPECT_THROW(multiply(d1, v2), std::domain_error);
 }
-TEST(AgradFwdFvarVarMatrix, multiply_rowvector_matrix) {
+TEST(AgradFwdMatrixOperatorMultiplication,fv_rowvector_matrix) {
   using stan::math::matrix_d;
   using stan::agrad::matrix_fv;
   using stan::agrad::vector_fv;
@@ -998,7 +998,7 @@ TEST(AgradFwdFvarVarMatrix, multiply_rowvector_matrix) {
   EXPECT_FLOAT_EQ(  3, output(0).d_.val());
   EXPECT_FLOAT_EQ(  3, output(1).d_.val());
 }
-TEST(AgradFwdFvarVarMatrix, multiply_rowvector_matrix_exception) {
+TEST(AgradFwdMatrixOperatorMultiplication,fv_rowvector_matrix_exception) {
   using stan::math::matrix_d;
   using stan::agrad::matrix_fv;
   using stan::math::row_vector_d;
@@ -1012,7 +1012,7 @@ TEST(AgradFwdFvarVarMatrix, multiply_rowvector_matrix_exception) {
   EXPECT_THROW(multiply(v1, d2), std::domain_error);
   EXPECT_THROW(multiply(d1, v2), std::domain_error);
 }
-TEST(AgradFwdFvarVarMatrix, multiply_matrix_matrix) {
+TEST(AgradFwdMatrixOperatorMultiplication,fv_matrix_matrix) {
   using stan::math::matrix_d;
   using stan::agrad::matrix_fv;
 
@@ -1070,7 +1070,7 @@ TEST(AgradFwdFvarVarMatrix, multiply_matrix_matrix) {
   EXPECT_FLOAT_EQ( 157, output(1,0).val_.val());
   EXPECT_FLOAT_EQ( 135, output(1,1).val_.val());
 }
-TEST(AgradFwdFvarVarMatrix, multiply_matrix_matrix_exception) {
+TEST(AgradFwdMatrixOperatorMultiplication,fv_matrix_matrix_exception) {
   using stan::math::matrix_d;
   using stan::agrad::matrix_fv;
 
@@ -1083,7 +1083,7 @@ TEST(AgradFwdFvarVarMatrix, multiply_matrix_matrix_exception) {
   EXPECT_THROW(multiply(v1, d2), std::domain_error);
   EXPECT_THROW(multiply(d1, v2), std::domain_error);
 }
-TEST(AgradFwdFvarFvarMatrix, multiply_vector_scalar) {
+TEST(AgradFwdMatrixOperatorMultiplication,ffd_vector_scalar) {
   using stan::math::vector_d;
   using stan::agrad::vector_ffd;
 
@@ -1156,7 +1156,7 @@ TEST(AgradFwdFvarFvarMatrix, multiply_vector_scalar) {
   EXPECT_FLOAT_EQ(  -5, output(2).d_.val());
 }
 
-TEST(AgradFwdFvarFvarMatrix, multiply_rowvector_scalar) {
+TEST(AgradFwdMatrixOperatorMultiplication,ffd_rowvector_scalar) {
   using stan::math::row_vector_d;
   using stan::agrad::row_vector_ffd;
 
@@ -1228,7 +1228,7 @@ TEST(AgradFwdFvarFvarMatrix, multiply_rowvector_scalar) {
   EXPECT_FLOAT_EQ(  -2, output(1).d_.val());
   EXPECT_FLOAT_EQ(  -5, output(2).d_.val());
 }
-TEST(AgradFwdFvarFvarMatrix, multiply_matrix_scalar) {
+TEST(AgradFwdMatrixOperatorMultiplication,ffd_matrix_scalar) {
   using stan::math::matrix_d;
   using stan::agrad::matrix_ffd;
   
@@ -1315,7 +1315,7 @@ TEST(AgradFwdFvarFvarMatrix, multiply_matrix_scalar) {
   EXPECT_FLOAT_EQ(  -5, output(1,0).d_.val());
   EXPECT_FLOAT_EQ(   2, output(1,1).d_.val());
 }
-TEST(AgradFwdFvarFvarMatrix, multiply_rowvector_vector) {
+TEST(AgradFwdMatrixOperatorMultiplication,ffd_rowvector_vector) {
   using stan::math::vector_d;
   using stan::agrad::vector_ffd;
   using stan::math::row_vector_d;
@@ -1358,7 +1358,7 @@ TEST(AgradFwdFvarFvarMatrix, multiply_rowvector_vector) {
   EXPECT_THROW(multiply(v1, d2), std::domain_error);
   EXPECT_THROW(multiply(d1, v2), std::domain_error);
 }
-TEST(AgradFwdFvarFvarMatrix, multiply_vector_rowvector) {
+TEST(AgradFwdMatrixOperatorMultiplication,ffd_vector_rowvector) {
   using stan::agrad::matrix_ffd;
   using stan::math::vector_d;
   using stan::agrad::vector_ffd;
@@ -1455,7 +1455,7 @@ TEST(AgradFwdFvarFvarMatrix, multiply_vector_rowvector) {
   EXPECT_FLOAT_EQ( -5, output(2,1).d_.val());
   EXPECT_FLOAT_EQ( -5, output(2,2).d_.val());
 }
-TEST(AgradFwdFvarFvarMatrix, multiply_matrix_vector) {
+TEST(AgradFwdMatrixOperatorMultiplication,ffd_matrix_vector) {
   using stan::math::matrix_d;
   using stan::agrad::matrix_ffd;
   using stan::math::vector_d;
@@ -1512,7 +1512,7 @@ TEST(AgradFwdFvarFvarMatrix, multiply_matrix_vector) {
   EXPECT_FLOAT_EQ(-1, output(1).d_.val());
   EXPECT_FLOAT_EQ(-3, output(2).d_.val());
 }
-TEST(AgradFwdFvarFvarMatrix, multiply_matrix_vector_exception) {
+TEST(AgradFwdMatrixOperatorMultiplication,ffd_matrix_vector_exception) {
   using stan::math::matrix_d;
   using stan::agrad::matrix_ffd;
   using stan::math::vector_d;
@@ -1526,7 +1526,7 @@ TEST(AgradFwdFvarFvarMatrix, multiply_matrix_vector_exception) {
   EXPECT_THROW(multiply(v1, d2), std::domain_error);
   EXPECT_THROW(multiply(d1, v2), std::domain_error);
 }
-TEST(AgradFwdFvarFvarMatrix, multiply_rowvector_matrix) {
+TEST(AgradFwdMatrixOperatorMultiplication,ffd_rowvector_matrix) {
   using stan::math::matrix_d;
   using stan::agrad::matrix_ffd;
   using stan::agrad::vector_ffd;
@@ -1578,7 +1578,7 @@ TEST(AgradFwdFvarFvarMatrix, multiply_rowvector_matrix) {
   EXPECT_FLOAT_EQ(  3, output(0).d_.val());
   EXPECT_FLOAT_EQ(  3, output(1).d_.val());
 }
-TEST(AgradFwdFvarFvarMatrix, multiply_rowvector_matrix_exception) {
+TEST(AgradFwdMatrixOperatorMultiplication,ffd_rowvector_matrix_exception) {
   using stan::math::matrix_d;
   using stan::agrad::matrix_ffd;
   using stan::math::row_vector_d;
@@ -1592,7 +1592,7 @@ TEST(AgradFwdFvarFvarMatrix, multiply_rowvector_matrix_exception) {
   EXPECT_THROW(multiply(v1, d2), std::domain_error);
   EXPECT_THROW(multiply(d1, v2), std::domain_error);
 }
-TEST(AgradFwdFvarFvarMatrix, multiply_matrix_matrix) {
+TEST(AgradFwdMatrixOperatorMultiplication,ffd_matrix_matrix) {
   using stan::math::matrix_d;
   using stan::agrad::matrix_ffd;
 
@@ -1664,7 +1664,7 @@ TEST(AgradFwdFvarFvarMatrix, multiply_matrix_matrix) {
   EXPECT_FLOAT_EQ( 157, output(1,0).val_.val());
   EXPECT_FLOAT_EQ( 135, output(1,1).val_.val());
 }
-TEST(AgradFwdFvarFvarMatrix, multiply_matrix_matrix_exception) {
+TEST(AgradFwdMatrixOperatorMultiplication,ffd_matrix_matrix_exception) {
   using stan::math::matrix_d;
   using stan::agrad::matrix_ffd;
 

@@ -4,7 +4,7 @@
 #include <stan/agrad/var.hpp>
 #include <test/agrad/util.hpp>
 
-TEST(Agrad_Fwd_Hypot,Fvar) {
+TEST(AgradFwdHypot,Fvar) {
   using stan::agrad::fvar;
   using boost::math::hypot;
   using std::isnan;
@@ -32,7 +32,7 @@ TEST(Agrad_Fwd_Hypot,Fvar) {
   EXPECT_FLOAT_EQ(1.0, d.d_);
 }
 
-TEST(Agrad_Fwd_Hypot,FvarVar_FvarVar_1stDeriv) {
+TEST(AgradFwdHypot,FvarVar_FvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using boost::math::hypot;
@@ -51,7 +51,7 @@ TEST(Agrad_Fwd_Hypot,FvarVar_FvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(3.0 / hypot(3.0,6.0),g[0]);
   EXPECT_FLOAT_EQ(6.0 / hypot(3.0,6.0),g[1]);
 }
-TEST(Agrad_Fwd_Hypot,FvarVar_Double_1stDeriv) {
+TEST(AgradFwdHypot,FvarVar_Double_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using boost::math::hypot;
@@ -68,7 +68,7 @@ TEST(Agrad_Fwd_Hypot,FvarVar_Double_1stDeriv) {
   a.val_.grad(y,g);
   EXPECT_FLOAT_EQ(3.0 / hypot(3.0,6.0),g[0]);
 }
-TEST(Agrad_Fwd_Hypot,Double_FvarVar_1stDeriv) {
+TEST(AgradFwdHypot,Double_FvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using boost::math::hypot;
@@ -85,7 +85,7 @@ TEST(Agrad_Fwd_Hypot,Double_FvarVar_1stDeriv) {
   a.val_.grad(y,g);
   EXPECT_FLOAT_EQ(6.0 / hypot(3.0,6.0),g[0]);
 }
-TEST(Agrad_Fwd_Hypot,FvarVar_FvarVar_2ndDeriv) {
+TEST(AgradFwdHypot,FvarVar_FvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using boost::math::hypot;
@@ -102,7 +102,7 @@ TEST(Agrad_Fwd_Hypot,FvarVar_FvarVar_2ndDeriv) {
   EXPECT_FLOAT_EQ((1.0 * 3.0 * 3.0 - 1.3 * 6.0 * 3.0) 
                   / hypot(3.0,6.0) / (9.0 + 36.0),g[1]);
 }
-TEST(Agrad_Fwd_Hypot,FvarVar_Double_2ndDeriv) {
+TEST(AgradFwdHypot,FvarVar_Double_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using boost::math::hypot;
@@ -116,7 +116,7 @@ TEST(Agrad_Fwd_Hypot,FvarVar_Double_2ndDeriv) {
   a.d_.grad(y,g);
   EXPECT_FLOAT_EQ(1.3 * 6.0 * 6.0 / hypot(3.0,6.0) / (9.0 + 36.0),g[0]);
 }
-TEST(Agrad_Fwd_Hypot,Double_FvarVar_2ndDeriv) {
+TEST(AgradFwdHypot,Double_FvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using boost::math::hypot;
@@ -131,7 +131,7 @@ TEST(Agrad_Fwd_Hypot,Double_FvarVar_2ndDeriv) {
   EXPECT_FLOAT_EQ(1.0 * 3.0 * 3.0 / hypot(3.0,6.0) / (9.0 + 36.0),g[0]);
 }
 
-TEST(Agrad_Fwd_Hypot,FvarFvarDouble) {
+TEST(AgradFwdHypot,FvarFvarDouble) {
   using stan::agrad::fvar;
   using boost::math::hypot;
 
@@ -150,7 +150,7 @@ TEST(Agrad_Fwd_Hypot,FvarFvarDouble) {
   EXPECT_FLOAT_EQ(6.0 / hypot(3.0,6.0), a.d_.val_);
   EXPECT_FLOAT_EQ(-0.059628479, a.d_.d_);
 }
-TEST(Agrad_Fwd_Hypot,FvarFvarVar_FvarFvarVar_1stDeriv) {
+TEST(AgradFwdHypot,FvarFvarVar_FvarFvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using boost::math::hypot;
@@ -175,7 +175,7 @@ TEST(Agrad_Fwd_Hypot,FvarFvarVar_FvarFvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(3.0 / hypot(3.0,6.0), g[0]);
   EXPECT_FLOAT_EQ(6.0 / hypot(3.0,6.0), g[1]);
 }
-TEST(Agrad_Fwd_Hypot,FvarFvarVar_Double_1stDeriv) {
+TEST(AgradFwdHypot,FvarFvarVar_Double_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using boost::math::hypot;
@@ -198,7 +198,7 @@ TEST(Agrad_Fwd_Hypot,FvarFvarVar_Double_1stDeriv) {
   EXPECT_FLOAT_EQ(3.0 / hypot(3.0,6.0), g[0]);
 }
 
-TEST(Agrad_Fwd_Hypot,Double_FvarFvarVar_1stDeriv) {
+TEST(AgradFwdHypot,Double_FvarFvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using boost::math::hypot;
@@ -220,7 +220,7 @@ TEST(Agrad_Fwd_Hypot,Double_FvarFvarVar_1stDeriv) {
   a.val_.val_.grad(p,g);
   EXPECT_FLOAT_EQ(6.0 / hypot(3.0,6.0), g[0]);
 }
-TEST(Agrad_Fwd_Hypot,FvarFvarVar_FvarFvarVar_2ndDeriv_x) {
+TEST(AgradFwdHypot,FvarFvarVar_FvarFvarVar_2ndDeriv_x) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using boost::math::hypot;
@@ -241,7 +241,7 @@ TEST(Agrad_Fwd_Hypot,FvarFvarVar_FvarFvarVar_2ndDeriv_x) {
   EXPECT_FLOAT_EQ(36.0 / hypot(3.0,6.0) / (9.0 + 36.0),g[0]);
   EXPECT_FLOAT_EQ(-0.059628479, g[1]);
 }
-TEST(Agrad_Fwd_Hypot,FvarFvarVar_FvarFvarVar_2ndDeriv_y) {
+TEST(AgradFwdHypot,FvarFvarVar_FvarFvarVar_2ndDeriv_y) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using boost::math::hypot;
@@ -261,7 +261,7 @@ TEST(Agrad_Fwd_Hypot,FvarFvarVar_FvarFvarVar_2ndDeriv_y) {
   EXPECT_FLOAT_EQ(-0.059628479, g[0]);
   EXPECT_FLOAT_EQ((3.0 * 3.0) / hypot(3.0,6.0) / (9.0 + 36.0),g[1]);
 }
-TEST(Agrad_Fwd_Hypot,FvarFvarVar_Double_2ndDeriv) {
+TEST(AgradFwdHypot,FvarFvarVar_Double_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using boost::math::hypot;
@@ -280,7 +280,7 @@ TEST(Agrad_Fwd_Hypot,FvarFvarVar_Double_2ndDeriv) {
   EXPECT_FLOAT_EQ(6.0 * 6.0 / hypot(3.0,6.0) / (9.0 + 36.0),g[0]);
 }
 
-TEST(Agrad_Fwd_Hypot,Double_FvarFvarVar_2ndDeriv) {
+TEST(AgradFwdHypot,Double_FvarFvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using boost::math::hypot;

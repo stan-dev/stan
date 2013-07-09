@@ -4,7 +4,7 @@
 #include <stan/math/matrix/prod.hpp>
 #include <stan/agrad/var.hpp>
 
-TEST(AgradFwdMatrix,prod_vector) {
+TEST(AgradFwdMatrixProd,fd_vector) {
   using stan::math::prod;
   using stan::math::vector_d;
   using stan::agrad::vector_fd;
@@ -37,7 +37,7 @@ TEST(AgradFwdMatrix,prod_vector) {
   EXPECT_FLOAT_EQ(5.0,f.d_);
 }
 
-TEST(AgradFwdMatrix,prod_rowvector) {
+TEST(AgradFwdMatrixProd,fd_rowvector) {
   using stan::math::prod;
   using stan::math::row_vector_d;
   using stan::agrad::row_vector_fd;
@@ -69,7 +69,7 @@ TEST(AgradFwdMatrix,prod_rowvector) {
   EXPECT_FLOAT_EQ(6.0,f.val_);
   EXPECT_FLOAT_EQ(5.0,f.d_);
 }
-TEST(AgradFwdMatrix,prod_matrix) {
+TEST(AgradFwdMatrixProd,fd_matrix) {
   using stan::math::prod;
   using stan::math::matrix_d;
   using stan::agrad::matrix_fd;
@@ -103,7 +103,7 @@ TEST(AgradFwdMatrix,prod_matrix) {
   EXPECT_FLOAT_EQ(36.0,f.val_);
   EXPECT_FLOAT_EQ(60.0,f.d_);
 }
-TEST(AgradFwdFvarVarMatrix,prod_vector) {
+TEST(AgradFwdMatrixProd,fv_vector) {
   using stan::math::prod;
   using stan::math::vector_d;
   using stan::agrad::vector_fv;
@@ -140,7 +140,7 @@ TEST(AgradFwdFvarVarMatrix,prod_vector) {
   EXPECT_FLOAT_EQ(5.0,f.d_.val());
 }
 
-TEST(AgradFwdFvarVarMatrix,prod_rowvector) {
+TEST(AgradFwdMatrixProd,fv_rowvector) {
   using stan::math::prod;
   using stan::math::row_vector_d;
   using stan::agrad::row_vector_fv;
@@ -173,7 +173,7 @@ TEST(AgradFwdFvarVarMatrix,prod_rowvector) {
   EXPECT_FLOAT_EQ(6.0,f.val_.val());
   EXPECT_FLOAT_EQ(5.0,f.d_.val());
 }
-TEST(AgradFwdFvarVarMatrix,prod_matrix) {
+TEST(AgradFwdMatrixProd,fv_matrix) {
   using stan::math::prod;
   using stan::math::matrix_d;
   using stan::agrad::matrix_fv;
@@ -208,7 +208,7 @@ TEST(AgradFwdFvarVarMatrix,prod_matrix) {
   EXPECT_FLOAT_EQ(36.0,f.val_.val());
   EXPECT_FLOAT_EQ(60.0,f.d_.val());
 }
-TEST(AgradFwdFvarFvarMatrix,prod_vector) {
+TEST(AgradFwdMatrixProd,ffd_vector) {
   using stan::math::prod;
   using stan::math::vector_d;
   using stan::agrad::vector_ffd;
@@ -242,7 +242,7 @@ TEST(AgradFwdFvarFvarMatrix,prod_vector) {
   EXPECT_FLOAT_EQ(5.0,f.d_.val());
 }
 
-TEST(AgradFwdFvarFvarMatrix,prod_rowvector) {
+TEST(AgradFwdMatrixProd,ffd_rowvector) {
   using stan::math::prod;
   using stan::math::row_vector_d;
   using stan::agrad::row_vector_ffd;
@@ -278,7 +278,7 @@ TEST(AgradFwdFvarFvarMatrix,prod_rowvector) {
   EXPECT_FLOAT_EQ(6.0,f.val_.val());
   EXPECT_FLOAT_EQ(5.0,f.d_.val());
 }
-TEST(AgradFwdFvarFvarMatrix,prod_matrix) {
+TEST(AgradFwdMatrixProd,ffd_matrix) {
   using stan::math::prod;
   using stan::math::matrix_d;
   using stan::agrad::matrix_ffd;

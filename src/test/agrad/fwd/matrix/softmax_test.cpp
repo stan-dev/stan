@@ -3,7 +3,7 @@
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <stan/agrad/var.hpp>
 
-TEST(AgradFwdMatrix,softmax) {
+TEST(AgradFwdMatrixSoftmax,fd) {
   using stan::math::softmax;
   using Eigen::Matrix;
   using Eigen::Dynamic;
@@ -48,7 +48,7 @@ TEST(AgradFwdMatrix,softmax) {
   EXPECT_FLOAT_EQ(-2.0605762e-09, theta3[1].d_);
   EXPECT_FLOAT_EQ(-1.6697022e-05, theta3[2].d_);
 }
-TEST(AgradFwdFvarVarMatrix,softmax) {
+TEST(AgradFwdMatrixSoftmax,fv) {
   using stan::math::softmax;
   using Eigen::Matrix;
   using Eigen::Dynamic;
@@ -94,7 +94,7 @@ TEST(AgradFwdFvarVarMatrix,softmax) {
   EXPECT_FLOAT_EQ(-2.0605762e-09, theta3[1].d_.val());
   EXPECT_FLOAT_EQ(-1.6697022e-05, theta3[2].d_.val());
 }
-TEST(AgradFwdFvarFvarMatrix,softmax) {
+TEST(AgradFwdMatrixSoftmax,ffd) {
   using stan::math::softmax;
   using Eigen::Matrix;
   using Eigen::Dynamic;

@@ -4,7 +4,7 @@
 #include <stan/agrad/var.hpp>
 #include <test/agrad/util.hpp>
 
-TEST(Agrad_Fwd_Log1m,Fvar) {
+TEST(AgradFwdLog1m,Fvar) {
   using stan::agrad::fvar;
   using stan::math::log1m;
   using std::isnan;
@@ -25,7 +25,7 @@ TEST(Agrad_Fwd_Log1m,Fvar) {
   isnan(c.val_);
   isnan(c.d_);
 }
-TEST(Agrad_Fwd_Log1m,FvarVar_1stDeriv) {
+TEST(AgradFwdLog1m,FvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::log1m;
@@ -41,7 +41,7 @@ TEST(Agrad_Fwd_Log1m,FvarVar_1stDeriv) {
   a.val_.grad(y,g);
   EXPECT_FLOAT_EQ(-1 / (0.5), g[0]);
 }
-TEST(Agrad_Fwd_Log1m,FvarVar_2ndDeriv) {
+TEST(AgradFwdLog1m,FvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::log1m;
@@ -54,7 +54,7 @@ TEST(Agrad_Fwd_Log1m,FvarVar_2ndDeriv) {
   a.d_.grad(y,g);
   EXPECT_FLOAT_EQ(-1.3 / (0.25), g[0]);
 }
-TEST(Agrad_Fwd_Log1m,FvarFvarDouble) {
+TEST(AgradFwdLog1m,FvarFvarDouble) {
   using stan::agrad::fvar;
   using stan::math::log1m;
 
@@ -79,7 +79,7 @@ TEST(Agrad_Fwd_Log1m,FvarFvarDouble) {
   EXPECT_FLOAT_EQ(-1 / (0.5), a.d_.val_);
   EXPECT_FLOAT_EQ(0, a.d_.d_);
 }
-TEST(Agrad_Fwd_Log1m,FvarFvarVar_1stDeriv) {
+TEST(AgradFwdLog1m,FvarFvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::log1m;
@@ -115,7 +115,7 @@ TEST(Agrad_Fwd_Log1m,FvarFvarVar_1stDeriv) {
   b.val_.val_.grad(q,r);
   EXPECT_FLOAT_EQ(-1 / 0.5, r[0]);
 }
-TEST(Agrad_Fwd_Log1m,FvarFvarVar_2ndDeriv) {
+TEST(AgradFwdLog1m,FvarFvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::log1m;

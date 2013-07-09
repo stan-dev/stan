@@ -6,7 +6,7 @@
 #include <stan/agrad/var.hpp>
 
 using stan::agrad::fvar;
-TEST(AgradFwdMatrix, max_vector) {
+TEST(AgradFwdMatrixMax, fd_vector) {
   using stan::math::max;
   using stan::math::vector_d;
   using stan::agrad::vector_fd;
@@ -29,7 +29,7 @@ TEST(AgradFwdMatrix, max_vector) {
   EXPECT_FLOAT_EQ(100, output.val_);
   EXPECT_FLOAT_EQ(1, output.d_);
 }
-TEST(AgradFwdMatrix, max_vector_exception) {
+TEST(AgradFwdMatrixMax, fd_vector_exception) {
   using stan::math::max;
   using stan::agrad::vector_fd;
 
@@ -37,7 +37,7 @@ TEST(AgradFwdMatrix, max_vector_exception) {
   EXPECT_EQ(-std::numeric_limits<double>::infinity(), max(v).val_);
   EXPECT_EQ(0, max(v).d_);
 }
-TEST(AgradFwdMatrix, max_rowvector) {
+TEST(AgradFwdMatrixMax, fd_rowvector) {
   using stan::math::max;
   using stan::math::row_vector_d;
   using stan::agrad::row_vector_fd;
@@ -60,7 +60,7 @@ TEST(AgradFwdMatrix, max_rowvector) {
   EXPECT_FLOAT_EQ(100, output.val_);
   EXPECT_FLOAT_EQ(1, output.d_);
 }
-TEST(AgradFwdMatrix, max_rowvector_exception) {
+TEST(AgradFwdMatrixMax, fd_rowvector_exception) {
   using stan::math::max;
   using stan::agrad::row_vector_fd;
 
@@ -68,7 +68,7 @@ TEST(AgradFwdMatrix, max_rowvector_exception) {
   EXPECT_EQ(-std::numeric_limits<double>::infinity(), max(v).val_);
   EXPECT_EQ(0, max(v).d_);
 }
-TEST(AgradFwdMatrix, max_matrix) {
+TEST(AgradFwdMatrixMax, fd_matrix) {
   using stan::math::max;
   using stan::math::matrix_d;
   using stan::agrad::matrix_fd;
@@ -91,7 +91,7 @@ TEST(AgradFwdMatrix, max_matrix) {
   EXPECT_FLOAT_EQ(100, output.val_);
   EXPECT_FLOAT_EQ(1, output.d_);
 }
-TEST(AgradFwdMatrix, max_matrix_exception) {
+TEST(AgradFwdMatrixMax, fd_matrix_exception) {
   using stan::math::max;
   using stan::agrad::matrix_fd;
   
@@ -99,7 +99,7 @@ TEST(AgradFwdMatrix, max_matrix_exception) {
   EXPECT_EQ(-std::numeric_limits<double>::infinity(), max(v).val_);
   EXPECT_EQ(0, max(v).d_);
 }
-TEST(AgradFwdFvarVarMatrix, max_vector) {
+TEST(AgradFwdMatrixMax, fv_vector) {
   using stan::math::max;
   using stan::math::vector_d;
   using stan::agrad::vector_fv;
@@ -125,7 +125,7 @@ TEST(AgradFwdFvarVarMatrix, max_vector) {
   EXPECT_FLOAT_EQ(100, output.val_.val());
   EXPECT_FLOAT_EQ(1, output.d_.val());
 }
-TEST(AgradFwdFvarVarMatrix, max_vector_exception) {
+TEST(AgradFwdMatrixMax, fv_vector_exception) {
   using stan::math::max;
   using stan::agrad::vector_fv;
 
@@ -133,7 +133,7 @@ TEST(AgradFwdFvarVarMatrix, max_vector_exception) {
   EXPECT_EQ(-std::numeric_limits<double>::infinity(), max(v).val_.val());
   EXPECT_EQ(0, max(v).d_.val());
 }
-TEST(AgradFwdFvarVarMatrix, max_rowvector) {
+TEST(AgradFwdMatrixMax, fv_rowvector) {
   using stan::math::max;
   using stan::math::row_vector_d;
   using stan::agrad::row_vector_fv;
@@ -159,7 +159,7 @@ TEST(AgradFwdFvarVarMatrix, max_rowvector) {
   EXPECT_FLOAT_EQ(100, output.val_.val());
   EXPECT_FLOAT_EQ(1, output.d_.val());
 }
-TEST(AgradFwdFvarVarMatrix, max_rowvector_exception) {
+TEST(AgradFwdMatrixMax, fv_rowvector_exception) {
   using stan::math::max;
   using stan::agrad::row_vector_fv;
 
@@ -167,7 +167,7 @@ TEST(AgradFwdFvarVarMatrix, max_rowvector_exception) {
   EXPECT_EQ(-std::numeric_limits<double>::infinity(), max(v).val_.val());
   EXPECT_EQ(0, max(v).d_.val());
 }
-TEST(AgradFwdFvarVarMatrix, max_matrix) {
+TEST(AgradFwdMatrixMax, fv_matrix) {
   using stan::math::max;
   using stan::math::matrix_d;
   using stan::agrad::matrix_fv;
@@ -193,7 +193,7 @@ TEST(AgradFwdFvarVarMatrix, max_matrix) {
   EXPECT_FLOAT_EQ(100, output.val_.val());
   EXPECT_FLOAT_EQ(1, output.d_.val());
 }
-TEST(AgradFwdFvarVarMatrix, max_matrix_exception) {
+TEST(AgradFwdMatrixMax, fv_matrix_exception) {
   using stan::math::max;
   using stan::agrad::matrix_fv;
   
@@ -201,7 +201,7 @@ TEST(AgradFwdFvarVarMatrix, max_matrix_exception) {
   EXPECT_EQ(-std::numeric_limits<double>::infinity(), max(v).val_.val());
   EXPECT_EQ(0, max(v).d_.val());
 }
-TEST(AgradFwdFvarFvarMatrix, max_vector) {
+TEST(AgradFwdMatrixMax, ffd_vector) {
   using stan::math::max;
   using stan::math::vector_d;
   using stan::agrad::vector_ffd;
@@ -230,7 +230,7 @@ TEST(AgradFwdFvarFvarMatrix, max_vector) {
   EXPECT_FLOAT_EQ(100, output.val_.val());
   EXPECT_FLOAT_EQ(1, output.d_.val());
 }
-TEST(AgradFwdFvarFvarMatrix, max_vector_exception) {
+TEST(AgradFwdMatrixMax, ffd_vector_exception) {
   using stan::math::max;
   using stan::agrad::vector_ffd;
 
@@ -238,7 +238,7 @@ TEST(AgradFwdFvarFvarMatrix, max_vector_exception) {
   EXPECT_EQ(-std::numeric_limits<double>::infinity(), max(v).val_.val());
   EXPECT_EQ(0, max(v).d_.val());
 }
-TEST(AgradFwdFvarFvarMatrix, max_rowvector) {
+TEST(AgradFwdMatrixMax, ffd_rowvector) {
   using stan::math::max;
   using stan::math::row_vector_d;
   using stan::agrad::row_vector_ffd;
@@ -267,7 +267,7 @@ TEST(AgradFwdFvarFvarMatrix, max_rowvector) {
   EXPECT_FLOAT_EQ(100, output.val_.val());
   EXPECT_FLOAT_EQ(1, output.d_.val());
 }
-TEST(AgradFwdFvarFvarMatrix, max_rowvector_exception) {
+TEST(AgradFwdMatrixMax, ffd_rowvector_exception) {
   using stan::math::max;
   using stan::agrad::row_vector_ffd;
 
@@ -275,7 +275,7 @@ TEST(AgradFwdFvarFvarMatrix, max_rowvector_exception) {
   EXPECT_EQ(-std::numeric_limits<double>::infinity(), max(v).val_.val());
   EXPECT_EQ(0, max(v).d_.val());
 }
-TEST(AgradFwdFvarFvarMatrix, max_matrix) {
+TEST(AgradFwdMatrixMax, ffd_matrix) {
   using stan::math::max;
   using stan::math::matrix_d;
   using stan::agrad::matrix_ffd;
@@ -304,7 +304,7 @@ TEST(AgradFwdFvarFvarMatrix, max_matrix) {
   EXPECT_FLOAT_EQ(100, output.val_.val());
   EXPECT_FLOAT_EQ(1, output.d_.val());
 }
-TEST(AgradFwdFvarFvarMatrix, max_matrix_exception) {
+TEST(AgradFwdMatrixMax, ffd_matrix_exception) {
   using stan::math::max;
   using stan::agrad::matrix_ffd;
   

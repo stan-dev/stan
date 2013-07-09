@@ -5,7 +5,7 @@
 #include <stan/agrad/var.hpp>
 #include <test/agrad/util.hpp>
 
-TEST(Agrad_Fwd_Phi,Fvar) {
+TEST(AgradFwdPhi,Fvar) {
   using stan::agrad::fvar;
   using stan::math::Phi;
   fvar<double> x = 1.0;
@@ -17,7 +17,7 @@ TEST(Agrad_Fwd_Phi,Fvar) {
   EXPECT_FLOAT_EQ(exp(stan::prob::normal_log<false>(1.0,0.0,1.0)),
                   Phi_x.d_);
 }
-TEST(Agrad_Fwd_Phi, FvarVar_1stDeriv) {
+TEST(AgradFwdPhi, FvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::Phi;
@@ -34,7 +34,7 @@ TEST(Agrad_Fwd_Phi, FvarVar_1stDeriv) {
   a.val_.grad(y,g);
   EXPECT_FLOAT_EQ(exp(stan::prob::normal_log<false>(1.0,0.0,1.0)), g[0]);
 }
-TEST(Agrad_Fwd_Phi, FvarVar_2ndDeriv) {
+TEST(AgradFwdPhi, FvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::Phi;
@@ -47,7 +47,7 @@ TEST(Agrad_Fwd_Phi, FvarVar_2ndDeriv) {
   a.d_.grad(y,g);
   EXPECT_FLOAT_EQ(-1.3 * exp(stan::prob::normal_log<false>(1.0,0.0,1.0)), g[0]);
 }
-TEST(Agrad_Fwd_Phi, FvarFvarDouble) {
+TEST(AgradFwdPhi, FvarFvarDouble) {
   using stan::agrad::fvar;
   using stan::math::Phi;
 
@@ -72,7 +72,7 @@ TEST(Agrad_Fwd_Phi, FvarFvarDouble) {
   EXPECT_FLOAT_EQ(exp(stan::prob::normal_log<false>(1.0,0.0,1.0)), a.d_.val_);
   EXPECT_FLOAT_EQ(0, a.d_.d_);
 }
-TEST(Agrad_Fwd_Phi, FvarFvarVar_1stDeriv) {
+TEST(AgradFwdPhi, FvarFvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::math::Phi;
   using stan::agrad::var;
@@ -111,7 +111,7 @@ TEST(Agrad_Fwd_Phi, FvarFvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(exp(stan::prob::normal_log<false>(1.0,0.0,1.0)), r[0]);
 }
 
-TEST(Agrad_Fwd_Phi, FvarFvarVar_2ndDeriv) {
+TEST(AgradFwdPhi, FvarFvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::math::Phi;
   using stan::agrad::var;

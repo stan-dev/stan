@@ -6,7 +6,7 @@
 
 using stan::agrad::fvar;
 using stan::agrad::var;
-TEST(AgradFwdMatrix, divide_scalar) {
+TEST(AgradFwdMatrixOperatorDivision,fd_scalar) {
   using stan::agrad::divide;
   double d1, d2;
   fvar<double>   v1, v2;
@@ -47,7 +47,7 @@ TEST(AgradFwdMatrix, divide_scalar) {
   EXPECT_TRUE(std::isnan(divide(v1, d2).d_));
   EXPECT_TRUE(std::isnan(divide(v1, v2).d_));
 }
-TEST(AgradFwdMatrix, divide_vector) {
+TEST(AgradFwdMatrixOperatorDivision,fd_vector) {
   using stan::math::divide;
   using stan::math::vector_d;
   using stan::agrad::vector_fd;
@@ -128,7 +128,7 @@ TEST(AgradFwdMatrix, divide_vector) {
   EXPECT_TRUE (std::isnan(output(1).d_));
   EXPECT_TRUE (std::isnan(output(2).d_));
 }
-TEST(AgradFwdMatrix, divide_rowvector) {
+TEST(AgradFwdMatrixOperatorDivision,fd_rowvector) {
   using stan::math::divide;
   using stan::math::row_vector_d;
   using stan::agrad::row_vector_fd;
@@ -208,7 +208,7 @@ TEST(AgradFwdMatrix, divide_rowvector) {
   EXPECT_TRUE(std::isnan(output(1).d_));
   EXPECT_TRUE(std::isnan(output(2).d_));
 }
-TEST(AgradFwdMatrix, divide_matrix) {
+TEST(AgradFwdMatrixOperatorDivision,fd_matrix) {
   using stan::math::divide;
   using stan::math::matrix_d;
   using stan::agrad::matrix_fd;
@@ -303,7 +303,7 @@ TEST(AgradFwdMatrix, divide_matrix) {
   EXPECT_TRUE (std::isnan(output(1,0).d_));
   EXPECT_TRUE (std::isnan(output(1,1).d_));
 }
-TEST(AgradFwdFvarVarMatrix, divide_scalar) {
+TEST(AgradFwdMatrixOperatorDivision,fv_scalar) {
   using stan::agrad::divide;
   double d1, d2;
   fvar<var> v1, v2;
@@ -348,7 +348,7 @@ TEST(AgradFwdFvarVarMatrix, divide_scalar) {
   EXPECT_TRUE(std::isnan(divide(v1, d2).d_.val()));
   EXPECT_TRUE(std::isnan(divide(v1, v2).d_.val()));
 }
-TEST(AgradFwdFvarVarMatrix, divide_vector) {
+TEST(AgradFwdMatrixOperatorDivision,fv_vector) {
   using stan::math::divide;
   using stan::math::vector_d;
   using stan::agrad::vector_fv;
@@ -435,7 +435,7 @@ TEST(AgradFwdFvarVarMatrix, divide_vector) {
   EXPECT_TRUE (std::isnan(output(1).d_.val()));
   EXPECT_TRUE (std::isnan(output(2).d_.val()));
 }
-TEST(AgradFwdFvarVarMatrix, divide_rowvector) {
+TEST(AgradFwdMatrixOperatorDivision,fv_rowvector) {
   using stan::math::divide;
   using stan::math::row_vector_d;
   using stan::agrad::row_vector_fv;
@@ -521,7 +521,7 @@ TEST(AgradFwdFvarVarMatrix, divide_rowvector) {
   EXPECT_TRUE(std::isnan(output(1).d_.val()));
   EXPECT_TRUE(std::isnan(output(2).d_.val()));
 }
-TEST(AgradFwdFvarVarMatrix, divide_matrix) {
+TEST(AgradFwdMatrixOperatorDivision,fv_matrix) {
   using stan::math::divide;
   using stan::math::matrix_d;
   using stan::agrad::matrix_fv;
@@ -629,7 +629,7 @@ TEST(AgradFwdFvarVarMatrix, divide_matrix) {
   EXPECT_TRUE (std::isnan(output(1,0).d_.val()));
   EXPECT_TRUE (std::isnan(output(1,1).d_.val()));
 }
-TEST(AgradFwdFvarFvarMatrix, divide_scalar) {
+TEST(AgradFwdMatrixOperatorDivision,ffd_scalar) {
   using stan::agrad::divide;
   double d1, d2;
   fvar<fvar<double> > v1, v2;
@@ -674,7 +674,7 @@ TEST(AgradFwdFvarFvarMatrix, divide_scalar) {
   EXPECT_TRUE(std::isnan(divide(v1, d2).d_.val()));
   EXPECT_TRUE(std::isnan(divide(v1, v2).d_.val()));
 }
-TEST(AgradFwdFvarFvarMatrix, divide_vector) {
+TEST(AgradFwdMatrixOperatorDivision,ffd_vector) {
   using stan::math::divide;
   using stan::math::vector_d;
   using stan::agrad::vector_ffd;
@@ -763,7 +763,7 @@ TEST(AgradFwdFvarFvarMatrix, divide_vector) {
   EXPECT_TRUE (std::isnan(output(1).d_.val()));
   EXPECT_TRUE (std::isnan(output(2).d_.val()));
 }
-TEST(AgradFwdFvarFvarMatrix, divide_rowvector) {
+TEST(AgradFwdMatrixOperatorDivision,ffd_rowvector) {
   using stan::math::divide;
   using stan::math::row_vector_d;
   using stan::agrad::row_vector_ffd;
@@ -853,7 +853,7 @@ TEST(AgradFwdFvarFvarMatrix, divide_rowvector) {
   EXPECT_TRUE(std::isnan(output(1).d_.val()));
   EXPECT_TRUE(std::isnan(output(2).d_.val()));
 }
-TEST(AgradFwdFvarFvarMatrix, divide_matrix) {
+TEST(AgradFwdMatrixOperatorDivision,ffd_matrix) {
   using stan::math::divide;
   using stan::math::matrix_d;
   using stan::agrad::matrix_ffd;

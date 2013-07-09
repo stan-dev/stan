@@ -3,7 +3,7 @@
 #include <stan/agrad/var.hpp>
 #include <test/agrad/util.hpp>
 
-TEST(Agrad_Fwd_Atan2,Fvar) {
+TEST(AgradFwdAtan2,Fvar) {
   using stan::agrad::fvar;
   using std::atan2;
 
@@ -24,7 +24,7 @@ TEST(Agrad_Fwd_Atan2,Fvar) {
   EXPECT_FLOAT_EQ((1.0 * 2.1) / (0.5 * 0.5 + 2.1 * 2.1), c.d_);
 }
 
-TEST(Agrad_Fwd_Atan2,FvarVar_FvarVar_1stDeriv) {
+TEST(AgradFwdAtan2,FvarVar_FvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::atan2;
@@ -43,7 +43,7 @@ TEST(Agrad_Fwd_Atan2,FvarVar_FvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(-1.0 / 3.0,g[1]);
 }
 
-TEST(Agrad_Fwd_Atan2,FvarVar_double_1stDeriv) {
+TEST(AgradFwdAtan2,FvarVar_double_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::atan2;
@@ -61,7 +61,7 @@ TEST(Agrad_Fwd_Atan2,FvarVar_double_1stDeriv) {
   EXPECT_FLOAT_EQ(1.0 / 3.0, g[0]);
 }
 
-TEST(Agrad_Fwd_Atan2,Double_FvarVar_1stDeriv) {
+TEST(AgradFwdAtan2,Double_FvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::atan2;
@@ -79,7 +79,7 @@ TEST(Agrad_Fwd_Atan2,Double_FvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(-1.0 / 3.0,g[0]);
 }
 
-TEST(Agrad_Fwd_Atan2,FvarVar_FvarVar_2ndDeriv) {
+TEST(AgradFwdAtan2,FvarVar_FvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::atan2;
@@ -95,7 +95,7 @@ TEST(Agrad_Fwd_Atan2,FvarVar_FvarVar_2ndDeriv) {
   EXPECT_FLOAT_EQ(2.0 / 9.0,g[1]);
 }
 
-TEST(Agrad_Fwd_Atan2,FvarVar_double_2ndDeriv) {
+TEST(AgradFwdAtan2,FvarVar_double_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::atan2;
@@ -110,7 +110,7 @@ TEST(Agrad_Fwd_Atan2,FvarVar_double_2ndDeriv) {
   EXPECT_FLOAT_EQ(-13.0 / 45.0, g[0]);
 }
 
-TEST(Agrad_Fwd_Atan2,Double_FvarVar_2ndDeriv) {
+TEST(AgradFwdAtan2,Double_FvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::atan2;
@@ -125,7 +125,7 @@ TEST(Agrad_Fwd_Atan2,Double_FvarVar_2ndDeriv) {
   EXPECT_FLOAT_EQ(2.0 / 9.0,g[0]);
 }
 
-TEST(Agrad_Fwd_Atan2,FvarFvarDouble) {
+TEST(AgradFwdAtan2,FvarFvarDouble) {
   using stan::agrad::fvar;
   using std::atan2;
 
@@ -160,7 +160,7 @@ TEST(Agrad_Fwd_Atan2,FvarFvarDouble) {
   EXPECT_FLOAT_EQ(0.0, a.d_.d_);
 }
 
-TEST(Agrad_Fwd_Atan2,FvarFvarVar_FvarFvarVar_1stDeriv) {
+TEST(AgradFwdAtan2,FvarFvarVar_FvarFvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::atan2;
@@ -187,7 +187,7 @@ TEST(Agrad_Fwd_Atan2,FvarFvarVar_FvarFvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(-1.0 / 3.0,g[1]);
 }
 
-TEST(Agrad_Fwd_Atan2,FvarFvarVar_Double_1stDeriv) {
+TEST(AgradFwdAtan2,FvarFvarVar_Double_1stDeriv) {
   using stan::agrad::var;
   using stan::agrad::fvar;
   using std::atan2;
@@ -212,7 +212,7 @@ TEST(Agrad_Fwd_Atan2,FvarFvarVar_Double_1stDeriv) {
 }
 
 
-TEST(Agrad_Fwd_Atan2,Double_FvarFvarVar_1stDeriv) {
+TEST(AgradFwdAtan2,Double_FvarFvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::atan2;
@@ -236,7 +236,7 @@ TEST(Agrad_Fwd_Atan2,Double_FvarFvarVar_1stDeriv) {
   EXPECT_FLOAT_EQ(-1.0 / 3.0,g[0]);
 }
 
-TEST(Agrad_Fwd_Atan2,FvarFvarVar_FvarFvarVar_2ndDeriv_x) {
+TEST(AgradFwdAtan2,FvarFvarVar_FvarFvarVar_2ndDeriv_x) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::atan2;
@@ -256,7 +256,7 @@ TEST(Agrad_Fwd_Atan2,FvarFvarVar_FvarFvarVar_2ndDeriv_x) {
   a.val_.d_.grad(q,g);
   EXPECT_FLOAT_EQ(-2.0 / 9.0, g[0]);
 }
-TEST(Agrad_Fwd_Atan2,FvarFvarVar_FvarFvarVar_2ndDeriv_y) {
+TEST(AgradFwdAtan2,FvarFvarVar_FvarFvarVar_2ndDeriv_y) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::atan2;
@@ -277,7 +277,7 @@ TEST(Agrad_Fwd_Atan2,FvarFvarVar_FvarFvarVar_2ndDeriv_y) {
   EXPECT_FLOAT_EQ(2.0 / 9.0, h[0]);
 }
 
-TEST(Agrad_Fwd_Atan2,FvarFvarVar_Double_2ndDeriv) {
+TEST(AgradFwdAtan2,FvarFvarVar_Double_2ndDeriv) {
   using stan::agrad::var;
   using stan::agrad::fvar;
   using std::atan2;
@@ -297,7 +297,7 @@ TEST(Agrad_Fwd_Atan2,FvarFvarVar_Double_2ndDeriv) {
 }
 
 
-TEST(Agrad_Fwd_Atan2,Double_FvarFvarVar_2ndDeriv) {
+TEST(AgradFwdAtan2,Double_FvarFvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::atan2;

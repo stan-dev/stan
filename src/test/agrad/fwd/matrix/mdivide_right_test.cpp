@@ -8,7 +8,7 @@
 
 using stan::agrad::fvar;
 using stan::agrad::var;
-TEST(AgradFwdMatrix,mdivide_right_matrix_matrix) {
+TEST(AgradFwdMatrixMdivideRight,fd_matrix_matrix) {
   using stan::math::matrix_d;
   using stan::agrad::matrix_fd;
   using stan::agrad::mdivide_right;
@@ -56,7 +56,7 @@ TEST(AgradFwdMatrix,mdivide_right_matrix_matrix) {
   EXPECT_NEAR(4.0,I(1,0).d_,1.0E-12);
   EXPECT_NEAR(-2.0,I(1,1).d_,1.0e-12);
 }
-TEST(AgradFwdMatrix,mdivide_right_matrix_rowvector) {
+TEST(AgradFwdMatrixMdivideRight,fd_matrix_rowvector) {
   using stan::math::matrix_d;
   using stan::agrad::matrix_fd;
   using stan::agrad::row_vector_fd;
@@ -100,7 +100,7 @@ TEST(AgradFwdMatrix,mdivide_right_matrix_rowvector) {
   EXPECT_NEAR(-1.0,output(0,0).d_,1.0E-12);
   EXPECT_NEAR(1.0,output(0,1).d_,1.0E-12);
 }
-TEST(AgradFwdMatrix,mdivide_right_exceptions) {
+TEST(AgradFwdMatrixMdivideRight,fd_exceptions) {
   using stan::math::matrix_d;
   using stan::math::vector_d;
   using stan::math::row_vector_d;
@@ -141,7 +141,7 @@ TEST(AgradFwdMatrix,mdivide_right_exceptions) {
   EXPECT_THROW(mdivide_right(vf1, fd2), std::domain_error);
   EXPECT_THROW(mdivide_right(vf2, fd2), std::domain_error);
 }
-TEST(AgradFwdFvarVarMatrix,mdivide_right_matrix_matrix) {
+TEST(AgradFwdMatrixMdivideRight,fv_matrix_matrix) {
   using stan::math::matrix_d;
   using stan::agrad::matrix_fv;
   using stan::agrad::mdivide_right;
@@ -189,7 +189,7 @@ TEST(AgradFwdFvarVarMatrix,mdivide_right_matrix_matrix) {
   EXPECT_NEAR(4.0,I(1,0).d_.val(),1.0E-12);
   EXPECT_NEAR(-2.0,I(1,1).d_.val(),1.0e-12);
 }
-TEST(AgradFwdFvarVarMatrix,mdivide_right_matrix_rowvector) {
+TEST(AgradFwdMatrixMdivideRight,fv_matrix_rowvector) {
   using stan::math::matrix_d;
   using stan::agrad::matrix_fv;
   using stan::agrad::row_vector_fv;
@@ -233,7 +233,7 @@ TEST(AgradFwdFvarVarMatrix,mdivide_right_matrix_rowvector) {
   EXPECT_NEAR(-1.0,output(0,0).d_.val(),1.0E-12);
   EXPECT_NEAR(1.0,output(0,1).d_.val(),1.0E-12);
 }
-TEST(AgradFwdFvarVarMatrix,mdivide_right_exceptions) {
+TEST(AgradFwdMatrixMdivideRight,fv_exceptions) {
   using stan::math::matrix_d;
   using stan::math::vector_d;
   using stan::math::row_vector_d;
@@ -274,7 +274,7 @@ TEST(AgradFwdFvarVarMatrix,mdivide_right_exceptions) {
   EXPECT_THROW(mdivide_right(vf1, fd2), std::domain_error);
   EXPECT_THROW(mdivide_right(vf2, fd2), std::domain_error);
 }
-TEST(AgradFwdFvarFvarMatrix,mdivide_right_matrix_matrix) {
+TEST(AgradFwdMatrixMdivideRight,ffd_matrix_matrix) {
   using stan::math::matrix_d;
   using stan::agrad::matrix_ffd;
   using stan::agrad::mdivide_right;
@@ -327,7 +327,7 @@ TEST(AgradFwdFvarFvarMatrix,mdivide_right_matrix_matrix) {
   EXPECT_NEAR(4.0,I(1,0).d_.val(),1.0E-12);
   EXPECT_NEAR(-2.0,I(1,1).d_.val(),1.0e-12);
 }
-TEST(AgradFwdFvarFvarMatrix,mdivide_right_matrix_rowvector) {
+TEST(AgradFwdMatrixMdivideRight,ffd_matrix_rowvector) {
   using stan::math::matrix_d;
   using stan::agrad::matrix_ffd;
   using stan::agrad::row_vector_ffd;
@@ -379,7 +379,7 @@ TEST(AgradFwdFvarFvarMatrix,mdivide_right_matrix_rowvector) {
   EXPECT_NEAR(-1.0,output(0,0).d_.val(),1.0E-12);
   EXPECT_NEAR(1.0,output(0,1).d_.val(),1.0E-12);
 }
-TEST(AgradFwdFvarFvarMatrix,mdivide_right_exceptions) {
+TEST(AgradFwdMatrixMdivideRight,ffd_exceptions) {
   using stan::math::matrix_d;
   using stan::math::vector_d;
   using stan::math::row_vector_d;

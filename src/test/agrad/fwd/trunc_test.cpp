@@ -3,7 +3,7 @@
 #include <stan/agrad/var.hpp>
 #include <test/agrad/util.hpp>
 
-TEST(Agrad_Fwd_Trunc, Fvar) {
+TEST(AgradFwdTrunc, Fvar) {
   using stan::agrad::fvar;
   using boost::math::trunc;
 
@@ -23,7 +23,7 @@ TEST(Agrad_Fwd_Trunc, Fvar) {
   EXPECT_FLOAT_EQ(0.0, c.d_);
 }
 
-TEST(Agrad_Fwd_Trunc, FvarVar_1stDeriv) {
+TEST(AgradFwdTrunc, FvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using boost::math::trunc;
@@ -39,7 +39,7 @@ TEST(Agrad_Fwd_Trunc, FvarVar_1stDeriv) {
   a.val_.grad(y,g);
   EXPECT_FLOAT_EQ(0, g[0]);
 }
-TEST(Agrad_Fwd_Trunc, FvarVar_2ndDeriv) {
+TEST(AgradFwdTrunc, FvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using boost::math::trunc;
@@ -53,7 +53,7 @@ TEST(Agrad_Fwd_Trunc, FvarVar_2ndDeriv) {
   EXPECT_FLOAT_EQ(0, g[0]);
 }
 
-TEST(Agrad_Fwd_Trunc, FvarFvarVar_1stDeriv) {
+TEST(AgradFwdTrunc, FvarFvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using boost::math::trunc;
@@ -89,7 +89,7 @@ TEST(Agrad_Fwd_Trunc, FvarFvarVar_1stDeriv) {
   b.val_.val_.grad(q,r);
   EXPECT_FLOAT_EQ(0, r[0]);
 }
-TEST(Agrad_Fwd_Trunc, FvarFvarVar_2ndDeriv) {
+TEST(AgradFwdTrunc, FvarFvarVar_2ndDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using boost::math::trunc;
@@ -117,7 +117,7 @@ TEST(Agrad_Fwd_Trunc, FvarFvarVar_2ndDeriv) {
   EXPECT_FLOAT_EQ(0, r[0]);
 }
 
-TEST(Agrad_Fwd_Trunc, FvarFvarDouble) {
+TEST(AgradFwdTrunc, FvarFvarDouble) {
   using stan::agrad::fvar;
   using boost::math::trunc;
 

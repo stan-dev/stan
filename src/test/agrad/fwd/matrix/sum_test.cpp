@@ -8,7 +8,7 @@
 
 using stan::agrad::fvar;
 using stan::agrad::var;
-TEST(AgradFwdMatrix, sum_vector) {
+TEST(AgradFwdMatrixSum, fd_vector) {
   using stan::math::sum;
   using stan::math::vector_d;
   using stan::agrad::vector_fd;
@@ -40,7 +40,7 @@ TEST(AgradFwdMatrix, sum_vector) {
   EXPECT_FLOAT_EQ(0.0, sum(v).val_);
   EXPECT_FLOAT_EQ(0.0, sum(v).d_);
 }
-TEST(AgradFwdMatrix, sum_rowvector) {
+TEST(AgradFwdMatrixSum, fd_rowvector) {
   using stan::math::sum;
   using stan::math::row_vector_d;
   using stan::agrad::row_vector_fd;
@@ -72,7 +72,7 @@ TEST(AgradFwdMatrix, sum_rowvector) {
   EXPECT_FLOAT_EQ(0.0, sum(v).val_);
   EXPECT_FLOAT_EQ(0.0, sum(v).d_);
 }
-TEST(AgradFwdMatrix, sum_matrix) {
+TEST(AgradFwdMatrixSum, fd_matrix) {
   using stan::math::sum;
   using stan::math::matrix_d;
   using stan::agrad::matrix_fd;
@@ -104,7 +104,7 @@ TEST(AgradFwdMatrix, sum_matrix) {
   EXPECT_FLOAT_EQ(0.0, sum(v).val_);
   EXPECT_FLOAT_EQ(0.0, sum(v).d_);
 }
-TEST(AgradFwdFvarVarMatrix, sum_vector) {
+TEST(AgradFwdMatrixSum, fv_vector) {
   using stan::math::sum;
   using stan::math::vector_d;
   using stan::agrad::vector_fv;
@@ -136,7 +136,7 @@ TEST(AgradFwdFvarVarMatrix, sum_vector) {
   EXPECT_FLOAT_EQ(0.0, sum(v).val_.val());
   EXPECT_FLOAT_EQ(0.0, sum(v).d_.val());
 }
-TEST(AgradFwdFvarVarMatrix, sum_rowvector) {
+TEST(AgradFwdMatrixSum, fv_rowvector) {
   using stan::math::sum;
   using stan::math::row_vector_d;
   using stan::agrad::row_vector_fv;
@@ -168,7 +168,7 @@ TEST(AgradFwdFvarVarMatrix, sum_rowvector) {
   EXPECT_FLOAT_EQ(0.0, sum(v).val_.val());
   EXPECT_FLOAT_EQ(0.0, sum(v).d_.val());
 }
-TEST(AgradFwdFvarVarMatrix, sum_matrix) {
+TEST(AgradFwdMatrixSum, fv_matrix) {
   using stan::math::sum;
   using stan::math::matrix_d;
   using stan::agrad::matrix_fv;
@@ -200,7 +200,7 @@ TEST(AgradFwdFvarVarMatrix, sum_matrix) {
   EXPECT_FLOAT_EQ(0.0, sum(v).val_.val());
   EXPECT_FLOAT_EQ(0.0, sum(v).d_.val());
 }
-TEST(AgradFwdFvarFvarMatrix, sum_vector) {
+TEST(AgradFwdMatrixSum, ffd_vector) {
   using stan::math::sum;
   using stan::math::vector_d;
   using stan::agrad::vector_ffd;
@@ -232,7 +232,7 @@ TEST(AgradFwdFvarFvarMatrix, sum_vector) {
   EXPECT_FLOAT_EQ(0.0, sum(v).val_.val());
   EXPECT_FLOAT_EQ(0.0, sum(v).d_.val());
 }
-TEST(AgradFwdFvarFvarMatrix, sum_rowvector) {
+TEST(AgradFwdMatrixSum, ffd_rowvector) {
   using stan::math::sum;
   using stan::math::row_vector_d;
   using stan::agrad::row_vector_ffd;
@@ -264,7 +264,7 @@ TEST(AgradFwdFvarFvarMatrix, sum_rowvector) {
   EXPECT_FLOAT_EQ(0.0, sum(v).val_.val());
   EXPECT_FLOAT_EQ(0.0, sum(v).d_.val());
 }
-TEST(AgradFwdFvarFvarMatrix, sum_matrix) {
+TEST(AgradFwdMatrixSum, ffd_matrix) {
   using stan::math::sum;
   using stan::math::matrix_d;
   using stan::agrad::matrix_ffd;
