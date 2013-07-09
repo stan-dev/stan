@@ -4,6 +4,7 @@
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <stan/agrad/fvar.hpp>
 #include <stan/agrad/var.hpp>
+#include <test/agrad/util.hpp>
 
 using stan::agrad::fvar;
 TEST(AgradFwdMatrixMax, fd_vector) {
@@ -99,7 +100,7 @@ TEST(AgradFwdMatrixMax, fd_matrix_exception) {
   EXPECT_EQ(-std::numeric_limits<double>::infinity(), max(v).val_);
   EXPECT_EQ(0, max(v).d_);
 }
-TEST(AgradFwdMatrixMax, fv_vector) {
+TEST(AgradFwdMatrixMax, fv_vector_1stDeriv) {
   using stan::math::max;
   using stan::math::vector_d;
   using stan::agrad::vector_fv;
@@ -124,6 +125,42 @@ TEST(AgradFwdMatrixMax, fv_vector) {
   output = max(v1);
   EXPECT_FLOAT_EQ(100, output.val_.val());
   EXPECT_FLOAT_EQ(1, output.d_.val());
+
+  AVEC q = createAVEC(a.val(),b.val(),c.val());
+  VEC h;
+  output.val_.grad(q,h);
+  EXPECT_FLOAT_EQ(1.0,h[0]);
+  EXPECT_FLOAT_EQ(0.0,h[1]);
+  EXPECT_FLOAT_EQ(0.0,h[2]);
+}
+TEST(AgradFwdMatrixMax, fv_vector_2ndDeriv) {
+  using stan::math::max;
+  using stan::math::vector_d;
+  using stan::agrad::vector_fv;
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+
+  vector_d d1(3);
+  vector_fv v1(3);
+  
+  fvar<var> a(100.0,1.0);
+  fvar<var> b(0.0,1.0);
+  fvar<var> c(-3.0,1.0);
+
+  d1 << 100, 0, -3;
+  v1 << a,b,c;
+  
+  fvar<var> output;
+  output = max(v1);
+  EXPECT_FLOAT_EQ(100, output.val_.val());
+  EXPECT_FLOAT_EQ(1, output.d_.val());
+
+  AVEC q = createAVEC(a.val(),b.val(),c.val());
+  VEC h;
+  output.d_.grad(q,h);
+  EXPECT_FLOAT_EQ(0.0,h[0]);
+  EXPECT_FLOAT_EQ(0.0,h[1]);
+  EXPECT_FLOAT_EQ(0.0,h[2]);
 }
 TEST(AgradFwdMatrixMax, fv_vector_exception) {
   using stan::math::max;
@@ -133,7 +170,7 @@ TEST(AgradFwdMatrixMax, fv_vector_exception) {
   EXPECT_EQ(-std::numeric_limits<double>::infinity(), max(v).val_.val());
   EXPECT_EQ(0, max(v).d_.val());
 }
-TEST(AgradFwdMatrixMax, fv_rowvector) {
+TEST(AgradFwdMatrixMax, fv_rowvector_1stDeriv) {
   using stan::math::max;
   using stan::math::row_vector_d;
   using stan::agrad::row_vector_fv;
@@ -158,6 +195,46 @@ TEST(AgradFwdMatrixMax, fv_rowvector) {
   output = max(v1);
   EXPECT_FLOAT_EQ(100, output.val_.val());
   EXPECT_FLOAT_EQ(1, output.d_.val());
+
+  AVEC q = createAVEC(a.val(),b.val(),c.val());
+  VEC h;
+  output.val_.grad(q,h);
+  EXPECT_FLOAT_EQ(1.0,h[0]);
+  EXPECT_FLOAT_EQ(0.0,h[1]);
+  EXPECT_FLOAT_EQ(0.0,h[2]);
+}
+TEST(AgradFwdMatrixMax, fv_rowvector_2ndDeriv) {
+  using stan::math::max;
+  using stan::math::row_vector_d;
+  using stan::agrad::row_vector_fv;
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+
+  row_vector_d d1(3);
+  row_vector_fv v1(3);
+  
+  fvar<var> a(100.0,1.0);
+  fvar<var> b(0.0,1.0);
+  fvar<var> c(-3.0,1.0);
+
+  d1 << 100, 0, -3;
+  v1 << a,b,c;
+  
+  fvar<var> output;
+  output = max(d1);
+  EXPECT_FLOAT_EQ(100, output.val_.val());
+  EXPECT_FLOAT_EQ(0, output.d_.val());
+                   
+  output = max(v1);
+  EXPECT_FLOAT_EQ(100, output.val_.val());
+  EXPECT_FLOAT_EQ(1, output.d_.val());
+
+  AVEC q = createAVEC(a.val(),b.val(),c.val());
+  VEC h;
+  output.d_.grad(q,h);
+  EXPECT_FLOAT_EQ(0.0,h[0]);
+  EXPECT_FLOAT_EQ(0.0,h[1]);
+  EXPECT_FLOAT_EQ(0.0,h[2]);
 }
 TEST(AgradFwdMatrixMax, fv_rowvector_exception) {
   using stan::math::max;
@@ -167,7 +244,7 @@ TEST(AgradFwdMatrixMax, fv_rowvector_exception) {
   EXPECT_EQ(-std::numeric_limits<double>::infinity(), max(v).val_.val());
   EXPECT_EQ(0, max(v).d_.val());
 }
-TEST(AgradFwdMatrixMax, fv_matrix) {
+TEST(AgradFwdMatrixMax, fv_matrix_1stDeriv) {
   using stan::math::max;
   using stan::math::matrix_d;
   using stan::agrad::matrix_fv;
@@ -192,6 +269,40 @@ TEST(AgradFwdMatrixMax, fv_matrix) {
   output = max(v1);
   EXPECT_FLOAT_EQ(100, output.val_.val());
   EXPECT_FLOAT_EQ(1, output.d_.val());
+
+  AVEC q = createAVEC(a.val(),b.val(),c.val());
+  VEC h;
+  output.val_.grad(q,h);
+  EXPECT_FLOAT_EQ(1.0,h[0]);
+  EXPECT_FLOAT_EQ(0.0,h[1]);
+  EXPECT_FLOAT_EQ(0.0,h[2]);
+}
+TEST(AgradFwdMatrixMax, fv_matrix_2ndDeriv) {
+  using stan::math::max;
+  using stan::math::matrix_d;
+  using stan::agrad::matrix_fv;
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+
+  matrix_d d1(3,1);
+  matrix_fv v1(1,3);
+  
+  fvar<var> a(100.0,1.0);
+  fvar<var> b(0.0,1.0);
+  fvar<var> c(-3.0,1.0);
+
+  d1 << 100, 0, -3;
+  v1 << a,b,c;
+  
+  fvar<var> output;
+  output = max(v1);
+
+  AVEC q = createAVEC(a.val(),b.val(),c.val());
+  VEC h;
+  output.d_.grad(q,h);
+  EXPECT_FLOAT_EQ(0.0,h[0]);
+  EXPECT_FLOAT_EQ(0.0,h[1]);
+  EXPECT_FLOAT_EQ(0.0,h[2]);
 }
 TEST(AgradFwdMatrixMax, fv_matrix_exception) {
   using stan::math::max;
@@ -311,4 +422,370 @@ TEST(AgradFwdMatrixMax, ffd_matrix_exception) {
   matrix_ffd v;
   EXPECT_EQ(-std::numeric_limits<double>::infinity(), max(v).val_.val());
   EXPECT_EQ(0, max(v).d_.val());
+}
+TEST(AgradFwdMatrixMax, ffv_vector_1stDeriv) {
+  using stan::math::max;
+  using stan::math::vector_d;
+  using stan::agrad::vector_ffv;
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+
+  vector_d d1(3);
+  vector_ffv v1(3);
+  
+  fvar<fvar<var> > a(100.0,1.0);
+  fvar<fvar<var> > b(0.0,1.0);
+  fvar<fvar<var> > c(-3.0,1.0);
+
+  d1 << 100, 0, -3;
+  v1 << a,b,c;
+  
+  fvar<fvar<var> > output;
+  output = max(d1);
+  EXPECT_FLOAT_EQ(100, output.val_.val().val());
+  EXPECT_FLOAT_EQ(0, output.d_.val().val());
+                   
+  output = max(v1);
+  EXPECT_FLOAT_EQ(100, output.val_.val().val());
+  EXPECT_FLOAT_EQ(1, output.d_.val().val());
+
+  AVEC q = createAVEC(a.val().val(),b.val().val(),c.val().val());
+  VEC h;
+  output.val_.val().grad(q,h);
+  EXPECT_FLOAT_EQ(1.0,h[0]);
+  EXPECT_FLOAT_EQ(0.0,h[1]);
+  EXPECT_FLOAT_EQ(0.0,h[2]);
+}
+TEST(AgradFwdMatrixMax, ffv_vector_2ndDeriv_1) {
+  using stan::math::max;
+  using stan::math::vector_d;
+  using stan::agrad::vector_ffv;
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+
+  vector_d d1(3);
+  vector_ffv v1(3);
+  
+  fvar<fvar<var> > a(100.0,1.0);
+  fvar<fvar<var> > b(0.0,1.0);
+  fvar<fvar<var> > c(-3.0,1.0);
+
+  d1 << 100, 0, -3;
+  v1 << a,b,c;
+  
+  fvar<fvar<var> > output;
+  output = max(v1);
+  EXPECT_FLOAT_EQ(100, output.val_.val().val());
+  EXPECT_FLOAT_EQ(1, output.d_.val().val());
+
+  AVEC q = createAVEC(a.val().val(),b.val().val(),c.val().val());
+  VEC h;
+  output.val().d_.grad(q,h);
+  EXPECT_FLOAT_EQ(0.0,h[0]);
+  EXPECT_FLOAT_EQ(0.0,h[1]);
+  EXPECT_FLOAT_EQ(0.0,h[2]);
+}
+TEST(AgradFwdMatrixMax, ffv_vector_2ndDeriv_2) {
+  using stan::math::max;
+  using stan::math::vector_d;
+  using stan::agrad::vector_ffv;
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+
+  vector_d d1(3);
+  vector_ffv v1(3);
+  
+  fvar<fvar<var> > a(100.0,1.0);
+  fvar<fvar<var> > b(0.0,1.0);
+  fvar<fvar<var> > c(-3.0,1.0);
+
+  d1 << 100, 0, -3;
+  v1 << a,b,c;
+  
+  fvar<fvar<var> > output;
+  output = max(v1);
+  EXPECT_FLOAT_EQ(100, output.val_.val().val());
+  EXPECT_FLOAT_EQ(1, output.d_.val().val());
+
+  AVEC q = createAVEC(a.val().val(),b.val().val(),c.val().val());
+  VEC h;
+  output.d_.val().grad(q,h);
+  EXPECT_FLOAT_EQ(0.0,h[0]);
+  EXPECT_FLOAT_EQ(0.0,h[1]);
+  EXPECT_FLOAT_EQ(0.0,h[2]);
+}
+TEST(AgradFwdMatrixMax, ffv_vector_3rdDeriv) {
+  using stan::math::max;
+  using stan::math::vector_d;
+  using stan::agrad::vector_ffv;
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+
+  vector_d d1(3);
+  vector_ffv v1(3);
+  
+  fvar<fvar<var> > a(100.0,1.0);
+  fvar<fvar<var> > b(0.0,1.0);
+  fvar<fvar<var> > c(-3.0,1.0);
+
+  d1 << 100, 0, -3;
+  v1 << a,b,c;
+  
+  fvar<fvar<var> > output;
+  output = max(v1);
+
+  AVEC q = createAVEC(a.val().val(),b.val().val(),c.val().val());
+  VEC h;
+  output.d_.d_.grad(q,h);
+  EXPECT_FLOAT_EQ(0.0,h[0]);
+  EXPECT_FLOAT_EQ(0.0,h[1]);
+  EXPECT_FLOAT_EQ(0.0,h[2]);
+}
+TEST(AgradFwdMatrixMax, ffv_vector_exception) {
+  using stan::math::max;
+  using stan::agrad::vector_ffv;
+
+  vector_ffv v;
+  EXPECT_EQ(-std::numeric_limits<double>::infinity(), max(v).val_.val().val());
+  EXPECT_EQ(0, max(v).d_.val().val());
+}
+TEST(AgradFwdMatrixMax, ffv_rowvector_1stDeriv) {
+  using stan::math::max;
+  using stan::math::row_vector_d;
+  using stan::agrad::row_vector_ffv;
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+
+  row_vector_d d1(3);
+  row_vector_ffv v1(3);
+  
+  fvar<fvar<var> > a(100.0,1.0);
+  fvar<fvar<var> > b(0.0,1.0);
+  fvar<fvar<var> > c(-3.0,1.0);
+
+  d1 << 100, 0, -3;
+  v1 << a,b,c;
+  
+  fvar<fvar<var> > output;
+  output = max(d1);
+  EXPECT_FLOAT_EQ(100, output.val_.val().val());
+  EXPECT_FLOAT_EQ(0, output.d_.val().val());
+                   
+  output = max(v1);
+  EXPECT_FLOAT_EQ(100, output.val_.val().val());
+  EXPECT_FLOAT_EQ(1, output.d_.val().val());
+
+  AVEC q = createAVEC(a.val().val(),b.val().val(),c.val().val());
+  VEC h;
+  output.val_.val().grad(q,h);
+  EXPECT_FLOAT_EQ(1.0,h[0]);
+  EXPECT_FLOAT_EQ(0.0,h[1]);
+  EXPECT_FLOAT_EQ(0.0,h[2]);
+}TEST(AgradFwdMatrixMax, ffv_rowvector_2ndDeriv_1) {
+  using stan::math::max;
+  using stan::math::row_vector_d;
+  using stan::agrad::row_vector_ffv;
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+
+  row_vector_d d1(3);
+  row_vector_ffv v1(3);
+  
+  fvar<fvar<var> > a(100.0,1.0);
+  fvar<fvar<var> > b(0.0,1.0);
+  fvar<fvar<var> > c(-3.0,1.0);
+
+  d1 << 100, 0, -3;
+  v1 << a,b,c;
+  
+  fvar<fvar<var> > output;
+  output = max(v1);
+
+  AVEC q = createAVEC(a.val().val(),b.val().val(),c.val().val());
+  VEC h;
+  output.val().d_.grad(q,h);
+  EXPECT_FLOAT_EQ(0.0,h[0]);
+  EXPECT_FLOAT_EQ(0.0,h[1]);
+  EXPECT_FLOAT_EQ(0.0,h[2]);
+}
+TEST(AgradFwdMatrixMax, ffv_rowvector_2ndDeriv_2) {
+  using stan::math::max;
+  using stan::math::row_vector_d;
+  using stan::agrad::row_vector_ffv;
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+
+  row_vector_d d1(3);
+  row_vector_ffv v1(3);
+  
+  fvar<fvar<var> > a(100.0,1.0);
+  fvar<fvar<var> > b(0.0,1.0);
+  fvar<fvar<var> > c(-3.0,1.0);
+
+  d1 << 100, 0, -3;
+  v1 << a,b,c;
+  
+  fvar<fvar<var> > output;
+  output = max(d1);
+  EXPECT_FLOAT_EQ(100, output.val_.val().val());
+  EXPECT_FLOAT_EQ(0, output.d_.val().val());
+                   
+  output = max(v1);
+  EXPECT_FLOAT_EQ(100, output.val_.val().val());
+  EXPECT_FLOAT_EQ(1, output.d_.val().val());
+
+  AVEC q = createAVEC(a.val().val(),b.val().val(),c.val().val());
+  VEC h;
+  output.d_.val().grad(q,h);
+  EXPECT_FLOAT_EQ(0.0,h[0]);
+  EXPECT_FLOAT_EQ(0.0,h[1]);
+  EXPECT_FLOAT_EQ(0.0,h[2]);
+}TEST(AgradFwdMatrixMax, ffv_rowvector_3rdDeriv) {
+  using stan::math::max;
+  using stan::math::row_vector_d;
+  using stan::agrad::row_vector_ffv;
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+
+  row_vector_d d1(3);
+  row_vector_ffv v1(3);
+  
+  fvar<fvar<var> > a(100.0,1.0);
+  fvar<fvar<var> > b(0.0,1.0);
+  fvar<fvar<var> > c(-3.0,1.0);
+
+  d1 << 100, 0, -3;
+  v1 << a,b,c;
+  
+  fvar<fvar<var> > output;
+  output = max(v1);
+
+  AVEC q = createAVEC(a.val().val(),b.val().val(),c.val().val());
+  VEC h;
+  output.d_.d_.grad(q,h);
+  EXPECT_FLOAT_EQ(0.0,h[0]);
+  EXPECT_FLOAT_EQ(0.0,h[1]);
+  EXPECT_FLOAT_EQ(0.0,h[2]);
+}
+TEST(AgradFwdMatrixMax, ffv_rowvector_exception) {
+  using stan::math::max;
+  using stan::agrad::row_vector_ffv;
+
+  row_vector_ffv v;
+  EXPECT_EQ(-std::numeric_limits<double>::infinity(), max(v).val_.val().val());
+  EXPECT_EQ(0, max(v).d_.val().val());
+}
+TEST(AgradFwdMatrixMax, ffv_matrix_1stDeriv) {
+  using stan::math::max;
+  using stan::math::matrix_d;
+  using stan::agrad::matrix_ffv;
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+
+  matrix_d d1(3,1);
+  matrix_ffv v1(1,3);
+  
+  fvar<fvar<var> > a(100.0,1.0);
+  fvar<fvar<var> > b(0.0,1.0);
+  fvar<fvar<var> > c(-3.0,1.0);
+
+  d1 << 100, 0, -3;
+  v1 << a,b,c;
+  
+  fvar<fvar<var> > output;
+  output = max(d1);
+  EXPECT_FLOAT_EQ(100, output.val_.val().val());
+  EXPECT_FLOAT_EQ(0, output.d_.val().val());
+                   
+  output = max(v1);
+  EXPECT_FLOAT_EQ(100, output.val_.val().val());
+  EXPECT_FLOAT_EQ(1, output.d_.val().val());
+
+  AVEC q = createAVEC(a.val().val(),b.val().val(),c.val().val());
+  VEC h;
+  output.val_.val().grad(q,h);
+  EXPECT_FLOAT_EQ(1.0,h[0]);
+  EXPECT_FLOAT_EQ(0.0,h[1]);
+  EXPECT_FLOAT_EQ(0.0,h[2]);
+}
+TEST(AgradFwdMatrixMax, ffv_matrix_2ndDeriv_1) {
+  using stan::math::max;
+  using stan::math::matrix_d;
+  using stan::agrad::matrix_ffv;
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+
+  matrix_d d1(3,1);
+  matrix_ffv v1(1,3);
+  
+  fvar<fvar<var> > a(100.0,1.0);
+  fvar<fvar<var> > b(0.0,1.0);
+  fvar<fvar<var> > c(-3.0,1.0);
+
+  d1 << 100, 0, -3;
+  v1 << a,b,c;
+  
+  fvar<fvar<var> > output;
+  output = max(v1);
+
+  AVEC q = createAVEC(a.val().val(),b.val().val(),c.val().val());
+  VEC h;
+  output.val().d_.grad(q,h);
+  EXPECT_FLOAT_EQ(0.0,h[0]);
+  EXPECT_FLOAT_EQ(0.0,h[1]);
+  EXPECT_FLOAT_EQ(0.0,h[2]);
+}
+TEST(AgradFwdMatrixMax, ffv_matrix_2ndDeriv_2) {
+  using stan::math::max;
+  using stan::math::matrix_d;
+  using stan::agrad::matrix_ffv;
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+
+  matrix_d d1(3,1);
+  matrix_ffv v1(1,3);
+  
+  fvar<fvar<var> > a(100.0,1.0);
+  fvar<fvar<var> > b(0.0,1.0);
+  fvar<fvar<var> > c(-3.0,1.0);
+
+  d1 << 100, 0, -3;
+  v1 << a,b,c;
+  
+  fvar<fvar<var> > output;
+  output = max(v1);
+
+  AVEC q = createAVEC(a.val().val(),b.val().val(),c.val().val());
+  VEC h;
+  output.d_.val().grad(q,h);
+  EXPECT_FLOAT_EQ(0.0,h[0]);
+  EXPECT_FLOAT_EQ(0.0,h[1]);
+  EXPECT_FLOAT_EQ(0.0,h[2]);
+}
+TEST(AgradFwdMatrixMax, ffv_matrix_3rdDeriv) {
+  using stan::math::max;
+  using stan::math::matrix_d;
+  using stan::agrad::matrix_ffv;
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+
+  matrix_d d1(3,1);
+  matrix_ffv v1(1,3);
+  
+  fvar<fvar<var> > a(100.0,1.0);
+  fvar<fvar<var> > b(0.0,1.0);
+  fvar<fvar<var> > c(-3.0,1.0);
+
+  d1 << 100, 0, -3;
+  v1 << a,b,c;
+  
+  fvar<fvar<var> > output;
+  output = max(v1);
+
+  AVEC q = createAVEC(a.val().val(),b.val().val(),c.val().val());
+  VEC h;
+  output.d_.d_.grad(q,h);
+  EXPECT_FLOAT_EQ(0.0,h[0]);
+  EXPECT_FLOAT_EQ(0.0,h[1]);
+  EXPECT_FLOAT_EQ(0.0,h[2]);
 }
