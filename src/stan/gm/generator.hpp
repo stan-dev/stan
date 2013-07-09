@@ -2390,7 +2390,7 @@ namespace stan {
           combo_dims.push_back(matrix_dims[i]);
 
         for (size_t i = combo_dims.size(); i-- > 0; ) {
-          generate_indent(2 + i,o_);
+          generate_indent(1 + combo_dims.size() - i,o_);
           o_ << "for (int k_" << i << "__ = 1;"
              << " k_" << i << "__ <= ";
           generate_expression(combo_dims[i].expr_,o_);
@@ -2543,7 +2543,7 @@ namespace stan {
           combo_dims.push_back(matrix_dims[i]);
 
         for (size_t i = combo_dims.size(); i-- > 0; ) {
-          generate_indent(2 + i,o_);
+          generate_indent(1 + combo_dims.size() - i,o_);
           o_ << "for (int k_" << i << "__ = 1;"
              << " k_" << i << "__ <= ";
           generate_expression(combo_dims[i].expr_,o_);
@@ -2695,7 +2695,7 @@ namespace stan {
           combo_dims.push_back(matrix_dims[i]);
 
         for (size_t i = combo_dims.size(); i-- > 0; ) {
-          generate_indent(2 + i,o_);
+          generate_indent(1 + combo_dims.size() - i,o_);
           o_ << "for (int k_" << i << "__ = 1;"
              << " k_" << i << "__ <= ";
           generate_expression(combo_dims[i].expr_,o_);
