@@ -4,7 +4,7 @@
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <stan/agrad/var.hpp>
 
-TEST(AgradFwdMatrix,col_v) {
+TEST(Agrad_Fwd_Matrix_Col,matrix_fd) {
   using stan::math::col;
   using stan::agrad::matrix_fd;
   using stan::agrad::vector_fd;
@@ -31,7 +31,7 @@ TEST(AgradFwdMatrix,col_v) {
   EXPECT_EQ(1.0,w[0].d_);
   EXPECT_EQ(1.0,w[1].d_);
 }
-TEST(AgradFwdMatrix,col_v_exc0) {
+TEST(Agrad_Fwd_Matrix_Col,matrix_fd_exc0) {
   using stan::math::col;
   using stan::agrad::matrix_fd;
 
@@ -46,7 +46,7 @@ TEST(AgradFwdMatrix,col_v_exc0) {
   EXPECT_THROW(col(y,0),std::domain_error);
   EXPECT_THROW(col(y,7),std::domain_error);
 }
-TEST(AgradFwdMatrix,col_v_excHigh) {
+TEST(Agrad_Fwd_Matrix_Col,matrix_fd_excHigh) {
   using stan::math::col;
   using stan::agrad::matrix_fd;
 
@@ -61,10 +61,10 @@ TEST(AgradFwdMatrix,col_v_excHigh) {
   EXPECT_THROW(col(y,0),std::domain_error);
   EXPECT_THROW(col(y,5),std::domain_error);
 }
-TEST(AgradFwdFvarVarMatrix,col_v) {
+TEST(Agrad_Fwd_Matrix_Col,matrix_fv) {
   using stan::math::col;
-  using stan::agrad::matrix_fdv;
-  using stan::agrad::vector_fdv;
+  using stan::agrad::matrix_fv;
+  using stan::agrad::vector_fv;
   using stan::agrad::fvar;
   using stan::agrad::var;
 
@@ -74,26 +74,26 @@ TEST(AgradFwdFvarVarMatrix,col_v) {
   fvar<var> d(4.0,1.0);
   fvar<var> e(5.0,1.0);
   fvar<var> f(6.0,1.0);
-  matrix_fdv y(2,3);
+  matrix_fv y(2,3);
   y << a,b,c,d,e,f;
 
-  vector_fdv z = col(y,1);
+  vector_fv z = col(y,1);
   EXPECT_EQ(2,z.size());
   EXPECT_FLOAT_EQ(1.0,z[0].val_.val());
   EXPECT_FLOAT_EQ(4.0,z[1].val_.val());
   EXPECT_FLOAT_EQ(1.0,z[0].d_.val());
   EXPECT_FLOAT_EQ(1.0,z[1].d_.val());
 
-  vector_fdv w = col(y,2);
+  vector_fv w = col(y,2);
   EXPECT_EQ(2,w.size());
   EXPECT_EQ(2.0,w[0].val_.val());
   EXPECT_EQ(5.0,w[1].val_.val());
   EXPECT_EQ(1.0,w[0].d_.val());
   EXPECT_EQ(1.0,w[1].d_.val());
 }
-TEST(AgradFwdFvarVarMatrix,col_v_exc0) {
+TEST(Agrad_Fwd_Matrix_Col,matrix_fv_exc0) {
   using stan::math::col;
-  using stan::agrad::matrix_fdv;
+  using stan::agrad::matrix_fv;
   using stan::agrad::fvar;
   using stan::agrad::var;
 
@@ -103,15 +103,15 @@ TEST(AgradFwdFvarVarMatrix,col_v_exc0) {
   fvar<var> d(4.0,1.0);
   fvar<var> e(5.0,1.0);
   fvar<var> f(6.0,1.0);
-  matrix_fdv y(2,3);
+  matrix_fv y(2,3);
   y << a,b,c,d,e,f;
 
   EXPECT_THROW(col(y,0),std::domain_error);
   EXPECT_THROW(col(y,7),std::domain_error);
 }
-TEST(AgradFwdFvarVarMatrix,col_v_excHigh) {
+TEST(Agrad_Fwd_Matrix_Col,matrix_fv_excHigh) {
   using stan::math::col;
-  using stan::agrad::matrix_fdv;
+  using stan::agrad::matrix_fv;
   using stan::agrad::fvar;
   using stan::agrad::var;
 
@@ -121,13 +121,13 @@ TEST(AgradFwdFvarVarMatrix,col_v_excHigh) {
   fvar<var> d(4.0,1.0);
   fvar<var> e(5.0,1.0);
   fvar<var> f(6.0,1.0);
-  matrix_fdv y(2,3);
+  matrix_fv y(2,3);
   y << a,b,c,d,e,f;
 
   EXPECT_THROW(col(y,0),std::domain_error);
   EXPECT_THROW(col(y,5),std::domain_error);
 }
-TEST(AgradFwdFvarFvarMatrix,col_v) {
+TEST(Agrad_Fwd_Matrix_Col,matrix_ffd) {
   using stan::math::col;
   using stan::agrad::matrix_ffd;
   using stan::agrad::vector_ffd;
@@ -169,7 +169,7 @@ TEST(AgradFwdFvarFvarMatrix,col_v) {
   EXPECT_EQ(1.0,w[0].d_.val());
   EXPECT_EQ(1.0,w[1].d_.val());
 }
-TEST(AgradFwdFvarFvarMatrix,col_v_exc0) {
+TEST(Agrad_Fwd_Matrix_Col,matrix_ffd_exc0) {
   using stan::math::col;
   using stan::agrad::matrix_ffd;
   using stan::agrad::fvar;
@@ -199,7 +199,7 @@ TEST(AgradFwdFvarFvarMatrix,col_v_exc0) {
   EXPECT_THROW(col(y,0),std::domain_error);
   EXPECT_THROW(col(y,7),std::domain_error);
 }
-TEST(AgradFwdFvarFvarMatrix,col_v_excHigh) {
+TEST(Agrad_Fwd_Matrix_Col,matrix_ffd_excHigh) {
   using stan::math::col;
   using stan::agrad::matrix_ffd;
   using stan::agrad::fvar;
@@ -224,6 +224,111 @@ TEST(AgradFwdFvarFvarMatrix,col_v_excHigh) {
   f.d_.val_ = 1.0;
 
   matrix_ffd y(2,3);
+  y << a,b,c,d,e,f;
+
+  EXPECT_THROW(col(y,0),std::domain_error);
+  EXPECT_THROW(col(y,5),std::domain_error);
+}
+TEST(Agrad_Fwd_Matrix_Col,matrix_ffv) {
+  using stan::math::col;
+  using stan::agrad::matrix_ffv;
+  using stan::agrad::vector_ffv;
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+
+  fvar<fvar<var> > a;
+  fvar<fvar<var> > b;
+  fvar<fvar<var> > c;
+  fvar<fvar<var> > d;
+  fvar<fvar<var> > e;
+  fvar<fvar<var> > f;
+  a.val_.val_ = 1.0;
+  a.d_.val_ = 1.0;  
+  b.val_.val_ = 2.0;
+  b.d_.val_ = 1.0;
+  c.val_.val_ = 3.0;
+  c.d_.val_ = 1.0;
+  d.val_.val_ = 4.0;
+  d.d_.val_ = 1.0;  
+  e.val_.val_ = 5.0;
+  e.d_.val_ = 1.0;
+  f.val_.val_ = 6.0;
+  f.d_.val_ = 1.0;
+
+  matrix_ffv y(2,3);
+  y << a,b,c,d,e,f;
+
+  vector_ffv z = col(y,1);
+  EXPECT_EQ(2,z.size());
+  EXPECT_FLOAT_EQ(1.0,z[0].val_.val().val());
+  EXPECT_FLOAT_EQ(4.0,z[1].val_.val().val());
+  EXPECT_FLOAT_EQ(1.0,z[0].d_.val().val());
+  EXPECT_FLOAT_EQ(1.0,z[1].d_.val().val());
+
+  vector_ffv w = col(y,2);
+  EXPECT_EQ(2,w.size());
+  EXPECT_EQ(2.0,w[0].val_.val().val());
+  EXPECT_EQ(5.0,w[1].val_.val().val());
+  EXPECT_EQ(1.0,w[0].d_.val().val());
+  EXPECT_EQ(1.0,w[1].d_.val().val());
+}
+TEST(Agrad_Fwd_Matrix_Col,matrix_ffv_exc0) {
+  using stan::math::col;
+  using stan::agrad::matrix_ffv;
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+
+  fvar<fvar<var> > a;
+  fvar<fvar<var> > b;
+  fvar<fvar<var> > c;
+  fvar<fvar<var> > d;
+  fvar<fvar<var> > e;
+  fvar<fvar<var> > f;
+  a.val_.val_ = 1.0;
+  a.d_.val_ = 1.0;  
+  b.val_.val_ = 2.0;
+  b.d_.val_ = 1.0;
+  c.val_.val_ = 3.0;
+  c.d_.val_ = 1.0;
+  d.val_.val_ = 4.0;
+  d.d_.val_ = 1.0;  
+  e.val_.val_ = 5.0;
+  e.d_.val_ = 1.0;
+  f.val_.val_ = 6.0;
+  f.d_.val_ = 1.0;
+
+  matrix_ffv y(2,3);
+  y << a,b,c,d,e,f;
+
+  EXPECT_THROW(col(y,0),std::domain_error);
+  EXPECT_THROW(col(y,7),std::domain_error);
+}
+TEST(Agrad_Fwd_Matrix_Col,matrix_ffv_excHigh) {
+  using stan::math::col;
+  using stan::agrad::matrix_ffv;
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+
+  fvar<fvar<var> > a;
+  fvar<fvar<var> > b;
+  fvar<fvar<var> > c;
+  fvar<fvar<var> > d;
+  fvar<fvar<var> > e;
+  fvar<fvar<var> > f;
+  a.val_.val_ = 1.0;
+  a.d_.val_ = 1.0;  
+  b.val_.val_ = 2.0;
+  b.d_.val_ = 1.0;
+  c.val_.val_ = 3.0;
+  c.d_.val_ = 1.0;
+  d.val_.val_ = 4.0;
+  d.d_.val_ = 1.0;  
+  e.val_.val_ = 5.0;
+  e.d_.val_ = 1.0;
+  f.val_.val_ = 6.0;
+  f.d_.val_ = 1.0;
+
+  matrix_ffv y(2,3);
   y << a,b,c,d,e,f;
 
   EXPECT_THROW(col(y,0),std::domain_error);
