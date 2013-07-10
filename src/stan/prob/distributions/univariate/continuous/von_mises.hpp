@@ -35,8 +35,6 @@ namespace stan {
       // Result accumulator.
       double logp = 0.0;
 
-      double const pi = boost::math::constants::pi<double>();
-
       // Validate arguments.
       if (!check_finite(function, y, "Random variable", &logp))
         return logp;
@@ -61,8 +59,7 @@ namespace stan {
       const bool kappa_const = is_constant_struct<T_scale>::value;
       
       // Determine which expensive computations to perform.
-      const bool compute_bessel0 = include_summand<propto,T_scale>::value ||
-        !kappa_const;
+      const bool compute_bessel0 = include_summand<propto,T_scale>::value;
       const bool compute_bessel1 = !kappa_const;
       const double TWO_PI = 2.0 * stan::math::pi();
       
@@ -71,6 +68,13 @@ namespace stan {
       VectorView<const T_loc> mu_vec(mu);
       VectorView<const T_scale> kappa_vec(kappa);
 
+      DoubleVectorView<true,is_vector<T_scale>::value> kappa_dbl(length(kappa));
+      DoubleVectorView<include_summand<propto,T_scale>::value,is_vector<T_scale>::value> log_bessel0(length(kappa));
+      for (size_t i = 0; i < length(kappa); i++) {
+        kappa_dbl[i] = value_of(kappa_vec[i]);
+        if (include_summand<propto,T_scale>::value)
+          log_bessel0[i] = log(boost::math::cyl_bessel_i(0, value_of(kappa_vec[i])));
+      }
       agrad::OperandsAndPartials<T_y, T_loc, T_scale> oap(y, mu, kappa);
 
       size_t N = max_size(y, mu, kappa);
@@ -80,21 +84,22 @@ namespace stan {
         const double y_ = value_of(y_vec[n]);
         const double y_dbl =  y_ - std::floor(y_ / TWO_PI) * TWO_PI;
         const double mu_dbl = value_of(mu_vec[n]);
-        const double kappa_dbl = value_of(kappa_vec[n]);
         
         // Reusable values.
-        const double bessel0 = compute_bessel0 ?
-          boost::math::cyl_bessel_i(0, kappa_dbl) : 0;
-        const double bessel1 = compute_bessel1 ?
-          boost::math::cyl_bessel_i(-1, kappa_dbl) : 0;
-        const double kappa_sin = kappa_dbl * std::sin(mu_dbl - y_dbl);
-        const double kappa_cos = kappa_dbl * std::cos(mu_dbl - y_dbl);
+        double bessel0 = 0;
+        if (compute_bessel0)
+          bessel0 = boost::math::cyl_bessel_i(0, kappa_dbl[n]);
+        double bessel1 = 0;
+        if (compute_bessel1)
+          bessel1 = boost::math::cyl_bessel_i(-1, kappa_dbl[n]);
+        const double kappa_sin = kappa_dbl[n] * std::sin(mu_dbl - y_dbl);
+        const double kappa_cos = kappa_dbl[n] * std::cos(mu_dbl - y_dbl);
         
         // Log probability.
         if (include_summand<propto>::value) 
           logp -= LOG_TWO_PI;
         if (include_summand<propto,T_scale>::value)
-          logp -= log(bessel0);
+          logp -= log_bessel0[n];
         if (include_summand<propto,T_y,T_loc,T_scale>::value)
           logp += kappa_cos;
         
@@ -104,7 +109,7 @@ namespace stan {
         if (!mu_const) 
           oap.d_x2[n] -= kappa_sin;
         if (!kappa_const) 
-          oap.d_x3[n] += kappa_cos / kappa_dbl - bessel1 / bessel0;
+          oap.d_x3[n] += kappa_cos / kappa_dbl[n] - bessel1 / bessel0;
       }
       
       return oap.to_var(logp);
