@@ -22,7 +22,7 @@ namespace stan {
           help_width(20) { }
 
       virtual ~argument() { }
-
+      
       std::string name() const { 
         return _name; 
       }

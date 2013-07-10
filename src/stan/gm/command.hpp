@@ -505,19 +505,21 @@ namespace stan {
       //           Optimization Algorithms            //
       //////////////////////////////////////////////////
       
+      std::cout << parser.arg("method")->arg("optimize") << std::endl;
+      
       if (parser.arg("method")->arg("optimize")) {
         
         list_argument* algo = dynamic_cast<list_argument*>
                               (parser.arg("method")->arg("optimize")->arg("algorithm"));
-        
+
         int num_iterations = dynamic_cast<int_argument*>(
-                             parser.arg("method")->arg("sample")->arg("iter"))->value();
-        
+                             parser.arg("method")->arg("optimize")->arg("iter"))->value();
+
         bool save_iterations = dynamic_cast<bool_argument*>(
-                               parser.arg("method")->arg("sample")->arg("save_iterations"))->value();
-        
+                               parser.arg("method")->arg("optimize")->arg("save_iterations"))->value();
+
         if (algo->value() == "nesterov") {
-          
+
           bool epsilon = dynamic_cast<real_argument*>(
                          algo->arg("nesterov")->arg("stepsize"))->value();
           
