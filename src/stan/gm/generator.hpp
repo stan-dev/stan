@@ -565,73 +565,90 @@ namespace stan {
         read_args.push_back(x.K_);
         generate_initialize_array(is_var_?"Eigen::Matrix<T__,Eigen::Dynamic,Eigen::Dynamic> ":"matrix_d","corr_matrix",read_args,x.name_,x.dims_);
       }
-      void generate_initialize_array(const std::string& var_type,
-                                     const std::string& read_type,
-                                     const std::vector<expression>& read_args,
-                                     const std::string& name,
-                                     const std::vector<expression>& dims) 
+      void generate_initialize_array2(const std::string& var_type,
+                                      const std::string& read_type,
+                                      const std::vector<expression>& read_args,
+                                      const std::string& name,
+                                      const std::vector<expression>& dims,
+                                      bool jacobian) 
         const {
 
         if (dims.size() == 0) {
-          generate_indent(2,o_);
-          if (declare_vars_) o_ << var_type << " ";
+          generate_indent(3,o_);
           o_ << name << " = in__." << read_type  << "_constrain(";
           for (size_t j = 0; j < read_args.size(); ++j) {
             if (j > 0) o_ << ",";
             generate_expression(read_args[j],o_);
           }
-          if (read_args.size() > 0)
+          if (read_args.size() > 0 && jacobian)
             o_ << ",";
-          o_ << "lp__";
+          if (jacobian) 
+            o_ << "lp__";
           o_ << ");" << EOL;
-          generate_indent(2,o_);
-          o_ << "(void) " << name << ";  // supress unused variable warning" << EOL;
           return;
         }
-        if (declare_vars_) {
-          o_ << INDENT2;
-          for (size_t i = 0; i < dims.size(); ++i) o_ << "vector<";
-          o_ << var_type;
-          for (size_t i = 0; i < dims.size(); ++i) o_ << "> ";
-          o_ << name << ";" << EOL;
-        }
+
         std::string name_dims(name);
         for (size_t i = 0; i < dims.size(); ++i) {
-          generate_indent(i + 2, o_);
+          generate_indent(i + 3, o_);
           o_ << "size_t dim_"  << name << "_" << i << "__ = ";
           generate_expression(dims[i],o_);
           o_ << ";" << EOL;
           if (i < dims.size() - 1) {  
-            generate_indent(i + 2, o_);
+            generate_indent(i + 3, o_);
             o_ << name_dims << ".resize(dim" << "_" << name << "_" << i << "__);" 
                << EOL;
             name_dims.append("[k_").append(to_string(i)).append("__]");
           }
-          generate_indent(i + 2, o_);
+          generate_indent(i + 3, o_);
           if (i == dims.size() - 1) {
             o_ << name_dims << ".reserve(dim_" << name << "_" << i << "__);" << EOL;
-            generate_indent(i + 2, o_);
+            generate_indent(i + 3, o_);
           }
           o_ << "for (size_t k_" << i << "__ = 0;"
              << " k_" << i << "__ < dim_" << name << "_" << i << "__;"
              << " ++k_" << i << "__) {" << EOL;
           if (i == dims.size() - 1) {
-            generate_indent(i + 3, o_);
+            generate_indent(i + 4, o_);
             o_ << name_dims << ".push_back(in__." << read_type << "_constrain(";
             for (size_t j = 0; j < read_args.size(); ++j) {
               if (j > 0) o_ << ",";
               generate_expression(read_args[j],o_);
             }
-            if (read_args.size() > 0)
+            if (read_args.size() > 0 && jacobian)
               o_ << ",";
-            o_ << "lp__";
+            if (jacobian) 
+              o_ << "lp__";
             o_ << "));" << EOL;
           }
         }
         for (size_t i = dims.size(); i > 0; --i) {
-          generate_indent(i + 1, o_);
+          generate_indent(i + 2, o_);
           o_ << "}" << EOL;
         }
+      }
+      void generate_initialize_array(const std::string& var_type,
+                                     const std::string& read_type,
+                                     const std::vector<expression>& read_args,
+                                     const std::string& name,
+                                     const std::vector<expression>& dims) 
+      const {
+
+        if (declare_vars_) {
+          o_ << INDENT2;
+          for (size_t i = 0; i < dims.size(); ++i) o_ << "vector<";
+          o_ << var_type;
+          for (size_t i = 0; i < dims.size(); ++i) o_ << "> ";
+          if (dims.size() == 0) o_ << " ";
+          o_ << name << ";" << EOL;
+        }
+
+        o_ << INDENT2 << "if (jacobian__) {" << EOL;
+        generate_initialize_array2(var_type,read_type,read_args,name,dims,true);
+        o_ << INDENT2 << "} else {" << EOL;
+        generate_initialize_array2(var_type,read_type,read_args,name,dims,false);
+        o_ << INDENT2 << "}";
+        o_ << EOL2;
       }
     };
 
@@ -1415,10 +1432,16 @@ namespace stan {
       o << INDENT << "var log_prob(vector<var>& params_r__," << EOL;
       o << INDENT << "             vector<int>& params_i__," << EOL;
       o << INDENT << "             std::ostream* pstream__ = 0) {" << EOL;
-      o << INDENT << "  return log_prob_poly<true,var>(params_r__,params_i__,pstream__);" << EOL;
+      o << INDENT << "  return log_prob_poly<true,true,var>(params_r__,params_i__,pstream__);" << EOL;
       o << INDENT << "}" << EOL;
       o << EOL;
-      o << INDENT << "template <bool propto__, typename T__>" << EOL;
+      o << INDENT << "var log_prob_no_jacobian(vector<var>& params_r__," << EOL;
+      o << INDENT << "                         vector<int>& params_i__," << EOL;
+      o << INDENT << "                         std::ostream* pstream__ = 0) {" << EOL;
+      o << INDENT << "  return log_prob_poly<true,false,var>(params_r__,params_i__,pstream__);" << EOL;
+      o << INDENT << "}" << EOL;
+      o << EOL;
+      o << INDENT << "template <bool propto__, bool jacobian__, typename T__>" << EOL;
       o << INDENT << "T__ log_prob_poly(vector<T__>& params_r__," << EOL;
       o << INDENT << "                  vector<int>& params_i__," << EOL;
       o << INDENT << "                  std::ostream* pstream__ = 0) {" << EOL2;
