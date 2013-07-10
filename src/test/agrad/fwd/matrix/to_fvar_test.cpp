@@ -2,6 +2,7 @@
 #include <stan/agrad/fvar.hpp>
 #include <gtest/gtest.h>
 #include <stan/agrad/var.hpp>
+#include <test/agrad/util.hpp>
 
 TEST(AgradFwdMatrixToFvar,fd_scalar) {
   using stan::agrad::fvar;

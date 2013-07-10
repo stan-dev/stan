@@ -2,6 +2,7 @@
 #include <gtest/gtest.h>
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <stan/agrad/var.hpp>
+#include <test/agrad/util.hpp>
 
 TEST(AgradFwdMatrixRows,fd_vector) {
   using stan::agrad::vector_fd;

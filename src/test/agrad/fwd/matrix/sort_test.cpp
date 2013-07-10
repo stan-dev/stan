@@ -8,6 +8,7 @@
 #include <stan/agrad/fvar.hpp>
 #include <stan/agrad/var.hpp>
 #include <stan/agrad/fwd/fvar.hpp>
+#include <test/agrad/util.hpp>
 
 typedef stan::agrad::fvar<double> AVAR;
 typedef std::vector<AVAR> AVEC;

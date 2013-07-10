@@ -4,6 +4,7 @@
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <stan/agrad/fvar.hpp>
 #include <stan/agrad/var.hpp>
+#include <test/agrad/util.hpp>
 
 TEST(AgradFwdMatrixVariance, fd_vector) {
   using stan::math::variance;

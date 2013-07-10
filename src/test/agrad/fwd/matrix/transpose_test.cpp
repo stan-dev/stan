@@ -3,6 +3,7 @@
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <stan/agrad/var.hpp>
+#include <test/agrad/util.hpp>
 
 TEST(AgradFwdMatrixTranspose,fd_matrix) {
   using stan::math::matrix_d;

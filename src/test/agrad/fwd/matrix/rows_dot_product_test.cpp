@@ -2,6 +2,7 @@
 #include <gtest/gtest.h>
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <stan/agrad/var.hpp>
+#include <test/agrad/util.hpp>
 
 TEST(AgradFwdMatrixRowsDotProduct,fd_vector_vector) {
   using stan::math::vector_d;

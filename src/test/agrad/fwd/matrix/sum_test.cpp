@@ -5,6 +5,7 @@
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/agrad/var.hpp>
+#include <test/agrad/util.hpp>
 
 using stan::agrad::fvar;
 using stan::agrad::var;

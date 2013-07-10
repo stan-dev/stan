@@ -3,6 +3,7 @@
 #include <stan/agrad/fvar.hpp>
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <stan/agrad/var.hpp>
+#include <test/agrad/util.hpp>
 
 TEST(AgradFwdMatrixRow,fd_v) {
   using stan::math::row;

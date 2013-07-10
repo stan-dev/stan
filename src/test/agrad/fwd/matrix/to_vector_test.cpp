@@ -3,6 +3,7 @@
 #include <stan/agrad/fvar.hpp>
 #include <stan/agrad/var.hpp>
 #include <gtest/gtest.h>
+#include <test/agrad/util.hpp>
 
 TEST(AgradFwdMatrixToVector, fd_vector) {
   using stan::math::to_vector;

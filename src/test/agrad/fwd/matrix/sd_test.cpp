@@ -8,6 +8,7 @@
 #include <stan/agrad/fwd/operator_division.hpp>
 #include <stan/agrad/fwd/operator_subtraction.hpp>
 #include <stan/agrad/var.hpp>
+#include <test/agrad/util.hpp>
 
 TEST(AgradFwdMatrixSD, fd_vector) {
   using stan::math::sd;
