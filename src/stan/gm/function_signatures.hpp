@@ -472,6 +472,17 @@ add("rank",INT_T,expr_type(INT_T,1),INT_T);
 add("rank",INT_T,expr_type(DOUBLE_T,1),INT_T);
 add("rank",INT_T,VECTOR_T,INT_T);
 add("rank",INT_T,ROW_VECTOR_T,INT_T);
+for (size_t i = 0; i < vector_types.size(); ++i)
+  for (size_t j = 0; j < vector_types.size(); ++j)
+    add("rayleigh_log",
+        DOUBLE_T, // result
+        vector_types[i], vector_types[j]); // args
+for (size_t i = 0; i < vector_types.size(); ++i)
+  for (size_t j = 0; j < vector_types.size(); ++j)
+    add("rayleigh_cdf",
+        DOUBLE_T, // result
+        vector_types[i], vector_types[j]); // args
+add_unary("rayleigh_rng");
 for (size_t i = 0; i < base_types.size(); ++i) {
   add("rep_array",expr_type(base_types[i],1), base_types[i], INT_T);
   add("rep_array",expr_type(base_types[i],2), base_types[i], INT_T,INT_T);
