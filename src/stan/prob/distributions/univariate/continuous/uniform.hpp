@@ -247,15 +247,18 @@ namespace stan {
       VectorView<const T_high> beta_vec(beta);
       size_t N = max_size(y, alpha, beta);
 
+      agrad::OperandsAndPartials<T_y,T_low,T_high> 
+        operands_and_partials(y,alpha,beta);
+
       for (size_t n = 0; n < N; n++) {
         const double y_dbl = value_of(y_vec[n]);
         if (y_dbl < value_of(alpha_vec[n]) 
             || y_dbl > value_of(beta_vec[n]))
           return stan::math::negative_infinity();
+        if (y_dbl == value_of(beta_vec[n]))
+          return operands_and_partials.to_var(0.0);
       }
-   
-      agrad::OperandsAndPartials<T_y,T_low,T_high> 
-        operands_and_partials(y,alpha,beta);
+
       for (size_t n = 0; n < N; n++) {
         const double y_dbl = value_of(y_vec[n]);
         const double alpha_dbl = value_of(alpha_vec[n]);

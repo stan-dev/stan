@@ -1957,7 +1957,7 @@ public:
         <T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>
         (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
       EXPECT_FLOAT_EQ(0.0, cdf_log_at_upper_bound.val())
-        << "cdf_log evaluated at upper bound should equal 1";
+        << "cdf_log evaluated at upper bound should equal 0";
     }
   }
 
