@@ -96,3 +96,33 @@ TEST(AgradFwdMatrixRepRowVector,ffd_rowvector_exception) {
 
   EXPECT_THROW(rep_row_vector(a,-2), std::domain_error);
 }
+TEST(AgradFwdMatrixRepRowVector,ffv_rowvector) {
+  using stan::math::rep_row_vector;
+  using stan::agrad::row_vector_ffv;
+  using stan::agrad::fvar;
+  fvar<fvar<var> > a;
+  a.val_ = 3.0;
+  a.d_ = 2.0;
+  row_vector_ffv output;
+  output = rep_row_vector(a, 4);
+
+  EXPECT_EQ(3,output(0).val_.val().val());
+  EXPECT_EQ(3,output(1).val_.val().val());
+  EXPECT_EQ(3,output(2).val_.val().val());
+  EXPECT_EQ(3,output(3).val_.val().val());
+  EXPECT_EQ(2,output(0).d_.val().val());
+  EXPECT_EQ(2,output(1).d_.val().val());
+  EXPECT_EQ(2,output(2).d_.val().val());
+  EXPECT_EQ(2,output(3).d_.val().val());
+}
+
+TEST(AgradFwdMatrixRepRowVector,ffv_rowvector_exception) {
+  using stan::math::rep_row_vector;
+  using stan::agrad::row_vector_ffv;
+  using stan::agrad::fvar;
+  fvar<fvar<var> > a;
+  a.val_ = 3.0;
+  a.d_ = 2.0;
+
+  EXPECT_THROW(rep_row_vector(a,-2), std::domain_error);
+}

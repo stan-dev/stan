@@ -106,3 +106,38 @@ TEST(AgradFwdMatrixRows,ffd_matrix) {
   m.resize(0,2);
   EXPECT_EQ(0U, rows(m));
 }
+
+TEST(AgradFwdMatrixRows,ffv_vector) {
+  using stan::agrad::vector_ffv;
+  using stan::agrad::row_vector_ffv;
+  using stan::math::rows;
+
+  vector_ffv v(5);
+  v << 0, 1, 2, 3, 4;
+  EXPECT_EQ(5U, rows(v));
+  
+  v.resize(0);
+  EXPECT_EQ(0U, rows(v));
+}
+TEST(AgradFwdMatrixRows,ffv_rowvector) {
+  using stan::agrad::row_vector_ffv;
+  using stan::math::rows;
+
+  row_vector_ffv rv(5);
+  rv << 0, 1, 2, 3, 4;
+  EXPECT_EQ(1U, rows(rv));
+
+  rv.resize(0);
+  EXPECT_EQ(1U, rows(rv));
+}
+TEST(AgradFwdMatrixRows,ffv_matrix) {
+  using stan::agrad::matrix_ffv;
+  using stan::math::rows;
+
+  matrix_ffv m(2,3);
+  m << 0, 1, 2, 3, 4, 5;
+  EXPECT_EQ(2U, rows(m));
+  
+  m.resize(0,2);
+  EXPECT_EQ(0U, rows(m));
+}
