@@ -279,4 +279,3 @@ TEST(AgradFwdOperatorAddition,Double_FvarFvarVar_2ndDeriv) {
   z.d_.val_.grad(p,g);
   EXPECT_FLOAT_EQ(0, g[0]);
 }
-AgradFwd
