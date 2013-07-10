@@ -324,6 +324,8 @@ namespace stan {
         if (y_dbl < value_of(alpha_vec[n]) 
             || y_dbl > value_of(beta_vec[n]))
           return 0.0;
+        if (y_dbl == value_of(beta_vec[n]))
+          return LOG_ZERO;
       }
    
       agrad::OperandsAndPartials<T_y,T_low,T_high> 
