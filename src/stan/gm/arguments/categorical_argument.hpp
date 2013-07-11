@@ -33,6 +33,7 @@ namespace stan {
       }
       
       void print_help(std::ostream* s, const int depth, const bool recurse) {
+        
         if (!s) 
           return;
         
@@ -42,8 +43,6 @@ namespace stan {
         *s << std::setiosflags(std::ios_base::left) << std::setw(help_width)
            << (indent + _name);
         *s << _short_description << std::endl;
-        
-        /*
         
         *s << indent << _name << std::endl;
         *s << indent << subindent << _description << std::endl;
@@ -61,7 +60,7 @@ namespace stan {
               (*it)->print_help(s, depth + 1, true);
           }
         }
-        */
+         
       }
       
       bool parse_args(std::vector<std::string>& args, std::ostream* out,
