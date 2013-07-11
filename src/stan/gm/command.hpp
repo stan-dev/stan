@@ -266,14 +266,14 @@ namespace stan {
       //////////////////////////////////////////////////
       
       unsigned int random_seed = 0;
-      int_argument* random_arg = dynamic_cast<int_argument*>(parser.arg("random")->arg("seed"));
+      u_int_argument* random_arg = dynamic_cast<u_int_argument*>(parser.arg("random")->arg("seed"));
       
       if (random_arg->is_default()) {
         random_seed = (boost::posix_time::microsec_clock::universal_time() -
                        boost::posix_time::ptime(boost::posix_time::min_date_time))
                       .total_milliseconds();
       }
-      
+  
       random_arg->set_value(random_seed);
       
       typedef boost::ecuyer1988 rng_t; // (2**50 = 1T samples, 1000 chains)

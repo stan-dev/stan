@@ -99,6 +99,7 @@ namespace stan {
     
     typedef singleton_argument<double> real_argument;
     typedef singleton_argument<int> int_argument;
+    typedef singleton_argument<unsigned int> u_int_argument;
     typedef singleton_argument<bool> bool_argument;
     typedef singleton_argument<std::string> string_argument;
     
