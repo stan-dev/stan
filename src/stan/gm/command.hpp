@@ -249,7 +249,7 @@ namespace stan {
       valid_arguments.push_back(new arg_output());
       valid_arguments.push_back(new arg_method());
       
-      argument_parser parser(valid_arguments);
+      argument_parser parser(valid_arguments, Model::model_name());
       
       if (!parser.parse_args(argc, argv, &std::cout, &std::cout)) {
         std::cout << "Failed to parse arguments, terminating Stan" << std::endl;

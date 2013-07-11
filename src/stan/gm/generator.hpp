@@ -3559,7 +3559,7 @@ namespace stan {
 
     void generate_model_name_method(const std::string& model_name,
                                     std::ostream& out) {
-      out << INDENT << "std::string model_name() {" << EOL
+      out << INDENT << "static std::string model_name() {" << EOL
           << INDENT2 << "return \"" << model_name << "\";" << EOL
           << INDENT << "}" << EOL2;
     }

@@ -15,8 +15,8 @@ namespace stan {
       
     public:
       
-      argument_parser(std::vector<argument*>& valid_args)
-        : _arguments(valid_args), _help_flag(false) {}
+      argument_parser(std::vector<argument*>& valid_args, std::string name)
+        : _arguments(valid_args), _model_name(name), _help_flag(false) {}
       
       bool parse_args(int argc,
                       const char* argv[],
@@ -75,9 +75,9 @@ namespace stan {
             print_help(out, false);
             
             *out << std::endl;
-            *out << "See 'model' <arg1> [ help | help-all ]"
+            *out << "See '" << _model_name << "' <arg1> [ help | help-all ]"
                  << " for argument specific information" << std::endl;
-            *out << " or 'model' help-all for all argument information" << std::endl;
+            *out << " or '" << _model_name << "' help-all for all argument information" << std::endl;
             
             _help_flag |= true;
             
@@ -133,6 +133,8 @@ namespace stan {
       // We can also check for, and warn the user of, deprecated arguments
       //std::vector<argument*> deprecated_arguments;
       // check_arg_conflict // Ensure non-zero intersection of valid and deprecated argumentss
+      
+      std::string _model_name;
       
       bool _help_flag;
       
