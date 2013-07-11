@@ -34,13 +34,12 @@ namespace stan {
            << (indent + _name + "=<>");
         *s << _short_description << std::endl;
           
-        /*
         *s << indent << _name << "=<>" << std::endl;
         *s << indent << subindent << _description << std::endl;
         *s << indent << subindent << "Valid values:" << print_valid() << std::endl;
         *s << indent << subindent << "Defaults to " << _default << std::endl;
         *s << std::endl;
-        */
+        
       }
       
       virtual std::string print_value() = 0;

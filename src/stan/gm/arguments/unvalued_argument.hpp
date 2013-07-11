@@ -29,12 +29,10 @@ namespace stan {
            << (indent + _name);
         *s << _short_description << std::endl;
 
+        *s << indent << _name << std::endl;
+        *s << indent << subindent << _description << std::endl;
+        *s << std::endl;
         
-        /*
-         *s << indent << _name << std::endl;
-         *s << indent << subindent << _description << std::endl;
-         *s << std::endl;
-         */
       }
       
       bool parse_args(std::vector<std::string>& args, std::ostream* out,
