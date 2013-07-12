@@ -6,6 +6,7 @@
 #include <fstream>
 
 #include <stan/gm/arguments/argument.hpp>
+#include <stan/gm/arguments/arg_method.hpp>
 
 namespace stan {
   
@@ -16,14 +17,30 @@ namespace stan {
     public:
       
       argument_parser(std::vector<argument*>& valid_args, std::string name)
-        : _arguments(valid_args), _model_name(name), _help_flag(false) {}
+        : _arguments(valid_args),
+          _model_name(name),
+          _help_flag(false),
+          _method_flag(false)
+      {
+        _arguments.insert(_arguments.begin(), new arg_method());
+      }
       
       bool parse_args(int argc,
                       const char* argv[],
                       std::ostream* out = 0,
                       std::ostream* err = 0) {
-        if (argc == 1) 
-          return true;
+        
+        if (argc == 1) {
+        
+          print_help_header(out);
+          print_help(out, false);
+          print_help_footer(out);
+          
+          _help_flag |= true;
+          
+          return 0;
+          
+        }
         
         std::vector<std::string> args;
         
@@ -38,14 +55,31 @@ namespace stan {
         std::vector<argument*> unset_args = _arguments;
         
         while(good_arg) {
-          if (args.size() == 0) 
-            return valid_arg;
+          
+          if (args.size() == 0)
+            break;
           
           good_arg = false;
           std::string cat_name = args.back();
+          
+          // Check for method arguments entered without the method= prefix
+          if (!_method_flag) {
+
+            list_argument* method = dynamic_cast<list_argument*>(_arguments.front());
+            
+            if (method->valid_value(cat_name)) {
+              cat_name = "method=" + cat_name;
+              args.back() = cat_name;
+            }
+            
+          }
+
           std::string val_name;
           std::string val;
           argument::split_arg(cat_name, val_name, val);
+          
+          if (val_name == "method")
+            _method_flag = true;
           
           std::vector<argument*>::iterator arg_it;
           
@@ -57,6 +91,7 @@ namespace stan {
               break;
             }
             else if ( (*arg_it)->name() == val_name) {
+              
               valid_arg &= (*arg_it)->parse_args(args, out, err, _help_flag);
               good_arg = true;
               break;
@@ -67,33 +102,39 @@ namespace stan {
           if (good_arg) unset_args.erase(arg_it);
           
           if (cat_name == "help") {
-            *out << "Usage: model <arg1> <subarg1_1> ... <subarg1_m>"
-                 << " ... <arg_n> <subarg_n_1> ... <subarg_n_m>"
-                 << std::endl << std::endl;
-            *out << "Valid arguments to Stan:" << std::endl << std::endl;
-            
+
+            print_help_header(out);
             print_help(out, false);
-            
-            *out << std::endl;
-            *out << "See '" << _model_name << "' <arg1> [ help | help-all ]"
-                 << " for argument specific information" << std::endl;
-            *out << " or '" << _model_name << "' help-all for all argument information" << std::endl;
-            
+            print_help_footer(out);
+
             _help_flag |= true;
             
             args.clear();
-            return 0;
+            
+            return true;
+            
           } else if (cat_name == "help-all") {
+            
             print_help(out, true);
             _help_flag |= true;
             args.clear();
-            return 0;
+            
+            return true;
+            
           }
           
           if (!good_arg && err) 
             *err << cat_name << " is either mistyped or misplaced." << std::endl;
+          
         }
-        return valid_arg && good_arg;
+        
+        if (_help_flag)
+          return true;
+        
+        if (!_method_flag)
+          *err << "A method must be specified!" << std::endl;
+        
+        return valid_arg && good_arg && _method_flag;
       }
       
       void print(std::ostream* s, const char prefix = '\0') {
@@ -106,14 +147,37 @@ namespace stan {
         
       }
       
+      void print_help_header(std::ostream* s) {
+        if (!s)
+          return;
+        
+        *s << "Usage: model <arg1> <subarg1_1> ... <subarg1_m>"
+           << " ... <arg_n> <subarg_n_1> ... <subarg_n_m>"
+           << std::endl << std::endl;
+        *s << "Valid arguments to Stan:" << std::endl << std::endl;
+        
+      }
+      
       void print_help(std::ostream* s, bool recurse) {
         if (!s) 
           return;
+        
         for (int i = 0; i < _arguments.size(); ++i) {
           _arguments.at(i)->print_help(s, 1, recurse);
         }
       }
     
+      void print_help_footer(std::ostream* s) {
+        if (!s)
+          return;
+        
+        *s << std::endl;
+        *s << "See '" << _model_name << "' <arg1> [ help | help-all ]"
+           << " for argument specific information" << std::endl;
+        *s << " or '" << _model_name << "' help-all for all argument information" << std::endl;
+        
+      }
+      
       argument* arg(std::string name) {
         for (std::vector<argument*>::iterator it = _arguments.begin();
              it != _arguments.end(); ++it)
@@ -137,6 +201,7 @@ namespace stan {
       std::string _model_name;
       
       bool _help_flag;
+      bool _method_flag;
       
     };
     

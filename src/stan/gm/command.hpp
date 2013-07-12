@@ -20,7 +20,6 @@
 #include <stan/gm/arguments/arg_init.hpp>
 #include <stan/gm/arguments/arg_test_gradient.hpp>
 #include <stan/gm/arguments/arg_random.hpp>
-#include <stan/gm/arguments/arg_method.hpp>
 #include <stan/gm/arguments/arg_output.hpp>
 
 #include <stan/mcmc/hmc/static/adapt_unit_e_static_hmc.hpp>
@@ -247,7 +246,6 @@ namespace stan {
       valid_arguments.push_back(new arg_test_gradient());
       valid_arguments.push_back(new arg_random());
       valid_arguments.push_back(new arg_output());
-      valid_arguments.push_back(new arg_method());
       
       argument_parser parser(valid_arguments, Model::model_name());
       
@@ -256,7 +254,8 @@ namespace stan {
         return 0;
       }
       
-      if (parser.help_printed()) return 0;
+      if (parser.help_printed())
+        return 0;
       
       // Identification
       unsigned int id = dynamic_cast<int_argument*>(parser.arg("id"))->value();
@@ -272,9 +271,10 @@ namespace stan {
         random_seed = (boost::posix_time::microsec_clock::universal_time() -
                        boost::posix_time::ptime(boost::posix_time::min_date_time))
                       .total_milliseconds();
+        
+        random_arg->set_value(random_seed);
+        
       }
-  
-      random_arg->set_value(random_seed);
       
       typedef boost::ecuyer1988 rng_t; // (2**50 = 1T samples, 1000 chains)
       rng_t base_rng(random_seed);
@@ -504,8 +504,6 @@ namespace stan {
       //////////////////////////////////////////////////
       //           Optimization Algorithms            //
       //////////////////////////////////////////////////
-      
-      std::cout << parser.arg("method")->arg("optimize") << std::endl;
       
       if (parser.arg("method")->arg("optimize")) {
         

@@ -92,7 +92,7 @@ namespace stan {
           std::string val_name;
           std::string val;
           split_arg(cat_name, val_name, val);
-          
+
           for (std::vector<argument*>::iterator it = _subarguments.begin();
                it != _subarguments.end(); ++it) {
             
@@ -103,12 +103,18 @@ namespace stan {
             } else if ( (*it)->name() == val_name ) {
               valid_arg &= (*it)->parse_args(args, out, err, help_flag);
               good_arg = true;
-            }             
+            }
           }
+
         }
         
-        return valid_arg & good_arg;
+        return valid_arg;
+        
       };
+      
+      std::vector<argument*>& subarguments() {
+        return _subarguments;
+      }
       
       argument* arg(const std::string name) {
         for (std::vector<argument*>::iterator it = _subarguments.begin();

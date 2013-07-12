@@ -90,6 +90,14 @@ namespace stan {
         return true;
         
       };
+
+      bool valid_value(std::string name) {
+        for (std::vector<argument*>::iterator it = _values.begin();
+             it != _values.end(); ++it)
+          if (name == (*it)->name())
+            return true;
+        return false;
+      }
       
       argument* arg(std::string name) {
         if(name == _values.at(_cursor)->name())
