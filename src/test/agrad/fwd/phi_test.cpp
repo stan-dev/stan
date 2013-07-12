@@ -138,3 +138,19 @@ TEST(AgradFwdPhi, FvarFvarVar_2ndDeriv) {
   b.d_.val_.grad(q,r);
   EXPECT_FLOAT_EQ(-exp(stan::prob::normal_log<false>(1.0,0.0,1.0)), r[0]);
 }
+TEST(AgradFwdPhi, FvarFvarVar_3rdDeriv) {
+  using stan::agrad::fvar;
+  using stan::math::Phi;
+  using stan::agrad::var;
+
+  fvar<fvar<var> > x;
+  x.val_.val_ = 1.0;
+  x.val_.d_ = 1.0;
+
+  fvar<fvar<var> > a = Phi(x);
+
+  AVEC p = createAVEC(x.val_.val_);
+  VEC g;
+  a.d_.d_.grad(p,g);
+  EXPECT_FLOAT_EQ(0, g[0]);
+}

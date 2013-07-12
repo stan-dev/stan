@@ -148,3 +148,19 @@ TEST(AgradFwdRound, FvarFvarVar_2ndDeriv) {
   b.d_.val_.grad(q,r);
   EXPECT_FLOAT_EQ(0, r[0]);
 }
+TEST(AgradFwdRound, FvarFvarVar_3rdDeriv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using boost::math::round;
+
+  fvar<fvar<var> > y;
+  y.val_.val_ = 1.5;
+  y.d_.val_ = 2.0;
+
+  fvar<fvar<var> > b = round(y);
+
+  AVEC q = createAVEC(y.val_.val_);
+  VEC r;
+  b.d_.d_.grad(q,r);
+  EXPECT_FLOAT_EQ(0, r[0]);
+}

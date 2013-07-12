@@ -148,4 +148,20 @@ TEST(AgradFwdSinh, FvarFvarVar_2ndDeriv) {
   b.d_.val_.grad(q,r);
   EXPECT_FLOAT_EQ(2.0 * sinh(1.5), r[0]);
 }
+TEST(AgradFwdSinh, FvarFvarVar_3rdDeriv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using std::sinh;
+  using std::cosh;
 
+  fvar<fvar<var> > x;
+  x.val_.val_ = 1.5;
+  x.val_.d_ = 2.0;
+
+  fvar<fvar<var> > a = sinh(x);
+
+  AVEC p = createAVEC(x.val_.val_);
+  VEC g;
+  a.d_.d_.grad(p,g);
+  EXPECT_FLOAT_EQ(0, g[0]);
+}

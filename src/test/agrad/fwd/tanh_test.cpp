@@ -143,4 +143,20 @@ TEST(AgradFwdTanh, FvarFvarVar_2ndDeriv) {
   b.d_.val_.grad(q,r);
   EXPECT_FLOAT_EQ(2.0 * -2.0 * tanh(1.5) / (cosh(1.5) * cosh(1.5)), r[0]);
 }
+TEST(AgradFwdTanh, FvarFvarVar_3rdDeriv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using std::tanh;
+  using std::cosh;
 
+  fvar<fvar<var> > x;
+  x.val_.val_ = 1.5;
+  x.val_.d_ = 2.0;
+
+  fvar<fvar<var> > a = tanh(x);
+
+  AVEC p = createAVEC(x.val_.val_);
+  VEC g;
+  a.d_.d_.grad(p,g);
+  EXPECT_FLOAT_EQ(0, g[0]);
+}

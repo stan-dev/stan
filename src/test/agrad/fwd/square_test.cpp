@@ -159,3 +159,19 @@ TEST(AgradFwdSquare, FvarFvarVar_2ndDeriv) {
   b.d_.val_.grad(q,r);
   EXPECT_FLOAT_EQ(2.0 * 2.0, r[0]);
 }
+TEST(AgradFwdSquare, FvarFvarVar_3rdDeriv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using stan::math::square;
+
+  fvar<fvar<var> > x;
+  x.val_.val_ = 1.5;
+  x.val_.d_ = 2.0;
+
+  fvar<fvar<var> > a = square(x);
+
+  AVEC p = createAVEC(x.val_.val_);
+  VEC g;
+  a.d_.d_.grad(p,g);
+  EXPECT_FLOAT_EQ(0, g[0]);
+}

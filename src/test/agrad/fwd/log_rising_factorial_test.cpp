@@ -303,3 +303,61 @@ TEST(AgradFwdLogRisingFactorial,Double_FvarFvarVar_2ndDeriv) {
   a.d_.val_.grad(p,g);
   EXPECT_FLOAT_EQ(0.15354517, g[0]);
 }
+TEST(AgradFwdLogRisingFactorial,FvarFvarVar_FvarFvarVar_3rdDeriv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using stan::math::log_rising_factorial;
+  using boost::math::digamma;
+
+  fvar<fvar<var> > x;
+  x.val_.val_ = 4.0;
+  x.val_.d_ = 1.0;
+
+  fvar<fvar<var> > y;
+  y.val_.val_ = 3.0;
+  y.d_.val_ = 1.0;
+
+  fvar<fvar<var> > a = log_rising_factorial(x,y);
+
+  AVEC p = createAVEC(x.val_.val_,y.val_.val_);
+  VEC g;
+  a.d_.d_.grad(p,g);
+  EXPECT_FLOAT_EQ(-0.023530472, g[0]);
+  EXPECT_FLOAT_EQ(-0.023530472, g[1]);
+}
+TEST(AgradFwdLogRisingFactorial,FvarFvarVar_Double_3rdDeriv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using stan::math::log_rising_factorial;
+  using boost::math::digamma;
+
+  fvar<fvar<var> > x;
+  x.val_.val_ = 4.0;
+  x.val_.d_ = 1.0;
+  double y(3.0);
+
+  fvar<fvar<var> > a = log_rising_factorial(x,y);
+
+  AVEC p = createAVEC(x.val_.val_);
+  VEC g;
+  a.d_.d_.grad(p,g);
+  EXPECT_FLOAT_EQ(0, g[0]);
+}
+TEST(AgradFwdLogRisingFactorial,Double_FvarFvarVar_3rdDeriv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using stan::math::log_rising_factorial;
+  using boost::math::digamma;
+
+  double x(4.0);
+  fvar<fvar<var> > y;
+  y.val_.val_ = 3.0;
+  y.d_.val_ = 1.0;
+
+  fvar<fvar<var> > a = log_rising_factorial(x,y);
+
+  AVEC p = createAVEC(y.val_.val_);
+  VEC g;
+  a.d_.d_.grad(p,g);
+  EXPECT_FLOAT_EQ(0, g[0]);
+}
