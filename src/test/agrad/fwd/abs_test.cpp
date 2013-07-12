@@ -109,13 +109,24 @@ TEST(AgradFwdAbs,FvarFvarVar_2ndDeriv) {
 
   fvar<fvar<var> > b = abs(y);
 
-  EXPECT_FLOAT_EQ(4.0, b.val_.val_.val());
-  EXPECT_FLOAT_EQ(1.0, b.val_.d_.val());
-  EXPECT_FLOAT_EQ(0.0, b.d_.val_.val());
-  EXPECT_FLOAT_EQ(0.0, b.d_.d_.val());
-
   AVEC z = createAVEC(y.val_.val_);
   VEC h;
   b.val_.d_.grad(z,h);
   EXPECT_FLOAT_EQ(0.0, h[0]);
 }
+TEST(AgradFwdAbs,FvarFvarVar_3rdDeriv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using std::abs;
+
+  fvar<fvar<var> > y;
+  y.val_ = fvar<var>(4.0,1.0);
+
+  fvar<fvar<var> > b = abs(y);
+
+  AVEC z = createAVEC(y.val_.val_);
+  VEC h;
+  b.d_.d_.grad(z,h);
+  EXPECT_FLOAT_EQ(0.0, h[0]);
+}
+

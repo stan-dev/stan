@@ -143,11 +143,6 @@ TEST(AgradFwdAcos,FvarFvarVar_2ndDeriv) {
 
   fvar<fvar<var> > b = acos(z);
 
-  EXPECT_FLOAT_EQ(acos(0.5), b.val_.val_.val());
-  EXPECT_FLOAT_EQ(-2.0 / sqrt(1.0 - 0.5 * 0.5), b.val_.d_.val());
-  EXPECT_FLOAT_EQ(0, b.d_.val_.val());
-  EXPECT_FLOAT_EQ(0, b.d_.d_.val());
-
   AVEC y = createAVEC(z.val_.val_);
   VEC g;
   b.val_.d_.grad(y,g);
@@ -158,13 +153,26 @@ TEST(AgradFwdAcos,FvarFvarVar_2ndDeriv) {
   w.d_.val_ = 2.0;
 
   fvar<fvar<var> > c = acos(w);
-  EXPECT_FLOAT_EQ(acos(0.5), c.val_.val_.val());
-  EXPECT_FLOAT_EQ(-2.0 / sqrt(1.0 - 0.5 * 0.5), c.d_.val_.val());
-  EXPECT_FLOAT_EQ(0, c.val_.d_.val());
-  EXPECT_FLOAT_EQ(0, c.d_.d_.val());
 
   AVEC p = createAVEC(w.val_.val_);
   VEC q;
   c.d_.val_.grad(p,q);
   EXPECT_FLOAT_EQ(-0.5 * 2.0 / (sqrt(1.0 - 0.5 * 0.5) * 0.75), q[0]);
+}
+
+TEST(AgradFwdAcos,FvarFvarVar_3rdDeriv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using std::acos;
+
+  fvar<fvar<var> > z;
+  z.val_.val_ = 0.5;
+  z.val_.d_ = 2.0;
+
+  fvar<fvar<var> > b = acos(z);
+
+  AVEC y = createAVEC(z.val_.val_);
+  VEC g;
+  b.d_.d_.grad(y,g);
+  EXPECT_FLOAT_EQ(0, g[0]);
 }
