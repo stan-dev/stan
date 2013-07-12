@@ -301,3 +301,58 @@ TEST(AgradFwdFmod,Double_FvarFvarVar_2ndDeriv) {
   a.d_.val_.grad(q,r);
   EXPECT_FLOAT_EQ(0, r[0]);
 }
+TEST(AgradFwdFmod,FvarFvarVar_FvarFvarVar_3rdDeriv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using std::fmod;
+
+  fvar<fvar<var> > x;
+  x.val_.val_ = 3.0;
+  x.val_.d_ = 1.0;
+  fvar<fvar<var> > y;
+  y.val_.val_ = 6.0;
+  y.d_.val_ = 1.0;
+
+  fvar<fvar<var> > a = fmod(x,y);
+
+  AVEC q = createAVEC(x.val_.val_,y.val_.val_);
+  VEC r;
+  a.d_.d_.grad(q,r);
+  EXPECT_FLOAT_EQ(0, r[0]);
+  EXPECT_FLOAT_EQ(0, r[1]);
+}
+TEST(AgradFwdFmod,FvarFvarVar_Double_3rdDeriv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using std::fmod;
+
+  fvar<fvar<var> > x;
+  x.val_.val_ = 3.0;
+  x.val_.d_ = 1.0;
+
+  double y(6.0);
+
+  fvar<fvar<var> > a = fmod(x,y);
+
+  AVEC q = createAVEC(x.val_.val_);
+  VEC r;
+  a.d_.d_.grad(q,r);
+  EXPECT_FLOAT_EQ(0, r[0]);
+}
+TEST(AgradFwdFmod,Double_FvarFvarVar_3rdDeriv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using std::fmod;
+
+  double x(3.0);
+  fvar<fvar<var> > y;
+  y.val_.val_ = 6.0;
+  y.d_.val_ = 1.0;
+
+  fvar<fvar<var> > a = fmod(x,y);
+
+  AVEC q = createAVEC(y.val_.val_);
+  VEC r;
+  a.d_.d_.grad(q,r);
+  EXPECT_FLOAT_EQ(0, r[0]);
+}

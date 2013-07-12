@@ -175,3 +175,22 @@ TEST(AgradFwdErf,FvarFvarVar_2ndDeriv) {
   EXPECT_FLOAT_EQ(-2 * exp(-0.5 * 0.5) / 
                   sqrt(boost::math::constants::pi<double>()), r[0]);
 }
+TEST(AgradFwdErf,FvarFvarVar_3rdDeriv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using std::exp;
+  using std::sqrt;
+  using boost::math::erf;
+
+  fvar<fvar<var> > x;
+  x.val_.val_ = 0.5;
+  x.val_.d_ = 1.0;
+
+  fvar<fvar<var> > a = erf(x);
+
+  AVEC p = createAVEC(x.val_.val_);
+  VEC g;
+  a.d_.d_.grad(p,g);
+  EXPECT_FLOAT_EQ(0, g[0]);
+}
+

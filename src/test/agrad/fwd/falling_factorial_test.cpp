@@ -148,3 +148,24 @@ TEST(AgradFwdFallingFactorial,FvarFvarVar_2ndDeriv_y) {
   EXPECT_FLOAT_EQ(-2.2683904, g[0]);
   EXPECT_FLOAT_EQ(2.0470674, g[1]);
 }
+TEST(AgradFwdFallingFactorial,FvarFvarVar_3rdDeriv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using stan::math::falling_factorial;
+
+  fvar<fvar<var> > x;
+  x.val_.val_ = 4.0;
+  x.val_.d_ = 1.0;
+
+  fvar<fvar<var> > y;
+  y.val_.val_ = 4.0;
+  y.d_.val_ = 1.0;
+
+  fvar<fvar<var> > a = falling_factorial(x,y);
+
+  AVEC p = createAVEC(x.val_.val_,y.val_.val_);
+  VEC g;
+  a.d_.d_.grad(p,g);
+  EXPECT_FLOAT_EQ(-3.7498014, g[0]);
+  EXPECT_FLOAT_EQ(3.0831244, g[1]);
+}

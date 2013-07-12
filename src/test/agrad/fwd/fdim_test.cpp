@@ -351,3 +351,64 @@ TEST(AgradFwdFdim,Double_FvarFvarVar_2ndDeriv) {
   a.d_.val_.grad(p,g);
   EXPECT_FLOAT_EQ(0.0, g[0]);
 }
+
+TEST(AgradFwdFdim,FvarFvarVar_FvarFvarVar_3rdDeriv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using stan::math::fdim;
+  using std::floor;
+
+  fvar<fvar<var> > x;
+  x.val_.val_ = 2.5;
+  x.val_.d_ = 1.0;
+
+  fvar<fvar<var> > y;
+  y.val_.val_ = 1.5;
+  y.d_.val_ = 1.0;
+
+  fvar<fvar<var> > a = fdim(x,y);
+
+  AVEC p = createAVEC(y.val_.val_);
+  VEC g;
+  a.d_.d_.grad(p,g);
+  EXPECT_FLOAT_EQ(0.0, g[0]);
+}
+TEST(AgradFwdFdim,FvarFvarVar_double_3rdDeriv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using stan::math::fdim;
+  using std::floor;
+
+  fvar<fvar<var> > x;
+  x.val_.val_ = 2.5;
+  x.val_.d_ = 1.0;
+
+  double y(1.5);
+
+  fvar<fvar<var> > a = fdim(x,y);
+
+  AVEC p = createAVEC(x.val_.val_);
+  VEC g;
+  a.d_.d_.grad(p,g);
+  EXPECT_FLOAT_EQ(0.0, g[0]);
+}
+
+TEST(AgradFwdFdim,Double_FvarFvarVar_3rdDeriv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using stan::math::fdim;
+  using std::floor;
+
+  double x(2.5);
+
+  fvar<fvar<var> > y;
+  y.val_.val_ = 1.5;
+  y.d_.val_ = 1.0;
+
+  fvar<fvar<var> > a = fdim(x,y);
+
+  AVEC p = createAVEC(y.val_.val_);
+  VEC g;
+  a.d_.d_.grad(p,g);
+  EXPECT_FLOAT_EQ(0.0, g[0]);
+}
