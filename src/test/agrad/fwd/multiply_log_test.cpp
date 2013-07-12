@@ -326,3 +326,61 @@ TEST(AgradFwdMultiplyLog,Double_FvarFvarVar_2ndDeriv) {
   a.d_.val_.grad(p,g);
   EXPECT_FLOAT_EQ(-1.5 / 1.8 / 1.8 * 1.1, g[0]);
 }
+TEST(AgradFwdMultiplyLog,FvarFvarVar_FvarFvarVar_3rdDeriv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using std::log;
+  using stan::math::multiply_log;
+
+  fvar<fvar<var> > x;
+  x.val_.val_ = 1.5;
+  x.val_.d_ = 1.3;
+
+  fvar<fvar<var> > y;
+  y.val_.val_ = 1.8;
+  y.d_.val_ = 1.1;
+
+  fvar<fvar<var> > a = multiply_log(x,y);
+
+  AVEC p = createAVEC(x.val_.val_,y.val_.val_);
+  VEC g;
+  a.d_.d_.grad(p,g);
+  EXPECT_FLOAT_EQ(0, g[0]);
+  EXPECT_FLOAT_EQ(-0.44135803, g[1]);
+}
+TEST(AgradFwdMultiplyLog,FvarFvarVar_Double_3rdDeriv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using std::log;
+  using stan::math::multiply_log;
+
+  fvar<fvar<var> > x;
+  x.val_.val_ = 1.5;
+  x.val_.d_ = 1.3;
+  double y(1.8);
+
+  fvar<fvar<var> > a = multiply_log(x,y);
+
+  AVEC p = createAVEC(x.val_.val_);
+  VEC g;
+  a.d_.d_.grad(p,g);
+  EXPECT_FLOAT_EQ(0, g[0]);
+}
+TEST(AgradFwdMultiplyLog,Double_FvarFvarVar_3rdDeriv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using std::log;
+  using stan::math::multiply_log;
+
+  double x(1.5);
+  fvar<fvar<var> > y;
+  y.val_.val_ = 1.8;
+  y.d_.val_ = 1.1;
+
+  fvar<fvar<var> > a = multiply_log(x,y);
+
+  AVEC p = createAVEC(y.val_.val_);
+  VEC g;
+  a.d_.d_.grad(p,g);
+  EXPECT_FLOAT_EQ(0, g[0]);
+}

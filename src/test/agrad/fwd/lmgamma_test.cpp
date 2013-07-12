@@ -138,10 +138,10 @@ TEST(AgradFwdLmgamma,FvarFvarVar_3rdDeriv) {
   using stan::agrad::var;
 
   fvar<fvar<var> > x;
-  x.val_.val_ = 0.5;
+  x.val_.val_ = 3.2;
   x.val_.d_ = 1.0;
 
-  fvar<fvar<var> > a = lmgamma(x);
+  fvar<fvar<var> > a = stan::math::lmgamma(3,x);
 
   AVEC p = createAVEC(x.val_.val_);
   VEC g;
