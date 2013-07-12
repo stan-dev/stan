@@ -158,5 +158,20 @@ TEST(AgradFwdInvCLogLog,FvarFvarVar_2ndDeriv) {
   b.d_.val_.grad(q,r);
   EXPECT_FLOAT_EQ(exp(0.5 - exp(0.5)) * (1.0 - exp(0.5)), r[0]);
 }
+TEST(AgradFwdInvCLogLog,FvarFvarVar_3rdDeriv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using stan::math::inv_cloglog;
+  using std::exp;
 
+  fvar<fvar<var> > x;
+  x.val_.val_ = 0.5;
+  x.val_.d_ = 1.0;
 
+  fvar<fvar<var> > a = inv_cloglog(x);
+
+  AVEC p = createAVEC(x.val_.val_);
+  VEC g;
+  a.d_.d_.grad(p,g);
+  EXPECT_FLOAT_EQ(0, g[0]);
+}

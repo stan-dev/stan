@@ -239,7 +239,7 @@ TEST(AgradFwdHypot,FvarFvarVar_FvarFvarVar_2ndDeriv_x) {
   a.val_.d_.grad(p,g);
 
   EXPECT_FLOAT_EQ(36.0 / hypot(3.0,6.0) / (9.0 + 36.0),g[0]);
-  EXPECT_FLOAT_EQ(-0.059628479, g[1]);
+  EXPECT_FLOAT_EQ(-2.0/15.0/std::sqrt(5.0), g[1]);
 }
 TEST(AgradFwdHypot,FvarFvarVar_FvarFvarVar_2ndDeriv_y) {
   using stan::agrad::fvar;
@@ -258,7 +258,7 @@ TEST(AgradFwdHypot,FvarFvarVar_FvarFvarVar_2ndDeriv_y) {
   AVEC p = createAVEC(x.val_.val_,y.val_.val_);
   VEC g;
   a.d_.val_.grad(p,g);
-  EXPECT_FLOAT_EQ(-0.059628479, g[0]);
+  EXPECT_FLOAT_EQ(-2.0/15.0/std::sqrt(5.0), g[0]);
   EXPECT_FLOAT_EQ((3.0 * 3.0) / hypot(3.0,6.0) / (9.0 + 36.0),g[1]);
 }
 TEST(AgradFwdHypot,FvarFvarVar_Double_2ndDeriv) {
@@ -301,4 +301,60 @@ TEST(AgradFwdHypot,Double_FvarFvarVar_2ndDeriv) {
   VEC g;
   a.d_.val_.grad(p,g);
   EXPECT_FLOAT_EQ((3.0 * 3.0) / hypot(3.0,6.0) / (9.0 + 36.0),g[0]);
+}
+TEST(AgradFwdHypot,FvarFvarVar_FvarFvarVar_3rdDeriv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using boost::math::hypot;
+
+  fvar<fvar<var> > x;
+  x.val_.val_ = 3.0;
+  x.val_.d_ = 1.0;
+  fvar<fvar<var> > y;
+  y.val_.val_ = 6.0;
+  y.d_.val_ = 1.0;
+
+  fvar<fvar<var> > a = hypot(x,y);
+
+  AVEC p = createAVEC(x.val_.val_,y.val_.val_);
+  VEC g;
+  a.d_.d_.grad(p,g);
+  EXPECT_FLOAT_EQ(-0.0079504643, g[0]);
+  EXPECT_FLOAT_EQ(0.013913312,g[1]);
+}
+TEST(AgradFwdHypot,FvarFvarVar_Double_3rdDeriv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using boost::math::hypot;
+
+  fvar<fvar<var> > x;
+  x.val_.val_ = 3.0;
+  x.val_.d_ = 1.0;
+  double y(6.0);
+
+  fvar<fvar<var> > a = hypot(x,y);
+
+  AVEC p = createAVEC(x.val_.val_);
+  VEC g;
+  a.d_.d_.grad(p,g);
+
+  EXPECT_FLOAT_EQ(0,g[0]);
+}
+
+TEST(AgradFwdHypot,Double_FvarFvarVar_3rdDeriv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using boost::math::hypot;
+
+  double x(3.0);
+  fvar<fvar<var> > y;
+  y.val_.val_ = 6.0;
+  y.d_.val_ = 1.0;
+
+  fvar<fvar<var> > a = hypot(x,y);
+
+  AVEC p = createAVEC(y.val_.val_);
+  VEC g;
+  a.d_.d_.grad(p,g);
+  EXPECT_FLOAT_EQ(0,g[0]);
 }
