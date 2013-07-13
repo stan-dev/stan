@@ -61,15 +61,17 @@ namespace stan {
           return false;
         }
         else if(_name == name) {
-          
+         
           args.pop_back();
           
           bool good_arg = false;
+          bool valid_arg = true;
+          
           for (int i = 0; i < _values.size(); ++i) {
             if( _values.at(i)->name() != value) continue;
             
             _cursor = i;
-            _values.at(_cursor)->parse_args(args, out, err, help_flag);
+            valid_arg &= _values.at(_cursor)->parse_args(args, out, err, help_flag);
             good_arg = true;
             break;
           }
@@ -82,8 +84,9 @@ namespace stan {
             }
             
             args.clear();
-            return false;
           }
+          
+          return valid_arg && good_arg;
           
         }
         

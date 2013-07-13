@@ -91,7 +91,6 @@ namespace stan {
               break;
             }
             else if ( (*arg_it)->name() == val_name) {
-              
               valid_arg &= (*arg_it)->parse_args(args, out, err, _help_flag);
               good_arg = true;
               break;
