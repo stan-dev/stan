@@ -18,7 +18,6 @@
 #include <stan/gm/arguments/arg_id.hpp>
 #include <stan/gm/arguments/arg_data.hpp>
 #include <stan/gm/arguments/arg_init.hpp>
-#include <stan/gm/arguments/arg_test_gradient.hpp>
 #include <stan/gm/arguments/arg_random.hpp>
 #include <stan/gm/arguments/arg_output.hpp>
 
@@ -243,7 +242,6 @@ namespace stan {
       valid_arguments.push_back(new arg_id());
       valid_arguments.push_back(new arg_data());
       valid_arguments.push_back(new arg_init());
-      valid_arguments.push_back(new arg_test_gradient());
       valid_arguments.push_back(new arg_random());
       valid_arguments.push_back(new arg_output());
       
@@ -480,13 +478,6 @@ namespace stan {
         
       }
       
-      // Test gradient
-      if (dynamic_cast<unvalued_argument*>(parser.arg("test_gradient"))->is_present()) {
-        std::cout << std::endl << "TEST GRADIENT MODE" << std::endl;
-        return model.test_gradients(cont_params, disc_params);
-        return 0;
-      }
-      
       // Initial output
       parser.print(&std::cout);
       std::cout << std::endl;
@@ -499,6 +490,22 @@ namespace stan {
       if (!append_diagnostic && diagnostic_stream) {
         write_stan(diagnostic_stream, '#');
         parser.print(diagnostic_stream, '#');
+      }
+      
+      //////////////////////////////////////////////////
+      //               Model Diagnostics              //
+      //////////////////////////////////////////////////
+      
+      if (parser.arg("method")->arg("diagnostic")) {
+      
+        list_argument* test = dynamic_cast<list_argument*>
+                              (parser.arg("method")->arg("diagnostic")->arg("test"));
+        
+        if (test->value() == "gradient") {
+          std::cout << std::endl << "TEST GRADIENT MODE" << std::endl;
+          return model.test_gradients(cont_params, disc_params);
+        }
+        
       }
       
       //////////////////////////////////////////////////

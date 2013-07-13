@@ -5,6 +5,7 @@
 
 #include <stan/gm/arguments/arg_sample.hpp>
 #include <stan/gm/arguments/arg_optimize.hpp>
+#include <stan/gm/arguments/arg_diagnostic.hpp>
 
 namespace stan {
   
@@ -22,6 +23,7 @@ namespace stan {
         
         _values.push_back(new arg_sample());
         _values.push_back(new arg_optimize());
+        _values.push_back(new arg_diagnostic());
         
         _default_cursor = 0;
         _cursor = _default_cursor;
