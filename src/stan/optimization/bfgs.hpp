@@ -1,7 +1,6 @@
 #ifndef __STAN__OPTIMIZATION__BFGS_HPP__
 #define __STAN__OPTIMIZATION__BFGS_HPP__
 
-#include <stan/model/prob_grad.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <cstdlib>
 #include <cmath>
@@ -423,17 +422,27 @@ namespace stan {
         return retcode;
       }
     };
-    
+
+                                
+
+    template <typename M>
+    double lp_no_jacobian(const M& model,
+                          std::vector<double>& params_r,
+                          std::vector<int>& params_i,
+                          std::ostream* o = 0) {
+    }
+
+    template <class M>
     class ModelAdaptor {
     private:
-      stan::model::prob_grad& _model;
+      M& _model;
       std::vector<int> _params_i;
       std::ostream* _output_stream;
       std::vector<double> _x, _g;
       size_t _fevals;
 
     public:
-      ModelAdaptor(stan::model::prob_grad& model,
+      ModelAdaptor(M& model,
                    const std::vector<int>& params_i,
                    std::ostream* output_stream)
       : _model(model), _params_i(params_i), _output_stream(output_stream), _fevals(0) {}
@@ -445,7 +454,9 @@ namespace stan {
           _x[i] = x[i];
 
         try {
-          f = -_model.log_prob(_x, _params_i, _output_stream);
+          // f = - _model.log_prob_propto_f_adjust_f(_x, _params_i, _output_stream);
+          // f = - lpp<M,false,false,double>::apply(_model,_x,_params_i,_output_stream);
+          f = - _model.template log_prob_poly<false,false>(_x,_params_i,_output_stream);
         } catch (const std::exception& e) {
           if (_output_stream)
             (*_output_stream) << e.what() << std::endl;
@@ -469,7 +480,7 @@ namespace stan {
         _fevals++;
 
         try {
-          f = -_model.grad_log_prob(_x, _params_i, _g, _output_stream);
+          f = -_model.template grad_log_prob<true,false>(_x, _params_i, _g, _output_stream);
         } catch (const std::exception& e) {
           if (_output_stream)
             (*_output_stream) << e.what() << std::endl;
@@ -502,40 +513,41 @@ namespace stan {
       }
     };
     
-    class BFGSLineSearch : public BFGSMinimizer<ModelAdaptor> {
+    template <typename M>
+    class BFGSLineSearch : public BFGSMinimizer<ModelAdaptor<M> > {
     private:
-      ModelAdaptor _adaptor;
+      ModelAdaptor<M> _adaptor;
       
     public:
-      BFGSLineSearch(stan::model::prob_grad& model,
+      BFGSLineSearch(M& model,
                      const std::vector<double>& params_r,
                      const std::vector<int>& params_i,
                      std::ostream* output_stream = 0)
-      : BFGSMinimizer<ModelAdaptor>(_adaptor),
-       _adaptor(model,params_i,output_stream)
+        : BFGSMinimizer<ModelAdaptor<M> >(_adaptor),
+          _adaptor(model,params_i,output_stream)
       {
 
         Eigen::Matrix<double,Eigen::Dynamic,1> x;
         x.resize(params_r.size());
         for (size_t i = 0; i < params_r.size(); i++)
           x[i] = params_r[i];
-        initialize(x);
+        this->initialize(x);
       }
 
       size_t grad_evals() { return _adaptor.fevals(); }
-      double logp() { return -curr_f(); }
-      double grad_norm() { return curr_g().norm(); }
+      double logp() { return -(this->curr_f()); }
+      double grad_norm() { return this->curr_g().norm(); }
       void grad(std::vector<double>& g) { 
-        const BFGSMinimizer<ModelAdaptor>::VectorT &cg(curr_g());
+        const typename BFGSMinimizer<ModelAdaptor<M> >::VectorT &cg(this->curr_g());
         g.resize(cg.size());
-        for (BFGSMinimizer<ModelAdaptor>::VectorT::size_type i = 0;
+          for (typename BFGSMinimizer<ModelAdaptor<M> >::VectorT::size_type i = 0;
              i < cg.size(); i++)
           g[i] = -cg[i];
       }
       void params_r(std::vector<double>& x) {
-        const BFGSMinimizer<ModelAdaptor>::VectorT &cx(curr_x());
+        const typename BFGSMinimizer<ModelAdaptor<M> >::VectorT &cx(this->curr_x());
         x.resize(cx.size());
-        for (BFGSMinimizer<ModelAdaptor>::VectorT::size_type i = 0; 
+        for (typename BFGSMinimizer<ModelAdaptor<M> >::VectorT::size_type i = 0; 
              i < cx.size(); i++)
           x[i] = cx[i];
       }

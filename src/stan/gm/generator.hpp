@@ -231,7 +231,7 @@ namespace stan {
       generate_using("std::string",o);
       generate_using("std::stringstream",o);
       generate_using("stan::agrad::var",o);
-      generate_using("stan::model::prob_grad_ad",o);
+      generate_using("stan::model::prob_grad",o);
       generate_using("stan::math::get_base1",o);
       generate_using("stan::math::stan_print",o);
       generate_using("stan::io::dump",o);
@@ -272,7 +272,7 @@ namespace stan {
 
     void generate_class_decl(const std::string& model_name,
                         std::ostream& o) {
-      o << "class " << model_name << " : public prob_grad_ad {" << EOL;
+      o << "class " << model_name << " : public prob_grad {" << EOL;
     }
 
     void generate_end_class_decl(std::ostream& o) {
@@ -1449,19 +1449,56 @@ namespace stan {
 
     void generate_log_prob(program const& p,
                            std::ostream& o) {
+
+
       o << EOL;
-      o << INDENT << "var log_prob(vector<var>& params_r__," << EOL;
-      o << INDENT << "             vector<int>& params_i__," << EOL;
-      o << INDENT << "             std::ostream* pstream__ = 0) {" << EOL;
-      o << INDENT << "  return log_prob_poly<true,true,var>(params_r__,params_i__,pstream__);" << EOL;
+      o << INDENT << "template <bool propto__, bool jacobian_adjust_transforms__>" << EOL;
+      o << INDENT << "double grad_log_prob(std::vector<double>& params_r__," << EOL;
+      o << INDENT << "                     std::vector<int>& params_i__," << EOL;
+      o << INDENT << "                     std::vector<double>& gradient__," << EOL;
+      o << INDENT << "                     std::ostream* output_stream__ = 0) {" << EOL;
+      o << INDENT << "  std::vector<stan::agrad::var> ad_params_r__(num_params_r());" << EOL;
+      o << INDENT << "  for (size_t i = 0; i < num_params_r(); ++i) {" << EOL;
+      o << INDENT << "    stan::agrad::var var_i(params_r__[i]);" << EOL;
+      o << INDENT << "    ad_params_r__[i] = var_i;" << EOL;
+      o << INDENT << "  }" << EOL;
+      o << INDENT << "  stan::agrad::var adLogProb__;" << EOL;
+      o << INDENT << "  try {" << EOL;
+      o << INDENT << "    adLogProb__ = log_prob_poly<propto__,jacobian_adjust_transforms__>(ad_params_r__,params_i__,output_stream__);" << EOL;
+      o << INDENT << "  } catch (std::exception &ex) {" << EOL;
+      o << INDENT << "    stan::agrad::recover_memory();" << EOL;
+      o << INDENT << "    throw;" << EOL;
+      o << INDENT << "  }" << EOL;
+      o << INDENT << "  double val__ = adLogProb__.val();" << EOL;
+      o << INDENT << "  adLogProb__.grad(ad_params_r__,gradient__);" << EOL;
+      o << INDENT << "  return val__;" << EOL;
       o << INDENT << "}" << EOL;
+
       o << EOL;
-       o << INDENT << "var log_prob_no_jacobian(vector<var>& params_r__," << EOL;
-      o << INDENT << "                         vector<int>& params_i__," << EOL;
-      o << INDENT << "                         std::ostream* pstream__ = 0) {" << EOL;
-      o << INDENT << "  return log_prob_poly<true,false,var>(params_r__,params_i__,pstream__);" << EOL;
-      o << INDENT << "}" << EOL;
-      o << EOL;
+      o << INDENT << "double log_prob(std::vector<double>& params_r__," << EOL;
+      o << INDENT << "                std::vector<int>& params_i__," << EOL;
+      o << INDENT << "                std::ostream* output_stream__ = 0) {" << EOL;
+      o << INDENT << "  std::vector<stan::agrad::var> ad_params_r__;" << EOL;
+      o << INDENT << "  for (size_t i = 0; i < num_params_r(); ++i) {" << EOL;
+      o << INDENT << "    stan::agrad::var var_i__(params_r__[i]);" << EOL;
+      o << INDENT << "    ad_params_r__.push_back(var_i__);" << EOL;
+      o << INDENT << "  }" << EOL;
+      o << INDENT << "  stan::agrad::var adLogProb__ = log_prob_poly<true,true>(ad_params_r__,params_i__,output_stream__);" << EOL;
+      o << INDENT << "  double val__ = adLogProb__.val();" << EOL;
+      o << INDENT << "  stan::agrad::recover_memory();" << EOL;
+      o << INDENT << "  return val__;" << EOL;
+      o << INDENT << "}" << EOL
+        << EOL;
+
+      // log_prob() required for abstract class
+      // o << EOL;
+      // o << INDENT << "var log_prob(vector<var>& params_r__," << EOL;
+      // o << INDENT << "             vector<int>& params_i__," << EOL;
+      // o << INDENT << "             std::ostream* pstream__ = 0) {" << EOL;
+      // o << INDENT << "  return log_prob_poly<true,true,var>(params_r__,params_i__,pstream__);" << EOL;
+      // o << INDENT << "}" << EOL;
+      // o << EOL << EOL;
+
       o << INDENT << "template <bool propto__, bool jacobian__, typename T__>" << EOL;
       o << INDENT << "T__ log_prob_poly(vector<T__>& params_r__," << EOL;
       o << INDENT << "                  vector<int>& params_i__," << EOL;
@@ -1908,7 +1945,7 @@ namespace stan {
       o << INDENT << model_name << "(stan::io::var_context& context__," << EOL;
       o << INDENT << "    std::ostream* pstream__ = 0)"
         << EOL;
-      o << INDENT2 << ": prob_grad_ad::prob_grad_ad(0) {" 
+      o << INDENT2 << ": prob_grad::prob_grad(0) {" 
         << EOL; // resize 0 with var_resizing
       o << INDENT2 << "static const char* function__ = \"" 
         << model_name << "_namespace::" << model_name << "(%1%)\";" << EOL;

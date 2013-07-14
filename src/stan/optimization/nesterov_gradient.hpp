@@ -1,16 +1,15 @@
 #ifndef __STAN__OPTIMIZATION__NESTEROV__GRADIENT_HPP__
 #define __STAN__OPTIMIZATION__NESTEROV__GRADIENT_HPP__
 
-#include <stan/model/prob_grad.hpp>
-
 namespace stan {
 
   namespace optimization {
 
+    template <class M>
     class NesterovGradient {
 
     private:
-      stan::model::prob_grad& model_;
+      M& model_;
       std::vector<double> x_;
       std::vector<double> y_;
       std::vector<int> z_;
@@ -31,7 +30,7 @@ namespace stan {
         for (size_t i = 0; i < x_.size(); i++)
           x_[i] += epsilon_ * grad_[i];
         try {
-          logp_ = model_.grad_log_prob(x_, z_, grad_, output_stream_);
+          logp_ = model_.template grad_log_prob<true,false>(x_, z_, grad_, output_stream_);
           valid = true;
         }
         catch (std::exception &ex) {
@@ -46,7 +45,7 @@ namespace stan {
             for (size_t i = 0; i < x_.size(); i++)
               x_[i] += epsilon_ * grad_[i];
             try {
-              logp_ = model_.grad_log_prob(x_, z_, grad_, output_stream_);
+              logp_ = model_.template grad_log_prob<true,false>(x_, z_, grad_, output_stream_);
             }
             catch (std::exception &ex) {
               valid = false;
@@ -62,7 +61,7 @@ namespace stan {
             for (size_t i = 0; i < x_.size(); i++)
               x_[i] = lastx[i] + epsilon_ * lastgrad[i];
             try {
-              logp_ = model_.grad_log_prob(x_, z_, grad_, output_stream_);
+              logp_ = model_.template grad_log_prob<true,false>(x_, z_, grad_, output_stream_);
               valid = true;
             }
             catch (std::exception &ex) {
@@ -73,14 +72,14 @@ namespace stan {
         y_ = x_;
       }
 
-      NesterovGradient(stan::model::prob_grad& model,
+      NesterovGradient(M& model,
                        const std::vector<double>& params_r,
                        const std::vector<int>& params_i,
                        double epsilon0 = -1,
                        std::ostream* output_stream = 0) :
         model_(model), x_(params_r), y_(params_r), z_(params_i),
         epsilon_(epsilon0), iteration_(0), output_stream_(output_stream) {
-        logp_ = model.grad_log_prob(x_, z_, grad_, output_stream_);
+        logp_ = model.template grad_log_prob<true,false>(x_, z_, grad_, output_stream_);
 //        if (epsilon_ == -1)
           initialize_epsilon();
         std::cout << "epsilon = " << epsilon_ << std::endl;
@@ -104,7 +103,7 @@ namespace stan {
           for (size_t i = 0; i < x_.size(); i++)
             x_[i] = y_[i] + epsilon_ * grad_[i];
           try {
-            logp_ = model_.log_prob(x_, z_, output_stream_);
+            logp_ = model_.template log_prob_poly<false,false>(x_, z_, output_stream_);
             valid = true;
           }
           catch (std::exception &ex) {
@@ -114,7 +113,7 @@ namespace stan {
         for (size_t i = 0; i < x_.size(); i++)
           y_[i] = x_[i] +
             (iteration_ - 1) / (iteration_ + 2) * (x_[i] - lastx[i]);
-        logp_ = model_.grad_log_prob(y_, z_, grad_, output_stream_);
+        logp_ = model_.template grad_log_prob<true,false>(y_, z_, grad_, output_stream_);
         return logp_;
       }
     };

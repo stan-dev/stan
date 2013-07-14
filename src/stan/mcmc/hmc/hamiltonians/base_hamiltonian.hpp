@@ -44,7 +44,9 @@ namespace stan {
         std::vector<double> grad_lp(this->_model.num_params_r());
         
         try {
-          z.V = - this->_model.grad_log_prob(z.q, z.r, grad_lp, _err_stream);
+          z.V = - this->_model.template grad_log_prob<true,true>(z.q, z.r, 
+                                                                 grad_lp, 
+                                                                 _err_stream);
         } catch (std::domain_error e) {
           this->_write_error_msg(_err_stream, e);
           z.V = std::numeric_limits<double>::infinity();

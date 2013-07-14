@@ -232,6 +232,7 @@ TEST(StanIoMcmcWriter, print_diagnostic_names) {
   std::string line;
   std::getline(diagnostic_stream, line);
   
+  // FIXME: make this work, too
   EXPECT_EQ("lp__,accept_stat__,stepsize__,treedepth__,mu1,mu2,p_mu1,p_mu2,g_mu1,g_mu2", line);
   
 }

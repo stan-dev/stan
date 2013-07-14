@@ -2,7 +2,7 @@
 
 #include <stan/model/model_header.hpp>
 
-namespace example_model_namespace {
+namespace command_model_namespace {
 
 using std::vector;
 using std::string;
@@ -21,22 +21,25 @@ typedef Eigen::Matrix<double,Eigen::Dynamic,1> vector_d;
 typedef Eigen::Matrix<double,1,Eigen::Dynamic> row_vector_d;
 typedef Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> matrix_d;
 
-class example_model : public prob_grad {
+class command_model : public prob_grad {
 private:
-    vector_d y;
+    double y;
 public:
-    example_model(stan::io::var_context& context__,
+    command_model(stan::io::var_context& context__,
         std::ostream* pstream__ = 0)
         : prob_grad::prob_grad(0) {
-        static const char* function__ = "example_model_namespace::example_model(%1%)";
+        static const char* function__ = "command_model_namespace::command_model(%1%)";
         (void) function__; // dummy call to supress warning
         size_t pos__;
         (void) pos__; // dummy call to supress warning
         std::vector<int> vals_i__;
         std::vector<double> vals_r__;
+        context__.validate_dims("data initialization", "y", "double", context__.to_vec());
+        y = double(0);
+        vals_r__ = context__.vals_r("y");
+        pos__ = 0;
+        y = vals_r__[pos__++];
         // validate data
-        stan::math::validate_non_negative_index("y", "2", 2);
-        y = vector_d(2);
 
         // validate transformed data
 
@@ -46,7 +49,6 @@ public:
     void set_param_ranges() {
         num_params_r__ = 0U;
         param_ranges_i__.clear();
-        ++num_params_r__;
         ++num_params_r__;
     }
 
@@ -59,23 +61,14 @@ public:
         std::vector<int> vals_i__;
 
 
-        if (!(context__.contains_r("mu1")))
-            throw std::runtime_error("variable mu1 missing");
-        vals_r__ = context__.vals_r("mu1");
+        if (!(context__.contains_r("mu")))
+            throw std::runtime_error("variable mu missing");
+        vals_r__ = context__.vals_r("mu");
         pos__ = 0U;
-        context__.validate_dims("initialization", "mu1", "double", context__.to_vec());
-        double mu1(0);
-        mu1 = vals_r__[pos__++];
-        writer__.scalar_unconstrain(mu1);
-
-        if (!(context__.contains_r("mu2")))
-            throw std::runtime_error("variable mu2 missing");
-        vals_r__ = context__.vals_r("mu2");
-        pos__ = 0U;
-        context__.validate_dims("initialization", "mu2", "double", context__.to_vec());
-        double mu2(0);
-        mu2 = vals_r__[pos__++];
-        writer__.scalar_unconstrain(mu2);
+        context__.validate_dims("initialization", "mu", "double", context__.to_vec());
+        double mu(0);
+        mu = vals_r__[pos__++];
+        writer__.scalar_unconstrain(mu);
         params_r__ = writer__.data_r();
         params_i__ = writer__.data_i();
     }
@@ -129,17 +122,11 @@ public:
         // model parameters
         stan::io::reader<T__> in__(params_r__,params_i__);
 
-        T__ mu1;
+        T__ mu;
         if (jacobian__)
-            mu1 = in__.scalar_constrain(lp__);
+            mu = in__.scalar_constrain(lp__);
         else
-            mu1 = in__.scalar_constrain();
-
-        T__ mu2;
-        if (jacobian__)
-            mu2 = in__.scalar_constrain(lp__);
-        else
-            mu2 = in__.scalar_constrain();
+            mu = in__.scalar_constrain();
 
 
         // transformed parameters
@@ -152,6 +139,7 @@ public:
         const char* function__ = "validate transformed params %1%";
         (void) function__; // dummy to suppress unused var warning
         // model body
+        lp__ += stan::prob::normal_log<true>(y, mu, 1);
 
         return lp__;
 
@@ -160,16 +148,13 @@ public:
 
     void get_param_names(std::vector<std::string>& names__) {
         names__.resize(0);
-        names__.push_back("mu1");
-        names__.push_back("mu2");
+        names__.push_back("mu");
     }
 
 
     void get_dims(std::vector<std::vector<size_t> >& dimss__) {
         dimss__.resize(0);
         std::vector<size_t> dims__;
-        dims__.resize(0);
-        dimss__.push_back(dims__);
         dims__.resize(0);
         dimss__.push_back(dims__);
     }
@@ -184,13 +169,11 @@ public:
                      std::ostream* pstream__ = 0) {
         vars__.resize(0);
         stan::io::reader<double> in__(params_r__,params_i__);
-        static const char* function__ = "example_model_namespace::write_array(%1%)";
+        static const char* function__ = "command_model_namespace::write_array(%1%)";
         (void) function__; // dummy call to supress warning
         // read-transform, write parameters
-        double mu1 = in__.scalar_constrain();
-        double mu2 = in__.scalar_constrain();
-        vars__.push_back(mu1);
-        vars__.push_back(mu2);
+        double mu = in__.scalar_constrain();
+        vars__.push_back(mu);
 
         if (!include_tparams__) return;
         // declare and define transformed parameters
@@ -231,9 +214,7 @@ public:
     void write_csv_header(std::ostream& o__) {
         stan::io::csv_writer writer__(o__);
         writer__.comma();
-        o__ << "mu1";
-        writer__.comma();
-        o__ << "mu2";
+        o__ << "mu";
         writer__.newline();
     }
 
@@ -245,13 +226,11 @@ public:
                    std::ostream* pstream__ = 0) {
         stan::io::reader<double> in__(params_r__,params_i__);
         stan::io::csv_writer writer__(o__);
-        static const char* function__ = "example_model_namespace::write_csv(%1%)";
+        static const char* function__ = "command_model_namespace::write_csv(%1%)";
         (void) function__; // dummy call to supress warning
         // read-transform, write parameters
-        double mu1 = in__.scalar_constrain();
-        writer__.write(mu1);
-        double mu2 = in__.scalar_constrain();
-        writer__.write(mu2);
+        double mu = in__.scalar_constrain();
+        writer__.write(mu);
 
         // declare, define and validate transformed parameters
         double lp__ = 0.0;
@@ -271,7 +250,7 @@ public:
     }
 
     std::string model_name() {
-        return "example_model";
+        return "command_model";
     }
 
 
@@ -280,10 +259,7 @@ public:
                                  bool include_gqs__ = true) {
         std::stringstream param_name_stream__;
         param_name_stream__.str(std::string());
-        param_name_stream__ << "mu1";
-        param_names__.push_back(param_name_stream__.str());
-        param_name_stream__.str(std::string());
-        param_name_stream__ << "mu2";
+        param_name_stream__ << "mu";
         param_names__.push_back(param_name_stream__.str());
 
         if (!include_gqs__ && !include_tparams__) return;
@@ -297,10 +273,7 @@ public:
                                    bool include_gqs__ = true) {
         std::stringstream param_name_stream__;
         param_name_stream__.str(std::string());
-        param_name_stream__ << "mu1";
-        param_names__.push_back(param_name_stream__.str());
-        param_name_stream__.str(std::string());
-        param_name_stream__ << "mu2";
+        param_name_stream__ << "mu";
         param_names__.push_back(param_name_stream__.str());
 
         if (!include_gqs__ && !include_tparams__) return;
@@ -311,3 +284,4 @@ public:
 }; // model
 
 } // namespace
+
