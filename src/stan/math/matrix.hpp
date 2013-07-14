@@ -74,6 +74,7 @@
 #include <stan/math/matrix/sum.hpp>
 #include <stan/math/matrix/tail.hpp>
 #include <stan/math/matrix/tcrossprod.hpp>
+#include <stan/math/matrix/to_vector.hpp>
 #include <stan/math/matrix/trace.hpp>
 #include <stan/math/matrix/trace_quad_form.hpp>
 #include <stan/math/matrix/trace_gen_quad_form.hpp>

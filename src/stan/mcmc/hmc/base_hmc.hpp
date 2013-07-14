@@ -4,6 +4,7 @@
 #include <math.h>
 #include <stdexcept>
 
+#include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/random/variate_generator.hpp>
 #include <boost/random/uniform_01.hpp>
 
@@ -54,7 +55,7 @@ namespace stan {
       
       void init_stepsize() {
   
-        ps_point z_init(static_cast<ps_point>(this->_z));
+        ps_point z_init(this->_z);
   
         this->_hamiltonian.sample_p(this->_z, this->_rand_int);
         this->_hamiltonian.init(this->_z);
@@ -64,7 +65,7 @@ namespace stan {
         this->_integrator.evolve(this->_z, this->_hamiltonian, this->_nom_epsilon);
         
         double h = this->_hamiltonian.H(this->_z);
-        if (h != h) h = std::numeric_limits<double>::infinity();
+        if (boost::math::isnan(h)) h = std::numeric_limits<double>::infinity();
         
         double delta_H = H0 - h;
         
@@ -72,7 +73,7 @@ namespace stan {
         
         while (1) {
           
-          this->_z.copy_base(z_init);
+          this->_z.ps_point::operator=(z_init);
           
           this->_hamiltonian.sample_p(this->_z, this->_rand_int);
           this->_hamiltonian.init(this->_z);
@@ -82,7 +83,7 @@ namespace stan {
           this->_integrator.evolve(this->_z, this->_hamiltonian, this->_nom_epsilon);
           
           double h = this->_hamiltonian.H(this->_z);
-          if (h != h) h = std::numeric_limits<double>::infinity();
+          if (boost::math::isnan(h)) h = std::numeric_limits<double>::infinity();
           
           double delta_H = H0 - h;
           
@@ -102,7 +103,7 @@ namespace stan {
           
         }
         
-        this->_z.copy_base(z_init);
+        this->_z.ps_point::operator=(z_init);
         
       }
       

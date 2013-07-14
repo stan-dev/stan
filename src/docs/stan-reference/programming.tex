@@ -192,7 +192,15 @@ non-negative integer variables \code{N\_obs} and \code{N\_miss}.  The
 observed data is provided as an array data variable \code{y\_obs}.
 The missing data is coded as an array parameter, \code{y\_miss}.  The
 ordinary parameters being estimated, the location \code{mu} and scale
-\code{sigma}, are also coded as parameters.
+\code{sigma}, are also coded as parameters.  A better way to write the
+model would be to vectorize, so the body would be
+%
+\begin{quote}
+\begin{Verbatim}
+   y_obs ~ normal(mu,sigma);
+   y_miss ~ normal(mu,sigma);
+\end{Verbatim}
+\end{quote}
 
 The model contains one loop over the observed data and one over the
 missing data.  This slight redundancy in specification leads to much
@@ -697,8 +705,8 @@ This latter form of the model is coded in \Stan as follows.
 \begin{Verbatim}
 data {
    int<lower=0> N;
-   real x[N];
-   real y[N];
+   vector[N] x;
+   vector[N] y;
 }
 parameters {
     real alpha;
@@ -804,17 +812,17 @@ follows.
 \begin{quote}
 \begin{Verbatim}
 data {
-    int<lower=0> N;
-    real x[N];
-    int<lower=0,upper=1> y[N];
+  int<lower=0> N;
+  real x[N];
+  int<lower=0,upper=1> y[N];
 }
 parameters {
-    real alpha;
-    real beta;
+  real alpha;
+  real beta;
 }
 model {
-    for (n in 1:N)
-        y[n] ~ bernoulli(inv_logit(alpha + beta * x[n]));
+  for (n in 1:N)
+    y[n] ~ bernoulli(inv_logit(alpha + beta * x[n]));
 } 
 \end{Verbatim}
 \end{quote}
@@ -1056,7 +1064,7 @@ Item-response theory (IRT) models the situation in which a number of
 students each answer one or more of a group of test questions.  The
 model is based on parameters for the ability of the students, the
 difficulty of the questions, and in more articulated models, the
-discimrinativess of the questions and the probability of guessing
+discriminativeness of the questions and the probability of guessing
 correctly; see \citep[pps.~314--320]{GelmanHill:2007} for a textbook
 introduction to hierarchical IRT models and \citep{Curtis:2010} for
 encodings of a range of IRT models in BUGS.
@@ -3089,13 +3097,7 @@ parameters {
 transformed parameters {
   ... eta as above ...
   cov_matrix[K] Sigma;       // covariance matrix
-  for (m in 1:K) {
-    Sigma[m,m] <- sigma[m] * sigma[m] * Omega[m,n];
-    for (n in (m+1):K) {
-      Sigma[m,n] <- sigma[m] * sigma[n] * Omega[m,n];
-      Sigma[n,m] <- Sigma[m,n];
-    }
-  } 
+  Sigma <- sigma' * Omega * sigma;
 }
 model {
   mu ~ normal(0,5);       // vectorized, diffuse
