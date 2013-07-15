@@ -9,12 +9,9 @@ transformed data {
   vector[N] work3; 
   vector[N] work4; 
   for (i in 1:N) {
-    if (mom_work[i] == 2)
-      work2[i] <- 1;
-    if (mom_work[i] == 3)
-      work3[i] <- 1;
-    if (mom_work[i] == 4)
-      work4[i] <- 1;
+    work2[i] <- mom_work[i] == 2;
+    work3[i] <- mom_work[i] == 3;
+    work4[i] <- mom_work[i] == 4;
   }
 }
 
