@@ -1,12 +1,12 @@
-# http://www.openbugs.info/Examples/Funshapes.html
-
+/*
+ * BUGS volume 3, fun shapes, circle
+ * http://www.openbugs.info/Examples/Funshapes.html
+ */
 parameters {
-  real<lower=-1,upper= 1> x; 
-  real<lower=-1,upper= 1> y; 
+  real<lower=-1,upper=1> x; 
+  real<lower = -sqrt(1 - square(x)), 
+       upper =  sqrt(1 - square(x))> y; 
 } 
-
 model {
-  // lp__ <- log(step(1 - x * x - y * y)); 
-  lp__ <- log(fmax(0, 1 - x * x - y * y)); 
-  
+  /* uniform within constraints */
 } 

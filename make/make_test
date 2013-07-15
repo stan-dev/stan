@@ -1,0 +1,44 @@
+STAN_HOME = /Users/daniel/dev/stan
+STAN_LIB = $(STAN_HOME)/lib
+STAN_BIN = $(STAN_HOME)/bin
+
+#CC = g++
+CC = clang++
+STANC = $(STAN_BIN)/stanc
+AR = ar
+
+O = 3
+CFLAGS = -g -march=native -I$(STAN_HOME)/src -I$(STAN_LIB)/eigen_3.1.3 -I$(STAN_LIB)/boost_1.53.0 -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS 
+LDFLAGS = -L$(STAN_BIN) -lstan
+EXE =
+PATH_SEPARATOR = /
+
+-include $(STAN_HOME)/make/detect_cc
+-include $(STAN_HOME)/make/os_detect
+
+MODEL_FILES = $(shell find . -type f -name '*.stan')
+SRC_FILES = $(addsuffix .cpp,$(basename $(MODEL_FILES)))
+OBJ_FILES = $(addsuffix .o,$(basename $(MODEL_FILES)))
+EXE_FILES = $(addsuffix $(EXE),$(basename $(MODEL_FILES)))
+
+models: normal
+
+clean:
+	rm -f $(SRC_FILES) $(OBJ_FILES) $(EXE_FILES)
+
+.PRECIOUS: %.o %.cpp
+%.o : %.cpp
+	@echo ''
+	@echo '--- Compiling C++ code ---'
+	$(COMPILE.c) -O$O $(OUTPUT_OPTION) $<
+
+$(patsubst %.stan,%,$(wildcard $(addsuffix .stan,$(MAKECMDGOALS)))) : %$(EXE): %.o
+	@echo ''
+	@echo '--- Linking C++ model ---'
+	$(LINK.c) -O$O $(OUTPUT_OPTION) $< $(LDLIBS)
+
+%.cpp : %.stan
+	@echo ''
+	@echo '--- Translating Stan graphical model to C++ code ---'
+	$(STANC) $< --o=$@
+ 
