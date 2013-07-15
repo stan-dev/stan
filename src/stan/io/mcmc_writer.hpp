@@ -1,7 +1,7 @@
 #ifndef __STAN__IO__MCMC__WRITER__HPP
 #define __STAN__IO__MCMC__WRITER__HPP
 
-#include <ostream>
+#include <iostream>
 #include <iomanip>
 
 #include <vector>

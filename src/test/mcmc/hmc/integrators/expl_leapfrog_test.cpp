@@ -1,6 +1,8 @@
 #include <stan/mcmc/hmc/integrators/expl_leapfrog.hpp>
 #include <gtest/gtest.h>
 
+#include <sstream>
+
 #include <test/mcmc/hmc/integrators/command.cpp>
 
 #include <stan/mcmc/hmc/hamiltonians/unit_e_metric.hpp>
@@ -18,11 +20,10 @@ class McmcHmcIntegratorsExplLeapfrog : public testing::Test {
 public:
   
   void SetUp() {
+    static const std::string DATA = "mu <- 0.0\ny <- 0\n";
+    std::stringstream data_stream(DATA);
     // setup hamiltonian
-    std::fstream data_stream("src/test/models/command1.data.R",
-                             std::fstream::in);
     stan::io::dump data_var_context(data_stream);
-    data_stream.close();
 
     model = new command_model_namespace::command_model(data_var_context);
   }
