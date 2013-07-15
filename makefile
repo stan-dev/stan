@@ -163,8 +163,8 @@ help:
 	@echo '--------------------------------------------------------------------------------'
 
 -include make/libstan  # libstan.a
--include make/tests    # tests: test-all, test-unit, test-models
 -include make/models   # models
+-include make/tests    # tests: test-all, test-unit, test-models
 -include make/command  # bin/stanc, bin/print
 -include make/doxygen  # doxygen
 -include make/dist     # dist: for distribution

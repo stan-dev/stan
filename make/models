@@ -4,16 +4,10 @@
 MODEL_HEADER := src/stan/model/model_header.hpp
 
 .PRECIOUS: %.cpp %.o
-$(patsubst %.stan,%,$(wildcard $(addsuffix .stan,$(MAKECMDGOALS)))) : %$(EXE): %.o bin/libstan.a
+%$(EXE): %.o bin/libstan.a
 	@echo ''
 	@echo '--- Linking C++ model ---'
 	$(LINK.c) -O$O $(OUTPUT_OPTION) $< $(LDLIBS)
-
-%.exe: %.o bin/libstan.a
-	@echo ''
-	@echo '--- Linking C++ model ---'
-	$(LINK.c) -O$O $(OUTPUT_OPTION) $< $(LDLIBS)
-
 
 .PRECIOUS: %.cpp
 %.cpp : %.stan $(MODEL_HEADER)$(PCH) bin/stanc$(EXE)
