@@ -1,0 +1,640 @@
+%! 
+%%Title: S graphics
+%%Creator: gelman
+%%CreationDate: Tue Feb 15 17:38:20 1994
+%%Pages: (atend)
+%%BoundingBox: 20 11 591 781
+%%EndComments
+% beginning of preamble
+100 dict begin
+/bd {bind def} def
+% drawing commands
+/I {Coord SetPage 1 setlinecap 1 setlinejoin
+    LineTypes {RastersPerPoint ScaleArray} forall
+    /Helvetica findfont
+    PointSize RastersPerPoint mul Cex mul scalefont setfont} bd
+/A {PageBegin} bd
+/B {newpath} bd
+/C {currentpoint stroke moveto} bd
+/E {stroke} bd
+/M {moveto} bd
+/L {lineto} bd
+/S {moveto lineto stroke} bd
+/F {closepath fill} bd
+/P {gsave moveto Pch-x Pch-y rmoveto Pch Show grestore} bd
+/T {/Adjust exch def gsave translate StringRot rotate 0 0 moveto
+    dup stringwidth pop neg Adjust mul 0 rmoveto
+    currentpoint translate TextShow grestore} bd
+/X {erasepage InPage {PageEnd} if} bd
+/Z {gsave showpage grestore PageEnd} bd
+/W {end} bd
+
+% parameter setting commands
+/St {1 sub LineTypes dup 3 1 roll length Rem floor get 0 setdash} bd
+/Sw {abs 2 div RastersPerPoint mul setlinewidth SetClip} bd
+/Sc {dup dup 1 lt exch 0 ge and
+     {1 exch sub setgray}
+     {1 sub Colors dup 3 1 roll length Rem floor get
+	dup type /arraytype eq {aload pop sethsbcolor} {setgray} ifelse} ifelse} bd
+/Sp {Pch exch 0 exch put SetPchSize} bd
+/Sx {dup Cex div /Ratio exch def
+     /Cex exch def
+     currentfont Ratio scalefont setfont
+     /Pch-x Pch-x Ratio mul def
+     /Pch-y Pch-y Ratio mul def
+     /Text-y Text-y Ratio mul def} bd
+/So {4 1 roll exch 4 -1 roll Plot astore pop SetClip} bd
+/Sg {4 1 roll exch 4 -1 roll Figure astore pop SetClip} bd
+/Sr {/StringRot exch def} bd
+/Sh {/CharRot exch def} bd
+/Sd {0 eq /ClipToPlot exch def SetClip} bd
+/Sf {dup 0 lt /Outline exch def abs
+     1 sub Fonts dup 3 1 roll length Rem floor get
+     findfont PointSize Cex mul RastersPerPoint mul scalefont dup setfont
+     dup /FontMatrix get /Matrix exch def /FontBBox get aload pop
+     Matrix transform 4 2 roll Matrix transform
+     exch pop add /Text-y exch def pop SetPchSize} bd
+
+% other variable definitions
+/InPage false def
+/Clip 4 array def
+/Page 4 array def
+/Figure [0 0 1 1] def
+/Plot [0 0 1 1] def
+/ClipToPlot true def
+/Cex 1 def
+/Outline false def
+/Pch 1 string def
+/Pch-x 0 def
+/Pch-y 0 def
+/Text-y 0 def
+/LineTypes [ % in default units
+	[]		[1 2]		[4 4]		[8 4]
+	[13 3]		[16 2 2 2]	[8 2 2 2]	[1 13]
+	[6 5]		[12 4]
+] def
+
+% other procedure definitions
+/Rem {2 copy div floor mul sub floor cvi} bd
+/RastersPerPoint {RastersPerInch 72 div} bd
+/ScaleArray {/Factor exch def /Array exch def
+	     0 1 Array length 1 sub
+	     {dup Array exch get Factor mul Array 3 1 roll put} for} bd
+/Coord {Region aload pop /uy exch def /ux exch def /ly exch def /lx exch def
+	uy ly sub ux lx sub Landscape {exch} if /Width exch def /Height exch def
+	lx ly translate Landscape {90 rotate 0 Height neg translate} if
+	1 RastersPerPoint div dup scale} bd
+/SetPchSize {gsave
+	     newpath 0 0 moveto Pch false charpath flattenpath pathbbox
+	     exch 3 1 roll
+	     add 2 div neg /Pch-y exch def
+	     add 2 div neg /Pch-x exch def
+	     grestore} bd
+/TextShow {CharRot StringRot sub dup 0 eq {pop SimpleShow} {FancyShow} ifelse} bd
+/SimpleShow {0 Text-y 2 div neg rmoveto Show} bd
+/FancyShow {
+	/RotDiff exch def
+	/Cos RotDiff cos abs def
+	/Sin RotDiff sin abs def
+	{
+		( ) dup 0 4 -1 roll put
+		dup stringwidth pop /CharWidth exch def
+		Cos 0 eq {
+			Text-y Sin div
+		} {
+			Sin 0 eq {
+				CharWidth Cos div
+			} {
+				/Ht Text-y Sin div def
+				/Wd CharWidth Cos div def
+				Ht Wd lt {Ht} {Wd} ifelse
+			} ifelse
+		} ifelse 2 div /CharDist exch def
+		CharDist 0 translate 0 0 moveto
+		gsave
+			RotDiff rotate
+			CharWidth 2 div neg Text-y 2 div neg rmoveto
+			Outline {false charpath stroke} {show} ifelse
+		grestore
+		CharDist 0 translate 0 0 moveto
+	} forall
+} bd
+/Show {Outline {false charpath stroke} {show} ifelse} bd
+/BoxClip {/CLW currentlinewidth def
+	  2 {CLW add 4 1 roll} repeat
+	  2 {CLW sub 4 1 roll} repeat
+	  initclip newpath 2 index exch 2 index exch dup 6 index exch
+	  moveto 3 {lineto} repeat closepath clip newpath} bd
+/Subregion {/A exch def /Uy exch def /Ux exch def /Ly exch def /Lx exch def
+	    Ux Lx sub A 0 get mul Lx add
+	    Uy Ly sub A 1 get mul Ly add
+	    Ux Lx sub A 2 get mul Lx add
+	    Uy Ly sub A 3 get mul Ly add} bd
+/SetFigure {Page aload pop Figure Subregion} bd
+/SetPlot {SetFigure Plot Subregion} bd
+/SetClip {ClipToPlot {SetPlot} {SetFigure} ifelse BoxClip} bd
+/SetPage {0 0 Width Height Page astore RastersPerPoint ScaleArray} bd
+/PageBegin {save /PageContext exch def /InPage true def} bd
+/PageEnd {PageContext restore /InPage false def} bd
+% end of preamble
+
+% fixed controlling parameters
+/Landscape true def
+/Region [20.8788 11.802 590.881 780.438] def
+/RastersPerInch 300 def
+/PointSize 14 def
+/Fonts [
+	/Helvetica
+	/Courier
+	/Times-Roman
+	/Helvetica-Oblique
+	/Helvetica-Bold
+	/Helvetica-BoldOblique
+	/Courier-Oblique
+	/Courier-Bold
+	/Courier-BoldOblique
+	/Times-Italic
+	/Times-Bold
+	/Times-BoldItalic
+	/Symbol
+	/AvantGarde-Book
+	/AvantGarde-BookOblique
+	/AvantGarde-Demi
+	/AvantGarde-DemiOblique
+	/Bookman-Demi
+	/Bookman-DemiItalic
+	/Bookman-Light
+	/Bookman-LightItalic
+	/Helvetica-Narrow
+	/Helvetica-Narrow-Bold
+	/Helvetica-Narrow-BoldOblique
+	/Helvetica-Narrow-Oblique
+	/NewCenturySchlbk-Roman
+	/NewCenturySchlbk-Bold
+	/NewCenturySchlbk-Italic
+	/NewCenturySchlbk-BoldItalic
+	/Palatino-Roman
+	/Palatino-Bold
+	/Palatino-Italic
+	/Palatino-BoldItalic
+	/ZapfChancery-MediumItalic
+	/ZapfDingbats
+] def
+/Colors [
+	0
+	0.6
+	0.3
+	0.9
+	0.4
+	0.7
+	0.1
+	0.5
+	0.8
+	0.2
+] def
+
+% all initialization action here
+I
+
+%%EndProlog
+
+
+%%Page: 1 1
+A
+1 St
+1 Sw
+1 Sc
+0 Sr
+111 Sp
+1 Sx
+0.0896133 0.954101 0.150315 0.879158 So
+0 1 0 1 Sg
+0 Sh
+1 Sd
+1 Sf
+(Year) 1671 112 0.5 T
+90 Sr
+90 Sh
+(Estimated incumbency advantage) 42 1223 0.5 T
+0 Sr
+0 Sh
+445 357 445 322 S
+1003 357 1003 322 S
+1560 357 1560 322 S
+2117 357 2117 322 S
+2674 357 2674 322 S
+445 357 2674 357 S
+(1900) 445 252 0.5 T
+(1920) 1003 252 0.5 T
+(1940) 1560 252 0.5 T
+(1960) 2117 252 0.5 T
+(1980) 2674 252 0.5 T
+90 Sr
+90 Sh
+287 669 252 669 S
+287 1087 252 1087 S
+287 1505 252 1505 S
+287 1923 252 1923 S
+287 669 287 1923 S
+(0.0) 182 669 0.5 T
+(0.05) 182 1087 0.5 T
+(0.10) 182 1505 0.5 T
+(0.15) 182 1923 0.5 T
+0 Sr
+0 Sh
+0 Sd
+B
+287 2088 M
+287 357 L
+3056 357 L
+3056 2088 L
+287 2088 L
+E
+9 Sc
+B
+390 666 M
+390 981 L
+E
+B
+445 653 M
+445 945 L
+E
+B
+557 744 M
+557 993 L
+E
+B
+612 558 M
+612 872 L
+E
+B
+668 598 M
+668 888 L
+E
+B
+724 481 M
+724 782 L
+E
+B
+835 989 M
+835 1297 L
+E
+B
+891 495 M
+891 914 L
+E
+B
+947 814 M
+947 1160 L
+E
+B
+1003 624 M
+1003 1007 L
+E
+B
+1114 636 M
+1114 966 L
+E
+B
+1170 495 M
+1170 838 L
+E
+B
+1225 676 M
+1225 1094 L
+E
+B
+1281 665 M
+1281 1142 L
+E
+B
+1393 603 M
+1393 923 L
+E
+B
+1448 678 M
+1448 995 L
+E
+B
+1504 745 M
+1504 1016 L
+E
+B
+1560 584 M
+1560 846 L
+E
+B
+1671 1145 M
+1671 1394 L
+E
+B
+1727 421 M
+1727 795 L
+E
+B
+1783 856 M
+1783 1187 L
+E
+B
+1839 634 M
+1839 987 L
+E
+B
+1950 973 M
+1950 1376 L
+E
+B
+2006 678 M
+2006 1038 L
+E
+B
+2061 755 M
+2061 1065 L
+E
+B
+2117 942 M
+2117 1236 L
+E
+B
+2229 1052 M
+2229 1437 L
+E
+B
+2284 1531 M
+2284 2024 L
+E
+B
+2340 1113 M
+2340 1526 L
+E
+B
+2396 1320 M
+2396 1694 L
+E
+B
+2507 1471 M
+2507 1755 L
+E
+B
+2563 1184 M
+2563 1677 L
+E
+B
+2619 1335 M
+2619 1807 L
+E
+B
+2674 1041 M
+2674 1514 L
+E
+B
+2786 1255 M
+2786 1798 L
+E
+B
+2842 588 M
+2842 997 L
+E
+B
+2897 738 M
+2897 1387 L
+E
+B
+2953 1316 M
+2953 1835 L
+E
+1 Sc
+15 Sp
+B
+376 844 M
+404 844 L
+404 816 L
+376 816 L
+F
+B
+431 815 M
+459 815 L
+459 787 L
+431 787 L
+F
+B
+543 884 M
+571 884 L
+571 856 L
+543 856 L
+F
+B
+598 734 M
+626 734 L
+626 706 L
+598 706 L
+F
+B
+654 758 M
+682 758 L
+682 730 L
+654 730 L
+F
+B
+710 647 M
+738 647 L
+738 619 L
+710 619 L
+F
+B
+821 1159 M
+849 1159 L
+849 1131 L
+821 1131 L
+F
+B
+877 716 M
+905 716 L
+905 688 L
+877 688 L
+F
+B
+933 1000 M
+961 1000 L
+961 972 L
+933 972 L
+F
+B
+989 825 M
+1017 825 L
+1017 797 L
+989 797 L
+F
+B
+1100 811 M
+1128 811 L
+1128 783 L
+1100 783 L
+F
+B
+1156 675 M
+1184 675 L
+1184 647 L
+1156 647 L
+F
+B
+1211 892 M
+1239 892 L
+1239 864 L
+1211 864 L
+F
+B
+1267 925 M
+1295 925 L
+1295 897 L
+1267 897 L
+F
+B
+1379 769 M
+1407 769 L
+1407 741 L
+1379 741 L
+F
+B
+1434 847 M
+1462 847 L
+1462 819 L
+1434 819 L
+F
+B
+1490 888 M
+1518 888 L
+1518 860 L
+1490 860 L
+F
+B
+1546 738 M
+1574 738 L
+1574 710 L
+1546 710 L
+F
+B
+1657 1291 M
+1685 1291 L
+1685 1263 L
+1657 1263 L
+F
+B
+1713 622 M
+1741 622 L
+1741 594 L
+1713 594 L
+F
+B
+1769 1037 M
+1797 1037 L
+1797 1009 L
+1769 1009 L
+F
+B
+1825 823 M
+1853 823 L
+1853 795 L
+1825 795 L
+F
+B
+1936 1174 M
+1964 1174 L
+1964 1146 L
+1936 1146 L
+F
+B
+1992 882 M
+2020 882 L
+2020 854 L
+1992 854 L
+F
+B
+2047 926 M
+2075 926 L
+2075 898 L
+2047 898 L
+F
+B
+2103 1110 M
+2131 1110 L
+2131 1082 L
+2103 1082 L
+F
+B
+2215 1240 M
+2243 1240 L
+2243 1212 L
+2215 1212 L
+F
+B
+2270 1793 M
+2298 1793 L
+2298 1765 L
+2270 1765 L
+F
+B
+2326 1338 M
+2354 1338 L
+2354 1310 L
+2326 1310 L
+F
+B
+2382 1529 M
+2410 1529 L
+2410 1501 L
+2382 1501 L
+F
+B
+2493 1631 M
+2521 1631 L
+2521 1603 L
+2493 1603 L
+F
+B
+2549 1432 M
+2577 1432 L
+2577 1404 L
+2549 1404 L
+F
+B
+2605 1584 M
+2633 1584 L
+2633 1556 L
+2605 1556 L
+F
+B
+2660 1285 M
+2688 1285 L
+2688 1257 L
+2660 1257 L
+F
+B
+2772 1546 M
+2800 1546 L
+2800 1518 L
+2772 1518 L
+F
+B
+2828 806 M
+2856 806 L
+2856 778 L
+2828 778 L
+F
+B
+2883 1098 M
+2911 1098 L
+2911 1070 L
+2883 1070 L
+F
+B
+2939 1574 M
+2967 1574 L
+2967 1546 L
+2939 1546 L
+F
+Z
+
+%%Trailer
+W
+%%Pages: 1

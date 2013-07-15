@@ -1,0 +1,196 @@
+# S functions for inference from iterative simulation
+
+# Written 1 July 1991 by Andrew Gelman, Dept. of Statistics, UC Berkeley
+
+# Please mail all comments/questions to gelman@stat.berkeley.edu
+
+# Software can be freely used for non-commercial purposes and freely
+#    distributed.  Submitted to statlib on 29 April 1992.
+
+# Derivations appear in the article, "Inference from iterative simulation,"
+#    by A. Gelman and D. B. Rubin, in "Statistical Science," to appear.
+
+#                     How to Use These Programs
+#
+# Preparation:  The results of m multiple sequences, each of length 2n,
+#    of iterative simulation (e.g., the Metropolis algorithm or the
+#    Gibbs sampler) used to simulate a probability distribution.
+#    The starting points of the simulations should be drawn from a
+#    distribution that is overdispersed relative to the "target"
+#    distribution you are trying to simulate.
+#
+#    At each iteration, all scalar parameters or summaries of interest
+#    should be stored.  The result will be an 2n by m matrix for each
+#    scalar summary.
+#
+# To run:  Use gpar (or gpar.log or gpar.logit) to do output analysis
+#    on the simulations for each scalar summary of interest.  For
+#    each scalar summary r, gpar produces two results:
+#
+#       a.  Estimates of the distribution of r,
+#       b.  The estimated potential scale reduction;
+#           i.e., the factor by which the estimated t intervals for r
+#           might decrease if the iterative simulation is continued
+#           forever.  As n increases, the scale reduction approaches 1.
+
+# The following S functions are included:
+
+# gpar (Gibbs-parallel) takes a matrix r of simulations:  each of
+#       m columns is an independent iteratively simulated sequence of length
+#       2n.  The first n steps of each sequence are discarded.
+#       Output is a list of three vectors:
+#
+#       post:  (2.5%, 50%, 97.5%) quantiles for the target distribution
+#               based on the Student-t distribution
+#       quantiles:  (2.5%, 25%, 50%, 75%, 97.5%) empirical quantiles of
+#               the mn simulated values.
+#       confshrink:  50% and 97.5% quantiles of a rough upper bound on
+#               how much the confidence interval of "post" will shrink
+#               if the iterative simulation is continued forever.
+#
+#           If both components of confshrink are not near 1, you should
+#           probably run the iterative simulation further.
+
+# gpar.log and gpar.logit are versions of gpar to be used for scalar
+#       summaries that are all-positive or are constrained to lie
+#       between 0 and 1.
+
+#############################################################################
+
+# SUBROUTINES
+
+cov _ function (a,b) {
+        m _ length(a)
+        ((mean ((a-mean(a))*(b-mean(b)))) * m)/(m-1)}
+logit _ function (x) {log(x/(1-x))}
+invlogit _ function (x) {1/(1+exp(-x))}
+
+col.means _ function(mat) {
+        ones _ matrix(1, nrow = 1, ncol = nrow(mat))
+        ones %*% mat/nrow(mat)}
+col.vars _ function(mat) {
+        means _ col.means(mat)
+        col.means(mat * mat) - means * means}
+
+# Chi-squared degrees of freedom estimated by method of moments
+#
+#       (Assume A has a gamma sampling distribution and varA is an unbiased
+#       estimate of the sampling variance of A.)
+
+chisqdf _ function (A, varA) {2*(A^2/varA)}
+
+#############################################################################
+
+# MAIN PROGRAM
+
+gpar _ function (r) {
+        alpha _ .05                     # 95% intervals
+        m _ ncol(r)
+        x _ r [(nrow(r)/2+1):nrow(r),]  # second half of simulated sequences
+        n _ nrow(x)
+
+# We compute the following statistics:
+#
+#  xdot:  vector of sequence means
+#  s2:  vector of sequence sample variances (dividing by n-1)
+#  W = mean(s2):  within MS
+#  B = n*var(xdot):  between MS.
+#  muhat = mean(xdot):  grand mean; unbiased under strong stationarity
+#  varW = var(s2)/m:  estimated sampling var of W
+#  varB = B^2 * 2/(m+1):  estimated sampling var of B
+#  covWB = (n/m)*(cov(s2,xdot^2) - 2*muhat*cov(s^2,xdot)):
+#                                               estimated sampling cov(W,B)
+#  sig2hat = ((n-1)/n))*W + (1/n)*B:  estimate of sig2; unbiased under
+#                                               strong stationarity
+#  quantiles:  emipirical quantiles from last half of simulated sequences
+
+        xdot _ as.vector(col.means(x))
+        s2 _ as.vector(col.vars(x))
+        W _ mean(s2)
+        B _ n*var(xdot)
+        muhat _ mean(xdot)
+        varW _ var(s2)/m
+        varB _ B^2 * 2/(m-1)
+        covWB _ (n/m)*(cov(s2,xdot^2) - 2*muhat*cov(s2,xdot))
+        sig2hat _ ((n-1)*W + B)/n
+        quantiles _ quantile (as.vector(x), probs=c(.025,.25,.5,.75,.975))
+
+    if (W > 1.e-8) {            # non-degenerate case
+
+# Posterior interval post.range combines all uncertainties
+# in a t interval with center muhat, scale sqrt(postvar),
+# and postvar.df degrees of freedom.
+#
+#       postvar = sig2hat + B/(mn):  variance for the posterior interval
+#                               The B/(mn) term is there because of the
+#                               sampling variance of muhat.
+#       varpostvar:  estimated sampling variance of postvar
+
+        postvar _ sig2hat + B/(m*n)
+        varpostvar _
+                (((n-1)^2)*varW + (1+1/m)^2*varB + 2*(n-1)*(1+1/m)*covWB)/n^2
+        post.df _ chisqdf (postvar, varpostvar)
+        post.range _ muhat + sqrt(postvar) * qt(1-alpha/2, post.df)*c(-1,0,1)
+
+# Estimated potential scale reduction (that would be achieved by
+# continuing simulations forever) has two components:  an estimate and
+# an approx. 97.5% upper bound.
+#
+# confshrink = sqrt(postvar/W),
+#     multiplied by sqrt(df/(df-2)) as an adjustment for the
+#     width of the t-interval with df degrees of freedom.
+#
+# postvar/W = (n-1)/n + (1+1/m)(1/n)(B/W); we approximate the sampling dist.
+# of (B/W) by an F distribution, with degrees of freedom estimated
+# from the approximate chi-squared sampling dists for B and W.  (The
+# F approximation assumes that the sampling dists of B and W are independent;
+# if they are positively correlated, the approximation is conservative.)
+
+        varlo.df _ chisqdf (W, varW)
+        confshrink.range _ sqrt (c(postvar/W,
+                (n-1)/n + (1+1/m)*(1/n)*(B/W) * qf(.975, m-1, varlo.df)) *
+                post.df/(post.df-2))
+
+        list(post=post.range, quantiles=quantiles, confshrink=confshrink.range)
+    }
+    else {      # degenerate case:  all entries in "data matrix" are identical
+        list (post=muhat*c(1,1,1), quantiles=quantiles, confshrink=c(1,1))
+    }
+        }
+
+##############################################################################
+
+gpar.log _ function (r) {
+        gp _ gpar(log(r))
+        list (post=exp(gp$post), quantiles=exp(gp$quantiles),
+              confshrink=gp$confshrink)}
+
+gpar.logit _ function (r) {
+        gp _ gpar(logit(r))
+        list (post=invlogit(gp$post), quantiles=invlogit(gp$quantiles),
+              confshrink=gp$confshrink)}
+
+gpar.vec _ function (a) {
+
+# monitors the convergence of the gibbs sampler
+# a[i,j,k], i=1,...,n, j=1,...,m, k=1,...,d
+d _ dim(a)[3]
+
+check _ NULL
+for (k in (1:d)){
+    gp _ gpar(a[,,k])
+    check _ rbind (check, gp$confshrink)
+}
+check
+}
+
+"do.summary"<-
+function(a, v = c(0, 0.01, 0.025, 0.05, 
+	0.1, 0.25, 0.5, 0.75, 0.9, 
+	0.95, 0.975, 0.99, 1), coef.names = paste(1:(dim(a)[3])))
+{
+	x <- apply(a, 3, quantile, probs = v)
+	dimnames(x) <- list(paste(round(100 * v, 0), "%", sep = ""), coef.names
+		)
+	t(x)
+}

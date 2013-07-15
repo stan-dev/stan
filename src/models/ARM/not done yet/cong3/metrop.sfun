@@ -1,0 +1,81 @@
+if (0){
+
+# set-up for running Hal's Metropolis program
+
+metrop.setup _ function (year){
+
+# inc regression for year "year"
+# 4 variance components, for open-open, inc-inc, open-inc, inc-open
+
+if (year%%10 == 2 | year<1898) {
+  print ("No estimate for year ending in 2 or before 1898")
+}
+else {
+  i _ (year - 1894)/2
+  now _ cong[[i]]
+  past _ cong[[i-1]]
+  contested _ now[,5]>0 & now[,6]>0 & past[,5]>0 & past[,6]>0
+  now[,4] _ ifelse(now[,4]==3,0,now[,4])
+  past[,4] _ ifelse(past[,4]==3,0,past[,4])
+  good _ contested & now[,2]==past[,2] & now[,3]==past[,3] & abs(now[,4])<=1 &
+    abs(past[,4])<=1
+  v.now _ now[good,5]/(now[good,5]+now[good,6])
+  v.past _ past[good,5]/(past[good,5]+past[good,6])
+  inc.now _ now[good,4]
+  inc.past _ past[good,4]
+  incparty.now _ ifelse (inc.now==0, ifelse (v.past>.5, 1, -1), inc.now)
+
+  if (length(v.now)!=length(v.past)) print ("mistake!")
+  outfile _ paste ("metrop", year, ".inp", sep="")
+  write (c(year, length(v.now)), ncolumns=2, outfile, append=F)
+  write (round (rbind (v.past,v.now,inc.past,inc.now),5), ncolumns=4,
+    outfile, append=T)
+}
+}
+
+for (year in seq(1900,1992,2)) {
+  if (year%%10 != 2) {
+    dum _ metrop.setup (year)
+    print (year)
+  }
+}
+
+}
+
+# Check Hal's program on data from 1920
+
+logpost _ function (delta1, delta2, phi, lsig, lsigphi, lsigsquig) {
+  year _ 1920
+  i _ (year - 1894)/2
+  now _ cong[[i]]
+  past _ cong[[i-1]]
+  contested _ now[,5]>0 & now[,6]>0 & past[,5]>0 & past[,6]>0
+  now[,4] _ ifelse(now[,4]==3,0,now[,4])
+  past[,4] _ ifelse(past[,4]==3,0,past[,4])
+  good _ contested & now[,2]==past[,2] & now[,3]==past[,3] & abs(now[,4])<=1 &
+    abs(past[,4])<=1
+  v.now _ now[good,5]/(now[good,5]+now[good,6])
+  v.past _ past[good,5]/(past[good,5]+past[good,6])
+  inc.now _ now[good,4]
+  inc.past _ past[good,4]
+  incparty.now _ ifelse (inc.now==0, ifelse (v.past>.5, 1, -1), inc.now)
+  n _ length(v.past)
+  sig _ exp(2*lsig)
+  sigphi _ exp(2*lsigphi)
+  sigsquig _ exp(2*lsigsquig)
+  varmat _ array (NA, c(n,2,2))
+  varmat[,1,1] _ sig + sigsquig + inc.past^2*sigphi
+  varmat[,2,2] _ sig + sigsquig + inc.now^2*sigphi
+  noswitch _ ifelse ((inc.past*inc.now)==-1, 0, 1)
+  varmat[,1,2] _ sigsquig + inc.past*inc.now*noswitch*sigphi
+  varmat[,2,1] _ varmat[,1,2]
+  ldens _ .5*log(sigphi) + .5*log(sigsquig)
+  dev1 _ v.past - delta1 - phi*inc.past
+  dev2 _ v.now - delta2 - phi*inc.now
+  dev _ cbind(dev1, dev2)
+  for (j in 1:n)
+    ldens _ ldens - .5*sum(log(eigen(varmat[j,,])$values)) -
+      .5*(t(dev[j,])%*%solve(varmat[j,,])%*%dev[j,])
+  ldens
+}
+

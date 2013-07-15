@@ -1,0 +1,29 @@
+# Simple example with 20 data points, 1 "fixed effect" parameter, and
+#	2 sets of 5 "random effects" parameters
+#
+# Model is y_{ij} = beta0_i + beta1_i * x_{ij} + beta2 * x_{ij}^2
+#	expts i=1,2,3,4,5; measurements j=1,2,3,4 for each expt
+
+intercepts _ 50 + 2*rnorm(5)
+linterms _ 20 + 3*rnorm(5)
+quadterm _ 10
+beta.true _ c(intercepts, linterms, quadterm)
+sigma.true _ 1
+x _ rnorm(20)
+expts _ c(1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5)
+design.mat _ cbind (expts==1, expts==2, expts==3, expts==4, expts==5)
+xmat _ cbind (design.mat, array(x,c(20,5))*design.mat, x^2)
+y _ xmat %*% beta.true + sigma.true*rnorm(20)
+vars _ rep (1,20)	# measurment errors assumed equal
+reffects _ c(1,1,1,1,1,2,2,2,2,2,0)	# groups of random effects
+Xb _ cbind (reffects==1, reffects==2)	# X-matrix of 2nd hierarchical level
+reg _ rerun (xmat, y, vars, b.gr=reffects, Xb=Xb,
+  num.trails=3, g.reps=100, verbose=1)
+
+inference _ monitor (reg$post.dist, trans=c(rep("",13),rep("log",3)))
+print (round (inference,2))
+
+# True parameter values are "beta.true" (for first 11 parameters),
+#	then 50, 20 (the group means), then 1, 4, 9 (the variances)
+
+

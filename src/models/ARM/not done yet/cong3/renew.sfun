@@ -1,0 +1,338 @@
+## S functions to derive posterior simulations for the parameters of a
+## hierarchical normal linear regression
+
+###############################################################################
+#  									      #
+# The function rerun does all the dirty work.  It sets up the problem as      #
+# a non-hierarchical regression (possibly with many different variances)      #
+# and calls various subroutines to get initial estimates of the variances     #
+# and their EM estimates.  Then procedures are called to approximate the      #
+# second derivative of the posterior density near the EM mode.  Using these   #
+# estimates, a procedure is called to generate starting points for the Gibbs  #
+# sampler, and then finally the Gibbs sampler is run.  Diagnostics for the    #
+# Gibbs sampler are returned as well as a summary of the posterior.           #
+#  									      #
+# Function: rerun							      #
+# Arguments: 								      #
+#	x	n by k matrix of covariates				      #
+#  									      #
+#	y	n by 1 vector of data					      #
+#  									      #
+#       y.gr	n by 1 vector of integers indicating which observations have  #
+#		variance sigma_1^2,...,sigma_I^2.			      #
+#  									      #
+#	b.gr 	k by 1 vector of integers indicating the grouping of fixed    #
+#		and random effects.  If all the beta's are fixed can leave    #
+#		as NULL, otherwise put 0 for fixed effects, 1's for first     #
+#		group of betas,..., J's for last group of betas		      #
+#  									      #
+#	Hy	if NULL, the y's have variance determined by y.gr and 	      #
+#		{sigma_i^2}.  If this is not true can specify a known Hy      #
+#		(precision multiplier) as a matrix (see chol.Hy) or as a      #
+#		diagonal vector (i.e. var(y_1)=s^2, var(y_2)=2_s^2)	      #
+#  									      #
+#	chol.Hy if TRUE, then if Hy is specified as a matrix, it is assumed   #
+#		to be the cholesky of the precision.  Otherwise the algorithm #
+#		will find the cholesky of Hy during runtime.		      #
+#  									      #
+#	Ha	if NULL, then Ha is assumed to be an l by l matrix of zeros.  #
+#		Specify this if you want an informative prior on the hyper    #
+#		parameters.						      #
+#  									      #
+#	chol.Ha see chol.Hy						      #
+#  									      #
+#	b0	the prior mean for the betas.  If NULL, taken to be zeros.    #
+#  									      #
+#	a0	the prior mean for the alphas.  If NULL, taken to be zeros.   #
+#  									      #
+#	Xb 	the matrix of parameter covariates.  This should be k by l.   #
+#		If NULL, then there are no alphas in the model.		      #
+#  									      #
+#	init 	initial estimates for the variance components.  If NULL, the  #
+#		program makes quick and dirty estimates which will            #
+#		hopefully not slow down the EM too badly.  If you want to     #
+#  		specify these, make sure to give I plus J of them.	      #
+#  									      #
+#	tol	a constant used in EM convergence check.  You might change    #
+#		this if the EM takes forever to converge.		      #
+#  									      #
+#	maxreps the maximum number of iterations for the EM algorithm to do.  #
+#  									      #
+#	delta	the fraction of change to use for the numerical approx to the #
+#		information matrix.  thi
+###############################################################################
+
+
+rerun <- function(x, y, y.gr, b.gr = NULL, Hy = NULL, chol.Hy = F, 
+	Ha = NULL, chol.Ha = F, b0 = NULL, a0 = NULL, 
+	Xb = NULL, Ha = NULL, init = NULL, pr = NULL, is.unknown = NULL,
+	tol = 1e-07, maxreps = 30,
+	delta = 0.1, eta =4, g.reps = 1000, num.trails = 10, verbose = 1,
+	perm.assign=F){
+
+	# do checks that everything is a vector or matrix
+	# ! NOT Implemented yet!
+
+	n_length(y)
+	k_dim(x)[2]
+	I <- 0
+	J <- 0
+	gr <- codes(ordered(y.gr))
+	if (!is.null(Hy)) {
+		if (!chol.Hy) {Hy <- chol(Hy)}
+		y <- Hy %*% y
+		x <- Hy %*% x
+		}
+	I <- max(gr)
+	ni <- as.vector(table(gr))
+	if (!is.null(b.gr)) {
+		if (any(b.gr==0)) {b.gr <- codes(ordered(b.gr)) - 1}
+		else {b.gr <- codes(ordered(b.gr))}
+		J <- max(b.gr)
+		if (is.null(b0)) {b0 <- rep(0, k)}
+		y <- c(y, b0[b.gr > 0])
+		x <- rbind(x, diag(k)[b.gr > 0, ])
+		k.st <- sum(b.gr > 0)
+		gr <- c(gr, b.gr[b.gr > 0] + I)
+		ni <- c(ni, as.vector(table(b.gr[b.gr > 0])))
+		I <- I + J
+		if (!is.null(Xb)){
+		#stop if Xb is wrong
+			l <- dim(Xb)[2]
+			x <- cbind(x, rbind(matrix(0, n, l),
+				as.matrix(-Xb[(b.gr > 0), ])))
+			if (is.null(Ha)) {l.st <- 0}
+			else {a.gr <- (diag(Ha) > 0)
+				l.st <- sum(sum(a.gr))}
+			if (is.null(a0)) {a0 <- rep(0,l)}
+			if (l.st > 0) {
+				Ha <- Ha[a.gr > 0, a.gr > 0]
+				if (!chol.Ha) {Ha <- chol(Ha)}
+				a0 <- a0[a.gr > 0]
+				a0 <- Ha %*% a0
+				y <- c(y, a0)
+				il <- diag(l)[a.gr > 0, ]
+				il <- Ha %*% il
+				x <- rbind(x, cbind(matrix(0, l.st, k), il))
+				}
+			k <- k + l
+			}
+		}
+	if (is.null(is.unknown)) {is.unknown <- rep(T,I)}
+#	if (is.null(pr)) {pr <- rep(c(2,0),c(I-J,J))}	# old
+	if (is.null(pr)) {pr <- rep(c(2,1),c(I-J,J))}	# new
+	if (verbose>0) cat(I,J,ni,pr,"\n")	# if (verbose>0) added
+	if (perm.assign){
+		I.s <<- I
+		x.s <<- x
+         	y.s <<- y
+		gr.s <<- gr
+		pr.s <<- pr
+		}
+	if (is.null(init)) {init <- get.init(I, x, y, gr, pr)}
+	if (perm.assign) {init.s <<- init}
+	v.mode <- em(x, y, init, gr, pr, is.unknown, ni, I, tol, maxreps,
+		verbose)
+	if(verbose>0) cat("Em found mode \n")
+	if(verbose>1) print(v.mode)
+	conv <- v.mode$converged
+	v.mode <- v.mode$var.mode
+	if (perm.assign) {v.mode.s <<- v.mode}
+	info.mode <- - d2pdv2(x, y, v.mode, gr, pr, is.unknown, I, delta,
+		verbose)
+# kluge
+	diag(info.mode) <- abs(diag(info.mode))
+# kluge
+	if (perm.assign) {info.mode.s <<- info.mode}
+	if(verbose>0) cat("cov estimated \n")
+	if(verbose>1) print(solve(info.mode))
+	v.start <- get.start(v.mode, is.unknown, info.mode, eta, num.trails)
+	if(verbose>0) cat("starting points \n")
+	if(verbose>1) print(v.start)
+	if (perm.assign) {v.start.s <<- v.start}
+	post.sim <- run.gibbs(x, y, v.start, gr, pr, is.unknown, I, ni, k, g.reps,
+		num.trails, verbose)
+	return(var.mode = v.mode, converged = conv, cov.est = solve(info.mode),
+		start.pts = v.start, post.dist = post.sim)
+	}
+
+get.init <- function(n, x, y, gr, pr){
+	return((n:1)+5)}
+
+get.start <- function(var.mode, is.unknown, info.mode, eta, numt){
+	mat <- matrix(NA, numt, length(var.mode))
+	sqrtsig <- t(solve(chol(info.mode)))
+	i <- 1
+	while (i < (numt+1)){
+		vec <- var.mode
+		vec[is.unknown] <- rmvt(var.mode[is.unknown], sqrtsig, eta)
+		if (all(vec > 0)) {
+			mat[i, ] <- vec 
+			i <- i + 1
+			}
+		}
+	return(mat)}
+
+em <- function(x, y, init, gr, pr, is.unknown, ni, I, tol, maxreps, verbose=1){
+	conv.flag <- F
+	post.curr <-  -1e99 	#Set this to avoid 1 step convergence
+	vc <- init
+	for (m in 1:maxreps){
+		if (verbose>1) cat(m,"\n")
+		qr.o <- do.qr(x, vc[gr], y, do.res = T)
+		r.inv <- utmsolve(qr.o$R)
+		s2.vec <- diag.xxt(x%*%r.inv)
+		vl <- vc 
+		for (i in 1:I){
+			if (is.unknown[i]){
+				vc[i] <- vl[i] * sum(qr.o$res[gr==i]^2)
+				vc[i] <- vc[i] + sum(s2.vec[gr==i])
+				vc[i] <- vc[i] / (pr[i] + ni[i])
+				}
+			}
+		if (verbose>1) cat(vc,"\n")
+		post.last <- post.curr
+		post.curr <- calc.post(vl, gr, pr, qr.o)
+		if (verbose>1) cat(post.curr,"\n")
+		if (abs((post.curr-post.last)/post.curr) < tol){
+			conv.flag <- T
+			break
+			}
+		}
+	return(list(var.mode = vc, converged = conv.flag))
+	}
+
+
+do.qr <- function(x, v, y = NULL, do.res = F, do.coef = F){
+	x <- updat(x, v)
+	y <- updat(y, v)
+	qr.o <- qr(x)
+	R.m <- utm(qr.o$qr[, qr.o$pivot])
+	if (do.res) {resids <- qr.resid(qr.o,y)}
+	else {resids <- null()}
+	if (do.coef) {coeffs <- qr.coef(qr.o,y)}
+	else {coeffs <- null()}
+	return(list(R =  R.m, res = resids, coef = coeffs))
+	}
+
+d2pdv2 <- function(x, y, v, gr, pr, is.unknown, I, delta,verbose){
+	qr.o <- NULL
+	I.new <- sum(is.unknown)
+	if (length(delta)==1) {delta <- rep(delta, I.new)}
+	dmat <- matrix(0, I.new, I.new)
+	for (i in 1:I.new){
+		pos <- (1:I)[is.unknown==T][i]
+		ui <- rep(0,I)
+		ui[pos] <- delta[i] * v[is.unknown][i]
+		for (j in i:I.new){
+			pos <- (1:I)[is.unknown==T][j]
+			uj <- rep(0,I)
+			uj[pos] <- delta[j] * v[is.unknown][j]
+			if (verbose > 1) {cat("Doing entry ",c(i,j),"\n")}
+			dmat[i,j] <- sum(
+				+calc.post(v + ui + uj, gr, pr, qr.o, x, y),
+				-calc.post(v - ui + uj, gr, pr, qr.o, x, y),
+				-calc.post(v + ui - uj, gr, pr, qr.o, x, y),
+				+calc.post(v - ui - uj, gr, pr, qr.o, x, y)
+				)/(4 * delta[i] * delta[j] *
+					v[is.unknown][i] * v[is.unknown][j])
+		}
+	}
+	dmat[row(dmat)>col(dmat)] <- t(dmat)[row(dmat)>col(dmat)]
+	return(dmat)
+}
+
+run.gibbs <- function(x, y, v.start, gr, pr, is.unknown, I, ni, k, g.reps=100,
+	num.tr=4, verbose=1){
+	v.last <- v.start
+	Iuk <- sum(is.unknown)
+	post.sim <- array(NA, c(g.reps, num.tr, k + Iuk))
+	for (m in 1:g.reps){
+		for (trail in 1:num.tr){
+			qr.o <- do.qr(x, v.last[trail,][gr], y, do.res = T,
+				do.coef = T)
+			gamma.sim <- rmnorm(qr.o$coef, t(utmsolve(qr.o$R)))
+			sim.res <- (y - x %*% gamma.sim)
+			for(i in 1:I){
+				if (is.unknown[i]){
+				  v.last[trail, i] <- sum(sim.res[gr==i]^2)/
+					rchisq(1, ni[i] - (2 - pr[i]))
+				  }
+				}
+			post.sim[m, trail, ] <- c(gamma.sim, 
+				v.last[trail,is.unknown])
+			}
+		if (verbose > 1) {cat("Iteration ",m,"\n")}
+		}
+	return(post.sim)}
+
+
+calc.post <- function(v, gr, pr, qr.o = NULL, x = NULL, y = NULL){
+	v.big <- v[gr]
+	if (is.null(qr.o)) {
+		qr.o <- do.qr(x, v.big, y, do.res = T)
+		}
+	det <- 1/(prod(diag(qr.o$R))^2)
+	return(sum(c(.5*log(det), -.5*sum(log(c(v.big, rep(v, pr)))),
+		-.5*sum(qr.o$res^2))))
+	}
+
+updat <- function(thing, var){
+	return(thing/sqrt(var))
+	}
+
+rmnorm <- function(mu, sqrtsig){
+	vec <- rnorm(length(mu))
+	t(sqrtsig) %*% vec + mu
+	}
+
+rmvt <- function(mu, sqrtsig, dof){
+	vec <- rmnorm(mu, sqrtsig)
+	return(vec * sqrt(dof/rchisq(1,dof)))
+	}
+
+tr <- function(mat){
+	sum(diag(mat))
+	}	
+
+
+utm <- function(mat){
+	mat <- mat[seq(min(dim(mat))),]
+	mat[row(mat) > col(mat)] <- 0
+	return(mat)
+	}
+
+
+diag.xxt <-  function(x)
+{
+	n <- dim(x)[1]
+	p <- dim(x)[2]
+	resvec <- as.double(rep(0,n))
+	if(!is.loaded(C.symbol("diagxxt_from_S")))
+		dyn.load("re.o")
+	storage.mode(x) <- "double"
+	result <- .C("diagxxt_from_S",
+		x,
+		answer = resvec,
+		as.integer(n),
+		as.integer(p))
+	return(result$answer)
+}
+
+utmsolve <- function(x)
+{
+	n <- dim(x)[1]
+	if (n!=(dim(x)[2])) stop("x must be square")
+	storage.mode(x) <- "double"
+	xinv <- x 
+	if(!is.loaded(C.symbol("uppersolve_from_S")))
+		dyn.load("re.o")
+	result <- .C("uppersolve_from_S",
+		x,
+		answer = xinv,
+		as.integer(n),
+		status = as.integer(1))
+	if (!result$status) stop("matrix not invertible")
+	return(result$answer)
+}
+

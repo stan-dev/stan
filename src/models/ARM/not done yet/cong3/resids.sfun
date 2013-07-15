@@ -1,0 +1,89 @@
+nsim _ function (mean, cov){
+    as.vector(mean + rnorm(nrow(cov)) %*% chol(cov))
+}
+
+if (0){
+
+increg _ function (year){
+
+# inc regression for year "year"
+
+if (year%%10 == 2 | year<1898) {
+  print ("No estimate for year ending in 2 or before 1898")
+}
+else {
+  i _ (year - 1894)/2
+  now _ cong[[i]]
+  past _ cong[[i-1]]
+  contested _ now[,5]>0 & now[,6]>0 & past[,5]>0 & past[,6]>0
+  now[,4] _ ifelse(now[,4]==3,0,now[,4])
+  good _ contested & now[,2]==past[,2] & now[,3]==past[,3] & abs(now[,4])<=1
+  v.now _ now[good,5]/(now[good,5]+now[good,6])
+  v.past _ past[good,5]/(past[good,5]+past[good,6])
+  inc.now _ now[good,4]
+  incparty.now _ ifelse (inc.now==0, ifelse (v.past>.5, 1, -1), inc.now)
+  x _ cbind (inc.now, v.past, incparty.now)
+  lsf _ lsfit (x, v.now)
+  lss _ ls.summary (lsf)
+  n _ nrow(x)
+  k _ ncol(x) + 1
+  output _ c(year, lsf$coef, lss$std.err, lss$std.dev, n, n-k)
+  print (round (output, 3))
+  list (regression=output, v.now=v.now, v.past=v.past, inc.now=inc.now,
+      resids=lsf$residuals, std.resids=lsf$residuals/lss$std.dev,
+      corrs=lss$correlation)
+}
+}
+
+incadv _ NULL
+v.now _ NULL
+v.past _ NULL
+inc.now _ NULL
+resids _ NULL
+std.resids _ NULL
+year.resids _ NULL
+corrs _ array (NA, c(4,4,38))
+ii _ 0
+for (year in seq(1898,1992,2)) {
+  if (year%%10 != 2) {
+    ii _ ii+1
+    output _ increg(year)
+    incadv _ rbind (incadv, output$regression)
+    v.now _ c(v.now,output$v.now)
+    v.past _ c(v.past, output$v.past)
+    inc.now _ c(inc.now, output$inc.now)
+    resids _ c(resids, output$resids)
+    std.resids _ c(std.resids, output$std.resids)
+    year.resids _ c(year.resids, rep(year,length(output$resids)))
+    corrs[,,ii] _ output$corrs
+  }
+}
+
+cond1 _ inc.now==0
+cond2 _ abs(resids)>.2
+sw _ (v.now>.5 & v.past<.5) | (v.now<.5 & v.past>.5)
+nopen _ sum(cond1)
+ncont _ sum(!cond1)
+observed _ c(mean(cond2[cond1]), mean(cond2[!cond1]), mean(sw))
+print (observed)
+
+# residuals over time
+
+postscript ("fig8.4.ps", horizontal=T, rasters=1200)
+incyear _ incadv[,1]
+rms.open _ NULL
+rms.inc _ NULL
+for (year in seq(1898,1992,2)) {
+  if (year%%10 != 2) {
+    rms.open _ c(rms.open, sqrt(mean(resids[year.resids==year&cond1]^2)))
+    rms.inc _ c(rms.inc, sqrt(mean(resids[year.resids==year&!cond1]^2)))
+  }
+}
+plot (range(incyear), range(rms.open,rms.inc),
+    xlab="Year", ylab="", type="n")
+lines (incyear, rms.open, lty=2)
+lines (incyear, rms.inc, lty=1)
+
+
+
+

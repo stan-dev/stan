@@ -1,0 +1,29 @@
+# 1948
+i _ 27
+postscript ("chance1a.ps", horizontal=T)
+par (mar=c(5,5,4,1)+.1)
+data _ cong[[i]]
+dem _ data[,5]
+rep _ data[,6]
+ok _ dem>-9 & rep>-9
+ratio _ dem[ok]/(dem[ok]+rep[ok])
+ratio _ ifelse (ratio==0, .001, ratio)
+ratio _ ifelse (ratio==1, .999, ratio)
+hist (ratio, breaks=seq(0,1,.05), xaxs="i", yaxs="i", yaxt="n",
+  xlab="Democratic share of vote for Congress", cex=2)
+title ("U.S. Congressional districts in 1948", cex=1.2)
+
+# 1988
+i _ 48
+postscript ("chance1b.ps", horizontal=T)
+par (mar=c(5,5,4,1)+.1)
+data _ cong[[i]]
+dem _ data[,5]
+rep _ data[,6]
+ok _ dem>-9 & rep>-9
+ratio _ dem[ok]/(dem[ok]+rep[ok])
+ratio _ ifelse (ratio==0, .001, ratio)
+ratio _ ifelse (ratio==1, .999, ratio)
+hist (ratio, breaks=seq(0,1,.05), xaxs="i", yaxs="i", yaxt="n",
+  xlab="Democratic share of vote for Congress", cex=2)
+title ("U.S. Congressional districts in 1988", cex=1.2)

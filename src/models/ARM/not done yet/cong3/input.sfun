@@ -1,0 +1,16 @@
+congress _ vector ("list", 49)
+for (i in 1:49){
+  year _ 1896 + 2*(i-1)
+  file _ paste ("../cong3/", year, ".asc", sep="")
+  data.year _ matrix (scan (file), byrow=T, ncol=5)
+  data.year _ cbind (rep(year, nrow(data.year)), data.year)
+  congress[[i]] _ data.year
+}
+
+
+for (i in 1:49){
+  year _ 1896 + 2*(i-1)
+  cond _ abs(congress[[i]][,4])>1 & congress[[i]][,4]!=-9
+  print (congress[[i]][cond,])
+}
+

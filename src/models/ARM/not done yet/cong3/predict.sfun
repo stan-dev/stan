@@ -1,0 +1,161 @@
+# S functions for graphs for my Berkeley talk
+
+incfix _ NULL
+for (year in seq(1896,1990,2)){
+  i _ (year - 1894)/2
+  if (year<1946)
+    incfix[i] _ 0.01
+  else if (year<1960)
+    incfix[i] _ 0.01 + 0.03*(year-1946)/(1960-1946)
+  else if (year<1974)
+    incfix[i] _ 0.04 + 0.06*(year-1960)/(1974-1960)
+  else
+    incfix[i] _ 0.10
+}
+
+predictions _ function (year){
+
+# inc regression for year "year"
+
+if (year%%10 == 2 | year%%10 == 4 | year<1900) {
+  print ("No estimate for year ending in 2 or 4 or before 1900")
+}
+else {
+  i _ (year - 1894)/2
+  now _ cong[[i]]
+  past _ cong[[i-1]]
+  v.now _ now[,5]/(now[,5]+now[,6])
+  v.past _ past[,5]/(past[,5]+past[,6])
+  contested.now _ v.now>.05 & v.now<.95
+  contested.past _ v.past>.05 & v.past<.95
+  dunc.past _ v.past>.95
+  runc.past _ v.past<.05
+  v.now _ ifelse (v.now<.05, .25, v.now)
+  v.now _ ifelse (v.now>.95, .75, v.now)
+  v.past _ ifelse (v.past<.05, .25, v.past)
+  v.past _ ifelse (v.past>.95, .75, v.past)
+  v2.ups _ v.now
+  v2.ups[contested.now] _ v.past[contested.now]
+  v2.ups[contested.now] _ v2.ups[contested.now] +
+    mean(v.now[contested.now]) - mean(v2.ups[contested.now])
+  s1 _ mean(v.past>.5)
+  s2 _ mean(v.now>.5)
+  s2.ups _ mean(v2.ups>.5)
+  inc.now _ now[,4] 
+  inc.past _ past[,4]
+  inc.now _ ifelse (abs(inc.now)>1, 0, inc.now) 
+  inc.past _ ifelse (abs(inc.past)>1, 0, inc.past)
+  v2.ups.inc _ v.now
+  v2.ups.inc[contested.now] _ v.past[contested.now] +
+    inc.now[contested.now]*incfix[i-1] - inc.past[contested.now]*incfix[i-1]
+  v2.ups.inc[contested.now] _ v2.ups.inc[contested.now] +
+    mean(v.now[contested.now]) - mean(v2.ups.inc[contested.now])
+  s2.ups.inc _ mean(v2.ups.inc>.5)
+
+  pastpast _ cong[[i-2]]
+  v.pastpast _ pastpast[,5]/(pastpast[,5]+pastpast[,6])
+  contested.pastpast _ v.pastpast>.05 & v.pastpast<.95
+  dunc.pastpast _ v.pastpast>.95
+  runc.pastpast _ v.pastpast<.05
+  v.pastpast _ ifelse (v.pastpast<.05, .25, v.pastpast)
+  v.pastpast _ ifelse (v.pastpast>.95, .75, v.pastpast)
+  inc.pastpast _ pastpast[,4]
+  inc.pastpast _ ifelse (abs(inc.pastpast)>1, 0, inc.pastpast) 
+  vcorr.past _ v.past - inc.past*incfix[i-1]
+  vcorr.pastpast _ v.pastpast - inc.pastpast*incfix[i-1]
+  if (sum(dunc.pastpast[contested.past])==0 &
+      sum(runc.pastpast[contested.past])==0){
+    x _ cbind (rep(1,length(v.past)),v.pastpast,inc.past)
+    x2 _ cbind (rep(1,length(v.past)),v.past,inc.now)
+  }
+  if (sum(dunc.pastpast[contested.past])==0 &
+      sum(runc.pastpast[contested.past])>0){
+    x _ cbind (rep(1,length(v.past)),v.pastpast,inc.past,
+      runc.pastpast)
+    x2 _ cbind (rep(1,length(v.past)),v.past,inc.now,
+      runc.past)
+  }
+  if (sum(dunc.pastpast[contested.past])>0 &
+      sum(runc.pastpast[contested.past])==0){
+    x _ cbind (rep(1,length(v.past)),v.pastpast,inc.past,
+      dunc.pastpast)
+    x2 _ cbind (rep(1,length(v.past)),v.past,inc.now,
+      dunc.past)
+  }
+  if (sum(dunc.pastpast[contested.past])>0 &
+      sum(runc.pastpast[contested.past])>0){
+    x _ cbind (rep(1,length(v.past)),v.pastpast,inc.past,
+      dunc.pastpast,runc.pastpast)
+    x2 _ cbind (rep(1,length(v.past)),v.past,inc.now,
+      dunc.past,runc.past)
+  }
+  incparty.past _ ifelse (v.pastpast>.5,1,-1)
+  incparty.now _ ifelse (v.past>.5,1,-1)
+  x _ cbind (x, incparty.past)
+  x2 _ cbind (x2, incparty.now)
+  lsf _ lsfit (x[contested.past,], v.past[contested.past], intercept=F)
+#  lsf _ lsfit (x2[contested.now,], v.now[contested.now], intercept=F)
+  lss _ ls.summary (lsf)
+  v2.pred _ v.now
+  v2.pred[contested.now] _ x2[contested.now,] %*% as.vector(lsf$coef)
+  v2.pred[contested.now] _ v2.pred[contested.now] +
+    mean(v.now[contested.now]) - mean(v2.pred[contested.now])
+  s2.pred _ mean(pnorm(v2.pred, .5, lss$std.dev))
+  output _ c(year, s1, s2, s2.ups, s2.ups.inc,  s2.pred)
+  output
+}
+}
+
+output _ NULL
+for (year in seq(1900,1992,2)) {
+  if (year%%10 != 2 & year%%10 != 4) {
+    output _ rbind(output, predictions(year))
+  }
+}
+
+print (sqrt(mean((output[,4]-output[,3])^2)))
+print (sqrt(mean((output[,5]-output[,3])^2)))
+print (sqrt(mean((output[,6]-output[,3])^2)))
+
+plot (output[,1],abs(output[,5]-output[,3]),type="l")
+lines (output[,1],abs(output[,6]-output[,3]),col=2)
+
+plot (output[,5]-output[,3], output[,6]-output[,3])
+abline (0,1)
+
+if (0){
+
+postscript ("histograms.ps", horizontal=T, rasters=1200)
+par(mfcol=c(2,2))
+year _ 1948
+i _ (year - 1894)/2
+now _ cong[[i]]
+v _ now[,5]/(now[,5]+now[,6])
+v _ ifelse (v==0, .001, v)
+v _ ifelse (v==1, .999, v)
+contested _ v>.05 & v<.95
+hist (v, breaks=seq(0,1,.05), xlab="Democratic vote share",cex=.7)
+title ("1948, raw data",cex=.5)
+inc _ now[,4]
+inc _ ifelse (inc==-9, 0, inc)
+v.fix _ ifelse (contested, v - inc*incfix[i], v)
+hist (v.fix,breaks=seq(0,1,.05),xlab="Democratic vote share",cex=.7)
+title ("1948, subtracting the incumbency advantage",cex=.5)
+
+year _ 1988
+i _ (year - 1894)/2
+now _ cong[[i]]
+v _ now[,5]/(now[,5]+now[,6])
+v _ ifelse (v==0, .001, v)
+v _ ifelse (v==1, .999, v)
+contested _ v>.05 & v<.95
+hist (v, breaks=seq(0,1,.05), xlab="Democratic vote share",cex=.7)
+title ("1988, raw data",cex=.5)
+inc _ now[,4]
+inc _ ifelse (inc==-9, 0, inc)
+v.fix _ ifelse (contested, v - inc*incfix[i], v)
+hist (v.fix,breaks=seq(0,1,.05),xlab="Democratic vote share",cex=.7)
+title ("1988, subtracting the incumbency advantage",cex=.5)
+
+
+}

@@ -1,0 +1,44 @@
+postscript ("ferd.ps")
+par (mfrow=c(4,3), pty="s")
+regs _ NULL
+for (year in seq(1898,1992,2)){
+  if (year%%10 != 2) {
+    i _ (year - 1894)/2
+    now _ cong[[i]]
+    past _ cong[[i-1]]
+    contested _ now[,5]>0 & now[,6]>0 & past[,5]>0 & past[,6]>0
+    now[,4] _ ifelse(now[,4]==3,0,now[,4])
+    good _ contested & now[,2]==past[,2] & now[,3]==past[,3] & abs(now[,4])<=1
+    v.now _ now[good,5]/(now[good,5]+now[good,6])
+    v.past _ past[good,5]/(past[good,5]+past[good,6])
+    contested1 _ v.now>.05 & v.now<.95 & v.past>.05 & v.past<.95
+    v.now _ v.now[contested1]
+    v.past _ v.past[contested1]
+    inc.now _ now[good,4][contested1]
+    incparty.now _ ifelse (inc.now==0, ifelse (v.past>.5, 1, -1), inc.now)
+    y _ v.now
+    x _ cbind (rep(1,length(y)), v.past-.5, inc.now, abs(inc.now)*(v.past-.5),
+      incparty.now)
+    lsf _ lsfit (x, y, intercept=F)
+    beta _ lsf$coef
+    plot (v.past, v.now, xlab=as.character(year-2), ylab=as.character(year),
+      xlim=c(0,1), ylim=c(0,1), type="n")
+    points (v.past[inc.now==0], v.now[inc.now==0], pch="o")
+    points (v.past[abs(inc.now)==1], v.now[abs(inc.now)==1], pch=".")
+    xdum _ cbind (c(1,1), c(-.5,0), c(0,0), c(0,0), c(-1,-1))
+    ydum _ xdum %*% beta
+    lines (xdum[,2]+.5, ydum, lty=2)
+    xdum _ cbind (c(1,1), c(0,.5), c(0,0), c(0,0), c(1,1))
+    ydum _ xdum %*% beta
+    lines (xdum[,2]+.5, ydum, lty=2)
+    xdum _ cbind (c(1,1), c(-.5,0), c(-1,-1), c(-.5,0), c(-1,-1))
+    ydum _ xdum %*% beta
+    lines (xdum[,2]+.5, ydum)
+    xdum _ cbind (c(1,1), c(0,.5), c(1,1), c(0,.5), c(1,1))
+    ydum _ xdum %*% beta
+    lines (xdum[,2]+.5, ydum)
+    print (round (c(year,beta),2))
+  }
+}
+
+

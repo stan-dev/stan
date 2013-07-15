@@ -1,0 +1,137 @@
+nsim _ function (mean, cov){
+    as.vector(mean + rnorm(nrow(cov)) %*% chol(cov))
+}
+
+if (0){
+
+increg _ function (year){
+
+# inc regression for year "year"
+
+if (year%%10 == 2 | year<1898) {
+  print ("No estimate for year ending in 2 or before 1898")
+}
+else {
+  i _ (year - 1894)/2
+  now _ cong[[i]]
+  past _ cong[[i-1]]
+  contested _ now[,5]>.1 & now[,6]>.1 & past[,5]>.1 & past[,6]>.1
+  now[,4] _ ifelse(now[,4]==3,0,now[,4])
+  good _ contested & now[,2]==past[,2] & now[,3]==past[,3] & abs(now[,4])<=1
+  v.now _ now[good,5]/(now[good,5]+now[good,6])
+  v.past _ past[good,5]/(past[good,5]+past[good,6])
+  inc.now _ now[good,4]
+  incparty.now _ ifelse (v.past>.5, 1, -1)
+  x _ cbind (inc.now, v.past, incparty.now)
+  lsf _ lsfit (x, v.now)
+  lss _ ls.summary (lsf)
+  n _ nrow(x)
+  k _ ncol(x) + 1
+  output _ c(year, lsf$coef, lss$std.err, lss$std.dev, n, n-k)
+  print (round (output, 3))
+  list (regression=output, v.now=v.now, v.past=v.past, inc.now=inc.now,
+      resids=lsf$residuals, std.resids=lsf$residuals/lss$std.dev,
+      corrs=lss$correlation)
+}
+}
+
+incadv _ NULL
+v.now _ NULL
+v.past _ NULL
+inc.now _ NULL
+resids _ NULL
+std.resids _ NULL
+year.resids _ NULL
+corrs _ array (NA, c(4,4,38))
+ii _ 0
+for (year in seq(1898,1992,2)) {
+  if (year%%10 != 2) {
+    ii _ ii+1
+    output _ increg(year)
+    incadv _ rbind (incadv, output$regression)
+    v.now _ c(v.now,output$v.now)
+    v.past _ c(v.past, output$v.past)
+    inc.now _ c(inc.now, output$inc.now)
+    resids _ c(resids, output$resids)
+    std.resids _ c(std.resids, output$std.resids)
+    year.resids _ c(year.resids, rep(year,length(output$resids)))
+    corrs[,,ii] _ output$corrs
+  }
+}
+
+cond1 _ inc.now==0
+cond2 _ abs(resids)>.2
+sw _ (v.now>.5 & v.past<.5) | (v.now<.5 & v.past>.5)
+nopen _ sum(cond1)
+ncont _ sum(!cond1)
+observed _ c(mean(cond2[cond1]), mean(cond2[!cond1]), mean(sw))
+print (observed)
+
+}
+
+# post pred sim (dum)
+
+nloop _ 1000
+test1 _ rep (0, nloop)
+test2 _ rep (0, nloop)
+test3 _ rep (0, nloop)
+test4 _ rep (0, nloop)
+test5 _ rep (0, nloop)
+ii _ 0
+for (year in seq(1898,1992,2)) {
+ if (year%%10 != 2) {
+  ii _ ii + 1
+  i _ (year - 1894)/2
+  now _ cong[[i]]
+  past _ cong[[i-1]]
+  contested _ now[,5]>.1 & now[,6]>.1 & past[,5]>.1 & past[,6]>.1
+  now[,4] _ ifelse(now[,4]==3,0,now[,4])
+  good _ contested & now[,2]==past[,2] & now[,3]==past[,3] & abs(now[,4])<=1
+  v.now _ now[good,5]/(now[good,5]+now[good,6])
+  v.past _ past[good,5]/(past[good,5]+past[good,6])
+  inc.now _ now[good,4]
+  incparty.now _ ifelse (v.past>.5, 1, -1)
+  x _ cbind (inc.now, v.past, incparty.now)
+  n _ nrow(x)
+  k _ ncol(x) + 1
+
+  a1 _ rep(NA,nloop)
+  a2 _ rep(NA,nloop)
+  for (loop in 1:nloop) {
+    sdmat _ array (incadv[ii,6:9], c(4,4))
+    covmat _ corrs[,,ii]*sdmat*t(sdmat)
+    sigsim _ incadv[ii,10] * sqrt((n-k)/rchisq(1,n-k))
+    betasim _ t(nsim (incadv[ii,2:5], .5*(covmat+t(covmat))*
+      (sigsim/incadv[ii,10])^2))
+    ysim _ cbind(rep(1,nrow(x)),x)%*%betasim + sigsim*rnorm(n)
+    lsf _ lsfit (x, ysim)
+    cond1 _ inc.now==0
+    cond2 _ abs(lsf$residuals)>.2
+    test1[loop] _ test1[loop] + sum(cond2[cond1])
+    test2[loop] _ test2[loop] + sum(cond2[!cond1])
+    sw _ (ysim>.5 & v.past<.5) | (ysim<.5 & v.past>.5)
+    test3[loop] _ test3[loop] + sum(sw)
+    test4[loop] _ test4[loop] + sum(sw[cond1])
+    test5[loop] _ test5[loop] + sum(sw[!cond1])
+  }
+  print (year)
+ }
+}
+
+test1 _ test1/nopen
+test2 _ test2/ncont
+test3 _ test3/(nopen+ncont)
+test4 _ test4/nopen
+test5 _ test5/ncont
+
+summ _ function (a){
+  n _ length(a)
+  a _ sort(a)
+  c (a[.025*n+1], median(a), a[.975*n])}
+
+print (observed)
+print (summ(test1))
+print (summ(test2))
+print (summ(test3))
+print (summ(test4))
+print (summ(test5))

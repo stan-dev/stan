@@ -1,0 +1,603 @@
+%! 
+%%Title: S graphics
+%%Creator: gelman
+%%CreationDate: Fri Sep  9 18:29:09 1994
+%%Pages: (atend)
+%%BoundingBox: 20 11 591 781
+%%EndComments
+% beginning of preamble
+100 dict begin
+/bd {bind def} def
+% drawing commands
+/I {Coord SetPage 1 setlinecap 1 setlinejoin
+    LineTypes {RastersPerPoint ScaleArray} forall
+    /Helvetica findfont
+    PointSize RastersPerPoint mul Cex mul scalefont setfont} bd
+/A {PageBegin} bd
+/B {newpath} bd
+/C {currentpoint stroke moveto} bd
+/E {stroke} bd
+/M {moveto} bd
+/L {lineto} bd
+/S {moveto lineto stroke} bd
+/F {closepath fill} bd
+/P {gsave moveto Pch-x Pch-y rmoveto Pch Show grestore} bd
+/T {/Adjust exch def gsave translate StringRot rotate 0 0 moveto
+    dup stringwidth pop neg Adjust mul 0 rmoveto
+    currentpoint translate TextShow grestore} bd
+/X {erasepage InPage {PageEnd} if} bd
+/Z {gsave showpage grestore PageEnd} bd
+/W {end} bd
+
+% parameter setting commands
+/St {1 sub LineTypes dup 3 1 roll length Rem floor get 0 setdash} bd
+/Sw {abs 2 div RastersPerPoint mul setlinewidth SetClip} bd
+/Sc {dup dup 1 lt exch 0 ge and
+     {1 exch sub setgray}
+     {1 sub Colors dup 3 1 roll length Rem floor get
+	dup type /arraytype eq {aload pop sethsbcolor} {setgray} ifelse} ifelse} bd
+/Sp {Pch exch 0 exch put SetPchSize} bd
+/Sx {dup Cex div /Ratio exch def
+     /Cex exch def
+     currentfont Ratio scalefont setfont
+     /Pch-x Pch-x Ratio mul def
+     /Pch-y Pch-y Ratio mul def
+     /Text-y Text-y Ratio mul def} bd
+/So {4 1 roll exch 4 -1 roll Plot astore pop SetClip} bd
+/Sg {4 1 roll exch 4 -1 roll Figure astore pop SetClip} bd
+/Sr {/StringRot exch def} bd
+/Sh {/CharRot exch def} bd
+/Sd {0 eq /ClipToPlot exch def SetClip} bd
+/Sf {dup 0 lt /Outline exch def abs
+     1 sub Fonts dup 3 1 roll length Rem floor get
+     findfont PointSize Cex mul RastersPerPoint mul scalefont dup setfont
+     dup /FontMatrix get /Matrix exch def /FontBBox get aload pop
+     Matrix transform 4 2 roll Matrix transform
+     exch pop add /Text-y exch def pop SetPchSize} bd
+
+% other variable definitions
+/InPage false def
+/Clip 4 array def
+/Page 4 array def
+/Figure [0 0 1 1] def
+/Plot [0 0 1 1] def
+/ClipToPlot true def
+/Cex 1 def
+/Outline false def
+/Pch 1 string def
+/Pch-x 0 def
+/Pch-y 0 def
+/Text-y 0 def
+/LineTypes [ % in default units
+	[]		[1 2]		[4 4]		[8 4]
+	[13 3]		[16 2 2 2]	[8 2 2 2]	[1 13]
+	[6 5]		[12 4]
+] def
+
+% other procedure definitions
+/Rem {2 copy div floor mul sub floor cvi} bd
+/RastersPerPoint {RastersPerInch 72 div} bd
+/ScaleArray {/Factor exch def /Array exch def
+	     0 1 Array length 1 sub
+	     {dup Array exch get Factor mul Array 3 1 roll put} for} bd
+/Coord {Region aload pop /uy exch def /ux exch def /ly exch def /lx exch def
+	uy ly sub ux lx sub Landscape {exch} if /Width exch def /Height exch def
+	lx ly translate Landscape {90 rotate 0 Height neg translate} if
+	1 RastersPerPoint div dup scale} bd
+/SetPchSize {gsave
+	     newpath 0 0 moveto Pch false charpath flattenpath pathbbox
+	     exch 3 1 roll
+	     add 2 div neg /Pch-y exch def
+	     add 2 div neg /Pch-x exch def
+	     grestore} bd
+/TextShow {CharRot StringRot sub dup 0 eq {pop SimpleShow} {FancyShow} ifelse} bd
+/SimpleShow {0 Text-y 2 div neg rmoveto Show} bd
+/FancyShow {
+	/RotDiff exch def
+	/Cos RotDiff cos abs def
+	/Sin RotDiff sin abs def
+	{
+		( ) dup 0 4 -1 roll put
+		dup stringwidth pop /CharWidth exch def
+		Cos 0 eq {
+			Text-y Sin div
+		} {
+			Sin 0 eq {
+				CharWidth Cos div
+			} {
+				/Ht Text-y Sin div def
+				/Wd CharWidth Cos div def
+				Ht Wd lt {Ht} {Wd} ifelse
+			} ifelse
+		} ifelse 2 div /CharDist exch def
+		CharDist 0 translate 0 0 moveto
+		gsave
+			RotDiff rotate
+			CharWidth 2 div neg Text-y 2 div neg rmoveto
+			Outline {false charpath stroke} {show} ifelse
+		grestore
+		CharDist 0 translate 0 0 moveto
+	} forall
+} bd
+/Show {Outline {false charpath stroke} {show} ifelse} bd
+/BoxClip {/CLW currentlinewidth def
+	  2 {CLW add 4 1 roll} repeat
+	  2 {CLW sub 4 1 roll} repeat
+	  initclip newpath 2 index exch 2 index exch dup 6 index exch
+	  moveto 3 {lineto} repeat closepath clip newpath} bd
+/Subregion {/A exch def /Uy exch def /Ux exch def /Ly exch def /Lx exch def
+	    Ux Lx sub A 0 get mul Lx add
+	    Uy Ly sub A 1 get mul Ly add
+	    Ux Lx sub A 2 get mul Lx add
+	    Uy Ly sub A 3 get mul Ly add} bd
+/SetFigure {Page aload pop Figure Subregion} bd
+/SetPlot {SetFigure Plot Subregion} bd
+/SetClip {ClipToPlot {SetPlot} {SetFigure} ifelse BoxClip} bd
+/SetPage {0 0 Width Height Page astore RastersPerPoint ScaleArray} bd
+/PageBegin {save /PageContext exch def /InPage true def} bd
+/PageEnd {PageContext restore /InPage false def} bd
+% end of preamble
+
+% fixed controlling parameters
+/Landscape false def
+/Region [20.8788 11.802 590.881 780.438] def
+/RastersPerInch 300 def
+/PointSize 14 def
+/Fonts [
+	/Helvetica
+	/Courier
+	/Times-Roman
+	/Helvetica-Oblique
+	/Helvetica-Bold
+	/Helvetica-BoldOblique
+	/Courier-Oblique
+	/Courier-Bold
+	/Courier-BoldOblique
+	/Times-Italic
+	/Times-Bold
+	/Times-BoldItalic
+	/Symbol
+	/AvantGarde-Book
+	/AvantGarde-BookOblique
+	/AvantGarde-Demi
+	/AvantGarde-DemiOblique
+	/Bookman-Demi
+	/Bookman-DemiItalic
+	/Bookman-Light
+	/Bookman-LightItalic
+	/Helvetica-Narrow
+	/Helvetica-Narrow-Bold
+	/Helvetica-Narrow-BoldOblique
+	/Helvetica-Narrow-Oblique
+	/NewCenturySchlbk-Roman
+	/NewCenturySchlbk-Bold
+	/NewCenturySchlbk-Italic
+	/NewCenturySchlbk-BoldItalic
+	/Palatino-Roman
+	/Palatino-Bold
+	/Palatino-Italic
+	/Palatino-BoldItalic
+	/ZapfChancery-MediumItalic
+	/ZapfDingbats
+] def
+/Colors [
+	0
+	0.6
+	0.3
+	0.9
+	0.4
+	0.7
+	0.1
+	0.5
+	0.8
+	0.2
+] def
+
+% all initialization action here
+I
+
+%%EndProlog
+
+
+%%Page: 1 1
+A
+1 St
+1 Sw
+1 Sc
+0 Sr
+111 Sp
+1 Sx
+0.120842 0.938106 0.207897 0.81396 So
+0 1 0 1 Sg
+0 Sh
+1 Sd
+1 Sf
+(1978) 1258 421 0.5 T
+90 Sr
+90 Sh
+(1980) 42 1636 0.5 T
+0 Sr
+0 Sh
+359 666 359 627 S
+718 666 718 627 S
+1078 666 1078 627 S
+1437 666 1437 627 S
+1797 666 1797 627 S
+2156 666 2156 627 S
+359 666 2156 666 S
+(0.0) 359 561 0.5 T
+(0.2) 718 561 0.5 T
+(0.4) 1078 561 0.5 T
+(0.6) 1437 561 0.5 T
+(0.8) 1797 561 0.5 T
+(1.0) 2156 561 0.5 T
+90 Sr
+90 Sh
+287 738 248 738 S
+287 1097 248 1097 S
+287 1457 248 1457 S
+287 1816 248 1816 S
+287 2175 248 2175 S
+287 2535 248 2535 S
+287 738 287 2535 S
+(0.0) 182 738 0.5 T
+(0.2) 182 1097 0.5 T
+(0.4) 182 1457 0.5 T
+(0.6) 182 1816 0.5 T
+(0.8) 182 2175 0.5 T
+(1.0) 182 2535 0.5 T
+0 Sr
+0 Sh
+0 Sd
+B
+287 2607 M
+287 666 L
+2228 666 L
+2228 2607 L
+287 2607 L
+E
+46 Sp
+1441 1871 P
+1107 1410 P
+1299 1643 P
+1513 1802 P
+1020 1304 P
+1160 1124 P
+1668 2099 P
+1711 2038 P
+1526 1923 P
+1325 1671 P
+1763 2147 P
+1057 1446 P
+1486 1830 P
+1460 1953 P
+1304 1541 P
+1104 1417 P
+1793 2135 P
+1553 1785 P
+1370 1645 P
+1479 1488 P
+852 1114 P
+1057 1498 P
+1311 1597 P
+1697 1963 P
+1143 1445 P
+1927 2294 P
+1639 1902 P
+837 1121 P
+1224 1221 P
+1722 1916 P
+1126 1504 P
+1345 1750 P
+1284 1612 P
+951 1334 P
+1520 1586 P
+1853 2097 P
+1346 1797 P
+1769 2070 P
+1936 2379 P
+1817 2189 P
+1808 2256 P
+1628 1666 P
+1475 1498 P
+1199 1510 P
+1880 2264 P
+1870 2301 P
+1307 1748 P
+1379 1817 P
+743 1080 P
+943 1123 P
+1361 1736 P
+1787 2201 P
+1185 1336 P
+1103 1150 P
+853 1204 P
+1724 2027 P
+1799 2268 P
+1409 1736 P
+1653 1860 P
+1119 1397 P
+781 1170 P
+1866 1944 P
+1265 1693 P
+1457 1619 P
+782 1148 P
+1393 1602 P
+1803 1805 P
+889 1267 P
+1200 1457 P
+771 1152 P
+1431 1825 P
+1393 1968 P
+742 1156 P
+1655 2041 P
+1310 1968 P
+1645 2000 P
+1181 1188 P
+1005 1636 P
+1300 1944 P
+1531 1976 P
+954 1313 P
+1869 2169 P
+967 1331 P
+1910 2267 P
+1904 2259 P
+1713 2051 P
+1261 1443 P
+1684 1992 P
+727 1203 P
+1057 1247 P
+807 1155 P
+1035 1156 P
+887 1352 P
+972 1418 P
+905 1528 P
+749 1321 P
+1186 1298 P
+1692 1895 P
+1538 1644 P
+1807 2032 P
+1454 1709 P
+1369 1547 P
+941 1426 P
+1298 1640 P
+1144 1338 P
+1222 1544 P
+1538 1895 P
+1378 1697 P
+1389 1767 P
+932 1492 P
+1281 1680 P
+873 1174 P
+1251 1570 P
+1379 1625 P
+1555 1847 P
+1284 1695 P
+1169 1350 P
+1346 1732 P
+1804 1962 P
+1755 2018 P
+1714 1932 P
+875 1210 P
+978 1164 P
+1300 1793 P
+1344 1796 P
+925 1235 P
+1031 1270 P
+873 1170 P
+1574 1483 P
+828 1198 P
+887 1250 P
+1133 1682 P
+1530 1885 P
+1661 1904 P
+878 1230 P
+754 1110 P
+945 1225 P
+1428 2105 P
+1245 1491 P
+1906 2323 P
+1338 1758 P
+1406 1714 P
+1488 1618 P
+1547 2006 P
+1685 2133 P
+895 1468 P
+1487 1900 P
+1115 1319 P
+1057 1126 P
+1007 1371 P
+1211 1556 P
+1522 1709 P
+1418 1820 P
+1550 1893 P
+1221 1567 P
+1609 1977 P
+1115 1177 P
+1133 1245 P
+891 1445 P
+975 1176 P
+1402 1800 P
+1479 2039 P
+1185 1598 P
+1582 2000 P
+1373 1896 P
+1831 2133 P
+1667 1957 P
+1671 1998 P
+1151 1265 P
+1057 1317 P
+1701 1752 P
+1532 1544 P
+1111 1121 P
+718 1026 P
+1258 1920 P
+861 909 P
+1288 1631 P
+1044 1288 P
+1318 1616 P
+1186 1415 P
+1235 1115 P
+1496 1838 P
+1828 2006 P
+1673 1920 P
+1464 2002 P
+1353 1806 P
+1493 2085 P
+1692 1913 P
+1813 1986 P
+1715 2068 P
+1178 1474 P
+1554 1962 P
+1742 1960 P
+1585 1870 P
+1469 1988 P
+966 1511 P
+1787 2057 P
+1636 1965 P
+1333 1656 P
+1588 1617 P
+1615 1973 P
+1419 1790 P
+917 1482 P
+1319 1573 P
+1126 1534 P
+1832 1821 P
+1619 1998 P
+1268 1656 P
+1529 2012 P
+626 1037 P
+1464 1605 P
+1731 1823 P
+1590 1823 P
+1704 1726 P
+1549 1996 P
+1131 1150 P
+1248 1612 P
+1330 1839 P
+1576 1902 P
+973 1331 P
+1215 1470 P
+1015 1668 P
+1552 1769 P
+1041 1243 P
+1746 2184 P
+1970 1994 P
+1280 1804 P
+1436 1787 P
+1344 1708 P
+720 1259 P
+1692 1900 P
+685 1168 P
+1423 1913 P
+1669 2127 P
+1499 1881 P
+1423 1588 P
+881 1144 P
+1323 1799 P
+986 1409 P
+1480 1839 P
+1309 1778 P
+1260 1738 P
+1015 1203 P
+1126 1478 P
+1389 1842 P
+1134 1473 P
+1705 2038 P
+1032 1618 P
+1302 1599 P
+1009 1297 P
+1102 1303 P
+1426 1503 P
+1196 1522 P
+1319 2044 P
+1354 1973 P
+1560 1690 P
+1634 2050 P
+1532 1939 P
+1390 1791 P
+1584 1769 P
+1565 1977 P
+1491 1667 P
+768 1106 P
+1424 1859 P
+1157 1409 P
+1439 2068 P
+1462 2074 P
+1177 1266 P
+1091 1258 P
+813 1070 P
+963 1056 P
+1480 1632 P
+994 1336 P
+1539 1938 P
+1541 1999 P
+1570 1994 P
+1239 1595 P
+1886 2330 P
+1642 2093 P
+1727 1963 P
+1150 1262 P
+1165 1190 P
+1330 1577 P
+1490 1722 P
+1009 1204 P
+1412 1782 P
+1011 1164 P
+971 1164 P
+1684 1578 P
+922 979 P
+1489 1923 P
+1603 1624 P
+1370 1723 P
+979 1076 P
+1283 1928 P
+1413 1864 P
+1458 1504 P
+1309 1670 P
+1472 1702 P
+1317 1767 P
+1159 1204 P
+1753 2233 P
+1946 2353 P
+111 Sp
+1616 1697 P
+1423 1583 P
+932 1382 P
+1281 1725 P
+1107 1499 P
+1912 2172 P
+1069 1332 P
+1315 1355 P
+1395 1995 P
+1939 2322 P
+979 1323 P
+977 1443 P
+1783 2400 P
+1570 1700 P
+990 1554 P
+1687 1766 P
+811 1610 P
+1352 1588 P
+1446 1508 P
+1299 1550 P
+925 1765 P
+1149 1486 P
+1047 1599 P
+1238 1533 P
+1467 1555 P
+1448 1607 P
+1463 1677 P
+1661 1758 P
+733 1322 P
+1443 1654 P
+1353 1529 P
+1055 1279 P
+1079 1570 P
+1577 1895 P
+1111 1548 P
+Z
+
+%%Trailer
+W
+%%Pages: 1

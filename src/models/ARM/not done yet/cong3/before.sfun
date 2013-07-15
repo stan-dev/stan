@@ -1,0 +1,69 @@
+before _ function (x, y, ylag, w) {
+  xbig _ cbind (w, ylag*w, ylag, x)
+  reg _ rerun (xbig, y, w, num.trails=3, verbose=0, g.reps=1)
+  vars _ reg$var.mode
+  lsf _ lsfit (xbig, y, wt=1/vars[codes(ordered(w))], intercept=F)
+  beta _ lsf$coef
+  lss _ ls.summary (lsf)
+  xbig0 _ cbind (rep(0,length(w)), ylag*rep(0,length(w)), ylag, x)
+  xbig1 _ cbind (rep(1,length(w)), ylag*rep(1,length(w)), ylag, x)
+  effect _ mean (xbig1%*%beta - xbig0%*%beta)
+  return (effect=effect, lag0=beta[3], lag1=beta[2]+beta[3], sds=sqrt(vars),
+    diff=beta[2], se=lss$std.err[2])
+}
+
+regs _ NULL
+for (year in seq(1898,1992,2)){
+  if (year%%10 != 2) {
+    i _ (year - 1894)/2
+    now _ cong[[i]]
+    past _ cong[[i-1]]
+    contested _ now[,5]>0 & now[,6]>0 & past[,5]>0 & past[,6]>0
+    now[,4] _ ifelse(now[,4]==3,0,now[,4])
+    good _ contested & now[,2]==past[,2] & now[,3]==past[,3] & abs(now[,4])<=1
+    v.now _ now[good,5]/(now[good,5]+now[good,6])
+    v.past _ past[good,5]/(past[good,5]+past[good,6])
+    contested1 _ v.now>.05 & v.now<.95 & v.past>.05 & v.past<.95
+    v.now _ v.now[contested1]
+    v.past _ v.past[contested1]
+    inc.now _ now[good,4][contested1]
+    incparty.now _ ifelse (inc.now==0, ifelse (v.past>.5, 1, -1), inc.now)
+    y _ .5 + (v.now-.5)*incparty.now
+    ylag _ .5 + (v.past-.5)*incparty.now
+    x _ cbind (rep(1,length(y)), incparty.now)
+    bef _ before (x, y, ylag, 1-abs(inc.now))
+    regs _ rbind (regs, c(year,unlist(bef)))
+    print (round(c(year,unlist(bef)),2))
+  }
+}
+
+postscript ("before.ps")
+par (mfrow=c(3,1))
+
+yr _ regs[,1]
+inc.b _ -regs[,2]
+plot (yr, inc.b, type="l")
+lines (c(1800,2000),c(0,0),lty=3)
+
+lag0 _ regs[,3]
+lag1 _ regs[,4]
+plot (rep(yr,2), c(lag0, lag1), type="n")
+lines (yr, lag0)
+lines (yr, lag1, lty=4)
+
+sd0 _ regs[,5]
+sd1 _ regs[,6]
+plot (rep(yr,2), c(sd0, sd1), type="n")
+lines (yr, sd0)
+lines (yr, sd1, lty=4)
+
+diff _ regs[,7]
+se _ regs[,8]
+plot (rep(yr,2), c(diff+se,diff-se), type="n")
+for (i in 1:length(yr)){
+  lines (rep(yr[i],2), diff[i]+c(-1,1)*se[i])
+}
+lines (c(1800,2000),c(0,0),lty=3)
+
+
+

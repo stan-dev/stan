@@ -1,0 +1,28 @@
+diffs _ NULL
+data.all _ NULL
+for (year in seq(1900,1992,2)){
+    i _ (year - 1894)/2
+    now _ cong[[i]]
+    contested _ now[,5]>0 & now[,6]>0
+    diff _ ifelse (contested, now[,5]-now[,6], 999999)
+    diffs _ rbind (diffs, cbind (rep(year,length(now[,6])),diff))
+    data.all _ rbind (data.all, now)
+}
+
+uncontested _ data.all[,5]==0 | data.all[,6]==0
+missing _ data.all[,5]==-9 | data.all[,6]==-9
+sum(uncontested)
+sum(missing)
+sum(uncontested|missing)
+
+sum(abs(diffs[,2])<10)
+sum(abs(diffs[,2])<100)
+sum(abs(diffs[,2])<500)
+sum(abs(diffs[,2])<1000)
+sum(abs(diffs.all[,2])<1000)
+for (year in seq(1900,1992,2)){
+  print(c(year,sum(abs(diffs[,2])<1000)))
+
+
+close _ abs(diffs[,2])<100
+data.all[close,]

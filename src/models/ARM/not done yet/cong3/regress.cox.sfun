@@ -1,0 +1,125 @@
+increg _ function (year){
+
+# inc regression for year "year"
+
+if (year%%10 == 2 | year<1898) {
+  print ("No estimate for year ending in 2 or before 1898")
+}
+else {
+  i _ (year - 1894)/2
+  now _ cong[[i]]
+  past _ cong[[i-1]]
+  contested _ now[,5]>0 & now[,6]>0 & past[,5]>0 & past[,6]>0
+  now[,4] _ ifelse(now[,4]==3,0,now[,4])
+  good _ contested & now[,2]==past[,2] & now[,3]==past[,3] & abs(now[,4])<=1
+  v.now _ now[good,5]/(now[good,5]+now[good,6])
+  v.past _ past[good,5]/(past[good,5]+past[good,6])
+  contested1 _ v.now>.05 & v.now<.95 & v.past>.05 & v.past<.95
+  v.now _ v.now[contested1]
+  v.past _ v.past[contested1]
+  inc.now _ now[good,4][contested1]
+  incparty.now _ ifelse (inc.now==0, ifelse (v.past>.5, 1, -1), inc.now)
+  x _ cbind (inc.now, v.past, incparty.now, rep(1,length(v.now)),
+    inc.now*v.past)
+  y.gr _ ifelse (abs(inc.now)==1, 1, 2)
+  reg _ rerun (x, v.now, y.gr, num.trails=3, verbose=0, g.reps=1)
+#  reg.post _ reg$post.dist    # [nsims, ntrails, nparams]
+#  monitor _ gpar.vec (reg.post)
+  summ _ do.summary (reg.post)
+print (summ)
+  n _ nrow(x)
+  k _ ncol(x)
+  output _ c(year, lsf$coef, lss$std.err, sqrt(vars), n, n-k)
+  print (round (output[1:(length(output)-2)], 3))
+  list (regression=output, v.past=v.past, inc.now=inc.now,
+      resids=lsf$residuals, std.resids=lsf$residuals/sqrt(vars[y.gr]))
+}
+}
+
+incadv _ NULL
+v.past _ NULL
+inc.now _ NULL
+resids _ NULL
+std.resids _ NULL
+year.resids _ NULL
+for (year in seq(1898,1992,2)) {
+  if (year%%10 != 2) {
+    output _ increg(year)
+    incadv _ rbind (incadv, output$regression)
+    v.past _ c(v.past, output$v.past)
+    inc.now _ c(inc.now, output$inc.now)
+    resids _ c(resids, output$resids)
+    std.resids _ c(std.resids, output$std.resids)
+    year.resids _ c(year.resids, rep(year,length(output$resids)))
+  }
+}
+
+postscript ("fig8.1a.ps")
+par (pty="s")
+year _ 1986
+i _ (year - 1894)/2
+now _ cong[[i]]
+past _ cong[[i-1]]
+contested _ now[,5]>0 & now[,6]>0 & past[,5]>0 & past[,6]>0
+good _ contested & now[,2]==past[,2] & now[,3]==past[,3] & abs(now[,4])<=1
+v.now0 _ now[good,5]/(now[good,5]+now[good,6])
+v.past0 _ past[good,5]/(past[good,5]+past[good,6])
+contested1 _ v.now0>.05 & v.now0<.95 & v.past0>.05 & v.past0<.95
+v.now0 _ v.now0[contested1]
+v.past0 _ v.past0[contested1]
+inc.now0 _ now[good,4][contested1]
+plot (v.past0, v.now0, xlab="Democratic vote in 1984",
+  ylab="Democratic vote in 1986", xlim=c(0,1), ylim=c(0,1), type="n")
+points (v.past0[inc.now0==0], v.now0[inc.now0==0], pch="o")
+points (v.past0[abs(inc.now0)==1], v.now0[abs(inc.now0)==1], pch=".")
+
+postscript ("fig8.2a.ps", horizontal=T)
+incyear _ incadv[,1]
+inc _ incadv[,2]
+incsd _ incadv[,6]
+df _ incadv[,13]
+yrange _ range (inc - qt(.975,df)*incsd, inc + qt(.975,df)*incsd)
+plot (incyear, inc, xlab="Year", ylab="Estimated incumbency advantage",
+  ylim=yrange, type="n")
+for (i in 1:length(incyear))
+  lines (rep(incyear[i],2), inc[i] + qt(.975,df[i])*c(-1,1)*incsd[i], col=9)
+points (incyear, inc, pch=15)
+
+# simulation of change from 1950s to 1980s
+
+dif _ NULL
+nloop _ 1000
+year _ incadv[,1]
+for (i in 1:nloop){
+  i50s _ year>1950 & year<=1960
+  i80s _ year>1980 & year<=1990
+  beta50s _ inc[i50s] + incsd[i50s]*rt(sum(i50s),df[i50s])
+  beta80s _ inc[i80s] + incsd[i80s]*rt(sum(i80s),df[i80s])
+  dif _ c(dif,mean(beta80s)-mean(beta50s))
+}
+print (c(mean(dif), sort(dif)[26], sort(dif)[975]))
+
+# residuals in the 1980s
+
+postscript ("fig8.3a.ps", horizontal=T)
+i80s _ year.resids>1980 & year.resids<=1990
+iinc _ abs(inc.now)==1
+plot (v.past[i80s], std.resids[i80s],
+    xlab="Democratic vote in previous election",
+    ylab="Standardized residual", type="n")
+points (v.past[i80s & iinc], std.resids[i80s & iinc], pch=".")
+points (v.past[i80s & !iinc], std.resids[i80s & !iinc], pch="o")
+lines (c(-10,10),c(0,0),col=9)
+
+# resid variances over time
+
+postscript ("fig8.4a.ps", horizontal=T, rasters=1200)
+par(mar=c(5,5,4,1)+.1)
+sd1 _ incadv[,10]
+sd2 _ incadv[,11]
+yrange _ range (sd1, sd2)
+plot (incyear, inc, xlab="Year", ylab="Standard deviation",
+  ylim=yrange, type="n", cex=2)
+lines (incyear, sd1)
+lines (incyear, sd2, lty=3)
+

@@ -1,0 +1,4 @@
+data94 _ read.table("1994.data",header=T)
+n94 _ nrow(data94)
+cong _ list (cong, cbind (rep(1994,n94), data94[,"STATE"], data94[,"DISTRICT"],
+  inc94, data94[,"DVOTE94"], data94[,"RVOTE94"]))

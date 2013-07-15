@@ -1,0 +1,47 @@
+increg _ function (year){
+
+# inc regression for year "year"
+
+if (year%%10 == 2 | year<1898) {
+  print ("No estimate for year ending in 2 or before 1898")
+}
+else {
+  i _ (year - 1894)/2
+  now _ cong[[i]]
+  past _ cong[[i-1]]
+  contested _ now[,5]>0 & now[,6]>0 & past[,5]>0 & past[,6]>0
+  now[,4] _ ifelse(now[,4]==3,0,now[,4])
+  good _ contested & now[,2]==past[,2] & now[,3]==past[,3] & abs(now[,4])<=1
+  v.now _ now[good,5]/(now[good,5]+now[good,6])
+  v.past _ past[good,5]/(past[good,5]+past[good,6])
+  contested1 _ v.now>.05 & v.now<.95 & v.past>.05 & v.past<.95
+  v.now _ v.now[contested1]
+  v.past _ v.past[contested1]
+  inc.now _ now[good,4][contested1]
+  incparty.now _ ifelse (inc.now==0, ifelse (v.past>.5, 1, -1), inc.now)
+  x _ cbind (inc.now, v.past, incparty.now)
+  lsf _ lsfit (x, v.now)
+  lss _ ls.summary (lsf)
+  n _ nrow(x)
+  k _ ncol(x) + 1
+  output _ c(year, lsf$coef, lss$std.err, lss$std.dev, n, n-k)
+  print (round (output, 3))
+  list (regression=output, v.past=v.past, inc.now=inc.now,
+      resids=lsf$residuals, std.resids=lsf$residuals/lss$std.dev)
+}
+}
+
+year _ 1988
+output _ increg (year)$regression
+df _ output[11]
+intervals _ rbind (output[2] + output[6]*qt(c(.025,.25,.5,.75,.975),df),
+  output[3] + output[7]*qt(c(.025,.25,.5,.75,.975),df),
+  output[4] + output[8]*qt(c(.025,.25,.5,.75,.975),df),
+  output[5] + output[9]*qt(c(.025,.25,.5,.75,.975),df),
+  output[10]*sqrt(df/qchisq(c(.975,.75,.5,.25,.025),df)))
+print (round(intervals,3))
+
+
+
+
+

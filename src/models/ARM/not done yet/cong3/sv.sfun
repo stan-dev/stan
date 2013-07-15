@@ -1,0 +1,46 @@
+sv _ function (year){
+
+# inc regression for year "year"
+
+  i _ (year - 1894)/2
+  now _ cong[[i]]
+  v.now _ now[,5]/(now[,5]+now[,6])
+  v.now _ ifelse (v.now<.05, .25, v.now)
+  v.now _ ifelse (v.now>.95, .75, v.now)
+  votes _ mean(v.now)
+  seats _ mean(v.now>.5)
+  output _ c(year, votes,seats)
+  output
+}
+
+output _ NULL
+for (year in seq(1902,1990,2)) {
+    output _ rbind(output, sv(year))
+}
+
+year _ output[,1]
+votes _ output[,2]
+seats _ output[,3]
+postscript ("sv.ps", horizontal=F, rasters=1200)
+par(mfrow=c(3,3))
+par(pty="s")
+for (i in 1:9){
+  lim _ range (.4,.6, votes[(5*(i-1)+1):(5*i)], seats[(5*(i-1)+1):(5*i)])
+  lim _ range (.5, votes, seats)
+  plot (votes[(5*(i-1)+1):(5*i)], seats[(5*(i-1)+1):(5*i)],
+    xlim=lim, ylim=lim, xlab="Democratic Votes",
+    ylab="Democratic Seats", cex=.5, pch="*")
+  abline (0,1, lwd=.5, col=9)
+  points (.5,.5,pch=16)
+  title (paste (year[5*(i-1)+1], year[5*i], sep="-"), cex=.5)
+}
+
+par (mfrow=c(2,1))
+  lim _ c(0,1)
+  plot (votes, seats,
+    xlim=lim, ylim=lim, xlab="Democratic Votes",
+    ylab="Democratic Seats", cex=.5, pch="*")
+  abline (0,1, lwd=.5, col=9)
+  points (.5,.5,pch=16)
+  title ("1902-1990", cex=.5)
+
