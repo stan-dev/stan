@@ -6,16 +6,6 @@ LIBGTEST = test/libgtest.a
 GTEST_MAIN = $(GTEST)/src/gtest_main.cc
 CFLAGS_GTEST += -I $(GTEST)/include -I $(GTEST)
 
-
-##
-# target to link all src models correctly
-##
-src/%$(EXE): src/%.o bin/libstan.a
-	@echo ''
-	@echo '--- Linking C++ model ---'
-	$(LINK.c) -O$O $(OUTPUT_OPTION) $< $(LDLIBS)
-
-
 ##
 # Target to build all models and test them. This needs to be before 
 # the test-unit target.
