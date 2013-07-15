@@ -5,12 +5,16 @@ data {
 }
  
 transformed data {
-  matrix[N,4] X; 
-  int mom_val;
+  vector[N] work2; 
+  vector[N] work3; 
+  vector[N] work4; 
   for (i in 1:N) {
-  mom_val <- mom_work[i];
-    for (j in 1:mom_val)
-      X[i,j] <- 1;
+    if (mom_work[i] == 2)
+      work2[i] <- 1;
+    if (mom_work[i] == 3)
+      work3[i] <- 1;
+    if (mom_work[i] == 4)
+      work4[i] <- 1;
   }
 }
 
@@ -20,5 +24,6 @@ parameters {
 } 
 
 model {
-  kid_score ~ normal(X * beta, sigma);
+  kid_score ~ normal(beta[1] + beta[2] * work2 + beta[3] * work3 
+                     + beta[4] * work4, sigma);
 }
