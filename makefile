@@ -61,9 +61,6 @@ PATH_SEPARATOR = /
 ##
 -include make/os_detect
 
-%$(EXE) : %.o %.cpp bin/libstan.a
-	$(LINK.c) -O$O $(OUTPUT_OPTION) $< $(LDLIBS)
-
 ##
 # Tell make the default way to compile a .o file.
 ##
@@ -193,10 +190,10 @@ docs: manual doxygen
 ##
 # Clean up.
 ##
-MODEL_SPECS := $(wildcard src/test/gm/model_specs/*.stan)
+MODEL_SPECS := $(wildcard src/test/gm/model_specs/compiled/*.stan) 
 .PHONY: clean clean-demo clean-dox clean-manual clean-models clean-all
 clean:
-	$(RM) $(wildcard *.dSYM) $(wildcard *.d.*)
+	$(RM) $(shell find src -type f -name '*.dSYM') $(shell find src -type f -name '*.d.*')
 	$(RM) $(wildcard $(MODEL_SPECS:%.stan=%.cpp) $(MODEL_SPECS:%.stan=%$(EXE)) $(MODEL_SPECS:%.stan=%.o))
 
 clean-dox:
@@ -210,8 +207,7 @@ clean-models:
 
 clean-all: clean clean-dox clean-manual clean-models
 	$(RM) -r test/* bin doc
-	$(RM) $(wildcard *.d) $(wildcard *.o)
-	$(RM) src/test/gm/model_specs/compiled/*.cpp src/test/gm/model_specs/compiled/*.o $(patsubst %.stan,%$(EXE),$(wildcard src/test/gm/model_specs/compiled/*.stan))
+	$(RM) $(shell find src -type f -name '*.d') $(shell find src -type f -name '*.o')
 	cd src/test/agrad/distributions/univariate/continuous; $(RM) *_generated_test.cpp
 	cd src/test/agrad/distributions/univariate/discrete; $(RM) *_generated_test.cpp
 	cd src/test/agrad/distributions/multivariate/continuous; $(RM) *_generated_test.cpp

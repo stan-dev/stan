@@ -12,11 +12,11 @@ public:
     model_path.push_back("bugs_examples");
     model_path.push_back("vol3");
     model_path.push_back("funshapes");
-    model_path.push_back("parallelagram");
+    model_path.push_back("parallelogram");
     return model_path;
   }
   static bool has_data() {
-    return true;
+    return false;
   }
 
   static bool has_init() {
@@ -38,7 +38,12 @@ public:
 
   static std::vector<std::pair<int, double> >
   get_expected_values() {
+    using std::make_pair;
+
     std::vector<std::pair<int, double> > expected_values;
+    expected_values.push_back(make_pair(chains->index("x"), 0.0));  
+    expected_values.push_back(make_pair(chains->index("y"), 0.0));
+        
     return expected_values;
   }
 
