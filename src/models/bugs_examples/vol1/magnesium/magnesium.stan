@@ -67,23 +67,19 @@ model {
   // Prior 6: Half-Normal on tau.sqrd
   tau_sq_6 ~ normal(0, p0_sigma) T[0,];
 
-  for (prior in 1:N_priors) 
-    mu[prior] ~ uniform(-10, 10);
+  mu ~ uniform(-10, 10);
 
   for (prior in 1:N_priors) {
-    for (study in 1:N_studies) {
-      pc[prior, study] ~ uniform(0,1);
-      theta[prior, study] ~ normal(mu[prior], tau[prior]);
-    }
+      pc[prior] ~ uniform(0,1);
+      theta[prior] ~ normal(mu[prior], tau[prior]);
   }
   for (prior in 1:N_priors) {
-    for (study in 1:N_studies) {
-      rc[study] ~ binomial(nc[study], pc[prior, study]);
-      rt[study] ~ binomial(nt[study], inv_logit(theta[prior, study] + 
-      		  		                logit(pc[prior, study])));
-    }
+    vector[N_studies] tmpp;
+    for (i in 1:N_studies) 
+      tmpp[i] <- inv_logit(theta[prior, i] + logit(pc[prior, i]));
+    rc ~ binomial(nc, pc[prior]);
+    rt ~ binomial(nt, tmpp);
   }
-
 } 
 generated quantities {
   real OR[N_priors];

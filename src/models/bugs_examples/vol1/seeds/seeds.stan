@@ -20,6 +20,7 @@ transformed parameters {
     sigma  <- 1.0 / sqrt(tau);
 }
 model {
+   real tmpp[I];
    alpha0 ~ normal(0.0,1.0E3);
    alpha1 ~ normal(0.0,1.0E3);
    alpha2 ~ normal(0.0,1.0E3);
@@ -27,12 +28,12 @@ model {
    tau ~ gamma(1.0E-3,1.0E-3);
 
    b ~ normal(0.0, sigma);
-
+   
    for (i in 1:I) {
-      n[i] ~ binomial(N[i], inv_logit(alpha0 
-                                      + alpha1 * x1[i] 
-                                      + alpha2 * x2[i]
-                                      + alpha12 * x1[i] * x2[i] 
-                                      + b[i]) );
+     tmpp[i] <- inv_logit(alpha0 + alpha1 * x1[i] 
+                                 + alpha2 * x2[i]
+                                 + alpha12 * x1[i] * x2[i] 
+                                 + b[i]);
    }
+   n ~ binomial(N, tmpp);
 }

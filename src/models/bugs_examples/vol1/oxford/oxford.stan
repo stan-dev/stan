@@ -27,13 +27,16 @@ transformed parameters {
   sigma <- sqrt(sigma_sq);
 }
 model {
+  real p1[K];
+  real p2[K];
   for (i in 1:K) {
-    r0[i] ~ binomial(n0[i], inv_logit(mu[i])); 
-    r1[i] ~ binomial(n1[i], 
-                     inv_logit(mu[i] + alpha + beta1 * year[i] + beta2 * (yearsq[i] - 22) + sigma * b[i]));
-    b[i]  ~ normal(0, 1);
-    mu[i] ~ normal(0, 1000); 
-  }
+    p1[i] <- inv_logit(mu[i]);
+    p2[i] <- inv_logit(mu[i] + alpha + beta1 * year[i] + beta2 * (yearsq[i] - 22) + sigma * b[i]);
+  } 
+  r0 ~ binomial(n0, p1);
+  r1 ~ binomial(n1, p2);
+  b  ~ normal(0, 1);
+  mu ~ normal(0, 1000); 
 
   alpha  ~ normal(0.0, 1000); 
   beta1  ~ normal(0.0, 1000); 

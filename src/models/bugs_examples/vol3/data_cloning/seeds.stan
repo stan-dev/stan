@@ -45,13 +45,13 @@ model {
    alpha12 ~ normal(0.0, 1.0E3);
    tau ~ gamma(1.0E-3, 1.0E-3);
    for (i in 1:I) {
-       for (k in 1:K) { 
-           b[i, k] ~ normal(0.0, sigma);
-           n[i] ~ binomial(N[i], inv_logit(alpha0 
-                                           + alpha1 * x1[i] 
-                                           + alpha2 * x2[i]
-                                           + alpha12 * x1[i] * x2[i] 
-                                           + b[i, k]));
-       }
+      b[i] ~ normal(0.0, sigma);
+      for (k in 1:K) {
+         n[i] ~ binomial(N[i], inv_logit(alpha0 
+                                         + alpha1 * x1[i] 
+                                         + alpha2 * x2[i]
+                                         + alpha12 * x1[i] * x2[i] 
+                                         + b[i, k]));
+      }
    }
 } 

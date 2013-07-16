@@ -49,10 +49,10 @@ model {
   alpha_V4   ~ normal(0, 100);
   sigmasq_b1 ~ inv_gamma(.001, .001);
   sigmasq_b ~ inv_gamma(.001, .001);
+  b1 ~ normal(0, sigma_b1); 
   for(n in 1:N) {
-    b1[n] ~ normal(0, sigma_b1); 
+    b[n] ~ normal(0, sigma_b); 
     for(t in 1:T) {
-      b[n, t] ~ normal(0, sigma_b); 
       y[n, t] ~ poisson(exp(a0 + alpha_Base * (log_Base4[n] - log_Base4_bar)   
                             + alpha_Trt * (Trt[n] - Trt_bar)  
                             + alpha_BT  * (BT[n] - BT_bar)  

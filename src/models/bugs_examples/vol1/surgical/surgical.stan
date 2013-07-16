@@ -21,8 +21,7 @@ model {
   mu ~ normal(0.0, 1000.0); 
   sigmasq ~ inv_gamma(0.001, 0.001);
   b ~ normal(mu, sigma);
-  for (i in 1:N) 
-    r[i] ~ binomial(n[i], inv_logit(b[i]));
+  r ~ binomial(n, p);
 }
 generated quantities {
   real pop_mean;

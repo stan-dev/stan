@@ -25,8 +25,7 @@ transformed parameters {
 model {
     alpha_star ~ normal(0.0, 1.0);	
     beta ~ normal(0.0, 1.0E4);
-    for (i in 1:N)
-        r[i] ~ binomial(n[i], p[i]);
+    r ~ binomial(n, p);
 }
 generated quantities {
 //  real D;
