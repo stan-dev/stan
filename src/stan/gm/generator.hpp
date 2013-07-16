@@ -232,7 +232,8 @@ namespace stan {
       generate_using("std::stringstream",o);
       generate_using("stan::agrad::var",o);
       generate_using("stan::model::prob_grad_ad",o);
-      generate_using("stan::math::get_base1",o);
+      // generate_using("stan::math::get_base1",o);
+      generate_using("stan::math::initialize",o);
       generate_using("stan::math::stan_print",o);
       generate_using("stan::io::dump",o);
       generate_using("std::istream",o);
@@ -1022,6 +1023,77 @@ namespace stan {
         boost::apply_visitor(vis,vs[i].decl_);
     }
 
+
+
+    struct generate_local_var_init_nan_visgen : public visgen {
+      const bool declare_vars_;
+      const bool is_var_;
+      const int indent_;
+      generate_local_var_init_nan_visgen(bool declare_vars,
+                                         bool is_var,
+                                         int indent,
+                                         std::ostream& o)
+        : visgen(o),
+          declare_vars_(declare_vars),
+          is_var_(is_var),
+          indent_(indent) {
+      }
+      void operator()(const nil& /*x*/) const { 
+        // no-op
+      }
+      void operator()(const int_var_decl& x) const {
+        // no-op; ints need no init to prevent crashes and no NaN available
+      }      
+      void operator()(const double_var_decl& x) const {
+        generate_init(x);
+      }
+      void operator()(const vector_var_decl& x) const {
+        generate_init(x);
+      }
+      void operator()(const row_vector_var_decl& x) const {
+        generate_init(x);
+      }
+      void operator()(const matrix_var_decl& x) const {
+        generate_init(x);
+      }
+      void operator()(const unit_vector_var_decl& x) const {
+        generate_init(x);
+      }
+      void operator()(const simplex_var_decl& x) const {
+        generate_init(x);
+      }
+      void operator()(const ordered_var_decl& x) const {
+        generate_init(x);
+      }
+      void operator()(const positive_ordered_var_decl& x) const {
+        generate_init(x);
+      }
+      void operator()(const cov_matrix_var_decl& x) const {
+        generate_init(x);
+      }
+      void operator()(const corr_matrix_var_decl& x) const {
+        generate_init(x);
+      }
+      template <typename T>
+      void generate_init(const T& x) const {
+        generate_indent(indent_,o_);
+        o_ << "stan::math::initialize(" << x.name_ << ", " 
+           << (is_var_ ? "DUMMY_VAR__" : "std::numeric_limits<double>::quiet_NaN()")
+           << ");"
+           << EOL;
+      }
+    };
+
+    void generate_local_var_init_nan(const std::vector<var_decl>& vs,
+                                     int indent,
+                                     std::ostream& o,
+                                     bool is_var) {
+      generate_local_var_init_nan_visgen vis(indent,is_var,indent,o);
+      for (size_t i = 0; i < vs.size(); ++i)
+        boost::apply_visitor(vis,vs[i].decl_);
+    }
+
+
     // see member_var_decl_visgen cut & paste
     struct generate_init_vars_visgen : public visgen {
       int indent_;
@@ -1318,6 +1390,7 @@ namespace stan {
           generate_indent(indent_,o_);
           o_ << "{" << EOL;  // need brackets for scope
           generate_local_var_decls(x.local_decl_,indent,o_,is_var_);
+          generate_local_var_init_nan(x.local_decl_,indent,o_,is_var_);
         }
                                  
         for (size_t i = 0; i < x.statements_.size(); ++i)
