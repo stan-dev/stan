@@ -12,7 +12,7 @@ namespace stan {
      *
      * The cumulative sum of a vector of values \code{x} is the
      *
-     * <code>x[0], x[1] + x[2], ..., x[1] + ,..., + x[x.size()-1]</code>
+     * @code x[0], x[1] + x[2], ..., x[1] + ,..., + x[x.size()-1] @endcode
      *
      * @tparm T Scalar type of vector.
      * @param x Vector of values.
@@ -36,7 +36,7 @@ namespace stan {
      * The cumulative sum is of the same type as the input and
      * has values defined by
      *
-     * <code>x(0), x(1) + x(2), ..., x(1) + ,..., + x(x.size()-1)</code>
+     * @code x(0), x(1) + x(2), ..., x(1) + ,..., + x(x.size()-1) @endcode
      *
      * @tparm T Scalar type of matrix.
      * @tparam R Row type of matrix.
