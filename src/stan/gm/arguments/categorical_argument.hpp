@@ -65,12 +65,11 @@ namespace stan {
       
       bool parse_args(std::vector<std::string>& args, std::ostream* out,
                       std::ostream* err, bool& help_flag) {
-        
+
         bool good_arg = true;
         bool valid_arg = true;
         
         while(good_arg) {
-          
           if (args.size() == 0)
             return valid_arg;
           
@@ -93,10 +92,11 @@ namespace stan {
           std::string val_name;
           std::string val;
           split_arg(cat_name, val_name, val);
-
+          
+          if (_subarguments.size() == 0)
+            valid_arg = false;
           for (std::vector<argument*>::iterator it = _subarguments.begin();
                it != _subarguments.end(); ++it) {
-            
             if ( (*it)->name() == cat_name) {
               args.pop_back();
               valid_arg &= (*it)->parse_args(args, out, err, help_flag);
@@ -104,13 +104,13 @@ namespace stan {
             } else if ( (*it)->name() == val_name ) {
               valid_arg &= (*it)->parse_args(args, out, err, help_flag);
               good_arg = true;
+            } else {
+              valid_arg = false;
+              good_arg = false;
             }
           }
-
         }
-        
         return valid_arg;
-        
       };
       
       std::vector<argument*>& subarguments() {
