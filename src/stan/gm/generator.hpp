@@ -1047,7 +1047,7 @@ namespace stan {
             || type == "Eigen::Matrix<T__,1,Eigen::Dynamic> " 
             || type == "Eigen::Matrix<T__,Eigen::Dynamic,1> ") {
           generate_indent(indents_,o_);
-          o_ << "stan::agrad::fill(" << name << ",DUMMY_VAR__);" << EOL;
+          o_ << "stan::math::fill(" << name << ",DUMMY_VAR__);" << EOL;
         } 
       }
     };
@@ -1072,47 +1072,47 @@ namespace stan {
       void operator()(nil const& /*x*/) const { }
       void operator()(int_var_decl const& x) const {
         generate_indent(indent_,o_);
-        o_ << "stan::agrad::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
+        o_ << "stan::math::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
       }
       void operator()(double_var_decl const& x) const {
         generate_indent(indent_,o_);
-        o_ << "stan::agrad::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
+        o_ << "stan::math::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
       }
       void operator()(vector_var_decl const& x) const {
         generate_indent(indent_,o_);
-        o_ << "stan::agrad::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
+        o_ << "stan::math::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
       }
       void operator()(row_vector_var_decl const& x) const {
         generate_indent(indent_,o_);
-        o_ << "stan::agrad::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
+        o_ << "stan::math::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
       }
       void operator()(matrix_var_decl const& x) const {
         generate_indent(indent_,o_);
-        o_ << "stan::agrad::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
+        o_ << "stan::math::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
       }
       void operator()(unit_vector_var_decl const& x) const {
         generate_indent(indent_,o_);
-        o_ << "stan::agrad::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
+        o_ << "stan::math::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
       }
       void operator()(simplex_var_decl const& x) const {
         generate_indent(indent_,o_);
-        o_ << "stan::agrad::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
+        o_ << "stan::math::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
       }
       void operator()(ordered_var_decl const& x) const {
         generate_indent(indent_,o_);
-        o_ << "stan::agrad::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
+        o_ << "stan::math::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
       }
       void operator()(positive_ordered_var_decl const& x) const {
         generate_indent(indent_,o_);
-        o_ << "stan::agrad::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
+        o_ << "stan::math::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
       }
       void operator()(cov_matrix_var_decl const& x) const {
         generate_indent(indent_,o_);
-        o_ << "stan::agrad::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
+        o_ << "stan::math::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
       }
       void operator()(corr_matrix_var_decl const& x) const {
         generate_indent(indent_,o_);
-        o_ << "stan::agrad::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
+        o_ << "stan::math::fill(" << x.name_ << ",DUMMY_VAR__);" << EOL;
       }
     };
 
@@ -1207,7 +1207,7 @@ namespace stan {
         }
 
         generate_indent(indents_ + dims.size(), o_);
-        o_ << "if (stan::agrad::is_uninitialized(" << name;
+        o_ << "if (stan::math::is_uninitialized(" << name;
         for (size_t k = 0; k < non_matrix_dims; ++k)
           o_ << "[i" << k << "__]";
         if (matrix_dims > 0) {
