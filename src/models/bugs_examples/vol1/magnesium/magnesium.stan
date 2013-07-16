@@ -26,7 +26,7 @@ transformed data {
 } 
 
 parameters {
-  real mu[N_priors];
+  real<lower=-10,upper=10> mu[N_priors];
   real theta[N_priors, N_studies];
   real<lower=0,upper=1> pc[N_priors, N_studies];
   real<lower=0> inv_tau_sq_1;
