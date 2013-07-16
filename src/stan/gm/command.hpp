@@ -570,7 +570,7 @@ namespace stan {
       
       if (command.has_flag("test_grad")) {
         std::cout << std::endl << "TEST GRADIENT MODE (+propto)" << std::endl;
-        return stan::model::test_gradients<Model,true,true>(model,cont_params, disc_params);
+        return stan::model::test_gradients<true,true>(model,cont_params, disc_params);
       }
       
       //////////////////////////////////////////////////

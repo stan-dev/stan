@@ -39,9 +39,9 @@ namespace stan {
         std::vector<double> hessian;
         
         double f0 
-          = stan::model::grad_hess_log_prob<M,true,false>(model,
-                                                          params_r, params_i, 
-                                                          gradient, hessian);
+          = stan::model::grad_hess_log_prob<true,false>(model,
+                                                        params_r, params_i, 
+                                                        gradient, hessian);
         matrix_d H(params_r.size(), params_r.size());
         for (size_t i = 0; i < hessian.size(); i++) {
           H(i) = hessian[i];
