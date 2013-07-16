@@ -28,9 +28,9 @@ beta.mean <- colMeans(beta.post)
 
 m <- ggplot() + geom_point(data=frame2,aes(x=mom_iq,y=kid_score)) + geom_point(data=frame1,aes(x=mom_iq,y=kid_score),colour="grey70")
 m <- m + scale_y_continuous("Child Test Score") + scale_x_continuous("Mother IQ score")
-m + geom_abline(intercept = beta.mean[1] + beta.mean[2], slope = beta.mean[3] + beta.mean[4],colour = "grey70") + geom_abline(intercept = beta.mean[1], slope = beta.mean[3])
+m + geom_abline(intercept = beta.mean[1] + beta.mean[2], slope = beta.mean[3] + beta.mean[4],colour = "grey70") + geom_abline(intercept = beta.mean[1], slope = beta.mean[3]) + theme_bw()
 
 # Figure 3.4 (b)
 m <- ggplot() + geom_point(data=frame2,aes(x=mom_iq,y=kid_score)) + geom_point(data=frame1,aes(x=mom_iq,y=kid_score),colour="grey70")
 m <- m + scale_y_continuous("Child Test Score", limits=c(-15, 150)) + scale_x_continuous("Mother IQ score", limits=c(0, 150)) 
-m + geom_abline(intercept = beta.mean[1] + beta.mean[2], slope = beta.mean[3] + beta.mean[4],colour = "grey70") + geom_abline(intercept = beta.mean[1], slope = beta.mean[3])
+m + geom_abline(intercept = beta.mean[1] + beta.mean[2], slope = beta.mean[3] + beta.mean[4],colour = "grey70") + geom_abline(intercept = beta.mean[1], slope = beta.mean[3]) + theme_bw()

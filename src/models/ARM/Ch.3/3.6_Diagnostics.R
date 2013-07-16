@@ -24,4 +24,4 @@ resid.sd <- sd(resid)
 
 kid.iq.one.pred.1 = data.frame(mom_iq=mom_iq,resid=resid)
 m <- ggplot(kid.iq.one.pred.1,aes(x=mom_iq,y=resid))
-m + geom_point() + scale_y_continuous("Residuals") + scale_x_continuous("Mother IQ score") + geom_hline(yintercept=0,colour="grey70",size=1)  + geom_hline(yintercept = resid.sd, linetype="dashed",colour="grey70",size=1)  + geom_hline(yintercept = -resid.sd, linetype="dashed",colour="grey70",size=1)
+m + geom_point() + scale_y_continuous("Residuals") + scale_x_continuous("Mother IQ score") + geom_hline(yintercept=0,colour="grey70",size=1)  + geom_hline(yintercept = resid.sd, linetype="dashed",colour="grey70",size=1)  + geom_hline(yintercept = -resid.sd, linetype="dashed",colour="grey70",size=1) + theme_bw()

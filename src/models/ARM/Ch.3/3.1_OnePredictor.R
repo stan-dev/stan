@@ -31,7 +31,7 @@ jitter.mom_hs <- jitter.binary(mom_hs)
 
 jitter.frame = data.frame(jitter.mom_hs=jitter.mom_hs,kidscore.jitter=kidscore.jitter)
 m <- ggplot(jitter.frame,aes(x=jitter.mom_hs,y=kidscore.jitter))
-m + geom_point() + scale_y_continuous("Mother Completed High School") + scale_x_continuous("Child Test Score")
+m + geom_point() + scale_y_continuous("Mother Completed High School") + scale_x_continuous("Child Test Score") + theme_bw()
 
 # Figure 3.2
 beta.post <- extract(kid_iq_one_pred.sf2, "beta")$beta
@@ -39,4 +39,4 @@ beta.mean <- colMeans(beta.post)
 
 kid.iq.one.pred.1 = data.frame(mom_iq=mom_iq,kid_score=kid_score)
 m <- ggplot(kid.iq.one.pred.1,aes(x=mom_iq,y=kid_score))
-m + geom_point() + scale_y_continuous("Child Test Score") + scale_x_continuous("Mother IQ score") + geom_abline(intercept = beta.mean[1], slope = beta.mean[2])
+m + geom_point() + scale_y_continuous("Child Test Score") + scale_x_continuous("Mother IQ score") + geom_abline(intercept = beta.mean[1], slope = beta.mean[2]) + theme_bw()
