@@ -11,7 +11,7 @@ transformed data {
 }
 
 parameters {
-  vector beta[4];
+  vector[4] beta;
   real<lower=0> sigma;
 } 
 
