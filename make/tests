@@ -42,12 +42,15 @@ ifeq ($(OS),win)
 else
   DEV_NULL = /dev/null
 endif
-.PHONY: make-dummy
-make-dummy:
+
+test/dummy.cpp:
 	@mkdir -p test
-	@$(shell echo "int main() {return 0;}" > test/dummy.cpp)
-%.hpp-test : %.hpp make-dummy
+	@touch $@
+	@echo "int main() {return 0;}" >> $@
+
+%.hpp-test : %.hpp test/dummy.cpp
 	$(COMPILE.c) -O0 -include $< -o $(DEV_NULL) test/dummy.cpp
+
 .PHONY: test-headers
 test-headers: $(HEADER_TESTS) 
 
