@@ -11,12 +11,14 @@ namespace stan {
   namespace model {
 
     /**
-     * The <code>prob_grad</code> class represents teh basic parameter
+     * The <code>prob_grad</code> class represents the basic parameter
      * holders for a model.  The command <code>bin/stanc</code> builds
      * Models extending this base helper class.
      */
     class prob_grad {
+
     protected:
+
       size_t num_params_r__;
       std::vector<std::pair<int,int> > param_ranges_i__;
 
@@ -35,15 +37,15 @@ namespace stan {
 
       virtual ~prob_grad() { }
 
-      inline size_t num_params_r() {
+      inline size_t num_params_r() const {
         return num_params_r__;
       }
 
-      inline size_t num_params_i() {
+      inline size_t num_params_i() const {
         return param_ranges_i__.size();
       }
 
-      inline std::pair<int,int> param_range_i(size_t idx) {
+      inline std::pair<int,int> param_range_i(size_t idx) const {
         return param_ranges_i__[idx];
       }
 

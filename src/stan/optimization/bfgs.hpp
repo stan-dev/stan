@@ -1,10 +1,13 @@
 #ifndef __STAN__OPTIMIZATION__BFGS_HPP__
 #define __STAN__OPTIMIZATION__BFGS_HPP__
 
-#include <boost/math/special_functions/fpclassify.hpp>
-#include <cstdlib>
 #include <cmath>
+#include <cstdlib>
 #include <string>
+
+#include <boost/math/special_functions/fpclassify.hpp>
+
+#include <stan/model/util.hpp>
 
 namespace stan {
   namespace optimization {
@@ -437,61 +440,66 @@ namespace stan {
     private:
       M& _model;
       std::vector<int> _params_i;
-      std::ostream* _output_stream;
+      std::ostream* _msgs;
       std::vector<double> _x, _g;
       size_t _fevals;
 
     public:
       ModelAdaptor(M& model,
                    const std::vector<int>& params_i,
-                   std::ostream* output_stream)
-      : _model(model), _params_i(params_i), _output_stream(output_stream), _fevals(0) {}
+                   std::ostream* msgs)
+      : _model(model), _params_i(params_i), _msgs(msgs), _fevals(0) {}
                   
       size_t fevals() const { return _fevals; }
-      int operator()(const Eigen::Matrix<double,Eigen::Dynamic,1> &x, double &f) {
+      int operator()(const Eigen::Matrix<double,Eigen::Dynamic,1> &x, 
+                     double &f) {
         _x.resize(x.size());
-        for (Eigen::Matrix<double,Eigen::Dynamic,1>::size_type i = 0; i < x.size(); i++)
+        for (Eigen::Matrix<double,Eigen::Dynamic,1>::size_type i = 0; 
+             i < x.size(); i++)
           _x[i] = x[i];
 
         try {
-          // f = - _model.log_prob_propto_f_adjust_f(_x, _params_i, _output_stream);
-          // f = - lpp<M,false,false,double>::apply(_model,_x,_params_i,_output_stream);
-          f = - _model.template log_prob_poly<false,false>(_x,_params_i,_output_stream);
+          f = - _model.template log_prob<false,false>(_x,_params_i,
+                                                      _msgs);
         } catch (const std::exception& e) {
-          if (_output_stream)
-            (*_output_stream) << e.what() << std::endl;
+          if (_msgs)
+            (*_msgs) << e.what() << std::endl;
           return 1;
         }
 
         if (boost::math::isfinite(f))
           return 0;
         else {
-          if (_output_stream)
-            *_output_stream << "Error evaluating model log probability: " 
-                               "Non-finite function evaluation." << std::endl;
+          if (_msgs)
+            *_msgs << "Error evaluating model log probability: " 
+                      "Non-finite function evaluation." << std::endl;
           return 2;
         }
       }
-      int operator()(const Eigen::Matrix<double,Eigen::Dynamic,1> &x, double &f, Eigen::Matrix<double,Eigen::Dynamic,1> &g) {
+      int operator()(const Eigen::Matrix<double,Eigen::Dynamic,1> &x, 
+                     double &f, Eigen::Matrix<double,Eigen::Dynamic,1> &g) {
         _x.resize(x.size());
-        for (Eigen::Matrix<double,Eigen::Dynamic,1>::size_type i = 0; i < x.size(); i++)
+        for (Eigen::Matrix<double,Eigen::Dynamic,1>::size_type i = 0; 
+             i < x.size(); i++)
           _x[i] = x[i];
         
         _fevals++;
 
         try {
-          f = -_model.template grad_log_prob<true,false>(_x, _params_i, _g, _output_stream);
+          f = - stan::model::log_prob_grad<true,false>(_model,
+                                                       _x, _params_i,
+                                                       _g, _msgs);
         } catch (const std::exception& e) {
-          if (_output_stream)
-            (*_output_stream) << e.what() << std::endl;
+          if (_msgs)
+            (*_msgs) << e.what() << std::endl;
           return 1;
         }
 
         g.resize(_g.size());
         for (size_t i = 0; i < _g.size(); i++) {
           if (!boost::math::isfinite(_g[i])) {
-            if (_output_stream)
-              *_output_stream << "Error evaluating model log probability: " 
+            if (_msgs)
+              *_msgs << "Error evaluating model log probability: " 
                                  "Non-finite gradient." << std::endl;
             return 3;
           }
@@ -501,13 +509,15 @@ namespace stan {
         if (boost::math::isfinite(f))
           return 0;
         else {
-          if (_output_stream)
-            *_output_stream << "Error evaluating model log probability: " 
-                               "Non-finite function evaluation." << std::endl;
+          if (_msgs)
+            *_msgs << "Error evaluating model log probability: " 
+                               "Non-finite function evaluation." 
+                   << std::endl;
           return 2;
         }
       }
-      int df(const Eigen::Matrix<double,Eigen::Dynamic,1> &x, Eigen::Matrix<double,Eigen::Dynamic,1> &g) {
+      int df(const Eigen::Matrix<double,Eigen::Dynamic,1> &x, 
+             Eigen::Matrix<double,Eigen::Dynamic,1> &g) {
         double f;
         return (*this)(x,f,g);
       }
@@ -517,14 +527,16 @@ namespace stan {
     class BFGSLineSearch : public BFGSMinimizer<ModelAdaptor<M> > {
     private:
       ModelAdaptor<M> _adaptor;
-      
     public:
+      typedef typename BFGSMinimizer<ModelAdaptor<M> >::VectorT vector_t;
+      typedef typename vector_t::size_type idx_t;
+      
       BFGSLineSearch(M& model,
                      const std::vector<double>& params_r,
                      const std::vector<int>& params_i,
-                     std::ostream* output_stream = 0)
+                     std::ostream* msgs = 0)
         : BFGSMinimizer<ModelAdaptor<M> >(_adaptor),
-          _adaptor(model,params_i,output_stream)
+          _adaptor(model,params_i,msgs)
       {
 
         Eigen::Matrix<double,Eigen::Dynamic,1> x;
@@ -538,17 +550,15 @@ namespace stan {
       double logp() { return -(this->curr_f()); }
       double grad_norm() { return this->curr_g().norm(); }
       void grad(std::vector<double>& g) { 
-        const typename BFGSMinimizer<ModelAdaptor<M> >::VectorT &cg(this->curr_g());
+        const vector_t &cg(this->curr_g());
         g.resize(cg.size());
-          for (typename BFGSMinimizer<ModelAdaptor<M> >::VectorT::size_type i = 0;
-             i < cg.size(); i++)
+        for (idx_t i = 0; i < cg.size(); i++)
           g[i] = -cg[i];
       }
       void params_r(std::vector<double>& x) {
-        const typename BFGSMinimizer<ModelAdaptor<M> >::VectorT &cx(this->curr_x());
+        const vector_t &cx(this->curr_x());
         x.resize(cx.size());
-        for (typename BFGSMinimizer<ModelAdaptor<M> >::VectorT::size_type i = 0; 
-             i < cx.size(); i++)
+        for (idx_t i = 0; i < cx.size(); i++)
           x[i] = cx[i];
       }
     };

@@ -23,23 +23,23 @@ namespace stan {
       mock_model(size_t num_params_r): model::prob_grad(num_params_r) {};
       
       template <bool propto, bool jacobian_adjust_transforms, typename T>
-      double log_prob_poly(std::vector<T>& params_r,
+      double log_prob(std::vector<T>& params_r,
                       std::vector<int>& params_i,
-                      std::ostream* output_stream = 0) { 
+                      std::ostream* output_stream = 0) const { 
         return 0; 
       }
 
-      template <bool propto, bool jacobian_adjust_transforms>
-      double grad_log_prob(std::vector<double>& params_r,
-                           std::vector<int>& params_i,
-                           std::vector<double>& gradient,
-                           std::ostream* output_stream = 0) { 
-        return 0; 
-      }
+      // template <bool propto, bool jacobian_adjust_transforms>
+      // double grad_log_prob(std::vector<double>& params_r,
+      //                      std::vector<int>& params_i,
+      //                      std::vector<double>& gradient,
+      //                      std::ostream* output_stream = 0) { 
+      //   return 0; 
+      // }
 
       double log_prob(std::vector<double>& params_r,
                       std::vector<int>& params_i,
-                      std::ostream* output_stream = 0) { 
+                      std::ostream* output_stream = 0) const { 
         return 0; 
       }
       

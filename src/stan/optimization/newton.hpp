@@ -38,9 +38,10 @@ namespace stan {
         std::vector<double> gradient;
         std::vector<double> hessian;
         
-        double f0 = stan::model::grad_hess_log_prob<M,true,false>(model,
-                                                                  params_r, params_i, 
-                                                                  gradient, hessian);
+        double f0 
+          = stan::model::grad_hess_log_prob<M,true,false>(model,
+                                                          params_r, params_i, 
+                                                          gradient, hessian);
         matrix_d H(params_r.size(), params_r.size());
         for (size_t i = 0; i < hessian.size(); i++) {
           H(i) = hessian[i];
@@ -59,7 +60,9 @@ namespace stan {
           for (size_t i = 0; i < params_r.size(); i++)
             new_params_r[i] = params_r[i] - step_size * g[i];
           try {
-            f1 = model.template grad_log_prob<true,false>(new_params_r, params_i, gradient);
+            f1 = stan::model::log_prob_grad<true,false>(model,
+                                                        new_params_r, 
+                                                        params_i, gradient);
           } catch (std::exception& e) {
             // FIXME:  this is not a good way to handle a general exception
             f1 = -1e100;

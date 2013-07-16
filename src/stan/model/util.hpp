@@ -1,56 +1,106 @@
 #ifndef __STAN__MODEL__UTIL_HPP__
 #define __STAN__MODEL__UTIL_HPP__
 
-#include <vector>
+#include <iomanip>
 #include <iostream>
+#include <vector>
+
+#include <stan/agrad/rev/var.hpp>
 
 namespace stan {
 
   namespace model {
 
-      /**
-       * Compute the gradient using finite differences for
-       * the specified parameters, writing the result into the
-       * specified gradient, using the specified perturbation.
-       *
-       * @tparam M Class of model.
-       * @tparam propto True if calculation is up to proportion
-       * (double-only terms dropped).
-       * @tparam jacobian_adjust_transform True if the log absolute
-       * Jacobian determinant of inverse transforms is added to the
-       * log probability.
-       * @param model Model.
-       * @param params_r Real-valued parameters.
-       * @param params_i Integer-valued parameters.
-       * @param[out] grad Vector into which gradient is written.
-       * @param epsilon
-       * @param[in,out] output_stream
-       */
+    /**
+     * Compute the gradient using reverse-mode automatic
+     * differentiation, writing the result into the specified
+     * gradient, using the specified perturbation.
+     *
+     * @tparam M Class of model.
+     * @tparam propto True if calculation is up to proportion
+     * (double-only terms dropped).
+     * @tparam jacobian_adjust_transform True if the log absolute
+     * Jacobian determinant of inverse parameter transforms is added to 
+     * the log probability.
+     * @param model[in] Model.
+     * @param params_r[in] Real-valued parameters.
+     * @param params_i[in] Integer-valued parameters.
+     * @param[out] gradient Vector into which gradient is written.
+     * @param[in,out] msgs
+     */
+    template <bool propto, bool jacobian_adjust_transform, class M>
+    double log_prob_grad(const M& model,
+                         std::vector<double>& params_r,
+                         std::vector<int>& params_i,
+                         std::vector<double>& gradient,
+                         std::ostream* msgs = 0) {
+      using std::vector;
+      using stan::agrad::var;
+      vector<var> ad_params_r(params_r.size());
+      for (size_t i = 0; i < model.num_params_r(); ++i) {
+        stan::agrad::var var_i(params_r[i]);
+        ad_params_r[i] = var_i;
+      }
+      var adLogProb;
+      try {
+        adLogProb 
+          = model
+          .template log_prob<propto,
+                             jacobian_adjust_transform>(ad_params_r,
+                                                        params_i,msgs);
+      } catch (std::exception &ex) {
+        stan::agrad::recover_memory();
+        throw;
+      }
+      double val = adLogProb.val();
+      adLogProb.grad(ad_params_r,gradient);
+      return val;
+    }
+
+    /**
+     * Compute the gradient using finite differences for
+     * the specified parameters, writing the result into the
+     * specified gradient, using the specified perturbation.
+     *
+     * @tparam M Class of model.
+     * @tparam propto True if calculation is up to proportion
+     * (double-only terms dropped).
+     * @tparam jacobian_adjust_transform True if the log absolute
+     * Jacobian determinant of inverse parameter transforms is added to the
+     * log probability.
+     * @param model Model.
+     * @param params_r Real-valued parameters.
+     * @param params_i Integer-valued parameters.
+     * @param[out] grad Vector into which gradient is written.
+     * @param epsilon
+     * @param[in,out] output_stream
+     */
     template <class M, bool propto, bool jacobian_adjust_transform>
-    void finite_diff_grad(M& model,
+    void finite_diff_grad(const M& model,
                           std::vector<double>& params_r,
                           std::vector<int>& params_i,
                           std::vector<double>& grad,
                           double epsilon = 1e-6,
                           std::ostream* msgs = 0) {
       std::vector<double> perturbed(params_r);
-      model
-        .template grad_log_prob<propto,
-                                jacobian_adjust_transform>(params_r, params_i,
-                                                           grad, msgs);
+      stan::model::log_prob_grad<propto,
+                                 jacobian_adjust_transform>(model, params_r,
+                                                            params_i,
+                                                            grad, msgs);
       grad.resize(params_r.size());
       for (size_t k = 0; k < params_r.size(); k++) {
         perturbed[k] += epsilon;
         double logp_plus 
           = model
-          .template log_prob_poly<propto,
-                                  jacobian_adjust_transform>(perturbed, params_i,
-                                                             msgs);
+          .template log_prob<propto,
+                             jacobian_adjust_transform>(perturbed, params_i, 
+                                                        msgs);
         perturbed[k] = params_r[k] - epsilon;
         double logp_minus
           = model
-          .template log_prob_poly<propto,jacobian_adjust_transform>(perturbed, params_i,
-                                                                    msgs);
+          .template log_prob<propto,
+                             jacobian_adjust_transform>(perturbed, params_i,
+                                                        msgs);
         double gradest = (logp_plus - logp_minus) / (2*epsilon);
         grad[k] = gradest;
         perturbed[k] = params_r[k]; 
@@ -58,31 +108,31 @@ namespace stan {
     }
 
 
-      /**
-       * Test the grad_log_prob() function's ability to produce
-       * accurate gradients using finite differences.  This shouldn't
-       * be necessary when using autodiff, but is useful for finding
-       * bugs in hand-written code (or agrad).
-       *
-       * @tparam M Class of model.
-       * @tparam propto True if calculation is up to proportion
-       * (double-only terms dropped).
-       * @tparam jacobian_adjust_transform True if the log absolute
-       * Jacobian determinant of inverse transforms is added to the
-       * log probability.
-       * @param model Model.
-       * @param params_r Real-valued parameter vector.
-       * @param params_i Integer-valued parameter vector.
-       * @param epsilon Real-valued scalar saying how much to perturb 
-       * @param error Real-valued scalar saying how much error to allow
-       * @param o Output stream for messages.
-       * params_r. Defaults to 1e-6.
-       * @param output_stream Stream to which Stan programs write.
-       * @return number of failed gradient comparisons versus allowed
-       * error, so 0 if all gradients pass
-       */
+    /**
+     * Test the log_prob_grad() function's ability to produce
+     * accurate gradients using finite differences.  This shouldn't
+     * be necessary when using autodiff, but is useful for finding
+     * bugs in hand-written code (or agrad).
+     *
+     * @tparam M Class of model.
+     * @tparam propto True if calculation is up to proportion
+     * (double-only terms dropped).
+     * @tparam jacobian_adjust_transform True if the log absolute
+     * Jacobian determinant of inverse parameter transforms is added to the
+     * log probability.
+     * @param model Model.
+     * @param params_r Real-valued parameter vector.
+     * @param params_i Integer-valued parameter vector.
+     * @param epsilon Real-valued scalar saying how much to perturb 
+     * @param error Real-valued scalar saying how much error to allow
+     * @param o Output stream for messages.
+     * params_r. Defaults to 1e-6.
+     * @param output_stream Stream to which Stan programs write.
+     * @return number of failed gradient comparisons versus allowed
+     * error, so 0 if all gradients pass
+     */
     template <class M, bool propto, bool jacobian_adjust_transform>
-    int test_gradients(M& model,
+    int test_gradients(const M& model,
                        std::vector<double>& params_r,
                        std::vector<int>& params_i,
                        double epsilon = 1e-6,
@@ -91,11 +141,12 @@ namespace stan {
                        std::ostream* msgs = 0) {
       std::vector<double> grad;
       double lp 
-        = model.template grad_log_prob<propto,
-                                       jacobian_adjust_transform>(params_r,
-                                                                  params_i,
-                                                                  grad,msgs);
-        
+        = stan::model::log_prob_grad<propto,
+                                     jacobian_adjust_transform>(model,
+                                                                params_r,
+                                                                params_i,
+                                                                grad,msgs);
+      
       std::vector<double> grad_fd;
       finite_diff_grad<M,propto,
                        jacobian_adjust_transform>(model,
@@ -130,73 +181,74 @@ namespace stan {
     }
 
 
-      /**
-       * Evaluate the log-probability, its gradient, and its Hessian
-       * at params_r. This default version computes the Hessian
-       * numerically by finite-differencing the gradient, at a cost of
-       * O(params_r.size()^2).
-       *
-       * @tparam M Class of model.
-       * @tparam propto True if calculation is up to proportion
-       * (double-only terms dropped).
-       * @tparam jacobian_adjust_transform True if the log absolute
-       * Jacobian determinant of inverse transforms is added to the
-       * log probability.
-       * @param model Model.
-       * @param params_r Real-valued parameter vector.
-       * @param params_i Integer-valued parameter vector.
-       * @param gradient Vector to write gradient to.
-       * @param hessian Vector to write gradient to. hessian[i*D + j]
-       * gives the element at the ith row and jth column of the Hessian
-       * (where D=params_r.size()).
-       * @param output_stream Stream to which print statements in Stan
-       * programs are written, default is 0
-       */
+    /**
+     * Evaluate the log-probability, its gradient, and its Hessian
+     * at params_r. This default version computes the Hessian
+     * numerically by finite-differencing the gradient, at a cost of
+     * O(params_r.size()^2).
+     *
+     * @tparam M Class of model.
+     * @tparam propto True if calculation is up to proportion
+     * (double-only terms dropped).
+     * @tparam jacobian_adjust_transform True if the log absolute
+     * Jacobian determinant of inverse parameter transforms is added to the
+     * log probability.
+     * @param model Model.
+     * @param params_r Real-valued parameter vector.
+     * @param params_i Integer-valued parameter vector.
+     * @param gradient Vector to write gradient to.
+     * @param hessian Vector to write gradient to. hessian[i*D + j]
+     * gives the element at the ith row and jth column of the Hessian
+     * (where D=params_r.size()).
+     * @param output_stream Stream to which print statements in Stan
+     * programs are written, default is 0
+     */
     template <class M, bool propto, bool jacobian_adjust_transform>
-    double grad_hess_log_prob(M& model,
+    double grad_hess_log_prob(const M& model,
                               std::vector<double>& params_r, 
                               std::vector<int>& params_i,
                               std::vector<double>& gradient,
                               std::vector<double>& hessian,
                               std::ostream* msgs = 0) {
-        const double epsilon = 1e-3;
-        const int order = 4;
-        const double perturbations[order] 
-          = {-2*epsilon, -1*epsilon, epsilon, 2*epsilon};
-        const double coefficients[order]
-          = { 1.0 / 12.0, 
-              -2.0 / 3.0, 
-              2.0 / 3.0, 
-              -1.0 / 12.0 };
+      const double epsilon = 1e-3;
+      const int order = 4;
+      const double perturbations[order] 
+        = {-2*epsilon, -1*epsilon, epsilon, 2*epsilon};
+      const double coefficients[order]
+        = { 1.0 / 12.0, 
+            -2.0 / 3.0, 
+            2.0 / 3.0, 
+            -1.0 / 12.0 };
 
-        double result 
-          = model.template grad_log_prob<propto,
-                                         jacobian_adjust_transform>(params_r, 
-                                                                    params_i, 
-                                                                    gradient, 
-                                                                    msgs);
-        hessian.assign(params_r.size() * params_r.size(), 0);
-        std::vector<double> temp_grad(params_r.size());
-        std::vector<double> perturbed_params(params_r.begin(), params_r.end());
-        for (size_t d = 0; d < params_r.size(); d++) {
-          double* row = &hessian[d*params_r.size()];
-          for (int i = 0; i < order; i++) {
-            perturbed_params[d] = params_r[d] + perturbations[i];
-            model
-              .template grad_log_prob<propto,
-                                      jacobian_adjust_transform>(perturbed_params,
-                                                                 params_i, 
-                                                                 temp_grad);
-            for (size_t dd = 0; dd < params_r.size(); dd++) {
-              row[dd] += 0.5 * coefficients[i] * temp_grad[dd] / epsilon;
-              hessian[d + dd*params_r.size()] 
-                += 0.5 * coefficients[i] * temp_grad[dd] / epsilon;
-            }
+      double result 
+        = stan::model::log_prob_grad<propto,
+                                     jacobian_adjust_transform>(model,
+                                                                params_r, 
+                                                                params_i, 
+                                                                gradient, 
+                                                                msgs);
+      hessian.assign(params_r.size() * params_r.size(), 0);
+      std::vector<double> temp_grad(params_r.size());
+      std::vector<double> perturbed_params(params_r.begin(), params_r.end());
+      for (size_t d = 0; d < params_r.size(); d++) {
+        double* row = &hessian[d*params_r.size()];
+        for (int i = 0; i < order; i++) {
+          perturbed_params[d] = params_r[d] + perturbations[i];
+          stan::model::log_prob_grad<propto,
+                                     jacobian_adjust_transform>(model,
+                                                            perturbed_params,
+                                                            params_i, 
+                                                            temp_grad);
+          for (size_t dd = 0; dd < params_r.size(); dd++) {
+            row[dd] += 0.5 * coefficients[i] * temp_grad[dd] / epsilon;
+            hessian[d + dd*params_r.size()] 
+              += 0.5 * coefficients[i] * temp_grad[dd] / epsilon;
           }
-          perturbed_params[d] = params_r[d];
         }
-        return result;
-      }    
+        perturbed_params[d] = params_r[d];
+      }
+      return result;
+    }    
 
   }
 }

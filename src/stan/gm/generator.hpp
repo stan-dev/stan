@@ -238,6 +238,7 @@ namespace stan {
       generate_using("std::istream",o);
       generate_using_namespace("stan::math",o);
       generate_using_namespace("stan::prob",o);
+      // FIXME:  get rid of agrad dependency
       generate_using_namespace("stan::agrad",o);
       o << EOL;
     }
@@ -1452,57 +1453,25 @@ namespace stan {
 
 
       o << EOL;
-      o << INDENT << "template <bool propto__, bool jacobian_adjust_transforms__>" << EOL;
-      o << INDENT << "double grad_log_prob(std::vector<double>& params_r__," << EOL;
-      o << INDENT << "                     std::vector<int>& params_i__," << EOL;
-      o << INDENT << "                     std::vector<double>& gradient__," << EOL;
-      o << INDENT << "                     std::ostream* output_stream__ = 0) {" << EOL;
-      o << INDENT << "  std::vector<stan::agrad::var> ad_params_r__(num_params_r());" << EOL;
-      o << INDENT << "  for (size_t i = 0; i < num_params_r(); ++i) {" << EOL;
-      o << INDENT << "    stan::agrad::var var_i(params_r__[i]);" << EOL;
-      o << INDENT << "    ad_params_r__[i] = var_i;" << EOL;
-      o << INDENT << "  }" << EOL;
-      o << INDENT << "  stan::agrad::var adLogProb__;" << EOL;
-      o << INDENT << "  try {" << EOL;
-      o << INDENT << "    adLogProb__ = log_prob_poly<propto__,jacobian_adjust_transforms__>(ad_params_r__,params_i__,output_stream__);" << EOL;
-      o << INDENT << "  } catch (std::exception &ex) {" << EOL;
-      o << INDENT << "    stan::agrad::recover_memory();" << EOL;
-      o << INDENT << "    throw;" << EOL;
-      o << INDENT << "  }" << EOL;
-      o << INDENT << "  double val__ = adLogProb__.val();" << EOL;
-      o << INDENT << "  adLogProb__.grad(ad_params_r__,gradient__);" << EOL;
-      o << INDENT << "  return val__;" << EOL;
-      o << INDENT << "}" << EOL;
-
-      o << EOL;
       o << INDENT << "double log_prob(std::vector<double>& params_r__," << EOL;
       o << INDENT << "                std::vector<int>& params_i__," << EOL;
-      o << INDENT << "                std::ostream* output_stream__ = 0) {" << EOL;
+      o << INDENT << "                std::ostream* output_stream__ = 0) const {" << EOL;
       o << INDENT << "  std::vector<stan::agrad::var> ad_params_r__;" << EOL;
       o << INDENT << "  for (size_t i = 0; i < num_params_r(); ++i) {" << EOL;
       o << INDENT << "    stan::agrad::var var_i__(params_r__[i]);" << EOL;
       o << INDENT << "    ad_params_r__.push_back(var_i__);" << EOL;
       o << INDENT << "  }" << EOL;
-      o << INDENT << "  stan::agrad::var adLogProb__ = log_prob_poly<true,true>(ad_params_r__,params_i__,output_stream__);" << EOL;
+      o << INDENT << "  stan::agrad::var adLogProb__ = log_prob<true,true>(ad_params_r__,params_i__,output_stream__);" << EOL;
       o << INDENT << "  double val__ = adLogProb__.val();" << EOL;
       o << INDENT << "  stan::agrad::recover_memory();" << EOL;
       o << INDENT << "  return val__;" << EOL;
       o << INDENT << "}" << EOL
         << EOL;
 
-      // log_prob() required for abstract class
-      // o << EOL;
-      // o << INDENT << "var log_prob(vector<var>& params_r__," << EOL;
-      // o << INDENT << "             vector<int>& params_i__," << EOL;
-      // o << INDENT << "             std::ostream* pstream__ = 0) {" << EOL;
-      // o << INDENT << "  return log_prob_poly<true,true,var>(params_r__,params_i__,pstream__);" << EOL;
-      // o << INDENT << "}" << EOL;
-      // o << EOL << EOL;
-
       o << INDENT << "template <bool propto__, bool jacobian__, typename T__>" << EOL;
-      o << INDENT << "T__ log_prob_poly(vector<T__>& params_r__," << EOL;
-      o << INDENT << "                  vector<int>& params_i__," << EOL;
-      o << INDENT << "                  std::ostream* pstream__ = 0) {" << EOL2;
+      o << INDENT << "T__ log_prob(vector<T__>& params_r__," << EOL;
+      o << INDENT << "             vector<int>& params_i__," << EOL;
+      o << INDENT << "             std::ostream* pstream__ = 0) const {" << EOL2;
 
       // use this dummy for inits
       o << INDENT2 << "T__ DUMMY_VAR__(std::numeric_limits<double>::quiet_NaN());" << EOL;
@@ -1539,7 +1508,7 @@ namespace stan {
       generate_statement(p.statement_,2,o,include_sampling,is_var);
       o << EOL;
       o << INDENT2 << "return lp__;" << EOL2;
-      o << INDENT << "} // log_prob_poly(...var...)" << EOL2;
+      o << INDENT << "} // log_prob(...var...)" << EOL2;
     }
 
     struct dump_member_var_visgen : public visgen {
@@ -2199,7 +2168,7 @@ namespace stan {
       o << EOL;
       o << INDENT << "void transform_inits(const stan::io::var_context& context__," << EOL;
       o << INDENT << "                     std::vector<int>& params_i__," << EOL;
-      o << INDENT << "                     std::vector<double>& params_r__) {" << EOL;
+      o << INDENT << "                     std::vector<double>& params_r__) const {" << EOL;
       o << INDENT2 << "stan::io::writer<double> writer__(params_r__,params_i__);" << EOL;
       o << INDENT2 << "size_t pos__;" << EOL;
       o << INDENT2 << "std::vector<double> vals_r__;" << EOL;
@@ -2300,7 +2269,7 @@ namespace stan {
                               std::ostream& o) {
       write_dims_visgen vis(o);
       o << EOL << INDENT 
-        << "void get_dims(std::vector<std::vector<size_t> >& dimss__) {" 
+        << "void get_dims(std::vector<std::vector<size_t> >& dimss__) const {" 
         << EOL;
 
       o << INDENT2 << "dimss__.resize(0);" << EOL;
@@ -2375,7 +2344,7 @@ namespace stan {
                                           std::ostream& o) {
       write_param_names_visgen vis(o);
       o << EOL << INDENT
-        << "void get_param_names(std::vector<std::string>& names__) {"
+        << "void get_param_names(std::vector<std::string>& names__) const {"
         << EOL;
 
       o << INDENT2
@@ -2500,7 +2469,7 @@ namespace stan {
     void generate_write_csv_header_method(const program& prog,
                                           std::ostream& o) {
       write_csv_header_visgen vis(o);
-      o << EOL << INDENT << "void write_csv_header(std::ostream& o__) {" << EOL;
+      o << EOL << INDENT << "void write_csv_header(std::ostream& o__) const {" << EOL;
       o << INDENT2 << "stan::io::csv_writer writer__(o__);" << EOL;
 
       // parameters
@@ -2628,7 +2597,7 @@ namespace stan {
         << EOL << INDENT 
         << "                             bool include_tparams__ = true,"
         << EOL << INDENT
-        << "                             bool include_gqs__ = true) {" 
+        << "                             bool include_gqs__ = true) const {" 
         << EOL << INDENT2 
         << "std::stringstream param_name_stream__;" << EOL;
 
@@ -2780,7 +2749,7 @@ namespace stan {
         << EOL << INDENT 
         << "                               bool include_tparams__ = true,"
         << EOL << INDENT
-        << "                               bool include_gqs__ = true) {" 
+        << "                               bool include_gqs__ = true) const {" 
         << EOL << INDENT2 
         << "std::stringstream param_name_stream__;" << EOL;
 
@@ -3044,7 +3013,7 @@ namespace stan {
       o << INDENT << "               std::vector<double>& params_r__," << EOL;
       o << INDENT << "               std::vector<int>& params_i__," << EOL;
       o << INDENT << "               std::ostream& o__," << EOL;
-      o << INDENT << "               std::ostream* pstream__ = 0) {" << EOL;
+      o << INDENT << "               std::ostream* pstream__ = 0) const {" << EOL;
       o << INDENT2 << "stan::io::reader<double> in__(params_r__,params_i__);" 
         << EOL;
       o << INDENT2 << "stan::io::csv_writer writer__(o__);" << EOL;
@@ -3366,7 +3335,7 @@ namespace stan {
       o << INDENT << "                 std::vector<double>& vars__," << EOL;
       o << INDENT << "                 bool include_tparams__ = true," << EOL;
       o << INDENT << "                 bool include_gqs__ = true," << EOL;
-      o << INDENT << "                 std::ostream* pstream__ = 0) {" << EOL;
+      o << INDENT << "                 std::ostream* pstream__ = 0) const {" << EOL;
       o << INDENT2 << "vars__.resize(0);" << EOL;
       o << INDENT2 << "stan::io::reader<double> in__(params_r__,params_i__);" << EOL;
       o << INDENT2 << "static const char* function__ = \""
@@ -3434,7 +3403,7 @@ namespace stan {
         << EOL
         << INDENT << "                        std::vector<double>& vars__,"
         << EOL
-        << INDENT << "                        std::ostream* pstream__ = 0) {"
+        << INDENT << "                        std::ostream* pstream__ = 0) const {"
         << EOL
         << INDENT2 << "boost::random::minstd_rand base_rng; // dummy" 
         << EOL
@@ -3449,7 +3418,7 @@ namespace stan {
         << EOL
         << INDENT << "                        std::vector<double>& vars__,"
         << EOL
-        << INDENT << "                        std::ostream* pstream__ = 0) {"
+        << INDENT << "                        std::ostream* pstream__ = 0) const {"
         << EOL
         << INDENT2 << "boost::random::minstd_rand base_rng; // dummy"
         << EOL
@@ -3640,7 +3609,7 @@ namespace stan {
 
     void generate_model_name_method(const std::string& model_name,
                                     std::ostream& out) {
-      out << INDENT << "std::string model_name() {" << EOL
+      out << INDENT << "static std::string model_name() {" << EOL
           << INDENT2 << "return \"" << model_name << "\";" << EOL
           << INDENT << "}" << EOL2;
     }
