@@ -11,7 +11,7 @@ if (!file.exists("wells_interactions.sm.RData")) {
     load("wells_interactions.sm.RData", verbose=TRUE)
 }
 dist100 <- dist / 100
-dataList.1 <- list(N=N, switc=switc, dist=dist100,arsenic=arsenic)
+dataList.1 <- list(N=N, switc=switc, dist=dist,arsenic=arsenic)
 wells_interactions.sf1 <- sampling(wells_interactions.sm, dataList.1)
 print(wells_interactions.sf1)
 
@@ -27,13 +27,18 @@ wells_interactions_center.sf1 <- sampling(wells_interactions.sm, dataList.2)
 print(wells_interactions_center.sf1)
 
 ## Graphing the model with interactions (Figure 5.12)
+jitter.binary <- function(a, jitt=.05){
+  ifelse (a==0, runif (length(a), 0, jitt), runif (length(a), 1-jitt, 1))
+}
+
+switch.jitter <- jitter.binary(switc)
 frame3 = data.frame(dist=dist,switc=switch.jitter)
 m2 <- ggplot(frame3,aes(x=dist,y=switc))
-m2 <- m2 + geom_point() + scale_y_continuous("Pr(Switching)",limits=c(-.01,1)) + scale_x_continuous("Distance (in meters) to nearest safe well") + theme_bw() + stat_function(fun=function(x) 1.0 / (1 + exp(-(beta.mean[1]+beta.mean[3]*0.5 + x * (beta.mean[2]/100 + 0.5 * beta.mean[4]/100))))) + stat_function(fun=function(x) 1.0 / (1 + exp-(beta.mean[1]+beta.mean[3] + x * (beta.mean[2]/100 + beta.mean[4]/100))))
+m2 + geom_point() + scale_y_continuous("Pr(Switching)",limits=c(-.01,1)) + scale_x_continuous("Distance (in meters) to nearest safe well") + theme_bw() + stat_function(fun=function(x) 1.0 / (1 + exp(-(beta.mean[1]+beta.mean[3]*0.5 + x * (beta.mean[2]/100 + 0.5 * beta.mean[4]/100))))) + stat_function(fun=function(x) 1.0 / (1 + exp(-(beta.mean[1]+beta.mean[3] + x * (beta.mean[2]/100 + beta.mean[4]/100)))))
 
 frame4 = data.frame(ars=arsenic,switc=switch.jitter)
-m2 <- ggplot(frame4,aes(x=dist,y=switc))
-m2 <- m2 + geom_point() + scale_y_continuous("Pr(Switching)",limits=c(-.01,1)) + scale_x_continuous("Arsenic concentration in well water") + theme_bw() + stat_function(fun=function(x) 1.0 / (1 + exp-(beta.mean[1]+beta.mean[3]*x))) + stat_function(fun=function(x) 1.0 / (1 + exp-(beta.mean[1]+beta.mean[2]*0.5 + x * (beta.mean[3] + beta.mean[4]*0.5))))
+m3 <- ggplot(frame4,aes(x=ars,y=switc))
+m3 + geom_point() + scale_y_continuous("Pr(Switching)",limits=c(-.01,1)) + scale_x_continuous("Arsenic concentration in well water") + theme_bw() + stat_function(fun=function(x) 1.0 / (1 + exp(-(beta.mean[1]+beta.mean[3]*x)))) + stat_function(fun=function(x) 1.0 / (1 + exp(-(beta.mean[1]+beta.mean[2]*0.5 + x * (beta.mean[3] + beta.mean[4]*0.5)))))
 
  # with community organization variable (wells_community.stan)
 if (!file.exists("wells_community.sm.RData")) {

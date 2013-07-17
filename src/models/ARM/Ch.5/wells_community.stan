@@ -14,13 +14,13 @@ transformed data {
   vector[N] inter;
   real mu_dist100;
   real mu_arsenic;
-  dist100 <- dist / 100;
+  dist100 <- dist / 100.0;
   mu_dist100 <- mean(dist100);
   mu_arsenic <- mean(arsenic);
   c_dist100 <- dist100 - mu_dist100;
   c_arsenic <- arsenic - mu_arsenic;
   inter <- c_dist100 .* c_arsenic;
-  educ4 <- educ / 4;
+  educ4 <- educ / 4.0;
 }
 parameters {
   vector[6] beta;

@@ -11,7 +11,7 @@ transformed data {
   vector[N] inter;
   real mu_dist100;
   real mu_arsenic;
-  dist100 <- dist / 100;
+  dist100 <- dist / 100.0;
   mu_dist100 <- mean(dist100);
   mu_arsenic <- mean(arsenic);
   c_dist100 <- dist100 - mu_dist100;
@@ -22,7 +22,6 @@ parameters {
   vector[4] beta;
 } 
 model {
-  for (n in 1:N)
-    switc[n] ~ bernoulli(inv_logit(beta[1] + beta[2] * c_dist100[n] 
-                            + beta[3] * c_arsenic[n] + beta[4] * inter[n]));
+  switc ~ bernoulli_logit(beta[1] + beta[2] * c_dist100
+                            + beta[3] * c_arsenic + beta[4] * inter);
 }

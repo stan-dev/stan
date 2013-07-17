@@ -6,13 +6,11 @@ data {
 }
 transformed data {
   vector[N] dist100;
-  dist100 <- dist / 100;
+  dist100 <- dist / 100.0;
 }
 parameters {
   vector[3] beta;
 } 
 model {
-  for (n in 1:N)
-    switc[n] ~ bernoulli(inv_logit(beta[1] + beta[2] * dist100[n] 
-                            + beta[3] * arsenic[n]));
+  switc ~ bernoulli_logit(beta[1] + beta[2] * dist100 + beta[3] * arsenic);
 }

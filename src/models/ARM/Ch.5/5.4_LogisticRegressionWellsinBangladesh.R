@@ -1,4 +1,4 @@
-stopifnot(require(rstan))
+library(rstan)
 library(ggplot2)
 source("wells.data.R")    
 
@@ -61,8 +61,8 @@ beta.mean2 <- colMeans(beta.post2)
 ## Graphing the fitted model with two predictors (Figure 5.11)
 frame3 = data.frame(dist=dist,switc=switch.jitter)
 m2 <- ggplot(frame3,aes(x=dist,y=switc))
-m2 <- m2 + geom_point() + scale_y_continuous("Pr(Switching)",limits=c(-.01,1)) + scale_x_continuous("Distance (in meters) to nearest safe well") + theme_bw() + stat_function(fun=function(x) 1.0 / (1 + exp(-beta.mean2[1] - 0.5 * beta.mean2[3] - beta.mean[2] * x / 100.0))) + stat_function(fun=function(x) 1.0 / (1 + exp(-beta.mean2[1] - beta.mean2[3] - beta.mean[2] * x / 100.0)))
+m2 + geom_point() + scale_y_continuous("Pr(Switching)",limits=c(-.01,1)) + scale_x_continuous("Distance (in meters) to nearest safe well") + theme_bw() + stat_function(fun=function(x) 1.0 / (1 + exp(-beta.mean2[1] - 0.5 * beta.mean2[3] - beta.mean2[2] * x / 100.0))) + stat_function(fun=function(x) 1.0 / (1 + exp(-beta.mean2[1] - beta.mean2[3] - beta.mean2[2] * x / 100.0)))
 
 frame4 = data.frame(ars=arsenic,switc=switch.jitter)
-m2 <- ggplot(frame4,aes(x=dist,y=switc))
-m2 <- m2 + geom_point() + scale_y_continuous("Pr(Switching)",limits=c(-.01,1)) + scale_x_continuous("Arsenic concentration in well water") + theme_bw() + stat_function(fun=function(x) 1.0 / (1 + exp(-beta.mean2[1] - beta.mean2[3] * x))) + stat_function(fun=function(x) 1.0 / (1 + exp(-beta.mean2[1] - beta.mean2[2] * 0.5 - beta.mean2[3] * x)))
+m3 <- ggplot(frame4,aes(x=ars,y=switc))
+m3 + geom_point() + scale_y_continuous("Pr(Switching)",limits=c(-.01,1)) + scale_x_continuous("Arsenic concentration in well water") + theme_bw() + stat_function(fun=function(x) 1.0 / (1 + exp(-beta.mean2[1] - beta.mean2[3] * x))) + stat_function(fun=function(x) 1.0 / (1 + exp(-beta.mean2[1] - beta.mean2[2] * 0.5 - beta.mean2[3] * x)))
