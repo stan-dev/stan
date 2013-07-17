@@ -230,7 +230,6 @@ namespace stan {
       generate_using("std::vector",o);
       generate_using("std::string",o);
       generate_using("std::stringstream",o);
-      // generate_using("stan::agrad::var",o);
       generate_using("stan::model::prob_grad",o);
       generate_using("stan::math::get_base1",o);
       generate_using("stan::math::stan_print",o);
@@ -238,7 +237,6 @@ namespace stan {
       generate_using("std::istream",o);
       generate_using_namespace("stan::math",o);
       generate_using_namespace("stan::prob",o);
-      // generate_using_namespace("stan::agrad",o);
       o << EOL;
     }
 
@@ -392,21 +390,6 @@ namespace stan {
       o << "\", ";
       generate_expression(expr,o);
       o << ");" << EOL;
-
-      // o << "if (0 > ";
-      // generate_expression(expr,o);
-      // o << ") {" << EOL;
-      // o << INDENT3 << "std::stringstream s__;" << EOL;
-      // o << INDENT3 << "s__ << \"Found negative index for variable declaration.\";" << EOL;
-      // o << INDENT3 << "s__ << \"; declared variable=" << var_name << "\";" << EOL;
-      // o << INDENT3 << "s__ << \"; dimension expression=";
-      // generate_expression(expr,o);
-      // o << "\";" << EOL;
-      // o << INDENT3 << "s__ << \"; expression value=\" << ";
-      // generate_expression(expr,o);
-      // o << ";" << EOL;
-      // o << INDENT3 << "throw std::invalid_argument(s__.str());" << EOL;
-      // o << INDENT2 << "}" << EOL;
     }
 
     void generate_initialization(std::ostream& o,
