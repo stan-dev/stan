@@ -3,7 +3,7 @@ data {
   vector[N] dist;
   vector[N] arsenic;
   vector[N] educ;
-  int<lower=0,upper=1> switch_w[N];
+  int<lower=0,upper=1> switc[N];
 }
 transformed data {
   vector[N] dist100;
@@ -36,7 +36,7 @@ parameters {
 } 
 model {
   for (n in 1:N)
-    switch_w[n] ~ bernoulli(inv_logit(beta[1] + beta[2] * c_dist100[n] 
+    switc[n] ~ bernoulli(inv_logit(beta[1] + beta[2] * c_dist100[n] 
                             + beta[3] * c_log_arsenic[n] + beta[4] * c_educ4[n]
                             + beta[5] * inter_dist_ars[n] 
                             + beta[6] * inter_dist_edu[n]
