@@ -263,7 +263,7 @@ namespace stan {
       return expr_type(); // ill-formed dummy
     }
     function_signatures::function_signatures() { 
-#include <stan/gm/function_signatures.hpp>
+#include <stan/gm/function_signatures.h>
     }
     function_signatures* function_signatures::sigs_ = 0;
 
