@@ -31,24 +31,17 @@ int.95 <- estimate + qt(c(.025,.975),n-1)*se
 polls <- matrix (scan("polls.dat"), ncol=5, byrow=TRUE)
 support <- polls[,3]/(polls[,3]+polls[,4])
 year <-  polls[,1] + (polls[,2]-6)/12
-y.max[32]
-y.min[32]
+y.max<-NULL
+y.min<-NULL
 for (i in 1:32) {
   y.bounds <- (100*(support[i]+c(-1,1)*sqrt(support[i]*(1-support[i])/1000)))
-  y.max[i] <-y.bounds[2]
-  y.min[i] <-y.bounds[1]
+  y.max <-c(y.max,y.bounds[2])
+  y.min <-c(y.min,y.bounds[1])
 }
 limits <- aes(ymax=y.max,ymin=y.min)
 frame1 = data.frame(year=year,support=support*100)
 m <- ggplot(frame1,aes(x=year,y=support))
 m + geom_point() + scale_y_continuous("Percentage Support for the Death Penalty") + scale_x_continuous("Year") + theme_bw() + geom_pointrange(limits)
-
-
-plot (year, support*100, xlab="Year", ylim=c(min(100*support)-1, max(100*support)+1),
-      ylab="Percentage support for the death penalty", cex=1.1, cex.main=1.2,
-      cex.axis=1.1, cex.lab=1.1, pch=20)
-for (i in 1:nrow(polls))
-  lines (rep(year[i],2), 100*(support[2]+c(-1,1)*sqrt(support[2]*(1-support[2])/1000)))
 
 # Weighted averages
 
