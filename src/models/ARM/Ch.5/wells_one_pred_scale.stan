@@ -1,7 +1,7 @@
 data {
   int<lower=0> N; 
   vector[N] dist;
-  int<lower=0,upper=1> switch_w[N];
+  int<lower=0,upper=1> switc[N];
 }
 transformed data {
   vector[N] dist100;
@@ -12,5 +12,5 @@ parameters {
 } 
 model {
   for (n in 1:N)
-    switch_w[n] ~ bernoulli(inv_logit(beta[1] + beta[2] * dist100[n]));
+    switc[n] ~ bernoulli(inv_logit(beta[1] + beta[2] * dist100[n]));
 }
