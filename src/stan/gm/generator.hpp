@@ -230,7 +230,7 @@ namespace stan {
       generate_using("std::vector",o);
       generate_using("std::string",o);
       generate_using("std::stringstream",o);
-      generate_using("stan::agrad::var",o);
+      // generate_using("stan::agrad::var",o);
       generate_using("stan::model::prob_grad",o);
       generate_using("stan::math::get_base1",o);
       generate_using("stan::math::stan_print",o);
@@ -238,8 +238,7 @@ namespace stan {
       generate_using("std::istream",o);
       generate_using_namespace("stan::math",o);
       generate_using_namespace("stan::prob",o);
-      // FIXME:  get rid of agrad dependency
-      generate_using_namespace("stan::agrad",o);
+      // generate_using_namespace("stan::agrad",o);
       o << EOL;
     }
 
@@ -1270,7 +1269,7 @@ namespace stan {
       }
       void operator()(assignment const& x) const {
         generate_indent(indent_,o_);
-        o_ << "assign(";
+        o_ << "stan::math::assign(";
         generate_indexed_expr<true>(x.var_dims_.name_,
                                     x.var_dims_.dims_,
                                     x.var_type_.base_type_,
@@ -1452,22 +1451,6 @@ namespace stan {
                            std::ostream& o) {
 
 
-      o << EOL;
-      o << INDENT << "double log_prob(std::vector<double>& params_r__," << EOL;
-      o << INDENT << "                std::vector<int>& params_i__," << EOL;
-      o << INDENT << "                std::ostream* output_stream__ = 0) const {" << EOL;
-      o << INDENT << "  std::vector<stan::agrad::var> ad_params_r__;" << EOL;
-      o << INDENT << "  for (size_t i = 0; i < num_params_r(); ++i) {" << EOL;
-      o << INDENT << "    stan::agrad::var var_i__(params_r__[i]);" << EOL;
-      o << INDENT << "    ad_params_r__.push_back(var_i__);" << EOL;
-      o << INDENT << "  }" << EOL;
-      o << INDENT << "  stan::agrad::var adLogProb__ = log_prob<true,true>(ad_params_r__,params_i__,output_stream__);" << EOL;
-      o << INDENT << "  double val__ = adLogProb__.val();" << EOL;
-      o << INDENT << "  stan::agrad::recover_memory();" << EOL;
-      o << INDENT << "  return val__;" << EOL;
-      o << INDENT << "}" << EOL
-        << EOL;
-
       o << INDENT << "template <bool propto__, bool jacobian__, typename T__>" << EOL;
       o << INDENT << "T__ log_prob(vector<T__>& params_r__," << EOL;
       o << INDENT << "             vector<int>& params_i__," << EOL;
@@ -1508,7 +1491,7 @@ namespace stan {
       generate_statement(p.statement_,2,o,include_sampling,is_var);
       o << EOL;
       o << INDENT2 << "return lp__;" << EOL2;
-      o << INDENT << "} // log_prob(...var...)" << EOL2;
+      o << INDENT << "} // log_prob()" << EOL2;
     }
 
     struct dump_member_var_visgen : public visgen {

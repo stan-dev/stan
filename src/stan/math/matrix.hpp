@@ -4,6 +4,7 @@
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/add.hpp>
 #include <stan/math/matrix/array_builder.hpp>
+#include <stan/math/matrix/assign.hpp>
 #include <stan/math/matrix/block.hpp>
 #include <stan/math/matrix/check_range.hpp>
 #include <stan/math/matrix/cholesky_decompose.hpp>
