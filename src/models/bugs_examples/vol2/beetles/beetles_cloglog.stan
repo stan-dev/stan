@@ -18,18 +18,8 @@ parameters {
 }
 transformed parameters {
   real p[N];
-  real llike[N];
-  real rhat[N];
-
-
-  for (i in 1:N) {
+  for (i in 1:N) 
     p[i] <- inv_cloglog(alpha_star + beta*centered_x[i]);
-    // log likelihood for sample i & saturated log-likelihood:
-    llike[i]  <- r[i]*log(p[i]) + (n[i]-r[i])*log(1-p[i]);  
-    // llike.sat[i] <- r[i]*log(r[i]/n[i]) + (n[i]-r[i])*log(1-r[i]/n[i]);
-    rhat[i] <- p[i]*n[i];  // fitted values
-  }
-  //D <- 2 * (sum(llike.sat[]) - sum(llike[]));
 }
 
 
@@ -42,6 +32,15 @@ model {
 
 generated quantities {
   real alpha; 
+  real llike[N];
+  real rhat[N];
   alpha <- alpha_star - beta*mean_x;              
+  for (i in 1:N) {
+    // log likelihood for sample i & saturated log-likelihood:
+    llike[i]  <- r[i]*log(p[i]) + (n[i]-r[i])*log(1-p[i]);  
+    // llike.sat[i] <- r[i]*log(r[i]/n[i]) + (n[i]-r[i])*log(1-r[i]/n[i]);
+    rhat[i] <- p[i]*n[i];  // fitted values
+  }
+  //D <- 2 * (sum(llike.sat[]) - sum(llike[]));
 } 
 

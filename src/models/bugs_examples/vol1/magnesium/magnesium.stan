@@ -74,11 +74,11 @@ model {
       theta[prior] ~ normal(mu[prior], tau[prior]);
   }
   for (prior in 1:N_priors) {
-    vector[N_studies] tmpp;
+    vector[N_studies] tmpm;
     for (i in 1:N_studies) 
-      tmpp[i] <- inv_logit(theta[prior, i] + logit(pc[prior, i]));
+      tmpm[i] <- theta[prior, i] + logit(pc[prior, i]);
     rc ~ binomial(nc, pc[prior]);
-    rt ~ binomial(nt, tmpp);
+    rt ~ binomial_logit(nt, tmpm);
   }
 } 
 generated quantities {
