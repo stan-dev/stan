@@ -46,11 +46,11 @@ frame1 = data.frame(mom_iq=mom_iq[ok],kid_score=kid_score[ok])
 frame2 = data.frame(mom_iq=mom_iq[!ok],kid_score=kid_score[!ok])
 
 beta.post <- extract(kid_iq_multi_preds.sf, "beta")$beta
-beta.mean <- colMeans(beta.post)
+beta.mean2 <- colMeans(beta.post)
 
 m <- ggplot() + geom_point(data=frame2,aes(x=mom_iq,y=kid_score)) + geom_point(data=frame1,aes(x=mom_iq,y=kid_score),colour="grey70")
 m <- m + scale_y_continuous("Child Test Score") + scale_x_continuous("Mother IQ score")
-m + geom_abline(intercept = beta.mean[1] + beta.mean[2], slope = beta.mean[3],colour = "grey70") + geom_abline(intercept = beta.mean[1], slope = beta.mean[3]) + theme_bw()
+m + geom_abline(intercept = beta.mean2[1] + beta.mean2[2], slope = beta.mean2[3],colour = "grey70") + geom_abline(intercept = beta.mean2[1], slope = beta.mean2[3]) + theme_bw()
 
 ## model with interaction (kid_iq_interaction.stan)
 ## lm (kid_score ~ mom_hs + mom_iq + mom_hs:mom_iq)
@@ -92,4 +92,27 @@ for (i in 1:10)
 m + geom_abline(intercept=beta.mean1[1],slope=beta.mean1[2],colour="red")
 
 ### Displaying using one plot for each input variable (Figure 3.11) FIXME
+fit.3 <- lm (kid_score ~ mom_hs + mom_iq)
+beta.sim <- coef(sim(fit.3))
 
+kidscore.jitter <- jitter(kid_score)
+
+jitter.binary <- function(a, jitt=.05){
+   ifelse (a==0, runif (length(a), 0, jitt), runif (length(a), 1-jitt, 1))
+}
+
+jitter.mom_hs <- jitter.binary(mom_hs)
+
+frame2 = data.frame(ks=kid_score,miq=mom_iq)
+m2 <- ggplot(frame2,aes(x=miq,y=ks))
+m2 <- m2 + geom_point() + scale_y_continuous("Child Test Score") + scale_x_continuous("Mother IQ Score") + theme_bw()
+for (i in 1:10)
+  m2 <- m2 + geom_abline(intercept=beta.sim[i,1] + mean(mom_hs) * beta.sim[i,2],slope=beta.sim[i,3],colour="grey",size=2)
+m2 + geom_abline(intercept=beta.mean2[1] + beta.mean2[2] * mean(mom_hs),slope=beta.mean2[3],colour="red")
+
+frame3 = data.frame(hs=jitter.mom_hs,ks=kidscore.jitter)
+m3 <- ggplot(frame3,aes(x=hs,y=ks))
+m3 <- m3 + geom_point() + scale_y_continuous("Child Test Score") + scale_x_continuous("Mother Completed High School") + theme_bw()
+for (i in 1:10)
+  m3 <- m3 + geom_abline(intercept=beta.sim[i,1] + mean(mom_iq) * beta.sim[i,3],slope=beta.sim[i,2],colour="grey",size=2)
+m3 + geom_abline(intercept=beta.mean2[1] + beta.mean2[3] * mean(mom_iq),slope=beta.mean2[2],colour="red")
