@@ -8,18 +8,48 @@ namespace stan {
   
   namespace gm {
     
+    template <typename T>
+    struct type_name {
+      static std::string name() { return typeid(T).name(); }
+    };
+    
+    // Specialize to something more readable
+    template <>
+    struct type_name<int> {
+      static std::string name() { return "int"; }
+    };
+    
+    template <>
+    struct type_name<unsigned int> {
+      static std::string name() { return "unsigned int"; }
+    };
+    
+    template <>
+    struct type_name<double> {
+      static std::string name() { return "double"; }
+    };
+    
+    template <>
+    struct type_name<bool> {
+      static std::string name() { return "boolean"; }
+    };
+    
+    template <>
+    struct type_name<std::string> {
+      static std::string name() { return "string"; }
+    };
+    
     template<typename T>
     class singleton_argument: public valued_argument {
       
     public:
       
-      singleton_argument()
-        : _validity("All") { 
+      singleton_argument(): _validity("All") { 
         _name = "";
+        _value_type = type_name<T>::name();
       }
       
-      singleton_argument(const std::string name)
-        : _validity("All") {
+      singleton_argument(const std::string name): _validity("All") {
         _name = name;
       }
 

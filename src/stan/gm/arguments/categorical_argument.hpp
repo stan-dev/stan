@@ -45,9 +45,12 @@ namespace stan {
         if (_subarguments.size() > 0) {
           *s << indent << subindent << "Valid subarguments:";
           
-          for (std::vector<argument*>::iterator it = _subarguments.begin();
-               it != _subarguments.end(); ++it)
-            *s << " " << (*it)->name();
+          std::vector<argument*>::iterator it = _subarguments.begin();
+          *s << " " << (*it)->name();
+          ++it;
+          
+          for (; it != _subarguments.end(); ++it)
+            *s << ", " << (*it)->name();
           *s << std::endl << std::endl;
         
           if (recurse) {

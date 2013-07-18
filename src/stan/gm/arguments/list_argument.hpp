@@ -11,6 +11,10 @@ namespace stan {
       
     public:
       
+      list_argument() {
+        _value_type = "list element";
+      }
+      
       ~list_argument() {
         
         for (std::vector<argument*>::iterator it = _values.begin();
@@ -116,9 +120,12 @@ namespace stan {
       std::string print_valid() {
         std::string valid_values;
         
-        for (std::vector<argument*>::iterator it = _values.begin();
-             it != _values.end(); ++it)
-          valid_values += " " + (*it)->name();
+        std::vector<argument*>::iterator it = _values.begin();
+        valid_values += " " + (*it)->name();
+        ++it;
+        
+        for (; it != _values.end(); ++it)
+          valid_values += ", " + (*it)->name();
         
         return valid_values;
         
