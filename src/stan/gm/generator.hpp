@@ -742,7 +742,13 @@ namespace stan {
           o_ << "\");" << EOL;
         }
         generate_indent(indents_ + x.dims_.size(),o_);
-        o_ << "} catch (std::domain_error& e) { throw std::domain_error(std::string(\"Invalid value of " << x.name_ << ": \") + std::string(e.what())); };" << EOL;
+        o_ << "} catch (std::domain_error& e) { "
+           << EOL;
+        generate_indent(indents_ + x.dims_.size() + 1, o_);
+        o_ << "throw std::domain_error(std::string(\"Invalid value of " << x.name_ << ": \") + std::string(e.what()));"
+          << EOL;
+        generate_indent(indents_ + x.dims_.size(), o_);
+        o_ << "};" << EOL;
         generate_end_for_dims(x.dims_.size());
       }
       void operator()(int_var_decl const& x) const {
@@ -1434,6 +1440,7 @@ namespace stan {
                            std::ostream& o) {
 
 
+      o << EOL;
       o << INDENT << "template <bool propto__, bool jacobian__, typename T__>" << EOL;
       o << INDENT << "T__ log_prob(vector<T__>& params_r__," << EOL;
       o << INDENT << "             vector<int>& params_i__," << EOL;
@@ -1874,6 +1881,171 @@ namespace stan {
         boost::apply_visitor(vis, vs[i].decl_);
     }
 
+    void generate_destructor(const std::string& model_name,
+                             std::ostream& o) {
+      o << EOL
+        << INDENT << "~" << model_name << "() { }"
+        << EOL2;
+    }
+
+    // know all data is set and range expressions only depend on data
+    struct set_param_ranges_visgen : public visgen {
+      set_param_ranges_visgen(std::ostream& o)
+        : visgen(o) {
+      }
+      void operator()(const nil& /*x*/) const { }
+      void operator()(const int_var_decl& x) const {
+        generate_increment_i(x.dims_);
+        // for loop for ranges
+        for (size_t i = 0; i < x.dims_.size(); ++i) {
+          generate_indent(i + 2, o_);
+          o_ << "for (size_t i_" << i << "__ = 0; ";
+          o_ << "i_" << i << "__ < ";
+          generate_expression(x.dims_[i],o_);
+          o_ << "; ++i_" << i << "__) {" << EOL;
+        }
+        // add range
+        generate_indent(x.dims_.size() + 2,o_);
+        o_ << "param_ranges_i__.push_back(std::pair<int,int>(";
+        generate_expression(x.range_.low_,o_);
+        o_ << ", ";
+        generate_expression(x.range_.high_,o_);
+        o_ << "));" << EOL;
+        // close for loop
+        for (size_t i = 0; i < x.dims_.size(); ++i) {
+          generate_indent(x.dims_.size() + 1 - i, o_);
+          o_ << "}" << EOL;
+        }
+      }
+      void operator()(const double_var_decl& x) const {
+        generate_increment(x.dims_);
+      }
+      void operator()(const vector_var_decl& x) const {
+        generate_increment(x.M_,x.dims_);
+      }
+      void operator()(const row_vector_var_decl& x) const {
+        generate_increment(x.N_,x.dims_);
+      }
+      void operator()(const matrix_var_decl& x) const {
+        generate_increment(x.M_,x.N_,x.dims_);
+      }
+      void operator()(const unit_vector_var_decl& x) const {
+        // only K-1 vals
+        o_ << INDENT2 << "num_params_r__ += (";
+        generate_expression(x.K_,o_);
+        o_ << " - 1)";
+        for (size_t i = 0; i < x.dims_.size(); ++i) {
+          o_ << " * ";
+          generate_expression(x.dims_[i],o_);
+        }
+        o_ << ";" << EOL;
+      }
+      void operator()(const simplex_var_decl& x) const {
+        // only K-1 vals
+        o_ << INDENT2 << "num_params_r__ += (";
+        generate_expression(x.K_,o_);
+        o_ << " - 1)";
+        for (size_t i = 0; i < x.dims_.size(); ++i) {
+          o_ << " * ";
+          generate_expression(x.dims_[i],o_);
+        }
+        o_ << ";" << EOL;
+      }
+      void operator()(const ordered_var_decl& x) const {
+        generate_increment(x.K_,x.dims_);
+      }
+      void operator()(const positive_ordered_var_decl& x) const {
+        generate_increment(x.K_,x.dims_);
+      }
+      void operator()(const cov_matrix_var_decl& x) const {
+        // (K * (K - 1))/2 + K  ?? define fun(K) = ??
+        o_ << INDENT2 << "num_params_r__ += ((";
+        generate_expression(x.K_,o_);
+        o_ << " * (";
+        generate_expression(x.K_,o_);
+        o_ << " - 1)) / 2 + ";
+        generate_expression(x.K_,o_);
+        o_ << ")";
+        for (size_t i = 0; i < x.dims_.size(); ++i) {
+          o_ << " * ";
+          generate_expression(x.dims_[i],o_);
+        }
+        o_ << ";" << EOL;
+      }
+      void operator()(const corr_matrix_var_decl& x) const {
+        o_ << INDENT2 << "num_params_r__ += ((";
+        generate_expression(x.K_,o_);
+        o_ << " * (";
+        generate_expression(x.K_,o_);
+        o_ << " - 1)) / 2)";
+        for (size_t i = 0; i < x.dims_.size(); ++i) {
+          o_ << " * ";
+          generate_expression(x.dims_[i],o_);
+        }
+        o_ << ";" << EOL;
+      }
+      // cut-and-paste from next for r
+      void generate_increment_i(std::vector<expression> dims) const {
+        if (dims.size() == 0) { 
+          o_ << INDENT2 << "++num_params_i__;" << EOL;
+          return;
+        }
+        o_ << INDENT2 << "num_params_r__ += ";
+        for (size_t i = 0; i < dims.size(); ++i) {
+          if (i > 0) o_ << " * ";
+          generate_expression(dims[i],o_);
+        }
+        o_ << ";" << EOL;
+      }
+      void generate_increment(std::vector<expression> dims) const {
+        if (dims.size() == 0) { 
+          o_ << INDENT2 << "++num_params_r__;" << EOL;
+          return;
+        }
+        o_ << INDENT2 << "num_params_r__ += ";
+        for (size_t i = 0; i < dims.size(); ++i) {
+          if (i > 0) o_ << " * ";
+          generate_expression(dims[i],o_);
+        }
+        o_ << ";" << EOL;
+      }
+      void generate_increment(expression K, 
+                              std::vector<expression> dims) const {
+        o_ << INDENT2 << "num_params_r__ += ";
+        generate_expression(K,o_);
+        for (size_t i = 0; i < dims.size(); ++i) {
+          o_ << " * ";
+          generate_expression(dims[i],o_);
+        }
+        o_ << ";" << EOL;
+
+      }
+      void generate_increment(expression M, expression N, 
+                              std::vector<expression> dims) const {
+        o_ << INDENT2 << "num_params_r__ += ";
+        generate_expression(M,o_);
+        o_ << " * ";
+        generate_expression(N,o_);
+        for (size_t i = 0; i < dims.size(); ++i) {
+          o_ << " * ";
+          generate_expression(dims[i],o_);
+        }
+        o_ << ";" << EOL;
+      }
+    };
+
+    void generate_set_param_ranges(const std::vector<var_decl>& var_decls,
+                                   std::ostream& o) {
+      // o << EOL;
+      // o << INDENT << "void set_param_ranges() {" << EOL;
+      o << INDENT2 << "num_params_r__ = 0U;" << EOL;
+      o << INDENT2 << "param_ranges_i__.clear();" << EOL;
+      set_param_ranges_visgen vis(o);
+      for (size_t i = 0; i < var_decls.size(); ++i)
+        boost::apply_visitor(vis,var_decls[i].decl_);
+      // o << INDENT << "}" << EOL;
+    }
+
     void generate_constructor(const program& prog,
                               const std::string& model_name,
                               std::ostream& o) {
@@ -1892,6 +2064,7 @@ namespace stan {
 
       generate_member_var_inits(prog.data_decl_,o);
 
+      o << EOL;
       generate_comment("validate data",2,o);
       generate_validate_var_decls(prog.data_decl_,2,o);
 
@@ -1902,11 +2075,16 @@ namespace stan {
       for (size_t i = 0; i < prog.derived_data_decl_.second.size(); ++i)
         generate_statement(prog.derived_data_decl_.second[i],
                            2,o,include_sampling,is_var);
-      
+
+      o << EOL;
       generate_comment("validate transformed data",2,o);
       generate_validate_var_decls(prog.derived_data_decl_.first,2,o);
 
-      o << EOL << INDENT2 << "set_param_ranges();" << EOL;
+      o << EOL;
+      generate_comment("set parameter ranges",2,o);
+      generate_set_param_ranges(prog.parameter_decl_,o);
+      // o << EOL << INDENT2 << "set_param_ranges();" << EOL;
+
       o << INDENT << "}" << EOL;
     }
 
@@ -3362,198 +3540,9 @@ namespace stan {
         o << EOL;
 
       o << INDENT << "}" << EOL2;
-
-      o << INDENT << "void write_array_params(std::vector<double>& params_r__,"
-        << EOL
-        << INDENT << "                        std::vector<int>& params_i__,"
-        << EOL
-        << INDENT << "                        std::vector<double>& vars__,"
-        << EOL
-        << INDENT << "                        std::ostream* pstream__ = 0) const {"
-        << EOL
-        << INDENT2 << "boost::random::minstd_rand base_rng; // dummy" 
-        << EOL
-        << INDENT2 << "write_array(base_rng,params_r__,params_i__,vars__,false,false,pstream__);"
-        << EOL
-        << INDENT << "}"
-        << EOL2;
-      
-      o << INDENT << "void write_array_params_all(std::vector<double>& params_r__,"
-        << EOL
-        << INDENT << "                        std::vector<int>& params_i__,"
-        << EOL
-        << INDENT << "                        std::vector<double>& vars__,"
-        << EOL
-        << INDENT << "                        std::ostream* pstream__ = 0) const {"
-        << EOL
-        << INDENT2 << "boost::random::minstd_rand base_rng; // dummy"
-        << EOL
-        << INDENT2 << "write_array(base_rng,params_r__,params_i__,vars__,true,true,pstream__);"
-        << EOL
-        << INDENT << "}"
-        << EOL2;
-      
     }
 
     
-    // know all data is set and range expressions only depend on data
-    struct set_param_ranges_visgen : public visgen {
-      set_param_ranges_visgen(std::ostream& o)
-        : visgen(o) {
-      }
-      void operator()(const nil& /*x*/) const { }
-      void operator()(const int_var_decl& x) const {
-        generate_increment_i(x.dims_);
-        // for loop for ranges
-        for (size_t i = 0; i < x.dims_.size(); ++i) {
-          generate_indent(i + 2, o_);
-          o_ << "for (size_t i_" << i << "__ = 0; ";
-          o_ << "i_" << i << "__ < ";
-          generate_expression(x.dims_[i],o_);
-          o_ << "; ++i_" << i << "__) {" << EOL;
-        }
-        // add range
-        generate_indent(x.dims_.size() + 2,o_);
-        o_ << "param_ranges_i__.push_back(std::pair<int,int>(";
-        generate_expression(x.range_.low_,o_);
-        o_ << ", ";
-        generate_expression(x.range_.high_,o_);
-        o_ << "));" << EOL;
-        // close for loop
-        for (size_t i = 0; i < x.dims_.size(); ++i) {
-          generate_indent(x.dims_.size() + 1 - i, o_);
-          o_ << "}" << EOL;
-        }
-      }
-      void operator()(const double_var_decl& x) const {
-        generate_increment(x.dims_);
-      }
-      void operator()(const vector_var_decl& x) const {
-        generate_increment(x.M_,x.dims_);
-      }
-      void operator()(const row_vector_var_decl& x) const {
-        generate_increment(x.N_,x.dims_);
-      }
-      void operator()(const matrix_var_decl& x) const {
-        generate_increment(x.M_,x.N_,x.dims_);
-      }
-      void operator()(const unit_vector_var_decl& x) const {
-        // only K-1 vals
-        o_ << INDENT2 << "num_params_r__ += (";
-        generate_expression(x.K_,o_);
-        o_ << " - 1)";
-        for (size_t i = 0; i < x.dims_.size(); ++i) {
-          o_ << " * ";
-          generate_expression(x.dims_[i],o_);
-        }
-        o_ << ";" << EOL;
-      }
-      void operator()(const simplex_var_decl& x) const {
-        // only K-1 vals
-        o_ << INDENT2 << "num_params_r__ += (";
-        generate_expression(x.K_,o_);
-        o_ << " - 1)";
-        for (size_t i = 0; i < x.dims_.size(); ++i) {
-          o_ << " * ";
-          generate_expression(x.dims_[i],o_);
-        }
-        o_ << ";" << EOL;
-      }
-      void operator()(const ordered_var_decl& x) const {
-        generate_increment(x.K_,x.dims_);
-      }
-      void operator()(const positive_ordered_var_decl& x) const {
-        generate_increment(x.K_,x.dims_);
-      }
-      void operator()(const cov_matrix_var_decl& x) const {
-        // (K * (K - 1))/2 + K  ?? define fun(K) = ??
-        o_ << INDENT2 << "num_params_r__ += ((";
-        generate_expression(x.K_,o_);
-        o_ << " * (";
-        generate_expression(x.K_,o_);
-        o_ << " - 1)) / 2 + ";
-        generate_expression(x.K_,o_);
-        o_ << ")";
-        for (size_t i = 0; i < x.dims_.size(); ++i) {
-          o_ << " * ";
-          generate_expression(x.dims_[i],o_);
-        }
-        o_ << ";" << EOL;
-      }
-      void operator()(const corr_matrix_var_decl& x) const {
-        o_ << INDENT2 << "num_params_r__ += ((";
-        generate_expression(x.K_,o_);
-        o_ << " * (";
-        generate_expression(x.K_,o_);
-        o_ << " - 1)) / 2)";
-        for (size_t i = 0; i < x.dims_.size(); ++i) {
-          o_ << " * ";
-          generate_expression(x.dims_[i],o_);
-        }
-        o_ << ";" << EOL;
-      }
-      // cut-and-paste from next for r
-      void generate_increment_i(std::vector<expression> dims) const {
-        if (dims.size() == 0) { 
-          o_ << INDENT2 << "++num_params_i__;" << EOL;
-          return;
-        }
-        o_ << INDENT2 << "num_params_r__ += ";
-        for (size_t i = 0; i < dims.size(); ++i) {
-          if (i > 0) o_ << " * ";
-          generate_expression(dims[i],o_);
-        }
-        o_ << ";" << EOL;
-      }
-      void generate_increment(std::vector<expression> dims) const {
-        if (dims.size() == 0) { 
-          o_ << INDENT2 << "++num_params_r__;" << EOL;
-          return;
-        }
-        o_ << INDENT2 << "num_params_r__ += ";
-        for (size_t i = 0; i < dims.size(); ++i) {
-          if (i > 0) o_ << " * ";
-          generate_expression(dims[i],o_);
-        }
-        o_ << ";" << EOL;
-      }
-      void generate_increment(expression K, 
-                              std::vector<expression> dims) const {
-        o_ << INDENT2 << "num_params_r__ += ";
-        generate_expression(K,o_);
-        for (size_t i = 0; i < dims.size(); ++i) {
-          o_ << " * ";
-          generate_expression(dims[i],o_);
-        }
-        o_ << ";" << EOL;
-
-      }
-      void generate_increment(expression M, expression N, 
-                              std::vector<expression> dims) const {
-        o_ << INDENT2 << "num_params_r__ += ";
-        generate_expression(M,o_);
-        o_ << " * ";
-        generate_expression(N,o_);
-        for (size_t i = 0; i < dims.size(); ++i) {
-          o_ << " * ";
-          generate_expression(dims[i],o_);
-        }
-        o_ << ";" << EOL;
-      }
-    };
-
-    void generate_set_param_ranges(const std::vector<var_decl>& var_decls,
-                                   std::ostream& o) {
-      o << EOL;
-      o << INDENT << "void set_param_ranges() {" << EOL;
-      o << INDENT2 << "num_params_r__ = 0U;" << EOL;
-      o << INDENT2 << "param_ranges_i__.clear();" << EOL;
-      set_param_ranges_visgen vis(o);
-      for (size_t i = 0; i < var_decls.size(); ++i)
-        boost::apply_visitor(vis,var_decls[i].decl_);
-      o << INDENT << "}" << EOL;
-    }
-   
     void generate_main(const std::string& model_name,
                        std::ostream& out) {
       out << "int main(int argc, const char* argv[]) {" << EOL;
@@ -3595,7 +3584,8 @@ namespace stan {
       generate_member_var_decls(prog.derived_data_decl_.first,1,out);
       generate_public_decl(out);
       generate_constructor(prog,model_name,out);
-      generate_set_param_ranges(prog.parameter_decl_,out);
+      generate_destructor(model_name,out);
+      // generate_set_param_ranges(prog.parameter_decl_,out);
       generate_init_method(prog.parameter_decl_,out);
       generate_log_prob(prog,out);
       generate_param_names_method(prog,out);

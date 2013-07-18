@@ -90,7 +90,8 @@ TEST(StanIoMcmcWriter, print_sample_params) {
   
   stan::io::mcmc_writer<example_model_namespace::example_model> writer(&sample_stream, &diagnostic_stream);
   
-  writer.print_sample_params(sample, sampler, model);
+  
+  writer.print_sample_params(base_rng, sample, sampler, model);
   
   std::string line;
   std::getline(sample_stream, line);

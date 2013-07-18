@@ -43,8 +43,11 @@ namespace stan {
         (*_sample_stream) << std::endl;
         
       }
-      
-      void print_sample_params(stan::mcmc::sample& sample,
+
+      // need RNG in order to do random part of generated quantities
+      template <class RNG>
+      void print_sample_params(RNG& rng, 
+                               stan::mcmc::sample& sample,
                                stan::mcmc::base_mcmc& sampler,
                                M& model) {
         
@@ -57,9 +60,11 @@ namespace stan {
         
         std::vector<double> model_values;
         
-        model.write_array_params_all(const_cast<std::vector<double>&>(sample.cont_params()),
-                                     const_cast<std::vector<int>&>(sample.disc_params()),
-                                     model_values);
+        model.write_array(rng,
+                          const_cast<std::vector<double>&>(sample.cont_params()),
+                          const_cast<std::vector<int>&>(sample.disc_params()),
+                          model_values,
+                          true, true); // FIXME: add ostream for msgs!
         
         values.insert(values.end(), model_values.begin(), model_values.end());
         
