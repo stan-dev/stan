@@ -2,23 +2,22 @@ data {
     int<lower=0> N;
     int<lower=0> n[N];
     int<lower=0> r[N];
-    real x[N];
+    vector[N] x;
 }
 transformed data {
+    vector[N] centered_x;
     real mean_x;
-    real centered_x[N];
-
     mean_x <- mean(x);
-    for (i in 1:N)
-        centered_x[i] <- x[i] - mean_x;
+    centered_x <- x - mean_x;
 }
+
 parameters {
     real alpha_star;
     real beta;
 }
+
 transformed parameters {
     real p[N];
-
     for (i in 1:N)
       p[i] <- Phi(alpha_star + beta*centered_x[i]);
 }
