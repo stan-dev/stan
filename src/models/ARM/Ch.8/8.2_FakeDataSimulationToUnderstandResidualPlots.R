@@ -1,0 +1,67 @@
+library(rstan)
+library(ggplot2)
+source("grades.data.R")    
+
+## Estimate the model (grades.stan)
+# lm (final ~ midterm)
+if (!file.exists("grades.sm.RData")) {
+    rt <- stanc("grades.stan", model_name="grades")
+    grades.sm <- stan_model(stanc_ret=rt)
+    save(grades.sm, file="grades.sm.RData")
+} else {
+    load("grades.sm.RData", verbose=TRUE)
+}
+dataList.1 <- list(N=N, midterm=midterm, final=final)
+grades.sf1 <- sampling(grades.sm, dataList.1)
+print(grades.sf1)
+
+beta.post <- extract(grades.sf1, "beta")$beta
+beta.mean <- colMeans(beta.post)
+
+## Construct fitted values
+
+n <- length(final)
+X <- cbind (rep(1,n), midterm)
+predicted <- X %*% beta.mean
+resid <- final - predicted
+
+## Simulate fake data & compute fitted values
+
+a <- 65
+b <- 0.7
+sigma <- 15
+y.fake <- a + b*midterm + rnorm (n, 0, sigma)
+
+fake.sf1 <- sampling(grades.sm, dataList.1)
+fake.post <- extract(fake.sf1, "beta")$beta
+fake.mean <- colMeans(fake.post)
+predicted.fake <- X %*% fake.mean
+resid.fake <- y.fake - predicted.fake
+
+## Plots figure 8.1
+
+ # plot on the left
+
+frame1 = data.frame(x1=predicted,x2=resid)
+m <- ggplot(frame1,aes(x=x1,y=x2))
+m + geom_point() + scale_y_continuous("Residual") + scale_x_continuous("Predicted Value") + theme_bw() + geom_hline(yintercept=0,colour="grey") + labs(title="Residuals vs. Predicted Values")
+
+ # plot on the right
+
+frame2 = data.frame(x1=final,x2=resid)
+m2 <- ggplot(frame2,aes(x=x1,y=x2))
+m2 + geom_point() + scale_y_continuous("Residual") + scale_x_continuous("Observed Value") + theme_bw() + geom_hline(yintercept=0,colour="grey") + labs(title="Residuals vs. Observed Values")
+
+## Plots figure 8.2
+
+ # plot on the left
+
+frame3 = data.frame(x1=predicted.fake,x2=resid.fake)
+m3 <- ggplot(frame3,aes(x=x1,y=x2))
+m3 + geom_point() + scale_y_continuous("Residual") + scale_x_continuous("Predicted Value") + theme_bw() + geom_hline(yintercept=0,colour="grey") + labs(title="Fake Data: Residuals vs. Predicted Values")
+
+ # plot on the right
+
+frame4 = data.frame(x1=y.fake,x2=resid.fake)
+m4 <- ggplot(frame4,aes(x=x1,y=x2))
+m4 + geom_point() + scale_y_continuous("Residual") + scale_x_continuous("Observed Value") + theme_bw() + geom_hline(yintercept=0,colour="grey") + labs(title="Fake Data: Residuals vs. Observed Values")
