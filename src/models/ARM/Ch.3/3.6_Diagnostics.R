@@ -1,4 +1,4 @@
-stopifnot(require(rstan))
+library(rstan)
 library(ggplot2)
 source("kid_iq.data.R")     # load kid_score, mom_hs, mom_iq
 

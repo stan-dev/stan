@@ -1,4 +1,4 @@
-stopifnot(require(rstan))
+library(rstan)
 library(ggplot2)
 library(arm)
 source("mesquite.data.R")    

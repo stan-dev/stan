@@ -1,3 +1,4 @@
+library(rstan)
 ## Read in the data
 
 #FIXME:missing data files?

@@ -1,9 +1,10 @@
 #FIXME
-
+library("arm")
+library(rstan)
 ## Figure 4.6
 
  # Read in the data
-library("arm")
+
 
 brdata <- read.dta("nes5200_processed_voters_realideo.dta",convert.factors=F)
 # Data are at http://www.stat.columbia.edu/~gelman/arm/examples/nes
