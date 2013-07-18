@@ -14,7 +14,6 @@ for (j in 1:4){
 }
 
 ## Basic analysis of a completely randomized experiment
-source("electric.data.R")    
 post.test <- c (treated.Posttest, control.Posttest)
 pre.test <- c (treated.Pretest, control.Pretest)
 grade <- rep (Grade, 2)
@@ -110,7 +109,7 @@ sigma.mean8 <- mean(sigma.post6)
 #graphs on Figure 9.5 FIXME
  
 
-## Controlling for pre-treatment predictors (Figure 9.6) FIXME:CHECK
+## Controlling for pre-treatment predictors (Figure 9.6)
 for (j in 1:4){
   ok <- Grade==j
   pret <- c (treated.Pretest[ok], control.Pretest[ok])
