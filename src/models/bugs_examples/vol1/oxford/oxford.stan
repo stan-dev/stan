@@ -7,34 +7,27 @@ data {
   int<lower=0> n1[K]; 
   int<lower=0> r0[K]; 
   int<lower=0> r1[K]; 
-  int year[K]; 
+  vector[K] year;
 } 
 transformed data {
-  int yearsq[K]; 
-  for (i in 1:K) 
-    yearsq[i] <- year[i] * year[i]; 
+  vector[K] yearsq;
+  yearsq <- year .* year;
 } 
 parameters {
-  real mu[K]; 
+  vector[K] mu;
   real alpha;
   real beta1; 
   real beta2;
   real<lower=0> sigma_sq;
-  real b[K]; 
+  vector[K] b; 
 }
 transformed parameters {
   real<lower=0> sigma;
   sigma <- sqrt(sigma_sq);
 }
 model {
-  real p1[K];
-  real p2[K];
-  for (i in 1:K) {
-    p1[i] <- inv_logit(mu[i]);
-    p2[i] <- inv_logit(mu[i] + alpha + beta1 * year[i] + beta2 * (yearsq[i] - 22) + sigma * b[i]);
-  } 
-  r0 ~ binomial(n0, p1);
-  r1 ~ binomial(n1, p2);
+  r0 ~ binomial_logit(n0, mu); 
+  r1 ~ binomial_logit(n1, alpha + mu + beta1 * year + beta2 * (yearsq - 22) + b * sigma); 
   b  ~ normal(0, 1);
   mu ~ normal(0, 1000); 
 
