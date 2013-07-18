@@ -3,6 +3,7 @@ library(ggplot2)
 source("wells.data.R")    
 
 ## Fitting the model (wells_edu.stan)
+##  glm (switch ~ dist100 + arsenic + educ4, family=binomial(link="logit"))
 if (!file.exists("wells_edu.sm.RData")) {
     rt <- stanc("wells_edu.stan", model_name="wells_edu")
     wells_edu.sm <- stan_model(stanc_ret=rt)
@@ -44,6 +45,7 @@ delta <- invlogit (b[1]+b[2]*dist/100+b[3]*arsenic+b[4]*hi) -
 print (mean(delta))
 
 ## Avg predictive comparisons with interactions (wells_all.stan)
+##  glm (switch ~ dist100 + arsenic + educ4 + dist100:arsenic, family=binomial(link="logit"))
 if (!file.exists("wells_all.sm.RData")) {
     rt <- stanc("wells_all.stan", model_name="wells_all")
     wells_all.sm <- stan_model(stanc_ret=rt)

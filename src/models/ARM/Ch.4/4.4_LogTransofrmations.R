@@ -4,7 +4,7 @@ library(arm)
 source("earnings.data.R")    
 
 ## Log transformation (earnings_log.stan)
-
+## lm(log.earn ~ height)
 if (!file.exists("earnings.sm.RData")) {
     rt <- stanc("earnings.stan", model_name="earnings")
     earnings.sm <- stan_model(stanc_ret=rt)
@@ -39,6 +39,7 @@ for (i in 1:20)
 mm + geom_abline(intercept=beta.mean[1],slope=beta.mean[2],colour="red")
 
 ## Log-base-10 transformation (earnings_log10.stan)
+## lm(log10.earn ~ height)
 log10.earn <- log10(earnings)
 
 dataList.2 <- list(N=N, earnings=log10.earn, height=height)
@@ -46,7 +47,7 @@ earnings_log10.sf1 <- sampling(earnings.sm, dataList.2)
 print(earnings_log10.sf1)
 
 ## Log scale regression model (earnings_multi_preds.stan)
-
+## lm(log.earn ~ height + male)
 if (!file.exists("earnings_multi_preds.sm.RData")) {
     rt <- stanc("earnings_multi_preds.stan", model_name="earnings_multi_preds")
     earnings_multi_preds.sm <- stan_model(stanc_ret=rt)
@@ -60,6 +61,7 @@ earnings_logmodel.sf1 <- sampling(earnings_multi_preds.sm, dataList.3)
 print(earnings_logmodel.sf1)
 
 ## Including interactions (earnings_interactions.stan)
+## lm(log.earn ~ height + male + height:male)
 if (!file.exists("earnings_interactions.sm.RData")) {
     rt <- stanc("earnings_interactions.stan", model_name="earnings_interactions")
     earnings_interactions.sm <- stan_model(stanc_ret=rt)
@@ -72,12 +74,14 @@ earnings_interactions.sf1 <- sampling(earnings_interactions.sm, dataList.3)
 print(earnings_interactions.sf1)
 
 ## Linear transformations (earnings_interaction_z.stan)
+## lm(log.earn ~ z.height + male + z.height:male)
 z.height <- (height - mean(height))/sd(height)
 dataList.4 <- list(N=N, earnings=log(earnings), height=z.height,male=2-sex)
 earnings_interactions.sf2 <- sampling(earnings_interactions.sm, dataList.4)
 print(earnings_interactions.sf2)
 
 ## Log-log model (earnings_log_log.stan)
+## lm(log.earn ~ log.height + male)
 log.height <- log(height)
 dataList.5 <- list(N=N, earnings=log(earnings), height=log.height,male=2-sex)
 earnings_interactions.sf3 <- sampling(earnings_interactions.sm, dataList.5)

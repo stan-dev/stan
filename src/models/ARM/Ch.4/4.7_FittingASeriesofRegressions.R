@@ -34,3 +34,5 @@ rvote <- ifelse (data[,"presvote"]==1, 0, ifelse(data[,"presvote"]==2, 1, NA))
 region.codes <- c(3,4,4,3,4,4,1,1,5,3,3,4,4,2,2,2,2,3,3,1,1,1,2,2,3,2,4,2,4,1,1,4,1,3,2,2,3,4,1,
    1,3,2,3,3,4,1,3,4,1,2,4)
 attach.all(data)
+
+#FIXME:INCOMPLETE

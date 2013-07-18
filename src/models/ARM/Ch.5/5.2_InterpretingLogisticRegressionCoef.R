@@ -2,8 +2,8 @@ stopifnot(require(rstan))
 library(ggplot2)
 source("nes.data.R")    
 
- # Estimation
-
+ # Estimation (nes.stan)
+ # glm (vote ~ income, family=binomial(link="logit"))
 if (!file.exists("nes.sm.RData")) {
     rt <- stanc("nes.stan", model_name="nes")
     nes.sm <- stan_model(stanc_ret=rt)

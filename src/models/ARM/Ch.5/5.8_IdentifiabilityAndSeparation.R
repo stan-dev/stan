@@ -6,7 +6,8 @@ library(ggplot2)
 x <- rnorm(60, mean =1, sd = 2)
 y <- ifelse(x<2,0,1)
 
-## Fit the model
+## Fit the model (y_x.stan)
+## glm (y ~ x, family=binomial(link="logit"))
 if (!file.exists("y_x.sm.RData")) {
     rt <- stanc("y_x.stan", model_name="y_x")
     y_x.sm <- stan_model(stanc_ret=rt)

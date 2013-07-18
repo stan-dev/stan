@@ -4,7 +4,8 @@ library(ggplot2)
 ### Data
 source("kid_iq.data.R")     # load kid_score, mom_hs, mom_iq
 
-### Model: kid_score ~ mom_hs + mom_iq
+### Model (kid_iq_multi_preds.stan)
+### lm (kid_score ~ mom_hs + mom_iq)
 
 if (!file.exists("kid_iq_multi_preds.sm.RData")) {
     rt <- stanc("kid_iq_multi_preds.stan", model_name="kid_iq_multi_preds")

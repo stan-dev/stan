@@ -3,8 +3,8 @@ library(ggplot2)
 library(arm)
 source("kid_iq.data.R")    
 
-## Fit the model
-
+## Fit the model (kid_iq_factor.stan)
+## lm (kid_score ~ as.factor(mom_work))
 if (!file.exists("kid_iq_factor.sm.RData")) {
     rt <- stanc("kid_iq_factor.stan", model_name="kid_iq_factor")
     kid_iq_factor.sm <- stan_model(stanc_ret=rt)

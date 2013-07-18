@@ -1,8 +1,9 @@
-stopifnot(require(rstan))
+library(rstan)
 library(ggplot2)
 source("wells.data.R")    
 
 ## Fitting the model (wells_interactions_center_educ.stan)
+## glm (switch ~ c.dist100 + c.arsenic + c.educ4 + c.dist100:c.arsenic + c.dist100:c.educ4 + c.arsenic:c.educ4, family=binomial(link="logit"))
 if (!file.exists("wells_interactions_center_educ.sm.RData")) {
     rt <- stanc("wells_interactions_center_educ.stan", model_name="wells_interactions_center_educ")
     wells_interactions_center_educ.sm <- stan_model(stanc_ret=rt)
@@ -75,6 +76,7 @@ m <- ggplot(frame4,aes(x=x1,y=y1))
 m + geom_point() + scale_y_continuous("Average residual") + scale_x_continuous("Distance to nearest safe well") + theme_bw() + geom_hline(yintercept=0,colour="grey") + geom_line(aes(x=x1,y=x2),colour="grey") + geom_line(aes(x=x1,y=-x2),colour="grey") + labs(title="Binned Residual Plot")
 
 ## Log transformation (wells_log_transform.stan)
+## glm (switch ~ c.dist100 + c.log.arsenic + c.educ4 + c.dist100:c.log.arsenic + c.dist100:c.educ4 + c.log.arsenic:c.educ4, family=binomial(link="logit"))
 if (!file.exists("wells_log_transform.sm.RData")) {
     rt <- stanc("wells_log_transform.stan", model_name="wells_log_transform")
     wells_log_transform.sm <- stan_model(stanc_ret=rt)
@@ -85,6 +87,7 @@ if (!file.exists("wells_log_transform.sm.RData")) {
 wells_log_transform.sf1 <- sampling(wells_log_transform.sm, dataList.3)
 print(wells_log_transform.sf1)
 
+## glm (switch ~ dist100 + log.arsenic + educ4 + dist100:log.arsenic + dist100:educ4 + log.arsenic:educ4, family=binomial(link="logit"))
 if (!file.exists("wells_log_transform2.sm.RData")) {
     rt <- stanc("wells_log_transform2.stan", model_name="wells_log_transform2")
     wells_log_transform2.sm <- stan_model(stanc_ret=rt)

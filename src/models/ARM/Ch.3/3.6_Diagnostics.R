@@ -2,7 +2,8 @@ stopifnot(require(rstan))
 library(ggplot2)
 source("kid_iq.data.R")     # load kid_score, mom_hs, mom_iq
 
-### Model: kid_score ~ mom_iq
+### Model (kid_iq_one_pred.stan)
+### lm (kid_score ~ mom_iq)
 
 if (!file.exists("kid_iq_one_pred.sm.RData")) {
     rt <- stanc("kid_iq_one_pred.stan", model_name="kid_iq_one_pred")

@@ -2,7 +2,8 @@ stopifnot(require(rstan))
 library(ggplot2)
 source("kid_iq.data.R")     # load kid_score, mom_hs, mom_iq
 
-### First model: kid_score ~ mom_hs
+### First model (kid_iq_one_pred.stan)
+### lm(kid_score ~ mom_hs)
 
 if (!file.exists("kid_iq_one_pred.sm.RData")) {
     rt <- stanc("kid_iq_one_pred.stan", model_name="kid_iq_one_pred")
@@ -34,6 +35,7 @@ m <- ggplot(jitter.frame,aes(x=jitter.mom_hs,y=kidscore.jitter))
 m + geom_point() + scale_y_continuous("Mother Completed High School") + scale_x_continuous("Child Test Score") + theme_bw()
 
 # Figure 3.2
+# lm (kid_score ~ mom_iq)
 beta.post <- extract(kid_iq_one_pred.sf2, "beta")$beta
 beta.mean <- colMeans(beta.post)
 

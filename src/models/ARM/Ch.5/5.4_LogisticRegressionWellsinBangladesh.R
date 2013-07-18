@@ -8,6 +8,7 @@ m <- ggplot(frame,aes(x=dist))  + scale_x_continuous("Distance (in meters) to th
 m + geom_histogram(colour = "black", fill = "white", binwidth=10) + theme_bw()
 
 ## Logistic regression with one predictor (wells_one_pred.stan)
+## glm (switch ~ dist, family=binomial(link="logit"))
 if (!file.exists("wells_one_pred.sm.RData")) {
     rt <- stanc("wells_one_pred.stan", model_name="wells_one_pred")
     wells_one_pred.sm <- stan_model(stanc_ret=rt)
@@ -23,6 +24,7 @@ print(wells_one_pred.sf1)
 beta.post <- extract(wells_one_pred.sf1, "beta")$beta
 beta.mean <- colMeans(beta.post)
 ## Repeat the regression above with distance in 100-meter units (wells_one_pred_scale.stan)
+## glm (switch ~ dist100, family=binomial(link="logit"))
 dist100 <- dist/100
 dataList.2 <- list(N=N, switc=switc, dist=dist100)
 wells_one_pred.sf2 <- sampling(wells_one_pred.sm, dataList.2)
@@ -44,6 +46,7 @@ m3 <- ggplot(frame3,aes(x=ars))  + scale_x_continuous("Arsenic concentration in 
 m3 + geom_histogram(colour = "black", fill = "white", binwidth=0.25) + theme_bw()
 
 ## Logistic regression with second input variable (wells_two_pred.stan)
+## glm (switch ~ dist100 + arsenic, family=binomial(link="logit"))
 if (!file.exists("wells_two_pred.sm.RData")) {
     rt <- stanc("wells_two_pred.stan", model_name="wells_two_pred")
     wells_two_pred.sm <- stan_model(stanc_ret=rt)

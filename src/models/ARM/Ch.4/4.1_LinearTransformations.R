@@ -4,7 +4,7 @@ library(arm)
 source("earnings.data.R")    
 
 ### First model: earnings ~ height
-
+### lm (earn ~ height)
 if (!file.exists("earnings_one_pred.sm.RData")) {
     rt <- stanc("earnings_one_pred.stan", model_name="earnings_one_pred")
     earnings_one_pred.sm <- stan_model(stanc_ret=rt)
