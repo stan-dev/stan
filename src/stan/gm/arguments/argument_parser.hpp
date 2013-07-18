@@ -16,9 +16,8 @@ namespace stan {
       
     public:
       
-      argument_parser(std::vector<argument*>& valid_args, std::string name)
+      argument_parser(std::vector<argument*>& valid_args)
         : _arguments(valid_args),
-          _model_name(name),
           _help_flag(false),
           _method_flag(false)
       {
@@ -32,9 +31,9 @@ namespace stan {
         
         if (argc == 1) {
         
-          print_help_header(out);
+          print_help_header(out, argv[0]);
           print_help(out, false);
-          print_help_footer(out);
+          print_help_footer(out, argv[0]);
           
           _help_flag |= true;
           
@@ -102,9 +101,9 @@ namespace stan {
           
           if (cat_name == "help") {
 
-            print_help_header(out);
+            print_help_header(out, argv[0]);
             print_help(out, false);
-            print_help_footer(out);
+            print_help_footer(out, argv[0]);
 
             _help_flag |= true;
             
@@ -146,11 +145,11 @@ namespace stan {
         
       }
       
-      void print_help_header(std::ostream* s) {
+      void print_help_header(std::ostream* s, const char* executable) {
         if (!s)
           return;
         
-        *s << "Usage: model <arg1> <subarg1_1> ... <subarg1_m>"
+        *s << "Usage: " << executable << " <arg1> <subarg1_1> ... <subarg1_m>"
            << " ... <arg_n> <subarg_n_1> ... <subarg_n_m>"
            << std::endl << std::endl;
         *s << "Valid arguments to Stan:" << std::endl << std::endl;
@@ -166,14 +165,14 @@ namespace stan {
         }
       }
     
-      void print_help_footer(std::ostream* s) {
+      void print_help_footer(std::ostream* s, const char* executable) {
         if (!s)
           return;
         
         *s << std::endl;
-        *s << "See '" << _model_name << "' <arg1> [ help | help-all ]"
+        *s << "See '" << executable << "' <arg1> [ help | help-all ]"
            << " for argument specific information" << std::endl;
-        *s << " or '" << _model_name << "' help-all for all argument information" << std::endl;
+        *s << " or '" << executable << "' help-all for all argument information" << std::endl;
         
       }
       
@@ -195,9 +194,7 @@ namespace stan {
       
       // We can also check for, and warn the user of, deprecated arguments
       //std::vector<argument*> deprecated_arguments;
-      // check_arg_conflict // Ensure non-zero intersection of valid and deprecated argumentss
-      
-      std::string _model_name;
+      // check_arg_conflict // Ensure non-zero intersection of valid and deprecated arguments
       
       bool _help_flag;
       bool _method_flag;
