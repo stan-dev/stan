@@ -30,15 +30,9 @@ namespace stan {
                       std::ostream* err = 0) {
         
         if (argc == 1) {
-        
-          print_help_header(out, argv[0]);
-          print_help(out, false);
-          print_help_footer(out, argv[0]);
-          
+          print_usage(out, argv[0]);
           _help_flag |= true;
-          
-          return 0;
-          
+          return true;
         }
         
         std::vector<std::string> args;
@@ -101,9 +95,7 @@ namespace stan {
           
           if (cat_name == "help") {
 
-            print_help_header(out, argv[0]);
-            print_help(out, false);
-            print_help_footer(out, argv[0]);
+            print_usage(out, argv[0]);
 
             _help_flag |= true;
             
@@ -145,17 +137,6 @@ namespace stan {
         
       }
       
-      void print_help_header(std::ostream* s, const char* executable) {
-        if (!s)
-          return;
-        
-        *s << "Usage: " << executable << " <arg1> <subarg1_1> ... <subarg1_m>"
-           << " ... <arg_n> <subarg_n_1> ... <subarg_n_m>"
-           << std::endl << std::endl;
-        *s << "Valid arguments to Stan:" << std::endl << std::endl;
-        
-      }
-      
       void print_help(std::ostream* s, bool recurse) {
         if (!s) 
           return;
@@ -164,15 +145,54 @@ namespace stan {
           _arguments.at(i)->print_help(s, 1, recurse);
         }
       }
-    
-      void print_help_footer(std::ostream* s, const char* executable) {
+      
+      void print_usage(std::ostream* s, const char* executable) {
         if (!s)
           return;
         
+        std::string indent(2, ' ');
+        int width = 12;
+        *s << std::left;
+        
+        *s << "Usage: " << executable << " <arg1> <subarg1_1> ... <subarg1_m>"
+          << " ... <arg_n> <subarg_n_1> ... <subarg_n_m>"
+          << std::endl << std::endl;
+        
+        *s << "Begin by selection amongst the following inference methods"
+           << " and diagnostics," << std::endl;
+
+        std::vector<argument*>::iterator arg_it = _arguments.begin();
+        list_argument* method = dynamic_cast<list_argument*>(*arg_it);
+        
+        for (std::vector<argument*>::iterator value_it = method->values().begin();
+             value_it != method->values().end(); ++value_it) {
+          *s << std::setw(width)
+             << indent + (*value_it)->name()
+             << indent + (*value_it)->description() << std::endl;
+        }
         *s << std::endl;
-        *s << "See '" << executable << "' <arg1> [ help | help-all ]"
-           << " for argument specific information" << std::endl;
-        *s << " or '" << executable << "' help-all for all argument information" << std::endl;
+        
+        *s << "Or see help information with" << std::endl;
+        *s << std::setw(width)
+           << indent + "help"
+           << indent + "Prints help" << std::endl;
+        *s << std::setw(width)
+           << indent + "help-all"
+           << indent + "Prints entire argument tree" << std::endl;
+        *s << std::endl;
+        
+        *s << "Additional configuration available by specifying" << std::endl;
+        
+        ++arg_it;
+        for (; arg_it != _arguments.end(); ++arg_it) {
+          *s << std::setw(width)
+             << indent + (*arg_it)->name()
+             << indent + (*arg_it)->description() << std::endl;
+        }
+        
+        *s << std::endl;
+        *s << "See " << executable << " <arg1> [ help | help-all ] "
+           << "for details on individual arguments." << std::endl << std::endl;
         
       }
       
