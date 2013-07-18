@@ -1,7 +1,7 @@
 library(rstan)
 library(ggplot2)
 library(arm)
-source("earnings.data.R")    
+source("wells.data.R")    
 
 ## Log transformation (earnings_log.stan)
 ## lm(log.earn ~ height)
