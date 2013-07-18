@@ -5,9 +5,9 @@ data {
   vector[N] treatment;
 }
 parameters {
-  vector[3] beta1;
-  real<lower=0> sigma1;
+  vector[3] beta;
+  real<lower=0> sigma;
 } 
 model {
-  post_test ~ normal(beta1[1] + beta1[2] * treatment + beta1[3] * pre_test,sigma1);
+  post_test ~ normal(beta[1] + beta[2] * treatment + beta[3] * pre_test,sigma);
 }

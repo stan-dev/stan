@@ -115,14 +115,19 @@ for (j in 1:4){
   ok <- Grade==j
   pret <- c (treated.Pretest[ok], control.Pretest[ok])
   postt <-c (treated.Posttest[ok], control.Posttest[ok])
-  dataList.1 <- list(N=length(pret), post_test=postt, pre_test=pret)
-  electric_one_pred.sf1 <- sampling(electric_one_pred.sm, dataList.1)
-  beta.post1 <- extract(electric_one_pred.sf1, "beta")$beta
-  beta.mean1 <- colMeans(beta.post1)
+  t <- rep (c(1,0), rep(sum(ok),2))
+  dataList.1 <- list(N=length(pret), post_test=postt, pre_test=pret,treatment=t)
+  electric_multi_preds.sf <- sampling(electric_multi_preds.sm, dataList.1)
+  beta.post <- extract(electric_multi_preds.sf, "beta")$beta
+  beta.mean <- colMeans(beta.post)
 
   frame1 = data.frame(x1=treated.Pretest[ok],y1=treated.Posttest[ok])
   frame2 = data.frame(x2=control.Pretest[ok],y2=control.Posttest[ok])
-  m <- ggplot()
-  m <- m + geom_point(data=frame1,aes(x=x1,y=y1),type=20) + geom_point(data=frame2,aes(x=x2,y=y2),type=21) + scale_y_continuous("Posttest",limits=c(-.01,1)) + scale_x_continuous("Pretest") + theme_bw() + labs(title=paste("Grade ",j))
-  m <- m + geom_abline(yintercept=beta.mean[1],slope=beta.mean[2]) + geom_abline(yintercept=beta.mean[1] +beta.mean[3],slope=beta.mean[2])
+  m3 <- ggplot()
+  m3 <- m3 + geom_point(data=frame1,aes(x=x1,y=y1),shape=20)
+  m3 <- m3 + geom_point(data=frame2,aes(x=x2,y=y2),shape=21)
+  m3 <- m3 + scale_y_continuous("Posttest",limits=c(0,125)) + scale_x_continuous("Pretest",limits=c(0,125)) + theme_bw() + labs(title=paste("Grade ",j))
+  m3 <- m3 + geom_abline(intercept=(beta.mean[1]+beta.mean[2]),slope=beta.mean[3])
+  m3 <- m3 + geom_abline(intercept=(beta.mean[1]),slope=beta.mean[3],linetype="dashed")
+  print(m3)
 }
