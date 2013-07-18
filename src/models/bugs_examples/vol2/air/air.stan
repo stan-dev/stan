@@ -16,7 +16,7 @@ transformed data {
 parameters {
    real theta1; 
    real theta2; 
-   real X[J]; 
+   vector[J] X; 
 } 
 
 model {
@@ -24,8 +24,6 @@ model {
   theta1 ~ normal(0, 32);   // 32^2 = 1024 
   theta2 ~ normal(0, 32); 
   X ~ normal(alpha + beta * Z, sigma);
-  for (j in 1:J) 
-    p[j] <- inv_logit(theta1 + theta2 * X[j]);
-  y ~ binomial(n, p);
+  y ~ binomial_logit(n, theta1 + theta2 * X);
 }
 
