@@ -26,9 +26,6 @@ namespace stan {
       std::string name() const { 
         return _name; 
       }
-      std::string short_description() const {
-        return _short_description;
-      }
       
       std::string description() const { 
         return _description; 
@@ -63,7 +60,6 @@ namespace stan {
       
     protected:
       std::string _name;
-      std::string _short_description;
       std::string _description;
     
       int indent_width;

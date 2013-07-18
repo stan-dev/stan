@@ -13,7 +13,6 @@ namespace stan {
       
       arg_id(): int_argument() {
         _name = "id";
-        _short_description = "Chain id";
         _description = "Unique process identifier";
         _validity = "id > 0";
         _default = "0";

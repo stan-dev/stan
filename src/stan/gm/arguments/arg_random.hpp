@@ -16,7 +16,6 @@ namespace stan {
       arg_random() {
         
         _name = "random";
-        _short_description = "Random number configuration";
         _description = "Random number configuration";
         
         _subarguments.push_back(new arg_seed());
