@@ -1,6 +1,7 @@
 #ifndef __STAN__MODEL__UTIL_HPP__
 #define __STAN__MODEL__UTIL_HPP__
 
+#include <cmath>
 #include <iomanip>
 #include <iostream>
 #include <vector>

@@ -7,6 +7,7 @@
 
 #include <boost/math/special_functions/fpclassify.hpp>
 
+#include <stan/math/matrix/Eigen.hpp>
 #include <stan/model/util.hpp>
 
 namespace stan {
