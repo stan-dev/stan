@@ -13,7 +13,7 @@ parameters {
   real<lower=0> sigmasq;
   real<lower=0> theta;
   real lambda_1; 
-  real<lower=0,upper= 1> p1; 
+  real<lower=0,upper=1> p1; 
 } 
 transformed parameters {
     real lambda[2];
@@ -24,7 +24,6 @@ transformed parameters {
 }
 
 model {
-  p1 ~ beta(1, 1); 
   theta ~ normal(0, 100); 
   lambda_1 ~ normal(0, 1e3); 
   sigmasq ~ inv_gamma(1e-3, 1e-3); 

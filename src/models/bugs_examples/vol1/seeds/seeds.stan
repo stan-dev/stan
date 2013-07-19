@@ -25,7 +25,6 @@ transformed parameters {
     sigma  <- 1.0 / sqrt(tau);
 }
 model {
-   real tmpp[I];
    alpha0 ~ normal(0.0,1.0E3);
    alpha1 ~ normal(0.0,1.0E3);
    alpha2 ~ normal(0.0,1.0E3);
