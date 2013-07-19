@@ -2480,8 +2480,8 @@ namespace stan {
         for (size_t i = 0; i < matrix_dims.size(); ++i)
           combo_dims.push_back(matrix_dims[i]);
 
-        for (size_t i = 0; i < combo_dims.size(); ++i) {
-          generate_indent(2 + i,o_);
+        for (size_t i = combo_dims.size(); i-- > 0; ) {
+          generate_indent(1 + combo_dims.size() - i,o_);
           o_ << "for (int k_" << i << "__ = 1;"
              << " k_" << i << "__ <= ";
           generate_expression(combo_dims[i].expr_,o_);
@@ -2504,6 +2504,40 @@ namespace stan {
           o_ << "}" << EOL; // end (1)
         }
       }
+      // void 
+      // generate_csv_header_array(const std::vector<expression>& matrix_dims, 
+      //                                const std::string& name,
+      //                                const std::vector<expression>& dims) const {
+
+      //   // begin for loop dims
+      //   std::vector<expression> combo_dims(dims);
+      //   for (size_t i = 0; i < matrix_dims.size(); ++i)
+      //     combo_dims.push_back(matrix_dims[i]);
+
+      //   for (size_t i = 0; i < combo_dims.size(); ++i) {
+      //     generate_indent(2 + i,o_);
+      //     o_ << "for (int k_" << i << "__ = 1;"
+      //        << " k_" << i << "__ <= ";
+      //     generate_expression(combo_dims[i].expr_,o_);
+      //     o_ << "; ++k_" << i << "__) {" << EOL; // begin (1)
+      //   }
+
+      //   // variable + indices
+      //   generate_indent(2 + combo_dims.size(),o_);
+      //   o_ << "writer__.comma();" << EOL;  // only writes comma after first call
+
+      //   generate_indent(2 + combo_dims.size(),o_);
+      //   o_ << "o__ << \"" << name << '"';
+      //   for (size_t i = 0; i < combo_dims.size(); ++i)
+      //     o_ << " << '.' << k_" << i << "__";
+      //   o_ << ';' << EOL;
+
+      //   // end for loop dims
+      //   for (size_t i = 0; i < combo_dims.size(); ++i) {
+      //     generate_indent(1 + combo_dims.size() - i,o_);
+      //     o_ << "}" << EOL; // end (1)
+      //   }
+      // }
     };
 
 
@@ -2599,8 +2633,8 @@ namespace stan {
         for (size_t i = 0; i < matrix_dims.size(); ++i)
           combo_dims.push_back(matrix_dims[i]);
 
-       for (size_t i = 0; i < combo_dims.size(); ++i) {
-          generate_indent(2 + i,o_);
+        for (size_t i = combo_dims.size(); i-- > 0; ) {
+          generate_indent(1 + combo_dims.size() - i,o_);
           o_ << "for (int k_" << i << "__ = 1;"
              << " k_" << i << "__ <= ";
           generate_expression(combo_dims[i].expr_,o_);
@@ -2625,9 +2659,8 @@ namespace stan {
           generate_indent(1 + combo_dims.size() - i,o_);
           o_ << "}" << EOL; // end (1)
         }
-        
-
       }
+
     };
 
 
@@ -2741,7 +2774,7 @@ namespace stan {
                                         int_literal(2)));
         generate_param_names_array(matrix_args,x.name_,x.dims_);
       }
-      // exact cut-and-paste from constrained
+      // FIXME: sharing instead of cut-and-paste from constrained
       void 
       generate_param_names_array(const std::vector<expression>& matrix_dims, 
                                  const std::string& name,
@@ -2752,14 +2785,14 @@ namespace stan {
         for (size_t i = 0; i < matrix_dims.size(); ++i)
           combo_dims.push_back(matrix_dims[i]);
 
-        for (size_t i = 0; i < combo_dims.size(); ++i) {
-          generate_indent(2 + i,o_);
+        for (size_t i = combo_dims.size(); i-- > 0; ) {
+          generate_indent(1 + combo_dims.size() - i,o_);
           o_ << "for (int k_" << i << "__ = 1;"
-          << " k_" << i << "__ <= ";
+             << " k_" << i << "__ <= ";
           generate_expression(combo_dims[i].expr_,o_);
           o_ << "; ++k_" << i << "__) {" << EOL; // begin (1)
         }
-        
+
         generate_indent(2 + combo_dims.size(),o_);
         o_ << "param_name_stream__.str(std::string());" << EOL;
         
@@ -2778,7 +2811,6 @@ namespace stan {
           generate_indent(1 + combo_dims.size() - i,o_);
           o_ << "}" << EOL; // end (1)
         }
-
       }
     };
 
