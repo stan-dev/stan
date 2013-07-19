@@ -19,6 +19,8 @@ namespace stan {
           + std::string("anything else identifies a file of values");
         _default = "\"2\"";
         _default_value = "2";
+        _constrained = false;
+        _good_value = "good";
         _value = _default_value;
       };
       

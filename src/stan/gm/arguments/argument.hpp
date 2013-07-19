@@ -41,6 +41,8 @@ namespace stan {
         return true; 
       }
       
+      virtual void probe_args(argument* base_arg, std::string prefix) {};
+      
       static void split_arg(const std::string& arg, std::string& name, std::string& value) {
         size_t pos = arg.find('=');
         

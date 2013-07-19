@@ -255,6 +255,7 @@ namespace stan {
       if (parser.help_printed())
         return 0;
       
+
       // Identification
       unsigned int id = dynamic_cast<int_argument*>(parser.arg("id"))->value();
       
@@ -901,6 +902,9 @@ namespace stan {
         diagnostic_stream->close();
         delete diagnostic_stream;
       }
+      
+      for (int i = 0; i < valid_arguments.size(); ++i)
+        delete valid_arguments.at(i);
       
       return 0;
  

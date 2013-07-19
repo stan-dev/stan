@@ -17,6 +17,8 @@ namespace stan {
         _validity = "seed > 0, if negative seed is generated from time";
         _default = "-1";
         _default_value = -1;
+        _constrained = false;
+        _good_value = 18383;
         _value = _default_value;
       };
       

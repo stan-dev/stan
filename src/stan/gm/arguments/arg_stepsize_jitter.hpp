@@ -17,6 +17,9 @@ namespace stan {
         _validity = "0 < stepsize_jitter < 1";
         _default = "0";
         _default_value = 0.0;
+        _constrained = true;
+        _good_value = 0.5;
+        _bad_value = -1.0;
         _value = _default_value;
       };
       

@@ -1,6 +1,7 @@
 #ifndef __STAN__GM__ARGUMENTS__SINGLETON__ARGUMENT__BETA__
 #define __STAN__GM__ARGUMENTS__SINGLETON__ARGUMENT__BETA__
 
+#include <iostream>
 #include <boost/lexical_cast.hpp>
 #include <stan/gm/arguments/valued_argument.hpp>
 
@@ -44,7 +45,8 @@ namespace stan {
       
     public:
       
-      singleton_argument(): _validity("All") { 
+      singleton_argument(): _validity("All") {
+        _constrained = false;
         _name = "";
         _value_type = type_name<T>::name();
       }
@@ -71,6 +73,7 @@ namespace stan {
         split_arg(args.back(), name, value);
         
         if (_name == name) {
+          
           args.pop_back();
           
           T proposed_value = boost::lexical_cast<T>(value);
@@ -90,6 +93,28 @@ namespace stan {
           
         }
         return true;
+      }
+      
+      virtual void probe_args(argument* base_arg, std::string prefix) {
+
+        std::ofstream output;
+        std::string file_name = prefix + "_" + name() + "_good.config";
+        
+        output.open(file_name.data());
+        _value = _good_value;
+        base_arg->print(&output, 0, '\0');
+        output.close();
+        
+        if (_constrained) {
+          std::ofstream output;
+          std::string file_name = prefix + "_" + name() + "_bad.config";
+          output.open(file_name.data());
+          _value = _bad_value;
+          base_arg->print(&output, 0, '\0');
+          output.close();
+        }
+
+        _value = _default_value;
       }
       
       T value() { return _value; }
@@ -124,6 +149,11 @@ namespace stan {
       
       T _value;
       T _default_value;
+      
+      bool _constrained;
+      
+      T _good_value;
+      T _bad_value;
       
     };
     

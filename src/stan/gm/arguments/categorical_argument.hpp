@@ -112,6 +112,13 @@ namespace stan {
         return valid_arg;
       };
       
+      virtual void probe_args(argument* base_arg, std::string prefix) {
+        for (std::vector<argument*>::iterator it = _subarguments.begin();
+             it != _subarguments.end(); ++it) {
+          (*it)->probe_args(base_arg, prefix + "_" + name());
+        }
+      }
+      
       std::vector<argument*>& subarguments() {
         return _subarguments;
       }

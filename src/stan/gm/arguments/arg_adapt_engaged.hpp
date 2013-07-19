@@ -17,6 +17,8 @@ namespace stan {
         _validity = "[0, 1]";
         _default = "1";
         _default_value = true;
+        _constrained = false;
+        _good_value = 1;
         _value = _default_value;
       };
       

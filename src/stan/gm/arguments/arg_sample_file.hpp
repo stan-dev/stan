@@ -16,6 +16,8 @@ namespace stan {
         _description = "Output file for sample information";
         _default = "samples.csv";
         _default_value = "samples.csv";
+        _constrained = false;
+        _good_value = "good";
         _value = _default_value;
       };
       

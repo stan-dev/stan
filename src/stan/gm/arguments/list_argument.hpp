@@ -1,7 +1,9 @@
 #ifndef __STAN__GM__ARGUMENTS__LIST__ARGUMENT__BETA__
 #define __STAN__GM__ARGUMENTS__LIST__ARGUMENT__BETA__
 
+#include <iostream>
 #include <stan/gm/arguments/valued_argument.hpp>
+#include <stan/gm/arguments/arg_fail.hpp>
 
 namespace stan {
   
@@ -98,6 +100,32 @@ namespace stan {
         
       };
 
+      virtual void probe_args(argument* base_arg, std::string prefix) {
+        
+        for (int i = 0; i < _values.size(); ++i) {
+          _cursor = i;
+          
+          std::ofstream output;
+          std::string file_name = prefix + "good.config";
+          output.open(file_name.data());
+          base_arg->print(&output, 0, '\0');
+          output.close();
+          
+          _values.at(i)->probe_args(base_arg, prefix + name() + "_");
+        }
+        
+        _values.push_back(new arg_fail);
+        _cursor = _values.size() - 1;
+        std::ofstream output;
+        std::string file_name = prefix + "bad.config";
+        output.open(file_name.data());
+        base_arg->print(&output, 0, '\0');
+        output.close();
+        
+        _values.pop_back();
+        _cursor = _default_cursor;
+      }
+      
       bool valid_value(std::string name) {
         for (std::vector<argument*>::iterator it = _values.begin();
              it != _values.end(); ++it)
