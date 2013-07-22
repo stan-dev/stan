@@ -170,8 +170,8 @@ namespace stan {
        *
        * @param params_r Real-valued parameter vector.
        * @param params_i Integer-valued parameter vector.
-       * @params o Stream to which CSV file is written
-       * @param output_stream Stream to which print statements in Stan
+       * @param o Stream to which CSV file is written
+       * output_stream Stream to which print statements in Stan
        * programs are written, default is 0
        */
       template <typename RNG>
