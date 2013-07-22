@@ -85,13 +85,39 @@ y.tilde <- ifelse (z.tilde>0, 1, 0)
 
 ### Compound models
 
- ## Models
-source("earnings1.data.R") ##FIXME. SWITCH TO STAN WHEN SIM SORTED OUT
-fit.1a <- glm (earn_pos ~ height + male, family=binomial(link="logit"))
-source("earnings.data.R") 
-male <- 2 - sex1
-log.earn <- log (earnings)
-fit.1b <- lm (log.earn ~ height + male, subset=earnings>0)
+## Models (earnings1.stan)
+## glm (earn_pos ~ height + male, family=binomial(link="logit"))
+source("earnings1.data.R")
+
+if (!file.exists("earnings1.sm.RData")) {
+    rt <- stanc("earnings1.stan", model_name="earnings1")
+    earnings1.sm <- stan_model(stanc_ret=rt)
+    save(earnings1.sm, file="earnings1.sm.RData")
+} else {
+    load("earnings1.sm.RData", verbose=TRUE)
+}
+
+dataList.2 <- list(N=N, earn_pos=earn_pos, height=height,male=male)
+earnings1.sf1 <- sampling(earnings1.sm, dataList.2)
+print(earnings1.sf1)
+fit1a.post <- extract(earnings1.sf1)
+
+## (earnings2.stan)
+##model lm (log.earn ~ height + male, subset=earnings>0)
+source("earnings2.data.R")
+
+if (!file.exists("earnings2.sm.RData")) {
+    rt <- stanc("earnings2.stan", model_name="earnings2")
+    earnings2.sm <- stan_model(stanc_ret=rt)
+    save(earnings1.sm, file="earnings2.sm.RData")
+} else {
+    load("earnings2.sm.RData", verbose=TRUE)
+}
+
+dataList.3 <- list(N=N, earnings=earnings, height=height,sex=sex)
+earnings2.sf1 <- sampling(earnings2.sm, dataList.3)
+print(earnings2.sf1)
+fit1b.post <- extract(earnings2.sf1)
 
 x.new <- c (1, 68, 1)          # constant term=1, height=68, male=1
 
@@ -101,42 +127,31 @@ n.sims <- 4000
 prob.earn.pos <- invlogit (fit1a.post$beta %*% x.new)
 earn.pos.sim <- rbinom (n.sims, 1, prob.earn.pos)
 earn.sim <- ifelse (earn.pos.sim==0, 0, 
-  exp (rnorm (n.sims, fit1a.post$beta %*% x.new, sigma.hat(fit.1b))))
+  exp (rnorm (n.sims, fit1a.post$beta %*% x.new,mean(fit1b.post$sigma))))
 
  # Simulated values of coefficient estimates
 
 sim.1a <- sim (fit.1a, n.sims)
 sim.1b <- sim (fit.1b, n.sims)
-prob.earn.pos <- invlogit (coef(sim.1a) %*% x.new)
+prob.earn.pos <- invlogit (fit1a.post$beta %*% x.new)
 earn.pos.sim <- rbinom (n.sims, 1, prob.earn.pos)
 earn.sim <- ifelse (earn.pos.sim==0, 0,
-  exp (rnorm (n.sims, coef(sim.1b) %*% x.new, sigma(sim.1b))))
+  exp (rnorm (n.sims, fit1b.post$beta %*% x.new, fit1b.post$sigma)))
 
-  # Computations into a function
+# Computations into a function
 
-Mean.earn <- function (height, male, sim.a, sim.b){
+Mean.earn <- function (height, male, fit1a.post, fit1b.post){
   x.new <- c (1, height, male)
-  prob.earn.pos <- invlogit (coef(sim.a)%*% x.new)
+  prob.earn.pos <- invlogit (fit1a.post$beta%*% x.new)
   earn.pos.sim <- rbinom (n.sims, 1, prob.earn.pos)  
   earn.sim <- ifelse (earn.pos.sim==0, 0,
-    exp (rnorm (n.sims, coef(sim.b) %*% x.new, sigma(sim.b))))
+    exp (rnorm (n.sims, fit1b.post$beta %*% x.new, fit1b.post$sigma)))
   return (mean (earn.sim))
 }
 
 heights <- seq (60, 75, 1)
-mean.earn.female <- sapply (heights, Mean.earn, male=0, sim.1a, sim.1b)
-mean.earn.male <- sapply (heights, Mean.earn, male=1, sim.1a, sim.1b)
-
-  # or
-
-heights <- seq (60, 75, 1)
-k <- length (heights) 
-mean.earn.female <- rep (NA, k)
-mean.earn.male <- rep (NA, k)
-for (i in 1:k){
-  mean.earn.female[i] <- Mean.earn (heights[i], 0, sim.1a, sim.1b)
-  mean.earn.male[i] <- Mean.earn (heights[i], 1, sim.1a, sim.1b)
-}
+mean.earn.female <- sapply (heights, Mean.earn, male=0, fit1a.post, fit1b.post)
+mean.earn.male <- sapply (heights, Mean.earn, male=1, fit1a.post, fit1b.post)
 
 frame = data.frame(x1=heights,x2=mean.earn.female)
 m <- ggplot(frame,aes(y=x2,x=x1))

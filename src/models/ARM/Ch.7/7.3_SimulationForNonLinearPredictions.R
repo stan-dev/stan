@@ -63,6 +63,8 @@ dataList.1 <- list(N=length(vote.88[ok]), vote_88=vote.88[ok], vote_86=vote.86[o
 congress.sf1 <- sampling(congress.sm, dataList.1)
 print(congress.sf1)
 
+fit88.post <- extract(congress.sf1)
+
 ## Figure 7.4
 
 # 7.4 (a)
@@ -102,13 +104,13 @@ vote.88 <- v88
 n.tilde <- length (vote.88)
 X.tilde <- cbind (rep (1, n.tilde), vote.88, incumbency.90)
 
-n.sims <- 1000
-sim.88 <- sim (fit.88, n.sims)
+n.sims <- 4000
+sim.88 <- fit88.post$beta
 y.tilde <- array (NA, c(n.sims, n.tilde))
 for (s in 1:n.sims){
-  pred <- X.tilde %*% sim.88$coef[s,]
+  pred <- X.tilde %*% fit88.post$beta[s,]
   ok <- !is.na(pred)
-  y.tilde[s,ok] <- rnorm (sum(ok), pred[ok], sim.88$sigma[s])
+  y.tilde[s,ok] <- rnorm (sum(ok), pred[ok], fit88.post$sigma[s])
 }
 
 ## Predictive simulation for a nonlinear function of new data
@@ -124,15 +126,14 @@ for (s in 1:n.sims){
 
 ## Implementation using functions
 
-Pred.88 <- function (X.pred, lm.fit){
-  sim.88 <- sim (lm.fit, 1)
-  pred <- X.tilde %*% t(sim.88$coef)
+Pred.88 <- function (X.pred){
+  pred <- X.tilde %*% t(fit88.post$beta)
   ok <- !is.na(pred)
   n.pred <- length (pred)
   y.pred <- rep (NA, n.pred)
-  y.pred[ok] <- rnorm (sum(ok), pred[ok], sim.88$sigma)
+  y.pred[ok] <- rnorm (sum(ok), pred[ok], fit88.post$sigma)
   return (y.pred)
 }
 
-y.tilde <- replicate (1000, Pred.88 (X.tilde, fit.88))
-dems.tilde <- replicate (1000, Pred.88 (X.tilde, fit.88) > .5)
+y.tilde <- replicate (1000, Pred.88 (X.tilde))
+dems.tilde <- replicate (1000, Pred.88 (X.tilde) > .5)

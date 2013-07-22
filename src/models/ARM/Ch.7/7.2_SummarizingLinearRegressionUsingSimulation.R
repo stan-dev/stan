@@ -17,7 +17,7 @@ dataList.3 <- list(N=N, earnings=earnings, height=height,sex=sex)
 earnings_interactions.sf1 <- sampling(earnings_interactions.sm, dataList.3)
 print(earnings_interactions.sf1)
 
- # Prediction
+ # Prediction FIXME
 log.earn <- log(earnings)
 male <- 2 - sex
 earn.logmodel.3 <- lm (log.earn ~ height + male + height:male)
