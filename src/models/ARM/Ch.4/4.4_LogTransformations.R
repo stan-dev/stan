@@ -29,10 +29,11 @@ m + geom_abline(intercept=beta.mean[1],slope=beta.mean[2],colour="red")
 
 #FIXME: graph loop doesn't work..
 frame2 = data.frame(height=height+ runif(N,-.2,.2),earn=(earnings))
+
 m2 <- ggplot(frame2,aes(x=height,y=earn))
 m2 <- m2 + geom_point() + scale_y_continuous("Earnings",limits=c(-1000,200000)) + scale_x_continuous("Height") + theme_bw()
 for (i in 1:20)
-  m2 <- m2 + stat_function(fun=function(x) exp(fit1.post$beta[4000-i,1]+fit1.post$beta[4000-i,2]*x),colour="grey")
+  m2 <- m2 + stat_function(aes(y=0),fun=function(x) exp(fit1.post$beta[4000-i,1]+fit1.post$beta[4000-i,2]*x),colour="grey")
 m2 + stat_function(fun=function(x) exp(beta.mean[1] + beta.mean[2]*x),colour="red")
 
 ## Log-base-10 transformation (earnings_log10.stan)

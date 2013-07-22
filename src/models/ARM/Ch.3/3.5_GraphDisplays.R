@@ -1,6 +1,5 @@
 library(rstan)
 library(ggplot2)
-library(arm)
 source("kid_iq.data.R")     # load kid_score, mom_hs, mom_iq
 
 ### First model (kid_iq_one_pred.stan)
@@ -40,7 +39,7 @@ dataList <- list(N=N, kid_score=kid_score, mom_hs=mom_hs, mom_iq=mom_iq)
 kid_iq_multi_preds.sf <- sampling(kid_iq_multi_preds.sm, dataList)
 print(kid_iq_multi_preds.sf)
 
-fit3.post <- extract(kid_iq_one_pred.sf2)
+fit3.post <- extract(kid_iq_multi_preds.sf)
 beta.mean3 <- colMeans(fit3.post$beta)
 
 #Graphics for above model
@@ -89,7 +88,7 @@ for (i in 1:10)
   m <- m + geom_abline(intercept=fit2.post$beta[4000-i,1],slope=fit2.post$beta[4000-i,2],colour="grey",size=2)
 m + geom_abline(intercept=beta.mean1[1],slope=beta.mean1[2],colour="red")
 
-### Displaying using one plot for each input variable (Figure 3.11) FIXME
+### Displaying using one plot for each input variable (Figure 3.11)
 kidscore.jitter <- jitter(kid_score)
 
 jitter.binary <- function(a, jitt=.05){

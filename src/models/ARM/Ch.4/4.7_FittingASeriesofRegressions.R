@@ -50,7 +50,6 @@ regress.year <- function (yr) {
   ok <- !is.na(this.year$partyid7+this.year$real_ideo+this.year$race.adj+this.year$age.discrete+this.year$educ1+this.year$gender+this.year$income)
   dataList.1 <- list(N=length(this.year$partyid7[ok]), partyid7=this.year$partyid7[ok], real_ideo=this.year$real_ideo[ok],race_adj=this.year$race.adj[ok], age=this.year$age.discrete[ok],educ1=this.year$educ1[ok], gender=this.year$gender[ok], income=this.year$income[ok])
   nes.sf1 <- sampling(nes.sm, dataList.1)
-  print(nes.sf1)
   coefs <- extract(nes.sf1)$beta
 }
 
