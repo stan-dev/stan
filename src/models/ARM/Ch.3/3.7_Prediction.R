@@ -56,6 +56,6 @@ m + geom_abline(slope = 1) + theme_bw()
 #right figure
 frame2 = data.frame(cscores.new=cscores.new,res=res)
 
-m <- ggplot() + theme_bw() + geom_point(data=frame2,aes(x=cscores.new,y=res),colour="grey70")
-m <- m + scale_y_continuous("Predicted Score") + scale_x_continuous("Actual Score")
-m + geom_hline(yintercept=0) + geom_hline(yintercept=a,linetype="dashed") + geom_hline(yintercept=-a,linetype="dashed")
+m2 <- ggplot() + theme_bw() + geom_point(data=frame2,aes(x=cscores.new,y=res),colour="grey70")
+m2 <- m2 + scale_y_continuous("Predicted Score") + scale_x_continuous("Actual Score")
+m2 + geom_hline(yintercept=0) + geom_hline(yintercept=a,linetype="dashed") + geom_hline(yintercept=-a,linetype="dashed")

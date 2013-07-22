@@ -1,42 +1,39 @@
 library(rstan)
 library(ggplot2)
-library(arm)
-source("wells.data.R")    
+source("earnings.data.R")    
 
 ## Log transformation (earnings_log.stan)
 ## lm(log.earn ~ height)
-if (!file.exists("earnings.sm.RData")) {
-    rt <- stanc("earnings.stan", model_name="earnings")
-    earnings.sm <- stan_model(stanc_ret=rt)
-    save(earnings.sm, file="earnings.sm.RData")
+if (!file.exists("earnings_one_pred.sm.RData")) {
+    rt <- stanc("earnings_one_pred.stan", model_name="earnings_one_pred")
+    earnings_one_pred.sm <- stan_model(stanc_ret=rt)
+    save(earnings_one_pred.sm, file="earnings_one_pred.sm.RData")
 } else {
-    load("earnings.sm.RData", verbose=TRUE)
+    load("earnings_one_pred.sm.RData", verbose=TRUE)
 }
 
 dataList.1 <- list(N=N, earnings=log(earnings), height=height)
-earnings_log.sf1 <- sampling(earnings.sm, dataList.1)
+earnings_log.sf1 <- sampling(earnings_one_pred.sm, dataList.1)
 print(earnings_log.sf1)
 
-earn.logmodel.1 <- lm(log(earnings) ~ height)
-sim.logmodel.1 <- sim (earn.logmodel.1)
-
-beta.post <- extract(earnings_log.sf1, "beta")$beta
-beta.mean <- colMeans(beta.post)
+fit1.post <- extract(earnings_log.sf1)
+beta.mean <- colMeans(fit1.post$beta)
 
 ## Figure 4.3
 frame1 = data.frame(height=height+ runif(N,-.2,.2),earn=log(earnings))
 m <- ggplot(frame1,aes(x=height,y=earn))
 m <- m + geom_point() + scale_y_continuous("Log(Earnings)") + scale_x_continuous("Height") + theme_bw()
 for (i in 1:20)
-  m <- m + geom_abline(intercept=coef(sim.logmodel.1)[i,1],slope=coef(sim.logmodel.1)[i,2],colour="grey")
+  m <- m + geom_abline(intercept=fit1.post$beta[4000-i,1],slope=fit1.post$beta[4000-i,2],colour="grey")
 m + geom_abline(intercept=beta.mean[1],slope=beta.mean[2],colour="red")
 
+#FIXME: graph loop doesn't work..
 frame2 = data.frame(height=height+ runif(N,-.2,.2),earn=(earnings))
-mm <- ggplot(frame2,aes(x=height,y=earn))
-mm <- mm + geom_point() + scale_y_continuous("Earnings",limits=c(-1000,200000)) + scale_x_continuous("Height") + theme_bw()
+m2 <- ggplot(frame2,aes(x=height,y=earn))
+m2 <- m2 + geom_point() + scale_y_continuous("Earnings",limits=c(-1000,200000)) + scale_x_continuous("Height") + theme_bw()
 for (i in 1:20)
-  mm <- mm + geom_abline(intercept=coef(sim.logmodel.1)[i,1],slope=coef(sim.logmodel.1)[i,2],colour="grey",size=2)
-mm + geom_abline(intercept=beta.mean[1],slope=beta.mean[2],colour="red")
+  m2 <- m2 + stat_function(fun=function(x) exp(fit1.post$beta[4000-i,1]+fit1.post$beta[4000-i,2]*x),colour="grey")
+m2 + stat_function(fun=function(x) exp(beta.mean[1] + beta.mean[2]*x),colour="red")
 
 ## Log-base-10 transformation (earnings_log10.stan)
 ## lm(log10.earn ~ height)

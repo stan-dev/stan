@@ -1,6 +1,5 @@
 library(rstan)
 library(ggplot2)
-library(arm)
 source("earnings.data.R")    
 
 ### First model: earnings ~ height
@@ -20,8 +19,8 @@ print(earnings_one_pred.sf1)
 lm.earn <- lm (earnings ~ height)
 sim.earn <- sim (lm.earn)
 
-beta.post <- extract(earnings_one_pred.sf1, "beta")$beta
-beta.mean <- colMeans(beta.post)
+fit1.post <- extract(earnings_one_pred.sf1)
+beta.mean <- colMeans(fit1.post$beta)
 
 ## Figure 4.1 (left)
 height.jitter.add <- runif (N, -.2, .2)
@@ -30,12 +29,12 @@ frame1 = data.frame(height=height+height.jitter.add,earn=earnings)
 m <- ggplot(frame1,aes(x=height,y=earn))
 m <- m + geom_point() + scale_y_continuous("Earnings") + scale_x_continuous("Height") + theme_bw()
 for (i in 1:20)
-  m <- m + geom_abline(intercept=coef(sim.earn)[i,1],slope=coef(sim.earn)[i,2],colour="grey")
+  m <- m + geom_abline(intercept=fit1.post$beta[4000-i,1],slope=fit1.post$beta[4000-i,2],colour="grey")
 m + geom_abline(intercept=beta.mean[1],slope=beta.mean[2],colour="red")
 
 ## Figure 4.1 (right) 
-mm <- ggplot(frame1,aes(x=height,y=earn))
-mm <- mm + geom_point() + scale_y_continuous("Earnings",limits=c(-200000,200000)) + scale_x_continuous("Height",limits=c(0,80)) + theme_bw()
+m2 <- ggplot(frame1,aes(x=height,y=earn))
+m2 <- m2 + geom_point() + scale_y_continuous("Earnings",limits=c(-200000,200000)) + scale_x_continuous("Height",limits=c(0,80)) + theme_bw()
 for (i in 1:20)
-  mm <- mm + geom_abline(intercept=coef(sim.earn)[i,1],slope=coef(sim.earn)[i,2],colour="grey")
-mm + geom_abline(intercept=beta.mean[1],slope=beta.mean[2],colour="red")
+  m2 <- m2 + geom_abline(intercept=fit1.post$beta[4000-i,1],slope=fit1.post$beta[4000-i,2],colour="grey")
+m2 + geom_abline(intercept=beta.mean[1],slope=beta.mean[2],colour="red")
