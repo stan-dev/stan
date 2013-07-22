@@ -23,11 +23,11 @@ namespace stan {
      * @tparam T type of value.
      */
     template <typename T>
-    inline
-    T& get_base1(std::vector<T>& x, 
-                 size_t i, 
-                 const char* error_msg,
-                 size_t idx) {
+    inline const T& 
+    get_base1(const std::vector<T>& x, 
+              size_t i, 
+              const char* error_msg,
+              size_t idx) {
       check_range(x.size(),i,error_msg,idx);
       return x[i - 1];
     }
@@ -48,12 +48,12 @@ namespace stan {
      * @tparam T type of value.
      */
     template <typename T>
-    inline
-    T& get_base1(std::vector<std::vector<T> >& x, 
-                 size_t i1, 
-                 size_t i2,
-                 const char* error_msg,
-                 size_t idx) {
+    inline const T& 
+    get_base1(const std::vector<std::vector<T> >& x, 
+              size_t i1, 
+              size_t i2,
+              const char* error_msg,
+              size_t idx) {
       check_range(x.size(),i1,error_msg,idx);
       return get_base1(x[i1 - 1],i2,error_msg,idx+1);
     }
@@ -75,13 +75,13 @@ namespace stan {
      * @tparam T type of value.
      */
     template <typename T>
-    inline
-    T& get_base1(std::vector<std::vector<std::vector<T> > >& x, 
-                 size_t i1, 
-                 size_t i2,
-                 size_t i3,
-                 const char* error_msg,
-                 size_t idx) {
+    inline const T& 
+    get_base1(const std::vector<std::vector<std::vector<T> > >& x, 
+              size_t i1, 
+              size_t i2,
+              size_t i3,
+              const char* error_msg,
+              size_t idx) {
       check_range(x.size(),i1,error_msg,idx);
       return get_base1(x[i1 - 1],i2,i3,error_msg,idx+1);
     }
@@ -104,14 +104,14 @@ namespace stan {
      * @tparam T type of value.
      */
     template <typename T>
-    inline
-    T& get_base1(std::vector<std::vector<std::vector<std::vector<T> > > >& x, 
-                 size_t i1, 
-                 size_t i2,
-                 size_t i3,
-                 size_t i4,
-                 const char* error_msg,
-                 size_t idx) {
+    inline const T& 
+    get_base1(const std::vector<std::vector<std::vector<std::vector<T> > > >& x, 
+              size_t i1, 
+              size_t i2,
+              size_t i3,
+              size_t i4,
+              const char* error_msg,
+              size_t idx) {
       check_range(x.size(),i1,error_msg,idx);
       return get_base1(x[i1 - 1],i2,i3,i4,error_msg,idx+1);
     }
@@ -135,15 +135,15 @@ namespace stan {
      * @tparam T type of value.
      */
     template <typename T>
-    inline
-    T& get_base1(std::vector<std::vector<std::vector<std::vector<std::vector<T> > > > >& x, 
-                 size_t i1, 
-                 size_t i2,
-                 size_t i3,
-                 size_t i4,
-                 size_t i5,
-                 const char* error_msg,
-                 size_t idx) {
+    inline const T& 
+    get_base1(const std::vector<std::vector<std::vector<std::vector<std::vector<T> > > > >& x, 
+              size_t i1, 
+              size_t i2,
+              size_t i3,
+              size_t i4,
+              size_t i5,
+              const char* error_msg,
+              size_t idx) {
       check_range(x.size(),i1,error_msg,idx);
       return get_base1(x[i1 - 1],i2,i3,i4,i5,error_msg,idx+1);
     }
@@ -168,16 +168,16 @@ namespace stan {
      * @tparam T type of value.
      */
     template <typename T>
-    inline
-    T& get_base1(std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<T> > > > > >& x, 
-                 size_t i1, 
-                 size_t i2,
-                 size_t i3,
-                 size_t i4,
-                 size_t i5,
-                 size_t i6,
-                 const char* error_msg,
-                 size_t idx) {
+    inline const T& 
+    get_base1(const std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<T> > > > > >& x, 
+              size_t i1, 
+              size_t i2,
+              size_t i3,
+              size_t i4,
+              size_t i5,
+              size_t i6,
+              const char* error_msg,
+              size_t idx) {
       check_range(x.size(),i1,error_msg,idx);
       return get_base1(x[i1 - 1],i2,i3,i4,i5,i6,error_msg,idx+1);
     }
@@ -204,17 +204,17 @@ namespace stan {
      * @tparam T type of value.
      */
     template <typename T>
-    inline
-    T& get_base1(std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<T> > > > > > >& x, 
-                 size_t i1, 
-                 size_t i2,
-                 size_t i3,
-                 size_t i4,
-                 size_t i5,
-                 size_t i6,
-                 size_t i7,
-                 const char* error_msg,
-                 size_t idx) {
+    inline const T& 
+    get_base1(const std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<T> > > > > > >& x, 
+              size_t i1, 
+              size_t i2,
+              size_t i3,
+              size_t i4,
+              size_t i5,
+              size_t i6,
+              size_t i7,
+              const char* error_msg,
+              size_t idx) {
       check_range(x.size(),i1,error_msg,idx);
       return get_base1(x[i1 - 1],i2,i3,i4,i5,i6,i7,error_msg,idx+1);
     }
@@ -242,8 +242,8 @@ namespace stan {
      * @tparam T type of value.
      */
     template <typename T>
-    inline
-    T& get_base1(std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<T> > > > > > > >& x, 
+    inline const T& 
+    get_base1(const std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<T> > > > > > > >& x, 
                  size_t i1, 
                  size_t i2,
                  size_t i3,
@@ -280,9 +280,8 @@ namespace stan {
      * @tparam T type of value.
      */
     template <typename T>
-    inline
-    Eigen::Matrix<T,1,Eigen::Dynamic>
-    get_base1(Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& x,
+    inline Eigen::Matrix<T,1,Eigen::Dynamic>
+    get_base1(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& x,
               size_t m,
               const char* error_msg,
               size_t idx) {
@@ -307,12 +306,12 @@ namespace stan {
      * @tparam T type of value.
      */
     template <typename T>
-    inline
-    T& get_base1(Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& x,
-                 size_t m,
-                 size_t n,
-                 const char* error_msg,
-                 size_t idx) {
+    inline const T& 
+    get_base1(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& x,
+              size_t m,
+              size_t n,
+              const char* error_msg,
+              size_t idx) {
       check_range(x.rows(),m,error_msg,idx);
       check_range(x.cols(),n,error_msg,idx + 1);
       return x(m - 1, n - 1);
@@ -334,13 +333,12 @@ namespace stan {
      */
     template <typename T>
     inline
-    T& get_base1(Eigen::Matrix<T,Eigen::Dynamic,1>& x,
-                 size_t m,
-                 const char* error_msg,
-                 size_t idx) {
+    const T& get_base1(const Eigen::Matrix<T,Eigen::Dynamic,1>& x,
+                       size_t m,
+                       const char* error_msg,
+                       size_t idx) {
       check_range(x.size(),m,error_msg,idx);
       return x(m - 1);
-      
     }
 
     /**
@@ -358,11 +356,11 @@ namespace stan {
      * @tparam T type of value.
      */
     template <typename T>
-    inline
-    T& get_base1(Eigen::Matrix<T,1,Eigen::Dynamic>& x,
-                 size_t n,
-                 const char* error_msg,
-                 size_t idx) {
+    inline const T& 
+    get_base1(const Eigen::Matrix<T,1,Eigen::Dynamic>& x,
+              size_t n,
+              const char* error_msg,
+              size_t idx) {
       check_range(x.size(),n,error_msg,idx);
       return x(n - 1);
     }
