@@ -16,9 +16,6 @@ dataList.1 <- list(N=N, earnings=earnings, height=height)
 earnings_one_pred.sf1 <- sampling(earnings_one_pred.sm, dataList.1)
 print(earnings_one_pred.sf1)
 
-lm.earn <- lm (earnings ~ height)
-sim.earn <- sim (lm.earn)
-
 fit1.post <- extract(earnings_one_pred.sf1)
 beta.mean <- colMeans(fit1.post$beta)
 
