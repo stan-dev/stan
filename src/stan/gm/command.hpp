@@ -513,6 +513,7 @@ namespace stan {
       //           Optimization Algorithms            //
       //////////////////////////////////////////////////
       
+      /*
       if (parser.arg("method")->arg("optimize")) {
         
         list_argument* algo = dynamic_cast<list_argument*>
@@ -690,6 +691,7 @@ namespace stan {
         }
 
       }
+      */
         
       //////////////////////////////////////////////////
       //              Sampling Algorithms             //
