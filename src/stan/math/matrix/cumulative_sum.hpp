@@ -14,7 +14,7 @@ namespace stan {
      *
      * @code x[0], x[1] + x[2], ..., x[1] + ,..., + x[x.size()-1] @endcode
      *
-     * @tparm T Scalar type of vector.
+     * @tparam T Scalar type of vector.
      * @param x Vector of values.
      * @return Cumulative sum of values.
      */
@@ -38,10 +38,10 @@ namespace stan {
      *
      * @code x(0), x(1) + x(2), ..., x(1) + ,..., + x(x.size()-1) @endcode
      *
-     * @tparm T Scalar type of matrix.
+     * @tparam T Scalar type of matrix.
      * @tparam R Row type of matrix.
      * @tparam C Column type of matrix.
-     * @param x Vector of values.
+     * @param m Matrix of values. 
      * @return Cumulative sum of values.
      */
     template <typename T, int R, int C>
