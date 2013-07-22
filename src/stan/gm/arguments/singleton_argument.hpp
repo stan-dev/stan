@@ -78,7 +78,7 @@ namespace stan {
           
           T proposed_value = boost::lexical_cast<T>(value);
           
-          if (!set_value(boost::lexical_cast<T>(value))) {
+          if (!set_value(proposed_value)) {
             
             if (err) {
               *err << proposed_value << " is not a valid value for "
@@ -95,8 +95,23 @@ namespace stan {
         return true;
       }
       
-      virtual void probe_args(argument* base_arg, std::string prefix) {
+      virtual void probe_args(argument* base_arg, std::stringstream& s) {
 
+        s << "good" << std::endl;
+        _value = _good_value;
+        base_arg->print(&s, 0, '\0');
+        s << std::endl;
+        
+        if (_constrained) {
+          s << "bad" << std::endl;
+          _value = _bad_value;
+          base_arg->print(&s, 0, '\0');
+          s << std::endl;
+        }
+
+        _value = _default_value;
+        
+        /*
         std::ofstream output;
         std::string file_name = prefix + "_" + name() + "_good.config";
         
@@ -113,8 +128,10 @@ namespace stan {
           base_arg->print(&output, 0, '\0');
           output.close();
         }
-
+        
         _value = _default_value;
+        */
+        
       }
       
       T value() { return _value; }

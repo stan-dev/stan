@@ -100,8 +100,29 @@ namespace stan {
         
       };
 
-      virtual void probe_args(argument* base_arg, std::string prefix) {
+      virtual void probe_args(argument* base_arg, std::stringstream& s) {
+
+        for (int i = 0; i < _values.size(); ++i) {
+          _cursor = i;
+          
+          s << "good" << std::endl;
+          base_arg->print(&s, 0, '\0');
+          s << std::endl;
+          
+          //_values.at(i)->probe_args(base_arg, prefix + name() + "_");
+          _values.at(i)->probe_args(base_arg, s);
+        }
         
+        _values.push_back(new arg_fail);
+        _cursor = _values.size() - 1;
+        s << "bad" << std::endl;
+        base_arg->print(&s, 0, '\0');
+        s << std::endl;
+        
+        _values.pop_back();
+        _cursor = _default_cursor;
+        
+        /*
         for (int i = 0; i < _values.size(); ++i) {
           _cursor = i;
           
@@ -124,6 +145,8 @@ namespace stan {
         
         _values.pop_back();
         _cursor = _default_cursor;
+        */
+        
       }
       
       bool valid_value(std::string name) {

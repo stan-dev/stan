@@ -3,7 +3,7 @@
 
 #include <string>
 #include <vector>
-#include <fstream>
+#include <sstream>
 
 #include <stan/gm/arguments/argument.hpp>
 #include <stan/gm/arguments/arg_method.hpp>
@@ -16,24 +16,22 @@ namespace stan {
       
     public:
       
-      argument_probe(std::vector<argument*>& valid_args, std::string dir= "")
-        : _arguments(valid_args),
-          _dir(dir) {
+      argument_probe(std::vector<argument*>& valid_args)
+        : _arguments(valid_args) {
         _arguments.insert(_arguments.begin(), new arg_method());
       }
       
-      void probe_args() {
+      void probe_args(std::stringstream& s) {
 
         for (std::vector<argument*>::iterator arg_it = _arguments.begin();
              arg_it != _arguments.end(); ++arg_it)
-          (*arg_it)->probe_args(*arg_it, _dir);
+          (*arg_it)->probe_args(*arg_it, s);
           
       }
       
     protected:
       
       std::vector<argument*>& _arguments;
-      std::string _dir;
       
     };
     

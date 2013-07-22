@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <string>
-#include <fstream>
+#include <sstream>
 #include <iomanip>
 
 namespace stan {
@@ -41,7 +41,7 @@ namespace stan {
         return true; 
       }
       
-      virtual void probe_args(argument* base_arg, std::string prefix) {};
+      virtual void probe_args(argument* base_arg, std::stringstream& s) {};
       
       static void split_arg(const std::string& arg, std::string& name, std::string& value) {
         size_t pos = arg.find('=');

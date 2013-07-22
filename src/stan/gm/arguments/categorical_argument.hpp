@@ -93,18 +93,19 @@ namespace stan {
           split_arg(cat_name, val_name, val);
           
           if (_subarguments.size() == 0)
-            valid_arg = false;
+            valid_arg = true;
           for (std::vector<argument*>::iterator it = _subarguments.begin();
                it != _subarguments.end(); ++it) {
             if ( (*it)->name() == cat_name) {
               args.pop_back();
               valid_arg &= (*it)->parse_args(args, out, err, help_flag);
               good_arg = true;
+              break;
             } else if ( (*it)->name() == val_name ) {
               valid_arg &= (*it)->parse_args(args, out, err, help_flag);
               good_arg = true;
+              break;
             } else {
-              valid_arg = false;
               good_arg = false;
             }
           }
@@ -112,10 +113,11 @@ namespace stan {
         return valid_arg;
       };
       
-      virtual void probe_args(argument* base_arg, std::string prefix) {
+      virtual void probe_args(argument* base_arg, std::stringstream& s) {
         for (std::vector<argument*>::iterator it = _subarguments.begin();
              it != _subarguments.end(); ++it) {
-          (*it)->probe_args(base_arg, prefix + "_" + name());
+          //(*it)->probe_args(base_arg, prefix + "_" + name());
+          (*it)->probe_args(base_arg, s);
         }
       }
       
