@@ -28,24 +28,19 @@ parameters {
 } 
 
 model {
-  real yaalpha[Nage]; 
+  vector[N] r;
 
   sigma ~ uniform(0, 1); 
   for (k in 1:2)  beta[k] ~ normal(0, sigma * 1E3); 
   for (k in 3:K)  beta[k] ~ normal(2 * beta[k - 1] - beta[k - 2], sigma); 
+  alpha ~ normal(0, 1000); 
 
-  // for (k in 1:K) 
-  //   logRR[k] <- beta[k] - beta[5];
+  for (i in 1:N) { 
+    if (age[i] == 1) r[i] <- alpha1 + log(pyr[i]) + beta[year[i]];
+    else r[i] <- alpha[age[i] - 1] + log(pyr[i]) + beta[year[i]];
+  } 
 
-  for (j in 2:Nage) alpha[j - 1] ~ normal(0, 1000); 
-
-  // real logRR[K]; 
-  yaalpha[1] <- alpha1; 
-  for (i in 2:Nage) 
-    yaalpha[i] <- alpha[i - 1]; 
-   
-  for (i in 1:N)  
-    cases[i] ~ poisson(exp(log(pyr[i]) + yaalpha[age[i]] + beta[year[i]]));
+  cases ~ poisson_log(r);
 } 
 
 generated quantities {
