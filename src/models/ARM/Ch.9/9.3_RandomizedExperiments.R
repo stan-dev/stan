@@ -52,7 +52,7 @@ est1[k] <- colMeans(beta.post)[2]
 se1[k] <- sd(beta.post[,2])
 }
 
-## Plot of the regression results (Figure 9.5) FIXME:CONDENSE TO ONE LOOP
+## Plot of the regression results (Figure 9.5)
 if (!file.exists("electric_multi_preds.sm.RData")) {
     rt <- stanc("electric_multi_preds.stan", model_name="electric_multi_preds")
     electric_multi_preds.sm <- stan_model(stanc_ret=rt)
