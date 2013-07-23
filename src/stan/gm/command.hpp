@@ -513,7 +513,6 @@ namespace stan {
       //           Optimization Algorithms            //
       //////////////////////////////////////////////////
       
-      /*
       if (parser.arg("method")->arg("optimize")) {
         
         list_argument* algo = dynamic_cast<list_argument*>
@@ -541,7 +540,7 @@ namespace stan {
           double lp = ng.logp();
           
           double lastlp = lp - 1;
-          std::cout << "initial log joint probability = " << lp << std::endl;
+          std::cout << "Initial log joint probability = " << lp << std::endl;
           int m = 0;
           for (size_t i = 0; i < num_iterations; i++) {
             lastlp = lp;
@@ -691,7 +690,6 @@ namespace stan {
         }
 
       }
-      */
         
       //////////////////////////////////////////////////
       //              Sampling Algorithms             //
