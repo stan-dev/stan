@@ -1,17 +1,21 @@
 library(rstan)
 library(ggplot2)
-read.table ("electric.dat", header=T)
-
+library(gridBase)
+electric <- read.table ("electric.dat", header=T)
+attach(electric)
 ## Plot of the raw data (Figure 9.4)
-for (j in 1:4){
-  frame = data.frame(x1=control.Posttest[Grade==j])
-  m1 <- ggplot(frame,aes(x=x1)) +  geom_histogram(colour = "black", fill = "white", binwidth=5) + theme_bw()
-  print(m1)
+  
+  electric$Grade <- factor(electric$Grade, levels=c('1','2','3','4'), labels=c('Grade 1', 'Grade 2', 'Grade 3', 'Grade 4'))
+  frame = data.frame(x1=control.Posttest,Grade=electric$Grade)
+  m1 <- ggplot(frame,aes(x1)) +  geom_histogram(colour = "black", fill = "white", binwidth=5) + theme_bw() + facet_grid(Grade ~.) + theme(strip.text.y = element_blank(),axis.title.y = element_blank(),axis.title.x=element_blank(),strip.background = element_blank()) + labs(title='Test Scores in Control Classes') 
 
-  frame2 = data.frame(x1=treated.Posttest[Grade==j])
-  m2 <- ggplot(frame2,aes(x=x1)) +  geom_histogram(colour = "black", fill = "white", binwidth=5) + theme_bw()
-  print(m2)
-}
+  frame2 = data.frame(x1=treated.Posttest,Grade=electric$Grade)
+  m2 <- ggplot(frame2,aes(x1)) +  geom_histogram(colour = "black", fill = "white", binwidth=5) + theme_bw() + facet_grid(Grade ~.) + theme(axis.title.y = element_blank(),axis.ticks.y = element_blank(),axis.text.y=element_blank(),axis.title.x=element_blank()) + labs(title='Test Scores in Treated Classes') 
+
+pushViewport(viewport(layout = grid.layout(1, 2)))
+print(m1, vp = viewport(layout.pos.row = 1, layout.pos.col = 1))
+print(m2, vp = viewport(layout.pos.row = 1, layout.pos.col = 2))
+
 
 ## Basic analysis of a completely randomized experiment
 post.test <- c (treated.Posttest, control.Posttest)
@@ -122,11 +126,15 @@ for (j in 1:4){
 
   frame1 = data.frame(x1=treated.Pretest[ok],y1=treated.Posttest[ok])
   frame2 = data.frame(x2=control.Pretest[ok],y2=control.Posttest[ok])
-  m3 <- ggplot()
-  m3 <- m3 + geom_point(data=frame1,aes(x=x1,y=y1),shape=20)
-  m3 <- m3 + geom_point(data=frame2,aes(x=x2,y=y2),shape=21)
-  m3 <- m3 + scale_y_continuous("Posttest",limits=c(0,125)) + scale_x_continuous("Pretest",limits=c(0,125)) + theme_bw() + labs(title=paste("Grade ",j))
-  m3 <- m3 + geom_abline(intercept=(beta.mean[1]+beta.mean[2]),slope=beta.mean[3])
-  m3 <- m3 + geom_abline(intercept=(beta.mean[1]),slope=beta.mean[3],linetype="dashed")
-  print(m3)
+  m[j] <- ggplot()
+  m[j] <- m[j] + geom_point(data=frame1,aes(x=x1,y=y1),shape=20)
+  m[j] <- m[j] + geom_point(data=frame2,aes(x=x2,y=y2),shape=21)
+  m[j] <- m[j] + scale_y_continuous("Posttest",limits=c(0,125)) + scale_x_continuous("Pretest",limits=c(0,125)) + theme_bw() + labs(title=paste("Grade ",j))
+  m[j] <- m[j] + geom_abline(intercept=(beta.mean[1]+beta.mean[2]),slope=beta.mean[3])
+  m[j] <- m[j] + geom_abline(intercept=(beta.mean[1]),slope=beta.mean[3],linetype="dashed")
 }
+pushViewport(viewport(layout = grid.layout(1, 4)))
+print(m[1], vp = viewport(layout.pos.row = 1, layout.pos.col = 1))
+print(m[2], vp = viewport(layout.pos.row = 1, layout.pos.col = 2))
+print(m[3], vp = viewport(layout.pos.row = 1, layout.pos.col = 3))
+print(m[4], vp = viewport(layout.pos.row = 1, layout.pos.col = 4))
