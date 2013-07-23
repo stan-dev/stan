@@ -55,7 +55,7 @@ for (j in 1:4){
   postt <-c (treated.Posttest[ok], control.Posttest[ok])
   t <- rep (c(1,0),rep(sum(ok),2))
   dataList.1 <- list(N=length(pret), post_test=postt, pre_test=pret,treatment=t)
- electric_interactions.sf <- sampling(electric_interactions.sm, dataList.1)
+  electric_interactions.sf <- sampling(electric_interactions.sm, dataList.1)
   beta.post <- extract(electric_interactions.sf, "beta")$beta
   beta.mean <- colMeans(beta.post)
 
@@ -69,8 +69,6 @@ for (j in 1:4){
   m3 <- m3 + geom_abline(intercept=(beta.mean[1]),slope=beta.mean[3],linetype="dashed")
   print(m3, vp = viewport(layout.pos.row = 1, layout.pos.col = j))
 }
-
-
 
 ## model to display uncertainty & Figure 9.8
 electric_interactions.sf <- sampling(electric_interactions.sm, dataList.2)

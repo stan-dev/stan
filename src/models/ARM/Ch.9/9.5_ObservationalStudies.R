@@ -1,43 +1,73 @@
 library(rstan)
 library(ggplot2)
-read.table ("electric.dat", header=T)
+source("9.3_Randomized experiments.R") # where data was cleaned
 
-## Observational studies FIXME CONVERT REGRESSION.2TABLSA
+## Observational studies
 
  # Plot Figure 9.9
 
- # function to make a graph out of the regression coeffs and se's
+supp <- c(as.numeric(electric[,"Supplement."])-1, rep(NA,nrow(electric)))
+# supp=0 for replace, 1 for supplement, NA for control
 
-                  # graphs on Figure 9.9
-
-
-## Plot of the regression results (Figure 9.5) FIXME:CONDENSE TO ONE LOOP
-if (!file.exists("electric_multi_preds.sm.RData")) {
-    rt <- stanc("electric_multi_preds.stan", model_name="electric_multi_preds")
-    electric_multi_preds.sm <- stan_model(stanc_ret=rt)
-    save(electric_multi_preds.sm, file="electric_multi_preds.sm.RData")
-} else {
-    load("electric_multi_preds.sm.RData", verbose=TRUE)
+est1 <- rep(NA,4)
+se1 <- rep(NA,4)
+for (k in 1:4){
+  ok <- (grade==k) & (!is.na(supp))
+  lm.supp <- lm (post.test ~ supp + pre.test, subset=ok)
+  est1[k] <- lm.supp$coef[2]
+  se1[k] <- summary(lm.supp)$coef[2,2]
 }
 
- 
+ # function to make a graph out of the regression coeffs and se's
 
-## Controlling for pre-treatment predictors (Figure 9.6)
+regression.2tablesA <- function (name, est1, se1, label1, file, bottom=FALSE){
+  J <- length(name)
+  name.range <- .6
+  x.range <- range (est1+2*se1, est1-2*se1)
+  A <- -x.range[1]/(x.range[2]-x.range[1])
+  B <- 1/(x.range[2]-x.range[1])
+  height <- .6*J
+  width <- 8*(name.range+1)
+  gap <- .4
+  
+  par (mar=c(4,0,0,0))
+  plot (c(-name.range,2+gap), c(3,-J-2), bty="n", xlab="", ylab="",
+        xaxt="n", yaxt="n", xaxs="i", yaxs="i", type="n")
+  text (-name.range, 2, "Subpopulation", adj=0, cex=.9)
+  text (.5, 2, label1, adj=.5, cex=.9)
+  lines (c(0,1), c(0,0))
+  lines (c(A,A), c(0,-J-1), lty=2, lwd=.5)
+  ax <- pretty (x.range)
+  ax <- ax[(A+B*ax)>0 & (A+B*ax)<1]
+  segments (A + B*ax, -.1, A + B*ax, .1, lwd=.5)
+  text (A + B*ax, .7, ax, cex=.9)
+  text (-name.range, -(1:J), name, adj=0, cex=.9)
+  points (A + B*est1, -(1:J), pch=20, cex=1)
+  segments (A + B*(est1-se1), -(1:J), A + B*(est1+se1), -(1:J), lwd=3)
+  segments (A + B*(est1-2*se1), -(1:J), A + B*(est1+2*se1), -(1:J), lwd=.5)
+  if (bottom){
+    lines (c(0,1), c(-J-1,-J-1))
+    segments (A + B*ax, -J-1-.1, A + B*ax, -J-1+.1, lwd=.5)
+    text (A + B*ax, -J-1-.7, ax, cex=.9)
+  } 
+}
+                  # graphs on Figure 9.9
+
+regression.2tablesA (paste ("Grade", 1:4), est1, se1, "Estimated effect of supplement,
+    \ncompared to replacement")
+
+## Examining overlap in the Electric Company example (Figure 9.12)
+
+par (mfrow=c(2,2), mar=c(5,4,2,2))
 for (j in 1:4){
   ok <- (grade==j) & (!is.na(supp))
-  t <- rep (c(1,0), rep(sum(ok),2))
-  frame1 = data.frame(x1=pre.test[ok],y1=post.test[ok])
-  dataList.1 <- list(N=length(pret), post_test=post.test[ok], pre_test=pre.test[ok],treatment=supp)
-  electric_multi_preds.sf <- sampling(electric_multi_preds.sm, dataList.1)
-  beta.post <- extract(electric_multi_preds.sf, "beta")$beta
-  beta.mean <- colMeans(beta.post)
-
-  frame1 = data.frame(x1=treated.Pretest[ok],y1=treated.Posttest[ok])
-  frame2 = data.frame(x2=control.Pretest[ok],y2=control.Posttest[ok])
-  m3 <- ggplot()
-  m3 <- m3 + geom_point(data=frame1,aes(x=x1,y=y1),shape=20)
-  m3 <- m3 + scale_y_continuous("Posttest",limits=c(0,125)) + scale_x_continuous("Pretest",limits=c(0,125)) + theme_bw() + labs(title=paste("Grade ",j))
-  m3 <- m3 + geom_abline(intercept=(beta.mean[1]+beta.mean[2]),slope=beta.mean[3])
-  m3 <- m3 + geom_abline(intercept=(beta.mean[1]),slope=beta.mean[3],colour="grey")
-  print(m3)
+  plot(pre.test[ok],post.test[ok], xlab="pre-test score", 
+    ylab="posttest score", pch=20, type="n", main=paste("grade",j))
+  fit.1 <- lm (post.test ~ pre.test + supp, subset=ok)
+  abline (fit.1$coef[1], fit.1$coef[2], lwd=.5, col="gray")
+  abline (fit.1$coef[1]+ fit.1$coef[3], fit.1$coef[2], lwd=.5)
+  points (pre.test[supp==1 & ok], post.test[supp==1 & ok], pch=20, 
+    cex=1.1)
+  points (pre.test[supp==0 & ok], post.test[supp==0 & ok], pch=20,
+    cex=1.1, col="gray")
 }
