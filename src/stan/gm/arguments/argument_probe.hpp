@@ -6,7 +6,6 @@
 #include <sstream>
 
 #include <stan/gm/arguments/argument.hpp>
-#include <stan/gm/arguments/arg_method.hpp>
 
 namespace stan {
   
@@ -17,9 +16,7 @@ namespace stan {
     public:
       
       argument_probe(std::vector<argument*>& valid_args)
-        : _arguments(valid_args) {
-        _arguments.insert(_arguments.begin(), new arg_method());
-      }
+        : _arguments(valid_args) {}
       
       void probe_args(std::stringstream& s) {
 
