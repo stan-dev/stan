@@ -16,8 +16,6 @@ parameters {
 } 
 
 model {
-  for (i in 1:N) { 
-    y[i] ~ student_t(d, 0, 1); 
-  } 
+  y ~ student_t(d, 0, 1); 
   // d ~ uniform(2, 100); 
 } 
