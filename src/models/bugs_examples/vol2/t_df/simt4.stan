@@ -12,7 +12,5 @@ parameters {
 } 
 
 model {
-  for (i in 1:1000) {
-    y[i] ~ student_t(d, 0, 1); 
-  } 
+  y ~ student_t(d, 0, 1); 
 } 

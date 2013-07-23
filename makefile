@@ -61,9 +61,6 @@ PATH_SEPARATOR = /
 ##
 -include make/os_detect
 
-%$(EXE) : %.o %.cpp bin/libstan.a
-	$(LINK.c) -O$O $(OUTPUT_OPTION) $< $(LDLIBS)
-
 ##
 # Tell make the default way to compile a .o file.
 ##
@@ -147,8 +144,9 @@ help:
 	@echo '  - *$(EXE)        : If a Stan model exists at *.stan, this target will build'
 	@echo '                     the Stan model as an executable.'
 	@echo '  Tests:'
+	@echo '  - test-headers   : Compiles a trivial file after including each header separately'
 	@echo '  - test-unit      : Runs unit tests.'
-	@echo '  - test-distributions : Runs unit tests for the distributions (subset of test-unit)'
+	@echo '  - test-distributions : Runs unit tests for the distributions'
 	@echo '  - test-models    : Runs diagnostic models.'
 	@echo '  - test-bugs      : Runs the bugs examples (subset of test-models).'
 	@echo '  - test-all       : Runs all tests.'

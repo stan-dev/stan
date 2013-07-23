@@ -26,7 +26,7 @@ transformed data {
 } 
 
 parameters {
-  real mu[N_priors];
+  real<lower=-10,upper=10> mu[N_priors];
   real theta[N_priors, N_studies];
   real<lower=0,upper=1> pc[N_priors, N_studies];
   real<lower=0> inv_tau_sq_1;
@@ -67,23 +67,19 @@ model {
   // Prior 6: Half-Normal on tau.sqrd
   tau_sq_6 ~ normal(0, p0_sigma) T[0,];
 
-  for (prior in 1:N_priors) 
-    mu[prior] ~ uniform(-10, 10);
+  mu ~ uniform(-10, 10);
 
   for (prior in 1:N_priors) {
-    for (study in 1:N_studies) {
-      pc[prior, study] ~ uniform(0,1);
-      theta[prior, study] ~ normal(mu[prior], tau[prior]);
-    }
+      pc[prior] ~ uniform(0,1);
+      theta[prior] ~ normal(mu[prior], tau[prior]);
   }
   for (prior in 1:N_priors) {
-    for (study in 1:N_studies) {
-      rc[study] ~ binomial(nc[study], pc[prior, study]);
-      rt[study] ~ binomial(nt[study], inv_logit(theta[prior, study] + 
-      		  		                logit(pc[prior, study])));
-    }
+    vector[N_studies] tmpm;
+    for (i in 1:N_studies) 
+      tmpm[i] <- theta[prior, i] + logit(pc[prior, i]);
+    rc ~ binomial(nc, pc[prior]);
+    rt ~ binomial_logit(nt, tmpm);
   }
-
 } 
 generated quantities {
   real OR[N_priors];

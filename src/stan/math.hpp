@@ -31,6 +31,7 @@
 #include "stan/math/functions/inv_cloglog.hpp"
 #include "stan/math/functions/inv_logit.hpp"
 #include "stan/math/functions/inverse_softmax.hpp"
+#include "stan/math/functions/is_uninitialized.hpp"
 #include "stan/math/functions/lbeta.hpp"
 #include "stan/math/functions/lmgamma.hpp"
 #include "stan/math/functions/log1m.hpp"
