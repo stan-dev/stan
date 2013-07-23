@@ -113,8 +113,6 @@ earn.sim <- ifelse (earn.pos.sim==0, 0,
 
  # Simulated values of coefficient estimates
 
-sim.1a <- sim (fit.1a, n.sims)
-sim.1b <- sim (fit.1b, n.sims)
 prob.earn.pos <- invlogit (fit1a.post$beta %*% x.new)
 earn.pos.sim <- rbinom (n.sims, 1, prob.earn.pos)
 earn.sim <- ifelse (earn.pos.sim==0, 0,

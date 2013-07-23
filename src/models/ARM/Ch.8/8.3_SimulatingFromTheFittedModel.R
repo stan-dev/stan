@@ -1,5 +1,6 @@
 library(rstan)
 library(ggplot2)
+library(reshape2)
 source("lightspeed.data.R")    
 
 ## Model fit (lightspeed.stan)
@@ -23,19 +24,17 @@ n.sims <- 1000
 
 ## Create fake data 
 
-n <- length (y)
+n <- 20
 y.rep <- array (NA, c(n.sims, n))
 for (s in 1:n.sims){
   y.rep[s,] <- rnorm (n, post$beta[s], post$sigma[s])
 }
 
 ## Histogram of replicated data (Figure 8.4)
-
-for (s in 1:20){
-  frame = data.frame(x1=y.rep[s,])
-  m <- ggplot(frame,aes(x=x1)) +  geom_histogram(colour = "black", fill = "white",binwidth=5) + theme_bw()
-  print(m)
-}
+y.new <- melt(y.rep)
+y.new$Var2 <- factor(y.new$Var2, levels=c('1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20'), labels=c('Replication #1','Replication #2','Replication #3','Replication #4','Replication #5','Replication #6','Replication #7','Replication #8','Replication #9','Replication #10','Replication #11','Replication #12','Replication #13','Replication #14','Replication #15','Replication #16','Replication #17','Replication #18','Replication #19','Replication #20'))
+m <- ggplot(y.new,aes(value)) +  geom_histogram(colour = "black", fill = "white",binwidth=5) + theme_bw() + facet_wrap( ~ Var2,ncol=5) + theme(axis.title.y = element_blank(),axis.title.x=element_blank())
+print(m)
 
 ## Write a function to make histograms with specified bin widths and ranges
 
