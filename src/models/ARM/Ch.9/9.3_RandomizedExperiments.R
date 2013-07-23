@@ -16,14 +16,15 @@ pushViewport(viewport(layout = grid.layout(1, 2)))
 print(m1, vp = viewport(layout.pos.row = 1, layout.pos.col = 1))
 print(m2, vp = viewport(layout.pos.row = 1, layout.pos.col = 2))
 
-
 ## Basic analysis of a completely randomized experiment
+electric <- read.table ("electric.dat", header=T)
+attach(electric)
+
 post.test <- c (treated.Posttest, control.Posttest)
 pre.test <- c (treated.Pretest, control.Pretest)
-grade <- rep (Grade, 2)
+grade <- rep (electric$Grade, 2)
 treatment <- rep (c(1,0), rep(length(treated.Posttest),2))
 n <- length (post.test)
-
 
 if (!file.exists("electric_one_pred.sm.RData")) {
     rt <- stanc("electric_one_pred.stan", model_name="electric_one_pred")
@@ -33,37 +34,23 @@ if (!file.exists("electric_one_pred.sm.RData")) {
     load("electric_one_pred.sm.RData", verbose=TRUE)
 }
 
-dataList.1 <- list(N=N1, post_test=post_test1, treatment=treatment1)
+est1 <- rep(NA,4)
+se1 <- rep(NA,4)
+for (k in 1:4) {
+post.test1 <- post.test[grade==k]
+treatment1 <- treatment[grade==k]
+ok <- !is.na(post.test1+treatment1)
+post.test2 <- post.test1[ok]
+treatment2 <- treatment1[ok]
+N1 <- length(post.test2)
+
+dataList.1 <- list(N=N1, post_test=post.test2, treatment=treatment2)
 electric_one_pred.sf1 <- sampling(electric_one_pred.sm, dataList.1)
 print(electric_one_pred.sf1)
-beta.post1 <- extract(electric_one_pred.sf1, "beta")$beta
-beta.mean1 <- colMeans(beta.post1)
-sigma.post1 <- extract(electric_one_pred.sf1, "sigma")$sigma
-sigma.mean1 <- mean(sigma.post1)
-
-dataList.2 <- list(N=N2, post_test=post_test2, treatment=treatment2)
-electric_one_pred.sf2 <- sampling(electric_one_pred.sm, dataList.2)
-print(electric_one_pred.sf2)
-beta.post2 <- extract(electric_one_pred.sf2, "beta")$beta
-beta.mean2 <- colMeans(beta.post2)
-sigma.post2 <- extract(electric_one_pred.sf2, "sigma")$sigma
-sigma.mean2 <- mean(sigma.post2)
-
-dataList.3 <- list(N=N3, post_test=post_test3, treatment=treatment3)
-electric_one_pred.sf3 <- sampling(electric_one_pred.sm, dataList.3)
-print(electric_one_pred.sf3)
-beta.post3 <- extract(electric_one_pred.sf3, "beta")$beta
-beta.mean3 <- colMeans(beta.post3)
-sigma.post3 <- extract(electric_one_pred.sf3, "sigma")$sigma
-sigma.mean3 <- mean(sigma.post3)
-
-dataList.4 <- list(N=N4, post_test=post_test4, treatment=treatment4)
-electric_one_pred.sf4 <- sampling(electric_one_pred.sm, dataList.4)
-print(electric_one_pred.sf4)
-beta.post4 <- extract(electric_one_pred.sf4, "beta")$beta
-beta.mean4 <- colMeans(beta.post4)
-sigma.post4 <- extract(electric_one_pred.sf4, "sigma")$sigma
-sigma.mean4 <- mean(sigma.post4)
+beta.post <- extract(electric_one_pred.sf1, "beta")$beta
+est1[k] <- colMeans(beta.post)[2]
+se1[k] <- sd(beta.post[,2])
+}
 
 ## Plot of the regression results (Figure 9.5) FIXME:CONDENSE TO ONE LOOP
 if (!file.exists("electric_multi_preds.sm.RData")) {
@@ -74,44 +61,77 @@ if (!file.exists("electric_multi_preds.sm.RData")) {
     load("electric_multi_preds.sm.RData", verbose=TRUE)
 }
 
-dataList.1 <- list(N=N1, post_test=post_test1, treatment=treatment1,pre_test=pre_test1)
+est2 <- rep(NA,4)
+se2 <- rep(NA,4)
+for (k in 1:4) {
+post.test1 <- post.test[grade==k]
+pre.test1 <- pre.test[grade==k]
+treatment1 <- treatment[grade==k]
+ok <- !is.na(post.test1+treatment1+pre.test1)
+post.test2 <- post.test1[ok]
+pre.test2 <- pre.test1[ok]
+treatment2 <- treatment1[ok]
+N1 <- length(post.test2)
+
+dataList.1 <- list(N=N1, post_test=post.test2, treatment=treatment2,pre_test=pre.test2)
 electric_multi_preds.sf1 <- sampling(electric_multi_preds.sm, dataList.1)
 print(electric_multi_preds.sf1)
-beta.post5 <- extract(electric_multi_preds.sf1, "beta")$beta
-beta.mean5 <- colMeans(beta.post5)
-sigma.post5 <- extract(electric_multi_preds.sf1, "sigma")$sigma
-sigma.mean5 <- mean(sigma.post5)
-
-
-dataList.2 <- list(N=N2, post_test=post_test2, treatment=treatment2,pre_test=pre_test2)
-electric_multi_preds.sf2 <- sampling(electric_multi_preds.sm, dataList.2)
-print(electric_multi_preds.sf2)
-beta.post6 <- extract(electric_multi_preds.sf2, "beta")$beta
-beta.mean6 <- colMeans(beta.post6)
-sigma.post6 <- extract(electric_multi_preds.sf2, "sigma")$sigma
-sigma.mean6 <- mean(sigma.post6)
-
-dataList.3 <- list(N=N3, post_test=post_test3, treatment=treatment3,pre_test=pre_test3)
-electric_multi_preds.sf3 <- sampling(electric_multi_preds.sm, dataList.3)
-print(electric_multi_preds.sf3)
-beta.post7 <- extract(electric_multi_preds.sf3, "beta")$beta
-beta.mean7 <- colMeans(beta.post7)
-sigma.post7 <- extract(electric_multi_preds.sf3, "sigma")$sigma
-sigma.mean7 <- mean(sigma.post7)
-
-dataList.4 <- list(N=N4, post_test=post_test4, treatment=treatment4,pre_test=pre_test4)
-electric_multi_preds.sf4 <- sampling(electric_multi_preds.sm, dataList.4)
-print(electric_multi_preds.sf4)
-beta.post8 <- extract(electric_multi_preds.sf4, "beta")$beta
-beta.mean8 <- colMeans(beta.post8)
-sigma.post8 <- extract(electric_multi_preds.sf1, "sigma")$sigma
-sigma.mean8 <- mean(sigma.post6)
+beta.post <- extract(electric_multi_preds.sf1, "beta")$beta
+est2[k] <- colMeans(beta.post)[2]
+se2[k] <- sd(beta.post[,2])
+}
 
  # function to make a graph out of the regression coeffs and se's
-#FIXME..
+regression.2tables <- function (name, est1, est2, se1, se2, label1, label2,
+                                file, bottom=FALSE){
+  J <- length(name)
+  name.range <- .6
+  x.range <- range (est1+2*se1, est1-2*se1, est2+2*se2, est1-2*se2)
+  A <- -x.range[1]/(x.range[2]-x.range[1])
+  B <- 1/(x.range[2]-x.range[1])
+  height <- .6*J
+  width <- 8*(name.range+1)
+  gap <- .4
+  par (mar=c(4,0,0,0))
+  plot (c(-name.range,2+gap), c(3,-J-2), bty="n", xlab="", ylab="", xaxt="n",
+     yaxt="n", xaxs="i", yaxs="i", type="n")
+  text (-name.range, 2, "Subpopulation", adj=0, cex=.9)
+  text (.5, 2, label1, adj=.5, cex=.9)
+  text (1+gap+.5, 2, label2, adj=.5, cex=.9)
+  lines (c(0,1), c(0,0))
+  lines (1+gap+c(0,1), c(0,0))
+  lines (c(A,A), c(0,-J-1), lty=2, lwd=.5)
+  lines (1+gap+c(A,A), c(0,-J-1), lty=2, lwd=.5)
+  ax <- pretty (x.range)
+  ax <- ax[(A+B*ax)>0 & (A+B*ax)<1]
+  segments (A + B*ax, -.1, A + B*ax, .1, lwd=.5)
+  segments (1+gap+A + B*ax, -.1, 1+gap+A + B*ax, .1, lwd=.5)
+  text (A + B*ax, .7, ax, cex=.9)
+  text (1+gap+A + B*ax, .7, ax, cex=.9)
+  text (-name.range, -(1:J), name, adj=0, cex=.9)
+  points (A + B*est1, -(1:J), pch=20, cex=.9)
+  points (1+gap+A + B*est2, -(1:J), pch=20, cex=.9)
+  segments (A + B*(est1-se1), -(1:J), A + B*(est1+se1), -(1:J), lwd=3)
+  segments (1+gap+A + B*(est2-se2), -(1:J), 1+gap+A + B*(est2+se2), -(1:J),
+            lwd=3)
+  segments (A + B*(est1-2*se1), -(1:J), A + B*(est1+2*se1), -(1:J), lwd=.5)
+  segments (1+gap+A + B*(est2-2*se2), -(1:J), 1+gap+A + B*(est2+2*se2), -(1:J),
+            lwd=.5)
+  if (bottom){
+    lines (c(0,1), c(-J-1,-J-1))
+    lines (1+gap+c(0,1), c(-J-1,-J-1))
+    segments (A + B*ax, -J-1-.1, A + B*ax, -J-1+.1, lwd=.5)
+    segments (1+gap+A + B*ax, -J-1-.1, 1+gap+A + B*ax, -J-1+.1, lwd=.5)
+    text (A + B*ax, -J-1-.7, ax, cex=.9)
+    text (1+gap+A + B*ax, -J-1-.7, ax, cex=.9)
+  } 
+}
 
-#graphs on Figure 9.5 FIXME
- 
+#graphs on Figure 9.5
+par (mfrow=c(1,1))
+ regression.2tables (paste ("Grade", 1:4), est1, est2, se1, se2, 
+  "Regression on treatment indicator", "Regression on treatment indicator,
+  \ncontrolling for pre-test")
 
 ## Controlling for pre-treatment predictors (Figure 9.6)
 for (j in 1:4){
@@ -126,12 +146,12 @@ for (j in 1:4){
 
   frame1 = data.frame(x1=treated.Pretest[ok],y1=treated.Posttest[ok])
   frame2 = data.frame(x2=control.Pretest[ok],y2=control.Posttest[ok])
-  m[j] <- ggplot()
-  m[j] <- m[j] + geom_point(data=frame1,aes(x=x1,y=y1),shape=20)
-  m[j] <- m[j] + geom_point(data=frame2,aes(x=x2,y=y2),shape=21)
-  m[j] <- m[j] + scale_y_continuous("Posttest",limits=c(0,125)) + scale_x_continuous("Pretest",limits=c(0,125)) + theme_bw() + labs(title=paste("Grade ",j))
-  m[j] <- m[j] + geom_abline(intercept=(beta.mean[1]+beta.mean[2]),slope=beta.mean[3])
-  m[j] <- m[j] + geom_abline(intercept=(beta.mean[1]),slope=beta.mean[3],linetype="dashed")
+  mm <- ggplot()
+  mm <- mm + geom_point(data=frame1,aes(x=x1,y=y1),shape=20)
+  mm <- mm + geom_point(data=frame2,aes(x=x2,y=y2),shape=21)
+  mm <- mm + scale_y_continuous("Posttest",limits=c(0,125)) + scale_x_continuous("Pretest",limits=c(0,125)) + theme_bw() + labs(title=paste("Grade ",j))
+  mm <- mm + geom_abline(intercept=(beta.mean[1]+beta.mean[2]),slope=beta.mean[3])
+  paste("mm",j) <- mm + geom_abline(intercept=(beta.mean[1]),slope=beta.mean[3],linetype="dashed")
 }
 pushViewport(viewport(layout = grid.layout(1, 4)))
 print(m[1], vp = viewport(layout.pos.row = 1, layout.pos.col = 1))
