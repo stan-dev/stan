@@ -1,6 +1,6 @@
 library(rstan)
 library(ggplot2)
-
+library(reshape2)
 unemployment <- read.table ("unemployment.dat", header=TRUE)
 year <- unemployment$year
 y <- unemployment$unemployed.pct
@@ -25,13 +25,12 @@ print(unemployment.sf1)
 
 ## Simulating replicated datasets
 
-beta.post <- extract(unemployment.sf1, "beta")$beta
-sigma.post <- extract(unemployment.sf1, "sigma")$sigma
-b.hat <- colMeans(beta.post)
-s.hat <- mean(sigma.post)
+lag.post <- extract(unemployment.sf1)
+b.hat <- colMeans(lag.post$beta)
+s.hat <- mean(lag.post$sigma)
 
-n.sims <- length(year)
-n <- length (year)
+n.sims <- length(year) + 1
+n <- 16
 y.rep <- array (NA, c(n.sims, n))
 for (s in 1:n.sims){
   y.rep[s,1] <- y[1]
@@ -41,51 +40,24 @@ for (s in 1:n.sims){
   }
 }
 
-## Including uncertainty in the estimated parameters (y_x.stan)
-## lm(y ~ y_lag)
-if (!file.exists("y_x.sm.RData")) {
-    rt <- stanc("y_x.stan", model_name="y_x")
-    y_x.sm <- stan_model(stanc_ret=rt)
-    save(y_x.sm, file="y_x.sm.RData")
-} else {
-    load("y_x.sm.RData", verbose=TRUE)
-}
-dataList.1 <- list(N=length(y), y=y, x=y_lag)
-y_x.sf1 <- sampling(grades.sm, dataList.1)
-print(y_x.sf1)
-lag.post <- extract(y_x.sf1)
-
+## Including uncertainty in the estimated parameters 
+n <- 15
 n.sims <- length(year)
+y.rep2 <- array (NA, c(n.sims, n))
 for (s in 1:n.sims){
-  y.rep2[s,1] <- y[1]
-  for (t in 2:n){
-    prediction <-  c (1, y.rep[s,t-1]) %*% lag.post$beta[s,]
+  for (t in 1:n){
+    prediction <-  c (1, y.rep[s+1,t]) %*% lag.post$beta[s,]
     y.rep2[s,t] <- rnorm (1, prediction, lag.post$sigma[s])
   }
 }
 
-## Plot of simulated unemployment rate series FIXME:won't compile. mismathc dimensions
+## Plot of simulated unemployment rate series
 
-for (s in 1:15){
-  frame2 = data.frame(year=year,y2=y.rep[s,])
-  m2 <- ggplot(frame2,aes(x=year,y=y2))
-  m2 + geom_point() + scale_y_continuous("Unemployment") + scale_x_continuous("Year") + theme_bw() + labs(title=paste("simulation #",s,sep=""))
-}
-
-unemployment15 <- data.frame(year=year, y1=y.rep)
-ss <- 1:15
-dev.new()
-p <- ggplot(data=unemployment15, aes(x=year, y=y1)) + scale_x_continuous(breaks=c(0,1), labels=c("0", "1")) + factor(ss, levels=ss[matrix(ss, nrow=3, byrow=FALSE)]) + facet_wrap(~y1, ncol = 5)
-print(p)
-
-
-
-
-
-
-
-
-
+y.new <- melt(y.rep2)
+y.new$Var2 <- factor(y.new$Var2, levels=c('1','2','3','4','5','6','7','8','9','10','11','12','13','14','15'), labels=c('Simulation #1','Simulation #2','Simulation #3','Simulation #4','Simulation #5','Simulation #6','Simulation #7','Simulation #8','Simulation #9','Simulation #10','Simulation #11','Simulation #12','Simulation #13','Simulation #14','Simulation #15'))
+frame2 = data.frame(y.new=y.new$value,year=year,Var2=y.new$Var2)
+m <- ggplot(frame2,aes(y=y.new,x=year)) + theme_bw() + geom_line() + facet_wrap( ~ Var2,ncol=5) + theme(axis.title.y = element_blank(),axis.title.x=element_blank())
+print(m)
 
 ## Numerical model check
 
