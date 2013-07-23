@@ -18,6 +18,7 @@ print(wells_interactions.sf1)
 
 beta.post <- extract(wells_interactions.sf1, "beta")$beta
 beta.mean <- colMeans(beta.post)
+
 ## Centering the input variables 
 c.dist100 <- dist100 - mean (dist100)
 c.arsenic <- arsenic - mean (arsenic)

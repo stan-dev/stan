@@ -1,6 +1,5 @@
 library(rstan)
 library(ggplot2)
-library(arm)
 source("kid_iq.data.R")    
 
 ## Fit the model (kid_iq_factor.stan)

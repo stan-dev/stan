@@ -15,19 +15,18 @@ if (!file.exists("lightspeed.sm.RData")) {
 dataList.1 <- list(N=N, y=y)
 lightspeed.sf1 <- sampling(lightspeed.sm, dataList.1)
 print(lightspeed.sf1)
+post <- extract(lightspeed.sf1)
 
 ## Create the replicated data 
 
-light <- lm (y ~ 1)
 n.sims <- 1000
-sim.light <- sim (light, n.sims)
 
 ## Create fake data 
 
 n <- length (y)
 y.rep <- array (NA, c(n.sims, n))
 for (s in 1:n.sims){
-  y.rep[s,] <- rnorm (n, coef(sim.light)[s], slot(sim.light,"sigma")[s])
+  y.rep[s,] <- rnorm (n, post$beta[s], post$sigma[s])
 }
 
 ## Histogram of replicated data (Figure 8.4)

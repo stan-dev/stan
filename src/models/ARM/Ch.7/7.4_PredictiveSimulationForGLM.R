@@ -1,6 +1,5 @@
 library(rstan)
 library(ggplot2)
-library(arm)
 source("wells.data.R")    
 
 ## Logistic regression (wells.stan)
@@ -27,31 +26,14 @@ m1 <- ggplot()
 m1 <- m1 + geom_point()
 m1 + theme_bw() + scale_y_continuous(expression(beta[1])) + scale_x_continuous(expression(beta[0])) 
 
- # Figure 7.6 (b)  FIXME LOOP IS BROKEN...
+ # Figure 7.6 (b)
 frame2 = data.frame(x1=dist,y1=switc)
-m2 <- ggplot(frame2,aes(x=x1,y=y1))
-m2 <- m2 + geom_point()
-m2 <- m2 + stat_function(fun=function(x){ 1.0 / (1 + exp(-fit1.post$beta[4000-1,1] - fit1.post$beta[4000-1,2] * x))},colour="grey")
-m2 <- m2 + stat_function(fun=function(x) 1.0 / (1 + exp(-fit1.post$beta[4000-2,1] - fit1.post$beta[4000-2,2] * x)),colour="grey")
-m2 <- m2 + stat_function(fun=function(x) 1.0 / (1 + exp(-fit1.post$beta[4000-3,1] - fit1.post$beta[4000-3,2] * x)),colour="grey")
-m2 <- m2 + stat_function(fun=function(x) 1.0 / (1 + exp(-fit1.post$beta[4000-4,1] - fit1.post$beta[4000-4,2] * x)),colour="grey")
-m2 <- m2 + stat_function(fun=function(x) 1.0 / (1 + exp(-fit1.post$beta[4000-5,1] - fit1.post$beta[4000-5,2] * x)),colour="grey")
-m2 <- m2 + stat_function(fun=function(x) 1.0 / (1 + exp(-fit1.post$beta[4000-6,1] - fit1.post$beta[4000-6,2] * x)),colour="grey")
-m2 <- m2 + stat_function(fun=function(x) 1.0 / (1 + exp(-fit1.post$beta[4000-7,1] - fit1.post$beta[4000-7,2] * x)),colour="grey")
-m2 <- m2 + stat_function(fun=function(x) 1.0 / (1 + exp(-fit1.post$beta[4000-8,1] - fit1.post$beta[4000-8,2] * x)),colour="grey")
-m2 <- m2 + stat_function(fun=function(x) 1.0 / (1 + exp(-fit1.post$beta[4000-9,1] - fit1.post$beta[4000-9,2] * x)),colour="grey")
-m2 <- m2 + stat_function(fun=function(x) 1.0 / (1 + exp(-fit1.post$beta[4000-10,1] - fit1.post$beta[4000-10,2] * x)),colour="grey")
-m2 <- m2 + stat_function(fun=function(x) 1.0 / (1 + exp(-fit1.post$beta[4000-11,1] - fit1.post$beta[4000-11,2] * x)),colour="grey")
-m2 <- m2 + stat_function(fun=function(x) 1.0 / (1 + exp(-fit1.post$beta[4000-12,1] - fit1.post$beta[4000-12,2] * x)),colour="grey")
-m2 <- m2 + stat_function(fun=function(x) 1.0 / (1 + exp(-fit1.post$beta[4000-13,1] - fit1.post$beta[4000-13,2] * x)),colour="grey")
-m2 <- m2 + stat_function(fun=function(x) 1.0 / (1 + exp(-fit1.post$beta[4000-14,1] - fit1.post$beta[4000-14,2] * x)),colour="grey")
-m2 <- m2 + stat_function(fun=function(x) 1.0 / (1 + exp(-fit1.post$beta[4000-15,1] - fit1.post$beta[4000-15,2] * x)),colour="grey")
-m2 <- m2 + stat_function(fun=function(x) 1.0 / (1 + exp(-fit1.post$beta[4000-16,1] - fit1.post$beta[4000-16,2] * x)),colour="grey")
-m2 <- m2 + stat_function(fun=function(x) 1.0 / (1 + exp(-fit1.post$beta[4000-17,1] - fit1.post$beta[4000-17,2] * x)),colour="grey")
-m2 <- m2 + stat_function(fun=function(x) 1.0 / (1 + exp(-fit1.post$beta[4000-18,1] - fit1.post$beta[4000-18,2] * x)),colour="grey")
-m2 <- m2 + stat_function(fun=function(x) 1.0 / (1 + exp(-fit1.post$beta[4000-19,1] - fit1.post$beta[4000-19,2] * x)),colour="grey")
-m2 <- m2 + stat_function(fun=function(x) 1.0 / (1 + exp(-fit1.post$beta[4000-20,1] - fit1.post$beta[4000-20,2] * x)),colour="grey")
-m2 + theme_bw() + scale_y_continuous("Pr(switching)") + scale_x_continuous("Distance (in meters) to the nearest safe well") + stat_function(fun=function(x) 1.0 / (1 + exp(-beta.mean[1] - beta.mean[2] * x)))
+m2 <- "ggplot(frame2,aes(x=x1,y=y1)) + geom_point()+ theme_bw() + scale_y_continuous('Pr(switching)') + scale_x_continuous('Distance (in meters) to the nearest safe well')"
+for (i in 1:20) {
+  m2 <- paste(m2,"+ stat_function(aes(y=0),fun=function(x) 1.0 / (1 + exp(-fit1.post$beta[4000-",i,",1]-fit1.post$beta[4000-",i,",2]*x)),colour='grey')")
+}
+m2 <- paste(m2, "+ stat_function(fun=function(x) 1.0 / (1 + exp(-beta.mean[1] - beta.mean[2] * x)))")
+eval(parse(text = m2))
 
 ## Predictive simulation using the binomial distribution
 

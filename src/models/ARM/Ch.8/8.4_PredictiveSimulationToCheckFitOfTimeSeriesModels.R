@@ -30,7 +30,8 @@ sigma.post <- extract(unemployment.sf1, "sigma")$sigma
 b.hat <- colMeans(beta.post)
 s.hat <- mean(sigma.post)
 
-n.sims <- 1000
+n.sims <- length(year)
+n <- length (year)
 y.rep <- array (NA, c(n.sims, n))
 for (s in 1:n.sims){
   y.rep[s,1] <- y[1]
@@ -40,25 +41,51 @@ for (s in 1:n.sims){
   }
 }
 
-## Including uncertainty in the estimated parameters
+## Including uncertainty in the estimated parameters (y_x.stan)
+## lm(y ~ y_lag)
+if (!file.exists("y_x.sm.RData")) {
+    rt <- stanc("y_x.stan", model_name="y_x")
+    y_x.sm <- stan_model(stanc_ret=rt)
+    save(y_x.sm, file="y_x.sm.RData")
+} else {
+    load("y_x.sm.RData", verbose=TRUE)
+}
+dataList.1 <- list(N=length(y), y=y, x=y_lag)
+y_x.sf1 <- sampling(grades.sm, dataList.1)
+print(y_x.sf1)
+lag.post <- extract(y_x.sf1)
 
-lm.lag <- lm (y ~ y_lag)
-lm.lag.sim <- sim (lm.lag, n.sims)       # simulations of beta and sigma
+n.sims <- length(year)
 for (s in 1:n.sims){
-  y.rep[s,1] <- y[1]
+  y.rep2[s,1] <- y[1]
   for (t in 2:n){
-    prediction <-  c (1, y.rep[s,t-1]) %*% lm.lag.sim@coef[s,]
-    y.rep[s,t] <- rnorm (1, prediction, lm.lag.sim@sigma[s])
+    prediction <-  c (1, y.rep[s,t-1]) %*% lag.post$beta[s,]
+    y.rep2[s,t] <- rnorm (1, prediction, lag.post$sigma[s])
   }
 }
 
 ## Plot of simulated unemployment rate series FIXME:won't compile. mismathc dimensions
 
 for (s in 1:15){
-  frame2 = data.frame(year=year,y=y.rep[s,])
-m2 <- ggplot(frame1,aes(x=year,y=y))
-m2 + geom_point() + scale_y_continuous("Unemployment") + scale_x_continuous("Year") + theme_bw() + labs(title=paste("simulation #",s,sep=""))
+  frame2 = data.frame(year=year,y2=y.rep[s,])
+  m2 <- ggplot(frame2,aes(x=year,y=y2))
+  m2 + geom_point() + scale_y_continuous("Unemployment") + scale_x_continuous("Year") + theme_bw() + labs(title=paste("simulation #",s,sep=""))
 }
+
+unemployment15 <- data.frame(year=year, y1=y.rep)
+ss <- 1:15
+dev.new()
+p <- ggplot(data=unemployment15, aes(x=year, y=y1)) + scale_x_continuous(breaks=c(0,1), labels=c("0", "1")) + factor(ss, levels=ss[matrix(ss, nrow=3, byrow=FALSE)]) + facet_wrap(~y1, ncol = 5)
+print(p)
+
+
+
+
+
+
+
+
+
 
 ## Numerical model check
 

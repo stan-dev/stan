@@ -10,3 +10,9 @@ parameters {
 model {
   kid_score ~ normal(beta[1] + beta[2] * mom_pred, sigma);
 }
+generated quantities {
+  real b1_twiddle;
+  real b2_twiddle;
+  b1_twiddle <- normal_rng(beta[1],sigma);
+  b2_twiddle <- normal_rng(beta[2],sigma);
+}

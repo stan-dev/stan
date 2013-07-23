@@ -1,6 +1,5 @@
 library(rstan)
 library(ggplot2)
-library(arm)
 source("mesquite.data.R")    
 # Data are at http://www.stat.columbia.edu/~gelman/arm/examples/mesquite
 

@@ -18,8 +18,8 @@ kid_iq_one_pred.sf2 <- sampling(kid_iq_one_pred.sm, dataList.2)
 print(kid_iq_one_pred.sf2)
 
 ## Regression line as a function of one input variable
-fit1.post <- extract(kid_iq_one_pred.sf2)
-beta.mean1 <- colMeans(fit1.post$beta)
+fit2.post <- extract(kid_iq_one_pred.sf2)
+beta.mean1 <- colMeans(fit2.post$beta)
 
 kid.iq.one.pred.1 = data.frame(mom_iq=mom_iq,kid_score=kid_score)
 m <- ggplot(kid.iq.one.pred.1,aes(x=mom_iq,y=kid_score))
@@ -85,7 +85,7 @@ frame1 = data.frame(ks=kid_score,miq=mom_iq)
 m <- ggplot(frame1,aes(x=miq,y=ks))
 m <- m + geom_point() + scale_y_continuous("Child Test Score") + scale_x_continuous("Mother IQ Score") + theme_bw()
 for (i in 1:10)
-  m <- m + geom_abline(intercept=fit2.post$beta[4000-i,1],slope=fit2.post$beta[4000-i,2],colour="grey",size=2)
+  m <- m + geom_abline(intercept=fit2.post$b1_twiddle[i],slope=fit2.post$b2_twiddle[i],colour="grey",size=2)
 m + geom_abline(intercept=beta.mean1[1],slope=beta.mean1[2],colour="red")
 
 ### Displaying using one plot for each input variable (Figure 3.11)

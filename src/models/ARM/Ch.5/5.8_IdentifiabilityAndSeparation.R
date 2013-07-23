@@ -2,7 +2,6 @@ library(rstan)
 library(ggplot2)
 
 ## Generating the variables
-
 x <- rnorm(60, mean =1, sd = 2)
 y <- ifelse(x<2,0,1)
 
