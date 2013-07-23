@@ -49,10 +49,12 @@ transformed parameters {
  
 model {
   int oldn; 
+  real m[N1];
   for (n in 1:N1) {
     oldn <- idxn1[n]; 
-    Yvec1[n] ~ normal(alpha[oldn] + beta[oldn] * (tvec1[n] - 6.5) + gamma * (y0[oldn] - y0_mean), sigma_y); 
+    m[n] <- alpha[oldn] + beta[oldn] * (tvec1[n] - 6.5) + gamma * (y0[oldn] - y0_mean); 
   }
+  Yvec1 ~ normal(m, sigma_y);
 
   alpha ~ normal(alpha0, sigma_alpha); 
   beta ~ normal(beta0, sigma_beta); 
