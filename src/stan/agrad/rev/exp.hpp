@@ -1,7 +1,7 @@
 #ifndef __STAN__AGRAD__REV__EXP_HPP__
 #define __STAN__AGRAD__REV__EXP_HPP__
 
-#include <valarray>
+#include <cmath>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/op/v_vari.hpp>
 

@@ -40,6 +40,7 @@
 #include <stan/math/matrix/log.hpp>
 #include <stan/math/matrix/log_determinant.hpp>
 #include <stan/math/matrix/log_determinant_spd.hpp>
+#include <stan/math/matrix/log_softmax.hpp>
 #include <stan/math/matrix/max.hpp>
 #include <stan/math/matrix/mdivide_left.hpp>
 #include <stan/math/matrix/mdivide_left_tri.hpp>

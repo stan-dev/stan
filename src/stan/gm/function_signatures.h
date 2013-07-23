@@ -321,6 +321,7 @@ add("log",MATRIX_T,MATRIX_T);
 add("log_determinant",DOUBLE_T,MATRIX_T);
 add_binary("log_falling_factorial");
 add_binary("log_rising_factorial");
+add("log_softmax",VECTOR_T,VECTOR_T);
 add("log_sum_exp",DOUBLE_T, expr_type(DOUBLE_T,1U));
 add_binary("log_sum_exp");
 add_nullary("log10");

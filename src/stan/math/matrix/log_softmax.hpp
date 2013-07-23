@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__MATRIX__SOFTMAX_HPP__
-#define __STAN__MATH__MATRIX__SOFTMAX_HPP__
+#ifndef __STAN__MATH__MATRIX__LOG_SOFTMAX_HPP__
+#define __STAN__MATH__MATRIX__LOG_SOFTMAX_HPP__
 
 #include <cmath>
 #include <stan/math/matrix/Eigen.hpp>
@@ -9,7 +9,7 @@ namespace stan {
   namespace math {
 
    /**
-     * Return the softmax of the specified vector.
+     * Return the natural logarithm of the softmax of the specified vector.
      *
      * @tparam T Scalar type of values in vector.
      * @param[in] v Vector to transform.
@@ -17,18 +17,18 @@ namespace stan {
      */
     template <typename T>
     inline Eigen::Matrix<T,Eigen::Dynamic,1>
-    softmax(const Eigen::Matrix<T,Eigen::Dynamic,1>& v) {
+    log_softmax(const Eigen::Matrix<T,Eigen::Dynamic,1>& v) {
       using std::exp;
+      using std::log;
       stan::math::validate_nonzero_size(v,"vector softmax");
       Eigen::Matrix<T,Eigen::Dynamic,1> theta(v.size());
       T sum(0.0);
       T max_v = v.maxCoeff();
-      for (int i = 0; i < v.size(); ++i) {
-        theta(i) = exp(v(i) - max_v); // extra work for (v[i] == max_v)
-        sum += theta(i);              // extra work vs. sum() w. auto-diff
-      }
       for (int i = 0; i < v.size(); ++i)
-        theta(i) /= sum;
+        sum += exp(v(i) - max_v); // log_sum_exp trick
+      T log_sum = log(sum);
+      for (int i = 0; i < v.size(); ++i)
+        theta(i) = (v(i) - max_v) - log_sum;
       return theta;
     }
 

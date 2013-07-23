@@ -29,5 +29,7 @@
 #include <stan/agrad/rev/matrix/crossprod.hpp>
 #include <stan/agrad/rev/matrix/assign_to_var.hpp>
 #include <stan/agrad/rev/matrix/assign.hpp>
+#include <stan/agrad/rev/matrix/softmax.hpp>
+#include <stan/agrad/rev/matrix/log_softmax.hpp>
 
 #endif
