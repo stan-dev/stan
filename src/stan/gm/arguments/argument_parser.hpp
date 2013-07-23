@@ -158,7 +158,7 @@ namespace stan {
           << " ... <arg_n> <subarg_n_1> ... <subarg_n_m>"
           << std::endl << std::endl;
         
-        *s << "Begin by selection amongst the following inference methods"
+        *s << "Begin by selecting amongst the following inference methods"
            << " and diagnostics," << std::endl;
 
         std::vector<argument*>::iterator arg_it = _arguments.begin();
