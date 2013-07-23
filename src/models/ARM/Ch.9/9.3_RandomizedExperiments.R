@@ -134,11 +134,14 @@ par (mfrow=c(1,1))
   \ncontrolling for pre-test")
 
 ## Controlling for pre-treatment predictors (Figure 9.6)
+electric <- read.table ("electric.dat", header=T)
+attach(electric)
+pushViewport(viewport(layout = grid.layout(1, 4)))
 for (j in 1:4){
-  ok <- Grade==j
+  ok <- electric$Grade==j & !is.na(treated.Posttest+treated.Pretest+control.Pretest+control.Posttest)
   pret <- c (treated.Pretest[ok], control.Pretest[ok])
   postt <-c (treated.Posttest[ok], control.Posttest[ok])
-  t <- rep (c(1,0), rep(sum(ok),2))
+  t <- rep (c(1,0),rep(sum(ok),2))
   dataList.1 <- list(N=length(pret), post_test=postt, pre_test=pret,treatment=t)
   electric_multi_preds.sf <- sampling(electric_multi_preds.sm, dataList.1)
   beta.post <- extract(electric_multi_preds.sf, "beta")$beta
@@ -151,10 +154,6 @@ for (j in 1:4){
   mm <- mm + geom_point(data=frame2,aes(x=x2,y=y2),shape=21)
   mm <- mm + scale_y_continuous("Posttest",limits=c(0,125)) + scale_x_continuous("Pretest",limits=c(0,125)) + theme_bw() + labs(title=paste("Grade ",j))
   mm <- mm + geom_abline(intercept=(beta.mean[1]+beta.mean[2]),slope=beta.mean[3])
-  paste("mm",j) <- mm + geom_abline(intercept=(beta.mean[1]),slope=beta.mean[3],linetype="dashed")
+  mm <- mm + geom_abline(intercept=(beta.mean[1]),slope=beta.mean[3],linetype="dashed")
+  print(mm, vp = viewport(layout.pos.row = 1, layout.pos.col = j))
 }
-pushViewport(viewport(layout = grid.layout(1, 4)))
-print(m[1], vp = viewport(layout.pos.row = 1, layout.pos.col = 1))
-print(m[2], vp = viewport(layout.pos.row = 1, layout.pos.col = 2))
-print(m[3], vp = viewport(layout.pos.row = 1, layout.pos.col = 3))
-print(m[4], vp = viewport(layout.pos.row = 1, layout.pos.col = 4))

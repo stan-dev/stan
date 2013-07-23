@@ -1,5 +1,6 @@
 library(rstan)
 library(ggplot2)
+library(gridBase)
 source("9.3_RandomizedExperiments.R") # where data was cleaned
 ##FIXME CHECK THAT THSE WORK
 ## Treatment interactions and poststratification
@@ -14,7 +15,7 @@ if (!file.exists("electric_one_pred.sm.RData")) {
     load("electric_one_pred.sm.RData", verbose=TRUE)
 }
 
-pt <- post_test(grade==4)
+pt <- post.test(grade==4)
 tr <- treatment(grade==4)
 dataList.1 <- list(N=length(pt), post_test=pt, treatment=tr)
 electric_one_pred.sf1 <- sampling(electric_one_pred.sm, dataList.1)
@@ -29,9 +30,9 @@ if (!file.exists("electric_multi_preds.sm.RData")) {
 } else {
     load("electric_multi_preds.sm.RData", verbose=TRUE)
 }
-pt <- post_test(grade==4)
-tr <- treatment(grade==4)
-pr <- pre_test(grade==4)
+pt <- post.test[grade==4]
+tr <- treatment[grade==4]
+pr <- pre.test[grade==4]
 dataList.2 <- list(N=length(pt), post_test=pt, treatment=tr,pre_test=pr)
 electric_multi_preds.sf1 <- sampling(electric_multi_preds.sm, dataList.2)
 print(electric_multi_preds.sf1)
@@ -45,13 +46,16 @@ if (!file.exists("electric_interactions.sm.RData")) {
     load("electric_interactions.sm.RData", verbose=TRUE)
 }
 
+electric <- read.table ("electric.dat", header=T)
+attach(electric)
+pushViewport(viewport(layout = grid.layout(1, 4)))
 for (j in 1:4){
-  ok <- Grade==j
+  ok <- electric$Grade==j & !is.na(treated.Posttest+treated.Pretest+control.Pretest+control.Posttest)
   pret <- c (treated.Pretest[ok], control.Pretest[ok])
   postt <-c (treated.Posttest[ok], control.Posttest[ok])
-  t <- rep (c(1,0), rep(sum(ok),2))
+  t <- rep (c(1,0),rep(sum(ok),2))
   dataList.1 <- list(N=length(pret), post_test=postt, pre_test=pret,treatment=t)
-  electric_interactions.sf <- sampling(electric_interactions.sm, dataList.1)
+ electric_interactions.sf <- sampling(electric_interactions.sm, dataList.1)
   beta.post <- extract(electric_interactions.sf, "beta")$beta
   beta.mean <- colMeans(beta.post)
 
@@ -63,8 +67,10 @@ for (j in 1:4){
   m3 <- m3 + scale_y_continuous("Posttest",limits=c(0,125)) + scale_x_continuous("Pretest",limits=c(0,125)) + theme_bw() + labs(title=paste("Grade ",j))
   m3 <- m3 + geom_abline(intercept=(beta.mean[1]+beta.mean[2]),slope=beta.mean[3]+beta.mean[4])
   m3 <- m3 + geom_abline(intercept=(beta.mean[1]),slope=beta.mean[3],linetype="dashed")
-  print(m3)
+  print(m3, vp = viewport(layout.pos.row = 1, layout.pos.col = j))
 }
+
+
 
 ## model to display uncertainty & Figure 9.8
 electric_interactions.sf <- sampling(electric_interactions.sm, dataList.2)
