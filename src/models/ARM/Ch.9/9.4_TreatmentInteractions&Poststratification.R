@@ -2,7 +2,6 @@ library(rstan)
 library(ggplot2)
 library(gridBase)
 source("9.3_RandomizedExperiments.R") # where data was cleaned
-##FIXME CHECK THAT THSE WORK
 ## Treatment interactions and poststratification
 
  # model with only treat. indicator (electric_one_pred.stan)
@@ -73,22 +72,21 @@ for (j in 1:4){
 ## model to display uncertainty & Figure 9.8
 electric_interactions.sf <- sampling(electric_interactions.sm, dataList.2)
 print(electric_interactions.sf)
-beta.post <- extract(electric_interactions.sf, "beta")$beta
-beta.mean4 <- colMeans(beta.post)
+fit4.post <- extract(electric_interactions.sf)
+beta.mean4 <- colMeans(fit4.post$beta)
 
- lm.4 <- lm (post.test ~ tr + pr + tr:pr) #grade==4
- lm.4.sim <- sim (lm.4)
 m <- ggplot()
-m <- m + geom_point() + scale_y_continuous("Treatment Effect") + scale_x_continuous("Pre-Test") + theme_bw() + labs(title="Treatment Effect in Grade 4")
-for (i in 1:10)
-  m <- m + geom_abline(intercept=coef(lm.4.sim)[i,2],slope=coef(lm.4.sim)[i,4],colour="grey",size=2)
+m <- m + geom_point() + scale_y_continuous("Treatment Effect",limits=c(-5,10)) + scale_x_continuous("Pre-Test",limits=c(78.4,119.8)) + theme_bw() + labs(title="Treatment Effect in Grade 4")
+for (i in 1:20) {
+  m <- m + geom_abline(intercept=fit4.post$beta[4000-i,2],slope=fit4.post$beta[4000-i,4],colour="grey")
+}
 m + geom_abline(intercept=beta.mean4[2],slope=beta.mean4[4]) + geom_hline(yintercept=0,linetype="dashed")
 
  # compute the average treatment effect & summarize
-n.sims <- nrow(lm.4.sim$coef)
+n.sims <- nrow(fit4.post$beta)
 effect <- array (NA, c(n.sims, sum(grade==4)))
 for (i in 1:n.sims){
-  effect[i,] <- lm.4.sim@coef[i,2] + lm.4.sim@coef[i,4]*pre.test[grade==4]
+  effect[i,] <- fit4.post$beta[i,2] + fit4.post$beta[i,4]*pre.test[grade==4]
 }
 avg.effect <- rowMeans (effect)
 
