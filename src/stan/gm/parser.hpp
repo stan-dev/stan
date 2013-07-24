@@ -62,6 +62,7 @@ namespace stan {
     inline bool parse(std::ostream* output_stream,
                       std::istream& input, 
                       const std::string& filename, 
+                      const std::string& model_name,
                       program& result) {
       namespace classic = boost::spirit::classic;
 
@@ -88,7 +89,7 @@ namespace stan {
       pos_iterator_type position_begin(fwd_begin, fwd_end, filename);
       pos_iterator_type position_end;
       
-      program_grammar<pos_iterator_type> prog_grammar;
+      program_grammar<pos_iterator_type> prog_grammar(model_name);
       whitespace_grammar<pos_iterator_type> whitesp_grammar;
       
       bool parse_succeeded = false;
