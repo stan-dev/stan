@@ -38,9 +38,10 @@ model {
     tau[j] ~ gamma(.001, .001); 
   }
   for (k in 1:K) {
-    for (j in 1:3)
-      theta[k, j] ~ normal(mu[j], sigma[j]);
+    real m[N];
+    theta[k] ~ normal(mu, sigma);
     for (n in 1:N)
-      Y[k, n] ~ normal(phi[k,1] / (1 + phi[k,2] * exp(phi[k,3] * x[n])), sigma_C);
+      m[n] <- phi[k,1] / (1 + phi[k,2] * exp(phi[k,3] * x[n]));
+    Y[k] ~ normal(m, sigma_C);
   }
 }

@@ -1033,9 +1033,24 @@ Examples of legal variable identifiers are as follows.
 Unlike in \R and \BUGS, variable identifiers in \Stan may not contain
 a period character.  
 
+\subsection{Reserved Names}
+
+\subsubsection{Model Name}
+
+The name of the model cannot be used as a variable within the model.
+This is usually not a problem because the default in \code{bin/stanc}
+is to append \code{\_model} to the name of the file containing the
+model specification.  For example, if the model is in file
+\code{foo.stan}, it would not be legal to have a variable named
+\code{foo\_model} when using the default model name through
+\code{bin/stanc}.  With user-specified model names, variables cannot
+match the model.
+
+\subsubsection{Reserved Words from Stan Language}
+
 The following list contains reserved words for \Stan's programming
-language.  Not all of these features are implemented, but the tokens
-are reserved for future use.
+language.  Not all of these features are implemented in Stan yet, but
+the tokens are reserved for future use.
 %
 \begin{quote}
 \code{for},
@@ -1082,11 +1097,20 @@ nor will they conflict with the names of predefined functions or
 distributions.  Nevertheless, these names should be avoided for the
 sake of program clarity.
 
+\subsubsection{Reserved Names from Stan Implementation}
+
 Some variable names are reserved because they are used within
 Stan's \Cpp implementation.  These are
+%
 \begin{quote}
-var.
+var
+fvar
 \end{quote}.
+%
+Most variables used in the implementation are suffixed with
+\code{\_\_}, so there is little chance of conflict.
+
+\subsubsection{Reserved Names from C++}
 
 Finally, variable names, including the names of models, should not
 conflict with any of the C++ keywords.

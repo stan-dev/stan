@@ -32,7 +32,7 @@
 #include <stan/math/rep_row_vector.hpp>
 #include <stan/math/rep_matrix.hpp>
 
-#include <stan/model/prob_grad_ad.hpp>
+#include <stan/model/prob_grad.hpp>
 #include <stan/prob/distributions.hpp>
 
 #endif

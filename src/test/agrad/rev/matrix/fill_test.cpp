@@ -1,9 +1,9 @@
-#include <stan/agrad/rev/matrix/fill.hpp>
+#include <stan/math/matrix/fill.hpp>
 #include <gtest/gtest.h>
 #include <test/agrad/util.hpp>
 
 TEST(AgradRevMatrix, fill) {
-  using stan::agrad::fill;
+  using stan::math::fill;
   using std::vector;
   using Eigen::Matrix;
   using Eigen::Dynamic;
@@ -45,7 +45,7 @@ TEST(AgradRevMatrix, fill) {
 TEST(AgradRevMatrix, fillDouble) {
   using Eigen::Matrix;
   using Eigen::Dynamic;
-  using stan::agrad::fill;
+  using stan::math::fill;
   Matrix<double,Dynamic,1> y(3);
   fill(y,3.0);
   EXPECT_EQ(3,y.size());

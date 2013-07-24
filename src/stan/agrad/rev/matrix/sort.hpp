@@ -4,6 +4,8 @@
 #include <valarray>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/op/v_vari.hpp>
+#include <stan/agrad/rev/operator_greater_than.hpp>
+#include <stan/agrad/rev/operator_less_than.hpp>
 #include <vector>
 #include <stan/math/matrix/Eigen.hpp>
 #include <algorithm>    // std::sort
