@@ -93,7 +93,11 @@ for (size_t i = 0; i < int_vector_types.size(); ++i)
   for (size_t j = 0; j < int_vector_types.size(); ++j)
     for (size_t k = 0; k < vector_types.size(); ++k)
       add("binomial_logit_log",DOUBLE_T,int_vector_types[i],int_vector_types[j],vector_types[k]);
-add("categorical_log",DOUBLE_T,INT_T,VECTOR_T);
+for (size_t i = 0; i < int_vector_types.size(); ++i) {
+  add("categorical_log",DOUBLE_T, int_vector_types[i],VECTOR_T);
+  add("categorical_log_log",DOUBLE_T, int_vector_types[i],VECTOR_T);
+  add("categorical_logit_log",DOUBLE_T, int_vector_types[i],VECTOR_T);
+}
 add("categorical_rng",INT_T,VECTOR_T);
 for (size_t i = 0; i < vector_types.size(); ++i)
   for (size_t j = 0; j < vector_types.size(); ++j)

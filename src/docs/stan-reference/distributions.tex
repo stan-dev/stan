@@ -286,21 +286,59 @@ then for $n \in \setlist{\max(0,N-b),\ldots,\min(a,N)}$,
 
 \section{Categorical Distribution}
 
-\subsubsection{Probability Mass Function}
+\subsubsection{Probability Mass Functions}
 
-If $N \in \nats$ and $\theta \in \mbox{$N$-simplex}$, then for $y \in
+If $N \in \nats$, $N > 0$, and $\theta \in \mbox{$N$-simplex}$, then for $y \in
 \setlist{1,\ldots,N}$, 
+%
 \[
-\distro{Categorical}(y|\theta) = \theta_n.
+\distro{Categorical}(y|\theta) = \theta_y.
+\]
+%
+In addition, Stan provides a log-odds scaled categorical distribution, 
+%
+\[
+\distro{CategoricalLogit}(y|\beta)
+= \distro{Categorical}(y|\mbox{softmax}(\beta)).
+\]
+%
+See \refsection{softmax} for the definition of the softmax function.
+
+Stan also provides a categorical distribution taking an unnormalized
+probability vector on the log scale,  parameter
+\distro{CategoricalLog}, defined by
+%
+\[
+\distro{CategoricalLog}(y|\alpha) = \exp(\alpha_y).
 \]
 
 
 \subsubsection{Stan Functions}
 
+All of the categorical distributions are vectorized so that the
+outcome \farg{y} can be a single integer (type \code{int}) or an array
+of integers (type \code{int[]}).
+
 \begin{description}
-\fitem{real}{categorical\_log}{int \farg{y}, vector \farg{theta}}{The
-  log categorical probability mass function with outcome \farg{y} in 
-$1:N$ given $N$-simplex distribution parameter \farg{theta}}
+\fitem{real}{categorical\_log}{ints \farg{y}, vector \farg{theta}}{The
+  log categorical probability mass function with outcome(s) \farg{y} in 
+$1:N$ given $N$-simplex distribution parameter \farg{theta}.}
+%
+\fitem{real}{categorical\_logit\_log}{ints \farg{y}, vector
+  \farg{beta}}{The log categorical probability mass function with
+  outcome(s) \farg{y} in $1:N$ given log-odds of outcomes \farg{beta}.}
+%
+\fitem{real}{categorical\_log\_log}{ints \farg{y}, vector
+  \farg{alpha}}{The log categorical probability mass function with
+  outcome(s) \farg{y} in $1:N$ given unnormalized, log-scale $N$-simplex
+  distribution parameter \farg{alpha}; if \farg{y} is between 1 and
+  the size of \farg{alpha} (inclusive), then
+  \begin{quote}
+  \code{categorical\_log\_log(\farg{y},\farg{alpha}) =
+    \farg{alpha}[y]}.  
+  \end{quote}
+  No check is made that exponentiating
+  \code{alpha} forms a simplex.}
 \end{description}
 %
 \begin{description}

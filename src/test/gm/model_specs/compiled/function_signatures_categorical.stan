@@ -15,8 +15,10 @@ transformed data {
   vector[d_int] transformed_data_vector;
   row_vector[d_int] transformed_data_row_vector;
 
+
   //*** Discrete Probabilities ***
   transformed_data_real <- categorical_log(d_int, d_vector);
+  transformed_data_real <- categorical_log(d_int_array, d_vector);
 }
 parameters {
   real p_real;
@@ -35,6 +37,9 @@ transformed parameters {
   //*** Discrete Probabilities ***
   transformed_param_real <- categorical_log(d_int, d_vector);
   transformed_param_real <- categorical_log(d_int, p_vector);
+
+  transformed_param_real <- categorical_log(d_int_array, d_vector);
+  transformed_param_real <- categorical_log(d_int_array, p_vector);
 }
 model {  
 }
