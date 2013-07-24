@@ -605,7 +605,9 @@ namespace stan {
     }
 
     void print_var_origin(std::ostream& o, const var_origin& vo) {
-      if (vo == data_origin)
+      if (vo == model_name_origin)
+        o << "model name";
+      else if (vo == data_origin)
         o << "data";
       else if (vo == transformed_data_origin)
         o << "transformed data";
