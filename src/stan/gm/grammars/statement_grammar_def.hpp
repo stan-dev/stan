@@ -384,6 +384,7 @@ namespace stan {
       using boost::spirit::qi::eps;
       using boost::spirit::qi::lexeme;
       using boost::spirit::qi::lit;
+      using boost::spirit::qi::no_skip;
       using boost::spirit::qi::_pass;
       using boost::spirit::qi::_val;
 
@@ -469,7 +470,7 @@ namespace stan {
       printable_string_r.name("printable quoted string");
       printable_string_r
         %= lit('"')
-        > lexeme[*char_("a-zA-Z0-9/~!@#$%^&*()`_+-={}|[]:;'<>?,./ ")]
+        > no_skip[*char_("a-zA-Z0-9/~!@#$%^&*()`_+-={}|[]:;'<>?,./ ")]
         > lit('"');
       
       identifier_r.name("identifier");

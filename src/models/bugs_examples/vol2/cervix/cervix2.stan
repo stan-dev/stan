@@ -34,7 +34,7 @@ parameters {
 model {
   for (n in 1:Nc) {
     xc[n] ~ bernoulli(q); 
-    dc[n] ~ bernoulli(inv_logit(beta0C + beta * xc[n])); 
+    dc[n] ~ bernoulli_logit(beta0C + beta * xc[n]); 
     wc[n] ~ bernoulli(phi[xc[n] + 1, dc[n] + 1]); 
   } 
   for (n in 1:Ni) {

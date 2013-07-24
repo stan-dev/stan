@@ -1,12 +1,13 @@
 #ifndef __STAN__AGRAD__FWD__ROUND__HPP__
 #define __STAN__AGRAD__FWD__ROUND__HPP__
 
+#include <boost/math/special_functions/round.hpp>
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/meta/traits.hpp>
 
-namespace stan{
+namespace stan {
 
-  namespace agrad{
+  namespace agrad {
 
     template <typename T>
     inline
@@ -15,6 +16,7 @@ namespace stan{
       using boost::math::round;
         return fvar<T>(round(x.val_), 0);
     }
+
   }
 }
 #endif
