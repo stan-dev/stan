@@ -35,7 +35,6 @@ model {
   for(j in 1:NT) {
     dL0[j] ~ gamma(r * (t[j + 1] - t[j]) * c, c);
     for(i in 1:N) {
-      // lp__ <- lp__ + if_else(Y[i, j], poisson_log(dN[i, j], Y[i, j] * exp(beta * Z[i]) * dL0[j]), 0); 
       if (Y[i, j] != 0)  lp__ <- lp__ + poisson_log(dN[i, j], Y[i, j] * exp(beta * Z[i]) * dL0[j]); 
     }     
   }
