@@ -27,22 +27,16 @@ transformed parameters {
 } 
 
 model { 
+  real lpa[N];
   for (i in 1:N) {  
-     real tmp; 
-     tmp <- sqrt(2 * pi()) * alpha * sigma * Phi(alpha * sigma) * exp(0.5 * pow(alpha * sigma, 2));
-     //  ## theta > x[i] 
-     //  lp__ <- lp__ + step(theta - x[i]) * (log(r) - log(Phi(alpha * sigma)) + lognormal_log(x[i], mu, sigma));
-
-     //  ## theta < x[i] 
-     //  lp__ <- lp__ + step(x[i] - theta) * (log(1 - r) + pareto_log(x[i], theta, alpha)); 
-
-     // log(r) = log(tmp) - log(1 + tmp), if r = tmp / (1 + tmp) 
-     lp__ <- lp__ + if_else(int_step(theta - x[i]), 
-                            # log(tmp) - log1p(tmp) - log(Phi(alpha * sigma)) + lognormal_log(x[i], mu, sigma), 
-                            log(tmp) - log(1 + tmp) - log(Phi(alpha * sigma)) + lognormal_log(x[i], mu, sigma), 
-                            -log(1 + tmp) + pareto_log(x[i], theta, alpha)); 
-
+    real tmp; 
+    tmp <- sqrt(2 * pi()) * alpha * sigma * Phi(alpha * sigma) * exp(0.5 * pow(alpha * sigma, 2));
+    if (theta > x[i]) 
+      lpa[i] <- log(tmp) - log1p(tmp) - log(Phi(alpha * sigma)) + lognormal_log(x[i], mu, sigma); 
+    else 
+      lpa[i] <- -log1p(tmp) + pareto_log(x[i], theta, alpha); 
   } 
+  lp__ <- lp__ + sum(lpa);
 
   theta ~ gamma(.001, .001);   
   alpha ~ gamma(.001, .001); 

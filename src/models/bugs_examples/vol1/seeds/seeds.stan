@@ -4,16 +4,21 @@ data {
     int<lower=0> I;
     int<lower=0> n[I];
     int<lower=0> N[I];
-    real x1[I];
-    real x2[I];
+    vector[I] x1; 
+    vector[I] x2; 
 }
+
+transformed data {
+    vector[I] x1x2;
+    x1x2 <- x1 .* x2;
+} 
 parameters {
     real alpha0;
     real alpha1;
     real alpha12;
     real alpha2;
     real<lower=0> tau;
-    real b[I];
+    vector[I] b;
 }
 transformed parameters {
     real<lower=0> sigma;
@@ -27,12 +32,5 @@ model {
    tau ~ gamma(1.0E-3,1.0E-3);
 
    b ~ normal(0.0, sigma);
-
-   for (i in 1:I) {
-      n[i] ~ binomial(N[i], inv_logit(alpha0 
-                                      + alpha1 * x1[i] 
-                                      + alpha2 * x2[i]
-                                      + alpha12 * x1[i] * x2[i] 
-                                      + b[i]) );
-   }
+   n ~ binomial_logit(N, alpha0 + alpha1 * x1 + alpha2 * x2 + alpha12 * x1x2 + b);
 }

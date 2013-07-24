@@ -1,3 +1,4 @@
+#include <stan/math/matrix/assign.hpp>
 #include <stan/math/matrix/multiply.hpp>
 #include <stan/math/matrix/typedefs.hpp>
 #include <gtest/gtest.h>
@@ -110,10 +111,9 @@ TEST(MathMatrix, multiply) {
 }
 
 
-#include <stan/agrad/rev/matrix/assign.hpp>
 TEST(AgradRevMatrix,multiply_int) {
   using stan::math::multiply;
-  using stan::agrad::assign;
+  using stan::math::assign;
 
   typedef Eigen::Matrix<double,Eigen::Dynamic,1> vector_d;
   
@@ -128,7 +128,6 @@ TEST(AgradRevMatrix,multiply_int) {
 TEST(AgradRevMatrix,multiply_vector_int) {
   using stan::math::multiply;
   using stan::math::vector_d;
-  using stan::agrad::vector_v;
 
   vector_d dvec(3);
   dvec << 1, 2, 3;

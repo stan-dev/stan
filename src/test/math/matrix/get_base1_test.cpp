@@ -1,6 +1,14 @@
 #include <stan/math/matrix/get_base1.hpp>
 #include <gtest/gtest.h>
 
+TEST(MathMatrix,failing_pre_20) {
+  using Eigen::Matrix;
+  using Eigen::Dynamic;
+  using stan::math::get_base1;
+  Matrix<double,Dynamic,1> y(3);
+  y << 1, 2, 3;
+  double z = get_base1(y,1,"y",1);
+}
 TEST(MathMatrix,get_base1_vec1) {
   using stan::math::get_base1;
   std::vector<double> x(2);
@@ -9,8 +17,9 @@ TEST(MathMatrix,get_base1_vec1) {
   EXPECT_FLOAT_EQ(10.0,get_base1(x,1,"x[1]",0));
   EXPECT_FLOAT_EQ(20.0,get_base1(x,2,"x[1]",0));
   
-  get_base1(x,2,"x[2]",0) = 5.0;
-  EXPECT_FLOAT_EQ(5.0,get_base1(x,2,"x[1]",0));
+  // no assign in get_base1
+  // get_base1(x,2,"x[2]",0) = 5.0;
+  // EXPECT_FLOAT_EQ(5.0,get_base1(x,2,"x[1]",0));
 
   EXPECT_THROW(get_base1(x,0,"x[0]",0),
                std::out_of_range);
@@ -39,8 +48,9 @@ TEST(MathMatrix,get_base1_vec2) {
     }
   }
 
-  get_base1(get_base1(x,1,"",-1),2,"",-1) = 112.5;
-  EXPECT_FLOAT_EQ(112.5, x[0][1]);
+  // no LHS usage in get_base1
+  // get_base1(get_base1(x,1,"",-1),2,"",-1) = 112.5;
+  // EXPECT_FLOAT_EQ(112.5, x[0][1]);
 
   EXPECT_THROW(get_base1(x,0,"",-1),std::out_of_range);
   EXPECT_THROW(get_base1(x,M+1,"",-1),std::out_of_range);
@@ -67,10 +77,6 @@ TEST(MathMatrix,get_base1_matrix) {
         = get_base1<double>(x,i+1,"x",1);
       EXPECT_FLOAT_EQ(x(i,j),xi[j]);
       EXPECT_FLOAT_EQ(x(i,j),get_base1(xi,j+1,"xi",2));
-      // this is no good because can't get ref to inside val
-      // could remedy by adding const versions, but don't need for Stan GM
-      // double xij = get_base1<double>(get_base1<double>(x,i+1,"x",1),
-      //                                j+1,"xi",2);
     }
   }
   EXPECT_THROW(get_base1(x,10,"x",1), std::out_of_range);

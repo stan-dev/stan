@@ -22,6 +22,8 @@
 #include <stan/mcmc/hmc/nuts/adapt_diag_e_nuts.hpp>
 #include <stan/mcmc/hmc/nuts/adapt_dense_e_nuts.hpp>
 
+#include <stan/model/util.hpp>
+
 #include <stan/optimization/newton.hpp>
 #include <stan/optimization/nesterov_gradient.hpp>
 #include <stan/optimization/bfgs.hpp>
@@ -253,7 +255,7 @@ namespace stan {
         init_s = sampler.transition(init_s);
           
         if ( save && ( (m % num_thin) == 0) ) {
-          writer.print_sample_params(init_s, sampler, model);
+          writer.print_sample_params(base_rng, init_s, sampler, model);
           writer.print_diagnostic_params(init_s, sampler);
         }
 
@@ -442,9 +444,13 @@ namespace stan {
           std::vector<double> init_grad;
           
           try {
-            init_log_prob = model.grad_log_prob(cont_params, disc_params, init_grad, &std::cout);
+            init_log_prob 
+              = stan::model::log_prob_grad<true,true>(model,
+                                                      cont_params, 
+                                                      disc_params, init_grad,
+                                                      &std::cout);
           } catch (std::domain_error e) {
-            std::cout << "Rejecting inititialization at zero because of grad_log_prob failure." << std::endl;
+            std::cout << "Rejecting inititialization at zero because of log_prob_grad failure." << std::endl;
             return 0;
           }
           
@@ -484,9 +490,12 @@ namespace stan {
           std::vector<double> init_grad;
           
           try {
-            init_log_prob = model.grad_log_prob(cont_params, disc_params, init_grad, &std::cout);
+            init_log_prob 
+              = stan::model::log_prob_grad<true,true>(model,cont_params, 
+                                                      disc_params, init_grad, 
+                                                      &std::cout);
           } catch (std::domain_error e) {
-            std::cout << "Rejecting user-specified inititialization because of grad_log_prob failure." << std::endl;
+            std::cout << "Rejecting user-specified inititialization because of log_prob_grad failure." << std::endl;
             return 0;
           }
           
@@ -528,7 +537,10 @@ namespace stan {
           // FIXME: allow config vs. std::cout
           double init_log_prob;
           try {
-            init_log_prob = model.grad_log_prob(cont_params, disc_params, init_grad, &std::cout);
+            init_log_prob 
+              = stan::model::log_prob_grad<true,true>(model, cont_params, 
+                                                      disc_params, init_grad, 
+                                                      &std::cout);
           } catch (std::domain_error e) {
             write_error_msg(&std::cout, e);
             std::cout << "Rejecting proposed initial value with zero density." << std::endl;
@@ -557,8 +569,8 @@ namespace stan {
       }
       
       if (command.has_flag("test_grad")) {
-        std::cout << std::endl << "TEST GRADIENT MODE" << std::endl;
-        return model.test_gradients(cont_params, disc_params);
+        std::cout << std::endl << "TEST GRADIENT MODE (+propto)" << std::endl;
+        return stan::model::test_gradients<true,true>(model,cont_params, disc_params);
       }
       
       //////////////////////////////////////////////////
@@ -608,7 +620,8 @@ namespace stan {
         std::vector<double> gradient;
         double lp;
         try {
-          lp = model.grad_log_prob(cont_params, disc_params, gradient);
+          lp = stan::model::log_prob_grad<true,true>(model,cont_params, 
+                                                     disc_params, gradient);
         } catch (std::domain_error e) {
           write_error_msg(&std::cout, e);
           lp = -std::numeric_limits<double>::infinity();
@@ -684,8 +697,8 @@ namespace stan {
         sample_stream << "lp__,";
         model.write_csv_header(sample_stream);
 
-        stan::optimization::NesterovGradient ng(model, cont_params, disc_params,
-                                                epsilon, &std::cout);
+        stan::optimization::NesterovGradient<Model> ng(model, cont_params, disc_params,
+                                                       epsilon, &std::cout);
 
         double lp = ng.logp();
         
@@ -763,8 +776,8 @@ namespace stan {
         sample_stream << "lp__,"; // log probability first
         model.write_csv_header(sample_stream);
         
-        stan::optimization::BFGSLineSearch ng(model, cont_params, disc_params,
-                                              &std::cout);
+        stan::optimization::BFGSLineSearch<Model> ng(model, cont_params, disc_params,
+                                                     &std::cout);
         if (epsilon > 0)
           ng._opts.alpha0 = epsilon;
         

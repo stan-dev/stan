@@ -1,6 +1,6 @@
-doses <-
+Ndoses <-
 6
-plates <-
+Nplates <-
 3
 y <-
 structure(c(15, 16, 16, 27, 33, 20, 21, 18, 26, 41, 38, 27, 29, 
