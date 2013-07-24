@@ -2,7 +2,7 @@ library(rstan)
 library(ggplot2)
 source("wells.data.R")    
 
-## Probit or logit (wells_logit.stan)
+## Probit or logit (wells_probit.stan)
 ## glm (switch ~ dist100, family=binomial(link="probit"))
 if (!file.exists("wells_probit.sm.RData")) {
     rt <- stanc("wells_probit.stan", model_name="wells_probit")

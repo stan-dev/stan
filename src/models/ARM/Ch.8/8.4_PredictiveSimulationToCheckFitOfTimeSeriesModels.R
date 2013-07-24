@@ -11,6 +11,7 @@ m2 <- ggplot(frame1,aes(x=year,y=y))
 m2 + geom_point() + scale_y_continuous("Unemployment") + scale_x_continuous("Year") + theme_bw()
 
 ## Fitting a 1st-order autogregression
+## lm(y ~ y_lag)
 if (!file.exists("unemployment.sm.RData")) {
     rt <- stanc("unemployment.stan", model_name="unemployment")
     unemployment.sm <- stan_model(stanc_ret=rt)
