@@ -81,7 +81,7 @@ namespace stan {
                   << " / " << finish;
           
         std::cout << " [" << std::setw(3) 
-                  << static_cast<int>( (100.0 * (m + 1 + start)) / finish )
+                  << static_cast<int>( (100.0 * (m + start)) / finish )
                   << "%] ";
         std::cout << (warmup ? " (Warmup)" : " (Sampling)");
         std::cout << std::endl;
