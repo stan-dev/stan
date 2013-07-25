@@ -350,7 +350,7 @@ namespace stan {
       
       try {
         
-        double R = boost::lexical_cast<double>(init);
+        double R = std::fabs(boost::lexical_cast<double>(init));
         
         if (R == 0) {
         
