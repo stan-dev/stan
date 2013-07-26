@@ -73,15 +73,15 @@ namespace stan {
     void print_progress(int m, int start, int finish, int refresh, bool warmup) {
       
       int it_print_width = std::ceil(std::log10(finish));
-      
-      if (do_print(m, refresh)) {
+
+      if (do_print(m, refresh) || (start + m + 1 == finish) ) {
         
         std::cout << "Iteration: ";
         std::cout << std::setw(it_print_width) << m + 1 + start
                   << " / " << finish;
           
         std::cout << " [" << std::setw(3) 
-                  << static_cast<int>( (100.0 * (m + start)) / finish )
+                  << static_cast<int>( (100.0 * (start + m + 1)) / finish )
                   << "%] ";
         std::cout << (warmup ? " (Warmup)" : " (Sampling)");
         std::cout << std::endl;
