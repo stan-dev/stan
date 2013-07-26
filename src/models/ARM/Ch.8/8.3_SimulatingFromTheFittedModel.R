@@ -76,4 +76,55 @@ hist (test.rep, xlim=range (Test(y), test.rep), yaxt="n", ylab="",
  xlab="", main="Observed T(y) and distribution of T(y.rep)")
 lines (rep (Test(y), 2), c(0,10*n))
 
-##FIXME:ADD ROACH STUFF.. currently not correct
+##############################################################################
+## Read the cleaned data
+# All data are at http://www.stat.columbia.edu/~gelman/arm/examples/roaches
+
+roachdata <- read.csv ("roachdata.csv")
+attach(roachdata)
+
+
+if (!file.exists("roaches.sm.RData")) {
+    rt <- stanc("roaches.stan", model_name="roaches")
+    roaches.sm <- stan_model(stanc_ret=rt)
+    save(roaches.sm, file="roaches.sm.RData")
+} else {
+    load("roaches.sm.RData", verbose=TRUE)
+}
+
+dataList.1 <- list(N=length(y), y=y,roach1=roach1,treatment=treatment,exposure2=exposure2,senior=senior)
+roaches.sf1 <- sampling(roaches.sm, dataList.1)
+print(roaches.sf1)
+post <- extract(roaches.sf1)
+
+## Comparing the data to a replicated dataset
+
+n <- length(y)
+X <- cbind (rep(1,n), roach1, treatment, senior)
+y.hat <- exposure2 * exp (X %*% colMeans(post$beta))
+y.rep <- rpois (n, y.hat)
+
+print (mean (y==0))
+print (mean (y.rep==0))
+
+## Comparing the data to 1000 replicated datasets
+
+n.sims <- 1000
+y.rep <- array (NA, c(n.sims, n))
+for (s in 1:n.sims){
+  y.hat <- exposure2 * exp (X %*% post$beta[s,])
+  y.rep[s,] <- rpois (n, y.hat)
+}
+
+ # test statistic 
+
+Test <- function (y){
+  mean (y==0)
+}
+test.rep <- rep (NA, n.sims)
+for (s in 1:n.sims){
+  test.rep[s] <- Test (y.rep[s,])
+}
+
+# p-value
+print (mean (test.rep > Test(y)))
