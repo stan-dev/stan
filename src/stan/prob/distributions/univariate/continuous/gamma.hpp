@@ -215,8 +215,13 @@ namespace stan {
               RNG& rng) {
       using boost::variate_generator;
       using boost::gamma_distribution;
+      /*
+        the boost gamma distribution is defined by
+	shape and scale, whereas the stan one is defined
+	by shape and rate
+      */
       variate_generator<RNG&, gamma_distribution<> >
-        gamma_rng(rng, gamma_distribution<>(alpha, beta));
+        gamma_rng(rng, gamma_distribution<>(alpha, 1/beta));
       return gamma_rng();
     }
 
