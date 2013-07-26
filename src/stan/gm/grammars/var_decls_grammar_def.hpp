@@ -221,9 +221,16 @@ namespace stan {
         if (vm.exists(var_decl.name_)) {
           // variable already exists
           pass = false;
-          error_msgs << "variable already declared, name="
-                     << var_decl.name_ 
-                     << std::endl;
+          error_msgs << "duplicate declaration of variable, name="
+                     << var_decl.name_;
+
+          error_msgs << "; attempt to redeclare as ";
+          print_var_origin(error_msgs,vo);  // FIXME -- need original vo
+
+          error_msgs << "; original declaration as ";
+          print_var_origin(error_msgs,vm.get_origin(var_decl.name_));
+
+          error_msgs << std::endl;
           return var_decl;
         } 
         if ((vo == parameter_origin || vo == transformed_parameter_origin)

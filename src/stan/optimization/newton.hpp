@@ -4,7 +4,8 @@
 #include <Eigen/Dense>
 #include <Eigen/Cholesky>
 #include <Eigen/Eigenvalues>
-#include <stan/model/prob_grad.hpp>
+
+#include <stan/model/util.hpp>
 
 namespace stan {
 
@@ -29,15 +30,18 @@ namespace stan {
       }
     }
 
-    double newton_step(stan::model::prob_grad& model, 
+    template <typename M>
+    double newton_step(M& model, 
                        std::vector<double>& params_r,
                        std::vector<int>& params_i,
                        std::ostream* output_stream = 0) {
         std::vector<double> gradient;
         std::vector<double> hessian;
         
-        double f0 = model.grad_hess_log_prob(params_r, params_i, 
-                                             gradient, hessian);
+        double f0 
+          = stan::model::grad_hess_log_prob<true,false>(model,
+                                                        params_r, params_i, 
+                                                        gradient, hessian);
         matrix_d H(params_r.size(), params_r.size());
         for (size_t i = 0; i < hessian.size(); i++) {
           H(i) = hessian[i];
@@ -56,8 +60,11 @@ namespace stan {
           for (size_t i = 0; i < params_r.size(); i++)
             new_params_r[i] = params_r[i] - step_size * g[i];
           try {
-            f1 = model.grad_log_prob(new_params_r, params_i, gradient);
+            f1 = stan::model::log_prob_grad<true,false>(model,
+                                                        new_params_r, 
+                                                        params_i, gradient);
           } catch (std::exception& e) {
+            // FIXME:  this is not a good way to handle a general exception
             f1 = -1e100;
           }
         }

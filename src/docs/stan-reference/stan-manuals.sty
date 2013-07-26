@@ -27,6 +27,7 @@
 \usepackage{url}
 \usepackage{changebar}
 \usepackage{alltt}
+\usepackage{lscape}
 
 \usepackage[titles]{tocloft}
 \setlength{\cftbeforechapskip}{0.5ex}
@@ -108,7 +109,7 @@
 \newcommand{\reffigure}[1]{Figure~\ref{#1.figure}}
 \newcommand{\refnote}[1]{Footnote~\ref{#1.footnote}}
 
-\newcommand{\fitem}[4]{\item[{\tt #1 {\bfseries #2}(#3)}]\mbox{ }
+\newcommand{\fitem}[4]{\item[\begin{minipage}{\textwidth}{\tt #1 {\bfseries #2}(#3)}\end{minipage}]\mbox{ }
  \\[4pt] #4\index{{\tt\bfseries #2 }!{\tt (#3):\,#1}|hyperpage}}
 % need special command for items requiring escapes in index
 \newcommand{\fitemindex}[5]{\item[{\tt #1 {\bfseries #2}(#3)}]\mbox{ }

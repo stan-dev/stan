@@ -360,8 +360,9 @@ namespace stan {
     bool has_low() const;
     bool has_high() const;
   };
-
+    
   typedef int var_origin;
+  const int model_name_origin = 0;
   const int data_origin = 1;
   const int transformed_data_origin = 2;
   const int parameter_origin = 3;

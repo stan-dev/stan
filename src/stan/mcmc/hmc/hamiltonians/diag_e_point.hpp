@@ -14,10 +14,15 @@ namespace stan {
     public:
       
       diag_e_point(int n, int m): ps_point(n, m),
-                                  mInv(Eigen::VectorXd::Ones(n)) 
-      {};
+                                  mInv(n) {
+        mInv.setOnes();
+      };
       
       Eigen::VectorXd mInv;
+      
+      diag_e_point(const diag_e_point& z): ps_point(z), mInv(z.mInv.size()) {
+        _fast_vector_copy<double>(mInv, z.mInv);
+      }
       
       void write_metric(std::ostream* o) {
         if(!o) return;

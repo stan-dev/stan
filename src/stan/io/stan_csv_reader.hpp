@@ -38,11 +38,26 @@ namespace stan {
       double delta;
       double gamma;
       std::string algorithm;
+
+      stan_csv_metadata() 
+        : stan_version_major(0), stan_version_minor(0), stan_version_patch(0),
+          model(""), data(""), init(""),
+          append_samples(false), save_warmup(false),
+          seed(0), random_seed(false),
+          chain_id(1), iter(0), warmup(0), thin(0),
+          equal_step_sizes(false), nondiag_mass(false),
+          leapfrog_steps(0), max_treedepth(0),
+          epsilon(0), epsilon_pm(0),
+          delta(0), gamma(0),
+          algorithm("") {}
     };
 
     struct stan_csv_adaptation {
       double step_size;
       Eigen::MatrixXd metric;
+      
+      stan_csv_adaptation() 
+        : step_size(0), metric(0,0) {}
     };
     
     struct stan_csv_timing {
@@ -50,7 +65,7 @@ namespace stan {
       double sampling;
       
       stan_csv_timing() 
-        : warmup(0), sampling(0) { }
+        : warmup(0), sampling(0) {}
     };
 
     struct stan_csv {
