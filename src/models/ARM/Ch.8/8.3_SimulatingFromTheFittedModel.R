@@ -83,7 +83,6 @@ lines (rep (Test(y), 2), c(0,10*n))
 roachdata <- read.csv ("roachdata.csv")
 attach(roachdata)
 
-
 if (!file.exists("roaches.sm.RData")) {
     rt <- stanc("roaches.stan", model_name="roaches")
     roaches.sm <- stan_model(stanc_ret=rt)
@@ -121,6 +120,38 @@ for (s in 1:n.sims){
 Test <- function (y){
   mean (y==0)
 }
+test.rep <- rep (NA, n.sims)
+for (s in 1:n.sims){
+  test.rep[s] <- Test (y.rep[s,])
+}
+
+# p-value
+print (mean (test.rep > Test(y)))
+
+## Checking the overdispersed model FIXME
+
+if (!file.exists("roaches_overdispersion.sm.RData")) {
+    rt <- stanc("roaches_overdispersion.stan", model_name="roaches_overdispersion")
+    roaches_overdispersion.sm <- stan_model(stanc_ret=rt)
+    save(roaches_overdispersion.sm, file="roaches_overdispersion.sm.RData")
+} else {
+    load("roaches_overdispersion.sm.RData", verbose=TRUE)
+}
+
+roaches_overdispersion.sf1 <- sampling(roaches_overdispersion.sm, dataList.1)
+print(roaches_overdispersion.sf1)
+post <- extract(roaches_overdispersion.sf1)
+
+ # 1000 replicated datasets 
+
+y.rep <- array (NA, c(n.sims, n))
+overdisp <- summary(glm.2)$dispersion
+for (s in 1:n.sims){
+  y.hat <- exposure2 * exp (X %*% sim.2$coef[s,])
+  a <- y.hat/(overdisp-1)              # using R's parametrization for the
+  y.rep[s,] <- rnegbin (n, y.hat, a)   # negative binomial distribution
+}
+
 test.rep <- rep (NA, n.sims)
 for (s in 1:n.sims){
   test.rep[s] <- Test (y.rep[s,])

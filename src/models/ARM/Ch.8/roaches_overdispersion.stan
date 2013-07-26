@@ -12,8 +12,10 @@ transformed data {
 }
 parameters {
   vector[4] beta;
+  real<lower=0> omega;
 } 
 model {
-  y ~ poisson_log(log_expo + beta[1] + beta[2] * roach1 + beta[3] * treatment
-                      + beta[4] * senior);
+  for (n in 1:N)
+    y[n] ~ neg_binomial(exposure2[n] * exp(beta[1] + beta[2] * roach1[n] + beta[3] * treatment[n]
+                      + beta[4] * senior[n]) / (omega - 1),1.0 / (omega - 1));
 }
