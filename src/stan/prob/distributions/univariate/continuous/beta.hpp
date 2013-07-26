@@ -58,6 +58,8 @@ namespace stan {
       using stan::math::log1m;
       using stan::math::multiply_log;
       using stan::math::value_of;
+      using stan::math::check_nonnegative;
+      using stan::math::check_less_or_equal;
 
       // check if any vectors are zero length
       if (!(stan::length(y) 
@@ -69,21 +71,13 @@ namespace stan {
       double logp(0.0);
       
       // validate args (here done over var, which should be OK)
-      if (!check_finite(function, alpha,
-                        "First shape parameter",
-                        &logp))
+      if (!check_finite(function, alpha, "First shape parameter", &logp))
         return logp;
-      if (!check_positive(function, alpha, 
-                          "First shape parameter",
-                          &logp))
+      if (!check_positive(function, alpha, "First shape parameter", &logp))
         return logp;
-      if (!check_finite(function, beta, 
-                        "Second shape parameter",
-                        &logp))
+      if (!check_finite(function, beta, "Second shape parameter", &logp))
         return logp;
-      if (!check_positive(function, beta, 
-                          "Second shape parameter",
-                          &logp))
+      if (!check_positive(function, beta, "Second shape parameter", &logp))
         return logp;
       if (!check_not_nan(function, y, "Random variable", &logp))
         return logp;
@@ -92,6 +86,10 @@ namespace stan {
                                    "Random variable","First shape parameter",
                                    "Second shape parameter",
                                    &logp)))
+        return logp;
+      if (!check_nonnegative(function, y, "Random variable", &logp))
+        return logp;
+      if (!check_less_or_equal(function, y, 1,"Random variable", &logp))
         return logp;
 
       // check if no variables are involved and prop-to
@@ -160,7 +158,8 @@ namespace stan {
         digamma_alpha_beta(max_size(alpha,beta));
   
       for (size_t n = 0; n < max_size(alpha,beta); n++) {
-        const double alpha_beta = value_of(alpha_vec[n]) + value_of(beta_vec[n]);
+        const double alpha_beta = value_of(alpha_vec[n]) 
+          + value_of(beta_vec[n]);
         if (include_summand<propto,T_scale_succ,T_scale_fail>::value)
           lgamma_alpha_beta[n] = lgamma(alpha_beta);
         if (!is_constant_struct<T_scale_succ>::value
@@ -188,7 +187,8 @@ namespace stan {
 
         // gradients
         if (!is_constant_struct<T_y>::value)
-          operands_and_partials.d_x1[n] += (alpha_dbl-1)/y_dbl + (beta_dbl-1)/(y_dbl-1);
+          operands_and_partials.d_x1[n] += (alpha_dbl-1)/y_dbl 
+            + (beta_dbl-1)/(y_dbl-1);
         if (!is_constant_struct<T_scale_succ>::value)
           operands_and_partials.d_x2[n]
             += log_y[n] + digamma_alpha_beta[n] - digamma_alpha[n];
@@ -201,10 +201,10 @@ namespace stan {
 
     template <typename T_y, typename T_scale_succ, typename T_scale_fail>
     inline typename return_type<T_y,T_scale_succ,T_scale_fail>::type
-    beta_log(const T_y& y, const T_scale_succ& alpha, const T_scale_fail& beta) {
+    beta_log(const T_y& y, const T_scale_succ& alpha, 
+             const T_scale_fail& beta) {
       return beta_log<false>(y,alpha,beta);
     }
-
     
     /**
      * Calculates the beta cumulative distribution function for the given
@@ -220,10 +220,13 @@ namespace stan {
      */
     template <typename T_y, typename T_scale_succ, typename T_scale_fail>
     typename return_type<T_y,T_scale_succ,T_scale_fail>::type
-    beta_cdf(const T_y& y, const T_scale_succ& alpha, const T_scale_fail& beta) {
+    beta_cdf(const T_y& y, const T_scale_succ& alpha, 
+             const T_scale_fail& beta) {
       
       // Size checks
-      if ( !( stan::length(y) && stan::length(alpha) && stan::length(beta) ) ) return 1.0;
+      if ( !( stan::length(y) && stan::length(alpha) 
+              && stan::length(beta) ) ) 
+        return 1.0;
       
       // Error checks
       static const char* function = "stan::prob::beta_cdf(%1%)";
@@ -234,29 +237,30 @@ namespace stan {
       using boost::math::tools::promote_args;
       using stan::math::check_consistent_sizes;
       using stan::math::value_of;
+      using stan::math::check_nonnegative;
+      using stan::math::check_less_or_equal;
       
       double P(1.0);
         
       if (!check_finite(function, alpha, "First shape parameter", &P))
         return P;
-        
       if (!check_positive(function, alpha, "First shape parameter", &P))
         return P;
-        
       if (!check_finite(function, beta, "Second shape parameter", &P))
         return P;
-        
       if (!check_positive(function, beta, "Second shape parameter", &P))
         return P;
-        
       if (!check_not_nan(function, y, "Random variable", &P))
         return P;
-        
       if (!(check_consistent_sizes(function, y, alpha, beta,
-                                   "Random variable", "Shape parameter", "Scale Parameter",
-                                   &P)))
+                                   "Random variable", "Shape parameter", 
+                                   "Scale Parameter", &P)))
         return P;
-      
+      if (!check_nonnegative(function, y, "Random variable", &P))
+        return P;
+      if (!check_less_or_equal(function, y, 1,"Random variable", &P))
+        return P;
+
       // Wrap arguments in vectors
       VectorView<const T_y> y_vec(y);
       VectorView<const T_scale_succ> alpha_vec(alpha);
@@ -267,7 +271,8 @@ namespace stan {
         operands_and_partials(y, alpha, beta);
 
       std::fill(operands_and_partials.all_partials,
-                operands_and_partials.all_partials + operands_and_partials.nvaris, 0.0);
+                operands_and_partials.all_partials 
+                + operands_and_partials.nvaris, 0.0);
 
       // Explicit return for extreme values
       // The gradients are technically ill-defined, but treated as zero
@@ -337,7 +342,8 @@ namespace stan {
         P *= Pn;
                   
         if (!is_constant_struct<T_y>::value)
-          operands_and_partials.d_x1[n] += ibeta_derivative(alpha_dbl, beta_dbl, y_dbl) / Pn;
+          operands_and_partials.d_x1[n] += ibeta_derivative(alpha_dbl, beta_dbl,
+                                                            y_dbl) / Pn;
 
         double g1 = 0;
         double g2 = 0;
@@ -352,24 +358,287 @@ namespace stan {
 
         if (!is_constant_struct<T_scale_succ>::value)
           operands_and_partials.d_x2[n] += g1 / Pn;
-                  
         if (!is_constant_struct<T_scale_fail>::value)
-          operands_and_partials.d_x3[n]  += g2 / Pn;
+          operands_and_partials.d_x3[n] += g2 / Pn;
       }
             
       if (!is_constant_struct<T_y>::value) {
-        for(size_t n = 0; n < stan::length(y); ++n) operands_and_partials.d_x1[n] *= P;
+        for(size_t n = 0; n < stan::length(y); ++n) 
+          operands_and_partials.d_x1[n] *= P;
       }
-            
       if (!is_constant_struct<T_scale_succ>::value) {
-        for(size_t n = 0; n < stan::length(alpha); ++n) operands_and_partials.d_x2[n] *= P;
+        for(size_t n = 0; n < stan::length(alpha); ++n) 
+          operands_and_partials.d_x2[n] *= P;
       }
-            
       if (!is_constant_struct<T_scale_fail>::value) {
-        for(size_t n = 0; n < stan::length(beta); ++n) operands_and_partials.d_x3[n] *= P;
+        for(size_t n = 0; n < stan::length(beta); ++n) 
+          operands_and_partials.d_x3[n] *= P;
       }
         
       return operands_and_partials.to_var(P);
+    }
+
+    template <typename T_y, typename T_scale_succ, typename T_scale_fail>
+    typename return_type<T_y,T_scale_succ,T_scale_fail>::type
+    beta_cdf_log(const T_y& y, const T_scale_succ& alpha, 
+                 const T_scale_fail& beta) {
+      
+      // Size checks
+      if ( !( stan::length(y) && stan::length(alpha) 
+              && stan::length(beta) ) ) 
+        return 0.0;
+      
+      // Error checks
+      static const char* function = "stan::prob::beta_cdf(%1%)";
+
+      using stan::math::check_positive;
+      using stan::math::check_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_nonnegative;
+      using stan::math::check_less_or_equal;
+      using boost::math::tools::promote_args;
+      using stan::math::check_consistent_sizes;
+      using stan::math::value_of;
+      
+      double cdf_log(0.0);
+        
+      if (!check_finite(function, alpha, "First shape parameter", &cdf_log))
+        return cdf_log;
+      if (!check_positive(function, alpha, "First shape parameter", &cdf_log))
+        return cdf_log;
+      if (!check_finite(function, beta, "Second shape parameter", &cdf_log))
+        return cdf_log;
+      if (!check_positive(function, beta, "Second shape parameter", &cdf_log))
+        return cdf_log;
+      if (!check_not_nan(function, y, "Random variable", &cdf_log))
+        return cdf_log;
+      if (!check_nonnegative(function, y, "Random variable", &cdf_log))
+        return cdf_log;
+      if (!check_less_or_equal(function, y, 1,"Random variable", &cdf_log))
+        return cdf_log;
+      if (!(check_consistent_sizes(function, y, alpha, beta,
+                                   "Random variable", "Shape parameter", 
+                                   "Scale Parameter", &cdf_log)))
+        return cdf_log;
+      
+      // Wrap arguments in vectors
+      VectorView<const T_y> y_vec(y);
+      VectorView<const T_scale_succ> alpha_vec(alpha);
+      VectorView<const T_scale_fail> beta_vec(beta);
+      size_t N = max_size(y, alpha, beta);
+
+      agrad::OperandsAndPartials<T_y, T_scale_succ, T_scale_fail> 
+        operands_and_partials(y, alpha, beta);
+
+      std::fill(operands_and_partials.all_partials,
+                operands_and_partials.all_partials 
+                + operands_and_partials.nvaris, 0.0);
+      
+      // Compute CDF and its gradients
+      using boost::math::ibeta;
+      using boost::math::ibeta_derivative;
+      using boost::math::digamma;
+        
+      // Cache a few expensive function calls if alpha or beta is a parameter
+      DoubleVectorView<!is_constant_struct<T_scale_succ>::value 
+                       || !is_constant_struct<T_scale_fail>::value,
+        is_vector<T_scale_succ>::value || is_vector<T_scale_fail>::value>
+        digamma_alpha_vec(max_size(alpha, beta));
+        
+      DoubleVectorView<!is_constant_struct<T_scale_succ>::value 
+                       || !is_constant_struct<T_scale_fail>::value,
+        is_vector<T_scale_succ>::value || is_vector<T_scale_fail>::value>
+        digamma_beta_vec(max_size(alpha, beta));
+        
+      DoubleVectorView<!is_constant_struct<T_scale_succ>::value
+                       || !is_constant_struct<T_scale_fail>::value,
+        is_vector<T_scale_succ>::value || is_vector<T_scale_fail>::value>
+        digamma_sum_vec(max_size(alpha, beta));
+        
+      DoubleVectorView<!is_constant_struct<T_scale_succ>::value
+                       || !is_constant_struct<T_scale_fail>::value,
+        is_vector<T_scale_succ>::value || is_vector<T_scale_fail>::value>
+        betafunc_vec(max_size(alpha, beta));
+        
+      if (!is_constant_struct<T_scale_succ>::value 
+          || !is_constant_struct<T_scale_fail>::value) {
+            
+        for (size_t i = 0; i < N; i++) {
+
+          const double alpha_dbl = value_of(alpha_vec[i]);
+          const double beta_dbl = value_of(beta_vec[i]);
+                
+          digamma_alpha_vec[i] = digamma(alpha_dbl);
+          digamma_beta_vec[i] = digamma(beta_dbl);
+          digamma_sum_vec[i] = digamma(alpha_dbl + beta_dbl);
+          betafunc_vec[i] = boost::math::beta(alpha_dbl, beta_dbl);
+        }
+      }
+        
+      // Compute vectorized CDFLog and gradient
+      for (size_t n = 0; n < N; n++) {
+              
+        // Pull out values
+        const double y_dbl = value_of(y_vec[n]);
+        const double alpha_dbl = value_of(alpha_vec[n]);
+        const double beta_dbl = value_of(beta_vec[n]);
+                  
+        // Compute
+        const double Pn = ibeta(alpha_dbl, beta_dbl, y_dbl);
+
+        cdf_log += log(Pn);
+                  
+        if (!is_constant_struct<T_y>::value)
+          operands_and_partials.d_x1[n] += 
+            ibeta_derivative(alpha_dbl, beta_dbl, y_dbl) / Pn;
+
+        double g1 = 0;
+        double g2 = 0;
+              
+        if (!is_constant_struct<T_scale_succ>::value
+            || !is_constant_struct<T_scale_fail>::value) {
+          stan::math::gradRegIncBeta(g1, g2, alpha_dbl, beta_dbl, y_dbl, 
+                                     digamma_alpha_vec[n], 
+                                     digamma_beta_vec[n], digamma_sum_vec[n], 
+                                     betafunc_vec[n]);
+        }
+        if (!is_constant_struct<T_scale_succ>::value)
+          operands_and_partials.d_x2[n] += g1 / Pn;
+        if (!is_constant_struct<T_scale_fail>::value)
+          operands_and_partials.d_x3[n]  += g2 / Pn;
+      }
+        
+      return operands_and_partials.to_var(cdf_log);
+    }
+
+   template <typename T_y, typename T_scale_succ, typename T_scale_fail>
+    typename return_type<T_y,T_scale_succ,T_scale_fail>::type
+    beta_ccdf_log(const T_y& y, const T_scale_succ& alpha, 
+                  const T_scale_fail& beta) {
+      
+      // Size checks
+      if ( !( stan::length(y) && stan::length(alpha) 
+              && stan::length(beta) ) ) 
+        return 0.0;
+      
+      // Error checks
+      static const char* function = "stan::prob::beta_cdf(%1%)";
+
+      using stan::math::check_positive;
+      using stan::math::check_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_nonnegative;
+      using stan::math::check_less_or_equal;
+      using boost::math::tools::promote_args;
+      using stan::math::check_consistent_sizes;
+      using stan::math::value_of;
+      
+      double ccdf_log(0.0);
+        
+      if (!check_finite(function, alpha, "First shape parameter", &ccdf_log))
+        return ccdf_log;
+      if (!check_positive(function, alpha, "First shape parameter", &ccdf_log))
+        return ccdf_log;
+      if (!check_finite(function, beta, "Second shape parameter", &ccdf_log))
+        return ccdf_log;
+      if (!check_positive(function, beta, "Second shape parameter", &ccdf_log))
+        return ccdf_log;
+      if (!check_not_nan(function, y, "Random variable", &ccdf_log))
+        return ccdf_log;
+      if (!check_nonnegative(function, y, "Random variable", &ccdf_log))
+        return ccdf_log;
+      if (!check_less_or_equal(function, y, 1,"Random variable", &ccdf_log))
+        return ccdf_log;
+      if (!(check_consistent_sizes(function, y, alpha, beta,
+                                   "Random variable", "Shape parameter", 
+                                   "Scale Parameter", &ccdf_log)))
+        return ccdf_log;
+      
+      // Wrap arguments in vectors
+      VectorView<const T_y> y_vec(y);
+      VectorView<const T_scale_succ> alpha_vec(alpha);
+      VectorView<const T_scale_fail> beta_vec(beta);
+      size_t N = max_size(y, alpha, beta);
+
+      agrad::OperandsAndPartials<T_y, T_scale_succ, T_scale_fail> 
+        operands_and_partials(y, alpha, beta);
+
+      std::fill(operands_and_partials.all_partials,
+                operands_and_partials.all_partials
+                + operands_and_partials.nvaris, 0.0);
+      
+      // Compute CDF and its gradients
+      using boost::math::ibeta;
+      using boost::math::ibeta_derivative;
+      using boost::math::digamma;
+        
+      // Cache a few expensive function calls if alpha or beta is a parameter
+      DoubleVectorView<!is_constant_struct<T_scale_succ>::value 
+                       || !is_constant_struct<T_scale_fail>::value,
+        is_vector<T_scale_succ>::value || is_vector<T_scale_fail>::value>
+        digamma_alpha_vec(max_size(alpha, beta));
+      DoubleVectorView<!is_constant_struct<T_scale_succ>::value 
+                       || !is_constant_struct<T_scale_fail>::value,
+        is_vector<T_scale_succ>::value || is_vector<T_scale_fail>::value>
+        digamma_beta_vec(max_size(alpha, beta));
+      DoubleVectorView<!is_constant_struct<T_scale_succ>::value
+                       || !is_constant_struct<T_scale_fail>::value,
+        is_vector<T_scale_succ>::value || is_vector<T_scale_fail>::value>
+        digamma_sum_vec(max_size(alpha, beta));        
+      DoubleVectorView<!is_constant_struct<T_scale_succ>::value
+                       || !is_constant_struct<T_scale_fail>::value,
+        is_vector<T_scale_succ>::value || is_vector<T_scale_fail>::value>
+        betafunc_vec(max_size(alpha, beta));
+        
+      if (!is_constant_struct<T_scale_succ>::value 
+          || !is_constant_struct<T_scale_fail>::value) {
+            
+        for (size_t i = 0; i < N; i++) {
+
+          const double alpha_dbl = value_of(alpha_vec[i]);
+          const double beta_dbl = value_of(beta_vec[i]);
+                
+          digamma_alpha_vec[i] = digamma(alpha_dbl);
+          digamma_beta_vec[i] = digamma(beta_dbl);
+          digamma_sum_vec[i] = digamma(alpha_dbl + beta_dbl);
+          betafunc_vec[i] = boost::math::beta(alpha_dbl, beta_dbl);
+        }
+      }
+        
+      // Compute vectorized CDFLog and gradient
+      for (size_t n = 0; n < N; n++) {
+              
+        // Pull out values
+        const double y_dbl = value_of(y_vec[n]);
+        const double alpha_dbl = value_of(alpha_vec[n]);
+        const double beta_dbl = value_of(beta_vec[n]);
+                  
+        // Compute
+        const double Pn = 1.0 - ibeta(alpha_dbl, beta_dbl, y_dbl);
+
+        ccdf_log += log(Pn);
+                  
+        if (!is_constant_struct<T_y>::value)
+          operands_and_partials.d_x1[n] -= 
+            ibeta_derivative(alpha_dbl, beta_dbl, y_dbl) / Pn;
+
+        double g1 = 0;
+        double g2 = 0;
+              
+        if (!is_constant_struct<T_scale_succ>::value
+            || !is_constant_struct<T_scale_fail>::value) {
+          stan::math::gradRegIncBeta(g1, g2, alpha_dbl, beta_dbl, y_dbl, 
+                                     digamma_alpha_vec[n], 
+                                     digamma_beta_vec[n], digamma_sum_vec[n], 
+                                     betafunc_vec[n]);
+        }
+        if (!is_constant_struct<T_scale_succ>::value)
+          operands_and_partials.d_x2[n] -= g1 / Pn;
+        if (!is_constant_struct<T_scale_fail>::value)
+          operands_and_partials.d_x3[n] -= g2 / Pn;
+      }
+        
+      return operands_and_partials.to_var(ccdf_log);
     }
 
     template <class RNG>
