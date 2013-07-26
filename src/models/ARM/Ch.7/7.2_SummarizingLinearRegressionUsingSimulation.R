@@ -1,6 +1,5 @@
 library(rstan)
 library(ggplot2)
-library(arm)
 source("earnings.data.R")
 
 ## Simulation to represent predictive uncertainty
@@ -13,13 +12,14 @@ if (!file.exists("earnings_interactions.sm.RData")) {
 } else {
     load("earnings_interactions.sm.RData", verbose=TRUE)
 }
-dataList.3 <- list(N=N, earnings=earnings, height=height,sex=sex)
+dataList.3 <- list(N=N, earnings=earnings, height=height,sex=sex1)
 earnings_interactions.sf1 <- sampling(earnings_interactions.sm, dataList.3)
 print(earnings_interactions.sf1)
+post <- extract(earnings_interactions.sf1)
 
- # Prediction FIXME
+ # Prediction
 log.earn <- log(earnings)
-male <- 2 - sex
+male <- 2 - sex1
 earn.logmodel.3 <- lm (log.earn ~ height + male + height:male)
 x.new <- data.frame (height=68, male=1)
 pred.interval <- predict (earn.logmodel.3, x.new, interval="prediction", 
@@ -50,13 +50,11 @@ pred.ratio <- pred.man/pred.woman
 
 ## Simulation to represent uncertainty in regression coefficients
 n.sims <- 1000
-fit.1<- lm (log.earn ~ height + male + height:male)
-sim.1 <- sim (fit.1, n.sims)
 
-height.coef <- sim.1$coef[,2]
+height.coef <- post$beta[,2]
 mean (height.coef)
 sd (height.coef)
 quantile (height.coef, c(.025, .975))
 
-height.for.men.coef <- sim.1$coef[,2] + sim.1$coef[,4]
+height.for.men.coef <- post$beta[,2] + post$beta[,4]
 quantile (height.for.men.coef, c(.025, .975))

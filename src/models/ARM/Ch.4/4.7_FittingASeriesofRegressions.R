@@ -60,16 +60,13 @@ for (yr in seq(1972,2000,4)){
 }
 
 yrs <- array(yrs,c(72,1))
-sum.new <- melt(summary)
+sum.n <- melt(summary)
+sum.new <- subset(sum.n,Var2 == 1)
 sum.new$Var3 <- factor(sum.new$Var3, levels=c("1","2","3","4","5","6","7","8","9"),labels=c("Intercept", "Ideology", "Black", "Age.30.44", "Age.45.64", "Age.65.up", 
    "Education", "Female", "Income"))
-nes.datas <- data.frame(yrs=yrs,sum=sum.new$value[sum.new$Var2==1],cat=sum.new$Var3)
-p <- ggplot(nes.datas,aes(yrs,sum)) + scale_x_continuous("Year") + scale_y_continuous("Coefficient")
-p + geom_point() + facet_wrap(~ cat,ncol=4)
-
-
-
-  sum1 <- melt(summary[,1,i])
-  sum2 <- melt(summary[,2,i])
-  limits <- aes(ymax=sum1+.67*sum2,ymin=sum1-.67*sum2)
-  p <- p + geom_bar(limits)
+sum.new$yrs <- yrs
+sum.new$sum1 <- melt(summary[,1,])$value
+sum.new$sum2 <- melt(summary[,2,])$value
+limits <- aes(ymax=sum1+.67*sum2,ymin=sum1-.67*sum2)
+p <- ggplot(sum.new,aes(yrs,value)) + scale_x_continuous("Year") + scale_y_continuous("Coefficient") + theme_bw() + geom_hline(aes(yintercept=0))
+p + geom_pointrange(limits)+ geom_point() + facet_wrap(~ Var3,ncol=4)
