@@ -16,7 +16,6 @@ public:
     param[2] = 3.3;           // s  (Scale)
     parameters.push_back(param);
     cdf.push_back(0.0781210912);  // expected CDF
-
   }
   
   void invalid_values(vector<size_t>& index, 
@@ -70,16 +69,17 @@ public:
     return stan::prob::scaled_inv_chi_square_cdf(y, nu, s);
   }
 
-
-  
   template <typename T_y, typename T_dof, typename T_scale,
       typename T3, typename T4, typename T5, 
       typename T6, typename T7, typename T8, 
       typename T9>
   typename stan::return_type<T_y, T_dof, T_scale>::type 
   cdf_function(const T_y& y, const T_dof& nu, const T_scale& s,
-         const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
-      return stan::prob::scaled_inv_chi_square_cdf(y, nu, s);
+               const T3&, const T4&, const T5&, const T6&, const T7&, 
+               const T8&, const T9&) {
+    using stan::agrad::gamma_q;
+    using stan::math::gamma_q;
+
+    return (gamma_q(nu * 0.5, 0.5 * nu * s * s / y));  
   }
-    
 };

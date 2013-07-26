@@ -775,27 +775,38 @@ samples1.csv	samples2.csv	samples3.csv
 \begin{Verbatim}
 > bin/print samples*.csv
 \end{Verbatim}
-{\small
+\end{quote}
+%
+\begin{landscape}
+\begin{quote}
+{ \footnotesize
 \begin{Verbatim}[fontshape=sl]
-Inference for Stan model: 
-3 chains: each with iter=(1000,1000,1000); warmup=(0,0,0); 
-thin=(1,1,1); 3000 iterations saved.
+Inference for Stan model: negative_binomial_model
+3 chains: each with iter=(1000,1000,1000); warmup=(0,0,0); thin=(1,1,1); 3000 iterations saved.
 
-       mean se_mean   sd 2.5%  25%  50%  75% 97.5% n_eff Rhat
-alpha  16.2     2.0 41.5  1.4  5.2  9.7 17.6  59.2   435  1.0
-beta   10.0     1.1 22.8  0.8  3.3  6.2 11.2  37.5   405  1.0
+Warmup took (0.054, 0.055, 0.057) seconds, 0.17 seconds total
+Sampling took (0.065, 0.056, 0.067) seconds, 0.19 seconds total
 
-Samples were drawn using mcmc::nuts_diag.
-For each parameter, n_eff is a crude measure of effective 
-sample size, and Rhat is the potential scale reduction factor 
-on split chains (at convergence, Rhat=1).
+                Mean   MCSE  StdDev        5%   50%   95%  N_Eff  N_Eff/s    R_hat
+lp__             -14  0.058     1.1  -1.7e+01   -14   -13    370     1965  1.0e+00
+accept_stat__   0.51  0.012    0.40   4.7e-13  0.52   1.0   1162     6161  1.0e+00
+stepsize__      0.39  0.038   0.047   3.2e-01  0.41  0.43    1.5      8.0  1.0e+14
+treedepth__      1.0  0.015    0.79   0.0e+00   1.0   2.0   2655    14079  1.0e+00
+alpha             17    3.1      37   1.9e+00   9.4    40    141      749  1.0e+00
+beta              11    2.1      25   1.2e+00   6.1    26    136      721  1.0e+00
+
+Samples were drawn using NUTS with a diagonal Euclidean metric.
+For each parameter, N_Eff is a crude measure of effective sample size,
+and R_hat is the potential scale reduction factor on split chains (at 
+convergence, R_hat=1).
 \end{Verbatim}
 }
 \end{quote}
+\end{landscape}
 %
 The posterior is skewed to the high side, resulting in posterior means
-($\alpha=16.2$ and $\beta=10.0$) that are a long way away from the posterior
-medians ($\alpha=9.7$ and $\beta=6.2$);  the posterior median is the
+($\alpha=17$ and $\beta=11$) that are a long way away from the posterior
+medians ($\alpha=9.4$ and $\beta=6.1$);  the posterior median is the
 value listed under \code{50\%}, which is the 50th percentile of the
 posterior values.
 
@@ -803,20 +814,22 @@ For Windows, the forward slash in paths need to be converted to backslashes.
 
 \section{Command-line Options}
 
-There is only a single command-line option for \code{print}, namely
-\code{--help}, which prints usage information.
+In addition to the filenames, \code{print} includes three flags to customize the output.  
 
-In a forthcoming release, there will be controls for the number of
-significant digits in the output;  as is, the print errs on the side
-of using too few digits.
-
-
-
-
-
-
-
-
+\begin{description}
+\cmdflag{help}
+{Prints usage information.}
+{No help output by default}
+%
+\cmdarg{sig\_figs}{+int}
+{Sets the number of significant figures displayed in the output.}
+{default = \code{2} }
+%
+\cmdarg{autocorr=}{+int}
+{Calculates and then displays the autocorrelation of the specified chain.}
+{No autocorrelation output by default}
+%
+\end{description}
 
 \chapter{Dump Data Format}\label{dump.chapter}
 
