@@ -9,13 +9,14 @@ data {
   int age[N];
 }
 transformed data {
-  matrix[N,4] fact_age;
+  matrix[N,3] fact_age;
   for (n in 1:N)
-    fact_age[n,age[n]] <- 1;
+    if (age[n] > 1)
+      fact_age[n,age[n]-1] <- 1;
 }
 parameters {
   vector[6] beta;
-  vector[4] beta_fact;
+  vector[3] beta_fact;
   real<lower=0> sigma;
 } 
 model {

@@ -50,7 +50,7 @@ regress.year <- function (yr) {
   ok <- !is.na(this.year$partyid7+this.year$real_ideo+this.year$race.adj+this.year$age.discrete+this.year$educ1+this.year$gender+this.year$income)
   dataList.1 <- list(N=length(this.year$partyid7[ok]), partyid7=this.year$partyid7[ok], real_ideo=this.year$real_ideo[ok],race_adj=this.year$race.adj[ok], age=this.year$age.discrete[ok],educ1=this.year$educ1[ok], gender=this.year$gender[ok], income=this.year$income[ok])
   nes.sf1 <- sampling(nes.sm, dataList.1)
-  coefs <- extract(nes.sf1)$beta
+  coefs <- extract(nes.sf1)$beta[,1:2]
 }
 
 summary <- array (NA, c(9,2,8))
@@ -59,4 +59,17 @@ for (yr in seq(1972,2000,4)){
   summary[,,i] <- regress.year(yr)
 }
 
-#FIXME still
+yrs <- array(yrs,c(72,1))
+sum.new <- melt(summary)
+sum.new$Var3 <- factor(sum.new$Var3, levels=c("1","2","3","4","5","6","7","8","9"),labels=c("Intercept", "Ideology", "Black", "Age.30.44", "Age.45.64", "Age.65.up", 
+   "Education", "Female", "Income"))
+nes.datas <- data.frame(yrs=yrs,sum=sum.new$value[sum.new$Var2==1],cat=sum.new$Var3)
+p <- ggplot(nes.datas,aes(yrs,sum)) + scale_x_continuous("Year") + scale_y_continuous("Coefficient")
+p + geom_point() + facet_wrap(~ cat,ncol=4)
+
+
+
+  sum1 <- melt(summary[,1,i])
+  sum2 <- melt(summary[,2,i])
+  limits <- aes(ymax=sum1+.67*sum2,ymin=sum1-.67*sum2)
+  p <- p + geom_bar(limits)
