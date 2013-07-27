@@ -23,6 +23,11 @@ public:
           vector<double>& value) {
 
     // y
+    index.push_back(0U);
+    value.push_back(-1.0);
+    
+    index.push_back(0U);
+    value.push_back(2.0);
 
     // alpha
     index.push_back(1U);
@@ -47,11 +52,19 @@ public:
   }
   
   bool has_lower_bound() {
-    return false;
+    return true;
+  }
+
+  double lower_bound() {
+    return 0.0;
   }
     
   bool has_upper_bound() {
-    return false;
+    return true;
+  }
+
+  double upper_bound() {
+    return 1.0;
   }
     
   template <typename T_y, typename T_scale_succ, typename T_scale_fail,

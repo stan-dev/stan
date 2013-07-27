@@ -60,7 +60,8 @@ namespace stan {
         return 0.0;
       
       // set up template expressions wrapping scalars into vector views
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale> operands_and_partials(y, mu, beta);
+      agrad::OperandsAndPartials<T_y, T_loc, T_scale> 
+        operands_and_partials(y, mu, beta);
 
       VectorView<const T_y> y_vec(y);
       VectorView<const T_loc> mu_vec(mu);
@@ -68,7 +69,8 @@ namespace stan {
       size_t N = max_size(y, mu, beta);
 
       DoubleVectorView<true,is_vector<T_scale>::value> inv_beta(length(beta));
-      DoubleVectorView<include_summand<propto,T_scale>::value,is_vector<T_scale>::value> log_beta(length(beta));
+      DoubleVectorView<include_summand<propto,T_scale>::value,
+                       is_vector<T_scale>::value> log_beta(length(beta));
       for (size_t i = 0; i < length(beta); i++) {
         inv_beta[i] = 1.0 / value_of(beta_vec[i]);
         if (include_summand<propto,T_scale>::value)
@@ -98,7 +100,8 @@ namespace stan {
           operands_and_partials.d_x2[n] += inv_beta[n] - scaled_diff;
         if (!is_constant_struct<T_scale>::value)
           operands_and_partials.d_x3[n] 
-            += -inv_beta[n] + y_minus_mu_over_beta * inv_beta[n] - scaled_diff * y_minus_mu_over_beta;
+            += -inv_beta[n] + y_minus_mu_over_beta * inv_beta[n] 
+            - scaled_diff * y_minus_mu_over_beta;
       }
       return operands_and_partials.to_var(logp);
     }
@@ -119,8 +122,9 @@ namespace stan {
       using stan::math::check_finite;
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
+      using stan::math::value_of;
 
-      typename return_type<T_y, T_loc, T_scale>::type cdf(1);
+      double cdf(1.0);
       // check if any vectors are zero length
       if (!(stan::length(y) 
             && stan::length(mu) 
@@ -131,17 +135,17 @@ namespace stan {
         return cdf;
       if (!check_finite(function, mu, "Location parameter", &cdf))
         return cdf;
-      if (!check_not_nan(function, beta, "Scale parameter", 
-                         &cdf))
+      if (!check_not_nan(function, beta, "Scale parameter", &cdf))
         return cdf;
-      if (!check_positive(function, beta, "Scale parameter", 
-                          &cdf))
+      if (!check_positive(function, beta, "Scale parameter", &cdf))
         return cdf;
-      if (!(check_consistent_sizes(function,
-                                   y,mu,beta,
-                                   "Random variable","Location parameter","Scale parameter",
-                                   &cdf)))
+      if (!(check_consistent_sizes(function, y,mu,beta,
+                                   "Random variable","Location parameter",
+                                   "Scale parameter", &cdf)))
         return cdf;
+
+      agrad::OperandsAndPartials<T_y, T_loc, T_scale> 
+        operands_and_partials(y, mu, beta);
 
       VectorView<const T_y> y_vec(y);
       VectorView<const T_loc> mu_vec(mu);
@@ -149,10 +153,155 @@ namespace stan {
       size_t N = max_size(y, mu, beta);
 
       for (size_t n = 0; n < N; n++) {
-        cdf *= exp(-exp(-((y_vec[n]) - (mu_vec[n])) / (beta_vec[n])));
+        const double y_dbl = value_of(y_vec[n]);
+        const double mu_dbl = value_of(mu_vec[n]);
+        const double beta_dbl = value_of(beta_vec[n]);
+        const double scaled_diff = (y_dbl - mu_dbl) / beta_dbl;
+        const double rep_deriv = exp(-scaled_diff - exp(-scaled_diff)) 
+          / beta_dbl;
+        const double cdf_ = exp(-exp(-scaled_diff));
+        cdf *= cdf_;
+
+        if (!is_constant_struct<T_y>::value)
+          operands_and_partials.d_x1[n] += rep_deriv / cdf_;
+        if (!is_constant_struct<T_loc>::value)
+          operands_and_partials.d_x2[n] -= rep_deriv / cdf_;
+        if (!is_constant_struct<T_scale>::value)
+          operands_and_partials.d_x3[n] -= rep_deriv * scaled_diff / cdf_;
       }
 
-      return cdf;
+      if (!is_constant_struct<T_y>::value) {
+        for(size_t n = 0; n < stan::length(y); ++n) 
+          operands_and_partials.d_x1[n] *= cdf;
+      }
+      if (!is_constant_struct<T_loc>::value) {
+        for(size_t n = 0; n < stan::length(mu); ++n) 
+          operands_and_partials.d_x2[n] *= cdf;
+      }
+      if (!is_constant_struct<T_scale>::value) {
+        for(size_t n = 0; n < stan::length(beta); ++n) 
+          operands_and_partials.d_x3[n] *= cdf;
+      }
+
+      return operands_and_partials.to_var(cdf);
+    }
+
+    template <typename T_y, typename T_loc, typename T_scale>
+    typename return_type<T_y,T_loc,T_scale>::type
+    gumbel_cdf_log(const T_y& y, const T_loc& mu, const T_scale& beta) {
+      static const char* function = "stan::prob::gumbel_cdf_log(%1%)";
+
+      using stan::math::check_positive;
+      using stan::math::check_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_consistent_sizes;
+      using stan::math::value_of;
+
+      double cdf_log(0.0);
+      // check if any vectors are zero length
+      if (!(stan::length(y) 
+            && stan::length(mu) 
+            && stan::length(beta)))
+        return cdf_log;
+
+      if (!check_not_nan(function, y, "Random variable", &cdf_log))
+        return cdf_log;
+      if (!check_finite(function, mu, "Location parameter", &cdf_log))
+        return cdf_log;
+      if (!check_not_nan(function, beta, "Scale parameter", &cdf_log))
+        return cdf_log;
+      if (!check_positive(function, beta, "Scale parameter", &cdf_log))
+        return cdf_log;
+      if (!(check_consistent_sizes(function, y,mu,beta,
+                                   "Random variable","Location parameter",
+                                   "Scale parameter", &cdf_log)))
+        return cdf_log;
+
+      agrad::OperandsAndPartials<T_y, T_loc, T_scale> 
+        operands_and_partials(y, mu, beta);
+
+      VectorView<const T_y> y_vec(y);
+      VectorView<const T_loc> mu_vec(mu);
+      VectorView<const T_scale> beta_vec(beta);
+      size_t N = max_size(y, mu, beta);
+
+      for (size_t n = 0; n < N; n++) {
+        const double y_dbl = value_of(y_vec[n]);
+        const double mu_dbl = value_of(mu_vec[n]);
+        const double beta_dbl = value_of(beta_vec[n]);
+        const double scaled_diff = (y_dbl - mu_dbl) / beta_dbl;
+        const double rep_deriv = exp(-scaled_diff) / beta_dbl;
+        cdf_log -= exp(-scaled_diff);
+
+        if (!is_constant_struct<T_y>::value)
+          operands_and_partials.d_x1[n] += rep_deriv;
+        if (!is_constant_struct<T_loc>::value)
+          operands_and_partials.d_x2[n] -= rep_deriv;
+        if (!is_constant_struct<T_scale>::value)
+          operands_and_partials.d_x3[n] -= rep_deriv * scaled_diff;
+      }
+
+      return operands_and_partials.to_var(cdf_log);
+    }
+
+    template <typename T_y, typename T_loc, typename T_scale>
+    typename return_type<T_y,T_loc,T_scale>::type
+    gumbel_ccdf_log(const T_y& y, const T_loc& mu, const T_scale& beta) {
+      static const char* function = "stan::prob::gumbel_ccdf_log(%1%)";
+
+      using stan::math::check_positive;
+      using stan::math::check_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_consistent_sizes;
+      using stan::math::value_of;
+
+      double ccdf_log(0.0);
+      // check if any vectors are zero length
+      if (!(stan::length(y) 
+            && stan::length(mu) 
+            && stan::length(beta)))
+        return ccdf_log;
+
+      if (!check_not_nan(function, y, "Random variable", &ccdf_log))
+        return ccdf_log;
+      if (!check_finite(function, mu, "Location parameter", &ccdf_log))
+        return ccdf_log;
+      if (!check_not_nan(function, beta, "Scale parameter", &ccdf_log))
+        return ccdf_log;
+      if (!check_positive(function, beta, "Scale parameter", &ccdf_log))
+        return ccdf_log;
+      if (!(check_consistent_sizes(function, y,mu,beta,
+                                   "Random variable","Location parameter",
+                                   "Scale parameter", &ccdf_log)))
+        return ccdf_log;
+
+      agrad::OperandsAndPartials<T_y, T_loc, T_scale> 
+        operands_and_partials(y, mu, beta);
+
+      VectorView<const T_y> y_vec(y);
+      VectorView<const T_loc> mu_vec(mu);
+      VectorView<const T_scale> beta_vec(beta);
+      size_t N = max_size(y, mu, beta);
+
+      for (size_t n = 0; n < N; n++) {
+        const double y_dbl = value_of(y_vec[n]);
+        const double mu_dbl = value_of(mu_vec[n]);
+        const double beta_dbl = value_of(beta_vec[n]);
+        const double scaled_diff = (y_dbl - mu_dbl) / beta_dbl;
+        const double rep_deriv = exp(-scaled_diff - exp(-scaled_diff)) 
+          / beta_dbl;
+        const double ccdf_log_ = 1.0 - exp(-exp(-scaled_diff));
+        ccdf_log += log(ccdf_log_);
+
+        if (!is_constant_struct<T_y>::value)
+          operands_and_partials.d_x1[n] -= rep_deriv / ccdf_log_;
+        if (!is_constant_struct<T_loc>::value)
+          operands_and_partials.d_x2[n] += rep_deriv / ccdf_log_;
+        if (!is_constant_struct<T_scale>::value)
+          operands_and_partials.d_x3[n] += rep_deriv * scaled_diff / ccdf_log_;
+      }
+
+      return operands_and_partials.to_var(ccdf_log);
     }
 
     template <class RNG>
