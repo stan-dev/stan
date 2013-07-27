@@ -11,6 +11,7 @@
 #include <stan/agrad/fwd/matrix/inverse.hpp>
 #include <stan/agrad/fwd/matrix/log_determinant.hpp>
 #include <stan/agrad/fwd/matrix/log_softmax.hpp>
+#include <stan/agrad/fwd/matrix/log_sum_exp.hpp>
 #include <stan/agrad/fwd/matrix/mdivide_left_tri_low.hpp>
 #include <stan/agrad/fwd/matrix/mdivide_left.hpp>
 #include <stan/agrad/fwd/matrix/mdivide_right_tri_low.hpp>

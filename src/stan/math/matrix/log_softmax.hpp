@@ -2,7 +2,10 @@
 #define __STAN__MATH__MATRIX__LOG_SOFTMAX_HPP__
 
 #include <cmath>
+#include <sstream>
+#include <stdexcept>
 #include <stan/math/matrix/Eigen.hpp>
+#include <stan/math/matrix/log_sum_exp.hpp>
 #include <stan/math/matrix/validate_nonzero_size.hpp>
 
 namespace stan {
@@ -20,16 +23,21 @@ namespace stan {
     log_softmax(const Eigen::Matrix<T,Eigen::Dynamic,1>& v) {
       using std::exp;
       using std::log;
+      using stan::math::log_sum_exp;
       stan::math::validate_nonzero_size(v,"vector softmax");
       Eigen::Matrix<T,Eigen::Dynamic,1> theta(v.size());
-      T sum(0.0);
-      T max_v = v.maxCoeff();
+      T z = log_sum_exp(v);
       for (int i = 0; i < v.size(); ++i)
-        sum += exp(v(i) - max_v); // log_sum_exp trick
-      T log_sum = log(sum);
-      for (int i = 0; i < v.size(); ++i)
-        theta(i) = (v(i) - max_v) - log_sum;
+        theta(i) = v(i) - z;
       return theta;
+      // T sum(0.0);
+      // T max_v = v.maxCoeff();
+      // for (int i = 0; i < v.size(); ++i)
+      //   sum += exp(v(i) - max_v); // log_sum_exp trick
+      // T log_sum = log(sum);
+      // for (int i = 0; i < v.size(); ++i)
+      //   theta(i) = (v(i) - max_v) - log_sum;
+      // return theta;
     }
 
   }

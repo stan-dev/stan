@@ -5,6 +5,8 @@
 #include <boost/math/tools/promotion.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/matrix/log_softmax.hpp>
+#include <stan/math/functions/log_sum_exp.hpp>
+#include <stan/math/matrix/log_sum_exp.hpp>
 #include <stan/math/matrix/sum.hpp>
 #include <stan/prob/traits.hpp>
 
@@ -22,7 +24,7 @@ namespace stan {
 
       using stan::math::check_bounded;
       using stan::math::check_finite;
-      using stan::math::log_softmax;
+      using stan::math::log_sum_exp;
 
       double lp = 0.0;
       if (!check_bounded(function, n, 1, beta.size(),
@@ -37,14 +39,13 @@ namespace stan {
         return 0.0;
         
       // FIXME:  wasteful vs. creating term (n-1) if not vectorized
-      return log_softmax(beta)(n-1);
+      return beta(n-1) - log_sum_exp(beta); // == log_softmax(beta)(n-1);
     }
 
     template <typename T_prob>
     inline
     typename boost::math::tools::promote_args<T_prob>::type
-    categorical_logit_log(const typename 
-                          Eigen::Matrix<T_prob,Eigen::Dynamic,1>::size_type n, 
+    categorical_logit_log(int n, 
                           const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& beta) {
       return categorical_logit_log<false>(n,beta);
     }

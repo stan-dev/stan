@@ -304,14 +304,6 @@ In addition, Stan provides a log-odds scaled categorical distribution,
 %
 See \refsection{softmax} for the definition of the softmax function.
 
-Stan also provides a categorical distribution taking an unnormalized
-probability vector on the log scale,  parameter
-\distro{CategoricalLog}, defined by
-%
-\[
-\distro{CategoricalLog}(y|\alpha) = \exp(\alpha_y).
-\]
-
 
 \subsubsection{Stan Functions}
 
@@ -328,17 +320,6 @@ $1:N$ given $N$-simplex distribution parameter \farg{theta}.}
   \farg{beta}}{The log categorical probability mass function with
   outcome(s) \farg{y} in $1:N$ given log-odds of outcomes \farg{beta}.}
 %
-\fitem{real}{categorical\_log\_log}{ints \farg{y}, vector
-  \farg{alpha}}{The log categorical probability mass function with
-  outcome(s) \farg{y} in $1:N$ given unnormalized, log-scale $N$-simplex
-  distribution parameter \farg{alpha}; if \farg{y} is between 1 and
-  the size of \farg{alpha} (inclusive), then
-  \begin{quote}
-  \code{categorical\_log\_log(\farg{y},\farg{alpha}) =
-    \farg{alpha}[y]}.  
-  \end{quote}
-  No check is made that exponentiating
-  \code{alpha} forms a simplex.}
 \end{description}
 %
 \begin{description}
