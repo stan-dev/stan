@@ -766,11 +766,21 @@ namespace stan {
     }
 
 
+    cholesky_factor_var_decl::cholesky_factor_var_decl() 
+      : base_var_decl(MATRIX_T) { 
+    }
+    cholesky_factor_var_decl::cholesky_factor_var_decl(expression const& K,
+                                                       std::string const& name,
+                                                       std::vector<expression> const& dims)
+      : base_var_decl(name,dims,MATRIX_T),
+        K_(K) {
+    }
+
     cov_matrix_var_decl::cov_matrix_var_decl() : base_var_decl(MATRIX_T) { 
     }
     cov_matrix_var_decl::cov_matrix_var_decl(expression const& K,
-                                     std::string const& name,
-                                     std::vector<expression> const& dims)
+                                             std::string const& name,
+                                             std::vector<expression> const& dims)
       : base_var_decl(name,dims,MATRIX_T),
         K_(K) {
     }
@@ -817,6 +827,9 @@ namespace stan {
     std::string name_vis::operator()(const positive_ordered_var_decl& x) const {
       return x.name_;
     }
+    std::string name_vis::operator()(const cholesky_factor_var_decl& x) const {
+      return x.name_;
+    }
     std::string name_vis::operator()(const cov_matrix_var_decl& x) const {
       return x.name_;
     }
@@ -825,9 +838,7 @@ namespace stan {
     }
 
 
-
-
-
+    // can't template out in .cpp file
 
     var_decl::var_decl(const var_decl_t& decl) : decl_(decl) { }
     var_decl::var_decl() : decl_(nil()) { }
@@ -841,13 +852,9 @@ namespace stan {
     var_decl::var_decl(const simplex_var_decl& decl) : decl_(decl) { }
     var_decl::var_decl(const ordered_var_decl& decl) : decl_(decl) { }
     var_decl::var_decl(const positive_ordered_var_decl& decl) : decl_(decl) { }
+    var_decl::var_decl(const cholesky_factor_var_decl& decl) : decl_(decl) { }
     var_decl::var_decl(const cov_matrix_var_decl& decl) : decl_(decl) { }
     var_decl::var_decl(const corr_matrix_var_decl& decl) : decl_(decl) { }
-
-    // template <typename Decl>
-    // var_decl::var_decl(Decl const& decl) : decl_(decl) { }
-
-
 
     std::string var_decl::name() const {
       return boost::apply_visitor(name_vis(),decl_);
@@ -855,7 +862,6 @@ namespace stan {
 
     statement::statement() : statement_(nil()) { }
 
-    // FIXME:  template these out
     statement::statement(const statement_t& st) : statement_(st) { }
     statement::statement(const nil& st) : statement_(st) { }
     statement::statement(const assignment& st) : statement_(st) { }
@@ -866,14 +872,6 @@ namespace stan {
     statement::statement(const conditional_statement& st) : statement_(st) { }
     statement::statement(const print_statement& st) : statement_(st) { }
     statement::statement(const no_op_statement& st) : statement_(st) { }
-
-    // template <typename Statement>
-    // statement::statement(const Statement& statement)
-    // : statement_(statement) {
-    // }
-
-
-
 
     for_statement::for_statement() {
     }

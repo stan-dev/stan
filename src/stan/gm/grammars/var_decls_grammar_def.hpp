@@ -67,6 +67,11 @@ BOOST_FUSION_ADAPT_STRUCT(stan::gm::positive_ordered_var_decl,
                           (std::string, name_)
                           (std::vector<stan::gm::expression>, dims_) )
 
+BOOST_FUSION_ADAPT_STRUCT(stan::gm::cholesky_factor_var_decl,
+                          (stan::gm::expression, K_)
+                          (std::string, name_)
+                          (std::vector<stan::gm::expression>, dims_) )
+
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::cov_matrix_var_decl,
                           (stan::gm::expression, K_)
                           (std::string, name_)
@@ -133,6 +138,11 @@ namespace stan {
       bool operator()(const positive_ordered_var_decl& /*x*/) const {
         error_msgs_ << "require unconstrained variable declaration."
                     << " found positive_ordered." << std::endl;
+        return false;
+      }
+      bool operator()(const cholesky_factor_var_decl& /*x*/) const {
+        error_msgs_ << "require unconstrained variable declaration."
+                    << " found cholesky_factor." << std::endl;
         return false;
       }
       bool operator()(const cov_matrix_var_decl& /*x*/) const {
@@ -302,8 +312,9 @@ namespace stan {
         reserve("positive_ordered"); 
         reserve("row_vector"); 
         reserve("matrix"); 
-        reserve("corr_matrix"); 
+        reserve("cholesky_factor");
         reserve("cov_matrix");
+        reserve("corr_matrix"); 
 
         
         reserve("model"); 
@@ -612,10 +623,13 @@ namespace stan {
             | positive_ordered_decl_r(_r2)   
             [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2,
                               boost::phoenix::ref(error_msgs_))]
-            | corr_matrix_decl_r(_r2)   
+            | cholesky_factor_decl_r(_r2)    
             [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2,
                               boost::phoenix::ref(error_msgs_))]
             | cov_matrix_decl_r(_r2)    
+            [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2,
+                              boost::phoenix::ref(error_msgs_))]
+            | corr_matrix_decl_r(_r2)   
             [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2,
                               boost::phoenix::ref(error_msgs_))]
             )
@@ -727,9 +741,9 @@ namespace stan {
         > opt_dims_r(_r1)
         > lit(';');
 
-      corr_matrix_decl_r.name("correlation matrix declaration");
-      corr_matrix_decl_r 
-        %= lit("corr_matrix")
+      cholesky_factor_decl_r.name("cholesky factor declaration");
+      cholesky_factor_decl_r 
+        %= lit("cholesky_factor")
         > lit('[')
         > expression_g(_r1)
         [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
@@ -744,6 +758,17 @@ namespace stan {
         > lit('[')
         > expression_g(_r1)
           [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
+        > lit(']')
+        > identifier_r 
+        > opt_dims_r(_r1)
+        > lit(';');
+
+      corr_matrix_decl_r.name("correlation matrix declaration");
+      corr_matrix_decl_r 
+        %= lit("corr_matrix")
+        > lit('[')
+        > expression_g(_r1)
+        [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
         > lit(']')
         > identifier_r 
         > opt_dims_r(_r1)

@@ -463,9 +463,13 @@ namespace stan {
                     std::vector<expression> const& dims);
   };
 
-   
-
-   
+  struct cholesky_factor_var_decl : public base_var_decl {
+    expression K_;
+    cholesky_factor_var_decl();
+    cholesky_factor_var_decl(expression const& K,
+                             std::string const& name,
+                             std::vector<expression> const& dims);
+  };
 
   struct cov_matrix_var_decl : public base_var_decl {
     expression K_;
@@ -476,7 +480,6 @@ namespace stan {
   };
 
 
-
   struct corr_matrix_var_decl : public base_var_decl {
     expression K_;
     corr_matrix_var_decl();
@@ -484,8 +487,6 @@ namespace stan {
                          std::string const& name,
                          std::vector<expression> const& dims);
   };
-
-
 
   struct name_vis : public boost::static_visitor<std::string> {
     name_vis();
@@ -499,6 +500,7 @@ namespace stan {
     std::string operator()(const unit_vector_var_decl& x) const;
     std::string operator()(const ordered_var_decl& x) const;
     std::string operator()(const positive_ordered_var_decl& x) const;
+    std::string operator()(const cholesky_factor_var_decl& x) const;
     std::string operator()(const cov_matrix_var_decl& x) const;
     std::string operator()(const corr_matrix_var_decl& x) const;
   };
@@ -517,6 +519,7 @@ namespace stan {
                            boost::recursive_wrapper<unit_vector_var_decl>,
                            boost::recursive_wrapper<ordered_var_decl>,
                            boost::recursive_wrapper<positive_ordered_var_decl>,
+                           boost::recursive_wrapper<cholesky_factor_var_decl>,
                            boost::recursive_wrapper<cov_matrix_var_decl>,
                            boost::recursive_wrapper<corr_matrix_var_decl> >
     var_decl_t;
@@ -538,6 +541,7 @@ namespace stan {
     var_decl(const unit_vector_var_decl& decl);
     var_decl(const ordered_var_decl& decl);
     var_decl(const positive_ordered_var_decl& decl);
+    var_decl(const cholesky_factor_var_decl& decl);
     var_decl(const cov_matrix_var_decl& decl);
     var_decl(const corr_matrix_var_decl& decl);
 
