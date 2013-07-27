@@ -610,6 +610,22 @@ The natural logarithm of the gamma function applied to \farg{x}}
 The natural logarithm of the multinomial gamma function with \farg{n}
 dimensions applied to \farg{x}.  }
 %
+\fitem{real}{gamma\_p}{real \farg{a}, real \farg{z}}{
+The normalised lower incomplete gamma function of \farg{a} and \farg{z} defined for positive \farg{a} and nonnegative \farg{z} by 
+\[
+P(a,z) =
+\frac{1}{\Gamma(a)}\int_0^z t^{a-1}e^{-t}dt
+\]
+}
+%
+\fitem{real}{gamma\_q}{real \farg{a}, real \farg{z}}{
+The normalised upper incomplete gamma function of \farg{a} and \farg{z} defined for positive \farg{a} and nonnegative \farg{z} by 
+\[
+Q(a,z) =
+\frac{1}{\Gamma(a)}\int_z^\infty t^{a-1}e^{-t}dt
+\]
+}
+%
 \fitem{real}{binomial\_coefficient\_log}{real \farg{x}, real
   \farg{y}}{ The natural logarithm of the binomial coefficient of
   \farg{x} and \farg{y}.  For non-negative integer inputs, this is
