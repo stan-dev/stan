@@ -67,11 +67,13 @@ attach(data)
  # Plot figure 10.8
 frame1 = data.frame(x1=1-dvp[deminc.cond],y1=score1[deminc.cond])
 frame2 = data.frame(x2=1-dvp[repinc.cond],y2=score1[repinc.cond])
-m <- ggplot()
-m <- m + geom_point(data=frame1,aes(x=x1,y=y1),shape="x")
-m <- m + geom_point(data=frame2,aes(x=x2,y=y2),shape="o")
-m <- m + scale_y_continuous("(liberal)           ideology score       (conservative)") + scale_x_continuous("Republican's vote share") + theme_bw()
-print(m)
+p1 <- ggplot() +
+      geom_point(data=frame1,aes(x=x1,y=y1),shape="x") +
+      geom_point(data=frame2,aes(x=x2,y=y2),shape="o") +
+      scale_y_continuous("(liberal)           ideology score       (conservative)") +
+     scale_x_continuous("Republican's vote share") +
+     theme_bw()
+print(p1)
 
  # regression discontinuity analysis
 
@@ -80,12 +82,14 @@ party <- ifelse (dvp<.5, 1, 0)
 
 ## Regression in the area near the discontinuity (ideo_two_pred.stan)
 ## lm (score1 ~ party + x, subset=overlap)
-if (!file.exists("ideo_two_pred.sm.RData")) {
-    rt <- stanc("ideo_two_pred.stan", model_name="ideo_two_pred")
-    ideo_two_pred.sm <- stan_model(stanc_ret=rt)
-    save(ideo_two_pred.sm, file="ideo_two_pred.sm.RData")
-} else {
-    load("ideo_two_pred.sm.RData", verbose=TRUE)
+if (!exists("ideo_two_pred.sm")) {
+    if (file.exists("ideo_two_pred.sm.RData")) {
+        load("ideo_two_pred.sm.RData", verbose = TRUE)
+    } else {
+        rt <- stanc("ideo_two_pred.stan", model_name = "ideo_two_pred")
+        ideo_two_pred.sm <- stan_model(stanc_ret = rt)
+        save(ideo_two_pred.sm, file = "ideo_two_pred.sm.RData")
+    }
 }
 
 overlap <- (deminc.cond | repinc.cond) & dvp>.45 & dvp<.55 & !is.na(score1+party+x)
@@ -108,12 +112,14 @@ print(ideo_two_pred.sf2)
 
 ## Regression with interactions (ideo_interactions.stan)
 ## lm (score1 ~ party + x + party:x, subset=incs)
-if (!file.exists("ideo_interactions.sm.RData")) {
-    rt <- stanc("ideo_interactions.stan", model_name="ideo_interactions")
-    ideo_interactions.sm <- stan_model(stanc_ret=rt)
-    save(ideo_interactions.sm, file="ideo_interactions.sm.RData")
-} else {
-    load("ideo_interactions.sm.RData", verbose=TRUE)
+if (!exists("ideo_interactions.sm")) {
+    if (file.exists("ideo_interactions.sm.RData")) {
+        load("ideo_interactions.sm.RData", verbose = TRUE)
+    } else {
+        rt <- stanc("ideo_interactions.stan", model_name = "ideo_interactions")
+        ideo_interactions.sm <- stan_model(stanc_ret = rt)
+        save(ideo_interactions.sm, file = "ideo_interactions.sm.RData")
+    }
 }
 
 ideo_interactions.sf1 <- sampling(ideo_interactions.sm, dataList.2)
@@ -121,13 +127,16 @@ print(ideo_interactions.sf1)
 
 ## Reparametrized regression (ideo_reparam.stan)
 ## lm (score1 ~ party + I(z*(party==0)) + I(z*(party==1)), subset=incs)
-if (!file.exists("ideo_reparam.sm.RData")) {
-    rt <- stanc("ideo_reparam.stan", model_name="ideo_reparam")
-    ideo_reparam.sm <- stan_model(stanc_ret=rt)
-    save(ideo_reparam.sm, file="ideo_reparam.sm.RData")
-} else {
-    load("ideo_reparam.sm.RData", verbose=TRUE)
+if (!exists("ideo_reparam.sm")) {
+    if (file.exists("ideo_reparam.sm.RData")) {
+        load("ideo_reparam.sm.RData", verbose = TRUE)
+    } else {
+        rt <- stanc("ideo_reparam.stan", model_name = "ideo_reparam")
+        ideo_reparam.sm <- stan_model(stanc_ret = rt)
+        save(ideo_reparam.sm, file = "ideo_reparam.sm.RData")
+    }
 }
+
 z <- x2 - 0.5
 z.1 <- I(z*(p2==0))
 z.2 <- I(z*(p2==1))

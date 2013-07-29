@@ -12,12 +12,14 @@ y <- postlet
 
 ## Instrumental variables estimate (sesame_one_pred_a.stan)
 ## lm (watched ~ encouraged)
-if (!file.exists("sesame_one_pred_a.sm.RData")) {
-    rt <- stanc("sesame_one_pred_a.stan", model_name="sesame_one_pred_a")
-    sesame_one_pred_a.sm <- stan_model(stanc_ret=rt)
-    save(sesame_one_pred_a.sm, file="sesame_one_pred_a.sm.RData")
-} else {
-    load("sesame_one_pred_a.sm.RData", verbose=TRUE)
+if (!exists("sesame_one_pred_a.sm")) {
+    if (file.exists("sesame_one_pred_a.sm.RData")) {
+        load("sesame_one_pred_a.sm.RData", verbose = TRUE)
+    } else {
+        rt <- stanc("sesame_one_pred_a.stan", model_name = "sesame_one_pred_a")
+        sesame_one_pred_a.sm <- stan_model(stanc_ret = rt)
+        save(sesame_one_pred_a.sm, file = "sesame_one_pred_a.sm.RData")
+    }
 }
 
 dataList.1 <- list(N=length(watched), watched=watched,encouraged=encouraged)

@@ -10,12 +10,14 @@ pretest <- prelet
 ## 2 stage least squares (sesame_one_pred_a.stan)
 ## lm (watched ~ encouraged)
 
-if (!file.exists("sesame_one_pred_a.sm.RData")) {
-    rt <- stanc("sesame_one_pred_a.stan", model_name="sesame_one_pred_a")
-    sesame_one_pred_a.sm <- stan_model(stanc_ret=rt)
-    save(sesame_one_pred_a.sm, file="sesame_one_pred_a.sm.RData")
-} else {
-    load("sesame_one_pred_a.sm.RData", verbose=TRUE)
+if (!exists("sesame_one_pred_a.sm")) {
+    if (file.exists("sesame_one_pred_a.sm.RData")) {
+        load("sesame_one_pred_a.sm.RData", verbose = TRUE)
+    } else {
+        rt <- stanc("sesame_one_pred_a.stan", model_name = "sesame_one_pred_a")
+        sesame_one_pred_a.sm <- stan_model(stanc_ret = rt)
+        save(sesame_one_pred_a.sm, file = "sesame_one_pred_a.sm.RData")
+    }
 }
 
 dataList.1 <- list(N=length(watched), watched=watched,encouraged=encouraged)
@@ -35,12 +37,14 @@ print(sesame_one_pred_2b.sf1)
 
 ## Adjusting for covariates in a IV framework (sesame_multi_preds_3a.stan)
 ## lm (watched ~ encouraged + pretest + as.factor(site) + setting)
-if (!file.exists("sesame_multi_preds_3a.sm.RData")) {
-    rt <- stanc("sesame_multi_preds_3a.stan", model_name="sesame_multi_preds_3a")
-    sesame_multi_preds_3a.sm <- stan_model(stanc_ret=rt)
-    save(sesame_multi_preds_3a.sm, file="sesame_multi_preds_3a.sm.RData")
-} else {
-    load("sesame_multi_preds_3a.sm.RData", verbose=TRUE)
+if (!exists("sesame_multi_preds_3a.sm")) {
+    if (file.exists("sesame_multi_preds_3a.sm.RData")) {
+        load("sesame_multi_preds_3a.sm.RData", verbose = TRUE)
+    } else {
+        rt <- stanc("sesame_multi_preds_3a.stan", model_name = "sesame_multi_preds_3a")
+        sesame_multi_preds_3a.sm <- stan_model(stanc_ret = rt)
+        save(sesame_multi_preds_3a.sm, file = "sesame_multi_preds_3a.sm.RData")
+    }
 }
 dataList.3 <- list(N=length(watched), watched=watched,encouraged=encouraged,pretest=pretest, site=site,setting=setting)
 sesame_multi_pred_3a.sf1 <- sampling(sesame_multi_preds_3a.sm, dataList.3)

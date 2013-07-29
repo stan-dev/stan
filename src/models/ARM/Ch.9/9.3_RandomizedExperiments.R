@@ -7,14 +7,24 @@ attach(electric)
   
   electric$Grade <- factor(electric$Grade, levels=c('1','2','3','4'), labels=c('Grade 1', 'Grade 2', 'Grade 3', 'Grade 4'))
   frame = data.frame(x1=control.Posttest,Grade=electric$Grade)
-  m1 <- ggplot(frame,aes(x1)) +  geom_histogram(colour = "black", fill = "white", binwidth=5) + theme_bw() + facet_grid(Grade ~.) + theme(strip.text.y = element_blank(),axis.title.y = element_blank(),axis.title.x=element_blank(),strip.background = element_blank()) + labs(title='Test Scores in Control Classes') 
+  p1 <- ggplot(frame,aes(x1)) +
+        geom_histogram(colour = "black", fill = "white", binwidth=5) +
+        theme_bw() +
+        facet_grid(Grade ~.) +
+        theme(strip.text.y = element_blank(),axis.title.y = element_blank(),axis.title.x=element_blank(),strip.background = element_blank()) +
+        labs(title='Test Scores in Control Classes') 
 
   frame2 = data.frame(x1=treated.Posttest,Grade=electric$Grade)
-  m2 <- ggplot(frame2,aes(x1)) +  geom_histogram(colour = "black", fill = "white", binwidth=5) + theme_bw() + facet_grid(Grade ~.) + theme(axis.title.y = element_blank(),axis.ticks.y = element_blank(),axis.text.y=element_blank(),axis.title.x=element_blank()) + labs(title='Test Scores in Treated Classes') 
+  p2 <- ggplot(frame2,aes(x1)) +
+        geom_histogram(colour = "black", fill = "white", binwidth=5) +
+        theme_bw() +
+        facet_grid(Grade ~.) +
+        theme(axis.title.y = element_blank(),axis.ticks.y = element_blank(),axis.text.y=element_blank(),axis.title.x=element_blank()) +
+        labs(title='Test Scores in Treated Classes') 
 
 pushViewport(viewport(layout = grid.layout(1, 2)))
-print(m1, vp = viewport(layout.pos.row = 1, layout.pos.col = 1))
-print(m2, vp = viewport(layout.pos.row = 1, layout.pos.col = 2))
+print(p1, vp = viewport(layout.pos.row = 1, layout.pos.col = 1))
+print(p2, vp = viewport(layout.pos.row = 1, layout.pos.col = 2))
 
 ## Basic analysis of a completely randomized experiment
 electric <- read.table ("electric.dat", header=T)
@@ -26,12 +36,14 @@ grade <- rep (electric$Grade, 2)
 treatment <- rep (c(1,0), rep(length(treated.Posttest),2))
 n <- length (post.test)
 
-if (!file.exists("electric_one_pred.sm.RData")) {
-    rt <- stanc("electric_one_pred.stan", model_name="electric_one_pred")
-    electric_one_pred.sm <- stan_model(stanc_ret=rt)
-    save(electric_one_pred.sm, file="electric_one_pred.sm.RData")
-} else {
-    load("electric_one_pred.sm.RData", verbose=TRUE)
+if (!exists("electric_one_pred.sm")) {
+    if (file.exists("electric_one_pred.sm.RData")) {
+        load("electric_one_pred.sm.RData", verbose = TRUE)
+    } else {
+        rt <- stanc("electric_one_pred.stan", model_name = "electric_one_pred")
+        electric_one_pred.sm <- stan_model(stanc_ret = rt)
+        save(electric_one_pred.sm, file = "electric_one_pred.sm.RData")
+    }
 }
 
 est1 <- rep(NA,4)
@@ -53,12 +65,14 @@ se1[k] <- sd(beta.post[,2])
 }
 
 ## Plot of the regression results (Figure 9.5)
-if (!file.exists("electric_multi_preds.sm.RData")) {
-    rt <- stanc("electric_multi_preds.stan", model_name="electric_multi_preds")
-    electric_multi_preds.sm <- stan_model(stanc_ret=rt)
-    save(electric_multi_preds.sm, file="electric_multi_preds.sm.RData")
-} else {
-    load("electric_multi_preds.sm.RData", verbose=TRUE)
+if (!exists("electric_multi_preds.sm")) {
+    if (file.exists("electric_multi_preds.sm.RData")) {
+        load("electric_multi_preds.sm.RData", verbose = TRUE)
+    } else {
+        rt <- stanc("electric_multi_preds.stan", model_name = "electric_multi_preds")
+        electric_multi_preds.sm <- stan_model(stanc_ret = rt)
+        save(electric_multi_preds.sm, file = "electric_multi_preds.sm.RData")
+    }
 }
 
 est2 <- rep(NA,4)
@@ -136,6 +150,7 @@ par (mfrow=c(1,1))
 ## Controlling for pre-treatment predictors (Figure 9.6)
 electric <- read.table ("electric.dat", header=T)
 attach(electric)
+dev.new()
 pushViewport(viewport(layout = grid.layout(1, 4)))
 for (j in 1:4){
   ok <- electric$Grade==j & !is.na(treated.Posttest+treated.Pretest+control.Pretest+control.Posttest)
@@ -149,11 +164,14 @@ for (j in 1:4){
 
   frame1 = data.frame(x1=treated.Pretest[ok],y1=treated.Posttest[ok])
   frame2 = data.frame(x2=control.Pretest[ok],y2=control.Posttest[ok])
-  mm <- ggplot()
-  mm <- mm + geom_point(data=frame1,aes(x=x1,y=y1),shape=20)
-  mm <- mm + geom_point(data=frame2,aes(x=x2,y=y2),shape=21)
-  mm <- mm + scale_y_continuous("Posttest",limits=c(0,125)) + scale_x_continuous("Pretest",limits=c(0,125)) + theme_bw() + labs(title=paste("Grade ",j))
-  mm <- mm + geom_abline(intercept=(beta.mean[1]+beta.mean[2]),slope=beta.mean[3])
-  mm <- mm + geom_abline(intercept=(beta.mean[1]),slope=beta.mean[3],linetype="dashed")
-  print(mm, vp = viewport(layout.pos.row = 1, layout.pos.col = j))
+  p3 <- ggplot() +
+        geom_point(data=frame1,aes(x=x1,y=y1),shape=20) +
+        geom_point(data=frame2,aes(x=x2,y=y2),shape=21) +
+        scale_y_continuous("Posttest",limits=c(0,125)) +
+        scale_x_continuous("Pretest",limits=c(0,125)) +
+        theme_bw() +
+        labs(title=paste("Grade ",j)) +
+        geom_abline(intercept=(beta.mean[1]+beta.mean[2]),slope=beta.mean[3]) +
+        geom_abline(intercept=(beta.mean[1]),slope=beta.mean[3],linetype="dashed")
+  print(p3, vp = viewport(layout.pos.row = 1, layout.pos.col = j))
 }
