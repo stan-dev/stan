@@ -1,0 +1,36 @@
+Data
+====
+
+1. earnings1.data.R
+- N       : number of observations
+- earn_pos: is earnings positive? 1: Yes, 0: No
+- height  : height in inches
+- male    : is male? 1: Yes, 0: No
+
+2. earnings2.data.R
+- N       : number of observations
+- earnings: earnings in dollars
+- height  : height in inches
+- sex     : 1: male, 2: female
+
+3. wells.data.R
+- N      : number of observations
+- switc  : household switched to new well? 1: Yes, 0: No
+- arsenic: level of arsenic of respondent's well
+- dist   : distance (in meters) to closest known safe well
+- assoc  : any household members active in community organizations? 1: Yes, 0: No
+- educ   : education level of head of household
+
+Models
+======
+
+1. One predictor
+wells_logit.stan : switc ~ dist100
+wells_probit.stan: switc ~ dist100
+
+2. Multiple predictors with no interaction
+earnings1.stan: earn_pos ~ height + male
+
+3. Log transformations
+earnings2.stan: log(earnings) ~ height + male
+
