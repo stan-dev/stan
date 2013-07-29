@@ -1,0 +1,52 @@
+Data
+====
+
+1. nes.data.R
+- N     : number of observations
+- vote  : voted for George Bush? 1: Yes, 0: No
+- income: income level (five-point scale)
+
+2. wells.data.R
+- N      : number of observations
+- switc  : household switched to new well? 1: Yes, 0: No
+- arsenic: level of arsenic of respondent's well
+- dist   : distance (in meters) to closest known safe well
+- assoc  : any household members active in community organizations? 1: Yes, 0: No
+- educ   : education level of head of household
+
+Models
+======
+
+1. One predictor
+wells_one_pred_scale.stan: switc ~ dist100
+wells_one_pred.stan      : switc ~ dist
+y_x.stan                 : y ~ x
+
+2. Multiple predictors with no interaction
+wells_edu.stan     : switc ~ dist100 + arsenic + educ4
+wells_two_pred.stan: switc ~ dist100 + arsenic
+
+3. Multiple predictors with interaction
+wells_all.stan         : switc ~ dist100 + arsenic + educ4 + dist100:arsenic
+wells_interactions.stan: switc ~ dist100 + arsenic + dist1::arsenic
+
+4. Centering
+wells_community.stan               : switc ~ c_dist100 + c_arsenic 
+                                             + c_dist100:c_arsenic + assoc 
+                                             + educ4
+wells_interactions_center_educ.stan: switc ~ c_dist100 + c_arsenic + c_educ4 
+                                             + c_dist100:c_arsenic 
+                                             + c_dist100:c_educ4 
+                                             + c_arsenic:c_educ4
+wells_interaction_center.stan      : switc ~ c_dist100 + c_arsenic 
+                                             + c_dist100:c_arsenic
+wells_social.stan                  : switc ~ c_dist100 + c_arsenic 
+                                             + c_dist100:c_arsenic + educ4
+
+5. Log transformations
+wells_log_transform.stan : switc ~ c_dist100 + c_log_arsenic + c_educ4 
+                                   + c_dist100:c_log_arsenic + c_dist100:c_educ4 
+                                   + c_log_arsenic:c_educ4
+wells_log_transform2.stan: switc ~ dist100 + log(arsenic) + c_educ4 
+                                   + dist100:log(arsenic) + dist100:educ4 
+                                   + log(arsenic):educ4

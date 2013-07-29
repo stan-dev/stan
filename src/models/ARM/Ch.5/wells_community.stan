@@ -26,8 +26,7 @@ parameters {
   vector[6] beta;
 } 
 model {
-  for (n in 1:N)
-    switc[n] ~ bernoulli(inv_logit(beta[1] + beta[2] * c_dist100[n] 
-                            + beta[3] * c_arsenic[n] + beta[4] * inter[n]
-                            + beta[5] * assoc[n] + beta[6] * educ4[n]));
+  switc ~ bernoulli_logit(beta[1] + beta[2] * c_dist100
+                            + beta[3] * c_arsenic + beta[4] * inter
+                            + beta[5] * assoc + beta[6] * educ4);
 }
