@@ -9,5 +9,5 @@ parameters {
   real<lower=0> sigma;
 } 
 model {
-  earn_pos[n] ~ bernoulli_logit(beta[1] + beta[2] * height + beta[3] * male);
+  earn_pos ~ bernoulli_logit(beta[1] + beta[2] * height + beta[3] * male);
 }
