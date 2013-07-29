@@ -10,13 +10,29 @@ source("12.6_Group-LevelPredictors.R") # where variables were defined
 
 ## Prediction for a new observation in a new group (new house in county 26
 ## with x=1) FIXME: use stan
-M2 <- lmer (y ~ x + u.full + (1 | county))
-a.hat.M2 <- fixef(M2)[1] + fixef(M2)[3]*u + ranef(M2)$county
-b.hat.M2 <- fixef(M2)[2]
+if (!exists("radon_group.sm")) {
+    if (file.exists("radon_group.sm.RData")) {
+        load("radon_group.sm.RData", verbose = TRUE)
+    } else {
+        rt <- stanc("radon_group.stan", model_name = "radon_group")
+        radon_group.sm <- stan_model(stanc_ret = rt)
+        save(radon_group.sm, file = "radon_group.sm.RData")
+    }
+}
+dataList.3 <- list(N=length(y), y=y,x=x,county=county,u=u.full)
+radon_group.sf1 <- sampling(radon_group.sm, dataList.3)
+print(radon_group.sf1)
+post1 <- extract(radon_group.sf1)
+post1.ranef <- colMeans(post1$const_coef)
+post1.beta <- colMeans(post1$beta)
+post1.fixef1 <- mean(post1.ranef)
+
+a.hat.M2 <- post1.fixef1 + post1.beta[2] * u + post1.ranef
+b.hat.M2 <- post1.beta[1]
 
 x.tilde <- 1
-sigma.y.hat <- sigma.hat(M2)$sigma$data
-coef.hat <- as.matrix (coef(M2)$county)[26,]
+sigma.y.hat <- mean(post1$sigma)
+coef.hat <- as.matrix (post1$fixef1,post1$beta[1,26],post1$beta[2,26])
 y.tilde <- rnorm (1, coef.hat %*% c(1, x.tilde, u[26]), sigma.y.hat)
 n.sims <- 1000
 y.tilde <- rnorm (n.sims, coef.hat %*% c(1, x.tilde, u[26]), sigma.y.hat)
@@ -29,9 +45,9 @@ mean(unlogged)
 ## Prediction for a new observation in an existing group (new house in
 ## a new county)
 u.tilde <- mean (u)
-g.0.hat <- fixef(M2)["(Intercept)"]
-g.1.hat <- fixef(M2)["u.full"]
-sigma.a.hat <- sigma.hat(M2)$sigma$county
+g.0.hat <- post1.fixef1
+g.1.hat <- post1.beta[2]
+sigma.a.hat <- mean(post1$sigma)
 
 a.tilde <- rnorm (n.sims, g.0.hat + g.1.hat*u.tilde, sigma.a.hat)
 y.tilde <- rnorm (n.sims, a.tilde + b.hat*x.tilde, sigma.y.hat)

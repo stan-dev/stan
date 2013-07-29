@@ -30,19 +30,34 @@ if (!exists("radon_group.sm")) {
 dataList.3 <- list(N=length(y), y=y,x=x,county=county,u=u.full)
 radon_group.sf1 <- sampling(radon_group.sm, dataList.3)
 print(radon_group.sf1)
-post <- extract(radon_group.sf1)
+post1 <- extract(radon_group.sf1)
+post1.ranef <- colMeans(post1$const_coef)
+post1.beta <- colMeans(post1$beta)
+post1.fixef1 <- mean(post1.ranef)
 
-## Plots on Figure 12.5 FIXME: model too slow
-M2 <- lmer (y ~ x + u.full + (1 | county))
-M1 <- lmer (y ~ x + (1 | county))
-a.hat.M1 <- fixef(M1)[1] + ranef(M1)$county                
-b.hat.M1 <- fixef(M1)[2]
-a.hat.M2 <- fixef(M2)[1] + fixef(M2)[3]*u + ranef(M2)$county
-b.hat.M2 <- fixef(M2)[2]
-a.hat.M1 <- melt(a.hat.M1)
-a.hat.M2 <- melt(a.hat.M2)
-b.hat.M1 <- melt(b.hat.M1)
-b.hat.M2 <- melt(b.hat.M2)
+## Plots on Figure 12.5
+if (!exists("radon_no_pool.sm")) {
+    if (file.exists("radon_no_pool.sm.RData")) {
+        load("radon_no_pool.sm.RData", verbose = TRUE)
+    } else {
+        rt <- stanc("radon_no_pool.stan", model_name = "radon_no_pool")
+        radon_no_pool.sm <- stan_model(stanc_ret = rt)
+        save(radon_group.sm, file = "radon_no_pool.sm.RData")
+    }
+}
+dataList.4 <- list(N=length(y), y=y,x=x,county=county)
+radon_no_pool.sf1 <- sampling(radon_no_pool.sm, dataList.4)
+print(radon_no_pool.sf1)
+post2 <- extract(radon_no_pool.sf1)
+post2.ranef <- colMeans(post2$factor)
+post2.fixef1 <- colMeans(post2$beta)
+post2.fixef2 <- mean(post2.ranef)
+
+a.hat.M1 <- post2.fixef2 + post2.ranef
+b.hat.M1 <- post2.fixef1
+
+a.hat.M2 <- post1.fixef1 + post1.beta[2] * u + post1.ranef
+b.hat.M2 <- post1.beta[1]
 
 x.jitter <- x + runif(n,-.05,.05)
 display8 <- c (36, 1, 35, 21, 14, 71, 61, 70)  # counties to be displayed
