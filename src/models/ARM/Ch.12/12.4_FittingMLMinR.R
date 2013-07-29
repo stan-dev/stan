@@ -52,22 +52,28 @@ radon8.data$unpooled.slope <- mean(post.unpooled$beta)
 radon8.data$coef.int <- a.hat.M1[radon8.data$county]
 radon8.data$coef.slope <- b.hat.M1[radon8.data$county]
 
-dev.new()
-p <- ggplot(radon8.data, aes(x.jitter, y)) +
+p1 <- ggplot(radon8.data, aes(x.jitter, y)) +
     geom_jitter(position = position_jitter(width = .05, height = 0)) +
     scale_x_continuous(breaks=c(0,1), labels=c("0", "1")) +
     geom_abline(aes(intercept = pooled.int, slope = pooled.slope), linetype = "dashed") +
     geom_abline(aes(intercept = unpooled.int, slope = unpooled.slope), size = 0.25) +
     geom_abline(aes(intercept = coef.int, slope = coef.slope), size = 0.25) +
     facet_wrap(~ county.name, ncol = 4)
-print(p)
+print(p1)
 
 ## Multilevel model ests vs. sample size (plot on the right on figure 12.3)
+dev.new()
 a.se.M1 <- se.coef(M1)$county
 sample.size <- as.vector (table (county))
 sample.size.jittered <- sample.size*exp (runif (J, -.1, .1))
 max1 <- a.hat.M1+a.se.M1
 min1 <- a.hat.M1-a.se.M1
 frame3 = data.frame(x1=sample.size.jittered,y1=unpooled,max1=max1,min1=min1)
-m2 <- ggplot(frame3,aes(x=x1,y=y1,ymin= min1,ymax=max1))
-m2 + geom_point() + scale_y_continuous("estimated intercept alpha (no pooling)") + scale_x_log10("Sample Size in County j") + theme_bw() + geom_linerange() + geom_hline(aes(yintercept=pooled[1]))
+p2 <- ggplot(frame3,aes(x=x1,y=y1,ymin= min1,ymax=max1)) +
+      geom_point() +
+      scale_y_continuous("estimated intercept alpha (no pooling)") +
+      scale_x_log10("Sample Size in County j") +
+      theme_bw() +
+      geom_linerange() +
+      geom_hline(aes(yintercept=pooled[1]))
+print(p2)

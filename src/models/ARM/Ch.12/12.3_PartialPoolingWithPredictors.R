@@ -3,12 +3,14 @@ library(ggplot2)
 source("12.2_PartialPoolingWithNoPredictors.R") # where data was cleaned
 
 ## Complete pooling regression
-if (!file.exists("radon_complete_pool.sm.RData")) {
-    rt <- stanc("radon_complete_pool.stan", model_name="radon_complete_pool")
-    radon_complete_pool.sm <- stan_model(stanc_ret=rt)
-    save(radon_complete_pool.sm, file="radon_complete_pool.sm.RData")
-} else {
-    load("radon_complete_pool.sm.RData", verbose=TRUE)
+if (!exists("radon_complete_pool.sm")) {
+    if (file.exists("radon_complete_pool.sm.RData")) {
+        load("radon_complete_pool.sm.RData", verbose = TRUE)
+    } else {
+        rt <- stanc("radon_complete_pool.stan", model_name = "radon_complete_pool")
+        radon_complete_pool.sm <- stan_model(stanc_ret = rt)
+        save(radon_complete_pool.sm, file = "radon_complete_pool.sm.RData")
+    }
 }
 dataList.1 <- list(N=length(y), y=y,x=x)
 radon_complete_pool.sf1 <- sampling(radon_complete_pool.sm, dataList.1)
@@ -17,12 +19,14 @@ post.pooled <- extract(radon_complete_pool.sf1)
 pooled <- colMeans(post.pooled$beta)
 
 ## No pooling regression
-if (!file.exists("radon_no_pool.sm.RData")) {
-    rt <- stanc("radon_no_pool.stan", model_name="radon_no_pool")
-    radon_no_pool.sm <- stan_model(stanc_ret=rt)
-    save(radon_no_pool.sm, file="radon_no_pool.sm.RData")
-} else {
-    load("radon_no_pool.sm.RData", verbose=TRUE)
+if (!exists("radon_no_pool.sm")) {
+    if (file.exists("radon_no_pool.sm.RData")) {
+        load("radon_no_pool.sm.RData", verbose = TRUE)
+    } else {
+        rt <- stanc("radon_no_pool.stan", model_name = "radon_no_pool")
+        radon_no_pool.sm <- stan_model(stanc_ret = rt)
+        save(radon_no_pool.sm, file = "radon_no_pool.sm.RData")
+    }
 }
 
 dataList.2 <- list(N=length(y), y=y,x=x,county=county)
@@ -52,21 +56,24 @@ radon8.data$pooled.slope <- pooled[2]
 radon8.data$unpooled.int <- unpooled[radon8.data$county]
 radon8.data$unpooled.slope <- mean(post.unpooled$beta)
 
-dev.new()
-p <- ggplot(radon8.data, aes(x.jitter, y)) +
-    geom_jitter(position = position_jitter(width = .05, height = 0)) +
-    scale_x_continuous(breaks=c(0,1), labels=c("0", "1")) +
-    geom_abline(aes(intercept = pooled.int, slope = pooled.slope), linetype = "dashed") +
-    geom_abline(aes(intercept = unpooled.int, slope = unpooled.slope), size = 0.25) +
-    facet_wrap(~ county.name, ncol = 4)
-print(p)
+p1 <- ggplot(radon8.data, aes(x.jitter, y)) +
+      geom_jitter(position = position_jitter(width = .05, height = 0)) +
+      scale_x_continuous(breaks=c(0,1), labels=c("0", "1")) +
+      geom_abline(aes(intercept = pooled.int, slope = pooled.slope), linetype = "dashed") +
+      geom_abline(aes(intercept = unpooled.int, slope = unpooled.slope), size = 0.25) +
+      facet_wrap(~ county.name, ncol = 4)
+print(p1)
 
 ## No-pooling ests vs. sample size (plot on the left on figure 12.3)
 sample.size <- as.vector (table (county))
 sample.size.jittered <- sample.size*exp (runif (J, -.1, .1))
-
+dev.new()
 frame1 = data.frame(x1=sample.size.jittered,y1=unpooled)
 limits <- aes(ymax=unpooled+sd.unpooled, ymin=unpooled-sd.unpooled)
-m2 <- ggplot(frame1,aes(x=x1,y=y1))
-m2 + geom_point() + scale_y_continuous("estimated intercept alpha (no pooling)") + scale_x_log10("Sample Size in County j") + theme_bw() + geom_pointrange(limits)
-
+p2 <- ggplot(frame1,aes(x=x1,y=y1)) +
+      geom_point() +
+      scale_y_continuous("estimated intercept alpha (no pooling)") +
+      scale_x_log10("Sample Size in County j") +
+      theme_bw() +
+      geom_pointrange(limits)
+print(p2)
