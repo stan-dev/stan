@@ -3,6 +3,7 @@
 
 #include <stan/math/error_handling/matrix/constraint_tolerance.hpp>
 #include <stan/math/error_handling/matrix/check_size_match.hpp>
+#include <stan/math/error_handling/matrix/check_lower_triangular.hpp>
 #include <stan/math/error_handling/matrix/check_symmetric.hpp>
 #include <stan/math/error_handling/matrix/check_pos_definite.hpp>
 #include <stan/math/error_handling/matrix/check_cholesky_factor.hpp>

@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <cstddef>
+#include <limits>
 #include <stdexcept>
 #include <sstream>
 #include <vector>
@@ -12,6 +13,7 @@
 #include <stan/agrad/matrix.hpp>
 #include <stan/math.hpp>
 #include <stan/math/matrix.hpp>
+#include <stan/math/matrix/sum.hpp>
 #include <stan/math/matrix/validate_less.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/matrix_error_handling.hpp>
@@ -1314,6 +1316,97 @@ namespace stan {
     }
     
 
+    // CHOLESKY FACTOR
+
+    /**
+     * Return the Cholesky factor of the specified size read from the
+     * specified vector.  A total of (k choose 2) + k free parameters are
+     * required to read a k by k Cholesky factor.
+     * 
+     * @tparam T Type of scalars in matrix
+     * @param x Vector of unconstrained values
+     * @param k Number of rows and columns in Cholesky factor
+     * @return Cholesky factor
+     */
+    template <typename T>
+    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
+    cholesky_factor_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x,
+                              int k) {
+      using std::exp;
+      if (x.size() != (k * (k + 1)) / 2)
+        throw std::domain_error("cholesky_factor_constrain: x.size() must be (k choose 2) + k");
+      Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> y(k,k);
+      T zero(0);
+      int pos = 0;
+      for (int m = 0; m < k; ++m) {
+        for (int n = 0; n < m; ++n)
+          y(m,n) = x(pos++);
+        y(m,m) = exp(x(pos++));
+        for (int n = m + 1; n < k; ++n)
+          y(m,n) = zero;
+      }
+      return y;
+    }
+
+    /**
+     * Return the Cholesky factor of the specified size read from the
+     * specified vector and increment the specified log probability
+     * reference with the log Jacobian adjustment of the transform.  A
+     * total of (k choose 2) + k free parameters are required to read
+     * a k by k Cholesky factor.
+     * 
+     * @tparam T Type of scalars in matrix
+     * @param x Vector of unconstrained values
+     * @param k Number of rows and columns in Cholesky factor
+     * @param lp Log probability that is incremented with the log Jacobian
+     * @return Cholesky factor
+     */
+    template <typename T>
+    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
+    cholesky_factor_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x,
+                              int k,
+                              T& lp) {
+      // cut-and-paste from above, so checks twice
+      using stan::math::sum;
+      if (x.size() != (k * (k + 1)) / 2)
+        throw std::domain_error("cholesky_factor_constrain: x.size() must be (k choose 2) + k");
+      int pos = 0;
+      std::vector<T> log_jacobians(k);
+      for (int m = 0; m < k; ++m) {
+        pos += m;
+        log_jacobians[m] = x(pos++);
+      }
+      lp += sum(log_jacobians);  // optimized for autodiff vs. direct lp += 
+      return cholesky_factor_constrain(x,k);
+    }
+
+    /**
+     * Return the unconstrained vector of parameters correspdonding to
+     * the specified Cholesky factor.  A Cholesky factor must be lower
+     * triangular and have positive diagonal elements.
+     *
+     * @param y Cholesky factor.
+     * @return Unconstrained parameters for Cholesky factor.
+     * @throw std::domain_error If the matrix is not a Cholesky factor.
+     */
+    template <typename T>
+    Eigen::Matrix<T,Eigen::Dynamic,1>
+    cholesky_factor_free(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& y) {
+      using std::log;
+      double result;
+      if (!stan::math::check_cholesky_factor("cholesky_factor_free(%1%)",y,"y",&result))
+        throw std::domain_error("cholesky_factor_free: y is not a Cholesky factor");
+      int k = y.rows();
+      Eigen::Matrix<T,Eigen::Dynamic,1> x((k * (k + 1)) / 2);
+      int pos = 0;
+      for (int m = 0; m < k; ++m) {
+        for (int n = 0; n < m; ++n)
+          x(pos++) = y(m,n);
+        x(pos++) = log(y(m,m));
+      }
+      return x;
+    }
+
     // CORRELATION MATRIX
     /**
      * Return the correlation matrix of the specified dimensionality
@@ -1467,7 +1560,7 @@ namespace stan {
         for (size_type n = m + 1; n < K; ++n) 
           L(m,n) = 0.0;
       }
-      Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> M = L * L.transpose();
+      // FIXME: return multiply_self_transpose
       return L * L.transpose();
     }
 
