@@ -10,12 +10,14 @@ y <- a + b*x + rnorm (n, 0, sigma)
 
 # (y_x.stan)
 # lm(y ~ x)
-if (!file.exists("y_x.sm.RData")) {
-    rt <- stanc("y_x.stan", model_name="y_x")
-    y_x.sm <- stan_model(stanc_ret=rt)
-    save(y_x.sm, file="y_x.sm.RData")
-} else {
-    load("y_x.sm.RData", verbose=TRUE)
+if (!exists("y_x.sm")) {
+    if (file.exists("y_x.sm.RData")) {
+        load("y_x.sm.RData", verbose = TRUE)
+    } else {
+        rt <- stanc("y_x.stan", model_name = "y_x")
+        y_x.sm <- stan_model(stanc_ret = rt)
+        save(y_x.sm, file = "y_x.sm.RData")
+    }
 }
 
 dataList.1 <- list(N=length(y), y=y, x=x)

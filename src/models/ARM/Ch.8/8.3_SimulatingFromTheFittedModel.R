@@ -1,19 +1,21 @@
 library(rstan)
 library(ggplot2)
 library(reshape2)
-source("lightspeed.data.R")    
+source("lightspeed.data.R", echo = TRUE)    
 
 ## Model fit (lightspeed.stan)
 ## lm (y ~ 1)
-if (!file.exists("lightspeed.sm.RData")) {
-    rt <- stanc("lightspeed.stan", model_name="lightspeed")
-    lightspeed.sm <- stan_model(stanc_ret=rt)
-    save(lightspeed.sm, file="lightspeed.sm.RData")
-} else {
-    load("lightspeed.sm.RData", verbose=TRUE)
+if (!exists("lightspeed.sm")) {
+    if (file.exists("lightspeed.sm.RData")) {
+        load("lightspeed.sm.RData", verbose = TRUE)
+    } else {
+        rt <- stanc("lightspeed.stan", model_name = "lightspeed")
+        lightspeed.sm <- stan_model(stanc_ret = rt)
+        save(lightspeed.sm, file = "lightspeed.sm.RData")
+    }
 }
 
-dataList.1 <- list(N=N, y=y)
+dataList.1 <- c("N","y")
 lightspeed.sf1 <- sampling(lightspeed.sm, dataList.1)
 print(lightspeed.sf1)
 post <- extract(lightspeed.sf1)
@@ -33,20 +35,30 @@ for (s in 1:n.sims){
 ## Histogram of replicated data (Figure 8.4)
 y.new <- melt(y.rep)
 y.new$Var2 <- factor(y.new$Var2, levels=c('1','2','3','4','5','6','7','8','9','10','11','12','13','14','15'), labels=c('Replication #1','Replication #2','Replication #3','Replication #4','Replication #5','Replication #6','Replication #7','Replication #8','Replication #9','Replication #10','Replication #11','Replication #12','Replication #13','Replication #14','Replication #15'))
-m <- ggplot(y.new,aes(value)) +  geom_histogram(colour = "black", fill = "white",binwidth=5) + theme_bw() + facet_wrap( ~ Var2,ncol=5) + theme(axis.title.y = element_blank(),axis.title.x=element_blank())
-print(m)
+p1 <- ggplot(y.new,aes(value)) +
+      geom_histogram(colour = "black", fill = "white",binwidth=5) +
+      theme_bw() +
+      facet_wrap( ~ Var2,ncol=5) +
+      theme(axis.title.y = element_blank(),axis.title.x=element_blank())
+print(p1)
 
 ## Write a function to make histograms with specified bin widths and ranges
 
 Hist.preset <- function (a, width, xtitle,ytitle,maintitle){
+  dev.new()
   a.hi <- max (a, na.rm=TRUE)
   a.lo <- min (a, na.rm=TRUE)
   if (is.null(width)) width <- min (sqrt(a.hi-a.lo), 1e-5)
   bin.hi <- width*ceiling(a.hi/width)
   bin.lo <- width*floor(a.lo/width)
   frame1 = data.frame(x1=a)
-  m1 <- ggplot(frame,aes(x=x1)) +  geom_histogram(colour = "black", fill = "white", binwidth=width) + theme_bw() + scale_x_continuous(xtitle) + scale_y_continuous(ytitle) + labs(title=maintitle)
-  print(m1)
+  p2 <- ggplot(frame,aes(x=x1)) +
+        geom_histogram(colour = "black", fill = "white", binwidth=width) +
+        theme_bw() +
+        scale_x_continuous(xtitle) +
+        scale_y_continuous(ytitle) +
+        labs(title=maintitle)
+  print(p2)
 }
 
 ## Run the function
@@ -66,15 +78,13 @@ for (s in 1:n.sims){
 }
 
 ## Histogram Figure 8.5
-
+dev.new()
   frame2 = data.frame(x1=test.rep)
-  m2 <- ggplot(frame,aes(x=x1)) +  geom_histogram(colour = "black", fill = "white") + theme_bw() + labs(title="Observed T(y) and distribution of T(y.rep)")
-  print(m2)
-
-
-hist (test.rep, xlim=range (Test(y), test.rep), yaxt="n", ylab="",
- xlab="", main="Observed T(y) and distribution of T(y.rep)")
-lines (rep (Test(y), 2), c(0,10*n))
+  p3 <- ggplot(frame,aes(x=x1)) +
+        geom_histogram(colour = "black", fill = "white") +
+        theme_bw() +
+        labs(title="Observed T(y) and distribution of T(y.rep)")
+  print(p3)
 
 ##############################################################################
 ## Read the cleaned data
@@ -83,12 +93,14 @@ lines (rep (Test(y), 2), c(0,10*n))
 roachdata <- read.csv ("roachdata.csv")
 attach(roachdata)
 
-if (!file.exists("roaches.sm.RData")) {
-    rt <- stanc("roaches.stan", model_name="roaches")
-    roaches.sm <- stan_model(stanc_ret=rt)
-    save(roaches.sm, file="roaches.sm.RData")
-} else {
-    load("roaches.sm.RData", verbose=TRUE)
+if (!exists("roaches.sm")) {
+    if (file.exists("roaches.sm.RData")) {
+        load("roaches.sm.RData", verbose = TRUE)
+    } else {
+        rt <- stanc("roaches.stan", model_name = "roaches")
+        roaches.sm <- stan_model(stanc_ret = rt)
+        save(roaches.sm, file = "roaches.sm.RData")
+    }
 }
 
 dataList.1 <- list(N=length(y), y=y,roach1=roach1,treatment=treatment,exposure2=exposure2,senior=senior)
@@ -130,12 +142,14 @@ print (mean (test.rep > Test(y)))
 
 ## Checking the overdispersed model FIXME
 
-if (!file.exists("roaches_overdispersion.sm.RData")) {
-    rt <- stanc("roaches_overdispersion.stan", model_name="roaches_overdispersion")
-    roaches_overdispersion.sm <- stan_model(stanc_ret=rt)
-    save(roaches_overdispersion.sm, file="roaches_overdispersion.sm.RData")
-} else {
-    load("roaches_overdispersion.sm.RData", verbose=TRUE)
+if (!exists("roaches_overdispersion.sm")) {
+    if (file.exists("roaches_overdispersion.sm.RData")) {
+        load("roaches_overdispersion.sm.RData", verbose = TRUE)
+    } else {
+        rt <- stanc("roaches_overdispersion.stan", model_name = "roaches_overdispersion")
+        roaches_overdispersion.sm <- stan_model(stanc_ret = rt)
+        save(roaches_overdispersion.sm, file = "roaches_overdispersion.sm.RData")
+    }
 }
 
 roaches_overdispersion.sf1 <- sampling(roaches_overdispersion.sm, dataList.1)

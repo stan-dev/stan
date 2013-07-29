@@ -1,26 +1,33 @@
 library(rstan)
 library(ggplot2)
 library(reshape2)
-unemployment <- read.table ("unemployment.dat", header=TRUE)
+unemployment <- read.table ("unemployment.dat", header=TRUE, echo = TRUE)
 year <- unemployment$year
 y <- unemployment$unemployed.pct
 
 ## Plot of the unemployment rate
 frame1 = data.frame(year=year,y=y)
-m2 <- ggplot(frame1,aes(x=year,y=y))
-m2 + geom_point() + scale_y_continuous("Unemployment") + scale_x_continuous("Year") + theme_bw()
+p1 <- ggplot(frame1,aes(x=year,y=y)) +
+      geom_point() +
+      scale_y_continuous("Unemployment") +
+      scale_x_continuous("Year") +
+      theme_bw()
+print(p1)
 
 ## Fitting a 1st-order autogregression
 ## lm(y ~ y_lag)
-if (!file.exists("unemployment.sm.RData")) {
-    rt <- stanc("unemployment.stan", model_name="unemployment")
-    unemployment.sm <- stan_model(stanc_ret=rt)
-    save(unemployment.sm, file="unemployment.sm.RData")
-} else {
-    load("unemployment.sm.RData", verbose=TRUE)
+if (!exists("unemployment.sm")) {
+    if (file.exists("unemployment.sm.RData")) {
+        load("unemployment.sm.RData", verbose = TRUE)
+    } else {
+        rt <- stanc("unemployment.stan", model_name = "unemployment")
+        unemployment.sm <- stan_model(stanc_ret = rt)
+        save(unemployment.sm, file = "unemployment.sm.RData")
+    }
 }
-source("unemployment.data.R")    
-dataList.1 <- list(N=N, y_lag=y_lag,y=y)
+
+source("unemployment.data.R", echo = TRUE)    
+dataList.1 <- c("N","y_lag","y")
 unemployment.sf1 <- sampling(unemployment.sm, dataList.1)
 print(unemployment.sf1)
 
@@ -57,8 +64,12 @@ for (s in 1:n.sims){
 y.new <- melt(y.rep2)
 y.new$Var2 <- factor(y.new$Var2, levels=c('1','2','3','4','5','6','7','8','9','10','11','12','13','14','15'), labels=c('Simulation #1','Simulation #2','Simulation #3','Simulation #4','Simulation #5','Simulation #6','Simulation #7','Simulation #8','Simulation #9','Simulation #10','Simulation #11','Simulation #12','Simulation #13','Simulation #14','Simulation #15'))
 frame2 = data.frame(y.new=y.new$value,year=year,Var2=y.new$Var2)
-m <- ggplot(frame2,aes(y=y.new,x=year)) + theme_bw() + geom_line() + facet_wrap( ~ Var2,ncol=5) + theme(axis.title.y = element_blank(),axis.title.x=element_blank())
-print(m)
+p2 <- ggplot(frame2,aes(y=y.new,x=year)) +
+      theme_bw() +
+      geom_line() +
+      facet_wrap( ~ Var2,ncol=5) +
+      theme(axis.title.y = element_blank(),axis.title.x=element_blank())
+print(p2)
 
 ## Numerical model check
 
