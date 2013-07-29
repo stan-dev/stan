@@ -1,46 +1,68 @@
 library(rstan)
-library(ggplot2)
 
 ### Data
-source("kid_iq.data.R")     # load kid_score, mom_hs, mom_iq
 
-### Model (kid_iq_interaction.stan)
-## lm (kid_score ~ mom_hs + mom_iq + mom_hs:mom_iq)
-if (!file.exists("kid_iq_interaction.sm.RData")) {
-    rt <- stanc("kid_iq_interaction.stan", model_name="kid_iq_interaction")
-    kid_iq_interaction.sm <- stan_model(stanc_ret=rt)
-    save(kid_iq_interaction.sm, file="kid_iq_interaction.sm.RData")
-} else {
-    load("kid_iq_interaction.sm.RData", verbose=TRUE)
+source("kidiq.data.R", echo = TRUE)
+
+### Model: kid_score ~ mom_hs + mom_iq + mom_hs:mom_iq
+
+if (!exists("kidiq_interaction.sm")) {
+    if (file.exists("kidiq_interaction.sm.RData")) {
+        load("kidiq_interaction.sm.RData", verbose = TRUE)
+    } else {
+        rt <- stanc("kidiq_interaction.stan", model_name = "kidiq_interaction")
+        kidiq_interaction.sm <- stan_model(stanc_ret = rt)
+        save(kidiq_interaction.sm, file = "kidiq_interaction.sm.RData")
+    }
 }
 
-dataList <- list(N=N, kid_score=kid_score, mom_hs=mom_hs, mom_iq=mom_iq)
-kid_iq_interaction.sf <- sampling(kid_iq_interaction.sm, dataList)
-print(kid_iq_interaction.sf)
+data.list <- c("N", "kid_score", "mom_hs", "mom_iq")
+kidiq_interaction.sf <- sampling(kidiq_interaction.sm, data.list)
+print(kidiq_interaction.sf, pars = c("beta", "sigma", "lp__"))
 
-# centering by subtracting the mean (kid_iq_center_mean.stan)
-# lm (kid_score ~ c_mom_hs + c_mom_iq + c_mom_hs:c_mom_iq)
-c_mom_hs <- mom_hs - mean(mom_hs)
-c_mom_iq <- mom_iq - mean(mom_iq)
+### Centering by subtracting the mean
 
-dataList2 <- list(N=N, kid_score=kid_score, mom_hs=c_mom_hs, mom_iq=c_mom_iq)
-kid_iq_interaction2.sf <- sampling(kid_iq_interaction.sm, dataList2)
-print(kid_iq_interaction2.sf)
+if (!exists("kidiq_interaction_c.sm")) {
+    if (file.exists("kidiq_interaction_c.sm.RData")) {
+        load("kidiq_interaction_c.sm.RData", verbose = TRUE)
+    } else {
+        rt <- stanc("kidiq_interaction_c.stan", model_name = "kidiq_interaction_c")
+        kidiq_interaction_c.sm <- stan_model(stanc_ret = rt)
+        save(kidiq_interaction_c.sm, file = "kidiq_interaction_c.sm.RData")
+    }
+}
 
-# using a conventional centering point (kid_iq_center_conventional.stan)
-# lm (kid_score ~ c2_mom_hs + c2_mom_iq + c2_mom_hs:c2_mom_iq)
-c2_mom_hs <- mom_hs - 0.5
-c2_mom_iq <- mom_iq - 100
+kidiq_interaction_c.sf <- sampling(kidiq_interaction_c.sm, data.list)
+print(kidiq_interaction_c.sf)
 
-dataList3 <- list(N=N, kid_score=kid_score, mom_hs=c2_mom_hs, mom_iq=c2_mom_iq)
-kid_iq_interaction3.sf <- sampling(kid_iq_interaction.sm, dataList3)
-print(kid_iq_interaction3.sf)
+### Using a conventional centering point:
+# c2_mom_hs <- mom_hs - 0.5
+# c2_mom_iq <- mom_iq - 100
 
-# centering by subtracting the mean & dividing by 2 sd (kid_iq_center_z.stan)
-# lm (kid_score ~ z_mom_hs + z_mom_iq + z_mom_hs:z_mom_iq)
-z_mom_hs <- (mom_hs - mean(mom_hs))/(2*sd(mom_hs))
-z_mom_iq <- (mom_iq - mean(mom_iq))/(2*sd(mom_iq))
+if (!exists("kidiq_interaction_c2.sm")) {
+    if (file.exists("kidiq_interaction_c2.sm.RData")) {
+        load("kidiq_interaction_c2.sm.RData", verbose = TRUE)
+    } else {
+        rt <- stanc("kidiq_interaction_c2.stan", model_name = "kidiq_interaction_c2")
+        kidiq_interaction_c2.sm <- stan_model(stanc_ret = rt)
+        save(kidiq_interaction_c2.sm, file = "kidiq_interaction_c2.sm.RData")
+    }
+}
 
-dataList4 <- list(N=N, kid_score=kid_score, mom_hs=z_mom_hs, mom_iq=z_mom_iq)
-kid_iq_interaction4.sf <- sampling(kid_iq_interaction.sm, dataList4)
-print(kid_iq_interaction4.sf)
+kidiq_interaction_c2.sf <- sampling(kidiq_interaction_c2.sm, data.list)
+print(kidiq_interaction_c2.sf)
+
+### Centering by subtracting the mean & dividing by 2 sd
+
+if (!exists("kidiq_interaction_z.sm")) {
+    if (file.exists("kidiq_interaction_z.sm.RData")) {
+        load("kidiq_interaction_z.sm.RData", verbose = TRUE)
+    } else {
+        rt <- stanc("kidiq_interaction_z.stan", model_name = "kidiq_interaction_z")
+        kidiq_interaction_z.sm <- stan_model(stanc_ret = rt)
+        save(kidiq_interaction_z.sm, file = "kidiq_interaction_z.sm.RData")
+    }
+}
+
+kidiq_interaction_z.sf <- sampling(kidiq_interaction_z.sm, data.list)
+print(kidiq_interaction_z.sf)

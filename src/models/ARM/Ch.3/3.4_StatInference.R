@@ -1,20 +1,21 @@
 library(rstan)
-library(ggplot2)
 
 ### Data
-source("kid_iq.data.R")     # load kid_score, mom_hs, mom_iq
 
-### Model (kid_iq_multi_preds.stan)
-### lm (kid_score ~ mom_hs + mom_iq)
+source("kidiq.data.R", echo = TRUE)
 
-if (!file.exists("kid_iq_multi_preds.sm.RData")) {
-    rt <- stanc("kid_iq_multi_preds.stan", model_name="kid_iq_multi_preds")
-    kid_iq_multi_preds.sm <- stan_model(stanc_ret=rt)
-    save(kid_iq_multi_preds.sm, file="kid_iq_multi_preds.sm.RData")
-} else {
-    load("kid_iq_multi_preds.sm.RData", verbose=TRUE)
+### Model (kidiq_multi_preds.stan): kid_score ~ mom_hs + mom_iq
+
+if (!exists("kidiq_multi_preds.sm")) {
+    if (file.exists("kidiq_multi_preds.sm.RData")) {
+        load("kidiq_multi_preds.sm.RData", verbose = TRUE)
+    } else {
+        rt <- stanc("kidiq_multi_preds.stan", model_name = "kidiq_multi_preds")
+        kidiq_multi_preds.sm <- stan_model(stanc_ret = rt)
+        save(kidiq_multi_preds.sm, file = "kidiq_multi_preds.sm.RData")
+    }
 }
 
-dataList <- list(N=N, kid_score=kid_score, mom_hs=mom_hs, mom_iq=mom_iq)
-kid_iq_multi_preds.sf <- sampling(kid_iq_multi_preds.sm, dataList)
-print(kid_iq_multi_preds.sf)
+data.list <- c("N", "kid_score", "mom_hs", "mom_iq")
+kidiq_multi_preds.sf <- sampling(kidiq_multi_preds.sm, data.list)
+print(kidiq_multi_preds.sf, pars = c("beta", "sigma", "lp__"))

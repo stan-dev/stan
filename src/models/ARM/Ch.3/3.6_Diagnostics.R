@@ -1,28 +1,37 @@
 library(rstan)
 library(ggplot2)
-source("kid_iq.data.R")     # load kid_score, mom_hs, mom_iq
 
-### Model (kid_iq_one_pred.stan)
-### lm (kid_score ~ mom_iq)
+### Data
 
-if (!file.exists("kid_iq_one_pred.sm.RData")) {
-    rt <- stanc("kid_iq_one_pred.stan", model_name="kid_iq_one_pred")
-    kid_iq_one_pred.sm <- stan_model(stanc_ret=rt)
-    save(kid_iq_one_pred.sm, file="kid_iq_one_pred.sm.RData")
-} else {
-    load("kid_iq_one_pred.sm.RData", verbose=TRUE)
+source("kidiq.data.R", echo = TRUE)
+
+### Model: kid_score ~ mom_iq
+
+if (!exists("kidscore_momiq.sm")) {
+    if (file.exists("kidscore_momiq.sm.RData")) {
+        load("kidscore_momiq.sm.RData", verbose = TRUE)
+    } else {
+        rt <- stanc("kidscore_momiq.stan", model_name = "kidscore_momiq")
+        kidscore_momiq.sm <- stan_model(stanc_ret = rt)
+        save(kidscore_momiq.sm, file = "kidscore_momiq.sm.RData")
+    }
 }
 
-dataList.2 <- list(N=length(kid_score), kid_score=kid_score, mom_pred=mom_iq)
-kid_iq_one_pred.sf2 <- sampling(kid_iq_one_pred.sm, dataList.2)
-print(kid_iq_one_pred.sf2)
+data.list.2 <- c("N", "kid_score", "mom_iq")
+kidscore_momiq.sf <- sampling(kidscore_momiq.sm, data.list.2)
+print(kidscore_momiq.sf, pars = c("beta", "sigma", "lp__"))
 
- # Figure 3.12
-beta.post <- extract(kid_iq_one_pred.sf2, "beta")$beta
+### Figure 3.12
+
+beta.post <- extract(kidscore_momiq.sf, "beta")$beta
 beta.mean <- colMeans(beta.post)
 resid <- kid_score - (beta.mean[1] + beta.mean[2] * mom_iq)
 resid.sd <- sd(resid)
 
-kid.iq.one.pred.1 = data.frame(mom_iq=mom_iq,resid=resid)
-m <- ggplot(kid.iq.one.pred.1,aes(x=mom_iq,y=resid))
-m + geom_point() + scale_y_continuous("Residuals") + scale_x_continuous("Mother IQ score") + geom_hline(yintercept=0,colour="grey70",size=1)  + geom_hline(yintercept = resid.sd, linetype="dashed",colour="grey70",size=1)  + geom_hline(yintercept = -resid.sd, linetype="dashed",colour="grey70",size=1) + theme_bw()
+p <- ggplot(data.frame(mom_iq, resid), aes(x = mom_iq, y = resid)) +
+    geom_point() +
+    geom_hline(yintercept = 0) +
+    geom_hline(yintercept = c(-resid.sd, resid.sd), linetype = "dashed") +
+    scale_x_continuous("Mother IQ score", breaks = seq(80, 140, 20)) +
+    scale_y_continuous("Residuals", breaks = seq(-60, 40, 20)) 
+print(p)

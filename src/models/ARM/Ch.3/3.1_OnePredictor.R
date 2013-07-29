@@ -1,44 +1,62 @@
 library(rstan)
 library(ggplot2)
-source("kid_iq.data.R")     # load kid_score, mom_hs, mom_iq
 
-### First model (kid_iq_one_pred.stan)
-### lm(kid_score ~ mom_hs)
+### Data
 
-if (!file.exists("kid_iq_one_pred.sm.RData")) {
-    rt <- stanc("kid_iq_one_pred.stan", model_name="kid_iq_one_pred")
-    kid_iq_one_pred.sm <- stan_model(stanc_ret=rt)
-    save(kid_iq_one_pred.sm, file="kid_iq_one_pred.sm.RData")
-} else {
-    load("kid_iq_one_pred.sm.RData", verbose=TRUE)
+source("kidiq.data.R", echo = TRUE)
+
+### First model: kid_score ~ mom_hs
+
+if (!exists("kidscore_momhs.sm")) {
+    if (file.exists("kidscore_momhs.sm.RData")) {
+        load("kidscore_momhs.sm.RData", verbose = TRUE)
+    } else {
+        rt <- stanc("kidscore_momhs.stan", model_name = "kidscore_momhs")
+        kidscore_momhs.sm <- stan_model(stanc_ret = rt)
+        save(kidscore_momhs.sm, file = "kidscore_momhs.sm.RData")
+    }
 }
 
-dataList.1 <- list(N=length(kid_score), kid_score=kid_score, mom_pred=mom_hs)
-kid_iq_one_pred.sf1 <- sampling(kid_iq_one_pred.sm, dataList.1)
-print(kid_iq_one_pred.sf1)
+data.list.1 <- c("N", "kid_score", "mom_hs")
+kidscore_momhs.sf <- sampling(kidscore_momhs.sm, data.list.1)
+print(kidscore_momhs.sf, pars = c("beta", "sigma", "lp__"))
 
 ### Second model: kid_score ~ mom_iq
 
-dataList.2 <- list(N=length(kid_score), kid_score=kid_score, mom_pred=mom_iq)
-kid_iq_one_pred.sf2 <- sampling(kid_iq_one_pred.sm, dataList.2)
-print(kid_iq_one_pred.sf2)
+if (!exists("kidscore_momiq.sm")) {
+    if (file.exists("kidscore_momiq.sm.RData")) {
+        load("kidscore_momiq.sm.RData", verbose = TRUE)
+    } else {
+        rt <- stanc("kidscore_momiq.stan", model_name = "kidscore_momiq")
+        kidscore_momiq.sm <- stan_model(stanc_ret = rt)
+        save(kidscore_momiq.sm, file = "kidscore_momiq.sm.RData")
+    }
+}
+
+data.list.2 <- c("N", "kid_score", "mom_iq")
+kidscore_momiq.sf <- sampling(kidscore_momiq.sm, data.list.2)
+print(kidscore_momiq.sf, pars = c("beta", "sigma", "lp__"))
 
 # Figure 3.1
-kidscore.jitter <- jitter(kid_score)
-jitter.binary <- function(a, jitt=.05) {
-   ifelse (a==0, runif (length(a), 0, jitt), runif (length(a), 1-jitt, 1))
-}
-jitter.mom_hs <- jitter.binary(mom_hs)
-
-jitter.frame = data.frame(jitter.mom_hs=jitter.mom_hs,kidscore.jitter=kidscore.jitter)
-m <- ggplot(jitter.frame,aes(x=jitter.mom_hs,y=kidscore.jitter))
-m + geom_point() + scale_y_continuous("Mother Completed High School") + scale_x_continuous("Child Test Score") + theme_bw()
+kidiq.data <- data.frame(kid_score, mom_hs, mom_iq)
+beta.post.1 <- extract(kidscore_momhs.sf, "beta")$beta
+beta.mean.1 <- colMeans(beta.post.1)
+p1 <- ggplot(kidiq.data, aes(x = mom_hs, y = kid_score)) +
+    geom_jitter(position = position_jitter(width = 0.05, height = 0)) +
+    geom_abline(aes(intercept = beta.mean.1[1], slope = beta.mean.1[2])) +
+    scale_x_continuous("Mother completed high school", breaks = c(0, 1)) +
+    scale_y_continuous("Child test score", breaks = c(20, 60, 100, 140)) +
+    theme_bw()
+print(p1)
 
 # Figure 3.2
-# lm (kid_score ~ mom_iq)
-beta.post <- extract(kid_iq_one_pred.sf2, "beta")$beta
-beta.mean <- colMeans(beta.post)
-
-kid.iq.one.pred.1 = data.frame(mom_iq=mom_iq,kid_score=kid_score)
-m <- ggplot(kid.iq.one.pred.1,aes(x=mom_iq,y=kid_score))
-m + geom_point() + scale_y_continuous("Child Test Score") + scale_x_continuous("Mother IQ score") + geom_abline(intercept = beta.mean[1], slope = beta.mean[2]) + theme_bw()
+dev.new()
+beta.post.2 <- extract(kidscore_momiq.sf, "beta")$beta
+beta.mean.2 <- colMeans(beta.post.2)
+p2 <- ggplot(kidiq.data, aes(x = mom_iq, y = kid_score)) +
+    geom_point() +
+    geom_abline(aes(intercept = beta.mean.2[1], slope = beta.mean.2[2])) +
+    scale_x_continuous("Mother IQ score", breaks = c(80, 100, 120, 140)) +
+    scale_y_continuous("Child test score", breaks = c(20, 60, 100, 140)) +
+    theme_bw()
+print(p2)

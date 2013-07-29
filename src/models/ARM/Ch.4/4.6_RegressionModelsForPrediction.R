@@ -1,96 +1,107 @@
 library(rstan)
-library(ggplot2)
-source("mesquite.data.R")    
-# Data are at http://www.stat.columbia.edu/~gelman/arm/examples/mesquite
 
-## First model (mesquite.stan)
-## lm (weight ~ diam1 + diam2 + canopy.height + total.height + density + group)
-if (!file.exists("mesquite.sm.RData")) {
-    rt <- stanc("mesquite.stan", model_name="mesquite")
-    mesquite.sm <- stan_model(stanc_ret=rt)
-    save(mesquite.sm, file="mesquite.sm.RData")
-} else {
-    load("mesquite.sm.RData", verbose=TRUE)
+### Data
+
+source("mesquite.data.R", echo = TRUE)
+
+### First model: weight ~ diam1 + diam2 + canopy.height + total.height + density + group
+
+if (!exists("mesquite.sm")) {
+    if (file.exists("mesquite.sm.RData")) {
+        load("mesquite.sm.RData", verbose = TRUE)
+    } else {
+        rt <- stanc("mesquite.stan", model_name = "mesquite")
+        mesquite.sm <- stan_model(stanc_ret = rt)
+        save(mesquite.sm, file = "mesquite.sm.RData")
+    }
 }
 
-dataList.1 <- list(N=N, LeafWt=LeafWt, Diam1=Diam1,Diam2=Diam2,CanHt=CanHt,TotHt,Dens=Dens,Group=Group)
-mesquite.sf1 <- sampling(mesquite.sm, dataList.1)
-print(mesquite.sf1)
+data.list <- c("N", "weight", "diam1", "diam2", "canopy_height", "total_height",
+               "density", "group")
+mesquite.sf <- sampling(mesquite.sm, data.list)
+print(mesquite.sf)
 
-## Data summary
-summary(mesquite)
-IQR(Diam1)
-IQR(Diam2)
-IQR(CanHt)
-IQR(TotHt)
-IQR(Dens)
-IQR(Group)
+### Log model: log(weight) ~ log(diam1) + log(diam2) + log(canopy.height)
+###                          + log(total.height) + log(density) + group
 
-## Other models
-
-# Log model (mesquite_log.stan)
-# lm (log(weight) ~ log(diam1) + log(diam2) + log(canopy.height) + log(total.height) + log(density) + group)
-if (!file.exists("mesquite_log.sm.RData")) {
-    rt <- stanc("mesquite_log.stan", model_name="mesquite_log")
-    mesquite_log.sm <- stan_model(stanc_ret=rt)
-    save(mesquite_log.sm, file="mesquite_log.sm.RData")
-} else {
-    load("mesquite_log.sm.RData", verbose=TRUE)
+if (!exists("mesquite_log.sm")) {
+    if (file.exists("mesquite_log.sm.RData")) {
+        load("mesquite_log.sm.RData", verbose = TRUE)
+    } else {
+        rt <- stanc("mesquite_log.stan", model_name = "mesquite_log")
+        mesquite_log.sm <- stan_model(stanc_ret = rt)
+        save(mesquite_log.sm, file = "mesquite_log.sm.RData")
+    }
 }
 
-mesquite_log.sf1 <- sampling(mesquite_log.sm, dataList.1)
-print(mesquite_log.sf1)
+mesquite_log.sf <- sampling(mesquite_log.sm, data.list)
+print(mesquite_log.sf)
 
-# Volume model (mesquite_canopy_volume.stan)
-# lm (log(weight) ~ log(canopy.volume))
-if (!file.exists("mesquite_canopy_volume.sm.RData")) {
-    rt <- stanc("mesquite_canopy_volume.stan", model_name="mesquite_canopy_volume")
-    mesquite_canopy_volume.sm <- stan_model(stanc_ret=rt)
-    save(mesquite_canopy_volume.sm, file="mesquite_canopy_volume.sm.RData")
-} else {
-    load("mesquite_canopy_volume.sm.RData", verbose=TRUE)
+### Volume model: log(weight) ~ log(canopy_volume)
+# canopy_volume <- diam1 * diam2 * canopy_height
+
+if (!exists("mesquite_volume.sm")) {
+    if (file.exists("mesquite_volume.sm.RData")) {
+        load("mesquite_volume.sm.RData", verbose = TRUE)
+    } else {
+        rt <- stanc("mesquite_volume.stan", model_name = "mesquite_volume")
+        mesquite_volume.sm <- stan_model(stanc_ret = rt)
+        save(mesquite_volume.sm, file = "mesquite_volume.sm.RData")
+    }
 }
 
-dataList.2 <- list(N=N, LeafWt=LeafWt, Diam1=Diam1,Diam2=Diam2,CanHt=CanHt)
-mesquite_canopy_volume.sf1 <- sampling(mesquite_canopy_volume.sm, dataList.2)
-print(mesquite_canopy_volume.sf1)
+mesquite_volume.sf <- sampling(mesquite_volume.sm, data.list)
+print(mesquite_volume.sf)
 
-# Volume, area & shape model (mesquite_volume_area_shape.stan)
-# lm (log(weight) ~ log(canopy.volume) + log(canopy.area) + log(canopy.shape) + log(total.height) + log(density) + group)
-if (!file.exists("mesquite_volume_area_shape.sm.RData")) {
-    rt <- stanc("mesquite_volume_area_shape.stan", model_name="mesquite_volume_area_shape")
-    mesquite_volume_area_shape.sm <- stan_model(stanc_ret=rt)
-    save(mesquite_volume_area_shape.sm, file="mesquite_volume_area_shape.sm.RData")
-} else {
-    load("mesquite_volume_area_shape.sm.RData", verbose=TRUE)
+### Volume, area & shape model:
+# log(weight) ~ log(canopy.volume) + log(canopy.area) + log(canopy.shape)
+#               + log(total.height) + log(density) + group
+# canopy_volume <- diam1 * diam2 * canopy_height
+# canopy_area   <- diam1 * diam2
+# canopy_shape  <- diam1 / diam2
+
+if (!exists("mesquite_vas.sm")) {
+    if (file.exists("mesquite_vas.sm.RData")) {
+        load("mesquite_vas.sm.RData", verbose = TRUE)
+    } else {
+        rt <- stanc("mesquite_vas.stan", model_name = "mesquite_vas")
+        mesquite_vas.sm <- stan_model(stanc_ret = rt)
+        save(mesquite_vas.sm, file = "mesquite_vas.sm.RData")
+    }
 }
 
-mesquite_volume_area_shape.sf1 <- sampling(mesquite_volume_area_shape.sm, dataList.1)
-print(mesquite_volume_area_shape.sf1)
+mesquite_vas.sf <- sampling(mesquite_vas.sm, data.list)
+print(mesquite_vas.sf)
 
-# Last two models (mesquite_volume_area.stan)
-# lm (log(weight) ~ log(canopy.volume) + log(canopy.area) + group)
-if (!file.exists("mesquite_volume_area.sm.RData")) {
-    rt <- stanc("mesquite_volume_area.stan", model_name="mesquite_volume_area")
-    mesquite_volume_area.sm <- stan_model(stanc_ret=rt)
-    save(mesquite_volume_area.sm, file="mesquite_volume_area.sm.RData")
-} else {
-    load("mesquite_volume_area.sm.RData", verbose=TRUE)
+### Last two models
+
+# log(weight) ~ log(canopy_volume) + log(canopy_area) + group
+
+if (!exists("mesquite_va.sm")) {
+    if (file.exists("mesquite_va.sm.RData")) {
+        load("mesquite_va.sm.RData", verbose = TRUE)
+    } else {
+        rt <- stanc("mesquite_va.stan", model_name = "mesquite_va")
+        mesquite_va.sm <- stan_model(stanc_ret = rt)
+        save(mesquite_va.sm, file = "mesquite_va.sm.RData")
+    }
 }
 
-dataList.3 <- list(N=N, LeafWt=LeafWt, Diam1=Diam1,Diam2=Diam2,CanHt=CanHt,Group=Group)
-mesquite_volume_area.sf1 <- sampling(mesquite_volume_area.sm, dataList.3)
-print(mesquite_volume_area.sf1)
+mesquite_va.sf <- sampling(mesquite_va.sm, data.list)
+print(mesquite_va.sf)
 
-# (mesquite_all.stan)
-# lm (log(weight) ~ log(canopy.volume) + log(canopy.area) + log(canopy.shape) + log(total.height) + group)
-if (!file.exists("mesquite_all.sm.RData")) {
-    rt <- stanc("mesquite_all.stan", model_name="mesquite_all")
-    mesquite_all.sm <- stan_model(stanc_ret=rt)
-    save(mesquite_all.sm, file="mesquite_all.sm.RData")
-} else {
-    load("mesquite_all.sm.RData", verbose=TRUE)
+# log(weight) ~ log(canopy_volume) + log(canopy_area) + log(canopy_shape)
+#               + log(total_height) + group
+
+if (!exists("mesquite_vash.sm")) {
+    if (file.exists("mesquite_vash.sm.RData")) {
+        load("mesquite_vash.sm.RData", verbose = TRUE)
+    } else {
+        rt <- stanc("mesquite_vash.stan", model_name = "mesquite_vash")
+        mesquite_vash.sm <- stan_model(stanc_ret = rt)
+        save(mesquite_vash.sm, file = "mesquite_vash.sm.RData")
+    }
 }
 
-mesquite_all.sf1 <- sampling(mesquite_all.sm, dataList.1)
-print(mesquite_all.sf1)
+mesquite_vash.sf <- sampling(mesquite_vash.sm, data.list)
+print(mesquite_vash.sf)
