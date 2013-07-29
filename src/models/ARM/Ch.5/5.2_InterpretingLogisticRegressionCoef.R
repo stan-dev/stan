@@ -1,18 +1,20 @@
 library(rstan)
 library(ggplot2)
-source("nes.data.R")    
+source("nes.data.R", echo = TRUE)    
 
  # Estimation (nes.stan)
  # glm (vote ~ income, family=binomial(link="logit"))
-if (!file.exists("nes.sm.RData")) {
-    rt <- stanc("nes.stan", model_name="nes")
-    nes.sm <- stan_model(stanc_ret=rt)
-    save(nes.sm, file="nes.sm.RData")
-} else {
-    load("nes.sm.RData", verbose=TRUE)
+if (!exists("nes.sm")) {
+    if (file.exists("nes.sm.RData")) {
+        load("nes.sm.RData", verbose = TRUE)
+    } else {
+        rt <- stanc("nes.stan", model_name = "nes")
+        nes.sm <- stan_model(stanc_ret = rt)
+        save(nes.sm, file = "nes.sm.RData")
+    }
 }
 
-dataList.1 <- list(N=N, income=income, vote=vote)
+dataList.1 <- c("N","income","vote")
 nes.sf1 <- sampling(nes.sm, dataList.1)
 print(nes.sf1)
 
@@ -82,7 +84,14 @@ for (i in 1:13) {
   y.max <-c(y.max,y.bounds[2])
   y.min <-c(y.min,y.bounds[1])
 }
+
 limits <- aes(ymax=y.max,ymin=y.min)
 frame1 = data.frame(year=income.year,coeff=income.coef)
-m <- ggplot(frame1,aes(x=year,y=coeff))
-m + geom_point() + scale_y_continuous("Coefficient of Income",limits=c(-.05,.52)) + scale_x_continuous("Year",limits=c(1950,2000)) + theme_bw() + geom_pointrange(limits) + geom_hline(yintercept=0,linetype="dashed")
+m <- ggplot(frame1,aes(x=year,y=coeff)) +
+     geom_point() +
+     scale_y_continuous("Coefficient of Income",limits=c(-.05,.52)) +
+     scale_x_continuous("Year",limits=c(1950,2000)) +
+     theme_bw() +
+     geom_pointrange(limits) +
+     geom_hline(yintercept=0,linetype="dashed")
+print(m)
