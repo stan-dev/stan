@@ -34,7 +34,7 @@ p1 <- ggplot(frame1,aes(x=income,y=vote)) +
 print(p1)
 
  # Graph figure 5.1 (b)
-
+dev.new()
 m2 <- "ggplot(frame1,aes(x=income,y=vote)) +
        scale_y_continuous('Pr(Republican Vote)',limits=c(-.01,1)) +
        scale_x_continuous('Income') +

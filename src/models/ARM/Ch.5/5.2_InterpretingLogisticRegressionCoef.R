@@ -87,11 +87,11 @@ for (i in 1:13) {
 
 limits <- aes(ymax=y.max,ymin=y.min)
 frame1 = data.frame(year=income.year,coeff=income.coef)
-m <- ggplot(frame1,aes(x=year,y=coeff)) +
-     geom_point() +
-     scale_y_continuous("Coefficient of Income",limits=c(-.05,.52)) +
-     scale_x_continuous("Year",limits=c(1950,2000)) +
-     theme_bw() +
-     geom_pointrange(limits) +
-     geom_hline(yintercept=0,linetype="dashed")
-print(m)
+p1 <- ggplot(frame1,aes(x=year,y=coeff)) +
+      geom_point() +
+      scale_y_continuous("Coefficient of Income",limits=c(-.05,.52)) +
+      scale_x_continuous("Year",limits=c(1950,2000)) +
+      theme_bw() +
+      geom_pointrange(limits) +
+      geom_hline(yintercept=0,linetype="dashed")
+print(p1)
