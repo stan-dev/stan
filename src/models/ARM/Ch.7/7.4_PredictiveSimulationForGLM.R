@@ -1,19 +1,21 @@
 library(rstan)
 library(ggplot2)
-source("wells.data.R")    
+source("wells.data.R", echo = TRUE)    
 
 ## Logistic regression (wells.stan)
 ## glm (switch ~ dist, family=binomial(link="logit"))
 
-if (!file.exists("wells.sm.RData")) {
-    rt <- stanc("wells.stan", model_name="wells")
-    wells.sm <- stan_model(stanc_ret=rt)
-    save(wells.sm, file="wells.sm.RData")
-} else {
-    load("wells.sm.RData", verbose=TRUE)
+if (!exists("wells.sm")) {
+    if (file.exists("wells.sm.RData")) {
+        load("wells.sm.RData", verbose = TRUE)
+    } else {
+        rt <- stanc("wells.stan", model_name = "wells")
+        wells.sm <- stan_model(stanc_ret = rt)
+        save(wells.sm, file = "wells.sm.RData")
+    }
 }
 
-dataList.1 <- list(N=N, dist=dist, switc=switc)
+dataList.1 <- c("N","dist","switc")
 wells.sf1 <- sampling(wells.sm, dataList.1)
 print(wells.sf1)
 fit1.post <- extract(wells.sf1)
@@ -22,18 +24,26 @@ beta.mean <- colMeans(fit1.post$beta)
  # Figure 7.6 (a)
 
 frame1 = data.frame(x1=coef(sim.1)[,1],y1=coef(sim.1)[,2])
-m1 <- ggplot()
-m1 <- m1 + geom_point()
-m1 + theme_bw() + scale_y_continuous(expression(beta[1])) + scale_x_continuous(expression(beta[0])) 
+p1 <- ggplot() +
+      geom_point() +
+      theme_bw() +
+      scale_y_continuous(expression(beta[1])) +
+      scale_x_continuous(expression(beta[0]))
+print(p1)
 
  # Figure 7.6 (b)
+dev.new()
 frame2 = data.frame(x1=dist,y1=switc)
-m2 <- "ggplot(frame2,aes(x=x1,y=y1)) + geom_point()+ theme_bw() + scale_y_continuous('Pr(switching)') + scale_x_continuous('Distance (in meters) to the nearest safe well')"
+p2 <- "ggplot(frame2,aes(x=x1,y=y1)) +
+       geom_point()+
+       theme_bw() +
+       scale_y_continuous('Pr(switching)') +
+       scale_x_continuous('Distance (in meters) to the nearest safe well')"
 for (i in 1:20) {
-  m2 <- paste(m2,"+ stat_function(aes(y=0),fun=function(x) 1.0 / (1 + exp(-fit1.post$beta[4000-",i,",1]-fit1.post$beta[4000-",i,",2]*x)),colour='grey')")
+  p2 <- paste(p2,"+ stat_function(aes(y=0),fun=function(x) 1.0 / (1 + exp(-fit1.post$beta[4000-",i,",1]-fit1.post$beta[4000-",i,",2]*x)),colour='grey')")
 }
-m2 <- paste(m2, "+ stat_function(fun=function(x) 1.0 / (1 + exp(-beta.mean[1] - beta.mean[2] * x)))")
-eval(parse(text = m2))
+p2 <- paste(p2, "+ stat_function(fun=function(x) 1.0 / (1 + exp(-beta.mean[1] - beta.mean[2] * x)))")
+eval(parse(text = p2))
 
 ## Predictive simulation using the binomial distribution
 
@@ -69,34 +79,38 @@ y.tilde <- ifelse (z.tilde>0, 1, 0)
 
 ## Models (earnings1.stan)
 ## glm (earn_pos ~ height + male, family=binomial(link="logit"))
-source("earnings1.data.R")
+source("earnings1.data.R", echo = TRUE)
 
-if (!file.exists("earnings1.sm.RData")) {
-    rt <- stanc("earnings1.stan", model_name="earnings1")
-    earnings1.sm <- stan_model(stanc_ret=rt)
-    save(earnings1.sm, file="earnings1.sm.RData")
-} else {
-    load("earnings1.sm.RData", verbose=TRUE)
+if (!exists("earnings1.sm")) {
+    if (file.exists("earnings1.sm.RData")) {
+        load("earnings1.sm.RData", verbose = TRUE)
+    } else {
+        rt <- stanc("earnings1.stan", model_name = "earnings1")
+        earnings1.sm <- stan_model(stanc_ret = rt)
+        save(earnings1.sm, file = "earnings1.sm.RData")
+    }
 }
 
-dataList.2 <- list(N=N, earn_pos=earn_pos, height=height,male=male)
+dataList.2 <- c("N","earn_pos","height","male")
 earnings1.sf1 <- sampling(earnings1.sm, dataList.2)
 print(earnings1.sf1)
 fit1a.post <- extract(earnings1.sf1)
 
 ## (earnings2.stan)
 ##model lm (log.earn ~ height + male, subset=earnings>0)
-source("earnings2.data.R")
+source("earnings2.data.R", echo = TRUE)
 
-if (!file.exists("earnings2.sm.RData")) {
-    rt <- stanc("earnings2.stan", model_name="earnings2")
-    earnings2.sm <- stan_model(stanc_ret=rt)
-    save(earnings1.sm, file="earnings2.sm.RData")
-} else {
-    load("earnings2.sm.RData", verbose=TRUE)
+if (!exists("earnings2.sm")) {
+    if (file.exists("earnings2.sm.RData")) {
+        load("earnings2.sm.RData", verbose = TRUE)
+    } else {
+        rt <- stanc("earnings2.stan", model_name = "earnings2")
+        earnings2.sm <- stan_model(stanc_ret = rt)
+        save(earnings2.sm, file = "earnings2.sm.RData")
+    }
 }
 
-dataList.3 <- list(N=N, earnings=earnings, height=height,sex=sex)
+dataList.3 <- c("N","earnings","height","sex")
 earnings2.sf1 <- sampling(earnings2.sm, dataList.3)
 print(earnings2.sf1)
 fit1b.post <- extract(earnings2.sf1)
@@ -133,6 +147,9 @@ heights <- seq (60, 75, 1)
 mean.earn.female <- sapply (heights, Mean.earn, male=0, fit1a.post, fit1b.post)
 mean.earn.male <- sapply (heights, Mean.earn, male=1, fit1a.post, fit1b.post)
 
+dev.new()
 frame = data.frame(x1=heights,x2=mean.earn.female)
-m <- ggplot(frame,aes(y=x2,x=x1))
-m + theme_bw() + geom_point()
+p3 <- ggplot(frame,aes(y=x2,x=x1)) +
+      theme_bw() +
+      geom_point()
+print(p3)

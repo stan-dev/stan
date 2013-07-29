@@ -67,8 +67,11 @@ for (s in 1:n.sims){
 }
 
 frame2 = data.frame(x1=avg.height)
-m2 <- ggplot(frame2,aes(x=x1))  + scale_x_continuous("Average height of 10 adults")
-m2 + geom_histogram(colour = "black", fill = "white") + theme_bw()
+p1 <- ggplot(frame2,aes(x=x1))  +
+      scale_x_continuous("Average height of 10 adults") +
+      geom_histogram(colour = "black", fill = "white") +
+      theme_bw()
+print(p1)
 
  # simulation for the maximum height
 
@@ -80,9 +83,13 @@ for (s in 1:n.sims){
   max.height[s] <- max (height)
 }
 
+dev.new()
 frame3 = data.frame(x1=max.height)
-m3 <- ggplot(frame3,aes(x=x1))  + scale_x_continuous("Maximum height of 10 adults")
-m3 + geom_histogram(colour = "black", fill = "white") + theme_bw()
+p2 <- ggplot(frame3,aes(x=x1))  +
+      scale_x_continuous("Maximum height of 10 adults") +
+      geom_histogram(colour = "black", fill = "white") +
+      theme_bw()
+print(p2)
 
 ## Simulation using custom-made functions
 
@@ -93,5 +100,8 @@ Height.sim <- function (n.adults){
 }
 
 frame4 = data.frame(x1=avg.height)
-m4 <- ggplot(frame4,aes(x=x1))  + scale_x_continuous("Average height of 10 adults")
-m4 + geom_histogram(colour = "black", fill = "white") + theme_bw()
+p3 <- ggplot(frame4,aes(x=x1))  +
+      scale_x_continuous("Average height of 10 adults") +
+      geom_histogram(colour = "black", fill = "white") +
+      theme_bw()
+print(p3)
