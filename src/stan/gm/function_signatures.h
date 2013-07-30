@@ -311,6 +311,8 @@ for (size_t i = 0; i < vector_types.size(); ++i)
           DOUBLE_T, // result
           vector_types[i], vector_types[j], vector_types[k]); // args
     }
+add("guassian_dlm_obs_log",DOUBLE_T,MATRIX_T,MATRIX_T,MATRIX_T,MATRIX_T,MATRIX_T,VECTOR_T,MATRIX_T);
+add("guassian_dlm_obs_log",DOUBLE_T,MATRIX_T,MATRIX_T,MATRIX_T,VECTOR_T,MATRIX_T,VECTOR_T,MATRIX_T);
 add_binary("gumbel_rng");
 add("head",ROW_VECTOR_T, ROW_VECTOR_T,INT_T);
 add("head",VECTOR_T, VECTOR_T,INT_T);
