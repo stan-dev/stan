@@ -19,12 +19,14 @@ transformed parameters {
     y_hat[i] <- beta[1] * x[i] + a[county[i]];
 }
 model {
-  mu_a ~ normal(0, .0001);
   mu_beta ~ normal(0, .0001);
-  sigma_y ~ uniform(0, 100);
-  sigma_a ~ uniform(0, 100);
   sigma_beta ~ uniform(0, 100);
   beta ~ normal(mu_beta, sigma_beta);
+
+  mu_a ~ normal(0, .0001);
+  sigma_a ~ uniform(0, 100);
   a ~ normal (mu_a, sigma_a);
-  y[i] ~ normal(y_hat, sigma_y);
+
+  sigma_y ~ uniform(0, 100);
+  y ~ normal(y_hat, sigma_y);
 }

@@ -6,20 +6,39 @@ data {
   int county[N];
 } 
 transformed data {
-  matrix[N,85] county_factors;
   vector[N] inter;
   inter <- u .* x;
-  for (i in 1:N) {
-    county_factors[i,county[i]] <- 1;
-  }
 }
 parameters {
-  vector[85] const_coef;
-  vector[85] x_coef;
+  vector[85] a;
+  vector[85] b;
   vector[2] beta;
-  real<lower=0> sigma;
+  real<lower=0> sigma_y;
+  real<lower=0> sigma_a;
+  real<lower=0> sigma_b;
+  real<lower=0> sigma_beta;
+  real mu_a;
+  real mu_b;
+  real mu_beta;
 } 
+transformed parameters {
+  vector[N] y_hat;
+  for (i in 1:N)
+    y_hat[i] <- a[county[i]] + x[i] * b[county[i]] + beta[1] * u[i] + beta[2] * inter[i];
+}
 model {
-  for (n in 1:N)
-    y[n] ~ normal(county_factors * const_coef + x[n] * county_factors * x_coef + beta[1] * u + beta[2] * inter, sigma);
+  mu_beta ~ normal(0, .0001);
+  sigma_beta ~ uniform(0, 100);
+  beta ~ normal(mu_beta, sigma_beta);
+
+  mu_a ~ normal(0, .0001);
+  sigma_a ~ uniform(0, 100);
+  a ~ normal (mu_a, sigma_a);
+
+  mu_b ~ normal(0, .0001);
+  sigma_b ~ uniform(0, 100);
+  b ~ normal (mu_b, sigma_b);
+
+  sigma_y ~ uniform(0, 100);
+  y ~ normal(y_hat, sigma_y);
 }

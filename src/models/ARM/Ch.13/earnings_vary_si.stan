@@ -5,19 +5,32 @@ data {
   int eth[N];
 } 
 transformed data {
-  matrix[N,4] ethn_factors;
   vector[N] log_earn;
   log_earn <- log(earn);
-  for (i in 1:N) {
-    ethn_factors[i,county[i]] <- 1;
-  }
 }
 parameters {
-  vector[4] const_coef;
-  vector[4] beta;
-  real<lower=0> sigma;
+  vector[4] a;
+  vector[4] b;
+  real<lower=0> sigma_y;
+  real<lower=0> sigma_a;
+  real mu_a;
+  real<lower=0> sigma_b;
+  real mu_b;
+}
+transformed parameters {
+  vector[N] y_hat;
+  for (i in 1:N)
+    y_hat[i] <- a[ethn[i]] + b[ethn[i]] * height[i];
 } 
 model {
-  for (n in 1:N)
-    log_earn[n] ~ normal(ethn_factors * const_coef + height[n] * ethn_factors * beta, sigma);
+  mu_a ~ normal(0, .0001);
+  sigma_a ~ uniform(0, 100);
+  a ~ normal (mu_a, sigma_a);
+
+  mu_b ~ normal(0, .0001);
+  sigma_b ~ uniform(0, 100);
+  b ~ normal (mu_b, sigma_b);
+
+  sigma_y ~ uniform(0, 100);
+  log_earn ~ normal(y_hat, sigma_y);
 }

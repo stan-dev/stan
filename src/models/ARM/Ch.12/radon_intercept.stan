@@ -16,8 +16,9 @@ transformed parameters {
 }
 model {
   mu_a ~ normal(0, .0001);
-  sigma_y ~ uniform(0, 100);
   sigma_a ~ uniform(0, 100);
   a ~ normal (mu_a, sigma_a);
-  y[i] ~ normal(y_hat, sigma_y);
+
+  sigma_y ~ uniform(0, 100);
+  y ~ normal(y_hat, sigma_y);
 }

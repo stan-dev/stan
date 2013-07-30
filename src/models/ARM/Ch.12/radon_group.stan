@@ -21,11 +21,13 @@ transformed parameters {
 }
 model {
   mu_b ~ normal(0, .0001);
-  mu_beta ~ normal(0, .0001);
   sigma_b ~ uniform(0, 100);
-  sigma_beta ~ uniform(0, 100);
-  sigma ~ uniform(0, 100);
   b ~ normal(mu_b, sigma_b);
+
+  mu_beta ~ normal(0, .0001);
+  sigma_beta ~ uniform(0, 100);
   beta ~ normal(mu_beta, sigma_beta);
+
+  sigma ~ uniform(0, 100);
   y ~ normal(y_hat, sigma);
 }
