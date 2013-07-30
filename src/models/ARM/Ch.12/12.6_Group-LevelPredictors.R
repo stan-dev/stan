@@ -32,6 +32,7 @@ radon_group.sf1 <- sampling(radon_group.sm, dataList.3)
 print(radon_group.sf1)
 post1 <- extract(radon_group.sf1)
 post1.ranef <- colMeans(post1$const_coef)
+mean1.ranef <- mean(post1.ranef)
 post1.beta <- colMeans(post1$beta)
 post1.fixef1 <- mean(post1.ranef)
 
@@ -50,13 +51,14 @@ radon_no_pool.sf1 <- sampling(radon_no_pool.sm, dataList.4)
 print(radon_no_pool.sf1)
 post2 <- extract(radon_no_pool.sf1)
 post2.ranef <- colMeans(post2$factor)
+mean2.ranef <- mean(post2.ranef)
 post2.fixef1 <- colMeans(post2$beta)
 post2.fixef2 <- mean(post2.ranef)
 
-a.hat.M1 <- post2.fixef2 + post2.ranef
+a.hat.M1 <- post2.fixef2 + post2.ranef - mean2.ranef
 b.hat.M1 <- post2.fixef1
 
-a.hat.M2 <- post1.fixef1 + post1.beta[2] * u + post1.ranef
+a.hat.M2 <- post1.fixef1 + post1.beta[2] * u + post1.ranef - mean1.ranef
 b.hat.M2 <- post1.beta[1]
 
 x.jitter <- x + runif(n,-.05,.05)

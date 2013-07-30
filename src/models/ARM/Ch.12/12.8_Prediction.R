@@ -24,10 +24,11 @@ radon_group.sf1 <- sampling(radon_group.sm, dataList.3)
 print(radon_group.sf1)
 post1 <- extract(radon_group.sf1)
 post1.ranef <- colMeans(post1$const_coef)
+mean.ranef <- mean(post1.ranef)
 post1.beta <- colMeans(post1$beta)
 post1.fixef1 <- mean(post1.ranef)
 
-a.hat.M2 <- post1.fixef1 + post1.beta[2] * u + post1.ranef
+a.hat.M2 <- post1.fixef1 + post1.beta[2] * u + (post1.ranef - mean.ranef)
 b.hat.M2 <- post1.beta[1]
 
 x.tilde <- 1
