@@ -20,10 +20,14 @@ transformed paramaters {
   vector[N] y_hat;
   vector[n_treatment] g_adj;
   vector[n_airport] d_adj;
-  real mean_d;
-  real mean_g;
-  g_adj <- g - mean_g;
-  d_adj <- d - mean_d;
+  real mu_adj;
+  real mu_g;
+  real mu_d;
+  mu_g <- mean(g)
+  mu_d <- mean(d)
+  g_adj <- g - mu_g;
+  d_adj <- d - mu_d;
+  mu_adj <- mu + mu_g + mu_d;
   for (i in 1:N)
     y_hat[i] <- mu + g[treatment[i]] + d[airport[i]];
 }
