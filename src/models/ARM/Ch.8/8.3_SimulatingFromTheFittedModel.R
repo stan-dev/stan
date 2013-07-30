@@ -89,6 +89,7 @@ dev.new()
 ##############################################################################
 ## Read the cleaned data
 # All data are at http://www.stat.columbia.edu/~gelman/arm/examples/roaches
+# if bad initial values, this model fails
 
 roachdata <- read.csv ("roachdata.csv")
 attach(roachdata)
