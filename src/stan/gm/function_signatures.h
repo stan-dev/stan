@@ -88,8 +88,8 @@ for (size_t i = 0; i < vector_types.size(); ++i)
 add_binary("beta_rng");
 add("binary_log_loss",DOUBLE_T,INT_T,DOUBLE_T);
 add_binary("binomial_coefficient_log");
-for (size_t i = 0; i < int_vector_types.size(); ++i) 
-  for (size_t j = 0; j < int_vector_types.size(); ++j)
+for (size_t i = 0; i < int_vector_types.size(); ++i) {
+  for (size_t j = 0; j < int_vector_types.size(); ++j) {
     for (size_t k = 0; k < vector_types.size(); ++k) {
       add("binomial_cdf",DOUBLE_T,
           int_vector_types[i],int_vector_types[j],vector_types[k]);
@@ -102,8 +102,13 @@ for (size_t i = 0; i < int_vector_types.size(); ++i)
       add("binomial_logit_log",DOUBLE_T,
           int_vector_types[i],int_vector_types[j],vector_types[k]);
     }
+  }
+}
 add("binomial_rng",INT_T,INT_T,DOUBLE_T);
-add("categorical_log",DOUBLE_T,INT_T,VECTOR_T);
+for (size_t i = 0; i < int_vector_types.size(); ++i) {
+  add("categorical_log",DOUBLE_T, int_vector_types[i],VECTOR_T);
+  add("categorical_logit_log",DOUBLE_T, int_vector_types[i],VECTOR_T);
+}
 add("categorical_rng",INT_T,VECTOR_T);
 for (size_t i = 0; i < vector_types.size(); ++i)
   for (size_t j = 0; j < vector_types.size(); ++j)
@@ -397,7 +402,11 @@ add("log",MATRIX_T,MATRIX_T);
 add("log_determinant",DOUBLE_T,MATRIX_T);
 add_binary("log_falling_factorial");
 add_binary("log_rising_factorial");
+add("log_softmax",VECTOR_T,VECTOR_T);
 add("log_sum_exp",DOUBLE_T, expr_type(DOUBLE_T,1U));
+add("log_sum_exp",DOUBLE_T, VECTOR_T);
+add("log_sum_exp",DOUBLE_T, ROW_VECTOR_T);
+add("log_sum_exp",DOUBLE_T, MATRIX_T);
 add_binary("log_sum_exp");
 add_nullary("log10");
 add_unary("log10");
