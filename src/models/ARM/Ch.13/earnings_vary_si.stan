@@ -2,7 +2,7 @@ data {
   int<lower=0> N; 
   vector[N] earn;
   vector[N] height;
-  int eth[N];
+  int ethn[N];
 } 
 transformed data {
   vector[N] log_earn;

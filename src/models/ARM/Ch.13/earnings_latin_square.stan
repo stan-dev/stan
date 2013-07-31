@@ -10,7 +10,9 @@ data {
 transformed data {
   int<lower=0> n_eth_age;
   int eth_age[N];
-  eth_age <- eth .* age;
+  
+  for (i in 1:N)
+    eth_age[i] <- eth[i] * age[i];
   n_eth_age <- n_eth * n_age;
 }
 parameters {
@@ -35,7 +37,7 @@ transformed parameters {
 model {
   mu_a ~ normal(0, .0001);
   sigma_a ~ uniform(0, 100);
-  a ~ normal (mu_a, sigma_a);
+  a ~ normal(mu_a, sigma_a);
 
   mu_b ~ normal(0, .0001);
   sigma_b ~ uniform(0, 100);

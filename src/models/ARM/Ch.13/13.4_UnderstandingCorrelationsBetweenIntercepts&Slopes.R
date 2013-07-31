@@ -1,7 +1,8 @@
 library(rstan)
 library(ggplot2)
 library(foreign)
-## Read the data FIXME: run models and test graphics
+library(gridBase)
+## Read the data 
 # Data are at http://www.stat.columbia.edu/~gelman/arm/examples/radon
 
 # The R codes & data files should be saved in the same directory for
@@ -26,15 +27,16 @@ attach.all (heights.clean)
 height.jitter.add <- runif (n, -.2, .2)
 
  # rename variables
-y <- log(earn)
-x <- height
-n <- length(y)
+y <- log(earn[ok])
+x <- height[ok]
+n <- length(y[ok])
 n.age <- 3
 n.eth <- 4
 age <- age.category
+eth.ok <- eth[ok]
 
 ## Regression of log (earnings) on height, age, and ethnicity
-## M1 <- lmer (y ~ x + (1 + x | eth))
+## M1 <- lmer (y ~ x + (1 + x | eth.ok))
 if (!exists("earnings_vary_si.sm")) {
     if (file.exists("earnings_vary_si.sm.RData")) {
         load("earnings_vary_si.sm.RData", verbose = TRUE)
@@ -45,53 +47,36 @@ if (!exists("earnings_vary_si.sm")) {
     }
 }
 
-dataList.1 <- list(N=n, earn=earn,height=x,ethn=ethn)
+dataList.1 <- list(N=n, earn=earn[ok]+1,height=x,ethn=eth[ok])
 earnings_vary_si.sf1 <- sampling(earnings_vary_si.sm, dataList.1)
-print(earnings_vary_si.sf1)
+print(earnings_vary_si.sf1, pars = c("a","b", "sigma_y", "lp__"))
 post1 <- extract(earnings_vary_si.sf1)
-post1.ranef <- colMeans(post1$const_coef)
-mean.ranef1 <- mean(post1.ranef)
-post1.beta <- colMeans(post1$beta)
-post1.ranef2 <- mean(post1.beta)
-mean.ranef2 <- mean(post1.ranef2)
-
-##FIXME: WHAT'S THIS
-ab.hat.M1 <- coef(M1)$eth
-a.hat.M1 <- ab.hat.M1[,1]
-b.hat.M1 <- ab.hat.M1[,2]
 
 ## plot on figure 13.3
-x.jitter <- x + runif(n, -.2,.2)
 age.label <- c("age 18-34", "age 35-49", "age 50-64")
-eth.label <- c("blacks", "hispanics", "whites", "others")
-x <- height - mean(height)
-x.jitter.add <- runif(n, -.2,.2)
-display8 <- c (1,2,3,4)  # ethnicities to be displayed
-y.range <- range (y[!is.na(match(county,display8))])
+eth.label <- c("BLACKS","HISPANICS","WHITES","OTHERS")
+x <- height[ok] - mean(height[ok])
+pushViewport(viewport(layout = grid.layout(1, 4)))
+a.hat.M1 <- colMeans(post1$a)
+b.hat.M1 <- colMeans(post1$b)
 
-eth.data <- data.frame(y, x, eth)
-eth.data$x <- x + x.jitter.add
-eth.data$eth.name <- eth.data$eth
-eth.data$eth.name <- factor(radon8.data$eth.name,levels=c("1","2","3","4"),
-                                  labels=c("BLACKS","HISPANICS","WHITES","OTHERS"))
-eth.data$a <- 
-eth.data$b <-
-eth.data$a.hat <-
-eth.data$b.hat <-
-
-p1 <- ggplot(radon8.data, aes(x, y)) +
-     geom_jitter(position = position_jitter(width = .05, height = 0)) +
-     scale_x_continuous("Height (inches)") +
-     scale_y_continuous("log(earnings)") +
-     geom_abline(aes(intercept = a.hat, slope=b.hat), size = 0.25) +
-for (s in 1:20)
-  p1 <- p1 + geom_abline(intercept=a[s,], slope=b[s,])
-p1 <- p1 + facet_wrap(~ eth.name, ncol = 4)
-print(p1)
+for (j in 1:4) {
+  frame1 = data.frame(y1=y[eth.ok==j],x1=x[eth.ok==j])
+  p1 <- ggplot(frame1, aes(x=x1, y=y1)) +
+        geom_jitter(position = position_jitter(width = .05, height = 0)) +
+        scale_x_continuous("Height (inches)") +
+        scale_y_continuous("log(earnings)") +
+        labs(title=eth.label[j]) +
+        theme_bw() +
+        geom_abline(aes(intercept = colMeans(post1$a)[j], slope=colMeans(post1$b)[j]), size = 0.25)
+  for (s in 1:20)
+    p1 <- p1 + geom_abline(intercept=post1$a[4000-s,j], slope=post1$b[4000-s,j],colour="grey10")
+  print(p1, vp = viewport(layout.pos.row = 1, layout.pos.col = j))
+}
 
 ## plot on figure 13.4
 dev.new()
-frame2 = data.frame(x1=a.hat.M1,y1=b.hat.M1)
+frame2 = data.frame(x1=colMeans(post1$a),y1=colMeans(post1$b))
 p2 <- ggplot(frame2,aes(x=x1,y=y1)) +
       geom_point() +
       scale_y_continuous("Intercept") +
@@ -101,7 +86,7 @@ print(p2)
 
  # plot on figure 13.5
 dev.new()
-frame3 = data.frame(x1=x.jitter,y1=y)
+frame3 = data.frame(x1=x,y1=y)
 p3 <- ggplot(frame3,aes(x=x1,y=y1)) +
       geom_point() +
       scale_y_continuous("log(earnings)") +
@@ -116,38 +101,29 @@ print(p3)
 ## Regression centering the predictors
 ## M2 <- lmer (y ~ x.centered + (1 + x.centered | eth))
 x.centered <- x - mean(x)
-x.centered.jitter <- x.jitter - mean(x)
 
 dataList.3 <- list(N=n, earn=earn,height=x.centered,ethn=ethn)
 earnings_vary_si.sf2 <- sampling(earnings_vary_si.sm, dataList.3)
 print(earnings_vary_si.sf2)
-post1 <- extract(earnings_vary_si.sf2)
-post1.ranef <- colMeans(post1$const_coef)
-mean.ranef1 <- mean(post1.ranef)
-post1.beta <- colMeans(post1$beta)
-post1.ranef2 <- mean(post1.beta)
-mean.ranef2 <- mean(post1.ranef2)
+post2 <- extract(earnings_vary_si.sf2)
 
-dev.new()
-eth2.data <- data.frame(y, x, eth)
-eth2.data$x <- x + x.jitter.add
-eth2.data$eth.name <- eth.data$eth
-eth2.data$eth.name <- factor(radon8.data$eth.name,levels=c("1","2","3","4"),
-                                  labels=c("BLACKS","HISPANICS","WHITES","OTHERS"))
-eth2.data$a <- 
-eth2.data$b <-
-eth2.data$a.hat.M2 <-
-eth2.data$b.hat.M2 <-
+pushViewport(viewport(layout = grid.layout(1, 4)))
+a.hat.M2 <- colMeans(post2$a)
+b.hat.M2 <- colMeans(post2$b)
 
-p4 <- ggplot(eth2.data, aes(x, y)) +
-     geom_jitter(position = position_jitter(width = .05, height = 0)) +
-     scale_x_continuous("Height (inches from mean)") +
-     scale_y_continuous("log(earnings)") +
-     geom_abline(aes(intercept = a.hat.M2, slope=b.hat.M2), size = 0.25) +
-for (s in 1:20)
-  p4 <- p4 + geom_abline(intercept=a[s,], slope=b[s,])
-p4 <- p4 + facet_wrap(~ eth.name, ncol = 4)
-print(p4)
+for (j in 1:4) {
+  frame1 = data.frame(y1=y[eth.ok==j],x1=x.centered[eth.ok==j])
+  p4 <- ggplot(frame1, aes(x=x1, y=y1)) +
+        geom_jitter(position = position_jitter(width = .05, height = 0)) +
+        scale_x_continuous("Height (inches from mean)") +
+        scale_y_continuous("log(earnings)") +
+        labs(title=eth.label[j]) +
+        theme_bw() +
+        geom_abline(aes(intercept = colMeans(post2$a)[j], slope=colMeans(post2$b)[j]), size = 0.25)
+  for (s in 1:20)
+    p4 <- p4 + geom_abline(intercept=post2$a[4000-s,j], slope=post2$b[4000-s,j],colour="grey10")
+  print(p4, vp = viewport(layout.pos.row = 1, layout.pos.col = j))
+}
 
 ## Figure 13.7
 dev.new()
