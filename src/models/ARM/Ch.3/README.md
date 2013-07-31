@@ -2,23 +2,23 @@ Data
 ====
 
 1. kiddiq.data.R
-- N         : number of observations
-- kid_score : cognitive test scores of three- and four-year-old children
-- mom_hs    : did mother complete high school? 1: Yes, 0: No
-- mom_iq    : mother IQ score
-- mom_hs_new: new data for prediction
-- mom_iq_new: new data for prediction
+  * N         : number of observations
+  * kid_score : cognitive test scores of three- and four-year-old children
+  * mom_hs    : did mother complete high school? 1: Yes, 0: No
+  * mom_iq    : mother IQ score
+  * mom_hs_new: new data for prediction
+  * mom_iq_new: new data for prediction
 
 2. kids_before1987.data.R
-- N   : number of observations
-- ppvt: cognitive test scores of children born before 1987
-- hs  : did mother complete high school? 1: Yes, 0: No
-- afqt: normalized mother IQ score (mean = 100, sd = 15)
+  * N   : number of observations
+  * ppvt: cognitive test scores of children born before 1987
+  * hs  : did mother complete high school? 1: Yes, 0: No
+  * afqt: normalized mother IQ score (mean = 100, sd = 15)
 
 3. kids_after1987.data.R
-- ppvt_ev: cognitive test scores of children born in 1987 or later
-- hs_ev  : did mother complete high school? 1: Yes, 0: No
-- afqt_ev: normalized mother IQ score (mean = 100, sd = 15)
+  * ppvt_ev: cognitive test scores of children born in 1987 or later
+  * hs_ev  : did mother complete high school? 1: Yes, 0: No
+  * afqt_ev: normalized mother IQ score (mean = 100, sd = 15)
 
 Models
 ======
@@ -35,10 +35,10 @@ kidiq_interaction.stan: lm(kid_score ~ mom_hs + mom_iq + mom_hs:mom_iq)
 
 4. Prediction
 kidiq_prediction.stan: 
-- fitted   : lm(kid_score ~ mom_hs + mom_iq)
-- predicted: lm(kid_score_pred ~ mom_hs_new + mom_iq_new)
+  * fitted   : lm(kid_score ~ mom_hs + mom_iq)
+  * predicted: lm(kid_score_pred ~ mom_hs_new + mom_iq_new)
 
 5. External validation
 kidiq_validation.stan: 
-- fitted   : lm(ppvt ~ hs + afqt)
-- validated: R code
+  * fitted   : lm(ppvt ~ hs + afqt)
+  * validated: R code
