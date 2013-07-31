@@ -35,10 +35,10 @@ Models
 
 4. Prediction
   * kidiq_prediction.stan: 
-    * fitted   : lm(kid_score ~ mom_hs + mom_iq)
-    * predicted: lm(kid_score_pred ~ mom_hs_new + mom_iq_new)
+      fitted   : lm(kid_score ~ mom_hs + mom_iq)
+      predicted: lm(kid_score_pred ~ mom_hs_new + mom_iq_new)
 
 5. External validation
   * kidiq_validation.stan: 
-    * fitted   : lm(ppvt ~ hs + afqt)
-    * validated: R code
+      fitted   : lm(ppvt ~ hs + afqt)
+      validated: R code
