@@ -446,6 +446,18 @@ namespace stan {
     };
     boost::phoenix::function<validate_identifier> validate_identifier_f;
 
+    // copies single dimension from M to N if only M declared
+    struct copy_square_cholesky_dimension_if_necessary {
+      template <typename T1>
+      struct result { typedef void type; };
+      void operator()(cholesky_factor_var_decl& var_decl) const {
+        if (is_nil(var_decl.N_))
+          var_decl.N_ = var_decl.M_;
+      }
+    };
+    boost::phoenix::function<copy_square_cholesky_dimension_if_necessary>
+    copy_square_cholesky_dimension_if_necessary_f;
+
     struct empty_range {
       template <typename T1>
       struct result { typedef range type; };
@@ -748,13 +760,16 @@ namespace stan {
         > lit('[')
         > expression_g(_r1)
           [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
-        > lit(',')
-        > expression_g(_r1)
-          [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
-        > lit(']')
+        > -( lit(',')
+             > expression_g(_r1)
+             [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
+             ) 
+        > lit(']') 
         > identifier_r 
         > opt_dims_r(_r1)
-        > lit(';');
+        > lit(';')
+        > eps
+        [copy_square_cholesky_dimension_if_necessary_f(_val)];
 
       cov_matrix_decl_r.name("covariance matrix declaration");
       cov_matrix_decl_r 
