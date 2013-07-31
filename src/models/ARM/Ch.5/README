@@ -18,35 +18,44 @@ Models
 ======
 
 1. One predictor
-wells_one_pred_scale.stan: switc ~ dist100
-wells_one_pred.stan      : switc ~ dist
-y_x.stan                 : y ~ x
+wells_one_pred_scale.stan: glm(switc ~ dist100, family=binomial(link="logit"))
+wells_one_pred.stan      : glm(switc ~ dist, family=binomial(link="logit"))
+y_x.stan                 : glm(y ~ x, family=binomial(link="logit"))
 
 2. Multiple predictors with no interaction
-wells_edu.stan     : switc ~ dist100 + arsenic + educ4
-wells_two_pred.stan: switc ~ dist100 + arsenic
+wells_edu.stan     : glm(switc ~ dist100 + arsenic + educ4, 
+			 family=binomial(link="logit"))
+wells_two_pred.stan: glm(switc ~ dist100 + arsenic, family=binomial(link="logit"))
 
 3. Multiple predictors with interaction
-wells_all.stan         : switc ~ dist100 + arsenic + educ4 + dist100:arsenic
-wells_interactions.stan: switc ~ dist100 + arsenic + dist1::arsenic
+wells_all.stan         : glm(switc ~ dist100 + arsenic + educ4 + dist100:arsenic,
+			     family=binomial(link="logit"))
+wells_interactions.stan: glm(switc ~ dist100 + arsenic + dist1::arsenic, 
+			     family=binomial(link="logit"))
 
 4. Centering
-wells_community.stan               : switc ~ c_dist100 + c_arsenic 
-                                             + c_dist100:c_arsenic + assoc 
-                                             + educ4
-wells_interactions_center_educ.stan: switc ~ c_dist100 + c_arsenic + c_educ4 
-                                             + c_dist100:c_arsenic 
-                                             + c_dist100:c_educ4 
-                                             + c_arsenic:c_educ4
-wells_interaction_center.stan      : switc ~ c_dist100 + c_arsenic 
-                                             + c_dist100:c_arsenic
-wells_social.stan                  : switc ~ c_dist100 + c_arsenic 
-                                             + c_dist100:c_arsenic + educ4
+wells_community.stan               : glm(switc ~ c_dist100 + c_arsenic 
+                                                 + c_dist100:c_arsenic + assoc 
+                                                 + educ4, 
+					 family=binomial(link="logit"))
+wells_interactions_center_educ.stan: glm(switc ~ c_dist100 + c_arsenic + c_educ4 
+                                                 + c_dist100:c_arsenic 
+                                                 + c_dist100:c_educ4 
+                                                 + c_arsenic:c_educ4, 
+					 family=binomial(link="logit"))
+wells_interaction_center.stan      : glm(switc ~ c_dist100 + c_arsenic 
+                                                 + c_dist100:c_arsenic, 
+					 family=binomial(link="logit"))
+wells_social.stan                  : glm(switc ~ c_dist100 + c_arsenic 
+                                                 + c_dist100:c_arsenic + educ4, 
+					 family=binomial(link="logit"))
 
 5. Log transformations
-wells_log_transform.stan : switc ~ c_dist100 + c_log_arsenic + c_educ4 
-                                   + c_dist100:c_log_arsenic + c_dist100:c_educ4 
-                                   + c_log_arsenic:c_educ4
-wells_log_transform2.stan: switc ~ dist100 + log(arsenic) + c_educ4 
-                                   + dist100:log(arsenic) + dist100:educ4 
-                                   + log(arsenic):educ4
+wells_log_transform.stan : glm(switc ~ c_dist100 + c_log_arsenic + c_educ4 
+                                       + c_dist100:c_log_arsenic + c_dist100:c_educ4 
+                                       + c_log_arsenic:c_educ4, 
+			       family=binomial(link="logit"))
+wells_log_transform2.stan: glm(switc ~ dist100 + log(arsenic) + c_educ4 
+                                       + dist100:log(arsenic) + dist100:educ4 
+                                       + log(arsenic):educ4, 
+			       family=binomial(link="logit"))

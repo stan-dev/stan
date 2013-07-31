@@ -44,13 +44,13 @@ Models
 ======
 
 1. One predictor
-wells.stan: switc ~ dist
+wells.stan: glm(switc ~ dist, family=binomial(link="logit"))
 
 2. Multiple predictors with no interaction
-earnings1.stan: earn_pos ~ height + male
-congress.stan: vote_88 ~ vote_86 + incumbency_88
+earnings1.stan: glm(earn_pos ~ height + male, family=binomial(link="logit"))
+congress.stan : lm(vote_88 ~ vote_86 + incumbency_88)
 
 3. Log transformations
-earnings_interaction.stan: log(earnings) ~ height + male + height:male
-earnings2.stan: log(earnings) ~ height + male
+earnings_interaction.stan: lm(log(earnings) ~ height + male + height:male)
+earnings2.stan           : lm(log(earnings) ~ height + male)
 

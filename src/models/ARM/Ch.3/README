@@ -24,21 +24,21 @@ Models
 ======
 
 1. One predictor
-kidscore_momhs.stan: kid_score ~ mom_hs
-kidscore_momiq.stan: kid_score ~ mom_iq
+kidscore_momhs.stan: lm(kid_score ~ mom_hs)
+kidscore_momiq.stan: lm(kid_score ~ mom_iq)
 
 2. Multiple predictors with no interaction
-kidiq_multi_preds.stan: kid_score ~ mom_hs + mom_iq
+kidiq_multi_preds.stan: lm(kid_score ~ mom_hs + mom_iq)
 
 3. Multiple predictors with interaction
-kidiq_interaction.stan: kid_score ~ mom_hs + mom_iq + mom_hs:mom_iq
+kidiq_interaction.stan: lm(kid_score ~ mom_hs + mom_iq + mom_hs:mom_iq)
 
 4. Prediction
 kidiq_prediction.stan: 
-- fitted   : kid_score ~ mom_hs + mom_iq
-- predicted: kid_score_pred ~ mom_hs_new + mom_iq_new
+- fitted   : lm(kid_score ~ mom_hs + mom_iq)
+- predicted: lm(kid_score_pred ~ mom_hs_new + mom_iq_new)
 
 5. External validation
 kidiq_validation.stan: 
-- fitted   : ppvt ~ hs + afqt
+- fitted   : lm(ppvt ~ hs + afqt)
 - validated: R code

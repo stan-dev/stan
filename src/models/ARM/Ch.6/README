@@ -25,12 +25,12 @@ Models
 ======
 
 1. One predictor
-wells_logit.stan : switc ~ dist100
-wells_probit.stan: switc ~ dist100
+wells_logit.stan : glm(switc ~ dist100, family=binomial(link="logit"))
+wells_probit.stan: glm(switc ~ dist100, family=binomial(link="probit"))
 
 2. Multiple predictors with no interaction
-earnings1.stan: earn_pos ~ height + male
+earnings1.stan: glm(earn_pos ~ height + male, family=binomial(link="logit"))
 
 3. Log transformations
-earnings2.stan: log(earnings) ~ height + male
+earnings2.stan: lm(log(earnings) ~ height + male)
 
