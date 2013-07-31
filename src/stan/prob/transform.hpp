@@ -1320,8 +1320,8 @@ namespace stan {
 
     /**
      * Return the Cholesky factor of the specified size read from the
-     * specified vector.  A total of (N * (N + 1)) / 2 + (M - N) * N
-     * elements are required to read an m by n Cholesky factor.
+     * specified vector.  A total of (N choose 2) + N + (M - N) * N
+     * elements are required to read an M by N Cholesky factor.
      * 
      * @tparam T Type of scalars in matrix
      * @param x Vector of unconstrained values
@@ -1361,8 +1361,8 @@ namespace stan {
      * Return the Cholesky factor of the specified size read from the
      * specified vector and increment the specified log probability
      * reference with the log Jacobian adjustment of the transform.  A
-     * total of (k choose 2) + k free parameters are required to read
-     * a k by k Cholesky factor.
+     * total of (N choose 2) + N + N * (M - N) free parameters are required to read
+     * an M by N Cholesky factor.
      * 
      * @tparam T Type of scalars in matrix
      * @param x Vector of unconstrained values
