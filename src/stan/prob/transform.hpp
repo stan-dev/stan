@@ -1320,31 +1320,40 @@ namespace stan {
 
     /**
      * Return the Cholesky factor of the specified size read from the
-     * specified vector.  A total of (k choose 2) + k free parameters are
-     * required to read a k by k Cholesky factor.
+     * specified vector.  A total of (N * (N + 1)) / 2 + (M - N) * N
+     * elements are required to read an m by n Cholesky factor.
      * 
      * @tparam T Type of scalars in matrix
      * @param x Vector of unconstrained values
-     * @param k Number of rows and columns in Cholesky factor
+     * @param M Number of rows
+     * @param N Number of columns
      * @return Cholesky factor
      */
     template <typename T>
     Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
     cholesky_factor_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x,
-                              int k) {
+                              int M,
+                              int N) {
       using std::exp;
-      if (x.size() != (k * (k + 1)) / 2)
-        throw std::domain_error("cholesky_factor_constrain: x.size() must be (k choose 2) + k");
-      Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> y(k,k);
+      if (M < N)
+        throw std::domain_error("cholesky_factor_constrain: num rows must be >= num cols");
+      if (x.size() != ((N * (N + 1)) / 2 + (M - N) * N))
+        throw std::domain_error("cholesky_factor_constrain: x.size() must be (N * (N + 1)) / 2 + (M - N) * N");
+      Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> y(M,N);
       T zero(0);
       int pos = 0;
-      for (int m = 0; m < k; ++m) {
+      // upper square
+      for (int m = 0; m < N; ++m) {
         for (int n = 0; n < m; ++n)
           y(m,n) = x(pos++);
         y(m,m) = exp(x(pos++));
-        for (int n = m + 1; n < k; ++n)
+        for (int n = m + 1; n < N; ++n)
           y(m,n) = zero;
       }
+      // lower rectangle
+      for (int m = N; m < M; ++m)
+        for (int n = 0; n < N; ++n)
+          y(m,n) = x(pos++);
       return y;
     }
 
@@ -1357,27 +1366,30 @@ namespace stan {
      * 
      * @tparam T Type of scalars in matrix
      * @param x Vector of unconstrained values
-     * @param k Number of rows and columns in Cholesky factor
+     * @param M Number of rows
+     * @param N Number of columns
      * @param lp Log probability that is incremented with the log Jacobian
      * @return Cholesky factor
      */
     template <typename T>
     Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
     cholesky_factor_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x,
-                              int k,
+                              int M,
+                              int N,
                               T& lp) {
       // cut-and-paste from above, so checks twice
+
       using stan::math::sum;
-      if (x.size() != (k * (k + 1)) / 2)
+      if (x.size() != ((N * (N + 1)) / 2 + (M - N) * N))
         throw std::domain_error("cholesky_factor_constrain: x.size() must be (k choose 2) + k");
       int pos = 0;
-      std::vector<T> log_jacobians(k);
-      for (int m = 0; m < k; ++m) {
-        pos += m;
-        log_jacobians[m] = x(pos++);
+      std::vector<T> log_jacobians(N);
+      for (int n = 0; n < N; ++n) {
+        pos += n;
+        log_jacobians[n] = x(pos++);
       }
       lp += sum(log_jacobians);  // optimized for autodiff vs. direct lp += 
-      return cholesky_factor_constrain(x,k);
+      return cholesky_factor_constrain(x,M,N);
     }
 
     /**
@@ -1396,14 +1408,21 @@ namespace stan {
       double result;
       if (!stan::math::check_cholesky_factor("cholesky_factor_free(%1%)",y,"y",&result))
         throw std::domain_error("cholesky_factor_free: y is not a Cholesky factor");
-      int k = y.rows();
-      Eigen::Matrix<T,Eigen::Dynamic,1> x((k * (k + 1)) / 2);
+      int M = y.rows();
+      int N = y.cols();
+      Eigen::Matrix<T,Eigen::Dynamic,1> x((N * (N + 1)) / 2 + (M - N) * N);
       int pos = 0;
-      for (int m = 0; m < k; ++m) {
+      // lower triangle of upper square
+      for (int m = 0; m < N; ++m) {
         for (int n = 0; n < m; ++n)
           x(pos++) = y(m,n);
+        // diagonal of upper square
         x(pos++) = log(y(m,m));
       }
+      // lower rectangle
+      for (int m = N; m < M; ++m)
+        for (int n = 0; n < N; ++n)
+          x(pos++) = y(m,n);
       return x;
     }
 

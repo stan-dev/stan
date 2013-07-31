@@ -934,15 +934,16 @@ namespace stan {
 
       /**
        * Return the next Cholesky factor with the specified
-       * dimensionality, reading it directly.
+       * dimensionality, reading it directly without transforms.
        *
-       * @param k Dimensionality of Cholesky factor.
+       * @param M Rows of Cholesky factor
+       * @param N Columns of Cholesky factor
        * @return Next Cholesky factor.
        * @throw std::domain_error if the matrix is not a valid
        * Cholesky factor.
        */
-      inline matrix_t cholesky_factor(size_t k) {
-        matrix_t y(matrix(k,k));
+      inline matrix_t cholesky_factor(size_t M, size_t N) {
+        matrix_t y(matrix(M,N));
         stan::math::check_cholesky_factor("stan::io::cholesky_factor(%1%)", y, "Constrained matrix");
         return y;
       }
@@ -952,14 +953,15 @@ namespace stan {
        * dimensionality, reading from an unconstrained vector of the
        * appropriate size.
        *
-       * @param k Dimensionality of Cholesky factor.
+       * @param M Rows of Cholesky factor
+       * @param N Columns of Cholesky factor
        * @return Next Cholesky factor.
        * @throw std::domain_error if the matrix is not a valid
        *    Cholesky factor.
        */
-      inline matrix_t cholesky_factor_constrain(size_t k) {
-        return stan::prob::cholesky_factor_constrain(vector((k * (k + 1)) / 2),
-                                                     k);
+      inline matrix_t cholesky_factor_constrain(size_t M, size_t N) {
+        return stan::prob::cholesky_factor_constrain(vector((N * (N + 1)) / 2 + (M - N) * N),
+                                                     M,N);
       }
 
       /**
@@ -968,14 +970,15 @@ namespace stan {
        * appropriate size, and increment the log probability reference
        * with the log Jacobian adjustment for the transform.
        *
-       * @param k Dimensionality of Cholesky factor.
+       * @param M Rows of Cholesky factor
+       * @param N Columns of Cholesky factor
        * @return Next Cholesky factor.
        * @throw std::domain_error if the matrix is not a valid
        *    Cholesky factor.
        */
-      inline matrix_t cholesky_factor_constrain(size_t k, T& lp) {
-        return stan::prob::cholesky_factor_constrain(vector((k * (k + 1)) / 2),
-                                                     k,lp);
+      inline matrix_t cholesky_factor_constrain(size_t M, size_t N, T& lp) {
+        return stan::prob::cholesky_factor_constrain(vector((N * (N + 1)) / 2 + (M - N) * N),
+                                                     M,N,lp);
       }
 
       /**

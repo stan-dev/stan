@@ -11,7 +11,9 @@ namespace stan {
   namespace math {
 
     /**
-     * Return <code>true</code> if the specified matrix is lower triangular.
+     * Return <code>true</code> if the specified matrix is lower
+     * triangular.  A matrix x is not lower triangular if there is
+     * a non-zero entry x[m,n] with m &lt; n.
      * 
      * @param function 
      * @param y Matrix to test.
@@ -26,7 +28,7 @@ namespace stan {
                 const char* name,
                 T_result* result) {
       for (int n = 1; n < y.cols(); ++n) {
-        for (int m = 0; m < n; ++m) {
+        for (int m = 0; m < n && m < y.rows(); ++m) {
           if (y(m,n) != 0) {
             std::stringstream msg;
             msg << name << " is not lower triangular;"

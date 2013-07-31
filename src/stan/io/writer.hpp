@@ -382,8 +382,7 @@ namespace stan {
        * @throw std::runtime_error if y has no elements or if it is not square
        */
       void cholesky_factor_unconstrain(matrix_t& y) {
-        // FIXME:  optimize by unrolling cholesky_factor_free into
-        // push_back to avoid temporary
+        // FIXME:  optimize by unrolling cholesky_factor_free
         Eigen::Matrix<T,Eigen::Dynamic,1> y_free
           = stan::prob::cholesky_factor_free(y);
         for (int i = 0; i < y_free.size(); ++i)

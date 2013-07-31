@@ -68,7 +68,8 @@ BOOST_FUSION_ADAPT_STRUCT(stan::gm::positive_ordered_var_decl,
                           (std::vector<stan::gm::expression>, dims_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::cholesky_factor_var_decl,
-                          (stan::gm::expression, K_)
+                          (stan::gm::expression, M_)
+                          (stan::gm::expression, N_)
                           (std::string, name_)
                           (std::vector<stan::gm::expression>, dims_) )
 
@@ -312,7 +313,7 @@ namespace stan {
         reserve("positive_ordered"); 
         reserve("row_vector"); 
         reserve("matrix"); 
-        reserve("cholesky_factor");
+        reserve("cholesky_factor_cov");
         reserve("cov_matrix");
         reserve("corr_matrix"); 
 
@@ -743,10 +744,13 @@ namespace stan {
 
       cholesky_factor_decl_r.name("cholesky factor declaration");
       cholesky_factor_decl_r 
-        %= lit("cholesky_factor")
+        %= lit("cholesky_factor_cov")
         > lit('[')
         > expression_g(_r1)
-        [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
+          [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
+        > lit(',')
+        > expression_g(_r1)
+          [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
         > lit(']')
         > identifier_r 
         > opt_dims_r(_r1)

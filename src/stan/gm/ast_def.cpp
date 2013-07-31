@@ -805,11 +805,13 @@ namespace stan {
     cholesky_factor_var_decl::cholesky_factor_var_decl() 
       : base_var_decl(MATRIX_T) { 
     }
-    cholesky_factor_var_decl::cholesky_factor_var_decl(expression const& K,
+    cholesky_factor_var_decl::cholesky_factor_var_decl(expression const& M,
+                                                       expression const& N,
                                                        std::string const& name,
                                                        std::vector<expression> const& dims)
       : base_var_decl(name,dims,MATRIX_T),
-        K_(K) {
+        M_(M),
+        N_(N) {
     }
 
     cov_matrix_var_decl::cov_matrix_var_decl() : base_var_decl(MATRIX_T) { 

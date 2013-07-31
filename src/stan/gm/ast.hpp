@@ -481,9 +481,11 @@ namespace stan {
   };
 
   struct cholesky_factor_var_decl : public base_var_decl {
-    expression K_;
+    expression M_;
+    expression N_;
     cholesky_factor_var_decl();
-    cholesky_factor_var_decl(expression const& K,
+    cholesky_factor_var_decl(expression const& M,
+                             expression const& N,
                              std::string const& name,
                              std::vector<expression> const& dims);
   };

@@ -3,8 +3,8 @@
 
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/error_handling/check_positive.hpp>
+#include <stan/math/error_handling/check_less_or_equal.hpp>
 #include <stan/math/error_handling/matrix/check_lower_triangular.hpp>
-#include <stan/math/error_handling/matrix/check_size_match.hpp>
 
 
 namespace stan {
@@ -14,7 +14,9 @@ namespace stan {
     /**
      * Return <code>true</code> if the specified matrix is a valid
      * Cholesky factor.  A Cholesky factor is a lower triangular
-     * matrix whose diagonal elements are all positive.
+     * matrix whose diagonal elements are all positive.  Note that
+     * Cholesky factors need not be square, but require at least as
+     * many rows M as columns N (i.e., M &gt;= N).
      *
      * @param function
      * @param y Matrix to test.
@@ -29,18 +31,17 @@ namespace stan {
                  const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
                  const char* name,
                  T_result* result) {
-      if (!check_size_match(function, 
-                            y.rows(), "rows of Cholesky factor",
-                            y.cols(), "columns of Cholesky factor",
-                            result)) 
+      if (!check_less_or_equal(function,y.cols(),y.rows(),
+                               "columns and rows of Cholesky factor",
+                               result))
         return false;
-      if (!check_positive(function, y.rows(), "rows of Cholesky factor", 
+      if (!check_positive(function, y.cols(), "columns of Cholesky factor", 
                           result))
         return false;
       // FIXME:  should report row i
       if (!check_lower_triangular(function, y, name, result))
         return false;
-      for (int i = 0; i < y.rows(); ++i)
+      for (int i = 0; i < y.cols(); ++i)
         if (!check_positive(function, y(i,i), name, result))
           return false;
       return true;
