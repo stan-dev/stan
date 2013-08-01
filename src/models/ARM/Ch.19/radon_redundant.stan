@@ -2,7 +2,7 @@ data {
   int<lower=0> N; 
   int<lower=0> J; 
   vector[N] y;
-  vector[J] county;
+  int county[N];
 } 
 parameters {
   real<lower=0> sigma_eta;
@@ -10,8 +10,14 @@ parameters {
   real mu;
   vector[J] eta;
 } 
-transformed paramaters {
+transformed parameters {
   vector[N] y_hat;
+  real mu_adj;
+  vector[J] eta_adj;
+  real mean_eta;
+  mean_eta <- mean(eta);
+  mu_adj <- mu + mean_eta;
+  eta_adj <- eta - mean_eta;
   for (i in 1:N)
     y_hat[i] <- mu + eta[county[i]];
 }

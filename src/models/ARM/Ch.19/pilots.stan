@@ -3,8 +3,8 @@ data {
   int<lower=0> n_treatment; 
   int<lower=0> n_airport; 
   vector[N] y;
-  vector[n_airport] airport;
-  vector[n_treatment] treatment;
+  int airport[N];
+  int treatment[N];
 } 
 parameters {
   vector[n_treatment] g;
@@ -16,18 +16,18 @@ parameters {
   real mu_d;
   real mu_g;
 } 
-transformed paramaters {
+transformed parameters {
   vector[N] y_hat;
   vector[n_treatment] g_adj;
   vector[n_airport] d_adj;
   real mu_adj;
-  real mu_g;
-  real mu_d;
-  mu_g <- mean(g)
-  mu_d <- mean(d)
-  g_adj <- g - mu_g;
-  d_adj <- d - mu_d;
-  mu_adj <- mu + mu_g + mu_d;
+  real mu_g2;
+  real mu_d2;
+  mu_g2 <- mean(g);
+  mu_d2 <- mean(d);
+  g_adj <- g - mu_g2;
+  d_adj <- d - mu_d2;
+  mu_adj <- mu + mu_g2 + mu_d2;
   for (i in 1:N)
     y_hat[i] <- mu + g[treatment[i]] + d[airport[i]];
 }
