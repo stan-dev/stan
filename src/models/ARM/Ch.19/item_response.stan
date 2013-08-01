@@ -2,16 +2,16 @@ data {
   int<lower=0> N; 
   int<lower=0> J;
   int<lower=0> K;
-  vector[N] y;
+  int y[N];
   vector[N] x;
-  vector[N] k;
-  vector[N] j;
+  int k[N];
+  int j[N];
 } 
 parameters {
   vector[J] a_raw;
   real mu_a_raw;
   real<lower=0> sigma_a_raw;
-  vector[k] b_raw;
+  vector[K] b_raw;
   real<lower=0> sigma_b_raw;
   vector[K] g_raw;
   real mu_g_raw;
@@ -19,11 +19,10 @@ parameters {
   real b_0_raw;
   real<lower=0> d_raw;
 } 
-transformed paramaters {
+transformed parameters {
   real shift;
   real scale;
   vector[N] p;
-  vector[N] p_bound;
   vector[J] a;
   vector[K] b_hat_raw;
   vector[K] b;
@@ -35,12 +34,10 @@ transformed paramaters {
   a <- (a_raw - shift) / scale;
   b_hat_raw <- b_0_raw + d_raw * x;
   b <- (b_raw - shift) / scale;
-  g <- g_raw[k] * scale;
+  g <- g_raw * scale;
   d <- d_raw * scale;
-  for (i in 1:n){
-    p[i] <- inv_logit(g[k[i]]*(a[j[i]] - b[k[i]]));
-    p_bound[i] <- max(0, min(1, p[i]));
-  }
+  for (i in 1:N)
+    p[i] <- (g[k[i]]*(a[j[i]] - b[k[i]]));
 }
 model {
   mu_a_raw ~ normal(0, .0001);
@@ -56,5 +53,5 @@ model {
   b_0_raw ~ normal(0, .0001);
   d_raw ~ normal(0, .0001);
 
-  y ~ binomial(p_bound,1);
+  y ~ bernoulli_logit(p);
 }

@@ -3,8 +3,8 @@ data {
   int<lower=0> n_treatment; 
   int<lower=0> n_airport; 
   vector[N] y;
-  vector[n_airport] airport;
-  vector[n_treatment] treatment;
+  int airport[N];
+  int treatment[N];
 } 
 parameters {
   vector[n_treatment] g_raw;
@@ -13,12 +13,12 @@ parameters {
   real<lower=0> sigma_d_raw;
   real<lower=0> sigma_g_raw;
   real mu;
-  real xi_g;
+  real<lower=0> xi_g;
   real xi_d;
   real mu_d_raw;
   real mu_g_raw;
 } 
-transformed paramaters {
+transformed parameters {
   vector[N] y_hat;
   vector[n_treatment] g;
   vector[n_airport] d;
@@ -36,7 +36,7 @@ model {
   sigma_y ~ uniform(0, 100);
   sigma_d_raw ~ uniform(0, 100);
   sigma_g_raw ~ uniform(0, 100);
-  xi_g ~ normal(0, .0001);
+  xi_g ~ uniform(0, 100);
   xi_d ~ normal(0, .0001);
   mu ~ normal(0, .0001);
   mu_g_raw ~ normal(0, .0001);
