@@ -51,10 +51,12 @@ transformed parameters {
  
 model {
   int oldn; 
+  real m[N1]; 
   for (n in 1:N1) {
     oldn <- idxn1[n]; 
-    Yvec1[n] ~ normal(alpha[oldn] + beta[oldn] * (tvec1[n] - 6.5) + gamma * (mu0[oldn] - y0_mean), sigma_y); 
+    m[n] <- alpha[oldn] + beta[oldn] * (tvec1[n] - 6.5) + gamma * (mu0[oldn] - y0_mean);
   }
+  Yvec1 ~ normal(m, sigma_y);
 
   mu0 ~ normal(theta, sigma_mu0); 
   ## It is a bit weird that to specify gamma prior on sigma_mu0 instead on gamma_mu0^2

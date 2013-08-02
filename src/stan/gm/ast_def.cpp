@@ -181,6 +181,42 @@ namespace stan {
       arg_types.push_back(arg_type5);
       add(name,result_type,arg_types);
     }
+    void function_signatures::add(const std::string& name,
+                                  const expr_type& result_type,
+                                  const expr_type& arg_type1,
+                                  const expr_type& arg_type2,
+                                  const expr_type& arg_type3,
+                                  const expr_type& arg_type4,
+                                  const expr_type& arg_type5,
+                                  const expr_type& arg_type6) {
+      std::vector<expr_type> arg_types;
+      arg_types.push_back(arg_type1);
+      arg_types.push_back(arg_type2);
+      arg_types.push_back(arg_type3);
+      arg_types.push_back(arg_type4);
+      arg_types.push_back(arg_type5);
+      arg_types.push_back(arg_type6);
+      add(name,result_type,arg_types);
+    }
+    void function_signatures::add(const std::string& name,
+                                  const expr_type& result_type,
+                                  const expr_type& arg_type1,
+                                  const expr_type& arg_type2,
+                                  const expr_type& arg_type3,
+                                  const expr_type& arg_type4,
+                                  const expr_type& arg_type5,
+                                  const expr_type& arg_type6,
+                                  const expr_type& arg_type7) {
+      std::vector<expr_type> arg_types;
+      arg_types.push_back(arg_type1);
+      arg_types.push_back(arg_type2);
+      arg_types.push_back(arg_type3);
+      arg_types.push_back(arg_type4);
+      arg_types.push_back(arg_type5);
+      arg_types.push_back(arg_type6);
+      arg_types.push_back(arg_type7);
+      add(name,result_type,arg_types);
+    }
     void function_signatures::add_nullary(const::std::string& name) {
       add(name,DOUBLE_T);
     }
@@ -263,7 +299,7 @@ namespace stan {
       return expr_type(); // ill-formed dummy
     }
     function_signatures::function_signatures() { 
-#include <stan/gm/function_signatures.hpp>
+#include <stan/gm/function_signatures.h>
     }
     function_signatures* function_signatures::sigs_ = 0;
 
@@ -605,7 +641,9 @@ namespace stan {
     }
 
     void print_var_origin(std::ostream& o, const var_origin& vo) {
-      if (vo == data_origin)
+      if (vo == model_name_origin)
+        o << "model name";
+      else if (vo == data_origin)
         o << "data";
       else if (vo == transformed_data_origin)
         o << "transformed data";

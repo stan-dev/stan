@@ -45,9 +45,8 @@ TEST(StanGmCommand, zero_init_domain_fail) {
     ADD_FAILURE() << "Failed running command: " << command;
   }
   
-  EXPECT_EQ("Rejecting inititialization at zero because of grad_log_prob failure.\n",
-            command_output)
-    << "Failed running: " << command;
+  EXPECT_EQ("Rejecting inititialization at zero because of log_prob_grad failure.\n",
+            command_output);
 }
 
 TEST(StanGmCommand, user_init_value_fail) {
@@ -112,7 +111,7 @@ TEST(StanGmCommand, user_init_domain_fail) {
     ADD_FAILURE() << "Failed running command: " << command;
   }
   
-  EXPECT_EQ("Rejecting user-specified inititialization because of grad_log_prob failure.\n",
-            command_output)
-    << "Failed running: " << command;
+  EXPECT_EQ("Rejecting user-specified inititialization because of log_prob_grad failure.\n",
+            command_output);
+
 }

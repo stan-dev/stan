@@ -34,6 +34,27 @@ BUGS_TESTS := $(BUGS_TESTS:src/test/%_test.cpp=test/%)
 test-bugs: $(addprefix runtest_no_fail/,$(BUGS_TESTS))
 
 ##
+# Target to verify header files are coherent
+##
+HEADER_TESTS := $(addsuffix -test,$(shell find src/stan -name '*.hpp' -type f)) 
+ifeq ($(OS),win) 
+  DEV_NULL = nul
+else
+  DEV_NULL = /dev/null
+endif
+
+test/dummy.cpp:
+	@mkdir -p test
+	@touch $@
+	@echo "int main() {return 0;}" >> $@
+
+%.hpp-test : %.hpp test/dummy.cpp
+	$(COMPILE.c) -O0 -include $< -o $(DEV_NULL) test/dummy.cpp
+
+.PHONY: test-headers
+test-headers: $(HEADER_TESTS) 
+
+##
 # Target to build unit tests. All unit tests are in src/test 
 # and are named *_test.cpp
 ##
@@ -65,7 +86,7 @@ test-unit: $(addprefix runtest/,$(UNIT_TESTS)) test/models/command$(EXE)
 # Target to build all tests
 ##
 .PHONY: test-all
-test-all: test-unit test-distributions test-models
+test-all: test-unit test-headers test-distributions test-models
 
 ##
 # Build the google test library.
@@ -129,6 +150,8 @@ test/gm/command$(EXE) : test/gm/command.o bin/libstan.a src/test/gm/model_specs/
 ifeq ($(findstring test-,$(MAKECMDGOALS))$(findstring runtest/,$(MAKECMDGOALS)),)
 	$@ --gtest_output="xml:$(basename $@).xml"
 endif
+
+.PRECIOUS: src/test/mcmc/models/improper$(EXE)
 
 test/mcmc/base_hmc$(EXE) : test/mcmc/base_hmc.o bin/libstan.a src/test/mcmc/models/improper$(EXE)
 	@mkdir -p $(dir $@)

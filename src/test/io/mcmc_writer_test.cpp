@@ -90,7 +90,7 @@ TEST(StanIoMcmcWriter, print_sample_params) {
   
   stan::io::mcmc_writer<example_model_namespace::example_model> writer(&sample_stream, &diagnostic_stream);
   
-  writer.print_sample_params(sample, &sampler, model);
+  writer.print_sample_params<rng_t>(base_rng, sample, sampler, model);
   
   std::string line;
   std::getline(sample_stream, line);
@@ -232,6 +232,7 @@ TEST(StanIoMcmcWriter, print_diagnostic_names) {
   std::string line;
   std::getline(diagnostic_stream, line);
   
+  // FIXME: make this work, too
   EXPECT_EQ("lp__,accept_stat__,stepsize__,treedepth__,mu1,mu2,p_mu1,p_mu2,g_mu1,g_mu2", line);
   
 }

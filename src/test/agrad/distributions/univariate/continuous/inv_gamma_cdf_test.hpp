@@ -79,7 +79,9 @@ public:
   typename stan::return_type<T_y, T_shape, T_scale>::type 
   cdf_function(const T_y& y, const T_shape& alpha, const T_scale& beta,
          const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
-      return stan::prob::inv_gamma_cdf(y, alpha, beta);
+    using stan::agrad::gamma_q;
+    using stan::math::gamma_q;
+
+    return (gamma_q(alpha, beta / y));  
   }
-    
 };

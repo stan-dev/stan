@@ -28,6 +28,8 @@
 #include <stan/mcmc/hmc/nuts/adapt_diag_e_nuts.hpp>
 #include <stan/mcmc/hmc/nuts/adapt_dense_e_nuts.hpp>
 
+#include <stan/model/util.hpp>
+
 #include <stan/optimization/newton.hpp>
 #include <stan/optimization/nesterov_gradient.hpp>
 #include <stan/optimization/bfgs.hpp>
@@ -111,7 +113,7 @@ namespace stan {
         init_s = sampler->transition(init_s);
           
         if ( save && ( (m % num_thin) == 0) ) {
-          writer.print_sample_params(init_s, sampler, model);
+          writer.print_sample_params<RNG>(base_rng, init_s, sampler, model);
           writer.print_diagnostic_params(init_s, sampler);
         }
 
@@ -361,9 +363,13 @@ namespace stan {
           std::vector<double> init_grad;
           
           try {
-            init_log_prob = model.grad_log_prob(cont_params, disc_params, init_grad, &std::cout);
+            init_log_prob 
+              = stan::model::log_prob_grad<true,true>(model,
+                                                      cont_params, 
+                                                      disc_params, init_grad,
+                                                      &std::cout);
           } catch (std::domain_error e) {
-            std::cout << "Rejecting inititialization at zero because of grad_log_prob failure." << std::endl;
+            std::cout << "Rejecting inititialization at zero because of log_prob_grad failure." << std::endl;
             return 0;
           }
           
@@ -459,9 +465,11 @@ namespace stan {
         std::vector<double> init_grad;
         
         try {
+
           init_log_prob = model.grad_log_prob(cont_params, disc_params, init_grad, &std::cout);
+
         } catch (std::domain_error e) {
-          std::cout << "Rejecting user-specified inititialization because of grad_log_prob failure." << std::endl;
+          std::cout << "Rejecting user-specified inititialization because of log_prob_grad failure." << std::endl;
           return 0;
         }
         
@@ -474,11 +482,12 @@ namespace stan {
           if (!boost::math::isfinite(init_grad[i])) {
             std::cout << "Rejecting user-specified inititialization because of divergent gradient." << std::endl;
             return 0;
+
           }
         }
         
       }
-      
+
       // Initial output
       parser.print(&std::cout);
       std::cout << std::endl;
