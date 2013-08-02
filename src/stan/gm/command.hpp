@@ -53,16 +53,15 @@ namespace stan {
       if (!error_stream) return;
       
       *error_stream << std::endl
-                    << "Informational Message: The parameter state is about to be Metropolis"
-                    << " rejected due to the following underlying, non-fatal (really)"
-                    << " issue (and please ignore that what comes next might say 'error'): "
+                    << "Informational Message: The current Metropolis proposal is about to be "
+                    << "rejected becuase of the following issue:"
+                    << std::endl;
                     << e.what()
                     << std::endl
-                    << "If the problem persists across multiple draws, you might have"
-                    << " a problem with an initial state or a gradient somewhere."
+                    << "If this warning occurs sporadically then the sampler is fine,"
                     << std::endl
-                    << " If the problem does not persist, the resulting samples will still"
-                    << " be drawn from the posterior."
+                    << "but if this warning occurs often then your model is either severly "
+                    << "ill-conditioned or even misspecified."
                     << std::endl;
       
     }
