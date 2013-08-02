@@ -512,12 +512,13 @@ program compiled to a platform-specific executable (see
 \section{Simple Example}
 
 Suppose the executable is in file \code{my\_model} and the data
-is in file \code{my\_data}, both in the current working directory.
+is in file \code{my\_data}, both in the current working directory, and
+you want to draw samples from the model.
 Then the \Stan executable may be run on Windows using
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-> my_model --data=my_data
+> my_model sample data=my_data
 \end{Verbatim}
 \end{quote}
 %
@@ -531,7 +532,7 @@ necessary to instead execute
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-> ./my_model --data=my_data
+> ./my_model sample data=my_data
 \end{Verbatim}
 \end{quote}
 %
@@ -546,8 +547,9 @@ a Bash shell on Mac or Linux execute
 \begin{Verbatim}[fontshape=sl]
 > for i in {1..4}
 > do
->   ./my_model --refresh=0 --seed=12345 --chain_id=$i \
->     --samples=samples$i.csv --data=my_data &
+>   ./my_model sample random seed=12345 \ 
+      id=$i data=my_data \
+>     output samples=samples$i.csv refresh=0 &
 > done
 >
 \end{Verbatim}
@@ -564,8 +566,9 @@ snippet above
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-> for /l %x in (1, 1, 4) do start /b model --refresh=0 ^
->   --seed=12345 --chain_id=%x  --samples=samples%x.csv
+> for /l %x in (1, 1, 4) do start /b model  sample ^
+< random seed=12345 id=%x data=my_data ^
+>  output samples=samples%x.csv refresh=0
 \end{Verbatim}
 \end{quote}
 %
@@ -581,150 +584,254 @@ combine the four csv files into a single csv file
 %
 \section{Command-Line Options}\label{stan-command-line-options.section}
 
-The executable \Stan program is highly configurable.  At the highest
-level, it may be configured for type of sampler (standard \HMC or
-\NUTS, with or without step size adaptation), it may
-be provided with data, initializations, a file to which to send the
-output, random number generation seeds, etc.
+\Stan executables are highly configurable, allowing the user to specify
+and customize not only the calculation method but also the data, output,
+initialization, and random number generation.  The arguments are defined
+hierarchically so that, for example, optimization settings are not necessary
+when sampling.  Specifying conflicting arguments causes the execution
+to immediately terminate.
 
-The full set of options is as follows.  The next section provides
-some typical use-case examples.
-%
+All commands must include at least one method, specified explicitly as
+\code{method=method\_name} or implicitly with only \code{method\_name}.
+All remaining configurations are optional.
+
+Additionally, there are various ways of displaying help output instead
+of execution.  Specifying \code{help} after any argument displays a 
+description and valid options for that argument, while \code{help-all}
+provides a verbose presentation of that argument and all arguments
+derived from it in the hierarchy.  If \code{help} is specified without any
+additional arguments a usage message is displayed, while \code{help-all}
+displays the entire argument hierarchy.
+
+The full hierarchy is as follows; some typical use-case examples 
+are provided in the next section.
+
 \begin{description}
-\cmdflag{help}
-{Display help information including the command call and
-  options.}
-{default is not to display help information}
+\hiercmdarg{}{method}{list element}
+  {Analysis method (Note that method= is optional)}
+  {Valid values: sample, optimize, diagnose}
+  {Defaults to sample}
 %
-\cmdarg{data}{file}
-{Read data from specified dump formatted
-  file}
-{required if model declares data}
+  \hierlongcmd{-}{sample}
+    {Bayesian inference with Markov Chain Monte Carlo}
+    {Valid subarguments: num\_samples, num\_warmup, save\_warmup, thin, adapt, algorithm}
 %
-\cmdarg{init}{file}
-{Use initial values from specified file or zero
-  values if \code{\farg{<file>}=0}}
-{default is random initialization}
+    \hiercmdarg{--}{num\_samples}{int}
+      {Number of sampling iterations}
+      {Valid values: 0 \textless num\_samples}
+      {Defaults to 1000}
 %
-\cmdarg{samples}{file}
-{File into which samples are written. Be sure to distinguish the
-file when executing multiple chains simultaneously.}
-{default = \code{samples.csv}}
+    \hiercmdarg{--}{num\_warmup}{int}
+      {Number of warmup iterations}
+      {Valid values: 0 \textless warmup}
+      {Defaults to 1000}
 %
-\cmdflag{append\_samples}
-{Append samples to existing file if it exists; do not print headers}
-{default is to overwrite specified file}
+    \hiercmdarg{--}{save\_warmup}{boolean}
+      {Stream warmup samples to output?}
+      {Valid values: [0, 1]}
+      {Defaults to 0}
 %
-\cmdarg{seed}{int}
-{Random number generation seed. When executing multiple chains
-simultaneously, it is best to give all of them the same seed
-but different values for chain\_id (see below).}
-{default is to randomly generate from time}
+    \hiercmdarg{--}{thin}{int}
+      {Period between saved samples}
+      {Valid values: 0 \textless thin}
+      {Defaults to 1}
 %
-\cmdarg{chain\_id}{int}
-{Markov chain identifier, indexed from 1, to seed the L'Ecuyer 
-  random number generator to ensure non-overlapping random number
-  sequences for each chain \citep{Lecuyer:1999}}
-{default = \code{1}}
+    \hierlongcmd{--}{adapt}
+      {Warmup Adaptation}
+      {Valid subarguments: engaged, gamma, delta, kappa, t0}
 %
-\cmdarg{iter}{+int}
-{Total number of iterations, including warmup}
-{default = \code{2000}}
+      \hiercmdarg{---}{engaged}{boolean}
+        {Adaptation engaged?}
+        {Valid values: [0, 1]}
+        {Defaults to 1}
 %
-\cmdarg{warmup}{+int}
-{Discard the specified number of initial samples}
-{default = \code{iter / 2}}
+      \hiercmdarg{---}{gamma}{double}
+        {Adaptation regularization scale}
+        {Valid values: 0 \textless gamma}
+        {Defaults to 0.05}
 %
-\cmdarg{thin}{+int}
-{Period between saved samples after warm up}
-{default = \code{max(1, (iter - warmup) / 1000)}}
+      \hiercmdarg{---}{delta}{double}
+        {Adaptation target acceptance statistic}
+        {Valid values: 0 \textless delta \textless 1}
+        {Defaults to 0.65}
 %
-\cmdarg{refresh}{+int}
-{Period between samples updating progress report print}
-{default = \code{max(1, iter / 200)}}
+      \hiercmdarg{---}{kappa}{double}
+        {Adaptation relaxation exponent}
+        {Valid values: 0 \textless kappa}
+        {Defaults to 0.75}
 %
-\cmdarg{leapfrog\_steps}{int}
-{Number of leapfrog steps; \code{-1} for No-U-Turn adaptation}
-{default = \code{-1}}
+      \hiercmdarg{---}{t0}{double}
+        {Adaptation iteration offset}
+        {Valid values: 0 \textless t0}
+        {Defaults to 10}
 %
-\cmdarg{max\_treedepth}{int}
-{Limit \NUTS leapfrog steps to \code{pow(2,max\_tree\_depth)}; \code{-1} for no limit}
-{default = \code{10}}
+    \hiercmdarg{--}{algorithm}{list element}
+      {Sampling algorithm}
+      {Valid values: hmc, metro}
+      {Defaults to hmc}
 %
-\cmdarg{epsilon}{float}
-{Initial value for step size, or \code{-1} to set automatically}
-{default = \code{-1}}
+      \hierlongcmd{---}{hmc}
+        {Hamiltonian Monte Carlo}
+        {Valid subarguments: engine, metric, stepsize, stepsize\_jitter}
 %
-\cmdarg{epsilon\_pm}{[0,1]}
-{Sample epsilon uniformly from the interval 
-\\
-\code{[epsilon * (1 - epsilon\_pm),\ epsilon * (1 + epsilon\_pm)]}}
-{default = \code{0.0}}
+        \hiercmdarg{----}{engine}{list element}
+          {Engine for Hamiltonian Monte Carlo}
+          {Valid values: static, nuts}
+          {Defaults to nuts}
 %
-\cmdflag{equal\_step\_sizes} {Use unit mass matrix for \NUTS; either
-  \code{equal\_step\_sizes} or \code{nondiag\_mass} may be set, but
-  not both; see related parameter \code{epsilon}} {\NUTS default is
-  to estimate step sizes that vary by parameter}%
-\footnote{\Stan's implementation of \NUTS follows the approach in
-  \citep[section 5.4.2.4]{Neal:2011}, which is equivalent to having
-  different step sizes for each parameter.  Varying step sizes are
-  acceptable for \HMC even though they vary the time scale of each
-  parameter and thus depart from the Hamiltonian interpretation of the
-  trajectory.}
+          \hierlongcmd{-----}{static}
+            {Static integration time}
+            {Valid subarguments: int\_time}
 %
-\cmdflag{nondiag\_mass}{Use full mass matrix estimation with \NUTS;
-  either \code{equal\_step\_sizes} or \code{nondiag\_mass} may be set,
-  but not both; see related parameter \code{epsilon} }{\NUTS default
-  is to estimate step sizes that vary by parameter}
+            \hiercmdarg{------}{int\_time}{double}
+              {Total integration time for Hamiltonian evolution}
+              {Valid values: 0 \textless int\_time}
+              {Defaults to 2 * pi}
 %
-\cmdarg{delta}{+float}
-{Initial step size for step-size adaptation}
-{default = \code{0.5}}
+          \hierlongcmd{-----}{nuts}
+            {The No-U-Turn Sampler}
+            {Valid subarguments: max\_depth}
 %
-\cmdarg{gamma}{+float}
-{Gamma parameter for dual averaging step-size adaptation}
-{default = \code{0.05}}
+            \hiercmdarg{------}{max\_depth}{int}
+              {Maximum tree depth}
+              {Valid values: 0 \textless max\_depth}
+              {Defaults to 10}
 %
-\cmdflag{save\_warmup}
-{Save the warmup samples as well as the post-warmup samples}
-{default is to not save the warmup samples}
+        \hiercmdarg{----}{metric}{list element}
+          {Geometry of base manifold}
+          {Valid values: unit\_e, diag\_e, dense\_e}
+          {Defaults to diag\_e}
 %
-\cmdflag{test\_grad}
-{Test gradient calculations using finite differences; if this option
-  is chosen, only the gradient tests are done.}
-{default is not to test gradients}
+          \hiershortcmd{-----}{unit\_e}
+            {Euclidean manifold with unit metric}
+%
+          \hiershortcmd{-----}{diag\_e}
+            {Euclidean manifold with diag metric}
+%
+          \hiershortcmd{-----}{dense\_e}
+            {Euclidean manifold with dense metric}
+%
+        \hiercmdarg{----}{stepsize}{double}
+          {Step size for discrete evolution}
+          {Valid values: 0 \textless stepsize}
+          {Defaults to 1}
+%
+        \hiercmdarg{----}{stepsize\_jitter}{double}
+          {Uniformly random jitter of the stepsize, in percent}
+          {Valid values: 0 \textless}{ stepsize\_jitter \textless= 1}
+          {Defaults to 0}
+%
+      \hierlongcmd{---}{metro}
+        {Random Walk Metropolis Monte Carlo}
+        {No subarguments}
+%
+  \hierlongcmd{-}{optimize}
+    {Point estimation}
+    {Valid subarguments: algorithm, iter, save\_iterations}
+%
+    \hiercmdarg{--}{algorithm}{list element}
+      {Optimization algorithm}
+      {Valid values: nesterov, bfgs, newton}
+      {Defaults to bfgs}
+%
+      \hierlongcmd{---}{nesterov}
+        {Nesterov's accelerated gradient method}
+        {Valid subarguments: stepsize}
+%
+        \hiercmdarg{----}{stepsize}{double}
+          {Step size for discrete evolution}
+          {Valid values: 0 \textless stepsize}
+          {Defaults to 1}
+%
+      \hierlongcmd{---}{bfgs}
+        {BFGS with linesearch}
+        {No subarguments}
+%
+      \hierlongcmd{---}{newton}
+        {Newton's method}
+        {No subarguments}
+%
+    \hiercmdarg{--}{iter}{int}
+      {Total number of iterations}
+      {Valid values: 0 \textless iter}
+      {Defaults to 2000}
+%
+    \hiercmdarg{--}{save\_iterations}{boolean}
+      {Stream optimization progress to output?}
+      {Valid values: [0, 1]}
+      {Defaults to 0}
+%
+  \hierlongcmd{-}{diagnose}
+    {Model diagnostics}
+    {Valid subarguments: test}
+%
+    \hiercmdarg{--}{test}{list element}
+      {Diagnostic test}
+      {Valid values: gradient}
+      {Defaults to gradient}
+%
+      \hiershortcmd{---}{gradient}
+        {Check model gradient against finite differences}
+%
+\hiercmdarg{}{id}{int}
+  {Unique process identifier}
+  {Valid values: id \textgreater 0}
+  {Defaults to 0}
+%
+\hiercmdarg{}{data}{string}
+  {Input data file}
+  {Valid values: All}
+  {Defaults to ``''}
+%
+\hiercmdarg{}{init}{string}
+  {Initialization method: ``x" initializes randomly bewteen [-x, x], "0'' initializes to 0, anything else identifies a file of values}
+  {Valid values: All}
+  {Defaults to ``2''}
+%
+\hierlongcmd{}{random}
+  {Random number configuration}
+  {Valid subarguments: seed}
+%
+  \hiercmdarg{-}{seed}{unsigned int}
+    {Random number generator seed}
+    {Valid values: seed \textgreater 0, if negative seed is generated from time}
+    {Defaults to -1}
+%
+\hierlongcmd{}{output}
+  {File output options}
+  {Valid subarguments: sample, append\_sample, diagnostic, append\_diagnostic, refresh, save\_warmup}
+%
+  \hiercmdarg{-}{sample}{string}
+    {Output file for sample information}
+    {Valid values: All}
+    {Defaults to samples.csv}
+%
+  \hiercmdarg{-}{append\_sample}{boolean}
+    {Append sample output to existing file?}
+    {Valid values: [0, 1]}
+    {Defaults to 0}
+%
+  \hiercmdarg{-}{diagnostic}{string}
+    {Output file for diagnostic information}
+    {Valid values: All}
+    {Defaults to ``''}
+%
+  \hiercmdarg{-}{append\_diagnostic}{boolean}
+    {Append diagnostic output to existing file?}
+    {Valid values: [0, 1]}
+    {Defaults to 0}
+%
+  \hiercmdarg{-}{refresh}{int}
+    {Number of interations between screen updates}
+    {Valid values: 0 \textless refresh}
+    {Defaults to 100}
+%
+  \hiercmdarg{-}{save\_warmup}{boolean}
+    {Stream warmup samples to output?}
+    {Valid values: [0, 1]}
+    {Defaults to 0}
 %
 \end{description}
-
-\section{Configuring the Sampler Type}
-
-Which sampler gets used, standard \HMC or one of the two forms of
-\NUTS, depends on the configuration of the command-line call.  The
-following table summarizes.
-%
-\begin{center}
-\begin{tabular}{l|ll}
-{\it Sampler} & {\it Command Options}
-\\ \hline \hline
-\HMC & \Verb|--epsilon=e --leapfrog_steps=L| 
-\\
-\HMC + tuned step size & \Verb|--leapfrog_steps=L|
-\\[8pt]
-\NUTS & \Verb|--epsilon=e|
-\\
-\NUTS + tuned step size & \Verb|--equal_step_sizes|
-\\
-\NUTS + tuned varying step sizes & (default configuration)
-\\
-\NUTS + full mass matrix & \Verb|--nondiag_mass|
-\end{tabular}
-\end{center}
-%
-For an overview of Hamiltonian Monte Carlo (\HMC), see
-\citep{Neal:2011}.  For details concerning the No-U-Turn sampler
-(\NUTS), see \citep{Hoffman-Gelman:2011,Hoffman-Gelman:2012}.
-
-
 
 \chapter{Print Command for Output Analysis}\label{print-command.chapter}
 
@@ -782,20 +889,20 @@ samples1.csv	samples2.csv	samples3.csv
 { \footnotesize
 \begin{Verbatim}[fontshape=sl]
 Inference for Stan model: negative_binomial_model
-3 chains: each with iter=(1000,1000,1000); warmup=(0,0,0); thin=(1,1,1); 3000 iterations saved.
+1 chains: each with iter=(1000); warmup=(0); thin=(1); 1000 iterations saved.
 
-Warmup took (0.054, 0.055, 0.057) seconds, 0.17 seconds total
-Sampling took (0.065, 0.056, 0.067) seconds, 0.19 seconds total
+Warmup took (0.054) seconds, 0.054 seconds total
+Sampling took (0.059) seconds, 0.059 seconds total
 
-                Mean   MCSE  StdDev        5%   50%   95%  N_Eff  N_Eff/s    R_hat
-lp__             -14  0.058     1.1  -1.7e+01   -14   -13    370     1965  1.0e+00
-accept_stat__   0.51  0.012    0.40   4.7e-13  0.52   1.0   1162     6161  1.0e+00
-stepsize__      0.39  0.038   0.047   3.2e-01  0.41  0.43    1.5      8.0  1.0e+14
-treedepth__      1.0  0.015    0.79   0.0e+00   1.0   2.0   2655    14079  1.0e+00
-alpha             17    3.1      37   1.9e+00   9.4    40    141      749  1.0e+00
-beta              11    2.1      25   1.2e+00   6.1    26    136      721  1.0e+00
+                Mean     MCSE   StdDev    5%   50%   95%  N_Eff  N_Eff/s  R_hat
+lp__             -14  6.2e-02  1.0e+00   -16   -14   -13    283     4773   1.00
+accept_stat__   0.88  5.6e-03  1.8e-01  0.51  0.95   1.0   1000    16881   1.00
+stepsize__      0.30  1.3e-15  8.9e-16  0.30  0.30  0.30   0.50      8.5   1.00
+treedepth__      1.4  2.6e-02  8.0e-01  0.00   1.0   2.0    946    15978   1.00
+alpha             17  1.8e+00  2.5e+01   1.9   9.5    50    181     3054   1.00
+beta              10  1.1e+00  1.4e+01   1.2   6.2    31    181     3057    1.0
 
-Samples were drawn using NUTS with a diagonal Euclidean metric.
+Samples were drawn using hmc with nuts.
 For each parameter, N_Eff is a crude measure of effective sample size,
 and R_hat is the potential scale reduction factor on split chains (at 
 convergence, R_hat=1).
@@ -817,16 +924,18 @@ For Windows, the forward slash in paths need to be converted to backslashes.
 In addition to the filenames, \code{print} includes three flags to customize the output.  
 
 \begin{description}
-\cmdflag{help}
-{Prints usage information.}
+\longcmd{help}
+{Prints usage information}
 {No help output by default}
 %
-\cmdarg{sig\_figs}{+int}
-{Sets the number of significant figures displayed in the output.}
+\cmdarg{sig\_figs}{int}
+{Sets the number of significant figures displayed in the output}
+{Valid values: 0 \textless sig\_figs}
 {default = \code{2} }
 %
-\cmdarg{autocorr=}{+int}
-{Calculates and then displays the autocorrelation of the specified chain.}
+\cmdarg{autocorr}{int}
+{Calculates and then displays the autocorrelation of the specified chain}
+{Valid values: Any integer matching a chain index}
 {No autocorrelation output by default}
 %
 \end{description}

@@ -59,6 +59,9 @@ namespace stan {
               (*it)->print_help(s, depth + 1, true);
           }
         }
+        else {
+          *s << std::endl;
+        }
          
       }
       
