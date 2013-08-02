@@ -28,7 +28,7 @@ namespace stan {
     /**
      * The log of a multivariate Gaussian Process for the given y, Sigma, and
      * w.  y is a dxN matrix, where each column is a different observation and each
-     * row is a different output dimension.  The Guassian Process is assumed to
+     * row is a different output dimension.  The Gaussian Process is assumed to
      * have a scaled kernel matrix with a different scale for each output dimension.
      * This distribution is equivalent to:
      *    for (i in 1:d) row(y,i) ~ multi_normal(0,(1/w[i])*Sigma).
