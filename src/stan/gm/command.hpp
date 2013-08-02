@@ -47,6 +47,13 @@ namespace stan {
       
     }
     
+    void write_model(std::ostream* s, std::string model_name, const char prefix = '\0') {
+      if(!s) return;
+      
+      *s << prefix << " model = " << model_name << std::endl;
+      
+    }
+    
     void write_error_msg(std::ostream* error_stream,
                          const std::domain_error& e) {
       
@@ -497,11 +504,13 @@ namespace stan {
       
       if (!append_sample && sample_stream) {
         write_stan(sample_stream, '#');
+        write_model(sample_stream, model.model_name(), '#');
         parser.print(sample_stream, '#');
       }
       
       if (!append_diagnostic && diagnostic_stream) {
         write_stan(diagnostic_stream, '#');
+        write_model(sample_stream, model.model_name(), '#');
         parser.print(diagnostic_stream, '#');
       }
       

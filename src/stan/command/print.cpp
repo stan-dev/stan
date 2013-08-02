@@ -167,7 +167,7 @@ int main(int argc, const char* argv[]) {
   Eigen::VectorXi thin(filenames.size());
   
   ifstream.open(filenames[0].c_str());
-
+  
   stan::io::stan_csv stan_csv = stan::io::stan_csv_reader::parse(ifstream);
   warmup_times(0) = stan_csv.timing.warmup;
   sampling_times(0) = stan_csv.timing.sampling;
@@ -336,10 +336,11 @@ int main(int argc, const char* argv[]) {
     }
     std::cout << std::endl;
   }
-  
+
   /// Footer output
   std::cout << std::endl;
-  std::cout << "Samples were drawn using " << stan_csv.metadata.algorithm << "." << std::endl
+  std::cout << "Samples were drawn using " << stan_csv.metadata.algorithm
+            << " with " << stan_csv.metadata.engine << "." << std::endl
             << "For each parameter, N_Eff is a crude measure of effective sample size," << std::endl
             << "and R_hat is the potential scale reduction factor on split chains (at " << std::endl
             << "convergence, R_hat=1)." << std::endl
