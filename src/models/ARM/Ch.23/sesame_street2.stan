@@ -17,7 +17,7 @@ parameters {
   real rho_ag;
   real phi_y;
   real phi_t;
-  row_vector[2] mu_ag;
+  vector[2] mu_ag;
   real d;
   real b;
   matrix[J,2] ag;
@@ -74,8 +74,8 @@ model {
 
   //data model
   for (i in 1:N)
-    yt[i] ~ multi_normal(yt_hat[i],Tau_yt);
+    transpose(yt[i]) ~ multi_normal_prec(transpose(yt_hat[i]),Tau_yt);
 
   for (j in 1:J)
-    ag[i] ~ multi_normal(mu_ag,Tau_ag);
+    ag[i] ~ multi_normal_prec(mu_ag,Tau_ag);
 }
