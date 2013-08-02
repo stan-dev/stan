@@ -55,7 +55,7 @@ namespace stan {
         std::vector<double> values;
         
         sample.get_sample_params(values);
-        sampler->get_sampler_params(values);
+        sampler.get_sampler_params(values);
         
         std::vector<double> model_values;
         

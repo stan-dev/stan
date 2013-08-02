@@ -46,7 +46,7 @@ namespace stan {
         
         try {
           logp_ = stan::model::log_prob_grad<true,false>(model_,x_, z_, 
-                                                         grad_, msgs_);
+                                                         grad_, output_stream_);
           valid = true;
         }
         catch (std::exception &ex) {
@@ -65,7 +65,7 @@ namespace stan {
             
             try {
               logp_ = stan::model::log_prob_grad<true,false>(model_, x_, z_, 
-                                                             grad_, msgs_);
+                                                             grad_, output_stream_);
             }
             catch (std::exception &ex) {
               valid = false;
@@ -87,7 +87,7 @@ namespace stan {
             
             try {
               logp_ = stan::model::log_prob_grad<true,false>(model_,x_, z_, 
-                                                             grad_, msgs_);
+                                                             grad_, output_stream_);
               valid = true;
             }
             catch (std::exception &ex) {

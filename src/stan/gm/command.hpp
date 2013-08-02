@@ -55,9 +55,8 @@ namespace stan {
       *error_stream << std::endl
                     << "Informational Message: The current Metropolis proposal is about to be "
                     << "rejected becuase of the following issue:"
-                    << std::endl;
-                    << e.what()
                     << std::endl
+                    << e.what() << std::endl
                     << "If this warning occurs sporadically then the sampler is fine,"
                     << std::endl
                     << "but if this warning occurs often then your model is either severly "
@@ -112,7 +111,7 @@ namespace stan {
         init_s = sampler->transition(init_s);
           
         if ( save && ( (m % num_thin) == 0) ) {
-          writer.print_sample_params<RNG>(base_rng, init_s, sampler, model);
+          writer.print_sample_params(base_rng, init_s, *sampler, model);
           writer.print_diagnostic_params(init_s, sampler);
         }
 
@@ -363,10 +362,9 @@ namespace stan {
           
           try {
             init_log_prob 
-              = stan::model::log_prob_grad<true,true>(model,
-                                                      cont_params, 
-                                                      disc_params, init_grad,
-                                                      &std::cout);
+              = stan::model::log_prob_grad<true, true>(model,
+                                                       cont_params, disc_params, init_grad,
+                                                       &std::cout);
           } catch (std::domain_error e) {
             std::cout << "Rejecting inititialization at zero because of log_prob_grad failure." << std::endl;
             return 0;
@@ -408,7 +406,10 @@ namespace stan {
             // FIXME: allow config vs. std::cout
             double init_log_prob;
             try {
-              init_log_prob = model.grad_log_prob(cont_params, disc_params, init_grad, &std::cout);
+              init_log_prob
+                = stan::model::log_prob_grad<true, true>(model,
+                                                         cont_params, disc_params, init_grad,
+                                                         &std::cout);
             } catch (std::domain_error e) {
               write_error_msg(&std::cout, e);
               std::cout << "Rejecting proposed initial value with zero density." << std::endl;
@@ -464,8 +465,11 @@ namespace stan {
         std::vector<double> init_grad;
         
         try {
-
-          init_log_prob = model.grad_log_prob(cont_params, disc_params, init_grad, &std::cout);
+        
+          init_log_prob
+            = stan::model::log_prob_grad<true, true>(model,
+                                                     cont_params, disc_params, init_grad,
+                                                     &std::cout);
 
         } catch (std::domain_error e) {
           std::cout << "Rejecting user-specified inititialization because of log_prob_grad failure." << std::endl;
@@ -512,7 +516,7 @@ namespace stan {
         
         if (test->value() == "gradient") {
           std::cout << std::endl << "TEST GRADIENT MODE" << std::endl;
-          return model.test_gradients(cont_params, disc_params);
+          return stan::model::test_gradients<true,true>(model,cont_params, disc_params);
         }
         
       }
@@ -542,8 +546,8 @@ namespace stan {
             model.write_csv_header(*sample_stream);
           }
           
-          stan::optimization::NesterovGradient ng(model, cont_params, disc_params,
-                                                  epsilon, &std::cout);
+          stan::optimization::NesterovGradient<Model> ng(model, cont_params, disc_params,
+                                                         epsilon, &std::cout);
           
           double lp = ng.logp();
           
@@ -588,7 +592,7 @@ namespace stan {
           std::vector<double> gradient;
           double lp;
           try {
-            lp = model.grad_log_prob(cont_params, disc_params, gradient);
+            lp = model.template log_prob<false, false>(cont_params, disc_params, &std::cout);
           } catch (std::domain_error e) {
             write_error_msg(&std::cout, e);
             lp = -std::numeric_limits<double>::infinity();
@@ -633,8 +637,8 @@ namespace stan {
             model.write_csv_header(*sample_stream);
           }
           
-          stan::optimization::BFGSLineSearch ng(model, cont_params, disc_params,
-                                                &std::cout);
+          stan::optimization::BFGSLineSearch<Model> ng(model, cont_params, disc_params,
+                                                       &std::cout);
           if (epsilon > 0)
             ng._opts.alpha0 = epsilon;
           
