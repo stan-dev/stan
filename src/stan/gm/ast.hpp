@@ -27,6 +27,7 @@ namespace stan {
     struct for_statement;
     struct fun;
     struct identifier;
+    struct increment_log_prob_statement;
     struct index_op;
     struct int_literal;
     struct inv_var_decl;
@@ -565,6 +566,7 @@ namespace stan {
     typedef boost::variant<boost::recursive_wrapper<nil>,
                            boost::recursive_wrapper<assignment>,
                            boost::recursive_wrapper<sample>,
+                           boost::recursive_wrapper<increment_log_prob_statement>,
                            boost::recursive_wrapper<statements>,
                            boost::recursive_wrapper<for_statement>,
                            boost::recursive_wrapper<conditional_statement>,
@@ -581,6 +583,7 @@ namespace stan {
     statement(const nil& st);
     statement(const assignment& st);
     statement(const sample& st);
+    statement(const increment_log_prob_statement& st);
     statement(const statements& st);
     statement(const for_statement& st);
     statement(const conditional_statement& st);
@@ -590,6 +593,12 @@ namespace stan {
 
     // template <typename Statement>
     // statement(const Statement& statement);
+  };
+    
+  struct increment_log_prob_statement {
+    expression log_prob_;
+    increment_log_prob_statement();
+    increment_log_prob_statement(const expression& log_prob);
   };
 
   struct for_statement {
