@@ -83,7 +83,7 @@ TEST_F(StanGmArgumentsCategoricalArgument,parse_args_unexpected) {
   help_flag = false;
   return_value = arg->parse_args(args,0,0,help_flag);
   
-  EXPECT_FALSE(return_value);
+  EXPECT_TRUE(return_value);
   EXPECT_FALSE(help_flag);
   EXPECT_EQ(1, args.size());
   
@@ -95,7 +95,7 @@ TEST_F(StanGmArgumentsCategoricalArgument,parse_args_unexpected) {
   help_flag = false;
   return_value = arg->parse_args(args,0,0,help_flag);
   
-  EXPECT_FALSE(return_value);
+  EXPECT_TRUE(return_value);
   EXPECT_FALSE(help_flag);
   EXPECT_EQ(2, args.size());
 
@@ -118,7 +118,7 @@ TEST_F(StanGmArgumentsCategoricalArgument,parse_args_unexpected) {
   help_flag = false;
   return_value = arg->parse_args(args,0,0,help_flag);
   
-  EXPECT_FALSE(return_value);
+  EXPECT_TRUE(return_value);
   EXPECT_FALSE(help_flag);
   EXPECT_EQ(1, args.size());
 }
@@ -148,7 +148,7 @@ TEST_F(StanGmArgumentsCategoricalArgument, parse_args_with_1_singleton) {
   help_flag = false;
   return_value = arg->parse_args(args,0,0,help_flag);
   
-  EXPECT_FALSE(return_value)
+  EXPECT_TRUE(return_value)
     << "called with 'bar'";
   EXPECT_FALSE(help_flag)
     << "called with 'bar'";
@@ -173,7 +173,7 @@ TEST_F(StanGmArgumentsCategoricalArgument, parse_args_with_1_singleton) {
   help_flag = false;
   return_value = arg->parse_args(args,0,0,help_flag);
   
-  EXPECT_FALSE(return_value)
+  EXPECT_TRUE(return_value)
     << "called with 'bar help'";
   EXPECT_FALSE(help_flag)
     << "called with 'bar help'";
