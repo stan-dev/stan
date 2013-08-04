@@ -94,10 +94,6 @@ namespace stan {
         std::string name;
         std::string value;
 
-        // Skip first two lines
-        std::getline(ss, line);
-        std::getline(ss, line);
-
         while (ss.good()) {
           
           ss >> comment;
@@ -137,7 +133,7 @@ namespace stan {
             metadata.init = value;
             boost::trim(metadata.init);
           } else if (name.compare("seed") == 0) {
-            metadata.seed = boost::lexical_cast<int>(value);
+            metadata.seed = boost::lexical_cast<unsigned int>(value);
             metadata.random_seed = false;
           } else if (name.compare("append_samples") == 0) {
             metadata.append_samples = boost::lexical_cast<bool>(value);
