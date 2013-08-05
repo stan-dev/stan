@@ -487,7 +487,7 @@ namespace stan {
 
       opt_dims_r.name("array dimensions (optional)");
       opt_dims_r 
-        %=  - dims_r(_r1);
+        %=  * dims_r(_r1);
 
       dims_r.name("array dimensions");
       dims_r 
