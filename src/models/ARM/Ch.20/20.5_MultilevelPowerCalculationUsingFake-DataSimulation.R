@@ -18,7 +18,7 @@ time <- visage - baseage
 
 ## Set up new patient id numbers from 1 to J
 ok <- !is.na(y+time+person)
-
+y1 <- y[ok]
 unique.pid <- unique (newpid)
 n <- length (y[ok])
 J <- length (unique.pid[ok])
@@ -39,7 +39,7 @@ if (!exists("hiv.sm")) {
     }
 }
 
-dataList.1 <- list(N=n, J=84,time=time[ok],person=person[ok],y=y[ok])
+dataList.1 <- list(N=n, J=84,time=time[ok],person=person[ok],y=y1)
 hiv.sf1 <- sampling(hiv.sm, dataList.1)
 print(hiv.sf1,pars = c("a","b", "sigma_y", "lp__"))
 post <- extract(hiv.sf1)
