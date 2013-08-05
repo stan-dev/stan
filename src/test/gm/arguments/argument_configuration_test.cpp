@@ -112,6 +112,8 @@ TEST(StanGmArgumentsConfiguration, TestMethod) {
         
       }
       
+      output.clear();
+      output.seekg(std::ios_base::beg);
       output.str(command_output);
       
       for (int i = 0; i < n_output; ++i) {
