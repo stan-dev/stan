@@ -126,8 +126,6 @@ dataList.2 <- list(N=n,y=y,n_airport=n.airport,
 pilots.sf1 <- sampling(pilots.sm, dataList.2)
 print(pilots.sf1,pars = c("g","d", "sigma_y", "lp__"))
 
-## Multilevel logistic regression
-## radon model
 polls.subset <- read.table ("polls.subset.dat")
 attach(polls.subset)
 
