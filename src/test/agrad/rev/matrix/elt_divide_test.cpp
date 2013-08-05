@@ -1,7 +1,7 @@
 #include <stan/math/matrix/elt_divide.hpp>
 #include <gtest/gtest.h>
 #include <test/agrad/util.hpp>
-#include <stan/agrad/agrad.hpp>
+#include <stan/agrad.hpp>
 #include <stan/agrad/matrix.hpp>
 TEST(AgradRevMatrix,elt_divide_vec_vv) {
   using stan::math::elt_divide;

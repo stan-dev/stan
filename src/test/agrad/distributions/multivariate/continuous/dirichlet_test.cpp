@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <test/agrad/distributions/expect_eq_diffs.hpp>
 #include <stan/prob/distributions/multivariate/continuous/dirichlet.hpp>
-#include <stan/agrad/agrad.hpp>
+#include <stan/agrad.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/agrad/matrix.hpp>
 

@@ -1,7 +1,7 @@
 #include <stan/math/matrix/elt_multiply.hpp>
 #include <gtest/gtest.h>
 #include <test/agrad/util.hpp>
-#include <stan/agrad/agrad.hpp>
+#include <stan/agrad.hpp>
 #include <stan/agrad/matrix.hpp>
 
 TEST(AgradRevMatrix,elt_multiply_vec_vv) {

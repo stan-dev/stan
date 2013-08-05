@@ -1,9 +1,8 @@
+#include <stan/agrad.hpp>
+#include <test/agrad/util.hpp>
+#include <stan/agrad/rev/jacobian.hpp>
 #include <stan/agrad/rev/matrix/multiply_lower_tri_self_transpose.hpp>
 #include <gtest/gtest.h>
-#include <test/agrad/util.hpp>
-#include <stan/agrad/agrad.hpp>
-#include <stan/agrad/rev/jacobian.hpp>
-
 
 void test_mult_LLT(const stan::agrad::matrix_v& L) {
   using stan::agrad::matrix_v;

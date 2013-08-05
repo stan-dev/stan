@@ -2,7 +2,7 @@
 #include <test/agrad/util.hpp>
 #include <gtest/gtest.h>
 #include <stan/agrad/rev/exp.hpp>
-#include <stan/agrad/agrad.hpp>
+#include <stan/agrad.hpp>
 
 void test_log1p_exp(double val) {
   using stan::math::log1p_exp;

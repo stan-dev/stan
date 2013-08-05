@@ -1,7 +1,7 @@
 #include <stan/math/matrix/inverse.hpp>
 #include <gtest/gtest.h>
 #include <test/agrad/util.hpp>
-#include <stan/agrad/agrad.hpp>
+#include <stan/agrad.hpp>
 #include <stan/agrad/matrix.hpp>
 
 TEST(AgradRevMatrix,inverse_val) {

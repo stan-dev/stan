@@ -1,7 +1,7 @@
 #include <stan/agrad/rev/fdim.hpp>
 #include <test/agrad/util.hpp>
 #include <gtest/gtest.h>
-#include <stan/agrad/agrad.hpp>
+#include <stan/agrad.hpp>
 #include <stan/math/functions/fdim.hpp>
 
 TEST(AgradRev,fdim_vv) {

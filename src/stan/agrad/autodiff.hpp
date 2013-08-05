@@ -4,8 +4,7 @@
 #define EIGEN_DENSEBASE_PLUGIN "stan/math/matrix/EigenDenseBaseAddons.h"
 #include <Eigen/Dense>
 
-#include <stan/agrad/agrad.hpp>
-#include <stan/agrad/fvar.hpp>
+#include <stan/agrad.hpp>
 
 namespace stan {
   

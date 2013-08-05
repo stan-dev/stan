@@ -10,7 +10,7 @@
 #include <stan/agrad/rev/matrix/typedefs.hpp>
 
 // FIXME: use explicit files
-#include <stan/agrad/agrad.hpp> 
+#include <stan/agrad.hpp> 
 
 namespace stan {
   namespace agrad {
