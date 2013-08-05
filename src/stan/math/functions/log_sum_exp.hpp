@@ -37,7 +37,8 @@ namespace stan {
      *
      * \f$\log \sum_{n=1}^N \exp(x_n) = \max(x) + \log \sum_{n=1}^N \exp(x_n - \max(x))\f$.
      * 
-     * @param x array of specified values
+     * @param[in] x array of specified values
+     * @return The log of the sum of the exponentiated vector values.
      */
     template <typename T>
     T log_sum_exp(const std::vector<T>& x) {

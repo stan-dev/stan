@@ -1,24 +1,26 @@
-#ifndef __STAN__AGRAD__REV__OP__VECTOR_VARI_HPP__
-#define __STAN__AGRAD__REV__OP__VECTOR_VARI_HPP__
+#ifndef __STAN__AGRAD__REV__OP__MATRIX_VARI_HPP__
+#define __STAN__AGRAD__REV__OP__MATRIX_VARI_HPP__
 
-#include <vector>
+#include <stan/math/matrix/Eigen.hpp>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/vari.hpp>
 
 namespace stan {
   namespace agrad {
 
-    class op_vector_vari : public vari {
+    class op_matrix_vari : public vari {
     protected:
       const size_t size_;
       vari** vis_;
     public:
-      op_vector_vari(double f, const std::vector<stan::agrad::var>& vs) :
+      template <int R, int C>
+      op_matrix_vari(double f, const Eigen::Matrix<stan::agrad::var,R,C>& vs) :
         vari(f),
         size_(vs.size()) {
+
         vis_ = (vari**) operator new(sizeof(vari*) * vs.size()); 
         for (size_t i = 0; i < vs.size(); ++i)
-          vis_[i] = vs[i].vi_;
+          vis_[i] = vs(i).vi_;
       }
       vari* operator[](size_t n) const {
         return vis_[n];

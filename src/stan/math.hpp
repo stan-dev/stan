@@ -64,7 +64,6 @@
 #include "stan/math/functions/multiply_log.hpp"
 #include "stan/math/functions/rising_factorial.hpp"
 #include "stan/math/functions/scaled_add.hpp"
-#include "stan/math/functions/softmax.hpp"
 #include "stan/math/functions/square.hpp"
 #include "stan/math/functions/step.hpp"
 #include "stan/math/functions/sub.hpp"
