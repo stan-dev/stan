@@ -14,12 +14,10 @@ transformed parameters {
   matrix[n_dogs,n_trials] n_avoid;
   matrix[n_dogs,n_trials] n_shock;
   matrix[n_dogs,n_trials] p;
-  matrix[2,2] Sigma_b;
-  matrix<lower=0>[2,2] Tau_b;
+  cov_matrix[2] Sigma_b;
   vector[n_dogs] beta1;
   vector[n_dogs] beta2;
 
-  Tau_b <- inverse(Sigma_ag);
   Sigma_b[1,1] <- pow(sigma_b1,2);
   Sigma_b[2,2] <- pow(sigma_b2,2);
   Sigma_b[1,2] <- rho_b*sigma_b1*sigma_b2;
@@ -46,7 +44,7 @@ model {
   mu_beta ~ normal(0, .0001);
 
   for (i in 1:n_dogs)
-    transpose(b_neg[i]) ~ multi_normal_prec(mu_beta,Tau_b);
+    transpose(b_neg[i]) ~ multi_normal_prec(mu_beta,Sigma_b);
 
   y ~ binomial(p, 1);
 }

@@ -18,9 +18,8 @@ parameters {
   matrix[J,2] ag;
 }
 transformed parameters {
-  matrix[2,2] Sigma_yt;
-  cov_matrix[2] Tau_yt;
-  matrix[2,2] Sigma_ag;
+  cov_matrix[2] Sigma_yt;
+  cov_matrix[2] Sigma_ag;
   matrix[N,2] yt_hat;
   vector[J] a;
   vector[J] g;
@@ -30,14 +29,12 @@ transformed parameters {
   Sigma_yt[2,2] <- pow(sigma_t,2);
   Sigma_yt[1,2] <- rho_yt*sigma_y*sigma_t;  
   Sigma_yt[2,1] <- Sigma_yt[1,2];
-  Tau_yt <- inverse(Sigma_yt);
    
   // group level
   Sigma_ag[1,1] <- pow(sigma_a,2);
   Sigma_ag[2,2] <- pow(sigma_g,2);
   Sigma_ag[1,2] <- rho_ag*sigma_a*sigma_g;
   Sigma_ag[2,1] <- Sigma_ag[1,2];  
-  Tau_ag <- inverse(Sigma_ag);
 
   for (j in 1:J) {
     a[j] <- ag[j,1];
@@ -45,8 +42,8 @@ transformed parameters {
   }
 
   for (i in 1:N) {
-    yt_hat[i,1] <- a[siteset[i]] + b * yt[i,2];
     yt_hat[i,2] <- g[siteset[i]] + d * z[i];
+    yt_hat[i,1] <- a[siteset[i]] + b * yt[i,2];
   }
 }
 model {
@@ -66,8 +63,8 @@ model {
 
   //data model
   for (i in 1:N)
-    transpose(yt[i]) ~ multi_normal_prec(transpose(yt_hat[i]),Tau_yt);
+    transpose(yt[i]) ~ multi_normal(transpose(yt_hat[i]),Sigma_yt);
 
   for (j in 1:J)
-    transpose(ag[j]) ~ multi_normal_prec(mu_ag,Tau_ag);
+    transpose(ag[j]) ~ multi_normal(mu_ag,Sigma_ag);
 }

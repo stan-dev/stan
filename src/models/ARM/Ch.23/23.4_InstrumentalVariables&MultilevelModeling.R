@@ -19,7 +19,6 @@ siteset[sesame$site==i & sesame$setting==j]=i+5*(j-1)
 J=9
 
 ## Fit the model for example 1
-## FIXME: WILL WORK ONCE MULTI NORMAL WORKS FOR ROW VECS
 if (!exists("sesame_street1.sm")) {
     if (file.exists("sesame_street1.sm.RData")) {
         load("sesame_street1.sm.RData", verbose = TRUE)
@@ -36,6 +35,7 @@ print(sesame_street1.sf1, pars = c("a","g","b","d","lp__"))
 
 
 ## Fit the model conditioning on pre-treatment variables
+## FIXME: MISSING DATA PRETEST VARIABLE
 if (!exists("sesame_street2.sm")) {
     if (file.exists("sesame_street2.sm.RData")) {
         load("sesame_street2.sm.RData", verbose = TRUE)
