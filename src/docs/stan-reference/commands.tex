@@ -618,12 +618,12 @@ are provided in the next section.
 %
     \hiercmdarg{\indentarrow\indentarrow}{num\_samples}{$$int$$}
       {Number of sampling iterations}
-      {Valid values: 0 $<$ num\_samples}
+      {Valid values: 0 $\le$ num\_samples}
       {Defaults to 1000}
 %
     \hiercmdarg{\indentarrow\indentarrow}{num\_warmup}{$$int$$}
       {Number of warmup iterations}
-      {Valid values: 0 $<$ warmup}
+      {Valid values: 0 $\le$ warmup}
       {Defaults to 1000}
 %
     \hiercmdarg{\indentarrow\indentarrow}{save\_warmup}{$$boolean$$}
@@ -721,9 +721,8 @@ are provided in the next section.
           {Valid values: 0 $\le$ stepsize\_jitter $\le$ 1}
           {Defaults to 0}
 %
-      \hierlongcmd{\indentarrow\indentarrow\indentarrow}{metro}
+      \hiershortcmd{\indentarrow\indentarrow\indentarrow}{metro}
         {Random Walk Metropolis Monte Carlo}
-        {No subarguments}
 %
   \hierlongcmd{\indentarrow}{optimize}
     {Point estimation}
@@ -745,11 +744,15 @@ are provided in the next section.
 %
       \hierlongcmd{\indentarrow\indentarrow\indentarrow}{bfgs}
         {BFGS with linesearch}
-        {No subarguments}
+        {Valid subarguments: stepsize}
 %
-      \hierlongcmd{\indentarrow\indentarrow\indentarrow}{newton}
+        \hiercmdarg{\indentarrow\indentarrow\indentarrow\indentarrow}{stepsize}{$$double$$}
+          {Step size for discrete evolution}
+          {Valid values: 0 $<$ stepsize}
+          {Defaults to 1}
+%
+      \hiershortcmd{\indentarrow\indentarrow\indentarrow}{newton}
         {Newton's method}
-        {No subarguments}
 %
     \hiercmdarg{\indentarrow\indentarrow}{iter}{$$int$$}
       {Total number of iterations}
