@@ -7,6 +7,8 @@ library(reshape2)
 
 y1 <- as.matrix (read.table ("dogs.dat"), nrows=30, ncol=25)
 y <- ifelse (y1[,]=="S",1,0)
+n.dogs <- nrow(y)
+n.trials <- ncol(y)
 
 ## Calling predictive replications in Bugs
 if (!exists("dogs.sm")) {
