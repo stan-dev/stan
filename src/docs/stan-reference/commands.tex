@@ -607,184 +607,184 @@ The full hierarchy is as follows; some typical use-case examples
 are provided in the next section.
 
 \begin{description}
-\hiercmdarg{}{method}{list element}
+\hiercmdarg{}{method}{$$list element$$}
   {Analysis method (Note that method= is optional)}
   {Valid values: sample, optimize, diagnose}
   {Defaults to sample}
 %
-  \hierlongcmd{-}{sample}
+  \hierlongcmd{\indentarrow}{sample}
     {Bayesian inference with Markov Chain Monte Carlo}
     {Valid subarguments: num\_samples, num\_warmup, save\_warmup, thin, adapt, algorithm}
 %
-    \hiercmdarg{--}{num\_samples}{int}
+    \hiercmdarg{\indentarrow\indentarrow}{num\_samples}{$$int$$}
       {Number of sampling iterations}
-      {Valid values: 0 \textless num\_samples}
+      {Valid values: 0 $<$ num\_samples}
       {Defaults to 1000}
 %
-    \hiercmdarg{--}{num\_warmup}{int}
+    \hiercmdarg{\indentarrow\indentarrow}{num\_warmup}{$$int$$}
       {Number of warmup iterations}
-      {Valid values: 0 \textless warmup}
+      {Valid values: 0 $<$ warmup}
       {Defaults to 1000}
 %
-    \hiercmdarg{--}{save\_warmup}{boolean}
+    \hiercmdarg{\indentarrow\indentarrow}{save\_warmup}{$$boolean$$}
       {Stream warmup samples to output?}
       {Valid values: [0, 1]}
       {Defaults to 0}
 %
-    \hiercmdarg{--}{thin}{int}
+    \hiercmdarg{\indentarrow\indentarrow}{thin}{$$int$$}
       {Period between saved samples}
-      {Valid values: 0 \textless thin}
+      {Valid values: 0 $<$ thin}
       {Defaults to 1}
 %
-    \hierlongcmd{--}{adapt}
+    \hierlongcmd{\indentarrow\indentarrow}{adapt}
       {Warmup Adaptation}
       {Valid subarguments: engaged, gamma, delta, kappa, t0}
 %
-      \hiercmdarg{---}{engaged}{boolean}
+      \hiercmdarg{\indentarrow\indentarrow\indentarrow}{engaged}{$$boolean$$}
         {Adaptation engaged?}
         {Valid values: [0, 1]}
         {Defaults to 1}
 %
-      \hiercmdarg{---}{gamma}{double}
+      \hiercmdarg{\indentarrow\indentarrow\indentarrow}{gamma}{$$double$$}
         {Adaptation regularization scale}
-        {Valid values: 0 \textless gamma}
+        {Valid values: 0 $<$ gamma}
         {Defaults to 0.05}
 %
-      \hiercmdarg{---}{delta}{double}
+      \hiercmdarg{\indentarrow\indentarrow\indentarrow}{delta}{$$double$$}
         {Adaptation target acceptance statistic}
-        {Valid values: 0 \textless delta \textless 1}
+        {Valid values: 0 $<$ delta $<$ 1}
         {Defaults to 0.65}
 %
-      \hiercmdarg{---}{kappa}{double}
+      \hiercmdarg{\indentarrow\indentarrow\indentarrow}{kappa}{$$double$$}
         {Adaptation relaxation exponent}
-        {Valid values: 0 \textless kappa}
+        {Valid values: 0 $<$ kappa}
         {Defaults to 0.75}
 %
-      \hiercmdarg{---}{t0}{double}
+      \hiercmdarg{\indentarrow\indentarrow\indentarrow}{t0}{$$double$$}
         {Adaptation iteration offset}
-        {Valid values: 0 \textless t0}
+        {Valid values: 0 $<$ t0}
         {Defaults to 10}
 %
-    \hiercmdarg{--}{algorithm}{list element}
+    \hiercmdarg{\indentarrow\indentarrow}{algorithm}{$$list element$$}
       {Sampling algorithm}
       {Valid values: hmc, metro}
       {Defaults to hmc}
 %
-      \hierlongcmd{---}{hmc}
+      \hierlongcmd{\indentarrow\indentarrow\indentarrow}{hmc}
         {Hamiltonian Monte Carlo}
         {Valid subarguments: engine, metric, stepsize, stepsize\_jitter}
 %
-        \hiercmdarg{----}{engine}{list element}
+        \hiercmdarg{\indentarrow\indentarrow\indentarrow\indentarrow}{engine}{$$list element$$}
           {Engine for Hamiltonian Monte Carlo}
           {Valid values: static, nuts}
           {Defaults to nuts}
 %
-          \hierlongcmd{-----}{static}
+          \hierlongcmd{\indentarrow\indentarrow\indentarrow\indentarrow\indentarrow}{static}
             {Static integration time}
             {Valid subarguments: int\_time}
 %
-            \hiercmdarg{------}{int\_time}{double}
+            \hiercmdarg{\indentarrow\indentarrow\indentarrow\indentarrow\indentarrow\indentarrow}{int\_time}{$$double$$}
               {Total integration time for Hamiltonian evolution}
-              {Valid values: 0 \textless int\_time}
+              {Valid values: 0 $<$ int\_time}
               {Defaults to 2 * pi}
 %
-          \hierlongcmd{-----}{nuts}
+          \hierlongcmd{\indentarrow\indentarrow\indentarrow\indentarrow\indentarrow}{nuts}
             {The No-U-Turn Sampler}
             {Valid subarguments: max\_depth}
 %
-            \hiercmdarg{------}{max\_depth}{int}
+            \hiercmdarg{\indentarrow\indentarrow\indentarrow\indentarrow\indentarrow\indentarrow}{max\_depth}{$$int$$}
               {Maximum tree depth}
-              {Valid values: 0 \textless max\_depth}
+              {Valid values: 0 $<$ max\_depth}
               {Defaults to 10}
 %
-        \hiercmdarg{----}{metric}{list element}
+        \hiercmdarg{\indentarrow\indentarrow\indentarrow\indentarrow}{metric}{$$list element$$}
           {Geometry of base manifold}
           {Valid values: unit\_e, diag\_e, dense\_e}
           {Defaults to diag\_e}
 %
-          \hiershortcmd{-----}{unit\_e}
+          \hiershortcmd{\indentarrow\indentarrow\indentarrow\indentarrow\indentarrow}{unit\_e}
             {Euclidean manifold with unit metric}
 %
-          \hiershortcmd{-----}{diag\_e}
+          \hiershortcmd{\indentarrow\indentarrow\indentarrow\indentarrow\indentarrow}{diag\_e}
             {Euclidean manifold with diag metric}
 %
-          \hiershortcmd{-----}{dense\_e}
+          \hiershortcmd{\indentarrow\indentarrow\indentarrow\indentarrow\indentarrow}{dense\_e}
             {Euclidean manifold with dense metric}
 %
-        \hiercmdarg{----}{stepsize}{double}
+        \hiercmdarg{\indentarrow\indentarrow\indentarrow\indentarrow}{stepsize}{$$double$$}
           {Step size for discrete evolution}
-          {Valid values: 0 \textless stepsize}
+          {Valid values: 0 $<$ stepsize}
           {Defaults to 1}
 %
-        \hiercmdarg{----}{stepsize\_jitter}{double}
+        \hiercmdarg{\indentarrow\indentarrow\indentarrow\indentarrow}{stepsize\_jitter}{$$double$$}
           {Uniformly random jitter of the stepsize, in percent}
-          {Valid values: 0 \textless}{ stepsize\_jitter \textless= 1}
+          {Valid values: 0 $\le$ stepsize\_jitter $\le$ 1}
           {Defaults to 0}
 %
-      \hierlongcmd{---}{metro}
+      \hierlongcmd{\indentarrow\indentarrow\indentarrow}{metro}
         {Random Walk Metropolis Monte Carlo}
         {No subarguments}
 %
-  \hierlongcmd{-}{optimize}
+  \hierlongcmd{\indentarrow}{optimize}
     {Point estimation}
     {Valid subarguments: algorithm, iter, save\_iterations}
 %
-    \hiercmdarg{--}{algorithm}{list element}
+    \hiercmdarg{\indentarrow\indentarrow}{algorithm}{$$list element$$}
       {Optimization algorithm}
       {Valid values: nesterov, bfgs, newton}
       {Defaults to bfgs}
 %
-      \hierlongcmd{---}{nesterov}
+      \hierlongcmd{\indentarrow\indentarrow\indentarrow}{nesterov}
         {Nesterov's accelerated gradient method}
         {Valid subarguments: stepsize}
 %
-        \hiercmdarg{----}{stepsize}{double}
+        \hiercmdarg{\indentarrow\indentarrow\indentarrow\indentarrow}{stepsize}{$$double$$}
           {Step size for discrete evolution}
-          {Valid values: 0 \textless stepsize}
+          {Valid values: 0 $<$ stepsize}
           {Defaults to 1}
 %
-      \hierlongcmd{---}{bfgs}
+      \hierlongcmd{\indentarrow\indentarrow\indentarrow}{bfgs}
         {BFGS with linesearch}
         {No subarguments}
 %
-      \hierlongcmd{---}{newton}
+      \hierlongcmd{\indentarrow\indentarrow\indentarrow}{newton}
         {Newton's method}
         {No subarguments}
 %
-    \hiercmdarg{--}{iter}{int}
+    \hiercmdarg{\indentarrow\indentarrow}{iter}{$$int$$}
       {Total number of iterations}
-      {Valid values: 0 \textless iter}
+      {Valid values: 0 $<$ iter}
       {Defaults to 2000}
 %
-    \hiercmdarg{--}{save\_iterations}{boolean}
+    \hiercmdarg{\indentarrow\indentarrow}{save\_iterations}{$$boolean$$}
       {Stream optimization progress to output?}
       {Valid values: [0, 1]}
       {Defaults to 0}
 %
-  \hierlongcmd{-}{diagnose}
+  \hierlongcmd{\indentarrow}{diagnose}
     {Model diagnostics}
     {Valid subarguments: test}
 %
-    \hiercmdarg{--}{test}{list element}
+    \hiercmdarg{\indentarrow\indentarrow}{test}{$$list element$$}
       {Diagnostic test}
       {Valid values: gradient}
       {Defaults to gradient}
 %
-      \hiershortcmd{---}{gradient}
+      \hiershortcmd{\indentarrow\indentarrow\indentarrow}{gradient}
         {Check model gradient against finite differences}
 %
-\hiercmdarg{}{id}{int}
+\hiercmdarg{}{id}{$$int$$}
   {Unique process identifier}
-  {Valid values: id \textgreater 0}
+  {Valid values: id $>$ 0}
   {Defaults to 0}
 %
-\hiercmdarg{}{data}{string}
+\hiercmdarg{}{data}{$$string$$}
   {Input data file}
   {Valid values: All}
-  {Defaults to ``''}
+  {Defaults to ""}
 %
-\hiercmdarg{}{init}{string}
-  {Initialization method: ``x" initializes randomly bewteen [-x, x], "0'' initializes to 0, anything else identifies a file of values}
+\hiercmdarg{}{init}{$$string$$}
+  {Initialization method: ``x'' initializes randomly bewteen [-x, x], ``0'' initializes to 0, anything else identifies a file of values}
   {Valid values: All}
   {Defaults to ``2''}
 %
@@ -792,41 +792,41 @@ are provided in the next section.
   {Random number configuration}
   {Valid subarguments: seed}
 %
-  \hiercmdarg{-}{seed}{unsigned int}
+  \hiercmdarg{\indentarrow}{seed}{$$unsigned int$$}
     {Random number generator seed}
-    {Valid values: seed \textgreater 0, if negative seed is generated from time}
+    {Valid values: seed $>$ 0, if negative seed is generated from time}
     {Defaults to -1}
 %
 \hierlongcmd{}{output}
   {File output options}
   {Valid subarguments: sample, append\_sample, diagnostic, append\_diagnostic, refresh, save\_warmup}
 %
-  \hiercmdarg{-}{sample}{string}
+  \hiercmdarg{\indentarrow}{sample}{$$string$$}
     {Output file for sample information}
     {Valid values: All}
     {Defaults to samples.csv}
 %
-  \hiercmdarg{-}{append\_sample}{boolean}
+  \hiercmdarg{\indentarrow}{append\_sample}{$$boolean$$}
     {Append sample output to existing file?}
     {Valid values: [0, 1]}
     {Defaults to 0}
 %
-  \hiercmdarg{-}{diagnostic}{string}
+  \hiercmdarg{\indentarrow}{diagnostic}{$$string$$}
     {Output file for diagnostic information}
     {Valid values: All}
-    {Defaults to ``''}
+    {Defaults to ""}
 %
-  \hiercmdarg{-}{append\_diagnostic}{boolean}
+  \hiercmdarg{\indentarrow}{append\_diagnostic}{$$boolean$$}
     {Append diagnostic output to existing file?}
     {Valid values: [0, 1]}
     {Defaults to 0}
 %
-  \hiercmdarg{-}{refresh}{int}
+  \hiercmdarg{\indentarrow}{refresh}{$$int$$}
     {Number of interations between screen updates}
-    {Valid values: 0 \textless refresh}
+    {Valid values: 0 $<$ refresh}
     {Defaults to 100}
 %
-  \hiercmdarg{-}{save\_warmup}{boolean}
+  \hiercmdarg{\indentarrow}{save\_warmup}{$$boolean$$}
     {Stream warmup samples to output?}
     {Valid values: [0, 1]}
     {Defaults to 0}
