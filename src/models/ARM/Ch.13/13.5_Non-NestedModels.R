@@ -65,7 +65,7 @@ for (x in seq(.5,n.scenario-.5,1)/(n.scenario-1)) lines (rep(x,2),c(-10,10),col=
 
 # The R codes & data files should be saved in the same directory for
 # the source command to work
-
+library(foreign)
 heights <- read.dta ("heights.dta")
 attach(heights)
 
@@ -77,11 +77,10 @@ eth <- ifelse (race==2, 1, ifelse (hisp==1, 2, ifelse (race==1, 3, 4)))
 male <- 2 - sex
 
   # (for simplicity) remove cases with missing data
-ok <- !is.na (earn+height+sex) & earn>0 & yearbn>25
+ok <- !is.na (earn+height+sex+age.category+eth) & earn>0 & yearbn>25
 heights.clean <- as.data.frame (cbind (earn, height, sex, race, hisp, ed, age,
     age.category, eth, male)[ok,])
 n <- nrow (heights.clean)
-attach.all (heights.clean)
 height.jitter.add <- runif (n, -.2, .2)
 
  # rename variables

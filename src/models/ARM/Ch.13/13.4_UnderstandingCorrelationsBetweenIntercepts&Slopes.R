@@ -23,7 +23,6 @@ ok <- !is.na (earn+height+sex) & earn>0 & yearbn>25
 heights.clean <- as.data.frame (cbind (earn, height, sex, race, hisp, ed, age,
     age.category, eth, male)[ok,])
 n <- nrow (heights.clean)
-attach.all (heights.clean)
 height.jitter.add <- runif (n, -.2, .2)
 
  # rename variables
@@ -47,7 +46,7 @@ if (!exists("earnings_vary_si.sm")) {
     }
 }
 
-dataList.1 <- list(N=n, earn=earn[ok]+1,height=x,ethn=eth[ok])
+dataList.1 <- list(N=n, earn=earn[ok]+1,height=x,eth=eth[ok])
 earnings_vary_si.sf1 <- sampling(earnings_vary_si.sm, dataList.1)
 print(earnings_vary_si.sf1, pars = c("a","b", "sigma_y", "lp__"))
 post1 <- extract(earnings_vary_si.sf1)
@@ -102,7 +101,7 @@ print(p3)
 ## M2 <- lmer (y ~ x.centered + (1 + x.centered | eth))
 x.centered <- x - mean(x)
 
-dataList.3 <- list(N=n, earn=earn,height=x.centered,ethn=ethn)
+dataList.3 <- list(N=n, earn=earn,height=x.centered,eth=ethn)
 earnings_vary_si.sf2 <- sampling(earnings_vary_si.sm, dataList.3)
 print(earnings_vary_si.sf2)
 post2 <- extract(earnings_vary_si.sf2)

@@ -2,7 +2,7 @@ data {
   int<lower=0> N; 
   vector[N] earn;
   vector[N] height;
-  int ethn[N];
+  int eth[N];
 } 
 transformed data {
   vector[N] log_earn;
@@ -20,7 +20,7 @@ parameters {
 transformed parameters {
   vector[N] y_hat;
   for (i in 1:N)
-    y_hat[i] <- a[ethn[i]] + b[ethn[i]] * height[i];
+    y_hat[i] <- a[eth[i]] + b[eth[i]] * height[i];
 } 
 model {
   mu_a ~ normal(0, .0001);
