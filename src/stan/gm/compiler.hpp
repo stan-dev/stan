@@ -28,6 +28,12 @@ namespace stan {
      * @return <code>false</code> if code could not be generated
      *    due to syntax error in the Graphical model; 
      *    <code>true</code> otherwise.
+     * @param output_stream
+     * @param stan_gm_in
+     * @param cpp_out
+     * @param model_name
+     * @param include_main
+     * @param in_file_name
      */
     bool compile(std::ostream* msgs, // for warnings
                  std::istream& stan_gm_in,

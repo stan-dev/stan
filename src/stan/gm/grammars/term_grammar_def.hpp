@@ -48,19 +48,19 @@
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::index_op,
                           (stan::gm::expression, expr_)
                           (std::vector<std::vector<stan::gm::expression> >, 
-                           dimss_) )
+                           dimss_) );
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::fun,
                           (std::string, name_)
-                          (std::vector<stan::gm::expression>, args_) )
+                          (std::vector<stan::gm::expression>, args_) );
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::int_literal,
                           (int,val_)
-                          (stan::gm::expr_type,type_))
+                          (stan::gm::expr_type,type_));
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::double_literal,
                           (double,val_)
-                          (stan::gm::expr_type,type_) )
+                          (stan::gm::expr_type,type_) );
 
 
 

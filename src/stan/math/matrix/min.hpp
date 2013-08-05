@@ -11,7 +11,7 @@ namespace stan {
     /**
      * Returns the minimum coefficient in the specified
      * column vector.
-     * @param v Specified vector.
+     * @param x Specified vector.
      * @return Minimum coefficient value in the vector.
      * @tparam Type of values being compared and returned
      */
@@ -28,7 +28,7 @@ namespace stan {
     /**
      * Returns the minimum coefficient in the specified
      * column vector.
-     * @param v Specified vector.
+     * @param x Specified vector.
      * @return Minimum coefficient value in the vector.
      * @tparam Type of values being compared and returned
      */
@@ -46,7 +46,7 @@ namespace stan {
     /**
      * Returns the minimum coefficient in the specified
      * matrix, vector, or row vector.
-     * @param v Specified matrix, vector, or row vector.
+     * @param m Specified matrix, vector, or row vector.
      * @return Minimum coefficient value in the vector.
      */
     template <typename T, int R, int C>

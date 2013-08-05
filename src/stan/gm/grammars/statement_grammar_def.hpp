@@ -49,32 +49,32 @@
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::assignment,
                           (stan::gm::variable_dims, var_dims_)
-                          (stan::gm::expression, expr_) )
+                          (stan::gm::expression, expr_) );
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::variable_dims,
                           (std::string, name_)
-                          (std::vector<stan::gm::expression>, dims_) )
+                          (std::vector<stan::gm::expression>, dims_) );
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::distribution,
                           (std::string, family_)
-                          (std::vector<stan::gm::expression>, args_) )
+                          (std::vector<stan::gm::expression>, args_) );
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::for_statement,
                           (std::string, variable_)
                           (stan::gm::range, range_)
-                          (stan::gm::statement, statement_) )
+                          (stan::gm::statement, statement_) );
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::print_statement,
-                          (std::vector<stan::gm::printable>, printables_) )
+                          (std::vector<stan::gm::printable>, printables_) );
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::sample,
                           (stan::gm::expression, expr_)
                           (stan::gm::distribution, dist_) 
-                          (stan::gm::range, truncation_) )
+                          (stan::gm::range, truncation_) );
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::statements,
                           (std::vector<stan::gm::var_decl>, local_decl_)
-                          (std::vector<stan::gm::statement>, statements_) )
+                          (std::vector<stan::gm::statement>, statements_) );
 
 namespace stan {
 

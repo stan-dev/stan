@@ -36,7 +36,7 @@ namespace stan {
     /**
      * Returns the sample variance (divide by length - 1) of the
      * coefficients in the specified column vector.
-     * @param v Specified vector.
+     * @param m Specified vector.
      * @return Sample variance of vector.
      */
     template <typename T, int R, int C>

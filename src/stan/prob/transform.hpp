@@ -381,7 +381,7 @@ namespace stan {
      * placeholder in auto-generated code.
      *
      * @param x Free scalar.
-     * @param lp Reference to log probability.
+     * lp Reference to log probability.
      * @return Transformed input.
      * @tparam T Type of scalar.
      */
@@ -980,7 +980,7 @@ namespace stan {
      * Return the unit length vector corresponding to the free vector y.
      * The free vector contains K-1 spherical coordinates.
      *
-     * @param Vector of K - 1 spherical coordinates
+     * @param y of K - 1 spherical coordinates
      * @return Unit length vector of dimension K
      * @tparam T Scalar type.
      **/
@@ -1005,7 +1005,7 @@ namespace stan {
      * Return the unit length vector corresponding to the free vector y.
      * The free vector contains K-1 spherical coordinates.
      *
-     * @param Vector of K - 1 spherical coordinates
+     * @param y of K - 1 spherical coordinates
      * @return Unit length vector of dimension K
      * @param lp Log probability reference to increment.
      * @tparam T Scalar type.

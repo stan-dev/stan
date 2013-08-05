@@ -167,9 +167,10 @@ namespace stan {
      * The cumulative density function for a gamma distribution for y
      * with the specified shape and inverse scale parameters.
      *
-     * @param y A scalar variable.
+     * y A scalar variable.
      * @param alpha Shape parameter.
      * @param beta Inverse scale parameter.
+     * @param rng Random number generator.
      * @throw std::domain_error if alpha is not greater than 0.
      * @throw std::domain_error if beta is not greater than 0.
      * @throw std::domain_error if y is not greater than or equal to 0.
