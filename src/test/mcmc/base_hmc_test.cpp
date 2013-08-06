@@ -130,6 +130,8 @@ TEST(McmcBaseHMC, init_stepsize) {
   model_path.push_back("improper");
   
   std::string command = convert_model_path(model_path);
+  command += " sample";
+  
   std::string command_output;
   long time;
   

@@ -3,6 +3,8 @@
 
 #include <stan/gm/arguments/categorical_argument.hpp>
 
+#include <stan/gm/arguments/arg_stepsize.hpp>
+
 namespace stan {
   
   namespace gm {
@@ -15,6 +17,8 @@ namespace stan {
         
         _name = "bfgs";
         _description = "BFGS with linesearch";
+        
+        _subarguments.push_back(new arg_stepsize());
         
       }
       

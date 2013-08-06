@@ -128,14 +128,14 @@ namespace stan {
         
         lambda_ = 0.5 * ( 1 + std::sqrt(1.0 + 4.0 * old_lambda * old_lambda) );
         gamma_ = (old_lambda - 1.0) / lambda_;
-        
+
         for (size_t i = 0; i < x_.size(); i++)
           y_[i] = x_[i] + epsilon_ * grad_[i];
         
         for (size_t i = 0; i < x_.size(); i++)
           x_[i] = (1 - gamma_) * y_[i] + gamma_ * old_y[i];
         
-        logp_ = stan::model::log_prob_grad<true,false>(model_,y_, z_,
+        logp_ = stan::model::log_prob_grad<true,false>(model_, x_, z_,
                                                        grad_, output_stream_);
         
         return logp_;
