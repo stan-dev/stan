@@ -1,11 +1,10 @@
-# Camel: Multivariate normal with structured missing data 
-# http://www.openbugs.info/Examples/Camel.html
-
-
-## integrate out the missings.  
-
+/*
+ * Camel: Multivariate normal with structured missing data 
+ * http://www.openbugs.info/Examples/Camel.html
+ *
+ * integrate out the missing data
+ */
 transformed data {
-
   vector[2] Y[4]; 
   real Y1[4];  // missing y2 
   real Y2[4];  // msising y1
@@ -39,22 +38,17 @@ transformed data {
   Y2[3] <- -2.; 
   Y2[4] <- -2.; 
 } 
-
 parameters { 
   cov_matrix[2] Sigma; 
 } 
-
 transformed parameters {
   real<lower=-1,upper= 1> rho; 
   rho <- Sigma[1, 2] / sqrt(Sigma[1, 1] * Sigma[2, 2]); 
 } 
-
-
 model {
   for (n in 1:4) Y[n] ~ multi_normal(mu, Sigma); 
   Y1 ~ normal(0, sqrt(Sigma[1, 1]));
   Y2 ~ normal(0, sqrt(Sigma[2, 2])); 
-  // Sigma ~ inv_wishart(2, S); 
-  lp__ <- lp__ - 1.5 * log(determinant(Sigma)); 
+  increment_log_prob(- 1.5 * log(determinant(Sigma)));
 } 
 

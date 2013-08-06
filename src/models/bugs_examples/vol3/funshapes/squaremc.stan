@@ -6,7 +6,7 @@
  * quadrant, then reflect in transformed parameters
  *
  * unfortunate redundancy in 1-sqrt() term because we can't
- * get local variables into parameters
+ * get local variables into parameter declarations
  */
 parameters {
   real<lower=-1,upper=1> x_raw;
@@ -20,5 +20,5 @@ transformed parameters {
   y <- if_else(y_raw > 0, 1, -1) - y_raw;
 }
 model {
-  lp__ <- lp__ + log1m(sqrt(1 - square(1 - fabs(x_raw))));
+  increment_log_prob(log1m(sqrt(1 - square(1 - fabs(x_raw)))));
 }

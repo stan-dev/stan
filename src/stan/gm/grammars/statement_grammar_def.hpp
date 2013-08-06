@@ -67,6 +67,9 @@ BOOST_FUSION_ADAPT_STRUCT(stan::gm::for_statement,
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::print_statement,
                           (std::vector<stan::gm::printable>, printables_) )
 
+BOOST_FUSION_ADAPT_STRUCT(stan::gm::increment_log_prob_statement,
+                          (stan::gm::expression, log_prob_))
+
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::sample,
                           (stan::gm::expression, expr_)
                           (stan::gm::distribution, dist_) 
@@ -250,33 +253,6 @@ namespace stan {
     };
     boost::phoenix::function<unscope_locals> unscope_locals_f;
 
-    // struct add_conditional_condition {
-    //   template <typename T1, typename T2, typename T3>
-    //   struct result { typedef bool type; };
-    //   bool operator()(conditional_statement& cs,
-    //                   const expression& e,
-    //                   std::stringstream& error_msgs) const {
-    //     if (!e.expression_type().is_primitive()) {
-    //       error_msgs << "conditions in if-else statement must be primitive int or real;"
-    //                  << " found type=" << e.expression_type() << std::endl;
-    //       return false;
-    //     }
-    //     cs.conditions_.push_back(e);
-    //     return true;
-    //   }               
-    // };
-    // boost::phoenix::function<add_conditional_condition> add_conditional_condition_f;
-
-    // struct add_conditional_body {
-    //   template <typename T1, typename T2>
-    //   struct result { typedef void type; };
-    //   void operator()(conditional_statement& cs,
-    //                   const statement& s) const {
-    //     cs.bodies_.push_back(s);
-    //   }
-    // };
-    // boost::phoenix::function<add_conditional_body> add_conditional_body_f;
-
     struct add_while_condition {
       template <typename T1, typename T2, typename T3>
       struct result { typedef bool type; };
@@ -398,6 +374,7 @@ namespace stan {
       statement_r.name("statement");
       statement_r
         %= statement_seq_r(_r1,_r2)
+        | increment_log_prob_statement_r(_r2)
         | for_statement_r(_r1,_r2)
         | while_statement_r(_r1,_r2)
         | statement_2_g(_r1,_r2)
@@ -424,6 +401,15 @@ namespace stan {
 
       local_var_decls_r
         %= var_decls_g(false,local_origin); // - constants
+
+      increment_log_prob_statement_r.name("increment log prob statement");
+      increment_log_prob_statement_r
+        = lit("increment_log_prob")
+        > lit('(')
+        > expression_g(_r1)
+        > lit(')')
+        > lit(';') 
+        ;
 
       while_statement_r.name("while statement");
       while_statement_r
@@ -501,7 +487,7 @@ namespace stan {
 
       opt_dims_r.name("array dimensions (optional)");
       opt_dims_r 
-        %=  - dims_r(_r1);
+        %=  * dims_r(_r1);
 
       dims_r.name("array dimensions");
       dims_r 

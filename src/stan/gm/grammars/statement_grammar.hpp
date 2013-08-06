@@ -58,6 +58,11 @@ namespace stan {
 
 
       boost::spirit::qi::rule<Iterator, 
+                              increment_log_prob_statement(var_origin), 
+                              whitespace_grammar<Iterator> > 
+      increment_log_prob_statement_r;
+
+      boost::spirit::qi::rule<Iterator, 
                               boost::spirit::qi::locals<std::string>, 
                               for_statement(bool,var_origin), 
                               whitespace_grammar<Iterator> > 

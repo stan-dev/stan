@@ -1,23 +1,20 @@
-# Endo: conditional inference in case-contrl studies 
-# http://www.openbugs.info/Examples/Endo.html
+/*
+ * Endo: conditional inference in case-contrl studies 
+ * http://www.openbugs.info/Examples/Endo.html
+ *
+ * In this example, three methods of different 
+ * model specifications are used for one equivalent
+ * model. This is method 2. 
 
-# In this example, three methods of different 
-# model specifications are used for one equivalent
-# model. This is method 2. 
-
-
-# FIXME: using the multinomial specification  
-
+ * FIXME: using the multinomial specification  
+ */
 data {
   int n10; 
   int n01; 
   int n11; 
   int I;
   int J;
-# int Y[I, 2]; 
-# int est[I, 2]; 
 } 
-
 transformed data {
   int<lower=0> Y[I, 2]; 
   int<lower=0> est[I, 2]; 
@@ -42,11 +39,9 @@ transformed data {
     est[i, 2] <- 0;
   }
 } 
-
 parameters {
   real beta; 
 } 
-
 model {
   real p[I, 2];
 
@@ -59,10 +54,8 @@ model {
     p[i, 1] <- p[i, 1] / (p[i, 1] + p[i, 2]); 
     p[i, 2] <- 1 - p[i, 1];
 
-    // Y[i] ~ multinomial(p[i]);
-
     // using the multinomial log-pmf explicitly 
-    lp__ <- lp__ + log(p[i, 1]) * Y[i, 1]; 
-    lp__ <- lp__ + log(p[i, 2]) * Y[i, 2]; 
+    increment_log_prob(log(p[i, 1]) * Y[i, 1]);
+    increment_log_prob(log(p[i, 2]) * Y[i, 2]);
   } 
-} 
+}
