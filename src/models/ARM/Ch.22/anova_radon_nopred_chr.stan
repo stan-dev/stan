@@ -8,13 +8,16 @@ parameters {
   real<lower=0> sigma_y;
   real<lower=0> sigma_a;
   real mu_a;
-  vector[J] a;
+  vector[J] eta;
 }
 transformed parameters {
   vector[N] y_hat;
+  vector[J] a;
   vector[N] e_y;
   real<lower=0> s_y;
   real<lower=0> s_a;
+
+  a <- mu_a + sigma_a * eta;
 
   for (i in 1:N)
     y_hat[i] <- a[county[i]];
@@ -26,6 +29,6 @@ transformed parameters {
 model {
   mu_a ~ normal(0, 100);
 
-  a ~ normal(mu_a, sigma_a);
+  eta ~ normal(0, 1);
   y ~ normal(y_hat, sigma_y);
 }

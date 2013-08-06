@@ -12,9 +12,7 @@ parameters {
   vector[J] a;
   real<lower=0> sigma_y;
   real<lower=0> sigma_a;
-  real<lower=0> sigma_b;
   real mu_a;
-  real mu_b;
 } 
 transformed parameters {
   vector[N] y_hat;
@@ -23,14 +21,10 @@ transformed parameters {
     y_hat[i] <- a[county[i]] + u[i] * b[1] + x[i] * b[2] + x_mean[i] * b[3];
 }
 model {
-  mu_a ~ normal(0, .0001);
-  sigma_a ~ uniform(0, 100);
-  a ~ normal (mu_a, sigma_a);
+  mu_a ~ normal(0, 100);
+  a ~ normal(mu_a, sigma_a);
 
-  mu_b ~ normal(0, .0001);
-  sigma_b ~ uniform(0, 100);
-  b ~ normal (mu_b, sigma_b);
+  b ~ normal(0, 100);
 
-  sigma_y ~ uniform(0, 100);
   y ~ normal(y_hat, sigma_y);
 }
