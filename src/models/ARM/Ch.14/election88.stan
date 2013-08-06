@@ -11,8 +11,6 @@ parameters {
   vector[2] b;
   real<lower=0> sigma_a;
   real mu_a;
-  real<lower=0> sigma_b;
-  real mu_b;
 }
 transformed parameters {
   vector[N] y_hat;
@@ -24,9 +22,7 @@ model {
   sigma_a ~ uniform(0, 100);
   a ~ normal (mu_a, sigma_a);
 
-  mu_b ~ normal(0, .0001);
-  sigma_b ~ uniform(0, 100);
-  b ~ normal (mu_b, sigma_b);
+  b ~ normal (0, 100);
 
   y ~ bernoulli_logit(y_hat);
 }
