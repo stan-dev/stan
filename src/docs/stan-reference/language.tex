@@ -1875,6 +1875,98 @@ supported.  Similarly, \Stan 1.0 does not support providing an array of
 indices as an argument to create a piecemeal subarray of a larger
 array.
 
+\section{Log Probability Increment Statement}
+
+The basis of Stan's execution is the evaluation of a log probability
+function for a given set of parameters.  Data and transformed data are
+fixed before log probability is involved.  Statements in the
+transformed parameter block and model block can have an effect on the
+log probability function defined by a model.
+
+The total log probability is initialized to zero.  Then statements in
+the transformed parameter block and model block may add to it.  The
+most direct way this is done is through the log probability increment
+statement, which is of the following form.
+%
+\begin{quote}
+\begin{Verbatim}
+increment_log_prob(-0.5 * y * y);
+\end{Verbatim}
+\end{quote}
+%
+In this example, the unnormalized log probability of a unit normal
+variable $y$ is adeed to the total log probability.  In the general
+case, the argument can be any expression.  Writing this model as
+\code{-0.5 * y * y} is more efficient than the equivalent \code{y * y
+  / 2} because multiplication is more efficient than division and the
+negation is rolled into the constant \code{-0.5}.
+
+An entire Stan model can be implemented this way.  For instance, the
+following model will draw a single variable according to a unit normal
+probability.  
+%
+\begin{quote}
+\begin{Verbatim}
+parameters {
+  real y;
+}
+model {
+  increment_log_prob(-0.5 * y * y);
+}
+\end{Verbatim}
+\end{quote}
+%
+This model defines a log probability function 
+%
+\[
+\log p(y) = - \, \frac{y^2}{2} - \log Z
+\]
+%
+where $Z$ is a normalizing constant that does not depend on $y$.  The
+constant $Z$ is conventionally written this way because on the linear
+scale,
+\[
+p(y) = \frac{1}{Z} \exp\left(-\frac{y^2}{2}\right).
+\]
+which is typically written without reference to $Z$ as
+\[
+p(y) \propto \exp\left(-\frac{y^2}{2}\right).
+\]
+
+Stan only requires models to be defined up to a constant that does not
+depend on the parameters.  This is convenient because often the
+normalizing constant $Z$ is either time-consuming to compute or
+intractable to evaluate.
+
+\subsection{Log Probability Variable \code{lp\_\_}}
+
+Before version 2.0 of Stan, rather than writing
+%
+\begin{quote}
+\begin{Verbatim}
+increment_log_prob(u);
+\end{Verbatim}
+\end{quote}
+%
+it was necessary to manipulate a special variable \code{lp\_\_}
+as follows
+%
+\begin{quote}
+\begin{Verbatim}
+lp__ <- lp__ + u;
+\end{Verbatim}
+\end{quote}
+%
+The special variable \code{lp\_\_} refers to the log probability value
+that will be returned by Stan's log probability function.  
+
+\subsubsection{Deprecation of \code{lp\_\_}}
+
+As of Stan version 2.0, the use of \code{lp\_\_} is deprecated.  It
+will be removed altogether in a future release, but until that time,
+programs still work with \code{lp\_\_}.  A deprecation warning is now
+printed every time \code{lp\_\_} is used.
+
 
 \section{Sampling Statements}
 
@@ -1895,20 +1987,16 @@ sampling statement.
 
 Executing such a statement does not perform any sampling.  In \Stan, a
 sampling statement is merely a notational convenience.  The above
-sampling statement could be written as an assignment statement using
-the reserved variable \code{lp\_\_} as follows (see
-\refsection{incr-vs-sample} for a full explanation).
+sampling statement could be expressed as a direct increment on the
+total log probability as
 %
 \begin{quote}
 \begin{Verbatim}
-lp__ <- lp__ + normal_log(y,mu,sigma);
+increment_log_prob(normal_log(y,mu,sigma));
 \end{Verbatim}
 \end{quote}
 %
-
-The variable \code{lp\_\_} acts as an accumulator for the log
-(proportional) probability defined by the model as a function of the
-parameters and data.
+See \refsection{incr-vs-sample} for a full explanation.
 
 In general, a sampling statement of the form
 %
@@ -1924,7 +2012,7 @@ corresponding assignment statement is well-formed,
 %
 \begin{quote}
 \begin{Verbatim}
-lp__ <- lp__ + dist_log(ex0,ex1,...,exN);
+increment_log_prob(dist_log(ex0,ex1,...,exN));
 \end{Verbatim}
 \end{quote}
 %
@@ -1947,7 +2035,7 @@ and explicitly incrementing the log probability function, as in
 %
 \begin{quote}
 \begin{Verbatim}
-lp__ <- lp__ + normal_log(y,mu,sigma);
+increment_log_prob(normal_log(y,mu,sigma));
 \end{Verbatim}
 \end{quote}
 %
@@ -1991,7 +2079,7 @@ account for the log transform.%
 %
 \begin{quote}
 \begin{Verbatim}
-lp__ <- lp__ - log(fabs(y));
+increment_log_prob(- log(fabs(y)));
 \end{Verbatim}
 \end{quote}
 %
@@ -2022,7 +2110,7 @@ same translation (up to arithmetic precision issues) as
 \begin{quote}
 \begin{Verbatim}
 y ~ normal(0,1);
-lp__ <- lp__ - log(normal_cdf(2.1,0,1) - normal_cdf(-0.5,0,1));
+increment_log_prob(- log(normal_cdf(2.1,0,1) - normal_cdf(-0.5,0,1)));
 \end{Verbatim}
 \end{quote}
 %
@@ -2054,13 +2142,13 @@ y ~ normal(0,1) T[-0.5,];
 % 
 The truncation has the same effect as the following direct update to
 the accumulated log probability (see \refsection{incr-vs-sample} for
-more information about the relation between incrementing \code{lp\_\_}
-and sampling).
+more information about the relation between incrementing the total log
+probability and sampling).
 %
 \begin{quote}
 \begin{Verbatim}
 y ~ normal(0,1);
-lp__ <- lp__ - log(1 - normal_cdf(-0.5,0,1));
+increment_log_prob(- log(1 - normal_cdf(-0.5,0,1)));
 \end{Verbatim}
 \end{quote}
 
@@ -2085,7 +2173,7 @@ the accumulated log probability.
 \begin{quote}
 \begin{Verbatim}
 y ~ normal(0,1);
-lp__ <- lp__ - log(normal_cdf(2.1,0,1));
+increment_log_prob(- log(normal_cdf(2.1,0,1)));
 \end{Verbatim}
 \end{quote}
 
@@ -2106,20 +2194,11 @@ points must be expressions of type \code{int}.
 
 For a truncated sampling statement, if the value sampled is not within
 the bounds specified by the truncation expression, the result is zero
-probability and the entire statement adds $-\infty$ to the log
-probability accumulator \Verb|lp__|, which in turn results in the
-sample being rejected; see \refsection{truncation-constraints} for
-programming strategies to keep all values within bounds.
+probability and the entire statement adds $-\infty$ to the total log
+probability, which in turn results in the sample being rejected; see
+\refsection{truncation-constraints} for programming strategies to keep
+all values within bounds.
 
-
-
-\subsection{Scope of\, \code{lp\_\_}}
-
-The variable \code{lp\_\_} is only available in the \code{parameter},
-\code{transformed parameter}, and \code{model} blocks (see
-\refchapter{blocks}).  The variable \code{lp\_\_} is undefined (and
-may not be declared by the user) in the \code{data}, \code{transformed
-  data} and \code{generated quantity} blocks.
 
 % \subsection{User-Defined Distributions}
 
@@ -2957,11 +3036,8 @@ transformed variables.
 
 The statements in a \code{transformed data} block are used to define
 (provide values for) variables declared in the \code{transformed data}
-block.  The special variable \code{lp\_\_} is not defined for the
-statements in the \code{transformed data} block.  Consequently,
-probability statements, which implicitly access \code{lp\_\_}, may not
-be used.  Furthermore, assignments are only allowed to variables
-declared in the \code{transformed data} block.
+block. Assignments are only allowed to variables declared in the
+\code{transformed data} block.
 
 These statements are executed once, in order, right after the data is
 read into the data variables.  This means they are executed once per
@@ -2969,6 +3045,13 @@ chain (though see \refnote{thread} in this chapter).
 
 Variables declared in the \code{data} block may be used in statements
 in the \code{transformed data} block.
+
+\subsubsection{Restriction on Operations in \code{transformed data}}
+
+The statements in the transformed data block are designed to be
+executed once and have a deterministic result.  Therefore, log
+probability is not accumulated and sampling statements may not be
+used.  Random number generating functions are also prohibited.
 
 \subsection{Variable Constraint Checking}
 

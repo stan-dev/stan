@@ -1402,13 +1402,13 @@ namespace stan {
       void operator()(sample const& x) const {
         if (!include_sampling_) return;
         generate_indent(indent_,o_);
-        o_ << "lp__ += stan::prob::" << x.dist_.family_ << "_log<true>(";
+        o_ << "lp_accum__.add(" << x.dist_.family_ << "_log<true>(";
         generate_expression(x.expr_,o_);
         for (size_t i = 0; i < x.dist_.args_.size(); ++i) {
           o_ << ", ";
           generate_expression(x.dist_.args_[i],o_);
         }
-        o_ << ");" << EOL;
+        o_ << "));" << EOL;
         // generate bounds test
         if (x.truncation_.has_low()) {
           generate_indent(indent_,o_);
@@ -1417,7 +1417,7 @@ namespace stan {
           o_ << " < ";
           generate_expression(x.truncation_.low_.expr_,o_); // low
                                                             // bound
-          o_ << ") lp__ -= std::numeric_limits<double>::infinity();" << EOL;
+          o_ << ") lp_accum__.add(-std::numeric_limits<double>::infinity());"  << EOL;
         }
         if (x.truncation_.has_high()) {
           generate_indent(indent_,o_);
@@ -1427,7 +1427,7 @@ namespace stan {
           o_ << " > ";
           generate_expression(x.truncation_.high_.expr_,o_); // low
                                                             // bound
-          o_ << ") lp__ -= std::numeric_limits<double>::infinity();" << EOL;
+          o_ << ") lp_accum__.add(-std::numeric_limits<double>::infinity());" << EOL;
         }
         if (x.truncation_.has_low() || x.truncation_.has_high()) {
           generate_indent(indent_,o_);
@@ -1435,7 +1435,7 @@ namespace stan {
         }
         // generate log denominator
         if (x.truncation_.has_low() && x.truncation_.has_high()) {
-          o_ << "lp__ -= log(";
+          o_ << "lp_accum__.add(-log(";
           o_ << x.dist_.family_ << "_cdf(";
           generate_expression(x.truncation_.high_.expr_,o_);
           for (size_t i = 0; i < x.dist_.args_.size(); ++i) {
@@ -1448,26 +1448,32 @@ namespace stan {
             o_ << ", ";
             generate_expression(x.dist_.args_[i],o_);
           }
-          o_ << "));" << EOL;
+          o_ << ")));" << EOL;
         } else if (!x.truncation_.has_low() && x.truncation_.has_high()) {
-          o_ << "lp__ -= log(";
+          o_ << "lp_accum__.add(-log(";
           o_ << x.dist_.family_ << "_cdf(";
           generate_expression(x.truncation_.high_.expr_,o_);
           for (size_t i = 0; i < x.dist_.args_.size(); ++i) {
             o_ << ", ";
             generate_expression(x.dist_.args_[i],o_);
           }
-          o_ << "));" << EOL;
+          o_ << ")));" << EOL;
         } else if (x.truncation_.has_low() && !x.truncation_.has_high()) {
-          o_ << "lp__ -= log1m(";
+          o_ << "lp_accum__.add(-log1m(";
           o_ << x.dist_.family_ << "_cdf(";
           generate_expression(x.truncation_.low_.expr_,o_);
           for (size_t i = 0; i < x.dist_.args_.size(); ++i) {
             o_ << ", ";
             generate_expression(x.dist_.args_[i],o_);
           }
-          o_ << "));" << EOL;
+          o_ << ")));" << EOL;
         }
+      }
+      void operator()(const increment_log_prob_statement& x) const {
+        generate_indent(indent_,o_);
+        o_ << "lp_accum__.add(";
+        generate_expression(x.log_prob_,o_);
+        o_ << ");" << EOL;
       }
       void operator()(const statements& x) const {
         bool has_local_vars = x.local_decl_.size() > 0;
@@ -1582,7 +1588,8 @@ namespace stan {
       o << INDENT2 << "T__ DUMMY_VAR__(std::numeric_limits<double>::quiet_NaN());" << EOL;
       o << INDENT2 << "(void) DUMMY_VAR__;  // suppress unused var warning" << EOL2;
 
-      o << INDENT2 << "T__ lp__(0.0);" << EOL2;
+      o << INDENT2 << "T__ lp__(0.0);" << EOL;
+      o << INDENT2 << "stan::math::accumulator<T__> lp_accum__;" << EOL2;
 
       bool is_var = true;
 
@@ -1612,7 +1619,8 @@ namespace stan {
       generate_comment("model body",2,o);
       generate_statement(p.statement_,2,o,include_sampling,is_var);
       o << EOL;
-      o << INDENT2 << "return lp__;" << EOL2;
+      o << INDENT2 << "lp_accum__.add(lp__);" << EOL;
+      o << INDENT2 << "return lp_accum__.sum();" << EOL2;
       o << INDENT << "} // log_prob()" << EOL2;
     }
 
@@ -3466,6 +3474,7 @@ namespace stan {
                        2,o);
       o << INDENT2 <<  "double lp__ = 0.0;" << EOL;
       suppress_warning(INDENT2, "lp__", o);
+      o << INDENT2 << "stan::math::accumulator<double> lp_accum__;" << EOL2;
       bool is_var = false;
       generate_local_var_decls(prog.derived_decl_.first,2,o,is_var); 
       o << EOL;
@@ -3802,6 +3811,7 @@ namespace stan {
       generate_comment("declare and define transformed parameters",2,o);
       o << INDENT2 <<  "double lp__ = 0.0;" << EOL;
       suppress_warning(INDENT2, "lp__", o);
+      o << INDENT2 << "stan::math::accumulator<double> lp_accum__;" << EOL2;
       bool is_var = false;
       generate_local_var_decls(prog.derived_decl_.first,2,o,is_var); 
       o << EOL;
