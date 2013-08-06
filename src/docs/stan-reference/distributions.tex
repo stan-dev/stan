@@ -316,21 +316,40 @@ then for $n \in \setlist{\max(0,N-b),\ldots,\min(a,N)}$,
 
 \section{Categorical Distribution}
 
-\subsubsection{Probability Mass Function}
+\subsubsection{Probability Mass Functions}
 
-If $N \in \nats$ and $\theta \in \mbox{$N$-simplex}$, then for $y \in
+If $N \in \nats$, $N > 0$, and $\theta \in \mbox{$N$-simplex}$, then for $y \in
 \setlist{1,\ldots,N}$, 
+%
 \[
-\distro{Categorical}(y|\theta) = \theta_n.
+\distro{Categorical}(y|\theta) = \theta_y.
 \]
+%
+In addition, Stan provides a log-odds scaled categorical distribution, 
+%
+\[
+\distro{CategoricalLogit}(y|\beta)
+= \distro{Categorical}(y|\mbox{softmax}(\beta)).
+\]
+%
+See \refsection{softmax} for the definition of the softmax function.
 
 
 \subsubsection{Stan Functions}
 
+All of the categorical distributions are vectorized so that the
+outcome \farg{y} can be a single integer (type \code{int}) or an array
+of integers (type \code{int[]}).
+
 \begin{description}
-\fitem{real}{categorical\_log}{int \farg{y}, vector \farg{theta}}{The
-  log categorical probability mass function with outcome \farg{y} in 
-$1:N$ given $N$-simplex distribution parameter \farg{theta}}
+\fitem{real}{categorical\_log}{ints \farg{y}, vector \farg{theta}}{The
+  log categorical probability mass function with outcome(s) \farg{y} in 
+$1:N$ given $N$-simplex distribution parameter \farg{theta}.}
+%
+\fitem{real}{categorical\_logit\_log}{ints \farg{y}, vector
+  \farg{beta}}{The log categorical probability mass function with
+  outcome(s) \farg{y} in $1:N$ given log-odds of outcomes \farg{beta}.}
+%
 \end{description}
 %
 \begin{description}
@@ -1679,7 +1698,7 @@ may only be used in generated quantities block}
 \end{description}
 
 
-\section{Guassian Dynamic Linear Models}
+\section{Gaussian Dynamic Linear Models}
 \label{sec:guass-dynam-line}
 
 A Gaussian Dynamic Linear model is defined as follows,

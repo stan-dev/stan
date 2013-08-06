@@ -1328,6 +1328,17 @@ This is a specialization of tcrossprod(x) for lower-triangular matrices.}
 
 \section{Reductions}
 
+\subsection{Log Sum of Exponents}
+
+\begin{description}
+\fitem{real}{log\_sum\_exp}{vector \farg{x}}{
+The natural logarithm of the sum of the exponentials of the elements in \farg{x}}
+\fitem{real}{log\_sum\_exp}{row\_vector \farg{x}}{
+The natural logarithm of the sum of the exponentials of the elements in \farg{x}}
+\fitem{real}{log\_sum\_exp}{matrix \farg{x}}{
+The natural logarithm of the sum of the exponentials of the elements in \farg{x}}
+\end{description}
+
 \subsection{Minimum and Maximum}
 
 \begin{description}
@@ -1609,7 +1620,7 @@ arbitrary subvector.
 
 \section{Special Matrix Functions}\label{softmax.section}
 
-The softmax function maps $\reals^K$ to the $K$-simplex by
+The softmax function maps $y \in \reals^K$ to the $K$-simplex by
 \[
 \mbox{softmax}(y)
  = \frac{\exp(y)}
@@ -1617,10 +1628,54 @@ The softmax function maps $\reals^K$ to the $K$-simplex by
 \]
 %
 where $\exp(y)$ is the componentwise exponentiation of $y$.
-
+%
+Softmax is usually calculated on the log scale, 
+\[
+\log \mbox{softmax}(y)
+ \ = \ y - \log \sum_{k=1}^K \exp(y_k)
+ \ = \ y - \mbox{log\_sum\_exp}(y).
+\]
+%
+The entries in the Jacobian of the softmax function are given by
+\[
+\begin{array}{l}
+\displaystyle
+\frac{\partial}{\partial y_m} \mbox{softmax}(y)[k]
+\\[8pt]
+\displaystyle
+\mbox{ } \ \ \ = \left\{ 
+\begin{array}{ll}
+\mbox{softmax}(y)[k] - \mbox{softmax}(y)[k] \times \mbox{softmax}(y)[m]
+& \mbox{ if } m = k, \mbox{ and}
+\\[6pt]
+\mbox{softmax}(y)[k] * \mbox{softmax}(y)[m]
+& \mbox{ if } m \neq k.
+\end{array}
+\right.
+\end{array}
+\]
+For the log softmax function, the entries are
+\[
+\frac{\partial}{\partial y_m} \mbox{softmax}(y)[k]
+= \left\{ 
+\begin{array}{ll}
+1 - \mbox{softmax}(y)[m]
+& \mbox{ if } m = k, \mbox{ and}
+\\[6pt]
+\mbox{softmax}(y)[m]
+& \mbox{ if } m \neq k.
+\end{array}
+\right.
+\]
+%
+Stan provides the following functions for softmax and its log.
+%
 \begin{description}
 \fitem{vector}{softmax}{vector \farg{x}}{
 The softmax of \farg{x}}
+%
+\fitem{vector}{log\_softmax}{vector \farg{x}}{
+The natural logarithm of the softmax of \farg{x}}
 \end{description}
 %
 
