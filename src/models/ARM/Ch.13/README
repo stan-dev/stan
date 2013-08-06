@@ -1,0 +1,56 @@
+Data
+====
+
+1. earnings.data.R
+- N         : number of observations
+- n_eth     : number of ethnic categories
+- n_age     : number of age categories
+- height    : height
+- earn      : earnings
+- y         : adjusted y value
+- x         : heights
+- x_centered: centered heights
+- age       : age category
+- eth       : ethnicity category
+
+2. pilots.data.R
+- N          : number of observations
+- n_scenarios: number of scenarios
+- n_groups   : number of groups
+- scenario_id: scenario id
+- group_id   : group id
+- y          : score
+
+3. radon.data.R
+- N     : number of observations
+- J     : number of counties
+- radon : radon measurement
+- x     : house-level first-floor indicator
+- y     : log of the home radon level
+- county: county number
+- u     : county-level uranium measure
+
+Models
+======
+
+1. One predictor
+radon_complete_pool.stan: lm(y ~ x)
+y_x.stan                : lm(y ~ x)
+
+2. Multilevel model with varying slope and intercept
+earnings_vary_si.stan: lmer(log(earn) ~ 1 + (1 + height | eth))
+radon_vary_si.stan   : lmer(y ~ 1 + (1 + x | county))
+radon_inter_vary.stan: lmer(y ~ u + u:x + (1 + x | county))
+
+3. Multilevel model with several group level predictors
+earnings_latin_square.stan: lmer(y ~ 1 + (1 + x | eth) + (1 + x | age) 
+				     + (1 + x | eth:age))
+pilots.stan               : lmer(y ~1 + (1 | group) + (1 | scenario))
+
+4. Above models with Matt trick
+earnings_vary_si_chr.stan     : lmer(log(earn) ~ 1 + (1 + height | eth))
+earnings_latin_square_chr.stan: lmer(y ~ 1 + (1 + x | eth) + (1 + x | age) 
+				         + (1 + x | eth:age))
+pilots_chr.stan               : lmer(y ~1 + (1 | group) + (1 | scenario))
+radon_vary_si_chr.stan        : lmer(y ~ 1 + (1 + x | county))
+radon_inter_vary_chr.stan     : lmer(y ~ u + u:x + (1 + x | county))

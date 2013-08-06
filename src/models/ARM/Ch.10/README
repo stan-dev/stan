@@ -1,0 +1,62 @@
+Data
+====
+
+1. ideo_incs.data.R
+- N     : number of observations
+- score1: effect of election results
+- party : party association? 1: Republican, 0: Democrat
+- x     : pretreatment variable
+
+2. ideo_overlap.data.R
+- N     : number of observations
+- score1: effect of election results
+- party : party association? 1: Republican, 0: Democrat
+- x     : pretreatment variable
+
+3. ideo_reparam.data.R
+- N     : number of observations
+- score1: effect of election results
+- party : party association? 1: Republican, 0: Democrat
+- z1    : reparameterized term 1
+- z2	: reparameterized term 2
+
+4. sesame.data.R
+- N          : number of observations
+- y          : post test scores
+- watched    : watched Sesame Street? 1: Yes, 0: No
+- encouraged : encouraged to watch? 1: Yes, 0: No
+- watched_hat: estimated casual effect of watching sesame street
+
+5. sesame_one_pred_2b.data.R
+- N          : number of observations
+- y          : post test scores
+- watched    : watched Sesame Street? 1: Yes, 0: No
+- encouraged : encouraged to watch? 1: Yes, 0: No
+- watched_hat: estimated casual effect of watching sesame street
+
+6. sesame_multi_preds_3b.data.R
+- N          : number of observations
+- y          : post test scores
+- watched    : watched Sesame Street? 1: Yes, 0: No
+- encouraged : encouraged to watch? 1: Yes, 0: No
+- watched_hat: estimated casual effect of watching sesame street
+- pretest    : pre test scores
+- site       : site category
+- setting    : setting category
+
+Models
+======
+
+1. One predictor
+sesame_one_pred_a.stan : lm(watched ~ encouraged)
+sesame_one_pred_b.stan : lm(y ~ encouraged)
+sesame_one_pred_2b.stan: lm(y ~ watched_hat)
+
+3. Multiple predictors without interaction
+sesame_mult_preds_3a.stan: lm(y ~ encouraged + pretest + factor(site) + setting)
+sesame_mult_preds_3b.stan: lm(y ~ watched_hat + pretest + factor(site) + setting)
+ideo_two_pred.stan       : lm(score1 ~ party + x)
+ideo_reparam.stan        : lm(score1 ~ party + z1 + z2)
+
+3. Multiple predictors with interaction
+ideo_interactions.stan: lm(score1 ~ party + x + party:x)
