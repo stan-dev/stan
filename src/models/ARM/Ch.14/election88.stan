@@ -18,7 +18,7 @@ transformed parameters {
     y_hat[i] <- b[1] * black[i] + b[2] * female[i] + a[state[i]];
 } 
 model {
-  mu_a ~ normal(0, .0001);
+  mu_a ~ normal(0, 100);
   sigma_a ~ uniform(0, 100);
   a ~ normal (mu_a, sigma_a);
 

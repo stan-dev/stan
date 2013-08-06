@@ -35,9 +35,9 @@ model {
   sigma_y ~ uniform(0, 100);
   sigma_d ~ uniform(0, 100);
   sigma_g ~ uniform(0, 100);
-  mu ~ normal(0, .0001);
-  mu_g ~ normal(0, .0001);
-  mu_d ~ normal(0, .0001);
+  mu ~ normal(0, 100);
+  mu_g ~ normal(0, 100);
+  mu_d ~ normal(0, 100);
   g ~ normal(mu_g, sigma_g);
   d ~ normal(mu_d, sigma_d);
   y ~ normal(y_hat, sigma_y);

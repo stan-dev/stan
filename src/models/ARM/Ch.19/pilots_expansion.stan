@@ -37,10 +37,10 @@ model {
   sigma_d_raw ~ uniform(0, 100);
   sigma_g_raw ~ uniform(0, 100);
   xi_g ~ uniform(0, 100);
-  xi_d ~ normal(0, .0001);
-  mu ~ normal(0, .0001);
-  mu_g_raw ~ normal(0, .0001);
-  mu_d_raw ~ normal(0, .0001);
+  xi_d ~ normal(0, 100);
+  mu ~ normal(0, 100);
+  mu_g_raw ~ normal(0, 100);
+  mu_d_raw ~ normal(0, 100);
   g_raw ~ normal(mu_g_raw, sigma_g_raw);
   d_raw ~ normal(mu_d_raw, sigma_d_raw);
   y ~ normal(y_hat, sigma_y);

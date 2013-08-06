@@ -40,18 +40,18 @@ transformed parameters {
     p[i] <- (g[k[i]]*(a[j[i]] - b[k[i]]));
 }
 model {
-  mu_a_raw ~ normal(0, .0001);
+  mu_a_raw ~ normal(0, 100);
   sigma_a_raw ~ uniform(0, 100);
   a_raw ~ normal(mu_a_raw, sigma_a_raw);
 
   sigma_b_raw ~ uniform(0,100);
   b_raw ~ normal(b_hat_raw, sigma_b_raw);
 
-  mu_g_raw ~ normal(0, .0001);
+  mu_g_raw ~ normal(0, 100);
   sigma_g_raw ~ uniform(0, 100);
   g_raw ~ normal(mu_g_raw, sigma_g_raw);
-  b_0_raw ~ normal(0, .0001);
-  d_raw ~ normal(0, .0001);
+  b_0_raw ~ normal(0, 100);
+  d_raw ~ normal(0, 100);
 
   y ~ bernoulli_logit(p);
 }

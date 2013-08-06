@@ -24,10 +24,13 @@ transformed parameters {
 } 
 model {
   mu_a ~ normal(0, 100);
+  sigma_a ~ uniform(0, 100);
   a ~ normal (mu_a, sigma_a);
 
   mu_b ~ normal(0, 100);
+  sigma_b ~ uniform(0, 100);
   b ~ normal (mu_b, sigma_b);
 
+  sigma_y ~ uniform(0, 100);
   log_earn ~ normal(y_hat, sigma_y);
 }

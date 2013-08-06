@@ -23,7 +23,7 @@ transformed parameters {
 }
 model {
   sigma_y ~ uniform(0, 100);
-  mu ~ normal(0, .0001);
+  mu ~ normal(0, 100);
   mu_eta ~ normal(0, 100);
   sigma_eta ~ uniform(0, 100);
   et ~ normal (0, 1);

@@ -27,7 +27,6 @@ parameters {
   real<lower=0> sigma_age_edu;
   real<lower=0> sigma_region;
   real<lower=0> sigma_state;
-  real<lower=0> sigma_beta;
   vector[n_age] b_age;
   vector[n_edu] b_edu;
   vector[n_state] b_state;
@@ -62,25 +61,24 @@ transformed parameters {
     b_state_hat[j] <- b_region[region[j]] + b_v_prev*v_prev[j];
 }
 model {  
-  mu_age ~ normal(0, .0001);
-  mu_edu ~ normal(0, .0001);
-  mu_age_edu ~ normal(0, .0001);
-  mu_region ~ normal(0, .0001);
-  mu ~ normal(0, .0001);
+  mu_age ~ normal(0, 100);
+  mu_edu ~ normal(0, 100);
+  mu_age_edu ~ normal(0, 100);
+  mu_region ~ normal(0, 100);
+  mu ~ normal(0, 100);
   sigma_age ~ uniform(0, 100);
   sigma_edu ~ uniform(0, 100);
   sigma_age_edu ~ uniform(0, 100);
   sigma_region ~ uniform(0, 100);
-  sigma_beta ~ uniform(0, 100);
   sigma_state ~ uniform(0, 100);
 
-  beta ~ normal(0, sigma_beta);
+  beta ~ normal(0, 100);
   b_age ~ normal(mu_age, sigma_age);
   b_edu ~ normal(mu_edu, sigma_edu);
   b_age_edu ~ normal(mu_age_edu,sigma_age_edu);
   b_state ~ normal(b_state_hat, sigma_state);
 
-  b_v_prev ~ normal(0, .0001);
+  b_v_prev ~ normal(0, 100);
   b_region ~ normal(mu_region, sigma_region);
 
   y ~ bernoulli_logit(Xbeta);

@@ -21,9 +21,9 @@ transformed parameters {
     y_hat[i] <- a[pair[i]] + beta * treatment[i];
 }
 model {
-  mu_a ~ normal(0, .0001);
+  mu_a ~ normal(0, 100);
   sigma_a ~ uniform(0, 100);
-  mu_beta ~ normal(0, .0001);
+  mu_beta ~ normal(0, 100);
   sigma_beta ~ uniform(0, 100);
   sigma_y ~ uniform(0, 100);
 

@@ -36,13 +36,20 @@ transformed parameters {
 } 
 model {
   mu_a ~ normal(0, 100);
-  a ~ normal(mu_a, sigma_a);
+  sigma_a ~ uniform(0, 100);
+  for (i in 1:n_eth)
+    a[i] ~ normal(mu_a, sigma_a);
 
   mu_b ~ normal(0, 100);
-  b ~ normal (mu_b, sigma_b);
+  sigma_b ~ uniform(0, 100);
+  for (i in 1:n_age)
+    b[i] ~ normal (mu_b, sigma_b);
 
   mu_c ~ normal(0, 100);
-  c ~ normal (mu_c, sigma_c);
+  sigma_c ~ uniform(0, 100);
+  for (i in 1:n_eth_age)
+    c[i] ~ normal (mu_c, sigma_c);
 
+  sigma_y ~ uniform(0, 100);
   y ~ normal(y_hat, sigma_y);
 }

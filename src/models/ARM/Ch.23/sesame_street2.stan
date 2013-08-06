@@ -56,8 +56,8 @@ model {
   sigma_y ~ uniform (0, 100);               
   sigma_t ~ uniform (0, 100);                  
   rho_yt ~ uniform(-1, 1);
-  d ~ normal (0, .001);
-  b ~ normal (0, .001);
+  d ~ normal (0, 100);
+  b ~ normal (0, 100);
   phi_y ~ normal(0, sigma_py);
   phi_y ~ normal(0, sigma_pt);
 
@@ -65,8 +65,8 @@ model {
   sigma_a ~ uniform (0, 100);
   sigma_g ~ uniform (0, 100);
   rho_ag ~ uniform(-1,1);
-  mu_ag[1] ~ normal (0, .001);
-  mu_ag[2] ~ normal (0, .001);
+  mu_ag[1] ~ normal (0, 100);
+  mu_ag[2] ~ normal (0, 100);
 
   //data model
   for (i in 1:N)

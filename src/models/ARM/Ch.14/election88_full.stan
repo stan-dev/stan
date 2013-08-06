@@ -27,7 +27,6 @@ parameters {
   real<lower=0> sigma_c;
   real<lower=0> sigma_d;
   real<lower=0> sigma_e;
-  real<lower=0> sigma_beta;
 }
 transformed parameters {
   vector[N] y_hat;
@@ -53,8 +52,7 @@ model {
   sigma_e ~ uniform(0, 100);
   e ~ normal (0, sigma_e);
 
-  sigma_beta ~ uniform(0, 100);
-  beta ~ normal(0, sigma_beta);
+  beta ~ normal(0, 100);
 
   y ~ bernoulli_logit(y_hat);
 }

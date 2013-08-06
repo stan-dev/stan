@@ -33,13 +33,13 @@ transformed parameters {
   e_y <- y - y_hat;
 }
 model {
-  g_0 ~ normal(0, .0001);
-  g_1 ~ normal(0, .0001);
+  g_0 ~ normal(0, 100);
+  g_1 ~ normal(0, 100);
 
   sigma_a ~ uniform(0, 100);
   a ~ normal (a_hat, sigma_a);
 
-  mu_b ~ normal(0, .0001);
+  mu_b ~ normal(0, 100);
   sigma_b ~ uniform(0, 100);
   b ~ normal (mu_b, sigma_b);
 

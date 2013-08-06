@@ -29,7 +29,6 @@ parameters {
   real<lower=0> sigma_region_raw;
   real<lower=0> sigma_state_raw;
   real<lower=0> sigma_age_edu_raw;
-  real<lower=0> sigma_beta;
   real<lower=0> xi_age;
   real<lower=0> xi_edu;
   real<lower=0> xi_age_edu;
@@ -78,23 +77,22 @@ transformed parameters {
     b_state_hat[j] <- b_region_raw[region[j]] + b_v_prev_raw*v_prev[j];
 }
 model {
-  mu ~ normal (0, .0001);
-  mu_age_edu ~ normal(0, .0001);
+  mu ~ normal (0, 100);
+  mu_age_edu ~ normal(0, 100);
   sigma_age_raw ~ uniform(0, 100);
   sigma_edu_raw ~ uniform(0, 100);
   sigma_age_edu ~ uniform(0, 100);
   sigma_state_raw ~ uniform(0, 100);
   sigma_region_raw ~ uniform(0, 100);
   sigma_age_edu_raw ~ uniform(0, 100);
-  sigma_beta ~ uniform(0, 100);
 
   b_age_raw ~ normal(0, sigma_age_raw);
   b_edu_raw ~ normal(0, sigma_edu_raw);
   b_age_edu ~ normal(mu_age_edu,sigma_age_edu);
   b_state_raw ~ normal(b_state_hat, sigma_state_raw);
-  beta ~ normal(0, sigma_beta);
+  beta ~ normal(0, 100);
 
-  b_v_prev_raw ~ normal(0, .0001);
+  b_v_prev_raw ~ normal(0, 100);
   b_region_raw ~ normal(0, sigma_region_raw);
 
   xi_age ~ uniform (0, 100);

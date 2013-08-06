@@ -41,7 +41,7 @@ model {
   sigma_b1 ~ uniform (0, 100);               
   sigma_b2 ~ uniform (0, 100);                  
   rho_b ~ uniform(-1, 1);
-  mu_beta ~ normal(0, .0001);
+  mu_beta ~ normal(0, 100);
 
   for (i in 1:n_dogs)
     transpose(b_neg[i]) ~ multi_normal_prec(mu_beta,Sigma_b);

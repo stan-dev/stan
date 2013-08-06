@@ -18,9 +18,9 @@ transformed parameters {
 }
 model {
   sigma_eta ~ inv_gamma(1, 1); //prior distribution can be changed to uniform
-  mu_theta ~ normal(0, .0001);
+  mu_theta ~ normal(0, 100);
 
   eta ~ normal(0, sigma_eta);
-  xi ~ normal(0, 0.04);
+  xi ~ normal(0, 5);
   y ~ normal(theta,sigma_y);
 }
