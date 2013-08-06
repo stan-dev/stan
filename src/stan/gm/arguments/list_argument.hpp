@@ -1,7 +1,9 @@
 #ifndef __STAN__GM__ARGUMENTS__LIST__ARGUMENT__BETA__
 #define __STAN__GM__ARGUMENTS__LIST__ARGUMENT__BETA__
 
+#include <iostream>
 #include <stan/gm/arguments/valued_argument.hpp>
+#include <stan/gm/arguments/arg_fail.hpp>
 
 namespace stan {
   
@@ -10,6 +12,10 @@ namespace stan {
     class list_argument: public valued_argument {
       
     public:
+      
+      list_argument() {
+        _value_type = "list element";
+      }
       
       ~list_argument() {
         
@@ -61,15 +67,17 @@ namespace stan {
           return false;
         }
         else if(_name == name) {
-          
+         
           args.pop_back();
           
           bool good_arg = false;
+          bool valid_arg = true;
+          
           for (int i = 0; i < _values.size(); ++i) {
             if( _values.at(i)->name() != value) continue;
             
             _cursor = i;
-            _values.at(_cursor)->parse_args(args, out, err, help_flag);
+            valid_arg &= _values.at(_cursor)->parse_args(args, out, err, help_flag);
             good_arg = true;
             break;
           }
@@ -82,14 +90,72 @@ namespace stan {
             }
             
             args.clear();
-            return false;
           }
+          
+          return valid_arg && good_arg;
           
         }
         
         return true;
         
       };
+
+      virtual void probe_args(argument* base_arg, std::stringstream& s) {
+
+        for (int i = 0; i < _values.size(); ++i) {
+          _cursor = i;
+          
+          s << "good" << std::endl;
+          base_arg->print(&s, 0, '\0');
+          s << std::endl;
+          
+          //_values.at(i)->probe_args(base_arg, prefix + name() + "_");
+          _values.at(i)->probe_args(base_arg, s);
+        }
+        
+        _values.push_back(new arg_fail);
+        _cursor = _values.size() - 1;
+        s << "bad" << std::endl;
+        base_arg->print(&s, 0, '\0');
+        s << std::endl;
+        
+        _values.pop_back();
+        _cursor = _default_cursor;
+        
+        /*
+        for (int i = 0; i < _values.size(); ++i) {
+          _cursor = i;
+          
+          std::ofstream output;
+          std::string file_name = prefix + "good.config";
+          output.open(file_name.data());
+          base_arg->print(&output, 0, '\0');
+          output.close();
+          
+          _values.at(i)->probe_args(base_arg, prefix + name() + "_");
+        }
+        
+        _values.push_back(new arg_fail);
+        _cursor = _values.size() - 1;
+        std::ofstream output;
+        std::string file_name = prefix + "bad.config";
+        output.open(file_name.data());
+        base_arg->print(&output, 0, '\0');
+        output.close();
+        
+        _values.pop_back();
+        _cursor = _default_cursor;
+        */
+        
+      }
+      
+      bool valid_value(std::string name) {
+        for (std::vector<argument*>::iterator it = _values.begin();
+             it != _values.end(); ++it)
+          if (name == (*it)->name())
+            return true;
+        return false;
+      }
       
       argument* arg(std::string name) {
         if(name == _values.at(_cursor)->name())
@@ -98,6 +164,8 @@ namespace stan {
           return 0;
       }
       
+      std::vector<argument*> values() { return _values; }
+      
       std::string value() { return _values.at(_cursor)->name(); }
       
       std::string print_value() { return _values.at(_cursor)->name(); }
@@ -105,9 +173,12 @@ namespace stan {
       std::string print_valid() {
         std::string valid_values;
         
-        for (std::vector<argument*>::iterator it = _values.begin();
-             it != _values.end(); ++it)
-          valid_values += " " + (*it)->name();
+        std::vector<argument*>::iterator it = _values.begin();
+        valid_values += " " + (*it)->name();
+        ++it;
+        
+        for (; it != _values.end(); ++it)
+          valid_values += ", " + (*it)->name();
         
         return valid_values;
         

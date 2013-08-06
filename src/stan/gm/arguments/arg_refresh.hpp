@@ -17,6 +17,9 @@ namespace stan {
         _validity = "0 < refresh";
         _default = "100";
         _default_value = 100;
+        _constrained = true;
+        _good_value = 2.0;
+        _bad_value = -1.0;
         _value = _default_value;
       };
       

@@ -17,6 +17,9 @@ namespace stan {
         _validity = "0 < kappa";
         _default = "0.75";
         _default_value = 0.75;
+        _constrained = true;
+        _good_value = 2.0;
+        _bad_value = -1.0;
         _value = _default_value;
       };
       

@@ -1,5 +1,6 @@
 #include <stan/gm/arguments/categorical_argument.hpp>
 #include <gtest/gtest.h>
+#include <stan/gm/arguments/singleton_argument.hpp>
 
 class StanGmArgumentsCategoricalArgument : public testing::Test {
 public:
@@ -82,7 +83,7 @@ TEST_F(StanGmArgumentsCategoricalArgument,parse_args_unexpected) {
   help_flag = false;
   return_value = arg->parse_args(args,0,0,help_flag);
   
-  EXPECT_FALSE(return_value);
+  EXPECT_TRUE(return_value);
   EXPECT_FALSE(help_flag);
   EXPECT_EQ(1, args.size());
   
@@ -94,7 +95,7 @@ TEST_F(StanGmArgumentsCategoricalArgument,parse_args_unexpected) {
   help_flag = false;
   return_value = arg->parse_args(args,0,0,help_flag);
   
-  EXPECT_FALSE(return_value);
+  EXPECT_TRUE(return_value);
   EXPECT_FALSE(help_flag);
   EXPECT_EQ(2, args.size());
 
@@ -117,9 +118,66 @@ TEST_F(StanGmArgumentsCategoricalArgument,parse_args_unexpected) {
   help_flag = false;
   return_value = arg->parse_args(args,0,0,help_flag);
   
-  EXPECT_FALSE(return_value);
+  EXPECT_TRUE(return_value);
   EXPECT_FALSE(help_flag);
   EXPECT_EQ(1, args.size());
+}
+
+TEST_F(StanGmArgumentsCategoricalArgument, parse_args_with_1_singleton) {
+  bool return_value;
+  std::vector<std::string> args;
+  bool help_flag;
+  
+  dynamic_cast<stan::gm::categorical_argument*>(arg)
+    ->subarguments().push_back(new stan::gm::singleton_argument<std::string>("foo"));
+
+  return_value = false;
+  args.clear();
+  args.push_back("foo");
+  help_flag = false;
+  return_value = arg->parse_args(args,0,0,help_flag);
+  
+  EXPECT_TRUE(return_value)
+    << "called with 'foo'";
+  EXPECT_FALSE(help_flag)
+    << "called with 'foo'";
+  
+  return_value = false;
+  args.clear();
+  args.push_back("bar");
+  help_flag = false;
+  return_value = arg->parse_args(args,0,0,help_flag);
+  
+  EXPECT_TRUE(return_value)
+    << "called with 'bar'";
+  EXPECT_FALSE(help_flag)
+    << "called with 'bar'";
+
+
+  return_value = false;
+  args.clear();
+  args.push_back("help");
+  args.push_back("foo");
+  help_flag = false;
+  return_value = arg->parse_args(args,0,0,help_flag);
+  
+  EXPECT_TRUE(return_value)
+    << "called with 'foo help'";
+  EXPECT_TRUE(help_flag)
+    << "called with 'foo help'";
+
+  return_value = false;
+  args.clear();
+  args.push_back("help");
+  args.push_back("bar");
+  help_flag = false;
+  return_value = arg->parse_args(args,0,0,help_flag);
+  
+  EXPECT_TRUE(return_value)
+    << "called with 'bar help'";
+  EXPECT_FALSE(help_flag)
+    << "called with 'bar help'";
+  
 }
 
 TEST_F(StanGmArgumentsCategoricalArgument,arg) {

@@ -5,6 +5,7 @@
 
 #include <stan/gm/arguments/arg_sample.hpp>
 #include <stan/gm/arguments/arg_optimize.hpp>
+#include <stan/gm/arguments/arg_diagnose.hpp>
 
 namespace stan {
   
@@ -17,11 +18,11 @@ namespace stan {
       arg_method() {
         
         _name = "method";
-        _short_description = "Analysis method";
-        _description = "Analysis method";
+        _description = "Analysis method (Note that method= is optional)";
         
         _values.push_back(new arg_sample());
         _values.push_back(new arg_optimize());
+        _values.push_back(new arg_diagnose());
         
         _default_cursor = 0;
         _cursor = _default_cursor;

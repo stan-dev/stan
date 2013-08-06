@@ -17,6 +17,9 @@ namespace stan {
         _validity = "0 < int_time";
         _default = "2 * pi";
         _default_value = 6.28318530717959;
+        _constrained = true;
+        _good_value = 2.0;
+        _bad_value = -1.0;
         _value = _default_value;
       };
       

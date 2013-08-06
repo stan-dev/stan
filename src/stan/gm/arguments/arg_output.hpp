@@ -21,8 +21,7 @@ namespace stan {
       arg_output() {
         
         _name = "output";
-        _short_description = "File output options";
-        _description = "File Output Options";
+        _description = "File output options";
         
         _subarguments.push_back(new arg_sample_file());
         _subarguments.push_back(new arg_append_sample());

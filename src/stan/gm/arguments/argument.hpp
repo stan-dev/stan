@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <string>
-#include <fstream>
+#include <sstream>
 #include <iomanip>
 
 namespace stan {
@@ -22,12 +22,9 @@ namespace stan {
           help_width(20) { }
 
       virtual ~argument() { }
-
+      
       std::string name() const { 
         return _name; 
-      }
-      std::string short_description() const {
-        return _short_description;
       }
       
       std::string description() const { 
@@ -43,6 +40,8 @@ namespace stan {
                               bool& help_flag) { 
         return true; 
       }
+      
+      virtual void probe_args(argument* base_arg, std::stringstream& s) {};
       
       static void split_arg(const std::string& arg, std::string& name, std::string& value) {
         size_t pos = arg.find('=');
@@ -63,7 +62,6 @@ namespace stan {
       
     protected:
       std::string _name;
-      std::string _short_description;
       std::string _description;
     
       int indent_width;

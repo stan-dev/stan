@@ -33,26 +33,24 @@ namespace stan {
       }
       
       void print_help(std::ostream* s, const int depth, const bool recurse) {
+        
         if (!s) 
           return;
         
         std::string indent(indent_width * depth, ' ');
         std::string subindent(indent_width, ' ');
         
-        *s << std::setiosflags(std::ios_base::left) << std::setw(help_width)
-           << (indent + _name);
-        *s << _short_description << std::endl;
-        
-        /*
-        
         *s << indent << _name << std::endl;
         *s << indent << subindent << _description << std::endl;
         if (_subarguments.size() > 0) {
           *s << indent << subindent << "Valid subarguments:";
           
-          for (std::vector<argument*>::iterator it = _subarguments.begin();
-               it != _subarguments.end(); ++it)
-            *s << " " << (*it)->name();
+          std::vector<argument*>::iterator it = _subarguments.begin();
+          *s << " " << (*it)->name();
+          ++it;
+          
+          for (; it != _subarguments.end(); ++it)
+            *s << ", " << (*it)->name();
           *s << std::endl << std::endl;
         
           if (recurse) {
@@ -61,17 +59,20 @@ namespace stan {
               (*it)->print_help(s, depth + 1, true);
           }
         }
-        */
+        else {
+          *s << std::endl;
+        }
+         
       }
       
       bool parse_args(std::vector<std::string>& args, std::ostream* out,
                       std::ostream* err, bool& help_flag) {
-        
+
         bool good_arg = true;
         bool valid_arg = true;
         
         while(good_arg) {
-          if (args.size() == 0) 
+          if (args.size() == 0)
             return valid_arg;
           
           good_arg = false;
@@ -94,22 +95,38 @@ namespace stan {
           std::string val;
           split_arg(cat_name, val_name, val);
           
+          if (_subarguments.size() == 0)
+            valid_arg = true;
           for (std::vector<argument*>::iterator it = _subarguments.begin();
                it != _subarguments.end(); ++it) {
-            
             if ( (*it)->name() == cat_name) {
               args.pop_back();
               valid_arg &= (*it)->parse_args(args, out, err, help_flag);
               good_arg = true;
+              break;
             } else if ( (*it)->name() == val_name ) {
               valid_arg &= (*it)->parse_args(args, out, err, help_flag);
               good_arg = true;
-            }             
+              break;
+            } else {
+              good_arg = false;
+            }
           }
         }
-        
-        return valid_arg & good_arg;
+        return valid_arg;
       };
+      
+      virtual void probe_args(argument* base_arg, std::stringstream& s) {
+        for (std::vector<argument*>::iterator it = _subarguments.begin();
+             it != _subarguments.end(); ++it) {
+          //(*it)->probe_args(base_arg, prefix + "_" + name());
+          (*it)->probe_args(base_arg, s);
+        }
+      }
+      
+      std::vector<argument*>& subarguments() {
+        return _subarguments;
+      }
       
       argument* arg(const std::string name) {
         for (std::vector<argument*>::iterator it = _subarguments.begin();

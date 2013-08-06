@@ -1,6 +1,7 @@
 #ifndef __STAN__GM__ARGUMENTS__SINGLETON__ARGUMENT__BETA__
 #define __STAN__GM__ARGUMENTS__SINGLETON__ARGUMENT__BETA__
 
+#include <iostream>
 #include <boost/lexical_cast.hpp>
 #include <stan/gm/arguments/valued_argument.hpp>
 
@@ -8,18 +9,49 @@ namespace stan {
   
   namespace gm {
     
+    template <typename T>
+    struct type_name {
+      static std::string name() { return typeid(T).name(); }
+    };
+    
+    // Specialize to something more readable
+    template <>
+    struct type_name<int> {
+      static std::string name() { return "int"; }
+    };
+    
+    template <>
+    struct type_name<unsigned int> {
+      static std::string name() { return "unsigned int"; }
+    };
+    
+    template <>
+    struct type_name<double> {
+      static std::string name() { return "double"; }
+    };
+    
+    template <>
+    struct type_name<bool> {
+      static std::string name() { return "boolean"; }
+    };
+    
+    template <>
+    struct type_name<std::string> {
+      static std::string name() { return "string"; }
+    };
+    
     template<typename T>
     class singleton_argument: public valued_argument {
       
     public:
       
-      singleton_argument()
-        : _validity("All") { 
+      singleton_argument(): _validity("All") {
+        _constrained = false;
         _name = "";
+        _value_type = type_name<T>::name();
       }
       
-      singleton_argument(const std::string name)
-        : _validity("All") {
+      singleton_argument(const std::string name): _validity("All") {
         _name = name;
       }
 
@@ -41,11 +73,12 @@ namespace stan {
         split_arg(args.back(), name, value);
         
         if (_name == name) {
+          
           args.pop_back();
           
           T proposed_value = boost::lexical_cast<T>(value);
           
-          if (!set_value(boost::lexical_cast<T>(value))) {
+          if (!set_value(proposed_value)) {
             
             if (err) {
               *err << proposed_value << " is not a valid value for "
@@ -60,6 +93,45 @@ namespace stan {
           
         }
         return true;
+      }
+      
+      virtual void probe_args(argument* base_arg, std::stringstream& s) {
+
+        s << "good" << std::endl;
+        _value = _good_value;
+        base_arg->print(&s, 0, '\0');
+        s << std::endl;
+        
+        if (_constrained) {
+          s << "bad" << std::endl;
+          _value = _bad_value;
+          base_arg->print(&s, 0, '\0');
+          s << std::endl;
+        }
+
+        _value = _default_value;
+        
+        /*
+        std::ofstream output;
+        std::string file_name = prefix + "_" + name() + "_good.config";
+        
+        output.open(file_name.data());
+        _value = _good_value;
+        base_arg->print(&output, 0, '\0');
+        output.close();
+        
+        if (_constrained) {
+          std::ofstream output;
+          std::string file_name = prefix + "_" + name() + "_bad.config";
+          output.open(file_name.data());
+          _value = _bad_value;
+          base_arg->print(&output, 0, '\0');
+          output.close();
+        }
+        
+        _value = _default_value;
+        */
+        
       }
       
       T value() { return _value; }
@@ -95,10 +167,16 @@ namespace stan {
       T _value;
       T _default_value;
       
+      bool _constrained;
+      
+      T _good_value;
+      T _bad_value;
+      
     };
     
     typedef singleton_argument<double> real_argument;
     typedef singleton_argument<int> int_argument;
+    typedef singleton_argument<unsigned int> u_int_argument;
     typedef singleton_argument<bool> bool_argument;
     typedef singleton_argument<std::string> string_argument;
     

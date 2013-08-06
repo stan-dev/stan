@@ -15,10 +15,28 @@
 #include <stan/gm/grammars/var_decls_grammar.hpp>
 
 
+std::string file_name_to_model_name(const std::string& name) {
+  std::string name_copy = name;
+  size_t last_bk = name_copy.find_last_of('\\');
+  if (last_bk != std::string::npos)
+    name_copy.erase(0,last_bk + 1);
+  size_t last_fwd = name_copy.find_last_of('/');
+  if (last_fwd != std::string::npos)
+    name_copy.erase(0,last_fwd + 1);
+    
+  size_t last_dot = name_copy.find_last_of('.');
+  if (last_dot != std::string::npos)
+    name_copy.erase(last_dot,name_copy.size());
+
+  name_copy += "_model";
+  return name_copy;
+}
+
 bool is_parsable(const std::string& file_name) {
   stan::gm::program prog;
   std::ifstream fs(file_name.c_str());
-  bool parsable = stan::gm::parse(0, fs, file_name, prog);
+  std::string model_name = file_name_to_model_name(file_name);
+  bool parsable = stan::gm::parse(0, fs, file_name, model_name, prog);
   return parsable;
 }
 
@@ -164,14 +182,6 @@ TEST(gm_parser,parsable_test_bad11) {
   EXPECT_THROW(is_parsable("src/test/gm/model_specs/bad11.stan"),
                std::invalid_argument);
 }
-TEST(gm_parser,parsable_test_bad_trunc) {
-  EXPECT_THROW(is_parsable("src/test/gm/model_specs/bad_trunc1.stan"),
-               std::invalid_argument);
-  EXPECT_THROW(is_parsable("src/test/gm/model_specs/bad_trunc2.stan"),
-               std::invalid_argument);
-  EXPECT_THROW(is_parsable("src/test/gm/model_specs/bad_trunc3.stan"),
-               std::invalid_argument);
-}
 TEST(gmParser,parsableBadPeriods) {
   EXPECT_THROW(is_parsable("src/test/gm/model_specs/bad_periods_data.stan"),
                std::invalid_argument);
@@ -184,6 +194,10 @@ TEST(gmParser,parsableBadPeriods) {
   EXPECT_THROW(is_parsable("src/test/gm/model_specs/bad_periods_gqs.stan"),
                std::invalid_argument);
   EXPECT_THROW(is_parsable("src/test/gm/model_specs/bad_periods_local.stan"),
+               std::invalid_argument);
+}
+TEST(gmParser,declareVarWithSameNameAsModel) {
+  EXPECT_THROW(is_parsable("src/test/gm/model_specs/bad_model_name_var.stan"),
                std::invalid_argument);
 }
 TEST(gm_parser,function_signatures) {

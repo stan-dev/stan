@@ -18,9 +18,7 @@
 #include <stan/gm/arguments/arg_id.hpp>
 #include <stan/gm/arguments/arg_data.hpp>
 #include <stan/gm/arguments/arg_init.hpp>
-#include <stan/gm/arguments/arg_test_gradient.hpp>
 #include <stan/gm/arguments/arg_random.hpp>
-#include <stan/gm/arguments/arg_method.hpp>
 #include <stan/gm/arguments/arg_output.hpp>
 
 #include <stan/mcmc/hmc/static/adapt_unit_e_static_hmc.hpp>
@@ -29,6 +27,8 @@
 #include <stan/mcmc/hmc/nuts/adapt_unit_e_nuts.hpp>
 #include <stan/mcmc/hmc/nuts/adapt_diag_e_nuts.hpp>
 #include <stan/mcmc/hmc/nuts/adapt_dense_e_nuts.hpp>
+
+#include <stan/model/util.hpp>
 
 #include <stan/optimization/newton.hpp>
 #include <stan/optimization/nesterov_gradient.hpp>
@@ -47,22 +47,27 @@ namespace stan {
       
     }
     
+    void write_model(std::ostream* s, std::string model_name, const char prefix = '\0') {
+      if(!s) return;
+      
+      *s << prefix << " model = " << model_name << std::endl;
+      
+    }
+    
     void write_error_msg(std::ostream* error_stream,
                          const std::domain_error& e) {
       
       if (!error_stream) return;
       
       *error_stream << std::endl
-                    << "Informational Message: The parameter state is about to be Metropolis"
-                    << " rejected due to the following underlying, non-fatal (really)"
-                    << " issue (and please ignore that what comes next might say 'error'): "
-                    << e.what()
+                    << "Informational Message: The current Metropolis proposal is about to be "
+                    << "rejected becuase of the following issue:"
                     << std::endl
-                    << "If the problem persists across multiple draws, you might have"
-                    << " a problem with an initial state or a gradient somewhere."
+                    << e.what() << std::endl
+                    << "If this warning occurs sporadically then the sampler is fine,"
                     << std::endl
-                    << " If the problem does not persist, the resulting samples will still"
-                    << " be drawn from the posterior."
+                    << "but if this warning occurs often then your model is either severly "
+                    << "ill-conditioned or even misspecified."
                     << std::endl;
       
     }
@@ -75,15 +80,15 @@ namespace stan {
     void print_progress(int m, int start, int finish, int refresh, bool warmup) {
       
       int it_print_width = std::ceil(std::log10(finish));
-      
-      if (do_print(m, refresh)) {
+
+      if (do_print(m, refresh) || (start + m + 1 == finish) ) {
         
         std::cout << "Iteration: ";
         std::cout << std::setw(it_print_width) << m + 1 + start
                   << " / " << finish;
           
         std::cout << " [" << std::setw(3) 
-                  << static_cast<int>( (100.0 * (m + 1 + start)) / finish )
+                  << static_cast<int>( (100.0 * (start + m + 1)) / finish )
                   << "%] ";
         std::cout << (warmup ? " (Warmup)" : " (Sampling)");
         std::cout << std::endl;
@@ -113,7 +118,7 @@ namespace stan {
         init_s = sampler->transition(init_s);
           
         if ( save && ( (m % num_thin) == 0) ) {
-          writer.print_sample_params(init_s, sampler, model);
+          writer.print_sample_params(base_rng, init_s, *sampler, model);
           writer.print_diagnostic_params(init_s, sampler);
         }
 
@@ -244,10 +249,8 @@ namespace stan {
       valid_arguments.push_back(new arg_id());
       valid_arguments.push_back(new arg_data());
       valid_arguments.push_back(new arg_init());
-      valid_arguments.push_back(new arg_test_gradient());
       valid_arguments.push_back(new arg_random());
       valid_arguments.push_back(new arg_output());
-      valid_arguments.push_back(new arg_method());
       
       argument_parser parser(valid_arguments);
       
@@ -256,8 +259,10 @@ namespace stan {
         return 0;
       }
       
-      if (parser.help_printed()) return 0;
+      if (parser.help_printed())
+        return 0;
       
+
       // Identification
       unsigned int id = dynamic_cast<int_argument*>(parser.arg("id"))->value();
       
@@ -266,15 +271,16 @@ namespace stan {
       //////////////////////////////////////////////////
       
       unsigned int random_seed = 0;
-      int_argument* random_arg = dynamic_cast<int_argument*>(parser.arg("random")->arg("seed"));
+      u_int_argument* random_arg = dynamic_cast<u_int_argument*>(parser.arg("random")->arg("seed"));
       
       if (random_arg->is_default()) {
         random_seed = (boost::posix_time::microsec_clock::universal_time() -
                        boost::posix_time::ptime(boost::posix_time::min_date_time))
                       .total_milliseconds();
+        
+        random_arg->set_value(random_seed);
+        
       }
-      
-      random_arg->set_value(random_seed);
       
       typedef boost::ecuyer1988 rng_t; // (2**50 = 1T samples, 1000 chains)
       rng_t base_rng(random_seed);
@@ -351,7 +357,7 @@ namespace stan {
       
       try {
         
-        double R = boost::lexical_cast<double>(init);
+        double R = std::fabs(boost::lexical_cast<double>(init));
         
         if (R == 0) {
         
@@ -362,9 +368,12 @@ namespace stan {
           std::vector<double> init_grad;
           
           try {
-            init_log_prob = model.grad_log_prob(cont_params, disc_params, init_grad, &std::cout);
+            init_log_prob 
+              = stan::model::log_prob_grad<true, true>(model,
+                                                       cont_params, disc_params, init_grad,
+                                                       &std::cout);
           } catch (std::domain_error e) {
-            std::cout << "Rejecting inititialization at zero because of grad_log_prob failure." << std::endl;
+            std::cout << "Rejecting inititialization at zero because of log_prob_grad failure." << std::endl;
             return 0;
           }
           
@@ -404,7 +413,10 @@ namespace stan {
             // FIXME: allow config vs. std::cout
             double init_log_prob;
             try {
-              init_log_prob = model.grad_log_prob(cont_params, disc_params, init_grad, &std::cout);
+              init_log_prob
+                = stan::model::log_prob_grad<true, true>(model,
+                                                         cont_params, disc_params, init_grad,
+                                                         &std::cout);
             } catch (std::domain_error e) {
               write_error_msg(&std::cout, e);
               std::cout << "Rejecting proposed initial value with zero density." << std::endl;
@@ -460,9 +472,14 @@ namespace stan {
         std::vector<double> init_grad;
         
         try {
-          init_log_prob = model.grad_log_prob(cont_params, disc_params, init_grad, &std::cout);
+        
+          init_log_prob
+            = stan::model::log_prob_grad<true, true>(model,
+                                                     cont_params, disc_params, init_grad,
+                                                     &std::cout);
+
         } catch (std::domain_error e) {
-          std::cout << "Rejecting user-specified inititialization because of grad_log_prob failure." << std::endl;
+          std::cout << "Rejecting user-specified inititialization because of log_prob_grad failure." << std::endl;
           return 0;
         }
         
@@ -475,30 +492,42 @@ namespace stan {
           if (!boost::math::isfinite(init_grad[i])) {
             std::cout << "Rejecting user-specified inititialization because of divergent gradient." << std::endl;
             return 0;
+
           }
         }
         
       }
-      
-      // Test gradient
-      if (dynamic_cast<unvalued_argument*>(parser.arg("test_gradient"))->is_present()) {
-        std::cout << std::endl << "TEST GRADIENT MODE" << std::endl;
-        return model.test_gradients(cont_params, disc_params);
-        return 0;
-      }
-      
+
       // Initial output
       parser.print(&std::cout);
       std::cout << std::endl;
       
       if (!append_sample && sample_stream) {
         write_stan(sample_stream, '#');
+        write_model(sample_stream, model.model_name(), '#');
         parser.print(sample_stream, '#');
       }
       
       if (!append_diagnostic && diagnostic_stream) {
         write_stan(diagnostic_stream, '#');
+        write_model(sample_stream, model.model_name(), '#');
         parser.print(diagnostic_stream, '#');
+      }
+      
+      //////////////////////////////////////////////////
+      //               Model Diagnostics              //
+      //////////////////////////////////////////////////
+      
+      if (parser.arg("method")->arg("diagnostic")) {
+      
+        list_argument* test = dynamic_cast<list_argument*>
+                              (parser.arg("method")->arg("diagnostic")->arg("test"));
+        
+        if (test->value() == "gradient") {
+          std::cout << std::endl << "TEST GRADIENT MODE" << std::endl;
+          return stan::model::test_gradients<true,true>(model,cont_params, disc_params);
+        }
+        
       }
       
       //////////////////////////////////////////////////
@@ -509,15 +538,15 @@ namespace stan {
         
         list_argument* algo = dynamic_cast<list_argument*>
                               (parser.arg("method")->arg("optimize")->arg("algorithm"));
-        
+
         int num_iterations = dynamic_cast<int_argument*>(
-                             parser.arg("method")->arg("sample")->arg("iter"))->value();
-        
+                             parser.arg("method")->arg("optimize")->arg("iter"))->value();
+
         bool save_iterations = dynamic_cast<bool_argument*>(
-                               parser.arg("method")->arg("sample")->arg("save_iterations"))->value();
-        
+                               parser.arg("method")->arg("optimize")->arg("save_iterations"))->value();
+
         if (algo->value() == "nesterov") {
-          
+
           bool epsilon = dynamic_cast<real_argument*>(
                          algo->arg("nesterov")->arg("stepsize"))->value();
           
@@ -526,13 +555,13 @@ namespace stan {
             model.write_csv_header(*sample_stream);
           }
           
-          stan::optimization::NesterovGradient ng(model, cont_params, disc_params,
-                                                  epsilon, &std::cout);
+          stan::optimization::NesterovGradient<Model> ng(model, cont_params, disc_params,
+                                                         epsilon, &std::cout);
           
           double lp = ng.logp();
           
           double lastlp = lp - 1;
-          std::cout << "initial log joint probability = " << lp << std::endl;
+          std::cout << "Initial log joint probability = " << lp << std::endl;
           int m = 0;
           for (size_t i = 0; i < num_iterations; i++) {
             lastlp = lp;
@@ -572,7 +601,7 @@ namespace stan {
           std::vector<double> gradient;
           double lp;
           try {
-            lp = model.grad_log_prob(cont_params, disc_params, gradient);
+            lp = model.template log_prob<false, false>(cont_params, disc_params, &std::cout);
           } catch (std::domain_error e) {
             write_error_msg(&std::cout, e);
             lp = -std::numeric_limits<double>::infinity();
@@ -617,8 +646,8 @@ namespace stan {
             model.write_csv_header(*sample_stream);
           }
           
-          stan::optimization::BFGSLineSearch ng(model, cont_params, disc_params,
-                                                &std::cout);
+          stan::optimization::BFGSLineSearch<Model> ng(model, cont_params, disc_params,
+                                                       &std::cout);
           if (epsilon > 0)
             ng._opts.alpha0 = epsilon;
           
@@ -894,6 +923,9 @@ namespace stan {
         diagnostic_stream->close();
         delete diagnostic_stream;
       }
+      
+      for (int i = 0; i < valid_arguments.size(); ++i)
+        delete valid_arguments.at(i);
       
       return 0;
  
