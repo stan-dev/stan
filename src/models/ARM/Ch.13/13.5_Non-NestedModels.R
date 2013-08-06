@@ -1,7 +1,7 @@
 library(rstan)
 library(ggplot2)
 
-## Read the pilots data & define variables FIXME
+## Read the pilots data & define variables
 # Data are at http://www.stat.columbia.edu/~gelman/arm/examples/pilots
 
 pilots <- read.table ("pilots.dat", header=TRUE)
@@ -107,9 +107,9 @@ if (!exists("earnings_latin_square.sm")) {
     }
 }
 
-dataList.2 <- list(N=length(y),y=y,x=x.centered,n_eth=n.eth,n_age=n.age,eth=eth.ok,age=age[ok])
+dataList.2 <- list(N=length(y),y=y,x_centered=x.centered,n_eth=n.eth,n_age=n.age,eth=eth.ok,age=age[ok])
 earnings_latin_square.sf1 <- sampling(earnings_latin_square.sm, dataList.2)
-print(pilots.sf1,pars = c("a","b", "c","sigma_y", "lp__"))
+print(pilots.sf1,pars = c("a1","a2","b1","b2", "c1","c2","sigma_y", "lp__"))
 post <- extract(pilots.sf1)
 
  # plot figure 13.10

@@ -4,21 +4,23 @@ data {
   int county[N];
 } 
 parameters {
-  vector[85] a;
   real<lower=0> sigma_y;
   real<lower=0> sigma_a;
   real mu_a;
+  vector[85] eta;
 } 
 transformed parameters {
   vector[N] y_hat;
+  vector[85] a;
+
+  a <- mu_a + sigma_a * eta;
+
   for (i in 1:N)
     y_hat[i] <- a[county[i]];
 }
 model {
-  mu_a ~ normal(0, .0001);
-  sigma_a ~ uniform(0, 100);
-  a ~ normal (mu_a, sigma_a);
+  mu_a ~ normal(0, 100);
+  eta ~ normal(0, 1);
 
-  sigma_y ~ uniform(0, 100);
   y ~ normal(y_hat, sigma_y);
 }

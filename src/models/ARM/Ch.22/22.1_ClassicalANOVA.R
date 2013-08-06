@@ -1,7 +1,7 @@
 library(rstan)
 library(ggplot2)
 
-## Read the pilots data & define variables FIXME
+## Read the pilots data & define variables
 # Data are at http://www.stat.columbia.edu/~gelman/arm/examples/pilots
 
 pilots <- read.table ("pilots.dat", header=TRUE)

@@ -9,28 +9,25 @@ transformed data {
   log_earn <- log(earn);
 }
 parameters {
-  vector[4] a;
-  vector[4] b;
   real<lower=0> sigma_y;
   real<lower=0> sigma_a;
   real mu_a;
-  real<lower=0> sigma_b;
-  real mu_b;
+  matrix[4,2] eta;
 }
 transformed parameters {
   vector[N] y_hat;
+  matrix[4,2] a;
+
+  a <- mu_a + sigma_a * eta;
+
   for (i in 1:N)
-    y_hat[i] <- a[eth[i]] + b[eth[i]] * height[i];
+    y_hat[i] <- a[eth[i],1] + a[eth[i],2] * height[i];
 } 
 model {
-  mu_a ~ normal(0, .0001);
-  sigma_a ~ uniform(0, 100);
-  a ~ normal (mu_a, sigma_a);
+  mu_a ~ normal(0, 100);
+  for (j in 1:4)
+    eta[j] ~ normal(0, 1);
 
-  mu_b ~ normal(0, .0001);
-  sigma_b ~ uniform(0, 100);
-  b ~ normal (mu_b, sigma_b);
 
-  sigma_y ~ uniform(0, 100);
   log_earn ~ normal(y_hat, sigma_y);
 }
