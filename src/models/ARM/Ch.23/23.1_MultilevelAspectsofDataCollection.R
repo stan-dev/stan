@@ -88,54 +88,28 @@ se3 <- apply(post.1a$beta,2,sd)
 est4 <- colMeans(post.1c$beta)
 se4 <- apply(post.1c$beta,2,sd)
 
+frame = data.frame(Grade=4:1,x1=est3,x2=est4,se1=se3,se2=se4)
+p1 <- ggplot(frame, aes(x=x1,y=Grade)) +
+      geom_point(size=3) +
+      theme_bw() +
+      labs(title="Regression on Treatment Indicator Controlling for Pairs") +
+      geom_segment(aes(x=x1-se1,y=Grade,xend=x1+se1,yend=Grade),size=2) + 
+      geom_segment(aes(x=x1-2 * se1,y=Grade,xend=x1+2*se1,yend=Grade)) +
+      geom_vline(xintercept=0,linetype="dotted") +
+      scale_x_continuous("Effect of the Electric Company TV Show")
 
- # function to make a graph out of the regression coeffs and se's FIXME--GGPLOT2
-regression.2tables <- function (name, est3, est4, se3, se4, label1, label2, file,
-     bottom=FALSE){
-  J <- length(name)
-  name.range <- .6
-  x.range <- range (est3+2*se3, est3-2*se3, est4+2*se4, est4-2*se4)
-  A <- -x.range[1]/(x.range[2]-x.range[1])
-  B <- 1/(x.range[2]-x.range[1])
-  height <- .6*J
-  width <- 8*(name.range+1)
-  gap <- .4
-  par (mar=c(4,0,0,0))
-  plot (c(-name.range,2+gap), c(3,-J-2), bty="n", xlab="", ylab="", xaxt="n",
-     yaxt="n", xaxs="i", yaxs="i", type="n")
-  text (-name.range, 2, "Subpopulation", adj=0, cex=.9)
-  text (.5, 2, label1, adj=.5, cex=.9)
-  text (1+gap+.5, 2, label2, adj=.5, cex=.9)
-  lines (c(0,1), c(0,0))
-  lines (1+gap+c(0,1), c(0,0))
-  lines (c(A,A), c(0,-J-1), lty=2, lwd=.5)
-  lines (1+gap+c(A,A), c(0,-J-1), lty=2, lwd=.5)
-  ax <- pretty (x.range)
-  ax <- ax[(A+B*ax)>0 & (A+B*ax)<1]
-  segments (A + B*ax, -.1, A + B*ax, .1, lwd=.5)
-  segments (1+gap+A + B*ax, -.1, 1+gap+A + B*ax, .1, lwd=.5)
-  text (A + B*ax, .7, ax, cex=.9)
-  text (1+gap+A + B*ax, .7, ax, cex=.9)
-  text (-name.range, -(1:J), name, adj=0, cex=.9)
-  points (A + B*est3, -(1:J), pch=20, cex=.9)
-  points (1+gap+A + B*est4, -(1:J), pch=20, cex=.9)
-  segments (A + B*(est3-se3), -(1:J), A + B*(est3+se3), -(1:J), lwd=3)
-  segments (1+gap+A + B*(est4-se4), -(1:J), 1+gap+A + B*(est4+se4), -(1:J), lwd=3)
-  segments (A + B*(est3-2*se3), -(1:J), A + B*(est3+2*se3), -(1:J), lwd=.5)
-  segments (1+gap+A + B*(est4-2*se4), -(1:J), 1+gap+A + B*(est4+2*se4), -(1:J), 
-     lwd=.5)
-  if (bottom){
-    lines (c(0,1), c(-J-1,-J-1))
-    lines (1+gap+c(0,1), c(-J-1,-J-1))
-    segments (A + B*ax, -J-1-.1, A + B*ax, -J-1+.1, lwd=.5)
-    segments (1+gap+A + B*ax, -J-1-.1, 1+gap+A + B*ax, -J-1+.1, lwd=.5)
-    text (A + B*ax, -J-1-.7, ax, cex=.9)
-    text (1+gap+A + B*ax, -J-1-.7, ax, cex=.9)
-  } 
-}
+p2 <- ggplot(frame, aes(x=x2,y=Grade)) +
+      geom_point(size=3) +
+      theme_bw() +
+      labs(title="Regression on Treatment Indicator Controlling for Pairs and Pre-test") +
+      geom_segment(aes(x=x2-se2,y=Grade,xend=x2+se2,yend=Grade),size=2) + 
+      geom_segment(aes(x=x2-2 * se2,y=Grade,xend=x2+2*se2,yend=Grade)) +
+      geom_vline(xintercept=0,linetype="dotted") +
+      scale_x_continuous("Effect of the Electric Company TV Show")
 
-regression.2tables (paste ("Grade", 1:4), est3, est4, se3, se4, "Regression on treatment indicator,\ncontrolling for pairs", "Regression on treatment indicator,\ncontrolling for pairs and pre-test")
-
+pushViewport(viewport(layout = grid.layout(1, 2)))
+print(p1, vp = viewport(layout.pos.row = 1, layout.pos.col = 1))
+print(p2, vp = viewport(layout.pos.row = 1, layout.pos.col = 2))
 
 ## Figure 23.2 comparing all the se's
 
