@@ -3,6 +3,7 @@
 
 //fvar
 #include <stan/agrad/fwd/fvar.hpp>
+#include <stan/agrad/fwd/traits.hpp>
 
 //numeric limits
 #include <stan/agrad/fwd/numeric_limits.hpp>

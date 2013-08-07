@@ -1,8 +1,9 @@
+#include <stan/meta/traits.hpp>
 #include <gtest/gtest.h>
+
 #include <boost/type_traits.hpp>
 #include <stan/agrad.hpp>
 #include <stan/agrad/fwd/fvar.hpp>
-#include <stan/meta/traits.hpp>
 #include <stan/math/matrix.hpp>
 
 using stan::length;
@@ -15,8 +16,6 @@ TEST(MetaTraits, isConstant) {
   EXPECT_TRUE(is_constant<int>::value);
   EXPECT_FALSE(is_constant<stan::agrad::var>::value);
 }
-
-
 
 TEST(MetaTraits, is_vector) {
   using stan::is_vector;
@@ -551,17 +550,4 @@ TEST(MetaTraits,isFvar) {
   EXPECT_TRUE(is_fvar<fvar<double> >::value);
   EXPECT_TRUE(is_fvar<fvar<fvar<double> > >::value);
   EXPECT_FALSE(is_fvar<var>::value);
-}
-
-TEST(MetaTraits,containsFvar) {
-  using stan::agrad::var;
-  using stan::agrad::fvar;
-  using stan::contains_fvar;
-  EXPECT_FALSE(contains_fvar<double>::value);
-  EXPECT_FALSE((contains_fvar<double,int,var>::value));
-  EXPECT_TRUE((contains_fvar<fvar<double> >::value));
-  EXPECT_TRUE((contains_fvar<double, fvar<double> >::value));
-  EXPECT_TRUE((contains_fvar<double, fvar<var>, int >::value));
-  EXPECT_TRUE((contains_fvar<fvar<double>, fvar<var> >::value));
-  EXPECT_TRUE((contains_fvar<fvar<fvar<double> > >::value));
 }
