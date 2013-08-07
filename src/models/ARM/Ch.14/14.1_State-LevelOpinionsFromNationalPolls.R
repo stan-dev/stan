@@ -137,7 +137,7 @@ a.age <- colMeans(post$a)
 a.edu <- colMeans(post$b)
 a.age.edu <- colMeans(post$c)
 a.state <- post$d
-## Plot Figure 14.3??? FIXME
+## Plot Figure 14.3???
 
 ## Plot Figure 14.2 
 

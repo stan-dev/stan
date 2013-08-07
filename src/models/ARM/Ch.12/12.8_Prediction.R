@@ -9,7 +9,7 @@ library(ggplot2)
 source("12.6_Group-LevelPredictors.R") # where variables were defined
 
 ## Prediction for a new observation in a new group (new house in county 26
-## with x=1) FIXME: use stan
+## with x=1)
 if (!exists("radon_group.sm")) {
     if (file.exists("radon_group.sm.RData")) {
         load("radon_group.sm.RData", verbose = TRUE)

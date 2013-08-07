@@ -141,7 +141,7 @@ for (s in 1:n.sims){
 # p-value
 print (mean (test.rep > Test(y)))
 
-## Checking the overdispersed model FIXME
+## Checking the overdispersed model
 
 if (!exists("roaches_overdispersion.sm")) {
     if (file.exists("roaches_overdispersion.sm.RData")) {
