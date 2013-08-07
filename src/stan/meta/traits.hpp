@@ -1,7 +1,6 @@
 #ifndef __STAN__META__TRAITS_HPP__
 #define __STAN__META__TRAITS_HPP__
 
-#include <stan/agrad/fwd/fvar.hpp>
 #include <vector>
 #include <boost/type_traits.hpp>
 #include <boost/type_traits/is_arithmetic.hpp> 
