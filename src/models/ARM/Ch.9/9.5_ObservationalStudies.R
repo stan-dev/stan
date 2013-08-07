@@ -1,5 +1,6 @@
 library(rstan)
 library(ggplot2)
+library(gridBase)
 source("9.3_Randomized experiments.R") # where data was cleaned
 
 ## Observational studies
@@ -13,61 +14,58 @@ est1 <- rep(NA,4)
 se1 <- rep(NA,4)
 for (k in 1:4){
   ok <- (grade==k) & (!is.na(supp))
-  lm.supp <- lm (post.test ~ supp + pre.test, subset=ok)
-  est1[k] <- lm.supp$coef[2]
-  se1[k] <- summary(lm.supp)$coef[2,2]
+  dataList.1 <- list(N=length(post.test[ok]), post_test=post.test[ok], treatment=supp[ok],pre_test=pre.test[ok])
+  electric_multi_preds.sf1 <- sampling(electric_multi_preds.sm, dataList.1)
+  print(electric_multi_preds.sf1)
+  beta.post <- extract(electric_multi_preds.sf1, "beta")$beta
+  est1[k] <- colMeans(beta.post)[2]
+  se1[k] <- sd(beta.post[,2])
 }
 
- # function to make a graph out of the regression coeffs and se's
+# graphs on Figure 9.9
 
-regression.2tablesA <- function (name, est1, se1, label1, file, bottom=FALSE){
-  J <- length(name)
-  name.range <- .6
-  x.range <- range (est1+2*se1, est1-2*se1)
-  A <- -x.range[1]/(x.range[2]-x.range[1])
-  B <- 1/(x.range[2]-x.range[1])
-  height <- .6*J
-  width <- 8*(name.range+1)
-  gap <- .4
-  
-  par (mar=c(4,0,0,0))
-  plot (c(-name.range,2+gap), c(3,-J-2), bty="n", xlab="", ylab="",
-        xaxt="n", yaxt="n", xaxs="i", yaxs="i", type="n")
-  text (-name.range, 2, "Subpopulation", adj=0, cex=.9)
-  text (.5, 2, label1, adj=.5, cex=.9)
-  lines (c(0,1), c(0,0))
-  lines (c(A,A), c(0,-J-1), lty=2, lwd=.5)
-  ax <- pretty (x.range)
-  ax <- ax[(A+B*ax)>0 & (A+B*ax)<1]
-  segments (A + B*ax, -.1, A + B*ax, .1, lwd=.5)
-  text (A + B*ax, .7, ax, cex=.9)
-  text (-name.range, -(1:J), name, adj=0, cex=.9)
-  points (A + B*est1, -(1:J), pch=20, cex=1)
-  segments (A + B*(est1-se1), -(1:J), A + B*(est1+se1), -(1:J), lwd=3)
-  segments (A + B*(est1-2*se1), -(1:J), A + B*(est1+2*se1), -(1:J), lwd=.5)
-  if (bottom){
-    lines (c(0,1), c(-J-1,-J-1))
-    segments (A + B*ax, -J-1-.1, A + B*ax, -J-1+.1, lwd=.5)
-    text (A + B*ax, -J-1-.7, ax, cex=.9)
-  } 
-}
-                  # graphs on Figure 9.9
+frame = data.frame(Grade=4:1,x1=est1,se1=se1)
+dev.new()
+p1 <- ggplot(frame, aes(x=x1,y=Grade)) +
+      geom_point(size=3) +
+      theme_bw() +
+      labs(title="Estimated Effect of Supplement Compared to Replacement") +
+      geom_segment(aes(x=x1-se1,y=Grade,xend=x1+se1,yend=Grade),size=2) + 
+      geom_segment(aes(x=x1-2 * se1,y=Grade,xend=x1+2*se1,yend=Grade)) +
+      geom_vline(xintercept=0,linetype="dotted") +
+      scale_x_continuous("")
 
-regression.2tablesA (paste ("Grade", 1:4), est1, se1, "Estimated effect of supplement,
-    \ncompared to replacement")
+print(p1)
 
 ## Examining overlap in the Electric Company example (Figure 9.12)
+dev.new()
+pushViewport(viewport(layout = grid.layout(1, 4)))
 
-par (mfrow=c(2,2), mar=c(5,4,2,2))
 for (j in 1:4){
   ok <- (grade==j) & (!is.na(supp))
-  plot(pre.test[ok],post.test[ok], xlab="pre-test score", 
-    ylab="posttest score", pch=20, type="n", main=paste("grade",j))
-  fit.1 <- lm (post.test ~ pre.test + supp, subset=ok)
-  abline (fit.1$coef[1], fit.1$coef[2], lwd=.5, col="gray")
-  abline (fit.1$coef[1]+ fit.1$coef[3], fit.1$coef[2], lwd=.5)
-  points (pre.test[supp==1 & ok], post.test[supp==1 & ok], pch=20, 
-    cex=1.1)
-  points (pre.test[supp==0 & ok], post.test[supp==0 & ok], pch=20,
-    cex=1.1, col="gray")
+  frame2 = data.frame(x1=pre.test[ok],y1=post.test[ok],x2=supp[ok])
+  dataList.2 <- list(N=length(frame2$x1),post_test=frame2$y1,
+                     treatment=frame2$x1,pre_test=frame2$x2)
+  electric_multi_preds.sf <- sampling(electric_multi_preds.sm, dataList.2)
+  beta.post <- extract(electric_multi_preds.sf, "beta")$beta
+  beta.mean <- colMeans(beta.post)
+  
+  pre.test2 <- pre.test[ok&supp==1]
+  post.test2 <- post.test[ok&supp==1]
+  frame3 = data.frame(x1=pre.test2,y1=post.test2)
+
+  pre.test3 <- pre.test[ok&supp==0]
+  post.test3 <- post.test[ok&supp==0]
+  frame4 = data.frame(x1=pre.test3,y1=post.test3)
+
+  p3 <- ggplot() +
+        geom_point(data=frame3,aes(x=x1,y=y1),shape=20) +
+        geom_point(data=frame4,aes(x=x1,y=y1),shape=20,colour="gray") +    
+        scale_y_continuous("Posttest") +
+        scale_x_continuous("Pretest") +
+        theme_bw() +
+        labs(title=paste("Grade ",j)) +
+        geom_abline(intercept=(beta.mean[1]+beta.mean[3]),slope=beta.mean[2],colour="gray30") +
+        geom_abline(intercept=(beta.mean[1]),slope=beta.mean[2])
+  print(p3, vp = viewport(layout.pos.row = 1, layout.pos.col = j))
 }

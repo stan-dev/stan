@@ -95,57 +95,32 @@ est2[k] <- colMeans(beta.post)[2]
 se2[k] <- sd(beta.post[,2])
 }
 
- # function to make a graph out of the regression coeffs and se's
-regression.2tables <- function (name, est1, est2, se1, se2, label1, label2,
-                                file, bottom=FALSE){
-  J <- length(name)
-  name.range <- .6
-  x.range <- range (est1+2*se1, est1-2*se1, est2+2*se2, est1-2*se2)
-  A <- -x.range[1]/(x.range[2]-x.range[1])
-  B <- 1/(x.range[2]-x.range[1])
-  height <- .6*J
-  width <- 8*(name.range+1)
-  gap <- .4
-  par (mar=c(4,0,0,0))
-  plot (c(-name.range,2+gap), c(3,-J-2), bty="n", xlab="", ylab="", xaxt="n",
-     yaxt="n", xaxs="i", yaxs="i", type="n")
-  text (-name.range, 2, "Subpopulation", adj=0, cex=.9)
-  text (.5, 2, label1, adj=.5, cex=.9)
-  text (1+gap+.5, 2, label2, adj=.5, cex=.9)
-  lines (c(0,1), c(0,0))
-  lines (1+gap+c(0,1), c(0,0))
-  lines (c(A,A), c(0,-J-1), lty=2, lwd=.5)
-  lines (1+gap+c(A,A), c(0,-J-1), lty=2, lwd=.5)
-  ax <- pretty (x.range)
-  ax <- ax[(A+B*ax)>0 & (A+B*ax)<1]
-  segments (A + B*ax, -.1, A + B*ax, .1, lwd=.5)
-  segments (1+gap+A + B*ax, -.1, 1+gap+A + B*ax, .1, lwd=.5)
-  text (A + B*ax, .7, ax, cex=.9)
-  text (1+gap+A + B*ax, .7, ax, cex=.9)
-  text (-name.range, -(1:J), name, adj=0, cex=.9)
-  points (A + B*est1, -(1:J), pch=20, cex=.9)
-  points (1+gap+A + B*est2, -(1:J), pch=20, cex=.9)
-  segments (A + B*(est1-se1), -(1:J), A + B*(est1+se1), -(1:J), lwd=3)
-  segments (1+gap+A + B*(est2-se2), -(1:J), 1+gap+A + B*(est2+se2), -(1:J),
-            lwd=3)
-  segments (A + B*(est1-2*se1), -(1:J), A + B*(est1+2*se1), -(1:J), lwd=.5)
-  segments (1+gap+A + B*(est2-2*se2), -(1:J), 1+gap+A + B*(est2+2*se2), -(1:J),
-            lwd=.5)
-  if (bottom){
-    lines (c(0,1), c(-J-1,-J-1))
-    lines (1+gap+c(0,1), c(-J-1,-J-1))
-    segments (A + B*ax, -J-1-.1, A + B*ax, -J-1+.1, lwd=.5)
-    segments (1+gap+A + B*ax, -J-1-.1, 1+gap+A + B*ax, -J-1+.1, lwd=.5)
-    text (A + B*ax, -J-1-.7, ax, cex=.9)
-    text (1+gap+A + B*ax, -J-1-.7, ax, cex=.9)
-  } 
-}
-
 #graphs on Figure 9.5
-par (mfrow=c(1,1))
- regression.2tables (paste ("Grade", 1:4), est1, est2, se1, se2, 
-  "Regression on treatment indicator", "Regression on treatment indicator,
-  \ncontrolling for pre-test")
+
+frame = data.frame(Grade=4:1,x1=est1,x2=est2,se1=se1,se2=se2)
+dev.new()
+p4 <- ggplot(frame, aes(x=x1,y=Grade)) +
+      geom_point(size=3) +
+      theme_bw() +
+      labs(title="Regression on Treatment Indicator") +
+      geom_segment(aes(x=x1-se1,y=Grade,xend=x1+se1,yend=Grade),size=2) + 
+      geom_segment(aes(x=x1-2 * se1,y=Grade,xend=x1+2*se1,yend=Grade)) +
+      geom_vline(xintercept=0,linetype="dotted") +
+      scale_x_continuous("Effect of the Electric Company TV Show")
+
+p5 <- ggplot(frame, aes(x=x2,y=Grade)) +
+      geom_point(size=3) +
+      theme_bw() +
+      labs(title="Regression on Treatment Indicator Controlling for Pre-test") +
+      geom_segment(aes(x=x2-se2,y=Grade,xend=x2+se2,yend=Grade),size=2) + 
+      geom_segment(aes(x=x2-2 * se2,y=Grade,xend=x2+2*se2,yend=Grade)) +
+      geom_vline(xintercept=0,linetype="dotted") +
+      scale_x_continuous("Effect of the Electric Company TV Show")
+
+pushViewport(viewport(layout = grid.layout(1, 2)))
+print(p4, vp = viewport(layout.pos.row = 1, layout.pos.col = 1))
+print(p5, vp = viewport(layout.pos.row = 1, layout.pos.col = 2))
+
 
 ## Controlling for pre-treatment predictors (Figure 9.6)
 electric <- read.table ("electric.dat", header=T)
