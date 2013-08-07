@@ -36,8 +36,7 @@ namespace stan {
      */
     template <bool propto, 
               typename T_y, typename T_loc, typename T_scale>
-    typename boost::enable_if_c<is_var_or_arithmetic<T_y,T_loc,T_scale>::value,
-                                typename return_type<T_y,T_loc,T_scale>::type>::type
+    typename return_type<T_y,T_loc,T_scale>::type
     normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
       static const char* function = "stan::prob::normal_log(%1%)";
 
