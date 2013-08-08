@@ -748,9 +748,9 @@ namespace stan {
                                       parser.arg("method")->arg("sample")->arg("adapt"));
         bool adapt_engaged = dynamic_cast<bool_argument*>(adapt->arg("engaged"))->value();
         
-        if (algo->value() == "metro") {
+        if (algo->value() == "rwm") {
           
-          std::cout << algo->arg("metro")->description() << std::endl;
+          std::cout << algo->arg("rwm")->description() << std::endl;
           return 0;
         
         } else if (algo->value() == "hmc") {

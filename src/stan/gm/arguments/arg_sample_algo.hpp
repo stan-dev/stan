@@ -4,7 +4,7 @@
 #include <stan/gm/arguments/list_argument.hpp>
 
 #include <stan/gm/arguments/arg_hmc.hpp>
-#include <stan/gm/arguments/arg_metro.hpp>
+#include <stan/gm/arguments/arg_rwm.hpp>
 
 namespace stan {
   
@@ -20,7 +20,7 @@ namespace stan {
         _description = "Sampling algorithm";
         
         _values.push_back(new arg_hmc());
-        _values.push_back(new arg_metro());
+        _values.push_back(new arg_rwm());
         
         _default_cursor = 0;
         _cursor = _default_cursor;
