@@ -654,7 +654,7 @@ generated for \code{bernoulli} on Linux or Mac use
 \end{Verbatim}
 \end{quote}
 %
-For Windows use backslashes for the executable
+For Windows use backslashes for the executable,
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
@@ -665,12 +665,9 @@ For Windows use backslashes for the executable
 The output of the command will display information about the run
 followed by information for each parameter and generated quantity. For
 \code{bernoulli}, we ran 1 chain and saved 1000 iterations. The information is
-echoed to the standard output:
+echoed to the standard output stream.
 %
-\begin{landscape}
-\begin{quote}
-{ \footnotesize
-\begin{Verbatim}[fontshape=sl,fontsize=\small]
+\begin{Verbatim}[fontshape=sl,fontsize=\footnotesize]
 Inference for Stan model: bernoulli_model
 1 chains: each with iter=(1000); warmup=(0); thin=(1); 1000 iterations saved.
 
@@ -688,11 +685,7 @@ Samples were drawn using hmc with nuts.
 For each parameter, N_Eff is a crude measure of effective sample size,
 and R_hat is the potential scale reduction factor on split chains (at 
 convergence, R_hat=1).
-
 \end{Verbatim}
-}
-\end{quote}
-\end{landscape}
 %
 In addition to the general information about the runs, \code{print}
 displays summary statistics for each parameter and generated
