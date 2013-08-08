@@ -37,7 +37,8 @@ commenting, as in the following example.
 \begin{quote}
 \begin{Verbatim}
 exp(y) ~ normal(0,1);
-lp__ <- lp__ + y;  // log Jacobian of exp(y) inverse transform
+// adjust for change of vars: y = log | d/dy exp(y) |
+increment_log_prob(y); 
 \end{Verbatim}
 \end{quote}
 %
@@ -108,19 +109,19 @@ different values at different points in the execution of a program.
 Print statements can be invaluable for debugging, especially for a
 language like Stan with no stepwise debugger.
 
-For instance, to print the value of the expression \code{y} along with
-the log probability accumulator, use the following statement.
+For instance, to print the value of variables \code{y} and
+\code{z}, use the following statement.
 %
 \begin{quote}
 \begin{Verbatim}
-print("y=", y, " log probability=", lp__);
+print("y=", y, " z=", z);
 \end{Verbatim}
 \end{quote}
 %
 This print statement prints the string ``y='' followed by the value of
-the expression \code{y}, followed by the string `` log probability=''
+\code{y}, followed by the string `` z=''
 (with the leading space), followed by the value of the variable
-\Verb|lp__|. 
+\code{z}.
 
 Each print statement is followed by a new line.  The specific ASCII
 character(s) generated to create a new line are platform specific.
@@ -506,17 +507,16 @@ parameters {
 model {
    for (n in 1:N_obs)
        y_obs[n] ~ normal(mu,sigma); 
-   lp__ <- lp__ + N_cens * log1m(normal_cdf(U,mu,sigma));
+   increment_log_prob(N_cens * log1m(normal_cdf(U,mu,sigma)));
 }
 \end{Verbatim}
 \end{quote}
 %
 For the observed values in \Verb|y_obs|, the normal sampling model is
-used without truncation.  The log probability accumulator
-\Verb|lp__| is directly incremented using the calculated log
-cumulative normal probability of the censored data items.  The
-built-in function \code{log1m} is used, which maps $x$ to $\log (1 -
-x)$ in an arithmetically stable way for values of $x$ near zero.
+used without truncation.  The log probability is directly incremented
+using the calculated log cumulative normal probability of the censored
+data items.  The built-in function \code{log1m} is used, which maps
+$x$ to $\log (1 - x)$ in an arithmetically stable way.
 
 To deal with situations where the censoring point variable \code{U} is
 unknown, the declaration of \code{U} should be moved from the data
@@ -583,8 +583,10 @@ parameters {
   real y;
 }
 model {
-   lp__ <- log_sum_exp(log(0.3) + normal_log(y,-1,2),
-                       log(0.7) + normal_log(y,3,1));
+  increment_log_prob(log_sum_exp(log(0.3) 
+                                   + normal_log(y,-1,2),
+                                 log(0.7) 
+                                   + normal_log(y,3,1));
 }
 \end{Verbatim}
 \end{quote}
@@ -639,7 +641,7 @@ model {
       ps[k] <- log(theta[k]) 
                + normal_log(y[n],mu[k],sigma[k]);
     }
-    lp__ <- lp__ + log_sum_exp(ps);    
+    increment_log_prob(log_sum_exp(ps));
   }
 }
 \end{Verbatim}
@@ -2061,7 +2063,7 @@ model {
         gamma[t,k] <- log_sum_exp(acc);
       }
     }
-    lp__ <- lp__ + log_sum_exp(gamma[T_unsup]);
+    increment_log_prob(log_sum_exp(gamma[T_unsup]));
   }
 \end{Verbatim}
 \end{quote}
@@ -2579,10 +2581,13 @@ transformed parameters {
                      - 0.5 * dot_self(mu[k] - y[n]);
 }
 model {
+  // prior
   for (k in 1:K)
-    mu[k] ~ normal(0,1);  // prior
+    mu[k] ~ normal(0,1);
+
+  // likelihood
   for (n in 1:N)
-    lp__ <- lp__ + log_sum_exp(soft_z[n]); // likelihood
+    increment_log_prob(log_sum_exp(soft_z[n])); 
 }
 \end{Verbatim}
 \end{quote}
@@ -2825,7 +2830,7 @@ model {
       gamma[doc[n],k] <- gamma[doc[n],k] 
                          + categorical_log(w[n],phi[k]);
   for (m in 1:M)
-    lp__ <- lp__ + log_sum_exp(gamma[m]);
+    increment_log_prob(log_sum_exp(gamma[m]));
 }
 \end{Verbatim}
 \end{quote}
@@ -2879,12 +2884,12 @@ for the labeled data, and a set of statements for the unlabeled data.
 
 An alternative to full Bayesian inference involves estimating a model
 using labeled data, then applying it to unlabeled data without
-updating the parameter estimates based on the unlabeled data.
-This behavior can be implemented by moving the definition of \code{gamma}
+updating the parameter estimates based on the unlabeled data.  This
+behavior can be implemented by moving the definition of \code{gamma}
 for the unlabeled documents to the generated quantities block.
-Because the variables no longer contribute to the log probability
-accumulator \code{lp\_\_}, they no longer jointly contribute to
-the estimation of the model parameters.
+Because the variables no longer contribute to the log probability,
+they no longer jointly contribute to the estimation of the model
+parameters.
 
 
 \section{Latent Dirichlet Allocation}
@@ -3012,7 +3017,7 @@ model {
     real gamma[K];
     for (k in 1:K) 
       gamma[k] <- log(theta[doc[n],k]) + log(phi[k,w[n]]);
-    lp__ <- lp__ + log_sum_exp(gamma);  // likelihood
+    increment_log_prob(log_sum_exp(gamma));  // likelihood
   }
 }
 \end{Verbatim}
@@ -3975,7 +3980,7 @@ parameters {
   ...
 model {
   log(y) ~ normal(mu,sigma);
-  lp__ <- lp__ - log(y);
+  increment_log_prob(- log(y));
   ...
 \end{Verbatim}
 \end{quote}
@@ -3992,7 +3997,7 @@ model {
   real log_y;
   log_y <- log(y);
   log_y ~ normal(mu,sigma);
-  lp__ <- lp__ - log_y;
+  increment_log_prob(- log_y);
   ...
 \end{Verbatim}
 \end{quote}
@@ -4020,7 +4025,7 @@ transformed parameters {
    matrix[K,K] J;   // Jacobian matrix of transform
    ... compute v as a function of u ...
    ... compute J[m,n] = d.v[m] / d.u[n] ...
-   lp__ <- lp__ + log(fabs(determinant(J)));
+   increment_log_prob(log(fabs(determinant(J))));
    ...
 model {
    v ~ ...;
@@ -4048,7 +4053,7 @@ transformed parameters {
   vector[K] J_diag;  // diagonals of Jacobian matrix
   ... 
   ... compute J[k,k] = d.v[k] / d.u[k] ...
-  lp__ <- lp__ + sum(log(J_diag));
+  incement_log_prob(sum(log(J_diag)));
   ...
 \end{Verbatim}
 \end{quote}
@@ -4061,8 +4066,8 @@ transformed parameters {
 \noindent
 Custom distributions may also be implemented directly within \Stan's
 programming language.  The only thing that is needed is to increment
-the log probability accumulator \Verb|lp__| with the log probability.
-The rest of the chapter provides two examples.
+the total log probability.  The rest of the chapter provides two
+examples.
 
 \section{Examples}
 
@@ -4101,25 +4106,18 @@ parameters {
     real<lower=-1,upper=1> y;
 }
 model {
-    lp__ <- lp__ + log1m(fabs(y));
+    increment_log_prob(log1m(fabs(y)));
 }
 \end{Verbatim}
 \end{quote}
 %
 The single scalar parameter \code{y} is declared as lying in the
-interval \code{(-1,1)}.  The log probability variable \code{lp\_\_} is
+interval \code{(-1,1)}.  The total log probability is
 incremented with the joint log probability of all parameters, i.e.,
 $\log \distro{Triangle}(y|-1,1)$.  This value is coded in \Stan as
 \code{log1m(fabs(y))}.  The function \code{log1m} is is defined so
 that \code{log1m(x)} has the same value as \code{log(1.0-x)}, but the
 computation is faster, more accurate, and more stable.
-
-The log probability variable \code{lp\_\_} is incremented in this
-program rather than being set.  This is because the transform involved
-for the bounded variable \code{y} of type \code{real<lower=-1,upper=1>} implicitly
-adds a term to \code{lp\_\_} to adjust the log probability for the
-transform (adding the log absolute derivative of the inverse
-transform, a scaled inverse logit).
 
 The constrained type \code{real<lower=-1,upper=1>} declared for \code{y} is
 critical for correct sampling behavior.  If the constraint on \code{y}
@@ -4134,7 +4132,7 @@ i.e., $-\infty$, for values outside of $(-1,1)$.
 %
 \begin{quote}
 \begin{Verbatim}
-    lp__ <- log(fmax(0.0,1 - fabs(y)));
+    increment_log_prob(log(fmax(0.0,1 - fabs(y))));
 \end{Verbatim}
 \end{quote}
 %
@@ -4163,7 +4161,7 @@ variate.
 %
 \begin{quote}
 \begin{Verbatim}
-lp__ <- lp__ + log(lambda) - y * lambda;
+increment_log_prob(log(lambda) - y * lambda);
 \end{Verbatim}
 \end{quote}
 %

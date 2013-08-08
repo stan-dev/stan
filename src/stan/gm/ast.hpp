@@ -27,6 +27,7 @@ namespace stan {
     struct for_statement;
     struct fun;
     struct identifier;
+    struct increment_log_prob_statement;
     struct index_op;
     struct int_literal;
     struct inv_var_decl;
@@ -121,6 +122,23 @@ namespace stan {
                const expr_type& arg_type3,
                const expr_type& arg_type4,
                const expr_type& arg_type5);
+      void add(const std::string& name,
+               const expr_type& result_type,
+               const expr_type& arg_type1,
+               const expr_type& arg_type2,
+               const expr_type& arg_type3,
+               const expr_type& arg_type4,
+               const expr_type& arg_type5,
+               const expr_type& arg_type6);
+      void add(const std::string& name,
+               const expr_type& result_type,
+               const expr_type& arg_type1,
+               const expr_type& arg_type2,
+               const expr_type& arg_type3,
+               const expr_type& arg_type4,
+               const expr_type& arg_type5,
+               const expr_type& arg_type6,
+               const expr_type& arg_type7);
       void add_nullary(const::std::string& name);
       void add_unary(const::std::string& name);
       void add_binary(const::std::string& name);
@@ -463,9 +481,15 @@ namespace stan {
                     std::vector<expression> const& dims);
   };
 
-   
-
-   
+  struct cholesky_factor_var_decl : public base_var_decl {
+    expression M_;
+    expression N_;
+    cholesky_factor_var_decl();
+    cholesky_factor_var_decl(expression const& M,
+                             expression const& N,
+                             std::string const& name,
+                             std::vector<expression> const& dims);
+  };
 
   struct cov_matrix_var_decl : public base_var_decl {
     expression K_;
@@ -476,7 +500,6 @@ namespace stan {
   };
 
 
-
   struct corr_matrix_var_decl : public base_var_decl {
     expression K_;
     corr_matrix_var_decl();
@@ -484,8 +507,6 @@ namespace stan {
                          std::string const& name,
                          std::vector<expression> const& dims);
   };
-
-
 
   struct name_vis : public boost::static_visitor<std::string> {
     name_vis();
@@ -499,6 +520,7 @@ namespace stan {
     std::string operator()(const unit_vector_var_decl& x) const;
     std::string operator()(const ordered_var_decl& x) const;
     std::string operator()(const positive_ordered_var_decl& x) const;
+    std::string operator()(const cholesky_factor_var_decl& x) const;
     std::string operator()(const cov_matrix_var_decl& x) const;
     std::string operator()(const corr_matrix_var_decl& x) const;
   };
@@ -517,6 +539,7 @@ namespace stan {
                            boost::recursive_wrapper<unit_vector_var_decl>,
                            boost::recursive_wrapper<ordered_var_decl>,
                            boost::recursive_wrapper<positive_ordered_var_decl>,
+                           boost::recursive_wrapper<cholesky_factor_var_decl>,
                            boost::recursive_wrapper<cov_matrix_var_decl>,
                            boost::recursive_wrapper<corr_matrix_var_decl> >
     var_decl_t;
@@ -538,6 +561,7 @@ namespace stan {
     var_decl(const unit_vector_var_decl& decl);
     var_decl(const ordered_var_decl& decl);
     var_decl(const positive_ordered_var_decl& decl);
+    var_decl(const cholesky_factor_var_decl& decl);
     var_decl(const cov_matrix_var_decl& decl);
     var_decl(const corr_matrix_var_decl& decl);
 
@@ -548,6 +572,7 @@ namespace stan {
     typedef boost::variant<boost::recursive_wrapper<nil>,
                            boost::recursive_wrapper<assignment>,
                            boost::recursive_wrapper<sample>,
+                           boost::recursive_wrapper<increment_log_prob_statement>,
                            boost::recursive_wrapper<statements>,
                            boost::recursive_wrapper<for_statement>,
                            boost::recursive_wrapper<conditional_statement>,
@@ -564,6 +589,7 @@ namespace stan {
     statement(const nil& st);
     statement(const assignment& st);
     statement(const sample& st);
+    statement(const increment_log_prob_statement& st);
     statement(const statements& st);
     statement(const for_statement& st);
     statement(const conditional_statement& st);
@@ -573,6 +599,12 @@ namespace stan {
 
     // template <typename Statement>
     // statement(const Statement& statement);
+  };
+    
+  struct increment_log_prob_statement {
+    expression log_prob_;
+    increment_log_prob_statement();
+    increment_log_prob_statement(const expression& log_prob);
   };
 
   struct for_statement {

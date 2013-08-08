@@ -316,21 +316,40 @@ then for $n \in \setlist{\max(0,N-b),\ldots,\min(a,N)}$,
 
 \section{Categorical Distribution}
 
-\subsubsection{Probability Mass Function}
+\subsubsection{Probability Mass Functions}
 
-If $N \in \nats$ and $\theta \in \mbox{$N$-simplex}$, then for $y \in
+If $N \in \nats$, $N > 0$, and $\theta \in \mbox{$N$-simplex}$, then for $y \in
 \setlist{1,\ldots,N}$, 
+%
 \[
-\distro{Categorical}(y|\theta) = \theta_n.
+\distro{Categorical}(y|\theta) = \theta_y.
 \]
+%
+In addition, Stan provides a log-odds scaled categorical distribution, 
+%
+\[
+\distro{CategoricalLogit}(y|\beta)
+= \distro{Categorical}(y|\mbox{softmax}(\beta)).
+\]
+%
+See \refsection{softmax} for the definition of the softmax function.
 
 
 \subsubsection{Stan Functions}
 
+All of the categorical distributions are vectorized so that the
+outcome \farg{y} can be a single integer (type \code{int}) or an array
+of integers (type \code{int[]}).
+
 \begin{description}
-\fitem{real}{categorical\_log}{int \farg{y}, vector \farg{theta}}{The
-  log categorical probability mass function with outcome \farg{y} in 
-$1:N$ given $N$-simplex distribution parameter \farg{theta}}
+\fitem{real}{categorical\_log}{ints \farg{y}, vector \farg{theta}}{The
+  log categorical probability mass function with outcome(s) \farg{y} in 
+$1:N$ given $N$-simplex distribution parameter \farg{theta}.}
+%
+\fitem{real}{categorical\_logit\_log}{ints \farg{y}, vector
+  \farg{beta}}{The log categorical probability mass function with
+  outcome(s) \farg{y} in $1:N$ given log-odds of outcomes \farg{beta}.}
+%
 \end{description}
 %
 \begin{description}
@@ -1704,6 +1723,55 @@ $y \in \reals^K$,
   of freedom \farg{nu}, location \farg{mu}, and scale matrix \farg{S}; 
 may only be used in generated quantities block}
 \end{description}
+
+
+\section{Gaussian Dynamic Linear Models}
+\label{sec:guass-dynam-line}
+
+A Gaussian Dynamic Linear model is defined as follows,
+For $t \in 1, \dots, T$,
+\[
+  \begin{aligned}[t]
+    y_{t} &\sim N(F' \theta_{t}, V) \\
+    \theta_{t} &\sim N(G \theta_{t - 1}, W) \\
+    \theta_{0} &\sim N(m_{0}, C_{0}) 
+  \end{aligned}
+\]
+where $y$ is $n \times T$ matrix where rows are variables and columns
+are observations. These functions calculate the log-likelihood of the
+observations marginalizing over the latent states ($p(y | F, G, V, W,
+m_{0}, C_{0})$).  This log-likelihood is system is calculated using
+the the Kalman Filter.  If $V$ is diagonal, then a more efficient
+algorithm which sequentially processes observations and avoids a
+matrix inversions can be used \citep[Sec~6.4]{DurbinKoopman:2001}.
+
+\subsubsection{Stan Functions}
+
+\begin{description}
+%
+\fitem{real}{gaussian\_dlm\_obs\_log}{vector \farg{y}, matrix \farg{F},
+  matrix \farg{G}, matrix \farg{V}, matrix \farg{W}, vector
+  \farg{m0}, matrix \farg{C0}} {The log of the density of the
+  Gaussian Dynamic Linear model with observation matrix \farg{y} in
+  which rows are variables and columns are observations, design
+  matrix \farg{F}, transition matrix \farg{G}, observation
+  covariance matrix \farg{V}, system covariance matrix \farg{W}, and
+  the initial state is distributed normal with mean \farg{m0} and
+  covariance \farg{C0}.}
+% 
+%
+\fitem{real}{gaussian\_dlm\_obs\_log}{vector \farg{y}, matrix \farg{F},
+  matrix \farg{G}, vector \farg{V}, matrix \farg{W}, vector \farg{m0},
+  matrix \farg{C0}} {The log of the density of the Gaussian Dynamic
+  Linear model with observation matrix \farg{y} in which rows are
+  variables and columns are observations, design matrix \farg{F},
+  transition matrix \farg{G}, observation covariance matrix with
+  diagonal \farg{V}, system covariance matrix \farg{W}, and the
+  initial state is distributed normal with mean \farg{m0} and
+  covariance \farg{C0}.}
+%
+\end{description}
+
 
 \chapter{Simplex Distributions}
 

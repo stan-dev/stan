@@ -1116,23 +1116,22 @@ data {
 }
 model {
   for (n in 1:N) {
-    if (y[n] == 0) {
-      lp__ <- lp__ + log_sum_exp(bernoulli_log(1,theta),
-                                 bernoulli_log(0,theta) 
-                                    + poisson_log(0));
-    } else {
-      0 ~ bernoulli(theta);
-      y[n] ~ poisson(lambda);
-    }
+    if (y[n] == 0)
+      increment_log_prob(log_sum_exp(bernoulli_log(1,theta),
+                                     bernoulli_log(0,theta) 
+                                     + poisson_log(y[n],lambda)));
+    else
+      increment_log_prob(bernoulli_Log(0,theta)
+                         + poisson_log(y[n],lambda));
   }
   ...
 }
 \end{Verbatim}
 \end{quote}
 %
-The \code{log\_sum\_exp(lp1,lp2)} function adds log probabilities, and
-is defined to be equal to \code{log(exp(lp1) + exp(lp2))}, but is more
-arithmetically stable. 
+The \code{log\_sum\_exp(lp1,lp2)} function adds the log probabilities
+on the linear scale; it is defined to be equal to \code{log(exp(lp1) +
+  exp(lp2))}, but is more arithmetically stable.
 %
 \item Stan supports general while loops using a standard syntax.  
 While loops give Stan full Turing equivalent computational power.
@@ -1706,9 +1705,7 @@ always a bad idea).
 %
 \begin{quote}
 \begin{Verbatim}
-lp__ <- lp__ + (y - mu)'
-               * inv(Sigma) 
-               * (y - mu);
+increment_log_prob((y - mu)' * inv(Sigma) * (y - mu));
 \end{Verbatim}
 \end{quote}
 %
@@ -1721,7 +1718,7 @@ argument up underneath as follows.
 \begin{quote}
 \begin{Verbatim}
 y[n] ~ normal(alpha + beta * x + gamma * y,
-              pow(tau,-2));
+              pow(tau,-0.5));
 \end{Verbatim}
 \end{quote}
 %
