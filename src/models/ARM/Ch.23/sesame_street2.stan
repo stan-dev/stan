@@ -3,23 +3,23 @@ data {
   int<lower=0> J;
   matrix[N,2] yt;
   vector[N] z;
-  int siteset[N];
+  int<lower=1,upper=J> siteset[N];
   vector[N] pretest;
 }
 parameters {
-  real<lower=0> sigma_y;
-  real<lower=0> sigma_t;
   real<lower=0> sigma_a;
   real<lower=0> sigma_g;
   real<lower=0> sigma_py;
   real<lower=0> sigma_pt;
-  real rho_yt;
+  real<lower=0> sigma_t;
+  real<lower=0> sigma_y;
   real rho_ag;
+  real rho_yt;
   real phi_y;
   real phi_t;
   vector[2] mu_ag;
-  real d;
   real b;
+  real d;
   matrix[J,2] ag;
 }
 transformed parameters {

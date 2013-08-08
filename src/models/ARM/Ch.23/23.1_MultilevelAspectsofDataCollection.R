@@ -39,7 +39,7 @@ if (!exists("electric_1a.sm")) {
 }
 
 dataList.1 <- list(N=n,y=y,n_grade=n.grade,grade=grade,grade_pair=grade.pair,
-                   treatment=treatment,n_pair=n.pair,pair=pair)
+                   treatment=treatment,n_pair=n.pair,pair=pair,n_grade_pair=4)
 electric_1a.sf1 <- sampling(electric_1a.sm, dataList.1)
 print(electric_1a.sf1, pars = c("a","beta","lp__"))
 
@@ -74,7 +74,8 @@ if (!exists("electric_1c.sm")) {
 }
 
 dataList.3 <- list(N=n,y=y,n_grade=n.grade,grade=grade,grade_pair=grade.pair,
-                   treatment=treatment,n_pair=n.pair,pair=pair,pre_test=pre.test)
+                   treatment=treatment,n_pair=n.pair,pair=pair,pre_test=pre.test,
+                   n_grade_pair=4)
 electric_1c.sf1 <- sampling(electric_1c.sm, dataList.3)
 print(electric_1c.sf1, pars = c("a","beta","beta2","lp__"))
 
