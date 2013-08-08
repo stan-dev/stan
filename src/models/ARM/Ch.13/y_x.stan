@@ -1,7 +1,7 @@
 data {
   int<lower=0> N; 
-  vector[N] y;
   vector[N] x;
+  vector[N] y;
 }
 parameters {
   vector[2] beta;

@@ -1,36 +1,30 @@
 data {
   int<lower=0> N; 
   vector[N] earn;
-  vector[N] height;
   int eth[N];
+  vector[N] height;
 } 
 transformed data {
   vector[N] log_earn;
+
   log_earn <- log(earn);
 }
 parameters {
-  vector[4] a;
-  vector[4] b;
-  real<lower=0> sigma_y;
-  real<lower=0> sigma_a;
+  matrix[2,4] a;
+  real<lower=0,upper=100> sigma_a;
+  real<lower=0,upper=100> sigma_y;
   real mu_a;
-  real<lower=0> sigma_b;
-  real mu_b;
 }
 transformed parameters {
   vector[N] y_hat;
+
   for (i in 1:N)
-    y_hat[i] <- a[eth[i]] + b[eth[i]] * height[i];
+    y_hat[i] <- a[1,eth[i]] + a[2,eth[i]] * height[i];
 } 
 model {
-  mu_a ~ normal(0, 100);
-  sigma_a ~ uniform(0, 100);
-  a ~ normal (mu_a, sigma_a);
+  mu_a ~ normal(0, 1);
+  for (i in 1:2)
+    a[i] ~ normal (100 * mu_a, sigma_a);
 
-  mu_b ~ normal(0, 100);
-  sigma_b ~ uniform(0, 100);
-  b ~ normal (mu_b, sigma_b);
-
-  sigma_y ~ uniform(0, 100);
   log_earn ~ normal(y_hat, sigma_y);
 }

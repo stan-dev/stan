@@ -1,55 +1,50 @@
 data {
   int<lower=0> N; 
-  int<lower=0> n_eth; 
   int<lower=0> n_age; 
-  vector[N] y;
+  int<lower=0> n_eth; 
+  int<lower=1,upper=n_age> age[N];
+  int<lower=1,upper=n_eth> eth[N];
   vector[N] x;
-  int eth[N];
-  int age[N];
+  vector[N] y;
 } 
 parameters {
-  matrix[n_eth,2] a;
-  matrix[n_age,2] b;
+  matrix[2,n_eth] a;
+  matrix[2,n_age] b;
   matrix[n_eth,n_age] c;
   matrix[n_eth,n_age] d;
-  real<lower=0> sigma_y;
-  real<lower=0> sigma_a;
-  real<lower=0> sigma_b;
-  real<lower=0> sigma_c;
-  real<lower=0> sigma_d;
   real mu_a;
   real mu_b;
   real mu_c;
   real mu_d;
+  real<lower=0,upper=100> sigma_a;
+  real<lower=0,upper=100> sigma_b;
+  real<lower=0,upper=100> sigma_c;
+  real<lower=0,upper=100> sigma_d;
+  real<lower=0,upper=100> sigma_y;
 }
 transformed parameters {
   vector[N] y_hat;
   for (i in 1:N)
-    y_hat[i] <- a[eth[i],1] + a[eth[i],2] * x[i] + b[age[i],1] 
-                + b[age[i],2] * x[i] + c[eth[i],age[i]] 
+    y_hat[i] <- a[1,eth[i]] + a[2,eth[i]] * x[i] + b[1,age[i]] 
+                + b[2,age[i]] * x[i] + c[eth[i],age[i]] 
                 + d[eth[i],age[i]] * x[i];
 } 
 model {
-  mu_a ~ normal(0, 100);
-  sigma_a ~ uniform(0, 100);
+  mu_a ~ normal(0, 1);
+  for (i in 1:2)
+    a[i] ~ normal(100 * mu_a, sigma_a);
+
+  mu_b ~ normal(0, 1);
+  for (i in 1:2)
+    b[i] ~ normal (100 * mu_b, sigma_b);
+
+  mu_c ~ normal(0, 1);
   for (i in 1:n_eth)
-    a[i] ~ normal(mu_a, sigma_a);
+    c[i] ~ normal (100 * mu_c, sigma_c);
 
-  mu_b ~ normal(0, 100);
-  sigma_b ~ uniform(0, 100);
-  for (i in 1:n_age)
-    b[i] ~ normal (mu_b, sigma_b);
-
-  mu_c ~ normal(0, 100);
-  sigma_c ~ uniform(0, 100);
+  mu_d ~ normal(0, 1);
   for (i in 1:n_eth)
-    c[i] ~ normal (mu_c, sigma_c);
+    d[i] ~ normal (100 * mu_d, sigma_d);
 
-  mu_d ~ normal(0, 100);
-  sigma_d ~ uniform(0, 100);
-  for (i in 1:n_eth)
-    d[i] ~ normal (mu_d, sigma_d);
-
-  sigma_y ~ uniform(0, 100);
   y ~ normal(y_hat, sigma_y);
 }
