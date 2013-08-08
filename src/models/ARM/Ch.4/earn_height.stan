@@ -7,13 +7,16 @@ transformed data {           // standardization
   vector[N] z_earn;
   vector[N] z_height;
   real earn_mean;
-  real<lower=0> earn_sd;
   real height_mean;
+  real<lower=0> earn_sd;
   real<lower=0> height_sd;
+
   earn_mean   <- mean(earn);
-  earn_sd     <- sd(earn);
   height_mean <- mean(height);
+
+  earn_sd     <- sd(earn);
   height_sd   <- sd(height);
+
   z_earn      <- (earn - earn_mean) / earn_sd;
   z_height    <- (height - height_mean) / height_sd;
 }

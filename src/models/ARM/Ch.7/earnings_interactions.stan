@@ -6,8 +6,8 @@ data {
 } 
 transformed data {
   vector[N] log_earnings;
-  vector[N] height_male_inter;
   vector[N] male;
+  vector[N] height_male_inter;
 
   log_earnings <- log(earnings);
   male <- 2 - sex;

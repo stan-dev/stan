@@ -8,6 +8,7 @@ transformed data {
   vector[N] log_earn;
   vector[N] z_height;
   vector[N] inter;
+
   log_earn <- log(earn);
   z_height <- (height - mean(height)) / sd(height);
   inter <- z_height .* male;

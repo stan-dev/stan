@@ -8,16 +8,20 @@ transformed data {
   vector[N] z_log10_earn;    
   vector[N] z_height;
   real log10_earn_mean;
-  real<lower=0> log10_earn_sd;
   real height_mean;
+  real<lower=0> log10_earn_sd;
   real<lower=0> height_sd;
+
   for (i in 1:N) {                       // log 10 transformation
     log10_earn[i] <- log10(earn[i]);
   }
+
   log10_earn_mean <- mean(log10_earn);   // standardization
-  log10_earn_sd   <- sd(log10_earn);
   height_mean     <- mean(height);
+
+  log10_earn_sd   <- sd(log10_earn);
   height_sd       <- sd(height);
+
   z_log10_earn    <- (log10_earn - log10_earn_mean) / log10_earn_sd;
   z_height        <- (height - height_mean) / height_sd;
 }

@@ -1,45 +1,48 @@
 data {
   int<lower=0> N;
-  vector[N] partyid7;
-  vector[N] real_ideo;
-  vector[N] race_adj;
+  int age_discrete[N];
   vector[N] educ1;
   vector[N] gender;
   vector[N] income;
-  int age_discrete[N];
+  vector[N] partyid7;
+  vector[N] race_adj;
+  vector[N] real_ideo;
 }
 transformed data {
   vector[N] age30_44;        // age as factor
   vector[N] age45_64;
   vector[N] age65up;
 
-  vector[N] z_partyid7;      // standardization
-  real partyid7_mean;
-  real<lower=0> partyid7_sd;
-  vector[N] z_real_ideo;
-  real real_ideo_mean;
-  real<lower=0> real_ideo_sd;
-  vector[N] z_race_adj;
-  real race_adj_mean;
-  real<lower=0> race_adj_sd;
-  vector[N] z_educ1;
-  real educ1_mean;
-  real<lower=0> educ1_sd;
-  vector[N] z_gender;
-  real gender_mean;
-  real<lower=0> gender_sd;
-  vector[N] z_income;
-  real income_mean;
-  real<lower=0> income_sd;
-  vector[N] z_age30_44;
-  real age30_44_mean;
-  real<lower=0> age30_44_sd;
+  vector[N] z_age30_44;      // standardization
   vector[N] z_age45_64;
-  real age45_64_mean;
-  real<lower=0> age45_64_sd;
   vector[N] z_age65up;
+  vector[N] z_educ1;
+  vector[N] z_gender;
+  vector[N] z_income;
+  vector[N] z_partyid7;      
+  vector[N] z_race_adj;
+  vector[N] z_real_ideo;
+
+  real age30_44_mean;
+  real age45_64_mean;
   real age65up_mean;
+  real educ1_mean;
+  real gender_mean;
+  real income_mean;
+  real race_adj_mean;
+  real real_ideo_mean;
+  real partyid7_mean;
+
+  real<lower=0> age30_44_sd;
+  real<lower=0> age45_64_sd;
   real<lower=0> age65up_sd;
+  real<lower=0> educ1_sd;
+  real<lower=0> gender_sd;
+  real<lower=0> income_sd;
+  real<lower=0> race_adj_sd;
+  real<lower=0> real_ideo_sd;
+  real<lower=0> partyid7_sd;
+
 
   // age as factor
   for (n in 1:N) {
@@ -49,33 +52,35 @@ transformed data {
   }
 
   // standardization
-  partyid7_mean  <- mean(partyid7);
-  partyid7_sd    <- sd(partyid7);
-  z_partyid7     <- (partyid7 - partyid7_mean) / partyid7_sd;
-  real_ideo_mean <- mean(real_ideo);
-  real_ideo_sd   <- sd(real_ideo);
-  z_real_ideo    <- (real_ideo - real_ideo_mean) / real_ideo_sd;
-  race_adj_mean  <- mean(race_adj);
-  race_adj_sd    <- sd(race_adj);
-  z_race_adj     <- (race_adj - race_adj_mean) / race_adj_sd;
+  age30_44_mean  <- mean(age30_44);
+  age45_64_mean  <- mean(age45_64);
+  age65up_mean   <- mean(age65up);
   educ1_mean     <- mean(educ1);
-  educ1_sd       <- sd(educ1);
-  z_educ1        <- (educ1 - educ1_mean) / educ1_sd;
   gender_mean    <- mean(gender);
-  gender_sd      <- sd(gender);
-  z_gender       <- (gender - gender_mean) / gender_sd;
   income_mean    <- mean(income);
   income_sd      <- sd(income);
-  z_income       <- (income - income_mean) / income_sd;
-  age30_44_mean  <- mean(age30_44);
+  partyid7_mean  <- mean(partyid7);
+  race_adj_mean  <- mean(race_adj);
+  real_ideo_mean <- mean(real_ideo);
+
   age30_44_sd    <- sd(age30_44);
-  z_age30_44     <- (age30_44 - age30_44_mean) / age30_44_sd;
-  age45_64_mean  <- mean(age45_64);
   age45_64_sd    <- sd(age45_64);
-  z_age45_64     <- (age45_64 - age45_64_mean) / age45_64_sd;
-  age65up_mean   <- mean(age65up);
   age65up_sd     <- sd(age65up);
+  educ1_sd       <- sd(educ1);
+  gender_sd      <- sd(gender);
+  partyid7_sd    <- sd(partyid7);
+  race_adj_sd    <- sd(race_adj);
+  real_ideo_sd   <- sd(real_ideo);
+
+  z_age30_44     <- (age30_44 - age30_44_mean) / age30_44_sd;
+  z_age45_64     <- (age45_64 - age45_64_mean) / age45_64_sd;
   z_age65up      <- (age65up - age65up_mean) / age65up_sd;
+  z_educ1        <- (educ1 - educ1_mean) / educ1_sd;
+  z_gender       <- (gender - gender_mean) / gender_sd;
+  z_income       <- (income - income_mean) / income_sd;
+  z_partyid7     <- (partyid7 - partyid7_mean) / partyid7_sd;
+  z_race_adj     <- (race_adj - race_adj_mean) / race_adj_sd;
+  z_real_ideo    <- (real_ideo - real_ideo_mean) / real_ideo_sd;
 }
 parameters {
   vector[9] z_beta;

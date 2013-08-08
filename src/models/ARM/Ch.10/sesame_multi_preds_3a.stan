@@ -1,8 +1,8 @@
 data {
   int<lower=0> N; 
   vector[N] encouraged;
-  int site[N];
   vector[N] setting;
+  int site[N];
   vector[N] pretest;
   vector[N] watched;
 }

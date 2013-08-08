@@ -1,12 +1,12 @@
 data {
   int<lower=0> N;
-  vector[N] weight;
+  vector[N] canopy_height;
   vector[N] diam1;
   vector[N] diam2;
-  vector[N] canopy_height;
-  vector[N] total_height;
   vector[N] density;
   vector[N] group;
+  vector[N] total_height;
+  vector[N] weight;
 }
 parameters {
   vector[7] beta;

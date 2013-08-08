@@ -1,32 +1,36 @@
 data {
   int<lower=0> N; 
-  vector[N] dist;
   vector[N] arsenic;
+  vector[N] dist;
   vector[N] educ;
   int<lower=0,upper=1> switc[N];
 }
 transformed data {
   vector[N] dist100;
-  vector[N] c_dist100;
-  vector[N] log_arsenic;
-  vector[N] c_log_arsenic;
   vector[N] educ4;
+  vector[N] log_arsenic;
+  vector[N] c_dist100;
   vector[N] c_educ4;
+  vector[N] c_log_arsenic;
   vector[N] inter_dist_ars;
   vector[N] inter_dist_edu;
   vector[N] inter_ars_edu;
   real mu_dist100;
   real mu_log_arsenic;
   real mu_educ4;
+
   dist100 <- dist / 100.0;
   educ4 <- educ / 4.0;
   log_arsenic <- log(arsenic);
+
   mu_dist100 <- mean(dist100);
-  mu_log_arsenic <- mean(log_arsenic);
   mu_educ4 <- mean(educ4);
+  mu_log_arsenic <- mean(log_arsenic);
+
   c_dist100 <- dist100 - mu_dist100;
-  c_log_arsenic <- log_arsenic - mu_log_arsenic;
   c_educ4 <- educ4 - mu_educ4;
+  c_log_arsenic <- log_arsenic - mu_log_arsenic;
+
   inter_dist_ars <- c_dist100 .* c_log_arsenic;
   inter_dist_edu <- c_dist100 .* c_educ4;
   inter_ars_edu <- c_log_arsenic .* c_educ4;

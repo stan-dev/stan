@@ -1,8 +1,8 @@
 data {
   int<lower=0> N; 
+  vector[N] party;
   vector[N] score1;
   vector[N] x;
-  vector[N] party;
 }
 parameters {
   vector[3] beta;

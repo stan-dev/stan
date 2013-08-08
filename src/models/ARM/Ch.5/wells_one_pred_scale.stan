@@ -5,6 +5,7 @@ data {
 }
 transformed data {
   vector[N] dist100;
+
   dist100 <- dist / 100;
 }
 parameters {

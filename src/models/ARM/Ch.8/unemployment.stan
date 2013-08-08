@@ -1,7 +1,7 @@
 data {
   int<lower=0> N; 
-  vector[N] y_lag;
   vector[N] y;
+  vector[N] y_lag;
 }
 parameters {
   vector[2] beta;

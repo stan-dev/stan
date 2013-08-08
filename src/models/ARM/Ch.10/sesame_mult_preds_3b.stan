@@ -1,9 +1,9 @@
 data {
   int<lower=0> N; 
-  vector[N] watched_hat;
-  int site[N];
-  vector[N] setting;
   vector[N] pretest;
+  vector[N] setting;
+  int site[N];
+  vector[N] watched_hat;
   vector[N] y;
 }
 transformed data {

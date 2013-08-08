@@ -9,17 +9,20 @@ transformed data {           // standardization
   vector[N] z_mom_hs;
   vector[N] z_mom_iq;
   real kid_score_mean;
-  real<lower=0> kid_score_sd;
   real mom_hs_mean;
-  real<lower=0> mom_hs_sd;
   real mom_iq_mean;
+  real<lower=0> kid_score_sd;
+  real<lower=0> mom_hs_sd;
   real<lower=0> mom_iq_sd;
+
   kid_score_mean <- mean(kid_score);
-  kid_score_sd   <- sd(kid_score);
   mom_hs_mean    <- mean(mom_hs);
-  mom_hs_sd      <- sd(mom_hs);
   mom_iq_mean    <- mean(mom_iq);
+
+  kid_score_sd   <- sd(kid_score);
+  mom_hs_sd      <- sd(mom_hs);
   mom_iq_sd      <- sd(mom_iq);
+
   z_kid_score    <- (kid_score - kid_score_mean) / kid_score_sd;
   z_mom_hs       <- (mom_hs - mom_hs_mean) / mom_hs_sd;
   z_mom_iq       <- (mom_iq - mom_iq_mean) / mom_iq_sd;

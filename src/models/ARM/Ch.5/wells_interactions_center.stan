@@ -1,7 +1,7 @@
 data {
   int<lower=0> N; 
-  vector[N] dist;
   vector[N] arsenic;
+  vector[N] dist;
   int<lower=0,upper=1> switc[N];
 }
 transformed data {
@@ -11,11 +11,15 @@ transformed data {
   vector[N] inter;
   real mu_dist100;
   real mu_arsenic;
+
   dist100 <- dist / 100.0;
+
   mu_dist100 <- mean(dist100);
   mu_arsenic <- mean(arsenic);
+
   c_dist100 <- dist100 - mu_dist100;
   c_arsenic <- arsenic - mu_arsenic;
+
   inter <- c_dist100 .* c_arsenic;
 }
 parameters {

@@ -5,32 +5,36 @@ data {
   vector[N] mom_iq;
 }
 transformed data {           // standardization (SML, §18.5)
+  vector[N] inter;
   vector[N] z_kid_score;
   vector[N] z_mom_hs;
   vector[N] z_mom_iq;
-  vector[N] inter;
   vector[N] z_inter;
-  real kid_score_mean;
-  real<lower=0> kid_score_sd;
-  real mom_hs_mean;
-  real<lower=0> mom_hs_sd;
-  real mom_iq_mean;
-  real<lower=0> mom_iq_sd;
   real inter_mean;
+  real kid_score_mean;
+  real mom_hs_mean;
+  real mom_iq_mean;
   real<lower=0> inter_sd;
+  real<lower=0> kid_score_sd;
+  real<lower=0> mom_hs_sd;
+  real<lower=0> mom_iq_sd;
+
+  inter          <- mom_hs .* mom_iq;
+
+  inter_mean     <- mean(inter);
   kid_score_mean <- mean(kid_score);
-  kid_score_sd   <- sd(kid_score);
   mom_hs_mean    <- mean(mom_hs);
-  mom_hs_sd      <- sd(mom_hs);
   mom_iq_mean    <- mean(mom_iq);
+
+  inter_sd       <- sd(inter);
+  kid_score_sd   <- sd(kid_score);
+  mom_hs_sd      <- sd(mom_hs);
   mom_iq_sd      <- sd(mom_iq);
+
+  z_inter        <- (inter - inter_mean) / inter_sd;
   z_kid_score    <- (kid_score - kid_score_mean) / kid_score_sd;
   z_mom_hs       <- (mom_hs - mom_hs_mean) / mom_hs_sd;
   z_mom_iq       <- (mom_iq - mom_iq_mean) / mom_iq_sd;
-  inter          <- mom_hs .* mom_iq;
-  inter_mean     <- mean(inter);
-  inter_sd       <- sd(inter);
-  z_inter        <- (inter - inter_mean) / inter_sd;
 }
 parameters {
   vector[4] z_beta;

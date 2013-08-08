@@ -1,11 +1,12 @@
 data {
   int<lower=0> N; 
+  vector[N] party;
   vector[N] score1;
   vector[N] x;
-  vector[N] party;
 }
 transformed data {
   vector[N] inter;
+
   inter <- party .* x;
 }
 parameters {

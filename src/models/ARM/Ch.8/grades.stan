@@ -1,7 +1,7 @@
 data {
   int<lower=0> N; 
-  vector[N] midterm;
   vector[N] final;
+  vector[N] midterm;
 }
 parameters {
   vector[2] beta;

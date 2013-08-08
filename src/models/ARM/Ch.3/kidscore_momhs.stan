@@ -7,13 +7,16 @@ transformed data {           // standardization
   vector[N] z_kid_score;
   vector[N] z_mom_hs;
   real kid_score_mean;
-  real<lower=0> kid_score_sd;
   real mom_hs_mean;
+  real<lower=0> kid_score_sd;
   real<lower=0> mom_hs_sd;
+ 
   kid_score_mean <- mean(kid_score);
-  kid_score_sd   <- sd(kid_score);
   mom_hs_mean    <- mean(mom_hs);
+
+  kid_score_sd   <- sd(kid_score);
   mom_hs_sd      <- sd(mom_hs);
+
   z_kid_score    <- (kid_score - kid_score_mean) / kid_score_sd;
   z_mom_hs       <- (mom_hs - mom_hs_mean) / mom_hs_sd;
 }

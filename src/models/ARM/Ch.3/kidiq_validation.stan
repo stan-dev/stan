@@ -9,17 +9,20 @@ transformed data {           // standardization
   vector[N] z_hs;
   vector[N] z_afqt;
   real ppvt_mean;
-  real<lower=0> ppvt_sd;
   real hs_mean;
-  real<lower=0> hs_sd;
   real afqt_mean;
+  real<lower=0> ppvt_sd;
+  real<lower=0> hs_sd;
   real<lower=0> afqt_sd;
+
   ppvt_mean <- mean(ppvt);
-  ppvt_sd   <- sd(ppvt);
   hs_mean   <- mean(hs);
-  hs_sd     <- sd(hs);
   afqt_mean <- mean(afqt);
+
+  ppvt_sd   <- sd(ppvt);
+  hs_sd     <- sd(hs);
   afqt_sd   <- sd(afqt);
+
   z_ppvt    <- (ppvt - ppvt_mean) / ppvt_sd;
   z_hs      <- (hs - hs_mean) / hs_sd;
   z_afqt    <- (afqt - afqt_mean) / afqt_sd;

@@ -1,7 +1,7 @@
 data {
   int<lower=0> N; 
-  vector[N] score1;
   vector[N] party;
+  vector[N] score1;
   vector[N] z1; //z value for party 0, 0 otherwise 
   vector[N] z2; //z value for party 1, 0 otherwise 
 }

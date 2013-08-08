@@ -6,6 +6,7 @@ data {
 }
 transformed data {
   vector[N] inter;
+
   inter <- treatment .* pre_test;
 }
 parameters {
