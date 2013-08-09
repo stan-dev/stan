@@ -110,28 +110,15 @@ namespace stan {
         }
 
         _value = _default_value;
-        
-        /*
-        std::ofstream output;
-        std::string file_name = prefix + "_" + name() + "_good.config";
-        
-        output.open(file_name.data());
-        _value = _good_value;
-        base_arg->print(&output, 0, '\0');
-        output.close();
-        
-        if (_constrained) {
-          std::ofstream output;
-          std::string file_name = prefix + "_" + name() + "_bad.config";
-          output.open(file_name.data());
-          _value = _bad_value;
-          base_arg->print(&output, 0, '\0');
-          output.close();
+  
+      }
+      
+      void find_arg(std::string name,
+                    std::string prefix,
+                    std::vector<std::string>& valid_paths) {
+        if (name == _name) {
+          valid_paths.push_back(prefix + _name + "=<" + _value_type + ">");
         }
-        
-        _value = _default_value;
-        */
-        
       }
       
       T value() { return _value; }

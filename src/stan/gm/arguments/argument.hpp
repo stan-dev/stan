@@ -43,12 +43,24 @@ namespace stan {
       
       virtual void probe_args(argument* base_arg, std::stringstream& s) {};
       
+      virtual void find_arg(std::string name,
+                            std::string prefix,
+                            std::vector<std::string>& valid_paths) {
+        if (name == _name) {
+          valid_paths.push_back(prefix + _name);
+        }
+      }
+      
       static void split_arg(const std::string& arg, std::string& name, std::string& value) {
         size_t pos = arg.find('=');
         
         if (pos != std::string::npos) {
           name = arg.substr(0, pos);
           value = arg.substr(pos + 1, arg.size() - pos);
+        }
+        else {
+          name = arg;
+          value = "";
         }
       }
       

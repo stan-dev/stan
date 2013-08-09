@@ -108,8 +108,7 @@ namespace stan {
           s << "good" << std::endl;
           base_arg->print(&s, 0, '\0');
           s << std::endl;
-          
-          //_values.at(i)->probe_args(base_arg, prefix + name() + "_");
+
           _values.at(i)->probe_args(base_arg, s);
         }
         
@@ -122,30 +121,22 @@ namespace stan {
         _values.pop_back();
         _cursor = _default_cursor;
         
-        /*
-        for (int i = 0; i < _values.size(); ++i) {
-          _cursor = i;
-          
-          std::ofstream output;
-          std::string file_name = prefix + "good.config";
-          output.open(file_name.data());
-          base_arg->print(&output, 0, '\0');
-          output.close();
-          
-          _values.at(i)->probe_args(base_arg, prefix + name() + "_");
+      }
+      
+      void find_arg(std::string name,
+                    std::string prefix,
+                    std::vector<std::string>& valid_paths) {
+        
+        if (name == _name) {
+          valid_paths.push_back(prefix + _name + "=<list_element>");
         }
         
-        _values.push_back(new arg_fail);
-        _cursor = _values.size() - 1;
-        std::ofstream output;
-        std::string file_name = prefix + "bad.config";
-        output.open(file_name.data());
-        base_arg->print(&output, 0, '\0');
-        output.close();
-        
-        _values.pop_back();
-        _cursor = _default_cursor;
-        */
+        prefix += _name + "=";
+        for (std::vector<argument*>::iterator it = _values.begin();
+             it != _values.end(); ++it) {
+          std::string value_prefix = prefix + (*it)->name() + " ";
+          (*it)->find_arg(name, prefix, valid_paths);
+        }
         
       }
       
