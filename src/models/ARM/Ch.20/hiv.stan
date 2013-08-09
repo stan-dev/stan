@@ -20,7 +20,7 @@ transformed parameters {
 model {
   mu_a ~ normal(0, 1);
   for (j in 1:2)
-    a[j] ~ normal (100 * mu_a, sigma_a);
+    a[j] ~ normal (2.5 * mu_a, sigma_a);
 
   y ~ normal(y_hat, sigma_y);
 }

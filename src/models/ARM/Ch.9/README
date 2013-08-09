@@ -29,8 +29,8 @@ Models
 
 2. Multiple predictors without interaction
   electric_trpre.stan: lm(post_test ~ treatment + pre_test)
+  electric_supp.stan : lm(post_test ~ supp + pre_test)
 
 3. Multiple predictors with interaction
   electric_inter.stan: lm(post_test ~ treatment + pre_test + treatment:pre_test)
 
-4. electric_supp.stan: post_test ~ supp + pre_test

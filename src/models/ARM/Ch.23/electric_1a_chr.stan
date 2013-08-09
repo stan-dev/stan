@@ -10,7 +10,7 @@ data {
   vector[N] y;
 }
 parameters {
-  vector[n_grade_pair] eta_a;
+  vector[n_pair] eta_a;
   vector[n_grade] eta_b;
   vector<lower=0,upper=100>[n_grade_pair] sigma_a;
   real<lower=0,upper=100> sigma_b;
@@ -19,16 +19,17 @@ parameters {
   real mu_b;
 }
 transformed parameters {
-  vector[n_grade_pair] a;
+  vector[n_pair] a;
   vector[n_grade] b;
   vector<lower=0>[N] sigma_y_hat;
   vector[N] y_hat;
 
-  a <- 100 * mu_a + sigma_a .* eta_a;
-  b <- 100 * mu_b + sigma_b * eta_b;
+  for (i in 1:n_pair)
+    a[i] <- 94 * mu_a[grade_pair[i]] + sigma_a[grade_pair[i]] * eta_a[i];
+  b <- 5 * mu_b + sigma_b * eta_b;
 
   for (i in 1:N) {
-    y_hat[i] <- a[grade[pair[i]]] + b[grade[i]] * treatment[i];
+    y_hat[i] <- a[pair[i]] + b[grade[i]] * treatment[i];
     sigma_y_hat[i] <- sigma_y[grade[i]];
   }
 }

@@ -69,7 +69,7 @@ Logistic regressions
    where:
    c_dist100 <- (dist - mean(dist)) / 100
    c_arsenic <- arsenic - mean(arsenic)
-    wells_predicted.stan  : glm(switched ~ c_dist100 + c_arsenic + c_educ4 
+  wells_predicted.stan    : glm(switched ~ c_dist100 + c_arsenic + c_educ4 
                                            + c_dist100:c_arsenic + c_dist100:c_educ4 
                                            + c_arsenic:c_educ4, 
 				family=binomial(link="logit"))

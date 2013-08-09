@@ -11,7 +11,7 @@ data {
   vector[N] y;
 }
 parameters {
-  vector[n_grade_pair] eta_a;
+  vector[n_pair] eta_a;
   vector[n_grade] eta_b;
   vector[n_grade] eta_c;
   vector[n_grade_pair] mu_a;
@@ -23,34 +23,29 @@ parameters {
   vector<lower=0,upper=100>[n_grade] sigma_y;
 }
 transformed parameters {
-  vector[n_grade_pair] a;
+  vector[n_pair] a;
   vector[n_grade] b;
   vector[n_grade] c;
   vector<lower=0,upper=100>[N] sigma_y_hat;
   vector[N] y_hat;
 
-  a <- 100 * mu_a + sigma_a .* eta_a;
-  b <- 100 * mu_b + sigma_b * eta_b;
-  c <- 100 * mu_c + sigma_c * eta_c;
+  for (i in 1:n_pair)
+    a[i] <- 29 * mu_a[grade_pair[i]] + sigma_a[grade_pair[i]] * eta_a[i];
+  b <- 4 * mu_b + sigma_b * eta_b;
+  c <- 1.7 * mu_c + sigma_c * eta_c;
 
   for (i in 1:N) {
-    y_hat[i] <- a[grade[pair[i]]] + b[grade[i]] * treatment[i] 
+    y_hat[i] <- a[pair[i]] + b[grade[i]] * treatment[i] 
                  + c[grade[i]] * pre_test[i];
     sigma_y_hat[i] <- sigma_y[grade[i]];
   }
 }
 model {
-  mu_a ~ normal(0, 1);
-  mu_b ~ normal(0, 1);
-  mu_c ~ normal(0, 1);
-
-  sigma_a ~ uniform(0, 100);
-  sigma_b ~ uniform(0, 100);
-  sigma_c ~ uniform(0, 100);
-
   eta_a ~ normal(0, 1);
   eta_b ~ normal(0, 1);
   eta_c ~ normal(0, 1);
-
+  mu_a ~ normal(0, 1);
+  mu_b ~ normal(0, 1);
+  mu_c ~ normal(0, 1);
   y ~ normal(y_hat, sigma_y_hat);
 }

@@ -44,11 +44,6 @@ model {
   mu_b ~ normal(0, 1);
   mu_c ~ normal(0, 1);
 
-  sigma_a ~ uniform(0, 100);
-  sigma_b ~ uniform(0, 100);
-  sigma_c ~ uniform(0, 100);
-  sigma_y ~ uniform(0, 100);
-
   a ~ normal(mu_a_hat, sigma_a_hat);
   b ~ normal(100 * mu_b, sigma_b);
   c ~ normal(100 * mu_c, sigma_c);

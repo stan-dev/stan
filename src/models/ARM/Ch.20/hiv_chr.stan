@@ -15,7 +15,7 @@ transformed parameters {
   matrix[2,J] a;
   vector[N] y_hat;
 
-  a <- 100 * mu_a + sigma_a * eta;
+  a <- 2.5 * mu_a + sigma_a * eta;
 
   for (i in 1:N)
     y_hat[i] <- a[1,person[i]] + a[2,person[i]] * time[i];
