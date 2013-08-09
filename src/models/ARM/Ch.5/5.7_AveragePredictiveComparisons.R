@@ -1,76 +1,79 @@
 library(rstan)
-library(ggplot2)
-library(boot)
-source("wells.data.R", echo = TRUE)    
 
-## Fitting the model (wells_edu.stan)
-##  glm (switch ~ dist100 + arsenic + educ4, family=binomial(link="logit"))
-if (!exists("wells_edu.sm")) {
-    if (file.exists("wells_edu.sm.RData")) {
-        load("wells_edu.sm.RData", verbose = TRUE)
+### Data
+
+source("wells.data.R", echo = TRUE)
+
+### Model: switched ~ dist/100 + arsenic + educ/4
+
+if (!exists("wells_dae.sm")) {
+    if (file.exists("wells_dae.sm.RData")) {
+        load("wells_dae.sm.RData", verbose = TRUE)
     } else {
-        rt <- stanc("wells_edu.stan", model_name = "wells_edu")
-        wells_edu.sm <- stan_model(stanc_ret = rt)
-        save(wells_edu.sm, file = "wells_edu.sm.RData")
+        rt <- stanc("wells_dae.stan", model_name = "wells_dae")
+        wells_dae.sm <- stan_model(stanc_ret = rt)
+        save(wells_dae.sm, file = "wells_dae.sm.RData")
     }
 }
-dataList.1 <- list(N=N, switc=switc, dist=dist,arsenic=arsenic,assoc=assoc,educ=educ)
-wells_edu.sf1 <- sampling(wells_edu.sm, dataList.1)
-print(wells_edu.sf1)
+
+data.list <- c("N", "switched", "dist", "arsenic", "educ")
+wells_dae.sf <- sampling(wells_dae.sm, data.list)
+print(wells_dae.sf, pars = c("beta", "lp__"))
 
 ## Avg predictive differences
 
-beta.post <- extract(wells_edu.sf1, "beta")$beta
-b <- colMeans(beta.post)
+b <- colMeans(extract(wells_dae.sf, "beta")$beta)
+invlogit <- function(x) plogis(x)
 
- # for distance to nearest safe well
+# for distance to nearest safe well
 
 hi <- 1
 lo <- 0
-delta <- inv.logit (b[1] + b[2]*hi + b[3]*arsenic + b[4]*educ/4) -
-         inv.logit (b[1] + b[2]*lo + b[3]*arsenic + b[4]*educ/4)
-print (mean(delta))
+delta <- invlogit(b[1] + b[2] * hi + b[3] * arsenic + b[4] * educ / 4) -
+         invlogit(b[1] + b[2] * lo + b[3] * arsenic + b[4] * educ / 4)
+print(mean(delta))
 
- #  for arsenic level
+# for arsenic level
 
 hi <- 1.0
 lo <- 0.5
-delta <- inv.logit (b[1] + b[2]*dist/100 + b[3]*hi + b[4]*educ/4) -
-         inv.logit (b[1] + b[2]*dist/100 + b[3]*lo + b[4]*educ/4)
-print (mean(delta))
+delta <- invlogit(b[1] + b[2] * dist / 100 + b[3] * hi + b[4] * educ / 4) -
+         invlogit(b[1] + b[2] * dist / 100 + b[3] * lo + b[4] * educ / 4)
+print(mean(delta))
 
- # for education
+# for education
 
 hi <- 3
 lo <- 0
-delta <- inv.logit (b[1]+b[2]*dist/100+b[3]*arsenic+b[4]*hi) -
-         inv.logit (b[1]+b[2]*dist/100+b[3]*arsenic+b[4]*lo)
-print (mean(delta))
+delta <- invlogit(b[1] + b[2] * dist / 100 + b[3] * arsenic + b[4] * hi) -
+         invlogit(b[1] + b[2] * dist / 100 + b[3] * arsenic + b[4] * lo)
+print(mean(delta))
 
-## Avg predictive comparisons with interactions (wells_all.stan)
-##  glm (switch ~ dist100 + arsenic + educ4 + dist100:arsenic, family=binomial(link="logit"))
-if (!exists("wells_all.sm")) {
-    if (file.exists("wells_all.sm.RData")) {
-        load("wells_all.sm.RData", verbose = TRUE)
+### Avg predictive comparisons with interactions
+##  switches ~ dist/100 + arsenic + educ/4 + dist/100:arsenic
+
+if (!exists("wells_dae_inter.sm")) {
+    if (file.exists("wells_dae_inter.sm.RData")) {
+        load("wells_dae_inter.sm.RData", verbose = TRUE)
     } else {
-        rt <- stanc("wells_all.stan", model_name = "wells_all")
-        wells_all.sm <- stan_model(stanc_ret = rt)
-        save(wells_all.sm, file = "wells_all.sm.RData")
+        rt <- stanc("wells_dae_inter.stan", model_name = "wells_dae_inter")
+        wells_dae_inter.sm <- stan_model(stanc_ret = rt)
+        save(wells_dae_inter.sm, file = "wells_dae_inter.sm.RData")
     }
 }
-dataList.2 <- c("N","switc","dist","arsenic","educ")
-wells_all.sf1 <- sampling(wells_all.sm, dataList.2)
-print(wells_all.sf1)
 
- # for distance
-beta.post <- extract(wells_all.sf1, "beta")$beta
-b <- colMeans(beta.post)
+wells_dae_inter.sf <- sampling(wells_dae_inter.sm, data.list)
+print(wells_dae_inter.sf)
+
+b <- colMeans(extract(wells_dae_inter.sf, "beta")$beta)
+
+# for distance
+
 hi <- 1
 lo <- 0
-delta <- inv.logit (b[1] + b[2]*hi + b[3]*arsenic + b[4]*educ/4 +
-                   b[5]*hi*arsenic) -
-         inv.logit (b[1] + b[2]*lo + b[3]*arsenic + b[4]*educ/4 +
-                   b[5]*lo*arsenic)
-print (mean(delta))
-
+delta <- invlogit(b[1] + b[2] * hi + b[3] * arsenic + b[4] * educ / 4 +
+                  b[5] * hi * arsenic) -
+         invlogit(b[1] + b[2] * lo + b[3] * arsenic + b[4] * educ / 4 +
+                  b[5] * lo * arsenic)
+print(mean(delta))
 

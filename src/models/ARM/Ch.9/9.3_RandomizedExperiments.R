@@ -1,152 +1,152 @@
+data <- read.table("~/docs/statistica/GelmanHill/Book_Codes/Ch.9/electric.dat", header=TRUE)
+electric <- data.frame(post_test = c(data$treated.Posttest, data$control.Posttest),
+                       pre_test = c(data$treated.Pretest, data$control.Pretest),
+                       grade = rep(data$Grade, 2),
+                       treatment = rep (c(1,0), rep(length(data$treated.Posttest),2)),
+                       supp = c(as.numeric(data[,"Supplement."])-1, rep(NA,nrow(data))))
+for (i in 1:4) {
+    temp <- electric[electric$grade == i,]
+    N <- nrow(temp)
+    attach(temp)
+    stan_rdump(c("N", "post_test", "pre_test", "grade", "treatment"),
+                file=paste("electric_grade", i, ".data.R", sep=""))
+    detach(temp)
+    temp <- electric[(electric$grade == i) & (!is.na(electric$supp)),]
+    N <- nrow(temp)
+    attach(temp)
+    stan_rdump(c("N", "post_test", "pre_test", "grade", "treatment", "supp"),
+                file=paste("electric_grade", i, "_supp.data.R", sep=""))
+    detach(temp)
+}
+rm(temp)
+
+
 library(rstan)
 library(ggplot2)
-library(gridBase)
-electric <- read.table ("electric.dat", header=T)
-attach(electric)
-## Plot of the raw data (Figure 9.4)
-  
-  electric$Grade <- factor(electric$Grade, levels=c('1','2','3','4'), labels=c('Grade 1', 'Grade 2', 'Grade 3', 'Grade 4'))
-  frame = data.frame(x1=control.Posttest,Grade=electric$Grade)
-  p1 <- ggplot(frame,aes(x1)) +
-        geom_histogram(colour = "black", fill = "white", binwidth=5) +
-        theme_bw() +
-        facet_grid(Grade ~.) +
-        theme(strip.text.y = element_blank(),axis.title.y = element_blank(),axis.title.x=element_blank(),strip.background = element_blank()) +
-        labs(title='Test Scores in Control Classes') 
 
-  frame2 = data.frame(x1=treated.Posttest,Grade=electric$Grade)
-  p2 <- ggplot(frame2,aes(x1)) +
-        geom_histogram(colour = "black", fill = "white", binwidth=5) +
-        theme_bw() +
-        facet_grid(Grade ~.) +
-        theme(axis.title.y = element_blank(),axis.ticks.y = element_blank(),axis.text.y=element_blank(),axis.title.x=element_blank()) +
-        labs(title='Test Scores in Treated Classes') 
+### Data
 
-pushViewport(viewport(layout = grid.layout(1, 2)))
-print(p1, vp = viewport(layout.pos.row = 1, layout.pos.col = 1))
-print(p2, vp = viewport(layout.pos.row = 1, layout.pos.col = 2))
+# electric_gradeX.data.R, where X = 1, 2, 3, 4
 
-## Basic analysis of a completely randomized experiment
-electric <- read.table ("electric.dat", header=T)
-attach(electric)
+# Plot of the raw data (Figure 9.4)
 
-post.test <- c (treated.Posttest, control.Posttest)
-pre.test <- c (treated.Pretest, control.Pretest)
-grade <- rep (electric$Grade, 2)
-treatment <- rep (c(1,0), rep(length(treated.Posttest),2))
-n <- length (post.test)
+electric.ggdf <- data.frame(c(), c(), c(), c(), c()) # empty data frame
+for (i in 1:4) {
+    source(paste("electric_grade", i, ".data.R", sep = ""))
+    means <- round(as.vector(by(post_test, treatment, mean)), 0);
+    sds <- round(as.vector(by(post_test, treatment, sd)), 0);
+    electric.ggdf <- rbind(electric.ggdf, data.frame(
+        post_test, pre_test, grade = paste("Grade", grade), treatment,
+        mean = means[treatment+1], sd = sds[treatment+1]))
+}
+electric.ggdf$treatment <- factor(electric.ggdf$treatment)
+levels(electric.ggdf$treatment) <- c("Test scores in control classes",
+                                    "Test scores in treated classes")
 
-if (!exists("electric_one_pred.sm")) {
-    if (file.exists("electric_one_pred.sm.RData")) {
-        load("electric_one_pred.sm.RData", verbose = TRUE)
+p1 <- ggplot(electric.ggdf, aes(x = post_test)) +
+    geom_histogram(color = "black", fill = "gray", binwidth = 5) +
+    geom_text(aes(x = 10, y = 6, label = paste("mean =", mean, "\n  sd =", sd)),
+              hjust = 0, vjust = 0, size = 3, alpha = 0.1) +
+    facet_grid(grade ~ treatment) +
+    scale_x_continuous("", limits = c(0, 125), breaks = c(0, 50, 100)) +
+#    scale_y_continuous("", breaks = c())
+    scale_y_continuous("", breaks = seq(0, 10, 2))
+print(p1)
+
+### Basic analysis of a completely randomized experiment
+
+## Models:
+#  post_test ~ treatment
+#  post_test ~ treatment + pre_test
+
+if (!exists("electric_tr.sm")) {
+    if (file.exists("electric_tr.sm.RData")) {
+        load("electric_tr.sm.RData", verbose = TRUE)
     } else {
-        rt <- stanc("electric_one_pred.stan", model_name = "electric_one_pred")
-        electric_one_pred.sm <- stan_model(stanc_ret = rt)
-        save(electric_one_pred.sm, file = "electric_one_pred.sm.RData")
+        rt <- stanc("electric_tr.stan", model_name = "electric_tr")
+        electric_tr.sm <- stan_model(stanc_ret = rt)
+        save(electric_tr.sm, file = "electric_tr.sm.RData")
     }
 }
 
-est1 <- rep(NA,4)
-se1 <- rep(NA,4)
-for (k in 1:4) {
-post.test1 <- post.test[grade==k]
-treatment1 <- treatment[grade==k]
-ok <- !is.na(post.test1+treatment1)
-post.test2 <- post.test1[ok]
-treatment2 <- treatment1[ok]
-N1 <- length(post.test2)
-
-dataList.1 <- list(N=N1, post_test=post.test2, treatment=treatment2)
-electric_one_pred.sf1 <- sampling(electric_one_pred.sm, dataList.1)
-print(electric_one_pred.sf1)
-beta.post <- extract(electric_one_pred.sf1, "beta")$beta
-est1[k] <- colMeans(beta.post)[2]
-se1[k] <- sd(beta.post[,2])
+if (!exists("electric_trpre.sm")) {
+    if (file.exists("electric_trpre.sm.RData")) {
+        load("electric_trpre.sm.RData", verbose = TRUE)
+    } else {
+        rt <- stanc("electric_trpre.stan", model_name = "electric_trpre")
+        electric_trpre.sm <- stan_model(stanc_ret = rt)
+        save(electric_trpre.sm, file = "electric_trpre.sm.RData")
+    }
 }
+
 
 ## Plot of the regression results (Figure 9.5)
-if (!exists("electric_multi_preds.sm")) {
-    if (file.exists("electric_multi_preds.sm.RData")) {
-        load("electric_multi_preds.sm.RData", verbose = TRUE)
-    } else {
-        rt <- stanc("electric_multi_preds.stan", model_name = "electric_multi_preds")
-        electric_multi_preds.sm <- stan_model(stanc_ret = rt)
-        save(electric_multi_preds.sm, file = "electric_multi_preds.sm.RData")
-    }
+
+alpha2 <- theta1 <- theta2 <- beta2 <- rep(NA, 4)
+se1  <- se2 <- rep(NA,4)
+
+# empty data frame (for Figure 9.6)
+prepost.ggdf <- data.frame(c(), c(), c(), c(), c(), c(), c()) 
+
+for (i in 1:4) {
+    source(paste("electric_grade", i, ".data.R", sep = ""))
+    temp <- data.frame(post_test, pre_test, grade, treatment)
+    data.list <- c("N", "post_test", "pre_test", "treatment")
+    sf.1 <- sampling(electric_tr.sm, data.list)
+    beta.post <- extract(sf.1, "beta")$beta
+    theta1[i] <- mean(beta.post[,2])
+    se1[i]    <- sd(beta.post[,2])
+    sf.2 <- sampling(electric_trpre.sm, data.list)
+    beta.post <- extract(sf.2, "beta")$beta
+    alpha2[i] <- mean(beta.post[,1])
+    theta2[i] <- mean(beta.post[,2])
+    beta2[i]  <- mean(beta.post[,3])
+    se2[i]    <- sd(beta.post[,2])
+    temp$alpha <- alpha2[i]
+    temp$theta <- theta2[i]
+    temp$beta  <- beta2[i]
+    prepost.ggdf <- rbind(prepost.ggdf, temp)
 }
 
-est2 <- rep(NA,4)
-se2 <- rep(NA,4)
-for (k in 1:4) {
-post.test1 <- post.test[grade==k]
-pre.test1 <- pre.test[grade==k]
-treatment1 <- treatment[grade==k]
-ok <- !is.na(post.test1+treatment1+pre.test1)
-post.test2 <- post.test1[ok]
-pre.test2 <- pre.test1[ok]
-treatment2 <- treatment1[ok]
-N1 <- length(post.test2)
-
-dataList.1 <- list(N=N1, post_test=post.test2, treatment=treatment2,pre_test=pre.test2)
-electric_multi_preds.sf1 <- sampling(electric_multi_preds.sm, dataList.1)
-print(electric_multi_preds.sf1)
-beta.post <- extract(electric_multi_preds.sf1, "beta")$beta
-est2[k] <- colMeans(beta.post)[2]
-se2[k] <- sd(beta.post[,2])
+theta.ggdf <- data.frame(c(), c(), c()) # empty data frame
+for (i in 1:4) {
+    theta.ggdf <- rbind(theta.ggdf,
+                        data.frame(est = theta1[i], se = se1[i], pretest = 0, grade = i))
+    theta.ggdf <- rbind(theta.ggdf,
+                        data.frame(est = theta2[i], se = se2[i], pretest = 1, grade = i))
 }
 
-#graphs on Figure 9.5
-
-frame = data.frame(Grade=4:1,x1=est1,x2=est2,se1=se1,se2=se2)
+theta.ggdf$pretest <- factor(theta.ggdf$pretest)
+levels(theta.ggdf$pretest) <- c("Regression on treatment indicator",
+                      "Regression on treatment indicator\ncontrolling for pre-test")
 dev.new()
-p4 <- ggplot(frame, aes(x=x1,y=Grade)) +
-      geom_point(size=3) +
-      theme_bw() +
-      labs(title="Regression on Treatment Indicator") +
-      geom_segment(aes(x=x1-se1,y=Grade,xend=x1+se1,yend=Grade),size=2) + 
-      geom_segment(aes(x=x1-2 * se1,y=Grade,xend=x1+2*se1,yend=Grade)) +
-      geom_vline(xintercept=0,linetype="dotted") +
-      scale_x_continuous("Effect of the Electric Company TV Show")
+p2 <- ggplot(theta.ggdf, aes(x = 5 - grade, y = est)) +
+    geom_pointrange(aes(ymin = est - se, ymax = est + se), size = 0.8) +
+    geom_pointrange(aes(ymin = est - 2 * se, ymax = est + 2 * se), size = 0.5) +
+    geom_hline(aes(yintercept = 0), linetype = "dashed") +
+    facet_grid(. ~ pretest) +
+    scale_x_continuous("Subpopulation", breaks = seq(1,4),
+                       labels = paste("Grade", seq(4,1,-1))) +
+    scale_y_continuous("", breaks = seq(0, 15, 5)) +
+    coord_flip()
+print(p2)
 
-p5 <- ggplot(frame, aes(x=x2,y=Grade)) +
-      geom_point(size=3) +
-      theme_bw() +
-      labs(title="Regression on Treatment Indicator Controlling for Pre-test") +
-      geom_segment(aes(x=x2-se2,y=Grade,xend=x2+se2,yend=Grade),size=2) + 
-      geom_segment(aes(x=x2-2 * se2,y=Grade,xend=x2+2*se2,yend=Grade)) +
-      geom_vline(xintercept=0,linetype="dotted") +
-      scale_x_continuous("Effect of the Electric Company TV Show")
+## Figure 9.6
 
-pushViewport(viewport(layout = grid.layout(1, 2)))
-print(p4, vp = viewport(layout.pos.row = 1, layout.pos.col = 1))
-print(p5, vp = viewport(layout.pos.row = 1, layout.pos.col = 2))
-
-
-## Controlling for pre-treatment predictors (Figure 9.6)
-electric <- read.table ("electric.dat", header=T)
-attach(electric)
+prepost.ggdf$grade <- factor(prepost.ggdf$grade)
+levels(prepost.ggdf$grade) <- paste("Grade", levels(prepost.ggdf$grade))
+prepost.ggdf$treatment <- factor(prepost.ggdf$treatment)
 dev.new()
-pushViewport(viewport(layout = grid.layout(1, 4)))
-for (j in 1:4){
-  ok <- electric$Grade==j & !is.na(treated.Posttest+treated.Pretest+control.Pretest+control.Posttest)
-  pret <- c (treated.Pretest[ok], control.Pretest[ok])
-  postt <-c (treated.Posttest[ok], control.Posttest[ok])
-  t <- rep (c(1,0),rep(sum(ok),2))
-  dataList.1 <- list(N=length(pret), post_test=postt, pre_test=pret,treatment=t)
-  electric_multi_preds.sf <- sampling(electric_multi_preds.sm, dataList.1)
-  beta.post <- extract(electric_multi_preds.sf, "beta")$beta
-  beta.mean <- colMeans(beta.post)
-
-  frame1 = data.frame(x1=treated.Pretest[ok],y1=treated.Posttest[ok])
-  frame2 = data.frame(x2=control.Pretest[ok],y2=control.Posttest[ok])
-  p3 <- ggplot() +
-        geom_point(data=frame1,aes(x=x1,y=y1),shape=20) +
-        geom_point(data=frame2,aes(x=x2,y=y2),shape=21) +
-        scale_y_continuous("Posttest",limits=c(0,125)) +
-        scale_x_continuous("Pretest",limits=c(0,125)) +
-        theme_bw() +
-        labs(title=paste("Grade ",j)) +
-        geom_abline(intercept=(beta.mean[1]+beta.mean[2]),slope=beta.mean[3]) +
-        geom_abline(intercept=(beta.mean[1]),slope=beta.mean[3],linetype="dashed")
-  print(p3, vp = viewport(layout.pos.row = 1, layout.pos.col = j))
-}
+p3 <- ggplot(prepost.ggdf, aes(x = pre_test, y = post_test)) +
+    geom_point(aes(shape=treatment)) +
+    scale_shape_manual(values = c(16, 1)) +
+    geom_abline(aes(intercept = alpha + theta * (as.numeric(treatment)-1),
+                    slope = beta, linetype = treatment)) +
+    scale_linetype_manual(values = c(2, 1)) +
+    facet_grid(. ~ grade) +
+    scale_x_continuous(expression(paste("pre-test, ", x[i])),
+                       limits = c(0, 125)) +
+    scale_y_continuous(expression(paste("post-test, ", y[i])),
+                       limits = c(0, 125)) +
+    theme(legend.position = "none")
+print(p3)

@@ -2,16 +2,16 @@ Data
 ====
 
 1. dogs.data.R
-- n_dogs  : number of dogs
-- n_trials: number of trials
-- y       :
+  - n_dogs  : number of dogs
+  - n_trials: number of trials
+  - y       :
 
 Models
 ======
 
 1. Multilevel model
-dogs.stan    : glmer(y ~ n_avoid + n_shock, family=binomial(link="logit"))
-dogs_log.stan: glmer(y ~ n_avoid + n_shock, family=binomial(link="exp"))
+  dogs.stan    : glmer(y ~ n_avoid + n_shock, family=binomial(link="logit"))
+  dogs_log.stan: glmer(y ~ n_avoid + n_shock, family=binomial(link="exp"))
 
 2. Multilevel models with multivariate distribution
-dogs_check.stan
+  dogs_check.stan

@@ -1,48 +1,71 @@
 library(rstan)
 library(ggplot2)
-source("nes.data.R", echo = TRUE)    
 
- # Estimation (nes.stan)
- # glm (vote ~ income, family=binomial(link="logit"))
+### Data
 
-if (!exists("nes.sm")) {
-    if (file.exists("nes.sm.RData")) {
-        load("nes.sm.RData", verbose = TRUE)
+source("nes1992_vote.data.R", echo = TRUE)
+
+### Logistic model: vote ~ income
+
+if (!exists("nes_logit.sm")) {
+    if (file.exists("nes_logit.sm.RData")) {
+        load("nes_logit.sm.RData", verbose = TRUE)
     } else {
-        rt <- stanc("nes.stan", model_name = "nes")
-        nes.sm <- stan_model(stanc_ret = rt)
-        save(nes.sm, file = "nes.sm.RData")
+        rt <- stanc("nes_logit.stan", model_name = "nes_logit")
+        nes_logit.sm <- stan_model(stanc_ret = rt)
+        save(nes_logit.sm, file = "nes_logit.sm.RData")
     }
 }
 
-dataList.1 <- c("N","income","vote")
-nes.sf1 <- sampling(nes.sm, dataList.1)
-print(nes.sf1, pars = c("beta", "lp__"))
+data.list <- c("N", "vote", "income")
+nes_logit.sf <- sampling(nes_logit.sm, data.list)
+print(nes_logit.sf, pars = c("beta", "lp__"))
 
-fit1.post <- extract(nes.sf1)
-beta.mean <- colMeans(fit1.post$beta)
+### Figures
 
- # Graph figure 5.1 (a)
+beta.post <- extract(nes_logit.sf, "beta")$beta
+beta.mean <- colMeans(beta.post)
 
-frame1 = data.frame(income=income,vote=vote)
-p1 <- ggplot(frame1,aes(x=income,y=vote)) +
-      geom_jitter(position=position_jitter(height=.08,width=.4)) +
-      scale_y_continuous("Pr(Republican Vote)",limits=c(-.01,1)) +
-      scale_x_continuous("Income",limits=c(-2,8)) + theme_bw() +
-      stat_smooth(method="glm",family="binomial",se=F,size=2,colour="black") +
-      stat_function(fun=function(x) 1.0 / (1 + exp(-beta.mean[1] - beta.mean[2] * x)))
+# Figure 5.1 (a)
+
+len <- 20
+x <- seq(1, 5, length.out = len)
+y <- 1 / (1 + exp(- beta.mean[1] - beta.mean[2] * x))
+nes_vote.ggdf.1 <- data.frame(x, y)
+
+p1 <- ggplot(data.frame(income, vote), aes(x = income, y = vote)) +
+    geom_jitter(position = position_jitter(height = 0.04, width = 0.4)) +
+    geom_line(aes(x, y), data = nes_vote.ggdf.1, size = 2) +
+    stat_function(fun = function(x)
+                  1 / (1 + exp(- beta.mean[1] - beta.mean[2] * x))) +
+    scale_x_continuous("Income", limits = c(-2, 8), breaks = seq(1, 5),
+                       labels = c("1\n(poor)", "2", "3", "4", "5\n(rich)")) +
+    scale_y_continuous("Pr(Republican Vote)", limits = c(-0.05, 1.05),
+                       breaks = seq(0, 1, 0.2))
 print(p1)
 
- # Graph figure 5.1 (b)
+# Figure 5.1 (b)
+
 dev.new()
-m2 <- "ggplot(frame1,aes(x=income,y=vote)) +
-       scale_y_continuous('Pr(Republican Vote)',limits=c(-.01,1)) +
-       scale_x_continuous('Income') +
-       theme_bw() +
-       stat_smooth(method='glm',family='binomial',se=F,colour='black') +
-       geom_jitter(position=position_jitter(height=.08,width=.4))"
-for (i in 1:20) {
-  m2 <- paste(m2,"+ stat_function(aes(y=0),fun=function(x) 1.0 / (1 + exp(-fit1.post$beta[4000-",i,",1]-fit1.post$beta[4000-",i,",2]*x)),colour='grey')")
+n <- 20
+ndx <- sample(nrow(beta.post), n)
+min.x <- 0.5
+max.x <- 5.5
+x <- seq(min.x, max.x, length.out = len)
+nes_vote.ggdf.2 <- data.frame(c(), c(), c()) # empty data frame
+for (i in ndx) {
+    y <- 1 / (1 + exp(- beta.post[i, 1] - beta.post[i, 2] * x))
+    nes_vote.ggdf.2 <- rbind(nes_vote.ggdf.2,
+                        data.frame(id = rep(i, len), x, y))
 }
-m2 <- paste(m2, "+ stat_function(fun=function(x) 1.0 / (1 + exp(-fit1.post$beta[1] - fit1.post$beta[2] * x)))")
-eval(parse(text = m2))
+
+p2 <- ggplot(data.frame(income, vote), aes(x = income, y = vote)) +
+    geom_jitter(position = position_jitter(height = .04, width = .4)) +
+    geom_line(aes(x, y, group = id), data = nes_vote.ggdf.2, alpha = 0.1) +
+    geom_line(aes(x, y = 1 / (1 + exp(- beta.mean[1] - beta.mean[2] * x))),
+                  data = nes_vote.ggdf.2) +
+    scale_x_continuous("Income", limits = c(min.x, max.x), breaks = seq(1, 5),
+                       labels = c("1\n(poor)", "2", "3", "4", "5\n(rich)")) +
+    scale_y_continuous("Pr(Republican Vote)", limits = c(-0.05, 1.05),
+                       breaks = seq(0, 1, 0.2))
+print(p2)

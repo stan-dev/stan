@@ -1,34 +1,36 @@
 library(rstan)
 library(ggplot2)
 
-## Generating the variables
-x <- rnorm(60, mean =1, sd = 2)
-y <- ifelse(x<2,0,1)
+### Data
 
-## Fit the model (y_x.stan)
-## glm (y ~ x, family=binomial(link="logit"))
-if (!exists("y_x.sm")) {
-    if (file.exists("y_x.sm.RData")) {
-        load("y_x.sm.RData", verbose = TRUE)
+# N <- 60
+# x <- rnorm(N, mean = 1, sd = 2)
+# y <- ifelse(x < 2, 0, 1)
+# stan_rdump(c("N", "y", "x"), file = "separation.data.R")
+
+source("separation.data.R", echo = TRUE)
+
+## Model: y ~ x
+
+if (!exists("separation.sm")) {
+    if (file.exists("separation.sm.RData")) {
+        load("separation.sm.RData", verbose = TRUE)
     } else {
-        rt <- stanc("y_x.stan", model_name = "y_x")
-        y_x.sm <- stan_model(stanc_ret = rt)
-        save(y_x.sm, file = "y_x.sm.RData")
+        rt <- stanc("separation.stan", model_name = "separation")
+        separation.sm <- stan_model(stanc_ret = rt)
+        save(separation.sm, file = "separation.sm.RData")
     }
 }
-dataList.1 <- list(N=length(x), y=y, x=x)
-y_x.sf1 <- sampling(y_x.sm, dataList.1)
-print(y_x.sf1)
+
+data.list <- c("N", "y", "x")
+separation.sf <- sampling(separation.sm, data.list)
+print(separation.sf)
 
 ## Plot
-beta.post <- extract(y_x.sf1, "beta")$beta
+beta.post <- extract(separation.sf, "beta")$beta
 b <- colMeans(beta.post)
 
-frame = data.frame(y1=y,x1=x)
-p1 <- ggplot(frame,aes(x=x1,y=y1)) +
-     geom_point() +
-     scale_y_continuous("y") +
-     scale_x_continuous("x", limits=c(-6,6)) +
-     theme_bw() +
-     stat_function(fun=function(x) 1.0 / (1 + exp(-(b[1]+b[2] * x))))
-print(p1)
+p <- ggplot(data.frame(x, y), aes(x, y)) +
+    geom_point() +
+    stat_function(fun = function(x) 1.0 / (1 + exp(-(b[1] + b[2] * x))))
+print(p)

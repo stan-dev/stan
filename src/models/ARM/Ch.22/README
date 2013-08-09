@@ -2,19 +2,19 @@ Data
 ====
 
 1. radon.data.R
-- N     : number of observations
-- J     : number of counties
-- radon : radon measurement
-- x     : house-level first-floor indicator
-- y     : log of the home radon level
-- county: county number
-- u     : county-level uranium measure
+  - J     : number of counties
+  - N     : number of observations
+  - county: county number
+  - radon : radon measurement
+  - u     : county-level uranium measure
+  - x     : house-level first-floor indicator
+  - y     : log of the home radon level
 
 Models
 ======
 
 1. Multilevel model with varying intercept
-anova_radon_nopred.stan: lmer(y ~ 1 + (1 | county))
+  anova_radon_nopred.stan: lmer(y ~ 1 + (1 | county))
 
 2. Above models with Matt trick
-anova_radon_nopred_chr.stan: lmer(y ~ 1 + (1 | county))
+  anova_radon_nopred_chr.stan: lmer(y ~ 1 + (1 | county))

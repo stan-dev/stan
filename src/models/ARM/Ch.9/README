@@ -1,32 +1,36 @@
 Data
 ====
 
-1. electric.data.R
-- N1      : number of observations for Grade 1
-- N2      : number of observations for Grade 2
-- N3      : number of observations for Grade 3
-- N4      : number of observations for Grade 4
-- posttest1: post test score for Grade 1 
-- posttest2: post test score for Grade 2 
-- posttest3: post test score for Grade 3 
-- posttest4: post test score for Grade 4 
-- pretest1: pre test score for Grade 1 
-- pretest2: pre test score for Grade 2 
-- pretest3: pre test score for Grade 3 
-- pretest4: pre test score for Grade 4 
-- treatment1: had treatment for Grade 1? 1: Yes, 0: No
-- treatment2: had treatment for Grade 2? 1: Yes, 0: No
-- treatment3: had treatment for Grade 3? 1: Yes, 0: No
-- treatment4: had treatment for Grade 4? 1: Yes, 0: No
+1. electric_gradeX.data.R, where X = 1, 2, 3, 4
+Data from an educational experiment performed around 1970 on a set of
+elementary school classes.
+The treatment was exposure to a new educational television show called The
+Electric Company.
+  - N        : number of observations
+  - grade    : one of four grades
+  - pre_test : reading test score at the beginning of the school year
+  - post_test: reading test score at the end of the school year
+  - treatment: 1 if the class was exposed to the television show
+
+2. electric_gradeX_supp.data.R, where X = 1, 2, 3, 4
+  - N        : number of observations
+  - grade    : one of four grades
+  - post_test: reading test score at the end of the school year
+  - pre_test : reading test score at the beginning of the school year
+  - treatment: 1 (only classes exposed to the television show)
+  - supp     : 1 if the teacher chose to supplement the regular reading program
+             0 if the teacher chose to replace the regular reading program
 
 Models
 ======
 
 1. One predictor
-electric_one_pred.stan: lm(post_test ~ treatment)
+  electric_tr.stan: lm(post_test ~ treatment)
 
-3. Multiple predictors without interaction
-electric_multi_preds.stan: lm(post_test ~ treatment + pre_test)
+2. Multiple predictors without interaction
+  electric_trpre.stan: lm(post_test ~ treatment + pre_test)
 
 3. Multiple predictors with interaction
-electric_interactions.stan: lm(post_test ~ treatment + pre_test + treatment:pre_test)
+  electric_inter.stan: lm(post_test ~ treatment + pre_test + treatment:pre_test)
+
+4. electric_supp.stan: post_test ~ supp + pre_test

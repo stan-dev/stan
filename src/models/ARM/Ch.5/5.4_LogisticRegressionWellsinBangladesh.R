@@ -1,103 +1,127 @@
 library(rstan)
 library(ggplot2)
-source("wells.data.R", echo = TRUE)    
 
-## Histogram on distance (Figure 5.8)
-frame = data.frame(dist=dist)
-p1 <- ggplot(frame,aes(x=dist))  +
-      scale_x_continuous("Distance (in meters) to the nearest safe well")
-      geom_histogram(colour = "black", fill = "white", binwidth=10) +
-      theme_bw()
+### Data
+
+source("wells.data.R", echo = TRUE)
+
+### Logistic regression with one predictor
+
+# Figure 5.8
+
+p1 <- ggplot(data.frame(dist)) +
+    geom_histogram(aes(dist), color = "black", fill = "gray", binwidth = 10) +
+    scale_x_continuous("Distance (in meters) to the nearest safe well") +
+    scale_y_continuous("")
 print(p1)
 
-## Logistic regression with one predictor (wells_one_pred.stan)
-## glm (switch ~ dist, family=binomial(link="logit"))
-if (!exists("wells_one_pred.sm")) {
-    if (file.exists("wells_one_pred.sm.RData")) {
-        load("wells_one_pred.sm.RData", verbose = TRUE)
+# First logistic model: switched ~ dist
+
+if (!exists("wells_dist.sm")) {
+    if (file.exists("wells_dist.sm.RData")) {
+        load("wells_dist.sm.RData", verbose = TRUE)
     } else {
-        rt <- stanc("wells_one_pred.stan", model_name = "wells_one_pred")
-        wells_one_pred.sm <- stan_model(stanc_ret = rt)
-        save(wells_one_pred.sm, file = "wells_one_pred.sm.RData")
+        rt <- stanc("wells_dist.stan", model_name = "wells_dist")
+        wells_dist.sm <- stan_model(stanc_ret = rt)
+        save(wells_dist.sm, file = "wells_dist.sm.RData")
     }
 }
 
-dataList.1 <- c("N","switc","dist")
-wells_one_pred.sf1 <- sampling(wells_one_pred.sm, dataList.1)
-print(wells_one_pred.sf1)
+data.list.1 <- c("N", "switched", "dist")
+wells_dist.sf <- sampling(wells_dist.sm, data.list.1)
+print(wells_dist.sf, pars = c("beta", "lp__"))
 
-beta.post <- extract(wells_one_pred.sf1, "beta")$beta
-beta.mean <- colMeans(beta.post)
+# More reasonable model: switched ~ dist/100
 
-## Repeat the regression above with distance in 100-meter units (wells_one_pred_scale.stan)
-## glm (switch ~ dist100, family=binomial(link="logit"))
-dist100 <- dist/100
-dataList.2 <- list(N=N, switc=switc, dist=dist100)
-wells_one_pred.sf2 <- sampling(wells_one_pred.sm, dataList.2)
-print(wells_one_pred.sf2)
-
-## Graphing the fitted model with one predictor (Figure 5.9)
-jitter.binary <- function(a, jitt=.05){
-  ifelse (a==0, runif (length(a), 0, jitt), runif (length(a), 1-jitt, 1))
+if (!exists("wells_dist100.sm")) {
+    if (file.exists("wells_dist100.sm.RData")) {
+        load("wells_dist100.sm.RData", verbose = TRUE)
+    } else {
+        rt <- stanc("wells_dist100.stan", model_name = "wells_dist100")
+        wells_dist100.sm <- stan_model(stanc_ret = rt)
+        save(wells_dist100.sm, file = "wells_dist100.sm.RData")
+    }
 }
 
+wells_dist100.sf <- sampling(wells_dist100.sm, data.list.1)
+print(wells_dist100.sf, pars = c("beta", "lp__"))
+
+# Figure 5.9
+
+beta.post.2 <- extract(wells_dist100.sf, "beta")$beta
+beta.mean.2 <- colMeans(beta.post.2)
+
 dev.new()
-switch.jitter <- jitter.binary(switc)
-frame1 = data.frame(dist=dist,switc=switch.jitter)
-p2 <- ggplot(frame1,aes(x=dist,y=switc)) +
-      geom_point() +
-      scale_y_continuous("Pr(Switching)",limits=c(-.01,1)) +
-      scale_x_continuous("Distance (in meters) to nearest safe well") +
-      theme_bw() +
-      stat_function(fun=function(x) 1.0 / (1 + exp(-beta.mean[1] - beta.mean[2] * x)))
+p2 <- ggplot(data.frame(switched, dist), aes(dist, switched)) +
+    geom_jitter(position = position_jitter(width = 0.2, height = 0.01)) +
+    stat_function(fun = function(x)
+                  1 / (1 + exp(- beta.mean.2[1] - beta.mean.2[2] * x / 100))) +
+    scale_x_continuous("Distance (in meters) to the nearest safe well",
+                       breaks = seq(from = 0, by = 50, length.out = 7)) +
+    scale_y_continuous("Pr(switching)", breaks = seq(0, 1, 0.2))
 print(p2)
 
-## Histogram on arsenic levels (Figure 5.10)
+### Logistic regression with second input variable
+
+# Figure 5.10
+
 dev.new()
-frame3 = data.frame(ars=arsenic)
-p3 <- ggplot(frame3,aes(x=ars))  +
-      scale_x_continuous("Arsenic concentration in well water")
-      geom_histogram(colour = "black", fill = "white", binwidth=0.25) +
-      theme_bw()
+p3 <- ggplot(data.frame(arsenic)) +
+    geom_histogram(aes(arsenic), color = "black", fill = "gray", binwidth = 0.25) +
+    scale_x_continuous("Arsenic concentration in well water") +
+    scale_y_continuous("")
 print(p3)
 
-## Logistic regression with second input variable (wells_two_pred.stan)
-## glm (switch ~ dist100 + arsenic, family=binomial(link="logit"))
-if (!exists("wells_two_pred.sm")) {
-    if (file.exists("wells_two_pred.sm.RData")) {
-        load("wells_two_pred.sm.RData", verbose = TRUE)
+# Model: switched ~ dist/100 + arsenic
+
+if (!exists("wells_d100ars.sm")) {
+    if (file.exists("wells_d100ars.sm.RData")) {
+        load("wells_d100ars.sm.RData", verbose = TRUE)
     } else {
-        rt <- stanc("wells_two_pred.stan", model_name = "wells_two_pred")
-        wells_two_pred.sm <- stan_model(stanc_ret = rt)
-        save(wells_two_pred.sm, file = "wells_two_pred.sm.RData")
+        rt <- stanc("wells_d100ars.stan", model_name = "wells_d100ars")
+        wells_d100ars.sm <- stan_model(stanc_ret = rt)
+        save(wells_d100ars.sm, file = "wells_d100ars.sm.RData")
     }
 }
-dataList.3 <- c("N","switc","dist","arsenic")
-wells_two_pred.sf1 <- sampling(wells_two_pred.sm, dataList.3)
-print(wells_two_pred.sf1)
 
-beta.post2 <- extract(wells_two_pred.sf1, "beta")$beta
-beta.mean2 <- colMeans(beta.post2)
+data.list.3 <- c("N", "switched", "dist", "arsenic")
+wells_d100ars.sf <- sampling(wells_d100ars.sm, data.list.3)
+print(wells_d100ars.sf, pars = c("beta", "lp__"))
 
-## Graphing the fitted model with two predictors (Figure 5.11)
-dev.new()
-frame3 = data.frame(dist=dist,switc=switch.jitter)
-p4 <- ggplot(frame3,aes(x=dist,y=switc)) +
-      geom_point() +
-      scale_y_continuous("Pr(Switching)",limits=c(-.01,1)) +
-      scale_x_continuous("Distance (in meters) to nearest safe well") +
-      theme_bw() +
-      stat_function(fun=function(x) 1.0 / (1 + exp(-beta.mean2[1] - 0.5 * beta.mean2[3] - beta.mean2[2] * x / 100.0))) +
-      stat_function(fun=function(x) 1.0 / (1 + exp(-beta.mean2[1] - beta.mean2[3] - beta.mean2[2] * x / 100.0)))
-print(p4)
+beta.post.3 <- extract(wells_d100ars.sf, "beta")$ beta
+beta.mean.3 <- colMeans(beta.post.3)
+
+# Figure 5.11 (a)
 
 dev.new()
-frame4 = data.frame(ars=arsenic,switc=switch.jitter)
-p5 <- ggplot(frame4,aes(x=ars,y=switc)) +
-      geom_point() +
-      scale_y_continuous("Pr(Switching)",limits=c(-.01,1)) +
-      scale_x_continuous("Arsenic concentration in well water") +
-      theme_bw() +
-      stat_function(fun=function(x) 1.0 / (1 + exp(-beta.mean2[1] - beta.mean2[3] * x))) +
-      stat_function(fun=function(x) 1.0 / (1 + exp(-beta.mean2[1] - beta.mean2[2] * 0.5 - beta.mean2[3] * x)))
+p4 <- ggplot(data.frame(switched, dist), aes(dist, switched)) +
+    geom_jitter(position = position_jitter(width = 0.2, height = 0.01)) +
+    stat_function(fun = function(x)
+                  1 / (1 + exp(- beta.mean.3[1] - beta.mean.3[2] * x / 100
+                       - beta.mean.3[3] * 0.5))) +
+    stat_function(fun = function(x)
+                  1 / (1 + exp(- beta.mean.3[1] - beta.mean.3[2] * x / 100
+                       - beta.mean.3[3]))) +
+    annotate("text", x = c(50,75), y = c(0.35, 0.55),
+             label = c("if As = 0.5", "if As = 1.0"), size = 4) +
+    scale_x_continuous("Distance (in meters) to the nearest safe well",
+                       breaks = seq(from = 0, by = 50, length.out = 7)) +
+    scale_y_continuous("Pr(switching)", breaks = seq(0, 1, 0.2))
+plot(p4)
+
+# Figure 5.11 (b)
+
+dev.new()
+p5 <- ggplot(data.frame(switched, arsenic), aes(arsenic, switched)) +
+    geom_jitter(position = position_jitter(width = 0.2, height = 0.01)) +
+    stat_function(fun = function(x)
+                  1 / (1 + exp(- beta.mean.3[1] - beta.mean.3[3] * x))) +
+    stat_function(fun = function(x)
+                  1 / (1 + exp(- beta.mean.3[1] - beta.mean.3[2] * 0.5
+                       - beta.mean.3[3] * x))) +
+    annotate("text", x = c(1.7,2.5), y = c(0.78, 0.56),
+             label = c("if dist = 0", "if dist = 50"), size = 4) +
+    scale_x_continuous("Arsenic concentration in well water",
+                       breaks = seq(from = 0, by = 2, length.out = 5)) +
+    scale_y_continuous("Pr(switching)", breaks = seq(0, 1, 0.2))
 print(p5)

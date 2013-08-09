@@ -1,71 +1,72 @@
 library(rstan)
 library(ggplot2)
-library(gridBase)
-source("9.3_Randomized experiments.R") # where data was cleaned
 
-## Observational studies
+### Data
 
- # Plot Figure 9.9
+# electric_gradeX_supp.data.R, where X = 1, 2, 3, 4
 
-supp <- c(as.numeric(electric[,"Supplement."])-1, rep(NA,nrow(electric)))
-# supp=0 for replace, 1 for supplement, NA for control
+### Model: post_test ~ supp + pretest
 
-est1 <- rep(NA,4)
-se1 <- rep(NA,4)
-for (k in 1:4){
-  ok <- (grade==k) & (!is.na(supp))
-  dataList.1 <- list(N=length(post.test[ok]), post_test=post.test[ok], treatment=supp[ok],pre_test=pre.test[ok])
-  electric_multi_preds.sf1 <- sampling(electric_multi_preds.sm, dataList.1)
-  print(electric_multi_preds.sf1)
-  beta.post <- extract(electric_multi_preds.sf1, "beta")$beta
-  est1[k] <- colMeans(beta.post)[2]
-  se1[k] <- sd(beta.post[,2])
+if (!exists("electric_supp.sm")) {
+    if (file.exists("electric_supp.sm.RData")) {
+        load("electric_supp.sm.RData", verbose = TRUE)
+    } else {
+        rt <- stanc("electric_supp.stan", model_name = "electric_supp")
+        electric_supp.sm <- stan_model(stanc_ret = rt)
+        save(electric_supp.sm, file = "electric_supp.sm.RData")
+    }
 }
 
-# graphs on Figure 9.9
+### Figures
 
-frame = data.frame(Grade=4:1,x1=est1,se1=se1)
-dev.new()
-p1 <- ggplot(frame, aes(x=x1,y=Grade)) +
-      geom_point(size=3) +
-      theme_bw() +
-      labs(title="Estimated Effect of Supplement Compared to Replacement") +
-      geom_segment(aes(x=x1-se1,y=Grade,xend=x1+se1,yend=Grade),size=2) + 
-      geom_segment(aes(x=x1-2 * se1,y=Grade,xend=x1+2*se1,yend=Grade)) +
-      geom_vline(xintercept=0,linetype="dotted") +
-      scale_x_continuous("")
+beta1 <- beta2 <- beta3 <- rep(NA, 4)
+sd2 <- rep(NA, 4)
+# empty data frames
+supp_effect.ggdf <- data.frame(c(), c(), c()) # Figure 9.9
+prepost.ggdf <- data.frame(c(), c(), c(), c(), c(), c(), c()) # Figure 9.12
 
+for (i in 1:4) {
+    source(paste("electric_grade", i, "_supp.data.R", sep = ""))
+    data.list <- c("N", "post_test", "pre_test", "supp")
+    sf <- sampling(electric_supp.sm, data.list)
+    beta.post <- extract(sf, "beta")$beta
+    beta1 <- mean(beta.post[,1])
+    beta2 <- mean(beta.post[,2])
+    beta3 <- mean(beta.post[,3])
+    sd2 <- sd(beta.post[,2])
+    supp_effect.ggdf <- rbind(supp_effect.ggdf,
+                              data.frame(est = beta2, se = sd2, grade = i))
+    prepost.ggdf <- rbind(prepost.ggdf,
+                          data.frame(post_test, pre_test, grade = i, supp,
+                                     beta1, beta2, beta3))
+}
+
+## Figure 9.9
+
+p1 <- ggplot(supp_effect.ggdf, aes(x = 5 - grade, y = est)) +
+    geom_pointrange(aes(ymin = est - se, ymax = est + se), size = 0.8) +
+    geom_pointrange(aes(ymin = est - 2 * se, ymax = est + 2 * se), size = 0.3) +
+    geom_hline(aes(yintercept = 0), linetype = "dashed") +
+    scale_x_continuous("Subpopulation", breaks = seq(1,4),
+                       labels = paste("Grade", seq(4,1,-1))) +
+    scale_y_continuous("", breaks = c(0, 5, 10)) +
+    coord_flip() +
+    ggtitle("Estimated effect of supplement,\ncompared to replacement")
 print(p1)
 
-## Examining overlap in the Electric Company example (Figure 9.12)
+## Figure 9.12
+
+prepost.ggdf$supp <- factor(prepost.ggdf$supp)
+prepost.ggdf$grade <- factor(prepost.ggdf$grade)
+levels(prepost.ggdf$grade) <- paste("Grade", levels(prepost.ggdf$grade))
 dev.new()
-pushViewport(viewport(layout = grid.layout(1, 4)))
-
-for (j in 1:4){
-  ok <- (grade==j) & (!is.na(supp))
-  frame2 = data.frame(x1=pre.test[ok],y1=post.test[ok],x2=supp[ok])
-  dataList.2 <- list(N=length(frame2$x1),post_test=frame2$y1,
-                     treatment=frame2$x1,pre_test=frame2$x2)
-  electric_multi_preds.sf <- sampling(electric_multi_preds.sm, dataList.2)
-  beta.post <- extract(electric_multi_preds.sf, "beta")$beta
-  beta.mean <- colMeans(beta.post)
-  
-  pre.test2 <- pre.test[ok&supp==1]
-  post.test2 <- post.test[ok&supp==1]
-  frame3 = data.frame(x1=pre.test2,y1=post.test2)
-
-  pre.test3 <- pre.test[ok&supp==0]
-  post.test3 <- post.test[ok&supp==0]
-  frame4 = data.frame(x1=pre.test3,y1=post.test3)
-
-  p3 <- ggplot() +
-        geom_point(data=frame3,aes(x=x1,y=y1),shape=20) +
-        geom_point(data=frame4,aes(x=x1,y=y1),shape=20,colour="gray") +    
-        scale_y_continuous("Posttest") +
-        scale_x_continuous("Pretest") +
-        theme_bw() +
-        labs(title=paste("Grade ",j)) +
-        geom_abline(intercept=(beta.mean[1]+beta.mean[3]),slope=beta.mean[2],colour="gray30") +
-        geom_abline(intercept=(beta.mean[1]),slope=beta.mean[2])
-  print(p3, vp = viewport(layout.pos.row = 1, layout.pos.col = j))
-}
+p2 <- ggplot(prepost.ggdf, aes(x = pre_test, y = post_test)) +
+    geom_point(aes(color = supp)) +
+    geom_abline(aes(intercept = beta1 + beta2 * (as.numeric(supp)-1),
+                    slope = beta3, color = supp)) +
+    scale_color_manual(values = c("darkgray", "black")) +
+    facet_wrap(~ grade, nrow = 1, scales = "free") +
+    scale_x_continuous("pre-test score") +
+    scale_y_continuous("post-test score") +
+    theme(legend.position = "null")
+print(p2)
