@@ -66,8 +66,8 @@ namespace stan {
                     << e.what() << std::endl
                     << "If this warning occurs sporadically then the sampler is fine,"
                     << std::endl
-                    << "but if this warning occurs often then your model is either severly "
-                    << "ill-conditioned or even misspecified."
+                    << "but if this warning occurs often then your model is either severely "
+                    << "ill-conditioned or misspecified."
                     << std::endl;
       
     }
