@@ -4,9 +4,7 @@ data {
   matrix[n_dogs,n_trials] y;
 }
 parameters {
-  real<lower=0> sigma_beta;
   vector[2] beta;
-  real mu_beta;
 }
 transformed parameters {
   matrix[n_dogs,n_trials] n_avoid;
@@ -27,6 +25,5 @@ transformed parameters {
 model {
   beta[1] ~ uniform(-100, 0);
   beta[2] ~ uniform(0, 100);
-
   y ~ binomial(p, 1);
 }

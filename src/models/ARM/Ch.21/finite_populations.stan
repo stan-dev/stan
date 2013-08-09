@@ -1,22 +1,21 @@
 data {
-  int<lower=0> N;
   int<lower=0> J; 
+  int<lower=0> N;
+  vector[J] g;
   vector[N] y;
   vector[N] y_hat;
-
-  vector[J] g;
 } 
 parameters {
-  real<lower=0> sigma_g;
+  real<lower=0,upper=100> sigma_g;
 }
 transformed parameters {
-  vector[N] e_y;
   vector[J] e_g;
-  real<lower=0> s_y;
-  real<lower=0> s_g;
-  real<lower=0> s_d;
-  real<lower=0> s_g2;
+  vector[N] e_y;
   vector[J] g_hat;
+  real<lower=0> s_d;
+  real<lower=0> s_g;
+  real<lower=0> s_g2;
+  real<lower=0> s_y;
 
   //finite population sd
   e_y <- y - y_hat;
@@ -31,6 +30,5 @@ transformed parameters {
 } 
 model {
   sigma_g ~ uniform(0, 100);
-
   g ~ normal(g_hat, sigma_g)
 }

@@ -1,18 +1,18 @@
 data {
-  int<lower=0> N; 
   int<lower=0> J; 
-  vector[N] y;
+  int<lower=0> N; 
+  int<lower=1,upper=J> county[N];
   vector[J] u;
   vector[N] x;
-  int county[N];
+  vector[N] y;
 } 
 parameters {
-  vector[2] b;
   vector[J] a;
-  real<lower=0> sigma_y;
-  real<lower=0> sigma_a;
-  real<lower=0> sigma_b;
+  vector[2] b;
   real mu_b;
+  real<lower=0,upper=100> sigma_a;
+  real<lower=0,upper=100> sigma_b;
+  real<lower=0,upper=100> sigma_y;
 } 
 transformed parameters {
   vector[N] y_hat;
@@ -24,9 +24,9 @@ model {
   sigma_a ~ uniform(0, 100);
   a ~ normal (a_hat, sigma_a);
 
-  mu_b ~ normal(0, 100);
+  mu_b ~ normal(0, 1);
   sigma_b ~ uniform(0, 100);
-  b ~ normal (mu_b, sigma_b);
+  b ~ normal (100 * mu_b, sigma_b);
 
   sigma_y ~ uniform(0, 100);
   y ~ normal(y_hat, sigma_y);

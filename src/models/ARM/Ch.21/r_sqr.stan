@@ -1,18 +1,18 @@
 data {
   int<lower=0> N;
   int<lower=0> n_county;
-  vector[N] y;
+  int<lower=1,upper=n_county> county[N];
   vector[N] u;
-  int county[N];
+  vector[N] y;
 } 
 parameters {
-  real<lower=0> sigma_y;
   vector[n_county] a;
   vector[n_county] b;
   matrix[j,2] B;
   matrix[j,2] B_hat;
-  vector[2] B_temp;
   vector[2] B_hat_temp;
+  vector[2] B_temp;
+  real<lower=0,upper=100> sigma_y;
 }
 transformed parameters {
   vector[N] y_hat;

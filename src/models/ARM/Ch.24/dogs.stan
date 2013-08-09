@@ -1,12 +1,10 @@
 data {
-  int<lower=0> n_trials;
   int<lower=0> n_dogs;
-  matrix[n_dogs,n_trials] y;
+  int<lower=0> n_trials;
+  int<lower=0,upper=1> y[n_dogs,n_trials];
 }
 parameters {
-  real<lower=0> sigma_beta;
   vector[3] beta;
-  real mu_beta;
 }
 transformed parameters {
   matrix[n_dogs,n_trials] n_avoid;
@@ -25,9 +23,6 @@ transformed parameters {
   }
 }
 model {
-  mu_beta ~ normal(0, 100);
-  sigma_beta ~ uniform(0, 100);
-  beta ~ normal(mu_beta, sigma_beta);
-
+  beta ~ normal(0, 100);
   y ~ bernoulli_logit(p);
 }

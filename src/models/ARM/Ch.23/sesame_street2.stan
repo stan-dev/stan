@@ -1,33 +1,33 @@
 data {
-  int<lower=0> N;
   int<lower=0> J;
+  int<lower=0> N;
+  vector[N] pretest;
+  int<lower=1,upper=J> siteset[N];
   matrix[N,2] yt;
   vector[N] z;
-  int<lower=1,upper=J> siteset[N];
-  vector[N] pretest;
 }
 parameters {
-  real<lower=0> sigma_a;
-  real<lower=0> sigma_g;
-  real<lower=0> sigma_py;
-  real<lower=0> sigma_pt;
-  real<lower=0> sigma_t;
-  real<lower=0> sigma_y;
-  real rho_ag;
-  real rho_yt;
-  real phi_y;
-  real phi_t;
-  vector[2] mu_ag;
+  matrix[J,2] ag;
   real b;
   real d;
-  matrix[J,2] ag;
+  vector[2] mu_ag;
+  real phi_y;
+  real phi_t;
+  real<lower=-1,upper=1> rho_ag;
+  real<lower=-1,upper=1> rho_yt;
+  real<lower=0,upper=100> sigma_a;
+  real<lower=0,upper=100> sigma_g;
+  real<lower=0,upper=100> sigma_py;
+  real<lower=0,upper=100> sigma_pt;
+  real<lower=0,upper=100> sigma_t;
+  real<lower=0,upper=100> sigma_y;
 }
 transformed parameters {
-  cov_matrix[2] Sigma_yt;
-  cov_matrix[2] Sigma_ag;
-  matrix[N,2] yt_hat;
   vector[J] a;
   vector[J] g;
+  cov_matrix[2] Sigma_ag;
+  cov_matrix[2] Sigma_yt;
+  matrix[N,2] yt_hat;
 
   //data level
   Sigma_yt[1,1] <- pow(sigma_y,2);

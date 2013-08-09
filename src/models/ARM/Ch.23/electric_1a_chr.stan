@@ -35,9 +35,7 @@ transformed parameters {
 model {
   mu_a ~ normal(0, 1);
   mu_b ~ normal(0, 1);
-
   eta_a ~ normal(0, 1);
   eta_b ~ normal(0, 1);
-
   y ~ normal(y_hat, sigma_y_hat);
 }

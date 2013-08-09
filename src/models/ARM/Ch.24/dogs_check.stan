@@ -1,22 +1,22 @@
 data {
-  int<lower=0> n_trials;
   int<lower=0> n_dogs;
+  int<lower=0> n_trials;
   matrix[n_dogs,n_trials] y;
 }
 parameters {
-  real<lower=0> sigma_b1;
-  real<lower=0> sigma_b2;  
+  real<lower=0,upper=100> sigma_b1;
+  real<lower=0,upper=100> sigma_b2;  
   matrix[n_dogs,2] beta_neg;
-  real rho_b;
+  real<lower=-1,upper=1> rho_b;
   vector[2] mu_beta;
 }
 transformed parameters {
+  vector[n_dogs] beta1;
+  vector[n_dogs] beta2;
   matrix[n_dogs,n_trials] n_avoid;
   matrix[n_dogs,n_trials] n_shock;
   matrix[n_dogs,n_trials] p;
   cov_matrix[2] Sigma_b;
-  vector[n_dogs] beta1;
-  vector[n_dogs] beta2;
 
   Sigma_b[1,1] <- pow(sigma_b1,2);
   Sigma_b[2,2] <- pow(sigma_b2,2);

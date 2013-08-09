@@ -1,28 +1,26 @@
 data {
-  int<lower=0> N; 
   int<lower=0> J; 
-  vector[N] y;
+  int<lower=0> N; 
+  int<lower=1,upper=J> county[N];
   vector[N] u;
-  int county[N];
+  vector[N] y;
 } 
 parameters {
-  real b;
   vector[J] a;
-  real<lower=0> sigma_y;
-  real<lower=0> sigma_a;
+  real b;
   real mu_a;
+  real<lower=0,upper=100> sigma_a;
+  real<lower=0,upper=100> sigma_y;
 } 
 transformed parameters {
   vector[N] y_hat;
 
   for (i in 1:N)
-    y_hat[i] <- a[county[i]] + u[i] * b;
+    y_hat[i] <- a[county[i]] + u[i] * b * 100;
 }
 model {
-  mu_a ~ normal(0, 100);
-  a ~ normal (mu_a, sigma_a);
-
-  b ~ normal(0, 100);
-
+  mu_a ~ normal(0, 1);
+  a ~ normal (100 * mu_a, sigma_a);
+  b ~ normal(0, 1);
   y ~ normal(y_hat, sigma_y);
 }

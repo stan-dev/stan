@@ -1,18 +1,17 @@
 data {
-  int<lower=0> N;
   int<lower=0> J;
-  vector[N] y;
-  vector[N] enroll97;
-  vector[N] work97;
-  vector[N] poor;
-  vector[N] male;
+  int<lower=0> N;
   vector[N] age97;
-  int village[N];
+  vector[N] enroll97;
+  vector[N] male;
+  vector[N] poor;
   vector[J] program;
+  int village[N];
+  vector[N] work97;
+  int<lower=0,upper=1> y[N];
 }
 parameters {
-  real<lower=0> sigma_a;
-  real<lower=0> sigma_beta;
+  real<lower=0,upper=100> sigma_a;
   vector[5] beta;
   real mu_beta;
   vector[J] a;
@@ -28,12 +27,10 @@ transformed parameters {
 }
 model {
   sigma_a ~ uniform(0, 100);
-  mu_beta ~ normal(0, .0001);
-  sigma_beta ~ uniform(0, 100);
-  g_0 ~ norma(0, .0001);
-  g_1 ~ norma(0, .0001);
+  g_0 ~ norma(0, 100);
+  g_1 ~ norma(0, 100);
 
   a ~ normal(a_hat, sigma_a);
-  beta ~ normal(mu_beta, sigma_beta);
+  beta ~ normal(0, 1);
   y ~ bernoulli_logit(y_hat);
 }

@@ -1,14 +1,14 @@
 data {
   int<lower=0> N; 
-  int earnings[N];
+  vector[N] any_charity;
+  vector[N] any_ssi;
+  vector[N] any_welfare;
+  int<lower=0,upper=1> earnings[N];
+  vector[N] educ_r;
+  vector[N] immig;
   vector[N] male;
   vector[N] over65;
   vector[N] white;
-  vector[N] immig;
-  vector[N] educ_r;
-  vector[N] any_ssi;
-  vector[N] any_welfare;
-  vector[N] any_charity;
 }
 parameters {
   vector[9] beta;
