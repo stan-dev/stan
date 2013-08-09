@@ -1,7 +1,8 @@
-#ifndef STAN_MEMORY_HPP
-#define STAN_MEMORY_HPP
+#ifndef __STAN__MEMORY_HPP__
+#define __STAN__MEMORY_HPP__
 
-#include "stan/memory/stack_alloc.hpp"
+// Intentionally not including stan/memory/chunk_alloc.hpp
+#include <stan/memory/stack_alloc.hpp>
 
 #endif
 

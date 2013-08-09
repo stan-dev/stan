@@ -118,4 +118,7 @@
 #include <stan/agrad/rev/rising_factorial.hpp>
 #include <stan/agrad/rev/log_falling_factorial.hpp>
 #include <stan/agrad/rev/log_rising_factorial.hpp>
+
+#include <stan/agrad/rev/error_handling/matrix/check_pos_definite.hpp>
+
 #endif

@@ -1,6 +1,6 @@
-#ifndef STAN_META_HPP
-#define STAN_META_HPP
+#ifndef __STAN__META_HPP__
+#define __STAN__META_HPP__
 
-#include "stan/meta/traits.hpp"
+#include <stan/meta/traits.hpp>
 
 #endif

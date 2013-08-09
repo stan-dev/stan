@@ -2,8 +2,8 @@
 #include <gtest/gtest.h>
 #include <test/agrad/util.hpp>
 #include <stan/math/matrix/determinant.hpp>
-#include <stan/agrad/rev/fabs.hpp>
-#include <stan/agrad/rev/log.hpp>
+// #include <stan/agrad/rev/fabs.hpp>
+// #include <stan/agrad/rev/log.hpp>
 
 TEST(AgradRevMatrix,determinant) {
   using stan::agrad::matrix_v;

@@ -7,10 +7,8 @@
 #include <stan/math/matrix/validate_multiplicable.hpp>
 #include <stan/math/matrix/validate_square.hpp>
 #include <stan/agrad/rev/var.hpp>
+#include <stan/agrad/matrix.hpp>
 #include <stan/agrad/rev/matrix/typedefs.hpp>
-
-// FIXME: use explicit files
-#include <stan/agrad.hpp> 
 
 namespace stan {
   namespace agrad {
