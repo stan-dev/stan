@@ -589,12 +589,143 @@ comma-separated values file.
 and customize not only the calculation method but also the data, output,
 initialization, and random number generation.  The arguments are defined
 hierarchically so that, for example, optimization settings are not necessary
-when sampling.  Specifying conflicting arguments causes the execution
-to immediately terminate.
+when sampling.  
+
+The atomic element of the hierarchy are \textit{categorical arguments}
+which define self-contained categories of arguments.  Categories and
+arguments within each category are unordered so that, for example,
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
+> ./model output sample=samples.csv diagnostic=diagnostics.csv random seed=1
+> ./model output random seed=1
+> ./model output random seed=1 sample=samples.csv diagnostic=diagnostics.csv 
+> ./model output random seed=1 diagnostic=diagnostics.csv sample=samples.csv 
+\end{Verbatim}
+\end{quote}
+%
+all define the same configuration.
+
+Categorical arguments can appear in isolation, such as \code{random} and
+\code{output}, or as values to other arguments (Figure \ref{fig:hierarchy}).  In the latter case the arguments
+are mutually exclusive and specifying conflicting arguments causes the execution
+to immediately terminate (Figure \ref{fig:configuration}).
+
+\begin{figure}
+\setlength{\unitlength}{0.01in} 
+\centering
+\begin{picture}(500, 480)
+%
+\put(10, 460) { \makebox(50, 10)[l]{id, data, init} }
+%
+\put(0, 410) { \framebox(500, 45) }
+\put(10, 440) { \makebox(50, 10)[l]{random} }
+\put(50, 420) { \makebox(50, 10)[l]{seed} }
+%
+\put(0, 360) { \framebox(500, 45) }
+\put(10, 390) { \makebox(65, 10)[l]{output} }
+\put(50, 370) { \makebox(500, 10)[l]{sample, append\_sample, diagnostic, append\_diagnostic, refresh, save\_warmup} }
+%
+\put(10, 340) { \makebox(50, 10)[l]{method} }
+\put(20, 117.5) { \line(0, 1){212.5} }
+\put(20, 117.5) { \vector(1, 0){15} }
+\put(20, 257.5) { \vector(1, 0){15} }
+\put(20, 307.5) { \vector(1, 0){15} }
+%
+\put(40, 285) { \framebox(460, 45) }
+\put(50, 315) { \makebox(65, 10)[l]{ diagnose } }
+\put(90, 295) { \makebox(50, 10)[l]{ $\ldots$ } }
+%
+\put(40, 235) { \framebox(460, 45) }
+\put(50, 265) { \makebox(63, 10)[l]{ optimize } }
+\put(90, 245) { \makebox(50, 10)[l]{ $\ldots$ } }
+%
+\put(40, 5) { \framebox(460, 225) }
+\put(50, 215) { \makebox(55, 10)[l]{sample} }
+\put(90, 195) { \makebox(350, 10)[l]{num\_samples, num\_warmup, save\_warmup, thin} }
+%
+\put(80, 140) { \framebox(410, 45) }
+\put(90, 170) { \makebox(55, 10)[l]{adapt} }
+\put(130, 150) { \makebox(50, 10)[l]{$\ldots$} }
+%
+\put(90, 120) { \makebox(55, 10)[l]{algorithm} }
+\put(100, 37.5) { \line(0, 1){70} }
+\put(100, 87.5) { \vector(1, 0){15} }
+\put(100, 37.5) { \vector(1, 0){15} }
+%
+\put(120, 65) { \framebox(370, 45) }
+\put(130, 95) { \makebox(55, 10)[l]{hmc} }
+\put(170, 75) { \makebox(50, 10)[l]{$\ldots$} }
+%
+\put(120, 15) { \framebox(370, 45) }
+\put(130, 45) { \makebox(115, 10)[l]{ rw\_metropolis } }
+\put(170, 25) { \makebox(50, 10)[l]{ $\ldots$ } }
+\end{picture}
+\label{fig:hierarchy}
+\caption{In the hierarchical argument structure, certain arguments, such as \code{random} and \code{output}, introduce new categories of arguments.  These categorical arguments can also appear as values of other arguments, such as \code{diagnose}, \code{optimize}, and \code{sample}, which define the mutually exclusive values for the argument {method}. }
+\end{figure}
+
+\begin{figure}
+\setlength{\unitlength}{0.01in} 
+\centering
+\begin{picture}(500, 480)
+%
+\put(10, 460) { \makebox(50, 10)[l]{id, data, init} }
+%
+\put(0, 410) { \framebox(500, 45) }
+\put(10, 440) { \makebox(50, 10)[l]{random} }
+\put(50, 420) { \makebox(50, 10)[l]{seed} }
+%
+\put(0, 360) { \framebox(500, 45) }
+\put(10, 390) { \makebox(65, 10)[l]{output} }
+\put(50, 370) { \makebox(500, 10)[l]{sample, append\_sample, diagnostic, append\_diagnostic, refresh, save\_warmup} }
+%
+\put(10, 340) { \makebox(50, 10)[l]{method} }
+\put(20, 117.5) { \line(0, 1){212.5} }
+\put(20, 117.5) { \vector(1, 0){15} }
+\put(20, 257.5) { \color{gray!30}\vector(1, 0){15} }
+\put(20, 307.5) { \color{gray!30}\vector(1, 0){15} }
+%
+\put(40, 285) { \color{gray!30}\framebox(460, 45) }
+\put(50, 315) { \makebox(65, 10)[l]{ \textcolor{gray!30}{diagnose} } }
+\put(90, 295) { \makebox(50, 10)[l]{ \textcolor{gray!30}{$\ldots$} } }
+%
+\put(40, 235) { \color{gray!30}\framebox(460, 45) }
+\put(50, 265) { \makebox(63, 10)[l]{ \textcolor{gray!30}{optimize} } }
+\put(90, 245) { \makebox(50, 10)[l]{ \textcolor{gray!30}{$\ldots$} } }
+%
+\put(40, 5) { \framebox(460, 225) }
+\put(50, 215) { \makebox(55, 10)[l]{sample} }
+\put(90, 195) { \makebox(350, 10)[l]{num\_samples, num\_warmup, save\_warmup, thin} }
+%
+\put(80, 140) { \framebox(410, 45) }
+\put(90, 170) { \makebox(55, 10)[l]{adapt} }
+\put(130, 150) { \makebox(50, 10)[l]{$\ldots$} }
+%
+\put(90, 120) { \makebox(55, 10)[l]{algorithm} }
+\put(100, 37.5) { \color{gray!30}\line(0, 1){70} }
+\put(100, 87.5) { \line(0, 1){20} }
+\put(100, 87.5) { \vector(1, 0){15} }
+\put(100, 37.5) { \color{gray!30}\vector(1, 0){15} }
+%
+\put(120, 65) { \framebox(370, 45) }
+\put(130, 95) { \makebox(55, 10)[l]{hmc} }
+\put(170, 75) { \makebox(50, 10)[l]{$\ldots$} }
+%
+\put(120, 15) { \color{gray!30}\framebox(370, 45) }
+\put(130, 45) { \makebox(115, 10)[l]{ \textcolor{gray!30}{rw\_metropolis} } }
+\put(170, 25) { \makebox(50, 10)[l]{ \textcolor{gray!30}{$\ldots$} } }
+\end{picture}
+\label{fig:configuration}
+\caption{A valid argument configuration defines only one mutually exclusive argument.
+If conflicting arguments are specified, for example \code{method=optimize method=sample},
+then execution immediately terminates with a warning message.}
+\end{figure}
 
 All commands must include at least one method, specified explicitly as
 \code{method=method\_name} or implicitly with only \code{method\_name}.
-All remaining configurations are optional.
+All remaining configurations are optional with defaults values provided
+for all arguments.
 
 Additionally, there are various ways of displaying help output instead
 of execution.  Specifying \code{help} after any argument displays a 
@@ -606,6 +737,8 @@ displays the entire argument hierarchy.
 
 The full hierarchy is as follows; some typical use-case examples 
 are provided in the next section.
+
+\pagebreak
 
 \begin{description}
 \hiercmdarg{}{method}{$$list element$$}
@@ -829,11 +962,6 @@ are provided in the next section.
     {Number of interations between screen updates}
     {Valid values: 0 $<$ refresh}
     {Defaults to 100}
-%
-  \hiercmdarg{\indentarrow}{save\_warmup}{$$boolean$$}
-    {Stream warmup samples to output?}
-    {Valid values: [0, 1]}
-    {Defaults to 0}
 %
 \end{description}
 
