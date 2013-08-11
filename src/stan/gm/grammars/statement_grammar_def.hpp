@@ -242,6 +242,34 @@ namespace stan {
     };
     boost::phoenix::function<validate_sample> validate_sample_f;
 
+    struct expression_as_statement {
+      template <typename T1, typename T2, typename T3>
+      struct result { typedef void type; };
+      void operator()(bool& pass,
+                      const stan::gm::expression& expr,
+                      std::stringstream& error_msgs) const {
+        error_msgs << "Illegal statement beginning with expression parsed as"
+                   << std::endl << "  ";
+        generate_expression(expr.expr_,error_msgs);
+        error_msgs << std::endl
+           << "Not a legal assignment or sampling statement.  Note that"
+           << std::endl
+           << "  * Assignment statements only allow variables (with optional indexes) on the left;"
+           << std::endl
+           << "    if you see an outer function logical_lt (<) with negated (-) second argument,"
+           << std::endl
+           << "    it indicates an assignment statement A <- B with illegal left"
+           << std::endl
+           << "    side A parsed as expression (A < (-B))."
+           << std::endl
+           << "  * Sampling statements allow arbitrary value-denoting expressions on the left."
+           << std::endl
+           << std::endl << std::endl;
+        pass = false;
+      }
+    };
+    boost::phoenix::function<expression_as_statement> expression_as_statement_f;
+
     struct unscope_locals {
       template <typename T1, typename T2>
       struct result { typedef void type; };
@@ -373,20 +401,19 @@ namespace stan {
       // set to true if sample_r are allowed
       statement_r.name("statement");
       statement_r
-        %= statement_seq_r(_r1,_r2)
-        | increment_log_prob_statement_r(_r2)
-        | for_statement_r(_r1,_r2)
-        | while_statement_r(_r1,_r2)
-        | statement_2_g(_r1,_r2)
-        | print_statement_r(_r2)
-        | assignment_r(_r2)
-          [_pass 
-            = validate_assignment_f(_1,_r2,boost::phoenix::ref(var_map_),
-                                     boost::phoenix::ref(error_msgs_))]
-        | sample_r(_r1,_r2) [_pass = validate_sample_f(_1,
-                                               boost::phoenix::ref(var_map_),
-                                               boost::phoenix::ref(error_msgs_))]
-        | no_op_statement_r
+        %= no_op_statement_r                        // key ";"
+        | statement_seq_r(_r1,_r2)                  // key "{"
+        | increment_log_prob_statement_r(_r2)       // key "increment"
+        | for_statement_r(_r1,_r2)                  // key "for"
+        | while_statement_r(_r1,_r2)                // key "while"
+        | statement_2_g(_r1,_r2)                    // key "if"
+        | print_statement_r(_r2)                    // key "print"
+        | assignment_r(_r2)                         // lvalue "<-"
+        // [_pass = validate_assignment_f(_1,_r2,boost::phoenix::ref(var_map_),
+        // boost::phoenix::ref(error_msgs_))]
+        | sample_r(_r1,_r2)                         // expression "~"
+        | expression_g(_r2)                         // expression
+          [expression_as_statement_f(_pass,_1,boost::phoenix::ref(error_msgs_))]
         ;
 
       // _r1, _r2 same as statement_r
@@ -477,7 +504,9 @@ namespace stan {
         %= ( var_lhs_r(_r1)
              >> lit("<-") )
         > expression_g(_r1)
-        > lit(';') 
+        > lit(';')
+          [_pass = validate_assignment_f(_val,_r1,boost::phoenix::ref(var_map_),
+                                         boost::phoenix::ref(error_msgs_))]
         ;
 
       var_lhs_r.name("variable and array dimensions");
@@ -504,12 +533,16 @@ namespace stan {
         %= ( expression_g(_r2)
              >> lit('~') )
         > eps
-        [_pass 
-         = validate_allow_sample_f(_r1,boost::phoenix::ref(error_msgs_))] 
+          [_pass = validate_allow_sample_f(_r1,
+                                           boost::phoenix::ref(error_msgs_))]
         > distribution_r(_r2)
         > -truncation_range_r(_r2)
-        > lit(';');
-
+        > lit(';')
+        > eps
+          [_pass = validate_sample_f(_val,
+                                     boost::phoenix::ref(var_map_),
+                                     boost::phoenix::ref(error_msgs_))]
+        ;
       distribution_r.name("distribution and parameters");
       distribution_r
         %= ( identifier_r

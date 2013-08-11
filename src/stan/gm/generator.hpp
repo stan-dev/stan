@@ -1399,6 +1399,9 @@ namespace stan {
         generate_expression(x.expr_,o_);
         o_ << ");" << EOL;
       }
+      void operator()(expression const& x) const {
+        throw std::invalid_argument("expression statements not yet supported");
+      }
       void operator()(sample const& x) const {
         if (!include_sampling_) return;
         generate_indent(indent_,o_);
