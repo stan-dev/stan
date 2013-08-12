@@ -1,11 +1,11 @@
-#ifndef __STAN__AGRAD__FWD__OPERATOR_MULTIPLICATION_HPP__
-#define __STAN__AGRAD__FWD__OPERATOR_MULTIPLICATION_HPP__
+#ifndef __STAN__DIFF__FWD__OPERATOR_MULTIPLICATION_HPP__
+#define __STAN__DIFF__FWD__OPERATOR_MULTIPLICATION_HPP__
 
-#include <stan/agrad/fwd/fvar.hpp>
+#include <stan/diff/fwd/fvar.hpp>
 #include <stan/meta/traits.hpp>
 
 namespace stan{
-  namespace agrad{
+  namespace diff{
 
     template <typename T1, typename T2>
     inline

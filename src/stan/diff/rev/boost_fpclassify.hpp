@@ -1,17 +1,17 @@
-#ifndef __STAN__AGRAD__REV__BOOST_FPCLASSIFY_HPP__
-#define __STAN__AGRAD__REV__BOOST_FPCLASSIFY_HPP__
+#ifndef __STAN__DIFF__REV__BOOST_FPCLASSIFY_HPP__
+#define __STAN__DIFF__REV__BOOST_FPCLASSIFY_HPP__
 
 #include <boost/math/special_functions/fpclassify.hpp>
-#include <stan/agrad/var.hpp>
+#include <stan/diff/var.hpp>
 
 namespace boost {
 
   namespace math {
 
     /**
-     * Categorizes the given stan::agrad::var value.
+     * Categorizes the given stan::diff::var value.
      * 
-     * Categorizes the stan::agrad::var value, v, into the following categories:
+     * Categorizes the stan::diff::var value, v, into the following categories:
      * zero, subnormal, normal, infinite, or NAN.
      *
      * @param v Variable to classify.
@@ -21,7 +21,7 @@ namespace boost {
      */
     template <>
     inline
-    int fpclassify(const stan::agrad::var& v) {
+    int fpclassify(const stan::diff::var& v) {
       return (boost::math::fpclassify)(v.val());
     }
 
@@ -36,7 +36,7 @@ namespace boost {
      */
     template <>
     inline
-    bool isfinite(const stan::agrad::var& v) {
+    bool isfinite(const stan::diff::var& v) {
       return (boost::math::isfinite)(v.val());
     }
 
@@ -51,7 +51,7 @@ namespace boost {
      */
     template <>
     inline
-    bool isinf(const stan::agrad::var& v) {
+    bool isinf(const stan::diff::var& v) {
       return (boost::math::isinf)(v.val());
     }
 
@@ -66,7 +66,7 @@ namespace boost {
      */
     template <>
     inline
-    bool isnan(const stan::agrad::var& v) {
+    bool isnan(const stan::diff::var& v) {
       return (boost::math::isnan)(v.val());
     }
 
@@ -81,7 +81,7 @@ namespace boost {
      */
     template <>
     inline
-    bool isnormal(const stan::agrad::var& v) {
+    bool isnormal(const stan::diff::var& v) {
       return (boost::math::isnormal)(v.val());
     }
 

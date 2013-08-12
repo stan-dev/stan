@@ -1,16 +1,16 @@
-#ifndef __STAN__AGRAD__REV__MATRIX__MDIVIDE_LEFT_SPD_HPP__
-#define __STAN__AGRAD__REV__MATRIX__MDIVIDE_LEFT_SPD_HPP__
+#ifndef __STAN__DIFF__REV__MATRIX__MDIVIDE_LEFT_SPD_HPP__
+#define __STAN__DIFF__REV__MATRIX__MDIVIDE_LEFT_SPD_HPP__
 
 #include <vector>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/math/matrix/validate_multiplicable.hpp>
 #include <stan/math/matrix/validate_square.hpp>
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/matrix/typedefs.hpp>
+#include <stan/diff/rev/var.hpp>
+#include <stan/diff/rev/matrix/typedefs.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
 
     namespace {
       template <int R1,int C1,int R2,int C2>
@@ -37,11 +37,11 @@ namespace stan {
           : vari(0.0),
             _M(A.rows()),
             _N(B.cols()),
-            _variRefA((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
+            _variRefA((vari**)stan::diff::memalloc_.alloc(sizeof(vari*) 
                                                            * A.rows() * A.cols())),
-            _variRefB((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
+            _variRefB((vari**)stan::diff::memalloc_.alloc(sizeof(vari*) 
                                                            * B.rows() * B.cols())),
-            _variRefC((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
+            _variRefC((vari**)stan::diff::memalloc_.alloc(sizeof(vari*) 
                                                            * B.rows() * B.cols())),
             _alloc(new mdivide_left_spd_alloc<R1,C1,R2,C2>())
         {
@@ -121,9 +121,9 @@ namespace stan {
           : vari(0.0),
             _M(A.rows()),
             _N(B.cols()),
-            _variRefB((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
+            _variRefB((vari**)stan::diff::memalloc_.alloc(sizeof(vari*) 
                                                            * B.rows() * B.cols())),
-            _variRefC((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
+            _variRefC((vari**)stan::diff::memalloc_.alloc(sizeof(vari*) 
                                                            * B.rows() * B.cols())),
             _alloc(new mdivide_left_spd_alloc<R1,C1,R2,C2>())
         {
@@ -185,9 +185,9 @@ namespace stan {
           : vari(0.0),
             _M(A.rows()),
             _N(B.cols()),
-            _variRefA((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
+            _variRefA((vari**)stan::diff::memalloc_.alloc(sizeof(vari*) 
                                                            * A.rows() * A.cols())),
-            _variRefC((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
+            _variRefC((vari**)stan::diff::memalloc_.alloc(sizeof(vari*) 
                                                            * B.rows() * B.cols())),
             _alloc(new mdivide_left_spd_alloc<R1,C1,R2,C2>())
         {

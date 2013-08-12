@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
-#include <stan/agrad/fvar.hpp>
+#include <stan/diff/fvar.hpp>
 #include <stan/math/functions/binary_log_loss.hpp>
 
 TEST(AgradFvar, binary_log_loss) {
-  using stan::agrad::fvar;
+  using stan::diff::fvar;
   using stan::math::binary_log_loss;
   using std::log;
   using std::isnan;

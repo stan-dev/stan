@@ -1,12 +1,12 @@
-#ifndef __STAN__AGRAD__REV__LOG_LOSS_HPP__
-#define __STAN__AGRAD__REV__LOG_LOSS_HPP__
+#ifndef __STAN__DIFF__REV__LOG_LOSS_HPP__
+#define __STAN__DIFF__REV__LOG_LOSS_HPP__
 
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/op/v_vari.hpp>
+#include <stan/diff/rev/var.hpp>
+#include <stan/diff/rev/op/v_vari.hpp>
 #include <stan/math/functions/log1p.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
 
     namespace {
       class binary_log_loss_1_vari : public op_v_vari {
@@ -46,7 +46,7 @@ namespace stan {
      * @return Log loss of response versus reference value.
      */
     inline var log_loss(const int& y, 
-                        const stan::agrad::var& y_hat) {
+                        const stan::diff::var& y_hat) {
       return y == 0  
         ? var(new binary_log_loss_0_vari(y_hat.vi_))
         : var(new binary_log_loss_1_vari(y_hat.vi_));

@@ -1,11 +1,11 @@
 #include <gtest/gtest.h>
-#include <stan/agrad/fvar.hpp>
-#include <stan/agrad/var.hpp>
-#include <test/agrad/util.hpp>
+#include <stan/diff/fvar.hpp>
+#include <stan/diff/var.hpp>
+#include <test/diff/util.hpp>
 
 TEST(AgradFvar, bessel_first_kind) {
-  using stan::agrad::fvar;
-  using stan::agrad::bessel_first_kind;
+  using stan::diff::fvar;
+  using stan::diff::bessel_first_kind;
 
   fvar<double> a(4.0,1.0);
   int b = 0;
@@ -21,8 +21,8 @@ TEST(AgradFvar, bessel_first_kind) {
 }
 
 TEST(AgradFvarVar, bessel_first_kind) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::diff::fvar;
+  using stan::diff::var;
   using stan::math::bessel_first_kind;
 
   fvar<var> z(-3.0,2.0);
@@ -38,7 +38,7 @@ TEST(AgradFvarVar, bessel_first_kind) {
 }
 
 TEST(AgradFvarFvar, bessel_first_kind) {
-  using stan::agrad::fvar;
+  using stan::diff::fvar;
   using stan::math::bessel_first_kind;
 
   fvar<fvar<double> > x;

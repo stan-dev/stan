@@ -1,5 +1,5 @@
-#include <stan/agrad/rev/acos.hpp>
-#include <test/agrad/util.hpp>
+#include <stan/diff/rev/acos.hpp>
+#include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
 TEST(AgradRev,acos_var) {

@@ -1,12 +1,12 @@
-#ifndef __STAN__AGRAD__FWD__MATRIX__TYPEDEFS_HPP__
-#define __STAN__AGRAD__FWD__MATRIX__TYPEDEFS_HPP__
+#ifndef __STAN__DIFF__FWD__MATRIX__TYPEDEFS_HPP__
+#define __STAN__DIFF__FWD__MATRIX__TYPEDEFS_HPP__
 
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/agrad/fwd/fvar.hpp>
-#include <stan/agrad/fwd/numeric_limits.hpp>
+#include <stan/diff/fwd/fvar.hpp>
+#include <stan/diff/fwd/numeric_limits.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
     
     typedef 
     Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>::size_type 

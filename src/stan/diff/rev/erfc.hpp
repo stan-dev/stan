@@ -1,14 +1,14 @@
-#ifndef __STAN__AGRAD__REV__ERFC_HPP__
-#define __STAN__AGRAD__REV__ERFC_HPP__
+#ifndef __STAN__DIFF__REV__ERFC_HPP__
+#define __STAN__DIFF__REV__ERFC_HPP__
 
 #include <valarray>
 #include <boost/math/special_functions/erf.hpp>
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/op/v_vari.hpp>
+#include <stan/diff/rev/var.hpp>
+#include <stan/diff/rev/op/v_vari.hpp>
 #include <stan/math/constants.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
 
     namespace {
       class erfc_vari : public op_v_vari {
@@ -34,7 +34,7 @@ namespace stan {
      * @param a The variable.
      * @return Complementary error function applied to the variable.
      */
-    inline var erfc(const stan::agrad::var& a) {
+    inline var erfc(const stan::diff::var& a) {
       return var(new erfc_vari(a.vi_));
     }
 

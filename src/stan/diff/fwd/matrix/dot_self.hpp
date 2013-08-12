@@ -1,15 +1,15 @@
-#ifndef __STAN__AGRAD__REV__MATRIX__DOT_SELF_HPP__
-#define __STAN__AGRAD__REV__MATRIX__DOT_SELF_HPP__
+#ifndef __STAN__DIFF__FWD__MATRIX__DOT_SELF_HPP__
+#define __STAN__DIFF__FWD__MATRIX__DOT_SELF_HPP__
 
 #include <vector>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/math/matrix/validate_vector.hpp>
-#include <stan/agrad/fwd/fvar.hpp>
-#include <stan/agrad/fwd/matrix/dot_product.hpp>
+#include <stan/diff/fwd/fvar.hpp>
+#include <stan/diff/fwd/matrix/dot_product.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
 
     template<typename T, int R, int C>
     inline fvar<T>

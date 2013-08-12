@@ -1,5 +1,5 @@
-#include <stan/agrad/rev/hypot.hpp>
-#include <test/agrad/util.hpp>
+#include <stan/diff/rev/hypot.hpp>
+#include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
 TEST(AgradRev,hypot_vv) {

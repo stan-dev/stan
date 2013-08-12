@@ -1,18 +1,18 @@
-#ifndef __STAN__AGRAD__REV__LOG_SUM_EXP_HPP__
-#define __STAN__AGRAD__REV__LOG_SUM_EXP_HPP__
+#ifndef __STAN__DIFF__REV__LOG_SUM_EXP_HPP__
+#define __STAN__DIFF__REV__LOG_SUM_EXP_HPP__
 
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/calculate_chain.hpp>
-#include <stan/agrad/rev/op/vv_vari.hpp>
-#include <stan/agrad/rev/op/vd_vari.hpp>
-#include <stan/agrad/rev/op/dv_vari.hpp>
-#include <stan/agrad/rev/op/vector_vari.hpp>
-#include <stan/agrad/rev/operator_greater_than.hpp>
-#include <stan/agrad/rev/operator_not_equal.hpp>
+#include <stan/diff/rev/var.hpp>
+#include <stan/diff/rev/calculate_chain.hpp>
+#include <stan/diff/rev/op/vv_vari.hpp>
+#include <stan/diff/rev/op/vd_vari.hpp>
+#include <stan/diff/rev/op/dv_vari.hpp>
+#include <stan/diff/rev/op/vector_vari.hpp>
+#include <stan/diff/rev/operator_greater_than.hpp>
+#include <stan/diff/rev/operator_not_equal.hpp>
 #include <stan/math/functions/log_sum_exp.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
 
     namespace {
       double log_sum_exp_as_double(const std::vector<var>& x) {
@@ -78,14 +78,14 @@ namespace stan {
     /**
      * Returns the log sum of exponentials.
      */
-    inline var log_sum_exp(const stan::agrad::var& a,
-                           const stan::agrad::var& b) {
+    inline var log_sum_exp(const stan::diff::var& a,
+                           const stan::diff::var& b) {
       return var(new log_sum_exp_vv_vari(a.vi_, b.vi_));
     }
     /**
      * Returns the log sum of exponentials.
      */
-    inline var log_sum_exp(const stan::agrad::var& a,
+    inline var log_sum_exp(const stan::diff::var& a,
                            const double& b) {
       return var(new log_sum_exp_vd_vari(a.vi_, b));
     }
@@ -93,7 +93,7 @@ namespace stan {
      * Returns the log sum of exponentials.
      */
     inline var log_sum_exp(const double& a,
-                           const stan::agrad::var& b) {
+                           const stan::diff::var& b) {
       return var(new log_sum_exp_dv_vari(a, b.vi_));
     }
     /**

@@ -1,15 +1,15 @@
-#ifndef __STAN__AGRAD__REV__LGAMMA_HPP__
-#define __STAN__AGRAD__REV__LGAMMA_HPP__
+#ifndef __STAN__DIFF__REV__LGAMMA_HPP__
+#define __STAN__DIFF__REV__LGAMMA_HPP__
 
 #include <valarray>
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/op/v_vari.hpp>
+#include <stan/diff/rev/var.hpp>
+#include <stan/diff/rev/op/v_vari.hpp>
 #include <stan/math/constants.hpp>
 #include <boost/math/special_functions/digamma.hpp>
 #include <boost/math/special_functions/gamma.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
 
     namespace {
       class lgamma_vari : public op_v_vari {
@@ -33,7 +33,7 @@ namespace stan {
      * @param a The variable.
      * @return Log gamma of the variable.
      */
-    inline var lgamma(const stan::agrad::var& a) {
+    inline var lgamma(const stan::diff::var& a) {
       double lgamma_a = boost::math::lgamma(a.val());
       return var(new lgamma_vari(lgamma_a, a.vi_));
     }

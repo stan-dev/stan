@@ -1,5 +1,5 @@
-#include <stan/agrad/rev/expm1.hpp>
-#include <test/agrad/util.hpp>
+#include <stan/diff/rev/expm1.hpp>
+#include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 #include <boost/math/special_functions/expm1.hpp>
 

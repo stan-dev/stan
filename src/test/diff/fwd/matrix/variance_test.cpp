@@ -1,13 +1,13 @@
 #include <stan/math/matrix/variance.hpp>
 #include <gtest/gtest.h>
 #include <stan/math/matrix/typedefs.hpp>
-#include <stan/agrad/fwd/matrix/typedefs.hpp>
-#include <stan/agrad/fvar.hpp>
+#include <stan/diff/fwd/matrix/typedefs.hpp>
+#include <stan/diff/fvar.hpp>
 
 TEST(AgradFwdMatrix, variance_vector) {
   using stan::math::variance;
   using stan::math::vector_d;
-  using stan::agrad::vector_fv;
+  using stan::diff::vector_fv;
 
   vector_d d(1);
   d << 12.9;
@@ -39,7 +39,7 @@ TEST(AgradFwdMatrix, variance_vector) {
 TEST(AgradFwdMatrix, variance_vector_exception) {
   using stan::math::variance;
   using stan::math::vector_d;
-  using stan::agrad::vector_fv;
+  using stan::diff::vector_fv;
 
   vector_d d1;
   vector_fv v1;
@@ -49,7 +49,7 @@ TEST(AgradFwdMatrix, variance_vector_exception) {
 TEST(AgradFwdMatrix, variance_rowvector) {
   using stan::math::variance;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fv;
+  using stan::diff::row_vector_fv;
 
   row_vector_d d(1);
   d << 12.9;
@@ -81,7 +81,7 @@ TEST(AgradFwdMatrix, variance_rowvector) {
 TEST(AgradFwdMatrix, variance_rowvector_exception) {
   using stan::math::variance;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fv;
+  using stan::diff::row_vector_fv;
 
   row_vector_d d1;
   row_vector_fv v1;
@@ -91,7 +91,7 @@ TEST(AgradFwdMatrix, variance_rowvector_exception) {
 TEST(AgradFwdMatrix, variance_matrix) {
   using stan::math::variance;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fv;
+  using stan::diff::matrix_fv;
   
   matrix_d m(1,1);
   m << 12.9;
@@ -123,7 +123,7 @@ TEST(AgradFwdMatrix, variance_matrix) {
 TEST(AgradFwdMatrix, variance_matrix_exception) {
   using stan::math::variance;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fv;
+  using stan::diff::matrix_fv;
 
   matrix_d d1;
   matrix_fv v1;
@@ -142,7 +142,7 @@ TEST(AgradFwdMatrix, variance_matrix_exception) {
 }
 TEST(AgradFwdMatrix, varianceStdVector) {
   using stan::math::variance;
-  using stan::agrad::fvar;
+  using stan::diff::fvar;
 
   fvar<double> x1 = 0.5;
   x1.d_ = 1.0;

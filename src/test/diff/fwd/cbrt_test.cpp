@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
-#include <stan/agrad/fvar.hpp>
+#include <stan/diff/fvar.hpp>
 #include <boost/math/special_functions/cbrt.hpp>
 
 TEST(AgradFvar, cbrt) {
-  using stan::agrad::fvar;
+  using stan::diff::fvar;
   using boost::math::cbrt;
   using std::isnan;
 

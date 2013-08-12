@@ -1,10 +1,10 @@
-#ifndef __STAN__AGRAD__REV__OP__V_VARI_HPP__
-#define __STAN__AGRAD__REV__OP__V_VARI_HPP__
+#ifndef __STAN__DIFF__REV__OP__V_VARI_HPP__
+#define __STAN__DIFF__REV__OP__V_VARI_HPP__
 
-#include <stan/agrad/rev/vari.hpp>
+#include <stan/diff/rev/vari.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
     
     class op_v_vari : public vari {
     protected:

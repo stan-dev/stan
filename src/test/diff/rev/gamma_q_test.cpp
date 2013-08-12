@@ -1,6 +1,6 @@
-#include <stan/agrad/rev/gamma_q.hpp>
+#include <stan/diff/rev/gamma_q.hpp>
 #include <boost/math/special_functions/gamma.hpp>
-#include <test/agrad/util.hpp>
+#include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
 TEST(AgradRev,gamma_q_var_var) {

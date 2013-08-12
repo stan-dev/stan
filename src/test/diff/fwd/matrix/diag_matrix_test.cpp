@@ -1,13 +1,13 @@
 #include <gtest/gtest.h>
-#include <stan/agrad/fvar.hpp>
-#include <stan/agrad/fwd/matrix/typedefs.hpp>
+#include <stan/diff/fvar.hpp>
+#include <stan/diff/fwd/matrix/typedefs.hpp>
 #include <stan/math/matrix/diag_matrix.hpp>
 
 TEST(AgradFwdMatrix,diagMatrix) {
   using stan::math::diag_matrix;
-  using stan::agrad::matrix_fv;
+  using stan::diff::matrix_fv;
   using stan::math::vector_d;
-  using stan::agrad::vector_fv;
+  using stan::diff::vector_fv;
 
   EXPECT_EQ(0,diag_matrix(vector_fv()).size());
   EXPECT_EQ(4,diag_matrix(vector_fv(2)).size());

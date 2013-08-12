@@ -1,10 +1,10 @@
-#include <stan/agrad/rev/trunc.hpp>
-#include <test/agrad/util.hpp>
+#include <stan/diff/rev/trunc.hpp>
+#include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
 TEST(AgradRev,trunc) {
   AVAR a = 1.2;
-  AVAR f = stan::agrad::trunc(a);
+  AVAR f = stan::diff::trunc(a);
   EXPECT_FLOAT_EQ(1.0, f.val());
   
   AVEC x = createAVEC(a);
@@ -15,7 +15,7 @@ TEST(AgradRev,trunc) {
 
 TEST(AgradRev,trunc_2) {
   AVAR a = -1.2;
-  AVAR f = stan::agrad::trunc(a);
+  AVAR f = stan::diff::trunc(a);
   EXPECT_FLOAT_EQ(-1.0, f.val());
   
   AVEC x = createAVEC(a);

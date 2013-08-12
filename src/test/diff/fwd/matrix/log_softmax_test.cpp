@@ -1,17 +1,17 @@
 #include <stdexcept>
 #include <gtest/gtest.h>
-#include <stan/agrad/fvar.hpp>
-#include <stan/agrad/fwd/matrix/log_softmax.hpp>
-#include <stan/agrad/fwd/matrix/softmax.hpp>
-#include <stan/agrad/fwd/matrix/typedefs.hpp>
+#include <stan/diff/fvar.hpp>
+#include <stan/diff/fwd/matrix/log_softmax.hpp>
+#include <stan/diff/fwd/matrix/softmax.hpp>
+#include <stan/diff/fwd/matrix/typedefs.hpp>
 
-void test_log_softmax(Eigen::Matrix<stan::agrad::fvar<double>,Eigen::Dynamic,1>& v) {
+void test_log_softmax(Eigen::Matrix<stan::diff::fvar<double>,Eigen::Dynamic,1>& v) {
   using stan::math::softmax;
   using stan::math::log_softmax;
   using Eigen::Matrix;
   using Eigen::Dynamic;
-  using stan::agrad::vector_fv;
-  using stan::agrad::fvar;
+  using stan::diff::vector_fv;
+  using stan::diff::fvar;
 
   for (int i = 0; i < v.size(); ++i) {
 
@@ -41,8 +41,8 @@ TEST(AgradFwdMatrix,logSoftmax) {
   using stan::math::log_softmax;
   using Eigen::Matrix;
   using Eigen::Dynamic;
-  using stan::agrad::vector_fv;
-  using stan::agrad::fvar;
+  using stan::diff::vector_fv;
+  using stan::diff::fvar;
 
   EXPECT_THROW(log_softmax(vector_fv()),std::domain_error);
   

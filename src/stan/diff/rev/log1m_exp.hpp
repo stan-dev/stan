@@ -1,14 +1,14 @@
-#ifndef __STAN__AGRAD__REV__LOG1M_EXP_HPP__
-#define __STAN__AGRAD__REV__LOG1M_EXP_HPP__
+#ifndef __STAN__DIFF__REV__LOG1M_EXP_HPP__
+#define __STAN__DIFF__REV__LOG1M_EXP_HPP__
 
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/op/v_vari.hpp>
+#include <stan/diff/rev/var.hpp>
+#include <stan/diff/rev/op/v_vari.hpp>
 #include <stan/math/functions/log1m_exp.hpp>
-#include <stan/agrad/rev/calculate_chain.hpp>
+#include <stan/diff/rev/calculate_chain.hpp>
 #include <boost/math/special_functions/expm1.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
 
     namespace {
       class log1m_exp_v_vari : public op_v_vari {
@@ -28,7 +28,7 @@ namespace stan {
      * Return the log of 1 minus the exponential of the specified
      * variable.
      */
-    inline var log1m_exp(const stan::agrad::var& a) {
+    inline var log1m_exp(const stan::diff::var& a) {
       return var(new log1m_exp_v_vari(a.vi_));
     }
 

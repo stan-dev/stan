@@ -1,12 +1,12 @@
-#ifndef __STAN__AGRAD__PRINT_STACK_HPP__
-#define __STAN__AGRAD__PRINT_STACK_HPP__
+#ifndef __STAN__DIFF__PRINT_STACK_HPP__
+#define __STAN__DIFF__PRINT_STACK_HPP__
 
 #include <ostream>
-#include <stan/agrad/rev/var_stack.hpp>
-#include <stan/agrad/rev/vari.hpp>
+#include <stan/diff/rev/var_stack.hpp>
+#include <stan/diff/rev/vari.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
         
     /** 
      * Prints the auto-dif variable stack. This function

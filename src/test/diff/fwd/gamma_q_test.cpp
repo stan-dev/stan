@@ -1,13 +1,13 @@
 #include <gtest/gtest.h>
-#include <stan/agrad/fvar.hpp>
+#include <stan/diff/fvar.hpp>
 #include <boost/math/special_functions/gamma.hpp>
-#include <stan/agrad/rev/gamma_q.hpp>
-#include <stan/agrad/var.hpp>
-#include <test/agrad/util.hpp>
+#include <stan/diff/rev/gamma_q.hpp>
+#include <stan/diff/var.hpp>
+#include <test/diff/util.hpp>
 
 TEST(AgradFvar, gamma_q){
-  using stan::agrad::fvar;
-  using stan::agrad::gamma_q;
+  using stan::diff::fvar;
+  using stan::diff::gamma_q;
   using boost::math::gamma_q;
 
   fvar<double> x(0.5);
@@ -35,12 +35,12 @@ TEST(AgradFvar, gamma_q){
 }
 //NEEDS DIGAMMA
 // TEST(AgradFvarVar, gamma_q) {
-//   using stan::agrad::fvar;
-//   using stan::agrad::var;
+//   using stan::diff::fvar;
+//   using stan::diff::var;
 
 //   fvar<var> x(0.5,1.0);
 //   fvar<var> z(1.0,1.0);
-//   fvar<var> a = stan::agrad::gamma_q(x,z);
+//   fvar<var> a = stan::diff::gamma_q(x,z);
 
   // EXPECT_FLOAT_EQ(boost::math::gamma_q(0.5,1.0), a.val_.val());
   // EXPECT_FLOAT_EQ(1.9431838, a.d_.val());
@@ -52,7 +52,7 @@ TEST(AgradFvar, gamma_q){
   // EXPECT_FLOAT_EQ(boost::math::gamma_p_derivative(0.5,1.0),g[1]);
 //}
 // TEST(AgradFvarFvar, gamma_q) {
-//   using stan::agrad::fvar;
+//   using stan::diff::fvar;
 //   using boost::math::gamma_q;
 
 //   fvar<fvar<double> > x;

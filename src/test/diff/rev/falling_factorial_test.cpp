@@ -1,12 +1,12 @@
-#include <stan/agrad/rev/falling_factorial.hpp>
-#include <test/agrad/util.hpp>
+#include <stan/diff/rev/falling_factorial.hpp>
+#include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 #include <boost/math/special_functions/digamma.hpp>
 
 TEST(AgradRev,falling_factorial_var_double) {
   double a(1);
   AVAR b(4.0);
-  AVAR f = stan::agrad::falling_factorial(b,a);
+  AVAR f = stan::diff::falling_factorial(b,a);
   EXPECT_FLOAT_EQ(24,f.val());
 
   AVEC x = createAVEC(a,b);
@@ -19,15 +19,15 @@ TEST(AgradRev,falling_factorial_var_double) {
 TEST(AgradRev, falling_factorial_exceptions) {
   double a = 1;
   AVAR b(-3.0);
-  EXPECT_THROW(stan::agrad::falling_factorial(b,a), std::domain_error);
-  EXPECT_THROW(stan::agrad::falling_factorial(a,b), std::domain_error);
-  EXPECT_THROW(stan::agrad::falling_factorial(b,b), std::domain_error);
+  EXPECT_THROW(stan::diff::falling_factorial(b,a), std::domain_error);
+  EXPECT_THROW(stan::diff::falling_factorial(a,b), std::domain_error);
+  EXPECT_THROW(stan::diff::falling_factorial(b,b), std::domain_error);
 }
 
 TEST(AgradRev, falling_factorial_double_var) {
   double a(5);
   AVAR b(4.0);
-  AVAR f = stan::agrad::falling_factorial(a,b);
+  AVAR f = stan::diff::falling_factorial(a,b);
   EXPECT_FLOAT_EQ(5.0, f.val());
   AVEC x = createAVEC(a,b);
   VEC g;  
@@ -38,7 +38,7 @@ TEST(AgradRev, falling_factorial_double_var) {
 TEST(AgradRev, falling_factorial_var_var) {
   AVAR a(4.0);
   AVAR b(4.0);
-  AVAR f = stan::agrad::falling_factorial(a,b);
+  AVAR f = stan::diff::falling_factorial(a,b);
   EXPECT_FLOAT_EQ(1.0, f.val());
   AVEC x = createAVEC(a,b);
   VEC g;

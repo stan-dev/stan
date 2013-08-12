@@ -1,14 +1,14 @@
-#ifndef __STAN__AGRAD__REV__IS_UNINITIALIZED_HPP__
-#define __STAN__AGRAD__REV__IS_UNINITIALIZED_HPP__
+#ifndef __STAN__DIFF__REV__IS_UNINITIALIZED_HPP__
+#define __STAN__DIFF__REV__IS_UNINITIALIZED_HPP__
 
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/vari.hpp>
-#include <stan/agrad/rev/operator_unary_negative.hpp>
+#include <stan/diff/rev/var.hpp>
+#include <stan/diff/rev/vari.hpp>
+#include <stan/diff/rev/operator_unary_negative.hpp>
 #include <stan/math/functions/is_uninitialized.hpp>
 
 namespace stan {
 
-  namespace agrad {
+  namespace diff {
 
     /**
      * Returns <code>true</code> if the specified variable is

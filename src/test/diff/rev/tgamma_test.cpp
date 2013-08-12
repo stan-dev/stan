@@ -1,5 +1,5 @@
-#include <stan/agrad/rev/tgamma.hpp>
-#include <test/agrad/util.hpp>
+#include <stan/diff/rev/tgamma.hpp>
+#include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 #include <boost/math/special_functions/digamma.hpp>
 #include <boost/math/special_functions/gamma.hpp>

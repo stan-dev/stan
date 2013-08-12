@@ -1,5 +1,5 @@
-#include <stan/agrad/rev/operator_divide_equal.hpp>
-#include <test/agrad/util.hpp>
+#include <stan/diff/rev/operator_divide_equal.hpp>
+#include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
 TEST(AgradRev,a_divideeq_b) {

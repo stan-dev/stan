@@ -1,12 +1,12 @@
-#ifndef __STAN__AGRAD__PARTIALS_VARI_HPP__
-#define __STAN__AGRAD__PARTIALS_VARI_HPP__
+#ifndef __STAN__DIFF__PARTIALS_VARI_HPP__
+#define __STAN__DIFF__PARTIALS_VARI_HPP__
 
 #include <stan/meta/traits.hpp>
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/vari.hpp>
+#include <stan/diff/rev/var.hpp>
+#include <stan/diff/rev/vari.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
 
     class partials_vari : public vari {
     private:
@@ -30,36 +30,36 @@ namespace stan {
     namespace {
       template<typename T>
       T partials_to_var(double logp, size_t /* nvaris */,
-                        agrad::vari** /* all_varis */,
+                        diff::vari** /* all_varis */,
                         double* /* all_partials */) {
         return logp;
       }
       template<>
       var partials_to_var<var>(double logp, size_t nvaris,
-                               agrad::vari** all_varis,
+                               diff::vari** all_varis,
                                double* all_partials) {
-        return var(new agrad::partials_vari(logp, nvaris, all_varis, all_partials));
+        return var(new diff::partials_vari(logp, nvaris, all_varis, all_partials));
       }
 
       template<typename T, 
                bool is_vec = is_vector<T>::value, 
                bool is_const = is_constant_struct<T>::value>
       struct set_varis {
-        inline size_t set(agrad::vari** /*varis*/, const T& /*x*/) {
+        inline size_t set(diff::vari** /*varis*/, const T& /*x*/) {
           return 0U;
         }
       };
       template<typename T>
       struct set_varis <T,true,false>{
-        inline size_t set(agrad::vari** varis, const T& x) {
+        inline size_t set(diff::vari** varis, const T& x) {
           for (size_t n = 0; n < length(x); n++)
             varis[n] = x[n].vi_;
           return length(x);
         }
       };
       template<>
-      struct set_varis<agrad::var, false, false> {
-        inline size_t set(agrad::vari** varis, const agrad::var& x) {
+      struct set_varis<diff::var, false, false> {
+        inline size_t set(diff::vari** varis, const diff::var& x) {
           varis[0] = x.vi_;
           return (1);
         }
@@ -76,7 +76,7 @@ namespace stan {
     struct OperandsAndPartials {
       const static bool all_constant = is_constant<T_return_type>::value;
       size_t nvaris;
-      agrad::vari** all_varis;
+      diff::vari** all_varis;
       double* all_partials;
 
       VectorView<double*, is_vector<T1>::value> d_x1;
@@ -94,8 +94,8 @@ namespace stan {
                  !is_constant_struct<T4>::value * length(x4) +
                  !is_constant_struct<T5>::value * length(x5) +
                  !is_constant_struct<T6>::value * length(x6)),
-          all_varis((agrad::vari**)agrad::chainable::operator new(sizeof(agrad::vari*) * nvaris)), 
-          all_partials((double*)agrad::chainable::operator new(sizeof(double) * nvaris)),
+          all_varis((diff::vari**)diff::chainable::operator new(sizeof(diff::vari*) * nvaris)), 
+          all_partials((double*)diff::chainable::operator new(sizeof(double) * nvaris)),
           d_x1(all_partials),
           d_x2(all_partials 
                + (!is_constant_struct<T1>::value) * length(x1)),

@@ -1,12 +1,12 @@
-#include <stan/agrad/rev/log2.hpp>
-#include <test/agrad/util.hpp>
+#include <stan/diff/rev/log2.hpp>
+#include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 #include <valarray>
-#include <stan/agrad/rev/numeric_limits.hpp>
+#include <stan/diff/rev/numeric_limits.hpp>
 
 TEST(AgradRev,log2) {
   AVAR a = 3.0;
-  AVAR f = stan::agrad::log2(a);
+  AVAR f = stan::diff::log2(a);
   EXPECT_FLOAT_EQ(std::log(3.0)/std::log(2.0), f.val());
   
   AVEC x = createAVEC(a);
@@ -16,5 +16,5 @@ TEST(AgradRev,log2) {
 
   a = std::numeric_limits<AVAR>::infinity();
   EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(),
-                  stan::agrad::log2(a).val());
+                  stan::diff::log2(a).val());
 }

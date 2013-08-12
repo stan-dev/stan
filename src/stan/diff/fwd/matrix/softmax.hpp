@@ -1,12 +1,12 @@
-#ifndef __STAN__AGRAD__FWD__MATRIX__SOFTMAX_HPP__
-#define __STAN__AGRAD__FWD__MATRIX__SOFTMAX_HPP__
+#ifndef __STAN__DIFF__FWD__MATRIX__SOFTMAX_HPP__
+#define __STAN__DIFF__FWD__MATRIX__SOFTMAX_HPP__
 
-#include <stan/agrad/fwd/fvar.hpp>
+#include <stan/diff/fwd/fvar.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/softmax.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
 
     template <typename T>
     inline 

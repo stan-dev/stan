@@ -1,10 +1,10 @@
 #include <stan/math/matrix/to_vector.hpp>
-#include <stan/agrad/var.hpp>
+#include <stan/diff/var.hpp>
 #include <gtest/gtest.h>
 
 TEST(AgradRevMatrix, to_vector) {
   using stan::math::to_vector;
-  using stan::agrad::var;
+  using stan::diff::var;
 
   Eigen::Matrix<var,Eigen::Dynamic,Eigen::Dynamic> a(3,3);
   Eigen::Matrix<var,Eigen::Dynamic,1> b(9);

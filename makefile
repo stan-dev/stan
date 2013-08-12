@@ -209,8 +209,8 @@ clean-models:
 clean-all: clean clean-dox clean-manual clean-models
 	$(RM) -r test/* bin doc
 	$(RM) $(shell find src -type f -name '*.d') $(shell find src -type f -name '*.o')
-	cd src/test/agrad/distributions/univariate/continuous; $(RM) *_generated_test.cpp
-	cd src/test/agrad/distributions/univariate/discrete; $(RM) *_generated_test.cpp
-	cd src/test/agrad/distributions/multivariate/continuous; $(RM) *_generated_test.cpp
-	cd src/test/agrad/distributions/multivariate/discrete; $(RM) *_generated_test.cpp
+	cd src/test/diff/distributions/univariate/continuous; $(RM) *_generated_test.cpp
+	cd src/test/diff/distributions/univariate/discrete; $(RM) *_generated_test.cpp
+	cd src/test/diff/distributions/multivariate/continuous; $(RM) *_generated_test.cpp
+	cd src/test/diff/distributions/multivariate/discrete; $(RM) *_generated_test.cpp
 

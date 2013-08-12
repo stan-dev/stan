@@ -1,11 +1,11 @@
 #include <stan/math/matrix/elt_divide.hpp>
 #include <gtest/gtest.h>
-#include <test/agrad/util.hpp>
-#include <stan/agrad.hpp>
-#include <stan/agrad/matrix.hpp>
+#include <test/diff/util.hpp>
+#include <stan/diff.hpp>
+#include <stan/diff/matrix.hpp>
 TEST(AgradRevMatrix,elt_divide_vec_vv) {
   using stan::math::elt_divide;
-  using stan::agrad::vector_v;
+  using stan::diff::vector_v;
 
   vector_v x(2);
   x << 2, 5;
@@ -25,7 +25,7 @@ TEST(AgradRevMatrix,elt_divide_vec_vv) {
 TEST(AgradRevMatrix,elt_divide_vec_vd) {
   using stan::math::elt_divide;
   using stan::math::vector_d;
-  using stan::agrad::vector_v;
+  using stan::diff::vector_v;
 
   vector_v x(2);
   x << 2, 5;
@@ -43,7 +43,7 @@ TEST(AgradRevMatrix,elt_divide_vec_vd) {
 TEST(AgradRevMatrix,elt_divide_vec_dv) {
   using stan::math::elt_divide;
   using stan::math::vector_d;
-  using stan::agrad::vector_v;
+  using stan::diff::vector_v;
 
   vector_d x(2);
   x << 2, 5;
@@ -61,7 +61,7 @@ TEST(AgradRevMatrix,elt_divide_vec_dv) {
 
 TEST(AgradRevMatrix,elt_divide_rowvec_vv) {
   using stan::math::elt_divide;
-  using stan::agrad::row_vector_v;
+  using stan::diff::row_vector_v;
 
   row_vector_v x(2);
   x << 2, 5;
@@ -81,7 +81,7 @@ TEST(AgradRevMatrix,elt_divide_rowvec_vv) {
 TEST(AgradRevMatrix,elt_divide_rowvec_vd) {
   using stan::math::elt_divide;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_v;
+  using stan::diff::row_vector_v;
 
   row_vector_v x(2);
   x << 2, 5;
@@ -99,7 +99,7 @@ TEST(AgradRevMatrix,elt_divide_rowvec_vd) {
 TEST(AgradRevMatrix,elt_divide_rowvec_dv) {
   using stan::math::elt_divide;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_v;
+  using stan::diff::row_vector_v;
 
   row_vector_d x(2);
   x << 2, 5;
@@ -118,7 +118,7 @@ TEST(AgradRevMatrix,elt_divide_rowvec_dv) {
 
 TEST(AgradRevMatrix,elt_divide_mat_vv) {
   using stan::math::elt_divide;
-  using stan::agrad::matrix_v;
+  using stan::diff::matrix_v;
 
   matrix_v x(2,3);
   x << 2, 5, 7, 13, 29, 112;
@@ -139,7 +139,7 @@ TEST(AgradRevMatrix,elt_divide_mat_vv) {
 TEST(AgradRevMatrix,elt_divide_mat_vd) {
   using stan::math::elt_divide;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_v;
+  using stan::diff::matrix_v;
   
   matrix_v x(2,3);
   x << 2, 5, 7, 13, 29, 112;
@@ -158,7 +158,7 @@ TEST(AgradRevMatrix,elt_divide_mat_vd) {
 TEST(AgradRevMatrix,elt_divide_mat_dv) {
   using stan::math::elt_divide;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_v;
+  using stan::diff::matrix_v;
 
   matrix_d x(2,3);
   x << 2, 5, 7, 13, 29, 112;

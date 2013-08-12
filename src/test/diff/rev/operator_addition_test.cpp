@@ -1,6 +1,6 @@
-#include <stan/agrad/rev/operator_addition.hpp>
-#include <stan/agrad/rev/operator_unary_negative.hpp>
-#include <test/agrad/util.hpp>
+#include <stan/diff/rev/operator_addition.hpp>
+#include <stan/diff/rev/operator_unary_negative.hpp>
+#include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
 TEST(AgradRev,a_plus_b) {

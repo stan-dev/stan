@@ -1,14 +1,14 @@
 #include <gtest/gtest.h>
-#include <stan/agrad/fvar.hpp>
-#include <stan/agrad/fwd/matrix/softmax.hpp>
-#include <stan/agrad/fwd/matrix/typedefs.hpp>
+#include <stan/diff/fvar.hpp>
+#include <stan/diff/fwd/matrix/softmax.hpp>
+#include <stan/diff/fwd/matrix/typedefs.hpp>
 
 TEST(AgradFwdMatrix,softmax) {
   using stan::math::softmax;
   using Eigen::Matrix;
   using Eigen::Dynamic;
-  using stan::agrad::vector_fv;
-  using stan::agrad::fvar;
+  using stan::diff::vector_fv;
+  using stan::diff::fvar;
 
   EXPECT_THROW(softmax(vector_fv()),std::domain_error);
   
@@ -16,7 +16,7 @@ TEST(AgradFwdMatrix,softmax) {
   x << 0.0;
   x(0).d_ = 1.0;
   
-  Matrix<fvar<double>,Dynamic,1> theta = stan::agrad::softmax(x);
+  Matrix<fvar<double>,Dynamic,1> theta = stan::diff::softmax(x);
   EXPECT_EQ(1,theta.size());
   EXPECT_FLOAT_EQ(1.0,theta[0].val_);
   EXPECT_FLOAT_EQ(0.0,theta[0].d_);

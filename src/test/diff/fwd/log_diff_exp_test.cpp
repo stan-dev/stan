@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
-#include <stan/agrad/fvar.hpp>
+#include <stan/diff/fvar.hpp>
 #include <stan/math/functions/log_diff_exp.hpp>
 
 TEST(AgradFvar, log_diff_exp) {
-  using stan::agrad::fvar;
+  using stan::diff::fvar;
   using stan::math::log_diff_exp;
   using std::exp;
 
@@ -28,7 +28,7 @@ TEST(AgradFvar, log_diff_exp) {
 }
 
 TEST(AgradFvar,log_diff_exp_exception) {
-  using stan::agrad::fvar;
+  using stan::diff::fvar;
   EXPECT_NO_THROW(log_diff_exp(fvar<double>(3), fvar<double>(4)));
   EXPECT_NO_THROW(log_diff_exp(fvar<double>(3), 4));
   EXPECT_NO_THROW(log_diff_exp(3, fvar<double>(4)));

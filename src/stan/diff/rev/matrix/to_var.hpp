@@ -1,19 +1,19 @@
-#ifndef __STAN__AGRAD__REV__MATRIX__TO_VAR_HPP__
-#define __STAN__AGRAD__REV__MATRIX__TO_VAR_HPP__
+#ifndef __STAN__DIFF__REV__MATRIX__TO_VAR_HPP__
+#define __STAN__DIFF__REV__MATRIX__TO_VAR_HPP__
 
 #include <vector>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/typedefs.hpp>
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/matrix/typedefs.hpp>
+#include <stan/diff/rev/var.hpp>
+#include <stan/diff/rev/matrix/typedefs.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
 
     /**
      * Converts argument to an automatic differentiation variable.
      *
-     * Returns a stan::agrad::var variable with the input value.
+     * Returns a stan::diff::var variable with the input value.
      *
      * @param[in] x A scalar value
      * @return An automatic differentiation variable with the input value.
@@ -24,7 +24,7 @@ namespace stan {
     /**
      * Converts argument to an automatic differentiation variable.
      *
-     * Returns a stan::agrad::var variable with the input value.
+     * Returns a stan::diff::var variable with the input value.
      *
      * @param[in] x An automatic differentiation variable.
      * @return An automatic differentiation variable with the input value.
@@ -35,7 +35,7 @@ namespace stan {
     /**
      * Converts argument to an automatic differentiation variable.
      *
-     * Returns a stan::agrad::var variable with the input value.
+     * Returns a stan::diff::var variable with the input value.
      *
      * @param[in] m A Matrix with scalars
      * @return A Matrix with automatic differentiation variables
@@ -50,7 +50,7 @@ namespace stan {
     /**
      * Converts argument to an automatic differentiation variable.
      *
-     * Returns a stan::agrad::var variable with the input value.
+     * Returns a stan::diff::var variable with the input value.
      * 
      * @param[in] m A Matrix with automatic differentiation variables.
      * @return A Matrix with automatic differentiation variables.
@@ -61,7 +61,7 @@ namespace stan {
     /**
      * Converts argument to an automatic differentiation variable.
      *
-     * Returns a stan::agrad::var variable with the input value.     
+     * Returns a stan::diff::var variable with the input value.     
      *
      * @param[in] v A Vector of scalars
      * @return A Vector of automatic differentiation variables with
@@ -76,7 +76,7 @@ namespace stan {
     /**
      * Converts argument to an automatic differentiation variable.
      *
-     * Returns a stan::agrad::var variable with the input value.     
+     * Returns a stan::diff::var variable with the input value.     
      *
      * @param[in] v A Vector of automatic differentiation variables
      * @return A Vector of automatic differentiation variables with
@@ -88,7 +88,7 @@ namespace stan {
     /**
      * Converts argument to an automatic differentiation variable.
      *
-     * Returns a stan::agrad::var variable with the input value.     
+     * Returns a stan::diff::var variable with the input value.     
      *
      * @param[in] rv A row vector of scalars
      * @return A row vector of automatic differentation variables with 
@@ -103,7 +103,7 @@ namespace stan {
     /**
      * Converts argument to an automatic differentiation variable.
      *
-     * Returns a stan::agrad::var variable with the input value.     
+     * Returns a stan::diff::var variable with the input value.     
      *
      * @param[in] rv A row vector with automatic differentiation variables
      * @return A row vector with automatic differentiation variables

@@ -1,17 +1,17 @@
-#ifndef __STAN__AGRAD__REV__MATRIX__DETERMINANT_HPP__
-#define __STAN__AGRAD__REV__MATRIX__DETERMINANT_HPP__
+#ifndef __STAN__DIFF__REV__MATRIX__DETERMINANT_HPP__
+#define __STAN__DIFF__REV__MATRIX__DETERMINANT_HPP__
 
 #include <vector>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/math/matrix/validate_multiplicable.hpp>
 #include <stan/math/matrix/validate_square.hpp>
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/matrix.hpp>
-#include <stan/agrad/rev/matrix/typedefs.hpp>
+#include <stan/diff/rev/var.hpp>
+#include <stan/diff/matrix.hpp>
+#include <stan/diff/rev/matrix/typedefs.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
 
     namespace {
       template<int R,int C>
@@ -25,9 +25,9 @@ namespace stan {
           : vari(determinant_vari_calc(A)), 
             _rows(A.rows()),
             _cols(A.cols()),
-            _A((double*)stan::agrad::memalloc_.alloc(sizeof(double) 
+            _A((double*)stan::diff::memalloc_.alloc(sizeof(double) 
                                                      * A.rows() * A.cols())),
-            _adjARef((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
+            _adjARef((vari**)stan::diff::memalloc_.alloc(sizeof(vari*) 
                                                           * A.rows() * A.cols()))
         {
           size_t pos = 0;

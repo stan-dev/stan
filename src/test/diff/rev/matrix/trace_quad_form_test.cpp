@@ -1,17 +1,17 @@
-#include <stan/agrad/rev/matrix/trace_quad_form.hpp>
-#include <stan/agrad/rev/matrix/trace_gen_quad_form.hpp>
-#include <stan/agrad/rev/matrix/sum.hpp>
+#include <stan/diff/rev/matrix/trace_quad_form.hpp>
+#include <stan/diff/rev/matrix/trace_gen_quad_form.hpp>
+#include <stan/diff/rev/matrix/sum.hpp>
 #include <gtest/gtest.h>
-#include <test/agrad/util.hpp>
+#include <test/diff/util.hpp>
 #include <stan/math/matrix/trace_quad_form.hpp>
 #include <stan/math/matrix/trace_gen_quad_form.hpp>
 #include <stan/math/matrix/sum.hpp>
 #include <stan/math/matrix/typedefs.hpp>
-#include <stan/agrad/rev/matrix/typedefs.hpp>
+#include <stan/diff/rev/matrix/typedefs.hpp>
 
 TEST(AgradRevMatrix, trace_quad_form_mat) {
   using stan::math::trace_quad_form;
-  using stan::agrad::matrix_v;
+  using stan::diff::matrix_v;
   using stan::math::matrix_d;
   
   matrix_v av(4,4);
@@ -60,7 +60,7 @@ TEST(AgradRevMatrix, trace_quad_form_mat) {
 TEST(AgradRevMatrix, trace_quad_form_mat_grad_vd) {
   using stan::math::trace_quad_form;
   using stan::math::sum;
-  using stan::agrad::matrix_v;
+  using stan::diff::matrix_v;
   using stan::math::matrix_d;
   
   matrix_v av(4,4);
@@ -104,7 +104,7 @@ TEST(AgradRevMatrix, trace_quad_form_mat_grad_vd) {
 TEST(AgradRevMatrix, trace_quad_form_mat_grad_dv) {
   using stan::math::trace_quad_form;
   using stan::math::sum;
-  using stan::agrad::matrix_v;
+  using stan::diff::matrix_v;
   using stan::math::matrix_d;
   
   matrix_d ad(4,4);
@@ -148,7 +148,7 @@ TEST(AgradRevMatrix, trace_quad_form_mat_grad_dv) {
 TEST(AgradRevMatrix, trace_quad_form_mat_grad_vv) {
   using stan::math::trace_quad_form;
   using stan::math::sum;
-  using stan::agrad::matrix_v;
+  using stan::diff::matrix_v;
   using stan::math::matrix_d;
   
   matrix_v av(4,4);
@@ -203,7 +203,7 @@ TEST(AgradRevMatrix, trace_quad_form_mat_grad_vv) {
 
 TEST(AgradRevMatrix, trace_gen_quad_form_mat) {
   using stan::math::trace_gen_quad_form;
-  using stan::agrad::matrix_v;
+  using stan::diff::matrix_v;
   using stan::math::matrix_d;
   
   matrix_v av(4,4);
@@ -272,7 +272,7 @@ TEST(AgradRevMatrix, trace_gen_quad_form_mat) {
 TEST(AgradRevMatrix, trace_gen_quad_form_mat_grad_dvd) {
   using stan::math::trace_gen_quad_form;
   using stan::math::sum;
-  using stan::agrad::matrix_v;
+  using stan::diff::matrix_v;
   using stan::math::matrix_d;
   
   matrix_v av(4,4);
@@ -327,7 +327,7 @@ TEST(AgradRevMatrix, trace_gen_quad_form_mat_grad_dvd) {
 TEST(AgradRevMatrix, trace_gen_quad_form_mat_grad_ddv) {
   using stan::math::trace_gen_quad_form;
   using stan::math::sum;
-  using stan::agrad::matrix_v;
+  using stan::diff::matrix_v;
   using stan::math::matrix_d;
   
   matrix_v av(4,4);
@@ -380,7 +380,7 @@ TEST(AgradRevMatrix, trace_gen_quad_form_mat_grad_ddv) {
 TEST(AgradRevMatrix, trace_gen_quad_form_mat_grad_vdd) {
   using stan::math::trace_gen_quad_form;
   using stan::math::sum;
-  using stan::agrad::matrix_v;
+  using stan::diff::matrix_v;
   using stan::math::matrix_d;
   
   matrix_v av(4,4);
@@ -432,7 +432,7 @@ TEST(AgradRevMatrix, trace_gen_quad_form_mat_grad_vdd) {
 TEST(AgradRevMatrix, trace_gen_quad_form_mat_grad_vvd) {
   using stan::math::trace_gen_quad_form;
   using stan::math::sum;
-  using stan::agrad::matrix_v;
+  using stan::diff::matrix_v;
   using stan::math::matrix_d;
   
   matrix_v av(4,4);
@@ -491,7 +491,7 @@ TEST(AgradRevMatrix, trace_gen_quad_form_mat_grad_vvd) {
 TEST(AgradRevMatrix, trace_gen_quad_form_mat_grad_vdv) {
   using stan::math::trace_gen_quad_form;
   using stan::math::sum;
-  using stan::agrad::matrix_v;
+  using stan::diff::matrix_v;
   using stan::math::matrix_d;
   
   matrix_v av(4,4);
@@ -550,7 +550,7 @@ TEST(AgradRevMatrix, trace_gen_quad_form_mat_grad_vdv) {
 TEST(AgradRevMatrix, trace_gen_quad_form_mat_grad_dvv) {
   using stan::math::trace_gen_quad_form;
   using stan::math::sum;
-  using stan::agrad::matrix_v;
+  using stan::diff::matrix_v;
   using stan::math::matrix_d;
   
   matrix_v av(4,4);
@@ -609,7 +609,7 @@ TEST(AgradRevMatrix, trace_gen_quad_form_mat_grad_dvv) {
 TEST(AgradRevMatrix, trace_gen_quad_form_mat_grad_vvv) {
   using stan::math::trace_gen_quad_form;
   using stan::math::sum;
-  using stan::agrad::matrix_v;
+  using stan::diff::matrix_v;
   using stan::math::matrix_d;
   
   matrix_v av(4,4);

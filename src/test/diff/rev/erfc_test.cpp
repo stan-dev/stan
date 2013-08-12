@@ -1,5 +1,5 @@
-#include <stan/agrad/rev/erfc.hpp>
-#include <test/agrad/util.hpp>
+#include <stan/diff/rev/erfc.hpp>
+#include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
 TEST(AgradRev,erfc) {

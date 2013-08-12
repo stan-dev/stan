@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
-#include <stan/agrad/fvar.hpp>
+#include <stan/diff/fvar.hpp>
 #include <stan/math/constants.hpp>
 
 TEST(AgradFvar, acos) {
-  using stan::agrad::fvar;
+  using stan::diff::fvar;
   using std::acos;
   using std::sqrt;
   using std::isnan;

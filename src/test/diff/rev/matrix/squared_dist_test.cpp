@@ -1,11 +1,11 @@
-#include <stan/agrad/rev/matrix/squared_dist.hpp>
+#include <stan/diff/rev/matrix/squared_dist.hpp>
 #include <gtest/gtest.h>
-#include <test/agrad/util.hpp>
-#include <stan/agrad.hpp>
+#include <test/diff/util.hpp>
+#include <stan/diff.hpp>
 
 TEST(AgradRevMatrix, squared_dist_vector_vector) {
   using stan::math::vector_d;
-  using stan::agrad::vector_v;
+  using stan::diff::vector_v;
 
   vector_d vd_1(3), vd_2(3);
   vector_v vv_1(3), vv_2(3);
@@ -15,28 +15,28 @@ TEST(AgradRevMatrix, squared_dist_vector_vector) {
   vd_2 << 4, -2, -1;
   vv_2 << 4, -2, -1;
 
-  EXPECT_FLOAT_EQ(50, stan::agrad::squared_dist(vv_1, vd_2).val());
-  EXPECT_FLOAT_EQ(50, stan::agrad::squared_dist(vd_1, vv_2).val());
-  EXPECT_FLOAT_EQ(50, stan::agrad::squared_dist(vv_1, vv_2).val());
+  EXPECT_FLOAT_EQ(50, stan::diff::squared_dist(vv_1, vd_2).val());
+  EXPECT_FLOAT_EQ(50, stan::diff::squared_dist(vd_1, vv_2).val());
+  EXPECT_FLOAT_EQ(50, stan::diff::squared_dist(vv_1, vv_2).val());
 }
 TEST(AgradRevMatrix, squared_dist_vector_vector_exception) {
   using stan::math::vector_d;
-  using stan::agrad::vector_v;
+  using stan::diff::vector_v;
 
   vector_d d1(3);
   vector_v v1(3);
   vector_d d2(2);
   vector_v v2(4);
 
-  EXPECT_THROW(stan::agrad::squared_dist(v1, d2), std::domain_error);
-  EXPECT_THROW(stan::agrad::squared_dist(d1, v2), std::domain_error);
-  EXPECT_THROW(stan::agrad::squared_dist(v1, v2), std::domain_error);
+  EXPECT_THROW(stan::diff::squared_dist(v1, d2), std::domain_error);
+  EXPECT_THROW(stan::diff::squared_dist(d1, v2), std::domain_error);
+  EXPECT_THROW(stan::diff::squared_dist(v1, v2), std::domain_error);
 }
 TEST(AgradRevMatrix, squared_dist_rowvector_vector) {
   using stan::math::vector_d;
-  using stan::agrad::vector_v;
+  using stan::diff::vector_v;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_v;
+  using stan::diff::row_vector_v;
 
   row_vector_d d1(3);
   row_vector_v v1(3);
@@ -48,30 +48,30 @@ TEST(AgradRevMatrix, squared_dist_rowvector_vector) {
   d2 << 4, -2, -1;
   v2 << 4, -2, -1;
 
-  EXPECT_FLOAT_EQ(50, stan::agrad::squared_dist(v1, d2).val());
-  EXPECT_FLOAT_EQ(50, stan::agrad::squared_dist(d1, v2).val());
-  EXPECT_FLOAT_EQ(50, stan::agrad::squared_dist(v1, v2).val());
+  EXPECT_FLOAT_EQ(50, stan::diff::squared_dist(v1, d2).val());
+  EXPECT_FLOAT_EQ(50, stan::diff::squared_dist(d1, v2).val());
+  EXPECT_FLOAT_EQ(50, stan::diff::squared_dist(v1, v2).val());
 }
 TEST(AgradRevMatrix, squared_dist_rowvector_vector_exception) {
   using stan::math::vector_d;
-  using stan::agrad::vector_v;
+  using stan::diff::vector_v;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_v;
+  using stan::diff::row_vector_v;
 
   row_vector_d d1(3);
   row_vector_v v1(3);
   vector_d d2(2);
   vector_v v2(4);
 
-  EXPECT_THROW(stan::agrad::squared_dist(v1, d2), std::domain_error);
-  EXPECT_THROW(stan::agrad::squared_dist(d1, v2), std::domain_error);
-  EXPECT_THROW(stan::agrad::squared_dist(v1, v2), std::domain_error);
+  EXPECT_THROW(stan::diff::squared_dist(v1, d2), std::domain_error);
+  EXPECT_THROW(stan::diff::squared_dist(d1, v2), std::domain_error);
+  EXPECT_THROW(stan::diff::squared_dist(v1, v2), std::domain_error);
 }
 TEST(AgradRevMatrix, squared_dist_vector_rowvector) {
   using stan::math::vector_d;
-  using stan::agrad::vector_v;
+  using stan::diff::vector_v;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_v;
+  using stan::diff::row_vector_v;
 
   vector_d d1(3);
   vector_v v1(3);
@@ -83,28 +83,28 @@ TEST(AgradRevMatrix, squared_dist_vector_rowvector) {
   d2 << 4, -2, -1;
   v2 << 4, -2, -1;
   
-  EXPECT_FLOAT_EQ(50, stan::agrad::squared_dist(v1, d2).val());
-  EXPECT_FLOAT_EQ(50, stan::agrad::squared_dist(d1, v2).val());
-  EXPECT_FLOAT_EQ(50, stan::agrad::squared_dist(v1, v2).val());
+  EXPECT_FLOAT_EQ(50, stan::diff::squared_dist(v1, d2).val());
+  EXPECT_FLOAT_EQ(50, stan::diff::squared_dist(d1, v2).val());
+  EXPECT_FLOAT_EQ(50, stan::diff::squared_dist(v1, v2).val());
 }
 TEST(AgradRevMatrix, squared_dist_vector_rowvector_exception) {
   using stan::math::vector_d;
-  using stan::agrad::vector_v;
+  using stan::diff::vector_v;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_v;
+  using stan::diff::row_vector_v;
 
   vector_d d1(3);
   vector_v v1(3);
   row_vector_d d2(2);
   row_vector_v v2(4);
 
-  EXPECT_THROW(stan::agrad::squared_dist(v1, d2), std::domain_error);
-  EXPECT_THROW(stan::agrad::squared_dist(d1, v2), std::domain_error);
-  EXPECT_THROW(stan::agrad::squared_dist(v1, v2), std::domain_error);
+  EXPECT_THROW(stan::diff::squared_dist(v1, d2), std::domain_error);
+  EXPECT_THROW(stan::diff::squared_dist(d1, v2), std::domain_error);
+  EXPECT_THROW(stan::diff::squared_dist(v1, v2), std::domain_error);
 }
 TEST(AgradRevMatrix, squared_dist_rowvector_rowvector) {
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_v;
+  using stan::diff::row_vector_v;
 
   row_vector_d d1(3), d2(3);
   row_vector_v v1(3), v2(3);
@@ -114,24 +114,24 @@ TEST(AgradRevMatrix, squared_dist_rowvector_rowvector) {
   d2 << 4, -2, -1;
   v2 << 4, -2, -1;
 
-  EXPECT_FLOAT_EQ(50, stan::agrad::squared_dist(v1, d2).val());
-  EXPECT_FLOAT_EQ(50, stan::agrad::squared_dist(d1, v2).val());
-  EXPECT_FLOAT_EQ(50, stan::agrad::squared_dist(v1, v2).val());
+  EXPECT_FLOAT_EQ(50, stan::diff::squared_dist(v1, d2).val());
+  EXPECT_FLOAT_EQ(50, stan::diff::squared_dist(d1, v2).val());
+  EXPECT_FLOAT_EQ(50, stan::diff::squared_dist(v1, v2).val());
 }
 TEST(AgradRevMatrix, squared_dist_rowvector_rowvector_exception) {
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_v;
+  using stan::diff::row_vector_v;
 
   row_vector_d d1(3), d2(2);
   row_vector_v v1(3), v2(4);
 
-  EXPECT_THROW(stan::agrad::squared_dist(v1, d2), std::domain_error);
-  EXPECT_THROW(stan::agrad::squared_dist(d1, v2), std::domain_error);
-  EXPECT_THROW(stan::agrad::squared_dist(v1, v2), std::domain_error);
+  EXPECT_THROW(stan::diff::squared_dist(v1, d2), std::domain_error);
+  EXPECT_THROW(stan::diff::squared_dist(d1, v2), std::domain_error);
+  EXPECT_THROW(stan::diff::squared_dist(v1, v2), std::domain_error);
 }
 
 TEST(AgradRevMatrix, squared_dist_vv) {
-  using stan::agrad::vector_v;
+  using stan::diff::vector_v;
 
   vector_v a(3), b(3);
   AVAR c;
@@ -157,7 +157,7 @@ TEST(AgradRevMatrix, squared_dist_vv) {
 }
 TEST(AgradRevMatrix, squared_dist_dv) {
   using stan::math::vector_d;
-  using stan::agrad::vector_v;
+  using stan::diff::vector_v;
 
   vector_d a(3);
   vector_v b(3);
@@ -180,7 +180,7 @@ TEST(AgradRevMatrix, squared_dist_dv) {
 }
 TEST(AgradRevMatrix, squared_dist_vd) {
   using stan::math::vector_d;
-  using stan::agrad::vector_v;
+  using stan::diff::vector_v;
 
   vector_v a(3);
   vector_d b(3);

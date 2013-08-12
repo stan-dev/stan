@@ -1,15 +1,15 @@
-#ifndef __STAN__AGRAD__FWD__MATRIX__TO_FVAR_HPP__
-#define __STAN__AGRAD__FWD__MATRIX__TO_FVAR_HPP__
+#ifndef __STAN__DIFF__FWD__MATRIX__TO_FVAR_HPP__
+#define __STAN__DIFF__FWD__MATRIX__TO_FVAR_HPP__
 
 #include <vector>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/typedefs.hpp>
-#include <stan/agrad/fwd/fvar.hpp>
-#include <stan/agrad/fwd/matrix/typedefs.hpp>
+#include <stan/diff/fwd/fvar.hpp>
+#include <stan/diff/fwd/matrix/typedefs.hpp>
 #include <stan/math/matrix/validate_matching_dims.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
 
     template<typename T>
     inline 

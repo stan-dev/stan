@@ -1,10 +1,10 @@
-#ifndef __STAN__AGRAD__REV__AS_BOOL_HPP__
-#define __STAN__AGRAD__REV__AS_BOOL_HPP__
+#ifndef __STAN__DIFF__REV__AS_BOOL_HPP__
+#define __STAN__DIFF__REV__AS_BOOL_HPP__
 
-#include <stan/agrad/rev/var.hpp>
+#include <stan/diff/rev/var.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
 
     /**
      * Return 1 if the argument is unequal to zero and 0 otherwise.
@@ -12,7 +12,7 @@ namespace stan {
      * @param x Value.
      * @return 1 if argument is equal to zero and 0 otherwise.
      */
-    inline int as_bool(const agrad::var& v) {
+    inline int as_bool(const diff::var& v) {
       return 0.0 != v.vi_->val_;
     }
 

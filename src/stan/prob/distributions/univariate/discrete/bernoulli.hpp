@@ -4,7 +4,7 @@
 #include <boost/random/bernoulli_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
 
-#include <stan/agrad.hpp>
+#include <stan/diff.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/functions/log1m.hpp>
 #include <stan/math/functions/value_of.hpp>
@@ -61,7 +61,7 @@ namespace stan {
       VectorView<const T_n> n_vec(n);
       VectorView<const T_prob> theta_vec(theta);
       size_t N = max_size(n, theta);
-      agrad::OperandsAndPartials<T_prob> operands_and_partials(theta);
+      diff::OperandsAndPartials<T_prob> operands_and_partials(theta);
       
       if (length(theta) == 1) {  
         size_t sum = 0;
@@ -165,7 +165,7 @@ namespace stan {
       VectorView<const T_n> n_vec(n);
       VectorView<const T_prob> theta_vec(theta);
       size_t N = max_size(n, theta);
-      agrad::OperandsAndPartials<T_prob> operands_and_partials(theta);
+      diff::OperandsAndPartials<T_prob> operands_and_partials(theta);
 
       for (size_t n = 0; n < N; n++) {
         // pull out values of arguments
@@ -247,7 +247,7 @@ namespace stan {
           
       // Compute vectorized CDF and gradient
       using stan::math::value_of;
-      agrad::OperandsAndPartials<T_prob> operands_and_partials(theta);
+      diff::OperandsAndPartials<T_prob> operands_and_partials(theta);
           
       std::fill(operands_and_partials.all_partials,
                 operands_and_partials.all_partials 
@@ -316,7 +316,7 @@ namespace stan {
           
       // Compute vectorized cdf_log and gradient
       using stan::math::value_of;
-      agrad::OperandsAndPartials<T_prob> operands_and_partials(theta);
+      diff::OperandsAndPartials<T_prob> operands_and_partials(theta);
           
       std::fill(operands_and_partials.all_partials,
                 operands_and_partials.all_partials 
@@ -382,7 +382,7 @@ namespace stan {
           
       // Compute vectorized cdf_log and gradient
       using stan::math::value_of;
-      agrad::OperandsAndPartials<T_prob> operands_and_partials(theta);
+      diff::OperandsAndPartials<T_prob> operands_and_partials(theta);
           
       std::fill(operands_and_partials.all_partials,
                 operands_and_partials.all_partials 

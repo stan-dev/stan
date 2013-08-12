@@ -1,5 +1,5 @@
-#include <stan/agrad/rev/log10.hpp>
-#include <test/agrad/util.hpp>
+#include <stan/diff/rev/log10.hpp>
+#include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
 TEST(AgradRev,log10_a) {

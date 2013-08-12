@@ -1,10 +1,10 @@
 #include <gtest/gtest.h>
-#include <stan/agrad/fvar.hpp>
+#include <stan/diff/fvar.hpp>
 #include <stan/math/functions/Phi.hpp>
 #include <stan/prob/distributions/univariate/continuous/normal.hpp>
 
 TEST(AgradFvar,Phi) {
-  using stan::agrad::fvar;
+  using stan::diff::fvar;
   using stan::math::Phi;
   fvar<double> x = 1.0;
   

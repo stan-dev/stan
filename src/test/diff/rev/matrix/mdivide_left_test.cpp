@@ -1,13 +1,13 @@
-#include <stan/agrad/rev/matrix/mdivide_left.hpp>
+#include <stan/diff/rev/matrix/mdivide_left.hpp>
 #include <gtest/gtest.h>
-#include <test/agrad/util.hpp>
+#include <test/diff/util.hpp>
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/math/matrix/mdivide_left.hpp>
 #include <stan/math/matrix/multiply.hpp>
 
 TEST(AgradRevMatrix,mdivide_left_val) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_v;
+  using stan::diff::matrix_v;
   using stan::math::mdivide_left;
 
   matrix_v Av(2,2);
@@ -40,7 +40,7 @@ TEST(AgradRevMatrix,mdivide_left_val) {
 
 TEST(AgradRevMatrix,mdivide_left_grad_vv) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_v;
+  using stan::diff::matrix_v;
   using stan::math::mdivide_left;
   using stan::math::multiply;
   
@@ -92,7 +92,7 @@ TEST(AgradRevMatrix,mdivide_left_grad_vv) {
 
 TEST(AgradRevMatrix,mdivide_left_grad_dv) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_v;
+  using stan::diff::matrix_v;
   using stan::math::mdivide_left;
   using stan::math::multiply;
   
@@ -135,7 +135,7 @@ TEST(AgradRevMatrix,mdivide_left_grad_dv) {
 
 TEST(AgradRevMatrix,mdivide_left_grad_vd) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_v;
+  using stan::diff::matrix_v;
   using stan::math::mdivide_left;
   using stan::math::multiply;
   

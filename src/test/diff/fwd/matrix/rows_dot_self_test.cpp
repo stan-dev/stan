@@ -1,11 +1,11 @@
-#include <stan/agrad/fwd/matrix/rows_dot_self.hpp>
+#include <stan/diff/fwd/matrix/rows_dot_self.hpp>
 #include <gtest/gtest.h>
-#include <stan/agrad/fwd/fvar.hpp>
+#include <stan/diff/fwd/fvar.hpp>
 #include <stan/math/matrix.hpp>
 
 TEST(AgradFwdMatrix,rows_dot_self) {
   using stan::math::columns_dot_self;
-  using stan::agrad::fvar;
+  using stan::diff::fvar;
 
   Eigen::Matrix<fvar<double>,Eigen::Dynamic,Eigen::Dynamic> m1(1,1);
   m1 << 2.0;

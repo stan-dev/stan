@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <stan/agrad/fvar.hpp>
+#include <stan/diff/fvar.hpp>
 
 template <typename T>
 void test_cumulative_sum() {
@@ -36,7 +36,7 @@ void test_cumulative_sum() {
   EXPECT_FLOAT_EQ(9.0, h[2].d_);
 }
 TEST(AgradFwdMatrix, cumulative_sum) {
-  using stan::agrad::fvar;
+  using stan::diff::fvar;
   using stan::math::cumulative_sum;
 
   EXPECT_FLOAT_EQ(0, cumulative_sum(std::vector<fvar<double> >(0)).size());

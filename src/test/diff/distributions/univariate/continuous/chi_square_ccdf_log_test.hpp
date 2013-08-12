@@ -5,7 +5,7 @@
 
 using std::vector;
 using std::numeric_limits;
-using stan::agrad::var;
+using stan::diff::var;
 
 class AgradCcdfLogChiSquare : public AgradCcdfLogTest {
 public:
@@ -72,7 +72,7 @@ public:
   ccdf_log_function(const T_y& y, const T_dof& nu, 
       const T2&, const T3&, const T4&, const T5&, 
       const T6&, const T7&, const T8&, const T9&) {
-    using stan::agrad::gamma_p;
+    using stan::diff::gamma_p;
     using stan::math::gamma_p;
     using std::log;
 

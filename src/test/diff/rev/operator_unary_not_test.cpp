@@ -1,5 +1,5 @@
-#include <stan/agrad/rev/operator_unary_not.hpp>
-#include <test/agrad/util.hpp>
+#include <stan/diff/rev/operator_unary_not.hpp>
+#include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
 TEST(AgradRev,not_a) {

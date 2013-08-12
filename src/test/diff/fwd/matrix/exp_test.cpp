@@ -1,13 +1,13 @@
 #include <stan/math/matrix/exp.hpp>
 #include <gtest/gtest.h>
 #include <stan/math/matrix/typedefs.hpp>
-#include <stan/agrad/fwd/matrix/typedefs.hpp>
-#include <stan/agrad/fwd/exp.hpp>
+#include <stan/diff/fwd/matrix/typedefs.hpp>
+#include <stan/diff/fwd/exp.hpp>
 
 TEST(AgradFwdMatrix, exp_matrix) {
   using stan::math::exp;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fv;
+  using stan::diff::matrix_fv;
 
   matrix_d expected_output(2,2);
   matrix_fv mv(2,2), output;
@@ -32,7 +32,7 @@ TEST(AgradFwdMatrix, exp_matrix) {
 TEST(AgradFwdMatrix, exp_vector) {
   using stan::math::exp;
   using stan::math::vector_d;
-  using stan::agrad::vector_fv;
+  using stan::diff::vector_fv;
 
   vector_d expected_output(4);
   vector_fv mv(4), output;
@@ -55,7 +55,7 @@ TEST(AgradFwdMatrix, exp_vector) {
 TEST(AgradFwdMatrix, exp_rowvector) {
   using stan::math::exp;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fv;
+  using stan::diff::row_vector_fv;
 
   row_vector_d expected_output(4);
   row_vector_fv mv(4), output;

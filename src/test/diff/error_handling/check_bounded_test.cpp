@@ -1,9 +1,9 @@
 #include <stan/math/error_handling/check_bounded.hpp>
-#include <stan/agrad.hpp>
+#include <stan/diff.hpp>
 #include <gtest/gtest.h>
 
 TEST(AgradErrorHandling,CheckBounded_X) {
-  using stan::agrad::var;
+  using stan::diff::var;
   using stan::math::check_bounded;
  
   const char* function = "check_bounded(%1%)";
@@ -48,7 +48,7 @@ TEST(AgradErrorHandling,CheckBounded_X) {
 }
 
 TEST(AgradErrorHandling,CheckBounded_Low) {
-  using stan::agrad::var;
+  using stan::diff::var;
   using stan::math::check_bounded;
 
   const char* function = "check_bounded(%1%)";
@@ -74,7 +74,7 @@ TEST(AgradErrorHandling,CheckBounded_Low) {
     << "check_bounded should throw with x: " << x << " and bounds: " << low << ", " << high;
 }
 TEST(AgradErrorHandling,CheckBounded_High) {
-  using stan::agrad::var;
+  using stan::diff::var;
   using stan::math::check_bounded;
 
   const char* function = "check_bounded(%1%)";

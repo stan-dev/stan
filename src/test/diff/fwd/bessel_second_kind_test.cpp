@@ -1,12 +1,12 @@
 #include <gtest/gtest.h>
-#include <stan/agrad/fvar.hpp>
-#include <stan/agrad/var.hpp>
-#include <test/agrad/util.hpp>
+#include <stan/diff/fvar.hpp>
+#include <stan/diff/var.hpp>
+#include <test/diff/util.hpp>
 #include <stan/math/functions/bessel_second_kind.hpp>
 
 TEST(AgradFvar, bessel_second_kind) {
-  using stan::agrad::fvar;
-  using stan::agrad::bessel_second_kind;
+  using stan::diff::fvar;
+  using stan::diff::bessel_second_kind;
 
   fvar<double> a(4.0,1.0);
   int b = 0;
@@ -24,8 +24,8 @@ TEST(AgradFvar, bessel_second_kind) {
 }
 
 TEST(AgradFvarVar, bessel_second_kind) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::diff::fvar;
+  using stan::diff::var;
   using stan::math::bessel_second_kind;
 
   fvar<var> z(3.0,2.0);
@@ -41,7 +41,7 @@ TEST(AgradFvarVar, bessel_second_kind) {
 }
 
 TEST(AgradFvarFvar, bessel_second_kind) {
-  using stan::agrad::fvar;
+  using stan::diff::fvar;
   using stan::math::bessel_second_kind;
 
   fvar<fvar<double> > x;
@@ -52,14 +52,14 @@ TEST(AgradFvarFvar, bessel_second_kind) {
   y.val_.val_ = 3.0;
   y.d_.val_ = 2.0;
 
-  fvar<fvar<double> > a = stan::agrad::bessel_second_kind(1,y);
+  fvar<fvar<double> > a = stan::diff::bessel_second_kind(1,y);
 
   EXPECT_FLOAT_EQ(stan::math::bessel_second_kind(1,3.0), a.val_.val_);
   EXPECT_FLOAT_EQ(0, a.val_.d_);
   EXPECT_FLOAT_EQ(0.53725040349771411, a.d_.val_);
   EXPECT_FLOAT_EQ(0, a.d_.d_);
 
-  fvar<fvar<double> > b = stan::agrad::bessel_second_kind(1, x);
+  fvar<fvar<double> > b = stan::diff::bessel_second_kind(1, x);
 
   EXPECT_FLOAT_EQ(stan::math::bessel_second_kind(1,3.0), b.val_.val_);
   EXPECT_FLOAT_EQ(0.53725040349771411, b.val_.d_);

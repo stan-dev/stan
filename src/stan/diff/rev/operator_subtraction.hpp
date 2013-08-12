@@ -1,13 +1,13 @@
-#ifndef __STAN__AGRAD__REV__OPERATOR_SUBTRACTION_HPP__
-#define __STAN__AGRAD__REV__OPERATOR_SUBTRACTION_HPP__
+#ifndef __STAN__DIFF__REV__OPERATOR_SUBTRACTION_HPP__
+#define __STAN__DIFF__REV__OPERATOR_SUBTRACTION_HPP__
 
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/op/vv_vari.hpp>
-#include <stan/agrad/rev/op/vd_vari.hpp>
-#include <stan/agrad/rev/op/dv_vari.hpp>
+#include <stan/diff/rev/var.hpp>
+#include <stan/diff/rev/op/vv_vari.hpp>
+#include <stan/diff/rev/op/vd_vari.hpp>
+#include <stan/diff/rev/op/dv_vari.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
 
     namespace {
       class subtract_vv_vari : public op_vv_vari {

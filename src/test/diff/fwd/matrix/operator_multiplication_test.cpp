@@ -1,12 +1,12 @@
-#include <stan/agrad/fwd/matrix/multiply.hpp>
+#include <stan/diff/fwd/matrix/multiply.hpp>
 #include <gtest/gtest.h>
 #include <stan/math/matrix/multiply.hpp>
 #include <stan/math/matrix/typedefs.hpp>
-#include <stan/agrad/fwd/matrix/typedefs.hpp>
-#include <stan/agrad/fwd/fvar.hpp>
+#include <stan/diff/fwd/matrix/typedefs.hpp>
+#include <stan/diff/fwd/fvar.hpp>
 
-using stan::agrad::fvar;  
-using stan::agrad::multiply;
+using stan::diff::fvar;  
+using stan::diff::multiply;
 
 TEST(AgradFwdMatrix, multiply_scalar_scalar) {
   double d1, d2;
@@ -32,7 +32,7 @@ TEST(AgradFwdMatrix, multiply_scalar_scalar) {
 
 TEST(AgradFwdMatrix, multiply_vector_scalar) {
   using stan::math::vector_d;
-  using stan::agrad::vector_fv;
+  using stan::diff::vector_fv;
 
   vector_d d1(3);
   vector_fv v1(3);
@@ -100,7 +100,7 @@ TEST(AgradFwdMatrix, multiply_vector_scalar) {
 
 TEST(AgradFwdMatrix, multiply_rowvector_scalar) {
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fv;
+  using stan::diff::row_vector_fv;
 
   row_vector_d d1(3);
   row_vector_fv v1(3);
@@ -167,7 +167,7 @@ TEST(AgradFwdMatrix, multiply_rowvector_scalar) {
 }
 TEST(AgradFwdMatrix, multiply_matrix_scalar) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fv;
+  using stan::diff::matrix_fv;
   
   matrix_d d1(2,2);
   matrix_fv v1(2,2);
@@ -247,9 +247,9 @@ TEST(AgradFwdMatrix, multiply_matrix_scalar) {
 }
 TEST(AgradFwdMatrix, multiply_rowvector_vector) {
   using stan::math::vector_d;
-  using stan::agrad::vector_fv;
+  using stan::diff::vector_fv;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fv;
+  using stan::diff::row_vector_fv;
 
   row_vector_d d1(3);
   row_vector_fv v1(3);
@@ -281,11 +281,11 @@ TEST(AgradFwdMatrix, multiply_rowvector_vector) {
   EXPECT_THROW(multiply(d1, v2), std::domain_error);
 }
 TEST(AgradFwdMatrix, multiply_vector_rowvector) {
-  using stan::agrad::matrix_fv;
+  using stan::diff::matrix_fv;
   using stan::math::vector_d;
-  using stan::agrad::vector_fv;
+  using stan::diff::vector_fv;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fv;
+  using stan::diff::row_vector_fv;
 
   vector_d d1(3);
   vector_fv v1(3);
@@ -371,9 +371,9 @@ TEST(AgradFwdMatrix, multiply_vector_rowvector) {
 }
 TEST(AgradFwdMatrix, multiply_matrix_vector) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fv;
+  using stan::diff::matrix_fv;
   using stan::math::vector_d;
-  using stan::agrad::vector_fv;
+  using stan::diff::vector_fv;
 
   matrix_d d1(3,2);
   matrix_fv v1(3,2);
@@ -422,9 +422,9 @@ TEST(AgradFwdMatrix, multiply_matrix_vector) {
 }
 TEST(AgradFwdMatrix, multiply_matrix_vector_exception) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fv;
+  using stan::diff::matrix_fv;
   using stan::math::vector_d;
-  using stan::agrad::vector_fv;
+  using stan::diff::vector_fv;
 
   matrix_d d1(3,2);
   matrix_fv v1(3,2);
@@ -436,10 +436,10 @@ TEST(AgradFwdMatrix, multiply_matrix_vector_exception) {
 }
 TEST(AgradFwdMatrix, multiply_rowvector_matrix) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fv;
-  using stan::agrad::vector_fv;
+  using stan::diff::matrix_fv;
+  using stan::diff::vector_fv;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fv;
+  using stan::diff::row_vector_fv;
 
   row_vector_d d1(3);
   row_vector_fv v1(3);
@@ -483,9 +483,9 @@ TEST(AgradFwdMatrix, multiply_rowvector_matrix) {
 }
 TEST(AgradFwdMatrix, multiply_rowvector_matrix_exception) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fv;
+  using stan::diff::matrix_fv;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fv;
+  using stan::diff::row_vector_fv;
 
   row_vector_d d1(4);
   row_vector_fv v1(4);
@@ -497,7 +497,7 @@ TEST(AgradFwdMatrix, multiply_rowvector_matrix_exception) {
 }
 TEST(AgradFwdMatrix, multiply_matrix_matrix) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fv;
+  using stan::diff::matrix_fv;
 
   matrix_d d1(2,3);
   matrix_fv v1(2,3);
@@ -555,7 +555,7 @@ TEST(AgradFwdMatrix, multiply_matrix_matrix) {
 }
 TEST(AgradFwdMatrix, multiply_matrix_matrix_exception) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fv;
+  using stan::diff::matrix_fv;
 
   matrix_d d1(2,2);
   matrix_fv v1(2,2);

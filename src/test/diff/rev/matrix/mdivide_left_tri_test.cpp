@@ -1,13 +1,13 @@
-#include <stan/agrad/rev/matrix/mdivide_left_tri.hpp>
+#include <stan/diff/rev/matrix/mdivide_left_tri.hpp>
 #include <gtest/gtest.h>
-#include <test/agrad/util.hpp>
+#include <test/diff/util.hpp>
 #include <stan/math/matrix/multiply.hpp>
 #include <stan/math/matrix/mdivide_left_tri.hpp>
-#include <stan/agrad.hpp>
+#include <stan/diff.hpp>
 
 TEST(AgradRevMatrix,mdivide_left_tri_val) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_v;
+  using stan::diff::matrix_v;
   using stan::math::mdivide_left_tri;
 
   matrix_v Av(2,2);
@@ -70,7 +70,7 @@ TEST(AgradRevMatrix,mdivide_left_tri_val) {
 }
 TEST(AgradRevMatrix,mdivide_left_tri_lower_grad_vv) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_v;
+  using stan::diff::matrix_v;
   using stan::math::mdivide_left_tri;
   using stan::math::multiply;
   
@@ -127,7 +127,7 @@ TEST(AgradRevMatrix,mdivide_left_tri_lower_grad_vv) {
 
 TEST(AgradRevMatrix,mdivide_left_tri_lower_grad_dv) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_v;
+  using stan::diff::matrix_v;
   using stan::math::mdivide_left_tri;
   using stan::math::multiply;
   
@@ -168,7 +168,7 @@ TEST(AgradRevMatrix,mdivide_left_tri_lower_grad_dv) {
 
 TEST(AgradRevMatrix,mdivide_left_tri_lower_grad_vd) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_v;
+  using stan::diff::matrix_v;
   using stan::math::mdivide_left_tri;
   using stan::math::multiply;
   
@@ -215,7 +215,7 @@ TEST(AgradRevMatrix,mdivide_left_tri_lower_grad_vd) {
 }
 TEST(AgradRevMatrix,mdivide_left_tri_upper_grad_vv) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_v;
+  using stan::diff::matrix_v;
   using stan::math::mdivide_left_tri;
   using stan::math::multiply;
   
@@ -272,7 +272,7 @@ TEST(AgradRevMatrix,mdivide_left_tri_upper_grad_vv) {
 
 TEST(AgradRevMatrix,mdivide_left_tri_upper_grad_dv) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_v;
+  using stan::diff::matrix_v;
   using stan::math::mdivide_left_tri;
   using stan::math::multiply;
   
@@ -313,7 +313,7 @@ TEST(AgradRevMatrix,mdivide_left_tri_upper_grad_dv) {
 
 TEST(AgradRevMatrix,mdivide_left_tri_upper_grad_vd) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_v;
+  using stan::diff::matrix_v;
   using stan::math::mdivide_left_tri;
   using stan::math::multiply;
   
@@ -362,11 +362,11 @@ TEST(AgradRevMatrix,mdivide_left_tri_upper_grad_vd) {
 // //         Works in clang++ and later g++
 // // TEST(AgradRevMatrix,mdivide_left_tri2) {
 // //   using stan::math::mdivide_left_tri;
-// //   using stan::agrad::mdivide_left_tri;
+// //   using stan::diff::mdivide_left_tri;
 // //   int k = 3;
-// //   Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,Eigen::Dynamic> L(k,k);
+// //   Eigen::Matrix<stan::diff::var,Eigen::Dynamic,Eigen::Dynamic> L(k,k);
 // //   L << 1, 2, 3, 4, 5, 6, 7, 8, 9;
-// //   Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,Eigen::Dynamic> I(k,k);
+// //   Eigen::Matrix<stan::diff::var,Eigen::Dynamic,Eigen::Dynamic> I(k,k);
 // //   I.setIdentity();
 // //   L = mdivide_left_tri<Eigen::Lower>(L, I);
 // // }

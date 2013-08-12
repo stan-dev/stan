@@ -1,10 +1,10 @@
 #include <stan/math/matrix/minus.hpp>
 #include <gtest/gtest.h>
 #include <stan/math/matrix/typedefs.hpp>
-#include <stan/agrad/fwd/matrix/typedefs.hpp>
-#include <stan/agrad/fvar.hpp>
+#include <stan/diff/fwd/matrix/typedefs.hpp>
+#include <stan/diff/fvar.hpp>
 
-using stan::agrad::fvar;
+using stan::diff::fvar;
 
 TEST(AgradFwdMatrix, minus_scalar) {
   using stan::math::minus;
@@ -18,7 +18,7 @@ TEST(AgradFwdMatrix, minus_scalar) {
 }
 TEST(AgradFwdMatrix, minus_vector) {
   using stan::math::vector_d;
-  using stan::agrad::vector_fv;
+  using stan::diff::vector_fv;
   using stan::math::minus;
 
   vector_d d(3);
@@ -47,7 +47,7 @@ TEST(AgradFwdMatrix, minus_vector) {
 }
 TEST(AgradFwdMatrix, minus_rowvector) {
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fv;
+  using stan::diff::row_vector_fv;
   using stan::math::minus;
 
   row_vector_d d(3);
@@ -76,7 +76,7 @@ TEST(AgradFwdMatrix, minus_rowvector) {
 }
 TEST(AgradFwdMatrix, minus_matrix) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fv;
+  using stan::diff::matrix_fv;
   using stan::math::minus;
 
   matrix_d d(2, 3);

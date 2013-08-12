@@ -1,12 +1,12 @@
-#ifndef __STAN__AGRAD__REV__OP__MATRIX_VARI_HPP__
-#define __STAN__AGRAD__REV__OP__MATRIX_VARI_HPP__
+#ifndef __STAN__DIFF__REV__OP__MATRIX_VARI_HPP__
+#define __STAN__DIFF__REV__OP__MATRIX_VARI_HPP__
 
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/vari.hpp>
+#include <stan/diff/rev/var.hpp>
+#include <stan/diff/rev/vari.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
 
     class op_matrix_vari : public vari {
     protected:
@@ -14,7 +14,7 @@ namespace stan {
       vari** vis_;
     public:
       template <int R, int C>
-      op_matrix_vari(double f, const Eigen::Matrix<stan::agrad::var,R,C>& vs) :
+      op_matrix_vari(double f, const Eigen::Matrix<stan::diff::var,R,C>& vs) :
         vari(f),
         size_(vs.size()) {
 

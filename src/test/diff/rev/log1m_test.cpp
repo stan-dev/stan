@@ -1,6 +1,6 @@
 #include <boost/math/special_functions/fpclassify.hpp>
-#include <stan/agrad/rev/log1m.hpp>
-#include <test/agrad/util.hpp>
+#include <stan/diff/rev/log1m.hpp>
+#include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
 TEST(AgradRev,log1m) {

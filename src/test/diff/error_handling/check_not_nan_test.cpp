@@ -1,9 +1,9 @@
 #include <stan/math/error_handling/check_not_nan.hpp>
-#include <stan/agrad.hpp>
+#include <stan/diff.hpp>
 #include <gtest/gtest.h>
 
 TEST(AgradErrorHandling,CheckNotNan) {
-  using stan::agrad::var;
+  using stan::diff::var;
   using stan::math::check_not_nan;
   const char* function = "check_not_nan(%1%)";
   var x = 0;

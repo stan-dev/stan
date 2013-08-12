@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
-#include <stan/agrad/fvar.hpp>
+#include <stan/diff/fvar.hpp>
 #include <stan/math/functions/fma.hpp>
 
 TEST(AgradFvar, fma) { 
-  using stan::agrad::fvar;
+  using stan::diff::fvar;
   using stan::math::fma;
   fvar<double> x(0.5);
   fvar<double> y(1.2);

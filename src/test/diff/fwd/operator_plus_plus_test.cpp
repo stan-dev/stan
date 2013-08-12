@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
-#include <stan/agrad/fvar.hpp>
+#include <stan/diff/fvar.hpp>
 
 TEST(AgradFvar, operatorPlusPlus){
-  using stan::agrad::fvar;
+  using stan::diff::fvar;
 
   fvar<double> x(0.5);
   x.d_ = 1.0;

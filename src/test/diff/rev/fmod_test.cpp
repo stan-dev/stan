@@ -1,5 +1,5 @@
-#include <stan/agrad/rev/fmod.hpp>
-#include <test/agrad/util.hpp>
+#include <stan/diff/rev/fmod.hpp>
+#include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
 TEST(AgradRev,fmod_var_var) {

@@ -1,13 +1,13 @@
-#ifndef __STAN__AGRAD__AUTO_DIFF_HPP__
-#define __STAN__AGRAD__AUTO_DIFF_HPP__
+#ifndef __STAN__DIFF__AUTO_DIFF_HPP__
+#define __STAN__DIFF__AUTO_DIFF_HPP__
 
-#include <stan/agrad/fvar.hpp>
-#include <stan/agrad/matrix.hpp>
-#include <stan/agrad/var.hpp>
+#include <stan/diff/fvar.hpp>
+#include <stan/diff/matrix.hpp>
+#include <stan/diff/var.hpp>
 
 namespace stan {
   
-  namespace agrad {
+  namespace diff {
 
 
     template <typename T, typename F>
@@ -44,13 +44,13 @@ namespace stan {
      * <p>The functor must implement 
      * 
      * <code>
-     * stan::agrad::var
+     * stan::diff::var
      * operator()(const
-     * Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,1>&)
+     * Eigen::Matrix<stan::diff::var,Eigen::Dynamic,1>&)
      * </code>
      *
      * using only operations that are defined for
-     * <code>stan::agrad::var</code>.  This latter constraint usually
+     * <code>stan::diff::var</code>.  This latter constraint usually
      * requires the functions to be defined in terms of the libraries
      * defined in Stan or in terms of functions with appropriately
      * general namespace imports that eventually depend on functions
@@ -72,7 +72,7 @@ namespace stan {
              const Eigen::Matrix<double,Eigen::Dynamic,1>& x,
              double& fx,
              Eigen::Matrix<double,Eigen::Dynamic,1>& grad_fx) {
-      using stan::agrad::var;
+      using stan::diff::var;
       Eigen::Matrix<var,Eigen::Dynamic,1> x_var(x.size());
       for (int i = 0; i < x.size(); ++i)
         x_var(i) = x(i);
@@ -80,10 +80,10 @@ namespace stan {
       fx = fx_var.val();
 
       grad_fx.resize(x.size());
-      stan::agrad::grad(fx_var.vi_);
+      stan::diff::grad(fx_var.vi_);
       for (int i = 0; i < x.size(); ++i)
         grad_fx(i) = x_var(i).adj();
-      stan::agrad::recover_memory();
+      stan::diff::recover_memory();
     }
     template <typename T, typename F>
     void
@@ -110,7 +110,7 @@ namespace stan {
              Eigen::Matrix<double,Eigen::Dynamic,1>& fx,
              Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& J) {
       using Eigen::Matrix;  using Eigen::Dynamic;
-      using stan::agrad::var;
+      using stan::diff::var;
       Matrix<var,Dynamic,1> x_var(x.size());
       for (int k = 0; k < x.size(); ++k)
         x_var(k) = x(k);
@@ -134,7 +134,7 @@ namespace stan {
              Eigen::Matrix<T,Eigen::Dynamic,1>& fx,
              Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& J) {
       using Eigen::Matrix;  using Eigen::Dynamic;
-      using stan::agrad::fvar;
+      using stan::diff::fvar;
       Matrix<fvar<T>,Dynamic,1> x_fvar(x.size());
       for (int i = 0; i < x.size(); ++i) {
         for (int k = 0; k < x.size(); ++k)
@@ -170,7 +170,7 @@ namespace stan {
         fvar<var> fx_fvar = f(x_fvar);
         grad(i) = fx_fvar.d_.val();
         if (i == 0) fx = fx_fvar.val_.val();
-        stan::agrad::grad(fx_fvar.d_.vi_);
+        stan::diff::grad(fx_fvar.d_.vi_);
         for (int j = 0; j < x.size(); ++j)
           H(i,j) = x_fvar(j).val_.adj();
       }
@@ -212,8 +212,8 @@ namespace stan {
                         const Eigen::Matrix<T2,Eigen::Dynamic,1>& v,
                         T1& fx,
                         T1& grad_fx_dot_v) {
-      using stan::agrad::fvar;
-      using stan::agrad::var;
+      using stan::diff::fvar;
+      using stan::diff::var;
       using Eigen::Matrix;
       using Eigen::Dynamic;
       Matrix<fvar<T1>,Dynamic,1> x_fvar(x.size());
@@ -234,8 +234,8 @@ namespace stan {
                          const Eigen::Matrix<double,Eigen::Dynamic,1>& v,
                          double& fx,
                          Eigen::Matrix<double,Eigen::Dynamic,1>& Hv) {
-      using stan::agrad::fvar;
-      using stan::agrad::var;
+      using stan::diff::fvar;
+      using stan::diff::var;
       using Eigen::Matrix; using Eigen::Dynamic;
       Matrix<var,Dynamic,1> x_var(x.size());
       for (int i = 0; i < x_var.size(); ++i)
@@ -244,11 +244,11 @@ namespace stan {
       var grad_fx_var_dot_v;
       gradient_dot_vector(f,x_var,v,fx_var,grad_fx_var_dot_v);
       fx = fx_var.val();
-      stan::agrad::grad(grad_fx_var_dot_v.vi_);
+      stan::diff::grad(grad_fx_var_dot_v.vi_);
       Hv.resize(x.size());
       for (int i = 0; i < x.size(); ++i) 
         Hv(i) = x_var(i).adj();
-      stan::agrad::recover_memory();
+      stan::diff::recover_memory();
     }
     template <typename T, typename F>
     void
@@ -298,10 +298,10 @@ namespace stan {
         sum += grad_fx_dot_v.d_;
       }
 
-      stan::agrad::grad(sum.vi_);
+      stan::diff::grad(sum.vi_);
       for (int i = 0; i < x.size(); ++i)
         grad_tr_MH(i) = x_var(i).adj();
-      stan::agrad::recover_memory();
+      stan::diff::recover_memory();
     }
 
 

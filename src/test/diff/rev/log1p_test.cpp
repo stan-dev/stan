@@ -1,10 +1,10 @@
-#include <stan/agrad/rev/log1p.hpp>
-#include <test/agrad/util.hpp>
+#include <stan/diff/rev/log1p.hpp>
+#include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
 TEST(AgradRev,log1p) {
   AVAR a = 0.1;
-  AVAR f = stan::agrad::log1p(a);
+  AVAR f = stan::diff::log1p(a);
   EXPECT_FLOAT_EQ(log(1 + 0.1), f.val());
 
   AVEC x = createAVEC(a);

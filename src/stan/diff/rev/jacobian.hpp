@@ -1,11 +1,11 @@
-#ifndef __STAN__AGRAD__REV__JACOBIAN_HPP__
-#define __STAN__AGRAD__REV__JACOBIAN_HPP__
+#ifndef __STAN__DIFF__REV__JACOBIAN_HPP__
+#define __STAN__DIFF__REV__JACOBIAN_HPP__
 
 #include <vector>
-#include <stan/agrad/rev/var.hpp>
+#include <stan/diff/rev/var.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
 
     /**
      * Return the Jacobian of the function producing the specified

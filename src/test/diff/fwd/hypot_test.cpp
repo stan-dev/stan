@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
-#include <stan/agrad/fvar.hpp>
+#include <stan/diff/fvar.hpp>
 #include <boost/math/special_functions/hypot.hpp>
 
 TEST(AgradFvar, hypot) {
-  using stan::agrad::fvar;
+  using stan::diff::fvar;
   using boost::math::hypot;
   using std::isnan;
 

@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
-#include <test/agrad/distributions/expect_eq_diffs.hpp>
+#include <test/diff/distributions/expect_eq_diffs.hpp>
 #include <stan/prob/distributions/multivariate/continuous/wishart.hpp>
-#include <stan/agrad.hpp>
+#include <stan/diff.hpp>
 #include <stan/meta/traits.hpp>
-#include <stan/agrad/matrix.hpp>
+#include <stan/diff/matrix.hpp>
 
 
 template <typename T_y, typename T_dof, typename T_scale>
@@ -19,8 +19,8 @@ void expect_propto(T_y W1, T_dof nu1, T_scale S1,
 
 using Eigen::Dynamic;
 using Eigen::Matrix;
-using stan::agrad::var;
-using stan::agrad::to_var;
+using stan::diff::var;
+using stan::diff::to_var;
 
 class AgradDistributionsWishart : public ::testing::Test {
 protected:

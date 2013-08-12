@@ -1,14 +1,14 @@
 #include <stan/math/matrix/log.hpp>
 #include <gtest/gtest.h>
-#include <test/agrad/util.hpp>
+#include <test/diff/util.hpp>
 #include <stan/math/matrix/typedefs.hpp>
-#include <stan/agrad/rev/matrix/typedefs.hpp>
-#include <stan/agrad.hpp>
+#include <stan/diff/rev/matrix/typedefs.hpp>
+#include <stan/diff.hpp>
 
 TEST(AgradRevMatrix, log_matrix) {
   using stan::math::log;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_v;
+  using stan::diff::matrix_v;
 
   matrix_d expected_output(2,2);
   matrix_v mv(2,2), output;

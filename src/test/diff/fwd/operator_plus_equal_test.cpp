@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
-#include <stan/agrad/fvar.hpp>
+#include <stan/diff/fvar.hpp>
 
 TEST(AgradFvar, operatorPlusEqual){
-  using stan::agrad::fvar;
+  using stan::diff::fvar;
 
   fvar<double> a(0.5);
   fvar<double> x1(0.4);

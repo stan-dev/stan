@@ -1,17 +1,17 @@
-#ifndef __STAN__AGRAD__FWD__MATRIX__INVERSE_HPP__
-#define __STAN__AGRAD__FWD__MATRIX__INVERSE_HPP__
+#ifndef __STAN__DIFF__FWD__MATRIX__INVERSE_HPP__
+#define __STAN__DIFF__FWD__MATRIX__INVERSE_HPP__
 
 #include <vector>
 #include <boost/math/tools/promotion.hpp>
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/agrad/fwd/fvar.hpp>
-#include <stan/agrad/fwd/matrix/typedefs.hpp>
-#include <stan/agrad/fwd/operator_multiplication.hpp>
+#include <stan/diff/fwd/fvar.hpp>
+#include <stan/diff/fwd/matrix/typedefs.hpp>
+#include <stan/diff/fwd/operator_multiplication.hpp>
 #include <stan/math/matrix/multiply.hpp>
-#include <stan/agrad/fwd/matrix/to_fvar.hpp>
+#include <stan/diff/fwd/matrix/to_fvar.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
     
     template<typename T, int R,int C>
     inline 

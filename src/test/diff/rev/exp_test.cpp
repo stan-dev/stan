@@ -1,5 +1,5 @@
-#include <stan/agrad/rev/exp.hpp>
-#include <test/agrad/util.hpp>
+#include <stan/diff/rev/exp.hpp>
+#include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
 TEST(AgradRev,exp_a) {

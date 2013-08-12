@@ -1,14 +1,14 @@
 #include <gtest/gtest.h>
-#include <stan/agrad/fvar.hpp>
+#include <stan/diff/fvar.hpp>
 #include <stan/math/functions/log_sum_exp.hpp>
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/agrad/fwd/log_sum_exp.hpp>
+#include <stan/diff/fwd/log_sum_exp.hpp>
 
 
 template <int R, int C>
 void log_sum_exp_test(const Eigen::Matrix<double,R,C>& x) {
   using std::exp;
-  using stan::agrad::fvar;
+  using stan::diff::fvar;
   using stan::math::log_sum_exp;
   for (int n = 0; n < x.size(); ++n) {
     // for d/d.x[n]

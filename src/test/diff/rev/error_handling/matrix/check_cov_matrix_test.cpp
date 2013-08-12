@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
 #include <stan/math/matrix_error_handling.hpp>
-#include <stan/agrad.hpp>
+#include <stan/diff.hpp>
 
 TEST(AgradRevErrorHandlingMatrix,CheckCovMatrix) {
-  using stan::agrad::var;
+  using stan::diff::var;
   using Eigen::Dynamic;
   using Eigen::Matrix;
   

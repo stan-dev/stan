@@ -1,15 +1,15 @@
-#ifndef __STAN__AGRAD__REV__MATRIX__TYPEDEFS_HPP__
-#define __STAN__AGRAD__REV__MATRIX__TYPEDEFS_HPP__
+#ifndef __STAN__DIFF__REV__MATRIX__TYPEDEFS_HPP__
+#define __STAN__DIFF__REV__MATRIX__TYPEDEFS_HPP__
 
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/agrad/rev/var.hpp>
+#include <stan/diff/rev/var.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
     typedef Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>::size_type size_type;
 
     /**
-     * The type of a matrix holding <code>stan::agrad::var</code>
+     * The type of a matrix holding <code>stan::diff::var</code>
      * values.
      */
     typedef 
@@ -17,7 +17,7 @@ namespace stan {
     matrix_v;
 
     /**
-     * The type of a (column) vector holding <code>stan::agrad::var</code>
+     * The type of a (column) vector holding <code>stan::diff::var</code>
      * values.
      */
     typedef 
@@ -25,7 +25,7 @@ namespace stan {
     vector_v;
 
     /**
-     * The type of a row vector holding <code>stan::agrad::var</code>
+     * The type of a row vector holding <code>stan::diff::var</code>
      * values.
      */
     typedef 

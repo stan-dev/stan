@@ -1,15 +1,15 @@
-#ifndef __STAN__AGRAD__REV__MATRIX__SUM_HPP__
-#define __STAN__AGRAD__REV__MATRIX__SUM_HPP__
+#ifndef __STAN__DIFF__REV__MATRIX__SUM_HPP__
+#define __STAN__DIFF__REV__MATRIX__SUM_HPP__
 
 #include <vector>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/typedefs.hpp>
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/vari.hpp>
-#include <stan/agrad/rev/matrix/typedefs.hpp>
+#include <stan/diff/rev/var.hpp>
+#include <stan/diff/rev/vari.hpp>
+#include <stan/diff/rev/matrix/typedefs.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
 
     namespace {
       class sum_v_vari : public vari{

@@ -1,10 +1,10 @@
 #include <stan/math/matrix/cols.hpp>
 #include <gtest/gtest.h>
-#include <stan/agrad/fwd/matrix/typedefs.hpp>
+#include <stan/diff/fwd/matrix/typedefs.hpp>
 
 TEST(AgradFwdMatrix,cols_vector) {
-  using stan::agrad::vector_fv;
-  using stan::agrad::row_vector_fv;
+  using stan::diff::vector_fv;
+  using stan::diff::row_vector_fv;
   using stan::math::cols;
 
   vector_fv v(5);
@@ -20,7 +20,7 @@ TEST(AgradFwdMatrix,cols_vector) {
   EXPECT_EQ(1U, cols(v));
 }
 TEST(AgradFwdMatrix,cols_rowvector) {
-  using stan::agrad::row_vector_fv;
+  using stan::diff::row_vector_fv;
   using stan::math::cols;
 
   row_vector_fv rv(5);
@@ -36,7 +36,7 @@ TEST(AgradFwdMatrix,cols_rowvector) {
   EXPECT_EQ(0U, cols(rv));
 }
 TEST(AgradFwdMatrix,cols_matrix) {
-  using stan::agrad::matrix_fv;
+  using stan::diff::matrix_fv;
   using stan::math::cols;
 
   matrix_fv m(2,3);

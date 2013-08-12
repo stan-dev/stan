@@ -5,7 +5,7 @@
 #include <stan/prob/distributions/univariate/discrete/binomial.hpp>
 #include <stan/prob/distributions/univariate/continuous/beta.hpp>
 
-#include <stan/agrad.hpp>
+#include <stan/diff.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/functions/lbeta.hpp>
 #include <stan/math/functions/value_of.hpp>
@@ -154,7 +154,7 @@ DoubleVectorView<!is_constant_struct<T_size1>::value,
       if (!is_constant_struct<T_size2>::value)
         digamma_beta[i] = digamma(value_of(beta_vec[i]));
 
-    agrad::OperandsAndPartials<T_n,T_N,T_size1,T_size2> 
+    diff::OperandsAndPartials<T_n,T_N,T_size1,T_size2> 
     operands_and_partials(n,N,alpha,beta);
     for (size_t i = 0; i < size; i++) {
       if (include_summand<propto>::value)
@@ -248,7 +248,7 @@ DoubleVectorView<!is_constant_struct<T_size1>::value,
     using boost::math::lgamma;
     using boost::math::digamma;
 
-    agrad::OperandsAndPartials<T_size1, T_size2> 
+    diff::OperandsAndPartials<T_size1, T_size2> 
       operands_and_partials(alpha, beta);
           
     std::fill(operands_and_partials.all_partials,
@@ -383,7 +383,7 @@ DoubleVectorView<!is_constant_struct<T_size1>::value,
     using boost::math::lgamma;
     using boost::math::digamma;
 
-    agrad::OperandsAndPartials<T_size1, T_size2> 
+    diff::OperandsAndPartials<T_size1, T_size2> 
       operands_and_partials(alpha, beta);
           
     std::fill(operands_and_partials.all_partials,
@@ -509,7 +509,7 @@ DoubleVectorView<!is_constant_struct<T_size1>::value,
     using boost::math::lgamma;
     using boost::math::digamma;
 
-    agrad::OperandsAndPartials<T_size1, T_size2> 
+    diff::OperandsAndPartials<T_size1, T_size2> 
       operands_and_partials(alpha, beta);
           
     std::fill(operands_and_partials.all_partials,

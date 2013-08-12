@@ -1,5 +1,5 @@
-#include <stan/agrad/rev/square.hpp>
-#include <test/agrad/util.hpp>
+#include <stan/diff/rev/square.hpp>
+#include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
 TEST(AgradRev,square) {

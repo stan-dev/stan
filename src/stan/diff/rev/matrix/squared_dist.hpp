@@ -1,18 +1,18 @@
-#ifndef __STAN__AGRAD__REV__MATRIX__SQUARED_DIST_HPP__
-#define __STAN__AGRAD__REV__MATRIX__SQUARED_DIST_HPP__
+#ifndef __STAN__DIFF__REV__MATRIX__SQUARED_DIST_HPP__
+#define __STAN__DIFF__REV__MATRIX__SQUARED_DIST_HPP__
 
 #include <vector>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/math/matrix/validate_vector.hpp>
 #include <stan/math/matrix/validate_matching_sizes.hpp>
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/vari.hpp>
-#include <stan/agrad/rev/sqrt.hpp>
-#include <stan/agrad/rev/matrix/typedefs.hpp>
+#include <stan/diff/rev/var.hpp>
+#include <stan/diff/rev/vari.hpp>
+#include <stan/diff/rev/sqrt.hpp>
+#include <stan/diff/rev/matrix/typedefs.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
     namespace {
       class squared_dist_vv_vari : public vari {
       protected:

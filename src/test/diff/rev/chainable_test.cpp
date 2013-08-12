@@ -1,9 +1,9 @@
-#include <stan/agrad/rev/chainable.hpp>
-#include <test/agrad/util.hpp>
+#include <stan/diff/rev/chainable.hpp>
+#include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
 namespace chainable_test {
-  class mock_chainable : public stan::agrad::chainable {
+  class mock_chainable : public stan::diff::chainable {
   public:
     mock_chainable() {
       throw std::invalid_argument("hello");

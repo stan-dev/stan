@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
-#include <stan/agrad/fvar.hpp>
+#include <stan/diff/fvar.hpp>
 
 TEST(AgradFvar, ceil) {
-  using stan::agrad::fvar;
+  using stan::diff::fvar;
   using std::ceil;
 
   fvar<double> x(0.5);

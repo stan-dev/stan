@@ -1,5 +1,5 @@
-#include <stan/agrad/rev/cosh.hpp>
-#include <test/agrad/util.hpp>
+#include <stan/diff/rev/cosh.hpp>
+#include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
 TEST(AgradRev,cosh_var) {

@@ -1,11 +1,11 @@
-#ifndef __STAN__AGRAD__REV__MATRIX__VALUE_OF_HPP__
-#define __STAN__AGRAD__REV__MATRIX__VALUE_OF_HPP__
+#ifndef __STAN__DIFF__REV__MATRIX__VALUE_OF_HPP__
+#define __STAN__DIFF__REV__MATRIX__VALUE_OF_HPP__
 
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/agrad/rev/var.hpp>
+#include <stan/diff/rev/var.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
     /**
      * Convert a matrix to a matrix of doubles.  When the input is already a matrix of doubles
      * a reference is returned.

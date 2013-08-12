@@ -1,13 +1,13 @@
-#ifndef __STAN__AGRAD__REV__INV_HPP__
-#define __STAN__AGRAD__REV__INV_HPP__
+#ifndef __STAN__DIFF__REV__INV_HPP__
+#define __STAN__DIFF__REV__INV_HPP__
 
 #include <valarray>
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/op/v_vari.hpp>
+#include <stan/diff/rev/var.hpp>
+#include <stan/diff/rev/op/v_vari.hpp>
 #include <stan/math/functions/inv.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
     
     namespace {
       class inv_vari : public op_v_vari {

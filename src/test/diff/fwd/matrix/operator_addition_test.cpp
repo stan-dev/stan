@@ -1,11 +1,11 @@
 #include <stan/math/matrix/add.hpp>
 #include <gtest/gtest.h>
 #include <stan/math/matrix/typedefs.hpp>
-#include <stan/agrad/fwd/matrix/typedefs.hpp>
-#include <stan/agrad/fvar.hpp>
+#include <stan/diff/fwd/matrix/typedefs.hpp>
+#include <stan/diff/fvar.hpp>
 
 TEST(AgradFwdMatrix,add_scalar_matrix) {
-  using stan::agrad::matrix_fv;
+  using stan::diff::matrix_fv;
   using stan::math::add;
 
   matrix_fv v(2,2);
@@ -37,7 +37,7 @@ TEST(AgradFwdMatrix,add_scalar_matrix) {
   EXPECT_FLOAT_EQ(1.0,result(1,1).d_);
 }
 TEST(AgradFwdMatrix,add_scalar_vector) {
-  using stan::agrad::vector_fv;
+  using stan::diff::vector_fv;
   using stan::math::add;
 
   vector_fv v(4);
@@ -69,7 +69,7 @@ TEST(AgradFwdMatrix,add_scalar_vector) {
   EXPECT_FLOAT_EQ(1.0,result(3).d_);
 }
 TEST(AgradFwdMatrix,add_scalar_rowvector) {
-  using stan::agrad::row_vector_fv;
+  using stan::diff::row_vector_fv;
   using stan::math::add;
 
   row_vector_fv v(4);
@@ -103,7 +103,7 @@ TEST(AgradFwdMatrix,add_scalar_rowvector) {
 TEST(AgradFwdMatrix, add_vector_vector) {
   using stan::math::add;
   using stan::math::vector_d;
-  using stan::agrad::vector_fv;
+  using stan::diff::vector_fv;
 
   vector_d vd_1(5);
   vector_d vd_2(5);
@@ -175,7 +175,7 @@ TEST(AgradFwdMatrix, add_vector_vector) {
 TEST(AgradFwdMatrix, add_vector_vector_exception) {
   using stan::math::add;
   using stan::math::vector_d;
-  using stan::agrad::vector_fv;
+  using stan::diff::vector_fv;
 
   vector_d d1(5), d2(1);
   vector_fv v1(5), v2(1);
@@ -188,7 +188,7 @@ TEST(AgradFwdMatrix, add_vector_vector_exception) {
 TEST(AgradFwdMatrix, add_rowvector_rowvector) {
   using stan::math::add;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fv;
+  using stan::diff::row_vector_fv;
 
   row_vector_d rvd_1(5), rvd_2(5);
   row_vector_fv rvv_1(5), rvv_2(5);
@@ -257,7 +257,7 @@ TEST(AgradFwdMatrix, add_rowvector_rowvector) {
 TEST(AgradFwdMatrix, add_rowvector_rowvector_exception) {
   using stan::math::add;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fv;
+  using stan::diff::row_vector_fv;
 
   row_vector_d d1(5), d2(2);
   row_vector_fv v1(5), v2(2);
@@ -271,7 +271,7 @@ TEST(AgradFwdMatrix, add_rowvector_rowvector_exception) {
 TEST(AgradFwdMatrix, add_matrix_matrix) {
   using stan::math::add;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fv;
+  using stan::diff::matrix_fv;
 
   matrix_d md_1(2,2), md_2(2,2);
   matrix_fv mv_1(2,2), mv_2(2,2);
@@ -331,7 +331,7 @@ TEST(AgradFwdMatrix, add_matrix_matrix) {
 TEST(AgradFwdMatrix, add_matrix_matrix_exception) {
   using stan::math::add;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fv;
+  using stan::diff::matrix_fv;
   
   matrix_d d1(2,2), d2(1,2);
   matrix_fv v1(2,2), v2(1,2);

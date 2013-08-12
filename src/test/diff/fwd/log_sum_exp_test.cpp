@@ -1,10 +1,10 @@
 #include <gtest/gtest.h>
-#include <stan/agrad/fvar.hpp>
+#include <stan/diff/fvar.hpp>
 #include <stan/math/functions/log_sum_exp.hpp>
-#include <stan/agrad/fwd/log_sum_exp.hpp>
+#include <stan/diff/fwd/log_sum_exp.hpp>
 
 TEST(AgradFvar, log_sum_exp) {
-  using stan::agrad::fvar;
+  using stan::diff::fvar;
   using stan::math::log_sum_exp;
   using std::exp;
 
@@ -31,7 +31,7 @@ TEST(AgradFvar, log_sum_exp) {
 
 void log_sum_exp_test(const std::vector<double>& x) {
   using std::exp;
-  using stan::agrad::fvar;
+  using stan::diff::fvar;
   for (size_t n = 0; n < x.size(); ++n) {
     // for d/d.x[n]
     std::vector<fvar<double> > xv(x.size());

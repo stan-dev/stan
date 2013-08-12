@@ -1,5 +1,5 @@
-#include <stan/agrad/rev/pow.hpp>
-#include <test/agrad/util.hpp>
+#include <stan/diff/rev/pow.hpp>
+#include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
 TEST(AgradRev,pow_var_var) {

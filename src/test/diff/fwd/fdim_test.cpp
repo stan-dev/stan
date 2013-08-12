@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
-#include <stan/agrad/fvar.hpp>
+#include <stan/diff/fvar.hpp>
 
 TEST(AgradFvar, fdim) {
-  using stan::agrad::fvar;
+  using stan::diff::fvar;
   using stan::math::fdim;
   using std::isnan;
   using std::floor;

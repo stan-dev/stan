@@ -1,13 +1,13 @@
 #include <gtest/gtest.h>
-#include <stan/agrad/fvar.hpp>
-#include <stan/agrad/fwd/matrix/typedefs.hpp>
+#include <stan/diff/fvar.hpp>
+#include <stan/diff/fwd/matrix/typedefs.hpp>
 #include <stan/math/matrix/prod.hpp>
 
 TEST(AgradFwdMatrix,prod_vector) {
   using stan::math::prod;
   using stan::math::vector_d;
-  using stan::agrad::vector_fv;
-  using stan::agrad::fvar;
+  using stan::diff::vector_fv;
+  using stan::diff::fvar;
 
   vector_d vd;
   vector_fv vv;
@@ -42,8 +42,8 @@ TEST(AgradFwdMatrix,prod_vector) {
 TEST(AgradFwdMatrix,prod_rowvector) {
   using stan::math::prod;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fv;
-  using stan::agrad::fvar;
+  using stan::diff::row_vector_fv;
+  using stan::diff::fvar;
 
   row_vector_d vd;
   row_vector_fv vv;
@@ -77,8 +77,8 @@ TEST(AgradFwdMatrix,prod_rowvector) {
 TEST(AgradFwdMatrix,prod_matrix) {
   using stan::math::prod;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fv;
-  using stan::agrad::fvar;
+  using stan::diff::matrix_fv;
+  using stan::diff::fvar;
 
   matrix_d vd;
   matrix_fv vv;

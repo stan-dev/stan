@@ -7,7 +7,7 @@ namespace command_model_namespace {
 using std::vector;
 using std::string;
 using std::stringstream;
-using stan::agrad::var;
+using stan::diff::var;
 using stan::model::prob_grad;
 using stan::math::get_base1;
 using stan::math::stan_print;
@@ -15,7 +15,7 @@ using stan::io::dump;
 using std::istream;
 using namespace stan::math;
 using namespace stan::prob;
-using namespace stan::agrad;
+using namespace stan::diff;
 
 typedef Eigen::Matrix<double,Eigen::Dynamic,1> vector_d;
 typedef Eigen::Matrix<double,1,Eigen::Dynamic> row_vector_d;
@@ -76,14 +76,14 @@ public:
     double log_prob(std::vector<double>& params_r__,
                     std::vector<int>& params_i__,
                     std::ostream* output_stream__ = 0) const {
-      std::vector<stan::agrad::var> ad_params_r__;
+      std::vector<stan::diff::var> ad_params_r__;
       for (size_t i = 0; i < num_params_r(); ++i) {
-        stan::agrad::var var_i__(params_r__[i]);
+        stan::diff::var var_i__(params_r__[i]);
         ad_params_r__.push_back(var_i__);
       }
-      stan::agrad::var adLogProb__ = log_prob<true,true>(ad_params_r__,params_i__,output_stream__);
+      stan::diff::var adLogProb__ = log_prob<true,true>(ad_params_r__,params_i__,output_stream__);
       double val__ = adLogProb__.val();
-      stan::agrad::recover_memory();
+      stan::diff::recover_memory();
       return val__;
     }
 

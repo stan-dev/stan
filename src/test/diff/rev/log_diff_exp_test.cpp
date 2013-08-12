@@ -1,7 +1,7 @@
-#include <stan/agrad/rev/log_diff_exp.hpp>
-#include <test/agrad/util.hpp>
+#include <stan/diff/rev/log_diff_exp.hpp>
+#include <test/diff/util.hpp>
 #include <gtest/gtest.h>
-#include <stan/agrad.hpp>
+#include <stan/diff.hpp>
 
 TEST(AgradRev,log_diff_exp_vv) {
   AVAR a = 5.0;
@@ -87,8 +87,8 @@ void test_log_diff_exp_2_vv(double a_val,
   
   double f_val = f.val();
 
-  stan::agrad::var a2(a_val);
-  stan::agrad::var b2(b_val);
+  stan::diff::var a2(a_val);
+  stan::diff::var b2(b_val);
   AVEC x2 = createAVEC(a2,b2);
   AVAR f2 = log(exp(a2) - exp(b2));
   VEC g2;
@@ -114,7 +114,7 @@ void test_log_diff_exp_2_vd(double a_val,
   
   double f_val = f.val();
 
-  stan::agrad::var a2(a_val);
+  stan::diff::var a2(a_val);
   AVEC x2 = createAVEC(a2);
   AVAR f2 = log(exp(a2) - exp(b));
   VEC g2;

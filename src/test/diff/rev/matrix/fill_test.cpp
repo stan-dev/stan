@@ -1,6 +1,6 @@
 #include <stan/math/matrix/fill.hpp>
 #include <gtest/gtest.h>
-#include <test/agrad/util.hpp>
+#include <test/diff/util.hpp>
 
 TEST(AgradRevMatrix, fill) {
   using stan::math::fill;

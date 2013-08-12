@@ -1,12 +1,12 @@
 #include <gtest/gtest.h>
-#include <stan/agrad/fwd/fvar.hpp>
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/fwd/numeric_limits.hpp>
+#include <stan/diff/fwd/fvar.hpp>
+#include <stan/diff/rev/var.hpp>
+#include <stan/diff/fwd/numeric_limits.hpp>
 #include <stan/math/constants.hpp>
 
 TEST(AgradFvar, numeric_limits) {
-  using stan::agrad::fvar;
-  using stan::agrad::var;
+  using stan::diff::fvar;
+  using stan::diff::var;
   using std::isnan;
   using stan::math::INFTY;
 

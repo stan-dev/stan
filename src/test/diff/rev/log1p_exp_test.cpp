@@ -1,13 +1,13 @@
-#include <stan/agrad/rev/log1p_exp.hpp>
-#include <test/agrad/util.hpp>
+#include <stan/diff/rev/log1p_exp.hpp>
+#include <test/diff/util.hpp>
 #include <gtest/gtest.h>
-#include <stan/agrad/rev/exp.hpp>
-#include <stan/agrad.hpp>
+#include <stan/diff/rev/exp.hpp>
+#include <stan/diff.hpp>
 
 void test_log1p_exp(double val) {
   using stan::math::log1p_exp;
-  using stan::agrad::log1p_exp;
-  using stan::agrad::exp;
+  using stan::diff::log1p_exp;
+  using stan::diff::exp;
   using std::exp;
 
   AVAR a(val);   

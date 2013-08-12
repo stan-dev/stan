@@ -1,15 +1,15 @@
-#include <stan/agrad/rev/inv_cloglog.hpp>
-#include <stan/agrad/rev/exp.hpp>
-#include <stan/agrad/rev/operator_unary_negative.hpp>
-#include <stan/agrad/rev/operator_subtraction.hpp>
+#include <stan/diff/rev/inv_cloglog.hpp>
+#include <stan/diff/rev/exp.hpp>
+#include <stan/diff/rev/operator_unary_negative.hpp>
+#include <stan/diff/rev/operator_subtraction.hpp>
 
 #include <stan/math/functions/inv_cloglog.hpp>
-#include <test/agrad/util.hpp>
+#include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
 TEST(AgradRev,inv_cloglog) {
   using std::exp;
-  using stan::agrad::exp;
+  using stan::diff::exp;
   AVAR a = 2.7;
   AVAR f = inv_cloglog(a);
   EXPECT_FLOAT_EQ(1 - std::exp(-std::exp(2.7)),f.val());

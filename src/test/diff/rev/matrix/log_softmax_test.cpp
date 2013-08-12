@@ -1,15 +1,15 @@
 #include <gtest/gtest.h>
-#include <test/agrad/util.hpp>
-#include <stan/agrad.hpp>
-#include <stan/agrad/matrix.hpp>
+#include <test/diff/util.hpp>
+#include <stan/diff.hpp>
+#include <stan/diff/matrix.hpp>
 #include <stan/math/matrix/log_softmax.hpp>
-#include <stan/agrad/rev/matrix/log_softmax.hpp>
+#include <stan/diff/rev/matrix/log_softmax.hpp>
 
 TEST(AgradRevMatrix,log_softmax) {
   using stan::math::log_softmax;
   using Eigen::Matrix;
   using Eigen::Dynamic;
-  using stan::agrad::vector_v;
+  using stan::diff::vector_v;
 
   EXPECT_THROW(log_softmax(vector_v()),std::domain_error);
   
@@ -46,7 +46,7 @@ log_softmax_grad(Eigen::Matrix<double,Eigen::Dynamic,1>& alpha_dbl,
                  int k) {
   using Eigen::Matrix;
   using Eigen::Dynamic;
-  using stan::agrad::var;
+  using stan::diff::var;
   Matrix<var,Dynamic,1> alpha(alpha_dbl.size());
   for (int i = 0; i < alpha.size(); ++i)
     alpha(i) = alpha_dbl(i);
@@ -63,7 +63,7 @@ log_softmax_grad(Eigen::Matrix<double,Eigen::Dynamic,1>& alpha_dbl,
 }
 TEST(AgradRevLogSoftmax, Grad) {
   using stan::math::log_softmax;
-  using stan::agrad::var;
+  using stan::diff::var;
   using Eigen::Matrix;
   using Eigen::Dynamic;
   for (int k = 0; k < 3; ++k) {

@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__REV__MATRIX__MULTIPLY_LOWER_TRI_SELF_TRANSPOSE_HPP__
-#define __STAN__AGRAD__REV__MATRIX__MULTIPLY_LOWER_TRI_SELF_TRANSPOSE_HPP__
+#ifndef __STAN__DIFF__REV__MATRIX__MULTIPLY_LOWER_TRI_SELF_TRANSPOSE_HPP__
+#define __STAN__DIFF__REV__MATRIX__MULTIPLY_LOWER_TRI_SELF_TRANSPOSE_HPP__
 
 #include <vector>
 #include <boost/math/tools/promotion.hpp>
@@ -8,14 +8,14 @@
 #include <stan/math/matrix/validate_multiplicable.hpp>
 #include <stan/math/matrix/validate_matching_sizes.hpp>
 #include <stan/math/matrix/validate_square.hpp>
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/numeric_limits.hpp>
-#include <stan/agrad/rev/matrix/typedefs.hpp>
-#include <stan/agrad/rev/matrix/dot_product.hpp>
-#include <stan/agrad/rev/matrix/dot_self.hpp>
+#include <stan/diff/rev/var.hpp>
+#include <stan/diff/rev/numeric_limits.hpp>
+#include <stan/diff/rev/matrix/typedefs.hpp>
+#include <stan/diff/rev/matrix/dot_product.hpp>
+#include <stan/diff/rev/matrix/dot_self.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
     
     inline matrix_v 
     multiply_lower_tri_self_transpose(const matrix_v& L) {

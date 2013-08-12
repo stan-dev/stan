@@ -1,10 +1,10 @@
-#include <stan/agrad/rev/step.hpp>
-#include <test/agrad/util.hpp>
+#include <stan/diff/rev/step.hpp>
+#include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
 TEST(AgradRev,step) {
   AVAR a = 3.5;
-  AVAR f = stan::agrad::step(a);
+  AVAR f = stan::diff::step(a);
   EXPECT_FLOAT_EQ(1.0,f.val());
 
   AVEC x = createAVEC(a);
@@ -15,7 +15,7 @@ TEST(AgradRev,step) {
 
 TEST(AgradRev,step_2) {
   AVAR a = 0.0;
-  AVAR f = stan::agrad::step(a);
+  AVAR f = stan::diff::step(a);
   EXPECT_FLOAT_EQ(1.0,f.val());
 
   AVEC x = createAVEC(a);
@@ -26,7 +26,7 @@ TEST(AgradRev,step_2) {
 
 TEST(AgradRev,step_3) {
   AVAR a = -18765.3;
-  AVAR f = stan::agrad::step(a);
+  AVAR f = stan::diff::step(a);
   EXPECT_FLOAT_EQ(0.0,f.val());
 
   AVEC x = createAVEC(a);

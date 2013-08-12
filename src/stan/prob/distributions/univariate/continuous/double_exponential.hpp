@@ -4,7 +4,7 @@
 #include <boost/random/uniform_01.hpp>
 #include <boost/random/variate_generator.hpp>
 
-#include <stan/agrad.hpp>
+#include <stan/diff.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/functions/value_of.hpp>
 #include <stan/meta/traits.hpp>
@@ -72,7 +72,7 @@ namespace stan {
       VectorView<const T_loc> mu_vec(mu);
       VectorView<const T_scale> sigma_vec(sigma);
       size_t N = max_size(y, mu, sigma);
-      agrad::OperandsAndPartials<T_y,T_loc,T_scale> operands_and_partials(y, mu, sigma);
+      diff::OperandsAndPartials<T_y,T_loc,T_scale> operands_and_partials(y, mu, sigma);
 
       DoubleVectorView<include_summand<propto,T_y,T_loc,T_scale>::value,is_vector<T_scale>::value> 
         inv_sigma(length(sigma));
@@ -173,7 +173,7 @@ namespace stan {
       if(!check_positive(function, sigma, "Scale parameter", &cdf))
         return cdf;
 
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale> 
+      diff::OperandsAndPartials<T_y, T_loc, T_scale> 
         operands_and_partials(y, mu, sigma);
 
       VectorView<const T_y> y_vec(y);
@@ -264,7 +264,7 @@ namespace stan {
       using std::log;
       using std::exp;
 
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale> 
+      diff::OperandsAndPartials<T_y, T_loc, T_scale> 
         operands_and_partials(y, mu, sigma);
 
       VectorView<const T_y> y_vec(y);
@@ -346,7 +346,7 @@ namespace stan {
       using std::log;
       using std::exp;
 
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale> 
+      diff::OperandsAndPartials<T_y, T_loc, T_scale> 
         operands_and_partials(y, mu, sigma);
 
       VectorView<const T_y> y_vec(y);

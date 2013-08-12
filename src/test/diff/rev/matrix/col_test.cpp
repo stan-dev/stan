@@ -1,13 +1,13 @@
 #include <stan/math/matrix/col.hpp>
 #include <gtest/gtest.h>
-#include <test/agrad/util.hpp>
-#include <stan/agrad.hpp>
-#include <stan/agrad/matrix.hpp>
+#include <test/diff/util.hpp>
+#include <stan/diff.hpp>
+#include <stan/diff/matrix.hpp>
 
 TEST(AgradRevMatrix,col_v) {
   using stan::math::col;
-  using stan::agrad::matrix_v;
-  using stan::agrad::vector_v;
+  using stan::diff::matrix_v;
+  using stan::diff::vector_v;
 
   matrix_v y(2,3);
   y << 1, 2, 3, 4, 5, 6;
@@ -23,7 +23,7 @@ TEST(AgradRevMatrix,col_v) {
 }
 TEST(AgradRevMatrix,col_v_exc0) {
   using stan::math::col;
-  using stan::agrad::matrix_v;
+  using stan::diff::matrix_v;
 
   matrix_v y(2,3);
   y << 1, 2, 3, 4, 5, 6;
@@ -32,7 +32,7 @@ TEST(AgradRevMatrix,col_v_exc0) {
 }
 TEST(AgradRevMatrix,col_v_excHigh) {
   using stan::math::col;
-  using stan::agrad::matrix_v;
+  using stan::diff::matrix_v;
 
   matrix_v y(2,3);
   y << 1, 2, 3, 4, 5, 6;

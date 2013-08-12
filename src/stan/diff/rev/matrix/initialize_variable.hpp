@@ -1,12 +1,12 @@
-#ifndef __STAN__AGRAD__REV__MATRIX__INITIALIZE_VARIABLE_HPP__
-#define __STAN__AGRAD__REV__MATRIX__INITIALIZE_VARIABLE_HPP__
+#ifndef __STAN__DIFF__REV__MATRIX__INITIALIZE_VARIABLE_HPP__
+#define __STAN__DIFF__REV__MATRIX__INITIALIZE_VARIABLE_HPP__
 
 #include <vector>
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/agrad/rev/var.hpp>
+#include <stan/diff/rev/var.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
     
     /**
      * Initialize variable to value.  (Function may look pointless, but

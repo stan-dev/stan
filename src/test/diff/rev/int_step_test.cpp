@@ -1,6 +1,6 @@
-#include <stan/agrad.hpp>
+#include <stan/diff.hpp>
 #include <stan/math.hpp>
-#include <test/agrad/util.hpp>
+#include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
 

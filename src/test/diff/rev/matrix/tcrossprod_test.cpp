@@ -1,12 +1,12 @@
-#include <stan/agrad/rev/matrix/tcrossprod.hpp>
+#include <stan/diff/rev/matrix/tcrossprod.hpp>
 #include <gtest/gtest.h>
-#include <test/agrad/util.hpp>
-#include <stan/agrad/rev/jacobian.hpp>
-#include <stan/agrad.hpp>
+#include <test/diff/util.hpp>
+#include <stan/diff/rev/jacobian.hpp>
+#include <stan/diff.hpp>
 
-void test_tcrossprod(const stan::agrad::matrix_v& L) {
-  using stan::agrad::matrix_v;
-  using stan::agrad::tcrossprod;
+void test_tcrossprod(const stan::diff::matrix_v& L) {
+  using stan::diff::matrix_v;
+  using stan::diff::tcrossprod;
   matrix_v LLT_eigen = L * L.transpose();
   matrix_v LLT_stan = tcrossprod(L);
   EXPECT_EQ(LLT_eigen.rows(),LLT_stan.rows());
@@ -16,7 +16,7 @@ void test_tcrossprod(const stan::agrad::matrix_v& L) {
       EXPECT_FLOAT_EQ(LLT_eigen(m,n).val(), LLT_stan(m,n).val());
 }
 TEST(AgradRevMatrix, tcrossprod) {
-  using stan::agrad::matrix_v;
+  using stan::diff::matrix_v;
 
   matrix_v L(3,3);
   L << 1, 0, 0,
@@ -57,8 +57,8 @@ TEST(AgradRevMatrix, tcrossprod) {
   test_tcrossprod(Q);
 }
 TEST(AgradRevMatrix, tcrossprodGrad1) {
-  using stan::agrad::tcrossprod;
-  using stan::agrad::matrix_v;
+  using stan::diff::tcrossprod;
+  using stan::diff::matrix_v;
 
   matrix_v L(1,1);
   L << 3.0;
@@ -72,14 +72,14 @@ TEST(AgradRevMatrix, tcrossprodGrad1) {
   EXPECT_FLOAT_EQ(9.0, LLt(0,0).val());
 
   std::vector<VEC > J;
-  stan::agrad::jacobian(y,x,J);
+  stan::diff::jacobian(y,x,J);
 
   EXPECT_FLOAT_EQ(6.0, J[0][0]);
 }
 
 TEST(AgradRevMatrix, tcrossprodGrad2) {
-  using stan::agrad::tcrossprod;
-  using stan::agrad::matrix_v;
+  using stan::diff::tcrossprod;
+  using stan::diff::matrix_v;
 
   matrix_v L(2,2);
   L <<
@@ -103,7 +103,7 @@ TEST(AgradRevMatrix, tcrossprodGrad2) {
   EXPECT_FLOAT_EQ(13.0, LLt(1,1).val());
 
   std::vector<VEC > J;
-  stan::agrad::jacobian(y,x,J);
+  stan::diff::jacobian(y,x,J);
 
   // L = 1 0
   //     2 3
@@ -130,8 +130,8 @@ TEST(AgradRevMatrix, tcrossprodGrad2) {
 }
 
 TEST(AgradRevMatrix, tcrossprodGrad3) {
-  using stan::agrad::tcrossprod;
-  using stan::agrad::matrix_v;
+  using stan::diff::tcrossprod;
+  using stan::diff::matrix_v;
 
   matrix_v L(3,3);
   L <<
@@ -159,7 +159,7 @@ TEST(AgradRevMatrix, tcrossprodGrad3) {
   y[8] = LLt(2,2);
 
   std::vector<VEC > J;
-  stan::agrad::jacobian(y,x,J);
+  stan::diff::jacobian(y,x,J);
 
   // L = 1 0 0
   //     2 3 0

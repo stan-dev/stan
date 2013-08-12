@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
-#include <test/agrad/distributions/expect_eq_diffs.hpp>
+#include <test/diff/distributions/expect_eq_diffs.hpp>
 #include <stan/prob/distributions/multivariate/continuous/dirichlet.hpp>
-#include <stan/agrad.hpp>
+#include <stan/diff.hpp>
 #include <stan/meta/traits.hpp>
-#include <stan/agrad/matrix.hpp>
+#include <stan/diff/matrix.hpp>
 
 template <typename T_prob, typename T_prior_sample_size>
 void expect_propto(T_prob theta, T_prior_sample_size alpha,
@@ -18,8 +18,8 @@ void expect_propto(T_prob theta, T_prior_sample_size alpha,
 
 using Eigen::Dynamic;
 using Eigen::Matrix;
-using stan::agrad::var;
-using stan::agrad::to_var;
+using stan::diff::var;
+using stan::diff::to_var;
 
 class AgradDistributionsDirichlet : public ::testing::Test {
 protected:

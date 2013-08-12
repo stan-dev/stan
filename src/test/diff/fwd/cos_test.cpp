@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
-#include <stan/agrad/fvar.hpp>
+#include <stan/diff/fvar.hpp>
 
 TEST(AgradFvar, cos) {
-  using stan::agrad::fvar;
+  using stan::diff::fvar;
   using std::sin;
   using std::cos;
 

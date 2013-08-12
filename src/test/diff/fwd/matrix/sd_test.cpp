@@ -1,17 +1,17 @@
 #include <stan/math/matrix/sd.hpp>
 #include <gtest/gtest.h>
 #include <stan/math/matrix/typedefs.hpp>
-#include <stan/agrad/fwd/matrix/typedefs.hpp>
-#include <stan/agrad/fwd/sqrt.hpp>
-#include <stan/agrad/fwd/operator_multiplication.hpp>
-#include <stan/agrad/fwd/operator_addition.hpp>
-#include <stan/agrad/fwd/operator_division.hpp>
-#include <stan/agrad/fwd/operator_subtraction.hpp>
+#include <stan/diff/fwd/matrix/typedefs.hpp>
+#include <stan/diff/fwd/sqrt.hpp>
+#include <stan/diff/fwd/operator_multiplication.hpp>
+#include <stan/diff/fwd/operator_addition.hpp>
+#include <stan/diff/fwd/operator_division.hpp>
+#include <stan/diff/fwd/operator_subtraction.hpp>
 
 TEST(AgradFwdMatrix, sd_vector) {
   using stan::math::sd;
   using stan::math::vector_d;
-  using stan::agrad::vector_fv;
+  using stan::diff::vector_fv;
 
   vector_d v(1);
   v << 1.0;
@@ -43,7 +43,7 @@ TEST(AgradFwdMatrix, sd_vector) {
 TEST(AgradFwdMatrix, sd_vector_exception) {
   using stan::math::sd;
   using stan::math::vector_d;
-  using stan::agrad::vector_fv;
+  using stan::diff::vector_fv;
 
   vector_d d1;
   vector_fv v1;
@@ -53,7 +53,7 @@ TEST(AgradFwdMatrix, sd_vector_exception) {
 TEST(AgradFwdMatrix, sd_rowvector) {
   using stan::math::sd;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fv;
+  using stan::diff::row_vector_fv;
 
   row_vector_d v(1);
   v << 1.0;
@@ -86,7 +86,7 @@ TEST(AgradFwdMatrix, sd_rowvector) {
 TEST(AgradFwdMatrix, sd_rowvector_exception) {
   using stan::math::sd;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fv;
+  using stan::diff::row_vector_fv;
 
   row_vector_d d;
   row_vector_fv v;
@@ -97,7 +97,7 @@ TEST(AgradFwdMatrix, sd_rowvector_exception) {
 TEST(AgradFwdMatrix, sd_matrix) {
   using stan::math::sd;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fv;
+  using stan::diff::matrix_fv;
 
   matrix_d v(1,1);
   v << 1.0;
@@ -128,7 +128,7 @@ TEST(AgradFwdMatrix, sd_matrix) {
 TEST(AgradFwdMatrix, sd_matrix_exception) {
   using stan::math::sd;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fv;
+  using stan::diff::matrix_fv;
 
   matrix_d d;
   matrix_fv v;

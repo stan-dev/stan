@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
-#include <stan/agrad/fvar.hpp>
+#include <stan/diff/fvar.hpp>
 
 TEST(AgradFvar, fmax) {
-  using stan::agrad::fvar;
+  using stan::diff::fvar;
   using std::isnan;
 
   fvar<double> x(2.0);

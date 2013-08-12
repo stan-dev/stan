@@ -3,7 +3,7 @@
 
 using std::vector;
 using std::numeric_limits;
-using stan::agrad::var;
+using stan::diff::var;
 
 class AgradCdfPoisson : public AgradCdfTest {
 public:
@@ -65,11 +65,11 @@ public:
   cdf_function(const T_n& n, const T_rate& lambda, const T2&,
          const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
     using std::pow;
-    using stan::agrad::pow;
-    using stan::agrad::lgamma;
+    using stan::diff::pow;
+    using stan::diff::lgamma;
     using boost::math::lgamma;
     using std::exp;
-    using stan::agrad::exp;
+    using stan::diff::exp;
     using std::log;
     
     typename stan::return_type<T_rate>::type cdf(0);

@@ -1,11 +1,11 @@
 #include <gtest/gtest.h>
-#include <test/agrad/util.hpp>
-#include <stan/agrad.hpp>
-#include <stan/agrad/matrix.hpp>
+#include <test/diff/util.hpp>
+#include <stan/diff.hpp>
+#include <stan/diff/matrix.hpp>
 #include <stan/math/matrix/assign.hpp>
 
 TEST(AgradRevMatrix,mv_squaredNorm) {
-  using stan::agrad::matrix_v;
+  using stan::diff::matrix_v;
 
   matrix_v a(2,2);
   a << -1.0, 2.0, 
@@ -23,7 +23,7 @@ TEST(AgradRevMatrix,mv_squaredNorm) {
   EXPECT_FLOAT_EQ(20.0, g[3]);
 }  
 TEST(AgradRevMatrix,mv_norm) {
-  using stan::agrad::matrix_v;
+  using stan::diff::matrix_v;
 
   matrix_v a(2,1);
   a << -3.0, 4.0;
@@ -39,7 +39,7 @@ TEST(AgradRevMatrix,mv_norm) {
   EXPECT_FLOAT_EQ(4.0/5.0, g[1]);
 }  
 TEST(AgradRevMatrix,mv_lp_norm) {
-  using stan::agrad::matrix_v;
+  using stan::diff::matrix_v;
 
   matrix_v a(2,2);
   a << -1.0, 2.0, 
@@ -57,7 +57,7 @@ TEST(AgradRevMatrix,mv_lp_norm) {
   EXPECT_FLOAT_EQ(0.0,g[3]); // ? depends on impl here, could be -1 or 1
 }  
 TEST(AgradRevMatrix,mv_lp_norm_inf) {
-  using stan::agrad::matrix_v;
+  using stan::diff::matrix_v;
 
   matrix_v a(2,2);
   a << -1.0, 2.0, 
@@ -83,9 +83,9 @@ TEST(AgradRevMatrix, UserCase1) {
   using stan::math::get_base1;
   using stan::math::assign;
   using stan::math::dot_product;
-  using stan::agrad::matrix_v;
+  using stan::diff::matrix_v;
   using stan::math::vector_d;
-  using stan::agrad::vector_v;
+  using stan::diff::vector_v;
 
   // also tried DpKm1 > H
   size_t H = 3;

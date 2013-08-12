@@ -4,7 +4,7 @@
 #include <boost/random/exponential_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
 
-#include <stan/agrad.hpp>
+#include <stan/diff.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/functions/value_of.hpp>
 #include <stan/meta/traits.hpp>
@@ -69,7 +69,7 @@ namespace stan {
       }
 
       // set up template expressions wrapping scalars into vector views
-      agrad::OperandsAndPartials<T_y,T_scale,T_shape> 
+      diff::OperandsAndPartials<T_y,T_scale,T_shape> 
         operands_and_partials(y, y_min, alpha);
       
       DoubleVectorView<include_summand<propto,T_y,T_shape>::value,
@@ -180,7 +180,7 @@ namespace stan {
       VectorView<const T_shape> alpha_vec(alpha);
       size_t N = max_size(y, y_min, alpha);
           
-      agrad::OperandsAndPartials<T_y, T_scale, T_shape> 
+      diff::OperandsAndPartials<T_y, T_scale, T_shape> 
         operands_and_partials(y, y_min, alpha);
           
       std::fill(operands_and_partials.all_partials,
@@ -288,7 +288,7 @@ namespace stan {
       VectorView<const T_shape> alpha_vec(alpha);
       size_t N = max_size(y, y_min, alpha);
           
-      agrad::OperandsAndPartials<T_y, T_scale, T_shape> 
+      diff::OperandsAndPartials<T_y, T_scale, T_shape> 
         operands_and_partials(y, y_min, alpha);
           
       std::fill(operands_and_partials.all_partials,
@@ -383,7 +383,7 @@ namespace stan {
       VectorView<const T_shape> alpha_vec(alpha);
       size_t N = max_size(y, y_min, alpha);
           
-      agrad::OperandsAndPartials<T_y, T_scale, T_shape> 
+      diff::OperandsAndPartials<T_y, T_scale, T_shape> 
         operands_and_partials(y, y_min, alpha);
           
       std::fill(operands_and_partials.all_partials,

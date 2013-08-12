@@ -1,5 +1,5 @@
-#include <stan/agrad/rev/fma.hpp>
-#include <test/agrad/util.hpp>
+#include <stan/diff/rev/fma.hpp>
+#include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
 TEST(AgradRev,fma_vvv) {

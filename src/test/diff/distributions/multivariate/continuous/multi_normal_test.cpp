@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <test/agrad/distributions/expect_eq_diffs.hpp>
+#include <test/diff/distributions/expect_eq_diffs.hpp>
 #include <stan/prob/distributions/multivariate/continuous/multi_normal.hpp>
 
 using Eigen::Dynamic;
@@ -21,8 +21,8 @@ void expect_propto(T_y y1, T_loc mu1, T_scale sigma1,
                   message);
 }
 
-using stan::agrad::var;
-using stan::agrad::to_var;
+using stan::diff::var;
+using stan::diff::to_var;
 
 class AgradDistributionsMultiNormal : public ::testing::Test {
 protected:

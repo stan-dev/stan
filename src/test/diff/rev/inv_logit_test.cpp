@@ -1,5 +1,5 @@
-#include <stan/agrad/rev/inv_logit.hpp>
-#include <test/agrad/util.hpp>
+#include <stan/diff/rev/inv_logit.hpp>
+#include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
 TEST(AgradRev,inv_logit) {

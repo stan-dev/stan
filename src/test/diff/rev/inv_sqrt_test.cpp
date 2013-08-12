@@ -1,5 +1,5 @@
-#include <stan/agrad/rev/inv_sqrt.hpp>
-#include <test/agrad/util.hpp>
+#include <stan/diff/rev/inv_sqrt.hpp>
+#include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 #include <stan/math/constants.hpp>
 

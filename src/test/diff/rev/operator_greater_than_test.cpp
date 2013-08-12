@@ -1,5 +1,5 @@
-#include <stan/agrad/rev/operator_greater_than.hpp>
-#include <test/agrad/util.hpp>
+#include <stan/diff/rev/operator_greater_than.hpp>
+#include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
 TEST(AgradRev,a_gt_b) {

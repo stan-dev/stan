@@ -1,12 +1,12 @@
 #include <gtest/gtest.h>
-#include <stan/agrad/fwd/matrix/typedefs.hpp>
-#include <stan/agrad/fwd/matrix/multiply.hpp>
+#include <stan/diff/fwd/matrix/typedefs.hpp>
+#include <stan/diff/fwd/matrix/multiply.hpp>
 #include <stan/math/matrix/diag_pre_multiply.hpp>
 
 TEST(AgradFwdMatrix, diag_pre_multiply_vector) {
-  using stan::agrad::matrix_fv;
+  using stan::diff::matrix_fv;
   using stan::math::matrix_d;
-  using stan::agrad::vector_fv;
+  using stan::diff::vector_fv;
   using stan::math::vector_d;
 
   matrix_d Z(3,3);
@@ -54,8 +54,8 @@ TEST(AgradFwdMatrix, diag_pre_multiply_vector) {
   EXPECT_FLOAT_EQ(18,output(2,2).d_);
 }
 TEST(AgradFwdMatrix, diag_pre_multiply_vector_exception) {
-  using stan::agrad::matrix_fv;
-  using stan::agrad::vector_fv;
+  using stan::diff::matrix_fv;
+  using stan::diff::vector_fv;
 
 
   matrix_fv Y(3,3);
@@ -69,9 +69,9 @@ TEST(AgradFwdMatrix, diag_pre_multiply_vector_exception) {
   EXPECT_THROW(stan::math::diag_pre_multiply(Y,Z), std::domain_error);
 }
 TEST(AgradFwdMatrix, diag_pre_multiply_rowvector) {
-  using stan::agrad::matrix_fv;
+  using stan::diff::matrix_fv;
   using stan::math::matrix_d;
-  using stan::agrad::row_vector_fv;
+  using stan::diff::row_vector_fv;
   using stan::math::row_vector_d;
 
   matrix_d Z(3,3);
@@ -119,8 +119,8 @@ TEST(AgradFwdMatrix, diag_pre_multiply_rowvector) {
   EXPECT_FLOAT_EQ(18,output(2,2).d_);
 }
 TEST(AgradFwdMatrix, diag_pre_multiply_rowvector_exception) {
-  using stan::agrad::matrix_fv;
-  using stan::agrad::row_vector_fv;
+  using stan::diff::matrix_fv;
+  using stan::diff::row_vector_fv;
 
 
   matrix_fv Y(3,3);

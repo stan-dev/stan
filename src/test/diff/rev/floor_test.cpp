@@ -1,5 +1,5 @@
-#include <stan/agrad/rev/floor.hpp>
-#include <test/agrad/util.hpp>
+#include <stan/diff/rev/floor.hpp>
+#include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
 TEST(AgradRev,floor_var) {

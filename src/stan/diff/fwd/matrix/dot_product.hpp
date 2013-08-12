@@ -1,17 +1,17 @@
-#ifndef __STAN__AGRAD__FWD__MATRIX__DOT_PRODUCT_HPP__
-#define __STAN__AGRAD__FWD__MATRIX__DOT_PRODUCT_HPP__
+#ifndef __STAN__DIFF__FWD__MATRIX__DOT_PRODUCT_HPP__
+#define __STAN__DIFF__FWD__MATRIX__DOT_PRODUCT_HPP__
 
 #include <vector>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/math/matrix/validate_vector.hpp>
 #include <stan/math/matrix/validate_matching_sizes.hpp>
-#include <stan/agrad/fvar.hpp>
-#include <stan/agrad/fwd/matrix/typedefs.hpp>
-#include <stan/agrad/fwd/matrix/to_fvar.hpp>
+#include <stan/diff/fvar.hpp>
+#include <stan/diff/fwd/matrix/typedefs.hpp>
+#include <stan/diff/fwd/matrix/to_fvar.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
 
     //dot_product for vec (in matrix) * vec (in matrix); does all combos of row row, col col, row col, col row
     template<typename T1, typename T2, int R1,int C1, int R2, int C2>

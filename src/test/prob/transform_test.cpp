@@ -3,7 +3,7 @@
 #include <stdexcept>
 #include <gtest/gtest.h>
 
-#include <stan/agrad.hpp>
+#include <stan/diff.hpp>
 #include <stan/prob/transform.hpp>
 #include <stan/math/matrix/determinant.hpp>
 
@@ -345,7 +345,7 @@ TEST(prob_transform,ordered_rt) {
   }
 }
 TEST(prob_transform,ordered_jacobian_ad) {
-  using stan::agrad::var;
+  using stan::diff::var;
   using stan::prob::ordered_constrain;
   using stan::math::determinant;
   using Eigen::Matrix;
@@ -375,7 +375,7 @@ TEST(prob_transform,ordered_jacobian_ad) {
     yvec[i] = yv[i];
 
   std::vector<std::vector<double> > j;
-  stan::agrad::jacobian(yvec,xvec,j);
+  stan::diff::jacobian(yvec,xvec,j);
 
   Matrix<double,Dynamic,Dynamic> J(3,3);
   for (int m = 0; m < 3; ++m)
@@ -435,7 +435,7 @@ TEST(prob_transform,positive_ordered_rt) {
   }
 }
 TEST(prob_transform,positive_ordered_jacobian_ad) {
-  using stan::agrad::var;
+  using stan::diff::var;
   using stan::prob::positive_ordered_constrain;
   using stan::math::determinant;
   using Eigen::Matrix;
@@ -465,7 +465,7 @@ TEST(prob_transform,positive_ordered_jacobian_ad) {
     yvec[i] = yv[i];
 
   std::vector<std::vector<double> > j;
-  stan::agrad::jacobian(yvec,xvec,j);
+  stan::diff::jacobian(yvec,xvec,j);
 
   Matrix<double,Dynamic,Dynamic> J(3,3);
   for (int m = 0; m < 3; ++m)
@@ -594,7 +594,7 @@ TEST(prob_transform,cov_matrix_free_exception) {
   EXPECT_THROW(stan::prob::cov_matrix_free(y), std::domain_error);
 }
 TEST(prob_transform,cov_matrix_jacobian) {
-  using stan::agrad::var;
+  using stan::diff::var;
   using stan::math::determinant;
   using std::log;
   using std::fabs;
@@ -616,7 +616,7 @@ TEST(prob_transform,cov_matrix_jacobian) {
       y.push_back(Sigma(m,n));
 
   std::vector<std::vector<double> > j;
-  stan::agrad::jacobian(y,x,j);
+  stan::diff::jacobian(y,x,j);
 
   Matrix<double,Dynamic,Dynamic> J(10,10);
   for (int m = 0; m < 10; ++m)
@@ -675,7 +675,7 @@ TEST(prob_transform,simplex_f_exception) {
   EXPECT_THROW(stan::prob::simplex_free(y), std::domain_error);
 }
 TEST(probTransform,simplex_jacobian) {
-  using stan::agrad::var;
+  using stan::diff::var;
   using std::vector;
   var a = 2.0;
   var b = 3.0;
@@ -699,7 +699,7 @@ TEST(probTransform,simplex_jacobian) {
   deps.push_back(x(2));
   
   vector<vector<double> > jacobian;
-  stan::agrad::jacobian(deps,indeps,jacobian);
+  stan::diff::jacobian(deps,indeps,jacobian);
 
   Matrix<double,Dynamic,Dynamic> J(3,3);
   for (int m = 0; m < 3; ++m)
@@ -762,7 +762,7 @@ TEST(prob_transform,unit_vector_f_exception) {
   EXPECT_THROW(stan::prob::unit_vector_free(y), std::domain_error);
 }
 TEST(probTransform,unit_vector_jacobian) {
-  using stan::agrad::var;
+  using stan::diff::var;
   using std::vector;
   var a = 2.0;
   var b = 3.0;
@@ -787,7 +787,7 @@ TEST(probTransform,unit_vector_jacobian) {
   deps.push_back(x(3));
   
   vector<vector<double> > jacobian;
-  stan::agrad::jacobian(deps,indeps,jacobian);
+  stan::diff::jacobian(deps,indeps,jacobian);
 
   Matrix<double,Dynamic,Dynamic> J(4,4);
   for (int m = 0; m < 4; ++m) {

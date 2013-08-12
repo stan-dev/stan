@@ -1,4 +1,4 @@
-#include <stan/agrad/fwd/matrix/mdivide_right.hpp>
+#include <stan/diff/fwd/matrix/mdivide_right.hpp>
 #include <gtest/gtest.h>
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/math/matrix/mdivide_left.hpp>
@@ -6,8 +6,8 @@
 
 TEST(AgradFwdMatrix,mdivide_right_matrix_matrix) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fv;
-  using stan::agrad::mdivide_right;
+  using stan::diff::matrix_fv;
+  using stan::diff::mdivide_right;
 
   matrix_fv Av(2,2);
   matrix_d Ad(2,2);
@@ -54,10 +54,10 @@ TEST(AgradFwdMatrix,mdivide_right_matrix_matrix) {
 }
 TEST(AgradFwdMatrix,mdivide_right_matrix_rowvector) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fv;
-  using stan::agrad::row_vector_fv;
+  using stan::diff::matrix_fv;
+  using stan::diff::row_vector_fv;
   using stan::math::row_vector_d;
-  using stan::agrad::mdivide_right;
+  using stan::diff::mdivide_right;
 
   matrix_fv fv(2,2);
   fv << 1, 2, 3, 4;
@@ -100,10 +100,10 @@ TEST(AgradFwdMatrix,mdivide_right_exceptions) {
   using stan::math::matrix_d;
   using stan::math::vector_d;
   using stan::math::row_vector_d;
-  using stan::agrad::matrix_fv;
-  using stan::agrad::vector_fv;
-  using stan::agrad::row_vector_fv;
-  using stan::agrad::mdivide_right;
+  using stan::diff::matrix_fv;
+  using stan::diff::vector_fv;
+  using stan::diff::row_vector_fv;
+  using stan::diff::mdivide_right;
 
   matrix_fv fv1(3,3), fv2(4,4);
   row_vector_fv rvf1(3), rvf2(4);

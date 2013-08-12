@@ -1,14 +1,14 @@
-#ifndef __STAN__AGRAD__FWD__GAMMA_P__HPP__
-#define __STAN__AGRAD__FWD__GAMMA_P__HPP__
+#ifndef __STAN__DIFF__FWD__GAMMA_P__HPP__
+#define __STAN__DIFF__FWD__GAMMA_P__HPP__
 
-#include <stan/agrad/fwd/fvar.hpp>
+#include <stan/diff/fwd/fvar.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/math/functions/gamma_p.hpp>
 #include <stan/prob/internal_math.hpp>
 
 namespace stan{
 
-  namespace agrad{
+  namespace diff{
 
     template <typename T>
     inline

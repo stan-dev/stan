@@ -1,13 +1,13 @@
-#ifndef __STAN__AGRAD__REV__ASINH_HPP__
-#define __STAN__AGRAD__REV__ASINH_HPP__
+#ifndef __STAN__DIFF__REV__ASINH_HPP__
+#define __STAN__DIFF__REV__ASINH_HPP__
 
 #include <valarray>
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/op/v_vari.hpp>
+#include <stan/diff/rev/var.hpp>
+#include <stan/diff/rev/op/v_vari.hpp>
 #include <boost/math/special_functions/asinh.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
 
     namespace {
       class asinh_vari : public op_v_vari {
@@ -33,7 +33,7 @@ namespace stan {
      * @param a The variable.
      * @return Inverse hyperbolic sine of the variable.
      */
-    inline var asinh(const stan::agrad::var& a) {
+    inline var asinh(const stan::diff::var& a) {
       return var(new asinh_vari(a.vi_));
     }
 

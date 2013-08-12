@@ -1,19 +1,19 @@
-#ifndef __STAN__AGRAD__FWD__MATRIX__MULTIPLY_HPP__
-#define __STAN__AGRAD__FWD__MATRIX__MULTIPLY_HPP__
+#ifndef __STAN__DIFF__FWD__MATRIX__MULTIPLY_HPP__
+#define __STAN__DIFF__FWD__MATRIX__MULTIPLY_HPP__
 
 #include <vector>
 #include <boost/math/tools/promotion.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/math/matrix/validate_multiplicable.hpp>
-#include <stan/agrad/fwd/fvar.hpp>
-#include <stan/agrad/fwd/matrix/typedefs.hpp>
-#include <stan/agrad/fwd/matrix/to_fvar.hpp>
-#include <stan/agrad/fwd/matrix/dot_product.hpp>
-#include <stan/agrad/fwd/operator_multiplication.hpp>
+#include <stan/diff/fwd/fvar.hpp>
+#include <stan/diff/fwd/matrix/typedefs.hpp>
+#include <stan/diff/fwd/matrix/to_fvar.hpp>
+#include <stan/diff/fwd/matrix/dot_product.hpp>
+#include <stan/diff/fwd/operator_multiplication.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
     
     template <typename T1, typename T2>
     inline
@@ -90,7 +90,7 @@ namespace stan {
         Eigen::Matrix<fvar<T1>,1,C1> crow = m1.row(i);
         for (size_type j = 0; j < m2.cols(); j++) {
           Eigen::Matrix<fvar<T2>,R2,1> ccol = m2.col(j);
-          result(i,j) = stan::agrad::dot_product(crow,ccol);
+          result(i,j) = stan::diff::dot_product(crow,ccol);
           }
         }
       return result;
@@ -107,7 +107,7 @@ namespace stan {
         Eigen::Matrix<fvar<T1>,1,C1> crow = m1.row(i);
         for (size_type j = 0; j < m2.cols(); j++) {
           Eigen::Matrix<T2,R2,1> ccol = m2.col(j);
-          result(i,j) = stan::agrad::dot_product(crow,ccol);
+          result(i,j) = stan::diff::dot_product(crow,ccol);
           }
         }
       return result;
@@ -124,7 +124,7 @@ namespace stan {
         Eigen::Matrix<T1,1,C1> crow = m1.row(i);
         for (size_type j = 0; j < m2.cols(); j++) {
           Eigen::Matrix<fvar<T2>,R2,1> ccol = m2.col(j);
-          result(i,j) = stan::agrad::dot_product(crow,ccol);
+          result(i,j) = stan::diff::dot_product(crow,ccol);
           }
         }
       return result;

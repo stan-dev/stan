@@ -1,7 +1,7 @@
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/operator_multiplication.hpp>
+#include <stan/diff/rev/var.hpp>
+#include <stan/diff/rev/operator_multiplication.hpp>
 #include <gtest/gtest.h>
-#include <test/agrad/util.hpp>
+#include <test/diff/util.hpp>
 
 TEST(AgradRev,a_eq_x) {
   AVAR a = 5.0;
@@ -51,8 +51,8 @@ TEST(AgradRev, smart_ptrs) {
 }
 
 TEST(AgradRev, stackAllocation) {
-  using stan::agrad::vari;
-  using stan::agrad::var;
+  using stan::diff::vari;
+  using stan::diff::var;
 
   vari ai(1.0);
   vari bi(2.0);
@@ -72,7 +72,7 @@ TEST(AgradRev, stackAllocation) {
 }
 
 TEST(AgradRev, print) {
-  using stan::agrad::var;
+  using stan::diff::var;
 
   std::ostringstream output;
   std::string str;

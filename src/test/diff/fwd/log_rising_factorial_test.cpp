@@ -1,12 +1,12 @@
 #include <gtest/gtest.h>
-#include <stan/agrad/fvar.hpp>
+#include <stan/diff/fvar.hpp>
 #include <boost/math/special_functions/digamma.hpp>
-#include <stan/agrad/var.hpp>
-#include <test/agrad/util.hpp>
+#include <stan/diff/var.hpp>
+#include <test/diff/util.hpp>
 
 TEST(AgradFvar, log_rising_factorial) {
-  using stan::agrad::fvar;
-  using stan::agrad::log_rising_factorial;
+  using stan::diff::fvar;
+  using stan::diff::log_rising_factorial;
   using boost::math::digamma;
 
   fvar<double> a(4.0,1.0);
@@ -30,9 +30,9 @@ TEST(AgradFvar, log_rising_factorial) {
 }
 //WONT WORK UNTIL STUFF IN CLEAN_UP_FVAR IS MERGED IN -- REQUIRES DIGAMMA FUNCTION
 // TEST(AgradFvarVar, log_rising_factorial) {
-//   using stan::agrad::fvar;
-//   using stan::agrad::var;
-//   using stan::agrad::log_rising_factorial;
+//   using stan::diff::fvar;
+//   using stan::diff::var;
+//   using stan::diff::log_rising_factorial;
 
 //   fvar<var> a(4.0,1.0);
 //   fvar<var> b(4.0,1.0);
@@ -49,7 +49,7 @@ TEST(AgradFvar, log_rising_factorial) {
 // }
 
 // TEST(AgradFvarFvar, log_rising_factorial) {
-//   using stan::agrad::fvar;
+//   using stan::diff::fvar;
 //   using stan::math::log_rising_factorial;
 
 //   fvar<fvar<double> > x;

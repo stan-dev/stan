@@ -1,13 +1,13 @@
 #include <stan/math/matrix/trace.hpp>
 #include <gtest/gtest.h>
 #include <stan/math/matrix/typedefs.hpp>
-#include <stan/agrad/fwd/matrix/typedefs.hpp>
-#include <stan/agrad/fvar.hpp>
+#include <stan/diff/fwd/matrix/typedefs.hpp>
+#include <stan/diff/fvar.hpp>
 
 TEST(AgradFwdMatrix,mv_trace) {
   using stan::math::trace;
-  using stan::agrad::matrix_fv;
-  using stan::agrad::fvar;
+  using stan::diff::matrix_fv;
+  using stan::diff::fvar;
 
   matrix_fv a(2,2);
   a << -1.0, 2.0, 

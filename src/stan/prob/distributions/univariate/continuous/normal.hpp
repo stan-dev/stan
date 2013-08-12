@@ -5,7 +5,7 @@
 #include <boost/random/variate_generator.hpp>
 #include <boost/utility/enable_if.hpp>
 
-#include <stan/agrad.hpp>
+#include <stan/diff.hpp>
 #include <stan/math.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/meta/traits.hpp>
@@ -78,7 +78,7 @@ namespace stan {
         return 0.0;
       
       // set up template expressions wrapping scalars into vector views
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale> operands_and_partials(y, mu, sigma);
+      diff::OperandsAndPartials<T_y, T_loc, T_scale> operands_and_partials(y, mu, sigma);
 
       VectorView<const T_y> y_vec(y);
       VectorView<const T_loc> mu_vec(mu);
@@ -188,7 +188,7 @@ namespace stan {
                                    &cdf)))
         return cdf;
 
-     agrad::OperandsAndPartials<T_y, T_loc, T_scale> 
+     diff::OperandsAndPartials<T_y, T_loc, T_scale> 
        operands_and_partials(y, mu, sigma);
 
       VectorView<const T_y> y_vec(y);
@@ -265,7 +265,7 @@ namespace stan {
                                    "Scale parameter", &cdf_log)))
         return cdf_log;
 
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale> 
+      diff::OperandsAndPartials<T_y, T_loc, T_scale> 
         operands_and_partials(y, mu, sigma);
 
       VectorView<const T_y> y_vec(y);
@@ -334,7 +334,7 @@ namespace stan {
                                    "Scale parameter", &ccdf_log)))
         return ccdf_log;
 
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale>
+      diff::OperandsAndPartials<T_y, T_loc, T_scale>
         operands_and_partials(y, mu, sigma);
 
       VectorView<const T_y> y_vec(y);

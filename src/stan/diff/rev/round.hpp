@@ -1,12 +1,12 @@
-#ifndef __STAN__AGRAD__REV__ROUND_HPP__
-#define __STAN__AGRAD__REV__ROUND_HPP__
+#ifndef __STAN__DIFF__REV__ROUND_HPP__
+#define __STAN__DIFF__REV__ROUND_HPP__
 
 #include <boost/math/special_functions/round.hpp>
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/vari.hpp>
+#include <stan/diff/rev/var.hpp>
+#include <stan/diff/rev/vari.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
 
     namespace {
       // derivative 0 almost everywhere
@@ -32,7 +32,7 @@ namespace stan {
      * @param a Specified variable.
      * @return Rounded variable.
      */
-    inline var round(const stan::agrad::var& a) {
+    inline var round(const stan::diff::var& a) {
       return var(new round_vari(a.vi_));
     }
 

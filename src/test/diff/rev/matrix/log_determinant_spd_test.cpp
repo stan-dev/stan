@@ -1,16 +1,16 @@
-#include <stan/agrad/rev/matrix/log_determinant_spd.hpp>
+#include <stan/diff/rev/matrix/log_determinant_spd.hpp>
 #include <gtest/gtest.h>
-#include <test/agrad/util.hpp>
+#include <test/diff/util.hpp>
 #include <stan/math/matrix/determinant.hpp>
 #include <stan/math/matrix/log_determinant_spd.hpp>
-#include <stan/agrad/rev/fabs.hpp>
-#include <stan/agrad/rev/log.hpp>
+#include <stan/diff/rev/fabs.hpp>
+#include <stan/diff/rev/log.hpp>
 
 TEST(AgradRevMatrix,log_determinant_spd_diff) {
-  using stan::agrad::matrix_v;
+  using stan::diff::matrix_v;
   using stan::math::determinant;
-  using stan::agrad::fabs;
-  using stan::agrad::log;
+  using stan::diff::fabs;
+  using stan::diff::log;
 
   // expected from auto-diff/Eigen
   AVEC x1 = createAVEC(2,1,1,3);
@@ -20,7 +20,7 @@ TEST(AgradRevMatrix,log_determinant_spd_diff) {
   std::vector<double> g1;
   det1.grad(x1,g1);
   
-  // optimized in agrad::matrix
+  // optimized in diff::matrix
   AVEC x2 = createAVEC(2,1,1,3);
   matrix_v v2(2,2);
   v2 << x2[0], x2[1], x2[2], x2[3];
@@ -35,7 +35,7 @@ TEST(AgradRevMatrix,log_determinant_spd_diff) {
 }
 
 TEST(AgradRevMatrix,log_determinant_spd) {
-  using stan::agrad::matrix_v;
+  using stan::diff::matrix_v;
   using stan::math::log_determinant_spd;
   
   matrix_v v(2,2);
@@ -47,14 +47,14 @@ TEST(AgradRevMatrix,log_determinant_spd) {
 }
 #if 0
 TEST(AgradRevMatrix,log_deteriminant_exception) {
-  using stan::agrad::matrix_v;
+  using stan::diff::matrix_v;
   using stan::math::log_determinant;
   
   EXPECT_THROW(log_determinant(matrix_v(2,3)), std::domain_error);
 }
 
 TEST(AgradRevMatrix,log_determinant_grad) {
-  using stan::agrad::matrix_v;
+  using stan::diff::matrix_v;
   using stan::math::log_determinant;
   
   matrix_v X(2,2);

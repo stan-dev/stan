@@ -1,6 +1,6 @@
-#include <stan/agrad/rev/operator_unary_plus.hpp>
-#include <stan/agrad/rev/operator_equal.hpp>
-#include <test/agrad/util.hpp>
+#include <stan/diff/rev/operator_unary_plus.hpp>
+#include <stan/diff/rev/operator_equal.hpp>
+#include <test/diff/util.hpp>
 
 #include <gtest/gtest.h>
 

@@ -1,5 +1,5 @@
-#include <stan/agrad/rev/atan.hpp>
-#include <test/agrad/util.hpp>
+#include <stan/diff/rev/atan.hpp>
+#include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
 TEST(AgradRev,atan_var) {

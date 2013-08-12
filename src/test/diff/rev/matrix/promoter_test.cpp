@@ -1,13 +1,13 @@
 #include <gtest/gtest.h>
-#include <test/agrad/util.hpp>
-#include <stan/agrad.hpp>
-#include <stan/agrad/matrix.hpp>
+#include <test/diff/util.hpp>
+#include <stan/diff.hpp>
+#include <stan/diff/matrix.hpp>
 
 TEST(AgradRevMatrix, promoter) {
   using stan::math::promoter;
   using stan::math::promote_common;
 
-  using stan::agrad::var;
+  using stan::diff::var;
 
   using std::vector;
 
@@ -15,9 +15,9 @@ TEST(AgradRevMatrix, promoter) {
   using stan::math::vector_d;
   using stan::math::row_vector_d;
 
-  using stan::agrad::matrix_v;
-  using stan::agrad::vector_v;
-  using stan::agrad::row_vector_v;
+  using stan::diff::matrix_v;
+  using stan::diff::vector_v;
+  using stan::diff::row_vector_v;
   
   double a = promote_common<double,double>(3.0);
   var b = promote_common<double,var>(4.0);

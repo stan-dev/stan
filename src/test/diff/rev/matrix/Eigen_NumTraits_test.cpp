@@ -1,3 +1,3 @@
-#include <stan/agrad/rev/matrix/Eigen_NumTraits.hpp>
+#include <stan/diff/rev/matrix/Eigen_NumTraits.hpp>
 #include <gtest/gtest.h>
-#include <test/agrad/util.hpp>
+#include <test/diff/util.hpp>

@@ -1,13 +1,13 @@
-#ifndef __STAN__AGRAD__FWD__MODIFIED_BESSEL_SECOND_KIND__HPP__
-#define __STAN__AGRAD__FWD__MODIFIED_BESSEL_SECOND_KIND__HPP__
+#ifndef __STAN__DIFF__FWD__MODIFIED_BESSEL_SECOND_KIND__HPP__
+#define __STAN__DIFF__FWD__MODIFIED_BESSEL_SECOND_KIND__HPP__
 
-#include <stan/agrad/fwd/fvar.hpp>
+#include <stan/diff/fwd/fvar.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/math/functions/modified_bessel_second_kind.hpp>
 
 namespace stan {
 
-  namespace agrad {
+  namespace diff {
 
     template <typename T>
     inline

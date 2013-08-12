@@ -1,11 +1,11 @@
-#ifndef __STAN__AGRAD__MATRIX_CPP__
-#define __STAN__AGRAD__MATRIX_CPP__
+#ifndef __STAN__DIFF__MATRIX_CPP__
+#define __STAN__DIFF__MATRIX_CPP__
 
-#include "stan/agrad/matrix.hpp"
+#include "stan/diff/matrix.hpp"
 
 namespace stan {
 
-  namespace agrad {
+  namespace diff {
 
 
   }

@@ -4,7 +4,7 @@
 #include <boost/random/chi_squared_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
 
-#include <stan/agrad.hpp>
+#include <stan/diff.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/functions/value_of.hpp>
 #include <stan/meta/traits.hpp>
@@ -111,7 +111,7 @@ namespace stan {
       }
 
 
-      agrad::OperandsAndPartials<T_y,T_dof> operands_and_partials(y, nu);
+      diff::OperandsAndPartials<T_y,T_dof> operands_and_partials(y, nu);
 
       for (size_t n = 0; n < N; n++) {
         const double y_dbl = value_of(y_vec[n]);
@@ -189,7 +189,7 @@ namespace stan {
       VectorView<const T_dof> nu_vec(nu);
       size_t N = max_size(y, nu);
           
-      agrad::OperandsAndPartials<T_y, T_dof> 
+      diff::OperandsAndPartials<T_y, T_dof> 
         operands_and_partials(y, nu);
           
       std::fill(operands_and_partials.all_partials,
@@ -300,7 +300,7 @@ namespace stan {
       VectorView<const T_dof> nu_vec(nu);
       size_t N = max_size(y, nu);
           
-      agrad::OperandsAndPartials<T_y, T_dof> 
+      diff::OperandsAndPartials<T_y, T_dof> 
         operands_and_partials(y, nu);
           
       std::fill(operands_and_partials.all_partials,
@@ -404,7 +404,7 @@ namespace stan {
       VectorView<const T_dof> nu_vec(nu);
       size_t N = max_size(y, nu);
           
-      agrad::OperandsAndPartials<T_y, T_dof> 
+      diff::OperandsAndPartials<T_y, T_dof> 
         operands_and_partials(y, nu);
           
       std::fill(operands_and_partials.all_partials,

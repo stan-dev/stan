@@ -1,5 +1,5 @@
-#include <stan/agrad/rev/asinh.hpp>
-#include <test/agrad/util.hpp>
+#include <stan/diff/rev/asinh.hpp>
+#include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
 TEST(AgradRev,asinh) {

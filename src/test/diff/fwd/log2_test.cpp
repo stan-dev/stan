@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
-#include <stan/agrad/fvar.hpp>
+#include <stan/diff/fvar.hpp>
 #include <stan/math/functions/log2.hpp>
 
 TEST(AgradFvar, log2) {
-  using stan::agrad::fvar;
+  using stan::diff::fvar;
   using std::log;
   using std::isnan;
   using stan::math::log2;

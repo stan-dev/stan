@@ -1,7 +1,7 @@
-#ifndef __STAN__AGRAD__FWD__SORT_HPP__
-#define __STAN__AGRAD__FWD__SORT_HPP__
+#ifndef __STAN__DIFF__FWD__SORT_HPP__
+#define __STAN__DIFF__FWD__SORT_HPP__
 
-#include <stan/agrad/fwd/fvar.hpp>
+#include <stan/diff/fwd/fvar.hpp>
 #include <stan/meta/traits.hpp>
 #include <vector>
 #include <stan/math/matrix/Eigen.hpp>
@@ -10,7 +10,7 @@
 
 namespace stan {
 
-  namespace agrad {
+  namespace diff {
 
     template <typename T>
     inline

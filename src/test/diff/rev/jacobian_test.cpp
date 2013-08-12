@@ -1,7 +1,7 @@
-#include <stan/agrad/rev/jacobian.hpp>
-#include <stan/agrad/rev/operator_addition.hpp>
-#include <stan/agrad/rev/operator_multiplication.hpp>
-#include <test/agrad/util.hpp>
+#include <stan/diff/rev/jacobian.hpp>
+#include <stan/diff/rev/operator_addition.hpp>
+#include <stan/diff/rev/operator_multiplication.hpp>
+#include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
 TEST(AgradRev,jacobian) {

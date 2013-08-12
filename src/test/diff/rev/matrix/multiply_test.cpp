@@ -1,12 +1,12 @@
-#include <stan/agrad/rev/matrix/multiply.hpp>
+#include <stan/diff/rev/matrix/multiply.hpp>
 #include <gtest/gtest.h>
-#include <test/agrad/util.hpp>
+#include <test/diff/util.hpp>
 #include <stan/math/matrix/multiply.hpp>
 #include <stan/math/matrix/typedefs.hpp>
-#include <stan/agrad/rev/matrix/typedefs.hpp>
+#include <stan/diff/rev/matrix/typedefs.hpp>
 
 TEST(AgradRevMatrix, multiply_scalar_scalar) {
-  using stan::agrad::multiply;
+  using stan::diff::multiply;
   double d1, d2;
   AVAR   v1, v2;
 
@@ -28,7 +28,7 @@ TEST(AgradRevMatrix, multiply_scalar_scalar) {
 }
 TEST(AgradRevMatrix, multiply_vector_scalar) {
   using stan::math::vector_d;
-  using stan::agrad::vector_v;
+  using stan::diff::vector_v;
 
   vector_d d1(3);
   vector_v v1(3);
@@ -58,7 +58,7 @@ TEST(AgradRevMatrix, multiply_vector_scalar) {
 }
 TEST(AgradRevMatrix, multiply_rowvector_scalar) {
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_v;
+  using stan::diff::row_vector_v;
 
   row_vector_d d1(3);
   row_vector_v v1(3);
@@ -88,7 +88,7 @@ TEST(AgradRevMatrix, multiply_rowvector_scalar) {
 }
 TEST(AgradRevMatrix, multiply_matrix_scalar) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_v;
+  using stan::diff::matrix_v;
   
   matrix_d d1(2,2);
   matrix_v v1(2,2);
@@ -121,9 +121,9 @@ TEST(AgradRevMatrix, multiply_matrix_scalar) {
 }
 TEST(AgradRevMatrix, multiply_rowvector_vector) {
   using stan::math::vector_d;
-  using stan::agrad::vector_v;
+  using stan::diff::vector_v;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_v;
+  using stan::diff::row_vector_v;
 
   row_vector_d d1(3);
   row_vector_v v1(3);
@@ -146,11 +146,11 @@ TEST(AgradRevMatrix, multiply_rowvector_vector) {
   EXPECT_THROW(multiply(d1, v2), std::domain_error);
 }
 TEST(AgradRevMatrix, multiply_vector_rowvector) {
-  using stan::agrad::matrix_v;
+  using stan::diff::matrix_v;
   using stan::math::vector_d;
-  using stan::agrad::vector_v;
+  using stan::diff::vector_v;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_v;
+  using stan::diff::row_vector_v;
 
   vector_d d1(3);
   vector_v v1(3);
@@ -203,9 +203,9 @@ TEST(AgradRevMatrix, multiply_vector_rowvector) {
 }
 TEST(AgradRevMatrix, multiply_matrix_vector) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_v;
+  using stan::diff::matrix_v;
   using stan::math::vector_d;
-  using stan::agrad::vector_v;
+  using stan::diff::vector_v;
 
   matrix_d d1(3,2);
   matrix_v v1(3,2);
@@ -238,9 +238,9 @@ TEST(AgradRevMatrix, multiply_matrix_vector) {
 }
 TEST(AgradRevMatrix, multiply_matrix_vector_exception) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_v;
+  using stan::diff::matrix_v;
   using stan::math::vector_d;
-  using stan::agrad::vector_v;
+  using stan::diff::vector_v;
 
   matrix_d d1(3,2);
   matrix_v v1(3,2);
@@ -252,10 +252,10 @@ TEST(AgradRevMatrix, multiply_matrix_vector_exception) {
 }
 TEST(AgradRevMatrix, multiply_rowvector_matrix) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_v;
-  using stan::agrad::vector_v;
+  using stan::diff::matrix_v;
+  using stan::diff::vector_v;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_v;
+  using stan::diff::row_vector_v;
 
   row_vector_d d1(3);
   row_vector_v v1(3);
@@ -284,9 +284,9 @@ TEST(AgradRevMatrix, multiply_rowvector_matrix) {
 }
 TEST(AgradRevMatrix, multiply_rowvector_matrix_exception) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_v;
+  using stan::diff::matrix_v;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_v;
+  using stan::diff::row_vector_v;
 
   row_vector_d d1(4);
   row_vector_v v1(4);
@@ -298,7 +298,7 @@ TEST(AgradRevMatrix, multiply_rowvector_matrix_exception) {
 }
 TEST(AgradRevMatrix, multiply_matrix_matrix) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_v;
+  using stan::diff::matrix_v;
 
   matrix_d d1(2,3);
   matrix_v v1(2,3);
@@ -336,7 +336,7 @@ TEST(AgradRevMatrix, multiply_matrix_matrix) {
 }
 TEST(AgradRevMatrix, multiply_matrix_matrix_exception) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_v;
+  using stan::diff::matrix_v;
 
   matrix_d d1(2,2);
   matrix_v v1(2,2);
@@ -348,8 +348,8 @@ TEST(AgradRevMatrix, multiply_matrix_matrix_exception) {
   EXPECT_THROW(multiply(d1, v2), std::domain_error);
 }
 TEST(AgradRevMatrix,multiply_scalar_vector_cv) {
-  using stan::agrad::multiply;
-  using stan::agrad::vector_v;
+  using stan::diff::multiply;
+  using stan::diff::vector_v;
 
   vector_v x(3);
   x << 1, 2, 3;
@@ -365,8 +365,8 @@ TEST(AgradRevMatrix,multiply_scalar_vector_cv) {
   EXPECT_FLOAT_EQ(0.0,g[2]);
 }
 TEST(AgradRevMatrix,multiply_scalar_vector_vv) {
-  using stan::agrad::multiply;
-  using stan::agrad::vector_v;
+  using stan::diff::multiply;
+  using stan::diff::vector_v;
 
   vector_v x(3);
   x << 1, 4, 9;
@@ -384,8 +384,8 @@ TEST(AgradRevMatrix,multiply_scalar_vector_vv) {
   EXPECT_FLOAT_EQ(4.0,g[3]);
 }
 TEST(AgradRevMatrix,multiply_scalar_vector_vc) {
-  using stan::agrad::multiply;
-  using stan::agrad::vector_v;
+  using stan::diff::multiply;
+  using stan::diff::vector_v;
 
   vector_v x(3);
   x << 1, 2, 3;
@@ -401,8 +401,8 @@ TEST(AgradRevMatrix,multiply_scalar_vector_vc) {
 }
 
 TEST(AgradRevMatrix,multiply_scalar_row_vector_cv) {
-  using stan::agrad::multiply;
-  using stan::agrad::row_vector_v;
+  using stan::diff::multiply;
+  using stan::diff::row_vector_v;
 
   row_vector_v x(3);
   x << 1, 2, 3;
@@ -418,8 +418,8 @@ TEST(AgradRevMatrix,multiply_scalar_row_vector_cv) {
   EXPECT_FLOAT_EQ(0.0,g[2]);
 }
 TEST(AgradRevMatrix,multiply_scalar_row_vector_vv) {
-  using stan::agrad::multiply;
-  using stan::agrad::row_vector_v;
+  using stan::diff::multiply;
+  using stan::diff::row_vector_v;
 
   row_vector_v x(3);
   x << 1, 4, 9;
@@ -437,8 +437,8 @@ TEST(AgradRevMatrix,multiply_scalar_row_vector_vv) {
   EXPECT_FLOAT_EQ(4.0,g[3]);
 }
 TEST(AgradRevMatrix,multiply_scalar_row_vector_vc) {
-  using stan::agrad::multiply;
-  using stan::agrad::row_vector_v;
+  using stan::diff::multiply;
+  using stan::diff::row_vector_v;
 
   row_vector_v x(3);
   x << 1, 2, 3;
@@ -454,8 +454,8 @@ TEST(AgradRevMatrix,multiply_scalar_row_vector_vc) {
 }
 
 TEST(AgradRevMatrix,multiply_scalar_matrix_cv) {
-  using stan::agrad::multiply;
-  using stan::agrad::matrix_v;
+  using stan::diff::multiply;
+  using stan::diff::matrix_v;
 
   matrix_v x(2,3);
   x << 1, 2, 3, 4, 5, 6;
@@ -473,9 +473,9 @@ TEST(AgradRevMatrix,multiply_scalar_matrix_cv) {
 }
 
 TEST(AgradRevMatrix,multiply_scalar_matrix_vc) {
-  using stan::agrad::multiply;
+  using stan::diff::multiply;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_v;
+  using stan::diff::matrix_v;
 
   matrix_d x(2,3);
   x << 1, 2, 3, 4, 5, 6;
@@ -492,10 +492,10 @@ TEST(AgradRevMatrix,multiply_scalar_matrix_vc) {
 }
 
 TEST(AgradRevMatrix,multiply_vector_int) {
-  using stan::agrad::multiply; // test namespace resolution
+  using stan::diff::multiply; // test namespace resolution
   using stan::math::multiply;
   using stan::math::vector_d;
-  using stan::agrad::vector_v;
+  using stan::diff::vector_v;
 
   vector_d dvec(3);
   dvec << 1, 2, 3;

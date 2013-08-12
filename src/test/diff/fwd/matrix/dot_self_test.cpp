@@ -1,8 +1,8 @@
-#include <stan/agrad/fwd/matrix/dot_self.hpp>
+#include <stan/diff/fwd/matrix/dot_self.hpp>
 #include <gtest/gtest.h>
-#include <stan/agrad/fwd/fvar.hpp>
+#include <stan/diff/fwd/fvar.hpp>
 
-using stan::agrad::fvar;
+using stan::diff::fvar;
 TEST(AgradFwdMatrix, dot_self_vec) {
   using stan::math::dot_self;
 

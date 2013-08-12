@@ -1,9 +1,9 @@
-#ifndef __STAN__AGRAD__FWD__FVAR__HPP__
-#define __STAN__AGRAD__FWD__FVAR__HPP__
+#ifndef __STAN__DIFF__FWD__FVAR__HPP__
+#define __STAN__DIFF__FWD__FVAR__HPP__
 
 namespace stan {
 
-  namespace agrad {
+  namespace diff {
 
     template <typename T>
     struct fvar {

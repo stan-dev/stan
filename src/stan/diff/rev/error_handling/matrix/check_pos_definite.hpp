@@ -1,14 +1,14 @@
-#ifndef __STAN__AGRAD__REV__ERROR_HANDLING__MATRIX__CHECK_POS_DEFINITE_HPP__
-#define __STAN__AGRAD__REV__ERROR_HANDLING__MATRIX__CHECK_POS_DEFINITE_HPP__
+#ifndef __STAN__DIFF__REV__ERROR_HANDLING__MATRIX__CHECK_POS_DEFINITE_HPP__
+#define __STAN__DIFF__REV__ERROR_HANDLING__MATRIX__CHECK_POS_DEFINITE_HPP__
 
 // global include
 #include <stan/math/error_handling/matrix/check_pos_definite.hpp>
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/numeric_limits.hpp>
+#include <stan/diff/rev/var.hpp>
+#include <stan/diff/rev/numeric_limits.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
 
     template <typename T_result, class Policy>
     inline bool check_pos_definite(const char* function,

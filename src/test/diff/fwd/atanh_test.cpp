@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
-#include <stan/agrad/fvar.hpp>
+#include <stan/diff/fvar.hpp>
 #include <boost/math/special_functions/atanh.hpp>
 
 TEST(AgradFvar, atanh) {
-  using stan::agrad::fvar;
+  using stan::diff::fvar;
   using boost::math::atanh;
 
   fvar<double> x(0.5);

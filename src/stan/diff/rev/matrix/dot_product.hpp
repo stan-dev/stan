@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__REV__MATRIX__DOT_PRODUCT_HPP__
-#define __STAN__AGRAD__REV__MATRIX__DOT_PRODUCT_HPP__
+#ifndef __STAN__DIFF__REV__MATRIX__DOT_PRODUCT_HPP__
+#define __STAN__DIFF__REV__MATRIX__DOT_PRODUCT_HPP__
 
 #include <vector>
 #include <boost/utility/enable_if.hpp>
@@ -9,13 +9,13 @@
 #include <stan/math/matrix/validate_vector.hpp>
 #include <stan/math/matrix/validate_matching_sizes.hpp>
 #include <stan/math/functions/value_of.hpp>
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/vari.hpp>
-#include <stan/agrad/rev/matrix/typedefs.hpp>
-#include <stan/agrad/rev/value_of.hpp>
+#include <stan/diff/rev/var.hpp>
+#include <stan/diff/rev/vari.hpp>
+#include <stan/diff/rev/matrix/typedefs.hpp>
+#include <stan/diff/rev/value_of.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
 
     namespace {      
       template<typename T>
@@ -62,7 +62,7 @@ namespace stan {
         template<typename Derived1,typename Derived2>
         inline static double var_dot(const Eigen::DenseBase<Derived1> &v1,
                                      const Eigen::DenseBase<Derived2> &v2) {
-          using stan::agrad::value_of;
+          using stan::diff::value_of;
           using stan::math::value_of;
           Eigen::VectorXd vd1(v1.size()), vd2(v1.size());
           for (size_t i = 0; i < v1.size(); i++) {

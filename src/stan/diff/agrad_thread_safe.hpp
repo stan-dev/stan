@@ -1,18 +1,16 @@
-#ifndef __STAN__AGRAD__AGRAD_HPP__
-#define __STAN__AGRAD__AGRAD_HPP__
+#ifndef __STAN__DIFF__AGRAD_HPP__
+#define __STAN__DIFF__AGRAD_HPP__
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <vector>
 #include <cmath>
 #include <cstddef>
-#include "stan/memory/stack_alloc.hpp"
-
-// FIXME:  Should include common defs, not this huge cut-and-paste!
+#include <stan/memory/stack_alloc.hpp>
 
 namespace stan {
 
-  namespace agrad {
+  namespace diff {
 
     class vari;
 
@@ -692,11 +690,11 @@ namespace stan {
     /**
      * Independent (input) and dependent (output) variables for gradients.
      *
-     * An agrad::var is constructed with a double and used like any
+     * An diff::var is constructed with a double and used like any
      * other scalar.  Arithmetical functions like negation, addition,
      * and subtraction, as well as a range of mathematical functions
      * like exponentiation and powers are overridden to operate on
-     * agrad::var values objects.
+     * diff::var values objects.
      */
     class var {
     public:
@@ -880,9 +878,9 @@ namespace stan {
        * <code>vari::free_all()</code> to release resources back to
        * the system rather than saving them for reuse).
        *
-       * Until the next creation of a stan::agrad::var instance, the
+       * Until the next creation of a stan::diff::var instance, the
        * gradient values will be available from an instance <code>x</code>
-       * of <code>stan::agrad::var</code> via <code>x.vi_->adj_</code>.
+       * of <code>stan::diff::var</code> via <code>x.vi_->adj_</code>.
        * It may be slightly more efficient to do this without the intermediate
        * creation and population of two vectors as done in the two-argument
        * form <code>grad(std::vector<var>&, std::vector<double>&)</code>.

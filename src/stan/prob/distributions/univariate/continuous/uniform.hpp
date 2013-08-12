@@ -4,7 +4,7 @@
 #include <boost/random/uniform_real_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
 
-#include <stan/agrad.hpp>
+#include <stan/diff.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/functions/value_of.hpp>
 #include <stan/meta/traits.hpp>
@@ -105,7 +105,7 @@ namespace stan {
           log_beta_minus_alpha[i] 
             = log(value_of(beta_vec[i]) - value_of(alpha_vec[i]));
       
-      agrad::OperandsAndPartials<T_y,T_low,T_high> 
+      diff::OperandsAndPartials<T_y,T_low,T_high> 
         operands_and_partials(y,alpha,beta);
       for (size_t n = 0; n < N; n++) {
         if (include_summand<propto,T_low,T_high>::value)
@@ -172,7 +172,7 @@ namespace stan {
           return 0.0;
       }
    
-      agrad::OperandsAndPartials<T_y,T_low,T_high> 
+      diff::OperandsAndPartials<T_y,T_low,T_high> 
         operands_and_partials(y,alpha,beta);
       for (size_t n = 0; n < N; n++) {
         const double y_dbl = value_of(y_vec[n]);
@@ -247,7 +247,7 @@ namespace stan {
       VectorView<const T_high> beta_vec(beta);
       size_t N = max_size(y, alpha, beta);
 
-      agrad::OperandsAndPartials<T_y,T_low,T_high> 
+      diff::OperandsAndPartials<T_y,T_low,T_high> 
         operands_and_partials(y,alpha,beta);
 
       for (size_t n = 0; n < N; n++) {
@@ -331,7 +331,7 @@ namespace stan {
           return LOG_ZERO;
       }
    
-      agrad::OperandsAndPartials<T_y,T_low,T_high> 
+      diff::OperandsAndPartials<T_y,T_low,T_high> 
         operands_and_partials(y,alpha,beta);
       for (size_t n = 0; n < N; n++) {
         const double y_dbl = value_of(y_vec[n]);

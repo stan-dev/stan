@@ -1,17 +1,17 @@
-#ifndef __STAN__AGRAD__FWD__MATRIX__ROWS__DOT_PRODUCT_HPP__
-#define __STAN__AGRAD__FWD__MATRIX__ROWS__DOT_PRODUCT_HPP__
+#ifndef __STAN__DIFF__FWD__MATRIX__ROWS__DOT_PRODUCT_HPP__
+#define __STAN__DIFF__FWD__MATRIX__ROWS__DOT_PRODUCT_HPP__
 
 #include <vector>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/math/matrix/validate_matching_dims.hpp>
-#include <stan/agrad/fwd/matrix/typedefs.hpp>
-#include <stan/agrad/fwd/matrix/dot_product.hpp>
-#include <stan/agrad/fwd/fvar.hpp>
+#include <stan/diff/fwd/matrix/typedefs.hpp>
+#include <stan/diff/fwd/matrix/dot_product.hpp>
+#include <stan/diff/fwd/fvar.hpp>
 
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
 
     template<typename T1, typename T2, int R1,int C1,int R2, int C2>
     inline 

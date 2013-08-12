@@ -1,11 +1,11 @@
-#ifndef __STAN__AGRAD__REV__CHAINABLE_HPP__
-#define __STAN__AGRAD__REV__CHAINABLE_HPP__
+#ifndef __STAN__DIFF__REV__CHAINABLE_HPP__
+#define __STAN__DIFF__REV__CHAINABLE_HPP__
 
 #include <vector>
-#include <stan/agrad/rev/var_stack.hpp>
+#include <stan/diff/rev/var_stack.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
 
     /**
      * Abstract base class for variable implementations that handles

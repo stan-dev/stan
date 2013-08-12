@@ -1,5 +1,5 @@
-#include <stan/agrad/rev/fabs.hpp>
-#include <test/agrad/util.hpp>
+#include <stan/diff/rev/fabs.hpp>
+#include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
 TEST(AgradRev,fabs_var) {

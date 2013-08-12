@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <stan/agrad/autodiff.hpp>
+#include <stan/diff/autodiff.hpp>
 
 struct fun0 {
   template <typename T>
@@ -35,7 +35,7 @@ TEST(AgradAutoDiff,derivative) {
   double x = 7;
   double fx;
   double d;
-  stan::agrad::derivative(f,x,fx,d);
+  stan::diff::derivative(f,x,fx,d);
   EXPECT_FLOAT_EQ(fx, 5 * 7 * 7 * 7);
   EXPECT_FLOAT_EQ(d, 5 * 3 * 7 * 7);
 }
@@ -49,13 +49,13 @@ TEST(AgradAutoDiff,partialDerivative) {
   
   double fx;
   double d;
-  stan::agrad::partial_derivative(f,x,0,fx,d);
+  stan::diff::partial_derivative(f,x,0,fx,d);
   EXPECT_FLOAT_EQ(5 * 5 * 7 + 3 * 7 * 7,fx);
   EXPECT_FLOAT_EQ(2 * 5 * 7, d);
 
   double fx2;
   double d2;
-  stan::agrad::partial_derivative(f,x,1,fx2,d2);
+  stan::diff::partial_derivative(f,x,1,fx2,d2);
   EXPECT_FLOAT_EQ(5 * 5 * 7 + 3 * 7 * 7,fx);
   EXPECT_FLOAT_EQ(5 * 5 + 3 * 2 * 7,d2);
 }
@@ -68,7 +68,7 @@ TEST(AgradAutoDiff,gradient) {
   x << 5, 7;
   double fx;
   Matrix<double,Dynamic,1> grad_fx;
-  stan::agrad::gradient(f,x,fx,grad_fx);
+  stan::diff::gradient(f,x,fx,grad_fx);
   EXPECT_FLOAT_EQ(5 * 5 * 7 + 3 * 7 * 7, fx);
   EXPECT_EQ(2,grad_fx.size());
   EXPECT_FLOAT_EQ(2 * x(0) * x(1), grad_fx(0));
@@ -76,7 +76,7 @@ TEST(AgradAutoDiff,gradient) {
 
   double fx2(0);
   Matrix<double,Dynamic,1> grad_fx2;
-  stan::agrad::gradient<double>(f,x,fx2,grad_fx2);
+  stan::diff::gradient<double>(f,x,fx2,grad_fx2);
   EXPECT_FLOAT_EQ(5 * 5 * 7 + 3 * 7 * 7, fx2);
   EXPECT_EQ(2,grad_fx2.size());
   EXPECT_FLOAT_EQ(2 * x(0) * x(1), grad_fx2(0));
@@ -84,7 +84,7 @@ TEST(AgradAutoDiff,gradient) {
 }
 TEST(AgradAutoDiff,gradientDotVector) {
   using Eigen::Matrix;  using Eigen::Dynamic;
-  using stan::agrad::var;
+  using stan::diff::var;
   fun1 f;
   Matrix<double,Dynamic,1> x(2);
   x << 5, 7;
@@ -92,17 +92,17 @@ TEST(AgradAutoDiff,gradientDotVector) {
   v << 11, 13;
   double fx;
   double grad_fx_dot_v;
-  stan::agrad::gradient_dot_vector(f,x,v,fx,grad_fx_dot_v);
+  stan::diff::gradient_dot_vector(f,x,v,fx,grad_fx_dot_v);
   
   double fx_expected;
   Matrix<double,Dynamic,1> grad_fx;
-  stan::agrad::gradient(f,x,fx_expected,grad_fx);
+  stan::diff::gradient(f,x,fx_expected,grad_fx);
   double grad_fx_dot_v_expected = grad_fx.dot(v);
   
   EXPECT_FLOAT_EQ(grad_fx_dot_v_expected, grad_fx_dot_v);
 }
 TEST(AgradAutoDiff,hessianTimesVector) {
-  using stan::agrad::hessian_times_vector;
+  using stan::diff::hessian_times_vector;
   using Eigen::Matrix;  using Eigen::Dynamic;
 
   fun1 f;
@@ -115,7 +115,7 @@ TEST(AgradAutoDiff,hessianTimesVector) {
 
   Matrix<double,Dynamic,1> Hv;
   double fx;
-  stan::agrad::hessian_times_vector(f,x,v,fx,Hv);
+  stan::diff::hessian_times_vector(f,x,v,fx,Hv);
 
   EXPECT_FLOAT_EQ(2 * 2 * -3 + 3.0 * -3 * -3, fx);
 
@@ -125,7 +125,7 @@ TEST(AgradAutoDiff,hessianTimesVector) {
 }
 TEST(AgradAutoDiff,jacobian) {
   using Eigen::Matrix;  using Eigen::Dynamic;
-  using stan::agrad::jacobian;
+  using stan::diff::jacobian;
 
   fun2 f;
   Matrix<double,Dynamic,1> x(2);
@@ -167,7 +167,7 @@ TEST(AgradAutodiff,hessian) {
   double fx;
   Matrix<double,Dynamic,1> grad;
   Matrix<double,Dynamic,Dynamic> H;
-  stan::agrad::hessian(f,x,fx,grad,H);
+  stan::diff::hessian(f,x,fx,grad,H);
 
   // x^2 * y + 3 * y^2
   EXPECT_FLOAT_EQ(5 * 5 * 7 + 3 * 7  * 7, fx);
@@ -186,7 +186,7 @@ TEST(AgradAutodiff,hessian) {
   double fx2;
   Matrix<double,Dynamic,1> grad2;
   Matrix<double,Dynamic,Dynamic> H2;
-  stan::agrad::hessian<double>(f,x,fx2,grad2,H2);
+  stan::diff::hessian<double>(f,x,fx2,grad2,H2);
 
   EXPECT_FLOAT_EQ(5 * 5 * 7 + 3 * 7  * 7, fx2);
 
@@ -212,7 +212,7 @@ TEST(AgradAutodiff,GradientTraceMatrixTimesHessian) {
   Matrix<double,Dynamic,1> x(2);
   x << 5, 7;
   Matrix<double,Dynamic,1> grad_tr_MH;
-  stan::agrad::grad_tr_mat_times_hessian(f,x,M,grad_tr_MH);
+  stan::diff::grad_tr_mat_times_hessian(f,x,M,grad_tr_MH);
 
   EXPECT_EQ(2,grad_tr_MH.size());
   EXPECT_FLOAT_EQ(60,grad_tr_MH(0));

@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
-#include <stan/agrad/fvar.hpp>
+#include <stan/diff/fvar.hpp>
 
 TEST(AgradFvar,fvar) {
-  using stan::agrad::fvar;
-  typedef stan::agrad::fvar<double> fvd;
+  using stan::diff::fvar;
+  typedef stan::diff::fvar<double> fvd;
 
   fvar<double> a;
   EXPECT_FLOAT_EQ(0.0, a.val_);

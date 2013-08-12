@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__REV__MATRIX__LOG_DETERMINANT_SPD_HPP__
-#define __STAN__AGRAD__REV__MATRIX__LOG_DETERMINANT_SPD_HPP__
+#ifndef __STAN__DIFF__REV__MATRIX__LOG_DETERMINANT_SPD_HPP__
+#define __STAN__DIFF__REV__MATRIX__LOG_DETERMINANT_SPD_HPP__
 
 #include <vector>
 #include <stan/math/error_handling/dom_err.hpp>
@@ -7,12 +7,12 @@
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/math/matrix/validate_multiplicable.hpp>
 #include <stan/math/matrix/validate_square.hpp>
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/matrix/typedefs.hpp>
-#include <stan/agrad/matrix.hpp>
+#include <stan/diff/rev/var.hpp>
+#include <stan/diff/rev/matrix/typedefs.hpp>
+#include <stan/diff/matrix.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
 
     namespace {
       template <int R,int C>
@@ -35,7 +35,7 @@ namespace stan {
           : vari(log_determinant_spd_vari_calc(A,&_alloc)), 
             _rows(A.rows()),
             _cols(A.cols()),
-            _adjARef((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
+            _adjARef((vari**)stan::diff::memalloc_.alloc(sizeof(vari*) 
                                                           * A.rows() * A.cols()))
         {
           size_t pos = 0;

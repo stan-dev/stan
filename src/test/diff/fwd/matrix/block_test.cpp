@@ -1,11 +1,11 @@
 #include <gtest/gtest.h>
 #include <stan/math/matrix/block.hpp>
-#include <stan/agrad/fwd/matrix/typedefs.hpp>
+#include <stan/diff/fwd/matrix/typedefs.hpp>
 
 TEST(AgradFwdMatrix,block_matrix) {
   using stan::math::block;
-  using stan::agrad::matrix_fv;
-  using stan::agrad::vector_fv;
+  using stan::diff::matrix_fv;
+  using stan::diff::vector_fv;
 
   matrix_fv v(3,3);
   v << 1, 4, 9,1, 4, 9,1, 4, 9;
@@ -50,7 +50,7 @@ TEST(AgradFwdMatrix,block_matrix) {
 }
 TEST(AgradFwdMatrix,block_matrix_exception) {
   using stan::math::block;
-  using stan::agrad::matrix_fv;
+  using stan::diff::matrix_fv;
 
   matrix_fv v(3,3);
   EXPECT_THROW(block(v,0,0,1,1), std::domain_error);

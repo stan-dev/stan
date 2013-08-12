@@ -1,12 +1,12 @@
-#ifndef __STAN__AGRAD__REV__TRUNC_HPP__
-#define __STAN__AGRAD__REV__TRUNC_HPP__
+#ifndef __STAN__DIFF__REV__TRUNC_HPP__
+#define __STAN__DIFF__REV__TRUNC_HPP__
 
 #include <boost/math/special_functions/trunc.hpp>
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/vari.hpp>
+#include <stan/diff/rev/var.hpp>
+#include <stan/diff/rev/vari.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
 
     namespace {
       // derivative 0 almost everywhere
@@ -31,7 +31,7 @@ namespace stan {
      * @param a Specified variable.
      * @return Truncation of the variable.
      */
-    inline var trunc(const stan::agrad::var& a) {
+    inline var trunc(const stan::diff::var& a) {
       return var(new trunc_vari(a.vi_));
     }
 

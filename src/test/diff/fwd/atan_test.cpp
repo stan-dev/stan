@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
-#include <stan/agrad/fvar.hpp>
+#include <stan/diff/fvar.hpp>
 
 TEST(AgradFvar, atan) {
-  using stan::agrad::fvar;
+  using stan::diff::fvar;
   using std::atan;
 
   fvar<double> x(0.5);

@@ -1,12 +1,12 @@
-#include <stan/agrad/rev/matrix/sort.hpp>
-#include <test/agrad/util.hpp>
+#include <stan/diff/rev/matrix/sort.hpp>
+#include <test/diff/util.hpp>
 #include <gtest/gtest.h>
-#include <stan/agrad.hpp>
+#include <stan/diff.hpp>
 #include <stan/math/matrix/sort.hpp>
 
 void test_sort_asc(VEC val) {
   using stan::math::sort_asc;
-  using stan::agrad::sort_asc;
+  using stan::diff::sort_asc;
   
   AVEC x;
   for(size_t i=0U; i<val.size(); i++)
@@ -28,7 +28,7 @@ void test_sort_asc(VEC val) {
 
 void test_sort_desc(VEC val) {
   using stan::math::sort_desc;
-  using stan::agrad::sort_desc;
+  using stan::diff::sort_desc;
   
   AVEC x;
   for(size_t i=0U; i<val.size(); i++)
@@ -51,7 +51,7 @@ void test_sort_desc(VEC val) {
 template <typename T, int R, int C>
 void test_sort_asc(Eigen::Matrix<T,R,C> val) {
   using stan::math::sort_asc;
-  using stan::agrad::sort_asc;
+  using stan::diff::sort_asc;
 
   typedef Eigen::Matrix<AVAR,R,C> AVEC;
   typedef Eigen::Matrix<double,R,C> VEC;
@@ -79,7 +79,7 @@ void test_sort_asc(Eigen::Matrix<T,R,C> val) {
 template <typename T, int R, int C>
 void test_sort_desc(Eigen::Matrix<T,R,C> val) {
   using stan::math::sort_desc;
-  using stan::agrad::sort_desc;
+  using stan::diff::sort_desc;
 
   typedef Eigen::Matrix<AVAR,R,C> AVEC;
   typedef Eigen::Matrix<double,R,C> VEC;

@@ -1,9 +1,9 @@
-#include <stan/agrad/rev/Phi.hpp>
-#include <test/agrad/util.hpp>
+#include <stan/diff/rev/Phi.hpp>
+#include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
 TEST(AgradRev, Phi) {
-  using stan::agrad::var;
+  using stan::diff::var;
   using std::exp;
 
   std::vector<double> y_values;
@@ -22,7 +22,7 @@ TEST(AgradRev, Phi) {
     AVEC x;
     VEC dy;
     y = y_values[i];
-    phi_y = stan::agrad::Phi(y);
+    phi_y = stan::diff::Phi(y);
     x = createAVEC(y);
     phi_y.grad(x,dy);
     EXPECT_FLOAT_EQ(stan::math::Phi(y.val()), phi_y.val());

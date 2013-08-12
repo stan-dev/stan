@@ -1,9 +1,9 @@
-#include <stan/agrad/fwd/matrix/inverse.hpp>
+#include <stan/diff/fwd/matrix/inverse.hpp>
 #include <gtest/gtest.h>
-#include <stan/agrad/fwd/matrix/typedefs.hpp>
+#include <stan/diff/fwd/matrix/typedefs.hpp>
 
 TEST(AgradFwdMatrix,inverse) {
-  using stan::agrad::matrix_fv;
+  using stan::diff::matrix_fv;
   using stan::math::matrix_d;
 
   matrix_fv a(2,2);
@@ -17,7 +17,7 @@ TEST(AgradFwdMatrix,inverse) {
    b << 2.0, 3.0, 5.0,7.0;
    b = b.inverse();
 
-  matrix_fv a_inv = stan::agrad::inverse(a);
+  matrix_fv a_inv = stan::diff::inverse(a);
 
   EXPECT_NEAR(b(0,0),a_inv(0,0).val_,1.0E-12);
   EXPECT_NEAR(b(0,1),a_inv(0,1).val_,1.0E-12);
@@ -28,5 +28,5 @@ TEST(AgradFwdMatrix,inverse) {
   EXPECT_NEAR( 6,a_inv(1,0).d_,1.0E-12);
   EXPECT_NEAR(-3,a_inv(1,1).d_,1.0E-12);
 
-  EXPECT_THROW(stan::agrad::inverse(matrix_fv(2,3)), std::domain_error);
+  EXPECT_THROW(stan::diff::inverse(matrix_fv(2,3)), std::domain_error);
 }

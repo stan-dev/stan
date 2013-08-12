@@ -1,12 +1,12 @@
 #include <gtest/gtest.h>
 #include <stan/math/rep_matrix.hpp>
-#include <stan/agrad/fwd/matrix/typedefs.hpp>
-#include <stan/agrad/fwd/fvar.hpp>
+#include <stan/diff/fwd/matrix/typedefs.hpp>
+#include <stan/diff/fwd/fvar.hpp>
 
 TEST(AgradFwdMatrix,rep_matrix_real) {
   using stan::math::rep_matrix;
-  using stan::agrad::matrix_fv;
-  using stan::agrad::fvar;
+  using stan::diff::matrix_fv;
+  using stan::diff::fvar;
   fvar<double> a;
   a.val_ = 3.0;
   a.d_ = 2.0;
@@ -28,8 +28,8 @@ TEST(AgradFwdMatrix,rep_matrix_real) {
 }
 TEST(AgradFwdMatrix,rep_matrix_exception_real) {
   using stan::math::rep_matrix;
-  using stan::agrad::matrix_fv;
-  using stan::agrad::fvar;
+  using stan::diff::matrix_fv;
+  using stan::diff::fvar;
   fvar<double> a;
   a.val_ = 3.0;
   a.d_ = 2.0;
@@ -38,8 +38,8 @@ TEST(AgradFwdMatrix,rep_matrix_exception_real) {
 }
 TEST(AgradFwdMatrix,rep_matrix_rowvector) {
   using stan::math::rep_matrix;
-  using stan::agrad::matrix_fv;
-  using stan::agrad::row_vector_fv;
+  using stan::diff::matrix_fv;
+  using stan::diff::row_vector_fv;
   
   row_vector_fv a(3);
   a<<3.0, 3.0, 3.0;
@@ -70,8 +70,8 @@ TEST(AgradFwdMatrix,rep_matrix_rowvector) {
 }
 TEST(AgradFwdMatrix,rep_matrix_exception_rowvector) {
   using stan::math::rep_matrix;
-  using stan::agrad::matrix_fv;
-  using stan::agrad::row_vector_fv;
+  using stan::diff::matrix_fv;
+  using stan::diff::row_vector_fv;
 
   row_vector_fv a(3);
   a<<3.0, 3.0, 3.0;
@@ -80,8 +80,8 @@ TEST(AgradFwdMatrix,rep_matrix_exception_rowvector) {
 }
 TEST(AgradFwdMatrix,rep_matrix_vector) {
   using stan::math::rep_matrix;
-  using stan::agrad::matrix_fv;
-  using stan::agrad::vector_fv;
+  using stan::diff::matrix_fv;
+  using stan::diff::vector_fv;
   
   vector_fv a(3);
   a<<3.0, 3.0, 3.0;
@@ -112,8 +112,8 @@ TEST(AgradFwdMatrix,rep_matrix_vector) {
 }
 TEST(AgradFwdMatrix,rep_matrix_exception_vector) {
   using stan::math::rep_matrix;
-  using stan::agrad::matrix_fv;
-  using stan::agrad::vector_fv;
+  using stan::diff::matrix_fv;
+  using stan::diff::vector_fv;
 
   vector_fv a(3);
   a<<3.0, 3.0, 3.0;

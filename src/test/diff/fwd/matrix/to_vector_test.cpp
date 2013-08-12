@@ -1,14 +1,14 @@
 #include <stan/math/matrix/to_vector.hpp>
-#include <stan/agrad/fwd/matrix/typedefs.hpp>
-#include <stan/agrad/fvar.hpp>
-#include <stan/agrad/var.hpp>
+#include <stan/diff/fwd/matrix/typedefs.hpp>
+#include <stan/diff/fvar.hpp>
+#include <stan/diff/var.hpp>
 #include <gtest/gtest.h>
 
 TEST(AgradFwdMatrix, to_vector) {
   using stan::math::to_vector;
 
-  stan::agrad::matrix_fv a(3,3);
-  stan::agrad::vector_fv b(9);
+  stan::diff::matrix_fv a(3,3);
+  stan::diff::vector_fv b(9);
   for(int i = 0; i < 3; i++) {
     for(int j = 0; j < 3; j++) {
       a(j,i).val_ = j + i;
@@ -39,8 +39,8 @@ TEST(AgradFwdMatrix, to_vector) {
 }
 TEST(AgradFwdFvarVarMatrix, to_vector) {
   using stan::math::to_vector;
-  using stan::agrad::var;
-  using stan::agrad::fvar;
+  using stan::diff::var;
+  using stan::diff::fvar;
 
   Eigen::Matrix<fvar<var>,Eigen::Dynamic,Eigen::Dynamic> a(3,3);
   Eigen::Matrix<fvar<var>,Eigen::Dynamic,1> b(9);
@@ -74,7 +74,7 @@ TEST(AgradFwdFvarVarMatrix, to_vector) {
 }
 TEST(AgradFwdFvarFvarMatrix, to_vector) {
   using stan::math::to_vector;
-  using stan::agrad::fvar;
+  using stan::diff::fvar;
 
   Eigen::Matrix<fvar<fvar<double> >,Eigen::Dynamic,Eigen::Dynamic> a(3,3);
   Eigen::Matrix<fvar<fvar<double> >,Eigen::Dynamic,1> b(9);

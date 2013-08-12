@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
-#include <stan/agrad/fvar.hpp>
+#include <stan/diff/fvar.hpp>
 #include <stan/math/functions/inv_logit.hpp>
 
 TEST(AgradFvar, invLogit) {
-  using stan::agrad::fvar;
+  using stan::diff::fvar;
   using stan::math::inv_logit;
 
   fvar<double> x(0.5);

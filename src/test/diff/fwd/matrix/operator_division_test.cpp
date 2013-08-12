@@ -1,12 +1,12 @@
-#include <stan/agrad/fwd/matrix/divide.hpp>
+#include <stan/diff/fwd/matrix/divide.hpp>
 #include <gtest/gtest.h>
-#include<stan/agrad/fwd/fvar.hpp>
+#include<stan/diff/fwd/fvar.hpp>
 #include <stan/math/matrix/divide.hpp>
 
-using stan::agrad::fvar;
+using stan::diff::fvar;
 
 TEST(AgradFwdMatrix, divide_scalar) {
-  using stan::agrad::divide;
+  using stan::diff::divide;
   double d1, d2;
   fvar<double>   v1, v2;
 
@@ -49,7 +49,7 @@ TEST(AgradFwdMatrix, divide_scalar) {
 TEST(AgradFwdMatrix, divide_vector) {
   using stan::math::divide;
   using stan::math::vector_d;
-  using stan::agrad::vector_fv;
+  using stan::diff::vector_fv;
 
   vector_d d1(3);
   vector_fv v1(3);
@@ -130,7 +130,7 @@ TEST(AgradFwdMatrix, divide_vector) {
 TEST(AgradFwdMatrix, divide_rowvector) {
   using stan::math::divide;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fv;
+  using stan::diff::row_vector_fv;
 
   row_vector_d d1(3);
   row_vector_fv v1(3);
@@ -210,7 +210,7 @@ TEST(AgradFwdMatrix, divide_rowvector) {
 TEST(AgradFwdMatrix, divide_matrix) {
   using stan::math::divide;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fv;
+  using stan::diff::matrix_fv;
 
   matrix_d d1(2,2);
   matrix_fv v1(2,2);

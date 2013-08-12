@@ -1,11 +1,11 @@
-#ifndef __STAN__AGRAD__REV__MATRIX__CROSSPROD_HPP__
-#define __STAN__AGRAD__REV__MATRIX__CROSSPROD_HPP__
+#ifndef __STAN__DIFF__REV__MATRIX__CROSSPROD_HPP__
+#define __STAN__DIFF__REV__MATRIX__CROSSPROD_HPP__
 
-#include <stan/agrad/rev/matrix/typedefs.hpp>
-#include <stan/agrad/rev/matrix/tcrossprod.hpp>
+#include <stan/diff/rev/matrix/typedefs.hpp>
+#include <stan/diff/rev/matrix/tcrossprod.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
     
     /**
      * Returns the result of pre-multiplying a matrix by its

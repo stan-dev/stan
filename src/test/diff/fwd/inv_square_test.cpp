@@ -1,10 +1,10 @@
 #include <gtest/gtest.h>
-#include <stan/agrad/fvar.hpp>
+#include <stan/diff/fvar.hpp>
 #include <stan/math/functions/inv_square.hpp>
 #include <stan/math/constants.hpp>
 
 TEST(AgradFvar, inv_square) {
-  using stan::agrad::fvar;
+  using stan::diff::fvar;
   using stan::math::inv_square;
 
   fvar<double> x(0.5);

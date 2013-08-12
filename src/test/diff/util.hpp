@@ -1,8 +1,8 @@
 #include <vector>
-#include <stan/agrad/rev/var.hpp>
+#include <stan/diff/rev/var.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 
-typedef stan::agrad::var AVAR;
+typedef stan::diff::var AVAR;
 typedef std::vector<AVAR> AVEC;
 typedef std::vector<double> VEC;
 typedef Eigen::Matrix<double,-1,-1>::size_type size_type;

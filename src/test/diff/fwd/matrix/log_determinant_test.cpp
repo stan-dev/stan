@@ -1,12 +1,12 @@
-#include <stan/agrad/fwd/matrix/typedefs.hpp>
+#include <stan/diff/fwd/matrix/typedefs.hpp>
 #include <gtest/gtest.h>
-#include <stan/agrad/fwd/matrix/log_determinant.hpp>
-#include <stan/agrad/fwd/fvar.hpp>
+#include <stan/diff/fwd/matrix/log_determinant.hpp>
+#include <stan/diff/fwd/fvar.hpp>
 
 TEST(AgradFwdMatrix,log_determinant) {
-  using stan::agrad::matrix_fv;
-  using stan::agrad::fvar;
-  using stan::agrad::log_determinant;
+  using stan::diff::matrix_fv;
+  using stan::diff::fvar;
+  using stan::diff::log_determinant;
   
   matrix_fv v(2,2);
   v << 0, 1, 2, 3;
@@ -22,7 +22,7 @@ TEST(AgradFwdMatrix,log_determinant) {
 }
 
 TEST(AgradFwdMatrix,log_deteriminant_exception) {
-  using stan::agrad::matrix_fv;
+  using stan::diff::matrix_fv;
   using stan::math::log_determinant;
   
   EXPECT_THROW(log_determinant(matrix_fv(2,3)), std::domain_error);

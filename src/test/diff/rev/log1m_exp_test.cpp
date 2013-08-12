@@ -1,13 +1,13 @@
-#include <stan/agrad/rev/log1m_exp.hpp>
-#include <test/agrad/util.hpp>
+#include <stan/diff/rev/log1m_exp.hpp>
+#include <test/diff/util.hpp>
 #include <gtest/gtest.h>
-#include <stan/agrad/rev/exp.hpp>
-#include <stan/agrad.hpp>
+#include <stan/diff/rev/exp.hpp>
+#include <stan/diff.hpp>
 
 void test_log1m_exp(double val) {
   using stan::math::log1m_exp;
-  using stan::agrad::log1m_exp;
-  using stan::agrad::exp;
+  using stan::diff::log1m_exp;
+  using stan::diff::exp;
   using std::exp;
 
   AVAR a(val);   
@@ -41,7 +41,7 @@ TEST(AgradRev, log1m_exp) {
 
 TEST(AgradRev, log1m_exp_exception) {
   using stan::math::log1m_exp;
-  using stan::agrad::log1m_exp;
+  using stan::diff::log1m_exp;
   EXPECT_NO_THROW(log1m_exp(AVAR(-3)));
   EXPECT_NO_THROW(log1m_exp(AVAR(3)));
 }

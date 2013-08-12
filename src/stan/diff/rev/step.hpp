@@ -1,10 +1,10 @@
-#ifndef __STAN__AGRAD__REV__STEP_HPP__
-#define __STAN__AGRAD__REV__STEP_HPP__
+#ifndef __STAN__DIFF__REV__STEP_HPP__
+#define __STAN__DIFF__REV__STEP_HPP__
 
-#include <stan/agrad/rev/var.hpp>
+#include <stan/diff/rev/var.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
 
     /**
      * Return the step, or heaviside, function applied to the
@@ -22,7 +22,7 @@ namespace stan {
      * @return The constant variable with value 1.0 if the argument's
      * value is greater than or equal to 0.0, and value 0.0 otherwise.
      */
-    inline var step(const stan::agrad::var& a) {
+    inline var step(const stan::diff::var& a) {
       return var(new vari(a.vi_->val_ < 0.0 ? 0.0 : 1.0));
     }
 

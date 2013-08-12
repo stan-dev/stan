@@ -1,12 +1,12 @@
 #include <cmath>
-#include <stan/agrad/rev/matrix/log_sum_exp.hpp>
-#include <test/agrad/util.hpp>
+#include <stan/diff/rev/matrix/log_sum_exp.hpp>
+#include <test/diff/util.hpp>
 #include <gtest/gtest.h>
-#include <stan/agrad.hpp>
+#include <stan/diff.hpp>
 
 using Eigen::Matrix;
 using Eigen::Dynamic;
-using stan::agrad::var;
+using stan::diff::var;
 using std::vector;
 
 template <int R, int C>

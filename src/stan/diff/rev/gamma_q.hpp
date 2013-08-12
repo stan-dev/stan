@@ -1,17 +1,17 @@
-#ifndef __STAN__AGRAD__REV__GAMMA_Q_HPP__
-#define __STAN__AGRAD__REV__GAMMA_Q_HPP__
+#ifndef __STAN__DIFF__REV__GAMMA_Q_HPP__
+#define __STAN__DIFF__REV__GAMMA_Q_HPP__
 
 #include <valarray>
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/op/vv_vari.hpp>
-#include <stan/agrad/rev/op/dv_vari.hpp>
-#include <stan/agrad/rev/op/vd_vari.hpp>
+#include <stan/diff/rev/var.hpp>
+#include <stan/diff/rev/op/vv_vari.hpp>
+#include <stan/diff/rev/op/dv_vari.hpp>
+#include <stan/diff/rev/op/vd_vari.hpp>
 #include <stan/math/functions/gamma_q.hpp>
 #include <boost/math/special_functions/gamma.hpp>
 #include <boost/math/special_functions/digamma.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
 
     namespace {
       class gamma_q_vv_vari : public op_vv_vari {
@@ -88,18 +88,18 @@ namespace stan {
       };
     }
 
-    inline var gamma_q(const stan::agrad::var& a,
-                       const stan::agrad::var& b) {
+    inline var gamma_q(const stan::diff::var& a,
+                       const stan::diff::var& b) {
       return var(new gamma_q_vv_vari(a.vi_,b.vi_));
     }
 
-    inline var gamma_q(const stan::agrad::var& a,
+    inline var gamma_q(const stan::diff::var& a,
                        const double& b) {
       return var(new gamma_q_vd_vari(a.vi_,b));
     }
 
     inline var gamma_q(const double& a,
-                       const stan::agrad::var& b) {
+                       const stan::diff::var& b) {
       return var(new gamma_q_dv_vari(a,b.vi_));
     }
 

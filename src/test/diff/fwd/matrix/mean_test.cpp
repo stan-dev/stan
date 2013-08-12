@@ -1,14 +1,14 @@
 #include <stan/math/matrix/mean.hpp>
 #include <gtest/gtest.h>
 #include <stan/math/matrix/typedefs.hpp>
-#include <stan/agrad/fwd/matrix/typedefs.hpp>
-#include <stan/agrad/fvar.hpp>
+#include <stan/diff/fwd/matrix/typedefs.hpp>
+#include <stan/diff/fvar.hpp>
 
 TEST(AgradFwdMatrix, mean_vector) {
   using stan::math::mean;
   using stan::math::vector_d;
-  using stan::agrad::vector_fv;
-  using stan::agrad::fvar;
+  using stan::diff::vector_fv;
+  using stan::diff::fvar;
 
   vector_d d1(3);
   vector_fv v1(3);
@@ -31,7 +31,7 @@ TEST(AgradFwdMatrix, mean_vector) {
 TEST(AgradFwdMatrix, mean_vector_exception) {
   using stan::math::mean;
   using stan::math::vector_d;
-  using stan::agrad::vector_fv;
+  using stan::diff::vector_fv;
 
   vector_d d;
   vector_fv v;
@@ -41,8 +41,8 @@ TEST(AgradFwdMatrix, mean_vector_exception) {
 TEST(AgradFwdMatrix, mean_rowvector) {
   using stan::math::mean;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fv;
-  using stan::agrad::fvar;
+  using stan::diff::row_vector_fv;
+  using stan::diff::fvar;
 
   row_vector_d d1(3);
   row_vector_fv v1(3);
@@ -65,7 +65,7 @@ TEST(AgradFwdMatrix, mean_rowvector) {
 TEST(AgradFwdMatrix, mean_rowvector_exception) {
   using stan::math::mean;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fv;
+  using stan::diff::row_vector_fv;
 
   row_vector_d d;
   row_vector_fv v;
@@ -75,8 +75,8 @@ TEST(AgradFwdMatrix, mean_rowvector_exception) {
 TEST(AgradFwdMatrix, mean_matrix) {
   using stan::math::mean;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fv;
-  using stan::agrad::fvar;
+  using stan::diff::matrix_fv;
+  using stan::diff::fvar;
 
   matrix_d d1(3,1);
   matrix_fv v1(1,3);
@@ -99,7 +99,7 @@ TEST(AgradFwdMatrix, mean_matrix) {
 TEST(AgradFwdMatrix, mean_matrix_exception) {
   using stan::math::mean;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fv;
+  using stan::diff::matrix_fv;
  
   matrix_d d;
   matrix_fv v;
@@ -108,7 +108,7 @@ TEST(AgradFwdMatrix, mean_matrix_exception) {
 }
 TEST(AgradFwdMatrix, meanStdVector) {
   using stan::math::mean;
-  using stan::agrad::fvar;
+  using stan::diff::fvar;
 
   std::vector<fvar<double> > x(0);
   EXPECT_THROW(mean(x), std::domain_error);

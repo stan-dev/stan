@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
-#include <stan/agrad/fvar.hpp>
+#include <stan/diff/fvar.hpp>
 
 TEST(AgradFvar, sqrt) {
-  using stan::agrad::fvar;
+  using stan::diff::fvar;
   using std::sqrt;
   using std::isnan;
 

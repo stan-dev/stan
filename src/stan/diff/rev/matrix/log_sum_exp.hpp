@@ -1,19 +1,19 @@
-#ifndef __STAN__AGRAD__REV__MATRIX__LOG_SUM_EXP_HPP__
-#define __STAN__AGRAD__REV__MATRIX__LOG_SUM_EXP_HPP__
+#ifndef __STAN__DIFF__REV__MATRIX__LOG_SUM_EXP_HPP__
+#define __STAN__DIFF__REV__MATRIX__LOG_SUM_EXP_HPP__
 
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/calculate_chain.hpp>
-#include <stan/agrad/rev/op/vv_vari.hpp>
-#include <stan/agrad/rev/op/vd_vari.hpp>
-#include <stan/agrad/rev/op/dv_vari.hpp>
-#include <stan/agrad/rev/op/matrix_vari.hpp>
-#include <stan/agrad/rev/operator_greater_than.hpp>
-#include <stan/agrad/rev/operator_not_equal.hpp>
+#include <stan/diff/rev/var.hpp>
+#include <stan/diff/rev/calculate_chain.hpp>
+#include <stan/diff/rev/op/vv_vari.hpp>
+#include <stan/diff/rev/op/vd_vari.hpp>
+#include <stan/diff/rev/op/dv_vari.hpp>
+#include <stan/diff/rev/op/matrix_vari.hpp>
+#include <stan/diff/rev/operator_greater_than.hpp>
+#include <stan/diff/rev/operator_not_equal.hpp>
 #include <stan/math/functions/log_sum_exp.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
 
     namespace {
 

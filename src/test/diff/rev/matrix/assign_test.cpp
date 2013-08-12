@@ -1,11 +1,11 @@
 #include <stan/math/matrix/assign.hpp>
-#include <stan/agrad/matrix.hpp>
-#include <test/agrad/util.hpp>
+#include <stan/diff/matrix.hpp>
+#include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
 
 TEST(MathMatrix,getAssignRowVar) {
-  using stan::agrad::var;
+  using stan::diff::var;
   using Eigen::Matrix;
   using Eigen::Dynamic;
   using stan::math::get_base1_lhs;
@@ -120,7 +120,7 @@ TEST(AgradRevMatrix, assign_error) {
 }
 
 TEST(MathAssign,VarDouble) {
-  using stan::agrad::var;
+  using stan::diff::var;
   using stan::math::assign;
   var x;
   double y = 10.1;

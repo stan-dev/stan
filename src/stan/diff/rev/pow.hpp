@@ -1,16 +1,16 @@
-#ifndef __STAN__AGRAD__REV__POW_HPP__
-#define __STAN__AGRAD__REV__POW_HPP__
+#ifndef __STAN__DIFF__REV__POW_HPP__
+#define __STAN__DIFF__REV__POW_HPP__
 
 #include <cmath>
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/op/vv_vari.hpp>
-#include <stan/agrad/rev/op/vd_vari.hpp>
-#include <stan/agrad/rev/op/dv_vari.hpp>
-#include <stan/agrad/rev/sqrt.hpp>
-#include <stan/agrad/rev/operator_multiplication.hpp>
+#include <stan/diff/rev/var.hpp>
+#include <stan/diff/rev/op/vv_vari.hpp>
+#include <stan/diff/rev/op/vd_vari.hpp>
+#include <stan/diff/rev/op/dv_vari.hpp>
+#include <stan/diff/rev/sqrt.hpp>
+#include <stan/diff/rev/operator_multiplication.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
 
     namespace {
       class pow_vv_vari : public op_vv_vari {

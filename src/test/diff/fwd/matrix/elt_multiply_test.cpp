@@ -1,11 +1,11 @@
 #include <stan/math/matrix/elt_multiply.hpp>
 #include <gtest/gtest.h>
-#include <stan/agrad/fvar.hpp>
-#include <stan/agrad/fwd/matrix/typedefs.hpp>
+#include <stan/diff/fvar.hpp>
+#include <stan/diff/fwd/matrix/typedefs.hpp>
 
 TEST(AgradFwdMatrix,elt_multiply_vec_vv) {
   using stan::math::elt_multiply;
-  using stan::agrad::vector_fv;
+  using stan::diff::vector_fv;
 
   vector_fv x(2);
   x << 2, 5;
@@ -26,7 +26,7 @@ TEST(AgradFwdMatrix,elt_multiply_vec_vv) {
 TEST(AgradFwdMatrix,elt_multiply_vec_vd) {
   using stan::math::elt_multiply;
   using stan::math::vector_d;
-  using stan::agrad::vector_fv;
+  using stan::diff::vector_fv;
 
   vector_fv x(2);
   x << 2, 5;
@@ -44,7 +44,7 @@ TEST(AgradFwdMatrix,elt_multiply_vec_vd) {
 TEST(AgradFwdMatrix,elt_multiply_vec_dv) {
   using stan::math::elt_multiply;
   using stan::math::vector_d;
-  using stan::agrad::vector_fv;
+  using stan::diff::vector_fv;
 
   vector_d x(2);
   x << 2, 5;
@@ -62,7 +62,7 @@ TEST(AgradFwdMatrix,elt_multiply_vec_dv) {
 
 TEST(AgradFwdMatrix,elt_multiply_row_vec_vv) {
   using stan::math::elt_multiply;
-  using stan::agrad::row_vector_fv;
+  using stan::diff::row_vector_fv;
 
   row_vector_fv x(2);
   x << 2, 5;
@@ -82,7 +82,7 @@ TEST(AgradFwdMatrix,elt_multiply_row_vec_vv) {
 TEST(AgradFwdMatrix,elt_multiply_row_vec_vd) {
   using stan::math::elt_multiply;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fv;
+  using stan::diff::row_vector_fv;
 
   row_vector_fv x(2);
   x << 2, 5;
@@ -100,7 +100,7 @@ TEST(AgradFwdMatrix,elt_multiply_row_vec_vd) {
 TEST(AgradFwdMatrix,elt_multiply_row_vec_dv) {
   using stan::math::elt_multiply;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fv;
+  using stan::diff::row_vector_fv;
 
   row_vector_d x(2);
   x << 2, 5;
@@ -118,7 +118,7 @@ TEST(AgradFwdMatrix,elt_multiply_row_vec_dv) {
 
 TEST(AgradFwdMatrix,elt_multiply_matrix_vv) {
   using stan::math::elt_multiply;
-  using stan::agrad::matrix_fv;
+  using stan::diff::matrix_fv;
 
   matrix_fv x(2,3);
   x << 2, 5, 6, 9, 13, 29;
@@ -148,7 +148,7 @@ TEST(AgradFwdMatrix,elt_multiply_matrix_vv) {
 TEST(AgradFwdMatrix,elt_multiply_matrix_vd) {
   using stan::math::elt_multiply;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fv;
+  using stan::diff::matrix_fv;
 
   matrix_fv x(2,3);
   x << 2, 5, 6, 9, 13, 29;
@@ -172,7 +172,7 @@ TEST(AgradFwdMatrix,elt_multiply_matrix_vd) {
 TEST(AgradFwdMatrix,elt_multiply_matrix_dv) {
   using stan::math::elt_multiply;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fv;
+  using stan::diff::matrix_fv;
 
   matrix_d x(2,3);
   x << 2, 5, 6, 9, 13, 29;

@@ -1,11 +1,11 @@
 #include <stan/math/matrix/transpose.hpp>
 #include <gtest/gtest.h>
 #include <stan/math/matrix/typedefs.hpp>
-#include <stan/agrad/fwd/matrix/typedefs.hpp>
+#include <stan/diff/fwd/matrix/typedefs.hpp>
 
 TEST(AgradFwdMatrix,transpose_matrix) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fv;
+  using stan::diff::matrix_fv;
   using stan::math::transpose;
 
   EXPECT_EQ(0,transpose(matrix_fv()).size());
@@ -39,10 +39,10 @@ TEST(AgradFwdMatrix,transpose_matrix) {
 
 }
 TEST(AgradFwdMatrix,transpose_vector) {
-  using stan::agrad::vector_fv;
-  using stan::agrad::row_vector_fv;
+  using stan::diff::vector_fv;
+  using stan::diff::row_vector_fv;
   using stan::math::transpose;
-  using stan::agrad::size_type;
+  using stan::diff::size_type;
 
   vector_fv a(3);
   a << 1.0, 2.0, 3.0;
@@ -59,10 +59,10 @@ TEST(AgradFwdMatrix,transpose_vector) {
   EXPECT_FLOAT_EQ(1.0, a_tr(2).d_);
 }
 TEST(AgradFwdMatrix,transpose_row_vector) {
-  using stan::agrad::vector_fv;
-  using stan::agrad::row_vector_fv;
+  using stan::diff::vector_fv;
+  using stan::diff::row_vector_fv;
   using stan::math::transpose;
-  using stan::agrad::size_type;
+  using stan::diff::size_type;
 
   row_vector_fv a(3);
   a << 1.0, 2.0, 3.0;

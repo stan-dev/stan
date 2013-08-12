@@ -1,14 +1,14 @@
 #include <stan/math/matrix/mdivide_right.hpp>
 #include <gtest/gtest.h>
-#include <test/agrad/util.hpp>
-#include <stan/agrad/rev/var.hpp>
+#include <test/diff/util.hpp>
+#include <stan/diff/rev/var.hpp>
 #include <stan/math/matrix/typedefs.hpp>
-#include <stan/agrad/rev/matrix/typedefs.hpp>
-#include <stan/agrad.hpp>
+#include <stan/diff/rev/matrix/typedefs.hpp>
+#include <stan/diff.hpp>
 
 TEST(AgradRevMatrix,mdivide_right_val) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_v;
+  using stan::diff::matrix_v;
   using stan::math::mdivide_right;
 
   matrix_v Av(2,2);

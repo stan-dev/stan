@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__REV__MATRIX__LDLT_HPP__
-#define __STAN__AGRAD__REV__MATRIX__LDLT_HPP__
+#ifndef __STAN__DIFF__REV__MATRIX__LDLT_HPP__
+#define __STAN__DIFF__REV__MATRIX__LDLT_HPP__
 
 #include <vector>
 #include <boost/type_traits.hpp>
@@ -9,11 +9,11 @@
 #include <stan/math/matrix/validate_multiplicable.hpp>
 #include <stan/math/matrix/validate_square.hpp>
 #include <stan/math/matrix/ldlt.hpp>
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/matrix/typedefs.hpp>
+#include <stan/diff/rev/var.hpp>
+#include <stan/diff/rev/matrix/typedefs.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
     namespace {
       template<int R, int C>
       class LDLT_alloc : public chainable_alloc {
@@ -53,12 +53,12 @@ namespace stan {
 namespace stan {
   namespace math {
     template<int R, int C>
-    class LDLT_factor<stan::agrad::var,R,C> {
+    class LDLT_factor<stan::diff::var,R,C> {
     public:
-      LDLT_factor() : _alloc(new stan::agrad::LDLT_alloc<R,C>()) {}
-      LDLT_factor(const Eigen::Matrix<stan::agrad::var,R,C> &A) : _alloc(new stan::agrad::LDLT_alloc<R,C>(A)) { }
+      LDLT_factor() : _alloc(new stan::diff::LDLT_alloc<R,C>()) {}
+      LDLT_factor(const Eigen::Matrix<stan::diff::var,R,C> &A) : _alloc(new stan::diff::LDLT_alloc<R,C>(A)) { }
       
-      inline void compute(const Eigen::Matrix<stan::agrad::var,R,C> &A) {
+      inline void compute(const Eigen::Matrix<stan::diff::var,R,C> &A) {
         stan::math::validate_square(A,"LDLT_factor<var>::compute");
         _alloc->compute(A);
       }
@@ -83,13 +83,13 @@ namespace stan {
       
       typedef size_t size_type;
 
-      stan::agrad::LDLT_alloc<R,C> *_alloc;
+      stan::diff::LDLT_alloc<R,C> *_alloc;
     };
   }
 }
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
     namespace {
       template<int R,int C>
       class log_det_ldlt_vari : public vari {
@@ -139,9 +139,9 @@ namespace stan {
         : vari(0.0),
         _M(A.rows()),
         _N(B.cols()),
-        _variRefB((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
+        _variRefB((vari**)stan::diff::memalloc_.alloc(sizeof(vari*) 
                                                        * B.rows() * B.cols())),
-        _variRefC((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
+        _variRefC((vari**)stan::diff::memalloc_.alloc(sizeof(vari*) 
                                                        * B.rows() * B.cols())),
         _alloc(new mdivide_left_ldlt_alloc<R1,C1,R2,C2>()),
         _alloc_ldlt(A._alloc)
@@ -204,9 +204,9 @@ namespace stan {
         : vari(0.0),
         _M(A.rows()),
         _N(B.cols()),
-        _variRefB((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
+        _variRefB((vari**)stan::diff::memalloc_.alloc(sizeof(vari*) 
                                                        * B.rows() * B.cols())),
-        _variRefC((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
+        _variRefC((vari**)stan::diff::memalloc_.alloc(sizeof(vari*) 
                                                        * B.rows() * B.cols())),
         _alloc(new mdivide_left_ldlt_alloc<R1,C1,R2,C2>())
         {
@@ -266,7 +266,7 @@ namespace stan {
           : vari(0.0),
             _M(A.rows()),
             _N(B.cols()),
-            _variRefC((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
+            _variRefC((vari**)stan::diff::memalloc_.alloc(sizeof(vari*) 
                                                            * B.rows() * B.cols())),
             _alloc(new mdivide_left_ldlt_alloc<R1,C1,R2,C2>()),
             _alloc_ldlt(A._alloc)

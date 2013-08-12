@@ -1,12 +1,12 @@
-#ifndef __STAN__AGRAD__REV__PHI_HPP__
-#define __STAN__AGRAD__REV__PHI_HPP__
+#ifndef __STAN__DIFF__REV__PHI_HPP__
+#define __STAN__DIFF__REV__PHI_HPP__
 
-#include <stan/agrad/rev/var.hpp>
+#include <stan/diff/rev/var.hpp>
 #include <stan/math/functions/Phi.hpp>
-#include <stan/agrad/rev/op/v_vari.hpp>
+#include <stan/diff/rev/op/v_vari.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
 
     namespace {
       class Phi_vari : public op_v_vari {
@@ -34,7 +34,7 @@ namespace stan {
      * @param a Variable argument.
      * @return The unit normal cdf evaluated at the specified argument.
      */
-    inline var Phi(const stan::agrad::var& a) {
+    inline var Phi(const stan::diff::var& a) {
       return var(new Phi_vari(a.vi_));
     }
 

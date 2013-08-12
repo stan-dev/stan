@@ -1,12 +1,12 @@
 #include <stan/math/matrix/col.hpp>
 #include <gtest/gtest.h>
-#include <stan/agrad/fvar.hpp>
-#include <stan/agrad/fwd/matrix/typedefs.hpp>
+#include <stan/diff/fvar.hpp>
+#include <stan/diff/fwd/matrix/typedefs.hpp>
 
 TEST(AgradFwdMatrix,col_v) {
   using stan::math::col;
-  using stan::agrad::matrix_fv;
-  using stan::agrad::vector_fv;
+  using stan::diff::matrix_fv;
+  using stan::diff::vector_fv;
 
   matrix_fv y(2,3);
   y << 1, 2, 3, 4, 5, 6;
@@ -32,7 +32,7 @@ TEST(AgradFwdMatrix,col_v) {
 }
 TEST(AgradFwdMatrix,col_v_exc0) {
   using stan::math::col;
-  using stan::agrad::matrix_fv;
+  using stan::diff::matrix_fv;
 
   matrix_fv y(2,3);
   y << 1, 2, 3, 4, 5, 6;
@@ -47,7 +47,7 @@ TEST(AgradFwdMatrix,col_v_exc0) {
 }
 TEST(AgradFwdMatrix,col_v_excHigh) {
   using stan::math::col;
-  using stan::agrad::matrix_fv;
+  using stan::diff::matrix_fv;
 
   matrix_fv y(2,3);
   y << 1, 2, 3, 4, 5, 6;

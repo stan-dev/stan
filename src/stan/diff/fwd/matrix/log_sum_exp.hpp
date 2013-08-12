@@ -1,14 +1,14 @@
-#ifndef __STAN__AGRAD__FWD__MATRIX__LOG__SUM__EXP__HPP__
-#define __STAN__AGRAD__FWD__MATRIX__LOG__SUM__EXP__HPP__
+#ifndef __STAN__DIFF__FWD__MATRIX__LOG__SUM__EXP__HPP__
+#define __STAN__DIFF__FWD__MATRIX__LOG__SUM__EXP__HPP__
 
 #include <vector>
-#include <stan/agrad/fwd/fvar.hpp>
+#include <stan/diff/fwd/fvar.hpp>
 #include <stan/math/functions/log_sum_exp.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 
 namespace stan{
 
-  namespace agrad{
+  namespace diff{
 
     // FIXME: cut-and-paste from fwd/log_sum_exp.hpp; should
     // be able to generalize

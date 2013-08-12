@@ -1,12 +1,12 @@
-#include <stan/agrad/rev/matrix/crossprod.hpp>
-#include <stan/agrad/matrix.hpp>
+#include <stan/diff/rev/matrix/crossprod.hpp>
+#include <stan/diff/matrix.hpp>
 #include <gtest/gtest.h>
-#include <test/agrad/util.hpp>
-#include <stan/agrad.hpp>
+#include <test/diff/util.hpp>
+#include <stan/diff.hpp>
 
-void test_crossprod(const stan::agrad::matrix_v& L) {
-  using stan::agrad::matrix_v;
-  using stan::agrad::crossprod;
+void test_crossprod(const stan::diff::matrix_v& L) {
+  using stan::diff::matrix_v;
+  using stan::diff::crossprod;
   matrix_v LLT_eigen = L.transpose() * L;
   matrix_v LLT_stan = crossprod(L);
   EXPECT_EQ(L.rows(),LLT_stan.rows());
@@ -17,7 +17,7 @@ void test_crossprod(const stan::agrad::matrix_v& L) {
 }
 
 TEST(AgradRevMatrix, crossprod) {
-  using stan::agrad::matrix_v;
+  using stan::diff::matrix_v;
 
   matrix_v L(3,3);
   L << 1, 0, 0,

@@ -5,7 +5,7 @@
 
 using std::vector;
 using std::numeric_limits;
-using stan::agrad::var;
+using stan::diff::var;
 
 class AgradCdfGamma : public AgradCdfTest {
 public:
@@ -97,7 +97,7 @@ public:
   cdf_function(const T_y& y, const T_shape& alpha, const T_inv_scale& beta,
                const T3&, const T4&, const T5&, const T6&, const T7&, const T8&,
                const T9&) {
-    using stan::agrad::gamma_p;
+    using stan::diff::gamma_p;
     using boost::math::gamma_p;
 
     return gamma_p(alpha, beta * y);

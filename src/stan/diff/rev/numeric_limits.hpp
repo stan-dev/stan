@@ -1,30 +1,30 @@
-#ifndef __STAN__AGRAD__REV__NUMERIC_LIMITS_HPP__
-#define __STAN__AGRAD__REV__NUMERIC_LIMITS_HPP__
+#ifndef __STAN__DIFF__REV__NUMERIC_LIMITS_HPP__
+#define __STAN__DIFF__REV__NUMERIC_LIMITS_HPP__
 
 #include <limits>
-#include <stan/agrad/rev/var.hpp>
+#include <stan/diff/rev/var.hpp>
 
 namespace std {
 
   /** 
    * Specialization of numeric limits for var objects.
    *
-   * This implementation of std::numeric_limits<stan::agrad::var>
+   * This implementation of std::numeric_limits<stan::diff::var>
    * is used to treat var objects like doubles.
    */
   template<> 
-  struct numeric_limits<stan::agrad::var> {
+  struct numeric_limits<stan::diff::var> {
     static const bool is_specialized = true;
-    static stan::agrad::var min() { return numeric_limits<double>::min(); }
-    static stan::agrad::var max() { return numeric_limits<double>::max(); }
+    static stan::diff::var min() { return numeric_limits<double>::min(); }
+    static stan::diff::var max() { return numeric_limits<double>::max(); }
     static const int digits = numeric_limits<double>::digits;
     static const int digits10 = numeric_limits<double>::digits10;
     static const bool is_signed = numeric_limits<double>::is_signed;
     static const bool is_integer = numeric_limits<double>::is_integer;
     static const bool is_exact = numeric_limits<double>::is_exact;
     static const int radix = numeric_limits<double>::radix;
-    static stan::agrad::var epsilon() { return numeric_limits<double>::epsilon(); }
-    static stan::agrad::var round_error() { return numeric_limits<double>::round_error(); }
+    static stan::diff::var epsilon() { return numeric_limits<double>::epsilon(); }
+    static stan::diff::var round_error() { return numeric_limits<double>::round_error(); }
 
     static const int  min_exponent = numeric_limits<double>::min_exponent;
     static const int  min_exponent10 = numeric_limits<double>::min_exponent10;
@@ -36,10 +36,10 @@ namespace std {
     static const bool has_signaling_NaN = numeric_limits<double>::has_signaling_NaN;
     static const float_denorm_style has_denorm = numeric_limits<double>::has_denorm;
     static const bool has_denorm_loss = numeric_limits<double>::has_denorm_loss;
-    static stan::agrad::var infinity() { return numeric_limits<double>::infinity(); }
-    static stan::agrad::var quiet_NaN() { return numeric_limits<double>::quiet_NaN(); }
-    static stan::agrad::var signaling_NaN() { return numeric_limits<double>::signaling_NaN(); }
-    static stan::agrad::var denorm_min() { return numeric_limits<double>::denorm_min(); }
+    static stan::diff::var infinity() { return numeric_limits<double>::infinity(); }
+    static stan::diff::var quiet_NaN() { return numeric_limits<double>::quiet_NaN(); }
+    static stan::diff::var signaling_NaN() { return numeric_limits<double>::signaling_NaN(); }
+    static stan::diff::var denorm_min() { return numeric_limits<double>::denorm_min(); }
 
     static const bool is_iec559 = numeric_limits<double>::is_iec559;
     static const bool is_bounded = numeric_limits<double>::is_bounded;
@@ -59,7 +59,7 @@ namespace std {
    * @param a Variable to test.
    * @return <code>true</code> if value is not a number.
    */
-  inline int isnan(const stan::agrad::var& a) {
+  inline int isnan(const stan::diff::var& a) {
     return isnan(a.val());
   }
 
@@ -72,7 +72,7 @@ namespace std {
    * @param a Variable to test.
    * @return <code>true</code> if value is infinite.
    */
-  inline int isinf(const stan::agrad::var& a) {
+  inline int isinf(const stan::diff::var& a) {
     return isinf(a.val());
   }
 

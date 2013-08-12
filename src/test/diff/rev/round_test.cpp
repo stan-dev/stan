@@ -1,5 +1,5 @@
-#include <stan/agrad/rev/round.hpp>
-#include <test/agrad/util.hpp>
+#include <stan/diff/rev/round.hpp>
+#include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
 TEST(AgradRev,round) {

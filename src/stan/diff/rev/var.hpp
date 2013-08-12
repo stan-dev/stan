@@ -1,11 +1,11 @@
-#ifndef __STAN__AGRAD__REV__VAR_HPP__
-#define __STAN__AGRAD__REV__VAR_HPP__
+#ifndef __STAN__DIFF__REV__VAR_HPP__
+#define __STAN__DIFF__REV__VAR_HPP__
 
 #include <ostream>
-#include <stan/agrad/rev/vari.hpp>
+#include <stan/diff/rev/vari.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
 
     // forward declare
     static void recover_memory();
@@ -18,11 +18,11 @@ namespace stan {
      * an agenda-based memory manager scoped to a single gradient
      * calculation.
      *
-     * An agrad::var is constructed with a double and used like any
+     * An diff::var is constructed with a double and used like any
      * other scalar.  Arithmetical functions like negation, addition,
      * and subtraction, as well as a range of mathematical functions
      * like exponentiation and powers are overridden to operate on
-     * agrad::var values objects.
+     * diff::var values objects.
      */
     class var {
     public:
@@ -236,7 +236,7 @@ namespace stan {
        */
       void grad(std::vector<var>& x,
                 std::vector<double>& g) {
-        stan::agrad::grad(vi_);
+        stan::diff::grad(vi_);
         g.resize(x.size());
         for (size_t i = 0; i < x.size(); ++i) 
           g[i] = x[i].vi_->adj_;
@@ -252,15 +252,15 @@ namespace stan {
        * <code>free_all()</code> to release resources back to
        * the system rather than saving them for reuse).
        *
-       * Until the next creation of a stan::agrad::var instance, the
+       * Until the next creation of a stan::diff::var instance, the
        * gradient values will be available from an instance <code>x</code>
-       * of <code>stan::agrad::var</code> via <code>x.adj()</code>.
+       * of <code>stan::diff::var</code> via <code>x.adj()</code>.
        * It may be slightly more efficient to do this without the intermediate
        * creation and population of two vectors as done in the two-argument
        * form <code>grad(std::vector<var>&, std::vector<double>&)</code>.
        */
       void grad() {
-        stan::agrad::grad(vi_);
+        stan::diff::grad(vi_);
         recover_memory();
       }
 

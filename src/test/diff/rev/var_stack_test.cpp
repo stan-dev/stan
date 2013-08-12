@@ -1,6 +1,6 @@
-#include <stan/agrad/rev/var_stack.hpp>
-#include <stan/agrad/rev/operator_multiplication.hpp>
-#include <test/agrad/util.hpp>
+#include <stan/diff/rev/var_stack.hpp>
+#include <stan/diff/rev/operator_multiplication.hpp>
+#include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
 TEST(AgradRev,free_memory) {
@@ -14,7 +14,7 @@ TEST(AgradRev,free_memory) {
   f.grad(x,grad_f);
   EXPECT_FLOAT_EQ(-3.0,grad_f[0]);
   EXPECT_FLOAT_EQ(2.0,grad_f[1]);
-  stan::agrad::free_memory();
+  stan::diff::free_memory();
 
   AVAR aa = 2.0;
   AVAR bb = -3.0;

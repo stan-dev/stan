@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
-#include <stan/agrad/fvar.hpp>
+#include <stan/diff/fvar.hpp>
 
 TEST(AgradFvar, fmin) {
-  using stan::agrad::fvar;
-  using stan::agrad::fmin;
+  using stan::diff::fvar;
+  using stan::diff::fmin;
   using std::isnan;
 
   fvar<double> x(2.0);

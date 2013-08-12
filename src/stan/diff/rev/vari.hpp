@@ -1,13 +1,13 @@
-#ifndef __STAN__AGRAD__REV__VARI_HPP__
-#define __STAN__AGRAD__REV__VARI_HPP__
+#ifndef __STAN__DIFF__REV__VARI_HPP__
+#define __STAN__DIFF__REV__VARI_HPP__
 
 #include <ostream>
 
-#include <stan/agrad/rev/var_stack.hpp>
-#include <stan/agrad/rev/chainable.hpp>
+#include <stan/diff/rev/var_stack.hpp>
+#include <stan/diff/rev/chainable.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
     
     // forward declaration of var
     class var;

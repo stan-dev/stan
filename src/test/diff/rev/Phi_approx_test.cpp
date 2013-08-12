@@ -1,11 +1,11 @@
-#include <stan/agrad/rev/Phi_approx.hpp>
-#include <test/agrad/util.hpp>
+#include <stan/diff/rev/Phi_approx.hpp>
+#include <test/diff/util.hpp>
 #include <gtest/gtest.h>
-#include <stan/agrad.hpp>
+#include <stan/diff.hpp>
 #include <stan/math/functions/Phi_approx.hpp>
 
 TEST(AgradRev, Phi_approx) {
-  using stan::agrad::var;
+  using stan::diff::var;
   using std::abs;
   using stan::math::Phi_approx;
 
@@ -17,7 +17,7 @@ TEST(AgradRev, Phi_approx) {
   for (size_t i = 0; i < y_values.size(); i++) {
     var y, phi_y, phi_approx_y;
     y = y_values[i];
-    phi_y = stan::agrad::Phi(y);
+    phi_y = stan::diff::Phi(y);
     phi_approx_y = Phi_approx(y);
     EXPECT_NEAR(phi_y.val(), phi_approx_y.val(), 0.00014);
 

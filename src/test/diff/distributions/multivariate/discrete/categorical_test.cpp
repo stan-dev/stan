@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
-#include <test/agrad/distributions/expect_eq_diffs.hpp>
-#include <stan/agrad.hpp>
+#include <test/diff/distributions/expect_eq_diffs.hpp>
+#include <stan/diff.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/distributions/multivariate/discrete/categorical.hpp>
 
@@ -15,7 +15,7 @@ void expect_propto(unsigned int n1, T_prob theta1,
                   message);
 }
 
-using stan::agrad::var;
+using stan::diff::var;
 using Eigen::Dynamic;
 using Eigen::Matrix;
 

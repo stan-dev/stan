@@ -1,10 +1,10 @@
-#ifndef __STAN__AGRAD__REV__FMAX_HPP__
-#define __STAN__AGRAD__REV__FMAX_HPP__
+#ifndef __STAN__DIFF__REV__FMAX_HPP__
+#define __STAN__DIFF__REV__FMAX_HPP__
 
-#include <stan/agrad/rev/var.hpp>
+#include <stan/diff/rev/var.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
 
     /**
      * Returns the maximum of the two variable arguments (C99).
@@ -23,8 +23,8 @@ namespace stan {
      * @return If the first variable's value is larger than the
      * second's, the first variable, otherwise the second variable.
      */
-    inline var fmax(const stan::agrad::var& a,
-                    const stan::agrad::var& b) {
+    inline var fmax(const stan::diff::var& a,
+                    const stan::diff::var& b) {
       return a.vi_->val_ > b.vi_->val_ ? a : b;
     }
 
@@ -44,7 +44,7 @@ namespace stan {
      * to the second value, the first variable, otherwise the second
      * value promoted to a fresh variable.
      */
-    inline var fmax(const stan::agrad::var& a,
+    inline var fmax(const stan::diff::var& a,
                     const double& b) {
       return a.vi_->val_ >= b ? a : var(b);
     }
@@ -66,7 +66,7 @@ namespace stan {
      * second variable.
      */
     inline var fmax(const double& a,
-                    const stan::agrad::var& b) {
+                    const stan::diff::var& b) {
       return a > b.vi_->val_ ? var(a) : b;
     }
 

@@ -1,15 +1,15 @@
-#ifndef __STAN__AGRAD__FWD__MATRIX__DIVIDE_HPP__
-#define __STAN__AGRAD__FWD__MATRIX__DIVIDE_HPP__
+#ifndef __STAN__DIFF__FWD__MATRIX__DIVIDE_HPP__
+#define __STAN__DIFF__FWD__MATRIX__DIVIDE_HPP__
 
 #include <vector>
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/agrad/fvar.hpp>
-#include <stan/agrad/fwd/operator_division.hpp>
-#include <stan/agrad/fwd/matrix/to_fvar.hpp>
-#include <stan/agrad/fwd/matrix/typedefs.hpp>
+#include <stan/diff/fvar.hpp>
+#include <stan/diff/fwd/operator_division.hpp>
+#include <stan/diff/fwd/matrix/to_fvar.hpp>
+#include <stan/diff/fwd/matrix/typedefs.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
 
     template <typename T1, typename T2>
     inline 

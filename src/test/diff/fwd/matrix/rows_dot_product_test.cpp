@@ -1,10 +1,10 @@
-#include <stan/agrad/fwd/matrix/rows_dot_product.hpp>
+#include <stan/diff/fwd/matrix/rows_dot_product.hpp>
 #include <gtest/gtest.h>
-#include <stan/agrad/fwd/matrix/typedefs.hpp>
+#include <stan/diff/fwd/matrix/typedefs.hpp>
 
 TEST(AgradFwdMatrix, rows_dot_product_vector_vector) {
   using stan::math::vector_d;
-  using stan::agrad::vector_fv;
+  using stan::diff::vector_fv;
 
   vector_d vd_1(3), vd_2(3);
   vector_fv vv_1(3), vv_2(3);
@@ -47,7 +47,7 @@ TEST(AgradFwdMatrix, rows_dot_product_vector_vector) {
 }
 TEST(AgradFwdMatrix, rows_dot_product_vector_vector_exception) {
   using stan::math::vector_d;
-  using stan::agrad::vector_fv;
+  using stan::diff::vector_fv;
 
   vector_d d1(3);
   vector_fv v1(3);
@@ -60,9 +60,9 @@ TEST(AgradFwdMatrix, rows_dot_product_vector_vector_exception) {
 }
 TEST(AgradFwdMatrix, rows_dot_product_rowvector_vector) {
   using stan::math::vector_d;
-  using stan::agrad::vector_fv;
+  using stan::diff::vector_fv;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fv;
+  using stan::diff::row_vector_fv;
 
   row_vector_d d1(3);
   row_vector_fv v1(3);
@@ -75,9 +75,9 @@ TEST(AgradFwdMatrix, rows_dot_product_rowvector_vector) {
 } 
 TEST(AgradFwdMatrix, rows_dot_product_vector_rowvector) {
   using stan::math::vector_d;
-  using stan::agrad::vector_fv;
+  using stan::diff::vector_fv;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fv;
+  using stan::diff::row_vector_fv;
 
   vector_d d1(3);
   vector_fv v1(3);
@@ -90,7 +90,7 @@ TEST(AgradFwdMatrix, rows_dot_product_vector_rowvector) {
 } 
 TEST(AgradFwdMatrix, rows_dot_product_rowvector_rowvector) {
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_fv;
+  using stan::diff::row_vector_fv;
 
   row_vector_d d1(3), d2(3);
   row_vector_fv v1(3), v2(3);
@@ -121,8 +121,8 @@ TEST(AgradFwdMatrix, rows_dot_product_rowvector_rowvector) {
 }
 TEST(AgradFwdMatrix, rows_dot_product_matrix_matrix) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fv;
-  using stan::agrad::vector_fv;
+  using stan::diff::matrix_fv;
+  using stan::diff::vector_fv;
 
   matrix_d d1(3,3), d2(3,3);
   matrix_fv v1(3,3), v2(3,3);
@@ -177,8 +177,8 @@ TEST(AgradFwdMatrix, rows_dot_product_matrix_matrix) {
 }
 TEST(AgradFwdMatrix, rows_dot_product_matrix_matrix_exception) {
   using stan::math::matrix_d;
-  using stan::agrad::matrix_fv;
-  using stan::agrad::rows_dot_product;
+  using stan::diff::matrix_fv;
+  using stan::diff::rows_dot_product;
 
   matrix_d d1(3,3);
   matrix_d d2(3,2);

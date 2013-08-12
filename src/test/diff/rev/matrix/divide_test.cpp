@@ -1,10 +1,10 @@
-#include <stan/agrad/rev/matrix/divide.hpp>
+#include <stan/diff/rev/matrix/divide.hpp>
 #include <gtest/gtest.h>
-#include <test/agrad/util.hpp>
+#include <test/diff/util.hpp>
 #include <stan/math/matrix/divide.hpp>
 
 TEST(AgradRevMatrix, divide_scalar) {
-  using stan::agrad::divide;
+  using stan::diff::divide;
   double d1, d2;
   AVAR   v1, v2;
 
@@ -36,7 +36,7 @@ TEST(AgradRevMatrix, divide_scalar) {
 TEST(AgradRevMatrix, divide_vector) {
   using stan::math::divide;
   using stan::math::vector_d;
-  using stan::agrad::vector_v;
+  using stan::diff::vector_v;
 
   vector_d d1(3);
   vector_v v1(3);
@@ -96,7 +96,7 @@ TEST(AgradRevMatrix, divide_vector) {
 TEST(AgradRevMatrix, divide_rowvector) {
   using stan::math::divide;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_v;
+  using stan::diff::row_vector_v;
 
   row_vector_d d1(3);
   row_vector_v v1(3);
@@ -154,7 +154,7 @@ TEST(AgradRevMatrix, divide_rowvector) {
 TEST(AgradRevMatrix, divide_matrix) {
   using stan::math::divide;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_v;
+  using stan::diff::matrix_v;
 
   matrix_d d1(2,2);
   matrix_v v1(2,2);

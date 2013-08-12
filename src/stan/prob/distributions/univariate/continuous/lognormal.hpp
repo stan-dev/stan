@@ -4,7 +4,7 @@
 #include <boost/random/lognormal_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
 
-#include <stan/agrad.hpp>
+#include <stan/diff.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/functions/value_of.hpp>
 #include <stan/math/functions/square.hpp>
@@ -72,7 +72,7 @@ namespace stan {
         if (value_of(y_vec[n]) <= 0)
           return LOG_ZERO;
       
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale> 
+      diff::OperandsAndPartials<T_y, T_loc, T_scale> 
         operands_and_partials(y, mu, sigma);
  
       using stan::math::square;
@@ -185,7 +185,7 @@ namespace stan {
       if (!check_positive(function, sigma, "Scale parameter", &cdf))
         return cdf;
 
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale> 
+      diff::OperandsAndPartials<T_y, T_loc, T_scale> 
         operands_and_partials(y, mu, sigma);
 
       VectorView<const T_y> y_vec(y);
@@ -266,7 +266,7 @@ namespace stan {
       if (!check_positive(function, sigma, "Scale parameter", &cdf_log))
         return cdf_log;
 
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale> 
+      diff::OperandsAndPartials<T_y, T_loc, T_scale> 
         operands_and_partials(y, mu, sigma);
 
       VectorView<const T_y> y_vec(y);
@@ -339,7 +339,7 @@ namespace stan {
       if (!check_positive(function, sigma, "Scale parameter", &ccdf_log))
         return ccdf_log;
 
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale> 
+      diff::OperandsAndPartials<T_y, T_loc, T_scale> 
         operands_and_partials(y, mu, sigma);
 
       VectorView<const T_y> y_vec(y);

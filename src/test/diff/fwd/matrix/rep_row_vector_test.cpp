@@ -1,12 +1,12 @@
 #include <gtest/gtest.h>
 #include <stan/math/rep_row_vector.hpp>
-#include <stan/agrad/fwd/matrix/typedefs.hpp>
-#include <stan/agrad/fwd/fvar.hpp>
+#include <stan/diff/fwd/matrix/typedefs.hpp>
+#include <stan/diff/fwd/fvar.hpp>
 
 TEST(AgradFwdMatrix,rep_rowvector) {
   using stan::math::rep_row_vector;
-  using stan::agrad::row_vector_fv;
-  using stan::agrad::fvar;
+  using stan::diff::row_vector_fv;
+  using stan::diff::fvar;
   fvar<double> a;
   a.val_ = 3.0;
   a.d_ = 2.0;
@@ -25,8 +25,8 @@ TEST(AgradFwdMatrix,rep_rowvector) {
 
 TEST(AgradFwdMatrix,rep_rowvector_exception) {
   using stan::math::rep_row_vector;
-  using stan::agrad::row_vector_fv;
-  using stan::agrad::fvar;
+  using stan::diff::row_vector_fv;
+  using stan::diff::fvar;
   fvar<double> a;
   a.val_ = 3.0;
   a.d_ = 2.0;

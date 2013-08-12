@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
-#include <stan/agrad/fvar.hpp>
+#include <stan/diff/fvar.hpp>
 
 TEST(AgradFvar, trunc) {
-  using stan::agrad::fvar;
+  using stan::diff::fvar;
   using boost::math::trunc;
 
   fvar<double> x(0.5);

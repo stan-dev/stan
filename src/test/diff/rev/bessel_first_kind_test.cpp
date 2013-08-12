@@ -1,11 +1,11 @@
-#include <stan/agrad/rev/bessel_first_kind.hpp>
-#include <test/agrad/util.hpp>
+#include <stan/diff/rev/bessel_first_kind.hpp>
+#include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
 TEST(AgradRev,bessel_first_kind_int_var) {
   int a(0);
   AVAR b(4.0);
-  AVAR f = stan::agrad::bessel_first_kind(a,b);
+  AVAR f = stan::diff::bessel_first_kind(a,b);
   EXPECT_FLOAT_EQ(-0.39714980986384737228659076845169804197561868528938,f.val());
 
   AVEC x = createAVEC(a,b);
@@ -16,7 +16,7 @@ TEST(AgradRev,bessel_first_kind_int_var) {
 
   a = 1;
   b = -3.0;
-  f = stan::agrad::bessel_first_kind(a,b);
+  f = stan::diff::bessel_first_kind(a,b);
 
   EXPECT_FLOAT_EQ(-0.33905895852593645892551459720647889697308041819800,
                   f.val());

@@ -1,7 +1,7 @@
-#ifndef __STAN__AGRAD__FWD__LOG1M__EXP__HPP__
-#define __STAN__AGRAD__FWD__LOG1M__EXP__HPP__
+#ifndef __STAN__DIFF__FWD__LOG1M__EXP__HPP__
+#define __STAN__DIFF__FWD__LOG1M__EXP__HPP__
 
-#include <stan/agrad/fwd/fvar.hpp>
+#include <stan/diff/fwd/fvar.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/math/functions/log1m_exp.hpp>
 #include <boost/math/special_functions/expm1.hpp>
@@ -9,7 +9,7 @@
 
 namespace stan{
 
-  namespace agrad{
+  namespace diff{
 
     template <typename T>
     inline

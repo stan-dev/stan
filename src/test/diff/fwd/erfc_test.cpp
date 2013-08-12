@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
-#include <stan/agrad/fvar.hpp>
+#include <stan/diff/fvar.hpp>
 #include <boost/math/special_functions/erf.hpp>
 
 TEST(AgradFvar, erfc){
-  using stan::agrad::fvar;
+  using stan::diff::fvar;
   using std::exp;
   using std::sqrt;
   using boost::math::erfc;

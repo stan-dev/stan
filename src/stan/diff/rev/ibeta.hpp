@@ -1,20 +1,20 @@
-#ifndef __STAN__AGRAD__REV__IBETA_HPP__
-#define __STAN__AGRAD__REV__IBETA_HPP__
+#ifndef __STAN__DIFF__REV__IBETA_HPP__
+#define __STAN__DIFF__REV__IBETA_HPP__
 
 #include <boost/math/special_functions/digamma.hpp>
 #include <boost/math/special_functions/gamma.hpp>
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/op/vvv_vari.hpp>
-#include <stan/agrad/rev/op/vvd_vari.hpp>
-#include <stan/agrad/rev/op/vdv_vari.hpp>
-#include <stan/agrad/rev/op/vdd_vari.hpp>
-#include <stan/agrad/rev/op/dvv_vari.hpp>
-#include <stan/agrad/rev/op/dvd_vari.hpp>
-#include <stan/agrad/rev/op/ddv_vari.hpp>
+#include <stan/diff/rev/var.hpp>
+#include <stan/diff/rev/op/vvv_vari.hpp>
+#include <stan/diff/rev/op/vvd_vari.hpp>
+#include <stan/diff/rev/op/vdv_vari.hpp>
+#include <stan/diff/rev/op/vdd_vari.hpp>
+#include <stan/diff/rev/op/dvv_vari.hpp>
+#include <stan/diff/rev/op/dvd_vari.hpp>
+#include <stan/diff/rev/op/ddv_vari.hpp>
 #include <stan/math/functions/ibeta.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
     
     namespace {
       /**
@@ -53,7 +53,7 @@ namespace stan {
           using boost::math::tgamma;
           using boost::math::digamma;
           using boost::math::ibeta;
-          using stan::agrad::ibeta_hypergeometric_helper;
+          using stan::diff::ibeta_hypergeometric_helper;
           avi_->adj_ += adj_ *
             (log(c) - digamma(a) + digamma(a+b)) * val_ - 
             tgamma(a)*tgamma(a+b)/tgamma(b) * pow(c,a) / tgamma(1+a) / tgamma(1+a) * ibeta_hypergeometric_helper(a, 1-b, c);
@@ -81,7 +81,7 @@ namespace stan {
           using boost::math::tgamma;
           using boost::math::digamma;
           using boost::math::ibeta;
-          using stan::agrad::ibeta_hypergeometric_helper;
+          using stan::diff::ibeta_hypergeometric_helper;
           avi_->adj_ += adj_ *
             (log(c) - digamma(a) + digamma(a+b)) * val_ - 
             tgamma(a)*tgamma(a+b)/tgamma(b) * pow(c,a) / tgamma(1+a) / tgamma(1+a) * ibeta_hypergeometric_helper(a, 1-b, c);
@@ -107,7 +107,7 @@ namespace stan {
           using boost::math::tgamma;
           using boost::math::digamma;
           using boost::math::ibeta;
-          using stan::agrad::ibeta_hypergeometric_helper;
+          using stan::diff::ibeta_hypergeometric_helper;
           avi_->adj_ += adj_ *
             (log(c) - digamma(a) + digamma(a+b)) * val_ - 
             tgamma(a)*tgamma(a+b)/tgamma(b) * pow(c,a) / tgamma(1+a) / tgamma(1+a) * ibeta_hypergeometric_helper(a, 1-b, c);
@@ -132,7 +132,7 @@ namespace stan {
           using boost::math::tgamma;
           using boost::math::digamma;
           using boost::math::ibeta;
-          using stan::agrad::ibeta_hypergeometric_helper;
+          using stan::diff::ibeta_hypergeometric_helper;
           avi_->adj_ += adj_ *
             (log(c) - digamma(a) + digamma(a+b)) * val_ - 
             tgamma(a)*tgamma(a+b)/tgamma(b) * pow(c,a) / tgamma(1+a) / tgamma(1+a) * ibeta_hypergeometric_helper(a, 1-b, c);
@@ -155,7 +155,7 @@ namespace stan {
           using boost::math::tgamma;
           using boost::math::digamma;
           using boost::math::ibeta;
-          using stan::agrad::ibeta_hypergeometric_helper;
+          using stan::diff::ibeta_hypergeometric_helper;
           bvi_->adj_ += adj_ * 
             (tgamma(b)*tgamma(a+b)/tgamma(a)*pow(1-c,b) * ibeta_hypergeometric_helper(b,1-a,1-c)/tgamma(b+1)/tgamma(b+1)
              + ibeta(b, a, 1-c) * (digamma(b) - digamma(a+b) - log(1-c)));
@@ -180,7 +180,7 @@ namespace stan {
           using boost::math::tgamma;
           using boost::math::digamma;
           using boost::math::ibeta;
-          using stan::agrad::ibeta_hypergeometric_helper;
+          using stan::diff::ibeta_hypergeometric_helper;
           bvi_->adj_ += adj_ * 
             (tgamma(b)*tgamma(a+b)/tgamma(a)*pow(1-c,b) * ibeta_hypergeometric_helper(b,1-a,1-c)/tgamma(b+1)/tgamma(b+1)
              + ibeta(b, a, 1-c) * (digamma(b) - digamma(a+b) - log(1-c)));

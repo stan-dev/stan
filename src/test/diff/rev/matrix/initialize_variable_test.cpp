@@ -1,9 +1,9 @@
-#include <stan/agrad/rev/matrix/initialize_variable.hpp>
+#include <stan/diff/rev/matrix/initialize_variable.hpp>
 #include <gtest/gtest.h>
-#include <test/agrad/util.hpp>
+#include <test/diff/util.hpp>
 
 TEST(AgradRevMatrix, initializeVariable) {
-  using stan::agrad::initialize_variable;
+  using stan::diff::initialize_variable;
   using std::vector;
 
   using Eigen::Matrix;

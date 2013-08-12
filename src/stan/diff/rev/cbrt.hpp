@@ -1,12 +1,12 @@
-#ifndef __STAN__AGRAD__REV__CBRT_HPP__
-#define __STAN__AGRAD__REV__CBRT_HPP__
+#ifndef __STAN__DIFF__REV__CBRT_HPP__
+#define __STAN__DIFF__REV__CBRT_HPP__
 
 #include <boost/math/special_functions/cbrt.hpp>
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/op/v_vari.hpp>
+#include <stan/diff/rev/var.hpp>
+#include <stan/diff/rev/op/v_vari.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
 
     namespace {
       class cbrt_vari : public op_v_vari {
@@ -32,7 +32,7 @@ namespace stan {
      * @param a Specified variable.
      * @return Cube root of the variable.
      */
-    inline var cbrt(const stan::agrad::var& a) {
+    inline var cbrt(const stan::diff::var& a) {
       return var(new cbrt_vari(a.vi_));
     }
 

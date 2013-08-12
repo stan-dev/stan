@@ -1,14 +1,14 @@
 #include <stan/math/matrix/sd.hpp>
 #include <gtest/gtest.h>
-#include <test/agrad/util.hpp>
+#include <test/diff/util.hpp>
 #include <stan/math/matrix/typedefs.hpp>
-#include <stan/agrad/rev/matrix/typedefs.hpp>
-#include <stan/agrad.hpp>
+#include <stan/diff/rev/matrix/typedefs.hpp>
+#include <stan/diff.hpp>
 
 TEST(AgradRevMatrix, sd_vector) {
   using stan::math::sd;
   using stan::math::vector_d;
-  using stan::agrad::vector_v;
+  using stan::diff::vector_v;
 
   vector_d v(1);
   v << 1.0;
@@ -32,7 +32,7 @@ TEST(AgradRevMatrix, sd_vector) {
 TEST(AgradRevMatrix, sd_vector_exception) {
   using stan::math::sd;
   using stan::math::vector_d;
-  using stan::agrad::vector_v;
+  using stan::diff::vector_v;
 
   vector_d d1;
   vector_v v1;
@@ -42,7 +42,7 @@ TEST(AgradRevMatrix, sd_vector_exception) {
 TEST(AgradRevMatrix, sd_rowvector) {
   using stan::math::sd;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_v;
+  using stan::diff::row_vector_v;
 
   row_vector_d v(1);
   v << 1.0;
@@ -67,7 +67,7 @@ TEST(AgradRevMatrix, sd_rowvector) {
 TEST(AgradRevMatrix, sd_rowvector_exception) {
   using stan::math::sd;
   using stan::math::row_vector_d;
-  using stan::agrad::row_vector_v;
+  using stan::diff::row_vector_v;
 
   row_vector_d d;
   row_vector_v v;
@@ -78,7 +78,7 @@ TEST(AgradRevMatrix, sd_rowvector_exception) {
 TEST(AgradRevMatrix, sd_matrix) {
   using stan::math::sd;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_v;
+  using stan::diff::matrix_v;
 
   matrix_d v(1,1);
   v << 1.0;
@@ -101,7 +101,7 @@ TEST(AgradRevMatrix, sd_matrix) {
 TEST(AgradRevMatrix, sd_matrix_exception) {
   using stan::math::sd;
   using stan::math::matrix_d;
-  using stan::agrad::matrix_v;
+  using stan::diff::matrix_v;
 
   matrix_d d;
   matrix_v v;

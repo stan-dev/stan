@@ -13,7 +13,7 @@
 #include <boost/exception/all.hpp>
 #include <boost/random/linear_congruential.hpp>
 
-#include <stan/agrad.hpp>
+#include <stan/diff.hpp>
 #include <stan/gm/command.hpp>
 #include <stan/io/cmd_line.hpp>
 #include <stan/io/dump.hpp>

@@ -1,11 +1,11 @@
-#ifndef __STAN__AGRAD__REV__VAR_STACK_HPP__
-#define __STAN__AGRAD__REV__VAR_STACK_HPP__
+#ifndef __STAN__DIFF__REV__VAR_STACK_HPP__
+#define __STAN__DIFF__REV__VAR_STACK_HPP__
 
 #include <vector>
 #include <stan/memory/stack_alloc.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
 
     // forward declaration of chainable
     class chainable;

@@ -1,5 +1,5 @@
-#include <stan/agrad/rev/ceil.hpp>
-#include <test/agrad/util.hpp>
+#include <stan/diff/rev/ceil.hpp>
+#include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
 TEST(AgradRev,ceil_var) {

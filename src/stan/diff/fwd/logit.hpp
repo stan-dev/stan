@@ -1,14 +1,14 @@
-#ifndef __STAN__AGRAD__FWD__LOGIT__HPP__
-#define __STAN__AGRAD__FWD__LOGIT__HPP__
+#ifndef __STAN__DIFF__FWD__LOGIT__HPP__
+#define __STAN__DIFF__FWD__LOGIT__HPP__
 
-#include <stan/agrad/fwd/fvar.hpp>
+#include <stan/diff/fwd/fvar.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/math/functions/logit.hpp>
 #include <stan/math/constants.hpp>
 
 namespace stan{
 
-  namespace agrad{
+  namespace diff{
 
     template <typename T>
     inline

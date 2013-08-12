@@ -1,10 +1,10 @@
-#include <stan/agrad/rev/owens_t.hpp>
-#include <test/agrad/util.hpp>
+#include <stan/diff/rev/owens_t.hpp>
+#include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
 TEST(AgradSpecialFunctions,owens_t_vv) {
-  using stan::agrad::var;
-  using stan::agrad::owens_t;
+  using stan::diff::var;
+  using stan::diff::owens_t;
   using boost::math::owens_t;
 
   var h = 1.0;
@@ -19,8 +19,8 @@ TEST(AgradSpecialFunctions,owens_t_vv) {
   EXPECT_FLOAT_EQ(-0.1154804963,grad_f[0]);
 }
 TEST(AgradSpecialFunctions,owens_t_vd) {
-  using stan::agrad::var;
-  using stan::agrad::owens_t;
+  using stan::diff::var;
+  using stan::diff::owens_t;
   using boost::math::owens_t;
 
   AVAR h = 1.0;
@@ -35,8 +35,8 @@ TEST(AgradSpecialFunctions,owens_t_vd) {
   EXPECT_FLOAT_EQ(-0.1154804963,grad_f[0]);
 }
 TEST(AgradSpecialFunctions,owens_t_dv) {
-  using stan::agrad::var;
-  using stan::agrad::owens_t;
+  using stan::diff::var;
+  using stan::diff::owens_t;
   using boost::math::owens_t;
 
   double h = 1.0;

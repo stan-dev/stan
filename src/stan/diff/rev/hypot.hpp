@@ -1,14 +1,14 @@
-#ifndef __STAN__AGRAD__REV__HYPOT_HPP__
-#define __STAN__AGRAD__REV__HYPOT_HPP__
+#ifndef __STAN__DIFF__REV__HYPOT_HPP__
+#define __STAN__DIFF__REV__HYPOT_HPP__
 
 #include <valarray>
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/op/vv_vari.hpp>
-#include <stan/agrad/rev/op/v_vari.hpp>
+#include <stan/diff/rev/var.hpp>
+#include <stan/diff/rev/op/vv_vari.hpp>
+#include <stan/diff/rev/op/v_vari.hpp>
 #include <boost/math/special_functions/hypot.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
 
     namespace {
       class hypot_vv_vari : public op_vv_vari {
@@ -51,8 +51,8 @@ namespace stan {
      * @param b Length of second side.
      * @return Length of hypoteneuse.
      */
-    inline var hypot(const stan::agrad::var& a,
-                     const stan::agrad::var& b) {
+    inline var hypot(const stan::diff::var& a,
+                     const stan::diff::var& b) {
       return var(new hypot_vv_vari(a.vi_,b.vi_));
     }
 
@@ -70,7 +70,7 @@ namespace stan {
      * @param b Length of second side.
      * @return Length of hypoteneuse.
      */
-    inline var hypot(const stan::agrad::var& a,
+    inline var hypot(const stan::diff::var& a,
                      const double& b) {
       return var(new hypot_vd_vari(a.vi_,b));
     }
@@ -90,7 +90,7 @@ namespace stan {
      * @return Length of hypoteneuse.
      */
     inline var hypot(const double& a,
-                     const stan::agrad::var& b) {
+                     const stan::diff::var& b) {
       return var(new hypot_vd_vari(b.vi_,a));
     }
 

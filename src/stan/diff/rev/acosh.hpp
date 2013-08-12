@@ -1,13 +1,13 @@
-#ifndef __STAN__AGRAD__REV__ACOSH_HPP__
-#define __STAN__AGRAD__REV__ACOSH_HPP__
+#ifndef __STAN__DIFF__REV__ACOSH_HPP__
+#define __STAN__DIFF__REV__ACOSH_HPP__
 
 #include <valarray>
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/op/v_vari.hpp>
+#include <stan/diff/rev/var.hpp>
+#include <stan/diff/rev/op/v_vari.hpp>
 #include <boost/math/special_functions/acosh.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
 
     namespace {
       class acosh_vari : public op_v_vari {
@@ -33,7 +33,7 @@ namespace stan {
      * @param a The variable.
      * @return Inverse hyperbolic cosine of the variable.
      */
-    inline var acosh(const stan::agrad::var& a) {
+    inline var acosh(const stan::diff::var& a) {
       return var(new acosh_vari(a.vi_));
     }
 

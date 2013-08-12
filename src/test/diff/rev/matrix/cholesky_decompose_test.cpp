@@ -1,11 +1,11 @@
 #include <stan/math/matrix/inverse.hpp>
 #include <gtest/gtest.h>
-#include <test/agrad/util.hpp>
-#include <stan/agrad.hpp>
-#include <stan/agrad/matrix.hpp>
+#include <test/diff/util.hpp>
+#include <stan/diff.hpp>
+#include <stan/diff/matrix.hpp>
 
 TEST(AgradRevMatrix,mat_cholesky) {
-  using stan::agrad::matrix_v;
+  using stan::diff::matrix_v;
   using stan::math::transpose;
   using stan::math::cholesky_decompose;
   using stan::math::singular_values;

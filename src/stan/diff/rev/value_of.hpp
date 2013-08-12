@@ -1,10 +1,10 @@
-#ifndef __STAN__AGRAD__REV__VALUE_OF_HPP__
-#define __STAN__AGRAD__REV__VALUE_OF_HPP__
+#ifndef __STAN__DIFF__REV__VALUE_OF_HPP__
+#define __STAN__DIFF__REV__VALUE_OF_HPP__
 
-#include <stan/agrad/rev/var.hpp>
+#include <stan/diff/rev/var.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
 
     /**
      * Return the value of the specified variable.  
@@ -13,13 +13,13 @@ namespace stan {
      * with <code>stan::math::value_of(T x)</code> to extract the
      * <code>double</code> value of either a scalar or an auto-dif
      * variable.  This function will be called when the argument is a
-     * <code>stan::agrad::var</code> even if the function is not
+     * <code>stan::diff::var</code> even if the function is not
      * referred to by namespace because of argument-dependent lookup.
      *
      * @param v Variable.
      * @return Value of variable.
      */
-    inline double value_of(const agrad::var& v) {
+    inline double value_of(const diff::var& v) {
       return v.vi_->val_;
     }
     

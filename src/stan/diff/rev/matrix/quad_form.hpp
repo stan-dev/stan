@@ -1,20 +1,20 @@
-#ifndef __STAN__AGRAD__REV__MATRIX__QUAD_FORM_HPP__
-#define __STAN__AGRAD__REV__MATRIX__QUAD_FORM_HPP__
+#ifndef __STAN__DIFF__REV__MATRIX__QUAD_FORM_HPP__
+#define __STAN__DIFF__REV__MATRIX__QUAD_FORM_HPP__
 
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/typedefs.hpp>
-#include <stan/agrad/var.hpp>
-#include <stan/agrad/rev/matrix/typedefs.hpp>
-#include <stan/agrad/rev/matrix/value_of.hpp>
+#include <stan/diff/var.hpp>
+#include <stan/diff/rev/matrix/typedefs.hpp>
+#include <stan/diff/rev/matrix/value_of.hpp>
 #include <stan/math/matrix/quad_form.hpp>
 #include <stan/math/matrix/validate_multiplicable.hpp>
 #include <stan/math/matrix/validate_square.hpp>
 #include <stan/math/matrix/validate_symmetric.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
     namespace {
       template<typename TA,int RA,int CA,typename TB,int RB,int CB>
       class quad_form_vari_alloc : public chainable_alloc {

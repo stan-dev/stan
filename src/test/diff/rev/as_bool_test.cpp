@@ -1,11 +1,11 @@
-#include <stan/agrad/rev/as_bool.hpp>
-#include <test/agrad/util.hpp>
+#include <stan/diff/rev/as_bool.hpp>
+#include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 #include <stan/math/functions/as_bool.hpp>
 
 TEST(AgradRev,asBool) {
   using stan::math::as_bool;
-  using stan::agrad::var;
+  using stan::diff::var;
 
   EXPECT_TRUE(as_bool(var(1)));
   EXPECT_TRUE(as_bool(var(-10L)));

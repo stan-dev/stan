@@ -1,13 +1,13 @@
 #include <stan/math/matrix/inverse.hpp>
 #include <gtest/gtest.h>
-#include <test/agrad/util.hpp>
-#include <stan/agrad.hpp>
-#include <stan/agrad/matrix.hpp>
+#include <test/diff/util.hpp>
+#include <stan/diff.hpp>
+#include <stan/diff/matrix.hpp>
 
 TEST(AgradRevMatrix,eigenval_sum) {
   using stan::math::sum;
-  using stan::agrad::matrix_v;
-  using stan::agrad::vector_v;
+  using stan::diff::matrix_v;
+  using stan::diff::vector_v;
   using stan::math::eigenvalues_sym;
 
   matrix_v a(3,3);

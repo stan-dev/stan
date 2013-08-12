@@ -1,10 +1,10 @@
-#ifndef __STAN__AGRAD__REV__OPERATOR_GREATER_THAN_OR_EQUAL_HPP__
-#define __STAN__AGRAD__REV__OPERATOR_GREATER_THAN_OR_EQUAL_HPP__
+#ifndef __STAN__DIFF__REV__OPERATOR_GREATER_THAN_OR_EQUAL_HPP__
+#define __STAN__DIFF__REV__OPERATOR_GREATER_THAN_OR_EQUAL_HPP__
 
-#include <stan/agrad/rev/var.hpp>
+#include <stan/diff/rev/var.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
 
     /**
      * Greater than or equal operator comparing two variables' values

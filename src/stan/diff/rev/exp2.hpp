@@ -1,13 +1,13 @@
-#ifndef __STAN__AGRAD__REV__EXP2_HPP__
-#define __STAN__AGRAD__REV__EXP2_HPP__
+#ifndef __STAN__DIFF__REV__EXP2_HPP__
+#define __STAN__DIFF__REV__EXP2_HPP__
 
 #include <valarray>
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/op/v_vari.hpp>
+#include <stan/diff/rev/var.hpp>
+#include <stan/diff/rev/op/v_vari.hpp>
 #include <stan/math/constants.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
 
     namespace {
       class exp2_vari : public op_v_vari {
@@ -33,7 +33,7 @@ namespace stan {
      * @param a The variable.
      * @return Two to the power of the specified variable.
      */
-    inline var exp2(const stan::agrad::var& a) {
+    inline var exp2(const stan::diff::var& a) {
       return var(new exp2_vari(a.vi_));
     }
 

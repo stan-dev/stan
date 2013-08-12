@@ -1,10 +1,10 @@
 #include <gtest/gtest.h>
-#include <stan/agrad/fvar.hpp>
+#include <stan/diff/fvar.hpp>
 #include <boost/math/special_functions/digamma.hpp>
 #include <stan/math/functions/binomial_coefficient_log.hpp>
 
 TEST(AgradFvar, binom_coeff_log) {
-  using stan::agrad::fvar;
+  using stan::diff::fvar;
   using stan::math::binomial_coefficient_log;
   using boost::math::digamma;
 
@@ -13,7 +13,7 @@ TEST(AgradFvar, binom_coeff_log) {
   fvar<double> y(1002.0);
   y.d_ = 2.0;
 
-  fvar<double> a = stan::agrad::binomial_coefficient_log(x, y);
+  fvar<double> a = stan::diff::binomial_coefficient_log(x, y);
   EXPECT_FLOAT_EQ(binomial_coefficient_log(2004.0, 1002.0), a.val_);
   EXPECT_FLOAT_EQ(2.0 * log(2004.0 - 1002.0) + (1002.0 * (1.0 - 2.0))
                   / (2004.0 - 1002.0) + 1.0 * log(2004.0 / (2004.0 - 1002.0))
@@ -26,7 +26,7 @@ TEST(AgradFvar, binom_coeff_log) {
 
   double z = 1003.0;
 
-  a = stan::agrad::binomial_coefficient_log(x, z);
+  a = stan::diff::binomial_coefficient_log(x, z);
   EXPECT_FLOAT_EQ(binomial_coefficient_log(2004.0, 1003.0), a.val_);
   EXPECT_FLOAT_EQ(0 * log(2004.0 - 1003.0) + (1003.0
                   * (1.0 - 0)) / (2004.0 - 1003.0) + 1.0 * log(2004.0 
@@ -39,7 +39,7 @@ TEST(AgradFvar, binom_coeff_log) {
 
   double w = 2006.0;
 
-  a = stan::agrad::binomial_coefficient_log(w, y);
+  a = stan::diff::binomial_coefficient_log(w, y);
 
   EXPECT_FLOAT_EQ(binomial_coefficient_log(2006.0, 1002.0), a.val_);
   EXPECT_FLOAT_EQ(2.0 * log(1004.0) + 1002.0 * -2.0 / 1004.0 

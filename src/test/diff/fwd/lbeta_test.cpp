@@ -1,10 +1,10 @@
 #include <gtest/gtest.h>
-#include <stan/agrad/fvar.hpp>
+#include <stan/diff/fvar.hpp>
 #include <boost/math/special_functions/digamma.hpp>
 #include <stan/math/functions/lbeta.hpp>
 
 TEST(AgradFvar, lbeta) {
-  using stan::agrad::fvar;
+  using stan::diff::fvar;
   using boost::math::tgamma;
   using stan::math::lbeta;
 

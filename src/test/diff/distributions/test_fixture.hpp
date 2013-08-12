@@ -1,17 +1,17 @@
-#ifndef __TEST__AGRAD__DISTRIBUTIONS__TEST_FIXTURE_HPP___
-#define __TEST__AGRAD__DISTRIBUTIONS__TEST_FIXTURE_HPP___
+#ifndef __TEST__DIFF__DISTRIBUTIONS__TEST_FIXTURE_HPP___
+#define __TEST__DIFF__DISTRIBUTIONS__TEST_FIXTURE_HPP___
 
 #include <stdexcept>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/matrix.hpp>
 #include <stan/math/functions/value_of.hpp>
-#include <stan/agrad.hpp>
-#include <test/agrad/distributions/utility.hpp>
+#include <stan/diff.hpp>
+#include <test/diff/distributions/utility.hpp>
 
 using std::vector;
 using Eigen::Matrix;
 using Eigen::Dynamic;
-using stan::agrad::var;
+using stan::diff::var;
 using stan::scalar_type;
 using stan::is_vector;
 using stan::is_constant;
@@ -1291,7 +1291,7 @@ public:
     if (!TestClass.has_lower_bound()) {
       if (!std::numeric_limits<Scalar0>::has_infinity) {
         for (size_t n = 0; n < parameters.size(); n++)
-          parameters[n][0] = stan::agrad::value_of(std::numeric_limits<Scalar0>::min());
+          parameters[n][0] = stan::diff::value_of(std::numeric_limits<Scalar0>::min());
       } else {
         for (size_t n = 0; n < parameters.size(); n++)
           parameters[n][0] = -std::numeric_limits<double>::infinity();
@@ -1330,7 +1330,7 @@ public:
     if (!TestClass.has_upper_bound()) {
       if (!std::numeric_limits<Scalar0>::has_infinity) {
         for (size_t n = 0; n < parameters.size(); n++)
-          parameters[n][0] = stan::agrad::value_of(std::numeric_limits<Scalar0>::max());
+          parameters[n][0] = stan::diff::value_of(std::numeric_limits<Scalar0>::max());
       } else {
         for (size_t n = 0; n < parameters.size(); n++)
           parameters[n][0] = std::numeric_limits<double>::infinity();
@@ -1892,7 +1892,7 @@ public:
     if (!TestClass.has_lower_bound()) {
       if (!std::numeric_limits<Scalar0>::has_infinity) {
         for (size_t n = 0; n < parameters.size(); n++)
-          parameters[n][0] = stan::agrad::value_of(std::numeric_limits<Scalar0>::min());
+          parameters[n][0] = stan::diff::value_of(std::numeric_limits<Scalar0>::min());
       } else {
         for (size_t n = 0; n < parameters.size(); n++)
           parameters[n][0] = -std::numeric_limits<double>::infinity();
@@ -1931,7 +1931,7 @@ public:
     if (!TestClass.has_upper_bound()) {
       if (!std::numeric_limits<Scalar0>::has_infinity) {
         for (size_t n = 0; n < parameters.size(); n++)
-          parameters[n][0] = stan::agrad::value_of(std::numeric_limits<Scalar0>::max());
+          parameters[n][0] = stan::diff::value_of(std::numeric_limits<Scalar0>::max());
       } else {
         for (size_t n = 0; n < parameters.size(); n++)
           parameters[n][0] = std::numeric_limits<double>::infinity();
@@ -2493,7 +2493,7 @@ public:
     if (!TestClass.has_lower_bound()) {
       if (!std::numeric_limits<Scalar0>::has_infinity) {
         for (size_t n = 0; n < parameters.size(); n++)
-          parameters[n][0] = stan::agrad::value_of(std::numeric_limits<Scalar0>::min());
+          parameters[n][0] = stan::diff::value_of(std::numeric_limits<Scalar0>::min());
       } else {
         for (size_t n = 0; n < parameters.size(); n++)
           parameters[n][0] = -std::numeric_limits<double>::infinity();
@@ -2532,7 +2532,7 @@ public:
     if (!TestClass.has_upper_bound()) {
       if (!std::numeric_limits<Scalar0>::has_infinity) {
         for (size_t n = 0; n < parameters.size(); n++)
-          parameters[n][0] = stan::agrad::value_of(std::numeric_limits<Scalar0>::max());
+          parameters[n][0] = stan::diff::value_of(std::numeric_limits<Scalar0>::max());
       } else {
         for (size_t n = 0; n < parameters.size(); n++)
           parameters[n][0] = std::numeric_limits<double>::infinity();

@@ -1,10 +1,10 @@
-#include <stan/agrad.hpp>
+#include <stan/diff.hpp>
 #include <stan/math.hpp>
-#include <test/agrad/util.hpp>
+#include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
 void test_log1m_inv_logit(const double x) {
-  using stan::agrad::var;
+  using stan::diff::var;
   using stan::math::log1m_inv_logit;
   using std::log;
   using stan::math::inv_logit;

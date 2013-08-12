@@ -1,19 +1,19 @@
-#ifndef __STAN__AGRAD__REV__OP__VECTOR_VARI_HPP__
-#define __STAN__AGRAD__REV__OP__VECTOR_VARI_HPP__
+#ifndef __STAN__DIFF__REV__OP__VECTOR_VARI_HPP__
+#define __STAN__DIFF__REV__OP__VECTOR_VARI_HPP__
 
 #include <vector>
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/vari.hpp>
+#include <stan/diff/rev/var.hpp>
+#include <stan/diff/rev/vari.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
 
     class op_vector_vari : public vari {
     protected:
       const size_t size_;
       vari** vis_;
     public:
-      op_vector_vari(double f, const std::vector<stan::agrad::var>& vs) :
+      op_vector_vari(double f, const std::vector<stan::diff::var>& vs) :
         vari(f),
         size_(vs.size()) {
         vis_ = (vari**) operator new(sizeof(vari*) * vs.size()); 

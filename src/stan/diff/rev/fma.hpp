@@ -1,17 +1,17 @@
-#ifndef __STAN__AGRAD__REV__FMA_HPP__
-#define __STAN__AGRAD__REV__FMA_HPP__
+#ifndef __STAN__DIFF__REV__FMA_HPP__
+#define __STAN__DIFF__REV__FMA_HPP__
 
 #include <valarray>
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/op/v_vari.hpp>
-#include <stan/agrad/rev/op/vv_vari.hpp>
-#include <stan/agrad/rev/op/vd_vari.hpp>
-#include <stan/agrad/rev/op/vvv_vari.hpp>
-#include <stan/agrad/rev/op/vdv_vari.hpp>
+#include <stan/diff/rev/var.hpp>
+#include <stan/diff/rev/op/v_vari.hpp>
+#include <stan/diff/rev/op/vv_vari.hpp>
+#include <stan/diff/rev/op/vd_vari.hpp>
+#include <stan/diff/rev/op/vvv_vari.hpp>
+#include <stan/diff/rev/op/vdv_vari.hpp>
 #include <stan/math/constants.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
 
     namespace {
       class fma_vvv_vari : public op_vvv_vari {
@@ -95,9 +95,9 @@ namespace stan {
      * @param c Summand.
      * @return Product of the multiplicands plus the summand, ($a * $b) + $c.
      */
-    inline var fma(const stan::agrad::var& a,
-                   const stan::agrad::var& b,
-                   const stan::agrad::var& c) {
+    inline var fma(const stan::diff::var& a,
+                   const stan::diff::var& b,
+                   const stan::diff::var& c) {
       return var(new fma_vvv_vari(a.vi_,b.vi_,c.vi_));
     }
 
@@ -119,8 +119,8 @@ namespace stan {
      * @param c Summand.
      * @return Product of the multiplicands plus the summand, ($a * $b) + $c.
      */
-    inline var fma(const stan::agrad::var& a,
-                   const stan::agrad::var& b,
+    inline var fma(const stan::diff::var& a,
+                   const stan::diff::var& b,
                    const double& c) {
       return var(new fma_vvd_vari(a.vi_,b.vi_,c));
     }
@@ -143,9 +143,9 @@ namespace stan {
      * @param c Summand.
      * @return Product of the multiplicands plus the summand, ($a * $b) + $c.
      */
-    inline var fma(const stan::agrad::var& a,
+    inline var fma(const stan::diff::var& a,
                    const double& b,
-                   const stan::agrad::var& c) {
+                   const stan::diff::var& c) {
       return var(new fma_vdv_vari(a.vi_,b,c.vi_));
     }
 
@@ -165,7 +165,7 @@ namespace stan {
      * @param c Summand.
      * @return Product of the multiplicands plus the summand, ($a * $b) + $c.
      */
-    inline var fma(const stan::agrad::var& a,
+    inline var fma(const stan::diff::var& a,
                    const double& b, 
                    const double& c) {
       return var(new fma_vdd_vari(a.vi_,b,c));
@@ -188,7 +188,7 @@ namespace stan {
      * @return Product of the multiplicands plus the summand, ($a * $b) + $c.
      */
     inline var fma(const double& a,
-                   const stan::agrad::var& b,
+                   const stan::diff::var& b,
                    const double& c) {
       return var(new fma_vdd_vari(b.vi_,a,c));
     }
@@ -211,7 +211,7 @@ namespace stan {
      */
     inline var fma(const double& a,
                    const double& b,
-                   const stan::agrad::var& c) {
+                   const stan::diff::var& c) {
       return var(new fma_ddv_vari(a,b,c.vi_));
     }
 
@@ -234,8 +234,8 @@ namespace stan {
      * @return Product of the multiplicands plus the summand, ($a * $b) + $c.
      */
     inline var fma(const double& a,
-                   const stan::agrad::var& b,
-                   const stan::agrad::var& c) {
+                   const stan::diff::var& b,
+                   const stan::diff::var& c) {
       return var(new fma_vdv_vari(b.vi_,a,c.vi_)); // a-b symmetry
     }
 

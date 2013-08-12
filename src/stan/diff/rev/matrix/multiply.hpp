@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__REV__MATRIX__MULTIPLY_HPP__
-#define __STAN__AGRAD__REV__MATRIX__MULTIPLY_HPP__
+#ifndef __STAN__DIFF__REV__MATRIX__MULTIPLY_HPP__
+#define __STAN__DIFF__REV__MATRIX__MULTIPLY_HPP__
 
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits.hpp>
@@ -9,14 +9,14 @@
 #include <stan/math/matrix/validate_multiplicable.hpp>
 #include <stan/math/matrix/validate_matching_sizes.hpp>
 #include <stan/math/matrix/validate_square.hpp>
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/matrix/typedefs.hpp>
-#include <stan/agrad/rev/matrix/to_var.hpp>
-#include <stan/agrad/rev/matrix/dot_product.hpp>
-#include <stan/agrad/rev/operator_multiplication.hpp>
+#include <stan/diff/rev/var.hpp>
+#include <stan/diff/rev/matrix/typedefs.hpp>
+#include <stan/diff/rev/matrix/to_var.hpp>
+#include <stan/diff/rev/matrix/dot_product.hpp>
+#include <stan/diff/rev/operator_multiplication.hpp>
 
 namespace stan {
-  namespace agrad {
+  namespace diff {
     
     /**
      * Return the product of two scalars.
