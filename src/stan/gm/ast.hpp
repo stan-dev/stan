@@ -573,6 +573,7 @@ namespace stan {
                            boost::recursive_wrapper<assignment>,
                            boost::recursive_wrapper<sample>,
                            boost::recursive_wrapper<increment_log_prob_statement>,
+                           boost::recursive_wrapper<expression>, // dummy now
                            boost::recursive_wrapper<statements>,
                            boost::recursive_wrapper<for_statement>,
                            boost::recursive_wrapper<conditional_statement>,
@@ -585,11 +586,11 @@ namespace stan {
 
     statement();
     statement(const statement_t& st);
-
     statement(const nil& st);
     statement(const assignment& st);
     statement(const sample& st);
     statement(const increment_log_prob_statement& st);
+    statement(const expression& st);
     statement(const statements& st);
     statement(const for_statement& st);
     statement(const conditional_statement& st);
