@@ -1,14 +1,9 @@
-# Camel: Multivariate normal with structured missing data 
-# http://www.openbugs.info/Examples/Camel.html
-
-#   data {
-#     int<lower=0> N; # N = 12 
-#     
-#   } 
-
-
-## status: results not verified with in those in bugs 
-
+/**
+ * Camel: Multivariate normal with structured missing data 
+ * http://www.openbugs.info/Examples/Camel.html
+ *
+ * status: results not verified with in those in bugs 
+ */
 transformed data {
   vector[2] mu; 
   matrix[2, 2] S; 
@@ -19,7 +14,6 @@ transformed data {
   S[2, 1] <- 0;
   S[2, 2] <- 1000;
 } 
-
 parameters { 
   cov_matrix[2] Sigma; 
   real y52; 
@@ -31,7 +25,6 @@ parameters {
   real y111; 
   real y121; 
 } 
-
 model {
   vector[2] Y[12]; 
   Y[1, 1] <- 1; 
@@ -60,13 +53,12 @@ model {
   Y[11, 2] <- -2; 
   Y[12, 2] <- -2; 
 
-  // Sigma ~ inv_wishart(2, S); 
- 
+  // instead of Sigma ~ inv_wishart(2, S), 
   // using the prior as in Tanner and Wong (1987) 
-  lp__ <- lp__ - 1.5 * log(determinant(Sigma));  
-  for (n in 1:12) Y[n] ~ multi_normal(mu, Sigma); 
+  increment_log_prob(-1.5 * log(determinant(Sigma)));  
+  for (n in 1:12) 
+    Y[n] ~ multi_normal(mu, Sigma); 
 } 
-
 generated quantities { 
   real<lower=-1,upper= 1> rho; 
   rho <- Sigma[1, 2] / sqrt(Sigma[1, 1] * Sigma[2, 2]); 
