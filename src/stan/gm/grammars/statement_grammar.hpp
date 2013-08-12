@@ -44,6 +44,11 @@ namespace stan {
                               whitespace_grammar<Iterator> > 
       assignment_r;
 
+      boost::spirit::qi::rule<Iterator, 
+                              expression(var_origin), 
+                              whitespace_grammar<Iterator> > 
+      non_lvalue_assign_r;
+
 
       boost::spirit::qi::rule<Iterator, 
                               std::vector<expression>(var_origin), 
@@ -122,7 +127,7 @@ namespace stan {
                               whitespace_grammar<Iterator> > 
       sample_r;
 
-      boost::spirit::qi::rule<Iterator, 
+      boost::spirit::qi::rule<Iterator,
                               statement(bool,var_origin), 
                               whitespace_grammar<Iterator> > 
       statement_r;
