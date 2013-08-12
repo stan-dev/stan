@@ -191,11 +191,11 @@ docs: manual doxygen
 ##
 # Clean up.
 ##
-MODEL_SPECS := $(wildcard src/test/gm/model_specs/compiled/*.stan) 
+MODEL_SPECS := $(wildcard src/test/gm/model_specs/compiled/*.stan) $(wildcard src/test/mcmc/models/*.stan)
 .PHONY: clean clean-demo clean-dox clean-manual clean-models clean-all
 clean:
 	$(RM) $(shell find src -type f -name '*.dSYM') $(shell find src -type f -name '*.d.*')
-	$(RM) $(wildcard $(MODEL_SPECS:%.stan=%.cpp) $(MODEL_SPECS:%.stan=%$(EXE)) $(MODEL_SPECS:%.stan=%.o))
+	$(RM) $(wildcard $(MODEL_SPECS:%.stan=%.cpp) $(MODEL_SPECS:%.stan=%$(EXE)) $(MODEL_SPECS:%.stan=%.o) $(MODEL_SPECS:%.stan=%.csv))
 
 clean-dox:
 	$(RM) -r doc/api
