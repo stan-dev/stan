@@ -1,7 +1,7 @@
 data {
   int<lower=0> N;
   vector[N] kid_score;
-  int<lower=1,upper=4> mom_work[N];
+  int mom_work[N];
 }
 transformed data {
   vector[N] work2;

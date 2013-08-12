@@ -1,8 +1,8 @@
 data {
   int<lower=0> N;
   vector[N] post_test;
-  vector[N] pre_test;
   vector[N] supp;
+  vector[N] pre_test;
 }
 parameters {
   vector[3] beta;

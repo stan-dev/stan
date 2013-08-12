@@ -1,27 +1,26 @@
 data {
   int<lower=0> N;
-  vector[N] canopy_height;
-  vector[N] density;
+  vector[N] weight;
   vector[N] diam1;
   vector[N] diam2;
-  vector[N] group;
+  vector[N] canopy_height;
   vector[N] total_height;
-  vector[N] weight;
+  vector[N] density;
+  vector[N] group;
 }
 transformed data {
+  vector[N] log_weight;
+  vector[N] log_canopy_volume;
   vector[N] log_canopy_area;
   vector[N] log_canopy_shape;
-  vector[N] log_canopy_volume;
-  vector[N] log_density;
   vector[N] log_total_height;
-  vector[N] log_weight;
-
+  vector[N] log_density;
+  log_weight        <- log(weight);
+  log_canopy_volume <- log(diam1 .* diam2 .* canopy_height);
   log_canopy_area   <- log(diam1 .* diam2);
   log_canopy_shape  <- log(diam1 ./ diam2);
-  log_canopy_volume <- log(diam1 .* diam2 .* canopy_height);
-  log_density       <- log(density);
   log_total_height  <- log(total_height);
-  log_weight        <- log(weight);
+  log_density       <- log(density);
 }
 parameters {
   vector[7] beta;

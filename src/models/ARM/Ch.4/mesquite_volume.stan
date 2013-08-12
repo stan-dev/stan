@@ -1,16 +1,15 @@
 data {
   int<lower=0> N;
-  vector[N] canopy_height;
+  vector[N] weight;
   vector[N] diam1;
   vector[N] diam2;
-  vector[N] weight;
+  vector[N] canopy_height;
 }
 transformed data {
-  vector[N] log_canopy_volume;
   vector[N] log_weight;
-
-  log_canopy_volume <- log(diam1 .* diam2 .* canopy_height);
+  vector[N] log_canopy_volume;
   log_weight        <- log(weight);
+  log_canopy_volume <- log(diam1 .* diam2 .* canopy_height);
 }
 parameters {
   vector[2] beta;

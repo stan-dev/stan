@@ -1,19 +1,18 @@
 data {
   int<lower=0> N;
-  vector[N] arsenic;
-  vector[N] dist;
-  vector[N] educ;
   int<lower=0,upper=1> switched[N];
+  vector[N] dist;
+  vector[N] arsenic;
+  vector[N] educ;
 }
 transformed data {
-  vector[N] log_arsenic;
   vector[N] c_dist100;
-  vector[N] c_educ4;
+  vector[N] log_arsenic;
   vector[N] c_log_arsenic;
-  vector[N] ae_inter;
+  vector[N] c_educ4;
   vector[N] da_inter;
   vector[N] de_inter;
-
+  vector[N] ae_inter;
   c_dist100     <- (dist - mean(dist)) / 100.0;
   log_arsenic   <- log(arsenic);
   c_log_arsenic <- log_arsenic - mean(log_arsenic);
