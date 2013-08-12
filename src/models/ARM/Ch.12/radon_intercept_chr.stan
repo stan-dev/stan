@@ -13,7 +13,7 @@ transformed parameters {
   vector[85] a;
   vector[N] y_hat;
 
-  a <- 100 * mu_a + sigma_a * eta;
+  a <- 10 * mu_a + sigma_a * eta;
 
   for (i in 1:N)
     y_hat[i] <- a[county[i]];

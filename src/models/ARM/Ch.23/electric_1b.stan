@@ -17,8 +17,8 @@ transformed parameters {
   vector[N] y_hat;
 
   for (i in 1:N)
-    y_hat[i] <- a[pair[i]] + 4.7 * beta[1] * treatment[i] 
-                  + 0.47 * beta[2] * pre_test[i];
+    y_hat[i] <- a[pair[i]] + beta[1] * treatment[i] 
+                  + beta[2] * pre_test[i];
 }
 model {
   mu_a ~ normal(0, 1);
@@ -26,7 +26,7 @@ model {
   sigma_a ~ uniform(0, 100);
   sigma_y ~ uniform(0, 100);
 
-  a ~ normal(60 * mu_a, sigma_a);
-  beta ~ normal(0, 1);
+  a ~ normal(100 * mu_a, sigma_a);
+  beta ~ normal(0, 10);
   y ~ normal(y_hat, sigma_y);
 }

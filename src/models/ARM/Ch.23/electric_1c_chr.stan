@@ -30,9 +30,9 @@ transformed parameters {
   vector[N] y_hat;
 
   for (i in 1:n_pair)
-    a[i] <- 29 * mu_a[grade_pair[i]] + sigma_a[grade_pair[i]] * eta_a[i];
-  b <- 4 * mu_b + sigma_b * eta_b;
-  c <- 1.7 * mu_c + sigma_c * eta_c;
+    a[i] <- 50 * mu_a[grade_pair[i]] + sigma_a[grade_pair[i]] * eta_a[i];
+  b <- 10 * mu_b + sigma_b * eta_b;
+  c <- mu_c + sigma_c * eta_c;
 
   for (i in 1:N) {
     y_hat[i] <- a[pair[i]] + b[grade[i]] * treatment[i] 

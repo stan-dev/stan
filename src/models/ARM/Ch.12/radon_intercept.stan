@@ -16,7 +16,7 @@ transformed parameters {
 }
 model {
   mu_a ~ normal(0, 1);
-  a ~ normal (100 * mu_a, sigma_a);
+  a ~ normal (10 * mu_a, sigma_a);
 
   y ~ normal(y_hat, sigma_y);
 }

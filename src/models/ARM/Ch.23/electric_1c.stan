@@ -36,7 +36,7 @@ transformed parameters {
 
   for (i in 1:n_pair) {
     sigma_a_hat[i] <- sigma_a[grade_pair[i]];
-    mu_a_hat[i] <- 100 * mu_a[grade_pair[i]];
+    mu_a_hat[i] <- 40 * mu_a[grade_pair[i]];
   }
 }
 model {
@@ -45,7 +45,7 @@ model {
   mu_c ~ normal(0, 1);
 
   a ~ normal(mu_a_hat, sigma_a_hat);
-  b ~ normal(100 * mu_b, sigma_b);
-  c ~ normal(100 * mu_c, sigma_c);
+  b ~ normal(10 * mu_b, sigma_b);
+  c ~ normal(mu_c, sigma_c);
   y ~ normal(y_hat, sigma_y_hat);
 }

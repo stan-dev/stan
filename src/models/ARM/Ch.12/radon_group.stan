@@ -22,7 +22,7 @@ transformed parameters {
 }
 model {
   mu_b ~ normal(0, 1);
-  b ~ normal(100 * mu_b, sigma_b);
+  b ~ normal(mu_b, sigma_b);
 
   mu_beta ~ normal(0, 1);
   beta ~ normal(100 * mu_beta, sigma_beta);

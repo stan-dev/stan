@@ -15,10 +15,10 @@ transformed parameters {
   vector[85] a;
   vector[N] y_hat;
 
-  a <- 100 * mu_a + sigma_a * eta;
+  a <- mu_a + sigma_a * eta;
 
   for (i in 1:N)
-    y_hat[i] <- 100 * beta * x[i] + a[county[i]];
+    y_hat[i] <- beta * x[i] + a[county[i]];
 }
 model {
   beta ~ normal(0, 1);
