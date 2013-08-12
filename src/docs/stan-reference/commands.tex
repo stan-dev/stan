@@ -661,8 +661,8 @@ to immediately terminate (Figure \ref{fig:configuration}).
 \put(130, 45) { \makebox(115, 10)[l]{ rw\_metropolis } }
 \put(170, 25) { \makebox(50, 10)[l]{ $\ldots$ } }
 \end{picture}
-\label{fig:hierarchy}
 \caption{In the hierarchical argument structure, certain arguments, such as \code{random} and \code{output}, introduce new categories of arguments.  These categorical arguments can also appear as values of other arguments, such as \code{diagnose}, \code{optimize}, and \code{sample}, which define the mutually exclusive values for the argument {method}. }
+\label{fig:hierarchy}
 \end{figure}
 
 \begin{figure}
@@ -716,10 +716,10 @@ to immediately terminate (Figure \ref{fig:configuration}).
 \put(130, 45) { \makebox(115, 10)[l]{ \textcolor{gray!30}{rw\_metropolis} } }
 \put(170, 25) { \makebox(50, 10)[l]{ \textcolor{gray!30}{$\ldots$} } }
 \end{picture}
-\label{fig:configuration}
 \caption{A valid argument configuration defines only one mutually exclusive argument.
 If conflicting arguments are specified, for example \code{method=optimize method=sample},
 then execution immediately terminates with a warning message.}
+\label{fig:configuration}
 \end{figure}
 
 All commands must include at least one method, specified explicitly as
