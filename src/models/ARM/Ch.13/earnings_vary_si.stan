@@ -27,8 +27,8 @@ transformed parameters {
 model {
   mu_a1 ~ normal(0, 1);
   mu_a2 ~ normal(0, 1);
-  a1 ~ normal (10 * mu_a1, sigma_a1);
-  a2 ~ normal (0.1 * mu_a2, sigma_a2);
+  a1 ~ normal(10 * mu_a1, sigma_a1);
+  a2 ~ normal(0.01 * mu_a2, sigma_a2);
 
   log_earn ~ normal(y_hat, sigma_y);
 }

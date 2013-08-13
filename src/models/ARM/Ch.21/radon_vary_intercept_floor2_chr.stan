@@ -18,7 +18,7 @@ transformed parameters {
   vector[J] a;
   vector[N] y_hat;
 
-  a <- 1.4 * mu_a + sigma_a * eta;
+  a <- mu_a + sigma_a * eta;
 
   for (i in 1:N)
     y_hat[i] <- a[county[i]] + u[i] * b[1] + x[i] * b[2] + x_mean[i] * b[3];

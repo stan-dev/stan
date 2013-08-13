@@ -14,7 +14,7 @@ transformed parameters {
   vector[N] y_hat;
 
   for (i in 1:N)
-    y_hat[i] <- 100 * mu + eta[county[i]];
+    y_hat[i] <- 0.1 * mu + eta[county[i]];
 }
 model {
   sigma_eta ~ uniform(0, 100);

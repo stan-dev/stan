@@ -21,9 +21,9 @@ transformed parameters {
 } 
 model {
   mu_a1 ~ normal(0, 1);
-  a1 ~ normal(100 * mu_a1, sigma_a1);
+  a1 ~ normal(mu_a1, sigma_a1);
   mu_a2 ~ normal(0, 1);
-  a2 ~ normal(100 * mu_a2, sigma_a2);
+  a2 ~ normal(0.1 * mu_a2, sigma_a2);
 
   y ~ normal(y_hat, sigma_y);
 }
