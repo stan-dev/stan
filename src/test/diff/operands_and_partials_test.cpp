@@ -1,4 +1,4 @@
-#include <stan/diff/partials_vari.hpp>
+#include <stan/diff/operands_and_partials.hpp>
 #include <gtest/gtest.h>
 #include <stan/diff.hpp>
 

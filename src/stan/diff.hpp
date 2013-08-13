@@ -7,7 +7,7 @@
 #include <stan/diff/fwd/matrix.hpp>
 #include <stan/diff/rev.hpp>
 #include <stan/diff/rev/matrix.hpp>
-#include <stan/diff/partials_vari.hpp>
+#include <stan/diff/operands_and_partials.hpp>
 
 #endif
 
