@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/diff/fwd/matrix/typedefs.hpp>
-#include <stan/diff/fvar.hpp>
+#include <stan/diff/fwd.hpp>
 
 using stan::diff::fvar;
 TEST(AgradFwdMatrix, max_vector) {

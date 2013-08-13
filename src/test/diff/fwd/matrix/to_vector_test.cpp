@@ -1,7 +1,7 @@
 #include <stan/math/matrix/to_vector.hpp>
 #include <stan/diff/fwd/matrix/typedefs.hpp>
-#include <stan/diff/fvar.hpp>
-#include <stan/diff/var.hpp>
+#include <stan/diff/fwd.hpp>
+#include <stan/diff/rev.hpp>
 #include <gtest/gtest.h>
 
 TEST(AgradFwdMatrix, to_vector) {

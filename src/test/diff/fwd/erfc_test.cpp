@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <stan/diff/fvar.hpp>
+#include <stan/diff/fwd.hpp>
 #include <boost/math/special_functions/erf.hpp>
 
 TEST(AgradFvar, erfc){

@@ -7,7 +7,7 @@
 #include <stan/prob/traits.hpp>
 #include <stan/diff.hpp>
 #include <stan/meta/traits.hpp>
-#include <stan/diff/matrix.hpp>
+#include <stan/diff/rev/matrix.hpp>
 #include <stan/math/matrix/log.hpp>
 #include <stan/math/matrix/log_determinant.hpp>
 #include <stan/math/matrix/subtract.hpp>

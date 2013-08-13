@@ -3,7 +3,7 @@
 #include <test/diff/util.hpp>
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/diff/fwd/matrix/typedefs.hpp>
-#include <stan/diff/fvar.hpp>
+#include <stan/diff/fwd.hpp>
 
 TEST(AgradFwdMatrix,subtract_scalar_matrix) {
   using stan::math::subtract;

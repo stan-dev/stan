@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 #include <test/diff/util.hpp>
 #include <stan/diff.hpp>
-#include <stan/diff/matrix.hpp>
+#include <stan/diff/rev/matrix.hpp>
 
 TEST(AgradRevMatrix,inverse_val) {
   using stan::math::inverse;

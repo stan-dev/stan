@@ -1,9 +1,9 @@
 #ifndef __STAN__DIFF__AUTO_DIFF_HPP__
 #define __STAN__DIFF__AUTO_DIFF_HPP__
 
-#include <stan/diff/fvar.hpp>
-#include <stan/diff/matrix.hpp>
-#include <stan/diff/var.hpp>
+#include <stan/diff/fwd.hpp>
+#include <stan/diff/rev/matrix.hpp>
+#include <stan/diff/rev.hpp>
 
 namespace stan {
   

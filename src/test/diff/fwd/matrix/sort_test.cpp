@@ -5,7 +5,7 @@
 
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/diff/fwd/matrix/typedefs.hpp>
-#include <stan/diff/fvar.hpp>
+#include <stan/diff/fwd.hpp>
 #include <stan/diff/fwd/fvar.hpp>
 
 typedef stan::diff::fvar<double> AVAR;

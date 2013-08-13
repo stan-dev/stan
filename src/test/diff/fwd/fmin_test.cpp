@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <stan/diff/fvar.hpp>
+#include <stan/diff/fwd.hpp>
 
 TEST(AgradFvar, fmin) {
   using stan::diff::fvar;

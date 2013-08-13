@@ -7,7 +7,7 @@
 #include <stan/math/matrix/validate_multiplicable.hpp>
 #include <stan/math/matrix/validate_square.hpp>
 #include <stan/diff/rev/var.hpp>
-#include <stan/diff/matrix.hpp>
+#include <stan/diff/rev/matrix.hpp>
 #include <stan/diff/rev/matrix/typedefs.hpp>
 
 namespace stan {

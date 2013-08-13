@@ -1,6 +1,6 @@
 #include <stan/math/matrix/elt_multiply.hpp>
 #include <gtest/gtest.h>
-#include <stan/diff/fvar.hpp>
+#include <stan/diff/fwd.hpp>
 #include <stan/diff/fwd/matrix/typedefs.hpp>
 
 TEST(AgradFwdMatrix,elt_multiply_vec_vv) {

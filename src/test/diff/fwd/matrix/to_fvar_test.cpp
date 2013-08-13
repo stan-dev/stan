@@ -1,5 +1,5 @@
 #include <stan/diff/fwd/matrix/to_fvar.hpp>
-#include <stan/diff/fvar.hpp>
+#include <stan/diff/fwd.hpp>
 #include <gtest/gtest.h>
 
 TEST(AgradFwdMatrix,to_fvar_scalar) {

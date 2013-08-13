@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <stan/diff/fvar.hpp>
+#include <stan/diff/fwd.hpp>
 
 template <typename T>
 void test_cumulative_sum() {

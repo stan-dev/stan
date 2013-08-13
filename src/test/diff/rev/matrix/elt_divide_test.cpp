@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 #include <test/diff/util.hpp>
 #include <stan/diff.hpp>
-#include <stan/diff/matrix.hpp>
+#include <stan/diff/rev/matrix.hpp>
 TEST(AgradRevMatrix,elt_divide_vec_vv) {
   using stan::math::elt_divide;
   using stan::diff::vector_v;

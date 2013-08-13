@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
-#include <stan/diff/fvar.hpp>
-#include <stan/diff/var.hpp>
+#include <stan/diff/fwd.hpp>
+#include <stan/diff/rev.hpp>
 #include <test/diff/util.hpp>
 #include <stan/math/functions/bessel_second_kind.hpp>
 

@@ -1,5 +1,5 @@
 #include <stan/diff/rev/matrix/crossprod.hpp>
-#include <stan/diff/matrix.hpp>
+#include <stan/diff/rev/matrix.hpp>
 #include <gtest/gtest.h>
 #include <test/diff/util.hpp>
 #include <stan/diff.hpp>

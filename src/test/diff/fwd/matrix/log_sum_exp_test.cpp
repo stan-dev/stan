@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <stan/diff/fvar.hpp>
+#include <stan/diff/fwd.hpp>
 #include <stan/math/functions/log_sum_exp.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/diff/fwd/log_sum_exp.hpp>

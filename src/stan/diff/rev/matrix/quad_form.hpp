@@ -5,7 +5,7 @@
 #include <boost/type_traits.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/typedefs.hpp>
-#include <stan/diff/var.hpp>
+#include <stan/diff/rev.hpp>
 #include <stan/diff/rev/matrix/typedefs.hpp>
 #include <stan/diff/rev/matrix/value_of.hpp>
 #include <stan/math/matrix/quad_form.hpp>

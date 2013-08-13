@@ -3,7 +3,7 @@
 #include <stan/prob/distributions/multivariate/continuous/dirichlet.hpp>
 #include <stan/diff.hpp>
 #include <stan/meta/traits.hpp>
-#include <stan/diff/matrix.hpp>
+#include <stan/diff/rev/matrix.hpp>
 
 template <typename T_prob, typename T_prior_sample_size>
 void expect_propto(T_prob theta, T_prior_sample_size alpha,

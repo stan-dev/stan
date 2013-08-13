@@ -1,5 +1,5 @@
 #include <stan/math/matrix/assign.hpp>
-#include <stan/diff/matrix.hpp>
+#include <stan/diff/rev/matrix.hpp>
 #include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 

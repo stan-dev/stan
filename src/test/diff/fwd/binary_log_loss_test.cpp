@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <stan/diff/fvar.hpp>
+#include <stan/diff/fwd.hpp>
 #include <stan/math/functions/binary_log_loss.hpp>
 
 TEST(AgradFvar, binary_log_loss) {

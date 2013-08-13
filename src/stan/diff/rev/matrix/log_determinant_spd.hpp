@@ -9,7 +9,7 @@
 #include <stan/math/matrix/validate_square.hpp>
 #include <stan/diff/rev/var.hpp>
 #include <stan/diff/rev/matrix/typedefs.hpp>
-#include <stan/diff/matrix.hpp>
+#include <stan/diff/rev/matrix.hpp>
 
 namespace stan {
   namespace diff {

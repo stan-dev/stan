@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/diff/fwd/matrix/typedefs.hpp>
-#include <stan/diff/fvar.hpp>
+#include <stan/diff/fwd.hpp>
 
 TEST(AgradFwdMatrix,add_scalar_matrix) {
   using stan::diff::matrix_fv;

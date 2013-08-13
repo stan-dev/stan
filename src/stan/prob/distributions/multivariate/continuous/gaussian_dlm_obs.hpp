@@ -11,7 +11,7 @@
 #include <stan/prob/traits.hpp>
 #include <stan/diff.hpp>
 #include <stan/meta/traits.hpp>
-#include <stan/diff/matrix.hpp>
+#include <stan/diff/rev/matrix.hpp>
 #include <stan/diff/rev/matrix/to_var.hpp>
 
 #include <stan/math/matrix/add.hpp>

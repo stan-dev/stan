@@ -3,7 +3,7 @@
 #include <stan/prob/distributions/multivariate/continuous/wishart.hpp>
 #include <stan/diff.hpp>
 #include <stan/meta/traits.hpp>
-#include <stan/diff/matrix.hpp>
+#include <stan/diff/rev/matrix.hpp>
 
 
 template <typename T_y, typename T_dof, typename T_scale>

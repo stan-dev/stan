@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <test/diff/util.hpp>
 #include <stan/diff.hpp>
-#include <stan/diff/matrix.hpp>
+#include <stan/diff/rev/matrix.hpp>
 #include <stan/math/matrix/log_softmax.hpp>
 #include <stan/diff/rev/matrix/log_softmax.hpp>
 

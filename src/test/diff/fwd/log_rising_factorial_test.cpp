@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
-#include <stan/diff/fvar.hpp>
+#include <stan/diff/fwd.hpp>
 #include <boost/math/special_functions/digamma.hpp>
-#include <stan/diff/var.hpp>
+#include <stan/diff/rev.hpp>
 #include <test/diff/util.hpp>
 
 TEST(AgradFvar, log_rising_factorial) {

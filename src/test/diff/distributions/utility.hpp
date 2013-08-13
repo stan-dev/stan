@@ -2,7 +2,7 @@
 #define __TEST__DIFF__DISTRIBUTIONS__UTILITY_HPP__
 
 #include <vector>
-#include <stan/diff/matrix.hpp>
+#include <stan/diff/rev/matrix.hpp>
 
 using std::vector;
 using stan::diff::var;

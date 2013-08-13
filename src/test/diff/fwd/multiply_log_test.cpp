@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <stan/diff/fvar.hpp>
+#include <stan/diff/fwd.hpp>
 #include <stan/math/functions/multiply_log.hpp>
 
 TEST(AgradFvar,multiply_log) {

@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/diff/fvar.hpp>
+#include <stan/diff/fwd.hpp>
 #include <stan/diff/fwd/operator_division.hpp>
 #include <stan/diff/fwd/matrix/to_fvar.hpp>
 #include <stan/diff/fwd/matrix/typedefs.hpp>

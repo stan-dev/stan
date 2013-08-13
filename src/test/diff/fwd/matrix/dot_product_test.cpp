@@ -1,6 +1,6 @@
 #include <stan/diff/fwd/matrix/dot_product.hpp>
 #include <gtest/gtest.h>
-#include <stan/diff/fvar.hpp>
+#include <stan/diff/fwd.hpp>
 #include <stan/diff/fwd/matrix/typedefs.hpp>
 
 TEST(AgradFwdMatrix, dot_product_vector_vector) {

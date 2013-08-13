@@ -1,6 +1,6 @@
 #include <stan/math/matrix/col.hpp>
 #include <gtest/gtest.h>
-#include <stan/diff/fvar.hpp>
+#include <stan/diff/fwd.hpp>
 #include <stan/diff/fwd/matrix/typedefs.hpp>
 
 TEST(AgradFwdMatrix,col_v) {
