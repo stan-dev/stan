@@ -362,6 +362,15 @@ namespace stan {
                      << std::endl;
           return var_expr;
         }
+        if (name == std::string("lp__")) {
+          error_msgs << std::endl
+                     << "WARNING:"
+                     << std::endl
+                     << "  Direct use of variable lp__ is deprecated and will be removed in a future release."
+                     << std::endl
+                     << "  Please use increment_log_prob(u) in place of of lp__ <- lp__ + u."
+                     << std::endl;
+        }
         pass = true;
         var_expr.set_type(vm.get_base_type(name),vm.get_num_dims(name));
         return var_expr;

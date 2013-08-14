@@ -904,12 +904,26 @@ namespace stan {
     statement::statement(const nil& st) : statement_(st) { }
     statement::statement(const assignment& st) : statement_(st) { }
     statement::statement(const sample& st) : statement_(st) { }
+    statement::statement(const increment_log_prob_statement& st) : statement_(st) { }
     statement::statement(const statements& st) : statement_(st) { }
+    statement::statement(const expression& st) : statement_(st) { }
     statement::statement(const for_statement& st) : statement_(st) { }
     statement::statement(const while_statement& st) : statement_(st) { }
     statement::statement(const conditional_statement& st) : statement_(st) { }
     statement::statement(const print_statement& st) : statement_(st) { }
     statement::statement(const no_op_statement& st) : statement_(st) { }
+
+    // template <typename Statement>
+    // statement::statement(const Statement& statement)
+    // : statement_(statement) {
+    // }
+
+
+    increment_log_prob_statement::increment_log_prob_statement() {
+    }
+    increment_log_prob_statement::increment_log_prob_statement(const expression& log_prob)
+      : log_prob_(log_prob) {
+    }
 
     for_statement::for_statement() {
     }

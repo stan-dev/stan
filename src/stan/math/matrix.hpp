@@ -2,6 +2,7 @@
 #define __STAN__MATH__MATRIX_HPP__
 
 #include <stan/math/matrix/Eigen.hpp>
+#include <stan/math/matrix/accumulator.hpp>
 #include <stan/math/matrix/add.hpp>
 #include <stan/math/matrix/array_builder.hpp>
 #include <stan/math/matrix/assign.hpp>
