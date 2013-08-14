@@ -277,7 +277,15 @@ extra time.
 
 \noindent
 Data in which measurements have been truncated or censored can be
-coded in \Stan following their respective probability models.
+coded in Stan following their respective probability models.
+
+\section{Truncated Distributions}
+
+Truncation in Stan is restricted to univariate distributions for which
+the corresponding log cumulative distribution function (cdf) and log
+completmentary cumulative distribution (ccdf) functions are
+available.  See \refsection{truncated-distributions} for more
+information on truncated distributions, cdfs, and ccdfs.
 
 \section{Truncated Data}
 
