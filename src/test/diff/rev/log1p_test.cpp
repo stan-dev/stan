@@ -2,7 +2,7 @@
 #include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
-TEST(AgradRev,log1p) {
+TEST(DiffRev,log1p) {
   AVAR a = 0.1;
   AVAR f = stan::diff::log1p(a);
   EXPECT_FLOAT_EQ(log(1 + 0.1), f.val());

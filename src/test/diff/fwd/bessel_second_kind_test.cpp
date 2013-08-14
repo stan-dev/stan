@@ -4,7 +4,7 @@
 #include <test/diff/util.hpp>
 #include <stan/math/functions/bessel_second_kind.hpp>
 
-TEST(AgradFvar, bessel_second_kind) {
+TEST(DiffFvar, bessel_second_kind) {
   using stan::diff::fvar;
   using stan::diff::bessel_second_kind;
 
@@ -23,7 +23,7 @@ TEST(AgradFvar, bessel_second_kind) {
   EXPECT_THROW(bessel_second_kind(0, -a), std::domain_error);
 }
 
-TEST(AgradFvarVar, bessel_second_kind) {
+TEST(DiffFvarVar, bessel_second_kind) {
   using stan::diff::fvar;
   using stan::diff::var;
   using stan::math::bessel_second_kind;
@@ -40,7 +40,7 @@ TEST(AgradFvarVar, bessel_second_kind) {
   EXPECT_FLOAT_EQ(0.53725040349771411 / 2.0, g[0]);
 }
 
-TEST(AgradFvarFvar, bessel_second_kind) {
+TEST(DiffFvarFvar, bessel_second_kind) {
   using stan::diff::fvar;
   using stan::math::bessel_second_kind;
 

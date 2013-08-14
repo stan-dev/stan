@@ -30,7 +30,7 @@ struct fun2 {
   }
 };
 
-TEST(AgradAutoDiff,derivative) {
+TEST(DiffAutoDiff,derivative) {
   fun0 f;
   double x = 7;
   double fx;
@@ -40,7 +40,7 @@ TEST(AgradAutoDiff,derivative) {
   EXPECT_FLOAT_EQ(d, 5 * 3 * 7 * 7);
 }
 
-TEST(AgradAutoDiff,partialDerivative) {
+TEST(DiffAutoDiff,partialDerivative) {
   using Eigen::Matrix;
   using Eigen::Dynamic;
   fun1 f;
@@ -60,7 +60,7 @@ TEST(AgradAutoDiff,partialDerivative) {
   EXPECT_FLOAT_EQ(5 * 5 + 3 * 2 * 7,d2);
 }
 
-TEST(AgradAutoDiff,gradient) {
+TEST(DiffAutoDiff,gradient) {
   using Eigen::Matrix;  
   using Eigen::Dynamic;
   fun1 f;
@@ -82,7 +82,7 @@ TEST(AgradAutoDiff,gradient) {
   EXPECT_FLOAT_EQ(2 * x(0) * x(1), grad_fx2(0));
   EXPECT_FLOAT_EQ(x(0) * x(0) + 3 * 2 * x(1), grad_fx2(1));
 }
-TEST(AgradAutoDiff,gradientDotVector) {
+TEST(DiffAutoDiff,gradientDotVector) {
   using Eigen::Matrix;  using Eigen::Dynamic;
   using stan::diff::var;
   fun1 f;
@@ -101,7 +101,7 @@ TEST(AgradAutoDiff,gradientDotVector) {
   
   EXPECT_FLOAT_EQ(grad_fx_dot_v_expected, grad_fx_dot_v);
 }
-TEST(AgradAutoDiff,hessianTimesVector) {
+TEST(DiffAutoDiff,hessianTimesVector) {
   using stan::diff::hessian_times_vector;
   using Eigen::Matrix;  using Eigen::Dynamic;
 
@@ -123,7 +123,7 @@ TEST(AgradAutoDiff,hessianTimesVector) {
   EXPECT_FLOAT_EQ(2 * x(1) * v(0) + 2 * x(0) * v(1), Hv(0));
   EXPECT_FLOAT_EQ(2 * x(0) * v(0) + 6 * v(1), Hv(1));
 }
-TEST(AgradAutoDiff,jacobian) {
+TEST(DiffAutoDiff,jacobian) {
   using Eigen::Matrix;  using Eigen::Dynamic;
   using stan::diff::jacobian;
 
@@ -159,7 +159,7 @@ TEST(AgradAutoDiff,jacobian) {
   EXPECT_FLOAT_EQ(6, J_rev(1,1));
 }
 
-TEST(AgradAutodiff,hessian) {
+TEST(DiffAutodiff,hessian) {
   using Eigen::Matrix;  using Eigen::Dynamic;
   fun1 f;
   Matrix<double,Dynamic,1> x(2);
@@ -203,7 +203,7 @@ TEST(AgradAutodiff,hessian) {
 
 }
   
-TEST(AgradAutodiff,GradientTraceMatrixTimesHessian) {
+TEST(DiffAutodiff,GradientTraceMatrixTimesHessian) {
   using Eigen::Matrix;
   using Eigen::Dynamic;
   Matrix<double,Dynamic,Dynamic> M(2,2);

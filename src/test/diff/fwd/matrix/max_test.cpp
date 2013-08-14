@@ -5,7 +5,7 @@
 #include <stan/diff/fwd.hpp>
 
 using stan::diff::fvar;
-TEST(AgradFwdMatrix, max_vector) {
+TEST(DiffFwdMatrix, max_vector) {
   using stan::math::max;
   using stan::math::vector_d;
   using stan::diff::vector_fv;
@@ -28,7 +28,7 @@ TEST(AgradFwdMatrix, max_vector) {
   EXPECT_FLOAT_EQ(100, output.val_);
   EXPECT_FLOAT_EQ(1, output.d_);
 }
-TEST(AgradFwdMatrix, max_vector_exception) {
+TEST(DiffFwdMatrix, max_vector_exception) {
   using stan::math::max;
   using stan::diff::vector_fv;
 
@@ -36,7 +36,7 @@ TEST(AgradFwdMatrix, max_vector_exception) {
   EXPECT_EQ(-std::numeric_limits<double>::infinity(), max(v).val_);
   EXPECT_EQ(0, max(v).d_);
 }
-TEST(AgradFwdMatrix, max_rowvector) {
+TEST(DiffFwdMatrix, max_rowvector) {
   using stan::math::max;
   using stan::math::row_vector_d;
   using stan::diff::row_vector_fv;
@@ -59,7 +59,7 @@ TEST(AgradFwdMatrix, max_rowvector) {
   EXPECT_FLOAT_EQ(100, output.val_);
   EXPECT_FLOAT_EQ(1, output.d_);
 }
-TEST(AgradFwdMatrix, max_rowvector_exception) {
+TEST(DiffFwdMatrix, max_rowvector_exception) {
   using stan::math::max;
   using stan::diff::row_vector_fv;
 
@@ -67,7 +67,7 @@ TEST(AgradFwdMatrix, max_rowvector_exception) {
   EXPECT_EQ(-std::numeric_limits<double>::infinity(), max(v).val_);
   EXPECT_EQ(0, max(v).d_);
 }
-TEST(AgradFwdMatrix, max_matrix) {
+TEST(DiffFwdMatrix, max_matrix) {
   using stan::math::max;
   using stan::math::matrix_d;
   using stan::diff::matrix_fv;
@@ -90,7 +90,7 @@ TEST(AgradFwdMatrix, max_matrix) {
   EXPECT_FLOAT_EQ(100, output.val_);
   EXPECT_FLOAT_EQ(1, output.d_);
 }
-TEST(AgradFwdMatrix, max_matrix_exception) {
+TEST(DiffFwdMatrix, max_matrix_exception) {
   using stan::math::max;
   using stan::diff::matrix_fv;
   

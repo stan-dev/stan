@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <stan/diff/fwd.hpp>
 
-TEST(AgradFvar, trunc) {
+TEST(DiffFvar, trunc) {
   using stan::diff::fvar;
   using boost::math::trunc;
 

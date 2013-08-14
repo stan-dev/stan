@@ -8,7 +8,7 @@
 #include <stan/diff/fwd/operator_division.hpp>
 #include <stan/diff/fwd/operator_subtraction.hpp>
 
-TEST(AgradFwdMatrix, sd_vector) {
+TEST(DiffFwdMatrix, sd_vector) {
   using stan::math::sd;
   using stan::math::vector_d;
   using stan::diff::vector_fv;
@@ -40,7 +40,7 @@ TEST(AgradFwdMatrix, sd_vector) {
   EXPECT_FLOAT_EQ(0.0, sd(v1).val_);
   EXPECT_FLOAT_EQ(0.0, sd(v1).d_);
 }
-TEST(AgradFwdMatrix, sd_vector_exception) {
+TEST(DiffFwdMatrix, sd_vector_exception) {
   using stan::math::sd;
   using stan::math::vector_d;
   using stan::diff::vector_fv;
@@ -50,7 +50,7 @@ TEST(AgradFwdMatrix, sd_vector_exception) {
   EXPECT_THROW(sd(d1), std::domain_error);
   EXPECT_THROW(sd(v1), std::domain_error);
 }
-TEST(AgradFwdMatrix, sd_rowvector) {
+TEST(DiffFwdMatrix, sd_rowvector) {
   using stan::math::sd;
   using stan::math::row_vector_d;
   using stan::diff::row_vector_fv;
@@ -83,7 +83,7 @@ TEST(AgradFwdMatrix, sd_rowvector) {
   EXPECT_FLOAT_EQ(0.0, sd(v1).val_);
   EXPECT_FLOAT_EQ(0.0, sd(v1).d_);
 }
-TEST(AgradFwdMatrix, sd_rowvector_exception) {
+TEST(DiffFwdMatrix, sd_rowvector_exception) {
   using stan::math::sd;
   using stan::math::row_vector_d;
   using stan::diff::row_vector_fv;
@@ -94,7 +94,7 @@ TEST(AgradFwdMatrix, sd_rowvector_exception) {
   EXPECT_THROW(sd(d), std::domain_error);
   EXPECT_THROW(sd(v), std::domain_error);
 }
-TEST(AgradFwdMatrix, sd_matrix) {
+TEST(DiffFwdMatrix, sd_matrix) {
   using stan::math::sd;
   using stan::math::matrix_d;
   using stan::diff::matrix_fv;
@@ -125,7 +125,7 @@ TEST(AgradFwdMatrix, sd_matrix) {
   EXPECT_FLOAT_EQ(0.0, sd(v1).val_);
   EXPECT_FLOAT_EQ(0.0, sd(v1).d_);
 }
-TEST(AgradFwdMatrix, sd_matrix_exception) {
+TEST(DiffFwdMatrix, sd_matrix_exception) {
   using stan::math::sd;
   using stan::math::matrix_d;
   using stan::diff::matrix_fv;

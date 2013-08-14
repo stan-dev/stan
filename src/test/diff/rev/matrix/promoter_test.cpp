@@ -3,7 +3,7 @@
 #include <stan/diff.hpp>
 #include <stan/diff/rev/matrix.hpp>
 
-TEST(AgradRevMatrix, promoter) {
+TEST(DiffRevMatrix, promoter) {
   using stan::math::promoter;
   using stan::math::promote_common;
 

@@ -3,7 +3,7 @@
 #include <stan/diff/rev.hpp>
 #include <test/diff/util.hpp>
 
-TEST(AgradFvar, modified_bessel_first_kind) {
+TEST(DiffFvar, modified_bessel_first_kind) {
   using stan::diff::fvar;
   using stan::diff::modified_bessel_first_kind;
 
@@ -24,7 +24,7 @@ TEST(AgradFvar, modified_bessel_first_kind) {
   EXPECT_FLOAT_EQ(2.0 * 3.5630025133974876, x.d_);
 }
 
-TEST(AgradFvarVar, modified_bessel_first_kind) {
+TEST(DiffFvarVar, modified_bessel_first_kind) {
   using stan::diff::fvar;
   using stan::diff::var;
   using stan::math::modified_bessel_first_kind;
@@ -41,7 +41,7 @@ TEST(AgradFvarVar, modified_bessel_first_kind) {
   EXPECT_FLOAT_EQ(8.8620556637102180189, g[0]);
 }
 
-TEST(AgradFvarFvar, modified_bessel_first_kind) {
+TEST(DiffFvarFvar, modified_bessel_first_kind) {
   using stan::diff::fvar;
   using stan::math::modified_bessel_first_kind;
 

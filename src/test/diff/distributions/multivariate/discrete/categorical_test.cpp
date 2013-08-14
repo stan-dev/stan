@@ -20,7 +20,7 @@ using Eigen::Dynamic;
 using Eigen::Matrix;
 
 
-TEST(AgradDistributionsCategorical,Propto) {
+TEST(DiffDistributionsCategorical,Propto) {
   unsigned int n;
   Matrix<var,Dynamic,1> theta1(3,1);
   theta1 << 0.3, 0.5, 0.2;

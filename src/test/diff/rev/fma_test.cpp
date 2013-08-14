@@ -2,7 +2,7 @@
 #include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
-TEST(AgradRev,fma_vvv) {
+TEST(DiffRev,fma_vvv) {
   AVAR a = 3.0;
   AVAR b = 5.0;
   AVAR c = 7.0;
@@ -16,7 +16,7 @@ TEST(AgradRev,fma_vvv) {
   EXPECT_FLOAT_EQ(3.0,grad_f[1]);
   EXPECT_FLOAT_EQ(1.0,grad_f[2]);
 }
-TEST(AgradRev,fma_vvd) {
+TEST(DiffRev,fma_vvd) {
   AVAR a = 3.0;
   AVAR b = 5.0;
   double c = 7.0;
@@ -29,7 +29,7 @@ TEST(AgradRev,fma_vvd) {
   EXPECT_FLOAT_EQ(5.0,grad_f[0]);
   EXPECT_FLOAT_EQ(3.0,grad_f[1]);
 }  
-TEST(AgradRev,fma_vdv) {
+TEST(DiffRev,fma_vdv) {
   AVAR a = 3.0;
   double b = 5.0;
   AVAR c = 7.0;
@@ -42,7 +42,7 @@ TEST(AgradRev,fma_vdv) {
   EXPECT_FLOAT_EQ(5.0,grad_f[0]);
   EXPECT_FLOAT_EQ(1.0,grad_f[1]);
 } 
-TEST(AgradRev,fma_vdd) {
+TEST(DiffRev,fma_vdd) {
   AVAR a = 3.0;
   double b = 5.0;
   double c = 7.0;
@@ -54,7 +54,7 @@ TEST(AgradRev,fma_vdd) {
   f.grad(x,grad_f);
   EXPECT_FLOAT_EQ(5.0,grad_f[0]);
 }  
-TEST(AgradRev,fma_dvv) {
+TEST(DiffRev,fma_dvv) {
   double a = 3.0;
   AVAR b = 5.0;
   AVAR c = 7.0;
@@ -67,7 +67,7 @@ TEST(AgradRev,fma_dvv) {
   EXPECT_FLOAT_EQ(3.0,grad_f[0]);
   EXPECT_FLOAT_EQ(1.0,grad_f[1]);
 }
-TEST(AgradRev,fma_dvd) {
+TEST(DiffRev,fma_dvd) {
   double a = 3.0;
   AVAR b = 5.0;
   double c = 7.0;
@@ -79,7 +79,7 @@ TEST(AgradRev,fma_dvd) {
   f.grad(x,grad_f);
   EXPECT_FLOAT_EQ(3.0,grad_f[0]);
 }  
-TEST(AgradRev,fma_ddv) {
+TEST(DiffRev,fma_ddv) {
   double a = 3.0;
   double b = 5.0;
   AVAR c = 7.0;

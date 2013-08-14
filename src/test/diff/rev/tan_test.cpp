@@ -2,7 +2,7 @@
 #include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
-TEST(AgradRev,tan_var) {
+TEST(DiffRev,tan_var) {
   AVAR a = 0.68;
   AVAR f = tan(a);
   EXPECT_FLOAT_EQ(tan(0.68), f.val());

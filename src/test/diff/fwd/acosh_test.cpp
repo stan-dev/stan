@@ -2,7 +2,7 @@
 #include <stan/diff/fwd.hpp>
 #include <boost/math/special_functions/acosh.hpp>
 
-TEST(AgradFvar, acosh) {
+TEST(DiffFvar, acosh) {
   using stan::diff::fvar;
   using boost::math::acosh;
   using std::sqrt;

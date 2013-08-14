@@ -2,7 +2,7 @@
 #include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
-TEST(AgradRev,fmax_vv) {
+TEST(DiffRev,fmax_vv) {
   AVAR a = 1.3;
   AVAR b = 2.0;
   AVAR f = fmax(a,b);
@@ -15,7 +15,7 @@ TEST(AgradRev,fmax_vv) {
   EXPECT_FLOAT_EQ(1.0,grad_f[1]);
 }  
 
-TEST(AgradRev,fmax_vv_2) {
+TEST(DiffRev,fmax_vv_2) {
   AVAR a = 2.3;
   AVAR b = 2.0;
   AVAR f = fmax(a,b);
@@ -28,7 +28,7 @@ TEST(AgradRev,fmax_vv_2) {
   EXPECT_FLOAT_EQ(0.0,grad_f[1]);
 }  
 
-TEST(AgradRev,fmax_vv_3) {
+TEST(DiffRev,fmax_vv_3) {
   AVAR a = 2.0;
   AVAR b = 2.0;
   AVAR f = fmax(a,b);
@@ -42,7 +42,7 @@ TEST(AgradRev,fmax_vv_3) {
   EXPECT_FLOAT_EQ(1.0,grad_f[1]);
 }  
 
-TEST(AgradRev,fmax_vd) {
+TEST(DiffRev,fmax_vd) {
   AVAR a = 1.3;
   double b = 2.0;
   AVAR f = fmax(a,b);
@@ -54,7 +54,7 @@ TEST(AgradRev,fmax_vd) {
   EXPECT_FLOAT_EQ(0.0,grad_f[0]);
 }  
 
-TEST(AgradRev,fmax_vd_2) {
+TEST(DiffRev,fmax_vd_2) {
   AVAR a = 2.3;
   double b = 2.0;
   AVAR f = fmax(a,b);
@@ -66,7 +66,7 @@ TEST(AgradRev,fmax_vd_2) {
   EXPECT_FLOAT_EQ(1.0,grad_f[0]);
 }  
 
-TEST(AgradRev,fmax_vd_3) {
+TEST(DiffRev,fmax_vd_3) {
   AVAR a = 2.0;
   double b = 2.0;
   AVAR f = fmax(a,b);
@@ -78,7 +78,7 @@ TEST(AgradRev,fmax_vd_3) {
   EXPECT_FLOAT_EQ(1.0,grad_f[0]);
 }  
 
-TEST(AgradRev,fmax_dv) {
+TEST(DiffRev,fmax_dv) {
   double a = 1.3;
   AVAR b = 2.0;
   AVAR f = fmax(a,b);
@@ -90,7 +90,7 @@ TEST(AgradRev,fmax_dv) {
   EXPECT_FLOAT_EQ(1.0,grad_f[0]);
 }  
 
-TEST(AgradRev,fmax_dv_2) {
+TEST(DiffRev,fmax_dv_2) {
   double a = 2.3;
   AVAR b = 2.0;
   AVAR f = fmax(a,b);
@@ -102,7 +102,7 @@ TEST(AgradRev,fmax_dv_2) {
   EXPECT_FLOAT_EQ(0.0,grad_f[0]);
 }  
 
-TEST(AgradRev,fmax_dv_3) {
+TEST(DiffRev,fmax_dv_3) {
   double a = 2.0;
   AVAR b = 2.0;
   AVAR f = fmax(a,b);

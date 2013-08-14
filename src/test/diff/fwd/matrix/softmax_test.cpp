@@ -3,7 +3,7 @@
 #include <stan/diff/fwd/matrix/softmax.hpp>
 #include <stan/diff/fwd/matrix/typedefs.hpp>
 
-TEST(AgradFwdMatrix,softmax) {
+TEST(DiffFwdMatrix,softmax) {
   using stan::math::softmax;
   using Eigen::Matrix;
   using Eigen::Dynamic;

@@ -4,7 +4,7 @@
 #include <stan/diff/rev/matrix.hpp>
 #include <stan/math/matrix/assign.hpp>
 
-TEST(AgradRevMatrix,mv_squaredNorm) {
+TEST(DiffRevMatrix,mv_squaredNorm) {
   using stan::diff::matrix_v;
 
   matrix_v a(2,2);
@@ -22,7 +22,7 @@ TEST(AgradRevMatrix,mv_squaredNorm) {
   EXPECT_FLOAT_EQ(10.0, g[2]);
   EXPECT_FLOAT_EQ(20.0, g[3]);
 }  
-TEST(AgradRevMatrix,mv_norm) {
+TEST(DiffRevMatrix,mv_norm) {
   using stan::diff::matrix_v;
 
   matrix_v a(2,1);
@@ -38,7 +38,7 @@ TEST(AgradRevMatrix,mv_norm) {
   EXPECT_FLOAT_EQ(-3.0/5.0, g[0]);
   EXPECT_FLOAT_EQ(4.0/5.0, g[1]);
 }  
-TEST(AgradRevMatrix,mv_lp_norm) {
+TEST(DiffRevMatrix,mv_lp_norm) {
   using stan::diff::matrix_v;
 
   matrix_v a(2,2);
@@ -56,7 +56,7 @@ TEST(AgradRevMatrix,mv_lp_norm) {
   EXPECT_FLOAT_EQ(1.0,g[2]);
   EXPECT_FLOAT_EQ(0.0,g[3]); // ? depends on impl here, could be -1 or 1
 }  
-TEST(AgradRevMatrix,mv_lp_norm_inf) {
+TEST(DiffRevMatrix,mv_lp_norm_inf) {
   using stan::diff::matrix_v;
 
   matrix_v a(2,2);
@@ -75,7 +75,7 @@ TEST(AgradRevMatrix,mv_lp_norm_inf) {
   EXPECT_FLOAT_EQ(0.0,g[3]); 
 }  
 
-TEST(AgradRevMatrix, UserCase1) {
+TEST(DiffRevMatrix, UserCase1) {
   using std::vector;
   using stan::math::multiply;
   using stan::math::transpose;

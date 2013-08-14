@@ -2,7 +2,7 @@
 #include <stan/diff/fwd.hpp>
 #include <boost/math/special_functions/asinh.hpp>
 
-TEST(AgradFvar, asinh) {
+TEST(DiffFvar, asinh) {
   using stan::diff::fvar;
   using boost::math::asinh;
   using std::sqrt;

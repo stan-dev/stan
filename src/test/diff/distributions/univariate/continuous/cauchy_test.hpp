@@ -8,7 +8,7 @@ using std::vector;
 using std::numeric_limits;
 using stan::diff::var;
 
-class AgradDistributionsCauchy : public AgradDistributionTest {
+class DiffDistributionsCauchy : public DiffDistributionTest {
 public:
   void valid_values(vector<vector<double> >& parameters,
                     vector<double>& log_prob) {

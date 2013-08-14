@@ -3,7 +3,7 @@
 #include <stan/math/functions/Phi.hpp>
 #include <stan/prob/distributions/univariate/continuous/normal.hpp>
 
-TEST(AgradFvar,Phi) {
+TEST(DiffFvar,Phi) {
   using stan::diff::fvar;
   using stan::math::Phi;
   fvar<double> x = 1.0;

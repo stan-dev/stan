@@ -5,7 +5,7 @@
 #include <stan/diff/rev.hpp>
 #include <test/diff/util.hpp>
 
-TEST(AgradFvar, gamma_q){
+TEST(DiffFvar, gamma_q){
   using stan::diff::fvar;
   using stan::diff::gamma_q;
   using boost::math::gamma_q;
@@ -34,7 +34,7 @@ TEST(AgradFvar, gamma_q){
   EXPECT_THROW(gamma_q(x,-y), std::domain_error);
 }
 //NEEDS DIGAMMA
-// TEST(AgradFvarVar, gamma_q) {
+// TEST(DiffFvarVar, gamma_q) {
 //   using stan::diff::fvar;
 //   using stan::diff::var;
 
@@ -51,7 +51,7 @@ TEST(AgradFvar, gamma_q){
   // EXPECT_FLOAT_EQ(1.7356299,g[0]);
   // EXPECT_FLOAT_EQ(boost::math::gamma_p_derivative(0.5,1.0),g[1]);
 //}
-// TEST(AgradFvarFvar, gamma_q) {
+// TEST(DiffFvarFvar, gamma_q) {
 //   using stan::diff::fvar;
 //   using boost::math::gamma_q;
 

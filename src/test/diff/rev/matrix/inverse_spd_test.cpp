@@ -6,7 +6,7 @@
 #include <stan/diff/rev/matrix.hpp>
 #include <stan/diff/rev/print_stack.hpp>
 
-TEST(AgradRevMatrix,inverse_spd_val) {
+TEST(DiffRevMatrix,inverse_spd_val) {
   using stan::math::inverse_spd;
   using stan::diff::matrix_v;
 
@@ -33,7 +33,7 @@ TEST(AgradRevMatrix,inverse_spd_val) {
   EXPECT_THROW(inverse_spd(a), std::domain_error);
 }
 
-TEST(AgradRevMatrix,inverse_spd_grad) {
+TEST(DiffRevMatrix,inverse_spd_grad) {
   using stan::math::inverse_spd;
   using stan::diff::matrix_v;
   
@@ -65,7 +65,7 @@ TEST(AgradRevMatrix,inverse_spd_grad) {
   }
 }
 
-TEST(AgradRevMatrix,inverse_spd_inverse_spd_sum) {
+TEST(DiffRevMatrix,inverse_spd_inverse_spd_sum) {
   using stan::math::sum;
   using stan::math::inverse_spd;
   using stan::diff::matrix_v;

@@ -6,7 +6,7 @@ using std::vector;
 using std::numeric_limits;
 using stan::diff::var;
 
-class AgradCdfBinomial : public AgradCdfTest {
+class DiffCdfBinomial : public DiffCdfTest {
 public:
   void valid_values(vector<vector<double> >& parameters,
         vector<double>& cdf) {

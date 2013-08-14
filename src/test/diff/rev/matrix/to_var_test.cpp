@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 #include <test/diff/util.hpp>
 
-TEST(AgradRevMatrix,to_var_scalar) {
+TEST(DiffRevMatrix,to_var_scalar) {
   double d = 5.0;
   AVAR v = 5.0;
   stan::diff::var var_x = stan::diff::to_var(d);
@@ -11,7 +11,7 @@ TEST(AgradRevMatrix,to_var_scalar) {
   var_x = stan::diff::to_var(v);
   EXPECT_FLOAT_EQ(5.0, var_x.val());
 }
-TEST(AgradRevMatrix,to_var_matrix) {
+TEST(DiffRevMatrix,to_var_matrix) {
   using stan::math::matrix_d;
   using stan::diff::matrix_v;
   matrix_d m_d(2,3);
@@ -24,7 +24,7 @@ TEST(AgradRevMatrix,to_var_matrix) {
     for (int jj = 0; jj < 3; jj++)
       EXPECT_FLOAT_EQ(ii*3 + jj, m_v(ii, jj).val());
 }
-TEST(AgradRevMatrix,to_var_vector) {
+TEST(DiffRevMatrix,to_var_vector) {
   using stan::math::vector_d;
   using stan::diff::vector_v;
 
@@ -48,7 +48,7 @@ TEST(AgradRevMatrix,to_var_vector) {
   EXPECT_FLOAT_EQ(4, out(3).val());
   EXPECT_FLOAT_EQ(5, out(4).val());
 }
-TEST(AgradRevMatrix,to_var_rowvector) {
+TEST(DiffRevMatrix,to_var_rowvector) {
   using stan::math::row_vector_d;
   using stan::diff::row_vector_v;
 

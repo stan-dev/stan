@@ -2,7 +2,7 @@
 #include <stan/diff/fwd.hpp>
 #include <boost/math/special_functions/digamma.hpp>
 
-TEST(AgradFvar, tgamma){
+TEST(DiffFvar, tgamma){
   using stan::diff::fvar;
   using boost::math::tgamma;
   using boost::math::digamma;

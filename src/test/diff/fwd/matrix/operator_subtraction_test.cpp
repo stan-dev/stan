@@ -5,7 +5,7 @@
 #include <stan/diff/fwd/matrix/typedefs.hpp>
 #include <stan/diff/fwd.hpp>
 
-TEST(AgradFwdMatrix,subtract_scalar_matrix) {
+TEST(DiffFwdMatrix,subtract_scalar_matrix) {
   using stan::math::subtract;
   using stan::diff::matrix_fv;
 
@@ -37,7 +37,7 @@ TEST(AgradFwdMatrix,subtract_scalar_matrix) {
   EXPECT_FLOAT_EQ(1.0,result(1,0).d_);
   EXPECT_FLOAT_EQ(1.0,result(1,1).d_);
 }
-TEST(AgradFwdMatrix,subtract_scalar_vector) {
+TEST(DiffFwdMatrix,subtract_scalar_vector) {
   using stan::math::subtract;
   using stan::diff::vector_fv;
 
@@ -69,7 +69,7 @@ TEST(AgradFwdMatrix,subtract_scalar_vector) {
   EXPECT_FLOAT_EQ(1.0,result(3).d_);
   EXPECT_FLOAT_EQ(1.0,result(3).d_);
 }
-TEST(AgradFwdMatrix,subtract_scalar_rowvector) {
+TEST(DiffFwdMatrix,subtract_scalar_rowvector) {
   using stan::math::subtract;
   using stan::diff::row_vector_fv;
 
@@ -101,7 +101,7 @@ TEST(AgradFwdMatrix,subtract_scalar_rowvector) {
   EXPECT_FLOAT_EQ(1.0,result(3).d_);
   EXPECT_FLOAT_EQ(1.0,result(3).d_);
 }
-TEST(AgradFwdMatrix, subtract_vector_vector) {
+TEST(DiffFwdMatrix, subtract_vector_vector) {
   using stan::math::subtract;
   using stan::math::vector_d;
   using stan::diff::vector_fv;
@@ -172,7 +172,7 @@ TEST(AgradFwdMatrix, subtract_vector_vector) {
   EXPECT_FLOAT_EQ(0, output(3).d_);
   EXPECT_FLOAT_EQ(0, output(4).d_);  
 }
-TEST(AgradFwdMatrix, subtract_vector_vector_exception) {
+TEST(DiffFwdMatrix, subtract_vector_vector_exception) {
   using stan::math::subtract;
   using stan::math::vector_d;
   using stan::diff::vector_fv;
@@ -186,7 +186,7 @@ TEST(AgradFwdMatrix, subtract_vector_vector_exception) {
   EXPECT_THROW(subtract(d1, v2), std::domain_error);
   EXPECT_THROW(subtract(v1, v2), std::domain_error);
 }
-TEST(AgradFwdMatrix, subtract_rowvector_rowvector) {
+TEST(DiffFwdMatrix, subtract_rowvector_rowvector) {
   using stan::math::subtract;
   using stan::math::row_vector_d;
   using stan::diff::row_vector_fv;
@@ -257,7 +257,7 @@ TEST(AgradFwdMatrix, subtract_rowvector_rowvector) {
   EXPECT_FLOAT_EQ(0, output(3).d_);
   EXPECT_FLOAT_EQ(0, output(4).d_);  
 }
-TEST(AgradFwdMatrix, subtract_rowvector_rowvector_exception) {
+TEST(DiffFwdMatrix, subtract_rowvector_rowvector_exception) {
   using stan::math::subtract;
   using stan::math::row_vector_d;
   using stan::diff::row_vector_fv;
@@ -271,7 +271,7 @@ TEST(AgradFwdMatrix, subtract_rowvector_rowvector_exception) {
   EXPECT_THROW(subtract(v1, d2), std::domain_error);
   EXPECT_THROW(subtract(v1, v2), std::domain_error);
 }
-TEST(AgradFwdMatrix, subtract_matrix_matrix) {
+TEST(DiffFwdMatrix, subtract_matrix_matrix) {
   using stan::math::subtract;
   using stan::math::matrix_d;
   using stan::diff::matrix_fv;
@@ -334,7 +334,7 @@ TEST(AgradFwdMatrix, subtract_matrix_matrix) {
   EXPECT_FLOAT_EQ(0, output(1,0).d_);
   EXPECT_FLOAT_EQ(0, output(1,1).d_);
 }
-TEST(AgradFwdMatrix, subtract_matrix_matrix_exception) {
+TEST(DiffFwdMatrix, subtract_matrix_matrix_exception) {
   using stan::math::subtract;
   using stan::math::matrix_d;
   using stan::diff::matrix_fv;

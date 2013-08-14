@@ -7,7 +7,7 @@ using std::vector;
 using std::numeric_limits;
 using stan::diff::var;
 
-class AgradCdfCauchy : public AgradCdfTest {
+class DiffCdfCauchy : public DiffCdfTest {
 public:
   void valid_values(vector<vector<double> >& parameters,
         vector<double>& cdf) {

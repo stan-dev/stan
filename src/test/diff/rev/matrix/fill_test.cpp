@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 #include <test/diff/util.hpp>
 
-TEST(AgradRevMatrix, fill) {
+TEST(DiffRevMatrix, fill) {
   using stan::math::fill;
   using std::vector;
   using Eigen::Matrix;
@@ -42,7 +42,7 @@ TEST(AgradRevMatrix, fill) {
     for (size_t j = 0; j < 2; ++j)
       EXPECT_FLOAT_EQ(54, d[i][j].val());
 }
-TEST(AgradRevMatrix, fillDouble) {
+TEST(DiffRevMatrix, fillDouble) {
   using Eigen::Matrix;
   using Eigen::Dynamic;
   using stan::math::fill;

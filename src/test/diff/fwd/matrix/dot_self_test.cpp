@@ -3,7 +3,7 @@
 #include <stan/diff/fwd/fvar.hpp>
 
 using stan::diff::fvar;
-TEST(AgradFwdMatrix, dot_self_vec) {
+TEST(DiffFwdMatrix, dot_self_vec) {
   using stan::math::dot_self;
 
   Eigen::Matrix<fvar<double>,Eigen::Dynamic,1> v1(1);

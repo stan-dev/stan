@@ -2,7 +2,7 @@
 #include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
-TEST(AgradRev,plus_plus_a) {
+TEST(DiffRev,plus_plus_a) {
   AVAR a(5.0);
   EXPECT_FLOAT_EQ(5.0,a.val());
   AVAR f = ++a;
@@ -14,7 +14,7 @@ TEST(AgradRev,plus_plus_a) {
   EXPECT_FLOAT_EQ(1.0,g[0]);
 }
 
-TEST(AgradRev,plus_plus_a_2) {
+TEST(DiffRev,plus_plus_a_2) {
   AVAR a(5.0);
   EXPECT_FLOAT_EQ(5.0,a.val());
   AVAR f = ++a;
@@ -33,7 +33,7 @@ TEST(AgradRev,plus_plus_a_2) {
   EXPECT_FLOAT_EQ(1.0,g[0]);
 }
 
-TEST(AgradRev,plus_plus_a_3) {
+TEST(DiffRev,plus_plus_a_3) {
   AVAR a(5.0);
   AVAR f = ++a;
   ++a; // reassignment loses connection to f
@@ -43,7 +43,7 @@ TEST(AgradRev,plus_plus_a_3) {
   EXPECT_FLOAT_EQ(0.0,g[0]);
 }
 
-TEST(AgradRev,a_plus_plus) {
+TEST(DiffRev,a_plus_plus) {
   AVAR a(5.0);
   AVEC x = createAVEC(a); // compare to placement in test 2
   AVAR f = a++;
@@ -54,7 +54,7 @@ TEST(AgradRev,a_plus_plus) {
   EXPECT_FLOAT_EQ(1.0,g[0]);
 }
 
-TEST(AgradRev,a_plus_plus_2) {
+TEST(DiffRev,a_plus_plus_2) {
   AVAR a(5.0);
   AVAR f = a++;
   AVEC x = createAVEC(a); // compare to placement in test 1

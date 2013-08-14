@@ -2,7 +2,7 @@
 #include <stan/diff/fwd.hpp>
 #include <stan/math/functions/square.hpp>
 
-TEST(AgradFvar, square) {
+TEST(DiffFvar, square) {
   using stan::diff::fvar;
   using stan::math::square;
 

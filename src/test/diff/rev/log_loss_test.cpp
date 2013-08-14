@@ -2,7 +2,7 @@
 #include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
-TEST(AgradRev,log_loss_zero) {
+TEST(DiffRev,log_loss_zero) {
   AVAR y_hat = 0.2;
   int y = 0;
   AVAR f = stan::diff::log_loss(y,y_hat);
@@ -14,7 +14,7 @@ TEST(AgradRev,log_loss_zero) {
   EXPECT_FLOAT_EQ((1.0 / (1.0 - 0.2)), grad_f[0]);
 }
 
-TEST(AgradRev,log_loss_one) {
+TEST(DiffRev,log_loss_one) {
   AVAR y_hat = 0.2;
   int y = 1;
   AVAR f = stan::diff::log_loss(y,y_hat);

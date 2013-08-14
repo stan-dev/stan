@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 #include <stan/diff/fwd/matrix/typedefs.hpp>
 
-TEST(AgradFwdMatrix,cols_vector) {
+TEST(DiffFwdMatrix,cols_vector) {
   using stan::diff::vector_fv;
   using stan::diff::row_vector_fv;
   using stan::math::cols;
@@ -19,7 +19,7 @@ TEST(AgradFwdMatrix,cols_vector) {
   v.resize(0);
   EXPECT_EQ(1U, cols(v));
 }
-TEST(AgradFwdMatrix,cols_rowvector) {
+TEST(DiffFwdMatrix,cols_rowvector) {
   using stan::diff::row_vector_fv;
   using stan::math::cols;
 
@@ -35,7 +35,7 @@ TEST(AgradFwdMatrix,cols_rowvector) {
   rv.resize(0);
   EXPECT_EQ(0U, cols(rv));
 }
-TEST(AgradFwdMatrix,cols_matrix) {
+TEST(DiffFwdMatrix,cols_matrix) {
   using stan::diff::matrix_fv;
   using stan::math::cols;
 

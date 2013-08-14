@@ -3,7 +3,7 @@
 #include <stan/diff/fwd/matrix/log_determinant.hpp>
 #include <stan/diff/fwd/fvar.hpp>
 
-TEST(AgradFwdMatrix,log_determinant) {
+TEST(DiffFwdMatrix,log_determinant) {
   using stan::diff::matrix_fv;
   using stan::diff::fvar;
   using stan::diff::log_determinant;
@@ -21,7 +21,7 @@ TEST(AgradFwdMatrix,log_determinant) {
   EXPECT_FLOAT_EQ(1.5, det.d_);
 }
 
-TEST(AgradFwdMatrix,log_deteriminant_exception) {
+TEST(DiffFwdMatrix,log_deteriminant_exception) {
   using stan::diff::matrix_fv;
   using stan::math::log_determinant;
   

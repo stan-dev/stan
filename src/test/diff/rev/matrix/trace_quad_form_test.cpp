@@ -9,7 +9,7 @@
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/diff/rev/matrix/typedefs.hpp>
 
-TEST(AgradRevMatrix, trace_quad_form_mat) {
+TEST(DiffRevMatrix, trace_quad_form_mat) {
   using stan::math::trace_quad_form;
   using stan::diff::matrix_v;
   using stan::math::matrix_d;
@@ -57,7 +57,7 @@ TEST(AgradRevMatrix, trace_quad_form_mat) {
   EXPECT_FLOAT_EQ(26758, res.val());
 }
 
-TEST(AgradRevMatrix, trace_quad_form_mat_grad_vd) {
+TEST(DiffRevMatrix, trace_quad_form_mat_grad_vd) {
   using stan::math::trace_quad_form;
   using stan::math::sum;
   using stan::diff::matrix_v;
@@ -101,7 +101,7 @@ TEST(AgradRevMatrix, trace_quad_form_mat_grad_vd) {
       EXPECT_FLOAT_EQ(grad[pos], dqda(i,j));
 }
 
-TEST(AgradRevMatrix, trace_quad_form_mat_grad_dv) {
+TEST(DiffRevMatrix, trace_quad_form_mat_grad_dv) {
   using stan::math::trace_quad_form;
   using stan::math::sum;
   using stan::diff::matrix_v;
@@ -145,7 +145,7 @@ TEST(AgradRevMatrix, trace_quad_form_mat_grad_dv) {
       EXPECT_FLOAT_EQ(grad[pos], dqdb(i,j));
 }
 
-TEST(AgradRevMatrix, trace_quad_form_mat_grad_vv) {
+TEST(DiffRevMatrix, trace_quad_form_mat_grad_vv) {
   using stan::math::trace_quad_form;
   using stan::math::sum;
   using stan::diff::matrix_v;
@@ -201,7 +201,7 @@ TEST(AgradRevMatrix, trace_quad_form_mat_grad_vv) {
       EXPECT_FLOAT_EQ(grad[pos], dqda(i,j));
 }
 
-TEST(AgradRevMatrix, trace_gen_quad_form_mat) {
+TEST(DiffRevMatrix, trace_gen_quad_form_mat) {
   using stan::math::trace_gen_quad_form;
   using stan::diff::matrix_v;
   using stan::math::matrix_d;
@@ -269,7 +269,7 @@ TEST(AgradRevMatrix, trace_gen_quad_form_mat) {
   EXPECT_FLOAT_EQ(26758, res.val());
 }
 
-TEST(AgradRevMatrix, trace_gen_quad_form_mat_grad_dvd) {
+TEST(DiffRevMatrix, trace_gen_quad_form_mat_grad_dvd) {
   using stan::math::trace_gen_quad_form;
   using stan::math::sum;
   using stan::diff::matrix_v;
@@ -324,7 +324,7 @@ TEST(AgradRevMatrix, trace_gen_quad_form_mat_grad_dvd) {
       EXPECT_FLOAT_EQ(grad[pos], dqda(i,j));
 }
 
-TEST(AgradRevMatrix, trace_gen_quad_form_mat_grad_ddv) {
+TEST(DiffRevMatrix, trace_gen_quad_form_mat_grad_ddv) {
   using stan::math::trace_gen_quad_form;
   using stan::math::sum;
   using stan::diff::matrix_v;
@@ -377,7 +377,7 @@ TEST(AgradRevMatrix, trace_gen_quad_form_mat_grad_ddv) {
       EXPECT_FLOAT_EQ(grad[pos], dqdb(i,j));
 }
 
-TEST(AgradRevMatrix, trace_gen_quad_form_mat_grad_vdd) {
+TEST(DiffRevMatrix, trace_gen_quad_form_mat_grad_vdd) {
   using stan::math::trace_gen_quad_form;
   using stan::math::sum;
   using stan::diff::matrix_v;
@@ -429,7 +429,7 @@ TEST(AgradRevMatrix, trace_gen_quad_form_mat_grad_vdd) {
       EXPECT_FLOAT_EQ(grad[pos], dqdc(i,j));
 }
 
-TEST(AgradRevMatrix, trace_gen_quad_form_mat_grad_vvd) {
+TEST(DiffRevMatrix, trace_gen_quad_form_mat_grad_vvd) {
   using stan::math::trace_gen_quad_form;
   using stan::math::sum;
   using stan::diff::matrix_v;
@@ -488,7 +488,7 @@ TEST(AgradRevMatrix, trace_gen_quad_form_mat_grad_vvd) {
       EXPECT_FLOAT_EQ(grad[pos], dqda(i,j));
 }
 
-TEST(AgradRevMatrix, trace_gen_quad_form_mat_grad_vdv) {
+TEST(DiffRevMatrix, trace_gen_quad_form_mat_grad_vdv) {
   using stan::math::trace_gen_quad_form;
   using stan::math::sum;
   using stan::diff::matrix_v;
@@ -547,7 +547,7 @@ TEST(AgradRevMatrix, trace_gen_quad_form_mat_grad_vdv) {
       EXPECT_FLOAT_EQ(grad[pos], dqdb(i,j));
 }
 
-TEST(AgradRevMatrix, trace_gen_quad_form_mat_grad_dvv) {
+TEST(DiffRevMatrix, trace_gen_quad_form_mat_grad_dvv) {
   using stan::math::trace_gen_quad_form;
   using stan::math::sum;
   using stan::diff::matrix_v;
@@ -606,7 +606,7 @@ TEST(AgradRevMatrix, trace_gen_quad_form_mat_grad_dvv) {
       EXPECT_FLOAT_EQ(grad[pos], dqda(i,j));
 }
 
-TEST(AgradRevMatrix, trace_gen_quad_form_mat_grad_vvv) {
+TEST(DiffRevMatrix, trace_gen_quad_form_mat_grad_vvv) {
   using stan::math::trace_gen_quad_form;
   using stan::math::sum;
   using stan::diff::matrix_v;

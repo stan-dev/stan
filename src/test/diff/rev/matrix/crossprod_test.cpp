@@ -16,7 +16,7 @@ void test_crossprod(const stan::diff::matrix_v& L) {
       EXPECT_FLOAT_EQ(LLT_eigen(m,n).val(), LLT_stan(m,n).val());
 }
 
-TEST(AgradRevMatrix, crossprod) {
+TEST(DiffRevMatrix, crossprod) {
   using stan::diff::matrix_v;
 
   matrix_v L(3,3);

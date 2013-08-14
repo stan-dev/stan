@@ -2,7 +2,7 @@
 #include <stan/diff/fwd.hpp>
 #include <gtest/gtest.h>
 
-TEST(AgradFwdMatrix,to_fvar_scalar) {
+TEST(DiffFwdMatrix,to_fvar_scalar) {
   using stan::diff::fvar;
   double d = 5.0;
   fvar<double> v = 5.0;
@@ -15,7 +15,7 @@ TEST(AgradFwdMatrix,to_fvar_scalar) {
   EXPECT_FLOAT_EQ(5.0, fvar_x.val_);
   EXPECT_FLOAT_EQ(1.0, fvar_x.d_);
 }
-TEST(AgradFwdMatrix,to_fvar_matrix) {
+TEST(DiffFwdMatrix,to_fvar_matrix) {
   using stan::math::matrix_d;
   using stan::diff::matrix_fv;
   matrix_d m_d(2,3);
@@ -30,7 +30,7 @@ TEST(AgradFwdMatrix,to_fvar_matrix) {
       EXPECT_FLOAT_EQ(0.0, m_v(ii, jj).d_);
     }
 }
-TEST(AgradFwdMatrix,to_fvar_vector) {
+TEST(DiffFwdMatrix,to_fvar_vector) {
   using stan::math::vector_d;
   using stan::diff::vector_fv;
 
@@ -69,7 +69,7 @@ TEST(AgradFwdMatrix,to_fvar_vector) {
   EXPECT_FLOAT_EQ(1, out(3).d_);
   EXPECT_FLOAT_EQ(1, out(4).d_);
 }
-TEST(AgradFwdMatrix,to_fvar_rowvector) {
+TEST(DiffFwdMatrix,to_fvar_rowvector) {
   using stan::math::row_vector_d;
   using stan::diff::row_vector_fv;
 
@@ -109,7 +109,7 @@ TEST(AgradFwdMatrix,to_fvar_rowvector) {
   EXPECT_FLOAT_EQ(1, output(3).d_);
   EXPECT_FLOAT_EQ(1, output(4).d_);
 }
-TEST(AgradFwdMatrix,to_fvar_matrix_matrix) {
+TEST(DiffFwdMatrix,to_fvar_matrix_matrix) {
   using stan::math::matrix_d;
   using stan::diff::matrix_fv;
 

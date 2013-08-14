@@ -5,7 +5,7 @@
 #include <stan/diff/rev/matrix/typedefs.hpp>
 #include <stan/diff.hpp>
 
-TEST(AgradRevMatrix, variance_vector) {
+TEST(DiffRevMatrix, variance_vector) {
   using stan::math::variance;
   using stan::math::vector_d;
   using stan::diff::vector_v;
@@ -29,7 +29,7 @@ TEST(AgradRevMatrix, variance_vector) {
   EXPECT_FLOAT_EQ(0.0, variance(d1));
   EXPECT_FLOAT_EQ(0.0, variance(v1).val());  
 }
-TEST(AgradRevMatrix, variance_vector_exception) {
+TEST(DiffRevMatrix, variance_vector_exception) {
   using stan::math::variance;
   using stan::math::vector_d;
   using stan::diff::vector_v;
@@ -39,7 +39,7 @@ TEST(AgradRevMatrix, variance_vector_exception) {
   EXPECT_THROW(variance(d1), std::domain_error);
   EXPECT_THROW(variance(v1), std::domain_error);
 }
-TEST(AgradRevMatrix, variance_rowvector) {
+TEST(DiffRevMatrix, variance_rowvector) {
   using stan::math::variance;
   using stan::math::row_vector_d;
   using stan::diff::row_vector_v;
@@ -63,7 +63,7 @@ TEST(AgradRevMatrix, variance_rowvector) {
   EXPECT_FLOAT_EQ(0.0, variance(d1));
   EXPECT_FLOAT_EQ(0.0, variance(v1).val());  
 }
-TEST(AgradRevMatrix, variance_rowvector_exception) {
+TEST(DiffRevMatrix, variance_rowvector_exception) {
   using stan::math::variance;
   using stan::math::row_vector_d;
   using stan::diff::row_vector_v;
@@ -73,7 +73,7 @@ TEST(AgradRevMatrix, variance_rowvector_exception) {
   EXPECT_THROW(variance(d1), std::domain_error);
   EXPECT_THROW(variance(v1), std::domain_error);
 }
-TEST(AgradRevMatrix, variance_matrix) {
+TEST(DiffRevMatrix, variance_matrix) {
   using stan::math::variance;
   using stan::math::matrix_d;
   using stan::diff::matrix_v;
@@ -97,7 +97,7 @@ TEST(AgradRevMatrix, variance_matrix) {
   EXPECT_FLOAT_EQ(0.0, variance(d1));
   EXPECT_FLOAT_EQ(0.0, variance(v1).val());  
 }
-TEST(AgradRevMatrix, variance_matrix_exception) {
+TEST(DiffRevMatrix, variance_matrix_exception) {
   using stan::math::variance;
   using stan::math::matrix_d;
   using stan::diff::matrix_v;
@@ -117,7 +117,7 @@ TEST(AgradRevMatrix, variance_matrix_exception) {
   EXPECT_THROW(variance(d1), std::domain_error);
   EXPECT_THROW(variance(v1), std::domain_error);
 }
-TEST(AgradRevMatrix, varianceStdVector) {
+TEST(DiffRevMatrix, varianceStdVector) {
   using stan::math::variance; // should use arg-dep lookup
 
   AVEC y1 = createAVEC(0.5,2.0,3.5);

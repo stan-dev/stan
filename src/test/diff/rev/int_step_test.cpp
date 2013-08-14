@@ -4,7 +4,7 @@
 #include <gtest/gtest.h>
 
 
-TEST(AgradRev,int_step) {
+TEST(DiffRev,int_step) {
   using stan::math::int_step;
 
   AVAR a(5.0);

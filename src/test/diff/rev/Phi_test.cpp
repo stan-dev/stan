@@ -2,7 +2,7 @@
 #include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
-TEST(AgradRev, Phi) {
+TEST(DiffRev, Phi) {
   using stan::diff::var;
   using std::exp;
 

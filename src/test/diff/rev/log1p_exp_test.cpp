@@ -31,7 +31,7 @@ void test_log1p_exp(double val) {
   EXPECT_FLOAT_EQ(f2.val(),f_val);
 }
 
-TEST(AgradRev, log1p_exp) {
+TEST(DiffRev, log1p_exp) {
   test_log1p_exp(-15.0);
   test_log1p_exp(-5.0);
   test_log1p_exp(-1.0);

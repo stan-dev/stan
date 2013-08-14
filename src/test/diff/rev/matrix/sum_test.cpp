@@ -5,7 +5,7 @@
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/diff/rev/matrix/typedefs.hpp>
 
-TEST(AgradRevMatrix, sum_vector) {
+TEST(DiffRevMatrix, sum_vector) {
   using stan::math::sum;
   using stan::math::vector_d;
   using stan::diff::vector_v;
@@ -28,7 +28,7 @@ TEST(AgradRevMatrix, sum_vector) {
   EXPECT_FLOAT_EQ(0.0, sum(d));
   EXPECT_FLOAT_EQ(0.0, sum(v).val());
 }
-TEST(AgradRevMatrix, sum_rowvector) {
+TEST(DiffRevMatrix, sum_rowvector) {
   using stan::math::sum;
   using stan::math::row_vector_d;
   using stan::diff::row_vector_v;
@@ -51,7 +51,7 @@ TEST(AgradRevMatrix, sum_rowvector) {
   EXPECT_FLOAT_EQ(0.0, sum(d));
   EXPECT_FLOAT_EQ(0.0, sum(v).val());
 }
-TEST(AgradRevMatrix, sum_matrix) {
+TEST(DiffRevMatrix, sum_matrix) {
   using stan::math::sum;
   using stan::math::matrix_d;
   using stan::diff::matrix_v;

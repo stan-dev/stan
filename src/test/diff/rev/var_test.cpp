@@ -3,23 +3,23 @@
 #include <gtest/gtest.h>
 #include <test/diff/util.hpp>
 
-TEST(AgradRev,a_eq_x) {
+TEST(DiffRev,a_eq_x) {
   AVAR a = 5.0;
   EXPECT_FLOAT_EQ(5.0,a.val());
 }
 
-TEST(AgradRev,a_of_x) {
+TEST(DiffRev,a_of_x) {
   AVAR a(6.0);
   EXPECT_FLOAT_EQ(6.0,a.val());
 }
 
-TEST(AgradRev,a__a_eq_x) {
+TEST(DiffRev,a__a_eq_x) {
   AVAR a;
   a = 7.0;
   EXPECT_FLOAT_EQ(7.0,a.val());
 }
 
-TEST(AgradRev,eq_a) {
+TEST(DiffRev,eq_a) {
   AVAR a = 5.0;
   AVAR f = a;
   AVEC x = createAVEC(a);
@@ -28,7 +28,7 @@ TEST(AgradRev,eq_a) {
   EXPECT_FLOAT_EQ(1.0,dx[0]);
 }
 
-TEST(AgradRev,a_ostream) {
+TEST(DiffRev,a_ostream) {
   AVAR a = 6.0;
   std::ostringstream os;
   
@@ -41,7 +41,7 @@ TEST(AgradRev,a_ostream) {
   EXPECT_EQ ("10.5:0", os.str());
 }
 
-TEST(AgradRev, smart_ptrs) {
+TEST(DiffRev, smart_ptrs) {
   AVAR a = 2.0;
   EXPECT_FLOAT_EQ(2.0, (*a).val_);
   EXPECT_FLOAT_EQ(2.0, a->val_);
@@ -50,7 +50,7 @@ TEST(AgradRev, smart_ptrs) {
   EXPECT_FLOAT_EQ(2.0,a.vi_->val_);
 }
 
-TEST(AgradRev, stackAllocation) {
+TEST(DiffRev, stackAllocation) {
   using stan::diff::vari;
   using stan::diff::var;
 
@@ -71,7 +71,7 @@ TEST(AgradRev, stackAllocation) {
   EXPECT_FLOAT_EQ(1.0,g[1]);
 }
 
-TEST(AgradRev, print) {
+TEST(DiffRev, print) {
   using stan::diff::var;
 
   std::ostringstream output;

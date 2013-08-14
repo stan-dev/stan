@@ -2,7 +2,7 @@
 #include <stan/diff/fwd.hpp>
 #include <stan/math/functions/log_diff_exp.hpp>
 
-TEST(AgradFvar, log_diff_exp) {
+TEST(DiffFvar, log_diff_exp) {
   using stan::diff::fvar;
   using stan::math::log_diff_exp;
   using std::exp;
@@ -27,7 +27,7 @@ TEST(AgradFvar, log_diff_exp) {
   EXPECT_FLOAT_EQ(2 / (1 - exp(1.1 - 0.5) ), c.d_);
 }
 
-TEST(AgradFvar,log_diff_exp_exception) {
+TEST(DiffFvar,log_diff_exp_exception) {
   using stan::diff::fvar;
   EXPECT_NO_THROW(log_diff_exp(fvar<double>(3), fvar<double>(4)));
   EXPECT_NO_THROW(log_diff_exp(fvar<double>(3), 4));

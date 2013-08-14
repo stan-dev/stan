@@ -3,7 +3,7 @@
 #include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
-TEST(AgradRev,gamma_q_var_var) {
+TEST(DiffRev,gamma_q_var_var) {
   AVAR a = 0.5;
   AVAR b = 1.0;
   AVAR f = gamma_q(a,b);
@@ -21,7 +21,7 @@ TEST(AgradRev,gamma_q_var_var) {
   b = -1.0;
   EXPECT_THROW(gamma_q(a,b), std::domain_error);
 }
-TEST(AgradRev,gamma_q_double_var) {
+TEST(DiffRev,gamma_q_double_var) {
   double a = 0.5;
   AVAR b = 1.0;
   AVAR f = gamma_q(a,b);
@@ -38,7 +38,7 @@ TEST(AgradRev,gamma_q_double_var) {
   b = -1.0;
   EXPECT_THROW(gamma_q(a,b), std::domain_error);
 }
-TEST(AgradRev,gamma_q_var_double) {
+TEST(DiffRev,gamma_q_var_double) {
   AVAR a = 0.5;
   double b = 1.0;
   AVAR f = gamma_q(a,b);

@@ -4,7 +4,7 @@
 #include <stan/diff/fwd/matrix/typedefs.hpp>
 #include <stan/diff/fwd/exp.hpp>
 
-TEST(AgradFwdMatrix, exp_matrix) {
+TEST(DiffFwdMatrix, exp_matrix) {
   using stan::math::exp;
   using stan::math::matrix_d;
   using stan::diff::matrix_fv;
@@ -29,7 +29,7 @@ TEST(AgradFwdMatrix, exp_matrix) {
   EXPECT_FLOAT_EQ(2.0 * std::exp(3), output(1,0).d_);
   EXPECT_FLOAT_EQ(2.0 * std::exp(4), output(1,1).d_);
 }
-TEST(AgradFwdMatrix, exp_vector) {
+TEST(DiffFwdMatrix, exp_vector) {
   using stan::math::exp;
   using stan::math::vector_d;
   using stan::diff::vector_fv;
@@ -52,7 +52,7 @@ TEST(AgradFwdMatrix, exp_vector) {
   EXPECT_FLOAT_EQ(2.0 * std::exp(3), output(2).d_);
   EXPECT_FLOAT_EQ(2.0 * std::exp(4), output(3).d_);
 }
-TEST(AgradFwdMatrix, exp_rowvector) {
+TEST(DiffFwdMatrix, exp_rowvector) {
   using stan::math::exp;
   using stan::math::row_vector_d;
   using stan::diff::row_vector_fv;

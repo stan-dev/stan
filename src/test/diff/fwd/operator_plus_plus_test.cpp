@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <stan/diff/fwd.hpp>
 
-TEST(AgradFvar, operatorPlusPlus){
+TEST(DiffFvar, operatorPlusPlus){
   using stan::diff::fvar;
 
   fvar<double> x(0.5);

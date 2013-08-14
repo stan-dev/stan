@@ -4,7 +4,7 @@
 
 
 
-TEST(AgradPartialsVari, OperandsAndPartials) {
+TEST(DiffPartialsVari, OperandsAndPartials) {
   using stan::diff::OperandsAndPartials;
   using stan::diff::var;
 
@@ -41,7 +41,7 @@ TEST(AgradPartialsVari, OperandsAndPartials) {
   EXPECT_FLOAT_EQ(30.0, grad[2]);
   EXPECT_FLOAT_EQ(40.0, grad[3]);
 }
-TEST(AgradPartialsVari,OperandsAndPartials1) {
+TEST(DiffPartialsVari,OperandsAndPartials1) {
   using stan::diff::vari;
   using stan::diff::OperandsAndPartials;
   using stan::diff::var;
@@ -56,7 +56,7 @@ TEST(AgradPartialsVari,OperandsAndPartials1) {
   stan::diff::grad(y.vi_);
   EXPECT_FLOAT_EQ(-15.0, x.adj());  // dy/dx = -15
 }
-TEST(AgradPartialsVari,OperandsAndPartials2) {
+TEST(DiffPartialsVari,OperandsAndPartials2) {
   using stan::diff::OperandsAndPartials;
   using stan::diff::vari;
   using stan::diff::var;
@@ -74,7 +74,7 @@ TEST(AgradPartialsVari,OperandsAndPartials2) {
   EXPECT_FLOAT_EQ(-55.0, x1.adj());  // dy/dx1 = -55
   EXPECT_FLOAT_EQ(-91.0, x2.adj());  // dy/dx2 = -91
 }
-TEST(AgradPartialsVari, OperandsAndPartials3) {
+TEST(DiffPartialsVari, OperandsAndPartials3) {
   using stan::diff::OperandsAndPartials;
   using stan::diff::vari;
   using stan::diff::var;

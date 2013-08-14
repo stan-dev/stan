@@ -3,7 +3,7 @@
 #include <stan/diff/fwd.hpp>
 #include <stan/diff/fwd/matrix/typedefs.hpp>
 
-TEST(AgradFwdMatrix,row_v) {
+TEST(DiffFwdMatrix,row_v) {
   using stan::math::row;
   using stan::diff::matrix_fv;
   using stan::diff::row_vector_fv;
@@ -28,7 +28,7 @@ TEST(AgradFwdMatrix,row_v) {
   EXPECT_EQ(5.0,w[1].val_);
   EXPECT_EQ(6.0,w[2].val_);
 }
-TEST(AgradFwdMatrix,row_v_exc0) {
+TEST(DiffFwdMatrix,row_v_exc0) {
   using stan::math::row;
   using stan::diff::matrix_fv;
 
@@ -43,7 +43,7 @@ TEST(AgradFwdMatrix,row_v_exc0) {
   EXPECT_THROW(row(y,0),std::domain_error);
   EXPECT_THROW(row(y,7),std::domain_error);
 }
-TEST(AgradFwdMatrix,row_v_excHigh) {
+TEST(DiffFwdMatrix,row_v_excHigh) {
   using stan::math::row;
   using stan::diff::matrix_fv;
 

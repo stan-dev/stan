@@ -18,7 +18,7 @@ using Eigen::Matrix;
 using stan::diff::var;
 using stan::diff::to_var;
 
-class AgradDistributionsInvWishart : public ::testing::Test {
+class DiffDistributionsInvWishart : public ::testing::Test {
 protected:
   virtual void SetUp() {
     Y1.resize(2,2);
@@ -46,37 +46,37 @@ protected:
   Matrix<double,Dynamic,Dynamic> S2;
 };
 
-TEST_F(AgradDistributionsInvWishart,Propto) {
+TEST_F(DiffDistributionsInvWishart,Propto) {
   expect_propto(to_var(Y1),to_var(nu1),to_var(S1),
                 to_var(Y2),to_var(nu2),to_var(S2),
                 "var: y, nu, and sigma");
 }
-TEST_F(AgradDistributionsInvWishart,ProptoY) {
+TEST_F(DiffDistributionsInvWishart,ProptoY) {
   expect_propto(to_var(Y1),nu1,S1,
                 to_var(Y2),nu1,S1,
                 "var: y");
 }
-TEST_F(AgradDistributionsInvWishart,ProptoYNu) {
+TEST_F(DiffDistributionsInvWishart,ProptoYNu) {
   expect_propto(to_var(Y1),to_var(nu1),S1,
                 to_var(Y2),to_var(nu2),S1,
                 "var: y, and nu");
 }
-TEST_F(AgradDistributionsInvWishart,ProptoYSigma) {
+TEST_F(DiffDistributionsInvWishart,ProptoYSigma) {
   expect_propto(to_var(Y1),nu1,to_var(S1),
                 to_var(Y2),nu1,to_var(S2),
                 "var: y and sigma");
 }
-TEST_F(AgradDistributionsInvWishart,ProptoNu) {
+TEST_F(DiffDistributionsInvWishart,ProptoNu) {
   expect_propto(Y1,to_var(nu1),S1,
                 Y1,to_var(nu2),S1,
                 "var: nu");
 }
-TEST_F(AgradDistributionsInvWishart,ProptoNuSigma) {
+TEST_F(DiffDistributionsInvWishart,ProptoNuSigma) {
   expect_propto(Y1,to_var(nu1),to_var(S1),
                 Y1,to_var(nu2),to_var(S2),
                 "var: nu and sigma");
 }
-TEST_F(AgradDistributionsInvWishart,ProptoSigma) {
+TEST_F(DiffDistributionsInvWishart,ProptoSigma) {
   expect_propto(Y1,nu1,to_var(S1),
                 Y1,nu1,to_var(S2),
                 "var: sigma");

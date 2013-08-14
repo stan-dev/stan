@@ -4,7 +4,7 @@
 #include <stan/diff.hpp>
 #include <stan/diff/rev/matrix.hpp>
 
-TEST(AgradRevMatrix,eigenval_sum) {
+TEST(DiffRevMatrix,eigenval_sum) {
   using stan::math::sum;
   using stan::diff::matrix_v;
   using stan::diff::vector_v;

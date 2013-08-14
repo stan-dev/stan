@@ -7,7 +7,7 @@ using std::vector;
 using std::numeric_limits;
 using stan::diff::var;
 
-class AgradCdfLogChiSquare : public AgradCdfLogTest {
+class DiffCdfLogChiSquare : public DiffCdfLogTest {
 public:
   void valid_values(vector<vector<double> >& parameters,
                     vector<double>& cdf_log) {

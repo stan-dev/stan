@@ -3,7 +3,7 @@
 #include <test/diff/util.hpp>
 #include <stan/diff/rev/matrix/typedefs.hpp>
 
-TEST(AgradRevMatrix,cols_vector) {
+TEST(DiffRevMatrix,cols_vector) {
   using stan::diff::vector_v;
   using stan::diff::row_vector_v;
   using stan::math::cols;
@@ -15,7 +15,7 @@ TEST(AgradRevMatrix,cols_vector) {
   v.resize(0);
   EXPECT_EQ(1U, cols(v));
 }
-TEST(AgradRevMatrix,cols_rowvector) {
+TEST(DiffRevMatrix,cols_rowvector) {
   using stan::diff::row_vector_v;
   using stan::math::cols;
 
@@ -26,7 +26,7 @@ TEST(AgradRevMatrix,cols_rowvector) {
   rv.resize(0);
   EXPECT_EQ(0U, cols(rv));
 }
-TEST(AgradRevMatrix,cols_matrix) {
+TEST(DiffRevMatrix,cols_matrix) {
   using stan::diff::matrix_v;
   using stan::math::cols;
 

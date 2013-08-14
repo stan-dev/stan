@@ -106,7 +106,7 @@ void test_sort_desc(Eigen::Matrix<T,R,C> val) {
 
 
 
-TEST(AgradRev, sort) {
+TEST(DiffRev, sort) {
   VEC a;
   a.push_back(1); a.push_back(2); a.push_back(2); a.push_back(3);
   test_sort_asc(a);
@@ -151,7 +151,7 @@ TEST(AgradRev, sort) {
   test_sort_desc(vec6);
 }
 
-TEST(AgradRev, sort_no_thrown) {
+TEST(DiffRev, sort_no_thrown) {
   AVEC vec0;
   EXPECT_EQ(0, vec0.size());
   EXPECT_NO_THROW(sort_asc(vec0));

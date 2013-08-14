@@ -3,7 +3,7 @@
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/diff/fwd/matrix/typedefs.hpp>
 
-TEST(AgradFwdMatrix,transpose_matrix) {
+TEST(DiffFwdMatrix,transpose_matrix) {
   using stan::math::matrix_d;
   using stan::diff::matrix_fv;
   using stan::math::transpose;
@@ -38,7 +38,7 @@ TEST(AgradFwdMatrix,transpose_matrix) {
   EXPECT_EQ(2,c.cols());
 
 }
-TEST(AgradFwdMatrix,transpose_vector) {
+TEST(DiffFwdMatrix,transpose_vector) {
   using stan::diff::vector_fv;
   using stan::diff::row_vector_fv;
   using stan::math::transpose;
@@ -58,7 +58,7 @@ TEST(AgradFwdMatrix,transpose_vector) {
   EXPECT_FLOAT_EQ(1.0, a_tr(1).d_);
   EXPECT_FLOAT_EQ(1.0, a_tr(2).d_);
 }
-TEST(AgradFwdMatrix,transpose_row_vector) {
+TEST(DiffFwdMatrix,transpose_row_vector) {
   using stan::diff::vector_fv;
   using stan::diff::row_vector_fv;
   using stan::math::transpose;

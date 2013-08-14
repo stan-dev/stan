@@ -4,7 +4,7 @@
 #include <stan/math/functions/ibeta.hpp>
 #include <boost/math/special_functions/beta.hpp>
 
-TEST(AgradRev,ibeta_vvv) {
+TEST(DiffRev,ibeta_vvv) {
   using stan::diff::var;
   using stan::math::ibeta;
   using stan::diff::ibeta;
@@ -35,7 +35,7 @@ TEST(AgradRev,ibeta_vvv) {
   EXPECT_FLOAT_EQ(0.02507405,grad_f[1]);
   EXPECT_FLOAT_EQ(ibeta_derivative(a.val(), b.val(), c.val()),grad_f[2]);
 }
-TEST(AgradRev,ibeta_vvd) {
+TEST(DiffRev,ibeta_vvd) {
   using stan::diff::var;
   using stan::math::ibeta;
   using stan::diff::ibeta;
@@ -64,7 +64,7 @@ TEST(AgradRev,ibeta_vvd) {
   EXPECT_FLOAT_EQ(-0.03737671,grad_f[0]);
   EXPECT_FLOAT_EQ(0.02507405,grad_f[1]);
 }
-TEST(AgradRev,ibeta_vdv) {
+TEST(DiffRev,ibeta_vdv) {
   using stan::diff::var;
   using stan::math::ibeta;
   using stan::diff::ibeta;
@@ -93,7 +93,7 @@ TEST(AgradRev,ibeta_vdv) {
   EXPECT_FLOAT_EQ(-0.03737671,grad_f[0]);
   EXPECT_FLOAT_EQ(ibeta_derivative(a.val(), b, c.val()),grad_f[1]);
 }
-TEST(AgradRev,ibeta_vdd) {
+TEST(DiffRev,ibeta_vdd) {
   using stan::diff::var;
   using stan::math::ibeta;
   using stan::diff::ibeta;
@@ -120,7 +120,7 @@ TEST(AgradRev,ibeta_vdd) {
   f.grad(x,grad_f);
   EXPECT_FLOAT_EQ(-0.03737671,grad_f[0]);
 }
-TEST(AgradRev,ibeta_dvv) {
+TEST(DiffRev,ibeta_dvv) {
   using stan::diff::var;
   using stan::math::ibeta;
   using stan::diff::ibeta;
@@ -149,7 +149,7 @@ TEST(AgradRev,ibeta_dvv) {
   EXPECT_FLOAT_EQ(0.02507405,grad_f[0]);
   EXPECT_FLOAT_EQ(ibeta_derivative(a, b.val(), c.val()),grad_f[1]);
 }
-TEST(AgradRev,ibeta_dvd) {
+TEST(DiffRev,ibeta_dvd) {
   using stan::diff::var;
   using stan::math::ibeta;
   using stan::diff::ibeta;
@@ -176,7 +176,7 @@ TEST(AgradRev,ibeta_dvd) {
   f.grad(x,grad_f);
   EXPECT_FLOAT_EQ(0.02507405,grad_f[0]);
 }
-TEST(AgradRev,ibeta_ddv) {
+TEST(DiffRev,ibeta_ddv) {
   using stan::diff::var;
   using stan::math::ibeta;
   using stan::diff::ibeta;

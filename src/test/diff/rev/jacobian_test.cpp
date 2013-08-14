@@ -4,7 +4,7 @@
 #include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
-TEST(AgradRev,jacobian) {
+TEST(DiffRev,jacobian) {
   AVAR x1 = 2.0;
   AVAR x2 = 3.0;
   

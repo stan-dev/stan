@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 #include <stan/diff.hpp>
 
-TEST(AgradRev,multiplyLogChainVV) {
+TEST(DiffRev,multiplyLogChainVV) {
   AVAR a = 19.7;
   AVAR b = 1299.1;
   AVAR f = 2.0 * multiply_log(a,b);
@@ -15,7 +15,7 @@ TEST(AgradRev,multiplyLogChainVV) {
   EXPECT_FLOAT_EQ(2.0 * std::log(b.val()), grad_f[0]);
   EXPECT_FLOAT_EQ(2.0 * a.val() / b.val(), grad_f[1]);
 }
-TEST(AgradRev,multiplyLogChainDV) {
+TEST(DiffRev,multiplyLogChainDV) {
   double a = 19.7;
   AVAR b = 1299.1;
   AVAR f = 2.0 * multiply_log(a,b);
@@ -26,7 +26,7 @@ TEST(AgradRev,multiplyLogChainDV) {
 
   EXPECT_FLOAT_EQ(2.0 * a / b.val(), grad_f[0]);
 }
-TEST(AgradRev,multiplyLogChainVD) {
+TEST(DiffRev,multiplyLogChainVD) {
   AVAR a = 19.7;
   double b = 1299.1;
   AVAR f = 2.0 * multiply_log(a,b);
@@ -37,7 +37,7 @@ TEST(AgradRev,multiplyLogChainVD) {
 
   EXPECT_FLOAT_EQ(2.0 * std::log(b), grad_f[0]);
 }
-TEST(AgradRev,multiply_log_var_var) {
+TEST(DiffRev,multiply_log_var_var) {
   AVAR a = 2.2;
   AVAR b = 3.3;
   AVAR f = multiply_log(a,b);
@@ -61,7 +61,7 @@ TEST(AgradRev,multiply_log_var_var) {
   EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(),g[1]);
 }
 
-TEST(AgradRev,multiply_log_var_double){
+TEST(DiffRev,multiply_log_var_double){
   AVAR a = 2.2;
   double b = 3.3;
   AVAR f = multiply_log(a,b);
@@ -82,7 +82,7 @@ TEST(AgradRev,multiply_log_var_double){
   f.grad(x,g);
   EXPECT_FLOAT_EQ(std::log(b),g[0]);
 }
-TEST(AgradRev,multiply_log_double_var){
+TEST(DiffRev,multiply_log_double_var){
   double a = 2.2;
   AVAR b = 3.3;
   AVAR f = multiply_log(a,b);

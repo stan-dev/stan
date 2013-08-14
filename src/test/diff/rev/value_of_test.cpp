@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 #include <stan/math/functions/value_of.hpp>
 
-TEST(AgradRev,value_of) {
+TEST(DiffRev,value_of) {
   using stan::diff::var;
   using stan::math::value_of;
   using stan::diff::value_of;

@@ -2,7 +2,7 @@
 #include <stan/math/matrix_error_handling.hpp>
 #include <stan/diff.hpp>
 
-TEST(AgradRevErrorHandlingMatrix,CheckCovMatrix) {
+TEST(DiffRevErrorHandlingMatrix,CheckCovMatrix) {
   using stan::diff::var;
   using Eigen::Dynamic;
   using Eigen::Matrix;

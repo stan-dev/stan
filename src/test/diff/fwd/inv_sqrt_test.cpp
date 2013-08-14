@@ -3,7 +3,7 @@
 #include <stan/math/functions/inv_sqrt.hpp>
 #include <stan/math/constants.hpp>
 
-TEST(AgradFvar, inv_sqrt) {
+TEST(DiffFvar, inv_sqrt) {
   using stan::diff::fvar;
   using stan::math::inv_sqrt;
 

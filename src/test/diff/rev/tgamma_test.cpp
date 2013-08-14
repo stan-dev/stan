@@ -4,7 +4,7 @@
 #include <boost/math/special_functions/digamma.hpp>
 #include <boost/math/special_functions/gamma.hpp>
 
-TEST(AgradRev,tgamma) {
+TEST(DiffRev,tgamma) {
   AVAR a = 3.5;
   AVAR f = tgamma(a);
   EXPECT_FLOAT_EQ(boost::math::tgamma(3.5),f.val());

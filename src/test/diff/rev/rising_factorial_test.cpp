@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 #include <boost/math/special_functions/digamma.hpp>
 
-TEST(AgradRev,rising_factorial_var_double) {
+TEST(DiffRev,rising_factorial_var_double) {
   using boost::math::digamma;
   double a(1);
   AVAR b(4.0);
@@ -17,7 +17,7 @@ TEST(AgradRev,rising_factorial_var_double) {
   EXPECT_FLOAT_EQ((digamma(5.0) - digamma(4.0)) * 4.0,g[1]);
 } 
 
-TEST(AgradRev, rising_factorial_exceptions) {
+TEST(DiffRev, rising_factorial_exceptions) {
   double a(1);
   AVAR b(-3.0);
   EXPECT_THROW(stan::diff::rising_factorial(b,a), std::domain_error);
@@ -25,7 +25,7 @@ TEST(AgradRev, rising_factorial_exceptions) {
   EXPECT_THROW(stan::diff::rising_factorial(b,b), std::domain_error);
 }
 
-TEST(AgradRev, rising_factorial_double_var) {
+TEST(DiffRev, rising_factorial_double_var) {
   using boost::math::digamma;
   double a(5);
   AVAR b(4.0);
@@ -38,7 +38,7 @@ TEST(AgradRev, rising_factorial_double_var) {
   EXPECT_FLOAT_EQ(digamma(9) * 5*6*7*8, g[1]);
 }
 
-TEST(AgradRev, rising_factorial_var_var) {
+TEST(DiffRev, rising_factorial_var_var) {
   using boost::math::digamma;
   AVAR c(4.0);
   AVAR b(4.0);

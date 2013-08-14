@@ -3,7 +3,7 @@
 #include <stan/diff/fwd.hpp>
 #include <stan/diff/fwd/matrix/typedefs.hpp>
 
-TEST(AgradFwdMatrix, dot_product_vector_vector) {
+TEST(DiffFwdMatrix, dot_product_vector_vector) {
   using stan::math::vector_d;
   using stan::diff::vector_fv;
 
@@ -29,7 +29,7 @@ TEST(AgradFwdMatrix, dot_product_vector_vector) {
   EXPECT_FLOAT_EQ( 0, stan::diff::dot_product(vv_1, vv_2).d_);
 }
 
-TEST(AgradFwdMatrix, dot_product_vector_vector_exception) {
+TEST(DiffFwdMatrix, dot_product_vector_vector_exception) {
   using stan::math::vector_d;
   using stan::diff::vector_fv;
 
@@ -42,7 +42,7 @@ TEST(AgradFwdMatrix, dot_product_vector_vector_exception) {
   EXPECT_THROW(stan::diff::dot_product(d1, v2), std::domain_error);
   EXPECT_THROW(stan::diff::dot_product(v1, v2), std::domain_error);
 }
-TEST(AgradFwdMatrix, dot_product_rowvector_vector) {
+TEST(DiffFwdMatrix, dot_product_rowvector_vector) {
   using stan::math::vector_d;
   using stan::diff::vector_fv;
   using stan::math::row_vector_d;
@@ -72,7 +72,7 @@ TEST(AgradFwdMatrix, dot_product_rowvector_vector) {
   EXPECT_FLOAT_EQ( 0, stan::diff::dot_product(v1, v2).d_);
 }
 
-TEST(AgradFwdMatrix, dot_product_rowvector_vector_exception) {
+TEST(DiffFwdMatrix, dot_product_rowvector_vector_exception) {
   using stan::math::vector_d;
   using stan::diff::vector_fv;
   using stan::math::row_vector_d;
@@ -88,7 +88,7 @@ TEST(AgradFwdMatrix, dot_product_rowvector_vector_exception) {
   EXPECT_THROW(stan::diff::dot_product(v1, v2), std::domain_error);
 }
 
-TEST(AgradFwdMatrix, dot_product_vector_rowvector) {
+TEST(DiffFwdMatrix, dot_product_vector_rowvector) {
   using stan::math::vector_d;
   using stan::diff::vector_fv;
   using stan::math::row_vector_d;
@@ -118,7 +118,7 @@ TEST(AgradFwdMatrix, dot_product_vector_rowvector) {
   EXPECT_FLOAT_EQ( 0, stan::diff::dot_product(v1, v2).d_);
 }
 
-TEST(AgradFwdMatrix, dot_product_vector_rowvector_exception) {
+TEST(DiffFwdMatrix, dot_product_vector_rowvector_exception) {
   using stan::math::vector_d;
   using stan::diff::vector_fv;
   using stan::math::row_vector_d;
@@ -134,7 +134,7 @@ TEST(AgradFwdMatrix, dot_product_vector_rowvector_exception) {
   EXPECT_THROW(stan::diff::dot_product(v1, v2), std::domain_error);
 }
 
-TEST(AgradFwdMatrix, dot_product_rowvector_rowvector) {
+TEST(DiffFwdMatrix, dot_product_rowvector_rowvector) {
   using stan::math::row_vector_d;
   using stan::diff::row_vector_fv;
 
@@ -160,7 +160,7 @@ TEST(AgradFwdMatrix, dot_product_rowvector_rowvector) {
   EXPECT_FLOAT_EQ( 0, stan::diff::dot_product(v1, v2).d_);
 }
 
-TEST(AgradFwdMatrix, dot_product_rowvector_rowvector_exception) {
+TEST(DiffFwdMatrix, dot_product_rowvector_rowvector_exception) {
   using stan::math::row_vector_d;
   using stan::diff::row_vector_fv;
 
@@ -172,7 +172,7 @@ TEST(AgradFwdMatrix, dot_product_rowvector_rowvector_exception) {
   EXPECT_THROW(stan::diff::dot_product(v1, v2), std::domain_error);
 }
 
-TEST(AgradFwdMatrix, dot_product_stdvector_stdvector) {
+TEST(DiffFwdMatrix, dot_product_stdvector_stdvector) {
   using std::vector;
   using stan::diff::fvar;
 
@@ -204,7 +204,7 @@ TEST(AgradFwdMatrix, dot_product_stdvector_stdvector) {
   EXPECT_FLOAT_EQ(12.0, dot_product(dv, fv1).d_);
   EXPECT_FLOAT_EQ(18.0, dot_product(fv1, fv2).d_);
 }
-TEST(AgradFwdMatrix, dot_product_matrix_matrix_exception) {
+TEST(DiffFwdMatrix, dot_product_matrix_matrix_exception) {
   using stan::math::matrix_d;
   using stan::diff::matrix_fv;
   using stan::diff::dot_product;
@@ -260,7 +260,7 @@ TEST(AgradFwdMatrix, dot_product_matrix_matrix_exception) {
   EXPECT_THROW(dot_product(d2,v5), std::domain_error);
   EXPECT_THROW(dot_product(d2,v6), std::domain_error);
 }
-TEST(AgradFwdMatrix, dot_product_vector_vector_length) {
+TEST(DiffFwdMatrix, dot_product_vector_vector_length) {
   using stan::math::vector_d;
   using stan::diff::vector_fv;
 
@@ -285,7 +285,7 @@ TEST(AgradFwdMatrix, dot_product_vector_vector_length) {
   EXPECT_FLOAT_EQ( 4, stan::diff::dot_product(vd_1, vv_2, length).d_);
   EXPECT_FLOAT_EQ( 6, stan::diff::dot_product(vv_1, vv_2, length).d_);
 }
-TEST(AgradFwdMatrix, dot_product_vector_vector_no_exception_length) {
+TEST(DiffFwdMatrix, dot_product_vector_vector_no_exception_length) {
   using stan::math::vector_d;
   using stan::diff::vector_fv;
 
@@ -314,7 +314,7 @@ TEST(AgradFwdMatrix, dot_product_vector_vector_no_exception_length) {
   EXPECT_FLOAT_EQ( 4, stan::diff::dot_product(d1, v2, length).d_);
   EXPECT_FLOAT_EQ( 6, stan::diff::dot_product(v1, v2, length).d_);
 }
-TEST(AgradFwdMatrix, dot_product_rowvector_vector_length) {
+TEST(DiffFwdMatrix, dot_product_rowvector_vector_length) {
   using stan::math::vector_d;
   using stan::diff::vector_fv;
   using stan::math::row_vector_d;
@@ -344,7 +344,7 @@ TEST(AgradFwdMatrix, dot_product_rowvector_vector_length) {
   EXPECT_FLOAT_EQ( 4, stan::diff::dot_product(d1, v2, length).d_);
   EXPECT_FLOAT_EQ( 6, stan::diff::dot_product(v1, v2, length).d_);
 }
-TEST(AgradFwdMatrix, dot_product_rowvector_vector_no_exception_length) {
+TEST(DiffFwdMatrix, dot_product_rowvector_vector_no_exception_length) {
   using stan::math::vector_d;
   using stan::diff::vector_fv;
   using stan::math::row_vector_d;
@@ -375,7 +375,7 @@ TEST(AgradFwdMatrix, dot_product_rowvector_vector_no_exception_length) {
   EXPECT_FLOAT_EQ( 4, stan::diff::dot_product(d1, v2, length).d_);
   EXPECT_FLOAT_EQ( 6, stan::diff::dot_product(v1, v2, length).d_);
 }
-TEST(AgradFwdMatrix, dot_product_vector_rowvector_length) {
+TEST(DiffFwdMatrix, dot_product_vector_rowvector_length) {
   using stan::math::vector_d;
   using stan::diff::vector_fv;
   using stan::math::row_vector_d;
@@ -405,7 +405,7 @@ TEST(AgradFwdMatrix, dot_product_vector_rowvector_length) {
   EXPECT_FLOAT_EQ( 4, stan::diff::dot_product(d1, v2, length).d_);
   EXPECT_FLOAT_EQ( 6, stan::diff::dot_product(v1, v2, length).d_);
 }
-TEST(AgradFwdMatrix, dot_product_vector_rowvector_no_exception_length) {
+TEST(DiffFwdMatrix, dot_product_vector_rowvector_no_exception_length) {
   using stan::math::vector_d;
   using stan::diff::vector_fv;
   using stan::math::row_vector_d;
@@ -436,7 +436,7 @@ TEST(AgradFwdMatrix, dot_product_vector_rowvector_no_exception_length) {
   EXPECT_FLOAT_EQ( 4, stan::diff::dot_product(d1, v2, length).d_);
   EXPECT_FLOAT_EQ( 6, stan::diff::dot_product(v1, v2, length).d_);
 }
-TEST(AgradFwdMatrix, dot_product_rowvector_rowvector_length) {
+TEST(DiffFwdMatrix, dot_product_rowvector_rowvector_length) {
   using stan::math::row_vector_d;
   using stan::diff::row_vector_fv;
 
@@ -462,7 +462,7 @@ TEST(AgradFwdMatrix, dot_product_rowvector_rowvector_length) {
   EXPECT_FLOAT_EQ( 4, stan::diff::dot_product(d1, v2, length).d_);
   EXPECT_FLOAT_EQ( 6, stan::diff::dot_product(v1, v2, length).d_);
 }
-TEST(AgradFwdMatrix, dot_product_rowvector_rowvector_no_exception_length) {
+TEST(DiffFwdMatrix, dot_product_rowvector_rowvector_no_exception_length) {
   using stan::math::row_vector_d;
   using stan::diff::row_vector_fv;
 
@@ -489,7 +489,7 @@ TEST(AgradFwdMatrix, dot_product_rowvector_rowvector_no_exception_length) {
   EXPECT_FLOAT_EQ( 4, stan::diff::dot_product(d1, v2, length).d_);
   EXPECT_FLOAT_EQ( 6, stan::diff::dot_product(v1, v2, length).d_);
 }
-TEST(AgradFwdMatrix, dot_product_stdvector_stdvector_length) {
+TEST(DiffFwdMatrix, dot_product_stdvector_stdvector_length) {
   using std::vector;
   using stan::diff::fvar;
 
@@ -521,7 +521,7 @@ TEST(AgradFwdMatrix, dot_product_stdvector_stdvector_length) {
   EXPECT_FLOAT_EQ( 6.0, dot_product(dv, fv1, length).d_);
   EXPECT_FLOAT_EQ( 8.0, dot_product(fv1, fv2, length).d_);
 }
-TEST(AgradFwdMatrix, dot_product_matrix_matrix_exception_length) {
+TEST(DiffFwdMatrix, dot_product_matrix_matrix_exception_length) {
   using stan::math::matrix_d;
   using stan::diff::matrix_fv;
   using stan::diff::dot_product;

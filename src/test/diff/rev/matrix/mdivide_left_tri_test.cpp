@@ -5,7 +5,7 @@
 #include <stan/math/matrix/mdivide_left_tri.hpp>
 #include <stan/diff.hpp>
 
-TEST(AgradRevMatrix,mdivide_left_tri_val) {
+TEST(DiffRevMatrix,mdivide_left_tri_val) {
   using stan::math::matrix_d;
   using stan::diff::matrix_v;
   using stan::math::mdivide_left_tri;
@@ -68,7 +68,7 @@ TEST(AgradRevMatrix,mdivide_left_tri_val) {
   EXPECT_NEAR(0.0,I(1,0).val(),1.0E-12);
   EXPECT_NEAR(1.0,I(1,1).val(),1.0e-12);
 }
-TEST(AgradRevMatrix,mdivide_left_tri_lower_grad_vv) {
+TEST(DiffRevMatrix,mdivide_left_tri_lower_grad_vv) {
   using stan::math::matrix_d;
   using stan::diff::matrix_v;
   using stan::math::mdivide_left_tri;
@@ -125,7 +125,7 @@ TEST(AgradRevMatrix,mdivide_left_tri_lower_grad_vv) {
   }
 }
 
-TEST(AgradRevMatrix,mdivide_left_tri_lower_grad_dv) {
+TEST(DiffRevMatrix,mdivide_left_tri_lower_grad_dv) {
   using stan::math::matrix_d;
   using stan::diff::matrix_v;
   using stan::math::mdivide_left_tri;
@@ -166,7 +166,7 @@ TEST(AgradRevMatrix,mdivide_left_tri_lower_grad_dv) {
   }
 }
 
-TEST(AgradRevMatrix,mdivide_left_tri_lower_grad_vd) {
+TEST(DiffRevMatrix,mdivide_left_tri_lower_grad_vd) {
   using stan::math::matrix_d;
   using stan::diff::matrix_v;
   using stan::math::mdivide_left_tri;
@@ -213,7 +213,7 @@ TEST(AgradRevMatrix,mdivide_left_tri_lower_grad_vd) {
     }
   }
 }
-TEST(AgradRevMatrix,mdivide_left_tri_upper_grad_vv) {
+TEST(DiffRevMatrix,mdivide_left_tri_upper_grad_vv) {
   using stan::math::matrix_d;
   using stan::diff::matrix_v;
   using stan::math::mdivide_left_tri;
@@ -270,7 +270,7 @@ TEST(AgradRevMatrix,mdivide_left_tri_upper_grad_vv) {
   }
 }
 
-TEST(AgradRevMatrix,mdivide_left_tri_upper_grad_dv) {
+TEST(DiffRevMatrix,mdivide_left_tri_upper_grad_dv) {
   using stan::math::matrix_d;
   using stan::diff::matrix_v;
   using stan::math::mdivide_left_tri;
@@ -311,7 +311,7 @@ TEST(AgradRevMatrix,mdivide_left_tri_upper_grad_dv) {
   }
 }
 
-TEST(AgradRevMatrix,mdivide_left_tri_upper_grad_vd) {
+TEST(DiffRevMatrix,mdivide_left_tri_upper_grad_vd) {
   using stan::math::matrix_d;
   using stan::diff::matrix_v;
   using stan::math::mdivide_left_tri;
@@ -358,9 +358,9 @@ TEST(AgradRevMatrix,mdivide_left_tri_upper_grad_vd) {
     }
   }
 }
-// // FIXME:  Fails in g++ 4.2 -- can't find agrad version of mdivide_left_tri
+// // FIXME:  Fails in g++ 4.2 -- can't find diff version of mdivide_left_tri
 // //         Works in clang++ and later g++
-// // TEST(AgradRevMatrix,mdivide_left_tri2) {
+// // TEST(DiffRevMatrix,mdivide_left_tri2) {
 // //   using stan::math::mdivide_left_tri;
 // //   using stan::diff::mdivide_left_tri;
 // //   int k = 3;

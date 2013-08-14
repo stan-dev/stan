@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-TEST(AgradRev,pos_a) {
+TEST(DiffRev,pos_a) {
   AVAR a = 5.0;
   AVAR f = +a;
   EXPECT_FLOAT_EQ(5.0,f.val());

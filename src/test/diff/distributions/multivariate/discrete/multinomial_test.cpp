@@ -20,7 +20,7 @@ using Eigen::Dynamic;
 using Eigen::Matrix;
 
 
-TEST(AgradDistributionsMultinomial,Propto) {
+TEST(DiffDistributionsMultinomial,Propto) {
   std::vector<int> ns;
   ns.push_back(1);
   ns.push_back(2);

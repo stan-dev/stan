@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <stan/diff/fwd.hpp>
 
-TEST(AgradFvar, fmod) {
+TEST(DiffFvar, fmod) {
   using stan::diff::fvar;
   using std::fmod;
   using std::floor;

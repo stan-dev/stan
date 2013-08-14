@@ -4,7 +4,7 @@
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/diff/rev/matrix/typedefs.hpp>
 
-TEST(AgradRevMatrix,transpose_matrix) {
+TEST(DiffRevMatrix,transpose_matrix) {
   using stan::math::matrix_d;
   using stan::diff::matrix_v;
   using stan::math::transpose;
@@ -30,7 +30,7 @@ TEST(AgradRevMatrix,transpose_matrix) {
   EXPECT_FLOAT_EQ(1.0,g[1]);
   EXPECT_FLOAT_EQ(0.0,g[2]);
 }
-TEST(AgradRevMatrix,transpose_vector) {
+TEST(DiffRevMatrix,transpose_vector) {
   using stan::diff::vector_v;
   using stan::diff::row_vector_v;
   using stan::math::transpose;
@@ -50,7 +50,7 @@ TEST(AgradRevMatrix,transpose_vector) {
   EXPECT_FLOAT_EQ(1.0,g[1]);
   EXPECT_FLOAT_EQ(0.0,g[2]);
 }
-TEST(AgradRevMatrix,transpose_row_vector) {
+TEST(DiffRevMatrix,transpose_row_vector) {
   using stan::diff::vector_v;
   using stan::diff::row_vector_v;
   using stan::math::transpose;

@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 #include <stan/diff/rev/numeric_limits.hpp>
 
-TEST(AgradRev,exp2) {
+TEST(DiffRev,exp2) {
   AVAR a = 1.3;
   AVAR f = stan::diff::exp2(a);
   EXPECT_FLOAT_EQ(std::pow(2.0,1.3), f.val());

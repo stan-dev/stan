@@ -5,7 +5,7 @@
 #include <stan/diff/rev/matrix/typedefs.hpp>
 #include <stan/diff.hpp>
 
-TEST(AgradRevMatrix, log_matrix) {
+TEST(DiffRevMatrix, log_matrix) {
   using stan::math::log;
   using stan::math::matrix_d;
   using stan::diff::matrix_v;

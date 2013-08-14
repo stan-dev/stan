@@ -3,7 +3,7 @@
 #include <stan/math/functions/log_sum_exp.hpp>
 #include <stan/diff/fwd/log_sum_exp.hpp>
 
-TEST(AgradFvar, log_sum_exp) {
+TEST(DiffFvar, log_sum_exp) {
   using stan::diff::fvar;
   using stan::math::log_sum_exp;
   using std::exp;
@@ -58,7 +58,7 @@ void log_sum_exp_test(const std::vector<double>& x) {
   }
 }
 
-TEST(AgradRevLogSumExp,vector) {
+TEST(DiffRevLogSumExp,vector) {
   using std::vector;
 
   vector<double> a(1);

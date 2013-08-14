@@ -5,7 +5,7 @@
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/diff/rev/matrix/typedefs.hpp>
 
-TEST(AgradRevMatrix, multiply_scalar_scalar) {
+TEST(DiffRevMatrix, multiply_scalar_scalar) {
   using stan::diff::multiply;
   double d1, d2;
   AVAR   v1, v2;
@@ -26,7 +26,7 @@ TEST(AgradRevMatrix, multiply_scalar_scalar) {
 
   
 }
-TEST(AgradRevMatrix, multiply_vector_scalar) {
+TEST(DiffRevMatrix, multiply_vector_scalar) {
   using stan::math::vector_d;
   using stan::diff::vector_v;
 
@@ -56,7 +56,7 @@ TEST(AgradRevMatrix, multiply_vector_scalar) {
   EXPECT_FLOAT_EQ(   0, output(1).val());
   EXPECT_FLOAT_EQ(   6, output(2).val());
 }
-TEST(AgradRevMatrix, multiply_rowvector_scalar) {
+TEST(DiffRevMatrix, multiply_rowvector_scalar) {
   using stan::math::row_vector_d;
   using stan::diff::row_vector_v;
 
@@ -86,7 +86,7 @@ TEST(AgradRevMatrix, multiply_rowvector_scalar) {
   EXPECT_FLOAT_EQ(   0, output(1).val());
   EXPECT_FLOAT_EQ(   6, output(2).val());
 }
-TEST(AgradRevMatrix, multiply_matrix_scalar) {
+TEST(DiffRevMatrix, multiply_matrix_scalar) {
   using stan::math::matrix_d;
   using stan::diff::matrix_v;
   
@@ -119,7 +119,7 @@ TEST(AgradRevMatrix, multiply_matrix_scalar) {
   EXPECT_FLOAT_EQ(   6, output(1,0).val());
   EXPECT_FLOAT_EQ(  -8, output(1,1).val());
 }
-TEST(AgradRevMatrix, multiply_rowvector_vector) {
+TEST(DiffRevMatrix, multiply_rowvector_vector) {
   using stan::math::vector_d;
   using stan::diff::vector_v;
   using stan::math::row_vector_d;
@@ -145,7 +145,7 @@ TEST(AgradRevMatrix, multiply_rowvector_vector) {
   EXPECT_THROW(multiply(v1, d2), std::domain_error);
   EXPECT_THROW(multiply(d1, v2), std::domain_error);
 }
-TEST(AgradRevMatrix, multiply_vector_rowvector) {
+TEST(DiffRevMatrix, multiply_vector_rowvector) {
   using stan::diff::matrix_v;
   using stan::math::vector_d;
   using stan::diff::vector_v;
@@ -201,7 +201,7 @@ TEST(AgradRevMatrix, multiply_vector_rowvector) {
   EXPECT_FLOAT_EQ( 10, output(2,1).val());
   EXPECT_FLOAT_EQ(  5, output(2,2).val());
 }
-TEST(AgradRevMatrix, multiply_matrix_vector) {
+TEST(DiffRevMatrix, multiply_matrix_vector) {
   using stan::math::matrix_d;
   using stan::diff::matrix_v;
   using stan::math::vector_d;
@@ -236,7 +236,7 @@ TEST(AgradRevMatrix, multiply_matrix_vector) {
   EXPECT_FLOAT_EQ(26, output(1).val());
   EXPECT_FLOAT_EQ( 0, output(2).val());
 }
-TEST(AgradRevMatrix, multiply_matrix_vector_exception) {
+TEST(DiffRevMatrix, multiply_matrix_vector_exception) {
   using stan::math::matrix_d;
   using stan::diff::matrix_v;
   using stan::math::vector_d;
@@ -250,7 +250,7 @@ TEST(AgradRevMatrix, multiply_matrix_vector_exception) {
   EXPECT_THROW(multiply(v1, d2), std::domain_error);
   EXPECT_THROW(multiply(d1, v2), std::domain_error);
 }
-TEST(AgradRevMatrix, multiply_rowvector_matrix) {
+TEST(DiffRevMatrix, multiply_rowvector_matrix) {
   using stan::math::matrix_d;
   using stan::diff::matrix_v;
   using stan::diff::vector_v;
@@ -282,7 +282,7 @@ TEST(AgradRevMatrix, multiply_rowvector_matrix) {
   EXPECT_FLOAT_EQ(-24, output(0).val());
   EXPECT_FLOAT_EQ(  9, output(1).val());
 }
-TEST(AgradRevMatrix, multiply_rowvector_matrix_exception) {
+TEST(DiffRevMatrix, multiply_rowvector_matrix_exception) {
   using stan::math::matrix_d;
   using stan::diff::matrix_v;
   using stan::math::row_vector_d;
@@ -296,7 +296,7 @@ TEST(AgradRevMatrix, multiply_rowvector_matrix_exception) {
   EXPECT_THROW(multiply(v1, d2), std::domain_error);
   EXPECT_THROW(multiply(d1, v2), std::domain_error);
 }
-TEST(AgradRevMatrix, multiply_matrix_matrix) {
+TEST(DiffRevMatrix, multiply_matrix_matrix) {
   using stan::math::matrix_d;
   using stan::diff::matrix_v;
 
@@ -334,7 +334,7 @@ TEST(AgradRevMatrix, multiply_matrix_matrix) {
   EXPECT_FLOAT_EQ( 157, output(1,0).val());
   EXPECT_FLOAT_EQ( 135, output(1,1).val());
 }
-TEST(AgradRevMatrix, multiply_matrix_matrix_exception) {
+TEST(DiffRevMatrix, multiply_matrix_matrix_exception) {
   using stan::math::matrix_d;
   using stan::diff::matrix_v;
 
@@ -347,7 +347,7 @@ TEST(AgradRevMatrix, multiply_matrix_matrix_exception) {
   EXPECT_THROW(multiply(v1, d2), std::domain_error);
   EXPECT_THROW(multiply(d1, v2), std::domain_error);
 }
-TEST(AgradRevMatrix,multiply_scalar_vector_cv) {
+TEST(DiffRevMatrix,multiply_scalar_vector_cv) {
   using stan::diff::multiply;
   using stan::diff::vector_v;
 
@@ -364,7 +364,7 @@ TEST(AgradRevMatrix,multiply_scalar_vector_cv) {
   EXPECT_FLOAT_EQ(0.0,g[1]);
   EXPECT_FLOAT_EQ(0.0,g[2]);
 }
-TEST(AgradRevMatrix,multiply_scalar_vector_vv) {
+TEST(DiffRevMatrix,multiply_scalar_vector_vv) {
   using stan::diff::multiply;
   using stan::diff::vector_v;
 
@@ -383,7 +383,7 @@ TEST(AgradRevMatrix,multiply_scalar_vector_vv) {
   EXPECT_FLOAT_EQ(0.0,g[2]);
   EXPECT_FLOAT_EQ(4.0,g[3]);
 }
-TEST(AgradRevMatrix,multiply_scalar_vector_vc) {
+TEST(DiffRevMatrix,multiply_scalar_vector_vc) {
   using stan::diff::multiply;
   using stan::diff::vector_v;
 
@@ -400,7 +400,7 @@ TEST(AgradRevMatrix,multiply_scalar_vector_vc) {
   EXPECT_FLOAT_EQ(3.0,g[0]);
 }
 
-TEST(AgradRevMatrix,multiply_scalar_row_vector_cv) {
+TEST(DiffRevMatrix,multiply_scalar_row_vector_cv) {
   using stan::diff::multiply;
   using stan::diff::row_vector_v;
 
@@ -417,7 +417,7 @@ TEST(AgradRevMatrix,multiply_scalar_row_vector_cv) {
   EXPECT_FLOAT_EQ(0.0,g[1]);
   EXPECT_FLOAT_EQ(0.0,g[2]);
 }
-TEST(AgradRevMatrix,multiply_scalar_row_vector_vv) {
+TEST(DiffRevMatrix,multiply_scalar_row_vector_vv) {
   using stan::diff::multiply;
   using stan::diff::row_vector_v;
 
@@ -436,7 +436,7 @@ TEST(AgradRevMatrix,multiply_scalar_row_vector_vv) {
   EXPECT_FLOAT_EQ(0.0,g[2]);
   EXPECT_FLOAT_EQ(4.0,g[3]);
 }
-TEST(AgradRevMatrix,multiply_scalar_row_vector_vc) {
+TEST(DiffRevMatrix,multiply_scalar_row_vector_vc) {
   using stan::diff::multiply;
   using stan::diff::row_vector_v;
 
@@ -453,7 +453,7 @@ TEST(AgradRevMatrix,multiply_scalar_row_vector_vc) {
   EXPECT_FLOAT_EQ(3.0,g[0]);
 }
 
-TEST(AgradRevMatrix,multiply_scalar_matrix_cv) {
+TEST(DiffRevMatrix,multiply_scalar_matrix_cv) {
   using stan::diff::multiply;
   using stan::diff::matrix_v;
 
@@ -472,7 +472,7 @@ TEST(AgradRevMatrix,multiply_scalar_matrix_cv) {
   EXPECT_FLOAT_EQ(0.0,g[3]);
 }
 
-TEST(AgradRevMatrix,multiply_scalar_matrix_vc) {
+TEST(DiffRevMatrix,multiply_scalar_matrix_vc) {
   using stan::diff::multiply;
   using stan::math::matrix_d;
   using stan::diff::matrix_v;
@@ -491,7 +491,7 @@ TEST(AgradRevMatrix,multiply_scalar_matrix_vc) {
   EXPECT_FLOAT_EQ(4.0,g[0]);
 }
 
-TEST(AgradRevMatrix,multiply_vector_int) {
+TEST(DiffRevMatrix,multiply_vector_int) {
   using stan::diff::multiply; // test namespace resolution
   using stan::math::multiply;
   using stan::math::vector_d;

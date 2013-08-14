@@ -7,7 +7,7 @@
 #include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
-TEST(AgradRev,inv_cloglog) {
+TEST(DiffRev,inv_cloglog) {
   using std::exp;
   using stan::diff::exp;
   AVAR a = 2.7;

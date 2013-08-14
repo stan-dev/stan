@@ -7,7 +7,7 @@
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/diff/rev/matrix/typedefs.hpp>
 
-TEST(AgradRevMatrix, quad_form_mat) {
+TEST(DiffRevMatrix, quad_form_mat) {
   using stan::math::quad_form;
   using stan::diff::matrix_v;
   using stan::math::matrix_d;
@@ -67,7 +67,7 @@ TEST(AgradRevMatrix, quad_form_mat) {
   EXPECT_FLOAT_EQ(725, res(1,1).val());
 }
 
-TEST(AgradRevMatrix, quad_form_mat_grad_vd) {
+TEST(DiffRevMatrix, quad_form_mat_grad_vd) {
   using stan::math::quad_form;
   using stan::math::sum;
   using stan::diff::matrix_v;
@@ -111,7 +111,7 @@ TEST(AgradRevMatrix, quad_form_mat_grad_vd) {
       EXPECT_FLOAT_EQ(grad[pos], dqda(i,j));
 }
 
-TEST(AgradRevMatrix, quad_form_mat_grad_dv) {
+TEST(DiffRevMatrix, quad_form_mat_grad_dv) {
   using stan::math::quad_form;
   using stan::math::sum;
   using stan::diff::matrix_v;
@@ -155,7 +155,7 @@ TEST(AgradRevMatrix, quad_form_mat_grad_dv) {
       EXPECT_FLOAT_EQ(grad[pos], dqdb(i,j));
 }
 
-TEST(AgradRevMatrix, quad_form_mat_grad_vv) {
+TEST(DiffRevMatrix, quad_form_mat_grad_vv) {
   using stan::math::quad_form;
   using stan::math::sum;
   using stan::diff::matrix_v;
@@ -211,7 +211,7 @@ TEST(AgradRevMatrix, quad_form_mat_grad_vv) {
       EXPECT_FLOAT_EQ(grad[pos], dqda(i,j));
 }
 
-TEST(AgradRevMatrix, quad_form_sym_mat) {
+TEST(DiffRevMatrix, quad_form_sym_mat) {
   using stan::math::quad_form_sym;
   using stan::diff::matrix_v;
   using stan::math::matrix_d;
@@ -271,7 +271,7 @@ TEST(AgradRevMatrix, quad_form_sym_mat) {
   EXPECT_FLOAT_EQ(725, res(1,1).val());
 }
 
-TEST(AgradRevMatrix, quad_form_sym_mat_grad_vd) {
+TEST(DiffRevMatrix, quad_form_sym_mat_grad_vd) {
   using stan::math::quad_form_sym;
   using stan::math::sum;
   using stan::diff::matrix_v;
@@ -315,7 +315,7 @@ TEST(AgradRevMatrix, quad_form_sym_mat_grad_vd) {
       EXPECT_FLOAT_EQ(grad[pos], dqda(i,j));
 }
 
-TEST(AgradRevMatrix, quad_form_sym_mat_grad_dv) {
+TEST(DiffRevMatrix, quad_form_sym_mat_grad_dv) {
   using stan::math::quad_form_sym;
   using stan::math::sum;
   using stan::diff::matrix_v;
@@ -359,7 +359,7 @@ TEST(AgradRevMatrix, quad_form_sym_mat_grad_dv) {
       EXPECT_FLOAT_EQ(grad[pos], dqdb(i,j));
 }
 
-TEST(AgradRevMatrix, quad_form_sym_mat_grad_vv) {
+TEST(DiffRevMatrix, quad_form_sym_mat_grad_vv) {
   using stan::math::quad_form_sym;
   using stan::math::sum;
   using stan::diff::matrix_v;
@@ -415,7 +415,7 @@ TEST(AgradRevMatrix, quad_form_sym_mat_grad_vv) {
       EXPECT_FLOAT_EQ(grad[pos], dqda(i,j));
 }
 
-TEST(AgradRevMatrix, quad_form_vec) {
+TEST(DiffRevMatrix, quad_form_vec) {
   using stan::math::quad_form;
   using stan::diff::matrix_v;
   using stan::diff::vector_v;
@@ -459,7 +459,7 @@ TEST(AgradRevMatrix, quad_form_vec) {
   EXPECT_FLOAT_EQ(26033, res.val());
 }
 
-TEST(AgradRevMatrix, quad_form_vec_grad_vd) {
+TEST(DiffRevMatrix, quad_form_vec_grad_vd) {
   using stan::math::quad_form;
   using stan::diff::matrix_v;
   using stan::diff::vector_v;
@@ -502,7 +502,7 @@ TEST(AgradRevMatrix, quad_form_vec_grad_vd) {
       EXPECT_FLOAT_EQ(grad[pos], dqda(i,j));
 }
 
-TEST(AgradRevMatrix, quad_form_vec_grad_dv) {
+TEST(DiffRevMatrix, quad_form_vec_grad_dv) {
   using stan::math::quad_form;
   using stan::diff::matrix_v;
   using stan::diff::vector_v;
@@ -543,7 +543,7 @@ TEST(AgradRevMatrix, quad_form_vec_grad_dv) {
     EXPECT_FLOAT_EQ(grad[pos], dqdb[i]);
 }
 
-TEST(AgradRevMatrix, quad_form_vec_grad_vv) {
+TEST(DiffRevMatrix, quad_form_vec_grad_vv) {
   using stan::math::quad_form;
   using stan::diff::matrix_v;
   using stan::diff::vector_v;
@@ -591,7 +591,7 @@ TEST(AgradRevMatrix, quad_form_vec_grad_vv) {
       EXPECT_FLOAT_EQ(grad[pos], dqda(i,j));
 }
 
-TEST(AgradRevMatrix, quad_form_sym_vec) {
+TEST(DiffRevMatrix, quad_form_sym_vec) {
   using stan::math::quad_form_sym;
   using stan::diff::matrix_v;
   using stan::diff::vector_v;
@@ -635,7 +635,7 @@ TEST(AgradRevMatrix, quad_form_sym_vec) {
   EXPECT_FLOAT_EQ(25433, res.val());
 }
 
-TEST(AgradRevMatrix, quad_form_sym_vec_grad_vd) {
+TEST(DiffRevMatrix, quad_form_sym_vec_grad_vd) {
   using stan::math::quad_form_sym;
   using stan::diff::matrix_v;
   using stan::diff::vector_v;
@@ -679,7 +679,7 @@ TEST(AgradRevMatrix, quad_form_sym_vec_grad_vd) {
       EXPECT_FLOAT_EQ(grad[pos], dqda(i,j));
 }
 
-TEST(AgradRevMatrix, quad_form_sym_vec_grad_dv) {
+TEST(DiffRevMatrix, quad_form_sym_vec_grad_dv) {
   using stan::math::quad_form_sym;
   using stan::diff::matrix_v;
   using stan::diff::vector_v;
@@ -721,7 +721,7 @@ TEST(AgradRevMatrix, quad_form_sym_vec_grad_dv) {
     EXPECT_FLOAT_EQ(grad[pos], dqdb[i]);
 }
 
-TEST(AgradRevMatrix, quad_form_sym_vec_grad_vv) {
+TEST(DiffRevMatrix, quad_form_sym_vec_grad_vv) {
   using stan::math::quad_form_sym;
   using stan::diff::matrix_v;
   using stan::diff::vector_v;

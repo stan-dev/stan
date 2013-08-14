@@ -4,7 +4,7 @@
 #include <stan/diff/rev.hpp>
 #include <test/diff/util.hpp>
 
-TEST(AgradFvar, rising_factorial) {
+TEST(DiffFvar, rising_factorial) {
   using stan::diff::fvar;
   using stan::diff::rising_factorial;
   using boost::math::digamma;
@@ -29,7 +29,7 @@ TEST(AgradFvar, rising_factorial) {
   EXPECT_FLOAT_EQ(1680.0 * digamma(9), x.d_);
 }
 //WONT WORK UNTIL STUFF IN CLEAN_UP_FVAR IS MERGED IN -- REQUIRES DIGAMMA FUNCTION
-// TEST(AgradFvarVar, rising_factorial) {
+// TEST(DiffFvarVar, rising_factorial) {
 //   using stan::diff::fvar;
 //   using stan::diff::var;
 //   using stan::diff::rising_factorial;
@@ -48,7 +48,7 @@ TEST(AgradFvar, rising_factorial) {
 //   EXPECT_FLOAT_EQ(0, g[1]);
 // }
 
-// TEST(AgradFvarFvar, rising_factorial) {
+// TEST(DiffFvarFvar, rising_factorial) {
 //   using stan::diff::fvar;
 //   using stan::math::rising_factorial;
 

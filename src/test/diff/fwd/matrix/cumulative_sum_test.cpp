@@ -35,7 +35,7 @@ void test_cumulative_sum() {
   EXPECT_FLOAT_EQ(6.0, h[1].d_);
   EXPECT_FLOAT_EQ(9.0, h[2].d_);
 }
-TEST(AgradFwdMatrix, cumulative_sum) {
+TEST(DiffFwdMatrix, cumulative_sum) {
   using stan::diff::fvar;
   using stan::math::cumulative_sum;
 

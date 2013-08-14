@@ -2,7 +2,7 @@
 #include <stan/math/matrix/diagonal.hpp>
 #include <stan/diff/fwd/matrix/typedefs.hpp>
 
-TEST(AgradFwdMatrix,diagonal_matrix) {
+TEST(DiffFwdMatrix,diagonal_matrix) {
   using stan::math::diagonal;
   using stan::diff::matrix_fv;
   using stan::math::matrix_d;

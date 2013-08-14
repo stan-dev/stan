@@ -5,7 +5,7 @@ using std::vector;
 using std::numeric_limits;
 using stan::diff::var;
 
-class AgradCdfInvChiSquare : public AgradCdfTest {
+class DiffCdfInvChiSquare : public DiffCdfTest {
 public:
   void valid_values(vector<vector<double> >& parameters,
         vector<double>& cdf) {

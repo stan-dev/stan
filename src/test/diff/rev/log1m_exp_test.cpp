@@ -31,7 +31,7 @@ void test_log1m_exp(double val) {
   EXPECT_FLOAT_EQ(f2.val(),f_val);
 }
 
-TEST(AgradRev, log1m_exp) {
+TEST(DiffRev, log1m_exp) {
   test_log1m_exp(-0.01);
   test_log1m_exp(-0.1);
   test_log1m_exp(-2.0);
@@ -39,7 +39,7 @@ TEST(AgradRev, log1m_exp) {
   test_log1m_exp(-15.0);
 }
 
-TEST(AgradRev, log1m_exp_exception) {
+TEST(DiffRev, log1m_exp_exception) {
   using stan::math::log1m_exp;
   using stan::diff::log1m_exp;
   EXPECT_NO_THROW(log1m_exp(AVAR(-3)));

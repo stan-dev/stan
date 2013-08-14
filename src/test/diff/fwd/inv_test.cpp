@@ -3,7 +3,7 @@
 #include <stan/math/functions/inv.hpp>
 #include <stan/math/constants.hpp>
 
-TEST(AgradFvar, inv) {
+TEST(DiffFvar, inv) {
   using stan::diff::fvar;
   using stan::math::inv;
 

@@ -4,7 +4,7 @@
 #include <stan/diff.hpp>
 #include <stan/diff/rev/matrix.hpp>
 
-TEST(AgradRevMatrix,mat_cholesky) {
+TEST(DiffRevMatrix,mat_cholesky) {
   using stan::diff::matrix_v;
   using stan::math::transpose;
   using stan::math::cholesky_decompose;

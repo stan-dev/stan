@@ -4,7 +4,7 @@
 #include <stan/diff/fwd/numeric_limits.hpp>
 #include <stan/math/constants.hpp>
 
-TEST(AgradFvar, numeric_limits) {
+TEST(DiffFvar, numeric_limits) {
   using stan::diff::fvar;
   using stan::diff::var;
   using std::isnan;

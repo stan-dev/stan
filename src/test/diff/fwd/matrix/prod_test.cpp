@@ -3,7 +3,7 @@
 #include <stan/diff/fwd/matrix/typedefs.hpp>
 #include <stan/math/matrix/prod.hpp>
 
-TEST(AgradFwdMatrix,prod_vector) {
+TEST(DiffFwdMatrix,prod_vector) {
   using stan::math::prod;
   using stan::math::vector_d;
   using stan::diff::vector_fv;
@@ -39,7 +39,7 @@ TEST(AgradFwdMatrix,prod_vector) {
   EXPECT_FLOAT_EQ(5.0,f.d_);
 }
 
-TEST(AgradFwdMatrix,prod_rowvector) {
+TEST(DiffFwdMatrix,prod_rowvector) {
   using stan::math::prod;
   using stan::math::row_vector_d;
   using stan::diff::row_vector_fv;
@@ -74,7 +74,7 @@ TEST(AgradFwdMatrix,prod_rowvector) {
   EXPECT_FLOAT_EQ(6.0,f.val_);
   EXPECT_FLOAT_EQ(5.0,f.d_);
 }
-TEST(AgradFwdMatrix,prod_matrix) {
+TEST(DiffFwdMatrix,prod_matrix) {
   using stan::math::prod;
   using stan::math::matrix_d;
   using stan::diff::matrix_fv;

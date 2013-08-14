@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <stan/diff/fwd.hpp>
 
-TEST(AgradFvar,fvar) {
+TEST(DiffFvar,fvar) {
   using stan::diff::fvar;
   typedef stan::diff::fvar<double> fvd;
 

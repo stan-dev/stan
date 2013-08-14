@@ -2,7 +2,7 @@
 #include <stan/diff/fwd.hpp>
 #include <stan/math/functions/log2.hpp>
 
-TEST(AgradFvar, log2) {
+TEST(DiffFvar, log2) {
   using stan::diff::fvar;
   using std::log;
   using std::isnan;

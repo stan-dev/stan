@@ -2,7 +2,7 @@
 #include <stan/diff/fwd.hpp>
 #include <boost/math/special_functions/expm1.hpp>
 
-TEST(AgradFvar, expm1) {
+TEST(DiffFvar, expm1) {
   using stan::diff::fvar;
   using boost::math::expm1;
   using std::exp;

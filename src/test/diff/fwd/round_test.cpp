@@ -2,7 +2,7 @@
 #include <stan/diff/fwd.hpp>
 #include <boost/math/special_functions/round.hpp>
 
-TEST(AgradFvar, round) {
+TEST(DiffFvar, round) {
   using stan::diff::fvar;
   using boost::math::round;
 

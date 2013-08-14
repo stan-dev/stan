@@ -2,7 +2,7 @@
 #include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
-TEST(AgradRev,erf) {
+TEST(DiffRev,erf) {
   AVAR a = 1.3;
   AVAR f = erf(a);
   EXPECT_FLOAT_EQ(boost::math::erf(1.3), f.val());

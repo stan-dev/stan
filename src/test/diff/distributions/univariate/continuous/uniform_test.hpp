@@ -5,7 +5,7 @@ using std::vector;
 using std::numeric_limits;
 using stan::diff::var;
 
-class AgradDistributionsUniform : public AgradDistributionTest {
+class DiffDistributionsUniform : public DiffDistributionTest {
 public:
   void valid_values(vector<vector<double> >& parameters,
                     vector<double>& log_prob) {

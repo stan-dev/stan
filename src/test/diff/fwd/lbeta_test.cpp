@@ -3,7 +3,7 @@
 #include <boost/math/special_functions/digamma.hpp>
 #include <stan/math/functions/lbeta.hpp>
 
-TEST(AgradFvar, lbeta) {
+TEST(DiffFvar, lbeta) {
   using stan::diff::fvar;
   using boost::math::tgamma;
   using stan::math::lbeta;

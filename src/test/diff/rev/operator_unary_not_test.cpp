@@ -2,7 +2,7 @@
 #include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
-TEST(AgradRev,not_a) {
+TEST(DiffRev,not_a) {
   AVAR a(6.0);
   EXPECT_EQ(0, !a);
   AVAR b(0.0);

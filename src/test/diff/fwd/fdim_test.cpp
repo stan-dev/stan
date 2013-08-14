@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <stan/diff/fwd.hpp>
 
-TEST(AgradFvar, fdim) {
+TEST(DiffFvar, fdim) {
   using stan::diff::fvar;
   using stan::math::fdim;
   using std::isnan;

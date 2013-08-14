@@ -4,7 +4,7 @@
 #include <stan/diff.hpp>
 #include <stan/math/functions/Phi_approx.hpp>
 
-TEST(AgradRev, Phi_approx) {
+TEST(DiffRev, Phi_approx) {
   using stan::diff::var;
   using std::abs;
   using stan::math::Phi_approx;

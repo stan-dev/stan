@@ -6,7 +6,7 @@
 #include <stan/diff/rev/matrix/typedefs.hpp>
 #include <stan/diff.hpp>
 
-TEST(AgradRevMatrix,mdivide_right_val) {
+TEST(DiffRevMatrix,mdivide_right_val) {
   using stan::math::matrix_d;
   using stan::diff::matrix_v;
   using stan::math::mdivide_right;

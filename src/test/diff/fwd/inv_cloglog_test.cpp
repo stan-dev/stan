@@ -2,7 +2,7 @@
 #include <stan/diff/fwd.hpp>
 #include <stan/math/functions/inv_cloglog.hpp>
 
-TEST(AgradFvar, invCLogLog) {
+TEST(DiffFvar, invCLogLog) {
   using stan::diff::fvar;
   using stan::math::inv_cloglog;
 

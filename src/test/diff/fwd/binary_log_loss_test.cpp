@@ -2,7 +2,7 @@
 #include <stan/diff/fwd.hpp>
 #include <stan/math/functions/binary_log_loss.hpp>
 
-TEST(AgradFvar, binary_log_loss) {
+TEST(DiffFvar, binary_log_loss) {
   using stan::diff::fvar;
   using stan::math::binary_log_loss;
   using std::log;

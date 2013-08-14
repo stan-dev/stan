@@ -2,7 +2,7 @@
 #include <stan/diff.hpp>
 #include <gtest/gtest.h>
 
-TEST(AgradErrorHandling,CheckBounded_X) {
+TEST(DiffErrorHandling,CheckBounded_X) {
   using stan::diff::var;
   using stan::math::check_bounded;
  
@@ -47,7 +47,7 @@ TEST(AgradErrorHandling,CheckBounded_X) {
     << "check_bounded should throw with x: " << x << " and bounds: " << high << ", " << low;
 }
 
-TEST(AgradErrorHandling,CheckBounded_Low) {
+TEST(DiffErrorHandling,CheckBounded_Low) {
   using stan::diff::var;
   using stan::math::check_bounded;
 
@@ -73,7 +73,7 @@ TEST(AgradErrorHandling,CheckBounded_Low) {
   EXPECT_THROW(check_bounded(function, x, low, high, name, &result), std::domain_error) 
     << "check_bounded should throw with x: " << x << " and bounds: " << low << ", " << high;
 }
-TEST(AgradErrorHandling,CheckBounded_High) {
+TEST(DiffErrorHandling,CheckBounded_High) {
   using stan::diff::var;
   using stan::math::check_bounded;
 

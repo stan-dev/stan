@@ -5,7 +5,7 @@
 // #include <stan/diff/rev/fabs.hpp>
 // #include <stan/diff/rev/log.hpp>
 
-TEST(AgradRevMatrix,determinant) {
+TEST(DiffRevMatrix,determinant) {
   using stan::diff::matrix_v;
   using stan::math::determinant;
 
@@ -30,13 +30,13 @@ TEST(AgradRevMatrix,determinant) {
   for (size_t i = 0; i < g1.size(); ++i)
     EXPECT_FLOAT_EQ(g1[i],g2[i]);
 }
-TEST(AgradRevMatrix,deteriminant_exception) {
+TEST(DiffRevMatrix,deteriminant_exception) {
   using stan::diff::matrix_v;
   using stan::math::determinant;
 
   EXPECT_THROW(determinant(matrix_v(2,3)), std::domain_error);
 }
-TEST(AgradRevMatrix,determinant_grad) {
+TEST(DiffRevMatrix,determinant_grad) {
   using stan::diff::matrix_v;
   using stan::math::determinant;
   
@@ -61,7 +61,7 @@ TEST(AgradRevMatrix,determinant_grad) {
   EXPECT_FLOAT_EQ(-3.0,g[2]);
   EXPECT_FLOAT_EQ(2.0,g[3]);
 }
-TEST(AgradRevMatrix,determinant3by3) {
+TEST(DiffRevMatrix,determinant3by3) {
   // just test it can handle it
   using stan::diff::matrix_v;
   using stan::math::determinant;

@@ -2,7 +2,7 @@
 #include <stan/diff/fwd.hpp>
 #include <stan/math/constants.hpp>
 
-TEST(AgradFvar, asin) {
+TEST(DiffFvar, asin) {
   using stan::diff::fvar;
   using std::asin;
   using std::isnan;

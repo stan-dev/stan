@@ -5,7 +5,7 @@
 #include <stan/diff/rev/matrix/typedefs.hpp>
 #include <stan/diff.hpp>
 
-TEST(AgradRevMatrix, sd_vector) {
+TEST(DiffRevMatrix, sd_vector) {
   using stan::math::sd;
   using stan::math::vector_d;
   using stan::diff::vector_v;
@@ -29,7 +29,7 @@ TEST(AgradRevMatrix, sd_vector) {
   EXPECT_FLOAT_EQ(0.0, sd(d1));
   EXPECT_FLOAT_EQ(0.0, sd(v1).val());
 }
-TEST(AgradRevMatrix, sd_vector_exception) {
+TEST(DiffRevMatrix, sd_vector_exception) {
   using stan::math::sd;
   using stan::math::vector_d;
   using stan::diff::vector_v;
@@ -39,7 +39,7 @@ TEST(AgradRevMatrix, sd_vector_exception) {
   EXPECT_THROW(sd(d1), std::domain_error);
   EXPECT_THROW(sd(v1), std::domain_error);
 }
-TEST(AgradRevMatrix, sd_rowvector) {
+TEST(DiffRevMatrix, sd_rowvector) {
   using stan::math::sd;
   using stan::math::row_vector_d;
   using stan::diff::row_vector_v;
@@ -64,7 +64,7 @@ TEST(AgradRevMatrix, sd_rowvector) {
   EXPECT_FLOAT_EQ(0.0, sd(d1));
   EXPECT_FLOAT_EQ(0.0, sd(v1).val());
 }
-TEST(AgradRevMatrix, sd_rowvector_exception) {
+TEST(DiffRevMatrix, sd_rowvector_exception) {
   using stan::math::sd;
   using stan::math::row_vector_d;
   using stan::diff::row_vector_v;
@@ -75,7 +75,7 @@ TEST(AgradRevMatrix, sd_rowvector_exception) {
   EXPECT_THROW(sd(d), std::domain_error);
   EXPECT_THROW(sd(v), std::domain_error);
 }
-TEST(AgradRevMatrix, sd_matrix) {
+TEST(DiffRevMatrix, sd_matrix) {
   using stan::math::sd;
   using stan::math::matrix_d;
   using stan::diff::matrix_v;
@@ -98,7 +98,7 @@ TEST(AgradRevMatrix, sd_matrix) {
   EXPECT_FLOAT_EQ(0.0, sd(d1));
   EXPECT_FLOAT_EQ(0.0, sd(v1).val());
 }
-TEST(AgradRevMatrix, sd_matrix_exception) {
+TEST(DiffRevMatrix, sd_matrix_exception) {
   using stan::math::sd;
   using stan::math::matrix_d;
   using stan::diff::matrix_v;
@@ -119,7 +119,7 @@ TEST(AgradRevMatrix, sd_matrix_exception) {
   EXPECT_THROW(sd(d), std::domain_error);
   EXPECT_THROW(sd(v), std::domain_error);
 }
-TEST(AgradRevMatrix, sdStdVector) {
+TEST(DiffRevMatrix, sdStdVector) {
   using stan::math::sd; // should use arg-dep lookup (and for sqrt)
 
   AVEC y1 = createAVEC(0.5,2.0,3.5);

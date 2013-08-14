@@ -2,7 +2,7 @@
 #include <stan/diff/rev/matrix.hpp>
 #include <gtest/gtest.h>
 
-TEST(AgradRevMatrix, to_vector) {
+TEST(DiffRevMatrix, to_vector) {
   using stan::math::to_vector;
   using stan::diff::var;
 

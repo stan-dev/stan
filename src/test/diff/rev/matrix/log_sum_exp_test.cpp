@@ -42,7 +42,7 @@ void test_log_sum_exp_matrix(const Matrix<double,R,C>& m) {
     EXPECT_FLOAT_EQ(g_expected[i], g[i]);
 }
 
-TEST(AgradRev,logSumExpMatrix) {
+TEST(DiffRev,logSumExpMatrix) {
   Matrix<double,Dynamic,1> a(2);
   a << 5, 2;
   test_log_sum_exp_matrix(a);

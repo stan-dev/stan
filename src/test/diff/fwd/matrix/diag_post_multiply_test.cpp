@@ -3,7 +3,7 @@
 #include <stan/diff/fwd/matrix/multiply.hpp>
 #include <stan/math/matrix/diag_post_multiply.hpp>
 
-TEST(AgradFwdMatrix, diag_post_multiply_vector) {
+TEST(DiffFwdMatrix, diag_post_multiply_vector) {
   using stan::diff::matrix_fv;
   using stan::math::matrix_d;
   using stan::diff::vector_fv;
@@ -53,7 +53,7 @@ TEST(AgradFwdMatrix, diag_post_multiply_vector) {
   EXPECT_FLOAT_EQ(16,output(2,1).d_);
   EXPECT_FLOAT_EQ(18,output(2,2).d_);
 }
-TEST(AgradFwdMatrix, diag_post_multiply_vector_exception) {
+TEST(DiffFwdMatrix, diag_post_multiply_vector_exception) {
   using stan::diff::matrix_fv;
   using stan::diff::vector_fv;
 
@@ -68,7 +68,7 @@ TEST(AgradFwdMatrix, diag_post_multiply_vector_exception) {
   EXPECT_THROW(stan::math::diag_post_multiply(Z,Y), std::domain_error);
   EXPECT_THROW(stan::math::diag_post_multiply(Y,Z), std::domain_error);
 }
-TEST(AgradFwdMatrix, diag_post_multiply_rowvector) {
+TEST(DiffFwdMatrix, diag_post_multiply_rowvector) {
   using stan::diff::matrix_fv;
   using stan::math::matrix_d;
   using stan::diff::row_vector_fv;
@@ -118,7 +118,7 @@ TEST(AgradFwdMatrix, diag_post_multiply_rowvector) {
   EXPECT_FLOAT_EQ(16,output(2,1).d_);
   EXPECT_FLOAT_EQ(18,output(2,2).d_);
 }
-TEST(AgradFwdMatrix, diag_post_multiply_rowvector_exception) {
+TEST(DiffFwdMatrix, diag_post_multiply_rowvector_exception) {
   using stan::diff::matrix_fv;
   using stan::diff::row_vector_fv;
 

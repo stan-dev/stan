@@ -4,7 +4,7 @@
 #include <stan/diff/fwd/matrix/typedefs.hpp>
 #include <stan/diff/fwd.hpp>
 
-TEST(AgradFwdMatrix,mv_trace) {
+TEST(DiffFwdMatrix,mv_trace) {
   using stan::math::trace;
   using stan::diff::matrix_fv;
   using stan::diff::fvar;

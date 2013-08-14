@@ -4,7 +4,7 @@
 #include <stan/diff.hpp>
 #include <stan/diff/rev/matrix.hpp>
 
-TEST(AgradRevMatrix,row_v) {
+TEST(DiffRevMatrix,row_v) {
   using stan::math::row;
   using stan::diff::matrix_v;
   using stan::diff::vector_v;
@@ -23,7 +23,7 @@ TEST(AgradRevMatrix,row_v) {
   EXPECT_EQ(5.0,w[1].val());
   EXPECT_EQ(6.0,w[2].val());
 }
-TEST(AgradRevMatrix,row_v_exc0) {
+TEST(DiffRevMatrix,row_v_exc0) {
   using stan::math::row;
   using stan::diff::matrix_v;
 
@@ -32,7 +32,7 @@ TEST(AgradRevMatrix,row_v_exc0) {
   EXPECT_THROW(row(y,0),std::domain_error);
   EXPECT_THROW(row(y,7),std::domain_error);
 }
-TEST(AgradRevMatrix,row_v_excHigh) {
+TEST(DiffRevMatrix,row_v_excHigh) {
   using stan::math::row;
   using stan::diff::matrix_v;
 

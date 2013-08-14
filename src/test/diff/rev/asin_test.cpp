@@ -2,7 +2,7 @@
 #include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
-TEST(AgradRev,asin_var) {
+TEST(DiffRev,asin_var) {
   AVAR a = 0.68;
   AVAR f = asin(a);
   EXPECT_FLOAT_EQ(asin(0.68), f.val());

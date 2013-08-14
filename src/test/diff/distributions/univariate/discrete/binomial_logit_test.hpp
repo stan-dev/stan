@@ -11,7 +11,7 @@ using std::vector;
 using std::numeric_limits;
 using stan::diff::var;
 
-class AgradDistributionsBinomialLogit : public AgradDistributionTest {
+class DiffDistributionsBinomialLogit : public DiffDistributionTest {
 public:
     void valid_values(vector<vector<double> >& parameters,
                     vector<double>& log_prob) {

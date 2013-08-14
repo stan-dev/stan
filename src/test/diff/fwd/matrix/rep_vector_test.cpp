@@ -3,7 +3,7 @@
 #include <stan/diff/fwd/matrix/typedefs.hpp>
 #include <stan/diff/fwd/fvar.hpp>
 
-TEST(AgradFwdMatrix,rep_vector) {
+TEST(DiffFwdMatrix,rep_vector) {
   using stan::math::rep_vector;
   using stan::diff::vector_fv;
   using stan::diff::fvar;
@@ -23,7 +23,7 @@ TEST(AgradFwdMatrix,rep_vector) {
   EXPECT_EQ(2,output(3).d_);
 }
 
-TEST(AgradFwdMatrix,rep_vector_exception) {
+TEST(DiffFwdMatrix,rep_vector_exception) {
   using stan::math::rep_vector;
   using stan::diff::vector_fv;
   using stan::diff::fvar;

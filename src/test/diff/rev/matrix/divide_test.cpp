@@ -3,7 +3,7 @@
 #include <test/diff/util.hpp>
 #include <stan/math/matrix/divide.hpp>
 
-TEST(AgradRevMatrix, divide_scalar) {
+TEST(DiffRevMatrix, divide_scalar) {
   using stan::diff::divide;
   double d1, d2;
   AVAR   v1, v2;
@@ -33,7 +33,7 @@ TEST(AgradRevMatrix, divide_scalar) {
   EXPECT_TRUE(std::isnan(divide(v1, d2).val()));
   EXPECT_TRUE(std::isnan(divide(v1, v2).val()));
 }
-TEST(AgradRevMatrix, divide_vector) {
+TEST(DiffRevMatrix, divide_vector) {
   using stan::math::divide;
   using stan::math::vector_d;
   using stan::diff::vector_v;
@@ -93,7 +93,7 @@ TEST(AgradRevMatrix, divide_vector) {
   EXPECT_TRUE (std::isnan(output(1).val()));
   EXPECT_FLOAT_EQ(-std::numeric_limits<double>::infinity(), output(2).val());
 }
-TEST(AgradRevMatrix, divide_rowvector) {
+TEST(DiffRevMatrix, divide_rowvector) {
   using stan::math::divide;
   using stan::math::row_vector_d;
   using stan::diff::row_vector_v;
@@ -151,7 +151,7 @@ TEST(AgradRevMatrix, divide_rowvector) {
   EXPECT_TRUE (std::isnan(output(1).val()));
   EXPECT_FLOAT_EQ(-std::numeric_limits<double>::infinity(), output(2).val());
 }
-TEST(AgradRevMatrix, divide_matrix) {
+TEST(DiffRevMatrix, divide_matrix) {
   using stan::math::divide;
   using stan::math::matrix_d;
   using stan::diff::matrix_v;

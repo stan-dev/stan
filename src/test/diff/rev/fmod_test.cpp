@@ -2,7 +2,7 @@
 #include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
-TEST(AgradRev,fmod_var_var) {
+TEST(DiffRev,fmod_var_var) {
   AVAR a = 2.7;
   AVAR b = 1.3;
   AVAR f = fmod(a,b);
@@ -15,7 +15,7 @@ TEST(AgradRev,fmod_var_var) {
   EXPECT_FLOAT_EQ(-2.0,g[1]); // (int)(2.7/1.3) = 2
 }
 
-TEST(AgradRev,fmod_var_double) {
+TEST(DiffRev,fmod_var_double) {
   AVAR a = 2.7;
   double b = 1.3;
   AVAR f = fmod(a,b);
@@ -27,7 +27,7 @@ TEST(AgradRev,fmod_var_double) {
   EXPECT_FLOAT_EQ(1.0,g[0]);
 }
 
-TEST(AgradRev,fmod_double_var) {
+TEST(DiffRev,fmod_double_var) {
   double a = 2.7;
   AVAR b = 1.3;
   AVAR f = fmod(a,b);

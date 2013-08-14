@@ -15,7 +15,7 @@ void test_tcrossprod(const stan::diff::matrix_v& L) {
     for (int n = 0; n < LLT_eigen.cols(); ++n)
       EXPECT_FLOAT_EQ(LLT_eigen(m,n).val(), LLT_stan(m,n).val());
 }
-TEST(AgradRevMatrix, tcrossprod) {
+TEST(DiffRevMatrix, tcrossprod) {
   using stan::diff::matrix_v;
 
   matrix_v L(3,3);
@@ -56,7 +56,7 @@ TEST(AgradRevMatrix, tcrossprod) {
     -1, 4, -9;
   test_tcrossprod(Q);
 }
-TEST(AgradRevMatrix, tcrossprodGrad1) {
+TEST(DiffRevMatrix, tcrossprodGrad1) {
   using stan::diff::tcrossprod;
   using stan::diff::matrix_v;
 
@@ -77,7 +77,7 @@ TEST(AgradRevMatrix, tcrossprodGrad1) {
   EXPECT_FLOAT_EQ(6.0, J[0][0]);
 }
 
-TEST(AgradRevMatrix, tcrossprodGrad2) {
+TEST(DiffRevMatrix, tcrossprodGrad2) {
   using stan::diff::tcrossprod;
   using stan::diff::matrix_v;
 
@@ -129,7 +129,7 @@ TEST(AgradRevMatrix, tcrossprodGrad2) {
   EXPECT_FLOAT_EQ(6.0,J[3][2]);
 }
 
-TEST(AgradRevMatrix, tcrossprodGrad3) {
+TEST(DiffRevMatrix, tcrossprodGrad3) {
   using stan::diff::tcrossprod;
   using stan::diff::matrix_v;
 

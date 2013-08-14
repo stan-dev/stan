@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 #include <stan/diff.hpp>
 
-TEST(AgradRev,log_sum_exp_vv) {
+TEST(DiffRev,log_sum_exp_vv) {
   AVAR a = 5.0;
   AVAR b = 2.0;
   AVAR f = log_sum_exp(a, b);
@@ -26,7 +26,7 @@ TEST(AgradRev,log_sum_exp_vv) {
   EXPECT_FLOAT_EQ (std::exp (1000.0 - (std::log(std::exp(0.0) + std::exp(-999.0)) + 1000)), grad_f[0]);
   EXPECT_FLOAT_EQ (std::exp (10.0 - (std::log(std::exp(0.0) + std::exp(-999.0)) + 1000)), grad_f[1]);
 }
-TEST(AgradRev,log_sum_exp_vd) {
+TEST(DiffRev,log_sum_exp_vd) {
   AVAR a = 5.0;
   double b = 2.0;
   AVAR f = log_sum_exp(a, b);
@@ -47,7 +47,7 @@ TEST(AgradRev,log_sum_exp_vd) {
   f.grad(x,grad_f);
   EXPECT_FLOAT_EQ (std::exp (1000.0 - (std::log(std::exp(0.0) + std::exp(-999.0)) + 1000)), grad_f[0]);
 }
-TEST(AgradRev,log_sum_exp_dv) {
+TEST(DiffRev,log_sum_exp_dv) {
   double a = 5.0;
   AVAR b = 2.0;
   AVAR f = log_sum_exp(a, b);
@@ -68,7 +68,7 @@ TEST(AgradRev,log_sum_exp_dv) {
   f.grad(x,grad_f);
   EXPECT_FLOAT_EQ (std::exp (1000.0 - (std::log(std::exp(0.0) + std::exp(-999.0)) + 1000)), grad_f[0]);
 }
-TEST(AgradRev,log_sum_exp_vector) {
+TEST(DiffRev,log_sum_exp_vector) {
   // simple test
   AVEC x;
   x.push_back (5.0);
@@ -221,7 +221,7 @@ void test_log_sum_exp_2(double a, double b) {
   test_log_sum_exp_2_dv(a,b);
 }
 
-TEST(AgradRev,log_sum_exp_2) {
+TEST(DiffRev,log_sum_exp_2) {
   test_log_sum_exp_2(0.0,0.0);
   test_log_sum_exp_2(1.0,2.0);
   test_log_sum_exp_2(2.0,1.0);
@@ -231,7 +231,7 @@ TEST(AgradRev,log_sum_exp_2) {
 
 
 
-TEST(AgradRev, log_sum_exp_vec_1) {
+TEST(DiffRev, log_sum_exp_vec_1) {
   using stan::math::log_sum_exp;
   using stan::diff::log_sum_exp;
   AVAR a(5.0);
@@ -246,7 +246,7 @@ TEST(AgradRev, log_sum_exp_vec_1) {
 }
 
 
-TEST(AgradRev, log_sum_exp_vec_2) {
+TEST(DiffRev, log_sum_exp_vec_2) {
   using stan::math::log_sum_exp;
   using stan::diff::log_sum_exp;
   AVAR a(5.0);
@@ -275,7 +275,7 @@ TEST(AgradRev, log_sum_exp_vec_2) {
   EXPECT_FLOAT_EQ(g[1],g2[1]);
 }
 
-TEST(AgradRev, log_sum_exp_vec_3) {
+TEST(DiffRev, log_sum_exp_vec_3) {
   using stan::math::log_sum_exp;
   using stan::diff::log_sum_exp;
   AVAR a(5.0);

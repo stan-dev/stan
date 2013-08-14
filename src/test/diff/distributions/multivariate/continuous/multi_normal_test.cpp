@@ -24,7 +24,7 @@ void expect_propto(T_y y1, T_loc mu1, T_scale sigma1,
 using stan::diff::var;
 using stan::diff::to_var;
 
-class AgradDistributionsMultiNormal : public ::testing::Test {
+class DiffDistributionsMultiNormal : public ::testing::Test {
 protected:
   virtual void SetUp() {
     y.resize(3,1);
@@ -55,43 +55,43 @@ protected:
   Matrix<double,Dynamic,Dynamic> Sigma2;
 };
 
-TEST_F(AgradDistributionsMultiNormal,Propto) {
+TEST_F(DiffDistributionsMultiNormal,Propto) {
   expect_propto(to_var(y),to_var(mu),to_var(Sigma),
                 to_var(y2),to_var(mu2),to_var(Sigma2),
                 "All vars: y, mu, sigma");
 }
-TEST_F(AgradDistributionsMultiNormal,ProptoY) {
+TEST_F(DiffDistributionsMultiNormal,ProptoY) {
   expect_propto(to_var(y),mu,Sigma,
                 to_var(y2),mu,Sigma,
                 "var: y");
 
 }
-TEST_F(AgradDistributionsMultiNormal,ProptoYMu) {
+TEST_F(DiffDistributionsMultiNormal,ProptoYMu) {
   expect_propto(to_var(y),to_var(mu),Sigma,
                 to_var(y2),to_var(mu2),Sigma,
                 "var: y and mu");
 }
-TEST_F(AgradDistributionsMultiNormal,ProptoYSigma) {
+TEST_F(DiffDistributionsMultiNormal,ProptoYSigma) {
   expect_propto(to_var(y),mu,to_var(Sigma),
                 to_var(y2),mu,to_var(Sigma2),
                 "var: y and sigma");
 }
-TEST_F(AgradDistributionsMultiNormal,ProptoMu) {
+TEST_F(DiffDistributionsMultiNormal,ProptoMu) {
   expect_propto(y,to_var(mu),Sigma,
                 y,to_var(mu2),Sigma,
                 "var: mu");
 }
-TEST_F(AgradDistributionsMultiNormal,ProptoMuSigma) {
+TEST_F(DiffDistributionsMultiNormal,ProptoMuSigma) {
   expect_propto(y,to_var(mu),to_var(Sigma),
                 y,to_var(mu2),to_var(Sigma2),
                 "var: mu and sigma");
 }
-TEST_F(AgradDistributionsMultiNormal,ProptoSigma) {
+TEST_F(DiffDistributionsMultiNormal,ProptoSigma) {
   expect_propto(y,mu,to_var(Sigma),
                 y,mu,to_var(Sigma2),
                 "var: sigma");
 }
-class AgradDistributionsMultiNormalMultiRow : public ::testing::Test {
+class DiffDistributionsMultiNormalMultiRow : public ::testing::Test {
 protected:
   virtual void SetUp() {
     y.resize(1,3);
@@ -122,38 +122,38 @@ protected:
   Matrix<double,Dynamic,Dynamic> Sigma2;
 };
 
-TEST_F(AgradDistributionsMultiNormalMultiRow,Propto) {
+TEST_F(DiffDistributionsMultiNormalMultiRow,Propto) {
   expect_propto(to_var(y),to_var(mu),to_var(Sigma),
                 to_var(y2),to_var(mu2),to_var(Sigma2),
                 "All vars: y, mu, sigma");
 }
-TEST_F(AgradDistributionsMultiNormalMultiRow,ProptoY) {
+TEST_F(DiffDistributionsMultiNormalMultiRow,ProptoY) {
   expect_propto(to_var(y),mu,Sigma,
                 to_var(y2),mu,Sigma,
                 "var: y");
 
 }
-TEST_F(AgradDistributionsMultiNormalMultiRow,ProptoYMu) {
+TEST_F(DiffDistributionsMultiNormalMultiRow,ProptoYMu) {
   expect_propto(to_var(y),to_var(mu),Sigma,
                 to_var(y2),to_var(mu2),Sigma,
                 "var: y and mu");
 }
-TEST_F(AgradDistributionsMultiNormalMultiRow,ProptoYSigma) {
+TEST_F(DiffDistributionsMultiNormalMultiRow,ProptoYSigma) {
   expect_propto(to_var(y),mu,to_var(Sigma),
                 to_var(y2),mu,to_var(Sigma2),
                 "var: y and sigma");
 }
-TEST_F(AgradDistributionsMultiNormalMultiRow,ProptoMu) {
+TEST_F(DiffDistributionsMultiNormalMultiRow,ProptoMu) {
   expect_propto(y,to_var(mu),Sigma,
                 y,to_var(mu2),Sigma,
                 "var: mu");
 }
-TEST_F(AgradDistributionsMultiNormalMultiRow,ProptoMuSigma) {
+TEST_F(DiffDistributionsMultiNormalMultiRow,ProptoMuSigma) {
   expect_propto(y,to_var(mu),to_var(Sigma),
                 y,to_var(mu2),to_var(Sigma2),
                 "var: mu and sigma");
 }
-TEST_F(AgradDistributionsMultiNormalMultiRow,ProptoSigma) {
+TEST_F(DiffDistributionsMultiNormalMultiRow,ProptoSigma) {
   expect_propto(y,mu,to_var(Sigma),
                 y,mu,to_var(Sigma2),
                 "var: sigma");

@@ -5,7 +5,7 @@
 #include <stan/diff/rev/matrix/typedefs.hpp>
 #include <stan/diff.hpp>
 
-TEST(AgradRevMatrix, max_vector) {
+TEST(DiffRevMatrix, max_vector) {
   using stan::math::max;
   using stan::math::vector_d;
   using stan::diff::vector_v;
@@ -23,14 +23,14 @@ TEST(AgradRevMatrix, max_vector) {
   output = max(v1);
   EXPECT_FLOAT_EQ(100, output.val());
 }
-TEST(AgradRevMatrix, max_vector_exception) {
+TEST(DiffRevMatrix, max_vector_exception) {
   using stan::math::max;
   using stan::diff::vector_v;
 
   vector_v v;
   EXPECT_EQ(-std::numeric_limits<double>::infinity(), max(v).val());
 }
-TEST(AgradRevMatrix, max_rowvector) {
+TEST(DiffRevMatrix, max_rowvector) {
   using stan::math::max;
   using stan::math::row_vector_d;
   using stan::diff::row_vector_v;
@@ -48,14 +48,14 @@ TEST(AgradRevMatrix, max_rowvector) {
   output = max(v1);
   EXPECT_FLOAT_EQ(100, output.val());
 }
-TEST(AgradRevMatrix, max_rowvector_exception) {
+TEST(DiffRevMatrix, max_rowvector_exception) {
   using stan::math::max;
   using stan::diff::row_vector_v;
 
   row_vector_v v;
   EXPECT_EQ(-std::numeric_limits<double>::infinity(), max(v).val());
 }
-TEST(AgradRevMatrix, max_matrix) {
+TEST(DiffRevMatrix, max_matrix) {
   using stan::math::max;
   using stan::math::matrix_d;
   using stan::diff::matrix_v;
@@ -73,7 +73,7 @@ TEST(AgradRevMatrix, max_matrix) {
   output = max(v1);
   EXPECT_FLOAT_EQ(100, output.val());
 }
-TEST(AgradRevMatrix, max_matrix_exception) {
+TEST(DiffRevMatrix, max_matrix_exception) {
   using stan::math::max;
   using stan::diff::matrix_v;
   

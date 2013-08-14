@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <stan/diff/fwd.hpp>
 
-TEST(AgradFvar, atan) {
+TEST(DiffFvar, atan) {
   using stan::diff::fvar;
   using std::atan;
 

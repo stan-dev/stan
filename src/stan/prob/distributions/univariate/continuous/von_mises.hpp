@@ -1,7 +1,7 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__VON_MISES_HPP__
 #define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__CONTINUOUS__VON_MISES_HPP__
 
-#include <stan/agrad.hpp>
+#include <stan/diff/operands_and_partials.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math.hpp>
 #include <stan/meta/traits.hpp>
@@ -75,7 +75,7 @@ namespace stan {
         if (include_summand<propto,T_scale>::value)
           log_bessel0[i] = log(boost::math::cyl_bessel_i(0, value_of(kappa_vec[i])));
       }
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale> oap(y, mu, kappa);
+      diff::OperandsAndPartials<T_y, T_loc, T_scale> oap(y, mu, kappa);
 
       size_t N = max_size(y, mu, kappa);
 

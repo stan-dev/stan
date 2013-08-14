@@ -5,7 +5,7 @@
 #include <stan/diff/rev/matrix/typedefs.hpp>
 #include <stan/diff.hpp>
 
-TEST(AgradRevMatrix, minus_scalar) {
+TEST(DiffRevMatrix, minus_scalar) {
   using stan::math::minus;
   double x = 10;
   AVAR v = 11;
@@ -13,7 +13,7 @@ TEST(AgradRevMatrix, minus_scalar) {
   EXPECT_FLOAT_EQ(-10, minus(x));
   EXPECT_FLOAT_EQ(-11, minus(v).val());
 }
-TEST(AgradRevMatrix, minus_vector) {
+TEST(DiffRevMatrix, minus_vector) {
   using stan::math::vector_d;
   using stan::diff::vector_v;
   using stan::math::minus;
@@ -36,7 +36,7 @@ TEST(AgradRevMatrix, minus_vector) {
   EXPECT_FLOAT_EQ(0, output[1].val());
   EXPECT_FLOAT_EQ(-1, output[2].val());
 }
-TEST(AgradRevMatrix, minus_rowvector) {
+TEST(DiffRevMatrix, minus_rowvector) {
   using stan::math::row_vector_d;
   using stan::diff::row_vector_v;
   using stan::math::minus;
@@ -59,7 +59,7 @@ TEST(AgradRevMatrix, minus_rowvector) {
   EXPECT_FLOAT_EQ(0, output[1].val());
   EXPECT_FLOAT_EQ(-1, output[2].val());
 }
-TEST(AgradRevMatrix, minus_matrix) {
+TEST(DiffRevMatrix, minus_matrix) {
   using stan::math::matrix_d;
   using stan::diff::matrix_v;
   using stan::math::minus;

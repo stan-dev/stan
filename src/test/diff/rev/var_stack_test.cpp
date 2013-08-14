@@ -3,7 +3,7 @@
 #include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
-TEST(AgradRev,free_memory) {
+TEST(DiffRev,free_memory) {
   AVAR a = 2.0;
   AVAR b = -3.0;
   AVAR f = a * b;

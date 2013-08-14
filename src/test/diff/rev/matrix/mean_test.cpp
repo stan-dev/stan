@@ -5,7 +5,7 @@
 #include <stan/diff/rev/matrix/typedefs.hpp>
 #include <stan/diff.hpp>
 
-TEST(AgradRevMatrix, mean_vector) {
+TEST(DiffRevMatrix, mean_vector) {
   using stan::math::mean;
   using stan::math::vector_d;
   using stan::diff::vector_v;
@@ -23,7 +23,7 @@ TEST(AgradRevMatrix, mean_vector) {
   output = mean(v1);
   EXPECT_FLOAT_EQ(97.0/3.0, output.val());
 }
-TEST(AgradRevMatrix, mean_vector_exception) {
+TEST(DiffRevMatrix, mean_vector_exception) {
   using stan::math::mean;
   using stan::math::vector_d;
   using stan::diff::vector_v;
@@ -33,7 +33,7 @@ TEST(AgradRevMatrix, mean_vector_exception) {
   EXPECT_THROW(mean(d), std::domain_error);
   EXPECT_THROW(mean(v), std::domain_error);
 }
-TEST(AgradRevMatrix, mean_rowvector) {
+TEST(DiffRevMatrix, mean_rowvector) {
   using stan::math::mean;
   using stan::math::row_vector_d;
   using stan::diff::row_vector_v;
@@ -51,7 +51,7 @@ TEST(AgradRevMatrix, mean_rowvector) {
   output = mean(v1);
   EXPECT_FLOAT_EQ(97.0/3.0, output.val());
 }
-TEST(AgradRevMatrix, mean_rowvector_exception) {
+TEST(DiffRevMatrix, mean_rowvector_exception) {
   using stan::math::mean;
   using stan::math::row_vector_d;
   using stan::diff::row_vector_v;
@@ -61,7 +61,7 @@ TEST(AgradRevMatrix, mean_rowvector_exception) {
   EXPECT_THROW(mean(d), std::domain_error);
   EXPECT_THROW(mean(v), std::domain_error);
 }
-TEST(AgradRevMatrix, mean_matrix) {
+TEST(DiffRevMatrix, mean_matrix) {
   using stan::math::mean;
   using stan::math::matrix_d;
   using stan::diff::matrix_v;
@@ -79,7 +79,7 @@ TEST(AgradRevMatrix, mean_matrix) {
   output = mean(v1);
   EXPECT_FLOAT_EQ(97.0/3.0, output.val());
 }
-TEST(AgradRevMatrix, mean_matrix_exception) {
+TEST(DiffRevMatrix, mean_matrix_exception) {
   using stan::math::mean;
   using stan::math::matrix_d;
   using stan::diff::matrix_v;
@@ -89,7 +89,7 @@ TEST(AgradRevMatrix, mean_matrix_exception) {
   EXPECT_THROW(mean(d), std::domain_error);
   EXPECT_THROW(mean(v), std::domain_error);
 }
-TEST(AgradRevMatrix, meanStdVector) {
+TEST(DiffRevMatrix, meanStdVector) {
   using stan::math::mean; // should use arg-dep lookup
   AVEC x(0);
   EXPECT_THROW(mean(x), std::domain_error);

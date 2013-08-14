@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <stan/diff/fwd.hpp>
 
-TEST(AgradFvar, sin) {
+TEST(DiffFvar, sin) {
   using stan::diff::fvar;
   using std::sin;
   using std::cos;

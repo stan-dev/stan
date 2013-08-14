@@ -2,7 +2,7 @@
 #include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
-TEST(AgradRev,square) {
+TEST(DiffRev,square) {
   AVAR a = 7.0;
   AVEC x = createAVEC(a);
   AVAR f = square(a);

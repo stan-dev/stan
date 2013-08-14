@@ -2,7 +2,7 @@
 #include <stan/diff/fwd.hpp>
 #include <boost/math/special_functions/hypot.hpp>
 
-TEST(AgradFvar, hypot) {
+TEST(DiffFvar, hypot) {
   using stan::diff::fvar;
   using boost::math::hypot;
   using std::isnan;

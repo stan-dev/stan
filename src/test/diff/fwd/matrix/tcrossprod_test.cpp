@@ -4,7 +4,7 @@
 #include <stan/diff/fwd/matrix/multiply.hpp>
 #include <stan/math/matrix/transpose.hpp>
 
-TEST(AgradFwdMatrix, tcrossprod_3x3_matrix) {
+TEST(DiffFwdMatrix, tcrossprod_3x3_matrix) {
   using stan::diff::matrix_fv;
   using stan::math::matrix_d;
   matrix_d Z(3,3);
@@ -41,7 +41,7 @@ TEST(AgradFwdMatrix, tcrossprod_3x3_matrix) {
   EXPECT_FLOAT_EQ(40,output(2,1).d_);
   EXPECT_FLOAT_EQ(60,output(2,2).d_);
 }
-TEST(AgradFwdMatrix, tcrossprod_2x2_matrix) {
+TEST(DiffFwdMatrix, tcrossprod_2x2_matrix) {
   using stan::diff::matrix_fv;
   using stan::math::matrix_d;
   matrix_d Z(2,2);
@@ -66,7 +66,7 @@ TEST(AgradFwdMatrix, tcrossprod_2x2_matrix) {
   EXPECT_FLOAT_EQ( 8,output(1,0).d_);
   EXPECT_FLOAT_EQ( 4,output(1,1).d_);
 }
-TEST(AgradFwdMatrix, tcrossprod_1x1_matrix) {
+TEST(DiffFwdMatrix, tcrossprod_1x1_matrix) {
   using stan::diff::matrix_fv;
 
   matrix_fv Y(1,1);
@@ -76,7 +76,7 @@ TEST(AgradFwdMatrix, tcrossprod_1x1_matrix) {
   EXPECT_FLOAT_EQ( 9, output(0,0).val_);
   EXPECT_FLOAT_EQ(12, output(0,0).d_);
 }
-TEST(AgradFwdMatrix, tcrossprod_1x3_matrix) {
+TEST(DiffFwdMatrix, tcrossprod_1x3_matrix) {
   using stan::diff::matrix_fv;
   using stan::math::matrix_d;
 
@@ -90,7 +90,7 @@ TEST(AgradFwdMatrix, tcrossprod_1x3_matrix) {
   EXPECT_FLOAT_EQ(14, output(0,0).val_); 
   EXPECT_FLOAT_EQ(24,output(0,0).d_);
 }
-TEST(AgradFwdMatrix, tcrossprod_2x3_matrix) {
+TEST(DiffFwdMatrix, tcrossprod_2x3_matrix) {
   using stan::diff::matrix_fv;
   using stan::math::matrix_d;
 
@@ -114,7 +114,7 @@ TEST(AgradFwdMatrix, tcrossprod_2x3_matrix) {
   EXPECT_FLOAT_EQ(  0, output(1,0).d_); 
   EXPECT_FLOAT_EQ(-24, output(1,1).d_); 
 }
-TEST(AgradFwdMatrix, tcrossprod_3x2_matrix) {
+TEST(DiffFwdMatrix, tcrossprod_3x2_matrix) {
   using stan::diff::matrix_fv;
   using stan::math::matrix_d;
 

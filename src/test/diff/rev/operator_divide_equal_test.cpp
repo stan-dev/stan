@@ -2,7 +2,7 @@
 #include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
-TEST(AgradRev,a_divideeq_b) {
+TEST(DiffRev,a_divideeq_b) {
   AVAR a(6.0);
   AVAR b(-2.0);
   AVEC x = createAVEC(a,b);
@@ -16,7 +16,7 @@ TEST(AgradRev,a_divideeq_b) {
   EXPECT_FLOAT_EQ(-6.0/((-2.0)*(-2.0)),g[1]);
 }
 
-TEST(AgradRev,a_divideeq_bd) {
+TEST(DiffRev,a_divideeq_bd) {
   AVAR a(6.0);
   double b = -2.0;
   AVEC x = createAVEC(a);

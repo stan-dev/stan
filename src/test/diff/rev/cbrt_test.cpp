@@ -2,7 +2,7 @@
 #include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
-TEST(AgradRev,cbrt) {
+TEST(DiffRev,cbrt) {
   AVAR a = 27.0;
   AVAR f = cbrt(a);
   EXPECT_FLOAT_EQ(3.0, f.val());

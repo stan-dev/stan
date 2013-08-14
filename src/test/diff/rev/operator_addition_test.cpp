@@ -3,7 +3,7 @@
 #include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
-TEST(AgradRev,a_plus_b) {
+TEST(DiffRev,a_plus_b) {
   AVAR a = 5.0;
   AVAR b = -1.0;
   AVAR f = a + b;
@@ -15,7 +15,7 @@ TEST(AgradRev,a_plus_b) {
   EXPECT_FLOAT_EQ(1.0,dx[1]);
 }
 
-TEST(AgradRev,a_plus_a) {
+TEST(DiffRev,a_plus_a) {
   AVAR a = 5.0;
   AVAR f = a + a;
   EXPECT_FLOAT_EQ(10.0,f.val());
@@ -25,7 +25,7 @@ TEST(AgradRev,a_plus_a) {
   EXPECT_FLOAT_EQ(2.0,dx[0]);
 }
 
-TEST(AgradRev,a_plus_neg_b) {
+TEST(DiffRev,a_plus_neg_b) {
   AVAR a = 5.0;
   AVAR b = -1.0;
   AVAR f = a + -b;
@@ -37,7 +37,7 @@ TEST(AgradRev,a_plus_neg_b) {
   EXPECT_FLOAT_EQ(-1.0,dx[1]);
 }
 
-TEST(AgradRev,a_plus_x) {
+TEST(DiffRev,a_plus_x) {
   AVAR a = 5.0;
   double z = 3.0;
   AVAR f = a + z;
@@ -48,7 +48,7 @@ TEST(AgradRev,a_plus_x) {
   EXPECT_FLOAT_EQ(1.0,dx[0]);
 }
 
-TEST(AgradRev,x_plus_a) {
+TEST(DiffRev,x_plus_a) {
   AVAR a = 5.0;
   double z = 3.0;
   AVAR f = z + a;

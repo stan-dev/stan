@@ -2,7 +2,7 @@
 #include <stan/math/matrix/block.hpp>
 #include <stan/diff/fwd/matrix/typedefs.hpp>
 
-TEST(AgradFwdMatrix,block_matrix) {
+TEST(DiffFwdMatrix,block_matrix) {
   using stan::math::block;
   using stan::diff::matrix_fv;
   using stan::diff::vector_fv;
@@ -48,7 +48,7 @@ TEST(AgradFwdMatrix,block_matrix) {
   EXPECT_EQ(2,n(1,0).d_);
   EXPECT_EQ(3,n(1,1).d_);
 }
-TEST(AgradFwdMatrix,block_matrix_exception) {
+TEST(DiffFwdMatrix,block_matrix_exception) {
   using stan::math::block;
   using stan::diff::matrix_fv;
 

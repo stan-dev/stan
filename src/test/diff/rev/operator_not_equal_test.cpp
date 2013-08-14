@@ -2,7 +2,7 @@
 #include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
-TEST(AgradRev,a_neq_y) {
+TEST(DiffRev,a_neq_y) {
   AVAR a = 2.0;
   double y = 3.0;
   EXPECT_TRUE(a != y);

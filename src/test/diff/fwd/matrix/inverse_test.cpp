@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 #include <stan/diff/fwd/matrix/typedefs.hpp>
 
-TEST(AgradFwdMatrix,inverse) {
+TEST(DiffFwdMatrix,inverse) {
   using stan::diff::matrix_fv;
   using stan::math::matrix_d;
 

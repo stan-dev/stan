@@ -4,7 +4,7 @@
 #include <stan/diff.hpp>
 #include <stan/diff/rev/matrix.hpp>
 
-TEST(AgradRevMatrix,elt_multiply_vec_vv) {
+TEST(DiffRevMatrix,elt_multiply_vec_vv) {
   using stan::math::elt_multiply;
   using stan::diff::vector_v;
 
@@ -24,7 +24,7 @@ TEST(AgradRevMatrix,elt_multiply_vec_vv) {
   EXPECT_FLOAT_EQ(0.0,g[3]);
 }
 
-TEST(AgradRevMatrix,elt_multiply_vec_vd) {
+TEST(DiffRevMatrix,elt_multiply_vec_vd) {
   using stan::math::elt_multiply;
   using stan::math::vector_d;
   using stan::diff::vector_v;
@@ -42,7 +42,7 @@ TEST(AgradRevMatrix,elt_multiply_vec_vd) {
   EXPECT_FLOAT_EQ(10.0,g[0]);
   EXPECT_FLOAT_EQ(0.0,g[1]);
 }
-TEST(AgradRevMatrix,elt_multiply_vec_dv) {
+TEST(DiffRevMatrix,elt_multiply_vec_dv) {
   using stan::math::elt_multiply;
   using stan::math::vector_d;
   using stan::diff::vector_v;
@@ -61,7 +61,7 @@ TEST(AgradRevMatrix,elt_multiply_vec_dv) {
   EXPECT_FLOAT_EQ(0.0,g[1]);
 }
 
-TEST(AgradRevMatrix,elt_multiply_row_vec_vv) {
+TEST(DiffRevMatrix,elt_multiply_row_vec_vv) {
   using stan::math::elt_multiply;
   using stan::diff::row_vector_v;
 
@@ -80,7 +80,7 @@ TEST(AgradRevMatrix,elt_multiply_row_vec_vv) {
   EXPECT_FLOAT_EQ(2.0,g[2]);
   EXPECT_FLOAT_EQ(0.0,g[3]);
 }
-TEST(AgradRevMatrix,elt_multiply_row_vec_vd) {
+TEST(DiffRevMatrix,elt_multiply_row_vec_vd) {
   using stan::math::elt_multiply;
   using stan::math::row_vector_d;
   using stan::diff::row_vector_v;
@@ -98,7 +98,7 @@ TEST(AgradRevMatrix,elt_multiply_row_vec_vd) {
   EXPECT_FLOAT_EQ(10.0,g[0]);
   EXPECT_FLOAT_EQ(0.0,g[1]);
 }
-TEST(AgradRevMatrix,elt_multiply_row_vec_dv) {
+TEST(DiffRevMatrix,elt_multiply_row_vec_dv) {
   using stan::math::elt_multiply;
   using stan::math::row_vector_d;
   using stan::diff::row_vector_v;
@@ -118,7 +118,7 @@ TEST(AgradRevMatrix,elt_multiply_row_vec_dv) {
 }
 
 
-TEST(AgradRevMatrix,elt_multiply_matrix_vv) {
+TEST(DiffRevMatrix,elt_multiply_matrix_vv) {
   using stan::math::elt_multiply;
   using stan::diff::matrix_v;
 
@@ -138,7 +138,7 @@ TEST(AgradRevMatrix,elt_multiply_matrix_vv) {
   EXPECT_FLOAT_EQ(0.0,g[2]);
   EXPECT_FLOAT_EQ(2.0,g[3]);
 }
-TEST(AgradRevMatrix,elt_multiply_matrix_vd) {
+TEST(DiffRevMatrix,elt_multiply_matrix_vd) {
   using stan::math::elt_multiply;
   using stan::math::matrix_d;
   using stan::diff::matrix_v;
@@ -159,7 +159,7 @@ TEST(AgradRevMatrix,elt_multiply_matrix_vd) {
   EXPECT_FLOAT_EQ(0.0,g[2]);
   EXPECT_FLOAT_EQ(0.0,g[3]);
 }
-TEST(AgradRevMatrix,elt_multiply_matrix_dv) {
+TEST(DiffRevMatrix,elt_multiply_matrix_dv) {
   using stan::math::elt_multiply;
   using stan::math::matrix_d;
   using stan::diff::matrix_v;

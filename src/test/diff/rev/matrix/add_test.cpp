@@ -5,7 +5,7 @@
 #include <stan/diff/rev/matrix/typedefs.hpp>
 #include <stan/diff.hpp>
 
-TEST(AgradRevMatrix,add_scalar) {
+TEST(DiffRevMatrix,add_scalar) {
   using stan::diff::matrix_v;
   using stan::math::add;
 
@@ -26,7 +26,7 @@ TEST(AgradRevMatrix,add_scalar) {
   EXPECT_FLOAT_EQ(6.0,result(1,1).val());
 }
 
-TEST(AgradRevMatrix, add_vector_vector) {
+TEST(DiffRevMatrix, add_vector_vector) {
   using stan::math::add;
   using stan::math::vector_d;
   using stan::diff::vector_v;
@@ -73,7 +73,7 @@ TEST(AgradRevMatrix, add_vector_vector) {
   EXPECT_FLOAT_EQ(expected_output(3), output_v(3).val());
   EXPECT_FLOAT_EQ(expected_output(4), output_v(4).val());  
 }
-TEST(AgradRevMatrix, add_vector_vector_exception) {
+TEST(DiffRevMatrix, add_vector_vector_exception) {
   using stan::math::add;
   using stan::math::vector_d;
   using stan::diff::vector_v;
@@ -86,7 +86,7 @@ TEST(AgradRevMatrix, add_vector_vector_exception) {
   EXPECT_THROW(add(d1, v2), std::domain_error);
   EXPECT_THROW(add(v1, v2), std::domain_error);
 }
-TEST(AgradRevMatrix, add_rowvector_rowvector) {
+TEST(DiffRevMatrix, add_rowvector_rowvector) {
   using stan::math::add;
   using stan::math::row_vector_d;
   using stan::diff::row_vector_v;
@@ -130,7 +130,7 @@ TEST(AgradRevMatrix, add_rowvector_rowvector) {
   EXPECT_FLOAT_EQ(expected_output(3), output_v(3).val());
   EXPECT_FLOAT_EQ(expected_output(4), output_v(4).val());  
 }
-TEST(AgradRevMatrix, add_rowvector_rowvector_exception) {
+TEST(DiffRevMatrix, add_rowvector_rowvector_exception) {
   using stan::math::add;
   using stan::math::row_vector_d;
   using stan::diff::row_vector_v;
@@ -144,7 +144,7 @@ TEST(AgradRevMatrix, add_rowvector_rowvector_exception) {
   EXPECT_THROW( add(v1, d2), std::domain_error);
   EXPECT_THROW( add(v1, v2), std::domain_error);
 }
-TEST(AgradRevMatrix, add_matrix_matrix) {
+TEST(DiffRevMatrix, add_matrix_matrix) {
   using stan::math::add;
   using stan::math::matrix_d;
   using stan::diff::matrix_v;
@@ -184,7 +184,7 @@ TEST(AgradRevMatrix, add_matrix_matrix) {
   EXPECT_FLOAT_EQ(expected_output(1,0), output_v(1,0).val());
   EXPECT_FLOAT_EQ(expected_output(1,1), output_v(1,1).val());
 }
-TEST(AgradRevMatrix, add_matrix_matrix_exception) {
+TEST(DiffRevMatrix, add_matrix_matrix_exception) {
   using stan::math::add;
   using stan::math::matrix_d;
   using stan::diff::matrix_v;

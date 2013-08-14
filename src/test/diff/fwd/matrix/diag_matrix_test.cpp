@@ -3,7 +3,7 @@
 #include <stan/diff/fwd/matrix/typedefs.hpp>
 #include <stan/math/matrix/diag_matrix.hpp>
 
-TEST(AgradFwdMatrix,diagMatrix) {
+TEST(DiffFwdMatrix,diagMatrix) {
   using stan::math::diag_matrix;
   using stan::diff::matrix_fv;
   using stan::math::vector_d;

@@ -2,7 +2,7 @@
 #include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
-TEST(AgradRev,a_times_b) {
+TEST(DiffRev,a_times_b) {
   AVAR a = 2.0;
   AVAR b = -3.0;
   AVAR f = a * b;
@@ -15,7 +15,7 @@ TEST(AgradRev,a_times_b) {
   EXPECT_FLOAT_EQ(2.0,grad_f[1]);
 }
 
-TEST(AgradRev,a_times_a) {
+TEST(DiffRev,a_times_a) {
   AVAR a = 2.0;
   AVAR f = a * a;
   EXPECT_FLOAT_EQ(4.0,f.val());
@@ -26,7 +26,7 @@ TEST(AgradRev,a_times_a) {
   EXPECT_FLOAT_EQ(4.0,grad_f[0]);
 }
 
-TEST(AgradRev,a_times_y) {
+TEST(DiffRev,a_times_y) {
   AVAR a = 2.0;
   double y = -3.0;
   AVAR f = a * y;
@@ -38,7 +38,7 @@ TEST(AgradRev,a_times_y) {
   EXPECT_FLOAT_EQ(-3.0,g[0]);
 }
  
-TEST(AgradRev,x_times_b) {
+TEST(DiffRev,x_times_b) {
   double x = 2.0;
   AVAR b = -3.0;
   AVAR f = x * b;

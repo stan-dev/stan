@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 #include <stan/diff.hpp>
 
-TEST(AgradRev,log_diff_exp_vv) {
+TEST(DiffRev,log_diff_exp_vv) {
   AVAR a = 5.0;
   AVAR b = 2.0;
   AVAR f = log_diff_exp(a, b);
@@ -27,7 +27,7 @@ TEST(AgradRev,log_diff_exp_vv) {
   EXPECT_FLOAT_EQ (std::exp (10.0 - (std::log(std::exp(0.0) - std::exp(-999.0)) + 1000)), grad_f[1]);
 }
 
-TEST(AgradRev,log_diff_exp_vd) {
+TEST(DiffRev,log_diff_exp_vd) {
   AVAR a = 5.0;
   double b = 2.0;
   AVAR f = log_diff_exp(a, b);
@@ -49,7 +49,7 @@ TEST(AgradRev,log_diff_exp_vd) {
   EXPECT_FLOAT_EQ (std::exp (1000.0 - (std::log(std::exp(0.0) - std::exp(-999.0)) + 1000)), grad_f[0]);
 }
 
-TEST(AgradRev,log_diff_exp_dv) {
+TEST(DiffRev,log_diff_exp_dv) {
   double a = 5.0;
   AVAR b = 2.0;
   AVAR f = log_diff_exp(a, b);
@@ -159,7 +159,7 @@ void test_log_diff_exp_2(double a, double b) {
   test_log_diff_exp_2_dv(a,b);
 }
 
-TEST(AgradRev,log_diff_exp_2) {
+TEST(DiffRev,log_diff_exp_2) {
   test_log_diff_exp_2(0.1,0.0);
   test_log_diff_exp_2(3.01,2.0);
   test_log_diff_exp_2(2.0,1.0);
@@ -167,7 +167,7 @@ TEST(AgradRev,log_diff_exp_2) {
   test_log_diff_exp_2(2.0,-15.0);
 }
 
-TEST(AgradRev,log_diff_exp_exception) {
+TEST(DiffRev,log_diff_exp_exception) {
   EXPECT_NO_THROW(log_diff_exp(AVAR(3), AVAR(4)));
   EXPECT_NO_THROW(log_diff_exp(AVAR(3), 4));
   EXPECT_NO_THROW(log_diff_exp(3, AVAR(4)));

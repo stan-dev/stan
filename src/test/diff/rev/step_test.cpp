@@ -2,7 +2,7 @@
 #include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
-TEST(AgradRev,step) {
+TEST(DiffRev,step) {
   AVAR a = 3.5;
   AVAR f = stan::diff::step(a);
   EXPECT_FLOAT_EQ(1.0,f.val());
@@ -13,7 +13,7 @@ TEST(AgradRev,step) {
   EXPECT_FLOAT_EQ(0.0,grad_f[0]);
 }  
 
-TEST(AgradRev,step_2) {
+TEST(DiffRev,step_2) {
   AVAR a = 0.0;
   AVAR f = stan::diff::step(a);
   EXPECT_FLOAT_EQ(1.0,f.val());
@@ -24,7 +24,7 @@ TEST(AgradRev,step_2) {
   EXPECT_FLOAT_EQ(0.0,grad_f[0]);
 }  
 
-TEST(AgradRev,step_3) {
+TEST(DiffRev,step_3) {
   AVAR a = -18765.3;
   AVAR f = stan::diff::step(a);
   EXPECT_FLOAT_EQ(0.0,f.val());

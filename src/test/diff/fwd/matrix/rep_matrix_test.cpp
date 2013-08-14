@@ -3,7 +3,7 @@
 #include <stan/diff/fwd/matrix/typedefs.hpp>
 #include <stan/diff/fwd/fvar.hpp>
 
-TEST(AgradFwdMatrix,rep_matrix_real) {
+TEST(DiffFwdMatrix,rep_matrix_real) {
   using stan::math::rep_matrix;
   using stan::diff::matrix_fv;
   using stan::diff::fvar;
@@ -26,7 +26,7 @@ TEST(AgradFwdMatrix,rep_matrix_real) {
   EXPECT_EQ(2,output(1,1).d_);
   EXPECT_EQ(2,output(1,2).d_);
 }
-TEST(AgradFwdMatrix,rep_matrix_exception_real) {
+TEST(DiffFwdMatrix,rep_matrix_exception_real) {
   using stan::math::rep_matrix;
   using stan::diff::matrix_fv;
   using stan::diff::fvar;
@@ -36,7 +36,7 @@ TEST(AgradFwdMatrix,rep_matrix_exception_real) {
 
   EXPECT_THROW(rep_matrix(a,-2,-1), std::domain_error);
 }
-TEST(AgradFwdMatrix,rep_matrix_rowvector) {
+TEST(DiffFwdMatrix,rep_matrix_rowvector) {
   using stan::math::rep_matrix;
   using stan::diff::matrix_fv;
   using stan::diff::row_vector_fv;
@@ -68,7 +68,7 @@ TEST(AgradFwdMatrix,rep_matrix_rowvector) {
   EXPECT_EQ(2,output(2,1).d_);
   EXPECT_EQ(2,output(2,2).d_);
 }
-TEST(AgradFwdMatrix,rep_matrix_exception_rowvector) {
+TEST(DiffFwdMatrix,rep_matrix_exception_rowvector) {
   using stan::math::rep_matrix;
   using stan::diff::matrix_fv;
   using stan::diff::row_vector_fv;
@@ -78,7 +78,7 @@ TEST(AgradFwdMatrix,rep_matrix_exception_rowvector) {
 
   EXPECT_THROW(rep_matrix(a,-3), std::domain_error);
 }
-TEST(AgradFwdMatrix,rep_matrix_vector) {
+TEST(DiffFwdMatrix,rep_matrix_vector) {
   using stan::math::rep_matrix;
   using stan::diff::matrix_fv;
   using stan::diff::vector_fv;
@@ -110,7 +110,7 @@ TEST(AgradFwdMatrix,rep_matrix_vector) {
   EXPECT_EQ(2,output(2,1).d_);
   EXPECT_EQ(2,output(2,2).d_);
 }
-TEST(AgradFwdMatrix,rep_matrix_exception_vector) {
+TEST(DiffFwdMatrix,rep_matrix_exception_vector) {
   using stan::math::rep_matrix;
   using stan::diff::matrix_fv;
   using stan::diff::vector_fv;

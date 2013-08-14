@@ -2,7 +2,7 @@
 #include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
-TEST(AgradSpecialFunctions,owens_t_vv) {
+TEST(DiffSpecialFunctions,owens_t_vv) {
   using stan::diff::var;
   using stan::diff::owens_t;
   using boost::math::owens_t;
@@ -18,7 +18,7 @@ TEST(AgradSpecialFunctions,owens_t_vv) {
   EXPECT_FLOAT_EQ(0.0026128467,grad_f[1]);
   EXPECT_FLOAT_EQ(-0.1154804963,grad_f[0]);
 }
-TEST(AgradSpecialFunctions,owens_t_vd) {
+TEST(DiffSpecialFunctions,owens_t_vd) {
   using stan::diff::var;
   using stan::diff::owens_t;
   using boost::math::owens_t;
@@ -34,7 +34,7 @@ TEST(AgradSpecialFunctions,owens_t_vd) {
   EXPECT_FLOAT_EQ(0,grad_f[1]);
   EXPECT_FLOAT_EQ(-0.1154804963,grad_f[0]);
 }
-TEST(AgradSpecialFunctions,owens_t_dv) {
+TEST(DiffSpecialFunctions,owens_t_dv) {
   using stan::diff::var;
   using stan::diff::owens_t;
   using boost::math::owens_t;

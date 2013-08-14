@@ -5,7 +5,7 @@
 #include <stan/diff/rev/matrix/typedefs.hpp>
 #include <stan/diff.hpp>
 
-TEST(AgradRevMatrix,subtract_scalar) {
+TEST(DiffRevMatrix,subtract_scalar) {
   using stan::math::subtract;
   using stan::diff::matrix_v;
 
@@ -26,7 +26,7 @@ TEST(AgradRevMatrix,subtract_scalar) {
   EXPECT_FLOAT_EQ(2.0,result(1,1).val());
 }
 
-TEST(AgradRevMatrix, subtract_vector_vector) {
+TEST(DiffRevMatrix, subtract_vector_vector) {
   using stan::math::subtract;
   using stan::math::vector_d;
   using stan::diff::vector_v;
@@ -72,7 +72,7 @@ TEST(AgradRevMatrix, subtract_vector_vector) {
   EXPECT_FLOAT_EQ(expected_output(3), output(3).val());
   EXPECT_FLOAT_EQ(expected_output(4), output(4).val());  
 }
-TEST(AgradRevMatrix, subtract_vector_vector_exception) {
+TEST(DiffRevMatrix, subtract_vector_vector_exception) {
   using stan::math::subtract;
   using stan::math::vector_d;
   using stan::diff::vector_v;
@@ -86,7 +86,7 @@ TEST(AgradRevMatrix, subtract_vector_vector_exception) {
   EXPECT_THROW( subtract(d1, v2), std::domain_error);
   EXPECT_THROW( subtract(v1, v2), std::domain_error);
 }
-TEST(AgradRevMatrix, subtract_rowvector_rowvector) {
+TEST(DiffRevMatrix, subtract_rowvector_rowvector) {
   using stan::math::subtract;
   using stan::math::row_vector_d;
   using stan::diff::row_vector_v;
@@ -132,7 +132,7 @@ TEST(AgradRevMatrix, subtract_rowvector_rowvector) {
   EXPECT_FLOAT_EQ(expected_output(3), output(3).val());
   EXPECT_FLOAT_EQ(expected_output(4), output(4).val());  
 }
-TEST(AgradRevMatrix, subtract_rowvector_rowvector_exception) {
+TEST(DiffRevMatrix, subtract_rowvector_rowvector_exception) {
   using stan::math::subtract;
   using stan::math::row_vector_d;
   using stan::diff::row_vector_v;
@@ -146,7 +146,7 @@ TEST(AgradRevMatrix, subtract_rowvector_rowvector_exception) {
   EXPECT_THROW( subtract(v1, d2), std::domain_error);
   EXPECT_THROW( subtract(v1, v2), std::domain_error);
 }
-TEST(AgradRevMatrix, subtract_matrix_matrix) {
+TEST(DiffRevMatrix, subtract_matrix_matrix) {
   using stan::math::subtract;
   using stan::math::matrix_d;
   using stan::diff::matrix_v;
@@ -189,7 +189,7 @@ TEST(AgradRevMatrix, subtract_matrix_matrix) {
   EXPECT_FLOAT_EQ(expected_output(1,0), output(1,0).val());
   EXPECT_FLOAT_EQ(expected_output(1,1), output(1,1).val());
 }
-TEST(AgradRevMatrix, subtract_matrix_matrix_exception) {
+TEST(DiffRevMatrix, subtract_matrix_matrix_exception) {
   using stan::math::subtract;
   using stan::math::matrix_d;
   using stan::diff::matrix_v;

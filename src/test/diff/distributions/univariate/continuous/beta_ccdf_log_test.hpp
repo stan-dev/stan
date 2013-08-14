@@ -5,7 +5,7 @@ using std::vector;
 using std::numeric_limits;
 using stan::diff::var;
 
-class AgradCcdfLogBeta : public AgradCcdfLogTest {
+class DiffCcdfLogBeta : public DiffCcdfLogTest {
 public:
   void valid_values(vector<vector<double> >& parameters,
                     vector<double>& log_ccdf) {

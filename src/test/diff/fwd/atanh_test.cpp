@@ -2,7 +2,7 @@
 #include <stan/diff/fwd.hpp>
 #include <boost/math/special_functions/atanh.hpp>
 
-TEST(AgradFvar, atanh) {
+TEST(DiffFvar, atanh) {
   using stan::diff::fvar;
   using boost::math::atanh;
 

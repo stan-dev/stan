@@ -2,7 +2,7 @@
 #include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
-TEST(AgradRev,acosh) {
+TEST(DiffRev,acosh) {
   AVAR a = 1.3;
   AVAR f = acosh(a);
   EXPECT_FLOAT_EQ(acosh(1.3), f.val());

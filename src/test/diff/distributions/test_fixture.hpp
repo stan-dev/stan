@@ -20,11 +20,11 @@ using stan::math::value_of;
 
 
 /** 
- * To test a distribution, define a subclass of AgradDistributionTest.
+ * To test a distribution, define a subclass of DiffDistributionTest.
  * Implement each of the functions.
  * 
  */
-class AgradDistributionTest {
+class DiffDistributionTest {
 public:
   virtual void valid_values(vector<vector<double> >& /*parameters*/,
                             vector<double>& /* log_prob */) {
@@ -81,7 +81,7 @@ public:
   */
 };
 
-class AgradCdfLogTest {
+class DiffCdfLogTest {
 public:
   virtual void valid_values(vector<vector<double> >& /*parameters*/,
                             vector<double>& /* cdf_log */) {
@@ -135,7 +135,7 @@ public:
   */
 };
 
-class AgradCdfTest {
+class DiffCdfTest {
 public:
   virtual void valid_values(vector<vector<double> >& /*parameters*/,
                             vector<double>& /* cdf */) {
@@ -189,7 +189,7 @@ public:
   */
 };
 
-class AgradCcdfLogTest {
+class DiffCcdfLogTest {
 public:
   virtual void valid_values(vector<vector<double> >& /*parameters*/,
                             vector<double>& /* cdf_log */) {
@@ -245,7 +245,7 @@ public:
 
 using boost::mpl::at_c;
 template<class T>
-class AgradDistributionTestFixture : public ::testing::Test {
+class DiffDistributionTestFixture : public ::testing::Test {
 public:
   typename at_c<T,0>::type TestClass;
   typedef typename at_c<typename at_c<T,1>::type, 0>::type T0;
@@ -801,41 +801,41 @@ public:
     return params[0];
   }
 };
-TYPED_TEST_CASE_P(AgradDistributionTestFixture);
+TYPED_TEST_CASE_P(DiffDistributionTestFixture);
 
-TYPED_TEST_P(AgradDistributionTestFixture, CallAllVersions) {
+TYPED_TEST_P(DiffDistributionTestFixture, CallAllVersions) {
   this->call_all_versions();
 }
 
-TYPED_TEST_P(AgradDistributionTestFixture, ValidValues) {
+TYPED_TEST_P(DiffDistributionTestFixture, ValidValues) {
   this->test_valid_values();
 }
 
-TYPED_TEST_P(AgradDistributionTestFixture, InvalidValues) {
+TYPED_TEST_P(DiffDistributionTestFixture, InvalidValues) {
   this->test_invalid_values();
 }
 
-TYPED_TEST_P(AgradDistributionTestFixture, Propto) {
+TYPED_TEST_P(DiffDistributionTestFixture, Propto) {
   this->test_propto();
 }
 
-TYPED_TEST_P(AgradDistributionTestFixture, FiniteDiff) {
+TYPED_TEST_P(DiffDistributionTestFixture, FiniteDiff) {
   this->test_finite_diff();
 }
 
-TYPED_TEST_P(AgradDistributionTestFixture, Function) {
+TYPED_TEST_P(DiffDistributionTestFixture, Function) {
   this->test_gradient_function();
 }
 
-TYPED_TEST_P(AgradDistributionTestFixture, RepeatAsVector) {
+TYPED_TEST_P(DiffDistributionTestFixture, RepeatAsVector) {
   this->test_repeat_as_vector();
 }
 
-TYPED_TEST_P(AgradDistributionTestFixture, Length0Vector) {
+TYPED_TEST_P(DiffDistributionTestFixture, Length0Vector) {
   this->test_length_0_vector();
 }
 
-REGISTER_TYPED_TEST_CASE_P(AgradDistributionTestFixture,
+REGISTER_TYPED_TEST_CASE_P(DiffDistributionTestFixture,
                            CallAllVersions,
                            ValidValues,
                            InvalidValues,
@@ -847,7 +847,7 @@ REGISTER_TYPED_TEST_CASE_P(AgradDistributionTestFixture,
 
 
 template<class T>
-class AgradCdfTestFixture : public ::testing::Test {
+class DiffCdfTestFixture : public ::testing::Test {
 public:
   typename at_c<T,0>::type TestClass;
   typedef typename at_c<typename at_c<T,1>::type, 0>::type T0;
@@ -1398,45 +1398,45 @@ public:
   }
 };
 
-TYPED_TEST_CASE_P(AgradCdfTestFixture);
+TYPED_TEST_CASE_P(DiffCdfTestFixture);
 
-TYPED_TEST_P(AgradCdfTestFixture, CallAllVersions) {
+TYPED_TEST_P(DiffCdfTestFixture, CallAllVersions) {
   this->call_all_versions();
 }
 
-TYPED_TEST_P(AgradCdfTestFixture, ValidValues) {
+TYPED_TEST_P(DiffCdfTestFixture, ValidValues) {
   this->test_valid_values();
 }
 
-TYPED_TEST_P(AgradCdfTestFixture, InvalidValues) {
+TYPED_TEST_P(DiffCdfTestFixture, InvalidValues) {
   this->test_invalid_values();
 }
 
-TYPED_TEST_P(AgradCdfTestFixture, FiniteDiff) {
+TYPED_TEST_P(DiffCdfTestFixture, FiniteDiff) {
   this->test_finite_diff();
 }
 
-TYPED_TEST_P(AgradCdfTestFixture, Function) {
+TYPED_TEST_P(DiffCdfTestFixture, Function) {
   this->test_gradient_function();
 }
 
-TYPED_TEST_P(AgradCdfTestFixture, RepeatAsVector) {
+TYPED_TEST_P(DiffCdfTestFixture, RepeatAsVector) {
   this->test_repeat_as_vector();
 }
 
-TYPED_TEST_P(AgradCdfTestFixture, LowerBound) {
+TYPED_TEST_P(DiffCdfTestFixture, LowerBound) {
   this->test_lower_bound();
 }
 
-TYPED_TEST_P(AgradCdfTestFixture, UpperBound) {
+TYPED_TEST_P(DiffCdfTestFixture, UpperBound) {
   this->test_upper_bound();
 }
 
-TYPED_TEST_P(AgradCdfTestFixture, Length0Vector) {
+TYPED_TEST_P(DiffCdfTestFixture, Length0Vector) {
   this->test_length_0_vector();
 }
 
-REGISTER_TYPED_TEST_CASE_P(AgradCdfTestFixture,
+REGISTER_TYPED_TEST_CASE_P(DiffCdfTestFixture,
                            CallAllVersions,
                            ValidValues,
                            InvalidValues,
@@ -1448,7 +1448,7 @@ REGISTER_TYPED_TEST_CASE_P(AgradCdfTestFixture,
                            Length0Vector);
 
 template<class T>
-class AgradCdfLogTestFixture : public ::testing::Test {
+class DiffCdfLogTestFixture : public ::testing::Test {
 public:
   typename at_c<T,0>::type TestClass;
   typedef typename at_c<typename at_c<T,1>::type, 0>::type T0;
@@ -1999,45 +1999,45 @@ public:
   }
 };
 
-TYPED_TEST_CASE_P(AgradCdfLogTestFixture);
+TYPED_TEST_CASE_P(DiffCdfLogTestFixture);
 
-TYPED_TEST_P(AgradCdfLogTestFixture, CallAllVersions) {
+TYPED_TEST_P(DiffCdfLogTestFixture, CallAllVersions) {
   this->call_all_versions();
 }
 
-TYPED_TEST_P(AgradCdfLogTestFixture, ValidValues) {
+TYPED_TEST_P(DiffCdfLogTestFixture, ValidValues) {
   this->test_valid_values();
 }
 
-TYPED_TEST_P(AgradCdfLogTestFixture, InvalidValues) {
+TYPED_TEST_P(DiffCdfLogTestFixture, InvalidValues) {
   this->test_invalid_values();
 }
 
-TYPED_TEST_P(AgradCdfLogTestFixture, FiniteDiff) {
+TYPED_TEST_P(DiffCdfLogTestFixture, FiniteDiff) {
   this->test_finite_diff();
 }
 
-TYPED_TEST_P(AgradCdfLogTestFixture, Function) {
+TYPED_TEST_P(DiffCdfLogTestFixture, Function) {
   this->test_gradient_function();
 }
 
-TYPED_TEST_P(AgradCdfLogTestFixture, RepeatAsVector) {
+TYPED_TEST_P(DiffCdfLogTestFixture, RepeatAsVector) {
   this->test_repeat_as_vector();
 }
 
-TYPED_TEST_P(AgradCdfLogTestFixture, LowerBound) {
+TYPED_TEST_P(DiffCdfLogTestFixture, LowerBound) {
   this->test_lower_bound();
 }
 
-TYPED_TEST_P(AgradCdfLogTestFixture, UpperBound) {
+TYPED_TEST_P(DiffCdfLogTestFixture, UpperBound) {
   this->test_upper_bound();
 }
 
-TYPED_TEST_P(AgradCdfLogTestFixture, Length0Vector) {
+TYPED_TEST_P(DiffCdfLogTestFixture, Length0Vector) {
   this->test_length_0_vector();
 }
 
-REGISTER_TYPED_TEST_CASE_P(AgradCdfLogTestFixture,
+REGISTER_TYPED_TEST_CASE_P(DiffCdfLogTestFixture,
                            CallAllVersions,
                            ValidValues,
                            InvalidValues,
@@ -2049,7 +2049,7 @@ REGISTER_TYPED_TEST_CASE_P(AgradCdfLogTestFixture,
                            Length0Vector);
 
 template<class T>
-class AgradCcdfLogTestFixture : public ::testing::Test {
+class DiffCcdfLogTestFixture : public ::testing::Test {
 public:
   typename at_c<T,0>::type TestClass;
   typedef typename at_c<typename at_c<T,1>::type, 0>::type T0;
@@ -2600,45 +2600,45 @@ public:
   }
 };
 
-TYPED_TEST_CASE_P(AgradCcdfLogTestFixture);
+TYPED_TEST_CASE_P(DiffCcdfLogTestFixture);
 
-TYPED_TEST_P(AgradCcdfLogTestFixture, CallAllVersions) {
+TYPED_TEST_P(DiffCcdfLogTestFixture, CallAllVersions) {
   this->call_all_versions();
 }
 
-TYPED_TEST_P(AgradCcdfLogTestFixture, ValidValues) {
+TYPED_TEST_P(DiffCcdfLogTestFixture, ValidValues) {
   this->test_valid_values();
 }
 
-TYPED_TEST_P(AgradCcdfLogTestFixture, InvalidValues) {
+TYPED_TEST_P(DiffCcdfLogTestFixture, InvalidValues) {
   this->test_invalid_values();
 }
 
-TYPED_TEST_P(AgradCcdfLogTestFixture, FiniteDiff) {
+TYPED_TEST_P(DiffCcdfLogTestFixture, FiniteDiff) {
   this->test_finite_diff();
 }
 
-TYPED_TEST_P(AgradCcdfLogTestFixture, Function) {
+TYPED_TEST_P(DiffCcdfLogTestFixture, Function) {
   this->test_gradient_function();
 }
 
-TYPED_TEST_P(AgradCcdfLogTestFixture, RepeatAsVector) {
+TYPED_TEST_P(DiffCcdfLogTestFixture, RepeatAsVector) {
   this->test_repeat_as_vector();
 }
 
-TYPED_TEST_P(AgradCcdfLogTestFixture, LowerBound) {
+TYPED_TEST_P(DiffCcdfLogTestFixture, LowerBound) {
   this->test_lower_bound();
 }
 
-TYPED_TEST_P(AgradCcdfLogTestFixture, UpperBound) {
+TYPED_TEST_P(DiffCcdfLogTestFixture, UpperBound) {
   this->test_upper_bound();
 }
 
-TYPED_TEST_P(AgradCcdfLogTestFixture, Length0Vector) {
+TYPED_TEST_P(DiffCcdfLogTestFixture, Length0Vector) {
   this->test_length_0_vector();
 }
 
-REGISTER_TYPED_TEST_CASE_P(AgradCcdfLogTestFixture,
+REGISTER_TYPED_TEST_CASE_P(DiffCcdfLogTestFixture,
                            CallAllVersions,
                            ValidValues,
                            InvalidValues,

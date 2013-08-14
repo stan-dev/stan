@@ -4,7 +4,7 @@
 #include <stan/math/matrix/mdivide_left.hpp>
 #include <stan/math/matrix/multiply.hpp>
 
-TEST(AgradFwdMatrix,mdivide_right_matrix_matrix) {
+TEST(DiffFwdMatrix,mdivide_right_matrix_matrix) {
   using stan::math::matrix_d;
   using stan::diff::matrix_fv;
   using stan::diff::mdivide_right;
@@ -52,7 +52,7 @@ TEST(AgradFwdMatrix,mdivide_right_matrix_matrix) {
   EXPECT_NEAR(4.0,I(1,0).d_,1.0E-12);
   EXPECT_NEAR(-2.0,I(1,1).d_,1.0e-12);
 }
-TEST(AgradFwdMatrix,mdivide_right_matrix_rowvector) {
+TEST(DiffFwdMatrix,mdivide_right_matrix_rowvector) {
   using stan::math::matrix_d;
   using stan::diff::matrix_fv;
   using stan::diff::row_vector_fv;
@@ -96,7 +96,7 @@ TEST(AgradFwdMatrix,mdivide_right_matrix_rowvector) {
   EXPECT_NEAR(-1.0,output(0,0).d_,1.0E-12);
   EXPECT_NEAR(1.0,output(0,1).d_,1.0E-12);
 }
-TEST(AgradFwdMatrix,mdivide_right_exceptions) {
+TEST(DiffFwdMatrix,mdivide_right_exceptions) {
   using stan::math::matrix_d;
   using stan::math::vector_d;
   using stan::math::row_vector_d;

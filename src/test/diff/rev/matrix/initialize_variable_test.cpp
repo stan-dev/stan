@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 #include <test/diff/util.hpp>
 
-TEST(AgradRevMatrix, initializeVariable) {
+TEST(DiffRevMatrix, initializeVariable) {
   using stan::diff::initialize_variable;
   using std::vector;
 

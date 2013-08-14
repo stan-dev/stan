@@ -2,7 +2,7 @@
 #include <stan/diff/fwd.hpp>
 #include <boost/math/special_functions/erf.hpp>
 
-TEST(AgradFvar, erf){
+TEST(DiffFvar, erf){
   using stan::diff::fvar;
   using std::exp;
   using std::sqrt;

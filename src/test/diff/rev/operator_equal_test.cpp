@@ -2,7 +2,7 @@
 #include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
-TEST(AgradRev,a_eq_b) {
+TEST(DiffRev,a_eq_b) {
   AVAR a = 2.0;
   AVAR b = 2.0;
   EXPECT_TRUE(a == b);
@@ -12,7 +12,7 @@ TEST(AgradRev,a_eq_b) {
   EXPECT_FALSE(c == a);
 }
 
-TEST(AgradRev,x_eq_b) {
+TEST(DiffRev,x_eq_b) {
   double x = 2.0;
   AVAR b = 2.0;
   EXPECT_TRUE(x == b);
@@ -22,7 +22,7 @@ TEST(AgradRev,x_eq_b) {
   EXPECT_FALSE(c == x);
 }
 
-TEST(AgradRev,a_eq_y) {
+TEST(DiffRev,a_eq_y) {
   AVAR a = 2.0;
   double y = 2.0;
   EXPECT_TRUE(a == y);

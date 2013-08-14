@@ -5,7 +5,7 @@
 #include <stan/diff/rev/matrix/typedefs.hpp>
 #include <stan/diff.hpp>
 
-TEST(AgradRevMatrix,mv_trace) {
+TEST(DiffRevMatrix,mv_trace) {
   using stan::math::trace;
   using stan::diff::matrix_v;
 

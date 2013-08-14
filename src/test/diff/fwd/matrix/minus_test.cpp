@@ -6,7 +6,7 @@
 
 using stan::diff::fvar;
 
-TEST(AgradFwdMatrix, minus_scalar) {
+TEST(DiffFwdMatrix, minus_scalar) {
   using stan::math::minus;
   double x = 10;
   fvar<double> v = 11;
@@ -16,7 +16,7 @@ TEST(AgradFwdMatrix, minus_scalar) {
   EXPECT_FLOAT_EQ(-11, minus(v).val_);
   EXPECT_FLOAT_EQ( -1, minus(v).d_);
 }
-TEST(AgradFwdMatrix, minus_vector) {
+TEST(DiffFwdMatrix, minus_vector) {
   using stan::math::vector_d;
   using stan::diff::vector_fv;
   using stan::math::minus;
@@ -45,7 +45,7 @@ TEST(AgradFwdMatrix, minus_vector) {
   EXPECT_FLOAT_EQ(-1, output[1].d_);
   EXPECT_FLOAT_EQ(-1, output[2].d_);
 }
-TEST(AgradFwdMatrix, minus_rowvector) {
+TEST(DiffFwdMatrix, minus_rowvector) {
   using stan::math::row_vector_d;
   using stan::diff::row_vector_fv;
   using stan::math::minus;
@@ -74,7 +74,7 @@ TEST(AgradFwdMatrix, minus_rowvector) {
   EXPECT_FLOAT_EQ(-1, output[1].d_);
   EXPECT_FLOAT_EQ(-1, output[2].d_);
 }
-TEST(AgradFwdMatrix, minus_matrix) {
+TEST(DiffFwdMatrix, minus_matrix) {
   using stan::math::matrix_d;
   using stan::diff::matrix_fv;
   using stan::math::minus;

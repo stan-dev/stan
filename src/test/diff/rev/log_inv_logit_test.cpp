@@ -30,7 +30,7 @@ void test_log_inv_logit(const double x) {
                   log_inv_logit(var(x)).val());
 
 }
-TEST(AgradRev, log_inv_logit) {
+TEST(DiffRev, log_inv_logit) {
   test_log_inv_logit(-7.2);
   test_log_inv_logit(0.0);
   test_log_inv_logit(1.9);

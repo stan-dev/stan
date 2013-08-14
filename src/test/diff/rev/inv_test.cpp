@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 #include <stan/math/constants.hpp>
 
-TEST(AgradRev,inv) {
+TEST(DiffRev,inv) {
   AVAR a = 7.0;
   AVEC x = createAVEC(a);
   AVAR f = inv(a);

@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 #include <stan/math/functions/as_bool.hpp>
 
-TEST(AgradRev,asBool) {
+TEST(DiffRev,asBool) {
   using stan::math::as_bool;
   using stan::diff::var;
 

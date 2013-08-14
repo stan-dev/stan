@@ -2,7 +2,7 @@
 #include <stan/diff.hpp>
 #include <test/diff/util.hpp>
 
-TEST(AgradRev, multiple_grads) {
+TEST(DiffRev, multiple_grads) {
   for (int i = 0; i < 100; ++i) {
     AVAR a = 2.0;
     AVAR b = 3.0 * a;

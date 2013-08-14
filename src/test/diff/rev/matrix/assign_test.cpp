@@ -24,7 +24,7 @@ TEST(MathMatrix,getAssignRowVar) {
 
 }
 
-TEST(AgradRevMatrix, assign) {
+TEST(DiffRevMatrix, assign) {
   using stan::math::assign;
   using std::vector;
   using Eigen::Matrix;
@@ -90,7 +90,7 @@ TEST(AgradRevMatrix, assign) {
   EXPECT_FLOAT_EQ(100,m_var(1,0).val());
   EXPECT_FLOAT_EQ(300,m_var(1,2).val());
 }
-TEST(AgradRevMatrix, assign_error) {
+TEST(DiffRevMatrix, assign_error) {
   using stan::math::assign;
   using std::vector;
   using Eigen::Matrix;

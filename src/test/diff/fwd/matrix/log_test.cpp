@@ -4,7 +4,7 @@
 #include <stan/diff/fwd/matrix/typedefs.hpp>
 #include <stan/diff/fwd.hpp>
 
-TEST(AgradFwdMatrix, log_matrix) {
+TEST(DiffFwdMatrix, log_matrix) {
   using stan::math::log;
   using stan::math::matrix_d;
   using stan::diff::matrix_fv;
@@ -30,7 +30,7 @@ TEST(AgradFwdMatrix, log_matrix) {
   EXPECT_FLOAT_EQ(0.25, output(1,1).d_);
 }
 
-TEST(AgradFwdMatrix, log_vector) {
+TEST(DiffFwdMatrix, log_vector) {
   using stan::math::log;
   using stan::math::vector_d;
   using stan::diff::vector_fv;
@@ -54,7 +54,7 @@ TEST(AgradFwdMatrix, log_vector) {
   EXPECT_FLOAT_EQ(0.25, output(3).d_);
 }
 
-TEST(AgradFwdMatrix, log_rowvector) {
+TEST(DiffFwdMatrix, log_rowvector) {
   using stan::math::log;
   using stan::math::row_vector_d;
   using stan::diff::row_vector_fv;

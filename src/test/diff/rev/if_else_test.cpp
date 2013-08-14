@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 #include <stan/math/functions/if_else.hpp>
 
-TEST(AgradRev,if_else) {
+TEST(DiffRev,if_else) {
   using stan::diff::var;
   using stan::math::if_else;
   using stan::diff::if_else;

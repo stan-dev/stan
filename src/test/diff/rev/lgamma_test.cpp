@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 #include <boost/math/special_functions/digamma.hpp>
 
-TEST(AgradRev,lgamma) {
+TEST(DiffRev,lgamma) {
   AVAR a = 3.0;
   AVAR f = lgamma(a);
   EXPECT_FLOAT_EQ(lgamma(3.0),f.val());

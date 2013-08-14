@@ -36,7 +36,7 @@ void log_sum_exp_test(const Eigen::Matrix<double,R,C>& x) {
   }
 }
 
-TEST(AgradRevLogSumExp,matrix) {
+TEST(DiffRevLogSumExp,matrix) {
   using Eigen::Matrix;
   using Eigen::Dynamic;
   

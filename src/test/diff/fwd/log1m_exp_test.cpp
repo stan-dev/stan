@@ -2,7 +2,7 @@
 #include <stan/diff/fwd.hpp>
 #include <stan/math/functions/log1m_exp.hpp>
 
-TEST(AgradFvar, log1m_exp) {
+TEST(DiffFvar, log1m_exp) {
   using stan::diff::fvar;
   using stan::math::log1m_exp;
   using std::exp;
@@ -30,7 +30,7 @@ TEST(AgradFvar, log1m_exp) {
   EXPECT_FLOAT_EQ(b.d_, b2.d_);
 }
 
-TEST(AgradFvar, log1m_exp_exception) {
+TEST(DiffFvar, log1m_exp_exception) {
   using stan::diff::fvar;
   using stan::math::log1m_exp;
   EXPECT_NO_THROW(log1m_exp(fvar<double>(-3)));

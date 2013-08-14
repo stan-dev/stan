@@ -2,7 +2,7 @@
 #include <stan/diff.hpp>
 #include <gtest/gtest.h>
 
-TEST(AgradErrorHandling,CheckNotNan) {
+TEST(DiffErrorHandling,CheckNotNan) {
   using stan::diff::var;
   using stan::math::check_not_nan;
   const char* function = "check_not_nan(%1%)";

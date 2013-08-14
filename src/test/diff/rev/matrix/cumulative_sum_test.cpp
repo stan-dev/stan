@@ -41,7 +41,7 @@ void test_cumulative_sum() {
   EXPECT_FLOAT_EQ(1.0,grad[1]);
   EXPECT_FLOAT_EQ(1.0,grad[2]);
 }
-TEST(AgradRevMatrix, cumulative_sum) {
+TEST(DiffRevMatrix, cumulative_sum) {
   using stan::diff::var;
   using stan::math::cumulative_sum;
 

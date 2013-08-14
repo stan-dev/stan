@@ -2,7 +2,7 @@
 #include <stan/diff/fwd.hpp>
 #include <stan/math/functions/log1m.hpp>
 
-TEST(AgradFvar, log1m){
+TEST(DiffFvar, log1m){
   using stan::diff::fvar;
   using stan::math::log1m;
   using std::isnan;

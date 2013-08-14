@@ -2,7 +2,7 @@
 #include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
-TEST(AgradRev,bessel_second_kind_int_var) {
+TEST(DiffRev,bessel_second_kind_int_var) {
   int a(0);
   AVAR b(4.0);
   AVAR f = stan::diff::bessel_second_kind(a,b);

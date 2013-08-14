@@ -2,7 +2,7 @@
 #include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
-TEST(AgradRev,round) {
+TEST(DiffRev,round) {
   AVAR a = 1.2;
   AVAR f = round(a);
   EXPECT_FLOAT_EQ(1.0, f.val());
@@ -13,7 +13,7 @@ TEST(AgradRev,round) {
   EXPECT_FLOAT_EQ(0.0, grad_f[0]);
 }
 
-TEST(AgradRev,round_2) {
+TEST(DiffRev,round_2) {
   AVAR a = -1.2;
   AVAR f = round(a);
   EXPECT_FLOAT_EQ(-1.0, f.val());
@@ -24,7 +24,7 @@ TEST(AgradRev,round_2) {
   EXPECT_FLOAT_EQ(0.0, grad_f[0]);
 }
 
-TEST(AgradRev,round_3) {
+TEST(DiffRev,round_3) {
   AVAR a = 1.7;
   AVAR f = round(a);
   EXPECT_FLOAT_EQ(2.0, f.val());
@@ -36,7 +36,7 @@ TEST(AgradRev,round_3) {
 }
 
 
-TEST(AgradRev,round_4) {
+TEST(DiffRev,round_4) {
   AVAR a = -1.7;
   AVAR f = round(a);
   EXPECT_FLOAT_EQ(-2.0, f.val());

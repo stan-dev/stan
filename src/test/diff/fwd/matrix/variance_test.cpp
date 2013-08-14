@@ -4,7 +4,7 @@
 #include <stan/diff/fwd/matrix/typedefs.hpp>
 #include <stan/diff/fwd.hpp>
 
-TEST(AgradFwdMatrix, variance_vector) {
+TEST(DiffFwdMatrix, variance_vector) {
   using stan::math::variance;
   using stan::math::vector_d;
   using stan::diff::vector_fv;
@@ -36,7 +36,7 @@ TEST(AgradFwdMatrix, variance_vector) {
   EXPECT_FLOAT_EQ(0.0, variance(v1).val_);  
   EXPECT_FLOAT_EQ(0.0, variance(v1).d_);  
 }
-TEST(AgradFwdMatrix, variance_vector_exception) {
+TEST(DiffFwdMatrix, variance_vector_exception) {
   using stan::math::variance;
   using stan::math::vector_d;
   using stan::diff::vector_fv;
@@ -46,7 +46,7 @@ TEST(AgradFwdMatrix, variance_vector_exception) {
   EXPECT_THROW(variance(d1), std::domain_error);
   EXPECT_THROW(variance(v1), std::domain_error);
 }
-TEST(AgradFwdMatrix, variance_rowvector) {
+TEST(DiffFwdMatrix, variance_rowvector) {
   using stan::math::variance;
   using stan::math::row_vector_d;
   using stan::diff::row_vector_fv;
@@ -78,7 +78,7 @@ TEST(AgradFwdMatrix, variance_rowvector) {
   EXPECT_FLOAT_EQ(0.0, variance(v1).val_);  
   EXPECT_FLOAT_EQ(0.0, variance(v1).d_);  
 }
-TEST(AgradFwdMatrix, variance_rowvector_exception) {
+TEST(DiffFwdMatrix, variance_rowvector_exception) {
   using stan::math::variance;
   using stan::math::row_vector_d;
   using stan::diff::row_vector_fv;
@@ -88,7 +88,7 @@ TEST(AgradFwdMatrix, variance_rowvector_exception) {
   EXPECT_THROW(variance(d1), std::domain_error);
   EXPECT_THROW(variance(v1), std::domain_error);
 }
-TEST(AgradFwdMatrix, variance_matrix) {
+TEST(DiffFwdMatrix, variance_matrix) {
   using stan::math::variance;
   using stan::math::matrix_d;
   using stan::diff::matrix_fv;
@@ -120,7 +120,7 @@ TEST(AgradFwdMatrix, variance_matrix) {
   EXPECT_FLOAT_EQ(0.0, variance(v1).val_);  
   EXPECT_FLOAT_EQ(0.0, variance(v1).d_);  
 }
-TEST(AgradFwdMatrix, variance_matrix_exception) {
+TEST(DiffFwdMatrix, variance_matrix_exception) {
   using stan::math::variance;
   using stan::math::matrix_d;
   using stan::diff::matrix_fv;
@@ -140,7 +140,7 @@ TEST(AgradFwdMatrix, variance_matrix_exception) {
   EXPECT_THROW(variance(d1), std::domain_error);
   EXPECT_THROW(variance(v1), std::domain_error);
 }
-TEST(AgradFwdMatrix, varianceStdVector) {
+TEST(DiffFwdMatrix, varianceStdVector) {
   using stan::math::variance;
   using stan::diff::fvar;
 

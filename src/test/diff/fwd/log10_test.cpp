@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <stan/diff/fwd.hpp>
 
-TEST(AgradFvar, log10) {
+TEST(DiffFvar, log10) {
   using stan::diff::fvar;
   using std::log;
   using std::log10;

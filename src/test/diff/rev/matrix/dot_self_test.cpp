@@ -17,7 +17,7 @@ void assert_val_grad(Eigen::Matrix<stan::diff::var,R,C>& v) {
 }  
 
 
-TEST(AgradRevMatrix, dot_self_vec) {
+TEST(DiffRevMatrix, dot_self_vec) {
   using stan::math::dot_self;
 
   Eigen::Matrix<AVAR,Eigen::Dynamic,1> v1(1);
@@ -43,7 +43,7 @@ TEST(AgradRevMatrix, dot_self_vec) {
   assert_val_grad(vvvv);
 }
 
-TEST(AgradRevMatrix,columns_dot_self) {
+TEST(DiffRevMatrix,columns_dot_self) {
   using stan::math::columns_dot_self;
 
   Eigen::Matrix<AVAR,Eigen::Dynamic,Eigen::Dynamic> m1(1,1);

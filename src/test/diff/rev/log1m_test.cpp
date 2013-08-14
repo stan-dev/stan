@@ -3,7 +3,7 @@
 #include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
-TEST(AgradRev,log1m) {
+TEST(DiffRev,log1m) {
   AVAR a = 0.1;
   AVAR f = log1m(a);
   EXPECT_FLOAT_EQ(log(1 - 0.1), f.val());
@@ -13,7 +13,7 @@ TEST(AgradRev,log1m) {
   f.grad(x,grad_f);
   EXPECT_FLOAT_EQ(-1.0/(1.0 - 0.1), grad_f[0]);
 }
-TEST(AgradRev,log1mErr) {
+TEST(DiffRev,log1mErr) {
   AVAR a = 10;
   AVAR f = log1m(a);
   EXPECT_TRUE(boost::math::isnan(f.val()));

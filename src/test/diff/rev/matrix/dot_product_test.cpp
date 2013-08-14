@@ -3,7 +3,7 @@
 #include <test/diff/util.hpp>
 #include <stan/diff.hpp>
 
-TEST(AgradRevMatrix, dot_product_vector_vector) {
+TEST(DiffRevMatrix, dot_product_vector_vector) {
   using stan::math::vector_d;
   using stan::diff::vector_v;
 
@@ -19,7 +19,7 @@ TEST(AgradRevMatrix, dot_product_vector_vector) {
   EXPECT_FLOAT_EQ(3, stan::diff::dot_product(vd_1, vv_2).val());
   EXPECT_FLOAT_EQ(3, stan::diff::dot_product(vv_1, vv_2).val());
 }
-TEST(AgradRevMatrix, dot_product_vector_vector_exception) {
+TEST(DiffRevMatrix, dot_product_vector_vector_exception) {
   using stan::math::vector_d;
   using stan::diff::vector_v;
 
@@ -32,7 +32,7 @@ TEST(AgradRevMatrix, dot_product_vector_vector_exception) {
   EXPECT_THROW(stan::diff::dot_product(d1, v2), std::domain_error);
   EXPECT_THROW(stan::diff::dot_product(v1, v2), std::domain_error);
 }
-TEST(AgradRevMatrix, dot_product_rowvector_vector) {
+TEST(DiffRevMatrix, dot_product_rowvector_vector) {
   using stan::math::vector_d;
   using stan::diff::vector_v;
   using stan::math::row_vector_d;
@@ -52,7 +52,7 @@ TEST(AgradRevMatrix, dot_product_rowvector_vector) {
   EXPECT_FLOAT_EQ(3, stan::diff::dot_product(d1, v2).val());
   EXPECT_FLOAT_EQ(3, stan::diff::dot_product(v1, v2).val());
 }
-TEST(AgradRevMatrix, dot_product_rowvector_vector_exception) {
+TEST(DiffRevMatrix, dot_product_rowvector_vector_exception) {
   using stan::math::vector_d;
   using stan::diff::vector_v;
   using stan::math::row_vector_d;
@@ -67,7 +67,7 @@ TEST(AgradRevMatrix, dot_product_rowvector_vector_exception) {
   EXPECT_THROW(stan::diff::dot_product(d1, v2), std::domain_error);
   EXPECT_THROW(stan::diff::dot_product(v1, v2), std::domain_error);
 }
-TEST(AgradRevMatrix, dot_product_vector_rowvector) {
+TEST(DiffRevMatrix, dot_product_vector_rowvector) {
   using stan::math::vector_d;
   using stan::diff::vector_v;
   using stan::math::row_vector_d;
@@ -87,7 +87,7 @@ TEST(AgradRevMatrix, dot_product_vector_rowvector) {
   EXPECT_FLOAT_EQ(3, stan::diff::dot_product(d1, v2).val());
   EXPECT_FLOAT_EQ(3, stan::diff::dot_product(v1, v2).val());
 }
-TEST(AgradRevMatrix, dot_product_vector_rowvector_exception) {
+TEST(DiffRevMatrix, dot_product_vector_rowvector_exception) {
   using stan::math::vector_d;
   using stan::diff::vector_v;
   using stan::math::row_vector_d;
@@ -102,7 +102,7 @@ TEST(AgradRevMatrix, dot_product_vector_rowvector_exception) {
   EXPECT_THROW(stan::diff::dot_product(d1, v2), std::domain_error);
   EXPECT_THROW(stan::diff::dot_product(v1, v2), std::domain_error);
 }
-TEST(AgradRevMatrix, dot_product_rowvector_rowvector) {
+TEST(DiffRevMatrix, dot_product_rowvector_rowvector) {
   using stan::math::row_vector_d;
   using stan::diff::row_vector_v;
 
@@ -118,7 +118,7 @@ TEST(AgradRevMatrix, dot_product_rowvector_rowvector) {
   EXPECT_FLOAT_EQ(3, stan::diff::dot_product(d1, v2).val());
   EXPECT_FLOAT_EQ(3, stan::diff::dot_product(v1, v2).val());
 }
-TEST(AgradRevMatrix, dot_product_rowvector_rowvector_exception) {
+TEST(DiffRevMatrix, dot_product_rowvector_rowvector_exception) {
   using stan::math::row_vector_d;
   using stan::diff::row_vector_v;
 
@@ -130,7 +130,7 @@ TEST(AgradRevMatrix, dot_product_rowvector_rowvector_exception) {
   EXPECT_THROW(stan::diff::dot_product(v1, v2), std::domain_error);
 }
 
-TEST(AgradRevMatrix, dot_product_vv) {
+TEST(DiffRevMatrix, dot_product_vv) {
   AVEC a, b;
   AVAR c;
   for (int i = -1; i < 2; i++) { // a = (-1, 0, 1), b = (1, 2, 3)
@@ -153,7 +153,7 @@ TEST(AgradRevMatrix, dot_product_vv) {
   EXPECT_EQ(grad[4], 3);
   EXPECT_EQ(grad[5], 1);
 }
-TEST(AgradRevMatrix, dot_product_dv) {
+TEST(DiffRevMatrix, dot_product_dv) {
   VEC a;
   AVEC b;
   AVAR c;
@@ -169,7 +169,7 @@ TEST(AgradRevMatrix, dot_product_dv) {
   EXPECT_EQ(grad[1], 0);
   EXPECT_EQ(grad[2], 1);
 }
-TEST(AgradRevMatrix, dot_product_vd) {
+TEST(DiffRevMatrix, dot_product_vd) {
   AVEC a;
   VEC b;
   AVAR c;
@@ -185,7 +185,7 @@ TEST(AgradRevMatrix, dot_product_vd) {
   EXPECT_EQ(grad[1], 2);
   EXPECT_EQ(grad[2], 3);
 }
-TEST(AgradRevMatrix, dot_product_vv_vec) {
+TEST(DiffRevMatrix, dot_product_vv_vec) {
   AVEC a, b;
   AVAR c;
   for (int i = -1; i < 2; i++) { // a = (-1, 0, 1), b = (1, 2, 3)
@@ -208,7 +208,7 @@ TEST(AgradRevMatrix, dot_product_vv_vec) {
   EXPECT_EQ(grad[4], 3);
   EXPECT_EQ(grad[5], 1);
 }
-TEST(AgradRevMatrix, dot_product_dv_vec) {
+TEST(DiffRevMatrix, dot_product_dv_vec) {
   VEC a;
   AVEC b;
   AVAR c;
@@ -224,7 +224,7 @@ TEST(AgradRevMatrix, dot_product_dv_vec) {
   EXPECT_EQ(grad[1], 0);
   EXPECT_EQ(grad[2], 1);
 }
-TEST(AgradRevMatrix, dot_product_vd_vec) {
+TEST(DiffRevMatrix, dot_product_vd_vec) {
   AVEC a;
   VEC b;
   AVAR c;

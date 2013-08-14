@@ -2,7 +2,7 @@
 #include <stan/diff/fwd.hpp>
 #include <stan/math/constants.hpp>
 
-TEST(AgradFvar, acos) {
+TEST(DiffFvar, acos) {
   using stan::diff::fvar;
   using std::acos;
   using std::sqrt;

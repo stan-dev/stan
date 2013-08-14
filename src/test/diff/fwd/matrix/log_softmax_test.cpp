@@ -37,7 +37,7 @@ void test_log_softmax(Eigen::Matrix<stan::diff::fvar<double>,Eigen::Dynamic,1>& 
   }
 }
 
-TEST(AgradFwdMatrix,logSoftmax) {
+TEST(DiffFwdMatrix,logSoftmax) {
   using stan::math::log_softmax;
   using Eigen::Matrix;
   using Eigen::Dynamic;

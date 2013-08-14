@@ -4,7 +4,7 @@
 #include <stan/diff/fwd/matrix/typedefs.hpp>
 #include <stan/diff/fwd.hpp>
 
-TEST(AgradFwdMatrix, mean_vector) {
+TEST(DiffFwdMatrix, mean_vector) {
   using stan::math::mean;
   using stan::math::vector_d;
   using stan::diff::vector_fv;
@@ -28,7 +28,7 @@ TEST(AgradFwdMatrix, mean_vector) {
   EXPECT_FLOAT_EQ(97.0/3.0, output.val_);
   EXPECT_FLOAT_EQ(1.0, output.d_);
 }
-TEST(AgradFwdMatrix, mean_vector_exception) {
+TEST(DiffFwdMatrix, mean_vector_exception) {
   using stan::math::mean;
   using stan::math::vector_d;
   using stan::diff::vector_fv;
@@ -38,7 +38,7 @@ TEST(AgradFwdMatrix, mean_vector_exception) {
   EXPECT_THROW(mean(d), std::domain_error);
   EXPECT_THROW(mean(v), std::domain_error);
 }
-TEST(AgradFwdMatrix, mean_rowvector) {
+TEST(DiffFwdMatrix, mean_rowvector) {
   using stan::math::mean;
   using stan::math::row_vector_d;
   using stan::diff::row_vector_fv;
@@ -62,7 +62,7 @@ TEST(AgradFwdMatrix, mean_rowvector) {
   EXPECT_FLOAT_EQ(97.0/3.0, output.val_);
   EXPECT_FLOAT_EQ(1.0, output.d_);
 }
-TEST(AgradFwdMatrix, mean_rowvector_exception) {
+TEST(DiffFwdMatrix, mean_rowvector_exception) {
   using stan::math::mean;
   using stan::math::row_vector_d;
   using stan::diff::row_vector_fv;
@@ -72,7 +72,7 @@ TEST(AgradFwdMatrix, mean_rowvector_exception) {
   EXPECT_THROW(mean(d), std::domain_error);
   EXPECT_THROW(mean(v), std::domain_error);
 }
-TEST(AgradFwdMatrix, mean_matrix) {
+TEST(DiffFwdMatrix, mean_matrix) {
   using stan::math::mean;
   using stan::math::matrix_d;
   using stan::diff::matrix_fv;
@@ -96,7 +96,7 @@ TEST(AgradFwdMatrix, mean_matrix) {
   EXPECT_FLOAT_EQ(97.0/3.0, output.val_);
   EXPECT_FLOAT_EQ(1.0, output.d_);
 }
-TEST(AgradFwdMatrix, mean_matrix_exception) {
+TEST(DiffFwdMatrix, mean_matrix_exception) {
   using stan::math::mean;
   using stan::math::matrix_d;
   using stan::diff::matrix_fv;
@@ -106,7 +106,7 @@ TEST(AgradFwdMatrix, mean_matrix_exception) {
   EXPECT_THROW(mean(d), std::domain_error);
   EXPECT_THROW(mean(v), std::domain_error);
 }
-TEST(AgradFwdMatrix, meanStdVector) {
+TEST(DiffFwdMatrix, meanStdVector) {
   using stan::math::mean;
   using stan::diff::fvar;
 

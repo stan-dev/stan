@@ -2,7 +2,7 @@
 #include <stan/diff/fwd.hpp>
 #include <boost/math/special_functions/cbrt.hpp>
 
-TEST(AgradFvar, cbrt) {
+TEST(DiffFvar, cbrt) {
   using stan::diff::fvar;
   using boost::math::cbrt;
   using std::isnan;

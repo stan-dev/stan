@@ -5,7 +5,7 @@
 #include <stan/diff/rev/matrix/typedefs.hpp>
 #include <stan/diff.hpp>
 
-TEST(AgradRevMatrix, min_vector) {
+TEST(DiffRevMatrix, min_vector) {
   using stan::math::min;
   using stan::math::vector_d;
   using stan::diff::vector_v;
@@ -23,7 +23,7 @@ TEST(AgradRevMatrix, min_vector) {
   output = min(v1);
   EXPECT_FLOAT_EQ(-3, output.val());
 }
-TEST(AgradRevMatrix, min_vector_exception) {
+TEST(DiffRevMatrix, min_vector_exception) {
   using stan::math::min;
   using stan::math::vector_d;
   using stan::diff::vector_v;
@@ -34,7 +34,7 @@ TEST(AgradRevMatrix, min_vector_exception) {
   v.resize(0);
   EXPECT_EQ(std::numeric_limits<double>::infinity(), min(v).val());
 }
-TEST(AgradRevMatrix, min_rowvector) {
+TEST(DiffRevMatrix, min_rowvector) {
   using stan::math::min;
   using stan::math::row_vector_d;
   using stan::diff::row_vector_v;
@@ -52,14 +52,14 @@ TEST(AgradRevMatrix, min_rowvector) {
   output = min(v1);
   EXPECT_FLOAT_EQ(-3, output.val());
 }
-TEST(AgradRevMatrix, min_rowvector_exception) {
+TEST(DiffRevMatrix, min_rowvector_exception) {
   using stan::math::min;
   using stan::diff::row_vector_v;
 
   row_vector_v v;
   EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(), min(v).val());
 }
-TEST(AgradRevMatrix, min_matrix) {
+TEST(DiffRevMatrix, min_matrix) {
   using stan::math::min;
   using stan::math::matrix_d;
   using stan::diff::matrix_v;
@@ -77,7 +77,7 @@ TEST(AgradRevMatrix, min_matrix) {
   output = min(v1);
   EXPECT_FLOAT_EQ(-3, output.val());
 }
-TEST(AgradRevMatrix, min_matrix_exception) {
+TEST(DiffRevMatrix, min_matrix_exception) {
   using stan::math::min;
   using stan::diff::matrix_v;
 

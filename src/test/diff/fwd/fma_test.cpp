@@ -2,7 +2,7 @@
 #include <stan/diff/fwd.hpp>
 #include <stan/math/functions/fma.hpp>
 
-TEST(AgradFvar, fma) { 
+TEST(DiffFvar, fma) { 
   using stan::diff::fvar;
   using stan::math::fma;
   fvar<double> x(0.5);

@@ -21,7 +21,7 @@ using Eigen::Matrix;
 using stan::diff::var;
 using stan::diff::to_var;
 
-class AgradDistributionsDirichlet : public ::testing::Test {
+class DiffDistributionsDirichlet : public ::testing::Test {
 protected:
   virtual void SetUp() {
     theta.resize(3,1);
@@ -39,17 +39,17 @@ protected:
   Matrix<double,Dynamic,1> alpha2;
 };
 
-TEST_F(AgradDistributionsDirichlet,Propto) {
+TEST_F(DiffDistributionsDirichlet,Propto) {
   expect_propto(to_var(theta),to_var(alpha),
                 to_var(theta2),to_var(alpha2),
                 "var: theta and alpha");
 }
-TEST_F(AgradDistributionsDirichlet,ProptoTheta) {
+TEST_F(DiffDistributionsDirichlet,ProptoTheta) {
   expect_propto(to_var(theta), alpha,
                 to_var(theta2), alpha,
                 "var: theta");
 }
-TEST_F(AgradDistributionsDirichlet,ProptoAlpha) {
+TEST_F(DiffDistributionsDirichlet,ProptoAlpha) {
   expect_propto(theta, to_var(alpha), 
                 theta, to_var(alpha2), 
                 "var: alpha");

@@ -3,7 +3,7 @@
 #include <stan/diff/fwd/fvar.hpp>
 #include <stan/math/matrix.hpp>
 
-TEST(AgradFwdMatrix,rows_dot_self) {
+TEST(DiffFwdMatrix,rows_dot_self) {
   using stan::math::columns_dot_self;
   using stan::diff::fvar;
 

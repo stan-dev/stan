@@ -5,7 +5,7 @@
 #include <stan/math/matrix/mdivide_left_spd.hpp>
 #include <stan/math/matrix/multiply.hpp>
 
-TEST(AgradRevMatrix,mdivide_left_spd_val) {
+TEST(DiffRevMatrix,mdivide_left_spd_val) {
   using stan::math::matrix_d;
   using stan::diff::matrix_v;
   using stan::math::mdivide_left_spd;
@@ -38,7 +38,7 @@ TEST(AgradRevMatrix,mdivide_left_spd_val) {
   EXPECT_NEAR(1.0,I(1,1).val(),1.0e-12);
 }
 
-TEST(AgradRevMatrix,mdivide_left_spd_grad_vv) {
+TEST(DiffRevMatrix,mdivide_left_spd_grad_vv) {
   using stan::math::matrix_d;
   using stan::diff::matrix_v;
   using stan::math::mdivide_left_spd;
@@ -90,7 +90,7 @@ TEST(AgradRevMatrix,mdivide_left_spd_grad_vv) {
   }
 }
 
-TEST(AgradRevMatrix,mdivide_left_spd_grad_dv) {
+TEST(DiffRevMatrix,mdivide_left_spd_grad_dv) {
   using stan::math::matrix_d;
   using stan::diff::matrix_v;
   using stan::math::mdivide_left_spd;
@@ -133,7 +133,7 @@ TEST(AgradRevMatrix,mdivide_left_spd_grad_dv) {
   }
 }
 
-TEST(AgradRevMatrix,mdivide_left_spd_grad_vd) {
+TEST(DiffRevMatrix,mdivide_left_spd_grad_vd) {
   using stan::math::matrix_d;
   using stan::diff::matrix_v;
   using stan::math::mdivide_left_spd;

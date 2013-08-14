@@ -2,7 +2,7 @@
 #include <test/diff/util.hpp>
 #include <gtest/gtest.h>
 
-TEST(AgradRev,minus_minus_a) {
+TEST(DiffRev,minus_minus_a) {
   AVAR a(5.0);
   AVAR f = --a;
   EXPECT_FLOAT_EQ(4.0,f.val());
@@ -13,7 +13,7 @@ TEST(AgradRev,minus_minus_a) {
   EXPECT_FLOAT_EQ(1.0,g[0]);
 }
 
-TEST(AgradRev,minus_minus_a_2) {
+TEST(DiffRev,minus_minus_a_2) {
   AVAR a(5.0);
   AVEC x = createAVEC(a);
   AVAR f = --a;
@@ -24,7 +24,7 @@ TEST(AgradRev,minus_minus_a_2) {
   EXPECT_FLOAT_EQ(1.0,g[0]);
 }
 
-TEST(AgradRev,a_minus_minus) {
+TEST(DiffRev,a_minus_minus) {
   AVAR a(5.0);
   AVEC x = createAVEC(a); // compare to placement in test 2
   AVAR f = a--;
@@ -35,7 +35,7 @@ TEST(AgradRev,a_minus_minus) {
   EXPECT_FLOAT_EQ(1.0,g[0]);
 }
 
-TEST(AgradRev,a_minus_minus_2) {
+TEST(DiffRev,a_minus_minus_2) {
   AVAR a(5.0);
   AVAR f = a--;
   AVEC x = createAVEC(a); // compare to placement in test 1

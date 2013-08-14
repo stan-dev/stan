@@ -3,7 +3,7 @@
 #include <stan/diff.hpp>
 #include <stan/diff/rev/matrix.hpp>
 
-TEST(AgradRevMatrix,prod) {
+TEST(DiffRevMatrix,prod) {
   using stan::math::prod;
   using stan::math::vector_d;
   using stan::diff::vector_v;

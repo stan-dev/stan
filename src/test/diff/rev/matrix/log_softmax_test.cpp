@@ -5,7 +5,7 @@
 #include <stan/math/matrix/log_softmax.hpp>
 #include <stan/diff/rev/matrix/log_softmax.hpp>
 
-TEST(AgradRevMatrix,log_softmax) {
+TEST(DiffRevMatrix,log_softmax) {
   using stan::math::log_softmax;
   using Eigen::Matrix;
   using Eigen::Dynamic;
@@ -61,7 +61,7 @@ log_softmax_grad(Eigen::Matrix<double,Eigen::Dynamic,1>& alpha_dbl,
   fx_k.grad(x,grad);
   return grad;
 }
-TEST(AgradRevLogSoftmax, Grad) {
+TEST(DiffRevLogSoftmax, Grad) {
   using stan::math::log_softmax;
   using stan::diff::var;
   using Eigen::Matrix;
