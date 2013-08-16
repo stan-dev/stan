@@ -17,9 +17,10 @@ SUFFIXES:
 # - AR: archiver (must specify for cross-compiling)
 # - OS: {mac, win, linux}. 
 ##
-CC = g++
+CC = clang++ -std=c++11 -stdlib=libc++
+#CC = clang++ 
 O = 3
-O_STANC = 0
+O_STANC = 3
 AR = ar
 
 ##
@@ -33,7 +34,7 @@ GTEST ?= lib/gtest_1.6.0
 ##
 # Set default compiler options.
 ## 
-CFLAGS = -I src -I $(EIGEN) -I $(BOOST) -Wall -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS
+CFLAGS = -I src -I $(EIGEN) -I $(BOOST) -Wall -ftemplate-depth=256 -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS
 CFLAGS_GTEST = -DGTEST_USE_OWN_TR1_TUPLE
 LDLIBS = -Lbin -lstan
 LDLIBS_STANC = -Lbin -lstanc

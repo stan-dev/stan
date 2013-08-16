@@ -7,7 +7,7 @@
 #include <boost/config/warning_disable.hpp>
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/qi_numeric.hpp>
-#include <boost/spirit/include/classic_position_iterator.hpp>
+//#include <boost/spirit/include/classic_position_iterator.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>
 #include <boost/spirit/include/phoenix_function.hpp>
 #include <boost/spirit/include/phoenix_fusion.hpp>
@@ -64,38 +64,39 @@ namespace stan {
                       const std::string& filename, 
                       const std::string& model_name,
                       program& result) {
-      namespace classic = boost::spirit::classic;
+      //namespace classic = boost::spirit::classic;
 
-      using boost::spirit::classic::position_iterator2;
+      //using boost::spirit::classic::position_iterator2;
       using boost::spirit::multi_pass;
       using boost::spirit::make_default_multi_pass;
       using std::istreambuf_iterator;
 
       using boost::spirit::qi::expectation_failure;
-      using boost::spirit::classic::file_position_base;
+      //using boost::spirit::classic::file_position_base;
       using boost::spirit::qi::phrase_parse;
 
 
       // iterate over stream input
       typedef istreambuf_iterator<char> base_iterator_type;
       typedef multi_pass<base_iterator_type>  forward_iterator_type;
-      typedef position_iterator2<forward_iterator_type> pos_iterator_type;
+      //typedef position_iterator2<forward_iterator_type> pos_iterator_type;
+      typedef forward_iterator_type pos_iterator_type;
 
       base_iterator_type in_begin(input);
       
       forward_iterator_type fwd_begin = make_default_multi_pass(in_begin);
       forward_iterator_type fwd_end;
       
-      pos_iterator_type position_begin(fwd_begin, fwd_end, filename);
-      pos_iterator_type position_end;
+      //pos_iterator_type position_begin(fwd_begin, fwd_end, filename);
+      //pos_iterator_type position_end;
       
       program_grammar<pos_iterator_type> prog_grammar(model_name);
       whitespace_grammar<pos_iterator_type> whitesp_grammar;
       
       bool parse_succeeded = false;
       try {
-        parse_succeeded = phrase_parse(position_begin, 
-                                       position_end,
+        parse_succeeded = phrase_parse(fwd_begin, 
+                                       fwd_end,
                                        prog_grammar,
                                        whitesp_grammar,
                                        result);
@@ -107,8 +108,9 @@ namespace stan {
                          << std::endl;
         }
       } catch (const expectation_failure<pos_iterator_type>& e) {
-        const file_position_base<std::string>& pos = e.first.get_position();
         std::stringstream msg;
+        /*
+        const file_position_base<std::string>& pos = e.first.get_position();
         msg << "EXPECTATION FAILURE LOCATION: file=" << pos.file
             << "; line=" << pos.line 
             << ", column=" << pos.column 
@@ -126,6 +128,7 @@ namespace stan {
               << diagnostics
               << std::endl;
         }
+        */
         throw std::invalid_argument(msg.str());
 
       } catch (const std::runtime_error& e) {
@@ -137,7 +140,7 @@ namespace stan {
         throw std::invalid_argument(msg.str());
       }
       
-      bool consumed_all_input = (position_begin == position_end); 
+      bool consumed_all_input = (fwd_begin == fwd_end); 
       bool success = parse_succeeded && consumed_all_input;
 
       if (!success) {      
@@ -147,6 +150,7 @@ namespace stan {
         if (!consumed_all_input)
           msg << "ERROR: non-whitespace beyond end of program:" << std::endl;
         
+        /*
         const file_position_base<std::string>& pos 
           = position_begin.get_position();
         msg << "LOCATION: file=" << pos.file
@@ -162,6 +166,7 @@ namespace stan {
 
         msg << "DIAGNOSTICS FROM PARSER:" << std::endl;
         msg << prog_grammar.error_msgs_.str() << std::endl << std::endl;
+        */
 
         throw std::invalid_argument(msg.str());
       }
