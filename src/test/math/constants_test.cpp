@@ -64,3 +64,12 @@ TEST(MathsConstants, negative_epsilon_fun) {
   EXPECT_FLOAT_EQ(-std::numeric_limits<double>::epsilon(),
                   stan::math::negative_epsilon());
 }
+TEST(MathsConstants, two_over_sqrt_pi) {
+  EXPECT_FLOAT_EQ(1.128379167,stan::math:: TWO_OVER_SQRT_PI);
+ }
+TEST(MathsConstants, neg_two_over_sqrt_pi){
+  EXPECT_FLOAT_EQ(-stan::math:: TWO_OVER_SQRT_PI, stan::math:: NEG_TWO_OVER_SQRT_PI);
+}
+TEST(MathsConstants, inv_sqrt_two_pi){
+  EXPECT_FLOAT_EQ(.39894228040,stan::math:: INV_SQRT_TWO_PI);
+}
