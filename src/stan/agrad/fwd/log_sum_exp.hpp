@@ -43,6 +43,25 @@ namespace stan{
                   stan::return_type<T1,T2>::type>(log_sum_exp(x1.val_, x2),
                           x1.d_ * exp(x1.val_) / (exp(x1.val_) + exp(x2)));
     }
+
+    template <typename T>
+    fvar<T>
+    log_sum_exp(const std::vector<fvar<T> >& v) {
+      using stan::math::log_sum_exp;
+      using std::exp;
+      std::vector<T> vals(v.size());
+      for (size_t i = 0; i < v.size(); ++i)
+        vals[i] = v[i].val_;
+      T deriv(0.0);
+      T denominator(0.0);
+      for (size_t i = 0; i < v.size(); ++i) {
+        T exp_vi = exp(vals[i]);
+        denominator += exp_vi;
+        deriv += v[i].d_ * exp_vi;
+      }
+      return fvar<T>(log_sum_exp(vals), deriv / denominator);
+    }
+    
   }
 }
 #endif

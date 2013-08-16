@@ -20,7 +20,6 @@ namespace stan {
 
   namespace prob {
 
-
     template <typename T>
     inline T log_inv_logit_diff(const T& alpha, const T& beta) {
       using std::exp;
