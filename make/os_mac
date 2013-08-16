@@ -21,5 +21,6 @@ ifeq (clang++,$(CC_TYPE))
   CFLAGS += -Wno-unused-function
   CFLAGS += -Wno-tautological-compare
   CFLAGS += -Wno-c++11-long-long
+  CFLAGS += -stdlib=libc++ -std=c++11
   #PCH = .pch
 endif
