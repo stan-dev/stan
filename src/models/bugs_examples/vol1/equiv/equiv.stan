@@ -33,10 +33,11 @@ transformed parameters {
 } 
 
 model {
-  for (p in 1:P) {
-    for (n in 1:N) {
-      Y[n, p] ~ normal(mu + sign[T[n, p]] * phi / 2 + sign[p] * pi / 2 + delta[n], sigma1); 
-    }
+  for (n in 1:N) {
+    vector[P] m;
+    for (p in 1:P)
+      m[p] <- mu + sign[T[n, p]] * phi / 2 + sign[p] * pi / 2 + delta[n];
+    Y[n] ~ normal(m, sigma1);
   }
   delta ~ normal(0, sigma2); 
   sigmasq1 ~ inv_gamma(.001, .001); 

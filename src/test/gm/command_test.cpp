@@ -11,7 +11,7 @@ TEST(StanGmCommand, zero_init_value_fail) {
   model_path.push_back("compiled");
   model_path.push_back("value_fail");
 
-  std::string command = convert_model_path(model_path) + " init=0";
+  std::string command = convert_model_path(model_path) + " sample init=0";
   std::string command_output;
   long time;
   
@@ -34,7 +34,7 @@ TEST(StanGmCommand, zero_init_domain_fail) {
   model_path.push_back("compiled");
   model_path.push_back("domain_fail");
   
-  std::string command = convert_model_path(model_path) + " init=0";
+  std::string command = convert_model_path(model_path) + " sample init=0";
   
   std::string command_output;
   long time;
@@ -45,9 +45,8 @@ TEST(StanGmCommand, zero_init_domain_fail) {
     ADD_FAILURE() << "Failed running command: " << command;
   }
   
-  EXPECT_EQ("Rejecting inititialization at zero because of grad_log_prob failure.\n",
-            command_output)
-    << "Failed running: " << command;
+  EXPECT_EQ("Rejecting inititialization at zero because of log_prob_grad failure.\n",
+            command_output);
 }
 
 TEST(StanGmCommand, user_init_value_fail) {
@@ -68,7 +67,7 @@ TEST(StanGmCommand, user_init_value_fail) {
   init_path.push_back("value_fail.init.R");
   
   std::string command = convert_model_path(model_path)
-                        + " init=" + convert_model_path(init_path);
+                        + " sample init=" + convert_model_path(init_path);
   
   std::string command_output;
   long time;
@@ -101,7 +100,7 @@ TEST(StanGmCommand, user_init_domain_fail) {
   init_path.push_back("domain_fail.init.R");
   
   std::string command = convert_model_path(model_path)
-                        + " init=" + convert_model_path(init_path);
+                        + " sample init=" + convert_model_path(init_path);
   
   std::string command_output;
   long time;
@@ -112,7 +111,7 @@ TEST(StanGmCommand, user_init_domain_fail) {
     ADD_FAILURE() << "Failed running command: " << command;
   }
   
-  EXPECT_EQ("Rejecting user-specified inititialization because of grad_log_prob failure.\n",
-            command_output)
-    << "Failed running: " << command;
+  EXPECT_EQ("Rejecting user-specified inititialization because of log_prob_grad failure.\n",
+            command_output);
+
 }

@@ -59,6 +59,9 @@ namespace stan {
               (*it)->print_help(s, depth + 1, true);
           }
         }
+        else {
+          *s << std::endl;
+        }
          
       }
       
@@ -116,9 +119,21 @@ namespace stan {
       virtual void probe_args(argument* base_arg, std::stringstream& s) {
         for (std::vector<argument*>::iterator it = _subarguments.begin();
              it != _subarguments.end(); ++it) {
-          //(*it)->probe_args(base_arg, prefix + "_" + name());
           (*it)->probe_args(base_arg, s);
         }
+      }
+      
+      void find_arg(std::string name,
+                    std::string prefix,
+                    std::vector<std::string>& valid_paths) {
+        
+        argument::find_arg(name, prefix, valid_paths);
+        
+        prefix += _name + " ";
+        for (std::vector<argument*>::iterator it = _subarguments.begin();
+             it != _subarguments.end(); ++it)
+          (*it)->find_arg(name, prefix, valid_paths);
+        
       }
       
       std::vector<argument*>& subarguments() {

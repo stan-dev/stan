@@ -8,7 +8,7 @@ using std::vector;
 using std::string;
 using std::stringstream;
 using stan::agrad::var;
-using stan::model::prob_grad_ad;
+using stan::model::prob_grad;
 using stan::math::get_base1;
 using stan::math::stan_print;
 using stan::io::dump;
@@ -21,12 +21,13 @@ typedef Eigen::Matrix<double,Eigen::Dynamic,1> vector_d;
 typedef Eigen::Matrix<double,1,Eigen::Dynamic> row_vector_d;
 typedef Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> matrix_d;
 
-class example_model : public prob_grad_ad {
+class example_model : public prob_grad {
 private:
+    vector_d y;
 public:
     example_model(stan::io::var_context& context__,
         std::ostream* pstream__ = 0)
-        : prob_grad_ad::prob_grad_ad(0) {
+        : prob_grad::prob_grad(0) {
         static const char* function__ = "example_model_namespace::example_model(%1%)";
         (void) function__; // dummy call to supress warning
         size_t pos__;
@@ -34,6 +35,8 @@ public:
         std::vector<int> vals_i__;
         std::vector<double> vals_r__;
         // validate data
+        stan::math::validate_non_negative_index("y", "2", 2);
+        y = vector_d(2);
 
         // validate transformed data
 
@@ -49,7 +52,7 @@ public:
 
     void transform_inits(const stan::io::var_context& context__,
                          std::vector<int>& params_i__,
-                         std::vector<double>& params_r__) {
+                         std::vector<double>& params_r__) const {
         stan::io::writer<double> writer__(params_r__,params_i__);
         size_t pos__;
         std::vector<double> vals_r__;
@@ -77,16 +80,24 @@ public:
         params_i__ = writer__.data_i();
     }
 
-    var log_prob(vector<var>& params_r__,
-                 vector<int>& params_i__,
-                 std::ostream* pstream__ = 0) {
-      return log_prob_poly<true,var>(params_r__,params_i__,pstream__);
+    double log_prob(std::vector<double>& params_r__,
+                    std::vector<int>& params_i__,
+                    std::ostream* output_stream__ = 0) const {
+      std::vector<stan::agrad::var> ad_params_r__;
+      for (size_t i = 0; i < num_params_r(); ++i) {
+        stan::agrad::var var_i__(params_r__[i]);
+        ad_params_r__.push_back(var_i__);
+      }
+      stan::agrad::var adLogProb__ = log_prob<true,true>(ad_params_r__,params_i__,output_stream__);
+      double val__ = adLogProb__.val();
+      stan::agrad::recover_memory();
+      return val__;
     }
 
-    template <bool propto__, typename T__>
-    T__ log_prob_poly(vector<T__>& params_r__,
-                      vector<int>& params_i__,
-                      std::ostream* pstream__ = 0) {
+    template <bool propto__, bool jacobian__, typename T__>
+    T__ log_prob(vector<T__>& params_r__,
+                 vector<int>& params_i__,
+                 std::ostream* pstream__ = 0) const {
 
         T__ DUMMY_VAR__(std::numeric_limits<double>::quiet_NaN());
         (void) DUMMY_VAR__;  // suppress unused var warning
@@ -96,10 +107,18 @@ public:
         // model parameters
         stan::io::reader<T__> in__(params_r__,params_i__);
 
-        T__ mu1 = in__.scalar_constrain(lp__);
-        (void) mu1;  // supress unused variable warning
-        T__ mu2 = in__.scalar_constrain(lp__);
-        (void) mu2;  // supress unused variable warning
+        T__ mu1;
+        if (jacobian__)
+            mu1 = in__.scalar_constrain(lp__);
+        else
+            mu1 = in__.scalar_constrain();
+
+        T__ mu2;
+        if (jacobian__)
+            mu2 = in__.scalar_constrain(lp__);
+        else
+            mu2 = in__.scalar_constrain();
+
 
         // transformed parameters
 
@@ -111,22 +130,20 @@ public:
         const char* function__ = "validate transformed params %1%";
         (void) function__; // dummy to suppress unused var warning
         // model body
-        lp__ += stan::prob::normal_log<true>(mu1, 0, 10);
-        lp__ += stan::prob::normal_log<true>(mu2, 0, 1);
 
         return lp__;
 
-    } // log_prob_poly(...var...)
+    } // log_prob(...)
 
 
-    void get_param_names(std::vector<std::string>& names__) {
+    void get_param_names(std::vector<std::string>& names__) const {
         names__.resize(0);
         names__.push_back("mu1");
         names__.push_back("mu2");
     }
 
 
-    void get_dims(std::vector<std::vector<size_t> >& dimss__) {
+    void get_dims(std::vector<std::vector<size_t> >& dimss__) const {
         dimss__.resize(0);
         std::vector<size_t> dims__;
         dims__.resize(0);
@@ -142,7 +159,7 @@ public:
                      std::vector<double>& vars__,
                      bool include_tparams__ = true,
                      bool include_gqs__ = true,
-                     std::ostream* pstream__ = 0) {
+                     std::ostream* pstream__ = 0) const {
         vars__.resize(0);
         stan::io::reader<double> in__(params_r__,params_i__);
         static const char* function__ = "example_model_namespace::write_array(%1%)";
@@ -175,7 +192,7 @@ public:
     void write_array_params(std::vector<double>& params_r__,
                             std::vector<int>& params_i__,
                             std::vector<double>& vars__,
-                            std::ostream* pstream__ = 0) {
+                            std::ostream* pstream__ = 0) const {
         boost::random::minstd_rand base_rng; // dummy
         write_array(base_rng,params_r__,params_i__,vars__,false,false,pstream__);
     }
@@ -183,13 +200,13 @@ public:
     void write_array_params_all(std::vector<double>& params_r__,
                             std::vector<int>& params_i__,
                             std::vector<double>& vars__,
-                            std::ostream* pstream__ = 0) {
+                            std::ostream* pstream__ = 0) const {
         boost::random::minstd_rand base_rng; // dummy
         write_array(base_rng,params_r__,params_i__,vars__,true,true,pstream__);
     }
 
 
-    void write_csv_header(std::ostream& o__) {
+    void write_csv_header(std::ostream& o__) const {
         stan::io::csv_writer writer__(o__);
         writer__.comma();
         o__ << "mu1";
@@ -203,7 +220,7 @@ public:
                    std::vector<double>& params_r__,
                    std::vector<int>& params_i__,
                    std::ostream& o__,
-                   std::ostream* pstream__ = 0) {
+                   std::ostream* pstream__ = 0) const {
         stan::io::reader<double> in__(params_r__,params_i__);
         stan::io::csv_writer writer__(o__);
         static const char* function__ = "example_model_namespace::write_csv(%1%)";
@@ -231,14 +248,14 @@ public:
         writer__.newline();
     }
 
-    std::string model_name() {
-        return "example_model";
-    }
+  static std::string model_name() {
+    return "example_model";
+  }
 
 
     void constrained_param_names(std::vector<std::string>& param_names__,
                                  bool include_tparams__ = true,
-                                 bool include_gqs__ = true) {
+                                 bool include_gqs__ = true) const {
         std::stringstream param_name_stream__;
         param_name_stream__.str(std::string());
         param_name_stream__ << "mu1";
@@ -255,7 +272,7 @@ public:
 
     void unconstrained_param_names(std::vector<std::string>& param_names__,
                                    bool include_tparams__ = true,
-                                   bool include_gqs__ = true) {
+                                   bool include_gqs__ = true) const {
         std::stringstream param_name_stream__;
         param_name_stream__.str(std::string());
         param_name_stream__ << "mu1";

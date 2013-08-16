@@ -1,7 +1,7 @@
 #ifndef __STAN__IO__MCMC__WRITER__HPP
 #define __STAN__IO__MCMC__WRITER__HPP
 
-#include <ostream>
+#include <iostream>
 #include <iomanip>
 
 #include <vector>
@@ -43,9 +43,11 @@ namespace stan {
         (*_sample_stream) << std::endl;
         
       }
-      
-      void print_sample_params(stan::mcmc::sample& sample,
-                               stan::mcmc::base_mcmc* sampler,
+
+      template <class RNG>
+      void print_sample_params(RNG& rng, 
+                               stan::mcmc::sample& sample,
+                               stan::mcmc::base_mcmc& sampler,
                                M& model) {
         
         if(!_sample_stream) return;
@@ -53,13 +55,15 @@ namespace stan {
         std::vector<double> values;
         
         sample.get_sample_params(values);
-        sampler->get_sampler_params(values);
+        sampler.get_sampler_params(values);
         
         std::vector<double> model_values;
         
-        model.write_array_params_all(const_cast<std::vector<double>&>(sample.cont_params()),
-                                     const_cast<std::vector<int>&>(sample.disc_params()),
-                                     model_values);
+        model.write_array(rng,
+                          const_cast<std::vector<double>&>(sample.cont_params()),
+                          const_cast<std::vector<int>&>(sample.disc_params()),
+                          model_values,
+                          true, true); // FIXME: add ostream for msgs!
         
         values.insert(values.end(), model_values.begin(), model_values.end());
         

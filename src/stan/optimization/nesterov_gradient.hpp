@@ -1,17 +1,20 @@
 #ifndef __STAN__OPTIMIZATION__NESTEROV__GRADIENT_HPP__
 #define __STAN__OPTIMIZATION__NESTEROV__GRADIENT_HPP__
 
-#include <stan/model/prob_grad.hpp>
+#include <vector>
+
+#include <stan/model/util.hpp>
 
 namespace stan {
 
   namespace optimization {
 
+    template <class M>
     class NesterovGradient {
 
     private:
-      
-      stan::model::prob_grad& model_;
+
+      M& model_;
       
       std::vector<double> x_;
       std::vector<double> y_;
@@ -42,7 +45,8 @@ namespace stan {
           x_[i] += epsilon_ * old_grad[i];
         
         try {
-          logp_ = model_.grad_log_prob(x_, z_, grad_, output_stream_);
+          logp_ = stan::model::log_prob_grad<true,false>(model_,x_, z_, 
+                                                         grad_, output_stream_);
           valid = true;
         }
         catch (std::exception &ex) {
@@ -60,7 +64,8 @@ namespace stan {
               x_[i] += epsilon_ * old_grad[i];
             
             try {
-              logp_ = model_.grad_log_prob(x_, z_, grad_, output_stream_);
+              logp_ = stan::model::log_prob_grad<true,false>(model_, x_, z_, 
+                                                             grad_, output_stream_);
             }
             catch (std::exception &ex) {
               valid = false;
@@ -81,7 +86,8 @@ namespace stan {
               x_[i] += epsilon_ * old_grad[i];
             
             try {
-              logp_ = model_.grad_log_prob(x_, z_, grad_, output_stream_);
+              logp_ = stan::model::log_prob_grad<true,false>(model_,x_, z_, 
+                                                             grad_, output_stream_);
               valid = true;
             }
             catch (std::exception &ex) {
@@ -95,7 +101,7 @@ namespace stan {
         
       }
 
-      NesterovGradient(stan::model::prob_grad& model,
+      NesterovGradient(M& model,
                        const std::vector<double>& params_r,
                        const std::vector<int>& params_i,
                        double epsilon = -1,
@@ -105,7 +111,8 @@ namespace stan {
         epsilon_(epsilon), gamma_(0.0), lambda_(0.0),
         output_stream_(output_stream) {
         
-        logp_ = model.grad_log_prob(x_, z_, grad_, output_stream_);
+        logp_ = stan::model::log_prob_grad<true,false>(model_,x_, z_,
+                                                         grad_, output_stream_);
         initialize_epsilon();
           
       }
@@ -121,14 +128,15 @@ namespace stan {
         
         lambda_ = 0.5 * ( 1 + std::sqrt(1.0 + 4.0 * old_lambda * old_lambda) );
         gamma_ = (old_lambda - 1.0) / lambda_;
-        
+
         for (size_t i = 0; i < x_.size(); i++)
           y_[i] = x_[i] + epsilon_ * grad_[i];
         
         for (size_t i = 0; i < x_.size(); i++)
           x_[i] = (1 - gamma_) * y_[i] + gamma_ * old_y[i];
         
-        logp_ = model_.grad_log_prob(x_, z_, grad_, output_stream_);
+        logp_ = stan::model::log_prob_grad<true,false>(model_, x_, z_,
+                                                       grad_, output_stream_);
         
         return logp_;
         

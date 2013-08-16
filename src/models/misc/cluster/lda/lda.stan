@@ -21,6 +21,6 @@ model {
     real gamma[K];
     for (k in 1:K) 
       gamma[k] <- log(theta[doc[n],k]) + log(phi[k,w[n]]);
-    lp__ <- lp__ + log_sum_exp(gamma);  // likelihood
+    increment_log_prob(log_sum_exp(gamma));  // likelihood
   }
 }

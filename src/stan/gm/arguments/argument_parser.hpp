@@ -34,7 +34,7 @@ namespace stan {
           _help_flag |= true;
           return true;
         }
-        
+
         std::vector<std::string> args;
         
         // Fill in reverse order as parse_args pops from the back
@@ -113,9 +113,22 @@ namespace stan {
             
           }
           
-          if (!good_arg && err) 
+          if (!good_arg && err) {
+          
             *err << cat_name << " is either mistyped or misplaced." << std::endl;
           
+            std::vector<std::string> valid_paths;
+            
+            for (int i = 0; i < _arguments.size(); ++i) {
+              _arguments.at(i)->find_arg(val_name, "", valid_paths);
+            }
+            
+            if (valid_paths.size()) {
+              *err << "Perhaps you meant one of the following valid configurations?" << std::endl;
+              for (int i = 0; i < valid_paths.size(); ++i)
+                std::cout << "  " << valid_paths.at(i) << std::endl;
+            }
+          }
         }
         
         if (_help_flag)

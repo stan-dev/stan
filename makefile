@@ -26,8 +26,8 @@ AR = ar
 # Library locations
 ##
 STAN_HOME := $(dir $(firstword $(MAKEFILE_LIST)))
-EIGEN ?= lib/eigen_3.1.3
-BOOST ?= lib/boost_1.53.0
+EIGEN ?= lib/eigen_3.2.0
+BOOST ?= lib/boost_1.54.0
 GTEST ?= lib/gtest_1.6.0
 
 ##
@@ -144,8 +144,9 @@ help:
 	@echo '  - *$(EXE)        : If a Stan model exists at *.stan, this target will build'
 	@echo '                     the Stan model as an executable.'
 	@echo '  Tests:'
+	@echo '  - test-headers   : Compiles a trivial file after including each header separately'
 	@echo '  - test-unit      : Runs unit tests.'
-	@echo '  - test-distributions : Runs unit tests for the distributions (subset of test-unit)'
+	@echo '  - test-distributions : Runs unit tests for the distributions'
 	@echo '  - test-models    : Runs diagnostic models.'
 	@echo '  - test-bugs      : Runs the bugs examples (subset of test-models).'
 	@echo '  - test-all       : Runs all tests.'

@@ -37,7 +37,7 @@ to \code{make} suffices.  First the directory is changed to Stan's home
 directory by replacing \code{<stan-home>} with the appropriate path.
 %
 \begin{quote}
-\begin{Verbatim}[fontshape=sl]
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
 > cd <stan-home>
 \end{Verbatim}
 \end{quote}
@@ -48,7 +48,7 @@ The current directory should now contain the file named
 will build an executable form of the Bernoulli estimator.
 %
 \begin{quote}
-\begin{Verbatim}[fontshape=sl]
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
 > make src/models/basic_estimators/bernoulli
 \end{Verbatim}
 \end{quote}
@@ -87,7 +87,7 @@ automatically build the \code{bin/stanc} compiler and the
 %appropriate path to the top-level directory in which Stan was
 %unpacked).
 %\begin{quote}
-%\begin{Verbatim}[fontshape=sl]
+%\begin{Verbatim}[fontshape=sl,fontsize=\small]
 %> cd <stan-home>src/models/basic_estimators
 %> make -f ../../../makefile bernoulli
 %\end{Verbatim}
@@ -109,14 +109,14 @@ It is located at the top-level of the distribution, so first change
 directories to that location.
 %
 \begin{quote}
-\begin{Verbatim}[fontshape=sl]
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
 > cd <stan-home>
 \end{Verbatim}
 \end{quote} 
 and then invoke make with the target \code{help},
 
 \begin{quote}
-\begin{Verbatim}[fontshape=sl]
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
 > make help
 \end{Verbatim}
 \end{quote}
@@ -133,7 +133,7 @@ itself.  For instance, to specify the \code{clang++} compiler at
 optimization level 0, use
 %
 \begin{quote}
-\begin{Verbatim}[fontshape=sl]
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
 > make CC=clang++ O=0 ...
 \end{Verbatim}
 \end{quote}
@@ -180,7 +180,7 @@ contains the file named \code{makefile}).
 A very useful target is \code{clean-all}, invoked as
 %
 \begin{quote}
-\begin{Verbatim}[fontshape=sl]
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
 > make clean-all
 \end{Verbatim}
 \end{quote}
@@ -194,7 +194,7 @@ automatically generated documentation.
 To make the \code{stanc} compiler, use
 %
 \begin{quote}
-\begin{Verbatim}[fontshape=sl]
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
 > make bin/stanc
 \end{Verbatim}
 \end{quote}
@@ -208,7 +208,7 @@ created under Windows.
 To build the Stan library, use the following target,
 %
 \begin{quote}
-\begin{Verbatim}[fontshape=sl]
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
 > make bin/libstan.a
 \end{Verbatim}
 \end{quote}
@@ -225,7 +225,7 @@ following command from the top-level distribution directory containing
 the file named \code{makefile}.
 %
 \begin{quote}
-\begin{Verbatim}[fontshape=sl]
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
 > make bin/stanc
 \end{Verbatim}
 \end{quote}
@@ -256,7 +256,7 @@ containing the file named \code{makefile}).
 For Linux and Mac:
 %
 \begin{quote}
-\begin{Verbatim}[fontshape=sl]
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
 > cd <stan-home>
 > bin/stanc --name=bernoulli --o=bernoulli.cpp \
   src/models/basic_estimators/bernoulli.stan 
@@ -268,7 +268,7 @@ The backslash (\Verb|\|) indicates a continuation of the same line.
 For Windows:
 %
 \begin{quote}
-\begin{Verbatim}[fontshape=sl]
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
 > cd <stan-home>
 > bin\stanc --name=bernoulli --o=bernoulli.cpp ^
 >   src/models/basic_estimators/bernoulli.stan 
@@ -408,7 +408,7 @@ build command for the \Stan archive is as follows (replacing
 which contains the file named \code{makefile}).
 %
 \begin{quote}
-\begin{Verbatim}[fontshape=sl]
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
 > cd <stan-home>
 > make CC=g++ O=3 bin/libstan.a 
 \end{Verbatim}
@@ -440,7 +440,7 @@ The following commands will produce an executable in the file
 \code{my\_model} in the current working directory (\code{<stan-home>}).
 %
 \begin{quote}
-\begin{Verbatim}[fontshape=sl]
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
 > cd <stan-home>
 > g++ -O3 -Lbin -Isrc -Ilib/boost_1.53.0 \
   -Ilib/eigen_3.1.2 my_model.cpp -o my_model -lstan
@@ -512,12 +512,13 @@ program compiled to a platform-specific executable (see
 \section{Simple Example}
 
 Suppose the executable is in file \code{my\_model} and the data
-is in file \code{my\_data}, both in the current working directory.
+is in file \code{my\_data}, both in the current working directory, and
+you want to draw samples from the model.
 Then the \Stan executable may be run on Windows using
 %
 \begin{quote}
-\begin{Verbatim}[fontshape=sl]
-> my_model --data=my_data
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
+> my_model sample data=my_data
 \end{Verbatim}
 \end{quote}
 %
@@ -530,8 +531,8 @@ the system time automatically. Note that on Mac or Linux, it is
 necessary to instead execute
 %
 \begin{quote}
-\begin{Verbatim}[fontshape=sl]
-> ./my_model --data=my_data
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
+> ./my_model sample data=my_data
 \end{Verbatim}
 \end{quote}
 %
@@ -543,11 +544,12 @@ in parallel on a multicore machine. To do so with four chains using
 a Bash shell on Mac or Linux execute
 %
 \begin{quote}
-\begin{Verbatim}[fontshape=sl]
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
 > for i in {1..4}
 > do
->   ./my_model --refresh=0 --seed=12345 --chain_id=$i \
->     --samples=samples$i.csv --data=my_data &
+>   ./my_model sample random seed=12345 \ 
+      id=$i data=my_data \
+>     output samples=samples$i.csv refresh=0 &
 > done
 >
 \end{Verbatim}
@@ -563,17 +565,19 @@ On Windows, the following is functionally equivalent to the Bash
 snippet above
 %
 \begin{quote}
-\begin{Verbatim}[fontshape=sl]
-> for /l %x in (1, 1, 4) do start /b model --refresh=0 ^
->   --seed=12345 --chain_id=%x  --samples=samples%x.csv
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
+> for /l %x in (1, 1, 4) do start /b model  sample ^
+< random seed=12345 id=%x data=my_data ^
+>  output samples=samples%x.csv refresh=0
 \end{Verbatim}
 \end{quote}
 %
 If the grep and sed programs are installed, then the following will
-combine the four csv files into a single csv file
+combine the four comma-separated values files into a single
+comma-separated values file.
 %
 \begin{quote}
-\begin{Verbatim}[fontshape=sl]
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
 > grep lp__ samples1.csv > combined.csv
 > sed '/^[#l]/d' samples*.csv >> combined.csv 
 \end{Verbatim}
@@ -581,150 +585,385 @@ combine the four csv files into a single csv file
 %
 \section{Command-Line Options}\label{stan-command-line-options.section}
 
-The executable \Stan program is highly configurable.  At the highest
-level, it may be configured for type of sampler (standard \HMC or
-\NUTS, with or without step size adaptation), it may
-be provided with data, initializations, a file to which to send the
-output, random number generation seeds, etc.
+\Stan executables are highly configurable, allowing the user to specify
+and customize not only the calculation method but also the data, output,
+initialization, and random number generation.  The arguments are defined
+hierarchically so that, for example, optimization settings are not necessary
+when sampling.  
 
-The full set of options is as follows.  The next section provides
-some typical use-case examples.
+The atomic element of the hierarchy are \textit{categorical arguments}
+which define self-contained categories of arguments.  Categories and
+arguments within each category are unordered so that, for example,
 %
+\begin{quote}
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
+> ./model output sample=samples.csv diagnostic=diagnostics.csv random seed=1
+> ./model output random seed=1
+> ./model output random seed=1 sample=samples.csv diagnostic=diagnostics.csv 
+> ./model output random seed=1 diagnostic=diagnostics.csv sample=samples.csv 
+\end{Verbatim}
+\end{quote}
+%
+all define the same configuration.
+
+Categorical arguments can appear in isolation, such as \code{random} and
+\code{output}, or as values to other arguments (Figure \ref{fig:hierarchy}).  In the latter case the arguments
+are mutually exclusive and specifying conflicting arguments causes the execution
+to immediately terminate (Figure \ref{fig:configuration}).
+
+\begin{figure}
+\setlength{\unitlength}{0.01in} 
+\centering
+\begin{picture}(500, 480)
+%
+\put(10, 460) { \makebox(50, 10)[l]{id, data, init} }
+%
+\put(0, 410) { \framebox(500, 45) }
+\put(10, 440) { \makebox(50, 10)[l]{random} }
+\put(50, 420) { \makebox(50, 10)[l]{seed} }
+%
+\put(0, 360) { \framebox(500, 45) }
+\put(10, 390) { \makebox(65, 10)[l]{output} }
+\put(50, 370) { \makebox(500, 10)[l]{sample, append\_sample, diagnostic, append\_diagnostic, refresh, save\_warmup} }
+%
+\put(10, 340) { \makebox(50, 10)[l]{method} }
+\put(20, 117.5) { \line(0, 1){212.5} }
+\put(20, 117.5) { \vector(1, 0){15} }
+\put(20, 257.5) { \vector(1, 0){15} }
+\put(20, 307.5) { \vector(1, 0){15} }
+%
+\put(40, 285) { \framebox(460, 45) }
+\put(50, 315) { \makebox(65, 10)[l]{ diagnose } }
+\put(90, 295) { \makebox(50, 10)[l]{ $\ldots$ } }
+%
+\put(40, 235) { \framebox(460, 45) }
+\put(50, 265) { \makebox(63, 10)[l]{ optimize } }
+\put(90, 245) { \makebox(50, 10)[l]{ $\ldots$ } }
+%
+\put(40, 5) { \framebox(460, 225) }
+\put(50, 215) { \makebox(55, 10)[l]{sample} }
+\put(90, 195) { \makebox(350, 10)[l]{num\_samples, num\_warmup, save\_warmup, thin} }
+%
+\put(80, 140) { \framebox(410, 45) }
+\put(90, 170) { \makebox(55, 10)[l]{adapt} }
+\put(130, 150) { \makebox(50, 10)[l]{$\ldots$} }
+%
+\put(90, 120) { \makebox(55, 10)[l]{algorithm} }
+\put(100, 37.5) { \line(0, 1){70} }
+\put(100, 87.5) { \vector(1, 0){15} }
+\put(100, 37.5) { \vector(1, 0){15} }
+%
+\put(120, 65) { \framebox(370, 45) }
+\put(130, 95) { \makebox(55, 10)[l]{hmc} }
+\put(170, 75) { \makebox(50, 10)[l]{$\ldots$} }
+%
+\put(120, 15) { \framebox(370, 45) }
+\put(130, 45) { \makebox(115, 10)[l]{ rw\_metropolis } }
+\put(170, 25) { \makebox(50, 10)[l]{ $\ldots$ } }
+\end{picture}
+\caption{In the hierarchical argument structure, certain arguments, such as \code{random} and \code{output}, introduce new categories of arguments.  These categorical arguments can also appear as values of other arguments, such as \code{diagnose}, \code{optimize}, and \code{sample}, which define the mutually exclusive values for the argument {method}. }
+\label{fig:hierarchy}
+\end{figure}
+
+\begin{figure}
+\setlength{\unitlength}{0.01in} 
+\centering
+\begin{picture}(500, 480)
+%
+\put(10, 460) { \makebox(50, 10)[l]{id, data, init} }
+%
+\put(0, 410) { \framebox(500, 45) }
+\put(10, 440) { \makebox(50, 10)[l]{random} }
+\put(50, 420) { \makebox(50, 10)[l]{seed} }
+%
+\put(0, 360) { \framebox(500, 45) }
+\put(10, 390) { \makebox(65, 10)[l]{output} }
+\put(50, 370) { \makebox(500, 10)[l]{sample, append\_sample, diagnostic, append\_diagnostic, refresh, save\_warmup} }
+%
+\put(10, 340) { \makebox(50, 10)[l]{method} }
+\put(20, 117.5) { \line(0, 1){212.5} }
+\put(20, 117.5) { \vector(1, 0){15} }
+\put(20, 257.5) { \color{gray!30}\vector(1, 0){15} }
+\put(20, 307.5) { \color{gray!30}\vector(1, 0){15} }
+%
+\put(40, 285) { \color{gray!30}\framebox(460, 45) }
+\put(50, 315) { \makebox(65, 10)[l]{ \textcolor{gray!30}{diagnose} } }
+\put(90, 295) { \makebox(50, 10)[l]{ \textcolor{gray!30}{$\ldots$} } }
+%
+\put(40, 235) { \color{gray!30}\framebox(460, 45) }
+\put(50, 265) { \makebox(63, 10)[l]{ \textcolor{gray!30}{optimize} } }
+\put(90, 245) { \makebox(50, 10)[l]{ \textcolor{gray!30}{$\ldots$} } }
+%
+\put(40, 5) { \framebox(460, 225) }
+\put(50, 215) { \makebox(55, 10)[l]{sample} }
+\put(90, 195) { \makebox(350, 10)[l]{num\_samples, num\_warmup, save\_warmup, thin} }
+%
+\put(80, 140) { \framebox(410, 45) }
+\put(90, 170) { \makebox(55, 10)[l]{adapt} }
+\put(130, 150) { \makebox(50, 10)[l]{$\ldots$} }
+%
+\put(90, 120) { \makebox(55, 10)[l]{algorithm} }
+\put(100, 37.5) { \color{gray!30}\line(0, 1){70} }
+\put(100, 87.5) { \line(0, 1){20} }
+\put(100, 87.5) { \vector(1, 0){15} }
+\put(100, 37.5) { \color{gray!30}\vector(1, 0){15} }
+%
+\put(120, 65) { \framebox(370, 45) }
+\put(130, 95) { \makebox(55, 10)[l]{hmc} }
+\put(170, 75) { \makebox(50, 10)[l]{$\ldots$} }
+%
+\put(120, 15) { \color{gray!30}\framebox(370, 45) }
+\put(130, 45) { \makebox(115, 10)[l]{ \textcolor{gray!30}{rw\_metropolis} } }
+\put(170, 25) { \makebox(50, 10)[l]{ \textcolor{gray!30}{$\ldots$} } }
+\end{picture}
+\caption{A valid argument configuration defines only one mutually exclusive argument.
+If conflicting arguments are specified, for example \code{method=optimize method=sample},
+then execution immediately terminates with a warning message.}
+\label{fig:configuration}
+\end{figure}
+
+All commands must include at least one method, specified explicitly as
+\code{method=method\_name} or implicitly with only \code{method\_name}.
+All remaining configurations are optional with defaults values provided
+for all arguments.
+
+Additionally, there are various ways of displaying help output instead
+of execution.  Specifying \code{help} after any argument displays a 
+description and valid options for that argument, while \code{help-all}
+provides a verbose presentation of that argument and all arguments
+derived from it in the hierarchy.  If \code{help} is specified without any
+additional arguments a usage message is displayed, while \code{help-all}
+displays the entire argument hierarchy.
+
+The full hierarchy is as follows; some typical use-case examples 
+are provided in the next section.
+
+\pagebreak
+
 \begin{description}
-\cmdflag{help}
-{Display help information including the command call and
-  options.}
-{default is not to display help information}
+\hiercmdarg{}{method}{$$list element$$}
+  {Analysis method (Note that method= is optional)}
+  {Valid values: sample, optimize, diagnose}
+  {Defaults to sample}
 %
-\cmdarg{data}{file}
-{Read data from specified dump formatted
-  file}
-{required if model declares data}
+  \hierlongcmd{\indentarrow}{sample}
+    {Bayesian inference with Markov Chain Monte Carlo}
+    {Valid subarguments: num\_samples, num\_warmup, save\_warmup, thin, adapt, algorithm}
 %
-\cmdarg{init}{file}
-{Use initial values from specified file or zero
-  values if \code{\farg{<file>}=0}}
-{default is random initialization}
+    \hiercmdarg{\indentarrow\indentarrow}{num\_samples}{$$int$$}
+      {Number of sampling iterations}
+      {Valid values: 0 $\le$ num\_samples}
+      {Defaults to 1000}
 %
-\cmdarg{samples}{file}
-{File into which samples are written. Be sure to distinguish the
-file when executing multiple chains simultaneously.}
-{default = \code{samples.csv}}
+    \hiercmdarg{\indentarrow\indentarrow}{num\_warmup}{$$int$$}
+      {Number of warmup iterations}
+      {Valid values: 0 $\le$ warmup}
+      {Defaults to 1000}
 %
-\cmdflag{append\_samples}
-{Append samples to existing file if it exists; do not print headers}
-{default is to overwrite specified file}
+    \hiercmdarg{\indentarrow\indentarrow}{save\_warmup}{$$boolean$$}
+      {Stream warmup samples to output?}
+      {Valid values: [0, 1]}
+      {Defaults to 0}
 %
-\cmdarg{seed}{int}
-{Random number generation seed. When executing multiple chains
-simultaneously, it is best to give all of them the same seed
-but different values for chain\_id (see below).}
-{default is to randomly generate from time}
+    \hiercmdarg{\indentarrow\indentarrow}{thin}{$$int$$}
+      {Period between saved samples}
+      {Valid values: 0 $<$ thin}
+      {Defaults to 1}
 %
-\cmdarg{chain\_id}{int}
-{Markov chain identifier, indexed from 1, to seed the L'Ecuyer 
-  random number generator to ensure non-overlapping random number
-  sequences for each chain \citep{Lecuyer:1999}}
-{default = \code{1}}
+    \hierlongcmd{\indentarrow\indentarrow}{adapt}
+      {Warmup Adaptation}
+      {Valid subarguments: engaged, gamma, delta, kappa, t0}
 %
-\cmdarg{iter}{+int}
-{Total number of iterations, including warmup}
-{default = \code{2000}}
+      \hiercmdarg{\indentarrow\indentarrow\indentarrow}{engaged}{$$boolean$$}
+        {Adaptation engaged?}
+        {Valid values: [0, 1]}
+        {Defaults to 1}
 %
-\cmdarg{warmup}{+int}
-{Discard the specified number of initial samples}
-{default = \code{iter / 2}}
+      \hiercmdarg{\indentarrow\indentarrow\indentarrow}{gamma}{$$double$$}
+        {Adaptation regularization scale}
+        {Valid values: 0 $<$ gamma}
+        {Defaults to 0.05}
 %
-\cmdarg{thin}{+int}
-{Period between saved samples after warm up}
-{default = \code{max(1, (iter - warmup) / 1000)}}
+      \hiercmdarg{\indentarrow\indentarrow\indentarrow}{delta}{$$double$$}
+        {Adaptation target acceptance statistic}
+        {Valid values: 0 $<$ delta $<$ 1}
+        {Defaults to 0.65}
 %
-\cmdarg{refresh}{+int}
-{Period between samples updating progress report print}
-{default = \code{max(1, iter / 200)}}
+      \hiercmdarg{\indentarrow\indentarrow\indentarrow}{kappa}{$$double$$}
+        {Adaptation relaxation exponent}
+        {Valid values: 0 $<$ kappa}
+        {Defaults to 0.75}
 %
-\cmdarg{leapfrog\_steps}{int}
-{Number of leapfrog steps; \code{-1} for No-U-Turn adaptation}
-{default = \code{-1}}
+      \hiercmdarg{\indentarrow\indentarrow\indentarrow}{t0}{$$double$$}
+        {Adaptation iteration offset}
+        {Valid values: 0 $<$ t0}
+        {Defaults to 10}
 %
-\cmdarg{max\_treedepth}{int}
-{Limit \NUTS leapfrog steps to \code{pow(2,max\_tree\_depth)}; \code{-1} for no limit}
-{default = \code{10}}
+    \hiercmdarg{\indentarrow\indentarrow}{algorithm}{$$list element$$}
+      {Sampling algorithm}
+      {Valid values: hmc, metro}
+      {Defaults to hmc}
 %
-\cmdarg{epsilon}{float}
-{Initial value for step size, or \code{-1} to set automatically}
-{default = \code{-1}}
+      \hierlongcmd{\indentarrow\indentarrow\indentarrow}{hmc}
+        {Hamiltonian Monte Carlo}
+        {Valid subarguments: engine, metric, stepsize, stepsize\_jitter}
 %
-\cmdarg{epsilon\_pm}{[0,1]}
-{Sample epsilon uniformly from the interval 
-\\
-\code{[epsilon * (1 - epsilon\_pm),\ epsilon * (1 + epsilon\_pm)]}}
-{default = \code{0.0}}
+        \hiercmdarg{\indentarrow\indentarrow\indentarrow\indentarrow}{engine}{$$list element$$}
+          {Engine for Hamiltonian Monte Carlo}
+          {Valid values: static, nuts}
+          {Defaults to nuts}
 %
-\cmdflag{equal\_step\_sizes} {Use unit mass matrix for \NUTS; either
-  \code{equal\_step\_sizes} or \code{nondiag\_mass} may be set, but
-  not both; see related parameter \code{epsilon}} {\NUTS default is
-  to estimate step sizes that vary by parameter}%
-\footnote{\Stan's implementation of \NUTS follows the approach in
-  \citep[section 5.4.2.4]{Neal:2011}, which is equivalent to having
-  different step sizes for each parameter.  Varying step sizes are
-  acceptable for \HMC even though they vary the time scale of each
-  parameter and thus depart from the Hamiltonian interpretation of the
-  trajectory.}
+          \hierlongcmd{\indentarrow\indentarrow\indentarrow\indentarrow\indentarrow}{static}
+            {Static integration time}
+            {Valid subarguments: int\_time}
 %
-\cmdflag{nondiag\_mass}{Use full mass matrix estimation with \NUTS;
-  either \code{equal\_step\_sizes} or \code{nondiag\_mass} may be set,
-  but not both; see related parameter \code{epsilon} }{\NUTS default
-  is to estimate step sizes that vary by parameter}
+            \hiercmdarg{\indentarrow\indentarrow\indentarrow\indentarrow\indentarrow\indentarrow}{int\_time}{$$double$$}
+              {Total integration time for Hamiltonian evolution}
+              {Valid values: 0 $<$ int\_time}
+              {Defaults to 2 * pi}
 %
-\cmdarg{delta}{+float}
-{Initial step size for step-size adaptation}
-{default = \code{0.5}}
+          \hierlongcmd{\indentarrow\indentarrow\indentarrow\indentarrow\indentarrow}{nuts}
+            {The No-U-Turn Sampler}
+            {Valid subarguments: max\_depth}
 %
-\cmdarg{gamma}{+float}
-{Gamma parameter for dual averaging step-size adaptation}
-{default = \code{0.05}}
+            \hiercmdarg{\indentarrow\indentarrow\indentarrow\indentarrow\indentarrow\indentarrow}{max\_depth}{$$int$$}
+              {Maximum tree depth}
+              {Valid values: 0 $<$ max\_depth}
+              {Defaults to 10}
 %
-\cmdflag{save\_warmup}
-{Save the warmup samples as well as the post-warmup samples}
-{default is to not save the warmup samples}
+        \hiercmdarg{\indentarrow\indentarrow\indentarrow\indentarrow}{metric}{$$list element$$}
+          {Geometry of base manifold}
+          {Valid values: unit\_e, diag\_e, dense\_e}
+          {Defaults to diag\_e}
 %
-\cmdflag{test\_grad}
-{Test gradient calculations using finite differences; if this option
-  is chosen, only the gradient tests are done.}
-{default is not to test gradients}
+          \hiershortcmd{\indentarrow\indentarrow\indentarrow\indentarrow\indentarrow}{unit\_e}
+            {Euclidean manifold with unit metric}
+%
+          \hiershortcmd{\indentarrow\indentarrow\indentarrow\indentarrow\indentarrow}{diag\_e}
+            {Euclidean manifold with diag metric}
+%
+          \hiershortcmd{\indentarrow\indentarrow\indentarrow\indentarrow\indentarrow}{dense\_e}
+            {Euclidean manifold with dense metric}
+%
+        \hiercmdarg{\indentarrow\indentarrow\indentarrow\indentarrow}{stepsize}{$$double$$}
+          {Step size for discrete evolution}
+          {Valid values: 0 $<$ stepsize}
+          {Defaults to 1}
+%
+        \hiercmdarg{\indentarrow\indentarrow\indentarrow\indentarrow}{stepsize\_jitter}{$$double$$}
+          {Uniformly random jitter of the stepsize, in percent}
+          {Valid values: 0 $\le$ stepsize\_jitter $\le$ 1}
+          {Defaults to 0}
+%
+      \hiershortcmd{\indentarrow\indentarrow\indentarrow}{metro}
+        {Random Walk Metropolis Monte Carlo}
+%
+  \hierlongcmd{\indentarrow}{optimize}
+    {Point estimation}
+    {Valid subarguments: algorithm, iter, save\_iterations}
+%
+    \hiercmdarg{\indentarrow\indentarrow}{algorithm}{$$list element$$}
+      {Optimization algorithm}
+      {Valid values: nesterov, bfgs, newton}
+      {Defaults to bfgs}
+%
+      \hierlongcmd{\indentarrow\indentarrow\indentarrow}{nesterov}
+        {Nesterov's accelerated gradient method}
+        {Valid subarguments: stepsize}
+%
+        \hiercmdarg{\indentarrow\indentarrow\indentarrow\indentarrow}{stepsize}{$$double$$}
+          {Step size for discrete evolution}
+          {Valid values: 0 $<$ stepsize}
+          {Defaults to 1}
+%
+      \hierlongcmd{\indentarrow\indentarrow\indentarrow}{bfgs}
+        {BFGS with linesearch}
+        {Valid subarguments: stepsize}
+%
+        \hiercmdarg{\indentarrow\indentarrow\indentarrow\indentarrow}{stepsize}{$$double$$}
+          {Step size for discrete evolution}
+          {Valid values: 0 $<$ stepsize}
+          {Defaults to 1}
+%
+      \hiershortcmd{\indentarrow\indentarrow\indentarrow}{newton}
+        {Newton's method}
+%
+    \hiercmdarg{\indentarrow\indentarrow}{iter}{$$int$$}
+      {Total number of iterations}
+      {Valid values: 0 $<$ iter}
+      {Defaults to 2000}
+%
+    \hiercmdarg{\indentarrow\indentarrow}{save\_iterations}{$$boolean$$}
+      {Stream optimization progress to output?}
+      {Valid values: [0, 1]}
+      {Defaults to 0}
+%
+  \hierlongcmd{\indentarrow}{diagnose}
+    {Model diagnostics}
+    {Valid subarguments: test}
+%
+    \hiercmdarg{\indentarrow\indentarrow}{test}{$$list element$$}
+      {Diagnostic test}
+      {Valid values: gradient}
+      {Defaults to gradient}
+%
+      \hiershortcmd{\indentarrow\indentarrow\indentarrow}{gradient}
+        {Check model gradient against finite differences}
+%
+\hiercmdarg{}{id}{$$int$$}
+  {Unique process identifier}
+  {Valid values: id $>$ 0}
+  {Defaults to 0}
+%
+\hiercmdarg{}{data}{$$string$$}
+  {Input data file}
+  {Valid values: All}
+  {Defaults to ""}
+%
+\hiercmdarg{}{init}{$$string$$}
+  {Initialization method: ``x'' initializes randomly bewteen [-x, x], ``0'' initializes to 0, anything else identifies a file of values}
+  {Valid values: All}
+  {Defaults to ``2''}
+%
+\hierlongcmd{}{random}
+  {Random number configuration}
+  {Valid subarguments: seed}
+%
+  \hiercmdarg{\indentarrow}{seed}{$$unsigned int$$}
+    {Random number generator seed}
+    {Valid values: seed $>$ 0, if negative seed is generated from time}
+    {Defaults to -1}
+%
+\hierlongcmd{}{output}
+  {File output options}
+  {Valid subarguments: sample, append\_sample, diagnostic, append\_diagnostic, refresh, save\_warmup}
+%
+  \hiercmdarg{\indentarrow}{sample}{$$string$$}
+    {Output file for sample information}
+    {Valid values: All}
+    {Defaults to samples.csv}
+%
+  \hiercmdarg{\indentarrow}{append\_sample}{$$boolean$$}
+    {Append sample output to existing file?}
+    {Valid values: [0, 1]}
+    {Defaults to 0}
+%
+  \hiercmdarg{\indentarrow}{diagnostic}{$$string$$}
+    {Output file for diagnostic information}
+    {Valid values: All}
+    {Defaults to ""}
+%
+  \hiercmdarg{\indentarrow}{append\_diagnostic}{$$boolean$$}
+    {Append diagnostic output to existing file?}
+    {Valid values: [0, 1]}
+    {Defaults to 0}
+%
+  \hiercmdarg{\indentarrow}{refresh}{$$int$$}
+    {Number of interations between screen updates}
+    {Valid values: 0 $<$ refresh}
+    {Defaults to 100}
 %
 \end{description}
-
-\section{Configuring the Sampler Type}
-
-Which sampler gets used, standard \HMC or one of the two forms of
-\NUTS, depends on the configuration of the command-line call.  The
-following table summarizes.
-%
-\begin{center}
-\begin{tabular}{l|ll}
-{\it Sampler} & {\it Command Options}
-\\ \hline \hline
-\HMC & \Verb|--epsilon=e --leapfrog_steps=L| 
-\\
-\HMC + tuned step size & \Verb|--leapfrog_steps=L|
-\\[8pt]
-\NUTS & \Verb|--epsilon=e|
-\\
-\NUTS + tuned step size & \Verb|--equal_step_sizes|
-\\
-\NUTS + tuned varying step sizes & (default configuration)
-\\
-\NUTS + full mass matrix & \Verb|--nondiag_mass|
-\end{tabular}
-\end{center}
-%
-For an overview of Hamiltonian Monte Carlo (\HMC), see
-\citep{Neal:2011}.  For details concerning the No-U-Turn sampler
-(\NUTS), see \citep{Hoffman-Gelman:2011,Hoffman-Gelman:2012}.
-
-
 
 \chapter{Print Command for Output Analysis}\label{print-command.chapter}
 
@@ -741,7 +980,7 @@ as follows from the home directory into which Stan was unpacked (here
 written as \code{<stan-home>}).
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 > cd <stan-home>
 > make bin/print
 \end{Verbatim}
@@ -763,39 +1002,46 @@ Suppose there are three samples files in a directory generated by
 fitting a negative binomial model to a small data set.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 > ls samples*.csv
 \end{Verbatim}
-\begin{Verbatim}[fontshape=sl]
+%
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
 samples1.csv	samples2.csv	samples3.csv
 \end{Verbatim}
-\end{quote}
-
-\begin{quote}
-\begin{Verbatim}
+%
+\begin{Verbatim}[fontsize=\small]
 > bin/print samples*.csv
 \end{Verbatim}
-{\small
-\begin{Verbatim}[fontshape=sl]
-Inference for Stan model: 
-3 chains: each with iter=(1000,1000,1000); warmup=(0,0,0); 
-thin=(1,1,1); 3000 iterations saved.
+%
+{
+\begin{Verbatim}[fontshape=sl,fontsize=\footnotesize]
+Inference for Stan model: negative_binomial_model
+1 chains: each with iter=(1000); warmup=(0); thin=(1); 1000 iterations saved.
 
-       mean se_mean   sd 2.5%  25%  50%  75% 97.5% n_eff Rhat
-alpha  16.2     2.0 41.5  1.4  5.2  9.7 17.6  59.2   435  1.0
-beta   10.0     1.1 22.8  0.8  3.3  6.2 11.2  37.5   405  1.0
+Warmup took (0.054) seconds, 0.054 seconds total
+Sampling took (0.059) seconds, 0.059 seconds total
 
-Samples were drawn using mcmc::nuts_diag.
-For each parameter, n_eff is a crude measure of effective 
-sample size, and Rhat is the potential scale reduction factor 
-on split chains (at convergence, Rhat=1).
+                Mean     MCSE   StdDev    5%   50%   95%  N_Eff  N_Eff/s  R_hat
+lp__             -14  6.2e-02  1.0e+00   -16   -14   -13    283     4773   1.00
+accept_stat__   0.88  5.6e-03  1.8e-01  0.51  0.95   1.0   1000    16881   1.00
+stepsize__      0.30  1.3e-15  8.9e-16  0.30  0.30  0.30   0.50      8.5   1.00
+treedepth__      1.4  2.6e-02  8.0e-01  0.00   1.0   2.0    946    15978   1.00
+alpha             17  1.8e+00  2.5e+01   1.9   9.5    50    181     3054   1.00
+beta              10  1.1e+00  1.4e+01   1.2   6.2    31    181     3057    1.0
+
+Samples were drawn using hmc with nuts.
+For each parameter, N_Eff is a crude measure of effective sample size,
+and R_hat is the potential scale reduction factor on split chains (at 
+convergence, R_hat=1).
 \end{Verbatim}
 }
 \end{quote}
+%\end{quote}
 %
 The posterior is skewed to the high side, resulting in posterior means
-($\alpha=16.2$ and $\beta=10.0$) that are a long way away from the posterior
-medians ($\alpha=9.7$ and $\beta=6.2$);  the posterior median is the
+($\alpha=17$ and $\beta=11$) that are a long way away from the posterior
+medians ($\alpha=9.4$ and $\beta=6.1$);  the posterior median is the
 value listed under \code{50\%}, which is the 50th percentile of the
 posterior values.
 
@@ -803,20 +1049,24 @@ For Windows, the forward slash in paths need to be converted to backslashes.
 
 \section{Command-line Options}
 
-There is only a single command-line option for \code{print}, namely
-\code{--help}, which prints usage information.
+In addition to the filenames, \code{print} includes three flags to customize the output.  
 
-In a forthcoming release, there will be controls for the number of
-significant digits in the output;  as is, the print errs on the side
-of using too few digits.
-
-
-
-
-
-
-
-
+\begin{description}
+\longcmd{help}
+{Prints usage information}
+{No help output by default}
+%
+\cmdarg{sig\_figs}{int}
+{Sets the number of significant figures displayed in the output}
+{Valid values: 0 \textless sig\_figs}
+{default = \code{2} }
+%
+\cmdarg{autocorr}{int}
+{Calculates and then displays the autocorrelation of the specified chain}
+{Valid values: Any integer matching a chain index}
+{No autocorrelation output by default}
+%
+\end{description}
 
 \chapter{Dump Data Format}\label{dump.chapter}
 
@@ -838,7 +1088,7 @@ valid dump file defining a single scalar variable \code{y} with value
 17.2.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 y <- 
 17.2
 \end{Verbatim}
@@ -853,7 +1103,7 @@ sequence notation.  The following example defines an integer-value and
 a real-valued sequence.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 n <- c(1,2,3)
 y <- c(2.0,3.0,9.7)
 \end{Verbatim}
@@ -879,7 +1129,7 @@ low, as in the first of the following examples, which is equivalent to
 the second.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 n <- 2:-2
 n <- c(2,1,0,-1,-2)
 \end{Verbatim}
@@ -902,7 +1152,7 @@ This defines a $2 \times 3$ array.  Data is stored in column-major
 order, meaning the values for \code{y} will be as follows.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 y[1,1] = 1     y[1,2] = 3     y[1,3] = 5    
 y[2,1] = 2     y[2,2] = 4     y[2,3] = 6
 \end{Verbatim}
@@ -997,7 +1247,7 @@ y <-
 The following dump file provides a real value for \code{y}.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 y <-
 2.0
 \end{Verbatim}
@@ -1038,7 +1288,7 @@ In order to support \JAGS data files, variables may be double quoted.
 For instance, the following definition is legal in a dump file.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 "y" <-
 c(1,2,3)
 \end{Verbatim}
@@ -1051,7 +1301,7 @@ the way \R reads in data.  Both of the following declarations are
 legal.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 y <- 2
 y <-
 3
@@ -1062,7 +1312,7 @@ Also following \R, breaking before the assignment arrow are not
 allowed, so the following is invalid.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 y
 <- 2  # Syntax Error
 \end{Verbatim}
@@ -1075,7 +1325,7 @@ For example, the following declaration of a $2 \times 2 \times 3$
 array is valid.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 y <-
 structure(c(1,2,3,
 4,5,6,7,8,9,10,11,

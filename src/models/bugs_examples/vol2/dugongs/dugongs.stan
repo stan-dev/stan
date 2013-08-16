@@ -26,8 +26,10 @@ transformed parameters {
   U3 <- logit(lambda);
 } 
 model {
+  real m[N];
   for (i in 1:N) 
-    Y[i] ~ normal(alpha - beta * pow(lambda, x[i]), sigma);
+    m[i] <- alpha - beta * pow(lambda, x[i]);
+  Y ~ normal(m, sigma); 
     
   alpha ~ normal(0.0, 1000); 
   beta ~ normal(0.0, 1000); 

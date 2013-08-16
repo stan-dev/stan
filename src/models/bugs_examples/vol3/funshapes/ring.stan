@@ -5,7 +5,7 @@ parameters {
 } 
 model {
   // p(z,phi) prop-to z
-  lp__ <- lp__ + log(z); 
+  increment_log_prob(log(z));
 } 
 generated quantities {
   real x;

@@ -577,7 +577,8 @@ In addition to standard \HMC, \Stan implements an adaptive version of
 tunes a step sizes during warmup.  A global step size is optimized for
 a target Metropolis-Hastings reject rate using dual averaging; see
 \citep{Nesterov:2009} for details of dual averaging and
-\citep{Hoffman-Gelman:2012} for details of its use in \Stan.  For
+\citep{Hoffman-Gelman:2011,Hoffman-Gelman:2013} 
+for details of its use in \Stan.  For
 information on run-time configuration of step-size adaptation, see
 \refsection{stan-command-line-options}.  Then step sizes per parameter
 are estimated during warmup.  
@@ -599,7 +600,7 @@ out; see \refchapter{mixture-modeling} for examples.
 \HMC uses a Metropolis rejection step to ensure detailed balance of
 the resulting Markovian system; for details, see \citep{Neal:2011}.
 \NUTS uses a form of slice sampling which guarantees detailed balance;
-for details, see \citep{Hoffman-Gelman:2012}.%
+for details, see \citep{Hoffman-Gelman:2011,Hoffman-Gelman:2013}.%
 %
 \footnote{A transition density $\phi(\omega'|\omega)$ and density
   $\pi(\omega)$ over state space $\Omega$ satisfy detailed balance if
@@ -1545,7 +1546,75 @@ $y$ by
 p_Y(y) = p_X(f^{-1}(y)) \ 2^K \ \prod_{k=1}^K z_{k,k}^{K-k+2}.
 \]
 
+\section{Cholesky Factors of Covariance Matrices}
 
+An $M \times N$ matrix is a Cholesky factor of a covariance matrix
+if it is lower triangular, the diagonal entries are positive, and $M
+\geq N$.  It requires $N + {N \choose 2} + (M - N)N$ parameters.
+
+\subsection{Cholesky Factor of Covariance Matrix Transform}
+
+Stan's Cholesky factor transform only requires the first step of the
+covariance matrix transform, namely log transforming the positive
+diagonal elements.  Suppose $x$ is an $M \times N$ Cholesky factor.
+The above-diagonal entries are zero, the diagonal entries are
+positive, and the below-diagonal entries are unconstrained.  The
+transform required is thus
+%
+\[
+y_{m,n} = 
+\left\{
+\begin{array}{cl}
+0 & \mbox{if } m < n,
+\\[4pt]
+\log x_{m,m} & \mbox{if } m = n, \mbox{ and}
+\\[4pt]
+x_{m,n} & \mbox{if } m > n.
+\end{array}
+\right.
+\]
+
+\subsection{Cholesky Factor of Covariance Matrix Inverse Transform}
+
+The inverse transform need only invert the logarithm with an
+exponentiation.  If $y$ is the unconstrained matrix representation,
+then the elements of the constrained matrix $x$ is defined by
+\[
+x_{m,n} =
+\left\{
+\begin{array}{cl}
+0 & \mbox{if } m < n,
+\\[4pt]
+\exp(y_{m,m}) & \mbox{if } m = n, \mbox{ and}
+\\[4pt]
+y_{m,n} & \mbox{if } m > n.
+\end{array}
+\right.
+\]
+
+\subsection{Absolute Jacobian Determinant of Cholesky Factor Inverse Transform}
+
+The transform has a diagonal Jacobian matrix, the absolute determinant
+of which is
+%
+\[
+\prod_{n=1}^N  \frac{\partial}{\partial_{y_{n,n}}} \, \exp(y_{n,n})
+\ = \ 
+\prod_{n=1}^N \exp(y_{n,n})
+\ = \
+\prod_{n=1}^N x_{n,n}.
+\]
+
+Let $x = f^{-1}(y)$ be the inverse transform from a $N + {N \choose 2}
++ (M - N)N$ vector to an $M \times N$ Cholesky factor for a covariance
+matrix $x$ defined in the previous section.  A density function
+$p_X(x)$ defined on $M \times N$ Cholesky factors of covariance
+matrices is transformed to the density $p_Y(y)$ over $N + {N \choose
+  2} + (M - N)N$ vectors $y$ by
+%
+\[
+p_Y(y) = p_X(f^{-1}(y)) \prod_{N=1}^N x_{n,n}.
+\]
 
 % \chapter{Generated C++ Model Class}
 

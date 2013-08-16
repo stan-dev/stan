@@ -40,6 +40,13 @@ If $\theta \in [0,1]$, then for $y \in \setlist{0,1}$,
   Bernoulli cumulative distribution function of \farg{y} given chance of success
   \farg{theta}}
 %
+\fitem{real}{bernoulli\_cdf\_log}{ints \farg{y}, reals \farg{theta}}{The
+  log of the Bernoulli cumulative distribution function of \farg{y} given 
+  chance of success \farg{theta}}
+%
+\fitem{real}{bernoulli\_ccdf\_log}{ints \farg{y}, reals \farg{theta}}{The
+  log of the Bernoulli complementary cumulative distribution function of 
+  \farg{y} given chance of success \farg{theta}}
 \end{description}
 %
 \begin{description}
@@ -135,6 +142,15 @@ Suppose $N \in \nats$ and $\theta \in [0,1]$, and $n \in
   \fitem{real}{binomial\_cdf}{ints \farg{n}, ints \farg{N}, reals
     \farg{theta}}{The binomial cumulative distribution function of \farg{n}
     successes in \farg{N} trials given chance of success \farg{theta}}
+%
+  \fitem{real}{binomial\_cdf\_log}{ints \farg{n}, ints \farg{N}, reals
+    \farg{theta}}{The log of the binomial cumulative distribution function of 
+    \farg{n} successes in \farg{N} trials given chance of success \farg{theta}}
+%
+  \fitem{real}{binomial\_ccdf\_log}{ints \farg{n}, ints \farg{N}, reals
+    \farg{theta}}{The log of the binomial complementary cumulative distribution 
+     function of \farg{n} successes in \farg{N} trials given chance of success
+    \farg{theta}}
 %
 \end{description}
 %
@@ -237,13 +253,26 @@ where the beta function $\Betafun(x,y)$ is defined for $x \in
   of \farg{n} successes in \farg{N} trials given prior success count
   (plus one) of \farg{alpha} and prior failure count (plus one) of
   \farg{beta}}
+%
+\fitem{real}{beta\_binomial\_cdf\_log}{ints \farg{n}, ints \farg{N}, reals
+  \farg{alpha}, reals \farg{beta}}{The log of the beta-binomial cumulative
+  distribution function
+  of \farg{n} successes in \farg{N} trials given prior success count
+  (plus one) of \farg{alpha} and prior failure count (plus one) of
+  \farg{beta}}
+%
+\fitem{real}{beta\_binomial\_ccdf\_log}{ints \farg{n}, ints \farg{N}, reals
+  \farg{alpha}, reals \farg{beta}}{The log of the beta-binomial complementary
+   cumulative distribution function of \farg{n} successes in \farg{N} trials 
+   given prior success count (plus one) of \farg{alpha} and prior failure count 
+  (plus one) of \farg{beta}}
 \end{description}
 %
 \begin{description}
-\fitem{int}{beta\_binomial\_rng}{int \farg{N}, real \farg{alpha}, real \farg{beta}}{Generate a beta-binomial variate with \farg{N} trials, prior success count
-  (plus one) of \farg{alpha}, and prior failure count (plus one) of
-  \farg{beta}; may only be used in
-  generated quantities block}
+\fitem{int}{beta\_binomial\_rng}{int \farg{N}, real \farg{alpha}, real 
+   \farg{beta}}{Generate a beta-binomial variate with \farg{N} trials, prior 
+   success count (plus one) of \farg{alpha}, and prior failure count (plus 
+   one) of \farg{beta}; may only be used in generated quantities block}
 \end{description}
 
 
@@ -276,9 +305,10 @@ then for $n \in \setlist{\max(0,N-b),\ldots,\min(a,N)}$,
 \end{description}
 %
 \begin{description}
-\fitem{int}{hypergeometric\_rng}{int \farg{N}, real \farg{a}, real \farg{b}}{Generate a hypergeometric variate with \farg{N} trials, total success count of
-    \farg{a}, and total failure count of \farg{b}; may only be used in
-  generated quantities block}
+\fitem{int}{hypergeometric\_rng}{int \farg{N}, real \farg{a}, real 
+   \farg{b}}{Generate a hypergeometric variate with \farg{N} trials, total 
+    success count of \farg{a}, and total failure count of \farg{b}; may only 
+    be used in generated quantities block}
 \end{description}
 
 
@@ -286,21 +316,40 @@ then for $n \in \setlist{\max(0,N-b),\ldots,\min(a,N)}$,
 
 \section{Categorical Distribution}
 
-\subsubsection{Probability Mass Function}
+\subsubsection{Probability Mass Functions}
 
-If $N \in \nats$ and $\theta \in \mbox{$N$-simplex}$, then for $y \in
+If $N \in \nats$, $N > 0$, and $\theta \in \mbox{$N$-simplex}$, then for $y \in
 \setlist{1,\ldots,N}$, 
+%
 \[
-\distro{Categorical}(y|\theta) = \theta_n.
+\distro{Categorical}(y|\theta) = \theta_y.
 \]
+%
+In addition, Stan provides a log-odds scaled categorical distribution, 
+%
+\[
+\distro{CategoricalLogit}(y|\beta)
+= \distro{Categorical}(y|\mbox{softmax}(\beta)).
+\]
+%
+See \refsection{softmax} for the definition of the softmax function.
 
 
 \subsubsection{Stan Functions}
 
+All of the categorical distributions are vectorized so that the
+outcome \farg{y} can be a single integer (type \code{int}) or an array
+of integers (type \code{int[]}).
+
 \begin{description}
-\fitem{real}{categorical\_log}{int \farg{y}, vector \farg{theta}}{The
-  log categorical probability mass function with outcome \farg{y} in 
-$1:N$ given $N$-simplex distribution parameter \farg{theta}}
+\fitem{real}{categorical\_log}{ints \farg{y}, vector \farg{theta}}{The
+  log categorical probability mass function with outcome(s) \farg{y} in 
+$1:N$ given $N$-simplex distribution parameter \farg{theta}.}
+%
+\fitem{real}{categorical\_logit\_log}{ints \farg{y}, vector
+  \farg{beta}}{The log categorical probability mass function with
+  outcome(s) \farg{y} in $1:N$ given log-odds of outcomes \farg{beta}.}
+%
 \end{description}
 %
 \begin{description}
@@ -347,8 +396,8 @@ $\mbox{logit}^{-1}(-\infty) = 0$ and $\mbox{logit}^{-1}(\infty) = 1$.
     \farg{k} given linear predictor \farg{eta} and cutpoints
     \farg{c}.}
 %
-\fitem{int}{ordered\_logistic\_rng}{real \farg{eta}, vector \farg{c}}{Generate an
-  ordered logistic variate with linear predictor \farg{eta} and cutpoints
+\fitem{int}{ordered\_logistic\_rng}{real \farg{eta}, vector \farg{c}}{Generate 
+  an ordered logistic variate with linear predictor \farg{eta} and cutpoints
     \farg{c}; may only be used in generated quantities block}
 \end{description}
 
@@ -417,6 +466,16 @@ where $\Psi$ is the digamma function, defined as
    distribution function
    of \farg{n} given shape \farg{alpha} and inverse scale \farg{beta}}
 %
+ \fitem{real}{neg\_binomial\_cdf\_log}{ints \farg{n}, reals
+   \farg{alpha}, reals \farg{beta}}{The log of the negative binomial cumulative
+   distribution function
+   of \farg{n} given shape \farg{alpha} and inverse scale \farg{beta}}
+%
+ \fitem{real}{neg\_binomial\_ccdf\_log}{ints \farg{n}, reals
+   \farg{alpha}, reals \farg{beta}}{The log of the negative binomial 
+   complementary cumulative distribution function of \farg{n} 
+   given shape \farg{alpha} and inverse scale \farg{beta}}
+%
 \fitem{int}{neg\_binomial\_rng}{real \farg{alpha}, real \farg{beta}}{Generate a
   negative binomial variate with shape \farg{alpha} and inverse scale
   \farg{beta}; may only be used in generated quantities block}
@@ -447,8 +506,14 @@ If $\lambda \in \posreals$, then for $n \in \nats$,
 \fitem{real}{poisson\_cdf}{ints \farg{n}, reals \farg{lambda}}{The
   Poisson cumulative distribution function of \farg{n} given rate \farg{lambda}}
 %
-\fitem{int}{poisson\_rng}{real \farg{lambda}}{Generate a
-  poisson variate with rate \farg{lambda}; may only be used in generated quantities block}
+\fitem{real}{poisson\_cdf\_log}{ints \farg{n}, reals \farg{lambda}}{The log of the 
+  Poisson cumulative distribution function of \farg{n} given rate \farg{lambda}}
+%
+\fitem{real}{poisson\_ccdf\_log}{ints \farg{n}, reals \farg{lambda}}{The log of the 
+  Poisson complementary cumulative distribution function of \farg{n} given rate \farg{lambda}}
+%
+\fitem{int}{poisson\_rng}{real \farg{lambda}}{Generate a poisson variate with 
+ rate \farg{lambda}; may only be used in generated quantities block}
 \end{description}
 
 
@@ -516,7 +581,8 @@ where the multinomial coefficient is defined by
     \code{N = sum(\farg{y})}}
 %
 \fitem{vector}{multinomial\_rng}{vector \farg{theta}, int \farg{N}}{Generate a
-  multinomial variate with simplex distribution parameter \farg{theta} and (implicit) total count $N$; may only be used in generated quantities block}
+  multinomial variate with simplex distribution parameter \farg{theta} and 
+  (implicit) total count $N$; may only be used in generated quantities block}
 \end{description}
 
 
@@ -558,6 +624,14 @@ If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in
 \fitem{real}{normal\_cdf}{reals \farg{y}, reals \farg{mu}, reals
   \farg{sigma}}{The cumulative normal distribution of \farg{y}
   given location \farg{mu} and scale \farg{sigma}}
+%
+\fitem{real}{normal\_cdf\_log}{reals \farg{y}, reals \farg{mu}, reals
+  \farg{sigma}}{The log of the cumulative normal distribution of \farg{y}
+  given location \farg{mu} and scale \farg{sigma}}
+%
+\fitem{real}{normal\_ccdf\_log}{reals \farg{y}, reals \farg{mu}, reals
+  \farg{sigma}}{The log of the complementary cumulative normal distribution 
+  of \farg{y} given location \farg{mu} and scale \farg{sigma}}
 \end{description}
 %
 \begin{description}
@@ -585,15 +659,25 @@ If $\mu \in \reals$, $\sigma \in \posreals$, and $\lambda \in
 \subsubsection{Stan Functions}
 
 \begin{description}
-  \fitem{real}{exp\_mod\_normal\_log}{reals \farg{y}, \\ reals
+  \fitem{real}{exp\_mod\_normal\_log}{reals \farg{y}, reals
     \farg{mu}, reals \farg{sigma}, \newline reals \farg{lambda}}{The
     log of the exponentially modified normal density of \farg{y} given
     location \farg{mu}, scale \farg{sigma}, and shape \farg{lambda}}
 %
   \fitem{real}{exp\_mod\_normal\_cdf}{reals \farg{y}, reals \farg{mu},
-    reals \farg{sigma}, reals \farg{lambda}}{The cumulative
-    exponentially modified normal distribution of \farg{y} given
-    location \farg{mu}, scale \farg{sigma}, and shape \farg{lambda}}
+    reals \farg{sigma}, reals \farg{lambda}}{The
+    exponentially modified normal cumulative distribution function of \farg{y} 
+    given location \farg{mu}, scale \farg{sigma}, and shape \farg{lambda}}
+%
+  \fitem{real}{exp\_mod\_normal\_cdf\_log}{reals \farg{y}, reals \farg{mu},
+    reals \farg{sigma}, reals \farg{lambda}}{The log of the
+    exponentially modified normal cumulative distribution function of \farg{y} 
+    given location \farg{mu}, scale \farg{sigma}, and shape \farg{lambda}}
+%
+  \fitem{real}{exp\_mod\_normal\_ccdf\_log}{reals \farg{y}, reals \farg{mu},
+    reals \farg{sigma}, reals \farg{lambda}}{The log of the
+    exponentially modified normal complementary cumulative distribution 
+    function of \farg{y} given location \farg{mu}, scale \farg{sigma}, and shape \farg{lambda}}
 \end{description}
 %
 \begin{description}
@@ -626,12 +710,23 @@ then for $y \in \reals$,
 
 \begin{description}
   \fitem{real}{skew\_normal\_log}{reals \farg{y}, reals \farg{mu}, reals
-    \farg{sigma}, reals \farg{alpha}}{The log of the skew normal density of \farg{y} given
-    location \farg{mu}, scale \farg{sigma}, and shape \farg{alpha}}
+    \farg{sigma}, reals \farg{alpha}}{The log of the skew normal density 
+	of \farg{y} given location \farg{mu}, scale \farg{sigma}, and 
+	shape \farg{alpha}}
 %
 \fitem{real}{skew\_normal\_cdf}{reals \farg{y}, reals \farg{mu}, reals
-  \farg{sigma}, reals \farg{alpha}}{The cumulative skew normal
-  distribution of \farg{y} given location \farg{mu}, scale
+  \farg{sigma}, reals \farg{alpha}}{The skew normal
+  distribution function of \farg{y} given location \farg{mu}, scale
+  \farg{sigma}, and shape \farg{alpha}}
+%
+\fitem{real}{skew\_normal\_cdf\_log}{reals \farg{y}, reals \farg{mu}, reals
+  \farg{sigma}, reals \farg{alpha}}{The log of the skew normal cumulative
+  distribution function of \farg{y} given location \farg{mu}, scale
+  \farg{sigma}, and shape \farg{alpha}}
+%
+\fitem{real}{skew\_normal\_ccdf\_log}{reals \farg{y}, reals \farg{mu}, reals
+  \farg{sigma}, reals \farg{alpha}}{The log of the skew normal complementary 
+   cumulative distribution function of \farg{y} given location \farg{mu}, scale
   \farg{sigma}, and shape \farg{alpha}}
 \end{description}
 %
@@ -676,6 +771,17 @@ then for $y \in \reals$,
     distribution function of \farg{y}
     given degrees of freedom \farg{nu}, location \farg{mu}, and scale
     \farg{sigma}}
+%
+  \fitem{real}{student\_t\_cdf\_log}{reals \farg{y}, reals \farg{nu}, reals
+    \farg{mu}, reals \farg{sigma}}{The log of the Student-$t$ cumulative
+    distribution function of \farg{y}
+    given degrees of freedom \farg{nu}, location \farg{mu}, and scale
+    \farg{sigma}}
+%
+  \fitem{real}{student\_t\_ccdf\_log}{reals \farg{y}, reals \farg{nu}, reals
+    \farg{mu}, reals \farg{sigma}}{The log of the Student-$t$ complementary 
+    cumulative distribution function of \farg{y} given degrees of freedom 
+    \farg{nu}, location \farg{mu}, and scale \farg{sigma}}
 \end{description}
 %
 \begin{description}
@@ -711,8 +817,16 @@ If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in \reals$,
  \farg{mu} and scale \farg{sigma}}
 %
 \fitem{real}{cauchy\_cdf}{reals \farg{y}, reals \farg{mu}, reals
- \farg{sigma}}{ The Cauchy cumulative distribution function of \farg{y} given location
- \farg{mu} and scale \farg{sigma}}
+ \farg{sigma}}{ The Cauchy cumulative distribution function of \farg{y} given 
+  location \farg{mu} and scale \farg{sigma}}
+%
+\fitem{real}{cauchy\_cdf\_log}{reals \farg{y}, reals \farg{mu}, reals
+ \farg{sigma}}{ The log of the Cauchy cumulative distribution function 
+	of \farg{y} given location \farg{mu} and scale \farg{sigma}}
+%
+\fitem{real}{cauchy\_ccdf\_log}{reals \farg{y}, reals \farg{mu}, reals
+ \farg{sigma}}{ The log of the Cauchy complementary cumulative distribution 
+  function of \farg{y} given location \farg{mu} and scale \farg{sigma}}
 \end{description}
 %
 \begin{description}
@@ -740,12 +854,25 @@ If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in \reals$,
 \fitem{real}{double\_exponential\_log}{reals \farg{y}, reals \farg{mu},
 reals \farg{sigma}}{ The log of the double exponential density of \farg{y} given
 location \farg{mu} and scale \farg{sigma}}
+%
+\fitem{real}{double\_exponential\_cdf}{reals \farg{y}, reals \farg{mu},
+reals \farg{sigma}}{ The double exponential cumulative distribution
+function of \farg{y} given location \farg{mu} and scale \farg{sigma}}
+%
+\fitem{real}{double\_exponential\_cdf\_log}{reals \farg{y}, reals \farg{mu},
+reals \farg{sigma}}{ The log of the double exponential cumulative distribution
+function of \farg{y} given location \farg{mu} and scale \farg{sigma}}
+%
+\fitem{real}{double\_exponential\_ccdf\_log}{reals \farg{y}, reals \farg{mu},
+reals \farg{sigma}}{ The log of the double exponential complementary cumulative distribution
+function of \farg{y} given location \farg{mu} and scale \farg{sigma}}
 \end{description}
 %
 \begin{description}
 \fitem{real}{double\_exponential\_rng}{real \farg{mu}, real
   \farg{sigma}}{Generate a double exponential variate with location
-  \farg{mu} and scale \farg{sigma}; may only be used in generated quantities block}
+  \farg{mu} and scale \farg{sigma}; may only be used in generated 
+  quantities block}
 \end{description}
 
 
@@ -774,8 +901,17 @@ reals \farg{sigma}}{ The log of the logistic density of \farg{y} given
 location \farg{mu} and scale \farg{sigma}}
 %
 \fitem{real}{logistic\_cdf}{reals \farg{y}, reals \farg{mu},
-reals \farg{sigma}}{ The logistic cumulative distribution function of \farg{y} given
-location \farg{mu} and scale \farg{sigma}}
+  reals \farg{sigma}}{ The logistic cumulative distribution function of 
+  \farg{y} given location \farg{mu} and scale \farg{sigma}}
+%
+\fitem{real}{logistic\_cdf\_log}{reals \farg{y}, reals \farg{mu},
+  reals \farg{sigma}}{ The log of the logistic cumulative distribution 
+  function of \farg{y} given location \farg{mu} and scale \farg{sigma}}
+%
+\fitem{real}{logistic\_ccdf\_log}{reals \farg{y}, reals \farg{mu},
+  reals \farg{sigma}}{ The log of the logistic complementary cumulative 
+  distribution function of \farg{y} given location \farg{mu} and scale 
+  \farg{sigma}}
 \end{description}
 %
 \begin{description}
@@ -803,11 +939,20 @@ If $\mu \in \reals$ and $\beta \in \posreals$, then for $y \in \reals$,
 
 \begin{description}
   \fitem{real}{gumbel\_log}{reals \farg{y}, reals \farg{mu}, reals
-    \farg{beta}}{The log of the gumbel density of \farg{y} given location \farg{mu} and scale \farg{beta}}
+    \farg{beta}}{The log of the gumbel density of \farg{y} given location 
+    \farg{mu} and scale \farg{beta}}
 %
 \fitem{real}{gumbel\_cdf}{reals \farg{y}, reals \farg{mu}, reals
-  \farg{beta}}{The cumulative gumbel distribution of \farg{y}
+  \farg{beta}}{The gumbel cumulative distribution function of \farg{y}
   given location \farg{mu} and scale \farg{beta}}
+%
+\fitem{real}{gumbel\_cdf\_log}{reals \farg{y}, reals \farg{mu}, reals
+  \farg{beta}}{The log of the gumbel cumulative distribution function of \farg{y}
+  given location \farg{mu} and scale \farg{beta}}
+%
+\fitem{real}{gumbel\_ccdf\_log}{reals \farg{y}, reals \farg{mu}, reals
+  \farg{beta}}{The log of the gumbel complementary cumulative distribution 
+   function of \farg{y} given location \farg{mu} and scale \farg{beta}}
 \end{description}
 %
 \begin{description}
@@ -853,9 +998,17 @@ If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in
   \farg{sigma}}{The log of the lognormal density of \farg{y} given location
   \farg{mu} and scale \farg{sigma}}
 %
-\fitem{real}{lognormal\_cdf}{real \farg{y}, real \farg{mu}, real
-  \farg{sigma}}{The cumulative lognormal distribution of \farg{y}
+\fitem{real}{lognormal\_cdf}{reals \farg{y}, reals \farg{mu}, reals
+  \farg{sigma}}{The cumulative lognormal distribution function of \farg{y}
   given location \farg{mu} and scale \farg{sigma}}
+%
+\fitem{real}{lognormal\_cdf\_log}{reals \farg{y}, reals \farg{mu}, reals
+  \farg{sigma}}{The log of the lognormal cumulative distribution fucntion 
+   of \farg{y} given location \farg{mu} and scale \farg{sigma}}
+%
+\fitem{real}{lognormal\_ccdf\_log}{reals \farg{y}, reals \farg{mu}, reals
+  \farg{sigma}}{The log of the lognormal complementary cumulative distribution 
+  function of \farg{y} given location \farg{mu} and scale \farg{sigma}}
 \end{description}
 %
 \begin{description}
@@ -888,6 +1041,18 @@ y^{\nu/2 - 1}
 \fitem{real}{chi\_square\_log}{reals \farg{y}, reals \farg{nu}}{The
   log of the Chi-square density of \farg{y} given degrees of freedom
   \farg{nu}}
+%
+\fitem{real}{chi\_square\_cdf}{reals \farg{y}, reals \farg{nu}}{The
+   Chi-square cumulative distribution function of \farg{y} given degrees 
+   of freedom \farg{nu}}
+%
+\fitem{real}{chi\_square\_cdf\_log}{reals \farg{y}, reals \farg{nu}}{The 
+   log of the Chi-square cumulative distribution function of 
+   \farg{y} given degrees of freedom \farg{nu}}
+%
+\fitem{real}{chi\_square\_ccdf\_log}{reals \farg{y}, reals \farg{nu}}{The 
+   log of the complementary Chi-square cumulative distribution 
+   function of \farg{y} given degrees of freedom \farg{nu}}
 \end{description}
 %
 \begin{description}
@@ -924,8 +1089,16 @@ y^{-(\nu/2 - 1)}
   degrees of freedom \farg{nu}}
 %
 \fitem{real}{inv\_chi\_square\_cdf}{reals \farg{y}, reals
-  \farg{nu}}{The inverse Chi-squared cumulative distribution function of \farg{y} given
-  degrees of freedom \farg{nu}}
+  \farg{nu}}{The inverse Chi-squared cumulative distribution function of 
+  \farg{y} given degrees of freedom \farg{nu}}
+%
+\fitem{real}{inv\_chi\_square\_cdf\_log}{reals \farg{y}, reals
+  \farg{nu}}{The log of the inverse Chi-squared cumulative distribution 
+   function of \farg{y} given degrees of freedom \farg{nu}}
+%
+\fitem{real}{inv\_chi\_square\_ccdf\_log}{reals \farg{y}, reals
+  \farg{nu}}{The log of the inverse Chi-squared complementary cumulative 
+  distribution function of \farg{y} given degrees of freedom \farg{nu}}
 \end{description}
 %
 \begin{description}
@@ -973,6 +1146,18 @@ y^{-(\nu/2 + 1)}
     cumulative distribution function
     of \farg{y} given degrees of freedom \farg{nu} and scale
     \farg{s}}
+%
+  \fitem{real}{scaled\_inv\_chi\_square\_cdf\_log}{reals \farg{y}, reals
+    \farg{nu}, reals \farg{s}}{The log of the scaled inverse Chi-square
+    cumulative distribution function
+    of \farg{y} given degrees of freedom \farg{nu} and scale
+    \farg{s}}
+%
+  \fitem{real}{scaled\_inv\_chi\_square\_ccdf\_log}{reals \farg{y}, reals
+    \farg{nu}, reals \farg{s}}{The log of the scaled inverse Chi-square
+    complementary cumulative distribution function
+    of \farg{y} given degrees of freedom \farg{nu} and scale
+    \farg{s}}
 \end{description}
 %
 \begin{description}
@@ -1002,15 +1187,23 @@ If $\beta \in \posreals$, then for $y \in \posreals$,
   \fitem{real}{exponential\_log}{reals \farg{y}, reals \farg{beta}}{The
     log of the exponential density of \farg{y} given inverse scale \farg{beta}}
 %
-\fitem{real}{exponential\_cdf}{real \farg{y}, real \farg{beta}}{The
-  cumulative distribution function of \farg{y} given inverse scale
+\fitem{real}{exponential\_cdf}{reals \farg{y}, reals \farg{beta}}{The
+  exponential cumulative distribution function of \farg{y} given inverse scale
   \farg{beta}}
+%
+\fitem{real}{exponential\_cdf\_log}{reals \farg{y}, reals \farg{beta}}{The
+  log of the exponential cumulative distribution function of \farg{y} given 
+  inverse scale \farg{beta}}
+%
+\fitem{real}{exponential\_ccdf\_log}{reals \farg{y}, reals \farg{beta}}{The
+  log of the exponential complementary cumulative distribution function 
+  of \farg{y} given inverse scale \farg{beta}}
 \end{description}
 %
 \begin{description}
 \fitem{real}{exponential\_rng}{real \farg{beta}}{Generate an
-  exponential variate with inverse scale \farg{beta}; may only be used in generated 
-quantities block}
+  exponential variate with inverse scale \farg{beta}; may only be used in 
+  generated quantities block}
 \end{description}
 
 
@@ -1039,9 +1232,17 @@ y^{\alpha - 1}
   \farg{beta}}{The log of the gamma density of \farg{y} given shape
   \farg{alpha} and inverse scale \farg{beta}}
 %
-%  \fitem{real}{gamma\_cdf}{real \farg{y}, real \farg{alpha}, real
- %  \farg{beta}}{The cumulative distribution function of \farg{y} given shape
- %  \farg{alpha} and inverse scale \farg{beta}}
+ \fitem{real}{gamma\_cdf}{reals \farg{y}, reals \farg{alpha}, reals
+   \farg{beta}}{The cumulative gamma distribution function of \farg{y} given shape
+   \farg{alpha} and inverse scale \farg{beta}}
+%
+ \fitem{real}{gamma\_cdf\_log}{reals \farg{y}, reals \farg{alpha}, reals
+   \farg{beta}}{The log of the cumulative gamma distribution function of \farg{y} given shape
+   \farg{alpha} and inverse scale \farg{beta}}
+%
+ \fitem{real}{gamma\_ccdf\_log}{reals \farg{y}, reals \farg{alpha}, reals
+   \farg{beta}}{The log of the complementary cumulative gamma distribution function of 
+   \farg{y} given shape \farg{alpha} and inverse scale \farg{beta}}
 \end{description}
 %
 \begin{description}
@@ -1074,12 +1275,20 @@ y^{-(\alpha + 1)}
 
 \begin{description}
 \fitem{real}{inv\_gamma\_log}{reals \farg{y}, reals \farg{alpha}, reals
-\farg{beta}}{The log of the inverse gamma density of \farg{y} given shape
-\farg{alpha} and scale \farg{beta}}
+  \farg{beta}}{The log of the inverse gamma density of \farg{y} given shape
+  \farg{alpha} and scale \farg{beta}}
 %
 \fitem{real}{inv\_gamma\_cdf}{reals \farg{y}, reals \farg{alpha}, reals
-\farg{beta}}{The inverse gamma cumulative distribution function of \farg{y} given shape
-\farg{alpha} and scale \farg{beta}}
+  \farg{beta}}{The inverse gamma cumulative distribution function of \farg{y} 
+  given shape \farg{alpha} and scale \farg{beta}}
+%
+\fitem{real}{inv\_gamma\_cdf\_log}{reals \farg{y}, reals \farg{alpha}, reals
+  \farg{beta}}{The log of the inverse gamma cumulative distribution function 
+  of \farg{y} given shape \farg{alpha} and scale \farg{beta}}
+%
+\fitem{real}{inv\_gamma\_ccdf\_log}{reals \farg{y}, reals \farg{alpha}, reals
+  \farg{beta}}{The log of the inverse gamma complementary cumulative distribution 
+  function of \farg{y} given shape \farg{alpha} and scale \farg{beta}}
 \end{description}
 %
 \begin{description}
@@ -1112,12 +1321,21 @@ If $\alpha \in \posreals$ and $\sigma \in [0,\infty)$, then for $y \in
 
 \begin{description}
 \fitem{real}{weibull\_log}{reals \farg{y}, reals \farg{alpha}, reals
-\farg{sigma}}{The log of the Weibull density of \farg{y} given shape
-\farg{alpha} and scale \farg{sigma}}
+  \farg{sigma}}{The log of the Weibull density of \farg{y} given shape
+  \farg{alpha} and scale \farg{sigma}}
 %
-\fitem{real}{weibull\_cdf}{real \farg{y}, real \farg{alpha}, real
-\farg{sigma}}{The Weibull cumulative distribution of \farg{y} given shape
-\farg{alpha} and scale \farg{sigma}}
+\fitem{real}{weibull\_cdf}{reals \farg{y}, reals \farg{alpha}, reals
+  \farg{sigma}}{The Weibull cumulative distribution function of \farg{y} given
+  shape \farg{alpha} and scale \farg{sigma}}
+%
+\fitem{real}{weibull\_cdf\_log}{reals \farg{y}, reals \farg{alpha}, reals
+  \farg{sigma}}{The log of the Weibull cumulative distribution function of 
+  \farg{y} given shape \farg{alpha} and scale \farg{sigma}}
+%
+\fitem{real}{weibull\_ccdf\_log}{reals \farg{y}, reals \farg{alpha}, reals
+  \farg{sigma}}{The log of the Weibull complementary cumulative 
+  distribution function of \farg{y} given shape \farg{alpha} and scale 
+  \farg{sigma}}
 \end{description}
 %
 \begin{description}
@@ -1150,6 +1368,13 @@ non-negative real numbers.
 %
 \fitem{real}{rayleigh\_cdf}{real \farg{y}, real
 \farg{sigma}}{The Rayleigh cumulative distribution of \farg{y} given scale \farg{sigma}}
+%
+\fitem{real}{rayleigh\_cdf\_log}{real \farg{y}, real \farg{sigma}}{The log of the
+ Rayleigh cumulative distribution of \farg{y} given scale \farg{sigma}}
+%
+\fitem{real}{rayleigh\_ccdf\_log}{real \farg{y}, real
+\farg{sigma}}{The log of the Rayleigh complementary cumulative distribution 
+ of \farg{y} given scale \farg{sigma}}
 \end{description}
 %
 \begin{description}
@@ -1191,12 +1416,22 @@ $y \in \posreals$,
   \fitem{real}{pareto\_cdf}{reals \farg{y}, reals \farg{y\_min}, reals
     \farg{alpha}}{The Pareto cumulative distribution function of \farg{y} given
     positive minimum value \farg{y\_min} and shape \farg{alpha}}
+%
+  \fitem{real}{pareto\_cdf\_log}{reals \farg{y}, reals \farg{y\_min}, reals
+    \farg{alpha}}{The log of the Pareto cumulative distribution function of 
+    \farg{y} given positive minimum value \farg{y\_min} and shape \farg{alpha}}
+%
+  \fitem{real}{pareto\_ccdf\_log}{reals \farg{y}, reals \farg{y\_min}, reals
+    \farg{alpha}}{The log of the Pareto complementary cumulative distribution
+    function of \farg{y} given positive minimum value \farg{y\_min} and shape 
+    \farg{alpha}}
 \end{description}
 %
 \begin{description}
 \fitem{real}{pareto\_rng}{real \farg{y\_min}, real
-  \farg{alpha}}{Generate a Pareto variate with positive minimum value \farg{y\_min} and shape \farg{alpha}; may only be used in generated 
-quantities block}
+  \farg{alpha}}{Generate a Pareto variate with positive minimum value 
+  \farg{y\_min} and shape \farg{alpha}; may only be used in generated 
+  quantities block}
 \end{description}
 
 
@@ -1236,8 +1471,18 @@ where the beta function $\Betafun()$ is as defined in \refsection{betafun}
     \farg{alpha} and prior failures (plus one) \farg{beta}}
 %
   \fitem{real}{beta\_cdf}{reals \farg{theta}, reals \farg{alpha}, reals
-    \farg{beta}}{The beta cumulative distribution function of \code{theta} in $[0,1]$
-    given positive prior successes (plus one)
+    \farg{beta}}{The beta cumulative distribution function of \code{theta} 
+    in $[0,1]$ given positive prior successes (plus one)
+    \farg{alpha} and prior failures (plus one) \farg{beta}}
+%
+  \fitem{real}{beta\_cdf\_log}{reals \farg{theta}, reals \farg{alpha}, reals
+    \farg{beta}}{The log of the beta cumulative distribution function of 
+    \code{theta} in $[0,1]$ given positive prior successes (plus one)
+    \farg{alpha} and prior failures (plus one) \farg{beta}}
+%
+  \fitem{real}{beta\_ccdf\_log}{reals \farg{theta}, reals \farg{alpha}, reals
+    \farg{beta}}{The log of the beta complementary cumulative distribution 
+    function of \code{theta} in $[0,1]$ given positive prior successes (plus one)
     \farg{alpha} and prior failures (plus one) \farg{beta}}
 \end{description}
 %
@@ -1276,6 +1521,19 @@ If $\alpha \in \reals$ and $\beta \in (\alpha,\infty)$, then for $y
 \fitem{real}{uniform\_log}{reals \farg{y}, reals \farg{alpha}, reals
   \farg{beta}}{The log of the uniform density of \farg{y} given lower bound
   \farg{alpha} and upper bound \farg{beta}}
+%
+\fitem{real}{uniform\_cdf}{reals \farg{y}, reals \farg{alpha}, reals
+  \farg{beta}}{The uniform cumulative distribution function of \farg{y} given 
+  lower bound \farg{alpha} and upper bound \farg{beta}}
+%
+\fitem{real}{uniform\_cdf\_log}{reals \farg{y}, reals \farg{alpha}, reals
+  \farg{beta}}{The log of the uniform cumulative distribution function of 
+  \farg{y} given lower bound \farg{alpha} and upper bound \farg{beta}}
+%
+\fitem{real}{uniform\_ccdf\_log}{reals \farg{y}, reals \farg{alpha}, reals
+  \farg{beta}}{The log of the uniform complementary cumulative distribution 
+  function of \farg{y} given lower bound \farg{alpha} and upper bound 
+  \farg{beta}}
 \end{description}
 %
 \begin{description}
@@ -1438,6 +1696,55 @@ $y \in \reals^K$,
   of freedom \farg{nu}, location \farg{mu}, and scale matrix \farg{S}; 
 may only be used in generated quantities block}
 \end{description}
+
+
+\section{Gaussian Dynamic Linear Models}
+\label{sec:guass-dynam-line}
+
+A Gaussian Dynamic Linear model is defined as follows,
+For $t \in 1, \dots, T$,
+\[
+  \begin{aligned}[t]
+    y_{t} &\sim N(F' \theta_{t}, V) \\
+    \theta_{t} &\sim N(G \theta_{t - 1}, W) \\
+    \theta_{0} &\sim N(m_{0}, C_{0}) 
+  \end{aligned}
+\]
+where $y$ is $n \times T$ matrix where rows are variables and columns
+are observations. These functions calculate the log-likelihood of the
+observations marginalizing over the latent states ($p(y | F, G, V, W,
+m_{0}, C_{0})$).  This log-likelihood is system is calculated using
+the the Kalman Filter.  If $V$ is diagonal, then a more efficient
+algorithm which sequentially processes observations and avoids a
+matrix inversions can be used \citep[Sec~6.4]{DurbinKoopman:2001}.
+
+\subsubsection{Stan Functions}
+
+\begin{description}
+%
+\fitem{real}{gaussian\_dlm\_obs\_log}{vector \farg{y}, matrix \farg{F},
+  matrix \farg{G}, matrix \farg{V}, matrix \farg{W}, vector
+  \farg{m0}, matrix \farg{C0}} {The log of the density of the
+  Gaussian Dynamic Linear model with observation matrix \farg{y} in
+  which rows are variables and columns are observations, design
+  matrix \farg{F}, transition matrix \farg{G}, observation
+  covariance matrix \farg{V}, system covariance matrix \farg{W}, and
+  the initial state is distributed normal with mean \farg{m0} and
+  covariance \farg{C0}.}
+% 
+%
+\fitem{real}{gaussian\_dlm\_obs\_log}{vector \farg{y}, matrix \farg{F},
+  matrix \farg{G}, vector \farg{V}, matrix \farg{W}, vector \farg{m0},
+  matrix \farg{C0}} {The log of the density of the Gaussian Dynamic
+  Linear model with observation matrix \farg{y} in which rows are
+  variables and columns are observations, design matrix \farg{F},
+  transition matrix \farg{G}, observation covariance matrix with
+  diagonal \farg{V}, system covariance matrix \farg{W}, and the
+  initial state is distributed normal with mean \farg{m0} and
+  covariance \farg{C0}.}
+%
+\end{description}
+
 
 \chapter{Simplex Distributions}
 
