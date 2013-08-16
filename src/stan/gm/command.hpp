@@ -626,6 +626,10 @@ namespace stan {
           write_error_msg(&std::cout, e);
           lp = -std::numeric_limits<double>::infinity();
         }
+        if (save_warmup) {
+          sample_stream << lp << ',';
+          model.write_csv(base_rng, cont_params, disc_params, sample_stream);
+        }
         
         double lastlp = lp - 1;
         std::cout << "initial log joint probability = " << lp << std::endl;
@@ -701,7 +705,12 @@ namespace stan {
                                                        epsilon, &std::cout);
 
         double lp = ng.logp();
-        
+        if (save_warmup) {
+          sample_stream << lp << ',';
+          model.write_csv(base_rng, cont_params, disc_params, sample_stream);
+          sample_stream.flush();
+        }
+
         double lastlp = lp - 1;
         std::cout << "initial log joint probability = " << lp << std::endl;
         int m = 0;
@@ -784,6 +793,11 @@ namespace stan {
         double lp = ng.logp();
         
         std::cout << "initial log joint probability = " << lp << std::endl;
+        if (save_warmup) {
+          sample_stream << lp << ',';
+          model.write_csv(base_rng,cont_params,disc_params,sample_stream);
+          sample_stream.flush();
+        }
         int m = 0;
         int ret = 0;
         for (size_t i = 0; i < num_iterations && ret == 0; i++) {
