@@ -598,9 +598,9 @@ arguments within each category are unordered so that, for example,
 \begin{quote}
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
 > ./model output sample=samples.csv diagnostic=diagnostics.csv random seed=1
-> ./model output random seed=1
-> ./model output random seed=1 sample=samples.csv diagnostic=diagnostics.csv 
-> ./model output random seed=1 diagnostic=diagnostics.csv sample=samples.csv 
+> ./model output diagnostic=diagnostics.csv sample=samples.csv random seed=1
+> ./model random seed=1 output sample=samples.csv diagnostic=diagnostics.csv 
+> ./model random seed=1 output diagnostic=diagnostics.csv sample=samples.csv 
 \end{Verbatim}
 \end{quote}
 %
