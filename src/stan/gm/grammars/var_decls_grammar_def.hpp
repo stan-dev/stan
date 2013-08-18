@@ -285,7 +285,7 @@ namespace stan {
     boost::phoenix::function<validate_decl_constraints> 
     validate_decl_constraints_f;
 
-    struct data_section_error_handler
+    struct var_decl_error_handler
     {
 
       template <class, class, class, class>
@@ -307,7 +307,7 @@ namespace stan {
           rest_of_section += last_char;
         }
 
-        cout << std::endl << "ERROR FOUND WHILE PARSING 'data' SECTION:"
+        cout << std::endl << "ERROR FOUND WHILE PARSING 'variable declarations':"
             << std::endl
             << boost::make_iterator_range (_begin, _where)
             << std::endl
@@ -318,7 +318,7 @@ namespace stan {
             << std::endl << std::endl;
       }
     };
-    boost::phoenix::function<data_section_error_handler> data_section_error_handler_f;
+    boost::phoenix::function<var_decl_error_handler> var_decl_error_handler_f;
 
     struct validate_identifier {
       std::set<std::string> reserved_word_set_;
@@ -921,7 +921,7 @@ namespace stan {
 
       on_error<rethrow>(
         var_decls_r,
-        data_section_error_handler_f(_1, _2, _3, _4)
+        var_decl_error_handler_f(_1, _2, _3, _4)
       );
 
     }

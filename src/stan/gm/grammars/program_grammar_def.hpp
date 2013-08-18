@@ -119,9 +119,6 @@ namespace stan {
 
         using boost::spirit::qi::eps;
         using boost::spirit::qi::lit;
-        using boost::spirit::qi::on_error;
-        using boost::spirit::qi::rethrow;
-        using namespace boost::spirit::qi::labels;
 
         // add model_name to var_map with special origin and no 
         var_map_.add(model_name,
@@ -187,6 +184,10 @@ namespace stan {
           > var_decls_g(true,derived_origin) // -constraints
           > *statement_g(false,derived_origin) // -sampling
           > lit('}');
+
+        using boost::spirit::qi::on_error;
+        using boost::spirit::qi::rethrow;
+        using namespace boost::spirit::qi::labels;
 
         on_error<rethrow>(
           program_r,

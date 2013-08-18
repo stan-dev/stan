@@ -28,7 +28,7 @@
 #include <boost/config/warning_disable.hpp>
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/qi_numeric.hpp>
-#include <boost/spirit/include/classic_position_iterator.hpp>
+//#include <boost/spirit/include/classic_position_iterator.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>
 #include <boost/spirit/include/phoenix_function.hpp>
 #include <boost/spirit/include/phoenix_fusion.hpp>
@@ -39,6 +39,9 @@
 #include <boost/tuple/tuple.hpp>
 #include <boost/variant/apply_visitor.hpp>
 #include <boost/variant/recursive_variant.hpp>
+
+#include <boost/spirit/include/version.hpp>
+#include <boost/spirit/include/support_line_pos_iterator.hpp>
 
 #include <stan/gm/ast.hpp>
 #include <stan/gm/grammars/whitespace_grammar.hpp>
@@ -373,6 +376,41 @@ namespace stan {
     boost::phoenix::function<validate_allow_sample> validate_allow_sample_f;
 
 
+    struct statement_error_handler
+    {
+
+      template <class, class, class, class>
+      struct result { typedef void type; };
+
+      template <class Iterator, class I>
+      void operator() (Iterator _begin, Iterator _end, Iterator _where, I const& _info) const
+      {
+        using std::cout;
+        using boost::phoenix::construct;
+        using boost::phoenix::val;
+
+        std::basic_stringstream<char> error_section;
+        error_section << make_iterator_range (_where, _end);
+        char last_char = ' ';
+        std::string rest_of_section = "";
+        while (!error_section.eof() && !(last_char == '}')) {
+          last_char = (char)error_section.get();
+          rest_of_section += last_char;
+        }
+
+        cout << std::endl << "ERROR FOUND WHILE PARSING 'statement':"
+            << std::endl
+            << boost::make_iterator_range (_begin, _where)
+            << std::endl
+            << "EXPECTED: " << _info
+            << " BUT FOUND: " 
+            << std::endl << std::endl
+            << rest_of_section
+            << std::endl << std::endl;
+      }
+    };
+    boost::phoenix::function<statement_error_handler> statement_error_handler_f;
+
     template <typename Iterator>
     statement_grammar<Iterator>::statement_grammar(variable_map& var_map,
                                                    std::stringstream& error_msgs)
@@ -563,6 +601,14 @@ namespace stan {
       no_op_statement_r 
         %= lit(';') [_val = no_op_statement()];  // ok to re-use instance
 
+      using boost::spirit::qi::on_error;
+      using boost::spirit::qi::rethrow;
+      using namespace boost::spirit::qi::labels;
+
+      on_error<rethrow>(
+        statement_r,
+        statement_error_handler_f(_1, _2, _3, _4)
+      ); 
     }
 
   }
