@@ -18,6 +18,9 @@
 #include <boost/variant/apply_visitor.hpp>
 #include <boost/variant/recursive_variant.hpp>
 
+#include <boost/spirit/include/version.hpp>
+#include <boost/spirit/home/support/iterators/line_pos_iterator.hpp>
+
 #include <cstddef>
 #include <iomanip>
 #include <iostream>
@@ -74,6 +77,12 @@ namespace stan {
       using boost::phoenix::construct;
       using boost::phoenix::val;
 
+      std::ostringstream buf;
+      buf << input.rdbuf();
+      std::string stan_string = buf.str();
+      //std::cout << stan_string << std::endl;
+
+      /*
       // iterate over stream input
       typedef istreambuf_iterator<char> base_iterator_type;
       typedef multi_pass<base_iterator_type>  forward_iterator_type;
@@ -83,9 +92,16 @@ namespace stan {
       
       forward_iterator_type fwd_begin = make_default_multi_pass(in_begin);
       forward_iterator_type fwd_end;
-      
-      program_grammar<pos_iterator_type> prog_grammar(model_name);
-      whitespace_grammar<pos_iterator_type> whitesp_grammar;
+      */
+
+      typedef std::string::const_iterator input_iterator;
+      typedef boost::spirit::line_pos_iterator<input_iterator> lp_iterator;
+
+      lp_iterator fwd_begin = lp_iterator (stan_string.begin());
+      lp_iterator fwd_end = lp_iterator (stan_string.end());
+
+      program_grammar<lp_iterator> prog_grammar(model_name);
+      whitespace_grammar<lp_iterator> whitesp_grammar;
       
       bool parse_succeeded = false;
       try {
@@ -101,7 +117,7 @@ namespace stan {
                          << diagnostics 
                          << std::endl;
         }
-      } catch (const expectation_failure<pos_iterator_type>& e) {
+      } catch (const expectation_failure<lp_iterator>& e) {
 
 /*
         const file_position_base<std::string>& pos = e.first.get_position();

@@ -105,7 +105,7 @@ namespace stan {
         using boost::phoenix::val;
 
         std::basic_stringstream<char> error_section;
-        error_section << make_iterator_range (_where, _end);
+        error_section << get_current_line(_begin, _where, _end);
         char last_char = ' ';
         std::string rest_of_section = "";
         while (!error_section.eof() && !(last_char == '}')) {
@@ -114,20 +114,24 @@ namespace stan {
         }
 
         if (!(get_line(_where) == -1)) {
-          error_msgs << "===> Error in input file at line = "
-            << get_line(_where) << std::endl
-            << std::endl;
-        } else {
-          error_msgs << "LOCATION OF PARSING ERROR:"
+          error_msgs << "===> Error in stan model file at line = "
+            << get_line(_where)
+            << " and position "
+            << get_column(_begin, _where) - 1
+            << '.'
+            << std::endl
+            << std::endl
+            << "LOCATION OF PARSING ERROR:"
             << std::endl << std::endl
             << boost::make_iterator_range (_begin, _where)
             << std::endl
             << "EXPECTED: " << _info
             << " BUT FOUND: " 
-            << std::endl << std::endl
+            << std::endl
             << rest_of_section
             << std::endl;
         }
+
 
       }
     };

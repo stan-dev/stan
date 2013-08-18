@@ -10,9 +10,8 @@
 
 namespace stan {
   namespace gm {
-    typedef std::istreambuf_iterator<char> base_iterator_t;
-    typedef boost::spirit::multi_pass<base_iterator_t>  forward_iterator_t;
-    typedef forward_iterator_t pos_iterator_t;
+      typedef std::string::const_iterator input_iterator;
+      typedef boost::spirit::line_pos_iterator<input_iterator> lp_iterator;
   }
 }
 #endif

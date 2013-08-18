@@ -34,5 +34,5 @@ files to try how well error reporting is working.
 To do
 ------------------- 
 
-1) A bunch of syntax and semantic error .stan files need to be added for testing
-2) Include the newer line-pos-iterator to get proper line & pos data
+1) A bunch of syntax and semantic error .stan files need to be added for testing.
+2) Would like to shorten the output to only show a single section.
