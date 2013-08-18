@@ -262,7 +262,6 @@ namespace stan {
       if (parser.help_printed())
         return 0;
       
-
       // Identification
       unsigned int id = dynamic_cast<int_argument*>(parser.arg("id"))->value();
       
@@ -303,7 +302,7 @@ namespace stan {
       
       // Sample output
       std::string sample_file = dynamic_cast<string_argument*>(
-                                parser.arg("output")->arg("sample"))->value();
+                                parser.arg("output")->arg("file"))->value();
 
       bool append_sample = dynamic_cast<bool_argument*>(
                            parser.arg("output")->arg("append_sample"))->value();
@@ -321,7 +320,7 @@ namespace stan {
       
       // Diagnostic output
       std::string diagnostic_file = dynamic_cast<string_argument*>(
-                                    parser.arg("output")->arg("diagnostic"))->value();
+                                    parser.arg("output")->arg("diagnostic_file"))->value();
       
       bool append_diagnostic = dynamic_cast<bool_argument*>(
                                parser.arg("output")->arg("append_diagnostic"))->value();
