@@ -517,10 +517,10 @@ namespace stan {
       //               Model Diagnostics              //
       //////////////////////////////////////////////////
       
-      if (parser.arg("method")->arg("diagnostic")) {
+      if (parser.arg("method")->arg("diagnose")) {
       
         list_argument* test = dynamic_cast<list_argument*>
-                              (parser.arg("method")->arg("diagnostic")->arg("test"));
+                              (parser.arg("method")->arg("diagnose")->arg("test"));
         
         if (test->value() == "gradient") {
           std::cout << std::endl << "TEST GRADIENT MODE" << std::endl;
