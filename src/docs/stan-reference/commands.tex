@@ -549,7 +549,7 @@ a Bash shell on Mac or Linux execute
 > do
 >   ./my_model sample random seed=12345 \ 
       id=$i data=my_data \
->     output samples=samples$i.csv refresh=0 &
+>     output file=samples$i.csv refresh=0 &
 > done
 >
 \end{Verbatim}
@@ -568,7 +568,7 @@ snippet above
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
 > for /l %x in (1, 1, 4) do start /b model  sample ^
 < random seed=12345 id=%x data=my_data ^
->  output samples=samples%x.csv refresh=0
+>  output file=samples%x.csv refresh=0
 \end{Verbatim}
 \end{quote}
 %
@@ -597,10 +597,10 @@ arguments within each category are unordered so that, for example,
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
-> ./model sample output sample=samples.csv diagnostic=diagnostics.csv random seed=1
-> ./model sample output diagnostic=diagnostics.csv sample=samples.csv random seed=1
-> ./model sample random seed=1 output sample=samples.csv diagnostic=diagnostics.csv 
-> ./model sample random seed=1 output diagnostic=diagnostics.csv sample=samples.csv 
+> ./model sample output file=samples.csv diagnostic_file=diagnostics.csv random seed=1
+> ./model sample output diagnostic_file=diagnostics.csv file=samples.csv random seed=1
+> ./model sample random seed=1 output file=samples.csv diagnostic_file=diagnostics.csv 
+> ./model sample random seed=1 output diagnostic_file=diagnostics.csv file=samples.csv 
 \end{Verbatim}
 \end{quote}
 %
@@ -624,7 +624,7 @@ to immediately terminate (Figure \ref{fig:configuration}).
 %
 \put(0, 360) { \framebox(500, 45) }
 \put(10, 390) { \makebox(65, 10)[l]{output} }
-\put(50, 370) { \makebox(500, 10)[l]{sample, append\_sample, diagnostic, append\_diagnostic, refresh, save\_warmup} }
+\put(50, 370) { \makebox(500, 10)[l]{file, append\_sample, diagnostic\_file, append\_diagnostic, refresh, save\_warmup} }
 %
 \put(10, 340) { \makebox(50, 10)[l]{method} }
 \put(20, 117.5) { \line(0, 1){212.5} }
@@ -678,7 +678,7 @@ to immediately terminate (Figure \ref{fig:configuration}).
 %
 \put(0, 360) { \framebox(500, 45) }
 \put(10, 390) { \makebox(65, 10)[l]{output} }
-\put(50, 370) { \makebox(500, 10)[l]{sample, append\_sample, diagnostic, append\_diagnostic, refresh, save\_warmup} }
+\put(50, 370) { \makebox(500, 10)[l]{file, append\_sample, diagnostic\_file, append\_diagnostic, refresh, save\_warmup} }
 %
 \put(10, 340) { \makebox(50, 10)[l]{method} }
 \put(20, 117.5) { \line(0, 1){212.5} }
@@ -936,10 +936,10 @@ are provided in the next section.
 %
 \hierlongcmd{}{output}
   {File output options}
-  {Valid subarguments: sample, append\_sample, diagnostic, append\_diagnostic, refresh, save\_warmup}
+  {Valid subarguments: file, append\_sample, diagnostic\_file, append\_diagnostic, refresh, save\_warmup}
 %
-  \hiercmdarg{\indentarrow}{sample}{$$string$$}
-    {Output file for sample information}
+  \hiercmdarg{\indentarrow}{file}{$$string$$}
+    {Output file}
     {Valid values: All}
     {Defaults to samples.csv}
 %
@@ -948,8 +948,8 @@ are provided in the next section.
     {Valid values: [0, 1]}
     {Defaults to 0}
 %
-  \hiercmdarg{\indentarrow}{diagnostic}{$$string$$}
-    {Output file for diagnostic information}
+  \hiercmdarg{\indentarrow}{diagnostic\_file}{$$string$$}
+    {Auxiliary output file for diagnostic information}
     {Valid values: All}
     {Defaults to ""}
 %
