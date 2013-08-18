@@ -1,0 +1,23 @@
+STAN C++11 README
+======================================================================
+
+This branch attempts to replace the existing parser error reporting.
+
+ 
+Why
+----------------------------------------------------------------------
+The current (1.3.0) error reporting is based on 'classic' pos-iterators.
+These collide when compiling for C++11 with optimization levels > 0
+
+
+Usage
+------------------- 
+The easiest way to test out this branch is in the root directory run:
+
+clear; make src/models/basic_estimators/bernoulli_with_statement_errors
+
+That is, after the inital build sequence, i.e:
+
+make clean-all
+make bin/libstan.a
+make bin/stanc
