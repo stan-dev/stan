@@ -16,6 +16,11 @@ The easiest way to test out this branch is in the root directory run:
 
 clear; make src/models/basic_estimators/bernoulli_with_statement_errors
 
+or
+
+clear; make src/models/basic_estimators/bernoulli_with_var_decls_errors
+
+
 That is, after the inital build sequence, i.e:
 
 make clean-all
@@ -28,11 +33,6 @@ files to try how well error reporting is working.
 
 To do
 ------------------- 
-I'm struggling with some basics:
 
-1) The error handler should become part of libstan.a (I think)
-2) There should only be a single source file
-3) From within the on_error method, error_msgs_ and 1 or more strings should
-   be passed in, e.g. rule_name, origin, source file name, section name, etc.
-4) A bunch of syntax and semantic error .stan files need to be added for testing
-5) 
+1) A bunch of syntax and semantic error .stan files need to be added for testing
+2) Include the newer line-pos-iterator to get proper line & pos data
