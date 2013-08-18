@@ -14,23 +14,11 @@
 #include <stdexcept>
 
 #include <boost/spirit/include/qi.hpp>
-// FIXME: get rid of unused include
-#include <boost/spirit/include/phoenix_core.hpp>
-#include <boost/spirit/include/phoenix_function.hpp>
-#include <boost/spirit/include/phoenix_fusion.hpp>
-#include <boost/spirit/include/phoenix_object.hpp>
-#include <boost/spirit/include/phoenix_operator.hpp>
-#include <boost/spirit/include/phoenix_stl.hpp>
-
-#include <boost/spirit/include/version.hpp>
-#include <boost/spirit/include/support_line_pos_iterator.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>
 #include <boost/fusion/include/std_pair.hpp>
 #include <boost/config/warning_disable.hpp>
-#include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/qi_numeric.hpp>
-#include <boost/spirit/include/support_line_pos_iterator.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>
 #include <boost/spirit/include/phoenix_function.hpp>
 #include <boost/spirit/include/phoenix_fusion.hpp>
@@ -41,6 +29,10 @@
 #include <boost/tuple/tuple.hpp>
 #include <boost/variant/apply_visitor.hpp>
 #include <boost/variant/recursive_variant.hpp>
+
+//#include <boost/spirit/include/support_line_pos_iterator.hpp>
+#include <boost/spirit/include/version.hpp>
+#include <boost/spirit/home/support/iterators/line_pos_iterator.hpp>
 
 #include <stan/gm/ast.hpp>
 #include <stan/gm/grammars/whitespace_grammar.hpp>
@@ -121,7 +113,12 @@ namespace stan {
           rest_of_section += last_char;
         }
 
-        error_msgs << std::endl << "LOCATION OF PARSING ERROR:"
+        if (!(get_line(_where) == -1)) {
+          error_msgs << "===> Error in input file at line = "
+            << get_line(_where) << std::endl
+            << std::endl;
+        } else {
+          error_msgs << "LOCATION OF PARSING ERROR:"
             << std::endl << std::endl
             << boost::make_iterator_range (_begin, _where)
             << std::endl
@@ -129,7 +126,9 @@ namespace stan {
             << " BUT FOUND: " 
             << std::endl << std::endl
             << rest_of_section
-            << std::endl << std::endl;
+            << std::endl;
+        }
+
       }
     };
     boost::phoenix::function<program_error> program_error_f;

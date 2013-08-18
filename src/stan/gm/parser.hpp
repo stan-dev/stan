@@ -102,6 +102,7 @@ namespace stan {
                          << std::endl;
         }
       } catch (const expectation_failure<pos_iterator_type>& e) {
+
 /*
         const file_position_base<std::string>& pos = e.first.get_position();
         msg << "EXPECTATION FAILURE LOCATION: file=" << pos.file
@@ -115,13 +116,12 @@ namespace stan {
         msg << " ^-- here" 
             << std::endl << std::endl;
 */
+
         std::stringstream msg;
         std::string diagnostics = prog_grammar.error_msgs_.str();
         if (output_stream && is_nonempty(diagnostics)) {
-          msg << "EXPECTATION FAILURE:" 
-          << std::endl;
-          msg << std::endl
-              << "DIAGNOSTIC(S) FROM PARSER:"
+          msg << "EXPECTATION FAILURE - DIAGNOSTIC(S) FROM PARSER:"
+              << std::endl
               << diagnostics
               << std::endl;
         }
@@ -129,10 +129,10 @@ namespace stan {
 
       } catch (const std::runtime_error& e) {
         std::stringstream msg;
-        msg << "LOCATION: unknown" << std::endl;
-
-        msg << "DIAGNOSTICS FROM PARSER:" << std::endl;
-        msg << prog_grammar.error_msgs_.str() << std::endl << std::endl;
+        msg << "NON EXPECTATION FAILURE - DIAGNOSTICS FROM PARSER:"
+            << std::endl
+            << prog_grammar.error_msgs_.str()
+            << std::endl;
 
         throw std::invalid_argument(msg.str());
       }
@@ -145,7 +145,11 @@ namespace stan {
         if (!parse_succeeded)
           msg << "PARSE DID NOT SUCCEED." << std::endl; 
         if (!consumed_all_input)
-          msg << "ERROR: non-whitespace beyond end of program:" << std::endl;
+          msg << "DIAGNOSTICS FROM PARSER:"
+              << std::endl
+              << "ERROR: non-whitespace beyond end of program."
+              << std::endl;
+
 /*
         const file_position_base<std::string>& pos 
           = position_begin.get_position();
@@ -159,10 +163,9 @@ namespace stan {
           msg << ' ';
         msg << " ^-- starting here" 
             << std::endl << std::endl;
-
-        msg << "DIAGNOSTICS FROM PARSER:" << std::endl;
-        msg << prog_grammar.error_msgs_.str() << std::endl << std::endl;
 */
+
+        msg << prog_grammar.error_msgs_.str() << std::endl;
         throw std::invalid_argument(msg.str());
       }
       return true;
