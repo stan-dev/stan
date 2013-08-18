@@ -602,10 +602,11 @@ namespace stan {
         %= lit(';') [_val = no_op_statement()];  // ok to re-use instance
 
       using boost::spirit::qi::on_error;
+      using boost::spirit::qi::fail;
       using boost::spirit::qi::rethrow;
       using namespace boost::spirit::qi::labels;
 
-      on_error<rethrow>(
+      on_error<fail>(
         statement_r,
         statement_error_handler_f(_1, _2, _3, _4)
       ); 
