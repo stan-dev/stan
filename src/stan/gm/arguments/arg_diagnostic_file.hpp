@@ -14,6 +14,7 @@ namespace stan {
       arg_diagnostic_file(): string_argument() {
         _name = "diagnostic_file";
         _description = "Auxiliary output file for diagnostic information";
+        _validity = "Path to existing file";
         _default = "\"\"";
         _default_value = "";
         _constrained = false;

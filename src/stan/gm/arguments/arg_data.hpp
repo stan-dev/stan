@@ -14,6 +14,7 @@ namespace stan {
       arg_data(): string_argument() {
         _name = "data";
         _description = "Input data file";
+        _validity = "Path to existing file";
         _default = "\"\"";
         _default_value = "";
         _constrained = false;

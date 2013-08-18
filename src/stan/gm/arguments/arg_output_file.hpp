@@ -14,6 +14,7 @@ namespace stan {
       arg_output_file(): string_argument() {
         _name = "file";
         _description = "Output file";
+        _validity = "Path to existing file";
         _default = "samples.csv";
         _default_value = "samples.csv";
         _constrained = false;

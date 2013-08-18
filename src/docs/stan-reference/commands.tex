@@ -801,7 +801,7 @@ are provided in the next section.
 %
     \hiercmdarg{\indentarrow\indentarrow}{algorithm}{$$list element$$}
       {Sampling algorithm}
-      {Valid values: hmc, metro}
+      {Valid values: hmc, rwm}
       {Defaults to hmc}
 %
       \hierlongcmd{\indentarrow\indentarrow\indentarrow}{hmc}
@@ -855,7 +855,7 @@ are provided in the next section.
           {Valid values: 0 $\le$ stepsize\_jitter $\le$ 1}
           {Defaults to 0}
 %
-      \hiershortcmd{\indentarrow\indentarrow\indentarrow}{metro}
+      \hiershortcmd{\indentarrow\indentarrow\indentarrow}{rwm}
         {Random Walk Metropolis Monte Carlo}
 %
   \hierlongcmd{\indentarrow}{optimize}
@@ -917,8 +917,8 @@ are provided in the next section.
 %
 \hiercmdarg{}{data}{$$string$$}
   {Input data file}
-  {Valid values: All}
-  {Defaults to ""}
+  {Valid values: Path to existing file}
+  {Defaults to ``''}
 %
 \hiercmdarg{}{init}{$$string$$}
   {Initialization method: ``x'' initializes randomly bewteen [-x, x], ``0'' initializes to 0, anything else identifies a file of values}
@@ -936,11 +936,11 @@ are provided in the next section.
 %
 \hierlongcmd{}{output}
   {File output options}
-  {Valid subarguments: file, append\_sample, diagnostic\_file, append\_diagnostic, refresh, save\_warmup}
+  {Valid subarguments: file, append\_sample, diagnostic\_file, append\_diagnostic, refresh}
 %
   \hiercmdarg{\indentarrow}{file}{$$string$$}
     {Output file}
-    {Valid values: All}
+    {Valid values: Path to existing file}
     {Defaults to samples.csv}
 %
   \hiercmdarg{\indentarrow}{append\_sample}{$$boolean$$}
@@ -950,8 +950,8 @@ are provided in the next section.
 %
   \hiercmdarg{\indentarrow}{diagnostic\_file}{$$string$$}
     {Auxiliary output file for diagnostic information}
-    {Valid values: All}
-    {Defaults to ""}
+    {Valid values: Path to existing file}
+    {Defaults to ``''}
 %
   \hiercmdarg{\indentarrow}{append\_diagnostic}{$$boolean$$}
     {Append diagnostic output to existing file?}

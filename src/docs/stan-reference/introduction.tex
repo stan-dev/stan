@@ -467,12 +467,11 @@ which shows up on the terminal as follows.
  random
    seed = 1170969085
  output
-   sample = samples.csv (Default)
+   file = samples.csv (Default)
    append_sample = 0 (Default)
-   diagnostic =  (Default)
+   diagnostic_file =  (Default)
    append_diagnostic = 0 (Default)
    refresh = 100 (Default)
-   save_warmup = 0 (Default)
 ...
 \end{Verbatim}
 \end{quote}
@@ -505,6 +504,7 @@ as comments (i.e., lines beginning with the pound sign (\Verb|#|)).
 # stan_version_major = 1
 # stan_version_minor = 3
 # stan_version_patch = 0
+# model = bernoulli_model
 # method = sample (Default)
 #   sample
 #     num_samples = 1000 (Default)
@@ -529,14 +529,13 @@ as comments (i.e., lines beginning with the pound sign (\Verb|#|)).
 # data = src/models/basic_estimators/bernoulli.data.R
 # init = 2 (Default)
 # random
-#   seed = 1845979644
+#   seed = 1170969085
 # output
-#   sample = samples.csv (Default)
+#   file = samples.csv (Default)
 #   append_sample = 0 (Default)
-#   diagnostic =  (Default)
+#   diagnostic_file =  (Default)
 #   append_diagnostic = 0 (Default)
 #   refresh = 100 (Default)
-#   save_warmup = 0 (Default)
 ...
 \end{Verbatim}
 \end{quote}
