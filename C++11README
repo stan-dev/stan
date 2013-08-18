@@ -21,3 +21,17 @@ That is, after the inital build sequence, i.e:
 make clean-all
 make bin/libstan.a
 make bin/stanc
+
+
+I usually edit the 2 src/models/basic_estimators/bernoulli_with_..._errors
+files to try how well error reporting is working.
+
+To do
+------------------- 
+I'm struggling with some basics:
+
+1) The error handler should become part of libstan.a (I think)
+2) There should only be a single source file
+3) From within the on_error method, error_msgs_ and 1 or more strings should
+   be passed in, e.g. rule_name, origin, source file name, section name, etc.
+
