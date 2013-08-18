@@ -34,4 +34,5 @@ I'm struggling with some basics:
 2) There should only be a single source file
 3) From within the on_error method, error_msgs_ and 1 or more strings should
    be passed in, e.g. rule_name, origin, source file name, section name, etc.
-
+4) A bunch of syntax and semantic error .stan files need to be added for testing
+5) 
