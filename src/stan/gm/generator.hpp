@@ -226,7 +226,8 @@ namespace stan {
         print_string_literal(o_,s);
       }
       void operator()(const expression& e) const { 
-        print_quoted_expression(o_,e);
+        generate_expression(e,o_);
+        // print_quoted_expression(o_,e);
       }
     };
 
