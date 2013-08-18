@@ -18,6 +18,9 @@
 #include <stan/gm/grammars/var_decls_grammar.hpp>
 #include <stan/gm/grammars/common_adaptors_def.hpp>
 
+#include <boost/spirit/include/version.hpp>
+#include <boost/spirit/include/support_line_pos_iterator.hpp>
+
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::int_var_decl,
                           (stan::gm::range, range_)
                           (std::string, name_)
@@ -281,6 +284,41 @@ namespace stan {
     };
     boost::phoenix::function<validate_decl_constraints> 
     validate_decl_constraints_f;
+
+    struct data_section_error_handler
+    {
+
+      template <class, class, class, class>
+      struct result { typedef void type; };
+
+      template <class Iterator, class I>
+      void operator() (Iterator _begin, Iterator _end, Iterator _where, I const& _info) const
+      {
+        using std::cout;
+        using boost::phoenix::construct;
+        using boost::phoenix::val;
+
+        std::basic_stringstream<char> error_section;
+        error_section << make_iterator_range (_where, _end);
+        char last_char = ' ';
+        std::string rest_of_section = "";
+        while (!error_section.eof() && !(last_char == '}')) {
+          last_char = (char)error_section.get();
+          rest_of_section += last_char;
+        }
+
+        cout << std::endl << "ERROR FOUND WHILE PARSING 'data' SECTION:"
+            << std::endl
+            << boost::make_iterator_range (_begin, _where)
+            << std::endl
+            << "EXPECTED: " << _info
+            << " BUT FOUND: " 
+            << std::endl << std::endl
+            << rest_of_section
+            << std::endl << std::endl;
+      }
+    };
+    boost::phoenix::function<data_section_error_handler> data_section_error_handler_f;
 
     struct validate_identifier {
       std::set<std::string> reserved_word_set_;
@@ -588,7 +626,9 @@ namespace stan {
     {
 
       using boost::spirit::qi::_1;
+      using boost::spirit::qi::_2;
       using boost::spirit::qi::_3;
+      using boost::spirit::qi::_4;
       using boost::spirit::qi::char_;
       using boost::spirit::qi::eps;
       using boost::spirit::qi::lexeme;
@@ -599,6 +639,8 @@ namespace stan {
       using boost::spirit::qi::labels::_a;
       using boost::spirit::qi::labels::_r1;
       using boost::spirit::qi::labels::_r2;
+      using boost::spirit::qi::on_error;
+      using boost::spirit::qi::rethrow;
 
       var_decls_r.name("variable declarations");
       var_decls_r 
@@ -876,6 +918,11 @@ namespace stan {
         >> lit(':') 
         >> expression_g(_r1)
         [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))];
+
+      on_error<rethrow>(
+        var_decls_r,
+        data_section_error_handler_f(_1, _2, _3, _4)
+      );
 
     }
 

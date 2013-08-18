@@ -71,6 +71,8 @@ namespace stan {
       using boost::spirit::qi::expectation_failure;
       using boost::spirit::qi::phrase_parse;
 
+      using boost::phoenix::construct;
+      using boost::phoenix::val;
 
       // iterate over stream input
       typedef istreambuf_iterator<char> base_iterator_type;
@@ -100,7 +102,6 @@ namespace stan {
                          << std::endl;
         }
       } catch (const expectation_failure<pos_iterator_type>& e) {
-        std::stringstream msg;
 /*
         const file_position_base<std::string>& pos = e.first.get_position();
         msg << "EXPECTATION FAILURE LOCATION: file=" << pos.file
@@ -114,8 +115,11 @@ namespace stan {
         msg << " ^-- here" 
             << std::endl << std::endl;
 */
+        std::stringstream msg;
         std::string diagnostics = prog_grammar.error_msgs_.str();
         if (output_stream && is_nonempty(diagnostics)) {
+          msg << "EXPECTATION FAILURE:" 
+          << std::endl;
           msg << std::endl
               << "DIAGNOSTIC(S) FROM PARSER:"
               << diagnostics

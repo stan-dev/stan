@@ -22,6 +22,8 @@
 #include <boost/spirit/include/phoenix_operator.hpp>
 #include <boost/spirit/include/phoenix_stl.hpp>
 
+#include <boost/spirit/include/version.hpp>
+#include <boost/spirit/include/support_line_pos_iterator.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>
 #include <boost/fusion/include/std_pair.hpp>
@@ -89,6 +91,21 @@ namespace stan {
     };
     boost::phoenix::function<remove_lp_var> remove_lp_var_f;
 
+    struct program_error_handler
+    {
+
+      template <class, class, class, class>
+      struct result { typedef void type; };
+
+      template <class Iterator, class I>
+      void operator() (Iterator _begin, 
+        Iterator _end, Iterator _where, I const& _info) const {
+
+        std::cout << "ENCOUNTERED A PARSING ERROR IN ONE OF THE SECTIONS."
+           << std::endl;
+      }
+    };
+    boost::phoenix::function<program_error_handler> program_error_handler_f;
 
     template <typename Iterator>
     program_grammar<Iterator>::program_grammar(const std::string& model_name) 
@@ -102,6 +119,9 @@ namespace stan {
 
         using boost::spirit::qi::eps;
         using boost::spirit::qi::lit;
+        using boost::spirit::qi::on_error;
+        using boost::spirit::qi::rethrow;
+        using namespace boost::spirit::qi::labels;
 
         // add model_name to var_map with special origin and no 
         var_map_.add(model_name,
@@ -168,13 +188,10 @@ namespace stan {
           > *statement_g(false,derived_origin) // -sampling
           > lit('}');
 
-        using boost::spirit::qi::on_error;
-        using boost::spirit::qi::rethrow;
-        on_error<rethrow>(program_r,
-                          (std::ostream&)error_msgs_
-                          << std::endl
-                          << boost::phoenix::val("Parser expecting: ")
-                          << boost::spirit::qi::labels::_4); 
+        on_error<rethrow>(
+          program_r,
+          program_error_handler_f(_1, _2, _3, _4)
+        ); 
     }
 
   }
