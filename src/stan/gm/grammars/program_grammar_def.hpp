@@ -91,21 +91,48 @@ namespace stan {
     };
     boost::phoenix::function<remove_lp_var> remove_lp_var_f;
 
-    struct program_error_handler
-    {
-
-      template <class, class, class, class>
+    struct program_error {
+      template <typename T1, typename T2, typename ,
+        typename T4, typename T5, typename T6, typename T7>
       struct result { typedef void type; };
 
       template <class Iterator, class I>
-      void operator() (Iterator _begin, 
-        Iterator _end, Iterator _where, I const& _info) const {
+      void operator()(
+        Iterator _begin, 
+        Iterator _end, 
+        Iterator _where, 
+        I const& _info,
+        std::string msg,
+        variable_map& vm,
+        std::stringstream& error_msgs) const {
 
-        std::cout << "ENCOUNTERED A PARSING ERROR IN ONE OF THE SECTIONS."
-           << std::endl;
+        error_msgs << msg
+                   << std::endl;
+
+        using boost::phoenix::construct;
+        using boost::phoenix::val;
+
+        std::basic_stringstream<char> error_section;
+        error_section << make_iterator_range (_where, _end);
+        char last_char = ' ';
+        std::string rest_of_section = "";
+        while (!error_section.eof() && !(last_char == '}')) {
+          last_char = (char)error_section.get();
+          rest_of_section += last_char;
+        }
+
+        error_msgs << std::endl << "LOCATION OF PARSING ERROR:"
+            << std::endl << std::endl
+            << boost::make_iterator_range (_begin, _where)
+            << std::endl
+            << "EXPECTED: " << _info
+            << " BUT FOUND: " 
+            << std::endl << std::endl
+            << rest_of_section
+            << std::endl << std::endl;
       }
     };
-    boost::phoenix::function<program_error_handler> program_error_handler_f;
+    boost::phoenix::function<program_error> program_error_f;
 
     template <typename Iterator>
     program_grammar<Iterator>::program_grammar(const std::string& model_name) 
@@ -191,7 +218,12 @@ namespace stan {
 
         on_error<rethrow>(
           program_r,
-          program_error_handler_f(_1, _2, _3, _4)
+          program_error_f(
+            _1, _2, _3, _4 ,
+            "",
+            boost::phoenix::ref(var_map_),
+            boost::phoenix::ref(error_msgs_)
+          )
         ); 
     }
 

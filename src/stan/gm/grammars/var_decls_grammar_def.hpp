@@ -285,41 +285,6 @@ namespace stan {
     boost::phoenix::function<validate_decl_constraints> 
     validate_decl_constraints_f;
 
-    struct var_decl_error_handler
-    {
-
-      template <class, class, class, class>
-      struct result { typedef void type; };
-
-      template <class Iterator, class I>
-      void operator() (Iterator _begin, Iterator _end, Iterator _where, I const& _info) const
-      {
-        using std::cout;
-        using boost::phoenix::construct;
-        using boost::phoenix::val;
-
-        std::basic_stringstream<char> error_section;
-        error_section << make_iterator_range (_where, _end);
-        char last_char = ' ';
-        std::string rest_of_section = "";
-        while (!error_section.eof() && !(last_char == '}')) {
-          last_char = (char)error_section.get();
-          rest_of_section += last_char;
-        }
-
-        cout << std::endl << "ERROR FOUND WHILE PARSING 'variable declarations':"
-            << std::endl
-            << boost::make_iterator_range (_begin, _where)
-            << std::endl
-            << "EXPECTED: " << _info
-            << " BUT FOUND: " 
-            << std::endl << std::endl
-            << rest_of_section
-            << std::endl << std::endl;
-      }
-    };
-    boost::phoenix::function<var_decl_error_handler> var_decl_error_handler_f;
-
     struct validate_identifier {
       std::set<std::string> reserved_word_set_;
 
@@ -918,11 +883,6 @@ namespace stan {
         >> lit(':') 
         >> expression_g(_r1)
         [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))];
-
-      on_error<rethrow>(
-        var_decls_r,
-        var_decl_error_handler_f(_1, _2, _3, _4)
-      );
 
     }
 

@@ -7,7 +7,8 @@ parameters {
 } 
 model {
   theta ~ beta(1,1);
-  for (n in 1:N)
+  for (n in 1:N) {
   	ERR
-    y[n] ~ bernoulli(theta);
+    y[n] ~ bernoulli(theta);  
+  }
 }

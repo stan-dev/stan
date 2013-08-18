@@ -375,41 +375,19 @@ namespace stan {
     };
     boost::phoenix::function<validate_allow_sample> validate_allow_sample_f;
 
-
-    struct statement_error_handler
-    {
-
-      template <class, class, class, class>
+    struct statement_error {
+      template <typename T1, typename T2, typename T3>
       struct result { typedef void type; };
 
-      template <class Iterator, class I>
-      void operator() (Iterator _begin, Iterator _end, Iterator _where, I const& _info) const
-      {
-        using std::cout;
-        using boost::phoenix::construct;
-        using boost::phoenix::val;
-
-        std::basic_stringstream<char> error_section;
-        error_section << make_iterator_range (_where, _end);
-        char last_char = ' ';
-        std::string rest_of_section = "";
-        while (!error_section.eof() && !(last_char == '}')) {
-          last_char = (char)error_section.get();
-          rest_of_section += last_char;
-        }
-
-        cout << std::endl << "ERROR FOUND WHILE PARSING 'statement':"
-            << std::endl
-            << boost::make_iterator_range (_begin, _where)
-            << std::endl
-            << "EXPECTED: " << _info
-            << " BUT FOUND: " 
-            << std::endl << std::endl
-            << rest_of_section
-            << std::endl << std::endl;
+      void operator()(std::string msg,
+                      variable_map& vm,
+                      std::stringstream& error_msgs) const {
+        error_msgs << msg
+                   << std::endl;
       }
     };
-    boost::phoenix::function<statement_error_handler> statement_error_handler_f;
+    boost::phoenix::function<statement_error> statement_error_f;
+
 
     template <typename Iterator>
     statement_grammar<Iterator>::statement_grammar(variable_map& var_map,
@@ -606,10 +584,15 @@ namespace stan {
       using boost::spirit::qi::rethrow;
       using namespace boost::spirit::qi::labels;
 
-      on_error<fail>(
+      /*
+      on_error<rethrow>(
         statement_r,
-        statement_error_handler_f(_1, _2, _3, _4)
-      ); 
+        statement_error_f(
+          "Error in statement",
+          boost::phoenix::ref(var_map_),
+          boost::phoenix::ref(error_msgs_))
+      );
+      */ 
     }
 
   }
