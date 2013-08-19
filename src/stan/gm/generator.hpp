@@ -1399,6 +1399,9 @@ namespace stan {
         generate_expression(x.expr_,o_);
         o_ << ");" << EOL;
       }
+      void operator()(expression const& x) const {
+        throw std::invalid_argument("expression statements not yet supported");
+      }
       void operator()(sample const& x) const {
         if (!include_sampling_) return;
         generate_indent(indent_,o_);
@@ -1409,6 +1412,7 @@ namespace stan {
           generate_expression(x.dist_.args_[i],o_);
         }
         o_ << "));" << EOL;
+        // rest of impl is for truncation
         // generate bounds test
         if (x.truncation_.has_low()) {
           generate_indent(indent_,o_);
@@ -1429,20 +1433,21 @@ namespace stan {
                                                             // bound
           o_ << ") lp_accum__.add(-std::numeric_limits<double>::infinity());" << EOL;
         }
+        // generate log denominator for case where bounds test pass
         if (x.truncation_.has_low() || x.truncation_.has_high()) {
           generate_indent(indent_,o_);
           o_ << "else ";
         }
-        // generate log denominator
         if (x.truncation_.has_low() && x.truncation_.has_high()) {
-          o_ << "lp_accum__.add(-log(";
-          o_ << x.dist_.family_ << "_cdf(";
+          // T[L,U]: -log_diff_exp(Dist_cdf_log(U|params),Dist_cdf_log(L|Params))
+          o_ << "lp_accum__.add(-log_diff_exp(";
+          o_ << x.dist_.family_ << "_cdf_log(";
           generate_expression(x.truncation_.high_.expr_,o_);
           for (size_t i = 0; i < x.dist_.args_.size(); ++i) {
             o_ << ", ";
             generate_expression(x.dist_.args_[i],o_);
           }
-          o_ << ") - " << x.dist_.family_ << "_cdf(";
+          o_ << "), " << x.dist_.family_ << "_cdf_log(";
           generate_expression(x.truncation_.low_.expr_,o_);
           for (size_t i = 0; i < x.dist_.args_.size(); ++i) {
             o_ << ", ";
@@ -1450,23 +1455,25 @@ namespace stan {
           }
           o_ << ")));" << EOL;
         } else if (!x.truncation_.has_low() && x.truncation_.has_high()) {
-          o_ << "lp_accum__.add(-log(";
-          o_ << x.dist_.family_ << "_cdf(";
+          // T[,U];  -Dist_cdf_log(U)
+          o_ << "lp_accum__.add(-";
+          o_ << x.dist_.family_ << "_cdf_log(";
           generate_expression(x.truncation_.high_.expr_,o_);
           for (size_t i = 0; i < x.dist_.args_.size(); ++i) {
             o_ << ", ";
             generate_expression(x.dist_.args_[i],o_);
           }
-          o_ << ")));" << EOL;
+          o_ << "));" << EOL;
         } else if (x.truncation_.has_low() && !x.truncation_.has_high()) {
-          o_ << "lp_accum__.add(-log1m(";
-          o_ << x.dist_.family_ << "_cdf(";
+          // T[L,]: -Dist_ccdf_log(L)
+          o_ << "lp_accum__.add(-";
+          o_ << x.dist_.family_ << "_ccdf_log(";
           generate_expression(x.truncation_.low_.expr_,o_);
           for (size_t i = 0; i < x.dist_.args_.size(); ++i) {
             o_ << ", ";
             generate_expression(x.dist_.args_[i],o_);
           }
-          o_ << ")));" << EOL;
+          o_ << "));" << EOL;
         }
       }
       void operator()(const increment_log_prob_statement& x) const {
