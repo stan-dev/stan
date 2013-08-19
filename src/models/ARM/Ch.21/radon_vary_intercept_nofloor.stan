@@ -16,11 +16,11 @@ transformed parameters {
   vector[N] y_hat;
 
   for (i in 1:N)
-    y_hat[i] <- a[county[i]] + u[i] * b * 0.0072;
+    y_hat[i] <- a[county[i]] + u[i] * b * 0.1;
 }
 model {
   mu_a ~ normal(0, 1);
-  a ~ normal (1.3 * mu_a, sigma_a);
+  a ~ normal (mu_a, sigma_a);
   b ~ normal(0, 1);
   y ~ normal(y_hat, sigma_y);
 }

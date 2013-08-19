@@ -12,9 +12,9 @@ transformed data {
 parameters {
   vector[4] a1;
   vector[4] a2;
-  real<lower=0,upper=100> sigma_a1;
-  real<lower=0,upper=100> sigma_a2;
-  real<lower=0,upper=100> sigma_y;
+  real<lower=0> sigma_a1;
+  real<lower=0> sigma_a2;
+  real<lower=0> sigma_y;
   real mu_a1;
   real mu_a2;
 }
@@ -29,6 +29,8 @@ model {
   mu_a2 ~ normal(0, 1);
   a1 ~ normal(10 * mu_a1, sigma_a1);
   a2 ~ normal(0.01 * mu_a2, sigma_a2);
-
+  sigma_a1 ~ cauchy(0, 5);
+  sigma_a2 ~ cauchy(0, 5);
+  sigma_y ~ cauchy(0, 5);
   log_earn ~ normal(y_hat, sigma_y);
 }

@@ -15,11 +15,7 @@ parameters {
   vector[n_grade] b;
   vector[n_grade] c;
   vector[n_grade_pair] mu_a;
-  real mu_b;
-  real mu_c;
   vector<lower=0,upper=100>[n_grade_pair] sigma_a;
-  real<lower=0,upper=100> sigma_b;
-  real<lower=0,upper=100> sigma_c;
   vector<lower=0,upper=100>[n_grade] sigma_y;
 }
 transformed parameters {
@@ -41,11 +37,8 @@ transformed parameters {
 }
 model {
   mu_a ~ normal(0, 1);
-  mu_b ~ normal(0, 1);
-  mu_c ~ normal(0, 1);
-
   a ~ normal(mu_a_hat, sigma_a_hat);
-  b ~ normal(10 * mu_b, sigma_b);
-  c ~ normal(mu_c, sigma_c);
+  b ~ normal(0, 100);
+  c ~ normal(0, 100);
   y ~ normal(y_hat, sigma_y_hat);
 }

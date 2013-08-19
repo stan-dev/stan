@@ -24,7 +24,7 @@ transformed parameters {
 }
 model {
   mu_a ~ normal(0, 1);
-  beta ~ normal(0, 10);
+  beta ~ normal(0, 100);
   eta ~ normal(0, 1);
 
   y ~ normal(y_hat, sigma_y);

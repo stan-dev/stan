@@ -20,18 +20,16 @@ transformed parameters {
   vector[n_groups] a;
   vector[n_scenarios] b;
 
-  a <- 100 * mu_a + eta_a * sigma_a;
-  b <- 100 * mu_b + eta_b * sigma_b;
+  a <- 0.1 * mu_a + eta_a * sigma_a;
+  b <- 0.1 * mu_b + eta_b * sigma_b;
 
   for (i in 1:N)
     y_hat[i] <- a[group_id[i]] + b[scenario_id[i]];
 } 
 model {
   mu_a ~ normal(0, 1);
-  eta_a ~ normal(0, 1);
-
   mu_b ~ normal(0, 1);
+  eta_a ~ normal(0, 1);
   eta_b ~ normal(0, 1);
-
   y ~ normal(y_hat, sigma_y);
 }

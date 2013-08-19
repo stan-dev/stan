@@ -19,7 +19,7 @@ transformed parameters {
   a <- 100 * mu_a + sigma_a * eta;
 
   for (i in 1:N)
-    y_hat[i] <- a[pair[i]] + 100 * beta * treatment[i];
+    y_hat[i] <- a[pair[i]] + beta * treatment[i];
 }
 model {
   mu_a ~ normal(0, 1);

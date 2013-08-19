@@ -23,10 +23,10 @@ transformed parameters {
 } 
 model {
   mu_a ~ normal(0, 1);
-  a ~ normal (mu_a, sigma_a);
+  a ~ normal (10 * mu_a, sigma_a);
 
   mu_b ~ normal(0, 1);
-  b ~ normal (mu_b, sigma_b);
+  b ~ normal (10 * mu_b, sigma_b);
 
   y ~ normal(y_hat, sigma_y);
 }
