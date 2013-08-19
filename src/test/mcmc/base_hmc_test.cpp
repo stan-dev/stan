@@ -130,7 +130,7 @@ TEST(McmcBaseHMC, init_stepsize) {
   model_path.push_back("improper");
   
   std::string command = convert_model_path(model_path);
-  command += " sample output sample=" + convert_model_path(model_path) + ".csv";
+  command += " sample output file=" + convert_model_path(model_path) + ".csv";
   std::string command_output;
   long time;
   
