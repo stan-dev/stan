@@ -114,6 +114,7 @@ namespace stan {
         if (output_stream && is_nonempty(diagnostics)) {
           *output_stream << "DIAGNOSTIC(S) FROM PARSER:" 
                          << std::endl
+                         << std::endl
                          << diagnostics 
                          << std::endl;
         }
@@ -138,6 +139,7 @@ namespace stan {
         if (output_stream && is_nonempty(diagnostics)) {
           msg << "EXPECTATION FAILURE - DIAGNOSTIC(S) FROM PARSER:"
               << std::endl
+              << std::endl
               << diagnostics
               << std::endl;
         }
@@ -146,6 +148,7 @@ namespace stan {
       } catch (const std::runtime_error& e) {
         std::stringstream msg;
         msg << "NON EXPECTATION FAILURE - DIAGNOSTICS FROM PARSER:"
+            << std::endl
             << std::endl
             << prog_grammar.error_msgs_.str()
             << std::endl;
@@ -181,7 +184,7 @@ namespace stan {
             << std::endl << std::endl;
 */
 
-        msg << prog_grammar.error_msgs_.str() << std::endl;
+        msg << std::endl << prog_grammar.error_msgs_.str() << std::endl;
         throw std::invalid_argument(msg.str());
       }
       return true;

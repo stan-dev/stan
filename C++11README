@@ -14,12 +14,13 @@ Usage
 ------------------- 
 The easiest way to test out this branch is in the root directory run:
 
-clear; make src/models/basic_estimators/bernoulli_with_statement_errors
+clear;make src/test/gm/model_specs/bernoulli_with_statement_errors
 
 or
 
-clear; make src/models/basic_estimators/bernoulli_with_var_decls_errors
+clear;make src/test/gm/model_specs/bernoulli_with_var_decls_errors
 
+or any of the other *.stan files
 
 That is, after the inital build sequence, i.e:
 
@@ -35,4 +36,3 @@ To do
 ------------------- 
 
 1) A bunch of syntax and semantic error .stan files need to be added for testing.
-2) Would like to shorten the output to only show a single section.

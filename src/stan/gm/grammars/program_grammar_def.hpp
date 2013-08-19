@@ -117,7 +117,10 @@ namespace stan {
         correct_section = correct_section.erase(indx-1, indx);
 
         //
-        //  
+        //  Clean up whatever is before the error occurred
+        //
+        //  Would be better to use the parser to select which 
+        //  section in the stan file contains the parsing error.
         //
         std::vector<std::string> sections = 
           {"generated", "model", "transformed", "parameters", "data"};
@@ -152,29 +155,41 @@ namespace stan {
           }
         }
 
+        //
+        //  Clean up whatever is comes after the error occurred
+        //
         std::basic_stringstream<char> error_section;
-        error_section << get_current_line(_begin, _where, _end);
+        error_section << boost::make_iterator_range (_where, _end);
         last_char = ' ';
         std::string rest_of_section = "";
         while (!error_section.eof() && !(last_char == '}')) {
           last_char = (char)error_section.get();
           rest_of_section += last_char;
+          //std::cout << rest_of_section.size() << std::endl;
+          if (error_section.eof() && rest_of_section.size() == 1) {
+            rest_of_section = "'end of file'";
+          }
         }
 
         if (!(get_line(_where) == -1)) {
-          error_msgs << "===> Error in stan model file at line = "
+          error_msgs
+            << std::endl
+            << "LOCATION OF PARSING ERROR (line = "
             << get_line(_where)
-            << " and position "
+            << ", position = "
             << get_column(_begin, _where) - 1
-            << '.'
+            <<  "):"
             << std::endl
             << std::endl
-            << "LOCATION OF PARSING ERROR:"
-            << std::endl << std::endl
+            << "PARSED:"
+            << std::endl
+            << std::endl
             << correct_section
+            << std::endl
             << std::endl
             << "EXPECTED: " << _info
             << " BUT FOUND: " 
+            << std::endl
             << std::endl
             << rest_of_section
             << std::endl;
