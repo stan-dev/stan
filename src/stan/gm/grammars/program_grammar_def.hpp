@@ -104,9 +104,57 @@ namespace stan {
         using boost::phoenix::construct;
         using boost::phoenix::val;
 
+        std::basic_stringstream<char> pre_error_section;
+        pre_error_section << boost::make_iterator_range (_begin, _where);
+        char last_char;
+        std::string correct_section = "";
+        while (!pre_error_section.eof()) {
+          last_char = (char)pre_error_section.get();
+          correct_section += last_char;
+        }
+
+        int indx = correct_section.size();
+        correct_section = correct_section.erase(indx-1, indx);
+
+        //
+        //  
+        //
+        std::vector<std::string> sections = 
+          {"generated", "model", "transformed", "parameters", "data"};
+        bool found_section = false;
+        indx = 0;
+
+        for (int i = 0; i < sections.size(); ++i) {
+          std::string section = sections[i];
+          indx = correct_section.find(section);
+          if (!(indx == std::string::npos)) {
+            if (i == 2) {
+              // Check which transformed block we're dealing with.
+              // If there is another transformed section, it must be
+              // a 'transformed parameters' section
+              int indx2 = correct_section.find("transformed", indx + 5);
+              if (!(indx2 == std::string::npos)) {
+                indx = indx2;
+              } else {
+                // No second transformed section, but maybe there
+                // is a parameter block?
+                indx2 = correct_section.find("parameters", indx2);
+                if (!(indx2 == std::string::npos)) {
+                  indx = indx2;
+                }
+                // Ok, we found a 'transformed data' block.
+                // indx is pointing at it.
+              }
+            }
+            found_section = true;
+            correct_section = correct_section.erase(0, indx);
+            break;
+          }
+        }
+
         std::basic_stringstream<char> error_section;
         error_section << get_current_line(_begin, _where, _end);
-        char last_char = ' ';
+        last_char = ' ';
         std::string rest_of_section = "";
         while (!error_section.eof() && !(last_char == '}')) {
           last_char = (char)error_section.get();
@@ -123,7 +171,7 @@ namespace stan {
             << std::endl
             << "LOCATION OF PARSING ERROR:"
             << std::endl << std::endl
-            << boost::make_iterator_range (_begin, _where)
+            << correct_section
             << std::endl
             << "EXPECTED: " << _info
             << " BUT FOUND: " 
@@ -131,8 +179,6 @@ namespace stan {
             << rest_of_section
             << std::endl;
         }
-
-
       }
     };
     boost::phoenix::function<program_error> program_error_f;
