@@ -29,10 +29,21 @@ make bin/libstan.a
 make bin/stanc
 
 
-I usually edit the 2 src/models/basic_estimators/bernoulli_with_..._errors
-files to try how well error reporting is working.
+Results/comments
+------------------- 
+
+I usually edit the src/test/gm/model_specs/bernoulli_with_statement_errors
+file to try how well error reporting is working, but have also been running
+the other .stan test cases in that directory.
+
+Not sure about the good-all.stan test case. Maybe outdated?
+
 
 To do
 ------------------- 
 
 1) A bunch of syntax and semantic error .stan files need to be added for testing.
+2) I wonder if occasionally _pass does not completely work
+   (e.g. with 'clear; make src/test/gm/model_specs/bad2', 
+    the parser should not get past the '<-' symbol).
+3)
