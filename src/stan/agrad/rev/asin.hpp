@@ -4,6 +4,8 @@
 #include <valarray>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/op/v_vari.hpp>
+#include <limits>
+#include <stan/math/error_handling/check_bounded.hpp>
 
 namespace stan {
   namespace agrad {
@@ -32,7 +34,10 @@ namespace stan {
      * @return Arc sine of variable, in radians. 
      */
     inline var asin(const var& a) {
-      return var(new asin_vari(a.vi_));
+      static const char* function = "stan::agrad::asin(%1%)";
+      if (!stan::math::check_bounded(function,a.val(),-1.0,1.0,"angle"))
+	return std::numeric_limits<double>::quiet_NaN();
+     return var(new asin_vari(a.vi_));
     }
 
   }
