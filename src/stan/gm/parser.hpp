@@ -56,11 +56,6 @@ namespace stan {
       return false;
     }
 
-    // Cut and paste source for iterator & reporting pattern:
-    // http://boost-spirit.com/home/articles/qi-example
-    //                 /tracking-the-input-position-while-parsing/
-    // http://boost-spirit.com/dl_more/parsing_tracking_position
-    //                 /stream_iterator_errorposition_parsing.cpp
     inline bool parse(std::ostream* output_stream,
                       std::istream& input, 
                       const std::string& filename, 
@@ -80,19 +75,6 @@ namespace stan {
       std::ostringstream buf;
       buf << input.rdbuf();
       std::string stan_string = buf.str();
-      //std::cout << stan_string << std::endl;
-
-      /*
-      // iterate over stream input
-      typedef istreambuf_iterator<char> base_iterator_type;
-      typedef multi_pass<base_iterator_type>  forward_iterator_type;
-      typedef forward_iterator_type pos_iterator_type;
-
-      base_iterator_type in_begin(input);
-      
-      forward_iterator_type fwd_begin = make_default_multi_pass(in_begin);
-      forward_iterator_type fwd_end;
-      */
 
       typedef std::string::const_iterator input_iterator;
       typedef boost::spirit::line_pos_iterator<input_iterator> lp_iterator;
@@ -119,20 +101,6 @@ namespace stan {
                          << std::endl;
         }
       } catch (const expectation_failure<lp_iterator>& e) {
-
-/*
-        const file_position_base<std::string>& pos = e.first.get_position();
-        msg << "EXPECTATION FAILURE LOCATION: file=" << pos.file
-            << "; line=" << pos.line 
-            << ", column=" << pos.column 
-            << std::endl;
-        msg << std::endl << e.first.get_currentline() 
-            << std::endl;
-        for (int i = 2; i < pos.column; ++i)
-          msg << ' ';
-        msg << " ^-- here" 
-            << std::endl << std::endl;
-*/
 
         std::stringstream msg;
         std::string diagnostics = prog_grammar.error_msgs_.str();
@@ -168,21 +136,6 @@ namespace stan {
               << std::endl
               << "ERROR: non-whitespace beyond end of program."
               << std::endl;
-
-/*
-        const file_position_base<std::string>& pos 
-          = position_begin.get_position();
-        msg << "LOCATION: file=" << pos.file
-            << "; line=" << pos.line
-            << ", column=" << pos.column
-            << std::endl;
-        msg << position_begin.get_currentline() 
-            << std::endl;
-        for (int i = 2; i < pos.column; ++i)
-          msg << ' ';
-        msg << " ^-- starting here" 
-            << std::endl << std::endl;
-*/
 
         msg << std::endl << prog_grammar.error_msgs_.str() << std::endl;
         throw std::invalid_argument(msg.str());
