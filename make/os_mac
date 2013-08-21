@@ -9,7 +9,7 @@
 ifeq (g++,$(CC_TYPE))
   CFLAGS += -Wno-unused-function
   VERSION := $(CC_MAJOR).$(CC_MINOR)
-  CFLAGS += -ftemplate-depth=1028
+  CFLAGS += -ftemplate-depth=256
   ifeq (4.2,$(CC_MAJOR).$(CC_MINOR))
     PCH = 
   else
@@ -23,8 +23,9 @@ ifeq (clang++,$(CC_TYPE))
   CFLAGS += -Wno-unused-function
   CFLAGS += -Wno-tautological-compare
   CFLAGS += -Wno-c++11-long-long
-  CFLAGS += -ftemplate-depth=1028
-  CFLAGS += -stdlib=libc++ -std=c++11
+  CFLAGS += -ftemplate-depth=256
+  ifeq (true,$(C++11))
+    CFLAGS += -stdlib=libc++ -std=c++11
+  endif
   #PCH = .pch
 endif
-
