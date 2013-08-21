@@ -29,9 +29,9 @@ namespace stan {
           : vari(0.0),
             M_(A.rows()),
             N_(B.cols()),
-            A_((double*)stan::agrad::memalloc_.alloc(sizeof(double) 
+            A_((double*)stan::diff::memalloc_.alloc(sizeof(double) 
                                                      * A.rows() * A.cols())),
-            C_((double*)stan::agrad::memalloc_.alloc(sizeof(double) 
+            C_((double*)stan::diff::memalloc_.alloc(sizeof(double) 
                                                      * B.rows() * B.cols())),
             _variRefA((vari**)stan::diff::memalloc_.alloc(sizeof(vari*) 
                                                            * A.rows() * A.cols())),
@@ -120,9 +120,9 @@ namespace stan {
           : vari(0.0),
             M_(A.rows()),
             N_(B.cols()),
-            A_((double*)stan::agrad::memalloc_.alloc(sizeof(double) 
+            A_((double*)stan::diff::memalloc_.alloc(sizeof(double) 
                                                      * A.rows() * A.cols())),
-            C_((double*)stan::agrad::memalloc_.alloc(sizeof(double) 
+            C_((double*)stan::diff::memalloc_.alloc(sizeof(double) 
                                                      * B.rows() * B.cols())),
             _variRefB((vari**)stan::diff::memalloc_.alloc(sizeof(vari*) 
                                                            * B.rows() * B.cols())),
@@ -199,9 +199,9 @@ namespace stan {
           : vari(0.0),
             M_(A.rows()),
             N_(B.cols()),
-            A_((double*)stan::agrad::memalloc_.alloc(sizeof(double) 
+            A_((double*)stan::diff::memalloc_.alloc(sizeof(double) 
                                                      * A.rows() * A.cols())),
-            C_((double*)stan::agrad::memalloc_.alloc(sizeof(double) 
+            C_((double*)stan::diff::memalloc_.alloc(sizeof(double) 
                                                      * B.rows() * B.cols())),
             _variRefA((vari**)stan::diff::memalloc_.alloc(sizeof(vari*) 
                                                            * A.rows() * A.cols())),

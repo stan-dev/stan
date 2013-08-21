@@ -25,7 +25,7 @@ namespace stan {
           : vari(determinant_vari_calc(A)), 
             _rows(A.rows()),
             _cols(A.cols()),
-            A_((double*)stan::agrad::memalloc_.alloc(sizeof(double) 
+            A_((double*)stan::diff::memalloc_.alloc(sizeof(double) 
                                                      * A.rows() * A.cols())),
             _adjARef((vari**)stan::diff::memalloc_.alloc(sizeof(vari*) 
                                                           * A.rows() * A.cols()))

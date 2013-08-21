@@ -139,7 +139,7 @@ namespace stan {
         : vari(0.0),
         M_(A.rows()),
         N_(B.cols()),
-        _variRefB((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
+        _variRefB((vari**)stan::diff::memalloc_.alloc(sizeof(vari*) 
                                                        * B.rows() * B.cols())),
         _variRefC((vari**)stan::diff::memalloc_.alloc(sizeof(vari*) 
                                                        * B.rows() * B.cols())),
@@ -204,7 +204,7 @@ namespace stan {
         : vari(0.0),
         M_(A.rows()),
         N_(B.cols()),
-        _variRefB((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
+        _variRefB((vari**)stan::diff::memalloc_.alloc(sizeof(vari*) 
                                                        * B.rows() * B.cols())),
         _variRefC((vari**)stan::diff::memalloc_.alloc(sizeof(vari*) 
                                                        * B.rows() * B.cols())),
@@ -266,7 +266,7 @@ namespace stan {
           : vari(0.0),
             M_(A.rows()),
             N_(B.cols()),
-            _variRefC((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
+            _variRefC((vari**)stan::diff::memalloc_.alloc(sizeof(vari*) 
                                                            * B.rows() * B.cols())),
             _alloc(new mdivide_left_ldlt_alloc<R1,C1,R2,C2>()),
             _alloc_ldlt(A._alloc)
