@@ -41,9 +41,10 @@ namespace stan {
     /** 
      * Prints single print option to output ptr if non-null.
      * 
+     * @param o
      * @param key_val 
      * @param msg 
-     * @param note 
+     * @param note
      */
     void print_help_helper(std::ostream* o,
                            const std::string& key_val,
@@ -64,6 +65,7 @@ namespace stan {
     /** 
      * Prints single print option to output ptr if non-null.
      * 
+     * @param o
      * @param key 
      * @param value_type 
      * @param msg 
