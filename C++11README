@@ -21,8 +21,8 @@ or any of the other *.stan files in that directory
 That is, after the inital build sequence, i.e:
 
 make clean-all
-make bin/libstan.a
-make bin/stanc
+make CC=clang++ -j7  bin/libstan.a
+make CC=clang++ O_STANC=3 -j7  bin/stanc
 
 
 Results/comments
@@ -31,6 +31,9 @@ Results/comments
 I usually edit the src/test/gm/model_specs/bernoulli_with_statement_errors
 file to try how well error reporting is working, but have also been running
 the other .stan test cases in that directory.
+
+On my system (preview version of Mavericks ftemplate-depth needs to be increased 
+to 256).
 
 Not sure about the good-all.stan test case. Maybe outdated?
 
