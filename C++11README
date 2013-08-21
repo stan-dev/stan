@@ -46,3 +46,89 @@ To do
    (e.g. with 'clear; make src/test/gm/model_specs/bad2', 
     the parser should not get past the '<-' symbol).
 3)
+
+
+No problems found
+------------------- 
+
+( make CC=clang++ -j7  test-manual )
+( make CC=clang++ -j7  test-test-unit )
+( make CC=clang++ -j7  test-headers )
+( make CC=clang++ -j7  test-distributions )
+
+
+Problems found
+------------------- 
+
+
+( make CC=clang++ -j7  test-models )
+====================================
+
+[  FAILED  ] Models_BugsExamples_Vol1_Kidney/Model_Test_Fixture/0.ChainsTest, where TypeParam = 31Models_BugsExamples_Vol1_Kidney (5 ms)
+[ RUN      ] Models_BugsExamples_Vol1_Kidney/Model_Test_Fixture/0.ExpectedValuesTest
+[       OK ] Models_BugsExamples_Vol1_Kidney/Model_Test_Fixture/0.ExpectedValuesTest (3 ms)
+[----------] 4 tests from Models_BugsExamples_Vol1_Kidney/Model_Test_Fixture/0 (89786 ms total)
+
+[----------] Global test environment tear-down
+[==========] 4 tests from 1 test case ran. (91946 ms total)
+[  PASSED  ] 3 tests.
+[  FAILED  ] 1 test, listed below:
+[  FAILED  ] Models_BugsExamples_Vol1_Kidney/Model_Test_Fixture/0.ChainsTest, where TypeParam = 31Models_BugsExamples_Vol1_Kidney
+
+ 1 FAILED TEST
+make: [runtest_no_fail/test/models/bugs_examples/vol1/kidney/kidney] Error 1 (ignored)
+
+------------------------------------------------------------
+
+[  FAILED  ] Models_BasicDistributions_InvWishart/Model_Test_Fixture/0.ChainsTest, where TypeParam = 36Models_BasicDistributions_InvWishart (1 ms)
+[ RUN      ] Models_BasicDistributions_InvWishart/Model_Test_Fixture/0.ExpectedValuesTest
+[       OK ] Models_BasicDistributions_InvWishart/Model_Test_Fixture/0.ExpectedValuesTest (4 ms)
+[----------] 4 tests from Models_BasicDistributions_InvWishart/Model_Test_Fixture/0 (495955 ms total)
+
+[----------] Global test environment tear-down
+[==========] 4 tests from 1 test case ran. (498193 ms total)
+[  PASSED  ] 3 tests.
+[  FAILED  ] 1 test, listed below:
+[  FAILED  ] Models_BasicDistributions_InvWishart/Model_Test_Fixture/0.ChainsTest, where TypeParam = 36Models_BasicDistributions_InvWishart
+
+ 1 FAILED TEST
+make: [runtest_no_fail/test/models/basic_distributions/inv_wishart] Error 1 (ignored)
+
+------------------------------------------------------------
+
+[  FAILED  ] Models_BugsExamples_Vol3_Camel/Model_Test_Fixture/0.ChainsTest, where TypeParam = 30Models_BugsExamples_Vol3_Camel (1 ms)
+[ RUN      ] Models_BugsExamples_Vol3_Camel/Model_Test_Fixture/0.ExpectedValuesTest
+[       OK ] Models_BugsExamples_Vol3_Camel/Model_Test_Fixture/0.ExpectedValuesTest (1 ms)
+[----------] 4 tests from Models_BugsExamples_Vol3_Camel/Model_Test_Fixture/0 (552827 ms total)
+
+[----------] Global test environment tear-down
+[==========] 4 tests from 1 test case ran. (554930 ms total)
+[  PASSED  ] 3 tests.
+[  FAILED  ] 1 test, listed below:
+[  FAILED  ] Models_BugsExamples_Vol3_Camel/Model_Test_Fixture/0.ChainsTest, where TypeParam = 30Models_BugsExamples_Vol3_Camel
+
+ 1 FAILED TEST
+make: [runtest_no_fail/test/models/bugs_examples/vol3/camel/camel] Error 1 (ignored)
+
+------------------------------------------------------------
+
+[  FAILED  ] Models_BugsExamples_Vol2_MvnOrange/Model_Test_Fixture/0.ChainsTest, where TypeParam = 34Models_BugsExamples_Vol2_MvnOrange (3 ms)
+[ RUN      ] Models_BugsExamples_Vol2_MvnOrange/Model_Test_Fixture/0.ExpectedValuesTest
+[       OK ] Models_BugsExamples_Vol2_MvnOrange/Model_Test_Fixture/0.ExpectedValuesTest (3 ms)
+[----------] 4 tests from Models_BugsExamples_Vol2_MvnOrange/Model_Test_Fixture/0 (3035742 ms total)
+
+[----------] Global test environment tear-down
+[==========] 4 tests from 1 test case ran. (3037955 ms total)
+[  PASSED  ] 3 tests.
+[  FAILED  ] 1 test, listed below:
+[  FAILED  ] Models_BugsExamples_Vol2_MvnOrange/Model_Test_Fixture/0.ChainsTest, where TypeParam = 34Models_BugsExamples_Vol2_MvnOrange
+
+ 1 FAILED TEST
+make: [runtest_no_fail/test/models/bugs_examples/vol2/mvn_orange/mvn_orange] Error 1 (ignored)
+
+-------------------- Missing 49 tests --------------------
+  src/models/basic_estimators/negative_binomial.stan
+  src/models/basic_estimators/negative_binomial2.stan
+  src/models/basic_estimators/normal_censored.stan
+  src/models/basic_estimators/normal_mixture_k.stan
+...
