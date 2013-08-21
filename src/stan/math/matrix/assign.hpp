@@ -56,8 +56,8 @@ namespace stan {
      * @tparam C1 Column shape of left-hand side matrix.
      * @tparam R2 Row shape of right-hand side matrix.
      * @tparam C2 Column shape of right-hand side matrix.
-     * @param lhs Left-hand side matrix.
-     * @param rhs Right-hand side matrix.
+     * @param x Left-hand side matrix.
+     * @param y Right-hand side matrix.
      * @throw std::domain_error if sizes do not match.
      */
     template <typename LHS, typename RHS, int R1, int C1, int R2, int C2>
@@ -87,8 +87,8 @@ namespace stan {
      * @tparam RHS Type of right-hand side matrix elements.
      * @tparam R Row shape of both matrices.
      * @tparam C Column shape of both mtarices.
-     * @param lhs Left-hand side matrix.
-     * @param rhs Right-hand side matrix.
+     * @param x Left-hand side matrix.
+     * @param y Right-hand side matrix.
      * @throw std::domain_error if sizes do not match.
      */
     template <typename LHS, typename RHS, int R, int C>
@@ -114,8 +114,8 @@ namespace stan {
      * @tparam RHS Type of right-hand side matrix elements.
      * @tparam R Row shape for right-hand side matrix.
      * @tparam C Column shape for right-hand side matrix.
-     * @param lhs Left-hand side block view of matrix.
-     * @param rhs Right-hand side matrix.
+     * @param x Left-hand side block view of matrix.
+     * @param y Right-hand side matrix.
      * @throw std::domain_error if sizes do not match.
      */
     template <typename LHS, typename RHS, int R, int C>
@@ -144,8 +144,8 @@ namespace stan {
      *
      * @tparam LHS Type of left-hand side vector elements.
      * @tparam RHS Type of right-hand side vector elements.
-     * @param lhs Left-hand side vector.
-     * @param rhs Right-hand side vector.
+     * @param x Left-hand side vector.
+     * @param y Right-hand side vector.
      * @throw std::domain_error if sizes do not match.
      */
     template <typename LHS, typename RHS>
