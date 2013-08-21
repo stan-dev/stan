@@ -16,10 +16,10 @@ namespace stan {
       template <int R1,int C1,int R2,int C2>
       class mdivide_left_vv_vari : public vari {
       public:
-        int _M; // A.rows() = A.cols() = B.rows()
-        int _N; // B.cols()
-        double* _A;
-        double* _C;
+        int M_; // A.rows() = A.cols() = B.rows()
+        int N_; // B.cols()
+        double* A_;
+        double* C_;
         vari** _variRefA;
         vari** _variRefB;
         vari** _variRefC;
@@ -27,11 +27,11 @@ namespace stan {
         mdivide_left_vv_vari(const Eigen::Matrix<var,R1,C1> &A,
                              const Eigen::Matrix<var,R2,C2> &B)
           : vari(0.0),
-            _M(A.rows()),
-            _N(B.cols()),
-            _A((double*)stan::agrad::memalloc_.alloc(sizeof(double) 
+            M_(A.rows()),
+            N_(B.cols()),
+            A_((double*)stan::agrad::memalloc_.alloc(sizeof(double) 
                                                      * A.rows() * A.cols())),
-            _C((double*)stan::agrad::memalloc_.alloc(sizeof(double) 
+            C_((double*)stan::agrad::memalloc_.alloc(sizeof(double) 
                                                      * B.rows() * B.cols())),
             _variRefA((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
                                                            * A.rows() * A.cols())),
@@ -44,32 +44,32 @@ namespace stan {
           using Eigen::Map;
 
           size_t pos = 0;
-          for (size_type j = 0; j < _M; j++) {
-            for (size_type i = 0; i < _M; i++) {
+          for (size_type j = 0; j < M_; j++) {
+            for (size_type i = 0; i < M_; i++) {
               _variRefA[pos] = A(i,j).vi_;
-              _A[pos++] = A(i,j).val();
+              A_[pos++] = A(i,j).val();
             }
           }
   
           pos = 0;
-          for (size_type j = 0; j < _N; j++) {
-            for (size_type i = 0; i < _M; i++) {
+          for (size_type j = 0; j < N_; j++) {
+            for (size_type i = 0; i < M_; i++) {
               _variRefB[pos] = B(i,j).vi_;
-              _C[pos++] = B(i,j).val();
+              C_[pos++] = B(i,j).val();
             }
           }
         
-          Matrix<double,R1,C2> C(_M,_N);
-          C = Map<Matrix<double,R1,C2> >(_C,_M,_N);
+          Matrix<double,R1,C2> C(M_,N_);
+          C = Map<Matrix<double,R1,C2> >(C_,M_,N_);
 
-          C = Map<Matrix<double,R1,C1> >(_A,_M,_M)
+          C = Map<Matrix<double,R1,C1> >(A_,M_,M_)
             .colPivHouseholderQr().solve(C);
 
           pos = 0;
-          for (size_type j = 0; j < _N; j++) {
-            for (size_type i = 0; i < _M; i++) {
-              _C[pos] = C(i,j);
-              _variRefC[pos] = new vari(_C[pos],false);
+          for (size_type j = 0; j < N_; j++) {
+            for (size_type i = 0; i < M_; i++) {
+              C_[pos] = C(i,j);
+              _variRefC[pos] = new vari(C_[pos],false);
               pos++;
             }
           }
@@ -78,9 +78,9 @@ namespace stan {
         virtual void chain() {
           using Eigen::Matrix;
           using Eigen::Map;
-          Eigen::Matrix<double,R1,C1> adjA(_M,_M);
-          Eigen::Matrix<double,R2,C2> adjB(_M,_N);
-          Eigen::Matrix<double,R1,C2> adjC(_M,_N);
+          Eigen::Matrix<double,R1,C1> adjA(M_,M_);
+          Eigen::Matrix<double,R2,C2> adjB(M_,N_);
+          Eigen::Matrix<double,R1,C2> adjC(M_,N_);
 
           size_t pos = 0;
           for (size_type j = 0; j < adjC.cols(); j++)
@@ -88,10 +88,10 @@ namespace stan {
               adjC(i,j) = _variRefC[pos++]->adj_;
         
         
-          adjB = Map<Matrix<double,R1,C1> >(_A,_M,_M)
+          adjB = Map<Matrix<double,R1,C1> >(A_,M_,M_)
             .transpose().colPivHouseholderQr().solve(adjC);
           adjA.noalias() = -adjB
-            * Map<Matrix<double,R1,C2> >(_C,_M,_N).transpose();
+            * Map<Matrix<double,R1,C2> >(C_,M_,N_).transpose();
         
           pos = 0;
           for (size_type j = 0; j < adjA.cols(); j++)
@@ -108,21 +108,21 @@ namespace stan {
       template <int R1,int C1,int R2,int C2>
       class mdivide_left_dv_vari : public vari {
       public:
-        int _M; // A.rows() = A.cols() = B.rows()
-        int _N; // B.cols()
-        double* _A;
-        double* _C;
+        int M_; // A.rows() = A.cols() = B.rows()
+        int N_; // B.cols()
+        double* A_;
+        double* C_;
         vari** _variRefB;
         vari** _variRefC;
       
         mdivide_left_dv_vari(const Eigen::Matrix<double,R1,C1> &A,
                              const Eigen::Matrix<var,R2,C2> &B)
           : vari(0.0),
-            _M(A.rows()),
-            _N(B.cols()),
-            _A((double*)stan::agrad::memalloc_.alloc(sizeof(double) 
+            M_(A.rows()),
+            N_(B.cols()),
+            A_((double*)stan::agrad::memalloc_.alloc(sizeof(double) 
                                                      * A.rows() * A.cols())),
-            _C((double*)stan::agrad::memalloc_.alloc(sizeof(double) 
+            C_((double*)stan::agrad::memalloc_.alloc(sizeof(double) 
                                                      * B.rows() * B.cols())),
             _variRefB((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
                                                            * B.rows() * B.cols())),
@@ -133,31 +133,31 @@ namespace stan {
           using Eigen::Map;
   
           size_t pos = 0;
-          for (size_type j = 0; j < _M; j++) {
-            for (size_type i = 0; i < _M; i++) {
-              _A[pos++] = A(i,j);
+          for (size_type j = 0; j < M_; j++) {
+            for (size_type i = 0; i < M_; i++) {
+              A_[pos++] = A(i,j);
             }
           }
   
           pos = 0;
-          for (size_type j = 0; j < _N; j++) {
-            for (size_type i = 0; i < _M; i++) {
+          for (size_type j = 0; j < N_; j++) {
+            for (size_type i = 0; i < M_; i++) {
               _variRefB[pos] = B(i,j).vi_;
-              _C[pos++] = B(i,j).val();
+              C_[pos++] = B(i,j).val();
             }
           }
                 
-          Matrix<double,R1,C2> C(_M,_N);
-          C = Map<Matrix<double,R1,C2> >(_C,_M,_N);
+          Matrix<double,R1,C2> C(M_,N_);
+          C = Map<Matrix<double,R1,C2> >(C_,M_,N_);
 
-          C = Map<Matrix<double,R1,C1> >(_A,_M,_M)
+          C = Map<Matrix<double,R1,C1> >(A_,M_,M_)
             .colPivHouseholderQr().solve(C);
   
           pos = 0;
-          for (size_type j = 0; j < _N; j++) {
-            for (size_type i = 0; i < _M; i++) {
-              _C[pos] = C(i,j);
-              _variRefC[pos] = new vari(_C[pos],false);
+          for (size_type j = 0; j < N_; j++) {
+            for (size_type i = 0; i < M_; i++) {
+              C_[pos] = C(i,j);
+              _variRefC[pos] = new vari(C_[pos],false);
               pos++;
             }
           }
@@ -166,15 +166,15 @@ namespace stan {
         virtual void chain() {
           using Eigen::Matrix;
           using Eigen::Map;
-          Eigen::Matrix<double,R2,C2> adjB(_M,_N);
-          Eigen::Matrix<double,R1,C2> adjC(_M,_N);
+          Eigen::Matrix<double,R2,C2> adjB(M_,N_);
+          Eigen::Matrix<double,R1,C2> adjC(M_,N_);
 
           size_t pos = 0;
           for (size_type j = 0; j < adjC.cols(); j++)
             for (size_type i = 0; i < adjC.rows(); i++)
               adjC(i,j) = _variRefC[pos++]->adj_;
 
-          adjB = Map<Matrix<double,R1,C1> >(_A,_M,_M)
+          adjB = Map<Matrix<double,R1,C1> >(A_,M_,M_)
             .transpose().colPivHouseholderQr().solve(adjC);
 
           pos = 0;
@@ -187,21 +187,21 @@ namespace stan {
       template <int R1,int C1,int R2,int C2>
       class mdivide_left_vd_vari : public vari {
       public:
-        int _M; // A.rows() = A.cols() = B.rows()
-        int _N; // B.cols()
-        double* _A;
-        double* _C;
+        int M_; // A.rows() = A.cols() = B.rows()
+        int N_; // B.cols()
+        double* A_;
+        double* C_;
         vari** _variRefA;
         vari** _variRefC;
       
         mdivide_left_vd_vari(const Eigen::Matrix<var,R1,C1> &A,
                              const Eigen::Matrix<double,R2,C2> &B)
           : vari(0.0),
-            _M(A.rows()),
-            _N(B.cols()),
-            _A((double*)stan::agrad::memalloc_.alloc(sizeof(double) 
+            M_(A.rows()),
+            N_(B.cols()),
+            A_((double*)stan::agrad::memalloc_.alloc(sizeof(double) 
                                                      * A.rows() * A.cols())),
-            _C((double*)stan::agrad::memalloc_.alloc(sizeof(double) 
+            C_((double*)stan::agrad::memalloc_.alloc(sizeof(double) 
                                                      * B.rows() * B.cols())),
             _variRefA((vari**)stan::agrad::memalloc_.alloc(sizeof(vari*) 
                                                            * A.rows() * A.cols())),
@@ -212,22 +212,22 @@ namespace stan {
           using Eigen::Map;
 
           size_t pos = 0;
-          for (size_type j = 0; j < _M; j++) {
-            for (size_type i = 0; i < _M; i++) {
+          for (size_type j = 0; j < M_; j++) {
+            for (size_type i = 0; i < M_; i++) {
               _variRefA[pos] = A(i,j).vi_;
-              _A[pos++] = A(i,j).val();
+              A_[pos++] = A(i,j).val();
             }
           }
   
-          Matrix<double,R1,C2> C(_M,_N);
-          C = Map<Matrix<double,R1,C1> >(_A,_M,_M)
+          Matrix<double,R1,C2> C(M_,N_);
+          C = Map<Matrix<double,R1,C1> >(A_,M_,M_)
             .colPivHouseholderQr().solve(B);
 
           pos = 0;
-          for (size_type j = 0; j < _N; j++) {
-            for (size_type i = 0; i < _M; i++) {
-              _C[pos] = C(i,j);
-              _variRefC[pos] = new vari(_C[pos],false);
+          for (size_type j = 0; j < N_; j++) {
+            for (size_type i = 0; i < M_; i++) {
+              C_[pos] = C(i,j);
+              _variRefC[pos] = new vari(C_[pos],false);
               pos++;
             }
           }
@@ -236,8 +236,8 @@ namespace stan {
         virtual void chain() {
           using Eigen::Matrix;
           using Eigen::Map;
-          Eigen::Matrix<double,R1,C1> adjA(_M,_M);
-          Eigen::Matrix<double,R1,C2> adjC(_M,_N);
+          Eigen::Matrix<double,R1,C1> adjA(M_,M_);
+          Eigen::Matrix<double,R1,C2> adjC(M_,N_);
 
           size_t pos = 0;
           for (size_type j = 0; j < adjC.cols(); j++)
@@ -245,10 +245,10 @@ namespace stan {
               adjC(i,j) = _variRefC[pos++]->adj_;
         
           // FIXME: add .noalias() to LHS
-          adjA = -Map<Matrix<double,R1,C1> >(_A,_M,_M)
+          adjA = -Map<Matrix<double,R1,C1> >(A_,M_,M_)
             .transpose()
             .colPivHouseholderQr()
-            .solve(adjC*Map<Matrix<double,R1,C2> >(_C,_M,_N).transpose());
+            .solve(adjC*Map<Matrix<double,R1,C2> >(C_,M_,N_).transpose());
 
           pos = 0;
           for (size_type j = 0; j < adjA.cols(); j++)
