@@ -94,23 +94,17 @@ namespace stan {
           if (good_arg) unset_args.erase(arg_it);
           
           if (cat_name == "help") {
-
-            print_usage(out, argv[0]);
-
             _help_flag |= true;
-            
             args.clear();
-            
-            return true;
-            
           } else if (cat_name == "help-all") {
-            
             print_help(out, true);
             _help_flag |= true;
             args.clear();
-            
+          }
+          
+          if (_help_flag) {
+            print_usage(out, argv[0]);
             return true;
-            
           }
           
           if (!good_arg && err) {
