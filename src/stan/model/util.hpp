@@ -28,9 +28,9 @@ namespace stan {
      * Jacobian determinant of inverse parameter transforms is added to 
      * the log probability.
      * @tparam M Class of model.
-     * @param model[in] Model.
-     * @param params_r[in] Real-valued parameters.
-     * @param params_i[in] Integer-valued parameters.
+     * @param[in] model Model.
+     * @param[in] params_r Real-valued parameters.
+     * @param[in] params_i Integer-valued parameters.
      * @param[in,out] msgs
      */
     template <bool jacobian_adjust_transform, class M>
@@ -69,9 +69,9 @@ namespace stan {
      * Jacobian determinant of inverse parameter transforms is added to 
      * the log probability.
      * @tparam M Class of model.
-     * @param model[in] Model.
-     * @param params_r[in] Real-valued parameters.
-     * @param params_i[in] Integer-valued parameters.
+     * @param[in] model Model.
+     * @param[in] params_r Real-valued parameters.
+     * @param[in] params_i Integer-valued parameters.
      * @param[out] gradient Vector into which gradient is written.
      * @param[in,out] msgs
      */
@@ -119,7 +119,7 @@ namespace stan {
      * @param params_i Integer-valued parameters.
      * @param[out] grad Vector into which gradient is written.
      * @param epsilon
-     * @param[in,out] output_stream
+     * @param[in,out] msgs
      */
     template <bool propto, bool jacobian_adjust_transform, class M>
     void finite_diff_grad(const M& model,
@@ -169,11 +169,10 @@ namespace stan {
      * @param model Model.
      * @param params_r Real-valued parameter vector.
      * @param params_i Integer-valued parameter vector.
-     * @param epsilon Real-valued scalar saying how much to perturb 
-     * @param error Real-valued scalar saying how much error to allow
-     * @param o Output stream for messages.
-     * params_r. Defaults to 1e-6.
-     * @param output_stream Stream to which Stan programs write.
+     * @param epsilon Real-valued scalar saying how much to perturb. Defaults to 1e-6.
+     * @param error Real-valued scalar saying how much error to allow. Defaults to 1e-6.
+     * @param o Output stream for messages. Defaults to std::cout.
+     * @param msgs Stream to which Stan programs write. Defaults to 0.
      * @return number of failed gradient comparisons versus allowed
      * error, so 0 if all gradients pass
      */
@@ -247,7 +246,7 @@ namespace stan {
      * @param hessian Vector to write gradient to. hessian[i*D + j]
      * gives the element at the ith row and jth column of the Hessian
      * (where D=params_r.size()).
-     * @param output_stream Stream to which print statements in Stan
+     * @param msgs Stream to which print statements in Stan
      * programs are written, default is 0
      */
     template <bool propto, bool jacobian_adjust_transform, class M>

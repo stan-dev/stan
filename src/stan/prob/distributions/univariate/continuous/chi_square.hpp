@@ -147,8 +147,8 @@ namespace stan {
      * Calculates the chi square cumulative distribution function for the given
      * variate and degrees of freedom.
      * 
-     * @param y A scalar variate.
-     * @param nu Degrees of freedom.
+     * y A scalar variate.
+     * nu Degrees of freedom.
      * 
      * @return The cdf of the chi square distribution
      */

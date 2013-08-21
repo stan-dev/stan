@@ -18,14 +18,14 @@ namespace stan {
       class determinant_vari : public vari {
         int _rows;
         int _cols;
-        double* _A;
+        double* A_;
         vari** _adjARef;
       public:
         determinant_vari(const Eigen::Matrix<var,R,C> &A)
           : vari(determinant_vari_calc(A)), 
             _rows(A.rows()),
             _cols(A.cols()),
-            _A((double*)stan::diff::memalloc_.alloc(sizeof(double) 
+            A_((double*)stan::agrad::memalloc_.alloc(sizeof(double) 
                                                      * A.rows() * A.cols())),
             _adjARef((vari**)stan::diff::memalloc_.alloc(sizeof(vari*) 
                                                           * A.rows() * A.cols()))
@@ -33,7 +33,7 @@ namespace stan {
           size_t pos = 0;
           for (size_type j = 0; j < _cols; j++) {
             for (size_type i = 0; i < _rows; i++) {
-              _A[pos] = A(i,j).val();
+              A_[pos] = A(i,j).val();
               _adjARef[pos++] = A(i,j).vi_;
             }
           }
@@ -51,7 +51,7 @@ namespace stan {
           using Eigen::Map;
           Matrix<double,R,C> adjA(_rows,_cols);
           adjA = (adj_ * val_) * 
-            Map<Matrix<double,R,C> >(_A,_rows,_cols).inverse().transpose();
+            Map<Matrix<double,R,C> >(A_,_rows,_cols).inverse().transpose();
           size_t pos = 0;
           for (size_type j = 0; j < _cols; j++) {
             for (size_type i = 0; i < _rows; i++) {

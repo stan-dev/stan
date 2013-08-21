@@ -104,41 +104,6 @@ namespace stan {
       return ret;
     }
 
-    //not sure what this is for..
-    // /**
-    //  * Returns the dot product.
-    //  *
-    //  * @param[in] v1 First array.
-    //  * @param[in] v2 Second array.
-    //  * @param[in] length Length of both arrays.
-    //  * @return Dot product of the arrays.
-    //  */
-    // inline var dot_product(const var* v1, const var* v2, size_t length) {
-    //   return var(new dot_product_vv_vari(v1, v2, length));
-    // }
-    // /**
-    //  * Returns the dot product.
-    //  *
-    //  * @param[in] v1 First array.
-    //  * @param[in] v2 Second array.
-    //  * @param[in] length Length of both arrays.
-    //  * @return Dot product of the arrays.
-    //  */
-    // inline var dot_product(const var* v1, const double* v2, size_t length) {
-    //   return var(new dot_product_vd_vari(v1, v2, length));
-    // }
-    // /**
-    //  * Returns the dot product.
-    //  *
-    //  * @param[in] v1 First array.
-    //  * @param[in] v2 Second array.
-    //  * @param[in] length Length of both arrays.
-    //  * @return Dot product of the arrays.
-    //  */
-    // inline var dot_product(const double* v1, const var* v2, size_t length) {
-    //   return var(new dot_product_vd_vari(v2, v1, length));
-    // }
-
     template<typename T1, typename T2>
     inline 
     fvar<typename stan::return_type<T1,T2>::type>

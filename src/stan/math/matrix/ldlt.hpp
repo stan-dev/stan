@@ -18,16 +18,16 @@ namespace stan {
     template<int R, int C>
     class LDLT_factor<double,R,C> {
     public:
-      LDLT_factor() : _N(0) {}
+      LDLT_factor() : N_(0) {}
       LDLT_factor(const Eigen::Matrix<double,R,C> &A)
-      : _N(0), _ldltP(new Eigen::LDLT< Eigen::Matrix<double,R,C> >())
+      : N_(0), _ldltP(new Eigen::LDLT< Eigen::Matrix<double,R,C> >())
       {
         compute(A);
       }
       
       inline void compute(const Eigen::Matrix<double,R,C> &A) {
         stan::math::validate_square(A,"LDLT_factor<double>::compute");
-        _N = A.rows();
+        N_ = A.rows();
         _ldltP->compute(A);
       }
       
@@ -44,7 +44,7 @@ namespace stan {
       }
       
       inline void inverse(Eigen::Matrix<double,R,C> &invA) const {
-        invA.setIdentity(_N);
+        invA.setIdentity(N_);
         _ldltP->solveInPlace(invA);
       }
 
@@ -58,12 +58,12 @@ namespace stan {
         return _ldltP->solve(B.transpose()).transpose();
       }
       
-      inline size_t rows() const { return _N; }
-      inline size_t cols() const { return _N; }
+      inline size_t rows() const { return N_; }
+      inline size_t cols() const { return N_; }
       
       typedef size_t size_type;
 
-      size_t _N;
+      size_t N_;
       boost::shared_ptr< Eigen::LDLT< Eigen::Matrix<double,R,C> > > _ldltP;
     };
     

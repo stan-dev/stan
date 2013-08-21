@@ -21,16 +21,16 @@ namespace stan {
       public:
         trace_quad_form_vari_alloc(const Eigen::Matrix<TA,RA,CA> &A,
                                    const Eigen::Matrix<TB,RB,CB> &B)
-        : _A(A), _B(B)
+        : A_(A), B_(B)
         { }
         
         double compute() {
-          return stan::math::trace_quad_form(value_of(_A),
-                                             value_of(_B));
+          return stan::math::trace_quad_form(value_of(A_),
+                                             value_of(B_));
         }
         
-        Eigen::Matrix<TA,RA,CA>  _A;
-        Eigen::Matrix<TB,RB,CB>  _B;
+        Eigen::Matrix<TA,RA,CA>  A_;
+        Eigen::Matrix<TB,RB,CB>  B_;
       };
       
       template<typename TA,int RA,int CA,typename TB,int RB,int CB>
@@ -82,8 +82,8 @@ namespace stan {
         : vari(impl->compute()), _impl(impl) { }
         
         virtual void chain() {
-          chainAB(_impl->_A, _impl->_B,
-                  value_of(_impl->_A), value_of(_impl->_B),
+          chainAB(_impl->A_, _impl->B_,
+                  value_of(_impl->A_), value_of(_impl->B_),
                   adj_);
         };
 

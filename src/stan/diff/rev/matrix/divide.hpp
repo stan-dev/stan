@@ -17,8 +17,8 @@ namespace stan {
     /**
      * Return the division of the first scalar by
      * the second scalar.
-     * @param[in] v Specified vector.
-     * @param[in] c Specified scalar.
+     * @param[in] x Specified vector.
+     * @param[in] y Specified scalar.
      * @return Vector divided by the scalar.
      */
     inline double
