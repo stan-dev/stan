@@ -1,11 +1,21 @@
 #include <stan/prob/distributions/univariate/discrete/neg_binomial.hpp>
 #include <gtest/gtest.h>
 #include <boost/random/mersenne_twister.hpp>
-#include<boost/math/distributions.hpp>
+#include <boost/math/distributions.hpp>
 
-TEST(ProbDistributionsNegBinomial, random) {
+TEST(ProbDistributionsNegBinomial, error_check) {
   boost::random::mt19937 rng;
   EXPECT_NO_THROW(stan::prob::neg_binomial_rng(6, 2, rng));
+
+  EXPECT_THROW(stan::prob::neg_binomial_rng(0, 2, rng),std::domain_error);
+  EXPECT_THROW(stan::prob::neg_binomial_rng(-6, 2, rng),std::domain_error);
+  EXPECT_THROW(stan::prob::neg_binomial_rng(6, -2, rng),std::domain_error);
+  EXPECT_THROW(stan::prob::neg_binomial_rng(stan::math::positive_infinity(), 2, 
+                                            rng),
+               std::domain_error);
+  EXPECT_THROW(stan::prob::neg_binomial_rng(6,stan::math::positive_infinity(), 
+                                            rng),
+               std::domain_error);
 }
 
 TEST(ProbDistributionsNegBinomial, chiSquareGoodnessFitTest) {
@@ -29,7 +39,7 @@ TEST(ProbDistributionsNegBinomial, chiSquareGoodnessFitTest) {
   expect[K-1] = N * (1 - cdf(dist, K - 1));
 
   while (count < N) {
-    int a = stan::prob::neg_binomial_rng(5,1.5,rng);
+    int a = stan::prob::neg_binomial_rng(5,1.0/0.6-1,rng);
     int i = 0;
     while (i < K-1 && a > loc[i]) 
       ++i;

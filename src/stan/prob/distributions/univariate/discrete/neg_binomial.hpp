@@ -596,10 +596,25 @@ namespace stan {
                      RNG& rng) {
       using boost::variate_generator;
       using boost::random::negative_binomial_distribution;
+
+      static const char* function = "stan::prob::neg_binomial_rng(%1%)";
+
+      using stan::math::check_finite;      
+      using stan::math::check_positive;
+
+      if (!check_finite(function, alpha, "Shape parameter"))
+        return 0;
+      if (!check_positive(function, alpha, "Shape parameter"))
+        return 0;
+      if (!check_finite(function, beta, "Inverse scale parameter"))
+        return 0;
+      if (!check_positive(function, beta, "Inverse scale parameter"))
+        return 0;
+
       variate_generator<RNG&, negative_binomial_distribution<> >
         neg_binomial_rng(rng, 
                          negative_binomial_distribution<>(alpha,
-                                                          beta / (beta + 1)));
+                                                          1.0 / (beta + 1.0)));
       return neg_binomial_rng();
     }
   }
