@@ -38,7 +38,7 @@ namespace stan {
      * Return the sum of the specified matrix and specified scalar.
      *
      * @tparam T1 Scalar type of matrix.
-     * @param T2 Type of scalar.
+     * @tparam T2 Type of scalar.
      * @param m Matrix.
      * @param c Scalar.
      * @return The matrix plus the scalar.
@@ -58,7 +58,7 @@ namespace stan {
     /**
      * Return the sum of the specified scalar and specified matrix.
      *
-     * @param T1 Type of scalar.
+     * @tparam T1 Type of scalar.
      * @tparam T2 Scalar type of matrix.
      * @param c Scalar.
      * @param m Matrix.

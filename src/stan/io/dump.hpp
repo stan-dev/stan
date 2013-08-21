@@ -306,7 +306,7 @@ namespace stan {
        * Write a structure variable with the specified name,
        * dimensions, and integer or double values.
        *
-       * @param name Name of variable.
+       * name Name of variable.
        * @param dims Dimensions of variable.
        * @param xs Values of variable in last-index major format.
        * @tparam T <code>double</code> or <code>int</code>.
