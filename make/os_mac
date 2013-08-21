@@ -15,11 +15,25 @@ ifeq (g++,$(CC_TYPE))
     PCH = .gch
   endif
 endif
+
+ifeq (clang,$(CC_TYPE))
+  CFLAGS_GTEST += -Wc++11-extensions
+  CFLAGS_GTEST += -Wno-c++11-long-long
+  CFLAGS += -Wno-unused-function
+  CFLAGS += -Wno-tautological-compare
+  CFLAGS += -Wno-c++11-long-long
+  CFLAGS += -ftemplate-depth=256
+  #CFLAGS += -stdlib=libc++ -std=c++11
+  #PCH = .pch
+endif
+
 ifeq (clang++,$(CC_TYPE))
   CFLAGS_GTEST += -Wc++11-extensions
   CFLAGS_GTEST += -Wno-c++11-long-long
   CFLAGS += -Wno-unused-function
   CFLAGS += -Wno-tautological-compare
   CFLAGS += -Wno-c++11-long-long
+  CFLAGS += -ftemplate-depth=256
+  CFLAGS += -stdlib=libc++ -std=c++11
   #PCH = .pch
 endif

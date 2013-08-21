@@ -13,22 +13,13 @@
 #include <vector>
 #include <stdexcept>
 
-#include <boost/spirit/include/qi.hpp>
-// FIXME: get rid of unused include
-#include <boost/spirit/include/phoenix_core.hpp>
-#include <boost/spirit/include/phoenix_function.hpp>
-#include <boost/spirit/include/phoenix_fusion.hpp>
-#include <boost/spirit/include/phoenix_object.hpp>
-#include <boost/spirit/include/phoenix_operator.hpp>
-#include <boost/spirit/include/phoenix_stl.hpp>
 
+#include <boost/spirit/include/qi.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>
 #include <boost/fusion/include/std_pair.hpp>
 #include <boost/config/warning_disable.hpp>
-#include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/qi_numeric.hpp>
-#include <boost/spirit/include/classic_position_iterator.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>
 #include <boost/spirit/include/phoenix_function.hpp>
 #include <boost/spirit/include/phoenix_fusion.hpp>
@@ -39,6 +30,9 @@
 #include <boost/tuple/tuple.hpp>
 #include <boost/variant/apply_visitor.hpp>
 #include <boost/variant/recursive_variant.hpp>
+
+#include <boost/spirit/include/version.hpp>
+#include <boost/spirit/include/support_line_pos_iterator.hpp>
 
 #include <stan/gm/ast.hpp>
 #include <stan/gm/grammars/whitespace_grammar.hpp>
@@ -372,6 +366,19 @@ namespace stan {
     };
     boost::phoenix::function<validate_allow_sample> validate_allow_sample_f;
 
+    struct statement_error {
+      template <typename T1, typename T2, typename T3>
+      struct result { typedef void type; };
+
+      void operator()(std::string msg,
+                      variable_map& vm,
+                      std::stringstream& error_msgs) const {
+        error_msgs << msg
+                   << std::endl;
+      }
+    };
+    boost::phoenix::function<statement_error> statement_error_f;
+
 
     template <typename Iterator>
     statement_grammar<Iterator>::statement_grammar(variable_map& var_map,
@@ -563,6 +570,20 @@ namespace stan {
       no_op_statement_r 
         %= lit(';') [_val = no_op_statement()];  // ok to re-use instance
 
+      using boost::spirit::qi::on_error;
+      using boost::spirit::qi::fail;
+      using boost::spirit::qi::rethrow;
+      using namespace boost::spirit::qi::labels;
+
+      /*
+      on_error<rethrow>(
+        statement_r,
+        statement_error_f(
+          "Error in statement",
+          boost::phoenix::ref(var_map_),
+          boost::phoenix::ref(error_msgs_))
+      );
+      */ 
     }
 
   }

@@ -1,0 +1,45 @@
+STAN C++11 README
+======================================================================
+
+This branch attempts to replace the existing parser error reporting.
+
+ 
+Why
+----------------------------------------------------------------------
+The current (1.3.0) error reporting is based on 'classic' pos-iterators.
+These collide when compiling for C++11 with optimization levels > 0
+
+
+Usage
+------------------- 
+The easiest way to test out this branch is in the root directory run:
+
+clear;make src/test/gm/model_specs/bernoulli_with_statement_errors
+
+or any of the other *.stan files in that directory
+
+That is, after the inital build sequence, i.e:
+
+make clean-all
+make bin/libstan.a
+make bin/stanc
+
+
+Results/comments
+------------------- 
+
+I usually edit the src/test/gm/model_specs/bernoulli_with_statement_errors
+file to try how well error reporting is working, but have also been running
+the other .stan test cases in that directory.
+
+Not sure about the good-all.stan test case. Maybe outdated?
+
+
+To do
+------------------- 
+
+1) Test structure for parser error reporting.
+2) I wonder if occasionally _pass does not completely work
+   (e.g. with 'clear; make src/test/gm/model_specs/bad2', 
+    the parser should not get past the '<-' symbol).
+3)
