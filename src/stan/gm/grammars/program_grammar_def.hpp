@@ -121,8 +121,18 @@ namespace stan {
         //  Would be better to use the parser to select which 
         //  section in the stan file contains the parsing error.
         //
-        std::vector<std::string> sections = 
-          {"generated", "model", "transformed", "parameters", "data"};
+        //std::vector<std::string> sections = 
+        //  {"generated", "model", "transformed", "parameters", "data"};
+
+        // Do it the 'old' way.
+
+        std::vector<std::string> sections;
+        sections.push_back("generated");
+        sections.push_back("model");
+        sections.push_back("transformed");
+        sections.push_back("parameter");
+        sections.push_back("data");
+
         bool found_section = false;
         indx = 0;
 
