@@ -22,20 +22,9 @@ public:
 
   void SetUp() {
     model_path = "models" + separator + "command";
-    
-    // help options: the options described when typing
-    //   model/command help
-    help_options.push_back("id=<>");
-    help_options.push_back("data=<>");
-    help_options.push_back("init=<>");
-    help_options.push_back("test_gradient");
-    help_options.push_back("random");
-    help_options.push_back("output");
-    help_options.push_back("method=<>");
 
   }
   std::string model_path;
-  std::vector<std::string> help_options;
   static std::string separator;
 };
 std::string  ModelCommand::separator = "";
@@ -76,7 +65,7 @@ TEST_F(ModelCommand, check_help_options) {
   // run: "model/command help"
   output = split_lines(run_command(help_command));
   
-  // usage output
+  // Usage
   block = next_block(output, line_number);
   ASSERT_EQ(2, block.size());
   EXPECT_EQ(0, block[0].find("Usage"))
@@ -86,38 +75,48 @@ TEST_F(ModelCommand, check_help_options) {
   EXPECT_EQ("", block[1]);
   line_number += block.size();
   
-  // valid arguments
+  // Method
   block = next_block(output, line_number);
-  ASSERT_EQ(2, block.size());
-  EXPECT_EQ(0, block[0].find("Valid arguments"))
+  ASSERT_EQ(5, block.size());
+  EXPECT_EQ(0, block[0].find("Begin by selecting"))
     << "line " << line_number + 0 << ": "
-    << "expecting 'Valid arguments' line. Found: "
+    << "expecting 'Begin by selecting' line. Found: "
     << block[0];
-  EXPECT_EQ("", block[1]);
+  EXPECT_EQ("", block[4]);
   line_number += block.size();
 
+  // Help
   block = next_block(output, line_number);
-  ASSERT_EQ(help_options.size(), block.size()-1)
-    << "the block should match the help options";
-  for (int n = 0; n < help_options.size(); n++) {
-    EXPECT_EQ(2, block[n].find(help_options[n]))
-      << "line " << line_number + n << ": "
-      << "expecting '" << help_options[n] << "' line. Found: "
-      << block[n];
-  }
-  EXPECT_EQ("", block[block.size()-1]);
-  line_number += block.size();
-
-  block = next_block(output, line_number);
-  ASSERT_TRUE(block.size() > 1)
-    << "for \"See 'model'\": expecting at least 3 lines";
-  EXPECT_EQ(0, block[0].find("See 'model'"))
-    << "line " << line_number + 0 << ": "
-    << "expecting \"See 'model'\" line. Found: "
-    << block[0];
+  ASSERT_EQ(4, block.size());
+  EXPECT_EQ(0, block[0].find("Or see help"))
+  << "line " << line_number + 0 << ": "
+  << "expecting 'Or see help' line. Found: "
+  << block[0];
+  EXPECT_EQ("", block[3]);
   line_number += block.size();
   
-  EXPECT_EQ(line_number, output.size()) 
+  // Configuration
+  block = next_block(output, line_number);
+  ASSERT_EQ(7, block.size());
+  EXPECT_EQ(0, block[0].find("Additional configuration"))
+  << "line " << line_number + 0 << ": "
+  << "expecting 'Additional configuration' line. Found: "
+  << block[0];
+  EXPECT_EQ("", block[6]);
+  line_number += block.size();
+  
+  // Footer
+  block = next_block(output, line_number);
+  ASSERT_EQ(2, block.size());
+  EXPECT_EQ(0, block[0].find("See models/command"))
+  << "line " << line_number + 0 << ": "
+  << "expecting 'See models/command' line. Found: "
+  << block[0];
+  EXPECT_EQ("", block[1]);
+  line_number += block.size();
+  
+  // Residual
+  EXPECT_EQ(line_number, output.size())
     << "there should be no more lines of output";
 }
 
