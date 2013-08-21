@@ -11,7 +11,7 @@ namespace stan {
     /**
      * Returns the maximum coefficient in the specified
      * column vector.
-     * @param v Specified vector.
+     * @param x Specified vector.
      * @return Maximum coefficient value in the vector.
      * @tparam Type of values being compared and returned
      * @throw std::domain_error If the size of the vector is zero.
@@ -29,7 +29,7 @@ namespace stan {
     /**
      * Returns the maximum coefficient in the specified
      * column vector.
-     * @param v Specified vector.
+     * @param x Specified vector.
      * @return Maximum coefficient value in the vector.
      * @tparam T Type of values being compared and returned
      */
@@ -47,7 +47,7 @@ namespace stan {
     /**
      * Returns the maximum coefficient in the specified
      * vector, row vector, or matrix.
-     * @param v Specified vector, row vector, or matrix.
+     * @param m Specified vector, row vector, or matrix.
      * @return Maximum coefficient value in the vector.
      */
     template <typename T, int R, int C>
