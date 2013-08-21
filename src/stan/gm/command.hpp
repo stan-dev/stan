@@ -911,6 +911,8 @@ namespace stan {
         
         writer.print_timing(warmDeltaT, sampleDeltaT);
         
+        if (sampler_ptr) delete sampler_ptr;
+        
       }
       
       if(sample_stream) {
