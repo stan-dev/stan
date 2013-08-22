@@ -279,6 +279,8 @@ namespace stan {
         
         random_arg->set_value(random_seed);
         
+      } else {
+        random_seed = random_arg->value();
       }
       
       typedef boost::ecuyer1988 rng_t; // (2**50 = 1T samples, 1000 chains)
