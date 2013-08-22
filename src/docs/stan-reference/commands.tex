@@ -855,9 +855,6 @@ are provided in the next section.
           {Valid values: 0 $\le$ stepsize\_jitter $\le$ 1}
           {Defaults to 0}
 %
-      \hiershortcmd{\indentarrow\indentarrow\indentarrow}{rwm}
-        {Random Walk Metropolis Monte Carlo}
-%
   \hierlongcmd{\indentarrow}{optimize}
     {Point estimation}
     {Valid subarguments: algorithm, iter, save\_iterations}
@@ -964,6 +961,327 @@ are provided in the next section.
     {Defaults to 100}
 %
 \end{description}
+
+\section{Command-Line Option Examples}
+
+The hierarchical structure of the command-line options can be intimidating,
+and here we provide an example workflow to help ease the introduction to
+new users, especially those used to the now-deprecated structure of \Stan 1.3
+and below.
+
+Let's say that we've just built our model, \code{model}, and are ready to run.
+We begin by specifying data and init files,
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
+> ./model data=model.data.R init=model.init.R
+\end{Verbatim}
+\end{quote}
+%
+but our model doesn't run,
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
+> A method must be specified!
+> Failed to parse arguments, terminating Stan
+\end{Verbatim}
+\end{quote}
+%
+The problem is that we forgot to specify a method.
+
+All \Stan arguments have default values, except for the method.  This is the
+only argument that must be specified by the user and a model will not
+run without it.  Assuming that we want to draw MCMC samples from our
+model, we can either specify a method implicitly,
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
+> ./model sample data=model.data.R init=model.init.R
+\end{Verbatim}
+\end{quote}
+%
+or explicitly,
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
+> ./model method=sample data=model.data.R init=model.init.R
+\end{Verbatim}
+\end{quote}
+%
+In either case our model now executes without any problem.
+
+Now let's say that we want to customize our execution.  In
+particular we want to set the seed for the random number generator,
+but we forgot the specific argument syntax.  Information for each
+argument can displayed by calling \code{help},
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
+> ./model random help
+\end{Verbatim}
+\end{quote}
+%
+which returns
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
+> random
+>   Random number configuration
+>   Valid subarguments: seed
+...
+\end{Verbatim}
+\end{quote}
+%
+before printing usage information.  For information on the 
+seed argument we just call help one level deeper,
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
+> ./model random seed help
+\end{Verbatim}
+\end{quote}
+%
+which returns
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
+> seed=<unsigned int>
+>   Random number generator seed
+>   Valid values: seed > 0, if negative seed is generated from time
+>   Defaults to -1
+...
+\end{Verbatim}
+\end{quote}
+%
+Fully informed, we can now run with a given seed,
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
+> ./model method=sample data=model.data.R init=model.init.R random seed=5
+\end{Verbatim}
+\end{quote}
+
+\code{method}, \code{data}, \code{init},  and \code{random}, are all top-level
+arguments.  To really see the power of a hierarchical argument structure let's
+try to drill down and specify the metric we use for HMC: instead of the default
+diagonal Euclidean metric, we want to use a dense Euclidean metric.  Attempting
+to specify the metric we try
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
+> ./model method=sample data=model.data.R init=model.init.R random seed=5 \
+> metric=unit
+\end{Verbatim}
+\end{quote}
+%
+only to have the execution fail with the message
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
+> metric=unit_e is either mistyped or misplaced.
+> Perhaps you meant one of the following valid configurations?
+>   method=sample algorithm=hmc metric=<list_element>
+> Failed to parse arguments, terminating Stan
+\end{Verbatim}
+\end{quote}
+%
+The argument \code{metric} does exist, but not at the top-level.  In order
+to specify it we have to drill down into sample by first specifying the
+sampling algorithm, as noted in the suggestion,
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
+> ./model method=sample algorithm=hmc metric=unit \
+> data=model.data.R init=model.init.R random seed=5
+\end{Verbatim}
+\end{quote}
+%
+Unfortunately we still messed up,
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
+> unit is not a valid value for "metric"
+>   Valid values: unit_e, diag_e, dense_e
+> Failed to parse arguments, terminating Stan
+\end{Verbatim}
+\end{quote}
+%
+Tweaking the metric name we make one last attempt,
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
+> ./model method=sample algorithm=hmc metric=unit_e \
+> data=model.data.R init=model.init.R random seed=5
+\end{Verbatim}
+\end{quote}
+%
+which successfully runs.
+
+Finally, let's consider the circumstance where our model runs fine but
+the NUTS iterations keep saturating the default tree depth limit of 10.  We need
+to change the limit, but how do we specify NUTS let alone the maximum tree depth?
+To see how let's take advantage of the \code{help-all} option which prints all
+arguments that derive from the given argument.  We know that NUTS is somehow
+related to sampling, so we try
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
+> ./model method=sample help-all
+\end{Verbatim}
+\end{quote}
+%
+which returns the verbose output,
+%
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
+> sample
+>   Bayesian inference with Markov Chain Monte Carlo
+>   Valid subarguments: num_samples, num_warmup, save_warmup, thin, adapt, algorithm
+> 
+>   num_samples=<int>
+>     Number of sampling iterations
+>     Valid values: 0 <= num_samples
+>     Defaults to 1000
+> 
+>   num_warmup=<int>
+>     Number of warmup iterations
+>     Valid values: 0 <= warmup
+>     Defaults to 1000
+> 
+>   save_warmup=<boolean>
+>     Stream warmup samples to output?
+>     Valid values: [0, 1]
+>     Defaults to 0
+> 
+>   thin=<int>
+>     Period between saved samples
+>     Valid values: 0 < thin
+>     Defaults to 1
+> 
+>   adapt
+>     Warmup Adaptation
+>     Valid subarguments: engaged, gamma, delta, kappa, t0
+> 
+>     engaged=<boolean>
+>       Adaptation engaged?
+>       Valid values: [0, 1]
+>       Defaults to 1
+> 
+>     gamma=<double>
+>       Adaptation regularization scale
+>       Valid values: 0 < gamma
+>       Defaults to 0.05
+> 
+>     delta=<double>
+>       Adaptation target acceptance statistic
+>       Valid values: 0 < delta < 1
+>       Defaults to 0.65
+> 
+>     kappa=<double>
+>       Adaptation relaxation exponent
+>       Valid values: 0 < kappa
+>       Defaults to 0.75
+> 
+>     t0=<double>
+>       Adaptation iteration offset
+>       Valid values: 0 < t0
+>       Defaults to 10
+> 
+>   algorithm=<list element>
+>     Sampling algorithm
+>     Valid values: hmc
+>     Defaults to hmc
+> 
+>     hmc
+>       Hamiltonian Monte Carlo
+>       Valid subarguments: engine, metric, stepsize, stepsize_jitter
+> 
+>       engine=<list element>
+>         Engine for Hamiltonian Monte Carlo
+>         Valid values: static, nuts
+>         Defaults to nuts
+> 
+>         static
+>           Static integration time
+>           Valid subarguments: int_time
+> 
+>           int_time=<double>
+>             Total integration time for Hamiltonian evolution
+>             Valid values: 0 < int_time
+>             Defaults to 2 * pi
+> 
+>         nuts
+>           The No-U-Turn Sampler
+>           Valid subarguments: max_depth
+> 
+>           max_depth=<int>
+>             Maximum tree depth
+>             Valid values: 0 < max_depth
+>             Defaults to 10
+> 
+>       metric=<list element>
+>         Geometry of base manifold
+>         Valid values: unit_e, diag_e, dense_e
+>         Defaults to diag_e
+> 
+>         unit_e
+>           Euclidean manifold with unit metric
+> 
+>         diag_e
+>           Euclidean manifold with diag metric
+> 
+>         dense_e
+>           Euclidean manifold with dense metric
+> 
+>       stepsize=<double>
+>         Step size for discrete evolution
+>         Valid values: 0 < stepsize
+>         Defaults to 1
+> 
+>       stepsize_jitter=<double>
+>         Uniformly random jitter of the stepsize, in percent
+>         Valid values: 0 <= stepsize_jitter <= 1
+>         Defaults to 0
+...
+\end{Verbatim}
+\end{quote}
+%
+Following the hierarchy, the maximum tree depth derives from \code{nuts},
+which itself is a value for the argument \code{engine} which derives from
+\code{hmc}.  Adding this to our previous call we attempt
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
+> ./model method=sample algorithm=hmc metric=unit_e \
+> engine=nuts max_depth=-15 \
+> data=model.data.R init=model.init.R random seed=5
+\end{Verbatim}
+\end{quote}
+%
+which yields
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
+> -1 is not a valid value for "max_depth"
+>   Valid values: 0 < max_depth
+> Failed to parse arguments, terminating Stan
+\end{Verbatim}
+\end{quote}
+%
+Where did that negative sign come from?  Clumsy fingers are nothing
+to be embarrassed about, especially with such complex argument 
+configurations.  Removing the guilty character, we try
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
+> ./model method=sample algorithm=hmc metric=unit_e \
+> engine=nuts max_depth=15 \
+> data=model.data.R init=model.init.R random seed=5
+\end{Verbatim}
+\end{quote}
+%
+which finally runs without issue.
 
 \chapter{Print Command for Output Analysis}\label{print-command.chapter}
 
