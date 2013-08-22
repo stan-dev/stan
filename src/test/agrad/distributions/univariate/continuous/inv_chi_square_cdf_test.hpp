@@ -67,8 +67,11 @@ public:
       typename T9>
   typename stan::return_type<T_y, T_dof>::type 
   cdf_function(const T_y& y, const T_dof& nu, const T2&,
-         const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
-      return stan::prob::inv_chi_square_cdf(y, nu);
-  }
+               const T3&, const T4&, const T5&, const T6&, const T7&, 
+               const T8&, const T9&) {
+    using stan::agrad::gamma_q;
+    using stan::math::gamma_q;
     
+    return gamma_q(0.5 * nu, 0.5 / y);
+  }
 };

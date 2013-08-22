@@ -38,5 +38,5 @@ model {
       mu[n] <- alpha + if_else(n <= k, beta[1], beta[2]) * (x[n] - x[k]);
     log_probs[k] <- log(theta[k]) + normal_log(Y, mu, sigma);
   }
-  lp__ <- lp__ + log_sum_exp(log_probs);
+  increment_log_prob(log_sum_exp(log_probs));
 }

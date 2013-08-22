@@ -48,19 +48,19 @@
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::index_op,
                           (stan::gm::expression, expr_)
                           (std::vector<std::vector<stan::gm::expression> >, 
-                           dimss_) )
+                           dimss_) );
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::fun,
                           (std::string, name_)
-                          (std::vector<stan::gm::expression>, args_) )
+                          (std::vector<stan::gm::expression>, args_) );
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::int_literal,
                           (int,val_)
-                          (stan::gm::expr_type,type_))
+                          (stan::gm::expr_type,type_));
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::double_literal,
                           (double,val_)
-                          (stan::gm::expr_type,type_) )
+                          (stan::gm::expr_type,type_) );
 
 
 
@@ -361,6 +361,15 @@ namespace stan {
           error_msgs << "variable \"" << name << '"' << " does not exist." 
                      << std::endl;
           return var_expr;
+        }
+        if (name == std::string("lp__")) {
+          error_msgs << std::endl
+                     << "WARNING:"
+                     << std::endl
+                     << "  Direct use of variable lp__ is deprecated and will be removed in a future release."
+                     << std::endl
+                     << "  Please use increment_log_prob(u) in place of of lp__ <- lp__ + u."
+                     << std::endl;
         }
         pass = true;
         var_expr.set_type(vm.get_base_type(name),vm.get_num_dims(name));

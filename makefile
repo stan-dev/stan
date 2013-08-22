@@ -26,8 +26,8 @@ AR = ar
 # Library locations
 ##
 STAN_HOME := $(dir $(firstword $(MAKEFILE_LIST)))
-EIGEN ?= lib/eigen_3.1.3
-BOOST ?= lib/boost_1.53.0
+EIGEN ?= lib/eigen_3.2.0
+BOOST ?= lib/boost_1.54.0
 GTEST ?= lib/gtest_1.6.0
 
 ##

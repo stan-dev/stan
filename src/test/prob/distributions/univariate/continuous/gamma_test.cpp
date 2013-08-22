@@ -12,7 +12,7 @@ TEST(ProbDistributionGamma, chiSquareGoodnessFitTest) {
   boost::random::mt19937 rng;
   int N = 10000;
   int K = boost::math::round(2 * std::pow(N, 0.4));
-  boost::math::gamma_distribution<>dist (2.0,1.0);
+  boost::math::gamma_distribution<>dist (2.0,2.0);
   boost::math::chi_squared mydist(K-1);
 
   double loc[K - 1];
@@ -28,7 +28,11 @@ TEST(ProbDistributionGamma, chiSquareGoodnessFitTest) {
   }
 
   while (count < N) {
-    double a = stan::prob::gamma_rng(2.0,1.0,rng);
+    /*
+      the stan gamma distribution is defined by
+      shape and rate (hence 0.5 here and 2 above).
+    */
+    double a = stan::prob::gamma_rng(2.0,0.5,rng);
     int i = 0;
     while (i < K-1 && a > loc[i]) 
       ++i;

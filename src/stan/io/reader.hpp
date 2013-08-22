@@ -176,7 +176,7 @@ namespace stan {
        * 
        * <p>See <code>scalar_constrain()</code>.  
        *
-       * @param log_prob Reference to log probability variable to increment.
+       * log_prob Reference to log probability variable to increment.
        * @return Next scalar.
        */
       T scalar_constrain(T& /*log_prob*/) {
@@ -223,7 +223,7 @@ namespace stan {
        * the next scalars.  The constraint and hence Jacobian are no-ops.
        *
        * @param m Number of rows in the vector to read.
-       * @param lp Log probability to increment.
+       * lp Log probability to increment.
        * @return Column vector made up of the next scalars.
        */
       inline vector_t vector_constrain(size_t m, T& /*lp*/) {
@@ -260,7 +260,7 @@ namespace stan {
        * probability is not incremented.
        *
        * @param m Number of rows in the vector to read.
-       * @param lp Log probability to increment.
+       * lp Log probability to increment.
        * @return Column vector made up of the next scalars.
        */
       inline row_vector_t row_vector_constrain(size_t m, T& /*lp*/) {
@@ -311,7 +311,7 @@ namespace stan {
        *
        * @param m Number of rows.  
        * @param n Number of columns.
-       * @param lp Log probability to increment.
+       * lp Log probability to increment.
        * @return Matrix made up of the next scalars.
        */
       inline matrix_t matrix_constrain(size_t m, size_t n, T& /*lp*/) {
@@ -352,7 +352,7 @@ namespace stan {
        * or equal to the specified lower bound.
        * 
        * @param lb Lower bound.
-       * @param lp Log probability (ignored because no Jacobian)
+       * lp Log probability (ignored because no Jacobian)
        * @return Next integer read.
        * @throw std::runtime_error If the next integer read is not
        * greater than or equal to the lower bound.
@@ -395,7 +395,7 @@ namespace stan {
        * or equal to the specified upper bound.
        * 
        * @param ub Upper bound.
-       * @param lp Log probability (ignored because no Jacobian)
+       * lp Log probability (ignored because no Jacobian)
        * @return Next integer read.
        * @throw std::runtime_error If the next integer read is not
        * less than or equal to the upper bound.
@@ -449,7 +449,7 @@ namespace stan {
        * 
        * @param lb Lower bound.
        * @param ub Upper bound.
-       * @param lp Log probability (ignored because no Jacobian)
+       * lp Log probability (ignored because no Jacobian)
        * @return Next integer read.
        * @throw std::runtime_error If the next integer read is not
        * less than or equal to the upper bound.
@@ -933,48 +933,53 @@ namespace stan {
       }
 
       /**
-       * Returns the next correlation matrix of the specified dimensionality.
+       * Return the next Cholesky factor with the specified
+       * dimensionality, reading it directly without transforms.
        *
-       * <p>See <code>stan::math::check_corr_matrix(Matrix)</code>.
-       *
-       * @param k Dimensionality of correlation matrix.
-       * @return Next correlation matrix of the specified dimensionality.
-       * @throw std::runtime_error if the matrix is not a correlation matrix
+       * @param M Rows of Cholesky factor
+       * @param N Columns of Cholesky factor
+       * @return Next Cholesky factor.
+       * @throw std::domain_error if the matrix is not a valid
+       * Cholesky factor.
        */
-      inline matrix_t corr_matrix(size_t k) {
-        matrix_t x(matrix(k,k));
-        stan::math::check_corr_matrix("stan::math::corr_matrix(%1%)", x, "Constrained matrix");
-        return x;
+      inline matrix_t cholesky_factor(size_t M, size_t N) {
+        matrix_t y(matrix(M,N));
+        stan::math::check_cholesky_factor("stan::io::cholesky_factor(%1%)", y, "Constrained matrix");
+        return y;
       }
 
       /**
-       * Return the next correlation matrix of the specified dimensionality.
+       * Return the next Cholesky factor with the specified
+       * dimensionality, reading from an unconstrained vector of the
+       * appropriate size.
        *
-       * <p>See <code>stan::prob::corr_matrix_constrain(Matrix)</code>.
-       *
-       * @param k Dimensionality of correlation matrix.
-       * @return Next correlation matrix of the specified dimensionality.
+       * @param M Rows of Cholesky factor
+       * @param N Columns of Cholesky factor
+       * @return Next Cholesky factor.
+       * @throw std::domain_error if the matrix is not a valid
+       *    Cholesky factor.
        */
-      inline matrix_t corr_matrix_constrain(size_t k) {
-        return stan::prob::corr_matrix_constrain(vector((k * (k - 1)) / 2),k);
+      inline matrix_t cholesky_factor_constrain(size_t M, size_t N) {
+        return stan::prob::cholesky_factor_constrain(vector((N * (N + 1)) / 2 + (M - N) * N),
+                                                     M,N);
       }
 
       /**
-       * Return the next correlation matrix of the specified dimensionality,
-       * incrementing the specified reference with the log absolute Jacobian
-       * determinant.
-       * 
-       * <p>See <code>stan::prob::corr_matrix_constrain(Matrix,T&)</code>.
+       * Return the next Cholesky factor with the specified
+       * dimensionality, reading from an unconstrained vector of the
+       * appropriate size, and increment the log probability reference
+       * with the log Jacobian adjustment for the transform.
        *
-       * @param k Dimensionality of the (square) correlation matrix.
-       * @param lp Log probability reference to increment.
-       * @return The next correlation matrix of the specified dimensionality.
+       * @param M Rows of Cholesky factor
+       * @param N Columns of Cholesky factor
+       * @return Next Cholesky factor.
+       * @throw std::domain_error if the matrix is not a valid
+       *    Cholesky factor.
        */
-      inline matrix_t corr_matrix_constrain(size_t k, T& lp) {
-        return stan::prob::corr_matrix_constrain(vector((k * (k - 1)) / 2),
-                                                 k,lp);
+      inline matrix_t cholesky_factor_constrain(size_t M, size_t N, T& lp) {
+        return stan::prob::cholesky_factor_constrain(vector((N * (N + 1)) / 2 + (M - N) * N),
+                                                     M,N,lp);
       }
-
 
       /**
        * Return the next covariance matrix with the specified 
@@ -1022,6 +1027,49 @@ namespace stan {
                                                 k,lp);
       }
 
+
+      /**
+       * Returns the next correlation matrix of the specified dimensionality.
+       *
+       * <p>See <code>stan::math::check_corr_matrix(Matrix)</code>.
+       *
+       * @param k Dimensionality of correlation matrix.
+       * @return Next correlation matrix of the specified dimensionality.
+       * @throw std::runtime_error if the matrix is not a correlation matrix
+       */
+      inline matrix_t corr_matrix(size_t k) {
+        matrix_t x(matrix(k,k));
+        stan::math::check_corr_matrix("stan::math::corr_matrix(%1%)", x, "Constrained matrix");
+        return x;
+      }
+
+      /**
+       * Return the next correlation matrix of the specified dimensionality.
+       *
+       * <p>See <code>stan::prob::corr_matrix_constrain(Matrix)</code>.
+       *
+       * @param k Dimensionality of correlation matrix.
+       * @return Next correlation matrix of the specified dimensionality.
+       */
+      inline matrix_t corr_matrix_constrain(size_t k) {
+        return stan::prob::corr_matrix_constrain(vector((k * (k - 1)) / 2),k);
+      }
+
+      /**
+       * Return the next correlation matrix of the specified dimensionality,
+       * incrementing the specified reference with the log absolute Jacobian
+       * determinant.
+       * 
+       * <p>See <code>stan::prob::corr_matrix_constrain(Matrix,T&)</code>.
+       *
+       * @param k Dimensionality of the (square) correlation matrix.
+       * @param lp Log probability reference to increment.
+       * @return The next correlation matrix of the specified dimensionality.
+       */
+      inline matrix_t corr_matrix_constrain(size_t k, T& lp) {
+        return stan::prob::corr_matrix_constrain(vector((k * (k - 1)) / 2),
+                                                 k,lp);
+      }
 
       template <typename TL>
       inline vector_t vector_lb(const TL lb, size_t m) {
