@@ -13,22 +13,13 @@
 #include <vector>
 #include <stdexcept>
 
-#include <boost/spirit/include/qi.hpp>
-// FIXME: get rid of unused include
-#include <boost/spirit/include/phoenix_core.hpp>
-#include <boost/spirit/include/phoenix_function.hpp>
-#include <boost/spirit/include/phoenix_fusion.hpp>
-#include <boost/spirit/include/phoenix_object.hpp>
-#include <boost/spirit/include/phoenix_operator.hpp>
-#include <boost/spirit/include/phoenix_stl.hpp>
 
+#include <boost/spirit/include/qi.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>
 #include <boost/fusion/include/std_pair.hpp>
 #include <boost/config/warning_disable.hpp>
-#include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/qi_numeric.hpp>
-//#include <boost/spirit/include/classic_position_iterator.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>
 #include <boost/spirit/include/phoenix_function.hpp>
 #include <boost/spirit/include/phoenix_fusion.hpp>
@@ -52,23 +43,23 @@
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::assignment,
                           (stan::gm::variable_dims, var_dims_)
-                          (stan::gm::expression, expr_) )
+                          (stan::gm::expression, expr_) );
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::variable_dims,
                           (std::string, name_)
-                          (std::vector<stan::gm::expression>, dims_) )
+                          (std::vector<stan::gm::expression>, dims_) );
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::distribution,
                           (std::string, family_)
-                          (std::vector<stan::gm::expression>, args_) )
+                          (std::vector<stan::gm::expression>, args_) );
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::for_statement,
                           (std::string, variable_)
                           (stan::gm::range, range_)
-                          (stan::gm::statement, statement_) )
+                          (stan::gm::statement, statement_) );
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::print_statement,
-                          (std::vector<stan::gm::printable>, printables_) )
+                          (std::vector<stan::gm::printable>, printables_) );
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::increment_log_prob_statement,
                           (stan::gm::expression, log_prob_))
@@ -76,11 +67,11 @@ BOOST_FUSION_ADAPT_STRUCT(stan::gm::increment_log_prob_statement,
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::sample,
                           (stan::gm::expression, expr_)
                           (stan::gm::distribution, dist_) 
-                          (stan::gm::range, truncation_) )
+                          (stan::gm::range, truncation_) );
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::statements,
                           (std::vector<stan::gm::var_decl>, local_decl_)
-                          (std::vector<stan::gm::statement>, statements_) )
+                          (std::vector<stan::gm::statement>, statements_) );
 
 namespace stan {
 
@@ -171,6 +162,11 @@ namespace stan {
           .get_result_type(function_name,arg_types,error_msgs)
           .is_primitive_double();
       }
+      static bool is_univariate(const expr_type& et) {
+        return et.num_dims_ == 0
+          && ( et.base_type_ == INT_T
+               || et.base_type_ == DOUBLE_T );
+      }
       bool operator()(const sample& s,
                       const variable_map& var_map,
                       std::ostream& error_msgs) const {
@@ -180,10 +176,6 @@ namespace stan {
           arg_types.push_back(s.dist_.args_[i].expression_type());
         std::string function_name(s.dist_.family_);
         function_name += "_log";
-        // expr_type result_type 
-        // = function_signatures::instance()
-        // .get_result_type(function_name,arg_types,error_msgs);
-        // if (!result_type.is_primitive_double()) {
         if (!is_double_return(function_name,arg_types,error_msgs)) {
           error_msgs << "unknown distribution=" << s.dist_.family_ << std::endl;
           return false;
@@ -205,11 +197,62 @@ namespace stan {
           error_msgs << function_name << "(...)";
           error_msgs << std::endl;
         }
+        // validate that variable and params are univariate if truncated
+        if (s.truncation_.has_low() || s.truncation_.has_high()) {
+          if (!is_univariate(s.expr_.expression_type())) { // .num_dims_ > 0) {
+            error_msgs << "Outcomes in truncated distributions must be univariate."
+                       << std::endl
+                       << "  Found outcome expression: ";
+            generate_expression(s.expr_,error_msgs);
+            error_msgs << std::endl
+                       << "  with non-univariate type: "
+                       << s.expr_.expression_type()
+                       << std::endl;
+            return false;
+          }
+          for (size_t i = 0; i < s.dist_.args_.size(); ++i)
+            if (!is_univariate(s.dist_.args_[i].expression_type())) { // .num_dims_ > 0) {
+              error_msgs << "Parameters in truncated distributions must be univariate."
+                         << std::endl
+                         << "  Found parameter expression: ";
+              generate_expression(s.dist_.args_[i],error_msgs);
+              error_msgs << std::endl
+                         << "  with non-univariate type: "
+                         << s.dist_.args_[i].expression_type()
+                         << std::endl;
+              return false;
+            }
+        }
+        if (s.truncation_.has_low()
+            && !is_univariate(s.truncation_.low_.expression_type())) {
+          error_msgs << "Lower boundsin truncated distributions must be univariate."
+                     << std::endl
+                     << "  Found lower bound expression: ";
+          generate_expression(s.truncation_.low_,error_msgs);
+          error_msgs << std::endl
+                     << "  with non-univariate type: "
+                     << s.truncation_.low_.expression_type()
+                     << std::endl;
+          return false;
+        }
+        if (s.truncation_.has_high() 
+            && !is_univariate(s.truncation_.high_.expression_type())) {
+          error_msgs << "Upper bounds in truncated distributions must be univariate."
+                     << std::endl
+                     << "  Found upper bound expression: ";
+          generate_expression(s.truncation_.high_,error_msgs);
+          error_msgs << std::endl
+                     << "  with non-univariate type: "
+                     << s.truncation_.high_.expression_type()
+                     << std::endl;
+          return false;
+        }
+
         if (s.truncation_.has_low()) {
           std::vector<expr_type> arg_types_trunc(arg_types);
           arg_types_trunc[0] = s.truncation_.low_.expression_type(); 
           std::string function_name_cdf(s.dist_.family_);
-          function_name_cdf += "_cdf";
+          function_name_cdf += "_cdf_log";
           if (!is_double_return(function_name_cdf,arg_types_trunc,error_msgs)) {
             error_msgs << "lower truncation not defined for specified arguments to "
                        << s.dist_.family_ << std::endl;
@@ -226,7 +269,7 @@ namespace stan {
           std::vector<expr_type> arg_types_trunc(arg_types);
           arg_types_trunc[0] = s.truncation_.high_.expression_type();
           std::string function_name_cdf(s.dist_.family_);
-          function_name_cdf += "_cdf";
+          function_name_cdf += "_cdf_log";
           if (!is_double_return(function_name_cdf,arg_types_trunc,error_msgs)) {
             error_msgs << "upper truncation not defined for specified arguments to "
                        << s.dist_.family_ << std::endl;

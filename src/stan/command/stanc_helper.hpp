@@ -159,7 +159,7 @@ int stanc_helper(int argc, const char* argv[],
     if (err_stream) {
       *err_stream << std::endl
                   << e.what();
-//                  << std::endl;
+                  //<< std::endl;
       *err_stream << "Execute \"stanc --help\" for more information" 
                   << std::endl;
       delete_file(out_stream,out_file_name);

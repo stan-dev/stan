@@ -18,9 +18,6 @@
 #include <stan/gm/grammars/var_decls_grammar.hpp>
 #include <stan/gm/grammars/common_adaptors_def.hpp>
 
-#include <boost/spirit/include/version.hpp>
-#include <boost/spirit/include/support_line_pos_iterator.hpp>
-
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::int_var_decl,
                           (stan::gm::range, range_)
                           (std::string, name_)
@@ -591,9 +588,7 @@ namespace stan {
     {
 
       using boost::spirit::qi::_1;
-      using boost::spirit::qi::_2;
       using boost::spirit::qi::_3;
-      using boost::spirit::qi::_4;
       using boost::spirit::qi::char_;
       using boost::spirit::qi::eps;
       using boost::spirit::qi::lexeme;
@@ -604,8 +599,6 @@ namespace stan {
       using boost::spirit::qi::labels::_a;
       using boost::spirit::qi::labels::_r1;
       using boost::spirit::qi::labels::_r2;
-      using boost::spirit::qi::on_error;
-      using boost::spirit::qi::rethrow;
 
       var_decls_r.name("variable declarations");
       var_decls_r 
@@ -885,8 +878,6 @@ namespace stan {
         [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))];
 
     }
-
-
   }
 }
 #endif

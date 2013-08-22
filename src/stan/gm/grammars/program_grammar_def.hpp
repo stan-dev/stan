@@ -30,7 +30,6 @@
 #include <boost/variant/apply_visitor.hpp>
 #include <boost/variant/recursive_variant.hpp>
 
-//#include <boost/spirit/include/support_line_pos_iterator.hpp>
 #include <boost/spirit/include/version.hpp>
 #include <boost/spirit/home/support/iterators/line_pos_iterator.hpp>
 
@@ -122,8 +121,18 @@ namespace stan {
         //  Would be better to use the parser to select which 
         //  section in the stan file contains the parsing error.
         //
-        std::vector<std::string> sections = 
-          {"generated", "model", "transformed", "parameters", "data"};
+        //std::vector<std::string> sections = 
+        //  {"generated", "model", "transformed", "parameters", "data"};
+
+        // Do it the 'old' way.
+
+        std::vector<std::string> sections;
+        sections.push_back("generated");
+        sections.push_back("model");
+        sections.push_back("transformed");
+        sections.push_back("parameter");
+        sections.push_back("data");
+
         bool found_section = false;
         indx = 0;
 

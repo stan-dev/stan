@@ -3,6 +3,6 @@
 
 namespace stan {
   namespace gm {
-    template struct statement_grammar<lp_iterator>;
+    template struct statement_grammar<pos_iterator_t>;
   }
 }
