@@ -33,3 +33,7 @@ TEST(AgradRev,log_0) {
   EXPECT_THROW(log(a),std::domain_error);
 }
 
+TEST(AgradRev,log_neg){
+  AVAR a(-2.0);
+  EXPECT_THROW(log(a),std::domain_error);
+}
