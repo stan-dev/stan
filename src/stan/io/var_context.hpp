@@ -151,6 +151,7 @@ namespace stan {
           std::stringstream msg;
           msg << "mismatch in number dimensions declared and found in context"
               << "; processing stage=" << stage
+              << "; variable name=" << name
               << "; dims declared=";
           add_vec(msg,dims_declared);
           msg << "; dims found=";
@@ -162,6 +163,7 @@ namespace stan {
             std::stringstream msg;
             msg << "mismatch in dimension declared and found in context"
                 << "; processing stage=" << stage
+                << "; variable name=" << name
                 << "; position="
                 << i
                 << "; dims declared=";
