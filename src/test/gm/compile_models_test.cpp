@@ -21,7 +21,7 @@ TEST(gm,issue91_segfault_printing_uninitialized) {
   std::string command 
     = convert_model_path(model_path)
     + " sample num_warmup=0 num_samples=0"
-    + " output sample=" + convert_model_path(model_path) + ".csv";
+    + " output file=" + convert_model_path(model_path) + ".csv";
   
   run_command(command);
 
@@ -45,7 +45,7 @@ TEST(gm,issue109_csv_header_consistent_with_samples) {
   std::string command
     = path
     + " sample num_warmup=0 num_samples=1"
-    + " output sample=" + samples;
+    + " output file=" + samples;
   
   std::cout << command << std::endl;
   
