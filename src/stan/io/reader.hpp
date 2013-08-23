@@ -176,7 +176,7 @@ namespace stan {
        * 
        * <p>See <code>scalar_constrain()</code>.  
        *
-       * @param log_prob Reference to log probability variable to increment.
+       * log_prob Reference to log probability variable to increment.
        * @return Next scalar.
        */
       T scalar_constrain(T& /*log_prob*/) {
@@ -223,7 +223,7 @@ namespace stan {
        * the next scalars.  The constraint and hence Jacobian are no-ops.
        *
        * @param m Number of rows in the vector to read.
-       * @param lp Log probability to increment.
+       * lp Log probability to increment.
        * @return Column vector made up of the next scalars.
        */
       inline vector_t vector_constrain(size_t m, T& /*lp*/) {
@@ -260,7 +260,7 @@ namespace stan {
        * probability is not incremented.
        *
        * @param m Number of rows in the vector to read.
-       * @param lp Log probability to increment.
+       * lp Log probability to increment.
        * @return Column vector made up of the next scalars.
        */
       inline row_vector_t row_vector_constrain(size_t m, T& /*lp*/) {
@@ -311,7 +311,7 @@ namespace stan {
        *
        * @param m Number of rows.  
        * @param n Number of columns.
-       * @param lp Log probability to increment.
+       * lp Log probability to increment.
        * @return Matrix made up of the next scalars.
        */
       inline matrix_t matrix_constrain(size_t m, size_t n, T& /*lp*/) {
@@ -352,7 +352,7 @@ namespace stan {
        * or equal to the specified lower bound.
        * 
        * @param lb Lower bound.
-       * @param lp Log probability (ignored because no Jacobian)
+       * lp Log probability (ignored because no Jacobian)
        * @return Next integer read.
        * @throw std::runtime_error If the next integer read is not
        * greater than or equal to the lower bound.
@@ -395,7 +395,7 @@ namespace stan {
        * or equal to the specified upper bound.
        * 
        * @param ub Upper bound.
-       * @param lp Log probability (ignored because no Jacobian)
+       * lp Log probability (ignored because no Jacobian)
        * @return Next integer read.
        * @throw std::runtime_error If the next integer read is not
        * less than or equal to the upper bound.
@@ -449,7 +449,7 @@ namespace stan {
        * 
        * @param lb Lower bound.
        * @param ub Upper bound.
-       * @param lp Log probability (ignored because no Jacobian)
+       * lp Log probability (ignored because no Jacobian)
        * @return Next integer read.
        * @throw std::runtime_error If the next integer read is not
        * less than or equal to the upper bound.
