@@ -1065,6 +1065,12 @@ a period character.
 
 \subsection{Reserved Names}
 
+Stan reserves many strings for internal use and these may not be used
+as the name of a variable.  An attempt to name a variable after an
+internal string results in the \code{stanc} translator halting with an
+error message indicating which reserved name was used and its location
+in the model code.
+
 \subsubsection{Model Name}
 
 The name of the model cannot be used as a variable within the model.
@@ -1113,7 +1119,7 @@ any of the following.
 \code{cov\_matrix}.
 \end{quote}
 %
-Variable names will not conflict with the following block identifiers,
+Variable names will {\it not}\ conflict with the following block identifiers,
 %
 \begin{quote}
 \code{model},
@@ -1124,9 +1130,6 @@ Variable names will not conflict with the following block identifiers,
 \code{generated},
 \end{quote}
 %
-nor will they conflict with the names of predefined functions or
-distributions.  Nevertheless, these names should be avoided for the
-sake of program clarity.
 
 \subsubsection{Reserved Names from Stan Implementation}
 
@@ -1138,8 +1141,21 @@ var
 fvar
 \end{quote}.
 %
-Most variables used in the implementation are suffixed with
-\code{\_\_}, so there is little chance of conflict.
+
+\subsubsection{Reserved Function and Distribution Names}
+
+Variable names will conflict with the names of predefined functions
+other than constants.  Thus a variable may not be named \code{logit}
+or \code{add}, but it may be named \code{pi} or \code{e}.
+
+Variable names will also conflict with the names of distributions
+suffixed with \code{\_log}, \code{\_cdf}, \code{\_cdf\_log},
+and \code{\_ccdf\_log}, such as \code{normal\_cdf\_log}.
+
+Using any of these variable names causes the \code{stanc} translator
+to halt and report the name and location of the variable causing the
+conflict.
+
 
 \subsubsection{Reserved Names from C++}
 
