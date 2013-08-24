@@ -18,6 +18,9 @@
 #include <boost/variant/apply_visitor.hpp>
 #include <boost/variant/recursive_variant.hpp>
 
+#include <boost/spirit/include/version.hpp>
+#include <boost/spirit/home/support/iterators/line_pos_iterator.hpp>
+
 #include <cstddef>
 #include <iomanip>
 #include <iostream>
@@ -53,11 +56,6 @@ namespace stan {
       return false;
     }
 
-    // Cut and paste source for iterator & reporting pattern:
-    // http://boost-spirit.com/home/articles/qi-example
-    //                 /tracking-the-input-position-while-parsing/
-    // http://boost-spirit.com/dl_more/parsing_tracking_position
-    //                 /stream_iterator_errorposition_parsing.cpp
     inline bool parse(std::ostream* output_stream,
                       std::istream& input, 
                       const std::string& filename, 
@@ -71,19 +69,21 @@ namespace stan {
       using boost::spirit::qi::expectation_failure;
       using boost::spirit::qi::phrase_parse;
 
+      using boost::phoenix::construct;
+      using boost::phoenix::val;
 
-      // iterate over stream input
-      typedef istreambuf_iterator<char> base_iterator_type;
-      typedef multi_pass<base_iterator_type>  forward_iterator_type;
-      typedef forward_iterator_type pos_iterator_type;
+      std::ostringstream buf;
+      buf << input.rdbuf();
+      std::string stan_string = buf.str();
 
-      base_iterator_type in_begin(input);
-      
-      forward_iterator_type fwd_begin = make_default_multi_pass(in_begin);
-      forward_iterator_type fwd_end;
-      
-      program_grammar<pos_iterator_type> prog_grammar(model_name);
-      whitespace_grammar<pos_iterator_type> whitesp_grammar;
+      typedef std::string::const_iterator input_iterator;
+      typedef boost::spirit::line_pos_iterator<input_iterator> lp_iterator;
+
+      lp_iterator fwd_begin = lp_iterator (stan_string.begin());
+      lp_iterator fwd_end = lp_iterator (stan_string.end());
+
+      program_grammar<lp_iterator> prog_grammar(model_name);
+      whitespace_grammar<lp_iterator> whitesp_grammar;
       
       bool parse_succeeded = false;
       try {
@@ -96,28 +96,18 @@ namespace stan {
         if (output_stream && is_nonempty(diagnostics)) {
           *output_stream << "DIAGNOSTIC(S) FROM PARSER:" 
                          << std::endl
+                         << std::endl
                          << diagnostics 
                          << std::endl;
         }
-      } catch (const expectation_failure<pos_iterator_type>& e) {
+      } catch (const expectation_failure<lp_iterator>& e) {
+
         std::stringstream msg;
-/*
-        const file_position_base<std::string>& pos = e.first.get_position();
-        msg << "EXPECTATION FAILURE LOCATION: file=" << pos.file
-            << "; line=" << pos.line 
-            << ", column=" << pos.column 
-            << std::endl;
-        msg << std::endl << e.first.get_currentline() 
-            << std::endl;
-        for (int i = 2; i < pos.column; ++i)
-          msg << ' ';
-        msg << " ^-- here" 
-            << std::endl << std::endl;
-*/
         std::string diagnostics = prog_grammar.error_msgs_.str();
         if (output_stream && is_nonempty(diagnostics)) {
-          msg << std::endl
-              << "DIAGNOSTIC(S) FROM PARSER:"
+          msg << "EXPECTATION FAILURE - DIAGNOSTIC(S) FROM PARSER:"
+              << std::endl
+              << std::endl
               << diagnostics
               << std::endl;
         }
@@ -125,10 +115,11 @@ namespace stan {
 
       } catch (const std::runtime_error& e) {
         std::stringstream msg;
-        msg << "LOCATION: unknown" << std::endl;
-
-        msg << "DIAGNOSTICS FROM PARSER:" << std::endl;
-        msg << prog_grammar.error_msgs_.str() << std::endl << std::endl;
+        msg << "NON EXPECTATION FAILURE - DIAGNOSTICS FROM PARSER:"
+            << std::endl
+            << std::endl
+            << prog_grammar.error_msgs_.str()
+            << std::endl;
 
         throw std::invalid_argument(msg.str());
       }
@@ -141,24 +132,12 @@ namespace stan {
         if (!parse_succeeded)
           msg << "PARSE DID NOT SUCCEED." << std::endl; 
         if (!consumed_all_input)
-          msg << "ERROR: non-whitespace beyond end of program:" << std::endl;
-/*
-        const file_position_base<std::string>& pos 
-          = position_begin.get_position();
-        msg << "LOCATION: file=" << pos.file
-            << "; line=" << pos.line
-            << ", column=" << pos.column
-            << std::endl;
-        msg << position_begin.get_currentline() 
-            << std::endl;
-        for (int i = 2; i < pos.column; ++i)
-          msg << ' ';
-        msg << " ^-- starting here" 
-            << std::endl << std::endl;
+          msg << "DIAGNOSTICS FROM PARSER:"
+              << std::endl
+              << "ERROR: non-whitespace beyond end of program."
+              << std::endl;
 
-        msg << "DIAGNOSTICS FROM PARSER:" << std::endl;
-        msg << prog_grammar.error_msgs_.str() << std::endl << std::endl;
-*/
+        msg << std::endl << prog_grammar.error_msgs_.str() << std::endl;
         throw std::invalid_argument(msg.str());
       }
       return true;

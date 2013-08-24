@@ -1,0 +1,139 @@
+STAN C++11 README
+======================================================================
+
+This branch attempts to replace the existing parser error reporting.
+
+ 
+Why
+----------------------------------------------------------------------
+The current (1.3.0) error reporting is based on 'classic' pos-iterators.
+These collide when compiling for C++11 with optimization levels > 0
+
+
+Usage
+------------------- 
+The easiest way to test out this branch is in the root directory run:
+
+clear;make src/test/gm/model_specs/bernoulli_with_statement_errors
+
+or
+
+clear;make CC=clang++ C++11=true -j7 src/test/gm/model_specs/bernoulli_with_statement_errors
+
+or making any of the other *.stan files in that directory
+
+That is, after the inital build sequence, i.e:
+
+make clean-all
+make CC=clang++ C++11=true -j7  bin/libstan.a
+make CC=clang++ C++11=true O_STANC=3 -j7  bin/stanc
+
+
+Results/comments
+------------------- 
+
+I usually edit the src/test/gm/model_specs/bernoulli_with_statement_errors
+file to try how well error reporting is working, but have also been running
+the other .stan test cases in that directory.
+
+On my system (preview version of Mavericks ftemplate-depth needs to be increased, 
+I'm using 256. The C++11 default is 1024. I believe the default on gcc 4.8.1 is 900
+as apparently some compilers ran into trouble with greater depths.
+
+Not sure about the good-all.stan test case. Maybe outdated?
+
+
+To do
+------------------- 
+
+1) Test structure for parser error reporting.
+2) I wonder if occasionally _pass does not completely work
+   (e.g. with 'clear; make src/test/gm/model_specs/bad2', 
+    the parser should not get past the '<-' symbol).
+3)
+
+
+No problems found
+------------------- 
+
+( make CC=clang++ -j7  test-manual )
+( make CC=clang++ -j7  test-test-unit )
+( make CC=clang++ -j7  test-headers )
+( make CC=clang++ -j7  test-distributions )
+
+
+Problems found
+------------------- 
+
+
+( make CC=clang++ -j7  test-models )
+====================================
+
+[  FAILED  ] Models_BugsExamples_Vol1_Kidney/Model_Test_Fixture/0.ChainsTest, where TypeParam = 31Models_BugsExamples_Vol1_Kidney (5 ms)
+[ RUN      ] Models_BugsExamples_Vol1_Kidney/Model_Test_Fixture/0.ExpectedValuesTest
+[       OK ] Models_BugsExamples_Vol1_Kidney/Model_Test_Fixture/0.ExpectedValuesTest (3 ms)
+[----------] 4 tests from Models_BugsExamples_Vol1_Kidney/Model_Test_Fixture/0 (89786 ms total)
+
+[----------] Global test environment tear-down
+[==========] 4 tests from 1 test case ran. (91946 ms total)
+[  PASSED  ] 3 tests.
+[  FAILED  ] 1 test, listed below:
+[  FAILED  ] Models_BugsExamples_Vol1_Kidney/Model_Test_Fixture/0.ChainsTest, where TypeParam = 31Models_BugsExamples_Vol1_Kidney
+
+ 1 FAILED TEST
+make: [runtest_no_fail/test/models/bugs_examples/vol1/kidney/kidney] Error 1 (ignored)
+
+------------------------------------------------------------
+
+[  FAILED  ] Models_BasicDistributions_InvWishart/Model_Test_Fixture/0.ChainsTest, where TypeParam = 36Models_BasicDistributions_InvWishart (1 ms)
+[ RUN      ] Models_BasicDistributions_InvWishart/Model_Test_Fixture/0.ExpectedValuesTest
+[       OK ] Models_BasicDistributions_InvWishart/Model_Test_Fixture/0.ExpectedValuesTest (4 ms)
+[----------] 4 tests from Models_BasicDistributions_InvWishart/Model_Test_Fixture/0 (495955 ms total)
+
+[----------] Global test environment tear-down
+[==========] 4 tests from 1 test case ran. (498193 ms total)
+[  PASSED  ] 3 tests.
+[  FAILED  ] 1 test, listed below:
+[  FAILED  ] Models_BasicDistributions_InvWishart/Model_Test_Fixture/0.ChainsTest, where TypeParam = 36Models_BasicDistributions_InvWishart
+
+ 1 FAILED TEST
+make: [runtest_no_fail/test/models/basic_distributions/inv_wishart] Error 1 (ignored)
+
+------------------------------------------------------------
+
+[  FAILED  ] Models_BugsExamples_Vol3_Camel/Model_Test_Fixture/0.ChainsTest, where TypeParam = 30Models_BugsExamples_Vol3_Camel (1 ms)
+[ RUN      ] Models_BugsExamples_Vol3_Camel/Model_Test_Fixture/0.ExpectedValuesTest
+[       OK ] Models_BugsExamples_Vol3_Camel/Model_Test_Fixture/0.ExpectedValuesTest (1 ms)
+[----------] 4 tests from Models_BugsExamples_Vol3_Camel/Model_Test_Fixture/0 (552827 ms total)
+
+[----------] Global test environment tear-down
+[==========] 4 tests from 1 test case ran. (554930 ms total)
+[  PASSED  ] 3 tests.
+[  FAILED  ] 1 test, listed below:
+[  FAILED  ] Models_BugsExamples_Vol3_Camel/Model_Test_Fixture/0.ChainsTest, where TypeParam = 30Models_BugsExamples_Vol3_Camel
+
+ 1 FAILED TEST
+make: [runtest_no_fail/test/models/bugs_examples/vol3/camel/camel] Error 1 (ignored)
+
+------------------------------------------------------------
+
+[  FAILED  ] Models_BugsExamples_Vol2_MvnOrange/Model_Test_Fixture/0.ChainsTest, where TypeParam = 34Models_BugsExamples_Vol2_MvnOrange (3 ms)
+[ RUN      ] Models_BugsExamples_Vol2_MvnOrange/Model_Test_Fixture/0.ExpectedValuesTest
+[       OK ] Models_BugsExamples_Vol2_MvnOrange/Model_Test_Fixture/0.ExpectedValuesTest (3 ms)
+[----------] 4 tests from Models_BugsExamples_Vol2_MvnOrange/Model_Test_Fixture/0 (3035742 ms total)
+
+[----------] Global test environment tear-down
+[==========] 4 tests from 1 test case ran. (3037955 ms total)
+[  PASSED  ] 3 tests.
+[  FAILED  ] 1 test, listed below:
+[  FAILED  ] Models_BugsExamples_Vol2_MvnOrange/Model_Test_Fixture/0.ChainsTest, where TypeParam = 34Models_BugsExamples_Vol2_MvnOrange
+
+ 1 FAILED TEST
+make: [runtest_no_fail/test/models/bugs_examples/vol2/mvn_orange/mvn_orange] Error 1 (ignored)
+
+-------------------- Missing 49 tests --------------------
+  src/models/basic_estimators/negative_binomial.stan
+  src/models/basic_estimators/negative_binomial2.stan
+  src/models/basic_estimators/normal_censored.stan
+  src/models/basic_estimators/normal_mixture_k.stan
+...

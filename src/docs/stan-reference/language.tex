@@ -2084,33 +2084,70 @@ increment_log_prob(- log(fabs(y)));
 \end{quote}
 %
 
-\subsection{Truncated Distributions}
+\subsection{Truncated Distributions}\label{truncated-distributions.section}
 
 A density function $p(x)$ may be truncated to an interval $(a,b)$ to
-define a new density $p_{(a,b)}(x)$ by setting
+define a new density $p_{(a,b)}\!(x)$ by setting
 %
 \[ 
 p_{\!(a,b)\!}(x) = \frac{p(x)}
                   {\int_a^b p(x') \, dx'}.
 \] 
+Given a density $p(x)$ function for random variable $X$, its
+cumulative distribution function (cdf) $F(x)$ is defined to be the
+probability that $X < a$ by
+\[
+F(x) = \int_{-\infty}^{x} p(x') \, dx'.
+\]
+%
+The complementary cumulative distribution function (ccdf) is $1 -
+F(x)$.  Cumulative distribution functions are useful for defining
+truncated distributions, because
+\[
+\int_a^b p(x') \, dx' = F(b) - F(a),
+\]
+so that
+\[ 
+p_{\!(a,b)\!}(x) = \frac{p_X(x)}
+                  {F(b) - F(a)}.
+\] 
+On the log scale,
+\[ 
+\log p_{\!(a,b)\!}(x) 
+\ = \ 
+\log p_X(x)
+- \log \left( F(b) - F(a) \right).
+\]
+The denominator is more stably computed using Stan's
+log\_diff\_exp operation as
+\begin{eqnarray*}
+\log \left( F(b) - F(a) \right)
+& = & \log \left( \exp(\log F(b)) - \exp(\log F(a)) \right)
+\\[6pt]
+& = & \mbox{log\_diff\_exp}\!\left( \log F(b), \log F(a) \right).
+\end{eqnarray*}
+
+
+
 As in \BUGS and \JAGS, \Stan allows probability functions to be
 truncated.  For example, a truncated unit normal distribution
-restricted to $(-0.5,2.1)$ is encoded as follows.
+restricted to $(-0.5, 2.1)$ is encoded as follows.
 %
 \begin{quote}
 \begin{Verbatim}
-y ~ normal(0,1) T[-0.5,2.1];
+y ~ normal(0,1) T[-0.5, 2.1];
 \end{Verbatim}
 \end{quote}
 % 
 Truncated distributions are translated as an addition summation for
 the accumulated log probability.  For instance, this example has the
-same translation (up to arithmetic precision issues) as
+same translation (up to arithmetic precision issues; see below) as
 %
 \begin{quote}
 \begin{Verbatim}
-y ~ normal(0,1);
-increment_log_prob(- log(normal_cdf(2.1,0,1) - normal_cdf(-0.5,0,1)));
+increment_log_prob(normal_log(y,0,1));
+increment_log_prob(-(log(normal_cdf(2.1,0,1)
+                         - normal_cdf(-0.5,0,1))));
 \end{Verbatim}
 \end{quote}
 %
@@ -2121,7 +2158,21 @@ distribution function.  For example, \code{normal\_cdf(2.1,0,1)} evaluates to
 \]
 %
 which is the probability a unit normal variable takes on values less
-than 2.1, or about 0.98.
+than 2.1, or about 0.98.  
+
+Arithmetic precision is handled by working on the log scale and using
+Stan's log scale cdf implementations.  The logarithm of the cdf for
+the normal distribution is \code{normal\_cdf\_log} and the ccdf is
+\code{normal\_ccdf\_log}.  Stan's translation for the denominator
+introduced by truncation is equivalent to
+%
+\begin{quote}
+\begin{Verbatim}
+increment_log_prob(-log_diff_exp(normal_cdf_log(2.1,0,1),
+                                 normal_cdf_log(-0.5,0,1)));
+\end{Verbatim}
+\end{quote}
+%
 
 As with constrained variable declarations, truncation can be one
 sided.  The density $p(x)$ can be truncated below by $a$ to define a
@@ -2147,8 +2198,17 @@ probability and sampling).
 %
 \begin{quote}
 \begin{Verbatim}
-y ~ normal(0,1);
-increment_log_prob(- log(1 - normal_cdf(-0.5,0,1)));
+increment_log_prob(normal_log(y, 0, 1));
+increment_log_prob(-(1 - log(normal_cdf(-0.5, 0, 1))));
+\end{Verbatim}
+\end{quote}
+%
+The denominator is actually impelemented with the more efficient and
+stable version
+%
+\begin{quote}
+\begin{Verbatim}
+increment_log_prob(-normal_ccdf_log(-0.5, 0, 1));
 \end{Verbatim}
 \end{quote}
 
@@ -2172,25 +2232,26 @@ the accumulated log probability.
 %
 \begin{quote}
 \begin{Verbatim}
-y ~ normal(0,1);
-increment_log_prob(- log(normal_cdf(2.1,0,1)));
+increment_log_prob(normal_log(y, 0, 1));
+increment_log_prob(-normal_cdf_log(2.1, 0, 1));
 \end{Verbatim}
 \end{quote}
 
-In all cases, the truncation is only well formed if there is an
-appropriate cumulative distribution function defined.%
+In all cases, the truncation is only well formed if the
+appropriate log cumulative distribution functions are defined.%
 %
-\footnote{Some cumulative distributions and their gradients present
-  computational challenges because they lack simple, analytic forms.
-  More cumulative distributions will be added in future releases.}
+\footnote{Although most distributions have cdfs and ccdfs implemented,
+  some cumulative distribution functions and their gradients present
+  computational challenges because they lack simple, analytic forms.}
 %
 \refpart{discrete-prob-functions} and
 \refpart{continuous-prob-functions} document the available discrete
-and continuous cumulative distribution functions.
+and continuous cumulative distribution functions.  Most distributions
+have cdf and ccdf functions.
 
 For continuous distributions, truncation points must be expressions of
 type \code{int} or \code{real}.  For discrete distributions, truncation
-points must be expressions of type \code{int}.
+points must be expressions of type \code{int}.  
 
 For a truncated sampling statement, if the value sampled is not within
 the bounds specified by the truncation expression, the result is zero
@@ -2199,6 +2260,10 @@ probability, which in turn results in the sample being rejected; see
 \refsection{truncation-constraints} for programming strategies to keep
 all values within bounds.
 
+\subsubsection{Vectorizing Truncated Distributions}
+
+Stan does not (yet) support vectorization of distribution functions
+with truncation.
 
 % \subsection{User-Defined Distributions}
 
