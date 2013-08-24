@@ -12,7 +12,8 @@
 #include <stan/prob/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/internal_math.hpp>
-
+#include <stan/prob/distributions/univariate/continuous/gamma.hpp>
+#include <stan/prob/distributions/univariate/discrete/poisson.hpp>
 #include <stan/math/functions/binomial_coefficient_log.hpp>
 
 namespace stan {
@@ -611,11 +612,8 @@ namespace stan {
       if (!check_positive(function, beta, "Inverse scale parameter"))
         return 0;
 
-      variate_generator<RNG&, negative_binomial_distribution<> >
-        neg_binomial_rng(rng, 
-                         negative_binomial_distribution<>(alpha,
-                                                          1.0 / (beta + 1.0)));
-      return neg_binomial_rng();
+      return stan::prob::poisson_rng(stan::prob::gamma_rng(alpha,1.0 / beta,
+                                                           rng),rng);
     }
   }
 }
