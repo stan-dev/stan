@@ -155,7 +155,7 @@ namespace stan {
           return 0;
       }
       
-      std::vector<argument*> values() { return _values; }
+      std::vector<argument*>& values() { return _values; }
       
       std::string value() { return _values.at(_cursor)->name(); }
       
