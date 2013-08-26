@@ -108,9 +108,9 @@ TEST_F(ModelCommand, check_help_options) {
   // Footer
   block = next_block(output, line_number);
   ASSERT_EQ(2, block.size());
-  EXPECT_EQ(0, block[0].find("See models/command"))
+  EXPECT_EQ(0, block[0].find("See"))
   << "line " << line_number + 0 << ": "
-  << "expecting 'See models/command' line. Found: "
+  << "expecting 'See' line. Found: "
   << block[0];
   EXPECT_EQ("", block[1]);
   line_number += block.size();
