@@ -89,10 +89,10 @@ namespace stan {
 
 
     struct set_fun_type_named {
-      template <typename T1, typename T2, typename T3, typename T4>
-      struct result { typedef fun type; };
+      template <typename T1, typename T2, typename T3, typename T4, typename T5>
+      struct result { typedef void type; };
 
-      fun operator()(fun& fun,
+      void operator()(expression& val, fun& fun,
                      const var_origin& var_origin,
                      bool& pass,
                      std::ostream& error_msgs) const {
@@ -112,7 +112,7 @@ namespace stan {
           error_msgs << std::endl;
         }
 
-        return fun;
+        val = fun;
       }
     };
     boost::phoenix::function<set_fun_type_named> set_fun_type_named_f;
@@ -121,15 +121,16 @@ namespace stan {
  
     struct multiplication_expr {
       template <typename T1, typename T2, typename T3>
-      struct result { typedef expression type; };
+      struct result { typedef void type; };
 
-      expression operator()(expression& expr1,
+      void operator()(expression& expr1,
                             const expression& expr2,
                             std::ostream& error_msgs) const {
 
         if (expr1.expression_type().is_primitive()
             && expr2.expression_type().is_primitive()) {
-          return expr1 *= expr2;
+          expr1 *= expr2;
+        return;
         }
         std::vector<expression> args;
         args.push_back(expr1);
@@ -137,7 +138,7 @@ namespace stan {
         set_fun_type sft;
         fun f("multiply",args);
         sft(f,error_msgs);
-        return expression(f);
+        expr1 = expression(f);
       }
     };
     boost::phoenix::function<multiplication_expr> multiplication;
@@ -146,9 +147,9 @@ namespace stan {
 
     struct division_expr {
       template <typename T1, typename T2, typename T3>
-      struct result { typedef expression type; };
+      struct result { typedef void type; };
 
-      expression operator()(expression& expr1,
+      void operator()(expression& expr1,
                             const expression& expr2,
                             std::ostream& error_msgs) const {
         if (expr1.expression_type().is_primitive_int() 
@@ -167,7 +168,8 @@ namespace stan {
             
         if (expr1.expression_type().is_primitive()
             && expr2.expression_type().is_primitive()) {
-          return expr1 /= expr2;
+          expr1 /= expr2;
+          return;
         }
         std::vector<expression> args;
         args.push_back(expr1);
@@ -178,26 +180,28 @@ namespace stan {
             && expr2.expression_type().type() == MATRIX_T) {
           fun f("mdivide_right",args);
           sft(f,error_msgs);
-          return expression(f);
+          expr1 = expression(f);
+          return;
         }
         
         fun f("divide",args);
         sft(f,error_msgs);
-        return expression(f);
+        expr1 = expression(f);
       }
     };
     boost::phoenix::function<division_expr> division;
 
     struct left_division_expr {
       template <typename T1, typename T2, typename T3>
-      struct result { typedef expression type; };
+      struct result { typedef void type; };
 
-      expression operator()(expression& expr1,
+      void operator()(expression& expr1,
                             const expression& expr2,
                             std::ostream& error_msgs) const {
         if (expr1.expression_type().is_primitive()
             && expr2.expression_type().is_primitive()) {
-          return expr1 /= expr2;
+          expr1 /= expr2;
+        return;
         }
         std::vector<expression> args;
         args.push_back(expr1);
@@ -208,26 +212,28 @@ namespace stan {
                 || expr2.expression_type().type() == MATRIX_T)) {
           fun f("mdivide_left",args);
           sft(f,error_msgs);
-          return expression(f);
+          expr1 = expression(f);
+          return;
         }
         fun f("divide_left",args);
         sft(f,error_msgs);
-        return expression(f);
+        expr1 = expression(f);
       }
     };
     boost::phoenix::function<left_division_expr> left_division;
 
     struct elt_multiplication_expr {
       template <typename T1, typename T2, typename T3>
-      struct result { typedef expression type; };
+      struct result { typedef void type; };
 
-      expression operator()(expression& expr1,
+      void operator()(expression& expr1,
                             const expression& expr2,
                             std::ostream& error_msgs) const {
 
         if (expr1.expression_type().is_primitive()
             && expr2.expression_type().is_primitive()) {
-          return expr1 *= expr2;
+          expr1 *= expr2;
+          return;
         }
         std::vector<expression> args;
         args.push_back(expr1);
@@ -235,23 +241,24 @@ namespace stan {
         set_fun_type sft;
         fun f("elt_multiply",args);
         sft(f,error_msgs);
-        return expression(f);
-        return expr1 += expr2;
+        expr1 = expression(f);
+        //return expr1 += expr2;  ?????????
       }
     };
     boost::phoenix::function<elt_multiplication_expr> elt_multiplication;
 
     struct elt_division_expr {
       template <typename T1, typename T2, typename T3>
-      struct result { typedef expression type; };
+      struct result { typedef void type; };
 
-      expression operator()(expression& expr1,
+      void operator()(expression& expr1,
                             const expression& expr2,
                             std::ostream& error_msgs) const {
 
         if (expr1.expression_type().is_primitive()
             && expr2.expression_type().is_primitive()) {
-          return expr1 /= expr2;
+          expr1 /= expr2;
+          return;
         }
         std::vector<expression> args;
         args.push_back(expr1);
@@ -259,8 +266,8 @@ namespace stan {
         set_fun_type sft;
         fun f("elt_divide",args);
         sft(f,error_msgs);
-        return expression(f);
-        return expr1 += expr2;
+        expr1= expression(f);
+        //return expr1 += expr2;
       }
     };
     boost::phoenix::function<elt_division_expr> elt_division;
@@ -274,8 +281,8 @@ namespace stan {
       template <typename T1, typename T2>
       struct result { typedef expression type; };
 
-      expression operator()(const expression& expr,
-                            std::ostream& error_msgs) const {
+      expression operator()(expression& expr,
+                      std::ostream& error_msgs) const {
         if (expr.expression_type().is_primitive()) {
           return expression(unary_op('-', expr));
         }
@@ -291,20 +298,22 @@ namespace stan {
 
     struct logical_negate_expr {
       template <typename T1, typename T2>
-      struct result { typedef expression type; };
+      struct result { typedef void type; };
 
-      expression operator()(const expression& expr,
-                            std::ostream& error_msgs) const {
+      void operator()(expression& expr,
+                      std::ostream& error_msgs) const {
         if (!expr.expression_type().is_primitive()) {
           error_msgs << "logical negation operator ! only applies to int or real types; ";
-          return expression();
+          //expr = expression();
+          expr = expression();
+          return;
         }
         std::vector<expression> args;
         args.push_back(expr);
         set_fun_type sft;
         fun f("logical_negation",args);
         sft(f,error_msgs);
-        return expression(f);
+        expr = expression(f);
       }
     };
     boost::phoenix::function<logical_negate_expr> logical_negate_expr_f;
@@ -330,12 +339,12 @@ namespace stan {
 
     struct add_expression_dimss {
       template <typename T1, typename T2, typename T3, typename T4>
-      struct result { typedef T1 type; };
-      expression operator()(expression& expression,
+      struct result { typedef void type; };
+      void operator()(expression& expr,
                             std::vector<std::vector<stan::gm::expression> >& dimss,
                             bool& pass,
                             std::ostream& error_msgs) const {
-        index_op iop(expression,dimss);
+        index_op iop(expr,dimss);
         iop.infer_type();
         if (iop.type_.is_ill_formed()) {
           error_msgs << "indexes inappropriate for expression." << std::endl;
@@ -343,7 +352,7 @@ namespace stan {
         } else {
           pass = true;
         }
-        return iop;
+        expr = iop;
       }
     };
     boost::phoenix::function<add_expression_dimss> add_expression_dimss_f;
@@ -441,18 +450,18 @@ namespace stan {
         = ( negated_factor_r(_r1)                       
             [_val = _1]
             >> *( (lit('*') > negated_factor_r(_r1)     
-                               [_val = multiplication(_val,_1,
+                               [multiplication(_val,_1,
                                                       boost::phoenix::ref(error_msgs_))])
                   | (lit('/') > negated_factor_r(_r1)   
-                                 [_val = division(_val,_1,boost::phoenix::ref(error_msgs_))])
+                                 [division(_val,_1,boost::phoenix::ref(error_msgs_))])
                   | (lit('\\') > negated_factor_r(_r1)   
-                                  [_val = left_division(_val,_1,
+                                  [left_division(_val,_1,
                                                         boost::phoenix::ref(error_msgs_))])
                   | (lit(".*") > negated_factor_r(_r1)   
-                                  [_val = elt_multiplication(_val,_1,
+                                  [elt_multiplication(_val,_1,
                                                          boost::phoenix::ref(error_msgs_))])
                   | (lit("./") > negated_factor_r(_r1)   
-                                  [_val = elt_division(_val,_1,
+                                  [elt_division(_val,_1,
                                                        boost::phoenix::ref(error_msgs_))])
                    )
              )
@@ -463,7 +472,7 @@ namespace stan {
         = lit('-') >> negated_factor_r(_r1) 
                       [_val = negate_expr_f(_1,boost::phoenix::ref(error_msgs_))]
         | lit('!') >> negated_factor_r(_r1) 
-                      [_val = logical_negate_expr_f(_1,boost::phoenix::ref(error_msgs_))]
+                      [logical_negate_expr_f(_1,boost::phoenix::ref(error_msgs_))]
         | lit('+') >> negated_factor_r(_r1)  [_val = _1]
         | indexed_factor_r(_r1) [_val = _1];
 
@@ -473,7 +482,7 @@ namespace stan {
         = factor_r(_r1) [_val = _1]
         > * (  
              (+dims_r(_r1)) 
-               [_val = add_expression_dimss_f(_val, _1, _pass,
+               [add_expression_dimss_f(_val, _1, _pass,
                                             boost::phoenix::ref(error_msgs_))]
                | 
                lit("'") 
@@ -486,7 +495,7 @@ namespace stan {
       factor_r
         =  int_literal_r     [_val = _1]
         | double_literal_r    [_val = _1]
-        | fun_r(_r1)          [_val = set_fun_type_named_f(_1,_r1,_pass,boost::phoenix::ref(error_msgs_))]
+        | fun_r(_r1)          [set_fun_type_named_f(_val, _1,_r1,_pass,boost::phoenix::ref(error_msgs_))]
         | variable_r          [_val = set_var_type_f(_1,boost::phoenix::ref(var_map_),
                                                      boost::phoenix::ref(error_msgs_),
                                                      _pass)]
