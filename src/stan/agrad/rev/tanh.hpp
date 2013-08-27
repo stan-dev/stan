@@ -12,7 +12,7 @@ namespace stan {
       class tanh_vari : public op_v_vari {
       public:
         tanh_vari(vari* avi) :
-        op_v_vari(std::tanh(avi->val_),avi) {
+          op_v_vari(std::tanh(avi->val_),avi) {
         }
         void chain() {
           double cosh = std::cosh(avi_->val_);

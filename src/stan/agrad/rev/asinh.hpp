@@ -14,8 +14,8 @@ namespace stan {
       class asinh_vari : public op_v_vari {
       public:
         asinh_vari(double val, vari* avi) :
-	  op_v_vari(val,avi) {
-	  }
+          op_v_vari(val,avi) {
+        }
         void chain() {
           avi_->adj_ += adj_ / std::sqrt(avi_->val_ * avi_->val_ + 1.0);
         }
@@ -36,7 +36,7 @@ namespace stan {
      */
     inline var asinh(const stan::agrad::var& a) {
       if (std::isinf(a))
-	return var(new asinh_vari(a.val(), a.vi_));
+        return var(new asinh_vari(a.val(), a.vi_));
       return var(new asinh_vari(boost::math::asinh(a.val()),a.vi_));
     }
 

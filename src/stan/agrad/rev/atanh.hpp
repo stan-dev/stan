@@ -41,12 +41,12 @@ namespace stan {
     inline var atanh(const stan::agrad::var& a) {
       static const char* function = "stan::agrad::acos(%1%)";
       if (a == 1.0)
-	return var(new atanh_vari(std::numeric_limits<double>::infinity(),a.vi_));
+        return var(new atanh_vari(std::numeric_limits<double>::infinity(),a.vi_));
       if (a == -1.0)
-	return var(new atanh_vari(-std::numeric_limits<double>::infinity(),a.vi_));
+        return var(new atanh_vari(-std::numeric_limits<double>::infinity(),a.vi_));
       if (!stan::math::check_greater(function,a.val(),-1.0,"angle")
-	  && !stan::math::check_less(function,a.val(), 1.0,"angle"))
-	return std::numeric_limits<double>::quiet_NaN();
+          && !stan::math::check_less(function,a.val(), 1.0,"angle"))
+        return std::numeric_limits<double>::quiet_NaN();
       return var(new atanh_vari(boost::math::atanh(a.val()),a.vi_));
     }
 

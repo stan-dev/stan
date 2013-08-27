@@ -35,7 +35,7 @@ namespace stan {
     inline var sqrt(const var& a) {
       static const char* function = "stan::agrad::sqrt(%1%)";
       if (!stan::math::check_nonnegative(function,a.val(),"variable"))
-	  return std::numeric_limits<double>::quiet_NaN();
+          return std::numeric_limits<double>::quiet_NaN();
       return var(new sqrt_vari(a.vi_));
     }
 

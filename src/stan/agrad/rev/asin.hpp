@@ -36,8 +36,8 @@ namespace stan {
     inline var asin(const var& a) {
       static const char* function = "stan::agrad::asin(%1%)";
       if (!stan::math::check_bounded(function,a.val(),-1.0,1.0,"angle"))
-	return std::numeric_limits<double>::quiet_NaN();
-     return var(new asin_vari(a.vi_));
+        return std::numeric_limits<double>::quiet_NaN();
+      return var(new asin_vari(a.vi_));
     }
 
   }

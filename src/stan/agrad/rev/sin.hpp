@@ -35,7 +35,7 @@ namespace stan {
     inline var sin(const var& a) {
       static const char* function = "stan::agrad::sin(%1%)";
       if (!stan::math::check_finite(function,a.val(),"angle"))
-	  return std::numeric_limits<double>::quiet_NaN();
+          return std::numeric_limits<double>::quiet_NaN();
       return var(new sin_vari(a.vi_));
     }
 

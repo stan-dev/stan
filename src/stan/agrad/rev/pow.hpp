@@ -66,8 +66,8 @@ namespace stan {
     inline var pow(const var& base, const var& exponent) {
       static const char* function = "stan::agrad::pow(%1%)";
       if (!stan::math::check_not_nan(function,base.val(),"base") 
-	  || !stan::math::check_not_nan(function,exponent.val(),"exponent"))
-	  return std::numeric_limits<double>::quiet_NaN();
+          || !stan::math::check_not_nan(function,exponent.val(),"exponent"))
+          return std::numeric_limits<double>::quiet_NaN();
       return var(new pow_vv_vari(base.vi_,exponent.vi_));
     }
   
@@ -92,8 +92,8 @@ namespace stan {
         return base * base; // FIXME: square() functionality from special_functions
       static const char* function = "stan::agrad::pow(%1%)";
       if (!stan::math::check_not_nan(function,base.val(),"base") 
-	  || !stan::math::check_not_nan(function,exponent,"exponent"))
-	  return std::numeric_limits<double>::quiet_NaN();
+          || !stan::math::check_not_nan(function,exponent,"exponent"))
+          return std::numeric_limits<double>::quiet_NaN();
       return var(new pow_vd_vari(base.vi_,exponent));
     }
 
@@ -112,8 +112,8 @@ namespace stan {
     inline var pow(const double base, const var& exponent) {
       static const char* function = "stan::agrad::pow(%1%)";
       if (!stan::math::check_not_nan(function,base,"base") 
-	  || !stan::math::check_not_nan(function,exponent.val(),"exponent"))
-	  return std::numeric_limits<double>::quiet_NaN();
+          || !stan::math::check_not_nan(function,exponent.val(),"exponent"))
+          return std::numeric_limits<double>::quiet_NaN();
       return var(new pow_dv_vari(base,exponent.vi_));
     }
 
