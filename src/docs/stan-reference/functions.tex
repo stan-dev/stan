@@ -8,7 +8,7 @@
 The normal probability function is specified with the signature
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 normal_log(reals,reals,reals);
 \end{Verbatim}
 \end{quote}
@@ -810,7 +810,7 @@ consisting of any variable with up to 8 array dimensions (and up to 2
 additional matrix dimensions) and returns an array of integers with
 the dimensions.  For example, if two variables are declared as follows,
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 real x[7,8,9];
 matrix[8,9] y[7];
 \end{Verbatim}
@@ -864,7 +864,7 @@ real array.  For example, the following example contrasts legal with
 illegal array creation and assignment
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 real y[5];
 int x[5];
 
@@ -884,7 +884,7 @@ If the value being repeated \code{v} is a vector (i.e., \code{T} is
 consisting of 27 copies of the vector \code{v}.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 vector[5] v;
 vector[5] a[3];
 ...
@@ -899,7 +899,7 @@ depending on which of the \code{rep\_array} functions is called.  For
 instance, consider the following legal code snippet.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 real a[5,6];
 real b[3,4,5,6];
 ...
@@ -1475,7 +1475,7 @@ statements produce the same result for vector broadcasting;  row vector
 and matrix broadcasting behave similarly.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 vector[3] x;
 x <- rep_vector(1, 3);
 x <- rep_vector(1.0, 3);  

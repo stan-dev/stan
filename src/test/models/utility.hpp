@@ -144,13 +144,6 @@ parse_command_output(const std::string& command_output) {
   string option, value;
   size_t start = 0, end = command_output.find("\n", start);
   
-  EXPECT_EQ("STAN SAMPLING COMMAND", 
-            command_output.substr(start, end))
-    << "command could not be run. output is: \n" 
-    << command_output;
-  if ("STAN SAMPLING COMMAND" != command_output.substr(start, end)) {
-    return output;
-  }
   start = end+1;
   end = command_output.find("\n", start);
   size_t equal_pos = command_output.find("=", start);
