@@ -36,11 +36,12 @@ TEST(AgradRev,acos_neg_1) {
 }
 
 TEST(AgradRev,acos_out_of_bounds) {
-  AVAR a = 2;
+  double epsilon = 1e-10;
+  AVAR a = 1 + epsilon;
   EXPECT_THROW(acos(a),std::domain_error)
-    <<"acos(2) should throw error";
+    <<"acos(1 + epsilon) should throw error";
 
-  a = -2;
+  a = -1 - epsilon;
   EXPECT_THROW(acos(a),std::domain_error)
-    <<"acos(-2) should throw error";
+    <<"acos(-1 - epsilon) should throw error";
 }
