@@ -68,7 +68,7 @@ namespace stan {
           pass = false;
         }
         cs.conditions_.push_back(e);
-        pass =true;
+        pass = true;
       }               
     };
     boost::phoenix::function<add_conditional_condition> add_conditional_condition_f;

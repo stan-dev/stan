@@ -86,13 +86,13 @@ namespace stan {
 
    struct binary_op_expr {
       template <typename T1, typename T2, typename T3, typename T4, typename T5>
-      struct result { typedef expression type; };
+      struct result { typedef void type; };
 
-      expression operator()(expression& expr1,
-                            const expression& expr2,
-                            const std::string& op,
-                            const std::string& fun_name,
-                            std::ostream& error_msgs) const {
+      void operator()(expression& expr1,
+                      const expression& expr2,
+                      const std::string& op,
+                      const std::string& fun_name,
+                      std::ostream& error_msgs) const {
         if (!expr1.expression_type().is_primitive()
             || !expr2.expression_type().is_primitive()) {
           error_msgs << "binary infix operator "
@@ -110,7 +110,7 @@ namespace stan {
         set_fun_type2 sft;
         fun f(fun_name,args);
         sft(f,error_msgs);
-        return expression(f);
+        expr1 = expression(f);
       }
     };
     boost::phoenix::function<binary_op_expr> binary_op_f;
@@ -118,14 +118,15 @@ namespace stan {
 
     struct addition_expr {
       template <typename T1, typename T2, typename T3>
-      struct result { typedef expression type; };
+      struct result { typedef void type; };
 
-      expression operator()(expression& expr1,
+      void operator()(expression& expr1,
                             const expression& expr2,
                             std::ostream& error_msgs) const {
         if (expr1.expression_type().is_primitive()
             && expr2.expression_type().is_primitive()) {
-          return expr1 += expr2;
+          expr1 += expr2;
+          return;
         }
         std::vector<expression> args;
         args.push_back(expr1);
@@ -133,8 +134,7 @@ namespace stan {
         set_fun_type2 sft;
         fun f("add",args);
         sft(f,error_msgs);
-        return expression(f);
-        return expr1 += expr2;
+        expr1 = expression(f);
       }
     };
     boost::phoenix::function<addition_expr> addition;
@@ -142,14 +142,15 @@ namespace stan {
 
     struct subtraction_expr {
       template <typename T1, typename T2, typename T3>
-      struct result { typedef expression type; };
+      struct result { typedef void type; };
 
-      expression operator()(expression& expr1,
+      void operator()(expression& expr1,
                             const expression& expr2,
                             std::ostream& error_msgs) const {
         if (expr1.expression_type().is_primitive()
             && expr2.expression_type().is_primitive()) {
-          return expr1 -= expr2;
+          expr1 -= expr2;
+          return;
         }
         std::vector<expression> args;
         args.push_back(expr1);
@@ -157,7 +158,7 @@ namespace stan {
         set_fun_type2 sft;
         fun f("subtract",args);
         sft(f,error_msgs);
-        return expression(f);
+        expr1 = expression(f);
       }
     };
     boost::phoenix::function<subtraction_expr> subtraction;
@@ -190,7 +191,7 @@ namespace stan {
       expression_r
         = expression14_r(_r1) [_val = _1]
         > *( lit("||") 
-             > expression14_r(_r1)  [_val = binary_op_f(_val,_1,"||","logical_or",
+             > expression14_r(_r1)  [binary_op_f(_val,_1,"||","logical_or",
                                                    boost::phoenix::ref(error_msgs))] 
              );
 
@@ -198,7 +199,7 @@ namespace stan {
       expression14_r 
         = expression10_r(_r1) [_val = _1]
         > *( lit("&&") 
-             > expression10_r(_r1)  [_val = binary_op_f(_val,_1,"&&","logical_and",
+             > expression10_r(_r1)  [binary_op_f(_val,_1,"&&","logical_and",
                                                    boost::phoenix::ref(error_msgs))] 
              );
 
@@ -206,11 +207,11 @@ namespace stan {
       expression10_r 
         = expression09_r(_r1) [_val = _1]
         > *( ( lit("==") 
-               > expression09_r(_r1)  [_val = binary_op_f(_val,_1,"==","logical_eq",
+               > expression09_r(_r1)  [binary_op_f(_val,_1,"==","logical_eq",
                                                        boost::phoenix::ref(error_msgs))] )
               |
               ( lit("!=") 
-                > expression09_r(_r1)  [_val = binary_op_f(_val,_1,"!=","logical_neq",
+                > expression09_r(_r1)  [binary_op_f(_val,_1,"!=","logical_neq",
                                                       boost::phoenix::ref(error_msgs))] ) 
               );
 
@@ -218,19 +219,19 @@ namespace stan {
       expression09_r 
         = expression07_r(_r1) [_val = _1]
         > *( ( lit("<=")
-               > expression07_r(_r1)  [_val = binary_op_f(_val,_1,"<","logical_lte",
+               > expression07_r(_r1)  [binary_op_f(_val,_1,"<","logical_lte",
                                                       boost::phoenix::ref(error_msgs))] )
               |
               ( lit("<") 
-                > expression07_r(_r1)  [_val = binary_op_f(_val,_1,"<=","logical_lt",
+                > expression07_r(_r1)  [binary_op_f(_val,_1,"<=","logical_lt",
                                                       boost::phoenix::ref(error_msgs))] ) 
               |
               ( lit(">=") 
-                > expression07_r(_r1)  [_val = binary_op_f(_val,_1,">","logical_gte",
+                > expression07_r(_r1)  [binary_op_f(_val,_1,">","logical_gte",
                                                       boost::phoenix::ref(error_msgs))] ) 
               |
               ( lit(">") 
-                > expression07_r(_r1)  [_val = binary_op_f(_val,_1,">=","logical_gt",
+                > expression07_r(_r1)  [binary_op_f(_val,_1,">=","logical_gt",
                                                       boost::phoenix::ref(error_msgs))] ) 
               );
       
@@ -240,11 +241,11 @@ namespace stan {
             [_val = _1]
         > *( ( lit('+')
                > term_g(_r1) // expression07_r       
-                [_val = addition(_val,_1,boost::phoenix::ref(error_msgs))] )
+                [addition(_val,_1,boost::phoenix::ref(error_msgs))] )
               |  
               ( lit('-') 
                 > term_g(_r1) // expression07_r   
-                [_val = subtraction(_val,_1,boost::phoenix::ref(error_msgs))] )
+                [subtraction(_val,_1,boost::phoenix::ref(error_msgs))] )
               )
         > eps[_pass = validate_expr_type2_f(_val,boost::phoenix::ref(error_msgs_))]
         ;
