@@ -111,7 +111,7 @@ TEST(MathMatrix, multiply) {
 }
 
 
-TEST(AgradRevMatrix,multiply_int) {
+TEST(MathMatrix,multiply_int) {
   using stan::math::multiply;
   using stan::math::assign;
 
@@ -125,7 +125,7 @@ TEST(AgradRevMatrix,multiply_int) {
 
 }
 
-TEST(AgradRevMatrix,multiply_vector_int) {
+TEST(MathMatrix,multiply_vector_int) {
   using stan::math::multiply;
   using stan::math::vector_d;
 

@@ -1,8 +1,9 @@
-#include <gtest/gtest.h>
-#include <boost/type_traits.hpp>
-#include <stan/agrad/agrad.hpp>
-#include <stan/agrad/fwd/fvar.hpp>
 #include <stan/meta/traits.hpp>
+#include <gtest/gtest.h>
+
+#include <boost/type_traits.hpp>
+#include <stan/diff.hpp>
+#include <stan/diff/fwd/fvar.hpp>
 #include <stan/math/matrix.hpp>
 
 using stan::length;
@@ -13,10 +14,8 @@ TEST(MetaTraits, isConstant) {
   EXPECT_TRUE(is_constant<float>::value);
   EXPECT_TRUE(is_constant<unsigned int>::value);
   EXPECT_TRUE(is_constant<int>::value);
-  EXPECT_FALSE(is_constant<stan::agrad::var>::value);
+  EXPECT_FALSE(is_constant<stan::diff::var>::value);
 }
-
-
 
 TEST(MetaTraits, is_vector) {
   using stan::is_vector;
@@ -61,15 +60,15 @@ typedef Eigen::Matrix<double,1,Eigen::Dynamic> const_v1;
 typedef std::vector<const_v1> const_v2;
 typedef std::vector<const_v2> const_v3;
 
-typedef Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,Eigen::Dynamic> var_t1;
+typedef Eigen::Matrix<stan::diff::var,Eigen::Dynamic,Eigen::Dynamic> var_t1;
 typedef std::vector<var_t1> var_t2;
 typedef std::vector<var_t2> var_t3;
 
-typedef Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,1> var_u1;
+typedef Eigen::Matrix<stan::diff::var,Eigen::Dynamic,1> var_u1;
 typedef std::vector<var_u1> var_u2;
 typedef std::vector<var_u2> var_u3;
 
-typedef Eigen::Matrix<stan::agrad::var,1,Eigen::Dynamic> var_v1;
+typedef Eigen::Matrix<stan::diff::var,1,Eigen::Dynamic> var_v1;
 typedef std::vector<var_v1> var_v2;
 typedef std::vector<var_v2> var_v3;
 
@@ -96,10 +95,10 @@ TEST(MetaTraits, isConstantStruct) {
   EXPECT_TRUE(is_constant_struct<const_v2>::value);
   EXPECT_TRUE(is_constant_struct<const_v3>::value);
 
-  EXPECT_FALSE(is_constant_struct<stan::agrad::var>::value);
-  EXPECT_FALSE(is_constant_struct<vector<stan::agrad::var> >::value);
-  EXPECT_FALSE(is_constant_struct<vector<vector<stan::agrad::var> > >::value);
-  EXPECT_FALSE(is_constant_struct<vector<vector<vector<stan::agrad::var> > > >::value);
+  EXPECT_FALSE(is_constant_struct<stan::diff::var>::value);
+  EXPECT_FALSE(is_constant_struct<vector<stan::diff::var> >::value);
+  EXPECT_FALSE(is_constant_struct<vector<vector<stan::diff::var> > >::value);
+  EXPECT_FALSE(is_constant_struct<vector<vector<vector<stan::diff::var> > > >::value);
   EXPECT_FALSE(is_constant_struct<var_t1>::value);
   EXPECT_FALSE(is_constant_struct<var_t2>::value);
   EXPECT_FALSE(is_constant_struct<var_t3>::value);
@@ -175,7 +174,7 @@ TEST(MetaTraits, VectorView_double)  {
 }
 TEST(MetaTraits, VectorView_var) {
   using stan::VectorView;
-  using stan::agrad::var;
+  using stan::diff::var;
   
   var d(10);
   VectorView<var> dv(d);
@@ -213,7 +212,7 @@ TEST(MetaTraits, VectorView_vector_double) {
 TEST(MetaTraits, VectorView_vector_var) {
   using stan::VectorView;
   using std::vector;
-  using stan::agrad::var;
+  using stan::diff::var;
   
   vector<var> x(10);
   for (size_t n = 0; n < 10; ++n) 
@@ -277,7 +276,7 @@ TEST(MetaTraits, VectorView_matrix_double) {
 }
 TEST(MetaTraits, VectorView_matrix_var) {
   using stan::VectorView;
-  using stan::agrad::var;
+  using stan::diff::var;
   using Eigen::Matrix;
   using Eigen::Dynamic;
   
@@ -347,7 +346,7 @@ TEST(MetaTraits, DoubleVectorView_false_false) {
   using stan::DoubleVectorView;
   using Eigen::Matrix;
   using Eigen::Dynamic;
-  using stan::agrad::var;
+  using stan::diff::var;
 
   double a_double(1);
   std::vector<double> a_std_vector(3);
@@ -405,7 +404,7 @@ TEST(MetaTraits, DoubleVectorView_false_true) {
   using stan::DoubleVectorView;
   using Eigen::Matrix;
   using Eigen::Dynamic;
-  using stan::agrad::var;
+  using stan::diff::var;
 
   var a_var(1);
   std::vector<var> a_std_vector(3);
@@ -430,7 +429,7 @@ TEST(MetaTraits, DoubleVectorView_true_true) {
   using stan::DoubleVectorView;
   using Eigen::Matrix;
   using Eigen::Dynamic;
-  using stan::agrad::var;
+  using stan::diff::var;
 
   var a_var(1);
   std::vector<var> a_std_vector(3);
@@ -543,25 +542,12 @@ TEST(MetaTraits,VectorView) {
 }
 
 TEST(MetaTraits,isFvar) {
-  using stan::agrad::var;
-  using stan::agrad::fvar;
+  using stan::diff::var;
+  using stan::diff::fvar;
   using stan::is_fvar;
   
   EXPECT_FALSE(is_fvar<double>::value);
   EXPECT_TRUE(is_fvar<fvar<double> >::value);
   EXPECT_TRUE(is_fvar<fvar<fvar<double> > >::value);
   EXPECT_FALSE(is_fvar<var>::value);
-}
-
-TEST(MetaTraits,containsFvar) {
-  using stan::agrad::var;
-  using stan::agrad::fvar;
-  using stan::contains_fvar;
-  EXPECT_FALSE(contains_fvar<double>::value);
-  EXPECT_FALSE((contains_fvar<double,int,var>::value));
-  EXPECT_TRUE((contains_fvar<fvar<double> >::value));
-  EXPECT_TRUE((contains_fvar<double, fvar<double> >::value));
-  EXPECT_TRUE((contains_fvar<double, fvar<var>, int >::value));
-  EXPECT_TRUE((contains_fvar<fvar<double>, fvar<var> >::value));
-  EXPECT_TRUE((contains_fvar<fvar<fvar<double> > >::value));
 }

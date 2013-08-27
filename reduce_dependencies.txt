@@ -1,0 +1,7 @@
+Goal:
+
+Split dependencies on agrad library from things that don't need the agrad library.
+
+Actions:
+1. removed src/stan/agrad/agrad.hpp, used #include <stan/agrad.hpp> instead.
+2. remove agrad dependency from traits

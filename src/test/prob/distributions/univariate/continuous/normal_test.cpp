@@ -4,7 +4,7 @@
 #include <boost/random/mersenne_twister.hpp>
 
 TEST(ProbDistributionsNormal, intVsDouble) {
-  using stan::agrad::var;
+  using stan::diff::var;
   for (double thetaval = -5.0; thetaval < 6.0; thetaval += 0.5) {
     var theta(thetaval);
     var lp1(0.0);

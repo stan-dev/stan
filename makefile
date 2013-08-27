@@ -191,11 +191,11 @@ docs: manual doxygen
 ##
 # Clean up.
 ##
-MODEL_SPECS := $(wildcard src/test/gm/model_specs/compiled/*.stan) 
+MODEL_SPECS := $(wildcard src/test/gm/model_specs/compiled/*.stan) $(wildcard src/test/mcmc/models/*.stan)
 .PHONY: clean clean-demo clean-dox clean-manual clean-models clean-all
 clean:
 	$(RM) $(shell find src -type f -name '*.dSYM') $(shell find src -type f -name '*.d.*')
-	$(RM) $(wildcard $(MODEL_SPECS:%.stan=%.cpp) $(MODEL_SPECS:%.stan=%$(EXE)) $(MODEL_SPECS:%.stan=%.o))
+	$(RM) $(wildcard $(MODEL_SPECS:%.stan=%.cpp) $(MODEL_SPECS:%.stan=%$(EXE)) $(MODEL_SPECS:%.stan=%.o) $(MODEL_SPECS:%.stan=%.csv))
 
 clean-dox:
 	$(RM) -r doc/api
@@ -209,8 +209,8 @@ clean-models:
 clean-all: clean clean-dox clean-manual clean-models
 	$(RM) -r test/* bin doc
 	$(RM) $(shell find src -type f -name '*.d') $(shell find src -type f -name '*.o')
-	cd src/test/agrad/distributions/univariate/continuous; $(RM) *_generated_test.cpp
-	cd src/test/agrad/distributions/univariate/discrete; $(RM) *_generated_test.cpp
-	cd src/test/agrad/distributions/multivariate/continuous; $(RM) *_generated_test.cpp
-	cd src/test/agrad/distributions/multivariate/discrete; $(RM) *_generated_test.cpp
+	cd src/test/diff/distributions/univariate/continuous; $(RM) *_generated_test.cpp
+	cd src/test/diff/distributions/univariate/discrete; $(RM) *_generated_test.cpp
+	cd src/test/diff/distributions/multivariate/continuous; $(RM) *_generated_test.cpp
+	cd src/test/diff/distributions/multivariate/discrete; $(RM) *_generated_test.cpp
 

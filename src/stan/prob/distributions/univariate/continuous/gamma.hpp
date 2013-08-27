@@ -4,7 +4,7 @@
 #include <boost/random/gamma_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
 
-#include <stan/agrad.hpp>
+#include <stan/diff.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/functions/value_of.hpp>
 #include <stan/meta/traits.hpp>
@@ -98,7 +98,7 @@ namespace stan {
       }
 
       size_t N = max_size(y, alpha, beta);
-      agrad::OperandsAndPartials<T_y, T_shape, T_inv_scale> operands_and_partials(y, alpha, beta);
+      diff::OperandsAndPartials<T_y, T_shape, T_inv_scale> operands_and_partials(y, alpha, beta);
 
       using boost::math::lgamma;
       using stan::math::multiply_log;
@@ -223,7 +223,7 @@ namespace stan {
       VectorView<const T_inv_scale> beta_vec(beta);
       size_t N = max_size(y, alpha, beta);
           
-      agrad::OperandsAndPartials<T_y, T_shape, T_inv_scale> 
+      diff::OperandsAndPartials<T_y, T_shape, T_inv_scale> 
         operands_and_partials(y, alpha, beta);
           
       std::fill(operands_and_partials.all_partials,
@@ -350,7 +350,7 @@ namespace stan {
       VectorView<const T_inv_scale> beta_vec(beta);
       size_t N = max_size(y, alpha, beta);
           
-      agrad::OperandsAndPartials<T_y, T_shape, T_inv_scale> 
+      diff::OperandsAndPartials<T_y, T_shape, T_inv_scale> 
         operands_and_partials(y, alpha, beta);
           
       std::fill(operands_and_partials.all_partials,
@@ -467,7 +467,7 @@ namespace stan {
       VectorView<const T_inv_scale> beta_vec(beta);
       size_t N = max_size(y, alpha, beta);
           
-      agrad::OperandsAndPartials<T_y, T_shape, T_inv_scale> 
+      diff::OperandsAndPartials<T_y, T_shape, T_inv_scale> 
         operands_and_partials(y, alpha, beta);
           
       std::fill(operands_and_partials.all_partials,

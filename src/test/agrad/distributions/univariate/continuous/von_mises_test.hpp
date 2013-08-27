@@ -6,9 +6,9 @@
 
 using std::vector;
 using std::numeric_limits;
-using stan::agrad::var;
+using stan::diff::var;
 
-class AgradDistributionVonMises : public AgradDistributionTest {
+class DiffDistributionVonMises : public DiffDistributionTest {
 public:
   void valid_values(vector<vector<double> >& parameters,
                     vector<double>& log_prob) {

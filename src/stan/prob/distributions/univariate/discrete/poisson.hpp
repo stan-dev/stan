@@ -6,7 +6,7 @@
 
 #include <limits>
 
-#include <stan/agrad.hpp>
+#include <stan/diff.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/functions/value_of.hpp>
 #include <stan/meta/traits.hpp>
@@ -72,7 +72,7 @@ namespace stan {
           return LOG_ZERO;
       
       // return accumulator with gradients
-      agrad::OperandsAndPartials<T_rate> operands_and_partials(lambda);
+      diff::OperandsAndPartials<T_rate> operands_and_partials(lambda);
 
       using stan::math::multiply_log;
       for (size_t i = 0; i < size; i++) {
@@ -158,7 +158,7 @@ namespace stan {
           return LOG_ZERO;
       
       // return accumulator with gradients
-      agrad::OperandsAndPartials<T_log_rate> operands_and_partials(alpha);
+      diff::OperandsAndPartials<T_log_rate> operands_and_partials(alpha);
 
       // FIXME: cache value_of for alpha_vec?  faster if only one?
       DoubleVectorView<include_summand<propto,T_log_rate>::value,
@@ -229,7 +229,7 @@ namespace stan {
       using boost::math::gamma_p_derivative;
       using boost::math::gamma_q;
           
-      agrad::OperandsAndPartials<T_rate> operands_and_partials(lambda);
+      diff::OperandsAndPartials<T_rate> operands_and_partials(lambda);
 
       std::fill(operands_and_partials.all_partials,
                 operands_and_partials.all_partials 
@@ -302,7 +302,7 @@ namespace stan {
       using boost::math::gamma_p_derivative;
       using boost::math::gamma_q;
           
-      agrad::OperandsAndPartials<T_rate> operands_and_partials(lambda);
+      diff::OperandsAndPartials<T_rate> operands_and_partials(lambda);
 
       std::fill(operands_and_partials.all_partials,
                 operands_and_partials.all_partials 
@@ -371,7 +371,7 @@ namespace stan {
       using boost::math::gamma_p_derivative;
       using boost::math::gamma_q;
           
-      agrad::OperandsAndPartials<T_rate> operands_and_partials(lambda);
+      diff::OperandsAndPartials<T_rate> operands_and_partials(lambda);
 
       std::fill(operands_and_partials.all_partials,
                 operands_and_partials.all_partials 

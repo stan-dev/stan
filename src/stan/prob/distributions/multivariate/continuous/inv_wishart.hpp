@@ -6,9 +6,9 @@
 #include <stan/math/error_handling.hpp>
 #include <stan/prob/traits.hpp>
 #include <stan/meta/traits.hpp>
-#include <stan/agrad/agrad.hpp>
-#include <stan/agrad/matrix.hpp>
-#include "stan/prob/distributions/multivariate/continuous/wishart.hpp"
+#include <stan/diff.hpp>
+#include <stan/diff/rev/matrix.hpp>
+#include <stan/prob/distributions/multivariate/continuous/wishart.hpp>
 #include <stan/math/matrix/ldlt.hpp>
 
 namespace stan {

@@ -1,9 +1,6 @@
 #ifndef __STAN__META__TRAITS_HPP__
 #define __STAN__META__TRAITS_HPP__
 
-#include <stan/agrad/fwd/fvar.hpp>
-// #include <stan/agrad.hpp>
-#include <stan/agrad/rev/var.hpp>
 #include <vector>
 #include <boost/type_traits.hpp>
 #include <boost/type_traits/is_arithmetic.hpp> 
@@ -314,89 +311,32 @@ namespace stan {
    * Metaprogram to calculate the base scalar return type resulting
    * from promoting all the scalar types of the template parameters.
    */
-    template <typename T1, 
-              typename T2 = double, 
-              typename T3 = double, 
-              typename T4 = double, 
-              typename T5 = double, 
-              typename T6 = double>
-    struct return_type {
-      typedef typename 
-      boost::math::tools::promote_args<typename scalar_type<T1>::type,
-                                       typename scalar_type<T2>::type,
-                                       typename scalar_type<T3>::type,
-                                       typename scalar_type<T4>::type,
-                                       typename scalar_type<T5>::type,
-                                       typename scalar_type<T6>::type>::type
-      type;
-    };
-
+  template <typename T1, 
+            typename T2 = double, 
+            typename T3 = double, 
+            typename T4 = double, 
+            typename T5 = double, 
+            typename T6 = double>
+  struct return_type {
+    typedef typename 
+    boost::math::tools::promote_args<typename scalar_type<T1>::type,
+                                     typename scalar_type<T2>::type,
+                                     typename scalar_type<T3>::type,
+                                     typename scalar_type<T4>::type,
+                                     typename scalar_type<T5>::type,
+                                     typename scalar_type<T6>::type>::type
+    type;
+  };
 
   template <typename T>
   struct is_fvar {
     enum { value = false };
   };
-  template <typename T>
-  struct is_fvar<stan::agrad::fvar<T> > {
-    enum { value = true };
-  };
-
 
   template <typename T>
   struct is_var {
     enum { value = false };
   };
-  template <>
-  struct is_var<stan::agrad::var> {
-    enum { value = true };
-  };
-
-
-
-  // FIXME:  pull out scalar types
-
-  /**
-   * Metaprogram to calculate the base scalar return type resulting
-   * from promoting all the scalar types of the template parameters.
-   */
-    template <typename T1, 
-              typename T2 = double, 
-              typename T3 = double, 
-              typename T4 = double, 
-              typename T5 = double, 
-              typename T6 = double>
-    struct contains_fvar {
-      enum {
-        value = is_fvar<typename scalar_type<T1>::type>::value
-        || is_fvar<typename scalar_type<T2>::type>::value
-        || is_fvar<typename scalar_type<T3>::type>::value
-        || is_fvar<typename scalar_type<T4>::type>::value
-        || is_fvar<typename scalar_type<T5>::type>::value
-        || is_fvar<typename scalar_type<T6>::type>::value
-      };
-    };
-
-
-    template <typename T1, 
-              typename T2 = double, 
-              typename T3 = double, 
-              typename T4 = double, 
-              typename T5 = double, 
-              typename T6 = double>
-    struct is_var_or_arithmetic {
-      enum {
-        value = (is_var<typename scalar_type<T1>::type>::value || boost::is_arithmetic<typename scalar_type<T1>::type>::value)
-        && (is_var<typename scalar_type<T2>::type>::value || boost::is_arithmetic<typename scalar_type<T2>::type>::value)
-        && (is_var<typename scalar_type<T3>::type>::value || boost::is_arithmetic<typename scalar_type<T3>::type>::value)
-        && (is_var<typename scalar_type<T4>::type>::value || boost::is_arithmetic<typename scalar_type<T4>::type>::value)
-        && (is_var<typename scalar_type<T5>::type>::value || boost::is_arithmetic<typename scalar_type<T5>::type>::value)
-        && (is_var<typename scalar_type<T6>::type>::value || boost::is_arithmetic<typename scalar_type<T6>::type>::value)
-      };
-    };
-
-
-
-
+  
 }
-
 #endif

@@ -4,7 +4,7 @@
 #include <boost/random/uniform_real_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
 
-#include <stan/agrad.hpp>
+#include <stan/diff.hpp>
 #include <stan/math.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/meta/traits.hpp>
@@ -55,7 +55,7 @@ namespace stan {
         return 0.0;
       
       // set up template expressions wrapping scalars into vector views
-      agrad::OperandsAndPartials<T_y, T_scale> operands_and_partials(y, sigma);
+      diff::OperandsAndPartials<T_y, T_scale> operands_and_partials(y, sigma);
 
       VectorView<const T_y> y_vec(y);
       VectorView<const T_scale> sigma_vec(sigma);
@@ -142,7 +142,7 @@ namespace stan {
 
 
       // set up template expressions wrapping scalars into vector views
-      agrad::OperandsAndPartials<T_y, T_scale> operands_and_partials(y, sigma);
+      diff::OperandsAndPartials<T_y, T_scale> operands_and_partials(y, sigma);
 
       VectorView<const T_y> y_vec(y);
       VectorView<const T_scale> sigma_vec(sigma);
@@ -219,7 +219,7 @@ namespace stan {
 
 
       // set up template expressions wrapping scalars into vector views
-      agrad::OperandsAndPartials<T_y, T_scale> operands_and_partials(y, sigma);
+      diff::OperandsAndPartials<T_y, T_scale> operands_and_partials(y, sigma);
 
       VectorView<const T_y> y_vec(y);
       VectorView<const T_scale> sigma_vec(sigma);
@@ -288,7 +288,7 @@ namespace stan {
 
 
       // set up template expressions wrapping scalars into vector views
-      agrad::OperandsAndPartials<T_y, T_scale> operands_and_partials(y, sigma);
+      diff::OperandsAndPartials<T_y, T_scale> operands_and_partials(y, sigma);
 
       VectorView<const T_y> y_vec(y);
       VectorView<const T_scale> sigma_vec(sigma);

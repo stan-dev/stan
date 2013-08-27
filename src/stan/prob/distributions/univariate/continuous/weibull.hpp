@@ -4,7 +4,7 @@
 #include <boost/random/weibull_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
 
-#include <stan/agrad.hpp>
+#include <stan/diff.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/functions/value_of.hpp>
 #include <stan/meta/traits.hpp>
@@ -107,7 +107,7 @@ namespace stan {
           y_div_sigma_pow_alpha[i] = pow(y_dbl * inv_sigma[i], alpha_dbl);
         }
 
-      agrad::OperandsAndPartials<T_y,T_shape,T_scale> operands_and_partials(y,alpha,sigma);
+      diff::OperandsAndPartials<T_y,T_shape,T_scale> operands_and_partials(y,alpha,sigma);
       for (size_t n = 0; n < N; n++) {
         const double alpha_dbl = value_of(alpha_vec[n]);
         if (include_summand<propto,T_shape>::value)
@@ -174,7 +174,7 @@ namespace stan {
       if (!check_positive(function, sigma, "Scale parameter", &cdf))
         return cdf;
       
-      agrad::OperandsAndPartials<T_y, T_shape, T_scale> 
+      diff::OperandsAndPartials<T_y, T_shape, T_scale> 
         operands_and_partials(y, alpha, sigma);
 
       VectorView<const T_y> y_vec(y);
@@ -245,7 +245,7 @@ namespace stan {
       if (!check_positive(function, sigma, "Scale parameter", &cdf_log))
         return cdf_log;
       
-      agrad::OperandsAndPartials<T_y, T_shape, T_scale> 
+      diff::OperandsAndPartials<T_y, T_shape, T_scale> 
         operands_and_partials(y, alpha, sigma);
 
       VectorView<const T_y> y_vec(y);
@@ -306,7 +306,7 @@ namespace stan {
       if (!check_positive(function, sigma, "Scale parameter", &ccdf_log))
         return ccdf_log;
       
-      agrad::OperandsAndPartials<T_y, T_shape, T_scale> 
+      diff::OperandsAndPartials<T_y, T_shape, T_scale> 
         operands_and_partials(y, alpha, sigma);
 
       VectorView<const T_y> y_vec(y);

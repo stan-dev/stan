@@ -5,10 +5,10 @@
 #include <boost/math/distributions.hpp>
 #include <stan/prob/distributions/univariate/continuous/uniform.hpp>
 
-#include <stan/agrad.hpp>
+#include <stan/diff.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/functions/owens_t.hpp>
-#include <stan/agrad/rev/owens_t.hpp>
+#include <stan/diff/rev/owens_t.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
@@ -68,7 +68,7 @@ namespace stan {
         return 0.0;
       
       // set up template expressions wrapping scalars into vector views
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale, T_shape> 
+      diff::OperandsAndPartials<T_y, T_loc, T_scale, T_shape> 
         operands_and_partials(y, mu, sigma, alpha);
 
       VectorView<const T_y> y_vec(y);
@@ -155,7 +155,7 @@ namespace stan {
       using stan::math::check_finite;
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
-      using stan::agrad::owens_t;
+      using stan::diff::owens_t;
       using stan::math::owens_t;
       using stan::math::value_of;
 
@@ -187,7 +187,7 @@ namespace stan {
                                    &cdf)))
         return cdf;
 
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale, T_shape> 
+      diff::OperandsAndPartials<T_y, T_loc, T_scale, T_shape> 
         operands_and_partials(y, mu, sigma, alpha);
 
       using stan::math::SQRT_2;
@@ -260,7 +260,7 @@ namespace stan {
       using stan::math::check_not_nan;
       using stan::math::value_of;
       using stan::math::check_consistent_sizes;
-      using stan::agrad::owens_t;
+      using stan::diff::owens_t;
       using stan::math::owens_t;
 
       double cdf_log(0.0);
@@ -291,7 +291,7 @@ namespace stan {
                                    &cdf_log)))
         return cdf_log;
 
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale, T_shape> 
+      diff::OperandsAndPartials<T_y, T_loc, T_scale, T_shape> 
         operands_and_partials(y, mu, sigma, alpha);
 
       using stan::math::SQRT_2;
@@ -350,7 +350,7 @@ namespace stan {
       using stan::math::check_finite;
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
-      using stan::agrad::owens_t;
+      using stan::diff::owens_t;
       using stan::math::owens_t;
       using stan::math::value_of;
 
@@ -382,7 +382,7 @@ namespace stan {
                                    &ccdf_log)))
         return ccdf_log;
 
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale, T_shape> 
+      diff::OperandsAndPartials<T_y, T_loc, T_scale, T_shape> 
         operands_and_partials(y, mu, sigma, alpha);
 
       using stan::math::SQRT_2;

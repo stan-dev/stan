@@ -40,11 +40,11 @@ src/test/mcmc/models/*
 !src/test/mcmc/models/*.stan
 
 
-# tests: generated agrad tests
-src/test/agrad/distributions/univariate/continuous/*_generated_test.cpp
-src/test/agrad/distributions/univariate/discrete/*_generated_test.cpp
-src/test/agrad/distributions/multivariate/continuous/*_generated_test.cpp
-src/test/agrad/distributions/multivariate/discrete/*_generated_test.cpp
+# tests: generated diff tests
+src/test/diff/distributions/univariate/continuous/*_generated_test.cpp
+src/test/diff/distributions/univariate/discrete/*_generated_test.cpp
+src/test/diff/distributions/multivariate/continuous/*_generated_test.cpp
+src/test/diff/distributions/multivariate/discrete/*_generated_test.cpp
 
 # For the Mac
 *.DS_Store

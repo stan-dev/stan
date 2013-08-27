@@ -5,7 +5,7 @@
 #include <boost/random/variate_generator.hpp>
 #include <boost/utility/enable_if.hpp>
 
-#include <stan/agrad.hpp>
+#include <stan/diff.hpp>
 #include <stan/math.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/meta/traits.hpp>
@@ -36,8 +36,7 @@ namespace stan {
      */
     template <bool propto, 
               typename T_y, typename T_loc, typename T_scale>
-    typename boost::enable_if_c<is_var_or_arithmetic<T_y,T_loc,T_scale>::value,
-                                typename return_type<T_y,T_loc,T_scale>::type>::type
+    typename return_type<T_y,T_loc,T_scale>::type
     normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
       static const char* function = "stan::prob::normal_log(%1%)";
 
@@ -79,7 +78,7 @@ namespace stan {
         return 0.0;
       
       // set up template expressions wrapping scalars into vector views
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale> operands_and_partials(y, mu, sigma);
+      diff::OperandsAndPartials<T_y, T_loc, T_scale> operands_and_partials(y, mu, sigma);
 
       VectorView<const T_y> y_vec(y);
       VectorView<const T_loc> mu_vec(mu);
@@ -189,7 +188,7 @@ namespace stan {
                                    &cdf)))
         return cdf;
 
-     agrad::OperandsAndPartials<T_y, T_loc, T_scale> 
+     diff::OperandsAndPartials<T_y, T_loc, T_scale> 
        operands_and_partials(y, mu, sigma);
 
       VectorView<const T_y> y_vec(y);
@@ -266,7 +265,7 @@ namespace stan {
                                    "Scale parameter", &cdf_log)))
         return cdf_log;
 
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale> 
+      diff::OperandsAndPartials<T_y, T_loc, T_scale> 
         operands_and_partials(y, mu, sigma);
 
       VectorView<const T_y> y_vec(y);
@@ -335,7 +334,7 @@ namespace stan {
                                    "Scale parameter", &ccdf_log)))
         return ccdf_log;
 
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale>
+      diff::OperandsAndPartials<T_y, T_loc, T_scale>
         operands_and_partials(y, mu, sigma);
 
       VectorView<const T_y> y_vec(y);

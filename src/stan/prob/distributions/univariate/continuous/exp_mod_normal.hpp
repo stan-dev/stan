@@ -7,7 +7,7 @@
 #include <stan/prob/distributions/univariate/continuous/normal.hpp>
 #include <stan/prob/distributions/univariate/continuous/exponential.hpp>
 
-#include <stan/agrad.hpp>
+#include <stan/diff.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
@@ -71,7 +71,7 @@ namespace stan {
         return 0.0;
       
       // set up template expressions wrapping scalars into vector views
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale, T_inv_scale> 
+      diff::OperandsAndPartials<T_y, T_loc, T_scale, T_inv_scale> 
         operands_and_partials(y, mu, sigma,lambda);
 
       VectorView<const T_y> y_vec(y);
@@ -188,7 +188,7 @@ namespace stan {
                                    &cdf)))
         return cdf;
 
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale, T_inv_scale> 
+      diff::OperandsAndPartials<T_y, T_loc, T_scale, T_inv_scale> 
         operands_and_partials(y, mu, sigma,lambda);
 
       using stan::math::SQRT_2;
@@ -311,7 +311,7 @@ namespace stan {
                                    &cdf_log)))
         return cdf_log;
 
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale, T_inv_scale> 
+      diff::OperandsAndPartials<T_y, T_loc, T_scale, T_inv_scale> 
         operands_and_partials(y, mu, sigma,lambda);
 
       using stan::math::SQRT_2;
@@ -426,7 +426,7 @@ namespace stan {
                                    &ccdf_log)))
         return ccdf_log;
 
-      agrad::OperandsAndPartials<T_y, T_loc, T_scale, T_inv_scale> 
+      diff::OperandsAndPartials<T_y, T_loc, T_scale, T_inv_scale> 
         operands_and_partials(y, mu, sigma,lambda);
 
       using stan::math::SQRT_2;

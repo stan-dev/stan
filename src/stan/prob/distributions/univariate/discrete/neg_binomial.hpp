@@ -5,7 +5,7 @@
 #include <boost/random/variate_generator.hpp>
 
 #include <boost/math/special_functions/digamma.hpp>
-#include <stan/agrad.hpp>
+#include <stan/diff.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/functions/value_of.hpp>
 #include <stan/meta/traits.hpp>
@@ -78,7 +78,7 @@ namespace stan {
       VectorView<const T_inv_scale> beta_vec(beta);
       size_t size = max_size(n, alpha, beta);
 
-      agrad::OperandsAndPartials<T_shape,T_inv_scale> 
+      diff::OperandsAndPartials<T_shape,T_inv_scale> 
         operands_and_partials(alpha,beta);
 
       size_t len_ab = max_size(alpha,beta);
@@ -238,7 +238,7 @@ namespace stan {
           
       using boost::math::digamma;
           
-      agrad::OperandsAndPartials<T_shape, T_inv_scale> 
+      diff::OperandsAndPartials<T_shape, T_inv_scale> 
         operands_and_partials(alpha, beta);
           
       std::fill(operands_and_partials.all_partials,
@@ -384,7 +384,7 @@ namespace stan {
           
       using boost::math::digamma;
           
-      agrad::OperandsAndPartials<T_shape, T_inv_scale> 
+      diff::OperandsAndPartials<T_shape, T_inv_scale> 
         operands_and_partials(alpha, beta);
           
       std::fill(operands_and_partials.all_partials,
@@ -511,7 +511,7 @@ namespace stan {
           
       using boost::math::digamma;
           
-      agrad::OperandsAndPartials<T_shape, T_inv_scale> 
+      diff::OperandsAndPartials<T_shape, T_inv_scale> 
         operands_and_partials(alpha, beta);
           
       std::fill(operands_and_partials.all_partials,

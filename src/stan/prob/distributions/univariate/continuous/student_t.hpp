@@ -4,7 +4,7 @@
 #include <boost/random/student_t_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
 
-#include <stan/agrad.hpp>
+#include <stan/diff.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/functions/square.hpp>
 #include <stan/math/functions/value_of.hpp>
@@ -167,7 +167,7 @@ namespace stan {
           log1p_exp[i] = log1p(square_y_minus_mu_over_sigma__over_nu[i]);
         }
 
-      agrad::OperandsAndPartials<T_y,T_dof,T_loc,T_scale>
+      diff::OperandsAndPartials<T_y,T_dof,T_loc,T_scale>
         operands_and_partials(y,nu,mu,sigma);
       for (size_t n = 0; n < N; n++) {
         const double y_dbl = value_of(y_vec[n]);
@@ -266,7 +266,7 @@ namespace stan {
       VectorView<const T_scale> sigma_vec(sigma);
       size_t N = max_size(y, nu, mu, sigma);
           
-      agrad::OperandsAndPartials<T_y, T_dof, T_loc, T_scale> 
+      diff::OperandsAndPartials<T_y, T_dof, T_loc, T_scale> 
         operands_and_partials(y, nu, mu, sigma);
           
       std::fill(operands_and_partials.all_partials,
@@ -453,7 +453,7 @@ namespace stan {
       VectorView<const T_scale> sigma_vec(sigma);
       size_t N = max_size(y, nu, mu, sigma);
           
-      agrad::OperandsAndPartials<T_y, T_dof, T_loc, T_scale> 
+      diff::OperandsAndPartials<T_y, T_dof, T_loc, T_scale> 
         operands_and_partials(y, nu, mu, sigma);
           
       std::fill(operands_and_partials.all_partials,
@@ -628,7 +628,7 @@ namespace stan {
       VectorView<const T_scale> sigma_vec(sigma);
       size_t N = max_size(y, nu, mu, sigma);
           
-      agrad::OperandsAndPartials<T_y, T_dof, T_loc, T_scale> 
+      diff::OperandsAndPartials<T_y, T_dof, T_loc, T_scale> 
         operands_and_partials(y, nu, mu, sigma);
           
       std::fill(operands_and_partials.all_partials,

@@ -6,7 +6,7 @@
 #include <iostream>
 #include <vector>
 
-#include <stan/agrad/rev/var.hpp>
+#include <stan/diff/rev/var.hpp>
 
 namespace stan {
 
@@ -17,7 +17,7 @@ namespace stan {
      * <code>double</code> scalars up to a proportion.
      *
      * This implementation wraps the <code>double</code> values in
-     * <code>stan::agrad::var</code> and calls the model's
+     * <code>stan::diff::var</code> and calls the model's
      * <code>log_prob()</code> function with <code>propto=true</code>
      * and the specified parameter for applying the Jacobian
      * adjustment for transformed parameters.
@@ -38,7 +38,7 @@ namespace stan {
                            std::vector<double>& params_r,
                            std::vector<int>& params_i,
                            std::ostream* msgs = 0) {
-      using stan::agrad::var;
+      using stan::diff::var;
       using std::vector;
       vector<var> ad_params_r;
       for (size_t i = 0; i < model.num_params_r(); ++i)
@@ -50,10 +50,10 @@ namespace stan {
                              jacobian_adjust_transform>(ad_params_r,params_i,
                                                         msgs)
         .val();
-        stan::agrad::recover_memory();
+        stan::diff::recover_memory();
         return lp;
       } catch (std::exception &ex) {
-        stan::agrad::recover_memory();
+        stan::diff::recover_memory();
         throw;
       }
     }
@@ -82,10 +82,10 @@ namespace stan {
                          std::vector<double>& gradient,
                          std::ostream* msgs = 0) {
       using std::vector;
-      using stan::agrad::var;
+      using stan::diff::var;
       vector<var> ad_params_r(params_r.size());
       for (size_t i = 0; i < model.num_params_r(); ++i) {
-        stan::agrad::var var_i(params_r[i]);
+        stan::diff::var var_i(params_r[i]);
         ad_params_r[i] = var_i;
       }
       try {
@@ -98,7 +98,7 @@ namespace stan {
         adLogProb.grad(ad_params_r,gradient);
         return val;
       } catch (std::exception &ex) {
-        stan::agrad::recover_memory();
+        stan::diff::recover_memory();
         throw;
       }
     }
@@ -158,7 +158,7 @@ namespace stan {
      * Test the log_prob_grad() function's ability to produce
      * accurate gradients using finite differences.  This shouldn't
      * be necessary when using autodiff, but is useful for finding
-     * bugs in hand-written code (or agrad).
+     * bugs in hand-written code (or diff).
      *
      * @tparam propto True if calculation is up to proportion
      * (double-only terms dropped).

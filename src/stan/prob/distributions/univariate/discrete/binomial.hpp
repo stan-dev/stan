@@ -4,7 +4,7 @@
 #include <boost/random/binomial_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
 
-#include <stan/agrad.hpp>
+#include <stan/diff.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/functions/log1m.hpp>
 #include <stan/math/functions/log_inv_logit.hpp>
@@ -80,7 +80,7 @@ namespace stan {
       VectorView<const T_prob> theta_vec(theta);
       size_t size = max_size(n, N, theta);
 
-      agrad::OperandsAndPartials<T_prob> operands_and_partials(theta);
+      diff::OperandsAndPartials<T_prob> operands_and_partials(theta);
       
       using stan::math::multiply_log;
       using stan::math::binomial_coefficient_log;
@@ -187,7 +187,7 @@ namespace stan {
       VectorView<const T_prob> alpha_vec(alpha);
       size_t size = max_size(n, N, alpha);
 
-      agrad::OperandsAndPartials<T_prob> operands_and_partials(alpha);
+      diff::OperandsAndPartials<T_prob> operands_and_partials(alpha);
       
       using stan::math::binomial_coefficient_log;
       using stan::math::log_inv_logit;
@@ -288,7 +288,7 @@ namespace stan {
       using boost::math::ibeta;
       using boost::math::ibeta_derivative;
           
-      agrad::OperandsAndPartials<T_prob> operands_and_partials(theta);
+      diff::OperandsAndPartials<T_prob> operands_and_partials(theta);
           
       std::fill(operands_and_partials.all_partials,
                 operands_and_partials.all_partials 
@@ -375,7 +375,7 @@ namespace stan {
       using boost::math::ibeta;
       using boost::math::ibeta_derivative;
           
-      agrad::OperandsAndPartials<T_prob> operands_and_partials(theta);
+      diff::OperandsAndPartials<T_prob> operands_and_partials(theta);
           
       std::fill(operands_and_partials.all_partials,
                 operands_and_partials.all_partials 
@@ -452,7 +452,7 @@ namespace stan {
       using boost::math::ibeta;
       using boost::math::ibeta_derivative;
           
-      agrad::OperandsAndPartials<T_prob> operands_and_partials(theta);
+      diff::OperandsAndPartials<T_prob> operands_and_partials(theta);
           
       std::fill(operands_and_partials.all_partials,
                 operands_and_partials.all_partials 

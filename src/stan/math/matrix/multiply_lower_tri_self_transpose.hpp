@@ -23,7 +23,7 @@ namespace stan {
         result(0,0) = L(0,0) * L(0,0);
         return result;
       }
-      // FIXME:  write custom following agrad/matrix because can't get L_tri into
+      // FIXME:  write custom following diff/matrix because can't get L_tri into
       // multiplication as no template support for tri * tri
       matrix_d L_tri = L.transpose().triangularView<Eigen::Upper>();
       return L.triangularView<Eigen::Lower>() * L_tri;

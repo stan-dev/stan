@@ -4,7 +4,7 @@
 #include <boost/random/exponential_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
 
-#include <stan/agrad.hpp>
+#include <stan/diff.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/functions/value_of.hpp>
 #include <stan/meta/traits.hpp>
@@ -84,7 +84,7 @@ namespace stan {
         if (include_summand<propto,T_inv_scale>::value)
           log_beta[i] = log(value_of(beta_vec[i]));
 
-      agrad::OperandsAndPartials<T_y,T_inv_scale> operands_and_partials(y, beta);
+      diff::OperandsAndPartials<T_y,T_inv_scale> operands_and_partials(y, beta);
 
       for (size_t n = 0; n < N; n++) {
         const double beta_dbl = value_of(beta_vec[n]);
@@ -152,7 +152,7 @@ namespace stan {
       if(!check_positive(function, beta, "Inverse scale parameter", &cdf))
         return cdf;
 
-      agrad::OperandsAndPartials<T_y, T_inv_scale> 
+      diff::OperandsAndPartials<T_y, T_inv_scale> 
         operands_and_partials(y, beta);
 
       VectorView<const T_y> y_vec(y);
@@ -211,7 +211,7 @@ namespace stan {
       if(!check_positive(function, beta, "Inverse scale parameter", &cdf_log))
         return cdf_log;
 
-      agrad::OperandsAndPartials<T_y, T_inv_scale> 
+      diff::OperandsAndPartials<T_y, T_inv_scale> 
         operands_and_partials(y, beta);
 
       VectorView<const T_y> y_vec(y);
@@ -262,7 +262,7 @@ namespace stan {
       if(!check_positive(function, beta, "Inverse scale parameter", &ccdf_log))
         return ccdf_log;
 
-      agrad::OperandsAndPartials<T_y, T_inv_scale> 
+      diff::OperandsAndPartials<T_y, T_inv_scale> 
         operands_and_partials(y, beta);
 
       VectorView<const T_y> y_vec(y);

@@ -20,7 +20,7 @@ namespace stan {
      *
      * \f$\log \mbox{B}(a,b) = \log \Gamma(a) + \log \Gamma(b) - \log \Gamma(a+b)\f$.
      *
-     * See boost::math::lgamma() for the double-based and stan::agrad for the
+     * See boost::math::lgamma() for the double-based and stan::diff for the
      * variable-based log Gamma function.
      * 
      * @param a First value

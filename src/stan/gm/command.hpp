@@ -281,7 +281,7 @@ namespace stan {
                                             init_s, model, base_rng);
       
     }
-
+    
     template <class Sampler, class Model, class RNG>
     void sample(Sampler& sampler,
                 int num_warmup,
