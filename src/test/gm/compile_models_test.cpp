@@ -60,4 +60,8 @@ TEST(gm,issue109_csv_header_consistent_with_samples) {
   EXPECT_FLOAT_EQ(2, chains.samples("z[1,2]")(0));
   EXPECT_FLOAT_EQ(3, chains.samples("z[2,1]")(0));
   EXPECT_FLOAT_EQ(4, chains.samples("z[2,2]")(0));
+  EXPECT_FLOAT_EQ(1, chains.samples("z_mat[1,1]")(0));
+  EXPECT_FLOAT_EQ(2, chains.samples("z_mat[1,2]")(0));
+  EXPECT_FLOAT_EQ(3, chains.samples("z_mat[2,1]")(0));
+  EXPECT_FLOAT_EQ(4, chains.samples("z_mat[2,2]")(0));
 }
