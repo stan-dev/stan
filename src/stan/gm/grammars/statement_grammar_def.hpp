@@ -95,7 +95,7 @@ namespace stan {
                      << std::endl;
           pass = false;
           error_msgs << "_pass set to false." << std::endl;
-           return;
+          return;
         }
         
         // validate origin
