@@ -4,9 +4,6 @@
 #include <cmath>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/op/v_vari.hpp>
-#include <limits>
-#include <stan/math/error_handling/check_finite.hpp>
-#include <stan/math/error_handling/check_greater.hpp>
 
 namespace stan {
   namespace agrad {
@@ -34,9 +31,6 @@ namespace stan {
      * @return Natural log of variable.
      */
     inline var log(const var& a) {
-      static const char* function = "stan::agrad::log(%1%)";
-      if (!stan::math::check_finite(function,a.val(),"value") || !stan::math::check_greater(function,a.val(),0.0,"value"))
-	return std::numeric_limits<double>::quiet_NaN();
       return var(new log_vari(a.vi_));
     }
     

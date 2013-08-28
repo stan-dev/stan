@@ -29,8 +29,16 @@ TEST(AgradRev,atan_boundry) {
   AVAR a = inf;
   AVAR f = atan(a);
   EXPECT_FLOAT_EQ(1.5707964,f.val());
+  AVEC x = createAVEC(a);
+  VEC g;
+  f.grad(x,g);
+  EXPECT_FLOAT_EQ(0.0, g[0]);
 
   AVAR b = -inf;
   AVAR e = atan(b);
   EXPECT_FLOAT_EQ(-1.5707964,e.val());
+  AVEC y = createAVEC(b);
+  VEC h;
+  e.grad(y, h);
+  EXPECT_FLOAT_EQ(0.0, h[0]);
 }

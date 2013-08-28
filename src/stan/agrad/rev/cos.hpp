@@ -1,11 +1,9 @@
 #ifndef __STAN__AGRAD__REV__COS_HPP__
 #define __STAN__AGRAD__REV__COS_HPP__
 
-#include <valarray>
+#include <cmath>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/op/v_vari.hpp>
-#include <limits>
-#include <stan/math/error_handling/check_finite.hpp>
 
 namespace stan {
   namespace agrad {
@@ -33,10 +31,7 @@ namespace stan {
      * @return Cosine of variable. 
      */
     inline var cos(const var& a) {
-static const char* function = "stan::agrad::cos(%1%)";
- if (!stan::math::check_finite(function,a.val(),"angle"))
-   return std::numeric_limits<double>::quiet_NaN();
- return var(new cos_vari(a.vi_));
+      return var(new cos_vari(a.vi_));
     }
 
   }

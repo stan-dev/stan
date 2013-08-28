@@ -1,11 +1,9 @@
 #ifndef __STAN__AGRAD__REV__TAN_HPP__
 #define __STAN__AGRAD__REV__TAN_HPP__
 
-#include <valarray>
+#include <cmath>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/op/v_vari.hpp>
-#include <limits>
-#include <stan/math/error_handling/check_finite.hpp>
 
 namespace stan {
   namespace agrad {
@@ -33,9 +31,6 @@ namespace stan {
      * @return Tangent of variable. 
      */
     inline var tan(const var& a) {
-      static const char* function = "stan::agrad::tan(%1%)";
-      if (!stan::math::check_finite(function,a.val(),"angle"))
-	return std::numeric_limits<double>::quiet_NaN();
       return var(new tan_vari(a.vi_));
     }
 

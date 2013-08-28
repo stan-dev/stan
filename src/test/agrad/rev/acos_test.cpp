@@ -1,6 +1,9 @@
 #include <stan/agrad/rev/acos.hpp>
 #include <test/agrad/util.hpp>
 #include <gtest/gtest.h>
+#include <stan/math/constants.hpp>
+#include <stan/agrad/rev/numeric_limits.hpp>
+
 
 TEST(AgradRev,acos_var) {
   AVAR a = 0.68;
@@ -36,11 +39,9 @@ TEST(AgradRev,acos_neg_1) {
 }
 
 TEST(AgradRev,acos_out_of_bounds) {
-  AVAR a = 2;
-  EXPECT_THROW(acos(a),std::domain_error)
-    <<"acos(2) should throw error";
+  AVAR a = 1.0 + stan::math::epsilon();
+  EXPECT_TRUE(std::isnan(acos(a)));
 
-  a = -2;
-  EXPECT_THROW(acos(a),std::domain_error)
-    <<"acos(-2) should throw error";
+  a = -1.0 - stan::math::epsilon();
+  EXPECT_TRUE(std::isnan(acos(a)));
 }

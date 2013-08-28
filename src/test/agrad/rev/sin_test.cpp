@@ -1,6 +1,7 @@
 #include <stan/agrad/rev/sin.hpp>
 #include <test/agrad/util.hpp>
 #include <gtest/gtest.h>
+#include <stan/agrad/rev/numeric_limits.hpp>
 
 TEST(AgradRev,sin_var) {
   AVAR a = 0.49;
@@ -27,10 +28,8 @@ TEST(AgradRev,sin_neg_var) {
 TEST(AgradRev,sin_boundry) {
   double inf = std::numeric_limits<double>::infinity();
   AVAR a = inf;
-  EXPECT_THROW(sin(a),std::domain_error)
-    <<"sin(a) should throw error";
+  EXPECT_TRUE(std::isnan(sin(a)));
 
   AVAR b = -inf;
-  EXPECT_THROW(sin(b),std::domain_error)
-    <<"sin(b) should throw error";
+  EXPECT_TRUE(std::isnan(sin(b)));
 }

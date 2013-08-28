@@ -4,8 +4,6 @@
 #include <valarray>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/op/v_vari.hpp>
-#include <limits>
-#include <stan/math/error_handling/check_bounded.hpp>
 
 namespace stan {
   namespace agrad {
@@ -14,7 +12,7 @@ namespace stan {
       class acos_vari : public op_v_vari {
       public:
         acos_vari(vari* avi) :
-        op_v_vari(std::acos(avi->val_),avi) {
+          op_v_vari(std::acos(avi->val_),avi) {
         }
         void chain() {
           avi_->adj_ -= adj_ / std::sqrt(1.0 - (avi_->val_ * avi_->val_));
@@ -34,9 +32,6 @@ namespace stan {
      * @return Arc cosine of variable, in radians. 
      */
     inline var acos(const var& a) {
-      static const char* function = "stan::agrad::acos(%1%)";
-      if (!stan::math::check_bounded(function,a.val(),-1.0,1.0,"angle"))
-	return std::numeric_limits<double>::quiet_NaN();
       return var(new acos_vari(a.vi_));
     }
 
