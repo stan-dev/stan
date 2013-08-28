@@ -2,6 +2,7 @@
 #include <test/agrad/util.hpp>
 #include <gtest/gtest.h>
 #include <stan/math/constants.hpp>
+#include <stan/agrad/rev/numeric_limits.hpp>
 
 TEST(AgradRev,acosh_val) {
   AVAR a = 1.3;
@@ -38,9 +39,9 @@ TEST(AgradRev,acosh_inf) {
 }
 
 TEST(AgradRev,acosh_out_of_bounds) {
-  double inf = std::numeric_limits<double>::infinity();
   AVAR a = 1.0 - stan::math::EPSILON;
-  AVAR b = 0.0;
-  EXPECT_THROW(acosh(a),std::domain_error);
-  EXPECT_THROW(acosh(b),std::domain_error);
+  EXPECT_THROW(acosh(a), std::domain_error);
+
+  AVAR b = std::numeric_limits<double>::infinity();
+  EXPECT_TRUE(std::isinf(acosh(b)) && acosh(b) > 0);
 }

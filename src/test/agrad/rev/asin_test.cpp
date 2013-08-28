@@ -1,6 +1,8 @@
 #include <stan/agrad/rev/asin.hpp>
 #include <test/agrad/util.hpp>
 #include <gtest/gtest.h>
+#include <stan/math/constants.hpp>
+#include <stan/agrad/rev/numeric_limits.hpp>
 
 TEST(AgradRev,asin_var) {
   AVAR a = 0.68;
@@ -36,11 +38,9 @@ TEST(AgradRev,asin_neg_1) {
 }
 
 TEST(AgradRev,asin_out_of_bounds) {
-  AVAR a = 2;
-  EXPECT_THROW(asin(a),std::domain_error)
-    <<"asin(2) should throw error";
+  AVAR a = 1.0 + stan::math::EPSILON;
+  EXPECT_TRUE(std::isnan(asin(a)));
 
-  a = -2;
-  EXPECT_THROW(asin(a),std::domain_error)
-    <<"asin(-2) should throw error";
+  a = -1.0 - stan::math::EPSILON;
+  EXPECT_TRUE(std::isnan(asin(a)));
 }

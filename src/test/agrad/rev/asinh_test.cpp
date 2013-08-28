@@ -27,19 +27,18 @@ TEST(AgradRev,asinh_neg_val) {
 TEST(AgradRev,asinh_boundry) {
   double inf = std::numeric_limits<double>::infinity();
   AVAR a = inf;
-  AVAR b = -inf;
   AVAR f = asinh(a);
-  AVAR e = asinh(b);
   EXPECT_FLOAT_EQ(inf, f.val());
-  EXPECT_FLOAT_EQ(-inf,e.val());
-  
   AVEC x = createAVEC(a);
   VEC g;
   f.grad(x,g);
-  EXPECT_FLOAT_EQ((0.0), g[0]);
-
+  EXPECT_FLOAT_EQ(0.0, g[0]);
+  
+  AVAR b = -inf;
+  AVAR e = asinh(b);
+  EXPECT_FLOAT_EQ(-inf,e.val());
   AVEC y = createAVEC(b);
   VEC h;
-  f.grad(y,h);
-  EXPECT_FLOAT_EQ((0.0), h[0]); 
+  e.grad(y,h);
+  EXPECT_FLOAT_EQ(0.0, h[0]); 
 }

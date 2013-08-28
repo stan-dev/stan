@@ -1,6 +1,9 @@
 #include <stan/agrad/rev/log.hpp>
 #include <test/agrad/util.hpp>
 #include <gtest/gtest.h>
+#include <stan/math/constants.hpp>
+#include <stan/agrad/rev/numeric_limits.hpp>
+#include <stan/agrad/rev/operator_less_than.hpp>
 
 TEST(AgradRev,log_a) {
   AVAR a(5.0);
@@ -14,26 +17,16 @@ TEST(AgradRev,log_a) {
 }
 
 TEST(AgradRev,log_inf) {
-  double inf = std::numeric_limits<double>::infinity();
-  AVAR a = inf;
-  EXPECT_THROW(log(a),std::domain_error);
-}
-
-TEST(AgradRev,log_inf_2) {
-  double inf = std::numeric_limits<double>::infinity();
-  AVAR f = log(inf);
-  AVEC x = createAVEC(inf);
-  VEC g;
-  f.grad(x,g);
-  EXPECT_FLOAT_EQ(0.0,g[0]);
+  AVAR a = std::numeric_limits<double>::infinity();
+  EXPECT_TRUE(std::isinf(log(a)));
 }
 
 TEST(AgradRev,log_0) {
   AVAR a(0.0);
-  EXPECT_THROW(log(a),std::domain_error);
+  EXPECT_TRUE(std::isinf(log(a)) && (log(a) < 0.0));
 }
 
 TEST(AgradRev,log_neg){
-  AVAR a(-2.0);
-  EXPECT_THROW(log(a),std::domain_error);
+  AVAR a(0.0 - stan::math::epsilon());
+  EXPECT_TRUE(std::isnan(log(a)));
 }
