@@ -77,14 +77,15 @@ namespace stan {
 
   namespace gm {
 
-    struct validate_assignment {
-      template <typename T1, typename T2, typename T3, typename T4>
-      struct result { typedef bool type; };
+    struct validate_lhs_of_assignment {
+      template <typename T1, typename T2, typename T3, typename T4, typename T5>
+      struct result { typedef void type; };
 
-      bool operator()(assignment& a,
+      void operator()(assignment& a,
                       const var_origin& origin_allowed,
                       variable_map& vm,
-                      std::stringstream& error_msgs) const {
+                      std::stringstream& error_msgs,
+                      bool& pass) const {
 
         // validate existence
         std::string name = a.var_dims_.name_;
@@ -92,7 +93,9 @@ namespace stan {
           error_msgs << "unknown variable in assignment"
                      << "; lhs variable=" << a.var_dims_.name_ 
                      << std::endl;
-          return false;
+          pass = false;
+          error_msgs << "_pass set to false." << std::endl;
+           return;
         }
         
         // validate origin
@@ -103,7 +106,54 @@ namespace stan {
                      << " left-hand-side variable origin=";
           print_var_origin(error_msgs,lhs_origin);
           error_msgs << std::endl;
-          return false;
+          pass = false;
+          error_msgs << "_pass set to false." << std::endl;
+          return;
+        }
+        error_msgs << "_pass set to true." << std::endl;
+        pass = true;
+      }
+    };
+    boost::phoenix::function<validate_lhs_of_assignment> validate_lhs_of_assignment_f;
+
+
+    struct validate_assignment {
+      template <typename T1, typename T2, typename T3, typename T4, typename T5>
+      struct result { typedef void type; };
+
+      void operator()(assignment& a,
+                      const var_origin& origin_allowed,
+                      variable_map& vm,
+                      std::stringstream& error_msgs,
+                      bool& pass) const {
+
+        if (pass == false) {
+          error_msgs << "_pass already false." << std::endl;
+          return;          
+        } else {
+          error_msgs << "_pass = true." << std::endl;
+        }
+
+        // validate existence
+        std::string name = a.var_dims_.name_;
+        if (!vm.exists(name)) {
+          error_msgs << "unknown variable in assignment"
+                     << "; lhs variable=" << a.var_dims_.name_ 
+                     << std::endl;
+          pass = false;
+          return;
+        }
+        
+        // validate origin
+        var_origin lhs_origin = vm.get_origin(name);
+        if (lhs_origin != local_origin
+            && lhs_origin != origin_allowed) {
+          error_msgs << "attempt to assign variable in wrong block."
+                     << " left-hand-side variable origin=";
+          print_var_origin(error_msgs,lhs_origin);
+          error_msgs << std::endl;
+          pass = false;
+          return;
         }
 
         // validate types
@@ -120,14 +170,16 @@ namespace stan {
                      << "; variable name = " << name
                      << "; num dimensions given = " << num_index_dims
                      << "; variable array dimensions = " << lhs_var_num_dims;
-          return false;
+          pass = false;
+          return;
         }
         if (lhs_type.num_dims_ != a.expr_.expression_type().num_dims_) {
           error_msgs << "mismatched dimensions on left- and right-hand side of assignment"
                      << "; left dims=" << lhs_type.num_dims_
                      << "; right dims=" << a.expr_.expression_type().num_dims_
                      << std::endl;
-          return false;
+          pass = false;
+          return;
         }
 
         base_expr_type lhs_base_type = lhs_type.base_type_;
@@ -144,9 +196,10 @@ namespace stan {
           error_msgs << "; right base type=";
           write_base_expr_type(error_msgs,rhs_base_type);
           error_msgs << std::endl;
-          return false;
+          pass = false;
+          return;
         }
-        return true;
+        pass = true;
       }
     };
     boost::phoenix::function<validate_assignment> validate_assignment_f;
@@ -162,11 +215,13 @@ namespace stan {
           .get_result_type(function_name,arg_types,error_msgs)
           .is_primitive_double();
       }
+
       static bool is_univariate(const expr_type& et) {
         return et.num_dims_ == 0
           && ( et.base_type_ == INT_T
                || et.base_type_ == DOUBLE_T );
       }
+
       bool operator()(const sample& s,
                       const variable_map& var_map,
                       std::ostream& error_msgs) const {
@@ -283,7 +338,6 @@ namespace stan {
           }
         }
         return true;
-
       }
     };
     boost::phoenix::function<validate_sample> validate_sample_f;
@@ -562,12 +616,19 @@ namespace stan {
 
       assignment_r.name("variable assignment by expression");
       assignment_r
-        %= ( var_lhs_r(_r1)
-             >> lit("<-") )
+        %=  ( var_lhs_r(_r1)
+              >> lit("<-")
+            )
+                [validate_lhs_of_assignment_f(_val,_r1,
+                                              boost::phoenix::ref(var_map_),
+                                              boost::phoenix::ref(error_msgs_),
+                                              _pass)]
         > expression_g(_r1)
         > lit(';')
-          [_pass = validate_assignment_f(_val,_r1,boost::phoenix::ref(var_map_),
-                                         boost::phoenix::ref(error_msgs_))]
+          [validate_assignment_f( _val,_r1,
+                                  boost::phoenix::ref(var_map_),
+                                  boost::phoenix::ref(error_msgs_),
+                                  _pass)]
         ;
 
       var_lhs_r.name("variable and array dimensions");
