@@ -138,9 +138,10 @@ public:
     for (size_t chain = 1; chain <= num_chains; chain++) {
       std::stringstream command_chain;
       command_chain << command;
-      command_chain << " --chain_id=" << chain
-                    << " --samples=" << path << get_path_separator() 
-                    << filename << ".chain_" << chain << ".csv";
+      command_chain << " file=" << path << get_path_separator()
+                    << filename << ".chain_" << chain << ".csv"
+                    << " id=" << chain;
+      
       std::string command_output;
       try {
         command_output = run_command(command_chain.str(), time);
@@ -171,6 +172,7 @@ public:
       std::string tmp(samples.str());
       ifstream.open(tmp.c_str());
     }
+
     stan::io::stan_csv stan_csv = stan::io::stan_csv_reader::parse(ifstream);
     ifstream.close();
     
@@ -237,9 +239,9 @@ public:
     // 2) Run Stan num_chains times
     std::stringstream command;
     command << path << get_path_separator() << "logistic"
-            << " --data=" << path << get_path_separator() << filename << ".data.R"
-            << " --iter=" << iterations
-            << " --refresh=" << iterations;
+            << " data=" << path << get_path_separator() << filename << ".data.R"
+            << " sample num_samples=" << 0.5 * iterations << " num_warmup=" << 0.5 * iterations
+            << " output refresh=" << iterations;
     vector<std::string> command_outputs;  
     long time = run_stan(command.str(), filename, command_outputs);
 
