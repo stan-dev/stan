@@ -20,8 +20,8 @@ TEST(gm,issue91_segfault_printing_uninitialized) {
 
   std::string command 
     = convert_model_path(model_path)
-    + " --iter=0" 
-    + " --samples=" + convert_model_path(model_path) + ".csv";
+    + " sample num_warmup=0 num_samples=0"
+    + " output file=" + convert_model_path(model_path) + ".csv";
   
   run_command(command);
 
@@ -44,9 +44,10 @@ TEST(gm,issue109_csv_header_consistent_with_samples) {
 
   std::string command
     = path
-    + " --iter=1"
-    + " --warmup=0"
-    + " --samples=" + samples;
+    + " sample num_warmup=0 num_samples=1"
+    + " output file=" + samples;
+  
+  std::cout << command << std::endl;
   
   run_command(command);
   std::ifstream ifstream;
@@ -59,4 +60,8 @@ TEST(gm,issue109_csv_header_consistent_with_samples) {
   EXPECT_FLOAT_EQ(2, chains.samples("z[1,2]")(0));
   EXPECT_FLOAT_EQ(3, chains.samples("z[2,1]")(0));
   EXPECT_FLOAT_EQ(4, chains.samples("z[2,2]")(0));
+  EXPECT_FLOAT_EQ(1, chains.samples("z_mat[1,1]")(0));
+  EXPECT_FLOAT_EQ(2, chains.samples("z_mat[1,2]")(0));
+  EXPECT_FLOAT_EQ(3, chains.samples("z_mat[2,1]")(0));
+  EXPECT_FLOAT_EQ(4, chains.samples("z_mat[2,2]")(0));
 }
