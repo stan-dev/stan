@@ -60,17 +60,11 @@ TEST_F(StanIoStanCsvReader,read_metadata1) {
   EXPECT_EQ(4085885484U, metadata.seed);
   EXPECT_FALSE(metadata.random_seed);
   EXPECT_EQ(1U, metadata.chain_id);
-  EXPECT_EQ(4000U, metadata.iter);
-  EXPECT_EQ(2000U, metadata.warmup);
+  EXPECT_EQ(2000U, metadata.num_samples);
+  EXPECT_EQ(2000U, metadata.num_warmup);
   EXPECT_EQ(2U, metadata.thin);
-  EXPECT_FALSE(metadata.equal_step_sizes);
-  EXPECT_EQ(-1, metadata.leapfrog_steps);
-  EXPECT_EQ(10, metadata.max_treedepth);
-  EXPECT_FLOAT_EQ(-1, metadata.epsilon);
-  EXPECT_FLOAT_EQ(0, metadata.epsilon_pm);
-  EXPECT_FLOAT_EQ(0.5, metadata.delta);
-  EXPECT_FLOAT_EQ(0.05, metadata.gamma);
-  EXPECT_EQ("NUTS with a diagonal Euclidean metric", metadata.algorithm);
+  EXPECT_EQ("hmc", metadata.algorithm);
+  EXPECT_EQ("nuts", metadata.engine);
 }
 TEST_F(StanIoStanCsvReader,read_header1) {
   Eigen::Matrix<std::string, Eigen::Dynamic, 1> header;
@@ -232,17 +226,11 @@ TEST_F(StanIoStanCsvReader,ParseBlocker) {
   EXPECT_EQ(4085885484U, blocker0.metadata.seed);
   EXPECT_FALSE(blocker0.metadata.random_seed);
   EXPECT_EQ(1U, blocker0.metadata.chain_id);
-  EXPECT_EQ(4000U, blocker0.metadata.iter);
-  EXPECT_EQ(2000U, blocker0.metadata.warmup);
+  EXPECT_EQ(2000U, blocker0.metadata.num_samples);
+  EXPECT_EQ(2000U, blocker0.metadata.num_warmup);
   EXPECT_EQ(2U, blocker0.metadata.thin);
-  EXPECT_FALSE(blocker0.metadata.equal_step_sizes);
-  EXPECT_EQ(-1, blocker0.metadata.leapfrog_steps);
-  EXPECT_EQ(10, blocker0.metadata.max_treedepth);
-  EXPECT_FLOAT_EQ(-1, blocker0.metadata.epsilon);
-  EXPECT_FLOAT_EQ(0, blocker0.metadata.epsilon_pm);
-  EXPECT_FLOAT_EQ(0.5, blocker0.metadata.delta);
-  EXPECT_FLOAT_EQ(0.05, blocker0.metadata.gamma);
-  EXPECT_EQ("NUTS with a diagonal Euclidean metric", blocker0.metadata.algorithm);
+  EXPECT_EQ("hmc", blocker0.metadata.algorithm);
+  EXPECT_EQ("nuts", blocker0.metadata.engine);
   
   // header
   ASSERT_EQ(52, blocker0.header.size());
@@ -381,23 +369,17 @@ TEST_F(StanIoStanCsvReader,read_metadata2) {
   EXPECT_EQ(0, metadata.stan_version_patch);
   
   EXPECT_EQ("src/models/bugs_examples/vol1/epil/epil.data.R", metadata.data);
-  EXPECT_EQ("random initialization", metadata.init);
+  EXPECT_EQ("2", metadata.init);
   EXPECT_FALSE(metadata.append_samples);
   EXPECT_FALSE(metadata.save_warmup);
   EXPECT_EQ(4258844633U, metadata.seed);
   EXPECT_FALSE(metadata.random_seed);
   EXPECT_EQ(1U, metadata.chain_id);
-  EXPECT_EQ(2000U, metadata.iter);
-  EXPECT_EQ(1000U, metadata.warmup);
+  EXPECT_EQ(1000U, metadata.num_samples);
+  EXPECT_EQ(1000U, metadata.num_warmup);
   EXPECT_EQ(1U, metadata.thin);
-  EXPECT_FALSE(metadata.equal_step_sizes);
-  EXPECT_EQ(-1, metadata.leapfrog_steps);
-  EXPECT_EQ(10, metadata.max_treedepth);
-  EXPECT_FLOAT_EQ(-1, metadata.epsilon);
-  EXPECT_FLOAT_EQ(0, metadata.epsilon_pm);
-  EXPECT_FLOAT_EQ(0.5, metadata.delta);
-  EXPECT_FLOAT_EQ(0.05, metadata.gamma);
-  EXPECT_EQ("NUTS with a diagonal Euclidean metric", metadata.algorithm);
+  EXPECT_EQ("hmc", metadata.algorithm);
+  EXPECT_EQ("nuts", metadata.engine);
 }
 
 TEST_F(StanIoStanCsvReader,read_header2) {
@@ -480,23 +462,17 @@ TEST_F(StanIoStanCsvReader,ParseEpil) {
   EXPECT_EQ(0, epil0.metadata.stan_version_patch);
   
   EXPECT_EQ("src/models/bugs_examples/vol1/epil/epil.data.R", epil0.metadata.data);
-  EXPECT_EQ("random initialization", epil0.metadata.init);
+  EXPECT_EQ("2", epil0.metadata.init);
   EXPECT_FALSE(epil0.metadata.append_samples);
   EXPECT_FALSE(epil0.metadata.save_warmup);
   EXPECT_EQ(4258844633U, epil0.metadata.seed);
   EXPECT_FALSE(epil0.metadata.random_seed);
   EXPECT_EQ(1U, epil0.metadata.chain_id);
-  EXPECT_EQ(2000U, epil0.metadata.iter);
-  EXPECT_EQ(1000U, epil0.metadata.warmup);
+  EXPECT_EQ(1000U, epil0.metadata.num_samples);
+  EXPECT_EQ(1000U, epil0.metadata.num_warmup);
   EXPECT_EQ(1U, epil0.metadata.thin);
-  EXPECT_FALSE(epil0.metadata.equal_step_sizes);
-  EXPECT_EQ(-1, epil0.metadata.leapfrog_steps);
-  EXPECT_EQ(10, epil0.metadata.max_treedepth);
-  EXPECT_FLOAT_EQ(-1, epil0.metadata.epsilon);
-  EXPECT_FLOAT_EQ(0, epil0.metadata.epsilon_pm);
-  EXPECT_FLOAT_EQ(0.5, epil0.metadata.delta);
-  EXPECT_FLOAT_EQ(0.05, epil0.metadata.gamma);
-  EXPECT_EQ("NUTS with a diagonal Euclidean metric", epil0.metadata.algorithm);
+  EXPECT_EQ("hmc", epil0.metadata.algorithm);
+  EXPECT_EQ("nuts", epil0.metadata.engine);
   
   // header
   ASSERT_EQ(310, epil0.header.size());
@@ -567,17 +543,11 @@ TEST_F(StanIoStanCsvReader,ParseBlockerNondiag) {
   EXPECT_EQ(4085885484U, blocker_nondiag.metadata.seed);
   EXPECT_FALSE(blocker_nondiag.metadata.random_seed);
   EXPECT_EQ(1U, blocker_nondiag.metadata.chain_id);
-  EXPECT_EQ(4000U, blocker_nondiag.metadata.iter);
-  EXPECT_EQ(2000U, blocker_nondiag.metadata.warmup);
+  EXPECT_EQ(2000U, blocker_nondiag.metadata.num_samples);
+  EXPECT_EQ(2000U, blocker_nondiag.metadata.num_warmup);
   EXPECT_EQ(2U, blocker_nondiag.metadata.thin);
-  EXPECT_FALSE(blocker_nondiag.metadata.equal_step_sizes);
-  EXPECT_EQ(-1, blocker_nondiag.metadata.leapfrog_steps);
-  EXPECT_EQ(10, blocker_nondiag.metadata.max_treedepth);
-  EXPECT_FLOAT_EQ(-1, blocker_nondiag.metadata.epsilon);
-  EXPECT_FLOAT_EQ(0, blocker_nondiag.metadata.epsilon_pm);
-  EXPECT_FLOAT_EQ(0.5, blocker_nondiag.metadata.delta);
-  EXPECT_FLOAT_EQ(0.05, blocker_nondiag.metadata.gamma);
-  EXPECT_EQ("NUTS with a dense Euclidean metric", blocker_nondiag.metadata.algorithm);
+  EXPECT_EQ("hmc", blocker_nondiag.metadata.algorithm);
+  EXPECT_EQ("nuts", blocker_nondiag.metadata.engine);
   
   // header
   ASSERT_EQ(52, blocker_nondiag.header.size());

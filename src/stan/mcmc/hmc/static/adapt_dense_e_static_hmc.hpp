@@ -42,8 +42,8 @@ namespace stan {
             this->init_stepsize();
             this->_update_L();
             
-            this->stepsize_adaptation.set_mu(log(10 * this->_nom_epsilon));
-            this->stepsize_adaptation.restart();
+            this->_stepsize_adaptation.set_mu(log(10 * this->_nom_epsilon));
+            this->_stepsize_adaptation.restart();
           }
           
         }
