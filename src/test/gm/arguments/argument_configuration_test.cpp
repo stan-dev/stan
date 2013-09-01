@@ -66,7 +66,6 @@ TEST(StanGmArgumentsConfiguration, TestMethod) {
     else if (l1 == "bad") expected_success = false;
     else if (l1 != "") expected_output << l1 << std::endl;
     else {
-      
       int n_output = 0;
       
       std::string l2;
@@ -87,9 +86,10 @@ TEST(StanGmArgumentsConfiguration, TestMethod) {
       std::string command = convert_model_path(model_path) + argument;
       std::string command_output;
       long time;
-      
+      int err_code;
+
       try {
-        command_output = run_command(command, time);
+        command_output = run_command(command, time, err_code);
       } catch(...) {
         ADD_FAILURE() << "Failed running command: " << command;
       }
@@ -217,9 +217,10 @@ TEST(StanGmArgumentsConfiguration, TestIdWithMethod) {
       std::string command = convert_model_path(model_path) + argument;
       std::string command_output;
       long time;
-      
+      int err_code;
+
       try {
-        command_output = run_command(command, time);
+        command_output = run_command(command, time, err_code);
       } catch(...) {
         ADD_FAILURE() << "Failed running command: " << command;
       }
@@ -327,9 +328,10 @@ TEST(StanGmArgumentsConfiguration, TestIdWithoutMethod) {
       std::string command = convert_model_path(model_path) + argument;
       std::string command_output;
       long time;
+      int err_code;
       
       try {
-        command_output = run_command(command, time);
+        command_output = run_command(command, time, err_code);
       } catch(...) {
         ADD_FAILURE() << "Failed running command: " << command;
       }
@@ -461,9 +463,10 @@ TEST(StanGmArgumentsConfiguration, TestDataWithMethod) {
       std::string command = convert_model_path(model_path) + argument;
       std::string command_output;
       long time;
+      int err_code;
       
       try {
-        command_output = run_command(command, time);
+        command_output = run_command(command, time, err_code);
       } catch(...) {
         ADD_FAILURE() << "Failed running command: " << command;
       }
@@ -571,9 +574,10 @@ TEST(StanGmArgumentsConfiguration, TestDataWithoutMethod) {
       std::string command = convert_model_path(model_path) + argument;
       std::string command_output;
       long time;
+      int err_code;
       
       try {
-        command_output = run_command(command, time);
+        command_output = run_command(command, time, err_code);
       } catch(...) {
         ADD_FAILURE() << "Failed running command: " << command;
       }
@@ -705,9 +709,10 @@ TEST(StanGmArgumentsConfiguration, TestInitWithMethod) {
       std::string command = convert_model_path(model_path) + argument;
       std::string command_output;
       long time;
+      int err_code;
       
       try {
-        command_output = run_command(command, time);
+        command_output = run_command(command, time, err_code);
       } catch(...) {
         ADD_FAILURE() << "Failed running command: " << command;
       }
@@ -815,9 +820,10 @@ TEST(StanGmArgumentsConfiguration, TestInitWithoutMethod) {
       std::string command = convert_model_path(model_path) + argument;
       std::string command_output;
       long time;
+      int err_code;
       
       try {
-        command_output = run_command(command, time);
+        command_output = run_command(command, time, err_code);
       } catch(...) {
         ADD_FAILURE() << "Failed running command: " << command;
       }
@@ -949,9 +955,10 @@ TEST(StanGmArgumentsConfiguration, TestRandomWithMethod) {
       std::string command = convert_model_path(model_path) + argument;
       std::string command_output;
       long time;
+      int err_code;
       
       try {
-        command_output = run_command(command, time);
+        command_output = run_command(command, time, err_code);
       } catch(...) {
         ADD_FAILURE() << "Failed running command: " << command;
       }
@@ -1059,9 +1066,10 @@ TEST(StanGmArgumentsConfiguration, TestRandomWithoutMethod) {
       std::string command = convert_model_path(model_path) + argument;
       std::string command_output;
       long time;
+      int err_code;
       
       try {
-        command_output = run_command(command, time);
+        command_output = run_command(command, time, err_code);
       } catch(...) {
         ADD_FAILURE() << "Failed running command: " << command;
       }
@@ -1193,9 +1201,9 @@ TEST(StanGmArgumentsConfiguration, TestOutputWithMethod) {
       std::string command = convert_model_path(model_path) + argument;
       std::string command_output;
       long time;
-      
+      int err_code;
       try {
-        command_output = run_command(command, time);
+        command_output = run_command(command, time, err_code);
       } catch(...) {
         ADD_FAILURE() << "Failed running command: " << command;
       }
@@ -1303,9 +1311,10 @@ TEST(StanGmArgumentsConfiguration, TestOutputWithoutMethod) {
       std::string command = convert_model_path(model_path) + argument;
       std::string command_output;
       long time;
+      int err_code;
       
       try {
-        command_output = run_command(command, time);
+        command_output = run_command(command, time, err_code);
       } catch(...) {
         ADD_FAILURE() << "Failed running command: " << command;
       }

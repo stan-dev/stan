@@ -143,8 +143,10 @@ public:
                     << " id=" << chain;
       
       std::string command_output;
+      int err_code;
+                                   
       try {
-        command_output = run_command(command_chain.str(), time);
+        command_output = run_command(command_chain.str(), time, err_code);
       } catch(...) {
         ADD_FAILURE() << "Failed running command: " << command_chain.str();
       }
@@ -367,8 +369,9 @@ size_t LogisticSpeedTest::max_M;
 TEST_F(LogisticSpeedTest,Prerequisites) {
   std::string command;
   command = "Rscript --version";
+  int err_code;
   try {
-    run_command(command);
+    run_command(command, err_code);
     has_R = true;
   } catch (...) {
     std::cout << "System does not have Rscript available" << std::endl
@@ -384,7 +387,7 @@ TEST_F(LogisticSpeedTest,Prerequisites) {
   command += convert_model_path(test_file);
   
   try {
-    run_command(command);
+    run_command(command, err_code);
     has_jags = true;
   } catch (...) {
     std::cout << "System does not have jags available" << std::endl
@@ -421,7 +424,7 @@ TEST_F(LogisticSpeedTest,GenerateData) {
 
   // no guarantee here that we have the right files
 
-  ASSERT_NO_THROW(run_command(command))
+  ASSERT_NO_THROW(run_command(command, err_code))
     << command;
   SUCCEED();
 }

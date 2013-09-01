@@ -133,9 +133,10 @@ TEST(McmcBaseHMC, init_stepsize) {
   command += " sample output file=" + convert_model_path(model_path) + ".csv";
   std::string command_output;
   long time;
+  int err_code;
   
   try {
-    command_output = run_command(command, time);
+    command_output = run_command(command, time, err_code);
   } catch(...) {
     ADD_FAILURE() << "Failed running command: " << command;
   }

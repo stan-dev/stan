@@ -49,9 +49,10 @@ std::string convert_model_path(const std::vector<std::string>& model_path) {
  * as a string.
  * 
  * @param command A command that can be run from the shell
+ * @param[out] err_code The resulting error code
  * @return the system output of the command
  */  
-std::string run_command(std::string command) {
+std::string run_command(std::string command, int& err_code) {
   FILE *in;
   command += " 2>&1"; // capture stderr
   if(!(in = popen(command.c_str(), "r"))) {
@@ -68,18 +69,19 @@ std::string run_command(std::string command) {
   while ((count = fread(&buf, 1, 1024, in)) > 0)
     output += std::string(&buf[0], &buf[count]);
   
-  int err;
-  if ((err=pclose(in)) != 0) {
+  if ((err_code=pclose(in)) != 0) {
+    // bits 15-8 is err code, bit 7 if core dump, bits 6-0 is signal number
+    err_code >>= 8;
+    
     std::stringstream err_msg;
     err_msg << "Run of command: \"" << command << std::endl;
-    // bits 15-8 is err code, bit 7 if core dump, bits 6-0 is signal number
-    err_msg << "err code: " << (err >> 8) << std::endl;
+    err_msg << "err code: " << err_code << std::endl;
     err_msg << "Output message: \n";
     err_msg << output;
     std::string msg(err_msg.str());
     throw std::runtime_error(msg.c_str());
   }
-
+  
   return output;
 }
 
@@ -88,15 +90,16 @@ std::string run_command(std::string command) {
  * as a string.
  * 
  * @param[in] command A command that can be run from the shell
- * @param[out] elapsed_milliseconds Adds number of milliseconds run to current value.
+ * @param[out] elapsed_milliseconds Adds number of milliseconds run to current value. 
+ * @param[out] err_code The resulting error code
  * @return the system output of the command
  */  
-std::string run_command(const std::string& command, long& elapsed_milliseconds) {
+std::string run_command(const std::string& command, long& elapsed_milliseconds, int& err_code) {
   using boost::posix_time::ptime;
   using boost::posix_time::microsec_clock;
   
   ptime time_start(microsec_clock::universal_time()); // start timer
-  std::string output = run_command(command);
+  std::string output = run_command(command, err_code);
   ptime time_end(microsec_clock::universal_time());   // end timer
 
   elapsed_milliseconds += (time_end - time_start).total_milliseconds();

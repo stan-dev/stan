@@ -22,8 +22,9 @@ TEST(gm,issue91_segfault_printing_uninitialized) {
     = convert_model_path(model_path)
     + " sample num_warmup=0 num_samples=0"
     + " output file=" + convert_model_path(model_path) + ".csv";
+  int err_code;
   
-  run_command(command);
+  run_command(command, err_code);
 
   SUCCEED()
     << "running this model should not seg fault";
@@ -46,10 +47,10 @@ TEST(gm,issue109_csv_header_consistent_with_samples) {
     = path
     + " sample num_warmup=0 num_samples=1"
     + " output file=" + samples;
+  int err_code;
   
-  std::cout << command << std::endl;
-  
-  run_command(command);
+  run_command(command, err_code);
+
   std::ifstream ifstream;
   ifstream.open(samples.c_str());
   stan::mcmc::chains<> chains(stan::io::stan_csv_reader::parse(ifstream));

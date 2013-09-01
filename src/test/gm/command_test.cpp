@@ -14,9 +14,10 @@ TEST(StanGmCommand, zero_init_value_fail) {
   std::string command = convert_model_path(model_path) + " sample init=0";
   std::string command_output;
   long time;
+  int err_code;
   
   try {
-    command_output = run_command(command, time);
+    command_output = run_command(command, time, err_code);
   } catch(...) {
     ADD_FAILURE() << "Failed running command: " << command;
   }
@@ -38,9 +39,10 @@ TEST(StanGmCommand, zero_init_domain_fail) {
   
   std::string command_output;
   long time;
-
+  int err_code;
+  
   try {
-    command_output = run_command(command, time);
+    command_output = run_command(command, time, err_code);
   } catch(...) {
     ADD_FAILURE() << "Failed running command: " << command;
   }
@@ -71,9 +73,10 @@ TEST(StanGmCommand, user_init_value_fail) {
   
   std::string command_output;
   long time;
+  int err_code; 
   
   try {
-    command_output = run_command(command, time);
+    command_output = run_command(command, time, err_code);
   } catch(...) {
     ADD_FAILURE() << "Failed running command: " << command;
   }
@@ -104,9 +107,10 @@ TEST(StanGmCommand, user_init_domain_fail) {
   
   std::string command_output;
   long time;
+  int err_code;
   
   try {
-    command_output = run_command(command, time);
+    command_output = run_command(command, time, err_code);
   } catch(...) {
     ADD_FAILURE() << "Failed running command: " << command;
   }

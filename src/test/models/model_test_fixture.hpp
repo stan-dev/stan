@@ -119,7 +119,8 @@ public:
     std::string command = get_command(1U);
     command += " diagnose test=gradient";
     std::string command_output;
-    EXPECT_NO_THROW(command_output = run_command(command))
+    int err_code;
+    EXPECT_NO_THROW(command_output = run_command(command, err_code))
       << "Gradient test failed. \n"
       << "\tRan command: " << command << "\n"
       << "\tCommand output: " << command_output;
@@ -133,7 +134,8 @@ public:
   static void run_model() {
     for (int chain = 1; chain <= num_chains; chain++) {
       std::string command_output;
-      command_output = run_command(get_command(chain), elapsed_milliseconds);
+      int err_code;
+      command_output = run_command(get_command(chain), elapsed_milliseconds, err_code);
       //EXPECT_NO_THROW(command_output = run_command(get_command(chain), elapsed_milliseconds)) 
       //<< "Can not execute command: " << get_command(chain) << std::endl;
       command_outputs.push_back(command_output);
@@ -151,9 +153,10 @@ public:
    */
   static stan::mcmc::chains<>* create_chains() {
     std::stringstream command;
+    int err_code;
     command << get_command(1U)
       << " sample num_samples=0 num_warmup=0";
-    EXPECT_NO_THROW(run_command(command.str())) 
+    EXPECT_NO_THROW(run_command(command.str(), err_code)) 
       << "Can not build header using: " << command.str();
       
     std::ifstream ifstream;
