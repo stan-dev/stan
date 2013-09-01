@@ -72,7 +72,8 @@ std::string run_command(std::string command) {
   if ((err=pclose(in)) != 0) {
     std::stringstream err_msg;
     err_msg << "Run of command: \"" << command << std::endl;
-    err_msg << "err code: " << err << std::endl;
+    // bits 15-8 is err code, bit 7 if core dump, bits 6-0 is signal number
+    err_msg << "err code: " << (err >> 8) << std::endl;
     err_msg << "Output message: \n";
     err_msg << output;
     std::string msg(err_msg.str());
