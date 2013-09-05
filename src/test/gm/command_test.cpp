@@ -1,3 +1,4 @@
+#include <stan/gm/error_codes.hpp>
 #include <gtest/gtest.h>
 #include <string>
 #include <test/models/utility.hpp>
@@ -24,6 +25,7 @@ TEST(StanGmCommand, zero_init_value_fail) {
   EXPECT_EQ("Rejecting inititialization at zero because of vanishing density.\n",
             command_output)
     << "Failed running: " << command;
+  EXPECT_EQ(stan::gm::error_codes::OK, err_code);
 }
 
 TEST(StanGmCommand, zero_init_domain_fail) {
@@ -49,6 +51,7 @@ TEST(StanGmCommand, zero_init_domain_fail) {
   
   EXPECT_EQ("Rejecting inititialization at zero because of log_prob_grad failure.\n",
             command_output);
+  EXPECT_EQ(stan::gm::error_codes::OK, err_code);
 }
 
 TEST(StanGmCommand, user_init_value_fail) {
@@ -83,6 +86,7 @@ TEST(StanGmCommand, user_init_value_fail) {
   EXPECT_EQ("Rejecting user-specified inititialization because of vanishing density.\n",
             command_output)
     << "Failed running: " << command;
+  EXPECT_EQ(stan::gm::error_codes::OK, err_code);
 }
 
 TEST(StanGmCommand, user_init_domain_fail) {
@@ -117,5 +121,5 @@ TEST(StanGmCommand, user_init_domain_fail) {
   
   EXPECT_EQ("Rejecting user-specified inititialization because of log_prob_grad failure.\n",
             command_output);
-
+  EXPECT_EQ(stan::gm::error_codes::OK, err_code);
 }
