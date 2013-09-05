@@ -5,6 +5,8 @@
 #include <stan/gm/arguments/arg_random.hpp>
 #include <stan/gm/arguments/arg_output.hpp>
 #include <gtest/gtest.h>
+#include <boost/iostreams/stream.hpp>
+#include <boost/iostreams/device/null.hpp>
 
 using stan::gm::argument;
 using stan::gm::arg_id;
@@ -37,6 +39,7 @@ public:
   std::vector<argument*> valid_arguments;
   argument_parser* parser;
   int err_code;
+  boost::iostreams::stream< boost::iostreams::null_sink > null_ostream;
 };
 
  
@@ -44,25 +47,22 @@ TEST_F(StanGmArgumentsArgumentParser, default) {
   const char* argv[] = {};
   int argc = 0;
   
-  err_code = parser->parse_args(argc, argv, &std::cout, &std::cout);
-
-  EXPECT_EQ(error_codes::USAGE, err_code);
+  err_code = parser->parse_args(argc, argv, &null_ostream, &null_ostream);
+  EXPECT_EQ(int(error_codes::USAGE), err_code);
 }
 
 TEST_F(StanGmArgumentsArgumentParser, help) {
   const char* argv[] = {"help"};
   int argc = 1;
   
-  err_code = parser->parse_args(argc, argv, &std::cout, &std::cout);
-
-  EXPECT_EQ(error_codes::OK, err_code);
+  err_code = parser->parse_args(argc, argv, &null_ostream, &null_ostream);
+  EXPECT_EQ(int(error_codes::OK), err_code);
 }
 
 TEST_F(StanGmArgumentsArgumentParser, unrecognized_argument) {
   const char* argv[] = {"foo"};
   int argc = 1;
   
-  err_code = parser->parse_args(argc, argv, &std::cout, &std::cout);
-
-  EXPECT_EQ(error_codes::USAGE, err_code);
+  err_code = parser->parse_args(argc, argv, &null_ostream, &null_ostream);
+  EXPECT_EQ(int(error_codes::USAGE), err_code);
 }
