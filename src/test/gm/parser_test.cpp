@@ -5,8 +5,8 @@
 #include <exception>
 #include <stdexcept>
 
-#include "stan/gm/ast.hpp"
-#include "stan/gm/parser.hpp"
+#include <stan/gm/ast.hpp>
+#include <stan/gm/parser.hpp>
 #include <stan/gm/generator.hpp>
 #include <stan/gm/grammars/program_grammar.hpp>
 #include <stan/gm/grammars/whitespace_grammar.hpp>
