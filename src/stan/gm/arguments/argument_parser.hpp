@@ -7,6 +7,7 @@
 
 #include <stan/gm/arguments/argument.hpp>
 #include <stan/gm/arguments/arg_method.hpp>
+#include <stan/gm/error_codes.hpp>
 
 namespace stan {
   
@@ -24,7 +25,7 @@ namespace stan {
         _arguments.insert(_arguments.begin(), new arg_method());
       }
       
-      bool parse_args(int argc,
+      int parse_args(int argc,
                       const char* argv[],
                       std::ostream* out = 0,
                       std::ostream* err = 0) {
