@@ -413,7 +413,6 @@ TEST_F(LogisticSpeedTest,GenerateData) {
 
   if (has_data)
     return;
-
   // generate data using R script
   std::string command;
   command = "cd ";
@@ -421,6 +420,7 @@ TEST_F(LogisticSpeedTest,GenerateData) {
   command += " && ";
   command += "Rscript ";
   command += Rscript;
+  int err_code;
 
   // no guarantee here that we have the right files
 
