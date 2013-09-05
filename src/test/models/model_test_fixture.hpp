@@ -83,9 +83,6 @@ public:
   static std::string get_command(int chain) {
     std::stringstream command;
     command << model_path;
-    command << " sample "
-            << " num_samples=" << 0.5 * iterations
-            << " num_warmup=" << 0.5 * iterations;
     command << " id=" << chain;
     if (has_data()) {
       command << " data=" << model_path << ".data.R";
@@ -116,15 +113,15 @@ public:
   }
   
   static void test_gradient() {
+
     std::string command = get_command(1U);
     command += " diagnose test=gradient";
+    
     std::string command_output;
-    int err_code;
-    EXPECT_NO_THROW(command_output = run_command(command, err_code))
+    EXPECT_NO_THROW(command_output = command)
       << "Gradient test failed. \n"
       << "\tRan command: " << command << "\n"
       << "\tCommand output: " << command_output;
-    //std::cout << "command_output: " << command_output << "\n";
   }
 
   /** 
@@ -133,11 +130,19 @@ public:
    */
   static void run_model() {
     for (int chain = 1; chain <= num_chains; chain++) {
+
+      std::string command = get_command(chain);
+      
+      std::stringstream method;
+      method << " sample num_samples="
+             << 0.5 * iterations
+             << " num_warmup="
+             << 0.5 * iterations;
+      
+      command += method.str();
+      
       std::string command_output;
-      int err_code;
-      command_output = run_command(get_command(chain), elapsed_milliseconds, err_code);
-      //EXPECT_NO_THROW(command_output = run_command(get_command(chain), elapsed_milliseconds)) 
-      //<< "Can not execute command: " << get_command(chain) << std::endl;
+      command_output = run_command(get_command(chain), elapsed_milliseconds);
       command_outputs.push_back(command_output);
     }
     populate_chains();
@@ -152,12 +157,12 @@ public:
    * @return An initialized chains object.
    */
   static stan::mcmc::chains<>* create_chains() {
-    std::stringstream command;
-    int err_code;
-    command << get_command(1U)
-      << " sample num_samples=0 num_warmup=0";
-    EXPECT_NO_THROW(run_command(command.str(), err_code)) 
-      << "Can not build header using: " << command.str();
+    
+    std::string command = get_command(1U);
+    command += " sample num_samples=0 num_warmup=0";
+    
+    EXPECT_NO_THROW(run_command(command))
+      << "Can not build header using: " << command;
       
     std::ifstream ifstream;
     ifstream.open(get_csv_file(1).c_str());
