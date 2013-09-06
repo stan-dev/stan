@@ -691,15 +691,6 @@ namespace stan {
       using boost::spirit::qi::rethrow;
       using namespace boost::spirit::qi::labels;
 
-      /*
-      on_error<rethrow>(
-        statement_r,
-        statement_error_f(
-          "Error in statement",
-          boost::phoenix::ref(var_map_),
-          boost::phoenix::ref(error_msgs_))
-      );
-      */ 
     }
 
   }

@@ -121,10 +121,6 @@ namespace stan {
         //  Would be better to use the parser to select which 
         //  section in the stan file contains the parsing error.
         //
-        //std::vector<std::string> sections = 
-        //  {"generated", "model", "transformed", "parameters", "data"};
-
-        // Do it the 'old' way.
 
         std::vector<std::string> sections;
         sections.push_back("generated");
@@ -165,7 +161,7 @@ namespace stan {
         }
 
         //
-        //  Clean up whatever is comes after the error occurred
+        //  Clean up whatever comes after the error occurred
         //
         std::basic_stringstream<char> error_section;
         error_section << boost::make_iterator_range (_where, _end);

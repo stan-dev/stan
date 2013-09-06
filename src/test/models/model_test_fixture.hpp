@@ -83,16 +83,18 @@ public:
   static std::string get_command(int chain) {
     std::stringstream command;
     command << model_path;
-    command << " --samples=" << get_csv_file(chain);
-    command << " --chain_id=" << chain;
+    command << " sample "
+            << " num_samples=" << 0.5 * iterations
+            << " num_warmup=" << 0.5 * iterations;
+    command << " id=" << chain;
     if (has_data()) {
-      command << " --data=" << model_path << ".data.R";
+      command << " data=" << model_path << ".data.R";
     }
     if (has_init()) {
-      command << " --init=" << model_path << ".init.R";
+      command << " init=" << model_path << ".init.R";
     }
-    command << " --iter=" << iterations;
-    command << " --refresh=" << iterations;
+    command << " output file=" << get_csv_file(chain)
+            << " refresh=" << iterations;
     return command.str();
   }
 
@@ -115,7 +117,7 @@ public:
   
   static void test_gradient() {
     std::string command = get_command(1U);
-    command += " --test_grad";
+    command += " diagnose test=gradient";
     std::string command_output;
     EXPECT_NO_THROW(command_output = run_command(command))
       << "Gradient test failed. \n"
@@ -150,7 +152,7 @@ public:
   static stan::mcmc::chains<>* create_chains() {
     std::stringstream command;
     command << get_command(1U)
-      << " --iter=0";
+      << " sample num_samples=0 num_warmup=0";
     EXPECT_NO_THROW(run_command(command.str())) 
       << "Can not build header using: " << command.str();
       
