@@ -9,7 +9,7 @@ LIBFLAGS = -L$(STAN_HOME)/bin -lstan
 $(PGM) :
 	$(STAN_HOME)/bin/stanc  --name=$(PGM)  $(PGM).stan 
 	$(CXX) -Wall -O3 -DNDEBUG $(CPPFLAGS) $(PGM).cpp -o $(PGM) $(LIBFLAGS)
-	./$(PGM) --data=$(PGM).data.R --seed=1340384924 --chain_id=4 --diagnostics=d.csv# --iters=20000
+	./$(PGM) id=4 data=$(PGM).data.R  method=sample  num_warmup=1000 num_samples=1000 random seed=1340384924 output sample=samples.csv
 
 clean :
 	rm -rf $(PGM).cpp samples.csv $(PGM) 
