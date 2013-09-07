@@ -12,17 +12,17 @@ LIBFLAGS = -L$(STAN_HOME)/bin -lstan
 $(PGM) : 
 	$(STAN_HOME)/bin/stanc --name=$(PGM)  $(PGM).stan 
 	$(CXX) -O3 -DNDEBUG $(CPPFLAGS) $(PGM).cpp -o $(PGM) $(LIBFLAGS) 
-	./$(PGM) --data=$(PGM).data.R --samples=samples1.csv 
+	./$(PGM) data=$(PGM).data.R sample output sample=samples1.csv 
 
 $(PGM2) : 
 	$(STAN_HOME)/bin/stanc --name=$(PGM2)  $(PGM2).stan 
 	$(CXX) -O3 -DNDEBUG $(CPPFLAGS) $(PGM2).cpp -o $(PGM2) $(LIBFLAGS) 
-	./$(PGM2) --data=$(PGM2).data.R --samples=samples2.csv 
+	./$(PGM2) data=$(PGM2).data.R sample output sample=samples2.csv 
 
 $(PGM3) : 
 	$(STAN_HOME)/bin/stanc --name=$(PGM3)  $(PGM3).stan.0 
 	$(CXX) -O3 -DNDEBUG $(CPPFLAGS) $(PGM3).cpp -o $(PGM3) $(LIBFLAGS) 
-	./$(PGM3) --data=$(PGM3).data.R --samples=samples3.csv 
+	./$(PGM3) data=$(PGM3).data.R sample output sample=samples3.csv 
 
 clean :
 	rm -f $(PGM).cpp samples1.csv $(PGM) 

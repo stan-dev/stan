@@ -552,9 +552,10 @@ namespace stan {
           scan_optional_long();
         } else {
           for (size_t j = 0; j < stack_i_.size(); ++j)
-            stack_r_.push_back(negate_val 
-                               ? -static_cast<double>(stack_i_[j])
-                               : static_cast<double>(stack_i_[j]));
+            stack_r_.push_back(static_cast<double>(stack_i_[j]));
+          // negate_val 
+          // ? -static_cast<double>(stack_i_[j])
+          // : static_cast<double>(stack_i_[j]));
           stack_i_.clear();
           double x;
           if (!(std::stringstream(buf) >> x))

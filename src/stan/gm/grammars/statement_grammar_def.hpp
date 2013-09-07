@@ -418,19 +418,6 @@ namespace stan {
     };
     boost::phoenix::function<validate_allow_sample> validate_allow_sample_f;
 
-    struct statement_error {
-      template <typename T1, typename T2, typename T3>
-      struct result { typedef void type; };
-
-      void operator()(std::string msg,
-                      variable_map& vm,
-                      std::stringstream& error_msgs) const {
-        error_msgs << msg
-                   << std::endl;
-      }
-    };
-    boost::phoenix::function<statement_error> statement_error_f;
-
 
     template <typename Iterator>
     statement_grammar<Iterator>::statement_grammar(variable_map& var_map,
@@ -626,16 +613,7 @@ namespace stan {
       using boost::spirit::qi::fail;
       using boost::spirit::qi::rethrow;
       using namespace boost::spirit::qi::labels;
-
-      /*
-      on_error<rethrow>(
-        statement_r,
-        statement_error_f(
-          "Error in statement",
-          boost::phoenix::ref(var_map_),
-          boost::phoenix::ref(error_msgs_))
-      );
-      */ 
+      
     }
 
   }
