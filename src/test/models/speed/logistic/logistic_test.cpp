@@ -142,15 +142,12 @@ public:
                     << filename << ".chain_" << chain << ".csv"
                     << " id=" << chain;
       
-      std::string command_output;
-      int err_code;
-                                   
-      try {
-        command_output = run_command(command_chain.str(), time, err_code);
-      } catch(...) {
-        ADD_FAILURE() << "Failed running command: " << command_chain.str();
+      run_command_output out = run_command(command_chain.str());
+      if (out.hasError) {
+        SCOPED_TRACE("failed running: " + out.command);
+        ADD_FAILURE() << out;
       }
-      command_outputs.push_back(command_output);
+      command_outputs.push_back(out.output);
     }
     return time;
   }
@@ -368,14 +365,15 @@ size_t LogisticSpeedTest::max_M;
 
 TEST_F(LogisticSpeedTest,Prerequisites) {
   std::string command;
+  run_command_output out;
   command = "Rscript --version";
-  int err_code;
-  try {
-    run_command(command, err_code);
-    has_R = true;
-  } catch (...) {
+
+  out = run_command(command);
+  if (out.hasError) {
     std::cout << "System does not have Rscript available" << std::endl
               << "Failed to run: " << command << std::endl;
+  } else {
+    has_R = true;
   }
 
   std::vector<std::string> test_file;
@@ -385,13 +383,14 @@ TEST_F(LogisticSpeedTest,Prerequisites) {
   test_file.push_back("empty.jags");
   command = "jags ";
   command += convert_model_path(test_file);
-  
-  try {
-    run_command(command, err_code);
-    has_jags = true;
-  } catch (...) {
+
+
+  out = run_command(command);
+  if (out.hasError) {
     std::cout << "System does not have jags available" << std::endl
               << "Failed to run: " << command << std::endl;
+  } else {
+    has_jags = true;
   }
 }
 
@@ -420,13 +419,11 @@ TEST_F(LogisticSpeedTest,GenerateData) {
   command += " && ";
   command += "Rscript ";
   command += Rscript;
-  int err_code;
 
   // no guarantee here that we have the right files
-
-  ASSERT_NO_THROW(run_command(command, err_code))
-    << command;
-  SUCCEED();
+  run_command_output out;
+  out = run_command(command);
+  EXPECT_FALSE(out.hasError);
 }
 
 TEST_P(LogisticSpeedTest, Stan) {

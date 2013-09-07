@@ -526,7 +526,9 @@ namespace stan {
         
         if (test->value() == "gradient") {
           std::cout << std::endl << "TEST GRADIENT MODE" << std::endl;
-          return stan::model::test_gradients<true,true>(model,cont_params, disc_params);
+          int num_failed 
+            = stan::model::test_gradients<true,true>(model,cont_params, disc_params);
+          return error_codes::OK;
         }
         
       }

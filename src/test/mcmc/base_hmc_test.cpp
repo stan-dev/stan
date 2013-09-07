@@ -131,19 +131,11 @@ TEST(McmcBaseHMC, init_stepsize) {
   
   std::string command = convert_model_path(model_path);
   command += " sample output file=" + convert_model_path(model_path) + ".csv";
-  std::string command_output;
-  long time;
-  int err_code;
+  run_command_output out;
   
-  try {
-    command_output = run_command(command, time, err_code);
-  } catch(...) {
-    ADD_FAILURE() << "Failed running command: " << command;
-  }
-  
-  command_output.erase(command_output.length() - 1);
-  
+  out = run_command(command);
+
+  EXPECT_FALSE(out.hasError);
   EXPECT_EQ("Posterior is improper. Please check your model.",
-            command_output.substr(command_output.rfind('\n')).erase(0, 1) );
-  
+            out.output.erase(out.output.length()-1).substr(out.output.rfind('\n')).erase(0, 1) );
 }
