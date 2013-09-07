@@ -13,19 +13,11 @@ TEST(StanGmCommand, zero_init_value_fail) {
   model_path.push_back("value_fail");
 
   std::string command = convert_model_path(model_path) + " sample init=0";
-  std::string command_output;
-  long time;
-  int err_code;
-  
-  try {
-    command_output = run_command(command, time, err_code);
-  } catch(...) {
-    ADD_FAILURE() << "Failed running command: " << command;
-  }
-  EXPECT_EQ("Rejecting inititialization at zero because of vanishing density.\n",
-            command_output)
-    << "Failed running: " << command;
-  EXPECT_EQ(stan::gm::error_codes::OK, err_code);
+  run_command_output out = run_command(command);
+  EXPECT_EQ(int(stan::gm::error_codes::OK), out.err_code);
+  EXPECT_EQ("Rejecting inititialization at zero because of vanishing density.\n", 
+            out.output)
+    << "Failed running: " << out.command;
 }
 
 TEST(StanGmCommand, zero_init_domain_fail) {
@@ -39,19 +31,11 @@ TEST(StanGmCommand, zero_init_domain_fail) {
   
   std::string command = convert_model_path(model_path) + " sample init=0";
   
-  std::string command_output;
-  long time;
-  int err_code;
-  
-  try {
-    command_output = run_command(command, time, err_code);
-  } catch(...) {
-    ADD_FAILURE() << "Failed running command: " << command;
-  }
-  
+  run_command_output out = run_command(command);
+  EXPECT_EQ(int(stan::gm::error_codes::OK), out.err_code);
   EXPECT_EQ("Rejecting inititialization at zero because of log_prob_grad failure.\n",
-            command_output);
-  EXPECT_EQ(stan::gm::error_codes::OK, err_code);
+            out.output)
+    << "Failed running: " << out.command;
 }
 
 TEST(StanGmCommand, user_init_value_fail) {
@@ -73,20 +57,12 @@ TEST(StanGmCommand, user_init_value_fail) {
   
   std::string command = convert_model_path(model_path)
                         + " sample init=" + convert_model_path(init_path);
-  
-  std::string command_output;
-  long time;
-  int err_code; 
-  
-  try {
-    command_output = run_command(command, time, err_code);
-  } catch(...) {
-    ADD_FAILURE() << "Failed running command: " << command;
-  }
+
+  run_command_output out = run_command(command);
+  EXPECT_EQ(int(stan::gm::error_codes::OK), out.err_code);
   EXPECT_EQ("Rejecting user-specified inititialization because of vanishing density.\n",
-            command_output)
-    << "Failed running: " << command;
-  EXPECT_EQ(stan::gm::error_codes::OK, err_code);
+            out.output)
+    << "Failed running: " << out.command;
 }
 
 TEST(StanGmCommand, user_init_domain_fail) {
@@ -109,19 +85,11 @@ TEST(StanGmCommand, user_init_domain_fail) {
   std::string command = convert_model_path(model_path)
                         + " sample init=" + convert_model_path(init_path);
   
-  std::string command_output;
-  long time;
-  int err_code;
-  
-  try {
-    command_output = run_command(command, time, err_code);
-  } catch(...) {
-    ADD_FAILURE() << "Failed running command: " << command;
-  }
-  
+  run_command_output out = run_command(command);
+  EXPECT_EQ(int(stan::gm::error_codes::OK), out.err_code);
   EXPECT_EQ("Rejecting user-specified inititialization because of log_prob_grad failure.\n",
-            command_output);
-  EXPECT_EQ(stan::gm::error_codes::OK, err_code);
+            out.output)
+    << "Failed running: " << out.command;
 }
 
 TEST(StanGmCommand, CheckCommand_default) {
@@ -132,19 +100,10 @@ TEST(StanGmCommand, CheckCommand_default) {
   model_path.push_back("model_specs");
   model_path.push_back("compiled");
   model_path.push_back("domain_fail"); // can use any model here
-  
- 
+   
   std::string command = convert_model_path(model_path);
-  std::string command_output;
-  long time;
-  int err_code;
-  
-  try {
-    command_output = run_command(command, time, err_code);
-  } catch(...) {
-    ADD_FAILURE() << "Failed running command: " << command;
-  }
-  EXPECT_EQ(stan::gm::error_codes::USAGE, err_code);
+  run_command_output out = run_command(command);
+  EXPECT_EQ(int(stan::gm::error_codes::USAGE), out.err_code);
 }
 
 TEST(StanGmCommand, CheckCommand_help) {
@@ -156,18 +115,10 @@ TEST(StanGmCommand, CheckCommand_help) {
   model_path.push_back("compiled");
   model_path.push_back("domain_fail"); // can use any model here
   
- 
-  std::string command = convert_model_path(model_path) + " help";
-  std::string command_output;
-  long time;
-  int err_code;
-  
-  try {
-    command_output = run_command(command, time, err_code);
-  } catch(...) {
-    ADD_FAILURE() << "Failed running command: " << command;
-  }
-  EXPECT_EQ(stan::gm::error_codes::OK, err_code);
+   std::string command = convert_model_path(model_path) + " help";
+
+  run_command_output out = run_command(command);
+  EXPECT_EQ(int(stan::gm::error_codes::OK), out.err_code);
 }
 
 TEST(StanGmCommand, CheckCommand_unrecognized_argument) {
@@ -179,16 +130,8 @@ TEST(StanGmCommand, CheckCommand_unrecognized_argument) {
   model_path.push_back("compiled");
   model_path.push_back("domain_fail"); // can use any model here
   
- 
   std::string command = convert_model_path(model_path) + " foo";
-  std::string command_output;
-  long time;
-  int err_code;
-  
-  try {
-    command_output = run_command(command, time, err_code);
-  } catch(...) {
-    ADD_FAILURE() << "Failed running command: " << command;
-  }
-  EXPECT_EQ(stan::gm::error_codes::OK, err_code);
+
+  run_command_output out = run_command(command);
+  EXPECT_EQ(int(stan::gm::error_codes::USAGE), out.err_code);
 }

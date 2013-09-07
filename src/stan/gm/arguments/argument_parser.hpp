@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <fstream>
+#include <cstring>
 
 #include <stan/gm/arguments/argument.hpp>
 #include <stan/gm/arguments/arg_method.hpp>
@@ -31,9 +32,20 @@ namespace stan {
                       std::ostream* err = 0) {
         
         if (argc == 1) {
+          // FIXME: why is this a special case?
+          // it currently has the right behavior, but this shouldn't have
+          // to be in its own conditional
+
           print_usage(out, argv[0]);
-          _help_flag |= true;
-          return true;
+          
+          if (strcmp("help",argv[0])==0) {
+            _help_flag |= true;
+          } else if (strcmp("help-all", argv[0])==0) {
+            _help_flag |= true;
+          }
+          if (_help_flag)
+            return error_codes::OK;
+          return error_codes::USAGE;
         }
 
         std::vector<std::string> args;
@@ -105,7 +117,7 @@ namespace stan {
           
           if (_help_flag) {
             print_usage(out, argv[0]);
-            return true;
+            return error_codes::OK;
           }
           
           if (!good_arg && err) {
@@ -121,18 +133,19 @@ namespace stan {
             if (valid_paths.size()) {
               *err << "Perhaps you meant one of the following valid configurations?" << std::endl;
               for (int i = 0; i < valid_paths.size(); ++i)
-                std::cout << "  " << valid_paths.at(i) << std::endl;
+                *err << "  " << valid_paths.at(i) << std::endl;
             }
           }
         }
         
         if (_help_flag)
-          return true;
+          return error_codes::OK;
         
         if (!_method_flag)
           *err << "A method must be specified!" << std::endl;
         
-        return valid_arg && good_arg && _method_flag;
+        return (valid_arg && good_arg && _method_flag) ?
+          error_codes::OK : error_codes::USAGE;
       }
       
       void print(std::ostream* s, const char prefix = '\0') {
