@@ -25,7 +25,9 @@ void remove_duplicates(std::string& argument) {
   while (cursor < argument.length()) {
     unsigned int end = argument.find(" ", cursor) - 1;
     std::string value = " " + argument.substr(cursor + 1, end - cursor);
-    if (argument.find(value, end) != std::string::npos)
+
+    if (value.length() == 1) ++end;
+    else if (argument.find(value, end) != std::string::npos)
       argument.erase(argument.find(value, end), value.length());
     cursor = argument.find("=", end);
   }
