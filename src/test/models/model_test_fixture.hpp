@@ -31,7 +31,6 @@ public:
   static const int skip;
   static int iterations;
   static long elapsed_milliseconds;
-  static int err_code;
 
   /** 
    * SetUpTestCase() called by google test once
@@ -142,9 +141,11 @@ public:
       
       command += method.str();
       
-      std::string command_output;
-      command_output = run_command(command, elapsed_milliseconds, err_code);
-      command_outputs.push_back(command_output);
+      
+      run_command_output out;
+      out = run_command(command);
+      elapsed_milliseconds += out.time;
+      command_outputs.push_back(out.output);
     }
     populate_chains();
   }
@@ -162,8 +163,9 @@ public:
     std::string command = get_command(1U);
     command += " sample num_samples=0 num_warmup=0";
     
-    EXPECT_NO_THROW(run_command(command, err_code))
-      << "Can not build header using: " << command;
+    run_command_output out = run_command(command);
+    EXPECT_FALSE(out.hasError)
+      << "Can not build header using: " << out;
       
     std::ifstream ifstream;
     ifstream.open(get_csv_file(1).c_str());
@@ -300,8 +302,6 @@ int Model_Test_Fixture<Derived>::iterations = 2000;
 template<class Derived>
 long Model_Test_Fixture<Derived>::elapsed_milliseconds = 0;
 
-template<class Derived>
-int Model_Test_Fixture<Derived>::err_code = 0;
 
 TYPED_TEST_CASE_P(Model_Test_Fixture);
 
