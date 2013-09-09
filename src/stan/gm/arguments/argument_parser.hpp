@@ -32,19 +32,7 @@ namespace stan {
                       std::ostream* err = 0) {
         
         if (argc == 1) {
-          // FIXME: why is this a special case?
-          // it currently has the right behavior, but this shouldn't have
-          // to be in its own conditional
-
           print_usage(out, argv[0]);
-          
-          if (strcmp("help",argv[0])==0) {
-            _help_flag |= true;
-          } else if (strcmp("help-all", argv[0])==0) {
-            _help_flag |= true;
-          }
-          if (_help_flag)
-            return error_codes::OK;
           return error_codes::USAGE;
         }
 
