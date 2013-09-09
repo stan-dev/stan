@@ -21,6 +21,7 @@
 #include <stan/gm/arguments/arg_random.hpp>
 #include <stan/gm/arguments/arg_output.hpp>
 
+#include <stan/mcmc/persistent_sampler.hpp>
 #include <stan/mcmc/hmc/static/adapt_unit_e_static_hmc.hpp>
 #include <stan/mcmc/hmc/static/adapt_diag_e_static_hmc.hpp>
 #include <stan/mcmc/hmc/static/adapt_dense_e_static_hmc.hpp>
@@ -749,7 +750,18 @@ namespace stan {
                                       parser.arg("method")->arg("sample")->arg("adapt"));
         bool adapt_engaged = dynamic_cast<bool_argument*>(adapt->arg("engaged"))->value();
         
-        if (algo->value() == "rwm") {
+        if (algo->value() == "persist") {
+          
+          sampler_ptr = new stan::mcmc::persistent_sampler();
+          
+          adapt_engaged = false;
+          
+          if (num_warmup != 0) {
+            std::cout << "Warning: warmup will be skipped for the persistent sampler!" << std::endl;
+            num_warmup = 0;
+          }
+          
+        } else if (algo->value() == "rwm") {
           
           std::cout << algo->arg("rwm")->description() << std::endl;
           return 0;

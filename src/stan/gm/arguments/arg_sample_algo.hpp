@@ -5,6 +5,7 @@
 
 #include <stan/gm/arguments/arg_hmc.hpp>
 #include <stan/gm/arguments/arg_rwm.hpp>
+#include <stan/gm/arguments/arg_persist.hpp>
 
 namespace stan {
   
@@ -20,6 +21,7 @@ namespace stan {
         _description = "Sampling algorithm";
         
         _values.push_back(new arg_hmc());
+        _values.push_back(new arg_persist());
         
         _default_cursor = 0;
         _cursor = _default_cursor;
