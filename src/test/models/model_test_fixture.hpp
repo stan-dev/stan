@@ -88,7 +88,7 @@ public:
             << " num_warmup=" << 0.5 * iterations;
     command << " id=" << chain;
     if (has_data()) {
-      command << " data=" << model_path << ".data.R";
+      command << " data file=" << model_path << ".data.R";
     }
     if (has_init()) {
       command << " init=" << model_path << ".init.R";

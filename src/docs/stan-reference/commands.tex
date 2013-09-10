@@ -801,7 +801,7 @@ are provided in the next section.
 %
     \hiercmdarg{\indentarrow\indentarrow}{algorithm}{$$list element$$}
       {Sampling algorithm}
-      {Valid values: hmc, rwm}
+      {Valid values: hmc}
       {Defaults to hmc}
 %
       \hierlongcmd{\indentarrow\indentarrow\indentarrow}{hmc}
@@ -912,10 +912,14 @@ are provided in the next section.
   {Valid values: id $>$ 0}
   {Defaults to 0}
 %
-\hiercmdarg{}{data}{$$string$$}
-  {Input data file}
-  {Valid values: Path to existing file}
-  {Defaults to ``''}
+\hierlongcmd{}{data}
+  {Input data options}
+  {Valid subarguments: file}
+%
+  \hiercmdarg{\indentarrow}{file}{$$string$$}
+    {Input data file}
+    {Valid values: Path to existing file}
+    {Defaults to ``''}
 %
 \hiercmdarg{}{init}{$$string$$}
   {Initialization method: ``x'' initializes randomly bewteen [-x, x], ``0'' initializes to 0, anything else identifies a file of values}
