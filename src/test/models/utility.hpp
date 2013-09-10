@@ -114,7 +114,10 @@ run_command_output run_command(std::string command) {
   ptime time_end(microsec_clock::universal_time());   // end timer
 
   // bits 15-8 is err code, bit 7 if core dump, bits 6-0 is signal number
-  int err_code = (pclose(in) >> 8);
+  int err_code = pclose(in);
+  // on Windows, err code is the return code.
+  if (err_code != 0 && (err_code >> 8) > 0)
+    err_code >>= 8;
 
   return run_command_output(command, output,
                             (time_end - time_start).total_milliseconds(), 
