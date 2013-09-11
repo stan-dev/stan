@@ -4,6 +4,7 @@
 #include <stan/gm/arguments/list_argument.hpp>
 
 #include <stan/gm/arguments/arg_test_gradient.hpp>
+#include <stan/gm/arguments/arg_test_trajectory.hpp>
 
 namespace stan {
   
@@ -19,6 +20,7 @@ namespace stan {
         _description = "Diagnostic test";
         
         _values.push_back(new arg_test_gradient());
+        _values.push_back(new arg_test_trajectory());
         
         _default_cursor = 0;
         _cursor = _default_cursor;

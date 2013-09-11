@@ -14,27 +14,31 @@ namespace stan {
     
     public:
         
-      base_static_hmc(M &m, BaseRNG& rng, std::ostream* o, std::ostream* e):
+      base_trajectory(M &m, BaseRNG& rng, std::ostream* o, std::ostream* e):
       base_hmc<M, P, H, I, BaseRNG>(m, rng, o, e), T_(1)
       { _update_L(); }
       
       ~base_trajectory() {};
       
-      void init(sample& init_sample) {
+      sample init(sample& init_sample) {
         
+        this->_sample_stepsize();
         this->seed(init_sample.cont_params(), init_sample.disc_params());
         
         this->_hamiltonian.sample_p(this->_z, this->_rand_int);
         this->_hamiltonian.init(this->_z);
         
+        return sample(this->_z.q, this->_z.r, - this->_hamiltonian.V(this->_z), 1);
+        
       }
-      
-      void increment() {
+
+      sample increment() {
         this->_integrator.evolve(this->_z, this->_hamiltonian, this->_epsilon);
+        return sample(this->_z.q, this->_z.r, - this->_hamiltonian.V(this->_z), 1);
       }
       
       sample transition(sample& init_sample) {
-        return sample(this->_z.q, this->_z.r, - this->_hamiltonian.V(this->_z), acceptProb);
+        return sample(this->_z.q, this->_z.r, - this->_hamiltonian.V(this->_z), 1);
       }
       
       void write_sampler_param_names(std::ostream& o) {
@@ -44,9 +48,9 @@ namespace stan {
       void write_sampler_params(std::ostream& o) {
         o << this->_epsilon << ","
           << this->T_ << ","
-          << this->_hamiltonian.H(this->_z); << ","
-          << this->_hamiltonian.T(this->_z); << ","
-          << this->_hamiltonian.V(this->_z); << ",";
+          << this->_hamiltonian.H(this->_z) << ","
+          << this->_hamiltonian.T(this->_z) << ","
+          << this->_hamiltonian.V(this->_z) << ",";
       }
       
       void get_sampler_param_names(std::vector<std::string>& names) {

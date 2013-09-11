@@ -21,6 +21,7 @@
 #include <stan/gm/arguments/arg_random.hpp>
 #include <stan/gm/arguments/arg_output.hpp>
 
+#include <stan/mcmc/hmc/unit_e_trajectory.hpp>
 #include <stan/mcmc/hmc/static/adapt_unit_e_static_hmc.hpp>
 #include <stan/mcmc/hmc/static/adapt_diag_e_static_hmc.hpp>
 #include <stan/mcmc/hmc/static/adapt_dense_e_static_hmc.hpp>
@@ -533,41 +534,31 @@ namespace stan {
           
           std::cout << std::endl << "TRAJECTORY MODE" << std::endl;
           
-          categorical_argument* hmc = dynamic_cast<categorical_argument*>(
-                                                                          algorithm->arg("hmc"));
+          stan::io::mcmc_writer<Model> writer(sample_stream, diagnostic_stream);
+          stan::mcmc::sample s(cont_params, disc_params, 0, 0);
+          stan::mcmc::unit_e_trajectory<Model, rng_t> sampler(model, base_rng);
           
-          categorical_argument* base = dynamic_cast<categorical_argument*>(
-                                                                           algorithm->arg("hmc")->arg("engine")->arg("static"));
+          categorical_argument* trajectory = dynamic_cast<categorical_argument*>(
+                                             test->arg("trajectory"));
           
-          double epsilon = dynamic_cast<real_argument*>(hmc->arg("stepsize"))->value();
-          double epsilon_jitter = dynamic_cast<real_argument*>(hmc->arg("stepsize_jitter"))->value();
-          double int_time = dynamic_cast<real_argument*>(base->arg("int_time"))->value();
+          double epsilon = dynamic_cast<real_argument*>(trajectory->arg("stepsize"))->value();
+          double int_time = dynamic_cast<real_argument*>(trajectory->arg("int_time"))->value();
+          sampler.set_nominal_stepsize_and_T(epsilon, int_time);
           
-          dynamic_cast<Sampler*>(sampler)->set_nominal_stepsize_and_T(epsilon, int_time);
-          dynamic_cast<Sampler*>(sampler)->set_stepsize_jitter(epsilon_jitter);
+          writer.print_sample_names(s, &sampler, model);
+          writer.print_diagnostic_names(s, &sampler, model);
           
-          try {
-            dynamic_cast<Sampler*>(sampler)->init_stepsize();
-          } catch (std::runtime_error e) {
-            std::cout << e.what() << std::endl;
-            return false;
-          }
+          stan::mcmc::sample s_new = sampler.init(s);
           
-          stan::mcmc::adapt_unit_e_nuts<Model, rng_t> sampler;
-          sampler_ptr = new sampler(model, base_rng)
+          writer.print_sample_params(base_rng, s_new, sampler, model);
+          writer.print_diagnostic_params(s_new, &sampler);
           
-          if (!append_sample) writer.print_sample_names(s, sampler_ptr, model);
-          if (!append_diagnostic) writer.print_diagnostic_names(s, sampler_ptr, model);
-          
-          sampler.init(s)
-          
-          writer.print_sample_params(base_rng, init_s, *sampler, model);
-          writer.print_diagnostic_params(init_s, sampler);
-          
-          for (int i = 0; i < N; ++i) {
-            sampler.increment();
-            writer.print_sample_params(base_rng, init_s, *sampler, model);
-            writer.print_diagnostic_params(init_s, sampler);
+          for (int i = 0; i < sampler.get_L(); ++i) {
+            
+            stan::mcmc::sample s_new = sampler.increment();
+            writer.print_sample_params(base_rng, s_new, sampler, model);
+            writer.print_diagnostic_params(s_new, &sampler);
+            
           }
           
         }
