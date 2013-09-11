@@ -64,9 +64,10 @@ namespace stan {
                     << "rejected becuase of the following issue:"
                     << std::endl
                     << e.what() << std::endl
-                    << "If this warning occurs sporadically then the sampler is fine,"
+                    << "If this warning occurs sporadically, such as for highly constrained "
+                    << "variable types like covariance matrices, then the sampler is fine,"
                     << std::endl
-                    << "but if this warning occurs often then your model is either severely "
+                    << "but if this warning occurs often then your model may be either severely "
                     << "ill-conditioned or misspecified."
                     << std::endl;
       
