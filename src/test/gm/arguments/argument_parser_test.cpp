@@ -52,8 +52,8 @@ TEST_F(StanGmArgumentsArgumentParser, default) {
 }
 
 TEST_F(StanGmArgumentsArgumentParser, help) {
-  const char* argv[] = {"help"};
-  int argc = 1;
+  const char* argv[] = {"model_name", "help"};
+  int argc = 2;
   
   err_code = parser->parse_args(argc, argv, &null_ostream, &null_ostream);
   EXPECT_EQ(int(error_codes::OK), err_code);
