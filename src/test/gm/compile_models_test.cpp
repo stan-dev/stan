@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <stan/gm/error_codes.hpp>
 #include <test/models/utility.hpp>
 #include <stan/mcmc/chains.hpp>
 
@@ -23,10 +24,9 @@ TEST(gm,issue91_segfault_printing_uninitialized) {
     + " sample num_warmup=0 num_samples=0"
     + " output file=" + convert_model_path(model_path) + ".csv";
   
-  run_command(command);
-
-  SUCCEED()
-    << "running this model should not seg fault";
+  run_command_output out = run_command(command);
+  EXPECT_EQ(int(stan::gm::error_codes::OK), out.err_code);
+  EXPECT_FALSE(out.hasError);
 }
 
 TEST(gm,issue109_csv_header_consistent_with_samples) {
@@ -46,10 +46,11 @@ TEST(gm,issue109_csv_header_consistent_with_samples) {
     = path
     + " sample num_warmup=0 num_samples=1"
     + " output file=" + samples;
-  
-  std::cout << command << std::endl;
-  
-  run_command(command);
+
+  run_command_output out = run_command(command);
+  EXPECT_EQ(int(stan::gm::error_codes::OK), out.err_code);
+  EXPECT_FALSE(out.hasError);
+
   std::ifstream ifstream;
   ifstream.open(samples.c_str());
   stan::mcmc::chains<> chains(stan::io::stan_csv_reader::parse(ifstream));

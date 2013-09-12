@@ -92,7 +92,6 @@ namespace stan {
                   << "%] ";
         std::cout << (warmup ? " (Warmup)" : " (Sampling)");
         std::cout << std::endl;
-          
       }
     
     }
@@ -253,14 +252,15 @@ namespace stan {
       valid_arguments.push_back(new arg_output());
       
       argument_parser parser(valid_arguments);
-      
-      if (!parser.parse_args(argc, argv, &std::cout, &std::cout)) {
+      int err_code = parser.parse_args(argc, argv, &std::cout, &std::cout);
+
+      if (err_code != 0) {
         std::cout << "Failed to parse arguments, terminating Stan" << std::endl;
-        return 0;
+        return err_code;
       }
       
       if (parser.help_printed())
-        return 0;
+        return err_code;
       
       // Identification
       unsigned int id = dynamic_cast<int_argument*>(parser.arg("id"))->value();
@@ -375,7 +375,7 @@ namespace stan {
                                                        &std::cout);
           } catch (std::domain_error e) {
             std::cout << "Rejecting inititialization at zero because of log_prob_grad failure." << std::endl;
-            return 0;
+            return error_codes::OK;
           }
           
           if (!boost::math::isfinite(init_log_prob)) {
@@ -526,7 +526,9 @@ namespace stan {
         
         if (test->value() == "gradient") {
           std::cout << std::endl << "TEST GRADIENT MODE" << std::endl;
-          return stan::model::test_gradients<true,true>(model,cont_params, disc_params);
+          int num_failed 
+            = stan::model::test_gradients<true,true>(model,cont_params, disc_params);
+          return error_codes::OK;
         }
         
       }
