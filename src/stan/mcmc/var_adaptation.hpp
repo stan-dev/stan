@@ -5,48 +5,27 @@
 #include <stan/math/matrix/Eigen.hpp>
 
 #include <stan/prob/welford_var_estimator.hpp>
-#include <stan/mcmc/base_adaptation.hpp>
+#include <stan/mcmc/windowed_adaptation.hpp>
 
 namespace stan {
   
   namespace mcmc {
         
-    class var_adaptation: public base_adaptation {
+    class var_adaptation: public windowed_adaptation {
       
     public:
       
-      var_adaptation(int n, int max_adapt): _estimator(n) {
-        
-        restart();
-        
-        int delta = 0.1 * max_adapt;
-        delta = delta > 100 ? 100 : delta;
-        
-        _adapt_max_adapt = max_adapt - delta;
-      
-      }
-      
-      void restart() {
-        _adapt_var_counter = 0;
-        _adapt_var_next = 10;
-        _estimator.restart();
-      }
-      
+      var_adaptation(int n): windowed_adaptation("variance"), _estimator(n) {}
+
       bool learn_variance(Eigen::VectorXd& var, std::vector<double>& q) {
         
-        ++_adapt_var_counter;
+        ++_adapt_window_counter;
 
-        _estimator.add_sample(q);
-        
-        if (_adapt_var_counter == _adapt_var_next) {
+        if (adaptation_window()) _estimator.add_sample(q);
+
+        if (end_adaptation_window()) {
           
-          _adapt_var_next *= 2;
-          
-          // If the following window would straddle the total
-          // number of adaptive iterations then stetch the
-          // current window to meet the total number of iterations
-          if (_adapt_max_adapt && 2 * _adapt_var_next > _adapt_max_adapt)
-            _adapt_var_next = _adapt_max_adapt;
+          compute_next_window();
           
           _estimator.sample_variance(var);
           
@@ -65,10 +44,6 @@ namespace stan {
       }
       
     protected:
-      
-      double _adapt_var_counter;
-      double _adapt_var_next;
-      int    _adapt_max_adapt;
 
       prob::welford_var_estimator _estimator;
       
