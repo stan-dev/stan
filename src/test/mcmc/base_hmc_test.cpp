@@ -2,6 +2,7 @@
 #include <stan/mcmc/hmc/base_hmc.hpp>
 
 #include <boost/random/additive_combine.hpp>
+#include <boost/algorithm/string/split.hpp>
 
 #include <gtest/gtest.h>
 #include <test/models/utility.hpp>
@@ -120,22 +121,3 @@ TEST(McmcBaseHMC, set_stepsize_jitter) {
   
 }
 
-TEST(McmcBaseHMC, init_stepsize) {
-  
-  std::vector<std::string> model_path;
-  model_path.push_back("src");
-  model_path.push_back("test");
-  model_path.push_back("mcmc");
-  model_path.push_back("models");
-  model_path.push_back("improper");
-  
-  std::string command = convert_model_path(model_path);
-  command += " sample output file=" + convert_model_path(model_path) + ".csv";
-  run_command_output out;
-  
-  out = run_command(command);
-
-  EXPECT_FALSE(out.hasError);
-  EXPECT_EQ("Posterior is improper. Please check your model.",
-            out.output.erase(out.output.length()-1).substr(out.output.rfind('\n')).erase(0, 1) );
-}
