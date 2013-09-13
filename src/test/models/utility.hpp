@@ -43,6 +43,42 @@ std::string convert_model_path(const std::vector<std::string>& model_path) {
   return path;
 }
 
+struct run_command_output {
+  std::string command;
+  std::string output;
+  long time;
+  int err_code;
+  bool hasError;
+
+  run_command_output(const std::string command,
+                     const std::string output,
+                     const long time,
+                     const int err_code)
+    : command(command),
+      output(output),
+      time(time),
+      err_code(err_code),
+      hasError(err_code != 0)
+  { }
+  
+  run_command_output() 
+    : command(),
+      output(),
+      time(0),
+      err_code(0),
+      hasError(false)
+      { }
+};
+
+std::ostream& operator<<(std::ostream& os, const run_command_output& out) {
+  os << "run_command output:" << std::endl
+     << "  command:   " << out.command << std::endl
+     << "  output:    " << out.output << std::endl
+     << "  time (ms): " << out.time << std::endl
+     << "  err_code:  " << out.err_code << std::endl
+     << "  hasError:  " << (out.hasError ? "true" : "false") << std::endl;
+  return os;
+}
 
 /** 
  * Runs the command provided and returns the system output
@@ -51,12 +87,19 @@ std::string convert_model_path(const std::vector<std::string>& model_path) {
  * @param command A command that can be run from the shell
  * @return the system output of the command
  */  
-std::string run_command(std::string command) {
+run_command_output run_command(std::string command) {
+  using boost::posix_time::ptime;
+  using boost::posix_time::microsec_clock;
+  
   FILE *in;
-  command += " 2>&1"; // capture stderr
-  if(!(in = popen(command.c_str(), "r"))) {
+  std::string new_command = command + " 2>&1"; 
+  // captures both std::cout amd std::err
+  
+  in = popen(command.c_str(), "r");
+  
+  if(!in) {
     std::string err_msg;
-    err_msg = "Could not run: \"";
+    err_msg = "Fatal error with popen; could not execute: \"";
     err_msg+= command;
     err_msg+= "\"";
     throw std::runtime_error(err_msg.c_str());
@@ -65,44 +108,21 @@ std::string run_command(std::string command) {
   std::string output;
   char buf[1024];
   size_t count;
+  ptime time_start(microsec_clock::universal_time()); // start timer
   while ((count = fread(&buf, 1, 1024, in)) > 0)
     output += std::string(&buf[0], &buf[count]);
-  
-  int err;
-  if ((err=pclose(in)) != 0) {
-    std::stringstream err_msg;
-    err_msg << "Run of command: \"" << command << std::endl;
-    err_msg << "err code: " << err << std::endl;
-    err_msg << "Output message: \n";
-    err_msg << output;
-    std::string msg(err_msg.str());
-    throw std::runtime_error(msg.c_str());
-  }
-
-  return output;
-}
-
-/** 
- * Runs the command provided and returns the system output
- * as a string.
- * 
- * @param[in] command A command that can be run from the shell
- * @param[out] elapsed_milliseconds Adds number of milliseconds run to current value.
- * @return the system output of the command
- */  
-std::string run_command(const std::string& command, long& elapsed_milliseconds) {
-  using boost::posix_time::ptime;
-  using boost::posix_time::microsec_clock;
-  
-  ptime time_start(microsec_clock::universal_time()); // start timer
-  std::string output = run_command(command);
   ptime time_end(microsec_clock::universal_time());   // end timer
 
-  elapsed_milliseconds += (time_end - time_start).total_milliseconds();
-  
-  return output;
-}
+  // bits 15-8 is err code, bit 7 if core dump, bits 6-0 is signal number
+  int err_code = pclose(in);
+  // on Windows, err code is the return code.
+  if (err_code != 0 && (err_code >> 8) > 0)
+    err_code >>= 8;
 
+  return run_command_output(command, output,
+                            (time_end - time_start).total_milliseconds(), 
+                            err_code);
+}
 
 /** 
  * Returns the help options from the string provided.
@@ -144,13 +164,6 @@ parse_command_output(const std::string& command_output) {
   string option, value;
   size_t start = 0, end = command_output.find("\n", start);
   
-  EXPECT_EQ("STAN SAMPLING COMMAND", 
-            command_output.substr(start, end))
-    << "command could not be run. output is: \n" 
-    << command_output;
-  if ("STAN SAMPLING COMMAND" != command_output.substr(start, end)) {
-    return output;
-  }
   start = end+1;
   end = command_output.find("\n", start);
   size_t equal_pos = command_output.find("=", start);
