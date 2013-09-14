@@ -3,9 +3,18 @@
 #include <boost/random/mersenne_twister.hpp>
 #include<boost/math/distributions.hpp>
 
-TEST(ProbDistributionHypergeometric, random) {
+TEST(ProbDistributionsHypergeometric, error_check) {
   boost::random::mt19937 rng;
   EXPECT_NO_THROW(stan::prob::hypergeometric_rng(10, 10, 15,rng));
+
+  EXPECT_THROW(stan::prob::hypergeometric_rng(30, 10, 15,rng),
+               std::domain_error);
+  EXPECT_THROW(stan::prob::hypergeometric_rng(-30, 10, 15,rng),
+               std::domain_error);
+  EXPECT_THROW(stan::prob::hypergeometric_rng(30, -10, 15,rng),
+               std::domain_error);
+  EXPECT_THROW(stan::prob::hypergeometric_rng(30, 10, -15,rng),
+               std::domain_error);
 }
 
 TEST(ProbDistributionsHypergeometric, chiSquareGoodnessFitTest) {

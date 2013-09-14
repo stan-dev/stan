@@ -323,6 +323,14 @@ namespace stan {
                  RNG& rng) {
       using boost::variate_generator;
       using boost::random::uniform_real_distribution;
+
+      static const char* function = "stan::prob::rayleigh_rng(%1%)";
+
+      using stan::math::check_positive;
+
+      if (!check_positive(function, sigma, "Scale parameter"))
+        return 0;
+
       variate_generator<RNG&, uniform_real_distribution<> >
         uniform_rng(rng, uniform_real_distribution<>(0.0, 1.0));
       return sigma * std::sqrt(-2.0 * std::log(uniform_rng()));

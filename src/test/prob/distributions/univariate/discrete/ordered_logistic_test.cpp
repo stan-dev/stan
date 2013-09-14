@@ -2,6 +2,7 @@
 #include <stan/prob/distributions/univariate/discrete/ordered_logistic.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/math/distributions.hpp>
+#include <stan/math/constants.hpp>
 
 using Eigen::Matrix;
 using Eigen::Dynamic;
@@ -132,14 +133,26 @@ void expect_nan(double x) {
 }
 
 
-TEST(ProbDistributionOrderedLogistic, random) {
+TEST(ProbDistributionOrderedLogistic, error_check) {
   boost::random::mt19937 rng;
   double inf = std::numeric_limits<double>::infinity();
-  Eigen::VectorXd c(3);
+  Eigen::VectorXd c(4);
+  c << -2, 
+    2.0,
+    5,
+    10;
+  EXPECT_NO_THROW(stan::prob::ordered_logistic_rng(4.0, c, rng));
+
+  EXPECT_THROW(stan::prob::ordered_logistic_rng(stan::math::positive_infinity(), 
+                                                c, rng),
+               std::domain_error);
   c << -inf, 
     2.0,
+    -5,
     inf;
-  EXPECT_NO_THROW(stan::prob::ordered_logistic_rng(4.0, c, rng));
+  EXPECT_THROW(stan::prob::ordered_logistic_rng(4.0, c, rng),
+               std::domain_error);
+
 }
 
 TEST(ProbDistributionOrderedLogistic, chiSquareGoodnessFitTest) {

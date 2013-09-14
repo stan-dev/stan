@@ -438,6 +438,19 @@ namespace stan {
                     const double alpha,
                     RNG& rng) {
       boost::math::skew_normal_distribution<>dist (mu, sigma, alpha);
+
+      static const char* function = "stan::prob::skew_normal_rng(%1%)";
+
+      using stan::math::check_positive;
+      using stan::math::check_finite;
+
+      if (!check_finite(function, mu, "Location parameter"))
+        return 0;
+      if (!check_finite(function, alpha, "Shape parameter"))
+        return 0;
+      if (!check_positive(function, sigma, "Scale parameter"))
+        return 0;
+
       return quantile(dist, stan::prob::uniform_rng(0.0,1.0,rng));
     }
   }
