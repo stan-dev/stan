@@ -105,13 +105,14 @@ discretization of the Hamiltonian and the total number of steps taken
 per iteration (with their product determining total simulation time).
 \Stan can be configured with a user-specified step size or it can
 estimate an optimal step size during warmup using dual averaging
-\citep{Nesterov:2009, Hoffman-Gelman:2012}.  In either case,
-additional randomization may be applied to draw the step size from an
-interval of possible step sizes \citep{Neal:2011}.
+\citep{Nesterov:2009, Hoffman-Gelman:2011, Hoffman-Gelman:2013}.  
+In either case, additional randomization may be applied to draw the 
+step size from an interval of possible step sizes \citep{Neal:2011}.
 
 \Stan can be set to use a specified number of steps, or it can
 automatically adapt the number of steps during sampling using the
-No-U-Turn (\NUTS) sampler \citep{Hoffman-Gelman:2012}.  
+No-U-Turn (\NUTS) sampler 
+\citep{Hoffman-Gelman:2011, Hoffman-Gelman:2013}.  
 
 The third tuning parameter is a mass matrix for the fictional
 particle.  \Stan can be configured to estimate a diagonal mass matrix
@@ -213,7 +214,7 @@ directories to the directory in which Stan is installed (i.e., the
 directory containing the file named \code{makefile}).
 %
 \begin{quote}
-\begin{Verbatim}[fontshape=sl]
+\begin{Verbatim}[fontshape=sl,fontsize=\small] 
 > cd <stan-home>
 \end{Verbatim}
 \end{quote}
@@ -221,7 +222,7 @@ directory containing the file named \code{makefile}).
 Then make the library with the following make command
 %
 \begin{quote}
-\begin{Verbatim}[fontshape=sl]
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
 > make bin/libstan.a
 \end{Verbatim}
 \end{quote}
@@ -229,7 +230,7 @@ Then make the library with the following make command
 then make the model parser and code generator with the following call
 %
 \begin{quote}
-\begin{Verbatim}[fontshape=sl]
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
 > make bin/stanc
 \end{Verbatim}
 \end{quote}
@@ -242,7 +243,7 @@ Finally, make the Stan output summary program with the following
 make command
 %
 \begin{quote}
-\begin{Verbatim}[fontshape=sl]
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
 > make bin/print
 \end{Verbatim}
 \end{quote}
@@ -267,7 +268,7 @@ distribution located at \code{<stan-home>} as
 The file contains the following model.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 data { 
   int<lower=0> N; 
   int<lower=0,upper=1> y[N];
@@ -298,7 +299,7 @@ following sampling statement can be eliminated from the model without
 changing the log probability calculation.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
   theta ~ beta(1,1);
 \end{Verbatim}
 \end{quote}
@@ -319,10 +320,10 @@ altogether based on whether the initial values satisfy the constraints.
 \subsubsection{Vectorizing Sampling Statements}
 
 Iterations of the model will be faster if the loop over sampling
-statements is vectorized, replacing
+statements is \textit{vectorized} by replacing
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
   for (n in 1:N) 
     y[n] ~ bernoulli(theta);
 \end{Verbatim}
@@ -331,7 +332,7 @@ statements is vectorized, replacing
 with the equivalent vectorized form,
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
   y ~ bernoulli(theta);
 \end{Verbatim}
 \end{quote}
@@ -356,7 +357,7 @@ A data set of $\mbox{\code{N}}=10$ observations is available in the file
 The content of the file is as follows.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 N <- 10
 y <- c(0,1,0,0,0,0,0,0,0,1)
 \end{Verbatim}
@@ -380,7 +381,7 @@ Stan was unpacked that contains the file named \code{makefile} and
 a subdirectory called \code{src/}.
 %
 \begin{quote}
-\begin{Verbatim}[fontshape=sl]
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
 > cd <stan-home>
 \end{Verbatim}
 \end{quote}
@@ -388,7 +389,7 @@ a subdirectory called \code{src/}.
 Then issue the following command:
 %
 \begin{quote}
-\begin{Verbatim}[fontshape=sl]
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
 > make src/models/basic_estimators/bernoulli 
 \end{Verbatim}
 \end{quote}
@@ -408,16 +409,16 @@ form will be placed in the same directory as the model.
 The model can be executed from the directory in which it resides.
 %
 \begin{quote}
-\begin{Verbatim}[fontshape=sl]
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
 > cd src/models/basic_estimators 
 \end{Verbatim}
 \end{quote}
 %
-To execute the model under Linux or Mac, use
+To execute sampling of the model under Linux or Mac, use
 %
 \begin{quote}
-\begin{Verbatim}[fontshape=sl]
-> ./bernoulli --data=bernoulli.data.R
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
+> ./bernoulli sample --data=bernoulli.data.R
 \end{Verbatim}
 \end{quote}
 %
@@ -429,8 +430,8 @@ For the Windows DOS terminal, the \code{./} prefix is not needed,
 resulting in the following command.
 %
 \begin{quote}
-\begin{Verbatim}[fontshape=sl]
-> bernoulli --data=bernoulli.data.R
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
+> bernoulli sample --data=bernoulli.data.R
 \end{Verbatim}
 \end{quote}
 %
@@ -439,27 +440,38 @@ output is the same.  First, the parameters are echoed to the standard output,
 which shows up on the terminal as follows.
 %
 \begin{quote}
-\begin{Verbatim}
-STAN SAMPLING COMMAND
-data = bernoulli.data.R
-init = random initialization
-init tries = 1
-samples = samples.csv
-append_samples = 0
-save_warmup = 0
-seed = 1845979644 (randomly generated)
-chain_id = 1 (default)
-iter = 2000
-warmup = 1000
-thin = 1 (default)
-equal_step_sizes = 0
-nondiag_mass = 0
-leapfrog_steps = -1
-max_treedepth = 10
-epsilon = -1
-epsilon_pm = 0
-delta = 0.5
-gamma = 0.05
+\begin{Verbatim}[fontsize=\small]
+ method = sample (Default)
+   sample
+     num_samples = 1000 (Default)
+     num_warmup = 1000 (Default)
+     save_warmup = 0 (Default)
+     thin = 1 (Default)
+     adapt
+       engaged = 1 (Default)
+       gamma = 0.050000000000000003 (Default)
+       delta = 0.65000000000000002 (Default)
+       kappa = 0.75 (Default)
+       t0 = 10 (Default)
+     algorithm = hmc (Default)
+       hmc
+         engine = nuts (Default)
+           nuts
+             max_depth = 10 (Default)
+         metric = diag_e (Default)
+         stepsize = 1 (Default)
+         stepsize_jitter = 0 (Default)
+ id = 0 (Default)
+ data = src/models/basic_estimators/bernoulli.data.R
+ init = 2 (Default)
+ random
+   seed = 1170969085
+ output
+   file = samples.csv (Default)
+   append_sample = 0 (Default)
+   diagnostic_file =  (Default)
+   append_diagnostic = 0 (Default)
+   refresh = 100 (Default)
 ...
 \end{Verbatim}
 \end{quote}
@@ -471,7 +483,7 @@ Next, the sampler counts up the iterations in place, reporting
 percentage completed, ending as follows.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 ...
 Iteration: 2000 / 2000 [100%]  (Sampling)
 ...
@@ -488,33 +500,42 @@ The first part of the output file just repeats the parameters
 as comments (i.e., lines beginning with the pound sign (\Verb|#|)).
 %
 \begin{quote}
-\begin{Verbatim}
-...
-# Samples Generated by Stan
-#
-# stan_version_major=1
-# stan_version_minor=3
-# stan_version_patch=0
-# model=bernoulli_model
-# data=src/models/basic_estimators/bernoulli.data.R
-# init=random initialization
-# append_samples=0
-# save_warmup=0
-# seed=2378472231
-# chain_id=1
-# iter=2000
-# warmup=1000
-# thin=1
-# nondiag_mass=0
-# equal_step_sizes=0
-# leapfrog_steps=-1
-# max_treedepth=10
-# epsilon=-1
-# epsilon_pm=0
-# delta=0.5
-# gamma=0.05
-# algorithm=NUTS with a diagonal Euclidean metric
-#
+\begin{Verbatim}[fontsize=\small]
+# stan_version_major = 1
+# stan_version_minor = 3
+# stan_version_patch = 0
+# model = bernoulli_model
+# method = sample (Default)
+#   sample
+#     num_samples = 1000 (Default)
+#     num_warmup = 1000 (Default)
+#     save_warmup = 0 (Default)
+#     thin = 1 (Default)
+#     adapt
+#       engaged = 1 (Default)
+#       gamma = 0.050000000000000003 (Default)
+#       delta = 0.65000000000000002 (Default)
+#       kappa = 0.75 (Default)
+#       t0 = 10 (Default)
+#     algorithm = hmc (Default)
+#       hmc
+#         engine = nuts (Default)
+#           nuts
+#             max_depth = 10 (Default)
+#         metric = diag_e (Default)
+#         stepsize = 1 (Default)
+#         stepsize_jitter = 0 (Default)
+# id = 0 (Default)
+# data = src/models/basic_estimators/bernoulli.data.R
+# init = 2 (Default)
+# random
+#   seed = 1170969085
+# output
+#   file = samples.csv (Default)
+#   append_sample = 0 (Default)
+#   diagnostic_file =  (Default)
+#   append_diagnostic = 0 (Default)
+#   refresh = 100 (Default)
 ...
 \end{Verbatim}
 \end{quote}
@@ -523,7 +544,7 @@ This is then followed by a header indicating the
 names of the values sampled.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 ...
 lp__,accept_stat__,stepsize__,treedepth__,theta
 ...
@@ -558,12 +579,12 @@ The single model parameter \code{theta} is stored in the fourth column.
 Next up is the result of adaptation, reported as comments.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 ...
 # Adaptation terminated
-# Step size = 1.80648
+# Step size = 1.81311
 # Diagonal elements of inverse mass matrix:
-# 0.446024
+# 0.415719
 ...
 \end{Verbatim}
 \end{quote}
@@ -574,37 +595,50 @@ indicate the multipliers for scaling individual parameters, here
 just a single multiplier, 0.446024, corresponding to the single
 parameter \code{theta}.
 
-The rest of the file contains lines corresponding to the
-samples from each iteration.%
+Samples from each iteration follow,%
 %
 \footnote{There are repeated entries due to the Metropolis accept step
 in the No-U-Turn sampling algorithm.}
 %
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 ...
--7.07769,1,1.43707,0.158674
--7.07769,1,1.43707,0.158674
--7.37289,1,1.43707,0.130089
--7.09254,1,1.43707,0.361906
--7.09254,1,1.43707,0.361906
--7.09254,1,1.43707,0.361906
--6.96213,1,1.43707,0.337061
--6.96213,1,1.43707,0.337061
--6.77689,1,1.43707,0.220795
+-6.85935,1,1.81311,0,0.194323
+-6.85935,0.0001295,1.81311,0,0.194323
+-6.79366,1,1.81311,0,0.288971
+-6.77936,1,1.81311,0,0.282131
+-6.77936,0.886654,1.81311,0,0.282131
+-6.74812,1,1.81311,0,0.248232
+-6.74812,0.0793306,1.81311,0,0.248232
+-7.04438,0.777304,1.81311,0,0.353339
+-7.04438,0.480879,1.81311,0,0.353339
+-7.07619,0.849599,1.81311,0,0.158857
 ...
--6.85235,1,1.43707,0.195994
--6.85235,1,1.43707,0.195994
--6.81491,1,1.43707,0.20624
--6.81491,1,1.43707,0.20624
--6.81491,1,1.43707,0.20624
--6.81491,1,1.43707,0.20624
--6.81491,1,1.43707,0.20624
+-6.74838,0.540129,1.81311,0,0.253368
+-6.74838,0.638693,1.81311,0,0.253368
+-6.74838,0.546,1.81311,0,0.253368
+-7.01801,0.794591,1.81311,0,0.348376
+-7.01801,0.0564743,1.81311,0,0.348376
+-7.17267,0.863864,1.81311,0,0.375023
+-6.86632,1,1.81311,0,0.192719
+-6.86632,0.0077144,1.81311,0,0.192719
+-8.21853,0.512368,1.81311,0,0.084075
+-8.7342,0.862726,1.81311,0,0.0669754
+...
 \end{Verbatim}
 \end{quote}
 %
-This ends the output.  
+
+The output ends with timing details,%
+\begin{quote}
+\begin{Verbatim}[fontsize=\small]
+...
+#  Elapsed Time: 0.006811 seconds (Warm-up)
+#                0.011645 seconds (Sampling)
+#                0.018456 seconds (Total)
+\end{Verbatim}
+\end{quote}
 
 \subsection{Summarizing Output}
 
@@ -614,15 +648,15 @@ information about the run (for more information, see
 generated for \code{bernoulli} on Linux or Mac use
 %
 \begin{quote}
-\begin{Verbatim}[fontshape=sl]
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
 > <stan-home>/bin/print samples.csv
 \end{Verbatim}
 \end{quote}
 %
-For Windows use backslashes for the executable
+For Windows use backslashes for the executable,
 %
 \begin{quote}
-\begin{Verbatim}[fontshape=sl]
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
 > <stan-home>\bin\print samples.csv
 \end{Verbatim}
 \end{quote}
@@ -630,39 +664,27 @@ For Windows use backslashes for the executable
 The output of the command will display information about the run
 followed by information for each parameter and generated quantity. For
 \code{bernoulli}, we ran 1 chain and saved 1000 iterations. The information is
-echoed to the standard output:
+echoed to the standard output stream.
 %
-\begin{landscape}
-\begin{quote}
-{ \footnotesize
-\begin{Verbatim}[fontshape=sl]
+\begin{Verbatim}[fontshape=sl,fontsize=\footnotesize]
 Inference for Stan model: bernoulli_model
 1 chains: each with iter=(1000); warmup=(0); thin=(1); 1000 iterations saved.
 
-Warmup took (0.01) seconds, 0.01 seconds total
-Sampling took (0.02) seconds, 0.02 seconds total
-
-Inference for Stan model: bernoulli_model
-1 chains: each with iter=(1000); warmup=(0); thin=(1); 1000 iterations saved.
-
-Warmup took (0.010) seconds, 0.010 seconds total
-Sampling took (0.014) seconds, 0.014 seconds total
+Warmup took (0.0066) seconds, 0.0066 seconds total
+Sampling took (0.011) seconds, 0.011 seconds total
 
                  Mean     MCSE   StdDev        5%   50%   95%  N_Eff  N_Eff/s  R_hat
-lp__             -7.3  4.1e-02  7.2e-01  -8.7e+00  -7.0  -6.8    313    22185   1.00
-accept_stat__    0.60  1.2e-02  3.8e-01   1.1e-03  0.66   1.0   1000    70867   1.00
-stepsize__        1.7  5.0e-15  3.6e-15   1.7e+00   1.7   1.7   0.50       35   1.00
-treedepth__     0.078  8.8e-03  2.7e-01   0.0e+00  0.00   1.0    927    65678   1.00
-theta            0.26  4.8e-03  1.2e-01   8.1e-02  0.24  0.48    643    45584   1.00
+lp__             -7.3  3.5e-02  6.9e-01  -8.7e+00  -7.0  -6.7    390    34020   1.00
+accept_stat__    0.64  1.2e-02  3.6e-01   5.1e-03  0.74   1.0    882    76898   1.00
+stepsize__        1.8  7.8e-15  5.6e-15   1.8e+00   1.8   1.8   0.50       44   1.00
+treedepth__     0.076  8.6e-03  2.7e-01   0.0e+00  0.00   1.0    942    82167   1.00
+theta            0.25  4.2e-03  1.2e-01   9.0e-02  0.23  0.47    827    72146   1.00
 
-Samples were drawn using NUTS with a diagonal Euclidean metric.
+Samples were drawn using hmc with nuts.
 For each parameter, N_Eff is a crude measure of effective sample size,
 and R_hat is the potential scale reduction factor on split chains (at 
 convergence, R_hat=1).
 \end{Verbatim}
-}
-\end{quote}
-\end{landscape}
 %
 In addition to the general information about the runs, \code{print}
 displays summary statistics for each parameter and generated
@@ -693,16 +715,16 @@ the next chapter. They can also be printed on the command
 line in Linux and on the Mac as follows.
 %
 \begin{quote}
-\begin{Verbatim}[fontshape=sl]
-> ./bernoulli --help
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
+> ./bernoulli help-all
 \end{Verbatim}
 \end{quote}
 %
 and on Windows with
 %
 \begin{quote}
-\begin{Verbatim}[fontshape=sl]
-> bernoulli --help
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
+> bernoulli help-all
 \end{Verbatim}
 \end{quote}
 
@@ -714,7 +736,7 @@ top-level directory into which Stan was unpacked; it should contain a
 file named \code{makefile}).
 %
 \begin{quote}
-\begin{Verbatim}[fontshape=sl]
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
 > cd <stan-home>
 > make O=0 test-unit
 > make O=0 test-distributions

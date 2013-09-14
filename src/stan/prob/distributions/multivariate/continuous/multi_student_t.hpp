@@ -145,8 +145,22 @@ namespace stan {
     inline Eigen::VectorXd
     multi_student_t_rng(const double nu,
                         const Eigen::Matrix<double,Eigen::Dynamic,1>& mu,
-                     const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& s,
+                        const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& s,
                      RNG& rng) {
+
+      static const char* function = "stan::prob::multi_student_t_rng(%1%)";
+
+      using stan::math::check_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_symmetric;
+      using stan::math::check_positive;      
+ 
+      check_finite(function, mu, "Location parameter");
+      check_symmetric(function, s, "Scale parameter");
+      check_not_nan(function, nu, 
+                    "Degrees of freedom parameter");
+      check_positive(function, nu, 
+                     "Degrees of freedom parameter");
 
       Eigen::VectorXd z(s.cols());
       z.setZero();

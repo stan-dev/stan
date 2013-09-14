@@ -1,7 +1,6 @@
 #ifndef __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__BETA_BINOMIAL_HPP__
 #define __STAN__PROB__DISTRIBUTIONS__UNIVARIATE__DISCRETE__BETA_BINOMIAL_HPP__
 
-
 #include <stan/prob/distributions/univariate/discrete/binomial.hpp>
 #include <stan/prob/distributions/univariate/continuous/beta.hpp>
 
@@ -588,6 +587,24 @@ DoubleVectorView<!is_constant_struct<T_size1>::value,
                     const double alpha,
                     const double beta,
                     RNG& rng) {
+
+      static const char* function = "stan::prob::beta_binomial_rng(%1%)";
+
+      using stan::math::check_finite;
+      using stan::math::check_nonnegative;
+      using stan::math::check_positive;
+  
+      if (!check_nonnegative(function, N, "Population size parameter"))
+        return 0;
+      if (!check_finite(function, alpha, "First prior sample size parameter"))
+        return 0;
+      if (!check_positive(function, alpha, "First prior sample size parameter"))
+        return 0;
+      if (!check_finite(function, beta, "Second prior sample size parameter"))
+        return 0;
+      if (!check_positive(function, beta, "Second prior sample size parameter"))
+        return 0;
+
     double a = stan::prob::beta_rng(alpha, beta, rng);
     while(a > 1 || a < 0) 
       a = stan::prob::beta_rng(alpha, beta, rng);

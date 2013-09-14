@@ -641,6 +641,17 @@ namespace stan {
                      RNG& rng) {
       using boost::variate_generator;
       using boost::normal_distribution;
+
+      static const char* function = "stan::prob::multi_normal_rng(%1%)";
+
+      using stan::math::check_positive;
+      using stan::math::check_finite;
+      using stan::math::check_symmetric;
+ 
+      check_positive(function, S.rows(), "Covariance matrix rows");
+      check_symmetric(function, S, "Covariance matrix");
+      check_finite(function, mu, "Location parameter");
+
       variate_generator<RNG&, normal_distribution<> >
         std_normal_rng(rng, normal_distribution<>(0,1));
 
