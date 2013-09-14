@@ -493,7 +493,6 @@ namespace stan {
           if (!boost::math::isfinite(init_grad[i])) {
             std::cout << "Rejecting user-specified inititialization because of divergent gradient." << std::endl;
             return 0;
-
           }
         }
         
