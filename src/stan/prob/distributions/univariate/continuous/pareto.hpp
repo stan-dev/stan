@@ -435,6 +435,21 @@ namespace stan {
                RNG& rng) {
       using boost::variate_generator;
       using boost::exponential_distribution;
+
+      static const char* function = "stan::prob::pareto_rng(%1%)";
+      
+      using stan::math::check_finite;
+      using stan::math::check_positive;
+
+      if (!check_finite(function, y_min, "Scale parameter"))
+        return 0;
+      if (!check_positive(function, y_min, "Scale parameter"))
+        return 0;
+      if (!check_finite(function, alpha, "Shape parameter"))
+        return 0;
+      if (!check_positive(function, alpha, "Shape parameter"))
+        return 0;
+
       variate_generator<RNG&, exponential_distribution<> >
         exp_rng(rng, exponential_distribution<>(alpha));
       return y_min * std::exp(exp_rng());

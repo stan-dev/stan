@@ -289,6 +289,17 @@ namespace stan {
                     RNG& rng) {
       using boost::variate_generator;
       using boost::exponential_distribution;
+
+      static const char* function = "stan::prob::exponential_rng(%1%)";
+
+      using stan::math::check_finite;
+      using stan::math::check_positive;
+
+      if(!check_finite(function, beta, "Inverse scale parameter"))
+        return 0;
+      if(!check_positive(function, beta, "Inverse scale parameter"))
+        return 0;
+
       variate_generator<RNG&, exponential_distribution<> >
         exp_rng(rng, exponential_distribution<>(beta));
       return exp_rng();

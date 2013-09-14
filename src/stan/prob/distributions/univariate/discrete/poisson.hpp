@@ -410,6 +410,19 @@ namespace stan {
                 RNG& rng) {
       using boost::variate_generator;
       using boost::random::poisson_distribution;
+
+      static const char* function = "stan::prob::poisson_rng(%1%)";
+      
+      using stan::math::check_not_nan;
+      using stan::math::check_nonnegative;
+ 
+      if (!check_not_nan(function, lambda,
+                         "Rate parameter"))
+        return 0;
+      if (!check_nonnegative(function, lambda,
+                             "Rate parameter"))
+        return 0;
+
       variate_generator<RNG&, poisson_distribution<> >
         poisson_rng(rng, poisson_distribution<>(lambda));
       return poisson_rng();
