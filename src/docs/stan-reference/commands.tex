@@ -518,7 +518,7 @@ Then the \Stan executable may be run on Windows using
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
-> my_model sample data=my_data
+> my_model sample data file=my_data
 \end{Verbatim}
 \end{quote}
 %
@@ -532,7 +532,7 @@ necessary to instead execute
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
-> ./my_model sample data=my_data
+> ./my_model sample data file=my_data
 \end{Verbatim}
 \end{quote}
 %
@@ -548,7 +548,7 @@ a Bash shell on Mac or Linux execute
 > for i in {1..4}
 > do
 >   ./my_model sample random seed=12345 \ 
-      id=$i data=my_data \
+      id=$i data file=my_data \
 >     output file=samples$i.csv refresh=0 &
 > done
 >
@@ -567,7 +567,7 @@ snippet above
 \begin{quote}
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
 > for /l %x in (1, 1, 4) do start /b model  sample ^
-< random seed=12345 id=%x data=my_data ^
+< random seed=12345 id=%x data file=my_data ^
 >  output file=samples%x.csv refresh=0
 \end{Verbatim}
 \end{quote}
@@ -978,7 +978,7 @@ We begin by specifying data and init files,
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
-> ./model data=model.data.R init=model.init.R
+> ./model data file=model.data.R init=model.init.R
 \end{Verbatim}
 \end{quote}
 %
@@ -1000,7 +1000,7 @@ model, we can either specify a method implicitly,
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
-> ./model sample data=model.data.R init=model.init.R
+> ./model sample data file=model.data.R init=model.init.R
 \end{Verbatim}
 \end{quote}
 %
@@ -1008,7 +1008,7 @@ or explicitly,
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
-> ./model method=sample data=model.data.R init=model.init.R
+> ./model method=sample data file=model.data.R init=model.init.R
 \end{Verbatim}
 \end{quote}
 %
@@ -1061,7 +1061,7 @@ Fully informed, we can now run with a given seed,
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
-> ./model method=sample data=model.data.R init=model.init.R random seed=5
+> ./model method=sample data fle=model.data.R init=model.init.R random seed=5
 \end{Verbatim}
 \end{quote}
 
@@ -1073,7 +1073,7 @@ to specify the metric we try
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
-> ./model method=sample data=model.data.R init=model.init.R random seed=5 \
+> ./model method=sample data file=model.data.R init=model.init.R random seed=5 \
 > metric=unit
 \end{Verbatim}
 \end{quote}
@@ -1096,7 +1096,7 @@ sampling algorithm, as noted in the suggestion,
 \begin{quote}
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
 > ./model method=sample algorithm=hmc metric=unit \
-> data=model.data.R init=model.init.R random seed=5
+> data file=model.data.R init=model.init.R random seed=5
 \end{Verbatim}
 \end{quote}
 %
@@ -1115,7 +1115,7 @@ Tweaking the metric name we make one last attempt,
 \begin{quote}
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
 > ./model method=sample algorithm=hmc metric=unit_e \
-> data=model.data.R init=model.init.R random seed=5
+> data file=model.data.R init=model.init.R random seed=5
 \end{Verbatim}
 \end{quote}
 %
@@ -1259,7 +1259,7 @@ which itself is a value for the argument \code{engine} which derives from
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
 > ./model method=sample algorithm=hmc metric=unit_e \
 > engine=nuts max_depth=-15 \
-> data=model.data.R init=model.init.R random seed=5
+> data file=model.data.R init=model.init.R random seed=5
 \end{Verbatim}
 \end{quote}
 %
@@ -1281,7 +1281,7 @@ configurations.  Removing the guilty character, we try
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
 > ./model method=sample algorithm=hmc metric=unit_e \
 > engine=nuts max_depth=15 \
-> data=model.data.R init=model.init.R random seed=5
+> data file=model.data.R init=model.init.R random seed=5
 \end{Verbatim}
 \end{quote}
 %
