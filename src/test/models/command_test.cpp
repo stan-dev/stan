@@ -63,7 +63,8 @@ TEST_F(ModelCommand, check_help_options) {
   std::vector<std::string> block;
   
   // run: "model/command help"
-  output = split_lines(run_command(help_command));
+  run_command_output out = run_command(help_command);
+  output = split_lines(out.output);
   
   // Usage
   block = next_block(output, line_number);
