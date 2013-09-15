@@ -141,7 +141,13 @@ namespace stan {
     lkj_corr_cholesky_rng(const size_t K,
                           const double eta,
                           RNG& rng) {
-      // Need checks
+      static const char* function 
+        = "stan::prob::lkj_corr_cholesky_rng(%1%)";
+
+      using stan::math::check_positive;
+      
+      check_positive(function, eta, "Shape parameter");
+
       Eigen::ArrayXd CPCs( (K * (K - 1)) / 2 );
       double alpha = eta + 0.5 * (K - 1);
       unsigned int count = 0;
@@ -160,6 +166,13 @@ namespace stan {
     lkj_corr_rng(const size_t K,
                  const double eta,
                  RNG& rng) {
+
+      static const char* function 
+        = "stan::prob::lkj_corr_rng(%1%)";
+
+      using stan::math::check_positive;
+      
+      check_positive(function, eta, "Shape parameter");
 
       using stan::math::multiply_lower_tri_self_transpose;
       return multiply_lower_tri_self_transpose(

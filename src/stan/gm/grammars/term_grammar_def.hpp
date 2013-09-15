@@ -210,7 +210,8 @@ namespace stan {
           sft(f,error_msgs);
           return expression(f);
         }
-        fun f("divide_left",args);
+        fun f("divide_left",args); // this doesn't exist, so will
+                                   // throw error on purpose
         sft(f,error_msgs);
         return expression(f);
       }

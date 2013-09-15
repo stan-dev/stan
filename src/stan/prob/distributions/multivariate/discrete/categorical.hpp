@@ -136,6 +136,13 @@ namespace stan {
                     RNG& rng) {
       using boost::variate_generator;
       using boost::uniform_01;
+      using stan::math::check_simplex;
+
+      static const char* function = "stan::prob::categorical_rng(%1%)";
+
+      check_simplex(function, theta,
+                    "Probabilities parameter");
+
       variate_generator<RNG&, uniform_01<> >
         uniform01_rng(rng, uniform_01<>());
       

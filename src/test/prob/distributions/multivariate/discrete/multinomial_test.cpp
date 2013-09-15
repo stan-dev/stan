@@ -87,8 +87,19 @@ TEST(ProbDistributionsMultinomial, zeros) {
   EXPECT_FLOAT_EQ(0.0, result2);
 }
 
+TEST(ProbDistributionsMultinomial, error_check) {
+  boost::random::mt19937 rng;
 
-TEST(ProbDistributionMultinomial, chiSquareGoodnessFitTest) {
+  Matrix<double,Dynamic,1> theta(3);
+  theta << 0.15, 0.45, 0.40;
+
+  EXPECT_THROW(stan::prob::multinomial_rng(theta,-3,rng), std::domain_error);
+
+  theta << 0.15, 0.45, 0.50;
+  EXPECT_THROW(stan::prob::multinomial_rng(theta,3,rng), std::domain_error);
+}
+
+TEST(ProbDistributionsMultinomial, chiSquareGoodnessFitTest) {
   boost::random::mt19937 rng;
   int M = 10;
   int trials = 1000;
@@ -96,7 +107,7 @@ TEST(ProbDistributionMultinomial, chiSquareGoodnessFitTest) {
 
   int K = 3;
   Matrix<double,Dynamic,1> theta(K);
-  theta << 0.15, 0.45, 0.40;
+  theta << 0.2, 0.35, 0.45;
   boost::math::chi_squared mydist(K-1);
 
   double expect[K];

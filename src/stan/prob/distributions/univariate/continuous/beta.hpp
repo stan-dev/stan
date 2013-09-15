@@ -648,6 +648,24 @@ namespace stan {
              RNG& rng) {
       using boost::variate_generator;
       using boost::random::gamma_distribution;
+      // Error checks
+      static const char* function = "stan::prob::beta_rng(%1%)";
+
+      using stan::math::check_positive;
+      using stan::math::check_finite;
+      using stan::math::check_not_nan;
+      using stan::math::check_nonnegative;
+      using stan::math::check_less_or_equal;
+        
+      if (!check_finite(function, alpha, "First shape parameter"))
+        return 0;
+      if (!check_positive(function, alpha, "First shape parameter"))
+        return 0;
+      if (!check_finite(function, beta, "Second shape parameter"))
+        return 0;
+      if (!check_positive(function, beta, "Second shape parameter"))
+        return 0;
+
       variate_generator<RNG&, gamma_distribution<> >
         rng_gamma_alpha(rng, gamma_distribution<>(alpha, 1.0));
       variate_generator<RNG&, gamma_distribution<> >

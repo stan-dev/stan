@@ -71,6 +71,13 @@ namespace stan {
     multinomial_rng(const Eigen::Matrix<double,Eigen::Dynamic,1>& theta,
                     const int N,
                     RNG& rng) {
+      static const char* function = "stan::prob::multinomial_rng(%1%)";
+      using stan::math::check_simplex;
+      using stan::math::check_positive;
+
+      check_simplex(function, theta, "Probabilites parameter");
+      check_positive(function,N,"number of trials variables");
+
       std::vector<int> result(N,0);
       double mass_left = 1.0;
       int n_left = N;

@@ -3,9 +3,21 @@
 #include <boost/random/mersenne_twister.hpp>
 #include<boost/math/distributions.hpp>
 
-TEST(ProbDistributionsScaledInvChiSquare, random) {
+TEST(ProbDistributionsScaledInvChiSquare, error_check) {
   boost::random::mt19937 rng;
   EXPECT_NO_THROW(stan::prob::scaled_inv_chi_square_rng(2.0,1.0,rng));
+
+  EXPECT_THROW(stan::prob::scaled_inv_chi_square_rng(-2.0,1.0,rng),
+               std::domain_error);
+  EXPECT_THROW(stan::prob::scaled_inv_chi_square_rng(2.0,-1.0,rng),
+               std::domain_error);
+  EXPECT_THROW(stan::prob::scaled_inv_chi_square_rng(stan::math::positive_infinity(),
+                                                     1.0,rng),
+               std::domain_error);
+  EXPECT_THROW(stan::prob::scaled_inv_chi_square_rng(2,
+                                                     stan::math::positive_infinity(),
+                                                     rng),
+               std::domain_error);
 }
 
 TEST(ProbDistributionsScaledInvChiSquare, chiSquareGoodnessFitTest) {
