@@ -180,12 +180,6 @@ namespace stan {
       dynamic_cast<Sampler*>(sampler)->set_nominal_stepsize_and_T(epsilon, int_time);
       dynamic_cast<Sampler*>(sampler)->set_stepsize_jitter(epsilon_jitter);
       
-      try {
-        dynamic_cast<Sampler*>(sampler)->init_stepsize();
-      } catch (std::runtime_error e) {
-        std::cout << e.what() << std::endl;
-        return false;
-      }
       
       return true;
       
@@ -208,13 +202,6 @@ namespace stan {
       dynamic_cast<Sampler*>(sampler)->set_stepsize_jitter(epsilon_jitter);
       dynamic_cast<Sampler*>(sampler)->set_max_depth(max_depth);
       
-      try {
-        dynamic_cast<Sampler*>(sampler)->init_stepsize();
-      } catch (std::runtime_error e) {
-        std::cout << e.what() << std::endl;
-        return false;
-      }
-      
       return true;
       
     }
@@ -229,13 +216,22 @@ namespace stan {
       
       double epsilon = dynamic_cast<Sampler*>(sampler)->get_nominal_stepsize();
       
-      dynamic_cast<Sampler*>(sampler)->get_stepsize_adaptation().set_mu(log(10 * epsilon));
-      dynamic_cast<Sampler*>(sampler)->get_stepsize_adaptation().set_delta(delta);
-      dynamic_cast<Sampler*>(sampler)->get_stepsize_adaptation().set_gamma(gamma);
-      dynamic_cast<Sampler*>(sampler)->get_stepsize_adaptation().set_kappa(kappa);
-      dynamic_cast<Sampler*>(sampler)->get_stepsize_adaptation().set_t0(t0);
+      Sampler* s = dynamic_cast<Sampler*>(sampler);
       
-      dynamic_cast<Sampler*>(sampler)->engage_adaptation();
+      s->get_stepsize_adaptation().set_mu(log(10 * epsilon));
+      s->get_stepsize_adaptation().set_delta(delta);
+      s->get_stepsize_adaptation().set_gamma(gamma);
+      s->get_stepsize_adaptation().set_kappa(kappa);
+      s->get_stepsize_adaptation().set_t0(t0);
+      
+      s->engage_adaptation();
+      
+      try {
+        s->init_stepsize();
+      } catch (std::runtime_error e) {
+        std::cout << e.what() << std::endl;
+        return false;
+      }
       
       return true;
       
