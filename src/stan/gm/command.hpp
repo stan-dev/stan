@@ -291,7 +291,7 @@ namespace stan {
       //////////////////////////////////////////////////
       
       // Data input
-      std::string data_file = dynamic_cast<string_argument*>(parser.arg("data"))->value();
+      std::string data_file = dynamic_cast<string_argument*>(parser.arg("data")->arg("file"))->value();
       
       std::fstream data_stream(data_file.c_str(),
                                std::fstream::in);
