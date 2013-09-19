@@ -106,6 +106,19 @@ namespace stan {
                      const double beta,
                      RNG& rng) {
       using boost::variate_generator;
+
+      static const char* function = "stan::prob::trunc_normal_rng(%1%)";
+      
+      using stan::math::check_greater;
+      using stan::math::check_not_nan;
+
+      if (!check_not_nan(function, alpha, "Lower bound")) 
+        return 0;
+      if (!check_not_nan(function, beta, "Upper bound"))
+        return 0;
+      if (!check_greater(function, beta, alpha, "Upper bound")) 
+        return 0;
+
       double a = stan::prob::normal_rng(mu, sigma, rng);
       while(a > beta || a < alpha)
         a = stan::prob::normal_rng(mu,sigma,rng);

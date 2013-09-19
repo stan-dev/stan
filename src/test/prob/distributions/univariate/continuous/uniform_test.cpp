@@ -3,9 +3,15 @@
 #include <boost/random/mersenne_twister.hpp>
 #include<boost/math/distributions.hpp>
 
-TEST(ProbDistributionsUniform, random) {
+TEST(ProbDistributionsUniform, error_check) {
   boost::random::mt19937 rng;
   EXPECT_NO_THROW(stan::prob::uniform_rng(1.0,2.0,rng));
+
+  EXPECT_THROW(stan::prob::uniform_rng(stan::math::negative_infinity(),2.0,rng),
+               std::domain_error);
+  EXPECT_THROW(stan::prob::uniform_rng(1,stan::math::positive_infinity(),rng),
+               std::domain_error);
+  EXPECT_THROW(stan::prob::uniform_rng(2,1,rng), std::domain_error);
 }
 
 TEST(ProbDistributionsUniform, chiSquareGoodnessFitTest) {

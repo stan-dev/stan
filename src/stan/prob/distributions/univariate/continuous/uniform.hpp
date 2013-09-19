@@ -364,6 +364,19 @@ namespace stan {
                 RNG& rng) {
       using boost::variate_generator;
       using boost::random::uniform_real_distribution;
+
+      static const char* function = "stan::prob::uniform_rng(%1%)";
+      
+      using stan::math::check_finite;
+      using stan::math::check_greater;
+
+      if (!check_finite(function, alpha, "Lower bound parameter"))
+        return 0;
+      if (!check_finite(function, beta, "Upper bound parameter"))
+        return 0;
+      if (!check_greater(function, beta, alpha, "Upper bound parameter"))
+        return 0;
+
       variate_generator<RNG&, uniform_real_distribution<> >
         uniform_rng(rng, uniform_real_distribution<>(alpha, beta));
       return uniform_rng();

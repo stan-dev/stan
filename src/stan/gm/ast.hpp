@@ -4,6 +4,8 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <map>
+#include <set>
 
 #include <boost/variant/recursive_variant.hpp>
 
@@ -149,6 +151,7 @@ namespace stan {
       expr_type get_result_type(const std::string& name,
                                 const std::vector<expr_type>& args,
                                 std::ostream& error_msgs);
+      std::set<std::string> key_set() const;
     private:
       function_signatures(); 
       function_signatures(const function_signatures& fs);
