@@ -123,11 +123,12 @@ namespace stan {
             if (ahi < alo)
               d2 = -d2;
             alpha = ahi - (ahi - alo)*(ahiDFp + d2 - d1)/(ahiDFp - aloDFp + 2*d2);
-            if (alpha < std::min(alo,ahi)+0.01*std::fabs(alo-ahi) ||
+            if (!boost::math::isfinite(alpha) ||
+                alpha < std::min(alo,ahi)+0.01*std::fabs(alo-ahi) ||
                 alpha > std::max(alo,ahi)-0.01*std::fabs(alo-ahi))
               alpha = 0.5*(alo+ahi);
           }
-          
+
           newX = x + alpha*p;
           while (func(newX,newF,newDF)) {
             alpha = 0.5*(alpha+std::min(alo,ahi));
@@ -375,16 +376,16 @@ namespace stan {
         sk.noalias() = _xk - _xk_1;
         // Check for convergence
         if (std::fabs(_fk - _fk_1) < _opts.tolF) {
-          retCode = 1;
+          retCode = 1; // Objective function improvement wasn't sufficient
         }
         else if (gradNorm < _opts.tolF) {
-          retCode = 2;
+          retCode = 2; // Gradient norm was below threshold
         }
         else if (sk.norm() < _opts.tolX) {
-          retCode = 3;
+          retCode = 3; // Change in x was too small
         }
         else {
-          retCode = 0;
+          retCode = 0; // Step was successful more progress to be made
         }
         
         yk.noalias() = _gk - _gk_1;
