@@ -110,6 +110,64 @@ void print_usage() {
   
 }
 
+bool is_matrix(const std::string& parameter_name) {
+  return (parameter_name.find("[") != std::string::npos);
+}
+
+std::string base_param_name(stan::mcmc::chains<>& chains, const int index) {
+  std::string name = chains.param_name(index);
+  return name.substr(0, name.find("["));
+}
+
+std::string matrix_index(stan::mcmc::chains<>& chains, const int index) {
+  std::string name = chains.param_name(index);
+  return name.substr(name.find("["));
+}
+
+std::vector<int> dimensions(stan::mcmc::chains<>& chains, const int start_index) {
+  std::vector<int> dims;
+  int dim;
+
+  std::string name = base_param_name(chains, start_index);
+  int last_matrix_element = start_index;
+  while (last_matrix_element+1 < chains.num_params()) {
+    if (base_param_name(chains, last_matrix_element+1) == name) 
+      last_matrix_element++;
+    else 
+      break;
+  }
+
+  std::stringstream ss(matrix_index(chains, last_matrix_element));
+  ss.get();
+  ss >> dim;
+
+  dims.push_back(dim);
+  while (ss.get() == ',') {
+    ss >> dim;
+    dims.push_back(dim);
+  }
+  return dims;
+}
+
+void next_index(std::vector<int>& index, const std::vector<int>& dims) {
+  index[index.size()-1]++;
+  for (int i = index.size()-1; i >= 0; i--) {
+    if (index[i] > dims[i]) {
+      index[i-1]++;
+      index[i] = 1;
+    }
+  }
+}
+
+int matrix_index(std::vector<int>& index, const std::vector<int>& dims) {
+  int offset = 0;
+  int prod = 1;
+  for (int i = 0; i < dims.size(); i++) {
+    offset += (index[i]-1) * prod;
+    prod *= dims[i];
+  }
+  return offset;
+}
 
 /**
  * The Stan print function.
@@ -326,15 +384,41 @@ int main(int argc, const char* argv[]) {
   
   // Value output
   for (int i = skip; i < chains.num_params(); i++) {
-    std::cout << std::setw(max_name_length + 1) << std::left << chains.param_name(i);
-    std::cout << std::right;
-    for (int j = 0; j < n; j++) {
-      std::cout.setf(formats(j), std::ios::floatfield);
-      std::cout << std::setprecision(
-                   compute_precision(values(i,j), sig_figs, formats(j) == std::ios_base::scientific))
-                << std::setw(column_widths(j)) << values(i, j);
+    if (!is_matrix(chains.param_name(i))) {
+      std::cout << std::setw(max_name_length + 1) << std::left << chains.param_name(i);
+      std::cout << std::right;
+      for (int j = 0; j < n; j++) {
+        std::cout.setf(formats(j), std::ios::floatfield);
+        std::cout << std::setprecision(
+                                       compute_precision(values(i,j), sig_figs, formats(j) == std::ios_base::scientific))
+                  << std::setw(column_widths(j)) << values(i, j);
+      }
+      std::cout << std::endl;
+    } else {
+      std::vector<int> dims = dimensions(chains, i);
+      std::vector<int> index(dims.size(), 1);
+      int max = 1;
+      for (int j = 0; j < dims.size(); j++)
+        max *= dims[j];
+      
+      for (int k = 0; k < max; k++) {
+        int param_index = i + matrix_index(index, dims);
+        std::cout << std::setw(max_name_length + 1) << std::left 
+                  << chains.param_name(param_index);
+        std::cout << std::right;
+        for (int j = 0; j < n; j++) {
+          std::cout.setf(formats(j), std::ios::floatfield);
+          std::cout 
+            << std::setprecision(compute_precision(values(param_index,j), 
+                                                   sig_figs, 
+                                                   formats(j) == std::ios_base::scientific))
+            << std::setw(column_widths(j)) << values(param_index, j);
+        }
+        std::cout << std::endl;
+        next_index(index, dims);
+      }
+      i += max-1;
     }
-    std::cout << std::endl;
   }
 
   /// Footer output
