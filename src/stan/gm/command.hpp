@@ -524,6 +524,7 @@ namespace stan {
           std::cout << std::endl << "TEST GRADIENT MODE" << std::endl;
           int num_failed 
             = stan::model::test_gradients<true,true>(model,cont_params, disc_params);
+          (void) num_failed; // FIXME: do something with the number failed
           return error_codes::OK;
         }
         
