@@ -518,7 +518,7 @@ Then the \Stan executable may be run on Windows using
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
-> my_model sample data=my_data
+> my_model sample data file=my_data
 \end{Verbatim}
 \end{quote}
 %
@@ -532,7 +532,7 @@ necessary to instead execute
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
-> ./my_model sample data=my_data
+> ./my_model sample data file=my_data
 \end{Verbatim}
 \end{quote}
 %
@@ -548,7 +548,7 @@ a Bash shell on Mac or Linux execute
 > for i in {1..4}
 > do
 >   ./my_model sample random seed=12345 \ 
-      id=$i data=my_data \
+      id=$i data file=my_data \
 >     output file=samples$i.csv refresh=0 &
 > done
 >
@@ -567,7 +567,7 @@ snippet above
 \begin{quote}
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
 > for /l %x in (1, 1, 4) do start /b model  sample ^
-< random seed=12345 id=%x data=my_data ^
+< random seed=12345 id=%x data file=my_data ^
 >  output file=samples%x.csv refresh=0
 \end{Verbatim}
 \end{quote}
@@ -724,7 +724,7 @@ then execution immediately terminates with a warning message.}
 
 All commands must include at least one method, specified explicitly as
 \code{method=method\_name} or implicitly with only \code{method\_name}.
-All remaining configurations are optional with defaults values provided
+All remaining configurations are optional with default values provided
 for all arguments.
 
 Additionally, there are various ways of displaying help output instead
@@ -801,7 +801,7 @@ are provided in the next section.
 %
     \hiercmdarg{\indentarrow\indentarrow}{algorithm}{$$list element$$}
       {Sampling algorithm}
-      {Valid values: hmc, rwm}
+      {Valid values: hmc}
       {Defaults to hmc}
 %
       \hierlongcmd{\indentarrow\indentarrow\indentarrow}{hmc}
@@ -912,10 +912,14 @@ are provided in the next section.
   {Valid values: id $>$ 0}
   {Defaults to 0}
 %
-\hiercmdarg{}{data}{$$string$$}
-  {Input data file}
-  {Valid values: Path to existing file}
-  {Defaults to ``''}
+\hierlongcmd{}{data}
+  {Input data options}
+  {Valid subarguments: file}
+%
+  \hiercmdarg{\indentarrow}{file}{$$string$$}
+    {Input data file}
+    {Valid values: Path to existing file}
+    {Defaults to ``''}
 %
 \hiercmdarg{}{init}{$$string$$}
   {Initialization method: ``x'' initializes randomly bewteen [-x, x], ``0'' initializes to 0, anything else identifies a file of values}
@@ -974,7 +978,7 @@ We begin by specifying data and init files,
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
-> ./model data=model.data.R init=model.init.R
+> ./model data file=model.data.R init=model.init.R
 \end{Verbatim}
 \end{quote}
 %
@@ -996,7 +1000,7 @@ model, we can either specify a method implicitly,
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
-> ./model sample data=model.data.R init=model.init.R
+> ./model sample data file=model.data.R init=model.init.R
 \end{Verbatim}
 \end{quote}
 %
@@ -1004,7 +1008,7 @@ or explicitly,
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
-> ./model method=sample data=model.data.R init=model.init.R
+> ./model method=sample data file=model.data.R init=model.init.R
 \end{Verbatim}
 \end{quote}
 %
@@ -1057,7 +1061,7 @@ Fully informed, we can now run with a given seed,
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
-> ./model method=sample data=model.data.R init=model.init.R random seed=5
+> ./model method=sample data fle=model.data.R init=model.init.R random seed=5
 \end{Verbatim}
 \end{quote}
 
@@ -1069,7 +1073,7 @@ to specify the metric we try
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
-> ./model method=sample data=model.data.R init=model.init.R random seed=5 \
+> ./model method=sample data file=model.data.R init=model.init.R random seed=5 \
 > metric=unit
 \end{Verbatim}
 \end{quote}
@@ -1092,7 +1096,7 @@ sampling algorithm, as noted in the suggestion,
 \begin{quote}
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
 > ./model method=sample algorithm=hmc metric=unit \
-> data=model.data.R init=model.init.R random seed=5
+> data file=model.data.R init=model.init.R random seed=5
 \end{Verbatim}
 \end{quote}
 %
@@ -1111,7 +1115,7 @@ Tweaking the metric name we make one last attempt,
 \begin{quote}
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
 > ./model method=sample algorithm=hmc metric=unit_e \
-> data=model.data.R init=model.init.R random seed=5
+> data file=model.data.R init=model.init.R random seed=5
 \end{Verbatim}
 \end{quote}
 %
@@ -1255,7 +1259,7 @@ which itself is a value for the argument \code{engine} which derives from
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
 > ./model method=sample algorithm=hmc metric=unit_e \
 > engine=nuts max_depth=-15 \
-> data=model.data.R init=model.init.R random seed=5
+> data file=model.data.R init=model.init.R random seed=5
 \end{Verbatim}
 \end{quote}
 %
@@ -1277,11 +1281,64 @@ configurations.  Removing the guilty character, we try
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
 > ./model method=sample algorithm=hmc metric=unit_e \
 > engine=nuts max_depth=15 \
-> data=model.data.R init=model.init.R random seed=5
+> data file=model.data.R init=model.init.R random seed=5
 \end{Verbatim}
 \end{quote}
 %
 which finally runs without issue.
+
+\section{Detailed Argument Information}
+
+Given their relative novelty, certain elements of the algorithms in \Stan,
+especially notation, may not be familiar to all users.  Here we discuss
+some of the more abstract notation used in the command line arguments
+introduced above.
+
+\subsection{Adaptation}
+
+Currently all \Stan sampling algorithms utilize dual averaging to
+optimize the step size.  This optimization procedure is extremely
+flexible and for completeness we have exposed each option,
+using the notation of \citep{Hoffman-Gelman:2011, Hoffman-Gelman:2013}.
+In practice the efficacy of the optimization is sensitive to the
+value of these parameters, and we do not recommend
+changing the defaults without experience with the dual averaging
+algorithm.  For more information, see the discussion of dual averaging
+in \citep{Hoffman-Gelman:2011, Hoffman-Gelman:2013}.
+
+\subsection{Hamiltonian Monte Carlo}
+
+Hamiltonian Monte Carlo is a very general approach to sampling that
+utilizes techniques of differential geometry and mathematical physics
+to generate efficient MCMC transitions.  This generality manifests in
+a wealth of implementation choices.
+
+\subsubsection{Engine}
+
+All HMC implementations require at least two parameters: an
+integration step size and a total integration time.  We refer to
+different specifications of the latter as \textit{engines}.
+
+In the \code{static\_hmc} implementation the total integration time
+must be specified by the user, where as the \code{nuts}
+implementation uses the No-U-Turn Sampler to determine
+an optimal integration time dynamically. 
+
+\subsubsection{Metric}
+
+The HMC implementations in \Stan utilize quadratic kinetic energy
+functions which are specified up to the choice of a symmetric,
+positive-definite matrix known as a \textit{mass matrix} or, more
+formally, a \textit{metric} \citep{Betancourt-Stein:2011}.
+
+If the metric is constant then the resulting implementation is known
+as \textit{Euclidean} HMC.  \Stan allows for three Euclidean HMC
+implementations: a unit metric, a diagonal metric, and a dense
+metric.  These can be specified with the values \code{unit\_e},
+\code{diag\_e}, and \code{dense\_e}, respectively.
+
+Future versions of \Stan will also include dynamic metrics associated
+with \textit{Riemannian} HMC \citep{GirolamiCalderhead:2011, Betancourt:2012}.
 
 \chapter{Print Command for Output Analysis}\label{print-command.chapter}
 

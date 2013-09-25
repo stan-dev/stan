@@ -92,7 +92,6 @@ namespace stan {
                   << "%] ";
         std::cout << (warmup ? " (Warmup)" : " (Sampling)");
         std::cout << std::endl;
-          
       }
     
     }
@@ -181,12 +180,6 @@ namespace stan {
       dynamic_cast<Sampler*>(sampler)->set_nominal_stepsize_and_T(epsilon, int_time);
       dynamic_cast<Sampler*>(sampler)->set_stepsize_jitter(epsilon_jitter);
       
-      try {
-        dynamic_cast<Sampler*>(sampler)->init_stepsize();
-      } catch (std::runtime_error e) {
-        std::cout << e.what() << std::endl;
-        return false;
-      }
       
       return true;
       
@@ -209,13 +202,6 @@ namespace stan {
       dynamic_cast<Sampler*>(sampler)->set_stepsize_jitter(epsilon_jitter);
       dynamic_cast<Sampler*>(sampler)->set_max_depth(max_depth);
       
-      try {
-        dynamic_cast<Sampler*>(sampler)->init_stepsize();
-      } catch (std::runtime_error e) {
-        std::cout << e.what() << std::endl;
-        return false;
-      }
-      
       return true;
       
     }
@@ -230,13 +216,22 @@ namespace stan {
       
       double epsilon = dynamic_cast<Sampler*>(sampler)->get_nominal_stepsize();
       
-      dynamic_cast<Sampler*>(sampler)->get_stepsize_adaptation().set_mu(log(10 * epsilon));
-      dynamic_cast<Sampler*>(sampler)->get_stepsize_adaptation().set_delta(delta);
-      dynamic_cast<Sampler*>(sampler)->get_stepsize_adaptation().set_gamma(gamma);
-      dynamic_cast<Sampler*>(sampler)->get_stepsize_adaptation().set_kappa(kappa);
-      dynamic_cast<Sampler*>(sampler)->get_stepsize_adaptation().set_t0(t0);
+      Sampler* s = dynamic_cast<Sampler*>(sampler);
       
-      dynamic_cast<Sampler*>(sampler)->engage_adaptation();
+      s->get_stepsize_adaptation().set_mu(log(10 * epsilon));
+      s->get_stepsize_adaptation().set_delta(delta);
+      s->get_stepsize_adaptation().set_gamma(gamma);
+      s->get_stepsize_adaptation().set_kappa(kappa);
+      s->get_stepsize_adaptation().set_t0(t0);
+      
+      s->engage_adaptation();
+      
+      try {
+        s->init_stepsize();
+      } catch (std::runtime_error e) {
+        std::cout << e.what() << std::endl;
+        return false;
+      }
       
       return true;
       
@@ -253,14 +248,15 @@ namespace stan {
       valid_arguments.push_back(new arg_output());
       
       argument_parser parser(valid_arguments);
-      
-      if (!parser.parse_args(argc, argv, &std::cout, &std::cout)) {
+      int err_code = parser.parse_args(argc, argv, &std::cout, &std::cout);
+
+      if (err_code != 0) {
         std::cout << "Failed to parse arguments, terminating Stan" << std::endl;
-        return 0;
+        return err_code;
       }
       
       if (parser.help_printed())
-        return 0;
+        return err_code;
       
       // Identification
       unsigned int id = dynamic_cast<int_argument*>(parser.arg("id"))->value();
@@ -295,7 +291,7 @@ namespace stan {
       //////////////////////////////////////////////////
       
       // Data input
-      std::string data_file = dynamic_cast<string_argument*>(parser.arg("data"))->value();
+      std::string data_file = dynamic_cast<string_argument*>(parser.arg("data")->arg("file"))->value();
       
       std::fstream data_stream(data_file.c_str(),
                                std::fstream::in);
@@ -375,7 +371,7 @@ namespace stan {
                                                        &std::cout);
           } catch (std::domain_error e) {
             std::cout << "Rejecting inititialization at zero because of log_prob_grad failure." << std::endl;
-            return 0;
+            return error_codes::OK;
           }
           
           if (!boost::math::isfinite(init_log_prob)) {
@@ -526,7 +522,9 @@ namespace stan {
         
         if (test->value() == "gradient") {
           std::cout << std::endl << "TEST GRADIENT MODE" << std::endl;
-          return stan::model::test_gradients<true,true>(model,cont_params, disc_params);
+          int num_failed 
+            = stan::model::test_gradients<true,true>(model,cont_params, disc_params);
+          return error_codes::OK;
         }
         
       }
