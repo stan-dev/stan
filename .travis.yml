@@ -9,7 +9,7 @@ branches:
     - master
 notifications:
   recipients:
-    - stan-buildbot@googlegroups.com
+    - mc.stanislaw@gmail.com
   email:
     on_success: change
     on_failure: always
