@@ -58,7 +58,7 @@ namespace stan {
        * @param vi Variable implementation. 
        */
       explicit var(vari* vi)
-      : vi_(vi) 
+        : vi_(vi) 
       {  }
 
       /**
@@ -68,9 +68,9 @@ namespace stan {
        * dangling.  Before an assignment, the behavior is thus undefined just
        * as for a basic double.
        */
-       var() 
-       : vi_(static_cast<vari*>(0U))
-       { }
+      var() 
+        : vi_(static_cast<vari*>(0U))
+      { }
 
       /**      
        * Construct a variable by static casting the specified

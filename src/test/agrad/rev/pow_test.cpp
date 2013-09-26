@@ -39,3 +39,23 @@ TEST(AgradRev,pow_double_var) {
   f.grad(x,g);
   EXPECT_FLOAT_EQ(log(3.0) * pow(3.0,4.0), g[0]);
 }
+
+TEST(AgradRev,pow_boundry) {
+  double inf = std::numeric_limits<double>::infinity();
+  AVAR a = inf;
+  AVAR b = 5;
+  AVAR f = pow(a,b);
+  EXPECT_FLOAT_EQ(inf, f.val());
+  AVAR g = pow(b,a);
+  EXPECT_FLOAT_EQ(inf, g.val());
+
+  AVAR c = -inf;
+  AVAR d = 6;
+  AVAR h = pow(c,b);
+  EXPECT_FLOAT_EQ(-inf, h.val());
+  AVAR i = pow(c,d);
+  EXPECT_FLOAT_EQ(inf, i.val());
+
+  AVAR j = pow(b,c);
+  EXPECT_FLOAT_EQ( 0.0 ,j.val());
+}
