@@ -5,7 +5,7 @@ compiler:
 env:
   - RUN_TARGET=build TEST_TARGET=test-unit
   - RUN_TARGET=docs
-script: make CC="$CXX" "${RUN_TARGET}" "${TEST_TARGET}"
+script: make CC="$CXX" ${RUN_TARGET} ${TEST_TARGET}
 branches:
   only:
     - develop
