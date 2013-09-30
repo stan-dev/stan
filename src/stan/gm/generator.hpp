@@ -49,6 +49,14 @@ namespace stan {
         o << INDENT;
     }
 
+    void generate_void_statement(const std::string& name,
+                                 const size_t indent,
+                                 std::ostream& o)  {
+      generate_indent(indent, o);
+      o << "(void) " << name << ";   // dummy to suppress unused var warning";
+      o << EOL;
+    }
+
     /** generic visitor with output for extension */
     struct visgen {
       typedef void result_type;
@@ -598,6 +606,7 @@ namespace stan {
         }
         
         if (dims.size() == 0) {
+          generate_void_statement(name, 2, o_);
           o_ << INDENT2 << "if (jacobian__)" << EOL;
 
           // w Jacobian

@@ -48,7 +48,7 @@ namespace stan {
                                   const Eigen::Matrix<double,RB,CB> &Bd,
                                   const double &adjC)
         {
-          size_t i,j;
+          int i,j;
           Eigen::Matrix<double,RA,CA>     adjA(adjC*Bd*Bd.transpose());
           for (j = 0; j < A.cols(); j++)
             for (i = 0; i < A.rows(); i++)
@@ -59,7 +59,7 @@ namespace stan {
                                   const Eigen::Matrix<double,RB,CB> &Bd,
                                   const double &adjC)
         {
-          size_t i,j;
+          int i,j;
           Eigen::Matrix<double,RA,CA>     adjB(adjC*(Ad + Ad.transpose())*Bd);
           for (j = 0; j < B.cols(); j++)
             for (i = 0; i < B.rows(); i++)
