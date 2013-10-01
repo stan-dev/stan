@@ -2425,9 +2425,11 @@ namespace stan {
                                const std::string& var_name,
                                const std::vector<expression>& dims) const {
         generate_dims_loop_fwd(dims);
-        o_ << "writer__." << write_method_name;
+        o_ << "try { writer__." << write_method_name;
         generate_name_dims(var_name,dims.size());
-        o_ << ");" << EOL;
+        o_ << "); } catch (std::exception& e) { "
+              " throw std::runtime_error(std::string(\"Error transforming variable "
+           << var_name << ": \") + e.what()); }" << EOL;
       }
       void generate_name_dims(const std::string name, 
                               size_t num_dims) const {
