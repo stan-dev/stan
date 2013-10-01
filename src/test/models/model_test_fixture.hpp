@@ -322,7 +322,7 @@ TYPED_TEST_P(Model_Test_Fixture, ChainsTest) {
     parse_command_output(TypeParam::command_outputs[chain]);
 
     std::string msg = "Seed is : ";
-    for (int option = 0; option < options.size(); option++) {
+    for (size_t option = 0; option < options.size(); option++) {
       if (options[option].first == "seed")
         msg += options[option].second;
     }
@@ -433,7 +433,7 @@ TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTest) {
       std::vector<std::pair<std::string, std::string> > options = 
         parse_command_output(TypeParam::command_outputs[chain]);
 
-      for (int option = 0; option < options.size(); option++) {
+      for (size_t option = 0; option < options.size(); option++) {
         if (options[option].first == "seed")
           err_message << "seed: " << options[option].second << std::endl;
       }
