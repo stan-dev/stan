@@ -31,7 +31,7 @@ public:
     parser = new argument_parser(valid_arguments);
   }
   void TearDown() {
-    for (int i = 0; i < valid_arguments.size(); ++i)
+    for (size_t i = 0; i < valid_arguments.size(); ++i)
       delete valid_arguments.at(i);
     delete(parser);
   }

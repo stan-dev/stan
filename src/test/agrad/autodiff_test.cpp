@@ -164,7 +164,7 @@ TEST(AgradAutodiff,hessian) {
   fun1 f;
   Matrix<double,Dynamic,1> x(2);
   x << 5, 7;
-  double fx;
+  double fx(0);
   Matrix<double,Dynamic,1> grad;
   Matrix<double,Dynamic,Dynamic> H;
   stan::agrad::hessian(f,x,fx,grad,H);

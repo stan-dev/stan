@@ -49,6 +49,14 @@ namespace stan {
         o << INDENT;
     }
 
+    void generate_void_statement(const std::string& name,
+                                 const size_t indent,
+                                 std::ostream& o)  {
+      generate_indent(indent, o);
+      o << "(void) " << name << ";   // dummy to suppress unused var warning";
+      o << EOL;
+    }
+
     /** generic visitor with output for extension */
     struct visgen {
       typedef void result_type;
@@ -598,6 +606,7 @@ namespace stan {
         }
         
         if (dims.size() == 0) {
+          generate_void_statement(name, 2, o_);
           o_ << INDENT2 << "if (jacobian__)" << EOL;
 
           // w Jacobian
@@ -1017,6 +1026,11 @@ namespace stan {
           o_ << ">";
         }
       }
+
+      void generate_void_statement(const std::string& name) const {
+        o_ << "(void) " << name << ";   // dummy to suppress unused var warning";
+      }
+
       // var_decl     -> type[0] name init_args[0] ;
       // init_args[k] -> ctor_args  if no dims left
       // init_args[k] -> ( dim[k] , ( type[k+1] init_args[k+1] ) )   
@@ -1079,6 +1093,11 @@ namespace stan {
         o_ << ' '  << name;
         generate_init_args(type,ctor_args,dims,0);
         o_ << ';' << EOL;
+        if (dims.size() == 0) {
+          generate_indent(indents_,o_);
+          generate_void_statement(name);
+          o_ << EOL;
+        }
         if (type == "Eigen::Matrix<T__,Eigen::Dynamic,Eigen::Dynamic> "
             || type == "Eigen::Matrix<T__,1,Eigen::Dynamic> " 
             || type == "Eigen::Matrix<T__,Eigen::Dynamic,1> ") {
@@ -2537,6 +2556,7 @@ namespace stan {
       o << INDENT << "                     std::vector<double>& params_r__) const {" << EOL;
       o << INDENT2 << "stan::io::writer<double> writer__(params_r__,params_i__);" << EOL;
       o << INDENT2 << "size_t pos__;" << EOL;
+      o << INDENT2 << "(void) pos__; // dummy call to supress warning" << EOL;
       o << INDENT2 << "std::vector<double> vals_r__;" << EOL;
       o << INDENT2 << "std::vector<int> vals_i__;" << EOL;
       o << EOL;

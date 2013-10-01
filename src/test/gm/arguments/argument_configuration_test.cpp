@@ -53,7 +53,7 @@ TEST(StanGmArgumentsConfiguration, TestMethod) {
   probe.probe_args(s);
   
   // Check argument consistency
-  bool expected_success;
+  bool expected_success = false;
   
   std::string l1;
   std::stringstream expected_output;
@@ -141,7 +141,7 @@ TEST(StanGmArgumentsConfiguration, TestMethod) {
     }
   }
   
-  for (int i = 0; i < valid_arguments.size(); ++i)
+  for (size_t i = 0; i < valid_arguments.size(); ++i)
     delete valid_arguments.at(i);
 }
 
@@ -185,7 +185,7 @@ TEST(StanGmArgumentsConfiguration, TestIdWithMethod) {
   probe.probe_args(s);
   
   // Check argument consistency
-  bool expected_success;
+  bool expected_success = false;
   
   std::string l1;
   std::stringstream expected_output;
@@ -262,7 +262,7 @@ TEST(StanGmArgumentsConfiguration, TestIdWithMethod) {
     
   }
   
-  for (int i = 0; i < valid_arguments.size(); ++i)
+  for (size_t i = 0; i < valid_arguments.size(); ++i)
     delete valid_arguments.at(i);
 
 }
@@ -288,7 +288,7 @@ TEST(StanGmArgumentsConfiguration, TestIdWithoutMethod) {
   probe.probe_args(s);
   
   // Check argument consistency
-  bool expected_success;
+  bool expected_success = false;
   
   std::string l1;
   std::stringstream expected_output;
@@ -370,7 +370,7 @@ TEST(StanGmArgumentsConfiguration, TestIdWithoutMethod) {
     
   }
   
-  for (int i = 0; i < valid_arguments.size(); ++i)
+  for (size_t i = 0; i < valid_arguments.size(); ++i)
     delete valid_arguments.at(i);
   
 }
@@ -415,7 +415,7 @@ TEST(StanGmArgumentsConfiguration, TestDataWithMethod) {
   probe.probe_args(s);
   
   // Check argument consistency
-  bool expected_success;
+  bool expected_success = false;
   
   std::string l1;
   std::stringstream expected_output;
@@ -492,7 +492,7 @@ TEST(StanGmArgumentsConfiguration, TestDataWithMethod) {
     
   }
   
-  for (int i = 0; i < valid_arguments.size(); ++i)
+  for (size_t i = 0; i < valid_arguments.size(); ++i)
     delete valid_arguments.at(i);
   
 }
@@ -518,7 +518,7 @@ TEST(StanGmArgumentsConfiguration, TestDataWithoutMethod) {
   probe.probe_args(s);
   
   // Check argument consistency
-  bool expected_success;
+  bool expected_success = false;
   
   std::string l1;
   std::stringstream expected_output;
@@ -600,7 +600,7 @@ TEST(StanGmArgumentsConfiguration, TestDataWithoutMethod) {
     
   }
   
-  for (int i = 0; i < valid_arguments.size(); ++i)
+  for (size_t i = 0; i < valid_arguments.size(); ++i)
     delete valid_arguments.at(i);
   
 }
@@ -645,7 +645,7 @@ TEST(StanGmArgumentsConfiguration, TestInitWithMethod) {
   probe.probe_args(s);
   
   // Check argument consistency
-  bool expected_success;
+  bool expected_success = false;
   
   std::string l1;
   std::stringstream expected_output;
@@ -722,7 +722,7 @@ TEST(StanGmArgumentsConfiguration, TestInitWithMethod) {
     
   }
   
-  for (int i = 0; i < valid_arguments.size(); ++i)
+  for (size_t i = 0; i < valid_arguments.size(); ++i)
     delete valid_arguments.at(i);
   
 }
@@ -748,7 +748,7 @@ TEST(StanGmArgumentsConfiguration, TestInitWithoutMethod) {
   probe.probe_args(s);
   
   // Check argument consistency
-  bool expected_success;
+  bool expected_success = false;
   
   std::string l1;
   std::stringstream expected_output;
@@ -830,7 +830,7 @@ TEST(StanGmArgumentsConfiguration, TestInitWithoutMethod) {
     
   }
   
-  for (int i = 0; i < valid_arguments.size(); ++i)
+  for (size_t i = 0; i < valid_arguments.size(); ++i)
     delete valid_arguments.at(i);
   
 }
@@ -875,7 +875,7 @@ TEST(StanGmArgumentsConfiguration, TestRandomWithMethod) {
   probe.probe_args(s);
   
   // Check argument consistency
-  bool expected_success;
+  bool expected_success = false;
   
   std::string l1;
   std::stringstream expected_output;
@@ -952,7 +952,7 @@ TEST(StanGmArgumentsConfiguration, TestRandomWithMethod) {
     
   }
   
-  for (int i = 0; i < valid_arguments.size(); ++i)
+  for (size_t i = 0; i < valid_arguments.size(); ++i)
     delete valid_arguments.at(i);
   
 }
@@ -978,7 +978,7 @@ TEST(StanGmArgumentsConfiguration, TestRandomWithoutMethod) {
   probe.probe_args(s);
   
   // Check argument consistency
-  bool expected_success;
+  bool expected_success = false;
   
   std::string l1;
   std::stringstream expected_output;
@@ -1060,7 +1060,7 @@ TEST(StanGmArgumentsConfiguration, TestRandomWithoutMethod) {
     
   }
   
-  for (int i = 0; i < valid_arguments.size(); ++i)
+  for (size_t i = 0; i < valid_arguments.size(); ++i)
     delete valid_arguments.at(i);
   
 }
@@ -1105,7 +1105,7 @@ TEST(StanGmArgumentsConfiguration, TestOutputWithMethod) {
   probe.probe_args(s);
   
   // Check argument consistency
-  bool expected_success;
+  bool expected_success = false;
   
   std::string l1;
   std::stringstream expected_output;
@@ -1182,7 +1182,7 @@ TEST(StanGmArgumentsConfiguration, TestOutputWithMethod) {
     
   }
   
-  for (int i = 0; i < valid_arguments.size(); ++i)
+  for (size_t i = 0; i < valid_arguments.size(); ++i)
     delete valid_arguments.at(i);
   
 }
@@ -1208,7 +1208,7 @@ TEST(StanGmArgumentsConfiguration, TestOutputWithoutMethod) {
   probe.probe_args(s);
   
   // Check argument consistency
-  bool expected_success;
+  bool expected_success = false;
   
   std::string l1;
   std::stringstream expected_output;
@@ -1290,7 +1290,7 @@ TEST(StanGmArgumentsConfiguration, TestOutputWithoutMethod) {
     
   }
   
-  for (int i = 0; i < valid_arguments.size(); ++i)
+  for (size_t i = 0; i < valid_arguments.size(); ++i)
     delete valid_arguments.at(i);
   
 }
