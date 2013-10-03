@@ -85,14 +85,13 @@ on the compiler and linker.
 \begin{itemize}
 \item Linux (Debian, Ubuntu, Red Hat), 
 \item Mac OS X (Snow Leopard, Lion, Mountain Lion), and
-\item Windows (XP, 7).
+\item Windows (XP, 7, 8).
 \end{itemize}
 %
 \Stan should work on other versions of these operating systems if
 compatible \Cpp compilers can be found.  The plan is to keep up with
 new versions of these operating systems and gradually phase out
 testing on older versions.
-
 
 
 \section{Step-by-Step Mac Install Instructions}
@@ -276,17 +275,9 @@ with
 
 \section{Step-by-Step Windows Install Instructions}
 
-Stan has been tested on Windows XP and Windows 7.
-
-\subsection{Note for Cygwin Users}
-
-Stan can be run under Cygwin, the Linux look-and-feel environment for
-Windows.  Cygwin must have recent versions of \code{make} and
-\code{g++} (part of gcc) installed.  Within a Cygwin shell, Stan
-will behave as under Linux. 
-
-The remaining instructions in this section are for users wishing to
-run Stan under Windows in a command (i.e., DOS) shell.
+Stan has been tested on Windows XP, Windows 7, and Windows 8.  See
+Section~\refsection{cygwin} for instructions for installing for Cygwin
+on Windows.
 
 \subsection{Windows Tips}
 
@@ -401,6 +392,56 @@ The \code{--no-same-owner} flag is not strictly necessary,
 but it removes a bunch of irrelevant warnings.
 
 
+\subsection{64-bit Cygwin Install Instructions}\label{cygwin.section}
+
+Stan can be run under Cygwin, the Unix look-and-feel environment for
+Windows.  Cygwin must have recent versions of \code{make} and
+\code{g++} (part of gcc) installed.  Within a Cygwin shell, Stan
+will behave as under other Unixes.
+
+Thanks to Kevin van Horn for mailing the following instructions into
+the Stan-users mailing list.  They only cover 64-bit R and 64-bit
+Cygwin, but that is what you should be using for Stan anyway.
+
+\begin{enumerate}
+\item Kill all Cygwin bash shells and shut down R.
+\item After installing R and Rtools, make sure that R and Rtools are
+  in the \code{PATH} environment variable. My R installation directory was
+  \Verb|c:\Program Files\R\R-3.0.1| and my Rtools installation
+  directory was \Verb|c:\Rtools|, so I added the following to the end
+  of my user \code{PATH} variable:
+  \begin{itemize}
+  \item \Verb|C:\Program Files\R\R-3.0.1\bin\x64|
+  \item \Verb|C:\Rtools\bin|
+  \item \Verb|C:\Rtools\gcc-4.6.3\bin|
+  \end{itemize}
+\item Now there could be a conflict between Cygwin and Rtools when
+  running a bash shell under Cygwin, so I added the following lines to
+  my \Verb|.bash_profile| file to remove any \code{PATH} directory
+  referencing Rtools:
+  \begin{Verbatim}
+> TMP=`echo $PATH | /usr/bin/tr ':' '\n'                      \
+                  | /usr/bin/egrep -iv '^/cygdrive/c/Rtools/' \
+                  | tr '\n' ':'`
+> PATH=${TMP%:}
+\end{Verbatim}
+(Note that the backslash characters signal that the line continues
+after a return.)  This was only necessary to allow me to continue
+using Cygwin.
+\item Apparently there is something in \code{Rcpp} or \code{inline} or
+  \code{rstan} that doesn't like \code{UNC} paths. My home directory
+  was \Verb|\\server\users\kevinv| and apparently this caused my
+  local R library directory to be \Verb|\server\users\kevinv\R|
+  as verified by \code{.libPaths()} from the R command prompt. 
+
+  I fixed this by copying the entire directory tree rooted at
+  \Verb|\server\users\kevinv\R| over to a local directory on my workstation,
+  \Verb|C:\Users\KevinV\R|, then adding the user environment variable
+  \Verb|R_LIBS_USER=C:\Users\KevinV\R|. I shut down R and restarted it.
+\item At this point the instructions given for installing Rstan
+  finally worked.
+\end{enumerate}
+
 
 \section{Required Software and Tools}
 
@@ -430,7 +471,7 @@ template metaprogramming facilities are implemented with the Boost
 \begin{itemize}
 \item Home: http://www.boost.org/users/license.html
 \item License: Boost Software License
-\item Tested Version: 1.53.0
+\item Tested Version: 1.54.0
 \end{itemize}
 %
 The Boost source code is distributed with \Stan.
@@ -444,7 +485,7 @@ algebra library.
 \begin{itemize}
 \item Home: \url{http://eigen.tuxfamily.org}
 \item License: Mozilla Public License, version 2.0
-\item Tested Version: 3.1.2
+\item Tested Version: 3.2.0
 \end{itemize}
 %
 The Eigen source code is distributed with \Stan.
@@ -479,6 +520,14 @@ License: BSD
 %
 \end{itemize}
 %
+
+\subsubsection{\Cpp-11 Support} 
+
+Stan 2.0 does not support \Cpp-11.  The remaining incompatibility with
+the parser will be included soon after Stan 2.0 is released.  This
+will include support for the latest versions of \code{g++} and
+\code{clang++}.
+
 
 \section{Optional Components for Developers}
 

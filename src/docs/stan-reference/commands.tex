@@ -1454,6 +1454,17 @@ dimensionality and its values.   There are three kinds of variable
 declarations, one for scalars, one for sequences, and one for general
 arrays.
 
+\section{Creating Dump Files}
+
+Dump files can be created from R using RStan.  The function is
+\code{stan\_rdump} in package \code{rstan}.
+
+Using R's native \code{dump()} function can produce dump files which
+Stan cannot read in.  The underlying cause is that R gets creative in
+the format it uses for output, only being constrained to something
+that can be executed in R.  So it will write the array containing the
+values 1, 2, 3, 4 as \code{1:4} rather than as \code{c(1,2,3,4)}.
+
 \section{Scalar Variables}
 
 A simple scalar value can be thought of as having an empty list of
@@ -1470,6 +1481,7 @@ y <-
 \end{quote}
 %
 A scalar value is just a zero-dimensional array value.
+
 
 \section{Sequence Variables}
 
@@ -1580,20 +1592,79 @@ z[2,1,4] = 20   z[2,2,4] = 22   z[2,3,4] = 24
 \end{verbatim}
 \end{quote}
 
+\section{Matrix- and Vector-Valued Variables}
 
+The dump format for matrices and vectors, including arrays of matrices
+and vectors, is the same as that for arrays of the same shape.
+
+\subsection{Vector Dump Format}
+
+The following three declarations have the same dump format for their
+data.
+%
+\begin{quote}
+\begin{Verbatim}
+real a[K];
+vector[K] b;
+row_vector[K] c;
+\end{Verbatim}
+\end{quote}
+
+\subsection{Matrix Dump Format}
+
+The following declarations have the same dump format.
+%
+\begin{quote}
+\begin{Verbatim}
+real a[M,N];
+matrix[M,N] b;
+\end{Verbatim}
+\end{quote}
+
+\subsection{Arrays of Vectors and Matrices}
+
+The key to undertanding arrays is that the array indexing comes before
+any of the container indexing.  That is, an array of vectors is just
+that --- provide an index and get a vector.  See
+Section~\refsection{arrays-of-matrices} for more information on
+indexing and assignment.
+
+For the dump data format, the following declarations have the same
+arrangement.
+%
+\begin{quote}
+\begin{Verbatim}
+real a[M,N];
+matrix[M,N] b;
+vector[N] c[M];
+row_vector[N] d[M];
+\end{Verbatim}
+\end{quote}
+%
+Similarly, the following also have the same dump format.
+%
+\begin{quote}
+\begin{Verbatim}
+real a[P,M,N];
+matrix[M,N] b[P];
+vector[N] c[P,M];
+row_vector[N] d[P,M];
+\end{Verbatim}
+\end{quote}
 
 \section{Integer- and Real-Valued Variables}
 
 There is no declaration in a dump file that distinguishes integer
 versus continuous values.  If a value in a dump file's definition of a
-variable contains a decimal point, \Stan assumes that the values are
-real.  
+variable contains a decimal point (e.g., \code{132.3}) or uses
+scientific notation (e.g., \code{1.323e2}), \Stan assumes that the
+values are real.
 
 For a single value, if there is no decimal point, it may be assigned
 to an \code{int} or \code{real} variable in \Stan.  An array value may
 only be assigned to an \code{int} array if there is no decimal point
-in any of the values.  This convention is compatible with the way \R
-writes data.
+or scientific notation in any of the values.  This convention is
+compatible with the way \R writes data.
 
 The following dump file declares an integer value for \code{y}.
 %
@@ -1632,6 +1703,14 @@ Even though this is a round value, the occurrence of the decimal
 point in the value, \code{2.0}, causes \Stan to infer that \code{y} is
 real valued.  This dump file may only be used for variables \code{y}
 declared as real in \Stan.
+
+\subsection{Scientific Notation}
+
+Numbers written in scientific notation may only be used for real
+values in Stan.  R will write out the integer one million as
+\code{1e+06}.  
+
+
 
 
 \subsection{Infinite and Not-a-Number Values}
