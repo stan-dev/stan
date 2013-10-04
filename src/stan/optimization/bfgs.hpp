@@ -435,6 +435,8 @@ namespace stan {
                           std::vector<double>& params_r,
                           std::vector<int>& params_i,
                           std::ostream* o = 0) {
+      // FIXME: is this supposed to return the log probability from the model?
+      return 0;
     }
 
     template <class M>

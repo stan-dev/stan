@@ -56,11 +56,11 @@ int calculate_column_width(const Eigen::VectorXd& x,
   int padding = 2;
   
   // Fixed Precision
-  int fixed_threshold = 8;
-  int max_fixed_width = 0;
+  size_t fixed_threshold = 8;
+  size_t max_fixed_width = 0;
   
   for (int i = 0; i < x.size(); ++i) {
-    int width = compute_width(x[i], sig_figs);
+    size_t width = compute_width(x[i], sig_figs);
     max_fixed_width = width > max_fixed_width ? width : max_fixed_width;
   }
   
@@ -71,7 +71,7 @@ int calculate_column_width(const Eigen::VectorXd& x,
   }
   
   // Scientific Notation
-  int scientific_width = sig_figs + 1 + 4; // Decimal place + exponent
+  size_t scientific_width = sig_figs + 1 + 4; // Decimal place + exponent
   if (x.minCoeff() < 0) ++scientific_width;
   
   scientific_width = name.length() > scientific_width ? name.length() : scientific_width;
@@ -254,7 +254,7 @@ int main(int argc, const char* argv[]) {
   // Compute largest variable name length
   const int skip = 0;
   std::string model_name = stan_csv.metadata.model;
-  int max_name_length = 0;
+  size_t max_name_length = 0;
   for (int i = skip; i < chains.num_params(); i++) 
     if (chains.param_name(i).length() > max_name_length)
       max_name_length = chains.param_name(i).length();
