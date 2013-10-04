@@ -419,11 +419,11 @@ TEST(io_dump, it_sign_ksvanhorn) {
   EXPECT_TRUE(dump.contains_r("sigma"));
 
   vector<int> N_values = dump.vals_i("N");
-  EXPECT_EQ(1,N_values.size());
+  EXPECT_EQ(1U,N_values.size());
   EXPECT_EQ(5,N_values[0]);
 
   vector<double> y_values = dump.vals_r("y");
-  EXPECT_EQ(5,y_values.size());
+  EXPECT_EQ(5U,y_values.size());
   EXPECT_FLOAT_EQ(2,y_values[0]);
   EXPECT_FLOAT_EQ(1,y_values[1]);
   EXPECT_FLOAT_EQ(1,y_values[2]);
@@ -431,7 +431,7 @@ TEST(io_dump, it_sign_ksvanhorn) {
   EXPECT_FLOAT_EQ(-3.4,y_values[4]);
 
   vector<double> sigma_values = dump.vals_r("sigma");
-  EXPECT_EQ(1,sigma_values.size());
+  EXPECT_EQ(1U,sigma_values.size());
   EXPECT_FLOAT_EQ(3,sigma_values[0]);
   
 }

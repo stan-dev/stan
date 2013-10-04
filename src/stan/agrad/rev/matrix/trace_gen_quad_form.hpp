@@ -60,21 +60,21 @@ namespace stan {
           
           if (varB) {
             Eigen::Matrix<double,RB,CB> adjB(adj*(A*BD + AtB*D.transpose()));
-            size_t i,j;
+            int i,j;
             for (j = 0; j < B.cols(); j++)
               for (i = 0; i < B.rows(); i++)
                 (*varB)(i,j).vi_->adj_ += adjB(i,j);
           }
           if (varA) {
             Eigen::Matrix<double,RA,CA> adjA(adj*(B*BD.transpose()));
-            size_t i,j;
+            int i,j;
             for (j = 0; j < A.cols(); j++)
               for (i = 0; i < A.rows(); i++)
                 (*varA)(i,j).vi_->adj_ += adjA(i,j);
           }
           if (varD) {
             Eigen::Matrix<double,RD,CD> adjD(adj*(B.transpose()*AtB));
-            size_t i,j;
+            int i,j;
             for (j = 0; j < D.cols(); j++)
               for (i = 0; i < D.rows(); i++)
                 (*varD)(i,j).vi_->adj_ += adjD(i,j);

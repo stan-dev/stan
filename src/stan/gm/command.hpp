@@ -524,6 +524,7 @@ namespace stan {
           std::cout << std::endl << "TEST GRADIENT MODE" << std::endl;
           int num_failed 
             = stan::model::test_gradients<true,true>(model,cont_params, disc_params);
+          (void) num_failed; // FIXME: do something with the number failed
           return error_codes::OK;
         }
         
@@ -562,7 +563,7 @@ namespace stan {
           double lastlp = lp - 1;
           std::cout << "Initial log joint probability = " << lp << std::endl;
           int m = 0;
-          for (size_t i = 0; i < num_iterations; i++) {
+          for (int i = 0; i < num_iterations; i++) {
             lastlp = lp;
             lp = ng.step();
             ng.params_r(cont_params);
@@ -656,7 +657,7 @@ namespace stan {
           int m = 0;
           int ret = 0;
           
-          for (size_t i = 0; i < num_iterations && ret == 0; i++) {
+          for (int i = 0; i < num_iterations && ret == 0; i++) {
             
             ret = ng.step();
             lp = ng.logp();
@@ -925,7 +926,7 @@ namespace stan {
         delete diagnostic_stream;
       }
       
-      for (int i = 0; i < valid_arguments.size(); ++i)
+      for (size_t i = 0; i < valid_arguments.size(); ++i)
         delete valid_arguments.at(i);
       
       return 0;

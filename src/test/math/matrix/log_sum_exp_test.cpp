@@ -7,7 +7,7 @@ void test_log_sum_exp(const Eigen::Matrix<double,R,C>& as) {
   using std::exp;
   using stan::math::log_sum_exp;
   double sum_exp = 0.0;
-  for (size_t n = 0; n < as.size(); ++n)
+  for (int n = 0; n < as.size(); ++n)
     sum_exp += exp(as(n));
   EXPECT_FLOAT_EQ(log(sum_exp),
                   log_sum_exp(as));
