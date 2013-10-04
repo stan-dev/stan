@@ -1,10 +1,10 @@
 #ifndef __STAN__IO__CSV_WRITER_HPP__
 #define __STAN__IO__CSV_WRITER_HPP__
 
+#include <stan/math/matrix.hpp>
 #include <ostream>
 #include <limits>
 #include <iomanip>
-#include <stan/math/matrix.hpp>
 
 namespace stan {
 

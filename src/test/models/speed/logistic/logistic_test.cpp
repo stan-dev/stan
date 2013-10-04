@@ -349,7 +349,7 @@ public:
     //<< " --refresh=" << iterations;
     //vector<std::string> command_outputs;  
     //long time = run_stan(command.str(), filename, command_outputs);
-    long time = 0;
+    //long time = 0;
     
     SUCCEED();
   }

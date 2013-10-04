@@ -63,7 +63,7 @@ namespace stan {
       using stan::math::sum;
 
       double lp = 0.0;
-      for (int k = 0; k < ns.size(); ++k)
+      for (size_t k = 0; k < ns.size(); ++k)
         if (!check_bounded(function, ns[k], 1, beta.size(),
                            "categorical outcome out of support",
                            &lp))
@@ -84,7 +84,7 @@ namespace stan {
       // FIXME:  replace with more efficient sum()
       Eigen::Matrix<typename boost::math::tools::promote_args<T_prob>::type,
                     Eigen::Dynamic,1> results(ns.size());
-      for (int i = 0; i < ns.size(); ++i)
+      for (size_t i = 0; i < ns.size(); ++i)
         results[i] = log_softmax_beta(ns[i] - 1);
       return sum(results);
     }

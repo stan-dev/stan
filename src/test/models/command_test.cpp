@@ -40,14 +40,14 @@ std::vector<std::string> split_lines(const std::string& text) {
 }
 
 std::vector<std::string> next_block(const std::vector<std::string>& lines,
-                                    const int& start) {
+                                    const size_t& start) {
   if (start > lines.size()) {
     ADD_FAILURE() << start 
                   << " is greater than the size of the lines: " 
                   << lines.size();
   }
   std::vector<std::string> block;
-  for (int n = start; n < lines.size(); n++) {
+  for (size_t n = start; n < lines.size(); n++) {
     block.push_back(lines[n]);
     if (lines[n] == "") {
       return(block);
@@ -57,7 +57,7 @@ std::vector<std::string> next_block(const std::vector<std::string>& lines,
 }
 
 TEST_F(ModelCommand, check_help_options) {
-  int line_number = 0;
+  size_t line_number = 0;
   std::string help_command = model_path + " help";
   std::vector<std::string> output;
   std::vector<std::string> block;
@@ -68,8 +68,8 @@ TEST_F(ModelCommand, check_help_options) {
   
   // Usage
   block = next_block(output, line_number);
-  ASSERT_EQ(2, block.size());
-  EXPECT_EQ(0, block[0].find("Usage"))
+  ASSERT_EQ(2U, block.size());
+  EXPECT_EQ(0U, block[0].find("Usage"))
     << "line " << line_number + 0 << ": "
     << "expecting 'Usage' line. Found: "
     << block[0];
@@ -78,8 +78,8 @@ TEST_F(ModelCommand, check_help_options) {
   
   // Method
   block = next_block(output, line_number);
-  ASSERT_EQ(5, block.size());
-  EXPECT_EQ(0, block[0].find("Begin by selecting"))
+  ASSERT_EQ(5U, block.size());
+  EXPECT_EQ(0U, block[0].find("Begin by selecting"))
     << "line " << line_number + 0 << ": "
     << "expecting 'Begin by selecting' line. Found: "
     << block[0];
@@ -88,8 +88,8 @@ TEST_F(ModelCommand, check_help_options) {
 
   // Help
   block = next_block(output, line_number);
-  ASSERT_EQ(4, block.size());
-  EXPECT_EQ(0, block[0].find("Or see help"))
+  ASSERT_EQ(4U, block.size());
+  EXPECT_EQ(0U, block[0].find("Or see help"))
   << "line " << line_number + 0 << ": "
   << "expecting 'Or see help' line. Found: "
   << block[0];
@@ -98,8 +98,8 @@ TEST_F(ModelCommand, check_help_options) {
   
   // Configuration
   block = next_block(output, line_number);
-  ASSERT_EQ(7, block.size());
-  EXPECT_EQ(0, block[0].find("Additional configuration"))
+  ASSERT_EQ(7U, block.size());
+  EXPECT_EQ(0U, block[0].find("Additional configuration"))
   << "line " << line_number + 0 << ": "
   << "expecting 'Additional configuration' line. Found: "
   << block[0];
@@ -108,8 +108,8 @@ TEST_F(ModelCommand, check_help_options) {
   
   // Footer
   block = next_block(output, line_number);
-  ASSERT_EQ(2, block.size());
-  EXPECT_EQ(0, block[0].find("See"))
+  ASSERT_EQ(2U, block.size());
+  EXPECT_EQ(0U, block[0].find("See"))
   << "line " << line_number + 0 << ": "
   << "expecting 'See' line. Found: "
   << block[0];
