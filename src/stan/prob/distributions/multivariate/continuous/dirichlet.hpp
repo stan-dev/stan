@@ -50,6 +50,8 @@ namespace stan {
       using boost::math::tools::promote_args;
       using stan::math::check_consistent_sizes;
       using stan::math::check_positive;
+      using stan::math::check_simplex;
+      using stan::math::multiply_log;
       
       typename promote_args<T_prob,T_prior_sample_size>::type lp(0.0);      
       if (!check_consistent_sizes(function, theta, alpha,
@@ -58,10 +60,9 @@ namespace stan {
 	return lp;
       if (!check_positive(function, alpha, "prior sample sizes", &lp))
 	return lp;
-      // FIXME: parameter check
+      if (!check_simplex(function, theta, "probabilities", &lp))
+	return lp;
 
-
-      using stan::math::multiply_log;
       if (include_summand<propto,T_prior_sample_size>::value) {
         lp += lgamma(alpha.sum());
         for (int k = 0; k < alpha.rows(); ++k)
