@@ -49,13 +49,15 @@ namespace stan {
       using boost::math::lgamma;
       using boost::math::tools::promote_args;
       using stan::math::check_consistent_sizes;
-
+      using stan::math::check_positive;
+      
       typename promote_args<T_prob,T_prior_sample_size>::type lp(0.0);      
-      if (!check_consistent_sizes(function,theta,alpha,
-				  "probabilities","prior sample sizes",
+      if (!check_consistent_sizes(function, theta, alpha,
+				  "probabilities", "prior sample sizes",
 				  &lp))
 	return lp;
-
+      if (!check_positive(function, alpha, "prior sample sizes", &lp))
+	return lp;
       // FIXME: parameter check
 
 
