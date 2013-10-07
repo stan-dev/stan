@@ -621,6 +621,61 @@ Windows.  A sequence of several such commands, perhaps interpspersed
 with \code{bin/print} can be executed from a single script file.
 
 
+\subsection{Optimization}
+
+Stan can find the posterior mode (assuming there is one).  If the
+posterior is not convex, there is no guarantee Stan will be able to
+find the global mode as opposed to a local optimum of log probability.
+
+For optimization, the mode is calculated without the Jacobian
+adjustment for constrained variables, which shifts the mode due to the
+change of variables.  Thus modes correspond to modes of the model as
+written.  
+
+\subsubsection{Windows}
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> my_model optimize data file=my_data
+\end{Verbatim}
+\end{quote}
+
+\subsubsection{Mac OS and Linux}
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> ./my_model optimize data file=my_data
+\end{Verbatim}
+\end{quote}
+
+
+
+\subsection{Diagnostics}
+
+Stan has a basic diagnostic feature that will calculate gradients of
+the initial state and compare them with those calculated with finite
+differences.  If there are discrepancies, there is a problem with the
+model or initial states (or a bug in Stan).
+
+\subsubsection{Windows}
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> my_model diagnose data file=my_data
+\end{Verbatim}
+\end{quote}
+
+\subsubsection{Mac OS and Linux}
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> ./my_model diagnose data file=my_data
+\end{Verbatim}
+\end{quote}
+
+
+
+
 \section{Command-Line Options}\label{stan-command-line-options.section}
 
 \Stan executables are highly configurable, allowing the user to specify
@@ -1488,7 +1543,7 @@ configurations.  Removing the guilty character, we try
 %
 which finally runs without issue.
 
-\section{Detailed Argument Information}
+\section{Detailed Argument Information}\label{detailed-command-arguments.section}
 
 Given their relative novelty, certain elements of the algorithms in \Stan,
 especially notation, may not be familiar to all users.  Here we discuss
@@ -1540,6 +1595,237 @@ metric.  These can be specified with the values \code{unit\_e},
 
 Future versions of \Stan will also include dynamic metrics associated
 with \textit{Riemannian} HMC \citep{GirolamiCalderhead:2011, Betancourt:2012}.
+
+
+\section{Command Templates}
+
+This section provides templates for all of the arguments for the
+various top-level methods.  Arguments in square brackets are optional,
+those not in square brackets are required for the template.
+
+\subsection{Sampling Templates}
+
+\begin{figure}
+\begin{quote}
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
+> ./my_model sample                                     \
+                 algorithm=hmc                          \
+                     engine=nuts                        \
+                       [max_depth=<int>]                \
+                     [metric={unit_e,diag_e,dense_e}]   \
+                     [stepsize=<double>]                \
+                     [stepsize_jitter=<double>]         \
+                 [num_samples=<int>]                    \
+                 [num_warmup=<int>]                     \
+                 [save_warmup=<boolean>]                \
+                 [thin=<int>]                           \
+                 [adapt                                 \
+                      [engaged=<boolean>]               \
+                      [gamma=<double>]                  \
+                      [delta=<double>]                  \
+                      [kappa=<double>]                  \
+                      [t0=<double>] ]                   \
+             [data file=<string>]                       \
+             [init=<string>]                            \
+             [random seed=<int>]                        \
+             [output                                    \
+                  [file=<string>]                       \
+                  [append_sample=<boolean>]             \
+                  [diagnostic_file=<string>]            \
+                  [append_diagnostic=<boolean>]         \
+                  [refresh=<int>] ]
+\end{Verbatim}
+\end{quote}
+\caption{\small\it Command skeleton for invoking the no-U-turn sampler
+  (NUTS). This is the same skeleton as that for basic HMC in
+  \reffigure{hmc-command}.  Elements in braces are optional.
+  All arguments and their default values are described in detail in
+  \refsection{detailed-command-arguments}}\label{nuts-command.figure}
+\end{figure}
+%
+The no-U-turn sampler (NUTS) is the default (and recommended) sampler
+for Stan.  The full set of configuration options is in
+\reffigure{nuts-command}.  
+
+A standard Hamiltonian Monte Carlo (HMC) sampler with user-specified
+integration time may also be used.  Its set of configuration options
+are shown in \reffigure{hmc-command}.
+
+Note that both NUTS and HMC may be configured with either a unit,
+diagonal or dense mass matrix; a diagonal mass matrix is the default.%
+%
+\footnote{In Euclidean HMC, a diagonal mass matrix amounts to the same
+  thing as using varying step sizes.  Varying step sizes were used in
+  Stan 1.3 and before.  \cite{Neal:2011} discusses the equivalence and
+  provides a derivation.}
+%
+A diagonal mass matrix essentially scales each parameter
+independently.  A unit mass matrix provides no parameter-by-parameter
+scaling.  A dense mass matrix also estimates parameter covariance, so
+that correlated parameters may move together.  Although dense mass
+matrices offer the hope of superior simulation performance, they
+require more computation, specifically $\mathcal{O}(\log(m) n^3 + m \,
+n^2)$ compared to $\mathcal{O}(m\,n)$ for diagonal mass matrices.
+Furthermore, dense mass matrices are difficult to estimate, because
+there are $\mathcal{O}(n^2)$ cells with complex interdependence.
+%
+\begin{figure}
+\begin{quote}
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
+> ./my_model sample                                     \
+                 algorithm=hmc                          \
+                     engine=static                      \
+                       [int_time=<double>]              \
+                     [metric={unit_e,diag_e,dense_e}]   \
+                     [stepsize=<double>]                \
+                     [stepsize_jitter=<double>]         \
+                 [num_samples=<int>]                    \
+                 [num_warmup=<int>]                     \
+                 [save_warmup=<boolean>]                \
+                 [thin=<int>]                           \
+                 [adapt                                 \
+                      [engaged=<boolean>]               \
+                      [gamma=<double>]                  \
+                      [delta=<double>]                  \
+                      [kappa=<double>]                  \
+                      [t0=<double>] ]                   \
+             [data file=<string>]                       \
+             [init=<string>]                            \
+             [random seed=<int>]                        \
+             [output                                    \
+                  [file=<string>]                       \
+                  [append_sample=<boolean>]             \
+                  [diagnostic_file=<string>]            \
+                  [append_diagnostic=<boolean>]         \
+                  [refresh=<int>] ]
+\end{Verbatim}
+\end{quote}
+\caption{\small\it Command skeleton for invoking the basic Hamiltonian
+  Monte Carlo sampler (HMC).  This is the same as the NUTS command
+  skeleton shown in \reffigure{nuts-command} other than for the
+  engine.  Elements in braces are optional.  All arguments and their
+  default values are described in detail in
+  \refsection{detailed-command-arguments}}\label{hmc-command.figure}
+\end{figure}
+
+
+
+
+\subsection{Optimization Templates}
+
+\begin{figure}
+\begin{quote}
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
+> ./my_model optimize                                   \
+                 algorithm=bfgs                         \
+                   [stepsize=<double>]                  \
+                 [iter=<int>]                           \
+                 [save_iterations=<boolean>]            \
+             [data file=<string>]                       \
+             [init=<string>]                            \
+             [random seed=<int>]                        \
+             [output                                    \
+                  [file=<string>]                       \
+                  [append_sample=<boolean>]             \
+                  [diagnostic_file=<string>]            \
+                  [append_diagnostic=<boolean>]         \
+                  [refresh=<int>] ]
+\end{Verbatim}
+\end{quote}
+\caption{\small\it Command skeleton for invoking the BFGS optimizer.
+  All arguments and their default values are described in detail in
+  \refsection{detailed-command-arguments}.}\label{bfgs-command.figure}
+\end{figure}
+%
+Stan supports several optimizers.  These share many of their
+configuration options with the samplers.  The default optimizer is the
+Broyden–Fletcher–Goldfarb–Shanno (BFGS) method (see
+\citep{NocedalWright:2006} for more information on BFGS).  The command
+skeleton for BFGS is in \reffigure{bfgs-command}.
+
+Stan also supports Nesterov's dual-averaging method
+\citep{Nesterov:2009} for optimization.  The BFGS method is the
+default approach because it is more efficient.  The command skeleton
+for dual averaging is shown in \reffigure{nesterov-command};  it is
+identical to that for BFGS other than the algorithm name.
+%
+\begin{figure}
+\begin{quote}
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
+> ./my_model optimize                                   \
+                 algorithm=nesterov                     \
+                   [stepsize=<double>]                  \
+                 [iter=<int>]                           \
+                 [save_iterations=<boolean>]            \
+             [data file=<string>]                       \
+             [init=<string>]                            \
+             [random seed=<int>]                        \
+             [output                                    \
+                  [file=<string>]                       \
+                  [append_sample=<boolean>]             \
+                  [diagnostic_file=<string>]            \
+                  [append_diagnostic=<boolean>]         \
+                  [refresh=<int>] ]
+\end{Verbatim}
+\end{quote}
+\caption{\small\it Command skeleton for invoking the Nesterov
+  dual-averaging ptimizer.  All arguments and their default values are
+  described in detail in
+  \refsection{detailed-command-arguments}.}\label{nesterov-command.figure}
+\end{figure}
+%
+Stan also supports Newton's method (see \citep{NocedalWright:2006} for
+more information).  This method is the least efficient of the three,
+but has the advantage of setting its own step size.  Other than not
+having a stepsize argument, the skeleton for Newton's method shown in
+\reffigure{newton-command} is identical to that for BFGS and
+Nesterov's dual averaging.
+%
+\begin{figure}
+\begin{quote}
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
+> ./my_model optimize                                   \
+                 algorithm=newton                       \
+                 [iter=<int>]                           \
+                 [save_iterations=<boolean>]            \
+             [data file=<string>]                       \
+             [init=<string>]                            \
+             [random seed=<int>]                        \
+             [output                                    \
+                  [file=<string>]                       \
+                  [append_sample=<boolean>]             \
+                  [diagnostic_file=<string>]            \
+                  [append_diagnostic=<boolean>]         \
+                  [refresh=<int>] ]
+\end{Verbatim}
+\end{quote}
+\caption{\small\it Command skeleton for invoking the Newton optimizer.
+  All arguments and their default values are described in detail in
+  \refsection{detailed-command-arguments}.}\label{newton-command.figure}
+\end{figure}
+%
+
+\subsection{Diagnostic Command Skeleton}
+
+Stan reports on gradients for the model at a specified or randomly
+generated initial value.  The command-skeleton in this case is very
+simple, and shown in \reffigure{diagnostic-command}.
+%
+\begin{figure}
+\begin{quote}
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
+> ./my_model diagnose                  \
+                 [test=gradient]       \
+             [data file=<string>]      \
+             [init=<string>]           \
+             [random seed=<int>]       \
+\end{Verbatim}
+\end{quote}
+\caption{\small\it Skeleton of the command for diagnostics.  All
+  arguments are described in detail in
+  \refsection{detailed-command-arguments}.}\label{diagnostic-command.figure}
+\end{figure}
+
 
 \chapter{Print Command for Output Analysis}\label{print-command.chapter}
 
