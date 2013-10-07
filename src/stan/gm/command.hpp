@@ -587,6 +587,9 @@ namespace stan {
           if (sample_stream) {
             *sample_stream << lp << ',';
             model.write_csv(base_rng, cont_params, disc_params, *sample_stream);
+            sample_stream->flush();
+            sample_stream->close();
+            delete sample_stream;          
           }
           
           return 0;
@@ -631,7 +634,10 @@ namespace stan {
           
           if (sample_stream) {
             *sample_stream << lp << ',';
-            model.write_csv(base_rng, cont_params, disc_params, *sample_stream);
+            model.write_csv(base_rng, cont_params, disc_params, *sample_stream);            
+            sample_stream->flush();
+            sample_stream->close();
+            delete sample_stream;
           }
           
           return 0;
@@ -704,6 +710,9 @@ namespace stan {
           if (sample_stream) {
             *sample_stream << lp << ',';
             model.write_csv(base_rng, cont_params, disc_params, *sample_stream);
+            sample_stream->flush();
+            sample_stream->close();
+            delete sample_stream;
           }
           
           return 0;
