@@ -524,11 +524,9 @@ option also has defaults, which are used in this section.
 \subsection{Sampling}
 
 Suppose the executable is in file \code{my\_model} and the data is in
-file \code{my\_data}, both in the current working directory.  Invoking
-the Stan executable is done differently on Windows versus Linux and
-Mac OS.
-
-To generate samples from a data set using the default settings, use
+file \code{my\_data}, both in the current working directory.  To
+generate samples from a data set using the default settings, use one
+of the following, depending on platform.
 %
 \subsubsection{Windows}
 %
@@ -548,7 +546,7 @@ To generate samples from a data set using the default settings, use
 \end{quote}
 %
 On both platforms, this command reads the data from file
-\code{my\_data}, runs warmup tuning for 1000 iterations (the valaues
+\code{my\_data}, runs warmup tuning for 1000 iterations (the values
 of which are discarded), and then runs the fully-adaptive \NUTS
 sampler for 1000 iterations, writing the parameter (and other) values
 to the file \code{samples.csv} in the current working directory.  When
@@ -563,7 +561,7 @@ in parallel on a multicore machine.
 
 \subsubsection{Mac OS and Linux}
 
-To sample four chains using a Bash shell on Mac or Linux, execute
+To sample four chains using a Bash shell on Mac OS or Linux, execute
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
@@ -576,11 +574,13 @@ To sample four chains using a Bash shell on Mac or Linux, execute
 \end{Verbatim}
 \end{quote}
 %
-Note that there is blank line at the end that returns control to the
-prompt. The ampersand (\code{\&}) at the end pushes each process into
-the background, so that the loop can continue without waiting for the
-previous chain to finish. This example requires several command-line
-options that are explained in further detail in the next subsection.
+The backslash (\code{\textbackslash}) indicates that the big command
+continues on the next display line; the blank line at the end that
+returns control to the prompt. The ampersand (\code{\&}) at the end of
+the nested command pushes each process into the background, so that
+the loop can continue without waiting for the current chain to
+finish. This example requires several command-line options that are
+explained in further detail in the next subsection.
 
 \subsubsection{Windows}
 
@@ -600,10 +600,16 @@ DOS.
 
 \subsubsection{Combining Parallel Chains}
 
-If the grep and sed programs are installed, then the following will
-combine the four comma-separated values files into a single
-comma-separated values file.  The command is the same on Windows, Mac
-OS and Linux.
+Stan has commands to analyze the output of multiple chains, each
+stored in their own file;  see \refchapter{print-command}.  RStan also
+has commands to read in multiple CSV files produced by Stan's
+command-line sampler.  
+
+To compute posterior quantities, it is sometimes easier to have the
+chains merged into a single CSV file.  If the grep and sed programs
+are installed, then the following will combine the four
+comma-separated values files into a single comma-separated values
+file.  The command is the same on Windows, Mac OS and Linux.
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
@@ -617,8 +623,12 @@ OS and Linux.
 The previous examples show how to sample in parallel from the command
 line.  Operations like these can also be scripted, using shell scripts
 (\code{.sh}) on Mac OS and Linux and DOS batch (\code{.bat}) files on
-Windows.  A sequence of several such commands, perhaps interpspersed
-with \code{bin/print} can be executed from a single script file.
+Windows.  A sequence of several such commands can be executed from a
+single script file.  Such scripts might contain \code{stanc} commands
+(see \refsection{stanc}) and \code{bin/print} commands (see
+\refchapter{print-command}) can be executed from a single script
+file.  At some point, it is worthwhile to move to something with
+stronger dependency control such as makefiles.
 
 
 \subsection{Optimization}
@@ -655,7 +665,8 @@ written.
 Stan has a basic diagnostic feature that will calculate gradients of
 the initial state and compare them with those calculated with finite
 differences.  If there are discrepancies, there is a problem with the
-model or initial states (or a bug in Stan).
+model or initial states (or a bug in Stan).  To run on the different
+platforms, use one of the following.
 
 \subsubsection{Windows}
 %
@@ -684,19 +695,25 @@ initialization, and random number generation.  The arguments are defined
 hierarchically so that, for example, optimization settings are not necessary
 when sampling.  
 
-The atomic element of the hierarchy are \textit{categorical arguments}
-which define self-contained categories of arguments.  
+The atomic elements of the hierarchy (i.e., those without
+corresponding values) are \textit{categorical arguments} (sometimes
+called ``flags'') which define self-contained categories of arguments.
 
 \subsection{Unordered}
 
-Categories and arguments within each category are unordered.  For
-example, the following four commands all define the same
-configuration.%
-\footnote{The backslash (\code{\textbackslash}) is used at the end of a line in a command to
-indicat that it continues on the next line.  The indentation to
-indicate the structure of the command is for pedagogical purposes
-only; the same result would be obtained writing each command on one
-line with single spaces separating the elements.}
+Arguments grouped within supercategories are not ordered with respect
+to each other.  For example, the following four commands all define
+the same configuration.%
+%
+\footnote{
+  Stan's commands have more hierarchical structure than is typical of
+  command line executables, which usually have at most two subgroups
+  of commands.  For instance, the Git version control system has
+  global control arguments (e.g., username and password), then a
+  ``method'' specification (e.g., pull or commit), and then arguments
+  specific to the method.  The only ordering is that the global
+  options come before the method argument and subcommand-specific
+  options after the method argument.}
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
@@ -721,22 +738,21 @@ line with single spaces separating the elements.}
 The value \code{seed} goes with \code{random} and the value for
 \code{diagnostic\_file} and \code{file} go with \code{output}.  No
 other order of arguments is permitted than the four specified above.
+The backslash (\code{\textbackslash}) is used at the end of a line in
+a command to indicate that it continues on the next line.  The
+indentation to indicate the structure of the command is for
+pedagogical purposes only; the same result would be obtained writing
+each command on one line with single spaces separating the elements.
 
 \subsection{Categorical Arguments without Values}
 
 Categorical arguments may appear without values as
 %
 \begin{itemize}
-\item top-level method indicators (e.g., \code{sample}),
+\item top-level method indicators (e.g., \code{sample}), or
 \item indicators for following subarguments (e.g., \code{random}
-  and \code{output}), or
-\item values of configuration parameters.
+  and \code{output}).
 \end{itemize}
-%
-The arguments \code{random} and \code{output} in the above examples
-serve as indicators for the following subarguments (e.g.,
-\code{nesterov} or \code{bfgs} used without a key to indicate which
-optimizer to use).
 %
 A visual diagram of the available categorical arguments is shown in
 \reffigure{hierarchy}.  The mutual exclusivity of these arguments is
@@ -898,16 +914,30 @@ provided for all arguments not specified.  Examples were provided in
 \subsubsection{Top-Level Help}
 
 If \code{help} is specified without any method, a usage message is
-displayed.  From the top-level \code{help\_all} displays the entire
+displayed.  From the top-level, \code{help\_all} displays the entire
 argument hierarchy.
 
 \subsubsection{Context-Sensitive Help}
 
 Specifying \code{help} after any argument displays a description and
-valid options for that argument.  The alternative \code{help-all}
+valid options for that argument.  For example,
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+./my_model sample help
+\end{Verbatim}
+\end{quote}
+%
+provides the top-level options for the \code{sample} method, whereas
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+./my_model sample help-all
+\end{Verbatim}
+\end{quote}
+%
 provides a verbose presentation of that argument and all arguments
-derived from it in the hierarchy.  
-
+derived from it in the hierarchy, as well as summarizing the relevant
+top-level arguments.
 
 \section{Full Argument Hierarchy}
 
@@ -930,7 +960,8 @@ argument.
 
 The following arguments are specific to sampling.  The method argument
 \code{sample} (or \code{method=sample}) must come first in order to
-enable the subsequent arguments.
+enable the subsequent arguments.  The other arguments are optional and
+may appear in any order.
 
 \begin{description}
   \hierlongcmd{\indentarrow}{sample}
@@ -962,6 +993,10 @@ enable the subsequent arguments.
 \end{description}
 
 \subsubsection{Sampling Adaptation-Specific Parameters}
+
+The following subarguments are introduced by the categorical argument
+\code{adapt}.  Each subargument must contiguously follow \code{adapt},
+though they may appear in any order.  
 
 \begin{description}
     \hierlongcmd{\indentarrow\indentarrow}{adapt}
@@ -995,7 +1030,19 @@ enable the subsequent arguments.
 %
 \end{description}
 
-\subsubsection{Sampling Algorithm-Specific Arguments}
+\subsubsection{Sampling Algorithm- and Engine-Specific Arguments}
+
+The following batch of arguments are used to control the sampler used
+for sampling.  The top-level specification is for engine, the only
+valid value of which is \code{hmc} (this will change in the future as
+we add new samplers).  
+
+The value of the argument \code{engine} controls the kind of HMC
+sampling, either \code{static} for vanilla HMC or \code{nuts} for the
+adaptive HMC.  The default is adaptive HMC with NUTS.  Each engine has
+its own specification, with integration time for static HMC and max
+tree depth for NUTS.  All other arguments apply to either static HMC
+or NUTS.
 
 \begin{description}
     \hiercmdarg{\indentarrow\indentarrow}{algorithm}{$$list element$$}
@@ -1056,7 +1103,11 @@ enable the subsequent arguments.
 \end{description}
 
 \subsection{Optimization-Specific Commands}
-%
+
+The following arguments are for the top-level method \code{optimize}.
+They allow control of the optimization algorithm, and some of its
+configuration.  The other arguments may appear in any order.
+
 \begin{description}
 %
   \hierlongcmd{\indentarrow}{optimize}
@@ -1101,7 +1152,10 @@ enable the subsequent arguments.
 %
 \end{description}
 
-\subsection{Diagnostic-Specific Argument}
+\subsection{Diagnostic-Specific Arguments}
+
+The following arguments are specific to diagnostics.  As of now, the
+only diagnostic is gradients of the log probability function.
 
 \begin{description}
 
@@ -1122,7 +1176,8 @@ enable the subsequent arguments.
 \subsection{General-Purpose Arguments}
 
 The following arguments may be used with any of the previous
-configurations. 
+configurations.   They may come either before or after the other
+subarguments of the top-level method.
 
 \subsubsection{Process Identifier Argument}
 
@@ -1221,10 +1276,16 @@ configurations.
 
 \section{Command-Line Option Examples}
 
-The hierarchical structure of the command-line options can be intimidating,
-and here we provide an example workflow to help ease the introduction to
-new users, especially those used to the now-deprecated structure of \Stan 1.3
-and below.
+The hierarchical structure of the command-line options can be
+intimidating, and here we provide an example workflow to help ease the
+introduction to new users, especially those used to \Stan 1.3 or
+earlier releases.  The examples in this section are for Mac OS and
+Linux; on Windows, just remove the \code{./} before the executable and
+change the line-continuation character from Unix's
+\code{\textbackslash} to DOS's \code{\textasciicircum}.  As in
+previous sections, the indentation on continued lines is for
+pedagogical purposes only and does not convey any content to the
+executable.
 
 Let's say that we've just built our model, \code{model}, and are ready to run.
 We begin by specifying data and init files,
@@ -1235,21 +1296,23 @@ We begin by specifying data and init files,
 \end{Verbatim}
 \end{quote}
 %
-but our model doesn't run,
+but our model doesn't run.  Instead, the above command prints
 %
 \begin{quote}
 \begin{Verbatim}
-> A method must be specified!
-> Failed to parse arguments, terminating Stan
+A method must be specified!
+Failed to parse arguments, terminating Stan
 \end{Verbatim}
 \end{quote}
 %
 The problem is that we forgot to specify a method.
 
-All \Stan arguments have default values, except for the method.  This is the
-only argument that must be specified by the user and a model will not
-run without it.  Assuming that we want to draw MCMC samples from our
-model, we can either specify a method implicitly,
+All \Stan arguments have default values, except for the method.  This
+is the only argument that must be specified by the user and a model
+will not run without it (though a model that requires data will not
+run properly without a data argument).  Assuming that we want to draw
+MCMC samples from our model, we can either specify a method
+implicitly,
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
@@ -1261,7 +1324,8 @@ or explicitly,
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-> ./model method=sample data file=model.data.R init=model.init.R
+> ./model method=sample data file=model.data.R  \
+          init=model.init.R
 \end{Verbatim}
 \end{quote}
 %
@@ -1315,20 +1379,24 @@ Fully informed, we can now run with a given seed,
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
 > ./model method=sample data fle=model.data.R  \
-    init=model.init.R random seed=5
+          init=model.init.R                    \
+          random seed=5
 \end{Verbatim}
 \end{quote}
 
-\code{method}, \code{data}, \code{init},  and \code{random}, are all top-level
-arguments.  To really see the power of a hierarchical argument structure let's
-try to drill down and specify the metric we use for HMC: instead of the default
-diagonal Euclidean metric, we want to use a dense Euclidean metric.  Attempting
-to specify the metric we try
+The arguments \code{method}, \code{data}, \code{init}, and
+\code{random} are all top-level arguments.  To really see the power of
+a hierarchical argument structure let's try to drill down and specify
+the metric we use for HMC: instead of the default diagonal Euclidean
+metric, we want to use a dense Euclidean metric.  Attempting to
+specify the metric we try
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
 > ./model method=sample data file=model.data.R  \
-    init=model.init.R random seed=5 metric=unit
+          init=model.init.R                     \
+          random seed=5                         \
+          metric=unit
 \end{Verbatim}
 \end{quote}
 %
@@ -1350,7 +1418,9 @@ sampling algorithm, as noted in the suggestion,
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
 > ./model method=sample algorithm=hmc metric=unit \
-    data file=model.data.R init=model.init.R random seed=5
+          data file=model.data.R                  \
+          init=model.init.R                       \
+          random seed=5       
 \end{Verbatim}
 \end{quote}
 %
@@ -1369,7 +1439,9 @@ Tweaking the metric name we make one last attempt,
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
 > ./model method=sample algorithm=hmc metric=unit_e \
-    data file=model.data.R init=model.init.R random seed=5
+          data file=model.data.R                    \
+          init=model.init.R                         \
+          random seed=5
 \end{Verbatim}
 \end{quote}
 %
@@ -1392,7 +1464,7 @@ which returns the verbose output,
 %
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 sample
   Bayesian inference with Markov Chain Monte Carlo
   Valid subarguments: num_samples, num_warmup,
@@ -1513,9 +1585,13 @@ which itself is a value for the argument \code{engine} which derives from
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-> ./model method=sample algorithm=hmc metric=unit_e        \
-    engine=nuts max_depth=-15                              \
-    data file=model.data.R init=model.init.R random seed=5
+> ./model method=sample                       \
+              algorithm=hmc                   \
+                  metric=unit_e               \
+                  engine=nuts max_depth=-15   \
+          data file=model.data.R              \
+          init=model.init.R                   \
+          random seed=5                       \
 \end{Verbatim}
 \end{quote}
 %
@@ -1535,9 +1611,13 @@ configurations.  Removing the guilty character, we try
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-> ./model method=sample algorithm=hmc metric=unit_e \
-    engine=nuts max_depth=15 \
-    data file=model.data.R init=model.init.R random seed=5
+> ./model method=sample                     \
+              algorithm=hmc                 \
+                  metric=unit_e             \
+                  engine=nuts max_depth=15  \
+          data file=model.data.R            \
+          init=model.init.R                 \
+          random seed=5
 \end{Verbatim}
 \end{quote}
 %
@@ -1553,14 +1633,16 @@ introduced above.
 \subsection{Adaptation}
 
 Currently all \Stan sampling algorithms utilize dual averaging to
-optimize the step size.  This optimization procedure is extremely
-flexible and for completeness we have exposed each option,
-using the notation of \citep{Hoffman-Gelman:2011, Hoffman-Gelman:2013}.
-In practice the efficacy of the optimization is sensitive to the
-value of these parameters, and we do not recommend
-changing the defaults without experience with the dual averaging
-algorithm.  For more information, see the discussion of dual averaging
-in \citep{Hoffman-Gelman:2011, Hoffman-Gelman:2013}.
+optimize the step size (this optimization during adaptation of the
+sampler should not be confused with running Stan's optimization method).
+This optimization procedure is extremely flexible and for completeness
+we have exposed each option, using the notation of
+\citep{Hoffman-Gelman:2011, Hoffman-Gelman:2013}.  In practice the
+efficacy of the optimization is sensitive to the value of these
+parameters, and we do not recommend changing the defaults without
+experience with the dual averaging algorithm.  For more information,
+see the discussion of dual averaging in \citep{Hoffman-Gelman:2011,
+  Hoffman-Gelman:2013}.
 
 \subsection{Hamiltonian Monte Carlo}
 
@@ -1604,7 +1686,11 @@ various top-level methods.  Arguments in square brackets are optional,
 those not in square brackets are required for the template.
 
 \subsection{Sampling Templates}
-
+%
+The no-U-turn sampler (NUTS) is the default (and recommended) sampler
+for Stan.  The full set of configuration options is in
+\reffigure{nuts-command}.  
+%
 \begin{figure}
 \begin{quote}
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
@@ -1643,9 +1729,6 @@ those not in square brackets are required for the template.
   \refsection{detailed-command-arguments}}\label{nuts-command.figure}
 \end{figure}
 %
-The no-U-turn sampler (NUTS) is the default (and recommended) sampler
-for Stan.  The full set of configuration options is in
-\reffigure{nuts-command}.  
 
 A standard Hamiltonian Monte Carlo (HMC) sampler with user-specified
 integration time may also be used.  Its set of configuration options
@@ -1664,10 +1747,12 @@ independently.  A unit mass matrix provides no parameter-by-parameter
 scaling.  A dense mass matrix also estimates parameter covariance, so
 that correlated parameters may move together.  Although dense mass
 matrices offer the hope of superior simulation performance, they
-require more computation, specifically $\mathcal{O}(\log(m) n^3 + m \,
-n^2)$ compared to $\mathcal{O}(m\,n)$ for diagonal mass matrices.
-Furthermore, dense mass matrices are difficult to estimate, because
-there are $\mathcal{O}(n^2)$ cells with complex interdependence.
+require more computation, specifically for $m$ samples of a model with
+$n$ parameters, the dense matrix requires $\mathcal{O}(n^3 \log(m) +
+n^2 \, m)$ operations, whereas diagonal mass matrices require only
+$\mathcal{O}(n \, m)$.  Furthermore, dense mass matrices are difficult
+to estimate, because there are $\mathcal{O}(n^2)$ cells with complex
+interdependence.
 %
 \begin{figure}
 \begin{quote}
@@ -1712,7 +1797,13 @@ there are $\mathcal{O}(n^2)$ cells with complex interdependence.
 
 
 \subsection{Optimization Templates}
-
+%
+Stan supports several optimizers.  These share many of their
+configuration options with the samplers.  The default optimizer is the
+Broyden-Fletcher-Goldfarb-Shanno (BFGS) method (see
+\citep{NocedalWright:2006} for more information on BFGS).  The command
+skeleton for BFGS is in \reffigure{bfgs-command}.
+%
 \begin{figure}
 \begin{quote}
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
@@ -1737,11 +1828,6 @@ there are $\mathcal{O}(n^2)$ cells with complex interdependence.
   \refsection{detailed-command-arguments}.}\label{bfgs-command.figure}
 \end{figure}
 %
-Stan supports several optimizers.  These share many of their
-configuration options with the samplers.  The default optimizer is the
-Broyden–Fletcher–Goldfarb–Shanno (BFGS) method (see
-\citep{NocedalWright:2006} for more information on BFGS).  The command
-skeleton for BFGS is in \reffigure{bfgs-command}.
 
 Stan also supports Nesterov's dual-averaging method
 \citep{Nesterov:2009} for optimization.  The BFGS method is the
@@ -1774,8 +1860,8 @@ identical to that for BFGS other than the algorithm name.
   \refsection{detailed-command-arguments}.}\label{nesterov-command.figure}
 \end{figure}
 %
-Stan also supports Newton's method (see \citep{NocedalWright:2006} for
-more information).  This method is the least efficient of the three,
+Stan also supports Newton's method; see \citep{NocedalWright:2006} for
+more information.  This method is the least efficient of the three,
 but has the advantage of setting its own step size.  Other than not
 having a stepsize argument, the skeleton for Newton's method shown in
 \reffigure{newton-command} is identical to that for BFGS and
@@ -1822,13 +1908,14 @@ simple, and shown in \reffigure{diagnostic-command}.
 \end{Verbatim}
 \end{quote}
 \caption{\small\it Skeleton of the command for diagnostics.  All
-  arguments are described in detail in
+  arguments and their default values are described in detail in
   \refsection{detailed-command-arguments}.}\label{diagnostic-command.figure}
 \end{figure}
 
 
 \chapter{Print Command for Output Analysis}\label{print-command.chapter}
 
+\noindent
 Stan is distributed with a print command that is able to read in the
 output of one or more Markov chains and summarize the posterior fits.
 This operation mimics the \code{print(fit)} command in RStan, which
