@@ -701,11 +701,14 @@ namespace stan {
             }
           
           }
-          
-          if (ret != 0)
-            std::cout << "Optimization terminated with code " << ret << std::endl;
-          else
-            std::cout << "Maximum number of iterations hit, optimization terminated." << std::endl;
+
+          if (ret >= 0) {          
+            std::cout << "Optimization terminated normally with code " << ret << ": ";
+            if (ret == 0) 
+              std::cout << "Maximum number of iterations hit, optimization terminated." << std::endl;
+            else
+              std::cout << ng.get_code_string(ret) << std::endl;
+          }
           
           if (sample_stream) {
             *sample_stream << lp << ',';

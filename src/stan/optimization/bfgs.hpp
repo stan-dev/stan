@@ -262,6 +262,23 @@ namespace stan {
       
       const std::string &note() const { return _note; }
       
+      std::string get_code_string(int retCode) {
+        switch(retCode) {
+          case 0:
+            return std::string("Successful step");
+          case 1:
+            return std::string("Change in objective function was less than tolF");
+          case 2:
+            return std::string("Gradient norm is less than tolGrad");
+          case 3:
+            return std::string("Norm of change in parameter values was less than tolX");
+          case -1:
+            return std::string("Line search failed to achieve a sufficient decrease, no more progress can be made");
+          default:
+            return std::string("Unknown return code");
+        }
+      }
+
       struct BFGSOptions {
         BFGSOptions() {
           maxIts = 10000;
@@ -272,6 +289,7 @@ namespace stan {
           alpha0 = 1e-3;
           tolX = 1e-8;
           tolF = 1e-8;
+          tolGrad = 1e-8;
         }
         size_t maxIts;
         Scalar rho;
@@ -281,6 +299,7 @@ namespace stan {
         Scalar minAlpha;
         Scalar tolX;
         Scalar tolF;
+        Scalar tolGrad;
       } _opts;
       
       
@@ -378,7 +397,7 @@ namespace stan {
         if (std::fabs(_fk - _fk_1) < _opts.tolF) {
           retCode = 1; // Objective function improvement wasn't sufficient
         }
-        else if (gradNorm < _opts.tolF) {
+        else if (gradNorm < _opts.tolGrad) {
           retCode = 2; // Gradient norm was below threshold
         }
         else if (sk.norm() < _opts.tolX) {
