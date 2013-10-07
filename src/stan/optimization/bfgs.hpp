@@ -267,11 +267,11 @@ namespace stan {
           case 0:
             return std::string("Successful step");
           case 1:
-            return std::string("Change in objective function was less than tolF");
+            return std::string("Change in objective function was less below tolerance");
           case 2:
-            return std::string("Gradient norm is less than tolGrad");
+            return std::string("Gradient norm is less than tolerance");
           case 3:
-            return std::string("Norm of change in parameter values was less than tolX");
+            return std::string("Norm of change in parameter values was less than tolerance");
           case -1:
             return std::string("Line search failed to achieve a sufficient decrease, no more progress can be made");
           default:

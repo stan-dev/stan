@@ -644,9 +644,6 @@ namespace stan {
           
         } else if (algo->value() == "bfgs") {
           
-          bool epsilon = dynamic_cast<real_argument*>(
-                         algo->arg("bfgs")->arg("stepsize"))->value();
-          
           if (sample_stream) {
             *sample_stream << "lp__,";
             model.write_csv_header(*sample_stream);
@@ -654,8 +651,14 @@ namespace stan {
           
           stan::optimization::BFGSLineSearch<Model> ng(model, cont_params, disc_params,
                                                        &std::cout);
-          if (epsilon > 0)
-            ng._opts.alpha0 = epsilon;
+          ng._opts.alpha0 = dynamic_cast<real_argument*>(
+                         algo->arg("bfgs")->arg("init_alpha"))->value();
+          ng._opts.tolF = dynamic_cast<real_argument*>(
+                         algo->arg("bfgs")->arg("tol_obj"))->value();
+          ng._opts.tolGrad = dynamic_cast<real_argument*>(
+                         algo->arg("bfgs")->arg("tol_grad"))->value();
+          ng._opts.tolX = dynamic_cast<real_argument*>(
+                         algo->arg("bfgs")->arg("tol_param"))->value();
           
           double lp = ng.logp();
           
