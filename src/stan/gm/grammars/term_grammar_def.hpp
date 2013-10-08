@@ -104,6 +104,17 @@ namespace stan {
                                                                     error_msgs);
 
         pass = !has_rng_suffix(fun.name_) || var_origin == derived_origin;
+        if (fun.name_ == "abs"
+            && fun.args_[0].expression_type().is_primitive_double()) {
+          error_msgs << "Warning: Function abs(real) is deprecated."
+                     << std::endl
+                     << "         It will be removed in a future release."
+                     << std::endl
+                     << "         Use fabs(real) instead."
+                     << std::endl << std::endl;
+        }
+
+
         if (!pass) {
           error_msgs << "random number generators only allowed in generated quantities block"
                      << "; found function=" << fun.name_
