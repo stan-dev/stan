@@ -40,7 +40,6 @@ public:
   static std::vector<std::pair<int, double> >
   get_expected_values() {
     using std::make_pair;
-    int index;
     std::vector<int> dims;
     dims.push_back(0);
 

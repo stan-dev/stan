@@ -39,6 +39,6 @@ $(patsubst %.stan,%,$(wildcard $(addsuffix .stan,$(MAKECMDGOALS)))) : %$(EXE): %
 
 %.cpp : %.stan
 	@echo ''
-	@echo '--- Translating Stan graphical model to C++ code ---'
+	@echo '--- Translating Stan model to C++ code ---'
 	$(STANC) $< --o=$@
  

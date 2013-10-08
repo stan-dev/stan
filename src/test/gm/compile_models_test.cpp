@@ -10,7 +10,6 @@ TEST(gm,compile_models) {
 }
 
 TEST(gm,issue91_segfault_printing_uninitialized) {
-  char path_separator = get_path_separator();
   std::vector<std::string> model_path;
   model_path.push_back("src");
   model_path.push_back("test");
@@ -30,7 +29,6 @@ TEST(gm,issue91_segfault_printing_uninitialized) {
 }
 
 TEST(gm,issue109_csv_header_consistent_with_samples) {
-  char path_separator = get_path_separator();
   std::vector<std::string> model_path;
   model_path.push_back("src");
   model_path.push_back("test");

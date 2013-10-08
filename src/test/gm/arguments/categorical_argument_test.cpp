@@ -47,7 +47,7 @@ TEST_F(StanGmArgumentsCategoricalArgument,parse_args) {
   
   EXPECT_TRUE(return_value);
   EXPECT_FALSE(help_flag);
-  EXPECT_EQ(0, args.size());
+  EXPECT_EQ(0U, args.size());
 
   
   return_value = false;
@@ -58,7 +58,7 @@ TEST_F(StanGmArgumentsCategoricalArgument,parse_args) {
   
   EXPECT_TRUE(return_value);
   EXPECT_TRUE(help_flag);
-  EXPECT_EQ(0, args.size());
+  EXPECT_EQ(0U, args.size());
 
 
   return_value = false;
@@ -69,7 +69,7 @@ TEST_F(StanGmArgumentsCategoricalArgument,parse_args) {
   
   EXPECT_TRUE(return_value);
   EXPECT_TRUE(help_flag);
-  EXPECT_EQ(0, args.size());
+  EXPECT_EQ(0U, args.size());
 }
 
 TEST_F(StanGmArgumentsCategoricalArgument,parse_args_unexpected) {
@@ -85,7 +85,7 @@ TEST_F(StanGmArgumentsCategoricalArgument,parse_args_unexpected) {
   
   EXPECT_TRUE(return_value);
   EXPECT_FALSE(help_flag);
-  EXPECT_EQ(1, args.size());
+  EXPECT_EQ(1U, args.size());
   
 
   return_value = false;
@@ -97,7 +97,7 @@ TEST_F(StanGmArgumentsCategoricalArgument,parse_args_unexpected) {
   
   EXPECT_TRUE(return_value);
   EXPECT_FALSE(help_flag);
-  EXPECT_EQ(2, args.size());
+  EXPECT_EQ(2U, args.size());
 
 
   return_value = false;
@@ -109,7 +109,7 @@ TEST_F(StanGmArgumentsCategoricalArgument,parse_args_unexpected) {
   
   EXPECT_TRUE(return_value);
   EXPECT_TRUE(help_flag);
-  EXPECT_EQ(0, args.size());
+  EXPECT_EQ(0U, args.size());
 
 
   return_value = false;
@@ -120,7 +120,7 @@ TEST_F(StanGmArgumentsCategoricalArgument,parse_args_unexpected) {
   
   EXPECT_TRUE(return_value);
   EXPECT_FALSE(help_flag);
-  EXPECT_EQ(1, args.size());
+  EXPECT_EQ(1U, args.size());
 }
 
 TEST_F(StanGmArgumentsCategoricalArgument, parse_args_with_1_singleton) {
