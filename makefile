@@ -184,8 +184,9 @@ ifneq (,$(filter runtest_no_fail/%,$(MAKECMDGOALS)))
   -include $(addsuffix .d,$(subst runtest_no_fail/,,$(MAKECMDGOALS)))
 endif
 
+.PHONY: all build docs
 all: build docs
-build: libstan.a stanc
+build: bin/stanc$(EXE)
 docs: manual doxygen
 
 ##
