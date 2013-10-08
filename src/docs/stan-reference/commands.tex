@@ -942,12 +942,35 @@ top-level arguments.
 \section{Full Argument Hierarchy}
 
 The full hierarchy is as follows; some typical use-case examples are
-provided in the next section.
+provided in the next section. 
+
+\subsection{Typographical Conventions}
+
+The following typographical conventions are obeyed in the hierarchy.
+%
+\begin{itemize}
+\item \code{arg=\farg{<value-type>}}
+\\
+for arguments with values;  lists value type, legal values, and default value
+%
+\item \code{\bfseries arg}
+\\
+for categorical arguments activating subarguments; lists valid subarguments
+%
+\item \code{\farg{value}}
+\\
+for values; describes effect of selecting the value
+%
+\item \code{\farg{\bfseries avalue}}
+\\
+for values that activate subarguments;  lists valid subarguments
+\end{itemize}
 
 \subsection{Top-Level Method Argument}
 
 Every command must have exactly one method specified as the very first
-argument.  
+argument.  The value type of \code{list element} means that the valid
+values are enumerated as a list. 
 
 \begin{description}
 \hiercmdarg{}{method}{$$list element$$}
@@ -964,7 +987,7 @@ enable the subsequent arguments.  The other arguments are optional and
 may appear in any order.
 
 \begin{description}
-  \hierlongcmd{\indentarrow}{sample}
+  \hierlongcmd{\indentarrow}{\farg{\bfseries sample}}
     {Bayesian inference with Markov Chain Monte Carlo}
     {Valid subarguments: 
       \code{num\_samples, num\_warmup, save\_warmup, 
@@ -999,7 +1022,7 @@ The following subarguments are introduced by the categorical argument
 though they may appear in any order.  
 
 \begin{description}
-    \hierlongcmd{\indentarrow\indentarrow}{adapt}
+    \hierlongcmd{\indentarrow\indentarrow}{\bfseries adapt}
       {Warmup Adaptation}
       {Valid subarguments: \code{engaged, gamma, delta, kappa, t0}}
 %
@@ -1050,7 +1073,7 @@ or NUTS.
       {Valid values: \  \code{hmc}}
       {Defaults to \code{hmc}}
 %
-      \hierlongcmd{\indentarrow\indentarrow\indentarrow}{hmc}
+      \hierlongcmd{\indentarrow\indentarrow\indentarrow}{\farg{\bfseries hmc}}
         {Hamiltonian Monte Carlo}
         {Valid subarguments: \code{engine, metric, stepsize, stepsize\_jitter}}
 %
@@ -1059,7 +1082,12 @@ or NUTS.
           {Valid values: \  \code{static, nuts}}
           {Defaults to \code{nuts}}
 %
-          \hierlongcmd{\indentarrow\indentarrow\indentarrow\indentarrow\indentarrow}{static}
+\end{description}
+%
+The following options are activated for static HMC.
+%
+\begin{description}
+          \hierlongcmd{\indentarrow\indentarrow\indentarrow\indentarrow\indentarrow}{\farg{\bfseries static}}
             {Static integration time}
             {Valid subarguments: \code{int\_time}}
 %
@@ -1067,8 +1095,12 @@ or NUTS.
               {Total integration time for Hamiltonian evolution}
               {Valid values: \  $0 < \mbox{\code{int\_time}}$}
               {Defaults to $2\pi$}
+\end{description}
 %
-          \hierlongcmd{\indentarrow\indentarrow\indentarrow\indentarrow\indentarrow}{nuts}
+These options are for NUTS, an adaptive version of HMC.
+%
+\begin{description}
+          \hierlongcmd{\indentarrow\indentarrow\indentarrow\indentarrow\indentarrow}{\farg{\bfseries nuts}}
             {The No-U-Turn Sampler}
             {Valid subarguments: \code{max\_depth}}
 %
@@ -1077,19 +1109,31 @@ or NUTS.
               {Valid values: \  $0 < \mbox{\code{max\_depth}}$}
               {Defaults to \code{10}}
 %
+\end{description}
+%
+The next three options pick out which form of mass matrix is
+estimated, and all three options are valid for both basic HMC and
+NUTS.
+%
+\begin{description}
         \hiercmdarg{\indentarrow\indentarrow\indentarrow\indentarrow}{metric}{$$list element$$}
           {Geometry of base manifold}
           {Valid values: \  \code{unit\_e, diag\_e, dense\_e}}
           {Defaults to \code{diag\_e}}
 %
-          \hiershortcmd{\indentarrow\indentarrow\indentarrow\indentarrow\indentarrow}{unit\_e}
+          \hiershortcmd{\indentarrow\indentarrow\indentarrow\indentarrow\indentarrow}{\farg{unit\_e}}
             {Euclidean manifold with unit metric}
 %
-          \hiershortcmd{\indentarrow\indentarrow\indentarrow\indentarrow\indentarrow}{diag\_e}
+          \hiershortcmd{\indentarrow\indentarrow\indentarrow\indentarrow\indentarrow}{\farg{diag\_e}}
             {Euclidean manifold with diag metric}
 %
-          \hiershortcmd{\indentarrow\indentarrow\indentarrow\indentarrow\indentarrow}{dense\_e}
+          \hiershortcmd{\indentarrow\indentarrow\indentarrow\indentarrow\indentarrow}{\farg{dense\_e}}
             {Euclidean manifold with dense metric}
+\end{description}
+%
+The remaining arguments apply to all forms of HMC.
+%
+\begin{description}
 %
         \hiercmdarg{\indentarrow\indentarrow\indentarrow\indentarrow}{stepsize}{$$double$$}
           {Step size for discrete evolution}
@@ -1110,7 +1154,7 @@ configuration.  The other arguments may appear in any order.
 
 \begin{description}
 %
-  \hierlongcmd{\indentarrow}{optimize}
+  \hierlongcmd{\indentarrow}{\farg{\bfseries optimize}}
     {Point estimation}
     {Valid subarguments: \code{algorithm, iter, save\_iterations}}
 %
@@ -1118,8 +1162,12 @@ configuration.  The other arguments may appear in any order.
       {Optimization algorithm}
       {Valid values: \  \code{nesterov, bfgs, newton}}
       {Defaults to \code{bfgs}}
+\end{description}
 %
-      \hierlongcmd{\indentarrow\indentarrow\indentarrow}{nesterov}
+The following options are for the Nesterov optimizer.
+%
+\begin{description}
+      \hierlongcmd{\indentarrow\indentarrow\indentarrow}{\farg{\bfseries nesterov}}
         {Nesterov's accelerated gradient method}
         {Valid subarguments: \code{stepsize}}
 %
@@ -1128,17 +1176,49 @@ configuration.  The other arguments may appear in any order.
           {Valid values: \  $0 < \mbox{\code{stepsize}}$}
           {Defaults to \code{1}}
 %
-      \hierlongcmd{\indentarrow\indentarrow\indentarrow}{bfgs}
+\end{description}
+The following options are for the BFGS optimizer.
+%
+\begin{description}
+      \hierlongcmd{\indentarrow\indentarrow\indentarrow}{\farg{\bfseries bfgs}}
         {BFGS with linesearch}
         {Valid subarguments: \code{stepsize}}
 %
-        \hiercmdarg{\indentarrow\indentarrow\indentarrow\indentarrow}{stepsize}{$$double$$}
-          {Step size for discrete evolution}
-          {Valid values: \  $0 < \mbox{\code{stepsize}}$}
-          {Defaults to \code{1}}
+        \hiercmdarg{\indentarrow\indentarrow\indentarrow\indentarrow}{init\_alpha}{$$double$$}
+           {Line search step size for first iteration}
+           {Valid values: $0 < \mbox{\code{init\_alpha}}$}
+           {Defaults to \code{0.001}}
 %
-      \hiershortcmd{\indentarrow\indentarrow\indentarrow}{newton}
+        \hiercmdarg{\indentarrow\indentarrow\indentarrow\indentarrow}{tol\_obj}{$$double$$}
+           {Convergence tolerance on changes in objective function value}
+           {Valid values: $0 < \mbox{\code{tol\_obj}}$}
+           {Defaults to \code{1e-8}}
+%
+        \hiercmdarg{\indentarrow\indentarrow\indentarrow\indentarrow}{tol\_grad}{$$double$$}
+        {Convergence tolerance on the norm of the gradient}
+        {Valid values: $0 < \mbox{\code{tol\_grad}}$}
+        {Defaults to \code{1e-8}}
+%
+        \hiercmdarg{\indentarrow\indentarrow\indentarrow\indentarrow}{tol\_param}{$$double$$}
+        {Convergence tolerance on changes in parameter value}
+        {Valid values: $0 < \mbox{\code{tol\_param}}$}
+        {Defaults to \code{1e-8}}
+%
+\end{description}
+The following argument is for Newton's optimization method;  there are
+currently no configuration parameters for Newton's method, and it is
+not recommended because of the slow Hessian calcuation involving
+finite differences.
+%
+\begin{description}
+      \hiershortcmd{\indentarrow\indentarrow\indentarrow}{\farg{\bfseries
+          newton}}
         {Newton's method}
+%
+\end{description}
+%
+The remaining arguments apply to all optimizers.
+\begin{description}
 %
     \hiercmdarg{\indentarrow\indentarrow}{iter}{$$int$$}
       {Total number of iterations}
@@ -1159,7 +1239,7 @@ only diagnostic is gradients of the log probability function.
 
 \begin{description}
 
-  \hierlongcmd{\indentarrow}{diagnose}
+  \hierlongcmd{\indentarrow}{\farg{\bfseries diagnose}}
     {Model diagnostics}
     {Valid subarguments: \code{test}}
 %
@@ -1168,7 +1248,7 @@ only diagnostic is gradients of the log probability function.
       {Valid values: \  \code{gradient}}
       {Defaults to \code{gradient}}
 %
-      \hiershortcmd{\indentarrow\indentarrow\indentarrow}{gradient}
+      \hiershortcmd{\indentarrow\indentarrow\indentarrow}{\farg{gradient}}
         {Check model gradient against finite differences}
 %
 \end{description}
@@ -1225,7 +1305,7 @@ subarguments of the top-level method.
 
 \begin{description}
 
-\hierlongcmd{}{random}
+\hierlongcmd{}{{\bfseries random}}
   {Random number configuration}
   {Valid subarguments: \code{seed}}
 %
@@ -1242,7 +1322,7 @@ subarguments of the top-level method.
 \subsubsection{Output Arguments}
 
 \begin{description}
-\hierlongcmd{}{output}
+\hierlongcmd{}{{\bfseries output}}
   {File output options}
   {Valid subarguments: \code{file, append\_sample, diagnostic\_file,
       \\ \hspace*{24pt} append\_diagnostic, refresh}}
@@ -1809,7 +1889,10 @@ skeleton for BFGS is in \reffigure{bfgs-command}.
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
 > ./my_model optimize                                   \
                  algorithm=bfgs                         \
-                   [stepsize=<double>]                  \
+                     [init_alpha=<double>]              \
+                     [tol_obj=<double>]                 \
+                     [tol_grad=<double>]                \
+                     [tol_param=<double>]               \
                  [iter=<int>]                           \
                  [save_iterations=<boolean>]            \
              [data file=<string>]                       \
@@ -1828,6 +1911,8 @@ skeleton for BFGS is in \reffigure{bfgs-command}.
   \refsection{detailed-command-arguments}.}\label{bfgs-command.figure}
 \end{figure}
 %
+
+
 
 Stan also supports Nesterov's dual-averaging method
 \citep{Nesterov:2009} for optimization.  The BFGS method is the
@@ -1907,7 +1992,7 @@ simple, and shown in \reffigure{diagnostic-command}.
              [random seed=<int>]       \
 \end{Verbatim}
 \end{quote}
-\caption{\small\it Skeleton of the command for diagnostics.  All
+\caption{\small\it Command skeleton for invoking model diagnostics.  All
   arguments and their default values are described in detail in
   \refsection{detailed-command-arguments}.}\label{diagnostic-command.figure}
 \end{figure}
