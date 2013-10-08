@@ -551,8 +551,8 @@ namespace stan {
         }
 
         double lp(0);
+        int return_code = error_codes::CONFIG;
         if (algo->value() == "nesterov") {
-
           bool epsilon = dynamic_cast<real_argument*>(
                          algo->arg("nesterov")->arg("stepsize"))->value();
           
@@ -585,11 +585,8 @@ namespace stan {
             }
 
           }
-        
-        
+          return_code = error_codes::OK;
         } else if (algo->value() == "newton") {
-          
-          
           std::vector<double> gradient;
           try {
             lp = model.template log_prob<false, false>(cont_params, disc_params, &std::cout);
@@ -619,21 +616,20 @@ namespace stan {
             }
             
           }
-                    
+          return_code = error_codes::OK;
         } else if (algo->value() == "bfgs") {
-                    
-          stan::optimization::BFGSLineSearch<Model> ng(model, cont_params, disc_params,
+          stan::optimization::BFGSLineSearch<Model> bfgs(model, cont_params, disc_params,
                                                        &std::cout);
-          ng._opts.alpha0 = dynamic_cast<real_argument*>(
+          bfgs._opts.alpha0 = dynamic_cast<real_argument*>(
                          algo->arg("bfgs")->arg("init_alpha"))->value();
-          ng._opts.tolF = dynamic_cast<real_argument*>(
+          bfgs._opts.tolF = dynamic_cast<real_argument*>(
                          algo->arg("bfgs")->arg("tol_obj"))->value();
-          ng._opts.tolGrad = dynamic_cast<real_argument*>(
+          bfgs._opts.tolGrad = dynamic_cast<real_argument*>(
                          algo->arg("bfgs")->arg("tol_grad"))->value();
-          ng._opts.tolX = dynamic_cast<real_argument*>(
+          bfgs._opts.tolX = dynamic_cast<real_argument*>(
                          algo->arg("bfgs")->arg("tol_param"))->value();
           
-          lp = ng.logp();
+          lp = bfgs.logp();
           
           std::cout << "initial log joint probability = " << lp << std::endl;
           int m = 0;
@@ -641,9 +637,9 @@ namespace stan {
           
           for (int i = 0; i < num_iterations && ret == 0; i++) {
             
-            ret = ng.step();
-            lp = ng.logp();
-            ng.params_r(cont_params);
+            ret = bfgs.step();
+            lp = bfgs.logp();
+            bfgs.params_r(cont_params);
             
             if (do_print(i, 50*refresh)) {
               std::cout << "    Iter ";
@@ -656,15 +652,15 @@ namespace stan {
               std::cout << " Notes " << std::endl;
             }
             
-            if (do_print(i, refresh) || ret != 0 || !ng.note().empty()) {
+            if (do_print(i, refresh) || ret != 0 || !bfgs.note().empty()) {
               std::cout << " " << std::setw(7) << (m + 1) << " ";
               std::cout << " " << std::setw(12) << std::setprecision(6) << lp << " ";
-              std::cout << " " << std::setw(12) << std::setprecision(6) << ng.prev_step_size() << " ";
-              std::cout << " " << std::setw(12) << std::setprecision(6) << ng.curr_g().norm() << " ";
-              std::cout << " " << std::setw(10) << std::setprecision(4) << ng.alpha() << " ";
-              std::cout << " " << std::setw(10) << std::setprecision(4) << ng.alpha0() << " ";
-              std::cout << " " << std::setw(7) << ng.grad_evals() << " ";
-              std::cout << " " << ng.note() << " ";
+              std::cout << " " << std::setw(12) << std::setprecision(6) << bfgs.prev_step_size() << " ";
+              std::cout << " " << std::setw(12) << std::setprecision(6) << bfgs.curr_g().norm() << " ";
+              std::cout << " " << std::setw(10) << std::setprecision(4) << bfgs.alpha() << " ";
+              std::cout << " " << std::setw(10) << std::setprecision(4) << bfgs.alpha0() << " ";
+              std::cout << " " << std::setw(7) << bfgs.grad_evals() << " ";
+              std::cout << " " << bfgs.note() << " ";
               std::cout << std::endl;
             }
             
@@ -677,14 +673,18 @@ namespace stan {
             }
           
           }
-
-          if (ret >= 0) {          
-            std::cout << "Optimization terminated normally with code " << ret << ": ";
-            if (ret == 0) 
-              std::cout << "Maximum number of iterations hit, optimization terminated." << std::endl;
-            else
-              std::cout << ng.get_code_string(ret) << std::endl;
+          
+          
+          if (ret >= 0) {
+            std::cout << "Optimization terminated normally: " << std::endl;
+            return_code = error_codes::OK;
+          } else {
+            std::cout << "Optimization terminated with error: " << std::endl;
+            return_code = error_codes::SOFTWARE;
           }
+          std::cout << "  " << bfgs.get_code_string(ret) << std::endl;
+        } else {
+          return_code = error_codes::CONFIG;
         }
 
         if (sample_stream) {

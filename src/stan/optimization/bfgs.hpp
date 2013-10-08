@@ -265,7 +265,7 @@ namespace stan {
       std::string get_code_string(int retCode) {
         switch(retCode) {
           case 0:
-            return std::string("Successful step");
+            return std::string("Maximum number of iterations hit");
           case 1:
             return std::string("Change in objective function was less below tolerance");
           case 2:
