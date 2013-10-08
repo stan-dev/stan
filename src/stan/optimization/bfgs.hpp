@@ -259,23 +259,26 @@ namespace stan {
 
       const Scalar &alpha0() const { return _alpha0; }
       const Scalar &alpha() const { return _alpha; }
+      const size_t iter_num() const { return _itNum; }
       
       const std::string &note() const { return _note; }
       
       std::string get_code_string(int retCode) {
         switch(retCode) {
           case 0:
-            return std::string("Maximum number of iterations hit");
+            return std::string("Successful step completed");
           case 1:
-            return std::string("Change in objective function was less below tolerance");
+            return std::string("Convergence detected: change in objective function was below tolerance");
           case 2:
-            return std::string("Gradient norm is less than tolerance");
+            return std::string("Convergence detected: gradient norm is below tolerance");
           case 3:
-            return std::string("Norm of change in parameter values was less than tolerance");
+            return std::string("Convergence detected: parameter change was below tolerance");
+          case 4:
+            return std::string("Maximum number of iterations hit, may not be at an optima");
           case -1:
             return std::string("Line search failed to achieve a sufficient decrease, no more progress can be made");
           default:
-            return std::string("Unknown return code");
+            return std::string("Unknown termination code");
         }
       }
 
@@ -402,6 +405,9 @@ namespace stan {
         }
         else if (sk.norm() < _opts.tolX) {
           retCode = 3; // Change in x was too small
+        }
+        else if (_itNum >= _opts.maxIts) {
+          retCode = 4; // Max number of iterations hit
         }
         else {
           retCode = 0; // Step was successful more progress to be made

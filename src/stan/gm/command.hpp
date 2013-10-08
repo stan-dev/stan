@@ -619,7 +619,7 @@ namespace stan {
           return_code = error_codes::OK;
         } else if (algo->value() == "bfgs") {
           stan::optimization::BFGSLineSearch<Model> bfgs(model, cont_params, disc_params,
-                                                       &std::cout);
+                                                         &std::cout);
           bfgs._opts.alpha0 = dynamic_cast<real_argument*>(
                          algo->arg("bfgs")->arg("init_alpha"))->value();
           bfgs._opts.tolF = dynamic_cast<real_argument*>(
@@ -628,50 +628,47 @@ namespace stan {
                          algo->arg("bfgs")->arg("tol_grad"))->value();
           bfgs._opts.tolX = dynamic_cast<real_argument*>(
                          algo->arg("bfgs")->arg("tol_param"))->value();
+          bfgs._opts.maxIts = num_iterations;
           
           lp = bfgs.logp();
           
           std::cout << "initial log joint probability = " << lp << std::endl;
-          int m = 0;
           int ret = 0;
           
-          for (int i = 0; i < num_iterations && ret == 0; i++) {
-            
+          while (1) {  
             ret = bfgs.step();
             lp = bfgs.logp();
             bfgs.params_r(cont_params);
             
-            if (do_print(i, 50*refresh)) {
+            if (do_print(bfgs.iter_num(), 50*refresh)) {
               std::cout << "    Iter ";
               std::cout << "     log prob ";
               std::cout << "       ||dx|| ";
               std::cout << "     ||grad|| ";
               std::cout << "      alpha ";
-              std::cout << "     alpha0 ";
+// MAB: commented out but left in because it may be useful for debugging in the future
+//              std::cout << "     alpha0 ";
               std::cout << " # evals ";
               std::cout << " Notes " << std::endl;
             }
             
-            if (do_print(i, refresh) || ret != 0 || !bfgs.note().empty()) {
-              std::cout << " " << std::setw(7) << (m + 1) << " ";
+            if (do_print(bfgs.iter_num(), refresh) || ret != 0 || !bfgs.note().empty()) {
+              std::cout << " " << std::setw(7) << bfgs.iter_num() << " ";
               std::cout << " " << std::setw(12) << std::setprecision(6) << lp << " ";
               std::cout << " " << std::setw(12) << std::setprecision(6) << bfgs.prev_step_size() << " ";
               std::cout << " " << std::setw(12) << std::setprecision(6) << bfgs.curr_g().norm() << " ";
               std::cout << " " << std::setw(10) << std::setprecision(4) << bfgs.alpha() << " ";
-              std::cout << " " << std::setw(10) << std::setprecision(4) << bfgs.alpha0() << " ";
+//              std::cout << " " << std::setw(10) << std::setprecision(4) << bfgs.alpha0() << " ";
               std::cout << " " << std::setw(7) << bfgs.grad_evals() << " ";
               std::cout << " " << bfgs.note() << " ";
               std::cout << std::endl;
             }
-            
-            m++;
             
             if (sample_stream && save_iterations) {
               *sample_stream << lp << ',';
               model.write_csv(base_rng, cont_params, disc_params, *sample_stream);
               sample_stream->flush();
             }
-          
           }
           
           
