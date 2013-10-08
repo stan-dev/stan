@@ -545,20 +545,22 @@ namespace stan {
         bool save_iterations = dynamic_cast<bool_argument*>(
                                parser.arg("method")->arg("optimize")->arg("save_iterations"))->value();
 
+        if (sample_stream) {
+          *sample_stream << "lp__,";
+          model.write_csv_header(*sample_stream);
+        }
+
+        double lp(0);
         if (algo->value() == "nesterov") {
 
           bool epsilon = dynamic_cast<real_argument*>(
                          algo->arg("nesterov")->arg("stepsize"))->value();
           
-          if (sample_stream) {
-            *sample_stream << "lp__,";
-            model.write_csv_header(*sample_stream);
-          }
           
           stan::optimization::NesterovGradient<Model> ng(model, cont_params, disc_params,
                                                          epsilon, &std::cout);
           
-          double lp = ng.logp();
+          lp = ng.logp();
           
           double lastlp = lp - 1;
           std::cout << "Initial log joint probability = " << lp << std::endl;
@@ -584,25 +586,11 @@ namespace stan {
 
           }
         
-          if (sample_stream) {
-            *sample_stream << lp << ',';
-            model.write_csv(base_rng, cont_params, disc_params, *sample_stream);
-            sample_stream->flush();
-            sample_stream->close();
-            delete sample_stream;          
-          }
-          
-          return 0;
         
         } else if (algo->value() == "newton") {
           
-          if (sample_stream) {
-            *sample_stream << "lp__,";
-            model.write_csv_header(*sample_stream);
-          }
           
           std::vector<double> gradient;
-          double lp;
           try {
             lp = model.template log_prob<false, false>(cont_params, disc_params, &std::cout);
           } catch (std::domain_error e) {
@@ -631,24 +619,9 @@ namespace stan {
             }
             
           }
-          
-          if (sample_stream) {
-            *sample_stream << lp << ',';
-            model.write_csv(base_rng, cont_params, disc_params, *sample_stream);            
-            sample_stream->flush();
-            sample_stream->close();
-            delete sample_stream;
-          }
-          
-          return 0;
-          
+                    
         } else if (algo->value() == "bfgs") {
-          
-          if (sample_stream) {
-            *sample_stream << "lp__,";
-            model.write_csv_header(*sample_stream);
-          }
-          
+                    
           stan::optimization::BFGSLineSearch<Model> ng(model, cont_params, disc_params,
                                                        &std::cout);
           ng._opts.alpha0 = dynamic_cast<real_argument*>(
@@ -660,7 +633,7 @@ namespace stan {
           ng._opts.tolX = dynamic_cast<real_argument*>(
                          algo->arg("bfgs")->arg("tol_param"))->value();
           
-          double lp = ng.logp();
+          lp = ng.logp();
           
           std::cout << "initial log joint probability = " << lp << std::endl;
           int m = 0;
@@ -712,19 +685,16 @@ namespace stan {
             else
               std::cout << ng.get_code_string(ret) << std::endl;
           }
-          
-          if (sample_stream) {
-            *sample_stream << lp << ',';
-            model.write_csv(base_rng, cont_params, disc_params, *sample_stream);
-            sample_stream->flush();
-            sample_stream->close();
-            delete sample_stream;
-          }
-          
-          return 0;
-        
         }
 
+        if (sample_stream) {
+          *sample_stream << lp << ',';
+          model.write_csv(base_rng, cont_params, disc_params, *sample_stream);
+          sample_stream->flush();
+          sample_stream->close();
+          delete sample_stream;
+        }
+        return 0;
       }
         
       //////////////////////////////////////////////////
