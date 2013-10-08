@@ -17,7 +17,12 @@ SUFFIXES:
 # - AR: archiver (must specify for cross-compiling)
 # - OS: {mac, win, linux}. 
 ##
-CC = g++
+ifndef CXX
+  CXX = g++
+endif
+ifndef CC
+  CC = $(CXX)
+endif
 O = 3
 O_STANC = 0
 AR = ar
@@ -185,7 +190,7 @@ ifneq (,$(filter runtest_no_fail/%,$(MAKECMDGOALS)))
 endif
 
 all: build docs
-build: libstan.a stanc
+build: bin/libstan.a bin/stanc
 docs: manual doxygen
 
 ##
