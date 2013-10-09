@@ -187,6 +187,7 @@ endif
 
 .PHONY: all build docs
 build: bin/stanc$(EXE)
+	@echo '--- Stan tools built ---'
 docs: manual doxygen
 all: build docs
 
