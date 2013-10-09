@@ -308,8 +308,8 @@ worse than no comment at all!
 \chapter{Containers: Arrays, Vectors, and Matrices}
 
 \noindent
-Stan provides three types of container objects, arrays vectors, and
-matrices.  The two types are not interchangeable.  Vectors, matrices,
+Stan provides three types of container objects: arrays, vectors, and
+matrices.  The three types are not interchangeable.  Vectors, matrices,
 and arrays are not assignable to one another, even if their dimensions
 are identical.  A $3 \times 4$ matrix is a different kind of object in
 Stan than a $3 \times 4$ array. 
@@ -367,7 +367,7 @@ terms of data types from the Eigen \Cpp library.  By having vectors
 and matrices as basic types, no conversion is necessary when invoking
 matrix operations or calling linear algebra functions.  
 
-Arrays, on the other hand, are implemented as instances of the \Cpp
+Arrays, on the other hand, are implemented as instances of the \Cpp \ 
 \code{std::vector} class (not to be confused with Eigen's
 \code{Eigen::Vector} class or Stan vectors).  By implementing arrays
 this way, indexing is very efficient because values can be returned by
@@ -418,7 +418,7 @@ for (m in 1:M)
 \end{Verbatim}
 \end{quote}
 %
-The first use of \code{a[m,n]} shoudl bring \code{a[m]} into memory.
+The first use of \code{a[m,n]} should bring \code{a[m]} into memory.
 Overall, traversing matrices is more efficient than traversing arrays.
 
 If \code{a} is a matrix, the notation \code{a[m]} picks out row
@@ -746,7 +746,7 @@ data {
    int<lower=1> N;
    real y[N];
 }
-parameters
+parameters {
    real<upper = min(y)> L; 
    real<lower = max(y)> U;
    real mu;
@@ -1701,11 +1701,11 @@ parameters {
 model {
     for (n in (K+1):N) {
         real mu;
-    mu <- alpha;
-    for (k in 1:K)
-        mu <- mu + beta[k] * y[n-k];
-    y[n] ~ normal(mu, sigma);
-  }
+        mu <- alpha;
+        for (k in 1:K)
+            mu <- mu + beta[k] * y[n-k];
+        y[n] ~ normal(mu, sigma);
+    }
 }
 \end{Verbatim}
 \end{quote}
@@ -1806,7 +1806,7 @@ parameters {
   real mu; 
   real<lower=0> alpha0;          
   real<lower=0,upper=1> alpha1;  
-  real<lower=0, upper=(1-alpha1)> beta1; 
+  real<lower=0,upper=(1-alpha1)> beta1; 
 }
 transformed parameters {
   real<lower=0> sigma[T];
@@ -1930,7 +1930,7 @@ data {
 parameters {
   real mu;              // mean
   real<lower=0> sigma;  // error scale
-  vector[2] theta;      // error coeff, lag -t
+  vector[Q] theta;      // error coeff, lag -t
 }
 transformed parameters {
   vector[T] epsilon;    // error term at time t

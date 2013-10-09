@@ -442,8 +442,8 @@ The following commands will produce an executable in the file
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
 > cd <stan-home>
-> g++ -O3 -Lbin -Isrc -Ilib/boost_1.53.0              \
-    -Ilib/eigen_3.1.2 my_model.cpp -o my_model -lstan
+> g++ -O3 -Lbin -Isrc -isystem lib/boost_1.54.0              \
+    -isystem lib/eigen_3.2.0 my_model.cpp -o my_model -lstan
 \end{Verbatim}
 \end{quote} %
 The backslash (\Verb|\|) is used to indicate that the command is
@@ -457,10 +457,10 @@ The options used here are as follows.
   directory,
 \item[\code{-Isrc}] specifies that the directory \code{src} should be
   searched for code (it contains the top-level \Stan headers),
-\item[\code{-Ilib/eigen\_3.1.2}] specifies the directory for
-  the Eigen library,
-\item[\code{-Ilib/boost\_1.53.0}] specifies the directory for the 
+\item[\code{-isystem lib/boost\_1.54.0}] specifies the include directory for the 
   Boost library,
+\item[\code{-isystem lib/eigen\_3.2.0}] specifies the include directory for
+  the Eigen library,
 \item[\code{my\_model.cpp}] specifies the name of the source file to
   compile, and 
 \item[\code{-o my\_model}] is the name of the resulting executable
@@ -699,11 +699,9 @@ The atomic elements of the hierarchy (i.e., those without
 corresponding values) are \textit{categorical arguments} (sometimes
 called ``flags'') which define self-contained categories of arguments.
 
-\subsection{Unordered}
-
-Arguments grouped within supercategories are not ordered with respect
+Arguments grouped within a category are not ordered with respect
 to each other.  For example, the following four commands all define
-the same configuration.%
+the same configuration:%
 %
 \footnote{
   Stan's commands have more hierarchical structure than is typical of
@@ -714,6 +712,13 @@ the same configuration.%
   specific to the method.  The only ordering is that the global
   options come before the method argument and subcommand-specific
   options after the method argument.}
+\footnote{
+The backslash (\code{\textbackslash}) is used at the end of a line in
+a command to indicate that it continues on the next line.  The
+indentation to indicate the structure of the command is for
+pedagogical purposes only; the same result would be obtained writing
+each command on one line with single spaces separating the elements.
+}
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
@@ -735,28 +740,20 @@ the same configuration.%
 \end{Verbatim}
 \end{quote}
 %
-The value \code{seed} goes with \code{random} and the value for
-\code{diagnostic\_file} and \code{file} go with \code{output}.  No
-other order of arguments is permitted than the four specified above.
-The backslash (\code{\textbackslash}) is used at the end of a line in
-a command to indicate that it continues on the next line.  The
-indentation to indicate the structure of the command is for
-pedagogical purposes only; the same result would be obtained writing
-each command on one line with single spaces separating the elements.
+The categorical arguments \code{output} and \code{random} can be
+in any order provided that the subarguments follow their respective
+parent, here \code{diagnostic\_file} and \code{file} following \code{output}
+and \code{seed} coming after \code{random}.  These four configurations
+exhaust all valid combinations.
 
-\subsection{Categorical Arguments without Values}
-
-Categorical arguments may appear without values as
-%
-\begin{itemize}
-\item top-level method indicators (e.g., \code{sample}), or
-\item indicators for following subarguments (e.g., \code{random}
-  and \code{output}).
-\end{itemize}
-%
-A visual diagram of the available categorical arguments is shown in
-\reffigure{hierarchy}.  The mutual exclusivity of these arguments is
-shown in \reffigure{configuration}.  Specifying conflicting arguments
+Categorical arguments may appear is isolation, for example when
+introducing \code{sample} or \code{random}, or they may appear as
+the values for other arguments, such as \code{hmc} which not only 
+introduces a category of HMC related arguments but also defines the
+value of the argument \code{algorithm}.  A visual diagram of the available 
+categorical arguments is shown in \reffigure{hierarchy}, with the mutual 
+exclusivity of these arguments as values shown in \reffigure{configuration}.  
+Specifying conflicting arguments
 causes the execution to immediately terminate.
 
 \begin{figure}
@@ -816,7 +813,7 @@ causes the execution to immediately terminate.
   categories of arguments.  Categorical arguments may also
   appear as values of other arguments, such as \code{diagnose},
   \code{optimize}, and \code{sample}, which define the mutually
-  exclusive values for the argument {method}. }%
+  exclusive values for the argument \code{method}. }%
 \label{hierarchy.figure}
 \end{figure}
 
@@ -880,69 +877,69 @@ causes the execution to immediately terminate.
     message.}\label{configuration.figure}
 \end{figure}
 
-\subsection{Top-Level Method}
+Note that any valid argument configuration must either specify a method
+or a help request.
 
-All commands (other than \code{help}) must include at least one
+\subsection{Method}
+
+All commands other than \code{help} must include at least one
 method, specified explicitly as \code{method=\farg{method\_name}} or
-implicitly with only \farg{method\_name}.  Available method names in
-Stan are as follows.  The two help options are included, though they
-are not technically methods;  see the next subsection for a
-description of available help options.
+implicitly with only \farg{method\_name}.  Currently Stan supports
+the following methods:
 %
 \begin{center}
 \begin{tabular}{r|l}
-{\it Method} & {\it Description} \\ \hline
+{\it Method} & {\it Description} \\ \hline \hline
 {\tt sample}   &  sample using MCMC
 \\
 {\tt optimize} &  find posterior mode using optimization
 \\
 {\tt diagnose} &  diagnose models
-\\ \hline
-{\tt help}     & print usage message
-\\
-{\tt help-all} & print full argument hierarchy
 \end{tabular}
 \end{center}
 %
-All remaining configurations are optional.  Default values are
-provided for all arguments not specified.  Examples were provided in
-\refsection{command-getting-started}. 
-
+All remaining configurations are option, with default values
+provided for all arguments not explicitly specified.
 
 \subsection{Help}
 
+Informative output can be retrieved either globally, by requesting help
+at the top-level, or locally, by requesting help deeper into the hierarchy.
+Note that after any help has been displayed the execution immediately
+terminates, even if a method has been specified.
+
 \subsubsection{Top-Level Help}
 
-If \code{help} is specified without any method, a usage message is
-displayed.  From the top-level, \code{help\_all} displays the entire
+If \code{help} is specified as the only argument then a usage message is
+displayed.  Similarly, specifying \code{help\_all} by itself displays the entire
 argument hierarchy.
 
 \subsubsection{Context-Sensitive Help}
 
 Specifying \code{help} after any argument displays a description and
 valid options for that argument.  For example,
+%
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
 ./my_model sample help
 \end{Verbatim}
 \end{quote}
 %
-provides the top-level options for the \code{sample} method, whereas
+provides the top-level options for the \code{sample} method.
+
+Detailed information on the argument, and all arguments deriving
+from it, can accessed by specifying \code{help-all} instead,
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
 ./my_model sample help-all
 \end{Verbatim}
 \end{quote}
-%
-provides a verbose presentation of that argument and all arguments
-derived from it in the hierarchy, as well as summarizing the relevant
-top-level arguments.
 
-\section{Full Argument Hierarchy}
+\section{Full Argument Hierarchy}\label{detailed-command-arguments.section}
 
-The full hierarchy is as follows; some typical use-case examples are
-provided in the next section. 
+Here we present the full argument hierarchy, along with relevant details.  
+Some typical use-case examples are provided in the next section. 
 
 \subsection{Typographical Conventions}
 
@@ -951,19 +948,19 @@ The following typographical conventions are obeyed in the hierarchy.
 \begin{itemize}
 \item \code{arg=\farg{<value-type>}}
 \\
-for arguments with values;  lists value type, legal values, and default value
+Arguments with values; displays the value type, legal values, and default value
 %
 \item \code{\bfseries arg}
 \\
-for categorical arguments activating subarguments; lists valid subarguments
+Isolated categorical arguments; displays all valid subarguments
 %
 \item \code{\farg{value}}
 \\
-for values; describes effect of selecting the value
+Values; describes effect of selecting the value
 %
 \item \code{\farg{\bfseries avalue}}
 \\
-for values that activate subarguments;  lists valid subarguments
+Categorical arguments that appear as values to other arguments; displays all valid subarguments
 \end{itemize}
 
 \subsection{Top-Level Method Argument}
@@ -1017,6 +1014,18 @@ may appear in any order.
 
 \subsubsection{Sampling Adaptation-Specific Parameters}
 
+Currently all \Stan sampling algorithms utilize dual averaging to
+optimize the step size (this optimization during adaptation of the
+sampler should not be confused with running Stan's optimization method).
+This optimization procedure is extremely flexible and for completeness
+we have exposed each option, using the notation of
+\citep{Hoffman-Gelman:2011, Hoffman-Gelman:2013}.  In practice the
+efficacy of the optimization is sensitive to the value of these
+parameters, and we do not recommend changing the defaults without
+experience with the dual averaging algorithm.  For more information,
+see the discussion of dual averaging in \citep{Hoffman-Gelman:2011,
+  Hoffman-Gelman:2013}.
+
 The following subarguments are introduced by the categorical argument
 \code{adapt}.  Each subargument must contiguously follow \code{adapt},
 though they may appear in any order.  
@@ -1060,28 +1069,38 @@ for sampling.  The top-level specification is for engine, the only
 valid value of which is \code{hmc} (this will change in the future as
 we add new samplers).  
 
-The value of the argument \code{engine} controls the kind of HMC
-sampling, either \code{static} for vanilla HMC or \code{nuts} for the
-adaptive HMC.  The default is adaptive HMC with NUTS.  Each engine has
-its own specification, with integration time for static HMC and max
-tree depth for NUTS.  All other arguments apply to either static HMC
-or NUTS.
-
 \begin{description}
     \hiercmdarg{\indentarrow\indentarrow}{algorithm}{$$list element$$}
       {Sampling algorithm}
       {Valid values: \  \code{hmc}}
       {Defaults to \code{hmc}}
+\end{description}
 %
+Hamiltonian Monte Carlo is a very general approach to sampling that
+utilizes techniques of differential geometry and mathematical physics
+to generate efficient MCMC transitions.  This generality manifests in
+a wealth of implementation choices.
+%
+\begin{description}
       \hierlongcmd{\indentarrow\indentarrow\indentarrow}{\farg{\bfseries hmc}}
         {Hamiltonian Monte Carlo}
         {Valid subarguments: \code{engine, metric, stepsize, stepsize\_jitter}}
+\end{description}
 %
+All HMC implementations require at least two parameters: an
+integration step size and a total integration time.  We refer to
+different specifications of the latter as \textit{engines}.
+
+In the \code{static\_hmc} implementation the total integration time
+must be specified by the user, where as the \code{nuts}
+implementation uses the No-U-Turn Sampler to determine
+an optimal integration time dynamically. 
+%
+\begin{description}
         \hiercmdarg{\indentarrow\indentarrow\indentarrow\indentarrow}{engine}{$$list element$$}
           {Engine for Hamiltonian Monte Carlo}
           {Valid values: \  \code{static, nuts}}
           {Defaults to \code{nuts}}
-%
 \end{description}
 %
 The following options are activated for static HMC.
@@ -1111,9 +1130,19 @@ These options are for NUTS, an adaptive version of HMC.
 %
 \end{description}
 %
-The next three options pick out which form of mass matrix is
-estimated, and all three options are valid for both basic HMC and
-NUTS.
+All HMC implementations in \Stan utilize quadratic kinetic energy
+functions which are specified up to the choice of a symmetric,
+positive-definite matrix known as a \textit{mass matrix} or, more
+formally, a \textit{metric} \citep{Betancourt-Stein:2011}.
+
+If the metric is constant then the resulting implementation is known
+as \textit{Euclidean} HMC.  \Stan allows for three Euclidean HMC
+implementations: a unit metric, a diagonal metric, and a dense
+metric.  These can be specified with the values \code{unit\_e},
+\code{diag\_e}, and \code{dense\_e}, respectively.
+
+Future versions of \Stan will also include dynamic metrics associated
+with \textit{Riemannian} HMC \citep{GirolamiCalderhead:2011, Betancourt:2012}.
 %
 \begin{description}
         \hiercmdarg{\indentarrow\indentarrow\indentarrow\indentarrow}{metric}{$$list element$$}
@@ -1131,7 +1160,9 @@ NUTS.
             {Euclidean manifold with dense metric}
 \end{description}
 %
-The remaining arguments apply to all forms of HMC.
+All implementations of HMC also use numerical integrators requiring a step size.  We also
+allow that step size to be ``jittered'' randomly during sampling to avoid any poor interactions
+with a fixed step size and regions of high curvature.
 %
 \begin{description}
 %
@@ -1389,8 +1420,9 @@ The problem is that we forgot to specify a method.
 
 All \Stan arguments have default values, except for the method.  This
 is the only argument that must be specified by the user and a model
-will not run without it (though a model that requires data will not
-run properly without a data argument).  Assuming that we want to draw
+will not run without it (not to say that the model will run without error,
+for example a model that requires data will eventually fail unless an input file 
+is specified with \code{file} under \code{data}).  Assuming that we want to draw
 MCMC samples from our model, we can either specify a method
 implicitly,
 %
@@ -1703,71 +1735,16 @@ configurations.  Removing the guilty character, we try
 %
 which finally runs without issue.
 
-\section{Detailed Argument Information}\label{detailed-command-arguments.section}
-
-Given their relative novelty, certain elements of the algorithms in \Stan,
-especially notation, may not be familiar to all users.  Here we discuss
-some of the more abstract notation used in the command line arguments
-introduced above.
-
-\subsection{Adaptation}
-
-Currently all \Stan sampling algorithms utilize dual averaging to
-optimize the step size (this optimization during adaptation of the
-sampler should not be confused with running Stan's optimization method).
-This optimization procedure is extremely flexible and for completeness
-we have exposed each option, using the notation of
-\citep{Hoffman-Gelman:2011, Hoffman-Gelman:2013}.  In practice the
-efficacy of the optimization is sensitive to the value of these
-parameters, and we do not recommend changing the defaults without
-experience with the dual averaging algorithm.  For more information,
-see the discussion of dual averaging in \citep{Hoffman-Gelman:2011,
-  Hoffman-Gelman:2013}.
-
-\subsection{Hamiltonian Monte Carlo}
-
-Hamiltonian Monte Carlo is a very general approach to sampling that
-utilizes techniques of differential geometry and mathematical physics
-to generate efficient MCMC transitions.  This generality manifests in
-a wealth of implementation choices.
-
-\subsubsection{Engine}
-
-All HMC implementations require at least two parameters: an
-integration step size and a total integration time.  We refer to
-different specifications of the latter as \textit{engines}.
-
-In the \code{static\_hmc} implementation the total integration time
-must be specified by the user, where as the \code{nuts}
-implementation uses the No-U-Turn Sampler to determine
-an optimal integration time dynamically. 
-
-\subsubsection{Metric}
-
-The HMC implementations in \Stan utilize quadratic kinetic energy
-functions which are specified up to the choice of a symmetric,
-positive-definite matrix known as a \textit{mass matrix} or, more
-formally, a \textit{metric} \citep{Betancourt-Stein:2011}.
-
-If the metric is constant then the resulting implementation is known
-as \textit{Euclidean} HMC.  \Stan allows for three Euclidean HMC
-implementations: a unit metric, a diagonal metric, and a dense
-metric.  These can be specified with the values \code{unit\_e},
-\code{diag\_e}, and \code{dense\_e}, respectively.
-
-Future versions of \Stan will also include dynamic metrics associated
-with \textit{Riemannian} HMC \citep{GirolamiCalderhead:2011, Betancourt:2012}.
-
-
 \section{Command Templates}
 
-This section provides templates for all of the arguments for the
-various top-level methods.  Arguments in square brackets are optional,
+This section provides templates for all of the arguments deriving from
+each of the possible methods: \code{sample}, \code{optimize}, and \code{diagnose}.  
+Arguments in square brackets are optional,
 those not in square brackets are required for the template.
 
 \subsection{Sampling Templates}
 %
-The no-U-turn sampler (NUTS) is the default (and recommended) sampler
+The No-U-Turn sampler (NUTS) is the default (and recommended) sampler
 for Stan.  The full set of configuration options is in
 \reffigure{nuts-command}.  
 %
@@ -1806,7 +1783,8 @@ for Stan.  The full set of configuration options is in
   (NUTS). This is the same skeleton as that for basic HMC in
   \reffigure{hmc-command}.  Elements in braces are optional.
   All arguments and their default values are described in detail in
-  \refsection{detailed-command-arguments}}\label{nuts-command.figure}
+  \refsection{detailed-command-arguments}.}
+\label{nuts-command.figure}
 \end{figure}
 %
 
@@ -1814,24 +1792,23 @@ A standard Hamiltonian Monte Carlo (HMC) sampler with user-specified
 integration time may also be used.  Its set of configuration options
 are shown in \reffigure{hmc-command}.
 
-Note that both NUTS and HMC may be configured with either a unit,
-diagonal or dense mass matrix; a diagonal mass matrix is the default.%
+Both NUTS and HMC may be configured with either a unit,
+diagonal or dense Euclidean metric, with a diagonal metric the default.%
 %
-\footnote{In Euclidean HMC, a diagonal mass matrix amounts to the same
-  thing as using varying step sizes.  Varying step sizes were used in
-  Stan 1.3 and before.  \cite{Neal:2011} discusses the equivalence and
-  provides a derivation.}
+\footnote{In Euclidean HMC, a diagonal metric emulates different step
+sizes for each parameter.  Explicitly varying step sizes were used in
+Stan 1.3 and before; \cite{Neal:2011} discusses the equivalence.}
 %
-A diagonal mass matrix essentially scales each parameter
-independently.  A unit mass matrix provides no parameter-by-parameter
-scaling.  A dense mass matrix also estimates parameter covariance, so
-that correlated parameters may move together.  Although dense mass
-matrices offer the hope of superior simulation performance, they
-require more computation, specifically for $m$ samples of a model with
-$n$ parameters, the dense matrix requires $\mathcal{O}(n^3 \log(m) +
-n^2 \, m)$ operations, whereas diagonal mass matrices require only
-$\mathcal{O}(n \, m)$.  Furthermore, dense mass matrices are difficult
-to estimate, because there are $\mathcal{O}(n^2)$ cells with complex
+A unit metric provides no parameter-by-parameter scaling,
+a diagonal metric scales each parameter independently, and
+a dense metric also rotates the parameters so
+that correlated parameters may move together.  Although dense metrics
+offer the hope of superior simulation performance, they
+require more computation per iteration.  Specifically for $m$ samples of a model with
+$n$ parameters, the dense metric requires $\mathcal{O}(n^3 \log(m) +
+n^2 \, m)$ operations, whereas diagonal metrics require only
+$\mathcal{O}(n \, m)$.  Furthermore, dense metrics are difficult
+to estimate, given the $\mathcal{O}(n^2)$ components with complex
 interdependence.
 %
 \begin{figure}
@@ -1870,11 +1847,9 @@ interdependence.
   skeleton shown in \reffigure{nuts-command} other than for the
   engine.  Elements in braces are optional.  All arguments and their
   default values are described in detail in
-  \refsection{detailed-command-arguments}}\label{hmc-command.figure}
+  \refsection{detailed-command-arguments}.}
+\label{hmc-command.figure}
 \end{figure}
-
-
-
 
 \subsection{Optimization Templates}
 %
@@ -1908,11 +1883,10 @@ skeleton for BFGS is in \reffigure{bfgs-command}.
 \end{quote}
 \caption{\small\it Command skeleton for invoking the BFGS optimizer.
   All arguments and their default values are described in detail in
-  \refsection{detailed-command-arguments}.}\label{bfgs-command.figure}
+  \refsection{detailed-command-arguments}.}
+\label{bfgs-command.figure}
 \end{figure}
 %
-
-
 
 Stan also supports Nesterov's dual-averaging method
 \citep{Nesterov:2009} for optimization.  The BFGS method is the
@@ -1942,7 +1916,8 @@ identical to that for BFGS other than the algorithm name.
 \caption{\small\it Command skeleton for invoking the Nesterov
   dual-averaging ptimizer.  All arguments and their default values are
   described in detail in
-  \refsection{detailed-command-arguments}.}\label{nesterov-command.figure}
+  \refsection{detailed-command-arguments}.}
+\label{nesterov-command.figure}
 \end{figure}
 %
 Stan also supports Newton's method; see \citep{NocedalWright:2006} for
@@ -1972,7 +1947,8 @@ Nesterov's dual averaging.
 \end{quote}
 \caption{\small\it Command skeleton for invoking the Newton optimizer.
   All arguments and their default values are described in detail in
-  \refsection{detailed-command-arguments}.}\label{newton-command.figure}
+  \refsection{detailed-command-arguments}.}
+\label{newton-command.figure}
 \end{figure}
 %
 
@@ -1994,7 +1970,8 @@ simple, and shown in \reffigure{diagnostic-command}.
 \end{quote}
 \caption{\small\it Command skeleton for invoking model diagnostics.  All
   arguments and their default values are described in detail in
-  \refsection{detailed-command-arguments}.}\label{diagnostic-command.figure}
+  \refsection{detailed-command-arguments}.}
+\label{diagnostic-command.figure}
 \end{figure}
 
 
