@@ -1508,7 +1508,7 @@ used to characterized bounded quantities, including probabilities.
 \subsubsection{Probability Density Function}
 
 If $\alpha \in \posreals$ and $\beta \in \posreals$, then for $\theta
-\in [0,1]$,
+\in (0,1)$,
 \[
 \distro{Beta}(\theta|\alpha,\beta)
 =
@@ -1519,7 +1519,9 @@ If $\alpha \in \posreals$ and $\beta \in \posreals$, then for $\theta
 (1 - \theta)^{\beta - 1}
 ,
 \] 
-where the beta function $\Betafun()$ is as defined in \refsection{betafun}
+where the beta function $\Betafun()$ is as defined in
+\refsection{betafun}.  If $\theta = 0$ or $\theta = 1$, then
+the log probability is $-\infty$.
 
 \pitem{theta}{beta}{alpha,beta}
 

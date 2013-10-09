@@ -116,6 +116,9 @@ The absolute value of \farg{x}}
 \fitem{int}{int\_step}{int \farg{x}}
 1 if \farg{x} is strictly greater than 0, and 0 otherwise
 %
+\fitem{int}{int\_step}{real \farg{x}}
+1 if \farg{x} is strictly greater than 0, and 0 otherwise
+%
 \end{description}
 %
 
@@ -1273,23 +1276,23 @@ $\mbox{\code{x}}^{\top}\,\mbox{\code{x}}$.}
 %
 \end{description}
 
+
+The following functions all provide shorthand forms for common
+expressions, which are also much more efficient.
+%
 \begin{description}
 %
 \fitem{matrix}{quad\_form}{matrix \farg{A}, matrix \farg{B}}{
-The quadratic form $B^T*A*B$.  Using this function is much more efficient than
-doing it directly.}
+The quadratic form, i.e., \code{B'~*~A~*~B}.}
 %
 \fitem{real}{quad\_form}{matrix \farg{A}, vector \farg{B}}{
-The quadratic form $B^T*A*B$.  Using this function is much more efficient than
-doing it directly.}
+The quadratic form, i.e., \code{B'~*~A~*~B}.}
 %
-\fitem{real}{trace\_quad\_form}{matrix \farg{A}, matrix \farg{B}}{
-The trace of a quadratic form, i.e., $trace(B^T*A*B)$.  Using this function is
-much more efficient than doing it directly.}
+\fitem{real}{trace\_quad\_form}{matrix \farg{A}, matrix \farg{B}}{ 
+The trace of the quadratic form, i.e., \code{trace(B'~*~A~*~B)}.}
 %
 \fitem{real}{trace\_gen\_quad\_form}{matrix \farg{D},matrix \farg{A}, matrix \farg{B}}{
-The trace of a generalized quadratic form, i.e., $trace(D*B^T*A*B)$.  Using this
-function is much more efficient than doing it directly.}
+The trace of a generalized quadratic form, i.e., \code{trace(D~*~B'~*~A~*~B).}}
 %
 \end{description}
 
