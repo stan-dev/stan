@@ -442,8 +442,8 @@ The following commands will produce an executable in the file
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
 > cd <stan-home>
-> g++ -O3 -Lbin -Isrc -Ilib/boost_1.53.0              \
-    -Ilib/eigen_3.1.2 my_model.cpp -o my_model -lstan
+> g++ -O3 -Lbin -Isrc -isystem lib/boost_1.54.0              \
+    -isystem lib/eigen_3.2.0 my_model.cpp -o my_model -lstan
 \end{Verbatim}
 \end{quote} %
 The backslash (\Verb|\|) is used to indicate that the command is
@@ -457,10 +457,10 @@ The options used here are as follows.
   directory,
 \item[\code{-Isrc}] specifies that the directory \code{src} should be
   searched for code (it contains the top-level \Stan headers),
-\item[\code{-Ilib/eigen\_3.1.2}] specifies the directory for
-  the Eigen library,
-\item[\code{-Ilib/boost\_1.53.0}] specifies the directory for the 
+\item[\code{-isystem lib/boost\_1.54.0}] specifies the include directory for the 
   Boost library,
+\item[\code{-isystem lib/eigen\_3.2.0}] specifies the include directory for
+  the Eigen library,
 \item[\code{my\_model.cpp}] specifies the name of the source file to
   compile, and 
 \item[\code{-o my\_model}] is the name of the resulting executable
