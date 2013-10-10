@@ -794,24 +794,3 @@ for (size_t i = 0; i < vector_types.size(); ++i)
 add_binary("weibull_rng");
 add("wishart_log",DOUBLE_T, MATRIX_T,DOUBLE_T,MATRIX_T);
 add("wishart_rng",MATRIX_T, DOUBLE_T,MATRIX_T);
-
-//------------------------------------------------------------
-/*
-// These need unit tests and doc
-add("diag_post_multiply",MATRIX_T,MATRIX_T,MATRIX_T);
-add("diag_post_multiply",MATRIX_T,MATRIX_T,VECTOR_T);
-add("diag_post_multiply",MATRIX_T,MATRIX_T,ROW_VECTOR_T);
-add("diag_pre_multiply",MATRIX_T,MATRIX_T,MATRIX_T);
-add("diag_pre_multiply",MATRIX_T,VECTOR_T,MATRIX_T);
-add("diag_pre_multiply",MATRIX_T,ROW_VECTOR_T,MATRIX_T);
-add("matrix_normal_prec_log",DOUBLE_T,MATRIX_T,MATRIX_T,MATRIX_T,MATRIX_T);
-add("multi_gp_log",DOUBLE_T,MATRIX_T,MATRIX_T,VECTOR_T);
-add("quad_form_sym",DOUBLE_T,MATRIX_T,VECTOR_T);
-add("quad_form_sym",MATRIX_T,MATRIX_T,MATRIX_T);
-add("squared_dist",DOUBLE_T,VECTOR_T,VECTOR_T);
-add("squared_dist",DOUBLE_T,ROW_VECTOR_T,ROW_VECTOR_T);
-add("squared_dist",DOUBLE_T,VECTOR_T,ROW_VECTOR_T);
-add("squared_dist",DOUBLE_T,ROW_VECTOR_T,VECTOR_T);
-add("squared_dist",DOUBLE_T,MATRIX_T,MATRIX_T);
-add("trunc_normal_log",DOUBLE_T, DOUBLE_T,DOUBLE_T,DOUBLE_T,DOUBLE_T,DOUBLE_T);
-*/
