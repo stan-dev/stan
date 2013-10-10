@@ -654,17 +654,17 @@ the observations as follows.
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
 data {
-   int<lower=0> N;
-   real U;
-   real<upper=U> y[N];
+  int<lower=0> N;
+  real U;
+  real<upper=U> y[N];
 } 
 parameters {
-   real mu;
-   real<lower=0> sigma;
+  real mu;
+  real<lower=0> sigma;
 } 
 model {
   for (n in 1:N)
-       y[n] ~ normal(mu,sigma) T[,U];
+    y[n] ~ normal(mu,sigma) T[,U];
 }
 \end{Verbatim}
 \end{quote}
@@ -687,7 +687,7 @@ sampled with the statement.
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
 for (n in 1:N) 
-    y[n] ~ normal(mu,sigma) T[L,U];
+  y[n] ~ normal(mu,sigma) T[L,U];
 \end{Verbatim}
 \end{quote}
 %
@@ -703,8 +703,8 @@ the values of \code{L} and \code{U}.
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
 parameters {
-    real<lower=L,upper=U> y[N];
-    ...
+  real<lower=L,upper=U> y[N];
+  ...
 \end{Verbatim}
 \end{quote}
 
@@ -719,8 +719,8 @@ are well behaved.
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
 parameters {
-    real<upper=min(y)> L; // L < y[n]
-    real<lower=fmax(L,max(y))> U; // L < U; y[n] < U
+  real<upper=min(y)> L; // L < y[n]
+  real<lower=fmax(L,max(y))> U; // L < U; y[n] < U
 \end{Verbatim}
 \end{quote}
 %
@@ -743,20 +743,20 @@ known truncation points.
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
 data {
-   int<lower=1> N;
-   real y[N];
+  int<lower=1> N;
+  real y[N];
 }
 parameters {
-   real<upper = min(y)> L; 
-   real<lower = max(y)> U;
-   real mu;
-   real<lower=0> sigma;
+  real<upper = min(y)> L; 
+  real<lower = max(y)> U;
+  real mu;
+  real<lower=0> sigma;
 }
 model {
   L ~ ...;  
   U ~ ...;
   for (n in 1:N)
-       y[n] ~ normal(mu,sigma) T[L,U];
+    y[n] ~ normal(mu,sigma) T[L,U];
 }
 \end{Verbatim}
 \end{quote}
@@ -793,10 +793,10 @@ matrices, the censored values must be represented explicitly.
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
 data {
-   int<lower=0> N_obs;
-   int<lower=0> N_cens;
-   real<lower=0> y_obs[N_obs];
-   real<lower=max(y_obs)> U;
+  int<lower=0> N_obs;
+  int<lower=0> N_cens;
+  real<lower=0> y_obs[N_obs];
+  real<lower=max(y_obs)> U;
 }
 parameters {
   real<lower=U> y_cens[N_cens];
@@ -804,10 +804,10 @@ parameters {
   real<lower=0> sigma;
 }
 model {
-   for (n in 1:N_obs)
-       y_obs[n] ~ normal(mu,sigma);
-   for (n in 1:N_cens)
-       y_cens[n] ~ normal(mu,sigma);
+  for (n in 1:N_obs)
+    y_obs[n] ~ normal(mu,sigma);
+  for (n in 1:N_cens)
+    y_cens[n] ~ normal(mu,sigma);
 }
 \end{Verbatim}
 \end{quote}
@@ -855,19 +855,19 @@ that the censoring point is known, so it is declared as data.
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
 data {
-   int<lower=0> N_obs;
-   int<lower=0> N_cens;
-   real<lower=0> y_obs[N_obs];
-   real<lower=max(y_obs)> U;
+  int<lower=0> N_obs;
+  int<lower=0> N_cens;
+  real<lower=0> y_obs[N_obs];
+  real<lower=max(y_obs)> U;
 }
 parameters {
   real mu;
   real<lower=0> sigma;
 }
 model {
-   for (n in 1:N_obs)
-       y_obs[n] ~ normal(mu,sigma); 
-   increment_log_prob(N_cens * log1m(normal_cdf(U,mu,sigma)));
+  for (n in 1:N_obs)
+    y_obs[n] ~ normal(mu,sigma); 
+  increment_log_prob(N_cens * log1m(normal_cdf(U,mu,sigma)));
 }
 \end{Verbatim}
 \end{quote}
@@ -1066,18 +1066,18 @@ This latter form of the model is coded in \Stan as follows.
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
 data {
-   int<lower=0> N;
-   vector[N] x;
-   vector[N] y;
+  int<lower=0> N;
+  vector[N] x;
+  vector[N] y;
 }
 parameters {
-    real alpha;
-    real beta;
-    real<lower=0> sigma;
+  real alpha;
+  real beta;
+  real<lower=0> sigma;
 }
 model {
-    for (n in 1:N)
-        y[n] ~ normal(alpha + beta * x[n], sigma);
+  for (n in 1:N)
+    y[n] ~ normal(alpha + beta * x[n], sigma);
 }
 \end{Verbatim}
 \end{quote}
@@ -1095,8 +1095,8 @@ For example, weak priors can be assigned to the coefficients as follows.
 %
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
-    alpha ~ normal(0,100);
-    beta ~ normal(0,100);
+alpha ~ normal(0,100);
+beta ~ normal(0,100);
 \end{Verbatim}
 \end{quote}
 %
@@ -1104,7 +1104,7 @@ And an upper bound to \code{sigma} can be given in order to implicitly
 give it a uniform prior.
 \begin{quote}
 \begin{verbatim}
-    real<lower=0,upper=100> sigma;
+real<lower=0,upper=100> sigma;
 \end{verbatim}
 \end{quote}
 
@@ -1114,9 +1114,9 @@ as follows.
 %
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
-    alpha ~ cauchy(0,2.5);
-    beta ~ cauchy(0,2.5);
-    sigma ~ cauchy(0,2.5);
+alpha ~ cauchy(0,2.5);
+beta ~ cauchy(0,2.5);
+sigma ~ cauchy(0,2.5);
 \end{Verbatim}
 \end{quote}
 %
@@ -1235,21 +1235,21 @@ $\distro{Normal}(0,5)$ priors on the coefficients is coded as follows.
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
 data {
-   int<lower=2> K;
-   int<lower=0> N;
-   int<lower=1> D;
-   int<lower=1,upper=K> y[N];
-   vector[D] x[N];
+  int<lower=2> K;
+  int<lower=0> N;
+  int<lower=1> D;
+  int<lower=1,upper=K> y[N];
+  vector[D] x[N];
 }
 parameters {
-   matrix[K,D] beta;
+  matrix[K,D] beta;
 }
 model {
   for (k in 1:K)
     for (d in 1:D)
       beta[k,d] ~ normal(0,5);
   for (n in 1:N)
-     y[n] ~ categorical(softmax(beta * x[n]));
+    y[n] ~ categorical(softmax(beta * x[n]));
 }
 \end{Verbatim}
 \end{quote}
@@ -1312,7 +1312,7 @@ parameters {
 } 
 model {
   for (n in 1:N)
-      y[n] ~ ordered_logistic(x[n] * beta, c);
+    y[n] ~ ordered_logistic(x[n] * beta, c);
 }
 \end{Verbatim}
 \end{quote}
@@ -1348,13 +1348,13 @@ parameters {
 model {
   vector[K] theta;
   for (n in 1:N) {
-      real eta;
-      eta <- x[n] * beta;
-      theta[1] <- 1 - Phi(eta - c[1]);
-      for (k in 2:(K-1))
-          theta[k] <- Phi(eta - c[k-1]) - Phi(eta - c[k]);
-      theta[K] <- Phi(eta - c[K-1]);
-      y[n] ~ categorical(theta);
+    real eta;
+    eta <- x[n] * beta;
+    theta[1] <- 1 - Phi(eta - c[1]);
+    for (k in 2:(K-1))
+      theta[k] <- Phi(eta - c[k-1]) - Phi(eta - c[k]);
+    theta[K] <- Phi(eta - c[K-1]);
+    y[n] ~ categorical(theta);
   }
 }
 \end{Verbatim}
@@ -1395,26 +1395,26 @@ with a hierarchical prior on the regression coefficients.
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
 data {
-    int<lower=1> D;
-    int<lower=0> N;
-    int<lower=1> L;
-    int<lower=0,upper=1> y[N];
-    int<lower=1,upper=L> ll[N];
-    row_vector[D] x[N];
+  int<lower=1> D;
+  int<lower=0> N;
+  int<lower=1> L;
+  int<lower=0,upper=1> y[N];
+  int<lower=1,upper=L> ll[N];
+  row_vector[D] x[N];
 }
 parameters {
-    real mu[D];
-    real<lower=0,upper=1000> sigma[D];
-    vector[D] beta[L];
+  real mu[D];
+  real<lower=0,upper=1000> sigma[D];
+  vector[D] beta[L];
 }
 model {
-    for (d in 1:D) {
-        mu[d] ~ normal(0,100);
-        for (l in 1:L)
-            beta[l,d] ~ normal(mu[d],sigma[d]);
-    }
-    for (n in 1:N)
-        y[n] ~ bernoulli(inv_logit(x[n] * beta[ll[n]]));
+  for (d in 1:D) {
+    mu[d] ~ normal(0,100);
+    for (l in 1:L)
+      beta[l,d] ~ normal(mu[d],sigma[d]);
+  }
+  for (n in 1:N)
+    y[n] ~ bernoulli(inv_logit(x[n] * beta[ll[n]]));
 }
 \end{Verbatim}
 \end{quote}   
@@ -1626,17 +1626,17 @@ the \Stan program for the AR(1) model is as follows.
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
 data {
-    int<lower=0> N;
-    real y[N];
+  int<lower=0> N;
+  real y[N];
 }
 parameters {
-    real alpha;
-    real beta;
-    real sigma;
+  real alpha;
+  real beta;
+  real sigma;
 }
 model {
-    for (n in 2:N)
-       y[n] ~ normal(alpha + beta*y[n-1], sigma);
+  for (n in 2:N)
+    y[n] ~ normal(alpha + beta*y[n-1], sigma);
 }
 \end{Verbatim}
 \end{quote}
@@ -1656,7 +1656,7 @@ coefficient \code{beta} may be constrained with bounds as follows.
 %
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
-    real<lower=-1,upper=1> beta;
+real<lower=-1,upper=1> beta;
 \end{Verbatim}
 \end{quote}
 %
@@ -1689,23 +1689,23 @@ predictor in a loop.
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
 data {
-    int<lower=0> K;
-    int<lower=0> N;
-    real y[N];
+  int<lower=0> K;
+  int<lower=0> N;
+  real y[N];
 }
 parameters {
-    real alpha;
-    real beta[K];
-    real sigma;
+  real alpha;
+  real beta[K];
+  real sigma;
 }
 model {
-    for (n in (K+1):N) {
-        real mu;
-        mu <- alpha;
-        for (k in 1:K)
-            mu <- mu + beta[k] * y[n-k];
-        y[n] ~ normal(mu, sigma);
-    }
+  for (n in (K+1):N) {
+    real mu;
+    mu <- alpha;
+    for (k in 1:K)
+      mu <- mu + beta[k] * y[n-k];
+    y[n] ~ normal(mu, sigma);
+  }
 }
 \end{Verbatim}
 \end{quote}
@@ -1762,8 +1762,7 @@ parameters {
 }
 model {
   for (t in 2:T)
-    r[t] ~ normal(mu, 
-                 sqrt(alpha0 + alpha1 * pow(r[t-1] - mu,2)));
+    r[t] ~ normal(mu, sqrt(alpha0 + alpha1 * pow(r[t-1] - mu,2)));
 }
 \end{Verbatim}
 \end{quote}
@@ -2146,7 +2145,7 @@ First, the sampling statements for return $y$ is easily vectorized to
 %
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
-    y ~ normal(0, exp(h / 2));
+y ~ normal(0, exp(h / 2));
 \end{Verbatim}
 \end{quote}
 %
@@ -4258,10 +4257,10 @@ follows.
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
 model {
-   real alpha;
-   real beta;
-   alpha <- lambda * phi;
-   beta <- lambda * (1 - phi);
+  real alpha;
+  real beta;
+  alpha <- lambda * phi;
+  beta <- lambda * (1 - phi);
 ...
   for (n in 1:N)
     theta[n] ~ beta(alpha,beta);
@@ -4449,18 +4448,18 @@ case where the Jacobian is not a full matrix.
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
 parameters {
-   vector[K] u;      // multivariate parameter
+  vector[K] u;      // multivariate parameter
    ...
 transformed parameters {
-   vector[K] v;     // transformed parameter
-   matrix[K,K] J;   // Jacobian matrix of transform
-   ... compute v as a function of u ...
-   ... compute J[m,n] = d.v[m] / d.u[n] ...
-   increment_log_prob(log(fabs(determinant(J))));
-   ...
+  vector[K] v;     // transformed parameter
+  matrix[K,K] J;   // Jacobian matrix of transform
+  ... compute v as a function of u ...
+  ... compute J[m,n] = d.v[m] / d.u[n] ...
+  increment_log_prob(log(fabs(determinant(J))));
+  ...
 model {
-   v ~ ...;
-   ...
+  v ~ ...;
+  ...
 \end{Verbatim}
 \end{quote}
 %
@@ -4534,10 +4533,10 @@ $\distro{Triangle}(-1,1)$.
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
 parameters {
-    real<lower=-1,upper=1> y;
+  real<lower=-1,upper=1> y;
 }
 model {
-    increment_log_prob(log1m(fabs(y)));
+  increment_log_prob(log1m(fabs(y)));
 }
 \end{Verbatim}
 \end{quote}
@@ -5239,7 +5238,7 @@ some operation that depends on \code{n}.
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
 for (n in 1:N) 
-   total <- total + foo(n,...);
+  total <- total + foo(n,...);
 \end{Verbatim}
 \end{quote}
 %
@@ -5281,21 +5280,22 @@ coefficients.
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
 data {
-    int<lower=1> K;
-    int<lower=1> N;
-    real x[K,N];
-    real y[N];
+  int<lower=1> K;
+  int<lower=1> N;
+  real x[K,N];
+  real y[N];
 }
 parameters {
-    real beta[K];
+  real beta[K];
 }
 model {
-    for (n in 1:N) {
-        real gamma;  gamma <- 0.0;
-        for (k in 1:K)
-            gamma <- gamma + x[n,k] * beta[k];
-        y[n] ~ normal(gamma,1);
-    }
+  for (n in 1:N) {
+    real gamma;  
+    gamma <- 0.0;
+    for (k in 1:K)
+      gamma <- gamma + x[n,k] * beta[k];
+    y[n] ~ normal(gamma,1);
+  }
 }
 \end{Verbatim}
 \end{quote}
@@ -5307,17 +5307,17 @@ initialization.
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
 data {
-    int<lower=1> K;
-    int<lower=1> N;
-    vector[K] x[N];
-    real y[N];
+  int<lower=1> K;
+  int<lower=1> N;
+  vector[K] x[N];
+  real y[N];
 }
 parameters {
-    vector[K] beta;
+  vector[K] beta;
 }
 model {
-    for (n in 1:N)
-        y[n] ~ normal(dot_product(x[n],beta), 1);
+  for (n in 1:N)
+    y[n] ~ normal(dot_product(x[n],beta), 1);
 }
 \end{Verbatim}
 \end{quote}
@@ -5350,12 +5350,12 @@ as follows.
 \begin{Verbatim}[fontsize=\small]
 ...
 transformed parameters {
-    row_vector[K] beta_t;
-    beta_t <- beta';
+  row_vector[K] beta_t;
+  beta_t <- beta';
 }
 model {
-    for (n in 1:N)
-        y[n] ~ normal(beta_t * x[n], 1);
+  for (n in 1:N)
+    y[n] ~ normal(beta_t * x[n], 1);
 }
 \end{Verbatim}
 \end{quote}
@@ -5367,16 +5367,16 @@ following example.
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
 data {
-    ...
-    row_vector[K] x[N];
-    ...
+  ...
+  row_vector[K] x[N];
+  ...
 }
 parameters {
-    vector[K] beta;
+  vector[K] beta;
 }
 model {
-    for (n in 1:N)
-        y[n] ~ normal(x[n] * beta, 1);
+  for (n in 1:N)
+    y[n] ~ normal(x[n] * beta, 1);
 }
 \end{Verbatim}
 \end{quote}
@@ -5394,16 +5394,16 @@ probability function, as in the following example.
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
 data {
-    int<lower=1> K;
-    int<lower=1> N;
-    matrix[N,K] x;
-    vector[N] y;
+  int<lower=1> K;
+  int<lower=1> N;
+  matrix[N,K] x;
+  vector[N] y;
 }
 parameters {
-    vector[K] beta;
+  vector[K] beta;
 } 
 model {
-    y ~ normal(x * beta, 1);
+  y ~ normal(x * beta, 1);
 }
 \end{Verbatim}
 \end{quote}
@@ -5431,18 +5431,18 @@ sampling model.
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
 data {
-    int<lower=0> N;
-    int<lower=0,upper=1> y[N];
-    real<lower=0> alpha;
-    real<lower=0> beta;
+  int<lower=0> N;
+  int<lower=0,upper=1> y[N];
+  real<lower=0> alpha;
+  real<lower=0> beta;
 }
 parameters {
-    real<lower=0,upper=1> theta;
+  real<lower=0,upper=1> theta;
 }
 model {
-    theta ~ beta(alpha,beta);
-    for (n in 1:N) 
-        y[n] ~ bernoulli(theta);
+  theta ~ beta(alpha,beta);
+  for (n in 1:N) 
+    y[n] ~ bernoulli(theta);
 }
 \end{Verbatim}
 \end{quote}
