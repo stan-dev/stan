@@ -10,6 +10,7 @@
 #include "stan/math/constants.hpp"
 #include "stan/math/functions/Phi.hpp"
 #include "stan/math/functions/Phi_approx.hpp"
+#include "stan/math/functions/abs.hpp"
 #include "stan/math/functions/as_bool.hpp"
 #include "stan/math/functions/bessel_first_kind.hpp"
 #include "stan/math/functions/bessel_second_kind.hpp"
