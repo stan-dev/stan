@@ -34,6 +34,52 @@ TEST(ProbDistributions,DirichletPropto) {
   EXPECT_FLOAT_EQ(0.0, stan::prob::dirichlet_log<true>(theta2,alpha2));
 }
 
+TEST(ProbDistributions,DirichletBounds) {
+  Matrix<double,Dynamic,1> good_alpha(2,1), bad_alpha(2,1);
+  Matrix<double,Dynamic,1> good_theta(2,1), bad_theta(2,1);
+
+  good_theta << 0.25, 0.75;
+  good_alpha << 2, 3;
+  EXPECT_NO_THROW(stan::prob::dirichlet_log(good_theta,good_alpha));
+
+  good_theta << 1.0, 0.0;
+  good_alpha << 2, 3;
+  EXPECT_NO_THROW(stan::prob::dirichlet_log(good_theta,good_alpha))
+    << "elements of theta can be 0";
+
+
+  bad_theta << 0.25, 0.25;
+  EXPECT_THROW(stan::prob::dirichlet_log(bad_theta,good_alpha),
+	       std::domain_error)
+    << "sum of theta is not 1";
+
+  bad_theta << -0.25, 1.25;
+  EXPECT_THROW(stan::prob::dirichlet_log(bad_theta,good_alpha),
+	       std::domain_error)
+    << "theta has element less than 0";
+
+  bad_theta << -0.25, 1.25;
+  EXPECT_THROW(stan::prob::dirichlet_log(bad_theta,good_alpha),
+	       std::domain_error)
+    << "theta has element less than 0";
+
+  bad_alpha << 0.0, 1.0;
+  EXPECT_THROW(stan::prob::dirichlet_log(good_theta,bad_alpha),
+	       std::domain_error)
+    << "alpha has element equal to 0";
+
+  bad_alpha << -0.5, 1.0;
+  EXPECT_THROW(stan::prob::dirichlet_log(good_theta,bad_alpha),
+	       std::domain_error)
+    << "alpha has element less than 0";
+
+  bad_alpha = Matrix<double,Dynamic,1>(4,1);
+  bad_alpha << 1, 2, 3, 4;
+  EXPECT_THROW(stan::prob::dirichlet_log(good_theta,bad_alpha),
+	       std::domain_error)
+    << "size mismatch: theta is a 2-vector, alpha is a 4-vector";
+}
+
 TEST(ProbDistributionsDirichlet, random) {
   boost::random::mt19937 rng;
   Matrix<double,Dynamic,Dynamic> alpha(3,1);
