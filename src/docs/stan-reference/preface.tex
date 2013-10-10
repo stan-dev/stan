@@ -180,7 +180,25 @@ to realize that it required a major refactoring (see, for example,
 while the outside hasn't changed dramatically in Stan 2, the inside is
 almost totally different in terms of how the HMC samplers are
 organized, how the output is analyzed, how the mathematics library is
-organized, etc.
+organized, etc.  
+
+We've also improved our optimization algorithm (BFGS) and its
+parameterization.  We've added more compile-time and run-time error
+checking for models.  We've added many new functions, including new
+matrix functions and new distributions.  We've added some new
+parameterizations and managed to vectorize all the univariate
+distributions.  We've increased compatibility with a range of C++
+compilers.  
+
+We've also tried to fill out the manual to clarify things like array
+and vector indexing, programming style, and the I/O and command-line
+formats.  Most of these changes are direct results of user-reported
+confusions.  So please let us know where we can be clearer or more
+fully explain something.
+
+Finally, we've fixed all the bugs which we know about.  It was keeping
+up with the latter that really set the development time back,
+including bugs that resulted in our having to add more error checking.
 
 
 \section*{\Stan's Future}

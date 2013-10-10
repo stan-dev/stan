@@ -130,7 +130,7 @@ accounts for both scaling and rotation,%
 but is more memory and computation intensive per leapfrog step due to
 the underlying matrix operations.
 
-\section{Convergence Monitoring and Effective Sample Size}
+\subsection{Convergence Monitoring and Effective Sample Size}
 
 Samples in a Markov chain are only drawn with the marginal
 distribution $p(\theta|y;x)$ after the chain has converged to its
@@ -153,9 +153,7 @@ error due to correlated samples.
 
 
 
-
-
-\section{Bayesian Inference and Monte Carlo Methods}
+\subsection{Bayesian Inference and Monte Carlo Methods}
 
 \Stan was developed to support full Bayesian inference.  Bayesian
 inference is based in part on Bayes's rule,
@@ -180,6 +178,64 @@ from the posterior using plug-in estimates for quantities of interest
 such as posterior means, posterior intervals, predictions based on the
 posterior such as event outcomes or the values of as yet unobserved
 data.
+
+
+\section{Optimization}
+
+\Stan also supports optimization of user models.  Given a posterior
+$p(\theta|y)$, Stan can find the posterior mode $\theta^*$, which is
+defined by
+%
+\[
+\theta^{*} = \mbox{argmax}_{\theta} \ p(\theta|y).
+\]
+%
+Here the notation $\mbox{argmax}_u \ f(v)$ is used to pick out the value
+of $v$ at which $f(v)$ is maximized.  
+
+If the prior is uniform, the posterior mode corresponds to the maximum
+likelihood estimate (MLE) of the parameters.  If the prior is not
+uniform, the posterior mode is sometimes called the maximum a
+posterior (MAP) estimate.  
+
+
+\subsection{Inference with Point Estimates}
+
+The estimate $\theta^{*}$ is a so-called ``point estimate,'' meaning
+that it summarizes the posterior distribution by a single point,
+rather than as a distribution over $\theta$.  Of course, such a
+summary does not take into account variance.  Posterior predictive
+inferences $p(\tilde{y} | y)$ can be made using the posterior mode
+given data $y$ as $p(\tilde{y}|\theta^*)$, but they are not Bayesian
+inferences, even if the model involves a prior, because they do not
+take posterior uncertainty into account.  If the posterior variance is
+low and the posterior mean is near the posterior mode, inference with
+point estimates can be very similar to full Bayesian inference.
+
+\subsubsection{``Empirical Bayes''}
+
+Fitting point estimates of priors and then using them for subsequent
+inference is sometimes called ``empirical Bayes'' (see, e.g.,
+\citep{Efron:2012}).%
+%
+\footnote{The scare quotes on ``empirical Bayes'' are because the
+  approach is no more empirical than full Bayes.  Empirical Bayes
+  approaches merely ignore some posterior uncertainty to make
+  inference more efficient computationally.}
+%
+Typically these optimizations will be done using maximum marignal
+likelihood rather than posterior modes of a full model.  Sometimes
+Empirical Bayes point estimates will be obtained using moment matching
+(see, e.g., the rat-tumor example in Chapter 5 of
+\citep{GelmanCarlinSternRubin:2003}).
+
+
+\subsection{Experimental Feature}
+
+Stan's optimizers have not been as well tested as its samplers, so
+they are still considered an ``experimental'' feature.  We would love
+to hear back about successess or failures users have with
+optimization.  
 
 
 

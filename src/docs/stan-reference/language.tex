@@ -1474,6 +1474,13 @@ Although not the most expressive character set, \ASCII is the most
 portable and least prone to corruption through improper character
 encodings or decodings.
 
+\subsubsection{Comments Allow ASCII-Compatible Encoding}
+
+Within comments, Stan can work with any ASCII-compatible character
+encoding, such as ASCII itself, UTF-8, or Latin1.  It is up to user
+shells and editors to display them properly.  
+
+
 \section{Parentheses for Grouping}
 
 Any expression wrapped in parentheses is also an expression. Like in
@@ -1606,7 +1613,7 @@ tabular form in \reffigure{operator-precedence}.
   precedences, associativities, place in an expression, and a
   description.  The last two lines list the precedence of function
   application and array, matrix, and vector indexing. The operators are
-  listed in order of precedence, from least tightly binded to most
+  listed in order of precedence, from least tightly binding to most
   tightly binding.  The full set of legal arguments and corresponding
   result types are provided in the function documentation in
   \refpart{built-in-functions} prefaced with \code{operator} (i.e.,
@@ -2364,11 +2371,11 @@ expression.  For instance, it is legal syntactically to write
 \begin{quote}
 \begin{Verbatim}
 data {
-    real<lower=0> y;
+  real<lower=0> y;
 }
 ...
 model {
-    log(y) ~ normal(mu,sigma);
+  log(y) ~ normal(mu,sigma);
 }
 \end{Verbatim}
 \end{quote}
@@ -2521,7 +2528,6 @@ stable version
 \begin{quote}
 \begin{Verbatim}
 increment_log_prob(-normal_ccdf_log(-0.5, 0, 1));
->>>>>>> develop
 \end{Verbatim}
 \end{quote}
 
@@ -2602,7 +2608,7 @@ is a well-formed for-loop statement.
 \begin{quote}
 \begin{Verbatim}
 for (n in 1:N) {
-   y[n] ~ normal(mu,sigma);
+  y[n] ~ normal(mu,sigma);
 }
 \end{Verbatim}
 \end{quote}
@@ -2657,8 +2663,8 @@ interpretation than the previous one.
 \begin{quote}
 \begin{Verbatim}
 for (n in 1:N) {
-   y[n] ~ bernoulli(theta);
-   theta <- inv_logit(alpha + x[n] * beta);
+  y[n] ~ bernoulli(theta);
+  theta <- inv_logit(alpha + x[n] * beta);
 }
 \end{Verbatim}
 \end{quote}
@@ -2676,7 +2682,7 @@ following.
 \begin{Verbatim}
 total <- 0.0;
 for (n in 1:N) 
-   total <- total + x[n];
+  total <- total + x[n];
 \end{Verbatim}
 \end{quote}
 %
@@ -2696,9 +2702,9 @@ times, as in the following legal code.
 \begin{quote}
 \begin{Verbatim}
 for (n in 1:100) {
-    y <- y + y * epsilon;
-    epsilon <- epsilon / 2.0;
-    y <- y + y * epsilon;
+  y <- y + y * epsilon;
+  epsilon <- epsilon / 2.0;
+  y <- y + y * epsilon;
 }
 \end{Verbatim}
 \end{quote}
@@ -2776,7 +2782,7 @@ can be written as follows.
 \begin{quote}
 \begin{Verbatim} 
 for (n in 1:N) 
- y[n] ~ normal(mu,sigma);
+  y[n] ~ normal(mu,sigma);
 \end{Verbatim}
 \end{quote}
 % 
@@ -2856,12 +2862,12 @@ the for loop.  For instance, the following is not legal.
 \begin{quote}
 \begin{Verbatim}
 for (m in 1:M) {
-    real theta;
-    for (n in 1:N) {
-      real theta; // ERROR!
-      theta <- inv_logit(alpha + x[m,n] * beta);
-      y[m,n] ~ bernoulli(theta);
-}
+  real theta;
+  for (n in 1:N) {
+    real theta; // ERROR!
+    theta <- inv_logit(alpha + x[m,n] * beta);
+    y[m,n] ~ bernoulli(theta);
+...
 \end{Verbatim}
 \end{quote}
 %
@@ -2887,13 +2893,13 @@ in a for loop, it is legal to have the following
 \begin{quote}
 \begin{Verbatim}
 for (m in 1:M) {
-   { 
+  { 
      int n;  
      n <- 2 * m; 
      sum <- sum + n 
-   }
-   for (n in 1:N) 
-     sum <- sum + x[m,n];
+  }
+  for (n in 1:N) 
+    sum <- sum + x[m,n];
 }
 \end{Verbatim}
 \end{quote}
@@ -3041,6 +3047,15 @@ is ignored (along with the slashes or pound sign).
 For bracketed comments, any text between a forward-slash and asterisk
 pair (\Verb|/*|) and an asterisk and forward-slash pair (\Verb|*/|) is
 ignored.
+
+\subsection{Character Encoding}
+
+Comments may be in ASCII, UTF-8, Latin1, or any other character
+encoding that is byte-wise compatible with ASCII.  This excludes
+encodings like UTF-16, Big5, etc.%
+%
+\footnote{The issue is that they will separate the characters in
+  \code{*/} and \code{*/}.}
 
 
 \section{Overview of \Stan's Program Blocks}
