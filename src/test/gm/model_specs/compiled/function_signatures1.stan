@@ -47,8 +47,7 @@ transformed data {
   transformed_data_real <- not_a_number();
   transformed_data_real <- positive_infinity();
   transformed_data_real <- negative_infinity();
-  transformed_data_real <- epsilon();
-  transformed_data_real <- negative_epsilon();
+  transformed_data_real <- machine_precision();
 
   // logical functions
   transformed_data_real <- if_else(d_int, d_real, d_real);
@@ -366,8 +365,7 @@ transformed parameters {
   transformed_param_real <- not_a_number();
   transformed_param_real <- positive_infinity();
   transformed_param_real <- negative_infinity();
-  transformed_param_real <- epsilon();
-  transformed_param_real <- negative_epsilon();
+  transformed_param_real <- machine_precision();
 
   // logical functions
   transformed_param_real <- if_else(d_int, d_real, d_real);
