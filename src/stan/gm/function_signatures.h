@@ -229,7 +229,6 @@ add("elt_divide",MATRIX_T,MATRIX_T,MATRIX_T);
 add("elt_multiply",VECTOR_T,VECTOR_T,VECTOR_T);
 add("elt_multiply",ROW_VECTOR_T,ROW_VECTOR_T,ROW_VECTOR_T);
 add("elt_multiply",MATRIX_T,MATRIX_T,MATRIX_T);
-add_nullary("epsilon");
 add_unary("erf");
 add_unary("erfc");
 add_unary("exp");
@@ -457,6 +456,7 @@ for (size_t i = 0; i < vector_types.size(); ++i)
           vector_types[i], vector_types[j], vector_types[k]); // args
     }
 add_binary("lognormal_rng");
+add_nullary("machine_precision");
 add("max",INT_T,expr_type(INT_T,1));
 add("max",DOUBLE_T,expr_type(DOUBLE_T,1));
 add("max",DOUBLE_T,VECTOR_T);
@@ -522,7 +522,6 @@ for (size_t i = 0; i < int_vector_types.size(); ++i)
           int_vector_types[i],vector_types[j],vector_types[k]);
     }
 add("neg_binomial_rng",INT_T,DOUBLE_T,DOUBLE_T);
-add_nullary("negative_epsilon");
 add_nullary("negative_infinity");
 for (size_t i = 0; i < vector_types.size(); ++i) 
   for (size_t j = 0; j < vector_types.size(); ++j) 
