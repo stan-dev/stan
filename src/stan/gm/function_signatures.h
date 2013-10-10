@@ -171,12 +171,6 @@ add("cumulative_sum", VECTOR_T, VECTOR_T);
 add("cumulative_sum", ROW_VECTOR_T, ROW_VECTOR_T);
 add("determinant",DOUBLE_T,MATRIX_T);
 add("diag_matrix",MATRIX_T,VECTOR_T);
-add("diag_post_multiply",MATRIX_T,MATRIX_T,MATRIX_T);
-add("diag_post_multiply",MATRIX_T,MATRIX_T,VECTOR_T);
-add("diag_post_multiply",MATRIX_T,MATRIX_T,ROW_VECTOR_T);
-add("diag_pre_multiply",MATRIX_T,MATRIX_T,MATRIX_T);
-add("diag_pre_multiply",MATRIX_T,VECTOR_T,MATRIX_T);
-add("diag_pre_multiply",MATRIX_T,ROW_VECTOR_T,MATRIX_T);
 add("diagonal",VECTOR_T,MATRIX_T);
 // dims() is polymorphic by size
 for (size_t i = 0; i < 8; ++i) {
@@ -802,6 +796,14 @@ add("wishart_log",DOUBLE_T, MATRIX_T,DOUBLE_T,MATRIX_T);
 add("wishart_rng",MATRIX_T, DOUBLE_T,MATRIX_T);
 
 //------------------------------------------------------------
+/*
+// These need unit tests and doc
+add("diag_post_multiply",MATRIX_T,MATRIX_T,MATRIX_T);
+add("diag_post_multiply",MATRIX_T,MATRIX_T,VECTOR_T);
+add("diag_post_multiply",MATRIX_T,MATRIX_T,ROW_VECTOR_T);
+add("diag_pre_multiply",MATRIX_T,MATRIX_T,MATRIX_T);
+add("diag_pre_multiply",MATRIX_T,VECTOR_T,MATRIX_T);
+add("diag_pre_multiply",MATRIX_T,ROW_VECTOR_T,MATRIX_T);
 add("matrix_normal_prec_log",DOUBLE_T,MATRIX_T,MATRIX_T,MATRIX_T,MATRIX_T);
 add("multi_gp_log",DOUBLE_T,MATRIX_T,MATRIX_T,VECTOR_T);
 add("quad_form_sym",DOUBLE_T,MATRIX_T,VECTOR_T);
@@ -812,3 +814,4 @@ add("squared_dist",DOUBLE_T,VECTOR_T,ROW_VECTOR_T);
 add("squared_dist",DOUBLE_T,ROW_VECTOR_T,VECTOR_T);
 add("squared_dist",DOUBLE_T,MATRIX_T,MATRIX_T);
 add("trunc_normal_log",DOUBLE_T, DOUBLE_T,DOUBLE_T,DOUBLE_T,DOUBLE_T,DOUBLE_T);
+*/
