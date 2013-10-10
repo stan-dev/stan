@@ -635,11 +635,7 @@ namespace stan {
           std::cout << "initial log joint probability = " << lp << std::endl;
           int ret = 0;
           
-          while (1) {  
-            ret = bfgs.step();
-            lp = bfgs.logp();
-            bfgs.params_r(cont_params);
-            
+          while (ret == 0) {  
             if (do_print(bfgs.iter_num(), 50*refresh)) {
               std::cout << "    Iter ";
               std::cout << "     log prob ";
@@ -651,6 +647,10 @@ namespace stan {
               std::cout << " # evals ";
               std::cout << " Notes " << std::endl;
             }
+            
+            ret = bfgs.step();
+            lp = bfgs.logp();
+            bfgs.params_r(cont_params);
             
             if (do_print(bfgs.iter_num(), refresh) || ret != 0 || !bfgs.note().empty()) {
               std::cout << " " << std::setw(7) << bfgs.iter_num() << " ";
