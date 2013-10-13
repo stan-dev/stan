@@ -28,6 +28,8 @@
 #include <stan/mcmc/hmc/nuts/adapt_diag_e_nuts.hpp>
 #include <stan/mcmc/hmc/nuts/adapt_dense_e_nuts.hpp>
 
+#include <stan/mcmc/hmc/nuts/adapt_softabs_static_hmc.hpp>
+
 #include <stan/model/util.hpp>
 
 #include <stan/optimization/newton.hpp>
@@ -163,6 +165,22 @@ namespace stan {
       
     }
       
+    template<class Sampler>
+    bool init_softabs(stan::mcmc::base_mcmc* sampler, categorical_argument* softabs) {
+    
+      double alpha = dynamic_cast<real_argument*>(adapt->arg("alpha"))->value();
+      int max_fp = dynamic_cast<int_argument*>(adapt->arg("max_fp"))->value();
+      double fp_threshold = dynamic_cast<real_argument*>(adapt->arg("fp_threshold"))->value();
+      
+      Sampler* s = dynamic_cast<Sampler*>(sampler);
+      
+      s->hamiltonian.set_alpha(alpha);
+      s->integrator.set_max_num_fixed_point(max_fp);
+      s->integrator.set_fixed_point_threshold(fp_threshold);
+      
+      return true;
+      
+    }
     
     template<class Sampler>
     bool init_static_hmc(stan::mcmc::base_mcmc* sampler, argument* algorithm) {
@@ -770,12 +788,12 @@ namespace stan {
           
           if (metric->value() == "unit_e") {
             metric_index = 0;
-            
           } else if (metric->value() == "diag_e") {
             metric_index = 1;
-            
           } else if (metric->value() == "dense_e") {
             metric_index = 2;
+          } else if (metric->value() == "softabs") {
+            metric_index = 3;
           }
           
           int sampler_select = engine_index + 10 * metric_index + 100 * static_cast<int>(adapt_engaged);
@@ -823,6 +841,23 @@ namespace stan {
               if (!init_nuts<sampler>(sampler_ptr, algo)) return 0;
               break;
             }
+              
+            case 30: {
+              typedef stan::mcmc::softabs_static_hmc<Model, rng_t> sampler;
+              sampler_ptr = new sampler(model, base_rng);
+              if (!init_softabs<sampler>(sampler_ptr, metric->arg("softabs"))) return 0;
+              if (!init_static_hmc<sampler>(sampler_ptr, algo)) return 0;
+              break;
+            }
+              
+            case 31: {
+              return 0;
+              //typedef stan::mcmc::softabs_nuts<Model, rng_t> sampler;
+              //sampler_ptr = new sampler(model, base_rng);
+              //if (!init_softabs<sampler>(sampler_ptr, metric->arg("softabs"))) return 0;
+              //if (!init_nuts<sampler>(sampler_ptr, algo)) return 0;
+              //break;
+            }
             
             case 100: {
               typedef stan::mcmc::adapt_unit_e_static_hmc<Model, rng_t> sampler;
@@ -869,6 +904,25 @@ namespace stan {
               sampler_ptr = new sampler(model, base_rng, num_warmup);
               if (!init_nuts<sampler>(sampler_ptr, algo)) return 0;
               if (!init_adapt<sampler>(sampler_ptr, adapt)) return 0;
+              break;
+            }
+              
+            case 130: {
+              typedef stan::mcmc::adapt_softabs_static_hmc<Model, rng_t> sampler;
+              sampler_ptr = new sampler(model, base_rng, num_warmup);
+              if (!init_softabs<sampler>(sampler_ptr, metric->arg("softabs"))) return 0;
+              if (!init_static_hmc<sampler>(sampler_ptr, algo)) return 0;
+              if (!init_adapt<sampler>(sampler_ptr, adapt)) return 0;
+              break;
+            }
+              
+            case 131: {
+              return 0;
+              //typedef stan::mcmc::adapt_softabs_nuts<Model, rng_t> sampler;
+              //sampler_ptr = new sampler(model, base_rng, num_warmup);
+              //if (!init_softabs<sampler>(sampler_ptr, metric->arg("softabs"))) return 0;
+              //if (!init_nuts<sampler>(sampler_ptr, algo)) return 0;
+              //if (!init_adapt<sampler>(sampler_ptr, adapt)) return 0;
               break;
             }
             

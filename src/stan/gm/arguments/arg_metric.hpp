@@ -7,6 +7,8 @@
 #include <stan/gm/arguments/arg_diag_e.hpp>
 #include <stan/gm/arguments/arg_dense_e.hpp>
 
+#include <stan/gm/arguments/arg_softabs.hpp>
+
 namespace stan {
   
   namespace gm {
@@ -23,6 +25,7 @@ namespace stan {
         _values.push_back(new arg_unit_e());
         _values.push_back(new arg_diag_e());
         _values.push_back(new arg_dense_e());
+        _values.push_back(new arg_softabs());
         
         _default_cursor = 1;
         _cursor = _default_cursor;

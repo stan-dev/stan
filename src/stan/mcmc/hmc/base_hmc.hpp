@@ -123,6 +123,9 @@ namespace stan {
       
       double get_stepsize_jitter() { return this->_epsilon_jitter; }
       
+      I<H<M, BaseRNG>, P>& integrator() { return _integrator; }
+      H<M, BaseRNG>& hamiltonian() { return _hamiltonian; }
+      
     protected:
     
       P _z;
