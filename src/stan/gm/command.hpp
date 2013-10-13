@@ -28,7 +28,7 @@
 #include <stan/mcmc/hmc/nuts/adapt_diag_e_nuts.hpp>
 #include <stan/mcmc/hmc/nuts/adapt_dense_e_nuts.hpp>
 
-#include <stan/mcmc/hmc/nuts/adapt_softabs_static_hmc.hpp>
+#include <stan/mcmc/hmc/static/adapt_softabs_static_hmc.hpp>
 
 #include <stan/model/util.hpp>
 
@@ -168,15 +168,15 @@ namespace stan {
     template<class Sampler>
     bool init_softabs(stan::mcmc::base_mcmc* sampler, categorical_argument* softabs) {
     
-      double alpha = dynamic_cast<real_argument*>(adapt->arg("alpha"))->value();
-      int max_fp = dynamic_cast<int_argument*>(adapt->arg("max_fp"))->value();
-      double fp_threshold = dynamic_cast<real_argument*>(adapt->arg("fp_threshold"))->value();
+      double alpha = dynamic_cast<real_argument*>(softabs->arg("alpha"))->value();
+      int max_fp = dynamic_cast<int_argument*>(softabs->arg("max_fp"))->value();
+      double fp_threshold = dynamic_cast<real_argument*>(softabs->arg("fp_threshold"))->value();
       
       Sampler* s = dynamic_cast<Sampler*>(sampler);
       
-      s->hamiltonian.set_alpha(alpha);
-      s->integrator.set_max_num_fixed_point(max_fp);
-      s->integrator.set_fixed_point_threshold(fp_threshold);
+      s->hamiltonian().set_alpha(alpha);
+      s->integrator().set_max_num_fixed_point(max_fp);
+      s->integrator().set_fixed_point_threshold(fp_threshold);
       
       return true;
       
@@ -845,7 +845,9 @@ namespace stan {
             case 30: {
               typedef stan::mcmc::softabs_static_hmc<Model, rng_t> sampler;
               sampler_ptr = new sampler(model, base_rng);
-              if (!init_softabs<sampler>(sampler_ptr, metric->arg("softabs"))) return 0;
+              categorical_argument* softabs = dynamic_cast<categorical_argument*>
+                                              (metric->arg("softabs"));
+              if (!init_softabs<sampler>(sampler_ptr, softabs)) return 0;
               if (!init_static_hmc<sampler>(sampler_ptr, algo)) return 0;
               break;
             }
@@ -854,7 +856,9 @@ namespace stan {
               return 0;
               //typedef stan::mcmc::softabs_nuts<Model, rng_t> sampler;
               //sampler_ptr = new sampler(model, base_rng);
-              //if (!init_softabs<sampler>(sampler_ptr, metric->arg("softabs"))) return 0;
+              //categorical_argument* softabs = dynamic_cast<categorical_argument*>
+              //                                (metric->arg("softabs"));
+              //if (!init_softabs<sampler>(sampler_ptr, softabs)) return 0;
               //if (!init_nuts<sampler>(sampler_ptr, algo)) return 0;
               //break;
             }
@@ -909,8 +913,10 @@ namespace stan {
               
             case 130: {
               typedef stan::mcmc::adapt_softabs_static_hmc<Model, rng_t> sampler;
-              sampler_ptr = new sampler(model, base_rng, num_warmup);
-              if (!init_softabs<sampler>(sampler_ptr, metric->arg("softabs"))) return 0;
+              sampler_ptr = new sampler(model, base_rng);
+              categorical_argument* softabs = dynamic_cast<categorical_argument*>
+                                              (metric->arg("softabs"));
+              if (!init_softabs<sampler>(sampler_ptr, softabs)) return 0;
               if (!init_static_hmc<sampler>(sampler_ptr, algo)) return 0;
               if (!init_adapt<sampler>(sampler_ptr, adapt)) return 0;
               break;
@@ -919,8 +925,10 @@ namespace stan {
             case 131: {
               return 0;
               //typedef stan::mcmc::adapt_softabs_nuts<Model, rng_t> sampler;
-              //sampler_ptr = new sampler(model, base_rng, num_warmup);
-              //if (!init_softabs<sampler>(sampler_ptr, metric->arg("softabs"))) return 0;
+              //sampler_ptr = new sampler(model, base_rng);
+              //categorical_argument* softabs = dynamic_cast<categorical_argument*>
+              //                                (metric->arg("softabs"));
+              //if (!init_softabs<sampler>(sampler_ptr, softabs)) return 0;
               //if (!init_nuts<sampler>(sampler_ptr, algo)) return 0;
               //if (!init_adapt<sampler>(sampler_ptr, adapt)) return 0;
               break;

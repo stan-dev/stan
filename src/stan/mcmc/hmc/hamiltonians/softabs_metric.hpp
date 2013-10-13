@@ -4,6 +4,8 @@
 #include <boost/random/variate_generator.hpp>
 #include <boost/random/normal_distribution.hpp>
 
+#include <stan/agrad/autodiff.hpp>
+
 #include <stan/mcmc/hmc/hamiltonians/base_hamiltonian.hpp>
 #include <stan/mcmc/hmc/hamiltonians/softabs_point.hpp>
 
@@ -15,21 +17,17 @@ namespace stan {
     struct _softabs_fun {
       
       const M& _model;
-      std::ostream& _o;
+      std::ostream* _o;
       
       _softabs_fun(M& m, std::ostream* out): _model(m), _o(out) {};
       
       template <typename T>
       T operator()(const Eigen::Matrix<T,Eigen::Dynamic,1>& x) const {
-        ...copy x to std::vector<T> v;...
-        
-        Eigen::Map<Eigen::VectorXd> eigen_x(&(x[0]), x.size());
-        
-        vector<int> dummy;
-        
-        return _model.log_prob<true, true, T>(eigen_x, dummy, _o);
+        Eigen::Map<Eigen::Matrix<T,Eigen::Dynamic,1> > eigen_x(&(x[0]), x.size());
+        std::vector<int> dummy_int;
+        return _model.log_prob<true,true,T>(eigen_x, dummy_int, _o);
       }
-    }
+    };
     
     // Riemannian manifold with SoftAbs metric
     template <typename M, typename BaseRNG>
@@ -44,7 +42,7 @@ namespace stan {
       ~softabs_metric() {};
       
       double T(softabs_point& z) {
-        _compute_metric(z);
+        compute_metric(z);
         return this->tau(z) + 0.5 * z.log_det_metric;
       }
       
@@ -66,7 +64,8 @@ namespace stan {
         z.cache.triangularView<Eigen::Lower>() = z.aux_one.transpose() * z.aux_two;
         
         Eigen::VectorXd aux(z.q.size());
-        stan::agrad::grad_tr_mat_times_hessian(_softabs_fun<M>(_model, 0), z.q, cache, aux);
+        Eigen::Map<Eigen::VectorXd> eigen_q(&(z.q[0]), z.q.size());
+        stan::agrad::grad_tr_mat_times_hessian(_softabs_fun<M>(this->_model, 0), eigen_q, z.cache, aux);
         aux *= -1;
         
         return -0.5 * aux;
@@ -77,14 +76,14 @@ namespace stan {
       }
       
       const Eigen::VectorXd dphi_dq(softabs_point& z) {
-        Eigen::vectorXd aux = z.softabs_lambda_inv.cwiseProduct(z.pseudo_j.diagonal());
+        Eigen::VectorXd aux = z.softabs_lambda_inv.cwiseProduct(z.pseudo_j.diagonal());
         z.aux_two.noalias() = aux.asDiagonal() * z.eigen_deco.eigenvectors().transpose();
         
         z.cache.setZero();
         z.cache.triangularView<Eigen::Lower>() = z.eigen_deco.eigenvectors() * z.aux_two;
-        
-        Eigen::VectorXd aux(z.q.size());
-        stan::agrad::grad_tr_mat_times_hessian(_softabs_fun<M>(_model, 0), z.q, cache, aux);
+
+        Eigen::Map<Eigen::VectorXd> eigen_q(&(z.q[0]), z.q.size());
+        stan::agrad::grad_tr_mat_times_hessian(_softabs_fun<M>(this->_model, 0), eigen_q, z.cache, aux);
         aux *= -1;
         
         return 0.5 * aux + z.g;
@@ -93,7 +92,7 @@ namespace stan {
       
       void sample_p(softabs_point& z, BaseRNG& rng) {
         
-        _compute_metric(z);
+        compute_metric(z);
         
         boost::variate_generator<BaseRNG&, boost::normal_distribution<> > 
           _rand_unit_gaus(rng, boost::normal_distribution<>());
@@ -107,11 +106,12 @@ namespace stan {
         
       }
       
-      void compute_metric(softabs_point& z);
+      void compute_metric(softabs_point& z)
       {
         
         // Compute the Hessian
-        stan::agrad::hessian(_softabs_fun<M>(_model, 0), z.q, z.V, z.g, z.hessian);
+        Eigen::Map<Eigen::VectorXd> eigen_q(&(z.q[0]), z.q.size());
+        stan::agrad::hessian(_softabs_fun<M>(this->_model, 0), eigen_q, z.V, z.g, z.hessian);
         
         z.V *= -1;
         z.g *= -1;
@@ -122,7 +122,7 @@ namespace stan {
         
         for (size_t i = 0; i < z.q.size(); ++i) {
           
-          const double lambda = eigen_deco.eigenvalues()(i);
+          const double lambda = z.eigen_deco.eigenvalues()(i);
           const double alpha_lambda = _alpha * lambda;
           
           double softabs_lambda = 0;
@@ -208,7 +208,7 @@ namespace stan {
       } // prepare_spatial_gradients
       
       void update(softabs_point& z) {
-        ps_point::update(z);
+        //base_hamiltonian::update(z);
         compute_metric(z);
         prepare_spatial_gradients(z);
       }

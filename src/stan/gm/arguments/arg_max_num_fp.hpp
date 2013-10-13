@@ -23,7 +23,7 @@ namespace stan {
         _value = _default_value;
       };
       
-      bool is_valid(double value) { return value > 0; }
+      bool is_valid(int value) { return value > 0; }
 
     };
     

@@ -11,7 +11,7 @@ namespace stan {
       
     public:
       
-      arg_stepsize(): real_argument() {
+      arg_softabs_alpha(): real_argument() {
         _name = "alpha";
         _description = "SoftAbs regularization parameter";
         _validity = "0 < alpha";

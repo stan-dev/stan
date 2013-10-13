@@ -38,14 +38,14 @@ namespace stan {
       Eigen::MatrixXd hessian;
       
       // Eigendecomposition of the Hessian
-      SelfAdjointEigenSolver<MatrixXd> eigen_deco;
+      Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> eigen_deco;
       
       // SoftAbs transformed eigenvalues of Hessian
       Eigen::VectorXd softabs_lambda;
       Eigen::VectorXd softabs_lambda_inv;
       
       // Psuedo-Jacobian of the eigenvalues
-      Eigen::MatrixXd psuedo_j;
+      Eigen::MatrixXd pseudo_j;
       
       // Auxilliary members for efficient matrix calculations
       Eigen::VectorXd Q_p;
@@ -53,7 +53,7 @@ namespace stan {
       
       Eigen::MatrixXd aux_one;
       Eigen::MatrixXd aux_two;
-      Eigen::matrixXd cache;
+      Eigen::MatrixXd cache;
 
       Eigen::VectorXd fp_init;  // initial point in fixed-point iteration
       Eigen::VectorXd fp_delta; // delta in fixed-point iteration

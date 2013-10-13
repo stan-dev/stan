@@ -13,7 +13,7 @@ namespace stan {
       
     public:
       
-      impl_leapfrog(std::ostream* o=0): base_leapfrog<H, P>(o)
+      impl_leapfrog(std::ostream* o=0): base_leapfrog<H, P>(o),
                                         _max_num_fixed_point(10),
                                         _fixed_point_threshold(1e-8) {};
       
@@ -23,7 +23,7 @@ namespace stan {
       }
       
       void update_q(P& z, H& hamiltonian, double epsilon) {
-        _hat_T(z, hamiltonian, epsilon);
+        _hat_T(z, hamiltonian, epsilon, this->_max_num_fixed_point);
       }
       
       void end_update_p(P& z, H& hamiltonian, double epsilon) {
