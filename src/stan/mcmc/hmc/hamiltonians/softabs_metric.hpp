@@ -23,8 +23,11 @@ namespace stan {
       
       template <typename T>
       T operator()(const Eigen::Matrix<T,Eigen::Dynamic,1>& x) const {
-        Eigen::Map<Eigen::Matrix<T,Eigen::Dynamic,1> > eigen_x(&(x[0]), x.size());
+        
+        std::vector<T> v(x.size());
+        Eigen::Map<Eigen::Matrix<T,Eigen::Dynamic,1> >(&(v[0]), v.size()) = x;
         std::vector<int> dummy_int;
+        
         return _model.log_prob<true,true,T>(eigen_x, dummy_int, _o);
       }
     };
