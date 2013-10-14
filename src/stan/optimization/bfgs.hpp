@@ -259,9 +259,29 @@ namespace stan {
 
       const Scalar &alpha0() const { return _alpha0; }
       const Scalar &alpha() const { return _alpha; }
+      const size_t iter_num() const { return _itNum; }
       
       const std::string &note() const { return _note; }
       
+      std::string get_code_string(int retCode) {
+        switch(retCode) {
+          case 0:
+            return std::string("Successful step completed");
+          case 1:
+            return std::string("Convergence detected: change in objective function was below tolerance");
+          case 2:
+            return std::string("Convergence detected: gradient norm is below tolerance");
+          case 3:
+            return std::string("Convergence detected: parameter change was below tolerance");
+          case 4:
+            return std::string("Maximum number of iterations hit, may not be at an optima");
+          case -1:
+            return std::string("Line search failed to achieve a sufficient decrease, no more progress can be made");
+          default:
+            return std::string("Unknown termination code");
+        }
+      }
+
       struct BFGSOptions {
         BFGSOptions() {
           maxIts = 10000;
@@ -272,6 +292,7 @@ namespace stan {
           alpha0 = 1e-3;
           tolX = 1e-8;
           tolF = 1e-8;
+          tolGrad = 1e-8;
         }
         size_t maxIts;
         Scalar rho;
@@ -281,6 +302,7 @@ namespace stan {
         Scalar minAlpha;
         Scalar tolX;
         Scalar tolF;
+        Scalar tolGrad;
       } _opts;
       
       
@@ -378,11 +400,14 @@ namespace stan {
         if (std::fabs(_fk - _fk_1) < _opts.tolF) {
           retCode = 1; // Objective function improvement wasn't sufficient
         }
-        else if (gradNorm < _opts.tolF) {
+        else if (gradNorm < _opts.tolGrad) {
           retCode = 2; // Gradient norm was below threshold
         }
         else if (sk.norm() < _opts.tolX) {
           retCode = 3; // Change in x was too small
+        }
+        else if (_itNum >= _opts.maxIts) {
+          retCode = 4; // Max number of iterations hit
         }
         else {
           retCode = 0; // Step was successful more progress to be made
