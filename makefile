@@ -8,7 +8,7 @@
 help:
 
 ## Disable implicit rules.
-SUFFIXES:
+SUFIXES:
 
 ##
 # Users should only need to set these three variables for use.
@@ -33,7 +33,7 @@ GTEST ?= lib/gtest_1.6.0
 ##
 # Set default compiler options.
 ## 
-CFLAGS = -I src -I $(EIGEN) -I $(BOOST) -Wall -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS
+CFLAGS = -I src -isystem $(EIGEN) -isystem $(BOOST) -Wall -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS
 CFLAGS_GTEST = -DGTEST_USE_OWN_TR1_TUPLE
 LDLIBS = -Lbin -lstan
 LDLIBS_STANC = -Lbin -lstanc
@@ -103,13 +103,20 @@ bin/%.d : src/%.cpp
 .PHONY: help
 help:
 	@echo '--------------------------------------------------------------------------------'
-	@echo 'Stan: makefile'
+	@echo 'Stan makefile:'
 	@echo '  Current configuration:'
 	@echo '  - OS (Operating System):   ' $(OS)
 	@echo '  - CC (Compiler):           ' $(CC)
 	@echo '  - O (Optimization Level):  ' $(O)
 	@echo '  - O_STANC (Opt for stanc): ' $(O_STANC)
+ifdef TEMPLATE_DEPTH
+	@echo '  - TEMPLATE_DEPTH:          ' $(TEMPLATE_DEPTH)
+endif
 	@echo '  - STAN_HOME                ' $(STAN_HOME)
+	@echo '  Library configuration:'
+	@echo '  - EIGEN                    ' $(EIGEN)
+	@echo '  - BOOST                    ' $(BOOST)
+	@echo '  - GTEST                    ' $(GTEST)
 	@echo ''
 	@echo 'Build a Stan model:'
 	@echo '  Given a Stan model at foo/bar.stan, the make target is:'
@@ -120,16 +127,13 @@ help:
 	@echo '  2. Use the Stan compiler to generate C++ code, foo/bar.cpp.'
 	@echo '  3. Compile the C++ code using $(CC) to generate foo/bar$(EXE)'
 	@echo ''
-	@echo '  Example - Sample from a normal:'
-	@echo '    1. Copy src/models/basic_distributions/normal.stan to foo/normal.stan:'
-	@echo '       mkdir foo'
-	@echo '       cp src/models/basic_distributions/normal.stan foo'
-	@echo '    2. Build the model foo/normal$(EXE):'
-	@echo '       make foo/normal$(EXE)'
-	@echo '    3. Run the model:'
-	@echo '       foo'$(PATH_SEPARATOR)'normal$(EXE) --samples=foo/normal.csv'
-	@echo '    4. Look at the samples:'
-	@echo '       more foo'$(PATH_SEPARATOR)'normal.csv'
+	@echo '  Example - Sample from a normal: src/models/basic_distributions/normal.stan'
+	@echo '    1. Build the model:'
+	@echo '       make src/models/basic_distributions/normal$(EXE)'
+	@echo '    2. Run the model:'
+	@echo '       src'$(PATH_SEPARATOR)'models'$(PATH_SEPARATOR)'basic_distributions'$(PATH_SEPARATOR)'normal$(EXE) sample'
+	@echo '    3. Look at the samples:'
+	@echo '       bin'$(PATH_SEPARATOR)'print$(EXE) samples.csv'
 	@echo ''
 	@echo 'Common targets:'
 	@echo '  Model related:'
@@ -161,6 +165,10 @@ help:
 	@echo '  Clean:'
 	@echo '  - clean          : Basic clean. Leaves doc and compiled libraries intact.'
 	@echo '  - clean-all      : Cleans up all of Stan.'
+	@echo '  Higher level targets:'
+	@echo '  - build          : Builds the Stan command line tools.'
+	@echo '  - docs           : Builds all docs.'
+	@echo '  - all            : Calls build and docs'
 	@echo '--------------------------------------------------------------------------------'
 
 -include make/libstan  # libstan.a
@@ -184,14 +192,16 @@ ifneq (,$(filter runtest_no_fail/%,$(MAKECMDGOALS)))
   -include $(addsuffix .d,$(subst runtest_no_fail/,,$(MAKECMDGOALS)))
 endif
 
-all: build docs
-build: libstan.a stanc
+.PHONY: all build docs
+build: bin/stanc$(EXE)
+	@echo '--- Stan tools built ---'
 docs: manual doxygen
+all: build docs
 
 ##
 # Clean up.
 ##
-MODEL_SPECS := $(wildcard src/test/gm/model_specs/compiled/*.stan) 
+MODEL_SPECS := $(wildcard src/test/gm/model_specs/compiled/*.stan) $(wildcard src/test/gm/arguments/*.stan)
 .PHONY: clean clean-demo clean-dox clean-manual clean-models clean-all
 clean:
 	$(RM) $(shell find src -type f -name '*.dSYM') $(shell find src -type f -name '*.d.*')

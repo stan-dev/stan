@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-
+#include <stan/gm/error_codes.hpp>
 #include <stan/gm/arguments/argument_probe.hpp>
 #include <stan/gm/arguments/arg_method.hpp>
 #include <stan/gm/arguments/arg_id.hpp>
@@ -25,7 +25,9 @@ void remove_duplicates(std::string& argument) {
   while (cursor < argument.length()) {
     unsigned int end = argument.find(" ", cursor) - 1;
     std::string value = " " + argument.substr(cursor + 1, end - cursor);
-    if (argument.find(value, end) != std::string::npos)
+
+    if (value.length() == 1) ++end;
+    else if (argument.find(value, end) != std::string::npos)
       argument.erase(argument.find(value, end), value.length());
     cursor = argument.find("=", end);
   }
@@ -51,22 +53,24 @@ TEST(StanGmArgumentsConfiguration, TestMethod) {
   probe.probe_args(s);
   
   // Check argument consistency
-  bool expected_success;
+  bool expected_success = false;
   
   std::string l1;
   std::stringstream expected_output;
   std::stringstream output;
   
   while (s.good()) {
-  
     std::getline(s, l1);
-    if (!s.good()) continue;
+    if (!s.good()) 
+      continue;
     
-    if      (l1 == "good") expected_success = true;
-    else if (l1 == "bad") expected_success = false;
-    else if (l1 != "") expected_output << l1 << std::endl;
+    if (l1 == "good") 
+      expected_success = true;
+    else if (l1 == "bad") 
+      expected_success = false;
+    else if (l1 != "") 
+      expected_output << l1 << std::endl;
     else {
-      
       int n_output = 0;
       
       std::string l2;
@@ -74,71 +78,71 @@ TEST(StanGmArgumentsConfiguration, TestMethod) {
       
       while (expected_output.good()) {
         std::getline(expected_output, l2);
-        if (!expected_output.good()) continue;
+        if (!expected_output.good()) 
+          continue;
         clean_line(l2);
         argument += " " + l2;
         ++n_output;
       }
       
-      if (argument.length() == 0) continue;
+      if (argument.length() == 0) 
+        continue;
       
       remove_duplicates(argument);
-      
+
       std::string command = convert_model_path(model_path) + argument;
-      std::string command_output;
-      long time;
-      
-      try {
-        command_output = run_command(command, time);
-      } catch(...) {
-        ADD_FAILURE() << "Failed running command: " << command;
-      }
-      
+
+      SCOPED_TRACE(command);
+
+      run_command_output out = run_command(command);
+
       expected_output.clear();
       expected_output.seekg(std::ios_base::beg);
       
       if (expected_success == false) {
-                
-        unsigned int c1 = command_output.find("is not");
-        command_output.erase(0, c1);
-        unsigned int c2 = command_output.find(" \"");
-        unsigned int c3 = command_output.find("Failed to parse");
-        command_output.replace(c2, c3 - c2, "\n");
+        unsigned int c1 = out.output.find("is not");
+        out.output.erase(0, c1);
+
+        unsigned int c2 = out.output.find(" \"");
+
+        unsigned int c3 = out.output.find("Failed to parse");
+
+        if (c3 != c2)
+          out.output.replace(c2, c3 - c2, "\n");
         
         expected_output.str(std::string());
+
         expected_output << "is not a valid value for" << std::endl;
         expected_output << "Failed to parse arguments, terminating Stan" << std::endl;
         n_output = 2;
-        
+        EXPECT_EQ(int(stan::gm::error_codes::USAGE), out.err_code);
+      } else {
+        EXPECT_EQ(int(stan::gm::error_codes::OK), out.err_code);
       }
       
       output.clear();
       output.seekg(std::ios_base::beg);
-      output.str(command_output);
+      output.str(out.output);
       
       for (int i = 0; i < n_output; ++i) {
-        
         std::string expected_line;
         std::getline(expected_output, expected_line);
+        
         
         std::string actual_line;
         std::getline(output, actual_line);
         
         EXPECT_EQ(expected_line, actual_line);
-        
       }
       
       expected_output.clear();
       expected_output.seekg(std::ios_base::beg);
       expected_output.str(std::string());
-      
     }
-    
   }
   
-  for (int i = 0; i < valid_arguments.size(); ++i)
+  for (size_t i = 0; i < valid_arguments.size(); ++i)
     delete valid_arguments.at(i);
-  
 }
 
 TEST(StanGmArgumentsConfiguration, TestIdWithMethod) {
@@ -181,7 +185,7 @@ TEST(StanGmArgumentsConfiguration, TestIdWithMethod) {
   probe.probe_args(s);
   
   // Check argument consistency
-  bool expected_success;
+  bool expected_success = false;
   
   std::string l1;
   std::stringstream expected_output;
@@ -215,14 +219,7 @@ TEST(StanGmArgumentsConfiguration, TestIdWithMethod) {
       argument = method_argument + argument;
       
       std::string command = convert_model_path(model_path) + argument;
-      std::string command_output;
-      long time;
-      
-      try {
-        command_output = run_command(command, time);
-      } catch(...) {
-        ADD_FAILURE() << "Failed running command: " << command;
-      }
+      run_command_output out = run_command(command);
       
       expected_output.clear();
       expected_output.seekg(std::ios_base::beg);
@@ -230,11 +227,11 @@ TEST(StanGmArgumentsConfiguration, TestIdWithMethod) {
       
       if (expected_success == false) {
         
-        unsigned int c1 = command_output.find("is not");
-        command_output.erase(0, c1);
-        unsigned int c2 = command_output.find(" \"");
-        unsigned int c3 = command_output.find("Failed to parse");
-        command_output.replace(c2, c3 - c2, "\n");
+        unsigned int c1 = out.output.find("is not");
+        out.output.erase(0, c1);
+        unsigned int c2 = out.output.find(" \"");
+        unsigned int c3 = out.output.find("Failed to parse");
+        out.output.replace(c2, c3 - c2, "\n");
         
         expected_output.str(std::string());
         expected_output << "is not a valid value for" << std::endl;
@@ -243,7 +240,7 @@ TEST(StanGmArgumentsConfiguration, TestIdWithMethod) {
         
       }
     
-      output.str(command_output);
+      output.str(out.output);
       
       for (int i = 0; i < n_output; ++i) {
         
@@ -265,7 +262,7 @@ TEST(StanGmArgumentsConfiguration, TestIdWithMethod) {
     
   }
   
-  for (int i = 0; i < valid_arguments.size(); ++i)
+  for (size_t i = 0; i < valid_arguments.size(); ++i)
     delete valid_arguments.at(i);
 
 }
@@ -291,7 +288,7 @@ TEST(StanGmArgumentsConfiguration, TestIdWithoutMethod) {
   probe.probe_args(s);
   
   // Check argument consistency
-  bool expected_success;
+  bool expected_success = false;
   
   std::string l1;
   std::stringstream expected_output;
@@ -325,25 +322,18 @@ TEST(StanGmArgumentsConfiguration, TestIdWithoutMethod) {
       remove_duplicates(argument);
       
       std::string command = convert_model_path(model_path) + argument;
-      std::string command_output;
-      long time;
-      
-      try {
-        command_output = run_command(command, time);
-      } catch(...) {
-        ADD_FAILURE() << "Failed running command: " << command;
-      }
+      run_command_output out = run_command(command);
       
       expected_output.clear();
       expected_output.seekg(std::ios_base::beg);
       
       if (expected_success == false) {
         
-        unsigned int c1 = command_output.find("is not");
-        command_output.erase(0, c1);
-        unsigned int c2 = command_output.find(" \"");
-        unsigned int c3 = command_output.find("Failed to parse");
-        command_output.replace(c2, c3 - c2, "\n");
+        unsigned int c1 = out.output.find("is not");
+        out.output.erase(0, c1);
+        unsigned int c2 = out.output.find(" \"");
+        unsigned int c3 = out.output.find("Failed to parse");
+        out.output.replace(c2, c3 - c2, "\n");
         
         expected_output.str(std::string());
         expected_output << "is not a valid value for" << std::endl;
@@ -358,7 +348,7 @@ TEST(StanGmArgumentsConfiguration, TestIdWithoutMethod) {
         n_output = 2;
       }
     
-      output.str(command_output);
+      output.str(out.output);
       
       for (int i = 0; i < n_output; ++i) {
         
@@ -380,7 +370,7 @@ TEST(StanGmArgumentsConfiguration, TestIdWithoutMethod) {
     
   }
   
-  for (int i = 0; i < valid_arguments.size(); ++i)
+  for (size_t i = 0; i < valid_arguments.size(); ++i)
     delete valid_arguments.at(i);
   
 }
@@ -425,7 +415,7 @@ TEST(StanGmArgumentsConfiguration, TestDataWithMethod) {
   probe.probe_args(s);
   
   // Check argument consistency
-  bool expected_success;
+  bool expected_success = false;
   
   std::string l1;
   std::stringstream expected_output;
@@ -459,26 +449,19 @@ TEST(StanGmArgumentsConfiguration, TestDataWithMethod) {
       argument = method_argument + argument;
       
       std::string command = convert_model_path(model_path) + argument;
-      std::string command_output;
-      long time;
-      
-      try {
-        command_output = run_command(command, time);
-      } catch(...) {
-        ADD_FAILURE() << "Failed running command: " << command;
-      }
-      
+      run_command_output out = run_command(command);
+
       expected_output.clear();
       expected_output.seekg(std::ios_base::beg);
       expected_output.str( method_output.str() + expected_output.str() );
       
       if (expected_success == false) {
         
-        unsigned int c1 = command_output.find("is not");
-        command_output.erase(0, c1);
-        unsigned int c2 = command_output.find(" \"");
-        unsigned int c3 = command_output.find("Failed to parse");
-        command_output.replace(c2, c3 - c2, "\n");
+        unsigned int c1 = out.output.find("is not");
+        out.output.erase(0, c1);
+        unsigned int c2 = out.output.find(" \"");
+        unsigned int c3 = out.output.find("Failed to parse");
+        out.output.replace(c2, c3 - c2, "\n");
         
         expected_output.str(std::string());
         expected_output << "is not a valid value for" << std::endl;
@@ -487,7 +470,7 @@ TEST(StanGmArgumentsConfiguration, TestDataWithMethod) {
         
       }
       
-      output.str(command_output);
+      output.str(out.output);
       
       for (int i = 0; i < n_output; ++i) {
         
@@ -509,7 +492,7 @@ TEST(StanGmArgumentsConfiguration, TestDataWithMethod) {
     
   }
   
-  for (int i = 0; i < valid_arguments.size(); ++i)
+  for (size_t i = 0; i < valid_arguments.size(); ++i)
     delete valid_arguments.at(i);
   
 }
@@ -535,7 +518,7 @@ TEST(StanGmArgumentsConfiguration, TestDataWithoutMethod) {
   probe.probe_args(s);
   
   // Check argument consistency
-  bool expected_success;
+  bool expected_success = false;
   
   std::string l1;
   std::stringstream expected_output;
@@ -569,25 +552,18 @@ TEST(StanGmArgumentsConfiguration, TestDataWithoutMethod) {
       remove_duplicates(argument);
       
       std::string command = convert_model_path(model_path) + argument;
-      std::string command_output;
-      long time;
-      
-      try {
-        command_output = run_command(command, time);
-      } catch(...) {
-        ADD_FAILURE() << "Failed running command: " << command;
-      }
+      run_command_output out = run_command(command);
       
       expected_output.clear();
       expected_output.seekg(std::ios_base::beg);
       
       if (expected_success == false) {
         
-        unsigned int c1 = command_output.find("is not");
-        command_output.erase(0, c1);
-        unsigned int c2 = command_output.find(" \"");
-        unsigned int c3 = command_output.find("Failed to parse");
-        command_output.replace(c2, c3 - c2, "\n");
+        unsigned int c1 = out.output.find("is not");
+        out.output.erase(0, c1);
+        unsigned int c2 = out.output.find(" \"");
+        unsigned int c3 = out.output.find("Failed to parse");
+        out.output.replace(c2, c3 - c2, "\n");
         
         expected_output.str(std::string());
         expected_output << "is not a valid value for" << std::endl;
@@ -602,7 +578,7 @@ TEST(StanGmArgumentsConfiguration, TestDataWithoutMethod) {
         n_output = 2;
       }
       
-      output.str(command_output);
+      output.str(out.output);
       
       for (int i = 0; i < n_output; ++i) {
         
@@ -624,7 +600,7 @@ TEST(StanGmArgumentsConfiguration, TestDataWithoutMethod) {
     
   }
   
-  for (int i = 0; i < valid_arguments.size(); ++i)
+  for (size_t i = 0; i < valid_arguments.size(); ++i)
     delete valid_arguments.at(i);
   
 }
@@ -669,7 +645,7 @@ TEST(StanGmArgumentsConfiguration, TestInitWithMethod) {
   probe.probe_args(s);
   
   // Check argument consistency
-  bool expected_success;
+  bool expected_success = false;
   
   std::string l1;
   std::stringstream expected_output;
@@ -703,14 +679,7 @@ TEST(StanGmArgumentsConfiguration, TestInitWithMethod) {
       argument = method_argument + argument;
       
       std::string command = convert_model_path(model_path) + argument;
-      std::string command_output;
-      long time;
-      
-      try {
-        command_output = run_command(command, time);
-      } catch(...) {
-        ADD_FAILURE() << "Failed running command: " << command;
-      }
+      run_command_output out = run_command(command);
       
       expected_output.clear();
       expected_output.seekg(std::ios_base::beg);
@@ -718,11 +687,11 @@ TEST(StanGmArgumentsConfiguration, TestInitWithMethod) {
       
       if (expected_success == false) {
         
-        unsigned int c1 = command_output.find("is not");
-        command_output.erase(0, c1);
-        unsigned int c2 = command_output.find(" \"");
-        unsigned int c3 = command_output.find("Failed to parse");
-        command_output.replace(c2, c3 - c2, "\n");
+        unsigned int c1 = out.output.find("is not");
+        out.output.erase(0, c1);
+        unsigned int c2 = out.output.find(" \"");
+        unsigned int c3 = out.output.find("Failed to parse");
+        out.output.replace(c2, c3 - c2, "\n");
         
         expected_output.str(std::string());
         expected_output << "is not a valid value for" << std::endl;
@@ -731,7 +700,7 @@ TEST(StanGmArgumentsConfiguration, TestInitWithMethod) {
         
       }
       
-      output.str(command_output);
+      output.str(out.output);
       
       for (int i = 0; i < n_output; ++i) {
         
@@ -753,7 +722,7 @@ TEST(StanGmArgumentsConfiguration, TestInitWithMethod) {
     
   }
   
-  for (int i = 0; i < valid_arguments.size(); ++i)
+  for (size_t i = 0; i < valid_arguments.size(); ++i)
     delete valid_arguments.at(i);
   
 }
@@ -779,7 +748,7 @@ TEST(StanGmArgumentsConfiguration, TestInitWithoutMethod) {
   probe.probe_args(s);
   
   // Check argument consistency
-  bool expected_success;
+  bool expected_success = false;
   
   std::string l1;
   std::stringstream expected_output;
@@ -813,25 +782,18 @@ TEST(StanGmArgumentsConfiguration, TestInitWithoutMethod) {
       remove_duplicates(argument);
       
       std::string command = convert_model_path(model_path) + argument;
-      std::string command_output;
-      long time;
-      
-      try {
-        command_output = run_command(command, time);
-      } catch(...) {
-        ADD_FAILURE() << "Failed running command: " << command;
-      }
+      run_command_output out = run_command(command);
       
       expected_output.clear();
       expected_output.seekg(std::ios_base::beg);
       
       if (expected_success == false) {
         
-        unsigned int c1 = command_output.find("is not");
-        command_output.erase(0, c1);
-        unsigned int c2 = command_output.find(" \"");
-        unsigned int c3 = command_output.find("Failed to parse");
-        command_output.replace(c2, c3 - c2, "\n");
+        unsigned int c1 = out.output.find("is not");
+        out.output.erase(0, c1);
+        unsigned int c2 = out.output.find(" \"");
+        unsigned int c3 = out.output.find("Failed to parse");
+        out.output.replace(c2, c3 - c2, "\n");
         
         expected_output.str(std::string());
         expected_output << "is not a valid value for" << std::endl;
@@ -846,7 +808,7 @@ TEST(StanGmArgumentsConfiguration, TestInitWithoutMethod) {
         n_output = 2;
       }
       
-      output.str(command_output);
+      output.str(out.output);
       
       for (int i = 0; i < n_output; ++i) {
         
@@ -868,7 +830,7 @@ TEST(StanGmArgumentsConfiguration, TestInitWithoutMethod) {
     
   }
   
-  for (int i = 0; i < valid_arguments.size(); ++i)
+  for (size_t i = 0; i < valid_arguments.size(); ++i)
     delete valid_arguments.at(i);
   
 }
@@ -913,7 +875,7 @@ TEST(StanGmArgumentsConfiguration, TestRandomWithMethod) {
   probe.probe_args(s);
   
   // Check argument consistency
-  bool expected_success;
+  bool expected_success = false;
   
   std::string l1;
   std::stringstream expected_output;
@@ -947,14 +909,7 @@ TEST(StanGmArgumentsConfiguration, TestRandomWithMethod) {
       argument = method_argument + argument;
       
       std::string command = convert_model_path(model_path) + argument;
-      std::string command_output;
-      long time;
-      
-      try {
-        command_output = run_command(command, time);
-      } catch(...) {
-        ADD_FAILURE() << "Failed running command: " << command;
-      }
+      run_command_output out = run_command(command);
       
       expected_output.clear();
       expected_output.seekg(std::ios_base::beg);
@@ -962,11 +917,11 @@ TEST(StanGmArgumentsConfiguration, TestRandomWithMethod) {
       
       if (expected_success == false) {
         
-        unsigned int c1 = command_output.find("is not");
-        command_output.erase(0, c1);
-        unsigned int c2 = command_output.find(" \"");
-        unsigned int c3 = command_output.find("Failed to parse");
-        command_output.replace(c2, c3 - c2, "\n");
+        unsigned int c1 = out.output.find("is not");
+        out.output.erase(0, c1);
+        unsigned int c2 = out.output.find(" \"");
+        unsigned int c3 = out.output.find("Failed to parse");
+        out.output.replace(c2, c3 - c2, "\n");
         
         expected_output.str(std::string());
         expected_output << "is not a valid value for" << std::endl;
@@ -975,7 +930,7 @@ TEST(StanGmArgumentsConfiguration, TestRandomWithMethod) {
         
       }
       
-      output.str(command_output);
+      output.str(out.output);
       
       for (int i = 0; i < n_output; ++i) {
         
@@ -997,7 +952,7 @@ TEST(StanGmArgumentsConfiguration, TestRandomWithMethod) {
     
   }
   
-  for (int i = 0; i < valid_arguments.size(); ++i)
+  for (size_t i = 0; i < valid_arguments.size(); ++i)
     delete valid_arguments.at(i);
   
 }
@@ -1023,7 +978,7 @@ TEST(StanGmArgumentsConfiguration, TestRandomWithoutMethod) {
   probe.probe_args(s);
   
   // Check argument consistency
-  bool expected_success;
+  bool expected_success = false;
   
   std::string l1;
   std::stringstream expected_output;
@@ -1057,25 +1012,18 @@ TEST(StanGmArgumentsConfiguration, TestRandomWithoutMethod) {
       remove_duplicates(argument);
       
       std::string command = convert_model_path(model_path) + argument;
-      std::string command_output;
-      long time;
-      
-      try {
-        command_output = run_command(command, time);
-      } catch(...) {
-        ADD_FAILURE() << "Failed running command: " << command;
-      }
+      run_command_output out = run_command(command);
       
       expected_output.clear();
       expected_output.seekg(std::ios_base::beg);
       
       if (expected_success == false) {
         
-        unsigned int c1 = command_output.find("is not");
-        command_output.erase(0, c1);
-        unsigned int c2 = command_output.find(" \"");
-        unsigned int c3 = command_output.find("Failed to parse");
-        command_output.replace(c2, c3 - c2, "\n");
+        unsigned int c1 = out.output.find("is not");
+        out.output.erase(0, c1);
+        unsigned int c2 = out.output.find(" \"");
+        unsigned int c3 = out.output.find("Failed to parse");
+        out.output.replace(c2, c3 - c2, "\n");
         
         expected_output.str(std::string());
         expected_output << "is not a valid value for" << std::endl;
@@ -1090,7 +1038,7 @@ TEST(StanGmArgumentsConfiguration, TestRandomWithoutMethod) {
         n_output = 2;
       }
       
-      output.str(command_output);
+      output.str(out.output);
       
       for (int i = 0; i < n_output; ++i) {
         
@@ -1112,7 +1060,7 @@ TEST(StanGmArgumentsConfiguration, TestRandomWithoutMethod) {
     
   }
   
-  for (int i = 0; i < valid_arguments.size(); ++i)
+  for (size_t i = 0; i < valid_arguments.size(); ++i)
     delete valid_arguments.at(i);
   
 }
@@ -1157,7 +1105,7 @@ TEST(StanGmArgumentsConfiguration, TestOutputWithMethod) {
   probe.probe_args(s);
   
   // Check argument consistency
-  bool expected_success;
+  bool expected_success = false;
   
   std::string l1;
   std::stringstream expected_output;
@@ -1191,14 +1139,7 @@ TEST(StanGmArgumentsConfiguration, TestOutputWithMethod) {
       argument = method_argument + argument;
       
       std::string command = convert_model_path(model_path) + argument;
-      std::string command_output;
-      long time;
-      
-      try {
-        command_output = run_command(command, time);
-      } catch(...) {
-        ADD_FAILURE() << "Failed running command: " << command;
-      }
+      run_command_output out = run_command(command);
       
       expected_output.clear();
       expected_output.seekg(std::ios_base::beg);
@@ -1206,11 +1147,11 @@ TEST(StanGmArgumentsConfiguration, TestOutputWithMethod) {
       
       if (expected_success == false) {
         
-        unsigned int c1 = command_output.find("is not");
-        command_output.erase(0, c1);
-        unsigned int c2 = command_output.find(" \"");
-        unsigned int c3 = command_output.find("Failed to parse");
-        command_output.replace(c2, c3 - c2, "\n");
+        unsigned int c1 = out.output.find("is not");
+        out.output.erase(0, c1);
+        unsigned int c2 = out.output.find(" \"");
+        unsigned int c3 = out.output.find("Failed to parse");
+        out.output.replace(c2, c3 - c2, "\n");
         
         expected_output.str(std::string());
         expected_output << "is not a valid value for" << std::endl;
@@ -1219,7 +1160,7 @@ TEST(StanGmArgumentsConfiguration, TestOutputWithMethod) {
         
       }
       
-      output.str(command_output);
+      output.str(out.output);
       
       for (int i = 0; i < n_output; ++i) {
         
@@ -1241,7 +1182,7 @@ TEST(StanGmArgumentsConfiguration, TestOutputWithMethod) {
     
   }
   
-  for (int i = 0; i < valid_arguments.size(); ++i)
+  for (size_t i = 0; i < valid_arguments.size(); ++i)
     delete valid_arguments.at(i);
   
 }
@@ -1267,7 +1208,7 @@ TEST(StanGmArgumentsConfiguration, TestOutputWithoutMethod) {
   probe.probe_args(s);
   
   // Check argument consistency
-  bool expected_success;
+  bool expected_success = false;
   
   std::string l1;
   std::stringstream expected_output;
@@ -1301,25 +1242,18 @@ TEST(StanGmArgumentsConfiguration, TestOutputWithoutMethod) {
       remove_duplicates(argument);
       
       std::string command = convert_model_path(model_path) + argument;
-      std::string command_output;
-      long time;
-      
-      try {
-        command_output = run_command(command, time);
-      } catch(...) {
-        ADD_FAILURE() << "Failed running command: " << command;
-      }
+      run_command_output out = run_command(command);
       
       expected_output.clear();
       expected_output.seekg(std::ios_base::beg);
       
       if (expected_success == false) {
         
-        unsigned int c1 = command_output.find("is not");
-        command_output.erase(0, c1);
-        unsigned int c2 = command_output.find(" \"");
-        unsigned int c3 = command_output.find("Failed to parse");
-        command_output.replace(c2, c3 - c2, "\n");
+        unsigned int c1 = out.output.find("is not");
+        out.output.erase(0, c1);
+        unsigned int c2 = out.output.find(" \"");
+        unsigned int c3 = out.output.find("Failed to parse");
+        out.output.replace(c2, c3 - c2, "\n");
         
         expected_output.str(std::string());
         expected_output << "is not a valid value for" << std::endl;
@@ -1334,7 +1268,7 @@ TEST(StanGmArgumentsConfiguration, TestOutputWithoutMethod) {
         n_output = 2;
       }
       
-      output.str(command_output);
+      output.str(out.output);
       
       for (int i = 0; i < n_output; ++i) {
         
@@ -1356,7 +1290,7 @@ TEST(StanGmArgumentsConfiguration, TestOutputWithoutMethod) {
     
   }
   
-  for (int i = 0; i < valid_arguments.size(); ++i)
+  for (size_t i = 0; i < valid_arguments.size(); ++i)
     delete valid_arguments.at(i);
   
 }

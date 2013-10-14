@@ -563,6 +563,21 @@ namespace stan {
                   RNG& rng) {
       using boost::variate_generator;
       using boost::random::gamma_distribution;
+
+      static const char* function = "stan::prob::inv_gamma_rng(%1%)";
+
+      using stan::math::check_positive;
+      using stan::math::check_finite;
+ 
+      if (!check_finite(function, alpha, "Shape parameter")) 
+        return 0;
+      if (!check_positive(function, alpha, "Shape parameter"))
+        return 0;
+      if (!check_finite(function, beta, "Scale parameter"))
+        return 0;
+      if (!check_positive(function, beta, "Scale parameter")) 
+        return 0;
+
       variate_generator<RNG&, gamma_distribution<> >
         gamma_rng(rng, gamma_distribution<>(alpha, 1 / beta));
       return 1 / gamma_rng();

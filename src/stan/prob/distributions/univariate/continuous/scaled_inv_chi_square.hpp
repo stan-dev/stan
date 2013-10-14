@@ -580,6 +580,22 @@ namespace stan {
                               RNG& rng) {
       using boost::variate_generator;
       using boost::random::chi_squared_distribution;
+
+      static const char* function 
+        = "stan::prob::scaled_inv_chi_square_rng(%1%)";
+      
+      using stan::math::check_finite;
+      using stan::math::check_positive;
+
+      if (!check_finite(function, nu, "Degrees of freedom parameter"))
+        return 0;
+      if (!check_positive(function, nu, "Degrees of freedom parameter")) 
+        return 0;
+      if (!check_finite(function, s, "Scale parameter"))
+        return 0;
+      if (!check_positive(function, s, "Scale parameter"))
+        return 0;
+
       variate_generator<RNG&, chi_squared_distribution<> >
         chi_square_rng(rng, chi_squared_distribution<>(nu));
       return nu * s / chi_square_rng();

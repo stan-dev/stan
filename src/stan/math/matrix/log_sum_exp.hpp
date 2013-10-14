@@ -31,12 +31,12 @@ namespace stan {
       using std::log;
       using std::exp;
       T max = -numeric_limits<T>::infinity();
-      for (size_t i = 0; i < x.size(); i++) 
+      for (int i = 0; i < x.size(); i++) 
         if (x(i) > max) 
           max = x(i);
             
       T sum = 0.0;
-      for (size_t i = 0; i < x.size(); i++) 
+      for (int i = 0; i < x.size(); i++) 
         if (x(i) != -numeric_limits<double>::infinity()) 
           sum += exp(x(i) - max);
           

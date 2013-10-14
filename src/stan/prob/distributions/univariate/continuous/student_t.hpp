@@ -771,6 +771,23 @@ namespace stan {
                   RNG& rng) {
       using boost::variate_generator;
       using boost::random::student_t_distribution;
+
+      static const char* function = "stan::prob::student_t_rng(%1%)";
+
+      using stan::math::check_positive;
+      using stan::math::check_finite;
+
+      if(!check_finite(function, nu, "Degrees of freedom parameter"))
+        return 0;
+      if(!check_positive(function, nu, "Degrees of freedom parameter")) 
+        return 0;
+      if (!check_finite(function, mu, "Location parameter")) 
+        return 0;
+      if (!check_finite(function, sigma, "Scale parameter")) 
+        return 0;
+      if (!check_positive(function, sigma, "Scale parameter"))
+        return 0;
+
       variate_generator<RNG&, student_t_distribution<> >
         rng_unit_student_t(rng, student_t_distribution<>(nu));
       return mu + sigma * rng_unit_student_t();

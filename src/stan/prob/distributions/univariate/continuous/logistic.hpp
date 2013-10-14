@@ -428,6 +428,19 @@ namespace stan {
                  RNG& rng) {
       using boost::variate_generator;
       using boost::random::exponential_distribution;
+
+      static const char* function = "stan::prob::logistic_rng(%1%)";
+      
+      using stan::math::check_positive;
+      using stan::math::check_finite;
+
+      if (!check_finite(function, mu, "Location parameter"))
+        return 0;
+      if (!check_finite(function, sigma, "Scale parameter"))
+        return 0;
+      if (!check_positive(function, sigma, "Scale parameter"))
+        return 0;
+
       variate_generator<RNG&, exponential_distribution<> >
         exp_rng(rng, exponential_distribution<>(1));
       return mu - sigma * std::log(exp_rng() / exp_rng());

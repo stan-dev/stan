@@ -5,13 +5,13 @@
 }
 body { 
   font-size: 1em;   
-  width: 32em;
+  width: 40em;
   margin: 1em 2em 1em 2em;
   background-color: #F8F8F8;
 }
 p {
   margin: 0.5em 0 0.5em 0;  
-  width: 30em;
+  width: 40em;
   line-height: 1.35em;
 }
 hr {

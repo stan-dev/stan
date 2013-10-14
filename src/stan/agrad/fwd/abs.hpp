@@ -5,22 +5,23 @@
 #include <stan/meta/traits.hpp>
 #include <stan/math/constants.hpp>
 
-namespace stan{
+namespace stan {
 
-  namespace agrad{
+  namespace agrad {
 
     template<typename T>
     inline
     fvar<T>
     abs(const fvar<T>& x) {
-      using std::abs;
       using stan::math::NOT_A_NUMBER;
-      if(x.val_ > 0.0)
-        return fvar<T>(abs(x.val_), x.d_);
-      else if(x.val_ == 0.0)
-        return fvar<T>(abs(x.val_), NOT_A_NUMBER);
-      else 
-        return fvar<T>(abs(x.val_), -x.d_);
+      if (x.val_ > 0.0)
+        return x;
+      else if (x.val_ < 0.0)
+        return fvar<T>(-x.val_, -x.d_);
+      else if (x.val_ == 0.0)
+        return fvar<T>(0, 0);
+      else
+        return fvar<T>(NOT_A_NUMBER,NOT_A_NUMBER);
     }
   }
 }
