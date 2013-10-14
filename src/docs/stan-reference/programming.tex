@@ -4858,6 +4858,100 @@ some time checking that that \code{beta\_unif} is between
 \code{-pi()/2} and \code{pi()/2}, but this condition is guaranteed by
 the constraints in the declaration of \code{beta\_unif}.  
 
+\subsection{Reparameterizing a Student-t Distribution}
+
+One thing that sometimes works when you're having trouble with the
+heavy-tailedness of Student-t distributions is to use the
+gamma-mixture representation, which says that you can generate a
+Student-t distributed variable $\beta$,
+\[
+\beta \sim \mbox{\sf Student-t}(\nu, 0, 1),
+\]
+by first generating a gamma-distributed $\tau$,
+\[
+\tau \sim \mbox{\sf Gamma}(\nu/2, \nu/2),
+\]
+and then generating $\beta$ from the normal distribution with
+precision $\tau$, which using our parameterization of the normal in
+terms of scale, is
+\[
+\beta \sim \mbox{\sf Normal}(0,\tau^{-2}).
+\]
+%
+That is, the marginal distribution of $\beta$ when you integrate out
+$\tau$ is $\mbox{\sf Student-t}(\nu, 0, 1)$, i.e.,
+\[
+\mbox{\sf Student-t}(\beta | \nu,0,1).
+= 
+\int_0^{\infty} 
+\,
+\mbox{\sf Normal}(\beta | 0, 1 / \tau^{2}) 
+\times
+\mbox{\sf Gamma}(\tau | \nu/2, \nu/2)
+\
+d\tau.
+\]
+%
+You can go a step further and instead of defining a $\beta$ drawn from
+a normal with precision $\tau$, define $\alpha$ to be drawn from a
+unit normal,
+%
+\[
+\alpha \sim \mbox{\sf Normal}(0,1)
+\]
+%
+and rescale by defining
+%
+\[
+\beta = \alpha / \tau^{2}.
+\]
+%
+Now suppose $\mu = \beta x$ is the product of $\beta$ with a
+regression predictor $x$.  Then the reparameterization $\mu = \alpha
+\tau^{-2} x$ has the same distribution, but in the original, direct
+parameterization, $\beta$ has (potentially) heavy tails, whereas in
+the second, neither $\tau$ nor $\alpha$ have heavy tails.
+
+To translate into Stan notation, this reparameterization replaces
+%
+\begin{quote}
+\begin{Verbatim}
+parameters {
+  real<lower=0> nu;
+  real beta;
+  ...
+model {
+  beta ~ student_t(nu,0,1);
+  ...
+\end{Verbatim}
+\end{quote}
+%
+with
+%
+\begin{quote}
+\begin{Verbatim}
+parameters {
+  real<lower=0> nu;
+  real<lower=0> tau;
+  ...
+transformed parameters {
+  real beta;
+  beta <- alpha / pow(tau,2);
+  ...
+model {
+  real half_nu;
+  half_nu <- 0.5 * nu;
+  tau ~ gamma(half_nu, half_nu);
+  alpha ~ normal(0, 1);
+  ...
+\end{Verbatim}
+\end{quote}  
+%
+In most cases, the lower bound for \code{nu} can be set to \code{1} or
+higher; when \code{nu} is 1, the result is a Cauchy distribution with
+very fat tails and as \code{nu} approaches infinity, the distribution
+approaches a normal distribution.   So the model for \code{nu}
+effectively parameterizes the heaviness of the tails of the model.
 
 \subsection{Hierarchical Models}
 
