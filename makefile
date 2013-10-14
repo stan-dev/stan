@@ -8,7 +8,7 @@
 help:
 
 ## Disable implicit rules.
-SUFFIXES:
+SUFIXES:
 
 ##
 # Users should only need to set these three variables for use.
@@ -103,13 +103,20 @@ bin/%.d : src/%.cpp
 .PHONY: help
 help:
 	@echo '--------------------------------------------------------------------------------'
-	@echo 'Stan: makefile'
+	@echo 'Stan makefile:'
 	@echo '  Current configuration:'
 	@echo '  - OS (Operating System):   ' $(OS)
 	@echo '  - CC (Compiler):           ' $(CC)
 	@echo '  - O (Optimization Level):  ' $(O)
 	@echo '  - O_STANC (Opt for stanc): ' $(O_STANC)
+ifdef TEMPLATE_DEPTH
+	@echo '  - TEMPLATE_DEPTH:          ' $(TEMPLATE_DEPTH)
+endif
 	@echo '  - STAN_HOME                ' $(STAN_HOME)
+	@echo '  Library configuration:'
+	@echo '  - EIGEN                    ' $(EIGEN)
+	@echo '  - BOOST                    ' $(BOOST)
+	@echo '  - GTEST                    ' $(GTEST)
 	@echo ''
 	@echo 'Build a Stan model:'
 	@echo '  Given a Stan model at foo/bar.stan, the make target is:'
