@@ -21,15 +21,22 @@ namespace stan {
       
       _softabs_fun(M& m, std::ostream* out): _model(m), _o(out) {};
       
+      //template <typename T>
+      //T operator()(const std::vector<T>& q) {
+      //  std::vector<int> dummy_ints;
+      //  return _model.template log_prob<true, true, T>(q, dummy_ints, _o);
+      //}
+      
       template <typename T>
       T operator()(const Eigen::Matrix<T,Eigen::Dynamic,1>& x) const {
         
         std::vector<T> v(x.size());
         Eigen::Map<Eigen::Matrix<T,Eigen::Dynamic,1> >(&(v[0]), v.size()) = x;
-        std::vector<int> dummy_int;
+        std::vector<int> dummy_ints;
         
-        return _model.log_prob<true,true,T>(eigen_x, dummy_int, _o);
+        return _model.template log_prob<true, true, T>(v, dummy_ints, _o);
       }
+      
     };
     
     // Riemannian manifold with SoftAbs metric
@@ -226,6 +233,11 @@ namespace stan {
         Eigen::VectorXd a = z.eigen_deco.eigenvectors().transpose() * v;
         Eigen::VectorXd b = z.softabs_lambda_inv.cwiseProduct(a);
         return z.eigen_deco.eigenvectors() * b;
+      }
+      
+      // Return the product of the current metric inverse with v with the current momentum
+      const Eigen::VectorXd metric_inv_dot_p(softabs_point& z) {
+        return z.eigen_deco.eigenvectors() * z.lambda_Q_p;
       }
       
       double get_alpha() { return this->_alpha; }

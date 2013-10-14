@@ -15,6 +15,11 @@ namespace stan {
       
       unit_e_point(int n, int m): ps_point(n, m) {};
 
+      void write_metric(std::ostream* o) {
+        if(!o) return;
+        *o << "# No free parameters for unit metric" << std::endl;
+      }
+      
     };
     
   } // mcmc

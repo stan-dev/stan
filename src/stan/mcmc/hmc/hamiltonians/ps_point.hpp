@@ -69,10 +69,7 @@ namespace stan {
           values.push_back(g(i));
       }
       
-      virtual void write_metric(std::ostream* o) {
-        if(!o) return;
-        *o << "# No free parameters for unit metric" << std::endl;
-      }
+      virtual void write_metric(std::ostream* o) {};
       
     protected:
       

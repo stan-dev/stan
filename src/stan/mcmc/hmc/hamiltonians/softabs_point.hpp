@@ -58,6 +58,11 @@ namespace stan {
       Eigen::VectorXd fp_init;  // initial point in fixed-point iteration
       Eigen::VectorXd fp_delta; // delta in fixed-point iteration
       
+      void write_metric(std::ostream* o) {
+        if(!o) return;
+        *o << "# No free parameters for softabs metric" << std::endl;
+      }
+      
     };
     
   } // mcmc

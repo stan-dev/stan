@@ -24,11 +24,12 @@
 #include <stan/mcmc/hmc/static/adapt_unit_e_static_hmc.hpp>
 #include <stan/mcmc/hmc/static/adapt_diag_e_static_hmc.hpp>
 #include <stan/mcmc/hmc/static/adapt_dense_e_static_hmc.hpp>
+#include <stan/mcmc/hmc/static/adapt_softabs_static_hmc.hpp>
+
 #include <stan/mcmc/hmc/nuts/adapt_unit_e_nuts.hpp>
 #include <stan/mcmc/hmc/nuts/adapt_diag_e_nuts.hpp>
 #include <stan/mcmc/hmc/nuts/adapt_dense_e_nuts.hpp>
-
-#include <stan/mcmc/hmc/static/adapt_softabs_static_hmc.hpp>
+#include <stan/mcmc/hmc/nuts/adapt_softabs_nuts.hpp>
 
 #include <stan/model/util.hpp>
 
@@ -854,13 +855,13 @@ namespace stan {
               
             case 31: {
               return 0;
-              //typedef stan::mcmc::softabs_nuts<Model, rng_t> sampler;
-              //sampler_ptr = new sampler(model, base_rng);
-              //categorical_argument* softabs = dynamic_cast<categorical_argument*>
-              //                                (metric->arg("softabs"));
-              //if (!init_softabs<sampler>(sampler_ptr, softabs)) return 0;
-              //if (!init_nuts<sampler>(sampler_ptr, algo)) return 0;
-              //break;
+              typedef stan::mcmc::softabs_nuts<Model, rng_t> sampler;
+              sampler_ptr = new sampler(model, base_rng);
+              categorical_argument* softabs = dynamic_cast<categorical_argument*>
+                                              (metric->arg("softabs"));
+              if (!init_softabs<sampler>(sampler_ptr, softabs)) return 0;
+              if (!init_nuts<sampler>(sampler_ptr, algo)) return 0;
+              break;
             }
             
             case 100: {
@@ -923,14 +924,13 @@ namespace stan {
             }
               
             case 131: {
-              return 0;
-              //typedef stan::mcmc::adapt_softabs_nuts<Model, rng_t> sampler;
-              //sampler_ptr = new sampler(model, base_rng);
-              //categorical_argument* softabs = dynamic_cast<categorical_argument*>
-              //                                (metric->arg("softabs"));
-              //if (!init_softabs<sampler>(sampler_ptr, softabs)) return 0;
-              //if (!init_nuts<sampler>(sampler_ptr, algo)) return 0;
-              //if (!init_adapt<sampler>(sampler_ptr, adapt)) return 0;
+              typedef stan::mcmc::adapt_softabs_nuts<Model, rng_t> sampler;
+              sampler_ptr = new sampler(model, base_rng);
+              categorical_argument* softabs = dynamic_cast<categorical_argument*>
+                                              (metric->arg("softabs"));
+              if (!init_softabs<sampler>(sampler_ptr, softabs)) return 0;
+              if (!init_nuts<sampler>(sampler_ptr, algo)) return 0;
+              if (!init_adapt<sampler>(sampler_ptr, adapt)) return 0;
               break;
             }
             
