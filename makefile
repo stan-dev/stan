@@ -107,6 +107,7 @@ help:
 	@echo '  Current configuration:'
 	@echo '  - OS (Operating System):   ' $(OS)
 	@echo '  - CC (Compiler):           ' $(CC)
+	@echo '  - Compiler version:        ' $(CC_MAJOR).$(CC_MINOR)
 	@echo '  - O (Optimization Level):  ' $(O)
 	@echo '  - O_STANC (Opt for stanc): ' $(O_STANC)
 ifdef TEMPLATE_DEPTH
