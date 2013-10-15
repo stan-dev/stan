@@ -4,15 +4,13 @@
 #   - CFLAGS
 #   - CFLAGS_GTEST
 #   - PCH
-##
-TEMPLATE_DEPTH ?= 256
+
 ifeq (g++,$(CC_TYPE))
   CFLAGS += -Wno-unused-function
   VERSION := $(CC_MAJOR).$(CC_MINOR)
-  ifeq ($(CC_MINOR), $(filter $(CC_MINOR), 2 3 4))
+  ifeq (4.2,$(CC_MAJOR).$(CC_MINOR))
+    TEMPLATE_DEPTH ?= 256
     CFLAGS += -ftemplate-depth-$(TEMPLATE_DEPTH)
-  else
-    CFLAGS += -ftemplate-depth=$(TEMPLATE_DEPTH)
   endif
   ifeq (4.2,$(CC_MAJOR).$(CC_MINOR))
     PCH = 
@@ -26,6 +24,9 @@ ifeq (clang++,$(CC_TYPE))
   CFLAGS += -Wno-unused-function
   CFLAGS += -Wno-tautological-compare
   CFLAGS += -Wno-c++11-long-long
-  CFLAGS += -ftemplate-depth=$(TEMPLATE_DEPTH)
+  ifeq (5.0,$(CC_MAJOR).$(CC_MINOR))
+    TEMPLATE_DEPTH ?= 256
+    CFLAGS += -ftemplate-depth=$(TEMPLATE_DEPTH)
+  endif
   #PCH = .pch
 endif
