@@ -116,6 +116,9 @@ The absolute value of \farg{x}}
 \fitem{int}{int\_step}{int \farg{x}}
 1 if \farg{x} is strictly greater than 0, and 0 otherwise
 %
+\fitem{int}{int\_step}{real \farg{x}}
+1 if \farg{x} is strictly greater than 0, and 0 otherwise
+%
 \end{description}
 %
 
@@ -177,11 +180,9 @@ Not-a-number, a special non-finite real value returned to signal an error}
  Negative infinity, a special non-finite real value smaller than all
   finite numbers}
 %
-\fitem{real}{epsilon}{}{
-The smallest positive real value representable}
-%
-\fitem{real}{negative\_epsilon}{}{
-The largest negative real value representable}
+\fitem{real}{machine\_precision}{}{
+The smallest number $x$ such that $(x + 1) \neq 1$ in floating-point
+arithmetic on the current hardware platform}
 %
 \end{description}
 
@@ -331,63 +332,85 @@ This is a no-op.}
 \end{description}
 
 
-\section{Absolute Functions}
+\section{Step-like Functions}\label{step-functions.section}
+
+{\it {\bf Warning:} These functions can seriously hinder sampling and
+  optimization efficiency for gradient-based methods (e.g., NUTS, HMC,
+  BFGS) if applied to parameters (including transformed parameters and
+  local variables in the transformed parameters or model block).  The
+  problem is that they break gradients due to discontinuities coupled with
+  zero gradients elsewhere.  They do not hinder sampling when used in the
+  data, transformed data, or generated quantities blocks.}
+
+\subsection{Absolute Value Functions}
 
 \begin{description}
 %
-\fitem{real}{abs}{real \farg{x}}{
-The absolute value of \farg{x}}
+  \fitem{real}{abs}{real \farg{x}}{ The absolute value of \farg{x}.
+    This function is deprecated and will be removed in the future;
+    please use \code{fabs} instead.}
 %
 \fitem{real}{fabs}{real \farg{x}}{
-The absolute value of \farg{x}}
+The absolute value of \farg{x};  
+see warning at start of \refsection{step-functions}}
 %
 \fitem{real}{fdim}{real \farg{x}, 
                  real \farg{y}}{
 The positive difference between \farg{x} and \farg{y}, which is
-\farg{x} - \farg{y} if \farg{x} is greater than \farg{y} and 0 otherwise}
+\farg{x} - \farg{y} if \farg{x} is greater than \farg{y} and 0
+otherwise;
+see warning at start of \refsection{step-functions}}
 %
 \end{description}
 
-\section{Bounds Functions}
+\subsection{Bounds Functions}
 
 \begin{description}
 %
 \fitem{real}{fmin}{real \farg{x}, real \farg{y}}{
-The minimum of \farg{x} and \farg{y}}
+The minimum of \farg{x} and \farg{y}\,; 
+see warning at start of \refsection{step-functions}}
 %
 \fitem{real}{fmax}{real \farg{x}, real \farg{y}}{
-The maximum of \farg{x} and \farg{y}}
+The maximum of \farg{x} and \farg{y}\,;
+see warning at start of \refsection{step-functions}}
 %
 \end{description}
 
 
-\section{Arithmetic Functions}
+\subsection{Arithmetic Functions}
+
 %
 \begin{description}
 \fitem{real}{fmod}{real \farg{x}, real \farg{y}}{
-The real value remainder after dividing \farg{x} by \farg{y}}
+The real value remainder after dividing \farg{x} by \farg{y}\,;
+see warning at start of \refsection{step-functions}}
 %
 \end{description}
 
 
-\section{Rounding Functions}
-%
+\subsection{Rounding Functions}
+
 \begin{description}
 %
 \fitem{real}{floor}{real \farg{x}}{
 The floor of \farg{x}, which is the largest integer less
-than or equal to \farg{x}, converted to a real value}
+than or equal to \farg{x}, converted to a real value;
+see warning at start of \refsection{step-functions}}
 %
 \fitem{real}{ceil}{real \farg{x}}{
 The ceiling of \farg{x}, which is the smallest integer greater
-than or equal to \farg{x}, converted to a real value}
+than or equal to \farg{x}, converted to a real value;
+see warning at start of \refsection{step-functions}}
 %
 \fitem{real}{round}{real \farg{x}}{
-The nearest integer to \farg{x}, converted to a real value}
+The nearest integer to \farg{x}, converted to a real value;
+see warning at start of \refsection{step-functions}}
 %
 \fitem{real}{trunc}{real \farg{x}}{
 The integer nearest to but no larger in magnitude than \farg{x},
-converted to a double value}
+converted to a double value;
+see warning at start of \refsection{step-functions}}
 %
 \end{description}
 
@@ -554,7 +577,7 @@ be used instead of \code{Phi} for probit regression.  See
 
 \fitem{real}{binary\_log\_loss}{int \farg{y}, real \farg{y\_hat}}{
 The log loss of predicting probability \farg{y\_hat} for 
-binary outcome \farg{y};
+binary outcome \farg{y}\,;
 
 The log loss function for predicting $\hat{y} \in [0,1]$ for 
 boolean outcome $y \in \setlist{0,1}$ is defined by
@@ -646,7 +669,8 @@ $\Gamma$ function, defining
 %
 \fitem{real}{bessel\_first\_kind}{real \farg{v}, real \farg{z}}{The Bessel function of the first kind with order \farg{v} applied to \farg{z} defined for all \farg{z} and \farg{v} by
 \[
-{J_v}(z) = \left(\frac{1}{2}z\right)^v\sum_{k=0}^\infty \frac{\left(-\frac{1}{4}z^2\right)^k}{k!\Gamma(v+k+1)}
+{J_v}(z) = \left(\frac{1}{2}z\right)^v\sum_{k=0}^\infty
+\frac{\left(-\frac{1}{4}z^2\right)^k}{k!\, \Gamma(v+k+1)}
 \]
 }
 %
@@ -720,7 +744,8 @@ The natural exponential of \farg{x} minus 1}
 \farg{z} plus the result of \farg{x} multiplied by \farg{y}}
 %
 \fitem{real}{multiply\_log}{real \farg{x}, real \farg{y}}{ 
-The product of \farg{x} and the natural logarithm of \farg{y}}
+The product of \farg{x} and the natural logarithm of \farg{y}\,;  if
+both \farg{x} and \farg{y} are 0, the return value is 0}
 %
 \fitem{real}{log1p}{real \farg{x}}{
 The natural logarithm of 1 plus \farg{x}}
@@ -797,6 +822,24 @@ dividing by \code{length - 1}), or 0 if \farg{x} is empty}
 \fitem{real}{sd}{real \farg{x}[]}{The sample standard deviation of
 elements in \farg{x} (divide by \code{length - 1}), or 0 if \farg{x}
 is empty}
+%
+% \fitem{real}{dist}{real \farg{x}[], real \farg{y}[]}{The Euclidean
+%   distance between \farg{x} and \farg{y}, defined by
+% \[
+% \mbox{dist}(\mbox{\farg{x}},\mbox{\farg{y}}) 
+% = \sqrt{\textstyle \sum_{n=1}^N (\mbox{\farg{x}}[n] - \mbox{\farg{y}}[n])^2},
+% \]
+% where \code{N} is the size of \farg{x} and \farg{y}.
+% }
+%
+% \fitem{real}{squared\_dist}{real \farg{x}[], real \farg{y}[]}{The Euclidean
+%   distance between \farg{x} and \farg{y}, defined by
+% \[
+% \mbox{squared\_dist}(\mbox{\farg{x}},\mbox{\farg{y}}) 
+% = \textstyle \sum_{n=1}^N (\mbox{\farg{x}}[n] - \mbox{\farg{y}}[n])^2,
+% \]
+% where \code{N} is the size of \farg{x} and \farg{y}.
+% }
 %
 \fitem{real}{log\_sum\_exp}{real \farg{x}[]}{
 The natural logarithm of the sum of the exponentials of the elements in \farg{x}}
@@ -1272,23 +1315,23 @@ $\mbox{\code{x}}^{\top}\,\mbox{\code{x}}$.}
 %
 \end{description}
 
+
+The following functions all provide shorthand forms for common
+expressions, which are also much more efficient.
+%
 \begin{description}
 %
 \fitem{matrix}{quad\_form}{matrix \farg{A}, matrix \farg{B}}{
-The quadratic form $B^T*A*B$.  Using this function is much more efficient than
-doing it directly.}
+The quadratic form, i.e., \code{B'~*~A~*~B}.}
 %
 \fitem{real}{quad\_form}{matrix \farg{A}, vector \farg{B}}{
-The quadratic form $B^T*A*B$.  Using this function is much more efficient than
-doing it directly.}
+The quadratic form, i.e., \code{B'~*~A~*~B}.}
 %
-\fitem{real}{trace\_quad\_form}{matrix \farg{A}, matrix \farg{B}}{
-The trace of a quadratic form, i.e., $trace(B^T*A*B)$.  Using this function is
-much more efficient than doing it directly.}
+\fitem{real}{trace\_quad\_form}{matrix \farg{A}, matrix \farg{B}}{ 
+The trace of the quadratic form, i.e., \code{trace(B'~*~A~*~B)}.}
 %
 \fitem{real}{trace\_gen\_quad\_form}{matrix \farg{D},matrix \farg{A}, matrix \farg{B}}{
-The trace of a generalized quadratic form, i.e., $trace(D*B^T*A*B)$.  Using this
-function is much more efficient than doing it directly.}
+The trace of a generalized quadratic form, i.e., \code{trace(D~*~B'~*~A~*~B).}}
 %
 \end{description}
 

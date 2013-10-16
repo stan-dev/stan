@@ -4,11 +4,18 @@
 
 \noindent 
 This chapter provides a sketch of how a compiled \Stan model is
-executed.  This sketch is elaborated in the following chapters of this
-part, which cover variable declarations, expressions, statements, and
-blocks in more detail.
+executed using sampling.  Optimization shares the same data reading
+and initialization steps, but then does optimization rather than sampling.
 
-\section{Before Sampling}
+This sketch is elaborated in the following chapters of this part,
+which cover variable declarations, expressions, statements, and blocks
+in more detail.
+
+
+\section{Reading and Transforming Data}
+
+The reading and transforming data steps are the same for sampling,
+optimization and diagnostics.
 
 \subsection{Read Data}
 
@@ -44,7 +51,11 @@ transformed data variables are validated.  If the validation fails,
 execution halts and the variable's name, value and constraints are
 displayed.
 
-\subsection{Initialization}
+\section{Initialization}
+
+Initialization is the same for sampling, optimization, and diagnosis
+
+\subsection{User-Supplied Initial Values}
 
 If there are user-supplied initial values for parameters, these are
 read using the same input mechanism and same file format as data
@@ -55,8 +66,58 @@ constraint, the program halts and a diagnostic message is printed.
 After being read, initial values are transformed to unconstrained
 values that will be used to initialize the sampler. 
 
-If there are no user-supplied initial values, the unconstrained
-initial values are generated uniformly from the interval $(-2,2)$.
+\subsection{Random Initial Values}
+
+If there are no user-supplied initial values, the default
+initialization strategy is to initialize the unconstrained parameters
+directly with values drawn uniformly from the interval $(-2,2)$.  The
+bounds of this initialization can be changed but it is always
+symmetric around 0. The value of 0 is special in that it represents
+the median of the initialization.  An unconstrained value of 0
+corresponds to different parameter values depending on the constraints
+declared on the parameters.
+
+An unconstrained real does not involve any transform, so an initial
+value of 0 for the unconstrained parameters is also a value of 0 for
+the constrained parameters.  
+
+For parameters that are bounded below at 0, the initial value of 0 on
+the unconstrained scale corresponds to $\exp(0) = 1$ on the
+constrained scale.  A value of -2 corresponds to $\exp(-2) = .13$ and
+a value of 2 corresponds to $\exp(2) = 7.4$.
+
+For parameters bounded above and below, the initial value of 0 on the
+unconstrained scale corresponds to a value at the midpoint of the
+constraint interval.  For probability parameters, bounded below by 0
+and above by 1, the transform is the inverse logit, so that an initial
+unconstrained value of 0 corresonds to a constrained value of 0.5, -2
+corresponds to 0.12 and 2 to 0.88.  Bounds other than 0 and 1 are
+just scaled and translated.
+
+Simplexes with initial values of 0 on the unconstrained basis
+correspond to symmetric values on the constrained values (i.e., each
+value is $1/K$ in a $K$-simplex).
+
+Cholesky factors for positive-definite matrices are initialized to 1
+on the diagonal and 0 elsewhere;  this is because the diagonal is log
+transformed and the below-diagonal values are unconstrained.
+
+The initial values for other parameters can be determined from the
+transfrom that is applied.  The transforms are all described in full
+detail in \refchapter{variable-transforms}.
+
+\subsection{Zero Initial Values}
+
+The initial values may all be set to 0 on the unconstrained scale.
+This can be helpful for diagnosis, and may also be a good starting
+point for sampling.  Once a model is running, multiple chains with
+more diffuse starting points can help diagnose problems with
+convergence; see \refsection{convergence} for more information on
+convergence monitoring.
+
+
+
+
 
 \section{Sampling}
 
@@ -123,7 +184,7 @@ used to evaluate the gradients by propagating partial derivatives
 backward along the expression graph.  The gradient calculations
 account for the majority of the cycles consumed by a \Stan program.
 
-\section{Metropolis Accept/Reject}
+\subsection{Metropolis Accept/Reject}
 
 A standard Metropolis accept/reject step is required to retain detailed
 balance and ensure samples are marginally distributed according to the
@@ -147,6 +208,26 @@ steps).
 
 If the proposal is accepted, the parameters are updated to their new
 values.  Otherwise, the sample is the current set of parameter values.
+
+
+\section{Optimization}
+
+Optimization runs very much like sampling in that it starts by reading
+the data and then initializing parameters.  Unlike sampling, it
+produces a deterministic output which requires no further analysis
+other than to verify that the optimizer itself converged to a
+posterior mode.  The output for optimization is also similar to that
+for sampling.
+
+
+\section{Model Diagnostics}
+
+Model diagnostics are like sampling and optimization in that they
+depend on a model's data being read and its parameters being
+initialized.  The output, at least so far, is just to the command
+line.  See \refsection{diagnostics} for information on the
+available diagnostics (as of Stan 2.0, just gradients and log
+probabilities at the initialization state).
 
 
 \section{Output}
@@ -359,7 +440,7 @@ both.  For instance, to declare \code{N} to be a positive integer, use
 the following.
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}
 int<lower=1> N;
 \end{Verbatim}
 \end{quote}
@@ -384,7 +465,7 @@ Unconstrained real variables are declared using the keyword
 unconstrained continuous value.
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}
 real theta;
 \end{Verbatim}
 \end{quote}
@@ -401,7 +482,7 @@ boundaries, so they are allowed in \Stan.
 The variable \code{sigma} may be declared to be non-negative as follows.
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}
 real<lower=0> sigma;
 \end{Verbatim}
 \end{quote}
@@ -419,7 +500,7 @@ To ensure \code{rho} takes on values between $-1$ and $1$, use the
 following declaration.
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}
 real<lower=-1,upper=1> rho;
 \end{Verbatim}
 \end{quote}
@@ -446,7 +527,7 @@ For example, it is acceptable to have the
 following declarations.
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}
 data { 
  real lb;
 }
@@ -464,7 +545,7 @@ for integer variables and of type \code{real} for real variables
 Variables used in constraints can be any variable that has been
 defined at the point the constraint is used.  For instance,
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}
 data { 
    int<lower=1> N;
    real y[N];
@@ -500,7 +581,6 @@ packages \R, \MATLAB, \BUGS, and \JAGS.  General computer programming
 languages, on the other hand, such as \Cpp and Python, index arrays
 starting from zero.
 
-
 \subsection{Vectors}
 
 Vectors in \Stan are column vectors; see the next subsection for
@@ -509,7 +589,7 @@ dimensionality).  For example, a 3-dimensional vector is declared with
 the keyword \code{vector}, as follows.
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}
 vector[3] u;
 \end{Verbatim}
 \end{quote}
@@ -518,7 +598,7 @@ Vectors may also be declared with constraints, as in the following
 declaration of a 3-vector of non-negative values.
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}
 vector<lower=0>[3] u;
 \end{Verbatim}
 \end{quote}
@@ -581,7 +661,7 @@ points in ordered logistic regression models (see
 The variable \code{c} is declared as an ordered 5-vector by
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}
 ordered[5] c;
 \end{Verbatim}
 \end{quote}
@@ -601,7 +681,7 @@ For instance, $(2,3.7,4,12.9)$ is a positive, ordered 4-vector.
 The variable \code{d} is declared as a positive, ordered 5-vector by
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}
 positive_ordered[5] d;
 \end{Verbatim}
 \end{quote}
@@ -618,7 +698,7 @@ Like (column) vectors, they are declared with a size.  For example,
 a 1093-dimensional row vector \code{u} would be declared as
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}
 row_vector[1093] u;
 \end{Verbatim}
 \end{quote}
@@ -626,7 +706,7 @@ row_vector[1093] u;
 Constraints are declared as for vectors, as in the following example
 of a 10-vector with values between -1 and 1.
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}
 row_vector<lower=-1,upper=1>[10] u;
 \end{Verbatim}
 \end{quote}
@@ -662,6 +742,30 @@ matrix<upper=0>[3,4] B;
 \end{Verbatim}
 \end{quote}
 %  
+
+\subsubsection{Assigning to Rows of a Matrix}
+
+Rows of a matrix can be assigned by indexing the left-hand side of an
+assignment statement. For example, this is possible.
+%
+\begin{quote}
+\begin{Verbatim}
+matrix[M,N] a;
+row_vector[N] b;
+...
+a[1] <- b;
+\end{Verbatim}
+\end{quote}
+%
+This copies the values from row vector \code{b} to \code{a[1]}, which
+is the first row of the matrix \code{a}.  If the number of columns in
+\code{a} is not the same as the size of \code{b}, a run-time error is
+raised;  the number of rows of \code{a} is \code{N}, which is also the
+size of \code{b}.
+
+Assignment works by copying values in Stan.  That means any subsequent
+assignment to \code{a[1]} does not affect \code{b}, nor does an
+assignment to \code{b} affect \code{a}.
 
 
 \subsection{Correlation Matrices}
@@ -751,7 +855,7 @@ is read in and transformed data variables defined by their statements.
 For example, the following is legal.
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}
 data {
   int<lower=0> N_observed;    int<lower=0> N_missing;
   ...
@@ -898,14 +1002,17 @@ z <- y[3];  // z == w[5][4][3] == w[5,4,3]
 \end{quote}
 %
 
+\subsection{Assigning}
 
-\subsection{Arrays of Matrices and Vectors}
+---fixme---
+
+\subsection{Arrays of Matrices and Vectors}\label{arrays-of-matrices.section}
 
 Arrays of vectors and matrices are accessed in the same way as arrays
 of doubles.  Consider the following vector and scalar declarations.
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}
 vector[5] a[4,3];
 vector[5] b[4];
 vector[5] c;
@@ -916,7 +1023,7 @@ real x;
 With these declarations, the following assignments are legal.
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}
 b <- a[1];      // result is array of vectors
 c <- a[1,3];    // result is vector
 c <- b[3];      //   same result as above
@@ -932,8 +1039,8 @@ behave the same way in terms of indexing.
 Consider the following matrix, vector and scalar declarations.
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
-matrix[6,5] d[4,3];
+\begin{Verbatim}
+matrix[6,5] d[3,4];
 matrix[6,5] e[4];
 matrix[6,5] f;
 row_vector[5] g;
@@ -944,14 +1051,14 @@ real x;
 With these declarations, the following definitions are legal.
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}
 e <- d[1];        // result is array of matrices
 f <- d[1,3];      // result is matrix
 f <- e[3];        //   same result as above
 g <- d[1,3,2];    // result is row vector
 g <- e[3,2];      //   same result as above
 g <- f[2];        //   same result as above
-x <- d[4,3,5,2];  // result is scalar
+x <- d[1,3,5,2];  // result is scalar
 x <- e[3,5,2];    //   same result as above
 x <- f[5,2];      //   same result as above
 x <- g[2];        //   same result as above
@@ -962,11 +1069,187 @@ As shown, the result \code{f[2]} of supplying a single index to a
 matrix is the indexed row, here row 2 of matrix \code{f}.
 
 
-\section{Types versus Sizes}
+\subsection{Partial Array Assignment}
+
+Subarrays of arrays may be assigned by indexing on the left-hand side
+of an assignment statement.  For example, the following is legal.
+%
+\begin{quote}
+\begin{Verbatim}
+real x[I,J,K];
+real y[J,K];
+real z[K];
+...
+x[1] <- y;
+x[1,1] <- z;
+\end{Verbatim}
+\end{quote}
+%
+The sizes must match.  Here, \code{x[1]} is a \code{J} by \code{K}
+array, as is is \code{y}.  
+
+Partial array assignment also works for arrays of matrices, vectors,
+and row vectors.  
+
+
+
+
+
+
+
+
+\subsection{Mixing Array, Vector, and Matrix Types}
+
+Arrays, row vectors, column vectors and matrices are not
+interchangeable in Stan.  Thus a variable of any one of these
+fundamental types is not assignable to any of the others, nor may it
+be used as an argument where the other is required (use as arguments
+follows the assignment rules).
+
+
+
+\subsubsection{Mixing Vectors and Arrays}
+
+For example, vectors cannot be assigned to arrays or vice-versa.
+%
+\begin{quote}
+\begin{Verbatim}
+real a[4];
+vector b[4];
+row_vector c[4];
+...
+a <- b; // illegal assignment of vector to array
+b <- a; // illegal assignment of array to vector
+a <- c; // illegal assignment of row vector to array
+c <- a; // illegal assignment of array to row vector
+\end{Verbatim}
+\end{quote}
+
+\subsubsection{Mixing Row and Column Vectors}
+
+It is not even legal to assign row vectors to column vectors or vice
+versa.  
+\begin{quote}
+\begin{Verbatim}
+vector b[4];
+row_vector c[4];
+...
+b <- c; // illegal assignment of row vector to column vector
+c <- b; // illegal assignment of column vector to row vector
+\end{Verbatim}
+\end{quote}
+%
+
+\subsubsection{Mixing Matrices and Arrays}
+
+The same holds for matrices, where 2-dimensional arrays may not be
+assigned to matrices or vice-versa.
+
+\begin{quote}
+\begin{Verbatim}
+real a[3,4];
+matrix[3,4] b;
+...
+a <- b;  // illegal assignment of matrix to array
+b <- a;  // illegal assignment of array to matrix
+\end{Verbatim}
+\end{quote}
+%
+
+\subsubsection{Mixing Matrices and Vectors}
+
+A $1 \times N$ matrix cannot be assigned a row vector or
+vice versa.  
+%
+\begin{quote}
+\begin{Verbatim}
+matrix[1,4] a;
+row_vector[4] b;
+...
+a <- b;  // illegal assignment of row vector to matrix
+b <- a;  // illegal assignment of matrix to row vector
+\end{Verbatim}
+\end{quote}
+%
+Similarly, an $M \times 1$ matrix may not be assigned to a column vector.
+%
+\begin{quote}
+\begin{Verbatim}
+matrix[4,1] a;
+vector[4] b;
+...
+a <- b;  // illegal assignment of column vector to matrix
+b <- a;  // illegal assignment of matrix to column vector
+\end{Verbatim}
+\end{quote}
+
+
+
+\section{Variable Types vs.\ Constraints and Sizes}
+
+The type information associated with a variable only contains the
+underlying type and dimensionality of the variable.  
+
+\subsection{Type Information Excludes Sizes}
 
 The size associated with a given variable is not part of its data
-type.  Sizes are determined dynamically (at run time) and thus
-cannot be type-checked statically.  
+type.  For example, declaring a variable using
+\begin{quote}
+\begin{Verbatim}
+real a[3];
+\end{Verbatim}
+\end{quote}
+%
+declares the variable \code{a} to be an array.  The fact that it was
+declared to have size 3 is part of its declaration, but not part of
+its underlying type.  
+
+\subsubsection{When are Sizes Checked?}
+
+Sizes are determined dynamically (at run time) and thus cannot be
+type-checked statically when the program is compiled.  As a result,
+any conformance error on size will raise a run-time error.  For
+example, trying to assign an array of size 5 to an array of size 6
+will cause a run-time error.  Similarly, multiplying an $N
+\times M$ by a $J \times K$ matrix will raise a run-time error if $M
+\neq J$.
+
+\subsection{Type Information Excludes Constraints}
+
+Like sizes, constraints are not treated as part of a variable's type
+in Stan when it comes to the compile-time check of operations it may
+participate in.  Anywhere Stan accepts a matrix as an argument, it
+will syntactically accept a correlation matrix or covariance matrix or
+Cholesky factor.  Thus a covariance matrix may be assigned to a matrix
+and vice-versa.
+
+Similarly, a bounded real may be assigned to an unconstrained real and
+vice-versa.  
+
+\subsubsection{When are Function Argument Constraints Checked?}
+
+For arguments to functions, constraints are sometimes, but not always
+checked when the function is called.  Exclusions include \Cpp standard
+library functions.  All probabiliy functions and cumulative
+distribution functions check that their arguments are appropriate at
+run time as the function is called.  
+
+\subsubsection{When are Declared Variable Constraints Checked?}
+
+For data variables, constraints are checked after the variable is read
+from a data file or other source.  For transformed data variables, the
+check is done after the statements in the transformed data block have
+executed.  Thus it is legal for intermediate values of variables to
+not satisfy declared constraints.
+
+For parameters, constraints are enforced by the transform applied and
+do not need to be checked.  For transformed parameters, the check is
+done after the statements in the transformed parameter block have
+executed.  
+
+For generated quantities, constraints are enforced after the
+statements in the generated quantities block have executed.
+
 
 \subsection{Type Naming Notation}
 
@@ -1272,6 +1555,13 @@ Although not the most expressive character set, \ASCII is the most
 portable and least prone to corruption through improper character
 encodings or decodings.
 
+\subsubsection{Comments Allow ASCII-Compatible Encoding}
+
+Within comments, Stan can work with any ASCII-compatible character
+encoding, such as ASCII itself, UTF-8, or Latin1.  It is up to user
+shells and editors to display them properly.  
+
+
 \section{Parentheses for Grouping}
 
 Any expression wrapped in parentheses is also an expression. Like in
@@ -1404,7 +1694,7 @@ tabular form in \reffigure{operator-precedence}.
   precedences, associativities, place in an expression, and a
   description.  The last two lines list the precedence of function
   application and array, matrix, and vector indexing. The operators are
-  listed in order of precedence, from least tightly binded to most
+  listed in order of precedence, from least tightly binding to most
   tightly binding.  The full set of legal arguments and corresponding
   result types are provided in the function documentation in
   \refpart{built-in-functions} prefaced with \code{operator} (i.e.,
@@ -1684,7 +1974,7 @@ dimensions in an expression such as the following declaration of a
 three-dimensional array of matrices.
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}
 matrix[M,N] a[I,J,K];
 \end{Verbatim}
 \end{quote}
@@ -1769,6 +2059,94 @@ as \code{real~operator*(row\_vector,vector)}.
 % compiler.  Details are provided in \refappendix{user-defined-functions}.
 
 
+\section{Chain Rule and Derivatives}
+
+Derivatives of the log probability function defined by a model are
+used in several ways by Stan.  The Hamiltonian Monte Carlo samplers,
+including NUTS, use gradients to guide updates.  The BFGS optimizers
+also use gradients to guide search for posterior modes.  
+
+\subsection{Errors Due to Chain Rule}
+
+Unlike evaluations in pure mathematics, evaluation of derivatives in
+Stan is done by applying the chain rule on an expression-by-expression
+basis, evaluating using floating-point arithmetic.  As a result,
+models such as the following are problematic for inference involving
+derivatives.
+%
+\begin{quote}
+\begin{Verbatim}
+parameters {
+  real x;
+}
+model {
+  x ~ normal(sqrt(x - x), 1);
+}
+\end{Verbatim}
+\end{quote}
+%
+Algebraically, the sampling statement in the model could be reduced to
+%
+\begin{quote}
+\begin{Verbatim}
+  x ~ normal(0, 1);
+\end{Verbatim}
+\end{quote}
+%
+and it would seem the model should produce unit normal samples for
+\code{x}.  But rather than cancelling, the expression \code{sqrt(x -
+  x)} causes a problem for derivatives.  The cause is the mechanistic
+evaluation of the chain rule, 
+%
+\begin{eqnarray*}
+\frac{d}{dx} \sqrt{x - x}
+& = &
+\frac{1}{2 \sqrt{x - x}} \times \frac{d}{dx} (x - x)
+\\[4pt]
+& = & 
+\frac{1}{0} \times (1 - 1)
+\\[4pt]
+& = & 
+\infty \times 0
+\\[4pt]
+& = & \mbox{NaN}.
+\end{eqnarray*}
+%
+Rather than the $x - x$ cancelling out, it introduces a 0 into the
+numerator and denominator of the chain-rule evaluation.
+
+The only way to avoid this kind problem is to be careful to do the
+necessary algebraic reductions as part of the model and not introduce
+expressions like \code{sqrt(x - x)} for which the chain rule produces
+not-a-number values.  
+
+\subsection{Diagnosing Problems with Derivatives}
+
+The best way to diagnose whether something is going wrong with the
+derivatives is to use the test-gradient option to the sampler or
+optimizer inputs; this option is availabe in both Stan and RStan
+(though it may be slow, because it relies on finite differences to
+make a comparison to the built-in automatic differentiation).
+
+For example, compiling the above model to an executable
+\code{sqrt-x-minus-x}, the test can be run as
+%
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
+> ./sqrt-x-minus-x diagnose test=gradient
+\end{Verbatim}
+\begin{Verbatim}[fontsize=\small]
+...
+TEST GRADIENT MODE
+
+ Log probability=-0.393734
+
+ param idx           value           model     finite diff           error
+         0       -0.887393             nan               0             nan
+\end{Verbatim}
+%
+Even though finite differences calculates the right gradient of 0,
+automatic differentiation follows the chain rule and produces a
+not-a-number output.
 
 
 
@@ -1830,9 +2208,9 @@ languages by writing
 Such self assignments are not allowed in \BUGS, because they induce a
 cycle into the directed graphical model.
 
-The left-hand side of an assignment may contain indices for array, matrix, or vector
-data structures.  For instance, if \code{Sigma} is of type
-\code{matrix}, then 
+The left-hand side of an assignment may contain indices for array,
+matrix, or vector data structures.  For instance, if \code{Sigma} is
+of type \code{matrix}, then
 %
 \begin{quote}
 \code{Sigma[1,1] <- 1.0;}
@@ -1846,7 +2224,7 @@ following assignment statement, in which the expression and variable
 are both of type \code{matrix}, is well formed.
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}
 Sigma
   <- diag_matrix(sigma)
      * Omega 
@@ -1863,7 +2241,7 @@ supported by \Stan.  For example, \code{a} is an array of type
 the following two statements are both well-formed.
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}
 a[3] <- b;
 b <- a[4];
 \end{Verbatim}
@@ -1875,7 +2253,7 @@ Similarly, if \code{x} is a variable declared to have type
 first two rows of \code{Y} is well formed.
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}
 x <- Y[1];
 Y[1] <- Y[2];
 Y[2] <- x;
@@ -1885,9 +2263,9 @@ Y[2] <- x;
 
 In \R, if \code{x} is a matrix or two-dimensional array, its first row
 is \code{x[1,]} and its first column is \code{x[,1]}.  As of version
-1.0, this notation is not supported by \Stan.  There are functions to
+2.0, this notation is not supported by \Stan.  There are functions to
 access rows and columns of matrices, but general array slicing is not
-supported.  Similarly, \Stan 1.0 does not support providing an array of
+supported.  Similarly, \Stan 2.0 does not support providing an array of
 indices as an argument to create a piecemeal subarray of a larger
 array.
 
@@ -1984,13 +2362,13 @@ programs still work with \code{lp\_\_}.  A deprecation warning is now
 printed every time \code{lp\_\_} is used.
 
 
-\section{Sampling Statements}
+\section{Sampling Statements}\label{sampling-statements.section}
 
 Like \BUGS and \JAGS, \Stan supports probability statements in
 sampling notation, such as
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}
 y ~ normal(mu,sigma);
 \end{Verbatim}
 \end{quote}
@@ -2007,7 +2385,7 @@ sampling statement could be expressed as a direct increment on the
 total log probability as
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}
 increment_log_prob(normal_log(y,mu,sigma));
 \end{Verbatim}
 \end{quote}
@@ -2017,7 +2395,7 @@ See \refsection{incr-vs-sample} for a full explanation.
 In general, a sampling statement of the form
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}
 ex0 ~ dist(ex1,...,exN);
 \end{Verbatim}
 \end{quote}
@@ -2027,7 +2405,7 @@ case where \code{N} is zero) will be well formed if and only if the
 corresponding assignment statement is well-formed,
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}
 increment_log_prob(dist_log(ex0,ex1,...,exN));
 \end{Verbatim}
 \end{quote}
@@ -2042,7 +2420,7 @@ Although both lead to the same sampling behavior in Stan, there is one
 critical difference between using the sampling statement, as in
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}
 y ~ normal(mu,sigma);
 \end{Verbatim}
 \end{quote}
@@ -2050,7 +2428,7 @@ y ~ normal(mu,sigma);
 and explicitly incrementing the log probability function, as in
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}
 increment_log_prob(normal_log(y,mu,sigma));
 \end{Verbatim}
 \end{quote}
@@ -2072,13 +2450,13 @@ The left-hand side of a sampling statement may be a complex
 expression.  For instance, it is legal syntactically to write
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}
 data {
-    real<lower=0> y;
+  real<lower=0> y;
 }
 ...
 model {
-    log(y) ~ normal(mu,sigma);
+  log(y) ~ normal(mu,sigma);
 }
 \end{Verbatim}
 \end{quote}
@@ -2094,7 +2472,7 @@ account for the log transform.%
   |y|$;  see \refsection{change-of-variables}.}
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}
 increment_log_prob(- log(fabs(y)));
 \end{Verbatim}
 \end{quote}
@@ -2109,16 +2487,22 @@ define a new density $p_{(a,b)}\!(x)$ by setting
 p_{\!(a,b)\!}(x) = \frac{p(x)}
                   {\int_a^b p(x') \, dx'}.
 \] 
-Given a density $p(x)$ function for random variable $X$, its
-cumulative distribution function (cdf) $F(x)$ is defined to be the
-probability that $X < a$ by
+Given a probability function $p_X(x)$ for a random variable $X$, its
+cumulative distribution function (cdf) $F_X(x)$ is defined to be the
+probability that $X \leq a$.  For continuous random variables, this is
 \[
-F(x) = \int_{-\infty}^{x} p(x') \, dx'.
+F_X(x) = \int_{-\infty}^{x} p_X(x') \, dx',
+\]
+whereas for discrete variables, it's
+\[
+F_X(x) = \sum_{n \leq x} p_X(x).
 \]
 %
 The complementary cumulative distribution function (ccdf) is $1 -
-F(x)$.  Cumulative distribution functions are useful for defining
-truncated distributions, because
+F_X(x)$.  
+
+Cumulative distribution functions are useful for defining truncated
+distributions, because
 \[
 \int_a^b p(x') \, dx' = F(b) - F(a),
 \]
@@ -2150,7 +2534,7 @@ truncated.  For example, a truncated unit normal distribution
 restricted to $(-0.5, 2.1)$ is encoded as follows.
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}
 y ~ normal(0,1) T[-0.5, 2.1];
 \end{Verbatim}
 \end{quote}
@@ -2160,7 +2544,7 @@ the accumulated log probability.  For instance, this example has the
 same translation (up to arithmetic precision issues; see below) as
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}
 increment_log_prob(normal_log(y,0,1));
 increment_log_prob(-(log(normal_cdf(2.1,0,1)
                          - normal_cdf(-0.5,0,1))));
@@ -2213,7 +2597,7 @@ more information about the relation between incrementing the total log
 probability and sampling).
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}
 increment_log_prob(normal_log(y, 0, 1));
 increment_log_prob(-(1 - log(normal_cdf(-0.5, 0, 1))));
 \end{Verbatim}
@@ -2225,7 +2609,6 @@ stable version
 \begin{quote}
 \begin{Verbatim}
 increment_log_prob(-normal_ccdf_log(-0.5, 0, 1));
->>>>>>> develop
 \end{Verbatim}
 \end{quote}
 
@@ -2248,7 +2631,7 @@ The truncation has the same effect as the following direct update to
 the accumulated log probability.
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}
 increment_log_prob(normal_log(y, 0, 1));
 increment_log_prob(-normal_cdf_log(2.1, 0, 1));
 \end{Verbatim}
@@ -2304,9 +2687,9 @@ that \code{n} has not been defined as a variable. Then the following
 is a well-formed for-loop statement.
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}
 for (n in 1:N) {
-   y[n] ~ normal(mu,sigma);
+  y[n] ~ normal(mu,sigma);
 }
 \end{Verbatim}
 \end{quote}
@@ -2359,10 +2742,10 @@ As a consequence, the following \Stan program has a very different
 interpretation than the previous one.
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}
 for (n in 1:N) {
-   y[n] ~ bernoulli(theta);
-   theta <- inv_logit(alpha + x[n] * beta);
+  y[n] ~ bernoulli(theta);
+  theta <- inv_logit(alpha + x[n] * beta);
 }
 \end{Verbatim}
 \end{quote}
@@ -2377,10 +2760,10 @@ sum the values of an array directly using code such as the
 following.
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}
 total <- 0.0;
 for (n in 1:N) 
-   total <- total + x[n];
+  total <- total + x[n];
 \end{Verbatim}
 \end{quote}
 %
@@ -2389,7 +2772,7 @@ the sum of the elements in the array \code{x}.  This example was
 purely pedagogical; it is easier and more efficient to write
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}
 total <- sum(x);
 \end{Verbatim}
 \end{quote}
@@ -2398,11 +2781,11 @@ A variable inside (or outside) a loop may even be reassigned multiple
 times, as in the following legal code.
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}
 for (n in 1:100) {
-    y <- y + y * epsilon;
-    epsilon <- epsilon / 2.0;
-    y <- y + y * epsilon;
+  y <- y + y * epsilon;
+  epsilon <- epsilon / 2.0;
+  y <- y + y * epsilon;
 }
 \end{Verbatim}
 \end{quote}
@@ -2413,7 +2796,7 @@ Stan supports full conditional statements using
 the same if-then-else syntax as \Cpp.  The general format is
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}
 if (condition1)
   statement1
 else if (condition2)
@@ -2446,7 +2829,7 @@ Stan supports standard while loops using the same syntax as \Cpp.  The
 general format is as follows.
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}
 while (condition)
   body
 \end{Verbatim}
@@ -2480,7 +2863,7 @@ can be written as follows.
 \begin{quote}
 \begin{Verbatim} 
 for (n in 1:N) 
- y[n] ~ normal(mu,sigma);
+  y[n] ~ normal(mu,sigma);
 \end{Verbatim}
 \end{quote}
 % 
@@ -2488,7 +2871,7 @@ To put multiple statements inside the body of a for loop, a block is
 used, as in the following example.
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}
 for (n in 1:N) {
   lambda[n] ~ gamma(alpha,beta);
   y[n] ~ poisson(lambda[n]);
@@ -2503,7 +2886,7 @@ Because whitespace is ignored in \Stan, the following program will
 not compile.
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}
 for (n in 1:N) 
   y[n] ~ normal(mu,sigma);
   z[n] ~ normal(mu,sigma); // ERROR!
@@ -2517,7 +2900,7 @@ statement directly following it, which is
 program.
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}
 for (n in 1:N) {
   y[n] ~ normal(mu,sigma);
 }
@@ -2540,7 +2923,7 @@ example of repeated assignment should use a local variable for maximum
 clarity and efficiency, as in the following example.
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}
 for (n in 1:N) {
   real theta;
   theta <- inv_logit(alpha + x[n] * beta);
@@ -2558,14 +2941,14 @@ variable hiding.  So it is illegal to declare a local variable
 the for loop.  For instance, the following is not legal.
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}
 for (m in 1:M) {
-    real theta;
-    for (n in 1:N) {
-      real theta; // ERROR!
-      theta <- inv_logit(alpha + x[m,n] * beta);
-      y[m,n] ~ bernoulli(theta);
-}
+  real theta;
+  for (n in 1:N) {
+    real theta; // ERROR!
+    theta <- inv_logit(alpha + x[m,n] * beta);
+    y[m,n] ~ bernoulli(theta);
+...
 \end{Verbatim}
 \end{quote}
 %
@@ -2589,15 +2972,15 @@ allowed, one or more of the statements may be a block.  For instance,
 in a for loop, it is legal to have the following
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}
 for (m in 1:M) {
-   { 
+  { 
      int n;  
      n <- 2 * m; 
      sum <- sum + n 
-   }
-   for (n in 1:N) 
-     sum <- sum + x[m,n];
+  }
+  for (n in 1:N) 
+    sum <- sum + x[m,n];
 }
 \end{Verbatim}
 \end{quote}
@@ -2616,7 +2999,7 @@ arguments.  Consider the following for-each statement with a print
 statement in its body.
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}
 for (n in 1:N) { print("loop iteration: ", n); ... }
 \end{Verbatim}
 \end{quote}
@@ -2645,7 +3028,7 @@ For array, vector, and matrix variables, the print format uses
 brackets.  For example, a 3-vector will print as
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}
 [1,2,3]
 \end{Verbatim}
 \end{quote}
@@ -2653,7 +3036,7 @@ brackets.  For example, a 3-vector will print as
 and a $2 \times 3$-matrix as 
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}
 [[1,2,3],[4,5,6]]
 \end{Verbatim}
 \end{quote}
@@ -2664,7 +3047,7 @@ with loops.  An example is the print statement in the following
 transformed data block.
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}
 transformed data {
   matrix[2,2] u;  
   u[1,1] <- 1.0;  u[1,2] <- 4.0;    
@@ -2679,7 +3062,7 @@ This print statement executes twice, printing the following two lines
 of output.
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}
 u[1] = [1,4]
 u[2] = [9,16]
 \end{Verbatim}
@@ -2703,7 +3086,7 @@ of the backslash character (\Verb|\|) and double quote character
 (\Verb|"|).  The full list of visible ASCII characters is as follows.
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}
 a b c d e f g h i j k l m n o p q r s t u v w x y z
 A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
 0 1 2 3 4 5 6 7 8 9 0 ~ @ # $ % ^ & * _ ' ` - + = { 
@@ -2745,6 +3128,15 @@ is ignored (along with the slashes or pound sign).
 For bracketed comments, any text between a forward-slash and asterisk
 pair (\Verb|/*|) and an asterisk and forward-slash pair (\Verb|*/|) is
 ignored.
+
+\subsection{Character Encoding}
+
+Comments may be in ASCII, UTF-8, Latin1, or any other character
+encoding that is byte-wise compatible with ASCII.  This excludes
+encodings like UTF-16, Big5, etc.%
+%
+\footnote{The issue is that they will separate the characters in
+  \code{*/} and \code{*/}.}
 
 
 \section{Overview of \Stan's Program Blocks}
