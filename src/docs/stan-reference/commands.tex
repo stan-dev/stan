@@ -1061,6 +1061,14 @@ though they may appear in any order.
         {Defaults to \code{10}}
 %
 \end{description}
+%
+By setting the acceptance statistic \code{delta} to a value closer to
+1 (its value must be strictly less than 1 and its default value is
+0.65), adaptation will be forced to use smaller step sizes.  This can
+improve sampling efficiency (effective samples per iteration) at the
+cost of increased iteration times.  Raising the value of \code{delta}
+will also allow some models that would otherwise get stuck overcome
+their blockages; see also the \code{stepsize\_jitter} argument.
 
 \subsubsection{Sampling Algorithm- and Engine-Specific Arguments}
 
@@ -1160,9 +1168,18 @@ with \textit{Riemannian} HMC \citep{GirolamiCalderhead:2011, Betancourt:2012}.
             {Euclidean manifold with dense metric}
 \end{description}
 %
-All implementations of HMC also use numerical integrators requiring a step size.  We also
-allow that step size to be ``jittered'' randomly during sampling to avoid any poor interactions
-with a fixed step size and regions of high curvature.
+All implementations of HMC also use numerical integrators requiring a
+step size.  We also allow that step size to be ``jittered'' randomly
+during sampling to avoid any poor interactions with a fixed step size
+and regions of high curvature.  The maximum amount of jitter is 1,
+which will cause step sizes to be selected in the range of 0 to twice
+the adapted step size.  Low step sizes can get HMC samplers unstuck
+that would otherwise get stuck with higher step sizes.  The downside
+is that jittering below the adapted value will increase the number of
+leapfrog steps required and thus slow down iterations, whereas
+jittering above the adapted value can cause premature rejection due to
+simulation error in the Hamiltonian dynamics calculation.  See
+\citep{Neal:2011} for further discussion of step-size jittering.
 %
 \begin{description}
 %
