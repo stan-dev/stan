@@ -181,7 +181,7 @@ namespace stan {
         stan::prob::autocorrelation(sample, ac);
 
         Eigen::VectorXd ac2(ac.size());
-        for (int i = 0; i < ac.size(); i++)
+        for (std::vector<double>::size_type i = 0; i < ac.size(); i++)
           ac2(i) = ac[i];
         return ac2;
       }
@@ -194,7 +194,7 @@ namespace stan {
         stan::prob::autocovariance(sample, ac);
 
         Eigen::VectorXd ac2(ac.size());
-        for (int i = 0; i < ac.size(); i++)
+        for (std::vector<double>::size_type i = 0; i < ac.size(); i++)
           ac2(i) = ac[i];
         return ac2;
       }
@@ -423,7 +423,7 @@ namespace stan {
         }
         add(stan_csv.samples);
         if (stan_csv.metadata.save_warmup)
-          set_warmup(num_chains()-1, stan_csv.metadata.warmup);
+          set_warmup(num_chains()-1, stan_csv.metadata.num_warmup);
       }
       
       Eigen::VectorXd samples(const int chain, const int index) {

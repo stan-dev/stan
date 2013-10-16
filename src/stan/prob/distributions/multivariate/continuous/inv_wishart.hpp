@@ -140,6 +140,17 @@ namespace stan {
                     const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& S,
                     RNG& rng) {
 
+      static const char* function = "stan::prob::inv_wishart_rng(%1%)";
+      
+      using stan::math::check_greater;
+      using stan::math::check_size_match;
+
+      typename Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>::size_type k = S.rows();
+      check_greater(function, nu, k-1, "Degrees of freedom parameter");
+      check_size_match(function, 
+                       S.rows(), "Rows of scale parameter",
+                       S.cols(), "columns of scale parameter");
+
       Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> S_inv(S.rows(), S.cols());
       S_inv = Eigen::MatrixXd::Identity(S.cols(),S.cols());
       S_inv = S.ldlt().solve(S_inv);

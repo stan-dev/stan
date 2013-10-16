@@ -30,6 +30,9 @@ namespace stan {
 
       const double SQRT_2 = std::sqrt(2.0);
 
+      const double LOG_TWO_PI = LOG_TWO + LOG_PI;
+      
+      const double NEG_LOG_TWO_PI = - LOG_TWO_PI;
     }
  
  }

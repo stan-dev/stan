@@ -15,6 +15,6 @@ model {
     for (k in 1:K)
       ps[k] <- log(theta[k]) 
                + normal_log(y[n],mu[k],sigma[k]);
-    lp__ <- lp__ + log_sum_exp(ps);    
+    increment_log_prob(log_sum_exp(ps));    
   }
 }

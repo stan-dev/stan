@@ -66,7 +66,27 @@ TEST(AgradRev, stackAllocation) {
   VEC g;
   f.grad(x,g);
   
-  EXPECT_EQ(2,g.size());
+  EXPECT_EQ(2U,g.size());
   EXPECT_FLOAT_EQ(2.0,g[0]);
   EXPECT_FLOAT_EQ(1.0,g[1]);
+}
+
+TEST(AgradRev, print) {
+  using stan::agrad::var;
+
+  std::ostringstream output;
+  std::string str;
+
+  var initialized_var(0);
+  output << initialized_var;
+  str = output.str();
+  EXPECT_STREQ("0:0", output.str().c_str());
+
+
+  output.clear();
+  output.str("");
+  var uninitialized_var;
+  output << uninitialized_var;
+  str = output.str();
+  EXPECT_STREQ("uninitialized", output.str().c_str());
 }

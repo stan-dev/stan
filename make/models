@@ -4,15 +4,27 @@
 MODEL_HEADER := src/stan/model/model_header.hpp
 
 .PRECIOUS: %.cpp %.o
-%$(EXE): %.o bin/libstan.a
+$(patsubst %.stan,%,$(wildcard $(addsuffix .stan,$(MAKECMDGOALS)))) : %$(EXE): %.o bin/libstan.a
 	@echo ''
 	@echo '--- Linking C++ model ---'
 	$(LINK.c) -O$O $(OUTPUT_OPTION) $< $(LDLIBS)
 
+src/%: src/%.o bin/libstan.a
+	@echo ''
+	@echo '--- Linking C++ model ---'
+	$(LINK.c) -O$O $(OUTPUT_OPTION) $< $(LDLIBS)
+
+
+%.exe: %.o bin/libstan.a
+	@echo ''
+	@echo '--- Linking C++ model ---'
+	$(LINK.c) -O$O $(OUTPUT_OPTION) $< $(LDLIBS)
+
+
 .PRECIOUS: %.cpp
 %.cpp : %.stan $(MODEL_HEADER)$(PCH) bin/stanc$(EXE)
 	@echo ''
-	@echo '--- Translating Stan graphical model to C++ code ---'
+	@echo '--- Translating Stan model to C++ code ---'
 	bin/stanc$(EXE) $< --o=$@
 
 .PRECIOUS: models/speed/%.stan
@@ -77,7 +89,7 @@ $(MODEL_HEADER).d : $(MODEL_HEADER)
 	(set -e; \
 	rm -f $@; \
 	$(CC) $(CFLAGS) -O$O $(TARGET_ARCH) -MM $< > $@.$$$$; \
-	sed -e 's,\($(notdir $*)\)\.o[ :]*,$(dir $@)\1.o $@ : ,g' < $@.$$$$ > $@; \
+	sed -e 's,\($(notdir $(basename $(MODEL_HEADER)))\)\.o[ :]*,$@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$ ); \
 	fi
 

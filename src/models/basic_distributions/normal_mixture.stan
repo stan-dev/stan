@@ -11,6 +11,8 @@ parameters {
   real y;
 }
 model {
-  lp__ <- lp__ + log_sum_exp(log(theta) + normal_log(y,mu[1],sigma[1]),
-                             log(1.0 - theta) + normal_log(y,mu[2],sigma[2]));
+  increment_log_prob(log_sum_exp(log(theta)
+                                   + normal_log(y,mu[1],sigma[1]),
+                                 log(1.0 - theta) 
+                                 + normal_log(y,mu[2],sigma[2])));
 }

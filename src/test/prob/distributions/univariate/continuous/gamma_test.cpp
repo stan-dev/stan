@@ -3,16 +3,23 @@
 #include <boost/random/mersenne_twister.hpp>
 #include<boost/math/distributions.hpp>
 
-TEST(ProbDistributionsGamma, random) {
+TEST(ProbDistributionsGamma, error_check) {
   boost::random::mt19937 rng;
   EXPECT_NO_THROW(stan::prob::gamma_rng(2.0,3.0,rng));
+
+  EXPECT_THROW(stan::prob::gamma_rng(-2.0,3.0,rng),std::domain_error);
+  EXPECT_THROW(stan::prob::gamma_rng(2.0,-3.0,rng),std::domain_error);
+  EXPECT_THROW(stan::prob::gamma_rng(stan::math::positive_infinity(),3.0,rng),
+               std::domain_error);
+  EXPECT_THROW(stan::prob::gamma_rng(2,stan::math::positive_infinity(),rng),
+               std::domain_error);
 }
 
 TEST(ProbDistributionGamma, chiSquareGoodnessFitTest) {
   boost::random::mt19937 rng;
   int N = 10000;
   int K = boost::math::round(2 * std::pow(N, 0.4));
-  boost::math::gamma_distribution<>dist (2.0,1.0);
+  boost::math::gamma_distribution<>dist (2.0,2.0);
   boost::math::chi_squared mydist(K-1);
 
   double loc[K - 1];
@@ -28,7 +35,11 @@ TEST(ProbDistributionGamma, chiSquareGoodnessFitTest) {
   }
 
   while (count < N) {
-    double a = stan::prob::gamma_rng(2.0,1.0,rng);
+    /*
+      the stan gamma distribution is defined by
+      shape and rate (hence 0.5 here and 2 above).
+    */
+    double a = stan::prob::gamma_rng(2.0,0.5,rng);
     int i = 0;
     while (i < K-1 && a > loc[i]) 
       ++i;

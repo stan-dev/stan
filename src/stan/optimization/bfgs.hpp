@@ -1,11 +1,14 @@
 #ifndef __STAN__OPTIMIZATION__BFGS_HPP__
 #define __STAN__OPTIMIZATION__BFGS_HPP__
 
-#include <stan/model/prob_grad.hpp>
-#include <boost/math/special_functions/fpclassify.hpp>
-#include <cstdlib>
 #include <cmath>
+#include <cstdlib>
 #include <string>
+
+#include <boost/math/special_functions/fpclassify.hpp>
+
+#include <stan/math/matrix/Eigen.hpp>
+#include <stan/model/util.hpp>
 
 namespace stan {
   namespace optimization {
@@ -120,11 +123,12 @@ namespace stan {
             if (ahi < alo)
               d2 = -d2;
             alpha = ahi - (ahi - alo)*(ahiDFp + d2 - d1)/(ahiDFp - aloDFp + 2*d2);
-            if (alpha < std::min(alo,ahi)+0.01*std::fabs(alo-ahi) ||
+            if (!boost::math::isfinite(alpha) ||
+                alpha < std::min(alo,ahi)+0.01*std::fabs(alo-ahi) ||
                 alpha > std::max(alo,ahi)-0.01*std::fabs(alo-ahi))
               alpha = 0.5*(alo+ahi);
           }
-          
+
           newX = x + alpha*p;
           while (func(newX,newF,newDF)) {
             alpha = 0.5*(alpha+std::min(alo,ahi));
@@ -223,266 +227,308 @@ namespace stan {
         return retCode;
       }
 
-      template<typename FunctorType, typename Scalar = double,
-               int DimAtCompile = Eigen::Dynamic,
-               int LineSearchMethod = 1>
-      class BFGSMinimizer {
-      public:
-        typedef Eigen::Matrix<Scalar,DimAtCompile,1> VectorT;
-        typedef Eigen::Matrix<Scalar,DimAtCompile,DimAtCompile> HessianT;
-        
-      protected:
-        FunctorType &_func;
-        VectorT _gk, _gk_1, _xk_1, _xk, _sk, _sk_1;
-        Scalar _fk, _fk_1, _alphak_1;
-        Scalar _alpha, _alpha0;
-        Eigen::LDLT< HessianT > _ldlt;
-        size_t _itNum;
-        std::string _note;
-        
-      public:
-        const Scalar &curr_f() const { return _fk; }
-        const VectorT &curr_x() const { return _xk; }
-        const VectorT &curr_g() const { return _gk; }
-        const VectorT &curr_s() const { return _sk; }
-        
-        const Scalar &prev_f() const { return _fk_1; }
-        const VectorT &prev_x() const { return _xk_1; }
-        const VectorT &prev_g() const { return _gk_1; }
-        const VectorT &prev_s() const { return _sk_1; }
-        Scalar prev_step_size() const { return _sk_1.norm()*_alphak_1; }
+    }
+    template<typename FunctorType, typename Scalar = double,
+             int DimAtCompile = Eigen::Dynamic,
+             int LineSearchMethod = 1>
+    class BFGSMinimizer {
+    public:
+      typedef Eigen::Matrix<Scalar,DimAtCompile,1> VectorT;
+      typedef Eigen::Matrix<Scalar,DimAtCompile,DimAtCompile> HessianT;
+      
+    protected:
+      FunctorType &_func;
+      VectorT _gk, _gk_1, _xk_1, _xk, _sk, _sk_1;
+      Scalar _fk, _fk_1, _alphak_1;
+      Scalar _alpha, _alpha0;
+      Eigen::LDLT< HessianT > _ldlt;
+      size_t _itNum;
+      std::string _note;
+      
+    public:
+      const Scalar &curr_f() const { return _fk; }
+      const VectorT &curr_x() const { return _xk; }
+      const VectorT &curr_g() const { return _gk; }
+      const VectorT &curr_s() const { return _sk; }
+      
+      const Scalar &prev_f() const { return _fk_1; }
+      const VectorT &prev_x() const { return _xk_1; }
+      const VectorT &prev_g() const { return _gk_1; }
+      const VectorT &prev_s() const { return _sk_1; }
+      Scalar prev_step_size() const { return _sk_1.norm()*_alphak_1; }
 
-        const Scalar &alpha0() const { return _alpha0; }
-        const Scalar &alpha() const { return _alpha; }
+      const Scalar &alpha0() const { return _alpha0; }
+      const Scalar &alpha() const { return _alpha; }
+      const size_t iter_num() const { return _itNum; }
+      
+      const std::string &note() const { return _note; }
+      
+      std::string get_code_string(int retCode) {
+        switch(retCode) {
+          case 0:
+            return std::string("Successful step completed");
+          case 1:
+            return std::string("Convergence detected: change in objective function was below tolerance");
+          case 2:
+            return std::string("Convergence detected: gradient norm is below tolerance");
+          case 3:
+            return std::string("Convergence detected: parameter change was below tolerance");
+          case 4:
+            return std::string("Maximum number of iterations hit, may not be at an optima");
+          case -1:
+            return std::string("Line search failed to achieve a sufficient decrease, no more progress can be made");
+          default:
+            return std::string("Unknown termination code");
+        }
+      }
+
+      struct BFGSOptions {
+        BFGSOptions() {
+          maxIts = 10000;
+          rho = 0.75;
+          c1 = 1e-4;
+          c2 = 0.9;
+          minAlpha = 1e-12;
+          alpha0 = 1e-3;
+          tolX = 1e-8;
+          tolF = 1e-8;
+          tolGrad = 1e-8;
+        }
+        size_t maxIts;
+        Scalar rho;
+        Scalar c1;
+        Scalar c2;
+        Scalar alpha0;
+        Scalar minAlpha;
+        Scalar tolX;
+        Scalar tolF;
+        Scalar tolGrad;
+      } _opts;
+      
+      
+      BFGSMinimizer(FunctorType &f) : _func(f) { }
+      
+      void initialize(const VectorT &x0) {
+        int ret;
+        _xk = x0;
+        ret = _func(_xk,_fk,_gk);
+        if (ret) {
+          throw std::runtime_error("Error evaluating initial BFGS point.");
+        }
         
-        const std::string &note() const { return _note; }
+        _itNum = 0;
+        _note = "";
+      }
+      
+      int step() {
+        Scalar gradNorm, thetak, skyk, skBksk;
+        VectorT sk, yk, Bksk, rk;
+        int retCode;
+        int resetB(0);
         
-        struct BFGSOptions {
-          BFGSOptions() {
-            maxIts = 10000;
-            rho = 0.75;
-            c1 = 1e-4;
-            c2 = 0.9;
-            minStep = 1e-16;
-            minGradNorm = 1e-6;
-            minAlpha = 1e-12;
-            alpha0 = 1e-3;
-          }
-          size_t maxIts;
-          Scalar rho;
-          Scalar c1;
-          Scalar c2;
-          Scalar minStep;
-          Scalar minGradNorm;
-          Scalar alpha0;
-          Scalar minAlpha;
-        } _opts;
-        
-        
-        BFGSMinimizer(FunctorType &f) : _func(f) { }
-        
-        void initialize(const VectorT &x0) {
-          int ret;
-          _xk = x0;
-          ret = _func(_xk,_fk,_gk);
-          if (ret) {
-            throw std::runtime_error("Error evaluating initial BFGS point.");
-          }
-          
-          _itNum = 0;
+        _itNum++;
+
+        if (_itNum == 1) {
+          resetB = 1;
+          _note = "";
+        }
+        else if (!(_ldlt.info() == Eigen::Success && _ldlt.isPositive() && (_ldlt.vectorD().array() > 0).all())) {
+          resetB = 1;
+          _note = "LDLT failed, BFGS reset; ";
+        }
+        else {
+          resetB = 0;
           _note = "";
         }
         
-        int step() {
-          Scalar gradNorm, thetak, skyk, skBksk;
-          VectorT sk, yk, Bksk, rk;
-          int retCode;
-          int resetB(0);
-          
-          _itNum++;
-
-          if (_itNum == 1) {
-            resetB = 1;
-            _note = "";
-          }
-          else if (!(_ldlt.info() == Eigen::Success && _ldlt.isPositive() && (_ldlt.vectorD().array() > 0).all())) {
-            resetB = 1;
-            _note = "LDLT failed, BFGS reset; ";
-          }
-          else {
-            resetB = 0;
-            _note = "";
-          }
-          
-          while (true) {
-            if (resetB) {
-//              if (_itNum == 1 || resetB == 2) {
-                _sk = -_gk;
-//              }
-//              else {
-//                _sk = -_gk/_ldlt.vectorD().maxCoeff();
-//              }
-            }
-            else {
-              _sk = -_ldlt.solve(_gk);
-            }
-            
-            if (_itNum > 1 && resetB != 2) {
-              _alpha0 = _alpha = std::min(1.0,
-                                          1.01*CubicInterp(_gk_1.dot(_sk_1),
-                                                           _alphak_1, _fk - _fk_1, _gk.dot(_sk_1),
-                                                           _opts.minAlpha, 1.0));
-//              _alpha0 = _alpha = std::min(1.0, 1.01*(2*(_fk - _fk_1)/_gk_1.dot(_sk_1)));
-            }
-            else {
-              _alpha0 = _alpha = _opts.alpha0;
-            }
-            
-            if (LineSearchMethod == 0) {
-              retCode = BTLineSearch(_func, _alpha, _xk_1, _fk_1, _gk_1,
-                                     _sk, _xk, _fk, _gk, _opts.rho, 
-                                     _opts.c1, _opts.minAlpha);
-            }
-            else if (LineSearchMethod == 1) {
-              retCode = WolfeLineSearch(_func, _alpha, _xk_1, _fk_1, _gk_1,
-                                        _sk, _xk, _fk, _gk,
-                                        _opts.c1, _opts.c2, 
-                                        _opts.minAlpha);
-            }
-            if (retCode) {
-              if (resetB) {
-                // Line-search failed and nothing left to try
-                retCode = -1;
-                return retCode;
-              }
-              else {
-                // Line-search failed, try ditching the Hessian approximation
-                resetB = 2;
-                _note += "LS failed, BFGS reset; ";
-                continue;
-              }
-            }
-            else {
-              break;
-            }
-          }
-          std::swap(_fk,_fk_1);
-          _xk.swap(_xk_1);
-          _gk.swap(_gk_1);
-          _sk.swap(_sk_1);
-          
-          gradNorm = _gk.squaredNorm();
-          sk.noalias() = _xk - _xk_1;
-          if (sk.array().abs().maxCoeff() <= _opts.minStep) {
-            if (gradNorm <= _opts.minGradNorm) {
-              retCode = 1;
-            }
-            else {
-              retCode = 2;
-            }
-          }
-          else {
-            retCode = 0;
-          }
-          
-          yk.noalias() = _gk - _gk_1;
-          skyk = yk.dot(sk);
+        while (true) {
           if (resetB) {
-            Scalar B0fact = yk.squaredNorm()/skyk;
-            _ldlt.compute(B0fact*HessianT::Identity(_xk.size(),_xk.size()));
-            Bksk.noalias() = B0fact*sk;
-            _sk_1 = -_gk_1/B0fact;
-            _alphak_1 = B0fact*_alpha;
+            // Reset the Hessian approximation
+            _sk = -_gk;
           }
           else {
-            Bksk = _ldlt.transpositionsP().transpose()*(_ldlt.matrixL()*(_ldlt.vectorD().asDiagonal()*(_ldlt.matrixU()*(_ldlt.transpositionsP()*sk))));
-            _alphak_1 = _alpha;
+            _sk = -_ldlt.solve(_gk);
           }
-          skBksk = sk.dot(Bksk);
-          if (skyk >= 0.2*skBksk) {
-            // Full update
-            thetak = 1;
-            rk = yk;
+          
+          if (_itNum > 1 && resetB != 2) {
+            _alpha0 = _alpha = std::min(1.0,
+                                        1.01*CubicInterp(_gk_1.dot(_sk_1),
+                                                         _alphak_1, _fk - _fk_1, _gk.dot(_sk_1),
+                                                         _opts.minAlpha, 1.0));
+//              _alpha0 = _alpha = std::min(1.0, 1.01*(2*(_fk - _fk_1)/_gk_1.dot(_sk_1)));
           }
           else {
-            // Damped update (Procedure 18.2)
-            thetak = 0.8*skBksk/(skBksk - skyk);
-            rk.noalias() = thetak*yk + (1.0 - thetak)*Bksk;
-            _note += "Damped BFGS update";
+            _alpha0 = _alpha = _opts.alpha0;
           }
-          _ldlt.rankUpdate(rk,1.0/sk.dot(rk));
-          _ldlt.rankUpdate(Bksk,-1.0/skBksk);
-
-          return retCode;
+          
+          if (LineSearchMethod == 0) {
+            retCode = BTLineSearch(_func, _alpha, _xk_1, _fk_1, _gk_1,
+                                   _sk, _xk, _fk, _gk, _opts.rho, 
+                                   _opts.c1, _opts.minAlpha);
+          }
+          else if (LineSearchMethod == 1) {
+            retCode = WolfeLineSearch(_func, _alpha, _xk_1, _fk_1, _gk_1,
+                                      _sk, _xk, _fk, _gk,
+                                      _opts.c1, _opts.c2, 
+                                      _opts.minAlpha);
+          }
+          if (retCode) {
+            if (resetB) {
+              // Line-search failed and nothing left to try
+              retCode = -1;
+              return retCode;
+            }
+            else {
+              // Line-search failed, try ditching the Hessian approximation
+              resetB = 2;
+              _note += "LS failed, BFGS reset; ";
+              continue;
+            }
+          }
+          else {
+            break;
+          }
+        }
+        std::swap(_fk,_fk_1);
+        _xk.swap(_xk_1);
+        _gk.swap(_gk_1);
+        _sk.swap(_sk_1);
+        
+        gradNorm = _gk.norm();
+        sk.noalias() = _xk - _xk_1;
+        // Check for convergence
+        if (std::fabs(_fk - _fk_1) < _opts.tolF) {
+          retCode = 1; // Objective function improvement wasn't sufficient
+        }
+        else if (gradNorm < _opts.tolGrad) {
+          retCode = 2; // Gradient norm was below threshold
+        }
+        else if (sk.norm() < _opts.tolX) {
+          retCode = 3; // Change in x was too small
+        }
+        else if (_itNum >= _opts.maxIts) {
+          retCode = 4; // Max number of iterations hit
+        }
+        else {
+          retCode = 0; // Step was successful more progress to be made
         }
         
-        int minimize(VectorT &x0) {
-          int retcode;
-          initialize(x0);
-          while (!(retcode = step()));
-          x0 = _xk;
-          return retcode;
+        yk.noalias() = _gk - _gk_1;
+        skyk = yk.dot(sk);
+        if (resetB) {
+          Scalar B0fact = yk.squaredNorm()/skyk;
+          _ldlt.compute(B0fact*HessianT::Identity(_xk.size(),_xk.size()));
+          Bksk.noalias() = B0fact*sk;
+          _sk_1 = -_gk_1/B0fact;
+          _alphak_1 = B0fact*_alpha;
         }
-      };
+        else {
+          Bksk = _ldlt.transpositionsP().transpose()*(_ldlt.matrixL()*(_ldlt.vectorD().asDiagonal()*(_ldlt.matrixU()*(_ldlt.transpositionsP()*sk))));
+          _alphak_1 = _alpha;
+        }
+        skBksk = sk.dot(Bksk);
+        if (skyk >= 0.2*skBksk) {
+          // Full update
+          thetak = 1;
+          rk = yk;
+        }
+        else {
+          // Damped update (Procedure 18.2)
+          thetak = 0.8*skBksk/(skBksk - skyk);
+          rk.noalias() = thetak*yk + (1.0 - thetak)*Bksk;
+          _note += "Damped BFGS update";
+        }
+        _ldlt.rankUpdate(rk,1.0/sk.dot(rk));
+        _ldlt.rankUpdate(Bksk,-1.0/skBksk);
+
+        return retCode;
+      }
+      
+      int minimize(VectorT &x0) {
+        int retcode;
+        initialize(x0);
+        while (!(retcode = step()));
+        x0 = _xk;
+        return retcode;
+      }
+    };
+
+                                
+
+    template <typename M>
+    double lp_no_jacobian(const M& model,
+                          std::vector<double>& params_r,
+                          std::vector<int>& params_i,
+                          std::ostream* o = 0) {
+      // FIXME: is this supposed to return the log probability from the model?
+      return 0;
     }
-    
+
+    template <class M>
     class ModelAdaptor {
     private:
-      stan::model::prob_grad& _model;
+      M& _model;
       std::vector<int> _params_i;
-      std::ostream* _output_stream;
+      std::ostream* _msgs;
       std::vector<double> _x, _g;
       size_t _fevals;
 
     public:
-      ModelAdaptor(stan::model::prob_grad& model,
+      ModelAdaptor(M& model,
                    const std::vector<int>& params_i,
-                   std::ostream* output_stream)
-      : _model(model), _params_i(params_i), _output_stream(output_stream), _fevals(0) {}
+                   std::ostream* msgs)
+      : _model(model), _params_i(params_i), _msgs(msgs), _fevals(0) {}
                   
       size_t fevals() const { return _fevals; }
-      int operator()(const Eigen::Matrix<double,Eigen::Dynamic,1> &x, double &f) {
+      int operator()(const Eigen::Matrix<double,Eigen::Dynamic,1> &x, 
+                     double &f) {
         _x.resize(x.size());
-        for (size_t i = 0; i < x.size(); i++)
+        for (Eigen::Matrix<double,Eigen::Dynamic,1>::size_type i = 0; 
+             i < x.size(); i++)
           _x[i] = x[i];
 
         try {
-          f = -_model.log_prob(_x, _params_i, _output_stream);
+          f = - _model.template log_prob<false,false>(_x,_params_i,
+                                                      _msgs);
         } catch (const std::exception& e) {
-          if (_output_stream)
-            (*_output_stream) << e.what() << std::endl;
+          if (_msgs)
+            (*_msgs) << e.what() << std::endl;
           return 1;
         }
 
         if (boost::math::isfinite(f))
           return 0;
         else {
-          if (_output_stream)
-            *_output_stream << "Error evaluating model log probability: " 
-                               "Non-finite function evaluation." << std::endl;
+          if (_msgs)
+            *_msgs << "Error evaluating model log probability: " 
+                      "Non-finite function evaluation." << std::endl;
           return 2;
         }
       }
-      int operator()(const Eigen::Matrix<double,Eigen::Dynamic,1> &x, double &f, Eigen::Matrix<double,Eigen::Dynamic,1> &g) {
+      int operator()(const Eigen::Matrix<double,Eigen::Dynamic,1> &x, 
+                     double &f, Eigen::Matrix<double,Eigen::Dynamic,1> &g) {
         _x.resize(x.size());
-        for (size_t i = 0; i < x.size(); i++)
+        for (Eigen::Matrix<double,Eigen::Dynamic,1>::size_type i = 0; 
+             i < x.size(); i++)
           _x[i] = x[i];
         
         _fevals++;
 
         try {
-          f = -_model.grad_log_prob(_x, _params_i, _g, _output_stream);
+          f = - stan::model::log_prob_grad<true,false>(_model,
+                                                       _x, _params_i,
+                                                       _g, _msgs);
         } catch (const std::exception& e) {
-          if (_output_stream)
-            (*_output_stream) << e.what() << std::endl;
+          if (_msgs)
+            (*_msgs) << e.what() << std::endl;
           return 1;
         }
 
         g.resize(_g.size());
         for (size_t i = 0; i < _g.size(); i++) {
           if (!boost::math::isfinite(_g[i])) {
-            if (_output_stream)
-              *_output_stream << "Error evaluating model log probability: " 
+            if (_msgs)
+              *_msgs << "Error evaluating model log probability: " 
                                  "Non-finite gradient." << std::endl;
             return 3;
           }
@@ -492,51 +538,56 @@ namespace stan {
         if (boost::math::isfinite(f))
           return 0;
         else {
-          if (_output_stream)
-            *_output_stream << "Error evaluating model log probability: " 
-                               "Non-finite function evaluation." << std::endl;
+          if (_msgs)
+            *_msgs << "Error evaluating model log probability: " 
+                               "Non-finite function evaluation." 
+                   << std::endl;
           return 2;
         }
       }
-      int df(const Eigen::Matrix<double,Eigen::Dynamic,1> &x, Eigen::Matrix<double,Eigen::Dynamic,1> &g) {
+      int df(const Eigen::Matrix<double,Eigen::Dynamic,1> &x, 
+             Eigen::Matrix<double,Eigen::Dynamic,1> &g) {
         double f;
         return (*this)(x,f,g);
       }
     };
     
-    class BFGSLineSearch : public BFGSMinimizer<ModelAdaptor> {
+    template <typename M>
+    class BFGSLineSearch : public BFGSMinimizer<ModelAdaptor<M> > {
     private:
-      ModelAdaptor _adaptor;
-      
+      ModelAdaptor<M> _adaptor;
     public:
-      BFGSLineSearch(stan::model::prob_grad& model,
+      typedef typename BFGSMinimizer<ModelAdaptor<M> >::VectorT vector_t;
+      typedef typename vector_t::size_type idx_t;
+      
+      BFGSLineSearch(M& model,
                      const std::vector<double>& params_r,
                      const std::vector<int>& params_i,
-                     std::ostream* output_stream = 0)
-      : BFGSMinimizer<ModelAdaptor>(_adaptor),
-       _adaptor(model,params_i,output_stream)
+                     std::ostream* msgs = 0)
+        : BFGSMinimizer<ModelAdaptor<M> >(_adaptor),
+          _adaptor(model,params_i,msgs)
       {
 
         Eigen::Matrix<double,Eigen::Dynamic,1> x;
         x.resize(params_r.size());
         for (size_t i = 0; i < params_r.size(); i++)
           x[i] = params_r[i];
-        initialize(x);
+        this->initialize(x);
       }
 
       size_t grad_evals() { return _adaptor.fevals(); }
-      double logp() { return -curr_f(); }
-      double grad_norm() { return curr_g().norm(); }
+      double logp() { return -(this->curr_f()); }
+      double grad_norm() { return this->curr_g().norm(); }
       void grad(std::vector<double>& g) { 
-        const BFGSMinimizer<ModelAdaptor>::VectorT &cg(curr_g());
+        const vector_t &cg(this->curr_g());
         g.resize(cg.size());
-        for (size_t i = 0; i < cg.size(); i++)
+        for (idx_t i = 0; i < cg.size(); i++)
           g[i] = -cg[i];
       }
       void params_r(std::vector<double>& x) {
-        const BFGSMinimizer<ModelAdaptor>::VectorT &cx(curr_x());
+        const vector_t &cx(this->curr_x());
         x.resize(cx.size());
-        for (size_t i = 0; i < cx.size(); i++)
+        for (idx_t i = 0; i < cx.size(); i++)
           x[i] = cx[i];
       }
     };

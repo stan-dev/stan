@@ -4,6 +4,7 @@
 #include <math.h>
 #include <stdexcept>
 
+#include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/random/variate_generator.hpp>
 #include <boost/random/uniform_01.hpp>
 
@@ -32,6 +33,21 @@ namespace stan {
       _epsilon_jitter(0.0)
       {};
       
+      void write_sampler_state(std::ostream* o) {
+        if(!o) return;
+        *o << "# Step size = " << get_nominal_stepsize() << std::endl;
+        _z.write_metric(o);
+      }
+      
+      void get_sampler_diagnostic_names(std::vector<std::string>& model_names,
+                                        std::vector<std::string>& names) {
+        _z.get_param_names(model_names, names);
+      };
+      
+      void get_sampler_diagnostics(std::vector<double>& values) {
+        _z.get_params(values);
+      };
+      
       void seed(const std::vector<double>& q, const std::vector<int>& r) {
         _z.q = q;
         _z.r = r;
@@ -39,7 +55,7 @@ namespace stan {
       
       void init_stepsize() {
   
-        ps_point z_init(static_cast<ps_point>(this->_z));
+        ps_point z_init(this->_z);
   
         this->_hamiltonian.sample_p(this->_z, this->_rand_int);
         this->_hamiltonian.init(this->_z);
@@ -49,7 +65,7 @@ namespace stan {
         this->_integrator.evolve(this->_z, this->_hamiltonian, this->_nom_epsilon);
         
         double h = this->_hamiltonian.H(this->_z);
-        if (h != h) h = std::numeric_limits<double>::infinity();
+        if (boost::math::isnan(h)) h = std::numeric_limits<double>::infinity();
         
         double delta_H = H0 - h;
         
@@ -57,7 +73,7 @@ namespace stan {
         
         while (1) {
           
-          this->_z.copy_base(z_init);
+          this->_z.ps_point::operator=(z_init);
           
           this->_hamiltonian.sample_p(this->_z, this->_rand_int);
           this->_hamiltonian.init(this->_z);
@@ -67,7 +83,7 @@ namespace stan {
           this->_integrator.evolve(this->_z, this->_hamiltonian, this->_nom_epsilon);
           
           double h = this->_hamiltonian.H(this->_z);
-          if (h != h) h = std::numeric_limits<double>::infinity();
+          if (boost::math::isnan(h)) h = std::numeric_limits<double>::infinity();
           
           double delta_H = H0 - h;
           
@@ -80,14 +96,14 @@ namespace stan {
                                    ? 2.0 * this->_nom_epsilon
                                    : 0.5 * this->_nom_epsilon );
           
-          if (this->_nom_epsilon > 1e300)
+          if (this->_nom_epsilon > 1e7)
             throw std::runtime_error("Posterior is improper. Please check your model.");
           if (this->_nom_epsilon == 0)
             throw std::runtime_error("No acceptably small step size could be found. Perhaps the posterior is not continuous?");
           
         }
         
-        this->_z.copy_base(z_init);
+        this->_z.ps_point::operator=(z_init);
         
       }
       

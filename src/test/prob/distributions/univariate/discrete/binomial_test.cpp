@@ -3,9 +3,14 @@
 #include <boost/random/mersenne_twister.hpp>
 #include<boost/math/distributions.hpp>
 
-TEST(ProbDistributionBinomiali, random) {
+TEST(ProbDistributionBinomiali, error_check) {
   boost::random::mt19937 rng;
   EXPECT_NO_THROW(stan::prob::binomial_rng(4,0.6,rng));
+  EXPECT_THROW(stan::prob::binomial_rng(-4,0.6,rng),std::domain_error);
+  EXPECT_THROW(stan::prob::binomial_rng(4,-0.6,rng),std::domain_error);
+  EXPECT_THROW(stan::prob::binomial_rng(4,2.6,rng),std::domain_error);
+  EXPECT_THROW(stan::prob::binomial_rng(4,stan::math::positive_infinity(),rng),
+               std::domain_error);
 }
 
 TEST(ProbDistributionsBinomial, chiSquareGoodnessFitTest) {

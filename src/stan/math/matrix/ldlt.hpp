@@ -18,16 +18,16 @@ namespace stan {
     template<int R, int C>
     class LDLT_factor<double,R,C> {
     public:
-      LDLT_factor() : _N(0) {}
+      LDLT_factor() : N_(0) {}
       LDLT_factor(const Eigen::Matrix<double,R,C> &A)
-      : _N(0), _ldltP(new Eigen::LDLT< Eigen::Matrix<double,R,C> >())
+      : N_(0), _ldltP(new Eigen::LDLT< Eigen::Matrix<double,R,C> >())
       {
         compute(A);
       }
       
       inline void compute(const Eigen::Matrix<double,R,C> &A) {
         stan::math::validate_square(A,"LDLT_factor<double>::compute");
-        _N = A.rows();
+        N_ = A.rows();
         _ldltP->compute(A);
       }
       
@@ -44,24 +44,26 @@ namespace stan {
       }
       
       inline void inverse(Eigen::Matrix<double,R,C> &invA) const {
-        invA.setIdentity(_N);
+        invA.setIdentity(N_);
         _ldltP->solveInPlace(invA);
       }
 
-      inline Eigen::Matrix<double,R,C> solve(const Eigen::Matrix<double,R,C> &B) const {
-        return _ldltP->solve(B);
+      template<typename Rhs>
+      inline const Eigen::internal::solve_retval<Eigen::LDLT< Eigen::Matrix<double,R,C> >, Rhs>
+      solve(const Eigen::MatrixBase<Rhs>& b) const {
+        return _ldltP->solve(b);
       }
 
       inline Eigen::Matrix<double,R,C> solveRight(const Eigen::Matrix<double,R,C> &B) const {
         return _ldltP->solve(B.transpose()).transpose();
       }
       
-      inline size_t rows() const { return _N; }
-      inline size_t cols() const { return _N; }
+      inline size_t rows() const { return N_; }
+      inline size_t cols() const { return N_; }
       
       typedef size_t size_type;
 
-      size_t _N;
+      size_t N_;
       boost::shared_ptr< Eigen::LDLT< Eigen::Matrix<double,R,C> > > _ldltP;
     };
     
@@ -99,7 +101,38 @@ namespace stan {
       return A.log_abs_det();
     }
     
+    /*
+     * Compute the trace of an inverse quadratic form.  I.E., this computes
+     *       trace(D B^T A^-1 B)
+     * where D is a square matrix and the LDLT_factor of A is provided.
+     */
+    template <int R1,int C1,int R2,int C2,int R3,int C3>
+    inline double
+    trace_inv_quad_form_ldlt(const Eigen::Matrix<double,R1,C1> &D,
+                             const stan::math::LDLT_factor<double,R2,C2> &A,
+                             const Eigen::Matrix<double,R3,C3> &B)
+    {
+      stan::math::validate_square(D,"trace_inv_quad_form_ldlt");
+      stan::math::validate_multiplicable(A,B,"trace_inv_quad_form_ldlt");
+      stan::math::validate_multiplicable(B,D,"trace_inv_quad_form_ldlt");
+      
+      return (D*B.transpose()*A._ldltP->solve(B)).trace();
+    }
 
+    /*
+     * Compute the trace of an inverse quadratic form.  I.E., this computes
+     *       trace(B^T A^-1 B)
+     * where the LDLT_factor of A is provided.
+     */
+    template <int R2,int C2,int R3,int C3>
+    inline double
+    trace_inv_quad_form_ldlt(const stan::math::LDLT_factor<double,R2,C2> &A,
+                             const Eigen::Matrix<double,R3,C3> &B)
+    {
+      stan::math::validate_multiplicable(A,B,"trace_inv_quad_form_ldlt");
+      
+      return (B.transpose()*A._ldltP->solve(B)).trace();
+    }
   }
 }
 #endif

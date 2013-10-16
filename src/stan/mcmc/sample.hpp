@@ -2,6 +2,7 @@
 #define __STAN__MCMC__SAMPLE__HPP__
 
 #include <vector>
+#include <string>
 
 namespace stan {
   
@@ -67,6 +68,16 @@ namespace stan {
       
       inline double accept_stat() const {
         return _accept_stat;
+      }
+      
+      void get_sample_param_names(std::vector<std::string>& names) {
+        names.push_back("lp__");
+        names.push_back("accept_stat__");
+      }
+      
+      void get_sample_params(std::vector<double>& values) {
+        values.push_back(_log_prob);
+        values.push_back(_accept_stat);
       }
       
     };

@@ -61,7 +61,7 @@ namespace stan {
       if (n != 0)
         validate_std_vector_index(sv, n, "head");
       std::vector<T> s;
-      for (int i = 0; i < n; ++i)
+      for (size_t i = 0; i < n; ++i)
         s.push_back(sv[i]);
       return s;
     }

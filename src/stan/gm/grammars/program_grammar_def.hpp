@@ -91,8 +91,9 @@ namespace stan {
 
 
     template <typename Iterator>
-    program_grammar<Iterator>::program_grammar() 
+    program_grammar<Iterator>::program_grammar(const std::string& model_name) 
         : program_grammar::base_type(program_r),
+          model_name_(model_name),
           var_map_(),
           error_msgs_(),
           expression_g(var_map_,error_msgs_),
@@ -101,6 +102,11 @@ namespace stan {
 
         using boost::spirit::qi::eps;
         using boost::spirit::qi::lit;
+
+        // add model_name to var_map with special origin and no 
+        var_map_.add(model_name,
+                     base_var_decl(),
+                     model_name_origin);
 
         program_r.name("program");
         program_r 
@@ -130,8 +136,8 @@ namespace stan {
 
         derived_data_var_decls_r.name("transformed data block");
         derived_data_var_decls_r
-          %= lit("transformed")
-          >> lit("data")
+          %= ( lit("transformed")
+               >> lit("data") )
           > lit('{')
           > var_decls_g(true,transformed_data_origin)  // -constraints
           > *statement_g(false,transformed_data_origin) // -sampling
@@ -146,8 +152,8 @@ namespace stan {
 
         derived_var_decls_r.name("derived variable declarations");
         derived_var_decls_r
-          %= lit("transformed")
-          >> lit("parameters")
+          %= ( lit("transformed")
+               >> lit("parameters") )
           > lit('{')
           > var_decls_g(true,transformed_parameter_origin) // -constraints
           > *statement_g(false,transformed_parameter_origin) // -sampling

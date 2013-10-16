@@ -401,3 +401,37 @@ TEST(io_dump, product) {
   dims.push_back(4);
   EXPECT_FLOAT_EQ(12.0, stan::io::product(dims));
 }
+
+
+// thanks to ksvanhorn for pointing out this test case
+// which failed in Stan 1.3
+TEST(io_dump, it_sign_ksvanhorn) {
+  using std::vector;
+  std::string txt
+    = "N <- 5\ny <- c(2, 1, 1, 2, -3.4)\nsigma <- 3\n";
+  vector<size_t> dims;
+  std::stringstream in(txt);
+  stan::io::dump dump(in);
+  EXPECT_TRUE(dump.contains_i("N"));
+  EXPECT_TRUE(dump.contains_r("N"));
+  EXPECT_TRUE(dump.contains_r("y"));
+  EXPECT_TRUE(dump.contains_i("sigma"));
+  EXPECT_TRUE(dump.contains_r("sigma"));
+
+  vector<int> N_values = dump.vals_i("N");
+  EXPECT_EQ(1U,N_values.size());
+  EXPECT_EQ(5,N_values[0]);
+
+  vector<double> y_values = dump.vals_r("y");
+  EXPECT_EQ(5U,y_values.size());
+  EXPECT_FLOAT_EQ(2,y_values[0]);
+  EXPECT_FLOAT_EQ(1,y_values[1]);
+  EXPECT_FLOAT_EQ(1,y_values[2]);
+  EXPECT_FLOAT_EQ(2,y_values[3]);
+  EXPECT_FLOAT_EQ(-3.4,y_values[4]);
+
+  vector<double> sigma_values = dump.vals_r("sigma");
+  EXPECT_EQ(1U,sigma_values.size());
+  EXPECT_FLOAT_EQ(3,sigma_values[0]);
+  
+}

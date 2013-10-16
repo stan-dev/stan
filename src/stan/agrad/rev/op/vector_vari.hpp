@@ -8,7 +8,6 @@
 namespace stan {
   namespace agrad {
 
-    // FIXME: memory leak -- copy vector to local memory
     class op_vector_vari : public vari {
     protected:
       const size_t size_;

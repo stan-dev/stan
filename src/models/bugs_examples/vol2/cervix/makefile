@@ -10,7 +10,7 @@ LIBFLAGS = -L$(STAN_HOME)/bin -lstan
 $(PGM) :
 	$(STAN_HOME)/bin/stanc  --name=$(PGM)  $(PGM).stan 
 	$(CXX) -O3 -DNDEBUG $(CPPFLAGS) $(PGM).cpp -o $(PGM) $(LIBFLAGS) 
-	./$(PGM) --data=$(PGM).data.R --iter=10000 --thin=1
+	./$(PGM) data=$(PGM).data.R sample num_samples=10000 num_warmup=1000 thin=1
 
 clean :
 	rm -f $(PGM).cpp samples.csv $(PGM) 

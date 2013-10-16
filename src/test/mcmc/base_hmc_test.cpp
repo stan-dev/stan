@@ -2,8 +2,10 @@
 #include <stan/mcmc/hmc/base_hmc.hpp>
 
 #include <boost/random/additive_combine.hpp>
+#include <boost/algorithm/string/split.hpp>
 
 #include <gtest/gtest.h>
+#include <test/models/utility.hpp>
 
 typedef boost::ecuyer1988 rng_t;
 
@@ -46,7 +48,6 @@ namespace stan {
 }
 
 TEST(McmcBaseHMC, point_construction) {
-  
   rng_t base_rng(0);
   
   std::vector<double> q(5, 1.0);
@@ -56,9 +57,8 @@ TEST(McmcBaseHMC, point_construction) {
   
   stan::mcmc::mock_hmc sampler(model, base_rng, &std::cout, &std::cerr);
 
-  EXPECT_EQ(q.size(), sampler.z().q.size());
-  EXPECT_EQ(q.size(), sampler.z().g.size());
-  
+  EXPECT_EQ(static_cast<size_t>(q.size()), sampler.z().q.size());
+  EXPECT_EQ(static_cast<int>(q.size()), sampler.z().g.size());
 }
 
 TEST(McmcBaseHMC, seed) {
@@ -76,7 +76,7 @@ TEST(McmcBaseHMC, seed) {
   
   sampler.seed(q_seed, r);
   
-  for (int i = 0; i < q.size(); ++i)
+  for (std::vector<double>::size_type i = 0; i < q.size(); ++i)
     EXPECT_EQ(q_seed.at(i), sampler.z().q.at(i));
   
 }
@@ -120,3 +120,4 @@ TEST(McmcBaseHMC, set_stepsize_jitter) {
   EXPECT_EQ(old_jitter, sampler.get_stepsize_jitter());
   
 }
+

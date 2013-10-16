@@ -27,10 +27,11 @@ ifeq (mingw32-g++,$(CC_TYPE))
 endif
 ifeq (clang++,$(CC_TYPE))
 #  CFLAGS += -stdlib=libc++
-#  CFLAGS_GTEST += -DGTEST_USE_OWN_TR1_TUPLE
   CFLAGS_GTEST += -DGTEST_HAS_PTHREAD=0
+  CFLAGS_GTEST += -Wno-c++11-long-long
   CFLAGS += -Wno-unused-function
   CFLAGS += -Wno-uninitialized
+  CFLAGS += -Wno-c++11-long-long
   #PCH = .pch
 endif
 

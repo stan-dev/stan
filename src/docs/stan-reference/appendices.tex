@@ -85,14 +85,13 @@ on the compiler and linker.
 \begin{itemize}
 \item Linux (Debian, Ubuntu, Red Hat), 
 \item Mac OS X (Snow Leopard, Lion, Mountain Lion), and
-\item Windows (XP, 7).
+\item Windows (XP, 7, 8).
 \end{itemize}
 %
 \Stan should work on other versions of these operating systems if
 compatible \Cpp compilers can be found.  The plan is to keep up with
 new versions of these operating systems and gradually phase out
 testing on older versions.
-
 
 
 \section{Step-by-Step Mac Install Instructions}
@@ -150,7 +149,7 @@ Click the top-level menu item \code{Xcode}, then click item
 To test, open the Terminal application and enter
 
 \begin{quote}
-\begin{Verbatim}[fontshape=sl]
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
 > make --version
 > g++ --version
 \end{Verbatim}
@@ -162,23 +161,23 @@ is at 4.2.1 or later.
 
 \subsection{Download and Unpack Stan Source}
 
-Download the most recent version of \code{stan-src-1.m.p.tgz}
+Download the most recent version of \code{stan-2.m.p.tar.gz}
 (\code{m} is the minor version and \code{p} the patch level) from
 the Stan downloads list,
 %
 \begin{quote}
-\url{http://code.google.com/p/stan/downloads/list}
+\url{https://github.com/stan-dev/stan/releases}
 \end{quote}
 
 Open the folder containing the download in the Finder
 (typically, the user's top-level \code{Downloads} folder).
 
-If the Mac OS has not automatically unpacked the \code{.tgz}
-file into file \code{stan-src-1.m.p.tar},
-double-click the \code{.tgz} file to unpack.
+If the Mac OS has not automatically unpacked the \code{.tar.gz}
+file into file \code{stan-2.m.p.tar},
+double-click the \code{.tar.gz} file to unpack.
 
 Double click on the \code{.tar} file to unarchive
-directory \code{stan-src-1.m.p}.
+directory \code{stan-2.m.p}.
 
 Move the resulting directory to a location where it will not be
 deleted, henceforth called \code{<stan-home>}.
@@ -197,7 +196,7 @@ To see if the \code{g++} compiler and \code{make} build system
 are already installed, use the commands
 %
 \begin{quote}
-\begin{Verbatim}[fontshape=sl]
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
 > g++ --version
 \end{Verbatim}
 \end{quote}
@@ -205,7 +204,7 @@ are already installed, use the commands
 and
 %
 \begin{quote}
-\begin{Verbatim}[fontshape=sl]
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
 > make --version
 \end{Verbatim}
 \end{quote}
@@ -220,7 +219,7 @@ To install the latest version of these
 tools (or upgrade an older version), use the commands
 %
 \begin{quote}
-\begin{Verbatim}[fontshape=sl]
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
 > sudo apt-get install g++ 
 \end{Verbatim}
 \end{quote}
@@ -228,7 +227,7 @@ tools (or upgrade an older version), use the commands
 and
 %
 \begin{quote}
-\begin{Verbatim}[fontshape=sl]
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
 > sudo apt-get install make 
 \end{Verbatim}
 \end{quote}
@@ -239,11 +238,11 @@ A password will likely be required by the superuser command \code{sudo}.
 \subsection{Downloading and Unpacking Stan Source}
 
 Download the most recent stable version of Stan,
-\code{stan-src-1.m.p.tgz}, where \code{m} is the minor version and
+\code{stan-2.m.p.tar.gz}, where \code{m} is the minor version and
 \code{p} the patch level), from the Stan downloads page,
 %
 \begin{quote}
-\url{http://code.google.com/p/stan/downloads/list}
+\url{https://github.com/stan-dev/stan/releases}
 \end{quote}
 %
 to the directory where Stan will reside.
@@ -252,7 +251,7 @@ In a command shell, change directories to where the
 tarball was downloaded, say \code{<download-dir>}, with
 %
 \begin{quote}
-\begin{Verbatim}[fontshape=sl]
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
 > cd <download-dir>
 \end{Verbatim}
 \end{quote}
@@ -261,14 +260,14 @@ where \code{<download-dir>} is replaced with the actual path to the directory.
 
 Then, unpack the distribution into the subdirectory
 \begin{quote}
-\nolinkurl{<download-dir>/stan-src-1.m.p}
+\nolinkurl{<download-dir>/stan-2.m.p}
 \end{quote}
 %
 with
 %
 \begin{quote}
-\begin{Verbatim}[fontshape=sl]
-> tar -xzf stan-src-1.m.p.tgz
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
+> tar -xzf stan-2.m.p.tar.gz
 \end{Verbatim}
 \end{quote}
 
@@ -276,17 +275,9 @@ with
 
 \section{Step-by-Step Windows Install Instructions}
 
-Stan has been tested on Windows XP and Windows 7.
-
-\subsection{Note for Cygwin Users}
-
-Stan can be run under Cygwin, the Linux look-and-feel environment for
-Windows.  Cygwin must have recent versions of \code{make} and
-\code{g++} (part of gcc) installed.  Within a Cygwin shell, Stan
-will behave as under Linux. 
-
-The remaining instructions in this section are for users wishing to
-run Stan under Windows in a command (i.e., DOS) shell.
+Stan has been tested on Windows XP, Windows 7, and Windows 8.  See
+Section~\refsection{cygwin} for instructions for installing for Cygwin
+on Windows.
 
 \subsection{Windows Tips}
 
@@ -334,13 +325,13 @@ install wizard, then proceed through its options.
 \subsection{Downloading and Unpacking Stan}
 
 The Stan source code distributions are named
-\code{stan-src-1.m.p.tgz}, where \code{m} is the minor version and
+\code{stan-2.m.p.tar.gz}, where \code{m} is the minor version and
 \code{p} the patch level.
 
 Download the latest Stan source from the Stan downloads page,
 %
 \begin{quote}
-\url{http://code.google.com/p/stan/downloads/list}
+\url{https://github.com/stan-dev/stan/releases}
 \end{quote}
 %
 to any non-temporary folder.  (If in doubt, select \code{My Documents}
@@ -354,36 +345,36 @@ a Windows user name.
 \item \emph{Windows XP}: \ From the default starting directory, use
 the following commands (quotes and all):
 \begin{quote}
-\begin{Verbatim}[fontshape=sl]
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
 > cd "My Documents"
 \end{Verbatim}
 \end{quote}
 %
 The full path (including quotes) will work from anywhere,
 \begin{quote}
-\begin{Verbatim}[fontshape=sl]
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
 > cd "c:\Documents and Settings\<username>\My Documents"
 \end{Verbatim}
 \end{quote}
 \item \emph{Windows 7}:  \  From the default starting directory, use
 \begin{quote}
-\begin{Verbatim}[fontshape=sl]
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
 > cd Documents
 \end{Verbatim}
 \end{quote} 
 or use the full path, including quotes, from anywhere,
 \begin{quote}
-\begin{Verbatim}[fontshape=sl]
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
 > cd "c:\Users\<username>\Documents"
 \end{Verbatim}
 \end{quote}
 \end{itemize}
 %
-To verify that the downloaded Stan \code{.tgz} file is there,
+To verify that the downloaded Stan \code{.tar.gz} file is there,
 list the directory contents using:
 %
 \begin{quote}
-\begin{Verbatim}[fontshape=sl]
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
 > dir
 \end{Verbatim}
 \end{quote}
@@ -392,14 +383,64 @@ Finally, unpack the distribution using the \code{tar} command (which is
 installed as part of Rtools).
 %
 \begin{quote}
-\begin{Verbatim}[fontshape=sl]
-> tar --no-same-owner -xzf stan-src-1.m.p.tgz 
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
+> tar --no-same-owner -xzf stan-2.m.p.tar.gz 
 \end{Verbatim}
 \end{quote}
 %
 The \code{--no-same-owner} flag is not strictly necessary,
 but it removes a bunch of irrelevant warnings.
 
+
+\subsection{64-bit Cygwin Install Instructions}\label{cygwin.section}
+
+Stan can be run under Cygwin, the Unix look-and-feel environment for
+Windows.  Cygwin must have recent versions of \code{make} and
+\code{g++} (part of gcc) installed.  Within a Cygwin shell, Stan
+will behave as under other Unixes.
+
+Thanks to Kevin van Horn for mailing the following instructions into
+the Stan-users mailing list.  They only cover 64-bit R and 64-bit
+Cygwin, but that is what you should be using for Stan anyway.
+
+\begin{enumerate}
+\item Kill all Cygwin bash shells and shut down R.
+\item After installing R and Rtools, make sure that R and Rtools are
+  in the \code{PATH} environment variable. My R installation directory was
+  \Verb|c:\Program Files\R\R-3.0.1| and my Rtools installation
+  directory was \Verb|c:\Rtools|, so I added the following to the end
+  of my user \code{PATH} variable:
+  \begin{itemize}
+  \item \Verb|C:\Program Files\R\R-3.0.1\bin\x64|
+  \item \Verb|C:\Rtools\bin|
+  \item \Verb|C:\Rtools\gcc-4.6.3\bin|
+  \end{itemize}
+\item Now there could be a conflict between Cygwin and Rtools when
+  running a bash shell under Cygwin, so I added the following lines to
+  my \Verb|.bash_profile| file to remove any \code{PATH} directory
+  referencing Rtools:
+  \begin{Verbatim}
+> TMP=`echo $PATH | /usr/bin/tr ':' '\n'                      \
+                  | /usr/bin/egrep -iv '^/cygdrive/c/Rtools/' \
+                  | tr '\n' ':'`
+> PATH=${TMP%:}
+\end{Verbatim}
+(Note that the backslash characters signal that the line continues
+after a return.)  This was only necessary to allow me to continue
+using Cygwin.
+\item Apparently there is something in \code{Rcpp} or \code{inline} or
+  \code{rstan} that doesn't like \code{UNC} paths. My home directory
+  was \Verb|\\server\users\kevinv| and apparently this caused my
+  local R library directory to be \Verb|\server\users\kevinv\R|
+  as verified by \code{.libPaths()} from the R command prompt. 
+
+  I fixed this by copying the entire directory tree rooted at
+  \Verb|\server\users\kevinv\R| over to a local directory on my workstation,
+  \Verb|C:\Users\KevinV\R|, then adding the user environment variable
+  \Verb|R_LIBS_USER=C:\Users\KevinV\R|. I shut down R and restarted it.
+\item At this point the instructions given for installing Rstan
+  finally worked.
+\end{enumerate}
 
 
 \section{Required Software and Tools}
@@ -430,7 +471,7 @@ template metaprogramming facilities are implemented with the Boost
 \begin{itemize}
 \item Home: http://www.boost.org/users/license.html
 \item License: Boost Software License
-\item Tested Version: 1.53.0
+\item Tested Version: 1.54.0
 \end{itemize}
 %
 The Boost source code is distributed with \Stan.
@@ -444,7 +485,7 @@ algebra library.
 \begin{itemize}
 \item Home: \url{http://eigen.tuxfamily.org}
 \item License: Mozilla Public License, version 2.0
-\item Tested Version: 3.1.2
+\item Tested Version: 3.2.0
 \end{itemize}
 %
 The Eigen source code is distributed with \Stan.
@@ -479,6 +520,14 @@ License: BSD
 %
 \end{itemize}
 %
+
+\subsubsection{\Cpp-11 Support} 
+
+Stan 2.0 does not support \Cpp-11.  The remaining incompatibility with
+the parser will be included soon after Stan 2.0 is released.  This
+will include support for the latest versions of \code{g++} and
+\code{clang++}.
+
 
 \section{Optional Components for Developers}
 
@@ -553,7 +602,7 @@ version of Mac OS X.
 \subsubsection{Official Apple Xcode Distribution}
 
 Xcode 4 may be downloaded for free for Mac OS X 10.7 (``Lion'') or
-later direclty from Apple:
+later directly from Apple:
 
 \begin{quote}
 Xcode 4: \url{https://developer.apple.com/xcode/}
@@ -703,7 +752,7 @@ to the system \code{PATH} environment variable.  You can do add to the
 top-level \Verb|~/.profile| file.  
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 export PATH=/Applications/Doxygen.app/Contents/Resources:$PATH
 \end{Verbatim}
 \end{quote}
@@ -837,7 +886,7 @@ you can look for similar structures in these examples.
   sample \code{y}.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 mu <- a + b * x;
 y ~ normal(mu,sigma);
 \end{Verbatim}
@@ -855,7 +904,7 @@ lp += normal_log(mu,sigma);
 Contrast this with the \Stan program
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 y ~ normal(mu,sigma)
 mu <- a + b * x
 \end{Verbatim}
@@ -866,7 +915,7 @@ a coding error, because it attempts to use \code{mu} before
 it is set. It translates to the following \Cpp code.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 lp += normal_log(mu,sigma);
 mu = a + b * x;
 \end{Verbatim}
@@ -923,7 +972,7 @@ sample out of hand as if it had zero probability.
   semicolon.  For example:
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 y ~ normal(mu, sigma);
 \end{Verbatim}
 \end{quote}
@@ -931,7 +980,7 @@ y ~ normal(mu, sigma);
 and
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 for (i in 1:n) y[i] ~ normal(mu, sigma);
 \end{Verbatim}
 \end{quote}
@@ -939,7 +988,7 @@ for (i in 1:n) y[i] ~ normal(mu, sigma);
 Or, equivalently (recall that a line break is just another form of whitespace),
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 for (i in 1:n)
   y[i] ~ normal(mu, sigma);
 \end{Verbatim}
@@ -948,7 +997,7 @@ for (i in 1:n)
 and also equivalently, 
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 for (i in 1:n) {
   y[i] ~ normal(mu, sigma);
 }
@@ -993,7 +1042,7 @@ $\vdots$ & $\vdots$
   legal and meaningful (if possibly inefficient) Stan code.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 {
   total <- 0;
   for (i in 1:n){
@@ -1032,7 +1081,7 @@ truncated versions may not exist and may not be vectorized.}
 allowing
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 for (i in 1:n) 
   y[i] ~ normal(mu[i], sigma[i]);
 \end{Verbatim}
@@ -1041,7 +1090,7 @@ for (i in 1:n)
 to be expressed more compactly as 
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 y ~ normal(mu,sigma);
 \end{Verbatim}
 \end{quote}
@@ -1053,7 +1102,7 @@ computation of the chain rule during algorithmic differentiation.
   For example, in a hierarchical model might have a vector of \code{K}
   parameters for each of \code{J} groups; this can be declared using
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 vector[K] theta[J];
 \end{Verbatim}
 \end{quote}
@@ -1063,7 +1112,7 @@ may be used in the code just like any other vector variable.
 \\[6pt]
 An alternative encoding would be with a two-dimensional array, as in
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 real theta[J,K];
 \end{Verbatim}
 \end{quote}
@@ -1074,7 +1123,7 @@ in computational speed for some operations.
 A third encoding would use a matrix:
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 matrix[J,K] theta;
 \end{Verbatim}
 \end{quote}
@@ -1108,7 +1157,7 @@ p(y_n|\theta,\lambda)
 The log probability function can be implemented directly in Stan as follows.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 data {
   int<lower=0> N;
   int<lower=0> y[N];
@@ -1116,23 +1165,22 @@ data {
 }
 model {
   for (n in 1:N) {
-    if (y[n] == 0) {
-      lp__ <- lp__ + log_sum_exp(bernoulli_log(1,theta),
-                                 bernoulli_log(0,theta) 
-                                    + poisson_log(0));
-    } else {
-      0 ~ bernoulli(theta);
-      y[n] ~ poisson(lambda);
-    }
+    if (y[n] == 0)
+      increment_log_prob(log_sum_exp(bernoulli_log(1,theta),
+                                     bernoulli_log(0,theta) 
+                                     + poisson_log(y[n],lambda)));
+    else
+      increment_log_prob(bernoulli_Log(0,theta)
+                         + poisson_log(y[n],lambda));
   }
   ...
 }
 \end{Verbatim}
 \end{quote}
 %
-The \code{log\_sum\_exp(lp1,lp2)} function adds log probabilities, and
-is defined to be equal to \code{log(exp(lp1) + exp(lp2))}, but is more
-arithmetically stable. 
+The \code{log\_sum\_exp(lp1,lp2)} function adds the log probabilities
+on the linear scale; it is defined to be equal to \code{log(exp(lp1) +
+  exp(lp2))}, but is more arithmetically stable.
 %
 \item Stan supports general while loops using a standard syntax.  
 While loops give Stan full Turing equivalent computational power.
@@ -1141,7 +1189,7 @@ termination conditions.  As an illustration of their syntax,
 the for-loop
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 model {
     ....
     for (n in 1:N) {
@@ -1154,7 +1202,7 @@ model {
 may be recoded using the following while loop.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 model {
     int n;
     ...
@@ -1189,7 +1237,7 @@ model {
   (on the scale in which the parameter is defined).  For example, if
   you have a parameter \code{p} declared as 
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 real<lower=0,upper=1> p;
 \end{Verbatim}
 \end{quote}
@@ -1200,7 +1248,7 @@ block, then you are implicitly assigning a uniform $[0,1]$ prior on
 On the other hand, if you have a parameter \code{theta} declared with
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 real theta;
 \end{Verbatim}
 \end{quote}
@@ -1228,7 +1276,7 @@ on $(-\infty,\infty)$ to \code{theta}.
   of proper marginal and conditional densities).  Stan models can be
   improper.  Here is the simplest improper Stan model: 
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 parameters {
   real theta;
 } 
@@ -1249,7 +1297,7 @@ model { }
 \item
   As noted earlier, each statement in a Stan model is directly translated into the \Cpp code for computing the log posterior.  Thus, for example, the following pair of statements is legal in a Stan model:
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 y ~ normal(0,1);
 y ~ normal(2,3);
 \end{Verbatim}
@@ -1263,7 +1311,7 @@ density function.
 \\[6pt] 
 For a perhaps more confusing example, consider the following two lines in a Stan model:
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 x ~ normal(0.8*y, sigma);
 y ~ normal(0.8*x, sigma);
 \end{Verbatim}
@@ -1387,7 +1435,7 @@ that it allows the loop variables to match.  So loops over the indices of
 an $M \times N$ matrix $a$ would look as follows.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 for (m in 1:M)
   for (n in 1:N)
      a[m,n] = ...
@@ -1406,7 +1454,7 @@ BUGS model, which uses a different element of \code{mu} in each
 iteration.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 model {
   real mu[N];
   for (n in 1:N) {
@@ -1435,7 +1483,7 @@ model {
 The local variable can be eliminated altogether, as follows.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 model {
   for (n in 1:N)
     y[n] ~ normal(alpha * x[n] + beta, sigma);
@@ -1457,7 +1505,7 @@ in which it is used.  This allows it to be allocated once and then
 reused.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 model {
   vector[K] mu;
   for (n in 1:N) {
@@ -1479,7 +1527,7 @@ Single-statement blocks can be rendered in one of two ways.  The fully
 explicit bracketed way is as follows.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 for (n in 1:N) {
   y[n] ~ normal(mu,1);
 }
@@ -1557,7 +1605,7 @@ can see.  The preferred Stan style is as shown in the previous
 section, not as follows.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 for (n in 1:N) 
 {
   y[n] ~ normal(mu,1);
@@ -1569,7 +1617,7 @@ This also goes for parameters blocks, transformed data blocks,
 which should look as follows.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 transformed parameters {
   real sigma;
   ...
@@ -1585,7 +1633,7 @@ Stan supports the full \Cpp-style conditional syntax,
 allowing real or integer values to act as conditions, as follows.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 real x;
 ...
 if (x) {
@@ -1603,7 +1651,7 @@ integer or real values that are not produced as the result of a
 comparison or boolean operation, as follows.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 if (x != 0) ...
 \end{Verbatim}
 \end{quote}
@@ -1649,7 +1697,7 @@ It is dispreferred to have multiple statements or declarations on the
 same line, as in the following example.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 transformed parameters {
   real mu_centered;  real sigma;
   mu <- (mu_raw - mean_mu_raw);    sigma <- pow(tau,-2);
@@ -1705,10 +1753,8 @@ following form (though not the content; inverting matrices is almost
 always a bad idea).
 %
 \begin{quote}
-\begin{Verbatim}
-lp__ <- lp__ + (y - mu)'
-               * inv(Sigma) 
-               * (y - mu);
+\begin{Verbatim}[fontsize=\small]
+increment_log_prob((y - mu)' * inv(Sigma) * (y - mu));
 \end{Verbatim}
 \end{quote}
 %
@@ -1719,9 +1765,9 @@ For function arguments, break after a comma and line the next
 argument up underneath as follows.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 y[n] ~ normal(alpha + beta * x + gamma * y,
-              pow(tau,-2));
+              pow(tau,-0.5));
 \end{Verbatim}
 \end{quote}
 %

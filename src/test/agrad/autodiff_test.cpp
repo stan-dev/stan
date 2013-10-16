@@ -74,7 +74,7 @@ TEST(AgradAutoDiff,gradient) {
   EXPECT_FLOAT_EQ(2 * x(0) * x(1), grad_fx(0));
   EXPECT_FLOAT_EQ(x(0) * x(0) + 3 * 2 * x(1), grad_fx(1));
 
-  double fx2;
+  double fx2(0);
   Matrix<double,Dynamic,1> grad_fx2;
   stan::agrad::gradient<double>(f,x,fx2,grad_fx2);
   EXPECT_FLOAT_EQ(5 * 5 * 7 + 3 * 7 * 7, fx2);
@@ -164,7 +164,7 @@ TEST(AgradAutodiff,hessian) {
   fun1 f;
   Matrix<double,Dynamic,1> x(2);
   x << 5, 7;
-  double fx;
+  double fx(0);
   Matrix<double,Dynamic,1> grad;
   Matrix<double,Dynamic,Dynamic> H;
   stan::agrad::hessian(f,x,fx,grad,H);

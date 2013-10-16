@@ -28,7 +28,7 @@ namespace stan {
     /**
      * The log of a multivariate Gaussian Process for the given y, Sigma, and
      * w.  y is a dxN matrix, where each column is a different observation and each
-     * row is a different output dimension.  The Guassian Process is assumed to
+     * row is a different output dimension.  The Gaussian Process is assumed to
      * have a scaled kernel matrix with a different scale for each output dimension.
      * This distribution is equivalent to:
      *    for (i in 1:d) row(y,i) ~ multi_normal(0,(1/w[i])*Sigma).
@@ -64,6 +64,7 @@ namespace stan {
       using stan::math::rows_dot_product;
       using stan::math::log_determinant_ldlt;
       using stan::math::mdivide_right_ldlt;
+      using stan::math::trace_inv_quad_form_ldlt;
       using stan::math::LDLT_factor;
 
       if (!check_size_match(function, 
@@ -71,18 +72,18 @@ namespace stan {
                             Sigma.cols(), "columns of kernel matrix",
                             &lp))
         return lp;
-      if (!check_positive(function, Sigma.rows(), "Kernel matrix rows", &lp))
+      if (!check_positive(function, Sigma.rows(), "Kernel rows", &lp))
         return lp;
       if (!check_finite(function, Sigma, "Kernel", &lp)) 
         return lp;
-      if (!check_symmetric(function, Sigma, "Kernel matrix", &lp))
+      if (!check_symmetric(function, Sigma, "Kernel", &lp))
         return lp;
       
       LDLT_factor<T_covar,Eigen::Dynamic,Eigen::Dynamic> ldlt_Sigma(Sigma);
       if (!ldlt_Sigma.success()) {
         std::ostringstream message;
         message << "Kernel matrix is not positive definite. " 
-                << "K(0,0) is %1%.";
+                << "K[1,1] is %1%.";
         std::string str(message.str());
         stan::math::dom_err(function,Sigma(0,0),"",str.c_str(),"",&lp);
         return lp;
@@ -121,11 +122,9 @@ namespace stan {
       }
       
       if (include_summand<propto,T_y,T_w,T_covar>::value) {
-        Eigen::Matrix<typename 
-        boost::math::tools::promote_args<T_covar,T_y>::type,
-        Eigen::Dynamic, Eigen::Dynamic> y_Kinv(mdivide_right_ldlt(y,ldlt_Sigma));
-
-        lp -= 0.5 * dot_product(rows_dot_product(y_Kinv,y),w);
+        Eigen::Matrix<T_w,Eigen::Dynamic,Eigen::Dynamic> w_mat(w.asDiagonal());
+        Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic> yT(y.transpose());
+        lp -= 0.5 * trace_inv_quad_form_ldlt(w_mat,ldlt_Sigma,yT);
       }
 
       return lp;

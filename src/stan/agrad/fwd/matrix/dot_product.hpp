@@ -104,41 +104,6 @@ namespace stan {
       return ret;
     }
 
-    //not sure what this is for..
-    // /**
-    //  * Returns the dot product.
-    //  *
-    //  * @param[in] v1 First array.
-    //  * @param[in] v2 Second array.
-    //  * @param[in] length Length of both arrays.
-    //  * @return Dot product of the arrays.
-    //  */
-    // inline var dot_product(const var* v1, const var* v2, size_t length) {
-    //   return var(new dot_product_vv_vari(v1, v2, length));
-    // }
-    // /**
-    //  * Returns the dot product.
-    //  *
-    //  * @param[in] v1 First array.
-    //  * @param[in] v2 Second array.
-    //  * @param[in] length Length of both arrays.
-    //  * @return Dot product of the arrays.
-    //  */
-    // inline var dot_product(const var* v1, const double* v2, size_t length) {
-    //   return var(new dot_product_vd_vari(v1, v2, length));
-    // }
-    // /**
-    //  * Returns the dot product.
-    //  *
-    //  * @param[in] v1 First array.
-    //  * @param[in] v2 Second array.
-    //  * @param[in] length Length of both arrays.
-    //  * @return Dot product of the arrays.
-    //  */
-    // inline var dot_product(const double* v1, const var* v2, size_t length) {
-    //   return var(new dot_product_vd_vari(v2, v1, length));
-    // }
-
     template<typename T1, typename T2>
     inline 
     fvar<typename stan::return_type<T1,T2>::type>
@@ -146,7 +111,7 @@ namespace stan {
                 const std::vector<fvar<T2> >& v2) {
       stan::math::validate_matching_sizes(v1,v2,"dot_product");
       fvar<typename stan::return_type<T1,T2>::type> ret(0,0);
-      for(size_type i = 0; i < v1.size(); i++)
+      for (typename std::vector<fvar<T1> >::size_type i = 0; i < v1.size(); i++)
         ret += v1.at(i) * v2.at(i);
       return ret;
     }
@@ -158,7 +123,7 @@ namespace stan {
                 const std::vector<fvar<T2> >& v2) {
       stan::math::validate_matching_sizes(v1,v2,"dot_product");
       fvar<typename stan::return_type<T1,T2>::type> ret(0,0);
-      for(size_type i = 0; i < v1.size(); i++)
+      for (typename std::vector<T1>::size_type i = 0; i < v1.size(); i++)
         ret += to_fvar(v1.at(i)) * v2.at(i);
       return ret;
     }
@@ -170,7 +135,7 @@ namespace stan {
                 const std::vector<T2>& v2) {
       stan::math::validate_matching_sizes(v1,v2,"dot_product");
       fvar<typename stan::return_type<T1,T2>::type> ret(0,0);
-      for(size_type i = 0; i < v1.size(); i++)
+      for (typename std::vector<fvar<T1> >::size_type i = 0; i < v1.size(); i++)
         ret += v1.at(i) * to_fvar(v2.at(i));
       return ret;
     }

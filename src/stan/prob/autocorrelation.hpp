@@ -19,6 +19,7 @@ namespace stan {
        * a minimum number of zeros are padded. 
        */ 
       size_t fft_next_good_size(size_t N) { 
+        if (N <= 2) return 2;
         while (true) {
           size_t m = N;
           while((m % 2) == 0) m /= 2;

@@ -2,6 +2,7 @@
 #define __STAN__MCMC__BASE__STATIC__HMC__BETA__
 
 #include <math.h>
+#include <boost/math/special_functions/fpclassify.hpp>
 #include <stan/mcmc/hmc/base_hmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
 
@@ -19,7 +20,7 @@ namespace stan {
     public:
       
       base_static_hmc(M &m, BaseRNG& rng, std::ostream* o, std::ostream* e):
-      base_hmc<M, P, H, I, BaseRNG>(m, rng, o, e), _T(1)
+      base_hmc<M, P, H, I, BaseRNG>(m, rng, o, e), T_(1)
       { _update_L(); }
       
       ~base_static_hmc() {};
@@ -33,20 +34,21 @@ namespace stan {
         this->_hamiltonian.sample_p(this->_z, this->_rand_int);
         this->_hamiltonian.init(this->_z);
         
-        ps_point z_init(static_cast<ps_point>(this->_z));
+        ps_point z_init(this->_z);
 
         double H0 = this->_hamiltonian.H(this->_z);
         
-        for (int i = 0; i < _L; ++i) {
+        for (int i = 0; i < L_; ++i) {
           this->_integrator.evolve(this->_z, this->_hamiltonian, this->_epsilon);
         }
         
-        double acceptProb = std::exp(H0 - this->_hamiltonian.H(this->_z));
+        double h = this->_hamiltonian.H(this->_z);
+        if (boost::math::isnan(h)) h = std::numeric_limits<double>::infinity();
         
-        double accept = true;
+        double acceptProb = std::exp(H0 - h);
+        
         if (acceptProb < 1 && this->_rand_uniform() > acceptProb) {
-          this->_z.copy_base(z_init);
-          accept = false;
+          this->_z.ps_point::operator=(z_init);
         }
         
         acceptProb = acceptProb > 1 ? 1 : acceptProb;
@@ -60,36 +62,34 @@ namespace stan {
       }
       
       void write_sampler_params(std::ostream& o) {
-        o << this->_epsilon << "," << this->_T << ",";
+        o << this->_epsilon << "," << this->T_ << ",";
       }
       
       void get_sampler_param_names(std::vector<std::string>& names) {
-        names.clear();
         names.push_back("stepsize__");
         names.push_back("int_time__");
       }
       
       void get_sampler_params(std::vector<double>& values) {
-        values.clear();
         values.push_back(this->_epsilon);
-        values.push_back(this->_T);
+        values.push_back(this->T_);
       }
       
       void set_nominal_stepsize_and_T(const double e, const double t) {
         if(e > 0 && t > 0) {
-          this->_nom_epsilon = e; _T = t; _update_L();
+          this->_nom_epsilon = e; T_ = t; _update_L();
         }
       }
       
       void set_nominal_stepsize_and_L(const double e, const int l) {
         if(e > 0 && l > 0) {
-          this->_nom_epsilon = e; _L = l; _T = this->_nom_epsilon * _L;
+          this->_nom_epsilon = e; L_ = l; T_ = this->_nom_epsilon * L_;
         }
       }
       
       void set_T(const double t) { 
         if(t > 0) {
-          _T = t; _update_L();
+          T_ = t; _update_L();
         }
         
       }
@@ -100,17 +100,17 @@ namespace stan {
         }
       }
       
-      double get_T() { return this->_T; }
-      int get_L() { return this->_L; }
+      double get_T() { return this->T_; }
+      int get_L() { return this->L_; }
       
     protected:
       
-      double _T;
-      int _L;
+      double T_;
+      int L_;
       
       void _update_L() { 
-        _L = static_cast<int>(_T / this->_nom_epsilon);
-        _L = _L < 1 ? 1 : _L;
+        L_ = static_cast<int>(T_ / this->_nom_epsilon);
+        L_ = L_ < 1 ? 1 : L_;
       }
       
     };

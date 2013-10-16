@@ -34,6 +34,27 @@ BUGS_TESTS := $(BUGS_TESTS:src/test/%_test.cpp=test/%)
 test-bugs: $(addprefix runtest_no_fail/,$(BUGS_TESTS))
 
 ##
+# Target to verify header files are coherent
+##
+HEADER_TESTS := $(addsuffix -test,$(shell find src/stan -name '*.hpp' -type f)) 
+ifeq ($(OS),win) 
+  DEV_NULL = nul
+else
+  DEV_NULL = /dev/null
+endif
+
+test/dummy.cpp:
+	@mkdir -p test
+	@touch $@
+	@echo "int main() {return 0;}" >> $@
+
+%.hpp-test : %.hpp test/dummy.cpp
+	$(COMPILE.c) -O0 -include $< -o $(DEV_NULL) test/dummy.cpp
+
+.PHONY: test-headers
+test-headers: $(HEADER_TESTS) 
+
+##
 # Target to build unit tests. All unit tests are in src/test 
 # and are named *_test.cpp
 ##
@@ -59,13 +80,13 @@ test-distributions: $(GENERATED_AGRAD_TESTS)
 	@$(MAKE) $(patsubst src/%_test.cpp,runtest/%,$(shell find src/test/agrad/distributions -type f -name '*_generated_test.cpp'))
 
 .PHONY: test-unit
-test-unit: $(addprefix runtest/,$(UNIT_TESTS))
+test-unit: $(addprefix runtest/,$(UNIT_TESTS)) test/models/command$(EXE)
 
 ##
 # Target to build all tests
 ##
 .PHONY: test-all
-test-all: test-unit test-distributions test-models
+test-all: test-unit test-headers test-distributions test-models
 
 ##
 # Build the google test library.
@@ -100,13 +121,57 @@ endif
 ##
 # Builds a single test
 ##
-test/gm/compile_models$(EXE) : test/gm/compile_models.o bin/libstan.a $(patsubst %.stan,%$(EXE),$(wildcard src/test/gm/model_specs/compiled/*.stan))
+FILES := $(wildcard src/test/gm/model_specs/compiled/*.stan)
+ifeq ($(OS),win)
+  WH := where
+else
+  WH := which
+endif
+
+ifneq ($(shell $(WH) shuf),)
+  FILES := $(shell shuf -e $(FILES))
+else
+ifneq ($(shell $(WH) Rscript),)
+  FILES := $(shell Rscript -e "cat(sample(commandArgs(trailingOnly=TRUE)))" $(FILES))
+else
+ifneq ($(shell $(WH) python),)
+  FILES := $(shell python -c "import random; import os; import sys; sys.argv.remove('-'); s = sys.argv; random.shuffle(s); print ' '.join(s)" - $(FILES))
+else
+ifneq ($(shell $(WH) perl),)
+  FILES := $(shell perl -MList::Util=shuffle -le'print for shuffle @ARGV' $(FILES))
+endif
+endif
+endif
+endif
+
+test/gm/command$(EXE) : test/gm/command.o bin/libstan.a bin/libstanc.a src/test/gm/model_specs/compiled/domain_fail$(EXE) src/test/gm/model_specs/compiled/value_fail$(EXE) 
 	@mkdir -p $(dir $@)
 	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS) $(LDLIBS_STANC)
 ifeq ($(findstring test-,$(MAKECMDGOALS))$(findstring runtest/,$(MAKECMDGOALS)),)
 	$@ --gtest_output="xml:$(basename $@).xml"
 endif
 
+.PRECIOUS: src/test/mcmc/models/improper$(EXE)
+test/mcmc/base_hmc$(EXE) : test/mcmc/base_hmc.o bin/libstan.a bin/libstanc.a src/test/mcmc/models/improper$(EXE)
+	@mkdir -p $(dir $@)
+	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS) $(LDLIBS_STANC)
+ifeq ($(findstring test-,$(MAKECMDGOALS))$(findstring runtest/,$(MAKECMDGOALS)),)
+	$@ --gtest_output="xml:$(basename $@).xml"
+endif
+
+test/gm/arguments/argument_configuration$(EXE) : test/gm/arguments/argument_configuration.o bin/libstan.a src/test/gm/arguments/test_model$(EXE)
+	@mkdir -p $(dir $@)
+	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS) $(LDLIBS_STANC)
+ifeq ($(findstring test-,$(MAKECMDGOALS))$(findstring runtest/,$(MAKECMDGOALS)),)
+	$@ --gtest_output="xml:$(basename $@).xml"
+endif
+
+test/gm/compile_models$(EXE) : test/gm/compile_models.o bin/libstan.a $(patsubst %.stan,%$(EXE),$(FILES))
+	@mkdir -p $(dir $@)
+	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS) $(LDLIBS_STANC)
+ifeq ($(findstring test-,$(MAKECMDGOALS))$(findstring runtest/,$(MAKECMDGOALS)),)
+	$@ --gtest_output="xml:$(basename $@).xml"
+endif
 
 .PRECIOUS: test/%.o
 test/%$(EXE) : test/%.o bin/libstan.a bin/libstanc.a

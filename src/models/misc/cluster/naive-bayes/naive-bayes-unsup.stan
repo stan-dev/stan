@@ -27,7 +27,7 @@ model {
        gamma[doc[n],k] <- gamma[doc[n],k] 
                           + categorical_log(w[n],phi[k]);
    for (m in 1:M)
-     lp__ <- lp__ + log_sum_exp(gamma[m]);
+     increment_log_prob(log_sum_exp(gamma[m]));
 
    // to normalize s.t. gamma[m,k] = log Pr[Z2[m] = k|data]
    // gamma[m] <- gamma[m] - log_sum_exp(gamma[m]);

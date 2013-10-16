@@ -3,15 +3,27 @@
 #include <boost/random/mersenne_twister.hpp>
 #include<boost/math/distributions.hpp>
 
-TEST(ProbDistributionsScaledInvChiSquare, random) {
+TEST(ProbDistributionsScaledInvChiSquare, error_check) {
   boost::random::mt19937 rng;
   EXPECT_NO_THROW(stan::prob::scaled_inv_chi_square_rng(2.0,1.0,rng));
+
+  EXPECT_THROW(stan::prob::scaled_inv_chi_square_rng(-2.0,1.0,rng),
+               std::domain_error);
+  EXPECT_THROW(stan::prob::scaled_inv_chi_square_rng(2.0,-1.0,rng),
+               std::domain_error);
+  EXPECT_THROW(stan::prob::scaled_inv_chi_square_rng(stan::math::positive_infinity(),
+                                                     1.0,rng),
+               std::domain_error);
+  EXPECT_THROW(stan::prob::scaled_inv_chi_square_rng(2,
+                                                     stan::math::positive_infinity(),
+                                                     rng),
+               std::domain_error);
 }
 
 TEST(ProbDistributionsScaledInvChiSquare, chiSquareGoodnessFitTest) {
   boost::random::mt19937 rng;
   int N = 10000;
-  int K = 5;
+  double K = 5;
   boost::math::inverse_chi_squared_distribution<>dist (2.0);
   boost::math::chi_squared mydist(K-1);
 

@@ -9,6 +9,7 @@
 #include <stan/math/error_handling.hpp>
 #include <stan/math/functions/inv_logit.hpp>
 #include <stan/math/functions/log1m.hpp>
+#include <stan/math/functions/log1m_exp.hpp>
 #include <stan/math/functions/log1p_exp.hpp>
 #include <stan/math/matrix_error_handling.hpp>
 #include <stan/math/error_handling.hpp>
@@ -19,13 +20,12 @@ namespace stan {
 
   namespace prob {
 
-
     template <typename T>
     inline T log_inv_logit_diff(const T& alpha, const T& beta) {
       using std::exp;
-      using stan::math::log1m;
+      using stan::math::log1m_exp;
       using stan::math::log1p_exp;
-      return beta + log1m(exp(alpha - beta)) - log1p_exp(alpha) - log1p_exp(beta);
+      return beta + log1m_exp(alpha - beta) - log1p_exp(alpha) - log1p_exp(beta);
     }
  
     // y in 0,...,K-1;   c.size()==K-2,  c increasing,  lambda finite
@@ -136,14 +136,43 @@ namespace stan {
     template <class RNG>
     inline int
     ordered_logistic_rng(const double eta,
-       const Eigen::Matrix<double,Eigen::Dynamic,1>& c,
-       RNG& rng) {
+                         const Eigen::Matrix<double,Eigen::Dynamic,1>& c,
+                         RNG& rng) {
       using boost::variate_generator;
       using stan::math::inv_logit;
+
+      static const char* function = "stan::prob::ordered_logistic(%1%)";
+      
+      using stan::math::check_finite;
+      using stan::math::check_positive;
+      using stan::math::check_nonnegative;
+      using stan::math::check_less;
+      using stan::math::check_less_or_equal;
+      using stan::math::check_greater;
+      using stan::math::check_bounded;
+
+      if (!check_finite(function, eta, 
+                        "Location parameter"))
+        return 0;
+      if (!check_greater(function, c.size(), 0,
+                         "Size of cut points parameter"))
+        return 0;
+      for (int i = 1; i < c.size(); ++i) {
+        if (!check_greater(function, c(i), c(i - 1),
+                           "Cut points parameter"))
+          return 0;
+      }
+      if (!check_finite(function, c(c.size()-1), 
+                        "Cut points parameter"))
+        return 0;
+      if (!check_finite(function, c(0),
+                        "Cut points parameter")) 
+        return 0;
+
       Eigen::VectorXd cut(c.rows());
       cut(0) = 1 - inv_logit(eta - c(0));
       for(int j = 1; j < c.rows() - 1; j++)
-  cut(j) = inv_logit(eta - c(j - 1)) - inv_logit(eta - c(j));
+        cut(j) = inv_logit(eta - c(j - 1)) - inv_logit(eta - c(j));
       cut(c.rows() - 1) = inv_logit(eta - c(c.rows() - 2));
 
       return stan::prob::categorical_rng(cut, rng);

@@ -26,11 +26,9 @@ TEST(MathsConstants, nan) {
 
 TEST(MathsConstants, epsilon) {
   EXPECT_TRUE(stan::math::EPSILON > 0.0);
-  EXPECT_FLOAT_EQ(std::numeric_limits<double>::epsilon(), stan::math::EPSILON);
 }
 TEST(MathsConstants, negative_epsilon) {
   EXPECT_TRUE(stan::math::NEGATIVE_EPSILON < 0.0);
-  EXPECT_FLOAT_EQ(-std::numeric_limits<double>::epsilon(), stan::math::NEGATIVE_EPSILON);
 }
 
 TEST(MathsConstants, pi_fun) {
@@ -56,11 +54,16 @@ TEST(MathsConstants, neg_infty_fun) {
 TEST(MathsConstants, not_a_number_fun) {
   EXPECT_TRUE(std::isnan(stan::math::not_a_number()));
 }
-TEST(MathsConstants, epsilon_fun) {
+TEST(MathsConstants, machine_precision_fun) {
   EXPECT_FLOAT_EQ(std::numeric_limits<double>::epsilon(),
-                  stan::math::epsilon());
+                  stan::math::machine_precision());
 }
-TEST(MathsConstants, negative_epsilon_fun) {
-  EXPECT_FLOAT_EQ(-std::numeric_limits<double>::epsilon(),
-                  stan::math::negative_epsilon());
+TEST(MathsConstants, two_over_sqrt_pi) {
+  EXPECT_FLOAT_EQ(1.128379167,stan::math:: TWO_OVER_SQRT_PI);
+ }
+TEST(MathsConstants, neg_two_over_sqrt_pi){
+  EXPECT_FLOAT_EQ(-stan::math:: TWO_OVER_SQRT_PI, stan::math:: NEG_TWO_OVER_SQRT_PI);
+}
+TEST(MathsConstants, inv_sqrt_two_pi){
+  EXPECT_FLOAT_EQ(.39894228040,stan::math:: INV_SQRT_TWO_PI);
 }

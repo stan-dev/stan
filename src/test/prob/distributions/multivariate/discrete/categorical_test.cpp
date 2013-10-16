@@ -19,6 +19,21 @@ TEST(ProbDistributionsCategorical,Propto) {
   EXPECT_FLOAT_EQ(0.0, stan::prob::categorical_log<true>(2,theta));
 }
 
+TEST(ProbDistributionsCategorical,VectorInt) {
+  Matrix<double,Dynamic,1> theta(3,1);
+  theta << 0.3, 0.5, 0.2;
+  std::vector<int> xs0;
+  EXPECT_FLOAT_EQ(0.0, stan::prob::categorical_log(xs0,theta));
+
+  std::vector<int> xs(3);
+  xs[0] = 1;
+  xs[1] = 3;
+  xs[2] = 1;
+  
+  EXPECT_FLOAT_EQ(log(0.3) + log(0.2) + log(0.3),
+                  stan::prob::categorical_log(xs,theta));
+}
+
 using stan::prob::categorical_log;
 
 TEST(ProbDistributionsCategorical,DefaultPolicy) {
@@ -47,10 +62,39 @@ TEST(ProbDistributionsCategorical,DefaultPolicy) {
   theta(1) = 1;
   theta(2) = 0;
   EXPECT_THROW(categorical_log(n, theta), std::domain_error);
+
+  std::vector<int> ns(3);
+  ns[0] = 3;
+  ns[1] = 2;
+  ns[2] = 3;
+  EXPECT_THROW(categorical_log(ns,theta), std::domain_error);
+  
+  theta << 0.3, 0.5, 0.2;
+  EXPECT_NO_THROW(categorical_log(ns,theta));
+  ns[1] = -1;
+  EXPECT_THROW(categorical_log(ns,theta), std::domain_error);
+
+  ns[1] = 1;
+  ns[2] = 12;
+  EXPECT_THROW(categorical_log(ns,theta), std::domain_error);
+  
+  
 }
 
-TEST(ProbDistributionCategorical, chiSquareGoodnessFitTest) {
+TEST(ProbDistributionsCategorical, error_check) {
   boost::random::mt19937 rng;
+  
+  Matrix<double,Dynamic,Dynamic> theta(3,1);
+  theta << 0.15, 
+    0.45,
+    0.50;
+
+  EXPECT_THROW(stan::prob::categorical_rng(theta,rng),std::domain_error);
+}
+
+TEST(ProbDistributionsCategorical, chiSquareGoodnessFitTest) {
+  boost::random::mt19937 rng;
+
   int N = 10000;
   Matrix<double,Dynamic,Dynamic> theta(3,1);
   theta << 0.15, 
