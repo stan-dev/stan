@@ -109,14 +109,25 @@
 \newcommand{\reffigure}[1]{Figure~\ref{#1.figure}}
 \newcommand{\refnote}[1]{Footnote~\ref{#1.footnote}}
 
+
 \newcommand{\fitem}[4]{\item[\begin{minipage}{\textwidth}{\tt #1 {\bfseries #2}(#3)}\end{minipage}]\mbox{ }
  \\[-10pt] #4\index{{\tt\bfseries #2 }!{\tt (#3):\,#1}|hyperpage}}
 % need special command for items requiring escapes in index
 \newcommand{\fitemindex}[5]{\item[{\tt #1 {\bfseries #2}(#3)}]\mbox{ }
-  \\[-10pt] #4\index{{\tt\bfseries #5 }!{\tt (#3):\,#1}|hyperpage}}
+  \\[2pt] #4\index{{\tt\bfseries #5 }!{\tt (#3):\,#1}|hyperpage}}
 \newcommand{\fitemindexsort}[6]{\item[{\tt #1 {\bfseries #2}(#3)}]\mbox{ }
-  \\[-10pt] #4\index{{\tt\bfseries #6 }@{\tt\bfseries #5 }!{\tt (#3):\,#1}|hyperpage}}
+  \\[2pt] #4\index{{\tt\bfseries #6 }@{\tt\bfseries #5 }!{\tt (#3):\,#1}|hyperpage}}
 \newcommand{\farg}[1]{{\tt\slshape #1}}
+
+\newcommand{\pitem}[3]{\subsubsection{Sampling Statement}
+\begin{description}
+\item {\tt \farg{#1} \textasciitilde\ {\bfseries #2}(\farg{#3});}
+  \\
+  Increment log probability with {\tt #2\_log(\farg{#1},\farg{#3})},
+  dropping constant additive terms; \refsection{sampling-statements}
+  explains sampling statements.%
+\index{{\tt\bfseries #2 }!sampling statement|hyperpage}
+\end{description}}
 
 \newcommand{\indentarrow}{ \rotatebox[origin=c]{180}{\ensuremath{\Lsh}} }
 
