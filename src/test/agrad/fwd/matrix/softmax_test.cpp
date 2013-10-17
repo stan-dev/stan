@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <stan/agrad/fvar.hpp>
+#include <stan/agrad/fwd/matrix/softmax.hpp>
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <stan/agrad/var.hpp>
 #include <test/agrad/util.hpp>
@@ -15,9 +16,9 @@ TEST(AgradFwdMatrixSoftmax,fd) {
   
   Matrix<fvar<double>,Dynamic,1> x(1);
   x << 0.0;
-   x(0).d_ = 1.0;
+  x(0).d_ = 1.0;
   
-  Matrix<fvar<double>,Dynamic,1> theta = softmax(x);
+  Matrix<fvar<double>,Dynamic,1> theta = stan::agrad::softmax(x);
   EXPECT_EQ(1,theta.size());
   EXPECT_FLOAT_EQ(1.0,theta[0].val_);
   EXPECT_FLOAT_EQ(0.0,theta[0].d_);

@@ -47,8 +47,7 @@ transformed data {
   transformed_data_real <- not_a_number();
   transformed_data_real <- positive_infinity();
   transformed_data_real <- negative_infinity();
-  transformed_data_real <- epsilon();
-  transformed_data_real <- negative_epsilon();
+  transformed_data_real <- machine_precision();
 
   // logical functions
   transformed_data_real <- if_else(d_int, d_real, d_real);
@@ -134,6 +133,8 @@ transformed data {
   transformed_data_real <- lgamma(d_real);
   transformed_data_real <- digamma(d_real);
   transformed_data_real <- trigamma(d_real);
+  transformed_data_real <- gamma_p(d_real, d_real);
+  transformed_data_real <- gamma_q(d_real, d_real);
   transformed_data_real <- lmgamma(d_int, d_real);
   transformed_data_real <- lbeta(d_real, d_real);
   transformed_data_real <- binomial_coefficient_log(d_real, d_real);
@@ -366,8 +367,7 @@ transformed parameters {
   transformed_param_real <- not_a_number();
   transformed_param_real <- positive_infinity();
   transformed_param_real <- negative_infinity();
-  transformed_param_real <- epsilon();
-  transformed_param_real <- negative_epsilon();
+  transformed_param_real <- machine_precision();
 
   // logical functions
   transformed_param_real <- if_else(d_int, d_real, d_real);
@@ -536,6 +536,14 @@ transformed parameters {
   transformed_param_real <- digamma(p_real);
   transformed_param_real <- trigamma(d_real);
   transformed_param_real <- trigamma(p_real);
+  transformed_param_real <- gamma_p(d_real, d_real);
+  transformed_param_real <- gamma_p(p_real, d_real);
+  transformed_param_real <- gamma_p(d_real, p_real);
+  transformed_param_real <- gamma_p(p_real, p_real);
+  transformed_param_real <- gamma_q(d_real, d_real);
+  transformed_param_real <- gamma_q(p_real, d_real);
+  transformed_param_real <- gamma_q(d_real, p_real);
+  transformed_param_real <- gamma_q(p_real, p_real);
   transformed_param_real <- lmgamma(d_int, d_real);
   transformed_param_real <- lmgamma(d_int, p_real);
   transformed_param_real <- lbeta(d_real, d_real);

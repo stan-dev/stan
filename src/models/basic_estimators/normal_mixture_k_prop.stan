@@ -16,8 +16,6 @@ transformed parameters {
 }
 model {
   // prior
-  // theta ~ dirichlet(rep_vector(1,K));
-  // mu_prop ~ dirichlet(rep_vector(1,K));
   mu_loc ~ cauchy(0,5);               
   mu_scale ~ cauchy(0,5);
   sigma ~ cauchy(0,5);
@@ -33,7 +31,7 @@ model {
         ps[k] <- log_theta[k]
                  + normal_log(y[n],mu[k],sigma[k]);
       }
-      lp__ <- lp__ + log_sum_exp(ps);    
+      increment_log_prob(log_sum_exp(ps));    
     }
   }
 }

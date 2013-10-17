@@ -24,18 +24,18 @@ namespace stan {
         trace_gen_quad_form_vari_alloc(const Eigen::Matrix<TD,RD,CD> &D,
                                        const Eigen::Matrix<TA,RA,CA> &A,
                                        const Eigen::Matrix<TB,RB,CB> &B)
-        : _D(D), _A(A), _B(B)
+        : D_(D), A_(A), B_(B)
         { }
         
         double compute() {
-          return stan::math::trace_gen_quad_form(value_of(_D),
-                                                 value_of(_A),
-                                                 value_of(_B));
+          return stan::math::trace_gen_quad_form(value_of(D_),
+                                                 value_of(A_),
+                                                 value_of(B_));
         }
         
-        Eigen::Matrix<TD,RD,CD>  _D;
-        Eigen::Matrix<TA,RA,CA>  _A;
-        Eigen::Matrix<TB,RB,CB>  _B;
+        Eigen::Matrix<TD,RD,CD>  D_;
+        Eigen::Matrix<TA,RA,CA>  A_;
+        Eigen::Matrix<TB,RB,CB>  B_;
       };
       
       template<typename TD,int RD,int CD,
@@ -60,21 +60,21 @@ namespace stan {
           
           if (varB) {
             Eigen::Matrix<double,RB,CB> adjB(adj*(A*BD + AtB*D.transpose()));
-            size_t i,j;
+            int i,j;
             for (j = 0; j < B.cols(); j++)
               for (i = 0; i < B.rows(); i++)
                 (*varB)(i,j).vi_->adj_ += adjB(i,j);
           }
           if (varA) {
             Eigen::Matrix<double,RA,CA> adjA(adj*(B*BD.transpose()));
-            size_t i,j;
+            int i,j;
             for (j = 0; j < A.cols(); j++)
               for (i = 0; i < A.rows(); i++)
                 (*varA)(i,j).vi_->adj_ += adjA(i,j);
           }
           if (varD) {
             Eigen::Matrix<double,RD,CD> adjD(adj*(B.transpose()*AtB));
-            size_t i,j;
+            int i,j;
             for (j = 0; j < D.cols(); j++)
               for (i = 0; i < D.rows(); i++)
                 (*varD)(i,j).vi_->adj_ += adjD(i,j);
@@ -88,12 +88,12 @@ namespace stan {
         
         virtual void chain() {
           computeAdjoints(adj_,
-                          value_of(_impl->_D),
-                          value_of(_impl->_A),
-                          value_of(_impl->_B),
-                          (Eigen::Matrix<var,RD,CD>*)(boost::is_same<TD,var>::value?(&_impl->_D):NULL),
-                          (Eigen::Matrix<var,RA,CA>*)(boost::is_same<TA,var>::value?(&_impl->_A):NULL),
-                          (Eigen::Matrix<var,RB,CB>*)(boost::is_same<TB,var>::value?(&_impl->_B):NULL));
+                          value_of(_impl->D_),
+                          value_of(_impl->A_),
+                          value_of(_impl->B_),
+                          (Eigen::Matrix<var,RD,CD>*)(boost::is_same<TD,var>::value?(&_impl->D_):NULL),
+                          (Eigen::Matrix<var,RA,CA>*)(boost::is_same<TA,var>::value?(&_impl->A_):NULL),
+                          (Eigen::Matrix<var,RB,CB>*)(boost::is_same<TB,var>::value?(&_impl->B_):NULL));
         }
         
         trace_gen_quad_form_vari_alloc<TD,RD,CD,TA,RA,CA,TB,RB,CB> *_impl;

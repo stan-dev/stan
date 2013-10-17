@@ -1,14 +1,217 @@
 \part{Programming Techniques}\label{programming-techniques.part}
 
 
-\chapter{Print Statements and Debugging}
+\chapter{Model Building as Software Development}
 
 \noindent
-Before getting into specific statistical programming techniques
-in the following chapters, this chapter is dedicated to comments
-and print statements.
+Developing a Stan model is a software development process.  Developing
+software is hard.  Very hard.  So many things can go wrong because
+there are so many moving parts and combinations of parts.  
 
-\section{Comments}
+Software development practices are designed to mitigate the problems
+caused by the inherent complexity of software development.
+Unfortunately, many methodologies veer off into dogma, bean counting,
+or both.  A couple we can recommend that provide solid, practical
+advice for developers are \citep{HuntThomas:99} and
+\citep{McConnell:2004}.  This section tries to summarize some of their
+advice.
+
+\section{Use Version Control}
+
+Version control software, such as Subversion or Git, should be in
+place before starting to code.%
+%
+\footnote{Stan started using Subversion (SVN), then switched to the
+  much more feature-rich Git package.  Git does everything SVN does
+  and a whole lot more.  The price is a steeper learning curve.  For
+  individual or very-small-team development, SVN is just fine.}
+%
+It may seem like a big investment to learn version control, but it's
+well worth it to be able to type a single command to revert to a
+previously working version or to get the difference between the
+current version and an old version.  It's even better when you need
+to share work with others, even on a paper.
+
+
+\section{Make it Reproducible}
+
+Rather than entering commands on the command-line when running models
+(or entering commands directly into an interactive programming
+language like R or Python), try writing scripts to run the data
+through the models and produce whatever posterior analysis you need.
+Scripts can be written for the shell, R, or Python.  Whatever language
+a script is in, it should be self contained and not depend on global
+variables having been set, other data being read in, etc.  
+
+\subsection{Scripts are Good Documentation}
+
+It may seem like overkill if running the project is only a single line
+of code, but the script provides not only a way to run the code, but
+also a form of concrete documentation for what is run. 
+
+
+\subsection{Randomization and Saving Seeds}
+
+Randomness defeats reproducibility.  MCMC methods are conceptually
+randomized.  Stan's samplers involve random initializations as well as
+randomization during each iteration (e.g., Hamiltonian Monte Carlo
+generates a random momentum in each iteration).
+
+Computers are deterministic.  There is no real randomness, just
+pseudo-random number generators.  These operate by generating a
+sequence of random numbers based on a ``seed.''  Stan (and other
+languages like R) can use time-based methods to generate a seed based
+on the time and date, or seeds can be provided to Stan (or R) in the
+form of long integers.  Stan writes out the seed used to generate the
+data as well as the version number of the Stan software so that
+results can be reproduced at a later date.%
+%
+\footnote{This also requires fixing compilers and hardware, because
+  floating-point arithmetic does not have an absolutely fixed behavior
+  across platforms or compilers, just operating parameters.}
+
+
+
+\section{Make it Readable}
+
+Treating programs and scripts like other forms of writing for an
+audience provides an important perspective on how the code will be
+used.  Not only might others want to read a program or model, the
+developer will want to read it later.  One of the motivations of
+Stan's design was to make models self-documenting in terms of variable
+usage (e.g., data versus parameter), types (e.g., covariance matrix
+vs. unconstrained matrix) and sizes.  
+
+A large part of readability is consistency.  Particularly in naming
+and layout.  Not only of programs themselves, but the directories and
+files in which they're stored.
+
+Readability of code is not just about comments (see
+Section~\refsection{comments-programming} for commenting
+recommendations and syntax in Stan).
+
+It is surprising how often the solution to a debugging or design
+problem occurs when trying to explain enough about the problem to
+someone else to get help.  This can be on a mailing list, but it works
+best person-to-person.  Finding the solution to your own problem when
+explaining it to someone else happens so frquently in software
+development that the listener is called a ``rubber ducky,'' because
+they only have to nod along.%
+%
+\footnote{Research has shown an actual rubber ducky won't work.  For
+  some reason, the rubber ducky must actually be capable of
+  understanding the explanation.}
+
+
+\section{Explore the Data}
+
+Although this should go without saying, don't just fit data blindly.
+Look at the data you actually have to understand its properties.  If
+you're doing a logistic regression, is it separable?  If you're
+building a multilevel model, do the basic outcomes vary by level?  If
+you're fitting a linear regression, see whether such a model makes
+sense by scatterplotting $x$ vs. $y$.
+
+\section{Design Top-Down, Code Bottom-Up}
+
+Software projects are almost always designed top-down from one or more
+intended use cases.  Good software coding, on the other hand, is
+typically done bottom-up.  
+
+The motivation for top-down design is obvious.  The motivation for
+bottom-up development is that it is much easier to develop software
+using components that have been thoroughly tested.  Although Stan has
+no built-in support for either modularity or testing, many of the same
+principles apply.  
+
+The way the developers of Stan themselves build models is to start as
+simply as possibly, then build up. This is true even if we have a
+complicated model in mind as the end goal, and even if we have a very
+good idea of the model we eventually want to fit.  Rather than
+building a hierarchical model with multiple interactions, covariance
+priors, or other complicated structure, start simple.  Build just a
+simple regression with fixed (and fairly tight) priors.  Then add
+interactions or additional levels.  One at a time.  Make sure that
+these do the right thing.  Then expand.
+
+\section{Fit Simulated Data}
+
+One of the best ways to make sure your model is doing the right thing
+computationally is to generate simulated (i.e., ``fake'') data with
+known parameter values, then see if the model can recover these
+parameters from the data.  If not, there is very little hope that it
+will do the right thing with data from the wild.  
+
+There are fancier ways to do this, where you can do things like run
+$\chi^2$ tests on marginal statistics or follow the paradigm
+introduced in \citep{CookGelmanRubin:2006}, which involves interval
+tests.  
+
+\section{Debug by Print}
+
+Although Stan does not have a stepwise debugger or any unit testing
+framework in place, it does support the time-honored tradition of
+debug-by-printf.
+%
+\footnote{The ``f'' is not a typo --- it's a historical artifact of
+  the name of the \code{printf} function used for formatted printing
+  in C.} 
+
+Stan supports print statements with one or more string or expression
+arguments.  Because Stan is an imperative language, variables can have
+different values at different points in the execution of a program.
+Print statements can be invaluable for debugging, especially for a
+language like Stan with no stepwise debugger.
+
+For instance, to print the value of variables \code{y} and
+\code{z}, use the following statement.
+%
+\begin{quote}
+\begin{Verbatim}[fontsize=\small]
+print("y=", y, " z=", z);
+\end{Verbatim}
+\end{quote}
+%
+This print statement prints the string ``y='' followed by the value of
+\code{y}, followed by the string `` z=''
+(with the leading space), followed by the value of the variable
+\code{z}.
+
+Each print statement is followed by a new line.  The specific ASCII
+character(s) generated to create a new line are platform specific.
+
+Arbitrary expressions can be used.  For example, the statement
+\begin{quote}
+\begin{Verbatim}[fontsize=\small]
+print("1+1=", 1+1);
+\end{Verbatim}
+\end{quote}
+%
+will print ``1 + 1 = 2'' followed by a new line.
+
+Print statements may be used anywhere other statements may be used,
+but their behavior in terms of frequency depends on how often the
+block they are in is evaluated.  See \refsection{print-statements} for
+more information on the syntax and evaluation of print statements.
+
+
+
+\section{Comments}\label{comments-programming.section}
+
+\subsection{Code Never Lies}
+
+The machine does what the code says, not what the documentation says.
+Docuementation, on the other hand, might not match the code.  Code
+documentation easily rots as the code evolves if the documentation is
+not well maintained.  
+
+Thus it is always preferable to write readable code as opposed to
+documenting unreadable code.  Every time you write a piece of
+documentation, ask yourself if there's a way to write the code in such
+a way as to make the documentation unnecessary.
+
+
+\subsection{Comment Styles in Stan}
 
 Stan supports \Cpp-style comments; see \refsection{comments} for full
 details.  The recommended style is to use line-based comments for
@@ -26,7 +229,7 @@ obvious.  For instance, there is no need to have comments
 such as the following, which add nothing to the code.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 y ~ normal(0,1);  // y has a unit normal distribution
 \end{Verbatim}
 \end{quote}
@@ -35,9 +238,10 @@ A Jacobian adjustment for a hand-coded transform might be worth
 commenting, as in the following example.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 exp(y) ~ normal(0,1);
-lp__ <- lp__ + y;  // log Jacobian of exp(y) inverse transform
+// adjust for change of vars: y = log | d/dy exp(y) |
+increment_log_prob(y);
 \end{Verbatim}
 \end{quote}
 %
@@ -52,7 +256,7 @@ example, some data variable declarations in an item-response model
 might be usefully commented as follows.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 int<lower=1> N;   // number of observations
 int<lower=1> I;   // number of students
 int<lower=1> J;   // number of test questions
@@ -62,14 +266,14 @@ int<lower=1> J;   // number of test questions
 The alternative is to use longer names that do not require comments.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 int<lower=1> n_obs;
 int<lower=1> n_students;
 int<lower=1> n_questions;
 \end{Verbatim}
 \end{quote}
 %
-Both styles reasonable and which one to adopt is mostly a matter of
+Both styles are reasonable and which one to adopt is mostly a matter of
 taste (mostly because sometimes models come with their own naming
 conventions which should be followed so as not to confuse readers of
 the code familiar with the statistical conventions).
@@ -80,7 +284,7 @@ information, and so on.  The following bracketed comment is an
 example of a conventional style for large comment blocks.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 /*
  * Item-Response Theory PL3 Model
  * -----------------------------------------------------
@@ -100,44 +304,192 @@ information in comments is that they can easily get out of synch with
 the reality of the code.  A misleading comment or one that is wrong is
 worse than no comment at all!
 
-\section{Print Statements}
 
-Stan supports print statements with one or more string or expression
-arguments.  Because Stan is an imperative language, variables can have
-different values at different points in the execution of a program.
-Print statements can be invaluable for debugging, especially for a
-language like Stan with no stepwise debugger.
+\chapter{Containers: Arrays, Vectors, and Matrices}
 
-For instance, to print the value of the expression \code{y} along with
-the log probability accumulator, use the following statement.
+\noindent
+Stan provides three types of container objects: arrays, vectors, and
+matrices.  The three types are not interchangeable.  Vectors, matrices,
+and arrays are not assignable to one another, even if their dimensions
+are identical.  A $3 \times 4$ matrix is a different kind of object in
+Stan than a $3 \times 4$ array. 
+
+\section{Vectors and Matrices}
+
+Vectors and matrices are more limited kinds of data structures than
+arrays.  Vectors are intrinsically one-dimensional collections of
+reals, whereas matrices are intrinsically two dimensional. 
+
+The intention of using matrix types is to call out their usage in the
+code.  There are three situations in Stan where {\it only} vectors and
+matrices may be used,
+%
+\begin{itemize}
+\item matrix arithmetic operations (e.g., matrix multiplication)
+\item linear algebra functions (e.g., eigenvalues and determinants),
+  and
+\item multivariate function parameters and outcomes (e.g.,
+  multivariate normal distribution arguments).
+\end{itemize}
+%
+
+Vectors and matrices cannot be typed to return integer values.  They
+are restricted to \code{real} values.%
+%
+\footnote{This may change if Stan is called upon to do complicated
+  integer matrix operations or boolean matrix operations.  Integers
+  are not appropriate inputs for linear algebra functions.}
+
+\section{Arrays}
+
+Arrays, on the other hand, are intrinsically one-dimensional
+collections of other kinds of objects.  The values in an array can be
+any type, so that arrays may contain values that are simple reals or
+integers, vectors, matrices, or other arrays.  Arrays are the only way
+to store sequences of integers, and some functions in Stan, such as
+discrete distributions, require integer arguments. 
+
+
+A two-dimensional array is just an array of arrays, both conceptually
+and in terms of current implementation.  When an index is supplied to
+an array, it returns the value at that index.  When more than one
+index is supplied, this idexing operation is chained.  For example, if
+\code{a} is a two-dimensional array, then \code{a[m,n]} is just
+a convenient shorthand for \code{a[m][n]}.
+
+
+\section{Efficiency Considerations}
+
+One of the motivations for Stan's underlying design is efficiency.
+
+The underlying matrix and linear algebra operations are implemented in
+terms of data types from the Eigen \Cpp library.  By having vectors
+and matrices as basic types, no conversion is necessary when invoking
+matrix operations or calling linear algebra functions.  
+
+Arrays, on the other hand, are implemented as instances of the \Cpp \ 
+\code{std::vector} class (not to be confused with Eigen's
+\code{Eigen::Vector} class or Stan vectors).  By implementing arrays
+this way, indexing is very efficient because values can be returned by
+reference rather than copied by value.
+
+\subsection{Matrices vs.\ Two-Dimensional Arrays}
+
+In Stan models, there are a few minor efficiency considerations in
+deciding between a two-dimensional array and a matrix, which may seem
+interchangeable at first glance.  
+
+First, matrices use a bit less memory than two-dimensional arrays.
+This is because they don't store a sequence of arrays, but just the
+data and the two dimensions.  
+
+Second, matrices store their data in row-major order.  Furthermore,
+all of the data in a matrix is guaranteed to be contiguous in memory.
+This is an important consideration for optimized code because bringing
+in data from memory to cache is much more expensive than performing
+arithmetic operations with contemporary CPUs.  Arrays, on the other
+hand, only guarantee that the values of primitive types are contiguous
+in memory; otherwise, they hold copies of their values (which are
+returned by reference wherever possible).
+
+Third, both data structures are best traversed in the order in which
+they are stored.  This also helps with memory locality.  This is
+column-major for matrices, so the following order is appropriate.
 %
 \begin{quote}
 \begin{Verbatim}
-print("y=", y, " log probability=", lp__);
+matrix[M,N] a;
+...
+for (n in 1:N)
+  for (m in 1:M)
+    ... do something with a[m,n] ...
 \end{Verbatim}
 \end{quote}
 %
-This print statement prints the string ``y='' followed by the value of
-the expression \code{y}, followed by the string `` log probability=''
-(with the leading space), followed by the value of the variable
-\Verb|lp__|. 
-
-Each print statement is followed by a new line.  The specific ASCII
-character(s) generated to create a new line are platform specific.
-
-Arbitrary expressions can be used.  For example, the statement
+Arrays, on the other hand, should be traversed in row-major order.
+%
 \begin{quote}
 \begin{Verbatim}
-print("1+1=", 1+1);
+real a[M,N];
+...
+for (m in 1:M)
+  for (n in 1:N)
+    ... do something with a[m,n] ...
 \end{Verbatim}
 \end{quote}
 %
-will print ``1 + 1 = 2'' followed by a new line.
+The first use of \code{a[m,n]} should bring \code{a[m]} into memory.
+Overall, traversing matrices is more efficient than traversing arrays.
 
-Print statements may be used anywhere other statements may be used,
-but their behavior in terms of frequency depends on how often the
-block they are in is evaluated.  See \refsection{print-statements} for
-more information on the syntax and evaluation of print statements.
+If \code{a} is a matrix, the notation \code{a[m]} picks out row
+\code{m} of that matrix.  This is a rather inefficient operation for
+matrices.  If indexing of vectors is needed, it is much better to
+declare an array of vectors.  That is, this
+%
+\begin{quote}
+\begin{Verbatim}
+row_vector[N] b[M];
+...
+for (m in 1:M)
+   ... do something with row vector b[m] ...
+\end{Verbatim}
+\end{quote}
+%
+is much more efficient than the pure matrix version
+%
+\begin{quote}
+\begin{Verbatim}
+matrix b[M,N];
+...
+for (m in 1:M)
+   ... do something with row vector b[m] ...
+\end{Verbatim}
+\end{quote}
+%
+Similarly, indexing an array of column vectors is more efficient than
+using the \code{col} function to pick out a column of a matrix.
+
+In contrast, whatever can be done as pure matrix algebra will be the
+fastest.  So if I want to create a row of predictor-coefficient
+dot-products, it's more efficient to do this
+%
+\begin{quote}
+\begin{Verbatim}
+matrix[N,K] x;    // predictors (aka covariates)
+...
+vector[K] beta;   // coeffs
+...
+vector[N] y_hat;  // linear prediction
+...
+y_hat <- x * beta;
+\end{Verbatim}
+\end{quote}
+%
+than it is to do this
+%
+\begin{quote}
+\begin{Verbatim}
+row_vector[K] x[N];    // predictors (aka covariates)
+...
+vector[K] beta;   // coeffs
+...
+vector[N] y_hat;  // linear prediction
+...
+for (n in 1:N)
+  y_hat[n] <- x[n] * beta;
+\end{Verbatim}
+\end{quote}
+
+\subsection{(Row) Vectors vs. One-Dimensional Arrays}
+
+For use purely as a container, there is really nothing to decide among
+vectors, row vectors and one-dimensional arrays.  The
+\code{Eigen::Vector} template specialization and the
+\code{std::vector} template class are implemented very similarly as
+containers of \code{double} values (the type \code{real} in Stan).
+Only arrays in Stan are allowed to store integer values.
+
+
 
 
 \chapter{Missing Data \& Partially Known Parameters}
@@ -167,7 +519,7 @@ missing normal observations%
 could be coded as follows.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 data {
   int<lower=0> N_obs;
   int<lower=0> N_miss;
@@ -196,7 +548,7 @@ ordinary parameters being estimated, the location \code{mu} and scale
 model would be to vectorize, so the body would be
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
    y_obs ~ normal(mu,sigma);
    y_miss ~ normal(mu,sigma);
 \end{Verbatim}
@@ -220,14 +572,15 @@ The following example involves a bivariate covariance matrix in which the
 variances are known, but the covariance is not.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 data {
   int<lower=0> N;
   vector[2] y[N];
   real<lower=0> var1;     real<lower=0> var2;
 }
 transformed data {
-  real<lower=0> max_cov;  real<lower=0> min_cov;   
+  real<upper=0> min_cov;   
+  real<lower=0> max_cov;  
   max_cov <- sqrt(var1 * var2);  
   min_cov <- -max_cov;
 }
@@ -276,7 +629,15 @@ extra time.
 
 \noindent
 Data in which measurements have been truncated or censored can be
-coded in \Stan following their respective probability models.
+coded in Stan following their respective probability models.
+
+\section{Truncated Distributions}
+
+Truncation in Stan is restricted to univariate distributions for which
+the corresponding log cumulative distribution function (cdf) and log
+completmentary cumulative distribution (ccdf) functions are
+available.  See \refsection{truncated-distributions} for more
+information on truncated distributions, cdfs, and ccdfs.
 
 \section{Truncated Data}
 
@@ -291,19 +652,19 @@ data can be modeled as following a truncated normal distribution for
 the observations as follows. 
 %
 \begin{quote}
-\begin{Verbatim} 
+\begin{Verbatim}[fontsize=\small]
 data {
-   int<lower=0> N;
-   real U;
-   real<upper=U> y[N];
+  int<lower=0> N;
+  real U;
+  real<upper=U> y[N];
 } 
 parameters {
-   real mu;
-   real<lower=0> sigma;
+  real mu;
+  real<lower=0> sigma;
 } 
 model {
   for (n in 1:N)
-       y[n] ~ normal(mu,sigma) T[,U];
+    y[n] ~ normal(mu,sigma) T[,U];
 }
 \end{Verbatim}
 \end{quote}
@@ -324,9 +685,9 @@ will evaluate to $-\infty$.  For instance, if variate \code{y} is
 sampled with the statement.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 for (n in 1:N) 
-    y[n] ~ normal(mu,sigma) T[L,U];
+  y[n] ~ normal(mu,sigma) T[L,U];
 \end{Verbatim}
 \end{quote}
 %
@@ -340,10 +701,10 @@ the above model, the declaration should constrain it to fall between
 the values of \code{L} and \code{U}.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 parameters {
-    real<lower=L,upper=U> y[N];
-    ...
+  real<lower=L,upper=U> y[N];
+  ...
 \end{Verbatim}
 \end{quote}
 
@@ -356,10 +717,10 @@ the sampler break down).  The following declarations ensure the bounds
 are well behaved.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 parameters {
-    real<upper=min(y)> L; // L < y[n]
-    real<lower=fmax(L,max(y))> U; // L < U; y[n] < U
+  real<upper=min(y)> L; // L < y[n]
+  real<lower=fmax(L,max(y))> U; // L < U; y[n] < U
 \end{Verbatim}
 \end{quote}
 %
@@ -380,22 +741,22 @@ variable declarations from the model in the previous section with
 known truncation points.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 data {
-   int<lower=1> N;
-   real y[N];
+  int<lower=1> N;
+  real y[N];
 }
-parameters
-   real<upper = min(y)> L; 
-   real<lower = max(y)> U;
-   real mu;
-   real<lower=0> sigma;
+parameters {
+  real<upper = min(y)> L; 
+  real<lower = max(y)> U;
+  real mu;
+  real<lower=0> sigma;
 }
 model {
   L ~ ...;  
   U ~ ...;
   for (n in 1:N)
-       y[n] ~ normal(mu,sigma) T[L,U];
+    y[n] ~ normal(mu,sigma) T[L,U];
 }
 \end{Verbatim}
 \end{quote}
@@ -430,12 +791,12 @@ values.  Because \Stan does not allow unknown values in its arrays or
 matrices, the censored values must be represented explicitly.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 data {
-   int<lower=0> N_obs;
-   int<lower=0> N_cens;
-   real<lower=0> y_obs[N_obs];
-   real<lower=max(y_obs)> U;
+  int<lower=0> N_obs;
+  int<lower=0> N_cens;
+  real<lower=0> y_obs[N_obs];
+  real<lower=max(y_obs)> U;
 }
 parameters {
   real<lower=U> y_cens[N_cens];
@@ -443,10 +804,10 @@ parameters {
   real<lower=0> sigma;
 }
 model {
-   for (n in 1:N_obs)
-       y_obs[n] ~ normal(mu,sigma);
-   for (n in 1:N_cens)
-       y_cens[n] ~ normal(mu,sigma);
+  for (n in 1:N_obs)
+    y_obs[n] ~ normal(mu,sigma);
+  for (n in 1:N_cens)
+    y_cens[n] ~ normal(mu,sigma);
 }
 \end{Verbatim}
 \end{quote}
@@ -492,31 +853,30 @@ The following model assumes
 that the censoring point is known, so it is declared as data.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 data {
-   int<lower=0> N_obs;
-   int<lower=0> N_cens;
-   real<lower=0> y_obs[N_obs];
-   real<lower=max(y_obs)> U;
+  int<lower=0> N_obs;
+  int<lower=0> N_cens;
+  real<lower=0> y_obs[N_obs];
+  real<lower=max(y_obs)> U;
 }
 parameters {
   real mu;
   real<lower=0> sigma;
 }
 model {
-   for (n in 1:N_obs)
-       y_obs[n] ~ normal(mu,sigma); 
-   lp__ <- lp__ + N_cens * log1m(normal_cdf(U,mu,sigma));
+  for (n in 1:N_obs)
+    y_obs[n] ~ normal(mu,sigma); 
+  increment_log_prob(N_cens * log1m(normal_cdf(U,mu,sigma)));
 }
 \end{Verbatim}
 \end{quote}
 %
 For the observed values in \Verb|y_obs|, the normal sampling model is
-used without truncation.  The log probability accumulator
-\Verb|lp__| is directly incremented using the calculated log
-cumulative normal probability of the censored data items.  The
-built-in function \code{log1m} is used, which maps $x$ to $\log (1 -
-x)$ in an arithmetically stable way for values of $x$ near zero.
+used without truncation.  The log probability is directly incremented
+using the calculated log cumulative normal probability of the censored
+data items.  The built-in function \code{log1m} is used, which maps
+$x$ to $\log (1 - x)$ in an arithmetically stable way.
 
 To deal with situations where the censoring point variable \code{U} is
 unknown, the declaration of \code{U} should be moved from the data
@@ -578,13 +938,15 @@ $\code{Normal}(3,1)$ with mixing proportion $\theta =
 (0.3,0.7)^{\top}$ can be implemented in \Stan as follows.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 parameters {
   real y;
 }
 model {
-   lp__ <- log_sum_exp(log(0.3) + normal_log(y,-1,2),
-                       log(0.7) + normal_log(y,3,1));
+  increment_log_prob(log_sum_exp(log(0.3) 
+                                   + normal_log(y,-1,2),
+                                 log(0.7) 
+                                   + normal_log(y,3,1));
 }
 \end{Verbatim}
 \end{quote}
@@ -618,7 +980,7 @@ components are unknown.  Further generalizing to a number of mixture
 components specified as data yields the following model.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 data {
   int<lower=1> K;          // number of mixture components
   int<lower=1> N;          // number of data points
@@ -639,7 +1001,7 @@ model {
       ps[k] <- log(theta[k]) 
                + normal_log(y[n],mu[k],sigma[k]);
     }
-    lp__ <- lp__ + log_sum_exp(ps);    
+    increment_log_prob(log_sum_exp(ps));
   }
 }
 \end{Verbatim}
@@ -702,20 +1064,20 @@ Y_n \sim \distro{Normal}(\alpha + \beta X_n, \, \sigma).
 This latter form of the model is coded in \Stan as follows.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 data {
-   int<lower=0> N;
-   vector[N] x;
-   vector[N] y;
+  int<lower=0> N;
+  vector[N] x;
+  vector[N] y;
 }
 parameters {
-    real alpha;
-    real beta;
-    real<lower=0> sigma;
+  real alpha;
+  real beta;
+  real<lower=0> sigma;
 }
 model {
-    for (n in 1:N)
-        y[n] ~ normal(alpha + beta * x[n], sigma);
+  for (n in 1:N)
+    y[n] ~ normal(alpha + beta * x[n], sigma);
 }
 \end{Verbatim}
 \end{quote}
@@ -732,9 +1094,9 @@ There are several ways in which this model can be generalized.
 For example, weak priors can be assigned to the coefficients as follows.
 %
 \begin{quote}
-\begin{Verbatim}
-    alpha ~ normal(0,100);
-    beta ~ normal(0,100);
+\begin{Verbatim}[fontsize=\small]
+alpha ~ normal(0,100);
+beta ~ normal(0,100);
 \end{Verbatim}
 \end{quote}
 %
@@ -742,7 +1104,7 @@ And an upper bound to \code{sigma} can be given in order to implicitly
 give it a uniform prior.
 \begin{quote}
 \begin{verbatim}
-    real<lower=0,upper=100> sigma;
+real<lower=0,upper=100> sigma;
 \end{verbatim}
 \end{quote}
 
@@ -751,10 +1113,10 @@ More informative priors based the (half) Cauchy distribution are coded
 as follows.
 %
 \begin{quote}
-\begin{Verbatim}
-    alpha ~ cauchy(0,2.5);
-    beta ~ cauchy(0,2.5);
-    sigma ~ cauchy(0,2.5);
+\begin{Verbatim}[fontsize=\small]
+alpha ~ cauchy(0,2.5);
+beta ~ cauchy(0,2.5);
+sigma ~ cauchy(0,2.5);
 \end{Verbatim}
 \end{quote}
 %
@@ -782,7 +1144,7 @@ the noise term a Student-$t$ distribution.  To code this in \Stan, the
 sampling distribution is changed to the following.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 data {
   ...
   real<lower=0> nu;
@@ -810,7 +1172,7 @@ A logistic regression model with one predictor and an intercept is coded as
 follows.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 data {
   int<lower=0> N;
   real x[N];
@@ -847,7 +1209,7 @@ may be coded in \Stan by replacing the logistic model's sampling
 statement with the following.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
         y[n] ~ bernoulli(Phi(alpha + beta * x[n]));
 \end{Verbatim}
 \end{quote}
@@ -857,7 +1219,7 @@ $\Phi$ is implemented in \Stan as the function \code{Phi\_approx}.  The
 approximate probit regression model may be coded with the following.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
         y[n] ~ bernoulli(Phi_approx(alpha + beta * x[n]));
 \end{Verbatim}
 \end{quote}
@@ -871,23 +1233,23 @@ vector $x_n$ of predictors for $y_n$.  The multi-logit model with
 $\distro{Normal}(0,5)$ priors on the coefficients is coded as follows.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 data {
-   int<lower=2> K;
-   int<lower=0> N;
-   int<lower=1> D;
-   int<lower=1,upper=K> y[N];
-   vector[D] x[N];
+  int<lower=2> K;
+  int<lower=0> N;
+  int<lower=1> D;
+  int<lower=1,upper=K> y[N];
+  vector[D] x[N];
 }
 parameters {
-   matrix[K,D] beta;
+  matrix[K,D] beta;
 }
 model {
   for (k in 1:K)
     for (d in 1:D)
       beta[k,d] ~ normal(0,5);
   for (n in 1:N)
-     y[n] ~ categorical(softmax(beta * x[n]));
+    y[n] ~ categorical(softmax(beta * x[n]));
 }
 \end{Verbatim}
 \end{quote}
@@ -936,7 +1298,7 @@ The ordered logistic model can be coded in \Stan using the
 \code{ordered\_logistic} distribution.
 %
 \begin{quote}
-\begin{Verbatim} 
+\begin{Verbatim}[fontsize=\small]
 data {
   int<lower=2> K;
   int<lower=0> N;
@@ -950,7 +1312,7 @@ parameters {
 } 
 model {
   for (n in 1:N)
-      y[n] ~ ordered_logistic(x[n] * beta, c);
+    y[n] ~ ordered_logistic(x[n] * beta, c);
 }
 \end{Verbatim}
 \end{quote}
@@ -962,7 +1324,7 @@ If the cutpoints were assigned independent priors, the constraint
 effectively truncates the joint prior to support over points that
 satisfy the ordering constraint.  Luckily, \Stan does not need to
 compute the effect of the constraint on the normalizing term because
-the probability is only needed up to a proportion.
+the probability is needed only up to a proportion.
 
 
 \subsubsection{Ordered Probit}
@@ -971,7 +1333,7 @@ An ordered probit model could be coded in a manner similar to the
 \BUGS encoding of an ordered logistic model.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 data {
   int<lower=2> K;
   int<lower=0> N;
@@ -986,13 +1348,13 @@ parameters {
 model {
   vector[K] theta;
   for (n in 1:N) {
-      real eta;
-      eta <- x[n] * beta;
-      theta[1] <- 1 - Phi(eta - c[1]);
-      for (k in 2:(K-1))
-          theta[k] <- Phi(eta - c[k-1]) - Phi(eta - c[k]);
-      theta[K] <- Phi(eta - c[K-1]);
-      y[n] ~ categorical(theta);
+    real eta;
+    eta <- x[n] * beta;
+    theta[1] <- 1 - Phi(eta - c[1]);
+    for (k in 2:(K-1))
+      theta[k] <- Phi(eta - c[k-1]) - Phi(eta - c[k]);
+    theta[K] <- Phi(eta - c[K-1]);
+    y[n] ~ categorical(theta);
   }
 }
 \end{Verbatim}
@@ -1031,28 +1393,28 @@ The following model encodes a hierarchical logistic regression model
 with a hierarchical prior on the regression coefficients.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 data {
-    int<lower=1> D;
-    int<lower=0> N;
-    int<lower=1> L;
-    int<lower=0,upper=1> y[N];
-    int<lower=1,upper=L> ll[N];
-    row_vector[D] x[N];
+  int<lower=1> D;
+  int<lower=0> N;
+  int<lower=1> L;
+  int<lower=0,upper=1> y[N];
+  int<lower=1,upper=L> ll[N];
+  row_vector[D] x[N];
 }
 parameters {
-    real mu[D];
-    real<lower=0,upper=1000> sigma[D];
-    vector[D] beta[L];
+  real mu[D];
+  real<lower=0,upper=1000> sigma[D];
+  vector[D] beta[L];
 }
 model {
-    for (d in 1:D) {
-        mu[d] ~ normal(0,100);
-        for (l in 1:L)
-            beta[l,d] ~ normal(mu[d],sigma[d]);
-    }
-    for (n in 1:N)
-        y[n] ~ bernoulli(inv_logit(x[n] * beta[ll[n]]));
+  for (d in 1:D) {
+    mu[d] ~ normal(0,100);
+    for (l in 1:L)
+      beta[l,d] ~ normal(mu[d],sigma[d]);
+  }
+  for (n in 1:N)
+    y[n] ~ bernoulli(inv_logit(x[n] * beta[ll[n]]));
 }
 \end{Verbatim}
 \end{quote}   
@@ -1077,7 +1439,7 @@ to account for the fact that not every student is required to answer
 every question.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 data {
   int<lower=1> J;              // number of students
   int<lower=1> K;              // number of questions
@@ -1108,7 +1470,7 @@ This model is distributed with Stan in the file
 The model parameters are declared as follows.
 %
 \begin{quote}
-\begin{Verbatim} 
+\begin{Verbatim}[fontsize=\small]
 parameters {    
   real delta;         // mean student ability
   real alpha[J];      // ability of student j - mean ability
@@ -1129,7 +1491,7 @@ response to the average question.%
 The model itself is as follows.
 %
 \begin{quote}
-\begin{Verbatim} 
+\begin{Verbatim}[fontsize=\small]
 model {
   alpha ~ normal(0,1);         // informative true prior
   beta ~ normal(0,1);          // informative true prior
@@ -1182,7 +1544,7 @@ student and question parameters.
 The model parameters are declared as follows.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 parameters {    
   real delta;                  // mean student ability
   real alpha[J];               // ability for j - mean
@@ -1198,7 +1560,7 @@ parameters {
 The parameters should be clearer after the model definition.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 model {
   alpha ~ normal(0,sigma_alpha); 
   beta ~ normal(0,sigma_beta);   
@@ -1262,19 +1624,19 @@ With improper flat priors on the regression coefficients for slope
 the \Stan program for the AR(1) model is as follows.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 data {
-    int<lower=0> N;
-    real y[N];
+  int<lower=0> N;
+  real y[N];
 }
 parameters {
-    real alpha;
-    real beta;
-    real sigma;
+  real alpha;
+  real beta;
+  real sigma;
 }
 model {
-    for (n in 2:N)
-       y[n] ~ normal(alpha + beta*y[n-1], sigma);
+  for (n in 2:N)
+    y[n] ~ normal(alpha + beta*y[n-1], sigma);
 }
 \end{Verbatim}
 \end{quote}
@@ -1293,8 +1655,8 @@ To enforce the estimation of a stationary AR(1) process, the slope
 coefficient \code{beta} may be constrained with bounds as follows.
 %
 \begin{quote}
-\begin{Verbatim}
-    real<lower=-1,upper=1> beta;
+\begin{Verbatim}[fontsize=\small]
+real<lower=-1,upper=1> beta;
 \end{Verbatim}
 \end{quote}
 %
@@ -1311,7 +1673,7 @@ example, an AR(2) model could be coded with the second-order
 coefficient \code{gamma} and the following model statement.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 for (n in 3:N)
   y[n] ~ normal(alpha + beta*y[n-1] + gamma*y[n-2], sigma);
 \end{Verbatim}
@@ -1325,23 +1687,23 @@ by putting the coefficients in an array and computing the linear
 predictor in a loop.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 data {
-    int<lower=0> K;
-    int<lower=0> N;
-    real y[N];
+  int<lower=0> K;
+  int<lower=0> N;
+  real y[N];
 }
 parameters {
-    real alpha;
-    real beta[K];
-    real sigma;
+  real alpha;
+  real beta[K];
+  real sigma;
 }
 model {
-    for (n in (K+1):N) {
-        real mu;
+  for (n in (K+1):N) {
+    real mu;
     mu <- alpha;
     for (k in 1:K)
-        mu <- mu + beta[k] * y[n-k];
+      mu <- mu + beta[k] * y[n-k];
     y[n] ~ normal(mu, sigma);
   }
 }
@@ -1388,7 +1750,7 @@ constrained to to be less than one, $\alpha_1 < 1$.%
 The ARCH(1) model may be coded directly in Stan as follows.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 data {
   int<lower=0> T;   // number of time points
   real r[T];        // return at time t
@@ -1400,8 +1762,7 @@ parameters {
 }
 model {
   for (t in 2:T)
-    r[t] ~ normal(mu, 
-                 sqrt(alpha0 + alpha1 * pow(r[t-1] - mu,2)));
+    r[t] ~ normal(mu, sqrt(alpha0 + alpha1 * pow(r[t-1] - mu,2)));
 }
 \end{Verbatim}
 \end{quote}
@@ -1434,7 +1795,7 @@ stationary, the coefficients must all satisfy $\alpha_0, \alpha_1,
 \beta_1 > 0$ and the slopes $\alpha_1 + \beta_1 < 1$.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 data {
   int<lower=0> T; 
   real r[T];
@@ -1444,7 +1805,7 @@ parameters {
   real mu; 
   real<lower=0> alpha0;          
   real<lower=0,upper=1> alpha1;  
-  real<lower=0, upper=(1-alpha1)> beta1; 
+  real<lower=0,upper=(1-alpha1)> beta1; 
 }
 transformed parameters {
   real<lower=0> sigma[T];
@@ -1508,7 +1869,7 @@ $\sigma$ must all be given priors.
 An $\mbox{MA}(2)$ model can be coded in Stan as follows.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 data {
   int<lower=3> T;  // number of observations
   vector[T] y;     // observation at time T
@@ -1541,11 +1902,11 @@ model {
 \end{quote}
 %
 The error terms $\epsilon_t$ are defined as transformed parameters in
-temrs of the observations and parameters.  The definition of the
+terms of the observations and parameters.  The definition of the
 sampling statement (defining the likelihood) follows the definition,
 which can only be applied to $y_n$ for $n > Q$.  In this example, the
-parameters are all given Cauchy (half-Cauchy for $\sigma$) priors;
-other priors can be used.
+parameters are all given Cauchy (half-Cauchy for $\sigma$) priors,
+although other priors can be used just as easily.
 
 This model could be improved in terms of speed by vectorizing the
 sampling statement in the model block.  Vectorizing the calculation of
@@ -1559,7 +1920,7 @@ A general $\mbox{MA}(Q)$ model with a vectorized sampling probability
 may be defined as follows.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 data {
   int<lower=0> Q;  // num previous noise terms
   int<lower=3> T;  // num observations
@@ -1568,7 +1929,7 @@ data {
 parameters {
   real mu;              // mean
   real<lower=0> sigma;  // error scale
-  vector[2] theta;      // error coeff, lag -t
+  vector[Q] theta;      // error coeff, lag -t
 }
 transformed parameters {
   vector[T] epsilon;    // error term at time t
@@ -1608,7 +1969,7 @@ ARMA(1,1) model, with a single state of history, can be encoded in
 Stan as follows.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 data {
   int<lower=1> T;            // num observations
   real y[T];                 // observed outputs
@@ -1661,7 +2022,7 @@ Wayne Folta suggested encoding the model without local vector
 variables as follows.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 model {
   real err;
   mu ~ normal(0,10);
@@ -1734,7 +2095,7 @@ Stan model, which is also available in the file
 along with R code to simulate data from the model for testing.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 data {
   int<lower=0> T;   // # time points (equally spaced)
   vector[T] y;      // mean corrected return at time t
@@ -1773,7 +2134,8 @@ $(0.16,0.38)$.
 
 The samples using NUTS show a high degree of autocorrelation among the
 samples, both for this model and the stochastic volatility model
-evaluated in \citep{Hoffman-Gelman:2011}.  Using a non-diagonal mass
+evaluated in \citep{Hoffman-Gelman:2011, Hoffman-Gelman:2013}.  
+Using a non-diagonal mass
 matrix provides faster convergence and more effective samples than a
 diagonal mass matrix, but will not scale to large values of $T$.
 
@@ -1782,8 +2144,8 @@ second generated by this model by one or more orders of magnitude.
 First, the sampling statements for return $y$ is easily vectorized to
 %
 \begin{quote}
-\begin{Verbatim}
-    y ~ normal(0, exp(h / 2));
+\begin{Verbatim}[fontsize=\small]
+y ~ normal(0, exp(h / 2));
 \end{Verbatim}
 \end{quote}
 %
@@ -1794,7 +2156,7 @@ reparameterizing in terms of a standardized volatility, then
 rescaling.  This requires a standardized parameter \code{h\_std} to be
 declared instead of \code{h}.
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 parameters {
   ...
   vector[T] h_std;             // std log volatility time t
@@ -1804,7 +2166,7 @@ parameters {
 The original value of \code{h} is then defined in a transformed
 parameter block.
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 transformed parameters {
   vector[T] h;                 // log volatility at time t
   h <- h_std * sigma;
@@ -1821,7 +2183,7 @@ Finally, the sampling statement for \code{h[1]} and loop for sampling
 sampling statement.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 model {
   ...
   h_std ~ normal(0,1);
@@ -1868,7 +2230,7 @@ naive model can be used to fit the parameters $\theta$ and $\phi$.
 \nolinkurl{<stan>/src/models/misc/hmm/hmm.stan}.)
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 data {
   int<lower=1> K;  // num categories
   int<lower=1> V;  // num words
@@ -1931,7 +2293,7 @@ sufficient statistics for estimating the transition and emission
 matrices.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 transformed data {
   int<lower=0> trans[K,K];
   int<lower=0> emit[K,V];
@@ -1985,7 +2347,7 @@ now computes the posterior Dirichlet parameters in the transformed
 data block.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 transformed data {
   vector<lower=0>[K] alpha_post[K];
   vector<lower=0>[V] beta_post[K];
@@ -2004,7 +2366,7 @@ transformed data {
 The posterior can now be written analytically as follows.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 model {
   for (k in 1:K) 
     theta[k] ~ dirichlet(alpha_post[k]);
@@ -2032,7 +2394,7 @@ is in \nolinkurl{<stan>/src/models/misc/hmm/hmm-semisup.stan}).  First,
 two additional data variable are declared for the unsupervised data.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 data {
   ...
   int<lower=1> T_unsup;  // num unsupervised items
@@ -2046,7 +2408,7 @@ data is handled with the following Stan implementation of the forward
 algorithm.  
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 model {
  ...
   { 
@@ -2061,7 +2423,7 @@ model {
         gamma[t,k] <- log_sum_exp(acc);
       }
     }
-    lp__ <- lp__ + log_sum_exp(gamma[T_unsup]);
+    increment_log_prob(log_sum_exp(gamma[T_unsup]));
   }
 \end{Verbatim}
 \end{quote}
@@ -2105,7 +2467,7 @@ sequence is determined from the transition probabilities
 different from sample to sample in the posterior.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 generated quantities {
   int<lower=1,upper=K> y_star[T_unsup];
   real log_p_y_star;
@@ -2198,7 +2560,7 @@ a predictor $x_n$ and outcome $y_n$.  In Stan, a linear regression for
 $y$ based on $x$ with a slope and intercept is modeled as follows.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 data {
   int<lower=0> N;        // number of cases
   real x[N];             // predictor (covariate)
@@ -2230,7 +2592,7 @@ This leads to the following regression model with constant measurement
 error.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 data {
   ...
   real x_meas[N];     // measurement of x
@@ -2261,7 +2623,7 @@ noise term \code{tau} to vary with item.  This only requires changing
 its declaration in the data block to
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
   real<lower=0> tau[N];  // measurement noise for case n
 \end{Verbatim}
 \end{quote}
@@ -2323,7 +2685,7 @@ constraint that $\mbox{\code{r\_t[j]}} \leq \mbox{\code{n\_t[j]}}$,
 but this constraint could be checked in the transformed data block.}
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 data {
   int<lower=0> J;
   int<lower=0> n_t[J];  // num cases, treatment
@@ -2362,7 +2724,7 @@ transformed parameter block, though care must be taken not to use
 integer division (see \refsection{int-arithmetic}).
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 transformed data {
   real y[J];
   real<lower=0> sigma[J];
@@ -2389,7 +2751,7 @@ which assumes a single parameter for the global odds ratio.  This
 model is coded in Stan as follows.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 parameters {
   real theta;  // global treatment effect, log odds
 }
@@ -2402,7 +2764,7 @@ model {
 The sampling statement for \code{y} is vectorized; it has the same
 effect as the following.
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
   for (j in 1:J)
     y[j] ~ normal(theta,sigma[j]);
 \end{Verbatim}
@@ -2422,7 +2784,7 @@ prior parameters, which will be estimated along with other unknown
 quantities.  
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 parameters {
   real theta[J];      // per-trial treatment effect
   real mu;            // mean treatment effect
@@ -2557,7 +2919,7 @@ an R program to randomly generate data sets and a sample data set) in
 the directory \nolinkurl{stan/src/models/misc/soft-k-means}.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 data {
   int<lower=0> N;  // number of data points
   int<lower=1> D;  // number of dimensions
@@ -2579,10 +2941,13 @@ transformed parameters {
                      - 0.5 * dot_self(mu[k] - y[n]);
 }
 model {
+  // prior
   for (k in 1:K)
-    mu[k] ~ normal(0,1);  // prior
+    mu[k] ~ normal(0,1);
+
+  // likelihood
   for (n in 1:N)
-    lp__ <- lp__ + log_sum_exp(soft_z[n]); // likelihood
+    increment_log_prob(log_sum_exp(soft_z[n])); 
 }
 \end{Verbatim}
 \end{quote}
@@ -2637,7 +3002,7 @@ The lack of identifiability means that the the cluster parameters
 cannot be compared across multiple Markov chains.  In fact, the only
 parameter in soft $K$-means is not identified, leading to problems in
 monitoring convergence.  Clusters can even fail to be identified
-within a single chain, with indexes swapping if the chain is long
+within a single chain, with indices swapping if the chain is long
 enough or the data is not cleanly separated. 
 
 \subsection{Multimodality}
@@ -2705,7 +3070,7 @@ produce equal probabilities for each category $k \in 1:K$.
 
 \subsection{Representing Ragged Arrays in Stan}
 
-The specification for LDA in the previous sections have used a ragged
+The specification for naive Bayes in the previous sections have used a ragged
 array notation for the words $w$.  Because Stan does not support
 ragged arrays, the models are coded using an alternative strategy that
 provides an index for each word in a global list of words.   The data
@@ -2744,7 +3109,7 @@ training data with documents of known categories can be coded in Stan
 as follows 
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 data {
   // training data
   int<lower=1> K;               // num topics
@@ -2811,7 +3176,7 @@ to stabilize the numerical calculation and return a result on the log
 scale.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 model {
   real gamma[M,K];
   theta ~ dirichlet(alpha);
@@ -2825,7 +3190,7 @@ model {
       gamma[doc[n],k] <- gamma[doc[n],k] 
                          + categorical_log(w[n],phi[k]);
   for (m in 1:M)
-    lp__ <- lp__ + log_sum_exp(gamma[m]);
+    increment_log_prob(log_sum_exp(gamma[m]));
 }
 \end{Verbatim}
 \end{quote}
@@ -2879,12 +3244,12 @@ for the labeled data, and a set of statements for the unlabeled data.
 
 An alternative to full Bayesian inference involves estimating a model
 using labeled data, then applying it to unlabeled data without
-updating the parameter estimates based on the unlabeled data.
-This behavior can be implemented by moving the definition of \code{gamma}
+updating the parameter estimates based on the unlabeled data.  This
+behavior can be implemented by moving the definition of \code{gamma}
 for the unlabeled documents to the generated quantities block.
-Because the variables no longer contribute to the log probability
-accumulator \code{lp\_\_}, they no longer jointly contribute to
-the estimation of the model parameters.
+Because the variables no longer contribute to the log probability,
+they no longer jointly contribute to the estimation of the model
+parameters.
 
 
 \section{Latent Dirichlet Allocation}
@@ -2988,7 +3353,7 @@ structure described in this section leads to the following Stan
 program for LDA.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 data {
   int<lower=2> K;               // num topics
   int<lower=2> V;               // num words
@@ -3012,7 +3377,7 @@ model {
     real gamma[K];
     for (k in 1:K) 
       gamma[k] <- log(theta[doc[n],k]) + log(phi[k,w[n]]);
-    lp__ <- lp__ + log_sum_exp(gamma);  // likelihood
+    increment_log_prob(log_sum_exp(gamma));  // likelihood
   }
 }
 \end{Verbatim}
@@ -3043,7 +3408,7 @@ the correlated topic model by replacing the Dirichlet topic prior
 the multivariate logistic normal prior.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 data {
   ... data as before without alpha ...
   vector[K] mu;          // topic mean
@@ -3057,7 +3422,7 @@ Dirichlet, a parameter \code{eta} is drawn from a multivariate normal
 distribution and then transformed using softmax into a simplex.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 parameters {
   simplex[V] phi[K];  // word dist for topic k
   vector[K] eta[M];   // topic dist for doc m
@@ -3085,7 +3450,7 @@ priors in the model.  A relatively efficient and interpretable prior
 for the covariance matrix \code{Sigma} may be encoded as follows.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 ... data block as before, but without alpha ...
 parameters {
   vector[K] mu;              // topic mean
@@ -3097,7 +3462,14 @@ parameters {
 transformed parameters {
   ... eta as above ...
   cov_matrix[K] Sigma;       // covariance matrix
-  Sigma <- sigma' * Omega * sigma;
+  for (m in 1:K)
+    Sigma[m,m] <- sigma[m] * sigma[m] * Omega[m,m];
+  for (m in 1:(K-1)) {
+    for (n in (m+1):K) {
+      Sigma[m,n] <- sigma[m] * sigma[n] * Omega[m,n];
+      Sigma[n,m] <- Sigma[m,n];
+    }
+  }
 }
 model {
   mu ~ normal(0,5);       // vectorized, diffuse
@@ -3246,7 +3618,7 @@ included in the Stan distribution in file
 \nolinkurl{src/models/misc/gaussian-process/gp-sim.stan}.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 data {
   int<lower=1> N;
   real x[N];
@@ -3272,8 +3644,10 @@ model {
 %
 The input data is just the vector of inputs \code{x} and its size
 \code{N}.  Such a model can be used with values of \code{x} evenly
-spaced over some interval in order to plot sample draws of functions from a
-Gaussian process.  
+spaced over some interval in order to plot sample draws of functions
+from a Gaussian process.  The covariance matrix \code{Sigma} is not
+being computed efficiently here; see
+Section~\refsection{fit-gp} for a better approach.
 
 \subsection{Multivariate Inputs}
 
@@ -3284,7 +3658,7 @@ multivariate sampling model is available in the source distribution at
 only lines that change from the univariate model above are as follows.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 data {
   int<lower=1> D;
   int<lower=1> N;
@@ -3339,7 +3713,7 @@ parameters change to the raw parameters sampled from an isotropic unit
 normal, and the actual samples are defined as generated quantities.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 ...
 transformed data {
   matrix[N,N] L;
@@ -3368,7 +3742,7 @@ vector \code{y} is then defined as a generated quantity using a direct
 encoding of the transform described above.
 
 
-\section{Fitting a Gaussian Process}
+\section{Fitting a Gaussian Process}\label{fit-gp.section}
 
 The hyperparameters controlling the covariance function of a Gaussian
 process can be fit by assigning them priors, then computing the
@@ -3390,7 +3764,7 @@ statements are executed has changed to accommodate the hyperparameter
 estimation problem.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 data {
   int<lower=1> N;
   vector[N] x;
@@ -3407,13 +3781,16 @@ parameters {
 }
 model {
   matrix[N,N] Sigma;
-  for (i in 1:N)
-    for (j in i:N)
-      Sigma[i,j] <- eta_sq * exp(-rho_sq * pow(x[i] - x[j],2))
-                    + if_else(i==j, sigma_sq, 0.0);
-  for (i in 1:N)
-    for (j in (i+1):N)
+  // off-diagonal elements
+  for (i in 1:(N-1)) {
+    for (j in i:N) {
+      Sigma[i,j] <- eta_sq * exp(-rho_sq * pow(x[i] - x[j],2));
       Sigma[j,i] <- Sigma[i,j];
+    }
+  }
+  // diagonal elements
+  for (k in 1:N)
+    Sigma[k,k] <- eta_sq + sigma_sq;  // + jitter
 
   eta_sq ~ cauchy(0,5);
   rho_sq ~ cauchy(0,5);
@@ -3491,7 +3868,7 @@ available in the distribution as
 \nolinkurl{src/models/misc/gaussian-process/gp-predict.stan}.  
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 data {
   int<lower=1> N1;     
   vector[N1] x1; 
@@ -3549,7 +3926,7 @@ normal sampling statement for \code{y}.
 This model could be sped up fairly substantially by computing the
 Cholesky factor of \code{Sigma} in the transformed data block
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 transformed data {
   matrix[N1+N2,N1+N2] L;
 ...
@@ -3562,7 +3939,7 @@ and then replacing \code{multi\_normal} with the more efficient
 \code{multi\_normal\_cholesky} in the model block.  
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 ...
 model {
 ...
@@ -3614,7 +3991,7 @@ calculation of the predictive mean \code{mu} and covariance Cholesky
 factor \code{L} is done in the transformed data block.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 transformed data {
   vector[N2] mu;
   matrix[N2,N2] L;
@@ -3641,7 +4018,7 @@ transformed data {
     K_transpose_div_Sigma <- K' / Sigma;
     mu <- K_transpose_div_Sigma * y1; 
     Tau <- Omega - K_transpose_div_Sigma * K;
-    for (i in 1:N2)
+    for (i in 1:(N2-1))
       for (j in (i+1):N2)
         Tau[i,j] <- Tau[j,i];
 
@@ -3728,7 +4105,7 @@ process regression is available in the distribution at
 \nolinkurl{src/models/misc/gaussian-process/gp-logit-predict.stan}.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 data {
   int<lower=1> N1;     
   vector[N1] x1; 
@@ -3820,7 +4197,7 @@ drawn i.i.d.\ for a Beta distribution whose parameters are themselves
 drawn from a hyperprior distribution.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 parameters {
   real<lower = 0> alpha;
   real<lower = 0> beta;
@@ -3849,7 +4226,7 @@ gets a uniform prior and the count parameter a Pareto prior with
 $p(\lambda) \propto \lambda^{-2.5}$.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 parameters {
   real<lower=0,upper=1> phi;
   real<lower=0.1> lambda;
@@ -3878,12 +4255,12 @@ they could instead be defined as local variables in the model as
 follows.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 model {
-   real alpha;
-   real beta;
-   alpha <- lambda * phi;
-   beta <- lambda * (1 - phi);
+  real alpha;
+  real beta;
+  alpha <- lambda * phi;
+  beta <- lambda * (1 - phi);
 ...
   for (n in 1:N)
     theta[n] ~ beta(alpha,beta);
@@ -3895,7 +4272,7 @@ model {
 With vectorization, this could be expressed more compactly and
 efficiently as follows.
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 model {
   theta ~ beta(lambda * phi, lambda * (1 - phi));
 ...
@@ -3903,24 +4280,17 @@ model {
 \end{Verbatim}
 \end{quote}
 %
+If the variables \code{alpha} and \code{beta} are of interest, they
+can be defined in the transformed parameter block and then used in the
+model.  
 
-Univariate transforms must be monotonic and differentiable everywhere
-in their support.  Stan takes care of the derivative involved in the
-gradient behind the scenes.  
 
-Multivariate transforms are more complex.  They require the log
-absolute Jacobian to be applied.  In Stan, this requires coding the
-transform and the Jacobian determinant.  
-% In the full case (where the Jacobian is
-% not triangular), the code would look as follows.
-% %
-% \begin{quote}
-% \begin{Verbatim}
-% parameters {
+\subsection{Jacobians not Necessary}
 
-% }
-% \end{Verbatim}
-% \end{quote}
+Because the transformed parameters are being used, rather than given a
+distribution, there is no need to apply a Jacobian adjustment for the
+transform.  For example, in the beta distribution example,
+\code{alpha} and \code{beta} have the correct posterior distribution.  
 
 
 
@@ -3928,16 +4298,18 @@ transform and the Jacobian determinant.
 \section{Changes of Variables}
 
 Changes of variables are applied when the transformation of a
-parameter has a specified distribution.  One textbook example is
-the lognormal distribution, which is the distribution of a variable
-$y > 0$ whose logarithm $\log y$ has a normal distribution.  
-
-\subsection{Univariate Changes of Variables}
+parameter is characterized by a distribution.  The standard textbook
+example is the lognormal distribution, which is the distribution of a
+variable $y > 0$ whose logarithm $\log y$ has a normal distribution.
+Note that the distribution is being assigned to $\log y$. 
 
 The change of variables requires an adjustment to the probability to
-account for the distortion caused by the transform.  In the case of
-univariate distributions, the resulting probability must be scaled
-by the absolute derivative of the transform (see
+account for the distortion caused by the transform.  For this to work,
+univariate changes of variables must be monotonic and differentiable
+everywhere in their support.
+
+For univariate changes of variables, the resulting probability must be
+scaled by the absolute derivative of the transform (see
 \refsection{uni-change-of-variables} for more precise definitions of
 univariate changes of variables).
 
@@ -3969,13 +4341,13 @@ directly in Stan as follows.%
   with the built-in \code{lognormal} probability function (see \refsection{lognormal}).}
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 parameters {
   real<lower=0> y;
   ...
 model {
   log(y) ~ normal(mu,sigma);
-  lp__ <- lp__ - log(y);
+  increment_log_prob(- log(y));
   ...
 \end{Verbatim}
 \end{quote}
@@ -3987,12 +4359,12 @@ It would be slightly more efficient to define a local variable for the
 logarithm, as follows.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 model {
   real log_y;
   log_y <- log(y);
   log_y ~ normal(mu,sigma);
-  lp__ <- lp__ - log_y;
+  increment_log_prob(- log_y);
   ...
 \end{Verbatim}
 \end{quote}
@@ -4001,6 +4373,69 @@ model {
 If \code{y} were declared as data instead of as a parameter, then the
 adjustment can be ignored because the data will be constant and Stan
 only requires the log probability up to a constant.
+
+\subsection{Change of Variables vs.\ Transformations}
+
+This section illustrates the difference between a change of variables
+and a simple variable transformation.  A transformation samples a
+parameter, then transforms it, whereas a change of variables
+transforms a parameter, then samples it.  Only the latter requires a
+Jacobian adjustment.
+
+\subsubsection{Gamma and Inverse Gamma Distribution}
+
+Like the log normal, the inverse gamma distribution is a distribution
+of variables whose inverse has a gamma distribution.  This section
+contrasts two approaches, first with a transform, then with a change
+of variables. 
+
+The transform based approach to sampling \code{y\_inv} with an inverse
+gamma distribution can be coded as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+parameters {
+  real<lower=0> y;
+}
+transformed parameters {
+  real<lower=0> y_inv;   
+  y_inv <- 1 / y;
+}
+model {
+  y ~ gamma(2,4);
+}
+\end{Verbatim}
+\end{quote}
+%
+The change-of-variables approach to sampling \code{y\_inv} with an
+inverse gamma distribution can be coded as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+parameters {
+  real<lower=0> y_inv;
+}
+transformed parameters {
+  real<lower=0> y;
+  y <- 1 / y_inv;                         // change
+  increment_log_prob( -2 * log(y_inv) );  // adjustment
+}
+model {
+  y ~ gamma(2,4);
+}
+\end{Verbatim}
+\end{quote}
+%
+The Jacobian adjustment is the log of the absolute derivative of the
+transform, which in this case is
+%
+\begin{eqnarray*}
+\log \left| \frac{d}{du} \left( \frac{1}{u} \right) \right|
+& = & \log \frac{1}{u^{-2}}
+\\[3pt]
+& = & -2 \log u.
+\end{eqnarray*}
+
 
 \subsection{Multivariate Changes of Variables}
 
@@ -4011,20 +4446,20 @@ and Jacobians).  In Stan, this can be coded as follows in the general
 case where the Jacobian is not a full matrix.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 parameters {
-   vector[K] u;      // multivariate parameter
+  vector[K] u;      // multivariate parameter
    ...
 transformed parameters {
-   vector[K] v;     // transformed parameter
-   matrix[K,K] J;   // Jacobian matrix of transform
-   ... compute v as a function of u ...
-   ... compute J[m,n] = d.v[m] / d.u[n] ...
-   lp__ <- lp__ + log(fabs(determinant(J)));
-   ...
+  vector[K] v;     // transformed parameter
+  matrix[K,K] J;   // Jacobian matrix of transform
+  ... compute v as a function of u ...
+  ... compute J[m,n] = d.v[m] / d.u[n] ...
+  increment_log_prob(log(fabs(determinant(J))));
+  ...
 model {
-   v ~ ...;
-   ...
+  v ~ ...;
+  ...
 \end{Verbatim}
 \end{quote}
 %
@@ -4042,13 +4477,13 @@ elements, so the transformed parameters block of the above model can
 be simplified and made more efficient by recoding as follows.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 transformed parameters {
   ...
   vector[K] J_diag;  // diagonals of Jacobian matrix
   ... 
   ... compute J[k,k] = d.v[k] / d.u[k] ...
-  lp__ <- lp__ + sum(log(J_diag));
+  incement_log_prob(sum(log(J_diag)));
   ...
 \end{Verbatim}
 \end{quote}
@@ -4061,8 +4496,8 @@ transformed parameters {
 \noindent
 Custom distributions may also be implemented directly within \Stan's
 programming language.  The only thing that is needed is to increment
-the log probability accumulator \Verb|lp__| with the log probability.
-The rest of the chapter provides two examples.
+the total log probability.  The rest of the chapter provides two
+examples.
 
 \section{Examples}
 
@@ -4096,30 +4531,23 @@ the following \Stan implementation of a sampler from
 $\distro{Triangle}(-1,1)$.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 parameters {
-    real<lower=-1,upper=1> y;
+  real<lower=-1,upper=1> y;
 }
 model {
-    lp__ <- lp__ + log1m(fabs(y));
+  increment_log_prob(log1m(fabs(y)));
 }
 \end{Verbatim}
 \end{quote}
 %
 The single scalar parameter \code{y} is declared as lying in the
-interval \code{(-1,1)}.  The log probability variable \code{lp\_\_} is
+interval \code{(-1,1)}.  The total log probability is
 incremented with the joint log probability of all parameters, i.e.,
 $\log \distro{Triangle}(y|-1,1)$.  This value is coded in \Stan as
 \code{log1m(fabs(y))}.  The function \code{log1m} is is defined so
 that \code{log1m(x)} has the same value as \code{log(1.0-x)}, but the
 computation is faster, more accurate, and more stable.
-
-The log probability variable \code{lp\_\_} is incremented in this
-program rather than being set.  This is because the transform involved
-for the bounded variable \code{y} of type \code{real<lower=-1,upper=1>} implicitly
-adds a term to \code{lp\_\_} to adjust the log probability for the
-transform (adding the log absolute derivative of the inverse
-transform, a scaled inverse logit).
 
 The constrained type \code{real<lower=-1,upper=1>} declared for \code{y} is
 critical for correct sampling behavior.  If the constraint on \code{y}
@@ -4133,8 +4561,8 @@ $\reals$ as follows by defining the probability to be \code{log(0.0)},
 i.e., $-\infty$, for values outside of $(-1,1)$.
 %
 \begin{quote}
-\begin{Verbatim}
-    lp__ <- log(fmax(0.0,1 - fabs(y)));
+\begin{Verbatim}[fontsize=\small]
+increment_log_prob(log(fmax(0.0,1 - fabs(y))));
 \end{Verbatim}
 \end{quote}
 %
@@ -4162,8 +4590,8 @@ where \code{lambda} is the inverse scale and \code{y} the sampled
 variate.
 %
 \begin{quote}
-\begin{Verbatim}
-lp__ <- lp__ + log(lambda) - y * lambda;
+\begin{Verbatim}[fontsize=\small]
+increment_log_prob(log(lambda) - y * lambda);
 \end{Verbatim}
 \end{quote}
 %
@@ -4175,7 +4603,7 @@ The assignment statement in the previous paragraph generates
 sampling statement.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 y ~ exponential(lambda);
 \end{Verbatim}
 \end{quote}
@@ -4228,10 +4656,20 @@ code, including vectorization, sufficient statistics, and conjugacy.
 
 Stan's sampler can be slow in sampling from distributions with
 difficult posterior geometries.  One way to speed up such models is
-through reparameterization.
+through reparameterization.  
 
 \subsection{Example: Neal's Funnel}
 
+In this section, we discuss a general transform from a centered to a
+non-centered parameterization \cite{papa-et-al:2007}.%
+%
+\footnote{This parameterization came to be known on our mailing lists
+  as the ``Matt trick'' after Matt Hoffman, who independently came up
+  with it while fitting hierarchical models in Stan.}
+%
+This reparameterization is helpful because it separates the
+hierarchical parameters and lower-level parameters in the prior.
+%
 \begin{figure}
 \vspace*{-6pt}
 \begin{center}
@@ -4274,7 +4712,7 @@ and the first dimension $x_1$ is shown in \reffigure{funnel}.
 The funnel can be implemented directly in Stan as follows.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 parameters {  
   real y;
   vector[9] x;
@@ -4298,7 +4736,7 @@ from which samples are drawn is known, the model can be converted to
 the following more efficient form.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 parameters {  
   real y_raw;
   vector[9] x_raw;
@@ -4332,7 +4770,7 @@ transformed parameter.
 Sampling from heavy tailed distributions such as the Cauchy is
 difficult for Hamiltonian Monte Carlo, which operates within a
 Euclidean geometry.%
-\footnote{Riemann-manifold Hamiltonian Monte Carlo (RM-HMC) overcomes
+\footnote{Riemannian Manifold Hamiltonian Monte Carlo (RMHMC) overcomes
   this difficulty by simulating the Hamiltonian dynamics in a a space
   with a position-dependent metric; see
   \citep{GirolamiCalderhead:2011} and \citep{Betancourt:2012}.}
@@ -4370,7 +4808,7 @@ Consider a Stan program involving a Cauchy-distributed parameter
 \code{beta}.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 parameters {
   real beta;
   ...
@@ -4387,7 +4825,7 @@ transformed parameter \code{beta} defined in terms of a
 uniform-distributed parameter \code{beta\_unif}.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 parameters {
   real<lower=-pi()/2, upper=pi()/2> beta_unif;
   ...
@@ -4420,6 +4858,100 @@ some time checking that that \code{beta\_unif} is between
 \code{-pi()/2} and \code{pi()/2}, but this condition is guaranteed by
 the constraints in the declaration of \code{beta\_unif}.  
 
+\subsection{Reparameterizing a Student-t Distribution}
+
+One thing that sometimes works when you're having trouble with the
+heavy-tailedness of Student-t distributions is to use the
+gamma-mixture representation, which says that you can generate a
+Student-t distributed variable $\beta$,
+\[
+\beta \sim \mbox{\sf Student-t}(\nu, 0, 1),
+\]
+by first generating a gamma-distributed $\tau$,
+\[
+\tau \sim \mbox{\sf Gamma}(\nu/2, \nu/2),
+\]
+and then generating $\beta$ from the normal distribution with
+precision $\tau$, which using our parameterization of the normal in
+terms of scale, is
+\[
+\beta \sim \mbox{\sf Normal}(0,\tau^{-2}).
+\]
+%
+That is, the marginal distribution of $\beta$ when you integrate out
+$\tau$ is $\mbox{\sf Student-t}(\nu, 0, 1)$, i.e.,
+\[
+\mbox{\sf Student-t}(\beta | \nu,0,1).
+= 
+\int_0^{\infty} 
+\,
+\mbox{\sf Normal}(\beta | 0, 1 / \tau^{2}) 
+\times
+\mbox{\sf Gamma}(\tau | \nu/2, \nu/2)
+\
+d\tau.
+\]
+%
+You can go a step further and instead of defining a $\beta$ drawn from
+a normal with precision $\tau$, define $\alpha$ to be drawn from a
+unit normal,
+%
+\[
+\alpha \sim \mbox{\sf Normal}(0,1)
+\]
+%
+and rescale by defining
+%
+\[
+\beta = \alpha / \tau^{2}.
+\]
+%
+Now suppose $\mu = \beta x$ is the product of $\beta$ with a
+regression predictor $x$.  Then the reparameterization $\mu = \alpha
+\tau^{-2} x$ has the same distribution, but in the original, direct
+parameterization, $\beta$ has (potentially) heavy tails, whereas in
+the second, neither $\tau$ nor $\alpha$ have heavy tails.
+
+To translate into Stan notation, this reparameterization replaces
+%
+\begin{quote}
+\begin{Verbatim}
+parameters {
+  real<lower=0> nu;
+  real beta;
+  ...
+model {
+  beta ~ student_t(nu,0,1);
+  ...
+\end{Verbatim}
+\end{quote}
+%
+with
+%
+\begin{quote}
+\begin{Verbatim}
+parameters {
+  real<lower=0> nu;
+  real<lower=0> tau;
+  ...
+transformed parameters {
+  real beta;
+  beta <- alpha / pow(tau,2);
+  ...
+model {
+  real half_nu;
+  half_nu <- 0.5 * nu;
+  tau ~ gamma(half_nu, half_nu);
+  alpha ~ normal(0, 1);
+  ...
+\end{Verbatim}
+\end{quote}  
+%
+In most cases, the lower bound for \code{nu} can be set to \code{1} or
+higher; when \code{nu} is 1, the result is a Cauchy distribution with
+very fat tails and as \code{nu} approaches infinity, the distribution
+approaches a normal distribution.   So the model for \code{nu}
+effectively parameterizes the heaviness of the tails of the model.
 
 \subsection{Hierarchical Models}
 
@@ -4431,7 +4963,7 @@ hierarchical model might draw a vector of coefficients $\beta$ with
 definitions as follows.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 parameters {
   real mu_beta;   
   real<lower=0> sigma_beta;
@@ -4460,7 +4992,7 @@ effective sample size by reparameterizing in exactly the same way as
 the funnel example.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 parameters {
   vector[K] beta_raw;
   ...
@@ -4522,7 +5054,7 @@ and covariance matrix $\Sigma$. Such a belief is reflected by the
 following code.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 data {
   int<lower=2> K;
   vector[K] mu;
@@ -4549,7 +5081,7 @@ covariance matrix $\Sigma$. One choice for $L$ is the Cholesky factor
 of $\Sigma$. Thus, the model above could be reparameterized as follows.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 data {
   int<lower=2> K;
   vector[K] mu;
@@ -4593,7 +5125,7 @@ then a reparameterization of \Verb|beta| in terms of \Verb|alpha|
 could be implemented as follows.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 data {
   int<lower=2> K;
   vector[K] mu;
@@ -4646,7 +5178,7 @@ $S = LL^{\top}$ and degrees of freedom $\nu$. Such a reparameterization
 can be implemented by the following Stan code:
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 data {
   int<lower=1> N;
   int<lower=1> K;
@@ -4663,7 +5195,7 @@ model {
   matrix[K,K] A;
   int count;
   count <- 1;
-  for (j in 1:K) {
+  for (j in 1:(K-1)) {
     for (i in (j+1):K) {
       A[i,j] <- z[count];
       count <- count + 1;
@@ -4703,7 +5235,7 @@ $L^{{-1}^{\top}} = L^{{\top}^{-1}}$ and $A^{{-1}^{\top}} = A^{{\top}^{-1}}$.
 We can slightly modify the above Stan code for this case:
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 data {
   int<lower=1> K;
   int<lower=K+2> nu
@@ -4729,7 +5261,7 @@ model {
   matrix[K,K] A_inv_L_inv;  
   int count;
   count <- 1;
-  for (j in 1:K) {
+  for (j in 1:(K-1)) {
     for (i in (j+1):K) {
       A[i,j] <- z[count];
       count <- count + 1;
@@ -4759,7 +5291,7 @@ then $\rho$ is distributed uniformally on the unit simplex. Thus, we can
 make $\rho$ be a transformed parameter to reduce dependence, as in:
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 data {
   int<lower=1> beta;
   ...
@@ -4808,9 +5340,9 @@ example, consider the following code snippet, where \code{foo()} is
 some operation that depends on \code{n}.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 for (n in 1:N) 
-   total <- total + foo(n,...);
+  total <- total + foo(n,...);
 \end{Verbatim}
 \end{quote}
 %
@@ -4821,7 +5353,7 @@ A faster alternative is to copy the values into a vector, then
 apply the \code{sum()} operator, as in the following refactoring.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 {  
   vector[N] summands;
   for (n in 1:N) 
@@ -4850,23 +5382,24 @@ array \code{y} of outcomes, and an array \code{beta} of regression
 coefficients.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 data {
-    int<lower=1> K;
-    int<lower=1> N;
-    real x[K,N];
-    real y[N];
+  int<lower=1> K;
+  int<lower=1> N;
+  real x[K,N];
+  real y[N];
 }
 parameters {
-    real beta[K];
+  real beta[K];
 }
 model {
-    for (n in 1:N) {
-        real gamma;  gamma <- 0.0;
-        for (k in 1:K)
-            gamma <- gamma + x[n,k] * beta[k];
-        y[n] ~ normal(gamma,1);
-    }
+  for (n in 1:N) {
+    real gamma;  
+    gamma <- 0.0;
+    for (k in 1:K)
+      gamma <- gamma + x[n,k] * beta[k];
+    y[n] ~ normal(gamma,1);
+  }
 }
 \end{Verbatim}
 \end{quote}
@@ -4876,19 +5409,19 @@ previous model, even supporting the same input files for data and
 initialization.
 %
 \begin{quote}
-\begin{Verbatim} 
+\begin{Verbatim}[fontsize=\small]
 data {
-    int<lower=1> K;
-    int<lower=1> N;
-    vector[K] x[N];
-    real y[N];
+  int<lower=1> K;
+  int<lower=1> N;
+  vector[K] x[N];
+  real y[N];
 }
 parameters {
-    vector[K] beta;
+  vector[K] beta;
 }
 model {
-    for (n in 1:N)
-        y[n] ~ normal(dot_product(x[n],beta), 1);
+  for (n in 1:N)
+    y[n] ~ normal(dot_product(x[n],beta), 1);
 }
 \end{Verbatim}
 \end{quote}
@@ -4897,7 +5430,7 @@ Although it produces equivalent results, the dot product should not be
 replaced with a transpose and multiply, as in
 %
 \begin{quote}
-\begin{Verbatim} 
+\begin{Verbatim}[fontsize=\small]
         y[n] ~ normal(x[n]' * beta, 1);
 \end{Verbatim}
 \end{quote}
@@ -4918,15 +5451,15 @@ reordering the product and pulling the transposition out of the loop,
 as follows.
 %
 \begin{quote}
-\begin{Verbatim} 
+\begin{Verbatim}[fontsize=\small]
 ...
 transformed parameters {
-    row_vector[K] beta_t;
-    beta_t <- beta';
+  row_vector[K] beta_t;
+  beta_t <- beta';
 }
 model {
-    for (n in 1:N)
-        y[n] ~ normal(beta_t * x[n], 1);
+  for (n in 1:N)
+    y[n] ~ normal(beta_t * x[n], 1);
 }
 \end{Verbatim}
 \end{quote}
@@ -4936,18 +5469,18 @@ encoding the \code{x} as a row vector, as in the
 following example.
 %
 \begin{quote}
-\begin{Verbatim} 
+\begin{Verbatim}[fontsize=\small]
 data {
-    ...
-    row_vector[K] x[N];
-    ...
+  ...
+  row_vector[K] x[N];
+  ...
 }
 parameters {
-    vector[K] beta;
+  vector[K] beta;
 }
 model {
-    for (n in 1:N)
-        y[n] ~ normal(x[n] * beta, 1);
+  for (n in 1:N)
+    y[n] ~ normal(x[n] * beta, 1);
 }
 \end{Verbatim}
 \end{quote}
@@ -4963,18 +5496,18 @@ transformed parameters by using the vectorized form of the normal
 probability function, as in the following example.
 %
 \begin{quote}
-\begin{Verbatim} 
+\begin{Verbatim}[fontsize=\small]
 data {
-    int<lower=1> K;
-    int<lower=1> N;
-    matrix[N,K] x;
-    vector[N] y;
+  int<lower=1> K;
+  int<lower=1> N;
+  matrix[N,K] x;
+  vector[N] y;
 }
 parameters {
-    vector[K] beta;
+  vector[K] beta;
 } 
 model {
-    y ~ normal(x * beta, 1);
+  y ~ normal(x * beta, 1);
 }
 \end{Verbatim}
 \end{quote}
@@ -5000,20 +5533,20 @@ expanded model.  For example, consider the following Bernoulli
 sampling model.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 data {
-    int<lower=0> N;
-    int<lower=0,upper=1> y[N];
-    real<lower=0> alpha;
-    real<lower=0> beta;
+  int<lower=0> N;
+  int<lower=0,upper=1> y[N];
+  real<lower=0> alpha;
+  real<lower=0> beta;
 }
 parameters {
-    real<lower=0,upper=1> theta;
+  real<lower=0,upper=1> theta;
 }
 model {
-    theta ~ beta(alpha,beta);
-    for (n in 1:N) 
-        y[n] ~ bernoulli(theta);
+  theta ~ beta(alpha,beta);
+  for (n in 1:N) 
+    y[n] ~ bernoulli(theta);
 }
 \end{Verbatim}
 \end{quote}
@@ -5023,7 +5556,7 @@ sufficient statistic for the chance of success \code{theta}.  The
 model may be recoded using the binomial distribution as follows.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
     theta ~ beta(alpha,beta);
     sum(y) ~ binomial(N,theta);
 \end{Verbatim}
@@ -5043,7 +5576,7 @@ beta prior and binomial sampling distribution allow the model to be
 further optimized to the following equivalent form.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
     theta ~ beta(alpha + sum(y), beta + N - sum(y));
 \end{Verbatim}
 \end{quote}
@@ -5104,7 +5637,7 @@ changes the scale of the priors.  Consider the following initial
 model.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 data {
   int<lower=0> N;
   vector[N] y;
@@ -5133,7 +5666,7 @@ standardized predictors and outputs are defined in the transformed
 data block.  
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 data {
   int<lower=0> N;
   vector[N] y;
@@ -5255,12 +5788,12 @@ These recovered parameter values on the original scales can be
 calculated within Stan using a generated quantities block following
 the model block,
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 generated quantities {
   real alpha;
   real beta;
   real<lower=0> sigma;
-  alpha <- sd(y) * (alpha_std + beta_std * mean(x) / sd(x)) 
+  alpha <- sd(y) * (alpha_std - beta_std * mean(x) / sd(x)) 
            + mean(y);
   beta <- beta_std * sd(y) / sd(x);
   sigma <- sd(y) * sigma_std;
@@ -5274,7 +5807,7 @@ calculated once and stored as transformed data.  Furthermore, the
 model sampling statement can be easily vectorized, for instance, in
 the transformed model, to
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
     y_std ~ normal(alpha_std + beta_std * x_std, sigma_std);
 \end{Verbatim}
 \end{quote}

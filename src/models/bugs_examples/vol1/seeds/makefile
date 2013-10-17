@@ -9,7 +9,7 @@ LIBFLAGS = -L$(STAN_HOME)/bin -lstan
 $(PGM) :
 	$(STAN_HOME)/bin/stanc --name=seeds  seeds.stan 
 	$(CXX) -O3 -DNDEBUG $(CPPFLAGS) $(PGM).cpp -o $(PGM) $(LIBFLAGS) 
-	./seeds --data=seeds.data.R
+	./seeds data=seeds.data.R sample
 
 clean :
 	rm -f seeds.cpp samples.csv seeds

@@ -9,7 +9,7 @@ namespace stan {
     /**
      * Return 1 if the argument is unequal to zero and 0 otherwise.
      *
-     * @param x Value.
+     * @param v Value.
      * @return 1 if argument is equal to zero and 0 otherwise.
      */
     inline int as_bool(const agrad::var& v) {

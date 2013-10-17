@@ -8,7 +8,7 @@
 The normal probability function is specified with the signature
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 normal_log(reals,reals,reals);
 \end{Verbatim}
 \end{quote}
@@ -116,6 +116,9 @@ The absolute value of \farg{x}}
 \fitem{int}{int\_step}{int \farg{x}}
 1 if \farg{x} is strictly greater than 0, and 0 otherwise
 %
+\fitem{int}{int\_step}{real \farg{x}}
+1 if \farg{x} is strictly greater than 0, and 0 otherwise
+%
 \end{description}
 %
 
@@ -177,11 +180,9 @@ Not-a-number, a special non-finite real value returned to signal an error}
  Negative infinity, a special non-finite real value smaller than all
   finite numbers}
 %
-\fitem{real}{epsilon}{}{
-The smallest positive real value representable}
-%
-\fitem{real}{negative\_epsilon}{}{
-The largest negative real value representable}
+\fitem{real}{machine\_precision}{}{
+The smallest number $x$ such that $(x + 1) \neq 1$ in floating-point
+arithmetic on the current hardware platform}
 %
 \end{description}
 
@@ -331,63 +332,85 @@ This is a no-op.}
 \end{description}
 
 
-\section{Absolute Functions}
+\section{Step-like Functions}\label{step-functions.section}
+
+{\it {\bf Warning:} These functions can seriously hinder sampling and
+  optimization efficiency for gradient-based methods (e.g., NUTS, HMC,
+  BFGS) if applied to parameters (including transformed parameters and
+  local variables in the transformed parameters or model block).  The
+  problem is that they break gradients due to discontinuities coupled with
+  zero gradients elsewhere.  They do not hinder sampling when used in the
+  data, transformed data, or generated quantities blocks.}
+
+\subsection{Absolute Value Functions}
 
 \begin{description}
 %
-\fitem{real}{abs}{real \farg{x}}{
-The absolute value of \farg{x}}
+  \fitem{real}{abs}{real \farg{x}}{ The absolute value of \farg{x}.
+    This function is deprecated and will be removed in the future;
+    please use \code{fabs} instead.}
 %
 \fitem{real}{fabs}{real \farg{x}}{
-The absolute value of \farg{x}}
+The absolute value of \farg{x};  
+see warning at start of \refsection{step-functions}}
 %
 \fitem{real}{fdim}{real \farg{x}, 
                  real \farg{y}}{
 The positive difference between \farg{x} and \farg{y}, which is
-\farg{x} - \farg{y} if \farg{x} is greater than \farg{y} and 0 otherwise}
+\farg{x} - \farg{y} if \farg{x} is greater than \farg{y} and 0
+otherwise;
+see warning at start of \refsection{step-functions}}
 %
 \end{description}
 
-\section{Bounds Functions}
+\subsection{Bounds Functions}
 
 \begin{description}
 %
 \fitem{real}{fmin}{real \farg{x}, real \farg{y}}{
-The minimum of \farg{x} and \farg{y}}
+The minimum of \farg{x} and \farg{y}\,; 
+see warning at start of \refsection{step-functions}}
 %
 \fitem{real}{fmax}{real \farg{x}, real \farg{y}}{
-The maximum of \farg{x} and \farg{y}}
+The maximum of \farg{x} and \farg{y}\,;
+see warning at start of \refsection{step-functions}}
 %
 \end{description}
 
 
-\section{Arithmetic Functions}
+\subsection{Arithmetic Functions}
+
 %
 \begin{description}
 \fitem{real}{fmod}{real \farg{x}, real \farg{y}}{
-The real value remainder after dividing \farg{x} by \farg{y}}
+The real value remainder after dividing \farg{x} by \farg{y}\,;
+see warning at start of \refsection{step-functions}}
 %
 \end{description}
 
 
-\section{Rounding Functions}
-%
+\subsection{Rounding Functions}
+
 \begin{description}
 %
 \fitem{real}{floor}{real \farg{x}}{
 The floor of \farg{x}, which is the largest integer less
-than or equal to \farg{x}, converted to a real value}
+than or equal to \farg{x}, converted to a real value;
+see warning at start of \refsection{step-functions}}
 %
 \fitem{real}{ceil}{real \farg{x}}{
 The ceiling of \farg{x}, which is the smallest integer greater
-than or equal to \farg{x}, converted to a real value}
+than or equal to \farg{x}, converted to a real value;
+see warning at start of \refsection{step-functions}}
 %
 \fitem{real}{round}{real \farg{x}}{
-The nearest integer to \farg{x}, converted to a real value}
+The nearest integer to \farg{x}, converted to a real value;
+see warning at start of \refsection{step-functions}}
 %
 \fitem{real}{trunc}{real \farg{x}}{
 The integer nearest to but no larger in magnitude than \farg{x},
-converted to a double value}
+converted to a double value;
+see warning at start of \refsection{step-functions}}
 %
 \end{description}
 
@@ -554,7 +577,7 @@ be used instead of \code{Phi} for probit regression.  See
 
 \fitem{real}{binary\_log\_loss}{int \farg{y}, real \farg{y\_hat}}{
 The log loss of predicting probability \farg{y\_hat} for 
-binary outcome \farg{y};
+binary outcome \farg{y}\,;
 
 The log loss function for predicting $\hat{y} \in [0,1]$ for 
 boolean outcome $y \in \setlist{0,1}$ is defined by
@@ -619,6 +642,22 @@ second derivative of the natural logarithm of the Gamma function.}
 The natural logarithm of the multinomial gamma function with \farg{n}
 dimensions applied to \farg{x}.}
 %
+\fitem{real}{gamma\_p}{real \farg{a}, real \farg{z}}{
+The normalised lower incomplete gamma function of \farg{a} and \farg{z} defined for positive \farg{a} and nonnegative \farg{z} by 
+\[
+P(a,z) =
+\frac{1}{\Gamma(a)}\int_0^z t^{a-1}e^{-t}dt
+\]
+}
+%
+\fitem{real}{gamma\_q}{real \farg{a}, real \farg{z}}{
+The normalised upper incomplete gamma function of \farg{a} and \farg{z} defined for positive \farg{a} and nonnegative \farg{z} by 
+\[
+Q(a,z) =
+\frac{1}{\Gamma(a)}\int_z^\infty t^{a-1}e^{-t}dt
+\]
+}
+%
 \fitem{real}{binomial\_coefficient\_log}{real \farg{x}, real
   \farg{y}}{ The natural logarithm of the binomial coefficient of
   \farg{x} and \farg{y}.  For non-negative integer inputs, this is
@@ -639,7 +678,8 @@ $\Gamma$ function, defining
 %
 \fitem{real}{bessel\_first\_kind}{int \farg{v}, real \farg{z}}{The Bessel function of the first kind with order \farg{v} applied to \farg{z} defined for all \farg{z} and \farg{v} by
 \[
-{J_v}(z) = \left(\frac{1}{2}z\right)^v\sum_{k=0}^\infty \frac{\left(-\frac{1}{4}z^2\right)^k}{k!\Gamma(v+k+1)}
+{J_v}(z) = \left(\frac{1}{2}z\right)^v\sum_{k=0}^\infty
+\frac{\left(-\frac{1}{4}z^2\right)^k}{k!\, \Gamma(v+k+1)}
 \]
 }
 %
@@ -713,7 +753,8 @@ The natural exponential of \farg{x} minus 1}
 \farg{z} plus the result of \farg{x} multiplied by \farg{y}}
 %
 \fitem{real}{multiply\_log}{real \farg{x}, real \farg{y}}{ 
-The product of \farg{x} and the natural logarithm of \farg{y}}
+The product of \farg{x} and the natural logarithm of \farg{y}\,;  if
+both \farg{x} and \farg{y} are 0, the return value is 0}
 %
 \fitem{real}{log1p}{real \farg{x}}{
 The natural logarithm of 1 plus \farg{x}}
@@ -791,6 +832,24 @@ dividing by \code{length - 1}), or 0 if \farg{x} is empty}
 elements in \farg{x} (divide by \code{length - 1}), or 0 if \farg{x}
 is empty}
 %
+% \fitem{real}{dist}{real \farg{x}[], real \farg{y}[]}{The Euclidean
+%   distance between \farg{x} and \farg{y}, defined by
+% \[
+% \mbox{dist}(\mbox{\farg{x}},\mbox{\farg{y}}) 
+% = \sqrt{\textstyle \sum_{n=1}^N (\mbox{\farg{x}}[n] - \mbox{\farg{y}}[n])^2},
+% \]
+% where \code{N} is the size of \farg{x} and \farg{y}.
+% }
+%
+% \fitem{real}{squared\_dist}{real \farg{x}[], real \farg{y}[]}{The Euclidean
+%   distance between \farg{x} and \farg{y}, defined by
+% \[
+% \mbox{squared\_dist}(\mbox{\farg{x}},\mbox{\farg{y}}) 
+% = \textstyle \sum_{n=1}^N (\mbox{\farg{x}}[n] - \mbox{\farg{y}}[n])^2,
+% \]
+% where \code{N} is the size of \farg{x} and \farg{y}.
+% }
+%
 \fitem{real}{log\_sum\_exp}{real \farg{x}[]}{
 The natural logarithm of the sum of the exponentials of the elements in \farg{x}}
 \end{description}
@@ -803,7 +862,7 @@ consisting of any variable with up to 8 array dimensions (and up to 2
 additional matrix dimensions) and returns an array of integers with
 the dimensions.  For example, if two variables are declared as follows,
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 real x[7,8,9];
 matrix[8,9] y[7];
 \end{Verbatim}
@@ -857,7 +916,7 @@ real array.  For example, the following example contrasts legal with
 illegal array creation and assignment
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 real y[5];
 int x[5];
 
@@ -877,7 +936,7 @@ If the value being repeated \code{v} is a vector (i.e., \code{T} is
 consisting of 27 copies of the vector \code{v}.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 vector[5] v;
 vector[5] a[3];
 ...
@@ -892,7 +951,7 @@ depending on which of the \code{rep\_array} functions is called.  For
 instance, consider the following legal code snippet.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 real a[5,6];
 real b[3,4,5,6];
 ...
@@ -1265,23 +1324,23 @@ $\mbox{\code{x}}^{\top}\,\mbox{\code{x}}$.}
 %
 \end{description}
 
+
+The following functions all provide shorthand forms for common
+expressions, which are also much more efficient.
+%
 \begin{description}
 %
 \fitem{matrix}{quad\_form}{matrix \farg{A}, matrix \farg{B}}{
-The quadratic form $B^T*A*B$.  Using this function is much more efficient than
-doing it directly.}
+The quadratic form, i.e., \code{B'~*~A~*~B}.}
 %
 \fitem{real}{quad\_form}{matrix \farg{A}, vector \farg{B}}{
-The quadratic form $B^T*A*B$.  Using this function is much more efficient than
-doing it directly.}
+The quadratic form, i.e., \code{B'~*~A~*~B}.}
 %
-\fitem{real}{trace\_quad\_form}{matrix \farg{A}, matrix \farg{B}}{
-The trace of a quadratic form, i.e., $trace(B^T*A*B)$.  Using this function is
-much more efficient than doing it directly.}
+\fitem{real}{trace\_quad\_form}{matrix \farg{A}, matrix \farg{B}}{ 
+The trace of the quadratic form, i.e., \code{trace(B'~*~A~*~B)}.}
 %
 \fitem{real}{trace\_gen\_quad\_form}{matrix \farg{D},matrix \farg{A}, matrix \farg{B}}{
-The trace of a generalized quadratic form, i.e., $trace(D*B^T*A*B)$.  Using this
-function is much more efficient than doing it directly.}
+The trace of a generalized quadratic form, i.e., \code{trace(D~*~B'~*~A~*~B).}}
 %
 \end{description}
 
@@ -1320,6 +1379,17 @@ This is a specialization of tcrossprod(x) for lower-triangular matrices.}
 
 
 \section{Reductions}
+
+\subsection{Log Sum of Exponents}
+
+\begin{description}
+\fitem{real}{log\_sum\_exp}{vector \farg{x}}{
+The natural logarithm of the sum of the exponentials of the elements in \farg{x}}
+\fitem{real}{log\_sum\_exp}{row\_vector \farg{x}}{
+The natural logarithm of the sum of the exponentials of the elements in \farg{x}}
+\fitem{real}{log\_sum\_exp}{matrix \farg{x}}{
+The natural logarithm of the sum of the exponentials of the elements in \farg{x}}
+\end{description}
 
 \subsection{Minimum and Maximum}
 
@@ -1457,7 +1527,7 @@ statements produce the same result for vector broadcasting;  row vector
 and matrix broadcasting behave similarly.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 vector[3] x;
 x <- rep_vector(1, 3);
 x <- rep_vector(1.0, 3);  
@@ -1602,7 +1672,7 @@ arbitrary subvector.
 
 \section{Special Matrix Functions}\label{softmax.section}
 
-The softmax function maps $\reals^K$ to the $K$-simplex by
+The softmax function maps $y \in \reals^K$ to the $K$-simplex by
 \[
 \mbox{softmax}(y)
  = \frac{\exp(y)}
@@ -1610,10 +1680,54 @@ The softmax function maps $\reals^K$ to the $K$-simplex by
 \]
 %
 where $\exp(y)$ is the componentwise exponentiation of $y$.
-
+%
+Softmax is usually calculated on the log scale, 
+\[
+\log \mbox{softmax}(y)
+ \ = \ y - \log \sum_{k=1}^K \exp(y_k)
+ \ = \ y - \mbox{log\_sum\_exp}(y).
+\]
+%
+The entries in the Jacobian of the softmax function are given by
+\[
+\begin{array}{l}
+\displaystyle
+\frac{\partial}{\partial y_m} \mbox{softmax}(y)[k]
+\\[8pt]
+\displaystyle
+\mbox{ } \ \ \ = \left\{ 
+\begin{array}{ll}
+\mbox{softmax}(y)[k] - \mbox{softmax}(y)[k] \times \mbox{softmax}(y)[m]
+& \mbox{ if } m = k, \mbox{ and}
+\\[6pt]
+\mbox{softmax}(y)[k] * \mbox{softmax}(y)[m]
+& \mbox{ if } m \neq k.
+\end{array}
+\right.
+\end{array}
+\]
+For the log softmax function, the entries are
+\[
+\frac{\partial}{\partial y_m} \mbox{softmax}(y)[k]
+= \left\{ 
+\begin{array}{ll}
+1 - \mbox{softmax}(y)[m]
+& \mbox{ if } m = k, \mbox{ and}
+\\[6pt]
+\mbox{softmax}(y)[m]
+& \mbox{ if } m \neq k.
+\end{array}
+\right.
+\]
+%
+Stan provides the following functions for softmax and its log.
+%
 \begin{description}
 \fitem{vector}{softmax}{vector \farg{x}}{
 The softmax of \farg{x}}
+%
+\fitem{vector}{log\_softmax}{vector \farg{x}}{
+The natural logarithm of the softmax of \farg{x}}
 \end{description}
 %
 

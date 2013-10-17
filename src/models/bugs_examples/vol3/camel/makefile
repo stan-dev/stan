@@ -10,12 +10,12 @@ LIBFLAGS = -L$(STAN_HOME)/bin -lstan
 $(PGM) :
 	$(STAN_HOME)/bin/stanc  --name=$(PGM)  $(PGM).stan 
 	$(CXX) -O3 -DNDEBUG $(CPPFLAGS)  $(PGM).cpp -o $(PGM) $(LIBFLAGS) 
-	./$(PGM) # --data=$(PGM).data.R
+	./$(PGM) sample
 
 $(PGM2) :
 	$(STAN_HOME)/bin/stanc  --name=$(PGM2)  $(PGM2).stan 
 	$(CXX) -O3 -DNDEBUG $(CPPFLAGS)  $(PGM2).cpp -o $(PGM2) $(LIBFLAGS) 
-	./$(PGM2) # --data=$(PGM2).data.R
+	./$(PGM2) sample
 
 clean :
 	rm -f $(PGM).cpp samples.csv $(PGM) 

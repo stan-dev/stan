@@ -17,11 +17,11 @@ TEST(AgradFwdLogSumExp,Fvar) {
   EXPECT_FLOAT_EQ(log_sum_exp(0.5, 1.2), a.val_);
   EXPECT_FLOAT_EQ((1.0 * exp(0.5) + 2.0 * exp(1.2)) / (exp(0.5) 
                                                        + exp(1.2)), a.d_);
-
+  
   fvar<double> b = log_sum_exp(x, z);
   EXPECT_FLOAT_EQ(log_sum_exp(0.5, 1.4), b.val_);
   EXPECT_FLOAT_EQ(1.0 * exp(0.5) / (exp(0.5) + exp(1.4)), b.d_);
-
+  
   fvar<double> c = log_sum_exp(z, x);
   EXPECT_FLOAT_EQ(log_sum_exp(1.4, 0.5), c.val_);
   EXPECT_FLOAT_EQ(1.0 * exp(0.5) / (exp(0.5) + exp(1.4)), c.d_);

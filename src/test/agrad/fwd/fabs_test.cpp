@@ -9,8 +9,10 @@ TEST(AgradFwdFabs,Fvar) {
   using std::fabs;
   using std::isnan;
 
-  fvar<double> x(2.0,1.0);
-  fvar<double> y(-3.0,2.0);
+  fvar<double> x(2.0);
+  fvar<double> y(-3.0);
+  x.d_ = 1.0;
+  y.d_ = 2.0;
 
   fvar<double> a = fabs(x);
   EXPECT_FLOAT_EQ(fabs(2), a.val_);
@@ -34,9 +36,18 @@ TEST(AgradFwdFabs,Fvar) {
 
   fvar<double> f = fabs(x - 2);
   EXPECT_FLOAT_EQ(fabs(2.0 - 2), f.val_);
-  isnan(f.d_);
- }
+  EXPECT_FLOAT_EQ(0, f.d_);
 
+  fvar<double> w = std::numeric_limits<double>::quiet_NaN();
+  fvar<double> h = fabs(w);
+  EXPECT_TRUE(boost::math::isnan(h.val_));
+  EXPECT_TRUE(boost::math::isnan(h.d_));
+
+  fvar<double> u = 0;
+  fvar<double> j = fabs(u);
+  EXPECT_FLOAT_EQ(0.0, j.val_);
+  EXPECT_FLOAT_EQ(0.0, j.d_);
+}
 TEST(AgradFwdFabs,FvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;

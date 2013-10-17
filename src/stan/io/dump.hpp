@@ -306,7 +306,7 @@ namespace stan {
        * Write a structure variable with the specified name,
        * dimensions, and integer or double values.
        *
-       * @param name Name of variable.
+       * name Name of variable.
        * @param dims Dimensions of variable.
        * @param xs Values of variable in last-index major format.
        * @tparam T <code>double</code> or <code>int</code>.
@@ -552,9 +552,10 @@ namespace stan {
           scan_optional_long();
         } else {
           for (size_t j = 0; j < stack_i_.size(); ++j)
-            stack_r_.push_back(negate_val 
-                               ? -static_cast<double>(stack_i_[j])
-                               : static_cast<double>(stack_i_[j]));
+            stack_r_.push_back(static_cast<double>(stack_i_[j]));
+          // negate_val 
+          // ? -static_cast<double>(stack_i_[j])
+          // : static_cast<double>(stack_i_[j]));
           stack_i_.clear();
           double x;
           if (!(std::stringstream(buf) >> x))

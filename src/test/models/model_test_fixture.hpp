@@ -83,16 +83,15 @@ public:
   static std::string get_command(int chain) {
     std::stringstream command;
     command << model_path;
-    command << " --samples=" << get_csv_file(chain);
-    command << " --chain_id=" << chain;
+    command << " id=" << chain;
     if (has_data()) {
-      command << " --data=" << model_path << ".data.R";
+      command << " data file=" << model_path << ".data.R";
     }
     if (has_init()) {
-      command << " --init=" << model_path << ".init.R";
+      command << " init=" << model_path << ".init.R";
     }
-    command << " --iter=" << iterations;
-    command << " --refresh=" << iterations;
+    command << " output file=" << get_csv_file(chain)
+            << " refresh=" << iterations;
     return command.str();
   }
 
@@ -114,14 +113,15 @@ public:
   }
   
   static void test_gradient() {
+
     std::string command = get_command(1U);
-    command += " --test_grad";
+    command += " diagnose test=gradient";
+    
     std::string command_output;
-    EXPECT_NO_THROW(command_output = run_command(command))
+    EXPECT_NO_THROW(command_output = command)
       << "Gradient test failed. \n"
       << "\tRan command: " << command << "\n"
       << "\tCommand output: " << command_output;
-    //std::cout << "command_output: " << command_output << "\n";
   }
 
   /** 
@@ -130,11 +130,22 @@ public:
    */
   static void run_model() {
     for (int chain = 1; chain <= num_chains; chain++) {
-      std::string command_output;
-      command_output = run_command(get_command(chain), elapsed_milliseconds);
-      //EXPECT_NO_THROW(command_output = run_command(get_command(chain), elapsed_milliseconds)) 
-      //<< "Can not execute command: " << get_command(chain) << std::endl;
-      command_outputs.push_back(command_output);
+
+      std::string command = get_command(chain);
+      
+      std::stringstream method;
+      method << " sample num_samples="
+             << 0.5 * iterations
+             << " num_warmup="
+             << 0.5 * iterations;
+      
+      command += method.str();
+      
+      
+      run_command_output out;
+      out = run_command(command);
+      elapsed_milliseconds += out.time;
+      command_outputs.push_back(out.output);
     }
     populate_chains();
   }
@@ -148,11 +159,13 @@ public:
    * @return An initialized chains object.
    */
   static stan::mcmc::chains<>* create_chains() {
-    std::stringstream command;
-    command << get_command(1U)
-      << " --iter=0";
-    EXPECT_NO_THROW(run_command(command.str())) 
-      << "Can not build header using: " << command.str();
+    
+    std::string command = get_command(1U);
+    command += " sample num_samples=0 num_warmup=0";
+    
+    run_command_output out = run_command(command);
+    EXPECT_FALSE(out.hasError)
+      << "Can not build header using: " << out;
       
     std::ifstream ifstream;
     ifstream.open(get_csv_file(1).c_str());
@@ -309,7 +322,7 @@ TYPED_TEST_P(Model_Test_Fixture, ChainsTest) {
     parse_command_output(TypeParam::command_outputs[chain]);
 
     std::string msg = "Seed is : ";
-    for (int option = 0; option < options.size(); option++) {
+    for (size_t option = 0; option < options.size(); option++) {
       if (options[option].first == "seed")
         msg += options[option].second;
     }
@@ -420,7 +433,7 @@ TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTest) {
       std::vector<std::pair<std::string, std::string> > options = 
         parse_command_output(TypeParam::command_outputs[chain]);
 
-      for (int option = 0; option < options.size(); option++) {
+      for (size_t option = 0; option < options.size(); option++) {
         if (options[option].first == "seed")
           err_message << "seed: " << options[option].second << std::endl;
       }

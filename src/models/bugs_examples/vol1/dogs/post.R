@@ -1,6 +1,6 @@
 
 library(coda) 
-post <- read.csv(file = "samples.csv", header = TRUE, comment.char = '#')[, -(1:3)]
+post <- read.csv(file = "samples.csv", header = TRUE, comment.char = '#')[, -(1:4)]
 summary(as.mcmc(post)) 
 plot(as.mcmc(post))
 

@@ -2,8 +2,10 @@
 #define __STAN__MATH__MATRIX_HPP__
 
 #include <stan/math/matrix/Eigen.hpp>
+#include <stan/math/matrix/accumulator.hpp>
 #include <stan/math/matrix/add.hpp>
 #include <stan/math/matrix/array_builder.hpp>
+#include <stan/math/matrix/assign.hpp>
 #include <stan/math/matrix/block.hpp>
 #include <stan/math/matrix/check_range.hpp>
 #include <stan/math/matrix/cholesky_decompose.hpp>
@@ -30,15 +32,19 @@
 #include <stan/math/matrix/elt_divide.hpp>
 #include <stan/math/matrix/elt_multiply.hpp>
 #include <stan/math/matrix/exp.hpp>
+#include <stan/math/matrix/fill.hpp>
 #include <stan/math/matrix/get_base1.hpp>
 #include <stan/math/matrix/get_base1_lhs.hpp>
 #include <stan/math/matrix/head.hpp>
+#include <stan/math/matrix/initialize.hpp>
 #include <stan/math/matrix/inverse.hpp>
 #include <stan/math/matrix/inverse_spd.hpp>
 #include <stan/math/matrix/ldlt.hpp>
 #include <stan/math/matrix/log.hpp>
 #include <stan/math/matrix/log_determinant.hpp>
 #include <stan/math/matrix/log_determinant_spd.hpp>
+#include <stan/math/matrix/log_softmax.hpp>
+#include <stan/math/matrix/log_sum_exp.hpp>
 #include <stan/math/matrix/max.hpp>
 #include <stan/math/matrix/mdivide_left.hpp>
 #include <stan/math/matrix/mdivide_left_tri.hpp>

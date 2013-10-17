@@ -448,6 +448,7 @@ TEST(AgradFwdSort, d) {
 
 }
 
+
 TEST(AgradFwdSort, d_no_thrown) {
   AVEC vec0;
   EXPECT_EQ(0, vec0.size());

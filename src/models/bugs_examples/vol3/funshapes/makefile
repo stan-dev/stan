@@ -17,27 +17,27 @@ all : $(PGM) $(PGM2) $(PGM3) $(PGM4) $(PGM5)
 $(PGM) :
 	$(STAN_HOME)/bin/stanc --name=$(PGM)  $(PGM).stan 
 	$(CXX) -Wall -O3 -DNDEBUG $(CPPFLAGS) $(PGM).cpp -o $(PGM) $(LIBFLAGS)
-	./$(PGM)
+	./$(PGM) sample
 
 $(PGM2) :
 	$(STAN_HOME)/bin/stanc --name=$(PGM2)  $(PGM2).stan
 	$(CXX) -Wall -O3 -DNDEBUG $(CPPFLAGS) $(PGM2).cpp -o $(PGM2) $(LIBFLAGS)
-	./$(PGM2)
+	./$(PGM2) sample
 
 $(PGM3) :
 	$(STAN_HOME)/bin/stanc --name=$(PGM3)  $(PGM3).stan
 	$(CXX) -Wall -O3 -DNDEBUG $(CPPFLAGS) $(PGM3).cpp -o $(PGM3) $(LIBFLAGS)
-	./$(PGM3)
+	./$(PGM3) sample
 
 $(PGM4) :
 	$(STAN_HOME)/bin/stanc --name=$(PGM4)  $(PGM4).stan
 	$(CXX) -Wall -O3 -DNDEBUG $(CPPFLAGS) $(PGM4).cpp -o $(PGM4) $(LIBFLAGS)
-	./$(PGM4)
+	./$(PGM4) sample
 
 $(PGM5) :
 	$(STAN_HOME)/bin/stanc --name=$(PGM5)  $(PGM5).stan
 	$(CXX) -Wall -O3 -DNDEBUG $(CPPFLAGS) $(PGM5).cpp -o $(PGM5) $(LIBFLAGS)
-	./$(PGM5)
+	./$(PGM5) sample
 
 
 clean :

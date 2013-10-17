@@ -35,6 +35,16 @@ stan.kdev4
 src/test/gm/model_specs/compiled/*
 !src/test/gm/model_specs/compiled/*.stan
 !src/test/gm/model_specs/compiled/.gitignore
+src/test/mcmc/models/improper
+src/test/mcmc/models/improper.exe
+src/test/mcmc/models/improper.cpp
+src/test/gm/arguments/test_model
+src/test/gm/arguments/test_model.exe
+src/test/gm/arguments/test_model.cpp
+
+src/test/mcmc/models/*
+!src/test/mcmc/models/*.stan
+
 
 # tests: generated agrad tests
 src/test/agrad/distributions/univariate/continuous/*_generated_test.cpp

@@ -10,6 +10,8 @@
 #include <stan/agrad/fwd/matrix/dot_self.hpp>
 #include <stan/agrad/fwd/matrix/inverse.hpp>
 #include <stan/agrad/fwd/matrix/log_determinant.hpp>
+#include <stan/agrad/fwd/matrix/log_softmax.hpp>
+#include <stan/agrad/fwd/matrix/log_sum_exp.hpp>
 #include <stan/agrad/fwd/matrix/mdivide_left_tri_low.hpp>
 #include <stan/agrad/fwd/matrix/mdivide_left.hpp>
 #include <stan/agrad/fwd/matrix/mdivide_right_tri_low.hpp>
@@ -18,6 +20,7 @@
 #include <stan/agrad/fwd/matrix/multiply.hpp>
 #include <stan/agrad/fwd/matrix/rows_dot_product.hpp>
 #include <stan/agrad/fwd/matrix/rows_dot_self.hpp>
+#include <stan/agrad/fwd/matrix/softmax.hpp>
 #include <stan/agrad/fwd/matrix/sort.hpp>
 #include <stan/agrad/fwd/matrix/sum.hpp>
 #include <stan/agrad/fwd/matrix/tcrossprod.hpp>

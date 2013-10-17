@@ -1,7 +1,6 @@
 #ifndef __STAN__AGRAD__VAR_MATRIX_HPP__
 #define __STAN__AGRAD__VAR_MATRIX_HPP__
 
-#include <stan/agrad/rev/matrix/fill.hpp>
 #include <stan/agrad/rev/matrix/Eigen_NumTraits.hpp>
 #include <stan/agrad/rev/matrix/initialize_variable.hpp>
 #include <stan/agrad/rev/matrix/typedefs.hpp>
@@ -27,7 +26,5 @@
 #include <stan/agrad/rev/matrix/trace_quad_form.hpp>
 #include <stan/agrad/rev/matrix/trace_gen_quad_form.hpp>
 #include <stan/agrad/rev/matrix/crossprod.hpp>
-#include <stan/agrad/rev/matrix/assign_to_var.hpp>
-#include <stan/agrad/rev/matrix/assign.hpp>
 
 #endif
