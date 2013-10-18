@@ -43,8 +43,8 @@ namespace stan {
       using stan::agrad::inv;
       using stan::agrad::inv_sqrt;
       using stan::agrad::inv_square;
-      using stan::agrad::sqrt;
-      using stan::agrad::square;
+      using std::sqrt;
+      using stan::math::square;
 
       if (x2 == -2)
         return inv_square(x1);

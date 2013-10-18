@@ -2,6 +2,7 @@
 #define __STAN__AGRAD__FWD__OWENS__T_HPP__
 
 #include <stan/agrad/fwd/fvar.hpp>
+#include <stan/meta/traits.hpp>
 #include <stan/math/constants.hpp>
 #include <stan/math/functions/owens_t.hpp>
 
