@@ -33,8 +33,8 @@ namespace stan {
       bool _compute_criterion(ps_point& start, 
                               dense_e_point& finish, 
                               Eigen::VectorXd& rho) {
-        return rho.transpose() * finish.mInv * finish.p > 0
-            && rho.transpose() * finish.mInv * start.p  > 0;
+        return finish.p.transpose() * finish.mInv * (rho - finish.p) > 0
+               && start.p.transpose() * finish.mInv * (rho - start.p)  > 0;
       }
                                           
     };
