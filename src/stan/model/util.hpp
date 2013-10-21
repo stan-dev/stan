@@ -190,7 +190,7 @@ namespace stan {
       
       std::vector<double> grad_fd;
       finite_diff_grad<false,
-                       jacobian_adjust_transform,
+                       true,
                        M>(model,
                           params_r, params_i,
                           grad_fd, epsilon,
