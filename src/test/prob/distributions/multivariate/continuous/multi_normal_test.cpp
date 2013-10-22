@@ -17,8 +17,6 @@ TEST(ProbDistributionsMultiNormal,MultiNormal) {
     -3.0,  4.0, 0.0,
     0.0, 0.0, 5.0;
   EXPECT_FLOAT_EQ(-11.73908, stan::prob::multi_normal_log(y,mu,Sigma));
-  Matrix<double,Dynamic,Dynamic> L = Sigma.llt().matrixL();
-  EXPECT_FLOAT_EQ(-11.73908, stan::prob::multi_normal_cholesky_log(y,mu,L));
 }
 TEST(ProbDistributionsMultiNormal,MultiNormalVar) {
   using stan::agrad::var;
@@ -31,8 +29,6 @@ TEST(ProbDistributionsMultiNormal,MultiNormalVar) {
     -3.0,  4.0, 0.0,
     0.0, 0.0, 5.0;
   EXPECT_FLOAT_EQ(-11.73908, stan::prob::multi_normal_log(y,mu,Sigma).val());
-  Matrix<var,Dynamic,Dynamic> L = Sigma.llt().matrixL();
-  EXPECT_FLOAT_EQ(-11.73908, stan::prob::multi_normal_cholesky_log(y,mu,L).val());
 }
 TEST(ProbDistributionsMultiNormal,MultiNormalGradientUnivariate) {
   using stan::agrad::var;
@@ -251,8 +247,6 @@ TEST(ProbDistributionsMultiNormal,MultiNormalOneRow) {
     -3.0,  4.0, 0.0,
     0.0, 0.0, 5.0;
   EXPECT_FLOAT_EQ(-11.73908, stan::prob::multi_normal_log(y,mu,Sigma));
-  Matrix<double,Dynamic,Dynamic> L = Sigma.llt().matrixL();
-  EXPECT_FLOAT_EQ(-11.73908, stan::prob::multi_normal_cholesky_log(y,mu,L));
 }
 
 TEST(ProbDistributionsMultiNormal,MultiNormalMultiRow) {
@@ -266,8 +260,6 @@ TEST(ProbDistributionsMultiNormal,MultiNormalMultiRow) {
     -3.0,  4.0, 0.0,
     0.0, 0.0, 5.0;
   EXPECT_FLOAT_EQ(-54.2152, stan::prob::multi_normal_log(y,mu,Sigma));
-  Matrix<double,Dynamic,Dynamic> L = Sigma.llt().matrixL();
-  EXPECT_FLOAT_EQ(-54.2152, stan::prob::multi_normal_cholesky_log(y,mu,L));
 }
 TEST(ProbDistributionsMultiNormal,SigmaMultiRow) {
   Matrix<double,Dynamic,Dynamic> y(1,2);
