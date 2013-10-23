@@ -106,6 +106,7 @@ help:
 	@echo '  Current configuration:'
 	@echo '  - OS (Operating System):   ' $(OS)
 	@echo '  - CC (Compiler):           ' $(CC)
+	@echo '  - Compiler version:        ' $(CC_MAJOR).$(CC_MINOR)
 	@echo '  - O (Optimization Level):  ' $(O)
 	@echo '  - O_STANC (Opt for stanc): ' $(O_STANC)
 ifdef TEMPLATE_DEPTH
@@ -158,9 +159,6 @@ endif
 	@echo '                     doc/stan-reference.pdf'
 	@echo '  - doxygen        : Builds the API documentation. The documentation is located'
 	@echo '                     doc/api/'
-	@echo '  Distribution:'
-	@echo '  - dist           : Creates a tarball for distribution. The resulting tarball is'
-	@echo '                     created at the top level as stan-src-<version>.tgz.'
 	@echo '  Clean:'
 	@echo '  - clean          : Basic clean. Leaves doc and compiled libraries intact.'
 	@echo '  - clean-all      : Cleans up all of Stan.'
@@ -175,7 +173,6 @@ endif
 -include make/models   # models
 -include make/command  # bin/stanc, bin/print
 -include make/doxygen  # doxygen
--include make/dist     # dist: for distribution
 -include make/manual   # manual: manual, doc/stan-reference.pdf
 -include make/demo     # for building demos
 
