@@ -1,6 +1,10 @@
 #include <gtest/gtest.h>
-#include <test/agrad/distributions/expect_eq_diffs.hpp>
+
 #include <stan/prob/distributions/multivariate/continuous/multi_normal_prec.hpp>
+
+#include <vector>
+#include <test/agrad/distributions/multivariate/continuous/test_gradients.hpp>
+#include <test/agrad/distributions/expect_eq_diffs.hpp>
 #include <test/agrad/distributions/multivariate/continuous/agrad_distributions_multi_normal_multi_row.hpp>
 #include <test/agrad/distributions/multivariate/continuous/agrad_distributions_multi_normal.hpp>
 
@@ -99,3 +103,59 @@ TEST_F(agrad_distributions_multi_normal_multi_row,ProptoSigma) {
 
 
 
+struct multi_normal_prec_fun {
+  const int K_;
+
+  multi_normal_prec_fun(int K) : K_(K) { }
+
+  template <typename T>
+  T operator()(const std::vector<T>& x) const {
+    using Eigen::Matrix;
+    using Eigen::Dynamic;
+    using stan::agrad::var;
+    Matrix<T,Dynamic,1> y(K_);
+    Matrix<T,Dynamic,1> mu(K_);
+    Matrix<T,Dynamic,Dynamic> Sigma(K_,K_);
+    int pos = 0;
+    for (int i = 0; i < K_; ++i)
+      y(i) = x[pos++];
+    for (int i = 0; i < K_; ++i)
+      mu(i) = x[pos++];
+    for (int j = 0; j < K_; ++j) {
+      for (int i = 0; i <= j; ++i) {
+        Sigma(i,j) = x[pos++];
+        Sigma(j,i) = Sigma(i,j);
+      }
+    }
+    return stan::prob::multi_normal_prec_log<false>(y,mu,Sigma);
+  }
+};
+
+TEST(MultiNormalPrec, TestGradFunctional) {
+  std::vector<double> x(3 + 3 + 3 * 3);
+  // y
+  x[0] = 1.0;
+  x[1] = 2.0;
+  x[2] = -3.0;
+  // mu
+  x[3] = 0.0;
+  x[4] = -2.0;
+  x[5] = -3.0;
+  // Sigma
+  x[6] = 1;
+  x[7] = -1;
+  x[8] = 10;
+  x[9] = -2;
+  x[10] = 20;
+  x[11] = 56;
+
+  test_grad(multi_normal_prec_fun(3), x);
+
+  std::vector<double> u(3);
+  u[0] = 1.9;
+  u[1] = -2.7;
+  u[2] = 0.48;
+  
+  test_grad(multi_normal_prec_fun(1), u);
+
+}
