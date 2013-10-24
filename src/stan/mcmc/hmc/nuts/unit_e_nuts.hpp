@@ -31,8 +31,8 @@ namespace stan {
       bool _compute_criterion(ps_point& start, 
                               unit_e_point& finish, 
                               Eigen::VectorXd& rho) {
-        return rho.dot(finish.p) > 0
-            && rho.dot(start.p)  > 0;
+        return finish.p.dot(rho - finish.p) > 0
+               && start.p.dot(rho - start.p) > 0;
       }
                                           
     };

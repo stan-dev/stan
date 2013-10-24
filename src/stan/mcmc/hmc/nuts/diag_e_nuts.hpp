@@ -33,8 +33,8 @@ namespace stan {
       bool _compute_criterion(ps_point& start, 
                               diag_e_point& finish, 
                               Eigen::VectorXd& rho) {
-        return rho.dot( finish.mInv.cwiseProduct(finish.p) )   > 0
-            && rho.dot( finish.mInv.cwiseProduct(start.p) ) > 0;
+        return finish.mInv.cwiseProduct(finish.p).dot(rho - finish.p) > 0
+               && finish.mInv.cwiseProduct(start.p).dot(rho - start.p) > 0;
       }
                                           
     };
