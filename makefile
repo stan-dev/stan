@@ -157,7 +157,7 @@ endif
 	@echo '  - test-all       : Runs all tests.'
 	@echo '  Documentation:'
 	@echo '  - manual         : Builds the reference manual. Copies built manual to'
-	@echo '                     doc/stan-reference.pdf'
+	@echo '                     doc/stan-reference-$(VERSION_STRING).pdf'
 	@echo '  - doxygen        : Builds the API documentation. The documentation is located'
 	@echo '                     doc/api/'
 	@echo '  Clean:'
@@ -213,8 +213,8 @@ clean-manual:
 clean-models:
 	$(RM) -r models $(MODEL_HEADER).gch $(MODEL_HEADER).pch $(MODEL_HEADER).d
 
-clean-all: clean clean-dox clean-manual clean-models
-	$(RM) -r test/* bin doc
+clean-all: clean clean-manual clean-models
+	$(RM) -r test/* bin
 	$(RM) $(shell find src -type f -name '*.d') $(shell find src -type f -name '*.o')
 	cd src/test/agrad/distributions/univariate/continuous; $(RM) *_generated_test.cpp
 	cd src/test/agrad/distributions/univariate/discrete; $(RM) *_generated_test.cpp

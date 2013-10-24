@@ -4621,29 +4621,6 @@ an additive constant.  If \code{lambda} and \code{y} are both
 constants, the sampling statement will drop both terms (but still
 check for out-of-domain errors on the inputs).
 
-\section{Poisson Cumulative Distribution Function}
-
-As of the original writing of this section, Stan does not have 
-a complete set of cumulative distribution functions.  For example, the
-cumulative Poisson distribution is missing.%
-%
-\footnote{The distributions for which cumulative distribution
-  functions are available can be found by browsing the index looking
-  for the suffix \code{\_cdf}.}
-%
-Thus in order to write a truncated Poisson distribution, its
-cumulative distribution must be coded by hand.  The cumulative
-distribution for the Poisson with rate $\lambda \in (0,\infty)$ at outcome $n \in
-\nats$ is
-\[
-\frac{\Gamma(n+1,\lambda)}{n!}.
-\]
-The function $\Gamma()$ here is the incomplete gamma function, defined
-recursively by the base case
-\begin{eqnarray*}
-\Gamma \left(
-\Gamma(n,\lambda) \right) = (n-1) \Gamma(n-1,\lambda) + \lambda^{n-1} \, \exp(-\lambda)
-\end{eqnarray*}
 
 
 

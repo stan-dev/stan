@@ -12,7 +12,7 @@ namespace stan {
   const std::string MINOR_VERSION = "0";
 
   /** Patch version for Stan package. */
-  const std::string PATCH_VERSION = "0";
+  const std::string PATCH_VERSION = "1";
 
 }
 
