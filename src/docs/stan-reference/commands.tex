@@ -1131,6 +1131,41 @@ These options are for NUTS, an adaptive version of HMC.
             {The No-U-Turn Sampler}
             {Valid subarguments: \code{max\_depth}}
 %
+\end{description}
+
+\subsubsection{Tree Depth}
+
+The \code{max\_depth} argument for NUTS controls how much deeper than
+the initial node exploration is allowed to go.  The tree depth
+actually used is calculated dynamically by NUTS each iteration, and
+reported along with the parameters in the output as
+\code{treedepth\_\_}.
+
+Each extension of the depth requires doubling the number of states and
+doubling the number of leapfrog steps.  Each leapfrog step requires a
+gradient evaluation, and this is where the vast majority of time is
+spent evaluating using HMC.  When NUTS has extended the tree
+\code{max\_depth} layers, it stops automatically.  If a model is
+hitting the maximum depth, it's a sign of extreme curvature and a
+strong warning sign there might be something wrong with the model.
+For most efficient sampling, the tree depth should not be constrained,
+otherwise HMC reverts to a random walk.
+
+Stan currently counts depth starting from -1 rather than
+from the traditional 0, with a depth of -1 indicating no progress was
+made from the initial state due to slice rejection or constraint
+violation.  
+%
+\footnote{This numbering will be corrected soon, at which point the
+  interpretation of this argument will change by 1 and this section of
+  the documentation will be updated.}
+%
+A depth of 0 means that one additional parameter state was considered.
+
+See \citep{Hoffman-Gelman:2011, Hoffman-Gelman:2013} for more
+information on how NUTS works.
+
+\begin{description}
             \hiercmdarg{\indentarrow\indentarrow\indentarrow\indentarrow\indentarrow\indentarrow}{max\_depth}{$$int$$}
               {Maximum tree depth}
               {Valid values: \  $0 < \mbox{\code{max\_depth}}$}
@@ -1138,6 +1173,11 @@ These options are for NUTS, an adaptive version of HMC.
 %
 \end{description}
 %
+
+
+
+\subsubsection{Euclidean Metric}
+
 All HMC implementations in \Stan utilize quadratic kinetic energy
 functions which are specified up to the choice of a symmetric,
 positive-definite matrix known as a \textit{mass matrix} or, more
@@ -1168,6 +1208,9 @@ with \textit{Riemannian} HMC \citep{GirolamiCalderhead:2011, Betancourt:2012}.
             {Euclidean manifold with dense metric}
 \end{description}
 %
+
+\subsubsection{Step Size and Jitter}
+
 All implementations of HMC also use numerical integrators requiring a
 step size.  We also allow that step size to be ``jittered'' randomly
 during sampling to avoid any poor interactions with a fixed step size
