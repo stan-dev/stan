@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<title>Stan: src/stan/prob/distributions/multivariate/continuous/multi_normal.hpp File Reference</title>
+<title>Stan: src/stan/prob/distributions/multivariate/continuous/multi_normal_cholesky.hpp File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -91,12 +91,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a href="#namespaces">Namespaces</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
-<div class="title">multi_normal.hpp File Reference</div>  </div>
+<div class="title">multi_normal_cholesky.hpp File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &lt;boost/random/normal_distribution.hpp&gt;</code><br/>
-<code>#include &lt;boost/random/variate_generator.hpp&gt;</code><br/>
-<code>#include &lt;<a class="el" href="agrad_2agrad_8hpp_source.html">stan/agrad/agrad.hpp</a>&gt;</code><br/>
+<div class="textblock"><code>#include &lt;<a class="el" href="agrad_2agrad_8hpp_source.html">stan/agrad/agrad.hpp</a>&gt;</code><br/>
 <code>#include &lt;<a class="el" href="agrad_2matrix_8hpp_source.html">stan/agrad/matrix.hpp</a>&gt;</code><br/>
 <code>#include &lt;<a class="el" href="error__handling_8hpp_source.html">stan/math/error_handling.hpp</a>&gt;</code><br/>
 <code>#include &lt;<a class="el" href="math_2matrix_2columns__dot__product_8hpp_source.html">stan/math/matrix/columns_dot_product.hpp</a>&gt;</code><br/>
@@ -117,7 +115,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <code>#include &lt;<a class="el" href="prob_2constants_8hpp_source.html">stan/prob/constants.hpp</a>&gt;</code><br/>
 <code>#include &lt;<a class="el" href="prob_2traits_8hpp_source.html">stan/prob/traits.hpp</a>&gt;</code><br/>
 </div>
-<p><a href="multi__normal_8hpp_source.html">Go to the source code of this file.</a></p>
+<p><a href="multi__normal__cholesky_8hpp_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="namespaces"></a>
 Namespaces</h2></td></tr>
@@ -130,25 +128,24 @@ Namespaces</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a71e8ba5779457e6f532f39e89de717e4"><td class="memTemplParams" colspan="2">template&lt;bool propto, typename T_y , typename T_loc , typename T_covar &gt; </td></tr>
-<tr class="memitem:a71e8ba5779457e6f532f39e89de717e4"><td class="memTemplItemLeft" align="right" valign="top">boost::math::tools::promote_args<br class="typebreak"/>
-&lt; T_y, T_loc, T_covar &gt;::type&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacestan_1_1prob.html#a71e8ba5779457e6f532f39e89de717e4">stan::prob::multi_normal_log</a> (const Eigen::Matrix&lt; T_y, Eigen::Dynamic, 1 &gt; &amp;y, const Eigen::Matrix&lt; T_loc, Eigen::Dynamic, 1 &gt; &amp;mu, const Eigen::Matrix&lt; T_covar, Eigen::Dynamic, Eigen::Dynamic &gt; &amp;Sigma)</td></tr>
-<tr class="separator:a71e8ba5779457e6f532f39e89de717e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a627102d5b7ce3cf3dc6835cb1e6b3455"><td class="memTemplParams" colspan="2">template&lt;typename T_y , typename T_loc , typename T_covar &gt; </td></tr>
-<tr class="memitem:a627102d5b7ce3cf3dc6835cb1e6b3455"><td class="memTemplItemLeft" align="right" valign="top">boost::math::tools::promote_args<br class="typebreak"/>
-&lt; T_y, T_loc, T_covar &gt;::type&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacestan_1_1prob.html#a627102d5b7ce3cf3dc6835cb1e6b3455">stan::prob::multi_normal_log</a> (const Eigen::Matrix&lt; T_y, Eigen::Dynamic, 1 &gt; &amp;y, const Eigen::Matrix&lt; T_loc, Eigen::Dynamic, 1 &gt; &amp;mu, const Eigen::Matrix&lt; T_covar, Eigen::Dynamic, Eigen::Dynamic &gt; &amp;Sigma)</td></tr>
-<tr class="separator:a627102d5b7ce3cf3dc6835cb1e6b3455"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1be2baaf4bbbf9997816256e21fc849c"><td class="memTemplParams" colspan="2">template&lt;bool propto, typename T_y , typename T_loc , typename T_covar &gt; </td></tr>
-<tr class="memitem:a1be2baaf4bbbf9997816256e21fc849c"><td class="memTemplItemLeft" align="right" valign="top">boost::math::tools::promote_args<br class="typebreak"/>
-&lt; T_y, T_loc, T_covar &gt;::type&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacestan_1_1prob.html#a1be2baaf4bbbf9997816256e21fc849c">stan::prob::multi_normal_log</a> (const Eigen::Matrix&lt; T_y, Eigen::Dynamic, Eigen::Dynamic &gt; &amp;y, const Eigen::Matrix&lt; T_loc, Eigen::Dynamic, 1 &gt; &amp;mu, const Eigen::Matrix&lt; T_covar, Eigen::Dynamic, Eigen::Dynamic &gt; &amp;Sigma)</td></tr>
-<tr class="separator:a1be2baaf4bbbf9997816256e21fc849c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5f7dfeb4f132811e2584b673f808396c"><td class="memTemplParams" colspan="2">template&lt;typename T_y , typename T_loc , typename T_covar &gt; </td></tr>
-<tr class="memitem:a5f7dfeb4f132811e2584b673f808396c"><td class="memTemplItemLeft" align="right" valign="top">boost::math::tools::promote_args<br class="typebreak"/>
-&lt; T_y, T_loc, T_covar &gt;::type&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacestan_1_1prob.html#a5f7dfeb4f132811e2584b673f808396c">stan::prob::multi_normal_log</a> (const Eigen::Matrix&lt; T_y, Eigen::Dynamic, Eigen::Dynamic &gt; &amp;y, const Eigen::Matrix&lt; T_loc, Eigen::Dynamic, 1 &gt; &amp;mu, const Eigen::Matrix&lt; T_covar, Eigen::Dynamic, Eigen::Dynamic &gt; &amp;Sigma)</td></tr>
-<tr class="separator:a5f7dfeb4f132811e2584b673f808396c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a93eceb90a88d6432e3bda7c5e35db8e0"><td class="memTemplParams" colspan="2">template&lt;class RNG &gt; </td></tr>
-<tr class="memitem:a93eceb90a88d6432e3bda7c5e35db8e0"><td class="memTemplItemLeft" align="right" valign="top">Eigen::VectorXd&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacestan_1_1prob.html#a93eceb90a88d6432e3bda7c5e35db8e0">stan::prob::multi_normal_rng</a> (const Eigen::Matrix&lt; double, Eigen::Dynamic, 1 &gt; &amp;mu, const Eigen::Matrix&lt; double, Eigen::Dynamic, Eigen::Dynamic &gt; &amp;S, RNG &amp;rng)</td></tr>
-<tr class="separator:a93eceb90a88d6432e3bda7c5e35db8e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a01330a7c13ec8bb09a28b0983ef805c3"><td class="memTemplParams" colspan="2">template&lt;bool propto, typename T_y , typename T_loc , typename T_covar &gt; </td></tr>
+<tr class="memitem:a01330a7c13ec8bb09a28b0983ef805c3"><td class="memTemplItemLeft" align="right" valign="top">boost::math::tools::promote_args<br class="typebreak"/>
+&lt; T_y, T_loc, T_covar &gt;::type&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacestan_1_1prob.html#a01330a7c13ec8bb09a28b0983ef805c3">stan::prob::multi_normal_cholesky_log</a> (const Eigen::Matrix&lt; T_y, Eigen::Dynamic, 1 &gt; &amp;y, const Eigen::Matrix&lt; T_loc, Eigen::Dynamic, 1 &gt; &amp;mu, const Eigen::Matrix&lt; T_covar, Eigen::Dynamic, Eigen::Dynamic &gt; &amp;L)</td></tr>
+<tr class="memdesc:a01330a7c13ec8bb09a28b0983ef805c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">The log of the multivariate normal density for the given y, mu, and a Cholesky factor L of the variance matrix.  <a href="#a01330a7c13ec8bb09a28b0983ef805c3"></a><br/></td></tr>
+<tr class="separator:a01330a7c13ec8bb09a28b0983ef805c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adb8d48a2490b405c5f07ff6a316b4d3a"><td class="memTemplParams" colspan="2">template&lt;typename T_y , typename T_loc , typename T_covar &gt; </td></tr>
+<tr class="memitem:adb8d48a2490b405c5f07ff6a316b4d3a"><td class="memTemplItemLeft" align="right" valign="top">boost::math::tools::promote_args<br class="typebreak"/>
+&lt; T_y, T_loc, T_covar &gt;::type&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacestan_1_1prob.html#adb8d48a2490b405c5f07ff6a316b4d3a">stan::prob::multi_normal_cholesky_log</a> (const Eigen::Matrix&lt; T_y, Eigen::Dynamic, 1 &gt; &amp;y, const Eigen::Matrix&lt; T_loc, Eigen::Dynamic, 1 &gt; &amp;mu, const Eigen::Matrix&lt; T_covar, Eigen::Dynamic, Eigen::Dynamic &gt; &amp;L)</td></tr>
+<tr class="separator:adb8d48a2490b405c5f07ff6a316b4d3a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aceed1445a3d25c5fc36dcf38ef115692"><td class="memTemplParams" colspan="2">template&lt;bool propto, typename T_y , typename T_loc , typename T_covar &gt; </td></tr>
+<tr class="memitem:aceed1445a3d25c5fc36dcf38ef115692"><td class="memTemplItemLeft" align="right" valign="top">boost::math::tools::promote_args<br class="typebreak"/>
+&lt; T_y, T_loc, T_covar &gt;::type&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacestan_1_1prob.html#aceed1445a3d25c5fc36dcf38ef115692">stan::prob::multi_normal_cholesky_log</a> (const Eigen::Matrix&lt; T_y, Eigen::Dynamic, Eigen::Dynamic &gt; &amp;y, const Eigen::Matrix&lt; T_loc, Eigen::Dynamic, 1 &gt; &amp;mu, const Eigen::Matrix&lt; T_covar, Eigen::Dynamic, Eigen::Dynamic &gt; &amp;L)</td></tr>
+<tr class="memdesc:aceed1445a3d25c5fc36dcf38ef115692"><td class="mdescLeft">&#160;</td><td class="mdescRight">y can have multiple rows (observations) and columns (on variables)  <a href="#aceed1445a3d25c5fc36dcf38ef115692"></a><br/></td></tr>
+<tr class="separator:aceed1445a3d25c5fc36dcf38ef115692"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a59d30c1dea51119a3bc99519eca23f1f"><td class="memTemplParams" colspan="2">template&lt;typename T_y , typename T_loc , typename T_covar &gt; </td></tr>
+<tr class="memitem:a59d30c1dea51119a3bc99519eca23f1f"><td class="memTemplItemLeft" align="right" valign="top">boost::math::tools::promote_args<br class="typebreak"/>
+&lt; T_y, T_loc, T_covar &gt;::type&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacestan_1_1prob.html#a59d30c1dea51119a3bc99519eca23f1f">stan::prob::multi_normal_cholesky_log</a> (const Eigen::Matrix&lt; T_y, Eigen::Dynamic, Eigen::Dynamic &gt; &amp;y, const Eigen::Matrix&lt; T_loc, Eigen::Dynamic, 1 &gt; &amp;mu, const Eigen::Matrix&lt; T_covar, Eigen::Dynamic, Eigen::Dynamic &gt; &amp;L)</td></tr>
+<tr class="separator:a59d30c1dea51119a3bc99519eca23f1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 </div><!-- contents -->
 <hr/>

@@ -25,6 +25,61 @@ row vector have the same size.
 The pseudo-type \code{ints} is used for vectorized arguments.
 
 
+\chapter{Void Functions}
+
+Stan does not technically support functions that do not return values.
+It does support two types of statements that look like functions, one
+for incrementing log probabilities and one for printing.
+Documentation on these functions is included here for completeness.
+
+Although it's not part of Stan's type language, in this chapter,
+\code{void} will be used for the return type.
+
+\section{Increment Log Probability}
+
+There is a special function \code{increment\_log\_prob} takes a single
+real-valued argument and adds the result to the log probability.
+%
+\begin{description}
+\fitem{void}{increment\_log\_prob}{real \farg{lp}}{Add \farg{lp} to
+  the total log probability accumulator returned by the log
+  probability function defined by a Stan model.}
+\end{description}
+%
+The full behavior of the \code{increment\_log\_prob} statement and its
+relation to sampling statements is described in
+\refsection{increment-log-prob}.
+
+
+\section{Print}
+
+The \code{print} statement is unique among Stan's syntactic constructs
+in two ways.  First, it is the only function-like construct that
+allows a variable number of arguments.  Second, it is the only
+function-like construct to accept string literals (e.g., \code{"hello
+  world"}) as arguments.
+
+Printing has no effect on the model's log probability function.  Its
+sole purpose is the side effect (i.e., an effect not represented in a
+return value) of arguments being printed to whatever the standard
+output stream is connected to (e.g., the terminal in command-line Stan
+or the R console in RStan).
+%
+\begin{description}
+  \fitem{void}{print}{T1 \farg{x1},..., TN \farg{xN}}{Print the values
+    denoted by the arguments \farg{x1} through \farg{xN} on the
+    standard output stream.  There are no spaces between items in the
+    print, but a line feed (LF; Unicode U+000A; \Cpp literal
+    \code{'\textbackslash{n}'}) is inserted at the end of the printed
+    line.  The types \code{T1} through \code{TN} can be any of Stan's
+    built-in numerical types or double quoted strings of ASCII
+    characters.}
+\end{description}
+%
+The full behavior of the \code{print} statement with examples is
+documented in \refsection{print-statements}.
+
+
 \chapter{Integer-Valued Basic Functions}
 
 \noindent
