@@ -3,7 +3,7 @@
 <project name="Stan Model PDF" default="pdf" basedir=".">
 
   <property name="version"  
-            value="2.0.0"/>
+            value="2.0.1"/>
 
   <path id="classpath">
     <pathelement location="stan-models.jar"/>
