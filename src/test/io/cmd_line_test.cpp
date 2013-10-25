@@ -51,3 +51,20 @@ TEST(io_cmd_line, cmd_line_int) {
   double aaa;
   EXPECT_FALSE(cl.bare<double>(2,aaa));
 }
+
+TEST(io_cmd_line, spaces) {
+  int argc = 3;
+  const char* argv[3];
+  argv[0] = "prog";
+  argv[1] = "arg 1";
+  argv[2] = "--foo=arg 2";
+  stan::io::cmd_line cl(argc,argv);
+  std::string x;
+  EXPECT_EQ(1U, cl.bare_size());
+  EXPECT_TRUE(cl.bare<std::string>(0,x));
+  EXPECT_EQ("arg 1", x);
+
+  std::string y;
+  EXPECT_TRUE(cl.val<std::string>("foo",y));
+  EXPECT_EQ("arg 2",y);
+}
