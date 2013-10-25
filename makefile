@@ -57,7 +57,6 @@ PATH_SEPARATOR = /
 #   - CFLAGS
 #   - CFLAGS_GTEST
 #   - EXE
-#   - PCH
 ##
 -include make/os_detect
 
@@ -157,7 +156,7 @@ endif
 	@echo '  - test-all       : Runs all tests.'
 	@echo '  Documentation:'
 	@echo '  - manual         : Builds the reference manual. Copies built manual to'
-	@echo '                     doc/stan-reference.pdf'
+	@echo '                     doc/stan-reference-$(VERSION_STRING).pdf'
 	@echo '  - doxygen        : Builds the API documentation. The documentation is located'
 	@echo '                     doc/api/'
 	@echo '  Clean:'
@@ -198,11 +197,11 @@ all: build docs
 ##
 # Clean up.
 ##
-MODEL_SPECS := $(wildcard src/test/gm/model_specs/compiled/*.stan) $(wildcard src/test/gm/arguments/*.stan)
+MODEL_SPECS := $(shell find src/test -type f -name '*.stan')
 .PHONY: clean clean-demo clean-dox clean-manual clean-models clean-all
 clean:
 	$(RM) $(shell find src -type f -name '*.dSYM') $(shell find src -type f -name '*.d.*')
-	$(RM) $(wildcard $(MODEL_SPECS:%.stan=%.cpp) $(MODEL_SPECS:%.stan=%$(EXE)) $(MODEL_SPECS:%.stan=%.o))
+	$(RM) $(wildcard $(MODEL_SPECS:%.stan=%.cpp) $(MODEL_SPECS:%.stan=%$(EXE)) $(MODEL_SPECS:%.stan=%.o) $(MODEL_SPECS:%.stan=%.d))
 
 clean-dox:
 	$(RM) -r doc/api
@@ -211,10 +210,10 @@ clean-manual:
 	cd src/docs/stan-reference; $(RM) *.brf *.aux *.bbl *.blg *.log *.toc *.pdf *.out *.idx *.ilg *.ind *.cb *.cb2 *.upa
 
 clean-models:
-	$(RM) -r models $(MODEL_HEADER).gch $(MODEL_HEADER).pch $(MODEL_HEADER).d
+	$(RM) -r models $(MODEL_HEADER).d
 
-clean-all: clean clean-dox clean-manual clean-models
-	$(RM) -r test/* bin doc
+clean-all: clean clean-manual clean-models
+	$(RM) -r test/* bin
 	$(RM) $(shell find src -type f -name '*.d') $(shell find src -type f -name '*.o')
 	cd src/test/agrad/distributions/univariate/continuous; $(RM) *_generated_test.cpp
 	cd src/test/agrad/distributions/univariate/discrete; $(RM) *_generated_test.cpp

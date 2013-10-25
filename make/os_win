@@ -22,7 +22,6 @@ ifeq (g++,$(CC_TYPE))
 #  CFLAGS_GTEST += -std=c++0x
   LDLIBS += -static-libgcc
   LDLIBS += -static-libstdc++
-  PCH = .gch
 endif
 ifeq (mingw32-g++,$(CC_TYPE))
   CFLAGS += -Wno-unused-function
@@ -30,10 +29,8 @@ ifeq (mingw32-g++,$(CC_TYPE))
 #  CFLAGS_GTEST += -std=c++0x
   LDLIBS += -static-libgcc
 #  LDLIBS += -static-libstdc++
-  #PCH = .gch
 endif
 ifeq (clang++,$(CC_TYPE))
-  #PCH = .pch
 endif
 
 ## adding target that maps targets without extensions
