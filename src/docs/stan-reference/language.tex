@@ -551,7 +551,7 @@ data {
    real y[N];
 }
 parameters {
-   real<lower=fmin(y),upper=fmax(y)> phi;
+   real<lower=min(y),upper=max(y)> phi;
 }
 \end{Verbatim}
 \end{quote}
@@ -2269,7 +2269,7 @@ supported.  Similarly, \Stan 2.0 does not support providing an array of
 indices as an argument to create a piecemeal subarray of a larger
 array.
 
-\section{Log Probability Increment Statement}
+\section{Log Probability Increment Statement}\label{increment-log-prob.section}
 
 The basis of Stan's execution is the evaluation of a log probability
 function for a given set of parameters.  Data and transformed data are

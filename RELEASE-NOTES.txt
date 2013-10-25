@@ -1,6 +1,19 @@
 STAN RELEASE NOTES
 ======================================================================
 
+
+
+v2.0.1 (24 October 2013)
+======================================================================
+
+Bug Fixes
+----------------------------------
+* fixed multi_normal distribution's gradient calculations
+* fixed diagnose mode from the command line to work for matrices
+* typos in the manual
+
+
+
 v2.0.0 (16 October 2013)
 ======================================================================
 
