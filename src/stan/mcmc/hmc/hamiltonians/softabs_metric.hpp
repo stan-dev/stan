@@ -51,6 +51,96 @@ namespace stan {
       {};
       ~softabs_metric() {};
       
+      void test_derivatives(softabs_point& z) {
+        
+        double epsilon = 1e-6;
+        
+        update(z);
+        prepare_spatial_gradients(z);
+        
+        std::cout << "dtau_dq" << std::endl;
+        Eigen::VectorXd g1 = dtau_dq(z);
+        
+        for (int i = 99; i < z.q.size(); ++i) {
+          
+          double delta = 0;
+          
+          z.q.at(i) += epsilon;
+          update(z);
+          
+          delta += tau(z);
+          
+          z.q.at(i) -= 2 * epsilon;
+          update(z);
+          
+          delta -= tau(z);
+          
+          z.q.at(i) += epsilon;
+          update(z);
+          
+          delta /= 2 * epsilon;
+          
+          std::cout << "\t" << i << "\t" << g1(i) << "\t" << delta << "\t"
+                    << (g1(i) - delta) / (epsilon * epsilon) << std::endl;
+          
+        }
+        
+        std::cout << "dtau_dp" << std::endl;
+        Eigen::VectorXd g2 = dtau_dp(z);
+        
+        for (int i = 99; i < z.q.size(); ++i) {
+          
+          double delta = 0;
+          
+          z.p(i) += epsilon;
+          update_p(z);
+          
+          delta += tau(z);
+          
+          z.p(i) -= 2 * epsilon;
+          update_p(z);
+          
+          delta -= tau(z);
+          
+          z.p(i) += epsilon;
+          update_p(z);
+          
+          delta /= 2 * epsilon;
+          
+          std::cout << "\t" << i << "\t" << g2(i) << "\t" << delta << "\t"
+                    << (g2(i) - delta) / (epsilon * epsilon) << std::endl;
+          
+        }
+    
+        std::cout << "dphi_dq" << std::endl;
+        Eigen::VectorXd g3 = dphi_dq(z);
+        
+        for (int i = 99; i < z.q.size(); ++i) {
+          
+          double delta = 0;
+          
+          z.q.at(i) += epsilon;
+          update(z);
+          
+          delta += phi(z);
+          
+          z.q.at(i) -= 2 * epsilon;
+          update(z);
+          
+          delta -= phi(z);
+          
+          z.q.at(i) += epsilon;
+          update(z);
+          
+          delta /= 2 * epsilon;
+          
+          std::cout << "\t" << i << "\t" << g3(i) << "\t" << delta << "\t"
+                    << (g3(i) - delta) / (epsilon * epsilon) << std::endl;
+          
+        }
+        
+      }
+      
       double T(softabs_point& z) {
         compute_metric(z);
         return this->tau(z) + 0.5 * z.log_det_metric;
@@ -73,12 +163,18 @@ namespace stan {
         z.cache.setZero();
         z.cache.triangularView<Eigen::Lower>() = z.aux_one.transpose() * z.aux_two;
         
+        for (int i = 0; i < z.p.size(); ++i) {
+          for (int j = i + 1; j < z.p.size(); ++j) {
+            z.cache(i, j) = z.cache(j, i);
+          }
+        }
+        
         Eigen::VectorXd aux(z.q.size());
         Eigen::Map<Eigen::VectorXd> eigen_q(&(z.q[0]), z.q.size());
         stan::agrad::grad_tr_mat_times_hessian(_softabs_fun<M>(this->_model, 0), eigen_q, z.cache, aux);
         aux *= -1;
         
-        return -0.5 * aux;
+        return 0.5 * aux;
       }
 
       const Eigen::VectorXd dtau_dp(softabs_point& z) {
@@ -92,9 +188,14 @@ namespace stan {
         z.cache.setZero();
         z.cache.triangularView<Eigen::Lower>() = z.eigen_deco.eigenvectors() * z.aux_two;
 
+        for (int i = 0; i < z.p.size(); ++i) {
+          for (int j = i + 1; j < z.p.size(); ++j) {
+            z.cache(i, j) = z.cache(j, i);
+          }
+        }
+        
         Eigen::Map<Eigen::VectorXd> eigen_q(&(z.q[0]), z.q.size());
         stan::agrad::grad_tr_mat_times_hessian(_softabs_fun<M>(this->_model, 0), eigen_q, z.cache, aux);
-        aux *= -1;
         
         return 0.5 * aux + z.g;
         
@@ -139,16 +240,13 @@ namespace stan {
           
           // Thresholds defined such that the approximation
           // error is on the same order of double precision
-          if(std::fabs(alpha_lambda) < 1e-4)
-          {
+          if(std::fabs(alpha_lambda) < 1e-4) {
             softabs_lambda = (1.0 + (1.0 / 3.0) * alpha_lambda * alpha_lambda) / _alpha;
           }
-          else if(std::fabs(alpha_lambda) > 18)
-          {
+          else if(std::fabs(alpha_lambda) > 18) {
             softabs_lambda = std::fabs(lambda);
           }
-          else
-          {
+          else {
             softabs_lambda = lambda / std::tanh(alpha_lambda);
           }
           
@@ -182,32 +280,27 @@ namespace stan {
             
             delta = z.eigen_deco.eigenvalues()(i) - z.eigen_deco.eigenvalues()(j);
             
-            if(std::fabs(delta) < 1e-10)
-            {
+            if(std::fabs(delta) < 1e-10) {
               
               lambda = z.eigen_deco.eigenvalues()(i);
               alpha_lambda = _alpha * lambda;
               
               // Thresholds defined such that the approximation
               // error is on the same order of double precision
-              if(std::fabs(alpha_lambda) < 1e-4)
-              {
+              if(std::fabs(alpha_lambda) < 1e-4) {
                 z.pseudo_j(i, j) = (2.0 / 3.0) * alpha_lambda
-                * (1.0 - (2.0 / 15.0) * alpha_lambda * alpha_lambda);
+                                   * (1.0 - (2.0 / 15.0) * alpha_lambda * alpha_lambda);
               }
-              else if(std::fabs(alpha_lambda) > 18)
-              {
+              else if(std::fabs(alpha_lambda) > 18) {
                 z.pseudo_j(i, j) = lambda > 0 ? 1 : -1;
               }
-              else
-              {
-                sdx = std::sinh(_alpha * lambda) / lambda;
+              else {
+                sdx = std::sinh(alpha_lambda) / lambda;
                 z.pseudo_j(i, j) = (z.softabs_lambda(i) - _alpha / (sdx * sdx) ) / lambda;
               }
               
             }
-            else
-            {
+            else {
               z.pseudo_j(i, j) = ( z.softabs_lambda(i) - z.softabs_lambda(j) ) / delta;
             }
             

@@ -836,9 +836,9 @@ namespace stan {
             }
               
             case 31: {
-              return 0;
               typedef stan::mcmc::softabs_nuts<Model, rng_t> sampler;
               sampler_ptr = new sampler(model, base_rng);
+              (dynamic_cast<sampler*>(sampler_ptr))->test(s);
               categorical_argument* softabs = dynamic_cast<categorical_argument*>
                                               (metric->arg("softabs"));
               if (!init_softabs<sampler>(sampler_ptr, softabs)) return 0;
