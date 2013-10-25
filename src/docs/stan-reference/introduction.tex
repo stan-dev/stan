@@ -66,7 +66,7 @@ the known values $y$ and $x$, then generates a sequence of
 $p(\theta|y;x)$.
 
 
-\section{\Stan's Samplers}
+\section{Sampling}
 
 For continuous parameters, \Stan uses Hamiltonian Monte Carlo (\HMC)
 sampling \citep{Duane:1987, Neal:1994, Neal:2011}, a form of Markov chain Monte
@@ -130,7 +130,7 @@ accounts for both scaling and rotation,%
 but is more memory and computation intensive per leapfrog step due to
 the underlying matrix operations.
 
-\section{Convergence Monitoring and Effective Sample Size}
+\subsection{Convergence Monitoring and Effective Sample Size}
 
 Samples in a Markov chain are only drawn with the marginal
 distribution $p(\theta|y;x)$ after the chain has converged to its
@@ -151,11 +151,7 @@ to also monitor (an estimate of) the effective sample size of
 parameters of interest in order to estimate the additional estimation
 error due to correlated samples.
 
-
-
-
-
-\section{Bayesian Inference and Monte Carlo Methods}
+\subsection{Bayesian Inference and Monte Carlo Methods}
 
 \Stan was developed to support full Bayesian inference.  Bayesian
 inference is based in part on Bayes's rule,
@@ -180,6 +176,67 @@ from the posterior using plug-in estimates for quantities of interest
 such as posterior means, posterior intervals, predictions based on the
 posterior such as event outcomes or the values of as yet unobserved
 data.
+
+
+\section{Optimization}
+
+\Stan also supports optimization-based inference for models.  Given a
+posterior $p(\theta|y)$, Stan can find the posterior mode $\theta^*$,
+which is defined by
+%
+\[
+\theta^{*} = \mbox{argmax}_{\theta} \ p(\theta|y).
+\]
+%
+Here the notation $\mbox{argmax}_u \ f(v)$ is used to pick out the value
+of $v$ at which $f(v)$ is maximized.  
+
+If the prior is uniform, the posterior mode corresponds to the maximum
+likelihood estimate (MLE) of the parameters.  If the prior is not
+uniform, the posterior mode is sometimes called the maximum a
+posterior (MAP) estimate.  If parameters (typically hierarchical) have
+been marginalized out, it's sometimes called a maximum marginal
+likelihood (MML) estimate. 
+
+
+\subsection{Inference with Point Estimates}
+
+The estimate $\theta^{*}$ is a so-called ``point estimate,'' meaning
+that it summarizes the posterior distribution by a single point,
+rather than with a distribution.  Of course, a point estimate does
+not, in and of itself, take into account estimation variance.
+Posterior predictive inferences $p(\tilde{y} | y)$ can be made using
+the posterior mode given data $y$ as $p(\tilde{y}|\theta^*)$, but they
+are not Bayesian inferences, even if the model involves a prior,
+because they do not take posterior uncertainty into account.  If the
+posterior variance is low and the posterior mean is near the posterior
+mode, inference with point estimates can be very similar to full
+Bayesian inference.
+
+\subsubsection{``Empirical Bayes''}
+
+Fitting point estimates of priors and then using them for subsequent
+inference is sometimes called ``empirical Bayes'' (see, e.g.,
+\citep{Efron:2012}).%
+%
+\footnote{The scare quotes on ``empirical Bayes'' are because the
+  approach is no more empirical than full Bayes.  Empirical Bayes
+  approaches merely ignore some posterior uncertainty to make
+  inference more efficient computationally.}
+%
+Typically these optimizations will be done using maximum marignal
+likelihood rather than posterior modes of a full model.  Sometimes
+Empirical Bayes point estimates will be obtained using moment matching
+(see, e.g., the rat-tumor example in Chapter 5 of
+\citep{GelmanCarlinSternRubin:2003}).
+
+
+\subsection{Experimental Feature}
+
+Stan's optimizers have not been as well tested as its samplers, so
+they are still considered an ``experimental'' feature.  We would love
+to hear back about successess or failures users have with
+optimization.  
 
 
 
@@ -214,7 +271,7 @@ directories to the directory in which Stan is installed (i.e., the
 directory containing the file named \code{makefile}).
 %
 \begin{quote}
-\begin{Verbatim}[fontshape=sl,fontsize=\small] 
+\begin{Verbatim}[fontshape=sl]
 > cd <stan-home>
 \end{Verbatim}
 \end{quote}
@@ -222,7 +279,7 @@ directory containing the file named \code{makefile}).
 Then make the library with the following make command
 %
 \begin{quote}
-\begin{Verbatim}[fontshape=sl,fontsize=\small]
+\begin{Verbatim}[fontshape=sl]
 > make bin/libstan.a
 \end{Verbatim}
 \end{quote}
@@ -230,7 +287,7 @@ Then make the library with the following make command
 then make the model parser and code generator with the following call
 %
 \begin{quote}
-\begin{Verbatim}[fontshape=sl,fontsize=\small]
+\begin{Verbatim}[fontshape=sl]
 > make bin/stanc
 \end{Verbatim}
 \end{quote}
@@ -243,7 +300,7 @@ Finally, make the Stan output summary program with the following
 make command
 %
 \begin{quote}
-\begin{Verbatim}[fontshape=sl,fontsize=\small]
+\begin{Verbatim}[fontshape=sl]
 > make bin/print
 \end{Verbatim}
 \end{quote}
@@ -268,7 +325,7 @@ distribution located at \code{<stan-home>} as
 The file contains the following model.
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}
 data { 
   int<lower=0> N; 
   int<lower=0,upper=1> y[N];
@@ -299,7 +356,7 @@ following sampling statement can be eliminated from the model without
 changing the log probability calculation.
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}
   theta ~ beta(1,1);
 \end{Verbatim}
 \end{quote}
@@ -323,7 +380,7 @@ Iterations of the model will be faster if the loop over sampling
 statements is \textit{vectorized} by replacing
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}
   for (n in 1:N) 
     y[n] ~ bernoulli(theta);
 \end{Verbatim}
@@ -332,7 +389,7 @@ statements is \textit{vectorized} by replacing
 with the equivalent vectorized form,
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}
   y ~ bernoulli(theta);
 \end{Verbatim}
 \end{quote}
@@ -357,7 +414,7 @@ A data set of $\mbox{\code{N}}=10$ observations is available in the file
 The content of the file is as follows.
 %
 \begin{quote}
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}
 N <- 10
 y <- c(0,1,0,0,0,0,0,0,0,1)
 \end{Verbatim}
@@ -381,7 +438,7 @@ Stan was unpacked that contains the file named \code{makefile} and
 a subdirectory called \code{src/}.
 %
 \begin{quote}
-\begin{Verbatim}[fontshape=sl,fontsize=\small]
+\begin{Verbatim}[fontshape=sl]
 > cd <stan-home>
 \end{Verbatim}
 \end{quote}
@@ -389,7 +446,7 @@ a subdirectory called \code{src/}.
 Then issue the following command:
 %
 \begin{quote}
-\begin{Verbatim}[fontshape=sl,fontsize=\small]
+\begin{Verbatim}[fontshape=sl]
 > make src/models/basic_estimators/bernoulli 
 \end{Verbatim}
 \end{quote}
@@ -404,12 +461,12 @@ The C++ generated for the model and its compiled executable
 form will be placed in the same directory as the model.
 
 
-\subsection{Executing the Model}
+\subsection{Sampling from the Model}
 
 The model can be executed from the directory in which it resides.
 %
 \begin{quote}
-\begin{Verbatim}[fontshape=sl,fontsize=\small]
+\begin{Verbatim}[fontshape=sl]
 > cd src/models/basic_estimators 
 \end{Verbatim}
 \end{quote}
@@ -417,7 +474,7 @@ The model can be executed from the directory in which it resides.
 To execute sampling of the model under Linux or Mac, use
 %
 \begin{quote}
-\begin{Verbatim}[fontshape=sl,fontsize=\small]
+\begin{Verbatim}[fontshape=sl]
 > ./bernoulli sample data file=bernoulli.data.R
 \end{Verbatim}
 \end{quote}
@@ -430,7 +487,7 @@ For the Windows DOS terminal, the \code{./} prefix is not needed,
 resulting in the following command.
 %
 \begin{quote}
-\begin{Verbatim}[fontshape=sl,fontsize=\small]
+\begin{Verbatim}[fontshape=sl]
 > bernoulli sample data file=bernoulli.data.R
 \end{Verbatim}
 \end{quote}
@@ -490,7 +547,7 @@ Iteration: 2000 / 2000 [100%]  (Sampling)
 \end{Verbatim}
 \end{quote}
 
-\subsection{Sampler Output}
+\subsubsection{Sampler Output}
 
 Each execution of the model results in the samples from a single
 Markov chain being written to a file in comma-separated value (CSV) format.
@@ -640,7 +697,7 @@ The output ends with timing details,%
 \end{Verbatim}
 \end{quote}
 
-\subsection{Summarizing Output}
+\subsubsection{Summarizing Sampler Output}
 
 The command-line program \code{bin/print} will display summary
 information about the run (for more information, see
@@ -648,7 +705,7 @@ information about the run (for more information, see
 generated for \code{bernoulli} on Linux or Mac use
 %
 \begin{quote}
-\begin{Verbatim}[fontshape=sl,fontsize=\small]
+\begin{Verbatim}[fontshape=sl]
 > <stan-home>/bin/print samples.csv
 \end{Verbatim}
 \end{quote}
@@ -656,7 +713,7 @@ generated for \code{bernoulli} on Linux or Mac use
 For Windows use backslashes for the executable,
 %
 \begin{quote}
-\begin{Verbatim}[fontshape=sl,fontsize=\small]
+\begin{Verbatim}[fontshape=sl]
 > <stan-home>\bin\print samples.csv
 \end{Verbatim}
 \end{quote}
@@ -693,7 +750,7 @@ quantity.
 In the \code{bernoulli} model, there is a single parameter,
 \code{theta}. The mean, standard error of the mean, standard
 deviation, the 5\%, 50\%, and 95\% quantiles,
-number of effective samples, and $\hat{R}$ value are displayed
+number of effective samples, and $\hat{R}$ value are displayed.
 These quantities and their uses are described in detail in 
 \refchapter{mcmc}.
 
@@ -708,14 +765,133 @@ convergence and inspect the means and quantiles of the fitted
 variables.  Additionally, downstream inferences may be performed using
 the samples (e.g., to make decisions or predictions for unseen data).
 
+\subsection{Optimization}
+
+Stan can be used for finding posterior modes as well as sampling from
+the posterior.   The model does not need to be recompiled in order to
+switch from optimization to sampling, and the data input format is the
+same.  Although many command-line arguments may be provided to
+configure the optimizer, the following minimal command suffices, using
+defaults for everything but where to find the data file.
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+./bernoulli optimize data file=bernoulli.data.R
+\end{Verbatim}
+\end{quote}
+%
+which prints out the following.
+%
+\begin{quote}
+\begin{Verbatim}[fontsize=\footnotesize]
+ method = optimize
+   optimize
+     algorithm = bfgs (Default)
+       bfgs
+         init_alpha = 0.001 (Default)
+         tol_obj = 1e-08 (Default)
+         tol_grad = 1e-08 (Default)
+         tol_param = 1e-08 (Default)
+     iter = 2000 (Default)
+     save_iterations = 0 (Default)
+ id = 0 (Default)
+ data
+   file = bernoulli.data.R
+ init = 2 (Default)
+ random
+   seed = 2907588507
+ output
+   file = samples.csv (Default)
+   append_sample = 0 (Default)
+   diagnostic_file =  (Default)
+   append_diagnostic = 0 (Default)
+   refresh = 100 (Default)
+
+initial log joint probability = -10.9308
+    Iter      log prob        ||dx||      ||grad||    alpha  # evals  Notes 
+       7      -5.00402   3.67055e-07   3.06339e-11        1       10   
+Optimization terminated normally: 
+  Convergence detected: change in objective function was below
+  tolerance
+\end{Verbatim}
+\end{quote}
+%
+The first part of the output reports on the configuration used, here
+indicating the default BFGS optimizer, with default initial stepsize
+and tolerances for monitoring convergence.  The second part of the
+output indicates how well the algorithm fared, here converging and
+terminating normally.  The numbers reported indicate that it took 7
+iterations and 10 gradient evaluations, resulting in a final state
+state where the change in parameters was roughly 3e-7 and the length
+of the gradient roughly 3e-11.  The \code{alpha} value is for step
+size used.  This is, not surprisingly, far fewer than required for
+sampling; even fewer would be used with larger convergence tolerances.
+
+
+\subsubsection{Output from Optimization}
+
+The output from optimization is somewhat confusingly written into the
+file \code{samples.csv} by default, because the default is global.
+It follows the same pattern as the output for sampling, first dumping
+the entire set of parameters used.
+%
+\begin{quote}
+\begin{Verbatim}[fontsize=\small]
+# stan_version_major = 2
+# stan_version_minor = 0
+# stan_version_patch = 0
+# model = bernoulli_model
+# method = optimize
+#   optimize
+#     algorithm = bfgs (Default)
+#       bfgs
+#         init_alpha = 0.001 (Default)
+#         tol_obj = 1e-08 (Default)
+#         tol_grad = 1e-08 (Default)
+#         tol_param = 1e-08 (Default)
+#     iter = 2000 (Default)
+#     save_iterations = 0 (Default)
+# id = 0 (Default)
+# data
+#   file = bernoulli.data.R
+# init = 2 (Default)
+# random
+#   seed = 2907588507
+# output
+#   file = samples.csv (Default)
+#   append_sample = 0 (Default)
+#   diagnostic_file =  (Default)
+#   append_diagnostic = 0 (Default)
+#   refresh = 100 (Default)
+lp__,theta
+-5.00402,0.2000000000030634
+\end{Verbatim}
+\end{quote}
+%
+Note that everything is a comment other than a line for the header,
+and a line for the values.  Here, the header indicates the
+unnormalized log probability with \code{lp\_\_} and the model
+parameter \code{theta}.  The maximum log probability is -5.0 and the
+posterior mode for \code{theta} is 0.20.  The mode exactly matches
+what we would expect from the data.  
+%
+\footnote{The Jacobian adjustment included for the sampler's log
+  probability function is not applied during optimization, because it can
+  change the shape of the posterior and hence the solution.}
+%
+Because the prior was uniform, the result 0.20 represents the maximum
+likelihood estimate (MLE) for the very simple Bernoulli model.  Note
+that no uncertainty is reported.  
+
+
 \subsection{Configuring Command-Line Options}
 
 The command-line options for running a model are detailed in
-the next chapter. They can also be printed on the command
-line in Linux and on the Mac as follows.
+\refchapter{stan-cmd}. They can also be printed on the command line
+using Linux or Mac OS with
 %
 \begin{quote}
-\begin{Verbatim}[fontshape=sl,fontsize=\small]
+\begin{Verbatim}[fontshape=sl]
 > ./bernoulli help-all
 \end{Verbatim}
 \end{quote}
@@ -723,10 +899,15 @@ line in Linux and on the Mac as follows.
 and on Windows with
 %
 \begin{quote}
-\begin{Verbatim}[fontshape=sl,fontsize=\small]
+\begin{Verbatim}[fontshape=sl]
 > bernoulli help-all
 \end{Verbatim}
 \end{quote}
+%
+It may help to glance at the command-line skeletons in
+\reffigure{nuts-command} through \reffigure{diagnostic-command} to get
+a handle on the options then read the detailed descriptions earlier in
+\refchapter{stan-cmd}.
 
 \subsection{Testing Stan}
 
@@ -736,7 +917,7 @@ top-level directory into which Stan was unpacked; it should contain a
 file named \code{makefile}).
 %
 \begin{quote}
-\begin{Verbatim}[fontshape=sl,fontsize=\small]
+\begin{Verbatim}[fontshape=sl]
 > cd <stan-home>
 > make O=0 test-unit
 > make O=0 test-distributions
@@ -757,16 +938,4 @@ of memory with the default compiler, \code{g++}.  It is faster
 to run the Clang compiler (option \code{CC=clang++}), and to run in
 multiple threads (option \code{-j4} for four threads).
 
-
-% \section{User-Defined Distributions and Functions}
-
-% \Stan allows new distributions to be coded directly in the modeling
-% language.  
-
-%  in one of two ways, either
-% directly in its modeling language (see
-% \refchapter{custom-probability-functions}), or by extending the
-% modeling language using \Cpp (see
-% \refappendix{user-defined-functions}).  The latter is more efficient
-% and also portable across models.
 

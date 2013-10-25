@@ -129,10 +129,6 @@ namespace stan {
                           double epsilon = 1e-6,
                           std::ostream* msgs = 0) {
       std::vector<double> perturbed(params_r);
-      stan::model::log_prob_grad<propto,
-                                 jacobian_adjust_transform>(model, params_r,
-                                                            params_i,
-                                                            grad, msgs);
       grad.resize(params_r.size());
       for (size_t k = 0; k < params_r.size(); k++) {
         perturbed[k] += epsilon;
@@ -193,8 +189,8 @@ namespace stan {
                                                                 grad,msgs);
       
       std::vector<double> grad_fd;
-      finite_diff_grad<propto,
-                       jacobian_adjust_transform,
+      finite_diff_grad<false,
+                       true,
                        M>(model,
                           params_r, params_i,
                           grad_fd, epsilon,
