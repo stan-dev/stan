@@ -57,7 +57,7 @@ namespace stan {
       {
         
         // Initialize the algorithm
-        this->_sample_stepsize();
+        this->sample_stepsize();
         
         nuts_util util;
         

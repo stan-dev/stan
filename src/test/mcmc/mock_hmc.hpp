@@ -25,8 +25,9 @@ namespace stan {
       template <bool propto, bool jacobian_adjust_transforms, typename T>
       double log_prob(std::vector<T>& params_r,
                       std::vector<int>& params_i,
-                      std::ostream* output_stream = 0) const { 
-        return 0; 
+                      std::ostream* output_stream = 0) const {
+        std::cout << "Returning log_prob = 2.5!" << std::endl;
+        return 0;
       }
 
       // template <bool propto, bool jacobian_adjust_transforms>
@@ -40,7 +41,7 @@ namespace stan {
       double log_prob(std::vector<double>& params_r,
                       std::vector<int>& params_i,
                       std::ostream* output_stream = 0) const { 
-        return 0; 
+        return 0;
       }
       
       
@@ -82,12 +83,17 @@ namespace stan {
     // Mock Integrator
     template <typename H, typename P>
     class mock_integrator: public base_integrator<H, P> {
+    
     public:
       mock_integrator(std::ostream* o) 
       : base_integrator<H,P>(o)
       { }
       
-      void evolve(P& z, H& hamiltonian, const double epsilon) {};
+      void evolve(P& z, H& hamiltonian, const double epsilon) {
+        Eigen::Map<Eigen::VectorXd> eigen_q(&(z.q[0]), z.q.size());
+        eigen_q += epsilon * z.p;
+      };
+      
     };
     
   } // mcmc
