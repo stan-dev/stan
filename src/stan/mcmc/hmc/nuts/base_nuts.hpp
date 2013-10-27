@@ -140,7 +140,7 @@ namespace stan {
           this->_z.ps_point::operator=(z_plus);
           Eigen::VectorXd delta_rho = rho_minus + rho_init + rho_plus;
 
-          util.criterion = _compute_criterion(z_minus, this->_z, delta_rho);
+          util.criterion = compute_criterion(z_minus, this->_z, delta_rho);
           
           ++(this->_depth);
 
@@ -173,10 +173,7 @@ namespace stan {
         values.push_back(this->_depth);
       }
 
-      
-    protected:
-      
-      virtual bool _compute_criterion(ps_point& start, P& finish, Eigen::VectorXd& rho) = 0;
+      virtual bool compute_criterion(ps_point& start, P& finish, Eigen::VectorXd& rho) = 0;
       
       // Returns number of valid points in the completed subtree
       int build_tree(int depth, Eigen::VectorXd& rho, 
@@ -236,7 +233,7 @@ namespace stan {
           
           rho += subtree_rho;
           
-          util.criterion &= _compute_criterion(z_init, this->_z, subtree_rho);
+          util.criterion &= compute_criterion(z_init, this->_z, subtree_rho);
           
           return n1 + n2;
           
