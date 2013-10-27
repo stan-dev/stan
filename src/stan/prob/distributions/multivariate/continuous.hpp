@@ -4,6 +4,8 @@
 #include <stan/prob/distributions/multivariate/continuous/gaussian_dlm_obs.hpp>
 #include <stan/prob/distributions/multivariate/continuous/matrix_normal.hpp>
 #include <stan/prob/distributions/multivariate/continuous/multi_normal.hpp>
+#include <stan/prob/distributions/multivariate/continuous/multi_normal_cholesky.hpp>
+#include <stan/prob/distributions/multivariate/continuous/multi_normal_prec.hpp>
 #include <stan/prob/distributions/multivariate/continuous/multi_gp.hpp>
 #include <stan/prob/distributions/multivariate/continuous/multi_student_t.hpp>
 #include <stan/prob/distributions/multivariate/continuous/wishart.hpp>

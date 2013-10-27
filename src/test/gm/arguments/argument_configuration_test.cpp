@@ -33,16 +33,31 @@ void remove_duplicates(std::string& argument) {
   }
 }
 
-TEST(StanGmArgumentsConfiguration, TestMethod) {
-  
-  // Prepare model
-  std::vector<std::string> model_path;
-  model_path.push_back("src");
-  model_path.push_back("test");
-  model_path.push_back("gm");
-  model_path.push_back("arguments");
-  model_path.push_back("test_model");
-  
+class StanGmArgumentsConfiguration : public testing::Test {
+public:
+  static void SetUpTestCase() {
+    std::vector<std::string> model_path;
+    model_path.push_back("..");
+    model_path.push_back("src");
+    model_path.push_back("test");
+    model_path.push_back("gm");
+    model_path.push_back("arguments");
+    model_path.push_back("test_model");
+
+    command += "cd test ";
+    command += multiple_command_separator();
+    command += " ";
+    command += convert_model_path(model_path);
+  }
+
+  static void TearDownTestCase() {
+  }
+
+  static std::string command;
+};
+std::string StanGmArgumentsConfiguration::command = "";
+
+TEST_F(StanGmArgumentsConfiguration, TestMethod) {
   // Prepare arguments
   std::stringstream s;
   
@@ -90,11 +105,9 @@ TEST(StanGmArgumentsConfiguration, TestMethod) {
       
       remove_duplicates(argument);
 
-      std::string command = convert_model_path(model_path) + argument;
+      SCOPED_TRACE(command + argument);
 
-      SCOPED_TRACE(command);
-
-      run_command_output out = run_command(command);
+      run_command_output out = run_command(command + argument);
 
       expected_output.clear();
       expected_output.seekg(std::ios_base::beg);
@@ -145,15 +158,7 @@ TEST(StanGmArgumentsConfiguration, TestMethod) {
     delete valid_arguments.at(i);
 }
 
-TEST(StanGmArgumentsConfiguration, TestIdWithMethod) {
-  
-  // Prepare model
-  std::vector<std::string> model_path;
-  model_path.push_back("src");
-  model_path.push_back("test");
-  model_path.push_back("gm");
-  model_path.push_back("arguments");
-  model_path.push_back("test_model");
+TEST_F(StanGmArgumentsConfiguration, TestIdWithMethod) {
   
   // Prepare arguments
   std::stringstream method_output;
@@ -218,8 +223,7 @@ TEST(StanGmArgumentsConfiguration, TestIdWithMethod) {
       remove_duplicates(argument);
       argument = method_argument + argument;
       
-      std::string command = convert_model_path(model_path) + argument;
-      run_command_output out = run_command(command);
+      run_command_output out = run_command(command + argument);
       
       expected_output.clear();
       expected_output.seekg(std::ios_base::beg);
@@ -268,15 +272,7 @@ TEST(StanGmArgumentsConfiguration, TestIdWithMethod) {
 }
 
 
-TEST(StanGmArgumentsConfiguration, TestIdWithoutMethod) {
-  
-  // Prepare model
-  std::vector<std::string> model_path;
-  model_path.push_back("src");
-  model_path.push_back("test");
-  model_path.push_back("gm");
-  model_path.push_back("arguments");
-  model_path.push_back("test_model");
+TEST_F(StanGmArgumentsConfiguration, TestIdWithoutMethod) {
   
   // Prepare arguments
   std::stringstream s;
@@ -321,8 +317,7 @@ TEST(StanGmArgumentsConfiguration, TestIdWithoutMethod) {
       
       remove_duplicates(argument);
       
-      std::string command = convert_model_path(model_path) + argument;
-      run_command_output out = run_command(command);
+      run_command_output out = run_command(command + argument);
       
       expected_output.clear();
       expected_output.seekg(std::ios_base::beg);
@@ -375,15 +370,7 @@ TEST(StanGmArgumentsConfiguration, TestIdWithoutMethod) {
   
 }
 
-TEST(StanGmArgumentsConfiguration, TestDataWithMethod) {
-  
-  // Prepare model
-  std::vector<std::string> model_path;
-  model_path.push_back("src");
-  model_path.push_back("test");
-  model_path.push_back("gm");
-  model_path.push_back("arguments");
-  model_path.push_back("test_model");
+TEST_F(StanGmArgumentsConfiguration, TestDataWithMethod) {
   
   // Prepare arguments
   std::stringstream method_output;
@@ -448,8 +435,7 @@ TEST(StanGmArgumentsConfiguration, TestDataWithMethod) {
       remove_duplicates(argument);
       argument = method_argument + argument;
       
-      std::string command = convert_model_path(model_path) + argument;
-      run_command_output out = run_command(command);
+      run_command_output out = run_command(command + argument);
 
       expected_output.clear();
       expected_output.seekg(std::ios_base::beg);
@@ -498,15 +484,7 @@ TEST(StanGmArgumentsConfiguration, TestDataWithMethod) {
 }
 
 
-TEST(StanGmArgumentsConfiguration, TestDataWithoutMethod) {
-  
-  // Prepare model
-  std::vector<std::string> model_path;
-  model_path.push_back("src");
-  model_path.push_back("test");
-  model_path.push_back("gm");
-  model_path.push_back("arguments");
-  model_path.push_back("test_model");
+TEST_F(StanGmArgumentsConfiguration, TestDataWithoutMethod) {
   
   // Prepare arguments
   std::stringstream s;
@@ -550,9 +528,8 @@ TEST(StanGmArgumentsConfiguration, TestDataWithoutMethod) {
       if (argument.length() == 0) continue;
       
       remove_duplicates(argument);
-      
-      std::string command = convert_model_path(model_path) + argument;
-      run_command_output out = run_command(command);
+
+      run_command_output out = run_command(command + argument);
       
       expected_output.clear();
       expected_output.seekg(std::ios_base::beg);
@@ -605,15 +582,7 @@ TEST(StanGmArgumentsConfiguration, TestDataWithoutMethod) {
   
 }
 
-TEST(StanGmArgumentsConfiguration, TestInitWithMethod) {
-  
-  // Prepare model
-  std::vector<std::string> model_path;
-  model_path.push_back("src");
-  model_path.push_back("test");
-  model_path.push_back("gm");
-  model_path.push_back("arguments");
-  model_path.push_back("test_model");
+TEST_F(StanGmArgumentsConfiguration, TestInitWithMethod) {
   
   // Prepare arguments
   std::stringstream method_output;
@@ -643,7 +612,6 @@ TEST(StanGmArgumentsConfiguration, TestInitWithMethod) {
   
   stan::gm::argument_probe probe(valid_arguments);
   probe.probe_args(s);
-  
   // Check argument consistency
   bool expected_success = false;
   
@@ -678,8 +646,7 @@ TEST(StanGmArgumentsConfiguration, TestInitWithMethod) {
       remove_duplicates(argument);
       argument = method_argument + argument;
       
-      std::string command = convert_model_path(model_path) + argument;
-      run_command_output out = run_command(command);
+      run_command_output out = run_command(command + argument);
       
       expected_output.clear();
       expected_output.seekg(std::ios_base::beg);
@@ -728,15 +695,7 @@ TEST(StanGmArgumentsConfiguration, TestInitWithMethod) {
 }
 
 
-TEST(StanGmArgumentsConfiguration, TestInitWithoutMethod) {
-  
-  // Prepare model
-  std::vector<std::string> model_path;
-  model_path.push_back("src");
-  model_path.push_back("test");
-  model_path.push_back("gm");
-  model_path.push_back("arguments");
-  model_path.push_back("test_model");
+TEST_F(StanGmArgumentsConfiguration, TestInitWithoutMethod) {
   
   // Prepare arguments
   std::stringstream s;
@@ -781,8 +740,7 @@ TEST(StanGmArgumentsConfiguration, TestInitWithoutMethod) {
       
       remove_duplicates(argument);
       
-      std::string command = convert_model_path(model_path) + argument;
-      run_command_output out = run_command(command);
+      run_command_output out = run_command(command + argument);
       
       expected_output.clear();
       expected_output.seekg(std::ios_base::beg);
@@ -835,15 +793,7 @@ TEST(StanGmArgumentsConfiguration, TestInitWithoutMethod) {
   
 }
 
-TEST(StanGmArgumentsConfiguration, TestRandomWithMethod) {
-  
-  // Prepare model
-  std::vector<std::string> model_path;
-  model_path.push_back("src");
-  model_path.push_back("test");
-  model_path.push_back("gm");
-  model_path.push_back("arguments");
-  model_path.push_back("test_model");
+TEST_F(StanGmArgumentsConfiguration, TestRandomWithMethod) {
   
   // Prepare arguments
   std::stringstream method_output;
@@ -908,8 +858,7 @@ TEST(StanGmArgumentsConfiguration, TestRandomWithMethod) {
       remove_duplicates(argument);
       argument = method_argument + argument;
       
-      std::string command = convert_model_path(model_path) + argument;
-      run_command_output out = run_command(command);
+      run_command_output out = run_command(command + argument);
       
       expected_output.clear();
       expected_output.seekg(std::ios_base::beg);
@@ -958,15 +907,7 @@ TEST(StanGmArgumentsConfiguration, TestRandomWithMethod) {
 }
 
 
-TEST(StanGmArgumentsConfiguration, TestRandomWithoutMethod) {
-  
-  // Prepare model
-  std::vector<std::string> model_path;
-  model_path.push_back("src");
-  model_path.push_back("test");
-  model_path.push_back("gm");
-  model_path.push_back("arguments");
-  model_path.push_back("test_model");
+TEST_F(StanGmArgumentsConfiguration, TestRandomWithoutMethod) {
   
   // Prepare arguments
   std::stringstream s;
@@ -1011,8 +952,7 @@ TEST(StanGmArgumentsConfiguration, TestRandomWithoutMethod) {
       
       remove_duplicates(argument);
       
-      std::string command = convert_model_path(model_path) + argument;
-      run_command_output out = run_command(command);
+      run_command_output out = run_command(command + argument);
       
       expected_output.clear();
       expected_output.seekg(std::ios_base::beg);
@@ -1065,15 +1005,7 @@ TEST(StanGmArgumentsConfiguration, TestRandomWithoutMethod) {
   
 }
 
-TEST(StanGmArgumentsConfiguration, TestOutputWithMethod) {
-  
-  // Prepare model
-  std::vector<std::string> model_path;
-  model_path.push_back("src");
-  model_path.push_back("test");
-  model_path.push_back("gm");
-  model_path.push_back("arguments");
-  model_path.push_back("test_model");
+TEST_F(StanGmArgumentsConfiguration, TestOutputWithMethod) {
   
   // Prepare arguments
   std::stringstream method_output;
@@ -1138,8 +1070,7 @@ TEST(StanGmArgumentsConfiguration, TestOutputWithMethod) {
       remove_duplicates(argument);
       argument = method_argument + argument;
       
-      std::string command = convert_model_path(model_path) + argument;
-      run_command_output out = run_command(command);
+      run_command_output out = run_command(command + argument);
       
       expected_output.clear();
       expected_output.seekg(std::ios_base::beg);
@@ -1188,15 +1119,7 @@ TEST(StanGmArgumentsConfiguration, TestOutputWithMethod) {
 }
 
 
-TEST(StanGmArgumentsConfiguration, TestOutputWithoutMethod) {
-  
-  // Prepare model
-  std::vector<std::string> model_path;
-  model_path.push_back("src");
-  model_path.push_back("test");
-  model_path.push_back("gm");
-  model_path.push_back("arguments");
-  model_path.push_back("test_model");
+TEST_F(StanGmArgumentsConfiguration, TestOutputWithoutMethod) {
   
   // Prepare arguments
   std::stringstream s;
@@ -1241,8 +1164,7 @@ TEST(StanGmArgumentsConfiguration, TestOutputWithoutMethod) {
       
       remove_duplicates(argument);
       
-      std::string command = convert_model_path(model_path) + argument;
-      run_command_output out = run_command(command);
+      run_command_output out = run_command(command + argument);
       
       expected_output.clear();
       expected_output.seekg(std::ios_base::beg);
