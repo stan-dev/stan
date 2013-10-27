@@ -23,6 +23,18 @@ char get_path_separator() {
 }
 
 /** 
+ * Multiple command separator
+ * 
+ * @return '&' for Windows, ';' otherwise.
+ */
+char multiple_command_separator() {
+  if (get_path_separator() == '/')
+    return ';';
+  else
+    return '&';
+}
+
+/** 
  * Returns the path as a string with the appropriate
  * path separator.
  * 
