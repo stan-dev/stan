@@ -59,7 +59,6 @@ namespace stan {
       void _hat_T(P&z, H& hamiltonian, double epsilon, int num_fixed_point) {
         
         Eigen::Map<Eigen::VectorXd> q(&(z.q[0]), z.q.size());
-        q += epsilon * hamiltonian.dtau_dp(z);
         
         z.fp_init.noalias() = q + 0.5 * epsilon * hamiltonian.dtau_dp(z);
         

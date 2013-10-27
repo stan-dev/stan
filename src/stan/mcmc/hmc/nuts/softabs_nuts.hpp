@@ -41,7 +41,7 @@ namespace stan {
                               Eigen::VectorXd& rho) {
         
         bool end_check = (rho.dot( this->_hamiltonian.metric_inv_dot_p(finish) )
-                          - finish.dot( this->_hamiltonian.metric_inv_dot_p(finish) ) ) > 0;
+                          - finish.p.dot( this->_hamiltonian.metric_inv_dot_p(finish) ) ) > 0;
         
         std::vector<double> q_swap = finish.q;
         Eigen::VectorXd p_swap = finish.p;
@@ -52,7 +52,7 @@ namespace stan {
         this->_hamiltonian.compute_metric(finish);
         
         bool start_check = (rho.dot( this->_hamiltonian.metric_inv_dot_p(finish) )
-                            - finish.dot( this->_hamiltonian.metric_inv_dot_p(finish) ) ) > 0;
+                            - finish.p.dot( this->_hamiltonian.metric_inv_dot_p(finish) ) ) > 0;
         
         finish.q = q_swap;
         finish.p = p_swap;
