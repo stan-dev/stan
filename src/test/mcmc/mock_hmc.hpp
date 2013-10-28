@@ -26,7 +26,6 @@ namespace stan {
       double log_prob(std::vector<T>& params_r,
                       std::vector<int>& params_i,
                       std::ostream* output_stream = 0) const {
-        std::cout << "Returning log_prob = 2.5!" << std::endl;
         return 0;
       }
 
