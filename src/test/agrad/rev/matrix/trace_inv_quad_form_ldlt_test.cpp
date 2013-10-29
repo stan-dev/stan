@@ -7,7 +7,7 @@
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/agrad/rev/matrix/typedefs.hpp>
 
-TEST(AgradRevMatrix, trace_inv_quad_form_mat) {
+TEST(AgradRevMatrix, trace_inv_quad_form_ldlt_mat) {
   using stan::agrad::matrix_v;
   using stan::math::matrix_d;
   
@@ -59,7 +59,7 @@ TEST(AgradRevMatrix, trace_inv_quad_form_mat) {
   EXPECT_FLOAT_EQ(1439.1061766207, res.val());
 }
 
-TEST(AgradRevMatrix, trace_quad_form_mat_grad_vd) {
+TEST(AgradRevMatrix, trace_quad_form_ldlt_mat_grad_vd) {
   using stan::math::sum;
   using stan::agrad::matrix_v;
   using stan::math::matrix_d;
@@ -107,7 +107,7 @@ TEST(AgradRevMatrix, trace_quad_form_mat_grad_vd) {
       EXPECT_FLOAT_EQ(grad[pos], dqda(i,j));
 }
 
-TEST(AgradRevMatrix, trace_quad_form_mat_grad_dv) {
+TEST(AgradRevMatrix, trace_quad_form_ldlt_mat_grad_dv) {
   using stan::math::sum;
   using stan::agrad::matrix_v;
   using stan::math::matrix_d;
@@ -154,7 +154,7 @@ TEST(AgradRevMatrix, trace_quad_form_mat_grad_dv) {
       EXPECT_FLOAT_EQ(grad[pos], dqdb(i,j));
 }
 
-TEST(AgradRevMatrix, trace_quad_form_mat_grad_vv) {
+TEST(AgradRevMatrix, trace_quad_form_ldlt_mat_grad_vv) {
   using stan::math::sum;
   using stan::agrad::matrix_v;
   using stan::math::matrix_d;
