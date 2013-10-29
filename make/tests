@@ -159,16 +159,22 @@ ifeq ($(findstring test-,$(MAKECMDGOALS))$(findstring runtest/,$(MAKECMDGOALS)),
 	$@ --gtest_output="xml:$(basename $@).xml"
 endif
 
+
+src/test/mcmc/hmc/hamiltonians/models/%.cpp : src/test/mcmc/hmc/hamiltonians/models/%.stan bin/stanc$(EXE)
+	bin$(PATH_SEPARATOR)stanc$(EXE) --name=$(basename $(@F)) --o=$@ --no_main $<
+
+src/test/mcmc/hmc/integrators/models/%.cpp : src/test/mcmc/hmc/integrators/models/%.stan bin/stanc$(EXE)
+	bin$(PATH_SEPARATOR)stanc$(EXE) --name=$(basename $(@F)) --o=$@ --no_main $<
+
 .PRECIOUS: src/test/mcmc/hmc/hamiltonians/models/funnel.cpp
-$(addprefix src/test/mcmc/hmc/hamiltonians/,unit_e_metric_test.cpp diag_e_metric_test.cpp dense_e_metric_test.cpp) : src/test/mcmc/hmc/hamiltonians/models/funnel.cpp
+test/mcmc/hmc/hamiltonians/unit_e_metric.o test/mcmc/hmc/hamiltonians/diag_e_metric.o test/mcmc/hmc/hamiltonians/dense_e_metric.o: test/%.o : src/test/%_test.cpp $(LIBGTEST) src/test/mcmc/hmc/hamiltonians/models/funnel.cpp
+	@mkdir -p $(dir $@)
+	$(COMPILE.c) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
 
-src/test/mcmc/hmc/hamiltonians/models/funnel.cpp : src/test/mcmc/hmc/hamiltonians/models/funnel.stan bin/stanc$(EXE)
-	bin$(PATH_SEPARATOR)stanc$(EXE) --name=funnel --o=$@ --no_main src/test/mcmc/hmc/hamiltonians/models/funnel.stan
-
-test/mcmc/hmc/integrators/expl_leapfrog$(EXE) : src/test/mcmc/hmc/integrators/models/gauss.cpp
-
-src/test/mcmc/hmc/integrators/models/gauss.cpp : src/test/mcmc/hmc/integrators/models/gauss.stan
-	bin$(PATH_SEPARATOR)stanc$(EXE) --name=gauss --o=$@ --no_main src/test/mcmc/hmc/integrators/models/gauss.stan
+.PRECIOUS: src/test/mcmc/hmc/integrators/models/gauss.cpp
+test/mcmc/hmc/integrators/expl_leapfrog.o: test/%.o : src/test/%_test.cpp $(LIBGTEST) src/test/mcmc/hmc/integrators/models/gauss.cpp
+	@mkdir -p $(dir $@)
+	$(COMPILE.c) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
 
 test/gm/arguments/argument_configuration$(EXE) : test/gm/arguments/argument_configuration.o bin/libstan.a src/test/gm/arguments/test_model$(EXE)
 	@mkdir -p $(dir $@)
@@ -229,6 +235,7 @@ endif
 # tests.
 ## 
 .PHONY: runtest/%
+.PRECIOUS: test/%$(EXE)
 .SECONDARY:
 runtest/% : %$(EXE)
 	@echo '------------------------------------------------------------'
