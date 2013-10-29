@@ -4,17 +4,19 @@
 #include <sstream>
 
 #include <test/mcmc/hmc/integrators/command.cpp>
+#include <test/mcmc/hmc/integrators/models/gauss.cpp>
+
+#include <stan/io/dump.hpp>
 
 #include <stan/mcmc/hmc/hamiltonians/unit_e_metric.hpp>
-#include <stan/mcmc/hmc/hamiltonians/unit_e_point.hpp>
 #include <stan/mcmc/hmc/hamiltonians/diag_e_metric.hpp>
-#include <stan/mcmc/hmc/hamiltonians/diag_e_point.hpp>
 #include <boost/random/additive_combine.hpp> // L'Ecuyer RNG
 
 
 // namespace
 //************************************************************
 
+typedef boost::ecuyer1988 rng_t;
 
 class McmcHmcIntegratorsExplLeapfrog : public testing::Test {
 public:
@@ -30,9 +32,7 @@ public:
   
   void TearDown() {
     delete(model);
-  }  
-  
-  typedef boost::ecuyer1988 rng_t;
+  }
   
   // integrator under test
   stan::mcmc::expl_leapfrog<
@@ -360,3 +360,45 @@ TEST_F(McmcHmcIntegratorsExplLeapfrog, evolve_9) {
   EXPECT_NEAR(z.p(0),  0.371492925378682, 5e-14);
   EXPECT_NEAR(z.g(0), -1.71246374711032, 5e-14);
 }
+
+TEST_F(McmcHmcIntegratorsExplLeapfrog, energy_conservation) {
+  
+  rng_t base_rng(0);
+  
+  std::fstream data_stream(std::string("").c_str(), std::fstream::in);
+  stan::io::dump data_var_context(data_stream);
+  data_stream.close();
+  
+  gauss_namespace::gauss model(data_var_context, &std::cout);
+  
+  stan::mcmc::expl_leapfrog<
+  stan::mcmc::unit_e_metric<gauss_namespace::gauss, rng_t>,
+  stan::mcmc::unit_e_point> integrator;
+  
+  stan::mcmc::unit_e_metric<gauss_namespace::gauss, rng_t> metric(model, &std::cout);
+  
+  stan::mcmc::unit_e_point z(1, 0);
+  z.q.at(0) = 1;
+  z.p(0) = 1;
+  
+  metric.update(z);
+  double H0 = metric.H(z);
+  double aveDeltaH = 0;
+  
+  double epsilon = 1e-3;
+  double tau = 6.28318530717959;
+  size_t L = tau / epsilon;
+  
+  for (int n = 0; n < L; ++n) {
+    
+    integrator.evolve(z, metric, epsilon);
+    
+    double deltaH = metric.H(z) - H0;
+    aveDeltaH += (deltaH - aveDeltaH) / double(n + 1);
+    
+  }
+
+  EXPECT_NEAR(aveDeltaH, 0, epsilon * epsilon);
+  
+}
+

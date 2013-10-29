@@ -166,6 +166,11 @@ test/mcmc/hmc/hamiltonians/dense_e_metric$(EXE) : src/test/mcmc/hmc/hamiltonians
 src/test/mcmc/hmc/hamiltonians/models/funnel.cpp : src/test/mcmc/hmc/hamiltonians/models/funnel.stan
 	bin$(PATH_SEPARATOR)stanc$(EXE) --name=funnel --o=$@ --no_main src/test/mcmc/hmc/hamiltonians/models/funnel.stan
 
+test/mcmc/hmc/integrators/expl_leapfrog$(EXE) : src/test/mcmc/hmc/integrators/models/gauss.cpp
+
+src/test/mcmc/hmc/integrators/models/gauss.cpp : src/test/mcmc/hmc/integrators/models/gauss.stan
+	bin$(PATH_SEPARATOR)stanc$(EXE) --name=gauss --o=$@ --no_main src/test/mcmc/hmc/integrators/models/gauss.stan
+
 test/gm/arguments/argument_configuration$(EXE) : test/gm/arguments/argument_configuration.o bin/libstan.a src/test/gm/arguments/test_model$(EXE)
 	@mkdir -p $(dir $@)
 	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS) $(LDLIBS_STANC)
