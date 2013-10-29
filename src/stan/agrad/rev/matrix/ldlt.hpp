@@ -448,10 +448,12 @@ namespace stan {
         static inline void chainA(const double &adj,
                                   trace_inv_quad_form_ldlt_impl<var,R2,C2,T3,R3,C3> *impl) {
           Eigen::Matrix<double,R2,C2> aA;
+
           if (impl->Dtype_ != 2)
-            aA.noalias() = -adj*(impl->AinvB_*impl->D_.transpose()*impl->AinvB_.transpose());
+            aA.noalias() = -adj*(impl->AinvB_ * impl->D_.transpose() * impl->AinvB_.transpose());
           else
-            aA.noalias() = -adj*(impl->AinvB_*impl->AinvB_.transpose());
+            aA.noalias() = -adj*(impl->AinvB_ * impl->AinvB_.transpose());
+
           for (size_type j = 0; j < aA.cols(); j++)
             for (size_type i = 0; i < aA.rows(); i++)
               impl->_ldlt._alloc->_variA(i,j)->adj_ += aA(i,j);
@@ -459,10 +461,12 @@ namespace stan {
         static inline void chainB(const double &adj,
                                   trace_inv_quad_form_ldlt_impl<T2,R2,C2,var,R3,C3> *impl) {
           Eigen::Matrix<double,R3,C3> aB;
+
           if (impl->Dtype_ != 2)
             aB.noalias() = adj*impl->AinvB_*(impl->D_ + impl->D_.transpose());
           else
-            aB.noalias() = adj*impl->AinvB_;
+            aB.noalias() = 2*adj*impl->AinvB_;
+
           for (size_type j = 0; j < aB.cols(); j++)
             for (size_type i = 0; i < aB.rows(); i++)
               impl->_variB(i,j)->adj_ += aB(i,j);
