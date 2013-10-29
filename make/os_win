@@ -35,5 +35,5 @@ endif
 
 ## adding target that maps targets without extensions
 ## to targets with .exe at the end.
-% : %.exe
+%: %.exe %.stan
 	@# this is an intentional blank line
