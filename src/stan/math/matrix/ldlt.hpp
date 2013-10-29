@@ -18,7 +18,9 @@ namespace stan {
     template<int R, int C>
     class LDLT_factor<double,R,C> {
     public:
-      LDLT_factor() : N_(0) {}
+      LDLT_factor()
+      : N_(0), _ldltP(new Eigen::LDLT< Eigen::Matrix<double,R,C> >()) {}
+
       LDLT_factor(const Eigen::Matrix<double,R,C> &A)
       : N_(0), _ldltP(new Eigen::LDLT< Eigen::Matrix<double,R,C> >())
       {
