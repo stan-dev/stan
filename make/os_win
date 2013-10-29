@@ -14,19 +14,19 @@
 ##
 
 EXE = .exe
+O_STANC = 3
 CFLAGS_GTEST += -DGTEST_HAS_PTHREAD=0
 PATH_SEPARATOR = '\'
 ifeq (g++,$(CC_TYPE))
+  CFLAGS += -m64
   CFLAGS += -Wno-unused-function
   CFLAGS += -Wno-uninitialized
-#  CFLAGS_GTEST += -std=c++0x
   LDLIBS += -static-libgcc
   LDLIBS += -static-libstdc++
 endif
 ifeq (mingw32-g++,$(CC_TYPE))
   CFLAGS += -Wno-unused-function
   CFLAGS += -Wno-uninitialized
-#  CFLAGS_GTEST += -std=c++0x
   LDLIBS += -static-libgcc
 #  LDLIBS += -static-libstdc++
 endif
