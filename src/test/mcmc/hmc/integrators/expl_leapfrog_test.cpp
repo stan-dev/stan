@@ -18,7 +18,7 @@
 
 typedef boost::ecuyer1988 rng_t;
 
-class McmcHmcIntegratorsExplLeapfrog : public testing::Test {
+class McmcHmcIntegratorsExplLeapfrogF : public testing::Test {
 public:
   
   void SetUp() {
@@ -49,7 +49,7 @@ public:
 
 
 
-TEST_F(McmcHmcIntegratorsExplLeapfrog, begin_update_p) {
+TEST_F(McmcHmcIntegratorsExplLeapfrogF, begin_update_p) {
   // setup z
   stan::mcmc::unit_e_point z(1,0);
   z.V    =  1.99974742955684;
@@ -75,7 +75,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrog, begin_update_p) {
   EXPECT_NEAR(z.g(0),  1.99987371079118, 5e-14);
 }
 
-TEST_F(McmcHmcIntegratorsExplLeapfrog, update_q) {
+TEST_F(McmcHmcIntegratorsExplLeapfrogF, update_q) {
   // setup z
   stan::mcmc::unit_e_point z(1,0);
   z.V    =  1.99974742955684;
@@ -101,7 +101,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrog, update_q) {
   EXPECT_NEAR(z.g(0),  1.99987371079118, 5e-14);
 }
 
-TEST_F(McmcHmcIntegratorsExplLeapfrog, end_update_p) {
+TEST_F(McmcHmcIntegratorsExplLeapfrogF, end_update_p) {
   // setup z
   stan::mcmc::unit_e_point z(1,0);
   z.V    =  1.39887860643153;
@@ -127,7 +127,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrog, end_update_p) {
   EXPECT_NEAR(z.g(0),  1.67264975797776, 5e-14);
 }
 
-TEST_F(McmcHmcIntegratorsExplLeapfrog, evolve_1) {
+TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_1) {
   // setup z
   stan::mcmc::unit_e_point z(1,0);
   z.V    =  1.99974742955684;
@@ -153,7 +153,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrog, evolve_1) {
   EXPECT_NEAR(z.g(0),  1.83126205010749, 5e-14);
 }
 
-TEST_F(McmcHmcIntegratorsExplLeapfrog, evolve_2) {
+TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_2) {
   // setup z
   stan::mcmc::unit_e_point z(1,0);
   z.V    =  1.99974742955684;
@@ -179,7 +179,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrog, evolve_2) {
   EXPECT_NEAR(z.g(0),  2.06610501430439, 5e-14);
 }
 
-TEST_F(McmcHmcIntegratorsExplLeapfrog, evolve_3) {
+TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_3) {
   // setup z
   stan::mcmc::unit_e_point z(1,0);
   z.V    =  1.99974742955684;
@@ -205,7 +205,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrog, evolve_3) {
   EXPECT_NEAR(z.g(0),  2.06610501430439, 5e-14);
 }
 
-TEST_F(McmcHmcIntegratorsExplLeapfrog, evolve_4) {
+TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_4) {
   // setup z
   stan::mcmc::unit_e_point z(1,0);
   z.V    =  1.99974742955684;
@@ -231,7 +231,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrog, evolve_4) {
   EXPECT_NEAR(z.g(0),  1.43528066467474, 5e-14);
 }
 
-TEST_F(McmcHmcIntegratorsExplLeapfrog, evolve_5) {
+TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_5) {
   // setup z
   stan::mcmc::unit_e_point z(1,0);
   z.V    =  1.99974742955684;
@@ -256,7 +256,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrog, evolve_5) {
   EXPECT_NEAR(z.p(0), -1.44022928930593, 5e-14);
   EXPECT_NEAR(z.g(0),  1.24660335198005, 5e-14);
 }
-TEST_F(McmcHmcIntegratorsExplLeapfrog, evolve_6) {
+TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_6) {
   // setup z
   stan::mcmc::unit_e_point z(1,0);
   z.V    =  1.99974742955684;
@@ -282,7 +282,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrog, evolve_6) {
   EXPECT_NEAR(z.g(0), -0.409204730680088, 5e-14);
 }
 
-TEST_F(McmcHmcIntegratorsExplLeapfrog, evolve_7) {
+TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_7) {
   // setup z
   stan::mcmc::unit_e_point z(1,0);
   z.V    =  1.99974742955684;
@@ -308,7 +308,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrog, evolve_7) {
   EXPECT_NEAR(z.g(0),  -4.97752176966686, 5e-14);
 }
 
-TEST_F(McmcHmcIntegratorsExplLeapfrog, evolve_8) {
+TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_8) {
   // setup z
   stan::mcmc::unit_e_point z(1,0);
   z.V    =  1.99974742955684;
@@ -334,7 +334,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrog, evolve_8) {
   EXPECT_NEAR(z.g(0),  3.73124965311523, 5e-14);
 }
 
-TEST_F(McmcHmcIntegratorsExplLeapfrog, evolve_9) {
+TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_9) {
   // setup z
   stan::mcmc::diag_e_point z(1,0);
   z.V    =  0.807684865121721;
@@ -361,7 +361,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrog, evolve_9) {
   EXPECT_NEAR(z.g(0), -1.71246374711032, 5e-14);
 }
 
-TEST_F(McmcHmcIntegratorsExplLeapfrog, energy_conservation) {
+TEST(McmcHmcIntegratorsExplLeapfrog, energy_conservation) {
   
   rng_t base_rng(0);
   
@@ -404,7 +404,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrog, energy_conservation) {
   
 }
 
-TEST_F(McmcHmcIntegratorsExplLeapfrog, symplecticness) {
+TEST(McmcHmcIntegratorsExplLeapfrog, symplecticness) {
   
   rng_t base_rng(0);
   
