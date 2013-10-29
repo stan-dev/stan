@@ -507,13 +507,13 @@ namespace stan {
     boost::enable_if_c<boost::is_same<T1,var>::value || 
                        boost::is_same<T2,var>::value || 
                        boost::is_same<T3,var>::value, var>::type
-    trace_inv_quad_form_ldlt(const Eigen::Matrix<T1,R1,C1> &D,
-                             const stan::math::LDLT_factor<T2,R2,C2> &A,
-                             const Eigen::Matrix<T3,R3,C3> &B)
+    trace_gen_inv_quad_form_ldlt(const Eigen::Matrix<T1,R1,C1> &D,
+                                 const stan::math::LDLT_factor<T2,R2,C2> &A,
+                                 const Eigen::Matrix<T3,R3,C3> &B)
     {
-      stan::math::validate_square(D,"trace_inv_quad_form_ldlt");
-      stan::math::validate_multiplicable(A,B,"trace_inv_quad_form_ldlt");
-      stan::math::validate_multiplicable(B,D,"trace_inv_quad_form_ldlt");
+      stan::math::validate_square(D,"trace_gen_inv_quad_form_ldlt");
+      stan::math::validate_multiplicable(A,B,"trace_gen_inv_quad_form_ldlt");
+      stan::math::validate_multiplicable(B,D,"trace_gen_inv_quad_form_ldlt");
       
       trace_inv_quad_form_ldlt_impl<T2,R2,C2,T3,R3,C3> *_impl = new trace_inv_quad_form_ldlt_impl<T2,R2,C2,T3,R3,C3>(D,A,B);
       
