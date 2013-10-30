@@ -4,7 +4,7 @@
 MODEL_HEADER := src/stan/model/model_header.hpp
 
 .PRECIOUS: %.cpp %.o
-$(patsubst %.stan,%,$(wildcard $(addsuffix .stan,$(MAKECMDGOALS)))) : %$(EXE): %.o bin/libstan.a
+$(patsubst %.stan,%,$(wildcard $(addsuffix .stan,$(MAKECMDGOALS)))) : % : %.o bin/libstan.a %.stan
 	@echo ''
 	@echo '--- Linking C++ model ---'
 	$(LINK.c) -O$O $(OUTPUT_OPTION) $< $(LDLIBS)
@@ -15,7 +15,7 @@ src/%: src/%.o bin/libstan.a
 	$(LINK.c) -O$O $(OUTPUT_OPTION) $< $(LDLIBS)
 
 
-%.exe: %.o bin/libstan.a
+%.exe: %.o bin/libstan.a %.stan
 	@echo ''
 	@echo '--- Linking C++ model ---'
 	$(LINK.c) -O$O $(OUTPUT_OPTION) $< $(LDLIBS)
@@ -65,12 +65,6 @@ models/%.stan : src/models/%.stan
 		echo 'cp $(addsuffix .init.R,$(basename $<)) $(addsuffix .init.R,$(basename $@))';\
 	fi;
 
-
-#.PRECIOUS: %.cpp
-#models/%$(EXE): models/%.o bin/libstan.a
-#	@echo ''
-#	@echo '--- Linking C++ model ---'
-#	$(LINK.c) $(OUTPUT_OPTION) $< $(LDLIBS)
 
 $(MODEL_HEADER).d : $(MODEL_HEADER)
 	@if test -d $(dir $@); \
