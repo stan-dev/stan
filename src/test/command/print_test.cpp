@@ -1,6 +1,6 @@
 #include <stan/command/print.hpp>
 #include <gtest/gtest.h>
-
+#include <test/models/utility.hpp>
 
 TEST(CommandPrint, next_index_1d) {
   std::vector<int> dims(1);
@@ -125,4 +125,19 @@ TEST(CommandPrint, matrix_index_2d) {
   EXPECT_THROW(matrix_index(index, dims), std::domain_error);
 }
 
+TEST(CommandPrint, functional_test__issue_342) {
+  std::string path_separator;
+  path_separator.push_back(get_path_separator());
+  std::string command = "bin" + path_separator + "print";
+  std::string csv_file 
+    = "src" + path_separator 
+    + "test" + path_separator
+    + "command" + path_separator
+    + "print_samples" + path_separator
+    + "matrix_output.csv";
+  
 
+
+  run_command_output out = run_command(command + " " + csv_file);
+  ASSERT_FALSE(out.hasError);
+}
