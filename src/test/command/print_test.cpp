@@ -135,9 +135,8 @@ TEST(CommandPrint, functional_test__issue_342) {
     + "command" + path_separator
     + "print_samples" + path_separator
     + "matrix_output.csv";
-  
-
 
   run_command_output out = run_command(command + " " + csv_file);
-  ASSERT_FALSE(out.hasError);
+  ASSERT_FALSE(out.hasError) 
+    << "\"" << out.command << "\" quit with an error";
 }
