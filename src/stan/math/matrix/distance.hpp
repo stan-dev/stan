@@ -1,5 +1,5 @@
 #ifndef __STAN__MATH__MATRIX__DISTANCE_HPP__
-#define __STAN__MATH__MATRIX__DIST_HPP__
+#define __STAN__MATH__MATRIX__DISTANCE_HPP__
 
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/meta/traits.hpp>
