@@ -878,24 +878,24 @@ dividing by \code{length - 1}), or 0 if \farg{x} is empty}
 elements in \farg{x} (divide by \code{length - 1}), or 0 if \farg{x}
 is empty}
 %
-% \fitem{real}{dist}{real \farg{x}[], real \farg{y}[]}{The Euclidean
-%   distance between \farg{x} and \farg{y}, defined by
-% \[
-% \mbox{dist}(\mbox{\farg{x}},\mbox{\farg{y}}) 
-% = \sqrt{\textstyle \sum_{n=1}^N (\mbox{\farg{x}}[n] - \mbox{\farg{y}}[n])^2},
-% \]
-% where \code{N} is the size of \farg{x} and \farg{y}.
-% }
+\fitem{real}{distance}{real \farg{x}[], real \farg{y}[]}{The Euclidean
+  distance between \farg{x} and \farg{y}, defined by
+\[
+\mbox{distance}(\mbox{\farg{x}},\mbox{\farg{y}}) 
+= \sqrt{\textstyle \sum_{n=1}^N (\mbox{\farg{x}}[n] - \mbox{\farg{y}}[n])^2},
+\]
+where \code{N} is the size of \farg{x} and \farg{y}.
+}
 %
-% \fitem{real}{squared\_dist}{real \farg{x}[], real \farg{y}[]}{The Euclidean
-%   distance between \farg{x} and \farg{y}, defined by
-% \[
-% \mbox{squared\_dist}(\mbox{\farg{x}},\mbox{\farg{y}}) 
-% = \textstyle \sum_{n=1}^N (\mbox{\farg{x}}[n] - \mbox{\farg{y}}[n])^2,
-% \]
-% where \code{N} is the size of \farg{x} and \farg{y}.
-% }
-%
+\fitem{real}{squared\_distance}{real \farg{x}[], real \farg{y}[]}{The Euclidean
+  distance between \farg{x} and \farg{y}, defined by
+\[
+\mbox{squared\_distance}(\mbox{\farg{x}},\mbox{\farg{y}}) 
+= \textstyle \sum_{n=1}^N (\mbox{\farg{x}}[n] - \mbox{\farg{y}}[n])^2,
+\]
+where \code{N} is the size of \farg{x} and \farg{y}.
+}
+
 \fitem{real}{log\_sum\_exp}{real \farg{x}[]}{
 The natural logarithm of the sum of the exponentials of the elements in \farg{x}}
 \end{description}

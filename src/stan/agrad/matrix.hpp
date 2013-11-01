@@ -6,7 +6,7 @@
 #include <stan/agrad/rev/matrix/typedefs.hpp>
 #include <stan/agrad/rev/matrix/to_var.hpp>
 #include <stan/agrad/rev/matrix/value_of.hpp>
-#include <stan/agrad/rev/matrix/squared_dist.hpp>
+#include <stan/agrad/rev/matrix/squared_distance.hpp>
 #include <stan/agrad/rev/matrix/dot_self.hpp>
 #include <stan/agrad/rev/matrix/dot_product.hpp>
 #include <stan/agrad/rev/matrix/sort.hpp>
