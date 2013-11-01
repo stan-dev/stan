@@ -564,6 +564,12 @@ namespace stan {
           
           double lastlp = lp - 1;
           std::cout << "Initial log joint probability = " << lp << std::endl;
+          if (sample_stream && save_iterations) {
+            *sample_stream << lp << ',';
+            model.write_csv(base_rng, cont_params, disc_params, *sample_stream);
+            sample_stream->flush();
+          }
+
           int m = 0;
           for (int i = 0; i < num_iterations; i++) {
             lastlp = lp;
