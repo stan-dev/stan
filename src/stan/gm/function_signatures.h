@@ -481,7 +481,7 @@ add("minus",ROW_VECTOR_T,ROW_VECTOR_T);
 add("minus",MATRIX_T,MATRIX_T);
 add("modified_bessel_first_kind",DOUBLE_T,INT_T,DOUBLE_T);
 add("modified_bessel_second_kind",DOUBLE_T,INT_T,DOUBLE_T);
-add("multi_gp_log",DOUBLE_T, VECTOR_T,MATRIX_T,VECTOR_T);
+add("multi_gp_log",DOUBLE_T, MATRIX_T,MATRIX_T,VECTOR_T);
 add("multi_normal_cholesky_log",DOUBLE_T, VECTOR_T,VECTOR_T,MATRIX_T);
 add("multi_normal_log",DOUBLE_T, VECTOR_T,VECTOR_T,MATRIX_T);
 add("multi_normal_prec_log",DOUBLE_T, VECTOR_T,VECTOR_T,MATRIX_T);
