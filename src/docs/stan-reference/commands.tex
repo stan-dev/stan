@@ -2147,8 +2147,9 @@ The result of \code{bin/print} is displayed in \reffigure{bin-print-eg}.
    accept_stat__   0.88  5.6e-03  1.8e-01  0.51  0.95   1.0   1000    16881   1.00
    stepsize__      0.30  1.3e-15  8.9e-16  0.30  0.30  0.30   0.50      8.5   1.00
    treedepth__      1.4  2.6e-02  8.0e-01  0.00   1.0   2.0    946    15978   1.00
+   n_divergent__    1.4  0.0e+00  0.0e+00  0.00   0.0   0.0   1000    16949   1.00
    alpha             17  1.8e+00  2.5e+01   1.9   9.5    50    181     3054   1.00
-   beta              10  1.1e+00  1.4e+01   1.2   6.2    31    181     3057    1.0
+   beta              10  1.1e+00  1.4e+01   1.2   6.2    31    181     3057   1.00
 
    Samples were drawn using hmc with nuts.
    For each parameter, N_Eff is a crude measure of effective sample size,
@@ -2168,7 +2169,10 @@ The result of \code{bin/print} is displayed in \reffigure{bin-print-eg}.
   step size used by NUTS in its Hamiltonian simulation, and
   \code{treedepth\_\_} is the depth of tree used by NUTS, which is the
   log (base 2) of the number of leapfrog steps taken during the
-  Hamiltonian simulation.  }\label{bin-print-eg.figure}
+  Hamiltonian simulation.  \code{n\_divergent\_\_} gives the number
+  of leapfrog iterations with diverging error; because NUTS terminates
+  at the first divergent iteration this should always be either 0 or 1.}
+\label{bin-print-eg.figure}
 \end{figure}
 %\end{quote}
 %
