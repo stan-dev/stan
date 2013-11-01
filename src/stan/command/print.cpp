@@ -251,7 +251,8 @@ int main(int argc, const char* argv[]) {
             << std::setw(column_widths(j)) << values(param_index, j);
         }
         std::cout << std::endl;
-        next_index(index, dims);
+        if (k < max-1)
+          next_index(index, dims);
       }
       i += max-1;
     }
