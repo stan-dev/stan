@@ -180,12 +180,6 @@ namespace stan {
       dynamic_cast<Sampler*>(sampler)->set_nominal_stepsize_and_T(epsilon, int_time);
       dynamic_cast<Sampler*>(sampler)->set_stepsize_jitter(epsilon_jitter);
       
-      try {
-        dynamic_cast<Sampler*>(sampler)->init_stepsize();
-      } catch (std::runtime_error e) {
-        std::cout << e.what() << std::endl;
-        return false;
-      }
       
       return true;
       
@@ -208,13 +202,6 @@ namespace stan {
       dynamic_cast<Sampler*>(sampler)->set_stepsize_jitter(epsilon_jitter);
       dynamic_cast<Sampler*>(sampler)->set_max_depth(max_depth);
       
-      try {
-        dynamic_cast<Sampler*>(sampler)->init_stepsize();
-      } catch (std::runtime_error e) {
-        std::cout << e.what() << std::endl;
-        return false;
-      }
-      
       return true;
       
     }
@@ -229,13 +216,22 @@ namespace stan {
       
       double epsilon = dynamic_cast<Sampler*>(sampler)->get_nominal_stepsize();
       
-      dynamic_cast<Sampler*>(sampler)->get_stepsize_adaptation().set_mu(log(10 * epsilon));
-      dynamic_cast<Sampler*>(sampler)->get_stepsize_adaptation().set_delta(delta);
-      dynamic_cast<Sampler*>(sampler)->get_stepsize_adaptation().set_gamma(gamma);
-      dynamic_cast<Sampler*>(sampler)->get_stepsize_adaptation().set_kappa(kappa);
-      dynamic_cast<Sampler*>(sampler)->get_stepsize_adaptation().set_t0(t0);
+      Sampler* s = dynamic_cast<Sampler*>(sampler);
       
-      dynamic_cast<Sampler*>(sampler)->engage_adaptation();
+      s->get_stepsize_adaptation().set_mu(log(10 * epsilon));
+      s->get_stepsize_adaptation().set_delta(delta);
+      s->get_stepsize_adaptation().set_gamma(gamma);
+      s->get_stepsize_adaptation().set_kappa(kappa);
+      s->get_stepsize_adaptation().set_t0(t0);
+      
+      s->engage_adaptation();
+      
+      try {
+        s->init_stepsize();
+      } catch (std::runtime_error e) {
+        std::cout << e.what() << std::endl;
+        return false;
+      }
       
       return true;
       
@@ -295,7 +291,7 @@ namespace stan {
       //////////////////////////////////////////////////
       
       // Data input
-      std::string data_file = dynamic_cast<string_argument*>(parser.arg("data"))->value();
+      std::string data_file = dynamic_cast<string_argument*>(parser.arg("data")->arg("file"))->value();
       
       std::fstream data_stream(data_file.c_str(),
                                std::fstream::in);
@@ -527,6 +523,7 @@ namespace stan {
           std::cout << std::endl << "TEST GRADIENT MODE" << std::endl;
           int num_failed 
             = stan::model::test_gradients<true,true>(model,cont_params, disc_params);
+          (void) num_failed; // FIXME: do something with the number failed
           return error_codes::OK;
         }
         
@@ -547,20 +544,24 @@ namespace stan {
         bool save_iterations = dynamic_cast<bool_argument*>(
                                parser.arg("method")->arg("optimize")->arg("save_iterations"))->value();
 
-        if (algo->value() == "nesterov") {
+        if (sample_stream) {
+          *sample_stream << "lp__,";
+          model.write_csv_header(*sample_stream);
+        }
 
+        double lp(0);
+        int return_code = error_codes::CONFIG;
+        if (algo->value() == "nesterov") {
           bool epsilon = dynamic_cast<real_argument*>(
                          algo->arg("nesterov")->arg("stepsize"))->value();
           
-          if (sample_stream) {
-            *sample_stream << "lp__,";
-            model.write_csv_header(*sample_stream);
-          }
           
           stan::optimization::NesterovGradient<Model> ng(model, cont_params, disc_params,
                                                          epsilon, &std::cout);
           
-          double lp = ng.logp();
+          lp = ng.logp();
+          
+          double lastlp = lp - 1;
           std::cout << "Initial log joint probability = " << lp << std::endl;
           if (sample_stream && save_iterations) {
             *sample_stream << lp << ',';
@@ -570,7 +571,7 @@ namespace stan {
 
           double lastlp = lp - 1;
           int m = 0;
-          for (size_t i = 0; i < num_iterations; i++) {
+          for (int i = 0; i < num_iterations; i++) {
             lastlp = lp;
             lp = ng.step();
             ng.params_r(cont_params);
@@ -590,23 +591,9 @@ namespace stan {
             }
 
           }
-        
-          if (sample_stream) {
-            *sample_stream << lp << ',';
-            model.write_csv(base_rng, cont_params, disc_params, *sample_stream);
-          }
-          
-          return 0;
-        
+          return_code = error_codes::OK;
         } else if (algo->value() == "newton") {
-          
-          if (sample_stream) {
-            *sample_stream << "lp__,";
-            model.write_csv_header(*sample_stream);
-          }
-          
           std::vector<double> gradient;
-          double lp;
           try {
             lp = model.template log_prob<false, false>(cont_params, disc_params, &std::cout);
           } catch (std::domain_error e) {
@@ -641,30 +628,21 @@ namespace stan {
             }
             
           }
-          
-          if (sample_stream) {
-            *sample_stream << lp << ',';
-            model.write_csv(base_rng, cont_params, disc_params, *sample_stream);
-          }
-          
-          return 0;
-          
+          return_code = error_codes::OK;
         } else if (algo->value() == "bfgs") {
+          stan::optimization::BFGSLineSearch<Model> bfgs(model, cont_params, disc_params,
+                                                         &std::cout);
+          bfgs._opts.alpha0 = dynamic_cast<real_argument*>(
+                         algo->arg("bfgs")->arg("init_alpha"))->value();
+          bfgs._opts.tolF = dynamic_cast<real_argument*>(
+                         algo->arg("bfgs")->arg("tol_obj"))->value();
+          bfgs._opts.tolGrad = dynamic_cast<real_argument*>(
+                         algo->arg("bfgs")->arg("tol_grad"))->value();
+          bfgs._opts.tolX = dynamic_cast<real_argument*>(
+                         algo->arg("bfgs")->arg("tol_param"))->value();
+          bfgs._opts.maxIts = num_iterations;
           
-          bool epsilon = dynamic_cast<real_argument*>(
-                         algo->arg("bfgs")->arg("stepsize"))->value();
-          
-          if (sample_stream) {
-            *sample_stream << "lp__,";
-            model.write_csv_header(*sample_stream);
-          }
-          
-          stan::optimization::BFGSLineSearch<Model> ng(model, cont_params, disc_params,
-                                                       &std::cout);
-          if (epsilon > 0)
-            ng._opts.alpha0 = epsilon;
-          
-          double lp = ng.logp();
+          lp = bfgs.logp();
           
           std::cout << "initial log joint probability = " << lp << std::endl;
           if (sample_stream && save_iterations) {
@@ -673,61 +651,65 @@ namespace stan {
             sample_stream->flush();
           }
 
-          int m = 0;
           int ret = 0;
-          for (size_t i = 0; i < num_iterations && ret == 0; i++) {
-            
-            ret = ng.step();
-            lp = ng.logp();
-            ng.params_r(cont_params);
-            
-            if (do_print(i, 50*refresh)) {
+          
+          while (ret == 0) {  
+            if (do_print(bfgs.iter_num(), 50*refresh)) {
               std::cout << "    Iter ";
               std::cout << "     log prob ";
               std::cout << "       ||dx|| ";
               std::cout << "     ||grad|| ";
               std::cout << "      alpha ";
-              std::cout << "     alpha0 ";
+// MAB: commented out but left in because it may be useful for debugging in the future
+//              std::cout << "     alpha0 ";
               std::cout << " # evals ";
               std::cout << " Notes " << std::endl;
             }
             
-            if (do_print(i, refresh) || ret != 0 || !ng.note().empty()) {
-              std::cout << " " << std::setw(7) << (m + 1) << " ";
+            ret = bfgs.step();
+            lp = bfgs.logp();
+            bfgs.params_r(cont_params);
+            
+            if (do_print(bfgs.iter_num(), refresh) || ret != 0 || !bfgs.note().empty()) {
+              std::cout << " " << std::setw(7) << bfgs.iter_num() << " ";
               std::cout << " " << std::setw(12) << std::setprecision(6) << lp << " ";
-              std::cout << " " << std::setw(12) << std::setprecision(6) << ng.prev_step_size() << " ";
-              std::cout << " " << std::setw(12) << std::setprecision(6) << ng.curr_g().norm() << " ";
-              std::cout << " " << std::setw(10) << std::setprecision(4) << ng.alpha() << " ";
-              std::cout << " " << std::setw(10) << std::setprecision(4) << ng.alpha0() << " ";
-              std::cout << " " << std::setw(7) << ng.grad_evals() << " ";
-              std::cout << " " << ng.note() << " ";
+              std::cout << " " << std::setw(12) << std::setprecision(6) << bfgs.prev_step_size() << " ";
+              std::cout << " " << std::setw(12) << std::setprecision(6) << bfgs.curr_g().norm() << " ";
+              std::cout << " " << std::setw(10) << std::setprecision(4) << bfgs.alpha() << " ";
+//              std::cout << " " << std::setw(10) << std::setprecision(4) << bfgs.alpha0() << " ";
+              std::cout << " " << std::setw(7) << bfgs.grad_evals() << " ";
+              std::cout << " " << bfgs.note() << " ";
               std::cout << std::endl;
             }
-            
-            m++;
             
             if (sample_stream && save_iterations) {
               *sample_stream << lp << ',';
               model.write_csv(base_rng, cont_params, disc_params, *sample_stream);
               sample_stream->flush();
             }
-          
           }
           
-          if (ret != 0)
-            std::cout << "Optimization terminated with code " << ret << std::endl;
-          else
-            std::cout << "Maximum number of iterations hit, optimization terminated." << std::endl;
           
-          if (sample_stream) {
-            *sample_stream << lp << ',';
-            model.write_csv(base_rng, cont_params, disc_params, *sample_stream);
+          if (ret >= 0) {
+            std::cout << "Optimization terminated normally: " << std::endl;
+            return_code = error_codes::OK;
+          } else {
+            std::cout << "Optimization terminated with error: " << std::endl;
+            return_code = error_codes::SOFTWARE;
           }
-          
-          return 0;
-        
+          std::cout << "  " << bfgs.get_code_string(ret) << std::endl;
+        } else {
+          return_code = error_codes::CONFIG;
         }
 
+        if (sample_stream) {
+          *sample_stream << lp << ',';
+          model.write_csv(base_rng, cont_params, disc_params, *sample_stream);
+          sample_stream->flush();
+          sample_stream->close();
+          delete sample_stream;
+        }
+        return 0;
       }
         
       //////////////////////////////////////////////////
@@ -944,7 +926,7 @@ namespace stan {
         delete diagnostic_stream;
       }
       
-      for (int i = 0; i < valid_arguments.size(); ++i)
+      for (size_t i = 0; i < valid_arguments.size(); ++i)
         delete valid_arguments.at(i);
       
       return 0;

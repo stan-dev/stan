@@ -151,8 +151,6 @@ namespace stan {
       using stan::math::check_greater;
       using stan::math::check_bounded;
 
-      int K = c.size() + 1;
-
       if (!check_finite(function, eta, 
                         "Location parameter"))
         return 0;

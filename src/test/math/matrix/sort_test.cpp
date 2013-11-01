@@ -29,14 +29,14 @@ void test_sort_asc() {
 
   T z; 
   EXPECT_NO_THROW(sort_asc(z));
-  EXPECT_EQ(0, z.size());
+  EXPECT_EQ(typename T::size_type(0), z.size());
 
 }
 
 TEST(MathMatrix,sort_asc) {
   using stan::math::sort_asc;
 
-  EXPECT_EQ(0, sort_asc(std::vector<int>(0)).size());
+  EXPECT_EQ(0U, sort_asc(std::vector<int>(0)).size());
 
   test_sort_asc<std::vector<double> >();
   test_sort_asc<Eigen::Matrix<double,Eigen::Dynamic,1> >();
@@ -72,13 +72,13 @@ void test_sort_desc() {
   
   T z; 
   EXPECT_NO_THROW(sort_desc(z));
-  EXPECT_EQ(0, z.size());
+  EXPECT_EQ(typename T::size_type(0), z.size());
 }
 
 TEST(MathMatrix,sort_desc) {
   using stan::math::sort_desc;    
 
-  EXPECT_EQ(0, sort_desc(std::vector<int>(0)).size());
+  EXPECT_EQ(0U, sort_desc(std::vector<int>(0)).size());
   
   test_sort_desc<std::vector<double> >();
   test_sort_desc<Eigen::Matrix<double,Eigen::Dynamic,1> >();

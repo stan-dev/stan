@@ -238,7 +238,7 @@ public:
     // 2) Run Stan num_chains times
     std::stringstream command;
     command << path << get_path_separator() << "logistic"
-            << " data=" << path << get_path_separator() << filename << ".data.R"
+            << " data file=" << path << get_path_separator() << filename << ".data.R"
             << " sample num_samples=" << 0.5 * iterations << " num_warmup=" << 0.5 * iterations
             << " output refresh=" << iterations;
     vector<std::string> command_outputs;  
@@ -349,7 +349,7 @@ public:
     //<< " --refresh=" << iterations;
     //vector<std::string> command_outputs;  
     //long time = run_stan(command.str(), filename, command_outputs);
-    long time = 0;
+    //long time = 0;
     
     SUCCEED();
   }

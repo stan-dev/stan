@@ -24,7 +24,7 @@ void log_sum_exp_test(const Eigen::Matrix<double,R,C>& x) {
     double deriv_expected = log_sum_exp_expected.d_;
   
     Eigen::Matrix<fvar<double>,R,C> xv2(x.rows(),x.cols());
-    for (size_t i = 0; i < x.size(); ++i)
+    for (int i = 0; i < x.size(); ++i)
       xv2(i) = x(i);
     xv2(n).d_ = 2.3;
     fvar<double> log_sum_exp_fvar = log_sum_exp(xv2);
