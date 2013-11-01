@@ -489,7 +489,6 @@ namespace stan {
           if (!boost::math::isfinite(init_grad[i])) {
             std::cout << "Rejecting user-specified inititialization because of divergent gradient." << std::endl;
             return 0;
-
           }
         }
         
@@ -601,8 +600,14 @@ namespace stan {
             lp = -std::numeric_limits<double>::infinity();
           }
           
-          double lastlp = lp - 1;
           std::cout << "initial log joint probability = " << lp << std::endl;
+          if (sample_stream && save_iterations) {
+            *sample_stream << lp << ',';
+            model.write_csv(base_rng, cont_params, disc_params, *sample_stream);
+            sample_stream->flush();
+          }
+
+          double lastlp = lp - 1;
           int m = 0;
           while ((lp - lastlp) / fabs(lp) > 1e-8) {
             
@@ -639,6 +644,12 @@ namespace stan {
           lp = bfgs.logp();
           
           std::cout << "initial log joint probability = " << lp << std::endl;
+          if (sample_stream && save_iterations) {
+            *sample_stream << lp << ',';
+            model.write_csv(base_rng, cont_params, disc_params, *sample_stream);
+            sample_stream->flush();
+          }
+
           int ret = 0;
           
           while (ret == 0) {  
