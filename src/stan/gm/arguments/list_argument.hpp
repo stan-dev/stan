@@ -73,7 +73,7 @@ namespace stan {
           bool good_arg = false;
           bool valid_arg = true;
           
-          for (int i = 0; i < _values.size(); ++i) {
+          for (size_t i = 0; i < _values.size(); ++i) {
             if( _values.at(i)->name() != value) continue;
             
             _cursor = i;
@@ -102,7 +102,7 @@ namespace stan {
 
       virtual void probe_args(argument* base_arg, std::stringstream& s) {
 
-        for (int i = 0; i < _values.size(); ++i) {
+        for (size_t i = 0; i < _values.size(); ++i) {
           _cursor = i;
           
           s << "good" << std::endl;

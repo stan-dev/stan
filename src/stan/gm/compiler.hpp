@@ -13,12 +13,12 @@ namespace stan {
   namespace gm {
 
     /**
-     * Read a Stan directed graphical model specification from the
+     * Read a Stan model specification from the
      * specified input, parse it, and write the C++ code for it
      * to the specified output.
      *
      * @param msgs Output stream for warning messages
-     * @param stan_gm_in Graphical model specification
+     * @param stan_gm_in Stan model specification
      * @param cpp_out C++ code output stream
      * @param model_name Name of model class
      * @param include_main Indicates whether to generate a main
@@ -26,7 +26,7 @@ namespace stan {
      * @param in_file_name Name of input file to use in error
      * messages; defaults to <code>input</code>.
      * @return <code>false</code> if code could not be generated
-     *    due to syntax error in the Graphical model; 
+     *    due to syntax error in the Stan model; 
      *    <code>true</code> otherwise.
      * @param msgs
      * @param stan_gm_in

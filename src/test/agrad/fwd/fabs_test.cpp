@@ -1,3 +1,5 @@
+#include <limits>
+#include <boost/math/special_functions/fpclassify.hpp>
 #include <gtest/gtest.h>
 #include <stan/agrad/fvar.hpp>
 #include <stan/math/constants.hpp>
@@ -34,5 +36,15 @@ TEST(AgradFvar, fabs) {
 
   fvar<double> f = fabs(x - 2);
   EXPECT_FLOAT_EQ(fabs(2.0 - 2), f.val_);
-  isnan(f.d_);
- }
+  EXPECT_FLOAT_EQ(0, f.d_);
+
+  fvar<double> w = std::numeric_limits<double>::quiet_NaN();
+  fvar<double> h = fabs(w);
+  EXPECT_TRUE(boost::math::isnan(h.val_));
+  EXPECT_TRUE(boost::math::isnan(h.d_));
+
+  fvar<double> u = 0;
+  fvar<double> j = fabs(u);
+  EXPECT_FLOAT_EQ(0.0, j.val_);
+  EXPECT_FLOAT_EQ(0.0, j.d_);
+}

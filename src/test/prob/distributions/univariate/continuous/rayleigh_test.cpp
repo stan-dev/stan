@@ -4,9 +4,11 @@
 #include <boost/random/mersenne_twister.hpp>
 
 
-TEST(ProbDistributionsRayleigh, random) {
+TEST(ProbDistributionsRayleigh, error_check) {
   boost::random::mt19937 rng;
   EXPECT_NO_THROW(stan::prob::rayleigh_rng(2.0,rng));
+
+  EXPECT_THROW(stan::prob::rayleigh_rng(-2.0,rng),std::domain_error);
 }
 
 TEST(ProbDistributionsRayleigh, chiSquareGoodnessFitTest) {

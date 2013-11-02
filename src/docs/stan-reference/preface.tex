@@ -117,9 +117,10 @@ set.  The step size parameter could be tuned during warmup based on
 Metropolis rejection rates, but the number of steps was not so easy to
 tune while maintaining detailed balance in the sampler.  This led to
 the development of the No-U-Turn sampler (\NUTS)
-\citep{Hoffman-Gelman:2012}, which takes an ever increasing number of
-steps until the direction of the simulation turns around, then uses
-slice sampling to select a point on the simulated trajectory.
+\citep{Hoffman-Gelman:2011, Hoffman-Gelman:2013}, which takes an ever
+increasing number of steps until the direction of the simulation turns
+around, then uses slice sampling to select a point on the simulated
+trajectory.
 
 We thought we were home free at this point.  But when we measured the
 speed of some \BUGS examples versus \Stan, we were very disappointed.
@@ -160,15 +161,72 @@ matrix estimation has rotational invariance as well, but scales less
 well because of the need to invert the mass matrix once and then do matrix
 multiplications every leapfrog step.
 
+\section*{Stan 2}
+
+It's been over a year since the initial release of Stan, and we have
+been overjoyed by the quantity and quality of models people are
+building with Stan.  We've also been a bit overwhelmed by the volume
+of traffic on our user's list and issue tracker.
+
+We've been particularly happy about all the feedback we've gotten
+about installation issues as well as bugs in the code and
+documentation.  We've been pleasantly surprised at the number of such
+requests which have come with solutions in the form of a GitHub pull
+request.  That certainly makes our life easy.
+
+As the code base grew and as we became more familiar with it, we came
+to realize that it required a major refactoring (see, for example,
+\citep{FowlerEtAl:1999} for a nice discussion of refactoring).  So
+while the outside hasn't changed dramatically in Stan 2, the inside is
+almost totally different in terms of how the HMC samplers are
+organized, how the output is analyzed, how the mathematics library is
+organized, etc.  
+
+We've also improved our optimization algorithm (BFGS) and its
+parameterization.  We've added more compile-time and run-time error
+checking for models.  We've added many new functions, including new
+matrix functions and new distributions.  We've added some new
+parameterizations and managed to vectorize all the univariate
+distributions.  We've increased compatibility with a range of C++
+compilers.  
+
+We've also tried to fill out the manual to clarify things like array
+and vector indexing, programming style, and the I/O and command-line
+formats.  Most of these changes are direct results of user-reported
+confusions.  So please let us know where we can be clearer or more
+fully explain something.
+
+Finally, we've fixed all the bugs which we know about.  It was keeping
+up with the latter that really set the development time back,
+including bugs that resulted in our having to add more error checking.
+
+
 \section*{\Stan's Future}
 
 We're not done. There's still an enormous amount of work to do to
-improve \Stan.  Our to-do list is kept at the top level of the release
-in the file \code{TO-DO.txt}.  
+improve \Stan.  Our to-do list is in the form of a Wiki on GitHub:
+%
+\begin{quote}
+\url{https://github.com/stan-dev/stan/wiki/To-Do-List}
+\end{quote}
+%
+We are gradually weaning ourselves off of the to-do list in favor of
+the GitHub issue tracker (see the next section for a link).
+
+Two major features are on the short-term horizon for us after Stan
+2.  The first is a differential equation solver, which will allow
+fitting parameters of ordinary differential equations as part of model
+building (PKBUGS supplies this functionality for BUGS and it has been
+rolled into OpenBUGS).  The second big project is Riemannian manifold
+Hamiltonian Monte Carlo (RMHMC).  Both of these projects require us to
+put the finishing touches on higher-order automatic differentiation.
+We also have a number of smaller projects in the works, including more
+improvements to the modeling language itself, such as a way to define
+and reuse functions and general matrix and array index slicing.
 
 \section*{You Can Help}
 
-Please let us know if you have comments on this document or
+Please let us know if you have comments about this manual or
 suggestions for \Stan.  We're especially interested in hearing about
 models you've fit or had problems fitting with \Stan.  The best way to
 communicate with the \Stan team about user issues is through the

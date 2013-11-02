@@ -400,6 +400,20 @@ namespace stan {
       using boost::random::uniform_01;
       using std::log;
       using std::abs;
+
+      static const char* function
+        = "stan::prob::double_exponential_rng(%1%)";
+      
+      using stan::math::check_finite;
+      using stan::math::check_positive;
+
+      if(!check_finite(function, mu, "Location parameter"))
+        return 0;
+      if(!check_finite(function, sigma, "Scale parameter"))
+        return 0;
+      if(!check_positive(function, sigma, "Scale parameter"))
+        return 0;
+
       variate_generator<RNG&, uniform_01<> >
         rng_unit_01(rng, uniform_01<>());
       double a = 0;
