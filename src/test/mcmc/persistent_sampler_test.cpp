@@ -17,11 +17,10 @@ TEST(McmcPersistentSampler, check_persistency) {
   
   std::string command = convert_model_path(model_path);
   command += " sample algorithm=persist output file=" + convert_model_path(model_path) + ".csv";
-  std::string command_output;
-  long time;
+  run_command_output command_output;
   
   try {
-    command_output = run_command(command, time);
+    command_output = run_command(command);
   } catch(...) {
     ADD_FAILURE() << "Failed running command: " << command;
   }
