@@ -1014,6 +1014,42 @@ may appear in any order.
 
 \subsubsection{Sampling Adaptation-Specific Parameters}
 
+\begin{figure}
+\setlength{\unitlength}{0.005in} 
+\centering
+\begin{picture}(1000, 200)
+%
+\footnotesize\tt
+\put(25, 20) { \framebox(75, 200)[c]{I} }
+\put(100, 20) { \framebox(25, 200)[c]{A} }
+\put(125, 20) { \framebox(50, 200)[c]{A} }
+\put(175, 20) { \framebox(100, 200)[c]{A} }
+\put(275, 20) { \framebox(200, 200)[c]{A} }
+\put(475, 20) { \framebox(400, 200)[c]{A} }
+\put(875, 20) { \framebox(50, 200)[c]{T} }
+\put(0, 20) { \vector(1, 0){1000} }
+\put(800, -10) { \makebox(200, 20)[l]{Iteration} }
+%
+\end{picture}
+\caption{\small\it Adaptation during warmup occurs in three stages: initialization (I),
+adaption (A), and termination (T).  The step size is adapted in each stage but the
+(co)variance is estimated only in the adaptation windows, and only if necessitated
+by the specified sampler.}
+    \label{adaptation.figure}
+\end{figure}
+
+When adaptation is engaged the warmup period is split into three
+stages (Figure \ref{adaptation.figure}).  First the chain is allowed 
+to converge towards the typical set in an initialization buffer, with 
+only the step size adapting.  After this initial stage the (co)variances 
+are estimated in a series of adaptation windows, if needed by the sampler.  
+Each adaptation window is expanded to twice the size of the previous 
+window with estimates and the step size, reset in between.  
+Finally the step size is allowed to adapt to the final (co)variance update
+in a termination buffer.  The size of the buffers and the adaptation
+window are all customizable, although user-specified values may be
+modified slightly in order to ensure alignment with the warmup period.
+
 Currently all \Stan sampling algorithms utilize dual averaging to
 optimize the step size (this optimization during adaptation of the
 sampler should not be confused with running Stan's optimization method).
@@ -1024,7 +1060,10 @@ efficacy of the optimization is sensitive to the value of these
 parameters, and we do not recommend changing the defaults without
 experience with the dual averaging algorithm.  For more information,
 see the discussion of dual averaging in \citep{Hoffman-Gelman:2011,
-  Hoffman-Gelman:2013}.
+ Hoffman-Gelman:2013}.
+  
+ Variances or covariances are estimated using Welford accumulators
+ to avoid a loss of precision over many floating point operations.
 
 The following subarguments are introduced by the categorical argument
 \code{adapt}.  Each subargument must contiguously follow \code{adapt},
@@ -1048,7 +1087,7 @@ though they may appear in any order.
       \hiercmdarg{\indentarrow\indentarrow\indentarrow}{delta}{$$double$$}
         {Adaptation target acceptance statistic}
         {Valid values: \  $0 < \mbox{\code{delta}} < 1$}
-        {Defaults to \code{0.65}}
+        {Defaults to \code{0.8}}
 %
       \hiercmdarg{\indentarrow\indentarrow\indentarrow}{kappa}{$$double$$}
         {Adaptation relaxation exponent}
@@ -1060,11 +1099,26 @@ though they may appear in any order.
         {Valid values: \  $0 < \mbox{\code{t0}}$}
         {Defaults to \code{10}}
 %
+      \hiercmdarg{\indentarrow\indentarrow\indentarrow}{init\_buffer}{$$unsigned int$$}
+        {Number of warmup iterations before adaptation commences}
+        {Valid values: \ All}
+        {Defaults to \code{75}}
+%
+      \hiercmdarg{\indentarrow\indentarrow\indentarrow}{term\_buffer}{$$unsigned int$$}
+        {Number of warmup iterations after adaptation terminates}
+        {Valid values: \ All}
+        {Defaults to \code{50}}
+%
+      \hiercmdarg{\indentarrow\indentarrow\indentarrow}{window}{$$unsigned int$$}
+        {Width of adaptation interval}
+        {Valid values: \ All}
+        {Defaults to \code{25}}
+%
 \end{description}
 %
 By setting the acceptance statistic \code{delta} to a value closer to
 1 (its value must be strictly less than 1 and its default value is
-0.65), adaptation will be forced to use smaller step sizes.  This can
+0.8), adaptation will be forced to use smaller step sizes.  This can
 improve sampling efficiency (effective samples per iteration) at the
 cost of increased iteration times.  Raising the value of \code{delta}
 will also allow some models that would otherwise get stuck overcome
