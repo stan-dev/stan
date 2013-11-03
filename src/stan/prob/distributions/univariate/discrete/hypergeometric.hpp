@@ -96,6 +96,20 @@ namespace stan {
                        RNG& rng) {
       using boost::variate_generator;
       
+      static const char* function = "stan::prob::hypergeometric_rng(%1%)";
+
+      using stan::math::check_bounded;
+      using stan::math::check_positive;
+
+      if (!check_bounded(function, N, 0, a+b, "Draws parameter"))
+        return 0;
+      if (!check_positive(function,N,"Draws parameter"))
+        return 0;
+      if (!check_positive(function,a,"Successes in population parameter"))
+        return 0;
+      if (!check_positive(function,b,"Failures in population parameter"))
+        return 0;
+
       boost::math::hypergeometric_distribution<>dist (b, N, a + b);
       std::vector<double> index(a);
       for(int i = 0; i < a; i++)

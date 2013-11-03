@@ -27,7 +27,7 @@ namespace stan {
       
       sample transition(sample& init_sample) {
         
-        this->_sample_stepsize();
+        this->sample_stepsize();
         
         this->seed(init_sample.cont_params(), init_sample.disc_params());
         

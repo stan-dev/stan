@@ -545,13 +545,28 @@ namespace stan {
               RNG& rng) {
       using boost::variate_generator;
       using boost::gamma_distribution;
+
+      static const char* function = "stan::prob::gamma_rng(%1%)";
+
+      using stan::math::check_finite;
+      using stan::math::check_positive;
+      
+      if (!check_finite(function, alpha, "Shape parameter")) 
+        return 0;
+      if (!check_positive(function, alpha, "Shape parameter")) 
+        return 0;
+      if (!check_finite(function, beta, "Inverse scale parameter"))
+        return 0;
+      if (!check_positive(function, beta, "Inverse scale parameter"))
+        return 0;
+
       /*
         the boost gamma distribution is defined by
 	shape and scale, whereas the stan one is defined
 	by shape and rate
       */
       variate_generator<RNG&, gamma_distribution<> >
-        gamma_rng(rng, gamma_distribution<>(alpha, 1/beta));
+        gamma_rng(rng, gamma_distribution<>(alpha, 1.0 / beta));
       return gamma_rng();
     }
 

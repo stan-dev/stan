@@ -85,14 +85,13 @@ on the compiler and linker.
 \begin{itemize}
 \item Linux (Debian, Ubuntu, Red Hat), 
 \item Mac OS X (Snow Leopard, Lion, Mountain Lion), and
-\item Windows (XP, 7).
+\item Windows (XP, 7, 8).
 \end{itemize}
 %
 \Stan should work on other versions of these operating systems if
 compatible \Cpp compilers can be found.  The plan is to keep up with
 new versions of these operating systems and gradually phase out
 testing on older versions.
-
 
 
 \section{Step-by-Step Mac Install Instructions}
@@ -162,23 +161,23 @@ is at 4.2.1 or later.
 
 \subsection{Download and Unpack Stan Source}
 
-Download the most recent version of \code{stan-src-1.m.p.tgz}
+Download the most recent version of \code{stan-2.m.p.tar.gz}
 (\code{m} is the minor version and \code{p} the patch level) from
 the Stan downloads list,
 %
 \begin{quote}
-\url{http://code.google.com/p/stan/downloads/list}
+\url{https://github.com/stan-dev/stan/releases}
 \end{quote}
 
 Open the folder containing the download in the Finder
 (typically, the user's top-level \code{Downloads} folder).
 
-If the Mac OS has not automatically unpacked the \code{.tgz}
-file into file \code{stan-src-1.m.p.tar},
-double-click the \code{.tgz} file to unpack.
+If the Mac OS has not automatically unpacked the \code{.tar.gz}
+file into file \code{stan-2.m.p.tar},
+double-click the \code{.tar.gz} file to unpack.
 
 Double click on the \code{.tar} file to unarchive
-directory \code{stan-src-1.m.p}.
+directory \code{stan-2.m.p}.
 
 Move the resulting directory to a location where it will not be
 deleted, henceforth called \code{<stan-home>}.
@@ -239,11 +238,11 @@ A password will likely be required by the superuser command \code{sudo}.
 \subsection{Downloading and Unpacking Stan Source}
 
 Download the most recent stable version of Stan,
-\code{stan-src-1.m.p.tgz}, where \code{m} is the minor version and
+\code{stan-2.m.p.tar.gz}, where \code{m} is the minor version and
 \code{p} the patch level), from the Stan downloads page,
 %
 \begin{quote}
-\url{http://code.google.com/p/stan/downloads/list}
+\url{https://github.com/stan-dev/stan/releases}
 \end{quote}
 %
 to the directory where Stan will reside.
@@ -261,14 +260,14 @@ where \code{<download-dir>} is replaced with the actual path to the directory.
 
 Then, unpack the distribution into the subdirectory
 \begin{quote}
-\nolinkurl{<download-dir>/stan-src-1.m.p}
+\nolinkurl{<download-dir>/stan-2.m.p}
 \end{quote}
 %
 with
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
-> tar -xzf stan-src-1.m.p.tgz
+> tar -xzf stan-2.m.p.tar.gz
 \end{Verbatim}
 \end{quote}
 
@@ -276,17 +275,9 @@ with
 
 \section{Step-by-Step Windows Install Instructions}
 
-Stan has been tested on Windows XP and Windows 7.
-
-\subsection{Note for Cygwin Users}
-
-Stan can be run under Cygwin, the Linux look-and-feel environment for
-Windows.  Cygwin must have recent versions of \code{make} and
-\code{g++} (part of gcc) installed.  Within a Cygwin shell, Stan
-will behave as under Linux. 
-
-The remaining instructions in this section are for users wishing to
-run Stan under Windows in a command (i.e., DOS) shell.
+Stan has been tested on Windows XP, Windows 7, and Windows 8.  See
+Section~\refsection{cygwin} for instructions for installing for Cygwin
+on Windows.
 
 \subsection{Windows Tips}
 
@@ -334,13 +325,13 @@ install wizard, then proceed through its options.
 \subsection{Downloading and Unpacking Stan}
 
 The Stan source code distributions are named
-\code{stan-src-1.m.p.tgz}, where \code{m} is the minor version and
+\code{stan-2.m.p.tar.gz}, where \code{m} is the minor version and
 \code{p} the patch level.
 
 Download the latest Stan source from the Stan downloads page,
 %
 \begin{quote}
-\url{http://code.google.com/p/stan/downloads/list}
+\url{https://github.com/stan-dev/stan/releases}
 \end{quote}
 %
 to any non-temporary folder.  (If in doubt, select \code{My Documents}
@@ -379,7 +370,7 @@ or use the full path, including quotes, from anywhere,
 \end{quote}
 \end{itemize}
 %
-To verify that the downloaded Stan \code{.tgz} file is there,
+To verify that the downloaded Stan \code{.tar.gz} file is there,
 list the directory contents using:
 %
 \begin{quote}
@@ -393,13 +384,63 @@ installed as part of Rtools).
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
-> tar --no-same-owner -xzf stan-src-1.m.p.tgz 
+> tar --no-same-owner -xzf stan-2.m.p.tar.gz 
 \end{Verbatim}
 \end{quote}
 %
 The \code{--no-same-owner} flag is not strictly necessary,
 but it removes a bunch of irrelevant warnings.
 
+
+\subsection{64-bit Cygwin Install Instructions}\label{cygwin.section}
+
+Stan can be run under Cygwin, the Unix look-and-feel environment for
+Windows.  Cygwin must have recent versions of \code{make} and
+\code{g++} (part of gcc) installed.  Within a Cygwin shell, Stan
+will behave as under other Unixes.
+
+Thanks to Kevin van Horn for mailing the following instructions into
+the Stan-users mailing list.  They only cover 64-bit R and 64-bit
+Cygwin, but that is what you should be using for Stan anyway.
+
+\begin{enumerate}
+\item Kill all Cygwin bash shells and shut down R.
+\item After installing R and Rtools, make sure that R and Rtools are
+  in the \code{PATH} environment variable. My R installation directory was
+  \Verb|c:\Program Files\R\R-3.0.1| and my Rtools installation
+  directory was \Verb|c:\Rtools|, so I added the following to the end
+  of my user \code{PATH} variable:
+  \begin{itemize}
+  \item \Verb|C:\Program Files\R\R-3.0.1\bin\x64|
+  \item \Verb|C:\Rtools\bin|
+  \item \Verb|C:\Rtools\gcc-4.6.3\bin|
+  \end{itemize}
+\item Now there could be a conflict between Cygwin and Rtools when
+  running a bash shell under Cygwin, so I added the following lines to
+  my \Verb|.bash_profile| file to remove any \code{PATH} directory
+  referencing Rtools:
+  \begin{Verbatim}
+> TMP=`echo $PATH | /usr/bin/tr ':' '\n'                      \
+                  | /usr/bin/egrep -iv '^/cygdrive/c/Rtools/' \
+                  | tr '\n' ':'`
+> PATH=${TMP%:}
+\end{Verbatim}
+(Note that the backslash characters signal that the line continues
+after a return.)  This was only necessary to allow me to continue
+using Cygwin.
+\item Apparently there is something in \code{Rcpp} or \code{inline} or
+  \code{rstan} that doesn't like \code{UNC} paths. My home directory
+  was \Verb|\\server\users\kevinv| and apparently this caused my
+  local R library directory to be \Verb|\server\users\kevinv\R|
+  as verified by \code{.libPaths()} from the R command prompt. 
+
+  I fixed this by copying the entire directory tree rooted at
+  \Verb|\server\users\kevinv\R| over to a local directory on my workstation,
+  \Verb|C:\Users\KevinV\R|, then adding the user environment variable
+  \Verb|R_LIBS_USER=C:\Users\KevinV\R|. I shut down R and restarted it.
+\item At this point the instructions given for installing Rstan
+  finally worked.
+\end{enumerate}
 
 
 \section{Required Software and Tools}
@@ -430,7 +471,7 @@ template metaprogramming facilities are implemented with the Boost
 \begin{itemize}
 \item Home: http://www.boost.org/users/license.html
 \item License: Boost Software License
-\item Tested Version: 1.53.0
+\item Tested Version: 1.54.0
 \end{itemize}
 %
 The Boost source code is distributed with \Stan.
@@ -444,7 +485,7 @@ algebra library.
 \begin{itemize}
 \item Home: \url{http://eigen.tuxfamily.org}
 \item License: Mozilla Public License, version 2.0
-\item Tested Version: 3.1.2
+\item Tested Version: 3.2.0
 \end{itemize}
 %
 The Eigen source code is distributed with \Stan.
@@ -479,6 +520,14 @@ License: BSD
 %
 \end{itemize}
 %
+
+\subsubsection{\Cpp-11 Support} 
+
+Stan 2.0 does not support \Cpp-11.  The remaining incompatibility with
+the parser will be included soon after Stan 2.0 is released.  This
+will include support for the latest versions of \code{g++} and
+\code{clang++}.
+
 
 \section{Optional Components for Developers}
 
@@ -553,7 +602,7 @@ version of Mac OS X.
 \subsubsection{Official Apple Xcode Distribution}
 
 Xcode 4 may be downloaded for free for Mac OS X 10.7 (``Lion'') or
-later direclty from Apple:
+later directly from Apple:
 
 \begin{quote}
 Xcode 4: \url{https://developer.apple.com/xcode/}

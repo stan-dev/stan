@@ -65,7 +65,7 @@ namespace stan {
           using stan::agrad::value_of;
           using stan::math::value_of;
           Eigen::VectorXd vd1(v1.size()), vd2(v1.size());
-          for (size_t i = 0; i < v1.size(); i++) {
+          for (int i = 0; i < v1.size(); i++) {
             vd1[i] = value_of(v1[i]);
             vd2[i] = value_of(v2[i]);
           }

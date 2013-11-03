@@ -3,9 +3,14 @@
 #include <boost/random/mersenne_twister.hpp>
 #include<boost/math/distributions.hpp>
 
-TEST(ProbDistributionsWeibull, random) {
+TEST(ProbDistributionsWeibull, error_check) {
   boost::random::mt19937 rng;
   EXPECT_NO_THROW(stan::prob::weibull_rng(2.0,3.0,rng));
+
+  EXPECT_THROW(stan::prob::weibull_rng(-2.0,3.0,rng),std::domain_error);
+  EXPECT_THROW(stan::prob::weibull_rng(2.0,-3.0,rng),std::domain_error);
+  EXPECT_THROW(stan::prob::weibull_rng(stan::math::positive_infinity(),3.0,rng),
+               std::domain_error);
 }
 
 TEST(ProbDistributionsWeibull, chiSquareGoodnessFitTest) {

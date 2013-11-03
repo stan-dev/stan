@@ -3,9 +3,11 @@
 #include <boost/random/mersenne_twister.hpp>
 #include<boost/math/distributions.hpp>
 
-TEST(ProbDistributionsPoisson, random) {
+TEST(ProbDistributionsPoisson, error_check) {
   boost::random::mt19937 rng;
   EXPECT_NO_THROW(stan::prob::poisson_rng(6, rng));
+
+  EXPECT_THROW(stan::prob::poisson_rng(-6, rng),std::domain_error);
 }
 
 TEST(ProbDistributionsPoisson, chiSquareGoodnessFitTest) {

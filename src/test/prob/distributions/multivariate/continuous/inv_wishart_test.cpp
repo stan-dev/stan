@@ -77,7 +77,7 @@ TEST(ProbDistributionsInvWishart,DefaultPolicy) {
   EXPECT_THROW(inv_wishart_log(Y, nu, Sigma), std::domain_error);
 }
 
-TEST(ProbDistributionsInvWishart, random) {
+TEST(ProbDistributionsInvWishart, error_checks) {
   boost::random::mt19937 rng;
 
   Matrix<double,Dynamic,Dynamic> sigma(3,3);
@@ -85,6 +85,10 @@ TEST(ProbDistributionsInvWishart, random) {
     -3.0,  4.0, 0.0,
     2.0, 1.0, 3.0;
   EXPECT_NO_THROW(stan::prob::inv_wishart_rng(3.0, sigma,rng));
+  EXPECT_THROW(stan::prob::inv_wishart_rng(2.0, sigma,rng),std::domain_error);
+
+  Matrix<double,Dynamic,Dynamic> sigma2(4,3);
+  EXPECT_THROW(stan::prob::inv_wishart_rng(2.0, sigma2,rng),std::domain_error);
 }
 
 TEST(ProbDistributionsInvWishart, chiSquareGoodnessFitTest) {

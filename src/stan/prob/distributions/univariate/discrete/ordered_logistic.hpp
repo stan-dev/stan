@@ -136,14 +136,43 @@ namespace stan {
     template <class RNG>
     inline int
     ordered_logistic_rng(const double eta,
-       const Eigen::Matrix<double,Eigen::Dynamic,1>& c,
-       RNG& rng) {
+                         const Eigen::Matrix<double,Eigen::Dynamic,1>& c,
+                         RNG& rng) {
       using boost::variate_generator;
       using stan::math::inv_logit;
+
+      static const char* function = "stan::prob::ordered_logistic(%1%)";
+      
+      using stan::math::check_finite;
+      using stan::math::check_positive;
+      using stan::math::check_nonnegative;
+      using stan::math::check_less;
+      using stan::math::check_less_or_equal;
+      using stan::math::check_greater;
+      using stan::math::check_bounded;
+
+      if (!check_finite(function, eta, 
+                        "Location parameter"))
+        return 0;
+      if (!check_greater(function, c.size(), 0,
+                         "Size of cut points parameter"))
+        return 0;
+      for (int i = 1; i < c.size(); ++i) {
+        if (!check_greater(function, c(i), c(i - 1),
+                           "Cut points parameter"))
+          return 0;
+      }
+      if (!check_finite(function, c(c.size()-1), 
+                        "Cut points parameter"))
+        return 0;
+      if (!check_finite(function, c(0),
+                        "Cut points parameter")) 
+        return 0;
+
       Eigen::VectorXd cut(c.rows());
       cut(0) = 1 - inv_logit(eta - c(0));
       for(int j = 1; j < c.rows() - 1; j++)
-  cut(j) = inv_logit(eta - c(j - 1)) - inv_logit(eta - c(j));
+        cut(j) = inv_logit(eta - c(j - 1)) - inv_logit(eta - c(j));
       cut(c.rows() - 1) = inv_logit(eta - c(c.rows() - 2));
 
       return stan::prob::categorical_rng(cut, rng);
