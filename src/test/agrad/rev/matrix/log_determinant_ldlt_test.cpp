@@ -12,7 +12,6 @@ TEST(AgradRevMatrix,log_determinant_ldlt_diff) {
   using stan::math::determinant;
   using stan::agrad::fabs;
   using stan::agrad::log;
-  stan::math::LDLT_factor<stan::agrad::var,-1,-1> ldlt_v;
 
   // expected from auto-diff/Eigen
   AVEC x1 = createAVEC(2,1,1,3);
@@ -23,6 +22,7 @@ TEST(AgradRevMatrix,log_determinant_ldlt_diff) {
   det1.grad(x1,g1);
   
   // optimized in agrad::matrix
+  stan::math::LDLT_factor<stan::agrad::var,-1,-1> ldlt_v;
   AVEC x2 = createAVEC(2,1,1,3);
   matrix_v v2(2,2);
   v2 << x2[0], x2[1], x2[2], x2[3];
@@ -39,7 +39,6 @@ TEST(AgradRevMatrix,log_determinant_ldlt_diff) {
 
 TEST(AgradRevMatrix,log_determinant_ldlt) {
   using stan::agrad::matrix_v;
-  using stan::math::log_determinant_spd;
   stan::math::LDLT_factor<stan::agrad::var,-1,-1> ldlt_v;
   
   matrix_v v(2,2);
