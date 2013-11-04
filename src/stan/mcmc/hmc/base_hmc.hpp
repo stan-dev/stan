@@ -123,6 +123,12 @@ namespace stan {
       
       double get_stepsize_jitter() { return this->_epsilon_jitter; }
       
+      void sample_stepsize() {
+        this->_epsilon = this->_nom_epsilon;
+        if(this->_epsilon_jitter)
+          this->_epsilon *= ( 1.0 + this->_epsilon_jitter * (2.0 * this->_rand_uniform() - 1.0) );
+      }
+      
     protected:
     
       P _z;
@@ -137,12 +143,6 @@ namespace stan {
       double _nom_epsilon;
       double _epsilon;
       double _epsilon_jitter;
-      
-      void _sample_stepsize() {
-        this->_epsilon = this->_nom_epsilon;
-        if(this->_epsilon_jitter)
-          this->_epsilon *= ( 1.0 + this->_epsilon_jitter * (2.0 * this->_rand_uniform() - 1.0) );
-      }
     
     };
     
