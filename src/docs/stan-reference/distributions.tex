@@ -24,6 +24,8 @@ If $\theta \in [0,1]$, then for $y \in \setlist{0,1}$,
 \right.
 \]
 
+\pitem{y}{bernoulli}{theta}
+
 \subsubsection{Stan Functions}
 
 \begin{description}
@@ -31,7 +33,9 @@ If $\theta \in [0,1]$, then for $y \in \setlist{0,1}$,
 \fitem{real}{bernoulli\_log}{ints \farg{y}, reals \farg{theta}}{The
   log Bernoulli probability mass of \farg{y} given chance of success
   \farg{theta}}
+
 %
+
 \end{description}
 
 \begin{description}
@@ -79,6 +83,8 @@ If $\alpha \in \reals$, then for $c \in \setlist{0,1}$,
 \end{array}
 \right.
 \]
+
+\pitem{y}{bernoulli\_logit}{alpha}
 
 \subsubsection{Stan Functions}
 
@@ -130,6 +136,8 @@ Suppose $N \in \nats$ and $\theta \in [0,1]$, and $n \in
 - \frac{N - n}{1 - \theta}
 \]
 
+
+\pitem{n}{binomial}{N,theta}
 
 \subsubsection{Stan Functions}
 
@@ -202,6 +210,7 @@ Suppose $N \in \nats$, $\alpha \in \reals$, and $n \in
 - \frac{N - n}{\mbox{logit}^{-1}(\alpha)}
 \]
 
+\pitem{n}{binomial\_logit}{N,alpha}
 
 \subsubsection{Stan Functions}
 
@@ -236,6 +245,7 @@ where the beta function $\Betafun(x,y)$ is defined for $x \in
 = \frac{\Gamma(x) \ \Gamma(y)}{\Gamma(x + y)}.
 \]
 
+\pitem{n}{beta\_binomial}{N,alpha}
 
 \subsubsection{Stan Functions}
 
@@ -292,6 +302,8 @@ then for $n \in \setlist{\max(0,N-b),\ldots,\min(a,N)}$,
 \]
 
 
+\pitem{n}{hypergeometric}{N,a,b}
+
 \subsubsection{Stan Functions}
 
 \begin{description}
@@ -335,6 +347,9 @@ In addition, Stan provides a log-odds scaled categorical distribution,
 See \refsection{softmax} for the definition of the softmax function.
 
 
+\pitem{y}{categorical}{theta}
+
+
 \subsubsection{Stan Functions}
 
 All of the categorical distributions are vectorized so that the
@@ -376,6 +391,7 @@ c_{k+1}$ for $k \in \setlist{1,\ldots,K-2}$, and $\eta \in \reals$, then for $k 
 \\[4pt]
 \mbox{logit}^{-1}(\eta - c_{k-1}) - \mbox{logit}^{-1}(\eta -
 c_{k})
+
 & \mbox{if } 1 < k < K, \mbox{and}
 \\[4pt]
 \mbox{logit}^{-1}(\eta - c_{K-1}) - 0
@@ -387,6 +403,9 @@ c_{k})
 The $k=1$ and $k=K$ edge cases can be subsumed into the general definition
 by setting $c_0 = -\infty$ and $c_K = +\infty$ with
 $\mbox{logit}^{-1}(-\infty) = 0$ and $\mbox{logit}^{-1}(\infty) = 1$.
+
+\pitem{k}{ordered\_logistic}{eta,c}
+
 
 \subsubsection{Stan Functions}
 
@@ -453,6 +472,8 @@ where $\Psi$ is the digamma function, defined as
 \Psi(x) = \frac{\partial}{\partial x} \log \Gamma(x).
 \]
 
+\pitem{n}{neg\_binomial}{alpha,beta}
+
 \subsubsection{Stan Functions}
 
 \begin{description}
@@ -497,6 +518,8 @@ If $\lambda \in \posreals$, then for $n \in \nats$,
 \exp(-\lambda).
 \]
 
+\pitem{n}{poisson}{lambda}
+
 \subsubsection{Stan Functions}
 
 \begin{description}
@@ -537,6 +560,8 @@ If $\alpha \in \reals$, then for $n \in \nats$,
 \exp \left(n\alpha - \exp(\alpha) \right).
 \]
 
+\pitem{n}{poisson\_log}{alpha}
+
 \subsubsection{Stan Functions}
 
 \begin{description}
@@ -570,6 +595,8 @@ where the multinomial coefficient is defined by
 {N \choose {y_1,\ldots,y_k}}
 = \frac{N!}{\prod_{k=1}^K y_k!}.
 \]
+
+\pitem{y}{multinomial}{theta,N}
 
 \subsubsection{Stan Functions}
 
@@ -614,6 +641,8 @@ If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in
 \!.
 \]
 
+\pitem{y}{normal}{mu,sigma}
+
 \subsubsection{Stan Functions}
 
 \begin{description}
@@ -655,6 +684,8 @@ If $\mu \in \reals$, $\sigma \in \posreals$, and $\lambda \in
 \exp \left(\frac{\lambda}{2} \left(2\mu + \lambda \sigma^2 - 2y\right)\right) \erfc\left(\frac{\mu + \lambda\sigma^2 - y}{\sqrt{2}\sigma}\right)
 .
 \]
+
+\pitem{y}{exp\_mod\_normal}{mu,sigma,lambda}
 
 \subsubsection{Stan Functions}
 
@@ -705,6 +736,8 @@ then for $y \in \reals$,
 \left(1 + \erf\left( \alpha\left(\frac{y - \mu}{\sigma\sqrt{2}}\right)\right)\right)
 .
 \]
+
+\pitem{y}{skew\_normal}{mu,sigma,alpha}
 
 \subsubsection{Stan Functions}
 
@@ -758,6 +791,8 @@ then for $y \in \reals$,
 \! .
 \]
 
+\pitem{y}{student\_t}{nu,mu,sigma}
+
 \subsubsection{Stan Functions}
 
 \begin{description}
@@ -807,6 +842,7 @@ If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in \reals$,
 .
 \]
 
+\pitem{y}{cauchy}{mu,sigma}
 
 \subsubsection{Stan Functions}
 
@@ -847,6 +883,8 @@ If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in \reals$,
   \exp \left( - \, \frac{|y - \mu|}{\sigma} \right)
 .
 \]
+
+\pitem{y}{double\_exponential}{mu,sigma}
 
 \subsubsection{Stan Functions}
 
@@ -893,6 +931,8 @@ If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in \reals$,
 \]
 
 
+\pitem{y}{logistic}{mu,sigma}
+
 \subsubsection{Stan Functions}
 
 \begin{description}
@@ -934,6 +974,8 @@ If $\mu \in \reals$ and $\beta \in \posreals$, then for $y \in \reals$,
 \exp\left(-\frac{y-\mu}{\beta}-\exp\left(-\frac{y-\mu}{\beta}\right)\right)
 .
 \]
+
+\pitem{y}{gumbel}{mu,beta}
 
 \subsubsection{Stan Functions}
 
@@ -989,6 +1031,8 @@ If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in
 .
 \]
 
+\pitem{y}{lognormal}{mu,sigma}
+
 
 \subsubsection{Stan Functions}
 
@@ -1033,6 +1077,8 @@ y^{\nu/2 - 1}
 \exp \! \left( -\, \frac{1}{2} \, y \right)
 .
 \]
+
+\pitem{y}{chi\_square}{nu}
 
 \subsubsection{Stan Functions}
 
@@ -1079,6 +1125,8 @@ y^{-(\nu/2 - 1)}
 .
 \]
 
+\pitem{y}{inv\_chi\_square}{nu}
+
 
 \subsubsection{Stan Functions}
 
@@ -1114,7 +1162,7 @@ may only be used in generated quantities block}
 If $\nu \in \posreals$ and $\sigma \in \posreals$, then for $y \in
 \posreals$,
 \[
-\distro{ScaledInvChiSquare}(y|\nu)
+\distro{ScaledInvChiSquare}(y|\nu,\sigma)
 = 
 \frac{(\nu / 2)^{\nu/2}}
      {\Gamma(\nu / 2)}
@@ -1130,39 +1178,41 @@ y^{-(\nu/2 + 1)}
 \]
 
 
+\pitem{y}{scaled\_inv\_chi\_square}{nu,sigma}
+
 \subsubsection{Stan Functions}
 
 \begin{description}
   \fitem{real}{scaled\_inv\_chi\_square\_log}{reals \farg{y}, reals
-    \farg{nu}, reals \farg{s}}{The log of the scaled inverse Chi-square
+    \farg{nu}, reals \farg{sigma}}{The log of the scaled inverse Chi-square
     density of \farg{y} given degrees of freedom \farg{nu} and scale
-    \farg{s}}
+    \farg{sigma}}
 \end{description}
 %
 \begin{description}
   \fitem{real}{scaled\_inv\_chi\_square\_cdf}{reals \farg{y}, reals
-    \farg{nu}, reals \farg{s}}{The scaled inverse Chi-square
+    \farg{nu}, reals \farg{sigma}}{The scaled inverse Chi-square
     cumulative distribution function
     of \farg{y} given degrees of freedom \farg{nu} and scale
-    \farg{s}}
+    \farg{sigma}}
 %
   \fitem{real}{scaled\_inv\_chi\_square\_cdf\_log}{reals \farg{y}, reals
-    \farg{nu}, reals \farg{s}}{The log of the scaled inverse Chi-square
+    \farg{nu}, reals \farg{sigma}}{The log of the scaled inverse Chi-square
     cumulative distribution function
     of \farg{y} given degrees of freedom \farg{nu} and scale
-    \farg{s}}
+    \farg{sigma}}
 %
   \fitem{real}{scaled\_inv\_chi\_square\_ccdf\_log}{reals \farg{y}, reals
-    \farg{nu}, reals \farg{s}}{The log of the scaled inverse Chi-square
+    \farg{nu}, reals \farg{sigma}}{The log of the scaled inverse Chi-square
     complementary cumulative distribution function
     of \farg{y} given degrees of freedom \farg{nu} and scale
-    \farg{s}}
+    \farg{sigma}}
 \end{description}
 %
 \begin{description}
 \fitem{real}{scaled\_inv\_chi\_square\_rng}{real \farg{nu}, real
-  \farg{s}}{Generate a scaled inverse Chi-squared variate with degrees 
-of freedom \farg{nu} and scale \farg{s}; may only be used in generated 
+  \farg{sigma}}{Generate a scaled inverse Chi-squared variate with degrees 
+of freedom \farg{nu} and scale \farg{sigma}; may only be used in generated 
 quantities block}
 \end{description}
 
@@ -1179,6 +1229,8 @@ If $\beta \in \posreals$, then for $y \in \posreals$,
 \exp ( - \beta \, y )
 .
 \]
+
+\pitem{y}{exponential}{beta}
 
 \subsubsection{Stan Functions}
 
@@ -1223,6 +1275,8 @@ y^{\alpha - 1}
 .
 \]
 
+
+\pitem{y}{gamma}{alpha,beta}
 
 \subsubsection{Stan Functions}
 
@@ -1270,6 +1324,9 @@ y^{-(\alpha + 1)}
 .
 \]
 
+\pitem{y}{inv\_gamma}{alpha,beta}
+
+
 \subsubsection{Stan Functions}
 
 \begin{description}
@@ -1315,6 +1372,7 @@ If $\alpha \in \posreals$ and $\sigma \in [0,\infty)$, then for $y \in
 .
 \]
 
+\pitem{y}{weibull}{alpha,sigma}
 
 \subsubsection{Stan Functions}
 
@@ -1359,6 +1417,8 @@ non-negative real numbers.
 \frac{y}{\sigma^2} \exp(-y^2 / 2\sigma^2)
 \!.
 \]
+
+\pitem{y}{rayleigh}{sigma}
 
 \subsubsection{Stan Functions}
 \begin{description}
@@ -1405,6 +1465,8 @@ $y \in \posreals$,
 \! .
 \]
 
+\pitem{y}{pareto}{y\_min,alpha}
+
 \subsubsection{Stan Functions}
 
 \begin{description}
@@ -1446,7 +1508,7 @@ used to characterized bounded quantities, including probabilities.
 \subsubsection{Probability Density Function}
 
 If $\alpha \in \posreals$ and $\beta \in \posreals$, then for $\theta
-\in [0,1]$,
+\in (0,1)$,
 \[
 \distro{Beta}(\theta|\alpha,\beta)
 =
@@ -1457,8 +1519,11 @@ If $\alpha \in \posreals$ and $\beta \in \posreals$, then for $\theta
 (1 - \theta)^{\beta - 1}
 ,
 \] 
-where the beta function $\Betafun()$ is as defined in \refsection{betafun}
+where the beta function $\Betafun()$ is as defined in
+\refsection{betafun}.  If $\theta = 0$ or $\theta = 1$, then
+the log probability is $-\infty$.
 
+\pitem{theta}{beta}{alpha,beta}
 
 \subsubsection{Stan Functions}
 
@@ -1512,6 +1577,8 @@ If $\mu \in \reals$ and $\kappa \in \posreals$, then for $y \in
 \!.
 \]
 
+\pitem{y}{von\_mises}{mu,kappa}
+
 \subsubsection{Stan Functions}
 
 \begin{description}
@@ -1541,6 +1608,8 @@ If $\alpha \in \reals$ and $\beta \in (\alpha,\infty)$, then for $y
 \frac{1}{\beta - \alpha}
 .
 \]
+
+\pitem{y}{uniform}{alpha,beta}
 
 \subsubsection{Stan Functions}
 
@@ -1602,21 +1671,22 @@ If $K \in \nats$, $\mu \in \reals^K$, and $\Sigma \in \reals^{K \times
 %
 where $|\Sigma|$ is the absolute determinant of $\Sigma$.
 
+\pitem{y}{multi\_normal}{mu,Sigma}
 
 \subsubsection{Stan Functions}
 
 \begin{description}
 %
 \fitem{real}{multi\_normal\_log}{vector \farg{y}, vector \farg{mu},
-  matrix \farg{S}}{The log of the multivariate normal density of vector \farg{y}
- given location \farg{mu} and covariance matrix \farg{S}}
+  matrix \farg{Sigma}}{The log of the multivariate normal density of vector \farg{y}
+ given location \farg{mu} and covariance matrix \farg{Sigma}}
 %
 \end{description}
 %
 \begin{description}
 \fitem{vector}{multi\_normal\_rng}{vector \farg{mu}, matrix
-  \farg{S}}{Generate a multivariate normal variate with location
-  \farg{mu} and covariance matrix \farg{S}; may only be used in 
+  \farg{Sigma}}{Generate a multivariate normal variate with location
+  \farg{mu} and covariance matrix \farg{Sigma}; may only be used in 
 generated quantities block}
 \end{description}
 
@@ -1633,15 +1703,16 @@ If $K \in \nats$, $\mu \in \reals^K$, and $\Omega \in \reals^{K \times
 = \distro{MultiNormal}(y|\mu,\Sigma^{-1})
 \]
 
+\pitem{y}{multi\_norm\_prec}{mu,Omega}
 
 \subsubsection{Stan Functions}
 
 \begin{description}
 %
 \fitem{real}{multi\_normal\_prec\_log}{vector \farg{y}, vector
-  \farg{mu}, matrix \farg{P}}{The log of the multivariate normal density of vector
+  \farg{mu}, matrix \farg{Omega}}{The log of the multivariate normal density of vector
   \farg{y} given location \farg{mu} and positive definite precision
-  matrix \farg{P}}
+  matrix \farg{Omega}}
 %
 \end{description}
 
@@ -1660,6 +1731,8 @@ triangular and such that $LL^{\top}$ is positive definite, then for $y
 \distro{MultiNormal}(y|\mu,LL^{\top}).
 \]
 
+
+\pitem{y}{multi\_normal\_cholesky}{mu,L}
 
 \subsubsection{Stan Functions}
 
@@ -1705,22 +1778,24 @@ $y \in \reals^K$,
 \]
 \vspace*{4pt}
 
+\pitem{y}{multi\_student\_t}{nu,mu,Sigma}
+
 
 \subsubsection{Stan Functions}
 
 \begin{description}
 %
 \fitem{real}{multi\_student\_t\_log}{vector \farg{y}, real \farg{nu},
-  vector \farg{mu}, matrix \farg{S}}{The log of the multivariate Student-$t$
+  vector \farg{mu}, matrix \farg{Sigma}}{The log of the multivariate Student-$t$
   density of vector \farg{y} given degrees of freedom \farg{nu},
-  location \farg{mu}, and scale matrix \farg{S}}
+  location \farg{mu}, and scale matrix \farg{Sigma}}
 %
 \end{description}
 %
 \begin{description}
 \fitem{vector}{multi\_student\_t\_rng}{real \farg{nu}, vector \farg{mu}, matrix
-  \farg{S}}{Generate a multivariate Student-$t$ variate with degrees
-  of freedom \farg{nu}, location \farg{mu}, and scale matrix \farg{S}; 
+  \farg{Sigma}}{Generate a multivariate Student-$t$ variate with degrees
+  of freedom \farg{nu}, location \farg{mu}, and scale matrix \farg{Sigma}; 
 may only be used in generated quantities block}
 \end{description}
 
@@ -1745,13 +1820,15 @@ the the Kalman Filter.  If $V$ is diagonal, then a more efficient
 algorithm which sequentially processes observations and avoids a
 matrix inversions can be used \citep[Sec~6.4]{DurbinKoopman:2001}.
 
+\pitem{y}{gaussian\_dlm\_obs}{F,G,V,W,m0,C0}
+
 \subsubsection{Stan Functions}
 
 \begin{description}
 %
 \fitem{real}{gaussian\_dlm\_obs\_log}{vector \farg{y}, matrix \farg{F},
-  matrix \farg{G}, matrix \farg{V}, matrix \farg{W}, vector
-  \farg{m0}, matrix \farg{C0}} {The log of the density of the
+  matrix \farg{G}, matrix \farg{V}, \\ \hspace*{132pt} matrix \farg{W}, vector
+  \farg{m0}, matrix \farg{C0}\vspace*{8pt}} {The log of the density of the
   Gaussian Dynamic Linear model with observation matrix \farg{y} in
   which rows are variables and columns are observations, design
   matrix \farg{F}, transition matrix \farg{G}, observation
@@ -1761,8 +1838,8 @@ matrix inversions can be used \citep[Sec~6.4]{DurbinKoopman:2001}.
 % 
 %
 \fitem{real}{gaussian\_dlm\_obs\_log}{vector \farg{y}, matrix \farg{F},
-  matrix \farg{G}, vector \farg{V}, matrix \farg{W}, vector \farg{m0},
-  matrix \farg{C0}} {The log of the density of the Gaussian Dynamic
+  matrix \farg{G}, vector \farg{V}, \\ \hspace*{132pt} matrix \farg{W}, vector \farg{m0},
+  matrix \farg{C0}\vspace*{8pt}} {The log of the density of the Gaussian Dynamic
   Linear model with observation matrix \farg{y} in which rows are
   variables and columns are observations, design matrix \farg{F},
   transition matrix \farg{G}, observation covariance matrix with
@@ -1798,6 +1875,7 @@ $\theta \in \mbox{$K$-simplex}$,
 .
 \]
 
+\pitem{theta}{dirichlet}{alpha}
 
 \subsubsection{Stan Functions}
 
@@ -1843,6 +1921,7 @@ $\eta$ becomes large. For $0 < \eta < 1$, the density has a trough at
 the identity matrix. See \citep{LewandowskiKurowickaJoe:2009} for
 definitions.
 
+\pitem{y}{lkj\_corr\_log}{eta}
 
 \subsubsection{Stan Functions}
 
@@ -1860,36 +1939,38 @@ definitions.
 \end{description}
 
 
-\section{Cholesky LKJ Correlation Distribution}
+% \section{Cholesky LKJ Correlation Distribution}
 
-\subsubsection{Probability Density Function}
+% \subsubsection{Probability Density Function}
 
-For $\eta > 0$, if $L$ is the Cholesky factor of a positive-definite
-matrix with unit diagonal (i.e., a correlation matrix), then
-\[
-\distro{LkjCholesky}(L|\eta) 
-\propto \det(L L^\top)^{(\eta - 1)} 
-= \det(L)^{(2 \eta - 2)}.
-\]
-See the previous section for details on interpreting the shape
-parameter $\eta$.
+% For $\eta > 0$, if $L$ is the Cholesky factor of a positive-definite
+% matrix with unit diagonal (i.e., a correlation matrix), then
+% \[
+% \distro{LkjCholesky}(L|\eta) 
+% \propto \det(L L^\top)^{(\eta - 1)} 
+% = \det(L)^{(2 \eta - 2)}.
+% \]
+% See the previous section for details on interpreting the shape
+% parameter $\eta$.
 
-\subsubsection{Stan Functions}
+% \pitem{L}{lkj\_corr\_cholesky}{eta}
 
-\begin{description}
-%
-  \fitem{real}{lkj\_corr\_cholesky\_log}{matrix \farg{L}, real
-    \farg{eta}}{The log of the LKJ density for the lower-triangular
-    Cholesky factor \farg{L} of a correlation matrix given shape
-    \farg{eta}.}
-%
-\end{description}
-\begin{description}
-\fitem{matrix}{lkj\_corr\_cholesky\_rng}{int \farg{K}, real \farg{eta}}{
-  Generate a random Cholesky factor of a LKJ random correlation matrix
-  of order \farg{K} with shape \farg{eta}; may only be used in 
-  generated quantities block}
-\end{description}
+% \subsubsection{Stan Functions}
+
+% \begin{description}
+% %
+%   \fitem{real}{lkj\_corr\_cholesky\_log}{matrix \farg{L}, real
+%     \farg{eta}}{The log of the LKJ density for the lower-triangular
+%     Cholesky factor \farg{L} of a correlation matrix given shape
+%     \farg{eta}.}
+% %
+% \end{description}
+% \begin{description}
+% \fitem{matrix}{lkj\_corr\_cholesky\_rng}{int \farg{K}, real \farg{eta}}{
+%   Generate a random Cholesky factor of a LKJ random correlation matrix
+%   of order \farg{K} with shape \farg{eta}; may only be used in 
+%   generated quantities block}
+% \end{description}
 
 
 
@@ -1933,22 +2014,23 @@ the multivariate Gamma function,
 \!.
 \]
 
+\pitem{W}{wishart}{nu,Sigma}
 
 \subsubsection{Stan Functions}
 
 \begin{description}
 %
 \fitem{real}{wishart\_log}{matrix \farg{W}, real \farg{nu}, matrix
- \farg{S}}{The log of the Wishart density for positive-definite matrix
+ \farg{Sigma}}{The log of the Wishart density for positive-definite matrix
  \farg{W} given degrees of freedom \farg{nu} and scale matrix
- \farg{S}}
+ \farg{Sigma}}
 %
 \end{description}
 %
 \begin{description}
-\fitem{matrix}{wishart\_rng}{real \farg{nu}, matrix \farg{S}}{Generate a
+\fitem{matrix}{wishart\_rng}{real \farg{nu}, matrix \farg{Sigma}}{Generate a
   Wishart variate with degrees of freedom \farg{nu} and scale matrix
- \farg{S}; may only be used in generated quantities block}
+ \farg{Sigma}; may only be used in generated quantities block}
 \end{description}
 
 
@@ -1978,25 +2060,29 @@ positive-definite $W \in \reals^{K \times K}$,
 \! .
 \]
 
+\pitem{W}{inv\_wishart}{nu,Sigma}
+
 \subsubsection{Stan Functions}
 
 \begin{description}
 %
 \fitem{real}{inv\_wishart\_log}{matrix \farg{W}, real \farg{nu}, matrix
- \farg{S}}{The log of the inverse Wishart density for positive-definite matrix
+ \farg{Sigma}}{The log of the inverse Wishart density for positive-definite matrix
  \farg{W} given degrees of freedom \farg{nu} and scale matrix
- \farg{S}}
+ \farg{Sigma}}
 %
 \end{description}
 %
 \begin{description}
 \fitem{matrix}{inv\_wishart\_rng}{real \farg{nu}, matrix
-  \farg{S}}{Generate an inverse Wishart variate with degrees of 
+  \farg{Sigma}}{Generate an inverse Wishart variate with degrees of 
 freedom \farg{nu} and scale matrix
- \farg{S}; may only be used in generated quantities block}
+ \farg{Sigma}; may only be used in generated quantities block}
 \end{description}
 
 \section{LKJ Covariance Distribution}
+
+\pitem{W}{lkj\_cov\_log}{mu,sigma,eta}
 
 \subsubsection{Stan Functions}
 

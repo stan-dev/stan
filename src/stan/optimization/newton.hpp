@@ -54,9 +54,14 @@ namespace stan {
 
         std::vector<double> new_params_r(params_r.size());
         double step_size = 2;
+        double min_step_size = 1e-50;
         double f1 = -1e100;
-        while (!(f1 >= f0)) {
+
+        while (f1 < f0) {
           step_size *= 0.5;
+          if (step_size < min_step_size)
+            return f0;
+
           for (size_t i = 0; i < params_r.size(); i++)
             new_params_r[i] = params_r[i] - step_size * g[i];
           try {

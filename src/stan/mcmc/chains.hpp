@@ -423,7 +423,7 @@ namespace stan {
         }
         add(stan_csv.samples);
         if (stan_csv.metadata.save_warmup)
-          set_warmup(num_chains()-1, stan_csv.metadata.warmup);
+          set_warmup(num_chains()-1, stan_csv.metadata.num_warmup);
       }
       
       Eigen::VectorXd samples(const int chain, const int index) {

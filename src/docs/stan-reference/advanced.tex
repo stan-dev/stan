@@ -280,7 +280,7 @@ bound on estimation error no longer applies.  These problems are
 addressed in the next two sections.
 
 
-\section{Initialization and Convergence Monitoring}
+\section{Initialization and Convergence Monitoring}\label{convergence.section}
 
 A Markov chain generates samples from the target distribution only
 after it has converged to equilibrium.  Unfortunately, this is only
@@ -577,7 +577,8 @@ In addition to standard \HMC, \Stan implements an adaptive version of
 tunes a step sizes during warmup.  A global step size is optimized for
 a target Metropolis-Hastings reject rate using dual averaging; see
 \citep{Nesterov:2009} for details of dual averaging and
-\citep{Hoffman-Gelman:2012} for details of its use in \Stan.  For
+\citep{Hoffman-Gelman:2011,Hoffman-Gelman:2013} 
+for details of its use in \Stan.  For
 information on run-time configuration of step-size adaptation, see
 \refsection{stan-command-line-options}.  Then step sizes per parameter
 are estimated during warmup.  
@@ -599,7 +600,7 @@ out; see \refchapter{mixture-modeling} for examples.
 \HMC uses a Metropolis rejection step to ensure detailed balance of
 the resulting Markovian system; for details, see \citep{Neal:2011}.
 \NUTS uses a form of slice sampling which guarantees detailed balance;
-for details, see \citep{Hoffman-Gelman:2012}.%
+for details, see \citep{Hoffman-Gelman:2011,Hoffman-Gelman:2013}.%
 %
 \footnote{A transition density $\phi(\omega'|\omega)$ and density
   $\pi(\omega)$ over state space $\Omega$ satisfy detailed balance if

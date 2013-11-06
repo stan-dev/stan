@@ -49,6 +49,14 @@ namespace stan {
         o << INDENT;
     }
 
+    void generate_void_statement(const std::string& name,
+                                 const size_t indent,
+                                 std::ostream& o)  {
+      generate_indent(indent, o);
+      o << "(void) " << name << ";   // dummy to suppress unused var warning";
+      o << EOL;
+    }
+
     /** generic visitor with output for extension */
     struct visgen {
       typedef void result_type;
@@ -226,7 +234,8 @@ namespace stan {
         print_string_literal(o_,s);
       }
       void operator()(const expression& e) const { 
-        print_quoted_expression(o_,e);
+        generate_expression(e,o_);
+        // print_quoted_expression(o_,e);
       }
     };
 
@@ -597,6 +606,7 @@ namespace stan {
         }
         
         if (dims.size() == 0) {
+          generate_void_statement(name, 2, o_);
           o_ << INDENT2 << "if (jacobian__)" << EOL;
 
           // w Jacobian
@@ -1016,6 +1026,11 @@ namespace stan {
           o_ << ">";
         }
       }
+
+      void generate_void_statement(const std::string& name) const {
+        o_ << "(void) " << name << ";   // dummy to suppress unused var warning";
+      }
+
       // var_decl     -> type[0] name init_args[0] ;
       // init_args[k] -> ctor_args  if no dims left
       // init_args[k] -> ( dim[k] , ( type[k+1] init_args[k+1] ) )   
@@ -1078,6 +1093,11 @@ namespace stan {
         o_ << ' '  << name;
         generate_init_args(type,ctor_args,dims,0);
         o_ << ';' << EOL;
+        if (dims.size() == 0) {
+          generate_indent(indents_,o_);
+          generate_void_statement(name);
+          o_ << EOL;
+        }
         if (type == "Eigen::Matrix<T__,Eigen::Dynamic,Eigen::Dynamic> "
             || type == "Eigen::Matrix<T__,1,Eigen::Dynamic> " 
             || type == "Eigen::Matrix<T__,Eigen::Dynamic,1> ") {
@@ -1405,7 +1425,7 @@ namespace stan {
       void operator()(sample const& x) const {
         if (!include_sampling_) return;
         generate_indent(indent_,o_);
-        o_ << "lp_accum__.add(" << x.dist_.family_ << "_log<true>(";
+        o_ << "lp_accum__.add(" << x.dist_.family_ << "_log<propto__>(";
         generate_expression(x.expr_,o_);
         for (size_t i = 0; i < x.dist_.args_.size(); ++i) {
           o_ << ", ";
@@ -2424,9 +2444,11 @@ namespace stan {
                                const std::string& var_name,
                                const std::vector<expression>& dims) const {
         generate_dims_loop_fwd(dims);
-        o_ << "writer__." << write_method_name;
+        o_ << "try { writer__." << write_method_name;
         generate_name_dims(var_name,dims.size());
-        o_ << ");" << EOL;
+        o_ << "); } catch (std::exception& e) { "
+              " throw std::runtime_error(std::string(\"Error transforming variable "
+           << var_name << ": \") + e.what()); }" << EOL;
       }
       void generate_name_dims(const std::string name, 
                               size_t num_dims) const {
@@ -2534,6 +2556,7 @@ namespace stan {
       o << INDENT << "                     std::vector<double>& params_r__) const {" << EOL;
       o << INDENT2 << "stan::io::writer<double> writer__(params_r__,params_i__);" << EOL;
       o << INDENT2 << "size_t pos__;" << EOL;
+      o << INDENT2 << "(void) pos__; // dummy call to supress warning" << EOL;
       o << INDENT2 << "std::vector<double> vals_r__;" << EOL;
       o << INDENT2 << "std::vector<int> vals_i__;" << EOL;
       o << EOL;
@@ -3861,7 +3884,7 @@ namespace stan {
                        std::ostream& out) {
       out << "int main(int argc, const char* argv[]) {" << EOL;
       out << INDENT << "try {" << EOL;
-      out << INDENT2 << "stan::gm::command<" << model_name 
+      out << INDENT2 << "return stan::gm::command<" << model_name 
           << "_namespace::" << model_name << ">(argc,argv);" << EOL;
       out << INDENT << "} catch (std::exception& e) {" << EOL;
       out << INDENT2 

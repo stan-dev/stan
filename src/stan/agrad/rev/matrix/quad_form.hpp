@@ -22,7 +22,7 @@ namespace stan {
         inline void compute(const Eigen::Matrix<double,RA,CA> &A,
                             const Eigen::Matrix<double,RB,CB> &B)
         {
-          size_t i,j;
+          int i,j;
           Eigen::Matrix<double,CB,CB> Cd(B.transpose()*A*B);
           for (j = 0; j < C_.cols(); j++) {
             for (i = 0; i < C_.rows(); i++) {
@@ -66,7 +66,7 @@ namespace stan {
                            const Eigen::Matrix<double,RB,CB> &Bd,
                            const Eigen::Matrix<double,CB,CB> &adjC)
         {
-          size_t i,j;
+          int i,j;
           Eigen::Matrix<double,RA,CA>     adjA(Bd*adjC*Bd.transpose());
           for (j = 0; j < A.cols(); j++) {
             for (i = 0; i < A.rows(); i++) {
@@ -79,7 +79,7 @@ namespace stan {
                            const Eigen::Matrix<double,RB,CB> &Bd,
                            const Eigen::Matrix<double,CB,CB> &adjC)
         {
-          size_t i,j;
+          int i,j;
           Eigen::Matrix<double,RA,CA>     adjB(Ad*Bd*adjC.transpose() + Ad.transpose()*Bd*adjC);
           for (j = 0; j < B.cols(); j++)
             for (i = 0; i < B.rows(); i++)
@@ -105,7 +105,7 @@ namespace stan {
         }
         
         virtual void chain() {
-          size_t i,j;
+          int i,j;
           Eigen::Matrix<double,CB,CB> adjC(_impl->C_.rows(),_impl->C_.cols());
           
           for (j = 0; j < _impl->C_.cols(); j++)

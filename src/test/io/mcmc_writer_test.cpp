@@ -47,7 +47,7 @@ TEST(StanIoMcmcWriter, print_sample_names) {
   
   stan::io::mcmc_writer<example_model_namespace::example_model> writer(&sample_stream, &diagnostic_stream);
   
-  writer.print_sample_names(sample, sampler, model);
+  writer.print_sample_names(sample, &sampler, model);
   
   std::string line;
   std::getline(sample_stream, line);
@@ -90,8 +90,7 @@ TEST(StanIoMcmcWriter, print_sample_params) {
   
   stan::io::mcmc_writer<example_model_namespace::example_model> writer(&sample_stream, &diagnostic_stream);
   
-  
-  writer.print_sample_params(base_rng, sample, sampler, model);
+  writer.print_sample_params<rng_t>(base_rng, sample, sampler, model);
   
   std::string line;
   std::getline(sample_stream, line);
@@ -145,7 +144,7 @@ TEST(StanIoMcmcWriter, print_adapt_finish) {
   
   stan::io::mcmc_writer<example_model_namespace::example_model> writer(&sample_stream, &diagnostic_stream);
   
-  writer.print_adapt_finish(sampler);
+  writer.print_adapt_finish(&sampler);
   
   std::stringstream expected_stream;
   expected_stream << "# Adaptation terminated" << std::endl;
@@ -228,7 +227,7 @@ TEST(StanIoMcmcWriter, print_diagnostic_names) {
   
   stan::io::mcmc_writer<example_model_namespace::example_model> writer(&sample_stream, &diagnostic_stream);
   
-  writer.print_diagnostic_names(sample, sampler, model);
+  writer.print_diagnostic_names(sample, &sampler, model);
   
   std::string line;
   std::getline(diagnostic_stream, line);
@@ -276,7 +275,7 @@ TEST(StanIoMcmcWriter, print_diagnostic_params) {
   
   stan::io::mcmc_writer<example_model_namespace::example_model> writer(&sample_stream, &diagnostic_stream);
   
-  writer.print_diagnostic_params(sample, sampler);
+  writer.print_diagnostic_params(sample, &sampler);
   
   std::string line;
   std::getline(diagnostic_stream, line);
@@ -337,13 +336,13 @@ TEST(StanIoMcmcWriter, print_timing) {
   double warm = 0.193933;
   double sampling = 0.483830;
 
-  writer.print_timing(warm, sampling, &sample_stream);
+  writer.print_timing(warm, sampling, &sample_stream, '#');
 
   std::stringstream expected_stream;
   expected_stream << std::endl;
-  expected_stream << "# Elapsed Time: " << warm << " seconds (Warm-up)" << std::endl;
-  expected_stream << "#               " << sampling << " seconds (Sampling)" << std::endl;
-  expected_stream << "#               " << warm + sampling << " seconds (Total)" << std::endl;
+  expected_stream << "#  Elapsed Time: " << warm << " seconds (Warm-up)" << std::endl;
+  expected_stream << "#                " << sampling << " seconds (Sampling)" << std::endl;
+  expected_stream << "#                " << warm + sampling << " seconds (Total)" << std::endl;
   expected_stream << std::endl;
   
   std::string line;

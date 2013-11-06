@@ -15,7 +15,7 @@ TEST(AgradRev,sqrt_a) {
 }
 
 TEST(AgradRev,sqrt_neg) {
-  AVAR a = 0.0 - stan::math::epsilon();
+  AVAR a = 0.0 - stan::math::EPSILON;
   EXPECT_TRUE(std::isnan(sqrt(a)));
 
   a = -100;

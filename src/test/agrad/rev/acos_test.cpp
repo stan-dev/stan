@@ -39,9 +39,9 @@ TEST(AgradRev,acos_neg_1) {
 }
 
 TEST(AgradRev,acos_out_of_bounds) {
-  AVAR a = 1.0 + stan::math::epsilon();
+  AVAR a = 1.0 + stan::math::EPSILON;
   EXPECT_TRUE(std::isnan(acos(a)));
 
-  a = -1.0 - stan::math::epsilon();
+  a = -1.0 - stan::math::EPSILON;
   EXPECT_TRUE(std::isnan(acos(a)));
 }

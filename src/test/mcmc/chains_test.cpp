@@ -516,25 +516,25 @@ TEST_F(McmcChains, blocker_quantile) {
   int index = 5;
   
   // R's quantile function
-  EXPECT_NEAR(-2.93776, chains.quantile(0,index,0.1), 1e-2);
-  EXPECT_NEAR(-2.71573, chains.quantile(0,index,0.2), 1e-2);
-  EXPECT_NEAR(-2.58469, chains.quantile(0,index,0.3), 1e-2);
-  EXPECT_NEAR(-2.57960, chains.quantile(0,index,0.4), 1e-2);
-  EXPECT_NEAR(-2.49539, chains.quantile(0,index,0.5), 1e-2);
-  EXPECT_NEAR(-2.37983, chains.quantile(0,index,0.6), 1e-2);
-  EXPECT_NEAR(-2.22837, chains.quantile(0,index,0.7), 1e-2);
-  EXPECT_NEAR(-2.08649, chains.quantile(0,index,0.8), 1e-2);
-  EXPECT_NEAR(-1.90839, chains.quantile(0,index,0.9), 1e-2);
-
-  EXPECT_NEAR(-2.93776, chains.quantile(index,0.1), 1e-2);
-  EXPECT_NEAR(-2.71573, chains.quantile(index,0.2), 1e-2);
-  EXPECT_NEAR(-2.58469, chains.quantile(index,0.3), 1e-2);
-  EXPECT_NEAR(-2.57960, chains.quantile(index,0.4), 1e-2);
-  EXPECT_NEAR(-2.49539, chains.quantile(index,0.5), 1e-2);
-  EXPECT_NEAR(-2.37983, chains.quantile(index,0.6), 1e-2);
-  EXPECT_NEAR(-2.22837, chains.quantile(index,0.7), 1e-2);
-  EXPECT_NEAR(-2.08649, chains.quantile(index,0.8), 1e-2);
-  EXPECT_NEAR(-1.90839, chains.quantile(index,0.9), 1e-2);
+  EXPECT_NEAR(0.00241709, chains.quantile(0,index,0.1), 1e-2);
+  EXPECT_NEAR(0.00348311, chains.quantile(0,index,0.2), 1e-2);
+  EXPECT_NEAR(0.00477931, chains.quantile(0,index,0.3), 1e-2);
+  EXPECT_NEAR(0.00607412, chains.quantile(0,index,0.4), 1e-2);
+  EXPECT_NEAR(0.00770871, chains.quantile(0,index,0.5), 1e-2);
+  EXPECT_NEAR(0.00999282, chains.quantile(0,index,0.6), 1e-2);
+  EXPECT_NEAR(0.0131629, chains.quantile(0,index,0.7), 1e-2);
+  EXPECT_NEAR(0.0185874, chains.quantile(0,index,0.8), 1e-2);
+  EXPECT_NEAR(0.0263824, chains.quantile(0,index,0.9), 1e-2);
+  
+  EXPECT_NEAR(0.00241709, chains.quantile(index,0.1), 1e-2);
+  EXPECT_NEAR(0.00348311, chains.quantile(index,0.2), 1e-2);
+  EXPECT_NEAR(0.00477931, chains.quantile(index,0.3), 1e-2);
+  EXPECT_NEAR(0.00607412, chains.quantile(index,0.4), 1e-2);
+  EXPECT_NEAR(0.00770871, chains.quantile(index,0.5), 1e-2);
+  EXPECT_NEAR(0.00999282, chains.quantile(index,0.6), 1e-2);
+  EXPECT_NEAR(0.0131629, chains.quantile(index,0.7), 1e-2);
+  EXPECT_NEAR(0.0185874, chains.quantile(index,0.8), 1e-2);
+  EXPECT_NEAR(0.0263824, chains.quantile(index,0.9), 1e-2);
 
   std::string name = chains.param_name(index);
   EXPECT_FLOAT_EQ(chains.quantile(0,index,0.1), chains.quantile(0,name,0.1));
@@ -561,29 +561,28 @@ TEST_F(McmcChains, blocker_quantiles) {
   quantiles = chains.quantiles(0,index,probs);
   // R's quantile function
   ASSERT_EQ(9, quantiles.size());
-  EXPECT_NEAR(-2.93776, quantiles(0), 1e-2);
-  EXPECT_NEAR(-2.71573, quantiles(1), 1e-2);
-  EXPECT_NEAR(-2.58469, quantiles(2), 1e-2);
-  EXPECT_NEAR(-2.57960, quantiles(3), 1e-2);
-  EXPECT_NEAR(-2.49539, quantiles(4), 1e-2);
-  EXPECT_NEAR(-2.37983, quantiles(5), 1e-2);
-  EXPECT_NEAR(-2.22837, quantiles(6), 1e-2);
-  EXPECT_NEAR(-2.08649, quantiles(7), 1e-2);
-  EXPECT_NEAR(-1.90839, quantiles(8), 1e-2);
-
+  EXPECT_NEAR(0.00241709, quantiles(0), 1e-2);
+  EXPECT_NEAR(0.00348311, quantiles(1), 1e-2);
+  EXPECT_NEAR(0.00477931, quantiles(2), 1e-2);
+  EXPECT_NEAR(0.00607412, quantiles(3), 1e-2);
+  EXPECT_NEAR(0.00770871, quantiles(4), 1e-2);
+  EXPECT_NEAR(0.00999282, quantiles(5), 1e-2);
+  EXPECT_NEAR(0.0131629, quantiles(6), 1e-2);
+  EXPECT_NEAR(0.0185874, quantiles(7), 1e-2);
+  EXPECT_NEAR(0.0263824, quantiles(8), 1e-2);
 
   quantiles = chains.quantiles(index,probs);
   // R's quantile function
   ASSERT_EQ(9, quantiles.size());
-  EXPECT_NEAR(-2.93776, quantiles(0), 1e-2);
-  EXPECT_NEAR(-2.71573, quantiles(1), 1e-2);
-  EXPECT_NEAR(-2.58469, quantiles(2), 1e-2);
-  EXPECT_NEAR(-2.57960, quantiles(3), 1e-2);
-  EXPECT_NEAR(-2.49539, quantiles(4), 1e-2);
-  EXPECT_NEAR(-2.37983, quantiles(5), 1e-2);
-  EXPECT_NEAR(-2.22837, quantiles(6), 1e-2);
-  EXPECT_NEAR(-2.08649, quantiles(7), 1e-2);
-  EXPECT_NEAR(-1.90839, quantiles(8), 1e-2);
+  EXPECT_NEAR(0.00241709, quantiles(0), 1e-2);
+  EXPECT_NEAR(0.00348311, quantiles(1), 1e-2);
+  EXPECT_NEAR(0.00477931, quantiles(2), 1e-2);
+  EXPECT_NEAR(0.00607412, quantiles(3), 1e-2);
+  EXPECT_NEAR(0.00770871, quantiles(4), 1e-2);
+  EXPECT_NEAR(0.00999282, quantiles(5), 1e-2);
+  EXPECT_NEAR(0.0131629, quantiles(6), 1e-2);
+  EXPECT_NEAR(0.0185874, quantiles(7), 1e-2);
+  EXPECT_NEAR(0.0263824, quantiles(8), 1e-2);
 
 
   std::string name = chains.param_name(index);
@@ -616,13 +615,13 @@ TEST_F(McmcChains, blocker_central_interval) {
 
   interval = chains.central_interval(0,index,0.6);
   // R's quantile function
-  EXPECT_NEAR(-2.71573, interval(0), 1e-2); // 0.2
-  EXPECT_NEAR(-2.08649, interval(1), 1e-2); // 0.8
+  EXPECT_NEAR(0.00348311, interval(0), 1e-2); // 0.2
+  EXPECT_NEAR(0.0185874, interval(1), 1e-2); // 0.8
 
   interval = chains.central_interval(index,0.6);
   // R's quantile function
-  EXPECT_NEAR(-2.71573, interval(0), 1e-2); // 0.2
-  EXPECT_NEAR(-2.08649, interval(1), 1e-2); // 0.8
+  EXPECT_NEAR(0.00348311, interval(0), 1e-2); // 0.2
+  EXPECT_NEAR(0.0185874, interval(1), 1e-2); // 0.8
 
   std::string name = chains.param_name(index);
   Eigen::VectorXd interval_by_name;
@@ -644,38 +643,38 @@ TEST_F(McmcChains, blocker_autocorrelation) {
   stan::mcmc::chains<> chains(blocker1);
   Eigen::VectorXd ac;
   EXPECT_NO_THROW(ac = chains.autocorrelation(0,5));
-
-  EXPECT_NEAR(1.0, ac[0], 0.01);  
-  EXPECT_NEAR(0.277, ac[1], 0.01);
-  EXPECT_NEAR(0.197, ac[2], 0.01);
-  EXPECT_NEAR(0.123, ac[3], 0.01);
-  EXPECT_NEAR(0.087, ac[4], 0.01);
-  EXPECT_NEAR(0.096, ac[5], 0.01);
-  EXPECT_NEAR(0.100, ac[6], 0.01);
-  EXPECT_NEAR(0.007, ac[7], 0.01);
-  EXPECT_NEAR(0.052, ac[8], 0.01);
-  EXPECT_NEAR(0.038, ac[9], 0.01);
-  EXPECT_NEAR(-0.007, ac[10], 0.01);
-  EXPECT_NEAR(0.070, ac[11], 0.01);
-  EXPECT_NEAR(0.004, ac[12], 0.01);
-  EXPECT_NEAR(0.019, ac[13], 0.01);
-  EXPECT_NEAR(0.003, ac[14], 0.01);
-  EXPECT_NEAR(-0.035, ac[15], 0.01);
-  EXPECT_NEAR(-0.076, ac[16], 0.01);
-  EXPECT_NEAR(-0.048, ac[17], 0.01);
-  EXPECT_NEAR(-0.097, ac[18], 0.01);
-  EXPECT_NEAR(-0.014, ac[19], 0.01);
-  EXPECT_NEAR(-0.065, ac[20], 0.01);
-  EXPECT_NEAR(-0.069, ac[21], 0.01);
-  EXPECT_NEAR(-0.004, ac[22], 0.01);
-  EXPECT_NEAR(-0.084, ac[23], 0.01);
-  EXPECT_NEAR(-0.005, ac[24], 0.01);
-  EXPECT_NEAR(0.031, ac[25], 0.01);
-  EXPECT_NEAR(0.002, ac[26], 0.01);
-  EXPECT_NEAR(-0.019, ac[27], 0.01);
-  EXPECT_NEAR(0.002, ac[28], 0.01);
-  EXPECT_NEAR(-0.011, ac[29], 0.01);
-  EXPECT_NEAR(-0.016, ac[30], 0.01);
+  
+  EXPECT_NEAR(1, ac[0], 0.01);
+  EXPECT_NEAR(0.529912, ac[1], 0.01);
+  EXPECT_NEAR(0.406604, ac[2], 0.01);
+  EXPECT_NEAR(0.371753, ac[3], 0.01);
+  EXPECT_NEAR(0.310224, ac[4], 0.01);
+  EXPECT_NEAR(0.242701, ac[5], 0.01);
+  EXPECT_NEAR(0.156984, ac[6], 0.01);
+  EXPECT_NEAR(0.112109, ac[7], 0.01);
+  EXPECT_NEAR(0.10186, ac[8], 0.01);
+  EXPECT_NEAR(0.111895, ac[9], 0.01);
+  EXPECT_NEAR(0.117979, ac[10], 0.01);
+  EXPECT_NEAR(0.114381, ac[11], 0.01);
+  EXPECT_NEAR(0.102338, ac[12], 0.01);
+  EXPECT_NEAR(0.108705, ac[13], 0.01);
+  EXPECT_NEAR(0.101822, ac[14], 0.01);
+  EXPECT_NEAR(0.100116, ac[15], 0.01);
+  EXPECT_NEAR(0.110643, ac[16], 0.01);
+  EXPECT_NEAR(0.0732924, ac[17], 0.01);
+  EXPECT_NEAR(0.0500377, ac[18], 0.01);
+  EXPECT_NEAR(0.0221466, ac[19], 0.01);
+  EXPECT_NEAR(0.0548695, ac[20], 0.01);
+  EXPECT_NEAR(0.0778131, ac[21], 0.01);
+  EXPECT_NEAR(0.0618869, ac[22], 0.01);
+  EXPECT_NEAR(0.0734811, ac[23], 0.01);
+  EXPECT_NEAR(0.0719091, ac[24], 0.01);
+  EXPECT_NEAR(0.154124, ac[25], 0.01);
+  EXPECT_NEAR(0.170683, ac[26], 0.01);
+  EXPECT_NEAR(0.0960402, ac[27], 0.01);
+  EXPECT_NEAR(0.140461, ac[28], 0.01);
+  EXPECT_NEAR(0.111866, ac[29], 0.01);
+  EXPECT_NEAR(0.112928, ac[30], 0.01);
 
   std::string name = chains.param_name(5);
   Eigen::VectorXd ac_by_name;
@@ -691,38 +690,38 @@ TEST_F(McmcChains, blocker_autocovariance) {
   stan::mcmc::chains<> chains(blocker1);
   Eigen::VectorXd ac;
   EXPECT_NO_THROW(ac = chains.autocovariance(0,5));
-
-  EXPECT_NEAR( 0.1728635075, ac[0], 0.01);  
-  EXPECT_NEAR( 0.0479453913, ac[1], 0.01);
-  EXPECT_NEAR( 0.0339712275, ac[2], 0.01);
-  EXPECT_NEAR( 0.0213133322, ac[3], 0.01);
-  EXPECT_NEAR( 0.0150613410, ac[4], 0.01);
-  EXPECT_NEAR( 0.0166353592, ac[5], 0.01);
-  EXPECT_NEAR( 0.0173524816, ac[6], 0.01);
-  EXPECT_NEAR( 0.0011691359, ac[7], 0.01);
-  EXPECT_NEAR( 0.0089205594, ac[8], 0.01);
-  EXPECT_NEAR( 0.0065516382, ac[9], 0.01);
-  EXPECT_NEAR(-0.0012707460, ac[10], 0.01);
-  EXPECT_NEAR( 0.0120453780, ac[11], 0.01);
-  EXPECT_NEAR( 0.0007551419, ac[12], 0.01);
-  EXPECT_NEAR( 0.0032945508, ac[13], 0.01);
-  EXPECT_NEAR( 0.0005656385, ac[14], 0.01);
-  EXPECT_NEAR(-0.0060412611, ac[15], 0.01);
-  EXPECT_NEAR(-0.0131231022, ac[16], 0.01);
-  EXPECT_NEAR(-0.0083577880, ac[17], 0.01);
-  EXPECT_NEAR(-0.0168234290, ac[18], 0.01);
-  EXPECT_NEAR(-0.0024401327, ac[19], 0.01);
-  EXPECT_NEAR(-0.0112285003, ac[20], 0.01);
-  EXPECT_NEAR(-0.0120031605, ac[21], 0.01);
-  EXPECT_NEAR(-0.0007499154, ac[22], 0.01);
-  EXPECT_NEAR(-0.0144821063, ac[23], 0.01);
-  EXPECT_NEAR(-0.0008450844, ac[24], 0.01);
-  EXPECT_NEAR( 0.0054121234, ac[25], 0.01);
-  EXPECT_NEAR( 0.0003861726, ac[26], 0.01);
-  EXPECT_NEAR(-0.0032979440, ac[27], 0.01);
-  EXPECT_NEAR( 0.0003806655, ac[28], 0.01);
-  EXPECT_NEAR(-0.0019447624, ac[29], 0.01);
-  EXPECT_NEAR(-0.0028139251, ac[30], 0.01);
+  
+  EXPECT_NEAR(0.000150861, ac[0], 0.01);
+  EXPECT_NEAR(7.99431e-05, ac[1], 0.01);
+  EXPECT_NEAR(6.13408e-05, ac[2], 0.01);
+  EXPECT_NEAR(5.60831e-05, ac[3], 0.01);
+  EXPECT_NEAR(4.68008e-05, ac[4], 0.01);
+  EXPECT_NEAR(3.66142e-05, ac[5], 0.01);
+  EXPECT_NEAR(2.36828e-05, ac[6], 0.01);
+  EXPECT_NEAR(1.69129e-05, ac[7], 0.01);
+  EXPECT_NEAR(1.53667e-05, ac[8], 0.01);
+  EXPECT_NEAR(1.68806e-05, ac[9], 0.01);
+  EXPECT_NEAR(1.77985e-05, ac[10], 0.01);
+  EXPECT_NEAR(1.72556e-05, ac[11], 0.01);
+  EXPECT_NEAR(1.54389e-05, ac[12], 0.01);
+  EXPECT_NEAR(1.63994e-05, ac[13], 0.01);
+  EXPECT_NEAR(1.53609e-05, ac[14], 0.01);
+  EXPECT_NEAR(1.51037e-05, ac[15], 0.01);
+  EXPECT_NEAR(1.66917e-05, ac[16], 0.01);
+  EXPECT_NEAR(1.1057e-05, ac[17], 0.01);
+  EXPECT_NEAR(7.54875e-06, ac[18], 0.01);
+  EXPECT_NEAR(3.34107e-06, ac[19], 0.01);
+  EXPECT_NEAR(8.27767e-06, ac[20], 0.01);
+  EXPECT_NEAR(1.1739e-05, ac[21], 0.01);
+  EXPECT_NEAR(9.33633e-06, ac[22], 0.01);
+  EXPECT_NEAR(1.10854e-05, ac[23], 0.01);
+  EXPECT_NEAR(1.08483e-05, ac[24], 0.01);
+  EXPECT_NEAR(2.32514e-05, ac[25], 0.01);
+  EXPECT_NEAR(2.57494e-05, ac[26], 0.01);
+  EXPECT_NEAR(1.44887e-05, ac[27], 0.01);
+  EXPECT_NEAR(2.11901e-05, ac[28], 0.01);
+  EXPECT_NEAR(1.68763e-05, ac[29], 0.01);
+  EXPECT_NEAR(1.70365e-05, ac[30], 0.01);
 
   std::string name = chains.param_name(5);
   Eigen::VectorXd ac_by_name;
@@ -742,19 +741,22 @@ TEST_F(McmcChains,blocker_effective_sample_size) {
 
   Eigen::VectorXd n_eff(48);
   n_eff << 
-    431,136,450,121,258,
-    202,287,615,107,131,
-    39,573,608,538,412,
-    32,199,106,153,298,
-    105,155,340,475,806,
-    518,657,277,149,979,
-    150,741,923,647,473,
-    638,796,62,709,551,
-    687,933,798,574,377,
-    457,650,44;
+    466.099,136.553,1196.89,
+    665.131,427.967,582.182,765.15,
+    744.164,319.834,476.121,313.209,
+    588.142,638.582,477.636,173.709,
+    178.031,640.858,465.084,561.947,
+    669.612,450.765,406.215,292.713,
+    652.314,1378.33,829.726,847.982,
+    979.486,595.743,887.565,228.659,
+    748.785,898.374,219.433,879.069,
+    729.496,716.738,189.522,944.547,
+    841.35,733.193,1077.03,469.143,
+    954.924,461.517,506.452,692.844,98.0912;
 
-  for (int index = 3; index < chains.num_params(); index++) {
-    ASSERT_NEAR(n_eff(index - 3), chains.effective_sample_size(index), 1.0)
+
+  for (int index = 4; index < chains.num_params(); index++) {
+    ASSERT_NEAR(n_eff(index - 4), chains.effective_sample_size(index), 1.0)
       << "n_effective for index: " << index << ", parameter: " 
       << chains.param_name(index);
   }
@@ -772,22 +774,22 @@ TEST_F(McmcChains,blocker_split_potential_scale_reduction) {
   
   stan::mcmc::chains<> chains(blocker1);
   chains.add(blocker2);
-
+  
   Eigen::VectorXd rhat(48);
   rhat << 
-    1.0044119, 1.0130149, 1.0024355, 1.0123774, 1.0091136,
-    1.0046465, 1.0030522, 1.0025938, 1.0016099, 1.0218149, 
-    1.0397644, 1.0087594, 1.0017704, 1.0048593, 1.0113208,
-    1.0401753, 1.0040739, 1.0151312, 1.0120381, 1.0034498, 
-    1.0179943, 1.0160549, 1.0107518, 1.0050004, 0.9997756, 
-    1.0014585, 1.0002573, 1.0113728, 1.0368905, 1.0020098,
-    1.0058891, 1.0008469, 1.0031100, 1.0071503, 1.0083617,
-    1.0062931, 0.9997813, 1.0169052, 0.9998256, 0.9994163,
-    1.0029211, 1.0013409, 1.0073875, 1.0023928, 1.0029867,
-    1.0002895, 1.0018717, 1.0289164;
+    1.00718,1.00473,0.999203,1.00061,1.00378,
+    1.01031,1.00173,1.0045,1.00111,1.00337,
+    1.00546,1.00105,1.00558,1.00463,1.00534,
+    1.01244,1.00174,1.00718,1.00186,1.00554,
+    1.00436,1.00147,1.01017,1.00162,1.00143,
+    1.00058,0.999221,1.00012,1.01028,1.001,
+    1.00305,1.00435,1.00055,1.00246,1.00447,
+    1.0048,1.00209,1.01159,1.00202,1.00077,
+    1.0021,1.00262,1.00308,1.00197,1.00246,
+    1.00085,1.00047,1.00735;
 
-  for (int index = 3; index < chains.num_params(); index++) {
-    ASSERT_FLOAT_EQ(rhat(index - 3), chains.split_potential_scale_reduction(index))
+  for (int index = 4; index < chains.num_params(); index++) {
+    ASSERT_NEAR(rhat(index - 4), chains.split_potential_scale_reduction(index), 1e-4)
       << "rhat for index: " << index << ", parameter: " 
       << chains.param_name(index);
   }
