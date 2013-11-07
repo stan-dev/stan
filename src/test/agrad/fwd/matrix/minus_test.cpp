@@ -482,7 +482,7 @@ TEST(AgradFwdMatrixMinus, ffv_scalar_1stDeriv) {
 TEST(AgradFwdMatrixMinus, ffv_scalar_2ndDeriv_1) {
   using stan::math::minus;
   using stan::agrad::var;
-  double x = 10;
+
   fvar<fvar<var> > v = 11;
    v.d_ = 1.0;
   
@@ -494,7 +494,7 @@ TEST(AgradFwdMatrixMinus, ffv_scalar_2ndDeriv_1) {
 TEST(AgradFwdMatrixMinus, ffv_scalar_2ndDeriv_2) {
   using stan::math::minus;
   using stan::agrad::var;
-  double x = 10;
+
   fvar<fvar<var> > v = 11;
    v.d_ = 1.0;
 
@@ -506,7 +506,7 @@ TEST(AgradFwdMatrixMinus, ffv_scalar_2ndDeriv_2) {
 TEST(AgradFwdMatrixMinus, ffv_scalar_3rdDeriv) {
   using stan::math::minus;
   using stan::agrad::var;
-  double x = 10;
+
   fvar<fvar<var> > v = 11;
    v.d_ = 1.0;
   

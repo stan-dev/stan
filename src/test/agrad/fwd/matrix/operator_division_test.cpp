@@ -14,10 +14,10 @@ TEST(AgradFwdMatrixOperatorDivision,fd_scalar) {
 
   d1 = 10;
   v1 = 10;
-   v1.d_ = 1.0;
+  v1.d_ = 1.0;
   d2 = -2;
   v2 = -2;
-   v2.d_ = 1.0;
+  v2.d_ = 1.0;
   
   EXPECT_FLOAT_EQ(  -5, divide(d1, d2));
   EXPECT_FLOAT_EQ(  -5, divide(d1, v2).val_);
@@ -60,12 +60,12 @@ TEST(AgradFwdMatrixOperatorDivision,fd_vector) {
   
   d1 << 100, 0, -3;
   v1 << 100, 0, -3;
-   v1(0).d_ = 1.0;
-   v1(1).d_ = 1.0;
-   v1(2).d_ = 1.0;
+  v1(0).d_ = 1.0;
+  v1(1).d_ = 1.0;
+  v1(2).d_ = 1.0;
   d2 = -2;
   v2 = -2;
-   v2.d_ = 1.0;
+  v2.d_ = 1.0;
   
   vector_d output_d;
   output_d = divide(d1, d2);
@@ -141,12 +141,12 @@ TEST(AgradFwdMatrixOperatorDivision,fd_rowvector) {
   
   d1 << 100, 0, -3;
   v1 << 100, 0, -3;
-   v1(0).d_ = 1.0;
-   v1(1).d_ = 1.0;
-   v1(2).d_ = 1.0;
+  v1(0).d_ = 1.0;
+  v1(1).d_ = 1.0;
+  v1(2).d_ = 1.0;
   d2 = -2;
   v2 = -2;
-   v2.d_ = 1.0;
+  v2.d_ = 1.0;
   
   row_vector_d output_d = divide(d1, d2);
   EXPECT_FLOAT_EQ(-50, output_d(0));
@@ -221,13 +221,13 @@ TEST(AgradFwdMatrixOperatorDivision,fd_matrix) {
   
   d1 << 100, 0, -3, 4;
   v1 << 100, 0, -3, 4;
-   v1(0,0).d_ = 1.0;
-   v1(0,1).d_ = 1.0;
-   v1(1,0).d_ = 1.0;
-   v1(1,1).d_ = 1.0;
+  v1(0,0).d_ = 1.0;
+  v1(0,1).d_ = 1.0;
+  v1(1,0).d_ = 1.0;
+  v1(1,1).d_ = 1.0;
   d2 = -2;
   v2 = -2;
-   v2.d_ = 1.0;
+  v2.d_ = 1.0;
   
   matrix_d output_d = divide(d1, d2);
   EXPECT_FLOAT_EQ(-50, output_d(0,0));
@@ -311,10 +311,10 @@ TEST(AgradFwdMatrixOperatorDivision,fv_scalar_1stDeriv) {
 
   d1 = 10;
   v1 = 10;
-   v1.d_ = 1.0;
+  v1.d_ = 1.0;
   d2 = -2;
   v2 = -2;
-   v2.d_ = 1.0;
+  v2.d_ = 1.0;
   
   EXPECT_FLOAT_EQ(  -5, divide(d1, d2));
   EXPECT_FLOAT_EQ(  -5, divide(d1, v2).val_.val());
@@ -360,11 +360,11 @@ TEST(AgradFwdMatrixOperatorDivision,fv_scalar_1stDeriv) {
 }
 TEST(AgradFwdMatrixOperatorDivision,fv_scalar_2ndDeriv) {
   using stan::agrad::divide;
-  double d1, d2;
+  double d2;
   fvar<var> v1, v2;
 
   v1 = 10;
-   v1.d_ = 1.0;
+  v1.d_ = 1.0;
   d2 = -2;
   
   AVEC q = createAVEC(v1.val());
@@ -384,12 +384,12 @@ TEST(AgradFwdMatrixOperatorDivision,fv_vector_1stDeriv) {
   
   d1 << 100, 0, -3;
   v1 << 100, 0, -3;
-   v1(0).d_ = 1.0;
-   v1(1).d_ = 1.0;
-   v1(2).d_ = 1.0;
+  v1(0).d_ = 1.0;
+  v1(1).d_ = 1.0;
+  v1(2).d_ = 1.0;
   d2 = -2;
   v2 = -2;
-   v2.d_ = 1.0;
+  v2.d_ = 1.0;
   
   vector_d output_d;
   output_d = divide(d1, d2);
@@ -460,11 +460,11 @@ TEST(AgradFwdMatrixOperatorDivision,fv_vector_1stDeriv) {
   EXPECT_TRUE (std::isnan(output(2).d_.val()));
 
   v1 << 100, 0, -3;
-   v1(0).d_ = 1.0;
-   v1(1).d_ = 1.0;
-   v1(2).d_ = 1.0;
+  v1(0).d_ = 1.0;
+  v1(1).d_ = 1.0;
+  v1(2).d_ = 1.0;
   v2 = -2;
-   v2.d_ = 1.0;
+  v2.d_ = 1.0;
 
   output = divide(v1, v2);
   AVEC q = createAVEC(v1(0).val(),v1(1).val(),v1(2).val());
@@ -486,12 +486,12 @@ TEST(AgradFwdMatrixOperatorDivision,fv_vector_2ndDeriv) {
   
   d1 << 100, 0, -3;
   v1 << 100, 0, -3;
-   v1(0).d_ = 1.0;
-   v1(1).d_ = 1.0;
-   v1(2).d_ = 1.0;
+  v1(0).d_ = 1.0;
+  v1(1).d_ = 1.0;
+  v1(2).d_ = 1.0;
   d2 = -2;
   v2 = -2;
-   v2.d_ = 1.0;
+  v2.d_ = 1.0;
   vector_fv output;
 
   output = divide(v1, v2);
@@ -514,12 +514,12 @@ TEST(AgradFwdMatrixOperatorDivision,fv_rowvector_1stDeriv) {
   
   d1 << 100, 0, -3;
   v1 << 100, 0, -3;
-   v1(0).d_ = 1.0;
-   v1(1).d_ = 1.0;
-   v1(2).d_ = 1.0;
+  v1(0).d_ = 1.0;
+  v1(1).d_ = 1.0;
+  v1(2).d_ = 1.0;
   d2 = -2;
   v2 = -2;
-   v2.d_ = 1.0;
+  v2.d_ = 1.0;
   
   row_vector_d output_d = divide(d1, d2);
   EXPECT_FLOAT_EQ(-50, output_d(0));
@@ -589,11 +589,11 @@ TEST(AgradFwdMatrixOperatorDivision,fv_rowvector_1stDeriv) {
   EXPECT_TRUE(std::isnan(output(2).d_.val()));
 
   v1 << 100, 0, -3;
-   v1(0).d_ = 1.0;
-   v1(1).d_ = 1.0;
-   v1(2).d_ = 1.0;
+  v1(0).d_ = 1.0;
+  v1(1).d_ = 1.0;
+  v1(2).d_ = 1.0;
   v2 = -2;
-   v2.d_ = 1.0;
+  v2.d_ = 1.0;
 
   output = divide(v1, v2);
   AVEC q = createAVEC(v1(0).val(),v1(1).val(),v1(2).val());
@@ -615,12 +615,12 @@ TEST(AgradFwdMatrixOperatorDivision,fv_rowvector_2ndDeriv) {
   
   d1 << 100, 0, -3;
   v1 << 100, 0, -3;
-   v1(0).d_ = 1.0;
-   v1(1).d_ = 1.0;
-   v1(2).d_ = 1.0;
+  v1(0).d_ = 1.0;
+  v1(1).d_ = 1.0;
+  v1(2).d_ = 1.0;
   d2 = -2;
   v2 = -2;
-   v2.d_ = 1.0;
+  v2.d_ = 1.0;
 
   row_vector_fv output;
 
@@ -644,13 +644,13 @@ TEST(AgradFwdMatrixOperatorDivision,fv_matrix_1stDeriv) {
   
   d1 << 100, 0, -3, 4;
   v1 << 100, 0, -3, 4;
-   v1(0,0).d_ = 1.0;
-   v1(0,1).d_ = 1.0;
-   v1(1,0).d_ = 1.0;
-   v1(1,1).d_ = 1.0;
+  v1(0,0).d_ = 1.0;
+  v1(0,1).d_ = 1.0;
+  v1(1,0).d_ = 1.0;
+  v1(1,1).d_ = 1.0;
   d2 = -2;
   v2 = -2;
-   v2.d_ = 1.0;
+  v2.d_ = 1.0;
   
   matrix_d output_d = divide(d1, d2);
   EXPECT_FLOAT_EQ(-50, output_d(0,0));
@@ -734,19 +734,19 @@ TEST(AgradFwdMatrixOperatorDivision,fv_matrix_1stDeriv) {
   EXPECT_FLOAT_EQ(-std::numeric_limits<double>::infinity(), 
                   output(1,0).val_.val());
   EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(),
- output(1,1).val_.val());
+                  output(1,1).val_.val());
   EXPECT_TRUE (std::isnan(output(0,0).d_.val()));
   EXPECT_TRUE (std::isnan(output(0,1).d_.val()));
   EXPECT_TRUE (std::isnan(output(1,0).d_.val()));
   EXPECT_TRUE (std::isnan(output(1,1).d_.val()));
 
   v1 << 100, 0, -3, 4;
-   v1(0,0).d_ = 1.0;
-   v1(0,1).d_ = 1.0;
-   v1(1,0).d_ = 1.0;
-   v1(1,1).d_ = 1.0;
+  v1(0,0).d_ = 1.0;
+  v1(0,1).d_ = 1.0;
+  v1(1,0).d_ = 1.0;
+  v1(1,1).d_ = 1.0;
   v2 = -2;
-   v2.d_ = 1.0;
+  v2.d_ = 1.0;
 
   output = divide(v1, v2);
   AVEC q = createAVEC(v1(0,0).val(),v1(0,1).val(),v1(1,0).val(),v1(1,1).val());
@@ -769,13 +769,13 @@ TEST(AgradFwdMatrixOperatorDivision,fv_matrix_2ndDeriv) {
   
   d1 << 100, 0, -3, 4;
   v1 << 100, 0, -3, 4;
-   v1(0,0).d_ = 1.0;
-   v1(0,1).d_ = 1.0;
-   v1(1,0).d_ = 1.0;
-   v1(1,1).d_ = 1.0;
+  v1(0,0).d_ = 1.0;
+  v1(0,1).d_ = 1.0;
+  v1(1,0).d_ = 1.0;
+  v1(1,1).d_ = 1.0;
   d2 = -2;
   v2 = -2;
-   v2.d_ = 1.0;
+  v2.d_ = 1.0;
 
   matrix_fv output;
 
@@ -1131,10 +1131,10 @@ TEST(AgradFwdMatrixOperatorDivision,ffv_scalar_1stDeriv) {
 
   d1 = 10;
   v1 = 10;
-   v1.d_ = 1.0;
+  v1.d_ = 1.0;
   d2 = -2;
   v2 = -2;
-   v2.d_ = 1.0;
+  v2.d_ = 1.0;
   
   EXPECT_FLOAT_EQ(  -5, divide(d1, d2));
   EXPECT_FLOAT_EQ(  -5, divide(d1, v2).val_.val().val());
@@ -1180,11 +1180,11 @@ TEST(AgradFwdMatrixOperatorDivision,ffv_scalar_1stDeriv) {
 }
 TEST(AgradFwdMatrixOperatorDivision,ffv_scalar_2ndDeriv_1) {
   using stan::agrad::divide;
-  double d1, d2;
+  double d2;
   fvar<fvar<var> > v1, v2;
 
   v1 = 10;
-   v1.d_ = 1.0;
+  v1.d_ = 1.0;
   d2 = -2;
   
   AVEC q = createAVEC(v1.val().val());
@@ -1194,11 +1194,11 @@ TEST(AgradFwdMatrixOperatorDivision,ffv_scalar_2ndDeriv_1) {
 }
 TEST(AgradFwdMatrixOperatorDivision,ffv_scalar_2ndDeriv_2) {
   using stan::agrad::divide;
-  double d1, d2;
+  double d2;
   fvar<fvar<var> > v1, v2;
 
   v1 = 10;
-   v1.d_ = 1.0;
+  v1.d_ = 1.0;
   d2 = -2;
   
   AVEC q = createAVEC(v1.val().val());
@@ -1208,11 +1208,11 @@ TEST(AgradFwdMatrixOperatorDivision,ffv_scalar_2ndDeriv_2) {
 }
 TEST(AgradFwdMatrixOperatorDivision,ffv_scalar_3rdDeriv) {
   using stan::agrad::divide;
-  double d1, d2;
+  double d2;
   fvar<fvar<var> > v1, v2;
 
   v1 = 10;
-   v1.d_ = 1.0;
+  v1.d_ = 1.0;
   d2 = -2;
   
   AVEC q = createAVEC(v1.val().val());
@@ -1232,12 +1232,12 @@ TEST(AgradFwdMatrixOperatorDivision,ffv_vector_1stDeriv) {
   
   d1 << 100, 0, -3;
   v1 << 100, 0, -3;
-   v1(0).d_ = 1.0;
-   v1(1).d_ = 1.0;
-   v1(2).d_ = 1.0;
+  v1(0).d_ = 1.0;
+  v1(1).d_ = 1.0;
+  v1(2).d_ = 1.0;
   d2 = -2;
   v2 = -2;
-   v2.d_ = 1.0;
+  v2.d_ = 1.0;
   
   vector_d output_d;
   output_d = divide(d1, d2);
@@ -1308,11 +1308,11 @@ TEST(AgradFwdMatrixOperatorDivision,ffv_vector_1stDeriv) {
   EXPECT_TRUE (std::isnan(output(2).d_.val().val()));
 
   v1 << 100, 0, -3;
-   v1(0).d_ = 1.0;
-   v1(1).d_ = 1.0;
-   v1(2).d_ = 1.0;
+  v1(0).d_ = 1.0;
+  v1(1).d_ = 1.0;
+  v1(2).d_ = 1.0;
   v2 = -2;
-   v2.d_ = 1.0;
+  v2.d_ = 1.0;
 
   output = divide(v1, v2);
   AVEC q = createAVEC(v1(0).val().val(),v1(1).val().val(),v1(2).val().val());
@@ -1334,12 +1334,12 @@ TEST(AgradFwdMatrixOperatorDivision,ffv_vector_2ndDeriv_1) {
   
   d1 << 100, 0, -3;
   v1 << 100, 0, -3;
-   v1(0).d_ = 1.0;
-   v1(1).d_ = 1.0;
-   v1(2).d_ = 1.0;
+  v1(0).d_ = 1.0;
+  v1(1).d_ = 1.0;
+  v1(2).d_ = 1.0;
   d2 = -2;
   v2 = -2;
-   v2.d_ = 1.0;
+  v2.d_ = 1.0;
   vector_ffv output;
 
   output = divide(v1, v2);
@@ -1362,12 +1362,12 @@ TEST(AgradFwdMatrixOperatorDivision,ffv_vector_2ndDeriv_2) {
   
   d1 << 100, 0, -3;
   v1 << 100, 0, -3;
-   v1(0).d_ = 1.0;
-   v1(1).d_ = 1.0;
-   v1(2).d_ = 1.0;
+  v1(0).d_ = 1.0;
+  v1(1).d_ = 1.0;
+  v1(2).d_ = 1.0;
   d2 = -2;
   v2 = -2;
-   v2.d_ = 1.0;
+  v2.d_ = 1.0;
   vector_ffv output;
 
   output = divide(v1, v2);
@@ -1390,12 +1390,12 @@ TEST(AgradFwdMatrixOperatorDivision,ffv_vector_3rdDeriv) {
   
   d1 << 100, 0, -3;
   v1 << 100, 0, -3;
-   v1(0).d_ = 1.0;
-   v1(1).d_ = 1.0;
-   v1(2).d_ = 1.0;
+  v1(0).d_ = 1.0;
+  v1(1).d_ = 1.0;
+  v1(2).d_ = 1.0;
   d2 = -2;
   v2 = -2;
-   v2.d_ = 1.0;
+  v2.d_ = 1.0;
   vector_ffv output;
 
   output = divide(v1, v2);
@@ -1418,12 +1418,12 @@ TEST(AgradFwdMatrixOperatorDivision,ffv_rowvector_1stDeriv) {
   
   d1 << 100, 0, -3;
   v1 << 100, 0, -3;
-   v1(0).d_ = 1.0;
-   v1(1).d_ = 1.0;
-   v1(2).d_ = 1.0;
+  v1(0).d_ = 1.0;
+  v1(1).d_ = 1.0;
+  v1(2).d_ = 1.0;
   d2 = -2;
   v2 = -2;
-   v2.d_ = 1.0;
+  v2.d_ = 1.0;
   
   row_vector_d output_d = divide(d1, d2);
   EXPECT_FLOAT_EQ(-50, output_d(0));
@@ -1493,11 +1493,11 @@ TEST(AgradFwdMatrixOperatorDivision,ffv_rowvector_1stDeriv) {
   EXPECT_TRUE(std::isnan(output(2).d_.val().val()));
 
   v1 << 100, 0, -3;
-   v1(0).d_ = 1.0;
-   v1(1).d_ = 1.0;
-   v1(2).d_ = 1.0;
+  v1(0).d_ = 1.0;
+  v1(1).d_ = 1.0;
+  v1(2).d_ = 1.0;
   v2 = -2;
-   v2.d_ = 1.0;
+  v2.d_ = 1.0;
 
   output = divide(v1, v2);
   AVEC q = createAVEC(v1(0).val().val(),v1(1).val().val(),v1(2).val().val());
@@ -1519,12 +1519,12 @@ TEST(AgradFwdMatrixOperatorDivision,ffv_rowvector_2ndDeriv_1) {
   
   d1 << 100, 0, -3;
   v1 << 100, 0, -3;
-   v1(0).d_ = 1.0;
-   v1(1).d_ = 1.0;
-   v1(2).d_ = 1.0;
+  v1(0).d_ = 1.0;
+  v1(1).d_ = 1.0;
+  v1(2).d_ = 1.0;
   d2 = -2;
   v2 = -2;
-   v2.d_ = 1.0;
+  v2.d_ = 1.0;
 
   row_vector_ffv output;
 
@@ -1548,12 +1548,12 @@ TEST(AgradFwdMatrixOperatorDivision,ffv_rowvector_2ndDeriv_2) {
   
   d1 << 100, 0, -3;
   v1 << 100, 0, -3;
-   v1(0).d_ = 1.0;
-   v1(1).d_ = 1.0;
-   v1(2).d_ = 1.0;
+  v1(0).d_ = 1.0;
+  v1(1).d_ = 1.0;
+  v1(2).d_ = 1.0;
   d2 = -2;
   v2 = -2;
-   v2.d_ = 1.0;
+  v2.d_ = 1.0;
 
   row_vector_ffv output;
 
@@ -1577,12 +1577,12 @@ TEST(AgradFwdMatrixOperatorDivision,ffv_rowvector_3rdDeriv) {
   
   d1 << 100, 0, -3;
   v1 << 100, 0, -3;
-   v1(0).d_ = 1.0;
-   v1(1).d_ = 1.0;
-   v1(2).d_ = 1.0;
+  v1(0).d_ = 1.0;
+  v1(1).d_ = 1.0;
+  v1(2).d_ = 1.0;
   d2 = -2;
   v2 = -2;
-   v2.d_ = 1.0;
+  v2.d_ = 1.0;
 
   row_vector_ffv output;
 
@@ -1606,13 +1606,13 @@ TEST(AgradFwdMatrixOperatorDivision,ffv_matrix_1stDeriv) {
   
   d1 << 100, 0, -3, 4;
   v1 << 100, 0, -3, 4;
-   v1(0,0).d_ = 1.0;
-   v1(0,1).d_ = 1.0;
-   v1(1,0).d_ = 1.0;
-   v1(1,1).d_ = 1.0;
+  v1(0,0).d_ = 1.0;
+  v1(0,1).d_ = 1.0;
+  v1(1,0).d_ = 1.0;
+  v1(1,1).d_ = 1.0;
   d2 = -2;
   v2 = -2;
-   v2.d_ = 1.0;
+  v2.d_ = 1.0;
   
   matrix_d output_d = divide(d1, d2);
   EXPECT_FLOAT_EQ(-50, output_d(0,0));
@@ -1696,19 +1696,19 @@ TEST(AgradFwdMatrixOperatorDivision,ffv_matrix_1stDeriv) {
   EXPECT_FLOAT_EQ(-std::numeric_limits<double>::infinity(), 
                   output(1,0).val_.val().val());
   EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(),
- output(1,1).val_.val().val());
+                  output(1,1).val_.val().val());
   EXPECT_TRUE (std::isnan(output(0,0).d_.val().val()));
   EXPECT_TRUE (std::isnan(output(0,1).d_.val().val()));
   EXPECT_TRUE (std::isnan(output(1,0).d_.val().val()));
   EXPECT_TRUE (std::isnan(output(1,1).d_.val().val()));
 
   v1 << 100, 0, -3, 4;
-   v1(0,0).d_ = 1.0;
-   v1(0,1).d_ = 1.0;
-   v1(1,0).d_ = 1.0;
-   v1(1,1).d_ = 1.0;
+  v1(0,0).d_ = 1.0;
+  v1(0,1).d_ = 1.0;
+  v1(1,0).d_ = 1.0;
+  v1(1,1).d_ = 1.0;
   v2 = -2;
-   v2.d_ = 1.0;
+  v2.d_ = 1.0;
 
   output = divide(v1, v2);
   AVEC q = createAVEC(v1(0,0).val().val(),v1(0,1).val().val(),v1(1,0).val().val(),v1(1,1).val().val());
@@ -1731,13 +1731,13 @@ TEST(AgradFwdMatrixOperatorDivision,ffv_matrix_2ndDeriv_1) {
   
   d1 << 100, 0, -3, 4;
   v1 << 100, 0, -3, 4;
-   v1(0,0).d_ = 1.0;
-   v1(0,1).d_ = 1.0;
-   v1(1,0).d_ = 1.0;
-   v1(1,1).d_ = 1.0;
+  v1(0,0).d_ = 1.0;
+  v1(0,1).d_ = 1.0;
+  v1(1,0).d_ = 1.0;
+  v1(1,1).d_ = 1.0;
   d2 = -2;
   v2 = -2;
-   v2.d_ = 1.0;
+  v2.d_ = 1.0;
 
   matrix_ffv output;
 
@@ -1763,13 +1763,13 @@ TEST(AgradFwdMatrixOperatorDivision,ffv_matrix_2ndDeriv_2) {
   
   d1 << 100, 0, -3, 4;
   v1 << 100, 0, -3, 4;
-   v1(0,0).d_ = 1.0;
-   v1(0,1).d_ = 1.0;
-   v1(1,0).d_ = 1.0;
-   v1(1,1).d_ = 1.0;
+  v1(0,0).d_ = 1.0;
+  v1(0,1).d_ = 1.0;
+  v1(1,0).d_ = 1.0;
+  v1(1,1).d_ = 1.0;
   d2 = -2;
   v2 = -2;
-   v2.d_ = 1.0;
+  v2.d_ = 1.0;
 
   matrix_ffv output;
 
@@ -1795,13 +1795,13 @@ TEST(AgradFwdMatrixOperatorDivision,ffv_matrix_3rdDeriv) {
   
   d1 << 100, 0, -3, 4;
   v1 << 100, 0, -3, 4;
-   v1(0,0).d_ = 1.0;
-   v1(0,1).d_ = 1.0;
-   v1(1,0).d_ = 1.0;
-   v1(1,1).d_ = 1.0;
+  v1(0,0).d_ = 1.0;
+  v1(0,1).d_ = 1.0;
+  v1(1,0).d_ = 1.0;
+  v1(1,1).d_ = 1.0;
   d2 = -2;
   v2 = -2;
-   v2.d_ = 1.0;
+  v2.d_ = 1.0;
 
   matrix_ffv output;
 
