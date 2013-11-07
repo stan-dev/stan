@@ -16,29 +16,27 @@ namespace stan {
       using stan::math::multiply_log;
       using std::log;
       return fvar<T>(multiply_log(x1.val_, x2.val_),
-                             x1.d_ * log(x2.val_) + x1.val_ * x2.d_ / x2.val_);
+                     x1.d_ * log(x2.val_) + x1.val_ * x2.d_ / x2.val_);
     }
 
     template <typename T>
     inline
-    fvar<typename stan::return_type<T,double>::type>
-    multiply_log(double x1, const fvar<T>& x2) {
+    fvar<T>
+    multiply_log(const double x1, const fvar<T>& x2) {
       using stan::math::multiply_log;
       using std::log;
-      return fvar<typename 
-                  stan::return_type<T,double>::type>(multiply_log(x1, x2.val_),
-                                 x1 * x2.d_ / x2.val_);
+      return fvar<T>(multiply_log(x1, x2.val_),
+                     x1 * x2.d_ / x2.val_);
     }
 
     template <typename T>
     inline
-    fvar<typename stan::return_type<T,double>::type>
-    multiply_log(const fvar<T>& x1, double x2) {
+    fvar<T>
+    multiply_log(const fvar<T>& x1, const double x2) {
       using stan::math::multiply_log;
       using std::log;
-      return fvar<typename 
-                  stan::return_type<T,double>::type>(multiply_log(x1.val_, x2),
-                                                  log(x2));
+      return fvar<T>(multiply_log(x1.val_, x2), 
+                     log(x2));
     }
   }
 }

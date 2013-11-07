@@ -20,21 +20,19 @@ namespace stan {
 
     template <typename T>
     inline
-    fvar<typename stan::return_type<T,double>::type>
-    fmod(const fvar<T>& x1, double x2) {
+    fvar<T>
+    fmod(const fvar<T>& x1, const double x2) {
       using std::fmod;
-      return fvar<typename stan::return_type<T,double>::type>(
-        fmod(x1.val_, x2), x1.d_ / x2);
+      return fvar<T>(fmod(x1.val_, x2), x1.d_ / x2);
     }
 
     template <typename T>
     inline
-    fvar<typename stan::return_type<T,double>::type>
-    fmod(double x1, const fvar<T>& x2) {
+    fvar<T>
+    fmod(const double x1, const fvar<T>& x2) {
       using std::fmod;
       using std::floor;
-      return fvar<typename stan::return_type<T,double>::type>(
-        fmod(x1, x2.val_), -x2.d_ * floor(x1 / x2.val_));
+      return fvar<T>(fmod(x1, x2.val_), -x2.d_ * floor(x1 / x2.val_));
     }
   }
 }

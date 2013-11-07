@@ -61,7 +61,7 @@ namespace stan {
 
     template<typename T,int R1, int C1, int R2, int C2>
     inline
-    Eigen::Matrix<fvar<typename stan::return_type<T, double>::type>,R1,C1> 
+    Eigen::Matrix<fvar<T>,R1,C1> 
     mdivide_left_tri_low(const Eigen::Matrix<double, R1, C1>& A, 
                          const Eigen::Matrix<fvar<T>, R2, C2>& b) {
       using stan::math::multiply;      
@@ -69,10 +69,8 @@ namespace stan {
       stan::math::validate_square(A,"mdivide_left");
       stan::math::validate_multiplicable(A,b,"mdivide_left");
 
-      Eigen::Matrix<typename stan::return_type<T, double>::type,R1,C2> 
-        inv_A_mult_b(A.rows(),b.cols());
-      Eigen::Matrix<typename stan::return_type<T, double>::type,R1,C2> 
-        inv_A_mult_deriv_b(A.rows(),b.cols());
+      Eigen::Matrix<T,R1,C2> inv_A_mult_b(A.rows(),b.cols());
+      Eigen::Matrix<T,R1,C2> inv_A_mult_deriv_b(A.rows(),b.cols());
       Eigen::Matrix<T,R2,C2> val_b(b.rows(),b.cols()); 
       Eigen::Matrix<T,R2,C2> deriv_b(b.rows(),b.cols()); 
       Eigen::Matrix<double,R1,C1> val_A(A.rows(),A.cols()); 
@@ -94,8 +92,7 @@ namespace stan {
       inv_A_mult_b = mdivide_left(val_A, val_b);
       inv_A_mult_deriv_b = mdivide_left(val_A, deriv_b);
 
-      Eigen::Matrix<typename stan::return_type<T, double>::type,R1,C2> 
-        deriv(A.rows(), b.cols());
+      Eigen::Matrix<T,R1,C2> deriv(A.rows(), b.cols());
       deriv = inv_A_mult_deriv_b;
 
       return stan::agrad::to_fvar(inv_A_mult_b, deriv);
@@ -103,7 +100,7 @@ namespace stan {
 
     template<typename T,int R1, int C1, int R2, int C2>
     inline
-    Eigen::Matrix<fvar<typename stan::return_type<T,double>::type>,R1,C1> 
+    Eigen::Matrix<fvar<T>,R1,C1> 
     mdivide_left_tri_low(const Eigen::Matrix<fvar<T>, R1, C1>& A, 
                          const Eigen::Matrix<double, R2, C2>& b) {
       using stan::math::multiply;      
@@ -111,7 +108,7 @@ namespace stan {
       stan::math::validate_square(A,"mdivide_left");
       stan::math::validate_multiplicable(A,b,"mdivide_left");
 
-      Eigen::Matrix<typename stan::return_type<T,double>::type,R1,C2> 
+      Eigen::Matrix<T,R1,C2> 
         inv_A_mult_b(A.rows(),b.cols());
       Eigen::Matrix<T,R1,C1> inv_A_mult_deriv_A(A.rows(),A.cols());
       Eigen::Matrix<T,R1,C1> val_A(A.rows(),A.cols()); 
@@ -129,8 +126,7 @@ namespace stan {
       inv_A_mult_b = mdivide_left(val_A, b);
       inv_A_mult_deriv_A = mdivide_left(val_A, deriv_A);
 
-      Eigen::Matrix<typename stan::return_type<T,double>::type,R1,C2> 
-        deriv(A.rows(), b.cols());
+      Eigen::Matrix<T,R1,C2> deriv(A.rows(), b.cols());
       deriv = -multiply(inv_A_mult_deriv_A, inv_A_mult_b);
 
       return stan::agrad::to_fvar(inv_A_mult_b, deriv);

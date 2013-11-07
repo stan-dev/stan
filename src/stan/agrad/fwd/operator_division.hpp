@@ -11,31 +11,26 @@ namespace stan {
     template <typename T>
     inline
     fvar<T>
-    operator/(const fvar<T>& x1, 
-              const fvar<T>& x2) {
-      return fvar<T>(x1.val_ / x2.val_, (x1.d_ * x2.val_ - x1.val_ * x2.d_)
-                                              / (x2.val_ * x2.val_));
+    operator/(const fvar<T>& x1, const fvar<T>& x2) {
+      return fvar<T>(x1.val_ / x2.val_, 
+                     (x1.d_ * x2.val_ - x1.val_ * x2.d_) / (x2.val_ * x2.val_));
     }
 
     template <typename T>
     inline
-    fvar<typename stan::return_type<T,double>::type>
-    operator/(const fvar<T>& x1, 
-              double x2) {
-      return fvar<typename stan::return_type<T,double>::type>(x1.val_ / x2,
-                                                              x1.d_ / x2);
+    fvar<T>
+    operator/(const fvar<T>& x1, const double x2) {
+      return fvar<T>(x1.val_ / x2,
+                     x1.d_ / x2);
     }
 
     template <typename T>
     inline
-    fvar<typename stan::return_type<T,double>::type>
-    operator/(double x1, 
-              const fvar<T>& x2) {
-      return fvar<typename 
-                  stan
-                  ::return_type<T,double>::type>(x1 / x2.val_, 
-                                                 - x1 * x2.d_ 
-                                                 / (x2.val_ * x2.val_));
+    fvar<T>
+    operator/(const double x1, const fvar<T>& x2) {
+      return fvar<T>(x1 / x2.val_, 
+                     - x1 * x2.d_ / (x2.val_ * x2.val_));
+                     
     }
   }
 }

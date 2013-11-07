@@ -19,26 +19,24 @@ namespace stan {
       using std::log;
       T pow_x1_x2(pow(x1.val_,x2.val_));
       return fvar<T>(pow_x1_x2,
-                       (x2.d_ * log(x1.val_) 
-                         + x2.val_ * x1.d_ / x1.val_) * pow_x1_x2);
+                     (x2.d_ * log(x1.val_) 
+                      + x2.val_ * x1.d_ / x1.val_) * pow_x1_x2);
     }
 
     template <typename T>
     inline
-    fvar<typename stan::return_type<T,double>::type>
-    pow(double x1, const fvar<T>& x2) {
+    fvar<T>
+    pow(const double x1, const fvar<T>& x2) {
       using std::pow;
       using std::log;
-      typename stan::return_type<T,double>::type u = pow(x1,x2.val_);
-      return fvar<typename 
-                  stan::return_type<T,double>::type>(u,
-                                          x2.d_ * log(x1) * u);
+      T u = pow(x1,x2.val_);
+      return fvar<T>(u, x2.d_ * log(x1) * u);
     }
 
     template <typename T>
     inline
-    fvar<typename stan::return_type<T,double>::type>
-    pow(const fvar<T>& x1, double x2) {
+    fvar<T>
+    pow(const fvar<T>& x1, const double x2) {
       using std::pow;
       using stan::agrad::inv;
       using stan::agrad::inv_sqrt;
@@ -59,9 +57,8 @@ namespace stan {
       if (x2 == 2.0)
         return square(x1);
 
-      return fvar<typename 
-                  stan::return_type<T,double>::type>(pow(x1.val_, x2),
-                                           x1.d_ * x2 * pow(x1.val_, x2 - 1));
+      return fvar<T>(pow(x1.val_, x2),
+                     x1.d_ * x2 * pow(x1.val_, x2 - 1));
     }
   }
 }

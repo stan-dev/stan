@@ -22,27 +22,25 @@ namespace stan {
     }
 
     template<typename T>
-    inline fvar<typename stan::return_type<T,double>::type>
-    falling_factorial(const fvar<T>& x, double n) {
+    inline fvar<T>
+    falling_factorial(const fvar<T>& x, const double n) {
       using stan::math::falling_factorial;
       using boost::math::digamma;
 
-      typename boost::math::tools::promote_args<T,double>::type falling_fact(
-                                                 falling_factorial(x.val_,n));
-      return fvar<typename stan::return_type<T,double>::type>(falling_fact, 
-        falling_fact * digamma(x.val_ + 1) * x.d_);
+      T falling_fact(falling_factorial(x.val_,n));
+      return fvar<T>(falling_fact, 
+                     falling_fact * digamma(x.val_ + 1) * x.d_);
     }
 
     template<typename T>
-    inline fvar<typename stan::return_type<T,double>::type>
-    falling_factorial(double x, const fvar<T>& n) {
+    inline fvar<T>
+    falling_factorial(const double x, const fvar<T>& n) {
       using stan::math::falling_factorial;
       using boost::math::digamma;
 
-      typename boost::math::tools::promote_args<T,double>::type 
-        falling_fact(falling_factorial(x, n.val_));
-      return fvar<typename stan::return_type<T,double>::type>(falling_fact, 
-        -falling_fact * digamma(n.val_ + 1) * n.d_);
+      T falling_fact(falling_factorial(x, n.val_));
+      return fvar<T>(falling_fact, 
+                     -falling_fact * digamma(n.val_ + 1) * n.d_);
     }
   }
 }

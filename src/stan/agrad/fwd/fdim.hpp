@@ -24,29 +24,26 @@ namespace stan {
 
     template <typename T>
     inline
-    fvar<typename stan::return_type<T,double>::type>
-    fdim(const fvar<T>& x1, double x2) {
+    fvar<T>
+    fdim(const fvar<T>& x1, const double x2) {
       using stan::math::fdim;
       using std::floor;
       if(x1.val_ < x2)
-           return fvar<typename 
-                       stan::return_type<T,double>::type>(fdim(x1.val_, x2), 0);
+        return fvar<T>(fdim(x1.val_, x2), 0);
       else 
-        return fvar<typename stan::return_type<T,double>::type>(                                                              fdim(x1.val_, x2), x1.d_);              
+        return fvar<T>(fdim(x1.val_, x2), x1.d_);              
     }
 
     template <typename T>
     inline
-    fvar<typename stan::return_type<T,double>::type>
-    fdim(double x1, const fvar<T>& x2) {
+    fvar<T>
+    fdim(const double x1, const fvar<T>& x2) {
       using stan::math::fdim;
       using std::floor;
       if(x1 < x2.val_)
-           return fvar<typename 
-                       stan::return_type<T,double>::type>(fdim(x1, x2.val_), 0);
+        return fvar<T>(fdim(x1, x2.val_), 0);
       else 
-        return fvar<typename stan::return_type<T,double>::type>(
-                             fdim(x1, x2.val_), x2.d_ * -floor(x1 / x2.val_));         
+        return fvar<T>(fdim(x1, x2.val_), x2.d_ * -floor(x1 / x2.val_));         
     }
   }
 }

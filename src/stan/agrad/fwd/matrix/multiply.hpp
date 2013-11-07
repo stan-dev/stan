@@ -29,9 +29,9 @@ namespace stan {
 
     template<typename T,int R2,int C2>
     inline 
-    Eigen::Matrix<fvar<typename stan::return_type<T,double>::type>, R2, C2> 
-    multiply(const Eigen::Matrix<fvar<T>, R2, C2>& m, double c) {
-      Eigen::Matrix<fvar<typename stan::return_type<T,double>::type>,R2,C2> 
+    Eigen::Matrix<fvar<T>, R2, C2> 
+    multiply(const Eigen::Matrix<fvar<T>, R2, C2>& m, const double c) {
+      Eigen::Matrix<fvar<T>,R2,C2> 
         res(m.rows(),m.cols());
       for(int i = 0; i < m.rows(); i++) {
         for(int j = 0; j < m.cols(); j++)
@@ -42,9 +42,9 @@ namespace stan {
 
     template<typename T, int R1,int C1>
     inline 
-    Eigen::Matrix<fvar<typename stan::return_type<T,double>::type>,R1,C1> 
+    Eigen::Matrix<fvar<T>,R1,C1> 
     multiply(const Eigen::Matrix<double, R1, C1>& m, const fvar<T>& c) {
-      Eigen::Matrix<fvar<typename stan::return_type<T,double>::type>,R1,C1> 
+      Eigen::Matrix<fvar<T>,R1,C1> 
         res(m.rows(),m.cols());
       for(int i = 0; i < m.rows(); i++) {
         for(int j = 0; j < m.cols(); j++)
@@ -62,14 +62,14 @@ namespace stan {
 
     template<typename T, int R1,int C1>
     inline 
-    Eigen::Matrix<fvar<typename stan::return_type<T,double>::type>,R1,C1> 
-    multiply(double c, const Eigen::Matrix<fvar<T>, R1, C1>& m) {
+    Eigen::Matrix<fvar<T>,R1,C1> 
+    multiply(const double c, const Eigen::Matrix<fvar<T>, R1, C1>& m) {
       return multiply(m, c);
     }
 
     template<typename T, int R1,int C1>
     inline 
-    Eigen::Matrix<fvar<typename stan::return_type<T,double>::type>,R1,C1> 
+    Eigen::Matrix<fvar<T>,R1,C1> 
     multiply(const fvar<T>& c, const Eigen::Matrix<double, R1, C1>& m) {
       return multiply(m, c);
     }
@@ -86,44 +86,44 @@ namespace stan {
         for (size_type j = 0; j < m2.cols(); j++) {
           Eigen::Matrix<fvar<T>,R2,1> ccol = m2.col(j);
           result(i,j) = stan::agrad::dot_product(crow,ccol);
-          }
         }
+      }
       return result;
     }
 
     template<typename T, int R1,int C1,int R2,int C2>
     inline 
-    Eigen::Matrix<fvar<typename stan::return_type<T,double>::type>,R1,C2> 
+    Eigen::Matrix<fvar<T>,R1,C2> 
     multiply(const Eigen::Matrix<fvar<T>,R1,C1>& m1,
              const Eigen::Matrix<double,R2,C2>& m2) {
       stan::math::validate_multiplicable(m1,m2,"multiply");
-      Eigen::Matrix<fvar<typename stan::return_type<T,double>::type>,R1,C2>
+      Eigen::Matrix<fvar<T>,R1,C2>
         result(m1.rows(),m2.cols());
       for (size_type i = 0; i < m1.rows(); i++) {
         Eigen::Matrix<fvar<T>,1,C1> crow = m1.row(i);
         for (size_type j = 0; j < m2.cols(); j++) {
           Eigen::Matrix<double,R2,1> ccol = m2.col(j);
           result(i,j) = stan::agrad::dot_product(crow,ccol);
-          }
         }
+      }
       return result;
     }
 
     template<typename T, int R1,int C1,int R2,int C2>
     inline
-    Eigen::Matrix<fvar<typename stan::return_type<T,double>::type>,R1,C2> 
+    Eigen::Matrix<fvar<T>,R1,C2> 
     multiply(const Eigen::Matrix<double,R1,C1>& m1,
              const Eigen::Matrix<fvar<T>,R2,C2>& m2) {
       stan::math::validate_multiplicable(m1,m2,"multiply");
-      Eigen::Matrix<fvar<typename stan::return_type<T,double>::type>,R1,C2>
+      Eigen::Matrix<fvar<T>,R1,C2>
         result(m1.rows(),m2.cols());
       for (size_type i = 0; i < m1.rows(); i++) {
         Eigen::Matrix<double,1,C1> crow = m1.row(i);
         for (size_type j = 0; j < m2.cols(); j++) {
           Eigen::Matrix<fvar<T>,R2,1> ccol = m2.col(j);
           result(i,j) = stan::agrad::dot_product(crow,ccol);
-          }
         }
+      }
       return result;
     }
 
@@ -139,7 +139,7 @@ namespace stan {
 
     template <typename T, int C1,int R2>
     inline 
-    fvar<typename stan::return_type<T,double>::type>
+    fvar<T>
     multiply(const Eigen::Matrix<fvar<T>, 1, C1>& rv, 
              const Eigen::Matrix<double, R2, 1>& v) {
       if (rv.size() != v.size())
@@ -149,7 +149,7 @@ namespace stan {
 
     template <typename T, int C1,int R2>
     inline 
-    fvar<typename stan::return_type<T,double>::type>
+    fvar<T>
     multiply(const Eigen::Matrix<double, 1, C1>& rv, 
              const Eigen::Matrix<fvar<T>, R2, 1>& v) {
       if (rv.size() != v.size())

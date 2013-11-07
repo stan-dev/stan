@@ -16,49 +16,40 @@ namespace stan {
       using std::max;
       using stan::math::NOT_A_NUMBER;
       if(x1.val_ > x2.val_)
-        return fvar<typename stan::return_type<T>::type>(
-          x1.val_, x1.d_ * 1.0);
+        return fvar<T>(x1.val_, x1.d_);
       else if(x1.val_ == x2.val_)
-        return fvar<typename stan::return_type<T>::type>(
-          x1.val_, NOT_A_NUMBER);
+        return fvar<T>(x1.val_, NOT_A_NUMBER);
       else 
-        return fvar<typename stan::return_type<T>::type>(
-          x2.val_, x2.d_ * 1.0);      
+        return fvar<T>(x2.val_, x2.d_);      
     }
 
     template <typename T>
     inline
-    fvar<typename stan::return_type<T,double>::type>
-    fmax(double x1, const fvar<T>& x2) {
+    fvar<T>
+    fmax(const double x1, const fvar<T>& x2) {
       using std::max;
       using stan::math::NOT_A_NUMBER;
       if(x1 > x2.val_)
-        return fvar<typename stan::return_type<T,double>::type>(
-          x1, 0.0);
+        return fvar<T>(x1, 0.0);
       else if(x1 == x2.val_)
-        return fvar<typename stan::return_type<T,double>::type>(
-          x2.val_, NOT_A_NUMBER);
+        return fvar<T>(x2.val_, NOT_A_NUMBER);
       else 
-        return fvar<typename stan::return_type<T,double>::type>(
-          x2.val_, x2.d_ * 1.0);    
+        return fvar<T>(x2.val_, x2.d_);    
     }
 
     template <typename T>
     inline
-    fvar<typename stan::return_type<T,double>::type>
-    fmax(const fvar<T>& x1, double x2) {
+    fvar<T>
+    fmax(const fvar<T>& x1, const double x2) {
       using std::max;
       using stan::math::NOT_A_NUMBER;
       if(x1.val_ > x2)
-        return fvar<typename stan::return_type<T,double>::type>(
-          x1.val_, x1.d_ * 1.0);
+        return fvar<T>(x1.val_, x1.d_);
       else if(x1.val_ == x2)
-        return fvar<typename stan::return_type<T,double>::type>(
-         x1.val_, NOT_A_NUMBER);
+        return fvar<T>(x1.val_, NOT_A_NUMBER);
       else 
-        return fvar<typename stan::return_type<T,double>::type>(
-          x2, 0.0);
-     }
+        return fvar<T>(x2, 0.0);
+    }
   }
 }
 #endif

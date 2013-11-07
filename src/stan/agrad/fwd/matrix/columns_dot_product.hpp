@@ -29,11 +29,11 @@ namespace stan {
     
     template<typename T, int R1,int C1,int R2, int C2>
     inline 
-    Eigen::Matrix<fvar<typename stan::return_type<T,double>::type>, 1, C1>
+    Eigen::Matrix<fvar<T>, 1, C1>
     columns_dot_product(const Eigen::Matrix<fvar<T>, R1, C1>& v1, 
                         const Eigen::Matrix<double, R2, C2>& v2) {
       stan::math::validate_matching_dims(v1,v2,"columns_dot_product");
-      Eigen::Matrix<fvar<typename stan::return_type<T,double>::type>, 1, C1> 
+      Eigen::Matrix<fvar<T>, 1, C1> 
         ret(1,v1.cols());
       for (size_type j = 0; j < v1.cols(); ++j) {
         Eigen::Matrix<fvar<T>,R1,C1> ccol1 = v1.col(j);
@@ -45,11 +45,11 @@ namespace stan {
 
     template<typename T, int R1,int C1,int R2, int C2>
     inline 
-    Eigen::Matrix<fvar<typename stan::return_type<T,double>::type>, 1, C1>
+    Eigen::Matrix<fvar<T>, 1, C1>
     columns_dot_product(const Eigen::Matrix<double, R1, C1>& v1, 
                         const Eigen::Matrix<fvar<T>, R2, C2>& v2) {
       stan::math::validate_matching_dims(v1,v2,"columns_dot_product");
-      Eigen::Matrix<fvar<typename stan::return_type<T,double>::type>, 1, C1> ret(1,v1.cols());
+      Eigen::Matrix<fvar<T>, 1, C1> ret(1,v1.cols());
       for (size_type j = 0; j < v1.cols(); ++j) {
         Eigen::Matrix<double,R1,C1> ccol = v1.col(j);
         Eigen::Matrix<fvar<T>,R2,C2> ccol2 = v2.col(j);

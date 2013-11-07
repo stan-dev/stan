@@ -19,7 +19,7 @@ namespace stan {
     inline
     Eigen::Matrix<fvar<T>,R1,C1> 
     mdivide_right_tri_low(const Eigen::Matrix<fvar<T>, R1, C1>& A, 
-                         const Eigen::Matrix<fvar<T>, R2, C2>& b) {
+                          const Eigen::Matrix<fvar<T>, R2, C2>& b) {
       using stan::math::multiply;      
       using stan::math::mdivide_right;
       stan::math::validate_square(b,"mdivide_right");
@@ -61,7 +61,7 @@ namespace stan {
 
     template <typename T, int R1,int C1,int R2,int C2>
     inline 
-    Eigen::Matrix<fvar<typename stan::return_type<T,double>::type>,R1,C2>
+    Eigen::Matrix<fvar<T>,R1,C2>
     mdivide_right_tri_low(const Eigen::Matrix<fvar<T>,R1,C1> &A,
                           const Eigen::Matrix<double,R2,C2> &b) {
       
@@ -95,7 +95,7 @@ namespace stan {
 
     template <typename T, int R1,int C1,int R2,int C2>
     inline 
-    Eigen::Matrix<fvar<typename stan::return_type<T,double>::type>,R1,C2>
+    Eigen::Matrix<fvar<T>,R1,C2>
     mdivide_right_tri_low(const Eigen::Matrix<double,R1,C1> &A,
                           const Eigen::Matrix<fvar<T>,R2,C2> &b) {
       
@@ -104,7 +104,7 @@ namespace stan {
       stan::math::validate_square(b,"mdivide_right");
       stan::math::validate_multiplicable(A,b,"mdivide_right");
 
-      Eigen::Matrix<typename stan::return_type<T,double>::type,R1,C2> 
+      Eigen::Matrix<T,R1,C2> 
         A_mult_inv_b(A.rows(),b.cols());
       Eigen::Matrix<T,R2,C2> deriv_b_mult_inv_b(b.rows(),b.cols());
       Eigen::Matrix<T,R2,C2> val_b(b.rows(),b.cols()); 
@@ -122,7 +122,7 @@ namespace stan {
       A_mult_inv_b = mdivide_right(A, val_b);
       deriv_b_mult_inv_b = mdivide_right(deriv_b, val_b);
 
-      Eigen::Matrix<typename stan::return_type<T,double>::type,R1,C2> 
+      Eigen::Matrix<T,R1,C2> 
         deriv(A.rows(), b.cols());
       deriv = -multiply(A_mult_inv_b, deriv_b_mult_inv_b);
 

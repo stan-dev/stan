@@ -30,9 +30,9 @@ namespace stan {
     }
 
     template <typename T, int R, int C>
-    inline Eigen::Matrix<fvar<typename stan::return_type<T,double>::type>,R,C>
-    divide(const Eigen::Matrix<fvar<T>, R,C>& v, double c) {
-      Eigen::Matrix<fvar<typename stan::return_type<T,double>::type>,R,C> 
+    inline Eigen::Matrix<fvar<T>,R,C>
+    divide(const Eigen::Matrix<fvar<T>, R,C>& v, const double c) {
+      Eigen::Matrix<fvar<T>,R,C> 
         res(v.rows(),v.cols());
       for(int i = 0; i < v.rows(); i++) {
         for(int j = 0; j < v.cols(); j++)
@@ -42,9 +42,9 @@ namespace stan {
     }
 
     template <typename T, int R, int C>
-    inline Eigen::Matrix<fvar<typename stan::return_type<T,double>::type>,R,C>
+    inline Eigen::Matrix<fvar<T>,R,C>
     divide(const Eigen::Matrix<double, R,C>& v, const fvar<T>& c) {
-      Eigen::Matrix<fvar<typename stan::return_type<T,double>::type>,R,C> 
+      Eigen::Matrix<fvar<T>,R,C> 
         res(v.rows(),v.cols());
       for(int i = 0; i < v.rows(); i++) {
         for(int j = 0; j < v.cols(); j++)
@@ -60,14 +60,14 @@ namespace stan {
     }
 
     template <typename T, int R, int C>
-    inline Eigen::Matrix<fvar<typename stan::return_type<T,double>::type>,R,C>
-    operator/(const Eigen::Matrix<fvar<T>, R,C>& v, double c) {
+    inline Eigen::Matrix<fvar<T>,R,C>
+    operator/(const Eigen::Matrix<fvar<T>, R,C>& v, const double c) {
       return divide(v,c);
     }
 
     template <typename T, int R, int C>
-    inline Eigen::Matrix<fvar<typename stan::return_type<T,double>::type>,R,C>
-    operator/(const Eigen::Matrix<double, R,C>& v, const fvar<T>& c) {
+    inline Eigen::Matrix<fvar<T>,R,C>
+    operator/(const Eigen::Matrix<double,R,C>& v, const fvar<T>& c) {
       return divide(v,c);
     }
   }
