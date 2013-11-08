@@ -878,8 +878,8 @@ namespace stan {
         [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))];
 
     }
-
-
   }
+
+  
 }
 #endif

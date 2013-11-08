@@ -20,7 +20,7 @@ namespace stan {
     public:
       
       base_static_hmc(M &m, BaseRNG& rng, std::ostream* o, std::ostream* e):
-      base_hmc<M, P, H, I, BaseRNG>(m, rng, o, e), _T(1)
+      base_hmc<M, P, H, I, BaseRNG>(m, rng, o, e), T_(1)
       { _update_L(); }
       
       ~base_static_hmc() {};
@@ -38,7 +38,7 @@ namespace stan {
 
         double H0 = this->_hamiltonian.H(this->_z);
         
-        for (int i = 0; i < _L; ++i) {
+        for (int i = 0; i < L_; ++i) {
           this->_integrator.evolve(this->_z, this->_hamiltonian, this->_epsilon);
         }
         
@@ -62,7 +62,7 @@ namespace stan {
       }
       
       void write_sampler_params(std::ostream& o) {
-        o << this->_epsilon << "," << this->_T << ",";
+        o << this->_epsilon << "," << this->T_ << ",";
       }
       
       void get_sampler_param_names(std::vector<std::string>& names) {
@@ -72,24 +72,24 @@ namespace stan {
       
       void get_sampler_params(std::vector<double>& values) {
         values.push_back(this->_epsilon);
-        values.push_back(this->_T);
+        values.push_back(this->T_);
       }
       
       void set_nominal_stepsize_and_T(const double e, const double t) {
         if(e > 0 && t > 0) {
-          this->_nom_epsilon = e; _T = t; _update_L();
+          this->_nom_epsilon = e; T_ = t; _update_L();
         }
       }
       
       void set_nominal_stepsize_and_L(const double e, const int l) {
         if(e > 0 && l > 0) {
-          this->_nom_epsilon = e; _L = l; _T = this->_nom_epsilon * _L;
+          this->_nom_epsilon = e; L_ = l; T_ = this->_nom_epsilon * L_;
         }
       }
       
       void set_T(const double t) { 
         if(t > 0) {
-          _T = t; _update_L();
+          T_ = t; _update_L();
         }
         
       }
@@ -100,17 +100,17 @@ namespace stan {
         }
       }
       
-      double get_T() { return this->_T; }
-      int get_L() { return this->_L; }
+      double get_T() { return this->T_; }
+      int get_L() { return this->L_; }
       
     protected:
       
-      double _T;
-      int _L;
+      double T_;
+      int L_;
       
       void _update_L() { 
-        _L = static_cast<int>(_T / this->_nom_epsilon);
-        _L = _L < 1 ? 1 : _L;
+        L_ = static_cast<int>(T_ / this->_nom_epsilon);
+        L_ = L_ < 1 ? 1 : L_;
       }
       
     };

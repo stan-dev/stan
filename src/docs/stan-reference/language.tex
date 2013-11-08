@@ -87,7 +87,7 @@ If the user specifies the number of leapfrog steps (i.e., chooses to
 use standard \HMC), that number of leapfrog steps are simulated.  If
 the user has not specified the number of leapfrog steps, the No-U-Turn
 sampler (\NUTS) will determine the number of leapfrog steps adaptively
-\citep{Hoffman-Gelman:2011}.
+\citep{Hoffman-Gelman:2011, Hoffman-Gelman:2013}.
 
 \subsection{Log Probability and Gradient Calculation}
 
@@ -359,7 +359,7 @@ both.  For instance, to declare \code{N} to be a positive integer, use
 the following.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 int<lower=1> N;
 \end{Verbatim}
 \end{quote}
@@ -384,7 +384,7 @@ Unconstrained real variables are declared using the keyword
 unconstrained continuous value.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 real theta;
 \end{Verbatim}
 \end{quote}
@@ -401,7 +401,7 @@ boundaries, so they are allowed in \Stan.
 The variable \code{sigma} may be declared to be non-negative as follows.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 real<lower=0> sigma;
 \end{Verbatim}
 \end{quote}
@@ -419,7 +419,7 @@ To ensure \code{rho} takes on values between $-1$ and $1$, use the
 following declaration.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 real<lower=-1,upper=1> rho;
 \end{Verbatim}
 \end{quote}
@@ -446,7 +446,7 @@ For example, it is acceptable to have the
 following declarations.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 data { 
  real lb;
 }
@@ -464,7 +464,7 @@ for integer variables and of type \code{real} for real variables
 Variables used in constraints can be any variable that has been
 defined at the point the constraint is used.  For instance,
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 data { 
    int<lower=1> N;
    real y[N];
@@ -509,7 +509,7 @@ dimensionality).  For example, a 3-dimensional vector is declared with
 the keyword \code{vector}, as follows.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 vector[3] u;
 \end{Verbatim}
 \end{quote}
@@ -518,7 +518,7 @@ Vectors may also be declared with constraints, as in the following
 declaration of a 3-vector of non-negative values.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 vector<lower=0>[3] u;
 \end{Verbatim}
 \end{quote}
@@ -581,7 +581,7 @@ points in ordered logistic regression models (see
 The variable \code{c} is declared as an ordered 5-vector by
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 ordered[5] c;
 \end{Verbatim}
 \end{quote}
@@ -601,7 +601,7 @@ For instance, $(2,3.7,4,12.9)$ is a positive, ordered 4-vector.
 The variable \code{d} is declared as a positive, ordered 5-vector by
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 positive_ordered[5] d;
 \end{Verbatim}
 \end{quote}
@@ -618,7 +618,7 @@ Like (column) vectors, they are declared with a size.  For example,
 a 1093-dimensional row vector \code{u} would be declared as
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 row_vector[1093] u;
 \end{Verbatim}
 \end{quote}
@@ -626,7 +626,7 @@ row_vector[1093] u;
 Constraints are declared as for vectors, as in the following example
 of a 10-vector with values between -1 and 1.
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 row_vector<lower=-1,upper=1>[10] u;
 \end{Verbatim}
 \end{quote}
@@ -751,7 +751,7 @@ is read in and transformed data variables defined by their statements.
 For example, the following is legal.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 data {
   int<lower=0> N_observed;    int<lower=0> N_missing;
   ...
@@ -905,7 +905,7 @@ Arrays of vectors and matrices are accessed in the same way as arrays
 of doubles.  Consider the following vector and scalar declarations.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 vector[5] a[4,3];
 vector[5] b[4];
 vector[5] c;
@@ -916,7 +916,7 @@ real x;
 With these declarations, the following assignments are legal.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 b <- a[1];      // result is array of vectors
 c <- a[1,3];    // result is vector
 c <- b[3];      //   same result as above
@@ -932,7 +932,7 @@ behave the same way in terms of indexing.
 Consider the following matrix, vector and scalar declarations.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 matrix[6,5] d[4,3];
 matrix[6,5] e[4];
 matrix[6,5] f;
@@ -944,7 +944,7 @@ real x;
 With these declarations, the following definitions are legal.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 e <- d[1];        // result is array of matrices
 f <- d[1,3];      // result is matrix
 f <- e[3];        //   same result as above
@@ -1136,7 +1136,7 @@ Stan's \Cpp implementation.  These are
 \begin{quote}
 var
 fvar
-\end{quote}.
+\end{quote}
 %
 Most variables used in the implementation are suffixed with
 \code{\_\_}, so there is little chance of conflict.
@@ -1668,7 +1668,7 @@ dimensions in an expression such as the following declaration of a
 three-dimensional array of matrices.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 matrix[M,N] a[I,J,K];
 \end{Verbatim}
 \end{quote}
@@ -1830,7 +1830,7 @@ following assignment statement, in which the expression and variable
 are both of type \code{matrix}, is well formed.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 Sigma
   <- diag_matrix(sigma)
      * Omega 
@@ -1847,7 +1847,7 @@ supported by \Stan.  For example, \code{a} is an array of type
 the following two statements are both well-formed.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 a[3] <- b;
 b <- a[4];
 \end{Verbatim}
@@ -1859,7 +1859,7 @@ Similarly, if \code{x} is a variable declared to have type
 first two rows of \code{Y} is well formed.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 x <- Y[1];
 Y[1] <- Y[2];
 Y[2] <- x;
@@ -1974,7 +1974,7 @@ Like \BUGS and \JAGS, \Stan supports probability statements in
 sampling notation, such as
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 y ~ normal(mu,sigma);
 \end{Verbatim}
 \end{quote}
@@ -1991,7 +1991,7 @@ sampling statement could be expressed as a direct increment on the
 total log probability as
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 increment_log_prob(normal_log(y,mu,sigma));
 \end{Verbatim}
 \end{quote}
@@ -2001,7 +2001,7 @@ See \refsection{incr-vs-sample} for a full explanation.
 In general, a sampling statement of the form
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 ex0 ~ dist(ex1,...,exN);
 \end{Verbatim}
 \end{quote}
@@ -2011,7 +2011,7 @@ case where \code{N} is zero) will be well formed if and only if the
 corresponding assignment statement is well-formed,
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 increment_log_prob(dist_log(ex0,ex1,...,exN));
 \end{Verbatim}
 \end{quote}
@@ -2026,7 +2026,7 @@ Although both lead to the same sampling behavior in Stan, there is one
 critical difference between using the sampling statement, as in
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 y ~ normal(mu,sigma);
 \end{Verbatim}
 \end{quote}
@@ -2034,7 +2034,7 @@ y ~ normal(mu,sigma);
 and explicitly incrementing the log probability function, as in
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 increment_log_prob(normal_log(y,mu,sigma));
 \end{Verbatim}
 \end{quote}
@@ -2056,7 +2056,7 @@ The left-hand side of a sampling statement may be a complex
 expression.  For instance, it is legal syntactically to write
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 data {
     real<lower=0> y;
 }
@@ -2078,39 +2078,76 @@ account for the log transform.%
   |y|$;  see \refsection{change-of-variables}.}
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 increment_log_prob(- log(fabs(y)));
 \end{Verbatim}
 \end{quote}
 %
 
-\subsection{Truncated Distributions}
+\subsection{Truncated Distributions}\label{truncated-distributions.section}
 
 A density function $p(x)$ may be truncated to an interval $(a,b)$ to
-define a new density $p_{(a,b)}(x)$ by setting
+define a new density $p_{(a,b)}\!(x)$ by setting
 %
 \[ 
 p_{\!(a,b)\!}(x) = \frac{p(x)}
                   {\int_a^b p(x') \, dx'}.
 \] 
+Given a density $p(x)$ function for random variable $X$, its
+cumulative distribution function (cdf) $F(x)$ is defined to be the
+probability that $X < a$ by
+\[
+F(x) = \int_{-\infty}^{x} p(x') \, dx'.
+\]
+%
+The complementary cumulative distribution function (ccdf) is $1 -
+F(x)$.  Cumulative distribution functions are useful for defining
+truncated distributions, because
+\[
+\int_a^b p(x') \, dx' = F(b) - F(a),
+\]
+so that
+\[ 
+p_{\!(a,b)\!}(x) = \frac{p_X(x)}
+                  {F(b) - F(a)}.
+\] 
+On the log scale,
+\[ 
+\log p_{\!(a,b)\!}(x) 
+\ = \ 
+\log p_X(x)
+- \log \left( F(b) - F(a) \right).
+\]
+The denominator is more stably computed using Stan's
+log\_diff\_exp operation as
+\begin{eqnarray*}
+\log \left( F(b) - F(a) \right)
+& = & \log \left( \exp(\log F(b)) - \exp(\log F(a)) \right)
+\\[6pt]
+& = & \mbox{log\_diff\_exp}\!\left( \log F(b), \log F(a) \right).
+\end{eqnarray*}
+
+
+
 As in \BUGS and \JAGS, \Stan allows probability functions to be
 truncated.  For example, a truncated unit normal distribution
-restricted to $(-0.5,2.1)$ is encoded as follows.
+restricted to $(-0.5, 2.1)$ is encoded as follows.
 %
 \begin{quote}
-\begin{Verbatim}
-y ~ normal(0,1) T[-0.5,2.1];
+\begin{Verbatim}[fontsize=\small]
+y ~ normal(0,1) T[-0.5, 2.1];
 \end{Verbatim}
 \end{quote}
 % 
 Truncated distributions are translated as an addition summation for
 the accumulated log probability.  For instance, this example has the
-same translation (up to arithmetic precision issues) as
+same translation (up to arithmetic precision issues; see below) as
 %
 \begin{quote}
-\begin{Verbatim}
-y ~ normal(0,1);
-increment_log_prob(- log(normal_cdf(2.1,0,1) - normal_cdf(-0.5,0,1)));
+\begin{Verbatim}[fontsize=\small]
+increment_log_prob(normal_log(y,0,1));
+increment_log_prob(-(log(normal_cdf(2.1,0,1)
+                         - normal_cdf(-0.5,0,1))));
 \end{Verbatim}
 \end{quote}
 %
@@ -2121,7 +2158,21 @@ distribution function.  For example, \code{normal\_cdf(2.1,0,1)} evaluates to
 \]
 %
 which is the probability a unit normal variable takes on values less
-than 2.1, or about 0.98.
+than 2.1, or about 0.98.  
+
+Arithmetic precision is handled by working on the log scale and using
+Stan's log scale cdf implementations.  The logarithm of the cdf for
+the normal distribution is \code{normal\_cdf\_log} and the ccdf is
+\code{normal\_ccdf\_log}.  Stan's translation for the denominator
+introduced by truncation is equivalent to
+%
+\begin{quote}
+\begin{Verbatim}
+increment_log_prob(-log_diff_exp(normal_cdf_log(2.1,0,1),
+                                 normal_cdf_log(-0.5,0,1)));
+\end{Verbatim}
+\end{quote}
+%
 
 As with constrained variable declarations, truncation can be one
 sided.  The density $p(x)$ can be truncated below by $a$ to define a
@@ -2146,9 +2197,19 @@ more information about the relation between incrementing the total log
 probability and sampling).
 %
 \begin{quote}
+\begin{Verbatim}[fontsize=\small]
+increment_log_prob(normal_log(y, 0, 1));
+increment_log_prob(-(1 - log(normal_cdf(-0.5, 0, 1))));
+\end{Verbatim}
+\end{quote}
+%
+The denominator is actually implemented with the more efficient and
+stable version
+%
+\begin{quote}
 \begin{Verbatim}
-y ~ normal(0,1);
-increment_log_prob(- log(1 - normal_cdf(-0.5,0,1)));
+increment_log_prob(-normal_ccdf_log(-0.5, 0, 1));
+>>>>>>> develop
 \end{Verbatim}
 \end{quote}
 
@@ -2171,26 +2232,27 @@ The truncation has the same effect as the following direct update to
 the accumulated log probability.
 %
 \begin{quote}
-\begin{Verbatim}
-y ~ normal(0,1);
-increment_log_prob(- log(normal_cdf(2.1,0,1)));
+\begin{Verbatim}[fontsize=\small]
+increment_log_prob(normal_log(y, 0, 1));
+increment_log_prob(-normal_cdf_log(2.1, 0, 1));
 \end{Verbatim}
 \end{quote}
 
-In all cases, the truncation is only well formed if there is an
-appropriate cumulative distribution function defined.%
+In all cases, the truncation is only well formed if the
+appropriate log cumulative distribution functions are defined.%
 %
-\footnote{Some cumulative distributions and their gradients present
-  computational challenges because they lack simple, analytic forms.
-  More cumulative distributions will be added in future releases.}
+\footnote{Although most distributions have cdfs and ccdfs implemented,
+  some cumulative distribution functions and their gradients present
+  computational challenges because they lack simple, analytic forms.}
 %
 \refpart{discrete-prob-functions} and
 \refpart{continuous-prob-functions} document the available discrete
-and continuous cumulative distribution functions.
+and continuous cumulative distribution functions.  Most distributions
+have cdf and ccdf functions.
 
 For continuous distributions, truncation points must be expressions of
 type \code{int} or \code{real}.  For discrete distributions, truncation
-points must be expressions of type \code{int}.
+points must be expressions of type \code{int}.  
 
 For a truncated sampling statement, if the value sampled is not within
 the bounds specified by the truncation expression, the result is zero
@@ -2199,6 +2261,10 @@ probability, which in turn results in the sample being rejected; see
 \refsection{truncation-constraints} for programming strategies to keep
 all values within bounds.
 
+\subsubsection{Vectorizing Truncated Distributions}
+
+Stan does not (yet) support vectorization of distribution functions
+with truncation.
 
 % \subsection{User-Defined Distributions}
 
@@ -2222,7 +2288,7 @@ that \code{n} has not been defined as a variable. Then the following
 is a well-formed for-loop statement.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 for (n in 1:N) {
    y[n] ~ normal(mu,sigma);
 }
@@ -2277,7 +2343,7 @@ As a consequence, the following \Stan program has a very different
 interpretation than the previous one.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 for (n in 1:N) {
    y[n] ~ bernoulli(theta);
    theta <- inv_logit(alpha + x[n] * beta);
@@ -2295,7 +2361,7 @@ sum the values of an array directly using code such as the
 following.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 total <- 0.0;
 for (n in 1:N) 
    total <- total + x[n];
@@ -2307,7 +2373,7 @@ the sum of the elements in the array \code{x}.  This example was
 purely pedagogical; it is easier and more efficient to write
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 total <- sum(x);
 \end{Verbatim}
 \end{quote}
@@ -2316,7 +2382,7 @@ A variable inside (or outside) a loop may even be reassigned multiple
 times, as in the following legal code.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 for (n in 1:100) {
     y <- y + y * epsilon;
     epsilon <- epsilon / 2.0;
@@ -2331,7 +2397,7 @@ Stan supports full conditional statements using
 the same if-then-else syntax as \Cpp.  The general format is
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 if (condition1)
   statement1
 else if (condition2)
@@ -2364,7 +2430,7 @@ Stan supports standard while loops using the same syntax as \Cpp.  The
 general format is as follows.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 while (condition)
   body
 \end{Verbatim}
@@ -2406,7 +2472,7 @@ To put multiple statements inside the body of a for loop, a block is
 used, as in the following example.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 for (n in 1:N) {
   lambda[n] ~ gamma(alpha,beta);
   y[n] ~ poisson(lambda[n]);
@@ -2421,7 +2487,7 @@ Because whitespace is ignored in \Stan, the following program will
 not compile.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 for (n in 1:N) 
   y[n] ~ normal(mu,sigma);
   z[n] ~ normal(mu,sigma); // ERROR!
@@ -2435,7 +2501,7 @@ statement directly following it, which is
 program.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 for (n in 1:N) {
   y[n] ~ normal(mu,sigma);
 }
@@ -2458,7 +2524,7 @@ example of repeated assignment should use a local variable for maximum
 clarity and efficiency, as in the following example.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 for (n in 1:N) {
   real theta;
   theta <- inv_logit(alpha + x[n] * beta);
@@ -2476,7 +2542,7 @@ variable hiding.  So it is illegal to declare a local variable
 the for loop.  For instance, the following is not legal.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 for (m in 1:M) {
     real theta;
     for (n in 1:N) {
@@ -2507,7 +2573,7 @@ allowed, one or more of the statements may be a block.  For instance,
 in a for loop, it is legal to have the following
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 for (m in 1:M) {
    { 
      int n;  
@@ -2534,7 +2600,7 @@ arguments.  Consider the following for-each statement with a print
 statement in its body.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 for (n in 1:N) { print("loop iteration: ", n); ... }
 \end{Verbatim}
 \end{quote}
@@ -2563,7 +2629,7 @@ For array, vector, and matrix variables, the print format uses
 brackets.  For example, a 3-vector will print as
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 [1,2,3]
 \end{Verbatim}
 \end{quote}
@@ -2571,7 +2637,7 @@ brackets.  For example, a 3-vector will print as
 and a $2 \times 3$-matrix as 
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 [[1,2,3],[4,5,6]]
 \end{Verbatim}
 \end{quote}
@@ -2582,7 +2648,7 @@ with loops.  An example is the print statement in the following
 transformed data block.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 transformed data {
   matrix[2,2] u;  
   u[1,1] <- 1.0;  u[1,2] <- 4.0;    
@@ -2597,7 +2663,7 @@ This print statement executes twice, printing the following two lines
 of output.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 u[1] = [1,4]
 u[2] = [9,16]
 \end{Verbatim}
@@ -2621,7 +2687,7 @@ of the backslash character (\Verb|\|) and double quote character
 (\Verb|"|).  The full list of visible ASCII characters is as follows.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 a b c d e f g h i j k l m n o p q r s t u v w x y z
 A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
 0 1 2 3 4 5 6 7 8 9 0 ~ @ # $ % ^ & * _ ' ` - + = { 
@@ -2893,7 +2959,7 @@ The following program illustrates various variables kinds, listing the
 kind of each variable next to its declaration.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 data {
   int<lower=0> N;           // unmodeled data
   real y[N];                // modeled data
@@ -3235,7 +3301,7 @@ Kleene star (\code{*}) indicates zero or more occurrences.
 \subsection{Programs}
 
 {\small
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 program ::= ?data ?tdata ?params ?tparams model ?generated
 
 data ::= 'data' var_decls
@@ -3254,7 +3320,7 @@ var_decls_statements ::= '{' var_decl* statement* '}'
 
 {
 \small
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 var_decl ::= var_type variable ?dims
 
 var_type ::= 'int' range_constraint
@@ -3288,7 +3354,7 @@ identifier ::= [a-zA-Z] [a-zA-Z0-9_]*
 
 {
 \small
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 expression ::= numeric_literal
              | variable
              | expression infixOp expression
@@ -3317,7 +3383,7 @@ function_literal ::= identifier
 
 {
 \small
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 statement 
 ::= lhs '<-' expression ';'
   | expression '~' identifier '(' ?expressions ')' ?truncation ';'
