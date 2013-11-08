@@ -3,30 +3,55 @@
 
 #include <valarray>
 #include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/op/dv_vari.hpp>
+#include <stan/agrad/rev/op/v_vari.hpp>
 #include <stan/math/constants.hpp>
-#include <stan/math/functions/binary_log_loss.hpp>
+#include <stan/math/functions/log1p.hpp>
 
 namespace stan {
   namespace agrad {
 
     namespace {
-      class binary_log_loss_dv_vari : public op_dv_vari {
+      class binary_log_loss_1_vari : public op_v_vari {
       public:
-        binary_log_loss_dv_vari(int a, vari* bvi) :
-          op_dv_vari(stan::math::binary_log_loss(a, bvi->val_),a,bvi) {
+        binary_log_loss_1_vari(vari* avi) :
+          op_v_vari(-std::log(avi->val_),avi) {
         }
         void chain() {
-          if (ad_ == 0)
-            bvi_->adj_ += adj_ / bvi_->val_;
-          if (ad_ == 1)
-            bvi_->adj_ -= adj_ / bvi_->val_;
+          avi_->adj_ -= adj_ / avi_->val_;
+        }
+      };
+
+      class binary_log_loss_0_vari : public op_v_vari {
+      public:
+        binary_log_loss_0_vari(vari* avi) :
+          op_v_vari(-stan::math::log1p(-avi->val_),avi) {
+        }
+        void chain() {
+          avi_->adj_ += adj_ / (1.0 - avi_->val_);
         }
       };
     }
 
-    inline var binary_log_loss(int a, const stan::agrad::var& b) {
-      return var(new binary_log_loss_dv_vari(a, b.vi_));
+    /**
+     * The log loss function for variables (stan).
+     *
+     * See stan::math::binary_log_loss() for the double-based version.
+     *
+     * The derivative with respect to the variable \f$\hat{y}\f$ is
+     *
+     * \f$\frac{d}{d\hat{y}} \mbox{logloss}(1,\hat{y}) = - \frac{1}{\hat{y}}\f$, and
+     *
+     * \f$\frac{d}{d\hat{y}} \mbox{logloss}(0,\hat{y}) = \frac{1}{1 - \hat{y}}\f$.
+     *
+     * @param y Reference value.
+     * @param y_hat Response variable.
+     * @return Log loss of response versus reference value.
+     */
+    inline var binary_log_loss(const int y, const stan::agrad::var& y_hat) {
+      if (y == 0)
+        return var(new binary_log_loss_0_vari(y_hat.vi_));
+      else
+        return var(new binary_log_loss_1_vari(y_hat.vi_));
     }
 
   }

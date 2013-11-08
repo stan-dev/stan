@@ -100,7 +100,6 @@
 #include <stan/agrad/rev/Phi.hpp>
 #include <stan/agrad/rev/inv_logit.hpp>
 #include <stan/agrad/rev/Phi_approx.hpp>
-#include <stan/agrad/rev/log_loss.hpp>
 #include <stan/agrad/rev/log1m_exp.hpp>
 #include <stan/agrad/rev/log1p_exp.hpp>
 #include <stan/agrad/rev/log_diff_exp.hpp>
