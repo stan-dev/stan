@@ -25,7 +25,7 @@ namespace stan {
      **/
     template<int R,int C>
     inline Eigen::Matrix<double,R,C> value_of(const Eigen::Matrix<var,R,C> &M) {
-      size_t i,j;
+      int i,j;
       Eigen::Matrix<double,R,C> Md(M.rows(),M.cols());
       for (j = 0; j < M.cols(); j++)
         for (i = 0; i < M.rows(); i++)

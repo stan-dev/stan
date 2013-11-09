@@ -447,12 +447,12 @@ TEST(io_reader_writer, cholesky_factor_roundtrip) {
   writer.cholesky_factor_unconstrain(y);
 
   std::vector<double> data_r = writer.data_r();
-  EXPECT_EQ(6,data_r.size());
+  EXPECT_EQ(6U,data_r.size());
 
   std::vector<int> data_i(0);
   stan::io::reader<double> reader(data_r,data_i);
 
-  EXPECT_EQ(6,reader.available());
+  EXPECT_EQ(6U,reader.available());
 
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> L(reader.cholesky_factor_constrain(3,3));
   EXPECT_EQ(3,L.rows());
@@ -477,12 +477,12 @@ TEST(io_reader_writer, cholesky_factor_roundtrip_asymmetric) {
   writer.cholesky_factor_unconstrain(y);
 
   std::vector<double> data_r = writer.data_r();
-  EXPECT_EQ(9,data_r.size());
+  EXPECT_EQ(9U,data_r.size());
 
   std::vector<int> data_i(0);
   stan::io::reader<double> reader(data_r,data_i);
 
-  EXPECT_EQ(9,reader.available());
+  EXPECT_EQ(9U,reader.available());
 
   Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> L(reader.cholesky_factor_constrain(4,3));
   EXPECT_EQ(4,L.rows());

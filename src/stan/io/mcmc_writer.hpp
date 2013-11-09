@@ -35,9 +35,9 @@ namespace stan {
         sample.get_sample_param_names(names);
         sampler->get_sampler_param_names(names);
         model.constrained_param_names(names, true, true);
-        
+       
         (*_sample_stream) << names.at(0);
-        for (int i = 1; i < names.size(); ++i) {
+        for (size_t i = 1; i < names.size(); ++i) {
           (*_sample_stream) << "," << names.at(i);
         }
         (*_sample_stream) << std::endl;
@@ -68,7 +68,7 @@ namespace stan {
         values.insert(values.end(), model_values.begin(), model_values.end());
         
         (*_sample_stream) << values.at(0);
-        for (int i = 1; i < values.size(); ++i) {
+        for (size_t i = 1; i < values.size(); ++i) {
           (*_sample_stream) << "," << values.at(i);
         }
         (*_sample_stream) << std::endl;
@@ -106,7 +106,7 @@ namespace stan {
         sampler->get_sampler_diagnostic_names(model_names, names);
         
         (*_diagnostic_stream) << names.at(0);
-        for (int i = 1; i < names.size(); ++i) {
+        for (size_t i = 1; i < names.size(); ++i) {
           (*_diagnostic_stream) << "," << names.at(i);
         }
         (*_diagnostic_stream) << std::endl;
@@ -125,7 +125,7 @@ namespace stan {
         sampler->get_sampler_diagnostics(values);
         
         (*_diagnostic_stream) << values.at(0);
-        for (int i = 1; i < values.size(); ++i) {
+        for (size_t i = 1; i < values.size(); ++i) {
           (*_diagnostic_stream) << "," << values.at(i);
         }
         (*_diagnostic_stream) << std::endl;

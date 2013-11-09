@@ -377,6 +377,21 @@ namespace stan {
                RNG& rng) {
       using boost::variate_generator;
       using boost::normal_distribution;
+      using stan::math::check_positive;
+      using stan::math::check_finite;
+      using stan::math::check_not_nan;
+
+      static const char* function = "stan::prob::normal_rng(%1%)";
+
+      if (!check_finite(function, mu, "Location parameter"))
+        return 0;
+      if (!check_not_nan(function, mu, "Location parameter"))
+        return 0;
+      if (!check_positive(function, sigma, "Scale parameter"))
+        return 0;
+       if (!check_not_nan(function, sigma, "Scale parameter"))
+        return 0;
+
       variate_generator<RNG&, normal_distribution<> >
         norm_rng(rng, normal_distribution<>(mu, sigma));
       return norm_rng();

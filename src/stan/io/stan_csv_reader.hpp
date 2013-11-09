@@ -99,7 +99,7 @@ namespace stan {
           ss >> comment;
           std::getline(ss, lhs);
           
-          int equal = lhs.find("=");
+          size_t equal = lhs.find("=");
           if (equal != std::string::npos) {
             name = lhs.substr(0, equal);
             boost::trim(name);

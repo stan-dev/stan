@@ -13,14 +13,15 @@ namespace stan{
     inline
     fvar<T>
     fabs(const fvar<T>& x) {
-      using std::fabs;
       using stan::math::NOT_A_NUMBER;
-      if(x.val_ > 0.0)
-         return fvar<T>(fabs(x.val_), x.d_);
-      else if(x.val_ == 0.0)
-        return fvar<T>(fabs(x.val_), NOT_A_NUMBER);
-      else 
-        return fvar<T>(fabs(x.val_), -x.d_);
+      if (x.val_ > 0.0)
+        return x;
+      else if (x.val_ < 0.0)
+        return fvar<T>(-x.val_, -x.d_);
+      else if (x.val_ == 0.0)
+        return fvar<T>(0, 0);
+      else
+        return fvar<T>(NOT_A_NUMBER,NOT_A_NUMBER);
     }
   }
 }

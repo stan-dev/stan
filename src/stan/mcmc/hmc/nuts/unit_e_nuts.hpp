@@ -22,17 +22,15 @@ namespace stan {
       
     public:
       
-    unit_e_nuts(M &m, BaseRNG& rng, std::ostream* o = &std::cout, std::ostream* e = 0):
-    base_nuts<M, unit_e_point, unit_e_metric, expl_leapfrog, BaseRNG>(m, rng, o, e)
-    { this->_name = "NUTS with a unit Euclidean metric"; }
+      unit_e_nuts(M &m, BaseRNG& rng, std::ostream* o = &std::cout, std::ostream* e = 0):
+      base_nuts<M, unit_e_point, unit_e_metric, expl_leapfrog, BaseRNG>(m, rng, o, e)
+      { this->_name = "NUTS with a unit Euclidean metric"; }
       
-    private:
-      
-      bool _compute_criterion(ps_point& start, 
-                              unit_e_point& finish, 
-                              Eigen::VectorXd& rho) {
-        return rho.dot(finish.p) > 0
-            && rho.dot(start.p)  > 0;
+      bool compute_criterion(ps_point& start,
+                             unit_e_point& finish,
+                             Eigen::VectorXd& rho) {
+        return finish.p.dot(rho - finish.p) > 0
+               && start.p.dot(rho - start.p) > 0;
       }
                                           
     };

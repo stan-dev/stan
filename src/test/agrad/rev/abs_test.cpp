@@ -1,3 +1,5 @@
+#include <limits>
+#include <boost/math/special_functions/fpclassify.hpp>
 #include <stan/agrad/rev/abs.hpp>
 #include <test/agrad/util.hpp>
 #include <gtest/gtest.h>
@@ -32,5 +34,19 @@ TEST(AgradRev,abs_var_3) {
   AVEC x = createAVEC(a);
   VEC g;
   f.grad(x,g);
+  EXPECT_EQ(1,g.size());
   EXPECT_FLOAT_EQ(0.0, g[0]);
+}
+
+TEST(AgradRev,abs_NaN) {
+  AVAR a = std::numeric_limits<double>::quiet_NaN();
+  AVAR f = abs(a);
+
+  AVEC x = createAVEC(a);
+  VEC g;
+  f.grad(x,g);
+  
+  EXPECT_TRUE(boost::math::isnan(f.val()));
+  ASSERT_EQ(1,g.size());
+  EXPECT_TRUE(boost::math::isnan(g[0]));
 }

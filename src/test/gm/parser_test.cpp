@@ -5,8 +5,8 @@
 #include <exception>
 #include <stdexcept>
 
-#include "stan/gm/ast.hpp"
-#include "stan/gm/parser.hpp"
+#include <stan/gm/ast.hpp>
+#include <stan/gm/parser.hpp>
 #include <stan/gm/generator.hpp>
 #include <stan/gm/grammars/program_grammar.hpp>
 #include <stan/gm/grammars/whitespace_grammar.hpp>
@@ -182,6 +182,14 @@ TEST(gm_parser,parsable_test_bad11) {
   EXPECT_THROW(is_parsable("src/test/gm/model_specs/bad11.stan"),
                std::invalid_argument);
 }
+TEST(gm_parser,parsable_test_bad_fun_name) {
+  EXPECT_THROW(is_parsable("src/test/gm/model_specs/bad_fun_name.stan"),
+               std::invalid_argument);
+}
+TEST(gm_parser,parsable_test_good_fun_name) {
+  EXPECT_TRUE(is_parsable("src/test/gm/model_specs/good_fun_name.stan"));
+}
+
 TEST(gmParser,parsableBadPeriods) {
   EXPECT_THROW(is_parsable("src/test/gm/model_specs/bad_periods_data.stan"),
                std::invalid_argument);

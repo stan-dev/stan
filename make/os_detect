@@ -18,6 +18,5 @@ endif
 # based on the OS:
 #   - CFLAGS
 #   - EXE
-#   - PCH
 ##
 -include make/os_$(OS)

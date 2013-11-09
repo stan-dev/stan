@@ -1,8 +1,8 @@
 #ifndef __STAN__MATH__MATRIX__SORT_HPP__
 #define __STAN__MATH__MATRIX__SORT_HPP__
 
-#include <vector>
 #include <stan/math/matrix/Eigen.hpp>
+#include <vector>
 #include <algorithm>    // std::sort
 #include <functional>   // std::greater
 
