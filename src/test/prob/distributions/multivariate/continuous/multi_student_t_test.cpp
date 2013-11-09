@@ -168,7 +168,7 @@ TEST(ProbDistributionsMultiStudentT,ProptoAllDoublesZero) {
 }
 
 
-TEST(ProbDistributionsMultiStudentT, random) {
+TEST(ProbDistributionsMultiStudentT, error_check) {
   boost::random::mt19937 rng;
   Matrix<double,Dynamic,Dynamic> mu(3,1);
   mu << 2.0, 
@@ -176,11 +176,28 @@ TEST(ProbDistributionsMultiStudentT, random) {
     11.0;
 
 Matrix<double,Dynamic,Dynamic> s(3,3);
- s << 2.0, 1.0, 4.0,
-   3.0, 9.0, 1.3,
-   11.0, 1.2, 2.7;
+ s << 2.0, 3.0, 11.0,
+   3.0, 9.0, 1.2,
+   11.0, 1.2, 16.0;
 
   EXPECT_NO_THROW(stan::prob::multi_student_t_rng(2.0,mu,s,rng));
+  EXPECT_THROW(stan::prob::multi_student_t_rng(-2.0,mu,s,rng),
+               std::domain_error);
+
+ s << 2.0, 3.0, 11.0,
+   3.0, 9.0, 1.2,
+   11.0, -1.2, 16.0;
+  EXPECT_THROW(stan::prob::multi_student_t_rng(2.0,mu,s,rng),
+               std::domain_error);
+
+  mu << stan::math::positive_infinity(), 
+    3.0,
+    11.0;
+ s << 2.0, 3.0, 11.0,
+   3.0, 9.0, 1.2,
+   11.0, 1.2, 16.0;
+  EXPECT_THROW(stan::prob::multi_student_t_rng(2.0,mu,s,rng),
+               std::domain_error);
 }
 
 TEST(ProbDistributionsMultiStudentT, marginalOneChiSquareGoodnessFitTest) {
@@ -191,9 +208,9 @@ TEST(ProbDistributionsMultiStudentT, marginalOneChiSquareGoodnessFitTest) {
     11.0;
 
 Matrix<double,Dynamic,Dynamic> s(3,3);
- s << 2.0, 1.0, 4.0,
-   3.0, 9.0, 1.3,
-   11.0, 1.2, 2.7;
+ s << 2.0, 3.0, 11.0,
+   3.0, 9.0, 1.2,
+   11.0, 1.2, 16.0;
   int N = 10000;
   int K = boost::math::round(2 * std::pow(N, 0.4));
   boost::math::students_t_distribution<>dist (3.0);
@@ -237,8 +254,8 @@ TEST(ProbDistributionsMultiStudentT, marginalTwoChiSquareGoodnessFitTest) {
     11.0;
 
 Matrix<double,Dynamic,Dynamic> s(3,3);
- s << 2.0, 1.0, 4.0,
-   3.0, 9.0, 1.3,
+ s << 2.0, 3.0, 11.0,
+   3.0, 9.0, 1.2,
    11.0, 1.2, 16.0;
   int N = 10000;
   int K = boost::math::round(2 * std::pow(N, 0.4));

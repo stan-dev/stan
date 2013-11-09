@@ -57,7 +57,7 @@ namespace stan {
       {
         
         // Initialize the algorithm
-        this->_sample_stepsize();
+        this->sample_stepsize();
         
         nuts_util util;
         
@@ -139,11 +139,11 @@ namespace stan {
           // Check validity of completed tree
           this->_z.ps_point::operator=(z_plus);
           Eigen::VectorXd delta_rho = rho_minus + rho_init + rho_plus;
-          
-          util.criterion = _compute_criterion(z_minus, this->_z, delta_rho);
+
+          util.criterion = compute_criterion(z_minus, this->_z, delta_rho);
           
           ++(this->_depth);
-          
+
         }
         
         --(this->_depth); // Correct for increment at end of loop
@@ -173,14 +173,12 @@ namespace stan {
         values.push_back(this->_depth);
       }
 
-      
-    protected:
-      
-      virtual bool _compute_criterion(ps_point& start, P& finish, Eigen::VectorXd& rho) = 0;
+      virtual bool compute_criterion(ps_point& start, P& finish, Eigen::VectorXd& rho) = 0;
       
       // Returns number of valid points in the completed subtree
       int build_tree(int depth, Eigen::VectorXd& rho, 
-                     ps_point* z_init, ps_point& z_propose, nuts_util& util)
+                     ps_point* z_init_parent, ps_point& z_propose,
+                     nuts_util& util)
       {
         
         // Base case
@@ -192,14 +190,14 @@ namespace stan {
           
           rho += this->_z.p;
           
-          if (z_init) *z_init = this->_z;
+          if (z_init_parent) *z_init_parent = this->_z;
           z_propose = this->_z;
           
           double h = this->_hamiltonian.H(this->_z); 
           if (boost::math::isnan(h)) h = std::numeric_limits<double>::infinity();
           
           util.criterion = util.log_u + (h - util.H0) < this->_max_delta;
-
+          
           util.sum_prob += stan::math::min(1, std::exp(util.H0 - h));
           util.n_tree += 1;
           
@@ -210,21 +208,19 @@ namespace stan {
         else 
         {
           
-          Eigen::VectorXd subtree_rho(rho.size()); subtree_rho.setZero();
+          Eigen::VectorXd left_subtree_rho(rho.size()); left_subtree_rho.setZero();
           ps_point z_init(this->_z);
           
-          int n1 = build_tree(depth - 1, subtree_rho, &z_init, z_propose, util);
+          int n1 = build_tree(depth - 1, left_subtree_rho, &z_init, z_propose, util);
 
-          rho += subtree_rho;
+          if (z_init_parent) *z_init_parent = z_init;
           
           if (!util.criterion) return 0;
           
-          subtree_rho.setZero();
+          Eigen::VectorXd right_subtree_rho(rho.size()); right_subtree_rho.setZero();
           ps_point z_propose_right(z_init);
           
-          int n2 = build_tree(depth - 1, subtree_rho, 0, z_propose_right, util);
-          
-          rho += subtree_rho;
+          int n2 = build_tree(depth - 1, right_subtree_rho, 0, z_propose_right, util);
           
           double accept_prob = static_cast<double>(n2) /
                                static_cast<double>(n1 + n2);
@@ -232,7 +228,12 @@ namespace stan {
           if ( util.criterion && (this->_rand_uniform() < accept_prob) )
             z_propose = z_propose_right;
           
-          util.criterion &= _compute_criterion(z_init, this->_z, rho);
+          Eigen::VectorXd& subtree_rho = left_subtree_rho;
+          subtree_rho += right_subtree_rho;
+          
+          rho += subtree_rho;
+          
+          util.criterion &= compute_criterion(z_init, this->_z, subtree_rho);
           
           return n1 + n2;
           

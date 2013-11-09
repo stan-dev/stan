@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include "stan/prob/distributions/multivariate/continuous/multi_normal.hpp"
 #include <boost/random/mersenne_twister.hpp>
-#include<boost/math/distributions.hpp>
+#include <boost/math/distributions.hpp>
 
 using Eigen::Dynamic;
 using Eigen::Matrix;
@@ -16,9 +16,8 @@ TEST(ProbDistributionsMultiNormal,MultiNormal) {
     -3.0,  4.0, 0.0,
     0.0, 0.0, 5.0;
   EXPECT_FLOAT_EQ(-11.73908, stan::prob::multi_normal_log(y,mu,Sigma));
-  Matrix<double,Dynamic,Dynamic> L = Sigma.llt().matrixL();
-  EXPECT_FLOAT_EQ(-11.73908, stan::prob::multi_normal_cholesky_log(y,mu,L));
 }
+
 TEST(ProbDistributionsMultiNormal,Sigma) {
   Matrix<double,Dynamic,1> y(2,1);
   y << 2.0, -2.0;
@@ -60,8 +59,6 @@ TEST(ProbDistributionsMultiNormal,MultiNormalOneRow) {
     -3.0,  4.0, 0.0,
     0.0, 0.0, 5.0;
   EXPECT_FLOAT_EQ(-11.73908, stan::prob::multi_normal_log(y,mu,Sigma));
-  Matrix<double,Dynamic,Dynamic> L = Sigma.llt().matrixL();
-  EXPECT_FLOAT_EQ(-11.73908, stan::prob::multi_normal_cholesky_log(y,mu,L));
 }
 
 TEST(ProbDistributionsMultiNormal,MultiNormalMultiRow) {
@@ -75,8 +72,6 @@ TEST(ProbDistributionsMultiNormal,MultiNormalMultiRow) {
     -3.0,  4.0, 0.0,
     0.0, 0.0, 5.0;
   EXPECT_FLOAT_EQ(-54.2152, stan::prob::multi_normal_log(y,mu,Sigma));
-  Matrix<double,Dynamic,Dynamic> L = Sigma.llt().matrixL();
-  EXPECT_FLOAT_EQ(-54.2152, stan::prob::multi_normal_cholesky_log(y,mu,L));
 }
 TEST(ProbDistributionsMultiNormal,SigmaMultiRow) {
   Matrix<double,Dynamic,Dynamic> y(1,2);
@@ -125,7 +120,7 @@ TEST(ProbDistributionsMultiNormal,SizeMismatch) {
   EXPECT_THROW(stan::prob::multi_normal_log(y, mu, Sigma), std::domain_error);
 }
 
-TEST(ProbDistributionsMultiNormal, random) {
+TEST(ProbDistributionsMultiNormal, error_check) {
   boost::random::mt19937 rng;
   Matrix<double,Dynamic,Dynamic> mu(3,1);
   mu << 2.0, 
@@ -134,17 +129,31 @@ TEST(ProbDistributionsMultiNormal, random) {
 
   Matrix<double,Dynamic,Dynamic> sigma(3,3);
   sigma << 9.0, -3.0, 0.0,
-    -3.0,  4.0, 0.0,
-    2.0, 1.0, 3.0;
+    -3.0,  4.0, 1.0,
+    0.0, 1.0, 3.0;
   EXPECT_NO_THROW(stan::prob::multi_normal_rng(mu, sigma,rng));
+
+  mu << stan::math::positive_infinity(), 
+    -2.0,
+    11.0;
+  EXPECT_THROW(stan::prob::multi_normal_rng(mu,sigma,rng),std::domain_error);
+
+  mu << 2.0, 
+    -2.0,
+    11.0;
+  sigma << 9.0, -3.0, 0.0,
+    3.0,  4.0, 0.0,
+    -2.0, 1.0, 3.0;
+  EXPECT_THROW(stan::prob::multi_normal_rng(mu,sigma,rng),std::domain_error);
+
 }
 
 TEST(ProbDistributionsMultiNormal, marginalOneChiSquareGoodnessFitTest) {
   boost::random::mt19937 rng;
   Matrix<double,Dynamic,Dynamic> sigma(3,3);
   sigma << 9.0, -3.0, 0.0,
-    -3.0,  4.0, 0.0,
-    2.0, 1.0, 16.0;
+    -3.0,  4.0, 1.0,
+    0.0, 1.0, 3.0;
   Matrix<double,Dynamic,Dynamic> mu(3,1);
   mu << 2.0, 
     -2.0,
@@ -186,8 +195,8 @@ TEST(ProbDistributionsMultiNormal, marginalTwoChiSquareGoodnessFitTest) {
   boost::random::mt19937 rng;
   Matrix<double,Dynamic,Dynamic> sigma(3,3);
   sigma << 9.0, -3.0, 0.0,
-    -3.0,  4.0, 0.0,
-    2.0, 1.0, 16.0;
+    -3.0,  4.0, 1.0,
+    0.0, 1.0, 3.0;
   Matrix<double,Dynamic,Dynamic> mu(3,1);
   mu << 2.0, 
     -2.0,
@@ -229,8 +238,8 @@ TEST(ProbDistributionsMultiNormal, marginalThreeChiSquareGoodnessFitTest) {
   boost::random::mt19937 rng;
   Matrix<double,Dynamic,Dynamic> sigma(3,3);
   sigma << 9.0, -3.0, 0.0,
-    -3.0,  4.0, 0.0,
-    2.0, 1.0, 16.0;
+    -3.0,  4.0, 1.0,
+    0.0, 1.0, 16.0;
   Matrix<double,Dynamic,Dynamic> mu(3,1);
   mu << 2.0, 
     -2.0,

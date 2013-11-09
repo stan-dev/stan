@@ -494,6 +494,27 @@ namespace stan {
                  RNG& rng) {
       using boost::variate_generator;
       using boost::binomial_distribution;
+
+      static const char* function = "stan::prob::binomial_rng(%1%)";
+      
+      using stan::math::check_finite;
+      using stan::math::check_less_or_equal;
+      using stan::math::check_greater_or_equal;
+      using stan::math::check_nonnegative;
+
+      if (!check_nonnegative(function, N,
+                             "Population size parameter"))
+        return 0;
+      if (!check_finite(function, theta,
+                        "Probability parameter"))
+        return 0;
+      if (!check_less_or_equal(function, theta, 1.0,
+                         "Probability parameter"))
+        return 0;
+      if (!check_greater_or_equal(function, theta, 0.0,
+                         "Probability parameter"))
+        return 0;
+
       variate_generator<RNG&, binomial_distribution<> >
         binomial_rng(rng, binomial_distribution<>(N, theta));
       return binomial_rng();

@@ -1,25 +1,25 @@
 #ifndef __STAN__GM__ARGUMENTS__DATA__HPP__
 #define __STAN__GM__ARGUMENTS__DATA__HPP__
 
-#include <stan/gm/arguments/singleton_argument.hpp>
+#include <stan/gm/arguments/categorical_argument.hpp>
+
+#include <stan/gm/arguments/arg_data_file.hpp>
 
 namespace stan {
   
   namespace gm {
     
-    class arg_data: public string_argument {
+    class arg_data: public categorical_argument {
       
     public:
       
-      arg_data(): string_argument() {
+      arg_data(): categorical_argument() {
+        
         _name = "data";
-        _description = "Input data file";
-        _validity = "Path to existing file";
-        _default = "\"\"";
-        _default_value = "";
-        _constrained = false;
-        _good_value = "good";
-        _value = _default_value;
+        _description = "Input data options";
+        
+        _subarguments.push_back(new arg_data_file());
+        
       };
       
     };

@@ -142,13 +142,12 @@ public:
                     << filename << ".chain_" << chain << ".csv"
                     << " id=" << chain;
       
-      std::string command_output;
-      try {
-        command_output = run_command(command_chain.str(), time);
-      } catch(...) {
-        ADD_FAILURE() << "Failed running command: " << command_chain.str();
+      run_command_output out = run_command(command_chain.str());
+      if (out.hasError) {
+        SCOPED_TRACE("failed running: " + out.command);
+        ADD_FAILURE() << out;
       }
-      command_outputs.push_back(command_output);
+      command_outputs.push_back(out.output);
     }
     return time;
   }
@@ -239,7 +238,7 @@ public:
     // 2) Run Stan num_chains times
     std::stringstream command;
     command << path << get_path_separator() << "logistic"
-            << " data=" << path << get_path_separator() << filename << ".data.R"
+            << " data file=" << path << get_path_separator() << filename << ".data.R"
             << " sample num_samples=" << 0.5 * iterations << " num_warmup=" << 0.5 * iterations
             << " output refresh=" << iterations;
     vector<std::string> command_outputs;  
@@ -350,7 +349,7 @@ public:
     //<< " --refresh=" << iterations;
     //vector<std::string> command_outputs;  
     //long time = run_stan(command.str(), filename, command_outputs);
-    long time = 0;
+    //long time = 0;
     
     SUCCEED();
   }
@@ -366,13 +365,15 @@ size_t LogisticSpeedTest::max_M;
 
 TEST_F(LogisticSpeedTest,Prerequisites) {
   std::string command;
+  run_command_output out;
   command = "Rscript --version";
-  try {
-    run_command(command);
-    has_R = true;
-  } catch (...) {
+
+  out = run_command(command);
+  if (out.hasError) {
     std::cout << "System does not have Rscript available" << std::endl
               << "Failed to run: " << command << std::endl;
+  } else {
+    has_R = true;
   }
 
   std::vector<std::string> test_file;
@@ -382,13 +383,14 @@ TEST_F(LogisticSpeedTest,Prerequisites) {
   test_file.push_back("empty.jags");
   command = "jags ";
   command += convert_model_path(test_file);
-  
-  try {
-    run_command(command);
-    has_jags = true;
-  } catch (...) {
+
+
+  out = run_command(command);
+  if (out.hasError) {
     std::cout << "System does not have jags available" << std::endl
               << "Failed to run: " << command << std::endl;
+  } else {
+    has_jags = true;
   }
 }
 
@@ -410,7 +412,6 @@ TEST_F(LogisticSpeedTest,GenerateData) {
 
   if (has_data)
     return;
-
   // generate data using R script
   std::string command;
   command = "cd ";
@@ -420,10 +421,9 @@ TEST_F(LogisticSpeedTest,GenerateData) {
   command += Rscript;
 
   // no guarantee here that we have the right files
-
-  ASSERT_NO_THROW(run_command(command))
-    << command;
-  SUCCEED();
+  run_command_output out;
+  out = run_command(command);
+  EXPECT_FALSE(out.hasError);
 }
 
 TEST_P(LogisticSpeedTest, Stan) {

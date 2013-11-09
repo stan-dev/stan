@@ -150,6 +150,16 @@ namespace stan {
                 const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& S,
                 RNG& rng) {
 
+      static const char* function = "stan::prob::wishart_rng(%1%)";
+
+      using stan::math::check_size_match;
+      using stan::math::check_positive;
+
+      check_positive(function,nu,"degrees of freedom");
+      check_size_match(function, 
+                       S.rows(), "Rows of scale parameter",
+                       S.cols(), "columns of scale parameter");
+
       Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> B(S.rows(), S.cols());
       B.setZero();
 

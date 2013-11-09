@@ -2,8 +2,11 @@
 #define __STAN__AGRAD__REV__FABS_HPP__
 
 #include <stan/agrad/rev/var.hpp>
+#include <stan/agrad/rev/precomp_v_vari.hpp>
 #include <stan/agrad/rev/vari.hpp>
 #include <stan/agrad/rev/operator_unary_negative.hpp>
+#include <stan/math/constants.hpp>
+
 
 namespace stan {
   namespace agrad {
@@ -20,18 +23,25 @@ namespace stan {
      *
      * The function <code>abs()</code> provides the same behavior, with
      * <code>abs()</code> defined in stdlib.h and <code>fabs()</code> defined in <code>cmath</code>.
+     * The derivative is 0 if the input is 0.
      *
+     * Returns std::numeric_limits<double>::quiet_NaN() for NaN inputs.
+     *
+
      * @param a Input variable.
      * @return Absolute value of variable.
      */
     inline var fabs(const var& a) {
+      using stan::math::NOT_A_NUMBER;
       // cut-and-paste from abs()
       if (a.val() > 0.0)
         return a;
-      if (a.val() < 0.0)
+      else if (a.val() < 0.0)
         return var(new neg_vari(a.vi_));
-      // FIXME:  is this right?  breaks connection to a
-      return var(new vari(0.0));
+      else if (a.val() == 0)
+        return var(new vari(0));
+      else
+        return var(new precomp_v_vari(NOT_A_NUMBER,a.vi_,NOT_A_NUMBER));
     }
 
   }

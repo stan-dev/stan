@@ -15,6 +15,7 @@
 #include <boost/fusion/include/std_pair.hpp>
 #include <boost/config/warning_disable.hpp>
 #include <boost/spirit/include/qi_numeric.hpp>
+#include <stan/gm/ast.hpp>
 #include <stan/gm/grammars/var_decls_grammar.hpp>
 #include <stan/gm/grammars/common_adaptors_def.hpp>
 
@@ -411,7 +412,29 @@ namespace stan {
         reserve("while"); 
         reserve("xor"); 
         reserve("xor_eq");
-      }      
+
+        // function names declared in signatures
+        using stan::gm::function_signatures;
+        using std::set;
+        using std::string;
+        const function_signatures& sigs = function_signatures::instance();
+        set<string> fun_names = sigs.key_set();
+        fun_names.erase("pi");
+        fun_names.erase("e");
+        fun_names.erase("sqrt2");
+        fun_names.erase("log2");
+        fun_names.erase("log10");
+        fun_names.erase("not_a_number");
+        fun_names.erase("positive_infinity");
+        fun_names.erase("negative_infinity");
+        fun_names.erase("epsilon");
+        fun_names.erase("negative_epsilon");
+        for (set<string>::iterator it = fun_names.begin();  
+             it != fun_names.end();  
+             ++it)
+          reserve(*it);
+        
+      }
 
       bool operator()(const std::string& identifier,
                       std::stringstream& error_msgs) const {

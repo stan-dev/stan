@@ -81,7 +81,7 @@ TYPED_TEST_P(StanGmArgumentsSingleton, parse_args) {
   
   EXPECT_TRUE(return_value);
   EXPECT_FALSE(help_flag);
-  EXPECT_EQ(0, args.size());
+  EXPECT_EQ(0U, args.size());
 
   return_value = false;
   args.clear();
@@ -91,7 +91,7 @@ TYPED_TEST_P(StanGmArgumentsSingleton, parse_args) {
   
   EXPECT_TRUE(return_value);
   EXPECT_TRUE(help_flag);
-  EXPECT_EQ(0, args.size());
+  EXPECT_EQ(0U, args.size());
 
   return_value = false;
   args.clear();
@@ -101,7 +101,7 @@ TYPED_TEST_P(StanGmArgumentsSingleton, parse_args) {
   
   EXPECT_TRUE(return_value);
   EXPECT_TRUE(help_flag);
-  EXPECT_EQ(0, args.size());
+  EXPECT_EQ(0U, args.size());
 
 
   return_value = false;
@@ -112,7 +112,7 @@ TYPED_TEST_P(StanGmArgumentsSingleton, parse_args) {
   
   EXPECT_TRUE(return_value);
   EXPECT_FALSE(help_flag);
-  EXPECT_EQ(0, args.size());
+  EXPECT_EQ(0U, args.size());
   EXPECT_EQ(argument_value<TypeParam>(), 
             static_cast<stan::gm::singleton_argument<TypeParam>*>(this->arg)->value());
 }
@@ -130,7 +130,7 @@ TYPED_TEST_P(StanGmArgumentsSingleton, parse_args_unexpected) {
   
   EXPECT_TRUE(return_value);
   EXPECT_FALSE(help_flag);
-  EXPECT_EQ(1, args.size());
+  EXPECT_EQ(1U, args.size());
 }
 
 TYPED_TEST_P(StanGmArgumentsSingleton, argument_lookup) {

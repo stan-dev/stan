@@ -421,6 +421,18 @@ namespace stan {
                   RNG& rng) {
       using boost::variate_generator;
       using boost::bernoulli_distribution;
+
+      static const char* function = "stan::prob::bernoulli_rng(%1%)";
+
+      using stan::math::check_finite;
+      using stan::math::check_bounded;
+ 
+      if (!check_finite(function, theta, "Probability parameter"))
+        return 0;
+      if (!check_bounded(function, theta, 0.0, 1.0,
+                         "Probability parameter"))
+        return 0;
+
       variate_generator<RNG&, bernoulli_distribution<> >
         bernoulli_rng(rng, bernoulli_distribution<>(theta));
       return bernoulli_rng();
