@@ -36,7 +36,7 @@ namespace stan {
       
       base_nuts(M &m, BaseRNG& rng, std::ostream* o, std::ostream* e):
       base_hmc<M, P, H, I, BaseRNG>(m, rng, o, e),
-      _depth(0), _max_depth(5), _max_delta(1000), _n_divergence(0)
+      _depth(0), _max_depth(5), _max_delta(1000), _n_divergent(0)
       {};
       
       ~base_nuts() {};
@@ -88,7 +88,7 @@ namespace stan {
         int n_valid = 0;
         
         this->_depth = 0;
-        this->_n_divergence = 0;
+        this->_n_divergent = 0;
         
         util.n_tree = 0;
         util.sum_prob = 0;
@@ -157,23 +157,23 @@ namespace stan {
       }
       
       void write_sampler_param_names(std::ostream& o) {
-        o << "stepsize__,treedepth__,n_divergence__,";
+        o << "stepsize__,treedepth__,n_divergent__,";
       }
       
       void write_sampler_params(std::ostream& o) {
-        o << this->_epsilon << "," << this->_depth << "," << this->_n_divergence << ",";
+        o << this->_epsilon << "," << this->_depth << "," << this->_n_divergent << ",";
       }
       
       void get_sampler_param_names(std::vector<std::string>& names) {
         names.push_back("stepsize__");
         names.push_back("treedepth__");
-        names.push_back("n_divergence__");
+        names.push_back("n_divergent__");
       }
       
       void get_sampler_params(std::vector<double>& values) {
         values.push_back(this->_epsilon);
         values.push_back(this->_depth);
-        values.push_back(this->_n_divergence);
+        values.push_back(this->_n_divergent);
       }
 
       virtual bool compute_criterion(ps_point& start, P& finish, Eigen::VectorXd& rho) = 0;
@@ -200,7 +200,7 @@ namespace stan {
           if (boost::math::isnan(h)) h = std::numeric_limits<double>::infinity();
           
           util.criterion = util.log_u + (h - util.H0) < this->_max_delta;
-          if (!util.criterion) ++(this->_n_divergence);
+          if (!util.criterion) ++(this->_n_divergent);
 
           util.sum_prob += stan::math::min(1, std::exp(util.H0 - h));
           util.n_tree += 1;
@@ -249,7 +249,7 @@ namespace stan {
       int _max_depth;
       double _max_delta;
 
-      int _n_divergence;
+      int _n_divergent;
       
     };
     
