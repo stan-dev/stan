@@ -52,7 +52,7 @@ TEST(StanIoMcmcWriter, print_sample_names) {
   std::string line;
   std::getline(sample_stream, line);
   
-  EXPECT_EQ("lp__,accept_stat__,stepsize__,treedepth__,n_divergence__,mu1,mu2", line);
+  EXPECT_EQ("lp__,accept_stat__,stepsize__,treedepth__,n_divergent__,mu1,mu2", line);
   
 }
 
@@ -234,7 +234,7 @@ TEST(StanIoMcmcWriter, print_diagnostic_names) {
   std::getline(diagnostic_stream, line);
   
   // FIXME: make this work, too
-  EXPECT_EQ("lp__,accept_stat__,stepsize__,treedepth__,n_divergence__,mu1,mu2,p_mu1,p_mu2,g_mu1,g_mu2", line);
+  EXPECT_EQ("lp__,accept_stat__,stepsize__,treedepth__,n_divergent__,mu1,mu2,p_mu1,p_mu2,g_mu1,g_mu2", line);
   
 }
 
