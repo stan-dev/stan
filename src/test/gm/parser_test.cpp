@@ -1,8 +1,9 @@
 #include <gtest/gtest.h>
-#include <iostream>
-#include <fstream>
-#include <istream>
 #include <exception>
+#include <fstream>
+#include <iostream>
+#include <istream>
+#include <sstream>
 #include <stdexcept>
 
 #include <stan/gm/ast.hpp>
@@ -13,6 +14,14 @@
 #include <stan/gm/grammars/expression_grammar.hpp>
 #include <stan/gm/grammars/statement_grammar.hpp>
 #include <stan/gm/grammars/var_decls_grammar.hpp>
+
+bool parse(const std::string& model) {
+  std::stringstream out;
+  std::stringstream in(model);
+  stan::gm::program result;
+  return stan::gm::parse(&out, in, "model_file_name", "model_name", result);
+}
+                
 
 
 std::string file_name_to_model_name(const std::string& name) {
@@ -241,4 +250,9 @@ TEST(gm_parser,function_signatures) {
   EXPECT_TRUE(is_parsable("src/test/gm/model_specs/compiled/function_signatures_student_t_3.stan"));
   EXPECT_TRUE(is_parsable("src/test/gm/model_specs/compiled/function_signatures_uniform.stan"));
   EXPECT_TRUE(is_parsable("src/test/gm/model_specs/compiled/function_signatures_weibull.stan"));
+}
+
+
+TEST(foo, bar) {
+  EXPECT_TRUE(parse("model { }"));
 }
