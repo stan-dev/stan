@@ -1031,24 +1031,40 @@ may appear in any order.
 \put(800, -10) { \makebox(200, 20)[l]{Iteration} }
 %
 \end{picture}
-\caption{\small\it Adaptation during warmup occurs in three stages: initialization (I),
-adaption (A), and termination (T).  The step size is adapted in each stage but the
-(co)variance is estimated only in the adaptation windows, and only if necessitated
-by the specified sampler.}
+\caption{\small\it Adaptation during warmup occurs in three stages: an initial
+``fast'' adaptation interval (I), a series of expanding ``slow'' adaptation intervals (A), 
+and a final ``fast'' adaptation interval (T).  For HMC both the fast and slow intervals
+are used for adapting the step size, while the slow intervals are used for learning
+the (co)variance is necessitated by the metric.}
     \label{adaptation.figure}
 \end{figure}
 
 When adaptation is engaged the warmup period is split into three
-stages (Figure \ref{adaptation.figure}).  First the chain is allowed 
-to converge towards the typical set in an initialization buffer, with 
-only the step size adapting.  After this initial stage the (co)variances 
-are estimated in a series of adaptation windows, if needed by the sampler.  
-Each adaptation window is expanded to twice the size of the previous 
-window with estimates and the step size, reset in between.  
-Finally the step size is allowed to adapt to the final (co)variance update
-in a termination buffer.  The size of the buffers and the adaptation
-window are all customizable, although user-specified values may be
-modified slightly in order to ensure alignment with the warmup period.
+stages (Figure \ref{adaptation.figure}), with two ``fast'' intervals
+surrounding a series of growing ``slow'' intervals.  Here ``fast''
+and ``slow'' refer to parameters that adapt using local and global
+information, respectively; the Hamiltonian Monte Carlo samplers,
+for example, define the step size as a ``fast'' parameter and 
+the (co)variance as a ``slow'' parameter.  The size of the the initial
+and final ``fast'' intervals and the initial size of the ``slow'' interval
+are all customizable, although user-specified values may be modified 
+slightly in order to ensure alignment with the warmup period.
+
+The motivation behind this partitioning of the warmup period is to
+allow for more robust adaptation.  In the initial ``fast'' interval the
+chain is allowed to converge towards the typical set,%
+%
+\footnote{The typical set is a concept borrowed from information
+theory and refers to the neighborhood (or neighborhoods in multimodal models)
+of significant posterior probability mass through which the Markov chain
+will travel in equilibrium.}
+%
+with only parameters that can learn from local information adapted.
+After this initial stage parameters that require global information,
+for example (co)variances, are estimated in a series of expanding,
+memoryless windows; often ``fast'' parameters will be adapted here
+as well.  Lastly the ``fast'' parameters are allowed to adapt to the final 
+update of the ``slow'' parameters.
 
 Currently all \Stan sampling algorithms utilize dual averaging to
 optimize the step size (this optimization during adaptation of the
@@ -1062,8 +1078,8 @@ experience with the dual averaging algorithm.  For more information,
 see the discussion of dual averaging in \citep{Hoffman-Gelman:2011,
  Hoffman-Gelman:2013}.
   
- Variances or covariances are estimated using Welford accumulators
- to avoid a loss of precision over many floating point operations.
+Variances or covariances are estimated using Welford accumulators
+to avoid a loss of precision over many floating point operations.
 
 The following subarguments are introduced by the categorical argument
 \code{adapt}.  Each subargument must contiguously follow \code{adapt},
@@ -1100,17 +1116,17 @@ though they may appear in any order.
         {Defaults to \code{10}}
 %
       \hiercmdarg{\indentarrow\indentarrow\indentarrow}{init\_buffer}{$$unsigned int$$}
-        {Number of warmup iterations before adaptation commences}
+        {Width of initial fast adaptation interval}
         {Valid values: \ All}
         {Defaults to \code{75}}
 %
       \hiercmdarg{\indentarrow\indentarrow\indentarrow}{term\_buffer}{$$unsigned int$$}
-        {Number of warmup iterations after adaptation terminates}
+        {Width of final fast adaptation interval}
         {Valid values: \ All}
         {Defaults to \code{50}}
 %
       \hiercmdarg{\indentarrow\indentarrow\indentarrow}{window}{$$unsigned int$$}
-        {Width of adaptation interval}
+        {Initial width of slow adaptation interval}
         {Valid values: \ All}
         {Defaults to \code{25}}
 %

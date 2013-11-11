@@ -13,7 +13,7 @@ namespace stan {
       
       arg_adapt_window(): u_int_argument() {
         _name = "window";
-        _description = "Width of adaptation interval";
+        _description = "Initial width of slow adaptation interval";
         _default = "25";
         _default_value = 25;
         _value = _default_value;
