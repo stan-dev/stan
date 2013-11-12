@@ -13,8 +13,7 @@ namespace stan {
       
       arg_adapt_init_buffer(): u_int_argument() {
         _name = "init_buffer";
-        _description = std::string("Number of warmup iterations before ")
-                       + std::string("adaptation commences");
+        _description = std::string("Width of initial fast adaptation interval");
         _default = "75";
         _default_value = 75;
         _value = _default_value;

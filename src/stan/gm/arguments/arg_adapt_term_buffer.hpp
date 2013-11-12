@@ -13,8 +13,7 @@ namespace stan {
       
       arg_adapt_term_buffer(): u_int_argument() {
         _name = "term_buffer";
-        _description = std::string("Number of warmup iterations after ")
-                       + std::string("adaptation terminates");
+        _description = std::string("Width of final fast adaptation interval");
         _default = "50";
         _default_value = 50;
         _value = _default_value;

@@ -28,7 +28,7 @@ AR = ar
 STAN_HOME := $(dir $(firstword $(MAKEFILE_LIST)))
 EIGEN ?= lib/eigen_3.2.0
 BOOST ?= lib/boost_1.54.0
-GTEST ?= lib/gtest_1.6.0
+GTEST ?= lib/gtest_1.7.0
 
 ##
 # Set default compiler options.
@@ -57,7 +57,6 @@ PATH_SEPARATOR = /
 #   - CFLAGS
 #   - CFLAGS_GTEST
 #   - EXE
-#   - PCH
 ##
 -include make/os_detect
 
@@ -107,6 +106,7 @@ help:
 	@echo '  Current configuration:'
 	@echo '  - OS (Operating System):   ' $(OS)
 	@echo '  - CC (Compiler):           ' $(CC)
+	@echo '  - Compiler version:        ' $(CC_MAJOR).$(CC_MINOR)
 	@echo '  - O (Optimization Level):  ' $(O)
 	@echo '  - O_STANC (Opt for stanc): ' $(O_STANC)
 ifdef TEMPLATE_DEPTH
@@ -156,12 +156,9 @@ endif
 	@echo '  - test-all       : Runs all tests.'
 	@echo '  Documentation:'
 	@echo '  - manual         : Builds the reference manual. Copies built manual to'
-	@echo '                     doc/stan-reference.pdf'
+	@echo '                     doc/stan-reference-$(VERSION_STRING).pdf'
 	@echo '  - doxygen        : Builds the API documentation. The documentation is located'
 	@echo '                     doc/api/'
-	@echo '  Distribution:'
-	@echo '  - dist           : Creates a tarball for distribution. The resulting tarball is'
-	@echo '                     created at the top level as stan-src-<version>.tgz.'
 	@echo '  Clean:'
 	@echo '  - clean          : Basic clean. Leaves doc and compiled libraries intact.'
 	@echo '  - clean-all      : Cleans up all of Stan.'
@@ -176,7 +173,6 @@ endif
 -include make/models   # models
 -include make/command  # bin/stanc, bin/print
 -include make/doxygen  # doxygen
--include make/dist     # dist: for distribution
 -include make/manual   # manual: manual, doc/stan-reference.pdf
 -include make/demo     # for building demos
 
@@ -201,11 +197,11 @@ all: build docs
 ##
 # Clean up.
 ##
-MODEL_SPECS := $(wildcard src/test/gm/model_specs/compiled/*.stan) $(wildcard src/test/gm/arguments/*.stan)
+MODEL_SPECS := $(shell find src/test -type f -name '*.stan')
 .PHONY: clean clean-demo clean-dox clean-manual clean-models clean-all
 clean:
 	$(RM) $(shell find src -type f -name '*.dSYM') $(shell find src -type f -name '*.d.*')
-	$(RM) $(wildcard $(MODEL_SPECS:%.stan=%.cpp) $(MODEL_SPECS:%.stan=%$(EXE)) $(MODEL_SPECS:%.stan=%.o))
+	$(RM) $(wildcard $(MODEL_SPECS:%.stan=%.cpp) $(MODEL_SPECS:%.stan=%$(EXE)) $(MODEL_SPECS:%.stan=%.o) $(MODEL_SPECS:%.stan=%.d))
 
 clean-dox:
 	$(RM) -r doc/api
@@ -214,10 +210,10 @@ clean-manual:
 	cd src/docs/stan-reference; $(RM) *.brf *.aux *.bbl *.blg *.log *.toc *.pdf *.out *.idx *.ilg *.ind *.cb *.cb2 *.upa
 
 clean-models:
-	$(RM) -r models $(MODEL_HEADER).gch $(MODEL_HEADER).pch $(MODEL_HEADER).d
+	$(RM) -r models $(MODEL_HEADER).d
 
-clean-all: clean clean-dox clean-manual clean-models
-	$(RM) -r test/* bin doc
+clean-all: clean clean-manual clean-models
+	$(RM) -r test/* bin
 	$(RM) $(shell find src -type f -name '*.d') $(shell find src -type f -name '*.o')
 	cd src/test/agrad/distributions/univariate/continuous; $(RM) *_generated_test.cpp
 	cd src/test/agrad/distributions/univariate/discrete; $(RM) *_generated_test.cpp
