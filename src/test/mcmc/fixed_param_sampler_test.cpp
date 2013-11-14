@@ -56,14 +56,14 @@ TEST(McmcFixedParamSampler, check_empty) {
   command += " sample algorithm=fixed_param output file=" + convert_model_path(model_path) + ".csv";
   run_command_output command_output;
   
-  bool success = TRUE;
+  bool success = true;
   
   try {
     command_output = run_command(command);
   } catch(...) {
-    success = FALSE;
+    success = false;
   }
 
-  EXPECT_EQ(success, TRUE);
+  EXPECT_EQ(success, true);
   
 }
