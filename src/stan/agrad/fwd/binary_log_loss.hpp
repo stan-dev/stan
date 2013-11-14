@@ -12,13 +12,13 @@ namespace stan {
     template <typename T>
     inline
     fvar<T>
-    binary_log_loss(int x1, const fvar<T>& x2) {
+    binary_log_loss(const int y, const fvar<T>& y_hat) {
       using stan::math::binary_log_loss;
 
-      if(x1 == 1)
-        return fvar<T>(binary_log_loss(x1,x2.val_), -x2.d_ / x2.val_);
-      if(x1 == 0)
-        return fvar<T>(binary_log_loss(x1,x2.val_), x2.d_ / x2.val_);
+      if (y)
+        return fvar<T>(binary_log_loss(y,y_hat.val_), -y_hat.d_ / y_hat.val_);
+      else
+        return fvar<T>(binary_log_loss(y,y_hat.val_), y_hat.d_ / (1.0 - y_hat.val_));
     }
   }
 }
