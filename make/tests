@@ -159,8 +159,8 @@ ifeq ($(findstring test-,$(MAKECMDGOALS))$(findstring runtest/,$(MAKECMDGOALS)),
 	$@ --gtest_output="xml:$(basename $@).xml"
 endif
 
-.PRECIOUS: src/test/mcmc/models/proper$(EXE)
-test/mcmc/persistent_sampler$(EXE) : test/mcmc/persistent_sampler.o bin/libstan.a bin/libstanc.a src/test/mcmc/models/proper$(EXE)
+.PRECIOUS: src/test/mcmc/models/proper$(EXE) src/test/mcmc/models/empty$(EXE)
+test/mcmc/fixed_param_sampler$(EXE) : test/mcmc/fixed_param_sampler.o test/mcmc/fixed_param_sampler.o bin/libstan.a bin/libstanc.a src/test/mcmc/models/proper$(EXE) src/test/mcmc/models/empty$(EXE)
 	@mkdir -p $(dir $@)
 	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS) $(LDLIBS_STANC)
 ifeq ($(findstring test-,$(MAKECMDGOALS))$(findstring runtest/,$(MAKECMDGOALS)),)
