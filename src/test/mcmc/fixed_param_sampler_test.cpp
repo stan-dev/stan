@@ -6,7 +6,12 @@
 #include <test/models/utility.hpp>
 
 
-TEST(McmcFixedParamSampler, check_persistency) {
+void test_constant(const Eigen::VectorXd& samples) {
+  for (int i = 1; i < samples.size(); i++)
+    EXPECT_EQ(samples(0), samples(i));
+}
+
+TEST(McmcPersistentSampler, check_persistency) {
   
   std::vector<std::string> model_path;
   model_path.push_back("src");
@@ -32,7 +37,7 @@ TEST(McmcFixedParamSampler, check_persistency) {
   stan::mcmc::chains<> chains(parsed_output);
   
   for (int i = 0; i < chains.num_params(); ++i) {
-    EXPECT_EQ(chains.samples(0, i).tail(1)(0), chains.samples(0, i).head(1)(0));
+    test_constant(chains.samples(0, i));
   }
   
 }

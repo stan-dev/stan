@@ -2,7 +2,10 @@ language: cpp
 compiler:
   - clang
   - gcc
-script: make test-unit CC=$CXX
+env:
+  - RUN_TARGET=build TEST_TARGET=test-unit
+  - RUN_TARGET=docs
+script: make CC="$CXX" ${RUN_TARGET} ${TEST_TARGET}
 branches:
   only:
     - develop
@@ -13,3 +16,9 @@ notifications:
   email:
     on_success: change
     on_failure: always
+matrix:
+  exclude: # only make docs once:
+    - compiler: clang
+      env: RUN_TARGET=docs
+      script: make CC="$CXX" "${RUN_TARGET}" "${TEST_TARGET}"
+      

@@ -1080,7 +1080,7 @@ we add new samplers).
 \begin{description}
     \hiercmdarg{\indentarrow\indentarrow}{algorithm}{$$list element$$}
       {Sampling algorithm}
-      {Valid values: \  \code{hmc}, \code{persist} }
+      {Valid values: \  \code{hmc}, \code{fixed\_param} }
       {Defaults to \code{hmc}}
 \end{description}
 %
@@ -1237,16 +1237,16 @@ simulation error in the Hamiltonian dynamics calculation.  See
           {Defaults to \code{0}}
 \end{description}
 
-\subsubsection{Persistent Sampler}
+\subsubsection{Fixed Parameter Sampler}
 
-The persistent sampler generates a new sample without changing
-the current state of the Markov chain.  This can be useful when,
-for example, trying to generate psuedo-data using the generated
-quantities block.
+The fixed parameter sampler generates a new sample without changing
+the current state of the Markov chain; only generated quantities may
+change.  This can be useful when, for example, trying to generate pseudo-data 
+using the generated quantities block.
 %
 \begin{description}
-      \hierlongcmd{\indentarrow\indentarrow\indentarrow}{\farg{\bfseries persist}}
-        {Persistent Sampler (leaves state constant)}
+      \hierlongcmd{\indentarrow\indentarrow\indentarrow}{\farg{\bfseries fixed\_param}}
+        {Fixed Parameter Sampler}
 \end{description}
 
 \subsection{Optimization-Specific Commands}

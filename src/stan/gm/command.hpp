@@ -1,4 +1,4 @@
-#ifndef __STAN__GM__COMMAND_HPP__
+ #ifndef __STAN__GM__COMMAND_HPP__
 #define __STAN__GM__COMMAND_HPP__
 
 #include <fstream>
@@ -21,7 +21,7 @@
 #include <stan/gm/arguments/arg_random.hpp>
 #include <stan/gm/arguments/arg_output.hpp>
 
-#include <stan/mcmc/persistent_sampler.hpp>
+#include <stan/mcmc/fixed_param_sampler.hpp>
 #include <stan/mcmc/hmc/static/adapt_unit_e_static_hmc.hpp>
 #include <stan/mcmc/hmc/static/adapt_diag_e_static_hmc.hpp>
 #include <stan/mcmc/hmc/static/adapt_dense_e_static_hmc.hpp>
@@ -490,7 +490,6 @@ namespace stan {
           if (!boost::math::isfinite(init_grad[i])) {
             std::cout << "Rejecting user-specified inititialization because of divergent gradient." << std::endl;
             return 0;
-
           }
         }
         
@@ -565,6 +564,12 @@ namespace stan {
           
           double lastlp = lp - 1;
           std::cout << "Initial log joint probability = " << lp << std::endl;
+          if (sample_stream && save_iterations) {
+            *sample_stream << lp << ',';
+            model.write_csv(base_rng, cont_params, disc_params, *sample_stream);
+            sample_stream->flush();
+          }
+
           int m = 0;
           for (int i = 0; i < num_iterations; i++) {
             lastlp = lp;
@@ -596,8 +601,14 @@ namespace stan {
             lp = -std::numeric_limits<double>::infinity();
           }
           
-          double lastlp = lp - 1;
           std::cout << "initial log joint probability = " << lp << std::endl;
+          if (sample_stream && save_iterations) {
+            *sample_stream << lp << ',';
+            model.write_csv(base_rng, cont_params, disc_params, *sample_stream);
+            sample_stream->flush();
+          }
+
+          double lastlp = lp - 1;
           int m = 0;
           while ((lp - lastlp) / fabs(lp) > 1e-8) {
             
@@ -634,6 +645,12 @@ namespace stan {
           lp = bfgs.logp();
           
           std::cout << "initial log joint probability = " << lp << std::endl;
+          if (sample_stream && save_iterations) {
+            *sample_stream << lp << ',';
+            model.write_csv(base_rng, cont_params, disc_params, *sample_stream);
+            sample_stream->flush();
+          }
+
           int ret = 0;
           
           while (ret == 0) {  
@@ -731,14 +748,14 @@ namespace stan {
                                       parser.arg("method")->arg("sample")->arg("adapt"));
         bool adapt_engaged = dynamic_cast<bool_argument*>(adapt->arg("engaged"))->value();
         
-        if (algo->value() == "persist") {
+        if (algo->value() == "fixed_param") {
           
-          sampler_ptr = new stan::mcmc::persistent_sampler();
+          sampler_ptr = new stan::mcmc::fixed_param_sampler();
           
           adapt_engaged = false;
           
           if (num_warmup != 0) {
-            std::cout << "Warning: warmup will be skipped for the persistent sampler!" << std::endl;
+            std::cout << "Warning: warmup will be skipped for the fixed parameter sampler!" << std::endl;
             num_warmup = 0;
           }
           
