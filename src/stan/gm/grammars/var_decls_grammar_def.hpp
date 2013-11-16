@@ -184,7 +184,9 @@ namespace stan {
       }
       bool operator()(const variable& x) const {
         var_origin origin = var_map_.get_origin(x.name_);
-        bool is_data = (origin == data_origin) || (origin == transformed_data_origin);
+        bool is_data = (origin == data_origin) 
+          || (origin == transformed_data_origin)
+          || (origin == local_origin);
         if (!is_data) {
           error_msgs_ << "non-data variables not allowed in dimension declarations."
                       << std::endl

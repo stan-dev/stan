@@ -571,7 +571,6 @@ Vectors, row vectors, and matrices contain real values.  Arrays, on
 the other hand, may contain any kind of value, including integers and
 structured values like vectors.
 
-
 \subsection{Indexing}
 
 Vectors and matrices, as well as arrays, are indexed starting from one
@@ -580,6 +579,7 @@ algebra as well as their implementations in the statistical software
 packages \R, \MATLAB, \BUGS, and \JAGS.  General computer programming
 languages, on the other hand, such as \Cpp and Python, index arrays
 starting from zero.
+
 
 \subsection{Vectors}
 
@@ -603,6 +603,9 @@ vector<lower=0>[3] u;
 \end{Verbatim}
 \end{quote}
 %
+
+
+
 
 \subsection{Unit Simplexes}
 
@@ -899,6 +902,24 @@ given a choice, the form \code{m[2,3]} is preferred.%
   compiler.\label{array-index-style.footnote}}
 
 
+\subsection{Size Declaration Restrictions}
+
+An integer expression is used to pick out the sizes of vectors,
+matrices, and arrays.  For instance, we can declare a vector of size
+\code{M + N} using
+%
+\begin{quote}
+\begin{Verbatim}
+vector[M + N] y;
+\end{Verbatim}
+\end{quote}
+%
+Any integer-denoting expression may be used for the size declaration,
+providing all variables involved are either data, transformed data, or
+local variables.  That is, expressions used for size declarations may
+not include parameters or transformed parameters or generated
+quantities.  
+
 \section{Array Data Types}
 
 \Stan supports arrays of arbitrary dimension.  An array's elements may
@@ -1183,7 +1204,12 @@ b <- a;  // illegal assignment of matrix to column vector
 \end{Verbatim}
 \end{quote}
 
+\subsection{Size Declaration Restrictions}
 
+An integer expression is used to pick out the sizes of arrays.  The
+same restrictions as for vector and matrix sizes apply, namely that
+the size is declared with an integer-denoting expression that does not
+contain any parameters, transformed parameters, or generated quantities.
 
 \section{Variable Types vs.\ Constraints and Sizes}
 
