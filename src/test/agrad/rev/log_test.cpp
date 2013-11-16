@@ -1,9 +1,12 @@
 #include <stan/agrad/rev/log.hpp>
 #include <test/agrad/util.hpp>
 #include <gtest/gtest.h>
+#include <boost/math/special_functions/fpclassify.hpp>
 #include <stan/math/constants.hpp>
 #include <stan/agrad/rev/numeric_limits.hpp>
 #include <stan/agrad/rev/operator_less_than.hpp>
+#include <stan/agrad/rev/operator_equal.hpp>
+#include <stan/agrad/rev/operator_unary_negative.hpp>
 
 TEST(AgradRev,log_a) {
   AVAR a(5.0);
@@ -18,12 +21,12 @@ TEST(AgradRev,log_a) {
 
 TEST(AgradRev,log_inf) {
   AVAR a = std::numeric_limits<double>::infinity();
-  EXPECT_TRUE(std::isinf(log(a)));
+  EXPECT_TRUE(boost::math::isinf(log(a)));
 }
 
 TEST(AgradRev,log_0) {
   AVAR a(0.0);
-  EXPECT_TRUE(std::isinf(log(a)) && (log(a) < 0.0));
+  EXPECT_TRUE(boost::math::isinf(log(a)) && (log(a) < 0.0));
 }
 
 TEST(AgradRev,log_neg){

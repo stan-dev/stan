@@ -4,8 +4,11 @@
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/op/v_vari.hpp>
 #include <boost/math/special_functions/acosh.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
 #include <stan/agrad/rev/numeric_limits.hpp>
 #include <stan/agrad/rev/operator_greater_than.hpp>
+#include <stan/agrad/rev/operator_equal.hpp>
+#include <stan/agrad/rev/operator_unary_negative.hpp>
 
 namespace stan {
   namespace agrad {
@@ -35,7 +38,7 @@ namespace stan {
      * @return Inverse hyperbolic cosine of the variable.
      */
     inline var acosh(const stan::agrad::var& a) {
-      if (std::isinf(a) && a > 0.0)
+      if (boost::math::isinf(a) && a > 0.0)
         return var(new acosh_vari(a.val(),a.vi_));
       return var(new acosh_vari(boost::math::acosh(a.val()),a.vi_));
     }

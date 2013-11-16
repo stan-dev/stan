@@ -1,6 +1,7 @@
 #include <stan/agrad/rev/acosh.hpp>
 #include <test/agrad/util.hpp>
 #include <gtest/gtest.h>
+#include <boost/math/special_functions/fpclassify.hpp>
 #include <stan/math/constants.hpp>
 #include <stan/agrad/rev/numeric_limits.hpp>
 
@@ -43,5 +44,5 @@ TEST(AgradRev,acosh_out_of_bounds) {
   EXPECT_THROW(acosh(a), std::domain_error);
 
   AVAR b = std::numeric_limits<double>::infinity();
-  EXPECT_TRUE(std::isinf(acosh(b)) && acosh(b) > 0);
+  EXPECT_TRUE(boost::math::isinf(acosh(b)) && acosh(b) > 0);
 }
