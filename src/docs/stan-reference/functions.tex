@@ -684,9 +684,18 @@ positive numbers and non-integral negative numbers by
 \fitem{real}{lgamma}{real \farg{x}}{
 The natural logarithm of the gamma function applied to \farg{x}}
 %
+\fitem{real}{digamma}{real \farg{x}}{
+The digamma function applied to \farg{x}.  The digamma function is the
+derivative of the natural logarithm of the Gamma function.  The function is defined for
+positive numbers and non-integral negative numbers.}
+%
+\fitem{real}{trigamma}{real \farg{x}}{
+The trigamma function applied to \farg{x}.  The trigamma function is the
+second derivative of the natural logarithm of the Gamma function.}
+%
 \fitem{real}{lmgamma}{int \farg{n}, real \farg{x}}{
 The natural logarithm of the multinomial gamma function with \farg{n}
-dimensions applied to \farg{x}.  }
+dimensions applied to \farg{x}.}
 %
 \fitem{real}{gamma\_p}{real \farg{a}, real \farg{z}}{
 The normalised lower incomplete gamma function of \farg{a} and \farg{z} defined for positive \farg{a} and nonnegative \farg{z} by 
@@ -722,14 +731,14 @@ $\Gamma$ function, defining
 \]
 }
 %
-\fitem{real}{bessel\_first\_kind}{real \farg{v}, real \farg{z}}{The Bessel function of the first kind with order \farg{v} applied to \farg{z} defined for all \farg{z} and \farg{v} by
+\fitem{real}{bessel\_first\_kind}{int \farg{v}, real \farg{z}}{The Bessel function of the first kind with order \farg{v} applied to \farg{z} defined for all \farg{z} and \farg{v} by
 \[
 {J_v}(z) = \left(\frac{1}{2}z\right)^v\sum_{k=0}^\infty
 \frac{\left(-\frac{1}{4}z^2\right)^k}{k!\, \Gamma(v+k+1)}
 \]
 }
 %
-\fitem{real}{bessel\_second\_kind}{real \farg{v}, real \farg{z}}{
+\fitem{real}{bessel\_second\_kind}{int \farg{v}, real \farg{z}}{
 The Bessel function of the second kind with order \farg{v} applied to \farg{z} defined for  positive \farg{z} and \farg{v} by
 \[
 {Y_v}(z)
@@ -738,13 +747,13 @@ The Bessel function of the second kind with order \farg{v} applied to \farg{z} d
 \]
 }
 %
-\fitem{real}{modified\_bessel\_first\_kind}{real \farg{v}, real \farg{z}}{The modified Bessel function of the first kind with order \farg{v} applied to \farg{z} defined for all \farg{z} and \farg{v} by
+\fitem{real}{modified\_bessel\_first\_kind}{int \farg{v}, real \farg{z}}{The modified Bessel function of the first kind with order \farg{v} applied to \farg{z} defined for all \farg{z} and \farg{v} by
 \[
 {I_v}(z) = \left(\frac{1}{2}z\right)^v\sum_{k=0}^\infty \frac{\left(\frac{1}{4}z^2\right)^k}{k!\Gamma(v+k+1)}
 \]
 }
 %
-\fitem{real}{modified\_bessel\_second\_kind}{real \farg{v}, real \farg{z}}{
+\fitem{real}{modified\_bessel\_second\_kind}{int \farg{v}, real \farg{z}}{
 The modified Bessel function of the second kind with order \farg{v} applied to \farg{z} defined for  positive \farg{z} and \farg{v} by
 \[
 {K_v}(z)

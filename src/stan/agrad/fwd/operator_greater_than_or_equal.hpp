@@ -4,28 +4,28 @@
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/meta/traits.hpp>
 
-namespace stan{
+namespace stan {
 
-  namespace agrad{
+  namespace agrad {
 
-    template <typename T1, typename T2>
+    template <typename T>
     inline
     bool
-    operator>=(const fvar<T1>& x, const fvar<T2>& y) {
+    operator>=(const fvar<T>& x, const fvar<T>& y) {
       return x.val_ >= y.val_;
     }
 
-    template <typename T1, typename T2>
+    template <typename T>
     inline 
     bool
-    operator>=(const fvar<T1>& x, const T2& y) {
+    operator>=(const fvar<T>& x, double y) {
       return x.val_ >= y;
     }
 
-    template <typename T1, typename T2>
+    template <typename T>
     inline 
     bool
-    operator>=(const T1& x, const fvar<T2>& y) {
+    operator>=(double x, const fvar<T>& y) {
       return x >= y.val_;
     }
   }
