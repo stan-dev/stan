@@ -13,7 +13,7 @@ namespace stan {
       class exp2_vari : public op_v_vari {
       public:
         exp2_vari(vari* avi) :
-        op_v_vari(std::pow(2.0,avi->val_),avi) {
+          op_v_vari(std::pow(2.0,avi->val_),avi) {
         }
         void chain() {
           avi_->adj_ += adj_ * val_ * stan::math::LOG_2;

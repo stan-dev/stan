@@ -12,7 +12,7 @@ namespace stan {
       class inv_logit_vari : public op_v_vari {
       public:
         inv_logit_vari(vari* avi) :
-        op_v_vari(stan::math::inv_logit(avi->val_),avi) {
+          op_v_vari(stan::math::inv_logit(avi->val_),avi) {
         }
         void chain() {
           avi_->adj_ +=  adj_ * val_ * (1.0 - val_);
