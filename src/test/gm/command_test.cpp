@@ -18,6 +18,8 @@ TEST(StanGmCommand, countMatches) {
   EXPECT_EQ(2, count_matches("aa","aaaa"));
 }
 
+
+
 void test_sample_prints(const std::string& base_cmd) {
   std::string cmd(base_cmd);
   cmd += " num_samples=100 num_warmup=100";
@@ -47,38 +49,46 @@ void test_optimize_prints(const std::string& base_cmd) {
 }
 
 TEST(StanGmCommand, printReallyPrints) {
-  // files auto-cleaned by clean-all due to location
-  std::string cmd
-    = "make CC=clang++ O=0 src/test/gm/model_specs/printer";
-  run_command(cmd);
+  std::vector<std::string> path_vector;
+  path_vector.push_back("..");
+  path_vector.push_back("src");
+  path_vector.push_back("test");
+  path_vector.push_back("gm");
+  path_vector.push_back("model_specs");
+  path_vector.push_back("printer");
 
+  std::string path = "cd test ";
+  path += multiple_command_separator();
+  path += " ";
+  path += convert_model_path(path_vector);
+  
   // SAMPLING
   // static HMC
   // + adapt
-  test_sample_prints("src/test/gm/model_specs/printer sample algorithm=hmc engine=static metric=unit_e adapt engaged=0");
-  test_sample_prints("src/test/gm/model_specs/printer sample algorithm=hmc engine=static metric=diag_e adapt engaged=0");
-  test_sample_prints("src/test/gm/model_specs/printer sample algorithm=hmc engine=static metric=dense_e adapt engaged=0");
+  test_sample_prints(path + " sample algorithm=hmc engine=static metric=unit_e adapt engaged=0");
+  test_sample_prints(path + " sample algorithm=hmc engine=static metric=diag_e adapt engaged=0");
+  test_sample_prints(path + " sample algorithm=hmc engine=static metric=dense_e adapt engaged=0");
 
   // - adapt
-  test_sample_prints("src/test/gm/model_specs/printer sample algorithm=hmc engine=static metric=unit_e adapt engaged=1");
-  test_sample_prints("src/test/gm/model_specs/printer sample algorithm=hmc engine=static metric=diag_e adapt engaged=1");
-  test_sample_prints("src/test/gm/model_specs/printer sample algorithm=hmc engine=static metric=dense_e adapt engaged=1");
+  test_sample_prints(path + " sample algorithm=hmc engine=static metric=unit_e adapt engaged=1");
+  test_sample_prints(path + " sample algorithm=hmc engine=static metric=diag_e adapt engaged=1");
+  test_sample_prints(path + " sample algorithm=hmc engine=static metric=dense_e adapt engaged=1");
 
   // NUTS
   // + adapt
-  test_sample_prints("src/test/gm/model_specs/printer sample algorithm=hmc engine=nuts metric=unit_e adapt engaged=0");
-  test_sample_prints("src/test/gm/model_specs/printer sample algorithm=hmc engine=nuts metric=diag_e adapt engaged=0");
-  test_sample_prints("src/test/gm/model_specs/printer sample algorithm=hmc engine=nuts metric=dense_e adapt engaged=0");
+  test_sample_prints(path + " sample algorithm=hmc engine=nuts metric=unit_e adapt engaged=0");
+  test_sample_prints(path + " sample algorithm=hmc engine=nuts metric=diag_e adapt engaged=0");
+  test_sample_prints(path + " sample algorithm=hmc engine=nuts metric=dense_e adapt engaged=0");
 
   // - adapt
-  test_sample_prints("src/test/gm/model_specs/printer sample algorithm=hmc engine=nuts metric=unit_e adapt engaged=1");
-  test_sample_prints("src/test/gm/model_specs/printer sample algorithm=hmc engine=nuts metric=diag_e adapt engaged=1");
-  test_sample_prints("src/test/gm/model_specs/printer sample algorithm=hmc engine=nuts metric=dense_e adapt engaged=1");
+  test_sample_prints(path + " sample algorithm=hmc engine=nuts metric=unit_e adapt engaged=1");
+  test_sample_prints(path + " sample algorithm=hmc engine=nuts metric=diag_e adapt engaged=1");
+  test_sample_prints(path + " sample algorithm=hmc engine=nuts metric=dense_e adapt engaged=1");
 
   // OPTIMIZATION
-  test_optimize_prints("src/test/gm/model_specs/printer optimize algorithm=newton");
-  test_optimize_prints("src/test/gm/model_specs/printer optimize algorithm=nesterov");
-  test_optimize_prints("src/test/gm/model_specs/printer optimize algorithm=bfgs");
+  test_optimize_prints(path + " optimize algorithm=newton");
+  test_optimize_prints(path + " optimize algorithm=nesterov");
+  test_optimize_prints(path + " optimize algorithm=bfgs");
 }
 
 
