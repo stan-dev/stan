@@ -8,7 +8,7 @@
 #include <stan/agrad/matrix.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/matrix_error_handling.hpp>
-#include <stan/math/matrix/ldlt.hpp>
+#include <stan/math/matrix/log_determinant_ldlt.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>

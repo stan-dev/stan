@@ -1,4 +1,4 @@
-#include <stan/math/matrix/ldlt.hpp>
+#include <stan/math/matrix/mdivide_left_ldlt.hpp>
 #include <stan/math/matrix/typedefs.hpp>
 #include <gtest/gtest.h>
 

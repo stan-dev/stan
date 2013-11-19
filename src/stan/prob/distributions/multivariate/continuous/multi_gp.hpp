@@ -19,7 +19,9 @@
 #include <stan/math/matrix/subtract.hpp>
 #include <stan/math/matrix/sum.hpp>
 
-#include <stan/math/matrix/ldlt.hpp>
+#include <stan/math/matrix/log_determinant_ldlt.hpp>
+#include <stan/math/matrix/mdivide_right_ldlt.hpp>
+#include <stan/math/matrix/trace_gen_inv_quad_form_ldlt.hpp>
 
 namespace stan {
   namespace prob {
