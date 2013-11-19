@@ -13,7 +13,7 @@
 #include <stan/math/matrix/subtract.hpp>
 #include <stan/math/matrix/trace_quad_form.hpp>
 
-#include <stan/math/matrix/ldlt.hpp>
+#include <stan/math/matrix/log_determinant_ldlt.hpp>
 
 namespace stan {
   namespace prob {

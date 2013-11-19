@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 #include <test/agrad/util.hpp>
 #include <stan/math/matrix/typedefs.hpp>
-#include <stan/math/matrix/ldlt.hpp>
+#include <stan/math/matrix/mdivide_left_ldlt.hpp>
 #include <stan/math/matrix/mdivide_left_spd.hpp>
 #include <stan/math/matrix/multiply.hpp>
 

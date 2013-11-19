@@ -8,7 +8,11 @@
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/math/matrix/validate_multiplicable.hpp>
 #include <stan/math/matrix/validate_square.hpp>
-#include <stan/math/matrix/ldlt.hpp>
+#include <stan/math/matrix/mdivide_left_ldlt.hpp>
+#include <stan/math/matrix/mdivide_right_ldlt.hpp>
+#include <stan/math/matrix/log_determinant_ldlt.hpp>
+#include <stan/math/matrix/trace_gen_inv_quad_form_ldlt.hpp>
+#include <stan/math/matrix/trace_inv_quad_form_ldlt.hpp>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/matrix/typedefs.hpp>
 
