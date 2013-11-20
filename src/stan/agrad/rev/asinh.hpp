@@ -5,6 +5,10 @@
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/op/v_vari.hpp>
 #include <boost/math/special_functions/asinh.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
+#include <stan/agrad/rev/numeric_limits.hpp>
+#include <stan/agrad/rev/operator_equal.hpp>
+#include <stan/agrad/rev/operator_unary_negative.hpp>
 
 namespace stan {
   namespace agrad {
@@ -12,8 +16,8 @@ namespace stan {
     namespace {
       class asinh_vari : public op_v_vari {
       public:
-        asinh_vari(vari* avi) :
-          op_v_vari(boost::math::asinh(avi->val_),avi) {
+        asinh_vari(double val, vari* avi) :
+          op_v_vari(val,avi) {
         }
         void chain() {
           avi_->adj_ += adj_ / std::sqrt(avi_->val_ * avi_->val_ + 1.0);
@@ -34,7 +38,9 @@ namespace stan {
      * @return Inverse hyperbolic sine of the variable.
      */
     inline var asinh(const stan::agrad::var& a) {
-      return var(new asinh_vari(a.vi_));
+      if (boost::math::isinf(a))
+        return var(new asinh_vari(a.val(), a.vi_));
+      return var(new asinh_vari(boost::math::asinh(a.val()),a.vi_));
     }
 
   }

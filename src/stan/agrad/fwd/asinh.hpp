@@ -4,10 +4,11 @@
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/meta/traits.hpp>
 #include <boost/math/special_functions/asinh.hpp>
+#include <stan/math/functions/square.hpp>
 
-namespace stan{
+namespace stan {
 
-  namespace agrad{
+  namespace agrad {
 
     template <typename T>
     inline
@@ -15,7 +16,8 @@ namespace stan{
     asinh(const fvar<T>& x) {
       using boost::math::asinh;
       using std::sqrt;
-      return fvar<T>(asinh(x.val_), x.d_ / sqrt(x.val_ * x.val_ + 1));
+      using stan::math::square;
+      return fvar<T>(asinh(x.val_), x.d_ / sqrt(square(x.val_) + 1));
     }
   }
 }

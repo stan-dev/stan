@@ -4,16 +4,17 @@
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/meta/traits.hpp>
 
-namespace stan{
+namespace stan {
 
-  namespace agrad{
+  namespace agrad {
 
     template <typename T>
     inline
     fvar<T>
     tanh(const fvar<T>& x) {
       using std::tanh;
-      return fvar<T>(tanh(x.val_), x.d_ * (1 - tanh(x.val_) * tanh(x.val_)));
+      T u = tanh(x.val_);
+      return fvar<T>(u, x.d_ * (1 - u * u));
     }
   }
 }
