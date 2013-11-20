@@ -1,10 +1,10 @@
-#include <stan/agrad/rev/matrix/ldlt.hpp>
-#include <stan/agrad/rev/matrix/sum.hpp>
+#include <stan/agrad/rev/matrix/trace_gen_inv_quad_form_ldlt.hpp>
 #include <gtest/gtest.h>
 #include <test/agrad/util.hpp>
 #include <stan/math/matrix/trace_gen_inv_quad_form_ldlt.hpp>
 #include <stan/math/matrix/sum.hpp>
 #include <stan/math/matrix/typedefs.hpp>
+#include <stan/agrad/rev/matrix/sum.hpp>
 #include <stan/agrad/rev/matrix/typedefs.hpp>
 
 TEST(AgradRevMatrix, trace_gen_inv_quad_form_ldlt_mat) {
