@@ -1,10 +1,11 @@
-#include <stan/agrad/rev/matrix/ldlt.hpp>
+#include <stan/agrad/rev/matrix/mdivide_left_ldlt.hpp>
 #include <gtest/gtest.h>
 #include <test/agrad/util.hpp>
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/math/matrix/mdivide_left_ldlt.hpp>
 #include <stan/math/matrix/mdivide_left_spd.hpp>
 #include <stan/math/matrix/multiply.hpp>
+#include <stan/agrad/rev/matrix/typedefs.hpp>
 
 TEST(AgradRevMatrix,mdivide_left_ldlt_val) {
   using stan::math::matrix_d;

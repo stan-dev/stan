@@ -1,4 +1,4 @@
-#include <stan/agrad/rev/matrix/ldlt.hpp>
+#include <stan/agrad/rev/matrix/trace_inv_quad_form_ldlt.hpp>
 #include <stan/agrad/rev/matrix/sum.hpp>
 #include <gtest/gtest.h>
 #include <test/agrad/util.hpp>
