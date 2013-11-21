@@ -23,12 +23,12 @@ TEST(AgradFwdMatrixOperatorMultiplication,fd_vector_scalar) {
   
   d1 << 100, 0, -3;
   v1 << 100, 0, -3;
-   v1(0).d_ = 1.0;  
-   v1(1).d_ = 1.0;
-   v1(2).d_ = 1.0;
+  v1(0).d_ = 1.0;  
+  v1(1).d_ = 1.0;
+  v1(2).d_ = 1.0;
   d2 = -2;
   v2 = -2;
-   v2.d_ = 1.0;  
+  v2.d_ = 1.0;  
 
   vector_fd output;
   output = multiply(d1, v2);
@@ -91,12 +91,12 @@ TEST(AgradFwdMatrixOperatorMultiplication,fd_rowvector_scalar) {
   
   d1 << 100, 0, -3;
   v1 << 100, 0, -3;
-   v1(0).d_ = 1.0;  
-   v1(1).d_ = 1.0;
-   v1(2).d_ = 1.0;
+  v1(0).d_ = 1.0;  
+  v1(1).d_ = 1.0;
+  v1(2).d_ = 1.0;
   d2 = -2;
   v2 = -2;
-   v2.d_ = 1.0;
+  v2.d_ = 1.0;
   
   row_vector_fd output;
   output = multiply(d1, v2);
@@ -158,13 +158,13 @@ TEST(AgradFwdMatrixOperatorMultiplication,fd_matrix_scalar) {
   
   d1 << 100, 0, -3, 4;
   v1 << 100, 0, -3, 4;
-   v1(0,0).d_ = 1.0; 
-   v1(0,1).d_ = 1.0; 
-   v1(1,0).d_ = 1.0; 
-   v1(1,1).d_ = 1.0; 
+  v1(0,0).d_ = 1.0; 
+  v1(0,1).d_ = 1.0; 
+  v1(1,0).d_ = 1.0; 
+  v1(1,1).d_ = 1.0; 
   d2 = -2;
   v2 = -2;
-   v2.d_ = 1.0;
+  v2.d_ = 1.0;
 
   matrix_fd output;
   output = multiply(d1, v2);
@@ -240,14 +240,14 @@ TEST(AgradFwdMatrixOperatorMultiplication,fd_rowvector_vector) {
   
   d1 << 1, 3, -5;
   v1 << 1, 3, -5;
-   v1(0).d_ = 1.0;
-   v1(1).d_ = 1.0;
-   v1(2).d_ = 1.0;
+  v1(0).d_ = 1.0;
+  v1(1).d_ = 1.0;
+  v1(2).d_ = 1.0;
   d2 << 4, -2, -1;
   v2 << 4, -2, -1;
-   v2(0).d_ = 1.0;
-   v2(1).d_ = 1.0;
-   v2(2).d_ = 1.0;
+  v2(0).d_ = 1.0;
+  v2(1).d_ = 1.0;
+  v2(2).d_ = 1.0;
 
   EXPECT_FLOAT_EQ( 3, multiply(v1, v2).val_);
   EXPECT_FLOAT_EQ( 3, multiply(v1, d2).val_);
@@ -276,14 +276,14 @@ TEST(AgradFwdMatrixOperatorMultiplication,fd_vector_rowvector) {
   
   d1 << 1, 3, -5;
   v1 << 1, 3, -5;
-   v1(0).d_ = 1.0;
-   v1(1).d_ = 1.0;
-   v1(2).d_ = 1.0;
+  v1(0).d_ = 1.0;
+  v1(1).d_ = 1.0;
+  v1(2).d_ = 1.0;
   d2 << 4, -2, -1;
   v2 << 4, -2, -1;
-   v2(0).d_ = 1.0;
-   v2(1).d_ = 1.0;
-   v2(2).d_ = 1.0;
+  v2(0).d_ = 1.0;
+  v2(1).d_ = 1.0;
+  v2(2).d_ = 1.0;
 
   matrix_fd output = multiply(v1, v2);
   EXPECT_EQ(3, output.rows());
@@ -364,16 +364,16 @@ TEST(AgradFwdMatrixOperatorMultiplication,fd_matrix_vector) {
   
   d1 << 1, 3, -5, 4, -2, -1;
   v1 << 1, 3, -5, 4, -2, -1;
-   v1(0,0).d_ = 1.0;
-   v1(0,1).d_ = 1.0;
-   v1(1,0).d_ = 1.0;
-   v1(1,1).d_ = 1.0;
-   v1(2,0).d_ = 1.0;
-   v1(2,1).d_ = 1.0;
+  v1(0,0).d_ = 1.0;
+  v1(0,1).d_ = 1.0;
+  v1(1,0).d_ = 1.0;
+  v1(1,1).d_ = 1.0;
+  v1(2,0).d_ = 1.0;
+  v1(2,1).d_ = 1.0;
   d2 << -2, 4;
   v2 << -2, 4;
-   v2(0).d_ = 1.0;
-   v2(1).d_ = 1.0;
+  v2(0).d_ = 1.0;
+  v2(1).d_ = 1.0;
 
   vector_fd output = multiply(v1, v2);
   EXPECT_EQ(3, output.size());
@@ -430,17 +430,17 @@ TEST(AgradFwdMatrixOperatorMultiplication,fd_rowvector_matrix) {
   
   d1 << -2, 4, 1;
   v1 << -2, 4, 1;
-   v1(0).d_ = 1.0;
-   v1(1).d_ = 1.0;
-   v1(2).d_ = 1.0;
+  v1(0).d_ = 1.0;
+  v1(1).d_ = 1.0;
+  v1(2).d_ = 1.0;
   d2 << 1, 3, -5, 4, -2, -1;
   v2 << 1, 3, -5, 4, -2, -1;
-   v2(0,0).d_ = 1.0;
-   v2(0,1).d_ = 1.0;
-   v2(1,0).d_ = 1.0;
-   v2(1,1).d_ = 1.0;
-   v2(2,0).d_ = 1.0;
-   v2(2,1).d_ = 1.0;
+  v2(0,0).d_ = 1.0;
+  v2(0,1).d_ = 1.0;
+  v2(1,0).d_ = 1.0;
+  v2(1,1).d_ = 1.0;
+  v2(2,0).d_ = 1.0;
+  v2(2,1).d_ = 1.0;
 
   vector_fd output = multiply(v1, v2);
   EXPECT_EQ(2, output.size());
@@ -488,20 +488,20 @@ TEST(AgradFwdMatrixOperatorMultiplication,fd_matrix_matrix) {
   
   d1 << 9, 24, 3, 46, -9, -33;
   v1 << 9, 24, 3, 46, -9, -33;
-   v1(0,0).d_ = 1.0;
-   v1(0,1).d_ = 1.0;
-   v1(0,2).d_ = 1.0;
-   v1(1,0).d_ = 1.0;
-   v1(1,1).d_ = 1.0;
-   v1(1,2).d_ = 1.0;
+  v1(0,0).d_ = 1.0;
+  v1(0,1).d_ = 1.0;
+  v1(0,2).d_ = 1.0;
+  v1(1,0).d_ = 1.0;
+  v1(1,1).d_ = 1.0;
+  v1(1,2).d_ = 1.0;
   d2 << 1, 3, -5, 4, -2, -1;
   v2 << 1, 3, -5, 4, -2, -1;
-   v2(0,0).d_ = 1.0;
-   v2(0,1).d_ = 1.0;
-   v2(1,0).d_ = 1.0;
-   v2(1,1).d_ = 1.0;
-   v2(2,0).d_ = 1.0;
-   v2(2,1).d_ = 1.0;
+  v2(0,0).d_ = 1.0;
+  v2(0,1).d_ = 1.0;
+  v2(1,0).d_ = 1.0;
+  v2(1,1).d_ = 1.0;
+  v2(2,0).d_ = 1.0;
+  v2(2,1).d_ = 1.0;
 
   matrix_fd output = multiply(v1, v2);
   EXPECT_EQ(2, output.rows());
@@ -559,12 +559,12 @@ TEST(AgradFwdMatrixOperatorMultiplication,fv_vector_scalar_1stDeriv) {
   
   d1 << 100, 0, -3;
   v1 << 100, 0, -3;
-   v1(0).d_ = 1.0;  
-   v1(1).d_ = 1.0;
-   v1(2).d_ = 1.0;
+  v1(0).d_ = 1.0;  
+  v1(1).d_ = 1.0;
+  v1(2).d_ = 1.0;
   d2 = -2;
   v2 = -2;
-   v2.d_ = 1.0;  
+  v2.d_ = 1.0;  
 
   vector_fv output;
   output = multiply(d1, v2);
@@ -626,19 +626,15 @@ TEST(AgradFwdMatrixOperatorMultiplication,fv_vector_scalar_2ndDeriv) {
   using stan::math::vector_d;
   using stan::agrad::vector_fv;
 
-  vector_d d1(3);
   vector_fv v1(3);
-  double d2;
   fvar<var> v2;
   
-  d1 << 100, 0, -3;
   v1 << 100, 0, -3;
-   v1(0).d_ = 1.0;  
-   v1(1).d_ = 1.0;
-   v1(2).d_ = 1.0;
-  d2 = -2;
+  v1(0).d_ = 1.0;  
+  v1(1).d_ = 1.0;
+  v1(2).d_ = 1.0;
   v2 = -2;
-   v2.d_ = 1.0;  
+  v2.d_ = 1.0;  
 
   vector_fv output;
 
@@ -663,12 +659,12 @@ TEST(AgradFwdMatrixOperatorMultiplication,fv_rowvector_scalar_1stDeriv) {
   
   d1 << 100, 0, -3;
   v1 << 100, 0, -3;
-   v1(0).d_ = 1.0;  
-   v1(1).d_ = 1.0;
-   v1(2).d_ = 1.0;
+  v1(0).d_ = 1.0;  
+  v1(1).d_ = 1.0;
+  v1(2).d_ = 1.0;
   d2 = -2;
   v2 = -2;
-   v2.d_ = 1.0;
+  v2.d_ = 1.0;
   
   row_vector_fv output;
   output = multiply(d1, v2);
@@ -730,19 +726,15 @@ TEST(AgradFwdMatrixOperatorMultiplication,fv_rowvector_scalar_2ndDeriv) {
   using stan::math::row_vector_d;
   using stan::agrad::row_vector_fv;
 
-  row_vector_d d1(3);
   row_vector_fv v1(3);
-  double d2;
   fvar<var> v2;
   
-  d1 << 100, 0, -3;
   v1 << 100, 0, -3;
-   v1(0).d_ = 1.0;  
-   v1(1).d_ = 1.0;
-   v1(2).d_ = 1.0;
-  d2 = -2;
+  v1(0).d_ = 1.0;  
+  v1(1).d_ = 1.0;
+  v1(2).d_ = 1.0;
   v2 = -2;
-   v2.d_ = 1.0;
+  v2.d_ = 1.0;
   
   row_vector_fv output;
 
@@ -766,13 +758,13 @@ TEST(AgradFwdMatrixOperatorMultiplication,fv_matrix_scalar_1stDeriv) {
   
   d1 << 100, 0, -3, 4;
   v1 << 100, 0, -3, 4;
-   v1(0,0).d_ = 1.0; 
-   v1(0,1).d_ = 1.0; 
-   v1(1,0).d_ = 1.0; 
-   v1(1,1).d_ = 1.0; 
+  v1(0,0).d_ = 1.0; 
+  v1(0,1).d_ = 1.0; 
+  v1(1,0).d_ = 1.0; 
+  v1(1,1).d_ = 1.0; 
   d2 = -2;
   v2 = -2;
-   v2.d_ = 1.0;
+  v2.d_ = 1.0;
 
   matrix_fv output;
   output = multiply(d1, v2);
@@ -847,20 +839,16 @@ TEST(AgradFwdMatrixOperatorMultiplication,fv_matrix_scalar_2ndDeriv) {
   using stan::math::matrix_d;
   using stan::agrad::matrix_fv;
   
-  matrix_d d1(2,2);
   matrix_fv v1(2,2);
-  double d2;
   fvar<var> v2;
   
-  d1 << 100, 0, -3, 4;
   v1 << 100, 0, -3, 4;
-   v1(0,0).d_ = 1.0; 
-   v1(0,1).d_ = 1.0; 
-   v1(1,0).d_ = 1.0; 
-   v1(1,1).d_ = 1.0; 
-  d2 = -2;
+  v1(0,0).d_ = 1.0; 
+  v1(0,1).d_ = 1.0; 
+  v1(1,0).d_ = 1.0; 
+  v1(1,1).d_ = 1.0; 
   v2 = -2;
-   v2.d_ = 1.0;
+  v2.d_ = 1.0;
 
   matrix_fv output;
   output = multiply(v2, v1);
@@ -886,14 +874,14 @@ TEST(AgradFwdMatrixOperatorMultiplication,fv_rowvector_vector_1stDeriv) {
   
   d1 << 1, 3, -5;
   v1 << 1, 3, -5;
-   v1(0).d_ = 1.0;
-   v1(1).d_ = 1.0;
-   v1(2).d_ = 1.0;
+  v1(0).d_ = 1.0;
+  v1(1).d_ = 1.0;
+  v1(2).d_ = 1.0;
   d2 << 4, -2, -1;
   v2 << 4, -2, -1;
-   v2(0).d_ = 1.0;
-   v2(1).d_ = 1.0;
-   v2(2).d_ = 1.0;
+  v2(0).d_ = 1.0;
+  v2(1).d_ = 1.0;
+  v2(2).d_ = 1.0;
 
   EXPECT_FLOAT_EQ( 3, multiply(v1, v2).val_.val());
   EXPECT_FLOAT_EQ( 3, multiply(v1, d2).val_.val());
@@ -928,14 +916,14 @@ TEST(AgradFwdMatrixOperatorMultiplication,fv_rowvector_vector_2ndDeriv) {
   
   d1 << 1, 3, -5;
   v1 << 1, 3, -5;
-   v1(0).d_ = 1.0;
-   v1(1).d_ = 1.0;
-   v1(2).d_ = 1.0;
+  v1(0).d_ = 1.0;
+  v1(1).d_ = 1.0;
+  v1(2).d_ = 1.0;
   d2 << 4, -2, -1;
   v2 << 4, -2, -1;
-   v2(0).d_ = 1.0;
-   v2(1).d_ = 1.0;
-   v2(2).d_ = 1.0;
+  v2(0).d_ = 1.0;
+  v2(1).d_ = 1.0;
+  v2(2).d_ = 1.0;
 
   AVEC q = createAVEC(v1(0).val(),v1(1).val(),v1(2).val());
   VEC h;
@@ -958,14 +946,14 @@ TEST(AgradFwdMatrixOperatorMultiplication,fv_vector_rowvector_1stDeriv) {
   
   d1 << 1, 3, -5;
   v1 << 1, 3, -5;
-   v1(0).d_ = 1.0;
-   v1(1).d_ = 1.0;
-   v1(2).d_ = 1.0;
+  v1(0).d_ = 1.0;
+  v1(1).d_ = 1.0;
+  v1(2).d_ = 1.0;
   d2 << 4, -2, -1;
   v2 << 4, -2, -1;
-   v2(0).d_ = 1.0;
-   v2(1).d_ = 1.0;
-   v2(2).d_ = 1.0;
+  v2(0).d_ = 1.0;
+  v2(1).d_ = 1.0;
+  v2(2).d_ = 1.0;
 
   matrix_fv output = multiply(v1, v2);
   EXPECT_EQ(3, output.rows());
@@ -1054,16 +1042,16 @@ TEST(AgradFwdMatrixOperatorMultiplication,fv_vector_rowvector_2ndDeriv) {
   
   d1 << 1, 3, -5;
   v1 << 1, 3, -5;
-   v1(0).d_ = 1.0;
-   v1(1).d_ = 1.0;
-   v1(2).d_ = 1.0;
+  v1(0).d_ = 1.0;
+  v1(1).d_ = 1.0;
+  v1(2).d_ = 1.0;
   d2 << 4, -2, -1;
   v2 << 4, -2, -1;
-   v2(0).d_ = 1.0;
-   v2(1).d_ = 1.0;
-   v2(2).d_ = 1.0;
+  v2(0).d_ = 1.0;
+  v2(1).d_ = 1.0;
+  v2(2).d_ = 1.0;
 
-   matrix_fv output;
+  matrix_fv output;
   output = multiply(d1, v2);
 
 
@@ -1087,16 +1075,16 @@ TEST(AgradFwdMatrixOperatorMultiplication,fv_matrix_vector_1stDeriv) {
   
   d1 << 1, 3, -5, 4, -2, -1;
   v1 << 1, 3, -5, 4, -2, -1;
-   v1(0,0).d_ = 1.0;
-   v1(0,1).d_ = 1.0;
-   v1(1,0).d_ = 1.0;
-   v1(1,1).d_ = 1.0;
-   v1(2,0).d_ = 1.0;
-   v1(2,1).d_ = 1.0;
+  v1(0,0).d_ = 1.0;
+  v1(0,1).d_ = 1.0;
+  v1(1,0).d_ = 1.0;
+  v1(1,1).d_ = 1.0;
+  v1(2,0).d_ = 1.0;
+  v1(2,1).d_ = 1.0;
   d2 << -2, 4;
   v2 << -2, 4;
-   v2(0).d_ = 1.0;
-   v2(1).d_ = 1.0;
+  v2(0).d_ = 1.0;
+  v2(1).d_ = 1.0;
 
   vector_fv output = multiply(v1, v2);
   EXPECT_EQ(3, output.size());
@@ -1147,16 +1135,16 @@ TEST(AgradFwdMatrixOperatorMultiplication,fv_matrix_vector_2ndDeriv) {
   
   d1 << 1, 3, -5, 4, -2, -1;
   v1 << 1, 3, -5, 4, -2, -1;
-   v1(0,0).d_ = 1.0;
-   v1(0,1).d_ = 1.0;
-   v1(1,0).d_ = 1.0;
-   v1(1,1).d_ = 1.0;
-   v1(2,0).d_ = 1.0;
-   v1(2,1).d_ = 1.0;
+  v1(0,0).d_ = 1.0;
+  v1(0,1).d_ = 1.0;
+  v1(1,0).d_ = 1.0;
+  v1(1,1).d_ = 1.0;
+  v1(2,0).d_ = 1.0;
+  v1(2,1).d_ = 1.0;
   d2 << -2, 4;
   v2 << -2, 4;
-   v2(0).d_ = 1.0;
-   v2(1).d_ = 1.0;
+  v2(0).d_ = 1.0;
+  v2(1).d_ = 1.0;
 
   vector_fv output;
   output = multiply(v1, d2);
@@ -1197,17 +1185,17 @@ TEST(AgradFwdMatrixOperatorMultiplication,fv_rowvector_matrix_1stDeriv) {
   
   d1 << -2, 4, 1;
   v1 << -2, 4, 1;
-   v1(0).d_ = 1.0;
-   v1(1).d_ = 1.0;
-   v1(2).d_ = 1.0;
+  v1(0).d_ = 1.0;
+  v1(1).d_ = 1.0;
+  v1(2).d_ = 1.0;
   d2 << 1, 3, -5, 4, -2, -1;
   v2 << 1, 3, -5, 4, -2, -1;
-   v2(0,0).d_ = 1.0;
-   v2(0,1).d_ = 1.0;
-   v2(1,0).d_ = 1.0;
-   v2(1,1).d_ = 1.0;
-   v2(2,0).d_ = 1.0;
-   v2(2,1).d_ = 1.0;
+  v2(0,0).d_ = 1.0;
+  v2(0,1).d_ = 1.0;
+  v2(1,0).d_ = 1.0;
+  v2(1,1).d_ = 1.0;
+  v2(2,0).d_ = 1.0;
+  v2(2,1).d_ = 1.0;
 
   vector_fv output = multiply(v1, v2);
   EXPECT_EQ(2, output.size());
@@ -1252,17 +1240,17 @@ TEST(AgradFwdMatrixOperatorMultiplication,fv_rowvector_matrix_2ndDeriv) {
   
   d1 << -2, 4, 1;
   v1 << -2, 4, 1;
-   v1(0).d_ = 1.0;
-   v1(1).d_ = 1.0;
-   v1(2).d_ = 1.0;
+  v1(0).d_ = 1.0;
+  v1(1).d_ = 1.0;
+  v1(2).d_ = 1.0;
   d2 << 1, 3, -5, 4, -2, -1;
   v2 << 1, 3, -5, 4, -2, -1;
-   v2(0,0).d_ = 1.0;
-   v2(0,1).d_ = 1.0;
-   v2(1,0).d_ = 1.0;
-   v2(1,1).d_ = 1.0;
-   v2(2,0).d_ = 1.0;
-   v2(2,1).d_ = 1.0;
+  v2(0,0).d_ = 1.0;
+  v2(0,1).d_ = 1.0;
+  v2(1,0).d_ = 1.0;
+  v2(1,1).d_ = 1.0;
+  v2(2,0).d_ = 1.0;
+  v2(2,1).d_ = 1.0;
 
   vector_fv output;
   output = multiply(d1, v2);
@@ -1300,20 +1288,20 @@ TEST(AgradFwdMatrixOperatorMultiplication,fv_matrix_matrix_1stDeriv) {
   
   d1 << 9, 24, 3, 46, -9, -33;
   v1 << 9, 24, 3, 46, -9, -33;
-   v1(0,0).d_ = 1.0;
-   v1(0,1).d_ = 1.0;
-   v1(0,2).d_ = 1.0;
-   v1(1,0).d_ = 1.0;
-   v1(1,1).d_ = 1.0;
-   v1(1,2).d_ = 1.0;
+  v1(0,0).d_ = 1.0;
+  v1(0,1).d_ = 1.0;
+  v1(0,2).d_ = 1.0;
+  v1(1,0).d_ = 1.0;
+  v1(1,1).d_ = 1.0;
+  v1(1,2).d_ = 1.0;
   d2 << 1, 3, -5, 4, -2, -1;
   v2 << 1, 3, -5, 4, -2, -1;
-   v2(0,0).d_ = 1.0;
-   v2(0,1).d_ = 1.0;
-   v2(1,0).d_ = 1.0;
-   v2(1,1).d_ = 1.0;
-   v2(2,0).d_ = 1.0;
-   v2(2,1).d_ = 1.0;
+  v2(0,0).d_ = 1.0;
+  v2(0,1).d_ = 1.0;
+  v2(1,0).d_ = 1.0;
+  v2(1,1).d_ = 1.0;
+  v2(2,0).d_ = 1.0;
+  v2(2,1).d_ = 1.0;
 
   matrix_fv output = multiply(v1, v2);
   EXPECT_EQ(2, output.rows());
@@ -1366,20 +1354,20 @@ TEST(AgradFwdMatrixOperatorMultiplication,fv_matrix_matrix_2ndDeriv) {
   
   d1 << 9, 24, 3, 46, -9, -33;
   v1 << 9, 24, 3, 46, -9, -33;
-   v1(0,0).d_ = 1.0;
-   v1(0,1).d_ = 1.0;
-   v1(0,2).d_ = 1.0;
-   v1(1,0).d_ = 1.0;
-   v1(1,1).d_ = 1.0;
-   v1(1,2).d_ = 1.0;
+  v1(0,0).d_ = 1.0;
+  v1(0,1).d_ = 1.0;
+  v1(0,2).d_ = 1.0;
+  v1(1,0).d_ = 1.0;
+  v1(1,1).d_ = 1.0;
+  v1(1,2).d_ = 1.0;
   d2 << 1, 3, -5, 4, -2, -1;
   v2 << 1, 3, -5, 4, -2, -1;
-   v2(0,0).d_ = 1.0;
-   v2(0,1).d_ = 1.0;
-   v2(1,0).d_ = 1.0;
-   v2(1,1).d_ = 1.0;
-   v2(2,0).d_ = 1.0;
-   v2(2,1).d_ = 1.0;
+  v2(0,0).d_ = 1.0;
+  v2(0,1).d_ = 1.0;
+  v2(1,0).d_ = 1.0;
+  v2(1,1).d_ = 1.0;
+  v2(2,0).d_ = 1.0;
+  v2(2,1).d_ = 1.0;
 
   matrix_fv output;
   output = multiply(d1, v2);
@@ -2009,12 +1997,12 @@ TEST(AgradFwdMatrixOperatorMultiplication,ffv_vector_scalar_1stDeriv) {
   
   d1 << 100, 0, -3;
   v1 << 100, 0, -3;
-   v1(0).d_ = 1.0;  
-   v1(1).d_ = 1.0;
-   v1(2).d_ = 1.0;
+  v1(0).d_ = 1.0;  
+  v1(1).d_ = 1.0;
+  v1(2).d_ = 1.0;
   d2 = -2;
   v2 = -2;
-   v2.d_ = 1.0;  
+  v2.d_ = 1.0;  
 
   vector_ffv output;
   output = multiply(d1, v2);
@@ -2076,19 +2064,15 @@ TEST(AgradFwdMatrixOperatorMultiplication,ffv_vector_scalar_2ndDeriv_1) {
   using stan::math::vector_d;
   using stan::agrad::vector_ffv;
 
-  vector_d d1(3);
   vector_ffv v1(3);
-  double d2;
   fvar<fvar<var> > v2;
   
-  d1 << 100, 0, -3;
   v1 << 100, 0, -3;
-   v1(0).d_ = 1.0;  
-   v1(1).d_ = 1.0;
-   v1(2).d_ = 1.0;
-  d2 = -2;
+  v1(0).d_ = 1.0;  
+  v1(1).d_ = 1.0;
+  v1(2).d_ = 1.0;
   v2 = -2;
-   v2.d_ = 1.0;  
+  v2.d_ = 1.0;  
 
   vector_ffv output;
 
@@ -2105,19 +2089,15 @@ TEST(AgradFwdMatrixOperatorMultiplication,ffv_vector_scalar_2ndDeriv_2) {
   using stan::math::vector_d;
   using stan::agrad::vector_ffv;
 
-  vector_d d1(3);
   vector_ffv v1(3);
-  double d2;
   fvar<fvar<var> > v2;
   
-  d1 << 100, 0, -3;
   v1 << 100, 0, -3;
-   v1(0).d_ = 1.0;  
-   v1(1).d_ = 1.0;
-   v1(2).d_ = 1.0;
-  d2 = -2;
+  v1(0).d_ = 1.0;  
+  v1(1).d_ = 1.0;
+  v1(2).d_ = 1.0;
   v2 = -2;
-   v2.d_ = 1.0;  
+  v2.d_ = 1.0;  
 
   vector_ffv output;
 
@@ -2134,19 +2114,15 @@ TEST(AgradFwdMatrixOperatorMultiplication,ffv_vector_scalar_3rdDeriv) {
   using stan::math::vector_d;
   using stan::agrad::vector_ffv;
 
-  vector_d d1(3);
   vector_ffv v1(3);
-  double d2;
   fvar<fvar<var> > v2;
   
-  d1 << 100, 0, -3;
   v1 << 100, 0, -3;
-   v1(0).d_ = 1.0;  
-   v1(1).d_ = 1.0;
-   v1(2).d_ = 1.0;
-  d2 = -2;
+  v1(0).d_ = 1.0;  
+  v1(1).d_ = 1.0;
+  v1(2).d_ = 1.0;
   v2 = -2;
-   v2.d_ = 1.0;  
+  v2.d_ = 1.0;  
 
   vector_ffv output;
 
@@ -2171,12 +2147,12 @@ TEST(AgradFwdMatrixOperatorMultiplication,ffv_rowvector_scalar_1stDeriv) {
   
   d1 << 100, 0, -3;
   v1 << 100, 0, -3;
-   v1(0).d_ = 1.0;  
-   v1(1).d_ = 1.0;
-   v1(2).d_ = 1.0;
+  v1(0).d_ = 1.0;  
+  v1(1).d_ = 1.0;
+  v1(2).d_ = 1.0;
   d2 = -2;
   v2 = -2;
-   v2.d_ = 1.0;
+  v2.d_ = 1.0;
   
   row_vector_ffv output;
   output = multiply(d1, v2);
@@ -2238,19 +2214,15 @@ TEST(AgradFwdMatrixOperatorMultiplication,ffv_rowvector_scalar_2ndDeriv_1) {
   using stan::math::row_vector_d;
   using stan::agrad::row_vector_ffv;
 
-  row_vector_d d1(3);
   row_vector_ffv v1(3);
-  double d2;
   fvar<fvar<var> > v2;
   
-  d1 << 100, 0, -3;
   v1 << 100, 0, -3;
-   v1(0).d_ = 1.0;  
-   v1(1).d_ = 1.0;
-   v1(2).d_ = 1.0;
-  d2 = -2;
+  v1(0).d_ = 1.0;  
+  v1(1).d_ = 1.0;
+  v1(2).d_ = 1.0;
   v2 = -2;
-   v2.d_ = 1.0;
+  v2.d_ = 1.0;
   
   row_vector_ffv output;
 
@@ -2267,19 +2239,15 @@ TEST(AgradFwdMatrixOperatorMultiplication,ffv_rowvector_scalar_2ndDeriv_2) {
   using stan::math::row_vector_d;
   using stan::agrad::row_vector_ffv;
 
-  row_vector_d d1(3);
   row_vector_ffv v1(3);
-  double d2;
   fvar<fvar<var> > v2;
   
-  d1 << 100, 0, -3;
   v1 << 100, 0, -3;
-   v1(0).d_ = 1.0;  
-   v1(1).d_ = 1.0;
-   v1(2).d_ = 1.0;
-  d2 = -2;
+  v1(0).d_ = 1.0;  
+  v1(1).d_ = 1.0;
+  v1(2).d_ = 1.0;
   v2 = -2;
-   v2.d_ = 1.0;
+  v2.d_ = 1.0;
   
   row_vector_ffv output;
 
@@ -2296,19 +2264,15 @@ TEST(AgradFwdMatrixOperatorMultiplication,ffv_rowvector_scalar_3rdDeriv) {
   using stan::math::row_vector_d;
   using stan::agrad::row_vector_ffv;
 
-  row_vector_d d1(3);
   row_vector_ffv v1(3);
-  double d2;
   fvar<fvar<var> > v2;
   
-  d1 << 100, 0, -3;
   v1 << 100, 0, -3;
-   v1(0).d_ = 1.0;  
-   v1(1).d_ = 1.0;
-   v1(2).d_ = 1.0;
-  d2 = -2;
+  v1(0).d_ = 1.0;  
+  v1(1).d_ = 1.0;
+  v1(2).d_ = 1.0;
   v2 = -2;
-   v2.d_ = 1.0;
+  v2.d_ = 1.0;
   
   row_vector_ffv output;
 
@@ -2332,13 +2296,13 @@ TEST(AgradFwdMatrixOperatorMultiplication,ffv_matrix_scalar_1stDeriv) {
   
   d1 << 100, 0, -3, 4;
   v1 << 100, 0, -3, 4;
-   v1(0,0).d_ = 1.0; 
-   v1(0,1).d_ = 1.0; 
-   v1(1,0).d_ = 1.0; 
-   v1(1,1).d_ = 1.0; 
+  v1(0,0).d_ = 1.0; 
+  v1(0,1).d_ = 1.0; 
+  v1(1,0).d_ = 1.0; 
+  v1(1,1).d_ = 1.0; 
   d2 = -2;
   v2 = -2;
-   v2.d_ = 1.0;
+  v2.d_ = 1.0;
 
   matrix_ffv output;
   output = multiply(d1, v2);
@@ -2413,20 +2377,16 @@ TEST(AgradFwdMatrixOperatorMultiplication,ffv_matrix_scalar_2ndDeriv_1) {
   using stan::math::matrix_d;
   using stan::agrad::matrix_ffv;
   
-  matrix_d d1(2,2);
   matrix_ffv v1(2,2);
-  double d2;
   fvar<fvar<var> > v2;
   
-  d1 << 100, 0, -3, 4;
   v1 << 100, 0, -3, 4;
-   v1(0,0).d_ = 1.0; 
-   v1(0,1).d_ = 1.0; 
-   v1(1,0).d_ = 1.0; 
-   v1(1,1).d_ = 1.0; 
-  d2 = -2;
+  v1(0,0).d_ = 1.0; 
+  v1(0,1).d_ = 1.0; 
+  v1(1,0).d_ = 1.0; 
+  v1(1,1).d_ = 1.0; 
   v2 = -2;
-   v2.d_ = 1.0;
+  v2.d_ = 1.0;
 
   matrix_ffv output;
   output = multiply(v2, v1);
@@ -2443,20 +2403,16 @@ TEST(AgradFwdMatrixOperatorMultiplication,ffv_matrix_scalar_2ndDeriv_2) {
   using stan::math::matrix_d;
   using stan::agrad::matrix_ffv;
   
-  matrix_d d1(2,2);
   matrix_ffv v1(2,2);
-  double d2;
   fvar<fvar<var> > v2;
   
-  d1 << 100, 0, -3, 4;
   v1 << 100, 0, -3, 4;
-   v1(0,0).d_ = 1.0; 
-   v1(0,1).d_ = 1.0; 
-   v1(1,0).d_ = 1.0; 
-   v1(1,1).d_ = 1.0; 
-  d2 = -2;
+  v1(0,0).d_ = 1.0; 
+  v1(0,1).d_ = 1.0; 
+  v1(1,0).d_ = 1.0; 
+  v1(1,1).d_ = 1.0; 
   v2 = -2;
-   v2.d_ = 1.0;
+  v2.d_ = 1.0;
 
   matrix_ffv output;
   output = multiply(v2, v1);
@@ -2473,20 +2429,16 @@ TEST(AgradFwdMatrixOperatorMultiplication,ffv_matrix_scalar_3rdDeriv) {
   using stan::math::matrix_d;
   using stan::agrad::matrix_ffv;
   
-  matrix_d d1(2,2);
   matrix_ffv v1(2,2);
-  double d2;
   fvar<fvar<var> > v2;
   
-  d1 << 100, 0, -3, 4;
   v1 << 100, 0, -3, 4;
-   v1(0,0).d_ = 1.0; 
-   v1(0,1).d_ = 1.0; 
-   v1(1,0).d_ = 1.0; 
-   v1(1,1).d_ = 1.0; 
-  d2 = -2;
+  v1(0,0).d_ = 1.0; 
+  v1(0,1).d_ = 1.0; 
+  v1(1,0).d_ = 1.0; 
+  v1(1,1).d_ = 1.0; 
   v2 = -2;
-   v2.d_ = 1.0;
+  v2.d_ = 1.0;
 
   matrix_ffv output;
   output = multiply(v2, v1);
@@ -2512,14 +2464,14 @@ TEST(AgradFwdMatrixOperatorMultiplication,ffv_rowvector_vector_1stDeriv) {
   
   d1 << 1, 3, -5;
   v1 << 1, 3, -5;
-   v1(0).d_ = 1.0;
-   v1(1).d_ = 1.0;
-   v1(2).d_ = 1.0;
+  v1(0).d_ = 1.0;
+  v1(1).d_ = 1.0;
+  v1(2).d_ = 1.0;
   d2 << 4, -2, -1;
   v2 << 4, -2, -1;
-   v2(0).d_ = 1.0;
-   v2(1).d_ = 1.0;
-   v2(2).d_ = 1.0;
+  v2(0).d_ = 1.0;
+  v2(1).d_ = 1.0;
+  v2(2).d_ = 1.0;
 
   EXPECT_FLOAT_EQ( 3, multiply(v1, v2).val_.val().val());
   EXPECT_FLOAT_EQ( 3, multiply(v1, d2).val_.val().val());
@@ -2554,14 +2506,14 @@ TEST(AgradFwdMatrixOperatorMultiplication,ffv_rowvector_vector_2ndDeriv_1) {
   
   d1 << 1, 3, -5;
   v1 << 1, 3, -5;
-   v1(0).d_ = 1.0;
-   v1(1).d_ = 1.0;
-   v1(2).d_ = 1.0;
+  v1(0).d_ = 1.0;
+  v1(1).d_ = 1.0;
+  v1(2).d_ = 1.0;
   d2 << 4, -2, -1;
   v2 << 4, -2, -1;
-   v2(0).d_ = 1.0;
-   v2(1).d_ = 1.0;
-   v2(2).d_ = 1.0;
+  v2(0).d_ = 1.0;
+  v2(1).d_ = 1.0;
+  v2(2).d_ = 1.0;
 
   AVEC q = createAVEC(v1(0).val().val(),v1(1).val().val(),v1(2).val().val());
   VEC h;
@@ -2583,14 +2535,14 @@ TEST(AgradFwdMatrixOperatorMultiplication,ffv_rowvector_vector_2ndDeriv_2) {
   
   d1 << 1, 3, -5;
   v1 << 1, 3, -5;
-   v1(0).d_ = 1.0;
-   v1(1).d_ = 1.0;
-   v1(2).d_ = 1.0;
+  v1(0).d_ = 1.0;
+  v1(1).d_ = 1.0;
+  v1(2).d_ = 1.0;
   d2 << 4, -2, -1;
   v2 << 4, -2, -1;
-   v2(0).d_ = 1.0;
-   v2(1).d_ = 1.0;
-   v2(2).d_ = 1.0;
+  v2(0).d_ = 1.0;
+  v2(1).d_ = 1.0;
+  v2(2).d_ = 1.0;
 
   AVEC q = createAVEC(v1(0).val().val(),v1(1).val().val(),v1(2).val().val());
   VEC h;
@@ -2612,14 +2564,14 @@ TEST(AgradFwdMatrixOperatorMultiplication,ffv_rowvector_vector_3rdDeriv) {
   
   d1 << 1, 3, -5;
   v1 << 1, 3, -5;
-   v1(0).d_ = 1.0;
-   v1(1).d_ = 1.0;
-   v1(2).d_ = 1.0;
+  v1(0).d_ = 1.0;
+  v1(1).d_ = 1.0;
+  v1(2).d_ = 1.0;
   d2 << 4, -2, -1;
   v2 << 4, -2, -1;
-   v2(0).d_ = 1.0;
-   v2(1).d_ = 1.0;
-   v2(2).d_ = 1.0;
+  v2(0).d_ = 1.0;
+  v2(1).d_ = 1.0;
+  v2(2).d_ = 1.0;
 
   AVEC q = createAVEC(v1(0).val().val(),v1(1).val().val(),v1(2).val().val());
   VEC h;
@@ -2642,14 +2594,14 @@ TEST(AgradFwdMatrixOperatorMultiplication,ffv_vector_rowvector_1stDeriv) {
   
   d1 << 1, 3, -5;
   v1 << 1, 3, -5;
-   v1(0).d_ = 1.0;
-   v1(1).d_ = 1.0;
-   v1(2).d_ = 1.0;
+  v1(0).d_ = 1.0;
+  v1(1).d_ = 1.0;
+  v1(2).d_ = 1.0;
   d2 << 4, -2, -1;
   v2 << 4, -2, -1;
-   v2(0).d_ = 1.0;
-   v2(1).d_ = 1.0;
-   v2(2).d_ = 1.0;
+  v2(0).d_ = 1.0;
+  v2(1).d_ = 1.0;
+  v2(2).d_ = 1.0;
 
   matrix_ffv output = multiply(v1, v2);
   EXPECT_EQ(3, output.rows());
@@ -2738,16 +2690,16 @@ TEST(AgradFwdMatrixOperatorMultiplication,ffv_vector_rowvector_2ndDeriv_1) {
   
   d1 << 1, 3, -5;
   v1 << 1, 3, -5;
-   v1(0).d_ = 1.0;
-   v1(1).d_ = 1.0;
-   v1(2).d_ = 1.0;
+  v1(0).d_ = 1.0;
+  v1(1).d_ = 1.0;
+  v1(2).d_ = 1.0;
   d2 << 4, -2, -1;
   v2 << 4, -2, -1;
-   v2(0).d_ = 1.0;
-   v2(1).d_ = 1.0;
-   v2(2).d_ = 1.0;
+  v2(0).d_ = 1.0;
+  v2(1).d_ = 1.0;
+  v2(2).d_ = 1.0;
 
-   matrix_ffv output;
+  matrix_ffv output;
   output = multiply(d1, v2);
 
 
@@ -2772,16 +2724,16 @@ TEST(AgradFwdMatrixOperatorMultiplication,ffv_vector_rowvector_2ndDeriv_2) {
   
   d1 << 1, 3, -5;
   v1 << 1, 3, -5;
-   v1(0).d_ = 1.0;
-   v1(1).d_ = 1.0;
-   v1(2).d_ = 1.0;
+  v1(0).d_ = 1.0;
+  v1(1).d_ = 1.0;
+  v1(2).d_ = 1.0;
   d2 << 4, -2, -1;
   v2 << 4, -2, -1;
-   v2(0).d_ = 1.0;
-   v2(1).d_ = 1.0;
-   v2(2).d_ = 1.0;
+  v2(0).d_ = 1.0;
+  v2(1).d_ = 1.0;
+  v2(2).d_ = 1.0;
 
-   matrix_ffv output;
+  matrix_ffv output;
   output = multiply(d1, v2);
 
 
@@ -2806,16 +2758,16 @@ TEST(AgradFwdMatrixOperatorMultiplication,ffv_vector_rowvector_3rdDeriv) {
   
   d1 << 1, 3, -5;
   v1 << 1, 3, -5;
-   v1(0).d_ = 1.0;
-   v1(1).d_ = 1.0;
-   v1(2).d_ = 1.0;
+  v1(0).d_ = 1.0;
+  v1(1).d_ = 1.0;
+  v1(2).d_ = 1.0;
   d2 << 4, -2, -1;
   v2 << 4, -2, -1;
-   v2(0).d_ = 1.0;
-   v2(1).d_ = 1.0;
-   v2(2).d_ = 1.0;
+  v2(0).d_ = 1.0;
+  v2(1).d_ = 1.0;
+  v2(2).d_ = 1.0;
 
-   matrix_ffv output;
+  matrix_ffv output;
   output = multiply(d1, v2);
 
 
@@ -2839,16 +2791,16 @@ TEST(AgradFwdMatrixOperatorMultiplication,ffv_matrix_vector_1stDeriv) {
   
   d1 << 1, 3, -5, 4, -2, -1;
   v1 << 1, 3, -5, 4, -2, -1;
-   v1(0,0).d_ = 1.0;
-   v1(0,1).d_ = 1.0;
-   v1(1,0).d_ = 1.0;
-   v1(1,1).d_ = 1.0;
-   v1(2,0).d_ = 1.0;
-   v1(2,1).d_ = 1.0;
+  v1(0,0).d_ = 1.0;
+  v1(0,1).d_ = 1.0;
+  v1(1,0).d_ = 1.0;
+  v1(1,1).d_ = 1.0;
+  v1(2,0).d_ = 1.0;
+  v1(2,1).d_ = 1.0;
   d2 << -2, 4;
   v2 << -2, 4;
-   v2(0).d_ = 1.0;
-   v2(1).d_ = 1.0;
+  v2(0).d_ = 1.0;
+  v2(1).d_ = 1.0;
 
   vector_ffv output = multiply(v1, v2);
   EXPECT_EQ(3, output.size());
@@ -2899,16 +2851,16 @@ TEST(AgradFwdMatrixOperatorMultiplication,ffv_matrix_vector_2ndDeriv_1) {
   
   d1 << 1, 3, -5, 4, -2, -1;
   v1 << 1, 3, -5, 4, -2, -1;
-   v1(0,0).d_ = 1.0;
-   v1(0,1).d_ = 1.0;
-   v1(1,0).d_ = 1.0;
-   v1(1,1).d_ = 1.0;
-   v1(2,0).d_ = 1.0;
-   v1(2,1).d_ = 1.0;
+  v1(0,0).d_ = 1.0;
+  v1(0,1).d_ = 1.0;
+  v1(1,0).d_ = 1.0;
+  v1(1,1).d_ = 1.0;
+  v1(2,0).d_ = 1.0;
+  v1(2,1).d_ = 1.0;
   d2 << -2, 4;
   v2 << -2, 4;
-   v2(0).d_ = 1.0;
-   v2(1).d_ = 1.0;
+  v2(0).d_ = 1.0;
+  v2(1).d_ = 1.0;
 
   vector_ffv output;
   output = multiply(v1, d2);
@@ -2934,16 +2886,16 @@ TEST(AgradFwdMatrixOperatorMultiplication,ffv_matrix_vector_2ndDeriv_2) {
   
   d1 << 1, 3, -5, 4, -2, -1;
   v1 << 1, 3, -5, 4, -2, -1;
-   v1(0,0).d_ = 1.0;
-   v1(0,1).d_ = 1.0;
-   v1(1,0).d_ = 1.0;
-   v1(1,1).d_ = 1.0;
-   v1(2,0).d_ = 1.0;
-   v1(2,1).d_ = 1.0;
+  v1(0,0).d_ = 1.0;
+  v1(0,1).d_ = 1.0;
+  v1(1,0).d_ = 1.0;
+  v1(1,1).d_ = 1.0;
+  v1(2,0).d_ = 1.0;
+  v1(2,1).d_ = 1.0;
   d2 << -2, 4;
   v2 << -2, 4;
-   v2(0).d_ = 1.0;
-   v2(1).d_ = 1.0;
+  v2(0).d_ = 1.0;
+  v2(1).d_ = 1.0;
 
   vector_ffv output;
   output = multiply(v1, d2);
@@ -2969,16 +2921,16 @@ TEST(AgradFwdMatrixOperatorMultiplication,ffv_matrix_vector_3rdDeriv) {
   
   d1 << 1, 3, -5, 4, -2, -1;
   v1 << 1, 3, -5, 4, -2, -1;
-   v1(0,0).d_ = 1.0;
-   v1(0,1).d_ = 1.0;
-   v1(1,0).d_ = 1.0;
-   v1(1,1).d_ = 1.0;
-   v1(2,0).d_ = 1.0;
-   v1(2,1).d_ = 1.0;
+  v1(0,0).d_ = 1.0;
+  v1(0,1).d_ = 1.0;
+  v1(1,0).d_ = 1.0;
+  v1(1,1).d_ = 1.0;
+  v1(2,0).d_ = 1.0;
+  v1(2,1).d_ = 1.0;
   d2 << -2, 4;
   v2 << -2, 4;
-   v2(0).d_ = 1.0;
-   v2(1).d_ = 1.0;
+  v2(0).d_ = 1.0;
+  v2(1).d_ = 1.0;
 
   vector_ffv output;
   output = multiply(v1, d2);
@@ -3019,17 +2971,17 @@ TEST(AgradFwdMatrixOperatorMultiplication,ffv_rowvector_matrix_1stDeriv) {
   
   d1 << -2, 4, 1;
   v1 << -2, 4, 1;
-   v1(0).d_ = 1.0;
-   v1(1).d_ = 1.0;
-   v1(2).d_ = 1.0;
+  v1(0).d_ = 1.0;
+  v1(1).d_ = 1.0;
+  v1(2).d_ = 1.0;
   d2 << 1, 3, -5, 4, -2, -1;
   v2 << 1, 3, -5, 4, -2, -1;
-   v2(0,0).d_ = 1.0;
-   v2(0,1).d_ = 1.0;
-   v2(1,0).d_ = 1.0;
-   v2(1,1).d_ = 1.0;
-   v2(2,0).d_ = 1.0;
-   v2(2,1).d_ = 1.0;
+  v2(0,0).d_ = 1.0;
+  v2(0,1).d_ = 1.0;
+  v2(1,0).d_ = 1.0;
+  v2(1,1).d_ = 1.0;
+  v2(2,0).d_ = 1.0;
+  v2(2,1).d_ = 1.0;
 
   vector_ffv output = multiply(v1, v2);
   EXPECT_EQ(2, output.size());
@@ -3074,17 +3026,17 @@ TEST(AgradFwdMatrixOperatorMultiplication,ffv_rowvector_matrix_2ndDeriv_1) {
   
   d1 << -2, 4, 1;
   v1 << -2, 4, 1;
-   v1(0).d_ = 1.0;
-   v1(1).d_ = 1.0;
-   v1(2).d_ = 1.0;
+  v1(0).d_ = 1.0;
+  v1(1).d_ = 1.0;
+  v1(2).d_ = 1.0;
   d2 << 1, 3, -5, 4, -2, -1;
   v2 << 1, 3, -5, 4, -2, -1;
-   v2(0,0).d_ = 1.0;
-   v2(0,1).d_ = 1.0;
-   v2(1,0).d_ = 1.0;
-   v2(1,1).d_ = 1.0;
-   v2(2,0).d_ = 1.0;
-   v2(2,1).d_ = 1.0;
+  v2(0,0).d_ = 1.0;
+  v2(0,1).d_ = 1.0;
+  v2(1,0).d_ = 1.0;
+  v2(1,1).d_ = 1.0;
+  v2(2,0).d_ = 1.0;
+  v2(2,1).d_ = 1.0;
 
   vector_ffv output;
   output = multiply(d1, v2);
@@ -3111,17 +3063,17 @@ TEST(AgradFwdMatrixOperatorMultiplication,ffv_rowvector_matrix_2ndDeriv_2) {
   
   d1 << -2, 4, 1;
   v1 << -2, 4, 1;
-   v1(0).d_ = 1.0;
-   v1(1).d_ = 1.0;
-   v1(2).d_ = 1.0;
+  v1(0).d_ = 1.0;
+  v1(1).d_ = 1.0;
+  v1(2).d_ = 1.0;
   d2 << 1, 3, -5, 4, -2, -1;
   v2 << 1, 3, -5, 4, -2, -1;
-   v2(0,0).d_ = 1.0;
-   v2(0,1).d_ = 1.0;
-   v2(1,0).d_ = 1.0;
-   v2(1,1).d_ = 1.0;
-   v2(2,0).d_ = 1.0;
-   v2(2,1).d_ = 1.0;
+  v2(0,0).d_ = 1.0;
+  v2(0,1).d_ = 1.0;
+  v2(1,0).d_ = 1.0;
+  v2(1,1).d_ = 1.0;
+  v2(2,0).d_ = 1.0;
+  v2(2,1).d_ = 1.0;
 
   vector_ffv output;
   output = multiply(d1, v2);
@@ -3148,17 +3100,17 @@ TEST(AgradFwdMatrixOperatorMultiplication,ffv_rowvector_matrix_3rdDeriv) {
   
   d1 << -2, 4, 1;
   v1 << -2, 4, 1;
-   v1(0).d_ = 1.0;
-   v1(1).d_ = 1.0;
-   v1(2).d_ = 1.0;
+  v1(0).d_ = 1.0;
+  v1(1).d_ = 1.0;
+  v1(2).d_ = 1.0;
   d2 << 1, 3, -5, 4, -2, -1;
   v2 << 1, 3, -5, 4, -2, -1;
-   v2(0,0).d_ = 1.0;
-   v2(0,1).d_ = 1.0;
-   v2(1,0).d_ = 1.0;
-   v2(1,1).d_ = 1.0;
-   v2(2,0).d_ = 1.0;
-   v2(2,1).d_ = 1.0;
+  v2(0,0).d_ = 1.0;
+  v2(0,1).d_ = 1.0;
+  v2(1,0).d_ = 1.0;
+  v2(1,1).d_ = 1.0;
+  v2(2,0).d_ = 1.0;
+  v2(2,1).d_ = 1.0;
 
   vector_ffv output;
   output = multiply(d1, v2);
@@ -3196,20 +3148,20 @@ TEST(AgradFwdMatrixOperatorMultiplication,ffv_matrix_matrix_1stDeriv) {
   
   d1 << 9, 24, 3, 46, -9, -33;
   v1 << 9, 24, 3, 46, -9, -33;
-   v1(0,0).d_ = 1.0;
-   v1(0,1).d_ = 1.0;
-   v1(0,2).d_ = 1.0;
-   v1(1,0).d_ = 1.0;
-   v1(1,1).d_ = 1.0;
-   v1(1,2).d_ = 1.0;
+  v1(0,0).d_ = 1.0;
+  v1(0,1).d_ = 1.0;
+  v1(0,2).d_ = 1.0;
+  v1(1,0).d_ = 1.0;
+  v1(1,1).d_ = 1.0;
+  v1(1,2).d_ = 1.0;
   d2 << 1, 3, -5, 4, -2, -1;
   v2 << 1, 3, -5, 4, -2, -1;
-   v2(0,0).d_ = 1.0;
-   v2(0,1).d_ = 1.0;
-   v2(1,0).d_ = 1.0;
-   v2(1,1).d_ = 1.0;
-   v2(2,0).d_ = 1.0;
-   v2(2,1).d_ = 1.0;
+  v2(0,0).d_ = 1.0;
+  v2(0,1).d_ = 1.0;
+  v2(1,0).d_ = 1.0;
+  v2(1,1).d_ = 1.0;
+  v2(2,0).d_ = 1.0;
+  v2(2,1).d_ = 1.0;
 
   matrix_ffv output = multiply(v1, v2);
   EXPECT_EQ(2, output.rows());
@@ -3262,20 +3214,20 @@ TEST(AgradFwdMatrixOperatorMultiplication,ffv_matrix_matrix_2ndDeriv_1) {
   
   d1 << 9, 24, 3, 46, -9, -33;
   v1 << 9, 24, 3, 46, -9, -33;
-   v1(0,0).d_ = 1.0;
-   v1(0,1).d_ = 1.0;
-   v1(0,2).d_ = 1.0;
-   v1(1,0).d_ = 1.0;
-   v1(1,1).d_ = 1.0;
-   v1(1,2).d_ = 1.0;
+  v1(0,0).d_ = 1.0;
+  v1(0,1).d_ = 1.0;
+  v1(0,2).d_ = 1.0;
+  v1(1,0).d_ = 1.0;
+  v1(1,1).d_ = 1.0;
+  v1(1,2).d_ = 1.0;
   d2 << 1, 3, -5, 4, -2, -1;
   v2 << 1, 3, -5, 4, -2, -1;
-   v2(0,0).d_ = 1.0;
-   v2(0,1).d_ = 1.0;
-   v2(1,0).d_ = 1.0;
-   v2(1,1).d_ = 1.0;
-   v2(2,0).d_ = 1.0;
-   v2(2,1).d_ = 1.0;
+  v2(0,0).d_ = 1.0;
+  v2(0,1).d_ = 1.0;
+  v2(1,0).d_ = 1.0;
+  v2(1,1).d_ = 1.0;
+  v2(2,0).d_ = 1.0;
+  v2(2,1).d_ = 1.0;
 
   matrix_ffv output;
   output = multiply(d1, v2);
@@ -3298,20 +3250,20 @@ TEST(AgradFwdMatrixOperatorMultiplication,ffv_matrix_matrix_2ndDeriv_2) {
   
   d1 << 9, 24, 3, 46, -9, -33;
   v1 << 9, 24, 3, 46, -9, -33;
-   v1(0,0).d_ = 1.0;
-   v1(0,1).d_ = 1.0;
-   v1(0,2).d_ = 1.0;
-   v1(1,0).d_ = 1.0;
-   v1(1,1).d_ = 1.0;
-   v1(1,2).d_ = 1.0;
+  v1(0,0).d_ = 1.0;
+  v1(0,1).d_ = 1.0;
+  v1(0,2).d_ = 1.0;
+  v1(1,0).d_ = 1.0;
+  v1(1,1).d_ = 1.0;
+  v1(1,2).d_ = 1.0;
   d2 << 1, 3, -5, 4, -2, -1;
   v2 << 1, 3, -5, 4, -2, -1;
-   v2(0,0).d_ = 1.0;
-   v2(0,1).d_ = 1.0;
-   v2(1,0).d_ = 1.0;
-   v2(1,1).d_ = 1.0;
-   v2(2,0).d_ = 1.0;
-   v2(2,1).d_ = 1.0;
+  v2(0,0).d_ = 1.0;
+  v2(0,1).d_ = 1.0;
+  v2(1,0).d_ = 1.0;
+  v2(1,1).d_ = 1.0;
+  v2(2,0).d_ = 1.0;
+  v2(2,1).d_ = 1.0;
 
   matrix_ffv output;
   output = multiply(d1, v2);
@@ -3334,20 +3286,20 @@ TEST(AgradFwdMatrixOperatorMultiplication,ffv_matrix_matrix_3rdDeriv) {
   
   d1 << 9, 24, 3, 46, -9, -33;
   v1 << 9, 24, 3, 46, -9, -33;
-   v1(0,0).d_ = 1.0;
-   v1(0,1).d_ = 1.0;
-   v1(0,2).d_ = 1.0;
-   v1(1,0).d_ = 1.0;
-   v1(1,1).d_ = 1.0;
-   v1(1,2).d_ = 1.0;
+  v1(0,0).d_ = 1.0;
+  v1(0,1).d_ = 1.0;
+  v1(0,2).d_ = 1.0;
+  v1(1,0).d_ = 1.0;
+  v1(1,1).d_ = 1.0;
+  v1(1,2).d_ = 1.0;
   d2 << 1, 3, -5, 4, -2, -1;
   v2 << 1, 3, -5, 4, -2, -1;
-   v2(0,0).d_ = 1.0;
-   v2(0,1).d_ = 1.0;
-   v2(1,0).d_ = 1.0;
-   v2(1,1).d_ = 1.0;
-   v2(2,0).d_ = 1.0;
-   v2(2,1).d_ = 1.0;
+  v2(0,0).d_ = 1.0;
+  v2(0,1).d_ = 1.0;
+  v2(1,0).d_ = 1.0;
+  v2(1,1).d_ = 1.0;
+  v2(2,0).d_ = 1.0;
+  v2(2,1).d_ = 1.0;
 
   matrix_ffv output;
   output = multiply(d1, v2);

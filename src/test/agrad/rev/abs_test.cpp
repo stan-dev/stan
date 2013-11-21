@@ -34,7 +34,7 @@ TEST(AgradRev,abs_var_3) {
   AVEC x = createAVEC(a);
   VEC g;
   f.grad(x,g);
-  EXPECT_EQ(1,g.size());
+  EXPECT_EQ(1U,g.size());
   EXPECT_FLOAT_EQ(0.0, g[0]);
 }
 
@@ -71,6 +71,6 @@ TEST(AgradRev,abs_NaN) {
   f.grad(x,g);
   
   EXPECT_TRUE(boost::math::isnan(f.val()));
-  ASSERT_EQ(1,g.size());
+  ASSERT_EQ(1U,g.size());
   EXPECT_TRUE(boost::math::isnan(g[0]));
 }
