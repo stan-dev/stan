@@ -22,19 +22,17 @@ namespace stan {
       
     public:
       
-    diag_e_nuts(M &m, BaseRNG& rng, std::ostream* o = &std::cout, std::ostream* e = 0):
-    base_nuts<M, diag_e_point, diag_e_metric, expl_leapfrog, BaseRNG>(m, rng, o, e)
-    { this->_name = "NUTS with a diagonal Euclidean metric"; }
-      
-    private:
+      diag_e_nuts(M &m, BaseRNG& rng, std::ostream* o = &std::cout, std::ostream* e = 0):
+      base_nuts<M, diag_e_point, diag_e_metric, expl_leapfrog, BaseRNG>(m, rng, o, e)
+      { this->_name = "NUTS with a diagonal Euclidean metric"; }
       
       // Note that the points don't need to be swapped
       // here since start.mInv = finish.mInv
-      bool _compute_criterion(ps_point& start, 
-                              diag_e_point& finish, 
-                              Eigen::VectorXd& rho) {
-        return rho.dot( finish.mInv.cwiseProduct(finish.p) )   > 0
-            && rho.dot( finish.mInv.cwiseProduct(start.p) ) > 0;
+      bool compute_criterion(ps_point& start, 
+                             diag_e_point& finish,
+                             Eigen::VectorXd& rho) {
+        return finish.mInv.cwiseProduct(finish.p).dot(rho - finish.p) > 0
+               && finish.mInv.cwiseProduct(start.p).dot(rho - start.p) > 0;
       }
                                           
     };

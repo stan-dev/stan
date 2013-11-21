@@ -1,4 +1,4 @@
-#include <stan/agrad/rev/matrix/ldlt.hpp>
+#include <stan/agrad/rev/matrix/log_determinant_ldlt.hpp>
 #include <gtest/gtest.h>
 #include <stan/agrad/rev/matrix/log_determinant_spd.hpp>
 #include <test/agrad/util.hpp>

@@ -13,7 +13,7 @@ namespace stan {
 
     namespace {
 
-     class log_falling_factorial_vv_vari : public op_vv_vari {
+      class log_falling_factorial_vv_vari : public op_vv_vari {
       public:
         log_falling_factorial_vv_vari(vari* avi, vari* bvi) :
           op_vv_vari(stan::math::log_falling_factorial(avi->val_, bvi->val_), avi, bvi) {
@@ -46,17 +46,17 @@ namespace stan {
     }
 
     inline var log_falling_factorial(const var& a, 
-                                 const double& b) {
+                                     const double& b) {
       return var(new log_falling_factorial_vd_vari(a.vi_, b));
     }
 
     inline var log_falling_factorial(const var& a, 
-                                 const var& b) {
+                                     const var& b) {
       return var(new log_falling_factorial_vv_vari(a.vi_, b.vi_));
     }
 
     inline var log_falling_factorial(const double& a, 
-                                 const var& b) {
+                                     const var& b) {
       return var(new log_falling_factorial_dv_vari(a, b.vi_));
     }
   }

@@ -13,7 +13,7 @@ namespace stan {
 
     namespace {
 
-     class rising_factorial_vv_vari : public op_vv_vari {
+      class rising_factorial_vv_vari : public op_vv_vari {
       public:
         rising_factorial_vv_vari(vari* avi, vari* bvi) :
           op_vv_vari(stan::math::rising_factorial(avi->val_, bvi->val_), avi, bvi) {
@@ -46,17 +46,17 @@ namespace stan {
     }
 
     inline var rising_factorial(const var& a, 
-                                 const double& b) {
+                                const double& b) {
       return var(new rising_factorial_vd_vari(a.vi_, b));
     }
 
     inline var rising_factorial(const var& a, 
-                                 const var& b) {
+                                const var& b) {
       return var(new rising_factorial_vv_vari(a.vi_, b.vi_));
     }
 
     inline var rising_factorial(const double& a, 
-                                 const var& b) {
+                                const var& b) {
       return var(new rising_factorial_dv_vari(a, b.vi_));
     }
   }

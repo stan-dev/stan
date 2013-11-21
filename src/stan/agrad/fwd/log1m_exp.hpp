@@ -16,11 +16,12 @@ namespace stan{
     fvar<T>
     log1m_exp(const fvar<T>& x) {
       using stan::math::log1m_exp;
+      using boost::math::expm1;
       using stan::math::NOT_A_NUMBER;
       using std::exp;
       if (x.val_ >= 0)
         return fvar<T>(NOT_A_NUMBER);
-      return fvar<T>(log1m_exp(x.val_), x.d_ / - boost::math::expm1(-x.val_));
+      return fvar<T>(log1m_exp(x.val_), x.d_ / -expm1(-x.val_));
     }
   }
 }

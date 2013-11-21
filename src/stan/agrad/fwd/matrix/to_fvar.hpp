@@ -26,9 +26,9 @@ namespace stan {
     }
 
     inline 
-    matrix_fv 
+    matrix_fd
     to_fvar(const stan::math::matrix_d& m) {
-      matrix_fv m_v(m.rows(), m.cols());
+      matrix_fd m_v(m.rows(), m.cols());
       for (int j = 0; j < m.cols(); ++j)
         for (int i = 0; i < m.rows(); ++i)
           m_v(i,j) = m(i,j);
@@ -36,38 +36,92 @@ namespace stan {
     }
 
     inline 
-    matrix_fv 
+    matrix_fd
+    to_fvar(const matrix_fd& m) {
+      return m;
+    }
+
+    inline 
+    matrix_fv
     to_fvar(const matrix_fv& m) {
       return m;
     }
 
+    inline 
+    matrix_ffd
+    to_fvar(const matrix_ffd& m) {
+      return m;
+    }
+
+    inline 
+    matrix_ffv 
+    to_fvar(const matrix_ffv& m) {
+      return m;
+    }
+
     inline
-    vector_fv 
+    vector_fd
     to_fvar(const stan::math::vector_d& v) {
-      vector_fv v_v(v.size());
+      vector_fd v_v(v.size());
       for (int i = 0; i < v.size(); ++i)
         v_v[i] = v[i];
       return v_v;
     }
 
     inline 
-    vector_fv 
+    vector_fd
+    to_fvar(const vector_fd& v) {
+      return v;
+    }
+
+    inline 
+    vector_fv
     to_fvar(const vector_fv& v) {
       return v;
     }
 
     inline 
-    row_vector_fv 
+    vector_ffd
+    to_fvar(const vector_ffd& v) {
+      return v;
+    }
+
+    inline 
+    vector_ffv 
+    to_fvar(const vector_ffv& v) {
+      return v;
+    }
+
+    inline 
+    row_vector_fd 
     to_fvar(const stan::math::row_vector_d& rv) {
-      row_vector_fv rv_v(rv.size());
+      row_vector_fd rv_v(rv.size());
       for (int i = 0; i < rv.size(); ++i)
         rv_v[i] = rv[i];
       return rv_v;
     }
 
     inline 
-    row_vector_fv 
+    row_vector_fd 
+    to_fvar(const row_vector_fd& rv) {
+      return rv;
+    }
+
+    inline 
+    row_vector_fv
     to_fvar(const row_vector_fv& rv) {
+      return rv;
+    }
+
+    inline 
+    row_vector_ffd 
+    to_fvar(const row_vector_ffd& rv) {
+      return rv;
+    }
+
+    inline 
+    row_vector_ffv
+    to_fvar(const row_vector_ffv& rv) {
       return rv;
     }
 
