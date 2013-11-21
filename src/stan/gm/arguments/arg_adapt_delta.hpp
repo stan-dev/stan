@@ -1,4 +1,4 @@
-#ifndef __STAN__GM__ARGUMENTS__ADAPT__DELTA_HPP__
+#ifndef __STAN__GM__ARGUMENTS__ADAPT__DELTA__HPP__
 #define __STAN__GM__ARGUMENTS__ADAPT__DELTA__HPP__
 
 #include <stan/gm/arguments/singleton_argument.hpp>

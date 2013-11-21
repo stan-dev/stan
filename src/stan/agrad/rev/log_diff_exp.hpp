@@ -53,21 +53,21 @@ namespace stan {
      * Returns the log sum of exponentials.
      */
     inline var log_diff_exp(const stan::agrad::var& a,
-                           const stan::agrad::var& b) {
+                            const stan::agrad::var& b) {
       return var(new log_diff_exp_vv_vari(a.vi_, b.vi_));
     }
     /**
      * Returns the log sum of exponentials.
      */
     inline var log_diff_exp(const stan::agrad::var& a,
-                           const double& b) {
+                            const double& b) {
       return var(new log_diff_exp_vd_vari(a.vi_, b));
     }
     /**
      * Returns the log sum of exponentials.
      */
     inline var log_diff_exp(const double& a,
-                           const stan::agrad::var& b) {
+                            const stan::agrad::var& b) {
       return var(new log_diff_exp_dv_vari(a, b.vi_));
     }
 

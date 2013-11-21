@@ -4,44 +4,42 @@
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/meta/traits.hpp>
 #include <boost/math/special_functions/hypot.hpp>
+#include <stan/math/functions/inv.hpp>
 
+namespace stan {
 
-namespace stan{
+  namespace agrad {
 
-  namespace agrad{
-
-    template <typename T1, typename T2>
+    template <typename T>
     inline
-    fvar<typename stan::return_type<T1,T2>::type>
-    hypot(const fvar<T1>& x1, const fvar<T2>& x2) {
+    fvar<T>
+    hypot(const fvar<T>& x1, const fvar<T>& x2) {
       using boost::math::hypot;
       using std::sqrt;
-    return fvar<typename 
-                stan::return_type<T1,T2>::type>(hypot(x1.val_, x2.val_), 
-                                    (x1.d_ * x1.val_ + x2.d_ * x2.val_) 
-                                      / hypot(x1.val_, x2.val_));
+      using stan::math::inv;
+      T u = hypot(x1.val_, x2.val_);
+      return fvar<T>(u, (x1.d_ * x1.val_ + x2.d_ * x2.val_) * inv(u));
     }
 
-    template <typename T1, typename T2>
+    template <typename T>
     inline
-    fvar<typename stan::return_type<T1,T2>::type>
-    hypot(const fvar<T1>& x1, const T2& x2) {
+    fvar<T>
+    hypot(const fvar<T>& x1, const double x2) {
       using boost::math::hypot;
       using std::sqrt;
-    return fvar<typename 
-                stan::return_type<T1,T2>::type>(hypot(x1.val_, x2), 
-                       (x1.d_ * x1.val_) / hypot(x1.val_, x2));
+      T u = hypot(x1.val_, x2);
+      return fvar<T>(u, (x1.d_ * x1.val_) * inv(u));
     }
 
-    template <typename T1, typename T2>
+    template <typename T>
     inline
-    fvar<typename stan::return_type<T1,T2>::type>
-    hypot(const T1& x1, const fvar<T2>& x2) {
+    fvar<T>
+    hypot(const double x1, const fvar<T>& x2) {
       using boost::math::hypot;
       using std::sqrt;
-    return fvar<typename 
-                stan::return_type<T1,T2>::type>(hypot(x1, x2.val_), 
-                       (x2.d_ * x2.val_) / hypot(x1, x2.val_));
+      using stan::math::inv;
+      T u = hypot(x1, x2.val_);
+      return fvar<T>(u, (x2.d_ * x2.val_) * inv(u));
     }
 
   }

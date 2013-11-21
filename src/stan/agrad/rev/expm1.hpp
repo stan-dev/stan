@@ -16,7 +16,7 @@ namespace stan {
           op_v_vari(std::exp(avi->val_) - 1.0,avi) {
         }
         void chain() {
-          avi_->adj_ += adj_ * val_;
+          avi_->adj_ += adj_ * (val_ + 1.0);
         }
       };
     }

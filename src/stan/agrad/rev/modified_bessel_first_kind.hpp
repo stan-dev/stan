@@ -22,7 +22,7 @@ namespace stan {
     }
 
     inline var modified_bessel_first_kind(const int& v, 
-                                 const var& a) {
+                                          const var& a) {
       return var(new modified_bessel_first_kind_dv_vari(v, a.vi_));
     }
 
