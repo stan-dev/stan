@@ -6,9 +6,9 @@
 #include <stan/math/functions/Phi.hpp>
 #include <stan/math/constants.hpp>
 
-namespace stan{
+namespace stan {
 
-  namespace agrad{
+  namespace agrad {
 
     template <typename T>
     inline fvar<T> Phi(const fvar<T>& x) {
@@ -17,7 +17,7 @@ namespace stan{
       using std::sqrt;
       T xv = x.val_;
       return fvar<T>(Phi(xv),
-                     exp(xv * xv / -2.0) / sqrt(2.0 * stan::math::pi()));
+                     x.d_ * exp(xv * xv / -2.0) / sqrt(2.0 * stan::math::pi()));
     }
   }
 }

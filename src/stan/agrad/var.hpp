@@ -73,11 +73,13 @@
 #include <stan/agrad/rev/acosh.hpp>
 #include <stan/agrad/rev/atanh.hpp>
 #include <stan/agrad/rev/asinh.hpp>
+#include <stan/agrad/rev/binary_log_loss.hpp>
 #include <stan/agrad/rev/erf.hpp>
 #include <stan/agrad/rev/erfc.hpp>
 #include <stan/agrad/rev/exp2.hpp>
 #include <stan/agrad/rev/expm1.hpp>
 #include <stan/agrad/rev/lgamma.hpp>
+#include <stan/agrad/rev/lmgamma.hpp>
 #include <stan/agrad/rev/log1p.hpp>
 #include <stan/agrad/rev/log1m.hpp>
 #include <stan/agrad/rev/fma.hpp>
@@ -92,12 +94,12 @@
 #include <stan/agrad/rev/trunc.hpp>
 #include <stan/agrad/rev/fdim.hpp>
 #include <stan/agrad/rev/tgamma.hpp>
+#include <stan/agrad/rev/digamma.hpp>
 #include <stan/agrad/rev/step.hpp>
 #include <stan/agrad/rev/inv_cloglog.hpp>
 #include <stan/agrad/rev/Phi.hpp>
 #include <stan/agrad/rev/inv_logit.hpp>
 #include <stan/agrad/rev/Phi_approx.hpp>
-#include <stan/agrad/rev/log_loss.hpp>
 #include <stan/agrad/rev/log1m_exp.hpp>
 #include <stan/agrad/rev/log1p_exp.hpp>
 #include <stan/agrad/rev/log_diff_exp.hpp>

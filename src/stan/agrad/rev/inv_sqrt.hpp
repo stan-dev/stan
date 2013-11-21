@@ -13,7 +13,7 @@ namespace stan {
       class inv_sqrt_vari : public op_v_vari {
       public:
         inv_sqrt_vari(vari* avi) :
-        op_v_vari(stan::math::inv_sqrt(avi->val_),avi) {
+          op_v_vari(stan::math::inv_sqrt(avi->val_),avi) {
         }
         void chain() {
           avi_->adj_ -= 0.5 * adj_ / (avi_->val_ * std::sqrt(avi_->val_));
