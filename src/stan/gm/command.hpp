@@ -716,7 +716,7 @@ namespace stan {
           sample_stream->close();
           delete sample_stream;
         }
-        return 0;
+        return return_code;
       }
         
       //////////////////////////////////////////////////

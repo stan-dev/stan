@@ -479,17 +479,13 @@ TEST(AgradFwdMatrixOperatorDivision,fv_vector_2ndDeriv) {
   using stan::math::vector_d;
   using stan::agrad::vector_fv;
 
-  vector_d d1(3);
   vector_fv v1(3);
-  double d2;
   fvar<var> v2;
   
-  d1 << 100, 0, -3;
   v1 << 100, 0, -3;
   v1(0).d_ = 1.0;
   v1(1).d_ = 1.0;
   v1(2).d_ = 1.0;
-  d2 = -2;
   v2 = -2;
   v2.d_ = 1.0;
   vector_fv output;
@@ -608,17 +604,13 @@ TEST(AgradFwdMatrixOperatorDivision,fv_rowvector_2ndDeriv) {
   using stan::math::row_vector_d;
   using stan::agrad::row_vector_fv;
 
-  row_vector_d d1(3);
   row_vector_fv v1(3);
-  double d2;
   fvar<var> v2;
   
-  d1 << 100, 0, -3;
   v1 << 100, 0, -3;
   v1(0).d_ = 1.0;
   v1(1).d_ = 1.0;
   v1(2).d_ = 1.0;
-  d2 = -2;
   v2 = -2;
   v2.d_ = 1.0;
 
@@ -762,18 +754,14 @@ TEST(AgradFwdMatrixOperatorDivision,fv_matrix_2ndDeriv) {
   using stan::math::matrix_d;
   using stan::agrad::matrix_fv;
 
-  matrix_d d1(2,2);
   matrix_fv v1(2,2);
-  double d2;
   fvar<var> v2;
   
-  d1 << 100, 0, -3, 4;
   v1 << 100, 0, -3, 4;
   v1(0,0).d_ = 1.0;
   v1(0,1).d_ = 1.0;
   v1(1,0).d_ = 1.0;
   v1(1,1).d_ = 1.0;
-  d2 = -2;
   v2 = -2;
   v2.d_ = 1.0;
 
@@ -1327,17 +1315,13 @@ TEST(AgradFwdMatrixOperatorDivision,ffv_vector_2ndDeriv_1) {
   using stan::math::vector_d;
   using stan::agrad::vector_ffv;
 
-  vector_d d1(3);
   vector_ffv v1(3);
-  double d2;
   fvar<fvar<var> > v2;
   
-  d1 << 100, 0, -3;
   v1 << 100, 0, -3;
   v1(0).d_ = 1.0;
   v1(1).d_ = 1.0;
   v1(2).d_ = 1.0;
-  d2 = -2;
   v2 = -2;
   v2.d_ = 1.0;
   vector_ffv output;
@@ -1355,17 +1339,13 @@ TEST(AgradFwdMatrixOperatorDivision,ffv_vector_2ndDeriv_2) {
   using stan::math::vector_d;
   using stan::agrad::vector_ffv;
 
-  vector_d d1(3);
   vector_ffv v1(3);
-  double d2;
   fvar<fvar<var> > v2;
   
-  d1 << 100, 0, -3;
   v1 << 100, 0, -3;
   v1(0).d_ = 1.0;
   v1(1).d_ = 1.0;
   v1(2).d_ = 1.0;
-  d2 = -2;
   v2 = -2;
   v2.d_ = 1.0;
   vector_ffv output;
@@ -1383,17 +1363,13 @@ TEST(AgradFwdMatrixOperatorDivision,ffv_vector_3rdDeriv) {
   using stan::math::vector_d;
   using stan::agrad::vector_ffv;
 
-  vector_d d1(3);
   vector_ffv v1(3);
-  double d2;
   fvar<fvar<var> > v2;
   
-  d1 << 100, 0, -3;
   v1 << 100, 0, -3;
   v1(0).d_ = 1.0;
   v1(1).d_ = 1.0;
   v1(2).d_ = 1.0;
-  d2 = -2;
   v2 = -2;
   v2.d_ = 1.0;
   vector_ffv output;
@@ -1512,17 +1488,13 @@ TEST(AgradFwdMatrixOperatorDivision,ffv_rowvector_2ndDeriv_1) {
   using stan::math::row_vector_d;
   using stan::agrad::row_vector_ffv;
 
-  row_vector_d d1(3);
   row_vector_ffv v1(3);
-  double d2;
   fvar<fvar<var> > v2;
   
-  d1 << 100, 0, -3;
   v1 << 100, 0, -3;
   v1(0).d_ = 1.0;
   v1(1).d_ = 1.0;
   v1(2).d_ = 1.0;
-  d2 = -2;
   v2 = -2;
   v2.d_ = 1.0;
 
@@ -1541,17 +1513,13 @@ TEST(AgradFwdMatrixOperatorDivision,ffv_rowvector_2ndDeriv_2) {
   using stan::math::row_vector_d;
   using stan::agrad::row_vector_ffv;
 
-  row_vector_d d1(3);
   row_vector_ffv v1(3);
-  double d2;
   fvar<fvar<var> > v2;
   
-  d1 << 100, 0, -3;
   v1 << 100, 0, -3;
   v1(0).d_ = 1.0;
   v1(1).d_ = 1.0;
   v1(2).d_ = 1.0;
-  d2 = -2;
   v2 = -2;
   v2.d_ = 1.0;
 
@@ -1570,17 +1538,13 @@ TEST(AgradFwdMatrixOperatorDivision,ffv_rowvector_3rdDeriv) {
   using stan::math::row_vector_d;
   using stan::agrad::row_vector_ffv;
 
-  row_vector_d d1(3);
   row_vector_ffv v1(3);
-  double d2;
   fvar<fvar<var> > v2;
   
-  d1 << 100, 0, -3;
   v1 << 100, 0, -3;
   v1(0).d_ = 1.0;
   v1(1).d_ = 1.0;
   v1(2).d_ = 1.0;
-  d2 = -2;
   v2 = -2;
   v2.d_ = 1.0;
 
@@ -1724,18 +1688,14 @@ TEST(AgradFwdMatrixOperatorDivision,ffv_matrix_2ndDeriv_1) {
   using stan::math::matrix_d;
   using stan::agrad::matrix_ffv;
 
-  matrix_d d1(2,2);
   matrix_ffv v1(2,2);
-  double d2;
   fvar<fvar<var> > v2;
   
-  d1 << 100, 0, -3, 4;
   v1 << 100, 0, -3, 4;
   v1(0,0).d_ = 1.0;
   v1(0,1).d_ = 1.0;
   v1(1,0).d_ = 1.0;
   v1(1,1).d_ = 1.0;
-  d2 = -2;
   v2 = -2;
   v2.d_ = 1.0;
 
@@ -1756,18 +1716,14 @@ TEST(AgradFwdMatrixOperatorDivision,ffv_matrix_2ndDeriv_2) {
   using stan::math::matrix_d;
   using stan::agrad::matrix_ffv;
 
-  matrix_d d1(2,2);
   matrix_ffv v1(2,2);
-  double d2;
   fvar<fvar<var> > v2;
   
-  d1 << 100, 0, -3, 4;
   v1 << 100, 0, -3, 4;
   v1(0,0).d_ = 1.0;
   v1(0,1).d_ = 1.0;
   v1(1,0).d_ = 1.0;
   v1(1,1).d_ = 1.0;
-  d2 = -2;
   v2 = -2;
   v2.d_ = 1.0;
 
@@ -1788,18 +1744,14 @@ TEST(AgradFwdMatrixOperatorDivision,ffv_matrix_3rdDeriv) {
   using stan::math::matrix_d;
   using stan::agrad::matrix_ffv;
 
-  matrix_d d1(2,2);
   matrix_ffv v1(2,2);
-  double d2;
   fvar<fvar<var> > v2;
   
-  d1 << 100, 0, -3, 4;
   v1 << 100, 0, -3, 4;
   v1(0,0).d_ = 1.0;
   v1(0,1).d_ = 1.0;
   v1(1,0).d_ = 1.0;
   v1(1,1).d_ = 1.0;
-  d2 = -2;
   v2 = -2;
   v2.d_ = 1.0;
 
