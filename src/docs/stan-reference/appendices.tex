@@ -292,6 +292,20 @@ Alternatively, enter \code{[Windows+r]} (both keys together on the
 keyboard), and enter \code{cmd} into the text field that pops up in
 the Run window, then press \code{[Return]} on the keyboard to run.
 
+\subsubsection{32-bit Builds}
+
+\Stan defaults to a 64-bit build. On a 32-bit operating system, set
+the \verb|BIT| variable to 32. For example, to build the bernoulli
+model in \refsection{compiling-model}, replace the original command
+with:
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> make BIT=32 src/models/basic_estimators/bernoulli
+\end{Verbatim}
+\end{quote}
+
+
 \subsection{Rtools C++ Development Environment}
 
 The simplest way to install a full \Cpp build environment that will
