@@ -29,5 +29,7 @@
 #include <stan/agrad/rev/matrix/softmax.hpp>
 #include <stan/agrad/rev/matrix/log_softmax.hpp>
 #include <stan/agrad/rev/matrix/log_sum_exp.hpp>
+#include <stan/agrad/rev/matrix/sd.hpp>
+#include <stan/agrad/rev/matrix/variance.hpp>
 
 #endif
