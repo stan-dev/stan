@@ -1,6 +1,8 @@
 #ifndef __STAN__AGRAD__REV__MATRIX__STORED_GRADIENT_HPP__
 #define __STAN__AGRAD__REV__MATRIX__STORED_GRADIENT_HPP__
 
+#include <stan/agrad/rev/vari.hpp>
+
 namespace stan {
 
   namespace agrad {
