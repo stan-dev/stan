@@ -44,7 +44,7 @@ TEST(ModelUtil, finite_diff_grad__false_false) {
     stan::model::finite_diff_grad<false,false,TestModel_uniform_01>
       (model, params_r, params_i, gradient);
     
-    ASSERT_EQ(1, gradient.size());
+    ASSERT_EQ(1U, gradient.size());
     EXPECT_FLOAT_EQ(0.0, gradient[0]);
   }
 }
@@ -61,7 +61,7 @@ TEST(ModelUtil, finite_diff_grad__false_true) {
     stan::model::finite_diff_grad<false,true,TestModel_uniform_01>
       (model, params_r, params_i, gradient);
     
-    ASSERT_EQ(1, gradient.size());
+    ASSERT_EQ(1U, gradient.size());
     
     // derivative of the transform
     double expected_gradient = -std::tanh(0.5 * x);    
@@ -82,7 +82,7 @@ TEST(ModelUtil, finite_diff_grad__true_false) {
     stan::model::finite_diff_grad<true,false,TestModel_uniform_01>
       (model, params_r, params_i, gradient);
     
-    ASSERT_EQ(1, gradient.size());
+    ASSERT_EQ(1U, gradient.size());
     
     EXPECT_FLOAT_EQ(0.0, gradient[0]);
   }
@@ -101,7 +101,7 @@ TEST(ModelUtil, finite_diff_grad__true_true) {
     stan::model::finite_diff_grad<true,true,TestModel_uniform_01>
       (model, params_r, params_i, gradient);
     
-    ASSERT_EQ(1, gradient.size());
+    ASSERT_EQ(1U, gradient.size());
     
     double expected_gradient = -std::tanh(0.5 * x);    
     EXPECT_FLOAT_EQ(expected_gradient, gradient[0]);

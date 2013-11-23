@@ -7,13 +7,13 @@ TEST(CommandPrint, next_index_1d) {
   std::vector<int> index(1,1);
   dims[0] = 100;
 
-  ASSERT_EQ(1, index.size());
+  ASSERT_EQ(1U, index.size());
   EXPECT_EQ(1, index[0]);
   for (int n = 1; n <= 100; n++) {
     if (n == 1)
       continue;
     next_index(index, dims);
-    ASSERT_EQ(1, index.size());
+    ASSERT_EQ(1U, index.size());
     EXPECT_EQ(n, index[0]);
   }
   
@@ -30,7 +30,7 @@ TEST(CommandPrint, next_index_2d) {
   dims[0] = 100;
   dims[1] = 3;
 
-  ASSERT_EQ(2, index.size());
+  ASSERT_EQ(2U, index.size());
   EXPECT_EQ(1, index[0]);
   EXPECT_EQ(1, index[1]);
   for (int i = 1; i <= 100; i++) 
@@ -38,7 +38,7 @@ TEST(CommandPrint, next_index_2d) {
       if (i == 1 && j == 1)
         continue;
       next_index(index, dims);
-      ASSERT_EQ(2, index.size());
+      ASSERT_EQ(2U, index.size());
       EXPECT_EQ(i, index[0]);
       EXPECT_EQ(j, index[1]);
     }
