@@ -13,7 +13,7 @@ namespace stan {
 
     namespace {
 
-     class falling_factorial_vv_vari : public op_vv_vari {
+      class falling_factorial_vv_vari : public op_vv_vari {
       public:
         falling_factorial_vv_vari(vari* avi, vari* bvi) :
           op_vv_vari(stan::math::falling_factorial(avi->val_, bvi->val_), avi, bvi) {

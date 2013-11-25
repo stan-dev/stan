@@ -1,10 +1,10 @@
 #ifndef __STAN__AGRAD__REV__ATANH_HPP__
 #define __STAN__AGRAD__REV__ATANH_HPP__
 
-#include <valarray>
+#include <boost/math/special_functions/atanh.hpp>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/op/v_vari.hpp>
-#include <boost/math/special_functions/atanh.hpp>
+#include <stan/agrad/rev/operator_equal.hpp>
 
 namespace stan {
   namespace agrad {
@@ -12,8 +12,8 @@ namespace stan {
     namespace {
       class atanh_vari : public op_v_vari {
       public:
-        atanh_vari(vari* avi) :
-          op_v_vari(boost::math::atanh(avi->val_),avi) {
+        atanh_vari(double val, vari* avi) :
+          op_v_vari(val,avi) {
         }
         void chain() {
           avi_->adj_ += adj_ / (1.0 - avi_->val_ * avi_->val_);
@@ -34,7 +34,11 @@ namespace stan {
      * @return Inverse hyperbolic tangent of the variable.
      */
     inline var atanh(const stan::agrad::var& a) {
-      return var(new atanh_vari(a.vi_));
+      if (a == 1.0)
+        return var(new atanh_vari(std::numeric_limits<double>::infinity(),a.vi_));
+      if (a == -1.0)
+        return var(new atanh_vari(-std::numeric_limits<double>::infinity(),a.vi_));
+      return var(new atanh_vari(boost::math::atanh(a.val()),a.vi_));
     }
 
   }

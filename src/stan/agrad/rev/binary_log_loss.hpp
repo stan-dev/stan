@@ -1,8 +1,10 @@
-#ifndef __STAN__AGRAD__REV__LOG_LOSS_HPP__
-#define __STAN__AGRAD__REV__LOG_LOSS_HPP__
+#ifndef __STAN__AGRAD__REV__BINARY_LOG_LOSS_HPP__
+#define __STAN__AGRAD__REV__BINARY_LOG_LOSS_HPP__
 
+#include <valarray>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/op/v_vari.hpp>
+#include <stan/math/constants.hpp>
 #include <stan/math/functions/log1p.hpp>
 
 namespace stan {
@@ -33,7 +35,7 @@ namespace stan {
     /**
      * The log loss function for variables (stan).
      *
-     * See stan::math::log_loss() for the double-based version.
+     * See stan::math::binary_log_loss() for the double-based version.
      *
      * The derivative with respect to the variable \f$\hat{y}\f$ is
      *
@@ -45,11 +47,11 @@ namespace stan {
      * @param y_hat Response variable.
      * @return Log loss of response versus reference value.
      */
-    inline var log_loss(const int& y, 
-                        const stan::agrad::var& y_hat) {
-      return y == 0  
-        ? var(new binary_log_loss_0_vari(y_hat.vi_))
-        : var(new binary_log_loss_1_vari(y_hat.vi_));
+    inline var binary_log_loss(const int y, const stan::agrad::var& y_hat) {
+      if (y == 0)
+        return var(new binary_log_loss_0_vari(y_hat.vi_));
+      else
+        return var(new binary_log_loss_1_vari(y_hat.vi_));
     }
 
   }

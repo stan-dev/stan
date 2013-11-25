@@ -5,10 +5,11 @@
 #include <stan/meta/traits.hpp>
 #include <boost/math/special_functions/erf.hpp>
 #include <stan/math/constants.hpp>
+#include <stan/math/functions/square.hpp>
 
-namespace stan{
+namespace stan {
 
-  namespace agrad{
+  namespace agrad {
 
     template <typename T>
     inline
@@ -17,7 +18,8 @@ namespace stan{
       using boost::math::erfc;
       using std::sqrt;
       using std::exp;
-      return fvar<T>(erfc(x.val_), -x.d_ * exp(-x.val_ * x.val_) 
+      using stan::math::square;
+      return fvar<T>(erfc(x.val_), -x.d_ * exp(-square(x.val_)) 
                                     * stan::math::TWO_OVER_SQRT_PI);
     }
   }

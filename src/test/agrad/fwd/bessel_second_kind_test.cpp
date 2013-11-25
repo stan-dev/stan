@@ -4,7 +4,7 @@
 #include <test/agrad/util.hpp>
 #include <stan/math/functions/bessel_second_kind.hpp>
 
-TEST(AgradFvar, bessel_second_kind) {
+TEST(AgradFwdBesselSecondKind,Fvar) {
   using stan::agrad::fvar;
   using stan::agrad::bessel_second_kind;
 
@@ -23,7 +23,7 @@ TEST(AgradFvar, bessel_second_kind) {
   EXPECT_THROW(bessel_second_kind(0, -a), std::domain_error);
 }
 
-TEST(AgradFvarVar, bessel_second_kind) {
+TEST(AgradFwdBesselSecondKind,FvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using stan::math::bessel_second_kind;
@@ -39,8 +39,20 @@ TEST(AgradFvarVar, bessel_second_kind) {
   a.val_.grad(y,g);
   EXPECT_FLOAT_EQ(0.53725040349771411 / 2.0, g[0]);
 }
+TEST(AgradFwdBesselSecondKind,FvarVar_2ndDeriv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using stan::math::bessel_second_kind;
 
-TEST(AgradFvarFvar, bessel_second_kind) {
+  fvar<var> z(3.0,2.0);
+  fvar<var> a = bessel_second_kind(1,z);
+
+  AVEC y = createAVEC(z.val_);
+  VEC g;
+  a.d_.grad(y,g);
+  EXPECT_FLOAT_EQ(-0.75628245, g[0]);
+}
+TEST(AgradFwdBesselSecondKind,FvarFvarDouble) {
   using stan::agrad::fvar;
   using stan::math::bessel_second_kind;
 
@@ -65,4 +77,84 @@ TEST(AgradFvarFvar, bessel_second_kind) {
   EXPECT_FLOAT_EQ(0.53725040349771411, b.val_.d_);
   EXPECT_FLOAT_EQ(0, b.d_.val_);
   EXPECT_FLOAT_EQ(0, b.d_.d_);
+}
+TEST(AgradFwdBesselSecondKind,FvarFvarVar_1stDeriv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using stan::math::bessel_second_kind;
+
+  fvar<fvar<var> > y;
+  y.val_.val_ = 3.0;
+  y.d_.val_ = 2.0;
+
+  fvar<fvar<var> > a = stan::agrad::bessel_second_kind(1,y);
+
+  EXPECT_FLOAT_EQ(stan::math::bessel_second_kind(1,3.0), a.val_.val_.val());
+  EXPECT_FLOAT_EQ(0, a.val_.d_.val());
+  EXPECT_FLOAT_EQ(0.53725040349771411, a.d_.val_.val());
+  EXPECT_FLOAT_EQ(0, a.d_.d_.val());
+
+  AVEC p = createAVEC(y.val_.val_);
+  VEC g;
+  a.val_.val_.grad(p,g);
+  EXPECT_FLOAT_EQ(0.53725040349771411 / 2.0, g[0]);
+
+  fvar<fvar<var> > x;
+  x.val_.val_ = 3.0;
+  x.val_.d_ = 2.0;
+
+  fvar<fvar<var> > b = stan::agrad::bessel_second_kind(1, x);
+
+  EXPECT_FLOAT_EQ(stan::math::bessel_second_kind(1,3.0), b.val_.val_.val());
+  EXPECT_FLOAT_EQ(0.53725040349771411, b.val_.d_.val());
+  EXPECT_FLOAT_EQ(0, b.d_.val_.val());
+  EXPECT_FLOAT_EQ(0, b.d_.d_.val());
+
+  AVEC q = createAVEC(x.val_.val_);
+  VEC r;
+  b.val_.val_.grad(q,r);
+  EXPECT_FLOAT_EQ(0.53725040349771411 / 2.0, r[0]);
+}
+TEST(AgradFwdBesselSecondKind,FvarFvarVar_2ndDeriv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using stan::math::bessel_second_kind;
+
+  fvar<fvar<var> > y;
+  y.val_.val_ = 3.0;
+  y.d_.val_ = 2.0;
+
+  fvar<fvar<var> > a = stan::agrad::bessel_second_kind(1,y);
+
+  AVEC p = createAVEC(y.val_.val_);
+  VEC g;
+  a.d_.val_.grad(p,g);
+  EXPECT_FLOAT_EQ(-0.75628245, g[0]);
+
+  fvar<fvar<var> > x;
+  x.val_.val_ = 3.0;
+  x.val_.d_ = 2.0;
+
+  fvar<fvar<var> > b = stan::agrad::bessel_second_kind(1, x);
+
+  AVEC q = createAVEC(x.val_.val_);
+  VEC r;
+  b.val_.d_.grad(q,r);
+  EXPECT_FLOAT_EQ(-0.75628245, r[0]);
+}
+TEST(AgradFwdBesselSecondKind,FvarFvarVar_3rdDeriv) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using stan::math::bessel_second_kind;
+
+  fvar<fvar<var> > y;
+  y.val_.val_ = 3.0;
+  y.d_.val_ = 2.0;
+
+  fvar<fvar<var> > a = stan::agrad::bessel_second_kind(1,y);
+
+  AVEC p = createAVEC(y.val_.val_);
+  VEC g;
+  a.d_.d_.grad(p,g);
+  EXPECT_FLOAT_EQ(0, g[0]);
 }

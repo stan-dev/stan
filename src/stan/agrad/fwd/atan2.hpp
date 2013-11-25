@@ -3,40 +3,41 @@
 
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/meta/traits.hpp>
+#include <stan/math/functions/square.hpp>
 
-namespace stan{
+namespace stan {
 
-  namespace agrad{
+  namespace agrad {
 
-    template <typename T1, typename T2>
+    template <typename T>
     inline
-    fvar<typename stan::return_type<T1,T2>::type>
-    atan2(const fvar<T1>& x1, const fvar<T2>& x2){
+    fvar<T>
+    atan2(const fvar<T>& x1, const fvar<T>& x2) {
       using std::atan2;
-      return fvar<typename 
-                  stan::return_type<T1,T2>::type>(atan2(x1.val_, x2.val_), 
-                              (x1.d_ * x2.val_ - x1.val_ * x2.d_) / 
-                                 (x2.val_ * x2.val_ + x1.val_ * x1.val_));
+      using stan::math::square;
+      return fvar<T>(atan2(x1.val_, x2.val_), 
+                     (x1.d_ * x2.val_ - x1.val_ * x2.d_) / 
+                     (square(x2.val_) + square(x1.val_)));
     }
 
-    template <typename T1, typename T2>
+    template <typename T>
     inline
-    fvar<typename stan::return_type<T1,T2>::type>
-    atan2(const T1& x1, const fvar<T2>& x2){
+    fvar<T>
+    atan2(const double x1, const fvar<T>& x2) {
       using std::atan2;
-      return fvar<typename 
-                  stan::return_type<T1,T2>::type>(atan2(x1, x2.val_), 
-                     (-x1 * x2.d_) / (x1 * x1 + x2.val_ * x2.val_));
+      using stan::math::square;
+      return fvar<T>(atan2(x1, x2.val_), 
+                     (-x1 * x2.d_) / (square(x1) + square(x2.val_)));
     }
 
-    template <typename T1, typename T2>
+    template <typename T>
     inline
-    fvar<typename stan::return_type<T1,T2>::type>
-    atan2(const fvar<T1>& x1, const T2& x2){
+    fvar<T>
+    atan2(const fvar<T>& x1, const double x2) {
       using std::atan2;
-      return fvar<typename 
-                  stan::return_type<T1,T2>::type>(atan2(x1.val_, x2), 
-                     (x1.d_ * x2) / (x2 * x2 + x1.val_ * x1.val_));
+      using stan::math::square;
+      return fvar<T>(atan2(x1.val_, x2), 
+                     (x1.d_ * x2) / (square(x2) + square(x1.val_)));
     }
   }
 }
