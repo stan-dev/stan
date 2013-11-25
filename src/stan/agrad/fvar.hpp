@@ -83,11 +83,13 @@
 //probability related functions
 #include <stan/agrad/fwd/erf.hpp>
 #include <stan/agrad/fwd/erfc.hpp>
-#include <stan/agrad/fwd/phi.hpp>
+#include <stan/agrad/fwd/Phi.hpp>
 #include <stan/agrad/fwd/binary_log_loss.hpp>
+#include <stan/agrad/fwd/owens_t.hpp>
 
 //combinatorial functions
 #include <stan/agrad/fwd/tgamma.hpp>
+#include <stan/agrad/fwd/digamma.hpp>
 #include <stan/agrad/fwd/lgamma.hpp>
 #include <stan/agrad/fwd/lmgamma.hpp>
 #include <stan/agrad/fwd/gamma_p.hpp>

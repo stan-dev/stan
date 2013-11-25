@@ -17,8 +17,9 @@ EXE = .exe
 O_STANC = 3
 CFLAGS_GTEST += -DGTEST_HAS_PTHREAD=0
 PATH_SEPARATOR = '\'
+BIT = 64
 ifeq (g++,$(CC_TYPE))
-  CFLAGS += -m64
+  CFLAGS += -m$(BIT)
   CFLAGS += -Wno-unused-function
   CFLAGS += -Wno-uninitialized
   LDLIBS += -static-libgcc

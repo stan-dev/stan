@@ -47,8 +47,8 @@ namespace stan{
 
     template <typename T>
     inline
-    fvar<typename stan::return_type<T,double>::type>
-    gamma_q(const fvar<T>& x1, double x2){
+    fvar<T>
+    gamma_q(const fvar<T>& x1, const double x2){
       using stan::math::gamma_q;
       using std::log;
       using std::exp;
@@ -57,7 +57,7 @@ namespace stan{
       using boost::math::tgamma;
       using boost::math::digamma;
 
-      typename stan::return_type<T,double>::type u = gamma_q(x1.val_, x2);
+      T u = gamma_q(x1.val_, x2);
       
       T S = 0;
       double s = 1;
@@ -77,14 +77,13 @@ namespace stan{
       
       T der1 = (1.0 - u) * ( dig - l ) + exp( x1.val_ * l ) * S / g;
       
-      return fvar<typename 
-                  stan::return_type<T,double>::type>(u,x1.d_ * der1);
+      return fvar<T>(u, x1.d_ * der1);
     }
 
     template <typename T>
     inline
-    fvar<typename stan::return_type<T,double>::type>
-    gamma_q(double x1, const fvar<T>& x2){
+    fvar<T>
+    gamma_q(const double x1, const fvar<T>& x2){
       using stan::math::gamma_q;
       using std::exp;
       using std::pow;
@@ -95,8 +94,7 @@ namespace stan{
       
       T der2 = -exp(-x2.val_) * pow(x2.val_, x1 - 1.0) / g;
       
-      return fvar<typename 
-                  stan::return_type<T,double>::type>(u,x2.d_ * der2);
+      return fvar<T>(u, x2.d_ * der2);
     }
   }
 }

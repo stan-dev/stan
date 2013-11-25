@@ -15,62 +15,119 @@
 namespace stan {
   namespace agrad {
     
-    template<typename T1, typename T2,int R1, int C1, int R2, int C2>
+    template<typename T,int R1, int C1, int R2, int C2>
     inline
-    Eigen::Matrix<fvar<typename stan::return_type<T1,T2>::type>,R2,C2> 
-    mdivide_right_tri_low(const Eigen::Matrix<fvar<T1>, R1, C1>& m, 
-                          const Eigen::Matrix<fvar<T2>, R2, C2>& n) {
-      stan::math::validate_square(n, "mdivide_right_tri_low");
-      stan::math::validate_multiplicable(m,n,"mdivide_right_tri_low");
+    Eigen::Matrix<fvar<T>,R1,C1> 
+    mdivide_right_tri_low(const Eigen::Matrix<fvar<T>, R1, C1>& A, 
+                          const Eigen::Matrix<fvar<T>, R2, C2>& b) {
+      using stan::math::multiply;      
+      using stan::math::mdivide_right;
+      stan::math::validate_square(b,"mdivide_right");
+      stan::math::validate_multiplicable(A,b,"mdivide_right");
 
-      Eigen::Matrix<fvar<T2>,R2,C2> L(n.rows(),n.cols());
-      L.setZero();
+      Eigen::Matrix<T,R1,C2> A_mult_inv_b(A.rows(),b.cols());
+      Eigen::Matrix<T,R1,C2> deriv_A_mult_inv_b(A.rows(),b.cols());
+      Eigen::Matrix<T,R2,C2> deriv_b_mult_inv_b(b.rows(),b.cols());
+      Eigen::Matrix<T,R1,C1> val_A(A.rows(),A.cols()); 
+      Eigen::Matrix<T,R1,C1> deriv_A(A.rows(),A.cols()); 
+      Eigen::Matrix<T,R2,C2> val_b(b.rows(),b.cols()); 
+      Eigen::Matrix<T,R2,C2> deriv_b(b.rows(),b.cols()); 
+      val_b.setZero();
+      deriv_b.setZero();
 
-      for(size_type i = 0; i < n.rows(); i++) {
-        for(size_type j = 0; (j < i + 1) && (j < n.cols()); j++)
-          L(i,j) = n(i,j);
+      for (size_type j = 0; j < A.cols(); j++) {
+        for(size_type i = 0; i < A.rows(); i++) {
+          val_A(i,j) = A(i,j).val_;
+          deriv_A(i,j) = A(i,j).d_;
+        }
       }
 
-      return stan::agrad::multiply(m, stan::agrad::inverse(L));
-    }
-
-    template<typename T1, typename T2,int R1, int C1, int R2, int C2>
-    inline
-    Eigen::Matrix<fvar<typename stan::return_type<T1,T2>::type>,R2,C2> 
-    mdivide_right_tri_low(const Eigen::Matrix<T1, R1, C1>& m, 
-                          const Eigen::Matrix<fvar<T2>, R2, C2>& n) {
-      stan::math::validate_square(n, "mdivide_right_tri_low");
-      stan::math::validate_multiplicable(m,n,"mdivide_right_tri_low");
-
-      Eigen::Matrix<fvar<T2>,R2,C2> L(n.rows(),n.cols());
-      L.setZero();
-
-      for(size_type i = 0; i < n.rows(); i++) {
-        for(size_type j = 0; (j < i + 1) && (j < n.cols()); j++)
-          L(i,j) = n(i,j);
+      for (size_type j = 0; j < b.cols(); j++) {
+        for(size_type i = j; i < b.rows(); i++) {
+          val_b(i,j) = b(i,j).val_;
+          deriv_b(i,j) = b(i,j).d_;
+        }
       }
 
-      return stan::agrad::multiply(m, stan::agrad::inverse(L));
+      A_mult_inv_b = mdivide_right(val_A, val_b);
+      deriv_A_mult_inv_b = mdivide_right(deriv_A, val_b);
+      deriv_b_mult_inv_b = mdivide_right(deriv_b, val_b);
+
+      Eigen::Matrix<T,R1,C2> deriv(A.rows(), b.cols());
+      deriv = deriv_A_mult_inv_b - multiply(A_mult_inv_b, deriv_b_mult_inv_b);
+
+      return stan::agrad::to_fvar(A_mult_inv_b, deriv);
     }
 
-    template<typename T1, typename T2,int R1, int C1, int R2, int C2>
-    inline
-    Eigen::Matrix<fvar<typename stan::return_type<T1,T2>::type>,R2,C2> 
-    mdivide_right_tri_low(const Eigen::Matrix<fvar<T1>, R1, C1>& m, 
-                          const Eigen::Matrix<T2, R2, C2>& n) {
-      stan::math::validate_square(n, "mdivide_right_tri_low");
-      stan::math::validate_multiplicable(m,n,"mdivide_right_tri_low");
+    template <typename T, int R1,int C1,int R2,int C2>
+    inline 
+    Eigen::Matrix<fvar<T>,R1,C2>
+    mdivide_right_tri_low(const Eigen::Matrix<fvar<T>,R1,C1> &A,
+                          const Eigen::Matrix<double,R2,C2> &b) {
+      
+      using stan::math::multiply;      
+      using stan::math::mdivide_right;
+      stan::math::validate_square(b,"mdivide_right");
+      stan::math::validate_multiplicable(A,b,"mdivide_right");
 
-      Eigen::Matrix<T2,R2,C2> L(n.rows(),n.cols());
-      L.setZero();
+      Eigen::Matrix<T,R2,C2> deriv_b_mult_inv_b(b.rows(),b.cols());
+      Eigen::Matrix<T,R1,C1> val_A(A.rows(),A.cols()); 
+      Eigen::Matrix<T,R1,C1> deriv_A(A.rows(),A.cols());
+      Eigen::Matrix<T,R2,C2> val_b(b.rows(),b.cols()); 
+      val_b.setZero();
 
-      for(size_type i = 0; i < n.rows(); i++) {
-        for(size_type j = 0; (j < i + 1) && (j < n.cols()); j++)
-          L(i,j) = n(i,j);
+      for (int j = 0; j < A.cols(); j++) {
+        for(int i = 0; i < A.rows(); i++) {
+          val_A(i,j) = A(i,j).val_;
+          deriv_A(i,j) = A(i,j).d_;
+        }
       }
 
-      return stan::agrad::multiply(m, stan::agrad::inverse(to_fvar(L)));
+      for (size_type j = 0; j < b.cols(); j++) {
+        for(size_type i = j; i < b.rows(); i++) {
+          val_b(i,j) = b(i,j);
+        }
+      }
+
+      return stan::agrad::to_fvar(mdivide_right(val_A, val_b), 
+                                  mdivide_right(deriv_A, val_b));
     }
+
+    template <typename T, int R1,int C1,int R2,int C2>
+    inline 
+    Eigen::Matrix<fvar<T>,R1,C2>
+    mdivide_right_tri_low(const Eigen::Matrix<double,R1,C1> &A,
+                          const Eigen::Matrix<fvar<T>,R2,C2> &b) {
+      
+      using stan::math::multiply;      
+      using stan::math::mdivide_right;
+      stan::math::validate_square(b,"mdivide_right");
+      stan::math::validate_multiplicable(A,b,"mdivide_right");
+
+      Eigen::Matrix<T,R1,C2> 
+        A_mult_inv_b(A.rows(),b.cols());
+      Eigen::Matrix<T,R2,C2> deriv_b_mult_inv_b(b.rows(),b.cols());
+      Eigen::Matrix<T,R2,C2> val_b(b.rows(),b.cols()); 
+      Eigen::Matrix<T,R2,C2> deriv_b(b.rows(),b.cols()); 
+      val_b.setZero();
+      deriv_b.setZero();
+
+      for (int j = 0; j < b.cols(); j++) {
+        for(int i = j; i < b.rows(); i++) {
+          val_b(i,j) = b(i,j).val_;
+          deriv_b(i,j) = b(i,j).d_;
+        }
+      }
+
+      A_mult_inv_b = mdivide_right(A, val_b);
+      deriv_b_mult_inv_b = mdivide_right(deriv_b, val_b);
+
+      Eigen::Matrix<T,R1,C2> 
+        deriv(A.rows(), b.cols());
+      deriv = -multiply(A_mult_inv_b, deriv_b_mult_inv_b);
+
+      return stan::agrad::to_fvar(A_mult_inv_b, deriv);
+    }  
   }
 }
 #endif

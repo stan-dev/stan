@@ -4,6 +4,7 @@
 #include <cstdlib>
 
 #include <boost/math/special_functions/gamma.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
 
 #include <stan/math/error_handling.hpp>
 #include <stan/math/matrix_error_handling.hpp>
@@ -87,7 +88,7 @@ namespace stan {
                           "Degrees of freedom parameter", &lp))
         return lp;
       
-      using std::isinf;
+      using boost::math::isinf;
 
       if (isinf(nu)) // already checked nu > 0
         return multi_normal_log(y,mu,Sigma);

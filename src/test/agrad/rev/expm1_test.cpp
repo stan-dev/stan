@@ -11,5 +11,5 @@ TEST(AgradRev,expm1) {
   AVEC x = createAVEC(a);
   VEC grad_f;
   f.grad(x,grad_f);
-  EXPECT_FLOAT_EQ(std::exp(1.3) - 1.0, grad_f[0]);
+  EXPECT_FLOAT_EQ(std::exp(1.3), grad_f[0]);
 }  

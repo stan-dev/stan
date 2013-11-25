@@ -5,6 +5,7 @@
 #include <boost/random/variate_generator.hpp>
 
 #include <limits>
+#include <boost/math/special_functions/fpclassify.hpp>
 
 #include <stan/agrad.hpp>
 #include <stan/math/error_handling.hpp>
@@ -65,7 +66,7 @@ namespace stan {
       size_t size = max_size(n, lambda);
 
       for (size_t i = 0; i < size; i++)
-        if (std::isinf(lambda_vec[i]))
+        if (boost::math::isinf(lambda_vec[i]))
           return LOG_ZERO;
       for (size_t i = 0; i < size; i++)
         if (lambda_vec[i] == 0 && n_vec[i] != 0)
