@@ -34,7 +34,7 @@ TEST(StoredGradientVari, propagate3) {
 
   std::vector<double> g;
   f.grad(in, g);
-  EXPECT_EQ(3, g.size());
+  EXPECT_EQ(3U, g.size());
   EXPECT_EQ(10 * 132.7, g[0]);
   EXPECT_EQ(100 * 132.7, g[1]);
   EXPECT_EQ(1000 * 132.7, g[2]);
@@ -58,7 +58,7 @@ TEST(StoredGradientVari, propagate0) {
 
   std::vector<double> g;
   f.grad(dummy, g);
-  EXPECT_EQ(3, g.size());
+  EXPECT_EQ(3U, g.size());
   for (int i = 0; i < 3; ++i)
     EXPECT_FLOAT_EQ(0, g[i]);
 }

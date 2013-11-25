@@ -16,7 +16,7 @@ TEST(AgradRevMatrix, sd_eq) {
   using stan::agrad::vector_v;
   using std::vector;
 
-  for (int size = 2; size <= 200; size *= 3) {
+  for (size_t size = 2; size <= 200; size *= 3) {
     vector<var> x_std_vec(size);
     vector_v x(size);
     for (size_t i = 0; i < size; ++i) {

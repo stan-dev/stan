@@ -19,7 +19,7 @@ TEST(AgradRevMatrix, varianceZeroBoundaryCase) {
   vector<double> g;
   f.grad(y, g);
   EXPECT_EQ(y.size(), g.size());
-  for (int i = 0; i < g.size(); ++i)
+  for (size_t i = 0; i < g.size(); ++i)
     EXPECT_FLOAT_EQ(0.0, g[i]);
 }
 
