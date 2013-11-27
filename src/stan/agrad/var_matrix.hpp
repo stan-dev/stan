@@ -12,19 +12,22 @@
 #include <stan/agrad/rev/matrix/sort.hpp>
 #include <stan/agrad/rev/matrix/sum.hpp>
 #include <stan/agrad/rev/matrix/mdivide_left.hpp>
+#include <stan/agrad/rev/matrix/mdivide_left_ldlt.hpp>
 #include <stan/agrad/rev/matrix/mdivide_left_spd.hpp>
 #include <stan/agrad/rev/matrix/mdivide_left_tri.hpp>
 #include <stan/agrad/rev/matrix/determinant.hpp>
 #include <stan/agrad/rev/matrix/quad_form.hpp>
-#include <stan/agrad/rev/matrix/ldlt.hpp>
 #include <stan/agrad/rev/matrix/log_determinant.hpp>
+#include <stan/agrad/rev/matrix/log_determinant_ldlt.hpp>
 #include <stan/agrad/rev/matrix/log_determinant_spd.hpp>
 #include <stan/agrad/rev/matrix/divide.hpp>
 #include <stan/agrad/rev/matrix/multiply.hpp>
 #include <stan/agrad/rev/matrix/multiply_lower_tri_self_transpose.hpp>
 #include <stan/agrad/rev/matrix/tcrossprod.hpp>
+#include <stan/agrad/rev/matrix/trace_inv_quad_form_ldlt.hpp>
 #include <stan/agrad/rev/matrix/trace_quad_form.hpp>
 #include <stan/agrad/rev/matrix/trace_gen_quad_form.hpp>
+#include <stan/agrad/rev/matrix/trace_inv_quad_form_ldlt.hpp>
 #include <stan/agrad/rev/matrix/crossprod.hpp>
 
 #endif

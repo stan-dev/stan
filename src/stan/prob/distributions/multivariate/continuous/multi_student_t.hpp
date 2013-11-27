@@ -44,7 +44,6 @@ namespace stan {
       using boost::math::tools::promote_args;
       using boost::math::lgamma;
       using stan::math::log_determinant_ldlt;
-      using stan::math::mdivide_left_ldlt;
       using stan::math::LDLT_factor;
       
       typename promote_args<T_y,T_dof,T_loc,T_scale>::type lp(0.0);
@@ -119,12 +118,9 @@ namespace stan {
         Eigen::Matrix<typename promote_args<T_y,T_loc>::type,
                       Eigen::Dynamic,
                       1> y_minus_mu = subtract(y,mu);
-        Eigen::Matrix<typename promote_args<T_scale,T_y,T_loc>::type,
-                      Eigen::Dynamic,
-                      1> invSigma_dy = mdivide_left_ldlt(ldlt_Sigma, y_minus_mu);
         lp -= 0.5 
           * (nu + d)
-          * log(1.0 + dot_product(y_minus_mu,invSigma_dy) / nu);
+          * log(1.0 + trace_inv_quad_form_ldlt(ldlt_Sigma,y_minus_mu) / nu);
       }
       return lp;
     }

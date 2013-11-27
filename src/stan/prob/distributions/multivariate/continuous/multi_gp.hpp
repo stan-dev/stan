@@ -19,7 +19,9 @@
 #include <stan/math/matrix/subtract.hpp>
 #include <stan/math/matrix/sum.hpp>
 
-#include <stan/math/matrix/ldlt.hpp>
+#include <stan/math/matrix/log_determinant_ldlt.hpp>
+#include <stan/math/matrix/mdivide_right_ldlt.hpp>
+#include <stan/math/matrix/trace_gen_inv_quad_form_ldlt.hpp>
 
 namespace stan {
   namespace prob {
@@ -64,7 +66,7 @@ namespace stan {
       using stan::math::rows_dot_product;
       using stan::math::log_determinant_ldlt;
       using stan::math::mdivide_right_ldlt;
-      using stan::math::trace_inv_quad_form_ldlt;
+      using stan::math::trace_gen_inv_quad_form_ldlt;
       using stan::math::LDLT_factor;
 
       if (!check_size_match(function, 
@@ -124,7 +126,7 @@ namespace stan {
       if (include_summand<propto,T_y,T_w,T_covar>::value) {
         Eigen::Matrix<T_w,Eigen::Dynamic,Eigen::Dynamic> w_mat(w.asDiagonal());
         Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic> yT(y.transpose());
-        lp -= 0.5 * trace_inv_quad_form_ldlt(w_mat,ldlt_Sigma,yT);
+        lp -= 0.5 * trace_gen_inv_quad_form_ldlt(w_mat,ldlt_Sigma,yT);
       }
 
       return lp;
