@@ -4,8 +4,7 @@
 #include <math.h>
 #include <boost/math/special_functions/gamma.hpp>
 #include <boost/math/special_functions/beta.hpp>
-
-#include <iostream>
+#include <boost/math/special_functions/fpclassify.hpp>
 
 namespace stan {
     
@@ -189,15 +188,13 @@ namespace stan {
           
       int k = 0;
       double delta = s / (a * a);
-      double last_delta;
           
       while (fabs(delta) > precision) {
         S += delta;
-        last_delta = delta;
         ++k;
         s *= - z / k;
         delta = s / ((k + a) * (k + a));
-        if (fabs(delta) > fabs(last_delta))
+        if (boost::math::isinf(delta))
           throw std::domain_error("stan::math::gradRegIncGamma not converging");
       }
       return gamma_p(a, z) * ( dig - l ) + std::exp( a * l ) * S / g;
