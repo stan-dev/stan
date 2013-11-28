@@ -96,25 +96,25 @@ namespace stan {
                  !is_constant_struct<T6>::value * length(x6)),
           all_varis((agrad::vari**)agrad::chainable::operator new(sizeof(agrad::vari*) * nvaris)), 
           all_partials((double*)agrad::chainable::operator new(sizeof(double) * nvaris)),
-          d_x1(all_partials),
-          d_x2(all_partials 
-               + (!is_constant_struct<T1>::value) * length(x1)),
-          d_x3(all_partials 
+          d_x1(is_constant_struct<T1>::value?NULL:all_partials),
+          d_x2(is_constant_struct<T2>::value?NULL:(all_partials 
+               + (!is_constant_struct<T1>::value) * length(x1))),
+          d_x3(is_constant_struct<T3>::value?NULL:(all_partials 
                + (!is_constant_struct<T1>::value) * length(x1)
-               + (!is_constant_struct<T2>::value) * length(x2)),
-          d_x4(all_partials 
-               + (!is_constant_struct<T1>::value) * length(x1)
-               + (!is_constant_struct<T2>::value) * length(x2)
-               + (!is_constant_struct<T3>::value) * length(x3)),
-          d_x5(all_partials 
+               + (!is_constant_struct<T2>::value) * length(x2))),
+          d_x4(is_constant_struct<T4>::value?NULL:(all_partials 
                + (!is_constant_struct<T1>::value) * length(x1)
                + (!is_constant_struct<T2>::value) * length(x2)
-               + (!is_constant_struct<T3>::value) * length(x3)
-               + (!is_constant_struct<T4>::value) * length(x4)),
-          d_x6(all_partials 
+               + (!is_constant_struct<T3>::value) * length(x3))),
+          d_x5(is_constant_struct<T5>::value?NULL:(all_partials 
                + (!is_constant_struct<T1>::value) * length(x1)
                + (!is_constant_struct<T2>::value) * length(x2)
                + (!is_constant_struct<T3>::value) * length(x3)
+               + (!is_constant_struct<T4>::value) * length(x4))),
+          d_x6(is_constant_struct<T6>::value?NULL:(all_partials 
+               + (!is_constant_struct<T1>::value) * length(x1)
+               + (!is_constant_struct<T2>::value) * length(x2)
+               + (!is_constant_struct<T3>::value) * length(x3))
                + (!is_constant_struct<T4>::value) * length(x4)
                + (!is_constant_struct<T5>::value) * length(x5))
       {
