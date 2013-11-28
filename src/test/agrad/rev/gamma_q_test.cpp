@@ -21,6 +21,26 @@ TEST(AgradRev,gamma_q_var_var) {
   b = -1.0;
   EXPECT_THROW(gamma_q(a,b), std::domain_error);
 }
+TEST(AgradRevGammaQ,infLoopInVersion2_0_1_var_var) {
+  // FIXME: causes infinite loop in 2.0.1 gradient calcs
+  AVAR a = 8.01006;
+  AVAR b = 2.47579e+215;
+  AVEC x = createAVEC(a,b);
+
+  AVAR f = gamma_q(a,b);
+  VEC g;
+  EXPECT_THROW(f.grad(x,g), std::domain_error);
+}
+TEST(AgradRevGammaQ,infLoopInVersion2_0_1_var_double) {
+  // FIXME: causes infinite loop in 2.0.1 gradient calcs
+  AVAR a = 8.01006;
+  double b = 2.47579e+215;
+  AVEC x = createAVEC(a);
+
+  AVAR f = gamma_q(a,b);
+  VEC g;
+  EXPECT_THROW(f.grad(x,g), std::domain_error);
+}
 TEST(AgradRev,gamma_q_double_var) {
   double a = 0.5;
   AVAR b = 1.0;
