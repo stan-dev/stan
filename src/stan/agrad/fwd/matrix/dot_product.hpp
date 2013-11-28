@@ -147,7 +147,7 @@ namespace stan {
                 const std::vector<fvar<T> >& v2,
                 size_type& length) {
       fvar<T> ret(0,0);
-      for(size_t i = 0; i < length; i++)
+      for(size_type i = 0; i < length; i++)
         ret += v1.at(i) * v2.at(i);
       return ret;
     }
@@ -159,7 +159,7 @@ namespace stan {
                 const std::vector<fvar<T> >& v2,
                 size_type& length) {
       fvar<T> ret(0,0);
-      for(size_t i = 0; i < length; i++)
+      for(size_type i = 0; i < length; i++)
         ret += v1.at(i) * v2.at(i);
       return ret;
     }
@@ -171,7 +171,7 @@ namespace stan {
                 const std::vector<double>& v2,
                 size_type& length) {
       fvar<T> ret(0,0);
-      for(size_t i = 0; i < length; i++)
+      for(size_type i = 0; i < length; i++)
         ret += v1.at(i) * v2.at(i);
       return ret;
     }

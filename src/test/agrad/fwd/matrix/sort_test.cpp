@@ -451,7 +451,7 @@ TEST(AgradFwdSort, d) {
 
 TEST(AgradFwdSort, d_no_thrown) {
   AVEC vec0;
-  EXPECT_EQ(0, vec0.size());
+  EXPECT_EQ(0U, vec0.size());
   EXPECT_NO_THROW(sort_asc(vec0));
   EXPECT_NO_THROW(sort_desc(vec0));
   
@@ -514,7 +514,7 @@ TEST(AgradFwdSort, var) {
 
 TEST(AgradFwdSort, fv_no_thrown) {
   AVEC vec0;
-  EXPECT_EQ(0, vec0.size());
+  EXPECT_EQ(0U, vec0.size());
   EXPECT_NO_THROW(sort_asc(vec0));
   EXPECT_NO_THROW(sort_desc(vec0));
   
@@ -576,7 +576,7 @@ TEST(AgradFwdSort, fdd_sort) {
 
 TEST(AgradFwdSort, ffd_no_thrown) {
   AVEC vec0;
-  EXPECT_EQ(0, vec0.size());
+  EXPECT_EQ(0U, vec0.size());
   EXPECT_NO_THROW(sort_asc(vec0));
   EXPECT_NO_THROW(sort_desc(vec0));
   
@@ -638,7 +638,7 @@ TEST(AgradFwdSort, ffv_sort) {
 
 TEST(AgradFwdSort, ffv_no_thrown) {
   AVEC vec0;
-  EXPECT_EQ(0, vec0.size());
+  EXPECT_EQ(0U, vec0.size());
   EXPECT_NO_THROW(sort_asc(vec0));
   EXPECT_NO_THROW(sort_desc(vec0));
   

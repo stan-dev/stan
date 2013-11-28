@@ -234,7 +234,7 @@ int main(int argc, const char* argv[]) {
       std::vector<int> dims = dimensions(chains, i);
       std::vector<int> index(dims.size(), 1);
       int max = 1;
-      for (int j = 0; j < dims.size(); j++)
+      for (size_t j = 0; j < dims.size(); j++)
         max *= dims[j];
       
       for (int k = 0; k < max; k++) {
