@@ -27,6 +27,40 @@ namespace stan {
 
     const double CONSTRAINT_TOLERANCE = 1E-8;
 
+    /**
+     * This function is intended to make starting values, given a unit
+     * upper-triangular matrix U such that U'DU is a correlation matrix
+     *   
+     * @param CPCs fill this unbounded
+     * @param Sigma U matrix
+     */
+    template<typename T>
+    void    
+    factor_U(Eigen::Array<T,Eigen::Dynamic,1>& CPCs,
+             const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& U) {
+
+      size_t K = U.rows();
+      size_t position = 0;
+      size_t pull = K - 1;
+
+      Eigen::Array<T,1,Eigen::Dynamic> temp = U.row(0).tail(pull);
+
+      CPCs.head(pull) = temp;
+
+      Eigen::Array<T,Eigen::Dynamic,1> acc(K);
+      acc(0) = -0.0;
+      acc.tail(pull) = 1.0 - temp.square();
+      for(size_t i = 1; i < (K - 1); i++) {
+        position += pull;
+        pull--;
+        temp = U.row(i).tail(pull);
+        temp /= sqrt(acc.tail(pull) / acc(i));
+        CPCs.segment(position, pull) = temp;
+        acc.tail(pull) *= 1.0 - temp.square();
+      }
+      CPCs = 0.5 * ( (1.0 + CPCs) / (1.0 - CPCs) ).log(); // now unbounded
+    }
+    
 
     /**
      * This function is intended to make starting values, given a
@@ -64,29 +98,25 @@ namespace stan {
       if (!ldlt.isPositive()) 
         return false;
       Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> U = ldlt.matrixU();
-
-      size_t position = 0;
-      size_t pull = K - 1;
-
-      Eigen::Array<T,1,Eigen::Dynamic> temp = U.row(0).tail(pull);
-
-      CPCs.head(pull) = temp;
-
-      Eigen::Array<T,Eigen::Dynamic,1> acc(K);
-      acc(0) = -0.0;
-      acc.tail(pull) = 1.0 - temp.square();
-      for(size_t i = 1; i < (K - 1); i++) {
-        position += pull;
-        pull--;
-        temp = U.row(i).tail(pull);
-        temp /= sqrt(acc.tail(pull) / acc(i));
-        CPCs.segment(position, pull) = temp;
-        acc.tail(pull) *= 1.0 - temp.square();
-      }
-      CPCs = 0.5 * ( (1.0 + CPCs) / (1.0 - CPCs) ).log(); // now unbounded
+      factor_U(CPCs, U);
       return true;
     }
 
+    /**
+     * This function is intended to make starting values, given a 
+     * lower-triangular matrix L such that LL' is a correlation matrix
+     *   
+     * @param CPCs fill this unbounded
+     * @param L L matrix
+     */
+    template<typename T>
+    void    
+    factor_L(Eigen::Array<T,Eigen::Dynamic,1>& CPCs,
+             const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& L) {
+    
+      factor_U(CPCs, L * ( L.diagonal().array().inverse().diagonal() ));
+    }
+    
     // MATRIX TRANSFORMS +/- JACOBIANS
 
     /**
