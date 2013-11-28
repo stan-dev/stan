@@ -71,18 +71,25 @@ namespace stan {
         const double theta_dbl = value_of(theta_vec[0]);
         // avoid nans when sum == N or sum == 0
         if (sum == N) {
-          logp += N * log(theta_dbl);
-          operands_and_partials.d_x1[0] += N / theta_dbl;
+          if (include_summand<propto,T_prob>::value)
+            logp += N * log(theta_dbl);
+          if (!is_constant_struct<T_prob>::value)
+            operands_and_partials.d_x1[0] += N / theta_dbl;
         } else if (sum == 0) {
-          logp += N * log1m(theta_dbl);
-          operands_and_partials.d_x1[0] += N / (theta_dbl - 1);
+          if (include_summand<propto,T_prob>::value)
+            logp += N * log1m(theta_dbl);
+          if (!is_constant_struct<T_prob>::value)
+            operands_and_partials.d_x1[0] += N / (theta_dbl - 1);
         } else {
           const double log_theta = log(theta_dbl);
           const double log1m_theta = log1m(theta_dbl);
           if (include_summand<propto,T_prob>::value) {
             logp += sum * log_theta;
             logp += (N - sum) * log1m_theta;
-    
+          }
+
+          // gradient
+          if (!is_constant_struct<T_prob>::value) {
             operands_and_partials.d_x1[0] += sum / theta_dbl;
             operands_and_partials.d_x1[0] += (N - sum) / (theta_dbl - 1);
           }
@@ -101,7 +108,7 @@ namespace stan {
           }
     
           // gradient
-          if (include_summand<propto,T_prob>::value) {
+          if (!is_constant_struct<T_prob>::value) {
             if (n_int == 1)
               operands_and_partials.d_x1[n] += 1.0 / theta_dbl;
             else
