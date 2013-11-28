@@ -1,4 +1,4 @@
-#ifndef __STAN__MCMC__MOCK__HMC_BETA__
+#ifndef __STAN__MCMC__MOCK__HMC__BETA__
 #define __STAN__MCMC__MOCK__HMC__BETA__
 
 #include <stan/math/matrix/Eigen.hpp>

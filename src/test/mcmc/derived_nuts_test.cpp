@@ -45,7 +45,7 @@ TEST(McmcDerivedNuts, compute_criterion_unit_e) {
   
   rho = start.p + finish.p;
   
-  EXPECT_EQ(false, sampler.compute_criterion(start, finish, rho));
+  EXPECT_FALSE(sampler.compute_criterion(start, finish, rho));
   
 }
 
@@ -80,8 +80,7 @@ TEST(McmcDerivedNuts, compute_criterion_diag_e) {
   
   rho = start.p + finish.p;
   
-  EXPECT_EQ(false, sampler.compute_criterion(start, finish, rho));
-  
+  EXPECT_FALSE(sampler.compute_criterion(start, finish, rho));
 }
 
 TEST(McmcDerivedNuts, compute_criterion_dense_e) {
@@ -115,6 +114,6 @@ TEST(McmcDerivedNuts, compute_criterion_dense_e) {
   
   rho = start.p + finish.p;
   
-  EXPECT_EQ(false, sampler.compute_criterion(start, finish, rho));
+  EXPECT_FALSE(sampler.compute_criterion(start, finish, rho));
   
 }
