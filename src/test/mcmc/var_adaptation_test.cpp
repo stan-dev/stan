@@ -12,7 +12,8 @@ TEST(McmcVarAdaptation, learn_variance) {
   Eigen::VectorXd target_var(Eigen::VectorXd::Ones(n));
   target_var *= 1e-3 * 5.0 / (n_learn + 5.0);
   
-  stan::mcmc::var_adaptation adapter(n, 0);
+  stan::mcmc::var_adaptation adapter(n);
+  adapter.set_window_params(50, 0, 0, n_learn);
   
   for (int i = 0; i < n_learn; ++i)
     adapter.learn_variance(var, q);

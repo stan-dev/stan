@@ -19,8 +19,6 @@ namespace stan {
       
       bool learn_covariance(Eigen::MatrixXd& covar, std::vector<double>& q) {
         
-        ++_adapt_window_counter;
-        
         if (adaptation_window()) _estimator.add_sample(q);
         
         if (end_adaptation_window()) {
@@ -32,13 +30,15 @@ namespace stan {
           double n = static_cast<double>(_estimator.num_samples());
           covar = (n / (n + 5.0)) * covar
                   + 1e-3 * (5.0 / (n + 5.0)) * Eigen::MatrixXd::Identity(covar.rows(), covar.cols());
-          
+
           _estimator.restart();
           
+          ++_adapt_window_counter;
           return true;
           
         }
         
+        ++_adapt_window_counter;
         return false;
         
       }
