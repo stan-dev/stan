@@ -71,22 +71,19 @@ namespace stan {
         const double theta_dbl = value_of(theta_vec[0]);
         // avoid nans when sum == N or sum == 0
         if (sum == N) {
-          if (include_summand<propto,T_prob>::value)
-            logp += N * log(theta_dbl);
+          logp += N * log(theta_dbl);
           if (!is_constant_struct<T_prob>::value)
             operands_and_partials.d_x1[0] += N / theta_dbl;
         } else if (sum == 0) {
-          if (include_summand<propto,T_prob>::value)
-            logp += N * log1m(theta_dbl);
+          logp += N * log1m(theta_dbl);
           if (!is_constant_struct<T_prob>::value)
             operands_and_partials.d_x1[0] += N / (theta_dbl - 1);
         } else {
           const double log_theta = log(theta_dbl);
           const double log1m_theta = log1m(theta_dbl);
-          if (include_summand<propto,T_prob>::value) {
-            logp += sum * log_theta;
-            logp += (N - sum) * log1m_theta;
-          }
+
+          logp += sum * log_theta;
+          logp += (N - sum) * log1m_theta;
 
           // gradient
           if (!is_constant_struct<T_prob>::value) {
@@ -100,12 +97,10 @@ namespace stan {
           const int n_int = value_of(n_vec[n]);
           const double theta_dbl = value_of(theta_vec[n]);
     
-          if (include_summand<propto,T_prob>::value) {
-            if (n_int == 1)
-              logp += log(theta_dbl);
-            else
-              logp += log1m(theta_dbl);
-          }
+          if (n_int == 1)
+            logp += log(theta_dbl);
+          else
+            logp += log1m(theta_dbl);
     
           // gradient
           if (!is_constant_struct<T_prob>::value) {
@@ -184,16 +179,14 @@ namespace stan {
         const double ntheta = sign * theta_dbl;
         const double exp_m_ntheta = exp(-ntheta);
   
-        if (include_summand<propto,T_prob>::value) {
-          // Handle extreme values gracefully using Taylor approximations.
-          const static double cutoff = 20.0;
-          if (ntheta > cutoff)
-            logp -= exp_m_ntheta;
-          else if (ntheta < -cutoff)
-            logp += ntheta;
-          else
-            logp -= log1p(exp_m_ntheta);
-        }
+        // Handle extreme values gracefully using Taylor approximations.
+        const static double cutoff = 20.0;
+        if (ntheta > cutoff)
+          logp -= exp_m_ntheta;
+        else if (ntheta < -cutoff)
+          logp += ntheta;
+        else
+          logp -= log1p(exp_m_ntheta);
 
         // gradients
         if (!is_constant_struct<T_prob>::value) {
