@@ -4,6 +4,7 @@
 #include <math.h>
 #include <boost/math/special_functions/gamma.hpp>
 #include <boost/math/special_functions/beta.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
 
 namespace stan {
     
@@ -173,33 +174,31 @@ namespace stan {
           
       }
       
-      // Gradient of the regularized incomplete gamma functions igamma(a, g)
-      double gradRegIncGamma(double a, double z, double g, double dig, double precision = 1e-6) 
-      {
+    // Gradient of the regularized incomplete gamma functions igamma(a, g)
+    // Precomputed values
+    // g   = boost::math::tgamma(a)
+    // dig = boost::math::digamma(a)
+    double gradRegIncGamma(double a, double z, double g, double dig, 
+                           double precision = 1e-6) {
+      using boost::math::gamma_p;
           
-          using boost::math::gamma_p;
+      double S = 0;
+      double s = 1;
+      double l = std::log(z);
           
-          double S = 0;
-          double s = 1;
-          double l = std::log(z);
+      int k = 0;
+      double delta = s / (a * a);
           
-          int k = 0;
-          double delta = s / (a * a);
-          
-          while (fabs(delta) > precision)
-          {
-              S += delta;
-              ++k;
-              s *= - z / k;
-              delta = s / ((k + a) * (k + a));
-          }
-          
-          // Precomputed values
-          // dig -> digamma(a)
-          // g   -> g(a)
-          return gamma_p(a, z) * ( dig - l ) + std::exp( a * l ) * S / g;
-          
+      while (fabs(delta) > precision) {
+        S += delta;
+        ++k;
+        s *= - z / k;
+        delta = s / ((k + a) * (k + a));
+        if (boost::math::isinf(delta))
+          throw std::domain_error("stan::math::gradRegIncGamma not converging");
       }
+      return gamma_p(a, z) * ( dig - l ) + std::exp( a * l ) * S / g;
+    }
       
   }
 
