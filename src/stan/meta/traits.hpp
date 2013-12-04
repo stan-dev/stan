@@ -284,7 +284,7 @@ namespace stan {
   public:
     DoubleVectorView(size_t /* n */) { }
     double& operator[](size_t /* i */) {
-      throw std::runtime_error("DoubleVectorView: used template parameter is false. this should never be called");
+      throw std::runtime_error("used is false. this should never be called");
     }
     size_t size() {
       return 0;
