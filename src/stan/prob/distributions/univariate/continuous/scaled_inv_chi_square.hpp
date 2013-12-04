@@ -238,10 +238,6 @@ namespace stan {
       agrad::OperandsAndPartials<T_y, T_dof, T_scale> 
         operands_and_partials(y, nu, s);
           
-      std::fill(operands_and_partials.all_partials,
-                operands_and_partials.all_partials 
-                + operands_and_partials.nvaris, 0.0);
-          
       // Explicit return for extreme values
       // The gradients are technically ill-defined, but treated as zero
           
@@ -497,10 +493,6 @@ namespace stan {
           
       agrad::OperandsAndPartials<T_y, T_dof, T_scale> 
         operands_and_partials(y, nu, s);
-          
-      std::fill(operands_and_partials.all_partials,
-                operands_and_partials.all_partials 
-                + operands_and_partials.nvaris, 0.0);
           
       // Explicit return for extreme values
       // The gradients are technically ill-defined, but treated as zero

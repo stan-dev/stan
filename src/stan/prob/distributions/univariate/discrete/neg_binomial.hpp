@@ -242,11 +242,6 @@ namespace stan {
       agrad::OperandsAndPartials<T_shape, T_inv_scale> 
         operands_and_partials(alpha, beta);
           
-      std::fill(operands_and_partials.all_partials,
-                operands_and_partials.all_partials 
-                + operands_and_partials.nvaris,
-                0.0);
-          
       // Explicit return for extreme values
       // The gradients are technically ill-defined, but treated as zero
       for (size_t i = 0; i < stan::length(n); i++) {
