@@ -286,9 +286,6 @@ namespace stan {
     double& operator[](size_t /* i */) {
       throw std::runtime_error("used is false. this should never be called");
     }
-    size_t size() {
-      return 0;
-    }
   };
 
   template<>
@@ -300,9 +297,6 @@ namespace stan {
     double& operator[](size_t /* i */) {
       return x_;
     }
-    size_t size() {
-      return 1;
-    }
   };
 
   template<>
@@ -313,9 +307,6 @@ namespace stan {
     DoubleVectorView(size_t n) : x_(n) { }
     double& operator[](size_t i) {
       return x_[i];
-    }
-    size_t size() {
-      return x_.size();
     }
   };
 

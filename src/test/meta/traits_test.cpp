@@ -356,20 +356,15 @@ TEST(MetaTraits, DoubleVectorView_false_false) {
 
   DoubleVectorView<false,false> dvv1(length(a_double));
   EXPECT_THROW(dvv1[0], std::runtime_error);
-  EXPECT_EQ(0U, dvv1.size());
 
   DoubleVectorView<false,false> dvv2(length(a_std_vector));
   EXPECT_THROW(dvv2[0], std::runtime_error);
-  EXPECT_EQ(0U, dvv2.size());
   
   DoubleVectorView<false,false> dvv3(length(a_vector));
   EXPECT_THROW(dvv3[0], std::runtime_error);
-  EXPECT_EQ(0U, dvv3.size());
-
+  
   DoubleVectorView<false,false> dvv4(length(a_row_vector));
   EXPECT_THROW(dvv4[0], std::runtime_error);
-  EXPECT_EQ(0U, dvv4.size());
-
 }
 
 
@@ -388,25 +383,21 @@ TEST(MetaTraits, DoubleVectorView_true_false) {
   EXPECT_FLOAT_EQ(0.0, dvv1[0]);
   EXPECT_FLOAT_EQ(0.0, dvv1[1]);
   EXPECT_FLOAT_EQ(0.0, dvv1[100]);
-  EXPECT_EQ(1U, dvv1.size());
 
   DoubleVectorView<true,false> dvv2(length(a_std_vector));
   EXPECT_FLOAT_EQ(0.0, dvv2[0]);
   EXPECT_FLOAT_EQ(0.0, dvv2[1]);
   EXPECT_FLOAT_EQ(0.0, dvv2[2]);  
-  EXPECT_EQ(1U, dvv2.size());
   
   DoubleVectorView<true,false> dvv3(length(a_vector));
   EXPECT_FLOAT_EQ(0.0, dvv3[0]);
   EXPECT_FLOAT_EQ(0.0, dvv3[1]);
   EXPECT_FLOAT_EQ(0.0, dvv3[2]);  
-  EXPECT_EQ(1U, dvv3.size());
   
   DoubleVectorView<true,false> dvv4(length(a_row_vector));
   EXPECT_FLOAT_EQ(0.0, dvv4[0]);
   EXPECT_FLOAT_EQ(0.0, dvv4[1]);
   EXPECT_FLOAT_EQ(0.0, dvv4[2]);
-  EXPECT_EQ(1U, dvv4.size());
 }
 
 TEST(MetaTraits, DoubleVectorView_false_true) {
@@ -423,19 +414,15 @@ TEST(MetaTraits, DoubleVectorView_false_true) {
 
   DoubleVectorView<false,true> dvv1(length(a_var));
   EXPECT_THROW(dvv1[0], std::runtime_error);
-  EXPECT_EQ(0U, dvv1.size());
 
   DoubleVectorView<false,true> dvv2(length(a_std_vector));
   EXPECT_THROW(dvv2[0], std::runtime_error);
-  EXPECT_EQ(0U, dvv2.size());
   
   DoubleVectorView<false,true> dvv3(length(a_vector));
   EXPECT_THROW(dvv3[0], std::runtime_error);
-  EXPECT_EQ(0U, dvv3.size());
   
   DoubleVectorView<false,true> dvv4(length(a_row_vector));
   EXPECT_THROW(dvv4[0], std::runtime_error);
-  EXPECT_EQ(0U, dvv4.size());
 }
 
 TEST(MetaTraits, DoubleVectorView_true_true) {
@@ -453,8 +440,7 @@ TEST(MetaTraits, DoubleVectorView_true_true) {
   DoubleVectorView<true,true> dvv1(length(a_var));
   dvv1[0] = 0.0;
   EXPECT_FLOAT_EQ(0.0, dvv1[0]);
-  EXPECT_EQ(1U, dvv1.size());
-  
+
   DoubleVectorView<true,true> dvv2(length(a_std_vector));
   dvv2[0] = 0.0;
   dvv2[1] = 1.0;
@@ -462,7 +448,6 @@ TEST(MetaTraits, DoubleVectorView_true_true) {
   EXPECT_FLOAT_EQ(0.0, dvv2[0]);
   EXPECT_FLOAT_EQ(1.0, dvv2[1]);
   EXPECT_FLOAT_EQ(2.0, dvv2[2]);  
-  EXPECT_EQ(3U, dvv2.size());
   
   DoubleVectorView<true,true> dvv3(length(a_vector));
   dvv3[0] = 0.0;
@@ -471,7 +456,6 @@ TEST(MetaTraits, DoubleVectorView_true_true) {
   EXPECT_FLOAT_EQ(0.0, dvv3[0]);
   EXPECT_FLOAT_EQ(1.0, dvv3[1]);
   EXPECT_FLOAT_EQ(2.0, dvv3[2]);  
-  EXPECT_EQ(4U, dvv3.size());
   
   DoubleVectorView<true,true> dvv4(length(a_row_vector));
   dvv4[0] = 0.0;
@@ -480,7 +464,6 @@ TEST(MetaTraits, DoubleVectorView_true_true) {
   EXPECT_FLOAT_EQ(0.0, dvv4[0]);
   EXPECT_FLOAT_EQ(1.0, dvv4[1]);
   EXPECT_FLOAT_EQ(2.0, dvv4[2]);
-  EXPECT_EQ(5U, dvv4.size());
 }
 
 
