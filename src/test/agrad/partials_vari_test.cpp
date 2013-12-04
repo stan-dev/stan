@@ -97,3 +97,50 @@ TEST(AgradPartialsVari, OperandsAndPartials3) {
   EXPECT_FLOAT_EQ(-171.0, x2.adj());  // dy/dx2 = -133
   EXPECT_FLOAT_EQ(-253.0, x3.adj());  // dy/dx2 = -253
 }
+TEST(AgradPartialsVari, OperandsAndPartials_accessing_illegal_partials) {
+  using stan::agrad::OperandsAndPartials;
+  using stan::agrad::var;
+
+  double d;
+  var v;
+  std::vector<double> v_d(1);
+  std::vector<var> v_v(1);
+  
+  OperandsAndPartials<double,double,double,double,double,double> o1(d,d,d,d,d,d);
+  EXPECT_THROW(o1.d_x1[0], std::runtime_error);
+  EXPECT_THROW(o1.d_x2[0], std::runtime_error);
+  EXPECT_THROW(o1.d_x3[0], std::runtime_error);
+  EXPECT_THROW(o1.d_x4[0], std::runtime_error);
+  EXPECT_THROW(o1.d_x5[0], std::runtime_error);
+  EXPECT_THROW(o1.d_x6[0], std::runtime_error);
+  
+  OperandsAndPartials<double,double,double,var,var,var> o2(d,d,d,v,v,v);
+  EXPECT_THROW(o2.d_x1[0], std::runtime_error);
+  EXPECT_THROW(o2.d_x2[0], std::runtime_error);
+  EXPECT_THROW(o2.d_x3[0], std::runtime_error);
+  EXPECT_NO_THROW(o2.d_x4[0]);
+  EXPECT_NO_THROW(o2.d_x5[0]);
+  EXPECT_NO_THROW(o2.d_x6[0]);
+
+
+  OperandsAndPartials<std::vector<double>,std::vector<double>,std::vector<double>,
+                      std::vector<double>,std::vector<double>,std::vector<double> > 
+    o3(v_d,v_d,v_d,v_d,v_d,v_d);
+  EXPECT_THROW(o3.d_x1[0], std::runtime_error);
+  EXPECT_THROW(o3.d_x2[0], std::runtime_error);
+  EXPECT_THROW(o3.d_x3[0], std::runtime_error);
+  EXPECT_THROW(o3.d_x4[0], std::runtime_error);
+  EXPECT_THROW(o3.d_x5[0], std::runtime_error);
+  EXPECT_THROW(o3.d_x6[0], std::runtime_error);
+
+  OperandsAndPartials<std::vector<double>,std::vector<double>,std::vector<double>,
+                      std::vector<var>,std::vector<var>,std::vector<var> > 
+    o4(v_d,v_d,v_d,v_v,v_v,v_v);
+  EXPECT_THROW(o4.d_x1[0], std::runtime_error);
+  EXPECT_THROW(o4.d_x2[0], std::runtime_error);
+  EXPECT_THROW(o4.d_x3[0], std::runtime_error);
+  EXPECT_NO_THROW(o4.d_x4[0]);
+  EXPECT_NO_THROW(o4.d_x5[0]);
+  EXPECT_NO_THROW(o4.d_x6[0]);
+
+}
