@@ -13,7 +13,7 @@ std::vector<double> finite_differences(const size_t row, const size_t col,
                                          const bool calc_A_partials,
                                          const stan::math::matrix_d B,
                                          const bool calc_B_partials) {
-  double e = 1e-10;
+  const double e = 1e-8;
   std::vector<double> finite_diff;
   stan::math::matrix_d C_plus, C_minus;
 
@@ -44,9 +44,7 @@ std::vector<double> finite_differences(const size_t row, const size_t col,
         stan::math::matrix_d B_plus(B);
         stan::math::matrix_d B_minus(B);
         B_plus(i,j) += e;
-        B_plus(j,i) = B_plus(i,j);
         B_minus(i,j) -= e;
-        B_minus(j,i) = B_minus(i,j);
         
         C_plus = stan::math::mdivide_left_ldlt(ldlt_A, B_plus);
         C_minus = stan::math::mdivide_left_ldlt(ldlt_A, B_minus);
@@ -174,11 +172,12 @@ TEST(AgradRevMatrix,mdivide_left_ldlt_finite_diff_vv) {
         A(k) = Ad(k);
         B(k) = Bd(k);
       }
+      A(0,1) = A(1,0);
       stan::math::LDLT_factor<stan::agrad::var,-1,-1> ldlt_A;
       ldlt_A.compute(A);
       
       C = mdivide_left_ldlt(ldlt_A,B);
-      AVEC x = createAVEC(A(0,0),A(1,0),A(0,1),A(1,1),
+      AVEC x = createAVEC(A(0,0),A(0,1),A(0,1),A(1,1),
                           B(0,0),B(1,0),B(0,1),B(1,1));
       VEC gradient;
       C(i,j).grad(x,gradient);
@@ -189,15 +188,6 @@ TEST(AgradRevMatrix,mdivide_left_ldlt_finite_diff_vv) {
       ASSERT_EQ(gradient.size(), finite_diffs.size());
       for (size_t k = 0; k < gradient.size(); k++)
         EXPECT_NEAR(finite_diffs[k], gradient[k], 1e-4);
-
-      //----------------------------------------
-      std::cout << std::setw(15) << "grad" 
-                << std::setw(15) << "finite diff" << std::endl;
-      for (size_t k = 0; k < gradient.size(); k++) {
-        std::cout << std::setw(15) << gradient[k]
-                  << std::setw(15) << finite_diffs[k] << std::endl;
-      }
-      //----------------------------------------
     }
   }
 }
@@ -279,20 +269,11 @@ TEST(AgradRevMatrix,mdivide_left_ldlt_finite_diff_dv) {
       C(i,j).grad(x,gradient);
 
       // compute finite differences
-      VEC finite_diffs = finite_differences(i, j, Ad, true, Bd, false);
+      VEC finite_diffs = finite_differences(i, j, Ad, false, Bd, true);
 
       ASSERT_EQ(gradient.size(), finite_diffs.size());
       for (size_t k = 0; k < gradient.size(); k++)
         EXPECT_NEAR(finite_diffs[k], gradient[k], 1e-4);
-
-      //----------------------------------------
-      std::cout << std::setw(15) << "grad" 
-                << std::setw(15) << "finite diff" << std::endl;
-      for (size_t k = 0; k < gradient.size(); k++) {
-        std::cout << std::setw(15) << gradient[k]
-                  << std::setw(15) << finite_diffs[k] << std::endl;
-      }
-      //----------------------------------------
     }
   }
 }
@@ -368,30 +349,22 @@ TEST(AgradRevMatrix,mdivide_left_ldlt_finite_diff_vd) {
       for (size_t k = 0; k < 4; k++) {
         A(k) = Ad(k);
       }
+      A(0,1) = A(1,0);
       stan::math::LDLT_factor<stan::agrad::var,-1,-1> ldlt_A;
       ldlt_A.compute(A);
       
       C = mdivide_left_ldlt(ldlt_A,Bd);
-      AVEC x = createAVEC(A(0,0),A(1,0),A(0,1),A(1,1));
+      AVEC x = createAVEC(A(0,0),A(0,1),A(0,1),A(1,1));
                           
       VEC gradient;
       C(i,j).grad(x,gradient);
       
       // compute finite differences
-      VEC finite_diffs = finite_differences(i, j, Ad, false, Bd, true);
+      VEC finite_diffs = finite_differences(i, j, Ad, true, Bd, false);
 
       ASSERT_EQ(gradient.size(), finite_diffs.size());
       for (size_t k = 0; k < gradient.size(); k++)
         EXPECT_NEAR(finite_diffs[k], gradient[k], 1e-4);
-
-      //----------------------------------------
-      std::cout << std::setw(15) << "grad" 
-                << std::setw(15) << "finite diff" << std::endl;
-      for (size_t k = 0; k < gradient.size(); k++) {
-        std::cout << std::setw(15) << gradient[k]
-                  << std::setw(15) << finite_diffs[k] << std::endl;
-      }
-      //----------------------------------------
     }
   }
 }
