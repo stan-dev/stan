@@ -249,10 +249,6 @@ namespace stan {
       using stan::math::value_of;
       agrad::OperandsAndPartials<T_prob> operands_and_partials(theta);
           
-      std::fill(operands_and_partials.all_partials,
-                operands_and_partials.all_partials 
-                + operands_and_partials.nvaris, 0.0);
-          
       // Explicit return for extreme values
       // The gradients are technically ill-defined, but treated as zero
       for (size_t i = 0; i < stan::length(n); i++) {
@@ -318,10 +314,6 @@ namespace stan {
       using stan::math::value_of;
       agrad::OperandsAndPartials<T_prob> operands_and_partials(theta);
           
-      std::fill(operands_and_partials.all_partials,
-                operands_and_partials.all_partials 
-                + operands_and_partials.nvaris, 0.0);
-          
       // Explicit return for extreme values
       // The gradients are technically ill-defined, but treated as zero
       for (size_t i = 0; i < stan::length(n); i++) {
@@ -383,10 +375,6 @@ namespace stan {
       // Compute vectorized cdf_log and gradient
       using stan::math::value_of;
       agrad::OperandsAndPartials<T_prob> operands_and_partials(theta);
-          
-      std::fill(operands_and_partials.all_partials,
-                operands_and_partials.all_partials 
-                + operands_and_partials.nvaris, 0.0);
           
       // Explicit return for extreme values
       // The gradients are technically ill-defined, but treated as zero

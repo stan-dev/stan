@@ -231,10 +231,6 @@ namespace stan {
       using boost::math::gamma_q;
           
       agrad::OperandsAndPartials<T_rate> operands_and_partials(lambda);
-
-      std::fill(operands_and_partials.all_partials,
-                operands_and_partials.all_partials 
-                + operands_and_partials.nvaris, 0.0);
         
       // Explicit return for extreme values
       // The gradients are technically ill-defined, but treated as zero
@@ -305,10 +301,6 @@ namespace stan {
           
       agrad::OperandsAndPartials<T_rate> operands_and_partials(lambda);
 
-      std::fill(operands_and_partials.all_partials,
-                operands_and_partials.all_partials 
-                + operands_and_partials.nvaris, 0.0);
-        
       // Explicit return for extreme values
       // The gradients are technically ill-defined, but treated as neg infinity
       for (size_t i = 0; i < stan::length(n); i++) {
@@ -374,10 +366,6 @@ namespace stan {
           
       agrad::OperandsAndPartials<T_rate> operands_and_partials(lambda);
 
-      std::fill(operands_and_partials.all_partials,
-                operands_and_partials.all_partials 
-                + operands_and_partials.nvaris, 0.0);
-        
       // Explicit return for extreme values
       // The gradients are technically ill-defined, but treated as neg infinity
       for (size_t i = 0; i < stan::length(n); i++) {
