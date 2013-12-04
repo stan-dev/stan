@@ -17,6 +17,18 @@ TEST(AgradFwdPhi,Fvar) {
   EXPECT_FLOAT_EQ(exp(stan::prob::normal_log<false>(1.0,0.0,1.0)),
                   Phi_x.d_);
 }
+TEST(AgradFwdPhi, FvarDerivUnderOverFlow) {
+  using stan::agrad::fvar;
+  fvar<double> x = -27.5;
+  x.d_ = 1.0;
+  fvar<double> Phi_x = Phi(x);
+  EXPECT_FLOAT_EQ(0, Phi_x.d_);
+
+  fvar<double> y = 27.5;
+  y.d_ = 1.0;
+  fvar<double> Phi_y = Phi(y);
+  EXPECT_FLOAT_EQ(0, Phi_y.d_);
+}
 TEST(AgradFwdPhi, FvarVar_1stDeriv) {
   using stan::agrad::fvar;
   using stan::agrad::var;
@@ -149,7 +161,7 @@ TEST(AgradFwdPhi, FvarFvarVar_3rdDeriv) {
 
   fvar<fvar<var> > a = Phi(x);
 
-  AVEC p = createAVEC(x.val_.val_);to get around const
+  AVEC p = createAVEC(x.val_.val_);
   VEC g;
   a.d_.d_.grad(p,g);
   EXPECT_FLOAT_EQ(0, g[0]);

@@ -10,12 +10,16 @@ TEST(AgradRev, Phi) {
   y_values.push_back(0.0);
   y_values.push_back(0.9);
   y_values.push_back(-5.0);
+  y_values.push_back(-27.5);
+  y_values.push_back(27.5);
 
   // d/dy = exp(normal_log(value_of(y), 0.0, 1.0))
   std::vector<double> dy_values;
   dy_values.push_back(0.3989423);
   dy_values.push_back(0.2660852);
   dy_values.push_back(1.4867195e-06);
+  dy_values.push_back(0);
+  dy_values.push_back(0);
 
   for (size_t i = 0; i < y_values.size(); i++) {
     var y, phi_y;
@@ -30,6 +34,7 @@ TEST(AgradRev, Phi) {
       << "y = " << y;
   }
 }
+
 // tests calculating using R 3.0.2 Snow Leopard build (6558)
 TEST(AgradRev, PhiTails) {
   using stan::agrad::Phi;
