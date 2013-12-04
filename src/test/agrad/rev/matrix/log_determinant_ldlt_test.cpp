@@ -45,8 +45,18 @@ TEST(AgradRevMatrix,log_determinant_ldlt) {
   v << 1, 0, 0, 3;
   ldlt_v.compute(v);
   
-  AVAR det;
-  det = log_determinant_ldlt(ldlt_v);
-  EXPECT_FLOAT_EQ(std::log(3.0), det.val());
-}
+  AVAR f;
+  AVEC v_vec = createAVEC(v(0,0), v(0,1), v(1,0), v(1,1));
+  VEC grad;
+  f = log_determinant_ldlt(ldlt_v);
+  f.grad(v_vec, grad);
 
+
+  // derivative is: 1/det(A) * adj(A)
+  EXPECT_FLOAT_EQ(std::log(3.0), f.val());
+  ASSERT_EQ(4U, grad.size());
+  EXPECT_FLOAT_EQ(1.0, grad[0]);
+  EXPECT_FLOAT_EQ(0, grad[1]);
+  EXPECT_FLOAT_EQ(0, grad[2]);
+  EXPECT_FLOAT_EQ(1.0/3.0, grad[3]);
+}
