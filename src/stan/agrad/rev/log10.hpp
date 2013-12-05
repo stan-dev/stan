@@ -14,8 +14,8 @@ namespace stan {
       public:
         const double exp_val_;
         log10_vari(vari* avi) :
-        op_v_vari(std::log10(avi->val_),avi),
-        exp_val_(avi->val_) {
+          op_v_vari(std::log10(avi->val_),avi),
+          exp_val_(avi->val_) {
         }
         void chain() {
           avi_->adj_ += adj_ / (stan::math::LOG_10 * exp_val_);

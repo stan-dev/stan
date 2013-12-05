@@ -13,7 +13,7 @@ namespace stan {
 
     namespace {
 
-     class log_rising_factorial_vv_vari : public op_vv_vari {
+      class log_rising_factorial_vv_vari : public op_vv_vari {
       public:
         log_rising_factorial_vv_vari(vari* avi, vari* bvi) :
           op_vv_vari(stan::math::log_rising_factorial(avi->val_, bvi->val_), avi, bvi) {

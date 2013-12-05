@@ -4,7 +4,7 @@
 #include <stan/agrad/fwd/numeric_limits.hpp>
 #include <stan/math/constants.hpp>
 
-TEST(AgradFvar, numeric_limits) {
+TEST(AgradFwdNumericLimits,All_Fvar) {
   using stan::agrad::fvar;
   using stan::agrad::var;
   using std::isnan;
