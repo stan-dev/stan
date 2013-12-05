@@ -20,13 +20,24 @@ namespace stan {
      * This function can be used to implement the inverse link function
      * for probit regression.  
      *
+     * Phi will underflow to 0 below -37.5 and overflow to 1 above 8
+     *
      * @param x Argument.
      * @return Probability random sample is less than or equal to argument. 
      */
     template <typename T>
     inline typename boost::math::tools::promote_args<T>::type
     Phi(const T x) {
-      return 0.5 * (1.0 + boost::math::erf(INV_SQRT_2 * x));
+      // overridden in fvar and var, so can hard-code boost versions
+      // here for scalars only
+      if (x < -37.5)
+        return 0;
+      else if (x < -5.0)
+        return 0.5 * boost::math::erfc(-INV_SQRT_2 * x);
+      else if (x > 8.25)
+        return 1;
+      else
+        return 0.5 * (1.0 + boost::math::erf(INV_SQRT_2 * x));
     }
 
   }

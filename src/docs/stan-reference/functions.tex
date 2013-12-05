@@ -616,7 +616,11 @@ The error function of \farg{x}}
 The complementary error function of \farg{x}}
 %
 \fitemindexsort{real}{Phi}{real \farg{x}}{
-The cumulative unit normal density function of \farg{x}}{Phi}{phi}
+The cumulative unit normal density function of \farg{x};
+\code{Phi(\farg{x})} will underflow to 0 for \farg{x} below -37.5 and overflow
+to 1 for \farg{x} above 8.25;  derivatives will underflow to 0 below
+-27.5 and overflow to 1 above 27.5.
+}{Phi}{phi}
 %
 \fitemindexsort{real}{Phi\_approx}{real \farg{x}}{
 Fast approximation of the cumulative unit normal density
