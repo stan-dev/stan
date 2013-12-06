@@ -23,17 +23,17 @@ TEST(AgradRevMatrix, mdivide_right_ldlt_vv) {
   vector<var> vars;
   vector<double> grad, grad_basic;
   
-  expected << 19, -2, 1, 13, 4;
+  expected << 1, 2, 3, 4, 5;
   
   for (int i = 0; i < b.size(); i++) {
     // solve using mdivide_right_ldlt
-    b << 19, 150, -170, 140, 31;
+    b << 62, 84, 84, 76, 108;
     A << 
-      1, 8, -9, 7, 5, 
-      0, 1, 0, 4, 4, 
-      0, 0, 1, 2, 5, 
-      0, 0, 0, 1, -5, 
-      0, 0, 0, 0, 1;
+      20, 8, -9,  7,  5, 
+      8, 20,  0,  4,  4, 
+     -9, 0,  20,  2,  5, 
+      7, 4,  2,  20, -5, 
+      5, 4,  5, -5,  20;
     LDLT_factor<var,-1,-1> ldlt_A;
     ldlt_A.compute(A);
     x = mdivide_right_ldlt(b, ldlt_A);
@@ -56,13 +56,13 @@ TEST(AgradRevMatrix, mdivide_right_ldlt_vv) {
 
 
     // solve using basic math
-    b << 19, 150, -170, 140, 31;
+    b << 62, 84, 84, 76, 108;
     A << 
-      1, 8, -9, 7, 5, 
-      0, 1, 0, 4, 4, 
-      0, 0, 1, 2, 5, 
-      0, 0, 0, 1, -5, 
-      0, 0, 0, 0, 1;
+      20, 8, -9,  7,  5, 
+      8, 20,  0,  4,  4, 
+     -9, 0,  20,  2,  5, 
+      7, 4,  2,  20, -5, 
+      5, 4,  5, -5,  20;
     x_basic = b * inverse(A);
     x_basic_val = stan::agrad::value_of(x_basic);
     ASSERT_EQ(expected.size(), x_basic_val.size());
@@ -79,6 +79,7 @@ TEST(AgradRevMatrix, mdivide_right_ldlt_vv) {
     for (int n = 0; n < A.size(); n++) {
       vars.push_back(A(n));
     }
+    x_basic(i).grad(vars, grad_basic);
 
     // test all gradients
     ASSERT_EQ(grad_basic.size(), grad.size());
@@ -108,17 +109,17 @@ TEST(AgradRevMatrix, mdivide_right_ldlt_vd) {
   vector<var> vars;
   vector<double> grad, grad_basic;
   
-  expected << 19, -2, 1, 13, 4;
+  expected << 1, 2, 3, 4, 5;
   
   for (int i = 0; i < b.size(); i++) {
     // solve using mdivide_right_ldlt
-    b << 19, 150, -170, 140, 31;
+    b << 62, 84, 84, 76, 108;
     A << 
-      1, 8, -9, 7, 5, 
-      0, 1, 0, 4, 4, 
-      0, 0, 1, 2, 5, 
-      0, 0, 0, 1, -5, 
-      0, 0, 0, 0, 1;
+      20, 8, -9,  7,  5, 
+      8, 20,  0,  4,  4, 
+     -9, 0,  20,  2,  5, 
+      7, 4,  2,  20, -5, 
+      5, 4,  5, -5,  20;
     LDLT_factor<double,-1,-1> ldlt_A;
     ldlt_A.compute(A);
     x = mdivide_right_ldlt(b, ldlt_A);
@@ -138,13 +139,13 @@ TEST(AgradRevMatrix, mdivide_right_ldlt_vd) {
 
 
     // solve using basic math
-    b << 19, 150, -170, 140, 31;
+    b << 62, 84, 84, 76, 108;
     A << 
-      1, 8, -9, 7, 5, 
-      0, 1, 0, 4, 4, 
-      0, 0, 1, 2, 5, 
-      0, 0, 0, 1, -5, 
-      0, 0, 0, 0, 1;
+      20, 8, -9,  7,  5, 
+      8, 20,  0,  4,  4, 
+     -9, 0,  20,  2,  5, 
+      7, 4,  2,  20, -5, 
+      5, 4,  5, -5,  20;
     x_basic = b * stan::agrad::to_var(inverse(A));
     x_basic_val = stan::agrad::value_of(x_basic);
     ASSERT_EQ(expected.size(), x_basic_val.size());
@@ -187,17 +188,17 @@ TEST(AgradRevMatrix, mdivide_right_ldlt_dv) {
   vector<var> vars;
   vector<double> grad, grad_basic;
   
-  expected << 19, -2, 1, 13, 4;
+  expected << 1, 2, 3, 4, 5;
   
   for (int i = 0; i < b.size(); i++) {
     // solve using mdivide_right_ldlt
-    b << 19, 150, -170, 140, 31;
+    b << 62, 84, 84, 76, 108;
     A << 
-      1, 8, -9, 7, 5, 
-      0, 1, 0, 4, 4, 
-      0, 0, 1, 2, 5, 
-      0, 0, 0, 1, -5, 
-      0, 0, 0, 0, 1;
+      20, 8, -9,  7,  5, 
+      8, 20,  0,  4,  4, 
+     -9, 0,  20,  2,  5, 
+      7, 4,  2,  20, -5, 
+      5, 4,  5, -5,  20;
     LDLT_factor<var,-1,-1> ldlt_A;
     ldlt_A.compute(A);
     x = mdivide_right_ldlt(b, ldlt_A);
@@ -217,13 +218,13 @@ TEST(AgradRevMatrix, mdivide_right_ldlt_dv) {
 
 
     // solve using basic math
-    b << 19, 150, -170, 140, 31;
+    b << 62, 84, 84, 76, 108;
     A << 
-      1, 8, -9, 7, 5, 
-      0, 1, 0, 4, 4, 
-      0, 0, 1, 2, 5, 
-      0, 0, 0, 1, -5, 
-      0, 0, 0, 0, 1;
+      20, 8, -9,  7,  5, 
+      8, 20,  0,  4,  4, 
+     -9, 0,  20,  2,  5, 
+      7, 4,  2,  20, -5, 
+      5, 4,  5, -5,  20;
     x_basic = stan::agrad::to_var(b) * inverse(A);
     x_basic_val = stan::agrad::value_of(x_basic);
     ASSERT_EQ(expected.size(), x_basic_val.size());
@@ -237,6 +238,7 @@ TEST(AgradRevMatrix, mdivide_right_ldlt_dv) {
     for (int n = 0; n < A.size(); n++) {
       vars.push_back(A(n));
     }
+    x_basic(i).grad(vars, grad_basic);
 
     // test all gradients
     ASSERT_EQ(grad_basic.size(), grad.size());
