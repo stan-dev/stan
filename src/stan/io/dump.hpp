@@ -435,6 +435,7 @@ namespace stan {
 
       bool scan_single_char(char c_expected) {
         int c = in_.peek();
+        if (in_.fail()) return false;
         if (c != c_expected)
           return false;
         char c_skip;
@@ -454,6 +455,7 @@ namespace stan {
       bool scan_char(char c_expected) {
         char c;
         in_ >> c;
+        if (in_.fail()) return false;
         if (c != c_expected) {
           in_.putback(c);
           return false;
@@ -464,6 +466,7 @@ namespace stan {
       bool scan_name_unquoted() {
         char c;
         in_ >> c; // 
+        if (in_.fail()) return false;
         if (!std::isalpha(c)) return false;
         name_.push_back(c); 
         while (in_.get(c)) { // get turns off auto space skip

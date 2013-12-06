@@ -270,10 +270,6 @@ namespace stan {
       agrad::OperandsAndPartials<T_y, T_scale_succ, T_scale_fail> 
         operands_and_partials(y, alpha, beta);
 
-      std::fill(operands_and_partials.all_partials,
-                operands_and_partials.all_partials 
-                + operands_and_partials.nvaris, 0.0);
-
       // Explicit return for extreme values
       // The gradients are technically ill-defined, but treated as zero
       for (size_t i = 0; i < stan::length(y); i++) {
@@ -430,10 +426,6 @@ namespace stan {
       agrad::OperandsAndPartials<T_y, T_scale_succ, T_scale_fail> 
         operands_and_partials(y, alpha, beta);
 
-      std::fill(operands_and_partials.all_partials,
-                operands_and_partials.all_partials 
-                + operands_and_partials.nvaris, 0.0);
-      
       // Compute CDF and its gradients
       using boost::math::ibeta;
       using boost::math::ibeta_derivative;
@@ -563,10 +555,6 @@ namespace stan {
       agrad::OperandsAndPartials<T_y, T_scale_succ, T_scale_fail> 
         operands_and_partials(y, alpha, beta);
 
-      std::fill(operands_and_partials.all_partials,
-                operands_and_partials.all_partials
-                + operands_and_partials.nvaris, 0.0);
-      
       // Compute CDF and its gradients
       using boost::math::ibeta;
       using boost::math::ibeta_derivative;
