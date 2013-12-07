@@ -389,7 +389,7 @@ TEST(McmcHmcIntegratorsExplLeapfrog, energy_conservation) {
   double tau = 6.28318530717959;
   size_t L = tau / epsilon;
   
-  for (int n = 0; n < L; ++n) {
+  for (size_t n = 0; n < L; ++n) {
     
     integrator.evolve(z, metric, epsilon);
     
@@ -445,7 +445,7 @@ TEST(McmcHmcIntegratorsExplLeapfrog, symplecticness) {
   for (int i = 0; i < n_points; ++i)
     metric.init(z.at(i));
   
-  for (int n = 0; n < L; ++n)
+  for (size_t n = 0; n < L; ++n)
     for (int i = 0; i < n_points; ++i)
       integrator.evolve(z.at(i), metric, epsilon);
   
