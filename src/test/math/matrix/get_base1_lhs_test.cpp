@@ -8,6 +8,7 @@ TEST(MathMatrix,failing_pre_20) {
   Matrix<double,Dynamic,1> y(3);
   y << 1, 2, 3;
   double z = get_base1_lhs(y,1,"y",1);
+  EXPECT_FLOAT_EQ(1, z);
 }
 TEST(MathMatrix,get_base1_lhs_vec1) {
   using stan::math::get_base1_lhs;

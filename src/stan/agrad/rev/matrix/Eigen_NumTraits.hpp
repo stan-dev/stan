@@ -86,7 +86,7 @@ namespace Eigen {
 
     /**
      * Return standard library's epsilon for double-precision floating
-     * point, <code>std::numeric_limits&lt;double&gt;::epsilon()</code>.
+     * point, <code>std::numeric_limits<double>::epsilon()</code>.
      *
      * @return Same epsilon as a <code>double</code>.
      */

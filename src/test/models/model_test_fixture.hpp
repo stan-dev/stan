@@ -85,7 +85,7 @@ public:
     command << model_path;
     command << " id=" << chain;
     if (has_data()) {
-      command << " data=" << model_path << ".data.R";
+      command << " data file=" << model_path << ".data.R";
     }
     if (has_init()) {
       command << " init=" << model_path << ".init.R";
@@ -294,7 +294,7 @@ template<class Derived>
 std::vector<std::string> Model_Test_Fixture<Derived>::command_outputs;
 
 template<class Derived>
-const int Model_Test_Fixture<Derived>::skip = 4;
+const int Model_Test_Fixture<Derived>::skip = 5;
 
 template<class Derived>
 int Model_Test_Fixture<Derived>::iterations = 2000;
@@ -322,7 +322,7 @@ TYPED_TEST_P(Model_Test_Fixture, ChainsTest) {
     parse_command_output(TypeParam::command_outputs[chain]);
 
     std::string msg = "Seed is : ";
-    for (int option = 0; option < options.size(); option++) {
+    for (size_t option = 0; option < options.size(); option++) {
       if (options[option].first == "seed")
         msg += options[option].second;
     }
@@ -433,7 +433,7 @@ TYPED_TEST_P(Model_Test_Fixture, ExpectedValuesTest) {
       std::vector<std::pair<std::string, std::string> > options = 
         parse_command_output(TypeParam::command_outputs[chain]);
 
-      for (int option = 0; option < options.size(); option++) {
+      for (size_t option = 0; option < options.size(); option++) {
         if (options[option].first == "seed")
           err_message << "seed: " << options[option].second << std::endl;
       }

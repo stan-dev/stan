@@ -43,8 +43,8 @@ TEST(MathMatrixAssign,vectorDouble) {
 
   vector<double> x(3);
   assign(x,y);
-  EXPECT_EQ(3,x.size());
-  EXPECT_EQ(3,y.size());
+  EXPECT_EQ(3U,x.size());
+  EXPECT_EQ(3U,y.size());
   for (size_t i = 0; i < 3; ++i)
     EXPECT_FLOAT_EQ(y[i],x[i]);
 
@@ -57,8 +57,8 @@ TEST(MathMatrixAssign,vectorDouble) {
   ns[2] = 500;
 
   assign(x,ns);
-  EXPECT_EQ(3,x.size());
-  EXPECT_EQ(3,ns.size());
+  EXPECT_EQ(3U,x.size());
+  EXPECT_EQ(3U,ns.size());
   for (size_t i = 0; i < 3; ++i)
     EXPECT_FLOAT_EQ(ns[i], x[i]);
 }
@@ -79,7 +79,7 @@ TEST(MathMatrixAssign,eigenRowVectorDoubleToDouble) {
   assign(x,y);
   EXPECT_EQ(3,x.size());
   EXPECT_EQ(3,y.size());
-  for (size_t i = 0; i < 3; ++i)
+  for (int i = 0; i < 3; ++i)
     EXPECT_FLOAT_EQ(y[i],x[i]);
 }
 TEST(MathMatrixAssign,eigenRowVectorIntToDouble) {
@@ -222,10 +222,10 @@ TEST(MathMatrix,vectorVector) {
   vector<vector<double> > y(3,vector<double>(2));
 
   assign(y,x);
-  EXPECT_EQ(3,y.size());
-  for (size_t i = 0; i < 3; ++i) {
-    EXPECT_EQ(2,y[i].size());
-    for (size_t j = 0; j < 2; ++j) {
+  EXPECT_EQ(3U,y.size());
+  for (size_t i = 0; i < 3U; ++i) {
+    EXPECT_EQ(2U,y[i].size());
+    for (size_t j = 0; j < 2U; ++j) {
       EXPECT_FLOAT_EQ(x[i][j],y[i][j]);
     }
   }
@@ -246,12 +246,12 @@ TEST(MathMatrix,vectorVectorVector) {
     y(4,vector<vector<double> >(3,vector<double>(2)));
 
   assign(y,x);
-  EXPECT_EQ(4,y.size());
-  for (size_t k = 0; k < 4; ++k) {
-    EXPECT_EQ(3,y[k].size());
-    for (size_t i = 0; i < 3; ++i) {
-      EXPECT_EQ(2,y[k][i].size());
-      for (size_t j = 0; j < 2; ++j) {
+  EXPECT_EQ(4U,y.size());
+  for (size_t k = 0; k < 4U; ++k) {
+    EXPECT_EQ(3U,y[k].size());
+    for (size_t i = 0; i < 3U; ++i) {
+      EXPECT_EQ(2U,y[k][i].size());
+      for (size_t j = 0; j < 2U; ++j) {
         EXPECT_FLOAT_EQ(x[k][i][j],y[k][i][j]);
       }
     }
@@ -272,10 +272,10 @@ TEST(MathMatrix,vectorEigenVector) {
 
   assign(y,x);
 
-  EXPECT_EQ(2,y.size());
-  for (size_t i = 0; i < 2; ++i) {
-    EXPECT_EQ(3,y[i].size());
-    for (int j = 0; j < 3; ++j) {
+  EXPECT_EQ(2U,y.size());
+  for (size_t i = 0; i < 2U; ++i) {
+    EXPECT_EQ(3U,y[i].size());
+    for (size_t j = 0; j < 3U; ++j) {
       EXPECT_FLOAT_EQ(x[i](j), y[i](j));
     }
   }

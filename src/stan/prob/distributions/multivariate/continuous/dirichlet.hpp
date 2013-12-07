@@ -44,13 +44,25 @@ namespace stan {
               typename T_prob, typename T_prior_sample_size>
     typename boost::math::tools::promote_args<T_prob,T_prior_sample_size>::type
     dirichlet_log(const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta,
-              const Eigen::Matrix<T_prior_sample_size,Eigen::Dynamic,1>& alpha) {
-      // FIXME: parameter check
+		  const Eigen::Matrix<T_prior_sample_size,Eigen::Dynamic,1>& alpha) {
+      static const char* function = "stan::prob::dirichlet_log(%1%)";
       using boost::math::lgamma;
       using boost::math::tools::promote_args;
-      typename promote_args<T_prob,T_prior_sample_size>::type lp(0.0);
-
+      using stan::math::check_consistent_sizes;
+      using stan::math::check_positive;
+      using stan::math::check_simplex;
       using stan::math::multiply_log;
+      
+      typename promote_args<T_prob,T_prior_sample_size>::type lp(0.0);      
+      if (!check_consistent_sizes(function, theta, alpha,
+				  "probabilities", "prior sample sizes",
+				  &lp))
+	return lp;
+      if (!check_positive(function, alpha, "prior sample sizes", &lp))
+	return lp;
+      if (!check_simplex(function, theta, "probabilities", &lp))
+	return lp;
+
       if (include_summand<propto,T_prior_sample_size>::value) {
         lp += lgamma(alpha.sum());
         for (int k = 0; k < alpha.rows(); ++k)

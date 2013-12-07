@@ -24,7 +24,7 @@ namespace stan {
     }
     template <typename T, int R, int C>
     inline void initialize(Eigen::Matrix<T,R,C>& x, const T& v) {
-      for (size_t i = 0; i < x.size(); ++i)
+      for (int i = 0; i < x.size(); ++i)
         initialize(x(i),v);
     }
     template <typename T, typename V>

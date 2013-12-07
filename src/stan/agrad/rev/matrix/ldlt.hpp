@@ -367,8 +367,8 @@ namespace stan {
         inline void initializeB(const Eigen::Matrix<var,R3,C3> &B,bool haveD) { 
           Eigen::Matrix<double,R3,C3> Bd(B.rows(),B.cols());
           _variB.resize(B.rows(),B.cols());
-          for (size_t j = 0; j < B.cols(); j++) {
-            for (size_t i = 0; i < B.rows(); i++) {
+          for (int j = 0; j < B.cols(); j++) {
+            for (int i = 0; i < B.rows(); i++) {
               _variB(i,j) = B(i,j).vi_;
               Bd(i,j) = B(i,j).val();
             }

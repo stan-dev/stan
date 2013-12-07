@@ -3,113 +3,7 @@
 #include <iomanip>
 #include <ios>
 #include <stan/mcmc/chains.hpp>
-
-void compute_width_and_precision(double value, int sig_figs, int& width, int& precision) {
-  
-  double abs_value = std::fabs(value);
-  
-  if (value == 0) {
-    width = sig_figs;
-    precision = sig_figs;
-  }
-  else if (abs_value >= 1) {
-    int int_part = std::ceil(log10(abs_value) + 1e-6);
-    width = int_part >= sig_figs ? int_part : sig_figs + 1;
-    precision = int_part >= sig_figs ? 0 : sig_figs - int_part;
-  }
-  else {
-    int frac_part = std::fabs(std::floor(log10(abs_value)));
-    width = 1 + frac_part + sig_figs;
-    precision = frac_part + sig_figs - 1;
-  }
-  
-  if (value < 0) ++width;
-  
-}
-
-int compute_width(double value, int sig_figs) {
-  int width;
-  int precision;
-  compute_width_and_precision(value, sig_figs, width, precision);
-  return width;
-}
-
-int compute_precision(double value, int sig_figs, bool scientific) {
-  
-  if (scientific) {
-    return sig_figs - 1;
-  }
-  else {
-    int width;
-    int precision;
-    compute_width_and_precision(value, sig_figs, width, precision);
-    return precision;
-  }
-  
-}
-
-int calculate_column_width(const Eigen::VectorXd& x,
-                           const std::string& name,
-                           const int sig_figs,
-                           std::ios_base::fmtflags& format) {
-
-  int padding = 2;
-  
-  // Fixed Precision
-  int fixed_threshold = 8;
-  int max_fixed_width = 0;
-  
-  for (int i = 0; i < x.size(); ++i) {
-    int width = compute_width(x[i], sig_figs);
-    max_fixed_width = width > max_fixed_width ? width : max_fixed_width;
-  }
-  
-  if (max_fixed_width + padding < fixed_threshold) {
-    format = std::ios_base::fixed;
-    max_fixed_width = name.length() > max_fixed_width ? name.length() : max_fixed_width;
-    return max_fixed_width + padding;
-  }
-  
-  // Scientific Notation
-  int scientific_width = sig_figs + 1 + 4; // Decimal place + exponent
-  if (x.minCoeff() < 0) ++scientific_width;
-  
-  scientific_width = name.length() > scientific_width ? name.length() : scientific_width;
-  
-  format = std::ios_base::scientific;
-  return scientific_width + padding;
-  
-}
-
-Eigen::VectorXi calculate_column_widths(const Eigen::MatrixXd& values,
-                                        const Eigen::Matrix<std::string, Eigen::Dynamic, 1>& headers,
-                                        const int sig_figs,
-                                        Eigen::Matrix<std::ios_base::fmtflags, Eigen::Dynamic, 1>& formats) {
-  int n = values.cols();
-  Eigen::VectorXi column_widths(n);
-  formats.resize(n);
-  for (int i = 0; i < n; i++) {
-    column_widths(i) = calculate_column_width(values.col(i), headers(i), sig_figs, formats(i));
-  }
-  return column_widths;
-}
-
-void print_usage() {
-  
-  std::cout << "USAGE:  print <filename 1> [<filename 2> ... <filename N>]"
-            << std::endl
-            << std::endl;
-  
-  std::cout << "OPTIONS:" << std::endl << std::endl;
-  std::cout << "  --autocorr=<chain_index>\tAppend the autocorrelations for the given chain"
-            << std::endl
-            << std::endl;
-  std::cout << "  --sig_figs=<int>\tSet significant figures of output (Defaults to 2)"
-            << std::endl
-            << std::endl;
-  
-}
-
+#include <stan/command/print.hpp>
 
 /**
  * The Stan print function.
@@ -196,7 +90,7 @@ int main(int argc, const char* argv[]) {
   // Compute largest variable name length
   const int skip = 0;
   std::string model_name = stan_csv.metadata.model;
-  int max_name_length = 0;
+  size_t max_name_length = 0;
   for (int i = skip; i < chains.num_params(); i++) 
     if (chains.param_name(i).length() > max_name_length)
       max_name_length = chains.param_name(i).length();
@@ -326,15 +220,42 @@ int main(int argc, const char* argv[]) {
   
   // Value output
   for (int i = skip; i < chains.num_params(); i++) {
-    std::cout << std::setw(max_name_length + 1) << std::left << chains.param_name(i);
-    std::cout << std::right;
-    for (int j = 0; j < n; j++) {
-      std::cout.setf(formats(j), std::ios::floatfield);
-      std::cout << std::setprecision(
-                   compute_precision(values(i,j), sig_figs, formats(j) == std::ios_base::scientific))
-                << std::setw(column_widths(j)) << values(i, j);
+    if (!is_matrix(chains.param_name(i))) {
+      std::cout << std::setw(max_name_length + 1) << std::left << chains.param_name(i);
+      std::cout << std::right;
+      for (int j = 0; j < n; j++) {
+        std::cout.setf(formats(j), std::ios::floatfield);
+        std::cout << std::setprecision(
+                                       compute_precision(values(i,j), sig_figs, formats(j) == std::ios_base::scientific))
+                  << std::setw(column_widths(j)) << values(i, j);
+      }
+      std::cout << std::endl;
+    } else {
+      std::vector<int> dims = dimensions(chains, i);
+      std::vector<int> index(dims.size(), 1);
+      int max = 1;
+      for (size_t j = 0; j < dims.size(); j++)
+        max *= dims[j];
+      
+      for (int k = 0; k < max; k++) {
+        int param_index = i + matrix_index(index, dims);
+        std::cout << std::setw(max_name_length + 1) << std::left 
+                  << chains.param_name(param_index);
+        std::cout << std::right;
+        for (int j = 0; j < n; j++) {
+          std::cout.setf(formats(j), std::ios::floatfield);
+          std::cout 
+            << std::setprecision(compute_precision(values(param_index,j), 
+                                                   sig_figs, 
+                                                   formats(j) == std::ios_base::scientific))
+            << std::setw(column_widths(j)) << values(param_index, j);
+        }
+        std::cout << std::endl;
+        if (k < max-1)
+          next_index(index, dims);
+      }
+      i += max-1;
     }
-    std::cout << std::endl;
   }
 
   /// Footer output

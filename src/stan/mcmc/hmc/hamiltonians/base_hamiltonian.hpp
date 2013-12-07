@@ -70,16 +70,15 @@ namespace stan {
           if (!error_msgs) return;
           
           *error_msgs << std::endl
-                      << "Informational Message: The parameter state is about to be Metropolis"
-                      << " rejected due to the following underlying, non-fatal (really)"
-                      << " issue (and please ignore that what comes next might say 'error'): "
-                      << e.what()
+                      << "Informational Message: The current Metropolis proposal is about to be "
+                      << "rejected becuase of the following issue:"
                       << std::endl
-                      << "If the problem persists across multiple draws, you might have"
-                      << " a problem with an initial state or a gradient somewhere."
+                      << e.what() << std::endl
+                      << "If this warning occurs sporadically, such as for highly constrained "
+                      << "variable types like covariance matrices, then the sampler is fine,"
                       << std::endl
-                      << " If the problem does not persist, the resulting samples will still"
-                      << " be drawn from the posterior."
+                      << "but if this warning occurs often then your model may be either severely "
+                      << "ill-conditioned or misspecified."
                       << std::endl;
           
       }
@@ -89,6 +88,6 @@ namespace stan {
   } // mcmc
 
 } // stan
-          
+
 
 #endif

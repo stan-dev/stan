@@ -114,13 +114,13 @@ namespace stan {
           
             std::vector<std::string> valid_paths;
             
-            for (int i = 0; i < _arguments.size(); ++i) {
+            for (size_t i = 0; i < _arguments.size(); ++i) {
               _arguments.at(i)->find_arg(val_name, "", valid_paths);
             }
             
             if (valid_paths.size()) {
               *err << "Perhaps you meant one of the following valid configurations?" << std::endl;
-              for (int i = 0; i < valid_paths.size(); ++i)
+              for (size_t i = 0; i < valid_paths.size(); ++i)
                 *err << "  " << valid_paths.at(i) << std::endl;
             }
           }
@@ -140,7 +140,7 @@ namespace stan {
         if (!s) 
           return;
 
-        for (int i = 0; i < _arguments.size(); ++i) {
+        for (size_t i = 0; i < _arguments.size(); ++i) {
           _arguments.at(i)->print(s, 0, prefix);
         }
         
@@ -150,7 +150,7 @@ namespace stan {
         if (!s) 
           return;
         
-        for (int i = 0; i < _arguments.size(); ++i) {
+        for (size_t i = 0; i < _arguments.size(); ++i) {
           _arguments.at(i)->print_help(s, 1, recurse);
         }
       }

@@ -4,17 +4,19 @@
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/meta/traits.hpp>
 #include <boost/math/special_functions/atanh.hpp>
+#include <stan/math/functions/square.hpp>
 
-namespace stan{
+namespace stan {
 
-  namespace agrad{
+  namespace agrad {
 
     template <typename T>
     inline
     fvar<T>
     atanh(const fvar<T>& x) {
       using boost::math::atanh;
-       return fvar<T>(atanh(x.val_), x.d_ / (1 - x.val_ * x.val_));
+      using stan::math::square;
+      return fvar<T>(atanh(x.val_), x.d_ / (1 - square(x.val_)));
     }
   }
 }

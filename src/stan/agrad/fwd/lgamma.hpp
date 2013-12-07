@@ -5,9 +5,9 @@
 #include <stan/meta/traits.hpp>
 #include <boost/math/special_functions/digamma.hpp>
 
-namespace stan{
+namespace stan {
 
-  namespace agrad{
+  namespace agrad {
 
     template <typename T>
     inline

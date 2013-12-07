@@ -10,12 +10,14 @@
 #include "stan/math/constants.hpp"
 #include "stan/math/functions/Phi.hpp"
 #include "stan/math/functions/Phi_approx.hpp"
+#include "stan/math/functions/abs.hpp"
 #include "stan/math/functions/as_bool.hpp"
 #include "stan/math/functions/bessel_first_kind.hpp"
 #include "stan/math/functions/bessel_second_kind.hpp"
 #include "stan/math/functions/binary_log_loss.hpp"
 #include "stan/math/functions/binomial_coefficient_log.hpp"
 #include "stan/math/functions/dist.hpp"
+#include "stan/math/functions/digamma.hpp"
 #include "stan/math/functions/dot.hpp"
 #include "stan/math/functions/dot_self.hpp"
 #include "stan/math/functions/exp2.hpp"
@@ -68,6 +70,7 @@
 #include "stan/math/functions/step.hpp"
 #include "stan/math/functions/sub.hpp"
 #include "stan/math/functions/sum.hpp"
+#include "stan/math/functions/trigamma.hpp"
 #include "stan/math/functions/value_of.hpp"
 
 #endif

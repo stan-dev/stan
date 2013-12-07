@@ -12,6 +12,7 @@ namespace stan {
         USAGE = 64,
         DATAERR = 65,
         NOINPUT = 66,
+        SOFTWARE = 70,
         CONFIG = 78
       };
     };

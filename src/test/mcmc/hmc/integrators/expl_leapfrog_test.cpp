@@ -4,19 +4,21 @@
 #include <sstream>
 
 #include <test/mcmc/hmc/integrators/command.cpp>
+#include <test/mcmc/hmc/integrators/models/gauss.cpp>
+
+#include <stan/io/dump.hpp>
 
 #include <stan/mcmc/hmc/hamiltonians/unit_e_metric.hpp>
-#include <stan/mcmc/hmc/hamiltonians/unit_e_point.hpp>
 #include <stan/mcmc/hmc/hamiltonians/diag_e_metric.hpp>
-#include <stan/mcmc/hmc/hamiltonians/diag_e_point.hpp>
 #include <boost/random/additive_combine.hpp> // L'Ecuyer RNG
 
 
 // namespace
 //************************************************************
 
+typedef boost::ecuyer1988 rng_t;
 
-class McmcHmcIntegratorsExplLeapfrog : public testing::Test {
+class McmcHmcIntegratorsExplLeapfrogF : public testing::Test {
 public:
   
   void SetUp() {
@@ -30,9 +32,7 @@ public:
   
   void TearDown() {
     delete(model);
-  }  
-  
-  typedef boost::ecuyer1988 rng_t;
+  }
   
   // integrator under test
   stan::mcmc::expl_leapfrog<
@@ -49,7 +49,7 @@ public:
 
 
 
-TEST_F(McmcHmcIntegratorsExplLeapfrog, begin_update_p) {
+TEST_F(McmcHmcIntegratorsExplLeapfrogF, begin_update_p) {
   // setup z
   stan::mcmc::unit_e_point z(1,0);
   z.V    =  1.99974742955684;
@@ -75,7 +75,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrog, begin_update_p) {
   EXPECT_NEAR(z.g(0),  1.99987371079118, 5e-14);
 }
 
-TEST_F(McmcHmcIntegratorsExplLeapfrog, update_q) {
+TEST_F(McmcHmcIntegratorsExplLeapfrogF, update_q) {
   // setup z
   stan::mcmc::unit_e_point z(1,0);
   z.V    =  1.99974742955684;
@@ -101,7 +101,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrog, update_q) {
   EXPECT_NEAR(z.g(0),  1.99987371079118, 5e-14);
 }
 
-TEST_F(McmcHmcIntegratorsExplLeapfrog, end_update_p) {
+TEST_F(McmcHmcIntegratorsExplLeapfrogF, end_update_p) {
   // setup z
   stan::mcmc::unit_e_point z(1,0);
   z.V    =  1.39887860643153;
@@ -127,7 +127,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrog, end_update_p) {
   EXPECT_NEAR(z.g(0),  1.67264975797776, 5e-14);
 }
 
-TEST_F(McmcHmcIntegratorsExplLeapfrog, evolve_1) {
+TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_1) {
   // setup z
   stan::mcmc::unit_e_point z(1,0);
   z.V    =  1.99974742955684;
@@ -153,7 +153,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrog, evolve_1) {
   EXPECT_NEAR(z.g(0),  1.83126205010749, 5e-14);
 }
 
-TEST_F(McmcHmcIntegratorsExplLeapfrog, evolve_2) {
+TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_2) {
   // setup z
   stan::mcmc::unit_e_point z(1,0);
   z.V    =  1.99974742955684;
@@ -179,7 +179,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrog, evolve_2) {
   EXPECT_NEAR(z.g(0),  2.06610501430439, 5e-14);
 }
 
-TEST_F(McmcHmcIntegratorsExplLeapfrog, evolve_3) {
+TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_3) {
   // setup z
   stan::mcmc::unit_e_point z(1,0);
   z.V    =  1.99974742955684;
@@ -205,7 +205,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrog, evolve_3) {
   EXPECT_NEAR(z.g(0),  2.06610501430439, 5e-14);
 }
 
-TEST_F(McmcHmcIntegratorsExplLeapfrog, evolve_4) {
+TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_4) {
   // setup z
   stan::mcmc::unit_e_point z(1,0);
   z.V    =  1.99974742955684;
@@ -231,7 +231,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrog, evolve_4) {
   EXPECT_NEAR(z.g(0),  1.43528066467474, 5e-14);
 }
 
-TEST_F(McmcHmcIntegratorsExplLeapfrog, evolve_5) {
+TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_5) {
   // setup z
   stan::mcmc::unit_e_point z(1,0);
   z.V    =  1.99974742955684;
@@ -256,7 +256,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrog, evolve_5) {
   EXPECT_NEAR(z.p(0), -1.44022928930593, 5e-14);
   EXPECT_NEAR(z.g(0),  1.24660335198005, 5e-14);
 }
-TEST_F(McmcHmcIntegratorsExplLeapfrog, evolve_6) {
+TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_6) {
   // setup z
   stan::mcmc::unit_e_point z(1,0);
   z.V    =  1.99974742955684;
@@ -282,7 +282,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrog, evolve_6) {
   EXPECT_NEAR(z.g(0), -0.409204730680088, 5e-14);
 }
 
-TEST_F(McmcHmcIntegratorsExplLeapfrog, evolve_7) {
+TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_7) {
   // setup z
   stan::mcmc::unit_e_point z(1,0);
   z.V    =  1.99974742955684;
@@ -308,7 +308,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrog, evolve_7) {
   EXPECT_NEAR(z.g(0),  -4.97752176966686, 5e-14);
 }
 
-TEST_F(McmcHmcIntegratorsExplLeapfrog, evolve_8) {
+TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_8) {
   // setup z
   stan::mcmc::unit_e_point z(1,0);
   z.V    =  1.99974742955684;
@@ -334,7 +334,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrog, evolve_8) {
   EXPECT_NEAR(z.g(0),  3.73124965311523, 5e-14);
 }
 
-TEST_F(McmcHmcIntegratorsExplLeapfrog, evolve_9) {
+TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_9) {
   // setup z
   stan::mcmc::diag_e_point z(1,0);
   z.V    =  0.807684865121721;
@@ -360,3 +360,128 @@ TEST_F(McmcHmcIntegratorsExplLeapfrog, evolve_9) {
   EXPECT_NEAR(z.p(0),  0.371492925378682, 5e-14);
   EXPECT_NEAR(z.g(0), -1.71246374711032, 5e-14);
 }
+
+TEST(McmcHmcIntegratorsExplLeapfrog, energy_conservation) {
+  
+  rng_t base_rng(0);
+  
+  std::fstream data_stream(std::string("").c_str(), std::fstream::in);
+  stan::io::dump data_var_context(data_stream);
+  data_stream.close();
+  
+  gauss_namespace::gauss model(data_var_context, &std::cout);
+  
+  stan::mcmc::expl_leapfrog<
+  stan::mcmc::unit_e_metric<gauss_namespace::gauss, rng_t>,
+  stan::mcmc::unit_e_point> integrator;
+  
+  stan::mcmc::unit_e_metric<gauss_namespace::gauss, rng_t> metric(model, &std::cout);
+  
+  stan::mcmc::unit_e_point z(1, 0);
+  z.q.at(0) = 1;
+  z.p(0) = 1;
+  
+  metric.update(z);
+  double H0 = metric.H(z);
+  double aveDeltaH = 0;
+  
+  double epsilon = 1e-3;
+  double tau = 6.28318530717959;
+  size_t L = tau / epsilon;
+  
+  for (size_t n = 0; n < L; ++n) {
+    
+    integrator.evolve(z, metric, epsilon);
+    
+    double deltaH = metric.H(z) - H0;
+    aveDeltaH += (deltaH - aveDeltaH) / double(n + 1);
+    
+  }
+
+  // Average error in Hamiltonian should be O(epsilon^{2})
+  // in general, smaller for the gaussian case due to cancellations
+  EXPECT_NEAR(aveDeltaH, 0, epsilon * epsilon);
+  
+}
+
+TEST(McmcHmcIntegratorsExplLeapfrog, symplecticness) {
+  
+  rng_t base_rng(0);
+  
+  std::fstream data_stream(std::string("").c_str(), std::fstream::in);
+  stan::io::dump data_var_context(data_stream);
+  data_stream.close();
+  
+  gauss_namespace::gauss model(data_var_context, &std::cout);
+  
+  stan::mcmc::expl_leapfrog<
+  stan::mcmc::unit_e_metric<gauss_namespace::gauss, rng_t>,
+  stan::mcmc::unit_e_point> integrator;
+  
+  stan::mcmc::unit_e_metric<gauss_namespace::gauss, rng_t> metric(model, &std::cout);
+  
+  // Create a circle of points
+  const int n_points = 1000;
+  
+  double pi = 3.141592653589793;
+  double r = 1.5;
+  double q0 = 1;
+  double p0 = 0;
+  
+  std::vector<stan::mcmc::unit_e_point> z;
+  
+  for (int i = 0; i < n_points; ++i) {
+    z.push_back(stan::mcmc::unit_e_point(1, 0));
+    
+    double theta = 2 * pi * (double)i / (double)n_points;
+    z.back().q.at(0) = r * cos(theta) + q0;
+    z.back().p(0)    = r * sin(theta) + p0;
+  }
+  
+  // Evolve circle
+  double epsilon = 1e-3;
+  size_t L = pi / epsilon;
+  
+  for (int i = 0; i < n_points; ++i)
+    metric.init(z.at(i));
+  
+  for (size_t n = 0; n < L; ++n)
+    for (int i = 0; i < n_points; ++i)
+      integrator.evolve(z.at(i), metric, epsilon);
+  
+  // Compute area of evolved shape using divergence theorem in 2D
+  double area = 0;
+  
+  for (int i = 0; i < n_points; ++i) {
+    
+    double x1 = z[i].q.at(0);
+    double y1 = z[i].p(0);
+    double x2 = z[(i + 1) % n_points].q.at(0);
+    double y2 = z[(i + 1) % n_points].p(0);
+    
+    double x_bary = 0.5 * (x1 + x2);
+    double y_bary = 0.5 * (y1 + y2);
+    
+    double x_delta = x2 - x1;
+    double y_delta = y2 - y1;
+    
+    double a = sqrt( x_delta * x_delta + y_delta * y_delta);
+    
+    double x_norm = 1;
+    double y_norm = - x_delta / y_delta;
+    double norm = sqrt( x_norm * x_norm + y_norm * y_norm );
+    
+    a *= (x_bary * x_norm + y_bary * y_norm) / norm;
+    a = a < 0 ? -a : a;
+    
+    area += a;
+    
+  }
+  
+  area *= 0.5;
+  
+  // Symplectic integrators preserve volume (area in 2D)
+  EXPECT_NEAR(area, pi * r * r, 1e-2);
+  
+}
+

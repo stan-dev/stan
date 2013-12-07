@@ -61,7 +61,7 @@ TEST(AgradRev,multiply_log_var_var) {
   EXPECT_FLOAT_EQ(std::numeric_limits<double>::infinity(),g[1]);
 }
 
-TEST(AgradRev,multiply_log_var_double){
+TEST(AgradRev,multiply_log_var_double) {
   AVAR a = 2.2;
   double b = 3.3;
   AVAR f = multiply_log(a,b);
@@ -82,7 +82,7 @@ TEST(AgradRev,multiply_log_var_double){
   f.grad(x,g);
   EXPECT_FLOAT_EQ(std::log(b),g[0]);
 }
-TEST(AgradRev,multiply_log_double_var){
+TEST(AgradRev,multiply_log_double_var) {
   double a = 2.2;
   AVAR b = 3.3;
   AVAR f = multiply_log(a,b);
