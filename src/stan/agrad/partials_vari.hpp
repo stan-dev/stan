@@ -79,12 +79,12 @@ namespace stan {
       agrad::vari** all_varis;
       double* all_partials;
 
-      VectorView<double*, is_vector<T1>::value> d_x1;
-      VectorView<double*, is_vector<T2>::value> d_x2;
-      VectorView<double*, is_vector<T3>::value> d_x3;
-      VectorView<double*, is_vector<T4>::value> d_x4;
-      VectorView<double*, is_vector<T5>::value> d_x5;
-      VectorView<double*, is_vector<T6>::value> d_x6;
+      VectorView<double*, is_vector<T1>::value, is_constant_struct<T1>::value> d_x1;
+      VectorView<double*, is_vector<T2>::value, is_constant_struct<T2>::value> d_x2;
+      VectorView<double*, is_vector<T3>::value, is_constant_struct<T3>::value> d_x3;
+      VectorView<double*, is_vector<T4>::value, is_constant_struct<T4>::value> d_x4;
+      VectorView<double*, is_vector<T5>::value, is_constant_struct<T5>::value> d_x5;
+      VectorView<double*, is_vector<T6>::value, is_constant_struct<T6>::value> d_x6;
       
       OperandsAndPartials(const T1& x1=0, const T2& x2=0, const T3& x3=0, 
                           const T4& x4=0, const T5& x5=0, const T6& x6=0)

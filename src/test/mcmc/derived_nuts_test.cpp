@@ -1,4 +1,6 @@
-#include <test/mcmc/mock_hmc.hpp>
+#include <gtest/gtest.h>
+
+#include <boost/random/additive_combine.hpp>
 
 #include <stan/mcmc/hmc/hamiltonians/unit_e_point.hpp>
 #include <stan/mcmc/hmc/hamiltonians/diag_e_point.hpp>
@@ -8,9 +10,7 @@
 #include <stan/mcmc/hmc/nuts/diag_e_nuts.hpp>
 #include <stan/mcmc/hmc/nuts/dense_e_nuts.hpp>
 
-#include <boost/random/additive_combine.hpp>
-
-#include <gtest/gtest.h>
+#include <test/mcmc/hmc/mock_hmc.hpp>
 
 typedef boost::ecuyer1988 rng_t;
 

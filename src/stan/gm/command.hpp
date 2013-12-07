@@ -371,18 +371,18 @@ namespace stan {
                                                        cont_params, disc_params, init_grad,
                                                        &std::cout);
           } catch (std::domain_error e) {
-            std::cout << "Rejecting inititialization at zero because of log_prob_grad failure." << std::endl;
+            std::cout << "Rejecting initialization at zero because of log_prob_grad failure." << std::endl;
             return error_codes::OK;
           }
           
           if (!boost::math::isfinite(init_log_prob)) {
-            std::cout << "Rejecting inititialization at zero because of vanishing density." << std::endl;
+            std::cout << "Rejecting initialization at zero because of vanishing density." << std::endl;
             return 0;
           }
           
           for (size_t i = 0; i < init_grad.size(); ++i) {
             if (!boost::math::isfinite(init_grad[i])) {
-              std::cout << "Rejecting inititialization at zero because of divergent gradient." << std::endl;
+              std::cout << "Rejecting initialization at zero because of divergent gradient." << std::endl;
               return 0;
             }
           }
@@ -477,18 +477,18 @@ namespace stan {
                                                      &std::cout);
 
         } catch (std::domain_error e) {
-          std::cout << "Rejecting user-specified inititialization because of log_prob_grad failure." << std::endl;
+          std::cout << "Rejecting user-specified initialization because of log_prob_grad failure." << std::endl;
           return 0;
         }
         
         if (!boost::math::isfinite(init_log_prob)) {
-          std::cout << "Rejecting user-specified inititialization because of vanishing density." << std::endl;
+          std::cout << "Rejecting user-specified initialization because of vanishing density." << std::endl;
           return 0;
         }
         
         for (size_t i = 0; i < init_grad.size(); ++i) {
           if (!boost::math::isfinite(init_grad[i])) {
-            std::cout << "Rejecting user-specified inititialization because of divergent gradient." << std::endl;
+            std::cout << "Rejecting user-specified initialization because of divergent gradient." << std::endl;
             return 0;
           }
         }
