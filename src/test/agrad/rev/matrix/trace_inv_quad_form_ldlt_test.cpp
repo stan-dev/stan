@@ -1,6 +1,8 @@
 #include <stan/agrad/rev/matrix/trace_inv_quad_form_ldlt.hpp>
 #include <stan/agrad/rev/matrix/sum.hpp>
 #include <gtest/gtest.h>
+#include <stan/agrad/var_matrix.hpp>
+#include <stan/math/matrix.hpp>
 #include <test/agrad/util.hpp>
 #include <stan/math/matrix/sum.hpp>
 #include <stan/math/matrix/trace_inv_quad_form_ldlt.hpp>
@@ -215,3 +217,205 @@ TEST(AgradRevMatrix, trace_quad_form_ldlt_mat_grad_vv) {
       EXPECT_FLOAT_EQ(grad[pos], dqda(i,j));
 }
 
+TEST(AgradRevMatrix, trace_quad_form_ldlt_vv_basic) {
+  using stan::agrad::matrix_v;
+  using stan::math::matrix_d;
+  using stan::math::LDLT_factor;
+  using stan::agrad::var;
+  using std::vector;
+  using stan::math::trace;
+  using stan::math::transpose;
+  using stan::math::inverse;
+  
+  matrix_v A(4,4);
+  matrix_v B(4,2);
+  LDLT_factor<var,-1,-1> ldlt_A;
+  var x, x_basic;
+  double x_val, x_basic_val;
+  vector<var> vars;
+  vector<double> grad, grad_basic;
+  
+  // solve using trace_quad_form_ldlt
+  A << 
+    9.0,  3.0, 3.0,   3.0, 
+    3.0, 10.0, 2.0,   2.0,
+    3.0,  2.0, 7.0,   1.0,
+    3.0,  2.0, 1.0, 112.0;
+  B << 
+    100, 10,
+    0,  1,
+    -3, -3,
+    5,  2;
+  ldlt_A.compute(A);
+  x = trace_inv_quad_form_ldlt(ldlt_A,B);
+  x_val = x.val();
+  
+  vars.clear();
+  for (int n = 0; n < A.size(); n++) 
+    vars.push_back(A(n));
+  for (int n = 0; n < B.size(); n++) 
+    vars.push_back(B(n));
+  x.grad(vars, grad);
+
+  // solve using basic math
+  A << 
+    9.0,  3.0, 3.0,   3.0, 
+    3.0, 10.0, 2.0,   2.0,
+    3.0,  2.0, 7.0,   1.0,
+    3.0,  2.0, 1.0, 112.0;
+  B << 
+    100, 10,
+    0,  1,
+    -3, -3,
+    5,  2;
+  matrix_v tmp = transpose(B) * inverse(A) * B;
+  x_basic = trace(tmp);
+  x_basic_val = x_basic.val();
+  
+  vars.clear();
+  for (int n = 0; n < A.size(); n++) 
+    vars.push_back(A(n));
+  for (int n = 0; n < B.size(); n++) 
+    vars.push_back(B(n));
+  x_basic.grad(vars, grad_basic);
+
+  
+  // check values
+  EXPECT_FLOAT_EQ(x_basic_val, x_val);
+  ASSERT_EQ(grad_basic.size(), grad.size());
+  for (int n = 0; n < grad_basic.size(); n++)
+    EXPECT_FLOAT_EQ(grad_basic[n], grad[n]);
+}
+
+TEST(AgradRevMatrix, trace_quad_form_ldlt_vd_basic) {
+  using stan::agrad::matrix_v;
+  using stan::math::matrix_d;
+  using stan::math::LDLT_factor;
+  using stan::agrad::var;
+  using std::vector;
+  using stan::math::trace;
+  using stan::math::transpose;
+  using stan::math::inverse;
+  
+  matrix_v A(4,4);
+  matrix_d B(4,2);
+  LDLT_factor<var,-1,-1> ldlt_A;
+  var x, x_basic;
+  double x_val, x_basic_val;
+  vector<var> vars;
+  vector<double> grad, grad_basic;
+  
+  // solve using trace_quad_form_ldlt
+  A << 
+    9.0,  3.0, 3.0,   3.0, 
+    3.0, 10.0, 2.0,   2.0,
+    3.0,  2.0, 7.0,   1.0,
+    3.0,  2.0, 1.0, 112.0;
+  B << 
+    100, 10,
+    0,  1,
+    -3, -3,
+    5,  2;
+  ldlt_A.compute(A);
+  x = trace_inv_quad_form_ldlt(ldlt_A,B);
+  x_val = x.val();
+  
+  vars.clear();
+  for (int n = 0; n < A.size(); n++) 
+    vars.push_back(A(n));
+  x.grad(vars, grad);
+
+  // solve using basic math
+  A << 
+    9.0,  3.0, 3.0,   3.0, 
+    3.0, 10.0, 2.0,   2.0,
+    3.0,  2.0, 7.0,   1.0,
+    3.0,  2.0, 1.0, 112.0;
+  B << 
+    100, 10,
+    0,  1,
+    -3, -3,
+    5,  2;
+  matrix_v tmp = stan::agrad::to_var(transpose(B)) * inverse(A) 
+    * stan::agrad::to_var(B);
+  x_basic = trace(tmp);
+  x_basic_val = x_basic.val();
+  
+  vars.clear();
+  for (int n = 0; n < A.size(); n++) 
+    vars.push_back(A(n));
+  x_basic.grad(vars, grad_basic);
+
+  
+  // check values
+  EXPECT_FLOAT_EQ(x_basic_val, x_val);
+  ASSERT_EQ(grad_basic.size(), grad.size());
+  for (int n = 0; n < grad_basic.size(); n++)
+    EXPECT_FLOAT_EQ(grad_basic[n], grad[n]);
+}
+
+TEST(AgradRevMatrix, trace_quad_form_ldlt_dv_basic) {
+  using stan::agrad::matrix_v;
+  using stan::math::matrix_d;
+  using stan::math::LDLT_factor;
+  using stan::agrad::var;
+  using std::vector;
+  using stan::math::trace;
+  using stan::math::transpose;
+  using stan::math::inverse;
+  
+  matrix_d A(4,4);
+  matrix_v B(4,2);
+  LDLT_factor<double,-1,-1> ldlt_A;
+  var x, x_basic;
+  double x_val, x_basic_val;
+  vector<var> vars;
+  vector<double> grad, grad_basic;
+  
+  // solve using trace_quad_form_ldlt
+  A << 
+    9.0,  3.0, 3.0,   3.0, 
+    3.0, 10.0, 2.0,   2.0,
+    3.0,  2.0, 7.0,   1.0,
+    3.0,  2.0, 1.0, 112.0;
+  B << 
+    100, 10,
+    0,  1,
+    -3, -3,
+    5,  2;
+  ldlt_A.compute(A);
+  x = trace_inv_quad_form_ldlt(ldlt_A,B);
+  x_val = x.val();
+  
+  vars.clear();
+  for (int n = 0; n < B.size(); n++) 
+    vars.push_back(B(n));
+  x.grad(vars, grad);
+
+  // solve using basic math
+  A << 
+    9.0,  3.0, 3.0,   3.0, 
+    3.0, 10.0, 2.0,   2.0,
+    3.0,  2.0, 7.0,   1.0,
+    3.0,  2.0, 1.0, 112.0;
+  B << 
+    100, 10,
+    0,  1,
+    -3, -3,
+    5,  2;
+  matrix_v tmp = transpose(B) * stan::agrad::to_var(A.inverse().eval()) * B;
+  x_basic = trace(tmp);
+  x_basic_val = x_basic.val();
+  
+  vars.clear();
+  for (int n = 0; n < B.size(); n++) 
+    vars.push_back(B(n));
+  x_basic.grad(vars, grad_basic);
+
+  
+  // check values
+  EXPECT_FLOAT_EQ(x_basic_val, x_val);
+  ASSERT_EQ(grad_basic.size(), grad.size());
+  for (int n = 0; n < grad_basic.size(); n++)
+    EXPECT_FLOAT_EQ(grad_basic[n], grad[n]);
+}
