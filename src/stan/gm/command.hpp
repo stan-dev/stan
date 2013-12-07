@@ -513,7 +513,7 @@ namespace stan {
       std::cout << "Gradient evaluation took " << deltaT << " seconds" << std::endl;
       std::cout << "1000 transitions using 10 leapfrog steps per transition would take "
                 << 1e4 * deltaT << " seconds." << std::endl;
-      std::cout << "Suit your expectations accordingly!" << std::endl << std::endl;
+      std::cout << "Adjust your expectations accordingly!" << std::endl << std::endl;
       
       // Initial output
       parser.print(&std::cout);
