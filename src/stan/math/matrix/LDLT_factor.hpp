@@ -7,6 +7,11 @@
 
 namespace stan {
   namespace math {
+
+    // This class is conceptually similar to the corresponding Eigen class
+    // Any spd matrix A can be decomposed as LDL' where L is unit lower-triangular
+    // and D is diagonal with positive diagonal elements
+
     template<typename T, int R, int C>
     class LDLT_factor;
     

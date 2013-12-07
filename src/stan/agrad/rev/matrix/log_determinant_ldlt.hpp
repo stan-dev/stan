@@ -10,6 +10,15 @@ namespace stan {
   namespace agrad {
     namespace {
 
+    /**
+     * Returns the log det of the matrix whose LDLT factorization is given
+     * See The Matrix Cookbook's chapter on Derivatives of a Determinant
+     * In this case, it is just the inverse of the underlying matrix
+     * @param A, which is a LDLT_factor
+     * @return ln(det(A))
+     * @throws never
+     */
+
       template<int R,int C>
       class log_det_ldlt_vari : public vari {
       public:

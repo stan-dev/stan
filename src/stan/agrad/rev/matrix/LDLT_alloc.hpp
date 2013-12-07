@@ -6,6 +6,11 @@
 
 namespace stan {
   namespace agrad {
+
+    /**
+     * FIX_DOX
+     */
+
     template<int R, int C>
     class LDLT_alloc : public chainable_alloc {
     public:
