@@ -495,6 +495,22 @@ namespace stan {
         
       }
 
+      // Check timing
+      clock_t start = clock();
+      
+      std::vector<double> init_grad;
+      stan::model::log_prob_grad<true, true>(model,
+                                             cont_params, disc_params, init_grad,
+                                             &std::cout);
+      
+      clock_t end = clock();
+      double deltaT = (double)(end - start) / CLOCKS_PER_SEC;
+      
+      std::cout << "Gradient evaluation took " << deltaT << " seconds" << std::endl;
+      std::cout << "1000 transitions using 10 leapfrog steps per transition would take "
+                << 1e4 * deltaT << " seconds." << std::endl;
+      std::cout << "Adjust your expectations accordingly!" << std::endl << std::endl;
+      
       // Initial output
       parser.print(&std::cout);
       std::cout << std::endl;

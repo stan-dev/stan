@@ -128,7 +128,9 @@ TEST_F(StanGmArgumentsConfiguration, TestMethod) {
         expected_output << "is not a valid value for" << std::endl;
         expected_output << "Failed to parse arguments, terminating Stan" << std::endl;
         n_output = 2;
+        
         EXPECT_EQ(int(stan::gm::error_codes::USAGE), out.err_code);
+        
       } else {
         EXPECT_EQ(int(stan::gm::error_codes::OK), out.err_code);
       }
@@ -136,13 +138,20 @@ TEST_F(StanGmArgumentsConfiguration, TestMethod) {
       output.clear();
       output.seekg(std::ios_base::beg);
       output.str(out.output);
+      std::string actual_line;
+      
+      // Advance past header
+      if (expected_success == true) {
+        std::getline(output, actual_line);
+        std::getline(output, actual_line);
+        std::getline(output, actual_line);
+        std::getline(output, actual_line);
+      }
       
       for (int i = 0; i < n_output; ++i) {
         std::string expected_line;
         std::getline(expected_output, expected_line);
         
-        
-        std::string actual_line;
         std::getline(output, actual_line);
         
         EXPECT_EQ(expected_line, actual_line);
@@ -245,17 +254,23 @@ TEST_F(StanGmArgumentsConfiguration, TestIdWithMethod) {
       }
     
       output.str(out.output);
+      std::string actual_line;
+      
+      // Advance past header
+      if (expected_success == true) {
+        std::getline(output, actual_line);
+        std::getline(output, actual_line);
+        std::getline(output, actual_line);
+        std::getline(output, actual_line);
+      }
       
       for (int i = 0; i < n_output; ++i) {
-        
         std::string expected_line;
         std::getline(expected_output, expected_line);
         
-        std::string actual_line;
         std::getline(output, actual_line);
         
         EXPECT_EQ(expected_line, actual_line);
-        
       }
       
       expected_output.clear();
@@ -344,17 +359,15 @@ TEST_F(StanGmArgumentsConfiguration, TestIdWithoutMethod) {
       }
     
       output.str(out.output);
+      std::string actual_line;
       
       for (int i = 0; i < n_output; ++i) {
-        
         std::string expected_line;
         std::getline(expected_output, expected_line);
         
-        std::string actual_line;
         std::getline(output, actual_line);
         
         EXPECT_EQ(expected_line, actual_line);
-        
       }
       
       expected_output.clear();
@@ -457,17 +470,23 @@ TEST_F(StanGmArgumentsConfiguration, TestDataWithMethod) {
       }
       
       output.str(out.output);
+      std::string actual_line;
+      
+      // Advance past header
+      if (expected_success == true) {
+        std::getline(output, actual_line);
+        std::getline(output, actual_line);
+        std::getline(output, actual_line);
+        std::getline(output, actual_line);
+      }
       
       for (int i = 0; i < n_output; ++i) {
-        
         std::string expected_line;
         std::getline(expected_output, expected_line);
         
-        std::string actual_line;
         std::getline(output, actual_line);
         
         EXPECT_EQ(expected_line, actual_line);
-        
       }
       
       expected_output.clear();
@@ -556,17 +575,15 @@ TEST_F(StanGmArgumentsConfiguration, TestDataWithoutMethod) {
       }
       
       output.str(out.output);
+      std::string actual_line;
       
       for (int i = 0; i < n_output; ++i) {
-        
         std::string expected_line;
         std::getline(expected_output, expected_line);
         
-        std::string actual_line;
         std::getline(output, actual_line);
         
         EXPECT_EQ(expected_line, actual_line);
-        
       }
       
       expected_output.clear();
@@ -668,25 +685,27 @@ TEST_F(StanGmArgumentsConfiguration, TestInitWithMethod) {
       }
       
       output.str(out.output);
+      std::string actual_line;
+      
+      // Advance past header
+      if (expected_success == true) {
+        std::getline(output, actual_line);
+        std::getline(output, actual_line);
+        std::getline(output, actual_line);
+        std::getline(output, actual_line);
+      }
       
       for (int i = 0; i < n_output; ++i) {
-        
         std::string expected_line;
         std::getline(expected_output, expected_line);
         
-        std::string actual_line;
         std::getline(output, actual_line);
         
         EXPECT_EQ(expected_line, actual_line);
-        
       }
       
-      expected_output.clear();
-      expected_output.seekg(std::ios_base::beg);
-      expected_output.str(std::string());
-      
     }
-    
+      
   }
   
   for (size_t i = 0; i < valid_arguments.size(); ++i)
@@ -767,22 +786,16 @@ TEST_F(StanGmArgumentsConfiguration, TestInitWithoutMethod) {
       }
       
       output.str(out.output);
-      
+      std::string actual_line;
+    
       for (int i = 0; i < n_output; ++i) {
-        
         std::string expected_line;
         std::getline(expected_output, expected_line);
         
-        std::string actual_line;
         std::getline(output, actual_line);
         
         EXPECT_EQ(expected_line, actual_line);
-        
       }
-      
-      expected_output.clear();
-      expected_output.seekg(std::ios_base::beg);
-      expected_output.str(std::string());
       
     }
     
@@ -880,22 +893,24 @@ TEST_F(StanGmArgumentsConfiguration, TestRandomWithMethod) {
       }
       
       output.str(out.output);
+      std::string actual_line;
+      
+      // Advance past header
+      if (expected_success == true) {
+        std::getline(output, actual_line);
+        std::getline(output, actual_line);
+        std::getline(output, actual_line);
+        std::getline(output, actual_line);
+      }
       
       for (int i = 0; i < n_output; ++i) {
-        
         std::string expected_line;
         std::getline(expected_output, expected_line);
         
-        std::string actual_line;
         std::getline(output, actual_line);
         
         EXPECT_EQ(expected_line, actual_line);
-        
       }
-      
-      expected_output.clear();
-      expected_output.seekg(std::ios_base::beg);
-      expected_output.str(std::string());
       
     }
     
@@ -979,17 +994,15 @@ TEST_F(StanGmArgumentsConfiguration, TestRandomWithoutMethod) {
       }
       
       output.str(out.output);
+      std::string actual_line;
       
       for (int i = 0; i < n_output; ++i) {
-        
         std::string expected_line;
         std::getline(expected_output, expected_line);
         
-        std::string actual_line;
         std::getline(output, actual_line);
         
         EXPECT_EQ(expected_line, actual_line);
-        
       }
       
       expected_output.clear();
@@ -1057,7 +1070,7 @@ TEST_F(StanGmArgumentsConfiguration, TestOutputWithMethod) {
       
       std::string l2;
       std::string argument("");
-      
+
       while (expected_output.good()) {
         std::getline(expected_output, l2);
         if (!expected_output.good()) continue;
@@ -1092,17 +1105,23 @@ TEST_F(StanGmArgumentsConfiguration, TestOutputWithMethod) {
       }
       
       output.str(out.output);
+      std::string actual_line;
+      
+      // Advance past header
+      if (expected_success == true) {
+        std::getline(output, actual_line);
+        std::getline(output, actual_line);
+        std::getline(output, actual_line);
+        std::getline(output, actual_line);
+      }
       
       for (int i = 0; i < n_output; ++i) {
-        
         std::string expected_line;
         std::getline(expected_output, expected_line);
         
-        std::string actual_line;
         std::getline(output, actual_line);
         
         EXPECT_EQ(expected_line, actual_line);
-        
       }
       
       expected_output.clear();
@@ -1191,17 +1210,15 @@ TEST_F(StanGmArgumentsConfiguration, TestOutputWithoutMethod) {
       }
       
       output.str(out.output);
+      std::string actual_line;
       
       for (int i = 0; i < n_output; ++i) {
-        
         std::string expected_line;
         std::getline(expected_output, expected_line);
         
-        std::string actual_line;
         std::getline(output, actual_line);
         
         EXPECT_EQ(expected_line, actual_line);
-        
       }
       
       expected_output.clear();
