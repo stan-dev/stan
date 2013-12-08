@@ -43,6 +43,11 @@ namespace stan {
       size_t position = 0;
       size_t pull = K - 1;
 
+      if (K == 2) {
+        CPCs(0) = atanh(U(1,0));
+        return;
+      }
+
       Eigen::Array<T,1,Eigen::Dynamic> temp = U.row(0).tail(pull);
 
       CPCs.head(pull) = temp;
@@ -113,10 +118,12 @@ namespace stan {
     void    
     factor_L(Eigen::Array<T,Eigen::Dynamic,1>& CPCs,
              const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& L) {
-    
-      factor_U(CPCs, L * ( L.diagonal().array().inverse().diagonal() ));
+
+      Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> newL;
+      newL = L * ( L.diagonal().array().inverse().matrix().asDiagonal() );
+      factor_U(CPCs, newL);
     }
-    
+
     // MATRIX TRANSFORMS +/- JACOBIANS
 
     /**
