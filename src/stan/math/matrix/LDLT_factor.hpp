@@ -15,6 +15,16 @@ namespace stan {
     template<typename T, int R, int C>
     class LDLT_factor;
     
+    /**
+     * LDLT_factor is a thin wrapper on Eigen::LDLT to allow for
+     * reusing factorizations and efficient autodiff of things like
+     * log determinants and solutions to linear systems.
+     *
+     * After the constructor and/or compute() is called users of
+     * LDLT_factor are responsible for calling success() to
+     * check whether the factorization has succeeded.  Use of an LDLT_factor
+     * object (e.g., in mdivide_left_ldlt) is undefined if success() is false.
+     **/
     template<int R, int C>
     class LDLT_factor<double,R,C> {
     public:
