@@ -391,6 +391,26 @@ namespace stan {
 
 
       /**
+       * Writes the unconstrained Cholesky factor for a correlation
+       * matrix corresponding to the specified constrained matrix.
+       *
+       * <p>The unconstraining operation is the inverse of the
+       * constraining operation in
+       * <code>cov_matrix_constrain(Matrix<T,Dynamic,Dynamic)</code>.
+       *
+       * @param y Constrained covariance matrix.
+       * @throw std::runtime_error if y has no elements or if it is not square
+       */
+      void cholesky_corr_unconstrain(matrix_t& y) {
+        // FIXME:  optimize by unrolling cholesky_factor_free
+        Eigen::Matrix<T,Eigen::Dynamic,1> y_free
+          = stan::prob::cholesky_corr_free(y);
+        for (int i = 0; i < y_free.size(); ++i)
+          data_r_.push_back(y_free[i]);
+      }
+
+
+      /**
        * Writes the unconstrained covariance matrix corresponding
        * to the specified constrained correlation matrix.
        *

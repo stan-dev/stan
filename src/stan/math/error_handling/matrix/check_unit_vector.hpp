@@ -21,11 +21,11 @@ namespace stan {
      * @param result
      * @return <code>true</code> if the vector is a unit vector.
      */
-    template <typename T_prob, typename T_result>
+    template <typename T_prob, typename T_result, int R, int C>
     bool check_unit_vector(const char* function,
-                       const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta,
-                       const char* name,
-                       T_result* result) {
+                           const Eigen::Matrix<T_prob,R,C>& theta,
+                           const char* name,
+                           T_result* result) {
       typedef typename Eigen::Matrix<T_prob,Eigen::Dynamic,1>::size_type size_t;
       if (theta.size() == 0) {
         std::string message(name);
@@ -39,7 +39,8 @@ namespace stan {
         std::stringstream msg;
         msg << "in function check_unit_vector(%1%), ";
         msg << name << " is not a valid unit vector.";
-        msg << " The sum of the squares of the elements should be 1, but is " << ssq;
+        msg << " The sum of the squares of the elements should be 1, but is " 
+            << ssq;
         std::string tmp(msg.str());
         return dom_err(function,ssq,name,
                        tmp.c_str(),"",
@@ -48,11 +49,11 @@ namespace stan {
       return true;
     }
 
-    template <typename T>
+    template <typename T, int R, int C>
     inline bool check_unit_vector(const char* function,
-                              const Eigen::Matrix<T,Eigen::Dynamic,1>& theta,
-                              const char* name,
-                              T* result = 0) {
+                                  const Eigen::Matrix<T,R,C>& theta,
+                                  const char* name,
+                                  T* result = 0) {
       return check_unit_vector<T,T>(function,theta,name,result);
     }
 

@@ -75,8 +75,7 @@ BOOST_FUSION_ADAPT_STRUCT(stan::gm::cholesky_factor_var_decl,
                           (std::vector<stan::gm::expression>, dims_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::cholesky_corr_var_decl,
-                          (stan::gm::expression, M_)
-                          (stan::gm::expression, N_)
+                          (stan::gm::expression, K_)
                           (std::string, name_)
                           (std::vector<stan::gm::expression>, dims_) )
 
@@ -328,6 +327,7 @@ namespace stan {
         reserve("row_vector"); 
         reserve("matrix"); 
         reserve("cholesky_factor_cov");
+        reserve("cholesky_factor_corr");
         reserve("cov_matrix");
         reserve("corr_matrix"); 
 
@@ -487,10 +487,6 @@ namespace stan {
       template <typename T1>
       struct result { typedef void type; };
       void operator()(cholesky_factor_var_decl& var_decl) const {
-        if (is_nil(var_decl.N_))
-          var_decl.N_ = var_decl.M_;
-      }
-      void operator()(cholesky_corr_var_decl& var_decl) const {
         if (is_nil(var_decl.N_))
           var_decl.N_ = var_decl.M_;
       }
@@ -799,7 +795,7 @@ namespace stan {
 
       cholesky_factor_decl_r.name("cholesky factor for symmetric, positive-def declaration");
       cholesky_factor_decl_r 
-        %= lit("cholesky_factor_cov")
+        %= lit("cholesky_factor_cov") 
         > lit('[')
         > expression_g(_r1)
           [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
@@ -816,21 +812,16 @@ namespace stan {
 
       cholesky_corr_decl_r.name("cholesky factor for correlation matrix declaration");
       cholesky_corr_decl_r 
-        %= lit("cholesky_corr")
+        %= lit("cholesky_factor_corr")
         > lit('[')
         > expression_g(_r1)
           [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
-        > -( lit(',')
-             > expression_g(_r1)
-             [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
-             ) 
         > lit(']') 
         > identifier_r 
         > opt_dims_r(_r1)
         > lit(';')
         > eps
-        [copy_square_cholesky_dimension_if_necessary_f(_val)];
-
+        ;
 
       cov_matrix_decl_r.name("covariance matrix declaration");
       cov_matrix_decl_r 

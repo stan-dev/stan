@@ -15,6 +15,7 @@
 #include <stan/math/matrix.hpp>
 #include <stan/math/matrix/sum.hpp>
 #include <stan/math/matrix/validate_less.hpp>
+#include <stan/math/matrix/validate_square.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/matrix_error_handling.hpp>
 
@@ -113,8 +114,10 @@ namespace stan {
     void    
     factor_L(Eigen::Array<T,Eigen::Dynamic,1>& CPCs,
              const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& L) {
-    
-      factor_U(CPCs, L * ( L.diagonal().array().inverse().diagonal() ));
+      Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> U
+        = L;
+        // = L * L.diagonal().array().inverse().diagonal();
+      factor_U(CPCs, U);
     }
     
     // MATRIX TRANSFORMS +/- JACOBIANS
@@ -1456,7 +1459,50 @@ namespace stan {
       return x;
     }
 
+    // CHOLESKY CORRELATION MATRIX
+
+    template <typename T>
+    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
+    cholesky_corr_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x,
+                            int K) {
+      stan::math::validate_square(x,"cholesky_corr_constrain/3");
+      int k_choose_2 = (K * (K - 1)) / 2;
+      if (k_choose_2 != x.size())
+        throw std::domain_error("x is not a valid unconstrained cholesky correlation matrix.");
+      Eigen::Array<T,Eigen::Dynamic,1> cpcs(k_choose_2);
+      for (int i = 0; i < k_choose_2; ++i)
+        cpcs(i) = corr_constrain(x(i));
+      return read_corr_L(cpcs, K);
+    }
+
+    template <typename T>
+    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
+    cholesky_corr_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x,
+                            int K,
+                            T& lp) {
+      stan::math::validate_square(x,"cholesky_corr_constrain/3");
+      int k_choose_2 = (K * (K - 1)) / 2;
+      if (k_choose_2 != x.size())
+        throw std::domain_error("x is not a valid unconstrained cholesky correlation matrix.");
+      Eigen::Array<T,Eigen::Dynamic,1> cpcs(k_choose_2);
+      for (int i = 0; i < k_choose_2; ++i)
+        cpcs(i) = corr_constrain(x(i));
+      return read_corr_L(cpcs, K, lp);
+    }
+
+    template <typename T>
+    Eigen::Matrix<T,Eigen::Dynamic,1>
+    cholesky_corr_free(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& L) {
+      stan::math::validate_square(L,"cholesky_corr_free");
+      Eigen::Array<T,Eigen::Dynamic,1> cpcs((L.rows() * (L.rows() - 1)) / 2);
+      factor_L(cpcs,L);
+      return cpcs;
+    }
+
+    
+
     // CORRELATION MATRIX
+
     /**
      * Return the correlation matrix of the specified dimensionality
      * derived from the specified vector of unconstrained values.  The

@@ -832,13 +832,11 @@ namespace stan {
     cholesky_corr_var_decl::cholesky_corr_var_decl() 
       : base_var_decl(MATRIX_T) { 
     }
-    cholesky_corr_var_decl::cholesky_corr_var_decl(expression const& M,
-                                                     expression const& N,
-                                                     std::string const& name,
-                                                     std::vector<expression> const& dims)
+    cholesky_corr_var_decl::cholesky_corr_var_decl(expression const& K,
+                                                   std::string const& name,
+                                                   std::vector<expression> const& dims)
       : base_var_decl(name,dims,MATRIX_T),
-        M_(M),
-        N_(N) {
+        K_(K) {
     }
 
     cov_matrix_var_decl::cov_matrix_var_decl() : base_var_decl(MATRIX_T) { 
