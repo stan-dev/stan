@@ -898,3 +898,16 @@ TEST(ProbTransform,choleskyFactorFreeError) {
     2, 3, 0;
   EXPECT_THROW(cholesky_factor_free(y),std::domain_error);
 }
+
+TEST(ProbTransform,factorL) {
+  using Eigen::Matrix;
+  using Eigen::Array;
+  using stan::prob::factor_L;
+
+  Eigen::MatrixXd L(2,2);
+  L << 1,0,cos(0.5),sin(0.5);
+  Eigen::ArrayXd CPCs(1);
+  CPCs.setOnes();
+  factor_L(CPCs,L);
+  EXPECT_FLOAT_EQ(CPCs(0),atanh(L(1,0)));
+}
