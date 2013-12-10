@@ -1457,6 +1457,17 @@ only diagnostic is gradients of the log probability function.
 %
       \hiershortcmd{\indentarrow\indentarrow\indentarrow}{\farg{gradient}}
         {Check model gradient against finite differences}
+        {Valid subarguments: \code{epsilon}, \code{error}}
+%
+        \hiercmdarg{\indentarrow\indentarrow\indentarrow\indentarrow}{epsilon}{$$real$$}
+        {Finite difference step size}
+	    {Valid values:\ $0 < \mbox{\code{epsilon}}$}
+	    {Defaults to \code{1e-6}}
+%
+        \hiercmdarg{\indentarrow\indentarrow\indentarrow\indentarrow}{error}{$$real$$}
+       {Error threshold}
+	   {Valid values:\ $0 < \mbox{\code{error}}$}
+	   {Defaults to \code{1e-6}}
 %
 \end{description}
 
@@ -1539,20 +1550,10 @@ subarguments of the top-level method.
     {Valid values: \  Path to existing file}
     {Defaults to \code{samples.csv}}
 %
-  \hiercmdarg{\indentarrow}{append\_sample}{$$boolean$$}
-    {Append sample output to existing file?}
-    {Valid values: \ \code{0, 1}}
-    {Defaults to \code{0}}
-%
   \hiercmdarg{\indentarrow}{diagnostic\_file}{$$string$$}
     {Auxiliary output file for diagnostic information}
     {Valid values: \  Path to existing file}
     {Defaults to empty path}
-%
-  \hiercmdarg{\indentarrow}{append\_diagnostic}{$$boolean$$}
-    {Append diagnostic output to existing file?}
-    {Valid values: \ \code{0, 1}}
-    {Defaults to \code{0}}
 %
   \hiercmdarg{\indentarrow}{refresh}{$$int$$}
     {Number of interations between screen updates}
@@ -2139,6 +2140,8 @@ simple, and shown in \reffigure{diagnostic-command}.
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
 > ./my_model diagnose                  \
                  [test=gradient]       \
+                     [epsilon=<real>]  \
+                     [error=<real>]    \
              [data file=<string>]      \
              [init=<string>]           \
              [random seed=<int>]       \
