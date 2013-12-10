@@ -104,8 +104,11 @@ TEST(StanGmCommand, zero_init_value_fail) {
   std::string command = convert_model_path(model_path) + " sample init=0 output file=test/gm/samples.csv";
   run_command_output out = run_command(command);
   EXPECT_EQ(int(stan::gm::error_codes::OK), out.err_code);
-  EXPECT_EQ("Rejecting initialization at zero because of vanishing density.\n", 
-            out.output)
+  
+  EXPECT_EQ(out.output.length(), 965);
+  
+  EXPECT_EQ("Rejecting initialization at zero because of vanishing density.\n",
+            out.output.substr(902, 64))
     << "Failed running: " << out.command;
 }
 
@@ -122,8 +125,11 @@ TEST(StanGmCommand, zero_init_domain_fail) {
   
   run_command_output out = run_command(command);
   EXPECT_EQ(int(stan::gm::error_codes::OK), out.err_code);
+  
+  EXPECT_EQ(out.output.length(), 969);
+  
   EXPECT_EQ("Rejecting initialization at zero because of log_prob_grad failure.\n",
-            out.output)
+            out.output.substr(902, 68))
     << "Failed running: " << out.command;
 }
 
@@ -150,8 +156,11 @@ TEST(StanGmCommand, user_init_value_fail) {
 
   run_command_output out = run_command(command);
   EXPECT_EQ(int(stan::gm::error_codes::OK), out.err_code);
+  
+  EXPECT_EQ(out.output.length(), 1021);
+  
   EXPECT_EQ("Rejecting user-specified initialization because of vanishing density.\n",
-            out.output)
+            out.output.substr(951, 70))
     << "Failed running: " << out.command;
 }
 
@@ -178,8 +187,11 @@ TEST(StanGmCommand, user_init_domain_fail) {
   
   run_command_output out = run_command(command);
   EXPECT_EQ(int(stan::gm::error_codes::OK), out.err_code);
+  
+  EXPECT_EQ(out.output.length(), 1026);
+  
   EXPECT_EQ("Rejecting user-specified initialization because of log_prob_grad failure.\n",
-            out.output)
+            out.output.substr(952, 74))
     << "Failed running: " << out.command;
 }
 
