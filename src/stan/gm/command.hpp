@@ -937,10 +937,10 @@ namespace stan {
         // Sampling
         start = clock();
         
-        sample<Model, rng_t>(sampler_ptr, num_warmup, num_samples, num_thin,
-                             refresh, true,
-                             writer,
-                             s, model, base_rng);
+        stan::gm::sample<Model, rng_t>(sampler_ptr, num_warmup, num_samples, num_thin,
+                                       refresh, true,
+                                       writer,
+                                       s, model, base_rng);
         
         end = clock();
         sampleDeltaT = (double)(end - start) / CLOCKS_PER_SEC;
