@@ -743,15 +743,15 @@ namespace stan {
         
         
         // Check timing
-        clock_t start = clock();
+        clock_t start_check = clock();
         
         std::vector<double> init_grad;
         stan::model::log_prob_grad<true, true>(model,
                                                cont_params, disc_params, init_grad,
                                                &std::cout);
         
-        clock_t end = clock();
-        double deltaT = (double)(end - start) / CLOCKS_PER_SEC;
+        clock_t end_check = clock();
+        double deltaT = (double)(end_check - start_check) / CLOCKS_PER_SEC;
         
         std::cout << std::endl;
         std::cout << "Gradient evaluation took " << deltaT << " seconds" << std::endl;
