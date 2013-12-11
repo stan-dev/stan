@@ -13,8 +13,8 @@
 #include <boost/exception/all.hpp>
 #include <boost/random/linear_congruential.hpp>
 
-#include <stan/agrad/agrad.hpp>
-#include <stan/agrad/matrix.hpp>
+#include <stan/agrad/var.hpp>
+#include <stan/agrad/var_matrix.hpp>
 #include <stan/agrad/rev/error_handling/matrix/check_pos_definite.hpp>
 #include <stan/agrad/partials_vari.hpp>
 #include <stan/gm/command.hpp>

@@ -261,6 +261,7 @@ namespace stan {
       generate_using("stan::math::get_base1",o);
       generate_using("stan::math::initialize",o);
       generate_using("stan::math::stan_print",o);
+      generate_using("stan::math::lgamma",o);
       generate_using("stan::io::dump",o);
       generate_using("std::istream",o);
       generate_using_namespace("stan::math",o);

@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <stan/agrad/fvar.hpp>
 #include <boost/math/special_functions/gamma.hpp>
-#include <stan/agrad/rev/gamma_p.hpp>
+#include <stan/agrad/rev/functions/gamma_p.hpp>
 #include <stan/agrad/var.hpp>
 #include <test/agrad/util.hpp>
 
