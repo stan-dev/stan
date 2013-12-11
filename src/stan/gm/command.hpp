@@ -273,6 +273,9 @@ namespace stan {
       
       if (parser.help_printed())
         return err_code;
+
+      parser.print(&std::cout);
+      std::cout << std::endl;
       
       // Identification
       unsigned int id = dynamic_cast<int_argument*>(parser.arg("id"))->value();
@@ -315,39 +318,22 @@ namespace stan {
       data_stream.close();
       
       // Sample output
-      std::string sample_file = dynamic_cast<string_argument*>(
+      std::string output_file = dynamic_cast<string_argument*>(
                                 parser.arg("output")->arg("file"))->value();
-
-      bool append_sample = dynamic_cast<bool_argument*>(
-                           parser.arg("output")->arg("append_sample"))->value();
-      
-      std::ios_base::openmode samples_append_mode
-        = append_sample
-          ? (std::fstream::out | std::fstream::app)
-          : std::fstream::out;
-      
-      std::fstream* sample_stream = 0;
-      if (sample_file != "") {
-        sample_stream = new std::fstream(sample_file.c_str(),
-                                         samples_append_mode);
+      std::fstream* output_stream = 0;
+      if (output_file != "") {
+        output_stream = new std::fstream(output_file.c_str(),
+                                         std::fstream::out);
       }
       
       // Diagnostic output
       std::string diagnostic_file = dynamic_cast<string_argument*>(
                                     parser.arg("output")->arg("diagnostic_file"))->value();
       
-      bool append_diagnostic = dynamic_cast<bool_argument*>(
-                               parser.arg("output")->arg("append_diagnostic"))->value();
-      
-      std::ios_base::openmode diagnostic_append_mode
-        = append_diagnostic
-          ? (std::fstream::out | std::fstream::app)
-          : std::fstream::out;
-      
       std::fstream* diagnostic_stream = 0;
       if (diagnostic_file != "") {
         diagnostic_stream = new std::fstream(diagnostic_file.c_str(),
-                                             diagnostic_append_mode);
+                                             std::fstream::out);
       }
       
       // Refresh rate
@@ -359,6 +345,18 @@ namespace stan {
       //////////////////////////////////////////////////
       
       Model model(data_var_context, &std::cout);
+      
+      if (output_stream) {
+        write_stan(output_stream, '#');
+        write_model(output_stream, model.model_name(), '#');
+        parser.print(output_stream, '#');
+      }
+      
+      if (diagnostic_stream) {
+        write_stan(diagnostic_stream, '#');
+        write_model(diagnostic_stream, model.model_name(), '#');
+        parser.print(diagnostic_stream, '#');
+      }
       
       std::vector<double> cont_params(model.num_params_r());
       std::vector<int> disc_params(model.num_params_i());
@@ -509,38 +507,6 @@ namespace stan {
         }
         
       }
-
-      // Check timing
-      clock_t start = clock();
-      
-      std::vector<double> init_grad;
-      stan::model::log_prob_grad<true, true>(model,
-                                             cont_params, disc_params, init_grad,
-                                             &std::cout);
-      
-      clock_t end = clock();
-      double deltaT = (double)(end - start) / CLOCKS_PER_SEC;
-      
-      std::cout << "Gradient evaluation took " << deltaT << " seconds" << std::endl;
-      std::cout << "1000 transitions using 10 leapfrog steps per transition would take "
-                << 1e4 * deltaT << " seconds." << std::endl;
-      std::cout << "Adjust your expectations accordingly!" << std::endl << std::endl;
-      
-      // Initial output
-      parser.print(&std::cout);
-      std::cout << std::endl;
-      
-      if (!append_sample && sample_stream) {
-        write_stan(sample_stream, '#');
-        write_model(sample_stream, model.model_name(), '#');
-        parser.print(sample_stream, '#');
-      }
-      
-      if (!append_diagnostic && diagnostic_stream) {
-        write_stan(diagnostic_stream, '#');
-        write_model(sample_stream, model.model_name(), '#');
-        parser.print(diagnostic_stream, '#');
-      }
       
       //////////////////////////////////////////////////
       //               Model Diagnostics              //
@@ -553,9 +519,28 @@ namespace stan {
         
         if (test->value() == "gradient") {
           std::cout << std::endl << "TEST GRADIENT MODE" << std::endl;
-          int num_failed 
-            = stan::model::test_gradients<true,true>(model,cont_params, disc_params);
+          
+          double epsilon = dynamic_cast<real_argument*>
+                           (test->arg("gradient")->arg("epsilon"))->value();
+          
+          double error = dynamic_cast<real_argument*>
+                         (test->arg("gradient")->arg("error"))->value();
+          
+          int num_failed
+            = stan::model::test_gradients<true,true>(model,cont_params, disc_params, epsilon, error, std::cout);
+          
+          if (output_stream) {
+            num_failed
+              = stan::model::test_gradients<true,true>(model,cont_params, disc_params, epsilon, error, *output_stream);
+          }
+          
+          if (diagnostic_stream) {
+            num_failed
+              = stan::model::test_gradients<true,true>(model,cont_params, disc_params, epsilon, error, *diagnostic_stream);
+          }
+          
           (void) num_failed; // FIXME: do something with the number failed
+          
           return error_codes::OK;
         }
         
@@ -576,9 +561,9 @@ namespace stan {
         bool save_iterations = dynamic_cast<bool_argument*>(
                                parser.arg("method")->arg("optimize")->arg("save_iterations"))->value();
 
-        if (sample_stream) {
-          *sample_stream << "lp__,";
-          model.write_csv_header(*sample_stream);
+        if (output_stream) {
+          *output_stream << "lp__,";
+          model.write_csv_header(*output_stream);
         }
 
         double lp(0);
@@ -595,11 +580,11 @@ namespace stan {
           
           double lastlp = lp - 1;
           std::cout << "Initial log joint probability = " << lp << std::endl;
-          if (sample_stream && save_iterations) {
-            *sample_stream << lp << ',';
+          if (output_stream && save_iterations) {
+            *output_stream << lp << ',';
             model.write_csv(base_rng, cont_params, disc_params, 
-                            *sample_stream, &std::cout);
-            sample_stream->flush();
+                            *output_stream, &std::cout);
+            output_stream->flush();
           }
 
           int m = 0;
@@ -616,11 +601,11 @@ namespace stan {
               std::cout.flush();
             }
             m++;
-            if (sample_stream && save_iterations) {
-              *sample_stream << lp << ',';
+            if (output_stream && save_iterations) {
+              *output_stream << lp << ',';
               model.write_csv(base_rng, cont_params, disc_params, 
-                              *sample_stream, &std::cout);
-              sample_stream->flush();
+                              *output_stream, &std::cout);
+              output_stream->flush();
             }
 
           }
@@ -635,11 +620,11 @@ namespace stan {
           }
           
           std::cout << "initial log joint probability = " << lp << std::endl;
-          if (sample_stream && save_iterations) {
-            *sample_stream << lp << ',';
+          if (output_stream && save_iterations) {
+            *output_stream << lp << ',';
             model.write_csv(base_rng, cont_params, disc_params, 
-                            *sample_stream, &std::cout);
-            sample_stream->flush();
+                            *output_stream, &std::cout);
+            output_stream->flush();
           }
 
           double lastlp = lp - 1;
@@ -656,10 +641,10 @@ namespace stan {
             std::cout.flush();
             m++;
 
-            if (sample_stream && save_iterations) {
-              *sample_stream << lp << ',';
+            if (output_stream && save_iterations) {
+              *output_stream << lp << ',';
               model.write_csv(base_rng, cont_params, disc_params, 
-                              *sample_stream, &std::cout);
+                              *output_stream, &std::cout);
             }
             
           }
@@ -680,11 +665,11 @@ namespace stan {
           lp = bfgs.logp();
           
           std::cout << "initial log joint probability = " << lp << std::endl;
-          if (sample_stream && save_iterations) {
-            *sample_stream << lp << ',';
+          if (output_stream && save_iterations) {
+            *output_stream << lp << ',';
             model.write_csv(base_rng, cont_params, disc_params, 
-                            *sample_stream, &std::cout);
-            sample_stream->flush();
+                            *output_stream, &std::cout);
+            output_stream->flush();
           }
 
           int ret = 0;
@@ -718,11 +703,11 @@ namespace stan {
               std::cout << std::endl;
             }
             
-            if (sample_stream && save_iterations) {
-              *sample_stream << lp << ',';
+            if (output_stream && save_iterations) {
+              *output_stream << lp << ',';
               model.write_csv(base_rng, cont_params, disc_params, 
-                              *sample_stream, &std::cout);
-              sample_stream->flush();
+                              *output_stream, &std::cout);
+              output_stream->flush();
             }
           }
           
@@ -739,13 +724,13 @@ namespace stan {
           return_code = error_codes::CONFIG;
         }
 
-        if (sample_stream) {
-          *sample_stream << lp << ',';
+        if (output_stream) {
+          *output_stream << lp << ',';
           model.write_csv(base_rng, cont_params, disc_params, 
-                          *sample_stream, &std::cout);
-          sample_stream->flush();
-          sample_stream->close();
-          delete sample_stream;
+                          *output_stream, &std::cout);
+          output_stream->flush();
+          output_stream->close();
+          delete output_stream;
         }
         return return_code;
       }
@@ -756,7 +741,26 @@ namespace stan {
       
       if (parser.arg("method")->arg("sample")) {
         
-        stan::io::mcmc_writer<Model> writer(sample_stream, diagnostic_stream, &std::cout);
+        
+        // Check timing
+        clock_t start_check = clock();
+        
+        std::vector<double> init_grad;
+        stan::model::log_prob_grad<true, true>(model,
+                                               cont_params, disc_params, init_grad,
+                                               &std::cout);
+        
+        clock_t end_check = clock();
+        double deltaT = (double)(end_check - start_check) / CLOCKS_PER_SEC;
+        
+        std::cout << std::endl;
+        std::cout << "Gradient evaluation took " << deltaT << " seconds" << std::endl;
+        std::cout << "1000 transitions using 10 leapfrog steps per transition would take "
+                  << 1e4 * deltaT << " seconds." << std::endl;
+        std::cout << "Adjust your expectations accordingly!" << std::endl << std::endl;
+        std::cout << std::endl;
+        
+        stan::io::mcmc_writer<Model> writer(output_stream, diagnostic_stream, &std::cout);
         
         // Sampling parameters
         int num_warmup = dynamic_cast<int_argument*>(
@@ -915,8 +919,8 @@ namespace stan {
         }
         
         // Headers
-        if (!append_sample) writer.print_sample_names(s, sampler_ptr, model);
-        if (!append_diagnostic) writer.print_diagnostic_names(s, sampler_ptr, model);
+        writer.print_sample_names(s, sampler_ptr, model);
+        writer.print_diagnostic_names(s, sampler_ptr, model);
         
         // Warm-Up
         clock_t start = clock();
@@ -951,9 +955,9 @@ namespace stan {
         
       }
       
-      if (sample_stream) {
-        sample_stream->close();
-        delete sample_stream;
+      if (output_stream) {
+        output_stream->close();
+        delete output_stream;
       }
         
       if (diagnostic_stream) {
