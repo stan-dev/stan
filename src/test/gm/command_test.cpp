@@ -105,7 +105,7 @@ TEST(StanGmCommand, zero_init_value_fail) {
   run_command_output out = run_command(command);
   EXPECT_EQ(int(stan::gm::error_codes::OK), out.err_code);
   
-  EXPECT_EQ(out.output.length(), 965);
+  EXPECT_EQ(965U, out.output.length());
   
   EXPECT_EQ("Rejecting initialization at zero because of vanishing density.\n",
             out.output.substr(902, 64))
@@ -126,7 +126,7 @@ TEST(StanGmCommand, zero_init_domain_fail) {
   run_command_output out = run_command(command);
   EXPECT_EQ(int(stan::gm::error_codes::OK), out.err_code);
   
-  EXPECT_EQ(out.output.length(), 969);
+  EXPECT_EQ(969U, out.output.length());
   
   EXPECT_EQ("Rejecting initialization at zero because of log_prob_grad failure.\n",
             out.output.substr(902, 68))
@@ -157,7 +157,7 @@ TEST(StanGmCommand, user_init_value_fail) {
   run_command_output out = run_command(command);
   EXPECT_EQ(int(stan::gm::error_codes::OK), out.err_code);
   
-  EXPECT_EQ(out.output.length(), 1021);
+  EXPECT_EQ(1021U, out.output.length());
   
   EXPECT_EQ("Rejecting user-specified initialization because of vanishing density.\n",
             out.output.substr(951, 70))
@@ -188,7 +188,7 @@ TEST(StanGmCommand, user_init_domain_fail) {
   run_command_output out = run_command(command);
   EXPECT_EQ(int(stan::gm::error_codes::OK), out.err_code);
   
-  EXPECT_EQ(out.output.length(), 1026);
+  EXPECT_EQ(1026U, out.output.length());
   
   EXPECT_EQ("Rejecting user-specified initialization because of log_prob_grad failure.\n",
             out.output.substr(952, 74))
