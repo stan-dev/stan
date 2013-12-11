@@ -770,8 +770,7 @@ causes the execution to immediately terminate.
 %
 \put(0, 360) { \framebox(470, 45) }
 \put(10, 390) { \makebox(65, 10)[l]{output} }
-\put(50, 370) { \makebox(500, 10)[l]{file, append\_sample,
-    diagnostic\_file, append\_diagnostic, ... } } % refresh, save\_warmup} }
+\put(50, 370) { \makebox(500, 10)[l]{file, diagnostic\_file, ... } } % refresh, save\_warmup} }
 %
 \put(10, 340) { \makebox(50, 10)[l]{method} }
 \put(20, 117.5) { \line(0, 1){212.5} }
@@ -831,8 +830,7 @@ causes the execution to immediately terminate.
 %
 \put(0, 360) { \framebox(470, 45) }
 \put(10, 390) { \makebox(65, 10)[l]{output} }
-\put(50, 370) { \makebox(450, 10)[l]{file, append\_sample,
-    diagnostic\_file, append\_diagnostic, ...} }  % refresh, ...
+\put(50, 370) { \makebox(450, 10)[l]{file, diagnostic\_file, ...} }  % refresh, ...
 %
 \put(10, 340) { \makebox(50, 10)[l]{method} }
 \put(20, 117.5) { \line(0, 1){212.5} }
@@ -1542,17 +1540,17 @@ subarguments of the top-level method.
 \begin{description}
 \hierlongcmd{}{{\bfseries output}}
   {File output options}
-  {Valid subarguments: \code{file, append\_sample, diagnostic\_file,
-      \\ \hspace*{24pt} append\_diagnostic, refresh}}
+  {Valid subarguments: \code{file, diagnostic\_file,
+      \\ \hspace*{24pt}, refresh}}
 %
   \hiercmdarg{\indentarrow}{file}{$$string$$}
     {Output file}
-    {Valid values: \  Path to existing file}
-    {Defaults to \code{samples.csv}}
+    {Valid values: \  Valid path}
+    {Defaults to \code{output.csv}}
 %
   \hiercmdarg{\indentarrow}{diagnostic\_file}{$$string$$}
     {Auxiliary output file for diagnostic information}
-    {Valid values: \  Path to existing file}
+    {Valid values: \  Valid path}
     {Defaults to empty path}
 %
   \hiercmdarg{\indentarrow}{refresh}{$$int$$}
@@ -1950,9 +1948,7 @@ for Stan.  The full set of configuration options is in
              [random seed=<int>]                        \
              [output                                    \
                   [file=<string>]                       \
-                  [append_sample=<boolean>]             \
                   [diagnostic_file=<string>]            \
-                  [append_diagnostic=<boolean>]         \
                   [refresh=<int>] ]
 \end{Verbatim}
 \end{quote}
@@ -2013,9 +2009,7 @@ interdependence.
              [random seed=<int>]                        \
              [output                                    \
                   [file=<string>]                       \
-                  [append_sample=<boolean>]             \
                   [diagnostic_file=<string>]            \
-                  [append_diagnostic=<boolean>]         \
                   [refresh=<int>] ]
 \end{Verbatim}
 \end{quote}
@@ -2052,9 +2046,7 @@ skeleton for BFGS is in \reffigure{bfgs-command}.
              [random seed=<int>]                        \
              [output                                    \
                   [file=<string>]                       \
-                  [append_sample=<boolean>]             \
                   [diagnostic_file=<string>]            \
-                  [append_diagnostic=<boolean>]         \
                   [refresh=<int>] ]
 \end{Verbatim}
 \end{quote}
@@ -2084,9 +2076,7 @@ identical to that for BFGS other than the algorithm name.
              [random seed=<int>]                        \
              [output                                    \
                   [file=<string>]                       \
-                  [append_sample=<boolean>]             \
                   [diagnostic_file=<string>]            \
-                  [append_diagnostic=<boolean>]         \
                   [refresh=<int>] ]
 \end{Verbatim}
 \end{quote}
@@ -2116,9 +2106,7 @@ Nesterov's dual averaging.
              [random seed=<int>]                        \
              [output                                    \
                   [file=<string>]                       \
-                  [append_sample=<boolean>]             \
                   [diagnostic_file=<string>]            \
-                  [append_diagnostic=<boolean>]         \
                   [refresh=<int>] ]
 \end{Verbatim}
 \end{quote}
