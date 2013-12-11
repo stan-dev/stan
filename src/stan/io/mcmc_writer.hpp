@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <string>
 #include <vector>
+#include <Eigen/Core>
 
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/mcmc/sample.hpp>
@@ -60,16 +61,16 @@ namespace stan {
         sample.get_sample_params(values);
         sampler.get_sampler_params(values);
         
-        std::vector<double> model_values;
+        Eigen::VectorXd model_values;
         
         model.write_array(rng,
-                          const_cast<std::vector<double>&>(sample.cont_params()),
-                          const_cast<std::vector<int>&>(sample.disc_params()),
+                          const_cast<Eigen::VectorXd&>(sample.cont_params()),
                           model_values,
                           true, true,
                           msg_stream_); 
-        
-        values.insert(values.end(), model_values.begin(), model_values.end());
+
+        for (int i = 0; i < model_values.size(); ++i)
+          values.push_back(model_values(i));
         
         (*sample_stream_) << values.at(0);
         for (size_t i = 1; i < values.size(); ++i) {

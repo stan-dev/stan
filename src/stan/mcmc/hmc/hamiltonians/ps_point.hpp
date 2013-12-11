@@ -17,10 +17,11 @@ namespace stan {
       
     public:
       
-      ps_point(int n, int m): q(n), r(m), p(n), V(0), g(n) {};
+      ps_point(int n): q(n), p(n), V(0), g(n) {};
   
-      ps_point(const ps_point& z): q(z.q), r(z.r), p(z.p.size()), V(z.V), g(z.g.size())
+      ps_point(const ps_point& z): q(z.q.size()), p(z.p.size()), V(z.V), g(z.g.size())
       {
+        _fast_vector_copy<double>(q, z.q);
         _fast_vector_copy<double>(p, z.p);
         _fast_vector_copy<double>(g, z.g);
       }
@@ -31,8 +32,7 @@ namespace stan {
         
         if(this == &z) return *this;
         
-        q = z.q;
-        r = z.r;
+        _fast_vector_copy<double>(q, z.q);
         
         V = z.V;
         
@@ -43,8 +43,7 @@ namespace stan {
         
       }
       
-      std::vector<double> q;
-      std::vector<int> r;
+      Eigen::VectorXd q;
       Eigen::VectorXd p;
       
       double V;
@@ -62,7 +61,7 @@ namespace stan {
 
       virtual void get_params(std::vector<double>& values) {
         for(size_t i = 0; i < q.size(); ++i)
-          values.push_back(q.at(i));
+          values.push_back(q(i));
         for(size_t i = 0; i < q.size(); ++i)
           values.push_back(p(i));
         for(size_t i = 0; i < q.size(); ++i)
