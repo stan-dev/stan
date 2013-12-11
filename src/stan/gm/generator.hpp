@@ -3910,6 +3910,25 @@ namespace stan {
         o << EOL;
 
       o << INDENT << "}" << EOL2;
+
+      o << INDENT << "template <typename RNG>" << EOL;
+      o << INDENT << "void write_array(RNG& base_rng," << EOL;
+      o << INDENT << "                 Eigen::Matrix<double,Eigen::Dynamic,1>& params_r," << EOL;
+      o << INDENT << "                 Eigen::Matrix<double,Eigen::Dynamic,1>& vars," << EOL;
+      o << INDENT << "                 bool include_tparams = true," << EOL;
+      o << INDENT << "                 bool include_gqs = true," << EOL;
+      o << INDENT << "                 std::ostream* pstream = 0) const {" << EOL;
+      o << INDENT << "  std::vector<double> params_r_vec(params_r.size());" << EOL;
+      o << INDENT << "  for (int i = 0; i < params_r.size(); ++i)" << EOL;
+      o << INDENT << "    params_r_vec[i] = params_r(i);" << EOL;
+      o << INDENT << "  std::vector<double> vars_vec;" << EOL;
+      o << INDENT << "  std::vector<int> params_i_vec;" << EOL;
+      o << INDENT << "  write_array(base_rng,params_r_vec,params_i_vec,vars_vec,include_tparams,include_gqs,pstream);" << EOL;
+      o << INDENT << "  vars.resize(vars_vec.size());" << EOL;
+      o << INDENT << "  for (int i = 0; i < vars.size(); ++i)" << EOL;
+      o << INDENT << "    vars(i) = vars_vec[i];" << EOL;
+      o << INDENT << "}" << EOL2;
+
     }
 
     

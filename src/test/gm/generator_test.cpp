@@ -110,6 +110,28 @@ TEST(gm, logProbPolymorphismDouble) {
   EXPECT_EQ(params_r.size(), params_r_vec_init.size());
   for (int i = 0; i < params_r_vec_init.size(); ++i)
     EXPECT_FLOAT_EQ(params_r_init[i], params_r_vec_init(i));
+
+  // only test write_array for doubles --- no var allowed
+  std::vector<double> params_r_write(2);
+  params_r_write[0] = -3.2;  
+  params_r_write[1] = 1.79;
+  std::vector<int> params_i_write;
+  
+  Matrix<double,Dynamic,1> params_r_vec_write(2);
+  params_r_vec_write << -3.2, 1.79;
+
+  for (int incl_tp = 0; incl_tp < 2; ++incl_tp) {
+    for (int incl_gq = 0; incl_gq < 2; ++incl_gq) { 
+      std::vector<double> vars_write;
+      Matrix<double,Dynamic,1> vars_vec_write(17);
+      model.write_array(rng, params_r_write, params_i_write, vars_write, incl_tp, incl_gq, 0);
+      model.write_array(rng, params_r_vec_write, vars_vec_write, incl_tp, incl_gq, 0);
+      EXPECT_EQ(vars_write.size(), vars_vec_write.size());
+      for (int i = 0; i < vars_vec_write.size(); ++i)
+        EXPECT_FLOAT_EQ(vars_write[i], vars_vec_write(i));
+    }
+  }
+
 }
 TEST(gm, logProbPolymorphismVar) {
   using std::vector;
