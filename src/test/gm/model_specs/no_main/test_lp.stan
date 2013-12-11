@@ -1,5 +1,5 @@
 parameters {
-  real y[2];
+  real<lower=-10, upper=10> y[2];
 }
 model {
   y ~ normal(0,1);

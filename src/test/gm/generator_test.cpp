@@ -1,10 +1,13 @@
-#include <gtest/gtest.h>
+#include <iostream>
+#include <sstream>
+#include <boost/random/additive_combine.hpp> // L'Ecuyer RNG
 #include <stan/agrad/var.hpp>
 #include <stan/gm/ast.hpp>
 #include <stan/gm/generator.hpp>
-#include <test/gm/model_specs/no_main/test_lp.cpp>
 #include <stan/io/dump.hpp>
+#include <test/gm/model_specs/no_main/test_lp.cpp>
 
+#include <gtest/gtest.h>
 
 void test_print_string_literal(const std::string& s,
                                const std::string& s_exp) {
@@ -83,6 +86,30 @@ TEST(gm, logProbPolymorphismDouble) {
   lp1 = model.log_prob<false,false>(params_r, params_i, 0);
   lp2 = model.log_prob<false,false>(params_r_vec, 0);
   EXPECT_FLOAT_EQ(lp1, lp2);
+
+  // only test write_csv for doubles -- no var allowed
+  std::stringstream s1;
+  std::stringstream s2;
+  boost::ecuyer1988 rng(123);
+  model.write_csv(rng,params_r,params_i,s1,0);
+  model.write_csv(rng,params_r_vec,s2,0);
+  EXPECT_EQ(s1.str(), s2.str());
+
+  // only test generate_inits for doubles -- no var allowed
+  std::string init_txt = "y <- c(-2.9,1.2)";
+  std::stringstream init_in(init_txt);
+  stan::io::dump init_dump(init_in);
+  std::vector<int> params_i_init;
+  std::vector<double> params_r_init;
+  model.transform_inits(init_dump, params_i_init, params_r_init);
+  EXPECT_EQ(0, params_i_init.size());
+  EXPECT_EQ(2, params_r_init.size());
+
+  Matrix<double,Dynamic,1> params_r_vec_init;
+  model.transform_inits(init_dump, params_r_vec_init);
+  EXPECT_EQ(params_r.size(), params_r_vec_init.size());
+  for (int i = 0; i < params_r_vec_init.size(); ++i)
+    EXPECT_FLOAT_EQ(params_r_init[i], params_r_vec_init(i));
 }
 TEST(gm, logProbPolymorphismVar) {
   using std::vector;
@@ -122,3 +149,6 @@ TEST(gm, logProbPolymorphismVar) {
   lp2 = model.log_prob<false,false>(params_r_vec, 0);
   EXPECT_FLOAT_EQ(lp1.val(), lp2.val());
 }
+
+// * write_csv
+// * transform_inits
