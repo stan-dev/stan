@@ -5,7 +5,6 @@
 #include <iomanip>
 #include <string>
 #include <vector>
-#include <Eigen/Core>
 
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/mcmc/sample.hpp>
