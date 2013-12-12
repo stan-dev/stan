@@ -29,8 +29,8 @@ namespace stan {
       
       
       sample transition(sample& init_sample) {
-        this->seed(init_sample.cont_params(), init_sample.disc_params());
-        return sample(this->_z.q, this->_z.r, - this->_hamiltonian.V(this->_z), 0);
+        this->seed(init_sample.cont_params());
+        return sample(this->_z.q, - this->_hamiltonian.V(this->_z), 0);
       }
       
       void write_sampler_param_names(std::ostream& o) {};
@@ -48,10 +48,12 @@ namespace stan {
 }
 
 TEST(McmcBaseHMC, point_construction) {
+
   rng_t base_rng(0);
   
-  std::vector<double> q(5, 1.0);
-  std::vector<int> r(2, 2);
+  Eigen::VectorXd q(2);
+  q(0) = 5;
+  q(1) = 1;
   
   stan::mcmc::mock_model model(q.size());
   
@@ -65,19 +67,18 @@ TEST(McmcBaseHMC, seed) {
   
   rng_t base_rng(0);
   
-  std::vector<double> q(5, 1.0);
-  std::vector<int> r;
+  Eigen::VectorXd q(2);
+  q(0) = 5;
+  q(1) = 1;
   
   stan::mcmc::mock_model model(q.size());
   
   stan::mcmc::mock_hmc sampler(model, base_rng, &std::cout, &std::cerr);
-  
-  std::vector<double> q_seed(q.size(), -1.0);
-  
-  sampler.seed(q_seed, r);
+
+  sampler.seed(q);
   
   for (std::vector<double>::size_type i = 0; i < q.size(); ++i)
-    EXPECT_EQ(q_seed.at(i), sampler.z().q.at(i));
+    EXPECT_EQ(q(i), sampler.z().q(i));
   
 }
 
@@ -85,8 +86,9 @@ TEST(McmcBaseHMC, set_nominal_stepsize) {
   
   rng_t base_rng(0);
   
-  std::vector<double> q(5, 1.0);
-  std::vector<int> r(2, 2);
+  Eigen::VectorXd q(2);
+  q(0) = 5;
+  q(1) = 1;
   
   stan::mcmc::mock_model model(q.size());
   
@@ -105,8 +107,9 @@ TEST(McmcBaseHMC, set_stepsize_jitter) {
   
   rng_t base_rng(0);
   
-  std::vector<double> q(5, 1.0);
-  std::vector<int> r(2, 2);
+  Eigen::VectorXd q(2);
+  q(0) = 5;
+  q(1) = 1;
   
   stan::mcmc::mock_model model(q.size());
   

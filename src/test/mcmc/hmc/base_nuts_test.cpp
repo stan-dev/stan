@@ -38,9 +38,10 @@ namespace stan {
 TEST(McmcBaseNuts, set_max_depth) {
   
   rng_t base_rng(0);
-  
-  std::vector<double> q(5, 1.0);
-  std::vector<int> r(2, 2);
+
+  Eigen::VectorXd q(2);
+  q(0) = 5;
+  q(1) = 1;
   
   stan::mcmc::mock_model model(q.size());
   
@@ -60,8 +61,9 @@ TEST(McmcBaseNuts, set_max_delta) {
   
   rng_t base_rng(0);
   
-  std::vector<double> q(5, 1.0);
-  std::vector<int> r(2, 2);
+  Eigen::VectorXd q(2);
+  q(0) = 5;
+  q(1) = 1;
   
   stan::mcmc::mock_model model(q.size());
   
@@ -82,11 +84,11 @@ TEST(McmcBaseNuts, build_tree) {
   
   Eigen::VectorXd rho = Eigen::VectorXd::Zero(model_size);
   
-  stan::mcmc::ps_point z_init(model_size, 0);
-  z_init.q.at(0) = 0;
+  stan::mcmc::ps_point z_init(model_size);
+  z_init.q(0) = 0;
   z_init.p(0) = init_momentum;
   
-  stan::mcmc::ps_point z_propose(model_size, 0);
+  stan::mcmc::ps_point z_propose(model_size);
   
   stan::mcmc::nuts_util util;
   util.log_u = -1;
@@ -112,10 +114,10 @@ TEST(McmcBaseNuts, build_tree) {
   
   EXPECT_EQ(init_momentum * util.n_tree, rho(0));
   
-  EXPECT_EQ(init_momentum, z_init.q.at(0));
+  EXPECT_EQ(init_momentum, z_init.q(0));
   EXPECT_EQ(init_momentum, z_init.p(0));
   
-  EXPECT_EQ(8 * init_momentum, sampler.z().q.at(0));
+  EXPECT_EQ(8 * init_momentum, sampler.z().q(0));
   EXPECT_EQ(init_momentum, sampler.z().p(0));
   
 }
