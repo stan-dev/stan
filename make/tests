@@ -173,8 +173,8 @@ test/mcmc/hmc/hamiltonians/unit_e_metric.o test/mcmc/hmc/hamiltonians/diag_e_met
 	@mkdir -p $(dir $@)
 	$(COMPILE.c) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
 
-.PRECIOUS: src/test/mcmc/hmc/integrators/models/gauss.cpp
-test/mcmc/hmc/integrators/expl_leapfrog.o: test/%.o : src/test/%_test.cpp $(LIBGTEST) src/test/mcmc/hmc/integrators/models/gauss.cpp
+.PRECIOUS: src/test/mcmc/hmc/integrators/models/gauss.cpp src/test/mcmc/hmc/integrators/models/command.cpp
+test/mcmc/hmc/integrators/expl_leapfrog.o: test/%.o : src/test/%_test.cpp $(LIBGTEST) src/test/mcmc/hmc/integrators/models/gauss.cpp src/test/mcmc/hmc/integrators/models/command.cpp
 	@mkdir -p $(dir $@)
 	$(COMPILE.c) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
 

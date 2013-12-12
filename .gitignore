@@ -45,6 +45,7 @@ src/test/mcmc/models/improper.exe
 src/test/mcmc/models/improper.cpp
 src/test/mcmc/hmc/hamiltonians/models/funnel.cpp
 src/test/mcmc/hmc/integrators/models/gauss.cpp
+src/test/mcmc/hmc/integrators/models/command.cpp
 src/test/gm/arguments/test_model
 src/test/gm/arguments/test_model.exe
 src/test/gm/arguments/test_model.cpp
