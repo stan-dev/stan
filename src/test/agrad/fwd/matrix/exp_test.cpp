@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
-#include <stan/agrad/fwd/exp.hpp>
+#include <stan/agrad/fwd/functions/exp.hpp>
 #include <stan/agrad/var.hpp>
 #include <test/agrad/util.hpp>
 
