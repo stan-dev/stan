@@ -102,12 +102,12 @@ TEST(gm, logProbPolymorphismDouble) {
   std::vector<int> params_i_init;
   std::vector<double> params_r_init;
   model.transform_inits(init_dump, params_i_init, params_r_init);
-  EXPECT_EQ(0, params_i_init.size());
-  EXPECT_EQ(2, params_r_init.size());
+  EXPECT_EQ(0U, params_i_init.size());
+  EXPECT_EQ(2U, params_r_init.size());
 
   Matrix<double,Dynamic,1> params_r_vec_init;
   model.transform_inits(init_dump, params_r_vec_init);
-  EXPECT_EQ(params_r.size(), params_r_vec_init.size());
+  EXPECT_EQ(int(params_r.size()), params_r_vec_init.size());
   for (int i = 0; i < params_r_vec_init.size(); ++i)
     EXPECT_FLOAT_EQ(params_r_init[i], params_r_vec_init(i));
 
@@ -126,7 +126,7 @@ TEST(gm, logProbPolymorphismDouble) {
       Matrix<double,Dynamic,1> vars_vec_write(17);
       model.write_array(rng, params_r_write, params_i_write, vars_write, incl_tp, incl_gq, 0);
       model.write_array(rng, params_r_vec_write, vars_vec_write, incl_tp, incl_gq, 0);
-      EXPECT_EQ(vars_write.size(), vars_vec_write.size());
+      EXPECT_EQ(int(vars_write.size()), vars_vec_write.size());
       for (int i = 0; i < vars_vec_write.size(); ++i)
         EXPECT_FLOAT_EQ(vars_write[i], vars_vec_write(i));
     }
