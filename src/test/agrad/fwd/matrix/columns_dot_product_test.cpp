@@ -1,7 +1,7 @@
 #include <stan/agrad/fwd/matrix/columns_dot_product.hpp>
 #include <gtest/gtest.h>
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
-#include <stan/agrad/var.hpp>
+#include <stan/agrad/rev.hpp>
 #include <test/agrad/util.hpp>
 
 TEST(AgradFwdMatrixColumnsDotProduct, vector_vector_fd) {

@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <stan/agrad/fvar.hpp>
+#include <stan/agrad/fwd.hpp>
 
 TEST(AgradFwdFvar,Fvar) {
   using stan::agrad::fvar;

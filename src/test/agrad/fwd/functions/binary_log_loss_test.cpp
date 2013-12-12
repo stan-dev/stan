@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
-#include <stan/agrad/fvar.hpp>
+#include <stan/agrad/fwd.hpp>
 #include <stan/math/functions/binary_log_loss.hpp>
-#include <stan/agrad/var.hpp>
+#include <stan/agrad/rev.hpp>
 #include <test/agrad/util.hpp>
 
 double deriv(const int y, const double y_hat) {

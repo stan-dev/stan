@@ -1,9 +1,12 @@
-#ifndef STAN_AGRAD_HPP
-#define STAN_AGRAD_HPP
+#ifndef __STAN__AGRAD_HPP__
+#define __STAN__AGRAD_HPP__
 
-#include <stan/agrad/agrad.hpp>
-#include <stan/agrad/matrix.hpp>
-#include <stan/agrad/rev/error_handling/matrix/check_pos_definite.hpp>
-#include <stan/agrad/partials_vari.hpp>
+// This header shouldn't be included directly.
+// For reverse mode autodiff, include:
+//     #include <stan/agrad/rev.hpp>
+//     #include <stan/agrad/rev/matrix.hpp>
+// For forward mode autodiff, include:
+//     #include <stan/agrad/fwd.hpp>
+//     #include <stan/agrad/fwd/matrix.hpp>
 
 #endif

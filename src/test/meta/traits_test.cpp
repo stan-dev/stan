@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <boost/type_traits.hpp>
-#include <stan/agrad/agrad.hpp>
+#include <stan/agrad/rev.hpp>
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/math/matrix.hpp>

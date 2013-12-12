@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
-#include <stan/agrad/fvar.hpp>
+#include <stan/agrad/fwd.hpp>
 #include <boost/math/special_functions/digamma.hpp>
 #include <stan/math/functions/lbeta.hpp>
-#include <stan/agrad/var.hpp>
+#include <stan/agrad/rev.hpp>
 #include <test/agrad/util.hpp>
 
 TEST(AgradFwdLbeta,Fvar) {

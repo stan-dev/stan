@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <stan/math/matrix_error_handling.hpp>
-#include <stan/agrad/agrad.hpp>
+#include <stan/agrad/rev.hpp>
 
 TEST(AgradRevErrorHandlingMatrix,CheckCovMatrix) {
   using stan::agrad::var;

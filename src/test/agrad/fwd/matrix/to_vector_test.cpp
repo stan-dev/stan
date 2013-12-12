@@ -1,7 +1,7 @@
 #include <stan/math/matrix/to_vector.hpp>
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
-#include <stan/agrad/fvar.hpp>
-#include <stan/agrad/var.hpp>
+#include <stan/agrad/fwd.hpp>
+#include <stan/agrad/rev.hpp>
 #include <gtest/gtest.h>
 #include <test/agrad/util.hpp>
 

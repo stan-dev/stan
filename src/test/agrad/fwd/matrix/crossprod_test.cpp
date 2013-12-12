@@ -3,7 +3,7 @@
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <stan/agrad/fwd/matrix/multiply.hpp>
 #include <stan/math/matrix/transpose.hpp>
-#include <stan/agrad/var.hpp>
+#include <stan/agrad/rev.hpp>
 #include <test/agrad/util.hpp>
 
 TEST(AgradFwdMatrixCrossProd, 3x3_matrix_fd) {

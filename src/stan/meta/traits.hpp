@@ -2,7 +2,7 @@
 #define __STAN__META__TRAITS_HPP__
 
 #include <stan/agrad/fwd/fvar.hpp>
-// #include <stan/agrad.hpp>
+// #include <stan/agrad/partials_vari.hpp>
 #include <stan/agrad/rev/var.hpp>
 #include <vector>
 #include <boost/type_traits.hpp>

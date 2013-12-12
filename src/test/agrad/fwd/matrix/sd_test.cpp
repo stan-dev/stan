@@ -7,7 +7,7 @@
 #include <stan/agrad/fwd/operators/operator_addition.hpp>
 #include <stan/agrad/fwd/operators/operator_division.hpp>
 #include <stan/agrad/fwd/operators/operator_subtraction.hpp>
-#include <stan/agrad/var.hpp>
+#include <stan/agrad/rev.hpp>
 #include <test/agrad/util.hpp>
 
 TEST(AgradFwdMatrixSD, fd_vector) {

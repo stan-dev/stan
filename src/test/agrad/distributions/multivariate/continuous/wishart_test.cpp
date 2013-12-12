@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
 #include <test/agrad/distributions/expect_eq_diffs.hpp>
 #include <stan/prob/distributions/multivariate/continuous/wishart.hpp>
-#include <stan/agrad/agrad.hpp>
+#include <stan/agrad/rev.hpp>
 #include <stan/meta/traits.hpp>
-#include <stan/agrad/matrix.hpp>
+#include <stan/agrad/rev/matrix.hpp>
 
 
 template <typename T_y, typename T_dof, typename T_scale>

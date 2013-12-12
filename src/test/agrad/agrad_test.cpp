@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <stan/agrad/agrad.hpp>
+#include <stan/agrad/rev.hpp>
 #include <test/agrad/util.hpp>
 
 TEST(AgradRev, multiple_grads) {

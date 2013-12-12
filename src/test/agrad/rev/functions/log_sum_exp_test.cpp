@@ -1,7 +1,7 @@
 #include <stan/agrad/rev/functions/log_sum_exp.hpp>
 #include <test/agrad/util.hpp>
 #include <gtest/gtest.h>
-#include <stan/agrad/agrad.hpp>
+#include <stan/agrad/rev.hpp>
 
 TEST(AgradRev,log_sum_exp_vv) {
   AVAR a = 5.0;

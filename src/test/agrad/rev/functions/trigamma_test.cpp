@@ -1,7 +1,7 @@
 #include <test/agrad/util.hpp>
 #include <gtest/gtest.h>
 #include <stan/math/functions/trigamma.hpp>
-#include <stan/agrad/var.hpp>
+#include <stan/agrad/rev.hpp>
 
 TEST(AgradRev,trigamma) {
   AVAR a = 0.5;

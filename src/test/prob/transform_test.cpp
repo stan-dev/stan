@@ -3,7 +3,7 @@
 #include <stdexcept>
 #include <gtest/gtest.h>
 
-#include <stan/agrad/agrad.hpp>
+#include <stan/agrad/rev.hpp>
 #include <stan/prob/transform.hpp>
 #include <stan/math/matrix/determinant.hpp>
 #include <stan/agrad/rev/jacobian.hpp>

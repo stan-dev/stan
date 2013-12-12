@@ -1,4 +1,4 @@
-#include <stan/agrad/agrad.hpp>
+#include <stan/agrad/rev.hpp>
 #include <stan/math.hpp>
 #include <test/agrad/util.hpp>
 #include <gtest/gtest.h>

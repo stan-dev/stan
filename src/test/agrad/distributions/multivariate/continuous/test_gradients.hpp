@@ -1,7 +1,7 @@
 #include <cmath>
 #include <vector>
 #include <iomanip>
-#include <stan/agrad/var.hpp>
+#include <stan/agrad/rev.hpp>
 
 template <typename F>
 std::vector<double> 

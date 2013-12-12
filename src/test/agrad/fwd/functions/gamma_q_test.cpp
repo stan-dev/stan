@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
-#include <stan/agrad/fvar.hpp>
+#include <stan/agrad/fwd.hpp>
 #include <boost/math/special_functions/gamma.hpp>
 #include <stan/agrad/rev/functions/gamma_q.hpp>
-#include <stan/agrad/var.hpp>
+#include <stan/agrad/rev.hpp>
 #include <test/agrad/util.hpp>
 
 TEST(AgradFvar, gamma_q){

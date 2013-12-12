@@ -1,7 +1,7 @@
 #include <stan/agrad/rev/functions/Phi_approx.hpp>
 #include <test/agrad/util.hpp>
 #include <gtest/gtest.h>
-#include <stan/agrad/agrad.hpp>
+#include <stan/agrad/rev.hpp>
 #include <stan/math/functions/Phi_approx.hpp>
 
 TEST(AgradRev, Phi_approx) {

@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
-#include <stan/agrad/fvar.hpp>
+#include <stan/agrad/fwd.hpp>
 #include <stan/math/functions/Phi.hpp>
 #include <stan/prob/distributions/univariate/continuous/normal.hpp>
-#include <stan/agrad/var.hpp>
+#include <stan/agrad/rev.hpp>
 #include <test/agrad/util.hpp>
 
 TEST(AgradFwdPhi,Fvar) {

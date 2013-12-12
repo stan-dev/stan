@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
 #include <test/agrad/distributions/expect_eq_diffs.hpp>
 #include <stan/prob/distributions/multivariate/continuous/dirichlet.hpp>
-#include <stan/agrad/agrad.hpp>
+#include <stan/agrad/rev.hpp>
 #include <stan/meta/traits.hpp>
-#include <stan/agrad/matrix.hpp>
+#include <stan/agrad/rev/matrix.hpp>
 
 template <typename T_prob, typename T_prior_sample_size>
 void expect_propto(T_prob theta, T_prior_sample_size alpha,

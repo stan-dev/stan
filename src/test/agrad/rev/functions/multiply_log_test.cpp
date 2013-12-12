@@ -1,7 +1,7 @@
 #include <stan/agrad/rev/functions/multiply_log.hpp>
 #include <test/agrad/util.hpp>
 #include <gtest/gtest.h>
-#include <stan/agrad/agrad.hpp>
+#include <stan/agrad/rev.hpp>
 
 TEST(AgradRev,multiplyLogChainVV) {
   AVAR a = 19.7;

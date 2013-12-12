@@ -5,9 +5,10 @@
 #include <boost/random/gamma_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
 
-#include <stan/agrad.hpp>
+#include <stan/agrad/partials_vari.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/functions/log1m.hpp>
+#include <stan/math/functions/multiply_log.hpp>
 #include <stan/math/functions/value_of.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
