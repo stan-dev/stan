@@ -1,7 +1,9 @@
 #ifndef __STAN__AGRAD__REV__MATRIX__GRAD_HPP__
 #define __STAN__AGRAD__REV__MATRIX__GRAD_HPP__
 
+
 #include <stan/math/matrix/Eigen.hpp>
+#include <stan/agrad/rev/matrix/Eigen_NumTraits.hpp>
 #include <stan/agrad/rev/var.hpp>
 
 namespace stan {
