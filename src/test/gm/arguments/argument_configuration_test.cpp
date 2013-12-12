@@ -140,14 +140,6 @@ TEST_F(StanGmArgumentsConfiguration, TestMethod) {
       output.str(out.output);
       std::string actual_line;
       
-      // Advance past header
-      if (expected_success == true) {
-        std::getline(output, actual_line);
-        std::getline(output, actual_line);
-        std::getline(output, actual_line);
-        std::getline(output, actual_line);
-      }
-      
       for (int i = 0; i < n_output; ++i) {
         std::string expected_line;
         std::getline(expected_output, expected_line);
@@ -255,14 +247,6 @@ TEST_F(StanGmArgumentsConfiguration, TestIdWithMethod) {
     
       output.str(out.output);
       std::string actual_line;
-      
-      // Advance past header
-      if (expected_success == true) {
-        std::getline(output, actual_line);
-        std::getline(output, actual_line);
-        std::getline(output, actual_line);
-        std::getline(output, actual_line);
-      }
       
       for (int i = 0; i < n_output; ++i) {
         std::string expected_line;
@@ -472,14 +456,6 @@ TEST_F(StanGmArgumentsConfiguration, TestDataWithMethod) {
       output.str(out.output);
       std::string actual_line;
       
-      // Advance past header
-      if (expected_success == true) {
-        std::getline(output, actual_line);
-        std::getline(output, actual_line);
-        std::getline(output, actual_line);
-        std::getline(output, actual_line);
-      }
-      
       for (int i = 0; i < n_output; ++i) {
         std::string expected_line;
         std::getline(expected_output, expected_line);
@@ -687,14 +663,6 @@ TEST_F(StanGmArgumentsConfiguration, TestInitWithMethod) {
       output.str(out.output);
       std::string actual_line;
       
-      // Advance past header
-      if (expected_success == true) {
-        std::getline(output, actual_line);
-        std::getline(output, actual_line);
-        std::getline(output, actual_line);
-        std::getline(output, actual_line);
-      }
-      
       for (int i = 0; i < n_output; ++i) {
         std::string expected_line;
         std::getline(expected_output, expected_line);
@@ -894,14 +862,6 @@ TEST_F(StanGmArgumentsConfiguration, TestRandomWithMethod) {
       
       output.str(out.output);
       std::string actual_line;
-      
-      // Advance past header
-      if (expected_success == true) {
-        std::getline(output, actual_line);
-        std::getline(output, actual_line);
-        std::getline(output, actual_line);
-        std::getline(output, actual_line);
-      }
       
       for (int i = 0; i < n_output; ++i) {
         std::string expected_line;
@@ -1106,14 +1066,6 @@ TEST_F(StanGmArgumentsConfiguration, TestOutputWithMethod) {
       
       output.str(out.output);
       std::string actual_line;
-      
-      // Advance past header
-      if (expected_success == true) {
-        std::getline(output, actual_line);
-        std::getline(output, actual_line);
-        std::getline(output, actual_line);
-        std::getline(output, actual_line);
-      }
       
       for (int i = 0; i < n_output; ++i) {
         std::string expected_line;
