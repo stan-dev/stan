@@ -15,7 +15,7 @@ namespace stan {
               Eigen::VectorXd& g) {
       stan::agrad::grad(v.vi_);
       g.resize(x.size());
-      for (size_t i = 0; i < x.size(); ++i)
+      for (int i = 0; i < x.size(); ++i)
         g(i) = x(i).vi_->adj_;
       recover_memory();
     }

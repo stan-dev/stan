@@ -389,7 +389,7 @@ namespace stan {
             return 0;
           }
           
-          for (size_t i = 0; i < init_grad.size(); ++i) {
+          for (int i = 0; i < init_grad.size(); ++i) {
             if (!boost::math::isfinite(init_grad[i])) {
               std::cout << "Rejecting initialization at zero because of divergent gradient." << std::endl;
               return 0;
@@ -413,7 +413,7 @@ namespace stan {
           
           for (num_init_tries = 1; num_init_tries <= MAX_INIT_TRIES; ++num_init_tries) {
             
-            for (size_t i = 0; i < cont_params.size(); ++i)
+            for (int i = 0; i < cont_params.size(); ++i)
               cont_params(i) = init_rng();
             
             // FIXME: allow config vs. std::cout
@@ -429,7 +429,7 @@ namespace stan {
             
             if (!boost::math::isfinite(init_log_prob))
               continue;
-            for (size_t i = 0; i < init_grad.size(); ++i)
+            for (int i = 0; i < init_grad.size(); ++i)
               if (!boost::math::isfinite(init_grad(i)))
                 continue;
             break;
@@ -490,7 +490,7 @@ namespace stan {
           return 0;
         }
         
-        for (size_t i = 0; i < init_grad.size(); ++i) {
+        for (int i = 0; i < init_grad.size(); ++i) {
           if (!boost::math::isfinite(init_grad[i])) {
             std::cout << "Rejecting user-specified initialization because of divergent gradient." << std::endl;
             return 0;

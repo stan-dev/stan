@@ -51,20 +51,20 @@ namespace stan {
         
       virtual void get_param_names(std::vector<std::string>& model_names,
                                    std::vector<std::string>& names) {
-        for(size_t i = 0; i < q.size(); ++i)
+        for(int i = 0; i < q.size(); ++i)
           names.push_back(model_names.at(i));
-        for(size_t i = 0; i < q.size(); ++i)
+        for(int i = 0; i < q.size(); ++i)
           names.push_back(std::string("p_") + model_names.at(i));
-        for(size_t i = 0; i < q.size(); ++i)
+        for(int i = 0; i < q.size(); ++i)
           names.push_back(std::string("g_") + model_names.at(i));
       }
 
       virtual void get_params(std::vector<double>& values) {
-        for(size_t i = 0; i < q.size(); ++i)
+        for(int i = 0; i < q.size(); ++i)
           values.push_back(q(i));
-        for(size_t i = 0; i < q.size(); ++i)
+        for(int i = 0; i < q.size(); ++i)
           values.push_back(p(i));
-        for(size_t i = 0; i < q.size(); ++i)
+        for(int i = 0; i < q.size(); ++i)
           values.push_back(g(i));
       }
       
