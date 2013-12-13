@@ -208,6 +208,32 @@ namespace stan {
     }
 
     template<class Sampler>
+    bool init_adapt(Sampler* sampler, 
+                    const double delta,
+                    const double gamma,
+                    const double kappa, 
+                    const double t0) {
+      const double epsilon = sampler->get_nominal_stepsize();
+      
+      sampler->get_stepsize_adaptation().set_mu(log(10 * epsilon));
+      sampler->get_stepsize_adaptation().set_delta(delta);
+      sampler->get_stepsize_adaptation().set_gamma(gamma);
+      sampler->get_stepsize_adaptation().set_kappa(kappa);
+      sampler->get_stepsize_adaptation().set_t0(t0);
+      
+      sampler->engage_adaptation();
+      
+      try {
+        sampler->init_stepsize();
+      } catch (std::runtime_error e) {
+        std::cout << e.what() << std::endl;
+        return false;
+      }
+      
+      return true;
+    }
+
+    template<class Sampler>
     bool init_adapt(stan::mcmc::base_mcmc* sampler, categorical_argument* adapt) {
       
       double delta = dynamic_cast<real_argument*>(adapt->arg("delta"))->value();
@@ -215,27 +241,9 @@ namespace stan {
       double kappa = dynamic_cast<real_argument*>(adapt->arg("kappa"))->value();
       double t0    = dynamic_cast<real_argument*>(adapt->arg("t0"))->value();
       
-      double epsilon = dynamic_cast<Sampler*>(sampler)->get_nominal_stepsize();
-      
       Sampler* s = dynamic_cast<Sampler*>(sampler);
-      
-      s->get_stepsize_adaptation().set_mu(log(10 * epsilon));
-      s->get_stepsize_adaptation().set_delta(delta);
-      s->get_stepsize_adaptation().set_gamma(gamma);
-      s->get_stepsize_adaptation().set_kappa(kappa);
-      s->get_stepsize_adaptation().set_t0(t0);
-      
-      s->engage_adaptation();
-      
-      try {
-        s->init_stepsize();
-      } catch (std::runtime_error e) {
-        std::cout << e.what() << std::endl;
-        return false;
-      }
-      
-      return true;
-      
+
+      return init_adapt<Sampler>(s, delta, gamma, kappa, t0);      
     }
     
     template<class Sampler>
