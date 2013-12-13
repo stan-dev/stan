@@ -3,5 +3,5 @@ parameters {
 }
 
 model {
-  lp__ <- lp__ + 1 / x;
+  increment_log_prob(1 / x);
 }

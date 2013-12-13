@@ -35,6 +35,7 @@ stan.kdev4
 src/test/gm/model_specs/compiled/*
 !src/test/gm/model_specs/compiled/*.stan
 !src/test/gm/model_specs/compiled/.gitignore
+src/test/gm/model_specs/no_main/*.cpp
 src/test/gm/model_specs/printer
 src/test/gm/model_specs/printer.exe
 src/test/gm/model_specs/printer.cpp
