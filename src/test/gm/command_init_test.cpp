@@ -25,9 +25,11 @@ public:
     gamma = 0.05;
     kappa = 0.75;
     t0 = 10;
-
-    z_0.assign(model->num_params_r(), 0);
-    z_init.assign(model->num_params_r(), 1);
+    
+    z_0.resize(model->num_params_r());
+    z_0.fill(0);
+    z_init.resize(model->num_params_r());
+    z_init.fill(1);
   }
   
   void TearDown() {
@@ -39,8 +41,8 @@ public:
   Model* model;
   sampler* sampler_ptr;
   double delta, gamma, kappa, t0;
-  std::vector<double> z_0;
-  std::vector<double> z_init;
+  Eigen::VectorXd z_0;
+  Eigen::VectorXd z_init;
 };
 
 TEST_F(GmCommand, init_adapt_z_0) {

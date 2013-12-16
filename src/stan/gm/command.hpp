@@ -213,7 +213,7 @@ namespace stan {
                     const double gamma,
                     const double kappa, 
                     const double t0,
-                    const std::vector<double>& cont_params) {
+                    const Eigen::VectorXd& cont_params) {
       const double epsilon = sampler->get_nominal_stepsize();
       
       sampler->get_stepsize_adaptation().set_mu(log(10 * epsilon));
@@ -237,7 +237,7 @@ namespace stan {
 
     template<class Sampler>
     bool init_adapt(stan::mcmc::base_mcmc* sampler, categorical_argument* adapt,
-                    const std::vector<double>& cont_params) {
+                    const Eigen::VectorXd& cont_params) {
       
       double delta = dynamic_cast<real_argument*>(adapt->arg("delta"))->value();
       double gamma = dynamic_cast<real_argument*>(adapt->arg("gamma"))->value();
@@ -251,7 +251,7 @@ namespace stan {
     
     template<class Sampler>
     bool init_windowed_adapt(stan::mcmc::base_mcmc* sampler, categorical_argument* adapt, 
-                             unsigned int num_warmup, const std::vector<double>& cont_params) {
+                             unsigned int num_warmup, const Eigen::VectorXd& cont_params) {
       
       init_adapt<Sampler>(sampler, adapt, cont_params);
       
