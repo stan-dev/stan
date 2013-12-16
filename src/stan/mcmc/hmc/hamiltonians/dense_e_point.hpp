@@ -13,8 +13,7 @@ namespace stan {
       
     public:
       
-      dense_e_point(int n, int m): ps_point(n, m),
-                                   mInv(n, n) {
+      dense_e_point(int n): ps_point(n), mInv(n, n) {
         mInv.setIdentity();
       };
       

@@ -4,7 +4,7 @@
 TEST(McmcCovarAdaptation, learn_covariance) {
 
   const int n = 10;
-  std::vector<double> q(n, 0.0);
+  Eigen::VectorXd q = Eigen::VectorXd::Zero(n);
   Eigen::MatrixXd covar(Eigen::MatrixXd::Zero(n, n));
   
   const int n_learn = 10;

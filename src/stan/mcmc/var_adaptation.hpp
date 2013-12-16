@@ -17,7 +17,7 @@ namespace stan {
       
       var_adaptation(int n): windowed_adaptation("variance"), _estimator(n) {}
 
-      bool learn_variance(Eigen::VectorXd& var, std::vector<double>& q) {
+      bool learn_variance(Eigen::VectorXd& var, const Eigen::VectorXd& q) {
 
         if (adaptation_window()) _estimator.add_sample(q);
 

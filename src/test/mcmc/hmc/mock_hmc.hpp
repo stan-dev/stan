@@ -9,8 +9,6 @@
 #include <stan/mcmc/hmc/hamiltonians/base_hamiltonian.hpp>
 #include <stan/mcmc/hmc/integrators/base_integrator.hpp>
 
-//#include <stan/mcmc/hmc/nuts/base_nuts.hpp>
-
 namespace stan {
   
   namespace mcmc {
@@ -23,8 +21,7 @@ namespace stan {
       mock_model(size_t num_params_r): model::prob_grad(num_params_r) {};
       
       template <bool propto, bool jacobian_adjust_transforms, typename T>
-      double log_prob(std::vector<T>& params_r,
-                      std::vector<int>& params_i,
+      T log_prob(Eigen::Matrix<T,Eigen::Dynamic,1>& params_r,
                       std::ostream* output_stream = 0) const {
         return 0;
       }
@@ -37,8 +34,7 @@ namespace stan {
       //   return 0; 
       // }
 
-      double log_prob(std::vector<double>& params_r,
-                      std::vector<int>& params_i,
+      double log_prob(Eigen::Matrix<double,Eigen::Dynamic,1>& params_r,
                       std::ostream* output_stream = 0) const { 
         return 0;
       }
@@ -89,8 +85,7 @@ namespace stan {
       { }
       
       void evolve(P& z, H& hamiltonian, const double epsilon) {
-        Eigen::Map<Eigen::VectorXd> eigen_q(&(z.q[0]), z.q.size());
-        eigen_q += epsilon * z.p;
+        z.q += epsilon * z.p;
       };
       
     };
