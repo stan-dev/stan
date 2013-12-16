@@ -72,7 +72,7 @@ TEST(McmcUnitEMetric, gradients) {
   
   Eigen::VectorXd g1 = metric.dtau_dq(z);
   
-  for (size_t i = 0; i < z.q.size(); ++i) {
+  for (int i = 0; i < z.q.size(); ++i) {
     
     double delta = 0;
     
@@ -95,7 +95,7 @@ TEST(McmcUnitEMetric, gradients) {
   
   Eigen::VectorXd g2 = metric.dtau_dp(z);
   
-  for (size_t i = 0; i < z.q.size(); ++i) {
+  for (int i = 0; i < z.q.size(); ++i) {
     
     double delta = 0;
     
@@ -115,7 +115,7 @@ TEST(McmcUnitEMetric, gradients) {
   
   Eigen::VectorXd g3 = metric.dphi_dq(z);
   
-  for (size_t i = 0; i < z.q.size(); ++i) {
+  for (int i = 0; i < z.q.size(); ++i) {
     
     double delta = 0;
     

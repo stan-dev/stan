@@ -59,7 +59,7 @@ TEST(McmcBaseHMC, point_construction) {
   
   stan::mcmc::mock_hmc sampler(model, base_rng, &std::cout, &std::cerr);
 
-  EXPECT_EQ(static_cast<size_t>(q.size()), sampler.z().q.size());
+  EXPECT_EQ(q.size(), sampler.z().q.size());
   EXPECT_EQ(static_cast<int>(q.size()), sampler.z().g.size());
 }
 
@@ -77,7 +77,7 @@ TEST(McmcBaseHMC, seed) {
 
   sampler.seed(q);
   
-  for (std::vector<double>::size_type i = 0; i < q.size(); ++i)
+  for (Eigen::VectorXd::size_type i = 0; i < q.size(); ++i)
     EXPECT_EQ(q(i), sampler.z().q(i));
   
 }
