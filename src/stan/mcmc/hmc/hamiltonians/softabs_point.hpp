@@ -13,8 +13,8 @@ namespace stan {
       
     public:
       
-      softabs_point(int n, int m):
-        ps_point(n, m),
+      softabs_point(int n):
+        ps_point(n),
         log_det_metric(0),
         hessian(Eigen::MatrixXd::Identity(n, n)),
         eigen_deco(n),

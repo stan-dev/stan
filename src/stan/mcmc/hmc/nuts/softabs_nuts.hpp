@@ -28,7 +28,7 @@ namespace stan {
       
     void test(sample& s) {
       
-      this->seed(s.cont_params(), s.disc_params());
+      this->seed(s.cont_params());
       this->_hamiltonian.sample_p(this->_z, this->_rand_int);
       
       this->_hamiltonian.test_derivatives(this->_z);
@@ -36,14 +36,14 @@ namespace stan {
                                            
     private:
       
-      bool _compute_criterion(ps_point& start, 
+      bool compute_criterion(ps_point& start, 
                               softabs_point& finish,
                               Eigen::VectorXd& rho) {
         
         bool end_check = (rho.dot( this->_hamiltonian.metric_inv_dot_p(finish) )
                           - finish.p.dot( this->_hamiltonian.metric_inv_dot_p(finish) ) ) > 0;
         
-        std::vector<double> q_swap = finish.q;
+        Eigen::VectorXd q_swap = finish.q;
         Eigen::VectorXd p_swap = finish.p;
         
         finish.q = start.q;

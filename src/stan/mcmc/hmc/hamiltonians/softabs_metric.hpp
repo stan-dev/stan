@@ -28,13 +28,8 @@ namespace stan {
       //}
       
       template <typename T>
-      T operator()(const Eigen::Matrix<T,Eigen::Dynamic,1>& x) const {
-        
-        std::vector<T> v(x.size());
-        Eigen::Map<Eigen::Matrix<T,Eigen::Dynamic,1> >(&(v[0]), v.size()) = x;
-        std::vector<int> dummy_ints;
-        
-        return _model.template log_prob<true, true, T>(v, dummy_ints, _o);
+      T operator()(Eigen::Matrix<T,Eigen::Dynamic,1>& x) const {
+        return _model.template log_prob<true, true, T>(x, _o);
       }
       
     };
@@ -65,17 +60,17 @@ namespace stan {
           
           double delta = 0;
           
-          z.q.at(i) += epsilon;
+          z.q(i) += epsilon;
           update(z);
           
           delta += tau(z);
           
-          z.q.at(i) -= 2 * epsilon;
+          z.q(i) -= 2 * epsilon;
           update(z);
           
           delta -= tau(z);
           
-          z.q.at(i) += epsilon;
+          z.q(i) += epsilon;
           update(z);
           
           delta /= 2 * epsilon;
@@ -119,17 +114,17 @@ namespace stan {
           
           double delta = 0;
           
-          z.q.at(i) += epsilon;
+          z.q(i) += epsilon;
           update(z);
           
           delta += phi(z);
           
-          z.q.at(i) -= 2 * epsilon;
+          z.q(i) -= 2 * epsilon;
           update(z);
           
           delta -= phi(z);
           
-          z.q.at(i) += epsilon;
+          z.q(i) += epsilon;
           update(z);
           
           delta /= 2 * epsilon;
@@ -170,8 +165,7 @@ namespace stan {
         }
         
         Eigen::VectorXd aux(z.q.size());
-        Eigen::Map<Eigen::VectorXd> eigen_q(&(z.q[0]), z.q.size());
-        stan::agrad::grad_tr_mat_times_hessian(_softabs_fun<M>(this->_model, 0), eigen_q, z.cache, aux);
+        stan::agrad::grad_tr_mat_times_hessian(_softabs_fun<M>(this->_model, 0), z.q, z.cache, aux);
         aux *= -1;
         
         return 0.5 * aux;
@@ -194,8 +188,7 @@ namespace stan {
           }
         }
         
-        Eigen::Map<Eigen::VectorXd> eigen_q(&(z.q[0]), z.q.size());
-        stan::agrad::grad_tr_mat_times_hessian(_softabs_fun<M>(this->_model, 0), eigen_q, z.cache, aux);
+        stan::agrad::grad_tr_mat_times_hessian(_softabs_fun<M>(this->_model, 0), z.q, z.cache, aux);
         
         return 0.5 * aux + z.g;
         
@@ -221,8 +214,7 @@ namespace stan {
       {
         
         // Compute the Hessian
-        Eigen::Map<Eigen::VectorXd> eigen_q(&(z.q[0]), z.q.size());
-        stan::agrad::hessian(_softabs_fun<M>(this->_model, 0), eigen_q, z.V, z.g, z.hessian);
+        stan::agrad::hessian(_softabs_fun<M>(this->_model, 0), z.q, z.V, z.g, z.hessian);
         
         z.V *= -1;
         z.g *= -1;

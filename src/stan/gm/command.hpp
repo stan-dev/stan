@@ -973,7 +973,7 @@ namespace stan {
                                               (metric->arg("softabs"));
               if (!init_softabs<sampler>(sampler_ptr, softabs)) return 0;
               if (!init_static_hmc<sampler>(sampler_ptr, algo)) return 0;
-              if (!init_adapt<sampler>(sampler_ptr, adapt)) return 0;
+              if (!init_adapt<sampler>(sampler_ptr, adapt, cont_params)) return 0;
               break;
             }
               
@@ -984,7 +984,7 @@ namespace stan {
                                               (metric->arg("softabs"));
               if (!init_softabs<sampler>(sampler_ptr, softabs)) return 0;
               if (!init_nuts<sampler>(sampler_ptr, algo)) return 0;
-              if (!init_adapt<sampler>(sampler_ptr, adapt)) return 0;
+              if (!init_adapt<sampler>(sampler_ptr, adapt, cont_params)) return 0;
               break;
             }
             
