@@ -26,5 +26,6 @@
 #include <stan/agrad/rev/matrix/trace_quad_form.hpp>
 #include <stan/agrad/rev/matrix/trace_gen_quad_form.hpp>
 #include <stan/agrad/rev/matrix/crossprod.hpp>
+#include <stan/agrad/rev/matrix/grad.hpp>
 
 #endif

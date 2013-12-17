@@ -2,6 +2,7 @@
 #define __STAN__AGRAD__REV__VAR_HPP__
 
 #include <ostream>
+#include <stan/math/matrix/Eigen.hpp>
 #include <stan/agrad/rev/vari.hpp>
 
 namespace stan {
@@ -242,7 +243,7 @@ namespace stan {
           g[i] = x[i].vi_->adj_;
         recover_memory();
       }
-
+      
       /**
        * Compute gradients of this dependent variable with respect to
        * all variables on which it depends.  

@@ -6,6 +6,8 @@
 #include <iostream>
 #include <vector>
 
+#include <stan/math/matrix/Eigen.hpp>
+#include <stan/agrad/rev/matrix/grad.hpp>
 #include <stan/agrad/rev/var.hpp>
 
 namespace stan {
@@ -96,6 +98,91 @@ namespace stan {
                                                         params_i,msgs);
         double val = adLogProb.val();
         adLogProb.grad(ad_params_r,gradient);
+        return val;
+      } catch (std::exception &ex) {
+        stan::agrad::recover_memory();
+        throw;
+      }
+    }
+    
+    /**
+     * Helper function to calculate log probability for
+     * <code>double</code> scalars up to a proportion.
+     *
+     * This implementation wraps the <code>double</code> values in
+     * <code>stan::agrad::var</code> and calls the model's
+     * <code>log_prob()</code> function with <code>propto=true</code>
+     * and the specified parameter for applying the Jacobian
+     * adjustment for transformed parameters.
+     *
+     * @tparam propto True if calculation is up to proportion
+     * (double-only terms dropped).
+     * @tparam jacobian_adjust_transform True if the log absolute
+     * Jacobian determinant of inverse parameter transforms is added to
+     * the log probability.
+     * @tparam M Class of model.
+     * @param[in] model Model.
+     * @param[in] params_r Real-valued parameters.
+     * @param[in,out] msgs
+     */
+    template <bool jacobian_adjust_transform, class M>
+    double log_prob_propto(const M& model,
+                           Eigen::VectorXd& params_r,
+                           std::ostream* msgs = 0) {
+      using stan::agrad::var;
+      using std::vector;
+      vector<var> ad_params_r;
+      for (size_t i = 0; i < model.num_params_r(); ++i)
+        ad_params_r.push_back(params_r(i));
+      try {
+        double lp
+        = model
+          .template log_prob<true,
+                             jacobian_adjust_transform>(ad_params_r, msgs)
+            .val();
+        stan::agrad::recover_memory();
+        return lp;
+      } catch (std::exception &ex) {
+        stan::agrad::recover_memory();
+        throw;
+      }
+    }
+    
+    /**
+     * Compute the gradient using reverse-mode automatic
+     * differentiation, writing the result into the specified
+     * gradient, using the specified perturbation.
+     *
+     * @tparam propto True if calculation is up to proportion
+     * (double-only terms dropped).
+     * @tparam jacobian_adjust_transform True if the log absolute
+     * Jacobian determinant of inverse parameter transforms is added to
+     * the log probability.
+     * @tparam M Class of model.
+     * @param[in] model Model.
+     * @param[in] params_r Real-valued parameters.
+     * @param[out] gradient Vector into which gradient is written.
+     * @param[in,out] msgs
+     */
+    template <bool propto, bool jacobian_adjust_transform, class M>
+    double log_prob_grad(const M& model,
+                         Eigen::VectorXd& params_r,
+                         Eigen::VectorXd& gradient,
+                         std::ostream* msgs = 0) {
+      using std::vector;
+      using stan::agrad::var;
+      Eigen::Matrix<var,Eigen::Dynamic,1> ad_params_r(params_r.size());
+      for (size_t i = 0; i < model.num_params_r(); ++i) {
+        stan::agrad::var var_i(params_r[i]);
+        ad_params_r[i] = var_i;
+      }
+      try {
+        var adLogProb
+          = model
+            .template log_prob<propto,
+                               jacobian_adjust_transform>(ad_params_r, msgs);
+        double val = adLogProb.val();
+        stan::agrad::grad(adLogProb, ad_params_r, gradient);
         return val;
       } catch (std::exception &ex) {
         stan::agrad::recover_memory();
