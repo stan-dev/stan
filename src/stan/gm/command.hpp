@@ -208,40 +208,52 @@ namespace stan {
     }
 
     template<class Sampler>
-    bool init_adapt(stan::mcmc::base_mcmc* sampler, categorical_argument* adapt) {
+    bool init_adapt(Sampler* sampler, 
+                    const double delta,
+                    const double gamma,
+                    const double kappa, 
+                    const double t0,
+                    const Eigen::VectorXd& cont_params) {
+      const double epsilon = sampler->get_nominal_stepsize();
       
-      double delta = dynamic_cast<real_argument*>(adapt->arg("delta"))->value();
-      double gamma = dynamic_cast<real_argument*>(adapt->arg("gamma"))->value();
-      double kappa = dynamic_cast<real_argument*>(adapt->arg("kappa"))->value();
-      double t0    = dynamic_cast<real_argument*>(adapt->arg("t0"))->value();
+      sampler->get_stepsize_adaptation().set_mu(log(10 * epsilon));
+      sampler->get_stepsize_adaptation().set_delta(delta);
+      sampler->get_stepsize_adaptation().set_gamma(gamma);
+      sampler->get_stepsize_adaptation().set_kappa(kappa);
+      sampler->get_stepsize_adaptation().set_t0(t0);
       
-      double epsilon = dynamic_cast<Sampler*>(sampler)->get_nominal_stepsize();
-      
-      Sampler* s = dynamic_cast<Sampler*>(sampler);
-      
-      s->get_stepsize_adaptation().set_mu(log(10 * epsilon));
-      s->get_stepsize_adaptation().set_delta(delta);
-      s->get_stepsize_adaptation().set_gamma(gamma);
-      s->get_stepsize_adaptation().set_kappa(kappa);
-      s->get_stepsize_adaptation().set_t0(t0);
-      
-      s->engage_adaptation();
+      sampler->engage_adaptation();
       
       try {
-        s->init_stepsize();
+        sampler->z().q = cont_params;
+        sampler->init_stepsize();
       } catch (std::runtime_error e) {
         std::cout << e.what() << std::endl;
         return false;
       }
       
       return true;
+    }
+
+    template<class Sampler>
+    bool init_adapt(stan::mcmc::base_mcmc* sampler, categorical_argument* adapt,
+                    const Eigen::VectorXd& cont_params) {
       
+      double delta = dynamic_cast<real_argument*>(adapt->arg("delta"))->value();
+      double gamma = dynamic_cast<real_argument*>(adapt->arg("gamma"))->value();
+      double kappa = dynamic_cast<real_argument*>(adapt->arg("kappa"))->value();
+      double t0    = dynamic_cast<real_argument*>(adapt->arg("t0"))->value();
+      
+      Sampler* s = dynamic_cast<Sampler*>(sampler);
+
+      return init_adapt<Sampler>(s, delta, gamma, kappa, t0, cont_params);
     }
     
     template<class Sampler>
-    bool init_windowed_adapt(stan::mcmc::base_mcmc* sampler, categorical_argument* adapt, unsigned int num_warmup) {
+    bool init_windowed_adapt(stan::mcmc::base_mcmc* sampler, categorical_argument* adapt, 
+                             unsigned int num_warmup, const Eigen::VectorXd& cont_params) {
       
-      init_adapt<Sampler>(sampler, adapt);
+      init_adapt<Sampler>(sampler, adapt, cont_params);
       
       unsigned int init_buffer = dynamic_cast<u_int_argument*>(adapt->arg("init_buffer"))->value();
       unsigned int term_buffer = dynamic_cast<u_int_argument*>(adapt->arg("term_buffer"))->value();
@@ -868,7 +880,7 @@ namespace stan {
               typedef stan::mcmc::adapt_unit_e_static_hmc<Model, rng_t> sampler;
               sampler_ptr = new sampler(model, base_rng, &std::cout, &std::cout);
               if (!init_static_hmc<sampler>(sampler_ptr, algo)) return 0;
-              if (!init_adapt<sampler>(sampler_ptr, adapt)) return 0;
+              if (!init_adapt<sampler>(sampler_ptr, adapt, cont_params)) return 0;
               break;
             }
             
@@ -876,7 +888,7 @@ namespace stan {
               typedef stan::mcmc::adapt_unit_e_nuts<Model, rng_t> sampler;
               sampler_ptr = new sampler(model, base_rng, &std::cout, &std::cout);
               if (!init_nuts<sampler>(sampler_ptr, algo)) return 0;
-              if (!init_adapt<sampler>(sampler_ptr, adapt)) return 0;
+              if (!init_adapt<sampler>(sampler_ptr, adapt, cont_params)) return 0;
               break;
             }
             
@@ -884,7 +896,7 @@ namespace stan {
               typedef stan::mcmc::adapt_diag_e_static_hmc<Model, rng_t> sampler;
               sampler_ptr = new sampler(model, base_rng, &std::cout, &std::cout);
               if (!init_static_hmc<sampler>(sampler_ptr, algo)) return 0;
-              if (!init_windowed_adapt<sampler>(sampler_ptr, adapt, num_warmup)) return 0;
+              if (!init_windowed_adapt<sampler>(sampler_ptr, adapt, num_warmup, cont_params)) return 0;
               break;
             }
             
@@ -892,7 +904,7 @@ namespace stan {
               typedef stan::mcmc::adapt_diag_e_nuts<Model, rng_t> sampler;
               sampler_ptr = new sampler(model, base_rng, &std::cout, &std::cout);
               if (!init_nuts<sampler>(sampler_ptr, algo)) return 0;
-              if (!init_windowed_adapt<sampler>(sampler_ptr, adapt, num_warmup)) return 0;
+              if (!init_windowed_adapt<sampler>(sampler_ptr, adapt, num_warmup, cont_params)) return 0;
               break;
             }
             
@@ -900,7 +912,7 @@ namespace stan {
               typedef stan::mcmc::adapt_dense_e_static_hmc<Model, rng_t> sampler;
               sampler_ptr = new sampler(model, base_rng, &std::cout, &std::cout);
               if (!init_static_hmc<sampler>(sampler_ptr, algo)) return 0;
-              if (!init_windowed_adapt<sampler>(sampler_ptr, adapt, num_warmup)) return 0;
+              if (!init_windowed_adapt<sampler>(sampler_ptr, adapt, num_warmup, cont_params)) return 0;
               break;
             }
             
@@ -908,7 +920,7 @@ namespace stan {
               typedef stan::mcmc::adapt_dense_e_nuts<Model, rng_t> sampler;
               sampler_ptr = new sampler(model, base_rng, &std::cout, &std::cout);
               if (!init_nuts<sampler>(sampler_ptr, algo)) return 0;
-              if (!init_windowed_adapt<sampler>(sampler_ptr, adapt, num_warmup)) return 0;
+              if (!init_windowed_adapt<sampler>(sampler_ptr, adapt, num_warmup, cont_params)) return 0;
               break;
             }
             
