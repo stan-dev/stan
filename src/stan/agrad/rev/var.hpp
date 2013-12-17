@@ -2,6 +2,7 @@
 #define __STAN__AGRAD__REV__VAR_HPP__
 
 #include <ostream>
+#include <stan/math/matrix/Eigen.hpp>
 #include <stan/agrad/rev/vari.hpp>
 
 namespace stan {
@@ -58,7 +59,7 @@ namespace stan {
        * @param vi Variable implementation. 
        */
       explicit var(vari* vi)
-      : vi_(vi) 
+        : vi_(vi) 
       {  }
 
       /**
@@ -68,9 +69,9 @@ namespace stan {
        * dangling.  Before an assignment, the behavior is thus undefined just
        * as for a basic double.
        */
-       var() 
-       : vi_(static_cast<vari*>(0U))
-       { }
+      var() 
+        : vi_(static_cast<vari*>(0U))
+      { }
 
       /**      
        * Construct a variable by static casting the specified
@@ -242,7 +243,7 @@ namespace stan {
           g[i] = x[i].vi_->adj_;
         recover_memory();
       }
-
+      
       /**
        * Compute gradients of this dependent variable with respect to
        * all variables on which it depends.  

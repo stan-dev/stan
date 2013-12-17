@@ -616,7 +616,11 @@ The error function of \farg{x}}
 The complementary error function of \farg{x}}
 %
 \fitemindexsort{real}{Phi}{real \farg{x}}{
-The cumulative unit normal density function of \farg{x}}{Phi}{phi}
+The cumulative unit normal density function of \farg{x};
+\code{Phi(\farg{x})} will underflow to 0 for \farg{x} below -37.5 and overflow
+to 1 for \farg{x} above 8.25;  derivatives will underflow to 0 below
+-27.5 and overflow to 1 above 27.5.
+}{Phi}{phi}
 %
 \fitemindexsort{real}{Phi\_approx}{real \farg{x}}{
 Fast approximation of the cumulative unit normal density
@@ -684,9 +688,18 @@ positive numbers and non-integral negative numbers by
 \fitem{real}{lgamma}{real \farg{x}}{
 The natural logarithm of the gamma function applied to \farg{x}}
 %
+\fitem{real}{digamma}{real \farg{x}}{
+The digamma function applied to \farg{x}.  The digamma function is the
+derivative of the natural logarithm of the Gamma function.  The function is defined for
+positive numbers and non-integral negative numbers.}
+%
+\fitem{real}{trigamma}{real \farg{x}}{
+The trigamma function applied to \farg{x}.  The trigamma function is the
+second derivative of the natural logarithm of the Gamma function.}
+%
 \fitem{real}{lmgamma}{int \farg{n}, real \farg{x}}{
 The natural logarithm of the multinomial gamma function with \farg{n}
-dimensions applied to \farg{x}.  }
+dimensions applied to \farg{x}.}
 %
 \fitem{real}{gamma\_p}{real \farg{a}, real \farg{z}}{
 The normalised lower incomplete gamma function of \farg{a} and \farg{z} defined for positive \farg{a} and nonnegative \farg{z} by 
@@ -722,14 +735,14 @@ $\Gamma$ function, defining
 \]
 }
 %
-\fitem{real}{bessel\_first\_kind}{real \farg{v}, real \farg{z}}{The Bessel function of the first kind with order \farg{v} applied to \farg{z} defined for all \farg{z} and \farg{v} by
+\fitem{real}{bessel\_first\_kind}{int \farg{v}, real \farg{z}}{The Bessel function of the first kind with order \farg{v} applied to \farg{z} defined for all \farg{z} and \farg{v} by
 \[
 {J_v}(z) = \left(\frac{1}{2}z\right)^v\sum_{k=0}^\infty
 \frac{\left(-\frac{1}{4}z^2\right)^k}{k!\, \Gamma(v+k+1)}
 \]
 }
 %
-\fitem{real}{bessel\_second\_kind}{real \farg{v}, real \farg{z}}{
+\fitem{real}{bessel\_second\_kind}{int \farg{v}, real \farg{z}}{
 The Bessel function of the second kind with order \farg{v} applied to \farg{z} defined for  positive \farg{z} and \farg{v} by
 \[
 {Y_v}(z)
@@ -738,13 +751,13 @@ The Bessel function of the second kind with order \farg{v} applied to \farg{z} d
 \]
 }
 %
-\fitem{real}{modified\_bessel\_first\_kind}{real \farg{v}, real \farg{z}}{The modified Bessel function of the first kind with order \farg{v} applied to \farg{z} defined for all \farg{z} and \farg{v} by
+\fitem{real}{modified\_bessel\_first\_kind}{int \farg{v}, real \farg{z}}{The modified Bessel function of the first kind with order \farg{v} applied to \farg{z} defined for all \farg{z} and \farg{v} by
 \[
 {I_v}(z) = \left(\frac{1}{2}z\right)^v\sum_{k=0}^\infty \frac{\left(\frac{1}{4}z^2\right)^k}{k!\Gamma(v+k+1)}
 \]
 }
 %
-\fitem{real}{modified\_bessel\_second\_kind}{real \farg{v}, real \farg{z}}{
+\fitem{real}{modified\_bessel\_second\_kind}{int \farg{v}, real \farg{z}}{
 The modified Bessel function of the second kind with order \farg{v} applied to \farg{z} defined for  positive \farg{z} and \farg{v} by
 \[
 {K_v}(z)
@@ -836,11 +849,14 @@ The natural logarithm of 1 minus the inverse logit function of \farg{x}}
 
 \chapter{Array Operations}
 
-\section{Reductions}
+\section{Reductions}\label{array-reductions.section}
 
 The following operations take arrays as input and produce single
 output values.
 %
+
+\subsection{Minimum and Maximum}
+
 \begin{description}
 \fitem{real}{min}{real \farg{x}[]}{
 The minimum value in \farg{x}, or $+\infty$ if \farg{x} is empty}
@@ -854,6 +870,11 @@ The maximum value in \farg{x}, or $-\infty$ if \farg{x} is empty}
 \fitem{int}{max}{int \farg{x}[]}{
 The maximum value in \farg{x}, or raise exception if \farg{x} is empty}
 %
+\end{description}
+
+\subsection{Sum, Product, and Log Sum of Exp}
+
+\begin{description}
 \fitem{real}{sum}{real \farg{x}[]}{
 The sum of the elements in \farg{x}, or 0 if \farg{x} is empty.}
 %
@@ -866,17 +887,74 @@ The product of the elements in \farg{x}, or 1 if \farg{x} is empty.}
 \fitem{real}{prod}{int \farg{x}[]}{
 The product of the elements in \farg{x}, or 1 if \farg{x} is empty.}
 %
+\fitem{real}{log\_sum\_exp}{real \farg{x}[]}{
+The natural logarithm of the sum of the exponentials of the elements in \farg{x}}
+\end{description}
+
+
+\subsection{Moments}
+
+Moments are only defined for arrays $x$ of size $N \geq 1$; it is an
+error to call them with arrays of size $N = 0$.  The sample mean is
+defined by
+\[
+\mbox{mean}(x) = \frac{1}{N} \sum_{n=1}^N x_n.
+\]
+%
+For $N \geq 2$, sample variance is defined for $N \geq 1$ by
+\[
+\mbox{variance}(x) 
+= 
+\frac{1}{N-1} \sum_{n=1}^N (x_n - \mbox{mean}(x))^2
+\]
+and sample standard deviation by 
+\[
+\mbox{sd}(x) = \sqrt{\, \mbox{variance}(x)},
+\]
+For convenience, when $N = 1$, $\mbox{variance(x)}$ and 
+$\mbox{sd}(x)$ are defined to be 0.
+
+% leaving gradients following for ref and in case we want
+% to add them for all functions at some point
+
+% For $N \geq 2$,
+% \[
+% \frac{\partial}{\partial x_n} \mbox{mean}(x)
+% = \frac{1}{N}.
+% \]
+% For $N \geq 2$,
+% \[
+% \frac{\partial}{\partial x_n} \mbox{variance}(x)
+% = \frac{2}{N-1} 
+%   \left( x_n - \mbox{mean}(x) \right).
+% \]
+% For $N \geq 2$,
+% \[
+% \frac{\partial}{\partial x_n} \mbox{sd}(x)
+% = \frac{1}{(N - 1) \, \mbox{sd}(x)} 
+%   \left( x_m - \mbox{mean}(x) \right)
+% \]
+% For $N \geq 2$, in the limit where $\mbox{sd}(x) = 0$, 
+% % 
+% \[
+% \frac{\partial}{\partial x_n} \mbox{sd}(x)
+% = \frac{1}{\sqrt{N}}.
+% \]
+
+
+
+\begin{description}
 \fitem{real}{mean}{real \farg{x}[]}{
-The sample mean of the elements in \farg{x}, or raise exception
-if \farg{x} is empty}
+The sample mean of the elements in \farg{x}}
 %
 \fitem{real}{variance}{real \farg{x}[]}{
-The sample variance of the elements in \farg{x} (based on
-dividing by \code{length - 1}), or 0 if \farg{x} is empty}
+The sample variance of the elements in \farg{x}}
 %
 \fitem{real}{sd}{real \farg{x}[]}{The sample standard deviation of
-elements in \farg{x} (divide by \code{length - 1}), or 0 if \farg{x}
-is empty}
+elements in \farg{x}}
+\end{description}
+
+% \subsection{Distance and Squared Distance}
 %
 % \fitem{real}{dist}{real \farg{x}[], real \farg{y}[]}{The Euclidean
 %   distance between \farg{x} and \farg{y}, defined by
@@ -896,9 +974,6 @@ is empty}
 % where \code{N} is the size of \farg{x} and \farg{y}.
 % }
 %
-\fitem{real}{log\_sum\_exp}{real \farg{x}[]}{
-The natural logarithm of the sum of the exponentials of the elements in \farg{x}}
-\end{description}
 
 \section{Array Size and Dimension Function}
 
@@ -1490,48 +1565,50 @@ The product of the values in \farg{x}, or 1 if \farg{x} is empty}
 
 \subsection{Sample Moments}
 
+Full definitions are provided for sample moments in
+\refsection{array-reductions}.
+
 \begin{description}
 %
 \fitem{real}{mean}{vector \farg{x}}{
-The sample mean of the values in \farg{x}, or raise
-exception if \farg{x} is empty}
+The sample mean of the values in \farg{x};  
+see \refsection{array-reductions} for details.}
 %
 \fitem{real}{mean}{row\_vector \farg{x}}{
-The sample mean of the values in \farg{x}, or raise
-exception if \farg{x} is empty}
+The sample mean of the values in \farg{x};
+see \refsection{array-reductions} for details.}
 %
 \fitem{real}{mean}{matrix \farg{x}}{
-The sample mean of the values in \farg{x}, or raise
-exception if \farg{x} is empty}
+The sample mean of the values in \farg{x};
+see \refsection{array-reductions} for details.}
 %
 \vspace*{4pt}
 %
 \fitem{real}{variance}{vector \farg{x}}{
-The sample variance of the values in \farg{x}
-(divide by size minus 1), or 0 if \farg{x} is empty}
+  The sample variance of the values in 
+  \farg{x}; see \refsection{array-reductions} for details.}
 %
-\fitem{real}{variance}{row\_vector \farg{x}}{ The sample variance of
-  the values in \farg{x} (divide by size minus 1), or 0 if \farg{x} is
-  empty}
+\fitem{real}{variance}{row\_vector \farg{x}}{ 
+  The sample variance of the values in 
+  \farg{x}; see \refsection{array-reductions} for details.}
 %
 \fitem{real}{variance}{matrix \farg{x}}{
 The sample variance of the values in 
-\farg{x} (divide by size minus 1), or 0 if \farg{x} is empty}
+\farg{x}; see \refsection{array-reductions} for details.}
 %
 \vspace*{4pt}
 %
 \fitem{real}{sd}{vector \farg{x}}{
-The sample standard deviation of the values in \farg{x}
-(divide by size minus 1), or 0 if \farg{x} is empty}
+The sample standard deviation of the values in \farg{x};  see 
+\refsection{array-reductions} for details.}
 %
 \fitem{real}{sd}{row\_vector \farg{x}}{ 
-The sample standard deviation of the values in \farg{x} (divide by
-size minus 1), or 0 if \farg{x} is empty}
+The sample standard deviation of the values in \farg{x}; see
+\refsection{array-reductions} for details.}
 %
 \fitem{real}{sd}{matrix \farg{x}}{
-The sample standard deviation of the values in 
-\farg{x} (divide by size minus 1), or 0 if \farg{x} is empty}
-%
+The sample standard deviation of the values in \farg{x};
+see \refsection{array-reductions} for details.}%
 \end{description}
 
 

@@ -28,7 +28,7 @@ AR = ar
 STAN_HOME := $(dir $(firstword $(MAKEFILE_LIST)))
 EIGEN ?= lib/eigen_3.2.0
 BOOST ?= lib/boost_1.54.0
-GTEST ?= lib/gtest_1.6.0
+GTEST ?= lib/gtest_1.7.0
 
 ##
 # Set default compiler options.
@@ -57,7 +57,6 @@ PATH_SEPARATOR = /
 #   - CFLAGS
 #   - CFLAGS_GTEST
 #   - EXE
-#   - PCH
 ##
 -include make/os_detect
 
@@ -211,7 +210,7 @@ clean-manual:
 	cd src/docs/stan-reference; $(RM) *.brf *.aux *.bbl *.blg *.log *.toc *.pdf *.out *.idx *.ilg *.ind *.cb *.cb2 *.upa
 
 clean-models:
-	$(RM) -r models $(MODEL_HEADER).gch $(MODEL_HEADER).pch $(MODEL_HEADER).d
+	$(RM) -r models $(MODEL_HEADER).d
 
 clean-all: clean clean-manual clean-models
 	$(RM) -r test/* bin

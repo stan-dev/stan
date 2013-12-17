@@ -134,6 +134,10 @@ TEST(gm_parser,good_cov) {
   EXPECT_TRUE(is_parsable("src/test/gm/model_specs/good_cov.stan"));
 }
 
+TEST(gm_parser,good_local_var_array_size) {
+  EXPECT_TRUE(is_parsable("src/test/gm/model_specs/good_local_var_array_size.stan"));
+}
+
 TEST(gm_parser,parsable_test_bad1) {
   EXPECT_THROW(is_parsable("src/test/gm/model_specs/bad1.stan"),
                std::invalid_argument);

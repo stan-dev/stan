@@ -5,9 +5,9 @@
 #include <stan/meta/traits.hpp>
 #include <stan/math/functions/inv_logit.hpp>
 
-namespace stan{
+namespace stan {
 
-  namespace agrad{
+  namespace agrad {
 
     template <typename T>
     inline

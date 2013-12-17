@@ -13,7 +13,7 @@ namespace stan {
       
     public:
       
-      unit_e_point(int n, int m): ps_point(n, m) {};
+      unit_e_point(int n): ps_point(n) {};
 
       void write_metric(std::ostream* o) {
         if(!o) return;

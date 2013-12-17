@@ -118,10 +118,14 @@ ifeq ($(findstring test-,$(MAKECMDGOALS))$(findstring runtest_no_fail/,$(MAKECMD
 	-$@ --gtest_output="xml:$(basename $@).xml"
 endif
 
+
 ##
-# Builds a single test
+# all files that should be compiled as tests
 ##
 FILES := $(wildcard src/test/gm/model_specs/compiled/*.stan)
+
+
+## These lines are to shuffle the files
 ifeq ($(OS),win)
   WH := where
 else
@@ -132,24 +136,23 @@ ifneq ($(shell $(WH) shuf),)
   FILES := $(shell shuf -e $(FILES))
 else
 ifneq ($(shell $(WH) Rscript),)
-  FILES := $(shell Rscript -e "cat(sample(commandArgs(trailingOnly=TRUE)))" $(FILES))
-else
-ifneq ($(shell $(WH) python),)
-  FILES := $(shell python -c "import random; import os; import sys; sys.argv.remove('-'); s = sys.argv; random.shuffle(s); print ' '.join(s)" - $(FILES))
-else
-ifneq ($(shell $(WH) perl),)
-  FILES := $(shell perl -MList::Util=shuffle -le'print for shuffle @ARGV' $(FILES))
+  FILES := $(shell Rscript --vanilla -e "cat(sample(commandArgs(trailingOnly=TRUE)))" $(FILES))
 endif
 endif
-endif
-endif
+## end shuffling
 
-test/gm/command$(EXE) : test/gm/command.o bin/libstan.a bin/libstanc.a src/test/gm/model_specs/compiled/domain_fail$(EXE) src/test/gm/model_specs/compiled/value_fail$(EXE) 
+test/gm/command$(EXE) : test/gm/command.o bin/libstan.a bin/libstanc.a src/test/gm/model_specs/compiled/domain_fail$(EXE) src/test/gm/model_specs/compiled/value_fail$(EXE) src/test/gm/model_specs/printer$(EXE)
 	@mkdir -p $(dir $@)
 	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS) $(LDLIBS_STANC)
 ifeq ($(findstring test-,$(MAKECMDGOALS))$(findstring runtest/,$(MAKECMDGOALS)),)
 	$@ --gtest_output="xml:$(basename $@).xml"
 endif
+
+.PRECIOUS: src/test/gm/model_specs/no_main/test_lp.cpp
+test/gm/command_init.o: test/%.o : src/test/%_test.cpp $(LIBGTEST) src/test/gm/model_specs/no_main/test_lp.cpp
+	@mkdir -p $(dir $@)
+	$(COMPILE.c) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
+
 
 .PRECIOUS: src/test/mcmc/models/improper$(EXE)
 test/mcmc/base_hmc$(EXE) : test/mcmc/base_hmc.o bin/libstan.a bin/libstanc.a src/test/mcmc/models/improper$(EXE)
@@ -159,14 +162,53 @@ ifeq ($(findstring test-,$(MAKECMDGOALS))$(findstring runtest/,$(MAKECMDGOALS)),
 	$@ --gtest_output="xml:$(basename $@).xml"
 endif
 
-test/gm/arguments/argument_configuration$(EXE) : test/gm/arguments/argument_configuration.o bin/libstan.a src/test/gm/arguments/test_model$(EXE)
+src/test/gm/model_specs/no_main/%.cpp : src/test/gm/model_specs/no_main/%.stan bin/stanc$(EXE)
+	bin$(PATH_SEPARATOR)stanc$(EXE) --name=$(basename $(@F)) --o=$@ --no_main $<
+
+src/test/mcmc/hmc/hamiltonians/models/%.cpp : src/test/mcmc/hmc/hamiltonians/models/%.stan bin/stanc$(EXE)
+	bin$(PATH_SEPARATOR)stanc$(EXE) --name=$(basename $(@F)) --o=$@ --no_main $<
+
+src/test/mcmc/hmc/integrators/models/%.cpp : src/test/mcmc/hmc/integrators/models/%.stan bin/stanc$(EXE)
+	bin$(PATH_SEPARATOR)stanc$(EXE) --name=$(basename $(@F)) --o=$@ --no_main $<
+
+src/test/io/test_model/%.cpp : src/test/io/test_model/%.stan bin/stanc$(EXE)
+	bin$(PATH_SEPARATOR)stanc$(EXE) --name=$(basename $(@F)) --o=$@ --no_main $<
+
+.PRECIOUS: src/test/mcmc/hmc/hamiltonians/models/funnel.cpp
+test/mcmc/hmc/hamiltonians/base_hamiltonian.o test/mcmc/hmc/hamiltonians/unit_e_metric.o test/mcmc/hmc/hamiltonians/diag_e_metric.o test/mcmc/hmc/hamiltonians/dense_e_metric.o: test/%.o : src/test/%_test.cpp $(LIBGTEST) src/test/mcmc/hmc/hamiltonians/models/funnel.cpp
+	@mkdir -p $(dir $@)
+	$(COMPILE.c) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
+
+.PRECIOUS: src/test/mcmc/hmc/integrators/models/gauss.cpp src/test/mcmc/hmc/integrators/models/command.cpp
+test/mcmc/hmc/integrators/expl_leapfrog.o: test/%.o : src/test/%_test.cpp $(LIBGTEST) src/test/mcmc/hmc/integrators/models/gauss.cpp src/test/mcmc/hmc/integrators/models/command.cpp
+	@mkdir -p $(dir $@)
+	$(COMPILE.c) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
+
+.PRECIOUS: src/test/gm/model_specs/no_main/test_lp.cpp
+test/gm/generator.o: test/%.o : src/test/%_test.cpp $(LIBGTEST) src/test/gm/model_specs/no_main/test_lp.cpp
+	@mkdir -p $(dir $@)
+	$(COMPILE.c) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
+
+.PRECIOUS: src/test/io/test_model/example.cpp
+test/io/mcmc_writer.o: test/%.o : src/test/%_test.cpp $(LIBGTEST) src/test/io/test_model/example.cpp
+	@mkdir -p $(dir $@)
+	$(COMPILE.c) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
+
+test/gm/arguments/argument_configuration$(EXE) : test/gm/arguments/argument_configuration.o bin/libstan.a bin/libstanc.a src/test/gm/arguments/test_model$(EXE)
 	@mkdir -p $(dir $@)
 	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS) $(LDLIBS_STANC)
 ifeq ($(findstring test-,$(MAKECMDGOALS))$(findstring runtest/,$(MAKECMDGOALS)),)
 	$@ --gtest_output="xml:$(basename $@).xml"
 endif
 
-test/gm/compile_models$(EXE) : test/gm/compile_models.o bin/libstan.a $(patsubst %.stan,%$(EXE),$(FILES))
+test/gm/compile_models$(EXE) : test/gm/compile_models.o bin/libstan.a bin/libstanc.a $(patsubst %.stan,%$(EXE),$(FILES))
+	@mkdir -p $(dir $@)
+	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS) $(LDLIBS_STANC)
+ifeq ($(findstring test-,$(MAKECMDGOALS))$(findstring runtest/,$(MAKECMDGOALS)),)
+	$@ --gtest_output="xml:$(basename $@).xml"
+endif
+
+test/command/print$(EXE) : test/command/print.o bin/libstan.a bin/libstanc.a bin/print$(EXE)
 	@mkdir -p $(dir $@)
 	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS) $(LDLIBS_STANC)
 ifeq ($(findstring test-,$(MAKECMDGOALS))$(findstring runtest/,$(MAKECMDGOALS)),)
@@ -218,6 +260,7 @@ endif
 # tests.
 ## 
 .PHONY: runtest/%
+.PRECIOUS: test/%$(EXE)
 .SECONDARY:
 runtest/% : %$(EXE)
 	@echo '------------------------------------------------------------'
