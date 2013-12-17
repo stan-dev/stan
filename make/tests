@@ -265,3 +265,33 @@ runtest_no_fail/% : %$(EXE)
 .PHONY: path_separator
 path_separator :
 	@echo $(PATH_SEPARATOR)
+
+##
+# PERCENT used for secondary expansion
+# $$(PERCENT) turns into %.
+##
+PERCENT = %
+
+##
+# TEST_TARGETS is the set of all src/test subdirectories excluding src/test.
+##
+TEST_TARGETS = $(shell find src/test ! -path src/test -type d)
+
+##
+# ALL_TESTS is the set of all test files
+##
+ALL_TESTS = $(shell find src/test -type f -name '*_test.cpp')
+
+ALL_TEST_EXECUTABLES = $(patsubst src/%_test.cpp,%$(EXE),$(ALL_TESTS))
+
+##
+# Defining the test target implicit static rule.
+#
+# Each src/test/* depends on each executable that's generated
+# by the test file.
+##
+.SECONDEXPANSION:
+.PHONY: $(TEST_TARGETS)
+$(TEST_TARGETS): src/test/%: $$(addprefix runtest/,$$(filter test/$$*/$$(PERCENT),$$(ALL_TEST_EXECUTABLES)))
+	@echo ''
+	@echo 'Ran tests for '$@
