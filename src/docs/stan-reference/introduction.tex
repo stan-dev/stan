@@ -13,7 +13,44 @@ parts of this document include a practically-oriented user's guide for
 programming models and a detailed reference manual for \Stan's
 modeling language and associated programs and data formats.
 
-\section{\Stan Programs}
+\section{Stan Interfaces}
+
+There are three interfaces for Stan that are supported as part of the
+Stan project.  Models and their use are the same across the three
+interfaces, and this manual is the modeling language manual for all
+three interfaces.  All of the interfaces share initialization,
+sampling and tuning controls, and roughly share posterior analysis
+functionality.   
+
+\subsection{CmdStan}
+
+CmdStan allows Stan to be run from the command line.  In some sense,
+CmdStan is the reference implementation of Stan.  This manual
+currently doubles as the CmdStan documentation.  In the near term,
+the CmdStan documentation will be broken out of this manual and given
+its own manual.
+
+\subsection{RStan}
+
+RStan is the R interface to Stan.  The installation and getting
+started guide for RStan can be found on GitHub at:
+
+\begin{quote}
+\url{https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started}
+\end{quote}
+
+\subsection{PyStan}
+
+PyStan is the Python interface to Stan.  The installation and getting
+started guide for PyStan can be found on Read the Docs at:
+
+\begin{quote}
+\url{https://pystan.readthedocs.org/en/latest/getting_started.html}
+\end{quote}
+
+
+
+\section{Stan Programs}
 
 A \Stan program defines a statistical model through a conditional
 probability function $p(\theta|y;x)$, where $\theta$ is a sequence of

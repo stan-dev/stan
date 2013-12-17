@@ -1824,11 +1824,17 @@ matrix inversions can be used \citep[Sec~6.4]{DurbinKoopman:2001}.
 
 \subsubsection{Stan Functions}
 
+The following two functions differ in the type of their \farg{V}, the
+first taking a full observation covariance matrix \farg{V} and the
+second a vector \farg{V} representing the diagonal of the observation
+covariance matrix.  The sampling statement defined in the previous
+section works with either type of observation \farg{V}.
+
 \begin{description}
 %
-\fitem{real}{gaussian\_dlm\_obs\_log}{vector \farg{y}, matrix \farg{F},
-  matrix \farg{G}, matrix \farg{V}, \\ \hspace*{132pt} matrix \farg{W}, vector
-  \farg{m0}, matrix \farg{C0}\vspace*{8pt}} {The log of the density of the
+\fitemtwolines{real}{gaussian\_dlm\_obs\_log}{vector \farg{y}, matrix \farg{F},
+  matrix \farg{G}, matrix \farg{V}}{matrix \farg{W}, vector
+  \farg{m0}, matrix \farg{C0}}{The log of the density of the
   Gaussian Dynamic Linear model with observation matrix \farg{y} in
   which rows are variables and columns are observations, design
   matrix \farg{F}, transition matrix \farg{G}, observation
@@ -1837,9 +1843,9 @@ matrix inversions can be used \citep[Sec~6.4]{DurbinKoopman:2001}.
   covariance \farg{C0}.}
 % 
 %
-\fitem{real}{gaussian\_dlm\_obs\_log}{vector \farg{y}, matrix \farg{F},
-  matrix \farg{G}, vector \farg{V}, \\ \hspace*{132pt} matrix \farg{W}, vector \farg{m0},
-  matrix \farg{C0}\vspace*{8pt}} {The log of the density of the Gaussian Dynamic
+\fitemtwolines{real}{gaussian\_dlm\_obs\_log}{vector \farg{y}, matrix \farg{F},
+  matrix \farg{G}, vector \farg{V}}{matrix \farg{W}, vector \farg{m0},
+  matrix \farg{C0}} {The log of the density of the Gaussian Dynamic
   Linear model with observation matrix \farg{y} in which rows are
   variables and columns are observations, design matrix \farg{F},
   transition matrix \farg{G}, observation covariance matrix with
@@ -1914,12 +1920,17 @@ unit diagonal (i.e., a correlation matrix), then
 \]
 %
 The shape parameter $\eta$ can be interpreted like the shape parameter
-of a symmetric beta distribution. If $\eta = 1$, then the density is
-uniform over all correlation matrices of a given order. If $\eta > 1$,
-the identity matrix is the modal correlation matrix, especially as
-$\eta$ becomes large. For $0 < \eta < 1$, the density has a trough at
-the identity matrix. See \citep{LewandowskiKurowickaJoe:2009} for
-definitions.
+of a symmetric beta distribution. 
+\begin{itemize}
+\item if $\eta = 1$, then the density is uniform over all correlation
+  matrices of a given order;
+\item if $\eta > 1$, the identity matrix is the modal correlation
+  matrix, with sharper peaks in the density around the identity matrix
+  for larger $\eta$; and
+\item for $0 < \eta < 1$, the density has a trough at the identity
+  matrix.
+\end{itemize}
+See \citep{LewandowskiKurowickaJoe:2009} for definitions.
 
 \pitem{y}{lkj\_corr\_log}{eta}
 

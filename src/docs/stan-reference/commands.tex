@@ -1017,7 +1017,7 @@ may appear in any order.
 \centering
 \begin{picture}(1000, 200)
 %
-\footnotesize\tt
+\footnotesize
 \put(25, 20) { \framebox(75, 200)[c]{I} }
 \put(100, 20) { \framebox(25, 200)[c]{II} }
 \put(125, 20) { \framebox(50, 200)[c]{II} }
@@ -1025,16 +1025,17 @@ may appear in any order.
 \put(275, 20) { \framebox(200, 200)[c]{II} }
 \put(475, 20) { \framebox(400, 200)[c]{II} }
 \put(875, 20) { \framebox(50, 200)[c]{III} }
-\put(0, 20) { \vector(1, 0){1000} }
-\put(800, -10) { \makebox(200, 20)[l]{Iteration} }
+\put(25, 20) { \vector(1, 0){950} }
+\put(800, -10) { \makebox(200, 20)[l]{{\small Iteration}} }
 %
 \end{picture}
 \caption{\small\it Adaptation during warmup occurs in three stages: an initial
 fast adaptation interval (I), a series of expanding slow adaptation intervals (II), 
-and a final fast adaptation interval (III).  For HMC both the fast and slow intervals
+and a final fast adaptation interval (III).  For HMC, both the fast and slow intervals
 are used for adapting the step size, while the slow intervals are used for learning
-the (co)variance is necessitated by the metric.}
-    \label{adaptation.figure}
+the (co)variance necessitated by the metric.  Iteration numbering
+starts at 1 on the left side of the figure and increases to the right.}%
+\label{adaptation.figure}
 \end{figure}
 
 When adaptation is engaged the warmup period is split into three
@@ -1501,6 +1502,10 @@ subarguments of the top-level method.
 \end{description}
 
 \subsubsection{Initialization Arguments}
+
+Initialization is only applied to parameters defined in the parameters
+block.  Any initial values supplied for transformed parameters or
+generated quantities are ignored. 
 
 \begin{description}
 \hiercmdarg{}{init}{$$string$$}

@@ -446,6 +446,30 @@ see warning at start of \refsection{step-functions}}
 
 \subsection{Rounding Functions}
 
+{\it Warning:}\ Rounding functions convert real values to integers.
+Because the output is an integer, any gradient information resulting
+from functions applied to the integer is not passed to the real value
+it was derived from.  With MCMC sampling using HMC or NUTS, the
+Metropolis/slice procedure will correct for any error due to poor
+gradient calculations, but the result is likely to be reduced
+acceptance probabilities and less efficient sampling.
+
+One case where rounding is reasonable is linear interpolation of
+function values.   For
+example, consider
+%
+\begin{quote}
+\begin{Verbatim}
+xm <- x[floor(c)];
+xp <- x[ceil(c)];
+x <- (c - floor(c))*xp + (ceil(c) - c)*xm;
+\end{Verbatim}
+\end{quote}
+%
+In this example, the first derivative for \code{x} with respect to
+\code{c} will be reasonable, but the second derivatives will all be
+zero.
+
 \begin{description}
 %
 \fitem{real}{floor}{real \farg{x}}{
@@ -875,10 +899,11 @@ The maximum value in \farg{x}, or raise exception if \farg{x} is empty}
 \subsection{Sum, Product, and Log Sum of Exp}
 
 \begin{description}
-\fitem{real}{sum}{real \farg{x}[]}{
+%
+\fitem{int}{sum}{int \farg{x}[]}{
 The sum of the elements in \farg{x}, or 0 if \farg{x} is empty.}
 %
-\fitem{real}{sum}{int \farg{x}[]}{
+\fitem{real}{sum}{real \farg{x}[]}{
 The sum of the elements in \farg{x}, or 0 if \farg{x} is empty.}
 %
 \fitem{real}{prod}{real \farg{x}[]}{
