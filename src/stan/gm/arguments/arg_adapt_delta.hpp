@@ -1,4 +1,4 @@
-#ifndef __STAN__GM__ARGUMENTS__ADAPT__DELTA_HPP__
+#ifndef __STAN__GM__ARGUMENTS__ADAPT__DELTA__HPP__
 #define __STAN__GM__ARGUMENTS__ADAPT__DELTA__HPP__
 
 #include <stan/gm/arguments/singleton_argument.hpp>
@@ -15,8 +15,8 @@ namespace stan {
         _name = "delta";
         _description = "Adaptation target acceptance statistic";
         _validity = "0 < delta < 1";
-        _default = "0.65";
-        _default_value = 0.65;
+        _default = "0.8";
+        _default_value = 0.8;
         _constrained = true;
         _good_value = 0.5;
         _bad_value = -1.0;

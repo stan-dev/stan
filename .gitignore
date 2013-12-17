@@ -35,12 +35,21 @@ stan.kdev4
 src/test/gm/model_specs/compiled/*
 !src/test/gm/model_specs/compiled/*.stan
 !src/test/gm/model_specs/compiled/.gitignore
+src/test/gm/model_specs/no_main/*.cpp
+src/test/gm/model_specs/printer
+src/test/gm/model_specs/printer.exe
+src/test/gm/model_specs/printer.cpp
+src/test/io/test_model/example.cpp
 src/test/mcmc/models/improper
 src/test/mcmc/models/improper.exe
 src/test/mcmc/models/improper.cpp
+src/test/mcmc/hmc/hamiltonians/models/funnel.cpp
+src/test/mcmc/hmc/integrators/models/gauss.cpp
+src/test/mcmc/hmc/integrators/models/command.cpp
 src/test/gm/arguments/test_model
 src/test/gm/arguments/test_model.exe
 src/test/gm/arguments/test_model.cpp
+
 
 src/test/mcmc/models/*
 !src/test/mcmc/models/*.stan

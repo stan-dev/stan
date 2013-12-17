@@ -2,6 +2,7 @@
 #include <stan/prob/distributions/univariate/discrete/poisson.hpp>
 
 #include <stan/math/functions/multiply_log.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
 
 using std::vector;
 using std::numeric_limits;
@@ -81,7 +82,7 @@ public:
     if (lambda == 0)
       return n == 0 ? 0 : LOG_ZERO;
     
-    if (std::isinf(lambda))
+    if (boost::math::isinf(lambda))
       return LOG_ZERO;
     
     if (include_summand<true>::value)

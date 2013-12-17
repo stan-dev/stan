@@ -5,9 +5,9 @@
 #include <stan/meta/traits.hpp>
 #include <stan/math/functions/fma.hpp>
 
-namespace stan{
+namespace stan {
 
-  namespace agrad{
+  namespace agrad {
 
     template <typename T1, typename T2, typename T3>
     inline

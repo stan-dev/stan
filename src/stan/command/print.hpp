@@ -167,7 +167,7 @@ void next_index(std::vector<int>& index, const std::vector<int>& dims) {
     }
   }
   
-  for (int n = 0; n < dims.size(); n++) {
+  for (size_t n = 0; n < dims.size(); n++) {
     if (index[n] <= 0 || index[n] > dims[n]) {
       std::stringstream message_stream("");
       message_stream << "next_index: index[" << n << "] out of bounds. "
@@ -185,7 +185,7 @@ int matrix_index(std::vector<int>& index, const std::vector<int>& dims) {
     throw std::domain_error("next_index: size mismatch");
   if (dims.size() == 0)
     return 0;
-  for (int n = 0; n < dims.size(); n++) {
+  for (size_t n = 0; n < dims.size(); n++) {
     if (index[n] <= 0 || index[n] > dims[n]) {
       std::stringstream message_stream("");
       message_stream << "matrix_index: index[" << n << "] out of bounds. "
@@ -197,7 +197,7 @@ int matrix_index(std::vector<int>& index, const std::vector<int>& dims) {
 
   int offset = 0;
   int prod = 1;
-  for (int i = 0; i < dims.size(); i++) {
+  for (size_t i = 0; i < dims.size(); i++) {
     offset += (index[i]-1) * prod;
     prod *= dims[i];
   }

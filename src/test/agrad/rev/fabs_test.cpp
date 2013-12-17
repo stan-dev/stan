@@ -46,6 +46,6 @@ TEST(AgradRev, fabs_NaN) {
   VEC g;
   f.grad(x,g);
   EXPECT_TRUE(boost::math::isnan(f.val()));
-  EXPECT_EQ(1,g.size());
+  EXPECT_EQ(1U,g.size());
   EXPECT_TRUE(boost::math::isnan(g[0]));
 }

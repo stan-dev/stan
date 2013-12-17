@@ -42,7 +42,7 @@ namespace stan {
       };
     }
 
- /**
+    /**
      * Return the positive difference between the first variable's the value
      * and the second's (C99).
      *

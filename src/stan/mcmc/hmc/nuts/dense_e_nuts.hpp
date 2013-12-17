@@ -22,19 +22,17 @@ namespace stan {
       
     public:
       
-    dense_e_nuts(M &m, BaseRNG& rng, std::ostream* o = &std::cout, std::ostream* e = 0):
-    base_nuts<M, dense_e_point, dense_e_metric, expl_leapfrog, BaseRNG>(m, rng, o, e)
-    { this->_name = "NUTS with a dense Euclidean metric"; }
-      
-    private:
+      dense_e_nuts(M &m, BaseRNG& rng, std::ostream* o = &std::cout, std::ostream* e = 0):
+      base_nuts<M, dense_e_point, dense_e_metric, expl_leapfrog, BaseRNG>(m, rng, o, e)
+      { this->_name = "NUTS with a dense Euclidean metric"; }
       
       // Note that the points don't need to be swapped
       // here since start.mInv = finish.mInv
-      bool _compute_criterion(ps_point& start, 
-                              dense_e_point& finish, 
-                              Eigen::VectorXd& rho) {
-        return rho.transpose() * finish.mInv * finish.p > 0
-            && rho.transpose() * finish.mInv * start.p  > 0;
+      bool compute_criterion(ps_point& start, 
+                             dense_e_point& finish,
+                             Eigen::VectorXd& rho) {
+        return finish.p.transpose() * finish.mInv * (rho - finish.p) > 0
+               && start.p.transpose() * finish.mInv * (rho - start.p)  > 0;
       }
                                           
     };

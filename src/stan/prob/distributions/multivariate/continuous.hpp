@@ -1,4 +1,4 @@
-#ifndef __STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINOUS_HPP__
+#ifndef __STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS_HPP__
 #define __STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS_HPP__
 
 #include <stan/prob/distributions/multivariate/continuous/gaussian_dlm_obs.hpp>

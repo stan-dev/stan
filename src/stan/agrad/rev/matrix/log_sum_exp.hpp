@@ -53,7 +53,7 @@ namespace stan {
     /**
      * Returns the log sum of exponentials.
      *
-     * @param 
+     * @param x matrix
      */
     template <int R, int C>
     inline var log_sum_exp(const Eigen::Matrix<var,R,C>& x) {
