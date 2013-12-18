@@ -22,6 +22,7 @@
 #include <stan/math/matrix/log_determinant_ldlt.hpp>
 #include <stan/math/matrix/mdivide_right_ldlt.hpp>
 #include <stan/math/matrix/trace_gen_inv_quad_form_ldlt.hpp>
+#include <stan/math/error_handling/matrix/check_ldlt_factor.hpp>
 
 namespace stan {
   namespace prob {
@@ -68,6 +69,7 @@ namespace stan {
       using stan::math::mdivide_right_ldlt;
       using stan::math::trace_gen_inv_quad_form_ldlt;
       using stan::math::LDLT_factor;
+      using stan::math::check_ldlt_factor;
 
       if (!check_size_match(function, 
                             Sigma.rows(), "Rows of kernel matrix",
@@ -82,14 +84,8 @@ namespace stan {
         return lp;
       
       LDLT_factor<T_covar,Eigen::Dynamic,Eigen::Dynamic> ldlt_Sigma(Sigma);
-      if (!ldlt_Sigma.success()) {
-        std::ostringstream message;
-        message << "Kernel matrix is not positive definite. " 
-                << "K[1,1] is %1%.";
-        std::string str(message.str());
-        stan::math::dom_err(function,Sigma(0,0),"",str.c_str(),"",&lp);
+      if(!check_ldlt_factor(function,ldlt_Sigma,"LDLT_Factor of Sigma",&lp))
         return lp;
-      }
 
       if (!check_size_match(function, 
                             y.rows(), "Size of random variable (rows y)",

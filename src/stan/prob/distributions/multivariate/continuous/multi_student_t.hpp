@@ -12,7 +12,7 @@
 #include <stan/prob/traits.hpp>
 #include <stan/prob/distributions/multivariate/continuous/multi_normal.hpp>
 #include <stan/prob/distributions/univariate/continuous/inv_gamma.hpp>
-
+#include <stan/math/error_handling/matrix/check_ldlt_factor.hpp>
 #include <boost/random/variate_generator.hpp>
 
 namespace stan {
@@ -45,8 +45,23 @@ namespace stan {
       using boost::math::lgamma;
       using stan::math::log_determinant_ldlt;
       using stan::math::LDLT_factor;
-      
+      using stan::math::check_ldlt_factor;
+
       typename promote_args<T_y,T_dof,T_loc,T_scale>::type lp(0.0);
+      
+      // allows infinities
+      if (!check_not_nan(function, nu, 
+                         "Degrees of freedom parameter", &lp))
+        return lp;
+      if (!check_positive(function, nu, 
+                          "Degrees of freedom parameter", &lp))
+        return lp;
+      
+      using boost::math::isinf;
+
+      if (isinf(nu)) // already checked nu > 0
+        return multi_normal_log(y,mu,Sigma);
+      
       if (!check_size_match(function, 
           y.size(), "Size of random variable",
           mu.size(), "size of location parameter",
@@ -70,27 +85,8 @@ namespace stan {
         return lp;
 
       LDLT_factor<T_scale,Eigen::Dynamic,Eigen::Dynamic> ldlt_Sigma(Sigma);
-      if (!ldlt_Sigma.success()) {
-        std::ostringstream message;
-        message << "Scale matrix is not positive definite. " 
-        << "Sigma(0,0) is %1%.";
-        std::string str(message.str());
-        stan::math::dom_err(function,Sigma(0,0),"Scale matrix",str.c_str(),"",&lp);
+      if(!check_ldlt_factor(function,ldlt_Sigma,"LDLT_Factor of scale parameter",&lp))
         return lp;
-      }
-
-      // allows infinities
-      if (!check_not_nan(function, nu, 
-                         "Degrees of freedom parameter", &lp))
-        return lp;
-      if (!check_positive(function, nu, 
-                          "Degrees of freedom parameter", &lp))
-        return lp;
-      
-      using boost::math::isinf;
-
-      if (isinf(nu)) // already checked nu > 0
-        return multi_normal_log(y,mu,Sigma);
 
       double d = y.size();
 

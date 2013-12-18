@@ -12,6 +12,7 @@
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
+#include <stan/math/error_handling/matrix/check_ldlt_factor.hpp>
 
 namespace stan {
 
@@ -31,6 +32,7 @@ namespace stan {
       using stan::math::check_positive;
       using stan::math::check_finite;
       using stan::math::check_symmetric;
+      using stan::math::check_ldlt_factor;
       
       if (!check_size_match(function, 
                             Sigma.rows(), "Rows of covariance parameter",
@@ -43,14 +45,8 @@ namespace stan {
         return lp;
       
       stan::math::LDLT_factor<T_covar,Eigen::Dynamic,Eigen::Dynamic> ldlt_Sigma(Sigma);
-      if (!ldlt_Sigma.success()) {
-        std::ostringstream message;
-        message << "Covariance matrix is not positive definite. " 
-        << "Sigma(0,0) is %1%.";
-        std::string str(message.str());
-        stan::math::dom_err(function,Sigma(0,0),"Covariance matrix",str.c_str(),"",&lp);
+      if(!check_ldlt_factor(function,ldlt_Sigma,"LDLT_Factor of covariance parameter",&lp))
         return lp;
-      }
 
       if (!check_size_match(function, 
                             y.size(), "Size of random variable",
@@ -119,6 +115,7 @@ namespace stan {
       using stan::math::check_finite;
       using stan::math::check_symmetric;
       using stan::math::check_not_nan;
+      using stan::math::check_ldlt_factor;
       
       if (!check_size_match(function, 
                             Sigma.rows(), "Rows of covariance matrix",
@@ -131,14 +128,8 @@ namespace stan {
         return lp;
 
       stan::math::LDLT_factor<T_covar,Eigen::Dynamic,Eigen::Dynamic> ldlt_Sigma(Sigma);
-      if (!ldlt_Sigma.success()) {
-        std::ostringstream message;
-        message << "Covariance matrix is not positive definite. " 
-        << "Sigma(0,0) is %1%.";
-        std::string str(message.str());
-        stan::math::dom_err(function,Sigma(0,0),"Covariance matrix",str.c_str(),"",&lp);
+      if(!check_ldlt_factor(function,ldlt_Sigma,"LDLT_Factor of Sigma",&lp))
         return lp;
-      }
 
       if (!check_size_match(function, 
                             y.cols(), "Columns of random variable",
