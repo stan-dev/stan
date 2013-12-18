@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/math/matrix/divide.hpp>
-#include <stan/agrad/var.hpp>
+#include <stan/agrad/rev.hpp>
 #include <test/agrad/util.hpp>
 
 using stan::agrad::fvar;

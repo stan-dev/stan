@@ -2,7 +2,7 @@
 #include <stan/agrad/rev/matrix/log_sum_exp.hpp>
 #include <test/agrad/util.hpp>
 #include <gtest/gtest.h>
-#include <stan/agrad/agrad.hpp>
+#include <stan/agrad/rev.hpp>
 
 using Eigen::Matrix;
 using Eigen::Dynamic;

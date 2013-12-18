@@ -208,40 +208,52 @@ namespace stan {
     }
 
     template<class Sampler>
-    bool init_adapt(stan::mcmc::base_mcmc* sampler, categorical_argument* adapt) {
+    bool init_adapt(Sampler* sampler, 
+                    const double delta,
+                    const double gamma,
+                    const double kappa, 
+                    const double t0,
+                    const Eigen::VectorXd& cont_params) {
+      const double epsilon = sampler->get_nominal_stepsize();
       
-      double delta = dynamic_cast<real_argument*>(adapt->arg("delta"))->value();
-      double gamma = dynamic_cast<real_argument*>(adapt->arg("gamma"))->value();
-      double kappa = dynamic_cast<real_argument*>(adapt->arg("kappa"))->value();
-      double t0    = dynamic_cast<real_argument*>(adapt->arg("t0"))->value();
+      sampler->get_stepsize_adaptation().set_mu(log(10 * epsilon));
+      sampler->get_stepsize_adaptation().set_delta(delta);
+      sampler->get_stepsize_adaptation().set_gamma(gamma);
+      sampler->get_stepsize_adaptation().set_kappa(kappa);
+      sampler->get_stepsize_adaptation().set_t0(t0);
       
-      double epsilon = dynamic_cast<Sampler*>(sampler)->get_nominal_stepsize();
-      
-      Sampler* s = dynamic_cast<Sampler*>(sampler);
-      
-      s->get_stepsize_adaptation().set_mu(log(10 * epsilon));
-      s->get_stepsize_adaptation().set_delta(delta);
-      s->get_stepsize_adaptation().set_gamma(gamma);
-      s->get_stepsize_adaptation().set_kappa(kappa);
-      s->get_stepsize_adaptation().set_t0(t0);
-      
-      s->engage_adaptation();
+      sampler->engage_adaptation();
       
       try {
-        s->init_stepsize();
+        sampler->z().q = cont_params;
+        sampler->init_stepsize();
       } catch (std::runtime_error e) {
         std::cout << e.what() << std::endl;
         return false;
       }
       
       return true;
+    }
+
+    template<class Sampler>
+    bool init_adapt(stan::mcmc::base_mcmc* sampler, categorical_argument* adapt,
+                    const Eigen::VectorXd& cont_params) {
       
+      double delta = dynamic_cast<real_argument*>(adapt->arg("delta"))->value();
+      double gamma = dynamic_cast<real_argument*>(adapt->arg("gamma"))->value();
+      double kappa = dynamic_cast<real_argument*>(adapt->arg("kappa"))->value();
+      double t0    = dynamic_cast<real_argument*>(adapt->arg("t0"))->value();
+      
+      Sampler* s = dynamic_cast<Sampler*>(sampler);
+
+      return init_adapt<Sampler>(s, delta, gamma, kappa, t0, cont_params);
     }
     
     template<class Sampler>
-    bool init_windowed_adapt(stan::mcmc::base_mcmc* sampler, categorical_argument* adapt, unsigned int num_warmup) {
+    bool init_windowed_adapt(stan::mcmc::base_mcmc* sampler, categorical_argument* adapt, 
+                             unsigned int num_warmup, const Eigen::VectorXd& cont_params) {
       
-      init_adapt<Sampler>(sampler, adapt);
+      init_adapt<Sampler>(sampler, adapt, cont_params);
       
       unsigned int init_buffer = dynamic_cast<u_int_argument*>(adapt->arg("init_buffer"))->value();
       unsigned int term_buffer = dynamic_cast<u_int_argument*>(adapt->arg("term_buffer"))->value();
@@ -346,6 +358,8 @@ namespace stan {
       
       Model model(data_var_context, &std::cout);
       
+      Eigen::VectorXd cont_params = Eigen::VectorXd::Zero(model.num_params_r());
+
       if (output_stream) {
         write_stan(output_stream, '#');
         write_model(output_stream, model.model_name(), '#');
@@ -358,9 +372,6 @@ namespace stan {
         parser.print(diagnostic_stream, '#');
       }
       
-      std::vector<double> cont_params(model.num_params_r());
-      std::vector<int> disc_params(model.num_params_i());
-      
       int num_init_tries = -1;
       
       std::string init = dynamic_cast<string_argument*>(
@@ -371,18 +382,15 @@ namespace stan {
         double R = std::fabs(boost::lexical_cast<double>(init));
         
         if (R == 0) {
-        
-          cont_params = std::vector<double>(model.num_params_r(), 0.0);
-          disc_params = std::vector<int>(model.num_params_i(), 0);
+          
+          cont_params.setZero();
           
           double init_log_prob;
-          std::vector<double> init_grad;
+          Eigen::VectorXd init_grad = Eigen::VectorXd::Zero(model.num_params_r());
           
           try {
             init_log_prob 
-              = stan::model::log_prob_grad<true, true>(model,
-                                                       cont_params, disc_params, init_grad,
-                                                       &std::cout);
+              = stan::model::log_prob_grad<true, true>(model, cont_params, init_grad, &std::cout);
           } catch (std::domain_error e) {
             std::cout << "Rejecting initialization at zero because of log_prob_grad failure." << std::endl;
             return error_codes::OK;
@@ -393,7 +401,7 @@ namespace stan {
             return 0;
           }
           
-          for (size_t i = 0; i < init_grad.size(); ++i) {
+          for (int i = 0; i < init_grad.size(); ++i) {
             if (!boost::math::isfinite(init_grad[i])) {
               std::cout << "Rejecting initialization at zero because of divergent gradient." << std::endl;
               return 0;
@@ -409,25 +417,22 @@ namespace stan {
           boost::random::uniform_real_distribution<double> >
           init_rng(base_rng, init_range_distribution);
           
-          cont_params = std::vector<double>(model.num_params_r());
-          disc_params = std::vector<int>(model.num_params_i(), 0);
+          cont_params.setZero();
           
           // Random initializations until log_prob is finite
-          std::vector<double> init_grad;
+          Eigen::VectorXd init_grad = Eigen::VectorXd::Zero(model.num_params_r());
           static int MAX_INIT_TRIES = 100;
           
           for (num_init_tries = 1; num_init_tries <= MAX_INIT_TRIES; ++num_init_tries) {
             
-            for (size_t i = 0; i < cont_params.size(); ++i)
-              cont_params[i] = init_rng();
+            for (int i = 0; i < cont_params.size(); ++i)
+              cont_params(i) = init_rng();
             
             // FIXME: allow config vs. std::cout
             double init_log_prob;
             try {
               init_log_prob
-                = stan::model::log_prob_grad<true, true>(model,
-                                                         cont_params, disc_params, init_grad,
-                                                         &std::cout);
+                = stan::model::log_prob_grad<true, true>(model, cont_params, init_grad, &std::cout);
             } catch (std::domain_error e) {
               write_error_msg(&std::cout, e);
               std::cout << "Rejecting proposed initial value with zero density." << std::endl;
@@ -436,8 +441,8 @@ namespace stan {
             
             if (!boost::math::isfinite(init_log_prob))
               continue;
-            for (size_t i = 0; i < init_grad.size(); ++i)
-              if (!boost::math::isfinite(init_grad[i]))
+            for (int i = 0; i < init_grad.size(); ++i)
+              if (!boost::math::isfinite(init_grad(i)))
                 continue;
             break;
             
@@ -469,7 +474,7 @@ namespace stan {
           
           stan::io::dump init_var_context(init_stream);
           init_stream.close();
-          model.transform_inits(init_var_context, disc_params, cont_params);
+          model.transform_inits(init_var_context, cont_params);
         
         } catch (const std::exception& e) {
           std::cerr << "Error during user-specified initialization:"
@@ -480,14 +485,12 @@ namespace stan {
         }
         
         double init_log_prob;
-        std::vector<double> init_grad;
+        Eigen::VectorXd init_grad = Eigen::VectorXd::Zero(model.num_params_r());
         
         try {
         
           init_log_prob
-            = stan::model::log_prob_grad<true, true>(model,
-                                                     cont_params, disc_params, init_grad,
-                                                     &std::cout);
+            = stan::model::log_prob_grad<true, true>(model, cont_params, init_grad, &std::cout);
 
         } catch (std::domain_error e) {
           std::cout << "Rejecting user-specified initialization because of log_prob_grad failure." << std::endl;
@@ -499,7 +502,7 @@ namespace stan {
           return 0;
         }
         
-        for (size_t i = 0; i < init_grad.size(); ++i) {
+        for (int i = 0; i < init_grad.size(); ++i) {
           if (!boost::math::isfinite(init_grad[i])) {
             std::cout << "Rejecting user-specified initialization because of divergent gradient." << std::endl;
             return 0;
@@ -514,12 +517,17 @@ namespace stan {
       
       if (parser.arg("method")->arg("diagnose")) {
       
+        std::vector<double> cont_vector(cont_params.size());
+        for (int i = 0; i < cont_params.size(); ++i)
+          cont_vector.at(i) = cont_params(i);
+        std::vector<int> disc_vector;
+        
         list_argument* test = dynamic_cast<list_argument*>
                               (parser.arg("method")->arg("diagnose")->arg("test"));
         
         if (test->value() == "gradient") {
           std::cout << std::endl << "TEST GRADIENT MODE" << std::endl;
-          
+
           double epsilon = dynamic_cast<real_argument*>
                            (test->arg("gradient")->arg("epsilon"))->value();
           
@@ -527,16 +535,16 @@ namespace stan {
                          (test->arg("gradient")->arg("error"))->value();
           
           int num_failed
-            = stan::model::test_gradients<true,true>(model,cont_params, disc_params, epsilon, error, std::cout);
+            = stan::model::test_gradients<true,true>(model,cont_vector, disc_vector, epsilon, error, std::cout);
           
           if (output_stream) {
             num_failed
-              = stan::model::test_gradients<true,true>(model,cont_params, disc_params, epsilon, error, *output_stream);
+              = stan::model::test_gradients<true,true>(model,cont_vector, disc_vector, epsilon, error, *output_stream);
           }
           
           if (diagnostic_stream) {
             num_failed
-              = stan::model::test_gradients<true,true>(model,cont_params, disc_params, epsilon, error, *diagnostic_stream);
+              = stan::model::test_gradients<true,true>(model,cont_vector, disc_vector, epsilon, error, *diagnostic_stream);
           }
           
           (void) num_failed; // FIXME: do something with the number failed
@@ -551,6 +559,11 @@ namespace stan {
       //////////////////////////////////////////////////
       
       if (parser.arg("method")->arg("optimize")) {
+        
+        std::vector<double> cont_vector(cont_params.size());
+        for (int i = 0; i < cont_params.size(); ++i)
+          cont_vector.at(i) = cont_params(i);
+        std::vector<int> disc_vector;
         
         list_argument* algo = dynamic_cast<list_argument*>
                               (parser.arg("method")->arg("optimize")->arg("algorithm"));
@@ -573,7 +586,7 @@ namespace stan {
                          algo->arg("nesterov")->arg("stepsize"))->value();
           
           
-          stan::optimization::NesterovGradient<Model> ng(model, cont_params, disc_params,
+          stan::optimization::NesterovGradient<Model> ng(model, cont_vector, disc_vector,
                                                          epsilon, &std::cout);
           
           lp = ng.logp();
@@ -582,7 +595,7 @@ namespace stan {
           std::cout << "Initial log joint probability = " << lp << std::endl;
           if (output_stream && save_iterations) {
             *output_stream << lp << ',';
-            model.write_csv(base_rng, cont_params, disc_params, 
+            model.write_csv(base_rng, cont_vector, disc_vector,
                             *output_stream, &std::cout);
             output_stream->flush();
           }
@@ -591,7 +604,7 @@ namespace stan {
           for (int i = 0; i < num_iterations; i++) {
             lastlp = lp;
             lp = ng.step();
-            ng.params_r(cont_params);
+            ng.params_r(cont_vector);
             if (do_print(i, refresh)) {
               std::cout << "Iteration ";
               std::cout << std::setw(2) << (m + 1) << ". ";
@@ -603,7 +616,7 @@ namespace stan {
             m++;
             if (output_stream && save_iterations) {
               *output_stream << lp << ',';
-              model.write_csv(base_rng, cont_params, disc_params, 
+              model.write_csv(base_rng, cont_vector, disc_vector,
                               *output_stream, &std::cout);
               output_stream->flush();
             }
@@ -611,9 +624,10 @@ namespace stan {
           }
           return_code = error_codes::OK;
         } else if (algo->value() == "newton") {
+          
           std::vector<double> gradient;
           try {
-            lp = model.template log_prob<false, false>(cont_params, disc_params, &std::cout);
+            lp = model.template log_prob<false, false>(cont_vector, disc_vector, &std::cout);
           } catch (std::domain_error e) {
             write_error_msg(&std::cout, e);
             lp = -std::numeric_limits<double>::infinity();
@@ -622,7 +636,7 @@ namespace stan {
           std::cout << "initial log joint probability = " << lp << std::endl;
           if (output_stream && save_iterations) {
             *output_stream << lp << ',';
-            model.write_csv(base_rng, cont_params, disc_params, 
+            model.write_csv(base_rng, cont_vector, disc_vector,
                             *output_stream, &std::cout);
             output_stream->flush();
           }
@@ -632,7 +646,7 @@ namespace stan {
           while ((lp - lastlp) / fabs(lp) > 1e-8) {
             
             lastlp = lp;
-            lp = stan::optimization::newton_step(model, cont_params, disc_params);
+            lp = stan::optimization::newton_step(model, cont_vector, disc_vector);
             std::cout << "Iteration ";
             std::cout << std::setw(2) << (m + 1) << ". ";
             std::cout << "Log joint probability = " << std::setw(10) << lp;
@@ -643,14 +657,15 @@ namespace stan {
 
             if (output_stream && save_iterations) {
               *output_stream << lp << ',';
-              model.write_csv(base_rng, cont_params, disc_params, 
+              model.write_csv(base_rng, cont_vector, disc_vector,
                               *output_stream, &std::cout);
             }
             
           }
           return_code = error_codes::OK;
         } else if (algo->value() == "bfgs") {
-          stan::optimization::BFGSLineSearch<Model> bfgs(model, cont_params, disc_params,
+          
+          stan::optimization::BFGSLineSearch<Model> bfgs(model, cont_vector, disc_vector,
                                                          &std::cout);
           bfgs._opts.alpha0 = dynamic_cast<real_argument*>(
                          algo->arg("bfgs")->arg("init_alpha"))->value();
@@ -667,7 +682,7 @@ namespace stan {
           std::cout << "initial log joint probability = " << lp << std::endl;
           if (output_stream && save_iterations) {
             *output_stream << lp << ',';
-            model.write_csv(base_rng, cont_params, disc_params, 
+            model.write_csv(base_rng, cont_vector, disc_vector,
                             *output_stream, &std::cout);
             output_stream->flush();
           }
@@ -689,7 +704,7 @@ namespace stan {
             
             ret = bfgs.step();
             lp = bfgs.logp();
-            bfgs.params_r(cont_params);
+            bfgs.params_r(cont_vector);
             
             if (do_print(bfgs.iter_num(), refresh) || ret != 0 || !bfgs.note().empty()) {
               std::cout << " " << std::setw(7) << bfgs.iter_num() << " ";
@@ -705,7 +720,7 @@ namespace stan {
             
             if (output_stream && save_iterations) {
               *output_stream << lp << ',';
-              model.write_csv(base_rng, cont_params, disc_params, 
+              model.write_csv(base_rng, cont_vector, disc_vector,
                               *output_stream, &std::cout);
               output_stream->flush();
             }
@@ -726,7 +741,7 @@ namespace stan {
 
         if (output_stream) {
           *output_stream << lp << ',';
-          model.write_csv(base_rng, cont_params, disc_params, 
+          model.write_csv(base_rng, cont_vector, disc_vector,
                           *output_stream, &std::cout);
           output_stream->flush();
           output_stream->close();
@@ -745,10 +760,8 @@ namespace stan {
         // Check timing
         clock_t start_check = clock();
         
-        std::vector<double> init_grad;
-        stan::model::log_prob_grad<true, true>(model,
-                                               cont_params, disc_params, init_grad,
-                                               &std::cout);
+        Eigen::VectorXd init_grad = Eigen::VectorXd::Zero(model.num_params_r());
+        stan::model::log_prob_grad<true, true>(model, cont_params, init_grad, &std::cout);
         
         clock_t end_check = clock();
         double deltaT = (double)(end_check - start_check) / CLOCKS_PER_SEC;
@@ -775,7 +788,7 @@ namespace stan {
         bool save_warmup = dynamic_cast<bool_argument*>(
                            parser.arg("method")->arg("sample")->arg("save_warmup"))->value();
         
-        stan::mcmc::sample s(cont_params, disc_params, 0, 0);
+        stan::mcmc::sample s(cont_params, 0, 0);
         
         double warmDeltaT;
         double sampleDeltaT;
@@ -867,7 +880,7 @@ namespace stan {
               typedef stan::mcmc::adapt_unit_e_static_hmc<Model, rng_t> sampler;
               sampler_ptr = new sampler(model, base_rng, &std::cout, &std::cout);
               if (!init_static_hmc<sampler>(sampler_ptr, algo)) return 0;
-              if (!init_adapt<sampler>(sampler_ptr, adapt)) return 0;
+              if (!init_adapt<sampler>(sampler_ptr, adapt, cont_params)) return 0;
               break;
             }
             
@@ -875,7 +888,7 @@ namespace stan {
               typedef stan::mcmc::adapt_unit_e_nuts<Model, rng_t> sampler;
               sampler_ptr = new sampler(model, base_rng, &std::cout, &std::cout);
               if (!init_nuts<sampler>(sampler_ptr, algo)) return 0;
-              if (!init_adapt<sampler>(sampler_ptr, adapt)) return 0;
+              if (!init_adapt<sampler>(sampler_ptr, adapt, cont_params)) return 0;
               break;
             }
             
@@ -883,7 +896,7 @@ namespace stan {
               typedef stan::mcmc::adapt_diag_e_static_hmc<Model, rng_t> sampler;
               sampler_ptr = new sampler(model, base_rng, &std::cout, &std::cout);
               if (!init_static_hmc<sampler>(sampler_ptr, algo)) return 0;
-              if (!init_windowed_adapt<sampler>(sampler_ptr, adapt, num_warmup)) return 0;
+              if (!init_windowed_adapt<sampler>(sampler_ptr, adapt, num_warmup, cont_params)) return 0;
               break;
             }
             
@@ -891,7 +904,7 @@ namespace stan {
               typedef stan::mcmc::adapt_diag_e_nuts<Model, rng_t> sampler;
               sampler_ptr = new sampler(model, base_rng, &std::cout, &std::cout);
               if (!init_nuts<sampler>(sampler_ptr, algo)) return 0;
-              if (!init_windowed_adapt<sampler>(sampler_ptr, adapt, num_warmup)) return 0;
+              if (!init_windowed_adapt<sampler>(sampler_ptr, adapt, num_warmup, cont_params)) return 0;
               break;
             }
             
@@ -899,7 +912,7 @@ namespace stan {
               typedef stan::mcmc::adapt_dense_e_static_hmc<Model, rng_t> sampler;
               sampler_ptr = new sampler(model, base_rng, &std::cout, &std::cout);
               if (!init_static_hmc<sampler>(sampler_ptr, algo)) return 0;
-              if (!init_windowed_adapt<sampler>(sampler_ptr, adapt, num_warmup)) return 0;
+              if (!init_windowed_adapt<sampler>(sampler_ptr, adapt, num_warmup, cont_params)) return 0;
               break;
             }
             
@@ -907,7 +920,7 @@ namespace stan {
               typedef stan::mcmc::adapt_dense_e_nuts<Model, rng_t> sampler;
               sampler_ptr = new sampler(model, base_rng, &std::cout, &std::cout);
               if (!init_nuts<sampler>(sampler_ptr, algo)) return 0;
-              if (!init_windowed_adapt<sampler>(sampler_ptr, adapt, num_warmup)) return 0;
+              if (!init_windowed_adapt<sampler>(sampler_ptr, adapt, num_warmup, cont_params)) return 0;
               break;
             }
             

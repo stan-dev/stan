@@ -1,7 +1,7 @@
 #ifndef __TEST__AGRAD__DISTRIBUTIONS__EXPECT_EQ_DIFFS_HPP__
 #define __TEST__AGRAD__DISTRIBUTIONS__EXPECT_EQ_DIFFS_HPP__
 
-#include "stan/agrad/agrad.hpp"
+#include <stan/agrad/rev.hpp>
 
 void expect_eq_diffs(double x1, double x2, 
                      double y1, double y2,

@@ -1,5 +1,6 @@
 #include <stan/math/matrix/assign.hpp>
-#include <stan/agrad/matrix.hpp>
+#include <stan/math/matrix/get_base1_lhs.hpp>
+#include <stan/agrad/rev/matrix.hpp>
 #include <test/agrad/util.hpp>
 #include <gtest/gtest.h>
 

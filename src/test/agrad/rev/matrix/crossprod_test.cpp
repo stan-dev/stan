@@ -1,8 +1,8 @@
 #include <stan/agrad/rev/matrix/crossprod.hpp>
-#include <stan/agrad/matrix.hpp>
+#include <stan/agrad/rev/matrix.hpp>
 #include <gtest/gtest.h>
 #include <test/agrad/util.hpp>
-#include <stan/agrad/agrad.hpp>
+#include <stan/agrad/rev.hpp>
 
 void test_crossprod(const stan::agrad::matrix_v& L) {
   using stan::agrad::matrix_v;

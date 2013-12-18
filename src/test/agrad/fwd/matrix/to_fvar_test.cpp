@@ -1,7 +1,7 @@
 #include <stan/agrad/fwd/matrix/to_fvar.hpp>
-#include <stan/agrad/fvar.hpp>
+#include <stan/agrad/fwd.hpp>
 #include <gtest/gtest.h>
-#include <stan/agrad/var.hpp>
+#include <stan/agrad/rev.hpp>
 #include <test/agrad/util.hpp>
 
 TEST(AgradFwdMatrixToFvar,fd_scalar) {

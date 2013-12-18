@@ -1,5 +1,5 @@
 #include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/rev/operator_multiplication.hpp>
+#include <stan/agrad/rev/operators/operator_multiplication.hpp>
 #include <gtest/gtest.h>
 #include <test/agrad/util.hpp>
 

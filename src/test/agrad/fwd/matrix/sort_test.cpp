@@ -5,8 +5,8 @@
 
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
-#include <stan/agrad/fvar.hpp>
-#include <stan/agrad/var.hpp>
+#include <stan/agrad/fwd.hpp>
+#include <stan/agrad/rev.hpp>
 #include <stan/agrad/fwd/fvar.hpp>
 
 typedef stan::agrad::fvar<double> AVAR;

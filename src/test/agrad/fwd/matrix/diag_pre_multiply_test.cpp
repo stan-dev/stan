@@ -2,7 +2,7 @@
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <stan/agrad/fwd/matrix/multiply.hpp>
 #include <stan/math/matrix/diag_pre_multiply.hpp>
-#include <stan/agrad/var.hpp>
+#include <stan/agrad/rev.hpp>
 #include <test/agrad/util.hpp>
 
 TEST(AgradFwdMatrixDiagPreMultiply, vector_fd) {

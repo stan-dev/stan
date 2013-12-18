@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include <stan/agrad/agrad.hpp>
+#include <stan/agrad/rev.hpp>
 #include <test/agrad/util.hpp>
 #include <stan/agrad/rev/matrix/sd.hpp>
 #include <stan/agrad/rev/matrix/typedefs.hpp>

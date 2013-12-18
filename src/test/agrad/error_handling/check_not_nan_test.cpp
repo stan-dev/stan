@@ -1,5 +1,5 @@
 #include <stan/math/error_handling/check_not_nan.hpp>
-#include <stan/agrad.hpp>
+#include <stan/agrad/rev.hpp>
 #include <gtest/gtest.h>
 
 TEST(AgradErrorHandling,CheckNotNan) {

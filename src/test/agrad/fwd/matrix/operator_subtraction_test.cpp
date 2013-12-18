@@ -3,8 +3,8 @@
 #include <test/agrad/util.hpp>
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
-#include <stan/agrad/fvar.hpp>
-#include <stan/agrad/var.hpp>
+#include <stan/agrad/fwd.hpp>
+#include <stan/agrad/rev.hpp>
 
 using stan::agrad::fvar;
 TEST(AgradFwdMatrixOperatorSubtraction,fd_scalar_matrix) {
