@@ -4,8 +4,9 @@
 #include <stan/prob/distributions/univariate/discrete/binomial.hpp>
 #include <stan/prob/distributions/univariate/continuous/beta.hpp>
 
-#include <stan/agrad.hpp>
+#include <stan/agrad/partials_vari.hpp>
 #include <stan/math/error_handling.hpp>
+#include <stan/math/constants.hpp>
 #include <stan/math/functions/lbeta.hpp>
 #include <stan/math/functions/value_of.hpp>
 #include <stan/meta/traits.hpp>
@@ -250,11 +251,6 @@ DoubleVectorView<!is_constant_struct<T_size1>::value,
     agrad::OperandsAndPartials<T_size1, T_size2> 
       operands_and_partials(alpha, beta);
           
-    std::fill(operands_and_partials.all_partials,
-              operands_and_partials.all_partials 
-              + operands_and_partials.nvaris, 
-              0.0);
-          
     // Explicit return for extreme values
     // The gradients are technically ill-defined, but treated as zero
     for (size_t i = 0; i < stan::length(n); i++) {
@@ -385,11 +381,6 @@ DoubleVectorView<!is_constant_struct<T_size1>::value,
     agrad::OperandsAndPartials<T_size1, T_size2> 
       operands_and_partials(alpha, beta);
           
-    std::fill(operands_and_partials.all_partials,
-              operands_and_partials.all_partials 
-              + operands_and_partials.nvaris, 
-              0.0);
-          
     // Explicit return for extreme values
     // The gradients are technically ill-defined, but treated as neg infinity
     for (size_t i = 0; i < stan::length(n); i++) {
@@ -510,11 +501,6 @@ DoubleVectorView<!is_constant_struct<T_size1>::value,
 
     agrad::OperandsAndPartials<T_size1, T_size2> 
       operands_and_partials(alpha, beta);
-          
-    std::fill(operands_and_partials.all_partials,
-              operands_and_partials.all_partials 
-              + operands_and_partials.nvaris, 
-              0.0);
           
     // Explicit return for extreme values
     // The gradients are technically ill-defined, but treated as neg infinity

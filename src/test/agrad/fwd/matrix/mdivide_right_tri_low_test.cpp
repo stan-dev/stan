@@ -1,7 +1,7 @@
 #include <stan/agrad/fwd/matrix/mdivide_right_tri_low.hpp>
 #include <gtest/gtest.h>
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
-#include <stan/agrad/var.hpp>
+#include <stan/agrad/rev.hpp>
 #include <stan/agrad/rev/matrix/multiply.hpp>
 #include <test/agrad/util.hpp>
 

@@ -5,10 +5,9 @@
 #include <boost/math/distributions.hpp>
 #include <stan/prob/distributions/univariate/continuous/uniform.hpp>
 
-#include <stan/agrad.hpp>
+#include <stan/agrad/partials_vari.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/functions/owens_t.hpp>
-#include <stan/agrad/rev/owens_t.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
@@ -155,7 +154,6 @@ namespace stan {
       using stan::math::check_finite;
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
-      using stan::agrad::owens_t;
       using stan::math::owens_t;
       using stan::math::value_of;
 
@@ -260,7 +258,6 @@ namespace stan {
       using stan::math::check_not_nan;
       using stan::math::value_of;
       using stan::math::check_consistent_sizes;
-      using stan::agrad::owens_t;
       using stan::math::owens_t;
 
       double cdf_log(0.0);
@@ -350,7 +347,6 @@ namespace stan {
       using stan::math::check_finite;
       using stan::math::check_not_nan;
       using stan::math::check_consistent_sizes;
-      using stan::agrad::owens_t;
       using stan::math::owens_t;
       using stan::math::value_of;
 

@@ -4,7 +4,7 @@
 #include <stan/agrad/rev/var.hpp>
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/agrad/rev/matrix/typedefs.hpp>
-#include <stan/agrad/agrad.hpp>
+#include <stan/agrad/rev.hpp>
 
 TEST(AgradRevMatrix,mdivide_right_val) {
   using stan::math::matrix_d;

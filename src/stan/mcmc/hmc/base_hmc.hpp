@@ -23,7 +23,7 @@ namespace stan {
     
       base_hmc(M &m, BaseRNG& rng, std::ostream* o, std::ostream* e):
       base_mcmc(o, e),
-      _z(m.num_params_r(), m.num_params_i()),
+      _z(m.num_params_r()),
       _integrator(this->_out_stream),
       _hamiltonian(m, this->_err_stream),
       _rand_int(rng),
@@ -48,9 +48,8 @@ namespace stan {
         _z.get_params(values);
       };
       
-      void seed(const std::vector<double>& q, const std::vector<int>& r) {
+      void seed(const Eigen::VectorXd& q) {
         _z.q = q;
-        _z.r = r;
       }
       
       void init_stepsize() {
@@ -69,7 +68,7 @@ namespace stan {
         
         double delta_H = H0 - h;
         
-        int direction = delta_H > std::log(0.5) ? 1 : -1;
+        int direction = delta_H > std::log(0.8) ? 1 : -1;
         
         while (1) {
           
@@ -87,9 +86,9 @@ namespace stan {
           
           double delta_H = H0 - h;
           
-          if ((direction == 1) && !(delta_H > std::log(0.5)))
+          if ((direction == 1) && !(delta_H > std::log(0.8)))
             break;
-          else if ((direction == -1) && !(delta_H < std::log(0.5)))
+          else if ((direction == -1) && !(delta_H < std::log(0.8)))
             break;
           else
             this->_nom_epsilon = ( (direction == 1)

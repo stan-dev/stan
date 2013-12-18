@@ -7,8 +7,10 @@
 #include <limits>
 #include <boost/math/special_functions/fpclassify.hpp>
 
-#include <stan/agrad.hpp>
+#include <stan/agrad/partials_vari.hpp>
 #include <stan/math/error_handling.hpp>
+#include <stan/math/constants.hpp>
+#include <stan/math/functions/multiply_log.hpp>
 #include <stan/math/functions/value_of.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/traits.hpp>
@@ -231,10 +233,6 @@ namespace stan {
       using boost::math::gamma_q;
           
       agrad::OperandsAndPartials<T_rate> operands_and_partials(lambda);
-
-      std::fill(operands_and_partials.all_partials,
-                operands_and_partials.all_partials 
-                + operands_and_partials.nvaris, 0.0);
         
       // Explicit return for extreme values
       // The gradients are technically ill-defined, but treated as zero
@@ -305,10 +303,6 @@ namespace stan {
           
       agrad::OperandsAndPartials<T_rate> operands_and_partials(lambda);
 
-      std::fill(operands_and_partials.all_partials,
-                operands_and_partials.all_partials 
-                + operands_and_partials.nvaris, 0.0);
-        
       // Explicit return for extreme values
       // The gradients are technically ill-defined, but treated as neg infinity
       for (size_t i = 0; i < stan::length(n); i++) {
@@ -374,10 +368,6 @@ namespace stan {
           
       agrad::OperandsAndPartials<T_rate> operands_and_partials(lambda);
 
-      std::fill(operands_and_partials.all_partials,
-                operands_and_partials.all_partials 
-                + operands_and_partials.nvaris, 0.0);
-        
       // Explicit return for extreme values
       // The gradients are technically ill-defined, but treated as neg infinity
       for (size_t i = 0; i < stan::length(n); i++) {

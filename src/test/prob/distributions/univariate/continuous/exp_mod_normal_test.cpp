@@ -1,5 +1,5 @@
 #include <stan/prob/distributions/univariate/continuous/exp_mod_normal.hpp>
-#include<boost/math/distributions.hpp>
+#include <boost/math/distributions.hpp>
 #include <gtest/gtest.h>
 #include <boost/random/mersenne_twister.hpp>
 

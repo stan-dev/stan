@@ -770,8 +770,7 @@ causes the execution to immediately terminate.
 %
 \put(0, 360) { \framebox(470, 45) }
 \put(10, 390) { \makebox(65, 10)[l]{output} }
-\put(50, 370) { \makebox(500, 10)[l]{file, append\_sample,
-    diagnostic\_file, append\_diagnostic, ... } } % refresh, save\_warmup} }
+\put(50, 370) { \makebox(500, 10)[l]{file, diagnostic\_file, ... } } % refresh, save\_warmup} }
 %
 \put(10, 340) { \makebox(50, 10)[l]{method} }
 \put(20, 117.5) { \line(0, 1){212.5} }
@@ -831,8 +830,7 @@ causes the execution to immediately terminate.
 %
 \put(0, 360) { \framebox(470, 45) }
 \put(10, 390) { \makebox(65, 10)[l]{output} }
-\put(50, 370) { \makebox(450, 10)[l]{file, append\_sample,
-    diagnostic\_file, append\_diagnostic, ...} }  % refresh, ...
+\put(50, 370) { \makebox(450, 10)[l]{file, diagnostic\_file, ...} }  % refresh, ...
 %
 \put(10, 340) { \makebox(50, 10)[l]{method} }
 \put(20, 117.5) { \line(0, 1){212.5} }
@@ -1014,6 +1012,58 @@ may appear in any order.
 
 \subsubsection{Sampling Adaptation-Specific Parameters}
 
+\begin{figure}
+\setlength{\unitlength}{0.005in} 
+\centering
+\begin{picture}(1000, 200)
+%
+\footnotesize\tt
+\put(25, 20) { \framebox(75, 200)[c]{I} }
+\put(100, 20) { \framebox(25, 200)[c]{II} }
+\put(125, 20) { \framebox(50, 200)[c]{II} }
+\put(175, 20) { \framebox(100, 200)[c]{II} }
+\put(275, 20) { \framebox(200, 200)[c]{II} }
+\put(475, 20) { \framebox(400, 200)[c]{II} }
+\put(875, 20) { \framebox(50, 200)[c]{III} }
+\put(0, 20) { \vector(1, 0){1000} }
+\put(800, -10) { \makebox(200, 20)[l]{Iteration} }
+%
+\end{picture}
+\caption{\small\it Adaptation during warmup occurs in three stages: an initial
+fast adaptation interval (I), a series of expanding slow adaptation intervals (II), 
+and a final fast adaptation interval (III).  For HMC both the fast and slow intervals
+are used for adapting the step size, while the slow intervals are used for learning
+the (co)variance is necessitated by the metric.}
+    \label{adaptation.figure}
+\end{figure}
+
+When adaptation is engaged the warmup period is split into three
+stages (Figure \ref{adaptation.figure}), with two \textit{fast} intervals
+surrounding a series of growing \textit{slow} intervals.  Here fast
+and slow refer to parameters that adapt using local and global
+information, respectively; the Hamiltonian Monte Carlo samplers,
+for example, define the step size as a fast parameter and 
+the (co)variance as a slow parameter.  The size of the the initial
+and final fast intervals and the initial size of the slow interval
+are all customizable, although user-specified values may be modified 
+slightly in order to ensure alignment with the warmup period.
+
+The motivation behind this partitioning of the warmup period is to
+allow for more robust adaptation.  In the initial fast interval the
+chain is allowed to converge towards the typical set,%
+%
+\footnote{The typical set is a concept borrowed from information
+theory and refers to the neighborhood (or neighborhoods in multimodal models)
+of significant posterior probability mass through which the Markov chain
+will travel in equilibrium.}
+%
+with only parameters that can learn from local information adapted.
+After this initial stage parameters that require global information,
+for example (co)variances, are estimated in a series of expanding,
+memoryless windows; often fast parameters will be adapted here
+as well.  Lastly the fast parameters are allowed to adapt to the final 
+update of the slow parameters.
+
 Currently all \Stan sampling algorithms utilize dual averaging to
 optimize the step size (this optimization during adaptation of the
 sampler should not be confused with running Stan's optimization method).
@@ -1024,7 +1074,10 @@ efficacy of the optimization is sensitive to the value of these
 parameters, and we do not recommend changing the defaults without
 experience with the dual averaging algorithm.  For more information,
 see the discussion of dual averaging in \citep{Hoffman-Gelman:2011,
-  Hoffman-Gelman:2013}.
+ Hoffman-Gelman:2013}.
+  
+Variances or covariances are estimated using Welford accumulators
+to avoid a loss of precision over many floating point operations.
 
 The following subarguments are introduced by the categorical argument
 \code{adapt}.  Each subargument must contiguously follow \code{adapt},
@@ -1048,7 +1101,7 @@ though they may appear in any order.
       \hiercmdarg{\indentarrow\indentarrow\indentarrow}{delta}{$$double$$}
         {Adaptation target acceptance statistic}
         {Valid values: \  $0 < \mbox{\code{delta}} < 1$}
-        {Defaults to \code{0.65}}
+        {Defaults to \code{0.8}}
 %
       \hiercmdarg{\indentarrow\indentarrow\indentarrow}{kappa}{$$double$$}
         {Adaptation relaxation exponent}
@@ -1060,11 +1113,26 @@ though they may appear in any order.
         {Valid values: \  $0 < \mbox{\code{t0}}$}
         {Defaults to \code{10}}
 %
+      \hiercmdarg{\indentarrow\indentarrow\indentarrow}{init\_buffer}{$$unsigned int$$}
+        {Width of initial fast adaptation interval}
+        {Valid values: \ All}
+        {Defaults to \code{75}}
+%
+      \hiercmdarg{\indentarrow\indentarrow\indentarrow}{term\_buffer}{$$unsigned int$$}
+        {Width of final fast adaptation interval}
+        {Valid values: \ All}
+        {Defaults to \code{50}}
+%
+      \hiercmdarg{\indentarrow\indentarrow\indentarrow}{window}{$$unsigned int$$}
+        {Initial width of slow adaptation interval}
+        {Valid values: \ All}
+        {Defaults to \code{25}}
+%
 \end{description}
 %
 By setting the acceptance statistic \code{delta} to a value closer to
 1 (its value must be strictly less than 1 and its default value is
-0.65), adaptation will be forced to use smaller step sizes.  This can
+0.8), adaptation will be forced to use smaller step sizes.  This can
 improve sampling efficiency (effective samples per iteration) at the
 cost of increased iteration times.  Raising the value of \code{delta}
 will also allow some models that would otherwise get stuck overcome
@@ -1387,6 +1455,17 @@ only diagnostic is gradients of the log probability function.
 %
       \hiershortcmd{\indentarrow\indentarrow\indentarrow}{\farg{gradient}}
         {Check model gradient against finite differences}
+        {Valid subarguments: \code{epsilon}, \code{error}}
+%
+        \hiercmdarg{\indentarrow\indentarrow\indentarrow\indentarrow}{epsilon}{$$real$$}
+        {Finite difference step size}
+	    {Valid values:\ $0 < \mbox{\code{epsilon}}$}
+	    {Defaults to \code{1e-6}}
+%
+        \hiercmdarg{\indentarrow\indentarrow\indentarrow\indentarrow}{error}{$$real$$}
+       {Error threshold}
+	   {Valid values:\ $0 < \mbox{\code{error}}$}
+	   {Defaults to \code{1e-6}}
 %
 \end{description}
 
@@ -1461,28 +1540,18 @@ subarguments of the top-level method.
 \begin{description}
 \hierlongcmd{}{{\bfseries output}}
   {File output options}
-  {Valid subarguments: \code{file, append\_sample, diagnostic\_file,
-      \\ \hspace*{24pt} append\_diagnostic, refresh}}
+  {Valid subarguments: \code{file, diagnostic\_file,
+      \\ \hspace*{24pt}, refresh}}
 %
   \hiercmdarg{\indentarrow}{file}{$$string$$}
     {Output file}
-    {Valid values: \  Path to existing file}
-    {Defaults to \code{samples.csv}}
-%
-  \hiercmdarg{\indentarrow}{append\_sample}{$$boolean$$}
-    {Append sample output to existing file?}
-    {Valid values: \ \code{0, 1}}
-    {Defaults to \code{0}}
+    {Valid values: \  Valid path}
+    {Defaults to \code{output.csv}}
 %
   \hiercmdarg{\indentarrow}{diagnostic\_file}{$$string$$}
     {Auxiliary output file for diagnostic information}
-    {Valid values: \  Path to existing file}
+    {Valid values: \  Valid path}
     {Defaults to empty path}
-%
-  \hiercmdarg{\indentarrow}{append\_diagnostic}{$$boolean$$}
-    {Append diagnostic output to existing file?}
-    {Valid values: \ \code{0, 1}}
-    {Defaults to \code{0}}
 %
   \hiercmdarg{\indentarrow}{refresh}{$$int$$}
     {Number of interations between screen updates}
@@ -1879,9 +1948,7 @@ for Stan.  The full set of configuration options is in
              [random seed=<int>]                        \
              [output                                    \
                   [file=<string>]                       \
-                  [append_sample=<boolean>]             \
                   [diagnostic_file=<string>]            \
-                  [append_diagnostic=<boolean>]         \
                   [refresh=<int>] ]
 \end{Verbatim}
 \end{quote}
@@ -1942,9 +2009,7 @@ interdependence.
              [random seed=<int>]                        \
              [output                                    \
                   [file=<string>]                       \
-                  [append_sample=<boolean>]             \
                   [diagnostic_file=<string>]            \
-                  [append_diagnostic=<boolean>]         \
                   [refresh=<int>] ]
 \end{Verbatim}
 \end{quote}
@@ -1981,9 +2046,7 @@ skeleton for BFGS is in \reffigure{bfgs-command}.
              [random seed=<int>]                        \
              [output                                    \
                   [file=<string>]                       \
-                  [append_sample=<boolean>]             \
                   [diagnostic_file=<string>]            \
-                  [append_diagnostic=<boolean>]         \
                   [refresh=<int>] ]
 \end{Verbatim}
 \end{quote}
@@ -2013,9 +2076,7 @@ identical to that for BFGS other than the algorithm name.
              [random seed=<int>]                        \
              [output                                    \
                   [file=<string>]                       \
-                  [append_sample=<boolean>]             \
                   [diagnostic_file=<string>]            \
-                  [append_diagnostic=<boolean>]         \
                   [refresh=<int>] ]
 \end{Verbatim}
 \end{quote}
@@ -2045,9 +2106,7 @@ Nesterov's dual averaging.
              [random seed=<int>]                        \
              [output                                    \
                   [file=<string>]                       \
-                  [append_sample=<boolean>]             \
                   [diagnostic_file=<string>]            \
-                  [append_diagnostic=<boolean>]         \
                   [refresh=<int>] ]
 \end{Verbatim}
 \end{quote}
@@ -2069,6 +2128,8 @@ simple, and shown in \reffigure{diagnostic-command}.
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
 > ./my_model diagnose                  \
                  [test=gradient]       \
+                     [epsilon=<real>]  \
+                     [error=<real>]    \
              [data file=<string>]      \
              [init=<string>]           \
              [random seed=<int>]       \

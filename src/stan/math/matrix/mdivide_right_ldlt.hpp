@@ -4,6 +4,7 @@
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/LDLT_factor.hpp>
 #include <stan/math/matrix/mdivide_left_ldlt.hpp>
+#include <stan/math/matrix/transpose.hpp>
 #include <stan/math/matrix/validate_multiplicable.hpp>
 #include <boost/math/tools/promotion.hpp>
 
@@ -23,6 +24,7 @@ namespace stan {
     Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type,R1,C2>
     mdivide_right_ldlt(const Eigen::Matrix<T1,R1,C1> &b,
                        const stan::math::LDLT_factor<T2,R2,C2> &A) {
+      using stan::math::transpose;
       stan::math::validate_multiplicable(b,A,"mdivide_right_ldlt");
 
       return transpose(mdivide_left_ldlt(A,transpose(b)));

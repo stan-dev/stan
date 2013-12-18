@@ -1,13 +1,15 @@
+#include <stan/agrad/rev/matrix.hpp>
 #include <stan/agrad/rev/matrix/trace_inv_quad_form_ldlt.hpp>
-#include <stan/agrad/rev/matrix/sum.hpp>
 #include <gtest/gtest.h>
-#include <stan/agrad/var_matrix.hpp>
-#include <stan/math/matrix.hpp>
 #include <test/agrad/util.hpp>
+#include <stan/agrad/rev/matrix/sum.hpp>
+#include <stan/math/matrix.hpp>
 #include <stan/math/matrix/sum.hpp>
 #include <stan/math/matrix/trace_inv_quad_form_ldlt.hpp>
 #include <stan/math/matrix/typedefs.hpp>
+#include <stan/math/matrix/inverse.hpp>
 #include <stan/agrad/rev/matrix/typedefs.hpp>
+#include <stan/agrad/rev/matrix/to_var.hpp>
 
 TEST(AgradRevMatrix, trace_inv_quad_form_ldlt_mat) {
   using stan::agrad::matrix_v;
@@ -284,7 +286,7 @@ TEST(AgradRevMatrix, trace_quad_form_ldlt_vv_basic) {
   EXPECT_FLOAT_EQ(x_basic_val, x_val);
   ASSERT_EQ(grad_basic.size(), grad.size());
   for (int n = 0; n < grad_basic.size(); n++)
-    EXPECT_FLOAT_EQ(grad_basic[n], grad[n]);
+  EXPECT_FLOAT_EQ(grad_basic[n], grad[n]);
 }
 
 TEST(AgradRevMatrix, trace_quad_form_ldlt_vd_basic) {
@@ -419,3 +421,4 @@ TEST(AgradRevMatrix, trace_quad_form_ldlt_dv_basic) {
   for (int n = 0; n < grad_basic.size(); n++)
     EXPECT_FLOAT_EQ(grad_basic[n], grad[n]);
 }
+

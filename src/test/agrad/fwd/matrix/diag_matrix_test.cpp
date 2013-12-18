@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
-#include <stan/agrad/fvar.hpp>
+#include <stan/agrad/fwd.hpp>
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <stan/math/matrix/diag_matrix.hpp>
-#include <stan/agrad/var.hpp>
+#include <stan/agrad/rev.hpp>
 #include <test/agrad/util.hpp>
 
 TEST(AgradFwdMatrixDiagMatrix,vector_fd) {

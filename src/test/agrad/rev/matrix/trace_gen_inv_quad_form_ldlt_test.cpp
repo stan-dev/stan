@@ -1,15 +1,17 @@
+#include <stan/agrad/rev/matrix.hpp>
 #include <stan/agrad/rev/matrix/trace_gen_inv_quad_form_ldlt.hpp>
 #include <gtest/gtest.h>
 #include <test/agrad/util.hpp>
+#include <stan/math/matrix/multiply.hpp>
 #include <stan/math/matrix/trace_gen_inv_quad_form_ldlt.hpp>
 #include <stan/math/matrix/inverse.hpp>
 #include <stan/math/matrix/sum.hpp>
 #include <stan/math/matrix/trace.hpp>
+#include <stan/math/matrix/transpose.hpp>
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/agrad/rev/matrix/multiply.hpp>
 #include <stan/agrad/rev/matrix/sum.hpp>
 #include <stan/agrad/rev/matrix/typedefs.hpp>
-#include <stan/agrad/agrad.hpp>
 
 TEST(AgradRevMatrix, trace_gen_inv_quad_form_ldlt) {
   using stan::agrad::matrix_v;

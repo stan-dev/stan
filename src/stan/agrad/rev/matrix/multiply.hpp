@@ -11,7 +11,7 @@
 #include <stan/math/matrix/validate_square.hpp>
 #include <stan/agrad/rev/matrix/to_var.hpp>
 #include <stan/agrad/rev/matrix/dot_product.hpp>
-#include <stan/agrad/rev/operator_multiplication.hpp>
+#include <stan/agrad/rev/operators/operator_multiplication.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits.hpp>
 #include <boost/math/tools/promotion.hpp>

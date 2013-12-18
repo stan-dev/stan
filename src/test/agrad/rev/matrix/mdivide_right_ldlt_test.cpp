@@ -1,11 +1,10 @@
-#include <stan/agrad/rev/var.hpp>
-#include <stan/agrad/var_matrix.hpp>
-#include <stan/math/matrix/mdivide_right_spd.hpp>
-#include <stan/agrad/rev/matrix/mdivide_left_spd.hpp>
+#include <stan/agrad/rev/matrix.hpp>
 #include <stan/math/matrix/mdivide_right_ldlt.hpp>
 #include <gtest/gtest.h>
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/agrad/rev/matrix/typedefs.hpp>
+#include <stan/math/matrix/mdivide_right_spd.hpp>
+#include <stan/agrad/rev/matrix/mdivide_left_spd.hpp>
 
 TEST(AgradRevMatrix, mdivide_right_ldlt_vv) {
   using stan::agrad::var;

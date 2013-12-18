@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <vector>
-#include <stan/agrad/agrad.hpp>
+#include <stan/agrad/rev.hpp>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/vari.hpp>
 #include <stan/agrad/rev/matrix/stored_gradient_vari.hpp>

@@ -1,7 +1,7 @@
 #include <stan/agrad/rev/matrix/sort.hpp>
 #include <test/agrad/util.hpp>
 #include <gtest/gtest.h>
-#include <stan/agrad/agrad.hpp>
+#include <stan/agrad/rev.hpp>
 #include <stan/math/matrix/sort.hpp>
 
 void test_sort_asc(VEC val) {

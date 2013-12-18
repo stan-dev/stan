@@ -1,8 +1,8 @@
 #include <stan/math/matrix/col.hpp>
 #include <gtest/gtest.h>
-#include <stan/agrad/fvar.hpp>
+#include <stan/agrad/fwd.hpp>
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
-#include <stan/agrad/var.hpp>
+#include <stan/agrad/rev.hpp>
 
 TEST(AgradFwdMatrixCol,matrix_fd) {
   using stan::math::col;

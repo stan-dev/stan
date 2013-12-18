@@ -2,7 +2,7 @@
 #include <limits>
 #include <stan/math/matrix/log_softmax.hpp>
 #include <stan/prob/distributions/multivariate/discrete/categorical_logit.hpp>
-#include<boost/math/distributions.hpp>
+#include <boost/math/distributions.hpp>
 
 using Eigen::Dynamic;
 using Eigen::Matrix;
