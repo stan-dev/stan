@@ -1,9 +1,23 @@
 \part{Built-In Functions}\label{built-in-functions.part}
 
 
-\chapter{Vectorization}
+\chapter{Vectorization}\label{vectorization.chapter}
 
-\section{Vectorized Functions}\label{prob-vectorization.section}
+\noindent
+Stan's scalar log probability functions all support vectorized
+function application, with results defined to be the sum of the
+elementwise application of the function.  In all cases, matrix
+operations are faster than loops and vectorized log probability
+functions are faster than their equivalent form defined with loops. 
+
+Stan also overloads some scalar functions, such as \code{log} and
+\code{exp}, to apply to vectors (arrays) and return vectors (arrays).  
+These vectorizations are defined elementwise and unlike the
+probability functions, provide only minimal efficiency speedups over
+repeated application and assignment in a loop.
+
+
+\section{Vectorized Function Signatures}\label{prob-vectorization.section}
 
 The normal probability function is specified with the signature
 %
@@ -20,9 +34,53 @@ vector, or a row-vector.  If there is more than one array or vector
 argument, their types can be anything but their size must match.  For
 instance, it is legal to use
 \code{normal\_log(row\_vector,vector,real)} as long as the vector and
-row vector have the same size.
+row vector have the same size.  
 
-The pseudo-type \code{ints} is used for vectorized arguments.
+The pseudo-type \code{ints} is used for vectorized integer arguments.
+
+
+\section{Evaluating Vectorized Functions}
+
+The result of a vectorized log probability function is equivalent to
+the sum of the evaluations on each element.  Any non-vector argument,
+namely \code{real} or \code{int}, is repeated.  For instance, if
+\code{y} is a vector of size \code{N}, \code{mu} is a vector of size
+\code{N}, and \code{sigma} is a scalar, then
+%
+\begin{quote}
+\begin{Verbatim}
+ll <- normal_log(y, mu, sigma);
+\end{Verbatim}
+\end{quote}
+%
+is just a more efficient way to write
+%
+\begin{quote}
+\begin{Verbatim}
+ll <- 0;
+for (n in 1:N)
+  ll <- ll + normal_log(y[n], mu[n], sigma);
+\end{Verbatim}
+\end{quote}
+%
+With the same arguments, the vectorized sampling statement
+%
+\begin{quote}
+\begin{Verbatim}
+y ~ normal(mu, sigma);
+\end{Verbatim}
+\end{quote}
+%
+has the same effect on the total log probability as
+%
+\begin{quote}
+\begin{Verbatim}
+for (n in 1:N)
+  y[n] ~ normal(mu[n], sigma);
+\end{Verbatim}
+\end{quote}
+
+
 
 
 \chapter{Void Functions}

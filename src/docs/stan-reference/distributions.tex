@@ -237,15 +237,15 @@ then for $n \in \setlist{0,\ldots,N}$,
   \beta)}{\Betafun(\alpha,\beta)},
 \]
 %
-where the beta function $\Betafun(x,y)$ is defined for $x \in
-\posreals$ and $y \in \posreals$ by
+where the beta function $\Betafun(u,v)$ is defined for $u \in
+\posreals$ and $v \in \posreals$ by
 %
 \[
-\Betafun(x,y)
-= \frac{\Gamma(x) \ \Gamma(y)}{\Gamma(x + y)}.
+\Betafun(u,v)
+= \frac{\Gamma(u) \ \Gamma(v)}{\Gamma(u + v)}.
 \]
 
-\pitem{n}{beta\_binomial}{N,alpha}
+\pitem{n}{beta\_binomial}{N,alpha,beta}
 
 \subsubsection{Stan Functions}
 
@@ -690,23 +690,23 @@ If $\mu \in \reals$, $\sigma \in \posreals$, and $\lambda \in
 \subsubsection{Stan Functions}
 
 \begin{description}
-  \fitem{real}{exp\_mod\_normal\_log}{reals \farg{y}, reals
-    \farg{mu}, reals \farg{sigma}, \newline reals \farg{lambda}}{The
+  \fitemtwolines{real}{exp\_mod\_normal\_log}{reals \farg{y}, reals
+    \farg{mu}, reals \farg{sigma}}{reals \farg{lambda}}{The
     log of the exponentially modified normal density of \farg{y} given
     location \farg{mu}, scale \farg{sigma}, and shape \farg{lambda}}
 %
-  \fitem{real}{exp\_mod\_normal\_cdf}{reals \farg{y}, reals \farg{mu},
-    reals \farg{sigma}, reals \farg{lambda}}{The
+  \fitemtwolines{real}{exp\_mod\_normal\_cdf}{reals \farg{y}, reals \farg{mu},
+    reals \farg{sigma}}{reals \farg{lambda}}{The
     exponentially modified normal cumulative distribution function of \farg{y} 
     given location \farg{mu}, scale \farg{sigma}, and shape \farg{lambda}}
 %
-  \fitem{real}{exp\_mod\_normal\_cdf\_log}{reals \farg{y}, reals \farg{mu},
-    reals \farg{sigma}, reals \farg{lambda}}{The log of the
+  \fitemtwolines{real}{exp\_mod\_normal\_cdf\_log}{reals \farg{y}, reals \farg{mu},
+    reals \farg{sigma}}{reals \farg{lambda}}{The log of the
     exponentially modified normal cumulative distribution function of \farg{y} 
     given location \farg{mu}, scale \farg{sigma}, and shape \farg{lambda}}
 %
-  \fitem{real}{exp\_mod\_normal\_ccdf\_log}{reals \farg{y}, reals \farg{mu},
-    reals \farg{sigma}, reals \farg{lambda}}{The log of the
+  \fitemtwolines{real}{exp\_mod\_normal\_ccdf\_log}{reals \farg{y}, reals \farg{mu},
+    reals \farg{sigma}}{reals \farg{lambda}}{The log of the
     exponentially modified normal complementary cumulative distribution 
     function of \farg{y} given location \farg{mu}, scale \farg{sigma}, and shape \farg{lambda}}
 \end{description}
@@ -752,13 +752,13 @@ then for $y \in \reals$,
   distribution function of \farg{y} given location \farg{mu}, scale
   \farg{sigma}, and shape \farg{alpha}}
 %
-\fitem{real}{skew\_normal\_cdf\_log}{reals \farg{y}, reals \farg{mu}, reals
-  \farg{sigma}, reals \farg{alpha}}{The log of the skew normal cumulative
+\fitemtwolines{real}{skew\_normal\_cdf\_log}{reals \farg{y}, reals \farg{mu}, reals
+  \farg{sigma}}{reals \farg{alpha}}{The log of the skew normal cumulative
   distribution function of \farg{y} given location \farg{mu}, scale
   \farg{sigma}, and shape \farg{alpha}}
 %
-\fitem{real}{skew\_normal\_ccdf\_log}{reals \farg{y}, reals \farg{mu}, reals
-  \farg{sigma}, reals \farg{alpha}}{The log of the skew normal complementary 
+\fitemtwolines{real}{skew\_normal\_ccdf\_log}{reals \farg{y}, reals \farg{mu}, reals
+  \farg{sigma}}{reals \farg{alpha}}{The log of the skew normal complementary 
    cumulative distribution function of \farg{y} given location \farg{mu}, scale
   \farg{sigma}, and shape \farg{alpha}}
 \end{description}
