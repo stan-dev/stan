@@ -13,7 +13,7 @@
 #include <stan/agrad/rev/matrix/typedefs.hpp>
 #include <stan/agrad/rev/matrix/to_var.hpp>
 #include <stan/agrad/rev/matrix/dot_product.hpp>
-#include <stan/agrad/rev/operator_multiplication.hpp>
+#include <stan/agrad/rev/operators/operator_multiplication.hpp>
 
 namespace stan {
   namespace agrad {

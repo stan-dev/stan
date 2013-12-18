@@ -1,7 +1,8 @@
 #include <gtest/gtest.h>
 #include <test/agrad/util.hpp>
 #include <stan/math/matrix.hpp>
-#include <stan/agrad/matrix.hpp>
+#include <stan/agrad/rev/matrix.hpp>
+#include <stan/agrad/rev/jacobian.hpp>
 
 TEST(AgradRevMatrix, dot_product_vv) {
   AVEC a, b;

@@ -1,7 +1,7 @@
 #include <stan/agrad/fwd/matrix/dot_self.hpp>
 #include <gtest/gtest.h>
 #include <stan/agrad/fwd/fvar.hpp>
-#include <stan/agrad/var.hpp>
+#include <stan/agrad/rev.hpp>
 #include <test/agrad/util.hpp>
 
 using stan::agrad::fvar;

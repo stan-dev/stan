@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <test/agrad/util.hpp>
-#include <stan/agrad/agrad.hpp>
-#include <stan/agrad/matrix.hpp>
+#include <stan/agrad/rev.hpp>
+#include <stan/agrad/rev/matrix.hpp>
 #include <stan/math/matrix/log_softmax.hpp>
 #include <stan/agrad/rev/matrix/log_softmax.hpp>
 

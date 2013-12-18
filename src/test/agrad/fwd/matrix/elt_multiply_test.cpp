@@ -1,8 +1,8 @@
 #include <stan/math/matrix/elt_multiply.hpp>
 #include <gtest/gtest.h>
-#include <stan/agrad/fvar.hpp>
+#include <stan/agrad/fwd.hpp>
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
-#include <stan/agrad/var.hpp>
+#include <stan/agrad/rev.hpp>
 #include <test/agrad/util.hpp>
 
 TEST(AgradFwdMatrixEltMultiply,fd_vec_vv) {

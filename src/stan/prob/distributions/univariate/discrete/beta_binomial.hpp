@@ -4,8 +4,9 @@
 #include <stan/prob/distributions/univariate/discrete/binomial.hpp>
 #include <stan/prob/distributions/univariate/continuous/beta.hpp>
 
-#include <stan/agrad.hpp>
+#include <stan/agrad/partials_vari.hpp>
 #include <stan/math/error_handling.hpp>
+#include <stan/math/constants.hpp>
 #include <stan/math/functions/lbeta.hpp>
 #include <stan/math/functions/value_of.hpp>
 #include <stan/meta/traits.hpp>

@@ -1,11 +1,9 @@
 #ifndef __STAN__AGRAD__AUTO_DIFF_HPP__
 #define __STAN__AGRAD__AUTO_DIFF_HPP__
 
-#define EIGEN_DENSEBASE_PLUGIN "stan/math/matrix/EigenDenseBaseAddons.h"
-#include <Eigen/Dense>
-
-#include <stan/agrad/agrad.hpp>
-#include <stan/agrad/fvar.hpp>
+#include <stan/math/matrix/Eigen.hpp>
+#include <stan/agrad/rev.hpp>
+#include <stan/agrad/fwd.hpp>
 
 namespace stan {
   

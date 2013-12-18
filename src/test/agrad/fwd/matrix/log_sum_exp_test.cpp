@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
-#include <stan/agrad/fvar.hpp>
+#include <stan/agrad/fwd.hpp>
 #include <stan/math/functions/log_sum_exp.hpp>
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/agrad/fwd/log_sum_exp.hpp>
+#include <stan/agrad/fwd/functions/log_sum_exp.hpp>
 
 
 template <int R, int C>

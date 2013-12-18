@@ -10,7 +10,7 @@
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <stan/agrad/fwd/matrix/to_fvar.hpp>
 #include <stan/agrad/fwd/matrix/dot_product.hpp>
-#include <stan/agrad/fwd/operator_multiplication.hpp>
+#include <stan/agrad/fwd/operators/operator_multiplication.hpp>
 
 namespace stan {
   namespace agrad {

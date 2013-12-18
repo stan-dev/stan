@@ -3,7 +3,7 @@
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/math/matrix/mdivide_left.hpp>
 #include <stan/math/matrix/multiply.hpp>
-#include <stan/agrad/var.hpp>
+#include <stan/agrad/rev.hpp>
 #include <stan/agrad/rev/matrix/multiply.hpp>
 #include <test/agrad/util.hpp>
 

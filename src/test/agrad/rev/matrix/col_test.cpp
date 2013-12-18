@@ -1,8 +1,8 @@
 #include <stan/math/matrix/col.hpp>
 #include <gtest/gtest.h>
 #include <test/agrad/util.hpp>
-#include <stan/agrad/agrad.hpp>
-#include <stan/agrad/matrix.hpp>
+#include <stan/agrad/rev.hpp>
+#include <stan/agrad/rev/matrix.hpp>
 
 TEST(AgradRevMatrix,col_v) {
   using stan::math::col;

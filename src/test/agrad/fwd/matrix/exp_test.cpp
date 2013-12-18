@@ -1,9 +1,10 @@
 #include <stan/math/matrix/exp.hpp>
 #include <gtest/gtest.h>
 #include <stan/math/matrix/typedefs.hpp>
+#include <stan/agrad/rev.hpp>
+#include <stan/agrad/fwd.hpp>
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
-#include <stan/agrad/fwd/exp.hpp>
-#include <stan/agrad/var.hpp>
+#include <stan/agrad/fwd/functions/exp.hpp>
 #include <test/agrad/util.hpp>
 
 TEST(AgradFwdMatrixExp, fd_matrix) {

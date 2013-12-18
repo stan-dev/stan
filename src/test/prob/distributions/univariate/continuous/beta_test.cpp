@@ -1,7 +1,8 @@
 #include <stan/prob/distributions/univariate/continuous/beta.hpp>
 #include <gtest/gtest.h>
 #include <boost/random/mersenne_twister.hpp>
-#include<boost/math/distributions.hpp>
+#include <boost/math/distributions.hpp>
+#include <stan/math/constants.hpp>
 
 TEST(ProbDistributionsBeta, error_check) {
   boost::random::mt19937 rng;

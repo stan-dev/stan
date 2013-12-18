@@ -1,10 +1,11 @@
 #include <stan/math/matrix/inverse_spd.hpp>
-#include <stan/math/matrix/multiply.hpp>
 #include <gtest/gtest.h>
 #include <test/agrad/util.hpp>
-#include <stan/agrad/agrad.hpp>
-#include <stan/agrad/matrix.hpp>
+#include <stan/agrad/rev.hpp>
+#include <stan/agrad/rev/matrix.hpp>
 #include <stan/agrad/rev/print_stack.hpp>
+#include <stan/math/matrix/multiply.hpp>
+#include <stan/math/matrix/sum.hpp>
 
 TEST(AgradRevMatrix,inverse_spd_val) {
   using stan::math::inverse_spd;
