@@ -43,12 +43,13 @@ namespace stan {
       virtual void update(P& z) {
         
         try {
-          z.V = - stan::model::log_prob_grad<true,true>(_model, z.q, z.g, _err_stream);
+          stan::model::gradient<true, true>(_model, z.q, z.V, z.g, _err_stream);
         } catch (std::domain_error e) {
           this->_write_error_msg(_err_stream, e);
           z.V = std::numeric_limits<double>::infinity();
         }
         
+        z.V *= -1;
         z.g *= -1;
         
       }

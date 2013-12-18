@@ -9,6 +9,8 @@
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/agrad/rev/matrix/grad.hpp>
 #include <stan/agrad/rev/var.hpp>
+#include <stan/agrad/rev/var.hpp>
+#include <stan/agrad/autodiff.hpp>
 
 namespace stan {
 
@@ -377,7 +379,93 @@ namespace stan {
         perturbed_params[d] = params_r[d];
       }
       return result;
-    }    
+    }
+    
+    // Interface for automatic differentiation of models
+    
+    template <bool propto, bool jacobian_adjust_transform, class M>
+    struct model_funk {
+      
+      const M& _model;
+      std::ostream* _o;
+      
+      model_funk(const M& m, std::ostream* out): _model(m), _o(out) {};
+      
+      template <typename T>
+      T operator()(Eigen::Matrix<T,Eigen::Dynamic,1>& x) const {
+        return _model.template log_prob<propto, jacobian_adjust_transform, T>(x, _o);
+      }
+      
+    };
+    
+    template <bool propto, bool jacobian_adjust_transform, class M>
+    void gradient(const M& model,
+                  const Eigen::Matrix<double, Eigen::Dynamic, 1>& x,
+                  double& f,
+                  Eigen::Matrix<double, Eigen::Dynamic, 1>& grad_f,
+                  std::ostream* msgs = 0) {
+      
+      stan::agrad::gradient(model_funk<propto,
+                                       jacobian_adjust_transform,
+                                       M>(model, msgs), x, f, grad_f);
+      
+    }
+    
+    template <bool propto, bool jacobian_adjust_transform, class M>
+    void hessian(const M& model,
+                 const Eigen::Matrix<double, Eigen::Dynamic, 1>& x,
+                 double& f,
+                 Eigen::Matrix<double, Eigen::Dynamic, 1>& grad_f,
+                 Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& hess_f,
+                 std::ostream* msgs = 0) {
+      
+      stan::agrad::hessian(model_funk<propto,
+                                      jacobian_adjust_transform,
+                                      M>(model, msgs), x, f, grad_f, hess_f);
+      
+    }
+
+    template <bool propto, bool jacobian_adjust_transform, class M>
+    void gradient_dot_vector(const M& model,
+                             const Eigen::Matrix<double, Eigen::Dynamic, 1>& x,
+                             const Eigen::Matrix<double, Eigen::Dynamic, 1>& v,
+                             double& f,
+                             Eigen::Matrix<double, Eigen::Dynamic, 1>& grad_f_dot_v,
+                             std::ostream* msgs = 0) {
+      
+      stan::agrad::gradient_dot_vector(model_funk<propto,
+                                       jacobian_adjust_transform,
+                                       M>(model, msgs), x, v, f, grad_f_dot_v);
+      
+    }
+    
+    template <bool propto, bool jacobian_adjust_transform, class M>
+    void hessian_times_vector(const M& model,
+                              const Eigen::Matrix<double, Eigen::Dynamic, 1>& x,
+                              const Eigen::Matrix<double, Eigen::Dynamic, 1>& v,
+                              double& f,
+                              Eigen::Matrix<double, Eigen::Dynamic, 1>& hess_f_dot_v,
+                              std::ostream* msgs = 0) {
+      
+      stan::agrad::hessian_times_vector(model_funk<propto,
+                                                   jacobian_adjust_transform,
+                                                   M>(model, msgs), x, v, f, hess_f_dot_v);
+      
+    }
+    
+    template <bool propto, bool jacobian_adjust_transform, class M>
+    void grad_tr_mat_times_hessian(const M& model,
+                                   const Eigen::Matrix<double, Eigen::Dynamic, 1>& x,
+                                   const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& X,
+                                   Eigen::Matrix<double, Eigen::Dynamic, 1>& grad_tr_X_hess_f,
+                                   std::ostream* msgs = 0) {
+      
+      stan::agrad::grad_tr_mat_times_hessian(model_funk<propto,
+                                                        jacobian_adjust_transform,
+                                                        M>(model, msgs), x, X, grad_tr_X_hess_f);
+      
+    }
+    
 
   }
 }
