@@ -1,7 +1,7 @@
 #include <stan/prob/distributions/univariate/continuous/inv_gamma.hpp>
 #include <gtest/gtest.h>
 #include <boost/random/mersenne_twister.hpp>
-#include<boost/math/distributions.hpp>
+#include <boost/math/distributions.hpp>
 
 TEST(ProbDistributionsInvGamma, error_check) {
   boost::random::mt19937 rng;

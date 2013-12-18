@@ -1,5 +1,5 @@
 #include <stan/math/matrix/to_vector.hpp>
-#include <stan/agrad/var.hpp>
+#include <stan/agrad/rev.hpp>
 #include <gtest/gtest.h>
 
 TEST(AgradRevMatrix, to_vector) {

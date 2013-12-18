@@ -3,7 +3,7 @@
 #include <test/agrad/util.hpp>
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/agrad/rev/matrix/typedefs.hpp>
-#include <stan/agrad/rev/exp.hpp>
+#include <stan/agrad/rev/functions/exp.hpp>
 
 TEST(AgradRevMatrix, exp_matrix) {
   using stan::math::exp;

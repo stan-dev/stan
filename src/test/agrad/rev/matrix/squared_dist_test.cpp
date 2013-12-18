@@ -1,7 +1,7 @@
 #include <stan/agrad/rev/matrix/squared_dist.hpp>
 #include <gtest/gtest.h>
 #include <test/agrad/util.hpp>
-#include <stan/agrad/agrad.hpp>
+#include <stan/agrad/rev.hpp>
 
 TEST(AgradRevMatrix, squared_dist_vector_vector) {
   using stan::math::vector_d;

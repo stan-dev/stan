@@ -1,7 +1,7 @@
 #include <iostream>
 #include <sstream>
 #include <boost/random/additive_combine.hpp> // L'Ecuyer RNG
-#include <stan/agrad/var.hpp>
+#include <stan/agrad/rev.hpp>
 #include <stan/gm/ast.hpp>
 #include <stan/gm/generator.hpp>
 #include <stan/io/dump.hpp>

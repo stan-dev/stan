@@ -3,7 +3,7 @@
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <stan/agrad/fwd/matrix/multiply.hpp>
 #include <stan/math/matrix/multiply_lower_tri_self_transpose.hpp>
-#include <stan/agrad/var.hpp>
+#include <stan/agrad/rev.hpp>
 #include <stan/agrad/rev/matrix/multiply.hpp>
 #include <test/agrad/util.hpp>
 
