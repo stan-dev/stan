@@ -33,7 +33,11 @@ namespace stan {
         ret = ret && (_alloc->_ldlt.vectorD().array() > 0).all();
         return ret;
       }
-      
+
+      inline Eigen::VectorXd vectorD() const {
+        return _alloc->_ldlt.vectorD();
+      }
+
       inline size_t rows() const { return _alloc->N_; }
       inline size_t cols() const { return _alloc->N_; }
       

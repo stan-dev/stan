@@ -69,7 +69,11 @@ namespace stan {
       inline Eigen::Matrix<double,R,C> solveRight(const Eigen::Matrix<double,R,C> &B) const {
         return _ldltP->solve(B.transpose()).transpose();
       }
-      
+
+      inline Eigen::VectorXd vectorD() const {
+        return _ldltP->vectorD();
+      }
+
       inline size_t rows() const { return N_; }
       inline size_t cols() const { return N_; }
       
