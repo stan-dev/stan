@@ -33,16 +33,18 @@
 \usepackage{lscape}
 
 \usepackage[titles]{tocloft}
-\setlength{\cftbeforechapskip}{0.5ex}
-\setlength{\cftbeforesecskip}{0.5ex}
+\setlength{\cftbeforechapskip}{1ex}
+\setlength{\cftbeforesecskip}{1ex}
 \renewcommand{\cftchapfont}{\normalsize\rm}
 \renewcommand{\cftchappagefont}{\normalsize\rm}
 \renewcommand{\cftpartfont}{\normalsize\rm\bfseries}
 \renewcommand{\cftpartpagefont}{\normalsize\rm\bfseries}
-\renewcommand{\cftchapaftersnum}{.\hspace*{12pt}}
+\renewcommand{\cftchapaftersnum}{.}
 \renewcommand{\cftchapaftersnumb}{\hspace*{8pt}}
-
+\renewcommand{\@pnumwidth}{5em} 
+\renewcommand{\@tocrmarg}{4em}
 \setcounter{tocdepth}{0}
+
 
 \titleformat{\chapter}{\bfseries\LARGE}{\thechapter.}{1.5pc}{}{}%{1.5pc}{}{}
 \titlespacing{\chapter}{0pt}{-24pt}{24pt}{}

@@ -699,19 +699,14 @@ The atomic elements of the hierarchy (i.e., those without
 corresponding values) are \textit{categorical arguments} (sometimes
 called ``flags'') which define self-contained categories of arguments.
 
-Arguments grouped within a category are not ordered with respect
-to each other.  For example, the following four commands all define
-the same configuration:%
+Stan's commands have more hierarchical structure than is typical of
+command line executables, which usually have at most two subgroups of
+commands.  Arguments grouped within a category are not ordered with
+respect to each other.  The only ordering is that the global options
+come before the method argument and subcommand-specific options after
+the method argument.  For example, the following four commands all
+define the same configuration:%
 %
-\footnote{
-  Stan's commands have more hierarchical structure than is typical of
-  command line executables, which usually have at most two subgroups
-  of commands.  For instance, the Git version control system has
-  global control arguments (e.g., username and password), then a
-  ``method'' specification (e.g., pull or commit), and then arguments
-  specific to the method.  The only ordering is that the global
-  options come before the method argument and subcommand-specific
-  options after the method argument.}
 \footnote{
 The backslash (\code{\textbackslash}) is used at the end of a line in
 a command to indicate that it continues on the next line.  The
@@ -764,11 +759,11 @@ causes the execution to immediately terminate.
 %
 \put(10, 460) { \makebox(50, 10)[l]{id, data, init} }
 %
-\put(0, 410) { \framebox(470, 45) }
+\put(0, 410) { \framebox(470, 45)\hss }
 \put(10, 440) { \makebox(50, 10)[l]{random} }
 \put(50, 420) { \makebox(50, 10)[l]{seed} }
 %
-\put(0, 360) { \framebox(470, 45) }
+\put(0, 360) { \framebox(470, 45)\hss }
 \put(10, 390) { \makebox(65, 10)[l]{output} }
 \put(50, 370) { \makebox(500, 10)[l]{file, diagnostic\_file, ... } } % refresh, save\_warmup} }
 %
@@ -778,19 +773,19 @@ causes the execution to immediately terminate.
 \put(20, 257.5) { \vector(1, 0){15} }
 \put(20, 307.5) { \vector(1, 0){15} }
 %
-\put(40, 285) { \framebox(430, 45) }
+\put(40, 285) { \framebox(430, 45)\hss }
 \put(50, 315) { \makebox(65, 10)[l]{ diagnose } }
 \put(90, 295) { \makebox(50, 10)[l]{ $\ldots$ } }
 %
-\put(40, 235) { \framebox(430, 45) }
+\put(40, 235) { \framebox(430, 45)\hss }
 \put(50, 265) { \makebox(63, 10)[l]{ optimize } }
 \put(90, 245) { \makebox(50, 10)[l]{ $\ldots$ } }
 %
-\put(40, 5) { \framebox(430, 225) }
+\put(40, 5) { \framebox(430, 225)\hss }
 \put(50, 215) { \makebox(55, 10)[l]{sample} }
 \put(90, 195) { \makebox(350, 10)[l]{num\_samples, num\_warmup, save\_warmup, thin} }
 %
-\put(80, 140) { \framebox(380, 45) }
+\put(80, 140) { \framebox(380, 45)\hss }
 \put(90, 170) { \makebox(55, 10)[l]{adapt} }
 \put(130, 150) { \makebox(50, 10)[l]{$\ldots$} }
 %
@@ -799,11 +794,11 @@ causes the execution to immediately terminate.
 \put(100, 87.5) { \vector(1, 0){15} }
 \put(100, 37.5) { \vector(1, 0){15} }
 %
-\put(120, 65) { \framebox(340, 45) }
+\put(120, 65) { \framebox(340, 45)\hss }
 \put(130, 95) { \makebox(55, 10)[l]{hmc} }
 \put(170, 75) { \makebox(50, 10)[l]{$\ldots$} }
 %
-\put(120, 15) { \framebox(340, 45) }
+\put(120, 15) { \framebox(340, 45)\hss }
 \put(130, 45) { \makebox(115, 10)[l]{ rw\_metropolis } }
 \put(170, 25) { \makebox(50, 10)[l]{ $\ldots$ } }
 \end{picture}
@@ -818,17 +813,17 @@ causes the execution to immediately terminate.
 
 \begin{figure}
 \setlength{\unitlength}{0.01in} 
-\centering
-\begin{picture}(480, 480)
+%\centering
+\begin{picture}(1000, 480)
 %
 \small\tt
 \put(10, 460) { \makebox(50, 10)[l]{id, data, init} }
 %
-\put(0, 410) { \framebox(470, 45) }
+\put(0, 410){ \framebox(470, 45) \hss}
 \put(10, 440) { \makebox(50, 10)[l]{random} }
 \put(50, 420) { \makebox(50, 10)[l]{seed} }
 %
-\put(0, 360) { \framebox(470, 45) }
+\put(0, 360) { \framebox(470, 45)\hss }
 \put(10, 390) { \makebox(65, 10)[l]{output} }
 \put(50, 370) { \makebox(450, 10)[l]{file, diagnostic\_file, ...} }  % refresh, ...
 %
@@ -838,19 +833,19 @@ causes the execution to immediately terminate.
 \put(20, 257.5) { \color{gray!30}\vector(1, 0){15} }
 \put(20, 307.5) { \color{gray!30}\vector(1, 0){15} }
 %
-\put(40, 285) { \color{gray!30}\framebox(430, 45) }
+\put(40, 285) { \color{gray!30}\framebox(430, 45)\hss }
 \put(50, 315) { \makebox(65, 10)[l]{ \textcolor{gray!30}{diagnose} } }
 \put(90, 295) { \makebox(50, 10)[l]{ \textcolor{gray!30}{$\ldots$} } }
 %
-\put(40, 235) { \color{gray!30}\framebox(430, 45) }
+\put(40, 235) { \color{gray!30}\framebox(430, 45)\hss }
 \put(50, 265) { \makebox(63, 10)[l]{ \textcolor{gray!30}{optimize} } }
 \put(90, 245) { \makebox(50, 10)[l]{ \textcolor{gray!30}{$\ldots$} } }
 %
-\put(40, 5) { \framebox(430, 225) }
+\put(40, 5) { \framebox(430, 225)\hss }
 \put(50, 215) { \makebox(55, 10)[l]{sample} }
 \put(90, 195) { \makebox(350, 10)[l]{num\_samples, num\_warmup, save\_warmup, thin} }
 %
-\put(80, 140) { \framebox(370, 45) }
+\put(80, 140) { \framebox(370, 45)\hss }
 \put(90, 170) { \makebox(55, 10)[l]{adapt} }
 \put(130, 150) { \makebox(50, 10)[l]{$\ldots$} }
 %
@@ -860,11 +855,11 @@ causes the execution to immediately terminate.
 \put(100, 87.5) { \vector(1, 0){15} }
 \put(100, 37.5) { \color{gray!30}\vector(1, 0){15} }
 %
-\put(120, 65) { \framebox(330, 45) }
+\put(120, 65) { \framebox(330, 45)\hss }
 \put(130, 95) { \makebox(55, 10)[l]{hmc} }
 \put(170, 75) { \makebox(50, 10)[l]{$\ldots$} }
 %
-\put(120, 15) { \color{gray!30}\framebox(330, 45) }
+\put(120, 15){ \color{gray!30}\framebox(330, 45)\hss }
 \put(130, 45) { \makebox(95, 10)[l]{ \textcolor{gray!30}{rw\_metropolis} } }
 \put(170, 25) { \makebox(50, 10)[l]{ \textcolor{gray!30}{$\ldots$} } }
 \end{picture}
