@@ -170,6 +170,9 @@ src/test/mcmc/hmc/hamiltonians/models/%.cpp : src/test/mcmc/hmc/hamiltonians/mod
 
 src/test/mcmc/hmc/integrators/models/%.cpp : src/test/mcmc/hmc/integrators/models/%.stan bin/stanc$(EXE)
 	bin$(PATH_SEPARATOR)stanc$(EXE) --name=$(basename $(@F)) --o=$@ --no_main $<
+  
+src/test/model/models/%.cpp : src/test/model/models/%.stan bin/stanc$(EXE)
+	bin$(PATH_SEPARATOR)stanc$(EXE) --name=$(basename $(@F)) --o=$@ --no_main $<
 
 src/test/io/test_model/%.cpp : src/test/io/test_model/%.stan bin/stanc$(EXE)
 	bin$(PATH_SEPARATOR)stanc$(EXE) --name=$(basename $(@F)) --o=$@ --no_main $<
@@ -186,6 +189,11 @@ test/mcmc/hmc/integrators/expl_leapfrog.o: test/%.o : src/test/%_test.cpp $(LIBG
 
 .PRECIOUS: src/test/gm/model_specs/no_main/test_lp.cpp
 test/gm/generator.o: test/%.o : src/test/%_test.cpp $(LIBGTEST) src/test/gm/model_specs/no_main/test_lp.cpp
+	@mkdir -p $(dir $@)
+	$(COMPILE.c) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
+
+.PRECIOUS: src/test/model/models/valid.cpp src/test/model/models/domain_fail.cpp
+test/model/util.o: test/%.o : src/test/%_test.cpp $(LIBGTEST) src/test/model/models/valid.cpp src/test/model/models/domain_fail.cpp
 	@mkdir -p $(dir $@)
 	$(COMPILE.c) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
 

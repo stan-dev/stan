@@ -383,35 +383,33 @@ namespace stan {
     
     // Interface for automatic differentiation of models
     
-    template <bool propto, bool jacobian_adjust_transform, class M>
-    struct model_funk {
+    template <class M>
+    struct model_functional {
       
-      const M& _model;
-      std::ostream* _o;
+      const M& model;
+      std::ostream* o;
       
-      model_funk(const M& m, std::ostream* out): _model(m), _o(out) {};
+      model_functional(const M& m, std::ostream* out): model(m), o(out) {};
       
       template <typename T>
-      T operator()(Eigen::Matrix<T,Eigen::Dynamic,1>& x) const {
-        return _model.template log_prob<propto, jacobian_adjust_transform, T>(x, _o);
+      T operator()(Eigen::Matrix<T, Eigen::Dynamic, 1>& x) const {
+        return model.template log_prob<true, true, T>(x, o);
       }
       
     };
     
-    template <bool propto, bool jacobian_adjust_transform, class M>
+    template <class M>
     void gradient(const M& model,
                   const Eigen::Matrix<double, Eigen::Dynamic, 1>& x,
                   double& f,
                   Eigen::Matrix<double, Eigen::Dynamic, 1>& grad_f,
                   std::ostream* msgs = 0) {
       
-      stan::agrad::gradient(model_funk<propto,
-                                       jacobian_adjust_transform,
-                                       M>(model, msgs), x, f, grad_f);
+      stan::agrad::gradient(model_functional<M>(model, msgs), x, f, grad_f);
       
     }
     
-    template <bool propto, bool jacobian_adjust_transform, class M>
+    template <class M>
     void hessian(const M& model,
                  const Eigen::Matrix<double, Eigen::Dynamic, 1>& x,
                  double& f,
@@ -419,27 +417,23 @@ namespace stan {
                  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& hess_f,
                  std::ostream* msgs = 0) {
       
-      stan::agrad::hessian(model_funk<propto,
-                                      jacobian_adjust_transform,
-                                      M>(model, msgs), x, f, grad_f, hess_f);
+      stan::agrad::hessian(model_functional<M>(model, msgs), x, f, grad_f, hess_f);
       
     }
 
-    template <bool propto, bool jacobian_adjust_transform, class M>
+    template <class M>
     void gradient_dot_vector(const M& model,
                              const Eigen::Matrix<double, Eigen::Dynamic, 1>& x,
                              const Eigen::Matrix<double, Eigen::Dynamic, 1>& v,
                              double& f,
-                             Eigen::Matrix<double, Eigen::Dynamic, 1>& grad_f_dot_v,
+                             double& grad_f_dot_v,
                              std::ostream* msgs = 0) {
       
-      stan::agrad::gradient_dot_vector(model_funk<propto,
-                                       jacobian_adjust_transform,
-                                       M>(model, msgs), x, v, f, grad_f_dot_v);
+      stan::agrad::gradient_dot_vector(model_functional<M>(model, msgs), x, v, f, grad_f_dot_v);
       
     }
     
-    template <bool propto, bool jacobian_adjust_transform, class M>
+    template <class M>
     void hessian_times_vector(const M& model,
                               const Eigen::Matrix<double, Eigen::Dynamic, 1>& x,
                               const Eigen::Matrix<double, Eigen::Dynamic, 1>& v,
@@ -447,22 +441,18 @@ namespace stan {
                               Eigen::Matrix<double, Eigen::Dynamic, 1>& hess_f_dot_v,
                               std::ostream* msgs = 0) {
       
-      stan::agrad::hessian_times_vector(model_funk<propto,
-                                                   jacobian_adjust_transform,
-                                                   M>(model, msgs), x, v, f, hess_f_dot_v);
+      stan::agrad::hessian_times_vector(model_functional<M>(model, msgs), x, v, f, hess_f_dot_v);
       
     }
     
-    template <bool propto, bool jacobian_adjust_transform, class M>
+    template <class M>
     void grad_tr_mat_times_hessian(const M& model,
                                    const Eigen::Matrix<double, Eigen::Dynamic, 1>& x,
                                    const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& X,
                                    Eigen::Matrix<double, Eigen::Dynamic, 1>& grad_tr_X_hess_f,
                                    std::ostream* msgs = 0) {
       
-      stan::agrad::grad_tr_mat_times_hessian(model_funk<propto,
-                                                        jacobian_adjust_transform,
-                                                        M>(model, msgs), x, X, grad_tr_X_hess_f);
+      stan::agrad::grad_tr_mat_times_hessian(model_functional<M>(model, msgs), x, X, grad_tr_X_hess_f);
       
     }
     
