@@ -31,6 +31,11 @@ stan.Rproj
 stan.kdev4
 .Rapp.history
 
+#test files
+src/test/test-models/**/*
+!src/test/test-models/**/*.stan
+!src/test/test-models/**/.gitignore
+
 # tests: compiled models
 src/test/gm/model_specs/compiled/*
 !src/test/gm/model_specs/compiled/*.stan

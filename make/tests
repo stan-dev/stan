@@ -171,9 +171,6 @@ src/test/mcmc/hmc/hamiltonians/models/%.cpp : src/test/mcmc/hmc/hamiltonians/mod
 src/test/mcmc/hmc/integrators/models/%.cpp : src/test/mcmc/hmc/integrators/models/%.stan bin/stanc$(EXE)
 	bin$(PATH_SEPARATOR)stanc$(EXE) --name=$(basename $(@F)) --o=$@ --no_main $<
 
-src/test/io/test_model/%.cpp : src/test/io/test_model/%.stan bin/stanc$(EXE)
-	bin$(PATH_SEPARATOR)stanc$(EXE) --name=$(basename $(@F)) --o=$@ --no_main $<
-
 .PRECIOUS: src/test/mcmc/hmc/hamiltonians/models/funnel.cpp
 test/mcmc/hmc/hamiltonians/base_hamiltonian.o test/mcmc/hmc/hamiltonians/unit_e_metric.o test/mcmc/hmc/hamiltonians/diag_e_metric.o test/mcmc/hmc/hamiltonians/dense_e_metric.o: test/%.o : src/test/%_test.cpp $(LIBGTEST) src/test/mcmc/hmc/hamiltonians/models/funnel.cpp
 	@mkdir -p $(dir $@)
@@ -303,6 +300,32 @@ ALL_TEST_EXECUTABLES = $(patsubst src/%_test.cpp,%$(EXE),$(ALL_TESTS))
 $(TEST_TARGETS): src/test/%: $$(addprefix runtest/,$$(filter test/$$*/$$(PERCENT),$$(ALL_TEST_EXECUTABLES)))
 	@echo ''
 	@echo 'Ran '$(words $^)' tests for '$@
+
+
+##
+# TEST_MODELS is the set of all the test models.
+# Those in the 'compiled' subdirectory are supposed to be compiled.
+# Those in the 'no_main' subdirectory are supposed to be compiled without a main function.
+##
+TEST_MODELS = $(shell find src/test/test-models -type f -name '*.stan')
+
+##
+# Compile these with a main.
+## 
+$(patsubst %.stan,%.cpp,$(filter src/test/test-models/compiled/%,$(TEST_MODELS))) : %.cpp : %.stan bin/stanc$(EXE)
+	bin$(PATH_SEPARATOR)stanc$(EXE) --name=$(basename $(@F)) --o=$@ $<
+##
+# Compile these with no main.
+##
+$(patsubst %.stan,%.cpp,$(filter src/test/test-models/no-main/%,$(TEST_MODELS))) : %.cpp : %.stan bin/stanc$(EXE)
+	bin$(PATH_SEPARATOR)stanc$(EXE) --name=$(basename $(@F)) --o=$@ --no_main $<
+
+
+##
+# Tests that also depend on generated models.
+##
+test/unit/io/mcmc_writer.o : src/test/test-models/no-main/io_example.cpp
+
 
 ##
 # CmdStan specific targets. Should be removed in the future.

@@ -7,19 +7,19 @@ class StanIoStanCsvReader : public testing::Test {
   
 public:
   void SetUp () {
-    blocker0_stream.open("src/test/io/test_csv_files/blocker.0.csv");
-    metadata1_stream.open("src/test/io/test_csv_files/metadata1.csv");
-    header1_stream.open("src/test/io/test_csv_files/header1.csv");
-    adaptation1_stream.open("src/test/io/test_csv_files/adaptation1.csv");
-    samples1_stream.open("src/test/io/test_csv_files/samples1.csv");
+    blocker0_stream.open("src/test/unit/io/test_csv_files/blocker.0.csv");
+    metadata1_stream.open("src/test/unit/io/test_csv_files/metadata1.csv");
+    header1_stream.open("src/test/unit/io/test_csv_files/header1.csv");
+    adaptation1_stream.open("src/test/unit/io/test_csv_files/adaptation1.csv");
+    samples1_stream.open("src/test/unit/io/test_csv_files/samples1.csv");
     
-    epil0_stream.open("src/test/io/test_csv_files/epil.0.csv");
-    metadata2_stream.open("src/test/io/test_csv_files/metadata2.csv");
-    header2_stream.open("src/test/io/test_csv_files/header2.csv");
-    adaptation2_stream.open("src/test/io/test_csv_files/adaptation2.csv");
-    samples2_stream.open("src/test/io/test_csv_files/samples2.csv");
+    epil0_stream.open("src/test/unit/io/test_csv_files/epil.0.csv");
+    metadata2_stream.open("src/test/unit/io/test_csv_files/metadata2.csv");
+    header2_stream.open("src/test/unit/io/test_csv_files/header2.csv");
+    adaptation2_stream.open("src/test/unit/io/test_csv_files/adaptation2.csv");
+    samples2_stream.open("src/test/unit/io/test_csv_files/samples2.csv");
     
-    blocker_nondiag0_stream.open("src/test/io/test_csv_files/blocker_nondiag.0.csv");
+    blocker_nondiag0_stream.open("src/test/unit/io/test_csv_files/blocker_nondiag.0.csv");
   }
   
   void TearDown() {

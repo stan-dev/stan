@@ -1,5 +1,5 @@
 #include <stan/io/mcmc_writer.hpp>
-#include <test/io/test_model/example.cpp>
+#include <test/test-models/no-main/io_example.cpp>
 
 #include <vector>
 #include <boost/random/additive_combine.hpp>
@@ -20,7 +20,7 @@ TEST(StanIoMcmcWriter, print_sample_names) {
   stan::io::dump data_var_context(data_stream);
   data_stream.close();
   
-  example_namespace::example model(data_var_context, &std::cout);
+  io_example_namespace::io_example model(data_var_context, &std::cout);
   
   // Sample
   Eigen::VectorXd real(2);
@@ -36,14 +36,14 @@ TEST(StanIoMcmcWriter, print_sample_names) {
   typedef boost::ecuyer1988 rng_t;
   rng_t base_rng(0);
   
-  stan::mcmc::adapt_diag_e_nuts<example_namespace::example, rng_t> sampler(model, base_rng, 0);
+  stan::mcmc::adapt_diag_e_nuts<io_example_namespace::io_example, rng_t> sampler(model, base_rng, 0);
   sampler.seed(real);
   
   // Writer
   std::stringstream sample_stream;
   std::stringstream diagnostic_stream;
   
-  stan::io::mcmc_writer<example_namespace::example> writer(&sample_stream, &diagnostic_stream);
+  stan::io::mcmc_writer<io_example_namespace::io_example> writer(&sample_stream, &diagnostic_stream);
   
   writer.print_sample_names(sample, &sampler, model);
   
@@ -61,7 +61,7 @@ TEST(StanIoMcmcWriter, print_sample_params) {
   stan::io::dump data_var_context(data_stream);
   data_stream.close();
   
-  example_namespace::example model(data_var_context, &std::cout);
+  io_example_namespace::io_example model(data_var_context, &std::cout);
   
   // Sample
   Eigen::VectorXd real(2);
@@ -77,14 +77,14 @@ TEST(StanIoMcmcWriter, print_sample_params) {
   typedef boost::ecuyer1988 rng_t;
   rng_t base_rng(0);
   
-  stan::mcmc::adapt_diag_e_nuts<example_namespace::example, rng_t> sampler(model, base_rng, 0);
+  stan::mcmc::adapt_diag_e_nuts<io_example_namespace::io_example, rng_t> sampler(model, base_rng, 0);
   sampler.seed(real);
   
   // Writer
   std::stringstream sample_stream;
   std::stringstream diagnostic_stream;
   
-  stan::io::mcmc_writer<example_namespace::example> writer(&sample_stream, &diagnostic_stream);
+  stan::io::mcmc_writer<io_example_namespace::io_example> writer(&sample_stream, &diagnostic_stream);
   
   writer.print_sample_params<rng_t>(base_rng, sample, sampler, model);
   
@@ -114,7 +114,7 @@ TEST(StanIoMcmcWriter, print_adapt_finish) {
   stan::io::dump data_var_context(data_stream);
   data_stream.close();
   
-  example_namespace::example model(data_var_context, &std::cout);
+  io_example_namespace::io_example model(data_var_context, &std::cout);
   
   // Sample
   Eigen::VectorXd real(2);
@@ -130,14 +130,14 @@ TEST(StanIoMcmcWriter, print_adapt_finish) {
   typedef boost::ecuyer1988 rng_t;
   rng_t base_rng(0);
   
-  stan::mcmc::adapt_diag_e_nuts<example_namespace::example, rng_t> sampler(model, base_rng, 0);
+  stan::mcmc::adapt_diag_e_nuts<io_example_namespace::io_example, rng_t> sampler(model, base_rng, 0);
   sampler.seed(real);
   
   // Writer
   std::stringstream sample_stream;
   std::stringstream diagnostic_stream;
   
-  stan::io::mcmc_writer<example_namespace::example> writer(&sample_stream, &diagnostic_stream);
+  stan::io::mcmc_writer<io_example_namespace::io_example> writer(&sample_stream, &diagnostic_stream);
   
   writer.print_adapt_finish(&sampler);
   
@@ -195,7 +195,7 @@ TEST(StanIoMcmcWriter, print_diagnostic_names) {
   stan::io::dump data_var_context(data_stream);
   data_stream.close();
   
-  example_namespace::example model(data_var_context, &std::cout);
+  io_example_namespace::io_example model(data_var_context, &std::cout);
   
   // Sample
   Eigen::VectorXd real(2);
@@ -211,14 +211,14 @@ TEST(StanIoMcmcWriter, print_diagnostic_names) {
   typedef boost::ecuyer1988 rng_t;
   rng_t base_rng(0);
   
-  stan::mcmc::adapt_diag_e_nuts<example_namespace::example, rng_t> sampler(model, base_rng, 0);
+  stan::mcmc::adapt_diag_e_nuts<io_example_namespace::io_example, rng_t> sampler(model, base_rng, 0);
   sampler.seed(real);
   
   // Writer
   std::stringstream sample_stream;
   std::stringstream diagnostic_stream;
   
-  stan::io::mcmc_writer<example_namespace::example> writer(&sample_stream, &diagnostic_stream);
+  stan::io::mcmc_writer<io_example_namespace::io_example> writer(&sample_stream, &diagnostic_stream);
   
   writer.print_diagnostic_names(sample, &sampler, model);
   
@@ -237,7 +237,7 @@ TEST(StanIoMcmcWriter, print_diagnostic_params) {
   stan::io::dump data_var_context(data_stream);
   data_stream.close();
   
-  example_namespace::example model(data_var_context, &std::cout);
+  io_example_namespace::io_example model(data_var_context, &std::cout);
   
   // Sample
   Eigen::VectorXd real(2);
@@ -253,7 +253,7 @@ TEST(StanIoMcmcWriter, print_diagnostic_params) {
   typedef boost::ecuyer1988 rng_t;
   rng_t base_rng(0);
   
-  stan::mcmc::adapt_diag_e_nuts<example_namespace::example, rng_t> sampler(model, base_rng, 0);
+  stan::mcmc::adapt_diag_e_nuts<io_example_namespace::io_example, rng_t> sampler(model, base_rng, 0);
   sampler.seed(real);
   sampler.z().p(0) = 0;
   sampler.z().p(1) = 0;
@@ -264,7 +264,7 @@ TEST(StanIoMcmcWriter, print_diagnostic_params) {
   std::stringstream sample_stream;
   std::stringstream diagnostic_stream;
   
-  stan::io::mcmc_writer<example_namespace::example> writer(&sample_stream, &diagnostic_stream);
+  stan::io::mcmc_writer<io_example_namespace::io_example> writer(&sample_stream, &diagnostic_stream);
   
   writer.print_diagnostic_params(sample, &sampler);
   
@@ -298,7 +298,7 @@ TEST(StanIoMcmcWriter, print_timing) {
   stan::io::dump data_var_context(data_stream);
   data_stream.close();
   
-  example_namespace::example model(data_var_context, &std::cout);
+  io_example_namespace::io_example model(data_var_context, &std::cout);
   
   // Sample
   Eigen::VectorXd real(2);
@@ -314,14 +314,14 @@ TEST(StanIoMcmcWriter, print_timing) {
   typedef boost::ecuyer1988 rng_t;
   rng_t base_rng(0);
   
-  stan::mcmc::adapt_diag_e_nuts<example_namespace::example, rng_t> sampler(model, base_rng, 0);
+  stan::mcmc::adapt_diag_e_nuts<io_example_namespace::io_example, rng_t> sampler(model, base_rng, 0);
   sampler.seed(real);
   
   // Writer
   std::stringstream sample_stream;
   std::stringstream diagnostic_stream;
   
-  stan::io::mcmc_writer<example_namespace::example> writer(&sample_stream, &diagnostic_stream);
+  stan::io::mcmc_writer<io_example_namespace::io_example> writer(&sample_stream, &diagnostic_stream);
   
   double warm = 0.193933;
   double sampling = 0.483830;
