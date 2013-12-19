@@ -132,7 +132,7 @@ TEST(CommandPrint, functional_test__issue_342) {
   std::string csv_file 
     = "src" + path_separator 
     + "test" + path_separator
-    + "command" + path_separator
+    + "CmdStan" + path_separator
     + "print_samples" + path_separator
     + "matrix_output.csv";
 

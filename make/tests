@@ -208,13 +208,6 @@ ifeq ($(findstring test-,$(MAKECMDGOALS))$(findstring runtest/,$(MAKECMDGOALS)),
 	$@ --gtest_output="xml:$(basename $@).xml"
 endif
 
-test/command/print$(EXE) : test/command/print.o bin/libstan.a bin/libstanc.a bin/print$(EXE)
-	@mkdir -p $(dir $@)
-	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS) $(LDLIBS_STANC)
-ifeq ($(findstring test-,$(MAKECMDGOALS))$(findstring runtest/,$(MAKECMDGOALS)),)
-	$@ --gtest_output="xml:$(basename $@).xml"
-endif
-
 .PRECIOUS: test/%.o
 test/%$(EXE) : test/%.o bin/libstan.a bin/libstanc.a
 	@mkdir -p $(dir $@)
@@ -226,6 +219,7 @@ endif
 test/%.o : src/test/%_test.cpp $(LIBGTEST)
 	@mkdir -p $(dir $@)
 	$(COMPILE.c) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
+
 
 
 ##
@@ -308,4 +302,11 @@ ALL_TEST_EXECUTABLES = $(patsubst src/%_test.cpp,%$(EXE),$(ALL_TESTS))
 .PHONY: $(TEST_TARGETS)
 $(TEST_TARGETS): src/test/%: $$(addprefix runtest/,$$(filter test/$$*/$$(PERCENT),$$(ALL_TEST_EXECUTABLES)))
 	@echo ''
-	@echo 'Ran tests for '$@
+	@echo 'Ran '$(words $^)' tests for '$@
+
+##
+# CmdStan specific targets. Should be removed in the future.
+##
+$(patsubst src/%_test.cpp,%.o,$(filter src/test/CmdStan/%,$(ALL_TESTS))): test/%.o : src/test/%_test.cpp $(LIBGTEST) bin/print$(EXE)
+	@mkdir -p $(dir $@)
+	$(COMPILE.c) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
