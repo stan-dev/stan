@@ -131,7 +131,8 @@ TEST(ModelUtil, gradient) {
   EXPECT_FLOAT_EQ(dim, x.size());
   EXPECT_FLOAT_EQ(dim, g.size());
   
-  domain_fail_namespace::domain_fail domain_fail_model(data_var_context, &std::cout);
+  // Incorporate once operands and partials has been generalized
+  //domain_fail_namespace::domain_fail domain_fail_model(data_var_context, &std::cout);
   //EXPECT_THROW(stan::model::gradient(domain_fail_model, x, f, g), std::domain_error);
   
 }
@@ -157,7 +158,8 @@ TEST(ModelUtil, hessian) {
   EXPECT_FLOAT_EQ(dim, hess_f.rows());
   EXPECT_FLOAT_EQ(dim, hess_f.cols());
   
-  domain_fail_namespace::domain_fail domain_fail_model(data_var_context, &std::cout);
+  // Incorporate once operands and partials has been generalized
+  //domain_fail_namespace::domain_fail domain_fail_model(data_var_context, &std::cout);
   //EXPECT_THROW(stan::model::hessian(domain_fail_model, x, f, grad_f, hess_f), std::domain_error);
   
 }
@@ -181,7 +183,8 @@ TEST(ModelUtil, gradient_dot_vector) {
   EXPECT_FLOAT_EQ(dim, x.size());
   EXPECT_FLOAT_EQ(dim, v.size());
   
-  domain_fail_namespace::domain_fail domain_fail_model(data_var_context, &std::cout);
+  // Incorporate once operands and partials has been generalized
+  //domain_fail_namespace::domain_fail domain_fail_model(data_var_context, &std::cout);
   //EXPECT_THROW(stan::model::gradient_dot_vector(domain_fail_model, x, v, f, grad_f_dot_v),
   //             std::domain_error);
   
@@ -207,7 +210,8 @@ TEST(ModelUtil, hessian_times_vector) {
   EXPECT_FLOAT_EQ(dim, v.size());
   EXPECT_FLOAT_EQ(dim, hess_f_dot_v.size());
   
-  domain_fail_namespace::domain_fail domain_fail_model(data_var_context, &std::cout);
+  // Incorporate once operands and partials has been generalized
+  //domain_fail_namespace::domain_fail domain_fail_model(data_var_context, &std::cout);
   //EXPECT_THROW(stan::model::hessian_times_vector(domain_fail_model, x, v, f, hess_f_dot_v),
   //             std::domain_error);
   
@@ -233,7 +237,8 @@ TEST(ModelUtil, grad_tr_mat_times_hessian) {
   EXPECT_FLOAT_EQ(dim, X.cols());
   EXPECT_FLOAT_EQ(dim, grad_tr_X_hess_f.size());
   
-  domain_fail_namespace::domain_fail domain_fail_model(data_var_context, &std::cout);
+  // Incorporate once operands and partials has been generalized
+  //domain_fail_namespace::domain_fail domain_fail_model(data_var_context, &std::cout);
   //EXPECT_THROW(stan::model::grad_tr_mat_times_hessian(domain_fail_model, x, X, grad_tr_X_hess_f),
   //             std::domain_error);
   

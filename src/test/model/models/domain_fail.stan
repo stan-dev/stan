@@ -1,7 +1,7 @@
 parameters {
-  real x;
+  real<lower=0> x;
 }
 
 model {
-  increment_log_prob(-0.5 * square(x));
+  increment_log_prob(-sqrt(-x));
 }
