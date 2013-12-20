@@ -148,6 +148,12 @@ ifeq ($(findstring test-,$(MAKECMDGOALS))$(findstring runtest/,$(MAKECMDGOALS)),
 	$@ --gtest_output="xml:$(basename $@).xml"
 endif
 
+.PRECIOUS: src/test/gm/model_specs/no_main/test_lp.cpp
+test/gm/command_init.o: test/%.o : src/test/%_test.cpp $(LIBGTEST) src/test/gm/model_specs/no_main/test_lp.cpp
+	@mkdir -p $(dir $@)
+	$(COMPILE.c) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
+
+
 .PRECIOUS: src/test/mcmc/models/improper$(EXE)
 test/mcmc/base_hmc$(EXE) : test/mcmc/base_hmc.o bin/libstan.a bin/libstanc.a src/test/mcmc/models/improper$(EXE)
 	@mkdir -p $(dir $@)
@@ -156,19 +162,35 @@ ifeq ($(findstring test-,$(MAKECMDGOALS))$(findstring runtest/,$(MAKECMDGOALS)),
 	$@ --gtest_output="xml:$(basename $@).xml"
 endif
 
+src/test/gm/model_specs/no_main/%.cpp : src/test/gm/model_specs/no_main/%.stan bin/stanc$(EXE)
+	bin$(PATH_SEPARATOR)stanc$(EXE) --name=$(basename $(@F)) --o=$@ --no_main $<
+
 src/test/mcmc/hmc/hamiltonians/models/%.cpp : src/test/mcmc/hmc/hamiltonians/models/%.stan bin/stanc$(EXE)
 	bin$(PATH_SEPARATOR)stanc$(EXE) --name=$(basename $(@F)) --o=$@ --no_main $<
 
 src/test/mcmc/hmc/integrators/models/%.cpp : src/test/mcmc/hmc/integrators/models/%.stan bin/stanc$(EXE)
 	bin$(PATH_SEPARATOR)stanc$(EXE) --name=$(basename $(@F)) --o=$@ --no_main $<
 
+src/test/io/test_model/%.cpp : src/test/io/test_model/%.stan bin/stanc$(EXE)
+	bin$(PATH_SEPARATOR)stanc$(EXE) --name=$(basename $(@F)) --o=$@ --no_main $<
+
 .PRECIOUS: src/test/mcmc/hmc/hamiltonians/models/funnel.cpp
-test/mcmc/hmc/hamiltonians/unit_e_metric.o test/mcmc/hmc/hamiltonians/diag_e_metric.o test/mcmc/hmc/hamiltonians/dense_e_metric.o: test/%.o : src/test/%_test.cpp $(LIBGTEST) src/test/mcmc/hmc/hamiltonians/models/funnel.cpp
+test/mcmc/hmc/hamiltonians/base_hamiltonian.o test/mcmc/hmc/hamiltonians/unit_e_metric.o test/mcmc/hmc/hamiltonians/diag_e_metric.o test/mcmc/hmc/hamiltonians/dense_e_metric.o: test/%.o : src/test/%_test.cpp $(LIBGTEST) src/test/mcmc/hmc/hamiltonians/models/funnel.cpp
 	@mkdir -p $(dir $@)
 	$(COMPILE.c) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
 
-.PRECIOUS: src/test/mcmc/hmc/integrators/models/gauss.cpp
-test/mcmc/hmc/integrators/expl_leapfrog.o: test/%.o : src/test/%_test.cpp $(LIBGTEST) src/test/mcmc/hmc/integrators/models/gauss.cpp
+.PRECIOUS: src/test/mcmc/hmc/integrators/models/gauss.cpp src/test/mcmc/hmc/integrators/models/command.cpp
+test/mcmc/hmc/integrators/expl_leapfrog.o: test/%.o : src/test/%_test.cpp $(LIBGTEST) src/test/mcmc/hmc/integrators/models/gauss.cpp src/test/mcmc/hmc/integrators/models/command.cpp
+	@mkdir -p $(dir $@)
+	$(COMPILE.c) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
+
+.PRECIOUS: src/test/gm/model_specs/no_main/test_lp.cpp
+test/gm/generator.o: test/%.o : src/test/%_test.cpp $(LIBGTEST) src/test/gm/model_specs/no_main/test_lp.cpp
+	@mkdir -p $(dir $@)
+	$(COMPILE.c) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
+
+.PRECIOUS: src/test/io/test_model/example.cpp
+test/io/mcmc_writer.o: test/%.o : src/test/%_test.cpp $(LIBGTEST) src/test/io/test_model/example.cpp
 	@mkdir -p $(dir $@)
 	$(COMPILE.c) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
 

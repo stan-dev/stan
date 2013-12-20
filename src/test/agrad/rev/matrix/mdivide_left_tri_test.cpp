@@ -3,7 +3,7 @@
 #include <test/agrad/util.hpp>
 #include <stan/math/matrix/multiply.hpp>
 #include <stan/math/matrix/mdivide_left_tri.hpp>
-#include <stan/agrad/agrad.hpp>
+#include <stan/agrad/rev.hpp>
 
 TEST(AgradRevMatrix,mdivide_left_tri_val) {
   using stan::math::matrix_d;

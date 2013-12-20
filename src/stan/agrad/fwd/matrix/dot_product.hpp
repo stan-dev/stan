@@ -6,7 +6,7 @@
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/math/matrix/validate_vector.hpp>
 #include <stan/math/matrix/validate_matching_sizes.hpp>
-#include <stan/agrad/fvar.hpp>
+#include <stan/agrad/fwd.hpp>
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <stan/agrad/fwd/matrix/to_fvar.hpp>
 

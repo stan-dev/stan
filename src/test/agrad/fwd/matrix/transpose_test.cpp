@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
-#include <stan/agrad/var.hpp>
+#include <stan/agrad/rev.hpp>
 #include <test/agrad/util.hpp>
 
 TEST(AgradFwdMatrixTranspose,fd_matrix) {

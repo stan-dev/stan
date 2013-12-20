@@ -16,13 +16,14 @@ TEST(McmcDiagEMetric, sample_p) {
   
   rng_t base_rng(0);
   
-  std::vector<double> q(5, 1.0);
-  std::vector<int> r(2, 2);
+  Eigen::VectorXd q(2);
+  q(0) = 5;
+  q(1) = 1;
   
   stan::mcmc::mock_model model(q.size());
   
   stan::mcmc::diag_e_metric<stan::mcmc::mock_model, rng_t> metric(model,&std::cout);
-  stan::mcmc::diag_e_point z(q.size(), r.size());
+  stan::mcmc::diag_e_point z(q.size());
   
   int n_samples = 1000;
   double m = 0;
@@ -51,9 +52,9 @@ TEST(McmcDiagEMetric, gradients) {
   
   rng_t base_rng(0);
   
-  std::vector<double> q(11, 1.0);
+  Eigen::VectorXd q = Eigen::VectorXd::Ones(11);
   
-  stan::mcmc::diag_e_point z(q.size(), 0);
+  stan::mcmc::diag_e_point z(q.size());
   z.q = q;
   z.p.setOnes();
   
@@ -71,19 +72,19 @@ TEST(McmcDiagEMetric, gradients) {
   
   Eigen::VectorXd g1 = metric.dtau_dq(z);
   
-  for (size_t i = 0; i < z.q.size(); ++i) {
+  for (int i = 0; i < z.q.size(); ++i) {
     
     double delta = 0;
     
-    z.q.at(i) += epsilon;
+    z.q(i) += epsilon;
     metric.update(z);
     delta += metric.tau(z);
     
-    z.q.at(i) -= 2 * epsilon;
+    z.q(i) -= 2 * epsilon;
     metric.update(z);
     delta -= metric.tau(z);
     
-    z.q.at(i) += epsilon;
+    z.q(i) += epsilon;
     metric.update(z);
     
     delta /= 2 * epsilon;
@@ -94,7 +95,7 @@ TEST(McmcDiagEMetric, gradients) {
   
   Eigen::VectorXd g2 = metric.dtau_dp(z);
   
-  for (size_t i = 0; i < z.q.size(); ++i) {
+  for (int i = 0; i < z.q.size(); ++i) {
     
     double delta = 0;
     
@@ -114,19 +115,19 @@ TEST(McmcDiagEMetric, gradients) {
   
   Eigen::VectorXd g3 = metric.dphi_dq(z);
   
-  for (size_t i = 0; i < z.q.size(); ++i) {
+  for (int i = 0; i < z.q.size(); ++i) {
     
     double delta = 0;
     
-    z.q.at(i) += epsilon;
+    z.q(i) += epsilon;
     metric.update(z);
     delta += metric.phi(z);
     
-    z.q.at(i) -= 2 * epsilon;
+    z.q(i) -= 2 * epsilon;
     metric.update(z);
     delta -= metric.phi(z);
     
-    z.q.at(i) += epsilon;
+    z.q(i) += epsilon;
     metric.update(z);
     
     delta /= 2 * epsilon;

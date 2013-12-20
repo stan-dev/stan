@@ -4,9 +4,10 @@
 #include <boost/random/cauchy_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
 
-#include <stan/agrad.hpp>
+#include <stan/agrad/partials_vari.hpp>
 #include <stan/prob/traits.hpp>
 #include <stan/math/error_handling.hpp>
+#include <stan/math/constants.hpp>
 #include <stan/math/functions/square.hpp>
 #include <stan/math/functions/value_of.hpp>
 #include <stan/prob/constants.hpp>

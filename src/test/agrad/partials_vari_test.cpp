@@ -1,6 +1,6 @@
 #include <stan/agrad/partials_vari.hpp>
 #include <gtest/gtest.h>
-#include <stan/agrad/agrad.hpp>
+#include <stan/agrad/rev.hpp>
 
 
 

@@ -1,7 +1,11 @@
+#include <stan/math/matrix/multiply.hpp>
+#include <stan/math/matrix/subtract.hpp>
+#include <stan/math/matrix/get_base1.hpp>
+#include <stan/math/matrix/dot_product.hpp>
 #include <gtest/gtest.h>
 #include <test/agrad/util.hpp>
-#include <stan/agrad/agrad.hpp>
-#include <stan/agrad/matrix.hpp>
+#include <stan/agrad/rev.hpp>
+#include <stan/agrad/rev/matrix.hpp>
 #include <stan/math/matrix/assign.hpp>
 
 TEST(AgradRevMatrix,mv_squaredNorm) {
