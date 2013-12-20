@@ -42,8 +42,8 @@ namespace stan {
         inline void initializeD(const Eigen::Matrix<var,R1,C1> &D) {
           D_.resize(D.rows(),D.cols());
           _variD.resize(D.rows(),D.cols());
-          for (size_t j = 0; j < D.cols(); j++) {
-            for (size_t i = 0; i < D.rows(); i++) {
+          for (int j = 0; j < D.cols(); j++) {
+            for (int i = 0; i < D.rows(); i++) {
               _variD(i,j) = D(i,j).vi_;
               D_(i,j) = D(i,j).val();
             }
@@ -105,8 +105,8 @@ namespace stan {
           else
             aA.noalias() = -adj*(impl->AinvB_ * impl->AinvB_.transpose());
 
-          for (size_t j = 0; j < aA.cols(); j++)
-            for (size_t i = 0; i < aA.rows(); i++)
+          for (int j = 0; j < aA.cols(); j++)
+            for (int i = 0; i < aA.rows(); i++)
               impl->_ldlt._alloc->_variA(i,j)->adj_ += aA(i,j);
         }
         static inline void chainB(const double &adj,
@@ -118,8 +118,8 @@ namespace stan {
           else
             aB.noalias() = 2*adj*impl->AinvB_;
 
-          for (size_t j = 0; j < aB.cols(); j++)
-            for (size_t i = 0; i < aB.rows(); i++)
+          for (int j = 0; j < aB.cols(); j++)
+            for (int i = 0; i < aB.rows(); i++)
               impl->_variB(i,j)->adj_ += aB(i,j);
         }
         
@@ -138,8 +138,8 @@ namespace stan {
           chainB(adj_, _impl);
           
           if (_impl->Dtype_ == 1) {
-            for (size_t j = 0; j < _impl->_variD.cols(); j++)
-              for (size_t i = 0; i < _impl->_variD.rows(); i++)
+            for (int j = 0; j < _impl->_variD.cols(); j++)
+              for (int i = 0; i < _impl->_variD.rows(); i++)
                 _impl->_variD(i,j)->adj_ += adj_*_impl->C_(i,j);
           }
         }
