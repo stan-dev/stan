@@ -84,7 +84,7 @@ TEST(AgradRevMatrix, mdivide_right_ldlt_vv) {
 
     // test all gradients
     ASSERT_EQ(grad_basic.size(), grad.size());
-    for (int n = 0; n < grad_basic.size(); n++)
+    for (size_t n = 0; n < grad_basic.size(); n++)
       EXPECT_FLOAT_EQ(grad_basic[n], grad[n])
         << "for element " << i << ", gradient " << n
         << " does not match the basic auto-diff implementation";
@@ -164,7 +164,7 @@ TEST(AgradRevMatrix, mdivide_right_ldlt_vd) {
 
     // test all gradients
     ASSERT_EQ(grad_basic.size(), grad.size());
-    for (int n = 0; n < grad_basic.size(); n++)
+    for (size_t n = 0; n < grad_basic.size(); n++)
       EXPECT_FLOAT_EQ(grad_basic[n], grad[n])
         << "for element " << i << ", gradient " << n
         << " does not match the basic auto-diff implementation";

@@ -13,7 +13,7 @@ namespace stan {
      * Return <code>true</code> if the underlying matrix is positive definite
      *
      * @param function
-     * @param LDLT_factor
+     * @param A 
      * @param name
      * @param result
      * @return <code>true</code> if the matrix is positive definite.

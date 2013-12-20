@@ -18,8 +18,8 @@ std::vector<double> finite_differences(const size_t row, const size_t col,
   stan::math::matrix_d C_plus, C_minus;
 
   if (calc_A_partials) {
-    for (size_t j = 0; j < A.cols(); j++) {
-      for (size_t i = 0; i < A.rows(); i++) {
+    for (size_type j = 0; j < A.cols(); j++) {
+      for (size_type i = 0; i < A.rows(); i++) {
         stan::math::matrix_d A_plus(A), A_minus(A);
         A_plus(i,j) += e;
         A_plus(j,i) = A_plus(i,j);
@@ -39,8 +39,8 @@ std::vector<double> finite_differences(const size_t row, const size_t col,
   if (calc_B_partials) {
     stan::math::LDLT_factor<double,-1,-1> ldlt_A;
     ldlt_A.compute(A);
-    for (size_t j = 0; j < B.cols(); j++) {
-      for (size_t i = 0; i < B.rows(); i++) {
+    for (size_type j = 0; j < B.cols(); j++) {
+      for (size_type i = 0; i < B.rows(); i++) {
         stan::math::matrix_d B_plus(B);
         stan::math::matrix_d B_minus(B);
         B_plus(i,j) += e;
@@ -164,8 +164,8 @@ TEST(AgradRevMatrix,mdivide_left_ldlt_finite_diff_vv) {
   stan::math::LDLT_factor<double,-1,-1> ldlt_Ad;
   ldlt_Ad.compute(Ad);
   
-  for (size_t i = 0; i < Bd.rows(); i++) {
-    for (size_t j = 0; j < Bd.cols(); j++) {
+  for (size_type i = 0; i < Bd.rows(); i++) {
+    for (size_type j = 0; j < Bd.cols(); j++) {
       // compute derivatives
       matrix_v A(2,2), B(2,2), C;
       for (size_t k = 0; k < 4; k++) {
@@ -255,8 +255,8 @@ TEST(AgradRevMatrix,mdivide_left_ldlt_finite_diff_dv) {
   stan::math::LDLT_factor<double,-1,-1> ldlt_Ad;
   ldlt_Ad.compute(Ad);
   
-  for (size_t i = 0; i < Bd.rows(); i++) {
-    for (size_t j = 0; j < Bd.cols(); j++) {
+  for (size_type i = 0; i < Bd.rows(); i++) {
+    for (size_type j = 0; j < Bd.cols(); j++) {
       // compute derivatives
       matrix_v B(2,2), C;
       for (size_t k = 0; k < 4; k++) {
@@ -342,8 +342,8 @@ TEST(AgradRevMatrix,mdivide_left_ldlt_finite_diff_vd) {
   stan::math::LDLT_factor<double,-1,-1> ldlt_Ad;
   ldlt_Ad.compute(Ad);
   
-  for (size_t i = 0; i < Bd.rows(); i++) {
-    for (size_t j = 0; j < Bd.cols(); j++) {
+  for (size_type i = 0; i < Bd.rows(); i++) {
+    for (size_type j = 0; j < Bd.cols(); j++) {
       // compute derivatives
       matrix_v A(2,2), C;
       for (size_t k = 0; k < 4; k++) {

@@ -493,7 +493,7 @@ TEST(AgradRevMatrix, trace_gen_inv_quad_form_ldlt_grad_dvv_basic) {
   double result_val, result_basic_val;
   AVEC vars;
   VEC grad, grad_basic;
-  size_t i,j;
+  size_type i,j;
   stan::math::LDLT_factor<stan::agrad::var,-1,-1> ldlt_av;
   
   // calculate gradient using trace_gen_inv_quad_form_ldlt

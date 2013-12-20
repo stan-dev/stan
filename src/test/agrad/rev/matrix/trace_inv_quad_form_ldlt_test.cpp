@@ -285,7 +285,7 @@ TEST(AgradRevMatrix, trace_quad_form_ldlt_vv_basic) {
   // check values
   EXPECT_FLOAT_EQ(x_basic_val, x_val);
   ASSERT_EQ(grad_basic.size(), grad.size());
-  for (int n = 0; n < grad_basic.size(); n++)
+  for (size_t n = 0; n < grad_basic.size(); n++)
   EXPECT_FLOAT_EQ(grad_basic[n], grad[n]);
 }
 
@@ -352,7 +352,7 @@ TEST(AgradRevMatrix, trace_quad_form_ldlt_vd_basic) {
   // check values
   EXPECT_FLOAT_EQ(x_basic_val, x_val);
   ASSERT_EQ(grad_basic.size(), grad.size());
-  for (int n = 0; n < grad_basic.size(); n++)
+  for (size_t n = 0; n < grad_basic.size(); n++)
     EXPECT_FLOAT_EQ(grad_basic[n], grad[n]);
 }
 
@@ -418,7 +418,7 @@ TEST(AgradRevMatrix, trace_quad_form_ldlt_dv_basic) {
   // check values
   EXPECT_FLOAT_EQ(x_basic_val, x_val);
   ASSERT_EQ(grad_basic.size(), grad.size());
-  for (int n = 0; n < grad_basic.size(); n++)
+  for (size_t n = 0; n < grad_basic.size(); n++)
     EXPECT_FLOAT_EQ(grad_basic[n], grad[n]);
 }
 
