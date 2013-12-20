@@ -395,6 +395,9 @@ is zero, returns 0 without evaluating \code{b}.
 
 \subsection{Logical Functions}
 
+The logical functions introduce conditional behavior functionally and
+are primarily provided for compatibility with BUGS and JAGS.
+%
 \begin{description}
 %
 \fitem{real}{if\_else}{int \farg{cond}, real \farg{x}, real \farg{y}}{
@@ -403,9 +406,54 @@ the ternary operator in \Cpp, Stan's \code{if\_else} function always
 evaluates both arguments \farg{x} and \farg{y}}
 %
 \fitem{real}{step}{real \farg{x}}{
-0 if \farg{x} is negative and 1 otherwise; equivalent to \code{x > 0.0}}
+1 if \farg{x} is positive and 0 otherwise; equivalent to \code{x > 0.0}}
 %
 \end{description}
+
+The log probability function and gradient evaluations are more
+efficient in Stan when implemented using conditional statements.  If
+\code{y} is a \code{real} variable, and \code{c}, \code{x1}, and
+\code{x2} are scalar expressions (type \code{real} or \code{int}),
+then the assignment statements
+%
+\begin{quote}
+\begin{Verbatim}
+y <- x1 * step(c) + x2 * (1 - step(c));
+\end{Verbatim}
+\end{quote}
+%
+and
+%
+\begin{quote}
+\begin{Verbatim}
+y <- if_else(c > 0, x1, x2);
+\end{Verbatim}
+\end{quote}
+%
+are more efficiently written with the conditional statement
+%
+\begin{quote}
+\begin{Verbatim}
+if (c > 0)
+  y <- x1;
+else
+  y <- x2;
+\end{Verbatim}
+\end{quote}
+%
+The reason the functional versions are slower is that they evaluate
+all of their arguments; the step function approach is particularly
+slow as it also introduces arithmetic operations.  The overhead will
+be more noticeable if \code{c}, \code{x1} or \code{x2}
+are parameters (including transformed parameters and local variables
+that depend on parameters) or if \code{x1} and \code{x2} are
+complicated expressions rather than constants or simple variables.  
+
+\emph{Warning: } \ If \code{y} is a parameter (including transformed
+parameters and local variables in model blocks) and any of \code{c},
+\code{x1}, or \code{x2} is a parameter, then all of the above
+approaches introduce the same discontinuities into the derivative of
+\code{y} with respect to the parameter arguments.
 
 
 \section{Real-Valued Arithmetic Operators}\label{real-valued-arithmetic-operators.section}

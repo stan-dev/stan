@@ -527,21 +527,20 @@ Suppose the executable is in file \code{my\_model} and the data is in
 file \code{my\_data}, both in the current working directory.  To
 generate samples from a data set using the default settings, use one
 of the following, depending on platform.
-%
-\subsubsection{Windows}
-%
-\begin{quote}
-\begin{Verbatim}[fontshape=sl]
-> my_model sample data file=my_data
-\end{Verbatim}
-\end{quote}
-%
 
 \subsubsection{Mac OS and Linux}
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
 > ./my_model sample data file=my_data
+\end{Verbatim}
+\end{quote}
+
+\subsubsection{Windows}
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> my_model sample data file=my_data
 \end{Verbatim}
 \end{quote}
 %
@@ -578,9 +577,14 @@ The backslash (\code{\textbackslash}) indicates that the big command
 continues on the next display line; the blank line at the end that
 returns control to the prompt. The ampersand (\code{\&}) at the end of
 the nested command pushes each process into the background, so that
-the loop can continue without waiting for the current chain to
-finish. This example requires several command-line options that are
-explained in further detail in the next subsection.
+the loop can continue without waiting for the current chain to finish.
+The \code{id} value makes sure that a non-overlapping set of random
+numbers are used for each chain.  The \code{refresh} option being set
+to 0 turns off output; this is not necessary, but if output is used,
+it will be interleaved for all chains running concurrently.  Also note
+that the output file is explicitly specified, with the variable
+\code{\$i} being used to ensure the output file name for each chain is
+unique.
 
 \subsubsection{Windows}
 
@@ -589,8 +593,8 @@ snippet above
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-> for /l %x in (1, 1, 4) do start /b model  sample  ^
-   random seed=12345 id=%x data file=my_data        ^
+> for /l %x in (1, 1, 4) do start /b model  sample   ^
+   random seed=12345 id=%x data file=my_data         ^
    output file=samples%x.csv refresh=0
 \end{Verbatim}
 \end{quote}
@@ -2193,7 +2197,11 @@ samples1.csv	samples2.csv	samples3.csv
 \end{Verbatim}
 \end{quote}
 %
-The result of \code{bin/print} is displayed in \reffigure{bin-print-eg}.
+The result of \code{bin/print} is displayed in
+\reffigure{bin-print-eg}.%
+%
+\footnote{RStan's and PyStan's output analysis print may be different
+  than that in the command-line version of Stan.}
 %
 \begin{figure}
 \begin{Verbatim}[fontsize=\footnotesize]
@@ -2215,7 +2223,8 @@ The result of \code{bin/print} is displayed in \reffigure{bin-print-eg}.
    Samples were drawn using hmc with nuts.
    For each parameter, N_Eff is a crude measure of effective sample size,
    and R_hat is the potential scale reduction factor on split chains (at 
-   convergence, R_hat=1).\end{Verbatim}
+   convergence, R_hat=1).
+\end{Verbatim}
 \vspace*{-6pt}
 \caption{\small\it Example output from \code{bin/print}.  The model
   parameters are \code{alpha} and \code{beta}.  The values for each
