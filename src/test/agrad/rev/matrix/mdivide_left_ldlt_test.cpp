@@ -71,7 +71,9 @@ TEST(AgradRevMatrix,mdivide_left_ldlt_val) {
     3.0, 7.0;
   
   ldlt_Av.compute(Av);
+  ASSERT_TRUE(ldlt_Av.success());
   ldlt_Ad.compute(Ad);
+  ASSERT_TRUE(ldlt_Ad.success());
 
   I = mdivide_left_ldlt(ldlt_Av,Av);
   EXPECT_NEAR(1.0,I(0,0).val(),1.0E-12);
@@ -121,6 +123,7 @@ TEST(AgradRevMatrix,mdivide_left_ldlt_grad_vv) {
       }
 
       ldlt_A.compute(A);
+      ASSERT_TRUE(ldlt_A.success());
 
       C = mdivide_left_ldlt(ldlt_A,B);
       AVEC x = createAVEC(A(0,0),A(1,0),A(0,1),A(1,1),
@@ -163,6 +166,7 @@ TEST(AgradRevMatrix,mdivide_left_ldlt_finite_diff_vv) {
 
   stan::math::LDLT_factor<double,-1,-1> ldlt_Ad;
   ldlt_Ad.compute(Ad);
+  ASSERT_TRUE(ldlt_Ad.success());
   
   for (size_type i = 0; i < Bd.rows(); i++) {
     for (size_type j = 0; j < Bd.cols(); j++) {
@@ -175,6 +179,7 @@ TEST(AgradRevMatrix,mdivide_left_ldlt_finite_diff_vv) {
       A(0,1) = A(1,0);
       stan::math::LDLT_factor<stan::agrad::var,-1,-1> ldlt_A;
       ldlt_A.compute(A);
+      ASSERT_TRUE(ldlt_A.success());
       
       C = mdivide_left_ldlt(ldlt_A,B);
       AVEC x = createAVEC(A(0,0),A(0,1),A(0,1),A(1,1),
@@ -220,6 +225,7 @@ TEST(AgradRevMatrix,mdivide_left_ldlt_grad_dv) {
       }
       
       ldlt_Ad.compute(Ad);
+      ASSERT_TRUE(ldlt_Ad.success());
       C = mdivide_left_ldlt(ldlt_Ad,B);
       AVEC x = createAVEC(B(0,0),B(1,0),B(0,1),B(1,1));
       
@@ -254,6 +260,7 @@ TEST(AgradRevMatrix,mdivide_left_ldlt_finite_diff_dv) {
 
   stan::math::LDLT_factor<double,-1,-1> ldlt_Ad;
   ldlt_Ad.compute(Ad);
+  ASSERT_TRUE(ldlt_Ad.success());
   
   for (size_type i = 0; i < Bd.rows(); i++) {
     for (size_type j = 0; j < Bd.cols(); j++) {
@@ -307,6 +314,7 @@ TEST(AgradRevMatrix,mdivide_left_ldlt_grad_vd) {
       }
       
       ldlt_A.compute(A);
+      ASSERT_TRUE(ldlt_A.success());
       C = mdivide_left_ldlt(ldlt_A,Bd);
       AVEC x = createAVEC(A(0,0),A(1,0),A(0,1),A(1,1));
       
@@ -341,6 +349,7 @@ TEST(AgradRevMatrix,mdivide_left_ldlt_finite_diff_vd) {
 
   stan::math::LDLT_factor<double,-1,-1> ldlt_Ad;
   ldlt_Ad.compute(Ad);
+  ASSERT_TRUE(ldlt_Ad.success());
   
   for (size_type i = 0; i < Bd.rows(); i++) {
     for (size_type j = 0; j < Bd.cols(); j++) {
@@ -352,6 +361,7 @@ TEST(AgradRevMatrix,mdivide_left_ldlt_finite_diff_vd) {
       A(0,1) = A(1,0);
       stan::math::LDLT_factor<stan::agrad::var,-1,-1> ldlt_A;
       ldlt_A.compute(A);
+      ASSERT_TRUE(ldlt_A.success());
       
       C = mdivide_left_ldlt(ldlt_A,Bd);
       AVEC x = createAVEC(A(0,0),A(0,1),A(0,1),A(1,1));

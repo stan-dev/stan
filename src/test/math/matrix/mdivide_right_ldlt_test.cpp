@@ -11,6 +11,8 @@ TEST(MathMatrix,mdivide_right_ldlt_val) {
         3.0, 7.0;
 
   ldlt_Ad.compute(Ad);
+  ASSERT_TRUE(ldlt_Ad.success());
+
   I = mdivide_right_ldlt(Ad,ldlt_Ad);
   EXPECT_NEAR(1.0,I(0,0),1.0E-12);
   EXPECT_NEAR(0.0,I(0,1),1.0E-12);

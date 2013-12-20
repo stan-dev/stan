@@ -50,7 +50,9 @@ TEST(AgradRevMatrix, trace_gen_inv_quad_form_ldlt) {
   stan::math::LDLT_factor<double,-1,-1> ldlt_ad;
   stan::math::LDLT_factor<stan::agrad::var,-1,-1> ldlt_av;
   ldlt_av.compute(av);
+  ASSERT_TRUE(ldlt_av.success());
   ldlt_ad.compute(ad);
+  ASSERT_TRUE(ldlt_ad.success());
   
   // double-double-double
   res = trace_gen_inv_quad_form_ldlt(cd,ldlt_ad,bd);
@@ -121,6 +123,7 @@ TEST(AgradRevMatrix, trace_gen_inv_quad_form_ldlt_grad_dvv) {
 
   stan::math::LDLT_factor<stan::agrad::var,-1,-1> ldlt_av;
   ldlt_av.compute(av);
+  ASSERT_TRUE(ldlt_av.success());
 
   matrix_d ainv(ad.inverse());
   matrix_d dqda(-ainv*bd*cd.transpose()*bd.transpose()*ainv);
@@ -180,6 +183,7 @@ TEST(AgradRevMatrix, trace_gen_inv_quad_form_ldlt_grad_vdv) {
 
   stan::math::LDLT_factor<double,-1,-1> ldlt_ad;
   ldlt_ad.compute(ad);
+  ASSERT_TRUE(ldlt_ad.success());
 
   matrix_d ainv(ad.inverse());
   matrix_d dqdb(ainv*bd*cd.transpose() + ainv.transpose()*bd*cd);
@@ -238,6 +242,7 @@ TEST(AgradRevMatrix, trace_gen_inv_quad_form_ldlt_grad_vvd) {
 
   stan::math::LDLT_factor<stan::agrad::var,-1,-1> ldlt_av;
   ldlt_av.compute(av);
+  ASSERT_TRUE(ldlt_av.success());
 
   matrix_d ainv(ad.inverse());
   matrix_d dqda(-ainv*bd*cd.transpose()*bd.transpose()*ainv);
@@ -292,6 +297,7 @@ TEST(AgradRevMatrix, trace_gen_inv_quad_form_ldlt_grad_vdd) {
 
   stan::math::LDLT_factor<double,-1,-1> ldlt_ad;
   ldlt_ad.compute(ad);
+  ASSERT_TRUE(ldlt_ad.success());
 
   matrix_d ainv(ad.inverse());
   matrix_d dqdc(bd.transpose()*ainv.transpose()*bd);
@@ -341,6 +347,7 @@ TEST(AgradRevMatrix, trace_gen_inv_quad_form_ldlt_grad_dvd) {
 
   stan::math::LDLT_factor<stan::agrad::var,-1,-1> ldlt_av;
   ldlt_av.compute(av);
+  ASSERT_TRUE(ldlt_av.success());
 
   matrix_d ainv(ad.inverse());
   matrix_d dqda(-ainv*bd*cd.transpose()*bd.transpose()*ainv);
@@ -390,6 +397,7 @@ TEST(AgradRevMatrix, trace_gen_inv_quad_form_ldlt_grad_ddv) {
 
   stan::math::LDLT_factor<double,-1,-1> ldlt_ad;
   ldlt_ad.compute(ad);
+  ASSERT_TRUE(ldlt_ad.success());
 
   matrix_d ainv(ad.inverse());
   matrix_d dqdb(ainv*bd*cd.transpose() + ainv.transpose()*bd*cd);
@@ -446,6 +454,7 @@ TEST(AgradRevMatrix, trace_gen_inv_quad_form_ldlt_grad_vvv) {
 
   stan::math::LDLT_factor<stan::agrad::var,-1,-1> ldlt_av;
   ldlt_av.compute(av);
+  ASSERT_TRUE(ldlt_av.success());
 
   matrix_d ainv(ad.inverse());
   matrix_d dqda(-ainv*bd*cd.transpose()*bd.transpose()*ainv);
@@ -507,6 +516,7 @@ TEST(AgradRevMatrix, trace_gen_inv_quad_form_ldlt_grad_dvv_basic) {
         3.0,  2.0, 1.0, 112.0;
   cd << 1, 2, 3, 4;
   ldlt_av.compute(av);
+  ASSERT_TRUE(ldlt_av.success());
   result = trace_gen_inv_quad_form_ldlt(cd,ldlt_av,bv);
   
   vars.clear();
@@ -583,6 +593,7 @@ TEST(AgradRevMatrix, trace_gen_inv_quad_form_ldlt_grad_vdv_basic) {
   cv << 1, 2, 3, 4;
 
   ldlt_ad.compute(ad);
+  ASSERT_TRUE(ldlt_ad.success());
   result = trace_gen_inv_quad_form_ldlt(cv,ldlt_ad,bv);
   
   vars.clear();
@@ -663,6 +674,7 @@ TEST(AgradRevMatrix, trace_gen_inv_quad_form_ldlt_grad_vvd_basic) {
   cv << 1, 2, 3, 4;
 
   ldlt_av.compute(av);
+  ASSERT_TRUE(ldlt_av.success());
   result = trace_gen_inv_quad_form_ldlt(cv,ldlt_av,bd);
   
   vars.clear();
@@ -743,6 +755,7 @@ TEST(AgradRevMatrix, trace_gen_inv_quad_form_ldlt_grad_vdd_basic) {
   cv << 1, 2, 3, 4;
 
   ldlt_ad.compute(ad);
+  ASSERT_TRUE(ldlt_ad.success());
   result = trace_gen_inv_quad_form_ldlt(cv,ldlt_ad,bd);
   
   vars.clear();
@@ -813,6 +826,7 @@ TEST(AgradRevMatrix, trace_gen_inv_quad_form_ldlt_grad_dvd_basic) {
   cd << 1, 2, 3, 4;
 
   ldlt_av.compute(av);
+  ASSERT_TRUE(ldlt_av.success());
   result = trace_gen_inv_quad_form_ldlt(cd,ldlt_av,bd);
   
   vars.clear();
@@ -885,6 +899,7 @@ TEST(AgradRevMatrix, trace_gen_inv_quad_form_ldlt_grad_ddv_basic) {
          -3, -3,
           5,  2;
   ldlt_ad.compute(ad);
+  ASSERT_TRUE(ldlt_ad.success());
   result = trace_gen_inv_quad_form_ldlt(cd,ldlt_ad,bv);
   
   vars.clear();
@@ -958,6 +973,7 @@ TEST(AgradRevMatrix, trace_gen_inv_quad_form_ldlt_grad_vvv_basic) {
   cv << 1, 2, 3, 4;
 
   ldlt_av.compute(av);
+  ASSERT_TRUE(ldlt_av.success());
   result = trace_gen_inv_quad_form_ldlt(cv,ldlt_av,bv);
   
   vars.clear();

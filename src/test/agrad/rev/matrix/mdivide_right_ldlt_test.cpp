@@ -37,6 +37,7 @@ TEST(AgradRevMatrix, mdivide_right_ldlt_vv) {
       5, 4,  5, -5,  20;
     LDLT_factor<var,-1,-1> ldlt_A;
     ldlt_A.compute(A);
+    ASSERT_TRUE(ldlt_A.success());
     x = mdivide_right_ldlt(b, ldlt_A);
     x_val = stan::agrad::value_of(x);
     ASSERT_EQ(expected.size(), x_val.size());
@@ -123,6 +124,7 @@ TEST(AgradRevMatrix, mdivide_right_ldlt_vd) {
       5, 4,  5, -5,  20;
     LDLT_factor<double,-1,-1> ldlt_A;
     ldlt_A.compute(A);
+    ASSERT_TRUE(ldlt_A.success());
     x = mdivide_right_ldlt(b, ldlt_A);
     x_val = stan::agrad::value_of(x);
     ASSERT_EQ(expected.size(), x_val.size());
@@ -202,6 +204,7 @@ TEST(AgradRevMatrix, mdivide_right_ldlt_dv) {
       5, 4,  5, -5,  20;
     LDLT_factor<var,-1,-1> ldlt_A;
     ldlt_A.compute(A);
+    ASSERT_TRUE(ldlt_A.success());
     x = mdivide_right_ldlt(b, ldlt_A);
     x_val = stan::agrad::value_of(x);
     ASSERT_EQ(expected.size(), x_val.size());

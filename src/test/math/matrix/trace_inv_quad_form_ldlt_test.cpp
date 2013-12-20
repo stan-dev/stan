@@ -16,6 +16,7 @@ TEST(MathMatrix, trace_inv_quad_form_ldlt) {
     -3, -3,
     5,  2;
   ldlt_A.compute(A);
+  ASSERT_TRUE(ldlt_A.success());
 
   EXPECT_FLOAT_EQ(1439.1061766207,
                   trace_inv_quad_form_ldlt(ldlt_A,B));

@@ -29,6 +29,7 @@ TEST(MathMatrix, trace_gen_inv_quad_form_ldlt) {
 
   stan::math::LDLT_factor<double,-1,-1> ldlt_A;
   ldlt_A.compute(A);
+  ASSERT_TRUE(ldlt_A.success());
   
   EXPECT_FLOAT_EQ(stan::math::trace(gen_inv_quad_form),
                   stan::math::trace_gen_inv_quad_form_ldlt(D, ldlt_A, B));

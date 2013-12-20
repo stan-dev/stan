@@ -27,6 +27,7 @@ TEST(AgradRevMatrix,log_determinant_ldlt_diff) {
   matrix_v v2(2,2);
   v2 << x2[0], x2[1], x2[2], x2[3];
   ldlt_v.compute(v2);
+  ASSERT_TRUE(ldlt_v.success());
   AVAR det2 = log_determinant_ldlt(ldlt_v);
   std::vector<double> g2;
   det2.grad(x2,g2);
@@ -44,6 +45,7 @@ TEST(AgradRevMatrix,log_determinant_ldlt) {
   matrix_v v(2,2);
   v << 1, 0, 0, 3;
   ldlt_v.compute(v);
+  ASSERT_TRUE(ldlt_v.success());
   
   AVAR f;
   AVEC v_vec = createAVEC(v(0,0), v(0,1), v(1,0), v(1,1));

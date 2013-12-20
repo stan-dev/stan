@@ -13,12 +13,14 @@ TEST(MathMatrix, log_deterimant_ldlt) {
 
   x << 2, 1, 1, 3;
   ldlt_x.compute(x);
+  ASSERT_TRUE(ldlt_x.success());
   
   EXPECT_FLOAT_EQ(log(fabs(determinant(x))),
                   stan::math::log_determinant_ldlt(ldlt_x));
 
   x << 1, 0, 0, 3;
   ldlt_x.compute(x);
+  ASSERT_TRUE(ldlt_x.success());
   EXPECT_FLOAT_EQ(log(3.0),
                   stan::math::log_determinant_ldlt(ldlt_x));
 }
