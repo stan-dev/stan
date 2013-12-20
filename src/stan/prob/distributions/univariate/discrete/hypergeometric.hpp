@@ -3,7 +3,7 @@
 
 #include <boost/math/distributions.hpp>
 #include <stan/prob/distributions/univariate/continuous/uniform.hpp>
-#include <stan/agrad.hpp>
+#include <stan/agrad/partials_vari.hpp>
 #include <stan/math.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/meta/traits.hpp>

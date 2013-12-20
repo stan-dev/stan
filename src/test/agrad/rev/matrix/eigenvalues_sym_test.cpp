@@ -1,8 +1,9 @@
-#include <stan/math/matrix/inverse.hpp>
+#include <stan/math/matrix/eigenvalues_sym.hpp>
+#include <stan/math/matrix/sum.hpp>
 #include <gtest/gtest.h>
 #include <test/agrad/util.hpp>
-#include <stan/agrad/agrad.hpp>
-#include <stan/agrad/matrix.hpp>
+#include <stan/agrad/rev.hpp>
+#include <stan/agrad/rev/matrix.hpp>
 
 TEST(AgradRevMatrix,eigenval_sum) {
   using stan::math::sum;

@@ -61,7 +61,7 @@ namespace stan {
         
         nuts_util util;
         
-        this->seed(init_sample.cont_params(), init_sample.disc_params());
+        this->seed(init_sample.cont_params());
         
         this->_hamiltonian.sample_p(this->_z, this->_rand_int);
         this->_hamiltonian.init(this->_z);
@@ -152,7 +152,7 @@ namespace stan {
         double accept_prob = util.sum_prob / static_cast<double>(util.n_tree);
         
         this->_z.ps_point::operator=(z_sample);
-        return sample(this->_z.q, this->_z.r, - this->_z.V, accept_prob);
+        return sample(this->_z.q, - this->_z.V, accept_prob);
         
       }
       

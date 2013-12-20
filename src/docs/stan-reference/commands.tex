@@ -527,21 +527,20 @@ Suppose the executable is in file \code{my\_model} and the data is in
 file \code{my\_data}, both in the current working directory.  To
 generate samples from a data set using the default settings, use one
 of the following, depending on platform.
-%
-\subsubsection{Windows}
-%
-\begin{quote}
-\begin{Verbatim}[fontshape=sl]
-> my_model sample data file=my_data
-\end{Verbatim}
-\end{quote}
-%
 
 \subsubsection{Mac OS and Linux}
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
 > ./my_model sample data file=my_data
+\end{Verbatim}
+\end{quote}
+
+\subsubsection{Windows}
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> my_model sample data file=my_data
 \end{Verbatim}
 \end{quote}
 %
@@ -578,9 +577,14 @@ The backslash (\code{\textbackslash}) indicates that the big command
 continues on the next display line; the blank line at the end that
 returns control to the prompt. The ampersand (\code{\&}) at the end of
 the nested command pushes each process into the background, so that
-the loop can continue without waiting for the current chain to
-finish. This example requires several command-line options that are
-explained in further detail in the next subsection.
+the loop can continue without waiting for the current chain to finish.
+The \code{id} value makes sure that a non-overlapping set of random
+numbers are used for each chain.  The \code{refresh} option being set
+to 0 turns off output; this is not necessary, but if output is used,
+it will be interleaved for all chains running concurrently.  Also note
+that the output file is explicitly specified, with the variable
+\code{\$i} being used to ensure the output file name for each chain is
+unique.
 
 \subsubsection{Windows}
 
@@ -589,8 +593,8 @@ snippet above
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-> for /l %x in (1, 1, 4) do start /b model  sample  ^
-   random seed=12345 id=%x data file=my_data        ^
+> for /l %x in (1, 1, 4) do start /b model  sample   ^
+   random seed=12345 id=%x data file=my_data         ^
    output file=samples%x.csv refresh=0
 \end{Verbatim}
 \end{quote}
@@ -699,19 +703,14 @@ The atomic elements of the hierarchy (i.e., those without
 corresponding values) are \textit{categorical arguments} (sometimes
 called ``flags'') which define self-contained categories of arguments.
 
-Arguments grouped within a category are not ordered with respect
-to each other.  For example, the following four commands all define
-the same configuration:%
+Stan's commands have more hierarchical structure than is typical of
+command line executables, which usually have at most two subgroups of
+commands.  Arguments grouped within a category are not ordered with
+respect to each other.  The only ordering is that the global options
+come before the method argument and subcommand-specific options after
+the method argument.  For example, the following four commands all
+define the same configuration:%
 %
-\footnote{
-  Stan's commands have more hierarchical structure than is typical of
-  command line executables, which usually have at most two subgroups
-  of commands.  For instance, the Git version control system has
-  global control arguments (e.g., username and password), then a
-  ``method'' specification (e.g., pull or commit), and then arguments
-  specific to the method.  The only ordering is that the global
-  options come before the method argument and subcommand-specific
-  options after the method argument.}
 \footnote{
 The backslash (\code{\textbackslash}) is used at the end of a line in
 a command to indicate that it continues on the next line.  The
@@ -764,11 +763,11 @@ causes the execution to immediately terminate.
 %
 \put(10, 460) { \makebox(50, 10)[l]{id, data, init} }
 %
-\put(0, 410) { \framebox(470, 45) }
+\put(0, 410) { \framebox(470, 45)\hss }
 \put(10, 440) { \makebox(50, 10)[l]{random} }
 \put(50, 420) { \makebox(50, 10)[l]{seed} }
 %
-\put(0, 360) { \framebox(470, 45) }
+\put(0, 360) { \framebox(470, 45)\hss }
 \put(10, 390) { \makebox(65, 10)[l]{output} }
 \put(50, 370) { \makebox(500, 10)[l]{file, diagnostic\_file, ... } } % refresh, save\_warmup} }
 %
@@ -778,19 +777,19 @@ causes the execution to immediately terminate.
 \put(20, 257.5) { \vector(1, 0){15} }
 \put(20, 307.5) { \vector(1, 0){15} }
 %
-\put(40, 285) { \framebox(430, 45) }
+\put(40, 285) { \framebox(430, 45)\hss }
 \put(50, 315) { \makebox(65, 10)[l]{ diagnose } }
 \put(90, 295) { \makebox(50, 10)[l]{ $\ldots$ } }
 %
-\put(40, 235) { \framebox(430, 45) }
+\put(40, 235) { \framebox(430, 45)\hss }
 \put(50, 265) { \makebox(63, 10)[l]{ optimize } }
 \put(90, 245) { \makebox(50, 10)[l]{ $\ldots$ } }
 %
-\put(40, 5) { \framebox(430, 225) }
+\put(40, 5) { \framebox(430, 225)\hss }
 \put(50, 215) { \makebox(55, 10)[l]{sample} }
 \put(90, 195) { \makebox(350, 10)[l]{num\_samples, num\_warmup, save\_warmup, thin} }
 %
-\put(80, 140) { \framebox(380, 45) }
+\put(80, 140) { \framebox(380, 45)\hss }
 \put(90, 170) { \makebox(55, 10)[l]{adapt} }
 \put(130, 150) { \makebox(50, 10)[l]{$\ldots$} }
 %
@@ -799,11 +798,11 @@ causes the execution to immediately terminate.
 \put(100, 87.5) { \vector(1, 0){15} }
 \put(100, 37.5) { \vector(1, 0){15} }
 %
-\put(120, 65) { \framebox(340, 45) }
+\put(120, 65) { \framebox(340, 45)\hss }
 \put(130, 95) { \makebox(55, 10)[l]{hmc} }
 \put(170, 75) { \makebox(50, 10)[l]{$\ldots$} }
 %
-\put(120, 15) { \framebox(340, 45) }
+\put(120, 15) { \framebox(340, 45)\hss }
 \put(130, 45) { \makebox(115, 10)[l]{ rw\_metropolis } }
 \put(170, 25) { \makebox(50, 10)[l]{ $\ldots$ } }
 \end{picture}
@@ -818,17 +817,17 @@ causes the execution to immediately terminate.
 
 \begin{figure}
 \setlength{\unitlength}{0.01in} 
-\centering
-\begin{picture}(480, 480)
+%\centering
+\begin{picture}(1000, 480)
 %
 \small\tt
 \put(10, 460) { \makebox(50, 10)[l]{id, data, init} }
 %
-\put(0, 410) { \framebox(470, 45) }
+\put(0, 410){ \framebox(470, 45) \hss}
 \put(10, 440) { \makebox(50, 10)[l]{random} }
 \put(50, 420) { \makebox(50, 10)[l]{seed} }
 %
-\put(0, 360) { \framebox(470, 45) }
+\put(0, 360) { \framebox(470, 45)\hss }
 \put(10, 390) { \makebox(65, 10)[l]{output} }
 \put(50, 370) { \makebox(450, 10)[l]{file, diagnostic\_file, ...} }  % refresh, ...
 %
@@ -838,19 +837,19 @@ causes the execution to immediately terminate.
 \put(20, 257.5) { \color{gray!30}\vector(1, 0){15} }
 \put(20, 307.5) { \color{gray!30}\vector(1, 0){15} }
 %
-\put(40, 285) { \color{gray!30}\framebox(430, 45) }
+\put(40, 285) { \color{gray!30}\framebox(430, 45)\hss }
 \put(50, 315) { \makebox(65, 10)[l]{ \textcolor{gray!30}{diagnose} } }
 \put(90, 295) { \makebox(50, 10)[l]{ \textcolor{gray!30}{$\ldots$} } }
 %
-\put(40, 235) { \color{gray!30}\framebox(430, 45) }
+\put(40, 235) { \color{gray!30}\framebox(430, 45)\hss }
 \put(50, 265) { \makebox(63, 10)[l]{ \textcolor{gray!30}{optimize} } }
 \put(90, 245) { \makebox(50, 10)[l]{ \textcolor{gray!30}{$\ldots$} } }
 %
-\put(40, 5) { \framebox(430, 225) }
+\put(40, 5) { \framebox(430, 225)\hss }
 \put(50, 215) { \makebox(55, 10)[l]{sample} }
 \put(90, 195) { \makebox(350, 10)[l]{num\_samples, num\_warmup, save\_warmup, thin} }
 %
-\put(80, 140) { \framebox(370, 45) }
+\put(80, 140) { \framebox(370, 45)\hss }
 \put(90, 170) { \makebox(55, 10)[l]{adapt} }
 \put(130, 150) { \makebox(50, 10)[l]{$\ldots$} }
 %
@@ -860,11 +859,11 @@ causes the execution to immediately terminate.
 \put(100, 87.5) { \vector(1, 0){15} }
 \put(100, 37.5) { \color{gray!30}\vector(1, 0){15} }
 %
-\put(120, 65) { \framebox(330, 45) }
+\put(120, 65) { \framebox(330, 45)\hss }
 \put(130, 95) { \makebox(55, 10)[l]{hmc} }
 \put(170, 75) { \makebox(50, 10)[l]{$\ldots$} }
 %
-\put(120, 15) { \color{gray!30}\framebox(330, 45) }
+\put(120, 15){ \color{gray!30}\framebox(330, 45)\hss }
 \put(130, 45) { \makebox(95, 10)[l]{ \textcolor{gray!30}{rw\_metropolis} } }
 \put(170, 25) { \makebox(50, 10)[l]{ \textcolor{gray!30}{$\ldots$} } }
 \end{picture}
@@ -1017,7 +1016,7 @@ may appear in any order.
 \centering
 \begin{picture}(1000, 200)
 %
-\footnotesize\tt
+\footnotesize
 \put(25, 20) { \framebox(75, 200)[c]{I} }
 \put(100, 20) { \framebox(25, 200)[c]{II} }
 \put(125, 20) { \framebox(50, 200)[c]{II} }
@@ -1025,16 +1024,17 @@ may appear in any order.
 \put(275, 20) { \framebox(200, 200)[c]{II} }
 \put(475, 20) { \framebox(400, 200)[c]{II} }
 \put(875, 20) { \framebox(50, 200)[c]{III} }
-\put(0, 20) { \vector(1, 0){1000} }
-\put(800, -10) { \makebox(200, 20)[l]{Iteration} }
+\put(25, 20) { \vector(1, 0){950} }
+\put(800, -10) { \makebox(200, 20)[l]{{\small Iteration}} }
 %
 \end{picture}
 \caption{\small\it Adaptation during warmup occurs in three stages: an initial
 fast adaptation interval (I), a series of expanding slow adaptation intervals (II), 
-and a final fast adaptation interval (III).  For HMC both the fast and slow intervals
+and a final fast adaptation interval (III).  For HMC, both the fast and slow intervals
 are used for adapting the step size, while the slow intervals are used for learning
-the (co)variance is necessitated by the metric.}
-    \label{adaptation.figure}
+the (co)variance necessitated by the metric.  Iteration numbering
+starts at 1 on the left side of the figure and increases to the right.}%
+\label{adaptation.figure}
 \end{figure}
 
 When adaptation is engaged the warmup period is split into three
@@ -1501,6 +1501,10 @@ subarguments of the top-level method.
 \end{description}
 
 \subsubsection{Initialization Arguments}
+
+Initialization is only applied to parameters defined in the parameters
+block.  Any initial values supplied for transformed parameters or
+generated quantities are ignored. 
 
 \begin{description}
 \hiercmdarg{}{init}{$$string$$}
@@ -2193,7 +2197,11 @@ samples1.csv	samples2.csv	samples3.csv
 \end{Verbatim}
 \end{quote}
 %
-The result of \code{bin/print} is displayed in \reffigure{bin-print-eg}.
+The result of \code{bin/print} is displayed in
+\reffigure{bin-print-eg}.%
+%
+\footnote{RStan's and PyStan's output analysis print may be different
+  than that in the command-line version of Stan.}
 %
 \begin{figure}
 \begin{Verbatim}[fontsize=\footnotesize]
@@ -2215,7 +2223,8 @@ The result of \code{bin/print} is displayed in \reffigure{bin-print-eg}.
    Samples were drawn using hmc with nuts.
    For each parameter, N_Eff is a crude measure of effective sample size,
    and R_hat is the potential scale reduction factor on split chains (at 
-   convergence, R_hat=1).\end{Verbatim}
+   convergence, R_hat=1).
+\end{Verbatim}
 \vspace*{-6pt}
 \caption{\small\it Example output from \code{bin/print}.  The model
   parameters are \code{alpha} and \code{beta}.  The values for each
@@ -2449,7 +2458,7 @@ matrix[M,N] b;
 The key to undertanding arrays is that the array indexing comes before
 any of the container indexing.  That is, an array of vectors is just
 that --- provide an index and get a vector.  See
-Section~\refsection{arrays-of-matrices} for more information on
+Section~\refsection{array-data-types} for more information on
 indexing and assignment.
 
 For the dump data format, the following declarations have the same
@@ -2539,7 +2548,7 @@ values in Stan.  R will write out the integer one million as
 \subsection{Infinite and Not-a-Number Values}
 
 Stan's reader supports infinite and not-a-number values for scalar
-quantities (see \refsection{real-data-type} for more information).
+quantities (see \refsection{numerical-data-types} for more information).
 Both infinite and not-a-number values are supported by Stan's
 dump-format readers.  
 %

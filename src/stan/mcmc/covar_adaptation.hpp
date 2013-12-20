@@ -17,7 +17,7 @@ namespace stan {
       
       covar_adaptation(int n): windowed_adaptation("covariance"), _estimator(n) {}
       
-      bool learn_covariance(Eigen::MatrixXd& covar, std::vector<double>& q) {
+      bool learn_covariance(Eigen::MatrixXd& covar, const Eigen::VectorXd& q) {
         
         if (adaptation_window()) _estimator.add_sample(q);
         

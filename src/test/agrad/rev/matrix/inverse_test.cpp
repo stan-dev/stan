@@ -1,8 +1,9 @@
 #include <stan/math/matrix/inverse.hpp>
 #include <gtest/gtest.h>
 #include <test/agrad/util.hpp>
-#include <stan/agrad/agrad.hpp>
-#include <stan/agrad/matrix.hpp>
+#include <stan/agrad/rev.hpp>
+#include <stan/agrad/rev/matrix.hpp>
+#include <stan/math/matrix/sum.hpp>
 
 TEST(AgradRevMatrix,inverse_val) {
   using stan::math::inverse;

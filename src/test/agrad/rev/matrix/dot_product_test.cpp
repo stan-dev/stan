@@ -1,7 +1,7 @@
 #include <stan/agrad/rev/matrix/dot_product.hpp>
 #include <gtest/gtest.h>
 #include <test/agrad/util.hpp>
-#include <stan/agrad/agrad.hpp>
+#include <stan/agrad/rev.hpp>
 
 TEST(AgradRevMatrix, dot_product_vector_vector) {
   using stan::math::vector_d;
@@ -240,3 +240,4 @@ TEST(AgradRevMatrix, dot_product_vd_vec) {
   EXPECT_EQ(grad[1], 2);
   EXPECT_EQ(grad[2], 3);
 }
+

@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <stan/prob/distributions/multivariate/discrete/multinomial.hpp>
 #include <boost/random/mersenne_twister.hpp>
-#include<boost/math/distributions.hpp>
+#include <boost/math/distributions.hpp>
 
 using Eigen::Matrix;
 using Eigen::Dynamic;

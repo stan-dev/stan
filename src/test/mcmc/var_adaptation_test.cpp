@@ -4,7 +4,7 @@
 TEST(McmcVarAdaptation, learn_variance) {
   
   const int n = 10;
-  std::vector<double> q(n, 0.0);
+  Eigen::VectorXd q = Eigen::VectorXd::Zero(n);
   Eigen::VectorXd var(Eigen::VectorXd::Zero(n));
   
   const int n_learn = 10;

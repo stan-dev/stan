@@ -2,12 +2,12 @@
 #include <gtest/gtest.h>
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
-#include <stan/agrad/fwd/sqrt.hpp>
-#include <stan/agrad/fwd/operator_multiplication.hpp>
-#include <stan/agrad/fwd/operator_addition.hpp>
-#include <stan/agrad/fwd/operator_division.hpp>
-#include <stan/agrad/fwd/operator_subtraction.hpp>
-#include <stan/agrad/var.hpp>
+#include <stan/agrad/fwd/functions/sqrt.hpp>
+#include <stan/agrad/fwd/operators/operator_multiplication.hpp>
+#include <stan/agrad/fwd/operators/operator_addition.hpp>
+#include <stan/agrad/fwd/operators/operator_division.hpp>
+#include <stan/agrad/fwd/operators/operator_subtraction.hpp>
+#include <stan/agrad/rev.hpp>
 #include <test/agrad/util.hpp>
 
 TEST(AgradFwdMatrixSD, fd_vector) {
