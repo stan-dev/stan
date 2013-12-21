@@ -24,6 +24,33 @@ namespace stan {
      * LDLT_factor are responsible for calling success() to
      * check whether the factorization has succeeded.  Use of an LDLT_factor
      * object (e.g., in mdivide_left_ldlt) is undefined if success() is false.
+     *
+     * It's usage pattern is:
+     *
+     * ~~~
+     * Eigen::Matrix<T,R,C> A1, A2;
+     *
+     * LDLT_factor<T,R,C> ldlt_A1(A1);
+     * LDLT_factor<T,R,C> ldlt_A2;
+     * ldlt_A2.compute(A2);
+     * ~~~
+     *
+     * Now, the caller should check that ldlt_A1.success() and ldlt_A2.success()
+     * are true or abort accordingly.  Alternatively, call check_ldlt_factor().
+     *
+     * Note that ldlt_A1 and ldlt_A2 are completely equivalent.  They simply 
+     * demonstrate two different ways to construct the factorization.
+     *
+     * Now, the caller can use the LDLT_factor objects as needed.  For instance
+     *
+     * ~~~
+     * x1 = mdivide_left_ldlt(ldlt_A1,b1);
+     * x2 = mdivide_right_ldlt(b2,ldlt_A2);
+     *
+     * d1 = log_determinant_ldlt(ldlt_A1);
+     * d2 = log_determinant_ldlt(ldlt_A2);
+     * ~~~
+     *
      **/
     template<int R, int C>
     class LDLT_factor<double,R,C> {

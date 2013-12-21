@@ -15,10 +15,25 @@ namespace stan {
       public:
         virtual ~mdivide_left_ldlt_alloc() {}
         
+        /**
+         * This share_ptr is used to prevent copying the LDLT factorizations
+         * for mdivide_left_ldlt(ldltA,b) when ldltA is a LDLT_factor<double>.
+         * The pointer is shared with the LDLT_factor<double> class.
+         **/
         boost::shared_ptr< Eigen::LDLT< Eigen::Matrix<double,R1,C1> > > _ldltP;
         Eigen::Matrix<double,R2,C2> C_;
       };
       
+      /**
+       * The vari for mdivide_left_ldlt(A,b) which handles the chain() call
+       * for all elements of the result.  This vari follows the pattern
+       * used in the other matrix operations where there is one "master"
+       * vari whose value is never used and a large number of "slave" varis
+       * whose chain() functions are never called because their adjoints are
+       * set by the "mater" vari.
+       *
+       * This class handles the var/var case.
+       **/
       template <int R1,int C1,int R2,int C2>
       class mdivide_left_ldlt_vv_vari : public vari {
       public:
@@ -85,6 +100,16 @@ namespace stan {
         }
       };
 
+      /**
+       * The vari for mdivide_left_ldlt(A,b) which handles the chain() call
+       * for all elements of the result.  This vari follows the pattern
+       * used in the other matrix operations where there is one "master"
+       * vari whose value is never used and a large number of "slave" varis
+       * whose chain() functions are never called because their adjoints are
+       * set by the "mater" vari.
+       *
+       * This class handles the double/var case.
+       **/
       template <int R1,int C1,int R2,int C2>
       class mdivide_left_ldlt_dv_vari : public vari {
       public:
@@ -147,6 +172,16 @@ namespace stan {
         }
       };
 
+      /**
+       * The vari for mdivide_left_ldlt(A,b) which handles the chain() call
+       * for all elements of the result.  This vari follows the pattern
+       * used in the other matrix operations where there is one "master"
+       * vari whose value is never used and a large number of "slave" varis
+       * whose chain() functions are never called because their adjoints are
+       * set by the "mater" vari.
+       *
+       * This class handles the var/double case.
+       **/
       template <int R1,int C1,int R2,int C2>
       class mdivide_left_ldlt_vd_vari : public vari {
       public:
@@ -203,7 +238,6 @@ namespace stan {
      * @return x = b A^-1, solution of the linear system.
      * @throws std::domain_error if rows of b don't match the size of A.
      */
-
     template <int R1,int C1,int R2,int C2>
     inline Eigen::Matrix<var,R1,C2>
     mdivide_left_ldlt(const stan::math::LDLT_factor<var,R1,C1> &A,
@@ -222,6 +256,13 @@ namespace stan {
       return res;
     }
 
+    /**
+     * Returns the solution of the system Ax=b given an LDLT_factor of A
+     * @param A LDLT_factor
+     * @param b Right hand side matrix or vector.
+     * @return x = b A^-1, solution of the linear system.
+     * @throws std::domain_error if rows of b don't match the size of A.
+     */
     template <int R1,int C1,int R2,int C2>
     inline Eigen::Matrix<var,R1,C2>
     mdivide_left_ldlt(const stan::math::LDLT_factor<var,R1,C1> &A,
@@ -240,6 +281,13 @@ namespace stan {
       return res;
     }
     
+    /**
+     * Returns the solution of the system Ax=b given an LDLT_factor of A
+     * @param A LDLT_factor
+     * @param b Right hand side matrix or vector.
+     * @return x = b A^-1, solution of the linear system.
+     * @throws std::domain_error if rows of b don't match the size of A.
+     */
     template <int R1,int C1,int R2,int C2>
     inline Eigen::Matrix<var,R1,C2>
     mdivide_left_ldlt(const stan::math::LDLT_factor<double,R1,C1> &A,

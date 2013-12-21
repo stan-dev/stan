@@ -6,11 +6,16 @@
 
 namespace stan {
   namespace agrad {
-
     /**
-     * FIX_DOX
-     */
-
+     * This object stores the actual (double typed) LDLT factorization of
+     * an Eigen::Matrix<var> along with pointers to its vari's which allow the
+     * *_ldlt functions to save memory.  It is derived from a chainable_alloc
+     * object so that it is allocated on the stack but does not have a chain()
+     * function called.
+     *
+     * This class should only be instantiated as part of an LDLT_factor object
+     * and is only used in *_ldlt functions.
+     **/
     template<int R, int C>
     class LDLT_alloc : public chainable_alloc {
     public:
@@ -18,7 +23,12 @@ namespace stan {
       LDLT_alloc(const Eigen::Matrix<var,R,C> &A) : N_(0) {
         compute(A);
       }
-        
+      
+      /**
+       * Compute the LDLT factorization and store pointets to the 
+       * vari's of the matrix entries to be used when chain() is
+       * called elsewhere.
+       **/
       inline void compute(const Eigen::Matrix<var,R,C> &A) {
         Eigen::Matrix<double,R,C> Ad(A.rows(),A.cols());
 
@@ -34,6 +44,8 @@ namespace stan {
           
         _ldlt.compute(Ad);
       }
+
+      /// Compute the log(abs(det(A))).  This is just a convenience function.
       inline double log_abs_det() const {
         return _ldlt.vectorD().array().log().sum();
       }
