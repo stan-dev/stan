@@ -61,6 +61,12 @@ PATH_SEPARATOR = /
 -include make/os_detect
 
 ##
+# Tell make the default way to compile a function_signatures*.o file.
+##
+src/test/gm/model_specs/compiled/function_signatures/%.o : src/test/gm/model_specs/compiled/function_signatures/%.cpp
+	$(COMPILE.c) -O0 -fsyntax-only $(OUTPUT_OPTION) $<
+
+##
 # Tell make the default way to compile a .o file.
 ##
 %.o : %.cpp

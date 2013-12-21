@@ -9,6 +9,9 @@ $(patsubst %.stan,%,$(wildcard $(addsuffix .stan,$(MAKECMDGOALS)))) : % : %.o bi
 	@echo '--- Linking C++ model ---'
 	$(LINK.c) -O$O $(OUTPUT_OPTION) $< $(LDLIBS)
 
+src/test/gm/model_specs/compiled/function_signatures/% : src/test/gm/model_specs/compiled/function_signatures/%.o
+	@echo ''
+
 src/%: src/%.o bin/libstan.a
 	@echo ''
 	@echo '--- Linking C++ model ---'
