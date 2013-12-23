@@ -1,6 +1,7 @@
 #include <stan/prob/distributions/univariate/continuous/normal.hpp>
-#include <boost/math/distributions.hpp>
 #include <gtest/gtest.h>
+#include <stan/agrad/rev.hpp>
+#include <boost/math/distributions.hpp>
 #include <boost/random/mersenne_twister.hpp>
 
 TEST(ProbDistributionsNormal, intVsDouble) {
@@ -52,7 +53,7 @@ TEST(ProbDistributionsNormal, chiSquareGoodnessFitTest) {
   int count = 0;
   int bin [K];
   double expect [K];
-  for(int i = 0 ; i < K; i++){
+  for(int i = 0 ; i < K; i++) {
     bin[i] = 0;
     expect[i] = N / K;
   }

@@ -132,6 +132,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </li>
 <li>chain()
 : <a class="el" href="classstan_1_1agrad_1_1precomp__v__vari.html#a009196476cbeca0b4721a2615e275d10">stan::agrad::precomp_v_vari</a>
+, <a class="el" href="classstan_1_1agrad_1_1stored__gradient__vari.html#ae97f9740598ac7be4c3af5769a54ac19">stan::agrad::stored_gradient_vari</a>
 , <a class="el" href="classstan_1_1agrad_1_1vari.html#aa0a84901028b116fad7020b30b926b98">stan::agrad::vari</a>
 , <a class="el" href="classstan_1_1agrad_1_1partials__vari.html#a0fa792b38fdadfd389dcffcea597deeb">stan::agrad::partials_vari</a>
 , <a class="el" href="classstan_1_1agrad_1_1chainable.html#a4d1b4d61c1b10d6da4ababce3d276592">stan::agrad::chainable</a>
@@ -149,7 +150,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 : <a class="el" href="classstan_1_1io_1_1reader.html#a9572cd028cf0d073c45ab83ae6f4477e">stan::io::reader&lt; T &gt;</a>
 </li>
 <li>cholesky_factor_constrain()
-: <a class="el" href="classstan_1_1io_1_1reader.html#a6c6bee8c526c8d114c95646f171413cc">stan::io::reader&lt; T &gt;</a>
+: <a class="el" href="classstan_1_1io_1_1reader.html#ac49f77d0cd4d89f3d06ac62515cfa809">stan::io::reader&lt; T &gt;</a>
 </li>
 <li>cholesky_factor_unconstrain()
 : <a class="el" href="classstan_1_1io_1_1writer.html#ae96ed09cbcd87375c712e20503894264">stan::io::writer&lt; T &gt;</a>
@@ -180,8 +181,17 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 : <a class="el" href="classstan_1_1math_1_1_l_d_l_t__factor_3_01stan_1_1agrad_1_1var_00_01_r_00_01_c_01_4.html#adea90c563014600ac9d7aa05056db56d">stan::math::LDLT_factor&lt; stan::agrad::var, R, C &gt;</a>
 , <a class="el" href="classstan_1_1math_1_1_l_d_l_t__factor_3_01double_00_01_r_00_01_c_01_4.html#add76e21a65bdd840ca67d24531612573">stan::math::LDLT_factor&lt; double, R, C &gt;</a>
 </li>
+<li>compute_criterion()
+: <a class="el" href="classstan_1_1mcmc_1_1unit__e__nuts.html#ab61a9ee4db3845a88adc78249e35c170">stan::mcmc::unit_e_nuts&lt; M, BaseRNG &gt;</a>
+, <a class="el" href="classstan_1_1mcmc_1_1base__nuts.html#ac2961f3ce35af570405291a8011e1064">stan::mcmc::base_nuts&lt; M, P, H, I, BaseRNG &gt;</a>
+, <a class="el" href="classstan_1_1mcmc_1_1dense__e__nuts.html#aa23ebe0b61e0ed91a9a94457e69e08da">stan::mcmc::dense_e_nuts&lt; M, BaseRNG &gt;</a>
+, <a class="el" href="classstan_1_1mcmc_1_1diag__e__nuts.html#a61f9db95ebdc67274cdea0f479dc0a5e">stan::mcmc::diag_e_nuts&lt; M, BaseRNG &gt;</a>
+</li>
 <li>compute_indent()
 : <a class="el" href="classstan_1_1gm_1_1argument.html#a1df06fb3f558fc0eecfce30d38f77359">stan::gm::argument</a>
+</li>
+<li>compute_next_window()
+: <a class="el" href="classstan_1_1mcmc_1_1windowed__adaptation.html#a99adff4a3380c627160d995b5584bf8e">stan::mcmc::windowed_adaptation</a>
 </li>
 <li>conditional_statement()
 : <a class="el" href="structstan_1_1gm_1_1conditional__statement.html#a1abc13ef1fe45721706610334a3fc111">stan::gm::conditional_statement</a>
@@ -200,8 +210,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 : <a class="el" href="structstan_1_1gm_1_1contains__nonparam__var.html#a6beb41e5c41785733e1cc6881eba82a9">stan::gm::contains_nonparam_var</a>
 </li>
 <li>contains_r()
-: <a class="el" href="classstan_1_1io_1_1var__context.html#abaa6a87ecb4d45c29386f0de57b330f4">stan::io::var_context</a>
-, <a class="el" href="classstan_1_1io_1_1dump.html#ac531d67fb8a74300ebbe014dfe367706">stan::io::dump</a>
+: <a class="el" href="classstan_1_1io_1_1dump.html#ac531d67fb8a74300ebbe014dfe367706">stan::io::dump</a>
+, <a class="el" href="classstan_1_1io_1_1var__context.html#abaa6a87ecb4d45c29386f0de57b330f4">stan::io::var_context</a>
 </li>
 <li>contains_var()
 : <a class="el" href="structstan_1_1gm_1_1contains__var.html#a8d00ba5b2f7fcecec2baca23d1ddb200">stan::gm::contains_var</a>
@@ -216,19 +226,19 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 : <a class="el" href="classstan_1_1io_1_1reader.html#aa410515341701109fb937c14b101e20d">stan::io::reader&lt; T &gt;</a>
 </li>
 <li>corr_matrix_constrain()
-: <a class="el" href="classstan_1_1io_1_1reader.html#a75eb056f8f7b1032865feb97f506e3e6">stan::io::reader&lt; T &gt;</a>
+: <a class="el" href="classstan_1_1io_1_1reader.html#ab23e0b88e39d354121b66e6823e1cac9">stan::io::reader&lt; T &gt;</a>
 </li>
 <li>corr_matrix_unconstrain()
 : <a class="el" href="classstan_1_1io_1_1writer.html#af26ec20d15ff3a57ab0e1a87579decbb">stan::io::writer&lt; T &gt;</a>
 </li>
 <li>corr_matrix_var_decl()
-: <a class="el" href="structstan_1_1gm_1_1corr__matrix__var__decl.html#acb8f9bbb7cbfcc2a5cae3b6b6e5aa3a3">stan::gm::corr_matrix_var_decl</a>
+: <a class="el" href="structstan_1_1gm_1_1corr__matrix__var__decl.html#a208b78416bf4d23b7b093014c19c03d2">stan::gm::corr_matrix_var_decl</a>
 </li>
 <li>corr_unconstrain()
 : <a class="el" href="classstan_1_1io_1_1writer.html#a00cb858ddd90f1af498f1dfe552f2658">stan::io::writer&lt; T &gt;</a>
 </li>
 <li>correlation()
-: <a class="el" href="classstan_1_1mcmc_1_1chains.html#aa5f25ea09b915b3c768947c3e3e03bf5">stan::mcmc::chains&lt; RNG &gt;</a>
+: <a class="el" href="classstan_1_1mcmc_1_1chains.html#aaf76107a82d21ec2a1b49e436faa459b">stan::mcmc::chains&lt; RNG &gt;</a>
 </li>
 <li>cov_matrix()
 : <a class="el" href="classstan_1_1io_1_1reader.html#a6b0b034457a37f2eb7c27cec9b8e600d">stan::io::reader&lt; T &gt;</a>
@@ -240,10 +250,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 : <a class="el" href="classstan_1_1io_1_1writer.html#a2f9bb2387b552311a613cc00391e6bb4">stan::io::writer&lt; T &gt;</a>
 </li>
 <li>cov_matrix_var_decl()
-: <a class="el" href="structstan_1_1gm_1_1cov__matrix__var__decl.html#aedec8ffe9e2f319afd7eb903e3b17dc6">stan::gm::cov_matrix_var_decl</a>
+: <a class="el" href="structstan_1_1gm_1_1cov__matrix__var__decl.html#aebf75d147fbbf2ee7e8d52aa48a0fd76">stan::gm::cov_matrix_var_decl</a>
 </li>
 <li>covar_adaptation()
-: <a class="el" href="classstan_1_1mcmc_1_1covar__adaptation.html#a87cd16e565dcd7c17e1e02f4917ce85f">stan::mcmc::covar_adaptation</a>
+: <a class="el" href="classstan_1_1mcmc_1_1covar__adaptation.html#a32edd1badb6af5fad1348168ab4d5d91">stan::mcmc::covar_adaptation</a>
 </li>
 <li>covariance()
 : <a class="el" href="classstan_1_1mcmc_1_1chains.html#a1611771bf5fa3c15e528d26836aa2ac5">stan::mcmc::chains&lt; RNG &gt;</a>

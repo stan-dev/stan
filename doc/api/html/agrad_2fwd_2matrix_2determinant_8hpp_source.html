@@ -97,41 +97,46 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;vector&gt;</span></div>
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;boost/math/tools/promotion.hpp&gt;</span></div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="_eigen_8hpp.html">stan/math/matrix/Eigen.hpp</a>&gt;</span></div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="fwd_2fvar_8hpp.html">stan/agrad/fwd/fvar.hpp</a>&gt;</span></div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="fvar_8hpp.html">stan/agrad/fwd/fvar.hpp</a>&gt;</span></div>
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="agrad_2fwd_2matrix_2typedefs_8hpp.html">stan/agrad/fwd/matrix/typedefs.hpp</a>&gt;</span></div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="math_2matrix_2multiply_8hpp.html">stan/math/matrix/multiply.hpp</a>&gt;</span></div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;</div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="keyword">namespace </span>stan {</div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;  <span class="keyword">namespace </span>agrad {</div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;    </div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T, <span class="keywordtype">int</span> R,<span class="keywordtype">int</span> C&gt;</div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;    <span class="keyword">inline</span> </div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;    fvar&lt;T&gt;</div>
-<div class="line"><a name="l00017"></a><span class="lineno"><a class="code" href="namespacestan_1_1agrad.html#aa27b1abc14538bd9946ad1d6d1e8e60a">   17</a></span>&#160;    <a class="code" href="namespacestan_1_1agrad.html#aa27b1abc14538bd9946ad1d6d1e8e60a">determinant</a>(<span class="keyword">const</span> Eigen::Matrix&lt;<a class="code" href="structstan_1_1agrad_1_1fvar.html">fvar&lt;T&gt;</a>, R, C&gt;&amp; m) {</div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;      <a class="code" href="namespacestan_1_1math.html#a80e2967cc986a918329c7e226aa97d35">stan::math::validate_square</a>(m, <span class="stringliteral">&quot;determinant&quot;</span>);</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;      Eigen::Matrix&lt;T,R,C&gt; m_deriv(m.rows(), m.cols());</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;      Eigen::Matrix&lt;T,R,C&gt; m_val(m.rows(), m.cols());</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;      Eigen::Matrix&lt;T,R,C&gt; m_inv(m.rows(), m.cols());</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;      <a class="code" href="structstan_1_1agrad_1_1fvar.html">fvar&lt;T&gt;</a> result;</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;      <span class="keywordflow">for</span>(<a class="code" href="namespacestan_1_1agrad.html#aeae9e6e94d5656d748136a7c4780856e">size_type</a> i = 0; i &lt; m.rows(); i++) {</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;        <span class="keywordflow">for</span>(<a class="code" href="namespacestan_1_1agrad.html#aeae9e6e94d5656d748136a7c4780856e">size_type</a> j = 0; j &lt; m.cols(); j++) {</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;          m_deriv(i,j) = m(i,j).<a class="code" href="structstan_1_1agrad_1_1fvar.html#a189f3e99b3716c92b73b43e709245787">d_</a>;</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;          m_val(i,j) = m(i,j).val_;</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;        }</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;      }</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;      m_inv = m_val.inverse();</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;      m_deriv = <a class="code" href="namespacestan_1_1math.html#a919d4a6495c489841df3d0423200b147" title="Return specified matrix multiplied by specified scalar.">stan::math::multiply</a>(m_inv, m_deriv);</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;      result.val_ = m_val.determinant();</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;      result.d_ = m_val.determinant() * m_deriv.trace();</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;      <span class="keywordflow">return</span> result;</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    }</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;  }</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;}</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="agrad_2fwd_2matrix_2multiply_8hpp.html">stan/agrad/fwd/matrix/multiply.hpp</a>&gt;</span></div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="math_2matrix_2inverse_8hpp.html">stan/math/matrix/inverse.hpp</a>&gt;</span></div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="agrad_2fwd_2matrix_2inverse_8hpp.html">stan/agrad/fwd/matrix/inverse.hpp</a>&gt;</span></div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;</div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="keyword">namespace </span>stan {</div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;  <span class="keyword">namespace </span>agrad {</div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;    </div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T, <span class="keywordtype">int</span> R,<span class="keywordtype">int</span> C&gt;</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;    <span class="keyword">inline</span> </div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;    fvar&lt;T&gt;</div>
+<div class="line"><a name="l00020"></a><span class="lineno"><a class="code" href="namespacestan_1_1agrad.html#aa27b1abc14538bd9946ad1d6d1e8e60a">   20</a></span>&#160;    <a class="code" href="namespacestan_1_1agrad.html#aa27b1abc14538bd9946ad1d6d1e8e60a">determinant</a>(<span class="keyword">const</span> Eigen::Matrix&lt;<a class="code" href="structstan_1_1agrad_1_1fvar.html">fvar&lt;T&gt;</a>, R, C&gt;&amp; m) {</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;      <span class="keyword">using</span> <a class="code" href="namespacestan_1_1math.html#a919d4a6495c489841df3d0423200b147" title="Return specified matrix multiplied by specified scalar.">stan::math::multiply</a>;</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;      <a class="code" href="namespacestan_1_1math.html#a80e2967cc986a918329c7e226aa97d35">stan::math::validate_square</a>(m, <span class="stringliteral">&quot;determinant&quot;</span>);</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;      Eigen::Matrix&lt;T,R,C&gt; m_deriv(m.rows(), m.cols());</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;      Eigen::Matrix&lt;T,R,C&gt; m_val(m.rows(), m.cols());</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;      Eigen::Matrix&lt;T,R,C&gt; m_inv(m.rows(), m.cols());</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;      <a class="code" href="structstan_1_1agrad_1_1fvar.html">fvar&lt;T&gt;</a> result;</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;      <span class="keywordflow">for</span>(<a class="code" href="namespacestan_1_1agrad.html#aeae9e6e94d5656d748136a7c4780856e">size_type</a> i = 0; i &lt; m.rows(); i++) {</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;        <span class="keywordflow">for</span>(<a class="code" href="namespacestan_1_1agrad.html#aeae9e6e94d5656d748136a7c4780856e">size_type</a> j = 0; j &lt; m.cols(); j++) {</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;          m_deriv(i,j) = m(i,j).<a class="code" href="structstan_1_1agrad_1_1fvar.html#a189f3e99b3716c92b73b43e709245787">d_</a>;</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;          m_val(i,j) = m(i,j).val_;</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;        }</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;      }</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;      m_inv = <a class="code" href="namespacestan_1_1math.html#a461598c914f5634fa5057da7a817803d" title="Returns the inverse of the specified matrix.">stan::math::inverse</a>(m_val);</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;      m_deriv = <a class="code" href="namespacestan_1_1agrad.html#af5dfb2569a8f7f2f95830d0f0bb5bd40">multiply</a>(m_inv, m_deriv);</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;      result.val_ = m_val.determinant();</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;      result.d_ = result.val_ * m_deriv.trace();</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;      <span class="keywordflow">return</span> result;</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    }</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  }</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;}</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
 <hr/>
 <div class="conents" style="font-size:80%;">

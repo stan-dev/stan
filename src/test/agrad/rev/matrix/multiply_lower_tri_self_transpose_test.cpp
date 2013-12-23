@@ -1,7 +1,7 @@
 #include <stan/agrad/rev/matrix/multiply_lower_tri_self_transpose.hpp>
 #include <gtest/gtest.h>
 #include <test/agrad/util.hpp>
-#include <stan/agrad/agrad.hpp>
+#include <stan/agrad/rev.hpp>
 #include <stan/agrad/rev/jacobian.hpp>
 
 

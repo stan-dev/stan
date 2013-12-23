@@ -5,6 +5,7 @@ var searchData=
   ['param_5fvar_5fdecls_5fr',['param_var_decls_r',['../structstan_1_1gm_1_1program__grammar.html#a84e0908a657b1bc073abd5a134e53bc8',1,'stan::gm::program_grammar']]],
   ['parameter_5fdecl_5f',['parameter_decl_',['../structstan_1_1gm_1_1program.html#aa468fc1c6838a4a02031d41391d0feee',1,'stan::gm::program']]],
   ['parameter_5forigin',['parameter_origin',['../namespacestan_1_1gm.html#a15fbbd2865f57526a81f238175751b83',1,'stan::gm']]],
+  ['partials_5f',['partials_',['../classstan_1_1agrad_1_1stored__gradient__vari.html#a6cc0dc9d0c215f4eedd8684f8d9d04ec',1,'stan::agrad::stored_gradient_vari']]],
   ['patch_5fversion',['PATCH_VERSION',['../namespacestan.html#ae9ae37a39676ea8ca7cbfeffce12f938',1,'stan']]],
   ['positive_5fordered_5fdecl_5fr',['positive_ordered_decl_r',['../structstan_1_1gm_1_1var__decls__grammar.html#a18e4327f093a7e92cc4b2bca94d50470',1,'stan::gm::var_decls_grammar']]],
   ['print_5fstatement_5fr',['print_statement_r',['../structstan_1_1gm_1_1statement__grammar.html#a481ea25baea5242da113c3e80b830bf8',1,'stan::gm::statement_grammar']]],

@@ -527,21 +527,20 @@ Suppose the executable is in file \code{my\_model} and the data is in
 file \code{my\_data}, both in the current working directory.  To
 generate samples from a data set using the default settings, use one
 of the following, depending on platform.
-%
-\subsubsection{Windows}
-%
-\begin{quote}
-\begin{Verbatim}[fontshape=sl]
-> my_model sample data file=my_data
-\end{Verbatim}
-\end{quote}
-%
 
 \subsubsection{Mac OS and Linux}
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
 > ./my_model sample data file=my_data
+\end{Verbatim}
+\end{quote}
+
+\subsubsection{Windows}
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> my_model sample data file=my_data
 \end{Verbatim}
 \end{quote}
 %
@@ -578,9 +577,14 @@ The backslash (\code{\textbackslash}) indicates that the big command
 continues on the next display line; the blank line at the end that
 returns control to the prompt. The ampersand (\code{\&}) at the end of
 the nested command pushes each process into the background, so that
-the loop can continue without waiting for the current chain to
-finish. This example requires several command-line options that are
-explained in further detail in the next subsection.
+the loop can continue without waiting for the current chain to finish.
+The \code{id} value makes sure that a non-overlapping set of random
+numbers are used for each chain.  The \code{refresh} option being set
+to 0 turns off output; this is not necessary, but if output is used,
+it will be interleaved for all chains running concurrently.  Also note
+that the output file is explicitly specified, with the variable
+\code{\$i} being used to ensure the output file name for each chain is
+unique.
 
 \subsubsection{Windows}
 
@@ -589,8 +593,8 @@ snippet above
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-> for /l %x in (1, 1, 4) do start /b model  sample  ^
-   random seed=12345 id=%x data file=my_data        ^
+> for /l %x in (1, 1, 4) do start /b model  sample   ^
+   random seed=12345 id=%x data file=my_data         ^
    output file=samples%x.csv refresh=0
 \end{Verbatim}
 \end{quote}
@@ -699,19 +703,14 @@ The atomic elements of the hierarchy (i.e., those without
 corresponding values) are \textit{categorical arguments} (sometimes
 called ``flags'') which define self-contained categories of arguments.
 
-Arguments grouped within a category are not ordered with respect
-to each other.  For example, the following four commands all define
-the same configuration:%
+Stan's commands have more hierarchical structure than is typical of
+command line executables, which usually have at most two subgroups of
+commands.  Arguments grouped within a category are not ordered with
+respect to each other.  The only ordering is that the global options
+come before the method argument and subcommand-specific options after
+the method argument.  For example, the following four commands all
+define the same configuration:%
 %
-\footnote{
-  Stan's commands have more hierarchical structure than is typical of
-  command line executables, which usually have at most two subgroups
-  of commands.  For instance, the Git version control system has
-  global control arguments (e.g., username and password), then a
-  ``method'' specification (e.g., pull or commit), and then arguments
-  specific to the method.  The only ordering is that the global
-  options come before the method argument and subcommand-specific
-  options after the method argument.}
 \footnote{
 The backslash (\code{\textbackslash}) is used at the end of a line in
 a command to indicate that it continues on the next line.  The
@@ -764,14 +763,13 @@ causes the execution to immediately terminate.
 %
 \put(10, 460) { \makebox(50, 10)[l]{id, data, init} }
 %
-\put(0, 410) { \framebox(470, 45) }
+\put(0, 410) { \framebox(470, 45)\hss }
 \put(10, 440) { \makebox(50, 10)[l]{random} }
 \put(50, 420) { \makebox(50, 10)[l]{seed} }
 %
-\put(0, 360) { \framebox(470, 45) }
+\put(0, 360) { \framebox(470, 45)\hss }
 \put(10, 390) { \makebox(65, 10)[l]{output} }
-\put(50, 370) { \makebox(500, 10)[l]{file, append\_sample,
-    diagnostic\_file, append\_diagnostic, ... } } % refresh, save\_warmup} }
+\put(50, 370) { \makebox(500, 10)[l]{file, diagnostic\_file, ... } } % refresh, save\_warmup} }
 %
 \put(10, 340) { \makebox(50, 10)[l]{method} }
 \put(20, 117.5) { \line(0, 1){212.5} }
@@ -779,19 +777,19 @@ causes the execution to immediately terminate.
 \put(20, 257.5) { \vector(1, 0){15} }
 \put(20, 307.5) { \vector(1, 0){15} }
 %
-\put(40, 285) { \framebox(430, 45) }
+\put(40, 285) { \framebox(430, 45)\hss }
 \put(50, 315) { \makebox(65, 10)[l]{ diagnose } }
 \put(90, 295) { \makebox(50, 10)[l]{ $\ldots$ } }
 %
-\put(40, 235) { \framebox(430, 45) }
+\put(40, 235) { \framebox(430, 45)\hss }
 \put(50, 265) { \makebox(63, 10)[l]{ optimize } }
 \put(90, 245) { \makebox(50, 10)[l]{ $\ldots$ } }
 %
-\put(40, 5) { \framebox(430, 225) }
+\put(40, 5) { \framebox(430, 225)\hss }
 \put(50, 215) { \makebox(55, 10)[l]{sample} }
 \put(90, 195) { \makebox(350, 10)[l]{num\_samples, num\_warmup, save\_warmup, thin} }
 %
-\put(80, 140) { \framebox(380, 45) }
+\put(80, 140) { \framebox(380, 45)\hss }
 \put(90, 170) { \makebox(55, 10)[l]{adapt} }
 \put(130, 150) { \makebox(50, 10)[l]{$\ldots$} }
 %
@@ -800,11 +798,11 @@ causes the execution to immediately terminate.
 \put(100, 87.5) { \vector(1, 0){15} }
 \put(100, 37.5) { \vector(1, 0){15} }
 %
-\put(120, 65) { \framebox(340, 45) }
+\put(120, 65) { \framebox(340, 45)\hss }
 \put(130, 95) { \makebox(55, 10)[l]{hmc} }
 \put(170, 75) { \makebox(50, 10)[l]{$\ldots$} }
 %
-\put(120, 15) { \framebox(340, 45) }
+\put(120, 15) { \framebox(340, 45)\hss }
 \put(130, 45) { \makebox(115, 10)[l]{ rw\_metropolis } }
 \put(170, 25) { \makebox(50, 10)[l]{ $\ldots$ } }
 \end{picture}
@@ -819,20 +817,19 @@ causes the execution to immediately terminate.
 
 \begin{figure}
 \setlength{\unitlength}{0.01in} 
-\centering
-\begin{picture}(480, 480)
+%\centering
+\begin{picture}(1000, 480)
 %
 \small\tt
 \put(10, 460) { \makebox(50, 10)[l]{id, data, init} }
 %
-\put(0, 410) { \framebox(470, 45) }
+\put(0, 410){ \framebox(470, 45) \hss}
 \put(10, 440) { \makebox(50, 10)[l]{random} }
 \put(50, 420) { \makebox(50, 10)[l]{seed} }
 %
-\put(0, 360) { \framebox(470, 45) }
+\put(0, 360) { \framebox(470, 45)\hss }
 \put(10, 390) { \makebox(65, 10)[l]{output} }
-\put(50, 370) { \makebox(450, 10)[l]{file, append\_sample,
-    diagnostic\_file, append\_diagnostic, ...} }  % refresh, ...
+\put(50, 370) { \makebox(450, 10)[l]{file, diagnostic\_file, ...} }  % refresh, ...
 %
 \put(10, 340) { \makebox(50, 10)[l]{method} }
 \put(20, 117.5) { \line(0, 1){212.5} }
@@ -840,19 +837,19 @@ causes the execution to immediately terminate.
 \put(20, 257.5) { \color{gray!30}\vector(1, 0){15} }
 \put(20, 307.5) { \color{gray!30}\vector(1, 0){15} }
 %
-\put(40, 285) { \color{gray!30}\framebox(430, 45) }
+\put(40, 285) { \color{gray!30}\framebox(430, 45)\hss }
 \put(50, 315) { \makebox(65, 10)[l]{ \textcolor{gray!30}{diagnose} } }
 \put(90, 295) { \makebox(50, 10)[l]{ \textcolor{gray!30}{$\ldots$} } }
 %
-\put(40, 235) { \color{gray!30}\framebox(430, 45) }
+\put(40, 235) { \color{gray!30}\framebox(430, 45)\hss }
 \put(50, 265) { \makebox(63, 10)[l]{ \textcolor{gray!30}{optimize} } }
 \put(90, 245) { \makebox(50, 10)[l]{ \textcolor{gray!30}{$\ldots$} } }
 %
-\put(40, 5) { \framebox(430, 225) }
+\put(40, 5) { \framebox(430, 225)\hss }
 \put(50, 215) { \makebox(55, 10)[l]{sample} }
 \put(90, 195) { \makebox(350, 10)[l]{num\_samples, num\_warmup, save\_warmup, thin} }
 %
-\put(80, 140) { \framebox(370, 45) }
+\put(80, 140) { \framebox(370, 45)\hss }
 \put(90, 170) { \makebox(55, 10)[l]{adapt} }
 \put(130, 150) { \makebox(50, 10)[l]{$\ldots$} }
 %
@@ -862,11 +859,11 @@ causes the execution to immediately terminate.
 \put(100, 87.5) { \vector(1, 0){15} }
 \put(100, 37.5) { \color{gray!30}\vector(1, 0){15} }
 %
-\put(120, 65) { \framebox(330, 45) }
+\put(120, 65) { \framebox(330, 45)\hss }
 \put(130, 95) { \makebox(55, 10)[l]{hmc} }
 \put(170, 75) { \makebox(50, 10)[l]{$\ldots$} }
 %
-\put(120, 15) { \color{gray!30}\framebox(330, 45) }
+\put(120, 15){ \color{gray!30}\framebox(330, 45)\hss }
 \put(130, 45) { \makebox(95, 10)[l]{ \textcolor{gray!30}{rw\_metropolis} } }
 \put(170, 25) { \makebox(50, 10)[l]{ \textcolor{gray!30}{$\ldots$} } }
 \end{picture}
@@ -1014,6 +1011,59 @@ may appear in any order.
 
 \subsubsection{Sampling Adaptation-Specific Parameters}
 
+\begin{figure}
+\setlength{\unitlength}{0.005in} 
+\centering
+\begin{picture}(1000, 200)
+%
+\footnotesize
+\put(25, 20) { \framebox(75, 200)[c]{I} }
+\put(100, 20) { \framebox(25, 200)[c]{II} }
+\put(125, 20) { \framebox(50, 200)[c]{II} }
+\put(175, 20) { \framebox(100, 200)[c]{II} }
+\put(275, 20) { \framebox(200, 200)[c]{II} }
+\put(475, 20) { \framebox(400, 200)[c]{II} }
+\put(875, 20) { \framebox(50, 200)[c]{III} }
+\put(25, 20) { \vector(1, 0){950} }
+\put(800, -10) { \makebox(200, 20)[l]{{\small Iteration}} }
+%
+\end{picture}
+\caption{\small\it Adaptation during warmup occurs in three stages: an initial
+fast adaptation interval (I), a series of expanding slow adaptation intervals (II), 
+and a final fast adaptation interval (III).  For HMC, both the fast and slow intervals
+are used for adapting the step size, while the slow intervals are used for learning
+the (co)variance necessitated by the metric.  Iteration numbering
+starts at 1 on the left side of the figure and increases to the right.}%
+\label{adaptation.figure}
+\end{figure}
+
+When adaptation is engaged the warmup period is split into three
+stages (Figure \ref{adaptation.figure}), with two \textit{fast} intervals
+surrounding a series of growing \textit{slow} intervals.  Here fast
+and slow refer to parameters that adapt using local and global
+information, respectively; the Hamiltonian Monte Carlo samplers,
+for example, define the step size as a fast parameter and 
+the (co)variance as a slow parameter.  The size of the the initial
+and final fast intervals and the initial size of the slow interval
+are all customizable, although user-specified values may be modified 
+slightly in order to ensure alignment with the warmup period.
+
+The motivation behind this partitioning of the warmup period is to
+allow for more robust adaptation.  In the initial fast interval the
+chain is allowed to converge towards the typical set,%
+%
+\footnote{The typical set is a concept borrowed from information
+theory and refers to the neighborhood (or neighborhoods in multimodal models)
+of significant posterior probability mass through which the Markov chain
+will travel in equilibrium.}
+%
+with only parameters that can learn from local information adapted.
+After this initial stage parameters that require global information,
+for example (co)variances, are estimated in a series of expanding,
+memoryless windows; often fast parameters will be adapted here
+as well.  Lastly the fast parameters are allowed to adapt to the final 
+update of the slow parameters.
+
 Currently all \Stan sampling algorithms utilize dual averaging to
 optimize the step size (this optimization during adaptation of the
 sampler should not be confused with running Stan's optimization method).
@@ -1024,7 +1074,10 @@ efficacy of the optimization is sensitive to the value of these
 parameters, and we do not recommend changing the defaults without
 experience with the dual averaging algorithm.  For more information,
 see the discussion of dual averaging in \citep{Hoffman-Gelman:2011,
-  Hoffman-Gelman:2013}.
+ Hoffman-Gelman:2013}.
+  
+Variances or covariances are estimated using Welford accumulators
+to avoid a loss of precision over many floating point operations.
 
 The following subarguments are introduced by the categorical argument
 \code{adapt}.  Each subargument must contiguously follow \code{adapt},
@@ -1048,7 +1101,7 @@ though they may appear in any order.
       \hiercmdarg{\indentarrow\indentarrow\indentarrow}{delta}{$$double$$}
         {Adaptation target acceptance statistic}
         {Valid values: \  $0 < \mbox{\code{delta}} < 1$}
-        {Defaults to \code{0.65}}
+        {Defaults to \code{0.8}}
 %
       \hiercmdarg{\indentarrow\indentarrow\indentarrow}{kappa}{$$double$$}
         {Adaptation relaxation exponent}
@@ -1060,11 +1113,26 @@ though they may appear in any order.
         {Valid values: \  $0 < \mbox{\code{t0}}$}
         {Defaults to \code{10}}
 %
+      \hiercmdarg{\indentarrow\indentarrow\indentarrow}{init\_buffer}{$$unsigned int$$}
+        {Width of initial fast adaptation interval}
+        {Valid values: \ All}
+        {Defaults to \code{75}}
+%
+      \hiercmdarg{\indentarrow\indentarrow\indentarrow}{term\_buffer}{$$unsigned int$$}
+        {Width of final fast adaptation interval}
+        {Valid values: \ All}
+        {Defaults to \code{50}}
+%
+      \hiercmdarg{\indentarrow\indentarrow\indentarrow}{window}{$$unsigned int$$}
+        {Initial width of slow adaptation interval}
+        {Valid values: \ All}
+        {Defaults to \code{25}}
+%
 \end{description}
 %
 By setting the acceptance statistic \code{delta} to a value closer to
 1 (its value must be strictly less than 1 and its default value is
-0.65), adaptation will be forced to use smaller step sizes.  This can
+0.8), adaptation will be forced to use smaller step sizes.  This can
 improve sampling efficiency (effective samples per iteration) at the
 cost of increased iteration times.  Raising the value of \code{delta}
 will also allow some models that would otherwise get stuck overcome
@@ -1387,6 +1455,17 @@ only diagnostic is gradients of the log probability function.
 %
       \hiershortcmd{\indentarrow\indentarrow\indentarrow}{\farg{gradient}}
         {Check model gradient against finite differences}
+        {Valid subarguments: \code{epsilon}, \code{error}}
+%
+        \hiercmdarg{\indentarrow\indentarrow\indentarrow\indentarrow}{epsilon}{$$real$$}
+        {Finite difference step size}
+	    {Valid values:\ $0 < \mbox{\code{epsilon}}$}
+	    {Defaults to \code{1e-6}}
+%
+        \hiercmdarg{\indentarrow\indentarrow\indentarrow\indentarrow}{error}{$$real$$}
+       {Error threshold}
+	   {Valid values:\ $0 < \mbox{\code{error}}$}
+	   {Defaults to \code{1e-6}}
 %
 \end{description}
 
@@ -1422,6 +1501,10 @@ subarguments of the top-level method.
 \end{description}
 
 \subsubsection{Initialization Arguments}
+
+Initialization is only applied to parameters defined in the parameters
+block.  Any initial values supplied for transformed parameters or
+generated quantities are ignored. 
 
 \begin{description}
 \hiercmdarg{}{init}{$$string$$}
@@ -1461,28 +1544,18 @@ subarguments of the top-level method.
 \begin{description}
 \hierlongcmd{}{{\bfseries output}}
   {File output options}
-  {Valid subarguments: \code{file, append\_sample, diagnostic\_file,
-      \\ \hspace*{24pt} append\_diagnostic, refresh}}
+  {Valid subarguments: \code{file, diagnostic\_file,
+      \\ \hspace*{24pt}, refresh}}
 %
   \hiercmdarg{\indentarrow}{file}{$$string$$}
     {Output file}
-    {Valid values: \  Path to existing file}
-    {Defaults to \code{samples.csv}}
-%
-  \hiercmdarg{\indentarrow}{append\_sample}{$$boolean$$}
-    {Append sample output to existing file?}
-    {Valid values: \ \code{0, 1}}
-    {Defaults to \code{0}}
+    {Valid values: \  Valid path}
+    {Defaults to \code{output.csv}}
 %
   \hiercmdarg{\indentarrow}{diagnostic\_file}{$$string$$}
     {Auxiliary output file for diagnostic information}
-    {Valid values: \  Path to existing file}
+    {Valid values: \  Valid path}
     {Defaults to empty path}
-%
-  \hiercmdarg{\indentarrow}{append\_diagnostic}{$$boolean$$}
-    {Append diagnostic output to existing file?}
-    {Valid values: \ \code{0, 1}}
-    {Defaults to \code{0}}
 %
   \hiercmdarg{\indentarrow}{refresh}{$$int$$}
     {Number of interations between screen updates}
@@ -1879,9 +1952,7 @@ for Stan.  The full set of configuration options is in
              [random seed=<int>]                        \
              [output                                    \
                   [file=<string>]                       \
-                  [append_sample=<boolean>]             \
                   [diagnostic_file=<string>]            \
-                  [append_diagnostic=<boolean>]         \
                   [refresh=<int>] ]
 \end{Verbatim}
 \end{quote}
@@ -1942,9 +2013,7 @@ interdependence.
              [random seed=<int>]                        \
              [output                                    \
                   [file=<string>]                       \
-                  [append_sample=<boolean>]             \
                   [diagnostic_file=<string>]            \
-                  [append_diagnostic=<boolean>]         \
                   [refresh=<int>] ]
 \end{Verbatim}
 \end{quote}
@@ -1981,9 +2050,7 @@ skeleton for BFGS is in \reffigure{bfgs-command}.
              [random seed=<int>]                        \
              [output                                    \
                   [file=<string>]                       \
-                  [append_sample=<boolean>]             \
                   [diagnostic_file=<string>]            \
-                  [append_diagnostic=<boolean>]         \
                   [refresh=<int>] ]
 \end{Verbatim}
 \end{quote}
@@ -2013,9 +2080,7 @@ identical to that for BFGS other than the algorithm name.
              [random seed=<int>]                        \
              [output                                    \
                   [file=<string>]                       \
-                  [append_sample=<boolean>]             \
                   [diagnostic_file=<string>]            \
-                  [append_diagnostic=<boolean>]         \
                   [refresh=<int>] ]
 \end{Verbatim}
 \end{quote}
@@ -2045,9 +2110,7 @@ Nesterov's dual averaging.
              [random seed=<int>]                        \
              [output                                    \
                   [file=<string>]                       \
-                  [append_sample=<boolean>]             \
                   [diagnostic_file=<string>]            \
-                  [append_diagnostic=<boolean>]         \
                   [refresh=<int>] ]
 \end{Verbatim}
 \end{quote}
@@ -2069,6 +2132,8 @@ simple, and shown in \reffigure{diagnostic-command}.
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
 > ./my_model diagnose                  \
                  [test=gradient]       \
+                     [epsilon=<real>]  \
+                     [error=<real>]    \
              [data file=<string>]      \
              [init=<string>]           \
              [random seed=<int>]       \
@@ -2132,7 +2197,11 @@ samples1.csv	samples2.csv	samples3.csv
 \end{Verbatim}
 \end{quote}
 %
-The result of \code{bin/print} is displayed in \reffigure{bin-print-eg}.
+The result of \code{bin/print} is displayed in
+\reffigure{bin-print-eg}.%
+%
+\footnote{RStan's and PyStan's output analysis print may be different
+  than that in the command-line version of Stan.}
 %
 \begin{figure}
 \begin{Verbatim}[fontsize=\footnotesize]
@@ -2147,13 +2216,15 @@ The result of \code{bin/print} is displayed in \reffigure{bin-print-eg}.
    accept_stat__   0.88  5.6e-03  1.8e-01  0.51  0.95   1.0   1000    16881   1.00
    stepsize__      0.30  1.3e-15  8.9e-16  0.30  0.30  0.30   0.50      8.5   1.00
    treedepth__      1.4  2.6e-02  8.0e-01  0.00   1.0   2.0    946    15978   1.00
+   n_divergent__    1.4  0.0e+00  0.0e+00  0.00   0.0   0.0   1000    16949   1.00
    alpha             17  1.8e+00  2.5e+01   1.9   9.5    50    181     3054   1.00
-   beta              10  1.1e+00  1.4e+01   1.2   6.2    31    181     3057    1.0
+   beta              10  1.1e+00  1.4e+01   1.2   6.2    31    181     3057   1.00
 
    Samples were drawn using hmc with nuts.
    For each parameter, N_Eff is a crude measure of effective sample size,
    and R_hat is the potential scale reduction factor on split chains (at 
-   convergence, R_hat=1).\end{Verbatim}
+   convergence, R_hat=1).
+\end{Verbatim}
 \vspace*{-6pt}
 \caption{\small\it Example output from \code{bin/print}.  The model
   parameters are \code{alpha} and \code{beta}.  The values for each
@@ -2168,7 +2239,10 @@ The result of \code{bin/print} is displayed in \reffigure{bin-print-eg}.
   step size used by NUTS in its Hamiltonian simulation, and
   \code{treedepth\_\_} is the depth of tree used by NUTS, which is the
   log (base 2) of the number of leapfrog steps taken during the
-  Hamiltonian simulation.  }\label{bin-print-eg.figure}
+  Hamiltonian simulation.  \code{n\_divergent\_\_} gives the number
+  of leapfrog iterations with diverging error; because NUTS terminates
+  at the first divergent iteration this should always be either 0 or 1.}
+\label{bin-print-eg.figure}
 \end{figure}
 %\end{quote}
 %
@@ -2384,7 +2458,7 @@ matrix[M,N] b;
 The key to undertanding arrays is that the array indexing comes before
 any of the container indexing.  That is, an array of vectors is just
 that --- provide an index and get a vector.  See
-Section~\refsection{arrays-of-matrices} for more information on
+Section~\refsection{array-data-types} for more information on
 indexing and assignment.
 
 For the dump data format, the following declarations have the same
@@ -2474,7 +2548,7 @@ values in Stan.  R will write out the integer one million as
 \subsection{Infinite and Not-a-Number Values}
 
 Stan's reader supports infinite and not-a-number values for scalar
-quantities (see \refsection{real-data-type} for more information).
+quantities (see \refsection{numerical-data-types} for more information).
 Both infinite and not-a-number values are supported by Stan's
 dump-format readers.  
 %

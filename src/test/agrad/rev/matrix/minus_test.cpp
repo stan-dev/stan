@@ -3,7 +3,7 @@
 #include <test/agrad/util.hpp>
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/agrad/rev/matrix/typedefs.hpp>
-#include <stan/agrad/agrad.hpp>
+#include <stan/agrad/rev.hpp>
 
 TEST(AgradRevMatrix, minus_scalar) {
   using stan::math::minus;

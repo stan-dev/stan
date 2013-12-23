@@ -96,7 +96,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor"></span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;vector&gt;</span></div>
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;boost/math/tools/promotion.hpp&gt;</span></div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="error__handling_8hpp.html">stan/math/error_handling.hpp</a>&gt;</span></div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="math_2error__handling_8hpp.html">stan/math/error_handling.hpp</a>&gt;</span></div>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="math_2matrix_2log__softmax_8hpp.html">stan/math/matrix/log_softmax.hpp</a>&gt;</span></div>
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="math_2functions_2log__sum__exp_8hpp.html">stan/math/functions/log_sum_exp.hpp</a>&gt;</span></div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="math_2matrix_2log__sum__exp_8hpp.html">stan/math/matrix/log_sum_exp.hpp</a>&gt;</span></div>
@@ -132,7 +132,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;        <span class="keywordflow">return</span> 0.0;</div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;        </div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;      <span class="comment">// FIXME:  wasteful vs. creating term (n-1) if not vectorized</span></div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;      <span class="keywordflow">return</span> beta(n-1) - <a class="code" href="namespacestan_1_1agrad.html#a4114c4822d5a54c7f1616bfc1dd87519">log_sum_exp</a>(beta); <span class="comment">// == log_softmax(beta)(n-1);</span></div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;      <span class="keywordflow">return</span> beta(n-1) - <a class="code" href="namespacestan_1_1agrad.html#a6cd9f7f4203d0dd299489be37445b5e1">log_sum_exp</a>(beta); <span class="comment">// == log_softmax(beta)(n-1);</span></div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    }</div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;</div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T_prob&gt;</div>

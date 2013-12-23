@@ -1,12 +1,12 @@
 var searchData=
 [
   ['d_5f',['d_',['../structstan_1_1agrad_1_1fvar.html#a189f3e99b3716c92b73b43e709245787',1,'stan::agrad::fvar::d_()'],['../agrad_2rev_2matrix_2ldlt_8hpp.html#a924a423d56557fce1ab298532ab03bb8',1,'D_():&#160;ldlt.hpp'],['../agrad_2rev_2matrix_2trace__gen__quad__form_8hpp.html#ab8b790d54b5b04c9c5dd60e063ed40bc',1,'D_():&#160;trace_gen_quad_form.hpp']]],
-  ['d_5fx1',['d_x1',['../structstan_1_1agrad_1_1_operands_and_partials.html#a212fa69d461115aec2465154b769655d',1,'stan::agrad::OperandsAndPartials']]],
-  ['d_5fx2',['d_x2',['../structstan_1_1agrad_1_1_operands_and_partials.html#a33f27f7ab50f2c103a2f1c5df96b26f1',1,'stan::agrad::OperandsAndPartials']]],
-  ['d_5fx3',['d_x3',['../structstan_1_1agrad_1_1_operands_and_partials.html#ac41da67e7f759808bac548129bd6524b',1,'stan::agrad::OperandsAndPartials']]],
-  ['d_5fx4',['d_x4',['../structstan_1_1agrad_1_1_operands_and_partials.html#af37cf36409f95d56d5dad553cbeaa04f',1,'stan::agrad::OperandsAndPartials']]],
-  ['d_5fx5',['d_x5',['../structstan_1_1agrad_1_1_operands_and_partials.html#a1edb012a6a05b8ae622dcf265df8dc27',1,'stan::agrad::OperandsAndPartials']]],
-  ['d_5fx6',['d_x6',['../structstan_1_1agrad_1_1_operands_and_partials.html#ae8bbfb13cfd34a78f09db019391fceac',1,'stan::agrad::OperandsAndPartials']]],
+  ['d_5fx1',['d_x1',['../structstan_1_1agrad_1_1_operands_and_partials.html#a3c0b97cb24df6cf073c7585a2ced93ea',1,'stan::agrad::OperandsAndPartials']]],
+  ['d_5fx2',['d_x2',['../structstan_1_1agrad_1_1_operands_and_partials.html#ae36664450bb09392fe8e0dae036ebfa1',1,'stan::agrad::OperandsAndPartials']]],
+  ['d_5fx3',['d_x3',['../structstan_1_1agrad_1_1_operands_and_partials.html#a1858e4f3e9bc2dee0f3bd25b72ac7862',1,'stan::agrad::OperandsAndPartials']]],
+  ['d_5fx4',['d_x4',['../structstan_1_1agrad_1_1_operands_and_partials.html#a1ca64b9b641bf4fe7a34bf2a6804c50a',1,'stan::agrad::OperandsAndPartials']]],
+  ['d_5fx5',['d_x5',['../structstan_1_1agrad_1_1_operands_and_partials.html#a99c7a29399d12adf8c55f31a60cbf6aa',1,'stan::agrad::OperandsAndPartials']]],
+  ['d_5fx6',['d_x6',['../structstan_1_1agrad_1_1_operands_and_partials.html#acd4f4706460ff63b51e987d343cd8bbf',1,'stan::agrad::OperandsAndPartials']]],
   ['da_5f',['da_',['../classstan_1_1agrad_1_1precomp__v__vari.html#af0cd4c5436b3bdc84f0d5c499a628be3',1,'stan::agrad::precomp_v_vari']]],
   ['data',['data',['../structstan_1_1io_1_1stan__csv__metadata.html#ab98a28bde3ef2a0c2a04588d527902da',1,'stan::io::stan_csv_metadata']]],
   ['data_5fdecl_5f',['data_decl_',['../structstan_1_1gm_1_1program.html#a6703cdf4c559cfdf4675c68eeff40fa5',1,'stan::gm::program']]],
@@ -31,5 +31,6 @@ var searchData=
   ['double_5fdecl_5fr',['double_decl_r',['../structstan_1_1gm_1_1var__decls__grammar.html#aaa761edc4a269b040365070ae0e1b38b',1,'stan::gm::var_decls_grammar']]],
   ['double_5fliteral_5fr',['double_literal_r',['../structstan_1_1gm_1_1term__grammar.html#a91f8666c8899032d59c1ad4f54a9c0c3',1,'stan::gm::term_grammar']]],
   ['double_5ft',['DOUBLE_T',['../namespacestan_1_1gm.html#a903b745f5e5ae0c05b667e45e5d62e66',1,'stan::gm']]],
+  ['dtrs_5f',['dtrs_',['../classstan_1_1agrad_1_1stored__gradient__vari.html#afb98edd9fb9584921e7ef283e5c9478e',1,'stan::agrad::stored_gradient_vari']]],
   ['dtype_5f',['Dtype_',['../agrad_2rev_2matrix_2ldlt_8hpp.html#a7c830ea3da654e2c30a3e8d4c41610e8',1,'ldlt.hpp']]]
 ];

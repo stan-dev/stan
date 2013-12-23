@@ -99,7 +99,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="math_2matrix_2typedefs_8hpp.html">stan/math/matrix/typedefs.hpp</a>&gt;</span></div>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="validate__multiplicable_8hpp.html">stan/math/matrix/validate_multiplicable.hpp</a>&gt;</span></div>
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="validate__square_8hpp.html">stan/math/matrix/validate_square.hpp</a>&gt;</span></div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="rev_2var_8hpp.html">stan/agrad/rev/var.hpp</a>&gt;</span></div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="var_8hpp.html">stan/agrad/rev/var.hpp</a>&gt;</span></div>
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="agrad_2rev_2matrix_2typedefs_8hpp.html">stan/agrad/rev/matrix/typedefs.hpp</a>&gt;</span></div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;</div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="keyword">namespace </span>stan {</div>
@@ -354,7 +354,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;    <span class="keyword">template</span> &lt;<span class="keywordtype">int</span> R1,<span class="keywordtype">int</span> C1,<span class="keywordtype">int</span> R2,<span class="keywordtype">int</span> C2&gt;</div>
 <div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;    <span class="keyword">inline</span> </div>
 <div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;    Eigen::Matrix&lt;var,R1,C2&gt;</div>
-<div class="line"><a name="l00264"></a><span class="lineno"><a class="code" href="namespacestan_1_1agrad.html#a290e23ab6f9674cb1400b32a1cadd61b">  264</a></span>&#160;    <a class="code" href="namespacestan_1_1agrad.html#ab24563301148f3edb54fd106a0579e42">mdivide_left</a>(<span class="keyword">const</span> Eigen::Matrix&lt;var,R1,C1&gt; &amp;A,</div>
+<div class="line"><a name="l00264"></a><span class="lineno"><a class="code" href="namespacestan_1_1agrad.html#a290e23ab6f9674cb1400b32a1cadd61b">  264</a></span>&#160;    <a class="code" href="namespacestan_1_1agrad.html#a2b41bf2c8372fd934837bcab95ea6218">mdivide_left</a>(<span class="keyword">const</span> Eigen::Matrix&lt;var,R1,C1&gt; &amp;A,</div>
 <div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;                 <span class="keyword">const</span> Eigen::Matrix&lt;var,R2,C2&gt; &amp;b) {</div>
 <div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;      Eigen::Matrix&lt;var,R1,C2&gt; res(b.rows(),b.cols());</div>
 <div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;      </div>
@@ -377,7 +377,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;    <span class="keyword">template</span> &lt;<span class="keywordtype">int</span> R1,<span class="keywordtype">int</span> C1,<span class="keywordtype">int</span> R2,<span class="keywordtype">int</span> C2&gt;</div>
 <div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;    <span class="keyword">inline</span> </div>
 <div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;    Eigen::Matrix&lt;var,R1,C2&gt;</div>
-<div class="line"><a name="l00287"></a><span class="lineno"><a class="code" href="namespacestan_1_1agrad.html#ad17f36acd5401a8f3d83410055cacd5b">  287</a></span>&#160;    <a class="code" href="namespacestan_1_1agrad.html#ab24563301148f3edb54fd106a0579e42">mdivide_left</a>(<span class="keyword">const</span> Eigen::Matrix&lt;var,R1,C1&gt; &amp;A,</div>
+<div class="line"><a name="l00287"></a><span class="lineno"><a class="code" href="namespacestan_1_1agrad.html#ad17f36acd5401a8f3d83410055cacd5b">  287</a></span>&#160;    <a class="code" href="namespacestan_1_1agrad.html#a2b41bf2c8372fd934837bcab95ea6218">mdivide_left</a>(<span class="keyword">const</span> Eigen::Matrix&lt;var,R1,C1&gt; &amp;A,</div>
 <div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;                 <span class="keyword">const</span> Eigen::Matrix&lt;double,R2,C2&gt; &amp;b) {</div>
 <div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;      Eigen::Matrix&lt;var,R1,C2&gt; res(b.rows(),b.cols());</div>
 <div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;      </div>
@@ -400,7 +400,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;    <span class="keyword">template</span> &lt;<span class="keywordtype">int</span> R1,<span class="keywordtype">int</span> C1,<span class="keywordtype">int</span> R2,<span class="keywordtype">int</span> C2&gt;</div>
 <div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;    <span class="keyword">inline</span> </div>
 <div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;    Eigen::Matrix&lt;var,R1,C2&gt;</div>
-<div class="line"><a name="l00310"></a><span class="lineno"><a class="code" href="namespacestan_1_1agrad.html#a35f1d7800586ac5f5c1930627c2ed408">  310</a></span>&#160;    <a class="code" href="namespacestan_1_1agrad.html#ab24563301148f3edb54fd106a0579e42">mdivide_left</a>(<span class="keyword">const</span> Eigen::Matrix&lt;double,R1,C1&gt; &amp;A,</div>
+<div class="line"><a name="l00310"></a><span class="lineno"><a class="code" href="namespacestan_1_1agrad.html#a35f1d7800586ac5f5c1930627c2ed408">  310</a></span>&#160;    <a class="code" href="namespacestan_1_1agrad.html#a2b41bf2c8372fd934837bcab95ea6218">mdivide_left</a>(<span class="keyword">const</span> Eigen::Matrix&lt;double,R1,C1&gt; &amp;A,</div>
 <div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;                 <span class="keyword">const</span> Eigen::Matrix&lt;var,R2,C2&gt; &amp;b) {</div>
 <div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;      Eigen::Matrix&lt;var,R1,C2&gt; res(b.rows(),b.cols());</div>
 <div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;      </div>

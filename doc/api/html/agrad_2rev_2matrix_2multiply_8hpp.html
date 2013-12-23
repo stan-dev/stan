@@ -102,11 +102,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <code>#include &lt;<a class="el" href="validate__multiplicable_8hpp_source.html">stan/math/matrix/validate_multiplicable.hpp</a>&gt;</code><br/>
 <code>#include &lt;<a class="el" href="validate__matching__sizes_8hpp_source.html">stan/math/matrix/validate_matching_sizes.hpp</a>&gt;</code><br/>
 <code>#include &lt;<a class="el" href="validate__square_8hpp_source.html">stan/math/matrix/validate_square.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="rev_2var_8hpp_source.html">stan/agrad/rev/var.hpp</a>&gt;</code><br/>
+<code>#include &lt;<a class="el" href="var_8hpp_source.html">stan/agrad/rev/var.hpp</a>&gt;</code><br/>
 <code>#include &lt;<a class="el" href="agrad_2rev_2matrix_2typedefs_8hpp_source.html">stan/agrad/rev/matrix/typedefs.hpp</a>&gt;</code><br/>
 <code>#include &lt;<a class="el" href="to__var_8hpp_source.html">stan/agrad/rev/matrix/to_var.hpp</a>&gt;</code><br/>
 <code>#include &lt;<a class="el" href="agrad_2rev_2matrix_2dot__product_8hpp_source.html">stan/agrad/rev/matrix/dot_product.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="rev_2operator__multiplication_8hpp_source.html">stan/agrad/rev/operator_multiplication.hpp</a>&gt;</code><br/>
+<code>#include &lt;<a class="el" href="rev_2operators_2operator__multiplication_8hpp_source.html">stan/agrad/rev/operators/operator_multiplication.hpp</a>&gt;</code><br/>
 </div>
 <p><a href="agrad_2rev_2matrix_2multiply_8hpp_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -121,10 +121,17 @@ Namespaces</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a8aeba100eebb1dbf96579d26190979cb"><td class="memTemplParams" colspan="2">template&lt;typename T1 , typename T2 &gt; </td></tr>
-<tr class="memitem:a8aeba100eebb1dbf96579d26190979cb"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="structstan_1_1return__type.html">stan::return_type</a>&lt; T1, T2 &gt;::type&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacestan_1_1agrad.html#a8aeba100eebb1dbf96579d26190979cb">stan::agrad::multiply</a> (const T1 &amp;v, const T2 &amp;c)</td></tr>
-<tr class="memdesc:a8aeba100eebb1dbf96579d26190979cb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the product of two scalars.  <a href="#a8aeba100eebb1dbf96579d26190979cb"></a><br/></td></tr>
-<tr class="separator:a8aeba100eebb1dbf96579d26190979cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a57ea43d861a571f86937062eda4fa5af"><td class="memTemplParams" colspan="2">template&lt;typename T1 , typename T2 &gt; </td></tr>
+<tr class="memitem:a57ea43d861a571f86937062eda4fa5af"><td class="memTemplItemLeft" align="right" valign="top">boost::enable_if_c<br class="typebreak"/>
+&lt; (boost::is_scalar&lt; T1 &gt;<br class="typebreak"/>
+::value||boost::is_same&lt; T1, <br class="typebreak"/>
+var &gt;::value)&amp;&amp;(boost::is_scalar<br class="typebreak"/>
+&lt; T2 &gt;::value||boost::is_same<br class="typebreak"/>
+&lt; T2, var &gt;::value), typename <br class="typebreak"/>
+boost::math::tools::promote_args<br class="typebreak"/>
+&lt; T1, T2 &gt;::type &gt;::type&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacestan_1_1agrad.html#a57ea43d861a571f86937062eda4fa5af">stan::agrad::multiply</a> (const T1 &amp;v, const T2 &amp;c)</td></tr>
+<tr class="memdesc:a57ea43d861a571f86937062eda4fa5af"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the product of two scalars.  <a href="#a57ea43d861a571f86937062eda4fa5af"></a><br/></td></tr>
+<tr class="separator:a57ea43d861a571f86937062eda4fa5af"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a26ac66272ba16ad14daa9f4952a16454"><td class="memTemplParams" colspan="2">template&lt;typename T1 , typename T2 , int R2, int C2&gt; </td></tr>
 <tr class="memitem:a26ac66272ba16ad14daa9f4952a16454"><td class="memTemplItemLeft" align="right" valign="top">Eigen::Matrix&lt; var, R2, C2 &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacestan_1_1agrad.html#a26ac66272ba16ad14daa9f4952a16454">stan::agrad::multiply</a> (const T1 &amp;c, const Eigen::Matrix&lt; T2, R2, C2 &gt; &amp;m)</td></tr>
 <tr class="memdesc:a26ac66272ba16ad14daa9f4952a16454"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the product of scalar and matrix.  <a href="#a26ac66272ba16ad14daa9f4952a16454"></a><br/></td></tr>

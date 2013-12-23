@@ -99,7 +99,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <code>#include &lt;<a class="el" href="math_2matrix_2typedefs_8hpp_source.html">stan/math/matrix/typedefs.hpp</a>&gt;</code><br/>
 <code>#include &lt;<a class="el" href="validate__multiplicable_8hpp_source.html">stan/math/matrix/validate_multiplicable.hpp</a>&gt;</code><br/>
 <code>#include &lt;<a class="el" href="validate__square_8hpp_source.html">stan/math/matrix/validate_square.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="fwd_2fvar_8hpp_source.html">stan/agrad/fwd/fvar.hpp</a>&gt;</code><br/>
+<code>#include &lt;<a class="el" href="fvar_8hpp_source.html">stan/agrad/fwd/fvar.hpp</a>&gt;</code><br/>
 <code>#include &lt;<a class="el" href="agrad_2fwd_2matrix_2typedefs_8hpp_source.html">stan/agrad/fwd/matrix/typedefs.hpp</a>&gt;</code><br/>
 <code>#include &lt;<a class="el" href="agrad_2fwd_2matrix_2inverse_8hpp_source.html">stan/agrad/fwd/matrix/inverse.hpp</a>&gt;</code><br/>
 <code>#include &lt;<a class="el" href="agrad_2fwd_2matrix_2multiply_8hpp_source.html">stan/agrad/fwd/matrix/multiply.hpp</a>&gt;</code><br/>
@@ -117,21 +117,15 @@ Namespaces</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a49ee1b4aa765ed7156a74d1d33638d84"><td class="memTemplParams" colspan="2">template&lt;typename T1 , typename T2 , int R1, int C1, int R2, int C2&gt; </td></tr>
-<tr class="memitem:a49ee1b4aa765ed7156a74d1d33638d84"><td class="memTemplItemLeft" align="right" valign="top">Eigen::Matrix&lt; fvar&lt; typename <br class="typebreak"/>
-<a class="el" href="structstan_1_1return__type.html">stan::return_type</a>&lt; T1, T2 &gt;<br class="typebreak"/>
-::type &gt;, R1, C2 &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacestan_1_1agrad.html#a49ee1b4aa765ed7156a74d1d33638d84">stan::agrad::mdivide_right</a> (const Eigen::Matrix&lt; fvar&lt; T1 &gt;, R1, C1 &gt; &amp;b, const Eigen::Matrix&lt; fvar&lt; T2 &gt;, R2, C2 &gt; &amp;A)</td></tr>
-<tr class="separator:a49ee1b4aa765ed7156a74d1d33638d84"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae000513caf18c3ad0e2568cf5bcc2e80"><td class="memTemplParams" colspan="2">template&lt;typename T1 , typename T2 , int R1, int C1, int R2, int C2&gt; </td></tr>
-<tr class="memitem:ae000513caf18c3ad0e2568cf5bcc2e80"><td class="memTemplItemLeft" align="right" valign="top">Eigen::Matrix&lt; fvar&lt; typename <br class="typebreak"/>
-<a class="el" href="structstan_1_1return__type.html">stan::return_type</a>&lt; T1, T2 &gt;<br class="typebreak"/>
-::type &gt;, R1, C2 &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacestan_1_1agrad.html#ae000513caf18c3ad0e2568cf5bcc2e80">stan::agrad::mdivide_right</a> (const Eigen::Matrix&lt; fvar&lt; T1 &gt;, R1, C1 &gt; &amp;b, const Eigen::Matrix&lt; T2, R2, C2 &gt; &amp;A)</td></tr>
-<tr class="separator:ae000513caf18c3ad0e2568cf5bcc2e80"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae858ea541be3dc019689659e05dd9308"><td class="memTemplParams" colspan="2">template&lt;typename T1 , typename T2 , int R1, int C1, int R2, int C2&gt; </td></tr>
-<tr class="memitem:ae858ea541be3dc019689659e05dd9308"><td class="memTemplItemLeft" align="right" valign="top">Eigen::Matrix&lt; fvar&lt; typename <br class="typebreak"/>
-<a class="el" href="structstan_1_1return__type.html">stan::return_type</a>&lt; T1, T2 &gt;<br class="typebreak"/>
-::type &gt;, R1, C2 &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacestan_1_1agrad.html#ae858ea541be3dc019689659e05dd9308">stan::agrad::mdivide_right</a> (const Eigen::Matrix&lt; T1, R1, C1 &gt; &amp;b, const Eigen::Matrix&lt; fvar&lt; T2 &gt;, R2, C2 &gt; &amp;A)</td></tr>
-<tr class="separator:ae858ea541be3dc019689659e05dd9308"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a92e113c418aa00fb0b0f05de3421a377"><td class="memTemplParams" colspan="2">template&lt;typename T , int R1, int C1, int R2, int C2&gt; </td></tr>
+<tr class="memitem:a92e113c418aa00fb0b0f05de3421a377"><td class="memTemplItemLeft" align="right" valign="top">Eigen::Matrix&lt; fvar&lt; T &gt;, R1, C2 &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacestan_1_1agrad.html#a92e113c418aa00fb0b0f05de3421a377">stan::agrad::mdivide_right</a> (const Eigen::Matrix&lt; fvar&lt; T &gt;, R1, C1 &gt; &amp;A, const Eigen::Matrix&lt; fvar&lt; T &gt;, R2, C2 &gt; &amp;b)</td></tr>
+<tr class="separator:a92e113c418aa00fb0b0f05de3421a377"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab1bf56872a19067bf76e9e0ae0319ff3"><td class="memTemplParams" colspan="2">template&lt;typename T , int R1, int C1, int R2, int C2&gt; </td></tr>
+<tr class="memitem:ab1bf56872a19067bf76e9e0ae0319ff3"><td class="memTemplItemLeft" align="right" valign="top">Eigen::Matrix&lt; fvar&lt; T &gt;, R1, C2 &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacestan_1_1agrad.html#ab1bf56872a19067bf76e9e0ae0319ff3">stan::agrad::mdivide_right</a> (const Eigen::Matrix&lt; fvar&lt; T &gt;, R1, C1 &gt; &amp;A, const Eigen::Matrix&lt; double, R2, C2 &gt; &amp;b)</td></tr>
+<tr class="separator:ab1bf56872a19067bf76e9e0ae0319ff3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad4d1ebb9e641da4b6d03b08eac67469c"><td class="memTemplParams" colspan="2">template&lt;typename T , int R1, int C1, int R2, int C2&gt; </td></tr>
+<tr class="memitem:ad4d1ebb9e641da4b6d03b08eac67469c"><td class="memTemplItemLeft" align="right" valign="top">Eigen::Matrix&lt; fvar&lt; T &gt;, R1, C2 &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacestan_1_1agrad.html#ad4d1ebb9e641da4b6d03b08eac67469c">stan::agrad::mdivide_right</a> (const Eigen::Matrix&lt; double, R1, C1 &gt; &amp;A, const Eigen::Matrix&lt; fvar&lt; T &gt;, R2, C2 &gt; &amp;b)</td></tr>
+<tr class="separator:ad4d1ebb9e641da4b6d03b08eac67469c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 </div><!-- contents -->
 <hr/>

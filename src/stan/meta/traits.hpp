@@ -2,7 +2,7 @@
 #define __STAN__META__TRAITS_HPP__
 
 #include <stan/agrad/fwd/fvar.hpp>
-// #include <stan/agrad.hpp>
+// #include <stan/agrad/partials_vari.hpp>
 #include <stan/agrad/rev/var.hpp>
 #include <vector>
 #include <boost/type_traits.hpp>
@@ -222,8 +222,34 @@ namespace stan {
   };
 
 
+  /**
+   *  VectorView is a template metaprogram that takes its argument and
+   *  allows it to be used like a vector. There are three template parameters
+   *  - T: Type of the thing to be wrapped. For example, double, var, vector<double>, etc.
+   *  - is_array: Boolean variable indicating whether the underlying type is an array.
+   *  - throw_if_accessed: Boolean variable indicating whether this instance should
+   *       not be used and should throw if operator[] is used.
+   *
+   *  For a scalar value, it broadcasts the single value when using
+   *  operator[].
+   *
+   *  For a vector, operator[] looks into the value passed in.
+   *  Note: this is not safe. It is possible to read past the size of
+   *  an array.
+   *
+   *  Uses: 
+   *    Read arguments to prob functions as vectors, even if scalars, so
+   *    they can be read by common code (and scalars automatically
+   *    broadcast up to behave like vectors) : VectorView of immutable
+   *    const array of double* (no allocation)
+   *
+   *    Build up derivatives into common storage : VectorView of
+   *    mutable shared array (no allocation because allocated on
+   *    auto-diff arena memory)
+   */
   template <typename T,
-            bool is_array = stan::is_vector_like<T>::value>
+            bool is_array = stan::is_vector_like<T>::value,
+            bool throw_if_accessed = false>
   class VectorView {
   public: 
     typedef typename scalar_type<T>::type scalar_t;
@@ -238,15 +264,23 @@ namespace stan {
     VectorView(scalar_t* x) : x_(x) { }
 
     scalar_t& operator[](int i) {
-      if (is_array) return x_[i];
-      else return x_[0];
+      if (throw_if_accessed) 
+        throw std::out_of_range("VectorView: this cannot be accessed");
+      if (is_array) 
+        return x_[i];
+      else 
+        return x_[0];
     }
   private:
     scalar_t* x_;
   };
 
-  template <typename T, bool is_array>
-  class VectorView<const T, is_array> {
+  /**
+   *
+   *  VectorView that has const correctness.
+   */
+  template <typename T, bool is_array, bool throw_if_accessed>
+  class VectorView<const T, is_array, throw_if_accessed> {
   public:
     typedef typename scalar_type<T>::type scalar_t;
 
@@ -259,9 +293,13 @@ namespace stan {
     template <int R, int C>
     VectorView(const Eigen::Matrix<scalar_t,R,C>& m) : x_(&m(0)) { }
 
-    const scalar_t operator[](int i) const {
-      if (is_array) return x_[i];
-      else return x_[0];
+    const scalar_t& operator[](int i) const {
+      if (throw_if_accessed) 
+        throw std::out_of_range("VectorView: this cannot be accessed");
+      if (is_array)
+        return x_[i];
+      else 
+        return x_[0];
     }
   private:
     const scalar_t* x_;
@@ -269,7 +307,7 @@ namespace stan {
 
   // simplify to hold value in common case where it's more efficient
   template <>
-  class VectorView<const double, false> {
+  class VectorView<const double, false, false> {
   public:
     VectorView(double x) : x_(x) { }
     double operator[](int /* i */)  const {
@@ -279,6 +317,21 @@ namespace stan {
     const double x_;
   };
 
+
+  /**
+   *
+   *  DoubleVectorView allocates double values to be used as
+   *  intermediate values. There are 2 template parameters:
+   *  - used: boolean variable indicating whether this instance
+   *      is used. If this is false, there is no storage allocated
+   *      and operator[] throws.
+   *  - is_vec: boolean variable indicating whether this instance
+   *      should allocate a vector, if it is used. If this is false,
+   *      the instance will only allocate a single double value.
+   *      If this is true, it will allocate the number requested.
+   *
+   *  These values are mutable.
+   */
   template<bool used, bool is_vec>
   class DoubleVectorView {
   public:

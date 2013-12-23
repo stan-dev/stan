@@ -97,6 +97,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 
+<p><a class="el" href="classstan_1_1_double_vector_view.html" title="DoubleVectorView allocates double values to be used as intermediate values.">DoubleVectorView</a> allocates double values to be used as intermediate values.  
+ <a href="classstan_1_1_double_vector_view.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="meta_2traits_8hpp_source.html">traits.hpp</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
@@ -110,8 +113,15 @@ Public Member Functions</h2></td></tr>
 <div class="textblock"><h3>template&lt;bool used, bool is_vec&gt;<br/>
 class stan::DoubleVectorView&lt; used, is_vec &gt;</h3>
 
+<p><a class="el" href="classstan_1_1_double_vector_view.html" title="DoubleVectorView allocates double values to be used as intermediate values.">DoubleVectorView</a> allocates double values to be used as intermediate values. </p>
+<p>There are 2 template parameters:</p>
+<ul>
+<li>used: boolean variable indicating whether this instance is used. If this is false, there is no storage allocated and operator[] throws.</li>
+<li>is_vec: boolean variable indicating whether this instance should allocate a vector, if it is used. If this is false, the instance will only allocate a single double value. If this is true, it will allocate the number requested.</li>
+</ul>
+<p>These values are mutable. </p>
 
-<p>Definition at line <a class="el" href="meta_2traits_8hpp_source.html#l00283">283</a> of file <a class="el" href="meta_2traits_8hpp_source.html">traits.hpp</a>.</p>
+<p>Definition at line <a class="el" href="meta_2traits_8hpp_source.html#l00336">336</a> of file <a class="el" href="meta_2traits_8hpp_source.html">traits.hpp</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a574803fc6d532f052ffcce6b8cefac58"></a>
 <div class="memitem">
@@ -137,7 +147,7 @@ template&lt;bool used, bool is_vec&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="meta_2traits_8hpp_source.html#l00285">285</a> of file <a class="el" href="meta_2traits_8hpp_source.html">traits.hpp</a>.</p>
+<p>Definition at line <a class="el" href="meta_2traits_8hpp_source.html#l00338">338</a> of file <a class="el" href="meta_2traits_8hpp_source.html">traits.hpp</a>.</p>
 
 </div>
 </div>
@@ -166,7 +176,7 @@ template&lt;bool used, bool is_vec&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="meta_2traits_8hpp_source.html#l00286">286</a> of file <a class="el" href="meta_2traits_8hpp_source.html">traits.hpp</a>.</p>
+<p>Definition at line <a class="el" href="meta_2traits_8hpp_source.html#l00339">339</a> of file <a class="el" href="meta_2traits_8hpp_source.html">traits.hpp</a>.</p>
 
 </div>
 </div>

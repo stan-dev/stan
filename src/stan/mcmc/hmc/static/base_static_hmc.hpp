@@ -27,9 +27,9 @@ namespace stan {
       
       sample transition(sample& init_sample) {
         
-        this->_sample_stepsize();
+        this->sample_stepsize();
         
-        this->seed(init_sample.cont_params(), init_sample.disc_params());
+        this->seed(init_sample.cont_params());
         
         this->_hamiltonian.sample_p(this->_z, this->_rand_int);
         this->_hamiltonian.init(this->_z);
@@ -53,7 +53,7 @@ namespace stan {
         
         acceptProb = acceptProb > 1 ? 1 : acceptProb;
         
-        return sample(this->_z.q, this->_z.r, - this->_hamiltonian.V(this->_z), acceptProb);
+        return sample(this->_z.q, - this->_hamiltonian.V(this->_z), acceptProb);
         
       }
       

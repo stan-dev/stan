@@ -394,425 +394,428 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;</div>
 <div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;      <span class="keywordtype">bool</span> scan_single_char(<span class="keywordtype">char</span> c_expected) {</div>
 <div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;        <span class="keywordtype">int</span> c = in_.peek();</div>
-<div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;        <span class="keywordflow">if</span> (c != c_expected)</div>
-<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;          <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;        <span class="keywordtype">char</span> c_skip;</div>
-<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;        in_.get(c_skip);</div>
-<div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;      }</div>
-<div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160;</div>
-<div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;      <span class="keywordtype">bool</span> scan_optional_long() {</div>
-<div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160;        <span class="keywordflow">if</span> (scan_single_char(<span class="charliteral">&#39;l&#39;</span>))</div>
-<div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160;          <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;        <span class="keywordflow">else</span> <span class="keywordflow">if</span> (scan_single_char(<span class="charliteral">&#39;L&#39;</span>))</div>
-<div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160;          <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160;        <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;          <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160;      }</div>
-<div class="line"><a name="l00453"></a><span class="lineno">  453</span>&#160;</div>
-<div class="line"><a name="l00454"></a><span class="lineno">  454</span>&#160;      <span class="keywordtype">bool</span> scan_char(<span class="keywordtype">char</span> c_expected) {</div>
-<div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160;        <span class="keywordtype">char</span> c;</div>
-<div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160;        in_ &gt;&gt; c;</div>
-<div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160;        <span class="keywordflow">if</span> (c != c_expected) {</div>
-<div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;          in_.putback(c);</div>
-<div class="line"><a name="l00459"></a><span class="lineno">  459</span>&#160;          <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160;        }</div>
-<div class="line"><a name="l00461"></a><span class="lineno">  461</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00462"></a><span class="lineno">  462</span>&#160;      }</div>
-<div class="line"><a name="l00463"></a><span class="lineno">  463</span>&#160;</div>
-<div class="line"><a name="l00464"></a><span class="lineno">  464</span>&#160;      <span class="keywordtype">bool</span> scan_name_unquoted() {</div>
-<div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160;        <span class="keywordtype">char</span> c;</div>
-<div class="line"><a name="l00466"></a><span class="lineno">  466</span>&#160;        in_ &gt;&gt; c; <span class="comment">// </span></div>
-<div class="line"><a name="l00467"></a><span class="lineno">  467</span>&#160;        <span class="keywordflow">if</span> (!std::isalpha(c)) <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00468"></a><span class="lineno">  468</span>&#160;        name_.push_back(c); </div>
-<div class="line"><a name="l00469"></a><span class="lineno">  469</span>&#160;        <span class="keywordflow">while</span> (in_.get(c)) { <span class="comment">// get turns off auto space skip</span></div>
-<div class="line"><a name="l00470"></a><span class="lineno">  470</span>&#160;          <span class="keywordflow">if</span> (std::isalpha(c) || std::isdigit(c) || c == <span class="charliteral">&#39;_&#39;</span> || c == <span class="charliteral">&#39;.&#39;</span>) {</div>
-<div class="line"><a name="l00471"></a><span class="lineno">  471</span>&#160;            name_.push_back(c);</div>
-<div class="line"><a name="l00472"></a><span class="lineno">  472</span>&#160;          } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00473"></a><span class="lineno">  473</span>&#160;            in_.putback(c);</div>
-<div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00475"></a><span class="lineno">  475</span>&#160;          }</div>
-<div class="line"><a name="l00476"></a><span class="lineno">  476</span>&#160;        }</div>
-<div class="line"><a name="l00477"></a><span class="lineno">  477</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>; <span class="comment">// but hit eos</span></div>
-<div class="line"><a name="l00478"></a><span class="lineno">  478</span>&#160;      }</div>
-<div class="line"><a name="l00479"></a><span class="lineno">  479</span>&#160;</div>
-<div class="line"><a name="l00480"></a><span class="lineno">  480</span>&#160;      <span class="keywordtype">bool</span> scan_name() {</div>
-<div class="line"><a name="l00481"></a><span class="lineno">  481</span>&#160;        <span class="keywordflow">if</span> (scan_char(<span class="charliteral">&#39;&quot;&#39;</span>)) {</div>
-<div class="line"><a name="l00482"></a><span class="lineno">  482</span>&#160;          <span class="keywordflow">if</span> (!scan_name_unquoted()) <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00483"></a><span class="lineno">  483</span>&#160;          <span class="keywordflow">if</span> (!scan_char(<span class="charliteral">&#39;&quot;&#39;</span>)) <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00484"></a><span class="lineno">  484</span>&#160;        } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (scan_char(<span class="charliteral">&#39;\&#39;&#39;</span>)) {</div>
+<div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;        <span class="keywordflow">if</span> (in_.fail()) <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;        <span class="keywordflow">if</span> (c != c_expected)</div>
+<div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;          <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;        <span class="keywordtype">char</span> c_skip;</div>
+<div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;        in_.get(c_skip);</div>
+<div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160;      }</div>
+<div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;</div>
+<div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160;      <span class="keywordtype">bool</span> scan_optional_long() {</div>
+<div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160;        <span class="keywordflow">if</span> (scan_single_char(<span class="charliteral">&#39;l&#39;</span>))</div>
+<div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;          <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160;        <span class="keywordflow">else</span> <span class="keywordflow">if</span> (scan_single_char(<span class="charliteral">&#39;L&#39;</span>))</div>
+<div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160;          <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;        <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160;          <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00453"></a><span class="lineno">  453</span>&#160;      }</div>
+<div class="line"><a name="l00454"></a><span class="lineno">  454</span>&#160;</div>
+<div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160;      <span class="keywordtype">bool</span> scan_char(<span class="keywordtype">char</span> c_expected) {</div>
+<div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160;        <span class="keywordtype">char</span> c;</div>
+<div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160;        in_ &gt;&gt; c;</div>
+<div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;        <span class="keywordflow">if</span> (in_.fail()) <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00459"></a><span class="lineno">  459</span>&#160;        <span class="keywordflow">if</span> (c != c_expected) {</div>
+<div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160;          in_.putback(c);</div>
+<div class="line"><a name="l00461"></a><span class="lineno">  461</span>&#160;          <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00462"></a><span class="lineno">  462</span>&#160;        }</div>
+<div class="line"><a name="l00463"></a><span class="lineno">  463</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00464"></a><span class="lineno">  464</span>&#160;      }</div>
+<div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160;</div>
+<div class="line"><a name="l00466"></a><span class="lineno">  466</span>&#160;      <span class="keywordtype">bool</span> scan_name_unquoted() {</div>
+<div class="line"><a name="l00467"></a><span class="lineno">  467</span>&#160;        <span class="keywordtype">char</span> c;</div>
+<div class="line"><a name="l00468"></a><span class="lineno">  468</span>&#160;        in_ &gt;&gt; c; <span class="comment">// </span></div>
+<div class="line"><a name="l00469"></a><span class="lineno">  469</span>&#160;        <span class="keywordflow">if</span> (in_.fail()) <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00470"></a><span class="lineno">  470</span>&#160;        <span class="keywordflow">if</span> (!std::isalpha(c)) <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00471"></a><span class="lineno">  471</span>&#160;        name_.push_back(c); </div>
+<div class="line"><a name="l00472"></a><span class="lineno">  472</span>&#160;        <span class="keywordflow">while</span> (in_.get(c)) { <span class="comment">// get turns off auto space skip</span></div>
+<div class="line"><a name="l00473"></a><span class="lineno">  473</span>&#160;          <span class="keywordflow">if</span> (std::isalpha(c) || std::isdigit(c) || c == <span class="charliteral">&#39;_&#39;</span> || c == <span class="charliteral">&#39;.&#39;</span>) {</div>
+<div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160;            name_.push_back(c);</div>
+<div class="line"><a name="l00475"></a><span class="lineno">  475</span>&#160;          } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00476"></a><span class="lineno">  476</span>&#160;            in_.putback(c);</div>
+<div class="line"><a name="l00477"></a><span class="lineno">  477</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00478"></a><span class="lineno">  478</span>&#160;          }</div>
+<div class="line"><a name="l00479"></a><span class="lineno">  479</span>&#160;        }</div>
+<div class="line"><a name="l00480"></a><span class="lineno">  480</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>; <span class="comment">// but hit eos</span></div>
+<div class="line"><a name="l00481"></a><span class="lineno">  481</span>&#160;      }</div>
+<div class="line"><a name="l00482"></a><span class="lineno">  482</span>&#160;</div>
+<div class="line"><a name="l00483"></a><span class="lineno">  483</span>&#160;      <span class="keywordtype">bool</span> scan_name() {</div>
+<div class="line"><a name="l00484"></a><span class="lineno">  484</span>&#160;        <span class="keywordflow">if</span> (scan_char(<span class="charliteral">&#39;&quot;&#39;</span>)) {</div>
 <div class="line"><a name="l00485"></a><span class="lineno">  485</span>&#160;          <span class="keywordflow">if</span> (!scan_name_unquoted()) <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00486"></a><span class="lineno">  486</span>&#160;          <span class="keywordflow">if</span> (!scan_char(<span class="charliteral">&#39;\&#39;&#39;</span>)) <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00487"></a><span class="lineno">  487</span>&#160;        } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00486"></a><span class="lineno">  486</span>&#160;          <span class="keywordflow">if</span> (!scan_char(<span class="charliteral">&#39;&quot;&#39;</span>)) <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00487"></a><span class="lineno">  487</span>&#160;        } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (scan_char(<span class="charliteral">&#39;\&#39;&#39;</span>)) {</div>
 <div class="line"><a name="l00488"></a><span class="lineno">  488</span>&#160;          <span class="keywordflow">if</span> (!scan_name_unquoted()) <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00489"></a><span class="lineno">  489</span>&#160;        }</div>
-<div class="line"><a name="l00490"></a><span class="lineno">  490</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00491"></a><span class="lineno">  491</span>&#160;      }</div>
-<div class="line"><a name="l00492"></a><span class="lineno">  492</span>&#160;</div>
-<div class="line"><a name="l00493"></a><span class="lineno">  493</span>&#160;</div>
-<div class="line"><a name="l00494"></a><span class="lineno">  494</span>&#160;      <span class="keywordtype">bool</span> scan_chars(std::string s, <span class="keywordtype">bool</span> case_sensitive = <span class="keyword">true</span>) {</div>
-<div class="line"><a name="l00495"></a><span class="lineno">  495</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; s.size(); ++i) {</div>
-<div class="line"><a name="l00496"></a><span class="lineno">  496</span>&#160;          <span class="keywordtype">char</span> c;</div>
-<div class="line"><a name="l00497"></a><span class="lineno">  497</span>&#160;          <span class="keywordflow">if</span> (!(in_ &gt;&gt; c)) {</div>
-<div class="line"><a name="l00498"></a><span class="lineno">  498</span>&#160;            <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> j = 1; j &lt; i; ++j) </div>
-<div class="line"><a name="l00499"></a><span class="lineno">  499</span>&#160;              in_.putback(s[i-j]);</div>
-<div class="line"><a name="l00500"></a><span class="lineno">  500</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00501"></a><span class="lineno">  501</span>&#160;          }</div>
-<div class="line"><a name="l00502"></a><span class="lineno">  502</span>&#160;          <span class="comment">// all ASCII, so toupper is OK</span></div>
-<div class="line"><a name="l00503"></a><span class="lineno">  503</span>&#160;          <span class="keywordflow">if</span> ((case_sensitive &amp;&amp; c != s[i])</div>
-<div class="line"><a name="l00504"></a><span class="lineno">  504</span>&#160;              || (!case_sensitive &amp;&amp; ::toupper(c) != ::toupper(s[i]))) {</div>
-<div class="line"><a name="l00505"></a><span class="lineno">  505</span>&#160;            in_.putback(c);</div>
-<div class="line"><a name="l00506"></a><span class="lineno">  506</span>&#160;            <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> j = 1; j &lt; i; ++j) </div>
-<div class="line"><a name="l00507"></a><span class="lineno">  507</span>&#160;              in_.putback(s[i-j]);</div>
-<div class="line"><a name="l00508"></a><span class="lineno">  508</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00509"></a><span class="lineno">  509</span>&#160;          }</div>
-<div class="line"><a name="l00510"></a><span class="lineno">  510</span>&#160;        }</div>
-<div class="line"><a name="l00511"></a><span class="lineno">  511</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00512"></a><span class="lineno">  512</span>&#160;      }</div>
-<div class="line"><a name="l00513"></a><span class="lineno">  513</span>&#160;</div>
-<div class="line"><a name="l00514"></a><span class="lineno">  514</span>&#160;      <span class="keywordtype">bool</span> scan_number(<span class="keywordtype">bool</span> negate_val) {</div>
-<div class="line"><a name="l00515"></a><span class="lineno">  515</span>&#160;</div>
-<div class="line"><a name="l00516"></a><span class="lineno">  516</span>&#160;        <span class="comment">// must take longest first!</span></div>
-<div class="line"><a name="l00517"></a><span class="lineno">  517</span>&#160;        <span class="keywordflow">if</span> (scan_chars(<span class="stringliteral">&quot;Inf&quot;</span>)) { </div>
-<div class="line"><a name="l00518"></a><span class="lineno">  518</span>&#160;          scan_chars(<span class="stringliteral">&quot;inity&quot;</span>); <span class="comment">// read past if there</span></div>
-<div class="line"><a name="l00519"></a><span class="lineno">  519</span>&#160;          stack_r_.push_back(negate_val</div>
-<div class="line"><a name="l00520"></a><span class="lineno">  520</span>&#160;                             ? -std::numeric_limits&lt;double&gt;::infinity()</div>
-<div class="line"><a name="l00521"></a><span class="lineno">  521</span>&#160;                             : std::numeric_limits&lt;double&gt;::infinity());</div>
-<div class="line"><a name="l00522"></a><span class="lineno">  522</span>&#160;          <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00523"></a><span class="lineno">  523</span>&#160;        }</div>
-<div class="line"><a name="l00524"></a><span class="lineno">  524</span>&#160;        <span class="keywordflow">if</span> (scan_chars(<span class="stringliteral">&quot;NaN&quot;</span>,<span class="keyword">false</span>)) {</div>
-<div class="line"><a name="l00525"></a><span class="lineno">  525</span>&#160;          stack_r_.push_back(std::numeric_limits&lt;double&gt;::quiet_NaN());</div>
-<div class="line"><a name="l00526"></a><span class="lineno">  526</span>&#160;          <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00527"></a><span class="lineno">  527</span>&#160;        }</div>
-<div class="line"><a name="l00528"></a><span class="lineno">  528</span>&#160;</div>
-<div class="line"><a name="l00529"></a><span class="lineno">  529</span>&#160;        <span class="keywordtype">char</span> c;</div>
-<div class="line"><a name="l00530"></a><span class="lineno">  530</span>&#160;        <span class="keywordtype">bool</span> is_double = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00531"></a><span class="lineno">  531</span>&#160;        std::string buf;</div>
-<div class="line"><a name="l00532"></a><span class="lineno">  532</span>&#160;        <span class="keywordflow">while</span> (in_.get(c)) {</div>
-<div class="line"><a name="l00533"></a><span class="lineno">  533</span>&#160;          <span class="keywordflow">if</span> (std::isdigit(c)) { <span class="comment">// before pre-scan || c == &#39;-&#39; || c == &#39;+&#39;) {</span></div>
-<div class="line"><a name="l00534"></a><span class="lineno">  534</span>&#160;            buf.push_back(c);</div>
-<div class="line"><a name="l00535"></a><span class="lineno">  535</span>&#160;          } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (c == <span class="charliteral">&#39;.&#39;</span></div>
-<div class="line"><a name="l00536"></a><span class="lineno">  536</span>&#160;                     || c == <span class="charliteral">&#39;e&#39;</span></div>
-<div class="line"><a name="l00537"></a><span class="lineno">  537</span>&#160;                     || c == <span class="charliteral">&#39;E&#39;</span></div>
-<div class="line"><a name="l00538"></a><span class="lineno">  538</span>&#160;                     || c == <span class="charliteral">&#39;-&#39;</span></div>
-<div class="line"><a name="l00539"></a><span class="lineno">  539</span>&#160;                     || c == <span class="charliteral">&#39;+&#39;</span>) {</div>
-<div class="line"><a name="l00540"></a><span class="lineno">  540</span>&#160;            is_double = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00541"></a><span class="lineno">  541</span>&#160;            buf.push_back(c);</div>
-<div class="line"><a name="l00542"></a><span class="lineno">  542</span>&#160;          } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00543"></a><span class="lineno">  543</span>&#160;            in_.putback(c);</div>
-<div class="line"><a name="l00544"></a><span class="lineno">  544</span>&#160;            <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l00545"></a><span class="lineno">  545</span>&#160;          }</div>
-<div class="line"><a name="l00546"></a><span class="lineno">  546</span>&#160;        }</div>
-<div class="line"><a name="l00547"></a><span class="lineno">  547</span>&#160;        <span class="keywordflow">if</span> (!is_double &amp;&amp; stack_r_.size() == 0) {</div>
-<div class="line"><a name="l00548"></a><span class="lineno">  548</span>&#160;          <span class="keywordtype">int</span> n;</div>
-<div class="line"><a name="l00549"></a><span class="lineno">  549</span>&#160;          <span class="keywordflow">if</span> (!(std::stringstream(buf) &gt;&gt; n))</div>
-<div class="line"><a name="l00550"></a><span class="lineno">  550</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00551"></a><span class="lineno">  551</span>&#160;          stack_i_.push_back(negate_val ? -n : n);</div>
-<div class="line"><a name="l00552"></a><span class="lineno">  552</span>&#160;          scan_optional_long();</div>
-<div class="line"><a name="l00553"></a><span class="lineno">  553</span>&#160;        } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00554"></a><span class="lineno">  554</span>&#160;          <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> j = 0; j &lt; stack_i_.size(); ++j)</div>
-<div class="line"><a name="l00555"></a><span class="lineno">  555</span>&#160;            stack_r_.push_back(static_cast&lt;double&gt;(stack_i_[j]));</div>
-<div class="line"><a name="l00556"></a><span class="lineno">  556</span>&#160;          <span class="comment">// negate_val </span></div>
-<div class="line"><a name="l00557"></a><span class="lineno">  557</span>&#160;          <span class="comment">// ? -static_cast&lt;double&gt;(stack_i_[j])</span></div>
-<div class="line"><a name="l00558"></a><span class="lineno">  558</span>&#160;          <span class="comment">// : static_cast&lt;double&gt;(stack_i_[j]));</span></div>
-<div class="line"><a name="l00559"></a><span class="lineno">  559</span>&#160;          stack_i_.clear();</div>
-<div class="line"><a name="l00560"></a><span class="lineno">  560</span>&#160;          <span class="keywordtype">double</span> x;</div>
-<div class="line"><a name="l00561"></a><span class="lineno">  561</span>&#160;          <span class="keywordflow">if</span> (!(std::stringstream(buf) &gt;&gt; x))</div>
-<div class="line"><a name="l00562"></a><span class="lineno">  562</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00563"></a><span class="lineno">  563</span>&#160;          stack_r_.push_back(negate_val ? -x : x);</div>
-<div class="line"><a name="l00564"></a><span class="lineno">  564</span>&#160;        }</div>
-<div class="line"><a name="l00565"></a><span class="lineno">  565</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00566"></a><span class="lineno">  566</span>&#160;      }</div>
-<div class="line"><a name="l00567"></a><span class="lineno">  567</span>&#160;</div>
-<div class="line"><a name="l00568"></a><span class="lineno">  568</span>&#160;      <span class="keywordtype">bool</span> scan_number() {</div>
-<div class="line"><a name="l00569"></a><span class="lineno">  569</span>&#160;        <span class="keywordtype">char</span> c;</div>
-<div class="line"><a name="l00570"></a><span class="lineno">  570</span>&#160;        <span class="keywordflow">while</span> (in_.get(c)) {</div>
-<div class="line"><a name="l00571"></a><span class="lineno">  571</span>&#160;          <span class="keywordflow">if</span> (std::isspace(c)) <span class="keywordflow">continue</span>;</div>
-<div class="line"><a name="l00572"></a><span class="lineno">  572</span>&#160;          in_.putback(c);</div>
-<div class="line"><a name="l00573"></a><span class="lineno">  573</span>&#160;          <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l00574"></a><span class="lineno">  574</span>&#160;        }</div>
-<div class="line"><a name="l00575"></a><span class="lineno">  575</span>&#160;        <span class="keywordtype">bool</span> negate_val = scan_char(<span class="charliteral">&#39;-&#39;</span>); </div>
-<div class="line"><a name="l00576"></a><span class="lineno">  576</span>&#160;        <span class="keywordflow">if</span> (!negate_val) scan_char(<span class="charliteral">&#39;+&#39;</span>); <span class="comment">// flush leading +</span></div>
-<div class="line"><a name="l00577"></a><span class="lineno">  577</span>&#160;        <span class="keywordflow">return</span> scan_number(negate_val);</div>
-<div class="line"><a name="l00578"></a><span class="lineno">  578</span>&#160;      }</div>
-<div class="line"><a name="l00579"></a><span class="lineno">  579</span>&#160;</div>
-<div class="line"><a name="l00580"></a><span class="lineno">  580</span>&#160;</div>
-<div class="line"><a name="l00581"></a><span class="lineno">  581</span>&#160;      <span class="keywordtype">bool</span> scan_seq_value() {</div>
-<div class="line"><a name="l00582"></a><span class="lineno">  582</span>&#160;        <span class="keywordflow">if</span> (!scan_char(<span class="charliteral">&#39;(&#39;</span>)) <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00583"></a><span class="lineno">  583</span>&#160;        <span class="keywordflow">if</span> (scan_char(<span class="charliteral">&#39;)&#39;</span>)) {</div>
-<div class="line"><a name="l00584"></a><span class="lineno">  584</span>&#160;          dims_.push_back(0U);</div>
-<div class="line"><a name="l00585"></a><span class="lineno">  585</span>&#160;          <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00586"></a><span class="lineno">  586</span>&#160;        }</div>
-<div class="line"><a name="l00587"></a><span class="lineno">  587</span>&#160;        <span class="keywordflow">if</span> (!scan_number()) <span class="keywordflow">return</span> <span class="keyword">false</span>;; <span class="comment">// first entry</span></div>
-<div class="line"><a name="l00588"></a><span class="lineno">  588</span>&#160;        <span class="keywordflow">while</span> (scan_char(<span class="charliteral">&#39;,&#39;</span>)) {</div>
-<div class="line"><a name="l00589"></a><span class="lineno">  589</span>&#160;          <span class="keywordflow">if</span> (!scan_number()) <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00590"></a><span class="lineno">  590</span>&#160;        }</div>
-<div class="line"><a name="l00591"></a><span class="lineno">  591</span>&#160;        dims_.push_back(stack_r_.size() + stack_i_.size());</div>
-<div class="line"><a name="l00592"></a><span class="lineno">  592</span>&#160;        <span class="keywordflow">return</span> scan_char(<span class="charliteral">&#39;)&#39;</span>);</div>
-<div class="line"><a name="l00593"></a><span class="lineno">  593</span>&#160;      }</div>
-<div class="line"><a name="l00594"></a><span class="lineno">  594</span>&#160;</div>
-<div class="line"><a name="l00595"></a><span class="lineno">  595</span>&#160;      <span class="keywordtype">bool</span> scan_struct_value() {</div>
-<div class="line"><a name="l00596"></a><span class="lineno">  596</span>&#160;        <span class="keywordflow">if</span> (!scan_char(<span class="charliteral">&#39;(&#39;</span>)) <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00597"></a><span class="lineno">  597</span>&#160;        <span class="keywordflow">if</span> (scan_char(<span class="charliteral">&#39;c&#39;</span>)) { </div>
-<div class="line"><a name="l00598"></a><span class="lineno">  598</span>&#160;          scan_seq_value();</div>
-<div class="line"><a name="l00599"></a><span class="lineno">  599</span>&#160;        } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00600"></a><span class="lineno">  600</span>&#160;          <span class="keywordtype">size_t</span> start;</div>
-<div class="line"><a name="l00601"></a><span class="lineno">  601</span>&#160;          in_ &gt;&gt; start;</div>
-<div class="line"><a name="l00602"></a><span class="lineno">  602</span>&#160;          <span class="keywordflow">if</span> (!scan_char(<span class="charliteral">&#39;:&#39;</span>))</div>
-<div class="line"><a name="l00603"></a><span class="lineno">  603</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00604"></a><span class="lineno">  604</span>&#160;          <span class="keywordtype">size_t</span> end;</div>
-<div class="line"><a name="l00605"></a><span class="lineno">  605</span>&#160;          in_ &gt;&gt; end;</div>
-<div class="line"><a name="l00606"></a><span class="lineno">  606</span>&#160;          <span class="keywordflow">if</span> (start &lt;= end) {</div>
-<div class="line"><a name="l00607"></a><span class="lineno">  607</span>&#160;            <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = start; i &lt;= end; ++i)</div>
-<div class="line"><a name="l00608"></a><span class="lineno">  608</span>&#160;              stack_i_.push_back(i);</div>
-<div class="line"><a name="l00609"></a><span class="lineno">  609</span>&#160;          } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00610"></a><span class="lineno">  610</span>&#160;            <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = start; i &gt;= end; --i)</div>
+<div class="line"><a name="l00489"></a><span class="lineno">  489</span>&#160;          <span class="keywordflow">if</span> (!scan_char(<span class="charliteral">&#39;\&#39;&#39;</span>)) <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00490"></a><span class="lineno">  490</span>&#160;        } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00491"></a><span class="lineno">  491</span>&#160;          <span class="keywordflow">if</span> (!scan_name_unquoted()) <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00492"></a><span class="lineno">  492</span>&#160;        }</div>
+<div class="line"><a name="l00493"></a><span class="lineno">  493</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00494"></a><span class="lineno">  494</span>&#160;      }</div>
+<div class="line"><a name="l00495"></a><span class="lineno">  495</span>&#160;</div>
+<div class="line"><a name="l00496"></a><span class="lineno">  496</span>&#160;</div>
+<div class="line"><a name="l00497"></a><span class="lineno">  497</span>&#160;      <span class="keywordtype">bool</span> scan_chars(std::string s, <span class="keywordtype">bool</span> case_sensitive = <span class="keyword">true</span>) {</div>
+<div class="line"><a name="l00498"></a><span class="lineno">  498</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; s.size(); ++i) {</div>
+<div class="line"><a name="l00499"></a><span class="lineno">  499</span>&#160;          <span class="keywordtype">char</span> c;</div>
+<div class="line"><a name="l00500"></a><span class="lineno">  500</span>&#160;          <span class="keywordflow">if</span> (!(in_ &gt;&gt; c)) {</div>
+<div class="line"><a name="l00501"></a><span class="lineno">  501</span>&#160;            <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> j = 1; j &lt; i; ++j) </div>
+<div class="line"><a name="l00502"></a><span class="lineno">  502</span>&#160;              in_.putback(s[i-j]);</div>
+<div class="line"><a name="l00503"></a><span class="lineno">  503</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00504"></a><span class="lineno">  504</span>&#160;          }</div>
+<div class="line"><a name="l00505"></a><span class="lineno">  505</span>&#160;          <span class="comment">// all ASCII, so toupper is OK</span></div>
+<div class="line"><a name="l00506"></a><span class="lineno">  506</span>&#160;          <span class="keywordflow">if</span> ((case_sensitive &amp;&amp; c != s[i])</div>
+<div class="line"><a name="l00507"></a><span class="lineno">  507</span>&#160;              || (!case_sensitive &amp;&amp; ::toupper(c) != ::toupper(s[i]))) {</div>
+<div class="line"><a name="l00508"></a><span class="lineno">  508</span>&#160;            in_.putback(c);</div>
+<div class="line"><a name="l00509"></a><span class="lineno">  509</span>&#160;            <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> j = 1; j &lt; i; ++j) </div>
+<div class="line"><a name="l00510"></a><span class="lineno">  510</span>&#160;              in_.putback(s[i-j]);</div>
+<div class="line"><a name="l00511"></a><span class="lineno">  511</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00512"></a><span class="lineno">  512</span>&#160;          }</div>
+<div class="line"><a name="l00513"></a><span class="lineno">  513</span>&#160;        }</div>
+<div class="line"><a name="l00514"></a><span class="lineno">  514</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00515"></a><span class="lineno">  515</span>&#160;      }</div>
+<div class="line"><a name="l00516"></a><span class="lineno">  516</span>&#160;</div>
+<div class="line"><a name="l00517"></a><span class="lineno">  517</span>&#160;      <span class="keywordtype">bool</span> scan_number(<span class="keywordtype">bool</span> negate_val) {</div>
+<div class="line"><a name="l00518"></a><span class="lineno">  518</span>&#160;</div>
+<div class="line"><a name="l00519"></a><span class="lineno">  519</span>&#160;        <span class="comment">// must take longest first!</span></div>
+<div class="line"><a name="l00520"></a><span class="lineno">  520</span>&#160;        <span class="keywordflow">if</span> (scan_chars(<span class="stringliteral">&quot;Inf&quot;</span>)) { </div>
+<div class="line"><a name="l00521"></a><span class="lineno">  521</span>&#160;          scan_chars(<span class="stringliteral">&quot;inity&quot;</span>); <span class="comment">// read past if there</span></div>
+<div class="line"><a name="l00522"></a><span class="lineno">  522</span>&#160;          stack_r_.push_back(negate_val</div>
+<div class="line"><a name="l00523"></a><span class="lineno">  523</span>&#160;                             ? -std::numeric_limits&lt;double&gt;::infinity()</div>
+<div class="line"><a name="l00524"></a><span class="lineno">  524</span>&#160;                             : std::numeric_limits&lt;double&gt;::infinity());</div>
+<div class="line"><a name="l00525"></a><span class="lineno">  525</span>&#160;          <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00526"></a><span class="lineno">  526</span>&#160;        }</div>
+<div class="line"><a name="l00527"></a><span class="lineno">  527</span>&#160;        <span class="keywordflow">if</span> (scan_chars(<span class="stringliteral">&quot;NaN&quot;</span>,<span class="keyword">false</span>)) {</div>
+<div class="line"><a name="l00528"></a><span class="lineno">  528</span>&#160;          stack_r_.push_back(std::numeric_limits&lt;double&gt;::quiet_NaN());</div>
+<div class="line"><a name="l00529"></a><span class="lineno">  529</span>&#160;          <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00530"></a><span class="lineno">  530</span>&#160;        }</div>
+<div class="line"><a name="l00531"></a><span class="lineno">  531</span>&#160;</div>
+<div class="line"><a name="l00532"></a><span class="lineno">  532</span>&#160;        <span class="keywordtype">char</span> c;</div>
+<div class="line"><a name="l00533"></a><span class="lineno">  533</span>&#160;        <span class="keywordtype">bool</span> is_double = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00534"></a><span class="lineno">  534</span>&#160;        std::string buf;</div>
+<div class="line"><a name="l00535"></a><span class="lineno">  535</span>&#160;        <span class="keywordflow">while</span> (in_.get(c)) {</div>
+<div class="line"><a name="l00536"></a><span class="lineno">  536</span>&#160;          <span class="keywordflow">if</span> (std::isdigit(c)) { <span class="comment">// before pre-scan || c == &#39;-&#39; || c == &#39;+&#39;) {</span></div>
+<div class="line"><a name="l00537"></a><span class="lineno">  537</span>&#160;            buf.push_back(c);</div>
+<div class="line"><a name="l00538"></a><span class="lineno">  538</span>&#160;          } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (c == <span class="charliteral">&#39;.&#39;</span></div>
+<div class="line"><a name="l00539"></a><span class="lineno">  539</span>&#160;                     || c == <span class="charliteral">&#39;e&#39;</span></div>
+<div class="line"><a name="l00540"></a><span class="lineno">  540</span>&#160;                     || c == <span class="charliteral">&#39;E&#39;</span></div>
+<div class="line"><a name="l00541"></a><span class="lineno">  541</span>&#160;                     || c == <span class="charliteral">&#39;-&#39;</span></div>
+<div class="line"><a name="l00542"></a><span class="lineno">  542</span>&#160;                     || c == <span class="charliteral">&#39;+&#39;</span>) {</div>
+<div class="line"><a name="l00543"></a><span class="lineno">  543</span>&#160;            is_double = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00544"></a><span class="lineno">  544</span>&#160;            buf.push_back(c);</div>
+<div class="line"><a name="l00545"></a><span class="lineno">  545</span>&#160;          } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00546"></a><span class="lineno">  546</span>&#160;            in_.putback(c);</div>
+<div class="line"><a name="l00547"></a><span class="lineno">  547</span>&#160;            <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00548"></a><span class="lineno">  548</span>&#160;          }</div>
+<div class="line"><a name="l00549"></a><span class="lineno">  549</span>&#160;        }</div>
+<div class="line"><a name="l00550"></a><span class="lineno">  550</span>&#160;        <span class="keywordflow">if</span> (!is_double &amp;&amp; stack_r_.size() == 0) {</div>
+<div class="line"><a name="l00551"></a><span class="lineno">  551</span>&#160;          <span class="keywordtype">int</span> n;</div>
+<div class="line"><a name="l00552"></a><span class="lineno">  552</span>&#160;          <span class="keywordflow">if</span> (!(std::stringstream(buf) &gt;&gt; n))</div>
+<div class="line"><a name="l00553"></a><span class="lineno">  553</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00554"></a><span class="lineno">  554</span>&#160;          stack_i_.push_back(negate_val ? -n : n);</div>
+<div class="line"><a name="l00555"></a><span class="lineno">  555</span>&#160;          scan_optional_long();</div>
+<div class="line"><a name="l00556"></a><span class="lineno">  556</span>&#160;        } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00557"></a><span class="lineno">  557</span>&#160;          <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> j = 0; j &lt; stack_i_.size(); ++j)</div>
+<div class="line"><a name="l00558"></a><span class="lineno">  558</span>&#160;            stack_r_.push_back(static_cast&lt;double&gt;(stack_i_[j]));</div>
+<div class="line"><a name="l00559"></a><span class="lineno">  559</span>&#160;          <span class="comment">// negate_val </span></div>
+<div class="line"><a name="l00560"></a><span class="lineno">  560</span>&#160;          <span class="comment">// ? -static_cast&lt;double&gt;(stack_i_[j])</span></div>
+<div class="line"><a name="l00561"></a><span class="lineno">  561</span>&#160;          <span class="comment">// : static_cast&lt;double&gt;(stack_i_[j]));</span></div>
+<div class="line"><a name="l00562"></a><span class="lineno">  562</span>&#160;          stack_i_.clear();</div>
+<div class="line"><a name="l00563"></a><span class="lineno">  563</span>&#160;          <span class="keywordtype">double</span> x;</div>
+<div class="line"><a name="l00564"></a><span class="lineno">  564</span>&#160;          <span class="keywordflow">if</span> (!(std::stringstream(buf) &gt;&gt; x))</div>
+<div class="line"><a name="l00565"></a><span class="lineno">  565</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00566"></a><span class="lineno">  566</span>&#160;          stack_r_.push_back(negate_val ? -x : x);</div>
+<div class="line"><a name="l00567"></a><span class="lineno">  567</span>&#160;        }</div>
+<div class="line"><a name="l00568"></a><span class="lineno">  568</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00569"></a><span class="lineno">  569</span>&#160;      }</div>
+<div class="line"><a name="l00570"></a><span class="lineno">  570</span>&#160;</div>
+<div class="line"><a name="l00571"></a><span class="lineno">  571</span>&#160;      <span class="keywordtype">bool</span> scan_number() {</div>
+<div class="line"><a name="l00572"></a><span class="lineno">  572</span>&#160;        <span class="keywordtype">char</span> c;</div>
+<div class="line"><a name="l00573"></a><span class="lineno">  573</span>&#160;        <span class="keywordflow">while</span> (in_.get(c)) {</div>
+<div class="line"><a name="l00574"></a><span class="lineno">  574</span>&#160;          <span class="keywordflow">if</span> (std::isspace(c)) <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00575"></a><span class="lineno">  575</span>&#160;          in_.putback(c);</div>
+<div class="line"><a name="l00576"></a><span class="lineno">  576</span>&#160;          <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00577"></a><span class="lineno">  577</span>&#160;        }</div>
+<div class="line"><a name="l00578"></a><span class="lineno">  578</span>&#160;        <span class="keywordtype">bool</span> negate_val = scan_char(<span class="charliteral">&#39;-&#39;</span>); </div>
+<div class="line"><a name="l00579"></a><span class="lineno">  579</span>&#160;        <span class="keywordflow">if</span> (!negate_val) scan_char(<span class="charliteral">&#39;+&#39;</span>); <span class="comment">// flush leading +</span></div>
+<div class="line"><a name="l00580"></a><span class="lineno">  580</span>&#160;        <span class="keywordflow">return</span> scan_number(negate_val);</div>
+<div class="line"><a name="l00581"></a><span class="lineno">  581</span>&#160;      }</div>
+<div class="line"><a name="l00582"></a><span class="lineno">  582</span>&#160;</div>
+<div class="line"><a name="l00583"></a><span class="lineno">  583</span>&#160;</div>
+<div class="line"><a name="l00584"></a><span class="lineno">  584</span>&#160;      <span class="keywordtype">bool</span> scan_seq_value() {</div>
+<div class="line"><a name="l00585"></a><span class="lineno">  585</span>&#160;        <span class="keywordflow">if</span> (!scan_char(<span class="charliteral">&#39;(&#39;</span>)) <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00586"></a><span class="lineno">  586</span>&#160;        <span class="keywordflow">if</span> (scan_char(<span class="charliteral">&#39;)&#39;</span>)) {</div>
+<div class="line"><a name="l00587"></a><span class="lineno">  587</span>&#160;          dims_.push_back(0U);</div>
+<div class="line"><a name="l00588"></a><span class="lineno">  588</span>&#160;          <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00589"></a><span class="lineno">  589</span>&#160;        }</div>
+<div class="line"><a name="l00590"></a><span class="lineno">  590</span>&#160;        <span class="keywordflow">if</span> (!scan_number()) <span class="keywordflow">return</span> <span class="keyword">false</span>;; <span class="comment">// first entry</span></div>
+<div class="line"><a name="l00591"></a><span class="lineno">  591</span>&#160;        <span class="keywordflow">while</span> (scan_char(<span class="charliteral">&#39;,&#39;</span>)) {</div>
+<div class="line"><a name="l00592"></a><span class="lineno">  592</span>&#160;          <span class="keywordflow">if</span> (!scan_number()) <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00593"></a><span class="lineno">  593</span>&#160;        }</div>
+<div class="line"><a name="l00594"></a><span class="lineno">  594</span>&#160;        dims_.push_back(stack_r_.size() + stack_i_.size());</div>
+<div class="line"><a name="l00595"></a><span class="lineno">  595</span>&#160;        <span class="keywordflow">return</span> scan_char(<span class="charliteral">&#39;)&#39;</span>);</div>
+<div class="line"><a name="l00596"></a><span class="lineno">  596</span>&#160;      }</div>
+<div class="line"><a name="l00597"></a><span class="lineno">  597</span>&#160;</div>
+<div class="line"><a name="l00598"></a><span class="lineno">  598</span>&#160;      <span class="keywordtype">bool</span> scan_struct_value() {</div>
+<div class="line"><a name="l00599"></a><span class="lineno">  599</span>&#160;        <span class="keywordflow">if</span> (!scan_char(<span class="charliteral">&#39;(&#39;</span>)) <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00600"></a><span class="lineno">  600</span>&#160;        <span class="keywordflow">if</span> (scan_char(<span class="charliteral">&#39;c&#39;</span>)) { </div>
+<div class="line"><a name="l00601"></a><span class="lineno">  601</span>&#160;          scan_seq_value();</div>
+<div class="line"><a name="l00602"></a><span class="lineno">  602</span>&#160;        } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00603"></a><span class="lineno">  603</span>&#160;          <span class="keywordtype">size_t</span> start;</div>
+<div class="line"><a name="l00604"></a><span class="lineno">  604</span>&#160;          in_ &gt;&gt; start;</div>
+<div class="line"><a name="l00605"></a><span class="lineno">  605</span>&#160;          <span class="keywordflow">if</span> (!scan_char(<span class="charliteral">&#39;:&#39;</span>))</div>
+<div class="line"><a name="l00606"></a><span class="lineno">  606</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00607"></a><span class="lineno">  607</span>&#160;          <span class="keywordtype">size_t</span> end;</div>
+<div class="line"><a name="l00608"></a><span class="lineno">  608</span>&#160;          in_ &gt;&gt; end;</div>
+<div class="line"><a name="l00609"></a><span class="lineno">  609</span>&#160;          <span class="keywordflow">if</span> (start &lt;= end) {</div>
+<div class="line"><a name="l00610"></a><span class="lineno">  610</span>&#160;            <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = start; i &lt;= end; ++i)</div>
 <div class="line"><a name="l00611"></a><span class="lineno">  611</span>&#160;              stack_i_.push_back(i);</div>
-<div class="line"><a name="l00612"></a><span class="lineno">  612</span>&#160;          }</div>
-<div class="line"><a name="l00613"></a><span class="lineno">  613</span>&#160;        } </div>
-<div class="line"><a name="l00614"></a><span class="lineno">  614</span>&#160;        dims_.clear();</div>
-<div class="line"><a name="l00615"></a><span class="lineno">  615</span>&#160;        <span class="keywordflow">if</span> (!scan_char(<span class="charliteral">&#39;,&#39;</span>)) <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00616"></a><span class="lineno">  616</span>&#160;        <span class="keywordflow">if</span> (!scan_char(<span class="charliteral">&#39;.&#39;</span>)) <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00617"></a><span class="lineno">  617</span>&#160;        <span class="keywordflow">if</span> (!scan_chars(<span class="stringliteral">&quot;Dim&quot;</span>)) <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00618"></a><span class="lineno">  618</span>&#160;        <span class="keywordflow">if</span> (!scan_char(<span class="charliteral">&#39;=&#39;</span>)) <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00619"></a><span class="lineno">  619</span>&#160;        <span class="keywordflow">if</span> (scan_char(<span class="charliteral">&#39;c&#39;</span>)) {</div>
-<div class="line"><a name="l00620"></a><span class="lineno">  620</span>&#160;          <span class="keywordflow">if</span> (!scan_char(<span class="charliteral">&#39;(&#39;</span>)) <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00621"></a><span class="lineno">  621</span>&#160;          <span class="keywordtype">size_t</span> dim;</div>
-<div class="line"><a name="l00622"></a><span class="lineno">  622</span>&#160;          in_ &gt;&gt; dim;</div>
-<div class="line"><a name="l00623"></a><span class="lineno">  623</span>&#160;          scan_optional_long(); </div>
-<div class="line"><a name="l00624"></a><span class="lineno">  624</span>&#160;          dims_.push_back(dim);</div>
-<div class="line"><a name="l00625"></a><span class="lineno">  625</span>&#160;          <span class="keywordflow">while</span> (scan_char(<span class="charliteral">&#39;,&#39;</span>)) {</div>
-<div class="line"><a name="l00626"></a><span class="lineno">  626</span>&#160;            in_ &gt;&gt; dim;</div>
-<div class="line"><a name="l00627"></a><span class="lineno">  627</span>&#160;            scan_optional_long(); </div>
-<div class="line"><a name="l00628"></a><span class="lineno">  628</span>&#160;            dims_.push_back(dim);</div>
-<div class="line"><a name="l00629"></a><span class="lineno">  629</span>&#160;          }</div>
-<div class="line"><a name="l00630"></a><span class="lineno">  630</span>&#160;          <span class="keywordflow">if</span> (!scan_char(<span class="charliteral">&#39;)&#39;</span>)) <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00631"></a><span class="lineno">  631</span>&#160;        } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00632"></a><span class="lineno">  632</span>&#160;          <span class="keywordtype">size_t</span> start;</div>
-<div class="line"><a name="l00633"></a><span class="lineno">  633</span>&#160;          in_ &gt;&gt; start;</div>
-<div class="line"><a name="l00634"></a><span class="lineno">  634</span>&#160;          <span class="keywordflow">if</span> (!scan_char(<span class="charliteral">&#39;:&#39;</span>))</div>
-<div class="line"><a name="l00635"></a><span class="lineno">  635</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00636"></a><span class="lineno">  636</span>&#160;          <span class="keywordtype">size_t</span> end;</div>
-<div class="line"><a name="l00637"></a><span class="lineno">  637</span>&#160;          in_ &gt;&gt; end;</div>
-<div class="line"><a name="l00638"></a><span class="lineno">  638</span>&#160;          <span class="keywordflow">if</span> (start &lt; end) {</div>
-<div class="line"><a name="l00639"></a><span class="lineno">  639</span>&#160;            <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = start; i &lt;= end; ++i)</div>
-<div class="line"><a name="l00640"></a><span class="lineno">  640</span>&#160;              dims_.push_back(i);</div>
-<div class="line"><a name="l00641"></a><span class="lineno">  641</span>&#160;          } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00642"></a><span class="lineno">  642</span>&#160;            <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = start; i &gt;= end; --i)</div>
+<div class="line"><a name="l00612"></a><span class="lineno">  612</span>&#160;          } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00613"></a><span class="lineno">  613</span>&#160;            <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = start; i &gt;= end; --i)</div>
+<div class="line"><a name="l00614"></a><span class="lineno">  614</span>&#160;              stack_i_.push_back(i);</div>
+<div class="line"><a name="l00615"></a><span class="lineno">  615</span>&#160;          }</div>
+<div class="line"><a name="l00616"></a><span class="lineno">  616</span>&#160;        } </div>
+<div class="line"><a name="l00617"></a><span class="lineno">  617</span>&#160;        dims_.clear();</div>
+<div class="line"><a name="l00618"></a><span class="lineno">  618</span>&#160;        <span class="keywordflow">if</span> (!scan_char(<span class="charliteral">&#39;,&#39;</span>)) <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00619"></a><span class="lineno">  619</span>&#160;        <span class="keywordflow">if</span> (!scan_char(<span class="charliteral">&#39;.&#39;</span>)) <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00620"></a><span class="lineno">  620</span>&#160;        <span class="keywordflow">if</span> (!scan_chars(<span class="stringliteral">&quot;Dim&quot;</span>)) <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00621"></a><span class="lineno">  621</span>&#160;        <span class="keywordflow">if</span> (!scan_char(<span class="charliteral">&#39;=&#39;</span>)) <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00622"></a><span class="lineno">  622</span>&#160;        <span class="keywordflow">if</span> (scan_char(<span class="charliteral">&#39;c&#39;</span>)) {</div>
+<div class="line"><a name="l00623"></a><span class="lineno">  623</span>&#160;          <span class="keywordflow">if</span> (!scan_char(<span class="charliteral">&#39;(&#39;</span>)) <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00624"></a><span class="lineno">  624</span>&#160;          <span class="keywordtype">size_t</span> dim;</div>
+<div class="line"><a name="l00625"></a><span class="lineno">  625</span>&#160;          in_ &gt;&gt; dim;</div>
+<div class="line"><a name="l00626"></a><span class="lineno">  626</span>&#160;          scan_optional_long(); </div>
+<div class="line"><a name="l00627"></a><span class="lineno">  627</span>&#160;          dims_.push_back(dim);</div>
+<div class="line"><a name="l00628"></a><span class="lineno">  628</span>&#160;          <span class="keywordflow">while</span> (scan_char(<span class="charliteral">&#39;,&#39;</span>)) {</div>
+<div class="line"><a name="l00629"></a><span class="lineno">  629</span>&#160;            in_ &gt;&gt; dim;</div>
+<div class="line"><a name="l00630"></a><span class="lineno">  630</span>&#160;            scan_optional_long(); </div>
+<div class="line"><a name="l00631"></a><span class="lineno">  631</span>&#160;            dims_.push_back(dim);</div>
+<div class="line"><a name="l00632"></a><span class="lineno">  632</span>&#160;          }</div>
+<div class="line"><a name="l00633"></a><span class="lineno">  633</span>&#160;          <span class="keywordflow">if</span> (!scan_char(<span class="charliteral">&#39;)&#39;</span>)) <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00634"></a><span class="lineno">  634</span>&#160;        } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00635"></a><span class="lineno">  635</span>&#160;          <span class="keywordtype">size_t</span> start;</div>
+<div class="line"><a name="l00636"></a><span class="lineno">  636</span>&#160;          in_ &gt;&gt; start;</div>
+<div class="line"><a name="l00637"></a><span class="lineno">  637</span>&#160;          <span class="keywordflow">if</span> (!scan_char(<span class="charliteral">&#39;:&#39;</span>))</div>
+<div class="line"><a name="l00638"></a><span class="lineno">  638</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00639"></a><span class="lineno">  639</span>&#160;          <span class="keywordtype">size_t</span> end;</div>
+<div class="line"><a name="l00640"></a><span class="lineno">  640</span>&#160;          in_ &gt;&gt; end;</div>
+<div class="line"><a name="l00641"></a><span class="lineno">  641</span>&#160;          <span class="keywordflow">if</span> (start &lt; end) {</div>
+<div class="line"><a name="l00642"></a><span class="lineno">  642</span>&#160;            <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = start; i &lt;= end; ++i)</div>
 <div class="line"><a name="l00643"></a><span class="lineno">  643</span>&#160;              dims_.push_back(i);</div>
-<div class="line"><a name="l00644"></a><span class="lineno">  644</span>&#160;          }</div>
-<div class="line"><a name="l00645"></a><span class="lineno">  645</span>&#160;        }</div>
-<div class="line"><a name="l00646"></a><span class="lineno">  646</span>&#160;        <span class="keywordflow">if</span> (!scan_char(<span class="charliteral">&#39;)&#39;</span>)) <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00647"></a><span class="lineno">  647</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00648"></a><span class="lineno">  648</span>&#160;      }</div>
-<div class="line"><a name="l00649"></a><span class="lineno">  649</span>&#160;</div>
-<div class="line"><a name="l00650"></a><span class="lineno">  650</span>&#160;  </div>
-<div class="line"><a name="l00651"></a><span class="lineno">  651</span>&#160;</div>
-<div class="line"><a name="l00652"></a><span class="lineno">  652</span>&#160;      <span class="keywordtype">bool</span> scan_value() {</div>
-<div class="line"><a name="l00653"></a><span class="lineno">  653</span>&#160;        <span class="keywordflow">if</span> (scan_char(<span class="charliteral">&#39;c&#39;</span>))</div>
-<div class="line"><a name="l00654"></a><span class="lineno">  654</span>&#160;          <span class="keywordflow">return</span> scan_seq_value();</div>
-<div class="line"><a name="l00655"></a><span class="lineno">  655</span>&#160;        <span class="keywordflow">if</span> (scan_chars(<span class="stringliteral">&quot;structure&quot;</span>))</div>
-<div class="line"><a name="l00656"></a><span class="lineno">  656</span>&#160;          <span class="keywordflow">return</span> scan_struct_value();</div>
-<div class="line"><a name="l00657"></a><span class="lineno">  657</span>&#160;        <span class="keywordflow">if</span> (!scan_number()) </div>
-<div class="line"><a name="l00658"></a><span class="lineno">  658</span>&#160;          <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00659"></a><span class="lineno">  659</span>&#160;        <span class="keywordflow">if</span> (!scan_char(<span class="charliteral">&#39;:&#39;</span>))</div>
-<div class="line"><a name="l00660"></a><span class="lineno">  660</span>&#160;          <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00661"></a><span class="lineno">  661</span>&#160;        <span class="keywordflow">if</span> (stack_i_.size() != 1)</div>
-<div class="line"><a name="l00662"></a><span class="lineno">  662</span>&#160;          <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00663"></a><span class="lineno">  663</span>&#160;        <span class="keywordflow">if</span> (!scan_number())</div>
-<div class="line"><a name="l00664"></a><span class="lineno">  664</span>&#160;          <span class="keywordflow">return</span> <span class="keyword">false</span>; </div>
-<div class="line"><a name="l00665"></a><span class="lineno">  665</span>&#160;        <span class="keywordflow">if</span> (stack_i_.size() != 2)</div>
-<div class="line"><a name="l00666"></a><span class="lineno">  666</span>&#160;          <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00667"></a><span class="lineno">  667</span>&#160;        <span class="keywordtype">int</span> start = stack_i_[0];</div>
-<div class="line"><a name="l00668"></a><span class="lineno">  668</span>&#160;        <span class="keywordtype">int</span> end = stack_i_[1];</div>
-<div class="line"><a name="l00669"></a><span class="lineno">  669</span>&#160;        stack_i_.clear();</div>
-<div class="line"><a name="l00670"></a><span class="lineno">  670</span>&#160;        <span class="keywordflow">if</span> (start &lt;= end) {</div>
-<div class="line"><a name="l00671"></a><span class="lineno">  671</span>&#160;          <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = start; i &lt;= end; ++i)</div>
-<div class="line"><a name="l00672"></a><span class="lineno">  672</span>&#160;            stack_i_.push_back(i);</div>
-<div class="line"><a name="l00673"></a><span class="lineno">  673</span>&#160;        } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00674"></a><span class="lineno">  674</span>&#160;          <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = start; i &gt;= end; --i) </div>
+<div class="line"><a name="l00644"></a><span class="lineno">  644</span>&#160;          } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00645"></a><span class="lineno">  645</span>&#160;            <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = start; i &gt;= end; --i)</div>
+<div class="line"><a name="l00646"></a><span class="lineno">  646</span>&#160;              dims_.push_back(i);</div>
+<div class="line"><a name="l00647"></a><span class="lineno">  647</span>&#160;          }</div>
+<div class="line"><a name="l00648"></a><span class="lineno">  648</span>&#160;        }</div>
+<div class="line"><a name="l00649"></a><span class="lineno">  649</span>&#160;        <span class="keywordflow">if</span> (!scan_char(<span class="charliteral">&#39;)&#39;</span>)) <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00650"></a><span class="lineno">  650</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00651"></a><span class="lineno">  651</span>&#160;      }</div>
+<div class="line"><a name="l00652"></a><span class="lineno">  652</span>&#160;</div>
+<div class="line"><a name="l00653"></a><span class="lineno">  653</span>&#160;  </div>
+<div class="line"><a name="l00654"></a><span class="lineno">  654</span>&#160;</div>
+<div class="line"><a name="l00655"></a><span class="lineno">  655</span>&#160;      <span class="keywordtype">bool</span> scan_value() {</div>
+<div class="line"><a name="l00656"></a><span class="lineno">  656</span>&#160;        <span class="keywordflow">if</span> (scan_char(<span class="charliteral">&#39;c&#39;</span>))</div>
+<div class="line"><a name="l00657"></a><span class="lineno">  657</span>&#160;          <span class="keywordflow">return</span> scan_seq_value();</div>
+<div class="line"><a name="l00658"></a><span class="lineno">  658</span>&#160;        <span class="keywordflow">if</span> (scan_chars(<span class="stringliteral">&quot;structure&quot;</span>))</div>
+<div class="line"><a name="l00659"></a><span class="lineno">  659</span>&#160;          <span class="keywordflow">return</span> scan_struct_value();</div>
+<div class="line"><a name="l00660"></a><span class="lineno">  660</span>&#160;        <span class="keywordflow">if</span> (!scan_number()) </div>
+<div class="line"><a name="l00661"></a><span class="lineno">  661</span>&#160;          <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00662"></a><span class="lineno">  662</span>&#160;        <span class="keywordflow">if</span> (!scan_char(<span class="charliteral">&#39;:&#39;</span>))</div>
+<div class="line"><a name="l00663"></a><span class="lineno">  663</span>&#160;          <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00664"></a><span class="lineno">  664</span>&#160;        <span class="keywordflow">if</span> (stack_i_.size() != 1)</div>
+<div class="line"><a name="l00665"></a><span class="lineno">  665</span>&#160;          <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00666"></a><span class="lineno">  666</span>&#160;        <span class="keywordflow">if</span> (!scan_number())</div>
+<div class="line"><a name="l00667"></a><span class="lineno">  667</span>&#160;          <span class="keywordflow">return</span> <span class="keyword">false</span>; </div>
+<div class="line"><a name="l00668"></a><span class="lineno">  668</span>&#160;        <span class="keywordflow">if</span> (stack_i_.size() != 2)</div>
+<div class="line"><a name="l00669"></a><span class="lineno">  669</span>&#160;          <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00670"></a><span class="lineno">  670</span>&#160;        <span class="keywordtype">int</span> start = stack_i_[0];</div>
+<div class="line"><a name="l00671"></a><span class="lineno">  671</span>&#160;        <span class="keywordtype">int</span> end = stack_i_[1];</div>
+<div class="line"><a name="l00672"></a><span class="lineno">  672</span>&#160;        stack_i_.clear();</div>
+<div class="line"><a name="l00673"></a><span class="lineno">  673</span>&#160;        <span class="keywordflow">if</span> (start &lt;= end) {</div>
+<div class="line"><a name="l00674"></a><span class="lineno">  674</span>&#160;          <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = start; i &lt;= end; ++i)</div>
 <div class="line"><a name="l00675"></a><span class="lineno">  675</span>&#160;            stack_i_.push_back(i);</div>
-<div class="line"><a name="l00676"></a><span class="lineno">  676</span>&#160;        }</div>
-<div class="line"><a name="l00677"></a><span class="lineno">  677</span>&#160;        dims_.push_back(stack_i_.size());</div>
-<div class="line"><a name="l00678"></a><span class="lineno">  678</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00679"></a><span class="lineno">  679</span>&#160;      }</div>
-<div class="line"><a name="l00680"></a><span class="lineno">  680</span>&#160;</div>
-<div class="line"><a name="l00684"></a><span class="lineno">  684</span>&#160;      <span class="keywordtype">void</span> print() {</div>
-<div class="line"><a name="l00685"></a><span class="lineno">  685</span>&#160;        std::cout &lt;&lt; <span class="stringliteral">&quot;var name=|&quot;</span> &lt;&lt; name_ &lt;&lt; <span class="stringliteral">&quot;|&quot;</span> &lt;&lt; std::endl;</div>
-<div class="line"><a name="l00686"></a><span class="lineno">  686</span>&#160;        std:: cout &lt;&lt; <span class="stringliteral">&quot;dims=(&quot;</span>;</div>
-<div class="line"><a name="l00687"></a><span class="lineno">  687</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; dims_.size(); ++i) {</div>
-<div class="line"><a name="l00688"></a><span class="lineno">  688</span>&#160;          <span class="keywordflow">if</span> (i &gt; 0)</div>
-<div class="line"><a name="l00689"></a><span class="lineno">  689</span>&#160;            std::cout &lt;&lt; <span class="stringliteral">&quot;,&quot;</span>;</div>
-<div class="line"><a name="l00690"></a><span class="lineno">  690</span>&#160;          std::cout &lt;&lt; dims_[i];</div>
-<div class="line"><a name="l00691"></a><span class="lineno">  691</span>&#160;        }</div>
-<div class="line"><a name="l00692"></a><span class="lineno">  692</span>&#160;        std::cout &lt;&lt; <span class="stringliteral">&quot;)&quot;</span> &lt;&lt; std::endl;</div>
-<div class="line"><a name="l00693"></a><span class="lineno">  693</span>&#160;        std::cout &lt;&lt; <span class="stringliteral">&quot;float stack:&quot;</span> &lt;&lt; std::endl;</div>
-<div class="line"><a name="l00694"></a><span class="lineno">  694</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; stack_r_.size(); ++i)</div>
-<div class="line"><a name="l00695"></a><span class="lineno">  695</span>&#160;          std::cout &lt;&lt; <span class="stringliteral">&quot;  [&quot;</span> &lt;&lt; i &lt;&lt; <span class="stringliteral">&quot;] &quot;</span> &lt;&lt; stack_r_[i] &lt;&lt; std::endl;</div>
-<div class="line"><a name="l00696"></a><span class="lineno">  696</span>&#160;        std::cout &lt;&lt; <span class="stringliteral">&quot;int stack&quot;</span> &lt;&lt; std::endl;</div>
-<div class="line"><a name="l00697"></a><span class="lineno">  697</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; stack_i_.size(); ++i)</div>
-<div class="line"><a name="l00698"></a><span class="lineno">  698</span>&#160;          std::cout &lt;&lt; <span class="stringliteral">&quot;  [&quot;</span> &lt;&lt; i &lt;&lt; <span class="stringliteral">&quot;] &quot;</span> &lt;&lt; stack_i_[i] &lt;&lt; std::endl;</div>
-<div class="line"><a name="l00699"></a><span class="lineno">  699</span>&#160;      }</div>
-<div class="line"><a name="l00700"></a><span class="lineno">  700</span>&#160;</div>
-<div class="line"><a name="l00701"></a><span class="lineno">  701</span>&#160;</div>
-<div class="line"><a name="l00702"></a><span class="lineno">  702</span>&#160;    <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00706"></a><span class="lineno"><a class="code" href="classstan_1_1io_1_1dump__reader.html#a60f0c45b98358118444362c4a954068f">  706</a></span>&#160;      <a class="code" href="classstan_1_1io_1_1dump__reader.html#a60f0c45b98358118444362c4a954068f" title="Construct a reader for standard input.">dump_reader</a>() : in_(std::cin) { }</div>
-<div class="line"><a name="l00707"></a><span class="lineno">  707</span>&#160;</div>
-<div class="line"><a name="l00713"></a><span class="lineno"><a class="code" href="classstan_1_1io_1_1dump__reader.html#a5a2d82e204b9dc1b0af62fc902a17e37">  713</a></span>&#160;      <a class="code" href="classstan_1_1io_1_1dump__reader.html#a5a2d82e204b9dc1b0af62fc902a17e37" title="Construct a reader for the specified input stream.">dump_reader</a>(std::istream&amp; in) : in_(in) { }</div>
-<div class="line"><a name="l00714"></a><span class="lineno">  714</span>&#160;</div>
-<div class="line"><a name="l00718"></a><span class="lineno"><a class="code" href="classstan_1_1io_1_1dump__reader.html#aff43241b7509e1877e4bca83e292fff1">  718</a></span>&#160;      <a class="code" href="classstan_1_1io_1_1dump__reader.html#aff43241b7509e1877e4bca83e292fff1" title="Destroy this reader.">~dump_reader</a>() { }</div>
-<div class="line"><a name="l00719"></a><span class="lineno">  719</span>&#160;</div>
-<div class="line"><a name="l00720"></a><span class="lineno">  720</span>&#160;</div>
-<div class="line"><a name="l00726"></a><span class="lineno"><a class="code" href="classstan_1_1io_1_1dump__reader.html#aed540ae1e798ad34757a2a66c35ad054">  726</a></span>&#160;      std::string <a class="code" href="classstan_1_1io_1_1dump__reader.html#aed540ae1e798ad34757a2a66c35ad054" title="Return the name of the most recently read variable.">name</a>() {</div>
-<div class="line"><a name="l00727"></a><span class="lineno">  727</span>&#160;        <span class="keywordflow">return</span> name_;</div>
-<div class="line"><a name="l00728"></a><span class="lineno">  728</span>&#160;      }</div>
-<div class="line"><a name="l00729"></a><span class="lineno">  729</span>&#160;</div>
-<div class="line"><a name="l00736"></a><span class="lineno"><a class="code" href="classstan_1_1io_1_1dump__reader.html#a6ada826cbef5e7ab4213efe629945d95">  736</a></span>&#160;      std::vector&lt;size_t&gt; <a class="code" href="classstan_1_1io_1_1dump__reader.html#a6ada826cbef5e7ab4213efe629945d95" title="Return the dimensions of the most recently read variable.">dims</a>() {</div>
-<div class="line"><a name="l00737"></a><span class="lineno">  737</span>&#160;        <span class="keywordflow">return</span> dims_;</div>
-<div class="line"><a name="l00738"></a><span class="lineno">  738</span>&#160;      }</div>
-<div class="line"><a name="l00739"></a><span class="lineno">  739</span>&#160;</div>
-<div class="line"><a name="l00747"></a><span class="lineno"><a class="code" href="classstan_1_1io_1_1dump__reader.html#a17c0c96ad8cb3c3c362fa74384b45bb7">  747</a></span>&#160;      <span class="keywordtype">bool</span> <a class="code" href="classstan_1_1io_1_1dump__reader.html#a17c0c96ad8cb3c3c362fa74384b45bb7" title="Checks if the last item read is integer.">is_int</a>() {</div>
-<div class="line"><a name="l00748"></a><span class="lineno">  748</span>&#160;        <span class="keywordflow">return</span> stack_i_.size() &gt; 0;</div>
-<div class="line"><a name="l00749"></a><span class="lineno">  749</span>&#160;      }</div>
-<div class="line"><a name="l00750"></a><span class="lineno">  750</span>&#160;</div>
-<div class="line"><a name="l00757"></a><span class="lineno"><a class="code" href="classstan_1_1io_1_1dump__reader.html#a595a2345787b84d1cb763c5f45a2c749">  757</a></span>&#160;      std::vector&lt;int&gt; <a class="code" href="classstan_1_1io_1_1dump__reader.html#a595a2345787b84d1cb763c5f45a2c749" title="Returns the integer values from the last item if the last item read was an integer and the empty vect...">int_values</a>() {</div>
-<div class="line"><a name="l00758"></a><span class="lineno">  758</span>&#160;        <span class="keywordflow">return</span> stack_i_;</div>
-<div class="line"><a name="l00759"></a><span class="lineno">  759</span>&#160;      }</div>
-<div class="line"><a name="l00760"></a><span class="lineno">  760</span>&#160;</div>
-<div class="line"><a name="l00768"></a><span class="lineno"><a class="code" href="classstan_1_1io_1_1dump__reader.html#ac275a400d67c89a01d980fa2ea093ed3">  768</a></span>&#160;      std::vector&lt;double&gt; <a class="code" href="classstan_1_1io_1_1dump__reader.html#ac275a400d67c89a01d980fa2ea093ed3" title="Returns the floating point values from the last item if the last item read contained floating point v...">double_values</a>() {</div>
-<div class="line"><a name="l00769"></a><span class="lineno">  769</span>&#160;        <span class="keywordflow">return</span> stack_r_;</div>
-<div class="line"><a name="l00770"></a><span class="lineno">  770</span>&#160;      }</div>
-<div class="line"><a name="l00771"></a><span class="lineno">  771</span>&#160;</div>
-<div class="line"><a name="l00779"></a><span class="lineno"><a class="code" href="classstan_1_1io_1_1dump__reader.html#aed46c1062b3a19c22a7440b72f1c8ffd">  779</a></span>&#160;      <span class="keywordtype">bool</span> <a class="code" href="classstan_1_1io_1_1dump__reader.html#aed46c1062b3a19c22a7440b72f1c8ffd" title="Read the next value from the input stream, returning true if successful and false if no further input...">next</a>() {</div>
-<div class="line"><a name="l00780"></a><span class="lineno">  780</span>&#160;        stack_r_.clear();</div>
-<div class="line"><a name="l00781"></a><span class="lineno">  781</span>&#160;        stack_i_.clear();</div>
-<div class="line"><a name="l00782"></a><span class="lineno">  782</span>&#160;        dims_.clear();</div>
-<div class="line"><a name="l00783"></a><span class="lineno">  783</span>&#160;        name_.erase();</div>
-<div class="line"><a name="l00784"></a><span class="lineno">  784</span>&#160;        <span class="keywordflow">if</span> (!scan_name())  <span class="comment">// set name</span></div>
-<div class="line"><a name="l00785"></a><span class="lineno">  785</span>&#160;          <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00786"></a><span class="lineno">  786</span>&#160;        <span class="keywordflow">if</span> (!scan_char(<span class="charliteral">&#39;&lt;&#39;</span>)) <span class="comment">// set &lt;- </span></div>
-<div class="line"><a name="l00787"></a><span class="lineno">  787</span>&#160;          <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00788"></a><span class="lineno">  788</span>&#160;        <span class="keywordflow">if</span> (!scan_char(<span class="charliteral">&#39;-&#39;</span>)) </div>
-<div class="line"><a name="l00789"></a><span class="lineno">  789</span>&#160;          <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00790"></a><span class="lineno">  790</span>&#160;        <span class="keywordflow">if</span> (!scan_value()) <span class="comment">// set stack_r_, stack_i_, dims_</span></div>
-<div class="line"><a name="l00791"></a><span class="lineno">  791</span>&#160;          <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00792"></a><span class="lineno">  792</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00793"></a><span class="lineno">  793</span>&#160;      }</div>
-<div class="line"><a name="l00794"></a><span class="lineno">  794</span>&#160;  </div>
-<div class="line"><a name="l00795"></a><span class="lineno">  795</span>&#160;    };</div>
-<div class="line"><a name="l00796"></a><span class="lineno">  796</span>&#160;</div>
-<div class="line"><a name="l00797"></a><span class="lineno">  797</span>&#160;</div>
-<div class="line"><a name="l00798"></a><span class="lineno">  798</span>&#160;</div>
-<div class="line"><a name="l00814"></a><span class="lineno"><a class="code" href="classstan_1_1io_1_1dump.html">  814</a></span>&#160;    <span class="keyword">class </span><a class="code" href="classstan_1_1io_1_1dump.html" title="Represents named arrays with dimensions.">dump</a> : <span class="keyword">public</span> <a class="code" href="classstan_1_1io_1_1var__context.html" title="A var_reader reads array variables of integer and floating point type by name and dimension...">stan::io::var_context</a> {</div>
-<div class="line"><a name="l00815"></a><span class="lineno">  815</span>&#160;    <span class="keyword">private</span>: </div>
-<div class="line"><a name="l00816"></a><span class="lineno">  816</span>&#160;      std::map&lt;std::string, </div>
-<div class="line"><a name="l00817"></a><span class="lineno">  817</span>&#160;               std::pair&lt;std::vector&lt;double&gt;,</div>
-<div class="line"><a name="l00818"></a><span class="lineno">  818</span>&#160;                         std::vector&lt;size_t&gt; &gt; &gt; vars_r_;</div>
+<div class="line"><a name="l00676"></a><span class="lineno">  676</span>&#160;        } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00677"></a><span class="lineno">  677</span>&#160;          <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = start; i &gt;= end; --i) </div>
+<div class="line"><a name="l00678"></a><span class="lineno">  678</span>&#160;            stack_i_.push_back(i);</div>
+<div class="line"><a name="l00679"></a><span class="lineno">  679</span>&#160;        }</div>
+<div class="line"><a name="l00680"></a><span class="lineno">  680</span>&#160;        dims_.push_back(stack_i_.size());</div>
+<div class="line"><a name="l00681"></a><span class="lineno">  681</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00682"></a><span class="lineno">  682</span>&#160;      }</div>
+<div class="line"><a name="l00683"></a><span class="lineno">  683</span>&#160;</div>
+<div class="line"><a name="l00687"></a><span class="lineno">  687</span>&#160;      <span class="keywordtype">void</span> print() {</div>
+<div class="line"><a name="l00688"></a><span class="lineno">  688</span>&#160;        std::cout &lt;&lt; <span class="stringliteral">&quot;var name=|&quot;</span> &lt;&lt; name_ &lt;&lt; <span class="stringliteral">&quot;|&quot;</span> &lt;&lt; std::endl;</div>
+<div class="line"><a name="l00689"></a><span class="lineno">  689</span>&#160;        std:: cout &lt;&lt; <span class="stringliteral">&quot;dims=(&quot;</span>;</div>
+<div class="line"><a name="l00690"></a><span class="lineno">  690</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; dims_.size(); ++i) {</div>
+<div class="line"><a name="l00691"></a><span class="lineno">  691</span>&#160;          <span class="keywordflow">if</span> (i &gt; 0)</div>
+<div class="line"><a name="l00692"></a><span class="lineno">  692</span>&#160;            std::cout &lt;&lt; <span class="stringliteral">&quot;,&quot;</span>;</div>
+<div class="line"><a name="l00693"></a><span class="lineno">  693</span>&#160;          std::cout &lt;&lt; dims_[i];</div>
+<div class="line"><a name="l00694"></a><span class="lineno">  694</span>&#160;        }</div>
+<div class="line"><a name="l00695"></a><span class="lineno">  695</span>&#160;        std::cout &lt;&lt; <span class="stringliteral">&quot;)&quot;</span> &lt;&lt; std::endl;</div>
+<div class="line"><a name="l00696"></a><span class="lineno">  696</span>&#160;        std::cout &lt;&lt; <span class="stringliteral">&quot;float stack:&quot;</span> &lt;&lt; std::endl;</div>
+<div class="line"><a name="l00697"></a><span class="lineno">  697</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; stack_r_.size(); ++i)</div>
+<div class="line"><a name="l00698"></a><span class="lineno">  698</span>&#160;          std::cout &lt;&lt; <span class="stringliteral">&quot;  [&quot;</span> &lt;&lt; i &lt;&lt; <span class="stringliteral">&quot;] &quot;</span> &lt;&lt; stack_r_[i] &lt;&lt; std::endl;</div>
+<div class="line"><a name="l00699"></a><span class="lineno">  699</span>&#160;        std::cout &lt;&lt; <span class="stringliteral">&quot;int stack&quot;</span> &lt;&lt; std::endl;</div>
+<div class="line"><a name="l00700"></a><span class="lineno">  700</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; stack_i_.size(); ++i)</div>
+<div class="line"><a name="l00701"></a><span class="lineno">  701</span>&#160;          std::cout &lt;&lt; <span class="stringliteral">&quot;  [&quot;</span> &lt;&lt; i &lt;&lt; <span class="stringliteral">&quot;] &quot;</span> &lt;&lt; stack_i_[i] &lt;&lt; std::endl;</div>
+<div class="line"><a name="l00702"></a><span class="lineno">  702</span>&#160;      }</div>
+<div class="line"><a name="l00703"></a><span class="lineno">  703</span>&#160;</div>
+<div class="line"><a name="l00704"></a><span class="lineno">  704</span>&#160;</div>
+<div class="line"><a name="l00705"></a><span class="lineno">  705</span>&#160;    <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00709"></a><span class="lineno"><a class="code" href="classstan_1_1io_1_1dump__reader.html#a60f0c45b98358118444362c4a954068f">  709</a></span>&#160;      <a class="code" href="classstan_1_1io_1_1dump__reader.html#a60f0c45b98358118444362c4a954068f" title="Construct a reader for standard input.">dump_reader</a>() : in_(std::cin) { }</div>
+<div class="line"><a name="l00710"></a><span class="lineno">  710</span>&#160;</div>
+<div class="line"><a name="l00716"></a><span class="lineno"><a class="code" href="classstan_1_1io_1_1dump__reader.html#a5a2d82e204b9dc1b0af62fc902a17e37">  716</a></span>&#160;      <a class="code" href="classstan_1_1io_1_1dump__reader.html#a5a2d82e204b9dc1b0af62fc902a17e37" title="Construct a reader for the specified input stream.">dump_reader</a>(std::istream&amp; in) : in_(in) { }</div>
+<div class="line"><a name="l00717"></a><span class="lineno">  717</span>&#160;</div>
+<div class="line"><a name="l00721"></a><span class="lineno"><a class="code" href="classstan_1_1io_1_1dump__reader.html#aff43241b7509e1877e4bca83e292fff1">  721</a></span>&#160;      <a class="code" href="classstan_1_1io_1_1dump__reader.html#aff43241b7509e1877e4bca83e292fff1" title="Destroy this reader.">~dump_reader</a>() { }</div>
+<div class="line"><a name="l00722"></a><span class="lineno">  722</span>&#160;</div>
+<div class="line"><a name="l00723"></a><span class="lineno">  723</span>&#160;</div>
+<div class="line"><a name="l00729"></a><span class="lineno"><a class="code" href="classstan_1_1io_1_1dump__reader.html#aed540ae1e798ad34757a2a66c35ad054">  729</a></span>&#160;      std::string <a class="code" href="classstan_1_1io_1_1dump__reader.html#aed540ae1e798ad34757a2a66c35ad054" title="Return the name of the most recently read variable.">name</a>() {</div>
+<div class="line"><a name="l00730"></a><span class="lineno">  730</span>&#160;        <span class="keywordflow">return</span> name_;</div>
+<div class="line"><a name="l00731"></a><span class="lineno">  731</span>&#160;      }</div>
+<div class="line"><a name="l00732"></a><span class="lineno">  732</span>&#160;</div>
+<div class="line"><a name="l00739"></a><span class="lineno"><a class="code" href="classstan_1_1io_1_1dump__reader.html#a6ada826cbef5e7ab4213efe629945d95">  739</a></span>&#160;      std::vector&lt;size_t&gt; <a class="code" href="classstan_1_1io_1_1dump__reader.html#a6ada826cbef5e7ab4213efe629945d95" title="Return the dimensions of the most recently read variable.">dims</a>() {</div>
+<div class="line"><a name="l00740"></a><span class="lineno">  740</span>&#160;        <span class="keywordflow">return</span> dims_;</div>
+<div class="line"><a name="l00741"></a><span class="lineno">  741</span>&#160;      }</div>
+<div class="line"><a name="l00742"></a><span class="lineno">  742</span>&#160;</div>
+<div class="line"><a name="l00750"></a><span class="lineno"><a class="code" href="classstan_1_1io_1_1dump__reader.html#a17c0c96ad8cb3c3c362fa74384b45bb7">  750</a></span>&#160;      <span class="keywordtype">bool</span> <a class="code" href="classstan_1_1io_1_1dump__reader.html#a17c0c96ad8cb3c3c362fa74384b45bb7" title="Checks if the last item read is integer.">is_int</a>() {</div>
+<div class="line"><a name="l00751"></a><span class="lineno">  751</span>&#160;        <span class="keywordflow">return</span> stack_i_.size() &gt; 0;</div>
+<div class="line"><a name="l00752"></a><span class="lineno">  752</span>&#160;      }</div>
+<div class="line"><a name="l00753"></a><span class="lineno">  753</span>&#160;</div>
+<div class="line"><a name="l00760"></a><span class="lineno"><a class="code" href="classstan_1_1io_1_1dump__reader.html#a595a2345787b84d1cb763c5f45a2c749">  760</a></span>&#160;      std::vector&lt;int&gt; <a class="code" href="classstan_1_1io_1_1dump__reader.html#a595a2345787b84d1cb763c5f45a2c749" title="Returns the integer values from the last item if the last item read was an integer and the empty vect...">int_values</a>() {</div>
+<div class="line"><a name="l00761"></a><span class="lineno">  761</span>&#160;        <span class="keywordflow">return</span> stack_i_;</div>
+<div class="line"><a name="l00762"></a><span class="lineno">  762</span>&#160;      }</div>
+<div class="line"><a name="l00763"></a><span class="lineno">  763</span>&#160;</div>
+<div class="line"><a name="l00771"></a><span class="lineno"><a class="code" href="classstan_1_1io_1_1dump__reader.html#ac275a400d67c89a01d980fa2ea093ed3">  771</a></span>&#160;      std::vector&lt;double&gt; <a class="code" href="classstan_1_1io_1_1dump__reader.html#ac275a400d67c89a01d980fa2ea093ed3" title="Returns the floating point values from the last item if the last item read contained floating point v...">double_values</a>() {</div>
+<div class="line"><a name="l00772"></a><span class="lineno">  772</span>&#160;        <span class="keywordflow">return</span> stack_r_;</div>
+<div class="line"><a name="l00773"></a><span class="lineno">  773</span>&#160;      }</div>
+<div class="line"><a name="l00774"></a><span class="lineno">  774</span>&#160;</div>
+<div class="line"><a name="l00782"></a><span class="lineno"><a class="code" href="classstan_1_1io_1_1dump__reader.html#aed46c1062b3a19c22a7440b72f1c8ffd">  782</a></span>&#160;      <span class="keywordtype">bool</span> <a class="code" href="classstan_1_1io_1_1dump__reader.html#aed46c1062b3a19c22a7440b72f1c8ffd" title="Read the next value from the input stream, returning true if successful and false if no further input...">next</a>() {</div>
+<div class="line"><a name="l00783"></a><span class="lineno">  783</span>&#160;        stack_r_.clear();</div>
+<div class="line"><a name="l00784"></a><span class="lineno">  784</span>&#160;        stack_i_.clear();</div>
+<div class="line"><a name="l00785"></a><span class="lineno">  785</span>&#160;        dims_.clear();</div>
+<div class="line"><a name="l00786"></a><span class="lineno">  786</span>&#160;        name_.erase();</div>
+<div class="line"><a name="l00787"></a><span class="lineno">  787</span>&#160;        <span class="keywordflow">if</span> (!scan_name())  <span class="comment">// set name</span></div>
+<div class="line"><a name="l00788"></a><span class="lineno">  788</span>&#160;          <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00789"></a><span class="lineno">  789</span>&#160;        <span class="keywordflow">if</span> (!scan_char(<span class="charliteral">&#39;&lt;&#39;</span>)) <span class="comment">// set &lt;- </span></div>
+<div class="line"><a name="l00790"></a><span class="lineno">  790</span>&#160;          <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00791"></a><span class="lineno">  791</span>&#160;        <span class="keywordflow">if</span> (!scan_char(<span class="charliteral">&#39;-&#39;</span>)) </div>
+<div class="line"><a name="l00792"></a><span class="lineno">  792</span>&#160;          <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00793"></a><span class="lineno">  793</span>&#160;        <span class="keywordflow">if</span> (!scan_value()) <span class="comment">// set stack_r_, stack_i_, dims_</span></div>
+<div class="line"><a name="l00794"></a><span class="lineno">  794</span>&#160;          <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00795"></a><span class="lineno">  795</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00796"></a><span class="lineno">  796</span>&#160;      }</div>
+<div class="line"><a name="l00797"></a><span class="lineno">  797</span>&#160;  </div>
+<div class="line"><a name="l00798"></a><span class="lineno">  798</span>&#160;    };</div>
+<div class="line"><a name="l00799"></a><span class="lineno">  799</span>&#160;</div>
+<div class="line"><a name="l00800"></a><span class="lineno">  800</span>&#160;</div>
+<div class="line"><a name="l00801"></a><span class="lineno">  801</span>&#160;</div>
+<div class="line"><a name="l00817"></a><span class="lineno"><a class="code" href="classstan_1_1io_1_1dump.html">  817</a></span>&#160;    <span class="keyword">class </span><a class="code" href="classstan_1_1io_1_1dump.html" title="Represents named arrays with dimensions.">dump</a> : <span class="keyword">public</span> <a class="code" href="classstan_1_1io_1_1var__context.html" title="A var_reader reads array variables of integer and floating point type by name and dimension...">stan::io::var_context</a> {</div>
+<div class="line"><a name="l00818"></a><span class="lineno">  818</span>&#160;    <span class="keyword">private</span>: </div>
 <div class="line"><a name="l00819"></a><span class="lineno">  819</span>&#160;      std::map&lt;std::string, </div>
-<div class="line"><a name="l00820"></a><span class="lineno">  820</span>&#160;               std::pair&lt;std::vector&lt;int&gt;, </div>
-<div class="line"><a name="l00821"></a><span class="lineno">  821</span>&#160;                         std::vector&lt;size_t&gt; &gt; &gt; vars_i_;</div>
-<div class="line"><a name="l00822"></a><span class="lineno">  822</span>&#160;      std::vector&lt;double&gt; <span class="keyword">const</span> empty_vec_r_;</div>
-<div class="line"><a name="l00823"></a><span class="lineno">  823</span>&#160;      std::vector&lt;int&gt; <span class="keyword">const</span> empty_vec_i_;</div>
-<div class="line"><a name="l00824"></a><span class="lineno">  824</span>&#160;      std::vector&lt;size_t&gt; <span class="keyword">const</span> empty_vec_ui_;</div>
-<div class="line"><a name="l00834"></a><span class="lineno">  834</span>&#160;      <span class="keywordtype">bool</span> contains_r_only(<span class="keyword">const</span> std::string&amp; name)<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00835"></a><span class="lineno">  835</span>&#160;        <span class="keywordflow">return</span> vars_r_.find(name) != vars_r_.end();</div>
-<div class="line"><a name="l00836"></a><span class="lineno">  836</span>&#160;      }</div>
-<div class="line"><a name="l00837"></a><span class="lineno">  837</span>&#160;    <span class="keyword">public</span>: </div>
-<div class="line"><a name="l00838"></a><span class="lineno">  838</span>&#160;</div>
-<div class="line"><a name="l00846"></a><span class="lineno"><a class="code" href="classstan_1_1io_1_1dump.html#a05c2de349bdf89ef97e2940dfabe3064">  846</a></span>&#160;      <a class="code" href="classstan_1_1io_1_1dump.html#a05c2de349bdf89ef97e2940dfabe3064" title="Construct a dump object from the specified input stream.">dump</a>(std::istream&amp; in) {</div>
-<div class="line"><a name="l00847"></a><span class="lineno">  847</span>&#160;        <a class="code" href="classstan_1_1io_1_1dump__reader.html" title="Reads data from S-plus dump format.">dump_reader</a> <a class="code" href="classstan_1_1io_1_1reader.html" title="A stream-based reader for integer, scalar, vector, matrix and array data types, with Jacobian calcula...">reader</a>(in);</div>
-<div class="line"><a name="l00848"></a><span class="lineno">  848</span>&#160;        <span class="keywordflow">while</span> (reader.<a class="code" href="classstan_1_1io_1_1dump__reader.html#aed46c1062b3a19c22a7440b72f1c8ffd" title="Read the next value from the input stream, returning true if successful and false if no further input...">next</a>()) {</div>
-<div class="line"><a name="l00849"></a><span class="lineno">  849</span>&#160;          <span class="keywordflow">if</span> (reader.<a class="code" href="classstan_1_1io_1_1dump__reader.html#a17c0c96ad8cb3c3c362fa74384b45bb7" title="Checks if the last item read is integer.">is_int</a>()) {</div>
-<div class="line"><a name="l00850"></a><span class="lineno">  850</span>&#160;            vars_i_[reader.<a class="code" href="classstan_1_1io_1_1dump__reader.html#aed540ae1e798ad34757a2a66c35ad054" title="Return the name of the most recently read variable.">name</a>()] </div>
-<div class="line"><a name="l00851"></a><span class="lineno">  851</span>&#160;              = std::pair&lt;std::vector&lt;int&gt;, </div>
-<div class="line"><a name="l00852"></a><span class="lineno">  852</span>&#160;                          std::vector&lt;size_t&gt; &gt;(reader.<a class="code" href="classstan_1_1io_1_1dump__reader.html#a595a2345787b84d1cb763c5f45a2c749" title="Returns the integer values from the last item if the last item read was an integer and the empty vect...">int_values</a>(), </div>
-<div class="line"><a name="l00853"></a><span class="lineno">  853</span>&#160;                                                      reader.<a class="code" href="classstan_1_1io_1_1dump__reader.html#a6ada826cbef5e7ab4213efe629945d95" title="Return the dimensions of the most recently read variable.">dims</a>());</div>
-<div class="line"><a name="l00854"></a><span class="lineno">  854</span>&#160;            </div>
-<div class="line"><a name="l00855"></a><span class="lineno">  855</span>&#160;          } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00856"></a><span class="lineno">  856</span>&#160;            vars_r_[reader.<a class="code" href="classstan_1_1io_1_1dump__reader.html#aed540ae1e798ad34757a2a66c35ad054" title="Return the name of the most recently read variable.">name</a>()] </div>
-<div class="line"><a name="l00857"></a><span class="lineno">  857</span>&#160;              = std::pair&lt;std::vector&lt;double&gt;, </div>
-<div class="line"><a name="l00858"></a><span class="lineno">  858</span>&#160;                          std::vector&lt;size_t&gt; &gt;(reader.<a class="code" href="classstan_1_1io_1_1dump__reader.html#ac275a400d67c89a01d980fa2ea093ed3" title="Returns the floating point values from the last item if the last item read contained floating point v...">double_values</a>(), </div>
-<div class="line"><a name="l00859"></a><span class="lineno">  859</span>&#160;                                                      reader.<a class="code" href="classstan_1_1io_1_1dump__reader.html#a6ada826cbef5e7ab4213efe629945d95" title="Return the dimensions of the most recently read variable.">dims</a>());</div>
-<div class="line"><a name="l00860"></a><span class="lineno">  860</span>&#160;          }</div>
-<div class="line"><a name="l00861"></a><span class="lineno">  861</span>&#160;        }</div>
-<div class="line"><a name="l00862"></a><span class="lineno">  862</span>&#160;      }</div>
-<div class="line"><a name="l00863"></a><span class="lineno">  863</span>&#160;</div>
-<div class="line"><a name="l00872"></a><span class="lineno"><a class="code" href="classstan_1_1io_1_1dump.html#ac531d67fb8a74300ebbe014dfe367706">  872</a></span>&#160;      <span class="keywordtype">bool</span> <a class="code" href="classstan_1_1io_1_1dump.html#ac531d67fb8a74300ebbe014dfe367706" title="Return true if this dump contains the specified variable name is defined.">contains_r</a>(<span class="keyword">const</span> std::string&amp; name)<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00873"></a><span class="lineno">  873</span>&#160;        <span class="keywordflow">return</span> contains_r_only(name) || <a class="code" href="classstan_1_1io_1_1dump.html#a1865fdffc3451dd6460a5540c8e0912e" title="Return true if this dump contains an integer valued array with the specified name.">contains_i</a>(name);</div>
-<div class="line"><a name="l00874"></a><span class="lineno">  874</span>&#160;      }</div>
-<div class="line"><a name="l00875"></a><span class="lineno">  875</span>&#160;</div>
-<div class="line"><a name="l00884"></a><span class="lineno"><a class="code" href="classstan_1_1io_1_1dump.html#a1865fdffc3451dd6460a5540c8e0912e">  884</a></span>&#160;      <span class="keywordtype">bool</span> <a class="code" href="classstan_1_1io_1_1dump.html#a1865fdffc3451dd6460a5540c8e0912e" title="Return true if this dump contains an integer valued array with the specified name.">contains_i</a>(<span class="keyword">const</span> std::string&amp; name)<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00885"></a><span class="lineno">  885</span>&#160;        <span class="keywordflow">return</span> vars_i_.find(name) != vars_i_.end();</div>
-<div class="line"><a name="l00886"></a><span class="lineno">  886</span>&#160;      }</div>
-<div class="line"><a name="l00887"></a><span class="lineno">  887</span>&#160;</div>
-<div class="line"><a name="l00895"></a><span class="lineno"><a class="code" href="classstan_1_1io_1_1dump.html#aa9b7bc08c1152a313e90b74ade5338b5">  895</a></span>&#160;      std::vector&lt;double&gt; <a class="code" href="classstan_1_1io_1_1dump.html#aa9b7bc08c1152a313e90b74ade5338b5" title="Return the double values for the variable with the specified name or null.">vals_r</a>(<span class="keyword">const</span> std::string&amp; name)<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00896"></a><span class="lineno">  896</span>&#160;        <span class="keywordflow">if</span> (contains_r_only(name)) {</div>
-<div class="line"><a name="l00897"></a><span class="lineno">  897</span>&#160;          <span class="keywordflow">return</span> (vars_r_.find(name)-&gt;second).first;</div>
-<div class="line"><a name="l00898"></a><span class="lineno">  898</span>&#160;        } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (<a class="code" href="classstan_1_1io_1_1dump.html#a1865fdffc3451dd6460a5540c8e0912e" title="Return true if this dump contains an integer valued array with the specified name.">contains_i</a>(name)) {</div>
-<div class="line"><a name="l00899"></a><span class="lineno">  899</span>&#160;          std::vector&lt;int&gt; vec_int = (vars_i_.find(name)-&gt;second).first;</div>
-<div class="line"><a name="l00900"></a><span class="lineno">  900</span>&#160;          std::vector&lt;double&gt; vec_r(vec_int.size());</div>
-<div class="line"><a name="l00901"></a><span class="lineno">  901</span>&#160;          <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> ii = 0; ii &lt; vec_int.size(); ii++) {</div>
-<div class="line"><a name="l00902"></a><span class="lineno">  902</span>&#160;            vec_r[ii] = vec_int[ii];</div>
-<div class="line"><a name="l00903"></a><span class="lineno">  903</span>&#160;          }</div>
-<div class="line"><a name="l00904"></a><span class="lineno">  904</span>&#160;          <span class="keywordflow">return</span> vec_r;</div>
-<div class="line"><a name="l00905"></a><span class="lineno">  905</span>&#160;        }</div>
-<div class="line"><a name="l00906"></a><span class="lineno">  906</span>&#160;        <span class="keywordflow">return</span> empty_vec_r_;</div>
-<div class="line"><a name="l00907"></a><span class="lineno">  907</span>&#160;      }</div>
-<div class="line"><a name="l00908"></a><span class="lineno">  908</span>&#160;      </div>
-<div class="line"><a name="l00916"></a><span class="lineno"><a class="code" href="classstan_1_1io_1_1dump.html#ad1a19a706880befca7fe4a3c4dc4a39f">  916</a></span>&#160;      std::vector&lt;size_t&gt; <a class="code" href="classstan_1_1io_1_1dump.html#ad1a19a706880befca7fe4a3c4dc4a39f" title="Return the dimensions for the double variable with the specified name.">dims_r</a>(<span class="keyword">const</span> std::string&amp; name)<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00917"></a><span class="lineno">  917</span>&#160;        <span class="keywordflow">if</span> (contains_r_only(name)) {</div>
-<div class="line"><a name="l00918"></a><span class="lineno">  918</span>&#160;          <span class="keywordflow">return</span> (vars_r_.find(name)-&gt;second).second;</div>
-<div class="line"><a name="l00919"></a><span class="lineno">  919</span>&#160;        } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (<a class="code" href="classstan_1_1io_1_1dump.html#a1865fdffc3451dd6460a5540c8e0912e" title="Return true if this dump contains an integer valued array with the specified name.">contains_i</a>(name)) {</div>
-<div class="line"><a name="l00920"></a><span class="lineno">  920</span>&#160;          <span class="keywordflow">return</span> (vars_i_.find(name)-&gt;second).second;</div>
-<div class="line"><a name="l00921"></a><span class="lineno">  921</span>&#160;        }</div>
-<div class="line"><a name="l00922"></a><span class="lineno">  922</span>&#160;        <span class="keywordflow">return</span> empty_vec_ui_;</div>
-<div class="line"><a name="l00923"></a><span class="lineno">  923</span>&#160;      }</div>
-<div class="line"><a name="l00924"></a><span class="lineno">  924</span>&#160;</div>
-<div class="line"><a name="l00932"></a><span class="lineno"><a class="code" href="classstan_1_1io_1_1dump.html#ac9a6ba06213461f7d86c5823813de2bd">  932</a></span>&#160;      std::vector&lt;int&gt; <a class="code" href="classstan_1_1io_1_1dump.html#ac9a6ba06213461f7d86c5823813de2bd" title="Return the integer values for the variable with the specified name.">vals_i</a>(<span class="keyword">const</span> std::string&amp; name)<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00933"></a><span class="lineno">  933</span>&#160;        <span class="keywordflow">if</span> (<a class="code" href="classstan_1_1io_1_1dump.html#a1865fdffc3451dd6460a5540c8e0912e" title="Return true if this dump contains an integer valued array with the specified name.">contains_i</a>(name)) {</div>
-<div class="line"><a name="l00934"></a><span class="lineno">  934</span>&#160;          <span class="keywordflow">return</span> (vars_i_.find(name)-&gt;second).first;</div>
-<div class="line"><a name="l00935"></a><span class="lineno">  935</span>&#160;        }</div>
-<div class="line"><a name="l00936"></a><span class="lineno">  936</span>&#160;        <span class="keywordflow">return</span> empty_vec_i_;</div>
-<div class="line"><a name="l00937"></a><span class="lineno">  937</span>&#160;      }</div>
-<div class="line"><a name="l00938"></a><span class="lineno">  938</span>&#160;      </div>
-<div class="line"><a name="l00946"></a><span class="lineno"><a class="code" href="classstan_1_1io_1_1dump.html#a1bdf386abd7e81a9a287c6a59a48eac9">  946</a></span>&#160;      std::vector&lt;size_t&gt; <a class="code" href="classstan_1_1io_1_1dump.html#a1bdf386abd7e81a9a287c6a59a48eac9" title="Return the dimensions for the integer variable with the specified name.">dims_i</a>(<span class="keyword">const</span> std::string&amp; name)<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00947"></a><span class="lineno">  947</span>&#160;        <span class="keywordflow">if</span> (<a class="code" href="classstan_1_1io_1_1dump.html#a1865fdffc3451dd6460a5540c8e0912e" title="Return true if this dump contains an integer valued array with the specified name.">contains_i</a>(name)) {</div>
-<div class="line"><a name="l00948"></a><span class="lineno">  948</span>&#160;          <span class="keywordflow">return</span> (vars_i_.find(name)-&gt;second).second;</div>
-<div class="line"><a name="l00949"></a><span class="lineno">  949</span>&#160;        }</div>
-<div class="line"><a name="l00950"></a><span class="lineno">  950</span>&#160;        <span class="keywordflow">return</span> empty_vec_ui_;</div>
-<div class="line"><a name="l00951"></a><span class="lineno">  951</span>&#160;      }</div>
-<div class="line"><a name="l00952"></a><span class="lineno">  952</span>&#160;</div>
-<div class="line"><a name="l00959"></a><span class="lineno"><a class="code" href="classstan_1_1io_1_1dump.html#a4c287f947ed4205be9115f8d4dbffb0d">  959</a></span>&#160;      <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classstan_1_1io_1_1dump.html#a4c287f947ed4205be9115f8d4dbffb0d" title="Return a list of the names of the floating point variables in the dump.">names_r</a>(std::vector&lt;std::string&gt;&amp; names)<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00960"></a><span class="lineno">  960</span>&#160;        names.resize(0);        </div>
-<div class="line"><a name="l00961"></a><span class="lineno">  961</span>&#160;        <span class="keywordflow">for</span> (std::map&lt;std::string, </div>
-<div class="line"><a name="l00962"></a><span class="lineno">  962</span>&#160;                      std::pair&lt;std::vector&lt;double&gt;,</div>
-<div class="line"><a name="l00963"></a><span class="lineno">  963</span>&#160;                                std::vector&lt;size_t&gt; &gt; &gt;</div>
-<div class="line"><a name="l00964"></a><span class="lineno">  964</span>&#160;                 ::const_iterator it = vars_r_.begin();</div>
-<div class="line"><a name="l00965"></a><span class="lineno">  965</span>&#160;             it != vars_r_.end(); ++it)</div>
-<div class="line"><a name="l00966"></a><span class="lineno">  966</span>&#160;          names.push_back((*it).first);</div>
-<div class="line"><a name="l00967"></a><span class="lineno">  967</span>&#160;      }</div>
-<div class="line"><a name="l00968"></a><span class="lineno">  968</span>&#160;</div>
-<div class="line"><a name="l00975"></a><span class="lineno"><a class="code" href="classstan_1_1io_1_1dump.html#a965e639a5884ffd40d3849c8a706e145">  975</a></span>&#160;      <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classstan_1_1io_1_1dump.html#a965e639a5884ffd40d3849c8a706e145" title="Return a list of the names of the integer variables in the dump.">names_i</a>(std::vector&lt;std::string&gt;&amp; names)<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00976"></a><span class="lineno">  976</span>&#160;        names.resize(0);        </div>
-<div class="line"><a name="l00977"></a><span class="lineno">  977</span>&#160;        <span class="keywordflow">for</span> (std::map&lt;std::string, </div>
-<div class="line"><a name="l00978"></a><span class="lineno">  978</span>&#160;                      std::pair&lt;std::vector&lt;int&gt;, </div>
-<div class="line"><a name="l00979"></a><span class="lineno">  979</span>&#160;                                std::vector&lt;size_t&gt; &gt; &gt;</div>
-<div class="line"><a name="l00980"></a><span class="lineno">  980</span>&#160;                 ::const_iterator it = vars_i_.begin();</div>
-<div class="line"><a name="l00981"></a><span class="lineno">  981</span>&#160;             it != vars_i_.end(); ++it)</div>
-<div class="line"><a name="l00982"></a><span class="lineno">  982</span>&#160;          names.push_back((*it).first);</div>
-<div class="line"><a name="l00983"></a><span class="lineno">  983</span>&#160;      }</div>
-<div class="line"><a name="l00984"></a><span class="lineno">  984</span>&#160;</div>
-<div class="line"><a name="l00992"></a><span class="lineno"><a class="code" href="classstan_1_1io_1_1dump.html#ae73ebbf7c924c54f04cb4cab5d3bb61c">  992</a></span>&#160;      <span class="keywordtype">bool</span> <span class="keyword">remove</span>(<span class="keyword">const</span> std::string&amp; name) {</div>
-<div class="line"><a name="l00993"></a><span class="lineno">  993</span>&#160;        <span class="keywordflow">return</span> (vars_i_.erase(name) &gt; 0) </div>
-<div class="line"><a name="l00994"></a><span class="lineno">  994</span>&#160;          || (vars_r_.erase(name) &gt; 0);</div>
-<div class="line"><a name="l00995"></a><span class="lineno">  995</span>&#160;      }</div>
-<div class="line"><a name="l00996"></a><span class="lineno">  996</span>&#160;      </div>
-<div class="line"><a name="l00997"></a><span class="lineno">  997</span>&#160;    };</div>
-<div class="line"><a name="l00998"></a><span class="lineno">  998</span>&#160;    </div>
-<div class="line"><a name="l00999"></a><span class="lineno">  999</span>&#160;  }</div>
-<div class="line"><a name="l01000"></a><span class="lineno"> 1000</span>&#160;</div>
-<div class="line"><a name="l01001"></a><span class="lineno"> 1001</span>&#160;}</div>
-<div class="line"><a name="l01002"></a><span class="lineno"> 1002</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00820"></a><span class="lineno">  820</span>&#160;               std::pair&lt;std::vector&lt;double&gt;,</div>
+<div class="line"><a name="l00821"></a><span class="lineno">  821</span>&#160;                         std::vector&lt;size_t&gt; &gt; &gt; vars_r_;</div>
+<div class="line"><a name="l00822"></a><span class="lineno">  822</span>&#160;      std::map&lt;std::string, </div>
+<div class="line"><a name="l00823"></a><span class="lineno">  823</span>&#160;               std::pair&lt;std::vector&lt;int&gt;, </div>
+<div class="line"><a name="l00824"></a><span class="lineno">  824</span>&#160;                         std::vector&lt;size_t&gt; &gt; &gt; vars_i_;</div>
+<div class="line"><a name="l00825"></a><span class="lineno">  825</span>&#160;      std::vector&lt;double&gt; <span class="keyword">const</span> empty_vec_r_;</div>
+<div class="line"><a name="l00826"></a><span class="lineno">  826</span>&#160;      std::vector&lt;int&gt; <span class="keyword">const</span> empty_vec_i_;</div>
+<div class="line"><a name="l00827"></a><span class="lineno">  827</span>&#160;      std::vector&lt;size_t&gt; <span class="keyword">const</span> empty_vec_ui_;</div>
+<div class="line"><a name="l00837"></a><span class="lineno">  837</span>&#160;      <span class="keywordtype">bool</span> contains_r_only(<span class="keyword">const</span> std::string&amp; name)<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00838"></a><span class="lineno">  838</span>&#160;        <span class="keywordflow">return</span> vars_r_.find(name) != vars_r_.end();</div>
+<div class="line"><a name="l00839"></a><span class="lineno">  839</span>&#160;      }</div>
+<div class="line"><a name="l00840"></a><span class="lineno">  840</span>&#160;    <span class="keyword">public</span>: </div>
+<div class="line"><a name="l00841"></a><span class="lineno">  841</span>&#160;</div>
+<div class="line"><a name="l00849"></a><span class="lineno"><a class="code" href="classstan_1_1io_1_1dump.html#a05c2de349bdf89ef97e2940dfabe3064">  849</a></span>&#160;      <a class="code" href="classstan_1_1io_1_1dump.html#a05c2de349bdf89ef97e2940dfabe3064" title="Construct a dump object from the specified input stream.">dump</a>(std::istream&amp; in) {</div>
+<div class="line"><a name="l00850"></a><span class="lineno">  850</span>&#160;        <a class="code" href="classstan_1_1io_1_1dump__reader.html" title="Reads data from S-plus dump format.">dump_reader</a> <a class="code" href="classstan_1_1io_1_1reader.html" title="A stream-based reader for integer, scalar, vector, matrix and array data types, with Jacobian calcula...">reader</a>(in);</div>
+<div class="line"><a name="l00851"></a><span class="lineno">  851</span>&#160;        <span class="keywordflow">while</span> (reader.<a class="code" href="classstan_1_1io_1_1dump__reader.html#aed46c1062b3a19c22a7440b72f1c8ffd" title="Read the next value from the input stream, returning true if successful and false if no further input...">next</a>()) {</div>
+<div class="line"><a name="l00852"></a><span class="lineno">  852</span>&#160;          <span class="keywordflow">if</span> (reader.<a class="code" href="classstan_1_1io_1_1dump__reader.html#a17c0c96ad8cb3c3c362fa74384b45bb7" title="Checks if the last item read is integer.">is_int</a>()) {</div>
+<div class="line"><a name="l00853"></a><span class="lineno">  853</span>&#160;            vars_i_[reader.<a class="code" href="classstan_1_1io_1_1dump__reader.html#aed540ae1e798ad34757a2a66c35ad054" title="Return the name of the most recently read variable.">name</a>()] </div>
+<div class="line"><a name="l00854"></a><span class="lineno">  854</span>&#160;              = std::pair&lt;std::vector&lt;int&gt;, </div>
+<div class="line"><a name="l00855"></a><span class="lineno">  855</span>&#160;                          std::vector&lt;size_t&gt; &gt;(reader.<a class="code" href="classstan_1_1io_1_1dump__reader.html#a595a2345787b84d1cb763c5f45a2c749" title="Returns the integer values from the last item if the last item read was an integer and the empty vect...">int_values</a>(), </div>
+<div class="line"><a name="l00856"></a><span class="lineno">  856</span>&#160;                                                      reader.<a class="code" href="classstan_1_1io_1_1dump__reader.html#a6ada826cbef5e7ab4213efe629945d95" title="Return the dimensions of the most recently read variable.">dims</a>());</div>
+<div class="line"><a name="l00857"></a><span class="lineno">  857</span>&#160;            </div>
+<div class="line"><a name="l00858"></a><span class="lineno">  858</span>&#160;          } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00859"></a><span class="lineno">  859</span>&#160;            vars_r_[reader.<a class="code" href="classstan_1_1io_1_1dump__reader.html#aed540ae1e798ad34757a2a66c35ad054" title="Return the name of the most recently read variable.">name</a>()] </div>
+<div class="line"><a name="l00860"></a><span class="lineno">  860</span>&#160;              = std::pair&lt;std::vector&lt;double&gt;, </div>
+<div class="line"><a name="l00861"></a><span class="lineno">  861</span>&#160;                          std::vector&lt;size_t&gt; &gt;(reader.<a class="code" href="classstan_1_1io_1_1dump__reader.html#ac275a400d67c89a01d980fa2ea093ed3" title="Returns the floating point values from the last item if the last item read contained floating point v...">double_values</a>(), </div>
+<div class="line"><a name="l00862"></a><span class="lineno">  862</span>&#160;                                                      reader.<a class="code" href="classstan_1_1io_1_1dump__reader.html#a6ada826cbef5e7ab4213efe629945d95" title="Return the dimensions of the most recently read variable.">dims</a>());</div>
+<div class="line"><a name="l00863"></a><span class="lineno">  863</span>&#160;          }</div>
+<div class="line"><a name="l00864"></a><span class="lineno">  864</span>&#160;        }</div>
+<div class="line"><a name="l00865"></a><span class="lineno">  865</span>&#160;      }</div>
+<div class="line"><a name="l00866"></a><span class="lineno">  866</span>&#160;</div>
+<div class="line"><a name="l00875"></a><span class="lineno"><a class="code" href="classstan_1_1io_1_1dump.html#ac531d67fb8a74300ebbe014dfe367706">  875</a></span>&#160;      <span class="keywordtype">bool</span> <a class="code" href="classstan_1_1io_1_1dump.html#ac531d67fb8a74300ebbe014dfe367706" title="Return true if this dump contains the specified variable name is defined.">contains_r</a>(<span class="keyword">const</span> std::string&amp; name)<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00876"></a><span class="lineno">  876</span>&#160;        <span class="keywordflow">return</span> contains_r_only(name) || <a class="code" href="classstan_1_1io_1_1dump.html#a1865fdffc3451dd6460a5540c8e0912e" title="Return true if this dump contains an integer valued array with the specified name.">contains_i</a>(name);</div>
+<div class="line"><a name="l00877"></a><span class="lineno">  877</span>&#160;      }</div>
+<div class="line"><a name="l00878"></a><span class="lineno">  878</span>&#160;</div>
+<div class="line"><a name="l00887"></a><span class="lineno"><a class="code" href="classstan_1_1io_1_1dump.html#a1865fdffc3451dd6460a5540c8e0912e">  887</a></span>&#160;      <span class="keywordtype">bool</span> <a class="code" href="classstan_1_1io_1_1dump.html#a1865fdffc3451dd6460a5540c8e0912e" title="Return true if this dump contains an integer valued array with the specified name.">contains_i</a>(<span class="keyword">const</span> std::string&amp; name)<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00888"></a><span class="lineno">  888</span>&#160;        <span class="keywordflow">return</span> vars_i_.find(name) != vars_i_.end();</div>
+<div class="line"><a name="l00889"></a><span class="lineno">  889</span>&#160;      }</div>
+<div class="line"><a name="l00890"></a><span class="lineno">  890</span>&#160;</div>
+<div class="line"><a name="l00898"></a><span class="lineno"><a class="code" href="classstan_1_1io_1_1dump.html#aa9b7bc08c1152a313e90b74ade5338b5">  898</a></span>&#160;      std::vector&lt;double&gt; <a class="code" href="classstan_1_1io_1_1dump.html#aa9b7bc08c1152a313e90b74ade5338b5" title="Return the double values for the variable with the specified name or null.">vals_r</a>(<span class="keyword">const</span> std::string&amp; name)<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00899"></a><span class="lineno">  899</span>&#160;        <span class="keywordflow">if</span> (contains_r_only(name)) {</div>
+<div class="line"><a name="l00900"></a><span class="lineno">  900</span>&#160;          <span class="keywordflow">return</span> (vars_r_.find(name)-&gt;second).first;</div>
+<div class="line"><a name="l00901"></a><span class="lineno">  901</span>&#160;        } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (<a class="code" href="classstan_1_1io_1_1dump.html#a1865fdffc3451dd6460a5540c8e0912e" title="Return true if this dump contains an integer valued array with the specified name.">contains_i</a>(name)) {</div>
+<div class="line"><a name="l00902"></a><span class="lineno">  902</span>&#160;          std::vector&lt;int&gt; vec_int = (vars_i_.find(name)-&gt;second).first;</div>
+<div class="line"><a name="l00903"></a><span class="lineno">  903</span>&#160;          std::vector&lt;double&gt; vec_r(vec_int.size());</div>
+<div class="line"><a name="l00904"></a><span class="lineno">  904</span>&#160;          <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> ii = 0; ii &lt; vec_int.size(); ii++) {</div>
+<div class="line"><a name="l00905"></a><span class="lineno">  905</span>&#160;            vec_r[ii] = vec_int[ii];</div>
+<div class="line"><a name="l00906"></a><span class="lineno">  906</span>&#160;          }</div>
+<div class="line"><a name="l00907"></a><span class="lineno">  907</span>&#160;          <span class="keywordflow">return</span> vec_r;</div>
+<div class="line"><a name="l00908"></a><span class="lineno">  908</span>&#160;        }</div>
+<div class="line"><a name="l00909"></a><span class="lineno">  909</span>&#160;        <span class="keywordflow">return</span> empty_vec_r_;</div>
+<div class="line"><a name="l00910"></a><span class="lineno">  910</span>&#160;      }</div>
+<div class="line"><a name="l00911"></a><span class="lineno">  911</span>&#160;      </div>
+<div class="line"><a name="l00919"></a><span class="lineno"><a class="code" href="classstan_1_1io_1_1dump.html#ad1a19a706880befca7fe4a3c4dc4a39f">  919</a></span>&#160;      std::vector&lt;size_t&gt; <a class="code" href="classstan_1_1io_1_1dump.html#ad1a19a706880befca7fe4a3c4dc4a39f" title="Return the dimensions for the double variable with the specified name.">dims_r</a>(<span class="keyword">const</span> std::string&amp; name)<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00920"></a><span class="lineno">  920</span>&#160;        <span class="keywordflow">if</span> (contains_r_only(name)) {</div>
+<div class="line"><a name="l00921"></a><span class="lineno">  921</span>&#160;          <span class="keywordflow">return</span> (vars_r_.find(name)-&gt;second).second;</div>
+<div class="line"><a name="l00922"></a><span class="lineno">  922</span>&#160;        } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (<a class="code" href="classstan_1_1io_1_1dump.html#a1865fdffc3451dd6460a5540c8e0912e" title="Return true if this dump contains an integer valued array with the specified name.">contains_i</a>(name)) {</div>
+<div class="line"><a name="l00923"></a><span class="lineno">  923</span>&#160;          <span class="keywordflow">return</span> (vars_i_.find(name)-&gt;second).second;</div>
+<div class="line"><a name="l00924"></a><span class="lineno">  924</span>&#160;        }</div>
+<div class="line"><a name="l00925"></a><span class="lineno">  925</span>&#160;        <span class="keywordflow">return</span> empty_vec_ui_;</div>
+<div class="line"><a name="l00926"></a><span class="lineno">  926</span>&#160;      }</div>
+<div class="line"><a name="l00927"></a><span class="lineno">  927</span>&#160;</div>
+<div class="line"><a name="l00935"></a><span class="lineno"><a class="code" href="classstan_1_1io_1_1dump.html#ac9a6ba06213461f7d86c5823813de2bd">  935</a></span>&#160;      std::vector&lt;int&gt; <a class="code" href="classstan_1_1io_1_1dump.html#ac9a6ba06213461f7d86c5823813de2bd" title="Return the integer values for the variable with the specified name.">vals_i</a>(<span class="keyword">const</span> std::string&amp; name)<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00936"></a><span class="lineno">  936</span>&#160;        <span class="keywordflow">if</span> (<a class="code" href="classstan_1_1io_1_1dump.html#a1865fdffc3451dd6460a5540c8e0912e" title="Return true if this dump contains an integer valued array with the specified name.">contains_i</a>(name)) {</div>
+<div class="line"><a name="l00937"></a><span class="lineno">  937</span>&#160;          <span class="keywordflow">return</span> (vars_i_.find(name)-&gt;second).first;</div>
+<div class="line"><a name="l00938"></a><span class="lineno">  938</span>&#160;        }</div>
+<div class="line"><a name="l00939"></a><span class="lineno">  939</span>&#160;        <span class="keywordflow">return</span> empty_vec_i_;</div>
+<div class="line"><a name="l00940"></a><span class="lineno">  940</span>&#160;      }</div>
+<div class="line"><a name="l00941"></a><span class="lineno">  941</span>&#160;      </div>
+<div class="line"><a name="l00949"></a><span class="lineno"><a class="code" href="classstan_1_1io_1_1dump.html#a1bdf386abd7e81a9a287c6a59a48eac9">  949</a></span>&#160;      std::vector&lt;size_t&gt; <a class="code" href="classstan_1_1io_1_1dump.html#a1bdf386abd7e81a9a287c6a59a48eac9" title="Return the dimensions for the integer variable with the specified name.">dims_i</a>(<span class="keyword">const</span> std::string&amp; name)<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00950"></a><span class="lineno">  950</span>&#160;        <span class="keywordflow">if</span> (<a class="code" href="classstan_1_1io_1_1dump.html#a1865fdffc3451dd6460a5540c8e0912e" title="Return true if this dump contains an integer valued array with the specified name.">contains_i</a>(name)) {</div>
+<div class="line"><a name="l00951"></a><span class="lineno">  951</span>&#160;          <span class="keywordflow">return</span> (vars_i_.find(name)-&gt;second).second;</div>
+<div class="line"><a name="l00952"></a><span class="lineno">  952</span>&#160;        }</div>
+<div class="line"><a name="l00953"></a><span class="lineno">  953</span>&#160;        <span class="keywordflow">return</span> empty_vec_ui_;</div>
+<div class="line"><a name="l00954"></a><span class="lineno">  954</span>&#160;      }</div>
+<div class="line"><a name="l00955"></a><span class="lineno">  955</span>&#160;</div>
+<div class="line"><a name="l00962"></a><span class="lineno"><a class="code" href="classstan_1_1io_1_1dump.html#a4c287f947ed4205be9115f8d4dbffb0d">  962</a></span>&#160;      <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classstan_1_1io_1_1dump.html#a4c287f947ed4205be9115f8d4dbffb0d" title="Return a list of the names of the floating point variables in the dump.">names_r</a>(std::vector&lt;std::string&gt;&amp; names)<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00963"></a><span class="lineno">  963</span>&#160;        names.resize(0);        </div>
+<div class="line"><a name="l00964"></a><span class="lineno">  964</span>&#160;        <span class="keywordflow">for</span> (std::map&lt;std::string, </div>
+<div class="line"><a name="l00965"></a><span class="lineno">  965</span>&#160;                      std::pair&lt;std::vector&lt;double&gt;,</div>
+<div class="line"><a name="l00966"></a><span class="lineno">  966</span>&#160;                                std::vector&lt;size_t&gt; &gt; &gt;</div>
+<div class="line"><a name="l00967"></a><span class="lineno">  967</span>&#160;                 ::const_iterator it = vars_r_.begin();</div>
+<div class="line"><a name="l00968"></a><span class="lineno">  968</span>&#160;             it != vars_r_.end(); ++it)</div>
+<div class="line"><a name="l00969"></a><span class="lineno">  969</span>&#160;          names.push_back((*it).first);</div>
+<div class="line"><a name="l00970"></a><span class="lineno">  970</span>&#160;      }</div>
+<div class="line"><a name="l00971"></a><span class="lineno">  971</span>&#160;</div>
+<div class="line"><a name="l00978"></a><span class="lineno"><a class="code" href="classstan_1_1io_1_1dump.html#a965e639a5884ffd40d3849c8a706e145">  978</a></span>&#160;      <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classstan_1_1io_1_1dump.html#a965e639a5884ffd40d3849c8a706e145" title="Return a list of the names of the integer variables in the dump.">names_i</a>(std::vector&lt;std::string&gt;&amp; names)<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00979"></a><span class="lineno">  979</span>&#160;        names.resize(0);        </div>
+<div class="line"><a name="l00980"></a><span class="lineno">  980</span>&#160;        <span class="keywordflow">for</span> (std::map&lt;std::string, </div>
+<div class="line"><a name="l00981"></a><span class="lineno">  981</span>&#160;                      std::pair&lt;std::vector&lt;int&gt;, </div>
+<div class="line"><a name="l00982"></a><span class="lineno">  982</span>&#160;                                std::vector&lt;size_t&gt; &gt; &gt;</div>
+<div class="line"><a name="l00983"></a><span class="lineno">  983</span>&#160;                 ::const_iterator it = vars_i_.begin();</div>
+<div class="line"><a name="l00984"></a><span class="lineno">  984</span>&#160;             it != vars_i_.end(); ++it)</div>
+<div class="line"><a name="l00985"></a><span class="lineno">  985</span>&#160;          names.push_back((*it).first);</div>
+<div class="line"><a name="l00986"></a><span class="lineno">  986</span>&#160;      }</div>
+<div class="line"><a name="l00987"></a><span class="lineno">  987</span>&#160;</div>
+<div class="line"><a name="l00995"></a><span class="lineno"><a class="code" href="classstan_1_1io_1_1dump.html#ae73ebbf7c924c54f04cb4cab5d3bb61c">  995</a></span>&#160;      <span class="keywordtype">bool</span> <span class="keyword">remove</span>(<span class="keyword">const</span> std::string&amp; name) {</div>
+<div class="line"><a name="l00996"></a><span class="lineno">  996</span>&#160;        <span class="keywordflow">return</span> (vars_i_.erase(name) &gt; 0) </div>
+<div class="line"><a name="l00997"></a><span class="lineno">  997</span>&#160;          || (vars_r_.erase(name) &gt; 0);</div>
+<div class="line"><a name="l00998"></a><span class="lineno">  998</span>&#160;      }</div>
+<div class="line"><a name="l00999"></a><span class="lineno">  999</span>&#160;      </div>
+<div class="line"><a name="l01000"></a><span class="lineno"> 1000</span>&#160;    };</div>
+<div class="line"><a name="l01001"></a><span class="lineno"> 1001</span>&#160;    </div>
+<div class="line"><a name="l01002"></a><span class="lineno"> 1002</span>&#160;  }</div>
+<div class="line"><a name="l01003"></a><span class="lineno"> 1003</span>&#160;</div>
+<div class="line"><a name="l01004"></a><span class="lineno"> 1004</span>&#160;}</div>
+<div class="line"><a name="l01005"></a><span class="lineno"> 1005</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
 <hr/>
 <div class="conents" style="font-size:80%;">

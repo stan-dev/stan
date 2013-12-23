@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['q',['q',['../classstan_1_1mcmc_1_1ps__point.html#a922ff5db7eca27ba7972d1c1d841ffc4',1,'stan::mcmc::ps_point']]],
+  ['q',['q',['../classstan_1_1mcmc_1_1ps__point.html#a3a12cd50a8d7e0d8c698a4debc767283',1,'stan::mcmc::ps_point']]],
   ['quad_5fform',['quad_form',['../namespacestan_1_1agrad.html#a12051c57c37d841f90b64d18d18b3572',1,'stan::agrad::quad_form(const Eigen::Matrix&lt; TA, RA, CA &gt; &amp;A, const Eigen::Matrix&lt; TB, RB, CB &gt; &amp;B)'],['../namespacestan_1_1agrad.html#ad10e001e4f70e7c20a0d0e4fc9ad6e45',1,'stan::agrad::quad_form(const Eigen::Matrix&lt; TA, RA, CA &gt; &amp;A, const Eigen::Matrix&lt; TB, RB, 1 &gt; &amp;B)'],['../namespacestan_1_1math.html#a376cbe31002df6a319da4caaaeb8598c',1,'stan::math::quad_form(const Eigen::Matrix&lt; double, RA, CA &gt; &amp;A, const Eigen::Matrix&lt; double, RB, CB &gt; &amp;B)'],['../namespacestan_1_1math.html#a0e0213e916c2185844b48eea25312e86',1,'stan::math::quad_form(const Eigen::Matrix&lt; double, RA, CA &gt; &amp;A, const Eigen::Matrix&lt; double, RB, 1 &gt; &amp;B)']]],
   ['quad_5fform_2ehpp',['quad_form.hpp',['../math_2matrix_2quad__form_8hpp.html',1,'']]],
   ['quad_5fform_2ehpp',['quad_form.hpp',['../agrad_2rev_2matrix_2quad__form_8hpp.html',1,'']]],

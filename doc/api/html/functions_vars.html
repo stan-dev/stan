@@ -126,24 +126,26 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 &#160;
 
 <h3><a class="anchor" id="index__"></a>- _ -</h3><ul>
-<li>_adapt_covar_counter
-: <a class="el" href="classstan_1_1mcmc_1_1covar__adaptation.html#a8c6a8537e286c31f8baf13d4b9b121ce">stan::mcmc::covar_adaptation</a>
-</li>
-<li>_adapt_covar_next
-: <a class="el" href="classstan_1_1mcmc_1_1covar__adaptation.html#a0485b6e9065da0abb6428a3cd2c9c832">stan::mcmc::covar_adaptation</a>
+<li>_adapt_base_window
+: <a class="el" href="classstan_1_1mcmc_1_1windowed__adaptation.html#ae25e5dc1480c6e553d65e24beb964dec">stan::mcmc::windowed_adaptation</a>
 </li>
 <li>_adapt_flag
 : <a class="el" href="classstan_1_1mcmc_1_1base__adapter.html#aef437ec008b42d9364f0165bd783a4de">stan::mcmc::base_adapter</a>
 </li>
-<li>_adapt_max_adapt
-: <a class="el" href="classstan_1_1mcmc_1_1covar__adaptation.html#a83f7c73976ae910c3f9fd726728f7801">stan::mcmc::covar_adaptation</a>
-, <a class="el" href="classstan_1_1mcmc_1_1var__adaptation.html#a1694b2ea76695a13c3c157e4520c1d85">stan::mcmc::var_adaptation</a>
+<li>_adapt_init_buffer
+: <a class="el" href="classstan_1_1mcmc_1_1windowed__adaptation.html#a7a79530d16f82b9d8beb0961b4bb1018">stan::mcmc::windowed_adaptation</a>
 </li>
-<li>_adapt_var_counter
-: <a class="el" href="classstan_1_1mcmc_1_1var__adaptation.html#aa0018d1a60eebe945cc52938e90747a6">stan::mcmc::var_adaptation</a>
+<li>_adapt_next_window
+: <a class="el" href="classstan_1_1mcmc_1_1windowed__adaptation.html#a0b3771ea39bc3fd60c43aea960b2df98">stan::mcmc::windowed_adaptation</a>
 </li>
-<li>_adapt_var_next
-: <a class="el" href="classstan_1_1mcmc_1_1var__adaptation.html#a34bec4fadd06b0eaf193b31817b3a051">stan::mcmc::var_adaptation</a>
+<li>_adapt_term_buffer
+: <a class="el" href="classstan_1_1mcmc_1_1windowed__adaptation.html#a81191d64fdfb010c997a538d479a270a">stan::mcmc::windowed_adaptation</a>
+</li>
+<li>_adapt_window_counter
+: <a class="el" href="classstan_1_1mcmc_1_1windowed__adaptation.html#ab589266e966065c3088e6b02c73ad1e3">stan::mcmc::windowed_adaptation</a>
+</li>
+<li>_adapt_window_size
+: <a class="el" href="classstan_1_1mcmc_1_1windowed__adaptation.html#a9b669ff236cb187f69901064ce4835d3">stan::mcmc::windowed_adaptation</a>
 </li>
 <li>_alloc
 : <a class="el" href="classstan_1_1math_1_1_l_d_l_t__factor_3_01stan_1_1agrad_1_1var_00_01_r_00_01_c_01_4.html#ac161188fa80c04c2affb499c81e8b3bd">stan::math::LDLT_factor&lt; stan::agrad::var, R, C &gt;</a>
@@ -208,6 +210,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 : <a class="el" href="classstan_1_1mcmc_1_1covar__adaptation.html#a58ed3f592a8a0ef46f440c9174ec439d">stan::mcmc::covar_adaptation</a>
 , <a class="el" href="classstan_1_1mcmc_1_1var__adaptation.html#ac7cca0e0ab1286b812f2d890049a09e4">stan::mcmc::var_adaptation</a>
 </li>
+<li>_estimator_name
+: <a class="el" href="classstan_1_1mcmc_1_1windowed__adaptation.html#a3a5f0f2df10b1e0e5431a97d9edc0a83">stan::mcmc::windowed_adaptation</a>
+</li>
 <li>_fk
 : <a class="el" href="classstan_1_1optimization_1_1_b_f_g_s_minimizer.html#a75288a0a0783ca985d0539f82a47a800">stan::optimization::BFGSMinimizer&lt; FunctorType, Scalar, DimAtCompile, LineSearchMethod &gt;</a>
 </li>
@@ -254,8 +259,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 : <a class="el" href="classstan_1_1math_1_1_l_d_l_t__factor_3_01double_00_01_r_00_01_c_01_4.html#aa41484403512f2b107922d0d7fc5c63d">stan::math::LDLT_factor&lt; double, R, C &gt;</a>
 </li>
 <li>_m
-: <a class="el" href="classstan_1_1prob_1_1welford__var__estimator.html#a97a3e57c6fd9781409f061b9f2937284">stan::prob::welford_var_estimator</a>
-, <a class="el" href="classstan_1_1prob_1_1welford__covar__estimator.html#a7cb4d78c9a9496b27f719eb93c56436d">stan::prob::welford_covar_estimator</a>
+: <a class="el" href="classstan_1_1prob_1_1welford__covar__estimator.html#a7cb4d78c9a9496b27f719eb93c56436d">stan::prob::welford_covar_estimator</a>
+, <a class="el" href="classstan_1_1prob_1_1welford__var__estimator.html#a97a3e57c6fd9781409f061b9f2937284">stan::prob::welford_var_estimator</a>
 </li>
 <li>_m2
 : <a class="el" href="classstan_1_1prob_1_1welford__covar__estimator.html#a9ebe972e6e8ea3e680031c36f59bc3c5">stan::prob::welford_covar_estimator</a>
@@ -276,9 +281,12 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li>_mu
 : <a class="el" href="classstan_1_1mcmc_1_1stepsize__adaptation.html#a3ba1ba74a735ae0c6826b49e7bd284df">stan::mcmc::stepsize_adaptation</a>
 </li>
+<li>_n_divergent
+: <a class="el" href="classstan_1_1mcmc_1_1base__nuts.html#a103b33df985e433f37a56ee0626a7861">stan::mcmc::base_nuts&lt; M, P, H, I, BaseRNG &gt;</a>
+</li>
 <li>_name
-: <a class="el" href="classstan_1_1mcmc_1_1base__mcmc.html#ad2c7124c9b80002735c5db2b7aecf482">stan::mcmc::base_mcmc</a>
-, <a class="el" href="classstan_1_1gm_1_1argument.html#a23946e8de0291c9868b0e5430ff71cf0">stan::gm::argument</a>
+: <a class="el" href="classstan_1_1gm_1_1argument.html#a23946e8de0291c9868b0e5430ff71cf0">stan::gm::argument</a>
+, <a class="el" href="classstan_1_1mcmc_1_1base__mcmc.html#ad2c7124c9b80002735c5db2b7aecf482">stan::mcmc::base_mcmc</a>
 </li>
 <li>_nom_epsilon
 : <a class="el" href="classstan_1_1mcmc_1_1base__hmc.html#a514b2e6f2d9481218709b1a16747f8a6">stan::mcmc::base_hmc&lt; M, P, H, I, BaseRNG &gt;</a>
@@ -287,8 +295,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 : <a class="el" href="classstan_1_1optimization_1_1_b_f_g_s_minimizer.html#a85128ba7124ddd7e9e604df71a9c71c5">stan::optimization::BFGSMinimizer&lt; FunctorType, Scalar, DimAtCompile, LineSearchMethod &gt;</a>
 </li>
 <li>_num_samples
-: <a class="el" href="classstan_1_1prob_1_1welford__covar__estimator.html#ac3239162bce3b35ff653b8072aa8e7e3">stan::prob::welford_covar_estimator</a>
-, <a class="el" href="classstan_1_1prob_1_1welford__var__estimator.html#a8b378660396e184e69b5cd7152f4e094">stan::prob::welford_var_estimator</a>
+: <a class="el" href="classstan_1_1prob_1_1welford__var__estimator.html#a8b378660396e184e69b5cd7152f4e094">stan::prob::welford_var_estimator</a>
+, <a class="el" href="classstan_1_1prob_1_1welford__covar__estimator.html#ac3239162bce3b35ff653b8072aa8e7e3">stan::prob::welford_covar_estimator</a>
+</li>
+<li>_num_warmup
+: <a class="el" href="classstan_1_1mcmc_1_1windowed__adaptation.html#a49833a6e927a0e7dec9a82d756626e16">stan::mcmc::windowed_adaptation</a>
 </li>
 <li>_opts
 : <a class="el" href="classstan_1_1optimization_1_1_b_f_g_s_minimizer.html#a2f69cfce2ab1a2004dd6687df21b565a">stan::optimization::BFGSMinimizer&lt; FunctorType, Scalar, DimAtCompile, LineSearchMethod &gt;</a>
@@ -314,8 +325,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </li>
 <li>_stepsize_adaptation
 : <a class="el" href="classstan_1_1mcmc_1_1stepsize__adapter.html#a560cd9f56401167b284e7eb36e58cbec">stan::mcmc::stepsize_adapter</a>
-, <a class="el" href="classstan_1_1mcmc_1_1stepsize__covar__adapter.html#a50045d3383df82e4c3dda971ed0ddf38">stan::mcmc::stepsize_covar_adapter</a>
 , <a class="el" href="classstan_1_1mcmc_1_1stepsize__var__adapter.html#aed1abeb55985ad65b435e7a7ced9d4d5">stan::mcmc::stepsize_var_adapter</a>
+, <a class="el" href="classstan_1_1mcmc_1_1stepsize__covar__adapter.html#a50045d3383df82e4c3dda971ed0ddf38">stan::mcmc::stepsize_covar_adapter</a>
 </li>
 <li>_subarguments
 : <a class="el" href="classstan_1_1gm_1_1categorical__argument.html#ae906b6761d356c568023f68020647240">stan::gm::categorical_argument</a>

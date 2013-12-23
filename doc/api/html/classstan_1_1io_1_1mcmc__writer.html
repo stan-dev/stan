@@ -101,8 +101,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a52839fee8bbc972b50868493fa15ef05"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1io_1_1mcmc__writer.html#a52839fee8bbc972b50868493fa15ef05">mcmc_writer</a> (std::ostream *sample_stream, std::ostream *diagnostic_stream)</td></tr>
-<tr class="separator:a52839fee8bbc972b50868493fa15ef05"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6a688bb1b2851d68f7305cb97c750a2b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1io_1_1mcmc__writer.html#a6a688bb1b2851d68f7305cb97c750a2b">mcmc_writer</a> (std::ostream *sample_stream, std::ostream *diagnostic_stream, std::ostream *msg_stream=0)</td></tr>
+<tr class="separator:a6a688bb1b2851d68f7305cb97c750a2b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4ff21af4911d312b84f3ad955c6be1f7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1io_1_1mcmc__writer.html#a4ff21af4911d312b84f3ad955c6be1f7">print_sample_names</a> (<a class="el" href="classstan_1_1mcmc_1_1sample.html">stan::mcmc::sample</a> &amp;sample, <a class="el" href="classstan_1_1mcmc_1_1base__mcmc.html">stan::mcmc::base_mcmc</a> *sampler, M &amp;model)</td></tr>
 <tr class="separator:a4ff21af4911d312b84f3ad955c6be1f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1141fad60b8e8587b5f84ded115a870f"><td class="memTemplParams" colspan="2">template&lt;class RNG &gt; </td></tr>
@@ -126,9 +126,9 @@ Public Member Functions</h2></td></tr>
 class stan::io::mcmc_writer&lt; M &gt;</h3>
 
 
-<p>Definition at line <a class="el" href="mcmc__writer_8hpp_source.html#l00019">19</a> of file <a class="el" href="mcmc__writer_8hpp_source.html">mcmc_writer.hpp</a>.</p>
+<p>Definition at line <a class="el" href="mcmc__writer_8hpp_source.html#l00018">18</a> of file <a class="el" href="mcmc__writer_8hpp_source.html">mcmc_writer.hpp</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="a52839fee8bbc972b50868493fa15ef05"></a>
+<a class="anchor" id="a6a688bb1b2851d68f7305cb97c750a2b"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
@@ -147,7 +147,13 @@ template&lt;class M&gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">std::ostream *&#160;</td>
-          <td class="paramname"><em>diagnostic_stream</em>&#160;</td>
+          <td class="paramname"><em>diagnostic_stream</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::ostream *&#160;</td>
+          <td class="paramname"><em>msg_stream</em> = <code>0</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -162,7 +168,7 @@ template&lt;class M&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="mcmc__writer_8hpp_source.html#l00023">23</a> of file <a class="el" href="mcmc__writer_8hpp_source.html">mcmc_writer.hpp</a>.</p>
+<p>Definition at line <a class="el" href="mcmc__writer_8hpp_source.html#l00022">22</a> of file <a class="el" href="mcmc__writer_8hpp_source.html">mcmc_writer.hpp</a>.</p>
 
 </div>
 </div>
@@ -201,7 +207,7 @@ template&lt;class M&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="mcmc__writer_8hpp_source.html#l00078">78</a> of file <a class="el" href="mcmc__writer_8hpp_source.html">mcmc_writer.hpp</a>.</p>
+<p>Definition at line <a class="el" href="mcmc__writer_8hpp_source.html#l00082">82</a> of file <a class="el" href="mcmc__writer_8hpp_source.html">mcmc_writer.hpp</a>.</p>
 
 </div>
 </div>
@@ -229,7 +235,7 @@ template&lt;class M&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="mcmc__writer_8hpp_source.html#l00087">87</a> of file <a class="el" href="mcmc__writer_8hpp_source.html">mcmc_writer.hpp</a>.</p>
+<p>Definition at line <a class="el" href="mcmc__writer_8hpp_source.html#l00091">91</a> of file <a class="el" href="mcmc__writer_8hpp_source.html">mcmc_writer.hpp</a>.</p>
 
 </div>
 </div>
@@ -273,7 +279,7 @@ template&lt;class M&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="mcmc__writer_8hpp_source.html#l00092">92</a> of file <a class="el" href="mcmc__writer_8hpp_source.html">mcmc_writer.hpp</a>.</p>
+<p>Definition at line <a class="el" href="mcmc__writer_8hpp_source.html#l00096">96</a> of file <a class="el" href="mcmc__writer_8hpp_source.html">mcmc_writer.hpp</a>.</p>
 
 </div>
 </div>
@@ -311,7 +317,7 @@ template&lt;class M&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="mcmc__writer_8hpp_source.html#l00116">116</a> of file <a class="el" href="mcmc__writer_8hpp_source.html">mcmc_writer.hpp</a>.</p>
+<p>Definition at line <a class="el" href="mcmc__writer_8hpp_source.html#l00120">120</a> of file <a class="el" href="mcmc__writer_8hpp_source.html">mcmc_writer.hpp</a>.</p>
 
 </div>
 </div>
@@ -355,7 +361,7 @@ template&lt;class M&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="mcmc__writer_8hpp_source.html#l00027">27</a> of file <a class="el" href="mcmc__writer_8hpp_source.html">mcmc_writer.hpp</a>.</p>
+<p>Definition at line <a class="el" href="mcmc__writer_8hpp_source.html#l00030">30</a> of file <a class="el" href="mcmc__writer_8hpp_source.html">mcmc_writer.hpp</a>.</p>
 
 </div>
 </div>
@@ -407,7 +413,7 @@ template&lt;class RNG &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="mcmc__writer_8hpp_source.html#l00048">48</a> of file <a class="el" href="mcmc__writer_8hpp_source.html">mcmc_writer.hpp</a>.</p>
+<p>Definition at line <a class="el" href="mcmc__writer_8hpp_source.html#l00051">51</a> of file <a class="el" href="mcmc__writer_8hpp_source.html">mcmc_writer.hpp</a>.</p>
 
 </div>
 </div>
@@ -457,7 +463,7 @@ template&lt;class M&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="mcmc__writer_8hpp_source.html#l00135">135</a> of file <a class="el" href="mcmc__writer_8hpp_source.html">mcmc_writer.hpp</a>.</p>
+<p>Definition at line <a class="el" href="mcmc__writer_8hpp_source.html#l00139">139</a> of file <a class="el" href="mcmc__writer_8hpp_source.html">mcmc_writer.hpp</a>.</p>
 
 </div>
 </div>
@@ -495,7 +501,7 @@ template&lt;class M&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="mcmc__writer_8hpp_source.html#l00150">150</a> of file <a class="el" href="mcmc__writer_8hpp_source.html">mcmc_writer.hpp</a>.</p>
+<p>Definition at line <a class="el" href="mcmc__writer_8hpp_source.html#l00156">156</a> of file <a class="el" href="mcmc__writer_8hpp_source.html">mcmc_writer.hpp</a>.</p>
 
 </div>
 </div>

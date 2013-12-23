@@ -95,31 +95,68 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define __STAN__AGRAD__FWD__MATRIX__TYPEDEFS_HPP__</span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor"></span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="_eigen_8hpp.html">stan/math/matrix/Eigen.hpp</a>&gt;</span></div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="fwd_2fvar_8hpp.html">stan/agrad/fwd/fvar.hpp</a>&gt;</span></div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="fwd_2numeric__limits_8hpp.html">stan/agrad/fwd/numeric_limits.hpp</a>&gt;</span></div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;</div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="keyword">namespace </span>stan {</div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;  <span class="keyword">namespace </span>agrad {</div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;    </div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;    <span class="keyword">typedef</span> </div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;    <a class="code" href="namespacestan_1_1agrad.html#aeae9e6e94d5656d748136a7c4780856e">Eigen::Matrix&lt;double,Eigen::Dynamic,Eigen::Dynamic&gt;::size_type</a> </div>
-<div class="line"><a name="l00013"></a><span class="lineno"><a class="code" href="namespacestan_1_1agrad.html#aeae9e6e94d5656d748136a7c4780856e">   13</a></span>&#160;    <a class="code" href="namespacestan_1_1agrad.html#aeae9e6e94d5656d748136a7c4780856e">size_type</a>;</div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;</div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;    <span class="keyword">typedef</span> </div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;    Eigen::Matrix&lt;fvar&lt;double&gt;,Eigen::Dynamic,Eigen::Dynamic&gt;</div>
-<div class="line"><a name="l00017"></a><span class="lineno"><a class="code" href="namespacestan_1_1agrad.html#ab98368cbab6489ad4274b58c3cb4be60">   17</a></span>&#160;    <a class="code" href="namespacestan_1_1agrad.html#ab98368cbab6489ad4274b58c3cb4be60">matrix_fv</a>;</div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;    <span class="keyword">typedef</span> </div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;    Eigen::Matrix&lt;fvar&lt;double&gt;,Eigen::Dynamic,1&gt;</div>
-<div class="line"><a name="l00021"></a><span class="lineno"><a class="code" href="namespacestan_1_1agrad.html#a92a58269b5a760aa81ee6ef554a9c4a8">   21</a></span>&#160;    <a class="code" href="namespacestan_1_1agrad.html#a92a58269b5a760aa81ee6ef554a9c4a8">vector_fv</a>;</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;    <span class="keyword">typedef</span> </div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;    Eigen::Matrix&lt;fvar&lt;double&gt;,1,Eigen::Dynamic&gt;</div>
-<div class="line"><a name="l00025"></a><span class="lineno"><a class="code" href="namespacestan_1_1agrad.html#a448daa5799ec758ffc715df7f5b8aafd">   25</a></span>&#160;    <a class="code" href="namespacestan_1_1agrad.html#a448daa5799ec758ffc715df7f5b8aafd">row_vector_fv</a>;</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;  }</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;}</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="fvar_8hpp.html">stan/agrad/fwd/fvar.hpp</a>&gt;</span></div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="var_8hpp.html">stan/agrad/rev/var.hpp</a>&gt;</span></div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="fwd_2numeric__limits_8hpp.html">stan/agrad/fwd/numeric_limits.hpp</a>&gt;</span></div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;</div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="keyword">namespace </span>stan {</div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;  <span class="keyword">namespace </span>agrad {</div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;    </div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;    <span class="keyword">typedef</span> </div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;    Eigen::Matrix&lt;double,Eigen::Dynamic,Eigen::Dynamic&gt;::Index </div>
+<div class="line"><a name="l00014"></a><span class="lineno"><a class="code" href="namespacestan_1_1agrad.html#aeae9e6e94d5656d748136a7c4780856e">   14</a></span>&#160;    <a class="code" href="namespacestan_1_1agrad.html#aeae9e6e94d5656d748136a7c4780856e">size_type</a>;</div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;</div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;    <span class="keyword">typedef</span> </div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;    Eigen::Matrix&lt;fvar&lt;double&gt;,Eigen::Dynamic,Eigen::Dynamic&gt;</div>
+<div class="line"><a name="l00018"></a><span class="lineno"><a class="code" href="namespacestan_1_1agrad.html#a9568a3aa8bbf0ba6c2e96ab703e83184">   18</a></span>&#160;    <a class="code" href="namespacestan_1_1agrad.html#a9568a3aa8bbf0ba6c2e96ab703e83184">matrix_fd</a>;</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;    <span class="keyword">typedef</span> </div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;    Eigen::Matrix&lt;fvar&lt;var&gt;,Eigen::Dynamic,Eigen::Dynamic&gt;</div>
+<div class="line"><a name="l00022"></a><span class="lineno"><a class="code" href="namespacestan_1_1agrad.html#aac5f57e2caa5ea24203633335cfe3fc6">   22</a></span>&#160;    <a class="code" href="namespacestan_1_1agrad.html#aac5f57e2caa5ea24203633335cfe3fc6">matrix_fv</a>;</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;    <span class="keyword">typedef</span> </div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;    Eigen::Matrix&lt;fvar&lt;fvar&lt;double&gt; &gt;,Eigen::Dynamic,Eigen::Dynamic&gt;</div>
+<div class="line"><a name="l00026"></a><span class="lineno"><a class="code" href="namespacestan_1_1agrad.html#aff56af7392587b36f7071967f87ad7d1">   26</a></span>&#160;    <a class="code" href="namespacestan_1_1agrad.html#aff56af7392587b36f7071967f87ad7d1">matrix_ffd</a>;</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    <span class="keyword">typedef</span> </div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    Eigen::Matrix&lt;fvar&lt;fvar&lt;var&gt; &gt;,Eigen::Dynamic,Eigen::Dynamic&gt;</div>
+<div class="line"><a name="l00030"></a><span class="lineno"><a class="code" href="namespacestan_1_1agrad.html#a3e6bc2f7c13dfbbb0c30dce6dcb62951">   30</a></span>&#160;    <a class="code" href="namespacestan_1_1agrad.html#a3e6bc2f7c13dfbbb0c30dce6dcb62951">matrix_ffv</a>;</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    <span class="keyword">typedef</span> </div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    Eigen::Matrix&lt;fvar&lt;double&gt;,Eigen::Dynamic,1&gt;</div>
+<div class="line"><a name="l00034"></a><span class="lineno"><a class="code" href="namespacestan_1_1agrad.html#a50e8b3ee954a699c1467801ab52be810">   34</a></span>&#160;    <a class="code" href="namespacestan_1_1agrad.html#a50e8b3ee954a699c1467801ab52be810">vector_fd</a>;</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    <span class="keyword">typedef</span> </div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    Eigen::Matrix&lt;fvar&lt;var&gt;,Eigen::Dynamic,1&gt;</div>
+<div class="line"><a name="l00038"></a><span class="lineno"><a class="code" href="namespacestan_1_1agrad.html#a4ee7f0ffda84be0aec51dfd293951daf">   38</a></span>&#160;    <a class="code" href="namespacestan_1_1agrad.html#a4ee7f0ffda84be0aec51dfd293951daf">vector_fv</a>;</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    <span class="keyword">typedef</span> </div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    Eigen::Matrix&lt;fvar&lt;fvar&lt;double&gt; &gt;,Eigen::Dynamic,1&gt;</div>
+<div class="line"><a name="l00042"></a><span class="lineno"><a class="code" href="namespacestan_1_1agrad.html#a97cd52b23aca617183eb7deadb1c6d9d">   42</a></span>&#160;    <a class="code" href="namespacestan_1_1agrad.html#a97cd52b23aca617183eb7deadb1c6d9d">vector_ffd</a>;</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="keyword">typedef</span> </div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    Eigen::Matrix&lt;fvar&lt;fvar&lt;var&gt; &gt;,Eigen::Dynamic,1&gt;</div>
+<div class="line"><a name="l00046"></a><span class="lineno"><a class="code" href="namespacestan_1_1agrad.html#a96902ae4f8847b57803a5ac7e5d9754d">   46</a></span>&#160;    <a class="code" href="namespacestan_1_1agrad.html#a96902ae4f8847b57803a5ac7e5d9754d">vector_ffv</a>;</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <span class="keyword">typedef</span> </div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    Eigen::Matrix&lt;fvar&lt;double&gt;,1,Eigen::Dynamic&gt;</div>
+<div class="line"><a name="l00050"></a><span class="lineno"><a class="code" href="namespacestan_1_1agrad.html#a034dc4f78e984e287123599a3b87ac97">   50</a></span>&#160;    <a class="code" href="namespacestan_1_1agrad.html#a034dc4f78e984e287123599a3b87ac97">row_vector_fd</a>;</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    <span class="keyword">typedef</span> </div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    Eigen::Matrix&lt;fvar&lt;var&gt;,1,Eigen::Dynamic&gt;</div>
+<div class="line"><a name="l00054"></a><span class="lineno"><a class="code" href="namespacestan_1_1agrad.html#a031f0408fe91a974e1cc09d61cea8807">   54</a></span>&#160;    <a class="code" href="namespacestan_1_1agrad.html#a031f0408fe91a974e1cc09d61cea8807">row_vector_fv</a>;</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <span class="keyword">typedef</span> </div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    Eigen::Matrix&lt;fvar&lt;fvar&lt;double&gt; &gt;,1,Eigen::Dynamic&gt;</div>
+<div class="line"><a name="l00058"></a><span class="lineno"><a class="code" href="namespacestan_1_1agrad.html#a493bb030b1f2016276f58fe67662e252">   58</a></span>&#160;    <a class="code" href="namespacestan_1_1agrad.html#a493bb030b1f2016276f58fe67662e252">row_vector_ffd</a>;</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    <span class="keyword">typedef</span> </div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    Eigen::Matrix&lt;fvar&lt;fvar&lt;var&gt; &gt;,1,Eigen::Dynamic&gt;</div>
+<div class="line"><a name="l00062"></a><span class="lineno"><a class="code" href="namespacestan_1_1agrad.html#a4a52427f4040846e15dca434ea633b7b">   62</a></span>&#160;    <a class="code" href="namespacestan_1_1agrad.html#a4a52427f4040846e15dca434ea633b7b">row_vector_ffv</a>;</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;  }</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;}</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
 <hr/>
 <div class="conents" style="font-size:80%;">

@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<title>Stan: src/stan/agrad/fvar.hpp File Reference</title>
+<title>Stan: src/stan/agrad/fwd/fvar.hpp File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -83,97 +83,34 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_9c4b002ce8795bbd5dbe2cf3421fe13a.html">src</a></li><li class="navelem"><a class="el" href="dir_b1c6471129ce395961fd25e68f861508.html">stan</a></li><li class="navelem"><a class="el" href="dir_52c3c3fe3bff0ba6815d4f34971ed7d3.html">agrad</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_9c4b002ce8795bbd5dbe2cf3421fe13a.html">src</a></li><li class="navelem"><a class="el" href="dir_b1c6471129ce395961fd25e68f861508.html">stan</a></li><li class="navelem"><a class="el" href="dir_52c3c3fe3bff0ba6815d4f34971ed7d3.html">agrad</a></li><li class="navelem"><a class="el" href="dir_fb5291ba38e4a736e77d8ba78c86369a.html">fwd</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
+  <div class="summary">
+<a href="#nested-classes">Classes</a> &#124;
+<a href="#namespaces">Namespaces</a>  </div>
   <div class="headertitle">
 <div class="title">fvar.hpp File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &lt;<a class="el" href="fwd_2fvar_8hpp_source.html">stan/agrad/fwd/fvar.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="fwd_2numeric__limits_8hpp_source.html">stan/agrad/fwd/numeric_limits.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="fwd_2operator__less__than_8hpp_source.html">stan/agrad/fwd/operator_less_than.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="fwd_2operator__less__than__or__equal_8hpp_source.html">stan/agrad/fwd/operator_less_than_or_equal.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="fwd_2operator__greater__than_8hpp_source.html">stan/agrad/fwd/operator_greater_than.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="fwd_2operator__greater__than__or__equal_8hpp_source.html">stan/agrad/fwd/operator_greater_than_or_equal.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="fwd_2operator__equal_8hpp_source.html">stan/agrad/fwd/operator_equal.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="fwd_2operator__not__equal_8hpp_source.html">stan/agrad/fwd/operator_not_equal.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="fwd_2operator__addition_8hpp_source.html">stan/agrad/fwd/operator_addition.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="fwd_2operator__subtraction_8hpp_source.html">stan/agrad/fwd/operator_subtraction.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="fwd_2operator__multiplication_8hpp_source.html">stan/agrad/fwd/operator_multiplication.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="fwd_2operator__division_8hpp_source.html">stan/agrad/fwd/operator_division.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="operator__unary__minus_8hpp_source.html">stan/agrad/fwd/operator_unary_minus.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="agrad_2fwd_2abs_8hpp_source.html">stan/agrad/fwd/abs.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="fwd_2fabs_8hpp_source.html">stan/agrad/fwd/fabs.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="agrad_2fwd_2fdim_8hpp_source.html">stan/agrad/fwd/fdim.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="fwd_2fmin_8hpp_source.html">stan/agrad/fwd/fmin.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="fwd_2fmax_8hpp_source.html">stan/agrad/fwd/fmax.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="fwd_2fmod_8hpp_source.html">stan/agrad/fwd/fmod.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="fwd_2floor_8hpp_source.html">stan/agrad/fwd/floor.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="fwd_2ceil_8hpp_source.html">stan/agrad/fwd/ceil.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="fwd_2round_8hpp_source.html">stan/agrad/fwd/round.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="fwd_2trunc_8hpp_source.html">stan/agrad/fwd/trunc.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="fwd_2sqrt_8hpp_source.html">stan/agrad/fwd/sqrt.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="fwd_2cbrt_8hpp_source.html">stan/agrad/fwd/cbrt.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="agrad_2fwd_2square_8hpp_source.html">stan/agrad/fwd/square.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="agrad_2fwd_2exp_8hpp_source.html">stan/agrad/fwd/exp.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="agrad_2fwd_2exp2_8hpp_source.html">stan/agrad/fwd/exp2.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="agrad_2fwd_2log_8hpp_source.html">stan/agrad/fwd/log.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="agrad_2fwd_2log2_8hpp_source.html">stan/agrad/fwd/log2.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="fwd_2log10_8hpp_source.html">stan/agrad/fwd/log10.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="fwd_2pow_8hpp_source.html">stan/agrad/fwd/pow.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="agrad_2fwd_2inv_8hpp_source.html">stan/agrad/fwd/inv.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="agrad_2fwd_2inv__sqrt_8hpp_source.html">stan/agrad/fwd/inv_sqrt.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="agrad_2fwd_2inv__square_8hpp_source.html">stan/agrad/fwd/inv_square.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="fwd_2hypot_8hpp_source.html">stan/agrad/fwd/hypot.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="fwd_2cos_8hpp_source.html">stan/agrad/fwd/cos.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="fwd_2sin_8hpp_source.html">stan/agrad/fwd/sin.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="fwd_2tan_8hpp_source.html">stan/agrad/fwd/tan.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="fwd_2acos_8hpp_source.html">stan/agrad/fwd/acos.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="fwd_2asin_8hpp_source.html">stan/agrad/fwd/asin.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="fwd_2atan_8hpp_source.html">stan/agrad/fwd/atan.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="fwd_2atan2_8hpp_source.html">stan/agrad/fwd/atan2.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="fwd_2cosh_8hpp_source.html">stan/agrad/fwd/cosh.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="fwd_2sinh_8hpp_source.html">stan/agrad/fwd/sinh.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="fwd_2tanh_8hpp_source.html">stan/agrad/fwd/tanh.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="fwd_2asinh_8hpp_source.html">stan/agrad/fwd/asinh.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="fwd_2acosh_8hpp_source.html">stan/agrad/fwd/acosh.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="fwd_2atanh_8hpp_source.html">stan/agrad/fwd/atanh.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="agrad_2fwd_2logit_8hpp_source.html">stan/agrad/fwd/logit.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="agrad_2fwd_2inv__logit_8hpp_source.html">stan/agrad/fwd/inv_logit.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="agrad_2fwd_2inv__cloglog_8hpp_source.html">stan/agrad/fwd/inv_cloglog.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="fwd_2erf_8hpp_source.html">stan/agrad/fwd/erf.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="fwd_2erfc_8hpp_source.html">stan/agrad/fwd/erfc.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="agrad_2fwd_2phi_8hpp_source.html">stan/agrad/fwd/phi.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="agrad_2fwd_2binary__log__loss_8hpp_source.html">stan/agrad/fwd/binary_log_loss.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="fwd_2tgamma_8hpp_source.html">stan/agrad/fwd/tgamma.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="agrad_2fwd_2lgamma_8hpp_source.html">stan/agrad/fwd/lgamma.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="agrad_2fwd_2lmgamma_8hpp_source.html">stan/agrad/fwd/lmgamma.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="agrad_2fwd_2gamma__p_8hpp_source.html">stan/agrad/fwd/gamma_p.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="agrad_2fwd_2gamma__q_8hpp_source.html">stan/agrad/fwd/gamma_q.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="agrad_2fwd_2lbeta_8hpp_source.html">stan/agrad/fwd/lbeta.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="agrad_2fwd_2binomial__coefficient__log_8hpp_source.html">stan/agrad/fwd/binomial_coefficient_log.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="agrad_2fwd_2bessel__first__kind_8hpp_source.html">stan/agrad/fwd/bessel_first_kind.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="agrad_2fwd_2bessel__second__kind_8hpp_source.html">stan/agrad/fwd/bessel_second_kind.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="agrad_2fwd_2modified__bessel__first__kind_8hpp_source.html">stan/agrad/fwd/modified_bessel_first_kind.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="agrad_2fwd_2modified__bessel__second__kind_8hpp_source.html">stan/agrad/fwd/modified_bessel_second_kind.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="agrad_2fwd_2falling__factorial_8hpp_source.html">stan/agrad/fwd/falling_factorial.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="agrad_2fwd_2rising__factorial_8hpp_source.html">stan/agrad/fwd/rising_factorial.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="agrad_2fwd_2log__rising__factorial_8hpp_source.html">stan/agrad/fwd/log_rising_factorial.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="agrad_2fwd_2log__falling__factorial_8hpp_source.html">stan/agrad/fwd/log_falling_factorial.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="fwd_2expm1_8hpp_source.html">stan/agrad/fwd/expm1.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="agrad_2fwd_2fma_8hpp_source.html">stan/agrad/fwd/fma.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="agrad_2fwd_2log1m_8hpp_source.html">stan/agrad/fwd/log1m.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="agrad_2fwd_2log1p_8hpp_source.html">stan/agrad/fwd/log1p.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="agrad_2fwd_2log1m__exp_8hpp_source.html">stan/agrad/fwd/log1m_exp.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="agrad_2fwd_2log1p__exp_8hpp_source.html">stan/agrad/fwd/log1p_exp.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="agrad_2fwd_2log__diff__exp_8hpp_source.html">stan/agrad/fwd/log_diff_exp.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="agrad_2fwd_2log__sum__exp_8hpp_source.html">stan/agrad/fwd/log_sum_exp.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="agrad_2fwd_2log__inv__logit_8hpp_source.html">stan/agrad/fwd/log_inv_logit.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="agrad_2fwd_2log1m__inv__logit_8hpp_source.html">stan/agrad/fwd/log1m_inv_logit.hpp</a>&gt;</code><br/>
-</div>
+
 <p><a href="fvar_8hpp_source.html">Go to the source code of this file.</a></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
+Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structstan_1_1agrad_1_1fvar.html">stan::agrad::fvar&lt; T &gt;</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="namespaces"></a>
+Namespaces</h2></td></tr>
+<tr class="memitem:namespacestan"><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan.html">stan</a></td></tr>
+<tr class="memdesc:namespacestan"><td class="mdescLeft">&#160;</td><td class="mdescRight">Probability, optimization and sampling library. <br/></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:namespacestan_1_1agrad"><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1agrad.html">stan::agrad</a></td></tr>
+<tr class="memdesc:namespacestan_1_1agrad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function gradients via reverse-mode automatic differentiation. <br/></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
 </div><!-- contents -->
 <hr/>
 <div class="conents" style="font-size:80%;">

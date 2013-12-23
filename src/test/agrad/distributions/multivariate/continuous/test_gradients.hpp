@@ -1,7 +1,7 @@
 #include <cmath>
 #include <vector>
 #include <iomanip>
-#include <stan/agrad/var.hpp>
+#include <stan/agrad/rev.hpp>
 
 template <typename F>
 std::vector<double> 
@@ -12,7 +12,7 @@ finite_diffs(const F& fun,
   std::vector<double> args_plus = args;
   std::vector<double> args_minus = args;
   
-  for (int i = 0; i < args.size(); ++i) {
+  for (size_t i = 0; i < args.size(); ++i) {
     args_plus[i] += epsilon;
     args_minus[i] -= epsilon;
     diffs[i] = (fun(args_plus) - fun(args_minus)) / (2 * epsilon);
@@ -27,7 +27,7 @@ std::vector<double>
 grad(const F& fun,
      const std::vector<double>& args) {
   std::vector<stan::agrad::var> x;
-  for (int i = 0; i < args.size(); ++i)
+  for (size_t i = 0; i < args.size(); ++i)
     x.push_back(args[i]);
 
   stan::agrad::var fx = fun(x);

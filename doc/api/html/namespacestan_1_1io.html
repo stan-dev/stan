@@ -149,6 +149,12 @@ Functions</h2></td></tr>
 <tr class="memitem:a0b47261532cf7c027e939aca02088c06"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1io.html#a0b47261532cf7c027e939aca02088c06">print_help_option</a> (std::ostream *o, const std::string &amp;key, const std::string &amp;value_type, const std::string &amp;msg, const std::string &amp;note=&quot;&quot;)</td></tr>
 <tr class="memdesc:a0b47261532cf7c027e939aca02088c06"><td class="mdescLeft">&#160;</td><td class="mdescRight">Prints single print option to output ptr if non-null.  <a href="#a0b47261532cf7c027e939aca02088c06"></a><br/></td></tr>
 <tr class="separator:a0b47261532cf7c027e939aca02088c06"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aec5638401c1a9174c2a1755dbb9b9a1c"><td class="memTemplParams" colspan="2">template&lt;&gt; </td></tr>
+<tr class="memitem:aec5638401c1a9174c2a1755dbb9b9a1c"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacestan_1_1io.html#aec5638401c1a9174c2a1755dbb9b9a1c">cmd_line::bare&lt; std::string &gt;</a> (size_t n, std::string &amp;x) const </td></tr>
+<tr class="separator:aec5638401c1a9174c2a1755dbb9b9a1c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6717f7e0267a49b9c35e24aa6183236a"><td class="memTemplParams" colspan="2">template&lt;&gt; </td></tr>
+<tr class="memitem:a6717f7e0267a49b9c35e24aa6183236a"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacestan_1_1io.html#a6717f7e0267a49b9c35e24aa6183236a">cmd_line::val&lt; std::string &gt;</a> (const std::string &amp;key, std::string &amp;x) const </td></tr>
+<tr class="separator:a6717f7e0267a49b9c35e24aa6183236a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a56441daea55f49d4bcb168b30d7313f0"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1io.html#a56441daea55f49d4bcb168b30d7313f0">utc_time_string</a> ()</td></tr>
 <tr class="memdesc:a56441daea55f49d4bcb168b30d7313f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the current coordinated universal time (UTC) as a string.  <a href="#a56441daea55f49d4bcb168b30d7313f0"></a><br/></td></tr>
 <tr class="separator:a56441daea55f49d4bcb168b30d7313f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -156,6 +162,66 @@ Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Input/output utilities. </p>
 </div><h2 class="groupheader">Function Documentation</h2>
+<a class="anchor" id="aec5638401c1a9174c2a1755dbb9b9a1c"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="classstan_1_1io_1_1cmd__line.html#a3879e1290c19f6580ee0285dc1625675">stan::io::cmd_line::bare</a>&lt; std::string &gt; </td>
+          <td>(</td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>n</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::string &amp;&#160;</td>
+          <td class="paramname"><em>x</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Definition at line <a class="el" href="cmd__line_8hpp_source.html#l00274">274</a> of file <a class="el" href="cmd__line_8hpp_source.html">cmd_line.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a6717f7e0267a49b9c35e24aa6183236a"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="classstan_1_1io_1_1cmd__line.html#a44c058f7d1a236d9fdc95720191e8bd2">stan::io::cmd_line::val</a>&lt; std::string &gt; </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::string &amp;&#160;</td>
+          <td class="paramname"><em>x</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Definition at line <a class="el" href="cmd__line_8hpp_source.html#l00284">284</a> of file <a class="el" href="cmd__line_8hpp_source.html">cmd_line.hpp</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="aefe8bb54168558ab08f140cb2886f1e3"></a>
 <div class="memitem">
 <div class="memproto">

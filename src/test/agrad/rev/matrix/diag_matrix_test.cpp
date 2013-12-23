@@ -1,7 +1,8 @@
+#include <stan/math/matrix/diag_matrix.hpp>
 #include <gtest/gtest.h>
 #include <test/agrad/util.hpp>
-#include <stan/agrad/agrad.hpp>
-#include <stan/agrad/matrix.hpp>
+#include <stan/agrad/rev.hpp>
+#include <stan/agrad/rev/matrix.hpp>
 
 TEST(AgradRevMatrix,diagMatrix) {
   using stan::math::diag_matrix;

@@ -2,7 +2,7 @@
 #define __TEST__AGRAD__DISTRIBUTIONS__UTILITY_HPP__
 
 #include <vector>
-#include <stan/agrad/matrix.hpp>
+#include <stan/agrad/rev/matrix.hpp>
 
 using std::vector;
 using stan::agrad::var;

@@ -20,39 +20,37 @@ TEST(StanIoMcmcWriter, print_sample_names) {
   stan::io::dump data_var_context(data_stream);
   data_stream.close();
   
-  example_model_namespace::example_model model(data_var_context, &std::cout);
+  example_namespace::example model(data_var_context, &std::cout);
   
   // Sample
-  std::vector<double> real;
-  real.push_back(1.43);
-  real.push_back(2.71);
-  
-  std::vector<int> discrete;
+  Eigen::VectorXd real(2);
+  real(0) = 1.43;
+  real(1) = 2.71;
   
   double log_prob = 3.14;
   double accept_stat = 0.84;
   
-  stan::mcmc::sample sample(real, discrete, log_prob, accept_stat);
+  stan::mcmc::sample sample(real, log_prob, accept_stat);
   
   // Sampler
   typedef boost::ecuyer1988 rng_t;
   rng_t base_rng(0);
   
-  stan::mcmc::adapt_diag_e_nuts<example_model_namespace::example_model, rng_t> sampler(model, base_rng, 0);
-  sampler.seed(real, discrete);
+  stan::mcmc::adapt_diag_e_nuts<example_namespace::example, rng_t> sampler(model, base_rng, 0);
+  sampler.seed(real);
   
   // Writer
   std::stringstream sample_stream;
   std::stringstream diagnostic_stream;
   
-  stan::io::mcmc_writer<example_model_namespace::example_model> writer(&sample_stream, &diagnostic_stream);
+  stan::io::mcmc_writer<example_namespace::example> writer(&sample_stream, &diagnostic_stream);
   
   writer.print_sample_names(sample, &sampler, model);
   
   std::string line;
   std::getline(sample_stream, line);
   
-  EXPECT_EQ("lp__,accept_stat__,stepsize__,treedepth__,mu1,mu2", line);
+  EXPECT_EQ("lp__,accept_stat__,stepsize__,treedepth__,n_divergent__,mu1,mu2", line);
   
 }
 
@@ -63,32 +61,30 @@ TEST(StanIoMcmcWriter, print_sample_params) {
   stan::io::dump data_var_context(data_stream);
   data_stream.close();
   
-  example_model_namespace::example_model model(data_var_context, &std::cout);
+  example_namespace::example model(data_var_context, &std::cout);
   
   // Sample
-  std::vector<double> real;
-  real.push_back(1.43);
-  real.push_back(2.71);
-  
-  std::vector<int> discrete;
+  Eigen::VectorXd real(2);
+  real(0) = 1.43;
+  real(1) = 2.71;
   
   double log_prob = 3.14;
   double accept_stat = 0.84;
   
-  stan::mcmc::sample sample(real, discrete, log_prob, accept_stat);
+  stan::mcmc::sample sample(real, log_prob, accept_stat);
   
   // Sampler
   typedef boost::ecuyer1988 rng_t;
   rng_t base_rng(0);
   
-  stan::mcmc::adapt_diag_e_nuts<example_model_namespace::example_model, rng_t> sampler(model, base_rng, 0);
-  sampler.seed(real, discrete);
+  stan::mcmc::adapt_diag_e_nuts<example_namespace::example, rng_t> sampler(model, base_rng, 0);
+  sampler.seed(real);
   
   // Writer
   std::stringstream sample_stream;
   std::stringstream diagnostic_stream;
   
-  stan::io::mcmc_writer<example_model_namespace::example_model> writer(&sample_stream, &diagnostic_stream);
+  stan::io::mcmc_writer<example_namespace::example> writer(&sample_stream, &diagnostic_stream);
   
   writer.print_sample_params<rng_t>(base_rng, sample, sampler, model);
   
@@ -100,8 +96,9 @@ TEST(StanIoMcmcWriter, print_sample_params) {
   expected_stream << accept_stat << ",";
   expected_stream << sampler.get_current_stepsize() << ",";
   expected_stream << 0 << ",";
-  expected_stream << real.at(0) << ",";
-  expected_stream << real.at(1);
+  expected_stream << 0 << ",";
+  expected_stream << real(0) << ",";
+  expected_stream << real(1);
   
   std::string expected_line;
   std::getline(expected_stream, expected_line);
@@ -117,32 +114,30 @@ TEST(StanIoMcmcWriter, print_adapt_finish) {
   stan::io::dump data_var_context(data_stream);
   data_stream.close();
   
-  example_model_namespace::example_model model(data_var_context, &std::cout);
+  example_namespace::example model(data_var_context, &std::cout);
   
   // Sample
-  std::vector<double> real;
-  real.push_back(1.43);
-  real.push_back(2.71);
-  
-  std::vector<int> discrete;
+  Eigen::VectorXd real(2);
+  real(0) = 1.43;
+  real(1) = 2.71;
   
   double log_prob = 3.14;
   double accept_stat = 0.84;
   
-  stan::mcmc::sample sample(real, discrete, log_prob, accept_stat);
+  stan::mcmc::sample sample(real, log_prob, accept_stat);
   
   // Sampler
   typedef boost::ecuyer1988 rng_t;
   rng_t base_rng(0);
   
-  stan::mcmc::adapt_diag_e_nuts<example_model_namespace::example_model, rng_t> sampler(model, base_rng, 0);
-  sampler.seed(real, discrete);
+  stan::mcmc::adapt_diag_e_nuts<example_namespace::example, rng_t> sampler(model, base_rng, 0);
+  sampler.seed(real);
   
   // Writer
   std::stringstream sample_stream;
   std::stringstream diagnostic_stream;
   
-  stan::io::mcmc_writer<example_model_namespace::example_model> writer(&sample_stream, &diagnostic_stream);
+  stan::io::mcmc_writer<example_namespace::example> writer(&sample_stream, &diagnostic_stream);
   
   writer.print_adapt_finish(&sampler);
   
@@ -200,32 +195,30 @@ TEST(StanIoMcmcWriter, print_diagnostic_names) {
   stan::io::dump data_var_context(data_stream);
   data_stream.close();
   
-  example_model_namespace::example_model model(data_var_context, &std::cout);
+  example_namespace::example model(data_var_context, &std::cout);
   
   // Sample
-  std::vector<double> real;
-  real.push_back(1.43);
-  real.push_back(2.71);
-  
-  std::vector<int> discrete;
+  Eigen::VectorXd real(2);
+  real(0) = 1.43;
+  real(1) = 2.71;
   
   double log_prob = 3.14;
   double accept_stat = 0.84;
   
-  stan::mcmc::sample sample(real, discrete, log_prob, accept_stat);
+  stan::mcmc::sample sample(real, log_prob, accept_stat);
   
   // Sampler
   typedef boost::ecuyer1988 rng_t;
   rng_t base_rng(0);
   
-  stan::mcmc::adapt_diag_e_nuts<example_model_namespace::example_model, rng_t> sampler(model, base_rng, 0);
-  sampler.seed(real, discrete);
+  stan::mcmc::adapt_diag_e_nuts<example_namespace::example, rng_t> sampler(model, base_rng, 0);
+  sampler.seed(real);
   
   // Writer
   std::stringstream sample_stream;
   std::stringstream diagnostic_stream;
   
-  stan::io::mcmc_writer<example_model_namespace::example_model> writer(&sample_stream, &diagnostic_stream);
+  stan::io::mcmc_writer<example_namespace::example> writer(&sample_stream, &diagnostic_stream);
   
   writer.print_diagnostic_names(sample, &sampler, model);
   
@@ -233,7 +226,7 @@ TEST(StanIoMcmcWriter, print_diagnostic_names) {
   std::getline(diagnostic_stream, line);
   
   // FIXME: make this work, too
-  EXPECT_EQ("lp__,accept_stat__,stepsize__,treedepth__,mu1,mu2,p_mu1,p_mu2,g_mu1,g_mu2", line);
+  EXPECT_EQ("lp__,accept_stat__,stepsize__,treedepth__,n_divergent__,mu1,mu2,p_mu1,p_mu2,g_mu1,g_mu2", line);
   
 }
 
@@ -244,26 +237,24 @@ TEST(StanIoMcmcWriter, print_diagnostic_params) {
   stan::io::dump data_var_context(data_stream);
   data_stream.close();
   
-  example_model_namespace::example_model model(data_var_context, &std::cout);
+  example_namespace::example model(data_var_context, &std::cout);
   
   // Sample
-  std::vector<double> real;
-  real.push_back(1.43);
-  real.push_back(2.71);
-  
-  std::vector<int> discrete;
+  Eigen::VectorXd real(2);
+  real(0) = 1.43;
+  real(1) = 2.71;
   
   double log_prob = 3.14;
   double accept_stat = 0.84;
   
-  stan::mcmc::sample sample(real, discrete, log_prob, accept_stat);
+  stan::mcmc::sample sample(real, log_prob, accept_stat);
   
   // Sampler
   typedef boost::ecuyer1988 rng_t;
   rng_t base_rng(0);
   
-  stan::mcmc::adapt_diag_e_nuts<example_model_namespace::example_model, rng_t> sampler(model, base_rng, 0);
-  sampler.seed(real, discrete);
+  stan::mcmc::adapt_diag_e_nuts<example_namespace::example, rng_t> sampler(model, base_rng, 0);
+  sampler.seed(real);
   sampler.z().p(0) = 0;
   sampler.z().p(1) = 0;
   sampler.z().g(0) = 0;
@@ -273,7 +264,7 @@ TEST(StanIoMcmcWriter, print_diagnostic_params) {
   std::stringstream sample_stream;
   std::stringstream diagnostic_stream;
   
-  stan::io::mcmc_writer<example_model_namespace::example_model> writer(&sample_stream, &diagnostic_stream);
+  stan::io::mcmc_writer<example_namespace::example> writer(&sample_stream, &diagnostic_stream);
   
   writer.print_diagnostic_params(sample, &sampler);
   
@@ -285,8 +276,9 @@ TEST(StanIoMcmcWriter, print_diagnostic_params) {
   expected_stream << accept_stat << ",";
   expected_stream << sampler.get_current_stepsize() << ",";
   expected_stream << 0 << ",";
-  expected_stream << real.at(0) << ",";
-  expected_stream << real.at(1) << ",";
+  expected_stream << 0 << ",";
+  expected_stream << real(0) << ",";
+  expected_stream << real(1) << ",";
   expected_stream << 0 << ",";
   expected_stream << 0 << ",";
   expected_stream << 0 << ",";
@@ -306,32 +298,30 @@ TEST(StanIoMcmcWriter, print_timing) {
   stan::io::dump data_var_context(data_stream);
   data_stream.close();
   
-  example_model_namespace::example_model model(data_var_context, &std::cout);
+  example_namespace::example model(data_var_context, &std::cout);
   
   // Sample
-  std::vector<double> real;
-  real.push_back(1.43);
-  real.push_back(2.71);
-  
-  std::vector<int> discrete;
+  Eigen::VectorXd real(2);
+  real(0) = 1.43;
+  real(1) = 2.71;
   
   double log_prob = 3.14;
   double accept_stat = 0.84;
   
-  stan::mcmc::sample sample(real, discrete, log_prob, accept_stat);
+  stan::mcmc::sample sample(real, log_prob, accept_stat);
   
   // Sampler
   typedef boost::ecuyer1988 rng_t;
   rng_t base_rng(0);
   
-  stan::mcmc::adapt_diag_e_nuts<example_model_namespace::example_model, rng_t> sampler(model, base_rng, 0);
-  sampler.seed(real, discrete);
+  stan::mcmc::adapt_diag_e_nuts<example_namespace::example, rng_t> sampler(model, base_rng, 0);
+  sampler.seed(real);
   
   // Writer
   std::stringstream sample_stream;
   std::stringstream diagnostic_stream;
   
-  stan::io::mcmc_writer<example_model_namespace::example_model> writer(&sample_stream, &diagnostic_stream);
+  stan::io::mcmc_writer<example_namespace::example> writer(&sample_stream, &diagnostic_stream);
   
   double warm = 0.193933;
   double sampling = 0.483830;

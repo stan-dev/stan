@@ -1,9 +1,28 @@
-#include <stan/math/matrix/variance.hpp>
 #include <gtest/gtest.h>
+
+#include <stan/agrad/rev.hpp>
 #include <test/agrad/util.hpp>
-#include <stan/math/matrix/typedefs.hpp>
 #include <stan/agrad/rev/matrix/typedefs.hpp>
-#include <stan/agrad/agrad.hpp>
+#include <stan/agrad/rev/matrix/variance.hpp>
+#include <stan/math/matrix/typedefs.hpp>
+#include <stan/math/matrix/variance.hpp>
+
+TEST(AgradRevMatrix, varianceZeroBoundaryCase) {
+  using stan::math::variance;
+  using std::vector;
+  using stan::agrad::var;
+
+  vector<var> y(3, 1.7);
+  var f = variance(y);
+  EXPECT_FLOAT_EQ(0.0, f.val());
+
+  vector<double> g;
+  f.grad(y, g);
+  EXPECT_EQ(y.size(), g.size());
+  for (size_t i = 0; i < g.size(); ++i)
+    EXPECT_FLOAT_EQ(0.0, g[i]);
+}
+
 
 TEST(AgradRevMatrix, variance_vector) {
   using stan::math::variance;
@@ -125,7 +144,7 @@ TEST(AgradRevMatrix, varianceStdVector) {
   VEC grad1 = cgrad(f1, y1[0], y1[1], y1[2]);
   double f1_val = f1.val(); // save before cleaned out
 
-  AVEC y2 = createAVEC(0.5,2.0,3.5);
+  AVEC y2 = createAVEC(0.5, 2.0, 3.5);
   AVAR mean2 = (y2[0] + y2[1] + y2[2]) / 3.0;
   AVAR sum_sq_diff_2 
     = (y2[0] - mean2) * (y2[0] - mean2)
@@ -139,6 +158,7 @@ TEST(AgradRevMatrix, varianceStdVector) {
 
   EXPECT_EQ(3U, grad1.size());
   EXPECT_EQ(3U, grad2.size());
-  for (size_t i = 0; i < 3; ++i)
+  for (size_t i = 0; i < 3; ++i) {
     EXPECT_FLOAT_EQ(grad2[i], grad1[i]);
+  }
 }

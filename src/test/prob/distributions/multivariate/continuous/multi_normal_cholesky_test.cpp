@@ -2,7 +2,7 @@
 #include "stan/prob/distributions/multivariate/continuous/multi_normal_cholesky.hpp"
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/math/distributions.hpp>
-#include <stan/agrad/agrad.hpp>
+#include <stan/agrad/rev.hpp>
 
 using Eigen::Dynamic;
 using Eigen::Matrix;

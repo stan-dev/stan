@@ -91,8 +91,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pro-methods">Protected Member Functions</a> &#124;
-<a href="#pro-attribs">Protected Attributes</a> &#124;
+<a href="#pub-attribs">Public Attributes</a> &#124;
 <a href="classstan_1_1mcmc_1_1base__nuts-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">stan::mcmc::base_nuts&lt; M, P, H, I, BaseRNG &gt; Class Template Reference<span class="mlabels"><span class="mlabel">abstract</span></span></div>  </div>
@@ -135,6 +134,10 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a1f1085f2b4bd6b4e94fbce9f43243a6c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7b804d04e40e371e8d543e78a6b1fc12"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1base__nuts.html#a7b804d04e40e371e8d543e78a6b1fc12">get_sampler_params</a> (std::vector&lt; double &gt; &amp;values)</td></tr>
 <tr class="separator:a7b804d04e40e371e8d543e78a6b1fc12"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac2961f3ce35af570405291a8011e1064"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1base__nuts.html#ac2961f3ce35af570405291a8011e1064">compute_criterion</a> (<a class="el" href="classstan_1_1mcmc_1_1ps__point.html">ps_point</a> &amp;start, P &amp;finish, Eigen::VectorXd &amp;rho)=0</td></tr>
+<tr class="separator:ac2961f3ce35af570405291a8011e1064"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abfa3f7a87c96c0021bbd4e9a87ad9f4b"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1base__nuts.html#abfa3f7a87c96c0021bbd4e9a87ad9f4b">build_tree</a> (int depth, Eigen::VectorXd &amp;rho, <a class="el" href="classstan_1_1mcmc_1_1ps__point.html">ps_point</a> *z_init_parent, <a class="el" href="classstan_1_1mcmc_1_1ps__point.html">ps_point</a> &amp;z_propose, <a class="el" href="structstan_1_1mcmc_1_1nuts__util.html">nuts_util</a> &amp;util)</td></tr>
+<tr class="separator:abfa3f7a87c96c0021bbd4e9a87ad9f4b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classstan_1_1mcmc_1_1base__hmc"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classstan_1_1mcmc_1_1base__hmc')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classstan_1_1mcmc_1_1base__hmc.html">stan::mcmc::base_hmc&lt; M, P, H, I, BaseRNG &gt;</a></td></tr>
 <tr class="memitem:a8c414cb92694b17a02b3d2a799499870 inherit pub_methods_classstan_1_1mcmc_1_1base__hmc"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1base__hmc.html#a8c414cb92694b17a02b3d2a799499870">base_hmc</a> (M &amp;m, BaseRNG &amp;rng, std::ostream *o, std::ostream *e)</td></tr>
 <tr class="separator:a8c414cb92694b17a02b3d2a799499870 inherit pub_methods_classstan_1_1mcmc_1_1base__hmc"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -144,8 +147,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ab03fa8ffe91879f8bd8b364641c4de5a inherit pub_methods_classstan_1_1mcmc_1_1base__hmc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abcf75357ef756a2c74f9855386b3be47 inherit pub_methods_classstan_1_1mcmc_1_1base__hmc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1base__hmc.html#abcf75357ef756a2c74f9855386b3be47">get_sampler_diagnostics</a> (std::vector&lt; double &gt; &amp;values)</td></tr>
 <tr class="separator:abcf75357ef756a2c74f9855386b3be47 inherit pub_methods_classstan_1_1mcmc_1_1base__hmc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad25ce2fd8d6981f6a24dcf04cfaf8a34 inherit pub_methods_classstan_1_1mcmc_1_1base__hmc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1base__hmc.html#ad25ce2fd8d6981f6a24dcf04cfaf8a34">seed</a> (const std::vector&lt; double &gt; &amp;q, const std::vector&lt; int &gt; &amp;r)</td></tr>
-<tr class="separator:ad25ce2fd8d6981f6a24dcf04cfaf8a34 inherit pub_methods_classstan_1_1mcmc_1_1base__hmc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af14724fbb8065467b10deeb4134c6e74 inherit pub_methods_classstan_1_1mcmc_1_1base__hmc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1base__hmc.html#af14724fbb8065467b10deeb4134c6e74">seed</a> (const Eigen::VectorXd &amp;q)</td></tr>
+<tr class="separator:af14724fbb8065467b10deeb4134c6e74 inherit pub_methods_classstan_1_1mcmc_1_1base__hmc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6ec1af08b215fda50b23dade2aa615a8 inherit pub_methods_classstan_1_1mcmc_1_1base__hmc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1base__hmc.html#a6ec1af08b215fda50b23dade2aa615a8">init_stepsize</a> ()</td></tr>
 <tr class="separator:a6ec1af08b215fda50b23dade2aa615a8 inherit pub_methods_classstan_1_1mcmc_1_1base__hmc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7b9f7a04975626ce6ea23a81d903b325 inherit pub_methods_classstan_1_1mcmc_1_1base__hmc"><td class="memItemLeft" align="right" valign="top">P &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1base__hmc.html#a7b9f7a04975626ce6ea23a81d903b325">z</a> ()</td></tr>
@@ -160,6 +163,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:aa049a77cf8131f53a707a3a976fa3c11 inherit pub_methods_classstan_1_1mcmc_1_1base__hmc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a17660d32d37d39df87f49ed0e8f97262 inherit pub_methods_classstan_1_1mcmc_1_1base__hmc"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1base__hmc.html#a17660d32d37d39df87f49ed0e8f97262">get_stepsize_jitter</a> ()</td></tr>
 <tr class="separator:a17660d32d37d39df87f49ed0e8f97262 inherit pub_methods_classstan_1_1mcmc_1_1base__hmc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3ac766b0cce7b20168fb576cc7b399af inherit pub_methods_classstan_1_1mcmc_1_1base__hmc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1base__hmc.html#a3ac766b0cce7b20168fb576cc7b399af">sample_stepsize</a> ()</td></tr>
+<tr class="separator:a3ac766b0cce7b20168fb576cc7b399af inherit pub_methods_classstan_1_1mcmc_1_1base__hmc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classstan_1_1mcmc_1_1base__mcmc"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classstan_1_1mcmc_1_1base__mcmc')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classstan_1_1mcmc_1_1base__mcmc.html">stan::mcmc::base_mcmc</a></td></tr>
 <tr class="memitem:a4fb817f487dc4fe86a91acca8109ac2a inherit pub_methods_classstan_1_1mcmc_1_1base__mcmc"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1base__mcmc.html#a4fb817f487dc4fe86a91acca8109ac2a">base_mcmc</a> (std::ostream *o, std::ostream *e)</td></tr>
 <tr class="separator:a4fb817f487dc4fe86a91acca8109ac2a inherit pub_methods_classstan_1_1mcmc_1_1base__mcmc"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -168,24 +173,19 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a999c963237aa4af863b691f1843b25bc inherit pub_methods_classstan_1_1mcmc_1_1base__mcmc"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1base__mcmc.html#a999c963237aa4af863b691f1843b25bc">name</a> ()</td></tr>
 <tr class="separator:a999c963237aa4af863b691f1843b25bc inherit pub_methods_classstan_1_1mcmc_1_1base__mcmc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
-Protected Member Functions</h2></td></tr>
-<tr class="memitem:a9b4db8a3a21a3c9e80cd8c86f0b4b621"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1base__nuts.html#a9b4db8a3a21a3c9e80cd8c86f0b4b621">_compute_criterion</a> (<a class="el" href="classstan_1_1mcmc_1_1ps__point.html">ps_point</a> &amp;start, P &amp;finish, Eigen::VectorXd &amp;rho)=0</td></tr>
-<tr class="separator:a9b4db8a3a21a3c9e80cd8c86f0b4b621"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a26db50badbc2f62f65a35aef92a6b3f2"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1base__nuts.html#a26db50badbc2f62f65a35aef92a6b3f2">build_tree</a> (int depth, Eigen::VectorXd &amp;rho, <a class="el" href="classstan_1_1mcmc_1_1ps__point.html">ps_point</a> *z_init, <a class="el" href="classstan_1_1mcmc_1_1ps__point.html">ps_point</a> &amp;z_propose, <a class="el" href="structstan_1_1mcmc_1_1nuts__util.html">nuts_util</a> &amp;util)</td></tr>
-<tr class="separator:a26db50badbc2f62f65a35aef92a6b3f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="inherit_header pro_methods_classstan_1_1mcmc_1_1base__hmc"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classstan_1_1mcmc_1_1base__hmc')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classstan_1_1mcmc_1_1base__hmc.html">stan::mcmc::base_hmc&lt; M, P, H, I, BaseRNG &gt;</a></td></tr>
-<tr class="memitem:a5686c6667f9a8e70049bd56231ca2a99 inherit pro_methods_classstan_1_1mcmc_1_1base__hmc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1base__hmc.html#a5686c6667f9a8e70049bd56231ca2a99">_sample_stepsize</a> ()</td></tr>
-<tr class="separator:a5686c6667f9a8e70049bd56231ca2a99 inherit pro_methods_classstan_1_1mcmc_1_1base__hmc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
-Protected Attributes</h2></td></tr>
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
+Public Attributes</h2></td></tr>
 <tr class="memitem:acb7e67dd254cab229429fcead7f18248"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1base__nuts.html#acb7e67dd254cab229429fcead7f18248">_depth</a></td></tr>
 <tr class="separator:acb7e67dd254cab229429fcead7f18248"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aca7e01df1dadea953191cb0818e45e2f"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1base__nuts.html#aca7e01df1dadea953191cb0818e45e2f">_max_depth</a></td></tr>
 <tr class="separator:aca7e01df1dadea953191cb0818e45e2f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a32c5b1250b06867e5bfad17cb33943b7"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1base__nuts.html#a32c5b1250b06867e5bfad17cb33943b7">_max_delta</a></td></tr>
 <tr class="separator:a32c5b1250b06867e5bfad17cb33943b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a103b33df985e433f37a56ee0626a7861"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1base__nuts.html#a103b33df985e433f37a56ee0626a7861">_n_divergent</a></td></tr>
+<tr class="separator:a103b33df985e433f37a56ee0626a7861"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
+Additional Inherited Members</h2></td></tr>
 <tr class="inherit_header pro_attribs_classstan_1_1mcmc_1_1base__hmc"><td colspan="2" onclick="javascript:toggleInherit('pro_attribs_classstan_1_1mcmc_1_1base__hmc')"><img src="closed.png" alt="-"/>&#160;Protected Attributes inherited from <a class="el" href="classstan_1_1mcmc_1_1base__hmc.html">stan::mcmc::base_hmc&lt; M, P, H, I, BaseRNG &gt;</a></td></tr>
 <tr class="memitem:abaa8c5f40b664481b188c8342f3917db inherit pro_attribs_classstan_1_1mcmc_1_1base__hmc"><td class="memItemLeft" align="right" valign="top">P&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1base__hmc.html#abaa8c5f40b664481b188c8342f3917db">_z</a></td></tr>
 <tr class="separator:abaa8c5f40b664481b188c8342f3917db inherit pro_attribs_classstan_1_1mcmc_1_1base__hmc"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -203,13 +203,6 @@ Protected Attributes</h2></td></tr>
 <tr class="separator:a0d4321fe558ad0295196d79c5525a777 inherit pro_attribs_classstan_1_1mcmc_1_1base__hmc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1eb0217fe58fa1a2e4d0691831f062d6 inherit pro_attribs_classstan_1_1mcmc_1_1base__hmc"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1base__hmc.html#a1eb0217fe58fa1a2e4d0691831f062d6">_epsilon_jitter</a></td></tr>
 <tr class="separator:a1eb0217fe58fa1a2e4d0691831f062d6 inherit pro_attribs_classstan_1_1mcmc_1_1base__hmc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="inherit_header pro_attribs_classstan_1_1mcmc_1_1base__mcmc"><td colspan="2" onclick="javascript:toggleInherit('pro_attribs_classstan_1_1mcmc_1_1base__mcmc')"><img src="closed.png" alt="-"/>&#160;Protected Attributes inherited from <a class="el" href="classstan_1_1mcmc_1_1base__mcmc.html">stan::mcmc::base_mcmc</a></td></tr>
-<tr class="memitem:ad2c7124c9b80002735c5db2b7aecf482 inherit pro_attribs_classstan_1_1mcmc_1_1base__mcmc"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1base__mcmc.html#ad2c7124c9b80002735c5db2b7aecf482">_name</a></td></tr>
-<tr class="separator:ad2c7124c9b80002735c5db2b7aecf482 inherit pro_attribs_classstan_1_1mcmc_1_1base__mcmc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab021a0550faee8630a30990d7ebf7b88 inherit pro_attribs_classstan_1_1mcmc_1_1base__mcmc"><td class="memItemLeft" align="right" valign="top">std::ostream *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1base__mcmc.html#ab021a0550faee8630a30990d7ebf7b88">_out_stream</a></td></tr>
-<tr class="separator:ab021a0550faee8630a30990d7ebf7b88 inherit pro_attribs_classstan_1_1mcmc_1_1base__mcmc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a38c1899ffa57046d3da3ac5496ac4a8e inherit pro_attribs_classstan_1_1mcmc_1_1base__mcmc"><td class="memItemLeft" align="right" valign="top">std::ostream *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1base__mcmc.html#a38c1899ffa57046d3da3ac5496ac4a8e">_err_stream</a></td></tr>
-<tr class="separator:a38c1899ffa57046d3da3ac5496ac4a8e inherit pro_attribs_classstan_1_1mcmc_1_1base__mcmc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;class M, class P, template&lt; class, class &gt; class H, template&lt; class, class &gt; class I, class BaseRNG&gt;<br/>
@@ -296,49 +289,7 @@ template&lt;class M, class P, template&lt; class, class &gt; class H, template&l
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="a9b4db8a3a21a3c9e80cd8c86f0b4b621"></a>
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;class M, class P, template&lt; class, class &gt; class H, template&lt; class, class &gt; class I, class BaseRNG&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual bool <a class="el" href="classstan_1_1mcmc_1_1base__nuts.html">stan::mcmc::base_nuts</a>&lt; M, P, H, I, BaseRNG &gt;::_compute_criterion </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classstan_1_1mcmc_1_1ps__point.html">ps_point</a> &amp;&#160;</td>
-          <td class="paramname"><em>start</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">P &amp;&#160;</td>
-          <td class="paramname"><em>finish</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">Eigen::VectorXd &amp;&#160;</td>
-          <td class="paramname"><em>rho</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span><span class="mlabel">pure virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a26db50badbc2f62f65a35aef92a6b3f2"></a>
+<a class="anchor" id="abfa3f7a87c96c0021bbd4e9a87ad9f4b"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
@@ -363,7 +314,7 @@ template&lt;class M, class P, template&lt; class, class &gt; class H, template&l
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="classstan_1_1mcmc_1_1ps__point.html">ps_point</a> *&#160;</td>
-          <td class="paramname"><em>z_init</em>, </td>
+          <td class="paramname"><em>z_init_parent</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -385,12 +336,56 @@ template&lt;class M, class P, template&lt; class, class &gt; class H, template&l
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 <p>Definition at line <a class="el" href="base__nuts_8hpp_source.html#l00182">182</a> of file <a class="el" href="base__nuts_8hpp_source.html">base_nuts.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ac2961f3ce35af570405291a8011e1064"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class M, class P, template&lt; class, class &gt; class H, template&lt; class, class &gt; class I, class BaseRNG&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual bool <a class="el" href="classstan_1_1mcmc_1_1base__nuts.html">stan::mcmc::base_nuts</a>&lt; M, P, H, I, BaseRNG &gt;::compute_criterion </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classstan_1_1mcmc_1_1ps__point.html">ps_point</a> &amp;&#160;</td>
+          <td class="paramname"><em>start</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">P &amp;&#160;</td>
+          <td class="paramname"><em>finish</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Eigen::VectorXd &amp;&#160;</td>
+          <td class="paramname"><em>rho</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Implemented in <a class="el" href="classstan_1_1mcmc_1_1dense__e__nuts.html#aa23ebe0b61e0ed91a9a94457e69e08da">stan::mcmc::dense_e_nuts&lt; M, BaseRNG &gt;</a>, <a class="el" href="classstan_1_1mcmc_1_1diag__e__nuts.html#a61f9db95ebdc67274cdea0f479dc0a5e">stan::mcmc::diag_e_nuts&lt; M, BaseRNG &gt;</a>, and <a class="el" href="classstan_1_1mcmc_1_1unit__e__nuts.html#ab61a9ee4db3845a88adc78249e35c170">stan::mcmc::unit_e_nuts&lt; M, BaseRNG &gt;</a>.</p>
 
 </div>
 </div>
@@ -474,7 +469,7 @@ template&lt;class M, class P, template&lt; class, class &gt; class H, template&l
 
 <p>Reimplemented from <a class="el" href="classstan_1_1mcmc_1_1base__mcmc.html#aca923f3231a9487745a999d95b5923ce">stan::mcmc::base_mcmc</a>.</p>
 
-<p>Definition at line <a class="el" href="base__nuts_8hpp_source.html#l00166">166</a> of file <a class="el" href="base__nuts_8hpp_source.html">base_nuts.hpp</a>.</p>
+<p>Definition at line <a class="el" href="base__nuts_8hpp_source.html#l00167">167</a> of file <a class="el" href="base__nuts_8hpp_source.html">base_nuts.hpp</a>.</p>
 
 </div>
 </div>
@@ -504,7 +499,7 @@ template&lt;class M, class P, template&lt; class, class &gt; class H, template&l
 
 <p>Reimplemented from <a class="el" href="classstan_1_1mcmc_1_1base__mcmc.html#af599911f5d38fbf91c4a475b0d27c1b6">stan::mcmc::base_mcmc</a>.</p>
 
-<p>Definition at line <a class="el" href="base__nuts_8hpp_source.html#l00171">171</a> of file <a class="el" href="base__nuts_8hpp_source.html">base_nuts.hpp</a>.</p>
+<p>Definition at line <a class="el" href="base__nuts_8hpp_source.html#l00173">173</a> of file <a class="el" href="base__nuts_8hpp_source.html">base_nuts.hpp</a>.</p>
 
 </div>
 </div>
@@ -620,7 +615,7 @@ template&lt;class M, class P, template&lt; class, class &gt; class H, template&l
 
 <p>Reimplemented from <a class="el" href="classstan_1_1mcmc_1_1base__mcmc.html#a2555bcff40b4656f370c751bfe06e9ab">stan::mcmc::base_mcmc</a>.</p>
 
-<p>Definition at line <a class="el" href="base__nuts_8hpp_source.html#l00158">158</a> of file <a class="el" href="base__nuts_8hpp_source.html">base_nuts.hpp</a>.</p>
+<p>Definition at line <a class="el" href="base__nuts_8hpp_source.html#l00159">159</a> of file <a class="el" href="base__nuts_8hpp_source.html">base_nuts.hpp</a>.</p>
 
 </div>
 </div>
@@ -650,7 +645,7 @@ template&lt;class M, class P, template&lt; class, class &gt; class H, template&l
 
 <p>Reimplemented from <a class="el" href="classstan_1_1mcmc_1_1base__mcmc.html#a4c30ef76ab8e9f78e46b1984b29c7f26">stan::mcmc::base_mcmc</a>.</p>
 
-<p>Definition at line <a class="el" href="base__nuts_8hpp_source.html#l00162">162</a> of file <a class="el" href="base__nuts_8hpp_source.html">base_nuts.hpp</a>.</p>
+<p>Definition at line <a class="el" href="base__nuts_8hpp_source.html#l00163">163</a> of file <a class="el" href="base__nuts_8hpp_source.html">base_nuts.hpp</a>.</p>
 
 </div>
 </div>
@@ -660,22 +655,14 @@ template&lt;class M, class P, template&lt; class, class &gt; class H, template&l
 <div class="memproto">
 <div class="memtemplate">
 template&lt;class M, class P, template&lt; class, class &gt; class H, template&lt; class, class &gt; class I, class BaseRNG&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">int <a class="el" href="classstan_1_1mcmc_1_1base__nuts.html">stan::mcmc::base_nuts</a>&lt; M, P, H, I, BaseRNG &gt;::_depth</td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="base__nuts_8hpp_source.html#l00243">243</a> of file <a class="el" href="base__nuts_8hpp_source.html">base_nuts.hpp</a>.</p>
+<p>Definition at line <a class="el" href="base__nuts_8hpp_source.html#l00248">248</a> of file <a class="el" href="base__nuts_8hpp_source.html">base_nuts.hpp</a>.</p>
 
 </div>
 </div>
@@ -684,22 +671,14 @@ template&lt;class M, class P, template&lt; class, class &gt; class H, template&l
 <div class="memproto">
 <div class="memtemplate">
 template&lt;class M, class P, template&lt; class, class &gt; class H, template&lt; class, class &gt; class I, class BaseRNG&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">double <a class="el" href="classstan_1_1mcmc_1_1base__nuts.html">stan::mcmc::base_nuts</a>&lt; M, P, H, I, BaseRNG &gt;::_max_delta</td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="base__nuts_8hpp_source.html#l00245">245</a> of file <a class="el" href="base__nuts_8hpp_source.html">base_nuts.hpp</a>.</p>
+<p>Definition at line <a class="el" href="base__nuts_8hpp_source.html#l00250">250</a> of file <a class="el" href="base__nuts_8hpp_source.html">base_nuts.hpp</a>.</p>
 
 </div>
 </div>
@@ -708,22 +687,30 @@ template&lt;class M, class P, template&lt; class, class &gt; class H, template&l
 <div class="memproto">
 <div class="memtemplate">
 template&lt;class M, class P, template&lt; class, class &gt; class H, template&lt; class, class &gt; class I, class BaseRNG&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">int <a class="el" href="classstan_1_1mcmc_1_1base__nuts.html">stan::mcmc::base_nuts</a>&lt; M, P, H, I, BaseRNG &gt;::_max_depth</td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="base__nuts_8hpp_source.html#l00244">244</a> of file <a class="el" href="base__nuts_8hpp_source.html">base_nuts.hpp</a>.</p>
+<p>Definition at line <a class="el" href="base__nuts_8hpp_source.html#l00249">249</a> of file <a class="el" href="base__nuts_8hpp_source.html">base_nuts.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a103b33df985e433f37a56ee0626a7861"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class M, class P, template&lt; class, class &gt; class H, template&lt; class, class &gt; class I, class BaseRNG&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">int <a class="el" href="classstan_1_1mcmc_1_1base__nuts.html">stan::mcmc::base_nuts</a>&lt; M, P, H, I, BaseRNG &gt;::_n_divergent</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Definition at line <a class="el" href="base__nuts_8hpp_source.html#l00252">252</a> of file <a class="el" href="base__nuts_8hpp_source.html">base_nuts.hpp</a>.</p>
 
 </div>
 </div>

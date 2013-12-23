@@ -33,8 +33,8 @@ var searchData=
   ['stan_5fcsv_5ftiming',['stan_csv_timing',['../structstan_1_1io_1_1stan__csv__timing.html',1,'stan::io']]],
   ['statement',['statement',['../structstan_1_1gm_1_1statement.html',1,'stan::gm']]],
   ['statement_5f2_5fgrammar',['statement_2_grammar',['../structstan_1_1gm_1_1statement__2__grammar.html',1,'stan::gm']]],
-  ['statement_5fgrammar',['statement_grammar',['../structstatement__grammar.html',1,'']]],
   ['statement_5fgrammar',['statement_grammar',['../structstan_1_1gm_1_1statement__grammar.html',1,'stan::gm']]],
+  ['statement_5fgrammar',['statement_grammar',['../structstatement__grammar.html',1,'']]],
   ['statement_5fvisgen',['statement_visgen',['../structstan_1_1gm_1_1statement__visgen.html',1,'stan::gm']]],
   ['statements',['statements',['../structstan_1_1gm_1_1statements.html',1,'stan::gm']]],
   ['stepsize_5fadaptation',['stepsize_adaptation',['../classstan_1_1mcmc_1_1stepsize__adaptation.html',1,'stan::mcmc']]],
@@ -52,5 +52,6 @@ var searchData=
   ['store_5ftype_3c_20std_3a_3avector_3c_20s_20_3e_20_3e',['store_type&lt; std::vector&lt; S &gt; &gt;',['../structstan_1_1math_1_1store__type.html',1,'stan::math']]],
   ['store_5ftype_3c_20std_3a_3avector_3c_20std_3a_3avector_3c_20t_20_3e_20_3e_20_3e',['store_type&lt; std::vector&lt; std::vector&lt; T &gt; &gt; &gt;',['../structstan_1_1math_1_1store__type.html',1,'stan::math']]],
   ['store_5ftype_3c_20std_3a_3avector_3c_20t_20_3e_20_3e',['store_type&lt; std::vector&lt; T &gt; &gt;',['../structstan_1_1math_1_1store__type.html',1,'stan::math']]],
+  ['stored_5fgradient_5fvari',['stored_gradient_vari',['../classstan_1_1agrad_1_1stored__gradient__vari.html',1,'stan::agrad']]],
   ['subtraction_5fexpr',['subtraction_expr',['../structstan_1_1gm_1_1subtraction__expr.html',1,'stan::gm']]]
 ];

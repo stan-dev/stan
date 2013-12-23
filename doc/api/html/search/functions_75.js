@@ -11,7 +11,7 @@ var searchData=
   ['uniform_5frng',['uniform_rng',['../namespacestan_1_1prob.html#ab9c29e62027123e900b55f29170e2426',1,'stan::prob']]],
   ['unit_5fe_5fmetric',['unit_e_metric',['../classstan_1_1mcmc_1_1unit__e__metric.html#acdbee1cba43deae117af1312703ab2b4',1,'stan::mcmc::unit_e_metric']]],
   ['unit_5fe_5fnuts',['unit_e_nuts',['../classstan_1_1mcmc_1_1unit__e__nuts.html#a0e74025d0c07dee2edc39b43d6fa85be',1,'stan::mcmc::unit_e_nuts']]],
-  ['unit_5fe_5fpoint',['unit_e_point',['../classstan_1_1mcmc_1_1unit__e__point.html#aecbb724c80e61f785e7f572156beb8a8',1,'stan::mcmc::unit_e_point']]],
+  ['unit_5fe_5fpoint',['unit_e_point',['../classstan_1_1mcmc_1_1unit__e__point.html#a8ab0ffea3990bf0b8cdb289e1f7327ef',1,'stan::mcmc::unit_e_point']]],
   ['unit_5fe_5fstatic_5fhmc',['unit_e_static_hmc',['../classstan_1_1mcmc_1_1unit__e__static__hmc.html#aa3f18e181e9b27bc487ec48af5ddd9c1',1,'stan::mcmc::unit_e_static_hmc']]],
   ['unit_5fvector',['unit_vector',['../classstan_1_1io_1_1reader.html#a6b8ebf459013095c8bef590c5e7f2dd2',1,'stan::io::reader']]],
   ['unit_5fvector_5fconstrain',['unit_vector_constrain',['../classstan_1_1io_1_1reader.html#aafcb145538d7414947c3420b652ad962',1,'stan::io::reader::unit_vector_constrain(size_t k)'],['../classstan_1_1io_1_1reader.html#ac4c986f3ceee7c402820835ba7bfde62',1,'stan::io::reader::unit_vector_constrain(size_t k, T &amp;lp)'],['../namespacestan_1_1prob.html#afd9044ce24ca929e0d1fcf49fdfcb7cc',1,'stan::prob::unit_vector_constrain(const Eigen::Matrix&lt; T, Eigen::Dynamic, 1 &gt; &amp;y)'],['../namespacestan_1_1prob.html#ac361cea0021ad5cbd7d9daa32935bf9b',1,'stan::prob::unit_vector_constrain(const Eigen::Matrix&lt; T, Eigen::Dynamic, 1 &gt; &amp;y, T &amp;lp)']]],

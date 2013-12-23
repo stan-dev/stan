@@ -91,7 +91,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="#pro-attribs">Protected Attributes</a> &#124;
 <a href="classstan_1_1mcmc_1_1base__hmc-members.html">List of all members</a>  </div>
   <div class="headertitle">
@@ -122,8 +121,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ab03fa8ffe91879f8bd8b364641c4de5a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abcf75357ef756a2c74f9855386b3be47"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1base__hmc.html#abcf75357ef756a2c74f9855386b3be47">get_sampler_diagnostics</a> (std::vector&lt; double &gt; &amp;values)</td></tr>
 <tr class="separator:abcf75357ef756a2c74f9855386b3be47"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad25ce2fd8d6981f6a24dcf04cfaf8a34"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1base__hmc.html#ad25ce2fd8d6981f6a24dcf04cfaf8a34">seed</a> (const std::vector&lt; double &gt; &amp;q, const std::vector&lt; int &gt; &amp;r)</td></tr>
-<tr class="separator:ad25ce2fd8d6981f6a24dcf04cfaf8a34"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af14724fbb8065467b10deeb4134c6e74"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1base__hmc.html#af14724fbb8065467b10deeb4134c6e74">seed</a> (const Eigen::VectorXd &amp;q)</td></tr>
+<tr class="separator:af14724fbb8065467b10deeb4134c6e74"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6ec1af08b215fda50b23dade2aa615a8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1base__hmc.html#a6ec1af08b215fda50b23dade2aa615a8">init_stepsize</a> ()</td></tr>
 <tr class="separator:a6ec1af08b215fda50b23dade2aa615a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7b9f7a04975626ce6ea23a81d903b325"><td class="memItemLeft" align="right" valign="top">P &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1base__hmc.html#a7b9f7a04975626ce6ea23a81d903b325">z</a> ()</td></tr>
@@ -138,6 +137,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:aa049a77cf8131f53a707a3a976fa3c11"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a17660d32d37d39df87f49ed0e8f97262"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1base__hmc.html#a17660d32d37d39df87f49ed0e8f97262">get_stepsize_jitter</a> ()</td></tr>
 <tr class="separator:a17660d32d37d39df87f49ed0e8f97262"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3ac766b0cce7b20168fb576cc7b399af"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1base__hmc.html#a3ac766b0cce7b20168fb576cc7b399af">sample_stepsize</a> ()</td></tr>
+<tr class="separator:a3ac766b0cce7b20168fb576cc7b399af"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classstan_1_1mcmc_1_1base__mcmc"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classstan_1_1mcmc_1_1base__mcmc')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classstan_1_1mcmc_1_1base__mcmc.html">stan::mcmc::base_mcmc</a></td></tr>
 <tr class="memitem:a4fb817f487dc4fe86a91acca8109ac2a inherit pub_methods_classstan_1_1mcmc_1_1base__mcmc"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1base__mcmc.html#a4fb817f487dc4fe86a91acca8109ac2a">base_mcmc</a> (std::ostream *o, std::ostream *e)</td></tr>
 <tr class="separator:a4fb817f487dc4fe86a91acca8109ac2a inherit pub_methods_classstan_1_1mcmc_1_1base__mcmc"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -155,11 +156,6 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:aca923f3231a9487745a999d95b5923ce inherit pub_methods_classstan_1_1mcmc_1_1base__mcmc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af599911f5d38fbf91c4a475b0d27c1b6 inherit pub_methods_classstan_1_1mcmc_1_1base__mcmc"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1base__mcmc.html#af599911f5d38fbf91c4a475b0d27c1b6">get_sampler_params</a> (std::vector&lt; double &gt; &amp;values)</td></tr>
 <tr class="separator:af599911f5d38fbf91c4a475b0d27c1b6 inherit pub_methods_classstan_1_1mcmc_1_1base__mcmc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
-Protected Member Functions</h2></td></tr>
-<tr class="memitem:a5686c6667f9a8e70049bd56231ca2a99"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1base__hmc.html#a5686c6667f9a8e70049bd56231ca2a99">_sample_stepsize</a> ()</td></tr>
-<tr class="separator:a5686c6667f9a8e70049bd56231ca2a99"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
@@ -245,33 +241,6 @@ template&lt;class M, class P, template&lt; class, class &gt; class H, template&l
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="a5686c6667f9a8e70049bd56231ca2a99"></a>
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;class M, class P, template&lt; class, class &gt; class H, template&lt; class, class &gt; class I, class BaseRNG&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void <a class="el" href="classstan_1_1mcmc_1_1base__hmc.html">stan::mcmc::base_hmc</a>&lt; M, P, H, I, BaseRNG &gt;::_sample_stepsize </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Definition at line <a class="el" href="base__hmc_8hpp_source.html#l00141">141</a> of file <a class="el" href="base__hmc_8hpp_source.html">base_hmc.hpp</a>.</p>
-
-</div>
-</div>
 <a class="anchor" id="a6e9333e00268e9ea5e0145a17bfbe4d2"></a>
 <div class="memitem">
 <div class="memproto">
@@ -295,7 +264,7 @@ template&lt;class M, class P, template&lt; class, class &gt; class H, template&l
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="base__hmc_8hpp_source.html#l00118">118</a> of file <a class="el" href="base__hmc_8hpp_source.html">base_hmc.hpp</a>.</p>
+<p>Definition at line <a class="el" href="base__hmc_8hpp_source.html#l00117">117</a> of file <a class="el" href="base__hmc_8hpp_source.html">base_hmc.hpp</a>.</p>
 
 </div>
 </div>
@@ -322,7 +291,7 @@ template&lt;class M, class P, template&lt; class, class &gt; class H, template&l
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="base__hmc_8hpp_source.html#l00116">116</a> of file <a class="el" href="base__hmc_8hpp_source.html">base_hmc.hpp</a>.</p>
+<p>Definition at line <a class="el" href="base__hmc_8hpp_source.html#l00115">115</a> of file <a class="el" href="base__hmc_8hpp_source.html">base_hmc.hpp</a>.</p>
 
 </div>
 </div>
@@ -419,7 +388,7 @@ template&lt;class M, class P, template&lt; class, class &gt; class H, template&l
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="base__hmc_8hpp_source.html#l00124">124</a> of file <a class="el" href="base__hmc_8hpp_source.html">base_hmc.hpp</a>.</p>
+<p>Definition at line <a class="el" href="base__hmc_8hpp_source.html#l00123">123</a> of file <a class="el" href="base__hmc_8hpp_source.html">base_hmc.hpp</a>.</p>
 
 </div>
 </div>
@@ -446,11 +415,38 @@ template&lt;class M, class P, template&lt; class, class &gt; class H, template&l
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="base__hmc_8hpp_source.html#l00056">56</a> of file <a class="el" href="base__hmc_8hpp_source.html">base_hmc.hpp</a>.</p>
+<p>Definition at line <a class="el" href="base__hmc_8hpp_source.html#l00055">55</a> of file <a class="el" href="base__hmc_8hpp_source.html">base_hmc.hpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="ad25ce2fd8d6981f6a24dcf04cfaf8a34"></a>
+<a class="anchor" id="a3ac766b0cce7b20168fb576cc7b399af"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class M, class P, template&lt; class, class &gt; class H, template&lt; class, class &gt; class I, class BaseRNG&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classstan_1_1mcmc_1_1base__hmc.html">stan::mcmc::base_hmc</a>&lt; M, P, H, I, BaseRNG &gt;::sample_stepsize </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Definition at line <a class="el" href="base__hmc_8hpp_source.html#l00125">125</a> of file <a class="el" href="base__hmc_8hpp_source.html">base_hmc.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="af14724fbb8065467b10deeb4134c6e74"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
@@ -462,19 +458,9 @@ template&lt;class M, class P, template&lt; class, class &gt; class H, template&l
         <tr>
           <td class="memname">void <a class="el" href="classstan_1_1mcmc_1_1base__hmc.html">stan::mcmc::base_hmc</a>&lt; M, P, H, I, BaseRNG &gt;::seed </td>
           <td>(</td>
-          <td class="paramtype">const std::vector&lt; double &gt; &amp;&#160;</td>
-          <td class="paramname"><em>q</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramtype">const Eigen::VectorXd &amp;&#160;</td>
+          <td class="paramname"><em>q</em></td><td>)</td>
           <td></td>
-          <td class="paramtype">const std::vector&lt; int &gt; &amp;&#160;</td>
-          <td class="paramname"><em>r</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -514,7 +500,7 @@ template&lt;class M, class P, template&lt; class, class &gt; class H, template&l
 
 <p>Reimplemented in <a class="el" href="classstan_1_1mcmc_1_1base__static__hmc.html#a0219d73bf44be4797b47c150d349d261">stan::mcmc::base_static_hmc&lt; M, P, H, I, BaseRNG &gt;</a>, <a class="el" href="classstan_1_1mcmc_1_1base__static__hmc.html#a0219d73bf44be4797b47c150d349d261">stan::mcmc::base_static_hmc&lt; M, diag_e_point, diag_e_metric, expl_leapfrog, BaseRNG &gt;</a>, <a class="el" href="classstan_1_1mcmc_1_1base__static__hmc.html#a0219d73bf44be4797b47c150d349d261">stan::mcmc::base_static_hmc&lt; M, dense_e_point, dense_e_metric, expl_leapfrog, BaseRNG &gt;</a>, and <a class="el" href="classstan_1_1mcmc_1_1base__static__hmc.html#a0219d73bf44be4797b47c150d349d261">stan::mcmc::base_static_hmc&lt; M, unit_e_point, unit_e_metric, expl_leapfrog, BaseRNG &gt;</a>.</p>
 
-<p>Definition at line <a class="el" href="base__hmc_8hpp_source.html#l00112">112</a> of file <a class="el" href="base__hmc_8hpp_source.html">base_hmc.hpp</a>.</p>
+<p>Definition at line <a class="el" href="base__hmc_8hpp_source.html#l00111">111</a> of file <a class="el" href="base__hmc_8hpp_source.html">base_hmc.hpp</a>.</p>
 
 </div>
 </div>
@@ -542,7 +528,7 @@ template&lt;class M, class P, template&lt; class, class &gt; class H, template&l
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="base__hmc_8hpp_source.html#l00120">120</a> of file <a class="el" href="base__hmc_8hpp_source.html">base_hmc.hpp</a>.</p>
+<p>Definition at line <a class="el" href="base__hmc_8hpp_source.html#l00119">119</a> of file <a class="el" href="base__hmc_8hpp_source.html">base_hmc.hpp</a>.</p>
 
 </div>
 </div>
@@ -599,7 +585,7 @@ template&lt;class M, class P, template&lt; class, class &gt; class H, template&l
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="base__hmc_8hpp_source.html#l00110">110</a> of file <a class="el" href="base__hmc_8hpp_source.html">base_hmc.hpp</a>.</p>
+<p>Definition at line <a class="el" href="base__hmc_8hpp_source.html#l00109">109</a> of file <a class="el" href="base__hmc_8hpp_source.html">base_hmc.hpp</a>.</p>
 
 </div>
 </div>
@@ -624,7 +610,7 @@ template&lt;class M, class P, template&lt; class, class &gt; class H, template&l
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="base__hmc_8hpp_source.html#l00138">138</a> of file <a class="el" href="base__hmc_8hpp_source.html">base_hmc.hpp</a>.</p>
+<p>Definition at line <a class="el" href="base__hmc_8hpp_source.html#l00143">143</a> of file <a class="el" href="base__hmc_8hpp_source.html">base_hmc.hpp</a>.</p>
 
 </div>
 </div>
@@ -648,7 +634,7 @@ template&lt;class M, class P, template&lt; class, class &gt; class H, template&l
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="base__hmc_8hpp_source.html#l00139">139</a> of file <a class="el" href="base__hmc_8hpp_source.html">base_hmc.hpp</a>.</p>
+<p>Definition at line <a class="el" href="base__hmc_8hpp_source.html#l00144">144</a> of file <a class="el" href="base__hmc_8hpp_source.html">base_hmc.hpp</a>.</p>
 
 </div>
 </div>
@@ -672,7 +658,7 @@ template&lt;class M, class P, template&lt; class, class &gt; class H, template&l
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="base__hmc_8hpp_source.html#l00130">130</a> of file <a class="el" href="base__hmc_8hpp_source.html">base_hmc.hpp</a>.</p>
+<p>Definition at line <a class="el" href="base__hmc_8hpp_source.html#l00135">135</a> of file <a class="el" href="base__hmc_8hpp_source.html">base_hmc.hpp</a>.</p>
 
 </div>
 </div>
@@ -696,7 +682,7 @@ template&lt;class M, class P, template&lt; class, class &gt; class H, template&l
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="base__hmc_8hpp_source.html#l00129">129</a> of file <a class="el" href="base__hmc_8hpp_source.html">base_hmc.hpp</a>.</p>
+<p>Definition at line <a class="el" href="base__hmc_8hpp_source.html#l00134">134</a> of file <a class="el" href="base__hmc_8hpp_source.html">base_hmc.hpp</a>.</p>
 
 </div>
 </div>
@@ -720,7 +706,7 @@ template&lt;class M, class P, template&lt; class, class &gt; class H, template&l
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="base__hmc_8hpp_source.html#l00137">137</a> of file <a class="el" href="base__hmc_8hpp_source.html">base_hmc.hpp</a>.</p>
+<p>Definition at line <a class="el" href="base__hmc_8hpp_source.html#l00142">142</a> of file <a class="el" href="base__hmc_8hpp_source.html">base_hmc.hpp</a>.</p>
 
 </div>
 </div>
@@ -744,7 +730,7 @@ template&lt;class M, class P, template&lt; class, class &gt; class H, template&l
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="base__hmc_8hpp_source.html#l00132">132</a> of file <a class="el" href="base__hmc_8hpp_source.html">base_hmc.hpp</a>.</p>
+<p>Definition at line <a class="el" href="base__hmc_8hpp_source.html#l00137">137</a> of file <a class="el" href="base__hmc_8hpp_source.html">base_hmc.hpp</a>.</p>
 
 </div>
 </div>
@@ -768,7 +754,7 @@ template&lt;class M, class P, template&lt; class, class &gt; class H, template&l
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="base__hmc_8hpp_source.html#l00135">135</a> of file <a class="el" href="base__hmc_8hpp_source.html">base_hmc.hpp</a>.</p>
+<p>Definition at line <a class="el" href="base__hmc_8hpp_source.html#l00140">140</a> of file <a class="el" href="base__hmc_8hpp_source.html">base_hmc.hpp</a>.</p>
 
 </div>
 </div>
@@ -792,7 +778,7 @@ template&lt;class M, class P, template&lt; class, class &gt; class H, template&l
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="base__hmc_8hpp_source.html#l00128">128</a> of file <a class="el" href="base__hmc_8hpp_source.html">base_hmc.hpp</a>.</p>
+<p>Definition at line <a class="el" href="base__hmc_8hpp_source.html#l00133">133</a> of file <a class="el" href="base__hmc_8hpp_source.html">base_hmc.hpp</a>.</p>
 
 </div>
 </div>

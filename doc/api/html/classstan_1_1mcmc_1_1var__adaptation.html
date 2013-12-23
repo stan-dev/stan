@@ -105,35 +105,58 @@ Inheritance diagram for stan::mcmc::var_adaptation:</div>
  <div class="center">
   <img src="classstan_1_1mcmc_1_1var__adaptation.png" usemap="#stan::mcmc::var_adaptation_map" alt=""/>
   <map id="stan::mcmc::var_adaptation_map" name="stan::mcmc::var_adaptation_map">
-<area href="classstan_1_1mcmc_1_1base__adaptation.html" alt="stan::mcmc::base_adaptation" shape="rect" coords="0,0,171,24"/>
+<area href="classstan_1_1mcmc_1_1windowed__adaptation.html" alt="stan::mcmc::windowed_adaptation" shape="rect" coords="0,56,200,80"/>
+<area href="classstan_1_1mcmc_1_1base__adaptation.html" alt="stan::mcmc::base_adaptation" shape="rect" coords="0,0,200,24"/>
 </map>
  </div></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:ae5bf4a5f18c697791d5eb8d341062765"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1var__adaptation.html#ae5bf4a5f18c697791d5eb8d341062765">var_adaptation</a> (int n, int max_adapt)</td></tr>
-<tr class="separator:ae5bf4a5f18c697791d5eb8d341062765"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af8a618d9726b1f2d7af5d3841705ca4b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1var__adaptation.html#af8a618d9726b1f2d7af5d3841705ca4b">restart</a> ()</td></tr>
-<tr class="separator:af8a618d9726b1f2d7af5d3841705ca4b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af8ca0bc31467c2615a89ebf6369992f4"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1var__adaptation.html#af8ca0bc31467c2615a89ebf6369992f4">learn_variance</a> (Eigen::VectorXd &amp;var, std::vector&lt; double &gt; &amp;q)</td></tr>
-<tr class="separator:af8ca0bc31467c2615a89ebf6369992f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6a890bf02c8dba36880f8e273b2f9549"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1var__adaptation.html#a6a890bf02c8dba36880f8e273b2f9549">var_adaptation</a> (int n)</td></tr>
+<tr class="separator:a6a890bf02c8dba36880f8e273b2f9549"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a52f68d10bf0c8628b395bf18a00ba34e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1var__adaptation.html#a52f68d10bf0c8628b395bf18a00ba34e">learn_variance</a> (Eigen::VectorXd &amp;var, const Eigen::VectorXd &amp;q)</td></tr>
+<tr class="separator:a52f68d10bf0c8628b395bf18a00ba34e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_classstan_1_1mcmc_1_1windowed__adaptation"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classstan_1_1mcmc_1_1windowed__adaptation')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classstan_1_1mcmc_1_1windowed__adaptation.html">stan::mcmc::windowed_adaptation</a></td></tr>
+<tr class="memitem:a80584644c847ec89734ec4dd578ce6af inherit pub_methods_classstan_1_1mcmc_1_1windowed__adaptation"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1windowed__adaptation.html#a80584644c847ec89734ec4dd578ce6af">windowed_adaptation</a> (std::string name)</td></tr>
+<tr class="separator:a80584644c847ec89734ec4dd578ce6af inherit pub_methods_classstan_1_1mcmc_1_1windowed__adaptation"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0c6ce68d4fdde8df0bdcb5436aae9675 inherit pub_methods_classstan_1_1mcmc_1_1windowed__adaptation"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1windowed__adaptation.html#a0c6ce68d4fdde8df0bdcb5436aae9675">restart</a> ()</td></tr>
+<tr class="separator:a0c6ce68d4fdde8df0bdcb5436aae9675 inherit pub_methods_classstan_1_1mcmc_1_1windowed__adaptation"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a818edfc11176b8ebc0bdb1b1d9c3319c inherit pub_methods_classstan_1_1mcmc_1_1windowed__adaptation"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1windowed__adaptation.html#a818edfc11176b8ebc0bdb1b1d9c3319c">set_window_params</a> (unsigned int num_warmup, unsigned int init_buffer, unsigned int term_buffer, unsigned int base_window, std::ostream *e=0)</td></tr>
+<tr class="separator:a818edfc11176b8ebc0bdb1b1d9c3319c inherit pub_methods_classstan_1_1mcmc_1_1windowed__adaptation"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8e82facfbdd25e23a6dc04dfb47f6f55 inherit pub_methods_classstan_1_1mcmc_1_1windowed__adaptation"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1windowed__adaptation.html#a8e82facfbdd25e23a6dc04dfb47f6f55">adaptation_window</a> ()</td></tr>
+<tr class="separator:a8e82facfbdd25e23a6dc04dfb47f6f55 inherit pub_methods_classstan_1_1mcmc_1_1windowed__adaptation"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae4b5c1e4712c89086d7f7e2c0463e245 inherit pub_methods_classstan_1_1mcmc_1_1windowed__adaptation"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1windowed__adaptation.html#ae4b5c1e4712c89086d7f7e2c0463e245">end_adaptation_window</a> ()</td></tr>
+<tr class="separator:ae4b5c1e4712c89086d7f7e2c0463e245 inherit pub_methods_classstan_1_1mcmc_1_1windowed__adaptation"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a99adff4a3380c627160d995b5584bf8e inherit pub_methods_classstan_1_1mcmc_1_1windowed__adaptation"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1windowed__adaptation.html#a99adff4a3380c627160d995b5584bf8e">compute_next_window</a> ()</td></tr>
+<tr class="separator:a99adff4a3380c627160d995b5584bf8e inherit pub_methods_classstan_1_1mcmc_1_1windowed__adaptation"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
-<tr class="memitem:aa0018d1a60eebe945cc52938e90747a6"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1var__adaptation.html#aa0018d1a60eebe945cc52938e90747a6">_adapt_var_counter</a></td></tr>
-<tr class="separator:aa0018d1a60eebe945cc52938e90747a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a34bec4fadd06b0eaf193b31817b3a051"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1var__adaptation.html#a34bec4fadd06b0eaf193b31817b3a051">_adapt_var_next</a></td></tr>
-<tr class="separator:a34bec4fadd06b0eaf193b31817b3a051"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1694b2ea76695a13c3c157e4520c1d85"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1var__adaptation.html#a1694b2ea76695a13c3c157e4520c1d85">_adapt_max_adapt</a></td></tr>
-<tr class="separator:a1694b2ea76695a13c3c157e4520c1d85"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac7cca0e0ab1286b812f2d890049a09e4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classstan_1_1prob_1_1welford__var__estimator.html">prob::welford_var_estimator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1var__adaptation.html#ac7cca0e0ab1286b812f2d890049a09e4">_estimator</a></td></tr>
 <tr class="separator:ac7cca0e0ab1286b812f2d890049a09e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pro_attribs_classstan_1_1mcmc_1_1windowed__adaptation"><td colspan="2" onclick="javascript:toggleInherit('pro_attribs_classstan_1_1mcmc_1_1windowed__adaptation')"><img src="closed.png" alt="-"/>&#160;Protected Attributes inherited from <a class="el" href="classstan_1_1mcmc_1_1windowed__adaptation.html">stan::mcmc::windowed_adaptation</a></td></tr>
+<tr class="memitem:a3a5f0f2df10b1e0e5431a97d9edc0a83 inherit pro_attribs_classstan_1_1mcmc_1_1windowed__adaptation"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1windowed__adaptation.html#a3a5f0f2df10b1e0e5431a97d9edc0a83">_estimator_name</a></td></tr>
+<tr class="separator:a3a5f0f2df10b1e0e5431a97d9edc0a83 inherit pro_attribs_classstan_1_1mcmc_1_1windowed__adaptation"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a49833a6e927a0e7dec9a82d756626e16 inherit pro_attribs_classstan_1_1mcmc_1_1windowed__adaptation"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1windowed__adaptation.html#a49833a6e927a0e7dec9a82d756626e16">_num_warmup</a></td></tr>
+<tr class="separator:a49833a6e927a0e7dec9a82d756626e16 inherit pro_attribs_classstan_1_1mcmc_1_1windowed__adaptation"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7a79530d16f82b9d8beb0961b4bb1018 inherit pro_attribs_classstan_1_1mcmc_1_1windowed__adaptation"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1windowed__adaptation.html#a7a79530d16f82b9d8beb0961b4bb1018">_adapt_init_buffer</a></td></tr>
+<tr class="separator:a7a79530d16f82b9d8beb0961b4bb1018 inherit pro_attribs_classstan_1_1mcmc_1_1windowed__adaptation"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a81191d64fdfb010c997a538d479a270a inherit pro_attribs_classstan_1_1mcmc_1_1windowed__adaptation"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1windowed__adaptation.html#a81191d64fdfb010c997a538d479a270a">_adapt_term_buffer</a></td></tr>
+<tr class="separator:a81191d64fdfb010c997a538d479a270a inherit pro_attribs_classstan_1_1mcmc_1_1windowed__adaptation"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae25e5dc1480c6e553d65e24beb964dec inherit pro_attribs_classstan_1_1mcmc_1_1windowed__adaptation"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1windowed__adaptation.html#ae25e5dc1480c6e553d65e24beb964dec">_adapt_base_window</a></td></tr>
+<tr class="separator:ae25e5dc1480c6e553d65e24beb964dec inherit pro_attribs_classstan_1_1mcmc_1_1windowed__adaptation"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab589266e966065c3088e6b02c73ad1e3 inherit pro_attribs_classstan_1_1mcmc_1_1windowed__adaptation"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1windowed__adaptation.html#ab589266e966065c3088e6b02c73ad1e3">_adapt_window_counter</a></td></tr>
+<tr class="separator:ab589266e966065c3088e6b02c73ad1e3 inherit pro_attribs_classstan_1_1mcmc_1_1windowed__adaptation"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0b3771ea39bc3fd60c43aea960b2df98 inherit pro_attribs_classstan_1_1mcmc_1_1windowed__adaptation"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1windowed__adaptation.html#a0b3771ea39bc3fd60c43aea960b2df98">_adapt_next_window</a></td></tr>
+<tr class="separator:a0b3771ea39bc3fd60c43aea960b2df98 inherit pro_attribs_classstan_1_1mcmc_1_1windowed__adaptation"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9b669ff236cb187f69901064ce4835d3 inherit pro_attribs_classstan_1_1mcmc_1_1windowed__adaptation"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1windowed__adaptation.html#a9b669ff236cb187f69901064ce4835d3">_adapt_window_size</a></td></tr>
+<tr class="separator:a9b669ff236cb187f69901064ce4835d3 inherit pro_attribs_classstan_1_1mcmc_1_1windowed__adaptation"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock">
 <p>Definition at line <a class="el" href="var__adaptation_8hpp_source.html#l00014">14</a> of file <a class="el" href="var__adaptation_8hpp_source.html">var_adaptation.hpp</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="ae5bf4a5f18c697791d5eb8d341062765"></a>
+<a class="anchor" id="a6a890bf02c8dba36880f8e273b2f9549"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -144,18 +167,8 @@ Protected Attributes</h2></td></tr>
           <td class="memname">stan::mcmc::var_adaptation::var_adaptation </td>
           <td>(</td>
           <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>n</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramname"><em>n</em></td><td>)</td>
           <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>max_adapt</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -170,7 +183,7 @@ Protected Attributes</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="af8ca0bc31467c2615a89ebf6369992f4"></a>
+<a class="anchor" id="a52f68d10bf0c8628b395bf18a00ba34e"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -186,7 +199,7 @@ Protected Attributes</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">std::vector&lt; double &gt; &amp;&#160;</td>
+          <td class="paramtype">const Eigen::VectorXd &amp;&#160;</td>
           <td class="paramname"><em>q</em>&#160;</td>
         </tr>
         <tr>
@@ -202,104 +215,11 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="var__adaptation_8hpp_source.html#l00035">35</a> of file <a class="el" href="var__adaptation_8hpp_source.html">var_adaptation.hpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="af8a618d9726b1f2d7af5d3841705ca4b"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void stan::mcmc::var_adaptation::restart </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Reimplemented from <a class="el" href="classstan_1_1mcmc_1_1base__adaptation.html#afc41c7354b21fd64eb4a3d5964b4e230">stan::mcmc::base_adaptation</a>.</p>
-
-<p>Definition at line <a class="el" href="var__adaptation_8hpp_source.html#l00029">29</a> of file <a class="el" href="var__adaptation_8hpp_source.html">var_adaptation.hpp</a>.</p>
+<p>Definition at line <a class="el" href="var__adaptation_8hpp_source.html#l00020">20</a> of file <a class="el" href="var__adaptation_8hpp_source.html">var_adaptation.hpp</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
-<a class="anchor" id="a1694b2ea76695a13c3c157e4520c1d85"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">int stan::mcmc::var_adaptation::_adapt_max_adapt</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Definition at line <a class="el" href="var__adaptation_8hpp_source.html#l00071">71</a> of file <a class="el" href="var__adaptation_8hpp_source.html">var_adaptation.hpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="aa0018d1a60eebe945cc52938e90747a6"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">double stan::mcmc::var_adaptation::_adapt_var_counter</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Definition at line <a class="el" href="var__adaptation_8hpp_source.html#l00069">69</a> of file <a class="el" href="var__adaptation_8hpp_source.html">var_adaptation.hpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a34bec4fadd06b0eaf193b31817b3a051"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">double stan::mcmc::var_adaptation::_adapt_var_next</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Definition at line <a class="el" href="var__adaptation_8hpp_source.html#l00070">70</a> of file <a class="el" href="var__adaptation_8hpp_source.html">var_adaptation.hpp</a>.</p>
-
-</div>
-</div>
 <a class="anchor" id="ac7cca0e0ab1286b812f2d890049a09e4"></a>
 <div class="memitem">
 <div class="memproto">
@@ -318,7 +238,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="var__adaptation_8hpp_source.html#l00073">73</a> of file <a class="el" href="var__adaptation_8hpp_source.html">var_adaptation.hpp</a>.</p>
+<p>Definition at line <a class="el" href="var__adaptation_8hpp_source.html#l00048">48</a> of file <a class="el" href="var__adaptation_8hpp_source.html">var_adaptation.hpp</a>.</p>
 
 </div>
 </div>

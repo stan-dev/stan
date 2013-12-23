@@ -115,42 +115,40 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;        <a class="code" href="classstan_1_1prob_1_1welford__var__estimator.html#aa805b2a914cff1c8326b2b9037cdbcec">_m2</a>.setZero();</div>
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;      }</div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;      </div>
-<div class="line"><a name="l00025"></a><span class="lineno"><a class="code" href="classstan_1_1prob_1_1welford__var__estimator.html#a8b725006449c6370a220dced05179f7e">   25</a></span>&#160;      <span class="keywordtype">void</span> <a class="code" href="classstan_1_1prob_1_1welford__var__estimator.html#a8b725006449c6370a220dced05179f7e">add_sample</a>(std::vector&lt;double&gt;&amp; q) {</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;        </div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;        Eigen::Map&lt;Eigen::VectorXd&gt; x(&amp;q[0], q.size());</div>
+<div class="line"><a name="l00025"></a><span class="lineno"><a class="code" href="classstan_1_1prob_1_1welford__var__estimator.html#a3706c5c31c545bafd3dee6fa1dcce816">   25</a></span>&#160;      <span class="keywordtype">void</span> <a class="code" href="classstan_1_1prob_1_1welford__var__estimator.html#a3706c5c31c545bafd3dee6fa1dcce816">add_sample</a>(<span class="keyword">const</span> Eigen::VectorXd&amp; q) {</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;         </div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;        ++<a class="code" href="classstan_1_1prob_1_1welford__var__estimator.html#a8b378660396e184e69b5cd7152f4e094">_num_samples</a>;</div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;        </div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;        ++<a class="code" href="classstan_1_1prob_1_1welford__var__estimator.html#a8b378660396e184e69b5cd7152f4e094">_num_samples</a>;</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;        </div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;        Eigen::VectorXd delta(x - <a class="code" href="classstan_1_1prob_1_1welford__var__estimator.html#a97a3e57c6fd9781409f061b9f2937284">_m</a>);</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;        <a class="code" href="classstan_1_1prob_1_1welford__var__estimator.html#a97a3e57c6fd9781409f061b9f2937284">_m</a>  += delta / <a class="code" href="classstan_1_1prob_1_1welford__var__estimator.html#a8b378660396e184e69b5cd7152f4e094">_num_samples</a>;</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;        <a class="code" href="classstan_1_1prob_1_1welford__var__estimator.html#aa805b2a914cff1c8326b2b9037cdbcec">_m2</a> += delta.cwiseProduct(x - <a class="code" href="classstan_1_1prob_1_1welford__var__estimator.html#a97a3e57c6fd9781409f061b9f2937284">_m</a>);</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;        </div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;      }</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;        Eigen::VectorXd delta(q - <a class="code" href="classstan_1_1prob_1_1welford__var__estimator.html#a97a3e57c6fd9781409f061b9f2937284">_m</a>);</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;        <a class="code" href="classstan_1_1prob_1_1welford__var__estimator.html#a97a3e57c6fd9781409f061b9f2937284">_m</a>  += delta / <a class="code" href="classstan_1_1prob_1_1welford__var__estimator.html#a8b378660396e184e69b5cd7152f4e094">_num_samples</a>;</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;        <a class="code" href="classstan_1_1prob_1_1welford__var__estimator.html#aa805b2a914cff1c8326b2b9037cdbcec">_m2</a> += delta.cwiseProduct(q - <a class="code" href="classstan_1_1prob_1_1welford__var__estimator.html#a97a3e57c6fd9781409f061b9f2937284">_m</a>);</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;        </div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;      }</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;      </div>
+<div class="line"><a name="l00035"></a><span class="lineno"><a class="code" href="classstan_1_1prob_1_1welford__var__estimator.html#aaead1fea2bb10ec78761a7544f47b9ed">   35</a></span>&#160;      <span class="keywordtype">int</span> <a class="code" href="classstan_1_1prob_1_1welford__var__estimator.html#aaead1fea2bb10ec78761a7544f47b9ed">num_samples</a>() { <span class="keywordflow">return</span> <a class="code" href="classstan_1_1prob_1_1welford__var__estimator.html#a8b378660396e184e69b5cd7152f4e094">_num_samples</a>; }</div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;      </div>
-<div class="line"><a name="l00037"></a><span class="lineno"><a class="code" href="classstan_1_1prob_1_1welford__var__estimator.html#aaead1fea2bb10ec78761a7544f47b9ed">   37</a></span>&#160;      <span class="keywordtype">int</span> <a class="code" href="classstan_1_1prob_1_1welford__var__estimator.html#aaead1fea2bb10ec78761a7544f47b9ed">num_samples</a>() { <span class="keywordflow">return</span> <a class="code" href="classstan_1_1prob_1_1welford__var__estimator.html#a8b378660396e184e69b5cd7152f4e094">_num_samples</a>; }</div>
+<div class="line"><a name="l00037"></a><span class="lineno"><a class="code" href="classstan_1_1prob_1_1welford__var__estimator.html#a9204b9e61b85661377f48f0d4c55531c">   37</a></span>&#160;      <span class="keywordtype">void</span> <a class="code" href="classstan_1_1prob_1_1welford__var__estimator.html#a9204b9e61b85661377f48f0d4c55531c">sample_mean</a>(Eigen::VectorXd&amp; <a class="code" href="namespacestan_1_1math.html#a3443c4ac994b039a7f055c55c5afa8a3" title="Returns the sample mean (i.e., average) of the coefficients in the specified standard vector...">mean</a>) { mean = <a class="code" href="classstan_1_1prob_1_1welford__var__estimator.html#a97a3e57c6fd9781409f061b9f2937284">_m</a>; }</div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;      </div>
-<div class="line"><a name="l00039"></a><span class="lineno"><a class="code" href="classstan_1_1prob_1_1welford__var__estimator.html#a9204b9e61b85661377f48f0d4c55531c">   39</a></span>&#160;      <span class="keywordtype">void</span> <a class="code" href="classstan_1_1prob_1_1welford__var__estimator.html#a9204b9e61b85661377f48f0d4c55531c">sample_mean</a>(Eigen::VectorXd&amp; <a class="code" href="namespacestan_1_1math.html#a3443c4ac994b039a7f055c55c5afa8a3" title="Returns the sample mean (i.e., average) of the coefficients in the specified standard vector...">mean</a>) { mean = <a class="code" href="classstan_1_1prob_1_1welford__var__estimator.html#a97a3e57c6fd9781409f061b9f2937284">_m</a>; }</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;      </div>
-<div class="line"><a name="l00041"></a><span class="lineno"><a class="code" href="classstan_1_1prob_1_1welford__var__estimator.html#a97832111891ecd58739f528506f64bbb">   41</a></span>&#160;      <span class="keywordtype">void</span> <a class="code" href="classstan_1_1prob_1_1welford__var__estimator.html#a97832111891ecd58739f528506f64bbb">sample_variance</a>(Eigen::VectorXd&amp; var) {</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;        <span class="keywordflow">if</span>(<a class="code" href="classstan_1_1prob_1_1welford__var__estimator.html#a8b378660396e184e69b5cd7152f4e094">_num_samples</a> &gt; 1)</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;          var = <a class="code" href="classstan_1_1prob_1_1welford__var__estimator.html#aa805b2a914cff1c8326b2b9037cdbcec">_m2</a> / (<a class="code" href="classstan_1_1prob_1_1welford__var__estimator.html#a8b378660396e184e69b5cd7152f4e094">_num_samples</a> - 1.0);</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;      }</div>
+<div class="line"><a name="l00039"></a><span class="lineno"><a class="code" href="classstan_1_1prob_1_1welford__var__estimator.html#a97832111891ecd58739f528506f64bbb">   39</a></span>&#160;      <span class="keywordtype">void</span> <a class="code" href="classstan_1_1prob_1_1welford__var__estimator.html#a97832111891ecd58739f528506f64bbb">sample_variance</a>(Eigen::VectorXd&amp; var) {</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;        <span class="keywordflow">if</span>(<a class="code" href="classstan_1_1prob_1_1welford__var__estimator.html#a8b378660396e184e69b5cd7152f4e094">_num_samples</a> &gt; 1)</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;          var = <a class="code" href="classstan_1_1prob_1_1welford__var__estimator.html#aa805b2a914cff1c8326b2b9037cdbcec">_m2</a> / (<a class="code" href="classstan_1_1prob_1_1welford__var__estimator.html#a8b378660396e184e69b5cd7152f4e094">_num_samples</a> - 1.0);</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;      }</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;      </div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="keyword">protected</span>:</div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;      </div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <span class="keyword">protected</span>:</div>
+<div class="line"><a name="l00046"></a><span class="lineno"><a class="code" href="classstan_1_1prob_1_1welford__var__estimator.html#a8b378660396e184e69b5cd7152f4e094">   46</a></span>&#160;      <span class="keywordtype">double</span> <a class="code" href="classstan_1_1prob_1_1welford__var__estimator.html#a8b378660396e184e69b5cd7152f4e094">_num_samples</a>;</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;      </div>
-<div class="line"><a name="l00048"></a><span class="lineno"><a class="code" href="classstan_1_1prob_1_1welford__var__estimator.html#a8b378660396e184e69b5cd7152f4e094">   48</a></span>&#160;      <span class="keywordtype">double</span> <a class="code" href="classstan_1_1prob_1_1welford__var__estimator.html#a8b378660396e184e69b5cd7152f4e094">_num_samples</a>;</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;      </div>
-<div class="line"><a name="l00050"></a><span class="lineno"><a class="code" href="classstan_1_1prob_1_1welford__var__estimator.html#a97a3e57c6fd9781409f061b9f2937284">   50</a></span>&#160;      Eigen::VectorXd <a class="code" href="classstan_1_1prob_1_1welford__var__estimator.html#a97a3e57c6fd9781409f061b9f2937284">_m</a>;</div>
-<div class="line"><a name="l00051"></a><span class="lineno"><a class="code" href="classstan_1_1prob_1_1welford__var__estimator.html#aa805b2a914cff1c8326b2b9037cdbcec">   51</a></span>&#160;      Eigen::VectorXd <a class="code" href="classstan_1_1prob_1_1welford__var__estimator.html#aa805b2a914cff1c8326b2b9037cdbcec">_m2</a>;</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;      </div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    };</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    </div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;  } <span class="comment">// prob</span></div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;  </div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;} <span class="comment">// stan</span></div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00048"></a><span class="lineno"><a class="code" href="classstan_1_1prob_1_1welford__var__estimator.html#a97a3e57c6fd9781409f061b9f2937284">   48</a></span>&#160;      Eigen::VectorXd <a class="code" href="classstan_1_1prob_1_1welford__var__estimator.html#a97a3e57c6fd9781409f061b9f2937284">_m</a>;</div>
+<div class="line"><a name="l00049"></a><span class="lineno"><a class="code" href="classstan_1_1prob_1_1welford__var__estimator.html#aa805b2a914cff1c8326b2b9037cdbcec">   49</a></span>&#160;      Eigen::VectorXd <a class="code" href="classstan_1_1prob_1_1welford__var__estimator.html#aa805b2a914cff1c8326b2b9037cdbcec">_m2</a>;</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;      </div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    };</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    </div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;  } <span class="comment">// prob</span></div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;  </div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;} <span class="comment">// stan</span></div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
 <hr/>
 <div class="conents" style="font-size:80%;">

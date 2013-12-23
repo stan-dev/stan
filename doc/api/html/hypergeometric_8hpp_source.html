@@ -96,9 +96,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor"></span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;boost/math/distributions.hpp&gt;</span></div>
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="uniform_8hpp.html">stan/prob/distributions/univariate/continuous/uniform.hpp</a>&gt;</span></div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="agrad_8hpp.html">stan/agrad.hpp</a>&gt;</span></div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="partials__vari_8hpp.html">stan/agrad/partials_vari.hpp</a>&gt;</span></div>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="math_8hpp.html">stan/math.hpp</a>&gt;</span></div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="error__handling_8hpp.html">stan/math/error_handling.hpp</a>&gt;</span></div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="math_2error__handling_8hpp.html">stan/math/error_handling.hpp</a>&gt;</span></div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="meta_2traits_8hpp.html">stan/meta/traits.hpp</a>&gt;</span></div>
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="prob_2traits_8hpp.html">stan/prob/traits.hpp</a>&gt;</span></div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="prob_2constants_8hpp.html">stan/prob/constants.hpp</a>&gt;</span></div>
@@ -133,10 +133,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;        <span class="keywordflow">return</span> 0.0;</div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;</div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;      <a class="code" href="classstan_1_1_vector_view.html">VectorView&lt;const T_n&gt;</a> n_vec(n);</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;      <a class="code" href="classstan_1_1_vector_view.html">VectorView&lt;const T_N&gt;</a> N_vec(N);</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;      <a class="code" href="classstan_1_1_vector_view.html">VectorView&lt;const T_a&gt;</a> a_vec(a);</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;      <a class="code" href="classstan_1_1_vector_view.html">VectorView&lt;const T_b&gt;</a> b_vec(b);</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;      <a class="code" href="classstan_1_1_vector_view.html" title="VectorView is a template metaprogram that takes its argument and allows it to be used like a vector...">VectorView&lt;const T_n&gt;</a> n_vec(n);</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;      <a class="code" href="classstan_1_1_vector_view.html" title="VectorView is a template metaprogram that takes its argument and allows it to be used like a vector...">VectorView&lt;const T_N&gt;</a> N_vec(N);</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;      <a class="code" href="classstan_1_1_vector_view.html" title="VectorView is a template metaprogram that takes its argument and allows it to be used like a vector...">VectorView&lt;const T_a&gt;</a> a_vec(a);</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;      <a class="code" href="classstan_1_1_vector_view.html" title="VectorView is a template metaprogram that takes its argument and allows it to be used like a vector...">VectorView&lt;const T_b&gt;</a> b_vec(b);</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;      <span class="keywordtype">size_t</span> <a class="code" href="namespacestan_1_1math.html#aa1f9966aade9c4515d33d3ffa7305462">size</a> = <a class="code" href="namespacestan.html#a8b2c79a3a686dcf90566be8492e1065d">max_size</a>(n, N, a, b);</div>
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;      </div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;      <span class="keywordtype">double</span> logp(0.0);</div>

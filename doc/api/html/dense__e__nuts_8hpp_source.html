@@ -115,28 +115,26 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;      </div>
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;    <span class="keyword">public</span>:</div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;      </div>
-<div class="line"><a name="l00025"></a><span class="lineno"><a class="code" href="classstan_1_1mcmc_1_1dense__e__nuts.html#a556e5c4e0ddf32b50ccd4bae8cb54e22">   25</a></span>&#160;    <a class="code" href="classstan_1_1mcmc_1_1dense__e__nuts.html#a556e5c4e0ddf32b50ccd4bae8cb54e22">dense_e_nuts</a>(M &amp;m, BaseRNG&amp; rng, std::ostream* o = &amp;std::cout, std::ostream* <a class="code" href="namespacestan_1_1math.html#a3b650a0131d41167ef4837ecc7d02be5" title="Return the base of the natural logarithm.">e</a> = 0):</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    <a class="code" href="classstan_1_1mcmc_1_1base__nuts.html">base_nuts</a>&lt;M, <a class="code" href="classstan_1_1mcmc_1_1dense__e__point.html">dense_e_point</a>, <a class="code" href="classstan_1_1mcmc_1_1dense__e__metric.html">dense_e_metric</a>, <a class="code" href="classstan_1_1mcmc_1_1expl__leapfrog.html">expl_leapfrog</a>, BaseRNG&gt;(m, rng, o, <a class="code" href="namespacestan_1_1math.html#a3b650a0131d41167ef4837ecc7d02be5" title="Return the base of the natural logarithm.">e</a>)</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    { this-&gt;<a class="code" href="classstan_1_1mcmc_1_1base__mcmc.html#ad2c7124c9b80002735c5db2b7aecf482">_name</a> = <span class="stringliteral">&quot;NUTS with a dense Euclidean metric&quot;</span>; }</div>
+<div class="line"><a name="l00025"></a><span class="lineno"><a class="code" href="classstan_1_1mcmc_1_1dense__e__nuts.html#a556e5c4e0ddf32b50ccd4bae8cb54e22">   25</a></span>&#160;      <a class="code" href="classstan_1_1mcmc_1_1dense__e__nuts.html#a556e5c4e0ddf32b50ccd4bae8cb54e22">dense_e_nuts</a>(M &amp;m, BaseRNG&amp; rng, std::ostream* o = &amp;std::cout, std::ostream* <a class="code" href="namespacestan_1_1math.html#a3b650a0131d41167ef4837ecc7d02be5" title="Return the base of the natural logarithm.">e</a> = 0):</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;      <a class="code" href="classstan_1_1mcmc_1_1base__nuts.html">base_nuts</a>&lt;M, <a class="code" href="classstan_1_1mcmc_1_1dense__e__point.html">dense_e_point</a>, <a class="code" href="classstan_1_1mcmc_1_1dense__e__metric.html">dense_e_metric</a>, <a class="code" href="classstan_1_1mcmc_1_1expl__leapfrog.html">expl_leapfrog</a>, BaseRNG&gt;(m, rng, o, <a class="code" href="namespacestan_1_1math.html#a3b650a0131d41167ef4837ecc7d02be5" title="Return the base of the natural logarithm.">e</a>)</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;      { this-&gt;<a class="code" href="classstan_1_1mcmc_1_1base__mcmc.html#ad2c7124c9b80002735c5db2b7aecf482">_name</a> = <span class="stringliteral">&quot;NUTS with a dense Euclidean metric&quot;</span>; }</div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;      </div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;      </div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;      <span class="comment">// Note that the points don&#39;t need to be swapped</span></div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;      <span class="comment">// here since start.mInv = finish.mInv</span></div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;      <span class="keywordtype">bool</span> _compute_criterion(<a class="code" href="classstan_1_1mcmc_1_1ps__point.html">ps_point</a>&amp; start, </div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;                              <a class="code" href="classstan_1_1mcmc_1_1dense__e__point.html">dense_e_point</a>&amp; finish, </div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;                              Eigen::VectorXd&amp; rho) {</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;        <span class="keywordflow">return</span> rho.transpose() * finish.<a class="code" href="classstan_1_1mcmc_1_1dense__e__point.html#abf64e065e1579f7aeb211d764dc62eb1">mInv</a> * finish.<a class="code" href="classstan_1_1mcmc_1_1ps__point.html#a1bb62217e59e573da4cc5ff391c1b2ce">p</a> &gt; 0</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;            &amp;&amp; rho.transpose() * finish.<a class="code" href="classstan_1_1mcmc_1_1dense__e__point.html#abf64e065e1579f7aeb211d764dc62eb1">mInv</a> * start.<a class="code" href="classstan_1_1mcmc_1_1ps__point.html#a1bb62217e59e573da4cc5ff391c1b2ce">p</a>  &gt; 0;</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;      }</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;                                          </div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    };</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;      <span class="comment">// Note that the points don&#39;t need to be swapped</span></div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;      <span class="comment">// here since start.mInv = finish.mInv</span></div>
+<div class="line"><a name="l00031"></a><span class="lineno"><a class="code" href="classstan_1_1mcmc_1_1dense__e__nuts.html#aa23ebe0b61e0ed91a9a94457e69e08da">   31</a></span>&#160;      <span class="keywordtype">bool</span> <a class="code" href="classstan_1_1mcmc_1_1dense__e__nuts.html#aa23ebe0b61e0ed91a9a94457e69e08da">compute_criterion</a>(<a class="code" href="classstan_1_1mcmc_1_1ps__point.html">ps_point</a>&amp; start, </div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;                             <a class="code" href="classstan_1_1mcmc_1_1dense__e__point.html">dense_e_point</a>&amp; finish,</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;                             Eigen::VectorXd&amp; rho) {</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;        <span class="keywordflow">return</span> finish.<a class="code" href="classstan_1_1mcmc_1_1ps__point.html#a1bb62217e59e573da4cc5ff391c1b2ce">p</a>.transpose() * finish.<a class="code" href="classstan_1_1mcmc_1_1dense__e__point.html#abf64e065e1579f7aeb211d764dc62eb1">mInv</a> * (rho - finish.<a class="code" href="classstan_1_1mcmc_1_1ps__point.html#a1bb62217e59e573da4cc5ff391c1b2ce">p</a>) &gt; 0</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;               &amp;&amp; start.<a class="code" href="classstan_1_1mcmc_1_1ps__point.html#a1bb62217e59e573da4cc5ff391c1b2ce">p</a>.transpose() * finish.<a class="code" href="classstan_1_1mcmc_1_1dense__e__point.html#abf64e065e1579f7aeb211d764dc62eb1">mInv</a> * (rho - start.<a class="code" href="classstan_1_1mcmc_1_1ps__point.html#a1bb62217e59e573da4cc5ff391c1b2ce">p</a>)  &gt; 0;</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;      }</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;                                          </div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    };</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    </div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  } <span class="comment">// mcmc</span></div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    </div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  } <span class="comment">// mcmc</span></div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    </div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;} <span class="comment">// stan</span></div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;} <span class="comment">// stan</span></div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
 <hr/>
 <div class="conents" style="font-size:80%;">

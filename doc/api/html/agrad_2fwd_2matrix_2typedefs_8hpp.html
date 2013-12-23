@@ -95,7 +95,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &lt;<a class="el" href="_eigen_8hpp_source.html">stan/math/matrix/Eigen.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="fwd_2fvar_8hpp_source.html">stan/agrad/fwd/fvar.hpp</a>&gt;</code><br/>
+<code>#include &lt;<a class="el" href="fvar_8hpp_source.html">stan/agrad/fwd/fvar.hpp</a>&gt;</code><br/>
+<code>#include &lt;<a class="el" href="var_8hpp_source.html">stan/agrad/rev/var.hpp</a>&gt;</code><br/>
 <code>#include &lt;<a class="el" href="fwd_2numeric__limits_8hpp_source.html">stan/agrad/fwd/numeric_limits.hpp</a>&gt;</code><br/>
 </div>
 <p><a href="agrad_2fwd_2matrix_2typedefs_8hpp_source.html">Go to the source code of this file.</a></p>
@@ -113,18 +114,54 @@ Namespaces</h2></td></tr>
 Typedefs</h2></td></tr>
 <tr class="memitem:aeae9e6e94d5656d748136a7c4780856e"><td class="memItemLeft" align="right" valign="top">typedef Eigen::Matrix&lt; double, <br class="typebreak"/>
 Eigen::Dynamic, Eigen::Dynamic &gt;<br class="typebreak"/>
-::size_type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1agrad.html#aeae9e6e94d5656d748136a7c4780856e">stan::agrad::size_type</a></td></tr>
+::Index&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1agrad.html#aeae9e6e94d5656d748136a7c4780856e">stan::agrad::size_type</a></td></tr>
 <tr class="separator:aeae9e6e94d5656d748136a7c4780856e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab98368cbab6489ad4274b58c3cb4be60"><td class="memItemLeft" align="right" valign="top">typedef Eigen::Matrix&lt; fvar<br class="typebreak"/>
+<tr class="memitem:a9568a3aa8bbf0ba6c2e96ab703e83184"><td class="memItemLeft" align="right" valign="top">typedef Eigen::Matrix&lt; fvar<br class="typebreak"/>
 &lt; double &gt;, Eigen::Dynamic, <br class="typebreak"/>
-Eigen::Dynamic &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1agrad.html#ab98368cbab6489ad4274b58c3cb4be60">stan::agrad::matrix_fv</a></td></tr>
-<tr class="separator:ab98368cbab6489ad4274b58c3cb4be60"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a92a58269b5a760aa81ee6ef554a9c4a8"><td class="memItemLeft" align="right" valign="top">typedef Eigen::Matrix&lt; fvar<br class="typebreak"/>
-&lt; double &gt;, Eigen::Dynamic, 1 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1agrad.html#a92a58269b5a760aa81ee6ef554a9c4a8">stan::agrad::vector_fv</a></td></tr>
-<tr class="separator:a92a58269b5a760aa81ee6ef554a9c4a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a448daa5799ec758ffc715df7f5b8aafd"><td class="memItemLeft" align="right" valign="top">typedef Eigen::Matrix&lt; fvar<br class="typebreak"/>
-&lt; double &gt;, 1, Eigen::Dynamic &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1agrad.html#a448daa5799ec758ffc715df7f5b8aafd">stan::agrad::row_vector_fv</a></td></tr>
-<tr class="separator:a448daa5799ec758ffc715df7f5b8aafd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+Eigen::Dynamic &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1agrad.html#a9568a3aa8bbf0ba6c2e96ab703e83184">stan::agrad::matrix_fd</a></td></tr>
+<tr class="separator:a9568a3aa8bbf0ba6c2e96ab703e83184"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aac5f57e2caa5ea24203633335cfe3fc6"><td class="memItemLeft" align="right" valign="top">typedef Eigen::Matrix&lt; fvar<br class="typebreak"/>
+&lt; var &gt;, Eigen::Dynamic, <br class="typebreak"/>
+Eigen::Dynamic &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1agrad.html#aac5f57e2caa5ea24203633335cfe3fc6">stan::agrad::matrix_fv</a></td></tr>
+<tr class="separator:aac5f57e2caa5ea24203633335cfe3fc6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aff56af7392587b36f7071967f87ad7d1"><td class="memItemLeft" align="right" valign="top">typedef Eigen::Matrix&lt; fvar<br class="typebreak"/>
+&lt; fvar&lt; double &gt;<br class="typebreak"/>
+ &gt;, Eigen::Dynamic, <br class="typebreak"/>
+Eigen::Dynamic &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1agrad.html#aff56af7392587b36f7071967f87ad7d1">stan::agrad::matrix_ffd</a></td></tr>
+<tr class="separator:aff56af7392587b36f7071967f87ad7d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3e6bc2f7c13dfbbb0c30dce6dcb62951"><td class="memItemLeft" align="right" valign="top">typedef Eigen::Matrix&lt; fvar<br class="typebreak"/>
+&lt; fvar&lt; var &gt;<br class="typebreak"/>
+ &gt;, Eigen::Dynamic, <br class="typebreak"/>
+Eigen::Dynamic &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1agrad.html#a3e6bc2f7c13dfbbb0c30dce6dcb62951">stan::agrad::matrix_ffv</a></td></tr>
+<tr class="separator:a3e6bc2f7c13dfbbb0c30dce6dcb62951"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a50e8b3ee954a699c1467801ab52be810"><td class="memItemLeft" align="right" valign="top">typedef Eigen::Matrix&lt; fvar<br class="typebreak"/>
+&lt; double &gt;, Eigen::Dynamic, 1 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1agrad.html#a50e8b3ee954a699c1467801ab52be810">stan::agrad::vector_fd</a></td></tr>
+<tr class="separator:a50e8b3ee954a699c1467801ab52be810"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4ee7f0ffda84be0aec51dfd293951daf"><td class="memItemLeft" align="right" valign="top">typedef Eigen::Matrix&lt; fvar<br class="typebreak"/>
+&lt; var &gt;, Eigen::Dynamic, 1 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1agrad.html#a4ee7f0ffda84be0aec51dfd293951daf">stan::agrad::vector_fv</a></td></tr>
+<tr class="separator:a4ee7f0ffda84be0aec51dfd293951daf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a97cd52b23aca617183eb7deadb1c6d9d"><td class="memItemLeft" align="right" valign="top">typedef Eigen::Matrix&lt; fvar<br class="typebreak"/>
+&lt; fvar&lt; double &gt;<br class="typebreak"/>
+ &gt;, Eigen::Dynamic, 1 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1agrad.html#a97cd52b23aca617183eb7deadb1c6d9d">stan::agrad::vector_ffd</a></td></tr>
+<tr class="separator:a97cd52b23aca617183eb7deadb1c6d9d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a96902ae4f8847b57803a5ac7e5d9754d"><td class="memItemLeft" align="right" valign="top">typedef Eigen::Matrix&lt; fvar<br class="typebreak"/>
+&lt; fvar&lt; var &gt;<br class="typebreak"/>
+ &gt;, Eigen::Dynamic, 1 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1agrad.html#a96902ae4f8847b57803a5ac7e5d9754d">stan::agrad::vector_ffv</a></td></tr>
+<tr class="separator:a96902ae4f8847b57803a5ac7e5d9754d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a034dc4f78e984e287123599a3b87ac97"><td class="memItemLeft" align="right" valign="top">typedef Eigen::Matrix&lt; fvar<br class="typebreak"/>
+&lt; double &gt;, 1, Eigen::Dynamic &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1agrad.html#a034dc4f78e984e287123599a3b87ac97">stan::agrad::row_vector_fd</a></td></tr>
+<tr class="separator:a034dc4f78e984e287123599a3b87ac97"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a031f0408fe91a974e1cc09d61cea8807"><td class="memItemLeft" align="right" valign="top">typedef Eigen::Matrix&lt; fvar<br class="typebreak"/>
+&lt; var &gt;, 1, Eigen::Dynamic &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1agrad.html#a031f0408fe91a974e1cc09d61cea8807">stan::agrad::row_vector_fv</a></td></tr>
+<tr class="separator:a031f0408fe91a974e1cc09d61cea8807"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a493bb030b1f2016276f58fe67662e252"><td class="memItemLeft" align="right" valign="top">typedef Eigen::Matrix&lt; fvar<br class="typebreak"/>
+&lt; fvar&lt; double &gt;<br class="typebreak"/>
+ &gt;, 1, Eigen::Dynamic &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1agrad.html#a493bb030b1f2016276f58fe67662e252">stan::agrad::row_vector_ffd</a></td></tr>
+<tr class="separator:a493bb030b1f2016276f58fe67662e252"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4a52427f4040846e15dca434ea633b7b"><td class="memItemLeft" align="right" valign="top">typedef Eigen::Matrix&lt; fvar<br class="typebreak"/>
+&lt; fvar&lt; var &gt;<br class="typebreak"/>
+ &gt;, 1, Eigen::Dynamic &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1agrad.html#a4a52427f4040846e15dca434ea633b7b">stan::agrad::row_vector_ffv</a></td></tr>
+<tr class="separator:a4a52427f4040846e15dca434ea633b7b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 </div><!-- contents -->
 <hr/>

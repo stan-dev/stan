@@ -98,7 +98,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="_eigen_8hpp.html">stan/math/matrix/Eigen.hpp</a>&gt;</span></div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="math_2matrix_2typedefs_8hpp.html">stan/math/matrix/typedefs.hpp</a>&gt;</span></div>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="validate__vector_8hpp.html">stan/math/matrix/validate_vector.hpp</a>&gt;</span></div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="fwd_2fvar_8hpp.html">stan/agrad/fwd/fvar.hpp</a>&gt;</span></div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="fvar_8hpp.html">stan/agrad/fwd/fvar.hpp</a>&gt;</span></div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="agrad_2fwd_2matrix_2dot__product_8hpp.html">stan/agrad/fwd/matrix/dot_product.hpp</a>&gt;</span></div>
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;</div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="keyword">namespace </span>stan {</div>
@@ -108,7 +108,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;    <span class="keyword">inline</span> fvar&lt;T&gt;</div>
 <div class="line"><a name="l00016"></a><span class="lineno"><a class="code" href="namespacestan_1_1agrad.html#a4c1836521010bd6f18b5a58061cc3198">   16</a></span>&#160;    <a class="code" href="namespacestan_1_1agrad.html#a4c1836521010bd6f18b5a58061cc3198">dot_self</a>(<span class="keyword">const</span> Eigen::Matrix&lt;<a class="code" href="structstan_1_1agrad_1_1fvar.html">fvar&lt;T&gt;</a>, R, C&gt;&amp; v) {</div>
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;      <a class="code" href="namespacestan_1_1math.html#a883b9b83e5ca3d865f9dcf26d57a69fe">stan::math::validate_vector</a>(v,<span class="stringliteral">&quot;dot_self&quot;</span>);</div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="namespacestan_1_1agrad.html#a6c698d520773ab229cae8dfbb22f840c">dot_product</a>(v, v);</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="namespacestan_1_1agrad.html#a6ab5996a680002f996384f7f7cc2ba86">dot_product</a>(v, v);</div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;    }</div>
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;  }</div>
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;}</div>

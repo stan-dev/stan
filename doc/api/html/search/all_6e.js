@@ -29,7 +29,7 @@ var searchData=
   ['newton_2ehpp',['newton.hpp',['../newton_8hpp.html',1,'']]],
   ['newton_5fstep',['newton_step',['../namespacestan_1_1optimization.html#a96fbc01564bc465d164199b41891be0d',1,'stan::optimization']]],
   ['next',['next',['../classstan_1_1io_1_1dump__reader.html#aed46c1062b3a19c22a7440b72f1c8ffd',1,'stan::io::dump_reader']]],
-  ['next_5findex',['next_index',['../print_8cpp.html#ab54368a8bca76f33372859602ca77797',1,'print.cpp']]],
+  ['next_5findex',['next_index',['../print_8hpp.html#ab54368a8bca76f33372859602ca77797',1,'print.hpp']]],
   ['nil',['nil',['../structstan_1_1gm_1_1nil.html',1,'stan::gm']]],
   ['no_5fop_5fstatement',['no_op_statement',['../structstan_1_1gm_1_1no__op__statement.html',1,'stan::gm']]],
   ['no_5fop_5fstatement_5fr',['no_op_statement_r',['../structstan_1_1gm_1_1statement__grammar.html#a0be0bd6e7a44724c32ff73e1bb96375e',1,'stan::gm::statement_grammar']]],

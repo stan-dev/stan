@@ -5,6 +5,18 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 
+// only counts non-overlapping matches;  after match, advances to
+// end of match;
+// empty target returns -1
+int count_matches(const std::string& target,
+                  const std::string& s) {
+  if (target.size() == 0) return -1;  // error
+  int count = 0;
+  for (size_t pos = 0; (pos = s.find(target,pos)) != std::string::npos; pos += target.size())
+    ++count;
+  return count;
+}
+
 /** 
  * Gets the path separator for the OS.
  * 
@@ -20,6 +32,18 @@ char get_path_separator() {
     pclose(in);
   }
   return path_separator;
+}
+
+/** 
+ * Multiple command separator
+ * 
+ * @return '&' for Windows, ';' otherwise.
+ */
+char multiple_command_separator() {
+  if (get_path_separator() == '/')
+    return ';';
+  else
+    return '&';
 }
 
 /** 

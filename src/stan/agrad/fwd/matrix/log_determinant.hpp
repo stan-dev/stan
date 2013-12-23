@@ -7,8 +7,8 @@
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <stan/agrad/fwd/matrix/determinant.hpp>
-#include <stan/agrad/fwd/fabs.hpp>
-#include <stan/agrad/fwd/log.hpp>
+#include <stan/agrad/fwd/functions/fabs.hpp>
+#include <stan/agrad/fwd/functions/log.hpp>
 
 namespace stan {
   namespace agrad {

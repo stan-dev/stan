@@ -97,90 +97,73 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;vector&gt;</span></div>
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;string&gt;</span></div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;</div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="keyword">namespace </span>stan {</div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;  </div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;  <span class="keyword">namespace </span>mcmc {</div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;    </div>
-<div class="line"><a name="l00011"></a><span class="lineno"><a class="code" href="classstan_1_1mcmc_1_1sample.html">   11</a></span>&#160;    <span class="keyword">class </span><a class="code" href="classstan_1_1mcmc_1_1sample.html">sample</a> {</div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;      </div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;    <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="_eigen_8hpp.html">stan/math/matrix/Eigen.hpp</a>&gt;</span></div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;</div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="keyword">namespace </span>stan {</div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;  </div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;  <span class="keyword">namespace </span>mcmc {</div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;    </div>
+<div class="line"><a name="l00013"></a><span class="lineno"><a class="code" href="classstan_1_1mcmc_1_1sample.html">   13</a></span>&#160;    <span class="keyword">class </span><a class="code" href="classstan_1_1mcmc_1_1sample.html">sample</a> {</div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;      </div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;      std::vector&lt;double&gt; _cont_params; <span class="comment">// Continuous coordinates of sample</span></div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;      std::vector&lt;int&gt; _disc_params;    <span class="comment">// Discrete coordinates of sample</span></div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;      <span class="keywordtype">double</span> _log_prob;                 <span class="comment">// Log probability of sample</span></div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;      <span class="keywordtype">double</span> _accept_stat;              <span class="comment">// Acceptance statistic of transition</span></div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;      </div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;    <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;      </div>
-<div class="line"><a name="l00022"></a><span class="lineno"><a class="code" href="classstan_1_1mcmc_1_1sample.html#afc53aa6035cb57a72c56cc46791cbfd0">   22</a></span>&#160;      <a class="code" href="classstan_1_1mcmc_1_1sample.html#afc53aa6035cb57a72c56cc46791cbfd0">sample</a>(<span class="keyword">const</span> std::vector&lt;double&gt;&amp; q,</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;             <span class="keyword">const</span> std::vector&lt;int&gt;&amp; r,</div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;    <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;      </div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;      Eigen::VectorXd _cont_params; <span class="comment">// Continuous coordinates of sample</span></div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;      <span class="keywordtype">double</span> _log_prob;             <span class="comment">// Log probability of sample</span></div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;      <span class="keywordtype">double</span> _accept_stat;          <span class="comment">// Acceptance statistic of transition</span></div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;      </div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;    <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;      </div>
+<div class="line"><a name="l00023"></a><span class="lineno"><a class="code" href="classstan_1_1mcmc_1_1sample.html#a028816248fc7ec7dbee24d0e7ea621dc">   23</a></span>&#160;      <a class="code" href="classstan_1_1mcmc_1_1sample.html#a028816248fc7ec7dbee24d0e7ea621dc">sample</a>(<span class="keyword">const</span> Eigen::VectorXd&amp; q,</div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;             <span class="keywordtype">double</span> <a class="code" href="classstan_1_1mcmc_1_1sample.html#a42aa100b16656e4904586f80ec028425">log_prob</a>,</div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;             <span class="keywordtype">double</span> stat) :</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;      _cont_params(q), </div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;      _disc_params(r),</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;      _log_prob(log_prob),</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;      _accept_stat(stat) {};</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;      </div>
-<div class="line"><a name="l00031"></a><span class="lineno"><a class="code" href="classstan_1_1mcmc_1_1sample.html#a20ad72aee8c1982a32277a374401f6db">   31</a></span>&#160;      <span class="keyword">virtual</span> <a class="code" href="classstan_1_1mcmc_1_1sample.html#a20ad72aee8c1982a32277a374401f6db">~sample</a>() {}; <span class="comment">// No-op</span></div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;      </div>
-<div class="line"><a name="l00033"></a><span class="lineno"><a class="code" href="classstan_1_1mcmc_1_1sample.html#aadbb128a85fb6d72df04d3097acfc3e5">   33</a></span>&#160;      <span class="keyword">inline</span> <span class="keywordtype">int</span> <a class="code" href="classstan_1_1mcmc_1_1sample.html#aadbb128a85fb6d72df04d3097acfc3e5">size_cont</a>()<span class="keyword"> const </span>{ </div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;        <span class="keywordflow">return</span> _cont_params.size(); </div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;      }</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;      </div>
-<div class="line"><a name="l00037"></a><span class="lineno"><a class="code" href="classstan_1_1mcmc_1_1sample.html#aa6dbff10de92bcd52e156ac8ca8eba6e">   37</a></span>&#160;      <span class="keyword">inline</span> <span class="keywordtype">double</span> <a class="code" href="classstan_1_1mcmc_1_1sample.html#aa6dbff10de92bcd52e156ac8ca8eba6e">cont_params</a>(<span class="keywordtype">int</span> k)<span class="keyword"> const </span>{ </div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;        <span class="keywordflow">return</span> _cont_params[k]; </div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;      }</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;      </div>
-<div class="line"><a name="l00041"></a><span class="lineno"><a class="code" href="classstan_1_1mcmc_1_1sample.html#aac09547ea79b35cdfd564fde4ea53e58">   41</a></span>&#160;      <span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code" href="classstan_1_1mcmc_1_1sample.html#aac09547ea79b35cdfd564fde4ea53e58">cont_params</a>(std::vector&lt;double&gt;&amp; x)<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;        x = _cont_params;</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;      }</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;      </div>
-<div class="line"><a name="l00045"></a><span class="lineno"><a class="code" href="classstan_1_1mcmc_1_1sample.html#a9ca7f51eb2c59110127aa8fc681cefdc">   45</a></span>&#160;      <span class="keyword">inline</span> <span class="keyword">const</span> std::vector&lt;double&gt;&amp; <a class="code" href="classstan_1_1mcmc_1_1sample.html#a9ca7f51eb2c59110127aa8fc681cefdc">cont_params</a>()<span class="keyword"> const </span>{ </div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;        <span class="keywordflow">return</span> _cont_params; </div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;      }</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;      </div>
-<div class="line"><a name="l00049"></a><span class="lineno"><a class="code" href="classstan_1_1mcmc_1_1sample.html#ab2b71ffe28d6694551da77acc26b3397">   49</a></span>&#160;      <span class="keyword">inline</span> <span class="keywordtype">int</span> <a class="code" href="classstan_1_1mcmc_1_1sample.html#ab2b71ffe28d6694551da77acc26b3397">size_disc</a>()<span class="keyword"> const </span>{ </div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;        <span class="keywordflow">return</span> _disc_params.size();</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;      }</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;      </div>
-<div class="line"><a name="l00053"></a><span class="lineno"><a class="code" href="classstan_1_1mcmc_1_1sample.html#aa3da13dc3b823ce8660024523c0ad0c5">   53</a></span>&#160;      <span class="keyword">inline</span> <span class="keywordtype">int</span> <a class="code" href="classstan_1_1mcmc_1_1sample.html#aa3da13dc3b823ce8660024523c0ad0c5">disc_params</a>(<span class="keywordtype">int</span> k)<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;        <span class="keywordflow">return</span> _disc_params[k];</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;      }</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;      </div>
-<div class="line"><a name="l00057"></a><span class="lineno"><a class="code" href="classstan_1_1mcmc_1_1sample.html#ae248d179b662fe2536cd567539a13a2d">   57</a></span>&#160;      <span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code" href="classstan_1_1mcmc_1_1sample.html#ae248d179b662fe2536cd567539a13a2d">disc_params</a>(std::vector&lt;int&gt;&amp; n)<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;        n = _disc_params;</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;      _cont_params(q),</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;      _log_prob(log_prob),</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;      _accept_stat(stat) {};</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;      </div>
+<div class="line"><a name="l00030"></a><span class="lineno"><a class="code" href="classstan_1_1mcmc_1_1sample.html#a20ad72aee8c1982a32277a374401f6db">   30</a></span>&#160;      <span class="keyword">virtual</span> <a class="code" href="classstan_1_1mcmc_1_1sample.html#a20ad72aee8c1982a32277a374401f6db">~sample</a>() {}; <span class="comment">// No-op</span></div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;      </div>
+<div class="line"><a name="l00032"></a><span class="lineno"><a class="code" href="classstan_1_1mcmc_1_1sample.html#aadbb128a85fb6d72df04d3097acfc3e5">   32</a></span>&#160;      <span class="keywordtype">int</span> <a class="code" href="classstan_1_1mcmc_1_1sample.html#aadbb128a85fb6d72df04d3097acfc3e5">size_cont</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;        <span class="keywordflow">return</span> _cont_params.size(); </div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;      }</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;      </div>
+<div class="line"><a name="l00036"></a><span class="lineno"><a class="code" href="classstan_1_1mcmc_1_1sample.html#aa6dbff10de92bcd52e156ac8ca8eba6e">   36</a></span>&#160;      <span class="keywordtype">double</span> <a class="code" href="classstan_1_1mcmc_1_1sample.html#aa6dbff10de92bcd52e156ac8ca8eba6e">cont_params</a>(<span class="keywordtype">int</span> k)<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;        <span class="keywordflow">return</span> _cont_params(k);</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;      }</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;      </div>
+<div class="line"><a name="l00040"></a><span class="lineno"><a class="code" href="classstan_1_1mcmc_1_1sample.html#ae659b68fe8ac4a7a87fcd53549133c90">   40</a></span>&#160;      <span class="keywordtype">void</span> <a class="code" href="classstan_1_1mcmc_1_1sample.html#ae659b68fe8ac4a7a87fcd53549133c90">cont_params</a>(Eigen::VectorXd&amp; x)<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;        x = _cont_params;</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;      }</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;      </div>
+<div class="line"><a name="l00044"></a><span class="lineno"><a class="code" href="classstan_1_1mcmc_1_1sample.html#afa5f116f5b79a757bfb7d68931bd3c17">   44</a></span>&#160;      <span class="keyword">const</span> Eigen::VectorXd&amp; <a class="code" href="classstan_1_1mcmc_1_1sample.html#afa5f116f5b79a757bfb7d68931bd3c17">cont_params</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;        <span class="keywordflow">return</span> _cont_params; </div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;      }</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;      </div>
+<div class="line"><a name="l00048"></a><span class="lineno"><a class="code" href="classstan_1_1mcmc_1_1sample.html#a42aa100b16656e4904586f80ec028425">   48</a></span>&#160;      <span class="keyword">inline</span> <span class="keywordtype">double</span> <a class="code" href="classstan_1_1mcmc_1_1sample.html#a42aa100b16656e4904586f80ec028425">log_prob</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;        <span class="keywordflow">return</span> _log_prob;</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;      }</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;      </div>
+<div class="line"><a name="l00052"></a><span class="lineno"><a class="code" href="classstan_1_1mcmc_1_1sample.html#ab427230e7e2d5cb3b541c3b7040d0fb7">   52</a></span>&#160;      <span class="keyword">inline</span> <span class="keywordtype">double</span> <a class="code" href="classstan_1_1mcmc_1_1sample.html#ab427230e7e2d5cb3b541c3b7040d0fb7">accept_stat</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;        <span class="keywordflow">return</span> _accept_stat;</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;      }</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;      </div>
+<div class="line"><a name="l00056"></a><span class="lineno"><a class="code" href="classstan_1_1mcmc_1_1sample.html#af9d0b064b26b744a8a3416726ed64ad0">   56</a></span>&#160;      <span class="keywordtype">void</span> <a class="code" href="classstan_1_1mcmc_1_1sample.html#af9d0b064b26b744a8a3416726ed64ad0">get_sample_param_names</a>(std::vector&lt;std::string&gt;&amp; names) {</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;        names.push_back(<span class="stringliteral">&quot;lp__&quot;</span>);</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;        names.push_back(<span class="stringliteral">&quot;accept_stat__&quot;</span>);</div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;      }</div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;      </div>
-<div class="line"><a name="l00061"></a><span class="lineno"><a class="code" href="classstan_1_1mcmc_1_1sample.html#a8e68e9e6047688ee506502317a89750d">   61</a></span>&#160;      <span class="keyword">inline</span> <span class="keyword">const</span> std::vector&lt;int&gt;&amp; <a class="code" href="classstan_1_1mcmc_1_1sample.html#a8e68e9e6047688ee506502317a89750d">disc_params</a>()<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;        <span class="keywordflow">return</span> _disc_params;</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;      }</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;      </div>
-<div class="line"><a name="l00065"></a><span class="lineno"><a class="code" href="classstan_1_1mcmc_1_1sample.html#a42aa100b16656e4904586f80ec028425">   65</a></span>&#160;      <span class="keyword">inline</span> <span class="keywordtype">double</span> <a class="code" href="classstan_1_1mcmc_1_1sample.html#a42aa100b16656e4904586f80ec028425">log_prob</a>()<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;        <span class="keywordflow">return</span> _log_prob;</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;      }</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;      </div>
-<div class="line"><a name="l00069"></a><span class="lineno"><a class="code" href="classstan_1_1mcmc_1_1sample.html#ab427230e7e2d5cb3b541c3b7040d0fb7">   69</a></span>&#160;      <span class="keyword">inline</span> <span class="keywordtype">double</span> <a class="code" href="classstan_1_1mcmc_1_1sample.html#ab427230e7e2d5cb3b541c3b7040d0fb7">accept_stat</a>()<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;        <span class="keywordflow">return</span> _accept_stat;</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;      }</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;      </div>
-<div class="line"><a name="l00073"></a><span class="lineno"><a class="code" href="classstan_1_1mcmc_1_1sample.html#af9d0b064b26b744a8a3416726ed64ad0">   73</a></span>&#160;      <span class="keywordtype">void</span> <a class="code" href="classstan_1_1mcmc_1_1sample.html#af9d0b064b26b744a8a3416726ed64ad0">get_sample_param_names</a>(std::vector&lt;std::string&gt;&amp; names) {</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;        names.push_back(<span class="stringliteral">&quot;lp__&quot;</span>);</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;        names.push_back(<span class="stringliteral">&quot;accept_stat__&quot;</span>);</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;      }</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;      </div>
-<div class="line"><a name="l00078"></a><span class="lineno"><a class="code" href="classstan_1_1mcmc_1_1sample.html#a0a0f69f242625c8f7d033cefae3b066c">   78</a></span>&#160;      <span class="keywordtype">void</span> <a class="code" href="classstan_1_1mcmc_1_1sample.html#a0a0f69f242625c8f7d033cefae3b066c">get_sample_params</a>(std::vector&lt;double&gt;&amp; values) {</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;        values.push_back(_log_prob);</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;        values.push_back(_accept_stat);</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;      }</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;      </div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    };</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    </div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;  } <span class="comment">// mcmc</span></div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;  </div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;} <span class="comment">// stan</span></div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l00061"></a><span class="lineno"><a class="code" href="classstan_1_1mcmc_1_1sample.html#a0a0f69f242625c8f7d033cefae3b066c">   61</a></span>&#160;      <span class="keywordtype">void</span> <a class="code" href="classstan_1_1mcmc_1_1sample.html#a0a0f69f242625c8f7d033cefae3b066c">get_sample_params</a>(std::vector&lt;double&gt;&amp; values) {</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;        values.push_back(_log_prob);</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;        values.push_back(_accept_stat);</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;      }</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;      </div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    };</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    </div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;  } <span class="comment">// mcmc</span></div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;  </div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;} <span class="comment">// stan</span></div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="preprocessor"></span></div>
 </div><!-- fragment --></div><!-- contents -->
 <hr/>
 <div class="conents" style="font-size:80%;">

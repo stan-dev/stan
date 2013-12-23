@@ -352,13 +352,13 @@ arrays of row vectors, and so on.
 
 
 
-\section{Primitive Numerical Data Types}
+\section{Primitive Numerical Data Types}\label{numerical-data-types.section}
 
 Unfortunately, the lovely mathematical abstraction of integers and
 real numbers is only partially supported by finite-precision computer
 arithmetic.  
 
-\subsection{Integers}\label{int-data-type.section}
+\subsection{Integers}
 
 Stan uses 32-bit (4-byte) integers for all of its integer
 representations.  The maximum value that can be represented
@@ -373,7 +373,7 @@ Integer arithmetic works in the expected way for addition,
 subtraction, and multiplication, but rounds the result of division
 (see \refsection{int-arithmetic} for more information).
 
-\subsection{Reals}\label{real-data-type.section}
+\subsection{Reals}
 
 \Stan uses 64-bit (8-byte) floating point representations of real
 numbers.  \Stan roughly%
@@ -571,7 +571,6 @@ Vectors, row vectors, and matrices contain real values.  Arrays, on
 the other hand, may contain any kind of value, including integers and
 structured values like vectors.
 
-
 \subsection{Indexing}
 
 Vectors and matrices, as well as arrays, are indexed starting from one
@@ -580,6 +579,7 @@ algebra as well as their implementations in the statistical software
 packages \R, \MATLAB, \BUGS, and \JAGS.  General computer programming
 languages, on the other hand, such as \Cpp and Python, index arrays
 starting from zero.
+
 
 \subsection{Vectors}
 
@@ -603,6 +603,9 @@ vector<lower=0>[3] u;
 \end{Verbatim}
 \end{quote}
 %
+
+
+
 
 \subsection{Unit Simplexes}
 
@@ -899,7 +902,25 @@ given a choice, the form \code{m[2,3]} is preferred.%
   compiler.\label{array-index-style.footnote}}
 
 
-\section{Array Data Types}
+\subsection{Size Declaration Restrictions}
+
+An integer expression is used to pick out the sizes of vectors,
+matrices, and arrays.  For instance, we can declare a vector of size
+\code{M + N} using
+%
+\begin{quote}
+\begin{Verbatim}
+vector[M + N] y;
+\end{Verbatim}
+\end{quote}
+%
+Any integer-denoting expression may be used for the size declaration,
+providing all variables involved are either data, transformed data, or
+local variables.  That is, expressions used for size declarations may
+not include parameters or transformed parameters or generated
+quantities.  
+
+\section{Array Data Types}\label{array-data-types.section}
 
 \Stan supports arrays of arbitrary dimension.  An array's elements may
 be any of the basic data types, that is univariate integers,
@@ -1006,7 +1027,7 @@ z <- y[3];  // z == w[5][4][3] == w[5,4,3]
 
 ---fixme---
 
-\subsection{Arrays of Matrices and Vectors}\label{arrays-of-matrices.section}
+\subsection{Arrays of Matrices and Vectors}
 
 Arrays of vectors and matrices are accessed in the same way as arrays
 of doubles.  Consider the following vector and scalar declarations.
@@ -1183,7 +1204,12 @@ b <- a;  // illegal assignment of matrix to column vector
 \end{Verbatim}
 \end{quote}
 
+\subsection{Size Declaration Restrictions}
 
+An integer expression is used to pick out the sizes of arrays.  The
+same restrictions as for vector and matrix sizes apply, namely that
+the size is declared with an integer-denoting expression that does not
+contain any parameters, transformed parameters, or generated quantities.
 
 \section{Variable Types vs.\ Constraints and Sizes}
 
@@ -1299,7 +1325,7 @@ The following list contains well-formed integer literals.
 \end{quote}
 %
 Integer literals must have values that fall within the bounds for
-integer values (see \refsection{int-data-type}).
+integer values (see \refsection{numerical-data-types}).
 
 Integer literals may not contain decimal points (\code{.}).  Thus the
 expressions \code{1.} and \code{1.0} are of type \code{real} and may
@@ -1578,7 +1604,7 @@ parentheses, this grouping may be made explicit with the expression
   3} has \code{1 + 2} as a subexpression and evaluates to 9.
 
 
-\section{Arithmetic and Matrix Expressions}
+\section{Arithmetic and Matrix Expressions}\label{arithmetic-expressions.section}
 
 For integer and real-valued expressions, \Stan supports the basic
 binary arithmetic operations of addition (\code{+}), subtraction
@@ -1635,7 +1661,7 @@ multiplied by a (column) vector, which produces a \code{real} value.
 
 
 
-\subsection{Operator Precedence and Associativity}\label{operator-precedence.section}
+\subsection{Operator Precedence and Associativity}
 
 The precedence and associativity of operators, as well as built-in
 syntax such as array indexing and function application is given in
@@ -1767,7 +1793,7 @@ the third row of the matrix denoted by \code{m[1,2]}.  Finally,
 third row and fourth column of the matrix that is found at the first
 row and second column of the array \code{m}.
 
-\section{Function Application}
+\section{Function Application}\label{function-application.section}
 
 \Stan provides a broad-range of built in mathematical and statistical
 functions, which are documented in \refpart{built-in-functions}.
@@ -1824,7 +1850,7 @@ functions.  For instance, the mathematical constants $\pi$ and $e$ are
 represented as nullary functions named \code{pi()} and \code{e()}.
 See \refsection{built-in-constants} for a list of built-in constants.
 
-\subsection{Type Promotion and Function Resolution}\label{type-promotion.section}
+\subsection{Type Promotion and Function Resolution}
 
 Because of integer to real type promotion, rules must be established
 for which function is called given a sequence of argument types.  The
@@ -2044,8 +2070,9 @@ In looking up functions, binary operators like \code{real~*~real} are
 defined as \code{operator*(real,real)} in the documentation and index.
 
 In matching a function definition, arguments of type \code{int} may be
-promoted to type \code{real} if necessary (see \refsection{type-promotion} for an
-exact specification of Stan's integer-to-real type-promotion rule).
+promoted to type \code{real} if necessary (see the subsection on type
+promotion in \refsection{function-application} for an exact
+specification of Stan's integer-to-real type-promotion rule).
 
 In general, matrix operations return the lowest inferrable type.  For
 example, \code{row\_vector~*~vector} returns a value of type
@@ -2124,7 +2151,7 @@ not-a-number values.
 
 The best way to diagnose whether something is going wrong with the
 derivatives is to use the test-gradient option to the sampler or
-optimizer inputs; this option is availabe in both Stan and RStan
+optimizer inputs; this option is available in both Stan and RStan
 (though it may be slow, because it relies on finite differences to
 make a comparison to the built-in automatic differentiation).
 
@@ -2290,10 +2317,16 @@ increment_log_prob(-0.5 * y * y);
 %
 In this example, the unnormalized log probability of a unit normal
 variable $y$ is adeed to the total log probability.  In the general
-case, the argument can be any expression.  Writing this model as
-\code{-0.5 * y * y} is more efficient than the equivalent \code{y * y
-  / 2} because multiplication is more efficient than division and the
-negation is rolled into the constant \code{-0.5}.
+case, the argument can be any expression.%
+%
+\footnote{Writing this model with the expression \code{-0.5 * y * y}
+  is more efficient than with the equivalent expression \code{y * y /
+    -2} because multiplication is more efficient than division; in
+  both cases, the negation is rolled into the numeric literal
+  (\code{-0.5} and \code{-2}).  Writing \code{square(y)} instead of
+  \code{y * y} would be even more efficient because the derivatives
+  can be precomputed, reducing the memory and number of operations
+  required for automatic differentiation.}
 
 An entire Stan model can be implemented this way.  For instance, the
 following model will draw a single variable according to a unit normal
@@ -2390,7 +2423,8 @@ increment_log_prob(normal_log(y,mu,sigma));
 \end{Verbatim}
 \end{quote}
 %
-See \refsection{incr-vs-sample} for a full explanation.
+See the subsection of \refsection{sampling-statements} discussing log
+probability increments for a full explanation.
 
 In general, a sampling statement of the form
 %
@@ -2414,7 +2448,7 @@ This will be well formed if and only if
 \code{dist\_log(ex0,ex1,...,exN)} is a well-formed function expression
 of type \code{real}.
 
-\subsection{Log Probability Increment vs.\ Sampling Statement}\label{incr-vs-sample.section}
+\subsection{Log Probability Increment vs.\ Sampling Statement}
 
 Although both lead to the same sampling behavior in Stan, there is one
 critical difference between using the sampling statement, as in
@@ -2478,7 +2512,7 @@ increment_log_prob(- log(fabs(y)));
 \end{quote}
 %
 
-\subsection{Truncated Distributions}\label{truncated-distributions.section}
+\subsection{Truncated Distributions}
 
 A density function $p(x)$ may be truncated to an interval $(a,b)$ to
 define a new density $p_{(a,b)}\!(x)$ by setting
@@ -2592,9 +2626,9 @@ y ~ normal(0,1) T[-0.5,];
 \end{quote}
 % 
 The truncation has the same effect as the following direct update to
-the accumulated log probability (see \refsection{incr-vs-sample} for
-more information about the relation between incrementing the total log
-probability and sampling).
+the accumulated log probability (see the subsection of
+\refsection{sampling-statements} contrasting log probability increment
+and sampling statements for more information).
 %
 \begin{quote}
 \begin{Verbatim}
@@ -2657,7 +2691,8 @@ For a truncated sampling statement, if the value sampled is not within
 the bounds specified by the truncation expression, the result is zero
 probability and the entire statement adds $-\infty$ to the total log
 probability, which in turn results in the sample being rejected; see
-\refsection{truncation-constraints} for programming strategies to keep
+the subsection of \refsection{truncated-data} discussing constraints
+and out-of-bounds returns for programming strategies to keep
 all values within bounds.
 
 \subsubsection{Vectorizing Truncated Distributions}
@@ -3577,7 +3612,7 @@ defined in terms of the constrained parameters.
 In some cases, the number of parameters is reduced in the
 unconstrained space.  For instance, a $K$-simplex only requires $K-1$
 unconstrained parameters, and a $K$-correlation matrix only requires
-${K \choose 2}$ unconstrained parameters.  This means that the
+$\binom{K}{2}$ unconstrained parameters.  This means that the
 probability function defined by the compiled \Stan program may have
 fewer parameters than it would appear from looking at the declarations
 in the \code{parameters} program block. 
@@ -3832,7 +3867,7 @@ argument types, see \refpart{built-in-functions}.
 
 In the \Stan grammar provided in this chapter, the expression \code{1
   + 2 * 3} has two parses.  As described in
-\refsection{operator-precedence}, \Stan disambiguates between the
+\refsection{arithmetic-expressions}, \Stan disambiguates between the
 meaning $1 + (2 \times 3)$ and the meaning $(1 + 2) \times 3$ based on
 operator precedences and associativities. 
 

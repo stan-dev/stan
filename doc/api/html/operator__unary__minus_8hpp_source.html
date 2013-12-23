@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<title>Stan: src/stan/agrad/fwd/operator_unary_minus.hpp Source File</title>
+<title>Stan: src/stan/agrad/fwd/operators/operator_unary_minus.hpp Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -83,7 +83,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_9c4b002ce8795bbd5dbe2cf3421fe13a.html">src</a></li><li class="navelem"><a class="el" href="dir_b1c6471129ce395961fd25e68f861508.html">stan</a></li><li class="navelem"><a class="el" href="dir_52c3c3fe3bff0ba6815d4f34971ed7d3.html">agrad</a></li><li class="navelem"><a class="el" href="dir_fb5291ba38e4a736e77d8ba78c86369a.html">fwd</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_9c4b002ce8795bbd5dbe2cf3421fe13a.html">src</a></li><li class="navelem"><a class="el" href="dir_b1c6471129ce395961fd25e68f861508.html">stan</a></li><li class="navelem"><a class="el" href="dir_52c3c3fe3bff0ba6815d4f34971ed7d3.html">agrad</a></li><li class="navelem"><a class="el" href="dir_fb5291ba38e4a736e77d8ba78c86369a.html">fwd</a></li><li class="navelem"><a class="el" href="dir_182af125d00bd279bb48de10042b58c3.html">operators</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -91,15 +91,15 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">operator_unary_minus.hpp</div>  </div>
 </div><!--header-->
 <div class="contents">
-<a href="operator__unary__minus_8hpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#ifndef __STAN__AGRAD__FWD__OPERATOR__UNARY__NEGATIVE__HPP__</span></div>
-<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define __STAN__AGRAD__FWD__OPERATOR__UNARY__NEGATIVE__HPP__</span></div>
+<a href="operator__unary__minus_8hpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#ifndef __STAN__AGRAD__FWD__OPERATORS__OPERATOR_UNARY_NEGATIVE_HPP__</span></div>
+<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define __STAN__AGRAD__FWD__OPERATORS__OPERATOR_UNARY_NEGATIVE_HPP__</span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="fwd_2fvar_8hpp.html">stan/agrad/fwd/fvar.hpp</a>&gt;</span></div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="fvar_8hpp.html">stan/agrad/fwd/fvar.hpp</a>&gt;</span></div>
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="meta_2traits_8hpp.html">stan/meta/traits.hpp</a>&gt;</span></div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;</div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="keyword">namespace </span>stan{</div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="keyword">namespace </span>stan {</div>
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;</div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;  <span class="keyword">namespace </span>agrad{</div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;  <span class="keyword">namespace </span>agrad {</div>
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;</div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;    <span class="keyword">inline</span> </div>

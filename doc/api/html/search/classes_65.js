@@ -10,8 +10,8 @@ var searchData=
   ['expr_5ftype',['expr_type',['../structstan_1_1gm_1_1expr__type.html',1,'stan::gm']]],
   ['expression',['expression',['../structstan_1_1gm_1_1expression.html',1,'stan::gm']]],
   ['expression_5fas_5fstatement',['expression_as_statement',['../structstan_1_1gm_1_1expression__as__statement.html',1,'stan::gm']]],
-  ['expression_5fgrammar',['expression_grammar',['../structstan_1_1gm_1_1expression__grammar.html',1,'stan::gm']]],
   ['expression_5fgrammar',['expression_grammar',['../structexpression__grammar.html',1,'']]],
+  ['expression_5fgrammar',['expression_grammar',['../structstan_1_1gm_1_1expression__grammar.html',1,'stan::gm']]],
   ['expression_5ftype_5fvis',['expression_type_vis',['../structstan_1_1gm_1_1expression__type__vis.html',1,'stan::gm']]],
   ['expression_5fvisgen',['expression_visgen',['../structstan_1_1gm_1_1expression__visgen.html',1,'stan::gm']]]
 ];

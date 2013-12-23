@@ -113,12 +113,14 @@ Inheritance diagram for stan::mcmc::stepsize_var_adapter:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:ab70dda7721ebc026ef5293da66cfeb04"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1stepsize__var__adapter.html#ab70dda7721ebc026ef5293da66cfeb04">stepsize_var_adapter</a> (int n, int max_adapt)</td></tr>
-<tr class="separator:ab70dda7721ebc026ef5293da66cfeb04"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1599b792341a655efeeebadf15c08d63"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1stepsize__var__adapter.html#a1599b792341a655efeeebadf15c08d63">stepsize_var_adapter</a> (int n)</td></tr>
+<tr class="separator:a1599b792341a655efeeebadf15c08d63"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af38b99277aa2cf9af8bbf69c1e683c0a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classstan_1_1mcmc_1_1stepsize__adaptation.html">stepsize_adaptation</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1stepsize__var__adapter.html#af38b99277aa2cf9af8bbf69c1e683c0a">get_stepsize_adaptation</a> ()</td></tr>
 <tr class="separator:af38b99277aa2cf9af8bbf69c1e683c0a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a63d086dbff4db90650091784bd48e54a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classstan_1_1mcmc_1_1var__adaptation.html">var_adaptation</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1stepsize__var__adapter.html#a63d086dbff4db90650091784bd48e54a">get_var_adaptation</a> ()</td></tr>
 <tr class="separator:a63d086dbff4db90650091784bd48e54a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9de24f09147a18ab6974426a518ba691"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1stepsize__var__adapter.html#a9de24f09147a18ab6974426a518ba691">set_window_params</a> (unsigned int num_warmup, unsigned int init_buffer, unsigned int term_buffer, unsigned int base_window, std::ostream *e=0)</td></tr>
+<tr class="separator:a9de24f09147a18ab6974426a518ba691"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classstan_1_1mcmc_1_1base__adapter"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classstan_1_1mcmc_1_1base__adapter')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classstan_1_1mcmc_1_1base__adapter.html">stan::mcmc::base_adapter</a></td></tr>
 <tr class="memitem:ac1d2bf71f98f15445b607766f5451bba inherit pub_methods_classstan_1_1mcmc_1_1base__adapter"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1base__adapter.html#ac1d2bf71f98f15445b607766f5451bba">base_adapter</a> ()</td></tr>
 <tr class="separator:ac1d2bf71f98f15445b607766f5451bba inherit pub_methods_classstan_1_1mcmc_1_1base__adapter"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -143,7 +145,7 @@ Protected Attributes</h2></td></tr>
 <div class="textblock">
 <p>Definition at line <a class="el" href="stepsize__var__adapter_8hpp_source.html#l00012">12</a> of file <a class="el" href="stepsize__var__adapter_8hpp_source.html">stepsize_var_adapter.hpp</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="ab70dda7721ebc026ef5293da66cfeb04"></a>
+<a class="anchor" id="a1599b792341a655efeeebadf15c08d63"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -154,18 +156,8 @@ Protected Attributes</h2></td></tr>
           <td class="memname">stan::mcmc::stepsize_var_adapter::stepsize_var_adapter </td>
           <td>(</td>
           <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>n</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramname"><em>n</em></td><td>)</td>
           <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>max_adapt</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -230,6 +222,60 @@ Protected Attributes</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="a9de24f09147a18ab6974426a518ba691"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void stan::mcmc::stepsize_var_adapter::set_window_params </td>
+          <td>(</td>
+          <td class="paramtype">unsigned int&#160;</td>
+          <td class="paramname"><em>num_warmup</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned int&#160;</td>
+          <td class="paramname"><em>init_buffer</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned int&#160;</td>
+          <td class="paramname"><em>term_buffer</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned int&#160;</td>
+          <td class="paramname"><em>base_window</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::ostream *&#160;</td>
+          <td class="paramname"><em>e</em> = <code>0</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Definition at line <a class="el" href="stepsize__var__adapter_8hpp_source.html#l00027">27</a> of file <a class="el" href="stepsize__var__adapter_8hpp_source.html">stepsize_var_adapter.hpp</a>.</p>
+
+</div>
+</div>
 <h2 class="groupheader">Member Data Documentation</h2>
 <a class="anchor" id="aed1abeb55985ad65b435e7a7ced9d4d5"></a>
 <div class="memitem">
@@ -249,7 +295,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="stepsize__var__adapter_8hpp_source.html#l00029">29</a> of file <a class="el" href="stepsize__var__adapter_8hpp_source.html">stepsize_var_adapter.hpp</a>.</p>
+<p>Definition at line <a class="el" href="stepsize__var__adapter_8hpp_source.html#l00042">42</a> of file <a class="el" href="stepsize__var__adapter_8hpp_source.html">stepsize_var_adapter.hpp</a>.</p>
 
 </div>
 </div>
@@ -271,7 +317,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="stepsize__var__adapter_8hpp_source.html#l00030">30</a> of file <a class="el" href="stepsize__var__adapter_8hpp_source.html">stepsize_var_adapter.hpp</a>.</p>
+<p>Definition at line <a class="el" href="stepsize__var__adapter_8hpp_source.html#l00043">43</a> of file <a class="el" href="stepsize__var__adapter_8hpp_source.html">stepsize_var_adapter.hpp</a>.</p>
 
 </div>
 </div>

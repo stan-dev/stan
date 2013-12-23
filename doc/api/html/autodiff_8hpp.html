@@ -89,15 +89,14 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="header">
   <div class="summary">
 <a href="#namespaces">Namespaces</a> &#124;
-<a href="#define-members">Macros</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">autodiff.hpp File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &lt;Eigen/Dense&gt;</code><br/>
-<code>#include &lt;<a class="el" href="agrad_2agrad_8hpp_source.html">stan/agrad/agrad.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="fvar_8hpp_source.html">stan/agrad/fvar.hpp</a>&gt;</code><br/>
+<div class="textblock"><code>#include &lt;<a class="el" href="_eigen_8hpp_source.html">stan/math/matrix/Eigen.hpp</a>&gt;</code><br/>
+<code>#include &lt;<a class="el" href="rev_8hpp_source.html">stan/agrad/rev.hpp</a>&gt;</code><br/>
+<code>#include &lt;<a class="el" href="fwd_8hpp_source.html">stan/agrad/fwd.hpp</a>&gt;</code><br/>
 </div>
 <p><a href="autodiff_8hpp_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -109,11 +108,6 @@ Namespaces</h2></td></tr>
 <tr class="memitem:namespacestan_1_1agrad"><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestan_1_1agrad.html">stan::agrad</a></td></tr>
 <tr class="memdesc:namespacestan_1_1agrad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function gradients via reverse-mode automatic differentiation. <br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
-Macros</h2></td></tr>
-<tr class="memitem:a90ac195153d63737038c5b747962f4df"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="autodiff_8hpp.html#a90ac195153d63737038c5b747962f4df">EIGEN_DENSEBASE_PLUGIN</a>&#160;&#160;&#160;&quot;stan/math/matrix/EigenDenseBaseAddons.h&quot;</td></tr>
-<tr class="separator:a90ac195153d63737038c5b747962f4df"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
@@ -155,21 +149,6 @@ Functions</h2></td></tr>
 <tr class="memitem:acba3577a92618529775046335dc015ac"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacestan_1_1agrad.html#acba3577a92618529775046335dc015ac">stan::agrad::grad_tr_mat_times_hessian</a> (const F &amp;f, const Eigen::Matrix&lt; double, Eigen::Dynamic, 1 &gt; &amp;x, const Eigen::Matrix&lt; double, Eigen::Dynamic, Eigen::Dynamic &gt; &amp;M, Eigen::Matrix&lt; double, Eigen::Dynamic, 1 &gt; &amp;grad_tr_MH)</td></tr>
 <tr class="separator:acba3577a92618529775046335dc015ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Macro Definition Documentation</h2>
-<a class="anchor" id="a90ac195153d63737038c5b747962f4df"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EIGEN_DENSEBASE_PLUGIN&#160;&#160;&#160;&quot;stan/math/matrix/EigenDenseBaseAddons.h&quot;</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Definition at line <a class="el" href="autodiff_8hpp_source.html#l00004">4</a> of file <a class="el" href="autodiff_8hpp_source.html">autodiff.hpp</a>.</p>
-
-</div>
-</div>
 </div><!-- contents -->
 <hr/>
 <div class="conents" style="font-size:80%;">

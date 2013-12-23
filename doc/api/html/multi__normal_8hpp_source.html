@@ -97,9 +97,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;boost/random/normal_distribution.hpp&gt;</span></div>
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;boost/random/variate_generator.hpp&gt;</span></div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;</div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="agrad_2agrad_8hpp.html">stan/agrad/agrad.hpp</a>&gt;</span></div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="agrad_2matrix_8hpp.html">stan/agrad/matrix.hpp</a>&gt;</span></div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="error__handling_8hpp.html">stan/math/error_handling.hpp</a>&gt;</span></div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="rev_8hpp.html">stan/agrad/rev.hpp</a>&gt;</span></div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="agrad_2rev_2matrix_8hpp.html">stan/agrad/rev/matrix.hpp</a>&gt;</span></div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="math_2error__handling_8hpp.html">stan/math/error_handling.hpp</a>&gt;</span></div>
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="math_2matrix_2columns__dot__product_8hpp.html">stan/math/matrix/columns_dot_product.hpp</a>&gt;</span></div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="math_2matrix_2columns__dot__self_8hpp.html">stan/math/matrix/columns_dot_self.hpp</a>&gt;</span></div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="math_2matrix_2dot__product_8hpp.html">stan/math/matrix/dot_product.hpp</a>&gt;</span></div>
@@ -191,7 +191,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;        Eigen::Matrix&lt;<span class="keyword">typename</span> </div>
 <div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;            boost::math::tools::promote_args&lt;T_covar,T_loc,T_y&gt;::type,</div>
 <div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;            Eigen::Dynamic, 1&gt; Sinv_y_minus_mu(<a class="code" href="namespacestan_1_1agrad.html#a20ea5c1fbce1ed4ad4d54fc8f2c558c2">mdivide_left_spd</a>(Sigma,y_minus_mu));</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;        lp -= 0.5 * <a class="code" href="namespacestan_1_1agrad.html#a6c698d520773ab229cae8dfbb22f840c">dot_product</a>(y_minus_mu,Sinv_y_minus_mu);</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;        lp -= 0.5 * <a class="code" href="namespacestan_1_1agrad.html#a6ab5996a680002f996384f7f7cc2ba86">dot_product</a>(y_minus_mu,Sinv_y_minus_mu);</div>
 <div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;      }</div>
 <div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;      <span class="keywordflow">return</span> lp;</div>
 <div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;    }</div>
@@ -297,7 +297,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;            boost::math::tools::promote_args&lt;T_covar,T_loc,T_y&gt;::type,</div>
 <div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;            Eigen::Dynamic,Eigen::Dynamic&gt; Sinv_z(<a class="code" href="namespacestan_1_1agrad.html#a20ea5c1fbce1ed4ad4d54fc8f2c558c2">mdivide_left_spd</a>(Sigma,z));</div>
 <div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;        </div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;        lp -= 0.5 * <a class="code" href="namespacestan_1_1agrad.html#a8baa11534c7cfb1b5e6f96bd958dfd03">sum</a>(<a class="code" href="namespacestan_1_1agrad.html#a2f7114414f452686a7ce0b173f8a5fb7">columns_dot_product</a>(z,Sinv_z));</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;        lp -= 0.5 * <a class="code" href="namespacestan_1_1agrad.html#a8baa11534c7cfb1b5e6f96bd958dfd03">sum</a>(<a class="code" href="namespacestan_1_1agrad.html#a4690cc81441d5be35328e09c11b6d0bb">columns_dot_product</a>(z,Sinv_z));</div>
 <div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;      }</div>
 <div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;      <span class="keywordflow">return</span> lp;      </div>
 <div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;    }</div>

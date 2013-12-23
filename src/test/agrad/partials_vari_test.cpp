@@ -1,6 +1,6 @@
 #include <stan/agrad/partials_vari.hpp>
 #include <gtest/gtest.h>
-#include <stan/agrad/agrad.hpp>
+#include <stan/agrad/rev.hpp>
 
 
 
@@ -96,4 +96,48 @@ TEST(AgradPartialsVari, OperandsAndPartials3) {
   EXPECT_FLOAT_EQ(-119.0, x1.adj());  // dy/dx1 = -119
   EXPECT_FLOAT_EQ(-171.0, x2.adj());  // dy/dx2 = -133
   EXPECT_FLOAT_EQ(-253.0, x3.adj());  // dy/dx2 = -253
+}
+TEST(AgradPartialsVari, OperandsAndPartials_check_throw) {
+  using stan::agrad::OperandsAndPartials;
+  using stan::agrad::var;
+  using std::vector;
+  
+  double d;
+  vector<double> D;
+  var v;
+  vector<var> V;
+  
+  OperandsAndPartials<> o1(d,d,d,d,d,d);
+  EXPECT_THROW(o1.d_x1[0], std::out_of_range);
+  EXPECT_THROW(o1.d_x2[0], std::out_of_range);
+  EXPECT_THROW(o1.d_x3[0], std::out_of_range);
+  EXPECT_THROW(o1.d_x4[0], std::out_of_range);
+  EXPECT_THROW(o1.d_x5[0], std::out_of_range);
+  EXPECT_THROW(o1.d_x6[0], std::out_of_range);
+
+  OperandsAndPartials<var,var,var,var,var,var> o2(v,v,v,v,v,v);
+  EXPECT_NO_THROW(o2.d_x1[0]);
+  EXPECT_NO_THROW(o2.d_x2[0]);
+  EXPECT_NO_THROW(o2.d_x3[0]);
+  EXPECT_NO_THROW(o2.d_x4[0]);
+  EXPECT_NO_THROW(o2.d_x5[0]);
+  EXPECT_NO_THROW(o2.d_x6[0]);
+
+  OperandsAndPartials<vector<double>,vector<double>,vector<double>,
+                      vector<double>,vector<double>,vector<double> > o3(D,D,D,D,D,D);
+  EXPECT_THROW(o3.d_x1[0], std::out_of_range);
+  EXPECT_THROW(o3.d_x2[0], std::out_of_range);
+  EXPECT_THROW(o3.d_x3[0], std::out_of_range);
+  EXPECT_THROW(o3.d_x4[0], std::out_of_range);
+  EXPECT_THROW(o3.d_x5[0], std::out_of_range);
+  EXPECT_THROW(o3.d_x6[0], std::out_of_range);
+
+  OperandsAndPartials<vector<var>,vector<var>,vector<var>,
+                      vector<var>,vector<var>,vector<var> > o4(V,V,V,V,V,V);
+  EXPECT_NO_THROW(o4.d_x1[0]);
+  EXPECT_NO_THROW(o4.d_x2[0]);
+  EXPECT_NO_THROW(o4.d_x3[0]);
+  EXPECT_NO_THROW(o4.d_x4[0]);
+  EXPECT_NO_THROW(o4.d_x5[0]);
+  EXPECT_NO_THROW(o4.d_x6[0]);
 }

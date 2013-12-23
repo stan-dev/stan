@@ -114,8 +114,8 @@ Inheritance diagram for stan::mcmc::ps_point:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a9e9b316e02d3cf0df34cb670f5136404"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1ps__point.html#a9e9b316e02d3cf0df34cb670f5136404">ps_point</a> (int n, int m)</td></tr>
-<tr class="separator:a9e9b316e02d3cf0df34cb670f5136404"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab3577ab2d8d6109485e03e893e770654"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1ps__point.html#ab3577ab2d8d6109485e03e893e770654">ps_point</a> (int n)</td></tr>
+<tr class="separator:ab3577ab2d8d6109485e03e893e770654"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa31c2f392681f074461372c98f76b7d0"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1ps__point.html#aa31c2f392681f074461372c98f76b7d0">ps_point</a> (const <a class="el" href="classstan_1_1mcmc_1_1ps__point.html">ps_point</a> &amp;z)</td></tr>
 <tr class="separator:aa31c2f392681f074461372c98f76b7d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6465e2b1c8c8abf56bd716fcb069be47"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classstan_1_1mcmc_1_1ps__point.html">ps_point</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1ps__point.html#a6465e2b1c8c8abf56bd716fcb069be47">operator=</a> (const <a class="el" href="classstan_1_1mcmc_1_1ps__point.html">ps_point</a> &amp;z)</td></tr>
@@ -129,10 +129,8 @@ Public Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:a922ff5db7eca27ba7972d1c1d841ffc4"><td class="memItemLeft" align="right" valign="top">std::vector&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1ps__point.html#a922ff5db7eca27ba7972d1c1d841ffc4">q</a></td></tr>
-<tr class="separator:a922ff5db7eca27ba7972d1c1d841ffc4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5f209c8d7c6101980c2e1f9454c823ce"><td class="memItemLeft" align="right" valign="top">std::vector&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1ps__point.html#a5f209c8d7c6101980c2e1f9454c823ce">r</a></td></tr>
-<tr class="separator:a5f209c8d7c6101980c2e1f9454c823ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3a12cd50a8d7e0d8c698a4debc767283"><td class="memItemLeft" align="right" valign="top">Eigen::VectorXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1ps__point.html#a3a12cd50a8d7e0d8c698a4debc767283">q</a></td></tr>
+<tr class="separator:a3a12cd50a8d7e0d8c698a4debc767283"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1bb62217e59e573da4cc5ff391c1b2ce"><td class="memItemLeft" align="right" valign="top">Eigen::VectorXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1ps__point.html#a1bb62217e59e573da4cc5ff391c1b2ce">p</a></td></tr>
 <tr class="separator:a1bb62217e59e573da4cc5ff391c1b2ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a21cea778ac74b5c026a2f23fbae71304"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1mcmc_1_1ps__point.html#a21cea778ac74b5c026a2f23fbae71304">V</a></td></tr>
@@ -153,7 +151,7 @@ Protected Member Functions</h2></td></tr>
 <div class="textblock">
 <p>Definition at line <a class="el" href="ps__point_8hpp_source.html#l00016">16</a> of file <a class="el" href="ps__point_8hpp_source.html">ps_point.hpp</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="a9e9b316e02d3cf0df34cb670f5136404"></a>
+<a class="anchor" id="ab3577ab2d8d6109485e03e893e770654"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -164,18 +162,8 @@ Protected Member Functions</h2></td></tr>
           <td class="memname">stan::mcmc::ps_point::ps_point </td>
           <td>(</td>
           <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>n</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramname"><em>n</em></td><td>)</td>
           <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>m</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -250,7 +238,7 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="ps__point_8hpp_source.html#l00086">86</a> of file <a class="el" href="ps__point_8hpp_source.html">ps_point.hpp</a>.</p>
+<p>Definition at line <a class="el" href="ps__point_8hpp_source.html#l00085">85</a> of file <a class="el" href="ps__point_8hpp_source.html">ps_point.hpp</a>.</p>
 
 </div>
 </div>
@@ -288,7 +276,7 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="ps__point_8hpp_source.html#l00080">80</a> of file <a class="el" href="ps__point_8hpp_source.html">ps_point.hpp</a>.</p>
+<p>Definition at line <a class="el" href="ps__point_8hpp_source.html#l00079">79</a> of file <a class="el" href="ps__point_8hpp_source.html">ps_point.hpp</a>.</p>
 
 </div>
 </div>
@@ -324,7 +312,7 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="ps__point_8hpp_source.html#l00053">53</a> of file <a class="el" href="ps__point_8hpp_source.html">ps_point.hpp</a>.</p>
+<p>Definition at line <a class="el" href="ps__point_8hpp_source.html#l00052">52</a> of file <a class="el" href="ps__point_8hpp_source.html">ps_point.hpp</a>.</p>
 
 </div>
 </div>
@@ -350,7 +338,7 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="ps__point_8hpp_source.html#l00063">63</a> of file <a class="el" href="ps__point_8hpp_source.html">ps_point.hpp</a>.</p>
+<p>Definition at line <a class="el" href="ps__point_8hpp_source.html#l00062">62</a> of file <a class="el" href="ps__point_8hpp_source.html">ps_point.hpp</a>.</p>
 
 </div>
 </div>
@@ -376,7 +364,7 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="ps__point_8hpp_source.html#l00029">29</a> of file <a class="el" href="ps__point_8hpp_source.html">ps_point.hpp</a>.</p>
+<p>Definition at line <a class="el" href="ps__point_8hpp_source.html#l00030">30</a> of file <a class="el" href="ps__point_8hpp_source.html">ps_point.hpp</a>.</p>
 
 </div>
 </div>
@@ -404,7 +392,7 @@ template&lt;typename T &gt; </div>
 
 <p>Reimplemented in <a class="el" href="classstan_1_1mcmc_1_1dense__e__point.html#a9a5591a32c9768f2dd6e80f92b16cf93">stan::mcmc::dense_e_point</a>, and <a class="el" href="classstan_1_1mcmc_1_1diag__e__point.html#a8002286217f14c53715bffe395b9755d">stan::mcmc::diag_e_point</a>.</p>
 
-<p>Definition at line <a class="el" href="ps__point_8hpp_source.html#l00072">72</a> of file <a class="el" href="ps__point_8hpp_source.html">ps_point.hpp</a>.</p>
+<p>Definition at line <a class="el" href="ps__point_8hpp_source.html#l00071">71</a> of file <a class="el" href="ps__point_8hpp_source.html">ps_point.hpp</a>.</p>
 
 </div>
 </div>
@@ -419,7 +407,7 @@ template&lt;typename T &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="ps__point_8hpp_source.html#l00051">51</a> of file <a class="el" href="ps__point_8hpp_source.html">ps_point.hpp</a>.</p>
+<p>Definition at line <a class="el" href="ps__point_8hpp_source.html#l00050">50</a> of file <a class="el" href="ps__point_8hpp_source.html">ps_point.hpp</a>.</p>
 
 </div>
 </div>
@@ -433,35 +421,21 @@ template&lt;typename T &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="ps__point_8hpp_source.html#l00048">48</a> of file <a class="el" href="ps__point_8hpp_source.html">ps_point.hpp</a>.</p>
+<p>Definition at line <a class="el" href="ps__point_8hpp_source.html#l00047">47</a> of file <a class="el" href="ps__point_8hpp_source.html">ps_point.hpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a922ff5db7eca27ba7972d1c1d841ffc4"></a>
+<a class="anchor" id="a3a12cd50a8d7e0d8c698a4debc767283"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">std::vector&lt;double&gt; stan::mcmc::ps_point::q</td>
+          <td class="memname">Eigen::VectorXd stan::mcmc::ps_point::q</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 <p>Definition at line <a class="el" href="ps__point_8hpp_source.html#l00046">46</a> of file <a class="el" href="ps__point_8hpp_source.html">ps_point.hpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a5f209c8d7c6101980c2e1f9454c823ce"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::vector&lt;int&gt; stan::mcmc::ps_point::r</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Definition at line <a class="el" href="ps__point_8hpp_source.html#l00047">47</a> of file <a class="el" href="ps__point_8hpp_source.html">ps_point.hpp</a>.</p>
 
 </div>
 </div>
@@ -475,7 +449,7 @@ template&lt;typename T &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="ps__point_8hpp_source.html#l00050">50</a> of file <a class="el" href="ps__point_8hpp_source.html">ps_point.hpp</a>.</p>
+<p>Definition at line <a class="el" href="ps__point_8hpp_source.html#l00049">49</a> of file <a class="el" href="ps__point_8hpp_source.html">ps_point.hpp</a>.</p>
 
 </div>
 </div>

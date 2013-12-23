@@ -96,11 +96,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor"></span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="prob_2constants_8hpp.html">stan/prob/constants.hpp</a>&gt;</span></div>
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="matrix__error__handling_8hpp.html">stan/math/matrix_error_handling.hpp</a>&gt;</span></div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="error__handling_8hpp.html">stan/math/error_handling.hpp</a>&gt;</span></div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="math_2error__handling_8hpp.html">stan/math/error_handling.hpp</a>&gt;</span></div>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="prob_2traits_8hpp.html">stan/prob/traits.hpp</a>&gt;</span></div>
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="meta_2traits_8hpp.html">stan/meta/traits.hpp</a>&gt;</span></div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="agrad_2agrad_8hpp.html">stan/agrad/agrad.hpp</a>&gt;</span></div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="agrad_2matrix_8hpp.html">stan/agrad/matrix.hpp</a>&gt;</span></div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="rev_8hpp.html">stan/agrad/rev.hpp</a>&gt;</span></div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="agrad_2rev_2matrix_8hpp.html">stan/agrad/rev/matrix.hpp</a>&gt;</span></div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="wishart_8hpp.html">stan/prob/distributions/multivariate/continuous/wishart.hpp</a>&quot;</span></div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="math_2matrix_2ldlt_8hpp.html">stan/math/matrix/ldlt.hpp</a>&gt;</span></div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;</div>
@@ -143,7 +143,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;        <span class="keywordflow">return</span> lp;</div>
 <div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;      <span class="comment">// FIXME: domain checks</span></div>
 <div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;        </div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;      <span class="keyword">using</span> <a class="code" href="namespacestan_1_1math.html#a3a672486593d10650d0646b513637305" title="Return the natural logarithm of the multivariate gamma function with the speciifed dimensions and arg...">stan::math::lmgamma</a>;</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;      <span class="keyword">using</span> <a class="code" href="namespacestan_1_1math.html#a0ee0706b2cb6d2e1da2c3b6041c06a56" title="Return the natural logarithm of the multivariate gamma function with the speciifed dimensions and arg...">stan::math::lmgamma</a>;</div>
 <div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;      <span class="keyword">using</span> <a class="code" href="namespacestan_1_1math.html#a306d737ee042b8f40e93713cd87fe48b">stan::math::log_determinant_ldlt</a>;</div>
 <div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;      <span class="keyword">using</span> <a class="code" href="namespacestan_1_1math.html#a978022fb9cb20fd35f6e9e89ab3bc871">stan::math::mdivide_left_ldlt</a>;</div>
 <div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;      <span class="keyword">using</span> <a class="code" href="namespacestan_1_1math.html#a7001fd7e0296d5dae6ab0a88e1a28547" title="Returns the trace of the specified matrix.">stan::math::trace</a>;</div>
@@ -167,7 +167,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;      }</div>
 <div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;      </div>
 <div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;      <span class="keywordflow">if</span> (<a class="code" href="structstan_1_1prob_1_1include__summand.html" title="Template metaprogram to calculate whether a summand needs to be included in a proportional (log) prob...">include_summand&lt;propto,T_dof&gt;::value</a>)</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;        lp -= <a class="code" href="namespacestan_1_1agrad.html#a4a9ba7d837bdf45b487870b6e838e740">lmgamma</a>(k, 0.5 * nu);</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;        lp -= <a class="code" href="namespacestan_1_1agrad.html#abcf5c1dacc44b491a46040004177e1ad">lmgamma</a>(k, 0.5 * nu);</div>
 <div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;      <span class="keywordflow">if</span> (<a class="code" href="structstan_1_1prob_1_1include__summand.html" title="Template metaprogram to calculate whether a summand needs to be included in a proportional (log) prob...">include_summand&lt;propto,T_dof,T_scale&gt;::value</a>) {</div>
 <div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;        lp += 0.5 * nu * <a class="code" href="namespacestan_1_1agrad.html#a836b4fbc18e46a0b211c77362ee5ea7f">log_determinant_ldlt</a>(ldlt_S);</div>
 <div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;      }</div>

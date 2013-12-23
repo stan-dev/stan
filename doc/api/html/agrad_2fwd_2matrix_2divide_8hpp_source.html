@@ -96,8 +96,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor"></span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;vector&gt;</span></div>
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="_eigen_8hpp.html">stan/math/matrix/Eigen.hpp</a>&gt;</span></div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="fvar_8hpp.html">stan/agrad/fvar.hpp</a>&gt;</span></div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="fwd_2operator__division_8hpp.html">stan/agrad/fwd/operator_division.hpp</a>&gt;</span></div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="fwd_8hpp.html">stan/agrad/fwd.hpp</a>&gt;</span></div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="fwd_2operators_2operator__division_8hpp.html">stan/agrad/fwd/operators/operator_division.hpp</a>&gt;</span></div>
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="to__fvar_8hpp.html">stan/agrad/fwd/matrix/to_fvar.hpp</a>&gt;</span></div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="agrad_2fwd_2matrix_2typedefs_8hpp.html">stan/agrad/fwd/matrix/typedefs.hpp</a>&gt;</span></div>
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;</div>
@@ -111,80 +111,61 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;      <span class="keywordflow">return</span> v / c;</div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;    }</div>
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T1, <span class="keyword">typename</span> T2&gt;</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;    <span class="keyword">inline</span> </div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;    fvar&lt;typename stan::return_type&lt;T1,T2&gt;::type&gt;</div>
-<div class="line"><a name="l00024"></a><span class="lineno"><a class="code" href="namespacestan_1_1agrad.html#a7dc488c9215a81057508e7523f7b4e9d">   24</a></span>&#160;    <a class="code" href="namespacestan_1_1agrad.html#a8834a2f7763f46dd14e765d6c3287d23">divide</a>(<span class="keyword">const</span> <a class="code" href="structstan_1_1agrad_1_1fvar.html">fvar&lt;T1&gt;</a>&amp; v, <span class="keyword">const</span> <a class="code" href="structstan_1_1agrad_1_1fvar.html">fvar&lt;T2&gt;</a>&amp; c) {</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="namespacestan_1_1agrad.html#afd6883af022a54c60dd207c733917425">to_fvar</a>(v) / <a class="code" href="namespacestan_1_1agrad.html#afd6883af022a54c60dd207c733917425">to_fvar</a>(c);</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    }</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T1, <span class="keyword">typename</span> T2&gt;</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <span class="keyword">inline</span> </div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    fvar&lt;typename stan::return_type&lt;T1,T2&gt;::type&gt;</div>
-<div class="line"><a name="l00031"></a><span class="lineno"><a class="code" href="namespacestan_1_1agrad.html#ac834a768db6954a56bc282023851fb5f">   31</a></span>&#160;    <a class="code" href="namespacestan_1_1agrad.html#a8834a2f7763f46dd14e765d6c3287d23">divide</a>(<span class="keyword">const</span> T1&amp; v, <span class="keyword">const</span> <a class="code" href="structstan_1_1agrad_1_1fvar.html">fvar&lt;T2&gt;</a>&amp; c) {</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="namespacestan_1_1agrad.html#afd6883af022a54c60dd207c733917425">to_fvar</a>(v) / c;</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    }</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T1, <span class="keyword">typename</span> T2&gt;</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    <span class="keyword">inline</span> </div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    fvar&lt;typename stan::return_type&lt;T1,T2&gt;::type&gt;</div>
-<div class="line"><a name="l00038"></a><span class="lineno"><a class="code" href="namespacestan_1_1agrad.html#ab18eefa4f8b7ed6dd0e64328593eadb3">   38</a></span>&#160;    <a class="code" href="namespacestan_1_1agrad.html#a8834a2f7763f46dd14e765d6c3287d23">divide</a>(<span class="keyword">const</span> <a class="code" href="structstan_1_1agrad_1_1fvar.html">fvar&lt;T1&gt;</a>&amp; v, <span class="keyword">const</span> T2&amp; c) {</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;      <span class="keywordflow">return</span> v / <a class="code" href="namespacestan_1_1agrad.html#afd6883af022a54c60dd207c733917425">to_fvar</a>(c);</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    }</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T1, <span class="keyword">typename</span> T2, <span class="keywordtype">int</span> R, <span class="keywordtype">int</span> C&gt;</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <span class="keyword">inline</span> Eigen::Matrix&lt;fvar&lt;typename stan::return_type&lt;T1,T2&gt;::type&gt;,R,C&gt;</div>
-<div class="line"><a name="l00044"></a><span class="lineno"><a class="code" href="namespacestan_1_1agrad.html#a4267bcf56f671d2c3b631dd838fe6975">   44</a></span>&#160;    <a class="code" href="namespacestan_1_1agrad.html#a8834a2f7763f46dd14e765d6c3287d23">divide</a>(<span class="keyword">const</span> Eigen::Matrix&lt;<a class="code" href="structstan_1_1agrad_1_1fvar.html">fvar&lt;T1&gt;</a>, R,C&gt;&amp; v, <span class="keyword">const</span> <a class="code" href="structstan_1_1agrad_1_1fvar.html">fvar&lt;T2&gt;</a>&amp; c) {</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;      Eigen::Matrix&lt;fvar&lt;typename stan::return_type&lt;T1,T2&gt;::type&gt;,R,C&gt; res(v.rows(),v.cols());</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;      <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; v.rows(); i++) {</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;        <span class="keywordflow">for</span>(<span class="keywordtype">int</span> j = 0; j &lt; v.cols(); j++)</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;          res(i,j) = v(i,j) / c;</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;      }</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;      <span class="keywordflow">return</span> res;</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    }</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T1, <span class="keyword">typename</span> T2, <span class="keywordtype">int</span> R, <span class="keywordtype">int</span> C&gt;</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    <span class="keyword">inline</span> Eigen::Matrix&lt;fvar&lt;typename stan::return_type&lt;T1,T2&gt;::type&gt;,R,C&gt;</div>
-<div class="line"><a name="l00055"></a><span class="lineno"><a class="code" href="namespacestan_1_1agrad.html#a277382d82a3b55ba94a937c8c6ade4e0">   55</a></span>&#160;    <a class="code" href="namespacestan_1_1agrad.html#a8834a2f7763f46dd14e765d6c3287d23">divide</a>(<span class="keyword">const</span> Eigen::Matrix&lt;<a class="code" href="structstan_1_1agrad_1_1fvar.html">fvar&lt;T1&gt;</a>, R,C&gt;&amp; v, <span class="keyword">const</span> T2&amp; c) {</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;      Eigen::Matrix&lt;fvar&lt;typename stan::return_type&lt;T1,T2&gt;::type&gt;,R,C&gt; res(v.rows(),v.cols());</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;      <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; v.rows(); i++) {</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;        <span class="keywordflow">for</span>(<span class="keywordtype">int</span> j = 0; j &lt; v.cols(); j++)</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;          res(i,j) = v(i,j) / c;</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;      }</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;      <span class="keywordflow">return</span> res;</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    }</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T1, <span class="keyword">typename</span> T2, <span class="keywordtype">int</span> R, <span class="keywordtype">int</span> C&gt;</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    <span class="keyword">inline</span> Eigen::Matrix&lt;fvar&lt;typename stan::return_type&lt;T1,T2&gt;::type&gt;,R,C&gt;</div>
-<div class="line"><a name="l00066"></a><span class="lineno"><a class="code" href="namespacestan_1_1agrad.html#a9d4a8ca8d689d54a199a94ba5c2c201a">   66</a></span>&#160;    <a class="code" href="namespacestan_1_1agrad.html#a8834a2f7763f46dd14e765d6c3287d23">divide</a>(<span class="keyword">const</span> Eigen::Matrix&lt;T1, R,C&gt;&amp; v, <span class="keyword">const</span> <a class="code" href="structstan_1_1agrad_1_1fvar.html">fvar&lt;T2&gt;</a>&amp; c) {</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;      Eigen::Matrix&lt;fvar&lt;typename stan::return_type&lt;T1,T2&gt;::type&gt;,R,C&gt; res(v.rows(),v.cols());</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;      <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; v.rows(); i++) {</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;        <span class="keywordflow">for</span>(<span class="keywordtype">int</span> j = 0; j &lt; v.cols(); j++)</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;          res(i,j) = <a class="code" href="namespacestan_1_1agrad.html#afd6883af022a54c60dd207c733917425">to_fvar</a>(v(i,j)) / c;</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;      }</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;      <span class="keywordflow">return</span> res;</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    }</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T1, <span class="keyword">typename</span> T2, <span class="keywordtype">int</span> R, <span class="keywordtype">int</span> C&gt;</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    <span class="keyword">inline</span> Eigen::Matrix&lt;fvar&lt;typename stan::return_type&lt;T1,T2&gt;::type&gt;,R,C&gt;</div>
-<div class="line"><a name="l00077"></a><span class="lineno"><a class="code" href="namespacestan_1_1agrad.html#afe069700bb8375fd2be8f73f0d76c481">   77</a></span>&#160;    <a class="code" href="namespacestan_1_1agrad.html#a7712039ced9aa4a7d848369b36a81832" title="Division operator for two variables (C++).">operator/</a>(<span class="keyword">const</span> Eigen::Matrix&lt;<a class="code" href="structstan_1_1agrad_1_1fvar.html">fvar&lt;T1&gt;</a>, R,C&gt;&amp; v, <span class="keyword">const</span> <a class="code" href="structstan_1_1agrad_1_1fvar.html">fvar&lt;T2&gt;</a>&amp; c) {</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="namespacestan_1_1agrad.html#a8834a2f7763f46dd14e765d6c3287d23">divide</a>(v,c);</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    }</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T1, <span class="keyword">typename</span> T2, <span class="keywordtype">int</span> R, <span class="keywordtype">int</span> C&gt;</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    <span class="keyword">inline</span> Eigen::Matrix&lt;fvar&lt;typename stan::return_type&lt;T1,T2&gt;::type&gt;,R,C&gt;</div>
-<div class="line"><a name="l00083"></a><span class="lineno"><a class="code" href="namespacestan_1_1agrad.html#adbf49fe2fa3283e2c07c51b73a223abc">   83</a></span>&#160;    <a class="code" href="namespacestan_1_1agrad.html#a7712039ced9aa4a7d848369b36a81832" title="Division operator for two variables (C++).">operator/</a>(<span class="keyword">const</span> Eigen::Matrix&lt;<a class="code" href="structstan_1_1agrad_1_1fvar.html">fvar&lt;T1&gt;</a>, R,C&gt;&amp; v, <span class="keyword">const</span> T2&amp; c) {</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="namespacestan_1_1agrad.html#a8834a2f7763f46dd14e765d6c3287d23">divide</a>(v,c);</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    }</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T1, <span class="keyword">typename</span> T2, <span class="keywordtype">int</span> R, <span class="keywordtype">int</span> C&gt;</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    <span class="keyword">inline</span> Eigen::Matrix&lt;fvar&lt;typename stan::return_type&lt;T1,T2&gt;::type&gt;,R,C&gt;</div>
-<div class="line"><a name="l00089"></a><span class="lineno"><a class="code" href="namespacestan_1_1agrad.html#a3f99ac51c9ff49f5035258955722c5aa">   89</a></span>&#160;    <a class="code" href="namespacestan_1_1agrad.html#a7712039ced9aa4a7d848369b36a81832" title="Division operator for two variables (C++).">operator/</a>(<span class="keyword">const</span> Eigen::Matrix&lt;T1, R,C&gt;&amp; v, <span class="keyword">const</span> <a class="code" href="structstan_1_1agrad_1_1fvar.html">fvar&lt;T2&gt;</a>&amp; c) {</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="namespacestan_1_1agrad.html#a8834a2f7763f46dd14e765d6c3287d23">divide</a>(v,c);</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    }</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;  }</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;}</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T, <span class="keywordtype">int</span> R, <span class="keywordtype">int</span> C&gt;</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;    <span class="keyword">inline</span> Eigen::Matrix&lt;fvar&lt;T&gt;,R,C&gt;</div>
+<div class="line"><a name="l00023"></a><span class="lineno"><a class="code" href="namespacestan_1_1agrad.html#a8bfe03ac15191df9f6777217e8d698b8">   23</a></span>&#160;    <a class="code" href="namespacestan_1_1agrad.html#a8834a2f7763f46dd14e765d6c3287d23">divide</a>(<span class="keyword">const</span> Eigen::Matrix&lt;<a class="code" href="structstan_1_1agrad_1_1fvar.html">fvar&lt;T&gt;</a>, R,C&gt;&amp; v, <span class="keyword">const</span> <a class="code" href="structstan_1_1agrad_1_1fvar.html">fvar&lt;T&gt;</a>&amp; c) {</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;      Eigen::Matrix&lt;fvar&lt;T&gt;,R,C&gt; res(v.rows(),v.cols());</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;      <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; v.rows(); i++) {</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;        <span class="keywordflow">for</span>(<span class="keywordtype">int</span> j = 0; j &lt; v.cols(); j++)</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;          res(i,j) = v(i,j) / c;</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;      }</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;      <span class="keywordflow">return</span> res;</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    }</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T, <span class="keywordtype">int</span> R, <span class="keywordtype">int</span> C&gt;</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <span class="keyword">inline</span> Eigen::Matrix&lt;fvar&lt;T&gt;,R,C&gt;</div>
+<div class="line"><a name="l00034"></a><span class="lineno"><a class="code" href="namespacestan_1_1agrad.html#a1897f84d86b89b5485b10f20e30a2613">   34</a></span>&#160;    <a class="code" href="namespacestan_1_1agrad.html#a8834a2f7763f46dd14e765d6c3287d23">divide</a>(<span class="keyword">const</span> Eigen::Matrix&lt;<a class="code" href="structstan_1_1agrad_1_1fvar.html">fvar&lt;T&gt;</a>, R,C&gt;&amp; v, <span class="keyword">const</span> <span class="keywordtype">double</span> c) {</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;      Eigen::Matrix&lt;fvar&lt;T&gt;,R,C&gt; </div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;        res(v.rows(),v.cols());</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;      <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; v.rows(); i++) {</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;        <span class="keywordflow">for</span>(<span class="keywordtype">int</span> j = 0; j &lt; v.cols(); j++)</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;          res(i,j) = v(i,j) / c;</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;      }</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;      <span class="keywordflow">return</span> res;</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    }</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T, <span class="keywordtype">int</span> R, <span class="keywordtype">int</span> C&gt;</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keyword">inline</span> Eigen::Matrix&lt;fvar&lt;T&gt;,R,C&gt;</div>
+<div class="line"><a name="l00046"></a><span class="lineno"><a class="code" href="namespacestan_1_1agrad.html#a9e95e534e22aad48cd9a29584958f7a2">   46</a></span>&#160;    <a class="code" href="namespacestan_1_1agrad.html#a8834a2f7763f46dd14e765d6c3287d23">divide</a>(<span class="keyword">const</span> Eigen::Matrix&lt;double, R,C&gt;&amp; v, <span class="keyword">const</span> <a class="code" href="structstan_1_1agrad_1_1fvar.html">fvar&lt;T&gt;</a>&amp; c) {</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;      Eigen::Matrix&lt;fvar&lt;T&gt;,R,C&gt; </div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;        res(v.rows(),v.cols());</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;      <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; v.rows(); i++) {</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;        <span class="keywordflow">for</span>(<span class="keywordtype">int</span> j = 0; j &lt; v.cols(); j++)</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;          res(i,j) = v(i,j) / c;</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;      }</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;      <span class="keywordflow">return</span> res;</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    }</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T, <span class="keywordtype">int</span> R, <span class="keywordtype">int</span> C&gt;</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    <span class="keyword">inline</span> Eigen::Matrix&lt;fvar&lt;T&gt;,R,C&gt;</div>
+<div class="line"><a name="l00058"></a><span class="lineno"><a class="code" href="namespacestan_1_1agrad.html#af4268a75b7456526175bcf5db4210ef4">   58</a></span>&#160;    <a class="code" href="namespacestan_1_1agrad.html#a7712039ced9aa4a7d848369b36a81832" title="Division operator for two variables (C++).">operator/</a>(<span class="keyword">const</span> Eigen::Matrix&lt;<a class="code" href="structstan_1_1agrad_1_1fvar.html">fvar&lt;T&gt;</a>, R,C&gt;&amp; v, <span class="keyword">const</span> <a class="code" href="structstan_1_1agrad_1_1fvar.html">fvar&lt;T&gt;</a>&amp; c) {</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="namespacestan_1_1agrad.html#a8834a2f7763f46dd14e765d6c3287d23">divide</a>(v,c);</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    }</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T, <span class="keywordtype">int</span> R, <span class="keywordtype">int</span> C&gt;</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    <span class="keyword">inline</span> Eigen::Matrix&lt;fvar&lt;T&gt;,R,C&gt;</div>
+<div class="line"><a name="l00064"></a><span class="lineno"><a class="code" href="namespacestan_1_1agrad.html#a18ac8b46664850a5703fd3caa9c68c08">   64</a></span>&#160;    <a class="code" href="namespacestan_1_1agrad.html#a7712039ced9aa4a7d848369b36a81832" title="Division operator for two variables (C++).">operator/</a>(<span class="keyword">const</span> Eigen::Matrix&lt;<a class="code" href="structstan_1_1agrad_1_1fvar.html">fvar&lt;T&gt;</a>, R,C&gt;&amp; v, <span class="keyword">const</span> <span class="keywordtype">double</span> c) {</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="namespacestan_1_1agrad.html#a8834a2f7763f46dd14e765d6c3287d23">divide</a>(v,c);</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    }</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T, <span class="keywordtype">int</span> R, <span class="keywordtype">int</span> C&gt;</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    <span class="keyword">inline</span> Eigen::Matrix&lt;fvar&lt;T&gt;,R,C&gt;</div>
+<div class="line"><a name="l00070"></a><span class="lineno"><a class="code" href="namespacestan_1_1agrad.html#abc825eb3bf95f70a94e073eaaddff374">   70</a></span>&#160;    <a class="code" href="namespacestan_1_1agrad.html#a7712039ced9aa4a7d848369b36a81832" title="Division operator for two variables (C++).">operator/</a>(<span class="keyword">const</span> Eigen::Matrix&lt;double,R,C&gt;&amp; v, <span class="keyword">const</span> <a class="code" href="structstan_1_1agrad_1_1fvar.html">fvar&lt;T&gt;</a>&amp; c) {</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="namespacestan_1_1agrad.html#a8834a2f7763f46dd14e765d6c3287d23">divide</a>(v,c);</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    }</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;  }</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;}</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
 <hr/>
 <div class="conents" style="font-size:80%;">

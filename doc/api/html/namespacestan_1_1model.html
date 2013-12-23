@@ -114,6 +114,14 @@ Functions</h2></td></tr>
 <tr class="memitem:aad33e9d6c10b589acbe6e527b5f9de80"><td class="memTemplItemLeft" align="right" valign="top">double&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacestan_1_1model.html#aad33e9d6c10b589acbe6e527b5f9de80">log_prob_grad</a> (const M &amp;model, std::vector&lt; double &gt; &amp;params_r, std::vector&lt; int &gt; &amp;params_i, std::vector&lt; double &gt; &amp;gradient, std::ostream *msgs=0)</td></tr>
 <tr class="memdesc:aad33e9d6c10b589acbe6e527b5f9de80"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute the gradient using reverse-mode automatic differentiation, writing the result into the specified gradient, using the specified perturbation.  <a href="#aad33e9d6c10b589acbe6e527b5f9de80"></a><br/></td></tr>
 <tr class="separator:aad33e9d6c10b589acbe6e527b5f9de80"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0267095f157269950cfd3f1f402abe21"><td class="memTemplParams" colspan="2">template&lt;bool jacobian_adjust_transform, class M &gt; </td></tr>
+<tr class="memitem:a0267095f157269950cfd3f1f402abe21"><td class="memTemplItemLeft" align="right" valign="top">double&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacestan_1_1model.html#a0267095f157269950cfd3f1f402abe21">log_prob_propto</a> (const M &amp;model, Eigen::VectorXd &amp;params_r, std::ostream *msgs=0)</td></tr>
+<tr class="memdesc:a0267095f157269950cfd3f1f402abe21"><td class="mdescLeft">&#160;</td><td class="mdescRight">Helper function to calculate log probability for <code>double</code> scalars up to a proportion.  <a href="#a0267095f157269950cfd3f1f402abe21"></a><br/></td></tr>
+<tr class="separator:a0267095f157269950cfd3f1f402abe21"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa8bbac348a197c17f86d57cc3a65e7d2"><td class="memTemplParams" colspan="2">template&lt;bool propto, bool jacobian_adjust_transform, class M &gt; </td></tr>
+<tr class="memitem:aa8bbac348a197c17f86d57cc3a65e7d2"><td class="memTemplItemLeft" align="right" valign="top">double&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacestan_1_1model.html#aa8bbac348a197c17f86d57cc3a65e7d2">log_prob_grad</a> (const M &amp;model, Eigen::VectorXd &amp;params_r, Eigen::VectorXd &amp;gradient, std::ostream *msgs=0)</td></tr>
+<tr class="memdesc:aa8bbac348a197c17f86d57cc3a65e7d2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute the gradient using reverse-mode automatic differentiation, writing the result into the specified gradient, using the specified perturbation.  <a href="#aa8bbac348a197c17f86d57cc3a65e7d2"></a><br/></td></tr>
+<tr class="separator:aa8bbac348a197c17f86d57cc3a65e7d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2660b5de2ccd8322d61f077d43289d18"><td class="memTemplParams" colspan="2">template&lt;bool propto, bool jacobian_adjust_transform, class M &gt; </td></tr>
 <tr class="memitem:a2660b5de2ccd8322d61f077d43289d18"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacestan_1_1model.html#a2660b5de2ccd8322d61f077d43289d18">finite_diff_grad</a> (const M &amp;model, std::vector&lt; double &gt; &amp;params_r, std::vector&lt; int &gt; &amp;params_i, std::vector&lt; double &gt; &amp;grad, double epsilon=1e-6, std::ostream *msgs=0)</td></tr>
 <tr class="memdesc:a2660b5de2ccd8322d61f077d43289d18"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute the gradient using finite differences for the specified parameters, writing the result into the specified gradient, using the specified perturbation.  <a href="#a2660b5de2ccd8322d61f077d43289d18"></a><br/></td></tr>
@@ -201,7 +209,7 @@ template&lt;bool propto, bool jacobian_adjust_transform, class M &gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="model_2util_8hpp_source.html#l00125">125</a> of file <a class="el" href="model_2util_8hpp_source.html">util.hpp</a>.</p>
+<p>Definition at line <a class="el" href="model_2util_8hpp_source.html#l00212">212</a> of file <a class="el" href="model_2util_8hpp_source.html">util.hpp</a>.</p>
 
 </div>
 </div>
@@ -277,7 +285,7 @@ template&lt;bool propto, bool jacobian_adjust_transform, class M &gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="model_2util_8hpp_source.html#l00249">249</a> of file <a class="el" href="model_2util_8hpp_source.html">util.hpp</a>.</p>
+<p>Definition at line <a class="el" href="model_2util_8hpp_source.html#l00336">336</a> of file <a class="el" href="model_2util_8hpp_source.html">util.hpp</a>.</p>
 
 </div>
 </div>
@@ -345,7 +353,68 @@ template&lt;bool propto, bool jacobian_adjust_transform, class M &gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="model_2util_8hpp_source.html#l00079">79</a> of file <a class="el" href="model_2util_8hpp_source.html">util.hpp</a>.</p>
+<p>Definition at line <a class="el" href="model_2util_8hpp_source.html#l00081">81</a> of file <a class="el" href="model_2util_8hpp_source.html">util.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aa8bbac348a197c17f86d57cc3a65e7d2"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;bool propto, bool jacobian_adjust_transform, class M &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">double stan::model::log_prob_grad </td>
+          <td>(</td>
+          <td class="paramtype">const M &amp;&#160;</td>
+          <td class="paramname"><em>model</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Eigen::VectorXd &amp;&#160;</td>
+          <td class="paramname"><em>params_r</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Eigen::VectorXd &amp;&#160;</td>
+          <td class="paramname"><em>gradient</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::ostream *&#160;</td>
+          <td class="paramname"><em>msgs</em> = <code>0</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Compute the gradient using reverse-mode automatic differentiation, writing the result into the specified gradient, using the specified perturbation. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">propto</td><td>True if calculation is up to proportion (double-only terms dropped). </td></tr>
+    <tr><td class="paramname">jacobian_adjust_transform</td><td>True if the log absolute Jacobian determinant of inverse parameter transforms is added to the log probability. </td></tr>
+    <tr><td class="paramname">M</td><td>Class of model. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">model</td><td>Model. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">params_r</td><td>Real-valued parameters. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">gradient</td><td>Vector into which gradient is written. </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">msgs</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="model_2util_8hpp_source.html#l00168">168</a> of file <a class="el" href="model_2util_8hpp_source.html">util.hpp</a>.</p>
 
 </div>
 </div>
@@ -407,7 +476,62 @@ template&lt;bool jacobian_adjust_transform, class M &gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="model_2util_8hpp_source.html#l00037">37</a> of file <a class="el" href="model_2util_8hpp_source.html">util.hpp</a>.</p>
+<p>Definition at line <a class="el" href="model_2util_8hpp_source.html#l00039">39</a> of file <a class="el" href="model_2util_8hpp_source.html">util.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a0267095f157269950cfd3f1f402abe21"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;bool jacobian_adjust_transform, class M &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">double stan::model::log_prob_propto </td>
+          <td>(</td>
+          <td class="paramtype">const M &amp;&#160;</td>
+          <td class="paramname"><em>model</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Eigen::VectorXd &amp;&#160;</td>
+          <td class="paramname"><em>params_r</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::ostream *&#160;</td>
+          <td class="paramname"><em>msgs</em> = <code>0</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Helper function to calculate log probability for <code>double</code> scalars up to a proportion. </p>
+<p>This implementation wraps the <code>double</code> values in <code><a class="el" href="classstan_1_1agrad_1_1var.html" title="Independent (input) and dependent (output) variables for gradients.">stan::agrad::var</a></code> and calls the model's <code>log_prob()</code> function with <code>propto=true</code> and the specified parameter for applying the Jacobian adjustment for transformed parameters.</p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">propto</td><td>True if calculation is up to proportion (double-only terms dropped). </td></tr>
+    <tr><td class="paramname">jacobian_adjust_transform</td><td>True if the log absolute Jacobian determinant of inverse parameter transforms is added to the log probability. </td></tr>
+    <tr><td class="paramname">M</td><td>Class of model. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">model</td><td>Model. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">params_r</td><td>Real-valued parameters. </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">msgs</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="model_2util_8hpp_source.html#l00129">129</a> of file <a class="el" href="model_2util_8hpp_source.html">util.hpp</a>.</p>
 
 </div>
 </div>
@@ -491,7 +615,7 @@ template&lt;bool propto, bool jacobian_adjust_transform, class M &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>number of failed gradient comparisons versus allowed error, so 0 if all gradients pass </dd></dl>
 
-<p>Definition at line <a class="el" href="model_2util_8hpp_source.html#l00176">176</a> of file <a class="el" href="model_2util_8hpp_source.html">util.hpp</a>.</p>
+<p>Definition at line <a class="el" href="model_2util_8hpp_source.html#l00263">263</a> of file <a class="el" href="model_2util_8hpp_source.html">util.hpp</a>.</p>
 
 </div>
 </div>

@@ -95,8 +95,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">traits.hpp File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &lt;<a class="el" href="fwd_2fvar_8hpp_source.html">stan/agrad/fwd/fvar.hpp</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="rev_2var_8hpp_source.html">stan/agrad/rev/var.hpp</a>&gt;</code><br/>
+<div class="textblock"><code>#include &lt;<a class="el" href="fvar_8hpp_source.html">stan/agrad/fwd/fvar.hpp</a>&gt;</code><br/>
+<code>#include &lt;<a class="el" href="var_8hpp_source.html">stan/agrad/rev/var.hpp</a>&gt;</code><br/>
 <code>#include &lt;vector&gt;</code><br/>
 <code>#include &lt;boost/type_traits.hpp&gt;</code><br/>
 <code>#include &lt;boost/type_traits/is_arithmetic.hpp&gt;</code><br/>
@@ -148,13 +148,16 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structstan_1_1is__vector__like_3_01_eigen_1_1_matrix_3_01_t_00_01_eigen_1_1_dynamic_00_01_eigen_1_1_dynamic_01_4_01_4.html">stan::is_vector_like&lt; Eigen::Matrix&lt; T, Eigen::Dynamic, Eigen::Dynamic &gt; &gt;</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1_vector_view.html">stan::VectorView&lt; T, is_array &gt;</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1_vector_view.html">stan::VectorView&lt; T, is_array, throw_if_accessed &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classstan_1_1_vector_view.html" title="VectorView is a template metaprogram that takes its argument and allows it to be used like a vector...">VectorView</a> is a template metaprogram that takes its argument and allows it to be used like a vector.  <a href="classstan_1_1_vector_view.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1_vector_view_3_01const_01_t_00_01is__array_01_4.html">stan::VectorView&lt; const T, is_array &gt;</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1_vector_view_3_01const_01_t_00_01is__array_00_01throw__if__accessed_01_4.html">stan::VectorView&lt; const T, is_array, throw_if_accessed &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classstan_1_1_vector_view.html" title="VectorView is a template metaprogram that takes its argument and allows it to be used like a vector...">VectorView</a> that has const correctness.  <a href="classstan_1_1_vector_view_3_01const_01_t_00_01is__array_00_01throw__if__accessed_01_4.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1_vector_view_3_01const_01double_00_01false_01_4.html">stan::VectorView&lt; const double, false &gt;</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1_vector_view_3_01const_01double_00_01false_00_01false_01_4.html">stan::VectorView&lt; const double, false, false &gt;</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1_double_vector_view.html">stan::DoubleVectorView&lt; used, is_vec &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classstan_1_1_double_vector_view.html" title="DoubleVectorView allocates double values to be used as intermediate values.">DoubleVectorView</a> allocates double values to be used as intermediate values.  <a href="classstan_1_1_double_vector_view.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstan_1_1_double_vector_view_3_01true_00_01false_01_4.html">stan::DoubleVectorView&lt; true, false &gt;</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>

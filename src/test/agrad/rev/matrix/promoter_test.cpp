@@ -1,7 +1,9 @@
+#include <stan/math/matrix/promoter.hpp>
+#include <stan/math/matrix/promote_common.hpp>
 #include <gtest/gtest.h>
 #include <test/agrad/util.hpp>
-#include <stan/agrad/agrad.hpp>
-#include <stan/agrad/matrix.hpp>
+#include <stan/agrad/rev.hpp>
+#include <stan/agrad/rev/matrix.hpp>
 
 TEST(AgradRevMatrix, promoter) {
   using stan::math::promoter;

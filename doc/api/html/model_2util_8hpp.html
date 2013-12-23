@@ -98,7 +98,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <code>#include &lt;iomanip&gt;</code><br/>
 <code>#include &lt;iostream&gt;</code><br/>
 <code>#include &lt;vector&gt;</code><br/>
-<code>#include &lt;<a class="el" href="rev_2var_8hpp_source.html">stan/agrad/rev/var.hpp</a>&gt;</code><br/>
+<code>#include &lt;<a class="el" href="_eigen_8hpp_source.html">stan/math/matrix/Eigen.hpp</a>&gt;</code><br/>
+<code>#include &lt;<a class="el" href="grad_8hpp_source.html">stan/agrad/rev/matrix/grad.hpp</a>&gt;</code><br/>
+<code>#include &lt;<a class="el" href="var_8hpp_source.html">stan/agrad/rev/var.hpp</a>&gt;</code><br/>
 </div>
 <p><a href="model_2util_8hpp_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -121,6 +123,14 @@ Functions</h2></td></tr>
 <tr class="memitem:aad33e9d6c10b589acbe6e527b5f9de80"><td class="memTemplItemLeft" align="right" valign="top">double&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacestan_1_1model.html#aad33e9d6c10b589acbe6e527b5f9de80">stan::model::log_prob_grad</a> (const M &amp;model, std::vector&lt; double &gt; &amp;params_r, std::vector&lt; int &gt; &amp;params_i, std::vector&lt; double &gt; &amp;gradient, std::ostream *msgs=0)</td></tr>
 <tr class="memdesc:aad33e9d6c10b589acbe6e527b5f9de80"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute the gradient using reverse-mode automatic differentiation, writing the result into the specified gradient, using the specified perturbation.  <a href="#aad33e9d6c10b589acbe6e527b5f9de80"></a><br/></td></tr>
 <tr class="separator:aad33e9d6c10b589acbe6e527b5f9de80"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0267095f157269950cfd3f1f402abe21"><td class="memTemplParams" colspan="2">template&lt;bool jacobian_adjust_transform, class M &gt; </td></tr>
+<tr class="memitem:a0267095f157269950cfd3f1f402abe21"><td class="memTemplItemLeft" align="right" valign="top">double&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacestan_1_1model.html#a0267095f157269950cfd3f1f402abe21">stan::model::log_prob_propto</a> (const M &amp;model, Eigen::VectorXd &amp;params_r, std::ostream *msgs=0)</td></tr>
+<tr class="memdesc:a0267095f157269950cfd3f1f402abe21"><td class="mdescLeft">&#160;</td><td class="mdescRight">Helper function to calculate log probability for <code>double</code> scalars up to a proportion.  <a href="#a0267095f157269950cfd3f1f402abe21"></a><br/></td></tr>
+<tr class="separator:a0267095f157269950cfd3f1f402abe21"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa8bbac348a197c17f86d57cc3a65e7d2"><td class="memTemplParams" colspan="2">template&lt;bool propto, bool jacobian_adjust_transform, class M &gt; </td></tr>
+<tr class="memitem:aa8bbac348a197c17f86d57cc3a65e7d2"><td class="memTemplItemLeft" align="right" valign="top">double&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacestan_1_1model.html#aa8bbac348a197c17f86d57cc3a65e7d2">stan::model::log_prob_grad</a> (const M &amp;model, Eigen::VectorXd &amp;params_r, Eigen::VectorXd &amp;gradient, std::ostream *msgs=0)</td></tr>
+<tr class="memdesc:aa8bbac348a197c17f86d57cc3a65e7d2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute the gradient using reverse-mode automatic differentiation, writing the result into the specified gradient, using the specified perturbation.  <a href="#aa8bbac348a197c17f86d57cc3a65e7d2"></a><br/></td></tr>
+<tr class="separator:aa8bbac348a197c17f86d57cc3a65e7d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2660b5de2ccd8322d61f077d43289d18"><td class="memTemplParams" colspan="2">template&lt;bool propto, bool jacobian_adjust_transform, class M &gt; </td></tr>
 <tr class="memitem:a2660b5de2ccd8322d61f077d43289d18"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacestan_1_1model.html#a2660b5de2ccd8322d61f077d43289d18">stan::model::finite_diff_grad</a> (const M &amp;model, std::vector&lt; double &gt; &amp;params_r, std::vector&lt; int &gt; &amp;params_i, std::vector&lt; double &gt; &amp;grad, double epsilon=1e-6, std::ostream *msgs=0)</td></tr>
 <tr class="memdesc:a2660b5de2ccd8322d61f077d43289d18"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute the gradient using finite differences for the specified parameters, writing the result into the specified gradient, using the specified perturbation.  <a href="#a2660b5de2ccd8322d61f077d43289d18"></a><br/></td></tr>

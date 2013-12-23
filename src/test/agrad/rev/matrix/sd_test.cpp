@@ -1,9 +1,41 @@
-#include <stan/math/matrix/sd.hpp>
 #include <gtest/gtest.h>
+
+#include <iostream>
+
+#include <stan/agrad/rev.hpp>
 #include <test/agrad/util.hpp>
-#include <stan/math/matrix/typedefs.hpp>
+#include <stan/agrad/rev/matrix/sd.hpp>
 #include <stan/agrad/rev/matrix/typedefs.hpp>
-#include <stan/agrad/agrad.hpp>
+#include <stan/agrad/rev/matrix/variance.hpp>
+#include <stan/math/matrix/sd.hpp>
+#include <stan/math/matrix/typedefs.hpp>
+
+TEST(AgradRevMatrix, sd_eq) {
+  using stan::math::sd;
+  using stan::agrad::var;
+  using stan::agrad::vector_v;
+  using std::vector;
+
+  for (size_t size = 2; size <= 200; size *= 3) {
+    vector<var> x_std_vec(size);
+    vector_v x(size);
+    for (size_t i = 0; i < size; ++i) {
+      x(i) = 3;
+      x_std_vec[i] = x(i);
+    }
+
+    stan::agrad::var f = sd(x);
+    EXPECT_NEAR(0.0, f.val(), 1e-12);
+
+    vector<double> grad;
+    f.grad(x_std_vec,grad);
+
+    EXPECT_EQ(size, grad.size());
+    double analytic = std::sqrt(size) / size;
+    for (size_t j = 0; j < size; ++j)
+      EXPECT_FLOAT_EQ(analytic, grad[j]);
+  }
+}
 
 TEST(AgradRevMatrix, sd_vector) {
   using stan::math::sd;
@@ -143,4 +175,21 @@ TEST(AgradRevMatrix, sdStdVector) {
   EXPECT_EQ(3U, grad2.size());
   for (size_t i = 0; i < 3; ++i)
     EXPECT_FLOAT_EQ(grad2[i], grad1[i]);
+}
+// used to validate analytic gradient definition at limit sd(x) -> 0
+
+
+TEST(AgradRevSd, finiteDiffsMatchAnalytic) {
+  using std::sqrt;
+  using stan::math::sd;
+  for (int n = 2; n <= 128; n *= 2) {
+    double analytic = sqrt(n) / n;
+    double epsilon = 1e-7;
+    std::vector<double> y(n,1.0);
+    double sd_y = 0.0;
+    y[1] += epsilon;
+    double sd_y_plus_epsilon = sd(y);
+    double finite_diff = (sd_y_plus_epsilon - sd_y) / epsilon;
+    EXPECT_FLOAT_EQ(analytic, finite_diff);
+  }
 }

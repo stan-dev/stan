@@ -1,6 +1,7 @@
 #include <stdexcept>
 #include <gtest/gtest.h>
-#include <stan/agrad/fvar.hpp>
+#include <stan/agrad/fwd.hpp>
+#include <stan/agrad/rev.hpp>
 #include <stan/agrad/fwd/matrix/log_softmax.hpp>
 #include <stan/agrad/fwd/matrix/softmax.hpp>
 #include <stan/agrad/fwd/matrix/typedefs.hpp>

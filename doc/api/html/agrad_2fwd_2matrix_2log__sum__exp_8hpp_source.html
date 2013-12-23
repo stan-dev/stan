@@ -91,11 +91,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">log_sum_exp.hpp</div>  </div>
 </div><!--header-->
 <div class="contents">
-<a href="agrad_2fwd_2matrix_2log__sum__exp_8hpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#ifndef __STAN__AGRAD__FWD__MATRIX__LOG__SUM__EXP__HPP__</span></div>
-<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define __STAN__AGRAD__FWD__MATRIX__LOG__SUM__EXP__HPP__</span></div>
+<a href="agrad_2fwd_2matrix_2log__sum__exp_8hpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#ifndef __STAN__AGRAD__FWD__MATRIX__LOG_SUM_EXP_HPP__</span></div>
+<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define __STAN__AGRAD__FWD__MATRIX__LOG_SUM_EXP_HPP__</span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor"></span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;vector&gt;</span></div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="fwd_2fvar_8hpp.html">stan/agrad/fwd/fvar.hpp</a>&gt;</span></div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="fvar_8hpp.html">stan/agrad/fwd/fvar.hpp</a>&gt;</span></div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="math_2functions_2log__sum__exp_8hpp.html">stan/math/functions/log_sum_exp.hpp</a>&gt;</span></div>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="_eigen_8hpp.html">stan/math/matrix/Eigen.hpp</a>&gt;</span></div>
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;</div>
@@ -107,7 +107,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;    <span class="comment">// be able to generalize</span></div>
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T, <span class="keywordtype">int</span> R, <span class="keywordtype">int</span> C&gt;</div>
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;    fvar&lt;T&gt;</div>
-<div class="line"><a name="l00017"></a><span class="lineno"><a class="code" href="namespacestan_1_1agrad.html#a29fc5b9e61a97f91f9d114abe3ab05a2">   17</a></span>&#160;    <a class="code" href="namespacestan_1_1agrad.html#a4114c4822d5a54c7f1616bfc1dd87519">log_sum_exp</a>(<span class="keyword">const</span> Eigen::Matrix&lt;T,R,C&gt;&amp; v) {</div>
+<div class="line"><a name="l00017"></a><span class="lineno"><a class="code" href="namespacestan_1_1agrad.html#a5df6229f0b30f3b43f5c6b4744acc62c">   17</a></span>&#160;    <a class="code" href="namespacestan_1_1agrad.html#a6cd9f7f4203d0dd299489be37445b5e1">log_sum_exp</a>(<span class="keyword">const</span> Eigen::Matrix&lt;<a class="code" href="structstan_1_1agrad_1_1fvar.html">fvar&lt;T&gt;</a>,R,C&gt;&amp; v) {</div>
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;      <span class="keyword">using</span> <a class="code" href="namespacestan_1_1math.html#a3c5f32f7cd1a5690a697f4031df569c4" title="Calculates the log sum of exponetials without overflow.">stan::math::log_sum_exp</a>;</div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;      <span class="keyword">using</span> <a class="code" href="namespacestan_1_1agrad.html#af8dbb5923cb5c5e94b80b21e1263e0e7" title="Return the exponentiation of the specified variable (cmath).">std::exp</a>;</div>
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;      std::vector&lt;T&gt; vals(v.size());</div>
@@ -120,7 +120,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;        denominator += exp_vi;</div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;        deriv += v[i].d_ * exp_vi;</div>
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;      }</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="structstan_1_1agrad_1_1fvar.html">fvar&lt;T&gt;</a>(<a class="code" href="namespacestan_1_1agrad.html#a4114c4822d5a54c7f1616bfc1dd87519">log_sum_exp</a>(vals), deriv / denominator);</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="structstan_1_1agrad_1_1fvar.html">fvar&lt;T&gt;</a>(<a class="code" href="namespacestan_1_1agrad.html#a6cd9f7f4203d0dd299489be37445b5e1">log_sum_exp</a>(vals), deriv / denominator);</div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    }</div>
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    </div>
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  }</div>

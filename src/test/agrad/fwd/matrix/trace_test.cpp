@@ -2,14 +2,16 @@
 #include <gtest/gtest.h>
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
-#include <stan/agrad/fvar.hpp>
+#include <stan/agrad/fwd.hpp>
+#include <stan/agrad/rev.hpp>
+#include <test/agrad/util.hpp>
 
-TEST(AgradFwdMatrix,mv_trace) {
+TEST(AgradFwdMatrixTrace,fd) {
   using stan::math::trace;
-  using stan::agrad::matrix_fv;
+  using stan::agrad::matrix_fd;
   using stan::agrad::fvar;
 
-  matrix_fv a(2,2);
+  matrix_fd a(2,2);
   a << -1.0, 2.0, 
     5.0, 10.0;
    a(0,0).d_ = 1.0;
@@ -21,3 +23,57 @@ TEST(AgradFwdMatrix,mv_trace) {
   EXPECT_FLOAT_EQ(9.0,s.val_);
   EXPECT_FLOAT_EQ(2.0,s.d_);
 }  
+TEST(AgradFwdMatrixTrace,fv) {
+  using stan::math::trace;
+  using stan::agrad::matrix_fv;
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+
+  matrix_fv a(2,2);
+  a << -1.0, 2.0, 
+    5.0, 10.0;
+   a(0,0).d_ = 1.0;
+   a(0,1).d_ = 1.0;
+   a(1,0).d_ = 1.0;
+   a(1,1).d_ = 1.0;
+  
+  fvar<var> s = trace(a);
+  EXPECT_FLOAT_EQ(9.0,s.val_.val());
+  EXPECT_FLOAT_EQ(2.0,s.d_.val());
+}
+TEST(AgradFwdMatrixTrace,ffd) {
+  using stan::math::trace;
+  using stan::agrad::matrix_ffd;
+  using stan::agrad::fvar;
+
+  matrix_ffd a(2,2);
+  a << -1.0, 2.0, 
+    5.0, 10.0;
+  a(0,0).d_ = 1.0;
+  a(0,1).d_ = 1.0;
+  a(1,0).d_ = 1.0;
+  a(1,1).d_ = 1.0;
+  
+  fvar<fvar<double> > s = trace(a);
+  EXPECT_FLOAT_EQ(9.0,s.val_.val());
+  EXPECT_FLOAT_EQ(2.0,s.d_.val());
+}  
+
+TEST(AgradFwdMatrixTrace,ffv) {
+  using stan::math::trace;
+  using stan::agrad::matrix_ffv;
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+
+  matrix_ffv a(2,2);
+  a << -1.0, 2.0, 
+    5.0, 10.0;
+   a(0,0).d_ = 1.0;
+   a(0,1).d_ = 1.0;
+   a(1,0).d_ = 1.0;
+   a(1,1).d_ = 1.0;
+  
+  fvar<fvar<var> > s = trace(a);
+  EXPECT_FLOAT_EQ(9.0,s.val_.val().val());
+  EXPECT_FLOAT_EQ(2.0,s.d_.val().val());
+}
