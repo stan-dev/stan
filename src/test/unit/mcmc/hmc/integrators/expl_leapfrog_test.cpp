@@ -3,8 +3,8 @@
 
 #include <sstream>
 
-#include <test/mcmc/hmc/integrators/models/command.cpp>
-#include <test/mcmc/hmc/integrators/models/gauss.cpp>
+#include <test/test-models/no-main/mcmc/hmc/integrators/command.cpp>
+#include <test/test-models/no-main/mcmc/hmc/integrators/gauss.cpp>
 
 #include <stan/io/dump.hpp>
 

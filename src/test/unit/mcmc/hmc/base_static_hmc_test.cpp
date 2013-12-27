@@ -1,4 +1,4 @@
-#include <test/mcmc/hmc/mock_hmc.hpp>
+#include <test/unit/mcmc/hmc/mock_hmc.hpp>
 #include <stan/mcmc/hmc/static/base_static_hmc.hpp>
 
 #include <boost/random/additive_combine.hpp>

@@ -3,10 +3,10 @@
 
 #include <stan/io/dump.hpp>
 
-#include <test/mcmc/hmc/mock_hmc.hpp>
+#include <test/unit/mcmc/hmc/mock_hmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/dense_e_metric.hpp>
 
-#include <test/mcmc/hmc/hamiltonians/models/funnel.cpp>
+#include <test/test-models/no-main/mcmc/hmc/hamiltonians/funnel.cpp>
 
 #include <gtest/gtest.h>
 

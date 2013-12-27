@@ -10,7 +10,7 @@
 #include <stan/mcmc/hmc/nuts/diag_e_nuts.hpp>
 #include <stan/mcmc/hmc/nuts/dense_e_nuts.hpp>
 
-#include <test/mcmc/hmc/mock_hmc.hpp>
+#include <test/unit/mcmc/hmc/mock_hmc.hpp>
 
 typedef boost::ecuyer1988 rng_t;
 
