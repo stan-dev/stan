@@ -1,6 +1,6 @@
 #include <stan/command/print.hpp>
 #include <gtest/gtest.h>
-#include <test/models/utility.hpp>
+#include <test/CmdStan/models/utility.hpp>
 
 TEST(CommandPrint, next_index_1d) {
   std::vector<int> dims(1);
