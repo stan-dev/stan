@@ -10,7 +10,7 @@ TEST(ProbAutocorrelation,test1) {
   // ar1.csv generated in R with
   //   > x[1] <- rnorm(1,0,1)
   //   > for (n in 2:1000) x[n] <- rnorm(1,0.8 * x[n-1],1)
-  std::fstream f("src/test/prob/ar1.csv");
+  std::fstream f("src/test/unit/prob/ar1.csv");
   std::vector<double> y;
   for (size_t i = 0; i < 1000; ++i) {
      double temp;
