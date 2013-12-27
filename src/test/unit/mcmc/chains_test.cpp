@@ -13,10 +13,10 @@ class McmcChains : public testing::Test {
 public:
   
   void SetUp() {
-    blocker1_stream.open("src/test/mcmc/test_csv_files/blocker.1.csv");
-    blocker2_stream.open("src/test/mcmc/test_csv_files/blocker.2.csv");
-    epil1_stream.open("src/test/mcmc/test_csv_files/epil.1.csv");
-    epil2_stream.open("src/test/mcmc/test_csv_files/epil.2.csv");
+    blocker1_stream.open("src/test/unit/mcmc/test_csv_files/blocker.1.csv");
+    blocker2_stream.open("src/test/unit/mcmc/test_csv_files/blocker.2.csv");
+    epil1_stream.open("src/test/unit/mcmc/test_csv_files/epil.1.csv");
+    epil2_stream.open("src/test/unit/mcmc/test_csv_files/epil.2.csv");
   }
   
   void TearDown() {

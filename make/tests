@@ -153,15 +153,6 @@ test/gm/command_init.o: test/%.o : src/test/%_test.cpp $(LIBGTEST) src/test/gm/m
 	@mkdir -p $(dir $@)
 	$(COMPILE.c) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
 
-
-.PRECIOUS: src/test/mcmc/models/improper$(EXE)
-test/mcmc/base_hmc$(EXE) : test/mcmc/base_hmc.o bin/libstan.a bin/libstanc.a src/test/mcmc/models/improper$(EXE)
-	@mkdir -p $(dir $@)
-	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS) $(LDLIBS_STANC)
-ifeq ($(findstring test-,$(MAKECMDGOALS))$(findstring runtest/,$(MAKECMDGOALS)),)
-	$@ --gtest_output="xml:$(basename $@).xml"
-endif
-
 src/test/gm/model_specs/no_main/%.cpp : src/test/gm/model_specs/no_main/%.stan bin/stanc$(EXE)
 	bin$(PATH_SEPARATOR)stanc$(EXE) --name=$(basename $(@F)) --o=$@ --no_main $<
 
