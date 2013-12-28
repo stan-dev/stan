@@ -63,7 +63,7 @@ for (size_t i = 0; i < int_vector_types.size(); i++)
             vector_types[l]);
         add("beta_binomial_cdf_log",DOUBLE_T, // result
             int_vector_types[i],int_vector_types[j],vector_types[k],
-            vector_types[l]);laplace_cdf
+            vector_types[l]);
         add("beta_binomial_log",DOUBLE_T, // result
             int_vector_types[i],int_vector_types[j],vector_types[k],
             vector_types[l]);
