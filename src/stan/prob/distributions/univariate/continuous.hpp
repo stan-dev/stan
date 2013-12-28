@@ -22,6 +22,6 @@
 #include <stan/prob/distributions/univariate/continuous/uniform.hpp>
 #include <stan/prob/distributions/univariate/continuous/von_mises.hpp>
 #include <stan/prob/distributions/univariate/continuous/weibull.hpp>
-
+#include <stan/prob/distributions/univariate/continuous/wiener.hpp>
 
 #endif
