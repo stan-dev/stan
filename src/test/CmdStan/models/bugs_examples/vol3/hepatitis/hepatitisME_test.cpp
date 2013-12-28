@@ -1,3 +1,4 @@
+// v2.1.0: this model doesn't always converge to the expected distribution
 #include <gtest/gtest.h>
 #include <test/CmdStan/models/model_test_fixture.hpp>
 
