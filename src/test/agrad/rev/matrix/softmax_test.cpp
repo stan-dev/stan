@@ -4,6 +4,30 @@
 #include <stan/agrad/rev/matrix.hpp>
 #include <stan/math/matrix/softmax.hpp>
 
+TEST(AgradRevMatrix,softamxLeak) {
+  using stan::math::softmax;
+  using stan::agrad::softmax;
+  using Eigen::Matrix;
+  using Eigen::Dynamic;
+  using stan::agrad::vector_v;
+  using stan::agrad::var;
+
+  std::vector<double> grad;
+  Matrix<var,Dynamic,1> x(20);
+  std::vector<var> xs(20);
+  // memory taken with 2.1.0:  95MB
+  // memory used with 2.1.1: < 1 MB
+  // extend 100000 to bigger number to see leak easily
+  for (int i = 0; i < 100000; ++i) {
+    for (int n = 0; n < x.size(); ++n) {
+      x(n) = 0.1 * n;
+      xs[n] = x(n);
+    }
+    Matrix<var,Dynamic,1> theta = softmax(x);
+    theta(0).grad(xs,grad);
+  }
+}
+
 TEST(AgradRevMatrix,softmax) {
   using stan::math::softmax;
   using stan::agrad::softmax;
