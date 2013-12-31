@@ -1,19 +1,15 @@
 #include <gtest/gtest.h>
-#include <test/agrad/distributions/expect_eq_diffs.hpp>
-#include <stan/prob/distributions/multivariate/continuous/wishart.hpp>
-#include <stan/agrad/rev.hpp>
-#include <stan/meta/traits.hpp>
-#include <stan/agrad/rev/matrix.hpp>
-
+#include <test/unit/distribution/expect_eq_diffs.hpp>
+#include <stan/prob/distributions/multivariate/continuous/inv_wishart.hpp>
 
 template <typename T_y, typename T_dof, typename T_scale>
 void expect_propto(T_y W1, T_dof nu1, T_scale S1,
                    T_y W2, T_dof nu2, T_scale S2,
                    std::string message) {
-  expect_eq_diffs(stan::prob::wishart_log<false>(W1,nu1,S1),
-                  stan::prob::wishart_log<false>(W2,nu2,S2),
-                  stan::prob::wishart_log<true>(W1,nu1,S1),
-                  stan::prob::wishart_log<true>(W2,nu2,S2),
+  expect_eq_diffs(stan::prob::inv_wishart_log<false>(W1,nu1,S1),
+                  stan::prob::inv_wishart_log<false>(W2,nu2,S2),
+                  stan::prob::inv_wishart_log<true>(W1,nu1,S1),
+                  stan::prob::inv_wishart_log<true>(W2,nu2,S2),
                   message);
 }
 
@@ -22,7 +18,7 @@ using Eigen::Matrix;
 using stan::agrad::var;
 using stan::agrad::to_var;
 
-class AgradDistributionsWishart : public ::testing::Test {
+class AgradDistributionsInvWishart : public ::testing::Test {
 protected:
   virtual void SetUp() {
     Y1.resize(2,2);
@@ -50,37 +46,37 @@ protected:
   Matrix<double,Dynamic,Dynamic> S2;
 };
 
-TEST_F(AgradDistributionsWishart,Propto) {
+TEST_F(AgradDistributionsInvWishart,Propto) {
   expect_propto(to_var(Y1),to_var(nu1),to_var(S1),
                 to_var(Y2),to_var(nu2),to_var(S2),
                 "var: y, nu, and sigma");
 }
-TEST_F(AgradDistributionsWishart,ProptoY) {
+TEST_F(AgradDistributionsInvWishart,ProptoY) {
   expect_propto(to_var(Y1),nu1,S1,
                 to_var(Y2),nu1,S1,
                 "var: y");
 }
-TEST_F(AgradDistributionsWishart,ProptoYNu) {
+TEST_F(AgradDistributionsInvWishart,ProptoYNu) {
   expect_propto(to_var(Y1),to_var(nu1),S1,
                 to_var(Y2),to_var(nu2),S1,
                 "var: y, and nu");
 }
-TEST_F(AgradDistributionsWishart,ProptoYSigma) {
+TEST_F(AgradDistributionsInvWishart,ProptoYSigma) {
   expect_propto(to_var(Y1),nu1,to_var(S1),
                 to_var(Y2),nu1,to_var(S2),
                 "var: y and sigma");
 }
-TEST_F(AgradDistributionsWishart,ProptoNu) {
+TEST_F(AgradDistributionsInvWishart,ProptoNu) {
   expect_propto(Y1,to_var(nu1),S1,
                 Y1,to_var(nu2),S1,
                 "var: nu");
 }
-TEST_F(AgradDistributionsWishart,ProptoNuSigma) {
+TEST_F(AgradDistributionsInvWishart,ProptoNuSigma) {
   expect_propto(Y1,to_var(nu1),to_var(S1),
                 Y1,to_var(nu2),to_var(S2),
                 "var: nu and sigma");
 }
-TEST_F(AgradDistributionsWishart,ProptoSigma) {
+TEST_F(AgradDistributionsInvWishart,ProptoSigma) {
   expect_propto(Y1,nu1,to_var(S1),
                 Y1,nu1,to_var(S2),
                 "var: sigma");

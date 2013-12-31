@@ -27,31 +27,14 @@ test/dummy.cpp:
 .PHONY: test-headers
 test-headers: $(HEADER_TESTS) 
 
-
-GENERATED_AGRAD_TESTS := $(shell find src/test/agrad/distributions -type f -name '*_test.hpp')
-GENERATED_AGRAD_TESTS := $(GENERATED_AGRAD_TESTS:%_test.hpp=%_00000_generated_test.cpp)
-##
-# Agrad distributions test generator
-##
-test/agrad/distributions/generate_tests$(EXE) : src/test/agrad/distributions/generate_tests.cpp
-	@mkdir -p $(dir $@)
-	$(LINK.c) -O$(O_STANC) $(CFLAGS) $< $(OUTPUT_OPTION)
-
-src/test/agrad/distributions/%_00000_generated_test.cpp : test/agrad/distributions/generate_tests$(EXE) src/test/agrad/distributions/%_test.hpp
-	@echo "--- Generating tests for $(word 2,$^) ---"
-	test/agrad/distributions/generate_tests$(EXE) $(word 2,$^)
-
-.PHONY: test-distributions
-test-distributions: $(GENERATED_AGRAD_TESTS)
-	@$(MAKE) $(patsubst src/%_test.cpp,runtest/%,$(shell find src/test/agrad/distributions -type f -name '*_generated_test.cpp'))
-
-
 .PHONY: test-models
 test-models: src/test/CmdStan/models
 
 .PHONY: test-unit
 test-unit: src/test/unit
 
+.PHONY: test-distributions
+test-distributions: src/test/unit-distribution
 
 ##
 # Target to build all tests
@@ -192,12 +175,6 @@ runtest/% : %$(EXE)
 	@echo '------------------------------------------------------------'
 	$< --gtest_output="xml:$*.xml";
 
-.PHONY: runtest_no_fail/%
-.SECONDARY:
-runtest_no_fail/% : %$(EXE)
-	@echo '------------------------------------------------------------'
-	-$< --gtest_output="xml:$*.xml";
-
 ##
 # target path_separator for use in some tests that need to 
 # call executables.
@@ -224,6 +201,9 @@ ALL_TESTS = $(shell find src/test -type f -name '*_test.cpp')
 
 ALL_TEST_EXECUTABLES = $(patsubst src/%_test.cpp,%$(EXE),$(ALL_TESTS))
 
+
+
+
 ##
 # Defining the test target implicit static rule.
 #
@@ -234,8 +214,9 @@ ALL_TEST_EXECUTABLES = $(patsubst src/%_test.cpp,%$(EXE),$(ALL_TESTS))
 .PHONY: $(TEST_TARGETS)
 $(TEST_TARGETS): src/test/%: $$(addprefix runtest/,$$(filter test/$$*/$$(PERCENT),$$(ALL_TEST_EXECUTABLES)))
 	@echo ''
-	@echo 'Ran '$(words $^)' tests for '$@
-
+	$(if $(GENERATE_TESTS),\
+             $(MAKE) $@, \
+             @echo 'Ran '$(words $(filter runtest/%,$^))' tests for '$@)
 
 ##
 # TEST_MODELS is the set of all the test models.
@@ -274,3 +255,48 @@ $(patsubst src/%_test.cpp,%.o,$(filter src/test/CmdStan/%,$(ALL_TESTS))): test/%
 ##
 $(patsubst src/%_test.cpp,%.o,$(filter src/test/CmdStan/models/%,$(ALL_TESTS))): test/CmdStan/%.o : %$(EXE)
 
+
+
+#GENERATED_AGRAD_TESTS := $(shell find src/test/agrad/distributions -type f -name '*_test.hpp')
+#GENERATED_AGRAD_TESTS := $(GENERATED_AGRAD_TESTS:%_test.hpp=%_00000_generated_test.cpp)
+##
+# Agrad distributions test generator
+##
+test/unit-distribution/generate_tests$(EXE) : src/test/unit-distribution/generate_tests.cpp
+	@mkdir -p $(dir $@)
+	$(LINK.c) -O$(O_STANC) $(CFLAGS) $< $(OUTPUT_OPTION)
+
+src/test/unit-distribution/%_00000_generated_test.cpp : src/test/unit-distribution/%_test.hpp | test/unit-distribution/generate_tests$(EXE)
+	@echo "--- Generating tests for $(notdir $<) ---"
+	test/unit-distribution/generate_tests$(EXE) $<
+
+
+##
+# For src/test/unit-distribution tests, adding
+# dependency on generated tests.
+##
+.SECONDEXPANSION:
+$(filter src/test/unit-distribution%,$(TEST_TARGETS)): src/test/unit-distribution%: $$(patsubst $$(PERCENT)_test.hpp,$$(PERCENT)_00000_generated_test.cpp,$$(shell find src/test/unit-distribution% -type f -name '*.hpp'))
+
+
+##
+# Set the variable GENERATE_TESTS to non-empty string
+# when the target is generating distribution tests.
+# This indicates whether make should be rerun.
+#
+#   Notes:
+#     The first argument to filter-out is the number of unique
+#        generated distribution tests that have already been generated
+#        in this current run of make. If this is the stage where
+#        we are generating tests, this number will be less than the
+#        number of tests to generate. (0 if running from a clean state)
+#     The second argument to filter-out is the number of unique
+#        generated distribution tests that should be generated. 
+#        This is determined by the existence of *_test.hpp files in 
+#        the appropriate directory.
+#     The filter-out function returns the total number of tests that should
+#        be generated if they have not yet been generated.
+##
+src/test/unit-distribution% : \
+GENERATE_TESTS = $(filter-out $(words $(filter %_00000_generated$(EXE),$^)),\
+                              $(words $(filter $@%_00000_generated_test.cpp,$(ALL_TESTS))))

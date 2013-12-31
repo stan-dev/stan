@@ -1,12 +1,12 @@
-#ifndef __TEST__AGRAD__DISTRIBUTIONS__TEST_FIXTURE_HPP___
-#define __TEST__AGRAD__DISTRIBUTIONS__TEST_FIXTURE_HPP___
+#ifndef __TEST__UNIT_DISTRIBUTION__TEST_FIXTURE_HPP___
+#define __TEST__UNIT_DISTRIBUTION__TEST_FIXTURE_HPP___
 
 #include <stdexcept>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/matrix.hpp>
 #include <stan/math/functions/value_of.hpp>
 #include <stan/agrad/rev.hpp>
-#include <test/agrad/distributions/utility.hpp>
+#include <test/unit-distribution/utility.hpp>
 
 using std::vector;
 using Eigen::Matrix;

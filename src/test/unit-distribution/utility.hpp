@@ -1,5 +1,5 @@
-#ifndef __TEST__AGRAD__DISTRIBUTIONS__UTILITY_HPP__
-#define __TEST__AGRAD__DISTRIBUTIONS__UTILITY_HPP__
+#ifndef __TEST__UNIT_DISTRIBUTION__UTILITY_HPP__
+#define __TEST__UNIT_DISTRIBUTION__UTILITY_HPP__
 
 #include <vector>
 #include <stan/agrad/rev/matrix.hpp>

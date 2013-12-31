@@ -61,10 +61,7 @@ src/test/mcmc/models/*
 
 
 # tests: generated agrad tests
-src/test/agrad/distributions/univariate/continuous/*_generated_test.cpp
-src/test/agrad/distributions/univariate/discrete/*_generated_test.cpp
-src/test/agrad/distributions/multivariate/continuous/*_generated_test.cpp
-src/test/agrad/distributions/multivariate/discrete/*_generated_test.cpp
+src/test/unit-distribution/**/**/**/*_generated_test.cpp
 
 # For the Mac
 *.DS_Store

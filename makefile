@@ -214,9 +214,5 @@ clean-models:
 
 clean-all: clean clean-manual clean-models
 	$(RM) -r test/* bin
-	$(RM) $(shell find src -type f -name '*.d') $(shell find src -type f -name '*.o')
-	cd src/test/agrad/distributions/univariate/continuous; $(RM) *_generated_test.cpp
-	cd src/test/agrad/distributions/univariate/discrete; $(RM) *_generated_test.cpp
-	cd src/test/agrad/distributions/multivariate/continuous; $(RM) *_generated_test.cpp
-	cd src/test/agrad/distributions/multivariate/discrete; $(RM) *_generated_test.cpp
+	$(RM) $(shell find src -type f -name '*.d') $(shell find src -type f -name '*.o') $(shell find src/test/unit-distribution -type f -name '*_generated_test.cpp')
 
