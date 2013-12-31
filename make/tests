@@ -24,18 +24,6 @@ test/dummy.cpp:
 %.hpp-test : %.hpp test/dummy.cpp
 	$(COMPILE.c) -O0 -include $< -o $(DEV_NULL) test/dummy.cpp
 
-.PHONY: test-headers
-test-headers: $(HEADER_TESTS) 
-
-.PHONY: test-models
-test-models: src/test/CmdStan/models
-
-.PHONY: test-unit
-test-unit: src/test/unit
-
-.PHONY: test-distributions
-test-distributions: src/test/unit-distribution
-
 ##
 # Target to build all tests
 ##
@@ -300,3 +288,24 @@ $(filter src/test/unit-distribution%,$(TEST_TARGETS)): src/test/unit-distributio
 src/test/unit-distribution% : \
 GENERATE_TESTS = $(filter-out $(words $(filter %_00000_generated$(EXE),$^)),\
                               $(words $(filter $@%_00000_generated_test.cpp,$(ALL_TESTS))))
+
+.PHONY: test-headers
+test-headers: $(HEADER_TESTS) 
+
+
+
+##
+# Deprecated test targets
+##
+.PHONY: test-models test-unit test-distributions
+test-models test-unit test-distributions:
+	@echo ''
+	@echo ''
+	@echo '  The '$@' target is deprecated. Please use:'
+	@echo '      '$<
+
+test-models: src/test/CmdStan/models
+
+test-unit: src/test/unit
+
+test-distributions: src/test/unit-distribution
