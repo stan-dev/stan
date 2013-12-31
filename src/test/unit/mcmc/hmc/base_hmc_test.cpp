@@ -5,7 +5,6 @@
 #include <boost/algorithm/string/split.hpp>
 
 #include <gtest/gtest.h>
-#include <test/models/utility.hpp>
 
 typedef boost::ecuyer1988 rng_t;
 
