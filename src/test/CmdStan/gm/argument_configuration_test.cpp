@@ -8,7 +8,7 @@
 #include <stan/gm/arguments/arg_random.hpp>
 #include <stan/gm/arguments/arg_output.hpp>
 
-#include <test/models/utility.hpp>
+#include <test/CmdStan/models/utility.hpp>
 
 #include <vector>
 #include <sstream>
@@ -40,8 +40,9 @@ public:
     model_path.push_back("..");
     model_path.push_back("src");
     model_path.push_back("test");
-    model_path.push_back("gm");
-    model_path.push_back("arguments");
+    model_path.push_back("test-models");
+    model_path.push_back("compiled");
+    model_path.push_back("CmdStan");
     model_path.push_back("test_model");
 
     command += "cd test ";

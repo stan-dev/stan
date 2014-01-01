@@ -1,6 +1,6 @@
 #include <stan/gm/command.hpp>
 #include <gtest/gtest.h>
-#include <test/gm/model_specs/no_main/test_lp.cpp>
+#include <test/test-models/no-main/gm/test_lp.cpp>
 
 typedef test_lp_namespace::test_lp Model;
 typedef boost::ecuyer1988 rng_t;

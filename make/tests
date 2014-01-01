@@ -49,8 +49,7 @@ test/gtest.o: $(GTEST)/src/gtest-all.cc
 ##
 # all files that should be compiled as tests
 ##
-FILES := $(wildcard src/test/gm/model_specs/compiled/*.stan)
-
+FILES := $(shell find src/test/test-models/compiled -type f -name '*.stan')
 
 ## These lines are to shuffle the files
 ifeq ($(OS),win)
@@ -68,26 +67,6 @@ endif
 endif
 ## end shuffling
 
-test/gm/command$(EXE) : test/gm/command.o bin/libstan.a bin/libstanc.a src/test/gm/model_specs/compiled/domain_fail$(EXE) src/test/gm/model_specs/compiled/value_fail$(EXE) src/test/gm/model_specs/printer$(EXE)
-	@mkdir -p $(dir $@)
-	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS) $(LDLIBS_STANC)
-ifeq ($(findstring test-,$(MAKECMDGOALS))$(findstring runtest/,$(MAKECMDGOALS)),)
-	$@ --gtest_output="xml:$(basename $@).xml"
-endif
-
-.PRECIOUS: src/test/gm/model_specs/no_main/test_lp.cpp
-test/gm/command_init.o: test/%.o : src/test/%_test.cpp $(LIBGTEST) src/test/gm/model_specs/no_main/test_lp.cpp
-	@mkdir -p $(dir $@)
-	$(COMPILE.c) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
-
-src/test/gm/model_specs/no_main/%.cpp : src/test/gm/model_specs/no_main/%.stan bin/stanc$(EXE)
-	bin$(PATH_SEPARATOR)stanc$(EXE) --name=$(basename $(@F)) --o=$@ --no_main $<
-
-src/test/mcmc/hmc/hamiltonians/models/%.cpp : src/test/mcmc/hmc/hamiltonians/models/%.stan bin/stanc$(EXE)
-	bin$(PATH_SEPARATOR)stanc$(EXE) --name=$(basename $(@F)) --o=$@ --no_main $<
-
-src/test/mcmc/hmc/integrators/models/%.cpp : src/test/mcmc/hmc/integrators/models/%.stan bin/stanc$(EXE)
-	bin$(PATH_SEPARATOR)stanc$(EXE) --name=$(basename $(@F)) --o=$@ --no_main $<
 
 .PRECIOUS: src/test/test-models/no-main/mcmc/hmc/hamiltonians/funnel.cpp
 test/unit/mcmc/hmc/hamiltonians/base_hamiltonian.o test/unit/mcmc/hmc/hamiltonians/unit_e_metric.o test/unit/mcmc/hmc/hamiltonians/diag_e_metric.o test/unit/mcmc/hmc/hamiltonians/dense_e_metric.o: test/%.o : src/test/%_test.cpp $(LIBGTEST) src/test/test-models/no-main/mcmc/hmc/hamiltonians/funnel.cpp
@@ -98,25 +77,6 @@ test/unit/mcmc/hmc/hamiltonians/base_hamiltonian.o test/unit/mcmc/hmc/hamiltonia
 test/unit/mcmc/hmc/integrators/expl_leapfrog.o: test/%.o : src/test/%_test.cpp $(LIBGTEST) src/test/test-models/no-main/mcmc/hmc/integrators/gauss.cpp src/test/test-models/no-main/mcmc/hmc/integrators/command.cpp
 	@mkdir -p $(dir $@)
 	$(COMPILE.c) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
-
-.PRECIOUS: src/test/gm/model_specs/no_main/test_lp.cpp
-test/gm/generator.o: test/%.o : src/test/%_test.cpp $(LIBGTEST) src/test/gm/model_specs/no_main/test_lp.cpp
-	@mkdir -p $(dir $@)
-	$(COMPILE.c) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
-
-test/gm/arguments/argument_configuration$(EXE) : test/gm/arguments/argument_configuration.o bin/libstan.a bin/libstanc.a src/test/gm/arguments/test_model$(EXE)
-	@mkdir -p $(dir $@)
-	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS) $(LDLIBS_STANC)
-ifeq ($(findstring test-,$(MAKECMDGOALS))$(findstring runtest/,$(MAKECMDGOALS)),)
-	$@ --gtest_output="xml:$(basename $@).xml"
-endif
-
-test/gm/compile_models$(EXE) : test/gm/compile_models.o bin/libstan.a bin/libstanc.a $(patsubst %.stan,%$(EXE),$(FILES))
-	@mkdir -p $(dir $@)
-	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS) $(LDLIBS_STANC)
-ifeq ($(findstring test-,$(MAKECMDGOALS))$(findstring runtest/,$(MAKECMDGOALS)),)
-	$@ --gtest_output="xml:$(basename $@).xml"
-endif
 
 .PRECIOUS: test/%.o
 test/%$(EXE) : test/%.o bin/libstan.a bin/libstanc.a
@@ -217,18 +177,27 @@ TEST_MODELS = $(shell find src/test/test-models -type f -name '*.stan')
 # Compile these with a main.
 ## 
 $(patsubst %.stan,%.cpp,$(filter src/test/test-models/compiled/%,$(TEST_MODELS))) : %.cpp : %.stan bin/stanc$(EXE)
-	bin$(PATH_SEPARATOR)stanc$(EXE) --name=$(basename $(@F)) --o=$@ $<
+	bin$(PATH_SEPARATOR)stanc$(EXE) --o=$@ $<
 ##
 # Compile these with no main.
 ##
 $(patsubst %.stan,%.cpp,$(filter src/test/test-models/no-main/%,$(TEST_MODELS))) : %.cpp : %.stan bin/stanc$(EXE)
-	bin$(PATH_SEPARATOR)stanc$(EXE) --name=$(basename $(@F)) --o=$@ --no_main $<
+	bin$(PATH_SEPARATOR)stanc$(EXE) --o=$@ --no_main $<
 
 
 ##
 # Tests that also depend on generated models.
 ##
-test/unit/io/mcmc_writer.o : src/test/test-models/no-main/io_example.cpp
+test/unit/io/mcmc_writer.o: src/test/test-models/no-main/io_example.cpp
+test/unit/gm/command_init.o: src/test/test-models/no-main/gm/test_lp.cpp
+test/unit/gm/generator.o: src/test/test-models/no-main/gm/test_lp.cpp
+
+test/integration/compile_models.o : $(patsubst %.stan,%$(EXE),$(FILES))
+
+test/CmdStan/command.o: \
+   $(addprefix src/test/test-models/compiled/CmdStan/,\
+               $(addsuffix $(EXE), printer domain_fail value_fail))
+test/CmdStan/gm/argument_configuration.o: src/test/test-models/compiled/CmdStan/test_model$(EXE)
 
 
 ##
@@ -244,9 +213,6 @@ $(patsubst src/%_test.cpp,%.o,$(filter src/test/CmdStan/%,$(ALL_TESTS))): test/%
 $(patsubst src/%_test.cpp,%.o,$(filter src/test/CmdStan/models/%,$(ALL_TESTS))): test/CmdStan/%.o : %$(EXE)
 
 
-
-#GENERATED_AGRAD_TESTS := $(shell find src/test/agrad/distributions -type f -name '*_test.hpp')
-#GENERATED_AGRAD_TESTS := $(GENERATED_AGRAD_TESTS:%_test.hpp=%_00000_generated_test.cpp)
 ##
 # Agrad distributions test generator
 ##

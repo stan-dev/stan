@@ -5,7 +5,7 @@
 #include <stan/gm/ast.hpp>
 #include <stan/gm/generator.hpp>
 #include <stan/io/dump.hpp>
-#include <test/gm/model_specs/no_main/test_lp.cpp>
+#include <test/test-models/no-main/gm/test_lp.cpp>
 
 #include <gtest/gtest.h>
 
