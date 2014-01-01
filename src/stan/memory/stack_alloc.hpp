@@ -199,7 +199,24 @@ namespace stan {
         blocks_.resize(1); 
         recover_all();
       }
-  
+
+      /**
+       * Return number of bytes allocated to this instance by the heap.
+       * This is not the same as the number of bytes allocated throuhg
+       * calls to memalloc_.  The latter number is not calculatable
+       * because space is wasted at the end of blocks if the next
+       * alloc request doesn't fit.  (Perhaps we could trim down to 
+       * what is actually used?)
+       *
+       * @return number of bytes allocated to this instance
+       */
+      long bytes_allocated() {
+        long sum = 0;
+        for (size_t i = 0; i <= cur_block_; ++i)
+          sum += sizes_[i];
+        return sum;
+      }
+
     };
 
   }
