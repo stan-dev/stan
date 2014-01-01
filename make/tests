@@ -160,7 +160,7 @@ ALL_TEST_EXECUTABLES = $(patsubst src/%_test.cpp,%$(EXE),$(ALL_TESTS))
 ##
 .SECONDEXPANSION:
 .PHONY: $(TEST_TARGETS)
-$(TEST_TARGETS): src/test/%: $$(addprefix runtest/,$$(filter test/$$*/$$(PERCENT),$$(ALL_TEST_EXECUTABLES)))
+$(TEST_TARGETS): src/test/%: $$(addprefix runtest/,$$(filter $$(patsubst src/$$(PERCENT),$$(PERCENT),$$@)$$(PERCENT),$$(ALL_TEST_EXECUTABLES)))
 	@echo ''
 	$(if $(GENERATE_TESTS),\
              $(MAKE) $@, \
