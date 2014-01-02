@@ -25,7 +25,7 @@ namespace stan {
       }
       
       /**
-       * Compute the LDLT factorization and store pointets to the 
+       * Compute the LDLT factorization and store pointers to the 
        * vari's of the matrix entries to be used when chain() is
        * called elsewhere.
        **/
