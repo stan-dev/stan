@@ -51,7 +51,7 @@ namespace stan {
       }
         
       size_t N_;
-      Eigen::LDLT< Eigen::Matrix<double,R,C> > _ldlt;
+      Eigen::LDLT<Eigen::Matrix<double,R,C> > _ldlt;
       Eigen::Matrix<vari*,R,C> _variA;
     };
   }
