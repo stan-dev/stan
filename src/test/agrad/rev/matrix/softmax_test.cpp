@@ -38,10 +38,10 @@ TEST(AgradRevMatrix,softmaxLeak2) {
     x(n) = 0.1 * n;
   }
   
-  size_t tmp = stan::agrad::memalloc_.current_size();
+  size_t tmp = stan::agrad::memalloc_.bytes_requested();
   Matrix<var,Dynamic,1> theta = softmax(x);
   
-  size_t size_diff = stan::agrad::memalloc_.current_size() - tmp;
+  size_t size_diff = stan::agrad::memalloc_.bytes_requested() - tmp;
   EXPECT_EQ(SIZE * (sizeof(stan::agrad::vari*) 
                     + sizeof(double) 
                     + sizeof(stan::agrad::softmax_elt_vari)), size_diff)
