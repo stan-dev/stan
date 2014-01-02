@@ -140,10 +140,11 @@ PERCENT = %
 ##
 # TEST_TARGETS is the set of all src/test subdirectories excluding src/test.
 ##
-TEST_TARGETS = $(shell find src/test ! -path src/test -type d)
+TEST_TARGETS := $(shell find src/test ! -path src/test -type d)
 
 ##
 # ALL_TESTS is the set of all test files
+#   This needs to be an '=' assignment and not a ':='.
 ##
 ALL_TESTS = $(shell find src/test -type f -name '*_test.cpp')
 
@@ -171,7 +172,7 @@ $(TEST_TARGETS): src/test/%: $$(addprefix runtest/,$$(filter $$(patsubst src/$$(
 # Those in the 'compiled' subdirectory are supposed to be compiled.
 # Those in the 'no_main' subdirectory are supposed to be compiled without a main function.
 ##
-TEST_MODELS = $(shell find src/test/test-models -type f -name '*.stan')
+TEST_MODELS := $(shell find src/test/test-models -type f -name '*.stan')
 
 ##
 # Compile these with a main.
@@ -229,8 +230,9 @@ src/test/unit-distribution/%_00000_generated_test.cpp : src/test/unit-distributi
 # For src/test/unit-distribution tests, adding
 # dependency on generated tests.
 ##
+DISTRIBUTION_TESTS := $(shell find src/test/unit-distribution -type f -name '*.hpp')
 .SECONDEXPANSION:
-$(filter src/test/unit-distribution%,$(TEST_TARGETS)): src/test/unit-distribution%: $$(patsubst $$(PERCENT)_test.hpp,$$(PERCENT)_00000_generated_test.cpp,$$(shell find src/test/unit-distribution% -type f -name '*.hpp'))
+$(filter src/test/unit-distribution%,$(TEST_TARGETS)): src/test/unit-distribution%: $$(patsubst $$(PERCENT)_test.hpp,$$(PERCENT)_00000_generated_test.cpp,$$(filter $$@$$(PERCENT),$$(DISTRIBUTION_TESTS)))
 
 
 ##
