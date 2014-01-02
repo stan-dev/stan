@@ -83,6 +83,7 @@ namespace stan {
       size_t cur_block_;          // index into blocks_ for next alloc
       char* cur_block_end_;       // ptr to cur_block_ptr_ + sizes_[cur_block_]
       char* next_loc_;            // ptr to next available spot in cur block
+      size_t cur_size_;
 
       /**
        * Moves us to the next block of memory, allocating that block
@@ -132,7 +133,8 @@ namespace stan {
         sizes_(1,initial_nbytes),
         cur_block_(0),
         cur_block_end_(blocks_[0] + initial_nbytes),
-        next_loc_(blocks_[0]) {
+        next_loc_(blocks_[0]),
+        cur_size_(0) {
 
         if (!blocks_[0])
           throw std::bad_alloc();  // no msg allowed in bad_alloc ctor
@@ -165,6 +167,7 @@ namespace stan {
        */
       inline void* alloc(size_t len) {
         // Typically, just return and increment the next location.
+        cur_size_ += len;
         char* result = next_loc_;
         next_loc_ += len;
         // Occasionally, we have to switch blocks.
@@ -183,6 +186,7 @@ namespace stan {
         cur_block_ = 0;
         next_loc_ = blocks_[0];
         cur_block_end_ = next_loc_ + sizes_[0];
+        cur_size_ = 0;
       }
     
       /**
@@ -195,6 +199,7 @@ namespace stan {
         for (size_t i = 1; i < blocks_.size(); ++i)
           if (blocks_[i])
             free(blocks_[i]);
+        cur_size_ = 0;
         sizes_.resize(1);
         blocks_.resize(1); 
         recover_all();
@@ -202,7 +207,7 @@ namespace stan {
 
       /**
        * Return number of bytes allocated to this instance by the heap.
-       * This is not the same as the number of bytes allocated throuhg
+       * This is not the same as the number of bytes allocated through
        * calls to memalloc_.  The latter number is not calculatable
        * because space is wasted at the end of blocks if the next
        * alloc request doesn't fit.  (Perhaps we could trim down to 
@@ -216,6 +221,18 @@ namespace stan {
           sum += sizes_[i];
         }
         return sum;
+      }
+
+      /**
+       * Return number of bytes used on the current heap.
+       * This is the number of bytes allocated through 
+       * alloc in this current run. free_all() and recover_all()
+       * will reset this to 0.
+       *
+       * @return number of bytes used on the heap
+       */
+      size_t current_size() {
+        return cur_size_;
       }
 
     };
