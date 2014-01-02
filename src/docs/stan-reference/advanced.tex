@@ -665,7 +665,7 @@ The rest of the chapter details the transforms used by \Stan.
 
 
 
-\subsection{Univariate Changes of Variables}\label{uni-change-of-variables.section}
+\subsection{Univariate Changes of Variables}
 
 Suppose $X$ is one dimensional and $f: \mbox{supp}(X) \rightarrow
 \reals$ is a one-to-one, monotonic function with a differentiable
@@ -681,7 +681,7 @@ scale of the transformed variable changes with respect to the
 underlying variable.
 
 
-\subsection{Multivariate Changes of Variables}\label{multi-change-of-variables.section}
+\subsection{Multivariate Changes of Variables}
 
 The multivariate generalization of an absolute derivative is a
 Jacobian, or more fully the absolute value of the determinant of the
@@ -1247,15 +1247,14 @@ a^{\top} x a > 0.
 \]
 To deal with this rather complicated constraint, \Stan implements the
 transform of \cite{LewandowskiKurowickaJoe:2009}.  The number of free
-parameters required to specify a $K \times K$ correlation matrix is $K
-\choose 2$.
+parameters required to specify a $K \times K$ correlation matrix is $\binom{K}{2}$.
 
 \subsection{Correlation Matrix Inverse Transform}
 
-It is easiest to specify the inverse, going from its $K \choose 2$
+It is easiest to specify the inverse, going from its $\binom{K}{2}$
 parameter basis to a correlation matrix.  The basis will actually be
 broken down into two steps.  To start, suppose $y$ is a vector
-containing $K \choose 2$ unconstrained values.  These are first
+containing $\binom{K}{2}$ unconstrained values.  These are first
 transformed via the bijective function $\tanh : \reals \rightarrow
 (0,1)$
 %
@@ -1265,7 +1264,7 @@ transformed via the bijective function $\tanh : \reals \rightarrow
 %
 Then, define a $K \times K$ matrix $z$, the upper triangular values of
 which are filled by row with the transformed values.  For example, in
-the $4 \times 4$ case, there are ${4 \choose 2}$ values arranged as
+the $4 \times 4$ case, there are $\binom{4}{2}$ values arranged as
 %
 \[
 z 
@@ -1403,7 +1402,7 @@ the Fisher transformation.
 
 A $K \times K$ matrix is a covariance matrix if it is symmetric and
 positive definite (see the previous section for definitions).  It
-requires $K + {K \choose 2}$ free parameters to specify a $K \times K$
+requires $K + \binom{K}{2}$ free parameters to specify a $K \times K$
 covariance matrix.
 
 
@@ -1537,11 +1536,10 @@ Jacobian determinants of the exponentiation and product transforms,
 \, \prod_{k=1}^K z_{k,k}^{K-k+2}.
 \]
 
-Let $f^{-1}$ be the inverse transform from a $K + {K \choose
-  2}$-vector $y$ to the $K \times K$ covariance matrix $x$.  A density
-function $p_X(x)$ defined on $K \times K$ covariance matrices is
-transformed to the density $p_Y(y)$ over $K + {K \choose 2}$ vectors
-$y$ by
+Let $f^{-1}$ be the inverse transform from a $K + \binom{K}{2}$-vector
+$y$ to the $K \times K$ covariance matrix $x$.  A density function
+$p_X(x)$ defined on $K \times K$ covariance matrices is transformed to
+the density $p_Y(y)$ over $K + \binom{K}{2}$ vectors $y$ by
 \[
 p_Y(y) = p_X(f^{-1}(y)) \ 2^K \ \prod_{k=1}^K z_{k,k}^{K-k+2}.
 \]
@@ -1550,7 +1548,7 @@ p_Y(y) = p_X(f^{-1}(y)) \ 2^K \ \prod_{k=1}^K z_{k,k}^{K-k+2}.
 
 An $M \times N$ matrix is a Cholesky factor of a covariance matrix
 if it is lower triangular, the diagonal entries are positive, and $M
-\geq N$.  It requires $N + {N \choose 2} + (M - N)N$ parameters.
+\geq N$.  It requires $N + \binom{N}{2} + (M - N)N$ parameters.
 
 \subsection{Cholesky Factor of Covariance Matrix Transform}
 
@@ -1605,12 +1603,12 @@ of which is
 \prod_{n=1}^N x_{n,n}.
 \]
 
-Let $x = f^{-1}(y)$ be the inverse transform from a $N + {N \choose 2}
+Let $x = f^{-1}(y)$ be the inverse transform from a $N + \binom{N}{2}
 + (M - N)N$ vector to an $M \times N$ Cholesky factor for a covariance
 matrix $x$ defined in the previous section.  A density function
 $p_X(x)$ defined on $M \times N$ Cholesky factors of covariance
-matrices is transformed to the density $p_Y(y)$ over $N + {N \choose
-  2} + (M - N)N$ vectors $y$ by
+matrices is transformed to the density $p_Y(y)$ over $N + \binom{N}{2}
++ (M - N)N$ vectors $y$ by
 %
 \[
 p_Y(y) = p_X(f^{-1}(y)) \prod_{N=1}^N x_{n,n}.

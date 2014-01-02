@@ -635,11 +635,12 @@ coded in Stan following their respective probability models.
 
 Truncation in Stan is restricted to univariate distributions for which
 the corresponding log cumulative distribution function (cdf) and log
-completmentary cumulative distribution (ccdf) functions are
-available.  See \refsection{truncated-distributions} for more
-information on truncated distributions, cdfs, and ccdfs.
+completmentary cumulative distribution (ccdf) functions are available.
+See the subsection on truncated distributions in
+\refsection{sampling-statements} for more information on truncated
+distributions, cdfs, and ccdfs.
 
-\section{Truncated Data}
+\section{Truncated Data}\label{truncated-data.section}
 
 Truncated data is data for which measurements are only reported if
 they fall above a lower bound, below an upper bound, or between a
@@ -677,7 +678,7 @@ This model implicitly uses an improper flat prior on the scale and
 location parameters; these could be given priors in the model using
 sampling statements.
 
-\subsection{Constraints and Out-of-Bounds Returns}\label{truncation-constraints.section}
+\subsection{Constraints and Out-of-Bounds Returns}
 
 If the sampled variate in a truncated distribution lies outside of
 the truncation range, the probability is zero, so the log probability
@@ -1088,10 +1089,81 @@ outcome \code{y[n]}.  The intercept and slope parameters are
 distributed noise term with scale \code{sigma}.  This model has
 improper priors for the two regression coefficients.
 
+\subsection{Matrix Notation and Vectorization}
+
+The sampling statement in the previous model can be vectorized and
+written equivalently as follows:
+%
+\begin{quote}
+\begin{Verbatim}
+model {
+  y ~ normal(alpha + beta * x, sigma);
+}
+\end{Verbatim}
+\end{quote}
+%
+The main difference is that the vectorized form is much faster.%
+%
+\footnote{Unlike in Python and R, which are interpreted, Stan is
+  translated to \Cpp and compiled, so loops and assignment statements
+  are fast.  Vectorized code is faster in Stan because (a) the
+  expression tree used to compute derivatives can be simplified,
+  leading to fewer virtual function calls, and (b) computations that
+  would be repeated in the looping version, such as \code{log(sigma)}
+  in the above model, will be computed once and reused.}
+
+In general, Stan allows the arguments to distributions such as
+\code{normal} to be vectors.  If any of the other arguments are
+vectors or arrays, they have to be the same size.  If any of the other
+arguments is a scalar, it is reused for each vector entry.  See
+\refchapter{vectorization} for more information on vectorization.
+
+The other reason this works is that Stan's arithmetic operators are
+overloaded to perform matrix arithmetic on matrices.  In this case,
+because \code{x} is of type \code{vector} and \code{beta} of type
+\code{real}, the expression \code{beta * x} is of type \code{vector}.
+Because Stan supports vectorization, a regression model with more than
+one predictor can be written directly using matrix notation.
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+  int<lower=0> N;   // number of data items
+  int<lower=0> K;   // number of predictors
+  matrix[N,K] x;    // predictor matrix
+  vector[N] y;      // outcome vector
+}
+parameters {
+  real alpha;           // intercept
+  vector[N] beta;       // coefficients for predictors
+  real<lower=0,upper=10> sigma;  // error scale
+}
+model {
+  y ~ normal(x * beta, sigma);  // likelihood
+}
+\end{Verbatim}
+\end{quote}
+%
+The constraint on \code{sigma} gives it a uniform prior on $(0,10)$.
+The sampling statement in the model above is equivalent to
+%
+\begin{quote}
+\begin{Verbatim}
+  for (n in 1:N)
+    y ~ normal(x[n] * beta, sigma);
+\end{Verbatim}
+\end{quote}
+%
+With Stan's matrix indexing scheme, \code{x[n]} picks out row \code{n}
+of the matrix \code{x};  because \code{beta} is a column vector, 
+the product \code{x[n] * beta} is a scalar of type \code{real}.
+
+
 \section{Coefficient and Noise Priors}
 
-There are several ways in which this model can be generalized.  
-For example, weak priors can be assigned to the coefficients as follows.
+There are several ways in which the model in the previous section can
+be generalized.  For example, weak priors can be assigned to the
+coefficients as follows.
 %
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
@@ -1235,10 +1307,10 @@ $\distro{Normal}(0,5)$ priors on the coefficients is coded as follows.
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
 data {
-  int<lower=2> K;
-  int<lower=0> N;
-  int<lower=1> D;
-  int<lower=1,upper=K> y[N];
+  int K;
+  int N;
+  int D;
+  int y[N];
   vector[D] x[N];
 }
 parameters {
@@ -1254,6 +1326,7 @@ model {
 \end{Verbatim}
 \end{quote}
 %
+
 The softmax function is defined for a $K$-vector $\gamma \in \reals^K$ by
 \[
 \mbox{softmax}(\gamma) = 
@@ -1268,6 +1341,43 @@ The softmax function is defined for a $K$-vector $\gamma \in \reals^K$ by
 %
 The result is in the unit $K$-simplex and thus appropriate to use as
 the parameter for a categorical distribution.
+
+\subsubsection{Constraints on Data Declarations}
+
+The data block in the above model is defined without constraints on
+sizes \code{K}, \code{N}, and \code{D} or on the outcome array
+\code{y}.  Constraints on data declarations provide error checking at
+the point data is read (or transformed data is defined), which is
+before sampling begins.  Constraints on data declarations also make
+the model author's intentions more explicit, which can help with
+readability.  The above model's declarations could be tightened to
+%
+\begin{quote}
+\begin{Verbatim}
+  int<lower=2> K;
+  int<lower=0> N;
+  int<lower=1> D;
+  int<lower=1,upper=K> y[N];
+\end{Verbatim}
+\end{quote}
+%
+These constraints arise because the number of categories, \code{K},
+must be at least two in order for a categorical model to be useful.
+The number of data items, \code{N}, can be zero, but not negative;
+unlike R, Stan's for-loops always move forward, so that a loop extent
+of \code{1:N} when \code{N} is equal to zero ensures the loop's body
+will not be executed.  The number of predictors, \code{D}, must be at
+least one in order for \code{beta * x[n]} to produce an
+appropriate agrument for \code{softmax()}.  The categorical outcomes
+\code{y[n]} must be between \code{1} and \code{K} in order for the
+discrete sampling to be well defined.
+
+Constraints on data declarations are optional.  Constraints on
+parameters declared in the \code{parameters} block, on the other hand,
+are {\it not}\ optional---they are required to ensure support for all
+parameter values satisfying their constraints.  Constraints on
+transformed data, transformed parameters, and generated quantities are
+also optional.
 
 \subsection{Identifiability}
 
@@ -4310,7 +4420,7 @@ everywhere in their support.
 
 For univariate changes of variables, the resulting probability must be
 scaled by the absolute derivative of the transform (see
-\refsection{uni-change-of-variables} for more precise definitions of
+\refsection{change-of-variables} for more precise definitions of
 univariate changes of variables).
 
 In the case of log normals, if $y$'s logarithm is normal with mean
@@ -4441,9 +4551,10 @@ transform, which in this case is
 
 In the case of a multivariate transform, the log of the Jacobian of
 the transform must be added to the log probability accumulator (see
-\refsection{multi-change-of-variables} for more precise definitions of multivariate transforms
-and Jacobians).  In Stan, this can be coded as follows in the general
-case where the Jacobian is not a full matrix.
+the subsection of \refsection{change-of-variables} on multivarate
+changes of variables for more precise definitions of multivariate
+transforms and Jacobians).  In Stan, this can be coded as follows in
+the general case where the Jacobian is not a full matrix.
 %
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
