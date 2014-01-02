@@ -59,7 +59,7 @@ TEST(gm, logProbPolymorphismDouble) {
   std::stringstream in(txt);
   stan::io::dump dump(in);
 
-  test_lp_namespace::test_lp model(dump);
+  test_lp_model_namespace::test_lp_model model(dump);
 
   std::vector<double> params_r(2);
   params_r[0] = 1.0;
@@ -143,7 +143,7 @@ TEST(gm, logProbPolymorphismVar) {
   std::stringstream in(txt);
   stan::io::dump dump(in);
 
-  test_lp_namespace::test_lp model(dump);
+  test_lp_model_namespace::test_lp_model model(dump);
 
   std::vector<var> params_r(2);
   params_r[0] = 1.0;

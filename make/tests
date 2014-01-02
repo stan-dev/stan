@@ -68,15 +68,6 @@ endif
 ## end shuffling
 
 
-.PRECIOUS: src/test/test-models/no-main/mcmc/hmc/hamiltonians/funnel.cpp
-test/unit/mcmc/hmc/hamiltonians/base_hamiltonian.o test/unit/mcmc/hmc/hamiltonians/unit_e_metric.o test/unit/mcmc/hmc/hamiltonians/diag_e_metric.o test/unit/mcmc/hmc/hamiltonians/dense_e_metric.o: test/%.o : src/test/%_test.cpp $(LIBGTEST) src/test/test-models/no-main/mcmc/hmc/hamiltonians/funnel.cpp
-	@mkdir -p $(dir $@)
-	$(COMPILE.c) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
-
-.PRECIOUS: src/test/test-models/no-main/mcmc/hmc/integrators/gauss.cpp src/test/test-models/no-main/mcmc/hmc/integrators/command.cpp
-test/unit/mcmc/hmc/integrators/expl_leapfrog.o: test/%.o : src/test/%_test.cpp $(LIBGTEST) src/test/test-models/no-main/mcmc/hmc/integrators/gauss.cpp src/test/test-models/no-main/mcmc/hmc/integrators/command.cpp
-	@mkdir -p $(dir $@)
-	$(COMPILE.c) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
 
 .PRECIOUS: test/%.o
 test/%$(EXE) : test/%.o bin/libstan.a bin/libstanc.a
@@ -161,11 +152,12 @@ ALL_TEST_EXECUTABLES = $(patsubst src/%_test.cpp,%$(EXE),$(ALL_TESTS))
 ##
 .SECONDEXPANSION:
 .PHONY: $(TEST_TARGETS)
-$(TEST_TARGETS): src/test/%: $$(addprefix runtest/,$$(filter $$(patsubst src/$$(PERCENT),$$(PERCENT),$$@)$$(PERCENT),$$(ALL_TEST_EXECUTABLES)))
+$(TEST_TARGETS): src/test/%: $$(addprefix runtest/,$$(filter $$(patsubst src/$$(PERCENT),$$(PERCENT),$$@)/$$(PERCENT),$$(ALL_TEST_EXECUTABLES)))
 	@echo ''
 	$(if $(GENERATE_TESTS),\
              $(MAKE) $@, \
              @echo 'Ran '$(words $(filter runtest/%,$^))' tests for '$@)
+
 
 ##
 # TEST_MODELS is the set of all the test models.
@@ -193,13 +185,18 @@ test/unit/io/mcmc_writer.o: src/test/test-models/no-main/io_example.cpp
 test/unit/gm/command_init.o: src/test/test-models/no-main/gm/test_lp.cpp
 test/unit/gm/generator.o: src/test/test-models/no-main/gm/test_lp.cpp
 
+test/unit/mcmc/hmc/hamiltonians/base_hamiltonian.o: src/test/test-models/no-main/mcmc/hmc/hamiltonians/funnel.cpp
+test/unit/mcmc/hmc/hamiltonians/unit_e_metric.o: src/test/test-models/no-main/mcmc/hmc/hamiltonians/funnel.cpp
+test/unit/mcmc/hmc/hamiltonians/diag_e_metric.o: src/test/test-models/no-main/mcmc/hmc/hamiltonians/funnel.cpp
+test/unit/mcmc/hmc/hamiltonians/dense_e_metric.o: src/test/test-models/no-main/mcmc/hmc/hamiltonians/funnel.cpp
+test/unit/mcmc/hmc/integrators/expl_leapfrog.o: src/test/test-models/no-main/mcmc/hmc/integrators/command.cpp src/test/test-models/no-main/mcmc/hmc/integrators/gauss.cpp
+
 test/integration/compile_models.o : $(patsubst %.stan,%$(EXE),$(FILES))
 
 test/CmdStan/command.o: \
    $(addprefix src/test/test-models/compiled/CmdStan/,\
                $(addsuffix $(EXE), printer domain_fail value_fail))
 test/CmdStan/gm/argument_configuration.o: src/test/test-models/compiled/CmdStan/test_model$(EXE)
-
 
 ##
 # CmdStan specific targets. Should be removed in the future.

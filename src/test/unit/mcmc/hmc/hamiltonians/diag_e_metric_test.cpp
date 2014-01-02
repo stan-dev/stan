@@ -62,9 +62,9 @@ TEST(McmcDiagEMetric, gradients) {
   stan::io::dump data_var_context(data_stream);
   data_stream.close();
   
-  funnel_namespace::funnel model(data_var_context, &std::cout);
+  funnel_model_namespace::funnel_model model(data_var_context, &std::cout);
   
-  stan::mcmc::diag_e_metric<funnel_namespace::funnel, rng_t> metric(model, &std::cout);
+  stan::mcmc::diag_e_metric<funnel_model_namespace::funnel_model, rng_t> metric(model, &std::cout);
   
   double epsilon = 1e-6;
   

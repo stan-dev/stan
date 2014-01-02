@@ -27,7 +27,7 @@ public:
     // setup hamiltonian
     stan::io::dump data_var_context(data_stream);
 
-    model = new command_namespace::command(data_var_context);
+    model = new command_model_namespace::command_model(data_var_context);
   }
   
   void TearDown() {
@@ -36,15 +36,15 @@ public:
   
   // integrator under test
   stan::mcmc::expl_leapfrog<
-    stan::mcmc::unit_e_metric<command_namespace::command,rng_t>, 
+    stan::mcmc::unit_e_metric<command_model_namespace::command_model,rng_t>, 
     stan::mcmc::unit_e_point> unit_e_integrator;
 
   stan::mcmc::expl_leapfrog<
-    stan::mcmc::diag_e_metric<command_namespace::command,rng_t>, 
+    stan::mcmc::diag_e_metric<command_model_namespace::command_model,rng_t>, 
     stan::mcmc::diag_e_point> diag_e_integrator;
   
   // model
-  command_namespace::command *model;
+  command_model_namespace::command_model *model;
 };
 
 
@@ -62,7 +62,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, begin_update_p) {
   EXPECT_NEAR(z.g(0),  1.99987371079118, 1e-15);
   
   // setup hamiltonian
-  stan::mcmc::unit_e_metric<command_namespace::command,
+  stan::mcmc::unit_e_metric<command_model_namespace::command_model,
     rng_t> hamiltonian(*model, &std::cout);
 
   // setup epsilon
@@ -88,7 +88,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, update_q) {
   EXPECT_NEAR(z.g(0),  1.99987371079118, 1e-15);
 
   // setup hamiltonian
-  stan::mcmc::unit_e_metric<command_namespace::command,
+  stan::mcmc::unit_e_metric<command_model_namespace::command_model,
     rng_t> hamiltonian(*model, &std::cout);
 
   // setup epsilon
@@ -114,7 +114,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, end_update_p) {
   EXPECT_NEAR(z.g(0),  1.67264975797776, 1e-15);
 
   // setup hamiltonian
-  stan::mcmc::unit_e_metric<command_namespace::command,
+  stan::mcmc::unit_e_metric<command_model_namespace::command_model,
     rng_t> hamiltonian(*model, &std::cout);
 
   // setup epsilon
@@ -140,7 +140,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_1) {
   EXPECT_NEAR(z.g(0),  1.99987371079118, 1e-15);
 
   // setup hamiltonian
-  stan::mcmc::unit_e_metric<command_namespace::command,
+  stan::mcmc::unit_e_metric<command_model_namespace::command_model,
     rng_t> hamiltonian(*model, &std::cout);
 
   // setup epsilon
@@ -166,7 +166,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_2) {
   EXPECT_NEAR(z.g(0),  1.99987371079118, 1e-15);
 
   // setup hamiltonian
-  stan::mcmc::unit_e_metric<command_namespace::command,
+  stan::mcmc::unit_e_metric<command_model_namespace::command_model,
     rng_t> hamiltonian(*model, &std::cout);
 
   // setup epsilon
@@ -192,7 +192,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_3) {
   EXPECT_NEAR(z.g(0),  1.99987371079118, 1e-15);
 
   // setup hamiltonian
-  stan::mcmc::unit_e_metric<command_namespace::command,
+  stan::mcmc::unit_e_metric<command_model_namespace::command_model,
     rng_t> hamiltonian(*model, &std::cout);
 
   // setup epsilon
@@ -218,7 +218,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_4) {
   EXPECT_NEAR(z.g(0),  1.99987371079118, 1e-15);
 
   // setup hamiltonian
-  stan::mcmc::unit_e_metric<command_namespace::command,
+  stan::mcmc::unit_e_metric<command_model_namespace::command_model,
     rng_t> hamiltonian(*model, &std::cout);
 
   // setup epsilon
@@ -244,7 +244,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_5) {
   EXPECT_NEAR(z.g(0),  1.99987371079118, 1e-15);
 
   // setup hamiltonian
-  stan::mcmc::unit_e_metric<command_namespace::command,
+  stan::mcmc::unit_e_metric<command_model_namespace::command_model,
     rng_t> hamiltonian(*model, &std::cout);
 
   // setup epsilon
@@ -269,7 +269,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_6) {
   EXPECT_NEAR(z.g(0),  1.99987371079118, 1e-15);
 
   // setup hamiltonian
-  stan::mcmc::unit_e_metric<command_namespace::command,
+  stan::mcmc::unit_e_metric<command_model_namespace::command_model,
     rng_t> hamiltonian(*model, &std::cout);
 
   // setup epsilon
@@ -295,7 +295,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_7) {
   EXPECT_NEAR(z.g(0),  1.99987371079118, 1e-15);
 
   // setup hamiltonian
-  stan::mcmc::unit_e_metric<command_namespace::command,
+  stan::mcmc::unit_e_metric<command_model_namespace::command_model,
     rng_t> hamiltonian(*model, &std::cout);
 
   // setup epsilon
@@ -321,7 +321,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_8) {
   EXPECT_NEAR(z.g(0),  1.99987371079118, 1e-15);
 
   // setup hamiltonian
-  stan::mcmc::unit_e_metric<command_namespace::command,
+  stan::mcmc::unit_e_metric<command_model_namespace::command_model,
     rng_t> hamiltonian(*model, &std::cout);
 
   // setup epsilon
@@ -348,7 +348,7 @@ TEST_F(McmcHmcIntegratorsExplLeapfrogF, evolve_9) {
   EXPECT_NEAR(z.g(0),  1.27097196280777, 1e-15);
 
   // setup hamiltonian
-  stan::mcmc::diag_e_metric<command_namespace::command,
+  stan::mcmc::diag_e_metric<command_model_namespace::command_model,
     rng_t> hamiltonian(*model, &std::cout);
 
   // setup epsilon
@@ -369,13 +369,13 @@ TEST(McmcHmcIntegratorsExplLeapfrog, energy_conservation) {
   stan::io::dump data_var_context(data_stream);
   data_stream.close();
   
-  gauss_namespace::gauss model(data_var_context, &std::cout);
+  gauss_model_namespace::gauss_model model(data_var_context, &std::cout);
   
   stan::mcmc::expl_leapfrog<
-  stan::mcmc::unit_e_metric<gauss_namespace::gauss, rng_t>,
+  stan::mcmc::unit_e_metric<gauss_model_namespace::gauss_model, rng_t>,
   stan::mcmc::unit_e_point> integrator;
   
-  stan::mcmc::unit_e_metric<gauss_namespace::gauss, rng_t> metric(model, &std::cout);
+  stan::mcmc::unit_e_metric<gauss_model_namespace::gauss_model, rng_t> metric(model, &std::cout);
   
   stan::mcmc::unit_e_point z(1);
   z.q(0) = 1;
@@ -399,7 +399,7 @@ TEST(McmcHmcIntegratorsExplLeapfrog, energy_conservation) {
   }
 
   // Average error in Hamiltonian should be O(epsilon^{2})
-  // in general, smaller for the gaussian case due to cancellations
+  // in general, smaller for the gauss_modelian case due to cancellations
   EXPECT_NEAR(aveDeltaH, 0, epsilon * epsilon);
   
 }
@@ -412,13 +412,13 @@ TEST(McmcHmcIntegratorsExplLeapfrog, symplecticness) {
   stan::io::dump data_var_context(data_stream);
   data_stream.close();
   
-  gauss_namespace::gauss model(data_var_context, &std::cout);
+  gauss_model_namespace::gauss_model model(data_var_context, &std::cout);
   
   stan::mcmc::expl_leapfrog<
-  stan::mcmc::unit_e_metric<gauss_namespace::gauss, rng_t>,
+  stan::mcmc::unit_e_metric<gauss_model_namespace::gauss_model, rng_t>,
   stan::mcmc::unit_e_point> integrator;
   
-  stan::mcmc::unit_e_metric<gauss_namespace::gauss, rng_t> metric(model, &std::cout);
+  stan::mcmc::unit_e_metric<gauss_model_namespace::gauss_model, rng_t> metric(model, &std::cout);
   
   // Create a circle of points
   const int n_points = 1000;

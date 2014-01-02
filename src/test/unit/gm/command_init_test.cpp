@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 #include <test/test-models/no-main/gm/test_lp.cpp>
 
-typedef test_lp_namespace::test_lp Model;
+typedef test_lp_model_namespace::test_lp_model Model;
 typedef boost::ecuyer1988 rng_t;
 typedef stan::mcmc::adapt_unit_e_nuts<Model, rng_t> sampler;
 

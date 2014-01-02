@@ -11,9 +11,9 @@ TEST(BaseHamiltonian, update) {
   stan::io::dump data_var_context(data_stream);
   data_stream.close();
   
-  funnel_namespace::funnel model(data_var_context, &std::cout);
+  funnel_model_namespace::funnel_model model(data_var_context, &std::cout);
   
-  stan::mcmc::mock_hamiltonian<funnel_namespace::funnel, rng_t> metric(model, &std::cout);
+  stan::mcmc::mock_hamiltonian<funnel_model_namespace::funnel_model, rng_t> metric(model, &std::cout);
   stan::mcmc::ps_point z(11);
   z.q.setOnes();
   
