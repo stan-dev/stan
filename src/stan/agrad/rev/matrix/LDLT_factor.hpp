@@ -77,7 +77,8 @@ namespace stan {
        **/
       inline bool success() const {
         bool ret;
-        ret = _alloc->_ldlt.info() == Eigen::Success;
+        ret = _alloc->N_ != 0;
+        ret = ret && _alloc->_ldlt.info() == Eigen::Success;
         ret = ret && _alloc->_ldlt.isPositive();
         ret = ret && (_alloc->_ldlt.vectorD().array() > 0).all();
         return ret;
