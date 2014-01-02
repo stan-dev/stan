@@ -210,10 +210,11 @@ namespace stan {
        *
        * @return number of bytes allocated to this instance
        */
-      long bytes_allocated() {
-        long sum = 0;
-        for (size_t i = 0; i <= cur_block_; ++i)
+      size_t bytes_allocated() {
+        size_t sum = 0;
+        for (size_t i = 0; i <= cur_block_; ++i) {
           sum += sizes_[i];
+        }
         return sum;
       }
 
