@@ -24,7 +24,7 @@ namespace stan {
      *
      * Now, the caller should check that ldlt_A1.success() and ldlt_A2.success()
      * are true or abort accordingly.  Alternatively, call check_ldlt_factor().
-     * The behaviour of using an LDLT_factor without checking success() is
+     * The behaviour of using an LDLT_factor without success() returning true is
      * undefined.
      *
      * Note that ldlt_A1 and ldlt_A2 are completely equivalent.  They simply 
@@ -59,7 +59,8 @@ namespace stan {
       /**
        * Use the LDLT_factor object to factorize a new matrix.  After calling
        * this function, the user should call success() to check that the
-       * factorization was successful.
+       * factorization was successful. If the factorization is not successful,
+       * the LDLT_factor is not valid and other functions should not be used.
        *
        * @param A A symmetric positive definite matrix to factorize
        **/
@@ -72,6 +73,9 @@ namespace stan {
        * Compute the actual numerical result of inv(A)*b.  Note that this isn't
        * meant to handle any of the autodiff.  This is a convenience function
        * for the actual implementations in mdivide_left_ldlt.
+       *
+       * Precondition: success() must return true. If success() returns false,
+       *    this function runs the risk of crashing Stan from within Eigen.
        *
        * @param b The right handside.  Note that this is templated such that
        * Eigen's expression-templating magic can work properly here.
@@ -99,6 +103,9 @@ namespace stan {
       /**
        * The entries of the diagonal matrix D.  They should be strictly positive
        * for a positive definite matrix.
+       *
+       * Precondition: success() must return true. If success() returns false,
+       *    this function runs the risk of crashing Stan from within Eigen.
        **/
       inline Eigen::VectorXd vectorD() const {
         return _alloc->_ldlt.vectorD();
