@@ -52,6 +52,6 @@ public:
 
 };
 
-INSTANTIATE_TYPED_TEST_CASE_P(Models_BugsExamples_Vol3_HepatitisME,
+INSTANTIATE_TYPED_TEST_CASE_P(DISABLED_Models_BugsExamples_Vol3_HepatitisME,
             Model_Test_Fixture,
             Models_BugsExamples_Vol3_HepatitisME);
