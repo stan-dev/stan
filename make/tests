@@ -271,6 +271,6 @@ test-models test-unit test-distributions:
 
 test-models: src/test/CmdStan/models
 
-test-unit: src/test/unit
+test-unit: src/test/unit src/test/unit-agrad-rev src/test/unit-agrad-fwd
 
 test-distributions: src/test/unit-distribution
