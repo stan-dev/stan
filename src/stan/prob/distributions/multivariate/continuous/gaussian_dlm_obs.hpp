@@ -17,7 +17,6 @@
 #include <stan/math/matrix/add.hpp>
 #include <stan/math/matrix/dot_product.hpp>
 #include <stan/math/matrix/inverse_spd.hpp>
-#include <stan/math/matrix/ldlt.hpp>
 #include <stan/math/matrix/log.hpp>
 #include <stan/math/matrix/log_determinant_spd.hpp>
 #include <stan/math/matrix/multiply.hpp>

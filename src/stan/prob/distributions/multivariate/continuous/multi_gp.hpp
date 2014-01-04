@@ -19,7 +19,10 @@
 #include <stan/math/matrix/subtract.hpp>
 #include <stan/math/matrix/sum.hpp>
 
-#include <stan/math/matrix/ldlt.hpp>
+#include <stan/math/matrix/log_determinant_ldlt.hpp>
+#include <stan/math/matrix/mdivide_right_ldlt.hpp>
+#include <stan/math/matrix/trace_gen_inv_quad_form_ldlt.hpp>
+#include <stan/math/error_handling/matrix/check_ldlt_factor.hpp>
 
 namespace stan {
   namespace prob {
@@ -64,8 +67,9 @@ namespace stan {
       using stan::math::rows_dot_product;
       using stan::math::log_determinant_ldlt;
       using stan::math::mdivide_right_ldlt;
-      using stan::math::trace_inv_quad_form_ldlt;
+      using stan::math::trace_gen_inv_quad_form_ldlt;
       using stan::math::LDLT_factor;
+      using stan::math::check_ldlt_factor;
 
       if (!check_size_match(function, 
                             Sigma.rows(), "Rows of kernel matrix",
@@ -80,14 +84,8 @@ namespace stan {
         return lp;
       
       LDLT_factor<T_covar,Eigen::Dynamic,Eigen::Dynamic> ldlt_Sigma(Sigma);
-      if (!ldlt_Sigma.success()) {
-        std::ostringstream message;
-        message << "Kernel matrix is not positive definite. " 
-                << "K[1,1] is %1%.";
-        std::string str(message.str());
-        stan::math::dom_err(function,Sigma(0,0),"",str.c_str(),"",&lp);
+      if(!check_ldlt_factor(function,ldlt_Sigma,"LDLT_Factor of Sigma",&lp))
         return lp;
-      }
 
       if (!check_size_match(function, 
                             y.rows(), "Size of random variable (rows y)",
@@ -124,7 +122,7 @@ namespace stan {
       if (include_summand<propto,T_y,T_w,T_covar>::value) {
         Eigen::Matrix<T_w,Eigen::Dynamic,Eigen::Dynamic> w_mat(w.asDiagonal());
         Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic> yT(y.transpose());
-        lp -= 0.5 * trace_inv_quad_form_ldlt(w_mat,ldlt_Sigma,yT);
+        lp -= 0.5 * trace_gen_inv_quad_form_ldlt(w_mat,ldlt_Sigma,yT);
       }
 
       return lp;
