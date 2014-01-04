@@ -1,4 +1,4 @@
-##
+#
 # LIBGTEST is the google test library
 # GTEST_MAIN is the file that contains the google test
 ##
@@ -163,16 +163,16 @@ ifeq ($(findstring test-,$(MAKECMDGOALS))$(findstring runtest/,$(MAKECMDGOALS)),
 endif
 
 src/test/gm/model_specs/no_main/%.cpp : src/test/gm/model_specs/no_main/%.stan bin/stanc$(EXE)
-	bin$(PATH_SEPARATOR)stanc$(EXE) --name=$(basename $(@F)) --o=$@ --no_main $<
+	$(WINE) bin$(PATH_SEPARATOR)stanc$(EXE) --name=$(basename $(@F)) --o=$@ --no_main $<
 
 src/test/mcmc/hmc/hamiltonians/models/%.cpp : src/test/mcmc/hmc/hamiltonians/models/%.stan bin/stanc$(EXE)
-	bin$(PATH_SEPARATOR)stanc$(EXE) --name=$(basename $(@F)) --o=$@ --no_main $<
+	$(WINE) bin$(PATH_SEPARATOR)stanc$(EXE) --name=$(basename $(@F)) --o=$@ --no_main $<
 
 src/test/mcmc/hmc/integrators/models/%.cpp : src/test/mcmc/hmc/integrators/models/%.stan bin/stanc$(EXE)
-	bin$(PATH_SEPARATOR)stanc$(EXE) --name=$(basename $(@F)) --o=$@ --no_main $<
+	$(WINE) bin$(PATH_SEPARATOR)stanc$(EXE) --name=$(basename $(@F)) --o=$@ --no_main $<
 
 src/test/io/test_model/%.cpp : src/test/io/test_model/%.stan bin/stanc$(EXE)
-	bin$(PATH_SEPARATOR)stanc$(EXE) --name=$(basename $(@F)) --o=$@ --no_main $<
+	$(WINE) bin$(PATH_SEPARATOR)stanc$(EXE) --name=$(basename $(@F)) --o=$@ --no_main $<
 
 .PRECIOUS: src/test/mcmc/hmc/hamiltonians/models/funnel.cpp
 test/mcmc/hmc/hamiltonians/base_hamiltonian.o test/mcmc/hmc/hamiltonians/unit_e_metric.o test/mcmc/hmc/hamiltonians/diag_e_metric.o test/mcmc/hmc/hamiltonians/dense_e_metric.o: test/%.o : src/test/%_test.cpp $(LIBGTEST) src/test/mcmc/hmc/hamiltonians/models/funnel.cpp
@@ -264,13 +264,13 @@ endif
 .SECONDARY:
 runtest/% : %$(EXE)
 	@echo '------------------------------------------------------------'
-	$< --gtest_output="xml:$*.xml";
+	$(WINE) $< --gtest_output="xml:$*.xml";
 
 .PHONY: runtest_no_fail/%
 .SECONDARY:
 runtest_no_fail/% : %$(EXE)
 	@echo '------------------------------------------------------------'
-	-$< --gtest_output="xml:$*.xml";
+	$(WINE) -$< --gtest_output="xml:$*.xml";
 
 ##
 # target path_separator for use in some tests that need to 

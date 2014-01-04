@@ -38,6 +38,7 @@ CFLAGS_GTEST = -DGTEST_USE_OWN_TR1_TUPLE
 LDLIBS = -Lbin -lstan
 LDLIBS_STANC = -Lbin -lstanc
 EXE = 
+WINE =
 PATH_SEPARATOR = /
 
 
