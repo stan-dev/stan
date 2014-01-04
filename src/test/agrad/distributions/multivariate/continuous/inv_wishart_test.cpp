@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 #include <test/agrad/distributions/expect_eq_diffs.hpp>
+#include <stan/agrad/rev/matrix.hpp>
 #include <stan/prob/distributions/multivariate/continuous/inv_wishart.hpp>
+
 
 template <typename T_y, typename T_dof, typename T_scale>
 void expect_propto(T_y W1, T_dof nu1, T_scale S1,
