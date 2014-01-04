@@ -122,24 +122,7 @@ endif
 ##
 # all files that should be compiled as tests
 ##
-FILES := $(wildcard src/test/gm/model_specs/compiled/*.stan)
-
-
-## These lines are to shuffle the files
-ifeq ($(OS),win)
-  WH := where
-else
-  WH := which
-endif
-
-ifneq ($(shell $(WH) shuf),)
-  FILES := $(shell shuf -e $(FILES))
-else
-ifneq ($(shell $(WH) Rscript),)
-  FILES := $(shell Rscript --vanilla -e "cat(sample(commandArgs(trailingOnly=TRUE)))" $(FILES))
-endif
-endif
-## end shuffling
+FILES := $(shell find src/test/gm/model_specs/compiled/ -type f -name '*.stan')
 
 test/gm/command$(EXE) : test/gm/command.o bin/libstan.a bin/libstanc.a src/test/gm/model_specs/compiled/domain_fail$(EXE) src/test/gm/model_specs/compiled/value_fail$(EXE) src/test/gm/model_specs/printer$(EXE)
 	@mkdir -p $(dir $@)

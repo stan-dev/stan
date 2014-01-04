@@ -33,7 +33,7 @@ GTEST ?= lib/gtest_1.7.0
 ##
 # Set default compiler options.
 ## 
-CFLAGS = -I src -isystem $(EIGEN) -isystem $(BOOST) -Wall -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS
+CFLAGS = -I src -isystem $(EIGEN) -isystem $(BOOST) -Wall -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS -pipe
 CFLAGS_GTEST = -DGTEST_USE_OWN_TR1_TUPLE
 LDLIBS = -Lbin -lstan
 LDLIBS_STANC = -Lbin -lstanc
@@ -59,6 +59,12 @@ PATH_SEPARATOR = /
 #   - EXE
 ##
 -include make/os_detect
+
+##
+# Tell make the default way to compile a function_signatures*.o file.
+##
+src/test/gm/model_specs/compiled/function_signatures/%.o : src/test/gm/model_specs/compiled/function_signatures/%.cpp
+	$(COMPILE.c) -O0 -fsyntax-only $(OUTPUT_OPTION) $<
 
 ##
 # Tell make the default way to compile a .o file.
