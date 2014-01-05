@@ -7,6 +7,7 @@
 #include <stan/agrad/rev.hpp>
 #include <stan/agrad/rev/matrix.hpp>
 #include <stan/math/matrix/assign.hpp>
+#include <stan/math/matrix/transpose.hpp>
 
 TEST(AgradRevMatrix,mv_squaredNorm) {
   using stan::agrad::matrix_v;

@@ -2,6 +2,7 @@
 #include <test/unit/distribution/expect_eq_diffs.hpp>
 #include <stan/prob/distributions/multivariate/continuous/inv_wishart.hpp>
 
+
 template <typename T_y, typename T_dof, typename T_scale>
 void expect_propto(T_y W1, T_dof nu1, T_scale S1,
                    T_y W2, T_dof nu2, T_scale S2,

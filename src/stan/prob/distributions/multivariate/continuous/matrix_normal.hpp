@@ -12,8 +12,8 @@
 #include <stan/math/matrix/log_determinant.hpp>
 #include <stan/math/matrix/subtract.hpp>
 #include <stan/math/matrix/trace_quad_form.hpp>
-
-#include <stan/math/matrix/ldlt.hpp>
+#include <stan/math/error_handling/matrix/check_ldlt_factor.hpp>
+#include <stan/math/matrix/log_determinant_ldlt.hpp>
 
 namespace stan {
   namespace prob {
@@ -54,6 +54,7 @@ namespace stan {
       using stan::math::log_determinant_ldlt;
       using stan::math::subtract;
       using stan::math::LDLT_factor;
+      using stan::math::check_ldlt_factor;
       
       if (!check_size_match(function, 
                             Sigma.rows(), "Rows of Sigma",
@@ -68,14 +69,8 @@ namespace stan {
         return lp;
       
       LDLT_factor<T_Sigma,Eigen::Dynamic,Eigen::Dynamic> ldlt_Sigma(Sigma);
-      if (!ldlt_Sigma.success()) {
-        std::ostringstream message;
-        message << "Sigma is not positive definite. " 
-        << "Sigma(0,0) is %1%.";
-        std::string str(message.str());
-        stan::math::dom_err(function,Sigma(0,0),"Sigma",str.c_str(),"",&lp);
+      if(!check_ldlt_factor(function,ldlt_Sigma,"LDLT_Factor of Sigma",&lp))
         return lp;
-      }
       
       if (!check_size_match(function, 
                             D.rows(), "Rows of D",
@@ -90,14 +85,8 @@ namespace stan {
         return lp;
       
       LDLT_factor<T_D,Eigen::Dynamic,Eigen::Dynamic> ldlt_D(D);
-      if (!ldlt_D.success()) {
-        std::ostringstream message;
-        message << "D is not positive definite. " 
-        << "D(0,0) is %1%.";
-        std::string str(message.str());
-        stan::math::dom_err(function,Sigma(0,0),"",str.c_str(),"",&lp);
+      if(!check_ldlt_factor(function,ldlt_D,"LDLT_Factor of D",&lp))
         return lp;
-      }
 
       if (!check_size_match(function, 
                             y.rows(), "Rows of random variable",
