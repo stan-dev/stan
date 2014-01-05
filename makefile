@@ -58,7 +58,7 @@ PATH_SEPARATOR = /
 #   - CFLAGS_GTEST
 #   - EXE
 ##
--include make/os_detect
+-include make/detect_os
 
 ##
 # Tell make the default way to compile a .o file.
