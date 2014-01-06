@@ -138,7 +138,7 @@ endif
 	@echo '    2. Run the model:'
 	@echo '       src'$(PATH_SEPARATOR)'models'$(PATH_SEPARATOR)'basic_distributions'$(PATH_SEPARATOR)'normal$(EXE) sample'
 	@echo '    3. Look at the samples:'
-	@echo '       bin'$(PATH_SEPARATOR)'print$(EXE) samples.csv'
+	@echo '       bin'$(PATH_SEPARATOR)'print$(EXE) output.csv'
 	@echo ''
 	@echo 'Common targets:'
 	@echo '  Model related:'
