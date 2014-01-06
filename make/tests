@@ -273,19 +273,24 @@ GENERATE_TESTS = $(filter-out $(words $(filter %_00000_generated$(EXE),$^)),\
 test-headers: $(HEADER_TESTS) 
 
 
-
 ##
 # Deprecated test targets
 ##
-.PHONY: test-models test-unit test-distributions
-test-models test-unit test-distributions:
+.PHONY: test-unit test-distributions test-models test-bugs
+test-unit test-distributions test-models test-bugs test-all:
 	@echo ''
 	@echo ''
 	@echo '  The '$@' target is deprecated. Please use:'
 	@echo '      '$^
 
-test-models: src/test/CmdStan/models
-
 test-unit: src/test/unit src/test/unit-agrad-rev src/test/unit-agrad-fwd
 
 test-distributions: src/test/unit-distribution
+
+test-models: src/test/CmdStan/models
+
+test-bugs: src/test/CmdStan/models/bugs_examples
+
+
+.PHONY: test-all
+test-all: test-headers $(TEST_TARGETS)
