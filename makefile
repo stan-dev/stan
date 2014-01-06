@@ -61,6 +61,11 @@ PATH_SEPARATOR = /
 -include make/detect_os
 
 ##
+# Get information about the version of make.
+##
+-include make/detect_make
+
+##
 # Tell make the default way to compile a .o file.
 ##
 %.o : %.cpp
