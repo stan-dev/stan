@@ -282,7 +282,7 @@ test-models test-unit test-distributions:
 	@echo ''
 	@echo ''
 	@echo '  The '$@' target is deprecated. Please use:'
-	@echo '      '$<
+	@echo '      '$^
 
 test-models: src/test/CmdStan/models
 
