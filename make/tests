@@ -270,7 +270,7 @@ runtest/% : %$(EXE)
 .SECONDARY:
 runtest_no_fail/% : %$(EXE)
 	@echo '------------------------------------------------------------'
-	$(WINE) -$< --gtest_output="xml:$*.xml";
+	-$(WINE) $< --gtest_output="xml:$*.xml";
 
 ##
 # target path_separator for use in some tests that need to 
