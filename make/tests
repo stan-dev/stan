@@ -237,7 +237,7 @@ src/test/unit-distribution/%_00000_generated_test.cpp : src/test/unit-distributi
 	test/unit-distribution/generate_tests$(EXE) $<
 
 
-ifeq ($(filter second-expansion,$(.FEATURES)),second-exapansion)
+ifneq ($(filter second-expansion,$(.FEATURES)),)
 ##
 # For src/test/unit-distribution tests, adding
 # dependency on generated tests.
