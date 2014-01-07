@@ -236,5 +236,5 @@ clean-models:
 
 clean-all: clean clean-manual clean-models
 	$(RM) -r test/* bin
-	$(RM) $(shell find src -type f -name '*.d') $(shell find src -type f -name '*.o') $(shell find src/test/unit-distribution -type f -name '*_generated_test.cpp')
+	$(RM) $(shell find src -type f -name '*.d') $(shell find src -type f -name '*.o') $(shell find src/test/unit-distribution -name '*_generated_test.cpp' -type f | sed 's#\(.*\)/.*#\1/*_generated_test.cpp#' | sort -u)
 
