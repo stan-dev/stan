@@ -6,7 +6,7 @@
 TEST(gm,compile_models) {
   SUCCEED() 
     << "Model compilation done through makefile dependencies." << std::endl
-    << "Should have compiled: src/test/test-models/compiled/*.stan";
+    << "Should have compiled: src/test/test-models/syntax-only/*.stan";
 }
 
 TEST(gm,issue91_segfault_printing_uninitialized) {
@@ -15,7 +15,6 @@ TEST(gm,issue91_segfault_printing_uninitialized) {
   model_path.push_back("test");
   model_path.push_back("test-models");
   model_path.push_back("compiled");
-  model_path.push_back("gm");
   model_path.push_back("issue91");
 
   std::string command 
@@ -34,7 +33,6 @@ TEST(gm,issue109_csv_header_consistent_with_samples) {
   model_path.push_back("test");
   model_path.push_back("test-models");
   model_path.push_back("compiled");
-  model_path.push_back("gm");
   model_path.push_back("issue109");
 
   std::string path = convert_model_path(model_path);

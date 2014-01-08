@@ -25,6 +25,13 @@ test/dummy.cpp:
 	$(COMPILE.c) -O0 -include $< -o $(DEV_NULL) test/dummy.cpp
 
 ##
+# Target to verify compiled models are valid
+##
+.PHONY: %.cpp-test
+%.cpp-test : %.cpp
+	$(COMPILE.c) -fsyntax-only -O$O $< 
+
+##
 # Target to build all tests
 ##
 .PHONY: test-all
@@ -45,29 +52,6 @@ test/gtest.o: $(GTEST)/src/gtest-all.cc
 # Adapted from the gnu make manual.
 # http://www.gnu.org/software/make/manual/html_node/Automatic-Prerequisites.html#Automatic-Prerequisites
 ##
-
-##
-# all files that should be compiled as tests
-##
-FILES := $(shell find src/test/test-models/compiled -type f -name '*.stan')
-
-## These lines are to shuffle the files
-ifeq ($(OS),win)
-  WH := where
-else
-  WH := which
-endif
-
-ifneq ($(shell $(WH) shuf),)
-  FILES := $(shell shuf -e $(FILES))
-else
-ifneq ($(shell $(WH) Rscript),)
-  FILES := $(shell Rscript --vanilla -e "cat(sample(commandArgs(trailingOnly=TRUE)))" $(FILES))
-endif
-endif
-## end shuffling
-
-
 
 .PRECIOUS: test/%.o
 test/%$(EXE) : test/%.o bin/libstan.a bin/libstanc.a
@@ -207,7 +191,12 @@ test/unit/mcmc/hmc/hamiltonians/diag_e_metric.o: src/test/test-models/no-main/mc
 test/unit/mcmc/hmc/hamiltonians/dense_e_metric.o: src/test/test-models/no-main/mcmc/hmc/hamiltonians/funnel.cpp
 test/unit/mcmc/hmc/integrators/expl_leapfrog.o: src/test/test-models/no-main/mcmc/hmc/integrators/command.cpp src/test/test-models/no-main/mcmc/hmc/integrators/gauss.cpp
 
-test/integration/compile_models.o : $(patsubst %.stan,%$(EXE),$(FILES))
+##
+# all files that should be compiled as tests
+##
+FILES := $(shell find src/test/test-models/compiled -type f -name '*.stan')
+
+test/integration/compile_models.o : $(patsubst %.stan,%$(EXE),$(FILES)) $(patsubst %.stan,%.cpp-test,$(wildcard src/test/test-models/syntax-only/*stan))
 
 test/CmdStan/command.o: \
    $(addprefix src/test/test-models/compiled/CmdStan/,\
