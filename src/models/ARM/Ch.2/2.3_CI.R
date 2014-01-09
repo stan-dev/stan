@@ -31,13 +31,9 @@ int.95 <- estimate + qt(c(.025,.975),n-1)*se
 polls <- matrix (scan("polls.dat"), ncol=5, byrow=TRUE)
 support <- polls[,3]/(polls[,3]+polls[,4])
 year <-  polls[,1] + (polls[,2]-6)/12
-y.max<-NULL
-y.min<-NULL
-for (i in 1:32) {
-  y.bounds <- (100*(support[i]+c(-1,1)*sqrt(support[i]*(1-support[i])/1000)))
-  y.max <-c(y.max,y.bounds[2])
-  y.min <-c(y.min,y.bounds[1])
-}
+y.se <- sqrt(support * (1 - support)/1000)
+y.max <- 100 * (support + y.se)
+y.min <- 100 * (support - y.se)
 limits <- aes(ymax=y.max,ymin=y.min)
 frame1 = data.frame(year=year,support=support*100)
 m <- ggplot(frame1,aes(x=year,y=support))
