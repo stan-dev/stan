@@ -263,7 +263,6 @@ GENERATE_TESTS = $(filter-out $(words $(filter %_00000_generated$(EXE),$^)),\
 .PHONY: test-headers
 test-headers: $(HEADER_TESTS) 
 
-
 ##
 # Deprecated test targets
 ##
