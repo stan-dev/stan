@@ -228,14 +228,19 @@ src/test/unit-distribution/%_00000_generated_test.cpp : src/test/unit-distributi
 	test/unit-distribution/generate_tests$(EXE) $<
 
 
-ifneq ($(filter second-expansion,$(.FEATURES)),)
+
+
 ##
 # For src/test/unit-distribution tests, adding
 # dependency on generated tests.
 ##
+
+ifneq ($(filter second-expansion,$(.FEATURES)),)
+
 DISTRIBUTION_TESTS := $(shell find src/test/unit-distribution -type f -name '*.hpp')
 .SECONDEXPANSION:
 $(filter src/test/unit-distribution%,$(TEST_TARGETS)): src/test/unit-distribution%: $$(patsubst $$(PERCENT)_test.hpp,$$(PERCENT)_00000_generated_test.cpp,$$(filter $$@$$(PERCENT),$$(DISTRIBUTION_TESTS)))
+
 endif
 
 ##
@@ -256,9 +261,10 @@ endif
 #     The filter-out function returns the total number of tests that should
 #        be generated if they have not yet been generated.
 ##
-src/test/unit-distribution% : \
+$(filter src/test/unit-distribution%,$(TEST_TARGETS)): \
 GENERATE_TESTS = $(filter-out $(words $(filter %_00000_generated$(EXE),$^)),\
                               $(words $(filter $@%_00000_generated_test.cpp,$(ALL_TESTS))))
+
 
 .PHONY: test-headers
 test-headers: $(HEADER_TESTS) 
