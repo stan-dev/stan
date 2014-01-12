@@ -1,3 +1,14 @@
+.PHONY: tmp tmp2
+
+tmp:
+	@echo $@
+	@echo $(MAKEFLAGS)
+	$(MAKE) tmp2
+
+tmp2:
+	@echo $@
+	@echo $(MAKEFLAGS)
+
 ##
 # LIBGTEST is the google test library
 # GTEST_MAIN is the file that contains the google test
@@ -143,7 +154,7 @@ ifneq ($(filter second-expansion,$(.FEATURES)),)
 $(TEST_TARGETS): src/test/%: $$(addprefix runtest/,$$(filter $$(patsubst src/$$(PERCENT),$$(PERCENT),$$@)/$$(PERCENT),$$(ALL_TEST_EXECUTABLES)))
 	@echo ''
 	$(if $(GENERATE_TESTS),\
-             $(MAKE) $@, \
+             $(MAKE) $@ $(if $(J),-j $(J)), \
              @echo 'Ran '$(words $(filter runtest/%,$^))' tests for '$@)
 else
 ####
