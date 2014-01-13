@@ -176,6 +176,7 @@ endif
 -include make/doxygen  # doxygen
 -include make/manual   # manual: manual, doc/stan-reference.pdf
 -include make/demo     # for building demos
+-include make/local    # for local stuff
 
 ifneq (,$(filter-out runtest/%,$(filter-out clean%,$(MAKECMDGOALS))))
   -include $(addsuffix .d,$(subst $(EXE),,$(MAKECMDGOALS)))

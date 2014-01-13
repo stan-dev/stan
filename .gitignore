@@ -68,3 +68,7 @@ src/test/agrad/distributions/multivariate/discrete/*_generated_test.cpp
 rstan/rstan/R/git_head.R
 rstan/rstan/inst/include/stanlib
 rstan/rstan/inst/include/stansrc
+
+# local make include
+make/local
+
