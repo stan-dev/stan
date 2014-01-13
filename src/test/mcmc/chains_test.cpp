@@ -330,11 +330,11 @@ TEST_F(McmcChains, blocker_sd) {
 
   for (int j = 0; j < chains.num_params(); j++) {
     std::string param_name = chains.param_name(j);
-    ASSERT_FLOAT_EQ(chains.sd(0,j), chains.sd(0,param_name))
+    ASSERT_NEAR(chains.sd(0,j), chains.sd(0,param_name), 1e-8)
       << "4: chain sd 0 called with string name: " << param_name;
-    ASSERT_FLOAT_EQ(chains.sd(1,j), chains.sd(1,param_name))
+    ASSERT_NEAR(chains.sd(1,j), chains.sd(1,param_name), 1e-8)
       << "4: chain sd 1 called with string name: " << param_name;
-    ASSERT_FLOAT_EQ(chains.sd(j), chains.sd(param_name))
+    ASSERT_NEAR(chains.sd(j), chains.sd(param_name), 1e-8)
       << "4: sd called with string name: " << param_name;
   }
 
@@ -386,11 +386,11 @@ TEST_F(McmcChains, blocker_variance) {
 
   for (int j = 0; j < chains.num_params(); j++) {
     std::string param_name = chains.param_name(j);
-    ASSERT_FLOAT_EQ(chains.variance(0,j), chains.variance(0,param_name))
+    ASSERT_NEAR(chains.variance(0,j), chains.variance(0,param_name), 1e-8)
       << "4: chain variance 0 called with string name: " << param_name;
-    ASSERT_FLOAT_EQ(chains.variance(1,j), chains.variance(1,param_name))
+    ASSERT_NEAR(chains.variance(1,j), chains.variance(1,param_name), 1e-8)
       << "4: chain variance 1 called with string name: " << param_name;
-    ASSERT_FLOAT_EQ(chains.variance(j), chains.variance(param_name))
+    ASSERT_NEAR(chains.variance(j), chains.variance(param_name), 1e-8)
       << "4: variance called with string name: " << param_name;
   }
 
