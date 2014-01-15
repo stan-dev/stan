@@ -11,8 +11,8 @@ data {
 
 // to standardize the x's 
 transformed data {
-  real z[N,p];
-  real mean_x[p];
+  matrix[N,p] z;
+  row_vector[p] mean_x;
   real sd_x[p];
   for (j in 1:p) { 
     mean_x[j] <- mean(col(x,j)); 
@@ -24,18 +24,17 @@ transformed data {
 
 parameters {
   real beta0; 
-  real beta[p]; 
+  vector[p] beta;
   real<lower=0> sigmasq; 
   real<lower=0> phi;
 } 
 
 transformed parameters {
   real<lower=0> sigma;
-  real mu[N];
+  vector[N] mu;
 
   sigma <- sqrt(sigmasq);
-  for (n in 1:N)
-    mu[n] <- beta0 + beta[1] * z[n, 1] + beta[2] * z[n, 2] + beta[3] * z[n, 3];
+  mu <- beta0 + z * beta;
 }
 
 model {
@@ -43,20 +42,19 @@ model {
   phi ~ gamma(0.01, 0.01);
   beta ~ normal(0, sqrt(phi));
   sigmasq ~ inv_gamma(.001, .001); 
-  for (n in 1:N) 
-    Y[n] ~ normal(mu[n], sigma); 
+  Y ~ normal(mu, sigma);
 } 
 
 generated quantities {
   real b0;
-  real b[p];
+  vector[p] b;
   real outlier_3;
   real outlier_4;
   real outlier_21;
 
   for (j in 1:p)
     b[j] <- beta[j] / sd_x[j];
-  b0 <- beta0 - b[1] * mean_x[1] - b[2] * mean_x[2] - b[3] * mean_x[3];
+  b0 <- beta0 - mean_x * b;
 
   outlier_3  <- step(fabs((Y[3] - mu[3]) / sigma) - 2.5);
   outlier_4  <- step(fabs((Y[4] - mu[4]) / sigma) - 2.5);

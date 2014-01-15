@@ -21,35 +21,24 @@ namespace stan {
       std::string model;
       std::string data;
       std::string init;
-      bool append_samples;
-      bool save_warmup;
+      size_t chain_id;
       size_t seed;
       bool random_seed;
-      size_t chain_id;
-      size_t iter;
-      size_t warmup;
+      size_t num_samples;
+      size_t num_warmup;
+      bool save_warmup;
       size_t thin;
-      bool equal_step_sizes;
-      bool nondiag_mass;
-      int leapfrog_steps;
-      int max_treedepth;
-      double epsilon;
-      double epsilon_pm;
-      double delta;
-      double gamma;
+      bool append_samples;
       std::string algorithm;
+      std::string engine;
 
-      stan_csv_metadata() 
+      stan_csv_metadata()
         : stan_version_major(0), stan_version_minor(0), stan_version_patch(0),
           model(""), data(""), init(""),
-          append_samples(false), save_warmup(false),
-          seed(0), random_seed(false),
-          chain_id(1), iter(0), warmup(0), thin(0),
-          equal_step_sizes(false), nondiag_mass(false),
-          leapfrog_steps(0), max_treedepth(0),
-          epsilon(0), epsilon_pm(0),
-          delta(0), gamma(0),
-          algorithm("") {}
+          chain_id(1), seed(0), random_seed(false),
+          num_samples(0), num_warmup(0), save_warmup(false), thin(0),
+          append_samples(false),
+          algorithm(""), engine("") {}
     };
 
     struct stan_csv_adaptation {
@@ -101,72 +90,58 @@ namespace stan {
 
         char comment;
         std::string lhs;
-
-        // Skip first two lines
-        std::getline(ss, line);
-        std::getline(ss, line);
+        
+        std::string name;
+        std::string value;
 
         while (ss.good()) {
           
           ss >> comment;
-          std::getline(ss, lhs, '=');
-          boost::trim(lhs);
+          std::getline(ss, lhs);
           
-          if (lhs.compare("") == 0) { // no-op
-          } else if (lhs.compare("stan_version_major") == 0) {
-            ss >> metadata.stan_version_major;
-          } else if (lhs.compare("stan_version_minor") == 0) {
-            ss >> metadata.stan_version_minor;
-          } else if (lhs.compare("stan_version_patch") == 0) {
-            ss >> metadata.stan_version_patch;
-          } else if (lhs.compare("model") == 0) {
-            ss >> metadata.model;
-          } else if (lhs.compare("data") == 0) {
-            ss >> metadata.data;      
-          } else if (lhs.compare("init") == 0) {
-            std::getline(ss, metadata.init);
-            boost::trim(metadata.init);
-            ss.unget();
-          } else if (lhs.compare("append_samples") == 0) {
-            ss >> metadata.append_samples;
-          } else if (lhs.compare("save_warmup") == 0) {
-            ss >> metadata.save_warmup;
-          } else if (lhs.compare("seed") == 0) {
-            ss >> metadata.seed;
-            metadata.random_seed = false;
-          } else if (lhs.compare("chain_id") == 0) {
-            ss >> metadata.chain_id;
-          } else if (lhs.compare("iter") == 0) {
-            ss >> metadata.iter;
-          } else if (lhs.compare("warmup") == 0) {
-            ss >> metadata.warmup;
-          } else if (lhs.compare("thin") == 0) {
-            ss >> metadata.thin;
-          } else if (lhs.compare("equal_step_sizes") == 0) {
-            ss >> metadata.equal_step_sizes;
-                } else if (lhs.compare("nondiag_mass") == 0) {
-            ss >> metadata.nondiag_mass;
-          } else if (lhs.compare("leapfrog_steps") == 0) {
-            ss >> metadata.leapfrog_steps;
-          } else if (lhs.compare("max_treedepth") == 0) {
-            ss >> metadata.max_treedepth;
-          } else if (lhs.compare("epsilon") == 0) {
-            ss >> metadata.epsilon;
-          } else if (lhs.compare("epsilon_pm") == 0) {
-            ss >> metadata.epsilon_pm;
-          } else if (lhs.compare("delta") == 0) {
-            ss >> metadata.delta;
-          } else if (lhs.compare("gamma") == 0) {
-            ss >> metadata.gamma;
-          } else if (lhs.compare("algorithm") == 0) {
-            std::getline(ss, metadata.algorithm);
-            boost::trim(metadata.algorithm);
-            ss.unget();
+          size_t equal = lhs.find("=");
+          if (equal != std::string::npos) {
+            name = lhs.substr(0, equal);
+            boost::trim(name);
+            value = lhs.substr(equal + 2, lhs.size());
+            boost::replace_first(value, " (Default)", "");
           } else {
-            std::cout << "unused option: " << lhs << std::endl;
+            continue;
           }
           
-          std::getline(ss, line);
+          if (name.compare("stan_version_major") == 0) {
+            metadata.stan_version_major = boost::lexical_cast<int>(value);
+          } else if (name.compare("stan_version_minor") == 0) {
+            metadata.stan_version_minor = boost::lexical_cast<int>(value);
+          } else if (name.compare("stan_version_patch") == 0) {
+            metadata.stan_version_patch = boost::lexical_cast<int>(value);
+          } else if (name.compare("model") == 0) {
+            metadata.model = value;
+          } else if (name.compare("num_samples") == 0) {
+            metadata.num_samples = boost::lexical_cast<int>(value);
+          } else if (name.compare("num_warmup") == 0) {
+            metadata.num_warmup = boost::lexical_cast<int>(value);
+          } else if (name.compare("save_warmup") == 0) {
+            metadata.save_warmup = boost::lexical_cast<bool>(value);
+          } else if (name.compare("thin") == 0) {
+            metadata.thin = boost::lexical_cast<int>(value);
+          } else if (name.compare("chain_id") == 0) {
+            metadata.chain_id = boost::lexical_cast<int>(value);
+          } else if (name.compare("data") == 0) {
+            metadata.data = value;
+          } else if (name.compare("init") == 0) {
+            metadata.init = value;
+            boost::trim(metadata.init);
+          } else if (name.compare("seed") == 0) {
+            metadata.seed = boost::lexical_cast<unsigned int>(value);
+            metadata.random_seed = false;
+          } else if (name.compare("append_samples") == 0) {
+            metadata.append_samples = boost::lexical_cast<bool>(value);
+          } else if (name.compare("algorithm") == 0) {
+            metadata.algorithm = value;
+          } else if (name.compare("engine") == 0) {
+            metadata.engine = value;
+          }
           
         }
         
@@ -288,11 +263,11 @@ namespace stan {
           if (comment_line) {
 
             if (line.find("(Warm-up)") != std::string::npos) {
-              int left = 16;
+              int left = 17;
               int right = line.find(" seconds");
               timing.warmup += boost::lexical_cast<double>(line.substr(left, right - left));
             } else if (line.find("(Sampling)") != std::string::npos) {
-              int left = 16;
+              int left = 17;
               int right = line.find(" seconds");
               timing.sampling += boost::lexical_cast<double>(line.substr(left, right - left));
             }
@@ -348,7 +323,7 @@ namespace stan {
         if (!read_metadata(in, data.metadata)) {
           std::cout << "Warning: non-fatal error reading metadata" << std::endl;
         }
-          
+        
         if (!read_header(in, data.header)) {
           std::cout << "Error: error reading header" << std::endl;
           throw std::invalid_argument("Error with header of input file in parse");

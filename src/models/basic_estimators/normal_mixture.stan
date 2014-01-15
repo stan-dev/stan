@@ -20,8 +20,9 @@ model {
   theta ~ uniform(0,1); // equivalently, ~ beta(1,1);
   for (k in 1:2)
     mu[k] ~ normal(0,10);
-  for (n in 1:N) {
-    lp__ <- lp__ + log_sum_exp(log_theta + normal_log(y[n],mu[1],1.0),
-                               log_one_minus_theta + normal_log(y[n],mu[2],1.0));
-  }
+  for (n in 1:N)
+    increment_log_prob(log_sum_exp(log_theta
+                                     + normal_log(y[n],mu[1],1.0),
+                                   log_one_minus_theta 
+                                     + normal_log(y[n],mu[2],1.0)));
 }

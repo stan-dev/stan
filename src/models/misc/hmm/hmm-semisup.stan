@@ -36,7 +36,7 @@ model {
         gamma[t,k] <- log_sum_exp(acc);
       }
     }
-    lp__ <- lp__ + log_sum_exp(gamma[T_unsup]);
+    increment_log_prob(log_sum_exp(gamma[T_unsup]));
   }
 }
 generated quantities {

@@ -15,13 +15,12 @@ parameters {
   matrix[I-1, K-1] beta0;
   matrix[J-1, K-1] gamma0; 
   matrix[I, J] lambda;
-
 }
 
 transformed parameters {
   vector[K] alpha; 
-  matrix[I, K] beta;
-  matrix[J, K] gamma; 
+  vector[K] beta[I];
+  vector[K] gamma[J]; 
 
   alpha[1] <- 0;
   for (k in 1:(K-1))
@@ -57,23 +56,24 @@ model {
   } 
 
   # LIKELIHOOD  
-  for (i in 1:I) {   
-    for (j in 1:J) {   
-      lambda[i, j] ~ normal(0, 320);
-      for (k in 1:K)       
-        X[i, j, k] ~ poisson_log(lambda[i, j] + alpha[k] + beta[i, k]  + gamma[j, k]);
-    }  
+  for (i in 1:I)  for (j in 1:J) {   
+    lambda[i, j] ~ normal(0, 320);
+    X[i, j] ~ poisson_log(lambda[i, j] + alpha + beta[i]  + gamma[j]);
   }
 }
 
 generated quantities {
-  real b[I, K];
-  real g[J, K];
+  matrix[I, K] b;
+  matrix[J, K] g;
+
+  for (k in 1:K) { 
+    for (i in 1:I) b[i,k] <- beta[i,k];
+    for (j in 1:J) g[j,k] <- gamma[j,k];
+  } 
 
   for (k in 1:K) {
     real mean_beta_k;
-    mean_beta_k <- mean(col(beta, k));
-    print("mean_beta_k: ", mean_beta_k);
+    mean_beta_k <- mean(col(b, k));
     for (i in 1:I) {
       b[i,k] <- beta[i,k] - mean_beta_k;
     }
@@ -81,7 +81,7 @@ generated quantities {
 
   for (k in 1:K) {
     real mean_gamma_k;
-    mean_gamma_k <- mean(col(gamma, k));
+    mean_gamma_k <- mean(col(g, k));
     for (j in 1:J) {
       g[j,k] <- gamma[j,k] - mean_gamma_k;
     }

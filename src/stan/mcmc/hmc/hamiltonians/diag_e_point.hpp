@@ -13,8 +13,7 @@ namespace stan {
       
     public:
       
-      diag_e_point(int n, int m): ps_point(n, m),
-                                  mInv(n) {
+      diag_e_point(int n): ps_point(n), mInv(n) {
         mInv.setOnes();
       };
       
@@ -28,7 +27,7 @@ namespace stan {
         if(!o) return;
         *o << "# Diagonal elements of inverse mass matrix:" << std::endl;
         *o << "# " << mInv(0) << std::flush;
-        for(size_t i = 1; i < mInv.size(); ++i)
+        for (int i = 1; i < mInv.size(); ++i)
           *o << ", " << mInv(i) << std::flush;
         *o << std::endl;
       };

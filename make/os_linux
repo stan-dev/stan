@@ -4,7 +4,6 @@
 #   - CFLAGS
 #   - CFLAGS_GTEST
 #   - EXE
-#   - PCH
 ##
 
 ifeq (g++,$(CC_TYPE))
@@ -13,7 +12,6 @@ ifeq (g++,$(CC_TYPE))
   ifeq (4.8,$(CC_MAJOR).$(CC_MINOR))
     CFLAGS += -Wno-unused-local-typedefs
   endif
-  PCH = .gch
 endif
 ifeq (mingw32-g++,$(CC_TYPE))
   CFLAGS += -m32
@@ -22,7 +20,6 @@ ifeq (mingw32-g++,$(CC_TYPE))
   LDLIBS_STANC += -static-libstdc++
   LDLIBS += -static-libgcc
   LDLIBS += -static-libstdc++
-  PCH = .gch
   EXE = .exe
 endif
 ifeq (clang++,$(CC_TYPE))
@@ -32,6 +29,5 @@ ifeq (clang++,$(CC_TYPE))
   CFLAGS += -Wno-unused-function
   CFLAGS += -Wno-uninitialized
   CFLAGS += -Wno-c++11-long-long
-  #PCH = .pch
 endif
 

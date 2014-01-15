@@ -181,6 +181,42 @@ namespace stan {
       arg_types.push_back(arg_type5);
       add(name,result_type,arg_types);
     }
+    void function_signatures::add(const std::string& name,
+                                  const expr_type& result_type,
+                                  const expr_type& arg_type1,
+                                  const expr_type& arg_type2,
+                                  const expr_type& arg_type3,
+                                  const expr_type& arg_type4,
+                                  const expr_type& arg_type5,
+                                  const expr_type& arg_type6) {
+      std::vector<expr_type> arg_types;
+      arg_types.push_back(arg_type1);
+      arg_types.push_back(arg_type2);
+      arg_types.push_back(arg_type3);
+      arg_types.push_back(arg_type4);
+      arg_types.push_back(arg_type5);
+      arg_types.push_back(arg_type6);
+      add(name,result_type,arg_types);
+    }
+    void function_signatures::add(const std::string& name,
+                                  const expr_type& result_type,
+                                  const expr_type& arg_type1,
+                                  const expr_type& arg_type2,
+                                  const expr_type& arg_type3,
+                                  const expr_type& arg_type4,
+                                  const expr_type& arg_type5,
+                                  const expr_type& arg_type6,
+                                  const expr_type& arg_type7) {
+      std::vector<expr_type> arg_types;
+      arg_types.push_back(arg_type1);
+      arg_types.push_back(arg_type2);
+      arg_types.push_back(arg_type3);
+      arg_types.push_back(arg_type4);
+      arg_types.push_back(arg_type5);
+      arg_types.push_back(arg_type6);
+      arg_types.push_back(arg_type7);
+      add(name,result_type,arg_types);
+    }
     void function_signatures::add_nullary(const::std::string& name) {
       add(name,DOUBLE_T);
     }
@@ -263,8 +299,23 @@ namespace stan {
       return expr_type(); // ill-formed dummy
     }
     function_signatures::function_signatures() { 
-#include <stan/gm/function_signatures.hpp>
+#include <stan/gm/function_signatures.h>
     }
+    std::set<std::string>
+    function_signatures::key_set() const {
+      using std::map;
+      using std::set;
+      using std::string;
+      using std::vector;
+      // inefficient:  if used intensively, should provide const iterator adaptor
+      set<string> result;
+      for (map<string,vector<function_signature_t> >::const_iterator it = sigs_map_.begin();
+           it != sigs_map_.end();
+           ++it)
+        result.insert(it->first);
+      return result;
+    }
+
     function_signatures* function_signatures::sigs_ = 0;
 
 
@@ -605,7 +656,9 @@ namespace stan {
     }
 
     void print_var_origin(std::ostream& o, const var_origin& vo) {
-      if (vo == data_origin)
+      if (vo == model_name_origin)
+        o << "model name";
+      else if (vo == data_origin)
         o << "data";
       else if (vo == transformed_data_origin)
         o << "transformed data";
@@ -764,11 +817,23 @@ namespace stan {
     }
 
 
+    cholesky_factor_var_decl::cholesky_factor_var_decl() 
+      : base_var_decl(MATRIX_T) { 
+    }
+    cholesky_factor_var_decl::cholesky_factor_var_decl(expression const& M,
+                                                       expression const& N,
+                                                       std::string const& name,
+                                                       std::vector<expression> const& dims)
+      : base_var_decl(name,dims,MATRIX_T),
+        M_(M),
+        N_(N) {
+    }
+
     cov_matrix_var_decl::cov_matrix_var_decl() : base_var_decl(MATRIX_T) { 
     }
     cov_matrix_var_decl::cov_matrix_var_decl(expression const& K,
-                                     std::string const& name,
-                                     std::vector<expression> const& dims)
+                                             std::string const& name,
+                                             std::vector<expression> const& dims)
       : base_var_decl(name,dims,MATRIX_T),
         K_(K) {
     }
@@ -815,6 +880,9 @@ namespace stan {
     std::string name_vis::operator()(const positive_ordered_var_decl& x) const {
       return x.name_;
     }
+    std::string name_vis::operator()(const cholesky_factor_var_decl& x) const {
+      return x.name_;
+    }
     std::string name_vis::operator()(const cov_matrix_var_decl& x) const {
       return x.name_;
     }
@@ -823,9 +891,7 @@ namespace stan {
     }
 
 
-
-
-
+    // can't template out in .cpp file
 
     var_decl::var_decl(const var_decl_t& decl) : decl_(decl) { }
     var_decl::var_decl() : decl_(nil()) { }
@@ -839,13 +905,9 @@ namespace stan {
     var_decl::var_decl(const simplex_var_decl& decl) : decl_(decl) { }
     var_decl::var_decl(const ordered_var_decl& decl) : decl_(decl) { }
     var_decl::var_decl(const positive_ordered_var_decl& decl) : decl_(decl) { }
+    var_decl::var_decl(const cholesky_factor_var_decl& decl) : decl_(decl) { }
     var_decl::var_decl(const cov_matrix_var_decl& decl) : decl_(decl) { }
     var_decl::var_decl(const corr_matrix_var_decl& decl) : decl_(decl) { }
-
-    // template <typename Decl>
-    // var_decl::var_decl(Decl const& decl) : decl_(decl) { }
-
-
 
     std::string var_decl::name() const {
       return boost::apply_visitor(name_vis(),decl_);
@@ -853,12 +915,13 @@ namespace stan {
 
     statement::statement() : statement_(nil()) { }
 
-    // FIXME:  template these out
     statement::statement(const statement_t& st) : statement_(st) { }
     statement::statement(const nil& st) : statement_(st) { }
     statement::statement(const assignment& st) : statement_(st) { }
     statement::statement(const sample& st) : statement_(st) { }
+    statement::statement(const increment_log_prob_statement& st) : statement_(st) { }
     statement::statement(const statements& st) : statement_(st) { }
+    statement::statement(const expression& st) : statement_(st) { }
     statement::statement(const for_statement& st) : statement_(st) { }
     statement::statement(const while_statement& st) : statement_(st) { }
     statement::statement(const conditional_statement& st) : statement_(st) { }
@@ -871,7 +934,11 @@ namespace stan {
     // }
 
 
-
+    increment_log_prob_statement::increment_log_prob_statement() {
+    }
+    increment_log_prob_statement::increment_log_prob_statement(const expression& log_prob)
+      : log_prob_(log_prob) {
+    }
 
     for_statement::for_statement() {
     }

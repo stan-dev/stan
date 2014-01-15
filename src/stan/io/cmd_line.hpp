@@ -41,9 +41,10 @@ namespace stan {
     /** 
      * Prints single print option to output ptr if non-null.
      * 
+     * @param o
      * @param key_val 
      * @param msg 
-     * @param note 
+     * @param note
      */
     void print_help_helper(std::ostream* o,
                            const std::string& key_val,
@@ -64,6 +65,7 @@ namespace stan {
     /** 
      * Prints single print option to output ptr if non-null.
      * 
+     * @param o
      * @param key 
      * @param value_type 
      * @param msg 
@@ -233,6 +235,7 @@ namespace stan {
         return true;
       }
 
+
       /**
        * Print a human readable parsed form of the command-line
        * arguments to the specified output stream.
@@ -264,6 +267,26 @@ namespace stan {
       }
 
     };
+
+    // explicit instantation for std::string to allow for spaces
+    // in bare_[n]
+    template <>
+    bool cmd_line::bare<std::string>(size_t n, std::string& x) const {
+      if (n >= bare_.size())
+        return false;
+      x = bare_[n];
+      return true;
+    }
+
+    // explicit instantation for std::string to allow for spaces
+    // in key_val_
+    template <>
+    bool cmd_line::val<std::string>(const std::string& key, std::string& x) const {
+      if (!has_key(key))
+        return false;
+      x = key_val_.find(key)->second;
+      return true;
+    }
 
 
   }

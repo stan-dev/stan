@@ -1,10 +1,10 @@
-#ifndef __STAN__AGRAD__PROB__UNIVARIATE__CONTINUOUS__NORMAL_HPP__
-#define __STAN__AGRAD__PROB__UNIVARIATE__CONTINUOUS__NORMAL_HPP__
+#ifndef __STAN__AGRAD__FWD__PROB__UNIVARIATE__CONTINUOUS__NORMAL_HPP__
+#define __STAN__AGRAD__FWD__PROB__UNIVARIATE__CONTINUOUS__NORMAL_HPP__
 
 #include <boost/random/normal_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
 #include <boost/utility/enable_if.hpp>
-#include <stan/agrad.hpp>
+#include <stan/agrad/partials_vari.hpp>
 #include <stan/math.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/meta/traits.hpp>
@@ -20,8 +20,8 @@ namespace stan {
     typename boost::enable_if_c<contains_fvar<T_y,T_loc,T_scale>::value,
                                 typename return_type<T_y,T_loc,T_scale>::type>::type
     normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
-      static const char* function = "stan::prob::normal_log(%1%)";
-      // FIXME: add input checks -- that will supress warning here.
+      // static const char* function = "stan::prob::normal_log(%1%)";
+      // FIXME: add input checks
 
       using std::log;
       using stan::is_constant_struct;

@@ -6,10 +6,12 @@
 #include <stan/math/error_handling.hpp>
 #include <stan/prob/traits.hpp>
 #include <stan/meta/traits.hpp>
-#include <stan/agrad/agrad.hpp>
-#include <stan/agrad/matrix.hpp>
-#include "stan/prob/distributions/multivariate/continuous/wishart.hpp"
-#include <stan/math/matrix/ldlt.hpp>
+#include <stan/agrad/rev.hpp>
+#include <stan/agrad/rev/matrix.hpp>
+#include <stan/prob/distributions/multivariate/continuous/wishart.hpp>
+#include <stan/math/matrix/log_determinant_ldlt.hpp>
+#include <stan/math/matrix/mdivide_left_ldlt.hpp>
+#include <stan/math/error_handling/matrix/check_ldlt_factor.hpp>
 
 namespace stan {
   namespace prob {
@@ -82,21 +84,14 @@ namespace stan {
       using stan::math::mdivide_left_ldlt;
       using stan::math::trace;
       using stan::math::LDLT_factor;
+      using stan::math::check_ldlt_factor;
       
       LDLT_factor<T_y,Eigen::Dynamic,Eigen::Dynamic> ldlt_W(W);
-      if (!ldlt_W.success()) {
-        std::ostringstream message;
-        message << "W is not positive definite (%1%).";
-        std::string str(message.str());
-        stan::math::dom_err(function,W(0,0),"W",str.c_str(),"",&lp);
+      if (!check_ldlt_factor(function,ldlt_W,"LDLT_Factor of random variable",&lp)) {
         return lp;
       }
       LDLT_factor<T_scale,Eigen::Dynamic,Eigen::Dynamic> ldlt_S(S);
-      if (!ldlt_S.success()) {
-        std::ostringstream message;
-        message << "S is not positive definite (%1%).";
-        std::string str(message.str());
-        stan::math::dom_err(function,S(0,0),"S",str.c_str(),"",&lp);
+      if (!check_ldlt_factor(function,ldlt_S,"LDLT_Factor of scale parameter",&lp)) {
         return lp;
       }
       
@@ -139,6 +134,17 @@ namespace stan {
     inv_wishart_rng(const double nu,
                     const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& S,
                     RNG& rng) {
+
+      static const char* function = "stan::prob::inv_wishart_rng(%1%)";
+      
+      using stan::math::check_greater;
+      using stan::math::check_size_match;
+
+      typename Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>::size_type k = S.rows();
+      check_greater(function, nu, k-1, "Degrees of freedom parameter");
+      check_size_match(function, 
+                       S.rows(), "Rows of scale parameter",
+                       S.cols(), "columns of scale parameter");
 
       Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> S_inv(S.rows(), S.cols());
       S_inv = Eigen::MatrixXd::Identity(S.cols(),S.cols());

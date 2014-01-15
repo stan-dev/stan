@@ -1,9 +1,16 @@
 .PHONY: manual src/docs/stan-reference/stan-reference.tex
+
+MAJOR_VERSION := $(shell grep MAJOR_VERSION src/stan/version.hpp | sed -e 's/.*\"\([^]]*\)\".*/\1/g')
+MINOR_VERSION := $(shell grep MINOR_VERSION src/stan/version.hpp | sed -e 's/.*\"\([^]]*\)\".*/\1/g')
+PATCH_VERSION := $(shell grep PATCH_VERSION src/stan/version.hpp | sed -e 's/.*\"\([^]]*\)\".*/\1/g')
+VERSION_STRING := $(MAJOR_VERSION).$(MINOR_VERSION).$(PATCH_VERSION)
+
+
 manual: src/docs/stan-reference/stan-reference.pdf
 	mkdir -p doc/
 	cp src/docs/stan-reference/stan-reference.pdf doc/stan-reference-$(VERSION_STRING).pdf
 
 MANUAL_FLAGS=
 %.pdf: %.tex
-	cd $(dir $@); pdflatex $(MANUAL_FLAGS) $(notdir $^); bibtex $(notdir $(basename $@)); makeindex -s stan-reference.ist $(notdir $(basename $@)); pdflatex $(MANUAL_FLAGS) $(notdir $^); pdflatex $(MANUAL_FLAGS) $(notdir $^);  pdflatex $(MANUAL_FLAGS) $(notdir $^); 
-	cd $(dir $@); pdflatex $(MANUAL_FLAGS) $(notdir $^); bibtex $(notdir $(basename $@)); makeindex -s stan-reference.ist $(notdir $(basename $@)); pdflatex $(MANUAL_FLAGS) $(notdir $^); pdflatex $(MANUAL_FLAGS) $(notdir $^);  pdflatex $(MANUAL_FLAGS) $(notdir $^); 
+	cd $(dir $@); pdflatex $(MANUAL_FLAGS) $(notdir $^); bibtex $(notdir $(basename $@)); makeindex -s stan-reference.ist $(notdir $(basename $@)); pdflatex $(MANUAL_FLAGS) $(notdir $^); pdflatex $(MANUAL_FLAGS) $(notdir $^);  pdflatex $(MANUAL_FLAGS) $(notdir $^);
+

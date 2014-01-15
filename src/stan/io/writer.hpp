@@ -1,6 +1,7 @@
 #ifndef __STAN__IO__WRITER_HPP__
 #define __STAN__IO__WRITER_HPP__
 
+#include <stdexcept>
 #include <stan/prob/transform.hpp>
 
 namespace stan {
@@ -129,9 +130,7 @@ namespace stan {
        * @throw std::runtime_error if y is lower than the lower bound provided.
        */
       void scalar_lb_unconstrain(double lb, T& y) {
-        if (y < lb)
-          BOOST_THROW_EXCEPTION(std::runtime_error ("y is lower than the lower bound"));
-        data_r_.push_back(log(y - lb));
+        data_r_.push_back(stan::prob::lb_free(y,lb));
       }
 
       /**
@@ -145,9 +144,7 @@ namespace stan {
        * @throw std::runtime_error if y is higher than the upper bound provided.
        */
       void scalar_ub_unconstrain(double ub, T& y) {
-        if (y > ub)
-          BOOST_THROW_EXCEPTION(std::runtime_error ("y is higher than the lower bound"));
-        data_r_.push_back(log(ub - y));
+        data_r_.push_back(stan::prob::ub_free(y,ub));
       }
 
       /**
@@ -163,9 +160,7 @@ namespace stan {
        * @throw std::runtime_error if y is not between the lower and upper bounds
        */
       void scalar_lub_unconstrain(double lb, double ub, T& y) {
-        if (y < lb || y > ub)
-          BOOST_THROW_EXCEPTION(std::runtime_error ("y is not between the lower and upper bounds"));
-        data_r_.push_back(stan::math::logit((y - lb) / (ub - lb)));
+        data_r_.push_back(stan::prob::lub_free(y,lb,ub));
       }
 
       /**
@@ -179,9 +174,7 @@ namespace stan {
        * @throw std::runtime_error if y is not between -1.0 and 1.0
        */
       void corr_unconstrain(T& y) {
-        if (y > 1.0 || y < -1.0)
-          BOOST_THROW_EXCEPTION(std::runtime_error ("y is not between -1.0 and 1.0"));
-        data_r_.push_back(atanh(y));
+        data_r_.push_back(stan::prob::corr_free(y));
       }
 
       /**
@@ -196,9 +189,7 @@ namespace stan {
        * @throw std::runtime_error if y is not between 0.0 and 1.0
         */
       void prob_unconstrain(T& y) {
-        if (y > 1.0 || y < 0.0)
-          BOOST_THROW_EXCEPTION(std::runtime_error ("y is not between 0.0 and 1.0"));
-        data_r_.push_back(stan::math::logit(y));
+        data_r_.push_back(stan::prob::prob_free(y));
       }
 
       /**
@@ -241,6 +232,7 @@ namespace stan {
        * @throw std::runtime_error if vector is not in ascending order.
        */
       void positive_ordered_unconstrain(vector_t& y) {
+        // reimplements pos_ordered_free in prob to avoid malloc
         if (y.size() == 0) return;
         stan::math::check_positive_ordered("stan::io::positive_ordered_unconstrain(%1%)", y, "Vector");
         data_r_.push_back(log(y[0]));
@@ -370,6 +362,54 @@ namespace stan {
       }
 
       /**
+       * Writes the unconstrained Cholesky factor corresponding to the
+       * specified constrained matrix.
+       *
+       * <p>The unconstraining operation is the inverse of the
+       * constraining operation in
+       * <code>cov_matrix_constrain(Matrix<T,Dynamic,Dynamic)</code>.
+       *
+       * @param y Constrained covariance matrix.
+       * @throw std::runtime_error if y has no elements or if it is not square
+       */
+      void cholesky_factor_unconstrain(matrix_t& y) {
+        // FIXME:  optimize by unrolling cholesky_factor_free
+        Eigen::Matrix<T,Eigen::Dynamic,1> y_free
+          = stan::prob::cholesky_factor_free(y);
+        for (int i = 0; i < y_free.size(); ++i)
+          data_r_.push_back(y_free[i]);
+      }
+
+
+      /**
+       * Writes the unconstrained covariance matrix corresponding
+       * to the specified constrained correlation matrix.
+       *
+       * <p>The unconstraining operation is the inverse of the
+       * constraining operation in
+       * <code>cov_matrix_constrain(Matrix<T,Dynamic,Dynamic)</code>.
+       *
+       * @param y Constrained covariance matrix.
+       * @throw std::runtime_error if y has no elements or if it is not square
+       */
+      void cov_matrix_unconstrain(matrix_t& y) {
+        typename matrix_t::size_type k = y.rows();
+        if (k == 0 || y.cols() != k)
+          BOOST_THROW_EXCEPTION(
+              std::runtime_error ("y must have elements and y must be a square matrix"));
+        typename matrix_t::size_type k_choose_2 = (k * (k-1)) / 2;
+        array_vec_t cpcs(k_choose_2);
+        array_vec_t sds(k);
+        bool successful = stan::prob::factor_cov_matrix(cpcs,sds,y);
+        if(!successful)
+          BOOST_THROW_EXCEPTION(std::runtime_error ("factor_cov_matrix failed"));
+        for (typename matrix_t::size_type i = 0; i < k_choose_2; ++i)
+          data_r_.push_back(cpcs[i]);
+        for (typename matrix_t::size_type i = 0; i < k; ++i)
+          data_r_.push_back(sds[i]);
+      }
+
+      /**
        * Writes the unconstrained correlation matrix corresponding
        * to the specified constrained correlation matrix.
        *
@@ -402,33 +442,6 @@ namespace stan {
           data_r_.push_back(cpcs[i]);
       }
 
-      /**
-       * Writes the unconstrained covariance matrix corresponding
-       * to the specified constrained correlation matrix.
-       *
-       * <p>The unconstraining operation is the inverse of the
-       * constraining operation in
-       * <code>cov_matrix_constrain(Matrix<T,Dynamic,Dynamic)</code>.
-       *
-       * @param y Constrained covariance matrix.
-       * @throw std::runtime_error if y has no elements or if it is not square
-       */
-      void cov_matrix_unconstrain(matrix_t& y) {
-        typename matrix_t::size_type k = y.rows();
-        if (k == 0 || y.cols() != k)
-          BOOST_THROW_EXCEPTION(
-              std::runtime_error ("y must have elements and y must be a square matrix"));
-        typename matrix_t::size_type k_choose_2 = (k * (k-1)) / 2;
-        array_vec_t cpcs(k_choose_2);
-        array_vec_t sds(k);
-        bool successful = stan::prob::factor_cov_matrix(cpcs,sds,y);
-        if(!successful)
-          BOOST_THROW_EXCEPTION(std::runtime_error ("factor_cov_matrix failed"));
-        for (typename matrix_t::size_type i = 0; i < k_choose_2; ++i)
-          data_r_.push_back(cpcs[i]);
-        for (typename matrix_t::size_type i = 0; i < k; ++i)
-          data_r_.push_back(sds[i]);
-      }
     };
   }
 

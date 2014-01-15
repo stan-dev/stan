@@ -13,7 +13,44 @@ parts of this document include a practically-oriented user's guide for
 programming models and a detailed reference manual for \Stan's
 modeling language and associated programs and data formats.
 
-\section{\Stan Programs}
+\section{Stan Interfaces}
+
+There are three interfaces for Stan that are supported as part of the
+Stan project.  Models and their use are the same across the three
+interfaces, and this manual is the modeling language manual for all
+three interfaces.  All of the interfaces share initialization,
+sampling and tuning controls, and roughly share posterior analysis
+functionality.   
+
+\subsection{CmdStan}
+
+CmdStan allows Stan to be run from the command line.  In some sense,
+CmdStan is the reference implementation of Stan.  This manual
+currently doubles as the CmdStan documentation.  In the near term,
+the CmdStan documentation will be broken out of this manual and given
+its own manual.
+
+\subsection{RStan}
+
+RStan is the R interface to Stan.  The installation and getting
+started guide for RStan can be found on GitHub at:
+
+\begin{quote}
+\url{https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started}
+\end{quote}
+
+\subsection{PyStan}
+
+PyStan is the Python interface to Stan.  The installation and getting
+started guide for PyStan can be found on Read the Docs at:
+
+\begin{quote}
+\url{https://pystan.readthedocs.org/en/latest/getting_started.html}
+\end{quote}
+
+
+
+\section{Stan Programs}
 
 A \Stan program defines a statistical model through a conditional
 probability function $p(\theta|y;x)$, where $\theta$ is a sequence of
@@ -66,7 +103,7 @@ the known values $y$ and $x$, then generates a sequence of
 $p(\theta|y;x)$.
 
 
-\section{\Stan's Samplers}
+\section{Sampling}
 
 For continuous parameters, \Stan uses Hamiltonian Monte Carlo (\HMC)
 sampling \citep{Duane:1987, Neal:1994, Neal:2011}, a form of Markov chain Monte
@@ -105,13 +142,14 @@ discretization of the Hamiltonian and the total number of steps taken
 per iteration (with their product determining total simulation time).
 \Stan can be configured with a user-specified step size or it can
 estimate an optimal step size during warmup using dual averaging
-\citep{Nesterov:2009, Hoffman-Gelman:2012}.  In either case,
-additional randomization may be applied to draw the step size from an
-interval of possible step sizes \citep{Neal:2011}.
+\citep{Nesterov:2009, Hoffman-Gelman:2011, Hoffman-Gelman:2013}.  
+In either case, additional randomization may be applied to draw the 
+step size from an interval of possible step sizes \citep{Neal:2011}.
 
 \Stan can be set to use a specified number of steps, or it can
 automatically adapt the number of steps during sampling using the
-No-U-Turn (\NUTS) sampler \citep{Hoffman-Gelman:2012}.  
+No-U-Turn (\NUTS) sampler 
+\citep{Hoffman-Gelman:2011, Hoffman-Gelman:2013}.  
 
 The third tuning parameter is a mass matrix for the fictional
 particle.  \Stan can be configured to estimate a diagonal mass matrix
@@ -129,7 +167,7 @@ accounts for both scaling and rotation,%
 but is more memory and computation intensive per leapfrog step due to
 the underlying matrix operations.
 
-\section{Convergence Monitoring and Effective Sample Size}
+\subsection{Convergence Monitoring and Effective Sample Size}
 
 Samples in a Markov chain are only drawn with the marginal
 distribution $p(\theta|y;x)$ after the chain has converged to its
@@ -150,11 +188,7 @@ to also monitor (an estimate of) the effective sample size of
 parameters of interest in order to estimate the additional estimation
 error due to correlated samples.
 
-
-
-
-
-\section{Bayesian Inference and Monte Carlo Methods}
+\subsection{Bayesian Inference and Monte Carlo Methods}
 
 \Stan was developed to support full Bayesian inference.  Bayesian
 inference is based in part on Bayes's rule,
@@ -179,6 +213,67 @@ from the posterior using plug-in estimates for quantities of interest
 such as posterior means, posterior intervals, predictions based on the
 posterior such as event outcomes or the values of as yet unobserved
 data.
+
+
+\section{Optimization}
+
+\Stan also supports optimization-based inference for models.  Given a
+posterior $p(\theta|y)$, Stan can find the posterior mode $\theta^*$,
+which is defined by
+%
+\[
+\theta^{*} = \mbox{argmax}_{\theta} \ p(\theta|y).
+\]
+%
+Here the notation $\mbox{argmax}_u \ f(v)$ is used to pick out the value
+of $v$ at which $f(v)$ is maximized.  
+
+If the prior is uniform, the posterior mode corresponds to the maximum
+likelihood estimate (MLE) of the parameters.  If the prior is not
+uniform, the posterior mode is sometimes called the maximum a
+posterior (MAP) estimate.  If parameters (typically hierarchical) have
+been marginalized out, it's sometimes called a maximum marginal
+likelihood (MML) estimate. 
+
+
+\subsection{Inference with Point Estimates}
+
+The estimate $\theta^{*}$ is a so-called ``point estimate,'' meaning
+that it summarizes the posterior distribution by a single point,
+rather than with a distribution.  Of course, a point estimate does
+not, in and of itself, take into account estimation variance.
+Posterior predictive inferences $p(\tilde{y} | y)$ can be made using
+the posterior mode given data $y$ as $p(\tilde{y}|\theta^*)$, but they
+are not Bayesian inferences, even if the model involves a prior,
+because they do not take posterior uncertainty into account.  If the
+posterior variance is low and the posterior mean is near the posterior
+mode, inference with point estimates can be very similar to full
+Bayesian inference.
+
+\subsubsection{``Empirical Bayes''}
+
+Fitting point estimates of priors and then using them for subsequent
+inference is sometimes called ``empirical Bayes'' (see, e.g.,
+\citep{Efron:2012}).%
+%
+\footnote{The scare quotes on ``empirical Bayes'' are because the
+  approach is no more empirical than full Bayes.  Empirical Bayes
+  approaches merely ignore some posterior uncertainty to make
+  inference more efficient computationally.}
+%
+Typically these optimizations will be done using maximum marignal
+likelihood rather than posterior modes of a full model.  Sometimes
+Empirical Bayes point estimates will be obtained using moment matching
+(see, e.g., the rat-tumor example in Chapter 5 of
+\citep{GelmanCarlinSternRubin:2003}).
+
+
+\subsection{Experimental Feature}
+
+Stan's optimizers have not been as well tested as its samplers, so
+they are still considered an ``experimental'' feature.  We would love
+to hear back about successess or failures users have with
+optimization.  
 
 
 
@@ -226,20 +321,22 @@ Then make the library with the following make command
 \end{Verbatim}
 \end{quote}
 %
-then make the model parser and code generator with the following call
+then make the model parser and code generator with the following call,
+adjusting the \code{2} in \code{-j2} to the number of CPU cores
+available.
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-> make bin/stanc
+> make -j2 bin/stanc
 \end{Verbatim}
 \end{quote}
 %
-\emph{Warning}: The \code{make} program may take 10+ minutes and
-consume 2+ GB of memory to build \code{libstan.a} and \code{stanc}.
-Compiler warnings, including \code{uname: not found}, may be safely ignored.
+\emph{Warning:} \ The \code{make} program may take 10+ minutes and
+consume 2+ GB of memory to build \code{stanc}.  Compiler warnings,
+such as \code{uname:~not found}, may be safely ignored.
  
 Finally, make the Stan output summary program with the following
-make command
+make command.
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
@@ -248,9 +345,10 @@ make command
 \end{quote}
 %
 
-Building \code{libstan.a}, \code{bin/stanc}, and \code{bin/print} need only be done once.
+Building \code{libstan.a}, \code{bin/stanc}, and \code{bin/print}
+needs to be done only once.
 
-\section{Compiling and Executing a Model}
+\section{Compiling and Executing a Model}\label{compiling-model.section}
 
 The rest of this quick-start guide explains how to code
 and run a very simple Bayesian model.
@@ -319,7 +417,7 @@ altogether based on whether the initial values satisfy the constraints.
 \subsubsection{Vectorizing Sampling Statements}
 
 Iterations of the model will be faster if the loop over sampling
-statements is vectorized, replacing
+statements is \textit{vectorized} by replacing
 %
 \begin{quote}
 \begin{Verbatim}
@@ -392,7 +490,8 @@ Then issue the following command:
 > make src/models/basic_estimators/bernoulli 
 \end{Verbatim}
 \end{quote}
-And yes, those are forward slashes in the make target for Windows.
+%
+The command for Windows is the same, including the forward slashes.
 
 The \code{make} command may be applied to files in locations
 that are not subdirectories issued from another directory as follows.
@@ -403,7 +502,7 @@ The C++ generated for the model and its compiled executable
 form will be placed in the same directory as the model.
 
 
-\subsection{Executing the Model}
+\subsection{Sampling from the Model}
 
 The model can be executed from the directory in which it resides.
 %
@@ -413,11 +512,11 @@ The model can be executed from the directory in which it resides.
 \end{Verbatim}
 \end{quote}
 %
-To execute the model under Linux or Mac, use
+To execute sampling of the model under Linux or Mac, use
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-> ./bernoulli --data=bernoulli.data.R
+> ./bernoulli sample data file=bernoulli.data.R
 \end{Verbatim}
 \end{quote}
 %
@@ -430,7 +529,7 @@ resulting in the following command.
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-> bernoulli --data=bernoulli.data.R
+> bernoulli sample data file=bernoulli.data.R
 \end{Verbatim}
 \end{quote}
 %
@@ -439,27 +538,40 @@ output is the same.  First, the parameters are echoed to the standard output,
 which shows up on the terminal as follows.
 %
 \begin{quote}
-\begin{Verbatim}
-STAN SAMPLING COMMAND
-data = bernoulli.data.R
-init = random initialization
-init tries = 1
-samples = samples.csv
-append_samples = 0
-save_warmup = 0
-seed = 1845979644 (randomly generated)
-chain_id = 1 (default)
-iter = 2000
-warmup = 1000
-thin = 1 (default)
-equal_step_sizes = 0
-nondiag_mass = 0
-leapfrog_steps = -1
-max_treedepth = 10
-epsilon = -1
-epsilon_pm = 0
-delta = 0.5
-gamma = 0.05
+\begin{Verbatim}[fontsize=\small]
+ method = sample (Default)
+   sample
+     num_samples = 1000 (Default)
+     num_warmup = 1000 (Default)
+     save_warmup = 0 (Default)
+     thin = 1 (Default)
+     adapt
+       engaged = 1 (Default)
+       gamma = 0.050000000000000003 (Default)
+       delta = 0.80000000000000004 (Default)
+       kappa = 0.75 (Default)
+       t0 = 10 (Default)
+       init_buffer = 75 (Default)
+       term_buffer = 50 (Default)
+       window = 25 (Default)
+     algorithm = hmc (Default)
+       hmc
+         engine = nuts (Default)
+           nuts
+             max_depth = 10 (Default)
+         metric = diag_e (Default)
+         stepsize = 1 (Default)
+         stepsize_jitter = 0 (Default)
+ id = 0 (Default)
+ data
+   file = bernoulli.data.R
+ init = 2 (Default)
+ random
+   seed = 4294967295 (Default)
+ output
+   file = output.csv (Default)
+   diagnostic_file =  (Default)
+   refresh = 100 (Default)
 ...
 \end{Verbatim}
 \end{quote}
@@ -467,50 +579,83 @@ gamma = 0.05
 The ellipses (\code{...}) indicate that the output continues (as
 described below).
 
+After the configuration has been displayed a short timing warning
+is given.
+%
+\begin{quote}
+\begin{Verbatim}[fontsize=\small]
+...
+Gradient evaluation took 4e-06 seconds
+1000 transitions using 10 leapfrog steps per transition would take 0.04 seconds.
+Adjust your expectations accordingly!
+...
+\end{Verbatim}
+\end{quote}
+
 Next, the sampler counts up the iterations in place, reporting
 percentage completed, ending as follows.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
+...
+Iteration:    1 / 2000 [  0%]  (Warmup)
+...
+Iteration: 1000 / 2000 [ 50%]  (Warmup)
+Iteration: 1001 / 2000 [ 50%]  (Sampling)
 ...
 Iteration: 2000 / 2000 [100%]  (Sampling)
 ...
 \end{Verbatim}
 \end{quote}
 
-\subsection{Sampler Output}
+\subsubsection{Sampler Output}
 
 Each execution of the model results in the samples from a single
 Markov chain being written to a file in comma-separated value (CSV) format.
-The default name of the output file is \nolinkurl{samples.csv}.
+The default name of the output file is \nolinkurl{output.csv}.
 
 The first part of the output file just repeats the parameters
 as comments (i.e., lines beginning with the pound sign (\Verb|#|)).
 %
 \begin{quote}
-\begin{Verbatim}
-...
-# Samples Generated by Stan
-#
-# stan_version_major=1
-# stan_version_minor=2
-# stan_version_patch=0
-# data=bernoulli.data.R
-# init=random initialization
-# append_samples=0
-# save_warmup=0
-# seed=1845979644
-# chain_id=1
-# iter=2000
-# warmup=1000
-# thin=1
-# equal_step_sizes=0
-# leapfrog_steps=-1
-# max_treedepth=10
-# epsilon=-1
-# epsilon_pm=0
-# delta=0.5
-# gamma=0.05
+\begin{Verbatim}[fontsize=\small]
+# stan_version_major = 2
+# stan_version_minor = 1
+# stan_version_patch = 0
+# model = bernoulli_model
+# method = sample (Default)
+#   sample
+#     num_samples = 1000 (Default)
+#     num_warmup = 1000 (Default)
+#     save_warmup = 0 (Default)
+#     thin = 1 (Default)
+#     adapt
+#       engaged = 1 (Default)
+#       gamma = 0.050000000000000003 (Default)
+#       delta = 0.80000000000000004 (Default)
+#       kappa = 0.75 (Default)
+#       t0 = 10 (Default)
+#       init_buffer = 75 (Default)
+#       term_buffer = 50 (Default)
+#       window = 25 (Default)
+#     algorithm = hmc (Default)
+#       hmc
+#         engine = nuts (Default)
+#           nuts
+#             max_depth = 10 (Default)
+#         metric = diag_e (Default)
+#         stepsize = 1 (Default)
+#         stepsize_jitter = 0 (Default)
+# id = 0 (Default)
+# data
+#   file = bernoulli.data.R
+# init = 2 (Default)
+# random
+#   seed = 355899897
+# output
+#   file = output.csv (Default)
+#   diagnostic_file =  (Default)
+#   refresh = 100 (Default)
 ...
 \end{Verbatim}
 \end{quote}
@@ -519,111 +664,155 @@ This is then followed by a header indicating the
 names of the values sampled.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 ...
-lp__,treedepth__,stepsize__,theta
+lp__,accept_stat__,stepsize__,treedepth__,n_divergent__,theta
 ...
 \end{Verbatim}
 \end{quote}
 %
-The first three names correspond to the log probability function
-value at the sample, the depth of tree evaluated by the NUTS sampler,
-and the step size.  The single model parameter \code{theta} is
-stored in the fourth column.
+The first column gives the log probability.  The next columns, here
+columns two through five, provide sampler-dependent information. For
+basic Hamiltonian Monte Carlo (HMC) and its adaptive variant No-U-Turn
+sampler (NUTS), the sampler-depedent parameters are described in the
+following table.
+%
+\begin{center}
+\begin{tabular}{l|l|l}
+{\it Sampler} & {\it Parameter} & {\it Description} 
+\\ \hline \hline
+\HMC & \Verb| accept_stat__ | &  Metropolis acceptance probability
+\\
+\HMC & \Verb| stepsize__  | & Integrator step size
+\\
+\HMC & \Verb| int_time__  | & Total integration time
+\\
+\NUTS & \Verb| accept_stat__  | & Metropolis acceptance probability
+\\
+& & averaged over samples in the slice 
+\\
+\NUTS & \Verb| stepsize__ | & Integrator step size
+\\
+\NUTS & \Verb| treedepth__  | & Tree depth
+\\
+\NUTS & \Verb| n_divergent__  | & Number of divergent iterations
+\\
+\end{tabular}
+\end{center}
+%
+The rest of the columns in the header correspond to model parameters, here
+just \code{theta} in the sixth column.  The parameter name header is
+output before warmup begins.
 
-Next up is the result of adaptation, reported as comments.
+The result of any adaptation taking place during warmup is output next
+after the parameter names.  
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 ...
-# step size=1.43707
-# parameter step size multipliers:
-# 1
+# Adaptation terminated
+# Step size = 1.81311
+# Diagonal elements of inverse mass matrix:
+# 0.415719
 ...
 \end{Verbatim}
 \end{quote}
 %
-This report says that NUTS step-size adaptation during warmup
-settled on a step size of 1.43707.  The next two lines
-indicate the multipliers for scaling individual parameters, here
-just a single multiplier, 1, corresponding to the single
-parameter \code{theta}.
+The default sampler is NUTS with an adapted step size and a diagonal
+inverse mass matrix.  For the running example, the step size is
+1.81311, and the inverse mass contains the single entry 0.415719
+corresponding to the parameter \code{theta}.
 
-The rest of the file contains lines corresponding to the
-samples from each iteration.%
+Samples from each iteration are printed out next, one per line in
+columns corresponding to the headers.
 %
 \footnote{There are repeated entries due to the Metropolis accept step
 in the No-U-Turn sampling algorithm.}
 %
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 ...
--7.07769,1,1.43707,0.158674
--7.07769,1,1.43707,0.158674
--7.37289,1,1.43707,0.130089
--7.09254,1,1.43707,0.361906
--7.09254,1,1.43707,0.361906
--7.09254,1,1.43707,0.361906
--6.96213,1,1.43707,0.337061
--6.96213,1,1.43707,0.337061
--6.77689,1,1.43707,0.220795
+-6.95293,0.945991,1.09068,1,0,0.335074
+-6.92373,0.938744,1.09068,0,0,0.181194
+-6.83655,0.934833,1.09068,1,0,0.304882
 ...
--6.85235,1,1.43707,0.195994
--6.85235,1,1.43707,0.195994
--6.81491,1,1.43707,0.20624
--6.81491,1,1.43707,0.20624
--6.81491,1,1.43707,0.20624
--6.81491,1,1.43707,0.20624
--6.81491,1,1.43707,0.20624
+-7.01732,1,1.09068,0,0,0.348244
+-8.96652,0.48441,1.09068,0,0,0.549066
+-7.22574,1,1.09068,0,0,0.383089
 \end{Verbatim}
 \end{quote}
 %
-This ends the output.  
 
-\subsection{Summarizing Output}
+The output ends with timing details,%
+\begin{quote}
+\begin{Verbatim}[fontsize=\small]
+...
+#  Elapsed Time: 0.006811 seconds (Warm-up)
+#                0.011645 seconds (Sampling)
+#                0.018456 seconds (Total)
+\end{Verbatim}
+\end{quote}
+
+
+\subsubsection{Summarizing Sampler Output}
 
 The command-line program \code{bin/print} will display summary
 information about the run (for more information, see
 \refchapter{print-command}). To run \code{print} on the output file
-generated for \code{bernoulli} on Linux or Mac use
+generated for \code{bernoulli} on Linux or Mac,  use
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-> <stan-home>/bin/print samples.csv
+> <stan-home>/bin/print output.csv
 \end{Verbatim}
 \end{quote}
 %
-For Windows use backslashes for the executable
+where \code{<stan-home>} is the path to where Stan was unpacked.  For
+Windows use backslashes for the executable,
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-> <stan-home>\bin\print samples.csv
+> <stan-home>\bin\print output.csv
 \end{Verbatim}
 \end{quote}
 %
 The output of the command will display information about the run
 followed by information for each parameter and generated quantity. For
-\code{bernoulli}, we ran 1 chain and saved 1000 iterations. The information is
-echoed to the standard output:
+\code{bernoulli}, we ran 1 chain and saved 1000 iterations. The
+information is echoed to the standard output stream.  For the running
+example, the path to \code{<stan-home>} can be specified from the
+directory in which the Bernoulli model resides using \code{../} (with
+backslashes on Windows) as
 %
 \begin{quote}
-{\small
 \begin{Verbatim}[fontshape=sl]
-Inference for Stan model:
-1 chains: each with iter=(1000); warmup=(0); thin=(1); 
-1000 iterations saved.
-
-       mean se_mean   sd 2.5%  25%  50%  75% 97.5% n_eff Rhat
-theta   0.2     0.0  0.1  0.1  0.2  0.2  0.3   0.5   478  1.0
-
-Samples were drawn using mcmc::nuts_diag.
-For each parameter, n_eff is a crude measure of effective 
-sample size, and Rhat is the potential scale reduction factor 
-on split chains (at convergence, Rhat=1).
+> ../../../bin/print output.csv 
 \end{Verbatim}
-}
 \end{quote}
+%
+For Windows, reverse the slashes.  The output is
+%
+\begin{Verbatim}[fontshape=sl,fontsize=\footnotesize]
+Inference for Stan model: bernoulli_model
+1 chains: each with iter=(1000); warmup=(0); thin=(1); 1000 iterations saved.
+
+Warmup took (0.0066) seconds, 0.0066 seconds total
+Sampling took (0.011) seconds, 0.011 seconds total
+
+                 Mean     MCSE   StdDev        5%   50%   95%  N_Eff  N_Eff/s  R_hat
+lp__             -7.3  3.5e-02  6.9e-01  -8.7e+00  -7.0  -6.7    390    34020   1.00
+accept_stat__    0.64  1.2e-02  3.6e-01   5.1e-03  0.74   1.0    882    76898   1.00
+stepsize__        1.8  7.8e-15  5.6e-15   1.8e+00   1.8   1.8   0.50       44   1.00
+treedepth__     0.076  8.6e-03  2.7e-01   0.0e+00  0.00   1.0    942    82167   1.00
+n_divergent__    0.00  0.0e+00  0.0e+00   0.0e+00  0.00  0.00   1000    90909   1.00
+theta            0.25  4.2e-03  1.2e-01   9.0e-02  0.23  0.47    827    72146   1.00
+
+Samples were drawn using hmc with nuts.
+For each parameter, N_Eff is a crude measure of effective sample size,
+and R_hat is the potential scale reduction factor on split chains (at 
+convergence, R_hat=1).
+\end{Verbatim}
 %
 In addition to the general information about the runs, \code{print}
 displays summary statistics for each parameter and generated
@@ -631,9 +820,9 @@ quantity.
 
 In the \code{bernoulli} model, there is a single parameter,
 \code{theta}. The mean, standard error of the mean, standard
-deviation, the 2.5\%, 25\%, 50\%, 75\%, and 97.5\% quantiles,
-number of effective samples, and $\hat{R}$ value are displayed
-These quantities and their uses are described in detail in 
+deviation, the 5\%, 50\%, and 95\% quantiles, number of effective
+samples (total and per second), and $\hat{R}$ value are displayed.
+These quantities and their uses are described in detail in
 \refchapter{mcmc}.
 
 The command \code{bin/print} can be called with more than one csv file
@@ -647,15 +836,134 @@ convergence and inspect the means and quantiles of the fitted
 variables.  Additionally, downstream inferences may be performed using
 the samples (e.g., to make decisions or predictions for unseen data).
 
-\subsection{Configuring Command-Line Options}
+\subsection{Optimization}
 
-The command-line options for running a model are detailed in
-the next chapter. They can also be printed on the command
-line in Linux and on the Mac as follows.
+Stan can be used for finding posterior modes as well as sampling from
+the posterior.   The model does not need to be recompiled in order to
+switch from optimization to sampling, and the data input format is the
+same.  Although many command-line arguments may be provided to
+configure the optimizer, the following minimal command suffices, using
+defaults for everything but where to find the data file.
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-> ./bernoulli --help
+./bernoulli optimize data file=bernoulli.data.R
+\end{Verbatim}
+\end{quote}
+%
+which prints out
+%
+\begin{quote}
+\begin{Verbatim}[fontsize=\footnotesize]
+ method = optimize
+   optimize
+     algorithm = bfgs (Default)
+       bfgs
+         init_alpha = 0.001 (Default)
+         tol_obj = 1e-08 (Default)
+         tol_grad = 1e-08 (Default)
+         tol_param = 1e-08 (Default)
+     iter = 2000 (Default)
+     save_iterations = 0 (Default)
+ id = 0 (Default)
+ data
+   file = bernoulli.data.R
+ init = 2 (Default)
+ random
+   seed = 2907588507
+ output
+   file = output.csv (Default)
+   append_sample = 0 (Default)
+   diagnostic_file =  (Default)
+   append_diagnostic = 0 (Default)
+   refresh = 100 (Default)
+
+initial log joint probability = -10.9308
+    Iter      log prob        ||dx||      ||grad||    alpha  # evals  Notes 
+       7      -5.00402   3.67055e-07   3.06339e-11        1       10   
+Optimization terminated normally: 
+  Convergence detected: change in objective function was below
+  tolerance
+\end{Verbatim}
+\end{quote}
+%
+The first part of the output reports on the configuration used, here
+indicating the default BFGS optimizer, with default initial stepsize
+and tolerances for monitoring convergence.  The second part of the
+output indicates how well the algorithm fared, here converging and
+terminating normally.  The numbers reported indicate that it took 7
+iterations and 10 gradient evaluations, resulting in a final state
+state where the change in parameters was roughly 3.7e-7 and the length
+of the gradient roughly 3e-11.  The \code{alpha} value is for step
+size used.  This is, not surprisingly, far fewer iterations than
+required for sampling; even fewer iterations would be used with less
+stringent user-specified convergence tolerances.
+
+
+\subsubsection{Output from Optimization}
+
+The output from optimization is written into the file
+\code{output.csv} by default.  The output follows the same pattern as the
+output for sampling, first dumping the entire set of parameters used.
+%
+\begin{quote}
+\begin{Verbatim}[fontsize=\small]
+# stan_version_major = 2
+# stan_version_minor = 1
+# stan_version_patch = 0
+# model = bernoulli_model
+# method = optimize
+#   optimize
+#     algorithm = bfgs (Default)
+#       bfgs
+#         init_alpha = 0.001 (Default)
+#         tol_obj = 1e-08 (Default)
+#         tol_grad = 1e-08 (Default)
+#         tol_param = 1e-08 (Default)
+#     iter = 2000 (Default)
+#     save_iterations = 0 (Default)
+# id = 0 (Default)
+# data
+#   file = bernoulli.data.R
+# init = 2 (Default)
+# random
+#   seed = 2907588507
+# output
+#   file = output.csv (Default)
+#   append_sample = 0 (Default)
+#   diagnostic_file =  (Default)
+#   append_diagnostic = 0 (Default)
+#   refresh = 100 (Default)
+lp__,theta
+-5.00402,0.2000000000030634
+\end{Verbatim}
+\end{quote}
+%
+Note that everything is a comment other than a line for the header,
+and a line for the values.  Here, the header indicates the
+unnormalized log probability with \code{lp\_\_} and the model
+parameter \code{theta}.  The maximum log probability is -5.0 and the
+posterior mode for \code{theta} is 0.20.  The mode exactly matches
+what we would expect from the data.  
+%
+\footnote{The Jacobian adjustment included for the sampler's log
+  probability function is not applied during optimization, because it can
+  change the shape of the posterior and hence the solution.}
+%
+Because the prior was uniform, the result 0.20 represents the maximum
+likelihood estimate (MLE) for the very simple Bernoulli model.  Note
+that no uncertainty is reported.  
+
+
+\subsection{Configuring Command-Line Options}
+
+The command-line options for running a model are detailed in
+\refchapter{stan-cmd}. They can also be printed on the command line
+using Linux or Mac OS with
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> ./bernoulli help-all
 \end{Verbatim}
 \end{quote}
 %
@@ -663,9 +971,14 @@ and on Windows with
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-> bernoulli --help
+> bernoulli help-all
 \end{Verbatim}
 \end{quote}
+%
+It may help to glance at the command-line skeletons in
+\reffigure{nuts-command} through \reffigure{diagnostic-command} to get
+a handle on the options then read the detailed descriptions earlier in
+\refchapter{stan-cmd}.
 
 \subsection{Testing Stan}
 
@@ -677,35 +990,25 @@ file named \code{makefile}).
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
 > cd <stan-home>
-> make O=0 test-unit
-> make O=0 test-distributions
-> make O=3 test-models
+> make -j4 O=0 test-unit
+> make -j4 O=0 test-distributions
+> make -j4 O=3 test-models
 \end{Verbatim}
 \end{quote}
 %
+As before, \code{-j4} indicates that four processes should be run in
+parallel; adjust the value \code{4} to correspond to the number of CPU
+cores available. Code optimization is specified by the letter `O'
+followed by an equal sign followed by the digit `0' for no
+optimization and `3' for more optimization; optimization slows down
+compilation of the executable but reduces its execution time.
 Warnings can be safely ignored if the tests complete without a
 \code{FAIL} error.
 
-Code optimization is specified by the letter `O' followed by an equal
-sign followed by the digit `0' for no optimization and `3' for more
-optimization; optimization slows down compilation of the executable
-but reduces its execution time.
+\emph{Warning}: \ The unit tests can take 30+ minutes and consume 3+
+GB of memory with the default compiler, \code{g++}.  The distribution
+test and model tests can take even longer.  It is faster to run the
+Clang compiler (option \code{CC=clang++}), and to run in multiple
+processes in parallel (e.g., option \code{-j4} for four threads).
 
-\emph{Warning}: The unit test can take 30+ minutes and consume 3+ GB
-of memory with the default compiler, \code{g++}.  It is faster
-to run the Clang compiler (option \code{CC=clang++}), and to run in
-multiple threads (option \code{-j4} for four threads).
-
-
-% \section{User-Defined Distributions and Functions}
-
-% \Stan allows new distributions to be coded directly in the modeling
-% language.  
-
-%  in one of two ways, either
-% directly in its modeling language (see
-% \refchapter{custom-probability-functions}), or by extending the
-% modeling language using \Cpp (see
-% \refappendix{user-defined-functions}).  The latter is more efficient
-% and also portable across models.
 

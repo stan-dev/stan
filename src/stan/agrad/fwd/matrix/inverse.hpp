@@ -6,9 +6,11 @@
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
-#include <stan/agrad/fwd/operator_multiplication.hpp>
+#include <stan/agrad/fwd/operators/operator_multiplication.hpp>
 #include <stan/math/matrix/multiply.hpp>
 #include <stan/agrad/fwd/matrix/to_fvar.hpp>
+#include <stan/agrad/fwd/matrix/multiply.hpp>
+#include <stan/math/matrix/inverse.hpp>
 
 namespace stan {
   namespace agrad {
@@ -18,6 +20,8 @@ namespace stan {
     Eigen::Matrix<fvar<T>,R,C> 
     inverse(const Eigen::Matrix<fvar<T>, R, C>& m) {
       using stan::math::multiply;
+      using stan::agrad::multiply;
+      using stan::math::inverse;
       stan::math::validate_square(m, "inverse");
       Eigen::Matrix<T,R,C> m_deriv(m.rows(), m.cols());
       Eigen::Matrix<T,R,C> m_inv(m.rows(), m.cols());
@@ -29,7 +33,8 @@ namespace stan {
         }
       }
 
-      m_inv = m_inv.inverse();
+      m_inv = stan::math::inverse(m_inv);
+
       m_deriv = -1 * multiply(multiply(m_inv, m_deriv), m_inv);
     
       return to_fvar(m_inv, m_deriv);

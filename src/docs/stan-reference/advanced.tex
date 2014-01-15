@@ -280,7 +280,7 @@ bound on estimation error no longer applies.  These problems are
 addressed in the next two sections.
 
 
-\section{Initialization and Convergence Monitoring}
+\section{Initialization and Convergence Monitoring}\label{convergence.section}
 
 A Markov chain generates samples from the target distribution only
 after it has converged to equilibrium.  Unfortunately, this is only
@@ -577,7 +577,8 @@ In addition to standard \HMC, \Stan implements an adaptive version of
 tunes a step sizes during warmup.  A global step size is optimized for
 a target Metropolis-Hastings reject rate using dual averaging; see
 \citep{Nesterov:2009} for details of dual averaging and
-\citep{Hoffman-Gelman:2012} for details of its use in \Stan.  For
+\citep{Hoffman-Gelman:2011,Hoffman-Gelman:2013} 
+for details of its use in \Stan.  For
 information on run-time configuration of step-size adaptation, see
 \refsection{stan-command-line-options}.  Then step sizes per parameter
 are estimated during warmup.  
@@ -599,7 +600,7 @@ out; see \refchapter{mixture-modeling} for examples.
 \HMC uses a Metropolis rejection step to ensure detailed balance of
 the resulting Markovian system; for details, see \citep{Neal:2011}.
 \NUTS uses a form of slice sampling which guarantees detailed balance;
-for details, see \citep{Hoffman-Gelman:2012}.%
+for details, see \citep{Hoffman-Gelman:2011,Hoffman-Gelman:2013}.%
 %
 \footnote{A transition density $\phi(\omega'|\omega)$ and density
   $\pi(\omega)$ over state space $\Omega$ satisfy detailed balance if
@@ -664,7 +665,7 @@ The rest of the chapter details the transforms used by \Stan.
 
 
 
-\subsection{Univariate Changes of Variables}\label{uni-change-of-variables.section}
+\subsection{Univariate Changes of Variables}
 
 Suppose $X$ is one dimensional and $f: \mbox{supp}(X) \rightarrow
 \reals$ is a one-to-one, monotonic function with a differentiable
@@ -680,7 +681,7 @@ scale of the transformed variable changes with respect to the
 underlying variable.
 
 
-\subsection{Multivariate Changes of Variables}\label{multi-change-of-variables.section}
+\subsection{Multivariate Changes of Variables}
 
 The multivariate generalization of an absolute derivative is a
 Jacobian, or more fully the absolute value of the determinant of the
@@ -1246,15 +1247,14 @@ a^{\top} x a > 0.
 \]
 To deal with this rather complicated constraint, \Stan implements the
 transform of \cite{LewandowskiKurowickaJoe:2009}.  The number of free
-parameters required to specify a $K \times K$ correlation matrix is $K
-\choose 2$.
+parameters required to specify a $K \times K$ correlation matrix is $\binom{K}{2}$.
 
 \subsection{Correlation Matrix Inverse Transform}
 
-It is easiest to specify the inverse, going from its $K \choose 2$
+It is easiest to specify the inverse, going from its $\binom{K}{2}$
 parameter basis to a correlation matrix.  The basis will actually be
 broken down into two steps.  To start, suppose $y$ is a vector
-containing $K \choose 2$ unconstrained values.  These are first
+containing $\binom{K}{2}$ unconstrained values.  These are first
 transformed via the bijective function $\tanh : \reals \rightarrow
 (0,1)$
 %
@@ -1264,7 +1264,7 @@ transformed via the bijective function $\tanh : \reals \rightarrow
 %
 Then, define a $K \times K$ matrix $z$, the upper triangular values of
 which are filled by row with the transformed values.  For example, in
-the $4 \times 4$ case, there are ${4 \choose 2}$ values arranged as
+the $4 \times 4$ case, there are $\binom{4}{2}$ values arranged as
 %
 \[
 z 
@@ -1402,7 +1402,7 @@ the Fisher transformation.
 
 A $K \times K$ matrix is a covariance matrix if it is symmetric and
 positive definite (see the previous section for definitions).  It
-requires $K + {K \choose 2}$ free parameters to specify a $K \times K$
+requires $K + \binom{K}{2}$ free parameters to specify a $K \times K$
 covariance matrix.
 
 
@@ -1536,16 +1536,83 @@ Jacobian determinants of the exponentiation and product transforms,
 \, \prod_{k=1}^K z_{k,k}^{K-k+2}.
 \]
 
-Let $f^{-1}$ be the inverse transform from a $K + {K \choose
-  2}$-vector $y$ to the $K \times K$ covariance matrix $x$.  A density
-function $p_X(x)$ defined on $K \times K$ covariance matrices is
-transformed to the density $p_Y(y)$ over $K + {K \choose 2}$ vectors
-$y$ by
+Let $f^{-1}$ be the inverse transform from a $K + \binom{K}{2}$-vector
+$y$ to the $K \times K$ covariance matrix $x$.  A density function
+$p_X(x)$ defined on $K \times K$ covariance matrices is transformed to
+the density $p_Y(y)$ over $K + \binom{K}{2}$ vectors $y$ by
 \[
 p_Y(y) = p_X(f^{-1}(y)) \ 2^K \ \prod_{k=1}^K z_{k,k}^{K-k+2}.
 \]
 
+\section{Cholesky Factors of Covariance Matrices}
 
+An $M \times N$ matrix is a Cholesky factor of a covariance matrix
+if it is lower triangular, the diagonal entries are positive, and $M
+\geq N$.  It requires $N + \binom{N}{2} + (M - N)N$ parameters.
+
+\subsection{Cholesky Factor of Covariance Matrix Transform}
+
+Stan's Cholesky factor transform only requires the first step of the
+covariance matrix transform, namely log transforming the positive
+diagonal elements.  Suppose $x$ is an $M \times N$ Cholesky factor.
+The above-diagonal entries are zero, the diagonal entries are
+positive, and the below-diagonal entries are unconstrained.  The
+transform required is thus
+%
+\[
+y_{m,n} = 
+\left\{
+\begin{array}{cl}
+0 & \mbox{if } m < n,
+\\[4pt]
+\log x_{m,m} & \mbox{if } m = n, \mbox{ and}
+\\[4pt]
+x_{m,n} & \mbox{if } m > n.
+\end{array}
+\right.
+\]
+
+\subsection{Cholesky Factor of Covariance Matrix Inverse Transform}
+
+The inverse transform need only invert the logarithm with an
+exponentiation.  If $y$ is the unconstrained matrix representation,
+then the elements of the constrained matrix $x$ is defined by
+\[
+x_{m,n} =
+\left\{
+\begin{array}{cl}
+0 & \mbox{if } m < n,
+\\[4pt]
+\exp(y_{m,m}) & \mbox{if } m = n, \mbox{ and}
+\\[4pt]
+y_{m,n} & \mbox{if } m > n.
+\end{array}
+\right.
+\]
+
+\subsection{Absolute Jacobian Determinant of Cholesky Factor Inverse Transform}
+
+The transform has a diagonal Jacobian matrix, the absolute determinant
+of which is
+%
+\[
+\prod_{n=1}^N  \frac{\partial}{\partial_{y_{n,n}}} \, \exp(y_{n,n})
+\ = \ 
+\prod_{n=1}^N \exp(y_{n,n})
+\ = \
+\prod_{n=1}^N x_{n,n}.
+\]
+
+Let $x = f^{-1}(y)$ be the inverse transform from a $N + \binom{N}{2}
++ (M - N)N$ vector to an $M \times N$ Cholesky factor for a covariance
+matrix $x$ defined in the previous section.  A density function
+$p_X(x)$ defined on $M \times N$ Cholesky factors of covariance
+matrices is transformed to the density $p_Y(y)$ over $N + \binom{N}{2}
++ (M - N)N$ vectors $y$ by
+%
+\[
+p_Y(y) = p_X(f^{-1}(y)) \prod_{N=1}^N x_{n,n}.
+\]
 
 % \chapter{Generated C++ Model Class}
 

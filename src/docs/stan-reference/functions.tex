@@ -1,14 +1,28 @@
 \part{Built-In Functions}\label{built-in-functions.part}
 
 
-\chapter{Vectorization}
+\chapter{Vectorization}\label{vectorization.chapter}
 
-\section{Vectorized Functions}\label{prob-vectorization.section}
+\noindent
+Stan's scalar log probability functions all support vectorized
+function application, with results defined to be the sum of the
+elementwise application of the function.  In all cases, matrix
+operations are faster than loops and vectorized log probability
+functions are faster than their equivalent form defined with loops. 
+
+Stan also overloads some scalar functions, such as \code{log} and
+\code{exp}, to apply to vectors (arrays) and return vectors (arrays).  
+These vectorizations are defined elementwise and unlike the
+probability functions, provide only minimal efficiency speedups over
+repeated application and assignment in a loop.
+
+
+\section{Vectorized Function Signatures}\label{prob-vectorization.section}
 
 The normal probability function is specified with the signature
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 normal_log(reals,reals,reals);
 \end{Verbatim}
 \end{quote}
@@ -20,9 +34,108 @@ vector, or a row-vector.  If there is more than one array or vector
 argument, their types can be anything but their size must match.  For
 instance, it is legal to use
 \code{normal\_log(row\_vector,vector,real)} as long as the vector and
-row vector have the same size.
+row vector have the same size.  
 
-The pseudo-type \code{ints} is used for vectorized arguments.
+The pseudo-type \code{ints} is used for vectorized integer arguments.
+
+
+\section{Evaluating Vectorized Functions}
+
+The result of a vectorized log probability function is equivalent to
+the sum of the evaluations on each element.  Any non-vector argument,
+namely \code{real} or \code{int}, is repeated.  For instance, if
+\code{y} is a vector of size \code{N}, \code{mu} is a vector of size
+\code{N}, and \code{sigma} is a scalar, then
+%
+\begin{quote}
+\begin{Verbatim}
+ll <- normal_log(y, mu, sigma);
+\end{Verbatim}
+\end{quote}
+%
+is just a more efficient way to write
+%
+\begin{quote}
+\begin{Verbatim}
+ll <- 0;
+for (n in 1:N)
+  ll <- ll + normal_log(y[n], mu[n], sigma);
+\end{Verbatim}
+\end{quote}
+%
+With the same arguments, the vectorized sampling statement
+%
+\begin{quote}
+\begin{Verbatim}
+y ~ normal(mu, sigma);
+\end{Verbatim}
+\end{quote}
+%
+has the same effect on the total log probability as
+%
+\begin{quote}
+\begin{Verbatim}
+for (n in 1:N)
+  y[n] ~ normal(mu[n], sigma);
+\end{Verbatim}
+\end{quote}
+
+
+
+
+\chapter{Void Functions}
+
+Stan does not technically support functions that do not return values.
+It does support two types of statements that look like functions, one
+for incrementing log probabilities and one for printing.
+Documentation on these functions is included here for completeness.
+
+Although it's not part of Stan's type language, in this chapter,
+\code{void} will be used for the return type.
+
+\section{Increment Log Probability}
+
+There is a special function \code{increment\_log\_prob} takes a single
+real-valued argument and adds the result to the log probability.
+%
+\begin{description}
+\fitem{void}{increment\_log\_prob}{real \farg{lp}}{Add \farg{lp} to
+  the total log probability accumulator returned by the log
+  probability function defined by a Stan model.}
+\end{description}
+%
+The full behavior of the \code{increment\_log\_prob} statement and its
+relation to sampling statements is described in
+\refsection{increment-log-prob}.
+
+
+\section{Print}
+
+The \code{print} statement is unique among Stan's syntactic constructs
+in two ways.  First, it is the only function-like construct that
+allows a variable number of arguments.  Second, it is the only
+function-like construct to accept string literals (e.g., \code{"hello
+  world"}) as arguments.
+
+Printing has no effect on the model's log probability function.  Its
+sole purpose is the side effect (i.e., an effect not represented in a
+return value) of arguments being printed to whatever the standard
+output stream is connected to (e.g., the terminal in command-line Stan
+or the R console in RStan).
+%
+\begin{description}
+  \fitem{void}{print}{T1 \farg{x1},..., TN \farg{xN}}{Print the values
+    denoted by the arguments \farg{x1} through \farg{xN} on the
+    standard output stream.  There are no spaces between items in the
+    print, but a line feed (LF; Unicode U+000A; \Cpp literal
+    \code{'\textbackslash{n}'}) is inserted at the end of the printed
+    line.  The types \code{T1} through \code{TN} can be any of Stan's
+    built-in numerical types or double quoted strings of ASCII
+    characters.}
+\end{description}
+%
+The full behavior of the \code{print} statement with examples is
+documented in \refsection{print-statements}.
 
 
 \chapter{Integer-Valued Basic Functions}
@@ -116,6 +229,9 @@ The absolute value of \farg{x}}
 \fitem{int}{int\_step}{int \farg{x}}
 1 if \farg{x} is strictly greater than 0, and 0 otherwise
 %
+\fitem{int}{int\_step}{real \farg{x}}
+1 if \farg{x} is strictly greater than 0, and 0 otherwise
+%
 \end{description}
 %
 
@@ -177,11 +293,9 @@ Not-a-number, a special non-finite real value returned to signal an error}
  Negative infinity, a special non-finite real value smaller than all
   finite numbers}
 %
-\fitem{real}{epsilon}{}{
-The smallest positive real value representable}
-%
-\fitem{real}{negative\_epsilon}{}{
-The largest negative real value representable}
+\fitem{real}{machine\_precision}{}{
+The smallest number $x$ such that $(x + 1) \neq 1$ in floating-point
+arithmetic on the current hardware platform}
 %
 \end{description}
 
@@ -281,6 +395,9 @@ is zero, returns 0 without evaluating \code{b}.
 
 \subsection{Logical Functions}
 
+The logical functions introduce conditional behavior functionally and
+are primarily provided for compatibility with BUGS and JAGS.
+%
 \begin{description}
 %
 \fitem{real}{if\_else}{int \farg{cond}, real \farg{x}, real \farg{y}}{
@@ -289,9 +406,54 @@ the ternary operator in \Cpp, Stan's \code{if\_else} function always
 evaluates both arguments \farg{x} and \farg{y}}
 %
 \fitem{real}{step}{real \farg{x}}{
-0 if \farg{x} is negative and 1 otherwise; equivalent to \code{x > 0.0}}
+1 if \farg{x} is positive and 0 otherwise; equivalent to \code{x > 0.0}}
 %
 \end{description}
+
+The log probability function and gradient evaluations are more
+efficient in Stan when implemented using conditional statements.  If
+\code{y} is a \code{real} variable, and \code{c}, \code{x1}, and
+\code{x2} are scalar expressions (type \code{real} or \code{int}),
+then the assignment statements
+%
+\begin{quote}
+\begin{Verbatim}
+y <- x1 * step(c) + x2 * (1 - step(c));
+\end{Verbatim}
+\end{quote}
+%
+and
+%
+\begin{quote}
+\begin{Verbatim}
+y <- if_else(c > 0, x1, x2);
+\end{Verbatim}
+\end{quote}
+%
+are more efficiently written with the conditional statement
+%
+\begin{quote}
+\begin{Verbatim}
+if (c > 0)
+  y <- x1;
+else
+  y <- x2;
+\end{Verbatim}
+\end{quote}
+%
+The reason the functional versions are slower is that they evaluate
+all of their arguments; the step function approach is particularly
+slow as it also introduces arithmetic operations.  The overhead will
+be more noticeable if \code{c}, \code{x1} or \code{x2}
+are parameters (including transformed parameters and local variables
+that depend on parameters) or if \code{x1} and \code{x2} are
+complicated expressions rather than constants or simple variables.  
+
+\emph{Warning: } \ If \code{y} is a parameter (including transformed
+parameters and local variables in model blocks) and any of \code{c},
+\code{x1}, or \code{x2} is a parameter, then all of the above
+approaches introduce the same discontinuities into the derivative of
+\code{y} with respect to the parameter arguments.
 
 
 \section{Real-Valued Arithmetic Operators}\label{real-valued-arithmetic-operators.section}
@@ -331,63 +493,109 @@ This is a no-op.}
 \end{description}
 
 
-\section{Absolute Functions}
+\section{Step-like Functions}\label{step-functions.section}
+
+{\it {\bf Warning:} These functions can seriously hinder sampling and
+  optimization efficiency for gradient-based methods (e.g., NUTS, HMC,
+  BFGS) if applied to parameters (including transformed parameters and
+  local variables in the transformed parameters or model block).  The
+  problem is that they break gradients due to discontinuities coupled with
+  zero gradients elsewhere.  They do not hinder sampling when used in the
+  data, transformed data, or generated quantities blocks.}
+
+\subsection{Absolute Value Functions}
 
 \begin{description}
 %
-\fitem{real}{abs}{real \farg{x}}{
-The absolute value of \farg{x}}
+  \fitem{real}{abs}{real \farg{x}}{ The absolute value of \farg{x}.
+    This function is deprecated and will be removed in the future;
+    please use \code{fabs} instead.}
 %
 \fitem{real}{fabs}{real \farg{x}}{
-The absolute value of \farg{x}}
+The absolute value of \farg{x};  
+see warning at start of \refsection{step-functions}}
 %
 \fitem{real}{fdim}{real \farg{x}, 
                  real \farg{y}}{
 The positive difference between \farg{x} and \farg{y}, which is
-\farg{x} - \farg{y} if \farg{x} is greater than \farg{y} and 0 otherwise}
+\farg{x} - \farg{y} if \farg{x} is greater than \farg{y} and 0
+otherwise;
+see warning at start of \refsection{step-functions}}
 %
 \end{description}
 
-\section{Bounds Functions}
+\subsection{Bounds Functions}
 
 \begin{description}
 %
 \fitem{real}{fmin}{real \farg{x}, real \farg{y}}{
-The minimum of \farg{x} and \farg{y}}
+The minimum of \farg{x} and \farg{y}\,; 
+see warning at start of \refsection{step-functions}}
 %
 \fitem{real}{fmax}{real \farg{x}, real \farg{y}}{
-The maximum of \farg{x} and \farg{y}}
+The maximum of \farg{x} and \farg{y}\,;
+see warning at start of \refsection{step-functions}}
 %
 \end{description}
 
 
-\section{Arithmetic Functions}
+\subsection{Arithmetic Functions}
+
 %
 \begin{description}
 \fitem{real}{fmod}{real \farg{x}, real \farg{y}}{
-The real value remainder after dividing \farg{x} by \farg{y}}
+The real value remainder after dividing \farg{x} by \farg{y}\,;
+see warning at start of \refsection{step-functions}}
 %
 \end{description}
 
 
-\section{Rounding Functions}
+\subsection{Rounding Functions}
+
+{\it Warning:}\ Rounding functions convert real values to integers.
+Because the output is an integer, any gradient information resulting
+from functions applied to the integer is not passed to the real value
+it was derived from.  With MCMC sampling using HMC or NUTS, the
+Metropolis/slice procedure will correct for any error due to poor
+gradient calculations, but the result is likely to be reduced
+acceptance probabilities and less efficient sampling.
+
+One case where rounding is reasonable is linear interpolation of
+function values.   For
+example, consider
 %
+\begin{quote}
+\begin{Verbatim}
+xm <- x[floor(c)];
+xp <- x[ceil(c)];
+x <- (c - floor(c))*xp + (ceil(c) - c)*xm;
+\end{Verbatim}
+\end{quote}
+%
+In this example, the first derivative for \code{x} with respect to
+\code{c} will be reasonable, but the second derivatives will all be
+zero.
+
 \begin{description}
 %
 \fitem{real}{floor}{real \farg{x}}{
 The floor of \farg{x}, which is the largest integer less
-than or equal to \farg{x}, converted to a real value}
+than or equal to \farg{x}, converted to a real value;
+see warning at start of \refsection{step-functions}}
 %
 \fitem{real}{ceil}{real \farg{x}}{
 The ceiling of \farg{x}, which is the smallest integer greater
-than or equal to \farg{x}, converted to a real value}
+than or equal to \farg{x}, converted to a real value;
+see warning at start of \refsection{step-functions}}
 %
 \fitem{real}{round}{real \farg{x}}{
-The nearest integer to \farg{x}, converted to a real value}
+The nearest integer to \farg{x}, converted to a real value;
+see warning at start of \refsection{step-functions}}
 %
 \fitem{real}{trunc}{real \farg{x}}{
 The integer nearest to but no larger in magnitude than \farg{x},
-converted to a double value}
+converted to a double value;
+see warning at start of \refsection{step-functions}}
 %
 \end{description}
 
@@ -538,7 +746,11 @@ The error function of \farg{x}}
 The complementary error function of \farg{x}}
 %
 \fitemindexsort{real}{Phi}{real \farg{x}}{
-The cumulative unit normal density function of \farg{x}}{Phi}{phi}
+The cumulative unit normal density function of \farg{x};
+\code{Phi(\farg{x})} will underflow to 0 for \farg{x} below -37.5 and overflow
+to 1 for \farg{x} above 8.25;  derivatives will underflow to 0 below
+-27.5 and overflow to 1 above 27.5.
+}{Phi}{phi}
 %
 \fitemindexsort{real}{Phi\_approx}{real \farg{x}}{
 Fast approximation of the cumulative unit normal density
@@ -554,7 +766,7 @@ be used instead of \code{Phi} for probit regression.  See
 
 \fitem{real}{binary\_log\_loss}{int \farg{y}, real \farg{y\_hat}}{
 The log loss of predicting probability \farg{y\_hat} for 
-binary outcome \farg{y};
+binary outcome \farg{y}\,;
 
 The log loss function for predicting $\hat{y} \in [0,1]$ for 
 boolean outcome $y \in \setlist{0,1}$ is defined by
@@ -606,17 +818,42 @@ positive numbers and non-integral negative numbers by
 \fitem{real}{lgamma}{real \farg{x}}{
 The natural logarithm of the gamma function applied to \farg{x}}
 %
+\fitem{real}{digamma}{real \farg{x}}{
+The digamma function applied to \farg{x}.  The digamma function is the
+derivative of the natural logarithm of the Gamma function.  The function is defined for
+positive numbers and non-integral negative numbers.}
+%
+\fitem{real}{trigamma}{real \farg{x}}{
+The trigamma function applied to \farg{x}.  The trigamma function is the
+second derivative of the natural logarithm of the Gamma function.}
+%
 \fitem{real}{lmgamma}{int \farg{n}, real \farg{x}}{
 The natural logarithm of the multinomial gamma function with \farg{n}
-dimensions applied to \farg{x}.  }
+dimensions applied to \farg{x}.}
+%
+\fitem{real}{gamma\_p}{real \farg{a}, real \farg{z}}{
+The normalised lower incomplete gamma function of \farg{a} and \farg{z} defined for positive \farg{a} and nonnegative \farg{z} by 
+\[
+P(a,z) =
+\frac{1}{\Gamma(a)}\int_0^z t^{a-1}e^{-t}dt
+\]
+}
+%
+\fitem{real}{gamma\_q}{real \farg{a}, real \farg{z}}{
+The normalised upper incomplete gamma function of \farg{a} and \farg{z} defined for positive \farg{a} and nonnegative \farg{z} by 
+\[
+Q(a,z) =
+\frac{1}{\Gamma(a)}\int_z^\infty t^{a-1}e^{-t}dt
+\]
+}
 %
 \fitem{real}{binomial\_coefficient\_log}{real \farg{x}, real
   \farg{y}}{ The natural logarithm of the binomial coefficient of
   \farg{x} and \farg{y}.  For non-negative integer inputs, this is
   pronounced ``\farg{x} choose \farg{y},'' written as
-  ${x \choose y}$, and defined by
+  $\binom{x}{y}$, and defined by
 \[
-{x \choose y} = \frac{x!}{(x - y)! \, y!}.
+\binom{x}{y} = \frac{x!}{(x - y)! \, y!}.
 \]
 This Stan function extends the domain to continuous quantities through the
 $\Gamma$ function, defining
@@ -628,13 +865,14 @@ $\Gamma$ function, defining
 \]
 }
 %
-\fitem{real}{bessel\_first\_kind}{real \farg{v}, real \farg{z}}{The Bessel function of the first kind with order \farg{v} applied to \farg{z} defined for all \farg{z} and \farg{v} by
+\fitem{real}{bessel\_first\_kind}{int \farg{v}, real \farg{z}}{The Bessel function of the first kind with order \farg{v} applied to \farg{z} defined for all \farg{z} and \farg{v} by
 \[
-{J_v}(z) = \left(\frac{1}{2}z\right)^v\sum_{k=0}^\infty \frac{\left(-\frac{1}{4}z^2\right)^k}{k!\Gamma(v+k+1)}
+{J_v}(z) = \left(\frac{1}{2}z\right)^v\sum_{k=0}^\infty
+\frac{\left(-\frac{1}{4}z^2\right)^k}{k!\, \Gamma(v+k+1)}
 \]
 }
 %
-\fitem{real}{bessel\_second\_kind}{real \farg{v}, real \farg{z}}{
+\fitem{real}{bessel\_second\_kind}{int \farg{v}, real \farg{z}}{
 The Bessel function of the second kind with order \farg{v} applied to \farg{z} defined for  positive \farg{z} and \farg{v} by
 \[
 {Y_v}(z)
@@ -643,13 +881,13 @@ The Bessel function of the second kind with order \farg{v} applied to \farg{z} d
 \]
 }
 %
-\fitem{real}{modified\_bessel\_first\_kind}{real \farg{v}, real \farg{z}}{The modified Bessel function of the first kind with order \farg{v} applied to \farg{z} defined for all \farg{z} and \farg{v} by
+\fitem{real}{modified\_bessel\_first\_kind}{int \farg{v}, real \farg{z}}{The modified Bessel function of the first kind with order \farg{v} applied to \farg{z} defined for all \farg{z} and \farg{v} by
 \[
 {I_v}(z) = \left(\frac{1}{2}z\right)^v\sum_{k=0}^\infty \frac{\left(\frac{1}{4}z^2\right)^k}{k!\Gamma(v+k+1)}
 \]
 }
 %
-\fitem{real}{modified\_bessel\_second\_kind}{real \farg{v}, real \farg{z}}{
+\fitem{real}{modified\_bessel\_second\_kind}{int \farg{v}, real \farg{z}}{
 The modified Bessel function of the second kind with order \farg{v} applied to \farg{z} defined for  positive \farg{z} and \farg{v} by
 \[
 {K_v}(z)
@@ -704,7 +942,8 @@ The natural exponential of \farg{x} minus 1}
 \farg{z} plus the result of \farg{x} multiplied by \farg{y}}
 %
 \fitem{real}{multiply\_log}{real \farg{x}, real \farg{y}}{ 
-The product of \farg{x} and the natural logarithm of \farg{y}}
+The product of \farg{x} and the natural logarithm of \farg{y}\,;  if
+both \farg{x} and \farg{y} are 0, the return value is 0}
 %
 \fitem{real}{log1p}{real \farg{x}}{
 The natural logarithm of 1 plus \farg{x}}
@@ -740,11 +979,14 @@ The natural logarithm of 1 minus the inverse logit function of \farg{x}}
 
 \chapter{Array Operations}
 
-\section{Reductions}
+\section{Reductions}\label{array-reductions.section}
 
 The following operations take arrays as input and produce single
 output values.
 %
+
+\subsection{Minimum and Maximum}
+
 \begin{description}
 \fitem{real}{min}{real \farg{x}[]}{
 The minimum value in \farg{x}, or $+\infty$ if \farg{x} is empty}
@@ -758,10 +1000,16 @@ The maximum value in \farg{x}, or $-\infty$ if \farg{x} is empty}
 \fitem{int}{max}{int \farg{x}[]}{
 The maximum value in \farg{x}, or raise exception if \farg{x} is empty}
 %
-\fitem{real}{sum}{real \farg{x}[]}{
+\end{description}
+
+\subsection{Sum, Product, and Log Sum of Exp}
+
+\begin{description}
+%
+\fitem{int}{sum}{int \farg{x}[]}{
 The sum of the elements in \farg{x}, or 0 if \farg{x} is empty.}
 %
-\fitem{real}{sum}{int \farg{x}[]}{
+\fitem{real}{sum}{real \farg{x}[]}{
 The sum of the elements in \farg{x}, or 0 if \farg{x} is empty.}
 %
 \fitem{real}{prod}{real \farg{x}[]}{
@@ -770,21 +1018,93 @@ The product of the elements in \farg{x}, or 1 if \farg{x} is empty.}
 \fitem{real}{prod}{int \farg{x}[]}{
 The product of the elements in \farg{x}, or 1 if \farg{x} is empty.}
 %
-\fitem{real}{mean}{real \farg{x}[]}{
-The sample mean of the elements in \farg{x}, or raise exception
-if \farg{x} is empty}
-%
-\fitem{real}{variance}{real \farg{x}[]}{
-The sample variance of the elements in \farg{x} (based on
-dividing by \code{length - 1}), or 0 if \farg{x} is empty}
-%
-\fitem{real}{sd}{real \farg{x}[]}{The sample standard deviation of
-elements in \farg{x} (divide by \code{length - 1}), or 0 if \farg{x}
-is empty}
-%
 \fitem{real}{log\_sum\_exp}{real \farg{x}[]}{
 The natural logarithm of the sum of the exponentials of the elements in \farg{x}}
 \end{description}
+
+
+\subsection{Moments}
+
+Moments are only defined for arrays $x$ of size $N \geq 1$; it is an
+error to call them with arrays of size $N = 0$.  The sample mean is
+defined by
+\[
+\mbox{mean}(x) = \frac{1}{N} \sum_{n=1}^N x_n.
+\]
+%
+For $N \geq 2$, sample variance is defined for $N \geq 1$ by
+\[
+\mbox{variance}(x) 
+= 
+\frac{1}{N-1} \sum_{n=1}^N (x_n - \mbox{mean}(x))^2
+\]
+and sample standard deviation by 
+\[
+\mbox{sd}(x) = \sqrt{\, \mbox{variance}(x)},
+\]
+For convenience, when $N = 1$, $\mbox{variance(x)}$ and 
+$\mbox{sd}(x)$ are defined to be 0.
+
+% leaving gradients following for ref and in case we want
+% to add them for all functions at some point
+
+% For $N \geq 2$,
+% \[
+% \frac{\partial}{\partial x_n} \mbox{mean}(x)
+% = \frac{1}{N}.
+% \]
+% For $N \geq 2$,
+% \[
+% \frac{\partial}{\partial x_n} \mbox{variance}(x)
+% = \frac{2}{N-1} 
+%   \left( x_n - \mbox{mean}(x) \right).
+% \]
+% For $N \geq 2$,
+% \[
+% \frac{\partial}{\partial x_n} \mbox{sd}(x)
+% = \frac{1}{(N - 1) \, \mbox{sd}(x)} 
+%   \left( x_m - \mbox{mean}(x) \right)
+% \]
+% For $N \geq 2$, in the limit where $\mbox{sd}(x) = 0$, 
+% % 
+% \[
+% \frac{\partial}{\partial x_n} \mbox{sd}(x)
+% = \frac{1}{\sqrt{N}}.
+% \]
+
+
+
+\begin{description}
+\fitem{real}{mean}{real \farg{x}[]}{
+The sample mean of the elements in \farg{x}}
+%
+\fitem{real}{variance}{real \farg{x}[]}{
+The sample variance of the elements in \farg{x}}
+%
+\fitem{real}{sd}{real \farg{x}[]}{The sample standard deviation of
+elements in \farg{x}}
+\end{description}
+
+% \subsection{Distance and Squared Distance}
+%
+% \fitem{real}{dist}{real \farg{x}[], real \farg{y}[]}{The Euclidean
+%   distance between \farg{x} and \farg{y}, defined by
+% \[
+% \mbox{dist}(\mbox{\farg{x}},\mbox{\farg{y}}) 
+% = \sqrt{\textstyle \sum_{n=1}^N (\mbox{\farg{x}}[n] - \mbox{\farg{y}}[n])^2},
+% \]
+% where \code{N} is the size of \farg{x} and \farg{y}.
+% }
+%
+% \fitem{real}{squared\_dist}{real \farg{x}[], real \farg{y}[]}{The Euclidean
+%   distance between \farg{x} and \farg{y}, defined by
+% \[
+% \mbox{squared\_dist}(\mbox{\farg{x}},\mbox{\farg{y}}) 
+% = \textstyle \sum_{n=1}^N (\mbox{\farg{x}}[n] - \mbox{\farg{y}}[n])^2,
+% \]
+% where \code{N} is the size of \farg{x} and \farg{y}.
+% }
+%
 
 \section{Array Size and Dimension Function}
 
@@ -794,7 +1114,7 @@ consisting of any variable with up to 8 array dimensions (and up to 2
 additional matrix dimensions) and returns an array of integers with
 the dimensions.  For example, if two variables are declared as follows,
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 real x[7,8,9];
 matrix[8,9] y[7];
 \end{Verbatim}
@@ -848,7 +1168,7 @@ real array.  For example, the following example contrasts legal with
 illegal array creation and assignment
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 real y[5];
 int x[5];
 
@@ -868,7 +1188,7 @@ If the value being repeated \code{v} is a vector (i.e., \code{T} is
 consisting of 27 copies of the vector \code{v}.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 vector[5] v;
 vector[5] a[3];
 ...
@@ -883,7 +1203,7 @@ depending on which of the \code{rep\_array} functions is called.  For
 instance, consider the following legal code snippet.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 real a[5,6];
 real b[3,4,5,6];
 ...
@@ -1256,23 +1576,23 @@ $\mbox{\code{x}}^{\top}\,\mbox{\code{x}}$.}
 %
 \end{description}
 
+
+The following functions all provide shorthand forms for common
+expressions, which are also much more efficient.
+%
 \begin{description}
 %
 \fitem{matrix}{quad\_form}{matrix \farg{A}, matrix \farg{B}}{
-The quadratic form $B^T*A*B$.  Using this function is much more efficient than
-doing it directly.}
+The quadratic form, i.e., \code{B'~*~A~*~B}.}
 %
 \fitem{real}{quad\_form}{matrix \farg{A}, vector \farg{B}}{
-The quadratic form $B^T*A*B$.  Using this function is much more efficient than
-doing it directly.}
+The quadratic form, i.e., \code{B'~*~A~*~B}.}
 %
-\fitem{real}{trace\_quad\_form}{matrix \farg{A}, matrix \farg{B}}{
-The trace of a quadratic form, i.e., $trace(B^T*A*B)$.  Using this function is
-much more efficient than doing it directly.}
+\fitem{real}{trace\_quad\_form}{matrix \farg{A}, matrix \farg{B}}{ 
+The trace of the quadratic form, i.e., \code{trace(B'~*~A~*~B)}.}
 %
 \fitem{real}{trace\_gen\_quad\_form}{matrix \farg{D},matrix \farg{A}, matrix \farg{B}}{
-The trace of a generalized quadratic form, i.e., $trace(D*B^T*A*B)$.  Using this
-function is much more efficient than doing it directly.}
+The trace of a generalized quadratic form, i.e., \code{trace(D~*~B'~*~A~*~B).}}
 %
 \end{description}
 
@@ -1311,6 +1631,17 @@ This is a specialization of tcrossprod(x) for lower-triangular matrices.}
 
 
 \section{Reductions}
+
+\subsection{Log Sum of Exponents}
+
+\begin{description}
+\fitem{real}{log\_sum\_exp}{vector \farg{x}}{
+The natural logarithm of the sum of the exponentials of the elements in \farg{x}}
+\fitem{real}{log\_sum\_exp}{row\_vector \farg{x}}{
+The natural logarithm of the sum of the exponentials of the elements in \farg{x}}
+\fitem{real}{log\_sum\_exp}{matrix \farg{x}}{
+The natural logarithm of the sum of the exponentials of the elements in \farg{x}}
+\end{description}
 
 \subsection{Minimum and Maximum}
 
@@ -1365,48 +1696,50 @@ The product of the values in \farg{x}, or 1 if \farg{x} is empty}
 
 \subsection{Sample Moments}
 
+Full definitions are provided for sample moments in
+\refsection{array-reductions}.
+
 \begin{description}
 %
 \fitem{real}{mean}{vector \farg{x}}{
-The sample mean of the values in \farg{x}, or raise
-exception if \farg{x} is empty}
+The sample mean of the values in \farg{x};  
+see \refsection{array-reductions} for details.}
 %
 \fitem{real}{mean}{row\_vector \farg{x}}{
-The sample mean of the values in \farg{x}, or raise
-exception if \farg{x} is empty}
+The sample mean of the values in \farg{x};
+see \refsection{array-reductions} for details.}
 %
 \fitem{real}{mean}{matrix \farg{x}}{
-The sample mean of the values in \farg{x}, or raise
-exception if \farg{x} is empty}
+The sample mean of the values in \farg{x};
+see \refsection{array-reductions} for details.}
 %
 \vspace*{4pt}
 %
 \fitem{real}{variance}{vector \farg{x}}{
-The sample variance of the values in \farg{x}
-(divide by size minus 1), or 0 if \farg{x} is empty}
+  The sample variance of the values in 
+  \farg{x}; see \refsection{array-reductions} for details.}
 %
-\fitem{real}{variance}{row\_vector \farg{x}}{ The sample variance of
-  the values in \farg{x} (divide by size minus 1), or 0 if \farg{x} is
-  empty}
+\fitem{real}{variance}{row\_vector \farg{x}}{ 
+  The sample variance of the values in 
+  \farg{x}; see \refsection{array-reductions} for details.}
 %
 \fitem{real}{variance}{matrix \farg{x}}{
 The sample variance of the values in 
-\farg{x} (divide by size minus 1), or 0 if \farg{x} is empty}
+\farg{x}; see \refsection{array-reductions} for details.}
 %
 \vspace*{4pt}
 %
 \fitem{real}{sd}{vector \farg{x}}{
-The sample standard deviation of the values in \farg{x}
-(divide by size minus 1), or 0 if \farg{x} is empty}
+The sample standard deviation of the values in \farg{x};  see 
+\refsection{array-reductions} for details.}
 %
 \fitem{real}{sd}{row\_vector \farg{x}}{ 
-The sample standard deviation of the values in \farg{x} (divide by
-size minus 1), or 0 if \farg{x} is empty}
+The sample standard deviation of the values in \farg{x}; see
+\refsection{array-reductions} for details.}
 %
 \fitem{real}{sd}{matrix \farg{x}}{
-The sample standard deviation of the values in 
-\farg{x} (divide by size minus 1), or 0 if \farg{x} is empty}
-%
+The sample standard deviation of the values in \farg{x};
+see \refsection{array-reductions} for details.}%
 \end{description}
 
 
@@ -1448,7 +1781,7 @@ statements produce the same result for vector broadcasting;  row vector
 and matrix broadcasting behave similarly.
 %
 \begin{quote}
-\begin{Verbatim}
+\begin{Verbatim}[fontsize=\small]
 vector[3] x;
 x <- rep_vector(1, 3);
 x <- rep_vector(1.0, 3);  
@@ -1593,7 +1926,7 @@ arbitrary subvector.
 
 \section{Special Matrix Functions}\label{softmax.section}
 
-The softmax function maps $\reals^K$ to the $K$-simplex by
+The softmax function maps $y \in \reals^K$ to the $K$-simplex by
 \[
 \mbox{softmax}(y)
  = \frac{\exp(y)}
@@ -1601,10 +1934,54 @@ The softmax function maps $\reals^K$ to the $K$-simplex by
 \]
 %
 where $\exp(y)$ is the componentwise exponentiation of $y$.
-
+%
+Softmax is usually calculated on the log scale, 
+\[
+\log \mbox{softmax}(y)
+ \ = \ y - \log \sum_{k=1}^K \exp(y_k)
+ \ = \ y - \mbox{log\_sum\_exp}(y).
+\]
+%
+The entries in the Jacobian of the softmax function are given by
+\[
+\begin{array}{l}
+\displaystyle
+\frac{\partial}{\partial y_m} \mbox{softmax}(y)[k]
+\\[8pt]
+\displaystyle
+\mbox{ } \ \ \ = \left\{ 
+\begin{array}{ll}
+\mbox{softmax}(y)[k] - \mbox{softmax}(y)[k] \times \mbox{softmax}(y)[m]
+& \mbox{ if } m = k, \mbox{ and}
+\\[6pt]
+\mbox{softmax}(y)[k] * \mbox{softmax}(y)[m]
+& \mbox{ if } m \neq k.
+\end{array}
+\right.
+\end{array}
+\]
+For the log softmax function, the entries are
+\[
+\frac{\partial}{\partial y_m} \mbox{softmax}(y)[k]
+= \left\{ 
+\begin{array}{ll}
+1 - \mbox{softmax}(y)[m]
+& \mbox{ if } m = k, \mbox{ and}
+\\[6pt]
+\mbox{softmax}(y)[m]
+& \mbox{ if } m \neq k.
+\end{array}
+\right.
+\]
+%
+Stan provides the following functions for softmax and its log.
+%
 \begin{description}
 \fitem{vector}{softmax}{vector \farg{x}}{
 The softmax of \farg{x}}
+%
+\fitem{vector}{log\_softmax}{vector \farg{x}}{
+The natural logarithm of the softmax of \farg{x}}
 \end{description}
 %
 

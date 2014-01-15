@@ -1,10 +1,10 @@
 #ifndef __STAN__IO__CSV_WRITER_HPP__
 #define __STAN__IO__CSV_WRITER_HPP__
 
+#include <stan/math/matrix.hpp>
 #include <ostream>
 #include <limits>
 #include <iomanip>
-#include <stan/math/matrix.hpp>
 
 namespace stan {
 
@@ -98,7 +98,7 @@ namespace stan {
        * @param m Matrix to write.
        */
       template<int R, int C>
-      void write(const Eigen::Matrix<double,R,C>& m) {
+      void write_row_major(const Eigen::Matrix<double,R,C>& m) {
         typedef typename Eigen::Matrix<double,R,C>::size_type size_type;
         for (size_type i = 0; i < m.rows(); ++i)
           for (size_type j = 0; j < m.cols(); ++j)
@@ -119,6 +119,11 @@ namespace stan {
         for (size_type j = 0; j < m.cols(); ++j)
           for (size_type i = 0; i < m.rows(); ++i)
             write(m(i,j));
+      }
+
+      template<int R, int C>
+      void write(const Eigen::Matrix<double,R,C>& m) {
+        write_col_major(m);
       }
 
       /**

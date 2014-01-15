@@ -4,7 +4,7 @@
 #include <stan/prob/constants.hpp>
 #include <stan/math/matrix_error_handling.hpp>
 #include <stan/math/error_handling.hpp>
-#include <stan/agrad/matrix.hpp>
+#include <stan/agrad/rev/matrix.hpp>
 #include <stan/prob/traits.hpp>
 #include <boost/concept_check.hpp>
 #include "stan/prob/distributions/univariate/continuous/normal.hpp"
@@ -12,10 +12,12 @@
 #include <stan/math/functions/lmgamma.hpp>
 #include <stan/math/matrix/columns_dot_product.hpp>
 #include <stan/math/matrix/trace.hpp>
-#include <stan/math/matrix/ldlt.hpp>
+#include <stan/math/matrix/log_determinant_ldlt.hpp>
+#include <stan/math/matrix/mdivide_left_ldlt.hpp>
 #include <stan/math/matrix/dot_product.hpp>
 #include <stan/math/matrix/mdivide_left_tri_low.hpp>
 #include <stan/math/matrix/multiply_lower_tri_self_transpose.hpp>
+#include <stan/math/error_handling/matrix/check_ldlt_factor.hpp>
 
 namespace stan {
 
@@ -88,21 +90,14 @@ namespace stan {
       using stan::math::log_determinant_ldlt;
       using stan::math::mdivide_left_ldlt;
       using stan::math::LDLT_factor;
+      using stan::math::check_ldlt_factor;
       
       LDLT_factor<T_y,Eigen::Dynamic,Eigen::Dynamic> ldlt_W(W);
-      if (!ldlt_W.success()) {
-        std::ostringstream message;
-        message << "W is not positive definite (%1%).";
-        std::string str(message.str());
-        stan::math::dom_err(function,W(0,0),"W",str.c_str(),"",&lp);
+      if (!check_ldlt_factor(function,ldlt_W,"LDLT_Factor of random variable",&lp)) {
         return lp;
       }
       LDLT_factor<T_scale,Eigen::Dynamic,Eigen::Dynamic> ldlt_S(S);
-      if (!ldlt_S.success()) {
-        std::ostringstream message;
-        message << "S is not positive definite (%1%).";
-        std::string str(message.str());
-        stan::math::dom_err(function,S(0,0),"S",str.c_str(),"",&lp);
+      if (!check_ldlt_factor(function,ldlt_S,"LDLT_Factor of scale parameter",&lp)) {
         return lp;
       }
       
@@ -149,6 +144,16 @@ namespace stan {
     wishart_rng(const double nu,
                 const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& S,
                 RNG& rng) {
+
+      static const char* function = "stan::prob::wishart_rng(%1%)";
+
+      using stan::math::check_size_match;
+      using stan::math::check_positive;
+
+      check_positive(function,nu,"degrees of freedom");
+      check_size_match(function, 
+                       S.rows(), "Rows of scale parameter",
+                       S.cols(), "columns of scale parameter");
 
       Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> B(S.rows(), S.cols());
       B.setZero();

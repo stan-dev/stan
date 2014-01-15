@@ -15,6 +15,7 @@
 #include <boost/fusion/include/std_pair.hpp>
 #include <boost/config/warning_disable.hpp>
 #include <boost/spirit/include/qi_numeric.hpp>
+#include <stan/gm/ast.hpp>
 #include <stan/gm/grammars/var_decls_grammar.hpp>
 #include <stan/gm/grammars/common_adaptors_def.hpp>
 
@@ -64,6 +65,12 @@ BOOST_FUSION_ADAPT_STRUCT(stan::gm::ordered_var_decl,
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::positive_ordered_var_decl,
                           (stan::gm::expression, K_)
+                          (std::string, name_)
+                          (std::vector<stan::gm::expression>, dims_) )
+
+BOOST_FUSION_ADAPT_STRUCT(stan::gm::cholesky_factor_var_decl,
+                          (stan::gm::expression, M_)
+                          (stan::gm::expression, N_)
                           (std::string, name_)
                           (std::vector<stan::gm::expression>, dims_) )
 
@@ -135,6 +142,11 @@ namespace stan {
                     << " found positive_ordered." << std::endl;
         return false;
       }
+      bool operator()(const cholesky_factor_var_decl& /*x*/) const {
+        error_msgs_ << "require unconstrained variable declaration."
+                    << " found cholesky_factor." << std::endl;
+        return false;
+      }
       bool operator()(const cov_matrix_var_decl& /*x*/) const {
         error_msgs_ << "require unconstrained variable declaration."
                     << " found cov_matrix." << std::endl;
@@ -172,7 +184,9 @@ namespace stan {
       }
       bool operator()(const variable& x) const {
         var_origin origin = var_map_.get_origin(x.name_);
-        bool is_data = (origin == data_origin) || (origin == transformed_data_origin);
+        bool is_data = (origin == data_origin) 
+          || (origin == transformed_data_origin)
+          || (origin == local_origin);
         if (!is_data) {
           error_msgs_ << "non-data variables not allowed in dimension declarations."
                       << std::endl
@@ -221,9 +235,16 @@ namespace stan {
         if (vm.exists(var_decl.name_)) {
           // variable already exists
           pass = false;
-          error_msgs << "variable already declared, name="
-                     << var_decl.name_ 
-                     << std::endl;
+          error_msgs << "duplicate declaration of variable, name="
+                     << var_decl.name_;
+
+          error_msgs << "; attempt to redeclare as ";
+          print_var_origin(error_msgs,vo);  // FIXME -- need original vo
+
+          error_msgs << "; original declaration as ";
+          print_var_origin(error_msgs,vm.get_origin(var_decl.name_));
+
+          error_msgs << std::endl;
           return var_decl;
         } 
         if ((vo == parameter_origin || vo == transformed_parameter_origin)
@@ -295,8 +316,9 @@ namespace stan {
         reserve("positive_ordered"); 
         reserve("row_vector"); 
         reserve("matrix"); 
-        reserve("corr_matrix"); 
+        reserve("cholesky_factor_cov");
         reserve("cov_matrix");
+        reserve("corr_matrix"); 
 
         
         reserve("model"); 
@@ -392,7 +414,29 @@ namespace stan {
         reserve("while"); 
         reserve("xor"); 
         reserve("xor_eq");
-      }      
+
+        // function names declared in signatures
+        using stan::gm::function_signatures;
+        using std::set;
+        using std::string;
+        const function_signatures& sigs = function_signatures::instance();
+        set<string> fun_names = sigs.key_set();
+        fun_names.erase("pi");
+        fun_names.erase("e");
+        fun_names.erase("sqrt2");
+        fun_names.erase("log2");
+        fun_names.erase("log10");
+        fun_names.erase("not_a_number");
+        fun_names.erase("positive_infinity");
+        fun_names.erase("negative_infinity");
+        fun_names.erase("epsilon");
+        fun_names.erase("negative_epsilon");
+        for (set<string>::iterator it = fun_names.begin();  
+             it != fun_names.end();  
+             ++it)
+          reserve(*it);
+        
+      }
 
       bool operator()(const std::string& identifier,
                       std::stringstream& error_msgs) const {
@@ -426,6 +470,18 @@ namespace stan {
       }
     };
     boost::phoenix::function<validate_identifier> validate_identifier_f;
+
+    // copies single dimension from M to N if only M declared
+    struct copy_square_cholesky_dimension_if_necessary {
+      template <typename T1>
+      struct result { typedef void type; };
+      void operator()(cholesky_factor_var_decl& var_decl) const {
+        if (is_nil(var_decl.N_))
+          var_decl.N_ = var_decl.M_;
+      }
+    };
+    boost::phoenix::function<copy_square_cholesky_dimension_if_necessary>
+    copy_square_cholesky_dimension_if_necessary_f;
 
     struct empty_range {
       template <typename T1>
@@ -605,10 +661,13 @@ namespace stan {
             | positive_ordered_decl_r(_r2)   
             [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2,
                               boost::phoenix::ref(error_msgs_))]
-            | corr_matrix_decl_r(_r2)   
+            | cholesky_factor_decl_r(_r2)    
             [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2,
                               boost::phoenix::ref(error_msgs_))]
             | cov_matrix_decl_r(_r2)    
+            [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2,
+                              boost::phoenix::ref(error_msgs_))]
+            | corr_matrix_decl_r(_r2)   
             [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2,
                               boost::phoenix::ref(error_msgs_))]
             )
@@ -720,16 +779,22 @@ namespace stan {
         > opt_dims_r(_r1)
         > lit(';');
 
-      corr_matrix_decl_r.name("correlation matrix declaration");
-      corr_matrix_decl_r 
-        %= lit("corr_matrix")
+      cholesky_factor_decl_r.name("cholesky factor declaration");
+      cholesky_factor_decl_r 
+        %= lit("cholesky_factor_cov")
         > lit('[')
         > expression_g(_r1)
-        [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
-        > lit(']')
+          [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
+        > -( lit(',')
+             > expression_g(_r1)
+             [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
+             ) 
+        > lit(']') 
         > identifier_r 
         > opt_dims_r(_r1)
-        > lit(';');
+        > lit(';')
+        > eps
+        [copy_square_cholesky_dimension_if_necessary_f(_val)];
 
       cov_matrix_decl_r.name("covariance matrix declaration");
       cov_matrix_decl_r 
@@ -737,6 +802,17 @@ namespace stan {
         > lit('[')
         > expression_g(_r1)
           [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
+        > lit(']')
+        > identifier_r 
+        > opt_dims_r(_r1)
+        > lit(';');
+
+      corr_matrix_decl_r.name("correlation matrix declaration");
+      corr_matrix_decl_r 
+        %= lit("corr_matrix")
+        > lit('[')
+        > expression_g(_r1)
+        [_pass = validate_int_expr_f(_1,boost::phoenix::ref(error_msgs_))]
         > lit(']')
         > identifier_r 
         > opt_dims_r(_r1)
