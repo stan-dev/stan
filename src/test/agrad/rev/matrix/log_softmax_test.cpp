@@ -15,17 +15,14 @@ TEST(AgradRevMatrix,logSoftmaxLeak) {
   using stan::agrad::vector_v;
   using stan::agrad::var;
 
-  int NUM = 231;
-  int SIZE = 100;
+  int NUM = 500;
+  int SIZE = 500;
   Matrix<var,Dynamic,1> x(SIZE);
   for (int i = 0; i < NUM; ++i) {
     for (int n = 0; n < x.size(); ++n) {
       x(n) = 0.1 * n;
     }
     Matrix<var,Dynamic,1> theta = log_softmax(x);
-    std::cout << "i=" << i 
-              << "; bytes alloc=" << stan::agrad::memalloc_.bytes_allocated()
-              << std::endl;
   }
   EXPECT_TRUE(stan::agrad::memalloc_.bytes_allocated() > 4000000);
 }
