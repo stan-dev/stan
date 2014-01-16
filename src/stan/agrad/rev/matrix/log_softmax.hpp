@@ -71,7 +71,7 @@ namespace stan {
         throw std::domain_error("arg vector to log_softmax() must have size > 0");
 
       vari** alpha_vi_array 
-        = (vari**) operator new(sizeof(vari*) * alpha.size());
+        = (vari**) agrad::chainable::operator new(sizeof(vari*) * alpha.size());
       for (int i = 0; i < alpha.size(); ++i)
         alpha_vi_array[i] = alpha(i).vi_;
       
@@ -103,7 +103,8 @@ namespace stan {
       // end fold
 
       double* softmax_alpha_d_array 
-        = (double*) operator new(sizeof(double) * alpha_d.size());
+         = (double*) agrad::chainable::operator new(sizeof(double) * alpha_d.size());
+
       for (int i = 0; i < alpha_d.size(); ++i)
         softmax_alpha_d_array[i] = softmax_alpha_d(i);
 

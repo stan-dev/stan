@@ -5,6 +5,31 @@
 #include <stan/math/matrix/log_softmax.hpp>
 #include <stan/agrad/rev/matrix/log_softmax.hpp>
 
+TEST(AgradRevMatrix,logSoftmaxLeak) {
+  // FIXME: very brittle test depending on unrelated constants of 
+  //        block sizes/growth in stan::memory::stack_alloc
+  using stan::math::log_softmax;
+  using stan::agrad::log_softmax;
+  using Eigen::Matrix;
+  using Eigen::Dynamic;
+  using stan::agrad::vector_v;
+  using stan::agrad::var;
+
+  int NUM = 231;
+  int SIZE = 100;
+  Matrix<var,Dynamic,1> x(SIZE);
+  for (int i = 0; i < NUM; ++i) {
+    for (int n = 0; n < x.size(); ++n) {
+      x(n) = 0.1 * n;
+    }
+    Matrix<var,Dynamic,1> theta = log_softmax(x);
+    std::cout << "i=" << i 
+              << "; bytes alloc=" << stan::agrad::memalloc_.bytes_allocated()
+              << std::endl;
+  }
+  EXPECT_TRUE(stan::agrad::memalloc_.bytes_allocated() > 4000000);
+}
+
 TEST(AgradRevMatrix,log_softmax) {
   using stan::math::log_softmax;
   using Eigen::Matrix;

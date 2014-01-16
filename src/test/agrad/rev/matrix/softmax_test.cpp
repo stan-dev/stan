@@ -23,6 +23,7 @@ TEST(AgradRevMatrix,softmaxLeak) {
     }
     Matrix<var,Dynamic,1> theta = softmax(x);
   }
+  // test is greater than because leak is on heap, not stack
   EXPECT_TRUE(stan::agrad::memalloc_.bytes_allocated() > 200000);
 }
 
