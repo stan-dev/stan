@@ -52,11 +52,19 @@ test/gtest.o: $(GTEST)/src/gtest-all.cc
 # Adapted from the gnu make manual.
 # http://www.gnu.org/software/make/manual/html_node/Automatic-Prerequisites.html#Automatic-Prerequisites
 ##
-
-.PRECIOUS: test/%.o
-test/%$(EXE) : test/%.o bin/libstan.a bin/libstanc.a
+$(GRAMMAR_TESTS) : test/%$(EXE) : test/%.o bin/libstan.a bin/libstanc.a
 	@mkdir -p $(dir $@)
 	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS) $(LDLIBS_STANC)
+ifeq ($(findstring test-,$(MAKECMDGOALS))\
+      $(findstring runtest/,$(MAKECMDGOALS))\
+      $(findstring src/test/,$(MAKECMDGOALS)),)
+	$@ --gtest_output="xml:$(basename $@).xml"
+endif
+
+.PRECIOUS: test/%.o
+test/%$(EXE) : test/%.o bin/libstan.a
+	@mkdir -p $(dir $@)
+	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS)
 ifeq ($(findstring test-,$(MAKECMDGOALS))\
       $(findstring runtest/,$(MAKECMDGOALS))\
       $(findstring src/test/,$(MAKECMDGOALS)),)
@@ -66,8 +74,6 @@ endif
 test/%.o : src/test/%_test.cpp $(LIBGTEST)
 	@mkdir -p $(dir $@)
 	$(COMPILE.c) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
-
-
 
 ##
 # Rule for generating dependencies.
@@ -126,6 +132,10 @@ TEST_TARGETS := $(shell find src/test ! -path src/test -type d)
 ALL_TESTS = $(shell find src/test -type f -name '*_test.cpp')
 
 ALL_TEST_EXECUTABLES = $(patsubst src/%_test.cpp,%$(EXE),$(ALL_TESTS))
+
+GRAMMAR_TESTS = $(foreach dir,\
+                          $(patsubst src/%,%,$(shell find src/test -type d -name 'gm')),\
+                          $(filter $(dir)/%,$(ALL_TEST_EXECUTABLES)))
 
 ####
 ## These make rules apply if SECONDEXPANSION is available
