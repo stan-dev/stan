@@ -1,25 +1,11 @@
 #include <gtest/gtest.h>
 #include <stdlib.h>
 #include <vector>
-#include "stan/memory/stack_alloc.hpp"
-
-TEST(stack_alloc, current_size) {
-  stan::memory::stack_alloc allocator;
-  ASSERT_EQ(0U, allocator.bytes_requested());
-  
-  size_t n = 1000;
-  allocator.alloc(n);
-  ASSERT_EQ(n, allocator.bytes_requested());
-  
-  EXPECT_NO_THROW(allocator.recover_all());
-  ASSERT_EQ(0U, allocator.bytes_requested());
-}
-
+#include <stan/memory/stack_alloc.hpp>
 
 TEST(stack_alloc, bytes_allocated) {
   stan::memory::stack_alloc allocator;
   EXPECT_TRUE(0L <= allocator.bytes_allocated());
-  EXPECT_EQ(0L, allocator.bytes_requested());
   for (size_t n = 1; n <= 100000; ++n) {
     allocator.alloc(n);
     size_t bytes_requested = (n * (n + 1)) / 2;
@@ -29,7 +15,6 @@ TEST(stack_alloc, bytes_allocated) {
       << "bytes_allocated: " << bytes_allocated;
     // 1 << 16 is initial allocation;  *3 is to account for slop at end
     EXPECT_TRUE(bytes_allocated < ((1 << 16) + bytes_requested * 3));
-    EXPECT_EQ(bytes_requested, allocator.bytes_requested());
   }
 }
 

@@ -27,30 +27,6 @@ TEST(AgradRevMatrix,softmaxLeak) {
   EXPECT_TRUE(stan::agrad::memalloc_.bytes_allocated() > 200000);
 }
 
-TEST(AgradRevMatrix,softmaxLeak2) {
-  using stan::agrad::softmax;
-  using Eigen::Matrix;
-  using Eigen::Dynamic;
-  using stan::agrad::var;
-
-  int SIZE = 20;
-  Matrix<var,Dynamic,1> x(SIZE);
-  for (int n = 0; n < x.size(); ++n) {
-    x(n) = 0.1 * n;
-  }
-  
-  size_t tmp = stan::agrad::memalloc_.bytes_requested();
-  Matrix<var,Dynamic,1> theta = softmax(x);
-  
-  size_t size_diff = stan::agrad::memalloc_.bytes_requested() - tmp;
-  EXPECT_EQ(SIZE * (sizeof(stan::agrad::vari*) 
-                    + sizeof(double) 
-                    + sizeof(stan::agrad::softmax_elt_vari)), size_diff)
-    << "for each element, softmax should put a vari*, double, and a softmax_elt_vari"
-    << " on the memalloc_ stack";
-}
-
-
 TEST(AgradRevMatrix,softmax) {
   using stan::math::softmax;
   using stan::agrad::softmax;
