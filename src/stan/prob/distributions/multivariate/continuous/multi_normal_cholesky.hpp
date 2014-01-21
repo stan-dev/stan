@@ -9,7 +9,6 @@
 #include <stan/math/matrix/dot_product.hpp>
 #include <stan/math/matrix/dot_self.hpp>
 #include <stan/math/matrix_error_handling.hpp>
-#include <stan/math/matrix/ldlt.hpp>
 #include <stan/math/matrix/log.hpp>
 #include <stan/math/matrix/log_determinant.hpp>
 #include <stan/math/matrix/mdivide_left_spd.hpp>
