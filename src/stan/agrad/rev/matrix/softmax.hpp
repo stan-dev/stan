@@ -60,8 +60,8 @@ namespace stan {
 
       stan::math::validate_nonzero_size(alpha,"vector argument to var softmax");
 
-      vari** alpha_vi_array 
-        = (vari**) operator new(sizeof(vari*) * alpha.size());
+      vari** alpha_vi_array
+        = (vari**) memalloc_.alloc(sizeof(vari*) * alpha.size());
       for (int i = 0; i < alpha.size(); ++i)
         alpha_vi_array[i] = alpha(i).vi_;
       
@@ -73,7 +73,7 @@ namespace stan {
         = stan::math::softmax(alpha_d);
 
       double* softmax_alpha_d_array 
-        = (double*) operator new(sizeof(double) * alpha_d.size());
+        = (double*) memalloc_.alloc(sizeof(double) * alpha_d.size());
       for (int i = 0; i < alpha_d.size(); ++i)
         softmax_alpha_d_array[i] = softmax_alpha_d(i);
 
