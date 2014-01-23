@@ -157,7 +157,7 @@ namespace stan {
         
         z.cache.setZero();
         z.cache.triangularView<Eigen::Lower>() = z.aux_one.transpose() * z.aux_two;
-        
+
         for (int i = 0; i < z.p.size(); ++i) {
           for (int j = i + 1; j < z.p.size(); ++j) {
             z.cache(i, j) = z.cache(j, i);
@@ -166,7 +166,6 @@ namespace stan {
         
         Eigen::VectorXd aux(z.q.size());
         stan::agrad::grad_tr_mat_times_hessian(_softabs_fun<M>(this->_model, 0), z.q, z.cache, aux);
-        aux *= -1;
         
         return 0.5 * aux;
       }
@@ -190,7 +189,7 @@ namespace stan {
         
         stan::agrad::grad_tr_mat_times_hessian(_softabs_fun<M>(this->_model, 0), z.q, z.cache, aux);
         
-        return 0.5 * aux + z.g;
+        return - 0.5 * aux + z.g;
         
       }
       
@@ -218,6 +217,7 @@ namespace stan {
         
         z.V *= -1;
         z.g *= -1;
+        z.hessian *= -1;
         
         // Compute the eigen decomposition of the Hessian,
         // then perform the SoftAbs transformation
@@ -276,7 +276,7 @@ namespace stan {
               
               lambda = z.eigen_deco.eigenvalues()(i);
               alpha_lambda = _alpha * lambda;
-              
+
               // Thresholds defined such that the approximation
               // error is on the same order of double precision
               if(std::fabs(alpha_lambda) < 1e-4) {
