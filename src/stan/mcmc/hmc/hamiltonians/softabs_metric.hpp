@@ -213,7 +213,7 @@ namespace stan {
       {
         
         // Compute the Hessian
-        stan::agrad::hessian(_softabs_fun<M>(this->_model, 0), z.q, z.V, z.g, z.hessian);
+        stan::agrad::hessian<double>(_softabs_fun<M>(this->_model, 0), z.q, z.V, z.g, z.hessian);
         
         z.V *= -1;
         z.g *= -1;
