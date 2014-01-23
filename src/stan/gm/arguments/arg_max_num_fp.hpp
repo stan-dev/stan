@@ -15,8 +15,8 @@ namespace stan {
         _name = "max_fp";
         _description = "Maximum number of floating interations";
         _validity = "0 < max_fp";
-        _default = "1";
-        _default_value = 1.0;
+        _default = "50";
+        _default_value = 50.0;
         _constrained = true;
         _good_value = 2.0;
         _bad_value = -1.0;
