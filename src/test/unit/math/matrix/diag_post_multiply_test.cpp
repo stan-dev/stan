@@ -1,6 +1,6 @@
 #include <stdexcept>
 #include <stan/math/matrix/diag_post_multiply.hpp>
-#include <test/math/matrix/expect_matrix_eq.hpp>
+#include <test/unit/math/matrix/expect_matrix_eq.hpp>
 #include <gtest/gtest.h>
 
 using Eigen::Matrix;
