@@ -459,6 +459,65 @@ using Cygwin.
   finally worked.
 \end{enumerate}
 
+\subsection{MKL Compiler Instructions}
+
+\subsubsection{Getting the MKL}
+
+To purchase a license, see
+%
+\begin{quote}
+\url{http://software.intel.com/en-us/intel-mkl}
+\end{quote}
+%
+For non-commercial development, see
+%
+\begin{quote}
+\url{http://software.intel.com/non-commercial-software-development}
+\end{quote}
+
+\subsubsection{Installing and Compiling with MKL}
+
+In order to use Intel's math kernel library (MKL) for \Cpp,
+%
+\begin{itemize}
+\item  Download and extract a fresh copy of Stan.
+\item  In your makefile change \code{CC=g++} to \code{CC=icc};  or
+  you can do this by supplying the argument \code{CC=icc} to each
+  call to make (aliases are good for this).
+\item  Add the MKL path to the makefile;  for example
+\begin{quote}
+\begin{Verbatim}
+MKLROOT = /apps/intel/2013/mkl)
+\end{Verbatim}
+\end{quote}
+\item  Add the following to makefile's \code{CFLAGS}: 
+\begin{quote}
+\begin{Verbatim}
+-I $(MKLROOT)/include and -DEIGEN_USE_MKL_ALL
+\end{Verbatim}
+\end{quote}
+\item Link to your MKL library by adding to your makefile's
+  \code{LDLIBS}.  The exact implementation will depend on your
+  system. Use the MKL link line advisor for help. For example, you
+  might add 
+\begin{quote}
+\begin{Verbatim}
+-L$(MKLROOT)/lib/intel64 -lmkl_intel_lp64
+   -lmkl_core -lmkl_sequential -lpthread -lm
+\end{Verbatim}
+\end{quote}
+\item  Compile your models as usual, for example
+\begin{quote}
+\begin{Verbatim}
+make src/models/speed/logistic/logistic
+\end{Verbatim}
+\end{quote}
+\end{itemize}
+%
+{\it Note:} \ Make sure to do the above changes before compiling for the first
+time - otherwise Stan will be compiled with \code{g++} and you won't see any
+performance gains.  
+
 
 \section{Required Software and Tools}
 

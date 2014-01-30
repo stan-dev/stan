@@ -323,7 +323,7 @@ Then make the library with the following make command
 %
 then make the model parser and code generator with the following call,
 adjusting the \code{2} in \code{-j2} to the number of CPU cores
-available.
+available 
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
@@ -331,6 +331,8 @@ available.
 \end{Verbatim}
 \end{quote}
 %
+On Windows, that'll be \code{bin/stanc.exe}.  
+
 \emph{Warning:} \ The \code{make} program may take 10+ minutes and
 consume 2+ GB of memory to build \code{stanc}.  Compiler warnings,
 such as \code{uname:~not found}, may be safely ignored.

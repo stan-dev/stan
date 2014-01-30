@@ -1555,7 +1555,7 @@ The dot product of the rows of \farg{x} with themselves}
 %
 \end{description}
 
-\subsection{Specialized Products}
+\subsection{Specialized Products}\label{specialized-products.section}
 
 
 \begin{description}
@@ -2073,11 +2073,11 @@ The inverse of \farg{A} where A is symmetric, positive definite}
 %
 \fitem{vector}{eigenvalues\_sym}{matrix \farg{A}}{
 The vector of eigenvalues of a symmetric matrix \farg{A} 
-in descending order}
+in asscending order}
 %
-\fitem{matrix}{eigenvectors\_sym}{matrix \farg{A}}{
-The matrix with the eigenvectors of symmetric matrix
-\farg{A}}
+\fitem{matrix}{eigenvectors\_sym}{matrix \farg{A}}{ The matrix with
+  the (column) eigenvectors of symmetric matrix \farg{A} in the same
+  order as returned by the function \code{eigenvalues\_sym}}
 %
 % \fitem{vector}{eigenvalues\_self\_adjoint}{matrix \farg{A}}{The vector
 %   of eigenvalues of the self-adjoint view of \farg{A} in descending
