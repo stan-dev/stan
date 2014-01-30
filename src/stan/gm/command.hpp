@@ -676,7 +676,7 @@ namespace stan {
           bfgs._opts.tolX = dynamic_cast<real_argument*>(
                          algo->arg("bfgs")->arg("tol_param"))->value();
           bfgs._opts.maxIts = num_iterations;
-          
+
           lp = bfgs.logp();
           
           std::cout << "initial log joint probability = " << lp << std::endl;
@@ -723,6 +723,21 @@ namespace stan {
               model.write_csv(base_rng, cont_vector, disc_vector,
                               *output_stream, &std::cout);
               output_stream->flush();
+            }
+          }
+          
+          std::string hess_file = dynamic_cast<string_argument*>(
+                                parser.arg("output")->arg("hessian"))->value();
+          if (hess_file.length() > 0) {
+            std::fstream hess_stream(hess_file.c_str(), std::fstream::out);
+            typename stan::optimization::BFGSLineSearch<Model>::HessianT H(bfgs.get_hessian_est());
+
+            hess_stream << std::setw(10) << std::setprecision(10);
+            for (size_t r = 0; r < H.rows(); r++) {
+              for (size_t c = 0; c < H.cols(); c++) {
+                hess_stream << H(r,c) << ", ";
+              }
+              hess_stream << std::endl;
             }
           }
           
