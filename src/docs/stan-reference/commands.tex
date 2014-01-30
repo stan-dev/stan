@@ -568,7 +568,7 @@ To sample four chains using a Bash shell on Mac OS or Linux, execute
   do                                         \
     ./my_model sample random seed=12345      \ 
        id=$i data file=my_data               \
-       output file=samples$i.csv refresh=0 & \
+       output file=samples$i.csv &           \
  done
 \end{Verbatim}
 \end{quote}
@@ -579,12 +579,23 @@ returns control to the prompt. The ampersand (\code{\&}) at the end of
 the nested command pushes each process into the background, so that
 the loop can continue without waiting for the current chain to finish.
 The \code{id} value makes sure that a non-overlapping set of random
-numbers are used for each chain.  The \code{refresh} option being set
-to 0 turns off output; this is not necessary, but if output is used,
-it will be interleaved for all chains running concurrently.  Also note
+numbers are used for each chain.  Also note
 that the output file is explicitly specified, with the variable
 \code{\$i} being used to ensure the output file name for each chain is
 unique.
+
+The terminal standard output will be interleaved for all chains
+running concurrently.  To suppress all terminal output, direct the
+standard output to the ``null'' device.  This is achieved by
+postfixing \code{> /dev/null} to a command, which in the above case,
+means changing the second-to-last line to 
+\begin{quote}
+\begin{Verbatim}
+       output file=samples$i.csv > /dev/null &  \
+\end{Verbatim}
+\end{quote}
+
+
 
 \subsubsection{Windows}
 
@@ -595,7 +606,7 @@ snippet above
 \begin{Verbatim}[fontshape=sl]
 > for /l %x in (1, 1, 4) do start /b model  sample   ^
    random seed=12345 id=%x data file=my_data         ^
-   output file=samples%x.csv refresh=0
+   output file=samples%x.csv 
 \end{Verbatim}
 \end{quote}
 %

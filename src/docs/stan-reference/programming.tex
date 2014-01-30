@@ -1431,7 +1431,7 @@ specialized diagonal pre- and post-multiply functions (see
 \begin{quote}
 \begin{Verbatim}
 Sigma_beta 
-  <- diag_pre_multiply(tau, diag_post_multiply(tau, Sigma));
+  <- diag_pre_multiply(tau, diag_post_multiply(Sigma, tau));
 \end{Verbatim}
 \end{quote}
 
