@@ -294,7 +294,7 @@ template<class Derived>
 std::vector<std::string> Model_Test_Fixture<Derived>::command_outputs;
 
 template<class Derived>
-const int Model_Test_Fixture<Derived>::skip = 5;
+const int Model_Test_Fixture<Derived>::skip = 6;
 
 template<class Derived>
 int Model_Test_Fixture<Derived>::iterations = 2000;
