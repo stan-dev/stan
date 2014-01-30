@@ -9,15 +9,14 @@
 #include <stan/math/error_handling/dom_err.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
-#include <stan/agrad/agrad.hpp>
+#include <stan/agrad/rev.hpp>
 #include <stan/meta/traits.hpp>
-#include <stan/agrad/matrix.hpp>
+#include <stan/agrad/rev/matrix.hpp>
 #include <stan/agrad/rev/matrix/to_var.hpp>
 
 #include <stan/math/matrix/add.hpp>
 #include <stan/math/matrix/dot_product.hpp>
 #include <stan/math/matrix/inverse_spd.hpp>
-#include <stan/math/matrix/ldlt.hpp>
 #include <stan/math/matrix/log.hpp>
 #include <stan/math/matrix/log_determinant_spd.hpp>
 #include <stan/math/matrix/multiply.hpp>
