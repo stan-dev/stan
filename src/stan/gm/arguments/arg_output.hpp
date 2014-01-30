@@ -4,6 +4,7 @@
 #include <stan/gm/arguments/categorical_argument.hpp>
 
 #include <stan/gm/arguments/arg_output_file.hpp>
+#include <stan/gm/arguments/arg_output_hessian.hpp>
 #include <stan/gm/arguments/arg_diagnostic_file.hpp>
 #include <stan/gm/arguments/arg_refresh.hpp>
 
@@ -21,6 +22,7 @@ namespace stan {
         _description = "File output options";
         
         _subarguments.push_back(new arg_output_file());
+        _subarguments.push_back(new arg_output_hessian());
         _subarguments.push_back(new arg_diagnostic_file());
         _subarguments.push_back(new arg_refresh());
         
