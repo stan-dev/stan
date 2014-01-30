@@ -250,6 +250,8 @@ namespace stan {
       const VectorT &curr_x() const { return _xk; }
       const VectorT &curr_g() const { return _gk; }
       const VectorT &curr_s() const { return _sk; }
+
+      HessianT get_hessian_est() const { return _ldlt.reconstructedMatrix(); }
       
       const Scalar &prev_f() const { return _fk_1; }
       const VectorT &prev_x() const { return _xk_1; }
