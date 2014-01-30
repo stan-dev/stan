@@ -726,8 +726,9 @@ namespace stan {
             }
           }
           
-          std::string hess_file = dynamic_cast<string_argument*>(
-                                parser.arg("output")->arg("hessian"))->value();
+          std::string hess_file;
+          hess_file = dynamic_cast<string_argument*>(
+                                parser.arg("output")->arg("hessian_est"))->value();
           if (hess_file.length() > 0) {
             std::fstream hess_stream(hess_file.c_str(), std::fstream::out);
             typename stan::optimization::BFGSLineSearch<Model>::HessianT H(bfgs.get_hessian_est());
@@ -735,7 +736,31 @@ namespace stan {
             hess_stream << std::setw(10) << std::setprecision(10);
             for (size_t r = 0; r < H.rows(); r++) {
               for (size_t c = 0; c < H.cols(); c++) {
-                hess_stream << H(r,c) << ", ";
+                hess_stream << H(r,c);
+                if (c+1 < H.cols())
+                  hess_stream << ", ";
+              }
+              hess_stream << std::endl;
+            }
+          }
+          hess_file = dynamic_cast<string_argument*>(
+                                parser.arg("output")->arg("hessian"))->value();
+          if (hess_file.length() > 0) {
+            std::fstream hess_stream(hess_file.c_str(), std::fstream::out);
+            std::vector<double> gradient;
+            std::vector<double> hessian;
+        
+            double f0 
+              = stan::model::grad_hess_log_prob<true,false>(model,
+                                                            cont_vector, disc_vector,
+                                                            gradient, hessian);
+            hess_stream << std::setw(10) << std::setprecision(10);
+            for (size_t r = 0, i = 0; r < cont_vector.size(); r++) {
+              for (size_t c = 0; c < cont_vector.size(); c++) {
+                hess_stream << -hessian[i];
+                if (c+1 < cont_vector.size())
+                  hess_stream << ", ";
+                i++;
               }
               hess_stream << std::endl;
             }
