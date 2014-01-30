@@ -43,7 +43,7 @@ namespace stan {
       virtual void update(P& z) {
         
         try {
-          stan::model::gradient<true, true>(_model, z.q, z.V, z.g, _err_stream);
+          stan::model::gradient(_model, z.q, z.V, z.g, _err_stream);
         } catch (std::domain_error e) {
           this->_write_error_msg(_err_stream, e);
           z.V = std::numeric_limits<double>::infinity();

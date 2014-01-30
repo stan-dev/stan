@@ -389,7 +389,7 @@ namespace stan {
           Eigen::VectorXd init_grad = Eigen::VectorXd::Zero(model.num_params_r());
           
           try {
-            stan::model::gradient<true, true>(model, cont_params, init_log_prob, init_grad, &std::cout);
+            stan::model::gradient(model, cont_params, init_log_prob, init_grad, &std::cout);
           } catch (std::domain_error e) {
             std::cout << "Rejecting initialization at zero because of gradient failure." << std::endl;
             return error_codes::OK;
@@ -430,7 +430,7 @@ namespace stan {
             // FIXME: allow config vs. std::cout
             double init_log_prob;
             try {
-              stan::model::gradient<true, true>(model, cont_params, init_log_prob, init_grad, &std::cout);
+              stan::model::gradient(model, cont_params, init_log_prob, init_grad, &std::cout);
             } catch (std::domain_error e) {
               write_error_msg(&std::cout, e);
               std::cout << "Rejecting proposed initial value with zero density." << std::endl;
@@ -486,7 +486,7 @@ namespace stan {
         Eigen::VectorXd init_grad = Eigen::VectorXd::Zero(model.num_params_r());
         
         try {
-          stan::model::gradient<true, true>(model, cont_params, init_log_prob, init_grad, &std::cout);
+          stan::model::gradient(model, cont_params, init_log_prob, init_grad, &std::cout);
         } catch (std::domain_error e) {
           std::cout << "Rejecting user-specified initialization because of gradient failure." << std::endl;
           return 0;
@@ -757,7 +757,7 @@ namespace stan {
         double init_log_prob;
         Eigen::VectorXd init_grad = Eigen::VectorXd::Zero(model.num_params_r());
         
-        stan::model::gradient<true, true>(model, cont_params, init_log_prob, init_grad, &std::cout);
+        stan::model::gradient(model, cont_params, init_log_prob, init_grad, &std::cout);
         
         clock_t end_check = clock();
         double deltaT = (double)(end_check - start_check) / CLOCKS_PER_SEC;
