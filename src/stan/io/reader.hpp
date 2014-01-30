@@ -972,6 +972,7 @@ namespace stan {
        *
        * @param M Rows of Cholesky factor
        * @param N Columns of Cholesky factor
+       * @param[in,out] lp log probability
        * @return Next Cholesky factor.
        * @throw std::domain_error if the matrix is not a valid
        *    Cholesky factor.

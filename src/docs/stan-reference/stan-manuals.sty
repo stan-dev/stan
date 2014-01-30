@@ -11,6 +11,9 @@
   \usepackage{amssymb}
 }
 
+%suppress underfull hbox warnings by setting hbadness to max
+\hbadness=10000
+
 \usepackage{makeidx}
 \makeindex
 
@@ -30,16 +33,18 @@
 \usepackage{lscape}
 
 \usepackage[titles]{tocloft}
-\setlength{\cftbeforechapskip}{0.5ex}
-\setlength{\cftbeforesecskip}{0.5ex}
+\setlength{\cftbeforechapskip}{1ex}
+\setlength{\cftbeforesecskip}{1ex}
 \renewcommand{\cftchapfont}{\normalsize\rm}
 \renewcommand{\cftchappagefont}{\normalsize\rm}
 \renewcommand{\cftpartfont}{\normalsize\rm\bfseries}
 \renewcommand{\cftpartpagefont}{\normalsize\rm\bfseries}
-\renewcommand{\cftchapaftersnum}{.\hspace*{12pt}}
+\renewcommand{\cftchapaftersnum}{.}
 \renewcommand{\cftchapaftersnumb}{\hspace*{8pt}}
-
+\renewcommand{\@pnumwidth}{5em} 
+\renewcommand{\@tocrmarg}{4em}
 \setcounter{tocdepth}{0}
+
 
 \titleformat{\chapter}{\bfseries\LARGE}{\thechapter.}{1.5pc}{}{}%{1.5pc}{}{}
 \titlespacing{\chapter}{0pt}{-24pt}{24pt}{}
@@ -52,7 +57,7 @@
 \titleformat{\subsubsection}{\slshape}{}{0em}{}
 %\titlespacing{\subsection}{-1em}{12pt}{6pt}
 
-\usepackage{color}
+\usepackage{xcolor}
 \definecolor{linkcolor}{RGB}{0,0,128}
 \usepackage[pagebackref,pdfpagelabels,plainpages=false,hypertexnames=true,colorlinks=true,linkcolor=linkcolor,anchorcolor=linkcolor,citecolor=linkcolor,filecolor=linkcolor,menucolor=linkcolor,runcolor=linkcolor,urlcolor=linkcolor,pdfborder={0 0 0}]{hyperref}
 
@@ -110,13 +115,22 @@
 \newcommand{\refnote}[1]{Footnote~\ref{#1.footnote}}
 
 
-\newcommand{\fitem}[4]{\item[\begin{minipage}{\textwidth}{\tt #1 {\bfseries #2}(#3)}\end{minipage}]\mbox{ }
+% \textwidth = 5in
+\newcommand{\fitem}[4]{\item[\begin{minipage}{4.9in}{\tt #1 {\bfseries #2}(#3)}\end{minipage}]\mbox{ }
  \\[-10pt] #4\index{{\tt\bfseries #2 }!{\tt (#3):\,#1}|hyperpage}}
+
+\newcommand{\fitemtwolines}[5]{\item[\begin{minipage}{4.9in}{\tt
+      #1 {\bfseries #2}(#3, \\ \hspace*{132pt}#4\vspace*{8pt})}\end{minipage}]\mbox{ }
+ \\[-10pt] #5\index{{\tt\bfseries #2 }!{\tt (#3 #4):\,#1}|hyperpage}}
+
 % need special command for items requiring escapes in index
 \newcommand{\fitemindex}[5]{\item[{\tt #1 {\bfseries #2}(#3)}]\mbox{ }
   \\[2pt] #4\index{{\tt\bfseries #5 }!{\tt (#3):\,#1}|hyperpage}}
+
 \newcommand{\fitemindexsort}[6]{\item[{\tt #1 {\bfseries #2}(#3)}]\mbox{ }
-  \\[2pt] #4\index{{\tt\bfseries #6 }@{\tt\bfseries #5 }!{\tt (#3):\,#1}|hyperpage}}
+  \\[2pt] #4\index{{\tt\bfseries #6 }@{\tt\bfseries #5 }!{\tt
+      (#3):\,#1}|hyperpage}}
+
 \newcommand{\farg}[1]{{\tt\slshape #1}}
 
 \newcommand{\pitem}[3]{\subsubsection{Sampling Statement}

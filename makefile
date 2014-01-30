@@ -33,7 +33,7 @@ GTEST ?= lib/gtest_1.7.0
 ##
 # Set default compiler options.
 ## 
-CFLAGS = -I src -isystem $(EIGEN) -isystem $(BOOST) -Wall -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS
+CFLAGS = -I src -isystem $(EIGEN) -isystem $(BOOST) -Wall -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS -pipe
 CFLAGS_GTEST = -DGTEST_USE_OWN_TR1_TUPLE
 LDLIBS = -Lbin -lstan
 LDLIBS_STANC = -Lbin -lstanc
@@ -58,7 +58,12 @@ PATH_SEPARATOR = /
 #   - CFLAGS_GTEST
 #   - EXE
 ##
--include make/os_detect
+-include make/detect_os
+
+##
+# Get information about the version of make.
+##
+-include make/detect_make
 
 ##
 # Tell make the default way to compile a .o file.
@@ -133,7 +138,7 @@ endif
 	@echo '    2. Run the model:'
 	@echo '       src'$(PATH_SEPARATOR)'models'$(PATH_SEPARATOR)'basic_distributions'$(PATH_SEPARATOR)'normal$(EXE) sample'
 	@echo '    3. Look at the samples:'
-	@echo '       bin'$(PATH_SEPARATOR)'print$(EXE) samples.csv'
+	@echo '       bin'$(PATH_SEPARATOR)'print$(EXE) output.csv'
 	@echo ''
 	@echo 'Common targets:'
 	@echo '  Model related:'
@@ -147,18 +152,24 @@ endif
 	@echo '                     Stan model.'
 	@echo '  - *$(EXE)        : If a Stan model exists at *.stan, this target will build'
 	@echo '                     the Stan model as an executable.'
-	@echo '  Tests:'
-	@echo '  - test-headers   : Compiles a trivial file after including each header separately'
-	@echo '  - test-unit      : Runs unit tests.'
-	@echo '  - test-distributions : Runs unit tests for the distributions'
-	@echo '  - test-models    : Runs diagnostic models.'
-	@echo '  - test-bugs      : Runs the bugs examples (subset of test-models).'
-	@echo '  - test-all       : Runs all tests.'
 	@echo '  Documentation:'
 	@echo '  - manual         : Builds the reference manual. Copies built manual to'
 	@echo '                     doc/stan-reference-$(VERSION_STRING).pdf'
+	@echo '                     (requires LaTeX installation)'
 	@echo '  - doxygen        : Builds the API documentation. The documentation is located'
 	@echo '                     doc/api/'
+	@echo '                     (requires doxygen installation)'
+	@echo '  Tests (requires make 3.81 or higher):'
+	@echo '  - test-headers   : Compiles a trivial file after including each '
+	@echo '                     header separately'
+	@echo '  - For any subdirectory directory in *src/test*, all tests within'
+	@echo '    the specified directory and subdirectories can be compiled '
+	@echo '    and executed by using the folder as the target (without a trailing slash).'
+	@echo '    Examples:'
+	@echo '    * all unit tests:            src/test/unit'
+	@echo '    * unit tests for meta:       src/test/unit/meta'
+	@echo '    * normal distribution tests: src/test/unit-distribution/univariate/continuous/normal'
+	@echo '  - test-all       : Runs all tests.'
 	@echo '  Clean:'
 	@echo '  - clean          : Basic clean. Leaves doc and compiled libraries intact.'
 	@echo '  - clean-all      : Cleans up all of Stan.'
@@ -166,6 +177,17 @@ endif
 	@echo '  - build          : Builds the Stan command line tools.'
 	@echo '  - docs           : Builds all docs.'
 	@echo '  - all            : Calls build and docs'
+	@echo ''
+	@echo '  Warning: Deprecated test targets'
+	@echo '  - test-unit      : Runs unit tests.'
+	@echo '    Replace with: src/test/unit src/test/unit-agrad-rev src/test/unit-agrad-fwd'
+	@echo '  - test-distributions : Runs unit tests for the distributions'
+	@echo '    Replace with: src/test/unit-distribution'
+	@echo '  - test-models    : Runs diagnostic models.'
+	@echo '    Replace with: src/test/CmdStan/models'
+	@echo '  - test-bugs      : Runs the bugs examples (subset of test-models).'
+	@echo '    Replace with: src/test/CmdStan/models/bugs_examples'
+	@echo ''
 	@echo '--------------------------------------------------------------------------------'
 
 -include make/libstan  # libstan.a
@@ -214,9 +236,5 @@ clean-models:
 
 clean-all: clean clean-manual clean-models
 	$(RM) -r test/* bin
-	$(RM) $(shell find src -type f -name '*.d') $(shell find src -type f -name '*.o')
-	cd src/test/agrad/distributions/univariate/continuous; $(RM) *_generated_test.cpp
-	cd src/test/agrad/distributions/univariate/discrete; $(RM) *_generated_test.cpp
-	cd src/test/agrad/distributions/multivariate/continuous; $(RM) *_generated_test.cpp
-	cd src/test/agrad/distributions/multivariate/discrete; $(RM) *_generated_test.cpp
+	$(RM) $(shell find src -type f -name '*.d') $(shell find src -type f -name '*.o') $(shell find src/test/unit-distribution -name '*_generated_test.cpp' -type f | sed 's#\(.*\)/.*#\1/*_generated_test.cpp#' | sort -u)
 

@@ -1,4 +1,4 @@
-LIBSTAN_OFILES = bin/stan/agrad/rev/var_stack.o bin/stan/math/matrix.o bin/stan/agrad/matrix.o
+LIBSTAN_OFILES = bin/stan/agrad/rev/var_stack.o
 bin/libstan.a : $(LIBSTAN_OFILES)
 	@mkdir -p $(dir $@)
 	$(AR) -rs bin/libstan.a $(LIBSTAN_OFILES)

@@ -275,9 +275,12 @@ with
 
 \section{Step-by-Step Windows Install Instructions}
 
-Stan has been tested on Windows XP, Windows 7, and Windows 8.  See
-Section~\refsection{cygwin} for instructions for installing for Cygwin
-on Windows.
+Stan has been tested on Windows XP, Windows 7, and Windows 8.  
+
+Stan also runs under Cygwin, which provides a unix-like shell on top
+of Windows.  Instructions for Cygwin installation are provided below
+in their own subsection.
+
 
 \subsection{Windows Tips}
 
@@ -291,6 +294,20 @@ program \code{Command Prompt}.
 Alternatively, enter \code{[Windows+r]} (both keys together on the
 keyboard), and enter \code{cmd} into the text field that pops up in
 the Run window, then press \code{[Return]} on the keyboard to run.
+
+\subsubsection{32-bit Builds}
+
+\Stan defaults to a 64-bit build. On a 32-bit operating system, set
+the \verb|BIT| variable to 32. For example, to build the Bernoulli
+model in \refsection{compiling-model}, replace the original command
+with:
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> make BIT=32 src/models/basic_estimators/bernoulli
+\end{Verbatim}
+\end{quote}
+
 
 \subsection{Rtools C++ Development Environment}
 
@@ -392,7 +409,7 @@ The \code{--no-same-owner} flag is not strictly necessary,
 but it removes a bunch of irrelevant warnings.
 
 
-\subsection{64-bit Cygwin Install Instructions}\label{cygwin.section}
+\subsection{64-bit Cygwin Install Instructions}
 
 Stan can be run under Cygwin, the Unix look-and-feel environment for
 Windows.  Cygwin must have recent versions of \code{make} and
@@ -502,7 +519,7 @@ tested is
 %
 \item \gpp
 \\
-Tested Versions: Mac 4.2.1, 4.6, Linux 4.4--4.7, Windows 4.6.3
+Tested Versions: Mac 4.2.1, 4.6, Linux 4.4--4.7 (plus trunk 4.8, 4.9), Windows 4.6.3
 \\
 Home: \url{http://gcc.gnu.org/}
 \\

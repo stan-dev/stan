@@ -4,9 +4,7 @@
 #include <stan/gm/arguments/categorical_argument.hpp>
 
 #include <stan/gm/arguments/arg_output_file.hpp>
-#include <stan/gm/arguments/arg_append_sample.hpp>
 #include <stan/gm/arguments/arg_diagnostic_file.hpp>
-#include <stan/gm/arguments/arg_append_diagnostic.hpp>
 #include <stan/gm/arguments/arg_refresh.hpp>
 
 namespace stan {
@@ -23,9 +21,7 @@ namespace stan {
         _description = "File output options";
         
         _subarguments.push_back(new arg_output_file());
-        _subarguments.push_back(new arg_append_sample());
         _subarguments.push_back(new arg_diagnostic_file());
-        _subarguments.push_back(new arg_append_diagnostic());
         _subarguments.push_back(new arg_refresh());
         
       }
