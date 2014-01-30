@@ -8,7 +8,7 @@
 #include <stan/math/matrix/validate_matching_sizes.hpp>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/vari.hpp>
-#include <stan/agrad/rev/sqrt.hpp>
+#include <stan/agrad/rev/functions/sqrt.hpp>
 #include <stan/agrad/rev/matrix/typedefs.hpp>
 
 namespace stan {

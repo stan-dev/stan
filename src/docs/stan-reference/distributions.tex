@@ -113,7 +113,7 @@ Suppose $N \in \nats$ and $\theta \in [0,1]$, and $n \in
 \{0,\ldots,N\}$.
 \[
 \distro{Binomial}(n|N,\theta)
-= {N \choose n} \theta^n (1 - \theta)^{N - n}.
+= \binom{N}{n} \theta^n (1 - \theta)^{N - n}.
 \]
 
 
@@ -185,7 +185,7 @@ Suppose $N \in \nats$, $\alpha \in \reals$, and $n \in
 \distro{BinomialLogit}(n|N,\alpha)
 & = & \distro{BinomialLogit}(n|N,\mbox{logit}^{-1}(\alpha))
 \\[6pt]
-& = & {N \choose n} \left( \mbox{logit}^{-1}(\alpha) \right)^{n}
+& = & \binom{N}{n} \left( \mbox{logit}^{-1}(\alpha) \right)^{n}
                     \left( 1 - \mbox{logit}^{-1}(\alpha) \right)^{N - n}.
 \end{eqnarray*}
 
@@ -233,19 +233,19 @@ then for $n \in \setlist{0,\ldots,N}$,
 \[
 \distro{BetaBinomial}(n|N,\alpha,\beta)
 = 
-{N \choose n} \frac{\Betafun(n+\alpha, N -n +
+\binom{N}{n} \frac{\Betafun(n+\alpha, N -n +
   \beta)}{\Betafun(\alpha,\beta)},
 \]
 %
-where the beta function $\Betafun(x,y)$ is defined for $x \in
-\posreals$ and $y \in \posreals$ by
+where the beta function $\Betafun(u,v)$ is defined for $u \in
+\posreals$ and $v \in \posreals$ by
 %
 \[
-\Betafun(x,y)
-= \frac{\Gamma(x) \ \Gamma(y)}{\Gamma(x + y)}.
+\Betafun(u,v)
+= \frac{\Gamma(u) \ \Gamma(v)}{\Gamma(u + v)}.
 \]
 
-\pitem{n}{beta\_binomial}{N,alpha}
+\pitem{n}{beta\_binomial}{N,alpha,beta}
 
 \subsubsection{Stan Functions}
 
@@ -297,8 +297,8 @@ then for $n \in \setlist{\max(0,N-b),\ldots,\min(a,N)}$,
 \[
 \distro{Hypergeometric}(n|N,a,b)
 =
-\frac{\normalsize{a \choose n} {b \choose {N - n}}}
-     {\normalsize{{a + b} \choose N}}.
+\frac{\normalsize{\binom{a}{n} \binom{b}{N - n}}}
+     {\normalsize{\binom{a + b}{N}}}.
 \]
 
 
@@ -438,7 +438,7 @@ If $\alpha \in \posreals$ and $\beta \in \posreals$, then for $n \in
 \[
 \distro{NegativeBinomial}(n|\alpha,\beta)
  = 
-{{n + \alpha - 1} \choose {\alpha - 1}}
+\binom{n + \alpha - 1}{\alpha - 1}
 \,
 \left( \frac{\beta}{\beta+1} \right)^{\!\alpha}
 \,
@@ -587,12 +587,12 @@ then for $y \in \nats^K$ such that $\sum_{k=1}^K y_k = N$,
 %
 \[
 \distro{Multinomial}(y|\theta,N)
-= {N \choose {y_1,\ldots,y_K}} 
+= \binom{N}{y_1,\ldots,y_K}
 \prod_{k=1}^K \theta_k^{y_k},
 \]
 where the multinomial coefficient is defined by
 \[
-{N \choose {y_1,\ldots,y_k}}
+\binom{N}{y_1,\ldots,y_k}
 = \frac{N!}{\prod_{k=1}^K y_k!}.
 \]
 
@@ -690,23 +690,23 @@ If $\mu \in \reals$, $\sigma \in \posreals$, and $\lambda \in
 \subsubsection{Stan Functions}
 
 \begin{description}
-  \fitem{real}{exp\_mod\_normal\_log}{reals \farg{y}, reals
-    \farg{mu}, reals \farg{sigma}, \newline reals \farg{lambda}}{The
+  \fitemtwolines{real}{exp\_mod\_normal\_log}{reals \farg{y}, reals
+    \farg{mu}, reals \farg{sigma}}{reals \farg{lambda}}{The
     log of the exponentially modified normal density of \farg{y} given
     location \farg{mu}, scale \farg{sigma}, and shape \farg{lambda}}
 %
-  \fitem{real}{exp\_mod\_normal\_cdf}{reals \farg{y}, reals \farg{mu},
-    reals \farg{sigma}, reals \farg{lambda}}{The
+  \fitemtwolines{real}{exp\_mod\_normal\_cdf}{reals \farg{y}, reals \farg{mu},
+    reals \farg{sigma}}{reals \farg{lambda}}{The
     exponentially modified normal cumulative distribution function of \farg{y} 
     given location \farg{mu}, scale \farg{sigma}, and shape \farg{lambda}}
 %
-  \fitem{real}{exp\_mod\_normal\_cdf\_log}{reals \farg{y}, reals \farg{mu},
-    reals \farg{sigma}, reals \farg{lambda}}{The log of the
+  \fitemtwolines{real}{exp\_mod\_normal\_cdf\_log}{reals \farg{y}, reals \farg{mu},
+    reals \farg{sigma}}{reals \farg{lambda}}{The log of the
     exponentially modified normal cumulative distribution function of \farg{y} 
     given location \farg{mu}, scale \farg{sigma}, and shape \farg{lambda}}
 %
-  \fitem{real}{exp\_mod\_normal\_ccdf\_log}{reals \farg{y}, reals \farg{mu},
-    reals \farg{sigma}, reals \farg{lambda}}{The log of the
+  \fitemtwolines{real}{exp\_mod\_normal\_ccdf\_log}{reals \farg{y}, reals \farg{mu},
+    reals \farg{sigma}}{reals \farg{lambda}}{The log of the
     exponentially modified normal complementary cumulative distribution 
     function of \farg{y} given location \farg{mu}, scale \farg{sigma}, and shape \farg{lambda}}
 \end{description}
@@ -752,13 +752,13 @@ then for $y \in \reals$,
   distribution function of \farg{y} given location \farg{mu}, scale
   \farg{sigma}, and shape \farg{alpha}}
 %
-\fitem{real}{skew\_normal\_cdf\_log}{reals \farg{y}, reals \farg{mu}, reals
-  \farg{sigma}, reals \farg{alpha}}{The log of the skew normal cumulative
+\fitemtwolines{real}{skew\_normal\_cdf\_log}{reals \farg{y}, reals \farg{mu}, reals
+  \farg{sigma}}{reals \farg{alpha}}{The log of the skew normal cumulative
   distribution function of \farg{y} given location \farg{mu}, scale
   \farg{sigma}, and shape \farg{alpha}}
 %
-\fitem{real}{skew\_normal\_ccdf\_log}{reals \farg{y}, reals \farg{mu}, reals
-  \farg{sigma}, reals \farg{alpha}}{The log of the skew normal complementary 
+\fitemtwolines{real}{skew\_normal\_ccdf\_log}{reals \farg{y}, reals \farg{mu}, reals
+  \farg{sigma}}{reals \farg{alpha}}{The log of the skew normal complementary 
    cumulative distribution function of \farg{y} given location \farg{mu}, scale
   \farg{sigma}, and shape \farg{alpha}}
 \end{description}
@@ -1496,7 +1496,7 @@ $y \in \posreals$,
 \end{description}
 
 
-\chapter{Continuous Distributions on $[0,1]$}
+\chapter{Continuous Distributions on [0, 1]}
 
 \noindent
 The continuous distributions with outcomes in the interval $[0,1]$ are
@@ -1824,11 +1824,17 @@ matrix inversions can be used \citep[Sec~6.4]{DurbinKoopman:2001}.
 
 \subsubsection{Stan Functions}
 
+The following two functions differ in the type of their \farg{V}, the
+first taking a full observation covariance matrix \farg{V} and the
+second a vector \farg{V} representing the diagonal of the observation
+covariance matrix.  The sampling statement defined in the previous
+section works with either type of observation \farg{V}.
+
 \begin{description}
 %
-\fitem{real}{gaussian\_dlm\_obs\_log}{vector \farg{y}, matrix \farg{F},
-  matrix \farg{G}, matrix \farg{V}, \\ \hspace*{132pt} matrix \farg{W}, vector
-  \farg{m0}, matrix \farg{C0}\vspace*{8pt}} {The log of the density of the
+\fitemtwolines{real}{gaussian\_dlm\_obs\_log}{vector \farg{y}, matrix \farg{F},
+  matrix \farg{G}, matrix \farg{V}}{matrix \farg{W}, vector
+  \farg{m0}, matrix \farg{C0}}{The log of the density of the
   Gaussian Dynamic Linear model with observation matrix \farg{y} in
   which rows are variables and columns are observations, design
   matrix \farg{F}, transition matrix \farg{G}, observation
@@ -1837,9 +1843,9 @@ matrix inversions can be used \citep[Sec~6.4]{DurbinKoopman:2001}.
   covariance \farg{C0}.}
 % 
 %
-\fitem{real}{gaussian\_dlm\_obs\_log}{vector \farg{y}, matrix \farg{F},
-  matrix \farg{G}, vector \farg{V}, \\ \hspace*{132pt} matrix \farg{W}, vector \farg{m0},
-  matrix \farg{C0}\vspace*{8pt}} {The log of the density of the Gaussian Dynamic
+\fitemtwolines{real}{gaussian\_dlm\_obs\_log}{vector \farg{y}, matrix \farg{F},
+  matrix \farg{G}, vector \farg{V}}{matrix \farg{W}, vector \farg{m0},
+  matrix \farg{C0}} {The log of the density of the Gaussian Dynamic
   Linear model with observation matrix \farg{y} in which rows are
   variables and columns are observations, design matrix \farg{F},
   transition matrix \farg{G}, observation covariance matrix with
@@ -1914,12 +1920,17 @@ unit diagonal (i.e., a correlation matrix), then
 \]
 %
 The shape parameter $\eta$ can be interpreted like the shape parameter
-of a symmetric beta distribution. If $\eta = 1$, then the density is
-uniform over all correlation matrices of a given order. If $\eta > 1$,
-the identity matrix is the modal correlation matrix, especially as
-$\eta$ becomes large. For $0 < \eta < 1$, the density has a trough at
-the identity matrix. See \citep{LewandowskiKurowickaJoe:2009} for
-definitions.
+of a symmetric beta distribution. 
+\begin{itemize}
+\item if $\eta = 1$, then the density is uniform over all correlation
+  matrices of a given order;
+\item if $\eta > 1$, the identity matrix is the modal correlation
+  matrix, with sharper peaks in the density around the identity matrix
+  for larger $\eta$; and
+\item for $0 < \eta < 1$, the density has a trough at the identity
+  matrix.
+\end{itemize}
+See \citep{LewandowskiKurowickaJoe:2009} for definitions.
 
 \pitem{y}{lkj\_corr\_log}{eta}
 

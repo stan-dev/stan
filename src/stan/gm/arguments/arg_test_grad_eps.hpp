@@ -1,5 +1,5 @@
 #ifndef __STAN__GM__ARGUMENTS__TEST__GRAD__EPS__HPP__
-#define __STAN__GM__ARGUMENTS__TEST__GRAD__ESP__HPP__
+#define __STAN__GM__ARGUMENTS__TEST__GRAD__EPS__HPP__
 
 #include <stan/gm/arguments/singleton_argument.hpp>
 
