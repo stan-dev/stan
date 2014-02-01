@@ -6,7 +6,7 @@
 TEST(stack_alloc, bytes_allocated) {
   stan::memory::stack_alloc allocator;
   EXPECT_TRUE(0L <= allocator.bytes_allocated());
-  for (size_t n = 1; n <= 100000; ++n) {
+  for (size_t n = 1; n <= 10000; ++n) {
     allocator.alloc(n);
     size_t bytes_requested = (n * (n + 1)) / 2;
     size_t bytes_allocated = allocator.bytes_allocated();
