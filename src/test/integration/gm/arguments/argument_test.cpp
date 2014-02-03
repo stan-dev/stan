@@ -2,10 +2,8 @@
 #include <gtest/gtest.h>
 
 class test_arg_impl : public stan::gm::argument {
-  void print(std::ostream* s, int depth, const char prefix) {
-  }
-  void print_help(std::ostream* s, int depth, bool recurse) {
-  }
+  void print(std::ostream* s, int depth, const std::string prefix) {}
+  void print_help(std::ostream* s, int depth, bool recurse) {}
 };
 
 class StanGmArgumentsArgument : public testing::Test {
