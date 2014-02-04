@@ -1,4 +1,4 @@
-#ifndef __STAN__GM__COMMAND_HPP__
+ #ifndef __STAN__GM__COMMAND_HPP__
 #define __STAN__GM__COMMAND_HPP__
 
 #include <fstream>
@@ -21,6 +21,7 @@
 #include <stan/gm/arguments/arg_random.hpp>
 #include <stan/gm/arguments/arg_output.hpp>
 
+#include <stan/mcmc/fixed_param_sampler.hpp>
 #include <stan/mcmc/hmc/static/adapt_unit_e_static_hmc.hpp>
 #include <stan/mcmc/hmc/static/adapt_diag_e_static_hmc.hpp>
 #include <stan/mcmc/hmc/static/adapt_dense_e_static_hmc.hpp>
@@ -392,10 +393,9 @@ namespace stan {
           Eigen::VectorXd init_grad = Eigen::VectorXd::Zero(model.num_params_r());
           
           try {
-            init_log_prob 
-              = stan::model::log_prob_grad<true, true>(model, cont_params, init_grad, &std::cout);
+            stan::model::gradient(model, cont_params, init_log_prob, init_grad, &std::cout);
           } catch (std::domain_error e) {
-            std::cout << "Rejecting initialization at zero because of log_prob_grad failure." << std::endl;
+            std::cout << "Rejecting initialization at zero because of gradient failure." << std::endl;
             return error_codes::OK;
           }
           
@@ -434,8 +434,7 @@ namespace stan {
             // FIXME: allow config vs. std::cout
             double init_log_prob;
             try {
-              init_log_prob
-                = stan::model::log_prob_grad<true, true>(model, cont_params, init_grad, &std::cout);
+              stan::model::gradient(model, cont_params, init_log_prob, init_grad, &std::cout);
             } catch (std::domain_error e) {
               write_error_msg(&std::cout, e);
               std::cout << "Rejecting proposed initial value with zero density." << std::endl;
@@ -491,12 +490,9 @@ namespace stan {
         Eigen::VectorXd init_grad = Eigen::VectorXd::Zero(model.num_params_r());
         
         try {
-        
-          init_log_prob
-            = stan::model::log_prob_grad<true, true>(model, cont_params, init_grad, &std::cout);
-
+          stan::model::gradient(model, cont_params, init_log_prob, init_grad, &std::cout);
         } catch (std::domain_error e) {
-          std::cout << "Rejecting user-specified initialization because of log_prob_grad failure." << std::endl;
+          std::cout << "Rejecting user-specified initialization because of gradient failure." << std::endl;
           return 0;
         }
         
@@ -759,12 +755,13 @@ namespace stan {
       
       if (parser.arg("method")->arg("sample")) {
         
-        
         // Check timing
         clock_t start_check = clock();
         
+        double init_log_prob;
         Eigen::VectorXd init_grad = Eigen::VectorXd::Zero(model.num_params_r());
-        stan::model::log_prob_grad<true, true>(model, cont_params, init_grad, &std::cout);
+        
+        stan::model::gradient(model, cont_params, init_log_prob, init_grad, &std::cout);
         
         clock_t end_check = clock();
         double deltaT = (double)(end_check - start_check) / CLOCKS_PER_SEC;
@@ -806,7 +803,18 @@ namespace stan {
                                       parser.arg("method")->arg("sample")->arg("adapt"));
         bool adapt_engaged = dynamic_cast<bool_argument*>(adapt->arg("engaged"))->value();
         
-        if (algo->value() == "rwm") {
+        if (algo->value() == "fixed_param") {
+          
+          sampler_ptr = new stan::mcmc::fixed_param_sampler();
+          
+          adapt_engaged = false;
+          
+          if (num_warmup != 0) {
+            std::cout << "Warning: warmup will be skipped for the fixed parameter sampler!" << std::endl;
+            num_warmup = 0;
+          }
+          
+        } else if (algo->value() == "rwm") {
           
           std::cout << algo->arg("rwm")->description() << std::endl;
           return 0;
