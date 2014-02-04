@@ -668,7 +668,7 @@ names of the values sampled.
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
 ...
-lp__,accept_stat__,stepsize__,treedepth__,n_divergent__,theta
+lp__,accept_stat__,stepsize__,treedepth__,n_leapfrog__,n_divergent__,theta
 ...
 \end{Verbatim}
 \end{quote}
@@ -696,6 +696,8 @@ following table.
 \NUTS & \Verb| stepsize__ | & Integrator step size
 \\
 \NUTS & \Verb| treedepth__  | & Tree depth
+\\
+\NUTS & \Verb| n_leapfrog__  | & Number of leapfrog calculations
 \\
 \NUTS & \Verb| n_divergent__  | & Number of divergent iterations
 \\
@@ -735,13 +737,13 @@ in the No-U-Turn sampling algorithm.}
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
 ...
--6.95293,0.945991,1.09068,1,0,0.335074
--6.92373,0.938744,1.09068,0,0,0.181194
--6.83655,0.934833,1.09068,1,0,0.304882
+-6.95293,0.945991,1.09068,2,3,0.335074
+-6.92373,0.938744,1.09068,1,1,0.181194
+-6.83655,0.934833,1.09068,2,3,0.304882
 ...
--7.01732,1,1.09068,0,0,0.348244
--8.96652,0.48441,1.09068,0,0,0.549066
--7.22574,1,1.09068,0,0,0.383089
+-7.01732,1,1.09068,1,1,0.348244
+-8.96652,0.48441,1.09068,1,1,0.549066
+-7.22574,1,1.09068,1,1,0.383089
 \end{Verbatim}
 \end{quote}
 %
@@ -807,6 +809,7 @@ lp__             -7.3  3.5e-02  6.9e-01  -8.7e+00  -7.0  -6.7    390    34020   
 accept_stat__    0.64  1.2e-02  3.6e-01   5.1e-03  0.74   1.0    882    76898   1.00
 stepsize__        1.8  7.8e-15  5.6e-15   1.8e+00   1.8   1.8   0.50       44   1.00
 treedepth__     0.076  8.6e-03  2.7e-01   0.0e+00  0.00   1.0    942    82167   1.00
+n_leapfrog__     2.7  4.9e-02  1.3e+00    1.0   3.0   3.0    716    65090  1.0e+00
 n_divergent__    0.00  0.0e+00  0.0e+00   0.0e+00  0.00  0.00   1000    90909   1.00
 theta            0.25  4.2e-03  1.2e-01   9.0e-02  0.23  0.47    827    72146   1.00
 
