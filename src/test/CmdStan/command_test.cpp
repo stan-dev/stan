@@ -130,10 +130,10 @@ TEST(StanGmCommand, zero_init_domain_fail) {
   run_command_output out = run_command(command);
   EXPECT_EQ(int(stan::gm::error_codes::OK), out.err_code);
 
-  EXPECT_EQ(1059U, out.output.length());
+  EXPECT_EQ(1054U, out.output.length());
 
-  EXPECT_EQ("Rejecting initialization at zero because of log_prob_grad failure.\n",
-            out.output.substr(907, 67))
+  EXPECT_EQ("Rejecting initialization at zero because of gradient failure.\n",
+            out.output.substr(907, 62))
     << "Failed running: " << out.command;
 }
 
@@ -192,10 +192,10 @@ TEST(StanGmCommand, user_init_domain_fail) {
   run_command_output out = run_command(command);
   EXPECT_EQ(int(stan::gm::error_codes::OK), out.err_code);
   
-  EXPECT_EQ(1121U, out.output.length());
+  EXPECT_EQ(1116U, out.output.length());
   
-  EXPECT_EQ("Rejecting user-specified initialization because of log_prob_grad failure.\n",
-            out.output.substr(962, 74))
+  EXPECT_EQ("Rejecting user-specified initialization because of gradient failure.\n",
+            out.output.substr(962, 69))
     << "Failed running: " << out.command;
 }
 
