@@ -555,7 +555,8 @@ namespace stan {
       //////////////////////////////////////////////////
       
       if (parser.arg("method")->arg("optimize")) {
-        
+        std::vector<double> model_values;
+
         std::vector<double> cont_vector(cont_params.size());
         for (int i = 0; i < cont_params.size(); ++i)
           cont_vector.at(i) = cont_params(i);
@@ -571,8 +572,15 @@ namespace stan {
                                parser.arg("method")->arg("optimize")->arg("save_iterations"))->value();
 
         if (output_stream) {
-          *output_stream << "lp__,";
-          model.write_csv_header(*output_stream);
+          std::vector<std::string> names;
+          names.push_back("lp__");
+          model.constrained_param_names(names,true,true);
+
+          (*output_stream) << names.at(0);
+          for (size_t i = 1; i < names.size(); ++i) {
+            (*output_stream) << "," << names.at(i);
+          }
+          (*output_stream) << std::endl;
         }
 
         double lp(0);
@@ -590,9 +598,14 @@ namespace stan {
           double lastlp = lp - 1;
           std::cout << "Initial log joint probability = " << lp << std::endl;
           if (output_stream && save_iterations) {
-            *output_stream << lp << ',';
-            model.write_csv(base_rng, cont_vector, disc_vector,
-                            *output_stream, &std::cout);
+            model_values.clear();
+            model.write_array(base_rng, cont_vector, disc_vector, model_values,
+                              true, true, &std::cout);
+            *output_stream << lp;
+            for (size_t i = 0; i < model_values.size(); ++i) {
+              (*output_stream) << "," << model_values.at(i);
+            }
+            (*output_stream) << std::endl;
             output_stream->flush();
           }
 
@@ -611,9 +624,14 @@ namespace stan {
             }
             m++;
             if (output_stream && save_iterations) {
-              *output_stream << lp << ',';
-              model.write_csv(base_rng, cont_vector, disc_vector,
-                              *output_stream, &std::cout);
+              model_values.clear();
+              model.write_array(base_rng, cont_vector, disc_vector, model_values,
+                                true, true, &std::cout);
+              *output_stream << lp;
+              for (size_t i = 0; i < model_values.size(); ++i) {
+                (*output_stream) << "," << model_values.at(i);
+              }
+              (*output_stream) << std::endl;
               output_stream->flush();
             }
 
@@ -631,9 +649,14 @@ namespace stan {
           
           std::cout << "initial log joint probability = " << lp << std::endl;
           if (output_stream && save_iterations) {
-            *output_stream << lp << ',';
-            model.write_csv(base_rng, cont_vector, disc_vector,
-                            *output_stream, &std::cout);
+            model_values.clear();
+            model.write_array(base_rng, cont_vector, disc_vector, model_values,
+                              true, true, &std::cout);
+            *output_stream << lp;
+            for (size_t i = 0; i < model_values.size(); ++i) {
+              (*output_stream) << "," << model_values.at(i);
+            }
+            (*output_stream) << std::endl;
             output_stream->flush();
           }
 
@@ -652,9 +675,15 @@ namespace stan {
             m++;
 
             if (output_stream && save_iterations) {
-              *output_stream << lp << ',';
-              model.write_csv(base_rng, cont_vector, disc_vector,
-                              *output_stream, &std::cout);
+              model_values.clear();
+              model.write_array(base_rng, cont_vector, disc_vector, model_values,
+                                true, true, &std::cout);
+              *output_stream << lp;
+              for (size_t i = 0; i < model_values.size(); ++i) {
+                (*output_stream) << "," << model_values.at(i);
+              }
+              (*output_stream) << std::endl;
+              output_stream->flush();
             }
             
           }
@@ -715,9 +744,14 @@ namespace stan {
             }
             
             if (output_stream && save_iterations) {
-              *output_stream << lp << ',';
-              model.write_csv(base_rng, cont_vector, disc_vector,
-                              *output_stream, &std::cout);
+              model_values.clear();
+              model.write_array(base_rng, cont_vector, disc_vector, model_values,
+                                true, true, &std::cout);
+              *output_stream << lp;
+              for (size_t i = 0; i < model_values.size(); ++i) {
+                (*output_stream) << "," << model_values.at(i);
+              }
+              (*output_stream) << std::endl;
               output_stream->flush();
             }
           }
@@ -736,9 +770,14 @@ namespace stan {
         }
 
         if (output_stream) {
-          *output_stream << lp << ',';
-          model.write_csv(base_rng, cont_vector, disc_vector,
-                          *output_stream, &std::cout);
+          model_values.clear();
+          model.write_array(base_rng, cont_vector, disc_vector, model_values,
+                            true, true, &std::cout);
+          *output_stream << lp;
+          for (size_t i = 0; i < model_values.size(); ++i) {
+            (*output_stream) << "," << model_values.at(i);
+          }
+          (*output_stream) << std::endl;
           output_stream->flush();
           output_stream->close();
           delete output_stream;
