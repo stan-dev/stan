@@ -2365,6 +2365,13 @@ depend on the parameters.  This is convenient because often the
 normalizing constant $Z$ is either time-consuming to compute or
 intractable to evaluate.
 
+\subsubsection{Vectorization}
+
+The \code{increment\_log\_prob} function accepts parameters of any
+expression type, including integers, reals, vectors, row vectors,
+matrices, and arrays of any dimensionality, including arrays of
+vectors and matrices.
+
 \subsection{Log Probability Variable \code{lp\_\_}}
 
 Before version 2.0 of Stan, rather than writing
@@ -3840,6 +3847,7 @@ statement
   | 'for' '(' identifier 'in' expression ':' expression ')' statement
   | '{' var_decl* statement+ '}'
   | 'print' '(' (expression | string_literal)* ')'
+  | 'increment_log_prob '(' expression ')'
   | ';'
 
 string_literal ::= '"' char* '"'
