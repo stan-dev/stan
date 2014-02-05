@@ -4,6 +4,29 @@
 #include <stan/agrad/rev/matrix.hpp>
 #include <stan/math/matrix/softmax.hpp>
 
+TEST(AgradRevMatrix,softmaxLeak) {
+  // FIXME: very brittle test depending on unrelated constants of 
+  //        block sizes/growth in stan::memory::stack_alloc
+  using stan::math::softmax;
+  using stan::agrad::softmax;
+  using Eigen::Matrix;
+  using Eigen::Dynamic;
+  using stan::agrad::vector_v;
+  using stan::agrad::var;
+
+  int SIZE = 20;
+  int NUM = 112;  // alloc on stack: 458752; bug fix used: = 196608
+  Matrix<var,Dynamic,1> x(SIZE);
+  for (int i = 0; i < NUM; ++i) {
+    for (int n = 0; n < x.size(); ++n) {
+      x(n) = 0.1 * n;
+    }
+    Matrix<var,Dynamic,1> theta = softmax(x);
+  }
+  // test is greater than because leak is on heap, not stack
+  EXPECT_TRUE(stan::agrad::memalloc_.bytes_allocated() > 200000);
+}
+
 TEST(AgradRevMatrix,softmax) {
   using stan::math::softmax;
   using stan::agrad::softmax;
