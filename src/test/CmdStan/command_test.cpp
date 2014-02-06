@@ -21,8 +21,6 @@ TEST(StanGmCommand, countMatches) {
   EXPECT_EQ(2, count_matches("aa","aaaa"));
 }
 
-
-
 void test_sample_prints(const std::string& base_cmd) {
   std::string cmd(base_cmd);
   cmd += " num_samples=100 num_warmup=100";
@@ -126,6 +124,9 @@ TEST(StanGmCommand, refresh_nonzero_ok) {
 }
 
 TEST(StanGmCommand, zero_init_value_fail) {
+  std::string expected_message
+    = "Rejecting initialization at zero because of vanishing density.\n";
+
   std::vector<std::string> model_path;
   model_path.push_back("src");
   model_path.push_back("test");
@@ -137,15 +138,18 @@ TEST(StanGmCommand, zero_init_value_fail) {
   std::string command = convert_model_path(model_path) + " sample init=0 output file=test/CmdStan/samples.csv";
   run_command_output out = run_command(command);
   EXPECT_EQ(int(stan::gm::error_codes::OK), out.err_code);
+
+  EXPECT_TRUE(out.header.length() > 0U);
+  EXPECT_TRUE(out.body.length() > 0U);
   
-  EXPECT_EQ(970U, out.output.length());
-  
-  EXPECT_EQ("Rejecting initialization at zero because of vanishing density.\n",
-            out.output.substr(907, 64))
+  EXPECT_EQ(1, count_matches(expected_message, out.body))
     << "Failed running: " << out.command;
 }
 
 TEST(StanGmCommand, zero_init_domain_fail) {
+  std::string expected_message
+    = "Rejecting initialization at zero because of gradient failure.\n";
+
   std::vector<std::string> model_path;
   model_path.push_back("src");
   model_path.push_back("test");
@@ -159,14 +163,17 @@ TEST(StanGmCommand, zero_init_domain_fail) {
   run_command_output out = run_command(command);
   EXPECT_EQ(int(stan::gm::error_codes::OK), out.err_code);
 
-  EXPECT_EQ(1054U, out.output.length());
-
-  EXPECT_EQ("Rejecting initialization at zero because of gradient failure.\n",
-            out.output.substr(907, 62))
+  EXPECT_TRUE(out.header.length() > 0U);
+  EXPECT_TRUE(out.body.length() > 0U);
+  
+  EXPECT_EQ(1, count_matches(expected_message, out.body))
     << "Failed running: " << out.command;
 }
 
 TEST(StanGmCommand, user_init_value_fail) {
+  std::string expected_message
+    = "Rejecting user-specified initialization because of vanishing density.\n";
+
   std::vector<std::string> model_path;
   model_path.push_back("src");
   model_path.push_back("test");
@@ -190,14 +197,17 @@ TEST(StanGmCommand, user_init_value_fail) {
   run_command_output out = run_command(command);
   EXPECT_EQ(int(stan::gm::error_codes::OK), out.err_code);
   
-  EXPECT_EQ(1031U, out.output.length());
+  EXPECT_TRUE(out.header.length() > 0U);
+  EXPECT_TRUE(out.body.length() > 0U);
   
-  EXPECT_EQ("Rejecting user-specified initialization because of vanishing density.\n",
-            out.output.substr(961, 70))
+  EXPECT_EQ(1, count_matches(expected_message, out.body))
     << "Failed running: " << out.command;
 }
 
 TEST(StanGmCommand, user_init_domain_fail) {
+  std::string expected_message
+    = "Rejecting user-specified initialization because of gradient failure.\n";
+
   std::vector<std::string> model_path;
   model_path.push_back("src");
   model_path.push_back("test");
@@ -221,10 +231,10 @@ TEST(StanGmCommand, user_init_domain_fail) {
   run_command_output out = run_command(command);
   EXPECT_EQ(int(stan::gm::error_codes::OK), out.err_code);
   
-  EXPECT_EQ(1116U, out.output.length());
+  EXPECT_TRUE(out.header.length() > 0U);
+  EXPECT_TRUE(out.body.length() > 0U);
   
-  EXPECT_EQ("Rejecting user-specified initialization because of gradient failure.\n",
-            out.output.substr(962, 69))
+  EXPECT_EQ(1, count_matches(expected_message, out.body))
     << "Failed running: " << out.command;
 }
 
@@ -333,5 +343,4 @@ typedef ::testing::Types<std::domain_error,
 
 INSTANTIATE_TYPED_TEST_CASE_P(, StanGmCommandException, 
                               BoostExceptionTypes);
-
 
