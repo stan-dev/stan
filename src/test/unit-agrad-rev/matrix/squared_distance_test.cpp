@@ -140,7 +140,7 @@ TEST(AgradRevMatrix, squared_distance_vv) {
     b(i+1) = i + 2;
   }
   c = squared_distance(a, b);
-  EXPECT_EQ(12, c);
+  EXPECT_FLOAT_EQ(12, c.val());
   AVEC ab;
   VEC grad;
   for (size_t i = 0; i < 3; i++) {
@@ -148,12 +148,12 @@ TEST(AgradRevMatrix, squared_distance_vv) {
     ab.push_back(b[i]);
   }
   c.grad(ab, grad);
-  EXPECT_EQ(grad[0],  2*(a(0).val() - b(0).val()));
-  EXPECT_EQ(grad[1], -2*(a(0).val() - b(0).val()));
-  EXPECT_EQ(grad[2],  2*(a(1).val() - b(1).val()));
-  EXPECT_EQ(grad[3], -2*(a(1).val() - b(1).val()));
-  EXPECT_EQ(grad[4],  2*(a(2).val() - b(2).val()));
-  EXPECT_EQ(grad[5], -2*(a(2).val() - b(2).val()));
+  EXPECT_FLOAT_EQ(2*(a(0).val() - b(0).val()), grad[0]);
+  EXPECT_FLOAT_EQ(-2*(a(0).val() - b(0).val()), grad[1]);
+  EXPECT_FLOAT_EQ(2*(a(1).val() - b(1).val()), grad[2]);
+  EXPECT_FLOAT_EQ(-2*(a(1).val() - b(1).val()), grad[3]);
+  EXPECT_FLOAT_EQ(2*(a(2).val() - b(2).val()), grad[4]);
+  EXPECT_FLOAT_EQ(-2*(a(2).val() - b(2).val()), grad[5]);
 }
 TEST(AgradRevMatrix, squared_distance_dv) {
   using stan::math::vector_d;
@@ -167,16 +167,16 @@ TEST(AgradRevMatrix, squared_distance_dv) {
     b(i+1) = i + 2;
   }
   c = squared_distance(a, b);
-  EXPECT_EQ(12, c);
+  EXPECT_FLOAT_EQ(12, c.val());
   AVEC bv;
   VEC grad;
   for (size_t i = 0; i < 3; i++) {
     bv.push_back(b[i]);
   }
   c.grad(bv, grad);
-  EXPECT_EQ(grad[0], -2*(a(0) - b(0).val()));
-  EXPECT_EQ(grad[1], -2*(a(1) - b(1).val()));
-  EXPECT_EQ(grad[2], -2*(a(2) - b(2).val()));
+  EXPECT_FLOAT_EQ(-2*(a(0) - b(0).val()), grad[0]);
+  EXPECT_FLOAT_EQ(-2*(a(1) - b(1).val()), grad[1]);
+  EXPECT_FLOAT_EQ(-2*(a(2) - b(2).val()), grad[2]);
 }
 TEST(AgradRevMatrix, squared_distance_vd) {
   using stan::math::vector_d;
@@ -190,14 +190,14 @@ TEST(AgradRevMatrix, squared_distance_vd) {
     b(i+1) = i + 2;
   }
   c = squared_distance(a, b);
-  EXPECT_EQ(12, c);
+  EXPECT_FLOAT_EQ(12, c.val());
   AVEC av;
   VEC grad;
   for (size_t i = 0; i < 3; i++) {
     av.push_back(a[i]);
   }
   c.grad(av, grad);
-  EXPECT_EQ(grad[0], 2*(a(0).val() - b(0)));
-  EXPECT_EQ(grad[1], 2*(a(1).val() - b(1)));
-  EXPECT_EQ(grad[2], 2*(a(2).val() - b(2)));
+  EXPECT_FLOAT_EQ(2*(a(0).val() - b(0)), grad[0]);
+  EXPECT_FLOAT_EQ(2*(a(1).val() - b(1)), grad[1]);
+  EXPECT_FLOAT_EQ(2*(a(2).val() - b(2)), grad[2]);
 }
