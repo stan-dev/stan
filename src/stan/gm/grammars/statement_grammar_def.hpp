@@ -68,7 +68,7 @@ BOOST_FUSION_ADAPT_STRUCT(stan::gm::print_statement,
                           (std::vector<stan::gm::printable>, printables_) );
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::increment_log_prob_statement,
-                          (stan::gm::expression, log_prob_))
+                          (stan::gm::expression, log_prob_) );
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::sample,
                           (stan::gm::expression, expr_)
