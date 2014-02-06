@@ -96,14 +96,22 @@ Although it's not part of Stan's type language, in this chapter,
 \section{Increment Log Probability}
 
 There is a special function \code{increment\_log\_prob} takes a single
-real-valued argument and adds the result to the log probability.
+argument of any expression type \code{T}.
 %
 \begin{description}
-\fitem{void}{increment\_log\_prob}{real \farg{lp}}{Add \farg{lp} to
-  the total log probability accumulator returned by the log
-  probability function defined by a Stan model.}
+  \fitem{void}{increment\_log\_prob}{T \farg{lp}}{Add \farg{lp} (or
+    elements of \farg{lp} if \code{T} is a container type) to the
+    total log probability accumulator returned by the log probability
+    function defined by a Stan model.}
 \end{description}
 %
+The expression \code{lp} can be of any expression type.  Specifically,
+it can be an integer or real primitive, a vector, row vector, or
+matrix, or an array of any type, including multidimensional arrays and
+arrays of matrices, vectors, or row vectors.  Vector arguments are
+included for convenience and have no speed advantage over adding
+values in a loop.
+
 The full behavior of the \code{increment\_log\_prob} statement and its
 relation to sampling statements is described in
 \refsection{increment-log-prob}.
