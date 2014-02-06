@@ -122,7 +122,7 @@ TEST(MathMatrix,diagPostMultiplyGrad_vv) {
   norm2.grad(xs2,g2);
   
   EXPECT_EQ(g1.size(), g2.size());
-  for (int i = 0; i < g1.size(); ++i)
+  for (size_t i = 0; i < g1.size(); ++i)
     EXPECT_FLOAT_EQ(g1[i], g2[i]);
 }
 
@@ -165,7 +165,7 @@ TEST(MathMatrix,diagPostMultiplyGrad_vd) {
   norm2.grad(xs2,g2);
   
   EXPECT_EQ(g1.size(), g2.size());
-  for (int i = 0; i < g1.size(); ++i)
+  for (size_t i = 0; i < g1.size(); ++i)
     EXPECT_FLOAT_EQ(g1[i], g2[i]);
 }
 
@@ -208,7 +208,7 @@ TEST(MathMatrix,diagPreMultiplyGrad_dv) {
   norm2.grad(xs2,g2);
   
   EXPECT_EQ(g1.size(), g2.size());
-  for (int i = 0; i < g1.size(); ++i)
+  for (size_t i = 0; i < g1.size(); ++i)
     EXPECT_FLOAT_EQ(g1[i], g2[i]);
 }
 
