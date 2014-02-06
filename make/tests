@@ -290,7 +290,7 @@ test-headers: $(HEADER_TESTS)
 test-unit test-distributions test-models test-bugs test-all:
 	@echo ''
 	@echo ''
-	@echo '  The '$@' target is deprecated. Please use:'
+	@echo '  The '$@' target is deprecated. Please use these make targets instead:'
 	@echo '      '$^
 
 test-unit: src/test/unit src/test/unit-agrad-rev src/test/unit-agrad-fwd
