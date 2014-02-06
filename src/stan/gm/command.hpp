@@ -39,7 +39,7 @@ namespace stan {
 
   namespace gm {
 
-    void write_stan(std::ostream* s, const char prefix = '\0') {
+    void write_stan(std::ostream* s, const std::string prefix = "") {
       if (!s) return;
       
       *s << prefix << " stan_version_major = " << stan::MAJOR_VERSION << std::endl;
@@ -48,7 +48,7 @@ namespace stan {
       
     }
     
-    void write_model(std::ostream* s, std::string model_name, const char prefix = '\0') {
+    void write_model(std::ostream* s, const std::string model_name, const std::string prefix = "") {
       if (!s) return;
       
       *s << prefix << " model = " << model_name << std::endl;
@@ -371,15 +371,15 @@ namespace stan {
       Eigen::VectorXd cont_params = Eigen::VectorXd::Zero(model.num_params_r());
 
       if (output_stream) {
-        write_stan(output_stream, '#');
-        write_model(output_stream, model.model_name(), '#');
-        parser.print(output_stream, '#');
+        write_stan(output_stream, "#");
+        write_model(output_stream, model.model_name(), "#");
+        parser.print(output_stream, "#");
       }
       
       if (diagnostic_stream) {
-        write_stan(diagnostic_stream, '#');
-        write_model(diagnostic_stream, model.model_name(), '#');
-        parser.print(diagnostic_stream, '#');
+        write_stan(diagnostic_stream, "#");
+        write_model(diagnostic_stream, model.model_name(), "#");
+        parser.print(diagnostic_stream, "#");
       }
       
       int num_init_tries = -1;

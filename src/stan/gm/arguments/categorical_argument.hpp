@@ -21,7 +21,7 @@ namespace stan {
         _subarguments.clear();
       }
       
-      void print(std::ostream* s, const int depth, const char prefix) {
+      void print(std::ostream* s, const int depth, const std::string prefix) {
         if (!s)
           return;
         std::string indent(compute_indent(depth), ' ');
