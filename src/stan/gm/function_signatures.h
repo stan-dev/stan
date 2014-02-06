@@ -171,6 +171,10 @@ add("cumulative_sum", VECTOR_T, VECTOR_T);
 add("cumulative_sum", ROW_VECTOR_T, ROW_VECTOR_T);
 add("determinant",DOUBLE_T,MATRIX_T);
 add("diag_matrix",MATRIX_T,VECTOR_T);
+add("diag_post_multiply",MATRIX_T, MATRIX_T,VECTOR_T);
+add("diag_post_multiply",MATRIX_T, MATRIX_T,ROW_VECTOR_T);
+add("diag_pre_multiply",MATRIX_T, VECTOR_T,MATRIX_T);
+add("diag_pre_multiply",MATRIX_T, ROW_VECTOR_T,MATRIX_T);
 add("diagonal",VECTOR_T,MATRIX_T);
 add_unary("digamma");
 // dims() is polymorphic by size
