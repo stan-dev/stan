@@ -74,16 +74,50 @@ namespace stan {
       
     }
     
-    bool do_print(int n, int refresh) {
+    /** 
+     * Indicates whether it should print on the current iteration.
+     * The function returns:
+     *   true if refresh > 0 and 
+     *     (n == 0 or (n + 1) % refresh == 0 or special == true)
+     *   false otherwise.
+     * Examples:
+     *   if refresh = 0, always returns false.
+     *   if refresh = 10 and special == false, 
+     *      returns true for n = {0, 9, 19, ...},
+     *      returns false for n = {1 - 8, 10 - 18, 20 - 28, ...}.
+     *   if refresh = 10 and special == true, returns true for all n.
+     *
+     * @param n Iteration number
+     * @param special When true, returns true
+     * @param refresh Number of iterations to refresh
+     */
+    bool do_print(int n, bool special, int refresh) {
       return (refresh > 0) &&
-      (n == 0 || ((n + 1) % refresh == 0) );
+        (special || n == 0 || ((n + 1) % refresh == 0) );
+    }
+    
+    /**
+     * Indicates whether it should print on the current iteration.
+     * The function returns:
+     *   true if refresh > 0 and (n == 0 or (n + 1) % refresh == 0)
+     *   false otherwise.
+     * Examples:
+     *   if refresh = 0, always returns false.
+     *   if refresh = 10, returns true for n = {0, 9, 19, ...},
+     *      returns false for n = {1 - 8, 10 - 18, 20 - 28, ...}.
+     * 
+     * @param n Iteration number
+     * @param refresh Number of iterations to refresh
+     */
+    bool do_print(int n, int refresh) {
+      return do_print(n,false,refresh);
     }
 
     void print_progress(int m, int start, int finish, int refresh, bool warmup) {
       
       int it_print_width = std::ceil(std::log10(finish));
 
-      if (do_print(m, refresh) || (start + m + 1 == finish) ) {
+      if (do_print(m, (start + m + 1 == finish), refresh )) {
         
         std::cout << "Iteration: ";
         std::cout << std::setw(it_print_width) << m + 1 + start
@@ -725,7 +759,7 @@ namespace stan {
             lp = bfgs.logp();
             bfgs.params_r(cont_vector);
             
-            if (do_print(bfgs.iter_num(), refresh) || ret != 0 || !bfgs.note().empty()) {
+            if (do_print(bfgs.iter_num(), ret != 0 || !bfgs.note().empty(),refresh)) {
               std::cout << " " << std::setw(7) << bfgs.iter_num() << " ";
               std::cout << " " << std::setw(12) << std::setprecision(6) 
                         << lp << " ";

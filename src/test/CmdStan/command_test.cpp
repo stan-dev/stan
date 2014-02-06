@@ -95,6 +95,35 @@ TEST(StanGmCommand, printReallyPrints) {
   test_optimize_prints(path + " optimize algorithm=bfgs");
 }
 
+TEST(StanGmCommand, refresh_zero_ok) {
+  std::vector<std::string> model_path;
+  model_path.push_back("src");
+  model_path.push_back("test");
+  model_path.push_back("test-models");
+  model_path.push_back("compiled");
+  model_path.push_back("CmdStan");
+  model_path.push_back("proper");
+  
+  std::string command = convert_model_path(model_path) + " sample num_samples=10 num_warmup=10 init=0 output refresh=0 file=test/CmdStan/samples.csv";
+  run_command_output out = run_command(command);
+  EXPECT_EQ(int(stan::gm::error_codes::OK), out.err_code);
+  EXPECT_EQ(0, count_matches("Iteration:", out.output));
+}
+
+TEST(StanGmCommand, refresh_nonzero_ok) {
+  std::vector<std::string> model_path;
+  model_path.push_back("src");
+  model_path.push_back("test");
+  model_path.push_back("test-models");
+  model_path.push_back("compiled");
+  model_path.push_back("CmdStan");
+  model_path.push_back("proper");
+  
+  std::string command = convert_model_path(model_path) + " sample num_samples=10 num_warmup=10 init=0 output refresh=1 file=test/CmdStan/samples.csv";
+  run_command_output out = run_command(command);
+  EXPECT_EQ(int(stan::gm::error_codes::OK), out.err_code);
+  EXPECT_EQ(20, count_matches("Iteration:", out.output));
+}
 
 TEST(StanGmCommand, zero_init_value_fail) {
   std::vector<std::string> model_path;
