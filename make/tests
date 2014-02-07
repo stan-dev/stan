@@ -194,6 +194,7 @@ $(patsubst %.stan,%.cpp,$(filter src/test/test-models/no-main/%,$(TEST_MODELS)))
 ##
 test/unit/io/mcmc_writer.o: src/test/test-models/no-main/io_example.cpp
 test/unit/gm/command_init.o: src/test/test-models/no-main/gm/test_lp.cpp
+test/unit/gm/command_write_iteration.o: src/test/test-models/no-main/gm/test_lp.cpp
 test/unit/gm/generator.o: src/test/test-models/no-main/gm/test_lp.cpp
 
 test/unit/model/util.o: src/test/test-models/no-main/model/valid.cpp src/test/test-models/no-main/model/domain_fail.cpp

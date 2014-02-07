@@ -1,4 +1,4 @@
- #ifndef __STAN__GM__COMMAND_HPP__
+#ifndef __STAN__GM__COMMAND_HPP__
 #define __STAN__GM__COMMAND_HPP__
 
 #include <fstream>
@@ -38,6 +38,30 @@
 namespace stan {
 
   namespace gm {
+
+    void write_iteration_csv(std::ostream& output_stream,
+                             const double lp,
+                             const std::vector<double>& model_values) {
+      output_stream << lp;
+      for (size_t i = 0; i < model_values.size(); ++i) {
+        output_stream << "," << model_values.at(i);
+      }
+      output_stream << std::endl;
+    }
+
+    template <class Model, class RNG>
+    void write_iteration(std::ostream& output_stream,
+                         Model& model,
+                         RNG& base_rng,
+                         double lp,
+                         std::vector<double>& cont_vector,
+                         std::vector<int>& disc_vector) {
+      std::vector<double> model_values;
+      model.write_array(base_rng, cont_vector, disc_vector, model_values,
+                        true, true, &std::cout);
+      write_iteration_csv(output_stream, lp, model_values);
+    }
+    
 
     void write_stan(std::ostream* s, const std::string prefix = "") {
       if (!s) return;
@@ -611,8 +635,6 @@ namespace stan {
       //////////////////////////////////////////////////
       
       if (parser.arg("method")->arg("optimize")) {
-        std::vector<double> model_values;
-
         std::vector<double> cont_vector(cont_params.size());
         for (int i = 0; i < cont_params.size(); ++i)
           cont_vector.at(i) = cont_params(i);
@@ -655,6 +677,7 @@ namespace stan {
           double lastlp = lp - 1;
           std::cout << "Initial log joint probability = " << lp << std::endl;
           if (output_stream && save_iterations) {
+            std::vector<double> model_values;
             model_values.clear();
             model.write_array(base_rng, cont_vector, disc_vector, model_values,
                               true, true, &std::cout);
@@ -681,6 +704,7 @@ namespace stan {
             }
             m++;
             if (output_stream && save_iterations) {
+              std::vector<double> model_values;
               model_values.clear();
               model.write_array(base_rng, cont_vector, disc_vector, model_values,
                                 true, true, &std::cout);
@@ -706,6 +730,7 @@ namespace stan {
           
           std::cout << "initial log joint probability = " << lp << std::endl;
           if (output_stream && save_iterations) {
+            std::vector<double> model_values;
             model_values.clear();
             model.write_array(base_rng, cont_vector, disc_vector, model_values,
                               true, true, &std::cout);
@@ -732,6 +757,7 @@ namespace stan {
             m++;
 
             if (output_stream && save_iterations) {
+              std::vector<double> model_values;
               model_values.clear();
               model.write_array(base_rng, cont_vector, disc_vector, model_values,
                                 true, true, &std::cout);
@@ -807,6 +833,7 @@ namespace stan {
             }
             
             if (output_stream && save_iterations) {
+              std::vector<double> model_values;
               model_values.clear();
               model.write_array(base_rng, cont_vector, disc_vector, model_values,
                                 true, true, &std::cout);
@@ -833,6 +860,7 @@ namespace stan {
         }
 
         if (output_stream) {
+          std::vector<double> model_values;
           model_values.clear();
           model.write_array(base_rng, cont_vector, disc_vector, model_values,
                             true, true, &std::cout);
