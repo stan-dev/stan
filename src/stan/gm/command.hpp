@@ -677,16 +677,8 @@ namespace stan {
           double lastlp = lp - 1;
           std::cout << "Initial log joint probability = " << lp << std::endl;
           if (output_stream && save_iterations) {
-            std::vector<double> model_values;
-            model_values.clear();
-            model.write_array(base_rng, cont_vector, disc_vector, model_values,
-                              true, true, &std::cout);
-            *output_stream << lp;
-            for (size_t i = 0; i < model_values.size(); ++i) {
-              (*output_stream) << "," << model_values.at(i);
-            }
-            (*output_stream) << std::endl;
-            output_stream->flush();
+            write_iteration(*output_stream, model, base_rng,
+                            lp, cont_vector, disc_vector);
           }
 
           int m = 0;
@@ -704,16 +696,8 @@ namespace stan {
             }
             m++;
             if (output_stream && save_iterations) {
-              std::vector<double> model_values;
-              model_values.clear();
-              model.write_array(base_rng, cont_vector, disc_vector, model_values,
-                                true, true, &std::cout);
-              *output_stream << lp;
-              for (size_t i = 0; i < model_values.size(); ++i) {
-                (*output_stream) << "," << model_values.at(i);
-              }
-              (*output_stream) << std::endl;
-              output_stream->flush();
+              write_iteration(*output_stream, model, base_rng,
+                              lp, cont_vector, disc_vector);
             }
 
           }
@@ -730,16 +714,8 @@ namespace stan {
           
           std::cout << "initial log joint probability = " << lp << std::endl;
           if (output_stream && save_iterations) {
-            std::vector<double> model_values;
-            model_values.clear();
-            model.write_array(base_rng, cont_vector, disc_vector, model_values,
-                              true, true, &std::cout);
-            *output_stream << lp;
-            for (size_t i = 0; i < model_values.size(); ++i) {
-              (*output_stream) << "," << model_values.at(i);
-            }
-            (*output_stream) << std::endl;
-            output_stream->flush();
+            write_iteration(*output_stream, model, base_rng,
+                            lp, cont_vector, disc_vector);
           }
 
           double lastlp = lp - 1;
@@ -757,16 +733,8 @@ namespace stan {
             m++;
 
             if (output_stream && save_iterations) {
-              std::vector<double> model_values;
-              model_values.clear();
-              model.write_array(base_rng, cont_vector, disc_vector, model_values,
-                                true, true, &std::cout);
-              *output_stream << lp;
-              for (size_t i = 0; i < model_values.size(); ++i) {
-                (*output_stream) << "," << model_values.at(i);
-              }
-              (*output_stream) << std::endl;
-              output_stream->flush();
+              write_iteration(*output_stream, model, base_rng,
+                              lp, cont_vector, disc_vector);
             }
             
           }
@@ -833,16 +801,8 @@ namespace stan {
             }
             
             if (output_stream && save_iterations) {
-              std::vector<double> model_values;
-              model_values.clear();
-              model.write_array(base_rng, cont_vector, disc_vector, model_values,
-                                true, true, &std::cout);
-              *output_stream << lp;
-              for (size_t i = 0; i < model_values.size(); ++i) {
-                (*output_stream) << "," << model_values.at(i);
-              }
-              (*output_stream) << std::endl;
-              output_stream->flush();
+              write_iteration(*output_stream, model, base_rng,
+                              lp, cont_vector, disc_vector);
             }
           }
           
