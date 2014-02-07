@@ -11,7 +11,7 @@ namespace stan {
       
     public:
       
-      virtual void print(std::ostream* s, const int depth, const char prefix) {
+      virtual void print(std::ostream* s, const int depth, const std::string prefix) {
         if (!s)
           return;
         

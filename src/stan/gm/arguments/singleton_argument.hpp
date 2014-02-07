@@ -99,13 +99,13 @@ namespace stan {
 
         s << "good" << std::endl;
         _value = _good_value;
-        base_arg->print(&s, 0, '\0');
+        base_arg->print(&s, 0, "");
         s << std::endl;
         
         if (_constrained) {
           s << "bad" << std::endl;
           _value = _bad_value;
-          base_arg->print(&s, 0, '\0');
+          base_arg->print(&s, 0, "");
           s << std::endl;
         }
 
