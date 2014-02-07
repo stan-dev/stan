@@ -820,16 +820,8 @@ namespace stan {
         }
 
         if (output_stream) {
-          std::vector<double> model_values;
-          model_values.clear();
-          model.write_array(base_rng, cont_vector, disc_vector, model_values,
-                            true, true, &std::cout);
-          *output_stream << lp;
-          for (size_t i = 0; i < model_values.size(); ++i) {
-            (*output_stream) << "," << model_values.at(i);
-          }
-          (*output_stream) << std::endl;
-          output_stream->flush();
+          write_iteration(*output_stream, model, base_rng,
+                          lp, cont_vector, disc_vector);
           output_stream->close();
           delete output_stream;
         }
