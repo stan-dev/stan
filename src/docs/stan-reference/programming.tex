@@ -5489,6 +5489,15 @@ standard deviations provide poor summaries of the posterior, thus
 complicating issues such as convergence monitoring and effective
 sample size estimation.
 
+One possibility for dealing with multimodal posteriors that arise from
+label switching in mixture models is to somehow define an ordering on
+the values, such as requiring $\mu_1 < \mu_2$. This can be achieved
+with Stan's constraint language, but can lead to estimation bias if
+the posterior uncertainty of $\mu_1$ overlaps with that of $\mu_2$. In
+other cases, such as a discrimination parameter $\delta_j$ in an
+item-response theory model, restricting $\delta_j > 0$ can solve the
+identifiability problem.
+
 
 \subsection{Posteriors with Unbounded Densities}
 
