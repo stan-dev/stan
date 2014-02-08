@@ -1587,6 +1587,28 @@ If $\mu \in \reals$ and $\kappa \in \posreals$, then for $y \in
     location \farg{mu} and scale \farg{kappa}}
 \end{description}
 
+\subsubsection{Numerical Stability}
+
+Evaluating the Von Mises distribution for $\kappa > 100$ is
+numerically unstable in the current implementation.  Nathanael I.\
+Lichti suggested the following workaround on the Stan users group,
+based on the fact that as $\kappa \rightarrow \infty$,
+\[
+\distro{VonMises}(y|\mu,\kappa) \rightarrow \distro{Normal}(\mu,
+\sqrt{1 / \kappa}).
+\]
+%
+The workaround is to replace \Verb|y ~ von_mises(mu,kappa)| with
+%
+\begin{quote}
+\begin{Verbatim}
+if (kappa < 100)
+  y ~ von_mises(mu, kappa);
+else 
+  y ~ normal(mu, sqrt(1 / kappa));
+\end{Verbatim}
+\end{quote} 
+
 
 \chapter{Bounded Continuous Probabilities}
 
