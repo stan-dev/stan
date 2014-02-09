@@ -204,6 +204,8 @@ test/unit/mcmc/hmc/hamiltonians/diag_e_metric.o: src/test/test-models/no-main/mc
 test/unit/mcmc/hmc/hamiltonians/dense_e_metric.o: src/test/test-models/no-main/mcmc/hmc/hamiltonians/funnel.cpp
 test/unit/mcmc/hmc/integrators/expl_leapfrog.o: src/test/test-models/no-main/mcmc/hmc/integrators/command.cpp src/test/test-models/no-main/mcmc/hmc/integrators/gauss.cpp
 
+test/stat-validity/models/funnel/funnel.o: src/test/test-models/compiled/stat-validity/funnel.cpp
+
 ##
 # all files that should be compiled as tests
 ##
