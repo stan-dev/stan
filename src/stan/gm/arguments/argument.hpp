@@ -31,7 +31,7 @@ namespace stan {
         return _description; 
       }
 
-      virtual void print(std::ostream* s, const int depth, const char prefix) = 0;
+      virtual void print(std::ostream* s, const int depth, const std::string prefix) = 0;
       virtual void print_help(std::ostream* s, const int depth, const bool recurse) = 0;
       
       virtual bool parse_args(std::vector<std::string>& args,

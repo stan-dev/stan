@@ -1,55 +1,72 @@
 #include <vector>
+#include <stan/agrad/rev.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/accumulator.hpp>
 #include <stan/math/matrix/typedefs.hpp>
 #include <gtest/gtest.h>
 
 // test sum of first n numbers for sum of a
-template <typename T>
-void test_sum(stan::math::accumulator<T>& a,
+void test_sum(stan::math::accumulator<stan::agrad::var>& a,
               int n) {
-  EXPECT_FLOAT_EQ((n * (n + 1)) / 2, a.sum());
+  EXPECT_FLOAT_EQ((n * (n + 1)) / 2, a.sum().val());
 }
 
-TEST(MathMatrix,accumulateDouble) {
+TEST(AgradRevMatrix,accumulateDouble) {
   using stan::math::accumulator;
-  
-  accumulator<double> a;
+  using stan::agrad::var;
+
+  accumulator<var> a;
   test_sum(a, 0);
 
-  a.add(1.0);
+  a.add(var(1.0));
   test_sum(a, 1);
 
   for (int i = 2; i <= 1000; ++i)
-    a.add(i);
+    a.add(var(i));
   test_sum(a, 1000);
   
 }
-TEST(MathMatrix,accumulateCollection) {
-  // tests int, double, vector<double>, vector<int>
-  // MatrixXd, VectorXd, and recursions of vector<T>
+TEST(AgradRevMathMatrix,accumulateCollection) {
+  // tests int, double, vector<double>, vector<int>,
+  // Matrix<double,...>,
+  // var, vector<var>, Matrix<var,...>, 
+  // and recursions of vector<T>
 
   using stan::math::accumulator;
   using std::vector;
   using Eigen::VectorXd;
   using Eigen::MatrixXd;
+  using Eigen::Matrix;
+  using Eigen::Dynamic;
+  using stan::agrad::var;
 
-  accumulator<double> a;
+  accumulator<var> a;
 
   int pos = 0;
   test_sum(a, 0);
 
-  vector<double> v(10);
+  vector<var> v(10);
   for (size_t i = 0; i < 10; ++i)
-    v[i] = pos++;
+    v[i] = var(pos++);
   a.add(v);                                         
   test_sum(a, pos-1);
 
-  a.add(pos++);                    
+  vector<double> d(10);
+  for (size_t i = 0; i < 10; ++i)
+    d[i] = pos++;
+  a.add(d);                                         
   test_sum(a, pos-1);
 
-  double x = pos++;
+  var x = pos++;
   a.add(x);                        
+  test_sum(a, pos-1);
+
+  int nnn = pos++;
+  a.add(nnn);
+  test_sum(a, pos-1);
+
+  double xxx = pos++;
+  a.add(xxx);
   test_sum(a, pos-1);
 
   vector<int> u(10);         
@@ -88,6 +105,29 @@ TEST(MathMatrix,accumulateCollection) {
     vvx[i] = vx;
   }
   a.add(vvx);
+  test_sum(a, pos-1);
+
+  Matrix<var,Dynamic,Dynamic> mvar(5,6);
+  for (int i = 0; i < 5; ++i)
+    for (int j = 0; j < 6; ++j)
+      mvar(i,j) = pos++;
+  a.add(mvar);
+  test_sum(a, pos-1);
+
+  Matrix<var,1,Dynamic> mvvar(7);
+  for (int i = 0; i < 7; ++i)
+    mvvar(i) = pos++;
+  a.add(mvvar);
+  test_sum(a, pos-1);
+
+  vector<Matrix<var,Dynamic,1> > vvx_var(8);
+  for (size_t i = 0; i < 8; ++i) {
+    Matrix<var,Dynamic,1> vx_var(3);
+    for (int j = 0; j < 3; ++j)
+      vx_var(j) = pos++;
+    vvx_var[i] = vx_var;
+  }
+  a.add(vvx_var);
   test_sum(a, pos-1);
 }
 

@@ -96,14 +96,22 @@ Although it's not part of Stan's type language, in this chapter,
 \section{Increment Log Probability}
 
 There is a special function \code{increment\_log\_prob} takes a single
-real-valued argument and adds the result to the log probability.
+argument of any expression type \code{T}.
 %
 \begin{description}
-\fitem{void}{increment\_log\_prob}{real \farg{lp}}{Add \farg{lp} to
-  the total log probability accumulator returned by the log
-  probability function defined by a Stan model.}
+  \fitem{void}{increment\_log\_prob}{T \farg{lp}}{Add \farg{lp} (or
+    elements of \farg{lp} if \code{T} is a container type) to the
+    total log probability accumulator returned by the log probability
+    function defined by a Stan model.}
 \end{description}
 %
+The expression \code{lp} can be of any expression type.  Specifically,
+it can be an integer or real primitive, a vector, row vector, or
+matrix, or an array of any type, including multidimensional arrays and
+arrays of matrices, vectors, or row vectors.  Vector arguments are
+included for convenience and have no speed advantage over adding
+values in a loop.
+
 The full behavior of the \code{increment\_log\_prob} statement and its
 relation to sampling statements is described in
 \refsection{increment-log-prob}.
@@ -1085,26 +1093,44 @@ The sample variance of the elements in \farg{x}}
 elements in \farg{x}}
 \end{description}
 
-% \subsection{Distance and Squared Distance}
+\subsection{Distance and Squared Distance}
+
+\begin{description}
+\fitem{real}{distance}{vector \farg{x}, vector \farg{y}}{The Euclidean
+  distance between \farg{x} and \farg{y}, defined by
+\[
+\mbox{distance}(\mbox{\farg{x}},\mbox{\farg{y}}) 
+= \sqrt{\textstyle \sum_{n=1}^N (\mbox{\farg{x}}[n] - \mbox{\farg{y}}[n])^2},
+\]
+where \code{N} is the size of \farg{x} and \farg{y}.}
 %
-% \fitem{real}{dist}{real \farg{x}[], real \farg{y}[]}{The Euclidean
-%   distance between \farg{x} and \farg{y}, defined by
-% \[
-% \mbox{dist}(\mbox{\farg{x}},\mbox{\farg{y}}) 
-% = \sqrt{\textstyle \sum_{n=1}^N (\mbox{\farg{x}}[n] - \mbox{\farg{y}}[n])^2},
-% \]
-% where \code{N} is the size of \farg{x} and \farg{y}.
-% }
+\fitem{real}{distance}{vector \farg{x}, row\_vector \farg{y}}{The Euclidean
+  distance between \farg{x} and \farg{y}}
 %
-% \fitem{real}{squared\_dist}{real \farg{x}[], real \farg{y}[]}{The Euclidean
-%   distance between \farg{x} and \farg{y}, defined by
-% \[
-% \mbox{squared\_dist}(\mbox{\farg{x}},\mbox{\farg{y}}) 
-% = \textstyle \sum_{n=1}^N (\mbox{\farg{x}}[n] - \mbox{\farg{y}}[n])^2,
-% \]
-% where \code{N} is the size of \farg{x} and \farg{y}.
-% }
+\fitem{real}{distance}{row\_vector \farg{x}, vector \farg{y}}{The Euclidean
+  distance between \farg{x} and \farg{y}}
 %
+\fitem{real}{distance}{row\_vector \farg{x}, row\_vector \farg{y}}{The Euclidean
+  distance between \farg{x} and \farg{y}}
+%
+\fitem{real}{squared\_distance}{vector \farg{x}, vector \farg{y}[]}{The Euclidean
+  distance between \farg{x} and \farg{y}, defined by
+\[
+\mbox{squared\_distance}(\mbox{\farg{x}},\mbox{\farg{y}}) 
+= \textstyle \sum_{n=1}^N (\mbox{\farg{x}}[n] - \mbox{\farg{y}}[n])^2,
+\]
+where \code{N} is the size of \farg{x} and \farg{y}.}
+%
+\fitem{real}{squared\_distance}{vector \farg{x}, row\_vector \farg{y}[]}{The Euclidean
+  distance between \farg{x} and \farg{y}}
+%
+\fitem{real}{squared\_distance}{row\_vector \farg{x}, vector \farg{y}[]}{The Euclidean
+  distance between \farg{x} and \farg{y}}
+%
+\fitem{real}{squared\_distance}{row\_vector \farg{x}, row\_vector \farg{y}[]}{The Euclidean
+  distance between \farg{x} and \farg{y}}
+%
+\end{description}
 
 \section{Array Size and Dimension Function}
 

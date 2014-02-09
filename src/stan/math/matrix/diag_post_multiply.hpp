@@ -18,9 +18,9 @@ namespace stan {
         throw std::domain_error("m2 must have same length as m1 has columns");
       Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type, R1, C1>
         result(m1.rows(),m1.cols());
-      for (int i = 0; i < m1.rows(); ++i)
-        for (int j = 0; j < m1.cols(); ++j)
-          result(i,j) = m2(i) * m1(i,j);
+      for (int j = 0; j < m1.cols(); ++j)
+        for (int i = 0; i < m1.rows(); ++i)
+          result(i,j) = m2(j) * m1(i,j);
       return result;
     }
 
