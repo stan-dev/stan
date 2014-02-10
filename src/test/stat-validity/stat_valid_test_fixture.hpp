@@ -58,7 +58,7 @@ public:
     if (has_data()) command << " data file=" << model_path << ".data.R";
     if (has_init()) command << " init=" << model_path << ".init.R";
     command << " output file=" << get_csv_file(chain)
-            << " refresh=-1";
+            << " refresh=" << num_samples();
     return command.str();
   }
 
@@ -75,8 +75,6 @@ public:
   static void run_model() {
     for (int chain = 1; chain <= num_chains; chain++) {
 
-      std::cout << "Running chain " << chain << std::endl;
-      
       std::string command = get_command(chain);
       
       std::stringstream method;
@@ -89,6 +87,7 @@ public:
       run_command_output out;
       out = run_command(command);
       command_outputs.push_back(out.output);
+      
     }
     
     populate_chains();
@@ -132,7 +131,7 @@ template<class Derived>
 stan::mcmc::chains<> *Stat_Valid_Test_Fixture<Derived>::chains;
 
 template<class Derived>
-int Stat_Valid_Test_Fixture<Derived>::num_chains = 5;
+int Stat_Valid_Test_Fixture<Derived>::num_chains = 50;
 
 template<class Derived>
 std::string Stat_Valid_Test_Fixture<Derived>::model_path;
@@ -161,6 +160,24 @@ TYPED_TEST_P(Stat_Valid_Test_Fixture, ConvergenceTest) {
   }
 }
 
+TYPED_TEST_P(Stat_Valid_Test_Fixture, ExpectedValuesExistenceTest) {
+  
+  
+  stan::mcmc::chains<> *c = TypeParam::chains;
+  
+  // Check expected values
+  std::vector<std::pair<std::string, double> > expected_values = TypeParam::get_expected_values();
+  int n = expected_values.size();
+  if (n == 0) return;
+  
+  for (int i = 0; i < n; i++) {
+    std::string name = expected_values[i].first;
+    EXPECT_GT(c->index(name), 0)
+      << name << " does not exist in the compiled model!\n";
+  }
+  
+}
+
 TYPED_TEST_P(Stat_Valid_Test_Fixture, ExpectedValuesTest) {
   
   using std::vector;
@@ -180,7 +197,7 @@ TYPED_TEST_P(Stat_Valid_Test_Fixture, ExpectedValuesTest) {
   double p_t_mid = 0.5;
   double p_t_high = 1 - p_t_low;
   
-  double p_binomial = 0.95;
+  double p_binomial = 0.999;
   double p_bin_low = 0.5 * (1 - p_binomial);
   double p_bin_high = 1 - p_bin_low;
   
@@ -205,7 +222,9 @@ TYPED_TEST_P(Stat_Valid_Test_Fixture, ExpectedValuesTest) {
     
     std::string name = expected_values[i].first;
     double expected_mean = expected_values[i].second;
-
+    
+    if (c->index(name) < 0) continue;
+    
     int n_fail_low = 0;
     int n_fail_mid = 0;
     int n_fail_high = 0;
@@ -222,20 +241,21 @@ TYPED_TEST_P(Stat_Valid_Test_Fixture, ExpectedValuesTest) {
       double low_threshold = - quantile(complement(t_dist, p_t_low));
       double mid_threshold = - quantile(complement(t_dist, p_t_mid));
       double high_threshold = - quantile(complement(t_dist, p_t_high));
+
       
       if (z < low_threshold) ++n_fail_low;
       if (z < mid_threshold) ++n_fail_mid;
       if (z < high_threshold) ++n_fail_high;
       
     }
-    
-    EXPECT_EQ(0, (n_fail_low <= n_bin_low_low) || (n_fail_low >= n_bin_low_high))
+  
+    EXPECT_EQ(false, (n_fail_low <= n_bin_low_low) || (n_fail_low > n_bin_low_high))
       << "Failed low-tail ensemble test for parameter " << name << "\n";
     
-    EXPECT_EQ(0, (n_fail_mid <= n_bin_mid_low) || (n_fail_mid >= n_bin_mid_high))
+    EXPECT_EQ(false, (n_fail_mid <= n_bin_mid_low) || (n_fail_mid > n_bin_mid_high))
       << "Failed median ensemble test for parameter " << name << "\n";
     
-    EXPECT_EQ(0, (n_fail_high <= n_bin_high_low) || (n_fail_high >= n_bin_high_high))
+    EXPECT_EQ(false, (n_fail_high <= n_bin_high_low) || (n_fail_high > n_bin_high_high))
       << "Failed high-tail ensemble test for parameter " << name << "\n";
     
   }
@@ -245,6 +265,7 @@ TYPED_TEST_P(Stat_Valid_Test_Fixture, ExpectedValuesTest) {
 REGISTER_TYPED_TEST_CASE_P(Stat_Valid_Test_Fixture,
                            RunModel,
                            ConvergenceTest,
+                           ExpectedValuesExistenceTest,
                            ExpectedValuesTest);
 
 #endif
