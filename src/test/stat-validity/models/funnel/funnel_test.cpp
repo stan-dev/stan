@@ -1,19 +1,20 @@
 #include <gtest/gtest.h>
 #include <test/stat-validity/stat_valid_test_fixture.hpp>
 
-class Stat_Valid_Models_Funnel :
-  public Stat_Valid_Test_Fixture<Stat_Valid_Models_Funnel> {
-
+class Funnel :
+  public Stat_Valid_Test_Fixture<Funnel> {
+  
 protected:
   virtual void SetUp() {}
     
 public:
   static std::vector<std::string> get_model_path() {
     std::vector<std::string> model_path;
+    model_path.push_back("src");
     model_path.push_back("test");
+    model_path.push_back("test-models");
+    model_path.push_back("compiled");
     model_path.push_back("stat-validity");
-    model_path.push_back("models");
-    model_path.push_back("funnel");
     model_path.push_back("funnel");
     return model_path;
   }
@@ -33,6 +34,6 @@ public:
 
 };
 
-INSTANTIATE_TYPED_TEST_CASE_P(Stat_Valid_Models_Funnel,
-            Stat_Valid_Test_Fixture,
-            Stat_Valid_Models_Funnel);
+INSTANTIATE_TYPED_TEST_CASE_P(Funnel,
+                              Stat_Valid_Test_Fixture,
+                              Funnel);
