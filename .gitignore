@@ -39,8 +39,9 @@ src/models/**/*
 
 # tests: compiled models
 src/test/test-models/**/*
-!src/test/test-models/**/*.stan
-!src/test/test-models/**/.gitignore
+!src/test/test-models/compiled
+!src/test/test-models/compiled/stat-validity
+!src/test/test-models/compiled/stat-validity/*.stan
 
 # tests: generated agrad tests
 src/test/unit-distribution/**/**/**/*_generated_test.cpp
