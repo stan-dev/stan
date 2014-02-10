@@ -22,7 +22,11 @@ parameters {
   vector[3] x;
 }
 
-transformed parameters {
+model {
+  x ~ multi_normal(rep_vector(0, 3), Omega);
+}
+
+generated quantities {
   real x2[3];
   real xy[3];
 
@@ -33,8 +37,4 @@ transformed parameters {
   xy[1] <- x[1] * x[2];
   xy[2] <- x[2] * x[3];
   xy[3] <- x[1] * x[3];
-}
-
-model {
-  x ~ multi_normal(rep_vector(0, 3), Omega);
 }

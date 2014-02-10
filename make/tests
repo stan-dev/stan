@@ -204,10 +204,6 @@ test/unit/mcmc/hmc/hamiltonians/diag_e_metric.o: src/test/test-models/no-main/mc
 test/unit/mcmc/hmc/hamiltonians/dense_e_metric.o: src/test/test-models/no-main/mcmc/hmc/hamiltonians/funnel.cpp
 test/unit/mcmc/hmc/integrators/expl_leapfrog.o: src/test/test-models/no-main/mcmc/hmc/integrators/command.cpp src/test/test-models/no-main/mcmc/hmc/integrators/gauss.cpp
 
-#test/stat-validity/models/funnel/funnel.o: src/test/test-models/compiled/stat-validity/funnel$(EXE)
-#test/stat-validity/models/gauss_iid/gauss_iid.o: src/test/test-models/compiled/stat-validity/gauss_iid$(EXE)
-test/stat-validity/models/gauss_corr/gauss_corr.o: src/test/test-models/compiled/stat-validity/gauss_corr$(EXE)
-
 ##
 # all files that should be compiled as tests
 ##
@@ -237,8 +233,7 @@ $(patsubst src/%_test.cpp,%.o,$(filter src/test/CmdStan/models/%,$(ALL_TESTS))):
 # Statistical validation tests. Adding built model as a dependency.
 ##
 
-#$(patsubst src/%_test.cpp,%.o,$(filter src/test/stat-validity/models/%,$(ALL_TESTS))): test/stat-validity/%.o : %$(EXE)
-
+$(patsubst src/%_test.cpp,%.o,$(filter src/test/stat-validity/models/%,$(ALL_TESTS))): test/stat-validity/models/%.o : src/test/test-models/compiled/stat-validity/%$(EXE)
 
 ##
 # Agrad distributions test generator
