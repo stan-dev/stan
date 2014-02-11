@@ -25,12 +25,12 @@ namespace stan {
     inline 
     R
     apply_recover(const F& f,
-                  const T& x) {
+                  T& x) {
       try {
         return f(x);
-      } catch (...) {
+      } catch (std::exception& e) {
         stan::agrad::recover_memory();
-        throw;  
+        throw;
       }
     }
 
@@ -125,11 +125,11 @@ namespace stan {
         x_var(i) = x(i);
       var fx_var = apply_recover<var>(f,x_var);
       fx = fx_var.val();
-
       grad_fx.resize(x.size());
       stan::agrad::grad(fx_var.vi_);
       for (int i = 0; i < x.size(); ++i)
         grad_fx(i) = x_var(i).adj();
+      stan::agrad::recover_memory();
     }
     template <typename T, typename F>
     void
