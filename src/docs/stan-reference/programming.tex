@@ -5057,72 +5057,284 @@ check for out-of-domain errors on the inputs).
 
 
 
-\chapter{Model Identifiability}\label{identifiability.chapter}%
+\chapter{Problematic Posteriors}\label{problematic-posteriors.chapter}%
 \noindent
-This chapter discusses the frequentist notion of model identifiability
-and the Bayesian notion of identifiability in terms of well-behaved
-posteriors, concentrating on computational issues arising from model
-formulation and computation in Stan.
+Mathematically speaking, with a proper posterior, one can do Bayesian
+inference and that's that. There is not even a need to require a
+finite variance or even a finite mean---all that's needed is a finite
+integral.  
 
-\section{Identifiability of Likelihoods}
+Nevertheless, modeling is a tricky business and it is common even for
+experienced modelers to inadvertently design a model that leads to
+improper priors.  Furthermore, some posteriors are mathematically
+sound, but ill-behaved in practice for reasons ranging from
+finite-precision computer arithmtic to nuisance parameters.
 
-In traditional frequentist statistics, a model is said to be
-identifiable if and only if different parameters produce different
-likelihood functions. More formally, a likelihood function
-$f_{\theta}(y) = p(y|\theta)$ is identifiable if and only if 
-%
-\[
-\theta \neq \theta' \mbox{ implies } f_{\theta} \neq f_{\theta'}.
-\]
-%
-The inequality on the right hand side of this definition is between
-functions of $y$, meaning that $f_{\theta} \neq f_{\theta'}$ if there
-is some $y$ such that $f_{\theta}(y) \neq f_{\theta'}(y)$.
+This chapter discusses issues in models that create problematic
+posterior inferences, either in general for Bayesian inference or in
+practice for Stan.
 
-Model identifiability is a necessary (but not sufficient) condition
-for the existence of maximum likelihood estimates (MLE). Without
-identifiability, the maximum likelihood estimate
-\[
-\hat{\theta} = \mbox{argmax}_{\theta} \ p(y|\theta)
-\]
-might not be unique.
+
+\section{Collinearity of Predictors in Regressions}
+
+With some models, there is a general problem related to the classical
+notion of identifiability.  These lead to ridges in the data sampling
+distribution of equal density and cause problems for posterior
+inference.  
 
 \subsection{Examples}
 
-A simple normal model with a location parameter $\mu$, a scale
-parameter $\sigma > 0$, and likelihood
-%
-\[
-p(y|\mu,\sigma) = \prod_{n=1}^N \distro{Normal}(y_n|\mu,\sigma).
-\]
-%
-is identifiable because every distinct value of $\mu$ and $\sigma$
-produces a different likelihood function $p(y|\mu,\sigma)$.
+\subsubsection{Redundant Intercepts}
 
-A similar model%
+The first example of collinearity is an artificial example involving
+redundant intercept parameters.%
 %
 \footnote{This example was raised by Richard McElreath on the Stan
   users group in a query about the behavior of the no-U-turn sampler
-  (NUTS).}
+  (NUTS) versus the Gibbs samplers used in BUGS and JAGS.}
 %
-with two location parameters, $\lambda_1$ and $\lambda_2$, a scale
-$\sigma > 0$, and likelihood function
+Suppose there are observations $y_n$ for $n \in 1{:}N$, 
+two intercept parameters $\lambda_1$ and
+$\lambda_2$, a scale parameter $\sigma > 0$, and the sampling distribution
 %
 \[
-p(y|\lambda_1,\lambda_2,\sigma) = \prod_{n=1}^N \distro{Normal}(y_n|\lambda_1 +
-\lambda_2,\sigma)
+y_n \sim \distro{Normal}(\lambda_1 + \lambda_2, \sigma).
 \]
 %
-is not identifiable because for any non-zero quantity $q$,
+For any constant $q$, the probability of $y$ does not change if we
+add $q$ to $\lambda_1$ and subtract it from $\lambda_2$, i.e.,
 %
 \[
-p(y|\lambda_1, \lambda_2, \sigma) = 
-p(y|\lambda_1 + q, \lambda_2 - q, \sigma).
+p(y | \lambda_1, \lambda_2,\sigma)
+=
+p(y | \lambda_1 + q, \lambda_2 - q, \sigma).
+\]
+%
+The consequence is that an improper uniform prior $p(\mu,\sigma)
+\propto 1$ leads to an improper posterior.%
+This impropriety arises because the neighborhoods around $\lambda_1 +
+q, \lambda_1 - q$ have the same mass no matter what $q$ is.
+Therefore, a sampler would need to spend as much time in the
+neighborhood of $\lambda_1=1000000000$ and $\lambda_2=-1000000000$ as
+it does in the neighborhood of $\lambda_1=0$ and $\lambda_2=0$, and so
+on for ever larger (and smaller) values of $\lambda_1$ and
+$\lambda_2$.%
+
+The maringal posterior $p(\lambda_1,\lambda_2|y)$ for this model is
+thus improper.%
+%
+\footnote{The marginal posterior for $\sigma$, $p(\sigma|y)$ is
+  proper here with more than two distinct data points.}
+%
+The impropriety shows up visually as a ridge in the posterior density,
+as illustrated in the left-hand figure of
+\reffigure{non-identifiable-density}.  The ridge for this model is
+along the line where $\lambda_2 = \lambda_1 + c$ for some constant
+$c$.  
+
+Contrast this model with a simple regression with a single intercept
+parameter $\mu$ and sampling distribution
+\[
+y_n \sim \distro{Normal}(\mu,\sigma).
+\]
+Even with an improper prior, the posterior is proper as long as there
+are at least two data points $y_n$ with distinct values.
+
+
+\subsubsection{Ability and Difficulty in IRT Models}
+
+Consider an item-response theory model for students $j \in 1{:}J$ with
+abilities $\alpha_j$ and test items $i \in 1{:}I$ with difficulties
+$\beta_i$.  The observed data is an $I \times J$ array with entries
+$y_{i,j} \in \{ 0, 1 \}$ coded such that $y_{i,j} = 1$ indicates that
+student $j$ answered question $i$ correctly.  The sampling
+distribution for the data is
+%
+\[
+y_{i,j} \sim \distro{Bernoulli}(\mbox{logit}^{-1}(\alpha_j - \beta_i)).
+\]
+%
+For any constant $c$, the probability of $y$ is unchanged by adding a
+constant $c$ to all the abilities and subtracting it from all the
+difficulties, i.e.,
+%
+\[
+p(y | \alpha, \beta)
+= 
+p(y | \alpha + c, \beta - c).
+\]
+%
+
+\subsubsection{General Collinear Regression Predictors}
+
+The general form of the collinearity problem arises when predictors
+for a regression are collinear.  For example, consider a linear
+regression sampling distribution
+\[
+y_n \sim \distro{Normal}(x_n \beta, \sigma)
+\]
+for an $N$-dimensional observation vector $y$, an $N \times K$ predictor
+matrix $x$, and a $K$-dimensional coefficient vector $\beta$.
+
+Now suppose that column $k$ of the predictor matrix is a multiple of
+column $k'$, i.e.,  $x_{,k} = c \, x_{,k'}$ for some constant $c$.
+In this case, the coefficients $\beta_k$ and $\beta_{k'}$ can covary
+without changing the predictions, so that for any $d \neq 0$,
+\[
+p(y | \ldots, \beta_k, \ldots, \beta_{k'}, \ldots, \sigma)
+=
+p(y | \ldots, d  \beta_k, \ldots, \frac{d}{c} \, \beta_{k'}, \ldots,
+\sigma).
 \]
 
-Another example of a non-identifiable model is a normal mixture model,
-with two location parameters $\mu_1$ and $\mu_2$, a shared scale
-$\sigma > 0$, a mixture ratio $\theta \in [0,1]$, and likelihood
+
+\subsubsection{Multiplicative Issues with Discrimination in IRT}
+
+Consider adding a discrimination parameter $\delta_i$ for the items in
+an IRT model, with data sampling model
+\[
+y_{i,j} \sim \distro{Bernoulli}(\mbox{logit}^{-1}(\delta_i(\alpha_j - \beta_i))).
+\]
+For any constant $c \neq 0$, multiplying $\delta$ by $c$ and dividing
+$\alpha$ and $\beta$ by $c$ produces the same likelihood,
+\[
+p(y|\delta,\alpha,\beta)
+= p(y|c \delta, \, \frac{1}{c}\alpha, \, \frac{1}{c}\beta).
+\]
+If $c < 0$, this switches the signs of every component in $\alpha$,
+$\beta$, and $\delta$ without changing the density.
+
+
+\subsection{Mitigating the Invariances}
+
+All of the examples discussed in the previous section allow
+translation or scaling of parameters while leaving the data
+probability density invariant.  These problems can be mitigated in
+several ways.
+
+\subsubsection{Removing Redundant Parameters or Predictors}
+
+In the case of the multiple intercepts, $\lambda_1$ and $\lambda_2$,
+the simplest solution is to remove the redundnat intecept, resulting
+in a model with a single intercept parameter $\mu$ and sampling
+distribution
+\[
+y_n \sim \distro{Normal}(\mu, \sigma).
+\]
+
+The same solution works for solving the problem with
+collinearity---just remove one of the columns of the predictor matrix
+$x$.
+
+\subsubsection{Pinning Parameters}
+
+The IRT model without a discrimination parameter can be fixed by
+pinning one of its parameters to a fixed value, typically 0.  For
+example, the first student ability $\alpha_1$ can be fixed to 0.  Now
+all other student abilities $\alpha_i$ for $i \in 2{:}I$ alongwith all
+difficulties $\beta_j$ for $j \in 1{:}J$ are interpretable as
+being relative to the ability of student 0.
+
+This solution is not sufficient to deal with the multiplicative
+invariance introduced by the difficulty parameters $\delta_j$. 
+To solve this problem, one of the difficulty parameters, say
+$\delta_1$, must also be constrained.  Because it's a multiplicative
+and not an additive invariance, it must be constrained to a non-zero
+value, with 1 being a convenient choice.  Now all of the
+discrimination parameters may be interpreted relative to item 1's
+discrimination.  
+
+\subsubsection{Adding Priors}
+
+So far, the models have been discussed as if the priors on the
+parameters were improper uniform priors.  
+
+A more general Bayesian solution to these invariance problems is to
+impose proper priors on the parameters.  This approach can be used to
+solve problems arising from either additive or multiplicative
+invariance.
+
+For example, normal priors on the multiple intercepts,
+\[
+\lambda_1, \lambda_2 \sim \distro{Normal}(0,\tau)
+\]
+with a constant scale $\tau$ ensures that the posterior mode is
+located at a point where $\lambda_1 = \lambda_2$, because this
+minimizes $\log \distro{Normal}(\lambda_1|0,\tau) + \log
+\distro{Normal}(\lambda_2|0,\tau)$.%
+%
+\footnote{A Laplace prior (or an L1 regularizer for penalized maximum
+  likelihood estimation) is not sufficient to remove this additive
+  invariance.  It provides shrinkage, but does not in and of itself
+  identify the parameters because adding a value to $\lambda_1$ and
+  subtracting it from $\lambda_2$ results in the same value for the
+  prior density.  \cite{ZouHastie:2005} combined L1 and L2
+  regularizers in the elastic net to provide the desirable properties
+  of both, including the shrinkage-to-zero properties of L1 and the
+  uniqueness of modes produced by L2.}
+
+%
+\begin{figure}
+\includegraphics[height=1.5in]{R/non-identified.png}%
+\includegraphics[height=1.5in]{R/non-identified-plus-prior.png}%
+\includegraphics[height=1.5in]{R/one-param-identified.png}
+\vspace*{-0.25in}
+\caption{\small\it Posteriors for two intercept parameterization
+  without prior, two intercept parameterization with unit normal
+  prior, and one intercept reparameterization without prior.  For all
+  three cases, the posterior is plotted for 100 data points drawn from
+  a unit normal. Left) The two intercept parameterization leads to an
+  improper prior with a ridge extending infinitely to the northwest
+  and southeast.  Middle) Adding a unit normal prior for the
+  intercepts results in a proper posterior.  Right) The single
+  intercept parameterization with no prior also has a proper posterior.}%
+\label{non-identifiable-density.figure}
+\end{figure}
+%
+The addition of a prior to the two intercepts model is shown in the
+middel plot in \reffigure{non-identifiable-density}.  The plot on
+the right of \reffigure{non-identifiable-density} shows the result of
+reparameterizing to a single intercept.
+
+Care must be used when adding a prior to resolve invariances.  If the
+prior is taken to be too broad (i.e., too vague), the resolution is in
+theory only, whereas if the prior is too narrow (i.e., too
+informative), then it will dominate the estimate based on the data.
+In most problems, the modeler will have some notion of the expected
+scale of the estimates and be able to choose a prior for
+identification purposes that does not dominate the data, but provides
+sufficient computational control on the posterior.
+
+Priors can also be used in the same way to control the additive
+invariance of the IRT model.  If the same strength prior is put on
+both ability and difficulty parameters, the difference between the
+parameters is also controlled as a side effect.  A typical approach is
+to place a strong prior on student ability parameters $\alpha$ to
+control scale and a weaker prior on item difficulty $\beta$ so as not
+to overly constrain the linear predictor $\alpha_j - \beta_i$ for a
+student's answer to a problem.
+
+Priors can also be used to be used to control multiplicative scaling.
+Placing a prior on the discrimination parameter in an IRT model will
+increase the posterior density of smaller values for the
+discrimination parameters.  Care must be taken in this setting because
+the prior constraining the scale of the discrimination parameters
+must be offset with a loosening of the priors affecting the difference
+between ability and difficulty parameters.
+
+
+
+
+\section{Label Switching in Mixture Models}
+
+A slightly different problem arises in cases where the posterior
+contains multiple modes of the same density.
+
+\subsection{Mixture Models}
+
+Another example of this problem is a normal mixture model for the same
+data.  Consider two location parameters $\mu_1$ and $\mu_2$, a shared
+scale $\sigma > 0$, a mixture ratio $\theta \in [0,1]$, and likelihood
 \[
 p(y|\theta,\mu_1,\mu_2,\sigma) 
 = \prod_{n=1}^N \big( \theta \times \distro{Normal}(y_n|\mu_1,\sigma)
@@ -5130,105 +5342,182 @@ p(y|\theta,\mu_1,\mu_2,\sigma)
 \]
 The issue here is exchangeability of the labels 1 and 2, because
 \[
-p(y|\theta,\mu_1,\mu_2,\sigma) = p(y|(1-\theta),\mu_2,\mu_1,\sigma).
+p(\theta,\mu_1,\mu_2,\sigma|y) = p((1-\theta),\mu_2,\mu_1,\sigma|y).
 \]
+This example is repeated in clustering models like $K$-means
+clustering and latent Dirichlet allocation, which are forms of mixture
+models.
+
+\subsection{Some Inferences are Invariant}
+
+In some sense, the identity of the labels doesn't matter---it's a
+so-called ``nuisance'' parameter.  The standard Bayesian approach to
+nuisance parameters it to marginalize them out.  This can be done for
+some many posterior predictive inferences in mixture models.  For
+instance, predicting the log probability of the outcome for a new data
+point does not depend on label identity.  Arguably, the only
+inferences that are sound in such models are those that are invariant
+to label switching.  Posterior means for all of the parameters, for
+instance, are meaningless, because they are not invariant to label
+switching.  
+
+\subsection{Convergence Monitoring and Effective Sample Size}
+
+The analysis of posterior convergence and effective sample size is
+also difficult for mixutre models.  For example, the $\hat{R}$
+convergence statistic reported by Stan and the computation of
+effective sample size are both compromised by label switching.  The
+problem is that the posterior mean, a key ingredient in these
+computations, is affected by label switching, resulting in a posterior
+mean for $\mu_1$ that is equal to that of $\mu_2$. 
 
 
-\section{Bayesian ``Identifiability''}
+\subsection{Highly Multimodal Posteriors}
 
-In the broadest sense, a Bayesian model is identified if the posterior
-distribution,
+Theoretically, this should not present a problem for inference because
+all of the integrals involved in posterior predictive inference will
+be well behaved. The problem in practice is computation. 
+
+Even with a proper posterior, all known sampling and inference
+techniques are notoriously ineffective when the number of modes grows
+exponentially as it does for mixture models with increasing numbers of
+components.  In Gibbs sampling, it is unlikely for $\mu_1$ to move to a
+new mode when sampled conditioned on the current values of $\mu_2$ and
+$\theta$. For HMC and NUTS, the problem is that the sampler gets stuck
+in one of the two ``bowls'' arounds the modes and cannot gather enough
+energy from random momentum assignment to move from one mode to
+another.
+
+\subsection{Hacks as Fixes}
+
+Several hacks (also known as ``dirty tricks'') are possible to deal
+with these problems in practice, if not in theory. 
+
+\subsubsection{Parameter Ordering Constraints}
+
+One common strategy is to impose an ordering on the outputs,
+requiring, for constraining $\mu_1 < \mu_2$ in the mixture model.  A
+problem that can arise from such an approach is when there is
+substantial probabilty mass for the opposite ordering $\mu_1 > \mu_2$.
+In these cases, the the posteriors are affected by the constraint and
+true posterior uncertainty in $\mu_1$ and $\mu_2$ is not captured by
+the model with the constraint.  In addition, standard approaches to
+posterior inference for event probabilities is compromised.  For
+instance, attempting to use $M$ posterior samples to estimate
+$\mbox{Pr}[\mu_1 > \mu_2]$, will fail, because the estimator
 \[
-p(\theta|y) \propto p(y|\theta) \, p(\theta),
+\mbox{Pr}[\mu_1 > \mu_n] 
+\approx 
+\sum_{m=1}^M \mbox{I}(\mu_1^{(m)} > \mu_2^{(m)})
 \]
-is proper, i.e.,
-%
-\[
-\int p(\theta|y) \, d\theta = 1.
-\]
-%
-Mathematically speaking, with a proper posterior, one can do Bayesian
-inference and that's that. There is not even a need to require a
-finite variance or even a finite mean---all that's needed is a finite
-integral.
+will result in an estimate of 0 because the posterior respects the
+constraint in the model.  
 
-\subsection{Examples (continued)}
+\subsubsection{Initialization around a Single Mode}
 
-Consider again the non-identifiable model from the previous
-section with two mean parameters. Now suppose we create a Bayesian
-model with the likelihood $p(y|\lambda_1,\lambda_2,\sigma)$ and an
-improper uniform prior $p(\lambda_1, \lambda_2, \sigma) = 1$.  The
-result is an improper posterior 
-\[
-p(\lambda_1,\lambda_2,\sigma|y) 
-\ \propto \
-p(y|\lambda_1,\lambda_2,\sigma) \, p(\lambda_1,\lambda_2,\sigma)
-\ = \
-p(y|\lambda_1,\lambda_2,\sigma).
-\]
-%
-The posterior contains a ridge with a peak along the line where the
-sum $\lambda_1 + \lambda_2$ is equal to the maximum likelihood
-estimate $\hat{\mu}$ from the identified model 
-%
-\[
-p(y,\mu,\sigma) = \prod_{n=1}^N \distro{Normal}(y_n|\mu,\sigma).
-\]
-%
-The posterior ridge is illustrated in the plot in the left-hand figure of
-\reffigure{non-identifiable-density}, which shows the posterior
-resulting from sampling 100 data points $y_n \sim
-\distro{Normal}(0,1)$. With 100 data points, the posterior for
-$\sigma$ is proper, even in the model parameterized by $\lambda_1$ and
-$\lambda_2$.
-%
-\begin{figure}
-\begin{center}
-\includegraphics[height=1.75in]{R/non-identified.png}
-\ \ \ \ \
-\includegraphics[height=1.75in]{R/non-identified-plus-prior.png}
-\end{center}
-\vspace*{-0.25in}
-\caption{\small\it Posteriors of an unidentified model and the same
-  model identified with a prior. In both models, the likelihood
-  function is $y_n \sim \distro{Normal}(\lambda_1 +
-  \lambda_2,\sigma)$. Both plots show the
-  posterior for the same 100 data points simulated from a unit normal
-  distribution. The left-hand plot shows the posterior for the model
-  with no priors for $\lambda_1$ or $\lambda_2$ (or $\sigma$).  The
-  resulting posterior has a ridge extending infinitely to the 
-  northwest and southeast, and is thus improper (does not integrate to
-  1).  The posterior density in the right-hand plot is from a model
-  that adds unit normal priors $\lambda_1, \lambda_2 \sim \distro{Normal}(0,1)$,
-  resulting in a proper posterior.}%
-\label{non-identifiable-density.figure}
-\end{figure}
-%
-With improper posteriors, sampling becomes impossible. A ``proper''
-posterior sample should spend as much time in the neighborhood of
-$\lambda_1=1000000000$ and $\lambda_2=-1000000000$ as it does in the
-neighborhood of $\lambda_1=0$ and $\lambda_2=0$, and so on for ever
-larger values. This is, of course, impossible in finite amounts of
-time, not to mention with limited maximum and minimum values for
-double-precision floating point numbers as used in computers.
+Another common approach is to initialize the parameters near desired
+values.  This can work better than the hard constraint approach if
+reasonable initial values can be found and the labels do not switch
+within a Markov chain.  The result is that all chains are glued to a
+neighborhood of a particular mode in the posterior.  
 
-By way of contrast, consider what happens when we add proper priors
-for $\lambda_1$ and $\lambda_2$, say 
-\[
-p(\lambda_1,\lambda_2) 
-\ = \
-\distro{Normal}(\lambda_1|0,1) 
-\times
-\distro{Normal}(\lambda_2|0,1).
-\]
-With proper priors on $\lambda_1$ and $\lambda_2$, the posterior is
-now proper. The effect on the posterior is to convert the ridge into a
-hill, as illustrated in the right-hand plot in
-\reffigure{non-identifiable-density}. With the same 100 data points
-$y_n$, the probability density quickly falls off as $\lambda_1$ and
-$\lambda_2$ move away from the origin $(0,0)$.
 
-\section{What Goes Wrong Sampling in Non-Identifiable Models}
+
+\section{Posteriors with Unbounded Densities}
+
+In some cases, the posterior density grows without bounds as
+parameters approach certain poles or boundaries. In thse cases, there
+are no posterior modes.  
+
+\subsection{Mixture Models with Varying Scales}
+
+One such example is a binary mixture model with scales varying by
+component, $\sigma_1$ and $\sigma_2$ for locations $\mu_1$ and
+$\mu_2$. In this situation, the density grows without bound as
+$\sigma_1 \rightarrow 0$ and $\mu_1 \rightarrow y_n$ for some $n$;
+that is, one of the mixture components concentrates all of its mass
+around a single data item $y_n$.
+
+\subsection{Beta-Binomial Models with Skewed Data and Weak Priors}
+
+Another example of unbounded densities arises with a posterior such as
+$\distro{Beta}(\phi|0.5,0.5)$, which can arise if very ``weak'' beta
+priors are used for groups that have no data. This density is
+unbounded as $\phi \rightarrow 0$ and $\phi \rightarrow 1$. Similarly,
+a Bernoulli likelihood model coupled with a ``weak'' beta prior, leads
+to a posterior
+%
+\begin{eqnarray*}
+p(\phi|y) 
+& \propto & \textstyle
+\distro{Beta}(\phi|0.5,0.5) \times \prod_{n=1}^N \distro{Bernoulli}(y_n|\phi)
+\\[4pt]
+& = &\textstyle
+\distro{Beta}(\phi \, | \, 0.5 + \sum_{n=1}^N y_n, \ \ 0.5 + N - \sum_{n=1}^N y_n).
+\end{eqnarray*}
+%
+If $N = 9$ and each $y_n = 1$, the posterior is
+$\distro{Beta}(\phi|9.5,0,5)$.  This posterior is unbounded as $\phi
+\rightarrow 1$.  Nevertheless, the posterior is proper, and although
+there is no posterior mode, the posterior mean is well-defined with a
+value of exactly 0.95.
+
+
+\section{Posteriors with Unbounded Parameters}
+
+In some cases, the posterior density will not grow without bound, but
+parameters will grow without bound with gradually increasing density
+values.  Like the models discussed in the previous section that have
+densities that grow without bound, such models also have no posterior
+modes.
+
+
+\subsection{Separability in Logistic Regression}
+
+Consider a logistic regression model with $N$ observed outcomes $y_n
+\in \{ 0, 1 \}$, an $N \times K$  matrix $x$ of predictors, a
+$K$-dimensional $\beta$, and sampling distribution
+\[
+y_n \sim \distro{Bernoulli}(\mbox{logit}^{-1}(x_n \beta)).
+\]
+Now suppose there is a column $x_{,k}$ of the predictor matrix such
+that $x_{n,k} > 0$ if and only if $y_n = 1$, a condition known as
+separability.  In this case, predictive accuracy on the observed data
+continue to improve as $\beta_k \rightarrow \infty$, because for cases
+with $y_n = 1$, $x_n \beta \rightarrow \infty$ and hence
+$\mbox{logit}^{-1}(x_n \beta) \rightarrow 1$.
+
+Because the posterior is proper even in these cases (i.e., the
+posterior mass does not grow without bound), Bayesian inference can
+often overcome the difficulty with maximum likelihood inference and
+calculate proper posterior means. In other cases, when the unbounded
+posterior modes are attractive enough, the simulated particle falls
+down an infinitely deep well corresponding to unbounded negative log
+posterior density and never gains enough random kinetic energy in
+future iterations to climb back out again.
+
+\section{Uniform Posteriors}
+
+Suppose your model includes a parameter $\psi$ that is defined on
+$[0,1]$ and is given a flat prior $\distro{Uniform}(\psi|0,1)$. Such a
+model is guaranteed to have a proper posterior for $\psi$ no matter
+what the data looks like. But suppose the data don't tell us anything
+about $\psi$, so that our posterior is also
+$\distro{Uniform}(\psi|0,1)$. 
+
+In this situation, where a posterior is uniform over a closed
+interval, the posterior is proper.  In the case of a uniform posterior
+on $[0,1]$, the posterior mean for $\psi$ is well-defined with value
+$1/2$.  Although there is no posterior mode, posterior predictive
+inference may nevertheless do the right thing by simply integrating
+(i.e., averaging) over the predictions for $\psi$ at all points in
+$[0,1]$.
+
+
+
+
+
+\section{Sampling Difficulties with Problematic Priors}
 
 With an improper posterior, it is theoretically impossible to properly
 explore the posterior. However, Gibbs sampling as performed by BUGS
@@ -5461,97 +5750,7 @@ outputs are the following.
 \end{itemize}
 
 
-\section{What can Go Wrong with Proper Posteriors}
 
-\subsection{Multimodal Posteriors}
-
-Even with proper priors, the normal mixture model discussed earlier
-will have a posterior $p(\theta,\mu_1,\mu_2,\sigma|y)$ that can be
-difficult in practice due to multiple modes that swap the indexes and
-value of $\theta$. The model is not identified in any real sense.
-
-Theoretically, this should not present a problem for inference because
-all of the integrals involved in posterior predictive inference will
-be well behaved. The problem in practice is computation. Even if the
-posterior is proper, MCMC samplers are notoriously ineffective at
-exploring multiple modes efficiently, especially when the number of
-modes grows exponentially as it does for mixture models with
-increasing numbers of components. In Gibbs sampling, it is unlikely
-for $\mu_1$ to move to a new mode when sampled conditioned on the
-current values of $\mu_2$ and $\theta$. For HMC and NUTS, the problem
-is that the sampler gets stuck in one of the two ``bowls'' arounds the
-modes and cannot gather enough energy from random momentum assignment
-to move from one mode to another.
-
-Supposing a sample could adequately explore multiple posterior modes, 
-a further complication arises due to the fact that posterior means and
-standard deviations provide poor summaries of the posterior, thus
-complicating issues such as convergence monitoring and effective
-sample size estimation.
-
-One possibility for dealing with multimodal posteriors that arise from
-label switching in mixture models is to somehow define an ordering on
-the values, such as requiring $\mu_1 < \mu_2$. This can be achieved
-with Stan's constraint language, but can lead to estimation bias if
-the posterior uncertainty of $\mu_1$ overlaps with that of $\mu_2$. In
-other cases, such as a discrimination parameter $\delta_j$ in an
-item-response theory model, restricting $\delta_j > 0$ can solve the
-identifiability problem.
-
-
-\subsection{Posteriors with Unbounded Densities}
-
-In some cases, the posterior density grows without bounds as
-parameters approach certain poles or boundaries. In thse cases, there
-are no maximum likelihood estimates. One such example is a binary
-mixture model with scales varying by component, $\sigma_1$ and
-$\sigma_2$ for locations $\mu_1$ and $\mu_2$. In this situation, the
-density grows without bound as $\sigma_1 \rightarrow 0$ and $\mu_1
-\rightarrow y_n$ for some $n$; that is, one of the mixture components
-concentrates all of its mass around a single data item $y_n$.
-
-Another example of unbounded densities arises with a posterior such as
-$\distro{Beta}(\phi|0.5,0.5)$, which can arise if very ``weak'' beta
-priors are used for groups that have no data. This density is
-unbounded as $\phi \rightarrow 0$ and $\phi \rightarrow 1$. Similarly,
-a Bernoulli likelihood model coupled with a ``weak'' beta prior, leads
-to a posterior
-%
-\begin{eqnarray*}
-p(\phi|y) 
-& \propto & \textstyle
-\distro{Beta}(\phi|0.5,0.5) \times \prod_{n=1}^N \distro{Bernoulli}(y_n|\phi)
-\\[4pt]
-& = &\textstyle
-\distro{Beta}(\phi \, | \, 0.5 + \sum_{n=1}^N y_n, \ \ 0.5 + N - \sum_{n=1}^N y_n).
-\end{eqnarray*}
-%
-If $N = 10$ and each $y_n = 1$, the posterior is
-$\distro{Beta}(\phi|10.5,0,5)$, which is unbounded as $\phi
-\rightarrow 1$.
-
-Because the posterior is proper even in these cases (i.e., the
-posterior mass does not grow without bound), Bayesian inference can
-often overcome the difficulty with maximum likelihood inference and
-calculate proper posterior means. In other cases, when the unbounded
-posterior modes are attractive enough, the simulated particle falls
-down an infinitely deep well corresponding to unbounded negative log
-posterior density and never gains enough random kinetic energy in
-future iterations to climb back out again.
-
-\subsection{Uniform Posteriors}
-
-Suppose your model includes a parameter $\psi$ that is defined on
-$[0,1]$ and is given a flat prior $\distro{Uniform}(\psi|0,1)$. Such a
-model is guaranteed to have a proper posterior for $\psi$ no matter
-what the data looks like. But suppose the data don't tell us anything
-about $\psi$, so that our posterior is also
-$\distro{Uniform}(\psi|0,1)$. The maximum likelihood estimate is ill
-defined, but the Bayesian posterior is proper. The posterior mean for
-$\psi$ is well defined at $1/2$, but the model still feels
-non-identified. Nevertheless, posterior predictive inference may do
-the right thing by simply integrating (i.e., averaging) over the
-predictions for $\psi$ at all points in $[0,1]$.
 
 
 \section{Weak Identification}

@@ -13,6 +13,34 @@ loc_sum_prior <- function(lambda1,lambda2) {
   sum(dnorm(c(lambda1,lambda2),0,1,log=TRUE));
 }
 
+one_param <- function(xs) {  
+  dta <- rnorm(100,0,1);
+  result <- rep(NA, length(xs));
+  i <- 1;
+  for (x in xs) {
+    result[i] <- sum(dnorm(dta,xs[i],1,log=TRUE));
+    i <- i + 1;
+  } 
+  return(result);
+}
+p_one_param <-
+  ggplot(data.frame(mu=c(-20, 20)), aes(mu)) +
+  labs(title = "Proper Posterior (without Prior)\n") + 
+  stat_function(fun=one_param) +
+  labs(x=expression(mu), y="log p") +
+  theme(aspect.ratio=1,
+        panel.border=element_blank(),
+        plot.margin=unit(c(0,0,0,0),"cm"),
+        text=element_text(size=28),
+        axis.title=element_text(size=32));
+png(res=100,height=800,width=900,file="one_param_identified.png");
+print(p_one_param);
+dev.off();
+
+
+
+
+
 K <- 500;
 ub <- 25;
 lambda_1 <- seq(-ub,ub,len=K);
