@@ -28,7 +28,7 @@ namespace stan {
         
       }
 
-      void print(std::ostream* s, int depth, const char prefix) {
+      void print(std::ostream* s, int depth, const std::string prefix) {
         valued_argument::print(s, depth, prefix);
         _values.at(_cursor)->print(s, depth + 1, prefix);
       }
@@ -106,7 +106,7 @@ namespace stan {
           _cursor = i;
           
           s << "good" << std::endl;
-          base_arg->print(&s, 0, '\0');
+          base_arg->print(&s, 0, "");
           s << std::endl;
 
           _values.at(i)->probe_args(base_arg, s);
@@ -115,7 +115,7 @@ namespace stan {
         _values.push_back(new arg_fail);
         _cursor = _values.size() - 1;
         s << "bad" << std::endl;
-        base_arg->print(&s, 0, '\0');
+        base_arg->print(&s, 0, "");
         s << std::endl;
         
         _values.pop_back();

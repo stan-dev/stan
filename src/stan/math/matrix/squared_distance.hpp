@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__MATRIX__SQUARED_DIST_HPP__
-#define __STAN__MATH__MATRIX__SQUARED_DIST_HPP__
+#ifndef __STAN__MATH__MATRIX__SQUARED_DISTANCE_HPP__
+#define __STAN__MATH__MATRIX__SQUARED_DISTANCE_HPP__
 
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/validate_vector.hpp>
@@ -18,11 +18,11 @@ namespace stan {
      * size or if they are both not vector dimensioned.
      */
     template<int R1,int C1,int R2, int C2>
-    inline double squared_dist(const Eigen::Matrix<double, R1, C1>& v1, 
-                               const Eigen::Matrix<double, R2, C2>& v2) {
-      validate_vector(v1,"squared_dist");
-      validate_vector(v2,"squared_dist");
-      validate_matching_sizes(v1,v2,"squared_dist");
+    inline double squared_distance(const Eigen::Matrix<double, R1, C1>& v1, 
+                                   const Eigen::Matrix<double, R2, C2>& v2) {
+      validate_vector(v1,"squared_distance");
+      validate_vector(v2,"squared_distance");
+      validate_matching_sizes(v1,v2,"squared_distance");
       if (v1.rows() != v2.rows())
         return (v1.transpose()-v2).squaredNorm();
       else

@@ -1,5 +1,5 @@
-#ifndef __STAN__AGRAD__REV__MATRIX__SQUARED_DIST_HPP__
-#define __STAN__AGRAD__REV__MATRIX__SQUARED_DIST_HPP__
+#ifndef __STAN__AGRAD__REV__MATRIX__SQUARED_DISTANCE_HPP__
+#define __STAN__AGRAD__REV__MATRIX__SQUARED_DISTANCE_HPP__
 
 #include <vector>
 #include <stan/math/matrix/Eigen.hpp>
@@ -14,14 +14,14 @@
 namespace stan {
   namespace agrad {
     namespace {
-      class squared_dist_vv_vari : public vari {
+      class squared_distance_vv_vari : public vari {
       protected:
         vari** v1_;
         vari** v2_;
         size_t length_;
         
         template<int R1,int C1,int R2,int C2>
-        inline static double var_squared_dist(const Eigen::Matrix<var,R1,C1> &v1,
+        inline static double var_squared_distance(const Eigen::Matrix<var,R1,C1> &v1,
                                               const Eigen::Matrix<var,R2,C2> &v2) {
           double result = 0;
           for (typename Eigen::Matrix<var,R1,C1>::size_type i = 0;
@@ -33,9 +33,9 @@ namespace stan {
         }
       public:
         template<int R1,int C1,int R2,int C2>
-        squared_dist_vv_vari(const Eigen::Matrix<var,R1,C1> &v1,
+        squared_distance_vv_vari(const Eigen::Matrix<var,R1,C1> &v1,
                              const Eigen::Matrix<var,R2,C2> &v2) 
-        : vari(var_squared_dist(v1, v2)), length_(v1.size())
+        : vari(var_squared_distance(v1, v2)), length_(v1.size())
         {
           v1_ = (vari**)memalloc_.alloc(length_*sizeof(vari*));
           for (size_t i = 0; i < length_; i++)
@@ -53,14 +53,14 @@ namespace stan {
           }
         }
       };
-      class squared_dist_vd_vari : public vari {
+      class squared_distance_vd_vari : public vari {
       protected:
         vari** v1_;
         double* v2_;
         size_t length_;
         
         template<int R1,int C1,int R2,int C2>
-        inline static double var_squared_dist(const Eigen::Matrix<var,R1,C1> &v1,
+        inline static double var_squared_distance(const Eigen::Matrix<var,R1,C1> &v1,
                                               const Eigen::Matrix<double,R2,C2> &v2) {
           double result = 0;
           for (typename Eigen::Matrix<var,R1,C1>::size_type i = 0; 
@@ -72,9 +72,9 @@ namespace stan {
         }
       public:
         template<int R1,int C1,int R2,int C2>
-        squared_dist_vd_vari(const Eigen::Matrix<var,R1,C1> &v1,
+        squared_distance_vd_vari(const Eigen::Matrix<var,R1,C1> &v1,
                              const Eigen::Matrix<double,R2,C2> &v2) 
-        : vari(var_squared_dist(v1, v2)), length_(v1.size())
+        : vari(var_squared_distance(v1, v2)), length_(v1.size())
         {
           v1_ = (vari**)memalloc_.alloc(length_*sizeof(vari*));
           for (size_t i = 0; i < length_; i++)
@@ -93,28 +93,28 @@ namespace stan {
     }
     
     template<int R1,int C1,int R2, int C2>
-    inline var squared_dist(const Eigen::Matrix<var, R1, C1>& v1, 
+    inline var squared_distance(const Eigen::Matrix<var, R1, C1>& v1, 
                             const Eigen::Matrix<var, R2, C2>& v2) {
-      stan::math::validate_vector(v1,"squared_dist");
-      stan::math::validate_vector(v2,"squared_dist");
-      stan::math::validate_matching_sizes(v1,v2,"squared_dist");
-      return var(new squared_dist_vv_vari(v1,v2));
+      stan::math::validate_vector(v1,"squared_distance");
+      stan::math::validate_vector(v2,"squared_distance");
+      stan::math::validate_matching_sizes(v1,v2,"squared_distance");
+      return var(new squared_distance_vv_vari(v1,v2));
     }
     template<int R1,int C1,int R2, int C2>
-    inline var squared_dist(const Eigen::Matrix<var, R1, C1>& v1, 
+    inline var squared_distance(const Eigen::Matrix<var, R1, C1>& v1, 
                             const Eigen::Matrix<double, R2, C2>& v2) {
-      stan::math::validate_vector(v1,"squared_dist");
-      stan::math::validate_vector(v2,"squared_dist");
-      stan::math::validate_matching_sizes(v1,v2,"squared_dist");
-      return var(new squared_dist_vd_vari(v1,v2));
+      stan::math::validate_vector(v1,"squared_distance");
+      stan::math::validate_vector(v2,"squared_distance");
+      stan::math::validate_matching_sizes(v1,v2,"squared_distance");
+      return var(new squared_distance_vd_vari(v1,v2));
     }
     template<int R1,int C1,int R2, int C2>
-    inline var squared_dist(const Eigen::Matrix<double, R1, C1>& v1, 
+    inline var squared_distance(const Eigen::Matrix<double, R1, C1>& v1, 
                             const Eigen::Matrix<var, R2, C2>& v2) {
-      stan::math::validate_vector(v1,"squared_dist");
-      stan::math::validate_vector(v2,"squared_dist");
-      stan::math::validate_matching_sizes(v1,v2,"squared_dist");
-      return var(new squared_dist_vd_vari(v2,v1));
+      stan::math::validate_vector(v1,"squared_distance");
+      stan::math::validate_vector(v2,"squared_distance");
+      stan::math::validate_matching_sizes(v1,v2,"squared_distance");
+      return var(new squared_distance_vd_vari(v2,v1));
     }
   }
 }

@@ -73,6 +73,8 @@ struct run_command_output {
   long time;
   int err_code;
   bool hasError;
+  std::string header;
+  std::string body;
 
   run_command_output(const std::string command,
                      const std::string output,
@@ -82,25 +84,39 @@ struct run_command_output {
       output(output),
       time(time),
       err_code(err_code),
-      hasError(err_code != 0)
-  { }
+      hasError(err_code != 0),
+      header(),
+      body()
+  { 
+    size_t end_of_header = output.find("\n\n");
+    if (end_of_header == std::string::npos)
+      end_of_header = 0;
+    else
+      end_of_header += 2;
+    header = output.substr(0, end_of_header);
+    body = output.substr(end_of_header);
+  }
   
   run_command_output() 
     : command(),
       output(),
       time(0),
       err_code(0),
-      hasError(false)
+      hasError(false),
+      header(),
+      body()
       { }
 };
 
 std::ostream& operator<<(std::ostream& os, const run_command_output& out) {
-  os << "run_command output:" << std::endl
-     << "  command:   " << out.command << std::endl
-     << "  output:    " << out.output << std::endl
-     << "  time (ms): " << out.time << std::endl
-     << "  err_code:  " << out.err_code << std::endl
-     << "  hasError:  " << (out.hasError ? "true" : "false") << std::endl;
+  os << "run_command output:" << "\n"
+     << "  command:   " << out.command << "\n"
+     << "  output:    " << out.output << "\n"
+     << "  time (ms): " << out.time << "\n"
+     << "  err_code:  " << out.err_code << "\n"
+     << "  hasError:  " << (out.hasError ? "true" : "false") << "\n"
+     << "  header:    " << out.header << "\n"
+     << "  body:      " << out.body << std::endl;
   return os;
 }
 
