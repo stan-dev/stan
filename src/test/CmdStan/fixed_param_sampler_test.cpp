@@ -69,3 +69,32 @@ TEST(McmcFixedParamSampler, check_empty) {
   EXPECT_EQ(success, true);
   
 }
+
+TEST(McmcFixedParamSampler, check_empty_but_algorithm_not_fixed_param) {
+  
+  std::vector<std::string> model_path;
+  model_path.push_back("src");
+  model_path.push_back("test");
+  model_path.push_back("test-models");
+  model_path.push_back("compiled");
+  model_path.push_back("CmdStan");
+  model_path.push_back("empty");
+  
+  std::string command = convert_model_path(model_path);
+  command += " sample output file=" + convert_model_path(model_path) + ".csv";
+  run_command_output command_output;
+  
+  bool success = true;
+  
+  try {
+    command_output = run_command(command);
+  } catch(...) {
+    success = false;
+  }
+
+  EXPECT_EQ(success, true);
+  EXPECT_NE(0, command_output.err_code);
+  char const * errmsg =
+    "Must use algorithm=fixed_param for model that has no parameters";
+  EXPECT_NE(std::string::npos, command_output.output.find(errmsg));  
+}

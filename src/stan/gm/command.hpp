@@ -358,7 +358,7 @@ namespace stan {
       //////////////////////////////////////////////////
       
       Model model(data_var_context, &std::cout);
-      
+
       Eigen::VectorXd cont_params = Eigen::VectorXd::Zero(model.num_params_r());
 
       if (output_stream) {
@@ -804,6 +804,13 @@ namespace stan {
                                       parser.arg("method")->arg("sample")->arg("adapt"));
         bool adapt_engaged = dynamic_cast<bool_argument*>(adapt->arg("engaged"))->value();
         
+	if (model.num_params_r() == 0 && algo->value() != "fixed_param") {
+	  std::cout
+	    << "Must use algorithm=fixed_param for model that has no parameters."
+	    << std::endl;
+	  return -1;
+	}      
+
         if (algo->value() == "fixed_param") {
           
           sampler_ptr = new stan::mcmc::fixed_param_sampler();
