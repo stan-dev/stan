@@ -241,6 +241,9 @@ clean:
 
 clean-dox:
 	$(RM) -r doc/api
+  
+clean-stat:
+	cd src/test/test-models/compiled/stat-validity; $(RM) *.csv *.o *.cpp
 
 clean-manual:
 	cd src/docs/stan-reference; $(RM) *.brf *.aux *.bbl *.blg *.log *.toc *.pdf *.out *.idx *.ilg *.ind *.cb *.cb2 *.upa
