@@ -1,4 +1,4 @@
- #ifndef __STAN__GM__COMMAND_HPP__
+#ifndef __STAN__GM__COMMAND_HPP__
 #define __STAN__GM__COMMAND_HPP__
 
 #include <fstream>
