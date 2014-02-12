@@ -217,6 +217,7 @@ test/CmdStan/command.o: \
                $(addsuffix $(EXE), printer domain_fail value_fail proper))
 test/CmdStan/gm/argument_configuration.o: src/test/test-models/compiled/CmdStan/test_model$(EXE)
 test/CmdStan/fixed_param_sampler.o: src/test/test-models/compiled/CmdStan/empty$(EXE) src/test/test-models/compiled/CmdStan/proper$(EXE)
+test/CmdStan/optimization_output.o: src/test/test-models/compiled/CmdStan/optimization_output$(EXE)
 
 ##
 # CmdStan specific targets. Should be removed in the future.

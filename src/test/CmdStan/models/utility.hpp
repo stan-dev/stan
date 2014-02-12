@@ -110,13 +110,13 @@ struct run_command_output {
 
 std::ostream& operator<<(std::ostream& os, const run_command_output& out) {
   os << "run_command output:" << "\n"
-     << "  command:   " << out.command << "\n"
-     << "  output:    " << out.output << "\n"
-     << "  time (ms): " << out.time << "\n"
-     << "  err_code:  " << out.err_code << "\n"
-     << "  hasError:  " << (out.hasError ? "true" : "false") << "\n"
-     << "  header:    " << out.header << "\n"
-     << "  body:      " << out.body << std::endl;
+     << "- command:   " << out.command << "\n"
+     << "- output:    " << out.output << "\n"
+     << "- time (ms): " << out.time << "\n"
+     << "- err_code:  " << out.err_code << "\n"
+     << "- hasError:  " << (out.hasError ? "true" : "false") << "\n"
+     << "- header:    " << out.header << "\n"
+     << "- body:      " << out.body << std::endl;
   return os;
 }
 

@@ -703,7 +703,6 @@ namespace stan {
           }
           return_code = error_codes::OK;
         } else if (algo->value() == "newton") {
-          
           std::vector<double> gradient;
           try {
             lp = model.template log_prob<false, false>(cont_vector, disc_vector, &std::cout);
@@ -718,8 +717,9 @@ namespace stan {
                             lp, cont_vector, disc_vector);
           }
 
-          double lastlp = lp - 1;
+          double lastlp = lp * 1.1;
           int m = 0;
+          std::cout << "(lp - lastlp) / lp > 1e-8: " << ((lp - lastlp) / fabs(lp)) << std::endl;
           while ((lp - lastlp) / fabs(lp) > 1e-8) {
             
             lastlp = lp;
