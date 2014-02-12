@@ -875,7 +875,7 @@ In addition to standard \HMC, \Stan implements an adaptive version of
 tunes a step sizes during warmup.  A global step size is optimized for
 a target Metropolis-Hastings reject rate using dual averaging; see
 \citep{Nesterov:2009} for details of dual averaging and
-\citep{Hoffman-Gelman:2011,Hoffman-Gelman:2013} 
+\citep{Hoffman-Gelman:2011,Hoffman-Gelman:2014} 
 for details of its use in \Stan.  For
 information on run-time configuration of step-size adaptation, see
 \refsection{stan-command-line-options}.  Then step sizes per parameter
@@ -898,7 +898,7 @@ out; see \refchapter{mixture-modeling} for examples.
 \HMC uses a Metropolis rejection step to ensure detailed balance of
 the resulting Markovian system; for details, see \citep{Neal:2011}.
 \NUTS uses a form of slice sampling which guarantees detailed balance;
-for details, see \citep{Hoffman-Gelman:2011,Hoffman-Gelman:2013}.%
+for details, see \citep{Hoffman-Gelman:2011,Hoffman-Gelman:2014}.%
 %
 \footnote{A transition density $\phi(\omega'|\omega)$ and density
   $\pi(\omega)$ over state space $\Omega$ satisfy detailed balance if
@@ -1114,7 +1114,7 @@ p_Y(y)
 \]
 
 
-\section{Lower and Upper Bounded Scalar}
+\section{Lower and Upper Bounded Scalar}\label{logit-transform-jacobian.section}
 
 For lower and upper-bounded variables, \Stan uses a scaled and
 translated log-odds transform.

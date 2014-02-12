@@ -142,14 +142,14 @@ discretization of the Hamiltonian and the total number of steps taken
 per iteration (with their product determining total simulation time).
 \Stan can be configured with a user-specified step size or it can
 estimate an optimal step size during warmup using dual averaging
-\citep{Nesterov:2009, Hoffman-Gelman:2011, Hoffman-Gelman:2013}.  
+\citep{Nesterov:2009, Hoffman-Gelman:2011, Hoffman-Gelman:2014}.  
 In either case, additional randomization may be applied to draw the 
 step size from an interval of possible step sizes \citep{Neal:2011}.
 
 \Stan can be set to use a specified number of steps, or it can
 automatically adapt the number of steps during sampling using the
 No-U-Turn (\NUTS) sampler 
-\citep{Hoffman-Gelman:2011, Hoffman-Gelman:2013}.  
+\citep{Hoffman-Gelman:2011, Hoffman-Gelman:2014}.  
 
 The third tuning parameter is a mass matrix for the fictional
 particle.  \Stan can be configured to estimate a diagonal mass matrix
