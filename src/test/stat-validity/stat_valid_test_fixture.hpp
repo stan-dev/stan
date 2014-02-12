@@ -58,7 +58,7 @@ public:
     if (has_data()) command << " data file=" << model_path << ".data.R";
     if (has_init()) command << " init=" << model_path << ".init.R";
     command << " output file=" << get_csv_file(chain)
-            << " refresh=" << num_samples();
+            << " refresh=0";
     return command.str();
   }
 
@@ -78,7 +78,8 @@ public:
       std::string command = get_command(chain);
       
       std::stringstream method;
-      method << " sample"
+      method << " sample "
+             << misc_sample_options()
              << " num_samples=" << num_samples()
              << " num_warmup=" << num_warmup();
       
@@ -121,6 +122,7 @@ public:
   static bool has_init()   { return Derived::has_init();    }
   static int num_warmup()  { return Derived::num_warmup();  }
   static int num_samples() { return Derived::num_samples(); }
+  static std::string misc_sample_options() { return Derived::misc_sample_options(); }
   
   static std::vector<std::pair<std::string, double> >
   get_expected_values() { return Derived::get_expected_values(); }

@@ -23,6 +23,7 @@ public:
   static bool has_init() { return false; }
   static int num_warmup() { return 1000; }
   static int num_samples() { return 1000; }
+  static std::string misc_sample_options() { return ""; }
 
   static std::vector<std::pair<std::string, double> >
   get_expected_values() {

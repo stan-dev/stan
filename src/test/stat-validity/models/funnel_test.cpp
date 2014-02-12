@@ -21,8 +21,11 @@ public:
 
   static bool has_data() { return false; }
   static bool has_init() { return false; }
-  static int num_warmup() { return 500; }
-  static int num_samples() { return 50000; }
+  static int num_warmup() { return 1000; }
+  static int num_samples() { return 10000; }
+  static std::string misc_sample_options() {
+    return "adapt engaged=0 algorithm=hmc stepsize=0.01 engine=nuts max_depth=15";
+  }
 
   static std::vector<std::pair<std::string, double> >
   get_expected_values() {
