@@ -1,4 +1,4 @@
- #ifndef __STAN__GM__COMMAND_HPP__
+#ifndef __STAN__GM__COMMAND_HPP__
 #define __STAN__GM__COMMAND_HPP__
 
 #include <fstream>
@@ -38,6 +38,30 @@
 namespace stan {
 
   namespace gm {
+
+    void write_iteration_csv(std::ostream& output_stream,
+                             const double lp,
+                             const std::vector<double>& model_values) {
+      output_stream << lp;
+      for (size_t i = 0; i < model_values.size(); ++i) {
+        output_stream << "," << model_values.at(i);
+      }
+      output_stream << std::endl;
+    }
+
+    template <class Model, class RNG>
+    void write_iteration(std::ostream& output_stream,
+                         Model& model,
+                         RNG& base_rng,
+                         double lp,
+                         std::vector<double>& cont_vector,
+                         std::vector<int>& disc_vector) {
+      std::vector<double> model_values;
+      model.write_array(base_rng, cont_vector, disc_vector, model_values,
+                        true, true, &std::cout);
+      write_iteration_csv(output_stream, lp, model_values);
+    }
+    
 
     void write_stan(std::ostream* s, const std::string prefix = "") {
       if (!s) return;
@@ -611,7 +635,6 @@ namespace stan {
       //////////////////////////////////////////////////
       
       if (parser.arg("method")->arg("optimize")) {
-        
         std::vector<double> cont_vector(cont_params.size());
         for (int i = 0; i < cont_params.size(); ++i)
           cont_vector.at(i) = cont_params(i);
@@ -628,8 +651,15 @@ namespace stan {
                                          ->arg("optimize")
                                          ->arg("save_iterations"))->value();
         if (output_stream) {
-          *output_stream << "lp__,";
-          model.write_csv_header(*output_stream);
+          std::vector<std::string> names;
+          names.push_back("lp__");
+          model.constrained_param_names(names,true,true);
+
+          (*output_stream) << names.at(0);
+          for (size_t i = 1; i < names.size(); ++i) {
+            (*output_stream) << "," << names.at(i);
+          }
+          (*output_stream) << std::endl;
         }
 
         double lp(0);
@@ -647,10 +677,8 @@ namespace stan {
           double lastlp = lp - 1;
           std::cout << "Initial log joint probability = " << lp << std::endl;
           if (output_stream && save_iterations) {
-            *output_stream << lp << ',';
-            model.write_csv(base_rng, cont_vector, disc_vector,
-                            *output_stream, &std::cout);
-            output_stream->flush();
+            write_iteration(*output_stream, model, base_rng,
+                            lp, cont_vector, disc_vector);
           }
 
           int m = 0;
@@ -668,16 +696,13 @@ namespace stan {
             }
             m++;
             if (output_stream && save_iterations) {
-              *output_stream << lp << ',';
-              model.write_csv(base_rng, cont_vector, disc_vector,
-                              *output_stream, &std::cout);
-              output_stream->flush();
+              write_iteration(*output_stream, model, base_rng,
+                              lp, cont_vector, disc_vector);
             }
 
           }
           return_code = error_codes::OK;
         } else if (algo->value() == "newton") {
-          
           std::vector<double> gradient;
           try {
             lp = model.template log_prob<false, false>(cont_vector, disc_vector, &std::cout);
@@ -688,14 +713,13 @@ namespace stan {
           
           std::cout << "initial log joint probability = " << lp << std::endl;
           if (output_stream && save_iterations) {
-            *output_stream << lp << ',';
-            model.write_csv(base_rng, cont_vector, disc_vector,
-                            *output_stream, &std::cout);
-            output_stream->flush();
+            write_iteration(*output_stream, model, base_rng,
+                            lp, cont_vector, disc_vector);
           }
 
-          double lastlp = lp - 1;
+          double lastlp = lp * 1.1;
           int m = 0;
+          std::cout << "(lp - lastlp) / lp > 1e-8: " << ((lp - lastlp) / fabs(lp)) << std::endl;
           while ((lp - lastlp) / fabs(lp) > 1e-8) {
             
             lastlp = lp;
@@ -709,9 +733,8 @@ namespace stan {
             m++;
 
             if (output_stream && save_iterations) {
-              *output_stream << lp << ',';
-              model.write_csv(base_rng, cont_vector, disc_vector,
-                              *output_stream, &std::cout);
+              write_iteration(*output_stream, model, base_rng,
+                              lp, cont_vector, disc_vector);
             }
             
           }
@@ -734,10 +757,8 @@ namespace stan {
           
           std::cout << "initial log joint probability = " << lp << std::endl;
           if (output_stream && save_iterations) {
-            *output_stream << lp << ',';
-            model.write_csv(base_rng, cont_vector, disc_vector,
-                            *output_stream, &std::cout);
-            output_stream->flush();
+            write_iteration(*output_stream, model, base_rng,
+                            lp, cont_vector, disc_vector);
           }
 
           int ret = 0;
@@ -778,10 +799,8 @@ namespace stan {
             }
             
             if (output_stream && save_iterations) {
-              *output_stream << lp << ',';
-              model.write_csv(base_rng, cont_vector, disc_vector,
-                              *output_stream, &std::cout);
-              output_stream->flush();
+              write_iteration(*output_stream, model, base_rng,
+                              lp, cont_vector, disc_vector);
             }
           }
           
@@ -799,10 +818,8 @@ namespace stan {
         }
 
         if (output_stream) {
-          *output_stream << lp << ',';
-          model.write_csv(base_rng, cont_vector, disc_vector,
-                          *output_stream, &std::cout);
-          output_stream->flush();
+          write_iteration(*output_stream, model, base_rng,
+                          lp, cont_vector, disc_vector);
           output_stream->close();
           delete output_stream;
         }
