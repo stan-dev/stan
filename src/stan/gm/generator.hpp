@@ -787,7 +787,7 @@ namespace stan {
           o_ << "\");" << EOL;
         }
         generate_indent(indents_ + x.dims_.size(),o_);
-        o_ << "} catch (std::domain_error& e) { "
+        o_ << "} catch (const std::exception& e) { "
            << EOL;
         generate_indent(indents_ + x.dims_.size() + 1, o_);
         o_ << "throw std::domain_error(std::string(\"Invalid value of " << x.name_ << ": \") + std::string(e.what()));"
@@ -820,7 +820,7 @@ namespace stan {
         generate_loop_var(x.name_,x.dims_.size());
         o_ << ",\"";
         generate_loop_var(x.name_,x.dims_.size());
-        o_ << "\"); } catch (std::domain_error& e) { throw std::domain_error(std::string(\"Invalid value of " << x.name_ << ": \") + std::string(e.what())); };" << EOL;
+        o_ << "\"); } catch (const std::exception& e) { throw std::domain_error(std::string(\"Invalid value of " << x.name_ << ": \") + std::string(e.what())); };" << EOL;
         generate_end_for_dims(x.dims_.size());
       }
       void operator()(unit_vector_var_decl const& x) const {
@@ -2458,7 +2458,7 @@ namespace stan {
         generate_dims_loop_fwd(dims);
         o_ << "try { writer__." << write_method_name;
         generate_name_dims(var_name,dims.size());
-        o_ << "); } catch (std::exception& e) { "
+        o_ << "); } catch (const std::exception& e) { "
               " throw std::runtime_error(std::string(\"Error transforming variable "
            << var_name << ": \") + e.what()); }" << EOL;
       }
@@ -3939,7 +3939,7 @@ namespace stan {
       out << INDENT << "try {" << EOL;
       out << INDENT2 << "return stan::gm::command<" << model_name 
           << "_namespace::" << model_name << ">(argc,argv);" << EOL;
-      out << INDENT << "} catch (std::exception& e) {" << EOL;
+      out << INDENT << "} catch (const std::exception& e) {" << EOL;
       out << INDENT2 
           << "std::cerr << std::endl << \"Exception: \" << e.what() << std::endl;" 
           << EOL;

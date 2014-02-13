@@ -171,6 +171,10 @@ add("cumulative_sum", VECTOR_T, VECTOR_T);
 add("cumulative_sum", ROW_VECTOR_T, ROW_VECTOR_T);
 add("determinant",DOUBLE_T,MATRIX_T);
 add("diag_matrix",MATRIX_T,VECTOR_T);
+add("diag_post_multiply",MATRIX_T, MATRIX_T,VECTOR_T);
+add("diag_post_multiply",MATRIX_T, MATRIX_T,ROW_VECTOR_T);
+add("diag_pre_multiply",MATRIX_T, VECTOR_T,MATRIX_T);
+add("diag_pre_multiply",MATRIX_T, ROW_VECTOR_T,MATRIX_T);
 add("diagonal",VECTOR_T,MATRIX_T);
 add_unary("digamma");
 // dims() is polymorphic by size
@@ -183,10 +187,10 @@ for (size_t i = 0; i < 8; ++i) {
 }
 add("dirichlet_log",DOUBLE_T,VECTOR_T,VECTOR_T);
 add("dirichlet_rng",VECTOR_T,VECTOR_T);
-add("dist",DOUBLE_T,VECTOR_T,VECTOR_T);
-add("dist",DOUBLE_T,ROW_VECTOR_T,ROW_VECTOR_T);
-add("dist",DOUBLE_T,VECTOR_T,ROW_VECTOR_T);
-add("dist",DOUBLE_T,ROW_VECTOR_T,VECTOR_T);
+add("distance",DOUBLE_T,VECTOR_T,VECTOR_T);
+add("distance",DOUBLE_T,ROW_VECTOR_T,ROW_VECTOR_T);
+add("distance",DOUBLE_T,VECTOR_T,ROW_VECTOR_T);
+add("distance",DOUBLE_T,ROW_VECTOR_T,VECTOR_T);
 add("divide",DOUBLE_T,DOUBLE_T,DOUBLE_T);
 add("divide",VECTOR_T,VECTOR_T,DOUBLE_T);
 add("divide",ROW_VECTOR_T,ROW_VECTOR_T,DOUBLE_T);
@@ -690,6 +694,10 @@ add("sort_desc",expr_type(INT_T,1),expr_type(INT_T,1));
 add("sort_desc",expr_type(DOUBLE_T,1),expr_type(DOUBLE_T,1));
 add("sort_desc",VECTOR_T,VECTOR_T);
 add("sort_desc",ROW_VECTOR_T,ROW_VECTOR_T);
+add("squared_distance",DOUBLE_T,VECTOR_T,VECTOR_T);
+add("squared_distance",DOUBLE_T,ROW_VECTOR_T,ROW_VECTOR_T);
+add("squared_distance",DOUBLE_T,VECTOR_T,ROW_VECTOR_T);
+add("squared_distance",DOUBLE_T,ROW_VECTOR_T,VECTOR_T);
 add_unary("sqrt");
 add_nullary("sqrt2");
 add_unary("square");
