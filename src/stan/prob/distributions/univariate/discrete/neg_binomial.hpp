@@ -721,6 +721,34 @@ namespace stan {
       return stan::prob::poisson_rng(stan::prob::gamma_rng(alpha,1.0 / beta,
                                                            rng),rng);
     }
+
+    template <class RNG>
+    inline int
+    neg_binomial_log_rng(const double eta,
+                     const double phi,
+                     RNG& rng) {
+      using boost::variate_generator;
+      using boost::random::negative_binomial_distribution;
+
+      static const char* function = "stan::prob::neg_binomial_rng(%1%)";
+
+      using stan::math::check_finite;
+      using stan::math::check_positive;
+
+      if (!check_finite(function, eta, "Log-location parameter"))
+        return 0;
+      if (!check_finite(function, phi, "Inverse scale parameter"))
+        return 0;
+      if (!check_positive(function, phi, "Inverse scale parameter"))
+        return 0;
+
+        return stan::prob::poisson_rng(stan::prob::gamma_rng(phi,phi/std::exp(eta),
+                                                           rng),rng);
+
+      //variate_generator<RNG&, negative_binomial_distribution<> >
+      //  negative_binomial_rng(rng, negative_binomial_distribution<>(phi, phi/(phi+std::exp(eta))));
+      //return negative_binomial_rng();
+    }
   }
 }
 #endif
