@@ -383,7 +383,7 @@ First, matrices use a bit less memory than two-dimensional arrays.
 This is because they don't store a sequence of arrays, but just the
 data and the two dimensions.  
 
-Second, matrices store their data in row-major order.  Furthermore,
+Second, matrices store their data in column-major order.  Furthermore,
 all of the data in a matrix is guaranteed to be contiguous in memory.
 This is an important consideration for optimized code because bringing
 in data from memory to cache is much more expensive than performing
@@ -406,7 +406,8 @@ for (n in 1:N)
 \end{Verbatim}
 \end{quote}
 %
-Arrays, on the other hand, should be traversed in row-major order.
+Arrays, on the other hand, should be traversed in row-major (or
+first-index fastest) order.%
 %
 \begin{quote}
 \begin{Verbatim}
@@ -420,6 +421,21 @@ for (m in 1:M)
 %
 The first use of \code{a[m,n]} should bring \code{a[m]} into memory.
 Overall, traversing matrices is more efficient than traversing arrays.
+
+This is true even for arrays of matrices.  For example, the ideal
+order in which to traverse a two-dimensional array of matrices is
+%
+\begin{quote}
+\begin{Verbatim}
+matrix[M,N] b[I,J];
+...
+for (i in 1:I)
+  for (j in 1:J)
+    for (n in 1:N)
+      for (m in 1:M)
+        ... do someting with b[i,j,m,n] ...
+\end{Verbatim}
+\end{quote}
 
 If \code{a} is a matrix, the notation \code{a[m]} picks out row
 \code{m} of that matrix.  This is a rather inefficient operation for
@@ -3101,7 +3117,7 @@ providing paired binomial data for a treatment and control group.  For
 instance, the data might be post-surgical pain reduction under a treatment
 of ibuprofen \citep{WarnThompsonSpiegelhalter:2002} or mortality after
 myocardial infarction under a treatment of beta blockers
-\citep[Section~5.6]{GelmanCarlinSternRubin:2003}.
+\citep[Section~5.6]{GelmanEtAl:2013}.
 
 \subsubsection{Data}
 
@@ -3239,14 +3255,14 @@ priors compared to the scale of the data.
 the treatment effect of Scholastic Aptitude Test (SAT) coaching in
 eight schools based on the sample treatment effect and standard error
 in each school.  The model provided for this data in
-\citep[Section~5.5]{GelmanCarlinSternRubin:2003} is included with the
+\citep[Section~5.5]{GelmanEtAl:2013} is included with the
 data in the Stan distribution in directory
 \nolinkurl{src/models/misc/eight-schools/}.
 
 \subsubsection{Extensions and Alternatives}
 
 \citet{SmithSpiegelhalterThomas:1995} and
-\citet[Section~19.4]{GelmanCarlinSternRubin:2003} provide
+\citet[Section~19.4]{GelmanEtAl:2013} provide
 meta-analyses based directly on binomial data.
 \citet{WarnThompsonSpiegelhalter:2002} consider the modeling
 implications of using alternatives to the log-odds ratio in
@@ -3655,7 +3671,7 @@ unlabeled data.  The estimands include both the model parameters and
 the posterior distribution over categories for the unlabeled data.  The
 model is essentially a missing data model assuming the unknown
 category labels are missing completely at random; see
-\citep{GelmanCarlinSternRubin:2003,GelmanHill:2007} for more
+\citep{GelmanEtAl:2013,GelmanHill:2007} for more
 information on missing data imputation.  The model is also an instance
 of semisupervised learning because the unlabeled data contributes to
 the parameter estimations.
@@ -4651,7 +4667,7 @@ and total count parameter
 \[
 \lambda = \alpha + \beta.
 \]
-Following \citep[Chapter 5]{GelmanCarlinSternRubin:2003}, the mean
+Following \citep[Chapter 5]{GelmanEtAl:2013}, the mean
 gets a uniform prior and the count parameter a Pareto prior with
 $p(\lambda) \propto \lambda^{-2.5}$.
 %
@@ -4810,7 +4826,24 @@ This section illustrates the difference between a change of variables
 and a simple variable transformation.  A transformation samples a
 parameter, then transforms it, whereas a change of variables
 transforms a parameter, then samples it.  Only the latter requires a
-Jacobian adjustment.
+Jacobian adjustment.  
+
+Note that it does not matter whether the probability function is
+expressed using a sampling statement, such as
+%
+\begin{quote}
+\begin{Verbatim}
+log(y) ~ normal(mu,sigma);
+\end{Verbatim}
+\end{quote}
+%
+or as an increment to the log probability function, as in
+%
+\begin{quote}
+\begin{Verbatim}
+increment_log_prob(normal_log(log(y), mu, sigma));
+\end{Verbatim}
+\end{quote}
 
 \subsubsection{Gamma and Inverse Gamma Distribution}\label{jacobian-adjustment.section}
 
@@ -5265,15 +5298,12 @@ minimizes $\log \distro{Normal}(\lambda_1|0,\tau) + \log
   invariance.  It provides shrinkage, but does not in and of itself
   identify the parameters because adding a constant to $\lambda_1$ and
   subtracting it from $\lambda_2$ results in the same value for the
-  prior density.  \cite{ZouHastie:2005} combined L1 and L2
-  regularizers in the elastic net to provide the desirable properties
-  of both, including the shrinkage-to-zero properties of L1 and the
-  uniqueness of modes produced by L2.}
+  prior density.}
 %
 \begin{figure}
-\includegraphics[height=1.5in]{R/non-identified.png}%
-\includegraphics[height=1.5in]{R/non-identified-plus-prior.png}%
-\includegraphics[height=1.5in]{R/one-param-identified.png}
+\includegraphics[height=1.45in]{R/non-identified.png}%
+\includegraphics[height=1.45in]{R/non-identified-plus-prior.png}%
+\includegraphics[height=1.45in]{R/one-param-identified.png}
 \vspace*{-0.25in}
 \caption{\small\it Posteriors for two intercept parameterization
   without prior, two intercept parameterization with unit normal

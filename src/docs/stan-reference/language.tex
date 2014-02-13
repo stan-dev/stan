@@ -66,6 +66,29 @@ constraint, the program halts and a diagnostic message is printed.
 After being read, initial values are transformed to unconstrained
 values that will be used to initialize the sampler. 
 
+\subsubsection{Boundary Values are Problematic}
+
+Because of the way Stan defines its transforms from the constrained to
+the unconstrained space, initializing parameters on the boundaries of
+their constraints is usually problematic.  For instance, with a
+constraint
+%
+\begin{quote}
+\begin{Verbatim}
+parameters {
+  real<lower=0,upper=1> theta;
+  ...
+}
+\end{Verbatim}
+\end{quote}
+%
+an initial value of 0 for \code{theta} leads to an unconstrained value
+of $-\infty$, whereas a value of 1 leads to an unconstrained value of
+$+\infty$.  While this will be inverse transformed back correctly
+given the behavior of floating point arithmetic, the Jacobian will be
+infinite and the log probability function will faill and raise an
+exception.  
+
 \subsection{Random Initial Values}
 
 If there are no user-supplied initial values, the default
@@ -1935,7 +1958,7 @@ to generate simulated data (at the individual and optionally at the
 group level for hierarchical models), which can then be compared
 informally using plots and formally by means of test statistics, to
 the actual data in order to assess the suitability of the model; see
-\citep[Chapter~6]{GelmanCarlinSternRubin:2003} for more information on
+\citep[Chapter~6]{GelmanEtAl:2013} for more information on
 posterior predictive checks.
 
 \section{Type Inference}
