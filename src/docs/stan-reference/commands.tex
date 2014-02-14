@@ -1148,7 +1148,7 @@ we add new samplers).
 \begin{description}
     \hiercmdarg{\indentarrow\indentarrow}{algorithm}{$$list element$$}
       {Sampling algorithm}
-      {Valid values: \  \code{hmc}}
+      {Valid values: \  \code{hmc}, \code{fixed\_param} }
       {Defaults to \code{hmc}}
 \end{description}
 %
@@ -1203,35 +1203,33 @@ These options are for NUTS, an adaptive version of HMC.
 
 \subsubsection{Tree Depth}
 
-The \code{max\_depth} argument for NUTS controls how much deeper than
-the initial node exploration is allowed to go.  The tree depth
-actually used is calculated dynamically by NUTS each iteration, and
-reported along with the parameters in the output as
-\code{treedepth\_\_}.
+NUTS generates a proposal by evolving the initial system both forwards
+and backwards in time to form a balanced binary tree.  At each iteration
+of the NUTS algorithm the tree depth is increased by one, doubling
+the number of leapfrog steps and effectively doubles the computation
+time.  The algorithm terminates in one of two ways: either the NUTS 
+criterion is satisfied for a new subtree or the completed tree, or the
+depth of the completed tree hits \code{max\_depth}.  
 
-Each extension of the depth requires doubling the number of states and
-doubling the number of leapfrog steps.  Each leapfrog step requires a
-gradient evaluation, and this is where the vast majority of time is
-spent evaluating using HMC.  When NUTS has extended the tree
-\code{max\_depth} layers, it stops automatically.  If a model is
-hitting the maximum depth, it's a sign of extreme curvature and a
-strong warning sign there might be something wrong with the model.
-For most efficient sampling, the tree depth should not be constrained,
-otherwise HMC reverts to a random walk.
-
-Stan currently counts depth starting from -1 rather than
-from the traditional 0, with a depth of -1 indicating no progress was
-made from the initial state due to slice rejection or constraint
-violation.  
+Both the tree depth and the actual number of leapfrog steps computed are 
+reported along with the parameters in the output as \code{treedepth\_\_} and
+\code{n\_leapfrog\_\_}, respectively.  Because the final subtree may only
+be partially constructed, these two will always satisfy
 %
-\footnote{This numbering will be corrected soon, at which point the
-  interpretation of this argument will change by 1 and this section of
-  the documentation will be updated.}
-%
-A depth of 0 means that one additional parameter state was considered.
+\begin{equation*}
+2^{\mathrm{treedepth} - 1} - 1 < N_{\mathrm{leapfrog}} \le 2^{\mathrm{treedepth} } - 1.
+\end{equation*}
 
-See \citep{Hoffman-Gelman:2011, Hoffman-Gelman:2013} for more
-information on how NUTS works.
+\code{treedepth\_\_} is an important diagnostic tool for NUTS.  For example,
+\code{treedepth\_\_ = 0} occurs when the first leapfrog step is immediately
+rejected and the initial state returned, indicating extreme curvature and
+poorly-chosen step size (at least relative to the current position).  On the other
+hand, if \code{treedepth\_\_ = max\_depth} then NUTS is taking many leapfrog
+steps and being terminated prematurely to avoid excessively long execution
+time.  For the most efficient sampling \code{max\_depth} should be increased
+to ensure that the NUTS tree can grow as large as necessary.
+
+For more information on the NUTS algorithm see \citep{Hoffman-Gelman:2011, Hoffman-Gelman:2013}.
 
 \begin{description}
             \hiercmdarg{\indentarrow\indentarrow\indentarrow\indentarrow\indentarrow\indentarrow}{max\_depth}{$$int$$}
@@ -1303,6 +1301,18 @@ simulation error in the Hamiltonian dynamics calculation.  See
           {Uniformly random jitter of the stepsize, in percent}
           {Valid values: \  $0 \leq \mbox{\code{stepsize\_jitter}} \leq 1$}
           {Defaults to \code{0}}
+\end{description}
+
+\subsubsection{Fixed Parameter Sampler}
+
+The fixed parameter sampler generates a new sample without changing
+the current state of the Markov chain; only generated quantities may
+change.  This can be useful when, for example, trying to generate pseudo-data 
+using the generated quantities block.
+%
+\begin{description}
+      \hierlongcmd{\indentarrow\indentarrow\indentarrow}{\farg{\bfseries fixed\_param}}
+        {Fixed Parameter Sampler}
 \end{description}
 
 \subsection{Optimization-Specific Commands}

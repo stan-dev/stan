@@ -12,10 +12,12 @@
 #include <stan/math/functions/lmgamma.hpp>
 #include <stan/math/matrix/columns_dot_product.hpp>
 #include <stan/math/matrix/trace.hpp>
-#include <stan/math/matrix/ldlt.hpp>
+#include <stan/math/matrix/log_determinant_ldlt.hpp>
+#include <stan/math/matrix/mdivide_left_ldlt.hpp>
 #include <stan/math/matrix/dot_product.hpp>
 #include <stan/math/matrix/mdivide_left_tri_low.hpp>
 #include <stan/math/matrix/multiply_lower_tri_self_transpose.hpp>
+#include <stan/math/error_handling/matrix/check_ldlt_factor.hpp>
 
 namespace stan {
 
@@ -88,21 +90,14 @@ namespace stan {
       using stan::math::log_determinant_ldlt;
       using stan::math::mdivide_left_ldlt;
       using stan::math::LDLT_factor;
+      using stan::math::check_ldlt_factor;
       
       LDLT_factor<T_y,Eigen::Dynamic,Eigen::Dynamic> ldlt_W(W);
-      if (!ldlt_W.success()) {
-        std::ostringstream message;
-        message << "W is not positive definite (%1%).";
-        std::string str(message.str());
-        stan::math::dom_err(function,W(0,0),"W",str.c_str(),"",&lp);
+      if (!check_ldlt_factor(function,ldlt_W,"LDLT_Factor of random variable",&lp)) {
         return lp;
       }
       LDLT_factor<T_scale,Eigen::Dynamic,Eigen::Dynamic> ldlt_S(S);
-      if (!ldlt_S.success()) {
-        std::ostringstream message;
-        message << "S is not positive definite (%1%).";
-        std::string str(message.str());
-        stan::math::dom_err(function,S(0,0),"S",str.c_str(),"",&lp);
+      if (!check_ldlt_factor(function,ldlt_S,"LDLT_Factor of scale parameter",&lp)) {
         return lp;
       }
       

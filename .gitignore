@@ -31,35 +31,19 @@ stan.Rproj
 stan.kdev4
 .Rapp.history
 
+# models:
+src/models/**/*
+!src/models/**/*.stan
+!src/models/**/*.R
+!src/models/**/makefile
+
 # tests: compiled models
-src/test/gm/model_specs/compiled/*
-!src/test/gm/model_specs/compiled/*.stan
-!src/test/gm/model_specs/compiled/.gitignore
-src/test/gm/model_specs/no_main/*.cpp
-src/test/gm/model_specs/printer
-src/test/gm/model_specs/printer.exe
-src/test/gm/model_specs/printer.cpp
-src/test/io/test_model/example.cpp
-src/test/mcmc/models/improper
-src/test/mcmc/models/improper.exe
-src/test/mcmc/models/improper.cpp
-src/test/mcmc/hmc/hamiltonians/models/funnel.cpp
-src/test/mcmc/hmc/integrators/models/gauss.cpp
-src/test/mcmc/hmc/integrators/models/command.cpp
-src/test/gm/arguments/test_model
-src/test/gm/arguments/test_model.exe
-src/test/gm/arguments/test_model.cpp
-
-
-src/test/mcmc/models/*
-!src/test/mcmc/models/*.stan
-
+src/test/test-models/**/*
+!src/test/test-models/**/*.stan
+!src/test/test-models/**/.gitignore
 
 # tests: generated agrad tests
-src/test/agrad/distributions/univariate/continuous/*_generated_test.cpp
-src/test/agrad/distributions/univariate/discrete/*_generated_test.cpp
-src/test/agrad/distributions/multivariate/continuous/*_generated_test.cpp
-src/test/agrad/distributions/multivariate/discrete/*_generated_test.cpp
+src/test/unit-distribution/**/**/**/*_generated_test.cpp
 
 # For the Mac
 *.DS_Store

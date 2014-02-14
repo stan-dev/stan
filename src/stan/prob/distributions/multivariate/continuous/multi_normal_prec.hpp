@@ -9,7 +9,7 @@
 #include <stan/math/matrix/dot_product.hpp>
 #include <stan/math/matrix/dot_self.hpp>
 #include <stan/math/matrix_error_handling.hpp>
-#include <stan/math/matrix/ldlt.hpp>
+#include <stan/math/matrix/log_determinant_ldlt.hpp>
 #include <stan/math/matrix/log.hpp>
 #include <stan/math/matrix/log_determinant.hpp>
 #include <stan/math/matrix/mdivide_left_spd.hpp>
@@ -21,6 +21,7 @@
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
+#include <stan/math/error_handling/matrix/check_ldlt_factor.hpp>
 
 namespace stan {
 
@@ -44,10 +45,11 @@ namespace stan {
       using stan::math::trace_quad_form;
       using stan::math::log_determinant_ldlt;
       using stan::math::LDLT_factor;
+      using stan::math::check_ldlt_factor;
       
       if (!check_size_match(function, 
-                            Sigma.rows(), "Rows of covariance parameter",
-                            Sigma.cols(), "columns of covariance parameter",
+                            Sigma.rows(), "Rows of precision parameter",
+                            Sigma.cols(), "columns of precision parameter",
                             &lp))
         return lp;
       if (!check_positive(function, Sigma.rows(), "Precision matrix rows", &lp))
@@ -56,14 +58,8 @@ namespace stan {
         return lp;
       
       LDLT_factor<T_covar,Eigen::Dynamic,Eigen::Dynamic> ldlt_Sigma(Sigma);
-      if (!ldlt_Sigma.success()) {
-        std::ostringstream message;
-        message << "Precision matrix is not positive definite. " 
-        << "Sigma[1,1] is %1%.";
-        std::string str(message.str());
-        stan::math::dom_err(function,Sigma(0,0),"",str.c_str(),"",&lp);
+      if(!check_ldlt_factor(function,ldlt_Sigma,"LDLT_Factor of precision parameter",&lp))
         return lp;
-      }
 
       if (!check_size_match(function, 
                             y.size(), "Size of random variable",
@@ -135,10 +131,11 @@ namespace stan {
       using stan::math::trace_quad_form;
       using stan::math::log_determinant_ldlt;
       using stan::math::LDLT_factor;
+      using stan::math::check_ldlt_factor;
       
       if (!check_size_match(function, 
-                            Sigma.rows(), "Rows of covariance matrix",
-                            Sigma.cols(), "columns of covariance matrix",
+                            Sigma.rows(), "Rows of precision matrix",
+                            Sigma.cols(), "columns of precision matrix",
                             &lp))
         return lp;
       if (!check_positive(function, Sigma.rows(), "Precision matrix rows", &lp))
@@ -147,14 +144,8 @@ namespace stan {
         return lp;
       
       LDLT_factor<T_covar,Eigen::Dynamic,Eigen::Dynamic> ldlt_Sigma(Sigma);
-      if (!ldlt_Sigma.success()) {
-        std::ostringstream message;
-        message << "Precision matrix is not positive definite. " 
-        << "Sigma[1,1] is %1%.";
-        std::string str(message.str());
-        stan::math::dom_err(function,Sigma(0,0),"",str.c_str(),"",&lp);
+      if(!check_ldlt_factor(function,ldlt_Sigma,"LDLT_Factor of precision matrix",&lp))
         return lp;
-      }
       
       if (!check_size_match(function, 
                             y.cols(), "Columns of random variable",

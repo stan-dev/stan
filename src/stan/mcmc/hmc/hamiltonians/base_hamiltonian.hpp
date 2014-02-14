@@ -43,8 +43,9 @@ namespace stan {
       virtual void update(P& z) {
         
         try {
-          z.V = - stan::model::log_prob_grad<true,true>(_model, z.q, z.g, _err_stream);
-        } catch (std::domain_error e) {
+          stan::model::gradient(_model, z.q, z.V, z.g, _err_stream);
+          z.V *= -1;
+        } catch (const std::exception& e) {
           this->_write_error_msg(_err_stream, e);
           z.V = std::numeric_limits<double>::infinity();
         }
@@ -60,7 +61,7 @@ namespace stan {
         std::ostream* _err_stream;
       
         void _write_error_msg(std::ostream* error_msgs,
-                             const std::domain_error& e) {
+                             const std::exception& e) {
           
           if (!error_msgs) return;
           

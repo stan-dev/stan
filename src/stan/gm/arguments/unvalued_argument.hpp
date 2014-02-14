@@ -16,7 +16,7 @@ namespace stan {
       unvalued_argument()
         : _is_present(false) {}
       
-      void print(std::ostream* s, const int depth, const char prefix) {}
+      void print(std::ostream* s, const int depth, const std::string prefix) {}
       
       void print_help(std::ostream* s, const int depth, const bool recurse = false) {
         if (!s)
