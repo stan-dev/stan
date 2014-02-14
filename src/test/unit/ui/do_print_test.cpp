@@ -1,8 +1,7 @@
-#include <stan/ui/command.hpp>
+#include <stan/ui/do_print.hpp>
 #include <gtest/gtest.h>
-#include <sstream> 
 
-TEST(UiCommand, do_print_2_args) {
+TEST(StanUi, do_print_2_args) {
   int refresh;
   
   refresh = 0;
@@ -29,7 +28,7 @@ TEST(UiCommand, do_print_2_args) {
   }
 }
 
-TEST(UiCommand, do_print_3_args) {
+TEST(StanUi, do_print_3_args) {
   int refresh;
   bool special;
 
