@@ -39,29 +39,11 @@
 #include <stan/ui/write_iteration.hpp>
 #include <stan/ui/write_stan.hpp>
 #include <stan/ui/write_model.hpp>
+#include <stan/ui/write_error_msg.hpp>
 
 namespace stan {
 
   namespace ui {
-       
-    void write_error_msg(std::ostream* error_stream,
-                         const std::exception& e) {
-      
-      if (!error_stream) return;
-      
-      *error_stream << std::endl
-                    << "Informational Message: The current Metropolis proposal is about to be"
-                    << " rejected becuase of the following issue:"
-                    << std::endl
-                    << e.what() << std::endl
-                    << "If this warning occurs sporadically, such as for highly constrained"
-                    << " variable types like covariance matrices, then the sampler is fine,"
-                    << std::endl
-                    << "but if this warning occurs often then your model may be either"
-                    << " severely ill-conditioned or misspecified."
-                    << std::endl;
-      
-    }
     
     /** 
      * Indicates whether it should print on the current iteration.
