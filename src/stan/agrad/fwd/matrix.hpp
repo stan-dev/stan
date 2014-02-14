@@ -22,6 +22,7 @@
 #include <stan/agrad/fwd/matrix/rows_dot_self.hpp>
 #include <stan/agrad/fwd/matrix/softmax.hpp>
 #include <stan/agrad/fwd/matrix/sort.hpp>
+#include <stan/agrad/fwd/matrix/sort_indices.hpp>
 #include <stan/agrad/fwd/matrix/sum.hpp>
 #include <stan/agrad/fwd/matrix/tcrossprod.hpp>
 #include <stan/agrad/fwd/matrix/to_fvar.hpp>
