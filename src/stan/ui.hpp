@@ -4,6 +4,7 @@
 #include <stan/ui/command.hpp>
 #include <stan/ui/write_iteration.hpp>
 #include <stan/ui/write_iteration_csv.hpp>
+#include <stan/ui/write_model.hpp>
 #include <stan/ui/write_stan.hpp>
 
 

@@ -38,18 +38,12 @@
 #include <stan/ui/write_iteration_csv.hpp>
 #include <stan/ui/write_iteration.hpp>
 #include <stan/ui/write_stan.hpp>
+#include <stan/ui/write_model.hpp>
 
 namespace stan {
 
   namespace ui {
-    
-    void write_model(std::ostream* s, const std::string model_name, const std::string prefix = "") {
-      if (!s) return;
-      
-      *s << prefix << " model = " << model_name << std::endl;
-      
-    }
-    
+       
     void write_error_msg(std::ostream* error_stream,
                          const std::exception& e) {
       
