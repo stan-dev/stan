@@ -568,7 +568,7 @@ To sample four chains using a Bash shell on Mac OS or Linux, execute
   do                                         \
     ./my_model sample random seed=12345      \ 
        id=$i data file=my_data               \
-       output file=samples$i.csv refresh=0 & \
+       output file=samples$i.csv &           \
  done
 \end{Verbatim}
 \end{quote}
@@ -579,12 +579,23 @@ returns control to the prompt. The ampersand (\code{\&}) at the end of
 the nested command pushes each process into the background, so that
 the loop can continue without waiting for the current chain to finish.
 The \code{id} value makes sure that a non-overlapping set of random
-numbers are used for each chain.  The \code{refresh} option being set
-to 0 turns off output; this is not necessary, but if output is used,
-it will be interleaved for all chains running concurrently.  Also note
+numbers are used for each chain.  Also note
 that the output file is explicitly specified, with the variable
 \code{\$i} being used to ensure the output file name for each chain is
 unique.
+
+The terminal standard output will be interleaved for all chains
+running concurrently.  To suppress all terminal output, direct the
+standard output to the ``null'' device.  This is achieved by
+postfixing \code{> /dev/null} to a command, which in the above case,
+means changing the second-to-last line to 
+\begin{quote}
+\begin{Verbatim}
+       output file=samples$i.csv > /dev/null &  \
+\end{Verbatim}
+\end{quote}
+
+
 
 \subsubsection{Windows}
 
@@ -595,7 +606,7 @@ snippet above
 \begin{Verbatim}[fontshape=sl]
 > for /l %x in (1, 1, 4) do start /b model  sample   ^
    random seed=12345 id=%x data file=my_data         ^
-   output file=samples%x.csv refresh=0
+   output file=samples%x.csv 
 \end{Verbatim}
 \end{quote}
 %
@@ -1069,12 +1080,12 @@ optimize the step size (this optimization during adaptation of the
 sampler should not be confused with running Stan's optimization method).
 This optimization procedure is extremely flexible and for completeness
 we have exposed each option, using the notation of
-\citep{Hoffman-Gelman:2011, Hoffman-Gelman:2013}.  In practice the
+\citep{Hoffman-Gelman:2011, Hoffman-Gelman:2014}.  In practice the
 efficacy of the optimization is sensitive to the value of these
 parameters, and we do not recommend changing the defaults without
 experience with the dual averaging algorithm.  For more information,
 see the discussion of dual averaging in \citep{Hoffman-Gelman:2011,
- Hoffman-Gelman:2013}.
+ Hoffman-Gelman:2014}.
   
 Variances or covariances are estimated using Welford accumulators
 to avoid a loss of precision over many floating point operations.
@@ -1229,7 +1240,7 @@ steps and being terminated prematurely to avoid excessively long execution
 time.  For the most efficient sampling \code{max\_depth} should be increased
 to ensure that the NUTS tree can grow as large as necessary.
 
-For more information on the NUTS algorithm see \citep{Hoffman-Gelman:2011, Hoffman-Gelman:2013}.
+For more information on the NUTS algorithm see \citep{Hoffman-Gelman:2011, Hoffman-Gelman:2014}.
 
 \begin{description}
             \hiercmdarg{\indentarrow\indentarrow\indentarrow\indentarrow\indentarrow\indentarrow}{max\_depth}{$$int$$}

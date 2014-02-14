@@ -56,7 +56,7 @@ class MakeModelTex {
         texWriter.write("\\\\[2in]" + EOL);
         texWriter.write("{\\Huge\\bf Stan Example Models}" + EOL);
         texWriter.write("\\\\[18pt]" + EOL);
-        texWriter.write("{\\large Version 2.1.0}" + EOL);
+        texWriter.write("{\\large Version 2.2.0}" + EOL);
         texWriter.write("\\\\[12pt]" + EOL);
         texWriter.write("{\\large \\today}" + EOL);
         texWriter.write("\\\\[1in]" + EOL);

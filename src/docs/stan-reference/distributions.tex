@@ -59,7 +59,7 @@ If $\theta \in [0,1]$, then for $y \in \setlist{0,1}$,
   generated quantities block}
 \end{description}
 
-\section{Bernoulli Distribution, Logit Parameterization}
+\section{Bernoulli Distribution, Logit Parameterization}\label{bernoulli-logit-distribution.section}
 
 \Stan also supplies a direct parameterization in terms of a
 logit-transformed chance-of-success parameter.  This parameterization
@@ -1587,6 +1587,28 @@ If $\mu \in \reals$ and $\kappa \in \posreals$, then for $y \in
     location \farg{mu} and scale \farg{kappa}}
 \end{description}
 
+\subsubsection{Numerical Stability}
+
+Evaluating the Von Mises distribution for $\kappa > 100$ is
+numerically unstable in the current implementation.  Nathanael I.\
+Lichti suggested the following workaround on the Stan users group,
+based on the fact that as $\kappa \rightarrow \infty$,
+\[
+\distro{VonMises}(y|\mu,\kappa) \rightarrow \distro{Normal}(\mu,
+\sqrt{1 / \kappa}).
+\]
+%
+The workaround is to replace \Verb|y ~ von_mises(mu,kappa)| with
+%
+\begin{quote}
+\begin{Verbatim}
+if (kappa < 100)
+  y ~ von_mises(mu, kappa);
+else 
+  y ~ normal(mu, sqrt(1 / kappa));
+\end{Verbatim}
+\end{quote} 
+
 
 \chapter{Bounded Continuous Probabilities}
 
@@ -1907,7 +1929,7 @@ factors of) correlation matrices.  A Cholesky factor $L$ for a $K
 so that the diagonal of $L L^{\top}$ is the unit $K$-vector.
 
 
-\section{LKJ Correlation Distribution}
+\section{LKJ Correlation Distribution}\label{lkj-correlation.section}
 
 \subsubsection{Probability Density Function}
 
