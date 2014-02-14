@@ -36,24 +36,11 @@
 #include <stan/optimization/bfgs.hpp>
 
 #include <stan/ui/write_iteration_csv.hpp>
+#include <stan/ui/write_iteration.hpp>
 
 namespace stan {
 
   namespace ui {
-
-    template <class Model, class RNG>
-    void write_iteration(std::ostream& output_stream,
-                         Model& model,
-                         RNG& base_rng,
-                         double lp,
-                         std::vector<double>& cont_vector,
-                         std::vector<int>& disc_vector) {
-      std::vector<double> model_values;
-      model.write_array(base_rng, cont_vector, disc_vector, model_values,
-                        true, true, &std::cout);
-      write_iteration_csv(output_stream, lp, model_values);
-    }
-    
 
     void write_stan(std::ostream* s, const std::string prefix = "") {
       if (!s) return;
@@ -1071,7 +1058,7 @@ namespace stan {
  
     }
 
-  } // namespace gm
+  } // namespace ui
 
 } // namespace stan
 

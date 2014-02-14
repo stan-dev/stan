@@ -1,4 +1,4 @@
-#include <stan/ui/command.hpp>
+#include <stan/ui/write_iteration.hpp>
 #include <gtest/gtest.h>
 #include <test/test-models/no-main/ui/test_lp.cpp>
 #include <sstream>
@@ -6,7 +6,7 @@
 typedef test_lp_model_namespace::test_lp_model Model;
 typedef boost::ecuyer1988 rng_t;
 
-class UiCommand : public testing::Test {
+class StanUi : public testing::Test {
 public:
   void SetUp() {
     std::fstream empty_data_stream(std::string("").c_str());
@@ -25,7 +25,7 @@ public:
   Model* model_ptr;
 };
 
-TEST_F(UiCommand, write_iteration) {
+TEST_F(StanUi, write_iteration) {
   std::stringstream stream;
   Model model = *model_ptr;
   double lp;
