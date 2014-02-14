@@ -193,8 +193,6 @@ $(patsubst %.stan,%.cpp,$(filter src/test/test-models/no-main/%,$(TEST_MODELS)))
 # Tests that also depend on generated models.
 ##
 test/unit/io/mcmc_writer.o: src/test/test-models/no-main/io_example.cpp
-test/unit/gm/command_init.o: src/test/test-models/no-main/gm/test_lp.cpp
-test/unit/gm/command_write_iteration.o: src/test/test-models/no-main/gm/test_lp.cpp
 test/unit/gm/generator.o: src/test/test-models/no-main/gm/test_lp.cpp
 
 test/unit/model/util.o: src/test/test-models/no-main/model/valid.cpp src/test/test-models/no-main/model/domain_fail.cpp
@@ -204,6 +202,9 @@ test/unit/mcmc/hmc/hamiltonians/unit_e_metric.o: src/test/test-models/no-main/mc
 test/unit/mcmc/hmc/hamiltonians/diag_e_metric.o: src/test/test-models/no-main/mcmc/hmc/hamiltonians/funnel.cpp
 test/unit/mcmc/hmc/hamiltonians/dense_e_metric.o: src/test/test-models/no-main/mcmc/hmc/hamiltonians/funnel.cpp
 test/unit/mcmc/hmc/integrators/expl_leapfrog.o: src/test/test-models/no-main/mcmc/hmc/integrators/command.cpp src/test/test-models/no-main/mcmc/hmc/integrators/gauss.cpp
+
+test/unit/ui/command_init.o: src/test/test-models/no-main/ui/test_lp.cpp
+test/unit/ui/command_write_iteration.o: src/test/test-models/no-main/ui/test_lp.cpp
 
 ##
 # all files that should be compiled as tests

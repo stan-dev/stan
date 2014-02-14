@@ -1,12 +1,12 @@
 #include <stan/gm/error_codes.hpp>
-#include <stan/gm/command.hpp>
+#include <stan/ui/command.hpp>
 #include <gtest/gtest.h>
 #include <string>
 #include <test/CmdStan/models/utility.hpp>
 #include <stdexcept>
 #include <boost/math/policies/error_handling.hpp>
 
-TEST(StanGmCommand, countMatches) {
+TEST(StanUiCommand, countMatches) {
   EXPECT_EQ(-1, count_matches("", ""));
   EXPECT_EQ(-1, count_matches("", "abc"));
 
@@ -49,7 +49,7 @@ void test_optimize_prints(const std::string& base_cmd) {
   EXPECT_TRUE(count_matches("w=", cmd_output) == 1);
 }
 
-TEST(StanGmCommand, printReallyPrints) {
+TEST(StanUiCommand, printReallyPrints) {
   std::vector<std::string> path_vector;
   path_vector.push_back("..");
   path_vector.push_back("src");
@@ -93,7 +93,7 @@ TEST(StanGmCommand, printReallyPrints) {
   test_optimize_prints(path + " optimize algorithm=bfgs");
 }
 
-TEST(StanGmCommand, refresh_zero_ok) {
+TEST(StanUiCommand, refresh_zero_ok) {
   std::vector<std::string> model_path;
   model_path.push_back("src");
   model_path.push_back("test");
@@ -108,7 +108,7 @@ TEST(StanGmCommand, refresh_zero_ok) {
   EXPECT_EQ(0, count_matches("Iteration:", out.output));
 }
 
-TEST(StanGmCommand, refresh_nonzero_ok) {
+TEST(StanUiCommand, refresh_nonzero_ok) {
   std::vector<std::string> model_path;
   model_path.push_back("src");
   model_path.push_back("test");
@@ -123,7 +123,7 @@ TEST(StanGmCommand, refresh_nonzero_ok) {
   EXPECT_EQ(20, count_matches("Iteration:", out.output));
 }
 
-TEST(StanGmCommand, zero_init_value_fail) {
+TEST(StanUiCommand, zero_init_value_fail) {
   std::string expected_message
     = "Rejecting initialization at zero because of vanishing density.\n";
 
@@ -146,7 +146,7 @@ TEST(StanGmCommand, zero_init_value_fail) {
     << "Failed running: " << out.command;
 }
 
-TEST(StanGmCommand, zero_init_domain_fail) {
+TEST(StanUiCommand, zero_init_domain_fail) {
   std::string expected_message
     = "Rejecting initialization at zero because of gradient failure.\n";
 
@@ -170,7 +170,7 @@ TEST(StanGmCommand, zero_init_domain_fail) {
     << "Failed running: " << out.command;
 }
 
-TEST(StanGmCommand, user_init_value_fail) {
+TEST(StanUiCommand, user_init_value_fail) {
   std::string expected_message
     = "Rejecting user-specified initialization because of vanishing density.\n";
 
@@ -204,7 +204,7 @@ TEST(StanGmCommand, user_init_value_fail) {
     << "Failed running: " << out.command;
 }
 
-TEST(StanGmCommand, user_init_domain_fail) {
+TEST(StanUiCommand, user_init_domain_fail) {
   std::string expected_message
     = "Rejecting user-specified initialization because of gradient failure.\n";
 
@@ -238,7 +238,7 @@ TEST(StanGmCommand, user_init_domain_fail) {
     << "Failed running: " << out.command;
 }
 
-TEST(StanGmCommand, CheckCommand_default) {
+TEST(StanUiCommand, CheckCommand_default) {
   std::vector<std::string> model_path;
   model_path.push_back("src");
   model_path.push_back("test");
@@ -252,7 +252,7 @@ TEST(StanGmCommand, CheckCommand_default) {
   EXPECT_EQ(int(stan::gm::error_codes::USAGE), out.err_code);
 }
 
-TEST(StanGmCommand, CheckCommand_help) {
+TEST(StanUiCommand, CheckCommand_help) {
   std::vector<std::string> model_path;
   model_path.push_back("src");
   model_path.push_back("test");
@@ -267,7 +267,7 @@ TEST(StanGmCommand, CheckCommand_help) {
   EXPECT_EQ(int(stan::gm::error_codes::OK), out.err_code);
 }
 
-TEST(StanGmCommand, CheckCommand_unrecognized_argument) {
+TEST(StanUiCommand, CheckCommand_unrecognized_argument) {
   std::vector<std::string> model_path;
   model_path.push_back("src");
   model_path.push_back("test");
@@ -318,20 +318,20 @@ struct sampler {
 };
 
 template<typename T>
-class StanGmCommandException : public ::testing::Test {
+class StanUiCommandException : public ::testing::Test {
 
 };
-TYPED_TEST_CASE_P(StanGmCommandException);
+TYPED_TEST_CASE_P(StanUiCommandException);
 
-TYPED_TEST_P(StanGmCommandException, init_adapt) {
+TYPED_TEST_P(StanUiCommandException, init_adapt) {
   sampler<TypeParam> throwing_sampler;
   Eigen::VectorXd cont_params;
   
-  EXPECT_FALSE(stan::gm::init_adapt(&throwing_sampler, 
+  EXPECT_FALSE(stan::ui::init_adapt(&throwing_sampler, 
                                     0, 0, 0, 0, cont_params));
 }
 
-REGISTER_TYPED_TEST_CASE_P(StanGmCommandException,
+REGISTER_TYPED_TEST_CASE_P(StanUiCommandException,
                            init_adapt);
 
 // exception types that can be thrown by Boost's math functions
@@ -341,6 +341,6 @@ typedef ::testing::Types<std::domain_error,
                          boost::math::rounding_error,
                          boost::math::evaluation_error> BoostExceptionTypes;
 
-INSTANTIATE_TYPED_TEST_CASE_P(, StanGmCommandException, 
+INSTANTIATE_TYPED_TEST_CASE_P(, StanUiCommandException, 
                               BoostExceptionTypes);
 

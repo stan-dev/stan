@@ -1,5 +1,5 @@
-#ifndef __STAN__GM__COMMAND_HPP__
-#define __STAN__GM__COMMAND_HPP__
+#ifndef __STAN__UI__COMMAND_HPP__
+#define __STAN__UI__COMMAND_HPP__
 
 #include <fstream>
 #include <stdexcept>
@@ -37,7 +37,7 @@
 
 namespace stan {
 
-  namespace gm {
+  namespace ui {
 
     void write_iteration_csv(std::ostream& output_stream,
                              const double lp,
@@ -226,18 +226,18 @@ namespace stan {
       
     
     template<class Sampler>
-    bool init_static_hmc(stan::mcmc::base_mcmc* sampler, argument* algorithm) {
+    bool init_static_hmc(stan::mcmc::base_mcmc* sampler, stan::gm::argument* algorithm) {
 
-      categorical_argument* hmc = dynamic_cast<categorical_argument*>(
+      stan::gm::categorical_argument* hmc = dynamic_cast<stan::gm::categorical_argument*>(
                                   algorithm->arg("hmc"));
       
-      categorical_argument* base = dynamic_cast<categorical_argument*>(
+      stan::gm::categorical_argument* base = dynamic_cast<stan::gm::categorical_argument*>(
                                    algorithm->arg("hmc")->arg("engine")->arg("static"));
       
-      double epsilon = dynamic_cast<real_argument*>(hmc->arg("stepsize"))->value();
+      double epsilon = dynamic_cast<stan::gm::real_argument*>(hmc->arg("stepsize"))->value();
       double epsilon_jitter 
-        = dynamic_cast<real_argument*>(hmc->arg("stepsize_jitter"))->value();
-      double int_time = dynamic_cast<real_argument*>(base->arg("int_time"))->value();
+        = dynamic_cast<stan::gm::real_argument*>(hmc->arg("stepsize_jitter"))->value();
+      double int_time = dynamic_cast<stan::gm::real_argument*>(base->arg("int_time"))->value();
       
       dynamic_cast<Sampler*>(sampler)->set_nominal_stepsize_and_T(epsilon, int_time);
       dynamic_cast<Sampler*>(sampler)->set_stepsize_jitter(epsilon_jitter);
@@ -248,18 +248,18 @@ namespace stan {
     }
   
     template<class Sampler>
-    bool init_nuts(stan::mcmc::base_mcmc* sampler, argument* algorithm) {
+    bool init_nuts(stan::mcmc::base_mcmc* sampler, stan::gm::argument* algorithm) {
       
-      categorical_argument* hmc = dynamic_cast<categorical_argument*>(
+      stan::gm::categorical_argument* hmc = dynamic_cast<stan::gm::categorical_argument*>(
                                    algorithm->arg("hmc"));
       
-      categorical_argument* base = dynamic_cast<categorical_argument*>(
+      stan::gm::categorical_argument* base = dynamic_cast<stan::gm::categorical_argument*>(
                                    algorithm->arg("hmc")->arg("engine")->arg("nuts"));
 
-      double epsilon = dynamic_cast<real_argument*>(hmc->arg("stepsize"))->value();
+      double epsilon = dynamic_cast<stan::gm::real_argument*>(hmc->arg("stepsize"))->value();
       double epsilon_jitter 
-        = dynamic_cast<real_argument*>(hmc->arg("stepsize_jitter"))->value();
-      int max_depth = dynamic_cast<int_argument*>(base->arg("max_depth"))->value();
+        = dynamic_cast<stan::gm::real_argument*>(hmc->arg("stepsize_jitter"))->value();
+      int max_depth = dynamic_cast<stan::gm::int_argument*>(base->arg("max_depth"))->value();
       
       dynamic_cast<Sampler*>(sampler)->set_nominal_stepsize(epsilon);
       dynamic_cast<Sampler*>(sampler)->set_stepsize_jitter(epsilon_jitter);
@@ -299,13 +299,13 @@ namespace stan {
     }
 
     template<class Sampler>
-    bool init_adapt(stan::mcmc::base_mcmc* sampler, categorical_argument* adapt,
+    bool init_adapt(stan::mcmc::base_mcmc* sampler, stan::gm::categorical_argument* adapt,
                     const Eigen::VectorXd& cont_params) {
       
-      double delta = dynamic_cast<real_argument*>(adapt->arg("delta"))->value();
-      double gamma = dynamic_cast<real_argument*>(adapt->arg("gamma"))->value();
-      double kappa = dynamic_cast<real_argument*>(adapt->arg("kappa"))->value();
-      double t0    = dynamic_cast<real_argument*>(adapt->arg("t0"))->value();
+      double delta = dynamic_cast<stan::gm::real_argument*>(adapt->arg("delta"))->value();
+      double gamma = dynamic_cast<stan::gm::real_argument*>(adapt->arg("gamma"))->value();
+      double kappa = dynamic_cast<stan::gm::real_argument*>(adapt->arg("kappa"))->value();
+      double t0    = dynamic_cast<stan::gm::real_argument*>(adapt->arg("t0"))->value();
       
       Sampler* s = dynamic_cast<Sampler*>(sampler);
 
@@ -313,16 +313,16 @@ namespace stan {
     }
     
     template<class Sampler>
-    bool init_windowed_adapt(stan::mcmc::base_mcmc* sampler, categorical_argument* adapt, 
+    bool init_windowed_adapt(stan::mcmc::base_mcmc* sampler, stan::gm::categorical_argument* adapt, 
                              unsigned int num_warmup, const Eigen::VectorXd& cont_params) {
       
       init_adapt<Sampler>(sampler, adapt, cont_params);
       
       unsigned int init_buffer 
-        = dynamic_cast<u_int_argument*>(adapt->arg("init_buffer"))->value();
+        = dynamic_cast<stan::gm::u_int_argument*>(adapt->arg("init_buffer"))->value();
       unsigned int term_buffer 
-        = dynamic_cast<u_int_argument*>(adapt->arg("term_buffer"))->value();
-      unsigned int window = dynamic_cast<u_int_argument*>(adapt->arg("window"))->value();
+        = dynamic_cast<stan::gm::u_int_argument*>(adapt->arg("term_buffer"))->value();
+      unsigned int window = dynamic_cast<stan::gm::u_int_argument*>(adapt->arg("window"))->value();
       
       dynamic_cast<Sampler*>(sampler)->set_window_params(num_warmup, init_buffer, 
                                                          term_buffer, window, &std::cout);
@@ -334,14 +334,14 @@ namespace stan {
     template <class Model>
     int command(int argc, const char* argv[]) {
 
-      std::vector<argument*> valid_arguments;
-      valid_arguments.push_back(new arg_id());
-      valid_arguments.push_back(new arg_data());
-      valid_arguments.push_back(new arg_init());
-      valid_arguments.push_back(new arg_random());
-      valid_arguments.push_back(new arg_output());
+      std::vector<stan::gm::argument*> valid_arguments;
+      valid_arguments.push_back(new stan::gm::arg_id());
+      valid_arguments.push_back(new stan::gm::arg_data());
+      valid_arguments.push_back(new stan::gm::arg_init());
+      valid_arguments.push_back(new stan::gm::arg_random());
+      valid_arguments.push_back(new stan::gm::arg_output());
       
-      argument_parser parser(valid_arguments);
+      stan::gm::argument_parser parser(valid_arguments);
       int err_code = parser.parse_args(argc, argv, &std::cout, &std::cout);
 
       if (err_code != 0) {
@@ -356,15 +356,15 @@ namespace stan {
       std::cout << std::endl;
       
       // Identification
-      unsigned int id = dynamic_cast<int_argument*>(parser.arg("id"))->value();
+      unsigned int id = dynamic_cast<stan::gm::int_argument*>(parser.arg("id"))->value();
       
       //////////////////////////////////////////////////
       //            Random number generator           //
       //////////////////////////////////////////////////
       
       unsigned int random_seed = 0;
-      u_int_argument* random_arg 
-        = dynamic_cast<u_int_argument*>(parser.arg("random")->arg("seed"));
+      stan::gm::u_int_argument* random_arg 
+        = dynamic_cast<stan::gm::u_int_argument*>(parser.arg("random")->arg("seed"));
       
       if (random_arg->is_default()) {
         random_seed = (boost::posix_time::microsec_clock::universal_time() -
@@ -390,7 +390,7 @@ namespace stan {
       
       // Data input
       std::string data_file 
-        = dynamic_cast<string_argument*>(parser.arg("data")->arg("file"))->value();
+        = dynamic_cast<stan::gm::string_argument*>(parser.arg("data")->arg("file"))->value();
       
       std::fstream data_stream(data_file.c_str(),
                                std::fstream::in);
@@ -398,7 +398,7 @@ namespace stan {
       data_stream.close();
       
       // Sample output
-      std::string output_file = dynamic_cast<string_argument*>(
+      std::string output_file = dynamic_cast<stan::gm::string_argument*>(
                                 parser.arg("output")->arg("file"))->value();
       std::fstream* output_stream = 0;
       if (output_file != "") {
@@ -407,7 +407,7 @@ namespace stan {
       }
       
       // Diagnostic output
-      std::string diagnostic_file = dynamic_cast<string_argument*>(
+      std::string diagnostic_file = dynamic_cast<stan::gm::string_argument*>(
                                     parser.arg("output")->arg("diagnostic_file"))->value();
       
       std::fstream* diagnostic_stream = 0;
@@ -417,7 +417,7 @@ namespace stan {
       }
       
       // Refresh rate
-      int refresh = dynamic_cast<int_argument*>(
+      int refresh = dynamic_cast<stan::gm::int_argument*>(
                     parser.arg("output")->arg("refresh"))->value();
       
       //////////////////////////////////////////////////
@@ -442,7 +442,7 @@ namespace stan {
       
       int num_init_tries = -1;
       
-      std::string init = dynamic_cast<string_argument*>(
+      std::string init = dynamic_cast<stan::gm::string_argument*>(
                          parser.arg("init"))->value();
       
       try {
@@ -462,7 +462,7 @@ namespace stan {
             std::cout << "Rejecting initialization at zero because of gradient failure."
                       << std::endl 
                       << e.what() << std::endl;
-            return error_codes::OK;
+            return stan::gm::error_codes::OK;
           }
           
           if (!boost::math::isfinite(init_log_prob)) {
@@ -595,16 +595,16 @@ namespace stan {
           cont_vector.at(i) = cont_params(i);
         std::vector<int> disc_vector;
         
-        list_argument* test = dynamic_cast<list_argument*>
+        stan::gm::list_argument* test = dynamic_cast<stan::gm::list_argument*>
                               (parser.arg("method")->arg("diagnose")->arg("test"));
         
         if (test->value() == "gradient") {
           std::cout << std::endl << "TEST GRADIENT MODE" << std::endl;
 
-          double epsilon = dynamic_cast<real_argument*>
+          double epsilon = dynamic_cast<stan::gm::real_argument*>
                            (test->arg("gradient")->arg("epsilon"))->value();
           
-          double error = dynamic_cast<real_argument*>
+          double error = dynamic_cast<stan::gm::real_argument*>
                          (test->arg("gradient")->arg("error"))->value();
           
           int num_failed
@@ -625,7 +625,7 @@ namespace stan {
           
           (void) num_failed; // FIXME: do something with the number failed
           
-          return error_codes::OK;
+          return stan::gm::error_codes::OK;
         }
         
       }
@@ -640,14 +640,14 @@ namespace stan {
           cont_vector.at(i) = cont_params(i);
         std::vector<int> disc_vector;
         
-        list_argument* algo = dynamic_cast<list_argument*>
+        stan::gm::list_argument* algo = dynamic_cast<stan::gm::list_argument*>
                               (parser.arg("method")->arg("optimize")->arg("algorithm"));
 
-        int num_iterations = dynamic_cast<int_argument*>(
+        int num_iterations = dynamic_cast<stan::gm::int_argument*>(
                              parser.arg("method")->arg("optimize")->arg("iter"))->value();
 
         bool save_iterations 
-          = dynamic_cast<bool_argument*>(parser.arg("method")
+          = dynamic_cast<stan::gm::bool_argument*>(parser.arg("method")
                                          ->arg("optimize")
                                          ->arg("save_iterations"))->value();
         if (output_stream) {
@@ -663,9 +663,9 @@ namespace stan {
         }
 
         double lp(0);
-        int return_code = error_codes::CONFIG;
+        int return_code = stan::gm::error_codes::CONFIG;
         if (algo->value() == "nesterov") {
-          bool epsilon = dynamic_cast<real_argument*>(
+          bool epsilon = dynamic_cast<stan::gm::real_argument*>(
                          algo->arg("nesterov")->arg("stepsize"))->value();
           
           
@@ -701,7 +701,7 @@ namespace stan {
             }
 
           }
-          return_code = error_codes::OK;
+          return_code = stan::gm::error_codes::OK;
         } else if (algo->value() == "newton") {
           std::vector<double> gradient;
           try {
@@ -738,18 +738,18 @@ namespace stan {
             }
             
           }
-          return_code = error_codes::OK;
+          return_code = stan::gm::error_codes::OK;
         } else if (algo->value() == "bfgs") {
           
           stan::optimization::BFGSLineSearch<Model> bfgs(model, cont_vector, disc_vector,
                                                          &std::cout);
-          bfgs._opts.alpha0 = dynamic_cast<real_argument*>(
+          bfgs._opts.alpha0 = dynamic_cast<stan::gm::real_argument*>(
                          algo->arg("bfgs")->arg("init_alpha"))->value();
-          bfgs._opts.tolF = dynamic_cast<real_argument*>(
+          bfgs._opts.tolF = dynamic_cast<stan::gm::real_argument*>(
                          algo->arg("bfgs")->arg("tol_obj"))->value();
-          bfgs._opts.tolGrad = dynamic_cast<real_argument*>(
+          bfgs._opts.tolGrad = dynamic_cast<stan::gm::real_argument*>(
                          algo->arg("bfgs")->arg("tol_grad"))->value();
-          bfgs._opts.tolX = dynamic_cast<real_argument*>(
+          bfgs._opts.tolX = dynamic_cast<stan::gm::real_argument*>(
                          algo->arg("bfgs")->arg("tol_param"))->value();
           bfgs._opts.maxIts = num_iterations;
           
@@ -807,14 +807,14 @@ namespace stan {
           
           if (ret >= 0) {
             std::cout << "Optimization terminated normally: " << std::endl;
-            return_code = error_codes::OK;
+            return_code = stan::gm::error_codes::OK;
           } else {
             std::cout << "Optimization terminated with error: " << std::endl;
-            return_code = error_codes::SOFTWARE;
+            return_code = stan::gm::error_codes::SOFTWARE;
           }
           std::cout << "  " << bfgs.get_code_string(ret) << std::endl;
         } else {
-          return_code = error_codes::CONFIG;
+          return_code = stan::gm::error_codes::CONFIG;
         }
 
         if (output_stream) {
@@ -853,16 +853,16 @@ namespace stan {
         stan::io::mcmc_writer<Model> writer(output_stream, diagnostic_stream, &std::cout);
         
         // Sampling parameters
-        int num_warmup = dynamic_cast<int_argument*>(
+        int num_warmup = dynamic_cast<stan::gm::int_argument*>(
                           parser.arg("method")->arg("sample")->arg("num_warmup"))->value();
         
-        int num_samples = dynamic_cast<int_argument*>(
+        int num_samples = dynamic_cast<stan::gm::int_argument*>(
                           parser.arg("method")->arg("sample")->arg("num_samples"))->value();
         
-        int num_thin = dynamic_cast<int_argument*>(
+        int num_thin = dynamic_cast<stan::gm::int_argument*>(
                        parser.arg("method")->arg("sample")->arg("thin"))->value();
         
-        bool save_warmup = dynamic_cast<bool_argument*>(
+        bool save_warmup = dynamic_cast<stan::gm::bool_argument*>(
                            parser.arg("method")->arg("sample")->arg("save_warmup"))->value();
         
         stan::mcmc::sample s(cont_params, 0, 0);
@@ -873,12 +873,12 @@ namespace stan {
         // Sampler
         stan::mcmc::base_mcmc* sampler_ptr = 0;
         
-        list_argument* algo = dynamic_cast<list_argument*>
+        stan::gm::list_argument* algo = dynamic_cast<stan::gm::list_argument*>
                               (parser.arg("method")->arg("sample")->arg("algorithm"));
         
-        categorical_argument* adapt = dynamic_cast<categorical_argument*>(
+        stan::gm::categorical_argument* adapt = dynamic_cast<stan::gm::categorical_argument*>(
                                       parser.arg("method")->arg("sample")->arg("adapt"));
-        bool adapt_engaged = dynamic_cast<bool_argument*>(adapt->arg("engaged"))->value();
+        bool adapt_engaged = dynamic_cast<stan::gm::bool_argument*>(adapt->arg("engaged"))->value();
         
         if (algo->value() == "fixed_param") {
           
@@ -899,8 +899,8 @@ namespace stan {
         } else if (algo->value() == "hmc") {
           
           int engine_index = 0;
-          list_argument* engine 
-            = dynamic_cast<list_argument*>(algo->arg("hmc")->arg("engine"));
+          stan::gm::list_argument* engine 
+            = dynamic_cast<stan::gm::list_argument*>(algo->arg("hmc")->arg("engine"));
           if (engine->value() == "static") {
             engine_index = 0;
           } else if (engine->value() == "nuts") {
@@ -908,8 +908,8 @@ namespace stan {
           }
           
           int metric_index = 0;
-          list_argument* metric 
-            = dynamic_cast<list_argument*>(algo->arg("hmc")->arg("metric"));
+          stan::gm::list_argument* metric 
+            = dynamic_cast<stan::gm::list_argument*>(algo->arg("hmc")->arg("metric"));
           if (metric->value() == "unit_e") {
             metric_index = 0;
           } else if (metric->value() == "diag_e") {
@@ -1048,7 +1048,7 @@ namespace stan {
         // Sampling
         start = clock();
         
-        stan::gm::sample<Model, rng_t>(sampler_ptr, num_warmup, num_samples, num_thin,
+        sample<Model, rng_t>(sampler_ptr, num_warmup, num_samples, num_thin,
                                        refresh, true,
                                        writer,
                                        s, model, base_rng);

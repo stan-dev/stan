@@ -1,12 +1,12 @@
-#include <stan/gm/command.hpp>
+#include <stan/ui/command.hpp>
 #include <gtest/gtest.h>
-#include <test/test-models/no-main/gm/test_lp.cpp>
+#include <test/test-models/no-main/ui/test_lp.cpp>
 
 typedef test_lp_model_namespace::test_lp_model Model;
 typedef boost::ecuyer1988 rng_t;
 typedef stan::mcmc::adapt_unit_e_nuts<Model, rng_t> sampler;
 
-class GmCommand : public testing::Test {
+class UiCommand : public testing::Test {
 public:
   void SetUp() {
     std::fstream empty_data_stream(std::string("").c_str());
@@ -45,8 +45,8 @@ public:
   Eigen::VectorXd z_init;
 };
 
-TEST_F(GmCommand, init_adapt_z_0) {
-  EXPECT_TRUE(stan::gm::init_adapt<sampler>(sampler_ptr,
+TEST_F(UiCommand, init_adapt_z_0) {
+  EXPECT_TRUE(stan::ui::init_adapt<sampler>(sampler_ptr,
                                             delta, gamma, kappa, t0,
                                             z_0));
   EXPECT_FLOAT_EQ(0.125, sampler_ptr->get_nominal_stepsize());
@@ -57,8 +57,8 @@ TEST_F(GmCommand, init_adapt_z_0) {
 }
 
 
-TEST_F(GmCommand, init_adapt_z_init) {
-  EXPECT_TRUE(stan::gm::init_adapt<sampler>(sampler_ptr,
+TEST_F(UiCommand, init_adapt_z_init) {
+  EXPECT_TRUE(stan::ui::init_adapt<sampler>(sampler_ptr,
                                             delta, gamma, kappa, t0,
                                             z_init));
   EXPECT_FLOAT_EQ(0.25, sampler_ptr->get_nominal_stepsize());

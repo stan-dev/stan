@@ -1,12 +1,12 @@
-#include <stan/gm/command.hpp>
+#include <stan/ui/command.hpp>
 #include <gtest/gtest.h>
-#include <test/test-models/no-main/gm/test_lp.cpp>
+#include <test/test-models/no-main/ui/test_lp.cpp>
 #include <sstream>
 
 typedef test_lp_model_namespace::test_lp_model Model;
 typedef boost::ecuyer1988 rng_t;
 
-class GmCommand : public testing::Test {
+class UiCommand : public testing::Test {
 public:
   void SetUp() {
     std::fstream empty_data_stream(std::string("").c_str());
@@ -25,7 +25,7 @@ public:
   Model* model_ptr;
 };
 
-TEST_F(GmCommand, write_iteration) {
+TEST_F(UiCommand, write_iteration) {
   std::stringstream stream;
   Model model = *model_ptr;
   double lp;
@@ -36,7 +36,7 @@ TEST_F(GmCommand, write_iteration) {
   cont_vector.push_back(0);
   cont_vector.push_back(0);
 
-  stan::gm::write_iteration(stream, model, base_rng,
+  stan::ui::write_iteration(stream, model, base_rng,
                             lp, cont_vector, disc_vector);
   EXPECT_EQ("1,0,0,1,1,2713\n", stream.str())
     << "the output should be (1,  0,       0,    exp(0),    exp(0), 2713) \n"
