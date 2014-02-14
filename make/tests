@@ -194,7 +194,10 @@ $(patsubst %.stan,%.cpp,$(filter src/test/test-models/no-main/%,$(TEST_MODELS)))
 ##
 test/unit/io/mcmc_writer.o: src/test/test-models/no-main/io_example.cpp
 test/unit/gm/command_init.o: src/test/test-models/no-main/gm/test_lp.cpp
+test/unit/gm/command_write_iteration.o: src/test/test-models/no-main/gm/test_lp.cpp
 test/unit/gm/generator.o: src/test/test-models/no-main/gm/test_lp.cpp
+
+test/unit/model/util.o: src/test/test-models/no-main/model/valid.cpp src/test/test-models/no-main/model/domain_fail.cpp
 
 test/unit/mcmc/hmc/hamiltonians/base_hamiltonian.o: src/test/test-models/no-main/mcmc/hmc/hamiltonians/funnel.cpp
 test/unit/mcmc/hmc/hamiltonians/unit_e_metric.o: src/test/test-models/no-main/mcmc/hmc/hamiltonians/funnel.cpp
@@ -211,9 +214,10 @@ test/integration/compile_models.o : $(patsubst %.stan,%$(EXE),$(FILES)) $(patsub
 
 test/CmdStan/command.o: \
    $(addprefix src/test/test-models/compiled/CmdStan/,\
-               $(addsuffix $(EXE), printer domain_fail value_fail))
+               $(addsuffix $(EXE), printer domain_fail value_fail proper))
 test/CmdStan/gm/argument_configuration.o: src/test/test-models/compiled/CmdStan/test_model$(EXE)
 test/CmdStan/fixed_param_sampler.o: src/test/test-models/compiled/CmdStan/empty$(EXE) src/test/test-models/compiled/CmdStan/proper$(EXE)
+test/CmdStan/optimization_output.o: src/test/test-models/compiled/CmdStan/optimization_output$(EXE)
 
 ##
 # CmdStan specific targets. Should be removed in the future.
@@ -288,7 +292,7 @@ test-headers: $(HEADER_TESTS)
 test-unit test-distributions test-models test-bugs test-all:
 	@echo ''
 	@echo ''
-	@echo '  The '$@' target is deprecated. Please use:'
+	@echo '  The '$@' target is deprecated. Please use these make targets instead:'
 	@echo '      '$^
 
 test-unit: src/test/unit src/test/unit-agrad-rev src/test/unit-agrad-fwd

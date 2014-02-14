@@ -13,7 +13,7 @@ TEST(ProbDistributions,MultinomialRNGSize) {
   theta << 0.3, 0.1, 0.2, 0.2, 0.2;  
   std::vector<int> sample = stan::prob::multinomial_rng(theta,10,rng);
   // bug in 2.1.0 returned 10 rather than 5 for returned size
-  EXPECT_EQ(5,sample.size());  
+  EXPECT_EQ(5U, sample.size());  
 }
 
 TEST(ProbDistributions,Multinomial) {

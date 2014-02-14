@@ -165,7 +165,7 @@ TEST_F(StanGmArgumentsConfiguration, TestIdWithMethod) {
   // Prepare arguments
   std::stringstream method_output;
   stan::gm::arg_method method;
-  method.print(&method_output, 0, '\0');
+  method.print(&method_output, 0, "");
   
   std::string l0;
   std::string method_argument("");
@@ -373,7 +373,7 @@ TEST_F(StanGmArgumentsConfiguration, TestDataWithMethod) {
   // Prepare arguments
   std::stringstream method_output;
   stan::gm::arg_method method;
-  method.print(&method_output, 0, '\0');
+  method.print(&method_output, 0, "");
   
   std::string l0;
   std::string method_argument("");
@@ -581,7 +581,7 @@ TEST_F(StanGmArgumentsConfiguration, TestInitWithMethod) {
   // Prepare arguments
   std::stringstream method_output;
   stan::gm::arg_method method;
-  method.print(&method_output, 0, '\0');
+  method.print(&method_output, 0, "");
   
   std::string l0;
   std::string method_argument("");
@@ -780,7 +780,7 @@ TEST_F(StanGmArgumentsConfiguration, TestRandomWithMethod) {
   // Prepare arguments
   std::stringstream method_output;
   stan::gm::arg_method method;
-  method.print(&method_output, 0, '\0');
+  method.print(&method_output, 0, "");
   
   std::string l0;
   std::string method_argument("");
@@ -984,7 +984,7 @@ TEST_F(StanGmArgumentsConfiguration, TestOutputWithMethod) {
   // Prepare arguments
   std::stringstream method_output;
   stan::gm::arg_method method;
-  method.print(&method_output, 0, '\0');
+  method.print(&method_output, 0, "");
   
   std::string l0;
   std::string method_argument("");

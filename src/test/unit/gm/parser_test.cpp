@@ -213,6 +213,7 @@ TEST(gmParser,declareVarWithSameNameAsModel) {
                std::invalid_argument);
 }
 TEST(gm_parser,function_signatures) {
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/good_inf.stan"));
   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures1.stan"));
   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures6.stan"));
   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures7.stan"));

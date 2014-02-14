@@ -96,14 +96,22 @@ Although it's not part of Stan's type language, in this chapter,
 \section{Increment Log Probability}
 
 There is a special function \code{increment\_log\_prob} takes a single
-real-valued argument and adds the result to the log probability.
+argument of any expression type \code{T}.
 %
 \begin{description}
-\fitem{void}{increment\_log\_prob}{real \farg{lp}}{Add \farg{lp} to
-  the total log probability accumulator returned by the log
-  probability function defined by a Stan model.}
+  \fitem{void}{increment\_log\_prob}{T \farg{lp}}{Add \farg{lp} (or
+    elements of \farg{lp} if \code{T} is a container type) to the
+    total log probability accumulator returned by the log probability
+    function defined by a Stan model.}
 \end{description}
 %
+The expression \code{lp} can be of any expression type.  Specifically,
+it can be an integer or real primitive, a vector, row vector, or
+matrix, or an array of any type, including multidimensional arrays and
+arrays of matrices, vectors, or row vectors.  Vector arguments are
+included for convenience and have no speed advantage over adding
+values in a loop.
+
 The full behavior of the \code{increment\_log\_prob} statement and its
 relation to sampling statements is described in
 \refsection{increment-log-prob}.
@@ -1085,26 +1093,44 @@ The sample variance of the elements in \farg{x}}
 elements in \farg{x}}
 \end{description}
 
-% \subsection{Distance and Squared Distance}
+\subsection{Distance and Squared Distance}
+
+\begin{description}
+\fitem{real}{distance}{vector \farg{x}, vector \farg{y}}{The Euclidean
+  distance between \farg{x} and \farg{y}, defined by
+\[
+\mbox{distance}(\mbox{\farg{x}},\mbox{\farg{y}}) 
+= \sqrt{\textstyle \sum_{n=1}^N (\mbox{\farg{x}}[n] - \mbox{\farg{y}}[n])^2},
+\]
+where \code{N} is the size of \farg{x} and \farg{y}.}
 %
-% \fitem{real}{dist}{real \farg{x}[], real \farg{y}[]}{The Euclidean
-%   distance between \farg{x} and \farg{y}, defined by
-% \[
-% \mbox{dist}(\mbox{\farg{x}},\mbox{\farg{y}}) 
-% = \sqrt{\textstyle \sum_{n=1}^N (\mbox{\farg{x}}[n] - \mbox{\farg{y}}[n])^2},
-% \]
-% where \code{N} is the size of \farg{x} and \farg{y}.
-% }
+\fitem{real}{distance}{vector \farg{x}, row\_vector \farg{y}}{The Euclidean
+  distance between \farg{x} and \farg{y}}
 %
-% \fitem{real}{squared\_dist}{real \farg{x}[], real \farg{y}[]}{The Euclidean
-%   distance between \farg{x} and \farg{y}, defined by
-% \[
-% \mbox{squared\_dist}(\mbox{\farg{x}},\mbox{\farg{y}}) 
-% = \textstyle \sum_{n=1}^N (\mbox{\farg{x}}[n] - \mbox{\farg{y}}[n])^2,
-% \]
-% where \code{N} is the size of \farg{x} and \farg{y}.
-% }
+\fitem{real}{distance}{row\_vector \farg{x}, vector \farg{y}}{The Euclidean
+  distance between \farg{x} and \farg{y}}
 %
+\fitem{real}{distance}{row\_vector \farg{x}, row\_vector \farg{y}}{The Euclidean
+  distance between \farg{x} and \farg{y}}
+%
+\fitem{real}{squared\_distance}{vector \farg{x}, vector \farg{y}[]}{The Euclidean
+  distance between \farg{x} and \farg{y}, defined by
+\[
+\mbox{squared\_distance}(\mbox{\farg{x}},\mbox{\farg{y}}) 
+= \textstyle \sum_{n=1}^N (\mbox{\farg{x}}[n] - \mbox{\farg{y}}[n])^2,
+\]
+where \code{N} is the size of \farg{x} and \farg{y}.}
+%
+\fitem{real}{squared\_distance}{vector \farg{x}, row\_vector \farg{y}[]}{The Euclidean
+  distance between \farg{x} and \farg{y}}
+%
+\fitem{real}{squared\_distance}{row\_vector \farg{x}, vector \farg{y}[]}{The Euclidean
+  distance between \farg{x} and \farg{y}}
+%
+\fitem{real}{squared\_distance}{row\_vector \farg{x}, row\_vector \farg{y}[]}{The Euclidean
+  distance between \farg{x} and \farg{y}}
+%
+\end{description}
 
 \section{Array Size and Dimension Function}
 
@@ -1218,6 +1244,7 @@ equal to \code{a[m,n]} where it is defined, for \code{j} in \code{1:3},
 \code{1:6}.
 
 \section{Other functions}
+
 \begin{description}
 %
 \fitem{real[]}{sort\_asc}{real[] \farg{v}}{
@@ -1555,7 +1582,7 @@ The dot product of the rows of \farg{x} with themselves}
 %
 \end{description}
 
-\subsection{Specialized Products}
+\subsection{Specialized Products}\label{specialized-products.section}
 
 
 \begin{description}
@@ -2053,17 +2080,30 @@ The left division of \farg{b} by a triangular view of
 
 \subsection{Linear Algebra Functions}
 
+\subsubsection{Trace}
+
 \begin{description}
 %
 \fitem{real}{trace}{matrix \farg{A}}{
 The trace of \farg{A}, or 0 if \farg{A} is empty;  \farg{A} is not
 required to be diagonal}
 %
+\end{description}
+
+\subsubsection{Determinants}
+
+\begin{description}
 \fitem{real}{determinant}{matrix \farg{A}}{
 The determinant of \farg{A}}
 %
 \fitem{real}{log\_determinant}{matrix \farg{A}}{
 The log of the absolute value of the determinant of \farg{A}}
+%
+\end{description}
+
+\subsubsection{Inverses}
+
+\begin{description}
 %
 \fitem{matrix}{inverse}{matrix \farg{A}}{
 The inverse of \farg{A}}
@@ -2071,13 +2111,36 @@ The inverse of \farg{A}}
 \fitem{matrix}{inverse\_spd}{matrix \farg{A}}{
 The inverse of \farg{A} where A is symmetric, positive definite}
 %
+\end{description}
+
+\subsubsection{Eigendecomposition}
+
+\begin{description}
+%
 \fitem{vector}{eigenvalues\_sym}{matrix \farg{A}}{
 The vector of eigenvalues of a symmetric matrix \farg{A} 
-in descending order}
+in asscending order}
 %
-\fitem{matrix}{eigenvectors\_sym}{matrix \farg{A}}{
-The matrix with the eigenvectors of symmetric matrix
-\farg{A}}
+\fitem{matrix}{eigenvectors\_sym}{matrix \farg{A}}{ The matrix with
+  the (column) eigenvectors of symmetric matrix \farg{A} in the same
+  order as returned by the function \code{eigenvalues\_sym}}
+%
+\end{description}
+%
+Because multiplying an eigenvector by $-1$ results in an eigenvector,
+eigenvectors returned by a decomposition are only identified up to a
+sign change.  In order to compare the eigenvectors produced by Stan's
+eigendecomposition to others, signs may need to be normalized in some
+way, such as by fixing the sign of a component, or doing comparisons
+allowig a multiplication by $-1$.
+
+The condition number of a symmetric matrix is defined to be the ratio
+of the largest eigenvalue to the smallest eigenvalue.  Large condition
+numbers lead to difficulty in numerical algorithms such as computing
+inverses, and thus known as ``ill conditioned.''  The ratio can even
+be infinite in the case of singular matrices (i.e., those with
+eigenvalues of 0).
+
 %
 % \fitem{vector}{eigenvalues\_self\_adjoint}{matrix \farg{A}}{The vector
 %   of eigenvalues of the self-adjoint view of \farg{A} in descending
@@ -2090,14 +2153,35 @@ The matrix with the eigenvectors of symmetric matrix
 %   \farg{A}.  See \code{eigenvalues\_self\_adjoint} for information on
 %   the self-adjoint view of a matrix.}
 %
+
+\subsubsection{Cholesky Decomposition}
+
+Every symmetric, positive-definite matrix (such as a correlation or
+covariance matrix) has a Cholesky decomposition.  If $\Sigma$ is a
+symmetric, positive-definite matrix, its Cholesky decomposition is the
+lower-triangular vector $L$ such that
+\[
+\Sigma = L \, L^{\top}.
+\]
+
+\begin{description}
+%
 \fitem{matrix}{cholesky\_decompose}{matrix \farg{A}}{
-The lower-triangular Cholesky factor of \farg{A}}
+The lower-triangular Cholesky factor of the symmetric
+positive-definite matrix \farg{A}}
+% 
+\end{description}
+
+\subsubsection{Singular Value Decomposition}
+
+Stan only provides functions for the singular values, not for the
+singular vectors involved in a singular value decomposition (SVD).
+
+\begin{description}
 %
 \fitem{vector}{singular\_values}{matrix \farg{A}}{
 The singular values of \farg{A} in descending order}
 %
-
-
 \end{description}
 
 
