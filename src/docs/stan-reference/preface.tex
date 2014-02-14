@@ -119,7 +119,7 @@ set.  The step size parameter could be tuned during warmup based on
 Metropolis rejection rates, but the number of steps was not so easy to
 tune while maintaining detailed balance in the sampler.  This led to
 the development of the No-U-Turn sampler (\NUTS)
-\citep{Hoffman-Gelman:2011, Hoffman-Gelman:2013}, which takes an ever
+\citep{Hoffman-Gelman:2011, Hoffman-Gelman:2014}, which takes an ever
 increasing number of steps until the direction of the simulation turns
 around, then uses slice sampling to select a point on the simulated
 trajectory.
