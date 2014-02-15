@@ -45,117 +45,15 @@
 #include <stan/ui/run_markov_chain.hpp>
 #include <stan/ui/warmup.hpp>
 #include <stan/ui/sample.hpp>
+#include <stan/ui/init_static_hmc.hpp>
+#include <stan/ui/init_nuts.hpp>
+#include <stan/ui/init_adapt.hpp>
+#include <stan/ui/init_windowed_adapt.hpp>
 
 namespace stan {
 
   namespace ui {
-    
-    template<class Sampler>
-    bool init_static_hmc(stan::mcmc::base_mcmc* sampler, stan::gm::argument* algorithm) {
 
-      stan::gm::categorical_argument* hmc = dynamic_cast<stan::gm::categorical_argument*>(
-                                  algorithm->arg("hmc"));
-      
-      stan::gm::categorical_argument* base = dynamic_cast<stan::gm::categorical_argument*>(
-                                   algorithm->arg("hmc")->arg("engine")->arg("static"));
-      
-      double epsilon = dynamic_cast<stan::gm::real_argument*>(hmc->arg("stepsize"))->value();
-      double epsilon_jitter 
-        = dynamic_cast<stan::gm::real_argument*>(hmc->arg("stepsize_jitter"))->value();
-      double int_time = dynamic_cast<stan::gm::real_argument*>(base->arg("int_time"))->value();
-      
-      dynamic_cast<Sampler*>(sampler)->set_nominal_stepsize_and_T(epsilon, int_time);
-      dynamic_cast<Sampler*>(sampler)->set_stepsize_jitter(epsilon_jitter);
-      
-      
-      return true;
-      
-    }
-  
-    template<class Sampler>
-    bool init_nuts(stan::mcmc::base_mcmc* sampler, stan::gm::argument* algorithm) {
-      
-      stan::gm::categorical_argument* hmc = dynamic_cast<stan::gm::categorical_argument*>(
-                                   algorithm->arg("hmc"));
-      
-      stan::gm::categorical_argument* base = dynamic_cast<stan::gm::categorical_argument*>(
-                                   algorithm->arg("hmc")->arg("engine")->arg("nuts"));
-
-      double epsilon = dynamic_cast<stan::gm::real_argument*>(hmc->arg("stepsize"))->value();
-      double epsilon_jitter 
-        = dynamic_cast<stan::gm::real_argument*>(hmc->arg("stepsize_jitter"))->value();
-      int max_depth = dynamic_cast<stan::gm::int_argument*>(base->arg("max_depth"))->value();
-      
-      dynamic_cast<Sampler*>(sampler)->set_nominal_stepsize(epsilon);
-      dynamic_cast<Sampler*>(sampler)->set_stepsize_jitter(epsilon_jitter);
-      dynamic_cast<Sampler*>(sampler)->set_max_depth(max_depth);
-      
-      return true;
-      
-    }
-
-    template<class Sampler>
-    bool init_adapt(Sampler* sampler, 
-                    const double delta,
-                    const double gamma,
-                    const double kappa, 
-                    const double t0,
-                    const Eigen::VectorXd& cont_params) {
-      const double epsilon = sampler->get_nominal_stepsize();
-      
-      sampler->get_stepsize_adaptation().set_mu(log(10 * epsilon));
-      sampler->get_stepsize_adaptation().set_delta(delta);
-      sampler->get_stepsize_adaptation().set_gamma(gamma);
-      sampler->get_stepsize_adaptation().set_kappa(kappa);
-      sampler->get_stepsize_adaptation().set_t0(t0);
-      
-      sampler->engage_adaptation();
-      
-      try {
-        sampler->z().q = cont_params;
-        sampler->init_stepsize();
-      } catch (const std::exception& e) {
-        std::cout << "Exception initializing step size." << std::endl
-                  << e.what() << std::endl;
-        return false;
-      }
-      
-      return true;
-    }
-
-    template<class Sampler>
-    bool init_adapt(stan::mcmc::base_mcmc* sampler, stan::gm::categorical_argument* adapt,
-                    const Eigen::VectorXd& cont_params) {
-      
-      double delta = dynamic_cast<stan::gm::real_argument*>(adapt->arg("delta"))->value();
-      double gamma = dynamic_cast<stan::gm::real_argument*>(adapt->arg("gamma"))->value();
-      double kappa = dynamic_cast<stan::gm::real_argument*>(adapt->arg("kappa"))->value();
-      double t0    = dynamic_cast<stan::gm::real_argument*>(adapt->arg("t0"))->value();
-      
-      Sampler* s = dynamic_cast<Sampler*>(sampler);
-
-      return init_adapt<Sampler>(s, delta, gamma, kappa, t0, cont_params);
-    }
-    
-    template<class Sampler>
-    bool init_windowed_adapt(stan::mcmc::base_mcmc* sampler, stan::gm::categorical_argument* adapt, 
-                             unsigned int num_warmup, const Eigen::VectorXd& cont_params) {
-      
-      init_adapt<Sampler>(sampler, adapt, cont_params);
-      
-      unsigned int init_buffer 
-        = dynamic_cast<stan::gm::u_int_argument*>(adapt->arg("init_buffer"))->value();
-      unsigned int term_buffer 
-        = dynamic_cast<stan::gm::u_int_argument*>(adapt->arg("term_buffer"))->value();
-      unsigned int window = dynamic_cast<stan::gm::u_int_argument*>(adapt->arg("window"))->value();
-      
-      dynamic_cast<Sampler*>(sampler)->set_window_params(num_warmup, init_buffer, 
-                                                         term_buffer, window, &std::cout);
-      
-      return true;
-      
-    }
-    
     template <class Model>
     int command(int argc, const char* argv[]) {
 

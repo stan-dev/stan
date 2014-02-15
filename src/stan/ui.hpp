@@ -3,6 +3,10 @@
 
 #include <stan/ui/command.hpp>
 #include <stan/ui/do_print.hpp>
+#include <stan/ui/init_adapt.hpp>
+#include <stan/ui/init_nuts.hpp>
+#include <stan/ui/init_static_hmc.hpp>
+#include <stan/ui/init_windowed_adapt.hpp>
 #include <stan/ui/print_progress.hpp>
 #include <stan/ui/run_markov_chain.hpp>
 #include <stan/ui/sample.hpp>
