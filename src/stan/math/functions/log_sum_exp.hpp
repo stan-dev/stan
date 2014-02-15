@@ -1,7 +1,7 @@
 #ifndef __STAN__MATH__FUNCTIONS__LOG_SUM_EXP_HPP__
 #define __STAN__MATH__FUNCTIONS__LOG_SUM_EXP_HPP__
 
-#include <stan/math/functions/log1p.hpp>
+#include <stan/math/functions/log1p_exp.hpp>
 #include <vector>
 #include <boost/math/tools/promotion.hpp>
 #include <limits>
@@ -24,8 +24,8 @@ namespace stan {
     log_sum_exp(const T2& a, const T1& b) {
       using std::exp;
       if (a > b)
-        return a + log1p(exp(b - a));
-      return b + log1p(exp(a - b));
+        return a + log1p_exp(b - a);
+      return b + log1p_exp(a - b);
     }
 
     /**
