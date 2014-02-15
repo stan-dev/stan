@@ -44,31 +44,11 @@
 #include <stan/ui/print_progress.hpp>
 #include <stan/ui/run_markov_chain.hpp>
 #include <stan/ui/warmup.hpp>
+#include <stan/ui/sample.hpp>
 
 namespace stan {
 
   namespace ui {
-
-    template <class Model, class RNG>
-    void sample(stan::mcmc::base_mcmc* sampler,
-                int num_warmup,
-                int num_samples,
-                int num_thin,
-                int refresh,
-                bool save,
-                stan::io::mcmc_writer<Model>& writer,
-                stan::mcmc::sample& init_s,
-                Model& model,
-                RNG& base_rng) {
-      
-      run_markov_chain<Model, RNG>(sampler, num_samples, num_warmup, 
-                                   num_warmup + num_samples, num_thin,
-                                   refresh, save, false,
-                                   writer,
-                                   init_s, model, base_rng);
-      
-    }
-      
     
     template<class Sampler>
     bool init_static_hmc(stan::mcmc::base_mcmc* sampler, stan::gm::argument* algorithm) {

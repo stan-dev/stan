@@ -5,6 +5,7 @@
 #include <stan/ui/do_print.hpp>
 #include <stan/ui/print_progress.hpp>
 #include <stan/ui/run_markov_chain.hpp>
+#include <stan/ui/sample.hpp>
 #include <stan/ui/warmup.hpp>
 #include <stan/ui/write_error_msg.hpp>
 #include <stan/ui/write_iteration.hpp>
