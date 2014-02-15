@@ -41,29 +41,11 @@
 #include <stan/ui/write_model.hpp>
 #include <stan/ui/write_error_msg.hpp>
 #include <stan/ui/do_print.hpp>
+#include <stan/ui/print_progress.hpp>
 
 namespace stan {
 
   namespace ui {
-    
-    void print_progress(int m, int start, int finish, int refresh, bool warmup) {
-      
-      int it_print_width = std::ceil(std::log10(finish));
-
-      if (do_print(m, (start + m + 1 == finish), refresh )) {
-        
-        std::cout << "Iteration: ";
-        std::cout << std::setw(it_print_width) << m + 1 + start
-                  << " / " << finish;
-          
-        std::cout << " [" << std::setw(3) 
-                  << static_cast<int>( (100.0 * (start + m + 1)) / finish )
-                  << "%] ";
-        std::cout << (warmup ? " (Warmup)" : " (Sampling)");
-        std::cout << std::endl;
-      }
-    
-    }
     
     template <class Model, class RNG>
     void run_markov_chain(stan::mcmc::base_mcmc* sampler,
