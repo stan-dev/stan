@@ -42,39 +42,11 @@
 #include <stan/ui/write_error_msg.hpp>
 #include <stan/ui/do_print.hpp>
 #include <stan/ui/print_progress.hpp>
+#include <stan/ui/run_markov_chain.hpp>
 
 namespace stan {
 
   namespace ui {
-    
-    template <class Model, class RNG>
-    void run_markov_chain(stan::mcmc::base_mcmc* sampler,
-                          int num_iterations,
-                          int start,
-                          int finish,
-                          int num_thin,
-                          int refresh,
-                          bool save,
-                          bool warmup,
-                          stan::io::mcmc_writer<Model>& writer,
-                          stan::mcmc::sample& init_s,
-                          Model& model,
-                          RNG& base_rng) {
-      
-      for (int m = 0; m < num_iterations; ++m) {
-      
-        print_progress(m, start, finish, refresh, warmup);
-      
-        init_s = sampler->transition(init_s);
-          
-        if ( save && ( (m % num_thin) == 0) ) {
-          writer.print_sample_params(base_rng, init_s, *sampler, model);
-          writer.print_diagnostic_params(init_s, sampler);
-        }
-
-      }
-      
-    }
 
     template <class Model, class RNG>
     void warmup(stan::mcmc::base_mcmc* sampler,
