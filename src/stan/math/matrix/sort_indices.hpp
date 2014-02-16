@@ -4,130 +4,89 @@
 #include <stan/math/matrix/Eigen.hpp>
 #include <vector>
 #include <algorithm>    // std::sort
-
-
+#include <iostream>
 
 namespace stan {
   namespace math {
     
     namespace {
-      struct svector_asc {
-        template <typename T> bool operator() (std::pair <T, int> i,
-                       std::pair <T, int> j) {
-                        if (i.first!=j.first)
-                          return (i.first < j.first);
-                        else
-                          return (i.second < j.second);
-        }
-      } vector_asc;
-      
-      struct svector_desc {
-        template <typename T> bool operator() (std::pair <T, int> i,
-                       std::pair <T, int> j) {
-                        if (i.first!=j.first)
-                          return (i.first > j.first);
-                        else
-                          return (i.second > j.second);
-        }
-      } vector_desc;
+      template <bool ascending, typename T>
+      class index_comparator_stdvector {
+         const std::vector<T>& xs_;
+      public:
+         index_comparator_stdvector(const std::vector<T>& xs) : xs_(xs) { }
+         bool operator()(int i, int j) const {
+           if (ascending)
+             return xs_[i-1] < xs_[j-1];
+           else
+             return xs_[i-1] > xs_[j-1];
+         }
+      };
+
+    
+      template <bool ascending, typename T>
+      std::vector<int> sort_indices(const std::vector<T>& xs) {
+        size_t size = xs.size();
+        std::vector<int> idxs(size);
+        for (int i = 0; i < size; ++i)
+          idxs[i] = i + 1;
+        index_comparator_stdvector<ascending,T> comparator(xs);
+        std::sort(idxs.begin(), idxs.end(),
+                  comparator);
+        return idxs;
+      }
+    
+    }
+    
+    template <typename T>
+    std::vector<int> sort_indices_asc(const std::vector<T>& xs) {
+      return sort_indices<true>(xs);
     }
 
     template <typename T>
-    inline std::vector<int> sort_indices_asc(std::vector<T> xs) {
-      size_t size = xs.size();
-      if (size < 2) {
-        if (size == 1)
-          return std::vector<int>(1, 1);
-        else
-          return std::vector<int>();
-      }
-      
-      std::vector<std::pair <T, int> > vector_pairs(size);
-
-      for (size_t i=0; i != size; i++)     
-        vector_pairs[i] = std::pair <T, int>(xs[i], i+1);
-
-      std::sort(vector_pairs.begin(), vector_pairs.end(), vector_asc);
-
-      std::vector<int> results(size);
-      for (size_t i=0; i != size; i++)
-        results[i] = vector_pairs[i].second;
-      
-      return results;
+    std::vector<int> sort_indices_desc(const std::vector<T>& xs) {
+      return sort_indices<false>(xs);
     }
+    
+    
+    //Same as all above, but for eigen matrices
+    namespace {
+      template <bool ascending, int R, int C, typename T>
+      class index_comparator_eigen {
+         const Eigen::Matrix<T, R, C>& xs_;
+      public:
+         index_comparator_eigen(const Eigen::Matrix<T, R, C>& xs) : xs_(xs) { }
+         bool operator()(int i, int j) const {
+           if (ascending)
+             return xs_[i-1] < xs_[j-1];
+           else
+             return xs_[i-1] > xs_[j-1];
+         }
+      };
 
-    template <typename T>
-    inline std::vector<int> sort_indices_desc(std::vector<T> xs) {
-      size_t size = xs.size();
-      if (size < 2) {
-        if (size == 1)
-          return std::vector<int>(1, 1);
-        else
-          return std::vector<int>();
+    
+      template <bool ascending, int R, int C, typename T>
+      std::vector<int> sort_indices(const Eigen::Matrix<T, R, C>& xs) {
+        size_t size = xs.size();
+        std::vector<int> idxs(size);
+        for (int i = 0; i < size; ++i)
+          idxs[i] = i + 1;
+        index_comparator_eigen<ascending, R, C, T> comparator(xs);
+        std::sort(idxs.begin(), idxs.end(),
+                  comparator);
+        return idxs;
       }
-      
-      std::vector<std::pair <T, int> > vector_pairs(size);
-
-      for (size_t i=0; i < size; i++)
-        vector_pairs[i] = std::pair <T, int>(xs[i], i+1);
-
-      std::sort(vector_pairs.begin(), vector_pairs.end(), vector_desc);
-
-      std::vector<int> results(size);
-      for (size_t i=0; i < size; i++)
-        results[i] = vector_pairs[i].second;
-
-      return results;
+    
     }
     
     template <typename T, int R, int C>
-    inline std::vector<int> sort_indices_asc(Eigen::Matrix<T, R, C> xs) {
-      ptrdiff_t size = xs.size();
-      if (size < 2) {
-        if (size == 1)
-          return std::vector<int>(1, 1);
-        else
-          return std::vector<int>();
-      }
-      
-      std::vector<std::pair <T, int> > vector_pairs(size);
-
-      T* data = xs.data();
-      for (ptrdiff_t i = 0; i < size; i++)
-        vector_pairs[i] = std::pair <T, int>(data[i], i+1);
-
-      std::sort(vector_pairs.begin(), vector_pairs.end(), vector_asc);
-
-      std::vector<int> results(size);
-      for (size_t i = 0; i < size; i++)
-        results[i] = vector_pairs[i].second;
-
-      return results;
+    std::vector<int> sort_indices_asc(const Eigen::Matrix<T, R, C>& xs) {
+      return sort_indices<true, R, C>(xs);
     }
 
     template <typename T, int R, int C>
-    inline std::vector<int> sort_indices_desc(Eigen::Matrix<T, R, C> xs) {
-      ptrdiff_t size = xs.size();
-      if (size < 2) {
-        if (size == 1)
-          return std::vector<int>(1, 1);
-        else
-          return std::vector<int>();
-      }
-      
-      std::vector<std::pair <T, int> > vector_pairs(size);
-
-      T* data = xs.data();
-      for (ptrdiff_t i = 0; i < size; i++)
-        vector_pairs[i] = std::pair <T, int>(data[i], i+1);
-
-      std::sort(vector_pairs.begin(), vector_pairs.end(), vector_desc);
-
-      std::vector<int> results(size);
-      for (size_t i=0; i < size; i++)
-        results[i] = vector_pairs[i].second;
-
-      return results;
+    std::vector<int> sort_indices_desc(const Eigen::Matrix<T, R, C>& xs) {
+      return sort_indices<false, R, C>(xs);
     }
 
   }
