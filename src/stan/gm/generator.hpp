@@ -1651,15 +1651,15 @@ namespace stan {
       o << INDENT2 << "return lp_accum__.sum();" << EOL2;
       o << INDENT << "} // log_prob()" << EOL2;
 
-      o << INDENT << "template <bool propto, bool jacobian, typename T>" << EOL;
-      o << INDENT << "T log_prob(Eigen::Matrix<T,Eigen::Dynamic,1>& params_r," << EOL;
+      o << INDENT << "template <bool propto, bool jacobian, typename T_>" << EOL;
+      o << INDENT << "T_ log_prob(Eigen::Matrix<T_,Eigen::Dynamic,1>& params_r," << EOL;
       o << INDENT << "           std::ostream* pstream = 0) const {" << EOL;
-      o << INDENT << "  std::vector<T> vec_params_r;" << EOL;
+      o << INDENT << "  std::vector<T_> vec_params_r;" << EOL;
       o << INDENT << "  vec_params_r.reserve(params_r.size());" << EOL;
       o << INDENT << "  for (int i = 0; i < params_r.size(); ++i)" << EOL;
       o << INDENT << "    vec_params_r.push_back(params_r(i));" << EOL;
       o << INDENT << "  std::vector<int> vec_params_i;" << EOL;
-      o << INDENT << "  return log_prob<propto,jacobian,T>(vec_params_r, vec_params_i, pstream);" << EOL;
+      o << INDENT << "  return log_prob<propto,jacobian,T_>(vec_params_r, vec_params_i, pstream);" << EOL;
       o << INDENT << "}" << EOL2;
     }
 
