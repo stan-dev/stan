@@ -1,3 +1,4 @@
+#include <stdexcept>
 #include <gtest/gtest.h>
 #include <stan/agrad/autodiff.hpp>
 
@@ -218,3 +219,30 @@ TEST(AgradAutodiff,GradientTraceMatrixTimesHessian) {
   EXPECT_FLOAT_EQ(60,grad_tr_MH(0));
   EXPECT_FLOAT_EQ(22,grad_tr_MH(1));
 }
+
+stan::agrad::var 
+sum_and_throw(const Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,1>& x) {
+  stan::agrad::var y = 0;
+  for (int i = 0; i < x.size(); ++i)
+    y += x(i);
+  throw std::domain_error("fooey");
+  return y;
+}
+
+TEST(AgradAutodiff, RecoverMemory) {
+  using Eigen::VectorXd;
+  for (int i = 0; i < 100000; ++i) {
+    try {
+      VectorXd x(5);
+      x << 1, 2, 3, 4, 5;
+      double fx;
+      VectorXd grad_fx;
+      gradient(sum_and_throw,x,fx,grad_fx);
+    } catch (const std::domain_error& e) {
+      // ignore me
+    }
+  }
+  // depends on starting allocation of 65K not being exceeded
+  // without recovery_memory in autodiff::apply_recover(), takes 67M 
+  EXPECT_TRUE(stan::agrad::memalloc_.bytes_allocated() < 100000);
+}  

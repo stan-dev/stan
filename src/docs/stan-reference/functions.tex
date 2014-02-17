@@ -1244,6 +1244,7 @@ equal to \code{a[m,n]} where it is defined, for \code{j} in \code{1:3},
 \code{1:6}.
 
 \section{Other functions}
+
 \begin{description}
 %
 \fitem{real[]}{sort\_asc}{real[] \farg{v}}{
@@ -1581,7 +1582,7 @@ The dot product of the rows of \farg{x} with themselves}
 %
 \end{description}
 
-\subsection{Specialized Products}
+\subsection{Specialized Products}\label{specialized-products.section}
 
 
 \begin{description}
@@ -2079,17 +2080,30 @@ The left division of \farg{b} by a triangular view of
 
 \subsection{Linear Algebra Functions}
 
+\subsubsection{Trace}
+
 \begin{description}
 %
 \fitem{real}{trace}{matrix \farg{A}}{
 The trace of \farg{A}, or 0 if \farg{A} is empty;  \farg{A} is not
 required to be diagonal}
 %
+\end{description}
+
+\subsubsection{Determinants}
+
+\begin{description}
 \fitem{real}{determinant}{matrix \farg{A}}{
 The determinant of \farg{A}}
 %
 \fitem{real}{log\_determinant}{matrix \farg{A}}{
 The log of the absolute value of the determinant of \farg{A}}
+%
+\end{description}
+
+\subsubsection{Inverses}
+
+\begin{description}
 %
 \fitem{matrix}{inverse}{matrix \farg{A}}{
 The inverse of \farg{A}}
@@ -2097,13 +2111,36 @@ The inverse of \farg{A}}
 \fitem{matrix}{inverse\_spd}{matrix \farg{A}}{
 The inverse of \farg{A} where A is symmetric, positive definite}
 %
+\end{description}
+
+\subsubsection{Eigendecomposition}
+
+\begin{description}
+%
 \fitem{vector}{eigenvalues\_sym}{matrix \farg{A}}{
 The vector of eigenvalues of a symmetric matrix \farg{A} 
-in descending order}
+in asscending order}
 %
-\fitem{matrix}{eigenvectors\_sym}{matrix \farg{A}}{
-The matrix with the eigenvectors of symmetric matrix
-\farg{A}}
+\fitem{matrix}{eigenvectors\_sym}{matrix \farg{A}}{ The matrix with
+  the (column) eigenvectors of symmetric matrix \farg{A} in the same
+  order as returned by the function \code{eigenvalues\_sym}}
+%
+\end{description}
+%
+Because multiplying an eigenvector by $-1$ results in an eigenvector,
+eigenvectors returned by a decomposition are only identified up to a
+sign change.  In order to compare the eigenvectors produced by Stan's
+eigendecomposition to others, signs may need to be normalized in some
+way, such as by fixing the sign of a component, or doing comparisons
+allowig a multiplication by $-1$.
+
+The condition number of a symmetric matrix is defined to be the ratio
+of the largest eigenvalue to the smallest eigenvalue.  Large condition
+numbers lead to difficulty in numerical algorithms such as computing
+inverses, and thus known as ``ill conditioned.''  The ratio can even
+be infinite in the case of singular matrices (i.e., those with
+eigenvalues of 0).
+
 %
 % \fitem{vector}{eigenvalues\_self\_adjoint}{matrix \farg{A}}{The vector
 %   of eigenvalues of the self-adjoint view of \farg{A} in descending
@@ -2116,14 +2153,35 @@ The matrix with the eigenvectors of symmetric matrix
 %   \farg{A}.  See \code{eigenvalues\_self\_adjoint} for information on
 %   the self-adjoint view of a matrix.}
 %
+
+\subsubsection{Cholesky Decomposition}
+
+Every symmetric, positive-definite matrix (such as a correlation or
+covariance matrix) has a Cholesky decomposition.  If $\Sigma$ is a
+symmetric, positive-definite matrix, its Cholesky decomposition is the
+lower-triangular vector $L$ such that
+\[
+\Sigma = L \, L^{\top}.
+\]
+
+\begin{description}
+%
 \fitem{matrix}{cholesky\_decompose}{matrix \farg{A}}{
-The lower-triangular Cholesky factor of \farg{A}}
+The lower-triangular Cholesky factor of the symmetric
+positive-definite matrix \farg{A}}
+% 
+\end{description}
+
+\subsubsection{Singular Value Decomposition}
+
+Stan only provides functions for the singular values, not for the
+singular vectors involved in a singular value decomposition (SVD).
+
+\begin{description}
 %
 \fitem{vector}{singular\_values}{matrix \farg{A}}{
 The singular values of \farg{A} in descending order}
 %
-
-
 \end{description}
 
 

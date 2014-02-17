@@ -459,6 +459,65 @@ using Cygwin.
   finally worked.
 \end{enumerate}
 
+\subsection{MKL Compiler Instructions}
+
+\subsubsection{Getting the MKL}
+
+To purchase a license, see
+%
+\begin{quote}
+\url{http://software.intel.com/en-us/intel-mkl}
+\end{quote}
+%
+For non-commercial development, see
+%
+\begin{quote}\small
+\url{http://software.intel.com/non-commercial-software-development}
+\end{quote}
+
+\subsubsection{Installing and Compiling with MKL}
+
+In order to use Intel's math kernel library (MKL) for \Cpp,
+%
+\begin{itemize}
+\item  Download and extract a fresh copy of Stan.
+\item  In your makefile change \code{CC=g++} to \code{CC=icc};  or
+  you can do this by supplying the argument \code{CC=icc} to each
+  call to make (aliases are good for this).
+\item  Add the MKL path to the makefile;  for example
+\begin{quote}
+\begin{Verbatim}
+MKLROOT = /apps/intel/2013/mkl)
+\end{Verbatim}
+\end{quote}
+\item  Add the following to makefile's \code{CFLAGS}: 
+\begin{quote}
+\begin{Verbatim}
+-I $(MKLROOT)/include and -DEIGEN_USE_MKL_ALL
+\end{Verbatim}
+\end{quote}
+\item Link to your MKL library by adding to your makefile's
+  \code{LDLIBS}.  The exact implementation will depend on your
+  system. Use the MKL link line advisor for help. For example, you
+  might add 
+\begin{quote}
+\begin{Verbatim}
+-L$(MKLROOT)/lib/intel64 -lmkl_intel_lp64
+   -lmkl_core -lmkl_sequential -lpthread -lm
+\end{Verbatim}
+\end{quote}
+\item  Compile your models as usual, for example
+\begin{quote}
+\begin{Verbatim}
+make src/models/speed/logistic/logistic
+\end{Verbatim}
+\end{quote}
+\end{itemize}
+%
+{\it Note:} \ Make sure to do the above changes before compiling for the first
+time - otherwise Stan will be compiled with \code{g++} and you won't see any
+performance gains.  
+
 
 \section{Required Software and Tools}
 
@@ -829,6 +888,32 @@ This should report version information for \gpp.  Next, verify that
 %
 This should print version information for make.
 
+\subsection{GNU Make 3.81 or Higher for Tests}\label{windows-make-install.section}
+
+Although the version of \code{make} distributed with \code{RTools}
+suffices to run Stan, in order to run the unit tests (see \refsection{testing-stan}),
+a version of GNU \code{make} version 3.81 or higher is required.  To
+install such a version of \code{make}:
+%
+\begin{itemize}
+\item Install \code{Rtools} according to instructions in the previous section.
+\item Download and install make 3.81 (or higher).  
+  \begin{itemize}
+    \item we have tested the version installed through the
+      \code{Setup} link at \\
+      \url{http://gnuwin32.sourceforge.net/packages/make.htm}
+  \end{itemize}
+\item Edit the \code{PATH} environment variable so the installation
+  location of \code{make} appears before \code{RTools}.
+\item Remove or move Windows' \code{find.exe} from
+  \Verb|C:\Windows system32|.  For example, move it to the top-level
+  \code{C:} directory.%
+\end{itemize}
+%
+The reason for the last step is a bug in this version of \code{make}. 
+Even though it should pick out \code{find.exe} from \code{Rtools}, 
+it picks out \Verb|C:\Windows\system32| first.
+
 \subsection{Install Git}
 
 There are a number of Git clients for Windows that will work.  The
@@ -843,10 +928,10 @@ Select the latest full installer and install it.
 
 \chapter{Stan for Users of BUGS}\label{stan-for-bugs.appendix}
 
-From the outside, Stan and \BUGS%
+From the outside, Stan and BUGS%
 %
-\footnote{Except where otherwise noted, we use ``\BUGS'' to refer to
-  Win\BUGS, Open\BUGS, and \JAGS, indiscriminately.}
+\footnote{Except where otherwise noted, we use ``BUGS'' to refer to
+  WinBUGS, OpenBUGS, and JAGS, indiscriminately.}
 %
 are similar --- they use statistically-themed modeling languages
 (which are similar but with some differences; see below), they can be
@@ -1345,7 +1430,7 @@ conditionals have regressions with slope 0.8.
 \item With censoring and truncation, Stan uses the censored-data or
   truncated-data likelihood---this is not always done in \BUGS.  All
   of the approaches to censoring and truncation discussed in
-  \citep{GelmanCarlinSternRubin:2003} and \citep{GelmanHill:2007} may
+  \citep{GelmanEtAl:2013} and \citep{GelmanHill:2007} may
   be implemented in Stan directly as written.
 %
 \item Stan, like \BUGS, can benefit from human intervention in the

@@ -11,7 +11,7 @@ public:
     std::vector<std::string> model_path;
     model_path.push_back("models");
     model_path.push_back("transforms");
-    model_path.push_back("bounded_double");
+    model_path.push_back("correlation_matrix");
     return model_path;
   }
   static bool has_data() {
