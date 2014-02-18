@@ -9,13 +9,35 @@
 namespace stan {
   namespace math {
     
+    /**
+     * A comparator that works for any container type that has the
+     * brackets operator.
+     *
+     * @tparam ascending true if sorting in ascending order
+     * @tparam C container type
+     */
     namespace {
-      template <bool ascending, typename T>
-      class index_comparator_stdvector {
-         const std::vector<T>& xs_;
+      template <bool ascending, typename C>
+      class index_comparator {
+         const C& xs_;
       public:
-         index_comparator_stdvector(const std::vector<T>& xs) : xs_(xs) { }
-         bool operator()(int i, int j) const {
+        /**
+         * Construct an index comparator holding a reference
+         * to the specified container.
+         *
+         * @patam xs Container
+         */
+         index_comparator(const C& xs) : xs_(xs) { }
+
+        /**
+         * Return true if the value at the first index is sorted in
+         * front of the value at the second index;  this will depend
+         * on the template parameter <code>ascending</code>.
+         *
+         * @param i Index of first value for comparison
+         * @param j Index of second value for comparison
+         */
+        bool operator()(int i, int j) const {
            if (ascending)
              return xs_[i-1] < xs_[j-1];
            else
@@ -24,70 +46,54 @@ namespace stan {
       };
 
     
-      template <bool ascending, typename T>
-      std::vector<int> sort_indices(const std::vector<T>& xs) {
+      /**
+       * Return an integer array of indices of the specified container
+       * sorting the values in ascending or descending order based on
+       * the value of the first template prameter.
+       *
+       * @tparam ascending true if sort is in ascending order
+       * @tparam C type of container
+       * @param xs Container to sort
+       * @return sorted version of container
+       */
+      template <bool ascending, typename C>
+      std::vector<int> sort_indices(const C& xs) {
         size_t size = xs.size();
-        std::vector<int> idxs(size);
+        std::vector<int> idxs;
+        idxs.resize(size);
         for (int i = 0; i < size; ++i)
           idxs[i] = i + 1;
-        index_comparator_stdvector<ascending,T> comparator(xs);
-        std::sort(idxs.begin(), idxs.end(),
-                  comparator);
+        index_comparator<ascending,C> comparator(xs);
+        std::sort(idxs.begin(), idxs.end(), comparator);
         return idxs;
       }
     
     }
     
-    template <typename T>
-    std::vector<int> sort_indices_asc(const std::vector<T>& xs) {
+    /**
+     * Return a sorted copy of the argument container in ascending order.
+     *
+     * @tparam C type of container
+     * @param xs Container to sort
+     * @return sorted version of container
+     */
+    template <typename C>
+    std::vector<int> sort_indices_asc(const C& xs) {
       return sort_indices<true>(xs);
     }
 
-    template <typename T>
-    std::vector<int> sort_indices_desc(const std::vector<T>& xs) {
+    /**
+     * Return a sorted copy of the argument container in ascending order.
+     *
+     * @tparam C type of container
+     * @param xs Container to sort
+     * @return sorted version of container
+     */
+    template <typename C>
+    std::vector<int> sort_indices_desc(const C& xs) {
       return sort_indices<false>(xs);
     }
-    
-    
-    //Same as all above, but for eigen matrices
-    namespace {
-      template <bool ascending, int R, int C, typename T>
-      class index_comparator_eigen {
-         const Eigen::Matrix<T, R, C>& xs_;
-      public:
-         index_comparator_eigen(const Eigen::Matrix<T, R, C>& xs) : xs_(xs) { }
-         bool operator()(int i, int j) const {
-           if (ascending)
-             return xs_[i-1] < xs_[j-1];
-           else
-             return xs_[i-1] > xs_[j-1];
-         }
-      };
 
-    
-      template <bool ascending, int R, int C, typename T>
-      std::vector<int> sort_indices(const Eigen::Matrix<T, R, C>& xs) {
-        size_t size = xs.size();
-        std::vector<int> idxs(size);
-        for (int i = 0; i < size; ++i)
-          idxs[i] = i + 1;
-        index_comparator_eigen<ascending, R, C, T> comparator(xs);
-        std::sort(idxs.begin(), idxs.end(),
-                  comparator);
-        return idxs;
-      }
-    
-    }
-    
-    template <typename T, int R, int C>
-    std::vector<int> sort_indices_asc(const Eigen::Matrix<T, R, C>& xs) {
-      return sort_indices<true, R, C>(xs);
-    }
-
-    template <typename T, int R, int C>
-    std::vector<int> sort_indices_desc(const Eigen::Matrix<T, R, C>& xs) {
-      return sort_indices<false, R, C>(xs);
-    }
 
   }
 }
