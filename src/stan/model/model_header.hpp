@@ -33,6 +33,6 @@
 #include <stan/model/prob_grad.hpp>
 #include <stan/prob/distributions.hpp>
 
-#include <stan/ui/command.hpp>
+#include <stan/common/command.hpp>
 
 #endif

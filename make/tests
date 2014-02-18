@@ -203,8 +203,8 @@ test/unit/mcmc/hmc/hamiltonians/diag_e_metric.o: src/test/test-models/no-main/mc
 test/unit/mcmc/hmc/hamiltonians/dense_e_metric.o: src/test/test-models/no-main/mcmc/hmc/hamiltonians/funnel.cpp
 test/unit/mcmc/hmc/integrators/expl_leapfrog.o: src/test/test-models/no-main/mcmc/hmc/integrators/command.cpp src/test/test-models/no-main/mcmc/hmc/integrators/gauss.cpp
 
-test/unit/ui/command_init.o: src/test/test-models/no-main/ui/test_lp.cpp
-test/unit/ui/write_iteration.o: src/test/test-models/no-main/ui/test_lp.cpp
+test/unit/common/command_init.o: src/test/test-models/no-main/common/test_lp.cpp
+test/unit/common/write_iteration.o: src/test/test-models/no-main/common/test_lp.cpp
 
 ##
 # all files that should be compiled as tests

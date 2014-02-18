@@ -288,7 +288,7 @@ namespace stan {
    
     void generate_includes(std::ostream& o) {
       generate_include("stan/model/model_header.hpp",o);
-      generate_include("stan/ui/command.hpp",o);
+      generate_include("stan/common/command.hpp",o);
       // generate_include("boost/random/linear_congruential.hpp",o);
       o << EOL;
     }
@@ -3938,7 +3938,7 @@ namespace stan {
                        std::ostream& out) {
       out << "int main(int argc, const char* argv[]) {" << EOL;
       out << INDENT << "try {" << EOL;
-      out << INDENT2 << "return stan::ui::command<" << model_name 
+      out << INDENT2 << "return stan::common::command<" << model_name 
           << "_namespace::" << model_name << ">(argc,argv);" << EOL;
       out << INDENT << "} catch (const std::exception& e) {" << EOL;
       out << INDENT2 
