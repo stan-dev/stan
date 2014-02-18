@@ -56,12 +56,11 @@ namespace stan {
        * @param xs Container to sort
        * @return sorted version of container
        */
-      template <bool ascending, typename C>
-      std::vector<int> sort_indices(const C& xs) {
-        size_t size = xs.size();
+      template <bool ascending, typename C, typename signal>
+      std::vector<int> sort_indices(const C& xs, const signal size) {
         std::vector<int> idxs;
         idxs.resize(size);
-        for (int i = 0; i < size; ++i)
+        for (signal i(0); i < size; ++i)
           idxs[i] = i + 1;
         index_comparator<ascending,C> comparator(xs);
         std::sort(idxs.begin(), idxs.end(), comparator);
@@ -79,7 +78,7 @@ namespace stan {
      */
     template <typename C>
     std::vector<int> sort_indices_asc(const C& xs) {
-      return sort_indices<true>(xs);
+      return sort_indices<true>(xs, xs.size());
     }
 
     /**
@@ -91,7 +90,7 @@ namespace stan {
      */
     template <typename C>
     std::vector<int> sort_indices_desc(const C& xs) {
-      return sort_indices<false>(xs);
+      return sort_indices<false>(xs, xs.size());
     }
 
 
