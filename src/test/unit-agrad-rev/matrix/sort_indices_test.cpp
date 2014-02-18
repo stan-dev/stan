@@ -1,4 +1,3 @@
-#include <stan/agrad/rev/matrix/sort_indices.hpp>
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
 #include <stan/agrad/rev.hpp>
@@ -6,7 +5,6 @@
 
 void test_sort_indices_asc(VEC val) {
   using stan::math::sort_indices_asc;
-  using stan::agrad::sort_indices_asc;
   
   AVEC x;
   for(size_t i=0U; i<val.size(); i++)
@@ -28,7 +26,6 @@ void test_sort_indices_asc(VEC val) {
 
 void test_sort_indices_desc(VEC val) {
   using stan::math::sort_indices_desc;
-  using stan::agrad::sort_indices_desc;
   
   AVEC x;
   for(size_t i=0U; i<val.size(); i++)
@@ -51,7 +48,6 @@ void test_sort_indices_desc(VEC val) {
 template <typename T, int R, int C>
 void test_sort_indices_asc(Eigen::Matrix<T,R,C> val) {
   using stan::math::sort_indices_asc;
-  using stan::agrad::sort_indices_asc;
 
   typedef Eigen::Matrix<AVAR,R,C> AVEC;
   typedef Eigen::Matrix<double,R,C> VEC;
@@ -79,7 +75,6 @@ void test_sort_indices_asc(Eigen::Matrix<T,R,C> val) {
 template <typename T, int R, int C>
 void test_sort_indices_desc(Eigen::Matrix<T,R,C> val) {
   using stan::math::sort_indices_desc;
-  using stan::agrad::sort_indices_desc;
 
   typedef Eigen::Matrix<AVAR,R,C> AVEC;
   typedef Eigen::Matrix<double,R,C> VEC;
@@ -152,6 +147,9 @@ TEST(AgradRev, sort_indices) {
 }
 
 TEST(AgradRev, sort_indices_no_thrown) {
+  using stan::math::sort_indices_asc;
+  using stan::math::sort_indices_desc;
+
   AVEC vec0;
   EXPECT_EQ(0U, vec0.size());
   EXPECT_NO_THROW(sort_indices_asc(vec0));

@@ -26,7 +26,6 @@
 #include <stan/agrad/rev/matrix/sd.hpp>
 #include <stan/agrad/rev/matrix/softmax.hpp>
 #include <stan/agrad/rev/matrix/sort.hpp>
-#include <stan/agrad/rev/matrix/sort_indices.hpp>
 #include <stan/agrad/rev/matrix/squared_distance.hpp>
 #include <stan/agrad/rev/matrix/stan_print.hpp>
 #include <stan/agrad/rev/matrix/stored_gradient_vari.hpp>
