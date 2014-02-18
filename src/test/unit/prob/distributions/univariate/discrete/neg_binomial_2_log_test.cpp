@@ -1,20 +1,20 @@
-#include <stan/prob/distributions/univariate/discrete/neg_binomial.hpp>
+#include <stan/prob/distributions/univariate/discrete/neg_binomial_2.hpp>
 #include <gtest/gtest.h>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/math/distributions.hpp>
 
 TEST(ProbDistributionsNegBinomial, error_check) {
   boost::random::mt19937 rng;
-  EXPECT_NO_THROW(stan::prob::neg_binomial_log_rng(6, 2, rng));
-  EXPECT_NO_THROW(stan::prob::neg_binomial_log_rng(-0.5,1,rng));
+  EXPECT_NO_THROW(stan::prob::neg_binomial_2_log_rng(6, 2, rng));
+  EXPECT_NO_THROW(stan::prob::neg_binomial_2_log_rng(-0.5,1,rng));
 
-  EXPECT_THROW(stan::prob::neg_binomial_log_rng(0, -2, rng),std::domain_error);
-  EXPECT_THROW(stan::prob::neg_binomial_log_rng(6, -2, rng),std::domain_error);
-  EXPECT_THROW(stan::prob::neg_binomial_log_rng(-6, -0.1, rng),std::domain_error);
-  EXPECT_THROW(stan::prob::neg_binomial_log_rng(stan::math::positive_infinity(), 2,
+  EXPECT_THROW(stan::prob::neg_binomial_2_log_rng(0, -2, rng),std::domain_error);
+  EXPECT_THROW(stan::prob::neg_binomial_2_log_rng(6, -2, rng),std::domain_error);
+  EXPECT_THROW(stan::prob::neg_binomial_2_log_rng(-6, -0.1, rng),std::domain_error);
+  EXPECT_THROW(stan::prob::neg_binomial_2_log_rng(stan::math::positive_infinity(), 2,
                                             rng),
                std::domain_error);
-  EXPECT_THROW(stan::prob::neg_binomial_log_rng(stan::math::positive_infinity(),
+  EXPECT_THROW(stan::prob::neg_binomial_2_log_rng(stan::math::positive_infinity(),
                                             6, rng),
                std::domain_error);
 }
@@ -40,7 +40,7 @@ TEST(ProbDistributionsNegBinomial, chiSquareGoodnessFitTest) {
   expect[K-1] = N * (1 - cdf(dist, K - 1));
 
   while (count < N) {
-    int a = stan::prob::neg_binomial_log_rng(2.4,1.1,rng);
+    int a = stan::prob::neg_binomial_2_log_rng(2.4,1.1,rng);
     int i = 0;
     while (i < K-1 && a > loc[i])
       ++i;
@@ -77,7 +77,7 @@ TEST(ProbDistributionsNegBinomial, chiSquareGoodnessFitTest2) {
   expect[K-1] = N * (1 - cdf(dist, K - 1));
 
   while (count < N) {
-    int a = stan::prob::neg_binomial_log_rng(2.4,0.6,rng);
+    int a = stan::prob::neg_binomial_2_log_rng(2.4,0.6,rng);
     int i = 0;
     while (i < K-1 && a > loc[i])
       ++i;
@@ -114,7 +114,7 @@ TEST(ProbDistributionsNegBinomial, chiSquareGoodnessFitTest3) {
   expect[K-1] = N * (1 - cdf(dist, K - 1));
 
   while (count < N) {
-    int a = stan::prob::neg_binomial_log_rng(2.4,121,rng);
+    int a = stan::prob::neg_binomial_2_log_rng(2.4,121,rng);
     int i = 0;
     while (i < K-1 && a > loc[i])
       ++i;

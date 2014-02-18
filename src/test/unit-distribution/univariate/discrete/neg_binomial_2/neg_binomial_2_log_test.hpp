@@ -1,5 +1,5 @@
 // Arguments: Ints, Doubles, Doubles
-#include <stan/prob/distributions/univariate/discrete/neg_binomial.hpp>
+#include <stan/prob/distributions/univariate/discrete/neg_binomial_2.hpp>
 #include <stan/prob/distributions/univariate/discrete/binomial.hpp>
 
 #include <stan/math/functions/multiply_log.hpp>
@@ -55,7 +55,7 @@ public:
      const T3&, const T4&, const T5&,
      const T6&, const T7&, const T8&,
      const T9&) {
-    return stan::prob::neg_binomial_log_log(n, eta, phi);
+    return stan::prob::neg_binomial_2_log_log(n, eta, phi);
   }
 
   template <bool propto,
@@ -68,7 +68,7 @@ public:
      const T3&, const T4&, const T5&,
      const T6&, const T7&, const T8&,
      const T9&) {
-    return stan::prob::neg_binomial_log_log<propto>(n, eta, phi);
+    return stan::prob::neg_binomial_2_log_log<propto>(n, eta, phi);
   }
 
 
