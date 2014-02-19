@@ -3960,6 +3960,12 @@ namespace stan {
           << INDENT << "}" << EOL2;
     }
 
+    void generate_model_typedef(const std::string& model_name,
+                                std::ostream& out) {
+      out << "typedef " << model_name << "_namespace::" << model_name
+          << " stan_model;" <<EOL2;
+    }
+
     void generate_cpp(const program& prog, 
                       const std::string& model_name,
                       std::ostream& out,
@@ -3991,6 +3997,7 @@ namespace stan {
       generate_end_namespace(out);
       if (include_main) 
         generate_main(model_name,out);
+      generate_model_typedef(model_name,out);
     }
 
   }
