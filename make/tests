@@ -214,7 +214,6 @@ FILES := $(shell find src/test/test-models/compiled -type f -name '*.stan')
 test/integration/compile_models.o : $(patsubst %.stan,%$(EXE),$(FILES)) $(patsubst %.stan,%.cpp-test,$(wildcard src/test/test-models/syntax-only/*stan))
 
 test/CmdStan/gm/argument_configuration.o: src/test/test-models/compiled/CmdStan/test_model$(EXE)
-test/CmdStan/fixed_param_sampler.o: src/test/test-models/compiled/CmdStan/empty$(EXE) src/test/test-models/compiled/CmdStan/proper$(EXE)
 test/CmdStan/optimization_output.o: src/test/test-models/compiled/CmdStan/optimization_output$(EXE)
 
 ##
