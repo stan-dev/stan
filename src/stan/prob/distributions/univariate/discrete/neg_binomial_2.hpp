@@ -137,7 +137,7 @@ namespace stan {
     neg_binomial_2_log_log(const T_n& n,
                      const T_log_location& eta,
                      const T_inv_scale& phi) {
-      return neg_binomial_log_log<false>(n,eta,phi);
+      return neg_binomial_2_log_log<false>(n,eta,phi);
     }
 
     template <class RNG>

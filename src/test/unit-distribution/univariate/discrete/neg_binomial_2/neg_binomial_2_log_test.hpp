@@ -10,7 +10,7 @@ using std::vector;
 using std::numeric_limits;
 using stan::agrad::var;
 
-class AgradDistributionsNegBinomial : public AgradDistributionTest {
+class AgradDistributionsNegBinomial2 : public AgradDistributionTest {
 public:
   void valid_values(vector<vector<double> >& parameters,
                     vector<double>& log_prob) {
