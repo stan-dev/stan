@@ -1,10 +1,605 @@
 \part{Additional Topics}
 
 
+\chapter{Point Estimation}\label{mle.chapter}
+
+\noindent
+This chapter defines the workhorses of non-Bayesian estimation,
+maximum likelihood and penalized maximum likelihood, and relates them
+to Bayesian point estimation based on posterior means, medians, and
+modes.  Such estimates are called ``point estimates'' because they
+are composed of a single value for the model parameters $\theta$
+rather than a posterior distribution.
+
+Stan's optimizer can be used to implement (penalized) maximum
+likelihood estimation for any likelihood function and penalty function
+that can be coded in Stan's modeling language.  Stan's optimizer can
+also be used for point estimation in Bayesian settings based on
+posterior modes.  Stan's Markov chain Monte Carlo samplers can be used
+to implement point inference in Bayesian models based on posterior
+means or medians.
+
+\section{Maximum Likelihood Estimation}\label{mle.section}
+
+Given a likelihood function $p(y|\theta)$ and a fixed data vector $y$,
+the maximum likelihood estimate (MLE) is the parameter vector $\hat{\theta}$
+that maximizes the likelihood, i.e., 
+\[
+\hat{\theta} = \mbox{argmax}_{\theta} \ p(y|\theta).
+\]
+It is usually more convenient to work on the log scale.  
+An equivalent%
+%
+\footnote{The equivalence follows from the fact that densities are
+  positive and the log function is strictly monotonic, i.e., 
+  $p(y|\theta) \geq 0$ and for all $a, b > 0$, $\log a > \log b$ if and
+  only if $a > b$.}
+%
+formulation of the MLE is
+%
+\[
+\hat{\theta} = \mbox{argmax}_{\theta} \ \log p(y|\theta).
+\]
+
+\subsection{Existence of Maximum Likelihood Estimates}
+
+Because not all functions have unique maximum values, maximum
+likelihood estimates are not guaranteed to exist.  As discussed in
+\refchapter{problematic-posteriors}, this situation can arise when
+%
+\begin{itemize}
+\item there is more than one point that maximizes the likelihood function,
+\item the likelihood function is unbounded, or
+\item the likelihood function is bounded by an asymptote that is never
+  reached for legal parameter values.
+\end{itemize}
+%
+These problems persist with the penalized maximum likelihood estimates
+discussed in the next section, and Bayesian posterior modes as
+discussed in the following section.  
+
+
+\subsection{Example: Linear Regression}
+
+Consider an ordinary linear regression problem with an $N$-dimensional
+vector of observations $y$, an $(N \times K)$-dimensional data matrix
+$x$ of predictors, a $K$-dimensional parameter vector $\beta$ of
+regression coefficients, and a real-valued noise scale $\sigma > 0$,
+with log likelihood function
+\[
+\log p(y|\beta,x) = \sum_{n=1}^N \log \distro{Normal}(y_n|x_n \beta,
+\sigma).
+\]
+%
+The maximum likelihood estimate for $\theta = (\beta,\sigma)$ is just
+\[
+(\hat{\beta},\hat{\sigma})
+\ = \
+\mbox{argmax}_{\beta,\sigma} 
+\log p(y|\beta,\sigma,x) = \sum_{n=1}^N \log \distro{Normal}(y_n|x_n \beta, \sigma).
+\]
+
+\subsubsection{Squared Error}
+
+A little algebra on the log likelihood function shows that the
+marginal maximum likelihood estimate $\hat{\theta} =
+(\hat{\beta},\hat{\sigma})$ can be equivalently formulated for
+$\hat{\beta}$ in terms of least squares.  That is, $\hat{\beta}$ is
+the value for the coefficient vector that minimizes the sum of squared
+prediction errors,
+%
+\[
+\hat{\beta} 
+\ = \
+\mbox{argmin}_{\beta} \sum_{n=1}^N (y_n - x_n \beta)^2
+\ = \ 
+\mbox{argmin}_{\beta} (y - x \beta)^{\top} (y - x\beta).
+\]
+%
+The residual error for data item $n$ is the difference between the
+actual value and predicted value, $y_n - x_n \hat{\beta}$.  The
+maximum likelihood estimate for the noise scale, $\hat{\sigma}$ is
+just the square root of the average squared residual, 
+\[
+\hat{\sigma}^2
+\ = \
+\frac{1}{N} \sum_{n=1}^N \left( y_n - x_n \hat{\beta} \right)^2
+\ = \
+\frac{1}{N} (y - x \hat{\beta})^{\top} (y - x\hat{\beta}).
+\]
+
+\subsubsection{Minimizing Squared Error in Stan}
+
+The squared error approach to linear regression can be directly coded
+in Stan with the following model.
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+  int<lower=0> N;
+  int<lower=1> K;
+  vector[N] y;
+  matrix[N,K] x;
+}
+parameters {
+  vector[K] beta;
+}
+transformed parameters {
+  real<lower=0> squared_error;
+  squared_error <- dot_self(y - x * beta);
+}
+model {
+  increment_log_prob(-squared_error);
+}  
+generated quantities {
+  real<lower=0> sigma_squared;
+  sigma_squared <- squared_error / N;
+}
+\end{Verbatim}
+\end{quote}
+%
+Running Stan's optimizer on this model produces the MLE for the linear
+regression by directly minimizing the sum of squared errors and using
+that to define the noise scale as a generated quantity.
+
+By replacing \code{N} with \code{N-1} in the denominator of the
+definition of \code{sigma\_squared}, the more commonly supplied
+unbiased estimate of $\sigma^2$ can be calculated; see
+\refsection{estimation-bias} for a definition of estimation bias and a
+discussion of estimating variance.
+
+
+
+\section{Penalized Maximum Likelihood Estimation}
+
+There is nothing special about a likelihood function as far as the
+ability to perform optimization is concerned.  It is common among
+non-Bayesian statisticians to add so-called ``penalty'' functions
+to log likelihoods and optimize the new function.  The penalized
+maximum likelihood estimator for a log likelihood function 
+$\log p(y|\theta)$ and penalty function $r(\theta)$ is defined to be
+\[
+\hat{\theta} = \mbox{argmax}_{\theta} \log p(y|\theta) - r(\theta).
+\]
+The penalty function $r(\theta)$ is negated in the maximization so
+that the estimate $\hat{\theta}$ balances maximizing the log
+likelihood and minimizing the penalty.  Penalization is sometimes
+called ``regularization.''
+
+
+\subsection{Examples}\label{penalized-mle-examples}
+
+\subsubsection{Ridge Regression}
+
+Ridge regression \citep{HoerlKennard:1970} is based on penalizing the
+Euclidean length of the coefficient vector $\beta$. The ridge penalty
+function is
+%
+\[
+r(\beta) 
+\ = \
+\lambda \, \sum_{k=1}^K \beta_k^2
+\ = \ 
+\lambda \, \beta^{\top} \beta,
+\]
+%
+where $\lambda$ is a constant tuning parameter that determines the
+magnitude of the penalty. 
+
+
+Therefore, the penalized maximum likelihood estimate for ridge
+regression is just
+%
+\[
+(\hat{\beta},\hat{\sigma}) 
+\ = \
+\mbox{argmax}_{\beta,\sigma} \,
+ \sum_{n=1}^N \log \distro{Normal}(y_n|x_n \beta, \sigma) - \lambda
+ \sum_{k=1}^K \beta_k^2
+\]
+%
+The ridge penalty is sometimes called L2 regularization or shrinkage,
+because of its relation to the L2 norm.
+
+Like the basic MLE for linear regression, the ridge regression
+estimate for the coefficients $\beta$ can also be formulated in terms
+of least squares,
+%
+\[
+\hat{\beta}
+\ = \ 
+\mbox{argmin}_{\beta} \, \sum_{n=1}^N (y_n - x_n \beta)^2 + \sum_{k=1}^K \beta_k^2
+\ = \ 
+\mbox{argmin}_{\beta} \, (y - x\beta)^{\top} (y - x\beta) +
+\lambda \beta^{\top} \beta.
+\]
+
+The effect of adding the ridge penalty function is that the ridge
+regression estimate for $\beta$ is a vector of shorter length, or in
+other words, $\hat{\beta}$ is shrunk.  The ridge estimate does not
+necessarily have a smaller absolute $\beta_k$ for each $k$, nor does
+the coefficient vector necessarily point in the same direction as the
+maximum likelihood estimate.
+
+In Stan, adding the ridge penalty involves adding its magnitude as a
+data variable and the penalty itself to the model block,
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+  ...
+  real<lower=0> lambda;
+}
+...
+model {
+  ...
+  increment_log_prob(lambda * dot_self(beta));
+}
+\end{Verbatim}
+\end{quote}
+%
+The noise term calculation remains the same.
+
+\subsubsection{The Lasso}
+
+The lasso \citep{Tibshirani:1996} is an alternative to ridge
+regression that applies a penalty based on the sum of the absolute
+coefficients, rather than the sum of their squares,
+\[
+r(\beta) = \lambda \sum_{k=1}^K | \beta_k |.
+\]
+The lasso is also called L1 shrinkage due to its relation to the L1
+norm, which is also known as taxicab distance or Manattan distance.
+
+ Because the derivative of the
+penalty does not depend on the value of the $\beta_k$,
+\[
+\frac{d}{d\beta_k} \lambda \sum_{k=1}^K | \beta_k | =
+\mbox{signum}(\beta_k),
+\]
+it has the effect of shrinking parameters all the way to 0 in maximum
+likelihood estimates.  Thus it can be used for variable selection as
+well as just shrinkage.
+
+The lasso can be implemented in Stan just as easily as ridge
+regression, with the magnitude declared as data and the penalty added
+to the model block,
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+  ...
+  real<lower=0> lambda;
+}
+...
+model {
+  ...
+  for (k in 1:K)
+    increment_log_prob(lambda * abs(beta[k]));
+}
+\end{Verbatim}
+\end{quote}
+
+\subsubsection{The Elastic Net}
+
+The naive elastic net \citep{ZouHastie:2005} involves a weighted
+average of ridge and lasso penalties, with a penalty function
+\[
+r(\beta) = \lambda_1 \sum_{k=1}^K \beta_k^2 + \lambda_2 \sum_{k=1}^K
+|\beta_k|.
+\]
+The naive elastic net combines properties of both ridge regression and
+the lasso, providing both identification and variable selection.
+
+The naive elastic net can be implemented directly in Stan by combining
+implementations of ridge regression and the lasso, as
+%
+\begin{quote}
+\begin{Verbatim}
+data {
+  real<lower=0> lambda1;
+  real<lower=0> lambda2;
+  ...
+}
+...
+model {
+  ...
+  increment_log_prob(lambda2 * dot_self(beta));
+  for (k in 1:K)
+    increment_log_prob(lambda1 * abs(beta[k]));
+}
+\end{Verbatim}
+\end{quote}
+%
+
+The elastic net \citep{ZouHastie:2005} involves adjusting the final estimate for
+$\beta$ based on the fit $\hat{\beta}$ produced by the naive elastic
+net.  The elastic net estimate is
+\[
+\hat{\beta} = (1 + \lambda_2) \beta^*
+\]
+where $\beta^{*}$ is the naive elastic net estimate.
+
+To implement the elastic net in Stan, the data, parameter, and model
+blocks are the same as for the naive elastic net.  In addition, the
+elastic net estimate is calculated in the generated quantities block.
+%
+\begin{quote}
+\begin{Verbatim}
+generated quantities {
+  vector[K] beta_elastic_net;
+  ...
+  beta_elastic_net <- (1 + lambda2) * beta;
+}
+\end{Verbatim}
+\end{quote}
+%
+The error scale also needs to be calculated in the generated
+quantities block based on the elastic net coefficients
+\code{beta\_elastic\_net}.
+
+
+\subsubsection{Other Penalized Regressions}
+
+It is also common to use penalty functions that bias the coefficient
+estimates toward values other than 0, as in the estimators of
+\cite{JamesStein:1961}.  Penalty functions can also be used to bias
+estimates toward population means; see
+\citep{EfronMorris:1975,Efron:2012}.  This latter approach is similar
+to the hierarchical models commonly employed in Bayesian statistics.
+
+
+\section{Posterior Mode Estimation}
+
+There are three common approaches to Bayesian point estimation based
+on the posterior $p(\theta|y)$ of parameters $\theta$ given observed
+data $y$: the mode (maximum), the mean, and the median.  This section
+covers estimates based on the parameters $\theta$ that maximize the
+posterior density, and the next sections continue with discussions of
+the mean and median.
+
+An estimate based on a model's posterior mode can be defined by
+%
+\[
+\hat{\theta} = \mbox{argmax}_{\theta} \, p(\theta|y).
+\]
+%
+When it exists, $\hat{\theta}$ maximizes the posterior density of the
+parameters given the data.  The posterior mode is sometimes called the
+``maximum a posteriori'' (MAP) estimate.
+
+As discussed in \refchapter{problematic-posteriors} and
+\refsection{mle}, a unique posterior mode might not
+exist---there may be no value that maximizes the posterior mode or
+there may be more than one.  In these cases, the posterior mode
+estimate is undefined.  Stan's optimizer, like most optimizers, will
+have problems in these situations.  It may also return a locally
+maximal value that is not the global maximum.
+
+In cases where there is a posterior mode, it will correspond to a
+penalized maximum likelihood estimate with a penalty function equal to
+the negation of the log prior.  This is because Bayes's rule,
+\[
+p(\theta|y) = \frac{p(y|\theta) \, p(\theta)}{p(y)},
+\]
+ensures that
+%
+\begin{eqnarray*}
+\mbox{argmax}_{\theta} \ p(\theta|y)
+& = &
+\mbox{argmax}_{\theta} \ \frac{p(y|\theta) \, p(\theta)}{p(y)}
+\\[6pt]
+& = &
+\mbox{argmax}_{\theta} \ p(y|\theta) \, p(\theta),
+\end{eqnarray*}
+%
+and the positiveness of densities and the strict monotonicity of log
+ensure that
+\[
+\mbox{argmax}_{\theta} \ p(y|\theta) \, p(\theta)
+\ = \
+\mbox{argmax}_{\theta} \ \log p(y|\theta) + \log p(\theta).
+\]
+%
+
+In the case where the prior (proper or improper) is uniform, the
+posterior mode is equivalent to the maximum likelihood estimate.
+
+For most commonly used penalty functions, there are probabilistic
+equivalents.  For example, the ridge penalty function corresponds to a
+normal prior on coefficients and the lasso to a Laplace prior.  The
+reverse is always true---a negative prior can always be treated as a
+penalty function.
+
+
+
+\section{Posterior Mean Estimation}
+
+A standard Bayesian approach to point estimation is to use the
+posterior mean (assuming it exists), defined by
+%
+\[
+\hat{\theta} = \int \theta \, p(\theta|y) \, d\theta.
+\]
+%
+The posterior mean is often called {\it the}\ Bayesian estimator,
+because it's the estimator that minimizes the expected square error of
+the estimate.
+
+An estimate of the posterior mean for each parameter is returned by Stan's
+\code{bin/print} command (see \refchapter{print-command}) under the
+column headed \code{Mean}.
+
+Posterior means exist in many situations where posterior
+modes do not exist.  For example, in the $\distro{Beta}(0.1, 0.1)$
+case, there is no posterior mode, but posterior mean is well defined
+with value 0.5.  
+
+A situation where posterior means fail to exist but posterior modes do
+exist is with a posterior with a Cauchy distribution
+$\distro{Cauchy}(\mu,\tau)$.  The posterior mode is $\mu$, but the
+integral expressing the posterior mean diverges.  Such diffuse priors
+rarely arise in practical modeling applications; even with a Cauchy
+Cauchy prior for some parameters, data will provide enough constraints
+that the posterior is better behaved and means exist.
+
+Sometimes when posterior means exist, they are not meaningful, as in
+the case of a multimodal posterior arising from a mixture model or in
+the case of a uniform distribution on a closed interval.  
+
+
+\section{Posterior Median Estimation}
+
+The posterior median (i.e., 50th percentile or 0.5 quantile) is
+another popular point estimate reported for Bayesian models.  The
+posterior median minimizes the expected absolute error of estimates.
+These estimates are returned in the columns headed by \Verb|50%|
+in \code{bin/print} (see \refchapter{print-command}).
+
+Although posterior medians may fail to be meaningful, they often exist
+even where posterior means do not, as in the Cauchy distribution.
+
+
+
+\section{Estimation Error, Bias, and Variance}\label{estimation-bias.section}
+
+An estimate $\hat{\theta}$ depends on the particular data $y$ and
+either the log likelihood function, $\log p(y|\theta)$, penalized log
+likelihood function $\log p(y|\theta) - r(\theta)$, or log probability
+funtion $\log p(y,\theta) = \log p(y,\theta) + \log p(\theta)$.  In
+this section, the notation $\hat{\theta}$ is overloaded to indicate
+the estimator, which is an implicit function of the data and
+(penalized) likelihood or probability function.
+
+\subsection{Estimation Error}
+
+For a particular observed data set $y$ generated according to true
+parameters $\theta$, the estimation error is the difference between
+the estimated value and true value of the parameter,
+\[
+\mbox{err}(\hat{\theta}) = \hat{\theta} - \theta.
+\]
+%
+
+\subsection{Estimation Bias}
+
+For a particular true parameter value $\theta$ and a likelihood
+function $p(y|\theta)$, the expected estimation error averaged over
+possible data sets $y$ according to their density under the likelihood
+is
+%
+\[
+\mathbb{E}_{p(y|\theta)}[\hat{\theta}] 
+\ = \
+\int \left( \mbox{argmax}_{\theta'} p(y|\theta') \right) p(y|\theta) dy.
+\]
+
+An estimator's bias is the expected estimation error,
+%
+\[
+\mathbb{E}_{p(y|\theta)}[\hat{\theta} - \theta]
+\ = \
+\mathbb{E}_{p(y|\theta)}[\hat{\theta}] - \theta
+\]
+%
+The bias is a multivariate quantity with the same dimensions as
+$\theta$.  An estimator is unbiased if its expected estimation error
+is zero and biased otherwise.
+
+\subsubsection{Example: Estimating a Normal Distribution}
+
+Suppose a data set of observations $y_n$ for $n \in 1{:}N$ drawn from
+a normal distribution.  This presupposes a model $y_n \sim
+\distro{Normal}(\mu,\sigma)$, where both $\mu$ and $\sigma > 0$ are
+parameters.  The log likelihood is just
+\[
+\log p(y|\mu,\sigma) = \sum_{n=1}^N \log
+\distro{Normal}(y_n|\mu,\sigma).
+\]
+The maximum likelihood estimator for $\mu$ is just the sample mean,
+i.e., the average of the samples,
+\[
+\hat{\mu} = \frac{1}{N} \sum_{n=1}^N y_n.
+\]
+The maximum likelihood estimate for the mean is unbiased.
+
+The maximum likelihood estimator for the variance $\sigma^2$ is the
+average of the squared difference from the mean,
+\[
+\hat{\sigma}^2 = \frac{1}{N} \sum_{n=1}^N (y_n - \hat{\mu})^2.
+\]
+The maximum likelihood for the variance is biased on the low side,
+i.e., 
+%
+\[
+\mathbb{E}_{p(y|\mu,\sigma)}[\hat{\sigma}^2] < \sigma.
+\]
+%
+The reason for this bias is that the maximum likelihood estimate is
+based on the difference from the estimated mean $\hat{\mu}$.  Plugging
+in the actual mean can lead to larger sum of squared differences;  if
+$\mu \neq \hat{\mu}$, then
+\[
+\frac{1}{N} \sum_{n=1}^N (y_n - \mu)^2
+> 
+\frac{1}{N} \sum_{n=1}^N (y_n - \hat{\mu})^2.
+\]
+
+An alternative estimate for the variance is the sample variance, which
+is defined by
+\[
+\hat{\mu} = \frac{1}{N-1} \sum_{n=1}^N (y_n - \hat{\mu})^2.
+\]
+This value is larger than the maximum likelihood estimate by a factor
+of $N/(N-1)$.
+
+
+\subsection{Estimation Variance}
+
+The variance of component $k$ of an estimator $\hat{\theta}$ is
+computed like any other variance, as the expected squared difference
+from its expectation, 
+%
+\[
+\mbox{var}_{p(y|\theta})[\hat{\theta}_k]
+\ = \
+\mathbb{E}_{p(y|\theta})[\, (\hat{\theta}_k -
+\mathbb{E}_{p(y|\theta)}[\hat{\theta}_k])^2 \,].
+\]
+%
+The full $K \times K$ covariance matrix for the estimator is thus
+defined, as usual, by
+%
+\[
+\mbox{covar}_{p(y|\theta)}[\hat{\theta}]
+\ = \
+\mathbb{E}_{p(y|\theta})[\, (\hat{\theta} - \mathbb{E}[\hat{\theta}]) \,
+                         (\hat{\theta} -
+                         \mathbb{E}[\hat{\theta}])^{\top} \, ].
+\]
+
+Continuing the example of estimating the mean and variance of a normal
+distribution based on sample data, the maximum likelihood estimator
+(i.e., the sample mean) is the unbiased estimator for the mean $\mu$
+with the lowest variance; the Gauss-Markov theorem establishes this
+result in some generality for least-squares estimation, or
+equivalently, maximum likelihood estimation under an assumption of
+normal noise; see \citep[Section~3.2.2]{HastieTibshiraniFriedman:2009}.
+
+
+
+
+
+
+
+
+
+
+
 \chapter{Bayesian Data Analysis}\label{bayesian.chapter}
 
 \noindent
-\cite{GelmanCarlinSternRubin:2003} provide the following
+\cite{GelmanEtAl:2013} provide the following
 characterization of Bayesian data analysis.
 %
 \begin{quote}
@@ -36,7 +631,7 @@ inference, as described below.
 
 \section{Bayesian Modeling}
 
-\citep{GelmanCarlinSternRubin:2003} break applied Bayesian modeling
+\citep{GelmanEtAl:2013} break applied Bayesian modeling
 into the following three steps.
 %
 \begin{enumerate}
@@ -171,7 +766,7 @@ After the parameters are fit to data, they can be used to simulate a
 new data set by running the model inferences in the forward
 direction.  These replicated data sets can then be compared to the
 original data either visually or statistically to assess model fit 
-\citep[Chapter 6]{GelmanCarlinSternRubin:2003}.  
+\citep[Chapter 6]{GelmanEtAl:2013}.  
 
 In Stan, posterior simulations can be generated in two ways.  The
 first approach is to treat the predicted variables as parameters and
@@ -577,7 +1172,7 @@ In addition to standard \HMC, \Stan implements an adaptive version of
 tunes a step sizes during warmup.  A global step size is optimized for
 a target Metropolis-Hastings reject rate using dual averaging; see
 \citep{Nesterov:2009} for details of dual averaging and
-\citep{Hoffman-Gelman:2011,Hoffman-Gelman:2013} 
+\citep{Hoffman-Gelman:2011,Hoffman-Gelman:2014} 
 for details of its use in \Stan.  For
 information on run-time configuration of step-size adaptation, see
 \refsection{stan-command-line-options}.  Then step sizes per parameter
@@ -600,7 +1195,7 @@ out; see \refchapter{mixture-modeling} for examples.
 \HMC uses a Metropolis rejection step to ensure detailed balance of
 the resulting Markovian system; for details, see \citep{Neal:2011}.
 \NUTS uses a form of slice sampling which guarantees detailed balance;
-for details, see \citep{Hoffman-Gelman:2011,Hoffman-Gelman:2013}.%
+for details, see \citep{Hoffman-Gelman:2011,Hoffman-Gelman:2014}.%
 %
 \footnote{A transition density $\phi(\omega'|\omega)$ and density
   $\pi(\omega)$ over state space $\Omega$ satisfy detailed balance if
@@ -816,7 +1411,7 @@ p_Y(y)
 \]
 
 
-\section{Lower and Upper Bounded Scalar}
+\section{Lower and Upper Bounded Scalar}\label{logit-transform-jacobian.section}
 
 For lower and upper-bounded variables, \Stan uses a scaled and
 translated log-odds transform.
