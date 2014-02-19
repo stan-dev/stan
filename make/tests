@@ -213,8 +213,6 @@ FILES := $(shell find src/test/test-models/compiled -type f -name '*.stan')
 
 test/integration/compile_models.o : $(patsubst %.stan,%$(EXE),$(FILES)) $(patsubst %.stan,%.cpp-test,$(wildcard src/test/test-models/syntax-only/*stan))
 
-test/CmdStan/gm/argument_configuration.o: src/test/test-models/compiled/CmdStan/test_model$(EXE)
-
 ##
 # CmdStan specific targets. Should be removed in the future.
 ##
