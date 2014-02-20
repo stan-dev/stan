@@ -58,10 +58,10 @@ namespace stan {
        */
       template <bool ascending, typename C>
       std::vector<int> sort_indices(const C& xs) {
-        size_t size = xs.size();
+        typename C::size_type size = xs.size();
         std::vector<int> idxs;
         idxs.resize(size);
-        for (int i = 0; i < size; ++i)
+        for (typename C::size_type i = 0; i < size; ++i)
           idxs[i] = i + 1;
         index_comparator<ascending,C> comparator(xs);
         std::sort(idxs.begin(), idxs.end(), comparator);
