@@ -9,20 +9,20 @@ void test_sort_indices_asc() {
   T c(1);
   c[0] = 1.7;
   std::vector<int> d = sort_indices_asc(c);
-  EXPECT_EQ(c.size(), d.size());
+  EXPECT_EQ(c.size(), typename T::size_type(d.size()));
   EXPECT_EQ(d.at(0), 1);
 
   T e(2);
   e[0] = 5.9;  e[1] = -1.2;
   std::vector<int> f = sort_indices_asc(e);
-  EXPECT_EQ(e.size(), f.size());
+  EXPECT_EQ(e.size(), typename T::size_type(f.size()));
   EXPECT_EQ(f.at(0), 2);
   EXPECT_EQ(f.at(1), 1);
 
   T g(3);
   g[0] = 5.9;  g[1] = -1.2;   g[2] = 192.13456;
   std::vector<int> h = sort_indices_asc(g);
-  EXPECT_EQ(g.size(), h.size());
+  EXPECT_EQ(g.size(), typename T::size_type(h.size()));
   EXPECT_EQ(h.at(0), 2);
   EXPECT_EQ(h.at(1), 1);
   EXPECT_EQ(h.at(2), 3);
@@ -30,7 +30,6 @@ void test_sort_indices_asc() {
   T z; 
   EXPECT_NO_THROW(sort_indices_asc(z));
   EXPECT_EQ(typename T::size_type(0), z.size());
-
 }
 
 TEST(MathMatrix,sort_indices_asc) {
@@ -51,20 +50,20 @@ void test_sort_indices_desc() {
   T c(1);
   c[0] = 1.7;
   std::vector<int> d = sort_indices_desc(c);
-  EXPECT_EQ(c.size(), d.size());
+  EXPECT_EQ(c.size(), typename T::size_type(d.size()));
   EXPECT_EQ(d.at(0), 1);
 
   T e(2);
   e[0] = 5.9;  e[1] = -1.2;
   std::vector<int> f = sort_indices_desc(e);
-  EXPECT_EQ(e.size(), f.size());
+  EXPECT_EQ(e.size(), typename T::size_type(f.size()));
   EXPECT_EQ(f.at(0), 1);
   EXPECT_EQ(f.at(1), 2);
 
   T g(3);
   g[0] = 5.9;  g[1] = -1.2;   g[2] = 192.13456;
   std::vector<int> h = sort_indices_desc(g);
-  EXPECT_EQ(g.size(), h.size());
+  EXPECT_EQ(g.size(), typename T::size_type(h.size()));
   EXPECT_EQ(h.at(0), 3);
   EXPECT_EQ(h.at(1), 1);
   EXPECT_EQ(h.at(2), 2);
