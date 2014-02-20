@@ -172,7 +172,6 @@ endif
 
 ##
 # TEST_MODELS is the set of all the test models.
-# Those in the 'compiled' subdirectory are supposed to be compiled.
 # Those in the 'no_main' subdirectory are supposed to be compiled without a main function.
 ##
 TEST_MODELS := $(shell find src/test/test-models -type f -name '*.stan')
@@ -201,12 +200,7 @@ test/unit/mcmc/hmc/integrators/expl_leapfrog.o: src/test/test-models/no-main/mcm
 test/unit/common/command_init.o: src/test/test-models/no-main/common/test_lp.cpp
 test/unit/common/write_iteration.o: src/test/test-models/no-main/common/test_lp.cpp
 
-##
-# all files that should be compiled as tests
-##
-FILES := $(shell find src/test/test-models/compiled -type f -name '*.stan')
-
-test/integration/compile_models.o : $(patsubst %.stan,%$(EXE),$(FILES)) $(patsubst %.stan,%.cpp-test,$(wildcard src/test/test-models/syntax-only/*stan))
+test/integration/compile_models.o : $(patsubst %.stan,%.cpp-test,$(wildcard src/test/test-models/syntax-only/*stan))
 
 ##
 # CmdStan specific targets. Should be removed in the future.
