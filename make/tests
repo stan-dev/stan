@@ -178,11 +178,6 @@ endif
 TEST_MODELS := $(shell find src/test/test-models -type f -name '*.stan')
 
 ##
-# Compile these with a main.
-## 
-$(patsubst %.stan,%.cpp,$(filter src/test/test-models/compiled/%,$(TEST_MODELS))) : %.cpp : %.stan bin/stanc$(EXE)
-	bin$(PATH_SEPARATOR)stanc$(EXE) --o=$@ $<
-##
 # Compile these with no main.
 ##
 $(patsubst %.stan,%.cpp,$(filter src/test/test-models/no-main/%,$(TEST_MODELS))) : %.cpp : %.stan bin/stanc$(EXE)
