@@ -30,7 +30,7 @@ namespace stan {
           << "%] ";
         o << (warmup ? " (Warmup)" : " (Sampling)");
         o << suffix;
-        o << std::endl;
+        o << std::flush;
       }
     }
 
