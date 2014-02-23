@@ -15,19 +15,30 @@ namespace stan {
                         const int start, 
                         const int finish, 
                         const int refresh, 
-                        const bool warmup) {
+                        const bool warmup,
+                        std::ostream& o) {
       int it_print_width = std::ceil(std::log10(finish));
       if (do_print(m, (start + m + 1 == finish), refresh)) {
-        std::cout << "Iteration: ";
-        std::cout << std::setw(it_print_width) << m + 1 + start
-                  << " / " << finish;
-        std::cout << " [" << std::setw(3) 
-                  << static_cast<int>( (100.0 * (start + m + 1)) / finish )
-                  << "%] ";
-        std::cout << (warmup ? " (Warmup)" : " (Sampling)");
-        std::cout << std::endl;
+        o << "Iteration: ";
+        o << std::setw(it_print_width) << m + 1 + start
+          << " / " << finish;
+        o << " [" << std::setw(3) 
+          << static_cast<int>( (100.0 * (start + m + 1)) / finish )
+          << "%] ";
+        o << (warmup ? " (Warmup)" : " (Sampling)");
+        o << std::endl;
       }
     }
+
+    void print_progress(const int m, 
+                        const int start, 
+                        const int finish, 
+                        const int refresh, 
+                        const bool warmup) {
+      print_progress(m, start, finish, refresh, warmup,
+                     std::cout);
+    }
+
 
   } // namespace common
 
