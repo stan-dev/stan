@@ -1243,7 +1243,25 @@ equal to \code{a[m,n]} where it is defined, for \code{j} in \code{1:3},
 \code{k} in \code{1:4}, \code{m} in \code{1:5}, and \code{n} in
 \code{1:6}.
 
-\section{Other functions}
+\section{Sorting functions}\label{sorting-functions.section}
+
+Sorting can be used to sort values or the indices of those values in
+either ascending or descending order.  For example, if \code{v} is
+declared as a real array of size 3, with values
+\[
+\mbox{\code{v}} = (1, -10.3, 20.987),
+\]
+then the various sort routines produce
+%
+\begin{eqnarray*}
+\mbox{\code{sort\_asc(v)}} & = &  (-10.3,1,20.987)
+\\[4pt]
+\mbox{\code{sort\_desc(v)}} & = &  (20.987,1,-10.3)
+\\[4pt]
+\mbox{\code{sort\_indices\_asc(v)}} & = &  (2,1,3)
+\\[4pt]
+\mbox{\code{sort\_indices\_desc(v)}} & = &  (3,1,2)
+\end{eqnarray*}
 
 \begin{description}
 %
@@ -1259,6 +1277,22 @@ Sort the elements of \farg{v} in descending order}
 \fitem{int[]}{sort\_desc}{int[] \farg{v}}{
 Sort the elements of \farg{v} in descending order}
 %
+\fitem{int[]}{sort\_indices\_asc}{real[] \farg{v}}{
+Return an array of indices between 1 and the size of \farg{v},
+sorted to index \farg{v} in ascending order.}
+%
+\fitem{int[]}{sort\_indices\_asc}{int[] \farg{v}}{
+Return an array of indices between 1 and the size of \farg{v},
+sorted to index \farg{v} in ascending order.}
+%
+\fitem{int[]}{sort\_indices\_desc}{real[] \farg{v}}{
+Return an array of indices between 1 and the size of \farg{v},
+sorted to index \farg{v} in descending order.}
+%
+\fitem{int[]}{sort\_indices\_desc}{int[] \farg{v}}{
+Return an array of indices between 1 and the size of \farg{v},
+sorted to index \farg{v} in descending order.}
+%
 \fitem{int}{rank}{real[] \farg{v}, int \farg{s}}{
 Number of components of \farg{v} less than \farg{v[s]}}
 %
@@ -1266,6 +1300,7 @@ Number of components of \farg{v} less than \farg{v[s]}}
 Number of components of \farg{v} less than \farg{v[s]}}
 %
 \end{description}
+
 
 \chapter{Matrix Operations}\label{matrix-operations.chapter}
 \noindent
@@ -2185,7 +2220,11 @@ The singular values of \farg{A} in descending order}
 \end{description}
 
 
-\section{Other functions}
+\section{Sort Functions}
+
+See \refsection{sorting-functions} for examples of how the functions
+work. 
+
 \begin{description}
 %
 \fitem{vector}{sort\_asc}{vector \farg{v}}{
@@ -2199,6 +2238,22 @@ Sort the elements of \farg{v} in descending order}
 %
 \fitem{row\_vector}{sort\_desc}{row\_vector \farg{v}}{
 Sort the elements of \farg{v} in descending order}
+%
+\fitem{int[]}{sort\_indices\_asc}{vector \farg{v}}{
+Return an array of indices between 1 and the size of \farg{v},
+sorted to index \farg{v} in ascending order.}
+%
+\fitem{int[]}{sort\_indices\_asc}{row\_vector \farg{v}}{
+Return an array of indices between 1 and the size of \farg{v},
+sorted to index \farg{v} in ascending order.}
+%
+\fitem{int[]}{sort\_indices\_desc}{vector \farg{v}}{
+Return an array of indices between 1 and the size of \farg{v},
+sorted to index \farg{v} in descending order.}
+%
+\fitem{int[]}{sort\_indices\_desc}{row\_vector \farg{v}}{
+Return an array of indices between 1 and the size of \farg{v},
+sorted to index \farg{v} in descending order.}
 %
 \fitem{int}{rank}{vector \farg{v}, int \farg{s}}{
 Number of components of \farg{v} less than \farg{v[s]}}
