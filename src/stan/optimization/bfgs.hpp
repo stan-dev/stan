@@ -238,10 +238,10 @@ namespace stan {
       
     protected:
       FunctorType &_func;
-      VectorT _gk, _gk_1, _xk_1, _xk, _sk, _sk_1;
+      VectorT _gk, _gk_1, _xk_1, _xk, _pk, _pk_1;
       Scalar _fk, _fk_1, _alphak_1;
       Scalar _alpha, _alpha0;
-      Eigen::LDLT< HessianT > _ldlt;
+      HessianT _Hk;
       size_t _itNum;
       std::string _note;
       
@@ -249,13 +249,13 @@ namespace stan {
       const Scalar &curr_f() const { return _fk; }
       const VectorT &curr_x() const { return _xk; }
       const VectorT &curr_g() const { return _gk; }
-      const VectorT &curr_s() const { return _sk; }
+      const VectorT &curr_p() const { return _pk; }
       
       const Scalar &prev_f() const { return _fk_1; }
       const VectorT &prev_x() const { return _xk_1; }
       const VectorT &prev_g() const { return _gk_1; }
-      const VectorT &prev_s() const { return _sk_1; }
-      Scalar prev_step_size() const { return _sk_1.norm()*_alphak_1; }
+      const VectorT &prev_p() const { return _pk_1; }
+      Scalar prev_step_size() const { return _pk_1.norm()*_alphak_1; }
 
       const Scalar &alpha0() const { return _alpha0; }
       const Scalar &alpha() const { return _alpha; }
@@ -321,7 +321,7 @@ namespace stan {
       }
       
       int step() {
-        Scalar gradNorm, thetak, skyk, skBksk;
+        Scalar gradNorm, skyk, rhok;
         VectorT sk, yk, Bksk, rk;
         int retCode;
         int resetB(0);
@@ -332,10 +332,6 @@ namespace stan {
           resetB = 1;
           _note = "";
         }
-        else if (!(_ldlt.info() == Eigen::Success && _ldlt.isPositive() && (_ldlt.vectorD().array() > 0).all())) {
-          resetB = 1;
-          _note = "LDLT failed, BFGS reset; ";
-        }
         else {
           resetB = 0;
           _note = "";
@@ -344,18 +340,19 @@ namespace stan {
         while (true) {
           if (resetB) {
             // Reset the Hessian approximation
-            _sk = -_gk;
+            _pk = -_gk;
           }
           else {
-            _sk = -_ldlt.solve(_gk);
+            _pk = -_Hk*_gk;
           }
           
           if (_itNum > 1 && resetB != 2) {
             _alpha0 = _alpha = std::min(1.0,
-                                        1.01*CubicInterp(_gk_1.dot(_sk_1),
-                                                         _alphak_1, _fk - _fk_1, _gk.dot(_sk_1),
+                                        1.01*CubicInterp(_gk_1.dot(_pk_1),
+                                                         _alphak_1,
+                                                         _fk - _fk_1,
+                                                         _gk.dot(_pk_1),
                                                          _opts.minAlpha, 1.0));
-//              _alpha0 = _alpha = std::min(1.0, 1.01*(2*(_fk - _fk_1)/_gk_1.dot(_sk_1)));
           }
           else {
             _alpha0 = _alpha = _opts.alpha0;
@@ -363,12 +360,12 @@ namespace stan {
           
           if (LineSearchMethod == 0) {
             retCode = BTLineSearch(_func, _alpha, _xk_1, _fk_1, _gk_1,
-                                   _sk, _xk, _fk, _gk, _opts.rho, 
+                                   _pk, _xk, _fk, _gk, _opts.rho, 
                                    _opts.c1, _opts.minAlpha);
           }
           else if (LineSearchMethod == 1) {
             retCode = WolfeLineSearch(_func, _alpha, _xk_1, _fk_1, _gk_1,
-                                      _sk, _xk, _fk, _gk,
+                                      _pk, _xk, _fk, _gk,
                                       _opts.c1, _opts.c2, 
                                       _opts.minAlpha);
           }
@@ -392,7 +389,7 @@ namespace stan {
         std::swap(_fk,_fk_1);
         _xk.swap(_xk_1);
         _gk.swap(_gk_1);
-        _sk.swap(_sk_1);
+        _pk.swap(_pk_1);
         
         gradNorm = _gk.norm();
         sk.noalias() = _xk - _xk_1;
@@ -415,31 +412,19 @@ namespace stan {
         
         yk.noalias() = _gk - _gk_1;
         skyk = yk.dot(sk);
+        rhok = 1.0/skyk;
         if (resetB) {
-          Scalar B0fact = yk.squaredNorm()/skyk;
-          _ldlt.compute(B0fact*HessianT::Identity(_xk.size(),_xk.size()));
-          Bksk.noalias() = B0fact*sk;
-          _sk_1 = -_gk_1/B0fact;
-          _alphak_1 = B0fact*_alpha;
+          Scalar H0fact = skyk/yk.squaredNorm();
+          _Hk.noalias() = H0fact*HessianT::Identity(_xk.size(),_xk.size());
+          _pk_1 = -H0fact*_gk_1;
+          _alphak_1 = _alpha/H0fact;
         }
         else {
-          Bksk = _ldlt.transpositionsP().transpose()*(_ldlt.matrixL()*(_ldlt.vectorD().asDiagonal()*(_ldlt.matrixU()*(_ldlt.transpositionsP()*sk))));
           _alphak_1 = _alpha;
         }
-        skBksk = sk.dot(Bksk);
-        if (skyk >= 0.2*skBksk) {
-          // Full update
-          thetak = 1;
-          rk = yk;
-        }
-        else {
-          // Damped update (Procedure 18.2)
-          thetak = 0.8*skBksk/(skBksk - skyk);
-          rk.noalias() = thetak*yk + (1.0 - thetak)*Bksk;
-          _note += "Damped BFGS update";
-        }
-        _ldlt.rankUpdate(rk,1.0/sk.dot(rk));
-        _ldlt.rankUpdate(Bksk,-1.0/skBksk);
+
+        HessianT Hupd(HessianT::Identity(_xk.size(),_xk.size()) - rhok*sk*yk.transpose());
+        _Hk = Hupd*_Hk*Hupd.transpose() + rhok*sk*sk.transpose();
 
         return retCode;
       }
