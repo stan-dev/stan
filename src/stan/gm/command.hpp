@@ -743,15 +743,15 @@ namespace stan {
           
           stan::optimization::BFGSLineSearch<Model> bfgs(model, cont_vector, disc_vector,
                                                          &std::cout);
-          bfgs._opts.alpha0 = dynamic_cast<real_argument*>(
+          bfgs._ls_opts.alpha0 = dynamic_cast<real_argument*>(
                          algo->arg("bfgs")->arg("init_alpha"))->value();
-          bfgs._opts.tolF = dynamic_cast<real_argument*>(
+          bfgs._conv_opts.tolF = dynamic_cast<real_argument*>(
                          algo->arg("bfgs")->arg("tol_obj"))->value();
-          bfgs._opts.tolGrad = dynamic_cast<real_argument*>(
+          bfgs._conv_opts.tolGrad = dynamic_cast<real_argument*>(
                          algo->arg("bfgs")->arg("tol_grad"))->value();
-          bfgs._opts.tolX = dynamic_cast<real_argument*>(
+          bfgs._conv_opts.tolX = dynamic_cast<real_argument*>(
                          algo->arg("bfgs")->arg("tol_param"))->value();
-          bfgs._opts.maxIts = num_iterations;
+          bfgs._conv_opts.maxIts = num_iterations;
           
           lp = bfgs.logp();
           

@@ -228,6 +228,39 @@ namespace stan {
       }
 
     }
+
+    template<typename Scalar = double>
+    class ConvergenceOptions {
+    public:
+      ConvergenceOptions() {
+        maxIts = 10000;
+        tolX = 1e-8;
+        tolF = 1e-8;
+        tolGrad = 1e-8;
+      }
+      size_t maxIts;
+      Scalar tolX;
+      Scalar tolF;
+      Scalar tolGrad;
+    };
+
+    template<typename Scalar = double>
+    class LSOptions {
+    public:
+      LSOptions() {
+        rho = 0.75;
+        c1 = 1e-4;
+        c2 = 0.9;
+        minAlpha = 1e-12;
+        alpha0 = 1e-3;
+      }
+      Scalar rho;
+      Scalar c1;
+      Scalar c2;
+      Scalar alpha0;
+      Scalar minAlpha;
+    };
+
     template<typename FunctorType, typename Scalar = double,
              int DimAtCompile = Eigen::Dynamic,
              int LineSearchMethod = 1>
@@ -246,6 +279,9 @@ namespace stan {
       std::string _note;
       
     public:
+      LSOptions<Scalar> _ls_opts;
+      ConvergenceOptions<Scalar> _conv_opts;
+      
       const Scalar &curr_f() const { return _fk; }
       const VectorT &curr_x() const { return _xk; }
       const VectorT &curr_g() const { return _gk; }
@@ -282,29 +318,6 @@ namespace stan {
         }
       }
 
-      struct BFGSOptions {
-        BFGSOptions() {
-          maxIts = 10000;
-          rho = 0.75;
-          c1 = 1e-4;
-          c2 = 0.9;
-          minAlpha = 1e-12;
-          alpha0 = 1e-3;
-          tolX = 1e-8;
-          tolF = 1e-8;
-          tolGrad = 1e-8;
-        }
-        size_t maxIts;
-        Scalar rho;
-        Scalar c1;
-        Scalar c2;
-        Scalar alpha0;
-        Scalar minAlpha;
-        Scalar tolX;
-        Scalar tolF;
-        Scalar tolGrad;
-      } _opts;
-      
       
       BFGSMinimizer(FunctorType &f) : _func(f) { }
       
@@ -352,22 +365,22 @@ namespace stan {
                                                          _alphak_1,
                                                          _fk - _fk_1,
                                                          _gk.dot(_pk_1),
-                                                         _opts.minAlpha, 1.0));
+                                                         _ls_opts.minAlpha, 1.0));
           }
           else {
-            _alpha0 = _alpha = _opts.alpha0;
+            _alpha0 = _alpha = _ls_opts.alpha0;
           }
           
           if (LineSearchMethod == 0) {
             retCode = BTLineSearch(_func, _alpha, _xk_1, _fk_1, _gk_1,
-                                   _pk, _xk, _fk, _gk, _opts.rho, 
-                                   _opts.c1, _opts.minAlpha);
+                                   _pk, _xk, _fk, _gk, _ls_opts.rho, 
+                                   _ls_opts.c1, _ls_opts.minAlpha);
           }
           else if (LineSearchMethod == 1) {
             retCode = WolfeLineSearch(_func, _alpha, _xk_1, _fk_1, _gk_1,
                                       _pk, _xk, _fk, _gk,
-                                      _opts.c1, _opts.c2, 
-                                      _opts.minAlpha);
+                                      _ls_opts.c1, _ls_opts.c2, 
+                                      _ls_opts.minAlpha);
           }
           if (retCode) {
             if (resetB) {
@@ -394,16 +407,16 @@ namespace stan {
         gradNorm = _gk.norm();
         sk.noalias() = _xk - _xk_1;
         // Check for convergence
-        if (std::fabs(_fk - _fk_1) < _opts.tolF) {
+        if (std::fabs(_fk - _fk_1) < _conv_opts.tolF) {
           retCode = 1; // Objective function improvement wasn't sufficient
         }
-        else if (gradNorm < _opts.tolGrad) {
+        else if (gradNorm < _conv_opts.tolGrad) {
           retCode = 2; // Gradient norm was below threshold
         }
-        else if (sk.norm() < _opts.tolX) {
+        else if (sk.norm() < _conv_opts.tolX) {
           retCode = 3; // Change in x was too small
         }
-        else if (_itNum >= _opts.maxIts) {
+        else if (_itNum >= _conv_opts.maxIts) {
           retCode = 4; // Max number of iterations hit
         }
         else {
