@@ -261,9 +261,37 @@ namespace stan {
       Scalar minAlpha;
     };
 
+
+    template<typename Scalar = double,
+             int DimAtCompile = Eigen::Dynamic>
+    class BFGSUpdate_HInv {
+    public:
+      typedef Eigen::Matrix<Scalar,DimAtCompile,1> VectorT;
+      typedef Eigen::Matrix<Scalar,DimAtCompile,DimAtCompile> HessianT;
+
+      inline void reset(const Scalar &B0,size_t N) {
+          _Hk.noalias() = (1.0/B0)*HessianT::Identity(N,N);
+      }
+      inline void update(const VectorT &yk, const VectorT &sk) {
+        Scalar rhok, skyk;
+        HessianT Hupd;
+
+        skyk = yk.dot(sk);
+        rhok = 1.0/skyk;
+
+        Hupd.noalias() = HessianT::Identity(yk.size(),yk.size()) - rhok*sk*yk.transpose();
+        _Hk = Hupd*_Hk*Hupd.transpose() + rhok*sk*sk.transpose();
+      }
+      inline void search_direction(VectorT &pk, const VectorT &gk) const {
+        pk.noalias() = -(_Hk*gk);
+      }
+
+      HessianT _Hk;
+    };
+
     template<typename FunctorType, typename Scalar = double,
              int DimAtCompile = Eigen::Dynamic,
-             int LineSearchMethod = 1>
+             int LineSearchMethod = 1, typename QNUpdateType = BFGSUpdate_HInv<Scalar,DimAtCompile> >
     class BFGSMinimizer {
     public:
       typedef Eigen::Matrix<Scalar,DimAtCompile,1> VectorT;
@@ -274,7 +302,7 @@ namespace stan {
       VectorT _gk, _gk_1, _xk_1, _xk, _pk, _pk_1;
       Scalar _fk, _fk_1, _alphak_1;
       Scalar _alpha, _alpha0;
-      HessianT _Hk;
+      QNUpdateType _qn;
       size_t _itNum;
       std::string _note;
       
@@ -334,8 +362,8 @@ namespace stan {
       }
       
       int step() {
-        Scalar gradNorm, skyk, rhok;
-        VectorT sk, yk, Bksk, rk;
+        Scalar gradNorm;
+        VectorT sk, yk;
         int retCode;
         int resetB(0);
         
@@ -353,10 +381,10 @@ namespace stan {
         while (true) {
           if (resetB) {
             // Reset the Hessian approximation
-            _pk = -_gk;
+            _pk.noalias() = -_gk;
           }
           else {
-            _pk = -_Hk*_gk;
+            _qn.search_direction(_pk,_gk);
           }
           
           if (_itNum > 1 && resetB != 2) {
@@ -370,7 +398,8 @@ namespace stan {
           else {
             _alpha0 = _alpha = _ls_opts.alpha0;
           }
-          
+          // Perform the line search.  If successful, the results are in the 
+          // variables: _xk_1, _fk_1 and _gk_1.
           if (LineSearchMethod == 0) {
             retCode = BTLineSearch(_func, _alpha, _xk_1, _fk_1, _gk_1,
                                    _pk, _xk, _fk, _gk, _ls_opts.rho, 
@@ -405,7 +434,10 @@ namespace stan {
         _pk.swap(_pk_1);
         
         gradNorm = _gk.norm();
+
         sk.noalias() = _xk - _xk_1;
+        yk.noalias() = _gk - _gk_1;
+
         // Check for convergence
         if (std::fabs(_fk - _fk_1) < _conv_opts.tolF) {
           retCode = 1; // Objective function improvement wasn't sufficient
@@ -422,22 +454,17 @@ namespace stan {
         else {
           retCode = 0; // Step was successful more progress to be made
         }
-        
-        yk.noalias() = _gk - _gk_1;
-        skyk = yk.dot(sk);
-        rhok = 1.0/skyk;
+
         if (resetB) {
-          Scalar H0fact = skyk/yk.squaredNorm();
-          _Hk.noalias() = H0fact*HessianT::Identity(_xk.size(),_xk.size());
-          _pk_1 = -H0fact*_gk_1;
-          _alphak_1 = _alpha/H0fact;
+          Scalar B0fact = yk.squaredNorm()/yk.dot(sk);
+          _qn.reset(B0fact,yk.size());
+          _pk_1 /= B0fact;
+          _alphak_1 = _alpha*B0fact;
         }
         else {
           _alphak_1 = _alpha;
         }
-
-        HessianT Hupd(HessianT::Identity(_xk.size(),_xk.size()) - rhok*sk*yk.transpose());
-        _Hk = Hupd*_Hk*Hupd.transpose() + rhok*sk*sk.transpose();
+        _qn.update(yk,sk);
 
         return retCode;
       }
