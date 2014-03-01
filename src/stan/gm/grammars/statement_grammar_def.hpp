@@ -387,17 +387,20 @@ namespace stan {
     boost::phoenix::function<remove_loop_identifier> remove_loop_identifier_f;
 
     struct validate_int_expr2 {
-      template <typename T1, typename T2>
-      struct result { typedef bool type; };
+      template <typename T1, typename T2, typename T3>
+      struct result { typedef void type; };
 
-      bool operator()(const expression& expr,
+      void operator()(const expression& expr,
+                      bool& pass,
                       std::stringstream& error_msgs) const {
         if (!expr.expression_type().is_primitive_int()) {
           error_msgs << "expression denoting integer required; found type=" 
                      << expr.expression_type() << std::endl;
-          return false;
+          pass = false;
+          return;
         }
-        return true;
+        pass = true;
+        return;
       }
     };
     boost::phoenix::function<validate_int_expr2> validate_int_expr2_f;
@@ -540,10 +543,10 @@ namespace stan {
       range_r.name("range expression pair, colon");
       range_r 
         %= expression_g(_r1)
-        [_pass = validate_int_expr2_f(_1,boost::phoenix::ref(error_msgs_))]
+           [validate_int_expr2_f(_1,_pass,boost::phoenix::ref(error_msgs_))]
         >> lit(':') 
         >> expression_g(_r1)
-        [_pass = validate_int_expr2_f(_1,boost::phoenix::ref(error_msgs_))];
+           [validate_int_expr2_f(_1,_pass,boost::phoenix::ref(error_msgs_))];
 
       assignment_r.name("variable assignment by expression");
       assignment_r
@@ -568,7 +571,7 @@ namespace stan {
       dims_r 
         %= lit('[') 
         > (expression_g(_r1)
-           [_pass = validate_int_expr2_f(_1,boost::phoenix::ref(error_msgs_))]
+           [validate_int_expr2_f(_1,_pass,boost::phoenix::ref(error_msgs_))]
            % ',')
         > lit(']')
         ;

@@ -283,10 +283,21 @@ void test_throws(const std::string& model_name, const std::string& msg) {
   EXPECT_TRUE(false);
 }
 
-TEST(gmParser, addConditionalCondition) {
+TEST(gmParserStatement2Grammar, addConditionalCondition) {
   test_parsable("conditional_condition_good");
   test_throws("conditional_condition_bad_1",
               "conditions in if-else");
   test_throws("conditional_condition_bad_2",
               "conditions in if-else");
+}
+TEST(gmParserStatementGrammar, validateIntExpr2) {
+  test_parsable("validate_int_expr2_good");
+  test_throws("validate_int_expr2_bad1",
+              "expression denoting integer required");
+  test_throws("validate_int_expr2_bad2",
+              "expression denoting integer required");
+  test_throws("validate_int_expr2_bad3",
+              "expression denoting integer required");
+  test_throws("validate_int_expr2_bad4",
+              "expression denoting integer required");
 }
