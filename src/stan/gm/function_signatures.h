@@ -519,11 +519,14 @@ for (size_t i = 0; i < int_vector_types.size(); ++i)
           int_vector_types[i],vector_types[j],vector_types[k]);
       add("neg_binomial_log",DOUBLE_T,
           int_vector_types[i],vector_types[j],vector_types[k]);
-      add("neg_binomial_log_log",DOUBLE_T,
+      add("neg_binomial_2_log",DOUBLE_T,
+          int_vector_types[i],vector_types[j],vector_types[k]);
+      add("neg_binomial_2_log_log",DOUBLE_T,
           int_vector_types[i],vector_types[j],vector_types[k]);
     }
 add("neg_binomial_rng",INT_T,DOUBLE_T,DOUBLE_T);
-add("neg_binomial_rng_log",INT_T,DOUBLE_T,DOUBLE_T);
+add("neg_binomial_2_rng",INT_T,DOUBLE_T,DOUBLE_T);
+add("neg_binomial_2_log_rng",INT_T,DOUBLE_T,DOUBLE_T);
 add_nullary("negative_infinity");
 for (size_t i = 0; i < vector_types.size(); ++i)
   for (size_t j = 0; j < vector_types.size(); ++j)
