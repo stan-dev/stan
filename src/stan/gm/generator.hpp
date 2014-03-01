@@ -261,6 +261,7 @@ namespace stan {
       generate_using("stan::math::get_base1",o);
       generate_using("stan::math::initialize",o);
       generate_using("stan::math::stan_print",o);
+      generate_using("stan::math::lgamma",o);
       generate_using("stan::io::dump",o);
       generate_using("std::istream",o);
       generate_using_namespace("stan::math",o);
@@ -786,7 +787,7 @@ namespace stan {
           o_ << "\");" << EOL;
         }
         generate_indent(indents_ + x.dims_.size(),o_);
-        o_ << "} catch (std::domain_error& e) { "
+        o_ << "} catch (const std::exception& e) { "
            << EOL;
         generate_indent(indents_ + x.dims_.size() + 1, o_);
         o_ << "throw std::domain_error(std::string(\"Invalid value of " << x.name_ << ": \") + std::string(e.what()));"
@@ -819,7 +820,7 @@ namespace stan {
         generate_loop_var(x.name_,x.dims_.size());
         o_ << ",\"";
         generate_loop_var(x.name_,x.dims_.size());
-        o_ << "\"); } catch (std::domain_error& e) { throw std::domain_error(std::string(\"Invalid value of " << x.name_ << ": \") + std::string(e.what())); };" << EOL;
+        o_ << "\"); } catch (const std::exception& e) { throw std::domain_error(std::string(\"Invalid value of " << x.name_ << ": \") + std::string(e.what())); };" << EOL;
         generate_end_for_dims(x.dims_.size());
       }
       void operator()(unit_vector_var_decl const& x) const {
@@ -1649,6 +1650,17 @@ namespace stan {
       o << INDENT2 << "lp_accum__.add(lp__);" << EOL;
       o << INDENT2 << "return lp_accum__.sum();" << EOL2;
       o << INDENT << "} // log_prob()" << EOL2;
+
+      o << INDENT << "template <bool propto, bool jacobian, typename T_>" << EOL;
+      o << INDENT << "T_ log_prob(Eigen::Matrix<T_,Eigen::Dynamic,1>& params_r," << EOL;
+      o << INDENT << "           std::ostream* pstream = 0) const {" << EOL;
+      o << INDENT << "  std::vector<T_> vec_params_r;" << EOL;
+      o << INDENT << "  vec_params_r.reserve(params_r.size());" << EOL;
+      o << INDENT << "  for (int i = 0; i < params_r.size(); ++i)" << EOL;
+      o << INDENT << "    vec_params_r.push_back(params_r(i));" << EOL;
+      o << INDENT << "  std::vector<int> vec_params_i;" << EOL;
+      o << INDENT << "  return log_prob<propto,jacobian,T_>(vec_params_r, vec_params_i, pstream);" << EOL;
+      o << INDENT << "}" << EOL2;
     }
 
     struct dump_member_var_visgen : public visgen {
@@ -2446,7 +2458,7 @@ namespace stan {
         generate_dims_loop_fwd(dims);
         o_ << "try { writer__." << write_method_name;
         generate_name_dims(var_name,dims.size());
-        o_ << "); } catch (std::exception& e) { "
+        o_ << "); } catch (const std::exception& e) { "
               " throw std::runtime_error(std::string(\"Error transforming variable "
            << var_name << ": \") + e.what()); }" << EOL;
       }
@@ -2566,7 +2578,17 @@ namespace stan {
 
       o << INDENT2 << "params_r__ = writer__.data_r();" << EOL;
       o << INDENT2 << "params_i__ = writer__.data_i();" << EOL;
-      o << INDENT << "}" << EOL;
+      o << INDENT << "}" << EOL2;
+
+      o << INDENT << "void transform_inits(const stan::io::var_context& context," << EOL;
+      o << INDENT << "                     Eigen::Matrix<double,Eigen::Dynamic,1>& params_r) const {" << EOL;
+      o << INDENT << "  std::vector<double> params_r_vec;" << EOL;
+      o << INDENT << "  std::vector<int> params_i_vec;" << EOL;
+      o << INDENT << "  transform_inits(context, params_i_vec, params_r_vec);" << EOL;
+      o << INDENT << "  params_r.resize(params_r_vec.size());" << EOL;
+      o << INDENT << "  for (int i = 0; i < params_r.size(); ++i)" << EOL;
+      o << INDENT << "    params_r(i) = params_r_vec[i];" << EOL;
+      o << INDENT << "}" << EOL2;
     }
 
     // see write_csv_visgen for similar structure
@@ -3538,6 +3560,18 @@ namespace stan {
 
       o << INDENT2 << "writer__.newline();" << EOL;
       o << INDENT << "}" << EOL2;
+
+      o << INDENT << "template <typename RNG>" << EOL;
+      o << INDENT << "void write_csv(RNG& base_rng," << EOL;
+      o << INDENT << "               Eigen::Matrix<double,Eigen::Dynamic,1>& params_r," << EOL;
+      o << INDENT << "               std::ostream& o," << EOL;
+      o << INDENT << "               std::ostream* pstream = 0) const {" << EOL;
+      o << INDENT << "  std::vector<double> params_r_vec(params_r.size());" << EOL;
+      o << INDENT << "  for (int i = 0; i < params_r.size(); ++i)" << EOL;
+      o << INDENT << "    params_r_vec[i] = params_r(i);" << EOL;
+      o << INDENT << "  std::vector<int> params_i_vec;  // dummy" << EOL;
+      o << INDENT << "  write_csv(base_rng, params_r_vec, params_i_vec, o, pstream);" << EOL;
+      o << INDENT << "}" << EOL2;
     }
 
 
@@ -3877,6 +3911,25 @@ namespace stan {
         o << EOL;
 
       o << INDENT << "}" << EOL2;
+
+      o << INDENT << "template <typename RNG>" << EOL;
+      o << INDENT << "void write_array(RNG& base_rng," << EOL;
+      o << INDENT << "                 Eigen::Matrix<double,Eigen::Dynamic,1>& params_r," << EOL;
+      o << INDENT << "                 Eigen::Matrix<double,Eigen::Dynamic,1>& vars," << EOL;
+      o << INDENT << "                 bool include_tparams = true," << EOL;
+      o << INDENT << "                 bool include_gqs = true," << EOL;
+      o << INDENT << "                 std::ostream* pstream = 0) const {" << EOL;
+      o << INDENT << "  std::vector<double> params_r_vec(params_r.size());" << EOL;
+      o << INDENT << "  for (int i = 0; i < params_r.size(); ++i)" << EOL;
+      o << INDENT << "    params_r_vec[i] = params_r(i);" << EOL;
+      o << INDENT << "  std::vector<double> vars_vec;" << EOL;
+      o << INDENT << "  std::vector<int> params_i_vec;" << EOL;
+      o << INDENT << "  write_array(base_rng,params_r_vec,params_i_vec,vars_vec,include_tparams,include_gqs,pstream);" << EOL;
+      o << INDENT << "  vars.resize(vars_vec.size());" << EOL;
+      o << INDENT << "  for (int i = 0; i < vars.size(); ++i)" << EOL;
+      o << INDENT << "    vars(i) = vars_vec[i];" << EOL;
+      o << INDENT << "}" << EOL2;
+
     }
 
     
@@ -3886,7 +3939,7 @@ namespace stan {
       out << INDENT << "try {" << EOL;
       out << INDENT2 << "return stan::gm::command<" << model_name 
           << "_namespace::" << model_name << ">(argc,argv);" << EOL;
-      out << INDENT << "} catch (std::exception& e) {" << EOL;
+      out << INDENT << "} catch (const std::exception& e) {" << EOL;
       out << INDENT2 
           << "std::cerr << std::endl << \"Exception: \" << e.what() << std::endl;" 
           << EOL;

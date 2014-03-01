@@ -182,6 +182,7 @@
 	Volume = {15},
 	Year = {2006}}
 
+
 @article{Curtis:2010, 
          Author = {S.~McKay Curtis},
          Year = {2010},
@@ -287,13 +288,14 @@
 }
 
 
-@book{GelmanCarlinSternRubin:2003,
+@book{GelmanEtAl:2013, 
 	Address = {London},
-	Author = {Andrew Gelman and J.~B.~Carlin and Hal S.~Stern and Donald B.~Rubin},
-	Edition = {2nd},
-	Publisher = {CRC Press},
+	Author = {Andrew Gelman and J.~B.~Carlin and Hal S.~Stern and
+	David B.~Dunson and Aki Vehtari and Donald B.~Rubin},
+	Edition = {Third},
+	Publisher = {Chapman \&Hall/CRC Press},
 	Title = {Bayesian Data Analysis},
-	Year = {2003}}
+	Year = {2013}}
 
 @book{GelmanHill:2007,
 	Address = {Cambridge, United Kingdom},
@@ -350,6 +352,16 @@
     Pages = {97--109}
 }
 
+@article{HoerlKennard:1970,
+  author = {Arthur E.\ Hoerl and Robert W.\ Kennard},
+  year = {1970},
+  title = {Ridge regression: biased estimation for nonorthogonal problems},
+  journal = {Technometrics},  
+  volume = {12},
+  number = {1},  
+  pages = {55--67}
+}
+
 @article{Hoffman-Gelman:2011,
     Author = {Matthew D. Hoffman and Andrew Gelman},
     Title = {The No-{U}-Turn Sampler: Adaptively Setting Path 
@@ -362,7 +374,7 @@
     Year = {2011}
 }
 
-@article{Hoffman-Gelman:2013,
+@article{Hoffman-Gelman:2014,
     Author = {Matthew D. Hoffman and Andrew Gelman},
     Title = {The No-{U}-Turn Sampler: Adaptively Setting Path 
              Lengths in {H}amiltonian {M}onte {C}arlo},
@@ -385,6 +397,19 @@
   title = {The Pragmatic Programmer},
   publisher = {Addison-Wesley}
 }
+
+@inproceedings{JamesStein:1961,
+  author = {W.\ James and Charles Stein},
+  year = {1961},
+  title = {Estimation with quadratic loss}, 
+  editor = {Jerzey Neyman},
+  booktitle = {Proceedings of the Fourth Berkeley Symposium on Mathematical Statistics and Probability},
+  volume = {1},
+  pages = {361--379},
+  publisher = {University of California Press}
+}
+
+
 
 @article{Lambert:1992,  
   author = {Diane Lambert},  
@@ -461,14 +486,15 @@
    Pages = {194--203}
 }
 
-@book{Neal:1996,
-  author = {Neal, Radford M.},
+@article{Neal:1996b,
+  author = {Radford M. Neal}, 
   year = {1996},
-  title = {Bayesian Learning for Neural Networks},
-  series = {Lecture Notes in Statistics},
-  number = {118}, 
-  publisher = {Springer},
-  location = {New York}
+  title = {Sampling from multimodal distributions using tempered
+           transitions},
+  journal = {Statistics and Computing},
+  volume = {6},
+  number = {4},
+  pages = {353--366}
 }
 
 @techreport{Neal:1997,
@@ -502,16 +528,17 @@
   Pages = {116--162}
 }
   
-
 @book{Neal:1996,
-   author = {Neal, Radford},
-   title = {Bayesian Learning for Neural Networks},
-   year = {1996},
-   publisher = {Springer},
-   address = {New York},
-   series = {Lecture Notes in Statistics},
-   volume = {118}
+  author = {Neal, Radford M.},
+  year = {1996},
+  title = {Bayesian Learning for Neural Networks},
+  series = {Lecture Notes in Statistics},
+  number = {118}, 
+  publisher = {Springer},
+  location = {New York}
 }
+
+
 
 @article{Nesterov:2009,
  title={Primal-dual subgradient methods for convex problems},
@@ -625,6 +652,25 @@ address = {Piscataway, NJ, USA}
   pages = {2685--2699}
 }
 
+@article{SwendsenWang:1986,  
+  author = {Robert H. Swendsen and Jian-Sheng Wang},  
+  year = {1986},  
+  title = {Replica Monte Carlo simulation of spin glasses},
+  journal = {Physical Review Letters},
+  volume = {57},
+  pages = {2607--2609}
+}
+
+@article{Tibshirani:1996,
+  author = {Robert Tibshirani},
+  year = {1996},  
+  title = {Regression shrinkage and selection via the lasso},
+  journal = {Journal of the Royal Statistical Society, Series B},
+  volume = {58},
+  number = {1},
+  pages = {267--288}
+}
+
 @techreport{TokudaGoodrichVanMechelen:2010,
 	Author = {Tomoki Tokuda and Ben Goodrich and Iven Van~Mechelen and Andrew Gelman and Francis Tuerlinckx},
 	Date-Added = {2011-10-11 09:21:36 -0400},
@@ -673,6 +719,15 @@ address = {Piscataway, NJ, USA}
   year={2011}
 }
 
+@article{ZouHastie:2005,
+  author = {Hui Zou and Trevor Hastie}, 
+  year = {2005},
+  title = {Regularization and variable selection via the elastic net},
+  journal = {Journal of the Royal Statistical Society, Series B},
+  volume = {67},  
+  number = {2},
+  pages = {301--320}
+}
 
 %%%% ==================== OLDER BIB ITEMS ======================
 
@@ -2007,21 +2062,6 @@ address = {Piscataway, NJ, USA}
 	Title = {Politics, Economics, and the Public: Political Outcomes in the American States},
 	Year = {1966}}
 
-@article{EfronMorris:1975,
-	Author = {Efron, B. and Morris, C.},
-	Journal = {Journal of the American Statistical Association},
-	Pages = {311--319},
-	Title = {Data analysis using Stein's estimator and its generalizations},
-	Volume = {70},
-	Year = {1975}}
-
-@book{EfronTibshirani:1993,
-	Address = {London},
-	Author = {Efron, B. and Tibshirani, R. J.},
-	Publisher = {Chapman and Hall},
-	Title = {An Introduction to the Bootstrap},
-	Year = {1993}}
-
 @book{Ehrenberg:1978,
 	Address = {New York},
 	Author = {Ehrenberg, A. S. C.},
@@ -3228,11 +3268,24 @@ address = {Piscataway, NJ, USA}
 	Year = {1990}}
 
 @book{HastieTibshiraniFriedman:2002,
-	Address = {New York},
 	Author = {Hastie, T. J. and Tibshirani, R. J. and Friedman, J.},
+	Year = {2002},
+	Title = {The Elements of Statistical Learning: Data Mining,
+                 Inference, and Prediction},
+        Edition = {First},
 	Publisher = {Springer-Verlag},
-	Title = {The Elements of Statistical Learning: Data Mining, Inference, and Prediction},
-	Year = {2002}}
+	Address = {New York}
+}
+
+@book{HastieTibshiraniFriedman:2009,
+	Author = {Trevor Hastie and Robert Tibshirani and Jerome Friedman},
+	Year = {2009},
+	Title = {The Elements of Statistical Learning: Data Mining,
+                 Inference, and Prediction},
+        Edition = {Second},
+	Publisher = {Springer-Verlag},
+	Address = {New York}
+}
 
 @article{HauerNgLovell:1988,
 	Author = {Hauer, E. and Ng, J. C. N. and Lovell, J.},
@@ -4621,15 +4674,6 @@ address = {Piscataway, NJ, USA}
      Volume = {35}, 
      Year = {1980},
      Pages = {773--782}
-}
-
-@book{NocedalWright:2006,
-    Author = { Jorge Nocedal and Stephen J.~Wright},
-    Year = {2006},
-    Publisher = {Springer-{V}erlag},
-    Address = {Berlin},
-    Title = {Numerical Optimization},
-    Edition = {Second}
 }
 
 @article{NormandGlickmanGatsonis:1997,
@@ -7082,15 +7126,6 @@ address = {Piscataway, NJ, USA}
 	Title = {Applied Regression Including Computing and Graphics},
 	Year = {1999}}
 
-@article{CookGelmanRubin:2006,
-	Author = {S. R. Cook and A. Gelman and D. B. Rubin},
-	Journal = {Journal of Computational and Graphical Statistics},
-	Number = {3},
-	Pages = {675--692},
-	Title = {Validation of Software for {B}ayesian Models Using Posterior Quantiles},
-	Volume = {15},
-	Year = {2006}}
-
 @article{Cook:1999,
 	Author = {Cook, Timothy E.},
 	Journal = {American Political Science Review},
@@ -7361,6 +7396,7 @@ address = {Piscataway, NJ, USA}
 	Title = {Data analysis using Stein's estimator and its generalizations},
 	Volume = {70},
 	Year = {1975}}
+
 
 @book{EfronTibshirani:1993,
 	Address = {London},

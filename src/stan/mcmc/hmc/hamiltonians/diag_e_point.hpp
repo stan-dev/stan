@@ -13,8 +13,7 @@ namespace stan {
       
     public:
       
-      diag_e_point(int n, int m): ps_point(n, m),
-                                  mInv(n) {
+      diag_e_point(int n): ps_point(n), mInv(n) {
         mInv.setOnes();
       };
       
