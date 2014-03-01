@@ -301,3 +301,11 @@ TEST(gmParserStatementGrammar, validateIntExpr2) {
   test_throws("validate_int_expr2_bad4",
               "expression denoting integer required");
 }
+TEST(gmParserStatementGrammar, validateAllowSample) {
+  test_throws("validate_allow_sample_bad1",
+              "sampling only allowed in model");
+  test_throws("validate_allow_sample_bad2",
+              "sampling only allowed in model");
+  test_throws("validate_allow_sample_bad3",
+              "sampling only allowed in model");
+}

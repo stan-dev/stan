@@ -406,17 +406,20 @@ namespace stan {
     boost::phoenix::function<validate_int_expr2> validate_int_expr2_f;
 
     struct validate_allow_sample {
-      template <typename T1, typename T2>
-      struct result { typedef bool type; };
+      template <typename T1, typename T2, typename T3>
+      struct result { typedef void type; };
 
-      bool operator()(const bool& allow_sample,
+      void operator()(const bool& allow_sample,
+                      bool& pass,
                       std::stringstream& error_msgs) const {
         if (!allow_sample) {
-          error_msgs << "ERROR:  sampling only allowed in model."
+          error_msgs << "sampling only allowed in model."
                      << std::endl;
-          return false;
+          pass = false;
+          return;
         }
-        return true;
+        pass = true;
+        return;
       }
     };
     boost::phoenix::function<validate_allow_sample> validate_allow_sample_f;
@@ -582,8 +585,8 @@ namespace stan {
         %= ( expression_g(_r2)
              >> lit('~') )
         > eps
-          [_pass = validate_allow_sample_f(_r1,
-                                           boost::phoenix::ref(error_msgs_))]
+          [validate_allow_sample_f(_r1,_pass,
+                                   boost::phoenix::ref(error_msgs_))]
         > distribution_r(_r2)
         > -truncation_range_r(_r2)
         > lit(';')
