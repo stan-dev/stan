@@ -6,6 +6,8 @@
 #include <string>
 
 #include <boost/math/special_functions/fpclassify.hpp>
+#include <boost/tuple/tuple.hpp>
+#include <boost/circular_buffer.hpp>
 
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/model/util.hpp>
@@ -264,6 +266,68 @@ namespace stan {
 
     template<typename Scalar = double,
              int DimAtCompile = Eigen::Dynamic>
+    class LBFGSUpdate {
+    public:
+      typedef Eigen::Matrix<Scalar,DimAtCompile,1> VectorT;
+      typedef Eigen::Matrix<Scalar,DimAtCompile,DimAtCompile> HessianT;
+      typedef boost::tuple<Scalar,VectorT,VectorT> UpdateT;
+
+      LBFGSUpdate(size_t L = 5) : _buf(L) {}
+
+      void set_history_size(size_t L) {
+        _buf.rset_capacity(L);
+      }
+
+      inline void reset(const Scalar &B0,size_t N) {
+      }
+      inline void update(const VectorT &yk, const VectorT &sk) {
+        // New updates are pushed to the "back" of the circular buffer
+        Scalar skyk = yk.dot(sk);
+        Scalar invskyk = 1.0/skyk;
+        _gammak = skyk/yk.squaredNorm();
+        _buf.push_back();
+        _buf.back() = boost::tie(invskyk,yk,sk);
+      }
+      inline void search_direction(VectorT &pk, const VectorT &gk) const {
+        std::vector<Scalar> alphas(_buf.size());
+        typename boost::circular_buffer<UpdateT>::const_reverse_iterator buf_rit;
+        typename boost::circular_buffer<UpdateT>::const_iterator buf_it;
+        typename std::vector<Scalar>::const_iterator alpha_it;
+        typename std::vector<Scalar>::reverse_iterator alpha_rit;
+
+        pk.noalias() = -gk;
+        for (buf_rit = _buf.rbegin(), alpha_rit = alphas.rbegin();
+             buf_rit != _buf.rend();
+             buf_rit++, alpha_rit++) {
+          Scalar alpha;
+          const Scalar &rhoi(boost::get<0>(*buf_rit));
+          const VectorT &yi(boost::get<1>(*buf_rit));
+          const VectorT &si(boost::get<2>(*buf_rit));
+
+          alpha = rhoi * si.dot(pk);
+          pk -= alpha * yi;
+          *alpha_rit = alpha;
+        }
+        pk *= _gammak;
+        for (buf_it = _buf.begin(), alpha_it = alphas.begin();
+             buf_it != _buf.end();
+             buf_it++, alpha_it++) {
+          Scalar beta;
+          const Scalar &rhoi(boost::get<0>(*buf_it));
+          const VectorT &yi(boost::get<1>(*buf_it));
+          const VectorT &si(boost::get<2>(*buf_it));
+
+          beta = rhoi*yi.dot(pk);
+          pk += (*alpha_it - beta)*si;
+        }
+      }
+
+      boost::circular_buffer<UpdateT> _buf;
+      Scalar _gammak;
+    };
+
+    template<typename Scalar = double,
+             int DimAtCompile = Eigen::Dynamic>
     class BFGSUpdate_HInv {
     public:
       typedef Eigen::Matrix<Scalar,DimAtCompile,1> VectorT;
@@ -279,7 +343,8 @@ namespace stan {
         skyk = yk.dot(sk);
         rhok = 1.0/skyk;
 
-        Hupd.noalias() = HessianT::Identity(yk.size(),yk.size()) - rhok*sk*yk.transpose();
+        Hupd.noalias() = HessianT::Identity(yk.size(),yk.size()) 
+                                        - rhok*sk*yk.transpose();
         _Hk = Hupd*_Hk*Hupd.transpose() + rhok*sk*sk.transpose();
       }
       inline void search_direction(VectorT &pk, const VectorT &gk) const {
@@ -291,7 +356,9 @@ namespace stan {
 
     template<typename FunctorType, typename Scalar = double,
              int DimAtCompile = Eigen::Dynamic,
-             int LineSearchMethod = 1, typename QNUpdateType = BFGSUpdate_HInv<Scalar,DimAtCompile> >
+             int LineSearchMethod = 1,
+             typename QNUpdateType = LBFGSUpdate<Scalar,DimAtCompile> >
+//             typename QNUpdateType = BFGSUpdate_HInv<Scalar,DimAtCompile> >
     class BFGSMinimizer {
     public:
       typedef Eigen::Matrix<Scalar,DimAtCompile,1> VectorT;
@@ -302,11 +369,11 @@ namespace stan {
       VectorT _gk, _gk_1, _xk_1, _xk, _pk, _pk_1;
       Scalar _fk, _fk_1, _alphak_1;
       Scalar _alpha, _alpha0;
-      QNUpdateType _qn;
       size_t _itNum;
       std::string _note;
       
     public:
+      QNUpdateType _qn;
       LSOptions<Scalar> _ls_opts;
       ConvergenceOptions<Scalar> _conv_opts;
       
@@ -345,7 +412,6 @@ namespace stan {
             return std::string("Unknown termination code");
         }
       }
-
       
       BFGSMinimizer(FunctorType &f) : _func(f) { }
       
