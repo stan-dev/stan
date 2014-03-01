@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <istream>
+#include <sstream>
 #include <exception>
 #include <stdexcept>
 
@@ -32,11 +33,12 @@ std::string file_name_to_model_name(const std::string& name) {
   return name_copy;
 }
 
-bool is_parsable(const std::string& file_name) {
+bool is_parsable(const std::string& file_name,
+                 std::ostream* msgs = 0) {
   stan::gm::program prog;
   std::ifstream fs(file_name.c_str());
   std::string model_name = file_name_to_model_name(file_name);
-  bool parsable = stan::gm::parse(0, fs, file_name, model_name, prog);
+  bool parsable = stan::gm::parse(msgs, fs, file_name, model_name, prog);
   return parsable;
 }
 
@@ -246,4 +248,45 @@ TEST(gm_parser,function_signatures) {
   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_student_t_3.stan"));
   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_uniform.stan"));
   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_weibull.stan"));
+}
+
+bool is_parsable_syntax(const std::string& model_name,
+                        std::ostream* msgs = 0) {
+  std::string path("src/test/test-models/syntax-only/");
+  path += model_name;
+  path += ".stan";
+  return is_parsable(path,msgs);
+}
+
+void test_parsable(const std::string& model_name) {
+  EXPECT_TRUE(is_parsable_syntax(model_name));
+}
+
+void test_unparsable(const std::string& model_name) {
+  EXPECT_THROW(is_parsable_syntax(model_name), std::invalid_argument);
+}
+
+/** test that model with specified name in syntax-only path throws
+ * an exception containing the second arg as a substring
+ *
+ * @param model_name Name of model to parse
+ * @param msg Substring of error message expected.
+ */
+void test_throws(const std::string& model_name, const std::string& msg) {
+  std::stringstream msgs;
+  try {
+    is_parsable_syntax(model_name,&msgs);
+  } catch (const std::invalid_argument& e) {
+    EXPECT_TRUE(msgs.str().find_first_of(msg) >= 0);
+    return;
+  }
+  EXPECT_TRUE(false);
+}
+
+TEST(gmParser, addConditionalCondition) {
+  test_parsable("conditional_condition_good");
+  test_throws("conditional_condition_bad_1",
+              "conditions in if-else");
+  test_throws("conditional_condition_bad_2",
+              "conditions in if-else");
 }
