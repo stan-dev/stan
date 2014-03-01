@@ -142,11 +142,6 @@ namespace stan {
     }
 
 
-
-
-
-
-
     // NegBinomial(n|eta,phi)  [phi > 0;  n >= 0]
     template <bool propto,
               typename T_n,
@@ -264,13 +259,39 @@ namespace stan {
 
     template <class RNG>
     inline int
+    neg_binomial_2_rng(const double mu,
+                     const double phi,
+                     RNG& rng) {
+      using boost::variate_generator;
+      using boost::random::negative_binomial_distribution;
+
+      static const char* function = "stan::prob::neg_binomial_2_rng(%1%)";
+
+      using stan::math::check_finite;
+      using stan::math::check_positive;
+
+      if (!check_finite(function, mu, "Location parameter"))
+        return 0;
+      if (!check_finite(function, phi, "Inverse scale parameter"))
+        return 0;
+      if (!check_positive(function, mu, "Location parameter"))
+        return 0;
+      if (!check_positive(function, phi, "Inverse scale parameter"))
+        return 0;
+
+      return stan::prob::poisson_rng(stan::prob::gamma_rng(phi,phi/mu,
+                                                           rng),rng);
+    }
+
+    template <class RNG>
+    inline int
     neg_binomial_2_log_rng(const double eta,
                      const double phi,
                      RNG& rng) {
       using boost::variate_generator;
       using boost::random::negative_binomial_distribution;
 
-      static const char* function = "stan::prob::neg_binomial_rng(%1%)";
+      static const char* function = "stan::prob::neg_binomial_2_log_rng(%1%)";
 
       using stan::math::check_finite;
       using stan::math::check_positive;
@@ -282,12 +303,8 @@ namespace stan {
       if (!check_positive(function, phi, "Inverse scale parameter"))
         return 0;
 
-        return stan::prob::poisson_rng(stan::prob::gamma_rng(phi,phi/std::exp(eta),
+      return stan::prob::poisson_rng(stan::prob::gamma_rng(phi,phi/std::exp(eta),
                                                            rng),rng);
-
-      //variate_generator<RNG&, negative_binomial_distribution<> >
-      //  negative_binomial_rng(rng, negative_binomial_distribution<>(phi, phi/(phi+std::exp(eta))));
-      //return negative_binomial_rng();
     }
   }
 }
