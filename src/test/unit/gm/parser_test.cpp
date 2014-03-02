@@ -309,3 +309,6 @@ TEST(gmParserStatementGrammar, validateAllowSample) {
   test_throws("validate_allow_sample_bad3",
               "sampling only allowed in model");
 }
+TEST(gmParserTermGrammar, multiplicationFun) {
+  test_parsable("validate_multiplication");
+}

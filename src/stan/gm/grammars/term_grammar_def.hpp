@@ -132,15 +132,16 @@ namespace stan {
  
     struct multiplication_expr {
       template <typename T1, typename T2, typename T3>
-      struct result { typedef expression type; };
+      struct result { typedef void type; };
 
-      expression operator()(expression& expr1,
-                            const expression& expr2,
-                            std::ostream& error_msgs) const {
+      void operator()(expression& expr1,
+                      const expression& expr2,
+                      std::ostream& error_msgs) const {
 
         if (expr1.expression_type().is_primitive()
             && expr2.expression_type().is_primitive()) {
-          return expr1 *= expr2;
+          expr1 *= expr2;;
+          return;
         }
         std::vector<expression> args;
         args.push_back(expr1);
@@ -148,10 +149,10 @@ namespace stan {
         set_fun_type sft;
         fun f("multiply",args);
         sft(f,error_msgs);
-        return expression(f);
+        expr1 = expression(f);
       }
     };
-    boost::phoenix::function<multiplication_expr> multiplication;
+    boost::phoenix::function<multiplication_expr> multiplication_f;
 
     void generate_expression(const expression& e, std::ostream& o);
 
@@ -453,8 +454,8 @@ namespace stan {
         = ( negated_factor_r(_r1)                       
             [_val = _1]
             >> *( (lit('*') > negated_factor_r(_r1)     
-                               [_val = multiplication(_val,_1,
-                                                      boost::phoenix::ref(error_msgs_))])
+                              [multiplication_f(_val,_1,
+                                                boost::phoenix::ref(error_msgs_))])
                   | (lit('/') > negated_factor_r(_r1)   
                                  [_val = division(_val,_1,boost::phoenix::ref(error_msgs_))])
                   | (lit('\\') > negated_factor_r(_r1)   
