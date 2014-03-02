@@ -303,21 +303,22 @@ namespace stan {
     boost::phoenix::function<negate_expr> negate_expr_f;
 
     struct logical_negate_expr {
-      template <typename T1, typename T2>
-      struct result { typedef expression type; };
+      template <typename T1, typename T2, typename T3>
+      struct result { typedef void type; };
 
-      expression operator()(const expression& expr,
-                            std::ostream& error_msgs) const {
+      void operator()(expression& expr_result,
+                      const expression& expr,
+                      std::ostream& error_msgs) const {
         if (!expr.expression_type().is_primitive()) {
           error_msgs << "logical negation operator ! only applies to int or real types; ";
-          return expression();
+          expr_result = expression();
         }
         std::vector<expression> args;
         args.push_back(expr);
         set_fun_type sft;
         fun f("logical_negation",args);
         sft(f,error_msgs);
-        return expression(f);
+        expr_result = expression(f);
       }
     };
     boost::phoenix::function<logical_negate_expr> logical_negate_expr_f;
@@ -476,7 +477,7 @@ namespace stan {
         = lit('-') >> negated_factor_r(_r1) 
                       [negate_expr_f(_val,_1,boost::phoenix::ref(error_msgs_))]
         | lit('!') >> negated_factor_r(_r1) 
-                      [_val = logical_negate_expr_f(_1,boost::phoenix::ref(error_msgs_))]
+                      [logical_negate_expr_f(_val,_1,boost::phoenix::ref(error_msgs_))]
         | lit('+') >> negated_factor_r(_r1)  [_val = _1]
         | indexed_factor_r(_r1) [_val = _1];
 

@@ -332,3 +332,8 @@ TEST(gmParserTermGrammar, eltMultiplicationFun) {
 TEST(gmParserTermGrammar, negateExprFun) {
   test_parsable("validate_negate_expr_good");
 }
+TEST(gmParserTermGrammar, logicalNegateExprFun) {
+  test_throws("validate_logical_negate_expr_bad",
+              "logical negation operator ! only applies to int or real");
+  test_parsable("validate_logical_negate_expr_good");
+}
