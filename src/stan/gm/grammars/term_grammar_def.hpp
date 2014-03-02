@@ -158,11 +158,11 @@ namespace stan {
 
     struct division_expr {
       template <typename T1, typename T2, typename T3>
-      struct result { typedef expression type; };
+      struct result { typedef void type; };
 
-      expression operator()(expression& expr1,
-                            const expression& expr2,
-                            std::ostream& error_msgs) const {
+      void operator()(expression& expr1,
+                      const expression& expr2,
+                      std::ostream& error_msgs) const {
         if (expr1.expression_type().is_primitive_int() 
             && expr2.expression_type().is_primitive_int()) {
           // getting here, but not printing?  only print error if problems?
@@ -179,7 +179,8 @@ namespace stan {
             
         if (expr1.expression_type().is_primitive()
             && expr2.expression_type().is_primitive()) {
-          return expr1 /= expr2;
+          expr1 /= expr2;
+          return;
         }
         std::vector<expression> args;
         args.push_back(expr1);
@@ -190,15 +191,15 @@ namespace stan {
             && expr2.expression_type().type() == MATRIX_T) {
           fun f("mdivide_right",args);
           sft(f,error_msgs);
-          return expression(f);
+          expr1 = expression(f);
+          return;
         }
-        
         fun f("divide",args);
         sft(f,error_msgs);
-        return expression(f);
+        expr1 = expression(f);
       }
     };
-    boost::phoenix::function<division_expr> division;
+    boost::phoenix::function<division_expr> division_f;
 
     struct left_division_expr {
       template <typename T1, typename T2, typename T3>
@@ -457,7 +458,7 @@ namespace stan {
                               [multiplication_f(_val,_1,
                                                 boost::phoenix::ref(error_msgs_))])
                   | (lit('/') > negated_factor_r(_r1)   
-                                 [_val = division(_val,_1,boost::phoenix::ref(error_msgs_))])
+                                 [division_f(_val,_1,boost::phoenix::ref(error_msgs_))])
                   | (lit('\\') > negated_factor_r(_r1)   
                                   [_val = left_division(_val,_1,
                                                         boost::phoenix::ref(error_msgs_))])

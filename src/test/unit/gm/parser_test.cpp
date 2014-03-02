@@ -266,18 +266,24 @@ void test_unparsable(const std::string& model_name) {
   EXPECT_THROW(is_parsable_syntax(model_name), std::invalid_argument);
 }
 
+void test_warning(const std::string& model_name, const std::string& warning_msg) {
+  std::stringstream msgs;
+  EXPECT_TRUE(is_parsable_syntax(model_name,&msgs));
+  EXPECT_TRUE(msgs.str().find_first_of(warning_msg) >= 0);
+}
+
 /** test that model with specified name in syntax-only path throws
  * an exception containing the second arg as a substring
  *
  * @param model_name Name of model to parse
  * @param msg Substring of error message expected.
  */
-void test_throws(const std::string& model_name, const std::string& msg) {
+void test_throws(const std::string& model_name, const std::string& error_msg) {
   std::stringstream msgs;
   try {
     is_parsable_syntax(model_name,&msgs);
   } catch (const std::invalid_argument& e) {
-    EXPECT_TRUE(msgs.str().find_first_of(msg) >= 0);
+    EXPECT_TRUE(msgs.str().find_first_of(error_msg) >= 0);
     return;
   }
   EXPECT_TRUE(false);
@@ -311,4 +317,9 @@ TEST(gmParserStatementGrammar, validateAllowSample) {
 }
 TEST(gmParserTermGrammar, multiplicationFun) {
   test_parsable("validate_multiplication");
+}
+TEST(gmParserTermGrammar, divisionFun) {
+  test_warning("validate_division_int_warning", 
+               "integer division implicitly rounds");
+  test_parsable("validate_division_good");
 }
