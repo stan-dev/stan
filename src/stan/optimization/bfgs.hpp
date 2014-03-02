@@ -229,7 +229,7 @@ namespace stan {
         return retCode;
       }
 
-    }
+    } // end anonymous namespace
 
     template<typename Scalar = double>
     class ConvergenceOptions {
@@ -322,6 +322,7 @@ namespace stan {
         }
       }
 
+    private:
       boost::circular_buffer<UpdateT> _buf;
       Scalar _gammak;
     };
@@ -351,6 +352,7 @@ namespace stan {
         pk.noalias() = -(_Hk*gk);
       }
 
+    private:
       HessianT _Hk;
     };
 
@@ -358,7 +360,6 @@ namespace stan {
              int DimAtCompile = Eigen::Dynamic,
              int LineSearchMethod = 1,
              typename QNUpdateType = LBFGSUpdate<Scalar,DimAtCompile> >
-//             typename QNUpdateType = BFGSUpdate_HInv<Scalar,DimAtCompile> >
     class BFGSMinimizer {
     public:
       typedef Eigen::Matrix<Scalar,DimAtCompile,1> VectorT;
@@ -371,11 +372,14 @@ namespace stan {
       Scalar _alpha, _alpha0;
       size_t _itNum;
       std::string _note;
+      QNUpdateType _qn;
       
     public:
-      QNUpdateType _qn;
       LSOptions<Scalar> _ls_opts;
       ConvergenceOptions<Scalar> _conv_opts;
+
+      QNUpdateType &get_qnupdate() { return _qn; }
+      const QNUpdateType &get_qnupdate() const { return _qn; }
       
       const Scalar &curr_f() const { return _fk; }
       const VectorT &curr_x() const { return _xk; }
@@ -643,19 +647,23 @@ namespace stan {
       }
     };
     
-    template <typename M>
-    class BFGSLineSearch : public BFGSMinimizer<ModelAdaptor<M> > {
+    template<typename M, typename Scalar = double,
+             int DimAtCompile = Eigen::Dynamic,
+             int LineSearchMethod = 1,
+             typename QNUpdateType = LBFGSUpdate<Scalar,DimAtCompile> >
+    class BFGSLineSearch : public BFGSMinimizer<ModelAdaptor<M>,Scalar,DimAtCompile,LineSearchMethod,QNUpdateType> {
     private:
       ModelAdaptor<M> _adaptor;
     public:
-      typedef typename BFGSMinimizer<ModelAdaptor<M> >::VectorT vector_t;
+      typedef BFGSMinimizer<ModelAdaptor<M>,Scalar,DimAtCompile,LineSearchMethod,QNUpdateType> BFGSBase;
+      typedef typename BFGSBase::VectorT vector_t;
       typedef typename vector_t::size_type idx_t;
       
       BFGSLineSearch(M& model,
                      const std::vector<double>& params_r,
                      const std::vector<int>& params_i,
                      std::ostream* msgs = 0)
-        : BFGSMinimizer<ModelAdaptor<M> >(_adaptor),
+        : BFGSBase(_adaptor),
           _adaptor(model,params_i,msgs)
       {
 

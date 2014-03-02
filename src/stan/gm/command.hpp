@@ -740,9 +740,8 @@ namespace stan {
           }
           return_code = error_codes::OK;
         } else if (algo->value() == "bfgs") {
-          
-          stan::optimization::BFGSLineSearch<Model> bfgs(model, cont_vector, disc_vector,
-                                                         &std::cout);
+          typedef stan::optimization::BFGSLineSearch<Model,double,Eigen::Dynamic,1,stan::optimization::BFGSUpdate_HInv<double,Eigen::Dynamic> > Optimizer;
+          Optimizer bfgs(model, cont_vector, disc_vector, &std::cout);
           bfgs._ls_opts.alpha0 = dynamic_cast<real_argument*>(
                          algo->arg("bfgs")->arg("init_alpha"))->value();
           bfgs._conv_opts.tolF = dynamic_cast<real_argument*>(
@@ -770,8 +769,7 @@ namespace stan {
               std::cout << "       ||dx|| ";
               std::cout << "     ||grad|| ";
               std::cout << "      alpha ";
-// MAB: commented out but left in because it may be useful for debugging in the future
-//              std::cout << "     alpha0 ";
+              std::cout << "     alpha0 ";
               std::cout << " # evals ";
               std::cout << " Notes " << std::endl;
             }
@@ -790,8 +788,83 @@ namespace stan {
                         << bfgs.curr_g().norm() << " ";
               std::cout << " " << std::setw(10) << std::setprecision(4) 
                         << bfgs.alpha() << " ";
-              // std::cout << " " << std::setw(10) << std::setprecision(4) 
-              // << bfgs.alpha0() << " ";
+              std::cout << " " << std::setw(10) << std::setprecision(4) 
+                        << bfgs.alpha0() << " ";
+              std::cout << " " << std::setw(7) 
+                        << bfgs.grad_evals() << " ";
+              std::cout << " " << bfgs.note() << " ";
+              std::cout << std::endl;
+            }
+            
+            if (output_stream && save_iterations) {
+              write_iteration(*output_stream, model, base_rng,
+                              lp, cont_vector, disc_vector);
+            }
+          }
+          
+          
+          if (ret >= 0) {
+            std::cout << "Optimization terminated normally: " << std::endl;
+            return_code = error_codes::OK;
+          } else {
+            std::cout << "Optimization terminated with error: " << std::endl;
+            return_code = error_codes::SOFTWARE;
+          }
+          std::cout << "  " << bfgs.get_code_string(ret) << std::endl;
+        } else if (algo->value() == "lbfgs") {
+          typedef stan::optimization::BFGSLineSearch<Model,double,Eigen::Dynamic,1,stan::optimization::LBFGSUpdate<double,Eigen::Dynamic> > Optimizer;
+          Optimizer bfgs(model, cont_vector, disc_vector, &std::cout);
+
+          bfgs.get_qnupdate().set_history_size(dynamic_cast<int_argument*>(
+                         algo->arg("lbfgs")->arg("history_size"))->value());
+          bfgs._ls_opts.alpha0 = dynamic_cast<real_argument*>(
+                         algo->arg("lbfgs")->arg("init_alpha"))->value();
+          bfgs._conv_opts.tolF = dynamic_cast<real_argument*>(
+                         algo->arg("lbfgs")->arg("tol_obj"))->value();
+          bfgs._conv_opts.tolGrad = dynamic_cast<real_argument*>(
+                         algo->arg("lbfgs")->arg("tol_grad"))->value();
+          bfgs._conv_opts.tolX = dynamic_cast<real_argument*>(
+                         algo->arg("lbfgs")->arg("tol_param"))->value();
+          bfgs._conv_opts.maxIts = num_iterations;
+          
+          lp = bfgs.logp();
+          
+          std::cout << "initial log joint probability = " << lp << std::endl;
+          if (output_stream && save_iterations) {
+            write_iteration(*output_stream, model, base_rng,
+                            lp, cont_vector, disc_vector);
+          }
+
+          int ret = 0;
+          
+          while (ret == 0) {  
+            if (do_print(bfgs.iter_num(), 50*refresh)) {
+              std::cout << "    Iter ";
+              std::cout << "     log prob ";
+              std::cout << "       ||dx|| ";
+              std::cout << "     ||grad|| ";
+              std::cout << "      alpha ";
+              std::cout << "     alpha0 ";
+              std::cout << " # evals ";
+              std::cout << " Notes " << std::endl;
+            }
+            
+            ret = bfgs.step();
+            lp = bfgs.logp();
+            bfgs.params_r(cont_vector);
+            
+            if (do_print(bfgs.iter_num(), ret != 0 || !bfgs.note().empty(),refresh)) {
+              std::cout << " " << std::setw(7) << bfgs.iter_num() << " ";
+              std::cout << " " << std::setw(12) << std::setprecision(6) 
+                        << lp << " ";
+              std::cout << " " << std::setw(12) << std::setprecision(6) 
+                        << bfgs.prev_step_size() << " ";
+              std::cout << " " << std::setw(12) << std::setprecision(6) 
+                        << bfgs.curr_g().norm() << " ";
+              std::cout << " " << std::setw(10) << std::setprecision(4) 
+                        << bfgs.alpha() << " ";
+              std::cout << " " << std::setw(10) << std::setprecision(4) 
+                        << bfgs.alpha0() << " ";
               std::cout << " " << std::setw(7) 
                         << bfgs.grad_evals() << " ";
               std::cout << " " << bfgs.note() << " ";
