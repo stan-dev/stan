@@ -363,3 +363,12 @@ TEST(gmParserVarDeclsGrammarDef, validateIntExpr) {
                 "expression denoting integer required");
   }
 }
+TEST(gmParserVarDeclsGrammarDef, setIntRangeLower) {
+  test_parsable("validate_set_int_range_lower_good");
+  test_throws("validate_set_int_range_lower_bad_1",
+                "expression denoting integer required");
+  test_throws("validate_set_int_range_lower_bad_2",
+                "expression denoting integer required");
+  test_throws("validate_set_int_range_lower_bad_3",
+                "expression denoting integer required");
+}

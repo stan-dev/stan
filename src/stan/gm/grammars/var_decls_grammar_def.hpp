@@ -515,16 +515,15 @@ namespace stan {
     boost::phoenix::function<validate_int_expr> validate_int_expr_f;
 
     struct set_int_range_lower {
-      template <typename T1, typename T2, typename T3>
-      struct result { typedef bool type; };
-      bool operator()(range& range,
+      template <typename T1, typename T2, typename T3, typename T4>
+      struct result { typedef void type; };
+      void operator()(range& range,
                       const expression& expr,
+                      bool& pass,
                       std::stringstream& error_msgs) const {
         range.low_ = expr;
         validate_int_expr validator;
-        bool result = true;
-        validator(expr,result,error_msgs);
-        return result;
+        validator(expr,pass,error_msgs);
       }
     };
     boost::phoenix::function<set_int_range_lower> set_int_range_lower_f;
@@ -850,13 +849,13 @@ namespace stan {
            ( (lit("lower")
               >> lit('=')
               >> expression07_g(_r1)
-              [ _pass = set_int_range_lower_f(_val,_1,
-                                               boost::phoenix::ref(error_msgs_)) ])
+                 [set_int_range_lower_f(_val,_1,_pass,
+                                        boost::phoenix::ref(error_msgs_)) ])
              >> -( lit(',')
                    >> lit("upper")
                    >> lit('=')
                    >> expression07_g(_r1)
-                    [ _pass = set_int_range_upper_f(_val,_1,
+                   [ _pass = set_int_range_upper_f(_val,_1,
                                                     boost::phoenix::ref(error_msgs_)) ] ) )
            | 
            ( lit("upper")
@@ -874,8 +873,8 @@ namespace stan {
            ( (lit("lower")
               > lit('=')
               > expression07_g(_r1)
-              [ _pass = set_double_range_lower_f(_val,_1,
-                                               boost::phoenix::ref(error_msgs_)) ])
+                [ _pass = set_double_range_lower_f(_val,_1,
+                                                   boost::phoenix::ref(error_msgs_)) ])
              > -( lit(',')
                   > lit("upper")
                   > lit('=')
