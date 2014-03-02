@@ -282,20 +282,22 @@ namespace stan {
     // so. Phoenix will be switching to BOOST_TYPEOF. In the meantime,
     // we will use a phoenix::function below:
     struct negate_expr {
-      template <typename T1, typename T2>
-      struct result { typedef expression type; };
+      template <typename T1, typename T2, typename T3>
+      struct result { typedef void type; };
 
-      expression operator()(const expression& expr,
-                            std::ostream& error_msgs) const {
+      void operator()(expression& expr_result,
+                      const expression& expr,
+                      std::ostream& error_msgs) const {
         if (expr.expression_type().is_primitive()) {
-          return expression(unary_op('-', expr));
+          expr_result = expression(unary_op('-', expr));
+          return;
         }
         std::vector<expression> args;
         args.push_back(expr);
         set_fun_type sft;
         fun f("minus",args);
         sft(f,error_msgs);
-        return expression(f);
+        expr_result = expression(f);
       }
     };
     boost::phoenix::function<negate_expr> negate_expr_f;
@@ -472,7 +474,7 @@ namespace stan {
 
       negated_factor_r 
         = lit('-') >> negated_factor_r(_r1) 
-                      [_val = negate_expr_f(_1,boost::phoenix::ref(error_msgs_))]
+                      [negate_expr_f(_val,_1,boost::phoenix::ref(error_msgs_))]
         | lit('!') >> negated_factor_r(_r1) 
                       [_val = logical_negate_expr_f(_1,boost::phoenix::ref(error_msgs_))]
         | lit('+') >> negated_factor_r(_r1)  [_val = _1]
