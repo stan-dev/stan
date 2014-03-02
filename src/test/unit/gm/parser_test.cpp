@@ -323,3 +323,6 @@ TEST(gmParserTermGrammar, divisionFun) {
                "integer division implicitly rounds");
   test_parsable("validate_division_good");
 }
+TEST(gmParserTermGrammar, leftDivisionFun) {
+  test_parsable("validate_left_division_good");
+}
