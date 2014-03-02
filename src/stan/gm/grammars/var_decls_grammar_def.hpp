@@ -598,14 +598,15 @@ namespace stan {
     boost::phoenix::function<set_double_range_lower> set_double_range_lower_f;
 
     struct set_double_range_upper {
-      template <typename T1, typename T2, typename T3>
-      struct result { typedef bool type; };
-      bool operator()(range& range,
+      template <typename T1, typename T2, typename T3, typename T4>
+      struct result { typedef void type; };
+      void operator()(range& range,
                       const expression& expr,
+                      bool& pass,
                       std::stringstream& error_msgs) const {
         range.high_ = expr;
         validate_double_expr validator;
-        return validator(expr,error_msgs);
+        pass = validator(expr,error_msgs);
       }
     };
     boost::phoenix::function<set_double_range_upper> set_double_range_upper_f;
@@ -879,14 +880,14 @@ namespace stan {
                   > lit("upper")
                   > lit('=')
                   > expression07_g(_r1)
-                    [_pass = set_double_range_upper_f(_val,_1,
-                                              boost::phoenix::ref(error_msgs_)) ] ) )
+                  [set_double_range_upper_f(_val,_1,_pass,
+                                            boost::phoenix::ref(error_msgs_)) ] ) )
            | 
            ( lit("upper")
              > lit('=')
              > expression07_g(_r1)
-               [_pass = set_double_range_upper_f(_val,_1,
-                                                  boost::phoenix::ref(error_msgs_)) ])
+               [set_double_range_upper_f(_val,_1,_pass,
+                                         boost::phoenix::ref(error_msgs_)) ])
             )
         > lit('>');
 
@@ -902,15 +903,6 @@ namespace stan {
                   >> *char_("a-zA-Z0-9_.")]
         ;
         
-
-      // range_r.name("range expression pair, colon");
-      // range_r 
-      //   %= expression_g(_r1)
-      //      [validate_int_expr_f(_1,_pass,boost::phoenix::ref(error_msgs_))]
-      //   >> lit(':') 
-      //   >> expression_g(_r1)
-      //      [validate_int_expr_f(_1,_pass,boost::phoenix::ref(error_msgs_))];
-
     }
   }
 

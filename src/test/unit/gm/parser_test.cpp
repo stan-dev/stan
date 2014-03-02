@@ -386,3 +386,10 @@ TEST(gmParserVarDeclsGrammarDef, setDoubleRangeLower) {
   test_throws("validate_set_double_range_lower_bad_2",
                 "expression denoting real required");
 }
+TEST(gmParserVarDeclsGrammarDef, setDoubleRangeUpper) {
+  test_parsable("validate_set_double_range_upper_good");
+  test_throws("validate_set_double_range_upper_bad_1",
+                "expression denoting real required");
+  test_throws("validate_set_double_range_upper_bad_2",
+                "expression denoting real required");
+}
