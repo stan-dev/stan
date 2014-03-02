@@ -89,13 +89,14 @@ namespace stan {
 
 
     struct set_fun_type_named {
-      template <typename T1, typename T2, typename T3, typename T4>
-      struct result { typedef fun type; };
+      template <typename T1, typename T2, typename T3, typename T4, typename T5>
+      struct result { typedef void type; };
 
-      fun operator()(fun& fun,
-                     const var_origin& var_origin,
-                     bool& pass,
-                     std::ostream& error_msgs) const {
+      void operator()(expression& fun_result,
+                      fun& fun,
+                      const var_origin& var_origin,
+                      bool& pass,
+                      std::ostream& error_msgs) const {
         std::vector<expr_type> arg_types;
         for (size_t i = 0; i < fun.args_.size(); ++i)
           arg_types.push_back(fun.args_[i].expression_type());
@@ -123,7 +124,7 @@ namespace stan {
           error_msgs << std::endl;
         }
 
-        return fun;
+        fun_result = fun;
       }
     };
     boost::phoenix::function<set_fun_type_named> set_fun_type_named_f;
@@ -497,8 +498,8 @@ namespace stan {
 
       factor_r.name("factor");
       factor_r =
-          fun_r(_r1)          [_val = set_fun_type_named_f(_1,_r1,_pass,
-                                                           boost::phoenix::ref(error_msgs_))]
+          fun_r(_r1)          [set_fun_type_named_f(_val,_1,_r1,_pass,
+                                                    boost::phoenix::ref(error_msgs_))]
         | variable_r          [_val = set_var_type_f(_1,boost::phoenix::ref(var_map_),
                                                      boost::phoenix::ref(error_msgs_),
                                                      _pass)]

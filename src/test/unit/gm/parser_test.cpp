@@ -342,3 +342,8 @@ TEST(gmParserTermGrammar, addExpressionDimssFun) {
               "indexes inappropriate");
   test_parsable("validate_add_expression_dimss_good");
 }
+TEST(gmParserTermGrammar, setFunTypeNamed) {
+  test_throws("validate_set_fun_type_named_bad1",
+              "random number generators only allowed in generated quantities");
+  test_parsable("validate_set_fun_type_named_good");
+}
