@@ -85,6 +85,21 @@ TEST_F(CmdStan, optimize_bfgs) {
   EXPECT_FLOAT_EQ(1000000, chains.samples(y22)[0]);
 }
 
+TEST_F(CmdStan, optimize_lbfgs) {
+  run_command_output out = run_command(base_command + " optimize algorithm=lbfgs");
+
+  ASSERT_EQ(0, out.err_code);
+
+  stan::mcmc::chains<> chains = parse_output_file();
+  ASSERT_EQ(1, chains.num_chains());
+  ASSERT_EQ(1, chains.num_samples());
+
+  EXPECT_FLOAT_EQ(1, chains.samples(y11)[0]);
+  EXPECT_FLOAT_EQ(100, chains.samples(y21)[0]);
+  EXPECT_FLOAT_EQ(10000, chains.samples(y12)[0]);
+  EXPECT_FLOAT_EQ(1000000, chains.samples(y22)[0]);
+}
+
 TEST_F(CmdStan, optimize_newton) {
   run_command_output out = run_command(base_command + " optimize algorithm=newton");
 
