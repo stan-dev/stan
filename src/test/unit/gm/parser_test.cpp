@@ -326,3 +326,6 @@ TEST(gmParserTermGrammar, divisionFun) {
 TEST(gmParserTermGrammar, leftDivisionFun) {
   test_parsable("validate_left_division_good");
 }
+TEST(gmParserTermGrammar, eltMultiplicationFun) {
+  test_parsable("validate_elt_multiplication_good");
+}

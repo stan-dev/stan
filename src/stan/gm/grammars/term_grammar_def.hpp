@@ -208,12 +208,6 @@ namespace stan {
       void operator()(expression& expr1,
                       const expression& expr2,
                       std::ostream& error_msgs) const {
-        // forbid left division of primitives
-        // if (expr1.expression_type().is_primitive()
-        // && expr2.expression_type().is_primitive()) {
-        // expr1 /= expr2;
-        // return;
-        // }
         std::vector<expression> args;
         args.push_back(expr1);
         args.push_back(expr2);
@@ -236,15 +230,16 @@ namespace stan {
 
     struct elt_multiplication_expr {
       template <typename T1, typename T2, typename T3>
-      struct result { typedef expression type; };
+      struct result { typedef void type; };
 
-      expression operator()(expression& expr1,
-                            const expression& expr2,
-                            std::ostream& error_msgs) const {
+      void operator()(expression& expr1,
+                      const expression& expr2,
+                      std::ostream& error_msgs) const {
 
         if (expr1.expression_type().is_primitive()
             && expr2.expression_type().is_primitive()) {
-          return expr1 *= expr2;
+          expr1 *= expr2;
+          return;
         }
         std::vector<expression> args;
         args.push_back(expr1);
@@ -252,11 +247,10 @@ namespace stan {
         set_fun_type sft;
         fun f("elt_multiply",args);
         sft(f,error_msgs);
-        return expression(f);
-        return expr1 += expr2;
+        expr1 = expression(f);
       }
     };
-    boost::phoenix::function<elt_multiplication_expr> elt_multiplication;
+    boost::phoenix::function<elt_multiplication_expr> elt_multiplication_f;
 
     struct elt_division_expr {
       template <typename T1, typename T2, typename T3>
@@ -461,15 +455,15 @@ namespace stan {
                               [multiplication_f(_val,_1,
                                                 boost::phoenix::ref(error_msgs_))])
                   | (lit('/') > negated_factor_r(_r1)   
-                                 [division_f(_val,_1,boost::phoenix::ref(error_msgs_))])
+                                [division_f(_val,_1,boost::phoenix::ref(error_msgs_))])
                   | (lit('\\') > negated_factor_r(_r1)   
-                                  [left_division_f(_val,_1,
+                                 [left_division_f(_val,_1,
                                                    boost::phoenix::ref(error_msgs_))])
                   | (lit(".*") > negated_factor_r(_r1)   
-                                  [_val = elt_multiplication(_val,_1,
-                                                         boost::phoenix::ref(error_msgs_))])
+                                 [elt_multiplication_f(_val,_1,
+                                                        boost::phoenix::ref(error_msgs_))])
                   | (lit("./") > negated_factor_r(_r1)   
-                                  [_val = elt_division(_val,_1,
+                                 [_val = elt_division(_val,_1,
                                                        boost::phoenix::ref(error_msgs_))])
                    )
              )
