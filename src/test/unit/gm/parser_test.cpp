@@ -347,3 +347,10 @@ TEST(gmParserTermGrammar, setFunTypeNamed) {
               "random number generators only allowed in generated quantities");
   test_parsable("validate_set_fun_type_named_good");
 }
+TEST(gmParserVarDeclsGrammarDef, addVar) {
+  test_throws("validate_add_var_bad1",
+              "duplicate declaration of variable");
+  test_throws("validate_add_var_bad2",
+              "integer parameters or transformed parameters are not allowed");
+  test_parsable("validate_add_var_good");
+}

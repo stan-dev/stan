@@ -223,15 +223,16 @@ namespace stan {
 
 
     struct add_var {
-      template <typename T1, typename T2, typename T3, typename T4, typename T5>
-      struct result { typedef T1 type; };
+      template <typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
+      struct result { typedef void type; };
       // each type derived from base_var_decl gets own instance
-      template <typename T>
-      T operator()(const T& var_decl, 
-                   variable_map& vm,
-                   bool& pass,
-                   const var_origin& vo,
-                   std::ostream& error_msgs) const {
+      template <typename R, typename T>
+      void operator()(R& var_decl_result,
+                      const T& var_decl, 
+                      variable_map& vm,
+                      bool& pass,
+                      const var_origin& vo,
+                      std::ostream& error_msgs) const {
         if (vm.exists(var_decl.name_)) {
           // variable already exists
           pass = false;
@@ -245,7 +246,8 @@ namespace stan {
           print_var_origin(error_msgs,vm.get_origin(var_decl.name_));
 
           error_msgs << std::endl;
-          return var_decl;
+          var_decl_result = var_decl;
+          return;
         } 
         if ((vo == parameter_origin || vo == transformed_parameter_origin)
             && var_decl.base_type_ == INT_T) {
@@ -253,11 +255,12 @@ namespace stan {
           error_msgs << "integer parameters or transformed parameters are not allowed; "
                      << " found declared type int, parameter name=" << var_decl.name_
                      << std::endl;
-          return var_decl;
+          var_decl_result = var_decl;
+          return;
         }
         pass = true;  // probably don't need to set true
         vm.add(var_decl.name_,var_decl,vo);
-        return var_decl;
+        var_decl_result = var_decl;
       }
     };
     boost::phoenix::function<add_var> add_var_f;
@@ -635,41 +638,41 @@ namespace stan {
       var_decl_r.name("variable declaration");
       var_decl_r 
         %= (int_decl_r(_r2)             
-            [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2,
-                              boost::phoenix::ref(error_msgs))]
+            [add_var_f(_val,_1,boost::phoenix::ref(var_map_),_a,_r2,
+                       boost::phoenix::ref(error_msgs))]
             | double_decl_r(_r2)        
-            [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2,
-                              boost::phoenix::ref(error_msgs_))]
+            [add_var_f(_val,_1,boost::phoenix::ref(var_map_),_a,_r2,
+                       boost::phoenix::ref(error_msgs_))]
             | vector_decl_r(_r2)        
-            [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2,
-                              boost::phoenix::ref(error_msgs_))]
+            [add_var_f(_val,_1,boost::phoenix::ref(var_map_),_a,_r2,
+                       boost::phoenix::ref(error_msgs_))]
             | row_vector_decl_r(_r2)    
-            [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2,
-                              boost::phoenix::ref(error_msgs_))]
+            [add_var_f(_val,_1,boost::phoenix::ref(var_map_),_a,_r2,
+                       boost::phoenix::ref(error_msgs_))]
             | matrix_decl_r(_r2)
-            [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2,
-                              boost::phoenix::ref(error_msgs_))]
+            [add_var_f(_val,_1,boost::phoenix::ref(var_map_),_a,_r2,
+                       boost::phoenix::ref(error_msgs_))]
             | unit_vector_decl_r(_r2)       
-            [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2,
-                              boost::phoenix::ref(error_msgs_))]
+            [add_var_f(_val,_1,boost::phoenix::ref(var_map_),_a,_r2,
+                       boost::phoenix::ref(error_msgs_))]
             | simplex_decl_r(_r2)
-            [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2,
-                              boost::phoenix::ref(error_msgs_))]
+            [add_var_f(_val,_1,boost::phoenix::ref(var_map_),_a,_r2,
+                       boost::phoenix::ref(error_msgs_))]
             | ordered_decl_r(_r2)
-            [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2,
-                              boost::phoenix::ref(error_msgs_))]
+            [add_var_f(_val,_1,boost::phoenix::ref(var_map_),_a,_r2,
+                       boost::phoenix::ref(error_msgs_))]
             | positive_ordered_decl_r(_r2)   
-            [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2,
-                              boost::phoenix::ref(error_msgs_))]
+            [add_var_f(_val,_1,boost::phoenix::ref(var_map_),_a,_r2,
+                       boost::phoenix::ref(error_msgs_))]
             | cholesky_factor_decl_r(_r2)    
-            [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2,
+            [add_var_f(_val,_1,boost::phoenix::ref(var_map_),_a,_r2,
                               boost::phoenix::ref(error_msgs_))]
             | cov_matrix_decl_r(_r2)    
-            [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2,
-                              boost::phoenix::ref(error_msgs_))]
+            [add_var_f(_val,_1,boost::phoenix::ref(var_map_),_a,_r2,
+                       boost::phoenix::ref(error_msgs_))]
             | corr_matrix_decl_r(_r2)   
-            [_val = add_var_f(_1,boost::phoenix::ref(var_map_),_a,_r2,
-                              boost::phoenix::ref(error_msgs_))]
+            [add_var_f(_val,_1,boost::phoenix::ref(var_map_),_a,_r2,
+                       boost::phoenix::ref(error_msgs_))]
             )
         > eps
         [_pass 
