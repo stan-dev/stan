@@ -354,3 +354,12 @@ TEST(gmParserVarDeclsGrammarDef, addVar) {
               "integer parameters or transformed parameters are not allowed");
   test_parsable("validate_add_var_good");
 }
+TEST(gmParserVarDeclsGrammarDef, validateIntExpr) {
+  test_parsable("validate_validate_int_expr_good");
+  for (int i = 1; i <= 13; ++i) {
+    std::string model_name("validate_validate_int_expr_bad");
+    model_name += i;
+    test_throws(model_name,
+                "expression denoting integer required");
+  }
+}
