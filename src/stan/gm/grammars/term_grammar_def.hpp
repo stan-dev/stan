@@ -344,20 +344,19 @@ namespace stan {
 
     struct add_expression_dimss {
       template <typename T1, typename T2, typename T3, typename T4>
-      struct result { typedef T1 type; };
-      expression operator()(expression& expression,
-                            std::vector<std::vector<stan::gm::expression> >& dimss,
-                            bool& pass,
-                            std::ostream& error_msgs) const {
+      struct result { typedef void type; };
+      void operator()(expression& expression,
+                      std::vector<std::vector<stan::gm::expression> >& dimss,
+                      bool& pass,
+                      std::ostream& error_msgs) const {
         index_op iop(expression,dimss);
         iop.infer_type();
         if (iop.type_.is_ill_formed()) {
           error_msgs << "indexes inappropriate for expression." << std::endl;
           pass = false;
-        } else {
-          pass = true;
-        }
-        return iop;
+        } 
+        pass = true;
+        expression = iop;
       }
     };
     boost::phoenix::function<add_expression_dimss> add_expression_dimss_f;
@@ -487,8 +486,8 @@ namespace stan {
         = factor_r(_r1) [_val = _1]
         > * (  
              (+dims_r(_r1)) 
-               [_val = add_expression_dimss_f(_val, _1, _pass,
-                                            boost::phoenix::ref(error_msgs_))]
+               [add_expression_dimss_f(_val, _1, _pass,
+                                       boost::phoenix::ref(error_msgs_))]
                | 
                lit("'") 
                [_val = transpose_f(_val, boost::phoenix::ref(error_msgs_))] 

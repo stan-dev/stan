@@ -337,3 +337,8 @@ TEST(gmParserTermGrammar, logicalNegateExprFun) {
               "logical negation operator ! only applies to int or real");
   test_parsable("validate_logical_negate_expr_good");
 }
+TEST(gmParserTermGrammar, addExpressionDimssFun) {
+  test_throws("validate_add_expression_dimss_bad",
+              "indexes inappropriate");
+  test_parsable("validate_add_expression_dimss_good");
+}
