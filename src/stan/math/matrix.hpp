@@ -75,6 +75,7 @@
 #include <stan/math/matrix/size.hpp>
 #include <stan/math/matrix/softmax.hpp>
 #include <stan/math/matrix/sort.hpp>
+#include <stan/math/matrix/sort_indices.hpp>
 #include <stan/math/matrix/stan_print.hpp>
 #include <stan/math/matrix/sub_col.hpp>
 #include <stan/math/matrix/sub_row.hpp>
