@@ -11,6 +11,7 @@
 #include <stan/mcmc/hmc/hamiltonians/diag_e_metric.hpp>
 #include <boost/random/additive_combine.hpp> // L'Ecuyer RNG
 
+typedef boost::ecuyer1988 rng_t;
 
 TEST(McmcHmcIntegratorsExplLeapfrog, energy_conservation) {
   
