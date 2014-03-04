@@ -6,7 +6,6 @@
 #include <stan/gm/generator.hpp>
 #include <stan/io/dump.hpp>
 #include <test/test-models/no-main/gm/test_lp.cpp>
-
 #include <gtest/gtest.h>
 
 void test_print_string_literal(const std::string& s,
@@ -170,6 +169,24 @@ TEST(gm, logProbPolymorphismVar) {
   lp1 = model.log_prob<false,false>(params_r, params_i, 0);
   lp2 = model.log_prob<false,false>(params_r_vec, 0);
   EXPECT_FLOAT_EQ(lp1.val(), lp2.val());
+}
+
+int count_matches(const std::string& target,
+                  const std::string& s) {
+  if (target.size() == 0) return -1;  // error
+  int count = 0;
+  for (size_t pos = 0; (pos = s.find(target,pos)) != std::string::npos; pos += target.size())
+    ++count;
+  return count;
+}
+
+TEST(gm, generate_model_typedef) {
+  std::string model_name = "name";
+  std::stringstream ss;
+  stan::gm::generate_model_typedef(model_name,ss);
+  
+  EXPECT_EQ(1, count_matches("typedef name_namespace::name stan_model;", 
+                             ss.str()));
 }
 
 // * write_csv
