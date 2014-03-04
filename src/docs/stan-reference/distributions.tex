@@ -507,27 +507,27 @@ where $\Psi$ is the digamma function, defined as
 \section{Negative Binomial Distribution, alternative parameterization}
 
 Stan also provides an alternative parameterization of the negative binomial
-distribution using the location and inverse dispersion as a
-parameters.  This is useful for log-linear negative
-binomial regressions.
+distribution using the mean and 
 
 \subsubsection{Probability Mass Function}
 
 If $\eta \in \reals$ and $\phi \in \posreals$, then for $y \in
 \nats$,
 \[
-\distro{NegativeBinomial2}(y|\eta,\phi)
+\distro{NegativeBinomial2}(y|\mu,\phi)
  =
 \binom{y + \phi - 1}{y}
 \,
-\left( \frac{e^\eta}{e^\eta+\phi} \right)^{\!y}
+\left( \frac{\mu}{\mu+\phi} \right)^{\!y}
 \,
-\left( \frac{\phi}{e^\eta+\phi} \right)^{\!\phi} \!.
+\left( \frac{\phi}{\mu+\phi} \right)^{\!\phi} \!.
 \]
 \[
-\mbox{With mean } E[Y] = e^\eta \mbox{ and variance } Var[Y] = \left( \frac{e^\eta(\phi + e^\eta)}{\phi}  \right)
+\mbox{With mean } E[Y] = \mu = e^\eta \mbox{ and variance } Var[Y] =
+\mu + \frac{\mu^2}{\phi}
 \]
 
+\pitem{y}{neg\_2\_binomial}{mu, phi}
 
 \pitem{y}{neg\_2\_binomial\_log}{eta, phi}
 
@@ -535,11 +535,22 @@ If $\eta \in \reals$ and $\phi \in \posreals$, then for $y \in
 
 \begin{description}
 %
+ \fitem{real}{neg\_binomial\_2\_log}{ints \farg{y}, reals
+   \farg{mu}, reals \farg{phi}}{The negative binomial probability
+   mass of \farg{n} given location \farg{mu} and inverse scale
+   \farg{phi}.}
+%
  \fitem{real}{neg\_binomial\_2\_log\_log}{ints \farg{y}, reals
    \farg{eta}, reals \farg{phi}}{The log negative binomial probability
-   mass of \farg{n} given log-location \farg{eta} and inverse scale \farg{phi}}
+   mass of \farg{n} given log-location \farg{eta} and inverse scale
+   \farg{phi}. This is useful for log-linear negative
+   binomial regressions.}
 %
-\fitem{int}{neg\_binomial\_2\_rng}{real \farg{eta}, real \farg{phi}}{Generate a
+\fitem{int}{neg\_binomial\_2\_rng}{real \farg{mu}, real \farg{phi}}{Generate a
+  negative binomial variate with location \farg{mu} and inverse scale
+  \farg{phi}; may only be used in generated quantities block}
+%
+\fitem{int}{neg\_binomial\_2\_log\_rng}{real \farg{eta}, real \farg{phi}}{Generate a
   negative binomial variate with log-location \farg{eta} and inverse scale
   \farg{phi}; may only be used in generated quantities block}
 \end{description}
