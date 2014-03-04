@@ -63,7 +63,8 @@ namespace stan {
       if (!(check_consistent_sizes(function,
                                    n,mu,phi,
                                    "Failures variable",
-                                   "Location parameter","Inverse scale parameter",
+                                   "Location parameter",
+                                   "Inverse scale parameter",
                                    &logp)))
         return logp;
 
@@ -83,50 +84,60 @@ namespace stan {
       VectorView<const T_inv_scale> phi_vec(phi);
       size_t size = max_size(n, mu, phi);
 
-      agrad::OperandsAndPartials<T_location,T_inv_scale>
+      agrad::OperandsAndPartials<T_location, T_inv_scale>
         operands_and_partials(mu, phi);
 
       size_t len_ep = max_size(mu, phi);
       size_t len_np = max_size(n, phi);
-
-      DoubleVectorView<true,is_vector<T_inv_scale>::value>
+      
+      DoubleVectorView<true, is_vector<T_location>::value>
+        mu__(length(mu));
+      for (size_t i = 0, size = length(mu); i < size; ++i)
+        mu__[i] = value_of(mu_vec[i]);
+  
+      DoubleVectorView<true, is_vector<T_inv_scale>::value>
+        phi__(length(phi));
+      for (size_t i = 0, size = length(phi); i < size; ++i)
+        phi__[i] = value_of(phi_vec[i]);
+      
+      DoubleVectorView<true, is_vector<T_inv_scale>::value>
         log_phi(length(phi));
-      for (size_t i = 0; i < length(phi); ++i)
-        log_phi[i] = log(value_of(phi_vec[i]));
+      for (size_t i = 0, size = length(phi); i < size; ++i)
+        log_phi[i] = log(phi__[i]);
 
-      DoubleVectorView<true,(is_vector<T_location>::value
+      DoubleVectorView<true, (is_vector<T_location>::value
                              || is_vector<T_inv_scale>::value)>
         log_mu_plus_phi(len_ep);
       for (size_t i = 0; i < len_ep; ++i)
-        log_mu_plus_phi[i] = log(value_of(mu_vec[i]) + value_of(phi_vec[i]));
+        log_mu_plus_phi[i] = log(mu__[i] + phi__[i]);
 
-      DoubleVectorView<true,(is_vector<T_n>::value
+      DoubleVectorView<true, (is_vector<T_n>::value
                              || is_vector<T_inv_scale>::value)>
         n_plus_phi(len_np);
       for (size_t i = 0; i < len_np; ++i)
-        n_plus_phi[i] = n_vec[i] + value_of(phi_vec[i]);
+        n_plus_phi[i] = n_vec[i] + phi__[i];
 
       for (size_t i = 0; i < size; i++) {
         if (include_summand<propto>::value)
           logp -= lgamma(n_vec[i] + 1.0);
         if (include_summand<propto,T_inv_scale>::value)
-          logp += multiply_log(value_of(phi_vec[i]), value_of(phi_vec[i])) - lgamma(value_of(phi_vec[i]));
+          logp += multiply_log(phi__[i], phi__[i]) - lgamma(phi__[i]);
         if (include_summand<propto,T_location,T_inv_scale>::value)
           logp -= (n_plus_phi[i])*log_mu_plus_phi[i];
         if (include_summand<propto,T_location>::value)
-          logp += multiply_log(n_vec[i], value_of(mu_vec[i]));
+          logp += multiply_log(n_vec[i], mu__[i]);
         if (include_summand<propto,T_inv_scale>::value)
           logp += lgamma(n_plus_phi[i]);
 
         if (!is_constant_struct<T_location>::value)
           operands_and_partials.d_x1[i]
-            += n_vec[i]/value_of(mu_vec[i]) 
-            - (n_vec[i] + value_of(phi_vec[i]))
-            / (value_of(mu_vec[i]) + value_of(phi_vec[i]));
+            += n_vec[i]/mu__[i] 
+            - (n_vec[i] + phi__[i])
+            / (mu__[i] + phi__[i]);
         if (!is_constant_struct<T_inv_scale>::value)
           operands_and_partials.d_x2[i]
-            += 1.0 - n_plus_phi[i]/(value_of(mu_vec[i]) + value_of(phi_vec[i]))
-            + log_phi[i] - log_mu_plus_phi[i] - digamma(value_of(phi_vec[i])) + digamma(n_plus_phi[i]);
+            += 1.0 - n_plus_phi[i]/(mu__[i] + phi__[i])
+            + log_phi[i] - log_mu_plus_phi[i] - digamma(phi__[i]) + digamma(n_plus_phi[i]);
       }
       return operands_and_partials.to_var(logp);
     }
@@ -180,7 +191,8 @@ namespace stan {
       if (!(check_consistent_sizes(function,
                                    n,eta,phi,
                                    "Failures variable",
-                                   "Log location parameter","Inverse scale parameter",
+                                   "Log location parameter",
+                                   "Inverse scale parameter",
                                    &logp)))
         return logp;
 
@@ -206,43 +218,54 @@ namespace stan {
       size_t len_ep = max_size(eta, phi);
       size_t len_np = max_size(n, phi);
 
-      DoubleVectorView<true,is_vector<T_inv_scale>::value>
-        log_phi(length(phi));
-      for (size_t i = 0; i < length(phi); ++i)
-        log_phi[i] = log(value_of(phi_vec[i]));
+      DoubleVectorView<true, is_vector<T_log_location>::value>
+        eta__(length(eta));
+      for (size_t i = 0, size = length(eta); i < size; ++i)
+        eta__[i] = value_of(eta_vec[i]);
+  
+      DoubleVectorView<true, is_vector<T_inv_scale>::value>
+        phi__(length(phi));
+      for (size_t i = 0, size = length(phi); i < size; ++i)
+        phi__[i] = value_of(phi_vec[i]);  
+        
 
-      DoubleVectorView<true,(is_vector<T_log_location>::value
+      DoubleVectorView<true, is_vector<T_inv_scale>::value>
+        log_phi(length(phi));
+      for (size_t i = 0, size = length(phi); i < size; ++i)
+        log_phi[i] = log(phi__[i]);
+
+      DoubleVectorView<true, (is_vector<T_log_location>::value
                              || is_vector<T_inv_scale>::value)>
         logsumexp_eta_logphi(len_ep);
       for (size_t i = 0; i < len_ep; ++i)
-        logsumexp_eta_logphi[i] = log_sum_exp(value_of(eta_vec[i]), log_phi[i]);
+        logsumexp_eta_logphi[i] = log_sum_exp(eta__[i], log_phi[i]);
 
-      DoubleVectorView<true,(is_vector<T_n>::value
+      DoubleVectorView<true, (is_vector<T_n>::value
                              || is_vector<T_inv_scale>::value)>
         n_plus_phi(len_np);
       for (size_t i = 0; i < len_np; ++i)
-        n_plus_phi[i] = n_vec[i] + value_of(phi_vec[i]);
+        n_plus_phi[i] = n_vec[i] + phi__[i];
 
       for (size_t i = 0; i < size; i++) {
         if (include_summand<propto>::value)
           logp -= lgamma(n_vec[i] + 1.0);
         if (include_summand<propto,T_inv_scale>::value)
-          logp += multiply_log(value_of(phi_vec[i]), value_of(phi_vec[i])) - lgamma(value_of(phi_vec[i]));
+          logp += multiply_log(phi__[i], phi__[i]) - lgamma(phi__[i]);
         if (include_summand<propto,T_log_location,T_inv_scale>::value)
           logp -= (n_plus_phi[i])*logsumexp_eta_logphi[i];
         if (include_summand<propto,T_log_location>::value)
-          logp += n_vec[i]*value_of(eta_vec[i]);
+          logp += n_vec[i]*eta__[i];
         if (include_summand<propto,T_inv_scale>::value)
           logp += lgamma(n_plus_phi[i]);
 
         if (!is_constant_struct<T_log_location>::value)
           operands_and_partials.d_x1[i]
             += n_vec[i] - n_plus_phi[i]
-            / (value_of(phi_vec[i])/exp(value_of(eta_vec[i])) + 1.0);
+            / (phi__[i]/exp(eta__[i]) + 1.0);
         if (!is_constant_struct<T_inv_scale>::value)
           operands_and_partials.d_x2[i]
-            += 1.0 - n_plus_phi[i]/(exp(value_of(eta_vec[i])) + value_of(phi_vec[i]))
-            + log_phi[i] - logsumexp_eta_logphi[i] - digamma(value_of(phi_vec[i])) + digamma(n_plus_phi[i]);
+            += 1.0 - n_plus_phi[i]/(exp(eta__[i]) + phi__[i])
+            + log_phi[i] - logsumexp_eta_logphi[i] - digamma(phi__[i]) + digamma(n_plus_phi[i]);
       }
       return operands_and_partials.to_var(logp);
     }
