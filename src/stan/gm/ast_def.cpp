@@ -432,12 +432,36 @@ namespace stan {
         return boost::apply_visitor(*this,e.subject.expr_);
     }
 
+    bool is_linear_function(const std::string& name) {
+      return name == "add"
+        || name == "block"
+        || name == "col"
+        || name == "cols"
+        || name == "diagonal"
+        || name == "head"
+        || name == "minus"
+        || name == "negative_infinity"
+        || name == "not_a_number"
+        || name == "rep_matrix"
+        || name == "rep_row_vector"
+        || name == "rep_vector"
+        || name == "row"
+        || name == "rows"
+        || name == "positive_infinity"
+        || name == "segment"
+        || name == "subtract"
+        || name == "sum"
+        || name == "tail"
+        || name == "to_vector"
+        || name == "transpose"
+        ;
+    }
+
     bool has_var(const expression& e,
-                           const variable_map& var_map) {
+                 const variable_map& var_map) {
       contains_var vis(var_map);
       return boost::apply_visitor(vis,e.expr_);
     }
-
 
     contains_nonparam_var::contains_nonparam_var(const variable_map& var_map) 
       : var_map_(var_map) {
@@ -463,19 +487,41 @@ namespace stan {
                || vo == local_origin );
     }
     bool contains_nonparam_var::operator()(const fun& e) const {
+      // any function applied to non-linearly transformed var
       for (size_t i = 0; i < e.args_.size(); ++i)
         if (boost::apply_visitor(*this,e.args_[i].expr_))
           return true;
+      // non-linear function applied to var
+      if (!is_linear_function(e.name_)) {
+        for (size_t i = 0; i < e.args_.size(); ++i)
+          if (has_var(e.args_[i],var_map_))
+            return true;
+      }
       return false;
     }
     bool contains_nonparam_var::operator()(const index_op& e) const {
       return boost::apply_visitor(*this,e.expr_.expr_);
     }
     bool contains_nonparam_var::operator()(const binary_op& e) const {
-      return has_var(e,var_map_);
+      if (e.op == "||" 
+          || e.op == "&&"
+          || e.op == "=="
+          || e.op == "!="
+          || e.op == "<"
+          || e.op == "<="
+          || e.op == ">"
+          || e.op == ">=")
+        return true;
+      if (has_non_param_var(e.left,var_map_)
+          || has_non_param_var(e.right,var_map_))
+        return true;
+      if (e.op == "*" || e.op == "/")
+        return has_var(e.left,var_map_) && has_var(e.right,var_map_);
+      return false;
     }
     bool contains_nonparam_var::operator()(const unary_op& e) const {
-      return has_var(e,var_map_);
+      // only negation, which is linear, so recurse
+      return has_non_param_var(e.subject,var_map_);
     }
 
     bool has_non_param_var(const expression& e,

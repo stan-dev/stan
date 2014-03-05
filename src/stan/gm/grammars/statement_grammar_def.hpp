@@ -184,14 +184,15 @@ namespace stan {
         if (has_non_param_var(s.expr_,var_map)) {
           // FIXME:  really want to get line numbers in here too
           error_msgs << "Warning (non-fatal):"
-                     << "     sampling statement (~) contains a transformed parameter or local variable."
-                     << std::endl
-                     << "     You must increment lp__ with the log absolute determinant"
-                     << " of the Jacobian of the transform."
-                     << std::endl
-                     << "     Sampling Statement left-hand-side expression:"
-                     << std::endl
-                     << "          ";
+             << " Left-hand side of sampling statement (~) contains a non-linear"
+             << " transform of a parameter or local variable."
+             << std::endl
+             << " You must call increment_log_prob() with the log absolute determinant"
+             << " of the Jacobian of the transform."
+             << std::endl
+             << "  Sampling Statement left-hand-side expression:"
+             << std::endl
+             << "    ";
           generate_expression(s.expr_,error_msgs);
           error_msgs << " ~ ";
           error_msgs << function_name << "(...)";
