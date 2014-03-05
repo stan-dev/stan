@@ -112,7 +112,7 @@ namespace stan {
           correct_section += last_char;
         }
 
-        int indx = correct_section.size();
+        size_t indx = correct_section.size();
         correct_section = correct_section.erase(indx-1, indx);
 
         //
@@ -176,7 +176,7 @@ namespace stan {
           }
         }
 
-        if (!(get_line(_where) == -1)) {
+        if (!(get_line(_where) == std::string::npos)) {
           error_msgs
             << std::endl
             << "LOCATION OF PARSING ERROR (line = "
