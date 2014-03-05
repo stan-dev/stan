@@ -42,6 +42,18 @@ bool is_parsable(const std::string& file_name,
   return parsable;
 }
 
+bool is_parsable_folder(const std::string& model_name,
+                        const std::string folder = "syntax-only",
+                        std::ostream* msgs = 0) {
+  std::string path("src/test/test-models/");
+  path += folder;
+  path += "/";
+  path += model_name;
+  path += ".stan";
+  return is_parsable(path,msgs);
+}
+
+
 TEST(gm_parser,eight_schools) {
   EXPECT_TRUE(is_parsable("src/models/misc/eight_schools/eight_schools.stan"));
 }
@@ -250,25 +262,14 @@ TEST(gm_parser,function_signatures) {
   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_weibull.stan"));
 }
 
-bool is_parsable_syntax(const std::string& model_name,
-                        std::ostream* msgs = 0) {
-  std::string path("src/test/test-models/syntax-only/");
-  path += model_name;
-  path += ".stan";
-  return is_parsable(path,msgs);
-}
 
 void test_parsable(const std::string& model_name) {
-  EXPECT_TRUE(is_parsable_syntax(model_name));
-}
-
-void test_unparsable(const std::string& model_name) {
-  EXPECT_THROW(is_parsable_syntax(model_name), std::invalid_argument);
+  EXPECT_TRUE(is_parsable_folder(model_name, "syntax-only"));
 }
 
 void test_warning(const std::string& model_name, const std::string& warning_msg) {
   std::stringstream msgs;
-  EXPECT_TRUE(is_parsable_syntax(model_name,&msgs));
+  EXPECT_TRUE(is_parsable_folder(model_name, "syntax-only", &msgs));
   EXPECT_TRUE(msgs.str().find_first_of(warning_msg) >= 0);
 }
 
@@ -281,7 +282,7 @@ void test_warning(const std::string& model_name, const std::string& warning_msg)
 void test_throws(const std::string& model_name, const std::string& error_msg) {
   std::stringstream msgs;
   try {
-    is_parsable_syntax(model_name,&msgs);
+    is_parsable_folder(model_name, "reference", &msgs);
   } catch (const std::invalid_argument& e) {
     EXPECT_TRUE(msgs.str().find_first_of(error_msg) >= 0);
     return;
@@ -366,30 +367,30 @@ TEST(gmParserVarDeclsGrammarDef, validateIntExpr) {
 TEST(gmParserVarDeclsGrammarDef, setIntRangeLower) {
   test_parsable("validate_set_int_range_lower_good");
   test_throws("validate_set_int_range_lower_bad_1",
-                "expression denoting integer required");
+              "expression denoting integer required");
   test_throws("validate_set_int_range_lower_bad_2",
-                "expression denoting integer required");
+              "expression denoting integer required");
   test_throws("validate_set_int_range_lower_bad_3",
-                "expression denoting integer required");
+              "expression denoting integer required");
 }
 TEST(gmParserVarDeclsGrammarDef, setIntRangeUpper) {
   test_parsable("validate_set_int_range_upper_good");
   test_throws("validate_set_int_range_upper_bad_1",
-                "expression denoting integer required");
+              "expression denoting integer required");
   test_throws("validate_set_int_range_upper_bad_2",
-                "expression denoting integer required");
+              "expression denoting integer required");
 }
 TEST(gmParserVarDeclsGrammarDef, setDoubleRangeLower) {
   test_parsable("validate_set_double_range_lower_good");
   test_throws("validate_set_double_range_lower_bad_1",
-                "expression denoting real required");
+              "expression denoting real required");
   test_throws("validate_set_double_range_lower_bad_2",
-                "expression denoting real required");
+              "expression denoting real required");
 }
 TEST(gmParserVarDeclsGrammarDef, setDoubleRangeUpper) {
   test_parsable("validate_set_double_range_upper_good");
   test_throws("validate_set_double_range_upper_bad_1",
-                "expression denoting real required");
+              "expression denoting real required");
   test_throws("validate_set_double_range_upper_bad_2",
-                "expression denoting real required");
+              "expression denoting real required");
 }
