@@ -837,7 +837,7 @@ namespace stan {
         nonbasic_validate(x,"positive_ordered");
       }
       void operator()(cholesky_factor_var_decl const& x) const {
-        nonbasic_validate(x,"choelsky_factor");
+        nonbasic_validate(x,"cholesky_factor");
       }
       void operator()(cov_matrix_var_decl const& x) const {
         nonbasic_validate(x,"cov_matrix");
