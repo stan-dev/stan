@@ -172,16 +172,10 @@ endif
 
 ##
 # TEST_MODELS is the set of all the test models.
-# Those in the 'compiled' subdirectory are supposed to be compiled.
 # Those in the 'no_main' subdirectory are supposed to be compiled without a main function.
 ##
 TEST_MODELS := $(shell find src/test/test-models -type f -name '*.stan')
 
-##
-# Compile these with a main.
-## 
-$(patsubst %.stan,%.cpp,$(filter src/test/test-models/compiled/%,$(TEST_MODELS))) : %.cpp : %.stan bin/stanc$(EXE)
-	bin$(PATH_SEPARATOR)stanc$(EXE) --o=$@ $<
 ##
 # Compile these with no main.
 ##
@@ -193,8 +187,6 @@ $(patsubst %.stan,%.cpp,$(filter src/test/test-models/no-main/%,$(TEST_MODELS)))
 # Tests that also depend on generated models.
 ##
 test/unit/io/mcmc_writer.o: src/test/test-models/no-main/io_example.cpp
-test/unit/gm/command_init.o: src/test/test-models/no-main/gm/test_lp.cpp
-test/unit/gm/command_write_iteration.o: src/test/test-models/no-main/gm/test_lp.cpp
 test/unit/gm/generator.o: src/test/test-models/no-main/gm/test_lp.cpp
 
 test/unit/model/util.o: src/test/test-models/no-main/model/valid.cpp src/test/test-models/no-main/model/domain_fail.cpp
@@ -203,21 +195,13 @@ test/unit/mcmc/hmc/hamiltonians/base_hamiltonian.o: src/test/test-models/no-main
 test/unit/mcmc/hmc/hamiltonians/unit_e_metric.o: src/test/test-models/no-main/mcmc/hmc/hamiltonians/funnel.cpp
 test/unit/mcmc/hmc/hamiltonians/diag_e_metric.o: src/test/test-models/no-main/mcmc/hmc/hamiltonians/funnel.cpp
 test/unit/mcmc/hmc/hamiltonians/dense_e_metric.o: src/test/test-models/no-main/mcmc/hmc/hamiltonians/funnel.cpp
-test/unit/mcmc/hmc/integrators/expl_leapfrog.o: src/test/test-models/no-main/mcmc/hmc/integrators/command.cpp src/test/test-models/no-main/mcmc/hmc/integrators/gauss.cpp
+test/unit/mcmc/hmc/integrators/expl_leapfrog.o: src/test/test-models/no-main/mcmc/hmc/integrators/command.cpp 
+test/unit/mcmc/hmc/integrators/expl_leapfrog2.o: src/test/test-models/no-main/mcmc/hmc/integrators/gauss.cpp
 
-##
-# all files that should be compiled as tests
-##
-FILES := $(shell find src/test/test-models/compiled -type f -name '*.stan')
+test/unit/common/command_init.o: src/test/test-models/no-main/common/test_lp.cpp
+test/unit/common/write_iteration.o: src/test/test-models/no-main/common/test_lp.cpp
 
-test/integration/compile_models.o : $(patsubst %.stan,%$(EXE),$(FILES)) $(patsubst %.stan,%.cpp-test,$(wildcard src/test/test-models/syntax-only/*stan))
-
-test/CmdStan/command.o: \
-   $(addprefix src/test/test-models/compiled/CmdStan/,\
-               $(addsuffix $(EXE), printer domain_fail value_fail proper))
-test/CmdStan/gm/argument_configuration.o: src/test/test-models/compiled/CmdStan/test_model$(EXE)
-test/CmdStan/fixed_param_sampler.o: src/test/test-models/compiled/CmdStan/empty$(EXE) src/test/test-models/compiled/CmdStan/proper$(EXE)
-test/CmdStan/optimization_output.o: src/test/test-models/compiled/CmdStan/optimization_output$(EXE)
+test/integration/compile_models.o : $(patsubst %.stan,%.cpp-test,$(wildcard src/test/test-models/syntax-only/*stan))
 
 ##
 # CmdStan specific targets. Should be removed in the future.
@@ -225,12 +209,6 @@ test/CmdStan/optimization_output.o: src/test/test-models/compiled/CmdStan/optimi
 $(patsubst src/%_test.cpp,%.o,$(filter src/test/CmdStan/%,$(ALL_TESTS))): test/%.o : src/test/%_test.cpp $(LIBGTEST) bin/print$(EXE)
 	@mkdir -p $(dir $@)
 	$(COMPILE.c) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
-
-##
-# CmdStan model tests. Adding built model as a dependency.
-##
-$(patsubst src/%_test.cpp,%.o,$(filter src/test/CmdStan/models/%,$(ALL_TESTS))): test/CmdStan/%.o : %$(EXE)
-
 
 ##
 # Agrad distributions test generator
@@ -289,7 +267,7 @@ test-headers: $(HEADER_TESTS)
 # Deprecated test targets
 ##
 .PHONY: test-unit test-distributions test-models test-bugs
-test-unit test-distributions test-models test-bugs test-all:
+test-unit test-distributions test-all:
 	@echo ''
 	@echo ''
 	@echo '  The '$@' target is deprecated. Please use these make targets instead:'
@@ -299,9 +277,23 @@ test-unit: src/test/unit src/test/unit-agrad-rev src/test/unit-agrad-fwd
 
 test-distributions: src/test/unit-distribution
 
-test-models: src/test/CmdStan/models
+test-models:
+	@echo ''
+	@echo 'These tests are now in the CmdStan repository. Run this from'
+	@echo 'the CmdStan directory:'
+	@echo ''
+	@echo '  "> make src/test/models"'
+	@echo ''
+	$(error Tests have moved to the CmdStan repository. Run "> make src/test/models")
 
-test-bugs: src/test/CmdStan/models/bugs_examples
+test-bugs:
+	@echo ''
+	@echo 'These tests are now in the CmdStan repository. Run this from'
+	@echo 'the CmdStan directory:'
+	@echo ''
+	@echo '  "> make src/test/models/bugs_examples"'
+	@echo ''
+	$(error Tests have moved to the CmdStan repository. Run "> make src/test/models/bugs_examples")
 
 
 .PHONY: test-all

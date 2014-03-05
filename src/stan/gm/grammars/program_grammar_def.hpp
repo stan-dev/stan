@@ -112,7 +112,7 @@ namespace stan {
           correct_section += last_char;
         }
 
-        int indx = correct_section.size();
+        size_t indx = correct_section.size();
         correct_section = correct_section.erase(indx-1, indx);
 
         //
@@ -129,10 +129,10 @@ namespace stan {
         sections.push_back("parameter");
         sections.push_back("data");
 
-        bool found_section = false;
+        //bool found_section = false; // FIXME: do something with found_section
         indx = 0;
 
-        for (int i = 0; i < sections.size(); ++i) {
+        for (size_t i = 0; i < sections.size(); ++i) {
           std::string section = sections[i];
           indx = correct_section.find(section);
           if (!(indx == std::string::npos)) {
@@ -154,7 +154,7 @@ namespace stan {
                 // indx is pointing at it.
               }
             }
-            found_section = true;
+            //found_section = true;
             correct_section = correct_section.erase(0, indx);
             break;
           }
@@ -176,7 +176,7 @@ namespace stan {
           }
         }
 
-        if (!(get_line(_where) == -1)) {
+        if (!(get_line(_where) == std::string::npos)) {
           error_msgs
             << std::endl
             << "LOCATION OF PARSING ERROR (line = "
