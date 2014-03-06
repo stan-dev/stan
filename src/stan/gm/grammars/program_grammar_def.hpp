@@ -140,7 +140,7 @@ namespace stan {
               // Check which transformed block we're dealing with.
               // If there is another transformed section, it must be
               // a 'transformed parameters' section
-              int indx2 = correct_section.find("transformed", indx + 5);
+              size_t indx2 = correct_section.find("transformed", indx + 5);
               if (!(indx2 == std::string::npos)) {
                 indx = indx2;
               } else {
