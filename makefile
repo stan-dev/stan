@@ -15,12 +15,14 @@ SUFIXES:
 # - CC: The compiler to use. Expecting g++ or clang++.
 # - O: Optimization level. Valid values are {0, 1, 2, 3}.
 # - AR: archiver (must specify for cross-compiling)
-# - OS: {mac, win, linux}. 
+# - OS: {mac, win, linux}
+# - C++11: Compile with C++11 extensions, Valid values: {true, false}. 
 ##
 CC = g++
 O = 3
 O_STANC = 0
 AR = ar
+C++11 = false
 
 ##
 # Library locations

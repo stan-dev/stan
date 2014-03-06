@@ -53,21 +53,22 @@ namespace stan {
 
   namespace gm {
 
-
-
     struct add_conditional_condition {
-      template <typename T1, typename T2, typename T3>
-      struct result { typedef bool type; };
-      bool operator()(conditional_statement& cs,
+      template <typename T1, typename T2, typename T3, typename T4>
+      struct result { typedef void type; };
+      void operator()(conditional_statement& cs,
                       const expression& e,
+                      bool& pass,
                       std::stringstream& error_msgs) const {
         if (!e.expression_type().is_primitive()) {
           error_msgs << "conditions in if-else statement must be primitive int or real;"
                      << " found type=" << e.expression_type() << std::endl;
-          return false;
+          pass = false;
+          return;
         }
         cs.conditions_.push_back(e);
-        return true;
+        pass = true;
+        return;
       }               
     };
     boost::phoenix::function<add_conditional_condition> add_conditional_condition_f;
@@ -117,17 +118,17 @@ namespace stan {
         = lit("if")
         > lit('(')
         > expression_g(_r2)
-          [_pass = add_conditional_condition_f(_val,_1,
-                                               boost::phoenix::ref(error_msgs_))]
+          [add_conditional_condition_f(_val,_1,_pass,
+                                       boost::phoenix::ref(error_msgs_))]
         > lit(')')
         > statement_g(_r1,_r2)
-        [add_conditional_body_f(_val,_1)]
+          [add_conditional_body_f(_val,_1)]
         > * (( lit("else")
                >> lit("if") )
              > lit('(')
              > expression_g(_r2)
-               [_pass = add_conditional_condition_f(_val,_1,
-                                                    boost::phoenix::ref(error_msgs_))]
+               [add_conditional_condition_f(_val,_1,_pass,
+                                            boost::phoenix::ref(error_msgs_))]
              > lit(')')
              > statement_g(_r1,_r2)
                [add_conditional_body_f(_val,_1)]
