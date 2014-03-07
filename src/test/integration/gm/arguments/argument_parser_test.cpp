@@ -20,7 +20,7 @@ using stan::gm::error_codes;
 class StanGmArgumentsArgumentParser : public testing::Test {
 public:
   void SetUp() {
-    // copied setup from src/stan/gm/command.hpp
+    // copied setup from src/stan/common/command.hpp
     // FIXME: move to factory?
     valid_arguments.push_back(new arg_id());
     valid_arguments.push_back(new arg_data());
