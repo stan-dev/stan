@@ -107,11 +107,6 @@ namespace stan {
       range_brackets_int_r;
 
       boost::spirit::qi::rule<Iterator, 
-                              range(var_origin), 
-                              whitespace_grammar<Iterator> > 
-      range_r;
-
-      boost::spirit::qi::rule<Iterator, 
                               row_vector_var_decl(var_origin), 
                               whitespace_grammar<Iterator> > 
       row_vector_decl_r;
