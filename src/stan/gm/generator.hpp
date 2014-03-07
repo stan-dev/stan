@@ -288,6 +288,7 @@ namespace stan {
    
     void generate_includes(std::ostream& o) {
       generate_include("stan/model/model_header.hpp",o);
+      generate_include("stan/common/command.hpp",o);
       // generate_include("boost/random/linear_congruential.hpp",o);
       o << EOL;
     }
@@ -836,7 +837,7 @@ namespace stan {
         nonbasic_validate(x,"positive_ordered");
       }
       void operator()(cholesky_factor_var_decl const& x) const {
-        nonbasic_validate(x,"choelsky_factor");
+        nonbasic_validate(x,"cholesky_factor");
       }
       void operator()(cov_matrix_var_decl const& x) const {
         nonbasic_validate(x,"cov_matrix");
@@ -3937,7 +3938,7 @@ namespace stan {
                        std::ostream& out) {
       out << "int main(int argc, const char* argv[]) {" << EOL;
       out << INDENT << "try {" << EOL;
-      out << INDENT2 << "return stan::gm::command<" << model_name 
+      out << INDENT2 << "return stan::common::command<" << model_name 
           << "_namespace::" << model_name << ">(argc,argv);" << EOL;
       out << INDENT << "} catch (const std::exception& e) {" << EOL;
       out << INDENT2 
@@ -3957,6 +3958,12 @@ namespace stan {
       out << INDENT << "static std::string model_name() {" << EOL
           << INDENT2 << "return \"" << model_name << "\";" << EOL
           << INDENT << "}" << EOL2;
+    }
+
+    void generate_model_typedef(const std::string& model_name,
+                                std::ostream& out) {
+      out << "typedef " << model_name << "_namespace::" << model_name
+          << " stan_model;" <<EOL2;
     }
 
     void generate_cpp(const program& prog, 
@@ -3990,6 +3997,7 @@ namespace stan {
       generate_end_namespace(out);
       if (include_main) 
         generate_main(model_name,out);
+      generate_model_typedef(model_name,out);
     }
 
   }
