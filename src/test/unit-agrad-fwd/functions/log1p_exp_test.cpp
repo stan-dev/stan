@@ -20,6 +20,12 @@ TEST(AgradFwdLog1pExp,Fvar) {
   fvar<double> b = log1p_exp(y);
   EXPECT_FLOAT_EQ(log1p_exp(1.0), b.val_);
   EXPECT_FLOAT_EQ(2.0 * exp(1.0) / (1 + exp(1.0)), b.d_);
+
+  fvar<double> a2 = log(1+exp(x));
+  EXPECT_FLOAT_EQ(a.d_, a2.d_);
+
+  fvar<double> b2 = log(1+exp(y));
+  EXPECT_FLOAT_EQ(b.d_, b2.d_);
 }
 
 TEST(AgradFwdLog1pExp,FvarVar_1stDeriv) {

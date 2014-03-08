@@ -13,22 +13,13 @@
 #include <vector>
 #include <stdexcept>
 
-#include <boost/spirit/include/qi.hpp>
-// FIXME: get rid of unused include
-#include <boost/spirit/include/phoenix_core.hpp>
-#include <boost/spirit/include/phoenix_function.hpp>
-#include <boost/spirit/include/phoenix_fusion.hpp>
-#include <boost/spirit/include/phoenix_object.hpp>
-#include <boost/spirit/include/phoenix_operator.hpp>
-#include <boost/spirit/include/phoenix_stl.hpp>
 
+#include <boost/spirit/include/qi.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>
 #include <boost/fusion/include/std_pair.hpp>
 #include <boost/config/warning_disable.hpp>
-#include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/qi_numeric.hpp>
-#include <boost/spirit/include/classic_position_iterator.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>
 #include <boost/spirit/include/phoenix_function.hpp>
 #include <boost/spirit/include/phoenix_fusion.hpp>
@@ -39,6 +30,9 @@
 #include <boost/tuple/tuple.hpp>
 #include <boost/variant/apply_visitor.hpp>
 #include <boost/variant/recursive_variant.hpp>
+
+#include <boost/spirit/include/version.hpp>
+#include <boost/spirit/include/support_line_pos_iterator.hpp>
 
 #include <stan/gm/ast.hpp>
 #include <stan/gm/grammars/whitespace_grammar.hpp>
@@ -190,14 +184,15 @@ namespace stan {
         if (has_non_param_var(s.expr_,var_map)) {
           // FIXME:  really want to get line numbers in here too
           error_msgs << "Warning (non-fatal):"
-                     << "     sampling statement (~) contains a transformed parameter or local variable."
-                     << std::endl
-                     << "     You must increment lp__ with the log absolute determinant"
-                     << " of the Jacobian of the transform."
-                     << std::endl
-                     << "     Sampling Statement left-hand-side expression:"
-                     << std::endl
-                     << "          ";
+             << " Left-hand side of sampling statement (~) contains a non-linear"
+             << " transform of a parameter or local variable."
+             << std::endl
+             << " You must call increment_log_prob() with the log absolute determinant"
+             << " of the Jacobian of the transform."
+             << std::endl
+             << "  Sampling Statement left-hand-side expression:"
+             << std::endl
+             << "    ";
           generate_expression(s.expr_,error_msgs);
           error_msgs << " ~ ";
           error_msgs << function_name << "(...)";
@@ -393,33 +388,39 @@ namespace stan {
     boost::phoenix::function<remove_loop_identifier> remove_loop_identifier_f;
 
     struct validate_int_expr2 {
-      template <typename T1, typename T2>
-      struct result { typedef bool type; };
+      template <typename T1, typename T2, typename T3>
+      struct result { typedef void type; };
 
-      bool operator()(const expression& expr,
+      void operator()(const expression& expr,
+                      bool& pass,
                       std::stringstream& error_msgs) const {
         if (!expr.expression_type().is_primitive_int()) {
           error_msgs << "expression denoting integer required; found type=" 
                      << expr.expression_type() << std::endl;
-          return false;
+          pass = false;
+          return;
         }
-        return true;
+        pass = true;
+        return;
       }
     };
     boost::phoenix::function<validate_int_expr2> validate_int_expr2_f;
 
     struct validate_allow_sample {
-      template <typename T1, typename T2>
-      struct result { typedef bool type; };
+      template <typename T1, typename T2, typename T3>
+      struct result { typedef void type; };
 
-      bool operator()(const bool& allow_sample,
+      void operator()(const bool& allow_sample,
+                      bool& pass,
                       std::stringstream& error_msgs) const {
         if (!allow_sample) {
-          error_msgs << "ERROR:  sampling only allowed in model."
+          error_msgs << "sampling only allowed in model."
                      << std::endl;
-          return false;
+          pass = false;
+          return;
         }
-        return true;
+        pass = true;
+        return;
       }
     };
     boost::phoenix::function<validate_allow_sample> validate_allow_sample_f;
@@ -546,10 +547,10 @@ namespace stan {
       range_r.name("range expression pair, colon");
       range_r 
         %= expression_g(_r1)
-        [_pass = validate_int_expr2_f(_1,boost::phoenix::ref(error_msgs_))]
+           [validate_int_expr2_f(_1,_pass,boost::phoenix::ref(error_msgs_))]
         >> lit(':') 
         >> expression_g(_r1)
-        [_pass = validate_int_expr2_f(_1,boost::phoenix::ref(error_msgs_))];
+           [validate_int_expr2_f(_1,_pass,boost::phoenix::ref(error_msgs_))];
 
       assignment_r.name("variable assignment by expression");
       assignment_r
@@ -574,7 +575,7 @@ namespace stan {
       dims_r 
         %= lit('[') 
         > (expression_g(_r1)
-           [_pass = validate_int_expr2_f(_1,boost::phoenix::ref(error_msgs_))]
+           [validate_int_expr2_f(_1,_pass,boost::phoenix::ref(error_msgs_))]
            % ',')
         > lit(']')
         ;
@@ -585,8 +586,8 @@ namespace stan {
         %= ( expression_g(_r2)
              >> lit('~') )
         > eps
-          [_pass = validate_allow_sample_f(_r1,
-                                           boost::phoenix::ref(error_msgs_))]
+          [validate_allow_sample_f(_r1,_pass,
+                                   boost::phoenix::ref(error_msgs_))]
         > distribution_r(_r2)
         > -truncation_range_r(_r2)
         > lit(';')
@@ -615,6 +616,11 @@ namespace stan {
       no_op_statement_r 
         %= lit(';') [_val = no_op_statement()];  // ok to re-use instance
 
+      using boost::spirit::qi::on_error;
+      using boost::spirit::qi::fail;
+      using boost::spirit::qi::rethrow;
+      using namespace boost::spirit::qi::labels;
+      
     }
 
   }

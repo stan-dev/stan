@@ -288,6 +288,7 @@ namespace stan {
    
     void generate_includes(std::ostream& o) {
       generate_include("stan/model/model_header.hpp",o);
+      generate_include("stan/common/command.hpp",o);
       // generate_include("boost/random/linear_congruential.hpp",o);
       o << EOL;
     }
@@ -836,7 +837,7 @@ namespace stan {
         nonbasic_validate(x,"positive_ordered");
       }
       void operator()(cholesky_factor_var_decl const& x) const {
-        nonbasic_validate(x,"choelsky_factor");
+        nonbasic_validate(x,"cholesky_factor");
       }
       void operator()(cov_matrix_var_decl const& x) const {
         nonbasic_validate(x,"cov_matrix");
@@ -1651,15 +1652,15 @@ namespace stan {
       o << INDENT2 << "return lp_accum__.sum();" << EOL2;
       o << INDENT << "} // log_prob()" << EOL2;
 
-      o << INDENT << "template <bool propto, bool jacobian, typename T>" << EOL;
-      o << INDENT << "T log_prob(Eigen::Matrix<T,Eigen::Dynamic,1>& params_r," << EOL;
+      o << INDENT << "template <bool propto, bool jacobian, typename T_>" << EOL;
+      o << INDENT << "T_ log_prob(Eigen::Matrix<T_,Eigen::Dynamic,1>& params_r," << EOL;
       o << INDENT << "           std::ostream* pstream = 0) const {" << EOL;
-      o << INDENT << "  std::vector<T> vec_params_r;" << EOL;
+      o << INDENT << "  std::vector<T_> vec_params_r;" << EOL;
       o << INDENT << "  vec_params_r.reserve(params_r.size());" << EOL;
       o << INDENT << "  for (int i = 0; i < params_r.size(); ++i)" << EOL;
       o << INDENT << "    vec_params_r.push_back(params_r(i));" << EOL;
       o << INDENT << "  std::vector<int> vec_params_i;" << EOL;
-      o << INDENT << "  return log_prob<propto,jacobian,T>(vec_params_r, vec_params_i, pstream);" << EOL;
+      o << INDENT << "  return log_prob<propto,jacobian,T_>(vec_params_r, vec_params_i, pstream);" << EOL;
       o << INDENT << "}" << EOL2;
     }
 
@@ -3937,7 +3938,7 @@ namespace stan {
                        std::ostream& out) {
       out << "int main(int argc, const char* argv[]) {" << EOL;
       out << INDENT << "try {" << EOL;
-      out << INDENT2 << "return stan::gm::command<" << model_name 
+      out << INDENT2 << "return stan::common::command<" << model_name 
           << "_namespace::" << model_name << ">(argc,argv);" << EOL;
       out << INDENT << "} catch (const std::exception& e) {" << EOL;
       out << INDENT2 
@@ -3957,6 +3958,12 @@ namespace stan {
       out << INDENT << "static std::string model_name() {" << EOL
           << INDENT2 << "return \"" << model_name << "\";" << EOL
           << INDENT << "}" << EOL2;
+    }
+
+    void generate_model_typedef(const std::string& model_name,
+                                std::ostream& out) {
+      out << "typedef " << model_name << "_namespace::" << model_name
+          << " stan_model;" <<EOL2;
     }
 
     void generate_cpp(const program& prog, 
@@ -3990,6 +3997,7 @@ namespace stan {
       generate_end_namespace(out);
       if (include_main) 
         generate_main(model_name,out);
+      generate_model_typedef(model_name,out);
     }
 
   }
