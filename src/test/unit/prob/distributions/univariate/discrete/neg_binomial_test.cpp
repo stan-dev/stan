@@ -40,7 +40,7 @@ TEST(ProbDistributionsNegBinomial, chiSquareGoodnessFitTest) {
   expect[K-1] = N * (1 - cdf(dist, K - 1));
 
   while (count < N) {
-    int a = stan::prob::neg_binomial_rng(5,1.0/0.6-1,rng);
+    int a = stan::prob::neg_binomial_rng(5, 0.6/(1-0.6), rng);
     int i = 0;
     while (i < K-1 && a > loc[i]) 
       ++i;
@@ -77,7 +77,7 @@ TEST(ProbDistributionsNegBinomial, chiSquareGoodnessFitTest2) {
   expect[K-1] = N * (1 - cdf(dist, K - 1));
 
   while (count < N) {
-    int a = stan::prob::neg_binomial_rng(2.4,1.0/0.6-1,rng);
+    int a = stan::prob::neg_binomial_rng(2.4, 0.6/(1-0.6), rng);
     int i = 0;
     while (i < K-1 && a > loc[i]) 
       ++i;
@@ -114,7 +114,7 @@ TEST(ProbDistributionsNegBinomial, chiSquareGoodnessFitTest3) {
   expect[K-1] = N * (1 - cdf(dist, K - 1));
 
   while (count < N) {
-    int a = stan::prob::neg_binomial_rng(0.4,1.0/0.6-1,rng);
+    int a = stan::prob::neg_binomial_rng(0.4, 0.6/(1-0.6), rng);
     int i = 0;
     while (i < K-1 && a > loc[i]) 
       ++i;
