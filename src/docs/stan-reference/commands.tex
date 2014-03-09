@@ -1319,7 +1319,7 @@ simulation error in the Hamiltonian dynamics calculation.  See
 The fixed parameter sampler generates a new sample without changing
 the current state of the Markov chain; only generated quantities may
 change.  This can be useful when, for example, trying to generate pseudo-data 
-using the generated quantities block.
+using the generated quantities block. If the parameters block is empty (no parameters) then using {\tt algorithm=fixed\_param} is mandatory.
 %
 \begin{description}
       \hierlongcmd{\indentarrow\indentarrow\indentarrow}{\farg{\bfseries fixed\_param}}

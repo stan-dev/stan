@@ -14,6 +14,7 @@ namespace stan {
 
     // Point in a generic phase space
     class ps_point {
+      friend class ps_point_test;
       
     public:
       
@@ -76,16 +77,23 @@ namespace stan {
     protected:
       
       template <typename T>
-      inline void _fast_vector_copy(Eigen::Matrix<T, Eigen::Dynamic, 1>& v_to, const Eigen::Matrix<T, Eigen::Dynamic, 1>& v_from) {
-        v_to.resize(v_from.size());
-        std::memcpy(&v_to(0), &v_from(0), v_from.size() * sizeof(double));
+      static inline void _fast_vector_copy(Eigen::Matrix<T, Eigen::Dynamic, 1>& v_to, const Eigen::Matrix<T, Eigen::Dynamic, 1>& v_from) {
+	int sz = v_from.size();
+        v_to.resize(sz);
+	if (sz > 0) {
+	  std::memcpy(&v_to(0), &v_from(0), v_from.size() * sizeof(double));
+	}
       }
 
       template <typename T>
-      inline void _fast_matrix_copy(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& v_to,
+      static inline void _fast_matrix_copy(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& v_to,
                                     const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& v_from) {
-        v_to.resize(v_from.rows(), v_from.cols());
-        std::memcpy(&v_to(0), &v_from(0), v_from.size() * sizeof(double));
+	int nr = v_from.rows();
+	int nc = v_from.cols();
+        v_to.resize(nr, nc);
+	if (nr > 0 && nc > 0) {
+	  std::memcpy(&v_to(0), &v_from(0), v_from.size() * sizeof(double));
+	}
       }
       
     };
