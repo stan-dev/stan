@@ -198,13 +198,13 @@ namespace stan {
           double h = this->_hamiltonian.H(this->_z); 
           if (boost::math::isnan(h)) h = std::numeric_limits<double>::infinity();
           
-          util.criterion = util.log_u + (h - util.H0) < this->_max_delta;
+          util.criterion = ( util.log_u + (h - util.H0) ) < this->_max_delta;
           if (!util.criterion) ++(this->_n_divergent);
 
           util.sum_prob += stan::math::min(1, std::exp(util.H0 - h));
           util.n_tree += 1;
           
-          return (util.log_u + (h - util.H0) < 0);
+          return ( (util.log_u + (h - util.H0) ) < 0 );
           
         } 
         // General recursion
