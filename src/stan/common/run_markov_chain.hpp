@@ -23,10 +23,10 @@ namespace stan {
                           stan::mcmc::sample& init_s,
                           Model& model,
                           RNG& base_rng,
-                          const std::string prefix = "",
-                          const std::string suffix = "\n",
-                          std::ostream& o = std::cout) {
-      
+                          const std::string& prefix,
+                          const std::string& suffix,
+                          std::ostream& o) {
+
       for (int m = 0; m < num_iterations; ++m) {
       
         print_progress(m, start, finish, refresh, warmup, prefix, suffix, o);
