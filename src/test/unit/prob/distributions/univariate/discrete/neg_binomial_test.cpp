@@ -35,7 +35,7 @@ TEST(ProbDistributionsNegBinomial, chiSquareGoodnessFitTest) {
   double expect [K];
   for(int i = 0 ; i < K; i++)  {
     bin[i] = 0;
-    expect[i] = N * pdf(dist, i);
+    expect[i] = N * boost::math::pdf(dist, i);
   }
   expect[K-1] = N * (1 - cdf(dist, K - 1));
 
@@ -109,7 +109,7 @@ TEST(ProbDistributionsNegBinomial, chiSquareGoodnessFitTest3) {
   double expect [K];
   for(int i = 0 ; i < K; i++)  {
     bin[i] = 0;
-    expect[i] = N * pdf(dist, i);
+    expect[i] = N * boost::math::pdf(dist, i);
   }
   expect[K-1] = N * (1 - cdf(dist, K - 1));
 
