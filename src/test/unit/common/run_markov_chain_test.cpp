@@ -78,6 +78,7 @@ TEST_F(StanCommon, run_markov_chain) {
 
   std::cout.rdbuf(old_cout_rdbuf);
   EXPECT_EQ(expected_std_cout, ss.str());
-  EXPECT_EQ("", redirect_cout.str());
+  EXPECT_EQ("", redirect_cout.str())
+    << "There should be no output to std::cout";
 }
 
