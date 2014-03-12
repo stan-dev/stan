@@ -66,16 +66,18 @@ TEST_F(StanCommon, run_markov_chain) {
   double stat = 0;
   stan::mcmc::sample s(q, log_prob, stat);
   std::string prefix = "";
-  std::string suffix = "";
+  std::string suffix = "\n";
   std::stringstream ss;
   stan::common::run_markov_chain(sampler,
                                  num_iterations, start, finish,
                                  num_thin, refresh, save, warmup,
-                                 *writer, s, *model, base_rng);
+                                 *writer, s, *model, base_rng,
+                                 prefix, suffix, ss);
   
   EXPECT_EQ(num_iterations, sampler->n_transition_called);
 
   std::cout.rdbuf(old_cout_rdbuf);
-  EXPECT_EQ(expected_std_cout, redirect_cout.str());
+  EXPECT_EQ(expected_std_cout, ss.str());
+  EXPECT_EQ("", redirect_cout.str());
 }
 
