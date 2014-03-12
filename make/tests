@@ -217,7 +217,7 @@ test/unit-distribution/generate_tests$(EXE) : src/test/unit-distribution/generat
 
 src/test/unit-distribution/%_00000_generated_test.cpp : src/test/unit-distribution/%_test.hpp | test/unit-distribution/generate_tests$(EXE)
 	@echo "--- Generating tests for $(notdir $<) ---"
-	test/unit-distribution/generate_tests$(EXE) $<
+	$(WINE) test/unit-distribution/generate_tests$(EXE) $<
 
 
 

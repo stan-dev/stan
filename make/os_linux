@@ -16,7 +16,7 @@ endif
 ifeq (mingw32-g++,$(CC_TYPE))
   CFLAGS_GTEST += -DGTEST_HAS_PTHREAD=0
   LDLIBS_STANC += -static
-  LDLIBS += -static
+  LDFLAGS += -static
   LDFLAGS += -lwinpthread
   EXE = .exe
   WINE = wine
