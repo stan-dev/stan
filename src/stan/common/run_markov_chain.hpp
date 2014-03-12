@@ -22,7 +22,10 @@ namespace stan {
                           stan::io::mcmc_writer<Model>& writer,
                           stan::mcmc::sample& init_s,
                           Model& model,
-                          RNG& base_rng) {
+                          RNG& base_rng,
+                          const std::string prefix = "",
+                          const std::string suffix = "\n",
+                          std::ostream& o = std::cout) {
       
       for (int m = 0; m < num_iterations; ++m) {
       
