@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <stan/common/run_markov_chain.hpp>
 #include <test/test-models/no-main/common/test_lp.cpp>
+#include <sstream>
 
 typedef boost::ecuyer1988 rng_t;
 
@@ -64,6 +65,9 @@ TEST_F(StanCommon, run_markov_chain) {
   double log_prob = 0;
   double stat = 0;
   stan::mcmc::sample s(q, log_prob, stat);
+  std::string prefix = "";
+  std::string suffix = "";
+  std::stringstream ss;
   stan::common::run_markov_chain(sampler,
                                  num_iterations, start, finish,
                                  num_thin, refresh, save, warmup,

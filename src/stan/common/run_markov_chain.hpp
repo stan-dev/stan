@@ -29,7 +29,7 @@ namespace stan {
       
       for (int m = 0; m < num_iterations; ++m) {
       
-        print_progress(m, start, finish, refresh, warmup);
+        print_progress(m, start, finish, refresh, warmup, prefix, suffix, o);
       
         init_s = sampler->transition(init_s);
           
