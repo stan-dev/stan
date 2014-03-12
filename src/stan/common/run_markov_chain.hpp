@@ -5,8 +5,6 @@
 #include <stan/io/mcmc_writer.hpp>
 #include <stan/common/print_progress.hpp>
 
-// FIXME: this function needs to take in an output stream
-
 namespace stan {
   namespace common {
 
