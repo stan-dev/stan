@@ -1,16 +1,17 @@
 #include <stan/math/matrix/containers_conversion.hpp>
+#include <test/unit/math/matrix/expect_matrix_eq.hpp>
 #include <gtest/gtest.h>
 
-using stan::math::flatten;  
 using stan::math::to_matrix;
 using stan::math::to_vector;
 using stan::math::to_row_vector;
-using stan::math::to_array;
+using stan::math::to_array_2d;
+using stan::math::to_array_1d;  
 using Eigen::Dynamic;
 using Eigen::Matrix;
 using std::vector;
 
-TEST(MathMatrix, conversions) {
+TEST(MathMatrix, conversions_1) {
 
   Matrix<double, Dynamic, Dynamic> a1(3,2);
   a1 << 1.1, 2.53,
@@ -64,33 +65,81 @@ TEST(MathMatrix, conversions) {
   
   vector<int> g2;
   
-  EXPECT_NO_THROW(to_matrix(d2));
+  
+  //Tests for empty containers
+  //matrix to_matrix(vector)
+  EXPECT_NO_THROW(to_matrix(a2));
+  
+  //matrix to_matrix(vector)
   EXPECT_NO_THROW(to_matrix(c2));
-  EXPECT_NO_THROW(to_matrix(b2));
-  EXPECT_NO_THROW(to_vector(e2));
-  EXPECT_NO_THROW(to_row_vector(e2));
-  EXPECT_NO_THROW(to_matrix(f2));
-  EXPECT_NO_THROW(to_vector(g2));
-  EXPECT_NO_THROW(to_row_vector(g2));
-  EXPECT_NO_THROW(to_array(a2));
-  EXPECT_NO_THROW(to_array(d2));
-  EXPECT_NO_THROW(to_array(c2));
-  EXPECT_NO_THROW(to_vector(a2));
-  EXPECT_NO_THROW(to_vector(d2));
-  EXPECT_NO_THROW(to_row_vector(a2));
-  EXPECT_NO_THROW(to_row_vector(c2));
   
   //matrix to_matrix(row_vector)
-  a2 = to_matrix(d1);
-  EXPECT_EQ(a2(0, 0), d1(0));
-  EXPECT_EQ(a2(0, 1), d1(1));
-  EXPECT_EQ(a2(0, 2), d1(2));
+  EXPECT_NO_THROW(to_matrix(d2));
+  
+  //matrix to_matrix(real[,])
+  EXPECT_NO_THROW(to_matrix(b2));
+  
+  //matrix to_matrix(int[,])
+  EXPECT_NO_THROW(to_matrix(f2));
+  
+  //vector to_vector(matrix)
+  EXPECT_NO_THROW(to_vector(a2));
+  
+  //vector to_vector(row_vector)
+  EXPECT_NO_THROW(to_vector(d2));
+  
+  //vector to_vector(vector)
+  EXPECT_NO_THROW(to_vector(c2));
+  
+  //vector to_vector(real[])
+  EXPECT_NO_THROW(to_vector(e2));
+  
+  //vector to_vector(int[])
+  EXPECT_NO_THROW(to_vector(g2));
+  
+  //row_vector to_row_vector(matrix)
+  EXPECT_NO_THROW(to_row_vector(a2));
+  
+  //row_vector to_row_vector(vector)
+  EXPECT_NO_THROW(to_row_vector(c2));
+  
+  //row_vector to_row_vector(row_vector)
+  EXPECT_NO_THROW(to_row_vector(d2));
+  
+  //row_vector to_row_vector(real[])
+  EXPECT_NO_THROW(to_row_vector(e2));
+  
+  //row_vector to_row_vector(int[])
+  EXPECT_NO_THROW(to_row_vector(g2));
+  
+  //real[,] to_array_2d(matrix)
+  EXPECT_NO_THROW(to_array_2d(a2));
+  
+  //real[] to_array_1d(matrix)
+  EXPECT_NO_THROW(to_array_1d(a2));
+  
+  //real[] to_array_1d(row_vector)
+  EXPECT_NO_THROW(to_array_1d(d2));
+  
+  //real[] to_array_1d(vector)
+  EXPECT_NO_THROW(to_array_1d(c2));
+  
+
+  //matrix to_matrix(vector)
+  a2 = to_matrix(a1);
+  expect_matrix_eq(a1, a2);
   
   //matrix to_matrix(vector)
   a2 = to_matrix(c1);
   EXPECT_EQ(a2(0, 0), c1(0));
   EXPECT_EQ(a2(1, 0), c1(1));
   EXPECT_EQ(a2(2, 0), c1(2));
+  
+  //matrix to_matrix(row_vector)
+  a2 = to_matrix(d1);
+  EXPECT_EQ(a2(0, 0), d1(0));
+  EXPECT_EQ(a2(0, 1), d1(1));
+  EXPECT_EQ(a2(0, 2), d1(2));
 
   //matrix to_matrix(real[,])
   a2 = to_matrix(b1);
@@ -101,21 +150,7 @@ TEST(MathMatrix, conversions) {
   EXPECT_EQ(a2(1, 1), b1[1][1]);
   EXPECT_EQ(a2(2, 0), b1[2][0]);
   EXPECT_EQ(a2(2, 1), b1[2][1]);
-
-  //vector to_vector(real[])
-  c2 = to_vector(e1);
   
-  EXPECT_EQ(c2(0), e1[0]);
-  EXPECT_EQ(c2(1), e1[1]);
-  EXPECT_EQ(c2(2), e1[2]);
-
-  //row_vector to_row_vector(real[])
-  d2 = to_row_vector(e1);
-  
-  EXPECT_EQ(d2(0), e1[0]);
-  EXPECT_EQ(d2(1), e1[1]);
-  EXPECT_EQ(d2(2), e1[2]);
-
   //matrix to_matrix(int[,])
   a2 = to_matrix(f1);
 
@@ -125,42 +160,6 @@ TEST(MathMatrix, conversions) {
   EXPECT_EQ(a2(1, 1), f1[1][1]);
   EXPECT_EQ(a2(2, 0), f1[2][0]);
   EXPECT_EQ(a2(2, 1), f1[2][1]);
-
-  //vector to_vector(int[])
-  c2 = to_vector(g1);
-  
-  EXPECT_EQ(c2(0), g1[0]);
-  EXPECT_EQ(c2(1), g1[1]);
-  EXPECT_EQ(c2(2), g1[2]);
-  
-  //row_vector to_row_vector(int[])
-  d2 = to_row_vector(g1);
-
-  EXPECT_EQ(d2(0), g1[0]);
-  EXPECT_EQ(d2(1), g1[1]);
-  EXPECT_EQ(d2(2), g1[2]);
-
-  //real[,] to_array(matrix)
-  b2 = to_array(a1);
-
-  EXPECT_EQ(a1(0, 0), b2[0][0]);
-  EXPECT_EQ(a1(0, 1), b2[0][1]);
-  EXPECT_EQ(a1(1, 0), b2[1][0]);
-  EXPECT_EQ(a1(1, 1), b2[1][1]);
-  EXPECT_EQ(a1(2, 0), b2[2][0]);
-  EXPECT_EQ(a1(2, 1), b2[2][1]);
-
-  //real[] to_array(row_vector)
-  e2 = to_array(d1);
-  EXPECT_EQ(d1(0), e2[0]);
-  EXPECT_EQ(d1(1), e2[1]);
-  EXPECT_EQ(d1(2), e2[2]);
-
-  //real[] to_array(vector)
-  e2 = to_array(c1);
-  EXPECT_EQ(c1(0), e2[0]);
-  EXPECT_EQ(c1(1), e2[1]);
-  EXPECT_EQ(c1(2), e2[2]);
   
   //vector to_vector(matrix)
   c2 = to_vector(a1);
@@ -176,6 +175,24 @@ TEST(MathMatrix, conversions) {
   for(int i=0; i<3; i++)
     EXPECT_EQ(c2(i), d1(i));
 
+  //vector to_vector(vector)
+  c2 = to_vector(c1);
+  expect_matrix_eq(c1, c2);
+    
+  //vector to_vector(real[])
+  c2 = to_vector(e1);
+  
+  EXPECT_EQ(c2(0), e1[0]);
+  EXPECT_EQ(c2(1), e1[1]);
+  EXPECT_EQ(c2(2), e1[2]);
+  
+  //vector to_vector(int[])
+  c2 = to_vector(g1);
+  
+  EXPECT_EQ(c2(0), g1[0]);
+  EXPECT_EQ(c2(1), g1[1]);
+  EXPECT_EQ(c2(2), g1[2]);
+  
   //row_vector to_row_vector(matrix)
   d2 = to_row_vector(a1);
   EXPECT_EQ(d2(0), a1(0, 0));
@@ -189,9 +206,67 @@ TEST(MathMatrix, conversions) {
   d2 = to_row_vector(c1);
   for(int i=0; i<3; i++)
     EXPECT_EQ(d2(i), c1(i));
-    
+
+  //row_vector to_row_vector(row_vector)
+  d2 = to_row_vector(d1);
+  expect_matrix_eq(d1, d2);
+
+  //row_vector to_row_vector(real[])
+  d2 = to_row_vector(e1);
+  
+  EXPECT_EQ(d2(0), e1[0]);
+  EXPECT_EQ(d2(1), e1[1]);
+  EXPECT_EQ(d2(2), e1[2]);
+  
+  //row_vector to_row_vector(int[])
+  d2 = to_row_vector(g1);
+
+  EXPECT_EQ(d2(0), g1[0]);
+  EXPECT_EQ(d2(1), g1[1]);
+  EXPECT_EQ(d2(2), g1[2]);
+
+  //real[,] to_array_2d(matrix)
+  b2 = to_array_2d(a1);
+
+  EXPECT_EQ(a1(0, 0), b2[0][0]);
+  EXPECT_EQ(a1(0, 1), b2[0][1]);
+  EXPECT_EQ(a1(1, 0), b2[1][0]);
+  EXPECT_EQ(a1(1, 1), b2[1][1]);
+  EXPECT_EQ(a1(2, 0), b2[2][0]);
+  EXPECT_EQ(a1(2, 1), b2[2][1]);
+
+  //real[] to_array_1d(matrix)
+  e2 = to_array_1d(a1);
+  
+  EXPECT_EQ(a1(0, 0), e2[0]);
+  EXPECT_EQ(a1(1, 0), e2[1]);
+  EXPECT_EQ(a1(2, 0), e2[2]);
+  EXPECT_EQ(a1(0, 1), e2[3]);
+  EXPECT_EQ(a1(1, 1), e2[4]);
+  EXPECT_EQ(a1(2, 1), e2[5]);
+
+  //real[] to_array_1d(row_vector)
+  e2 = to_array_1d(d1);
+  EXPECT_EQ(d1(0), e2[0]);
+  EXPECT_EQ(d1(1), e2[1]);
+  EXPECT_EQ(d1(2), e2[2]);
+
+  //real[] to_array_1d(vector)
+  e2 = to_array_1d(c1);
+  EXPECT_EQ(c1(0), e2[0]);
+  EXPECT_EQ(c1(1), e2[1]);
+  EXPECT_EQ(c1(2), e2[2]);
+  
+  //Now we play with some lossless operations
+  expect_matrix_eq(a1, to_matrix(to_array_2d(a1)));
+  expect_matrix_eq(c1, to_vector(to_array_1d(c1)));
+  expect_matrix_eq(c1, to_vector(to_matrix(c1)));
+  expect_matrix_eq(c1, to_vector(to_row_vector(c1)));
+  expect_matrix_eq(d1, to_row_vector(to_array_1d(d1)));
+  expect_matrix_eq(d1, to_row_vector(to_matrix(d1)));
+  expect_matrix_eq(d1, to_row_vector(to_vector(d1)));
 }
-TEST(MathMatrix,flatten) {
+TEST(MathMatrix, conversions_2) {
 
   vector< vector < vector <double> > > a1(3, vector < vector<double> >(2, vector <double>(4)));
   a1[0][0][0] = 11.341;
@@ -257,20 +332,20 @@ TEST(MathMatrix,flatten) {
   
   vector<int> f2;
   
-  EXPECT_NO_THROW(flatten(a2));
-  EXPECT_NO_THROW(flatten(b2));
-  EXPECT_NO_THROW(flatten(c2));
-  EXPECT_NO_THROW(flatten(d2));
-  EXPECT_NO_THROW(flatten(e2));
-  EXPECT_NO_THROW(flatten(f2));
+  EXPECT_NO_THROW(to_array_1d(a2));
+  EXPECT_NO_THROW(to_array_1d(b2));
+  EXPECT_NO_THROW(to_array_1d(c2));
+  EXPECT_NO_THROW(to_array_1d(d2));
+  EXPECT_NO_THROW(to_array_1d(e2));
+  EXPECT_NO_THROW(to_array_1d(f2));
   
-  c2 = flatten(a1);
+  c2 = to_array_1d(a1);
   for (size_t i = 0, ijk = 0; i < 3; i++)
     for (size_t j = 0; j < 2; j++)
       for (size_t k = 0; k < 4; k++, ijk++)
         EXPECT_EQ(a1[i][j][k], c2[ijk]);
   
-  c2 = flatten(b1);
+  c2 = to_array_1d(b1);
   EXPECT_EQ(b1[0][0], c2[0]);
   EXPECT_EQ(b1[0][1], c2[1]);
   EXPECT_EQ(b1[1][0], c2[2]);
@@ -278,7 +353,7 @@ TEST(MathMatrix,flatten) {
   EXPECT_EQ(b1[2][0], c2[4]);
   EXPECT_EQ(b1[2][1], c2[5]);
 
-  c2 = flatten(c1);
+  c2 = to_array_1d(c1);
   EXPECT_EQ(c1[0], c2[0]);
   EXPECT_EQ(c1[1], c2[1]);
   EXPECT_EQ(c1[2], c2[2]);
