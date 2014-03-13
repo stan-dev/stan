@@ -620,9 +620,8 @@ namespace stan {
         error_msgs_(error_msgs),
         // expression_g allows full recursion
         expression_g(var_map,error_msgs),
-        // expression07_g starts at expression07_r and uses
-        // expression_g for reccursion
-        expression07_g(var_map,error_msgs,false,&expression_g)
+        // expression07_g disallows comparisons
+        expression07_g(var_map,error_msgs,expression_g)
     {
 
       using boost::spirit::qi::_1;

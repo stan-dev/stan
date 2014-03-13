@@ -409,3 +409,8 @@ TEST(gmParserStatementGrammarDef, jacobianAdjustmentWarning) {
   test_warning("validate_jacobian_warning6",
                "you must call increment_log_prob() with the log absolute determinant");
 }
+TEST(gmParserStatementGrammarDef, comparisonsInBoundsTest) {
+  test_parsable("validate_bounds_comparison");
+  EXPECT_THROW(is_parsable("src/test/test-models/reference/gm/bad_bounds1.stan"),
+               std::invalid_argument);
+}
