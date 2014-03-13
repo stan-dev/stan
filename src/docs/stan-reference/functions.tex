@@ -1852,15 +1852,6 @@ x <- rep_vector(1.0, 3);
 %
 There are no integer vector or matrix types, so integer values are
 automatically promoted.
-%
-\begin{description}
-%
-\fitem{vector}{to\_vector}{matrix \farg{m}}{
-Return the matrix \farg{m} as a vector in column-major order.}
-%
-\fitem{vector}{to\_vector}{row\_vector \farg{m}}{
-Return the row vector \farg{m} as a vector in column-major order.}
-\end{description}
 
 \section{Slice and Package Functions}
 
@@ -2260,5 +2251,66 @@ Number of components of \farg{v} less than \farg{v[s]}}
 %
 \fitem{int}{rank}{row\_vector \farg{v}, int \farg{s}}{
 Number of components of \farg{v} less than \farg{v[s]}}
+%
+\end{description}
+
+
+\chapter{Mixed Operations}
+
+\begin{description}
+%
+\fitem{matrix}{to\_matrix}{vector \farg{v}}{
+Convert a column vector to a Nx1 matrix.}
+%
+\fitem{matrix}{to\_matrix}{row\_vector \farg{v}}{
+Convert a row vector to a 1xN matrix.}
+%
+\fitem{matrix}{to\_matrix}{real[,] \farg{a}}{
+Convert a two dimensional array to a matrix.}
+%
+\fitem{matrix}{to\_matrix}{int[,] \farg{a}}{
+Convert a two dimensional array to a matrix.}
+%
+
+\fitem{vector}{to\_vector}{matrix \farg{m}}{
+Return the matrix \farg{m} as a column vector in column-major order.}
+%
+\fitem{vector}{to\_vector}{row\_vector \farg{m}}{
+Return the row vector \farg{m} as a column vector in column-major order.}
+%
+\fitem{vector}{to\_vector}{real[] \farg{a}}{
+Convert an one-dimensional array to a column vector.}
+%
+\fitem{vector}{to\_vector}{int[] \farg{a}}{
+Convert an one-dimensional array to a column vector.}
+%
+
+\fitem{row\_vector}{to\_row\_vector}{matrix \farg{m}}{
+Return the matrix \farg{m} as a row vector in column-major order.}
+%
+\fitem{row\_vector}{to\_row\_vector}{row\_vector \farg{m}}{
+Return the column vector \farg{m} as a row vector in column-major order.}
+%
+\fitem{row\_vector}{to\_row\_vector}{real[] \farg{a}}{
+Convert an one-dimensional array to a row vector.}
+%
+\fitem{row\_vector}{to\_row\_vector}{int[] \farg{a}}{
+Convert an one-dimensional array to a row vector.}
+%
+
+\fitem{real[,]}{to\_real}{matrix \farg{m}}{
+Convert a matrix to a two dimensional array.}
+%
+\fitem{real[]}{to\_real}{vector \farg{v}}{
+Convert a column vector to an one-dimensional array.}
+%
+\fitem{real[]}{to\_real}{row\_vector \farg{v}}{
+Convert a row vector to an one-dimensional array.}
+%
+\fitem{real[]}{flatten}{real[...] \farg{a}}{
+Convert an array of any size to an one-dimensional array in row-major order.}
+%
+\fitem{int[]}{flatten}{int[...] \farg{a}}{
+Convert an array of any size to an one-dimensional array in row-major order.}
 %
 \end{description}
