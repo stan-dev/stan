@@ -599,7 +599,7 @@ namespace stan {
       if (!check_positive(function, beta, "Inverse scale parameter"))
         return 0;
 
-      return stan::prob::poisson_rng(stan::prob::gamma_rng(alpha,1.0 / beta,
+      return stan::prob::poisson_rng(stan::prob::gamma_rng(alpha, beta,
                                                            rng),rng);
     }
   }
