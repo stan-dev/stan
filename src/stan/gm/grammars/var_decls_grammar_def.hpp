@@ -618,8 +618,11 @@ namespace stan {
       : var_decls_grammar::base_type(var_decls_r),
         var_map_(var_map),
         error_msgs_(error_msgs),
+        // expression_g allows full recursion
         expression_g(var_map,error_msgs),
-        expression07_g(var_map,error_msgs,false)
+        // expression07_g starts at expression07_r and uses
+        // expression_g for reccursion
+        expression07_g(var_map,error_msgs,false,&expression_g)
     {
 
       using boost::spirit::qi::_1;
@@ -637,7 +640,8 @@ namespace stan {
 
       var_decls_r.name("variable declarations");
       var_decls_r 
-        %= *var_decl_r(_r1,_r2);
+        %= *(var_decl_r(_r1,_r2)) 
+        ;
 
       // _a = error state local, 
       // _r1 constraints allowed inherited,
@@ -681,7 +685,7 @@ namespace stan {
             [add_var_f(_val,_1,boost::phoenix::ref(var_map_),_a,_r2,
                        boost::phoenix::ref(error_msgs_))]
             )
-        > eps
+        > lit(';')
         [_pass 
          = validate_decl_constraints_f(_r1,_a,_val,
                                        boost::phoenix::ref(error_msgs_))]
@@ -692,10 +696,9 @@ namespace stan {
         %= ( lit("int")
              >> no_skip[!char_("a-zA-Z0-9_")] )
         > -range_brackets_int_r(_r1)
-        // >> (lit(' ') | lit('\n') | lit('\t') | lit('\r'))
         > identifier_r 
         > opt_dims_r(_r1)
-        > lit(';');
+        ;
 
       double_decl_r.name("real declaration");
       double_decl_r 
@@ -704,7 +707,7 @@ namespace stan {
         > -range_brackets_double_r(_r1)
         > identifier_r
         > opt_dims_r(_r1)
-        > lit(';');
+        ;
 
       vector_decl_r.name("vector declaration");
       vector_decl_r 
@@ -716,7 +719,7 @@ namespace stan {
         > lit(']')
         > identifier_r 
         > opt_dims_r(_r1)
-        > lit(';');
+        ;
 
       row_vector_decl_r.name("row vector declaration");
       row_vector_decl_r 
@@ -728,7 +731,7 @@ namespace stan {
         > lit(']')
         > identifier_r 
         > opt_dims_r(_r1)
-        > lit(';');
+        ;
 
       matrix_decl_r.name("matrix declaration");
       matrix_decl_r 
@@ -743,7 +746,7 @@ namespace stan {
         > lit(']')
         > identifier_r 
         > opt_dims_r(_r1)
-        > lit(';');
+        ;
 
       unit_vector_decl_r.name("unit_vector declaration");
       unit_vector_decl_r 
@@ -754,7 +757,7 @@ namespace stan {
         > lit(']')
         > identifier_r 
         > opt_dims_r(_r1)
-        > lit(';'); 
+        ;
 
       simplex_decl_r.name("simplex declaration");
       simplex_decl_r 
@@ -765,7 +768,7 @@ namespace stan {
         > lit(']')
         > identifier_r 
         > opt_dims_r(_r1)
-        > lit(';'); 
+        ;
 
       ordered_decl_r.name("ordered declaration");
       ordered_decl_r 
@@ -776,7 +779,7 @@ namespace stan {
         > lit(']')
         > identifier_r 
         > opt_dims_r(_r1)
-        > lit(';');
+        ;
 
       positive_ordered_decl_r.name("positive_ordered declaration");
       positive_ordered_decl_r 
@@ -787,7 +790,7 @@ namespace stan {
         > lit(']')
         > identifier_r 
         > opt_dims_r(_r1)
-        > lit(';');
+        ;
 
       cholesky_factor_decl_r.name("cholesky factor declaration");
       cholesky_factor_decl_r 
@@ -802,9 +805,9 @@ namespace stan {
         > lit(']') 
         > identifier_r 
         > opt_dims_r(_r1)
-        > lit(';')
         > eps
-        [copy_square_cholesky_dimension_if_necessary_f(_val)];
+        [copy_square_cholesky_dimension_if_necessary_f(_val)]
+        ;
 
       cov_matrix_decl_r.name("covariance matrix declaration");
       cov_matrix_decl_r 
@@ -815,7 +818,7 @@ namespace stan {
         > lit(']')
         > identifier_r 
         > opt_dims_r(_r1)
-        > lit(';');
+        ;
 
       corr_matrix_decl_r.name("correlation matrix declaration");
       corr_matrix_decl_r 
@@ -826,7 +829,7 @@ namespace stan {
         > lit(']')
         > identifier_r 
         > opt_dims_r(_r1)
-        > lit(';');
+        ;
 
       opt_dims_r.name("array dimensions (optional)");
       opt_dims_r 

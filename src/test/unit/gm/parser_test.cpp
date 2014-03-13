@@ -226,41 +226,41 @@ TEST(gmParser,declareVarWithSameNameAsModel) {
   EXPECT_THROW(is_parsable("src/test/test-models/reference/gm/bad_model_name_var.stan"),
                std::invalid_argument);
 }
-// TEST(gm_parser,function_signatures) {
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/good_inf.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures1.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures6.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures7.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_bernoulli.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_beta.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_beta_binomial.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_binomial.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_categorical.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_cauchy.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_chi_square.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_dirichlet.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_double_exponential.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_exponential.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_gamma.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_hypergeometric.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_inv_chi_square.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_inv_gamma.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_logistic.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_lognormal.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_multinomial.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_neg_binomial.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_normal.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_ordered_logistic.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_pareto.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_poisson.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_scaled_inv_chi_square.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_student_t_0.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_student_t_1.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_student_t_2.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_student_t_3.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_uniform.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_weibull.stan"));
-// }
+TEST(gm_parser,function_signatures) {
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/good_inf.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures1.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures6.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures7.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_bernoulli.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_beta.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_beta_binomial.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_binomial.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_categorical.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_cauchy.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_chi_square.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_dirichlet.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_double_exponential.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_exponential.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_gamma.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_hypergeometric.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_inv_chi_square.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_inv_gamma.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_logistic.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_lognormal.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_multinomial.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_neg_binomial.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_normal.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_ordered_logistic.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_pareto.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_poisson.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_scaled_inv_chi_square.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_student_t_0.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_student_t_1.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_student_t_2.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_student_t_3.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_uniform.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_weibull.stan"));
+}
 
 
 void test_parsable(const std::string& model_name) {

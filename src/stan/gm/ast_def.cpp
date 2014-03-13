@@ -319,6 +319,19 @@ namespace stan {
     function_signatures* function_signatures::sigs_ = 0;
 
 
+    function_decl_def::function_decl_def() { }
+    function_decl_def::function_decl_def(const std::string& name) 
+      : name_(name) { 
+    }
+
+    function_decl_defs::function_decl_defs() { }
+    function_decl_defs::function_decl_defs(const std::vector<function_decl_def>& decl_defs)
+      : decl_defs_(decl_defs) { 
+    }
+
+    
+    
+
 
     statements::statements() {  }
     statements::statements(const std::vector<var_decl>& local_decl,
@@ -1020,7 +1033,8 @@ namespace stan {
     }
     
     program::program() { }
-    program::program(const std::vector<var_decl>& data_decl,
+    program::program(const std::vector<function_decl_def>& function_decl_defs,
+                     const std::vector<var_decl>& data_decl,
                      const std::pair<std::vector<var_decl>,
                      std::vector<statement> >& derived_data_decl,
                      const std::vector<var_decl>& parameter_decl,
@@ -1029,7 +1043,8 @@ namespace stan {
                      const statement& st,
                      const std::pair<std::vector<var_decl>,
                      std::vector<statement> >& generated_decl)
-      : data_decl_(data_decl),
+      : function_decl_defs_(function_decl_defs),
+        data_decl_(data_decl),
         derived_data_decl_(derived_data_decl),
         parameter_decl_(parameter_decl),
         derived_decl_(derived_decl),

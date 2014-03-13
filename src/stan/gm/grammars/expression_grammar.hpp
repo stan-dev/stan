@@ -26,10 +26,16 @@ namespace stan {
       : public boost::spirit::qi::grammar<Iterator,
                                           expression(var_origin),
                                           whitespace_grammar<Iterator> > {
-
+      
+      // FIXME: ugly hack --- should really break out expression_07_r
+      //        into its own grammar
+      // if allow_lte, start from expression_r, otherwise start from
+      // expression07_r;  if liberal_eg passed in, use it for
+      // recursion inside term grammar
       expression_grammar(variable_map& var_map,
                          std::stringstream& error_msgs,
-                         bool allow_lte = true);
+                         bool allow_lte = true,
+                         expression_grammar* liberal_eg = 0);
 
       variable_map& var_map_;
 

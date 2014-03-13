@@ -39,6 +39,7 @@
 #include <stan/gm/grammars/var_decls_grammar.hpp>
 #include <stan/gm/grammars/statement_grammar.hpp>
 #include <stan/gm/grammars/program_grammar.hpp>
+#include <stan/gm/grammars/functions_grammar.hpp>
 
 namespace {
   // hack to pass pair into macro below to adapt; in namespace to hide
@@ -50,6 +51,7 @@ namespace {
 
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::program,
+                          (std::vector<stan::gm::function_decl_def>, function_decl_defs_)
                           (std::vector<stan::gm::var_decl>, data_decl_)
                           (DUMMY_STRUCT::type, derived_data_decl_)
                           (std::vector<stan::gm::var_decl>, parameter_decl_)
@@ -211,7 +213,8 @@ namespace stan {
           error_msgs_(),
           expression_g(var_map_,error_msgs_),
           var_decls_g(var_map_,error_msgs_),
-          statement_g(var_map_,error_msgs_) {
+          statement_g(var_map_,error_msgs_),
+          functions_g(var_map_,error_msgs_) {
 
         using boost::spirit::qi::eps;
         using boost::spirit::qi::lit;
@@ -223,7 +226,8 @@ namespace stan {
 
         program_r.name("program");
         program_r 
-          %= -data_var_decls_r
+          %= -functions_g
+          > -data_var_decls_r
           > -derived_data_var_decls_r
           > -param_var_decls_r
           // scope lp__ to "transformed params" and "model" only
