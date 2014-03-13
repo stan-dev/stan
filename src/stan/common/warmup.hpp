@@ -8,7 +8,7 @@
 namespace stan {
   namespace common {
 
-    template <class Model, class RNG>
+    template <class Model, class RNG, class StartTransitionCallback>
     void warmup(stan::mcmc::base_mcmc* sampler,
                 int num_warmup,
                 int num_samples,
@@ -21,12 +21,15 @@ namespace stan {
                 RNG& base_rng,
                 const std::string& prefix,
                 const std::string& suffix,
-                std::ostream& o) {
-      run_markov_chain<Model, RNG>(sampler, num_warmup, 0, num_warmup + num_samples, num_thin,
-                                   refresh, save, true,
-                                   writer,
-                                   init_s, model, base_rng,
-                                   prefix, suffix, o);
+                std::ostream& o,
+                StartTransitionCallback& callback) {
+      run_markov_chain<Model, RNG, StartTransitionCallback>
+        (sampler, num_warmup, 0, num_warmup + num_samples, num_thin,
+         refresh, save, true,
+         writer,
+         init_s, model, base_rng,
+         prefix, suffix, o,
+         callback);
     }
   }
 }

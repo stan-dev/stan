@@ -54,6 +54,10 @@ namespace stan {
 
   namespace common {
 
+    struct NoOpFunctor {
+      void operator()() { }
+    };
+
     template <class Model>
     int command(int argc, const char* argv[]) {
 
@@ -761,7 +765,8 @@ namespace stan {
         
         std::string prefix = "";
         std::string suffix = "\n";
-        
+        NoOpFunctor startTransitionCallback;
+
         // Warm-Up
         clock_t start = clock();
         
@@ -769,7 +774,8 @@ namespace stan {
                              refresh, save_warmup,
                              writer,
                              s, model, base_rng,
-                             prefix, suffix, std::cout);
+                             prefix, suffix, std::cout,
+                             startTransitionCallback);
         
         clock_t end = clock();
         warmDeltaT = (double)(end - start) / CLOCKS_PER_SEC;
@@ -786,7 +792,8 @@ namespace stan {
                              refresh, true,
                              writer,
                              s, model, base_rng,
-                             prefix, suffix, std::cout);
+                             prefix, suffix, std::cout,
+                             startTransitionCallback);
         
         end = clock();
         sampleDeltaT = (double)(end - start) / CLOCKS_PER_SEC;

@@ -18,6 +18,14 @@ public:
   int n_transition_called;
 };
 
+struct mock_callback {
+  int n;
+  mock_callback() : n(0) { }
+  
+  void operator()() {
+    n++;
+  }
+};
 
 class StanCommon : public testing::Test {
 public:
@@ -55,14 +63,14 @@ public:
 };
 
 
-TEST_F(StanCommon, sample) {
+TEST_F(StanCommon, warmup) {
   std::stringstream out;
   std::stringstream redirect_cout;
   std::streambuf* old_cout_rdbuf = std::cout.rdbuf(redirect_cout.rdbuf());
 
-  std::string expected_std_cout =  "Iteration:  1 / 100 [  1%]  (Warmup)\nIteration:  4 / 100 [  4%]  (Warmup)\nIteration:  8 / 100 [  8%]  (Warmup)\nIteration: 12 / 100 [ 12%]  (Warmup)\nIteration: 16 / 100 [ 16%]  (Warmup)\nIteration: 20 / 100 [ 20%]  (Warmup)\nIteration: 24 / 100 [ 24%]  (Warmup)\nIteration: 28 / 100 [ 28%]  (Warmup)\nIteration: 32 / 100 [ 32%]  (Warmup)\nIteration: 36 / 100 [ 36%]  (Warmup)\nIteration: 40 / 100 [ 40%]  (Warmup)\nIteration: 44 / 100 [ 44%]  (Warmup)\nIteration: 48 / 100 [ 48%]  (Warmup)\n";
+  std::string expected_std_cout =  "Iteration:  1 / 80 [  1%]  (Warmup)\nIteration:  4 / 80 [  5%]  (Warmup)\nIteration:  8 / 80 [ 10%]  (Warmup)\nIteration: 12 / 80 [ 15%]  (Warmup)\nIteration: 16 / 80 [ 20%]  (Warmup)\nIteration: 20 / 80 [ 25%]  (Warmup)\nIteration: 24 / 80 [ 30%]  (Warmup)\nIteration: 28 / 80 [ 35%]  (Warmup)\n";
   
-  int num_warmup = 50;
+  int num_warmup = 30;
   int num_samples = 50;
   int num_thin = 2;
   int refresh = 4;
@@ -71,14 +79,17 @@ TEST_F(StanCommon, sample) {
   std::string prefix = "";
   std::string suffix = "\n";
   std::stringstream ss;
+  mock_callback callback;
 
   stan::common::warmup(sampler,
                        num_warmup, num_samples,
                        num_thin, refresh, save,
                        *writer, s, *model, base_rng,
-                       prefix, suffix, ss);
+                       prefix, suffix, ss,
+                       callback);
   
-  EXPECT_EQ(num_samples, sampler->n_transition_called);
+  EXPECT_EQ(num_warmup, sampler->n_transition_called);
+  EXPECT_EQ(num_warmup, callback.n);
 
   std::cout.rdbuf(old_cout_rdbuf);
   EXPECT_EQ(expected_std_cout, ss.str());

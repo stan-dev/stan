@@ -18,6 +18,14 @@ public:
   int n_transition_called;
 };
 
+struct mock_callback {
+  int n;
+  mock_callback() : n(0) { }
+  
+  void operator()() {
+    n++;
+  }
+};
 
 class StanCommon : public testing::Test {
 public:
@@ -60,9 +68,9 @@ TEST_F(StanCommon, sample) {
   std::stringstream redirect_cout;
   std::streambuf* old_cout_rdbuf = std::cout.rdbuf(redirect_cout.rdbuf());
 
-  std::string expected_std_cout = "Iteration: 51 / 100 [ 51%]  (Sampling)\nIteration: 54 / 100 [ 54%]  (Sampling)\nIteration: 58 / 100 [ 58%]  (Sampling)\nIteration: 62 / 100 [ 62%]  (Sampling)\nIteration: 66 / 100 [ 66%]  (Sampling)\nIteration: 70 / 100 [ 70%]  (Sampling)\nIteration: 74 / 100 [ 74%]  (Sampling)\nIteration: 78 / 100 [ 78%]  (Sampling)\nIteration: 82 / 100 [ 82%]  (Sampling)\nIteration: 86 / 100 [ 86%]  (Sampling)\nIteration: 90 / 100 [ 90%]  (Sampling)\nIteration: 94 / 100 [ 94%]  (Sampling)\nIteration: 98 / 100 [ 98%]  (Sampling)\nIteration: 100 / 100 [100%]  (Sampling)\n";
+  std::string expected_std_cout = "Iteration: 31 / 80 [ 38%]  (Sampling)\nIteration: 34 / 80 [ 42%]  (Sampling)\nIteration: 38 / 80 [ 47%]  (Sampling)\nIteration: 42 / 80 [ 52%]  (Sampling)\nIteration: 46 / 80 [ 57%]  (Sampling)\nIteration: 50 / 80 [ 62%]  (Sampling)\nIteration: 54 / 80 [ 67%]  (Sampling)\nIteration: 58 / 80 [ 72%]  (Sampling)\nIteration: 62 / 80 [ 77%]  (Sampling)\nIteration: 66 / 80 [ 82%]  (Sampling)\nIteration: 70 / 80 [ 87%]  (Sampling)\nIteration: 74 / 80 [ 92%]  (Sampling)\nIteration: 78 / 80 [ 97%]  (Sampling)\nIteration: 80 / 80 [100%]  (Sampling)\n";
   
-  int num_warmup = 50;
+  int num_warmup = 30;
   int num_samples = 50;
   int num_thin = 2;
   int refresh = 4;
@@ -71,14 +79,17 @@ TEST_F(StanCommon, sample) {
   std::string prefix = "";
   std::string suffix = "\n";
   std::stringstream ss;
+  mock_callback callback;
 
   stan::common::sample(sampler,
                        num_warmup, num_samples,
                        num_thin, refresh, save,
                        *writer, s, *model, base_rng,
-                       prefix, suffix, ss);
+                       prefix, suffix, ss,
+                       callback);
   
   EXPECT_EQ(num_samples, sampler->n_transition_called);
+  EXPECT_EQ(num_samples, callback.n);
 
   std::cout.rdbuf(old_cout_rdbuf);
   EXPECT_EQ(expected_std_cout, ss.str());

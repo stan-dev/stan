@@ -18,6 +18,14 @@ public:
   int n_transition_called;
 };
 
+struct mock_callback {
+  int n;
+  mock_callback() : n(0) { }
+  
+  void operator()() {
+    n++;
+  }
+};
 
 class StanCommon : public testing::Test {
 public:
@@ -73,14 +81,17 @@ TEST_F(StanCommon, run_markov_chain) {
   std::string prefix = "";
   std::string suffix = "\n";
   std::stringstream ss;
-  
+  mock_callback callback;
+
   stan::common::run_markov_chain(sampler,
                                  num_iterations, start, finish,
                                  num_thin, refresh, save, warmup,
                                  *writer, s, *model, base_rng,
-                                 prefix, suffix, ss);
+                                 prefix, suffix, ss,
+                                 callback);
   
   EXPECT_EQ(num_iterations, sampler->n_transition_called);
+  EXPECT_EQ(num_iterations, callback.n);
 
   std::cout.rdbuf(old_cout_rdbuf);
   EXPECT_EQ(expected_std_cout, ss.str());

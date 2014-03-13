@@ -8,7 +8,7 @@
 namespace stan {
   namespace common {
 
-    template <class Model, class RNG>
+    template <class Model, class RNG, class StartTransitionCallback>
     void run_markov_chain(stan::mcmc::base_mcmc* sampler,
                           const int num_iterations,
                           const int start,
@@ -23,10 +23,11 @@ namespace stan {
                           RNG& base_rng,
                           const std::string& prefix,
                           const std::string& suffix,
-                          std::ostream& o) {
-
+                          std::ostream& o,
+                          StartTransitionCallback& callback) {
       for (int m = 0; m < num_iterations; ++m) {
-      
+        callback();
+        
         print_progress(m, start, finish, refresh, warmup, prefix, suffix, o);
       
         init_s = sampler->transition(init_s);
