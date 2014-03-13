@@ -759,13 +759,17 @@ namespace stan {
         writer.print_sample_names(s, sampler_ptr, model);
         writer.print_diagnostic_names(s, sampler_ptr, model);
         
+        std::string prefix = "";
+        std::string suffix = "\n";
+        
         // Warm-Up
         clock_t start = clock();
         
         warmup<Model, rng_t>(sampler_ptr, num_warmup, num_samples, num_thin,
                              refresh, save_warmup,
                              writer,
-                             s, model, base_rng);
+                             s, model, base_rng,
+                             prefix, suffix, std::cout);
         
         clock_t end = clock();
         warmDeltaT = (double)(end - start) / CLOCKS_PER_SEC;
@@ -779,9 +783,10 @@ namespace stan {
         start = clock();
         
         sample<Model, rng_t>(sampler_ptr, num_warmup, num_samples, num_thin,
-                                       refresh, true,
-                                       writer,
-                                       s, model, base_rng);
+                             refresh, true,
+                             writer,
+                             s, model, base_rng,
+                             prefix, suffix, std::cout);
         
         end = clock();
         sampleDeltaT = (double)(end - start) / CLOCKS_PER_SEC;

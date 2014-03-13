@@ -18,12 +18,16 @@ namespace stan {
                 stan::io::mcmc_writer<Model>& writer,
                 stan::mcmc::sample& init_s,
                 Model& model,
-                RNG& base_rng) {
-          run_markov_chain<Model, RNG>(sampler, num_samples, num_warmup, 
+                RNG& base_rng,
+                const std::string& prefix,
+                const std::string& suffix,
+                std::ostream& o) {
+      run_markov_chain<Model, RNG>(sampler, num_samples, num_warmup, 
                                    num_warmup + num_samples, num_thin,
                                    refresh, save, false,
                                    writer,
-                                   init_s, model, base_rng);
+                                   init_s, model, base_rng,
+                                   prefix, suffix, o);
     }
 
   }

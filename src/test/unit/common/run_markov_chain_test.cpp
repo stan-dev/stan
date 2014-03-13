@@ -33,7 +33,12 @@ public:
     writer = new stan::io::mcmc_writer<stan_model>(&std::cout, &std::cout, &std::cout);
 
     base_rng.seed(123456);
+    
+    q = Eigen::VectorXd(0,1);
+    log_prob = 0;
+    stat = 0;
   }
+
   void TearDown() {
     delete sampler;
     delete model;
@@ -44,6 +49,9 @@ public:
   stan_model* model;
   stan::io::mcmc_writer<stan_model>* writer;
   rng_t base_rng;
+  Eigen::VectorXd q;
+  double log_prob;
+  double stat;
 };
 
 
@@ -61,13 +69,11 @@ TEST_F(StanCommon, run_markov_chain) {
   int refresh = 4;
   bool save = false;
   bool warmup = false;
-  Eigen::VectorXd q(0, 1);
-  double log_prob = 0;
-  double stat = 0;
   stan::mcmc::sample s(q, log_prob, stat);
   std::string prefix = "";
   std::string suffix = "\n";
   std::stringstream ss;
+  
   stan::common::run_markov_chain(sampler,
                                  num_iterations, start, finish,
                                  num_thin, refresh, save, warmup,
