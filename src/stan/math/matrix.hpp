@@ -69,6 +69,7 @@
 #include <stan/math/matrix/rows.hpp>
 #include <stan/math/matrix/rows_dot_product.hpp>
 #include <stan/math/matrix/rows_dot_self.hpp>
+#include <stan/math/matrix/scale.hpp>
 #include <stan/math/matrix/sd.hpp>
 #include <stan/math/matrix/segment.hpp>
 #include <stan/math/matrix/singular_values.hpp>
