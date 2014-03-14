@@ -44,3 +44,6 @@ stan.kdev4
 
 # For the Mac
 *.DS_Store
+
+# local make include
+make/local
