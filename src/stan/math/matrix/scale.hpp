@@ -18,19 +18,22 @@ namespace stan {
     <typename promote_args<T1,T2>::type, Dynamic, Dynamic>
     scale(const Matrix<T1, Dynamic, Dynamic>& mat,
           const Matrix<T2, R, C>& vec) {
+      if (vec.cols() != 1 && vec.rows() != 1)
+        throw std::domain_error("error in call to scale: vec must be a vector");
       stan::math::validate_square(mat, "scale");
       int size = vec.size();
       stan::math::validate_equal(mat.rows(), size, "matrix size",
                                  "vector size", "scale");
       Matrix<typename promote_args<T1,T2>::type, Dynamic, Dynamic>
         result(size, size);
-      typename promote_args<T1,T2>::type * datap_result =
-        result.data();
-      const T1 * datap_mat =
-        mat.data();
-      for (int i = 0, ij = 0; i < size; ++i)
-        for (int j = 0; j < size; ++j, ij++)
-          datap_result[ij] = datap_mat[ij]*vec(i)*vec(j);
+      for (int i = 0; i < size; i++) {
+        result(i,i) = vec(i)*vec(i)*mat(i,i);
+        for (int j = i+1; j < size; ++j) {
+          typename promote_args<T1,T2>::type temp = vec(i)*vec(j);
+          result(j,i) = temp*mat(j,i);
+          result(i,j) = temp*mat(i,j);
+        }
+      }
       return result;
     }
 
