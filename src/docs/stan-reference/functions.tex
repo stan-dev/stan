@@ -1650,6 +1650,16 @@ The quadratic form, i.e., \code{B'~*~A~*~B}.}
 \fitem{real}{quad\_form}{matrix \farg{A}, vector \farg{B}}{
 The quadratic form, i.e., \code{B'~*~A~*~B}.}
 %
+\fitem{matrix}{quad\_form\_diag}{matrix \farg{m}, vector \farg{v}}
+  {The quadratic form using the column vector
+  \farg{v} as a diagonal matrix, i.e.,
+  \code{diag\_matrix(\farg{v})~*~\farg{m}~*~diag\_matrix(\farg{v})}.}
+%
+\fitem{matrix}{quad\_form\_diag}{matrix \farg{m}, row\_vector \farg{rv}}
+  {The quadratic form using the row vector
+  \farg{rv} as a diagonal matrix, i.e.,
+  \code{diag\_matrix(\farg{rv})~*~\farg{m}~*~diag\_matrix(\farg{rv})}.}
+%
 \fitem{real}{trace\_quad\_form}{matrix \farg{A}, matrix \farg{B}}{ 
 The trace of the quadratic form, i.e., \code{trace(B'~*~A~*~B)}.}
 %
@@ -1673,16 +1683,6 @@ This is a specialization of tcrossprod(x) for lower-triangular matrices.}
 \end{description}
 
 \begin{description}
-  \fitem{matrix}{quad\_form\_diag}{matrix, vector \farg{v}
-    \farg{m}}{Scale the square matrix \farg{m}
-    using the column vector \farg{v}, i.e.,
-    \code{diag\_matrix(\farg{v})~*~\farg{m}~*~diag\_matrix(\farg{v})}.}
-%
-  \fitem{matrix}{quad\_form\_diag}{matrix, row\_vector \farg{rv}
-    \farg{m}}{Scale the square matrix \farg{m}
-    using the row vector \farg{rv}, i.e.,
-    \code{diag\_matrix(\farg{rv})~*~\farg{m}~*~diag\_matrix(\farg{rv})}.}
-%
   \fitem{matrix}{diag\_pre\_multiply}{vector \farg{v}, matrix
     \farg{m}}{Return the product of the diagonal matrix formed from
     the vector \farg{v} and the matrix \farg{m}, i.e.,
