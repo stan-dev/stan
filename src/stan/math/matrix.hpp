@@ -63,13 +63,13 @@
 #include <stan/math/matrix/promote_common.hpp>
 #include <stan/math/matrix/promoter.hpp>
 #include <stan/math/matrix/quad_form.hpp>
+#include <stan/math/matrix/quad_form_diag.hpp>
 #include <stan/math/matrix/rank.hpp>
 #include <stan/math/matrix/resize.hpp>
 #include <stan/math/matrix/row.hpp>
 #include <stan/math/matrix/rows.hpp>
 #include <stan/math/matrix/rows_dot_product.hpp>
 #include <stan/math/matrix/rows_dot_self.hpp>
-#include <stan/math/matrix/scale.hpp>
 #include <stan/math/matrix/sd.hpp>
 #include <stan/math/matrix/segment.hpp>
 #include <stan/math/matrix/singular_values.hpp>

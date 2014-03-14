@@ -587,6 +587,8 @@ add("prod",DOUBLE_T,ROW_VECTOR_T);
 add("prod",DOUBLE_T,MATRIX_T);
 add("quad_form",DOUBLE_T,MATRIX_T,VECTOR_T);
 add("quad_form",MATRIX_T,MATRIX_T,MATRIX_T);
+add("quad_form_diag",MATRIX_T,MATRIX_T,VECTOR_T);
+add("quad_form_diag",MATRIX_T,MATRIX_T,ROW_VECTOR_T);
 add("rank",INT_T,expr_type(INT_T,1),INT_T);
 add("rank",INT_T,expr_type(DOUBLE_T,1),INT_T);
 add("rank",INT_T,VECTOR_T,INT_T);
@@ -634,8 +636,6 @@ add("rows_dot_product",VECTOR_T,MATRIX_T,MATRIX_T);
 add("rows_dot_self",VECTOR_T,VECTOR_T);
 add("rows_dot_self",VECTOR_T,ROW_VECTOR_T);
 add("rows_dot_self",VECTOR_T,MATRIX_T);
-add("scale",MATRIX_T,MATRIX_T,VECTOR_T);
-add("scale",MATRIX_T,MATRIX_T,ROW_VECTOR_T);
 for (size_t i = 0; i < vector_types.size(); ++i)
   for (size_t j = 0; j < vector_types.size(); ++j)
     for (size_t k = 0; k < vector_types.size(); ++k) {

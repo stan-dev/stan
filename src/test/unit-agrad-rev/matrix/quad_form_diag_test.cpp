@@ -2,16 +2,16 @@
 #include <stan/agrad.hpp>
 #include <stan/agrad/rev/matrix.hpp>
 #include <stan/agrad/rev/matrix/multiply.hpp>
-#include <stan/math/matrix/scale.hpp>
+#include <stan/math/matrix/quad_form_diag.hpp>
 #include <test/unit-agrad-rev/matrix/expect_matrix_eq.hpp>
 #include <gtest/gtest.h>
 
 using Eigen::Matrix;
 using Eigen::Dynamic;
 using stan::agrad::var;
-using stan::math::scale;
+using stan::math::quad_form_diag;
 
-TEST(MathMatrix,scale2_vv) {
+TEST(MathMatrix,quadFormDiag2_vv) {
   Matrix<var,Dynamic,Dynamic> m(3,3);
   m << 1, 2, 3, 4, 5, 6, 7, 8, 9;
 
@@ -26,15 +26,15 @@ TEST(MathMatrix,scale2_vv) {
   
   Matrix<var,Dynamic,Dynamic> v_m_times_m = v_m * m * v_m;
 
-  expect_matrix_eq(v_m_times_m, scale(m,v));
+  expect_matrix_eq(v_m_times_m, quad_form_diag(m,v));
 
   Matrix<var,1,Dynamic> rv(3);
   rv << 1, 2, 3;
 
-  expect_matrix_eq(v_m_times_m, scale(m,rv));
+  expect_matrix_eq(v_m_times_m, quad_form_diag(m,rv));
 }
 
-TEST(MathMatrix,scale2_vd) {
+TEST(MathMatrix,quadFormDiag2_vd) {
   Matrix<var,Dynamic,Dynamic> m1(3,3);
   m1 << 1, 2, 3, 4, 5, 6, 7, 8, 9;
 
@@ -52,10 +52,10 @@ TEST(MathMatrix,scale2_vd) {
   Matrix<var,Dynamic,Dynamic> m2(3,3);
   m2 << 1, 2, 3, 4, 5, 6, 7, 8, 9;
 
-  expect_matrix_eq(v_m_times_m1, scale(m2,v));
+  expect_matrix_eq(v_m_times_m1, quad_form_diag(m2,v));
 }
 
-TEST(MathMatrix,diagPreMultiply2_dv) {
+TEST(MathMatrix,quadFormDiag2_dv) {
   Matrix<double,Dynamic,Dynamic> m1(3,3);
   m1 << 1, 2, 3, 4, 5, 6, 7, 8, 9;
 
@@ -74,12 +74,12 @@ TEST(MathMatrix,diagPreMultiply2_dv) {
 
   Matrix<var,Dynamic,Dynamic> v_m_times_m2 = v_m * m2 * v_m;
 
-  expect_matrix_eq(v_m_times_m2, scale(m1,v));
+  expect_matrix_eq(v_m_times_m2, quad_form_diag(m1,v));
 
 }
 
 
-TEST(MathMatrix,scaleGrad_vv) {
+TEST(MathMatrix,quadFormDiagGrad_vv) {
   Matrix<var,Dynamic,Dynamic> m1(3,3);
   m1 << 1, 2, 3, 4, 5, 6, 7, 8, 9;
 
@@ -92,7 +92,7 @@ TEST(MathMatrix,scaleGrad_vv) {
   for (int i = 0; i < 3; ++i)
     xs1.push_back(v(i));
 
-  Matrix<var,Dynamic,Dynamic> v_post_multipy_m1 = scale(m1, v);
+  Matrix<var,Dynamic,Dynamic> v_post_multipy_m1 = quad_form_diag(m1, v);
 
   var norm1 = v_post_multipy_m1.norm();
 
@@ -127,7 +127,7 @@ TEST(MathMatrix,scaleGrad_vv) {
     EXPECT_FLOAT_EQ(g1[i], g2[i]);
 }
 
-TEST(MathMatrix,scaleGrad_vd) {
+TEST(MathMatrix,quadFormDiagGrad_vd) {
   Matrix<var,Dynamic,Dynamic> m1(3,3);
   m1 << 1, 2, 3, 4, 5, 6, 7, 8, 9;
 
@@ -138,7 +138,7 @@ TEST(MathMatrix,scaleGrad_vd) {
   for (int i = 0; i < 9; ++i)
     xs1.push_back(m1(i));
 
-  Matrix<var,Dynamic,Dynamic> m1_post_multipy_v = scale(m1, v);
+  Matrix<var,Dynamic,Dynamic> m1_post_multipy_v = quad_form_diag(m1, v);
 
   var norm1 = m1_post_multipy_v.norm();
 
@@ -170,7 +170,7 @@ TEST(MathMatrix,scaleGrad_vd) {
     EXPECT_FLOAT_EQ(g1[i], g2[i]);
 }
 
-TEST(MathMatrix,diagPreMultiplyGrad_dv) {
+TEST(MathMatrix,quadFormDiagGrad_dv) {
   Matrix<double,Dynamic,Dynamic> m1(3,3);
   m1 << 1, 2, 3, 4, 5, 6, 7, 8, 9;
 
@@ -181,7 +181,7 @@ TEST(MathMatrix,diagPreMultiplyGrad_dv) {
   for (int i = 0; i < 3; ++i)
     xs1.push_back(v(i));
 
-  Matrix<var,Dynamic,Dynamic> m1_post_multipy_v = scale(m1, v);
+  Matrix<var,Dynamic,Dynamic> m1_post_multipy_v = quad_form_diag(m1, v);
 
   var norm1 = m1_post_multipy_v.norm();
 
@@ -214,14 +214,14 @@ TEST(MathMatrix,diagPreMultiplyGrad_dv) {
 }
 
 
-TEST(MathMatrix,diagPreMultiplyException) {
+TEST(MathMatrix,quadFormDiagException) {
   Matrix<var,Dynamic,Dynamic> m(2,2);
   m << 
     2, 3,
     4, 5;
-  EXPECT_THROW(scale(m,m), std::domain_error);
+  EXPECT_THROW(quad_form_diag(m,m), std::domain_error);
 
   Matrix<var,Dynamic,1> v(3);
   v << 1, 2, 3;
-  EXPECT_THROW(scale(m,v), std::domain_error);
+  EXPECT_THROW(quad_form_diag(m,v), std::domain_error);
 }

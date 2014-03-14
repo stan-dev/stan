@@ -11,8 +11,8 @@ transformed data {
   mt <- diag_post_multiply(m,v);
   mt <- diag_post_multiply(m,rv);
   
-  mt <- scale(m,v);
-  mt <- scale(m,rv);
+  mt <- quad_form_diag(m,v);
+  mt <- quad_form_diag(m,rv);
 }
 parameters {  
   matrix[3,3] pm;
@@ -28,8 +28,8 @@ transformed parameters {
   pmt <- diag_post_multiply(pm,pv);
   pmt <- diag_post_multiply(pm,prv);
   
-  pmt <- scale(pm,pv);
-  pmt <- scale(pm,prv);
+  pmt <- quad_form_diag(pm,pv);
+  pmt <- quad_form_diag(pm,prv);
 }
 model {
   pv ~ normal(0,1);

@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__MATRIX__SCALE_HPP__
-#define __STAN__MATH__MATRIX__SCALE_HPP__
+#ifndef __STAN__MATH__MATRIX__QUAD_FORM_DIAG_HPP__
+#define __STAN__MATH__MATRIX__QUAD_FORM_DIAG_HPP__
 
 #include <stan/math/matrix/Eigen.hpp>
 #include <boost/math/tools/promotion.hpp>
@@ -16,14 +16,14 @@ namespace stan {
     template <typename T1, typename T2, int R, int C>
     inline Matrix
     <typename promote_args<T1,T2>::type, Dynamic, Dynamic>
-    scale(const Matrix<T1, Dynamic, Dynamic>& mat,
+    quad_form_diag(const Matrix<T1, Dynamic, Dynamic>& mat,
           const Matrix<T2, R, C>& vec) {
       if (vec.cols() != 1 && vec.rows() != 1)
-        throw std::domain_error("error in call to scale: vec must be a vector");
-      stan::math::validate_square(mat, "scale");
+        throw std::domain_error("error in call to quad_form_diag: vec must be a vector");
+      stan::math::validate_square(mat, "quad_form_diag");
       int size = vec.size();
       stan::math::validate_equal(mat.rows(), size, "matrix size",
-                                 "vector size", "scale");
+                                 "vector size", "quad_form_diag");
       Matrix<typename promote_args<T1,T2>::type, Dynamic, Dynamic>
         result(size, size);
       for (int i = 0; i < size; i++) {

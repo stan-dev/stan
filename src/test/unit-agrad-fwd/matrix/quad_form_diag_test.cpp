@@ -1,25 +1,25 @@
 #include <gtest/gtest.h>
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <stan/agrad/fwd/matrix/multiply.hpp>
-#include <stan/math/matrix/scale.hpp>
+#include <stan/math/matrix/quad_form_diag.hpp>
 #include <stan/agrad/rev.hpp>
 #include <test/unit/agrad/util.hpp>
 
 using stan::math::matrix_d;
 using stan::math::vector_d;
 using stan::math::row_vector_d;
-using stan::math::scale;
+using stan::math::quad_form_diag;
 
 using stan::agrad::matrix_fd;
 using stan::agrad::fvar;
 using stan::agrad::vector_fd;
 using stan::agrad::row_vector_fd;
 
-void test_fwd_scale_vv(matrix_d md, vector_d vd) {
+void test_fwd_quad_form_diag_vv(matrix_d md, vector_d vd) {
   int M = md.rows();
   int N = md.cols();
   int K = vd.size();
-  matrix_d md_vd = scale(md,vd);
+  matrix_d md_vd = quad_form_diag(md,vd);
 
   // left tangent & value
   for (int m1 = 0; m1 < M; ++m1) {
@@ -39,7 +39,7 @@ void test_fwd_scale_vv(matrix_d md, vector_d vd) {
         vf(k).val_ = vd(k);
 
       // value
-      matrix_fd mf_vf = scale(mf, vf);
+      matrix_fd mf_vf = quad_form_diag(mf, vf);
       EXPECT_EQ(M, mf_vf.rows());
       EXPECT_EQ(N, mf_vf.cols());
       for (int m = 0; m < M; ++m)
@@ -55,7 +55,7 @@ void test_fwd_scale_vv(matrix_d md, vector_d vd) {
         rvf(k).val_ = vd(k);
 
       // value
-      matrix_fd mf_rvf = scale(mf, rvf);
+      matrix_fd mf_rvf = quad_form_diag(mf, rvf);
       EXPECT_EQ(M, mf_rvf.rows());
       EXPECT_EQ(N, mf_rvf.cols());
       for (int m = 0; m < M; ++m)
@@ -82,7 +82,7 @@ void test_fwd_scale_vv(matrix_d md, vector_d vd) {
         if (k == k1) vf(k).d_ = 3.7;
       }
 
-      matrix_fd mf_vf = scale(mf, vf);
+      matrix_fd mf_vf = quad_form_diag(mf, vf);
 
       // right tangent
       for (int m = 0; m < M; ++m) {
@@ -104,7 +104,7 @@ void test_fwd_scale_vv(matrix_d md, vector_d vd) {
         if (k == k1) rvf(k).d_ = 3.7;
       }
 
-      matrix_fd mf_rvf = scale(mf, rvf);
+      matrix_fd mf_rvf = quad_form_diag(mf, rvf);
 
       // right tangent
       for (int m = 0; m < M; ++m) {
@@ -121,11 +121,11 @@ void test_fwd_scale_vv(matrix_d md, vector_d vd) {
       }
   } 
 }
-void test_fwd_scale_vd(matrix_d md, vector_d vd) {
+void test_fwd_quad_form_diag_vd(matrix_d md, vector_d vd) {
   int M = md.rows();
   int N = md.cols();
   int K = vd.size();
-  matrix_d md_vd = scale(md,vd);
+  matrix_d md_vd = quad_form_diag(md,vd);
 
   // left tangent & value
   for (int m1 = 0; m1 < M; ++m1) {
@@ -141,7 +141,7 @@ void test_fwd_scale_vd(matrix_d md, vector_d vd) {
       }
 
       // value
-      matrix_fd mf_vf = scale(mf, vd);
+      matrix_fd mf_vf = quad_form_diag(mf, vd);
       EXPECT_EQ(M, mf_vf.rows());
       EXPECT_EQ(N, mf_vf.cols());
       for (int m = 0; m < M; ++m)
@@ -170,7 +170,7 @@ void test_fwd_scale_vd(matrix_d md, vector_d vd) {
       }
 
       // value
-      matrix_fd mf_rvf = scale(mf, rvf);
+      matrix_fd mf_rvf = quad_form_diag(mf, rvf);
       EXPECT_EQ(M, mf_rvf.rows());
       EXPECT_EQ(N, mf_rvf.cols());
       for (int m = 0; m < M; ++m)
@@ -183,11 +183,11 @@ void test_fwd_scale_vd(matrix_d md, vector_d vd) {
   }
 
 }
-void test_fwd_scale_dv(matrix_d md, vector_d vd) {
+void test_fwd_quad_form_diag_dv(matrix_d md, vector_d vd) {
   int M = md.rows();
   int N = md.cols();
   int K = vd.size();
-  matrix_d md_vd = scale(md,vd);
+  matrix_d md_vd = quad_form_diag(md,vd);
 
   // value
   for (int m1 = 0; m1 < M; ++m1) {
@@ -198,7 +198,7 @@ void test_fwd_scale_dv(matrix_d md, vector_d vd) {
         vf(k).val_ = vd(k);
 
       // value
-      matrix_fd mf_vf = scale(md, vf);
+      matrix_fd mf_vf = quad_form_diag(md, vf);
       EXPECT_EQ(M, mf_vf.rows());
       EXPECT_EQ(N, mf_vf.cols());
       for (int m = 0; m < M; ++m)
@@ -211,7 +211,7 @@ void test_fwd_scale_dv(matrix_d md, vector_d vd) {
         rvf(k).val_ = vd(k);
 
       // value
-      matrix_fd mf_rvf = scale(md, rvf);
+      matrix_fd mf_rvf = quad_form_diag(md, rvf);
       EXPECT_EQ(M, mf_rvf.rows());
       EXPECT_EQ(N, mf_rvf.cols());
       for (int m = 0; m < M; ++m)
@@ -229,7 +229,7 @@ void test_fwd_scale_dv(matrix_d md, vector_d vd) {
         if (k == k1) vf(k).d_ = 3.7;
       }
 
-      matrix_fd mf_vf = scale(md, vf);
+      matrix_fd mf_vf = quad_form_diag(md, vf);
 
       // right tangent
       for (int m = 0; m < M; ++m) {
@@ -252,7 +252,7 @@ void test_fwd_scale_dv(matrix_d md, vector_d vd) {
         if (k == k1) rvf(k).d_ = 3.7;
       }
 
-      matrix_fd mf_rvf = scale(md, rvf);
+      matrix_fd mf_rvf = quad_form_diag(md, rvf);
 
       // right tangent
       for (int m = 0; m < M; ++m) {
@@ -270,35 +270,35 @@ void test_fwd_scale_dv(matrix_d md, vector_d vd) {
   }
 }
 
-void test_fwd_scale(matrix_d m, vector_d v) {
-  test_fwd_scale_vv(m,v);
-  test_fwd_scale_vd(m,v);
-  test_fwd_scale_dv(m,v);
+void test_fwd_quad_form_diag(matrix_d m, vector_d v) {
+  test_fwd_quad_form_diag_vv(m,v);
+  test_fwd_quad_form_diag_vd(m,v);
+  test_fwd_quad_form_diag_dv(m,v);
 }
 
-TEST(AgradFwdMatrixScale, ff1) {
+TEST(AgradFwdMatrixQuadFormDiag, ff1) {
   matrix_d m(1,1);
   m << 10;
   vector_d v(1);
   v << 3;
-  test_fwd_scale(m,v);
+  test_fwd_quad_form_diag(m,v);
 }
-TEST(AgradFwdMatrixScale, ff2) {
+TEST(AgradFwdMatrixQuadFormDiag, ff2) {
   matrix_d m(2,2);
   m << 1, 10, 100, 1000;
   vector_d v(2);
   v << 2, 3;
-  test_fwd_scale(m,v);
+  test_fwd_quad_form_diag(m,v);
 }
 
-TEST(AgradFwdMatrixScale, ff3) {
+TEST(AgradFwdMatrixQuadFormDiag, ff3) {
   matrix_d m(3,3);
   m << 1, 10, 100, 1000, 2, -4, 8, -16, 32;
   vector_d v(3);
   v << -1.7, 111.2, -29.3;
-  test_fwd_scale(m,v);
+  test_fwd_quad_form_diag(m,v);
 }
-TEST(AgradFwdMatrixScale, exceptions) {
+TEST(AgradFwdMatrixQuadFormDiag, exceptions) {
   matrix_d m(3,3);
   m << 1, 10, 100, 1000, 2, -4, 8, -16, 32;
 
@@ -317,13 +317,13 @@ TEST(AgradFwdMatrixScale, exceptions) {
   vector_fd rvf(2);
   rvf << -1.7, 111.2;
 
-  EXPECT_THROW(scale(mf,mf), std::domain_error);
+  EXPECT_THROW(quad_form_diag(mf,mf), std::domain_error);
 
-  EXPECT_THROW(scale(mf,v), std::domain_error);
-  EXPECT_THROW(scale(m,vf), std::domain_error);
-  EXPECT_THROW(scale(mf,vf), std::domain_error);
+  EXPECT_THROW(quad_form_diag(mf,v), std::domain_error);
+  EXPECT_THROW(quad_form_diag(m,vf), std::domain_error);
+  EXPECT_THROW(quad_form_diag(mf,vf), std::domain_error);
 
-  EXPECT_THROW(scale(mf,rv), std::domain_error);
-  EXPECT_THROW(scale(m,rvf), std::domain_error);
-  EXPECT_THROW(scale(mf,rvf), std::domain_error);
+  EXPECT_THROW(quad_form_diag(mf,rv), std::domain_error);
+  EXPECT_THROW(quad_form_diag(m,rvf), std::domain_error);
+  EXPECT_THROW(quad_form_diag(mf,rvf), std::domain_error);
 }
