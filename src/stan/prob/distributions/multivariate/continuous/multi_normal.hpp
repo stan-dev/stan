@@ -20,20 +20,21 @@ namespace stan {
 
    template <bool propto,
              typename T_y, typename T_loc, typename T_covar>
-    typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
-    multi_normal_log(const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
-                     const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
+    typename boost::math::tools::promote_args<typename scalar_type<T_y>::type, typename scalar_type<T_loc>::type, T_covar>::type
+    multi_normal_log(const T_y& y,
+                     const T_loc& mu,
                      const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma) {
+      
       static const char* function = "stan::prob::multi_normal_log(%1%)";
-      typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type lp(0.0);
+      typename boost::math::tools::promote_args<typename scalar_type<T_y>::type, typename scalar_type<T_loc>::type, T_covar>::type lp(0.0);
       
       using stan::math::check_not_nan;
       using stan::math::check_size_match;
       using stan::math::check_positive;
       using stan::math::check_finite;
       using stan::math::check_symmetric;
-      using stan::math::check_ldlt_factor;
-      
+      using stan::math::check_ldlt_factor;     
+             
       if (!check_size_match(function, 
                             Sigma.rows(), "Rows of covariance parameter",
                             Sigma.cols(), "columns of covariance parameter",
@@ -47,53 +48,65 @@ namespace stan {
       stan::math::LDLT_factor<T_covar,Eigen::Dynamic,Eigen::Dynamic> ldlt_Sigma(Sigma);
       if(!check_ldlt_factor(function,ldlt_Sigma,"LDLT_Factor of covariance parameter",&lp))
         return lp;
+        
+      using Eigen::Matrix;
+      using Eigen::Dynamic;
+      using std::vector;
+      VectorViewMvt<const T_y> y_vec(y);
+      VectorViewMvt<const T_loc> mu_vec(mu);
+      size_t size = max_size_mvt(y, mu);
 
-      if (!check_size_match(function, 
-                            y.size(), "Size of random variable",
-                            mu.size(), "size of location parameter",
-                            &lp))
-        return lp;
-      if (!check_size_match(function, 
-                            y.size(), "Size of random variable",
-                            Sigma.rows(), "rows of covariance parameter",
-                            &lp))
-        return lp;
-      if (!check_size_match(function, 
-                            y.size(), "Size of random variable",
-                            Sigma.cols(), "columns of covariance parameter",
-                            &lp))
-        return lp;
-      if (!check_finite(function, mu, "Location parameter", &lp))
-        return lp;
-      if (!check_not_nan(function, y, "Random variable", &lp))
-        return lp;
-      
-      if (y.rows() == 0)
-        return lp;
-      
-      if (include_summand<propto>::value) 
-        lp += NEG_LOG_SQRT_TWO_PI * y.rows();
-      
-      if (include_summand<propto,T_covar>::value) {
-        lp -= 0.5 * log_determinant_ldlt(ldlt_Sigma);
+      for (size_t i = 0; i < size; i++) {      
+        if (!check_size_match(function, 
+                              y_vec[i].size(), "Size of random variable",
+                              mu_vec[i].size(), "size of location parameter",
+                              &lp))
+          return lp;
+        if (!check_size_match(function, 
+                              y_vec[i].size(), "Size of random variable",
+                              Sigma.rows(), "rows of covariance parameter",
+                              &lp))
+          return lp;
+        if (!check_size_match(function, 
+                              y_vec[i].size(), "Size of random variable",
+                              Sigma.cols(), "columns of covariance parameter",
+                              &lp))
+          return lp;
+        if (!check_finite(function, mu_vec[i], "Location parameter", &lp))
+          return lp;
+        if (!check_not_nan(function, y_vec[i], "Random variable", &lp))
+          return lp;
+        
+        if (y_vec[i].rows() == 0)
+          return lp;
       }
 
-      if (include_summand<propto,T_y,T_loc,T_covar>::value) {
-        Eigen::Matrix<typename 
-            boost::math::tools::promote_args<T_y,T_loc>::type,
-            Eigen::Dynamic, 1> y_minus_mu(y.size());
-        for (int i = 0; i < y.size(); i++)
-          y_minus_mu(i) = y(i)-mu(i);
-        lp -= 0.5 * trace_inv_quad_form_ldlt(ldlt_Sigma,y_minus_mu);
+      for (size_t i = 0; i < size; i++) {
+        if (include_summand<propto>::value) 
+          lp += NEG_LOG_SQRT_TWO_PI * y_vec[i].rows();
+        
+        if (include_summand<propto, T_covar>::value) {
+          lp -= 0.5 * log_determinant_ldlt(ldlt_Sigma);
+        }
+
+        if (include_summand<propto,T_y,T_loc,T_covar>::value) {
+          int y_size = y_vec[i].size();
+          Matrix<typename 
+              boost::math::tools::promote_args<typename scalar_type<T_y>::type, typename scalar_type<T_loc>::type>::type,
+              Dynamic, 1> y_minus_mu(y_size);
+          for (int j = 0; j < y_size; j++)
+            y_minus_mu(j) = y_vec[i](j)-mu_vec[i](j);
+          lp -= 0.5 * trace_inv_quad_form_ldlt(ldlt_Sigma,y_minus_mu);
+        }
       }
       return lp;
     }
 
     template <typename T_y, typename T_loc, typename T_covar>
     inline
-    typename boost::math::tools::promote_args<T_y,T_loc,T_covar>::type
-    multi_normal_log(const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
-                     const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
+    typename boost::math::tools::promote_args<typename scalar_type<T_y>::type, typename scalar_type<T_loc>::type, T_covar>::type
+    multi_normal_log(const T_y& y,
+                     const T_loc& mu,
                      const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma) {
       return multi_normal_log<false>(y,mu,Sigma);
     }

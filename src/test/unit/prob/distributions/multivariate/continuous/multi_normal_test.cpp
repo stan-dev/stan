@@ -5,7 +5,7 @@
 
 using Eigen::Dynamic;
 using Eigen::Matrix;
-
+using std::vector;
 TEST(ProbDistributionsMultiNormal,MultiNormal) {
   Matrix<double,Dynamic,1> y(3,1);
   y << 2.0, -2.0, 11.0;
@@ -17,7 +17,25 @@ TEST(ProbDistributionsMultiNormal,MultiNormal) {
     0.0, 0.0, 5.0;
   EXPECT_FLOAT_EQ(-11.73908, stan::prob::multi_normal_log(y,mu,Sigma));
 }
-
+TEST(ProbDistributionsMultiNormal,MultiNormal2) {
+  vector< Matrix<double,Dynamic,1> > vec_y(2);
+  Matrix<double,Dynamic,1> y(3,1);
+  y << 2.0, -2.0, 11.0;
+  vec_y[0] = y;
+  y << 4.0, -2.0, 1.0;
+  vec_y[1] = y;
+  vector< Matrix<double,Dynamic,1> > vec_mu(2);
+  Matrix<double,Dynamic,1> mu(3,1);
+  mu << 1.0, -1.0, 3.0;
+  vec_mu[0] = mu;
+  mu << 2.0, -1.0, 4.0;
+  vec_mu[1] = mu;
+  Matrix<double,Dynamic,Dynamic> Sigma(3,3);
+  Sigma << 10.0, -3.0, 0.0,
+    -3.0,  5.0, 0.0,
+    0.0, 0.0, 5.0;
+  EXPECT_FLOAT_EQ(-11.928077-6.5378327, stan::prob::multi_normal_log(vec_y,vec_mu,Sigma));
+}
 TEST(ProbDistributionsMultiNormal,Sigma) {
   Matrix<double,Dynamic,1> y(2,1);
   y << 2.0, -2.0;
