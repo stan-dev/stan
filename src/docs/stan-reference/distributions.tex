@@ -1762,11 +1762,35 @@ where $|\Sigma|$ is the absolute determinant of $\Sigma$.
 
 \subsubsection{Stan Functions}
 
+The multivariate normal probability function is overloaded to allow
+the variate vector $y$ and location vector $\mu$ to be vectors or row
+vectors (or to mix the two types).  The density function is also
+vectorized, so it allows arrays of row vectors or vectors as
+arguments; see \refsection{prob-vectorization} for a description of
+vectorization.
+
+
 \begin{description}
 %
-\fitem{real}{multi\_normal\_log}{vector \farg{y}, vector \farg{mu},
-  matrix \farg{Sigma}}{The log of the multivariate normal density of vector \farg{y}
- given location \farg{mu} and covariance matrix \farg{Sigma}}
+  \fitem{real}{multi\_normal\_log}{vectors \farg{y}, vectors
+    \farg{mu}, matrix \farg{Sigma}}{The log of the multivariate normal
+    density of vector(s) \farg{y} given location vector(s) \farg{mu} and
+    covariance matrix \farg{Sigma}}
+%
+  \fitem{real}{multi\_normal\_log}{vectors \farg{y}, row\_vectors
+    \farg{mu}, matrix \farg{Sigma}}{The log of the multivariate normal
+    density of vector(s) \farg{y} given location row vector(s)
+    \farg{mu} and covariance matrix \farg{Sigma}}
+%
+  \fitem{real}{multi\_normal\_log}{row\_vectors \farg{y}, vectors
+    \farg{mu}, matrix \farg{Sigma}}{The log of the multivariate normal
+    density of row vector(s) \farg{y} given location vector(s)
+    \farg{mu} and covariance matrix \farg{Sigma}}
+%
+  \fitem{real}{multi\_normal\_log}{row\_vectors \farg{y}, row\_vectors
+    \farg{mu}, matrix \farg{Sigma}}{The log of the multivariate normal
+    density of row vector(s) \farg{y} given location row vector(s)
+    \farg{mu} and covariance matrix \farg{Sigma}}
 %
 \end{description}
 %
