@@ -76,8 +76,8 @@ namespace stan {
         for (size_t i = 1, size_ = length_mvt(y); i < size_; i++) {
           int size_y_new = y_vec[i].size();
           if (!check_size_match(function, 
-                                size_y_new, "Size of one of the vectors of the response variable",
-                                size_y_old, "Size of another vector of the response variable",
+                                size_y_new, "Size of one of the vectors of the random variable",
+                                size_y_old, "Size of another vector of the random variable",
                                 &lp))
             return lp;          
           size_y_old = size_y_new;
