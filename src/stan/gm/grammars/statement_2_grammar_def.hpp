@@ -43,7 +43,6 @@
 #include <stan/gm/ast.hpp>
 #include <stan/gm/grammars/whitespace_grammar.hpp>
 #include <stan/gm/grammars/expression_grammar.hpp>
-#include <stan/gm/grammars/var_decls_grammar.hpp>
 #include <stan/gm/grammars/statement_grammar.hpp>
 #include <stan/gm/grammars/statement_2_grammar.hpp>
 #include <stan/gm/grammars/common_adaptors_def.hpp>
