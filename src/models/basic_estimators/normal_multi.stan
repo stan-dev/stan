@@ -49,4 +49,15 @@ model {
   y ~ multi_normal_prec(rbeta, inv_sigma);
   y ~ multi_normal_prec(rbeta[1], inv_sigma);
   ry[1] ~ multi_normal_prec(rbeta, inv_sigma);
+  
+  for (n in 1:J)
+    ry[n] ~ multi_student_t(10, beta[n], sigma);
+  y ~ multi_student_t(10, beta, sigma);
+  ry ~ multi_student_t(10, beta[1], sigma);
+  y[1] ~ multi_student_t(10, beta, sigma);
+  for (n in 1:J)
+    y[n] ~ multi_student_t(10, rbeta[n], sigma);
+  y ~ multi_student_t(10, rbeta, sigma);
+  y ~ multi_student_t(10, rbeta[1], sigma);
+  ry[1] ~ multi_student_t(10, rbeta, sigma);
 }

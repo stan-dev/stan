@@ -5,7 +5,7 @@
 
 using Eigen::Dynamic;
 using Eigen::Matrix;
-
+using std::vector;
 using stan::prob::multi_student_t_log;
 
 TEST(ProbDistributionsMultiStudentT,MultiT) {
@@ -22,7 +22,27 @@ TEST(ProbDistributionsMultiStudentT,MultiT) {
   // calc using R's mnormt package's dmt function
   EXPECT_NEAR(-10.1246,lp,0.0001);
 }
-
+TEST(ProbDistributionsMultiStudentT,MultiT2) {
+  vector< Matrix<double,Dynamic,1> > vec_y(2);
+  Matrix<double,Dynamic,1> y(3,1);
+  y << 3.0, -2.0, 10.0;
+  vec_y[0] = y;
+  y << -3.0, -1.0, 5.0;
+  vec_y[1] = y;
+  vector< Matrix<double,Dynamic,1> > vec_mu(2);
+  Matrix<double,Dynamic,1> mu(3,1);
+  mu << 2.0, -1.0, 4.0;
+  vec_mu[0] = mu;
+  mu << 1.0, -3.0, 4.0;
+  vec_mu[1] = mu;
+  Matrix<double,Dynamic,Dynamic> Sigma(3,3);
+  Sigma << 10.0, -3.0, 0.0,
+    -3.0,  5.0, 0.0,
+    0.0, 0.0, 5.0;
+  double nu = 4.0;
+  double lp = multi_student_t_log(vec_y,nu,vec_mu,Sigma);
+  EXPECT_FLOAT_EQ(-8.9286697029902093-6.6504917261594869,lp);
+}
 TEST(ProbDistributionsMultiStudentT,Sigma) {
   Matrix<double,Dynamic,1> y(3,1);
   y << 2.0, -2.0, 11.0;

@@ -27,10 +27,10 @@ namespace stan {
      */
     template <bool propto,
               typename T_y, typename T_dof, typename T_loc, typename T_scale>
-    typename boost::math::tools::promote_args<T_y,T_dof,T_loc,T_scale>::type
-    multi_student_t_log(const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
+    typename boost::math::tools::promote_args<typename scalar_type<T_y>::type,T_dof,typename scalar_type<T_loc>::type,T_scale>::type
+    multi_student_t_log(const T_y& y,
                         const T_dof& nu,
-                        const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
+                        const T_loc& mu,
                         const 
                         Eigen::Matrix<T_scale,
                                       Eigen::Dynamic,Eigen::Dynamic>& Sigma) {
@@ -47,7 +47,8 @@ namespace stan {
       using stan::math::LDLT_factor;
       using stan::math::check_ldlt_factor;
 
-      typename promote_args<T_y,T_dof,T_loc,T_scale>::type lp(0.0);
+      typename boost::math::tools::promote_args<typename scalar_type<T_y>::type,T_dof,typename scalar_type<T_loc>::type,T_scale>::type
+      lp(0.0);
       
       // allows infinities
       if (!check_not_nan(function, nu, 
@@ -61,43 +62,82 @@ namespace stan {
 
       if (isinf(nu)) // already checked nu > 0
         return multi_normal_log(y,mu,Sigma);
+
+      using Eigen::Matrix;
+      using Eigen::Dynamic;
+      using std::vector;
+      VectorViewMvt<const T_y> y_vec(y);
+      VectorViewMvt<const T_loc> mu_vec(mu);
+      size_t size = max_size_mvt(y, mu);
+      
+      
+      //Check if every vector of the array has the same size
+      int size_y = y_vec[0].size();
+      if (size > 1) {
+        int size_y_old = size_y;
+        int size_y_new;
+        for (size_t i = 1, size_ = length_mvt(y); i < size_; i++) {
+          int size_y_new = y_vec[i].size();
+          if (!check_size_match(function, 
+                                size_y_new, "Size of one of the vectors of the response variable",
+                                size_y_old, "Size of another vector of the response variable",
+                                &lp))
+            return lp;          
+          size_y_old = size_y_new;
+        }
+        int size_mu_old = mu_vec[0].size();
+        int size_mu_new;
+        for (size_t i = 1, size_ = length_mvt(mu); i < size_; i++) {
+          int size_mu_new = mu_vec[i].size();
+          if (!check_size_match(function, 
+                                size_mu_new, "Size of one of the vectors of the location variable",
+                                size_mu_old, "Size of another vector of the location variable",
+                                &lp))
+            return lp;          
+          size_mu_old = size_mu_new;
+        }
+      }
+
       
       if (!check_size_match(function, 
-          y.size(), "Size of random variable",
-          mu.size(), "size of location parameter",
+          size_y, "Size of random variable",
+          mu_vec[0].size(), "size of location parameter",
           &lp))
         return lp;
       if (!check_size_match(function, 
-          y.size(), "Size of random variable",
+          size_y, "Size of random variable",
           Sigma.rows(), "rows of scale parameter",
           &lp))
         return lp;
       if (!check_size_match(function, 
-          y.size(), "Size of random variable",
+          size_y, "Size of random variable",
           Sigma.cols(), "columns of scale parameter",
           &lp))
         return lp;
-      if (!check_finite(function, mu, "Location parameter", &lp))
-        return lp;
-      if (!check_not_nan(function, y, "Random variable", &lp)) 
-        return lp;
+      
+      for (size_t i = 0; i < size; i++) {
+        if (!check_finite(function, mu_vec[i], "Location parameter", &lp))
+          return lp;
+        if (!check_not_nan(function, y_vec[i], "Random variable", &lp)) 
+          return lp;
+      }    
       if (!check_symmetric(function, Sigma, "Scale parameter", &lp))
         return lp;
 
+      
       LDLT_factor<T_scale,Eigen::Dynamic,Eigen::Dynamic> ldlt_Sigma(Sigma);
       if(!check_ldlt_factor(function,ldlt_Sigma,"LDLT_Factor of scale parameter",&lp))
         return lp;
 
-      double d = y.size();
 
       if (include_summand<propto,T_dof>::value) {
-        lp += lgamma(0.5 * (nu + d));
-        lp -= lgamma(0.5 * nu);
-        lp -= (0.5 * d) * log(nu);
+        lp += lgamma(0.5 * (nu + size_y)) * size;
+        lp -= lgamma(0.5 * nu) * size;
+        lp -= (0.5 * size_y) * log(nu) * size;
       }
 
       if (include_summand<propto>::value) 
-        lp -= (0.5 * d) * LOG_PI;
+        lp -= (0.5 * size_y) * LOG_PI * size;
 
       using stan::math::multiply;
       using stan::math::dot_product;
@@ -106,27 +146,30 @@ namespace stan {
 
 
       if (include_summand<propto,T_scale>::value) {
-        lp -= 0.5*log_determinant_ldlt(ldlt_Sigma);
+        lp -= 0.5 * log_determinant_ldlt(ldlt_Sigma) * size;
       }
 
-      if (include_summand<propto,T_y,T_dof,T_loc,T_scale>::value) {
-        
-        Eigen::Matrix<typename promote_args<T_y,T_loc>::type,
-                      Eigen::Dynamic,
-                      1> y_minus_mu = subtract(y,mu);
-        lp -= 0.5 
-          * (nu + d)
-          * log(1.0 + trace_inv_quad_form_ldlt(ldlt_Sigma,y_minus_mu) / nu);
+      for (size_t i = 0; i < size; i++) {
+        if (include_summand<propto,T_y,T_dof,T_loc,T_scale>::value) {
+          Matrix<typename 
+              boost::math::tools::promote_args<typename scalar_type<T_y>::type, typename scalar_type<T_loc>::type>::type,
+              Dynamic, 1> y_minus_mu(size_y);
+          for (int j = 0; j < size_y; j++)
+            y_minus_mu(j) = y_vec[i](j)-mu_vec[i](j);
+          lp -= 0.5 
+            * (nu + size_y)
+            * log(1.0 + trace_inv_quad_form_ldlt(ldlt_Sigma,y_minus_mu) / nu);
+        }
       }
       return lp;
     }
 
     template <typename T_y, typename T_dof, typename T_loc, typename T_scale>
     inline 
-    typename boost::math::tools::promote_args<T_y,T_dof,T_loc,T_scale>::type
-    multi_student_t_log(const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
+    typename boost::math::tools::promote_args<typename scalar_type<T_y>::type,T_dof,typename scalar_type<T_loc>::type,T_scale>::type
+    multi_student_t_log(const T_y& y,
                         const T_dof& nu,
-                        const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
+                        const T_loc& mu,
                         const 
                         Eigen::Matrix<T_scale,
                                       Eigen::Dynamic,Eigen::Dynamic>& Sigma) {
