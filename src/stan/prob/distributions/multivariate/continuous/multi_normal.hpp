@@ -55,46 +55,74 @@ namespace stan {
       VectorViewMvt<const T_y> y_vec(y);
       VectorViewMvt<const T_loc> mu_vec(mu);
       size_t size = max_size_mvt(y, mu);
-
+      
+      
+      //Check if every vector of the array has the same size
+      int size_y = y_vec[0].size();
+      if (size > 1) {
+        int size_y_old = size_y;
+        int size_y_new;
+        for (size_t i = 1, size_ = length_mvt(y); i < size_; i++) {
+          int size_y_new = y_vec[i].size();
+          if (!check_size_match(function, 
+                                size_y_new, "Size of one of the vectors of the response variable",
+                                size_y_old, "Size of another vector of the response variable",
+                                &lp))
+            return lp;          
+          size_y_old = size_y_new;
+        }
+        int size_mu_old = mu_vec[0].size();
+        int size_mu_new;
+        for (size_t i = 1, size_ = length_mvt(mu); i < size_; i++) {
+          int size_mu_new = mu_vec[i].size();
+          if (!check_size_match(function, 
+                                size_mu_new, "Size of one of the vectors of the location variable",
+                                size_mu_old, "Size of another vector of the location variable",
+                                &lp))
+            return lp;          
+          size_mu_old = size_mu_new;
+        }
+      }
+    
+      if (!check_size_match(function, 
+                            size_y, "Size of random variable",
+                            mu_vec[0].size(), "size of location parameter",
+                            &lp))
+        return lp;
+      if (!check_size_match(function, 
+                            size_y, "Size of random variable",
+                            Sigma.rows(), "rows of covariance parameter",
+                            &lp))
+        return lp;
+      if (!check_size_match(function, 
+                            size_y, "Size of random variable",
+                            Sigma.cols(), "columns of covariance parameter",
+                            &lp))
+        return lp;
+  
       for (size_t i = 0; i < size; i++) {      
-        if (!check_size_match(function, 
-                              y_vec[i].size(), "Size of random variable",
-                              mu_vec[i].size(), "size of location parameter",
-                              &lp))
-          return lp;
-        if (!check_size_match(function, 
-                              y_vec[i].size(), "Size of random variable",
-                              Sigma.rows(), "rows of covariance parameter",
-                              &lp))
-          return lp;
-        if (!check_size_match(function, 
-                              y_vec[i].size(), "Size of random variable",
-                              Sigma.cols(), "columns of covariance parameter",
-                              &lp))
-          return lp;
         if (!check_finite(function, mu_vec[i], "Location parameter", &lp))
           return lp;
         if (!check_not_nan(function, y_vec[i], "Random variable", &lp))
           return lp;
-        
-        if (y_vec[i].rows() == 0)
-          return lp;
-      }
+      } 
+      
+      if (size_y == 0) //y_vec[0].size() == 0
+        return lp;
 
+
+      if (include_summand<propto, T_covar>::value)
+        lp -= 0.5 * log_determinant_ldlt(ldlt_Sigma) * size;
+
+      if (include_summand<propto>::value) 
+        lp += NEG_LOG_SQRT_TWO_PI * size_y * size;
+          
       for (size_t i = 0; i < size; i++) {
-        if (include_summand<propto>::value) 
-          lp += NEG_LOG_SQRT_TWO_PI * y_vec[i].rows();
-        
-        if (include_summand<propto, T_covar>::value) {
-          lp -= 0.5 * log_determinant_ldlt(ldlt_Sigma);
-        }
-
         if (include_summand<propto,T_y,T_loc,T_covar>::value) {
-          int y_size = y_vec[i].size();
           Matrix<typename 
               boost::math::tools::promote_args<typename scalar_type<T_y>::type, typename scalar_type<T_loc>::type>::type,
-              Dynamic, 1> y_minus_mu(y_size);
-          for (int j = 0; j < y_size; j++)
+              Dynamic, 1> y_minus_mu(size_y);
+          for (int j = 0; j < size_y; j++)
             y_minus_mu(j) = y_vec[i](j)-mu_vec[i](j);
           lp -= 0.5 * trace_inv_quad_form_ldlt(ldlt_Sigma,y_minus_mu);
         }
