@@ -70,6 +70,7 @@ namespace stan {
 
       //Check if every vector of the array has the same size
       int size_y = y_vec[0].size();
+      int size_mu = mu_vec[0].size();
       if (size > 1) {
         int size_y_old = size_y;
         int size_y_new;
@@ -82,7 +83,7 @@ namespace stan {
             return lp;          
           size_y_old = size_y_new;
         }
-        int size_mu_old = mu_vec[0].size();
+        int size_mu_old = size_mu;
         int size_mu_new;
         for (size_t i = 1, size_ = length_mvt(mu); i < size_; i++) {
           int size_mu_new = mu_vec[i].size();
@@ -93,12 +94,16 @@ namespace stan {
             return lp;          
           size_mu_old = size_mu_new;
         }
+        (void) size_y_old;
+        (void) size_y_new;
+        (void) size_mu_old;
+        (void) size_mu_new;
       }
 
     
       if (!check_size_match(function, 
                             size_y, "Size of random variable",
-                            mu_vec[0].size(), "size of location parameter",
+                            size_mu, "size of location parameter",
                             &lp))
         return lp;
       if (!check_size_match(function, 
