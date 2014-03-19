@@ -7,6 +7,7 @@
 #include <stan/common/init_nuts.hpp>
 #include <stan/common/init_static_hmc.hpp>
 #include <stan/common/init_windowed_adapt.hpp>
+#include <stan/common/io.hpp>
 #include <stan/common/print_progress.hpp>
 #include <stan/common/run_markov_chain.hpp>
 #include <stan/common/sample.hpp>

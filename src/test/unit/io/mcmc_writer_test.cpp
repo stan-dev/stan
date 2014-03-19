@@ -328,7 +328,7 @@ TEST(StanIoMcmcWriter, print_timing) {
   double warm = 0.193933;
   double sampling = 0.483830;
 
-  stan::io::as_csv sample_recorder(&sample_stream, "# ");
+  stan::common::io::as_csv sample_recorder(&sample_stream, "# ");
   writer.print_timing(warm, sampling, sample_recorder);
 
   std::stringstream expected_stream;
