@@ -38,7 +38,13 @@ public:
     
     model = new stan_model(empty_data_context, &std::cout);
     
-    writer = new stan::io::mcmc_writer<stan_model>(&std::cout, &std::cout, &std::cout);
+    stan::common::io::as_csv sample_recorder(&std::cout, "# ");
+    stan::common::io::as_csv diagnostic_recorder(&std::cout, "# ");
+    
+    writer = new stan::io::mcmc_writer<stan_model,
+                                       stan::common::io::as_csv,
+                                       stan::common::io::as_csv>
+      (sample_recorder, diagnostic_recorder, &std::cout);
 
     base_rng.seed(123456);
 
@@ -54,7 +60,9 @@ public:
   
   mock_sampler* sampler;
   stan_model* model;
-  stan::io::mcmc_writer<stan_model>* writer;
+  stan::io::mcmc_writer<stan_model,
+                        stan::common::io::as_csv,
+                        stan::common::io::as_csv>* writer;
   rng_t base_rng;
 
   Eigen::VectorXd q;

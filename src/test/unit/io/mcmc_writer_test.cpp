@@ -42,8 +42,14 @@ TEST(StanIoMcmcWriter, print_sample_names) {
   // Writer
   std::stringstream sample_stream;
   std::stringstream diagnostic_stream;
-  
-  stan::io::mcmc_writer<io_example_model_namespace::io_example_model> writer(&sample_stream, &diagnostic_stream);
+
+  stan::common::io::as_csv sample_recorder(&sample_stream, "# ");
+  stan::common::io::as_csv diagnostic_recorder(&diagnostic_stream, "# ");
+
+  stan::io::mcmc_writer<io_example_model_namespace::io_example_model,
+                        stan::common::io::as_csv,
+                        stan::common::io::as_csv> 
+    writer(sample_recorder, diagnostic_recorder);
   
   writer.print_sample_names(sample, &sampler, model);
   
@@ -83,8 +89,13 @@ TEST(StanIoMcmcWriter, print_sample_params) {
   // Writer
   std::stringstream sample_stream;
   std::stringstream diagnostic_stream;
+
+  stan::common::io::as_csv sample_recorder(&sample_stream, "# ");
+  stan::common::io::as_csv diagnostic_recorder(&diagnostic_stream, "# ");
   
-  stan::io::mcmc_writer<io_example_model_namespace::io_example_model> writer(&sample_stream, &diagnostic_stream);
+  stan::io::mcmc_writer<io_example_model_namespace::io_example_model,
+                        stan::common::io::as_csv,
+                        stan::common::io::as_csv> writer(sample_recorder, diagnostic_recorder);
   
   writer.print_sample_params<rng_t>(base_rng, sample, sampler, model);
   
@@ -138,7 +149,13 @@ TEST(StanIoMcmcWriter, print_adapt_finish) {
   std::stringstream sample_stream;
   std::stringstream diagnostic_stream;
   
-  stan::io::mcmc_writer<io_example_model_namespace::io_example_model> writer(&sample_stream, &diagnostic_stream);
+  stan::common::io::as_csv sample_recorder(&sample_stream, "# ");
+  stan::common::io::as_csv diagnostic_recorder(&diagnostic_stream, "# ");
+
+  stan::io::mcmc_writer<io_example_model_namespace::io_example_model,
+                        stan::common::io::as_csv,
+                        stan::common::io::as_csv> 
+    writer(sample_recorder, diagnostic_recorder);
   
   writer.print_adapt_finish(&sampler);
   
@@ -219,7 +236,13 @@ TEST(StanIoMcmcWriter, print_diagnostic_names) {
   std::stringstream sample_stream;
   std::stringstream diagnostic_stream;
   
-  stan::io::mcmc_writer<io_example_model_namespace::io_example_model> writer(&sample_stream, &diagnostic_stream);
+  stan::common::io::as_csv sample_recorder(&sample_stream, "# ");
+  stan::common::io::as_csv diagnostic_recorder(&diagnostic_stream, "# ");
+
+  stan::io::mcmc_writer<io_example_model_namespace::io_example_model,
+                        stan::common::io::as_csv,
+                        stan::common::io::as_csv> 
+    writer(sample_recorder, diagnostic_recorder);
   
   writer.print_diagnostic_names(sample, &sampler, model);
   
@@ -265,7 +288,13 @@ TEST(StanIoMcmcWriter, print_diagnostic_params) {
   std::stringstream sample_stream;
   std::stringstream diagnostic_stream;
   
-  stan::io::mcmc_writer<io_example_model_namespace::io_example_model> writer(&sample_stream, &diagnostic_stream);
+  stan::common::io::as_csv sample_recorder(&sample_stream, "# ");
+  stan::common::io::as_csv diagnostic_recorder(&diagnostic_stream, "# ");
+
+  stan::io::mcmc_writer<io_example_model_namespace::io_example_model,
+                        stan::common::io::as_csv,
+                        stan::common::io::as_csv> 
+    writer(sample_recorder, diagnostic_recorder);
   
   writer.print_diagnostic_params(sample, &sampler);
   
@@ -323,12 +352,17 @@ TEST(StanIoMcmcWriter, print_timing) {
   std::stringstream sample_stream;
   std::stringstream diagnostic_stream;
   
-  stan::io::mcmc_writer<io_example_model_namespace::io_example_model> writer(&sample_stream, &diagnostic_stream);
+  stan::common::io::as_csv sample_recorder(&sample_stream, "# ");
+  stan::common::io::as_csv diagnostic_recorder(&diagnostic_stream, "# ");
+
+  stan::io::mcmc_writer<io_example_model_namespace::io_example_model,
+                        stan::common::io::as_csv,
+                        stan::common::io::as_csv> 
+    writer(sample_recorder, diagnostic_recorder);
   
   double warm = 0.193933;
   double sampling = 0.483830;
 
-  stan::common::io::as_csv sample_recorder(&sample_stream, "# ");
   writer.print_timing(warm, sampling, sample_recorder);
 
   std::stringstream expected_stream;

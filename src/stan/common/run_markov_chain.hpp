@@ -8,7 +8,8 @@
 namespace stan {
   namespace common {
 
-    template <class Model, class RNG, class StartTransitionCallback>
+    template <class Model, class RNG, class StartTransitionCallback, 
+              class SampleRecorder, class DiagnosticRecorder>
     void run_markov_chain(stan::mcmc::base_mcmc* sampler,
                           const int num_iterations,
                           const int start,
@@ -17,7 +18,7 @@ namespace stan {
                           const int refresh,
                           const bool save,
                           const bool warmup,
-                          stan::io::mcmc_writer<Model>& writer,
+                          stan::io::mcmc_writer<Model,SampleRecorder,DiagnosticRecorder>& writer,
                           stan::mcmc::sample& init_s,
                           Model& model,
                           RNG& base_rng,

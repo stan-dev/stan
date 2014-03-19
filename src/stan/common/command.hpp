@@ -49,6 +49,7 @@
 #include <stan/common/init_nuts.hpp>
 #include <stan/common/init_adapt.hpp>
 #include <stan/common/init_windowed_adapt.hpp>
+#include <stan/common/io/as_csv.hpp>
 
 namespace stan {
 
@@ -577,7 +578,11 @@ namespace stan {
         std::cout << "Adjust your expectations accordingly!" << std::endl << std::endl;
         std::cout << std::endl;
         
-        stan::io::mcmc_writer<Model> writer(output_stream, diagnostic_stream, &std::cout);
+        stan::common::io::as_csv sample_recorder(output_stream, "# ");
+        stan::common::io::as_csv diagnostic_recorder(diagnostic_stream, "# ");
+        
+        stan::io::mcmc_writer<Model, stan::common::io::as_csv, stan::common::io::as_csv> 
+          writer(sample_recorder, diagnostic_recorder, &std::cout);
         
         // Sampling parameters
         int num_warmup = dynamic_cast<stan::gm::int_argument*>(

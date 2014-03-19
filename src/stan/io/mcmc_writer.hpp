@@ -1,5 +1,5 @@
-#ifndef __STAN__IO__MCMC__WRITER__HPP
-#define __STAN__IO__MCMC__WRITER__HPP
+#ifndef __STAN__IO__MCMC__WRITER__HPP__
+#define __STAN__IO__MCMC__WRITER__HPP__
 
 #include <ostream>
 #include <iomanip>
@@ -21,17 +21,14 @@ namespace stan {
      *
      * @tparam M Model class
      */
-    template <class M>
+    template <class M, class SampleRecorder, class DiagnosticRecorder>
     class mcmc_writer {
 
     private:
-      std::ostream* sample_stream_;     // replace with sample_recorder
-      std::ostream* diagnostic_stream_; // replace with diagnostic_recorder
+      SampleRecorder sample_recorder_;
+      DiagnosticRecorder diagnostic_recorder_;
       std::ostream* msg_stream_;
-      
-      stan::common::io::as_csv sample_recorder;
-      stan::common::io::as_csv diagnostic_recorder;
-      stan::common::io::as_csv cout_recorder;
+      stan::common::io::as_csv msg_recorder_;
       
     public:
       
@@ -46,15 +43,13 @@ namespace stan {
        * @post none
        * @sideeffects streams are stored in this object 
        */
-      mcmc_writer(std::ostream* sample_stream,
-                  std::ostream* diagnostic_stream,
+      mcmc_writer(SampleRecorder& sample_recorder,
+                  DiagnosticRecorder& diagnostic_recorder,
                   std::ostream* msg_stream = 0)
-        : sample_stream_(sample_stream),
-          diagnostic_stream_(diagnostic_stream),
+        : sample_recorder_(sample_recorder),
+          diagnostic_recorder_(diagnostic_recorder),
           msg_stream_(msg_stream),
-          sample_recorder(sample_stream, "# "),
-          diagnostic_recorder(diagnostic_stream, "# "),
-          cout_recorder(&std::cout, "") {
+          msg_recorder_(stan::common::io::as_csv(msg_stream, "")) {
       }
       
       /**
@@ -84,7 +79,7 @@ namespace stan {
         sampler->get_sampler_param_names(names);
         model.constrained_param_names(names, true, true);
         
-        sample_recorder(names);
+        sample_recorder_(names);
       }
 
 
@@ -123,7 +118,7 @@ namespace stan {
         for (int i = 0; i < model_values.size(); ++i)
           values.push_back(model_values(i));
 
-        sample_recorder(values);
+        sample_recorder_(values);
       }
       
       /**
@@ -132,8 +127,9 @@ namespace stan {
        * @param sampler sampler
        * @param stream stream to output stuff to
        */
+      template <class Recorder>
       void print_adapt_finish(stan::mcmc::base_mcmc* sampler, 
-                              stan::common::io::as_csv& recorder) {
+                              Recorder& recorder) {
         if (!recorder.is_recording())
           return;
         std::stringstream stream;
@@ -151,8 +147,8 @@ namespace stan {
        * @param sampler sampler
        */
       void print_adapt_finish(stan::mcmc::base_mcmc* sampler) {
-        print_adapt_finish(sampler, sample_recorder);
-        print_adapt_finish(sampler, diagnostic_recorder);
+        print_adapt_finish(sampler, sample_recorder_);
+        print_adapt_finish(sampler, diagnostic_recorder_);
       }
 
 
@@ -181,7 +177,7 @@ namespace stan {
         
         sampler->get_sampler_diagnostic_names(model_names, names);
 
-        diagnostic_recorder(names);
+        diagnostic_recorder_(names);
       }
       
       /**
@@ -204,7 +200,7 @@ namespace stan {
         sampler->get_sampler_params(values);
         sampler->get_sampler_diagnostics(values);
         
-        diagnostic_recorder(values);
+        diagnostic_recorder_(values);
       }
 
 
@@ -221,8 +217,9 @@ namespace stan {
        * @sideeffects stream is updated with information about timing
        *
        */
+      template <class Recorder>
       void print_timing(double warmDeltaT, double sampleDeltaT, 
-                        stan::common::io::as_csv& recorder) {
+                        Recorder& recorder) {
         if (!recorder.is_recording())
           return;
 
@@ -258,9 +255,9 @@ namespace stan {
        * @param sampleDeltaT sample time (sec)
        */
       void print_timing(double warmDeltaT, double sampleDeltaT) {
-        print_timing(warmDeltaT, sampleDeltaT, sample_recorder);
-        print_timing(warmDeltaT, sampleDeltaT, diagnostic_recorder);
-        print_timing(warmDeltaT, sampleDeltaT, cout_recorder);
+        print_timing(warmDeltaT, sampleDeltaT, sample_recorder_);
+        print_timing(warmDeltaT, sampleDeltaT, diagnostic_recorder_);
+        print_timing(warmDeltaT, sampleDeltaT, msg_recorder_);
       }
             
     };
