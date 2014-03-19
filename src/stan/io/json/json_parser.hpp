@@ -109,6 +109,7 @@ namespace stan {
             ss << c;
             c = get_char();
           } 
+
           // int
           //   zero / digit1-9
           if (c < '0' || c > '9') 
@@ -116,20 +117,22 @@ namespace stan {
           ss << c;
 
           //   *DIGIT
-          if (c != '0') {
+          bool leading_zero = (c == '0');
+          c = get_char();
+          if (leading_zero && (c == '0'))
+              throw json_exception("zero padded numbers not allowed");
+          while (c >= '0' && c <= '9') {
+            ss << c;
             c = get_char();
-            while (c >= '0' && c <= '9') {
-              ss << c;
-              c = get_char();
-            }
           }
+
           // frac
           bool is_integer = true;
           if (c == '.') {
             is_integer = false;
             ss << '.';
             c = get_char();
-            if (c < '0' && c > '9')
+            if (c < '0' || c > '9')
               throw json_exception("expected digit after decimal");
             ss << c;
             c = get_char();
@@ -138,6 +141,7 @@ namespace stan {
               c = get_char();
             }
           }
+
           // exp
           if (c == 'e' || c == 'E') {
             is_integer = false;
@@ -149,16 +153,16 @@ namespace stan {
               c = get_char();
             }
             // 1*DIGIT
-            if (c < '0' && c > '9')
+            if (c < '0' || c > '9')
               throw json_exception("expected digit after e/E");
-            ss << c;
-            c = get_char();
             while (c >= '0' && c <= '9') {
               ss << c;
               c = get_char();
             }
           }
           unget_char();
+
+
           if (is_integer) {
             if (is_positive) {
               unsigned long n;
@@ -180,11 +184,9 @@ namespace stan {
           std::stringstream s;
           while (true) {
             char c = get_char();
-            //            std::cout << c << std::endl;
             if (c == '"') {
               return s.str();
             } else if (c == '\\') {
-              // std::cout << "in escape" << std::endl;
               c = get_char();
               if (c == '\\'  || c == '/' || c == '"') {
                 s << c;
@@ -203,7 +205,6 @@ namespace stan {
               } else {
                 throw json_exception("expecting legal escape");
               }
-              // std::cout << "handled escape" << std::endl;
             } else if (c < 0x20) {
               throw json_exception("illegal string character with code point"
                                    " less than U+0020");
@@ -246,6 +247,10 @@ namespace stan {
             if (c == ']') return;
             if (c != ',') 
               throw json_exception("in array, expecting ] or ,");
+            c = get_non_ws_char();
+            if (c == ']') 
+              throw json_exception("in array, expecting value");
+            unget_char();
           }
         }
 
@@ -254,7 +259,7 @@ namespace stan {
           if (c == '}') return;
           while (true) {
             // string (key)
-            if (c != '"')
+            if (c != '"') 
               throw json_exception("expecting member key"
                                    " or end of object marker (})");
             std::string key = parse_string_chars_quotation_mark();
