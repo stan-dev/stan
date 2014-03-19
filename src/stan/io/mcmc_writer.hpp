@@ -13,6 +13,58 @@
 namespace stan {
   
   namespace io {
+
+    /**
+     * Writes out a vector as string.
+     */
+    class as_csv {
+    private:
+      std::ostream *o_;
+      const bool has_stream_;
+      
+    public:
+      /**
+       * Construct an object.
+       *
+       * @param o pointer to stream. Will accept 0.
+       */
+      as_csv(std::ostream *o) 
+        : o_(o), has_stream_(o != 0) { }
+      
+      /**
+       * Print vector as csv.
+       *
+       * Uses the insertion operator to write out the elements
+       * as comma separated values, flushing the buffer after the
+       * line is complete
+       * 
+       * @tparam T type of element
+       * @param x vector of type T
+       */
+      template <class T>
+      void operator()(const std::vector<T>& x) {
+        if (!has_stream_)
+          return;
+        
+        if (x.size() != 0) {
+          *o_ << x.at(0);
+          for (typename T::size_type n = 1; n < x.size(); n++) {
+            *o_ << "," << x.at(n);
+          }
+        }
+        *o_ << std::endl;
+      }
+      
+      /**
+       * Indicator function for whether the instance is recording.
+       *
+       * For this class, returns true if it has a stream.
+       */
+      bool is_recording() const {
+        return has_stream_;
+      }
+    };
+
     
     /**
      * mcmc_writer writes out headers and samples
