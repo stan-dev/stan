@@ -180,30 +180,34 @@ namespace stan {
           std::stringstream s;
           while (true) {
             char c = get_char();
+            //            std::cout << c << std::endl;
             if (c == '"') {
               return s.str();
             } else if (c == '\\') {
+              // std::cout << "in escape" << std::endl;
               c = get_char();
-            } else if (c == '\\'  || c == '/' || c == '"') {
-              s << c;
-            } else if (c == 'b') {
-              s << '\b';
-            } else if (c == 'f') {
-              s << '\f';
-            } else if (c == 'n') {
-              s << '\n';
-            } else if (c == 'r') {
-              s << '\r';
-            } else if (c == 't') {
-              s << '\t';
-            } else if (c == 'u') {
-              throw json_exception("unicode escapes not supported");
-            } else {
-              throw json_exception("expecting legal escape");
-            }
-            if (c < 0x20)
+              if (c == '\\'  || c == '/' || c == '"') {
+                s << c;
+              } else if (c == 'b') {
+                s << '\b';
+              } else if (c == 'f') {
+                s << '\f';
+              } else if (c == 'n') {
+                s << '\n';
+              } else if (c == 'r') {
+                s << '\r';
+              } else if (c == 't') {
+                s << '\t';
+              } else if (c == 'u') {
+                throw json_exception("unicode escapes not supported");
+              } else {
+                throw json_exception("expecting legal escape");
+              }
+              // std::cout << "handled escape" << std::endl;
+            } else if (c < 0x20) {
               throw json_exception("illegal string character with code point"
                                    " less than U+0020");
+            }
             s << c;
           }
         }
