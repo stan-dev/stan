@@ -84,7 +84,7 @@ void test_exception(const std::string& input,
 }
 
 
-TEST(ioJson,0) {
+TEST(ioJson,jsonParserA0) {
   test_parser("[0]",
               "S:text" "S:arr" "UL(INT):0" "E:arr" "E:text");
 }
@@ -162,6 +162,37 @@ TEST(ioJson,jsonParserO1) {
               "S:text" "S:obj" "KEY:\"foo\"" "UL(INT):1" "E:obj" "E:text");
 }
 
+TEST(ioJson,jsonParserO11) {
+  test_parser("{  \"foo\" : { \"bar\": 1 } }   ",
+              "S:text" "S:obj" "KEY:\"foo\"" "S:obj" "KEY:\"bar\"" 
+              "UL(INT):1" "E:obj" "E:obj" "E:text");
+}
+
+TEST(ioJson,jsonParserO12) {
+  test_parser("{  \"foo\" : { \"bar\": 1, \"baz\": 2 } }   ",
+              "S:text" "S:obj" "KEY:\"foo\"" "S:obj" 
+              "KEY:\"bar\""  "UL(INT):1" 
+              "KEY:\"baz\""  "UL(INT):2" 
+              "E:obj" "E:obj" "E:text");
+}
+
+
+TEST(ioJson,jsonParserO13) {
+  test_parser("{  \"foo\" : { \"bar\": { \"baz\": [ 1, 2]  } } }  ",
+              "S:text" "S:obj" "KEY:\"foo\"" "S:obj" 
+              "KEY:\"bar\""  "S:obj" "KEY:\"baz\""  
+              "S:arr" "UL(INT):1" "UL(INT):2" "E:arr" 
+              "E:obj" "E:obj" "E:obj" "E:text");
+}
+
+TEST(ioJson,jsonParserO14) {
+  test_parser("{  \"foo\" : [ { \"bar\": { \"baz\": [ 1, 2]  } }, -3, -4.44 ] }  ",
+              "S:text" "S:obj" "KEY:\"foo\"" "S:arr" "S:obj" 
+              "KEY:\"bar\""  "S:obj" "KEY:\"baz\""  
+              "S:arr" "UL(INT):1" "UL(INT):2" "E:arr" "E:obj" "E:obj" 
+              "L(INT):-3" "D(REAL):-4.44" "E:arr" "E:obj" "E:text");
+}
+
 TEST(ioJson,jsonParserO2) {
   test_parser("{  \"foo\"  : 1 ,  \n   \"bar\" : 2 }",
               "S:text" "S:obj" "KEY:\"foo\"" "UL(INT):1" 
@@ -218,6 +249,62 @@ TEST(ioJson,jsonParserO7) {
   test_parser("{ \"foo\": -1.0100e09 }",
               textReport.str());
 }
+
+
+TEST(ioJson,jsonParserStr0) {
+  test_parser("[ \"foo\" ]",
+              "S:text" "S:arr" "STR:\"foo\"" "E:arr" "E:text");
+}
+
+TEST(ioJson,jsonParserStr1) {
+  test_parser("[ \"\\nfoo\" ]",
+              "S:text" "S:arr" "STR:\"\nfoo\"" "E:arr" "E:text");
+}
+
+TEST(ioJson,jsonParserStr2) {
+  test_parser("[ \"\\nfoo\\bbar\" ]",
+              "S:text" "S:arr" "STR:\"\nfoo\bbar\"" "E:arr" "E:text");
+}
+
+
+TEST(ioJson,jsonParserStr3) {
+  test_parser("[ \"\\bfoo\\nbar\" ]",
+              "S:text" "S:arr" "STR:\"\bfoo\nbar\"" "E:arr" "E:text");
+}
+
+TEST(ioJson,jsonParserStr4) {
+  test_parser("[ \"\\\"foo\\/bar\" ]",
+              "S:text" "S:arr" "STR:\"\"foo/bar\"" "E:arr" "E:text");
+}
+
+TEST(ioJson,jsonParserStr5) {
+  test_parser("[ \"\\\"foo\\\\bar\" ]",
+              "S:text" "S:arr" "STR:\"\"foo\\bar\"" "E:arr" "E:text");
+}
+
+TEST(ioJson,jsonParserStr6) {
+  test_parser("[ \"\\tfoo\\tbar\" ]",
+              "S:text" "S:arr" "STR:\"\tfoo\tbar\"" "E:arr" "E:text");
+}
+
+TEST(ioJson,jsonParserStr7) {
+  test_parser("[ \"\\nfoo\\nbar\\n\" ]",
+              "S:text" "S:arr" "STR:\"\nfoo\nbar\n\"" "E:arr" "E:text");
+}
+
+TEST(ioJson,jsonParserStr8) {
+  test_parser("[ \"\\nfoo\\nbar\\\"\" ]",
+              "S:text" "S:arr" "STR:\"\nfoo\nbar\"\"" "E:arr" "E:text");
+}
+
+
+TEST(ioJson,jsonParserStr9) {
+  test_parser("[ \"foo\\nbar\\\"\" , \"foo\\nbar\\\"\"  ]",
+              "S:text" "S:arr" 
+              "STR:\"foo\nbar\"\"" "STR:\"foo\nbar\"\"" 
+              "E:arr" "E:text");
+}
+
 
 TEST(ioJson,jsonParserErr01) {
   test_exception(" \n \n   5    ",
@@ -314,4 +401,3 @@ TEST(ioJson,jsonParserErr18) {
   test_exception("[ -1, -2, \"-inf\", ]",
                  "in array, expecting value\n");
 }
-

@@ -205,6 +205,7 @@ namespace stan {
               } else {
                 throw json_exception("expecting legal escape");
               }
+              continue;
             } else if (c < 0x20) {
               throw json_exception("illegal string character with code point"
                                    " less than U+0020");
