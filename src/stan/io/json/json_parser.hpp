@@ -91,10 +91,12 @@ namespace stan {
             // object / array
             unget_char();
             parse_text();
-          } else {
-            // number
+          } else if (c == '-' || 
+                     (c >= '0' && c <= '9') ) {
             unget_char();
             parse_number();
+          } else {
+            throw json_exception("illegal value, expecting object, array, number, string, or literal true/false/null");
           }
         }
       
@@ -246,8 +248,9 @@ namespace stan {
             parse_value();
             char c = get_non_ws_char();
             if (c == ']') return;
-            if (c != ',') 
+            if (c != ',') {
               throw json_exception("in array, expecting ] or ,");
+            }
             c = get_non_ws_char();
             if (c == ']') 
               throw json_exception("in array, expecting value");

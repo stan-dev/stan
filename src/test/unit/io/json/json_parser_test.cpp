@@ -50,16 +50,15 @@ public:
   }
 };
 
-
-
 bool hasEnding(std::string const &fullString, std::string const &ending) {
+  //  std::cout << "found: " << fullString << std::endl;
+  //  std::cout << "expect: " << ending << std::endl;
   if (fullString.length() >= ending.length()) {
     return (0 == fullString.compare (fullString.length() - ending.length(), ending.length(), ending));
   } else {
     return false;
   }
 }
-
 
 void test_parser(const std::string& input,
                  const std::string& expected_output) {
@@ -76,7 +75,6 @@ void test_exception(const std::string& input,
     std::stringstream s(input);
     stan::json::parse(s, handler);
   } catch (const std::exception& e) {
-    std::cout << e.what() << std::endl;
     EXPECT_TRUE(hasEnding(e.what(), exception_text));
     return;
   }
@@ -305,7 +303,6 @@ TEST(ioJson,jsonParserStr9) {
               "E:arr" "E:text");
 }
 
-
 TEST(ioJson,jsonParserErr01) {
   test_exception(" \n \n   5    ",
                  "expecting start of object ({) or array ([)\n");
@@ -313,7 +310,7 @@ TEST(ioJson,jsonParserErr01) {
 
 TEST(ioJson,jsonParserErr02) {
   test_exception("[ .5 ]",
-                 "expecting int part of number\n");
+                 "illegal value, expecting object, array, number, string, or literal true/false/null\n");
 }
 
 TEST(ioJson,jsonParserErr03) {
@@ -370,6 +367,21 @@ TEST(ioJson,jsonParserErr12) {
                  "in array, expecting ] or ,\n");
 }
 
+TEST(ioJson,jsonParserErr12a) {
+  test_exception("[ a ]",
+                 "illegal value, expecting object, array, number, string, or literal true/false/null\n");
+}
+
+TEST(ioJson,jsonParserErr12b) {
+  test_exception("[ \"a\", a ]",
+                 "illegal value, expecting object, array, number, string, or literal true/false/null\n");
+}
+
+TEST(ioJson,jsonParserErr12c) {
+  test_exception("[ \"a\", ",
+                 "unexpected end of stream\n");
+}
+
 TEST(ioJson,jsonParserErr13) {
   test_exception("{ hello }",
                  "expecting member key or end of object marker (})\n");
@@ -379,6 +391,39 @@ TEST(ioJson,jsonParserErr13) {
 TEST(ioJson,jsonParserErr14) {
   test_exception("{ \"foo\": -1.0100e09 , }",
               "expecting member key or end of object marker (})\n");
+}
+
+
+TEST(ioJson,jsonParserErr14a) {
+  test_exception("{ { \"foo\": -1.0100e09 , }",
+              "expecting member key or end of object marker (})\n");
+}
+
+
+TEST(ioJson,jsonParserErr14b) {
+  test_exception("{ \"bar\" : { \"foo\": -1.0100e09 , }",
+              "expecting member key or end of object marker (})\n");
+}
+
+
+TEST(ioJson,jsonParserErr14c) {
+  test_exception("{ \"bar\" : [ \"foo\": -1.0100e09 , }",
+                 "in array, expecting ] or ,\n");
+}
+
+TEST(ioJson,jsonParseErr14d) {
+  test_exception("{  \"foo\" : [ { \"bar\": { \"baz\": [ 1, 2]  } }, -3, -4.44  }  ",
+                 "in array, expecting ] or ,\n");
+}
+
+TEST(ioJson,jsonParseErr14e) {
+  test_exception("{  \"foo\" : [ { \"bar\": { \"baz\": [ 1, 2]  } }, -3, -4.44 } } } ] }  ",
+                 "in array, expecting ] or ,\n");
+}
+
+TEST(ioJson,jsonParserErr14f) {
+  test_exception("{ \"foo\": -1.0100e09 , ",
+              "unexpected end of stream\n");
 }
 
 
@@ -401,3 +446,5 @@ TEST(ioJson,jsonParserErr18) {
   test_exception("[ -1, -2, \"-inf\", ]",
                  "in array, expecting value\n");
 }
+
+
