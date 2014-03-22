@@ -122,6 +122,8 @@ namespace stan {
       }
       
       /**
+       * Internal method
+       *
        * Prints additional sampler info to the stream.
        * 
        * @param sampler sampler
@@ -205,6 +207,8 @@ namespace stan {
 
 
       /**
+       * Internal method
+       *
        * Prints timing information
        *
        * @param warmDeltaT warmup time in seconds
