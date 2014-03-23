@@ -58,6 +58,9 @@ BOOST_FUSION_ADAPT_STRUCT(stan::gm::for_statement,
                           (stan::gm::range, range_)
                           (stan::gm::statement, statement_) );
 
+BOOST_FUSION_ADAPT_STRUCT(stan::gm::return_statement,
+                          (stan::gm::expression, return_value_) );
+
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::print_statement,
                           (std::vector<stan::gm::printable>, printables_) );
 
@@ -461,6 +464,7 @@ namespace stan {
         | while_statement_r(_r1,_r2)                // key "while"
         | statement_2_g(_r1,_r2)                    // key "if"
         | print_statement_r(_r2)                    // key "print"
+        | return_statement_r(_r2)                   // key "return"
         | assignment_r(_r2)                         // lvalue "<-"
         // [_pass = validate_assignment_f(_1,_r2,boost::phoenix::ref(var_map_),
         // boost::phoenix::ref(error_msgs_))]
@@ -611,6 +615,12 @@ namespace stan {
         > lit(',')
         > -expression_g(_r1)
         > lit(']');
+
+      return_statement_r.name("return statement");
+      return_statement_r
+        %= lit("return")
+        >> expression_g(_r1)
+        >> lit(';');
 
       no_op_statement_r.name("no op statement");
       no_op_statement_r 

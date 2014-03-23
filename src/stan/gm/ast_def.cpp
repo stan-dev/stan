@@ -319,9 +319,36 @@ namespace stan {
     function_signatures* function_signatures::sigs_ = 0;
 
 
+    bare_type::bare_type() { }
+    bare_type::bare_type(base_expr_type base_type,
+                         int num_dims)
+      : base_type_(base_type),
+        num_dims_(num_dims) {
+    }
+
+    arg_decl::arg_decl() { }
+    arg_decl::arg_decl(const bare_type& arg_type,
+                       const std::string& name)
+      : arg_type_(arg_type),
+        name_(name) {
+    }
+    base_var_decl arg_decl::base_variable_declaration() {
+      std::vector<expression> dims;
+      for (int i = 0; i < arg_type_.num_dims_; ++i)
+        dims.push_back(expression(int_literal(0))); // dummy value 0
+      return base_var_decl(name_,dims,arg_type_.base_type_);
+    }
+
     function_decl_def::function_decl_def() { }
-    function_decl_def::function_decl_def(const std::string& name) 
-      : name_(name) { 
+    function_decl_def::function_decl_def(const bare_type& return_type,
+                                         const std::string& name,
+                                         const std::vector<arg_decl>& arg_decls,
+                                         const statement& body)
+                                         
+      : return_type_(return_type),
+        name_(name),
+        arg_decls_(arg_decls),
+        body_(body) { 
     }
 
     function_decl_defs::function_decl_defs() { }
@@ -729,6 +756,8 @@ namespace stan {
         o << "generated quantities";
       else if (vo == local_origin)
         o << "local";
+      else if (vo == function_argument_origin)
+        o << "function argument";
       else 
         o << "UNKNOWN ORIGIN";
     }
@@ -985,13 +1014,51 @@ namespace stan {
     statement::statement(const while_statement& st) : statement_(st) { }
     statement::statement(const conditional_statement& st) : statement_(st) { }
     statement::statement(const print_statement& st) : statement_(st) { }
+    statement::statement(const return_statement& st) : statement_(st) { }
     statement::statement(const no_op_statement& st) : statement_(st) { }
 
-    // template <typename Statement>
-    // statement::statement(const Statement& statement)
-    // : statement_(statement) {
-    // }
 
+    bool is_no_op_statement_vis::operator()(const nil& st) const { 
+      return false; 
+    }
+    bool is_no_op_statement_vis::operator()(const assignment& st) const { 
+      return false; 
+    }
+    bool is_no_op_statement_vis::operator()(const sample& st) const { 
+      return false; 
+    }
+    bool is_no_op_statement_vis::operator()(const increment_log_prob_statement& t) const {
+      return false; 
+    }
+    bool is_no_op_statement_vis::operator()(const expression& st) const { 
+      return false; 
+    }
+    bool is_no_op_statement_vis::operator()(const statements& st) const { 
+      return false; 
+    }
+    bool is_no_op_statement_vis::operator()(const for_statement& st) const { 
+      return false; 
+    }
+    bool is_no_op_statement_vis::operator()(const conditional_statement& st) const { 
+      return false; 
+    }
+    bool is_no_op_statement_vis::operator()(const while_statement& st) const { 
+      return false; 
+    }
+    bool is_no_op_statement_vis::operator()(const print_statement& st) const {
+      return false; 
+    }
+    bool is_no_op_statement_vis::operator()(const no_op_statement& st) const { 
+      return true; 
+    }
+    bool is_no_op_statement_vis::operator()(const return_statement& st) const {
+      return false; 
+    }
+
+    bool statement::is_no_op_statement() const {
+      is_no_op_statement_vis vis;
+      return boost::apply_visitor(vis,statement_);
+    }
 
     increment_log_prob_statement::increment_log_prob_statement() {
     }
@@ -1024,6 +1091,11 @@ namespace stan {
                             const std::vector<statement>& bodies)
       : conditions_(conditions),
         bodies_(bodies) {
+    }
+
+    return_statement::return_statement() { }
+    return_statement::return_statement(const expression& expr) 
+      : return_value_(expr) {
     }
 
     print_statement::print_statement() { }

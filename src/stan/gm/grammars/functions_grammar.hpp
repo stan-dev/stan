@@ -1,5 +1,5 @@
-#ifndef STAN__GM__PARSER__FUNCTIONS__GRAMMAR__HPP__
-#define STAN__GM__PARSER__FUNCTIONS__GRAMMAR__HPP__
+#ifndef STAN__GM__PARSER__FUNCTIONS_GRAMMAR_HPP__
+#define STAN__GM__PARSER__FUNCTIONS_GRAMMAR_HPP__
 
 #include <string>
 #include <sstream>
@@ -10,6 +10,7 @@
 #include <stan/gm/ast.hpp>
 #include <stan/gm/grammars/whitespace_grammar.hpp>
 #include <stan/gm/grammars/statement_grammar.hpp>
+#include <stan/gm/grammars/bare_type_grammar.hpp>
 
 namespace stan { 
 
@@ -27,6 +28,7 @@ namespace stan {
       
       // grammars
       statement_grammar<Iterator> statement_g;
+      bare_type_grammar<Iterator> bare_type_g;
       
       // constructor
       functions_grammar(variable_map& var_map,
@@ -44,9 +46,20 @@ namespace stan {
       function_r;
 
       boost::spirit::qi::rule<Iterator, 
+                              std::vector<arg_decl>(),
+                              whitespace_grammar<Iterator> > 
+      arg_decls_r;
+
+      boost::spirit::qi::rule<Iterator, 
+                              arg_decl(),
+                              whitespace_grammar<Iterator> > 
+      arg_decl_r;
+
+      boost::spirit::qi::rule<Iterator, 
                               std::string(), 
                               whitespace_grammar<Iterator> > 
       identifier_r;
+
       
     };
                                

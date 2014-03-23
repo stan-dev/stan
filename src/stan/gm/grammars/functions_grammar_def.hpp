@@ -27,15 +27,78 @@
 #include <stan/gm/grammars/whitespace_grammar.hpp>
 
 
-// BOOST_FUSION_ADAPT_STRUCT(stan::gm::function_decl_defs,
-//                          (stan::gm::function_decl_def, decl_defs_) );
-
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::function_decl_def,
-                          (std::string, name_) );
+                          (stan::gm::bare_type, return_type_)
+                          (std::string, name_) 
+                          (std::vector<stan::gm::arg_decl>, arg_decls_)
+                          (stan::gm::statement, body_) );
+
+BOOST_FUSION_ADAPT_STRUCT(stan::gm::arg_decl,
+                          (stan::gm::bare_type, arg_type_)
+                          (std::string, name_)
+                          (stan::gm::statement, body_) );
 
 namespace stan {
 
   namespace gm {
+
+    struct add_function_signature {
+      template <typename T1>
+      struct result { typedef void type; };
+      void operator()(const function_decl_def& decl) const {
+        expr_type result_type(decl.return_type_.base_type_,
+                              decl.return_type_.num_dims_);
+        std::vector<expr_type> arg_types;
+        for (size_t i = 0; i < decl.arg_decls_.size(); ++i)
+          arg_types.push_back(expr_type(decl.arg_decls_[i].arg_type_.base_type_,
+                                        decl.arg_decls_[i].arg_type_.num_dims_));
+        function_signatures::instance().add(decl.name_,result_type,arg_types);
+      }
+    };
+    boost::phoenix::function<add_function_signature> add_function_signature_f;
+
+    struct unscope_variables {
+      template <typename T1, typename T2>
+      struct result { typedef void type; };
+      void operator()(function_decl_def& decl,
+                      variable_map& vm) const {
+        for (size_t i = 0; i < decl.arg_decls_.size(); ++i)
+          vm.remove(decl.arg_decls_[i].name_);
+      }
+    };
+    boost::phoenix::function<unscope_variables> unscope_variables_f;
+
+
+    struct add_fun_var {
+      template <typename T1, typename T2, typename T3, typename T4>
+      struct result { typedef void type; };
+      // each type derived from base_var_decl gets own instance
+      void operator()(arg_decl& decl,
+                      bool& pass,
+                      variable_map& vm,
+                      std::ostream& error_msgs) const {
+        if (vm.exists(decl.name_)) {
+          // variable already exists
+          pass = false;
+          error_msgs << "duplicate declaration of variable, name="
+                     << decl.name_;
+
+          error_msgs << "; attempt to redeclare as function argument";
+
+          error_msgs << "; original declaration as ";
+          print_var_origin(error_msgs,vm.get_origin(decl.name_));
+
+          error_msgs << std::endl;
+          return;
+        }
+
+        pass = true;
+        vm.add(decl.name_,
+               decl.base_variable_declaration(),
+               function_argument_origin);
+      }
+    };
+    boost::phoenix::function<add_fun_var> add_fun_var_f;
 
   template <typename Iterator>
   functions_grammar<Iterator>::functions_grammar(variable_map& var_map,
@@ -43,7 +106,8 @@ namespace stan {
       : functions_grammar::base_type(functions_r),
         var_map_(var_map),
         error_msgs_(error_msgs),
-        statement_g(var_map_,error_msgs_)
+        statement_g(var_map_,error_msgs_),
+        bare_type_g(var_map_,error_msgs_)
   {
       using boost::spirit::qi::_1;
       using boost::spirit::qi::char_;
@@ -73,8 +137,28 @@ namespace stan {
       
       function_r.name("function declaration or definition");
       function_r
-        %= identifier_r
-        >> lit(';')
+        %= bare_type_g
+        >> identifier_r
+        >> lit('(')
+        >> arg_decls_r
+        >> lit(')')
+        >> statement_g(false,local_origin)
+        >> eps [ unscope_variables_f(_val,
+                                     boost::phoenix::ref(var_map_)) ]
+        >> eps [ add_function_signature_f(_val) ]
+        ;
+      
+      arg_decls_r.name("function argument declaration sequence");
+      arg_decls_r
+        %= arg_decl_r % ',';
+
+      arg_decl_r.name("function argument declaration");
+      arg_decl_r 
+        %= bare_type_g
+        >> identifier_r
+        >> eps[ add_fun_var_f(_val,_pass,
+                              boost::phoenix::ref(var_map_),
+                              boost::phoenix::ref(error_msgs_)) ]
         ;
 
       identifier_r.name("identifier");

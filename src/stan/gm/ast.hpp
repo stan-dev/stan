@@ -20,6 +20,7 @@ namespace stan {
     // components of abstract syntax tree 
     struct array_literal;
     struct assignment;
+    struct bare_type;
     struct binary_op;
     struct conditional_statement;
     struct distribution;
@@ -42,6 +43,7 @@ namespace stan {
     struct print_statement;
     struct program;
     struct range;
+    struct return_statement;
     struct row_vector_var_decl;
     struct sample;
     struct simplex_var_decl;
@@ -368,22 +370,13 @@ namespace stan {
       bool has_high() const;
     };
 
-    struct function_decl_def {
-      function_decl_def();
-      function_decl_def(const std::string& name);
-      std::string name_;
-      // expr_type return_type_;
-      // std::vector<expr_type> arg_types_;
-      // statements body_;
+    struct bare_type {
+      base_expr_type base_type_;
+      int num_dims_;
+      bare_type();
+      bare_type(base_expr_type base_type,
+                int num_dims);
     };
-
-    struct function_decl_defs {
-      function_decl_defs();
-      function_decl_defs(const std::vector<function_decl_def>& decl_defs);
-      std::vector<function_decl_def> decl_defs_;
-    };
-
-
 
 
     typedef int var_origin;
@@ -394,7 +387,7 @@ namespace stan {
     const int transformed_parameter_origin = 4;
     const int derived_origin = 5;
     const int local_origin = 6;
-
+    const int function_argument_origin = 7;
 
 
     void print_var_origin(std::ostream& o, const var_origin& vo);
@@ -603,6 +596,7 @@ namespace stan {
                              boost::recursive_wrapper<conditional_statement>,
                              boost::recursive_wrapper<while_statement>,
                              boost::recursive_wrapper<print_statement>,
+                             boost::recursive_wrapper<return_statement>,
                              boost::recursive_wrapper<no_op_statement> >
       statement_t;
     
@@ -621,9 +615,24 @@ namespace stan {
       statement(const while_statement& st);
       statement(const print_statement& st);
       statement(const no_op_statement& st);
+      statement(const return_statement& st);
 
-      // template <typename Statement>
-      // statement(const Statement& statement);
+      bool is_no_op_statement() const;
+    };
+
+    struct is_no_op_statement_vis : public boost::static_visitor<bool> {
+      bool operator()(const nil& st) const;
+      bool operator()(const assignment& st) const;
+      bool operator()(const sample& st) const;
+      bool operator()(const increment_log_prob_statement& t) const;
+      bool operator()(const expression& st) const;
+      bool operator()(const statements& st) const;
+      bool operator()(const for_statement& st) const;
+      bool operator()(const conditional_statement& st) const;
+      bool operator()(const while_statement& st) const;
+      bool operator()(const print_statement& st) const;
+      bool operator()(const no_op_statement& st) const;
+      bool operator()(const return_statement& st) const;
     };
     
     struct increment_log_prob_statement {
@@ -665,10 +674,43 @@ namespace stan {
       print_statement(const std::vector<printable>& printables);
     };
 
+    struct return_statement {
+      expression return_value_;
+      return_statement();
+      return_statement(const expression& expr);
+    };
 
     struct no_op_statement {
       // no op, no data
     };
+
+    struct arg_decl {
+      bare_type arg_type_;
+      std::string name_;
+      arg_decl();
+      arg_decl(const bare_type& arg_type,
+               const std::string& name);
+      base_var_decl base_variable_declaration();
+    };
+
+    struct function_decl_def {
+      function_decl_def();
+      function_decl_def(const bare_type& return_type,
+                        const std::string& name,
+                        const std::vector<arg_decl>& arg_decls,
+                        const statement& body);
+      bare_type return_type_;
+      std::string name_;
+      std::vector<arg_decl> arg_decls_;
+      statement body_;
+    };
+
+    struct function_decl_defs {
+      function_decl_defs();
+      function_decl_defs(const std::vector<function_decl_def>& decl_defs);
+      std::vector<function_decl_def> decl_defs_;
+    };
+
 
     struct program {
       std::vector<function_decl_def> function_decl_defs_;
