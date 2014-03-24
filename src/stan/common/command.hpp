@@ -765,8 +765,8 @@ namespace stan {
         }
         
         // Headers
-        writer.print_sample_names(s, sampler_ptr, model);
-        writer.print_diagnostic_names(s, sampler_ptr, model);
+        writer.write_sample_names(s, sampler_ptr, model);
+        writer.write_diagnostic_names(s, sampler_ptr, model);
         
         std::string prefix = "";
         std::string suffix = "\n";
@@ -787,7 +787,7 @@ namespace stan {
         
         if (adapt_engaged) {
           dynamic_cast<mcmc::base_adapter*>(sampler_ptr)->disengage_adaptation();
-          writer.print_adapt_finish(sampler_ptr);
+          writer.write_adapt_finish(sampler_ptr);
         }
         
         // Sampling
@@ -803,7 +803,7 @@ namespace stan {
         end = clock();
         sampleDeltaT = (double)(end - start) / CLOCKS_PER_SEC;
         
-        writer.print_timing(warmDeltaT, sampleDeltaT);
+        writer.write_timing(warmDeltaT, sampleDeltaT);
         
         if (sampler_ptr) delete sampler_ptr;
         

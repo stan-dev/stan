@@ -13,7 +13,7 @@
 #include <gtest/gtest.h>
 
 
-TEST(StanIoMcmcWriter, print_sample_names) {
+TEST(StanIoMcmcWriter, write_sample_names) {
   
   // Model
   std::fstream data_stream("", std::fstream::in);
@@ -51,7 +51,7 @@ TEST(StanIoMcmcWriter, print_sample_names) {
                         stan::common::io::as_csv> 
     writer(sample_recorder, diagnostic_recorder);
   
-  writer.print_sample_names(sample, &sampler, model);
+  writer.write_sample_names(sample, &sampler, model);
   
   std::string line;
   std::getline(sample_stream, line);
@@ -60,7 +60,7 @@ TEST(StanIoMcmcWriter, print_sample_names) {
   
 }
 
-TEST(StanIoMcmcWriter, print_sample_params) {
+TEST(StanIoMcmcWriter, write_sample_params) {
   
   // Model
   std::fstream data_stream("", std::fstream::in);
@@ -97,7 +97,7 @@ TEST(StanIoMcmcWriter, print_sample_params) {
                         stan::common::io::as_csv,
                         stan::common::io::as_csv> writer(sample_recorder, diagnostic_recorder);
   
-  writer.print_sample_params<rng_t>(base_rng, sample, sampler, model);
+  writer.write_sample_params<rng_t>(base_rng, sample, sampler, model);
   
   std::string line;
   std::getline(sample_stream, line);
@@ -119,7 +119,7 @@ TEST(StanIoMcmcWriter, print_sample_params) {
   
 }
 
-TEST(StanIoMcmcWriter, print_adapt_finish) {
+TEST(StanIoMcmcWriter, write_adapt_finish) {
   
   // Model
   std::fstream data_stream("", std::fstream::in);
@@ -157,7 +157,7 @@ TEST(StanIoMcmcWriter, print_adapt_finish) {
                         stan::common::io::as_csv> 
     writer(sample_recorder, diagnostic_recorder);
   
-  writer.print_adapt_finish(&sampler);
+  writer.write_adapt_finish(&sampler);
   
   std::stringstream expected_stream;
   expected_stream << "# Adaptation terminated" << std::endl;
@@ -206,7 +206,7 @@ TEST(StanIoMcmcWriter, print_adapt_finish) {
   
 }
 
-TEST(StanIoMcmcWriter, print_diagnostic_names) {
+TEST(StanIoMcmcWriter, write_diagnostic_names) {
   
   // Model
   std::fstream data_stream("", std::fstream::in);
@@ -244,7 +244,7 @@ TEST(StanIoMcmcWriter, print_diagnostic_names) {
                         stan::common::io::as_csv> 
     writer(sample_recorder, diagnostic_recorder);
   
-  writer.print_diagnostic_names(sample, &sampler, model);
+  writer.write_diagnostic_names(sample, &sampler, model);
   
   std::string line;
   std::getline(diagnostic_stream, line);
@@ -254,7 +254,7 @@ TEST(StanIoMcmcWriter, print_diagnostic_names) {
   
 }
 
-TEST(StanIoMcmcWriter, print_diagnostic_params) {
+TEST(StanIoMcmcWriter, write_diagnostic_params) {
   
   // Model
   std::fstream data_stream("", std::fstream::in);
@@ -296,7 +296,7 @@ TEST(StanIoMcmcWriter, print_diagnostic_params) {
                         stan::common::io::as_csv> 
     writer(sample_recorder, diagnostic_recorder);
   
-  writer.print_diagnostic_params(sample, &sampler);
+  writer.write_diagnostic_params(sample, &sampler);
   
   std::string line;
   std::getline(diagnostic_stream, line);
@@ -322,7 +322,7 @@ TEST(StanIoMcmcWriter, print_diagnostic_params) {
   
 }
 
-TEST(StanIoMcmcWriter, print_timing) {
+TEST(StanIoMcmcWriter, write_timing) {
   
   // Model
   std::fstream data_stream("", std::fstream::in);
@@ -363,7 +363,7 @@ TEST(StanIoMcmcWriter, print_timing) {
   double warm = 0.193933;
   double sampling = 0.483830;
 
-  writer.print_timing(warm, sampling, sample_recorder);
+  writer.write_timing(warm, sampling, sample_recorder);
 
   std::stringstream expected_stream;
   expected_stream << std::endl;

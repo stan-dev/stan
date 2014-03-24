@@ -20,6 +20,8 @@ namespace stan {
      * mcmc_writer writes out headers and samples
      *
      * @tparam M Model class
+     * @tparam SampleRecorder Class for recording samples
+     * @tparam DiagnosticRecorder Class for diagnostic samples
      */
     template <class M, class SampleRecorder, class DiagnosticRecorder>
     class mcmc_writer {
@@ -70,7 +72,7 @@ namespace stan {
        * @sideeffects sample_stream_ is written to with comma separated values
        *   with a newline at the end
        */
-      void print_sample_names(stan::mcmc::sample& sample,
+      void write_sample_names(stan::mcmc::sample& sample,
                               stan::mcmc::base_mcmc* sampler,
                               M& model) {
         std::vector<std::string> names;
@@ -98,7 +100,7 @@ namespace stan {
        * @param model the model
        */
       template <class RNG>
-      void print_sample_params(RNG& rng, 
+      void write_sample_params(RNG& rng, 
                                stan::mcmc::sample& sample,
                                stan::mcmc::base_mcmc& sampler,
                                M& model) {
@@ -130,7 +132,7 @@ namespace stan {
        * @param stream stream to output stuff to
        */
       template <class Recorder>
-      void print_adapt_finish(stan::mcmc::base_mcmc* sampler, 
+      void write_adapt_finish(stan::mcmc::base_mcmc* sampler, 
                               Recorder& recorder) {
         if (!recorder.is_recording())
           return;
@@ -148,9 +150,9 @@ namespace stan {
        *
        * @param sampler sampler
        */
-      void print_adapt_finish(stan::mcmc::base_mcmc* sampler) {
-        print_adapt_finish(sampler, sample_recorder_);
-        print_adapt_finish(sampler, diagnostic_recorder_);
+      void write_adapt_finish(stan::mcmc::base_mcmc* sampler) {
+        write_adapt_finish(sampler, sample_recorder_);
+        write_adapt_finish(sampler, diagnostic_recorder_);
       }
 
 
@@ -166,7 +168,7 @@ namespace stan {
        * @sideeffects diagnostic_stream_ is appended with comma
        *   separated names with newline at the end
        */
-      void print_diagnostic_names(stan::mcmc::sample sample,
+      void write_diagnostic_names(stan::mcmc::sample sample,
                                   stan::mcmc::base_mcmc* sampler,
                                   M& model) {
         std::vector<std::string> names;
@@ -194,7 +196,7 @@ namespace stan {
        *   sample's get_sample_params(), the sampler's get_sampler_params(),
        *   and get_sampler_diagnostics()
        */
-      void print_diagnostic_params(stan::mcmc::sample& sample,
+      void write_diagnostic_params(stan::mcmc::sample& sample,
                                    stan::mcmc::base_mcmc* sampler) {
         std::vector<double> values;
         
@@ -222,7 +224,7 @@ namespace stan {
        *
        */
       template <class Recorder>
-      void print_timing(double warmDeltaT, double sampleDeltaT, 
+      void write_timing(double warmDeltaT, double sampleDeltaT, 
                         Recorder& recorder) {
         if (!recorder.is_recording())
           return;
@@ -258,10 +260,10 @@ namespace stan {
        * @param warmDeltaT warmup time (sec)
        * @param sampleDeltaT sample time (sec)
        */
-      void print_timing(double warmDeltaT, double sampleDeltaT) {
-        print_timing(warmDeltaT, sampleDeltaT, sample_recorder_);
-        print_timing(warmDeltaT, sampleDeltaT, diagnostic_recorder_);
-        print_timing(warmDeltaT, sampleDeltaT, msg_recorder_);
+      void write_timing(double warmDeltaT, double sampleDeltaT) {
+        write_timing(warmDeltaT, sampleDeltaT, sample_recorder_);
+        write_timing(warmDeltaT, sampleDeltaT, diagnostic_recorder_);
+        write_timing(warmDeltaT, sampleDeltaT, msg_recorder_);
       }
             
     };
