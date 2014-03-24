@@ -32,13 +32,13 @@
 
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::function_decl_def,
-                          (stan::gm::bare_type, return_type_)
+                          (stan::gm::expr_type, return_type_)
                           (std::string, name_) 
                           (std::vector<stan::gm::arg_decl>, arg_decls_)
                           (stan::gm::statement, body_) );
 
 BOOST_FUSION_ADAPT_STRUCT(stan::gm::arg_decl,
-                          (stan::gm::bare_type, arg_type_)
+                          (stan::gm::expr_type, arg_type_)
                           (std::string, name_)
                           (stan::gm::statement, body_) );
 
@@ -122,6 +122,16 @@ namespace stan {
       }
     };
     boost::phoenix::function<add_function_signature> add_function_signature_f;
+
+    struct validate_return_type {
+      template <typename T1, typename T2, typename T3>
+      struct result { typedef void type; };
+      void operator()(function_decl_def& decl,
+                      bool& pass,
+                      std::ostream& error_msgs) const {
+      }
+    };
+    boost::phoenix::function<validate_return_type> validate_return_type_f;
 
     struct unscope_variables {
       template <typename T1, typename T2>
@@ -213,9 +223,12 @@ namespace stan {
         >> lit('(')
         >> arg_decls_r
         >> lit(')')
-        >> statement_g(false,local_origin)
+           // false=no sampling; local_origin = all vars local; true=allow returns
+        >> statement_g(false,local_origin,true) 
         >> eps [ unscope_variables_f(_val,
                                      boost::phoenix::ref(var_map_)) ]
+        >> eps [ validate_return_type_f(_val,_pass,
+                                        boost::phoenix::ref(error_msgs_)) ]
         >> eps [ add_function_signature_f(_val,_pass,
                                           boost::phoenix::ref(functions_declared_),
                                           boost::phoenix::ref(functions_defined_),

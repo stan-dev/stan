@@ -20,7 +20,6 @@ namespace stan {
     // components of abstract syntax tree 
     struct array_literal;
     struct assignment;
-    struct bare_type;
     struct binary_op;
     struct conditional_statement;
     struct distribution;
@@ -374,15 +373,6 @@ namespace stan {
       bool has_high() const;
     };
 
-    struct bare_type {
-      base_expr_type base_type_;
-      int num_dims_;
-      bare_type();
-      bare_type(base_expr_type base_type,
-                int num_dims);
-    };
-
-
     typedef int var_origin;
     const int model_name_origin = 0;
     const int data_origin = 1;
@@ -689,21 +679,21 @@ namespace stan {
     };
 
     struct arg_decl {
-      bare_type arg_type_;
+      expr_type arg_type_;
       std::string name_;
       arg_decl();
-      arg_decl(const bare_type& arg_type,
+      arg_decl(const expr_type& arg_type,
                const std::string& name);
       base_var_decl base_variable_declaration();
     };
 
     struct function_decl_def {
       function_decl_def();
-      function_decl_def(const bare_type& return_type,
+      function_decl_def(const expr_type& return_type,
                         const std::string& name,
                         const std::vector<arg_decl>& arg_decls,
                         const statement& body);
-      bare_type return_type_;
+      expr_type return_type_;
       std::string name_;
       std::vector<arg_decl> arg_decls_;
       statement body_;

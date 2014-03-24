@@ -339,15 +339,8 @@ namespace stan {
     function_signatures* function_signatures::sigs_ = 0;
 
 
-    bare_type::bare_type() { }
-    bare_type::bare_type(base_expr_type base_type,
-                         int num_dims)
-      : base_type_(base_type),
-        num_dims_(num_dims) {
-    }
-
     arg_decl::arg_decl() { }
-    arg_decl::arg_decl(const bare_type& arg_type,
+    arg_decl::arg_decl(const expr_type& arg_type,
                        const std::string& name)
       : arg_type_(arg_type),
         name_(name) {
@@ -360,7 +353,7 @@ namespace stan {
     }
 
     function_decl_def::function_decl_def() { }
-    function_decl_def::function_decl_def(const bare_type& return_type,
+    function_decl_def::function_decl_def(const expr_type& return_type,
                                          const std::string& name,
                                          const std::vector<arg_decl>& arg_decls,
                                          const statement& body)

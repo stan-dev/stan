@@ -25,9 +25,9 @@
 #include <stan/gm/grammars/bare_type_grammar.hpp>
 #include <stan/gm/grammars/whitespace_grammar.hpp>
 
-BOOST_FUSION_ADAPT_STRUCT(stan::gm::bare_type,
+BOOST_FUSION_ADAPT_STRUCT(stan::gm::expr_type,
                           (stan::gm::base_expr_type, base_type_)
-                          (int, num_dims_) );
+                          (size_t, num_dims_) );
 
 namespace stan {
 

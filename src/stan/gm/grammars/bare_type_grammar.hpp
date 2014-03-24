@@ -18,7 +18,7 @@ namespace stan {
     template <typename Iterator>
     struct bare_type_grammar
       : boost::spirit::qi::grammar<Iterator,
-                                   bare_type(),
+                                   expr_type(),
                                    whitespace_grammar<Iterator> > {
 
       // global info for function defs
@@ -30,7 +30,7 @@ namespace stan {
                         std::stringstream& error_msgs);
 
       boost::spirit::qi::rule<Iterator, 
-                              bare_type(),
+                              expr_type(),
                               whitespace_grammar<Iterator> > 
       bare_type_r;
 
@@ -40,7 +40,7 @@ namespace stan {
       type_identifier_r;
 
       boost::spirit::qi::rule<Iterator, 
-                              int(),
+                              size_t(),
                               whitespace_grammar<Iterator> > 
       array_dims_r;
       

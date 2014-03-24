@@ -4036,7 +4036,7 @@ namespace stan {
           << " stan_model;" <<EOL2;
     }
 
-    void generate_bare_type(const bare_type& t,
+    void generate_bare_type(const expr_type& t,
                             const std::string& scalar_t_name,
                             std::ostream& out) {
       for (size_t d = 0; d < t.num_dims_; ++d)

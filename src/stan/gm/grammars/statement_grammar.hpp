@@ -20,7 +20,7 @@ namespace stan {
     template <typename Iterator>
     struct statement_grammar 
       : boost::spirit::qi::grammar<Iterator,
-                                   statement(bool,var_origin),
+                                   statement(bool,var_origin,bool),
                                    whitespace_grammar<Iterator> > {
 
   
@@ -69,13 +69,13 @@ namespace stan {
 
       boost::spirit::qi::rule<Iterator, 
                               boost::spirit::qi::locals<std::string>, 
-                              for_statement(bool,var_origin), 
+                              for_statement(bool,var_origin,bool), 
                               whitespace_grammar<Iterator> > 
       for_statement_r;
 
 
       boost::spirit::qi::rule<Iterator, 
-                              while_statement(bool,var_origin), 
+                              while_statement(bool,var_origin,bool), 
                               whitespace_grammar<Iterator> > 
       while_statement_r;
 
@@ -87,7 +87,7 @@ namespace stan {
 
 
       boost::spirit::qi::rule<Iterator,
-                              return_statement(var_origin),
+                              return_statement(var_origin,bool),
                               whitespace_grammar<Iterator> >
       return_statement_r;
 
@@ -136,13 +136,13 @@ namespace stan {
       sample_r;
 
       boost::spirit::qi::rule<Iterator,
-                              statement(bool,var_origin), 
+                              statement(bool,var_origin,bool), 
                               whitespace_grammar<Iterator> > 
       statement_r;
 
       boost::spirit::qi::rule<Iterator, 
                               boost::spirit::qi::locals<std::vector<var_decl> >,
-                              statements(bool,var_origin), 
+                              statements(bool,var_origin,bool), 
                               whitespace_grammar<Iterator> >
       statement_seq_r;
 

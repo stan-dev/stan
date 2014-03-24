@@ -241,7 +241,7 @@ namespace stan {
         model_r.name("model declaration");
         model_r 
           %= lit("model")
-          > statement_g(true,local_origin)  // assign only to locals
+          > statement_g(true,local_origin,false)  // assign only to locals
           ;
 
         data_var_decls_r.name("data variable declarations");
@@ -257,7 +257,7 @@ namespace stan {
                >> lit("data") )
           > lit('{')
           > var_decls_g(true,transformed_data_origin)  // -constraints
-          > *statement_g(false,transformed_data_origin) // -sampling
+          > *statement_g(false,transformed_data_origin,false) // -sampling
           > lit('}');
 
         param_var_decls_r.name("parameter variable declarations");
@@ -273,7 +273,7 @@ namespace stan {
                >> lit("parameters") )
           > lit('{')
           > var_decls_g(true,transformed_parameter_origin) // -constraints
-          > *statement_g(false,transformed_parameter_origin) // -sampling
+          > *statement_g(false,transformed_parameter_origin,false) // -sampling
           > lit('}');
 
         generated_var_decls_r.name("generated variable declarations");
@@ -282,7 +282,7 @@ namespace stan {
           > lit("quantities")
           > lit('{')
           > var_decls_g(true,derived_origin) // -constraints
-          > *statement_g(false,derived_origin) // -sampling
+          > *statement_g(false,derived_origin,false) // -sampling
           > lit('}');
 
         using boost::spirit::qi::on_error;

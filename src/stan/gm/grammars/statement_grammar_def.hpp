@@ -80,6 +80,23 @@ namespace stan {
 
   namespace gm {
 
+    struct validate_return_allowed {
+      template <typename T1, typename T2, typename T3>
+      struct result { typedef void type; };
+      void operator()(bool return_allowed,
+                      bool& pass,
+                      std::ostream& error_msgs) const {
+        if (!return_allowed) {
+          error_msgs << "Returns only allowed from function bodies." << std::endl;
+          pass = false;
+          return;
+        }
+        pass = true;
+      }
+    };
+    boost::phoenix::function<validate_return_allowed> validate_return_allowed_f;
+
+
     struct validate_assignment {
       template <typename T1, typename T2, typename T3, typename T4>
       struct result { typedef bool type; };
@@ -87,7 +104,7 @@ namespace stan {
       bool operator()(assignment& a,
                       const var_origin& origin_allowed,
                       variable_map& vm,
-                      std::stringstream& error_msgs) const {
+                      std::ostream& error_msgs) const {
 
         // validate existence
         std::string name = a.var_dims_.name_;
@@ -451,34 +468,34 @@ namespace stan {
       using boost::spirit::qi::labels::_a;
       using boost::spirit::qi::labels::_r1;
       using boost::spirit::qi::labels::_r2;
+      using boost::spirit::qi::labels::_r3;
 
-      // _r1 true if sample_r allowed (inherited)
-      // _r2 source of variables allowed for assignments
-      // set to true if sample_r are allowed
+      // inherited features
+      //   _r1 true if sample_r allowed
+      //   _r2 source of variables allowed for assignments
+      //   _r3 true if return_r allowed 
       statement_r.name("statement");
       statement_r
         %= no_op_statement_r                        // key ";"
-        | statement_seq_r(_r1,_r2)                  // key "{"
+        | statement_seq_r(_r1,_r2,_r3)              // key "{"
         | increment_log_prob_statement_r(_r2)       // key "increment"
-        | for_statement_r(_r1,_r2)                  // key "for"
-        | while_statement_r(_r1,_r2)                // key "while"
-        | statement_2_g(_r1,_r2)                    // key "if"
+        | for_statement_r(_r1,_r2,_r3)              // key "for"
+        | while_statement_r(_r1,_r2,_r3)            // key "while"
+        | statement_2_g(_r1,_r2,_r3)                // key "if"
         | print_statement_r(_r2)                    // key "print"
-        | return_statement_r(_r2)                   // key "return"
+        | return_statement_r(_r2,_r3)               // key "return"
         | assignment_r(_r2)                         // lvalue "<-"
-        // [_pass = validate_assignment_f(_1,_r2,boost::phoenix::ref(var_map_),
-        // boost::phoenix::ref(error_msgs_))]
         | sample_r(_r1,_r2)                         // expression "~"
         | expression_g(_r2)                         // expression
           [expression_as_statement_f(_pass,_1,boost::phoenix::ref(error_msgs_))]
         ;
 
-      // _r1, _r2 same as statement_r
+      // _r1, _r2, _r3 same as statement_r
       statement_seq_r.name("sequence of statements");
       statement_seq_r
         %= lit('{')
         > local_var_decls_r[_a = _1]
-        > *statement_r(_r1,_r2)
+        > *statement_r(_r1,_r2,_r3)
         > lit('}')
         > eps[unscope_locals_f(_a,boost::phoenix::ref(var_map_))]
         ;
@@ -495,6 +512,7 @@ namespace stan {
         > lit(';') 
         ;
 
+      // _r1, _r2, _r3 same as statement_r
       while_statement_r.name("while statement");
       while_statement_r
         = lit("while")
@@ -503,12 +521,12 @@ namespace stan {
           [_pass = add_while_condition_f(_val,_1,
                                          boost::phoenix::ref(error_msgs_))]
         > lit(')')
-        > statement_r(_r1,_r2)
+        > statement_r(_r1,_r2,_r3)
           [add_while_body_f(_val,_1)]
         ;
       
 
-      // _r1, _r2 same as statement_r
+      // _r1, _r2, _r3 same as statement_r
       for_statement_r.name("for statement");
       for_statement_r
         %= lit("for")
@@ -520,7 +538,7 @@ namespace stan {
         > lit("in")
         > range_r(_r2)
         > lit(')')
-        > statement_r(_r1,_r2)
+        > statement_r(_r1,_r2,_r3)
         > eps 
         [remove_loop_identifier_f(_a,boost::phoenix::ref(var_map_))];
       ;
@@ -600,12 +618,14 @@ namespace stan {
                                      boost::phoenix::ref(var_map_),
                                      boost::phoenix::ref(error_msgs_))]
         ;
+
       distribution_r.name("distribution and parameters");
       distribution_r
         %= ( identifier_r
              >> lit('(')
              >> -(expression_g(_r1) % ',') )
-        > lit(')');
+        > lit(')')
+        ;
 
       truncation_range_r.name("range pair");
       truncation_range_r
@@ -614,13 +634,16 @@ namespace stan {
         > -expression_g(_r1)
         > lit(',')
         > -expression_g(_r1)
-        > lit(']');
+        > lit(']')
+        ;
 
       return_statement_r.name("return statement");
       return_statement_r
         %= lit("return")
         >> expression_g(_r1)
-        >> lit(';');
+        >> lit(';') [ validate_return_allowed_f(_r2,_pass,
+                                                boost::phoenix::ref(error_msgs_)) ]
+        ;
 
       no_op_statement_r.name("no op statement");
       no_op_statement_r 
