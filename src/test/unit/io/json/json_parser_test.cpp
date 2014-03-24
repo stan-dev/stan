@@ -1,9 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <stan/io/json/json_error.hpp>
-#include <stan/io/json/json_handler.hpp>
-#include <stan/io/json/json_parser.hpp>
-
+#include <stan/io/json.hpp>
 
 class recording_handler : public stan::json::json_handler {
 public:
@@ -380,6 +377,17 @@ TEST(ioJson,jsonParserErr12b) {
 TEST(ioJson,jsonParserErr12c) {
   test_exception("[ \"a\", ",
                  "unexpected end of stream\n");
+}
+
+
+TEST(ioJson,jsonParserErr12d) {
+  test_exception("{ \"a\" : 5 ] }",
+                 "expecting end of object } or separator ,\n");
+}
+
+TEST(ioJson,jsonParserErr12e) {
+  test_exception("{ \"a\" : [ 5 ] ] }",
+                 "expecting end of object } or separator ,\n");
 }
 
 TEST(ioJson,jsonParserErr13) {

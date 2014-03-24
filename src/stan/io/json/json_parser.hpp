@@ -1,5 +1,5 @@
-#ifndef STAN__IO__JSON__JSON_PARSER_HPP__
-#define STAN__IO__JSON__JSON_PARSER_HPP__
+#ifndef __STAN__IO__JSON__JSON_PARSER_HPP__
+#define __STAN__IO__JSON__JSON_PARSER_HPP__
 
 #include <stdexcept>
 #include <iostream>
