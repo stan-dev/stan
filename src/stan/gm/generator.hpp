@@ -4121,7 +4121,7 @@ namespace stan {
         }
         out << ">" << EOL;
       }
-      out << INDENT << "static inline" << EOL;
+      out << INDENT << "inline" << EOL;
       out << INDENT;
       generate_bare_type(fun.return_type_,scalar_t_name,out);
       out << EOL;
@@ -4138,7 +4138,7 @@ namespace stan {
       }
       out << ")";
       if (fun.body_.is_no_op_statement()) {
-        out << ";" << EOL;
+        out << ";" << EOL2;
         // add to list of declarations already
       } else {
         // don't add to function signatures until defined
@@ -4170,6 +4170,7 @@ namespace stan {
       generate_start_namespace(model_name,out);
       generate_usings(out);
       generate_typedefs(out);
+      generate_functions(prog.function_decl_defs_,out);
       generate_class_decl(model_name,out);
       generate_private_decl(out);
       generate_member_var_decls(prog.data_decl_,1,out);
@@ -4177,7 +4178,6 @@ namespace stan {
       generate_public_decl(out);
       generate_constructor(prog,model_name,out);
       generate_destructor(model_name,out);
-      generate_functions(prog.function_decl_defs_,out);
       // generate_set_param_ranges(prog.parameter_decl_,out);
       generate_init_method(prog.parameter_decl_,out);
       generate_log_prob(prog,out);

@@ -1,6 +1,10 @@
 #ifndef STAN__GM__PARSER__FUNCTIONS__GRAMMAR_DEF__HPP__
 #define STAN__GM__PARSER__FUNCTIONS__GRAMMAR_DEF__HPP__
 
+#include <set>
+#include <utility>
+#include <vector>
+
 #include <boost/spirit/include/qi.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>
@@ -42,17 +46,79 @@ namespace stan {
 
   namespace gm {
 
-    struct add_function_signature {
-      template <typename T1>
+    struct validate_declarations {
+      template <typename T1, typename T2, typename T3, typename T4>
       struct result { typedef void type; };
-      void operator()(const function_decl_def& decl) const {
+      void operator()(bool& pass,
+                      std::set<std::pair<std::string, 
+                                         function_signature_t> >& declared,
+                      std::set<std::pair<std::string, 
+                                         function_signature_t> >& defined,
+                      std::ostream& error_msgs) const {
+        using std::set;
+        using std::string;
+        using std::pair;
+        typedef set<pair<string, function_signature_t> >::iterator iterator_t;
+        for (iterator_t it = declared.begin(); it != declared.end(); ++it) {
+          if (defined.find(*it) == defined.end()) {
+            error_msgs <<"Function declared, but not defined."
+                       << " Function name=" << (*it).first
+                       << std::endl;
+            pass = false;
+            return;
+          }
+        }
+        pass = true;
+      }
+    };
+    boost::phoenix::function<validate_declarations> validate_declarations_f;
+
+    struct add_function_signature {
+      template <typename T1, typename T2, typename T3, typename T4, typename T5>
+      struct result { typedef void type; };
+      void operator()(const function_decl_def& decl,
+                      bool& pass,
+                      std::set<std::pair<std::string, 
+                                         function_signature_t> >& functions_declared,
+                      std::set<std::pair<std::string, 
+                                         function_signature_t> >& functions_defined,
+                      std::ostream& error_msgs) const {
+
+        // build up representations
         expr_type result_type(decl.return_type_.base_type_,
                               decl.return_type_.num_dims_);
         std::vector<expr_type> arg_types;
         for (size_t i = 0; i < decl.arg_decls_.size(); ++i)
           arg_types.push_back(expr_type(decl.arg_decls_[i].arg_type_.base_type_,
                                         decl.arg_decls_[i].arg_type_.num_dims_));
-        function_signatures::instance().add(decl.name_,result_type,arg_types);
+        function_signature_t sig(result_type, arg_types);
+        std::pair<std::string, function_signature_t> name_sig(decl.name_, sig);
+        
+        // check that not already declared if just declaration
+        if (decl.body_.is_no_op_statement()
+            && functions_declared.find(name_sig) != functions_declared.end()) {
+          error_msgs << "Parse Error.  Function already declared, name=" << decl.name_;
+          pass = false;
+          return;
+        }
+
+        // check not already defined
+        if (functions_defined.find(name_sig) != functions_defined.end()) {
+          error_msgs << "Parse Error.  Function already defined, name=" << decl.name_;
+          pass = false;
+          return;
+        }
+
+        // add declaration in local sets and in parser function sigs
+        if (functions_declared.find(name_sig) == functions_declared.end()) {
+            functions_declared.insert(name_sig);
+            function_signatures::instance().add(decl.name_,result_type,arg_types);
+        }
+        
+        // add as definition if there's a body
+        if (!decl.body_.is_no_op_statement())
+          functions_defined.insert(name_sig);
+        pass = true;
       }
     };
     boost::phoenix::function<add_function_signature> add_function_signature_f;
@@ -105,6 +171,8 @@ namespace stan {
                                                  std::stringstream& error_msgs)
       : functions_grammar::base_type(functions_r),
         var_map_(var_map),
+        functions_declared_(),
+        functions_defined_(),
         error_msgs_(error_msgs),
         statement_g(var_map_,error_msgs_),
         bare_type_g(var_map_,error_msgs_)
@@ -132,7 +200,10 @@ namespace stan {
         %= lit("functions") 
         >> lit('{')
         >> *function_r
-        >> lit('}')
+        >> lit('}')[ validate_declarations_f(_pass, 
+                                             boost::phoenix::ref(functions_declared_),
+                                             boost::phoenix::ref(functions_defined_),
+                                             boost::phoenix::ref(error_msgs_) ) ]
         ;
       
       function_r.name("function declaration or definition");
@@ -145,7 +216,10 @@ namespace stan {
         >> statement_g(false,local_origin)
         >> eps [ unscope_variables_f(_val,
                                      boost::phoenix::ref(var_map_)) ]
-        >> eps [ add_function_signature_f(_val) ]
+        >> eps [ add_function_signature_f(_val,_pass,
+                                          boost::phoenix::ref(functions_declared_),
+                                          boost::phoenix::ref(functions_defined_),
+                                          boost::phoenix::ref(error_msgs_) ) ]
         ;
       
       arg_decls_r.name("function argument declaration sequence");

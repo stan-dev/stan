@@ -1,6 +1,7 @@
 #ifndef STAN__GM__PARSER__FUNCTIONS_GRAMMAR_HPP__
 #define STAN__GM__PARSER__FUNCTIONS_GRAMMAR_HPP__
 
+#include <set>
 #include <string>
 #include <sstream>
 #include <vector>
@@ -24,6 +25,11 @@ namespace stan {
 
       // global info for function defs
       variable_map& var_map_;
+      std::set<std::pair<std::string, 
+                         function_signature_t> > functions_declared_;
+      std::set<std::pair<std::string, 
+                         function_signature_t> > functions_defined_;
+
       std::stringstream& error_msgs_;
       
       // grammars

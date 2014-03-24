@@ -78,6 +78,10 @@ namespace stan {
                 size_t num_dims); 
       bool operator==(const expr_type& et) const;
       bool operator!=(const expr_type& et) const;
+      bool operator<(const expr_type& et) const;
+      bool operator<=(const expr_type& et) const;
+      bool operator>(const expr_type& et) const;
+      bool operator>=(const expr_type& et) const;
       bool is_primitive() const;
       bool is_primitive_int() const;
       bool is_primitive_double() const;
