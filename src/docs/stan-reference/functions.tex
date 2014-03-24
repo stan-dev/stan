@@ -1650,6 +1650,16 @@ The quadratic form, i.e., \code{B'~*~A~*~B}.}
 \fitem{real}{quad\_form}{matrix \farg{A}, vector \farg{B}}{
 The quadratic form, i.e., \code{B'~*~A~*~B}.}
 %
+\fitem{matrix}{quad\_form\_diag}{matrix \farg{m}, vector \farg{v}}
+  {The quadratic form using the column vector
+  \farg{v} as a diagonal matrix, i.e.,
+  \code{diag\_matrix(\farg{v})~*~\farg{m}~*~diag\_matrix(\farg{v})}.}
+%
+\fitem{matrix}{quad\_form\_diag}{matrix \farg{m}, row\_vector \farg{rv}}
+  {The quadratic form using the row vector
+  \farg{rv} as a diagonal matrix, i.e.,
+  \code{diag\_matrix(\farg{rv})~*~\farg{m}~*~diag\_matrix(\farg{rv})}.}
+%
 \fitem{real}{trace\_quad\_form}{matrix \farg{A}, matrix \farg{B}}{ 
 The trace of the quadratic form, i.e., \code{trace(B'~*~A~*~B)}.}
 %
