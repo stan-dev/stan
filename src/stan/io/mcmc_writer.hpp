@@ -10,7 +10,7 @@
 #include <stan/mcmc/sample.hpp>
 #include <stan/model/prob_grad.hpp>
 
-#include <stan/common/io/as_csv.hpp>
+#include <stan/common/recorder/csv.hpp>
 
 namespace stan {
   
@@ -30,7 +30,7 @@ namespace stan {
       SampleRecorder sample_recorder_;
       DiagnosticRecorder diagnostic_recorder_;
       std::ostream* msg_stream_;
-      stan::common::io::as_csv msg_recorder_;
+      stan::common::recorder::csv msg_recorder_;
       
     public:
       
@@ -51,7 +51,7 @@ namespace stan {
         : sample_recorder_(sample_recorder),
           diagnostic_recorder_(diagnostic_recorder),
           msg_stream_(msg_stream),
-          msg_recorder_(stan::common::io::as_csv(msg_stream, "")) {
+          msg_recorder_(stan::common::recorder::csv(msg_stream, "")) {
       }
       
       /**

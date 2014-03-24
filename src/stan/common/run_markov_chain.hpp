@@ -34,8 +34,8 @@ namespace stan {
         init_s = sampler->transition(init_s);
           
         if ( save && ( (m % num_thin) == 0) ) {
-          writer.print_sample_params(base_rng, init_s, *sampler, model);
-          writer.print_diagnostic_params(init_s, sampler);
+          writer.write_sample_params(base_rng, init_s, *sampler, model);
+          writer.write_diagnostic_params(init_s, sampler);
         }
 
       }

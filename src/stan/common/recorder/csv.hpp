@@ -1,17 +1,17 @@
-#ifndef __STAN__COMMON__IO__AS_CSV_HPP__
-#define __STAN__COMMON__IO__AS_CSV_HPP__
+#ifndef __STAN__COMMON__RECORDER__CSV_HPP__
+#define __STAN__COMMON__RECORDER__CSV_HPP__
 
 #include <ostream>
 #include <string>
 
 namespace stan {
   namespace common {
-    namespace io {
+    namespace recorder {
       
       /**
        * Writes out a vector as string.
        */
-      class as_csv {
+      class csv {
       private:
         std::ostream *o_;
         const bool has_stream_;
@@ -23,7 +23,7 @@ namespace stan {
          *
          * @param o pointer to stream. Will accept 0.
          */
-        as_csv(std::ostream *o, std::string prefix) 
+        csv(std::ostream *o, std::string prefix) 
           : o_(o), has_stream_(o != 0), prefix_(prefix) { }
       
         /**
