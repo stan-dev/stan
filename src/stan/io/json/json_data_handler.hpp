@@ -14,8 +14,7 @@
 #include <stan/io/var_context.hpp>
 #include <stan/io/json/json_error.hpp>
 #include <stan/io/json/json_parser.hpp>
-#include <stan/io/json/json_data_handler.hpp>
-
+#include <stan/io/json/json_handler.hpp>
 
 namespace stan {
 
@@ -79,7 +78,8 @@ namespace stan {
       json_data_handler(vars_map_r& vars_r, vars_map_i& vars_i) : 
         json_handler(), vars_r_(vars_r), vars_i_(vars_i), 
         key_(), values_r_(), values_i_(), 
-        dims_(), dims_verify_(), dims_unknown_(), dim_idx_(), is_int_() {
+        dims_(), dims_verify_(), dims_unknown_(), 
+        dim_idx_(), is_int_() {
       }
 
       void start_text() {
@@ -87,18 +87,19 @@ namespace stan {
         vars_i_.clear();
         vars_r_.clear();
         reset();
-        std::cout << "is_init: " << is_init() << std::endl;
       }
 
       void end_text() {
         std::cout << "end_text" << std::endl;
-        std::cout << "vars_i_ size: " << vars_i_.size() << std::endl;
-        std::cout << "vars_r_ size: " << vars_r_.size() << std::endl;
         reset(); 
       }
 
       void start_array() {
         std::cout << "start_array" << std::endl;
+        if (0 == key_.size()) {
+          throw json_error("expecting JSON object, found array");
+        }
+        //        std::cout << "begin dim_idx: " << dim_idx_ << " num dims: " << dims_.size() << std::endl;
         if (dim_idx_ > 0) incr_dim_size();
         dim_idx_++;
         if (dims_.size() < dim_idx_) {
@@ -108,26 +109,38 @@ namespace stan {
         } else {
           dims_verify_[dim_idx_-1] = 0;
         }
+        //        std::cout << "end dim_idx: " << dim_idx_ << " num dims: " << dims_.size() << std::endl;
+        //        std::cout.flush();
       }
 
       void end_array() {
         std::cout << "end_array" << std::endl;
-        if (dims_[dim_idx_-1] == 0)
-          throw json_error("empty array not allowed");
+        //        std::cout << "begin dim_idx: " << dim_idx_ << " num dims: " << dims_.size() << std::endl;
+        if (dims_[dim_idx_-1] == 0) {
+          std::stringstream errorMsg;
+          errorMsg << "variable: " << key_ << ", error: empty array not allowed";
+          throw json_error(errorMsg.str());
+        }
         if (dims_unknown_[dim_idx_-1] == true) {
           dims_unknown_[dim_idx_-1] = false;
         } else if (dims_verify_[dim_idx_-1] != dims_[dim_idx_-1]) {
-          throw json_error("non-rectangular array");
+          std::stringstream errorMsg;
+          errorMsg << "variable: " << key_ << ", error: non-rectangular array";
+          throw json_error(errorMsg.str());
         }
         dim_idx_--;
+        //        std::cout << "end dim_idx: " << dim_idx_ << " num dims: " << dims_.size() << std::endl;
+        //        std::cout.flush();
       }
 
       void start_object() {
         std::cout << "start_object" << std::endl;
-        if (!is_init())
-          throw json_error("no nested objects allowed");
+        if (!is_init()) {
+          std::stringstream errorMsg;
+          errorMsg << "variable: " << key_ << ", error: nested objects not allowed";
+          throw json_error(errorMsg.str());
+        }
       }
-
 
       void end_object() {
         std::cout << "end_object" << std::endl;
@@ -137,12 +150,16 @@ namespace stan {
 
       void null() {
         std::cout << "null literal" << std::endl;
-        throw json_error("null values not allowed");
+        std::stringstream errorMsg;
+        errorMsg << "variable: " << key_ << ", error: null values not allowed";
+        throw json_error(errorMsg.str());
       }
 
       void boolean(bool p) {
         std::cout << "bool literal" << std::endl;
-        throw json_error("boolean values not allowed");
+        std::stringstream errorMsg;
+        errorMsg << "variable: " << key_ << ", error: boolean values not allowed";
+        throw json_error(errorMsg.str());
       }
 
       void string(const std::string& s) {
@@ -152,24 +169,24 @@ namespace stan {
           tmp = -std::numeric_limits<double>::infinity();
         } else if (0 == s.compare("inf")) {
           tmp = std::numeric_limits<double>::infinity();
-        } else
-          throw json_error("boolean values not allowed");
+        } else {
+          std::stringstream errorMsg;
+          errorMsg << "variable: " << key_ << ", error: string values not allowed";
+          throw json_error(errorMsg.str());
+        }
         if (is_int_) {
-          for (std::vector<int>::iterator it = values_i_.begin(); 
-               it != values_i_.end(); ++it)
+          for (std::vector<int>::iterator it = values_i_.begin(); it != values_i_.end(); ++it)
             values_r_.push_back(*it);
-          values_r_.push_back(tmp);
         }
         is_int_ = false;
+        values_r_.push_back(tmp);
         incr_dim_size();
       }
 
       void key(const std::string& key) {
         std::cout << "key: " << key << std::endl;
-        if (!is_init()) {
-          save_current_key_value_pair();
-          reset();
-        }
+        save_current_key_value_pair();
+        reset();
         key_ = key;
       }
 
@@ -219,7 +236,17 @@ namespace stan {
       }
 
       void save_current_key_value_pair() {
+        if (0 == key_.size()) return;  // json object is empty?
+
         std::cout << "save key_: " << key_ << std::endl;
+        // redefinition or variables not allowed
+        if (vars_r_.find(key_) != vars_r_.end()
+            || vars_i_.find(key_) != vars_i_.end()) {
+            std::stringstream errorMsg;
+            errorMsg << "attempt to redefine variable: " << key_;
+            throw json_error(errorMsg.str());
+        }
+
         if (is_int_) {
           std::pair<std::vector<int>, 
                     std::vector<size_t> > pair = make_pair(values_i_, dims_);
