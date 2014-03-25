@@ -129,6 +129,9 @@ namespace stan {
       void operator()(function_decl_def& decl,
                       bool& pass,
                       std::ostream& error_msgs) const {
+        pass = decl.body_.is_no_op_statement()
+          || stan::gm::returns_type(decl.return_type_, decl.body_, 
+                                    error_msgs);
       }
     };
     boost::phoenix::function<validate_return_type> validate_return_type_f;

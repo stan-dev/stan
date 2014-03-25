@@ -365,11 +365,98 @@ namespace stan {
     }
 
     function_decl_defs::function_decl_defs() { }
-    function_decl_defs::function_decl_defs(const std::vector<function_decl_def>& decl_defs)
+    function_decl_defs::function_decl_defs(const std::vector<function_decl_def>& 
+                                           decl_defs)
       : decl_defs_(decl_defs) { 
     }
 
-    
+    returns_type_vis::returns_type_vis(const expr_type& return_type,
+                                       std::ostream& error_msgs) 
+      : return_type_(return_type),
+        error_msgs_(error_msgs) {
+    }
+    bool returns_type_vis::operator()(const nil& st) const {
+      error_msgs_ << "Expecting return, found nil statement." 
+                 << std::endl;
+      return false;
+    }
+    bool returns_type_vis::operator()(const assignment& st) const {
+      error_msgs_ << "Expecting return, found assignment statement." 
+                 << std::endl;
+      return false;
+    }
+    bool returns_type_vis::operator()(const sample& st) const {
+      error_msgs_ << "Expecting return, found sampling statement." 
+                 << std::endl;
+      return false;
+    }
+    bool returns_type_vis::operator()(const 
+                                      increment_log_prob_statement& t) const {
+      error_msgs_ << "Expecting return, found increment_log_prob statement." 
+                 << std::endl;
+      return false;
+    }
+    bool returns_type_vis::operator()(const expression& st) const  {
+      error_msgs_ << "Expecting return, found increment_log_prob statement." 
+                 << std::endl;
+      return false;
+    }
+    bool returns_type_vis::operator()(const print_statement& st) const  {
+      error_msgs_ << "Expecting return, found print statement." 
+                 << std::endl;
+      return false;
+    }
+    bool returns_type_vis::operator()(const no_op_statement& st) const  {
+      error_msgs_ << "Expecting return, found no_op statement." 
+                 << std::endl;
+      return false;
+    }
+    // recursive cases
+    bool returns_type_vis::operator()(const statements& st) const  {
+      // last statement in sequence must return type
+      if (st.statements_.size() == 0) {
+        error_msgs_ << ( "Expecting return, found"
+                         " statement sequence with empty body." )
+                    << std::endl;
+        return false;
+      }
+      return returns_type(return_type_, st.statements_.back(), error_msgs_);
+    }
+    bool returns_type_vis::operator()(const for_statement& st) const  {
+      // body must end in appropriate return
+      return returns_type(return_type_, st.statement_, error_msgs_);
+    }
+    bool returns_type_vis::operator()(const while_statement& st) const  {
+      // body must end in appropriate return
+      return returns_type(return_type_, st.body_, error_msgs_);
+    }
+    bool returns_type_vis::operator()(const 
+                                      conditional_statement& st) const  {
+      // all condition bodies must end in appropriate return
+      if (st.bodies_.size() != (st.conditions_.size() + 1)) {
+        error_msgs_ << ( "Expecting return, found conditional"
+                         " without final else.")
+                    << std::endl;
+        return false;
+      }
+      for (size_t i = 0; i < st.bodies_.size(); ++i)
+        if (!returns_type(return_type_, st.bodies_[i], error_msgs_))
+          return false;
+      return true;
+    }
+    bool returns_type_vis::operator()(const return_statement& st) const  {
+      // return checked for type
+      return is_assignable(return_type_, st.return_value_.expression_type(),
+                           "Returned expression does not match return type",
+                           error_msgs_);
+    }
+
+    bool returns_type(const expr_type& return_type,
+                      const statement& statement,
+                      std::ostream& error_msgs) {
+      returns_type_vis vis(return_type,error_msgs);
+      return boost::apply_visitor(vis,statement.statement_);
+    }
     
 
 
@@ -1190,6 +1277,31 @@ namespace stan {
         && s[n-3] == 'r'
         && s[n-4] == '_';
     }
+
+    bool is_assignable(const expr_type& l_type,
+                       const expr_type& r_type,
+                       const std::string& failure_message,
+                       std::ostream& error_msgs) {
+      bool assignable = true;
+      if (l_type.num_dims_ != r_type.num_dims_) {
+        assignable = false;
+        error_msgs << "Mismatched array dimensions.";
+      }
+      if (l_type.base_type_ != r_type.base_type_
+          && (! (l_type.base_type_ == DOUBLE_T && r_type.base_type_ == INT_T))) {
+        assignable = false;
+        error_msgs << "Base type mismatch. ";
+      }
+      if (!assignable)
+        error_msgs << failure_message
+                   << std::endl
+                   << "    LHS type = " << l_type
+                   << "; RHS type = " << r_type
+                   << std::endl;
+      return assignable;
+    }
+
+
 
 
   }

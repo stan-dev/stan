@@ -1553,7 +1553,7 @@ namespace stan {
         size_t indent = has_local_vars ? (indent_ + 1) : indent_;
         if (has_local_vars) {
           generate_indent(indent_,o_);
-          o_ << "{" << EOL;  // need brackets for scope
+          o_ << "{" << EOL;
           generate_local_var_decls(x.local_decl_,indent,o_,
                                    is_var_,is_fun_return_);
           generate_local_var_init_nan(x.local_decl_,indent,o_,
@@ -1645,7 +1645,7 @@ namespace stan {
                             bool include_sampling,
                             bool is_var,
                             bool is_fun_return) {
-      statement_visgen vis(indent,include_sampling,is_var,is_fun_return,o);
+      statement_visgen vis(indent,include_sampling,is_var,is_fun_return, o);
       boost::apply_visitor(vis,s.statement_);
     }
 
@@ -4137,22 +4137,22 @@ namespace stan {
         }
       }
       out << ")";
+
       if (fun.body_.is_no_op_statement()) {
         out << ";" << EOL2;
-        // add to list of declarations already
-      } else {
-        // don't add to function signatures until defined
-        out << " {" << EOL;
-        out << INDENT2 
+        return;
+      } 
+
+      out << " {" << EOL;
+      out << INDENT2 
           << "typedef " << scalar_t_name << " return_t__;"
           << EOL;
-        bool is_var = false;
-        bool is_fun_return = true;
-        generate_statement(fun.body_,2,out,false,is_var,
-                           is_fun_return);
-        out << INDENT << "}" 
-            << EOL2;
-      }
+      bool is_var = false;
+      bool is_fun_return = true;
+      generate_statement(fun.body_,2,out,false,is_var,
+                         is_fun_return);
+      out << INDENT << "}" 
+          << EOL2;
     }
 
     void generate_functions(const std::vector<function_decl_def>& funs,

@@ -629,6 +629,30 @@ namespace stan {
       bool operator()(const return_statement& st) const;
     };
     
+
+    struct returns_type_vis : public boost::static_visitor<bool> {
+      expr_type return_type_;
+      std::ostream& error_msgs_;
+      returns_type_vis(const expr_type& return_type,
+                       std::ostream& error_msgs);
+      bool operator()(const nil& st) const;
+      bool operator()(const assignment& st) const;
+      bool operator()(const sample& st) const;
+      bool operator()(const increment_log_prob_statement& t) const;
+      bool operator()(const expression& st) const;
+      bool operator()(const statements& st) const;
+      bool operator()(const for_statement& st) const;
+      bool operator()(const conditional_statement& st) const;
+      bool operator()(const while_statement& st) const;
+      bool operator()(const print_statement& st) const;
+      bool operator()(const no_op_statement& st) const;
+      bool operator()(const return_statement& st) const;
+    };
+
+    bool returns_type(const expr_type& return_type,
+                      const statement& statement,
+                      std::ostream& error_msgs);
+
     struct increment_log_prob_statement {
       expression log_prob_;
       increment_log_prob_statement();
@@ -789,6 +813,11 @@ namespace stan {
 
     bool has_non_param_var(const expression& e,
                            const variable_map& var_map);
+
+    bool is_assignable(const expr_type& l_type,
+                       const expr_type& r_type,
+                       const std::string& failure_message,
+                       std::ostream& error_msgs);
 
 
   }
