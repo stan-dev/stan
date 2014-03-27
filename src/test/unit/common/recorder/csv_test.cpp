@@ -3,9 +3,9 @@
 #include <sstream>
 #include <vector>
 
-class StanCommonIo : public ::testing::Test {
+class StanCommonRecorder : public ::testing::Test {
 public:
-  StanCommonIo() :
+  StanCommonRecorder() :
     prefix("prefix"),
     recorder(&ss, prefix) { }
   
@@ -23,7 +23,7 @@ public:
 
 
 
-TEST_F(StanCommonIo, csv_vector_double) {
+TEST_F(StanCommonRecorder, csv_vector_double) {
   ASSERT_EQ("", ss.str());
   std::vector<double> x;
   std::string expected;
@@ -53,7 +53,7 @@ TEST_F(StanCommonIo, csv_vector_double) {
   EXPECT_EQ(expected, ss.str());
 }
 
-TEST_F(StanCommonIo, csv_vector_string) {
+TEST_F(StanCommonRecorder, csv_vector_string) {
   ASSERT_EQ("", ss.str());
   
   std::vector<std::string> y;
@@ -72,7 +72,7 @@ TEST_F(StanCommonIo, csv_vector_string) {
   EXPECT_EQ(expected, ss.str());
 }
 
-TEST_F(StanCommonIo, csv_string) {
+TEST_F(StanCommonRecorder, csv_string) {
   ASSERT_EQ("", ss.str());
   std::string x;
   std::string expected;
@@ -83,7 +83,7 @@ TEST_F(StanCommonIo, csv_string) {
   EXPECT_EQ(expected, ss.str());
 }
 
-TEST_F(StanCommonIo, csv_noargs) {
+TEST_F(StanCommonRecorder, csv_noargs) {
   ASSERT_EQ("", ss.str());
   
   recorder();
@@ -93,7 +93,7 @@ TEST_F(StanCommonIo, csv_noargs) {
   EXPECT_EQ("\n\n", ss.str());
 }
 
-TEST_F(StanCommonIo, csv_is_recording) {
+TEST_F(StanCommonRecorder, csv_is_recording) {
   EXPECT_TRUE(recorder.is_recording());
   
   stan::common::recorder::csv null_recorder(0, "");
