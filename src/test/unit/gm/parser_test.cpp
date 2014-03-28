@@ -414,3 +414,7 @@ TEST(gmParserStatementGrammarDef, comparisonsInBoundsTest) {
   EXPECT_THROW(is_parsable("src/test/test-models/reference/gm/bad_bounds1.stan"),
                std::invalid_argument);
 }
+
+TEST(parserFunctions, good_test) {
+  test_parsable("validate_functions"); // tests proper definitions and use
+}

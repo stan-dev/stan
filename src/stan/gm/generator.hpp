@@ -5,6 +5,7 @@
 #include <boost/lexical_cast.hpp>
 
 #include <cstddef>
+#include <iostream>
 #include <ostream>
 #include <sstream>
 #include <stdexcept>
@@ -189,6 +190,8 @@ namespace stan {
         }
         if (has_rng_suffix(fx.name_))
           o_ << ", base_rng__";
+        if (has_lp_suffix(fx.name_))
+          o_ << ", lp__, lp_accum__";
         o_ << ')';
       }
       void operator()(const binary_op& expr) const {
@@ -4094,15 +4097,23 @@ namespace stan {
       out << " " << decl.name_;
     }
 
-    std::string return_type(size_t num_args) {
-      if (num_args == 0)
+    std::string return_scalar_type(size_t num_args, bool is_lp) {
+      // nullary, non-lp
+      if (num_args == 0 && !is_lp)
         return "double";
+
+      // need template metaprogram to construct return
       std::stringstream ss;
       ss << "typename boost::math::tools::promote_args<";
       for (size_t i = 0; i < num_args; ++i) {
         if (i > 0) 
           ss << ", ";
         ss << "T" << i << "__";
+      }
+      if (is_lp) {
+        if (num_args > 0)
+          ss << ", ";
+        ss << "T_lp";
       }
       ss << ">::type";
       return ss.str();
@@ -4111,21 +4122,42 @@ namespace stan {
     void generate_function(const function_decl_def& fun,
                            std::ostream& out) {
       // promoted scalar type for return and intermediate vars
-      std::string scalar_t_name = return_type(fun.arg_decls_.size());
+      // ends_with defined in ast.hpp
+      bool is_rng = ends_with("_rng", fun.name_);
+      bool is_lp = ends_with("_lp", fun.name_);
+      std::string scalar_t_name 
+        = return_scalar_type(fun.arg_decls_.size(), is_lp);
+
+      // template parameters
       if (fun.arg_decls_.size() > 0) {
         out << INDENT << "template <";
         for (size_t i = 0; i < fun.arg_decls_.size(); ++i) {
           if (i > 0) 
             out << ", ";
           out << "typename T" << i << "__";
+          if (is_rng)
+            out << ", class RNG";
+          else if (is_lp)
+            out << ", typename T_lp, typename T_lp_accum";
         }
         out << ">" << EOL;
+      } else if (is_rng) {
+        // nullary RNG case
+        out << "template <class RNG>" << EOL;
+      } else if (is_lp) {
+        out << "template <typename T_lp>" << EOL;
       }
+
+      // return
       out << INDENT << "inline" << EOL;
       out << INDENT;
       generate_bare_type(fun.return_type_,scalar_t_name,out);
       out << EOL;
+
+      // name
       out << INDENT << fun.name_;
+
+      // arguments
       out << "(";
       for (size_t i = 0; i < fun.arg_decls_.size(); ++i) {
         std::string template_type_i = "T" + std::to_string(i) + "__";
@@ -4135,14 +4167,22 @@ namespace stan {
           for (int i = 0; i <= fun.name_.size(); ++i)
             out << " ";
         }
+        if ((is_rng || is_lp) && fun.arg_decls_.size() > 0)
+          out << ", ";
+        if (is_rng)
+          out << "RNG& base_rng__";
+        else if (is_lp)
+          out << "T_lp& lp__, T_lp_accum& lp_accum__";
       }
       out << ")";
 
+      // no-op body
       if (fun.body_.is_no_op_statement()) {
         out << ";" << EOL2;
         return;
       } 
 
+      // standard body
       out << " {" << EOL;
       out << INDENT2 
           << "typedef " << scalar_t_name << " return_t__;"

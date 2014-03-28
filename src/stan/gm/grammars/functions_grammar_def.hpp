@@ -46,6 +46,26 @@ namespace stan {
 
   namespace gm {
 
+    struct set_allows_sampling {
+      template <typename T1, typename T2, typename T3>
+      struct result { typedef void type; };
+      void operator()(const std::string& identifier,
+                      bool& allow_sampling,
+                      int& origin) const {
+        if (ends_with("_lp", identifier)) {
+          allow_sampling = true;
+          origin = function_argument_origin_lp;
+        } else if (ends_with("_rng", identifier)) {
+          allow_sampling = false;
+          origin = function_argument_origin_rng;
+        } else {
+          allow_sampling = false;
+          origin = function_argument_origin;
+        }
+      }
+    };
+    boost::phoenix::function<set_allows_sampling> set_allows_sampling_f;
+
     struct validate_declarations {
       template <typename T1, typename T2, typename T3, typename T4>
       struct result { typedef void type; };
@@ -136,11 +156,22 @@ namespace stan {
     };
     boost::phoenix::function<validate_return_type> validate_return_type_f;
 
+    struct scope_lp {
+      template <typename T1>
+      struct result { typedef void type; };
+      void operator()(variable_map& vm) const {
+        vm.add("lp__", DOUBLE_T, local_origin);
+      }
+    };
+    boost::phoenix::function<scope_lp> scope_lp_f;
+    
+
     struct unscope_variables {
       template <typename T1, typename T2>
       struct result { typedef void type; };
       void operator()(function_decl_def& decl,
                       variable_map& vm) const {
+        vm.remove("lp__");
         for (size_t i = 0; i < decl.arg_decls_.size(); ++i)
           vm.remove(decl.arg_decls_[i].name_);
       }
@@ -200,6 +231,7 @@ namespace stan {
       using boost::spirit::qi::_val;
 
       using boost::spirit::qi::labels::_a;
+      using boost::spirit::qi::labels::_b;
       using boost::spirit::qi::labels::_r1;
       using boost::spirit::qi::labels::_r2;
 
@@ -218,16 +250,16 @@ namespace stan {
                                              boost::phoenix::ref(functions_defined_),
                                              boost::phoenix::ref(error_msgs_) ) ]
         ;
-      
+      // locals: _a = allow sampling, _b = origin (function, rng/lp)
       function_r.name("function declaration or definition");
       function_r
         %= bare_type_g
-        >> identifier_r
+        >> identifier_r[ set_allows_sampling_f(_1,_a,_b) ]
         >> lit('(')
         >> arg_decls_r
         >> lit(')')
-           // false=no sampling; local_origin = all vars local; true=allow returns
-        >> statement_g(false,local_origin,true) 
+        >> eps [ scope_lp_f(boost::phoenix::ref(var_map_)) ]
+        >> statement_g(_a,_b,true)
         >> eps [ unscope_variables_f(_val,
                                      boost::phoenix::ref(var_map_)) ]
         >> eps [ validate_return_type_f(_val,_pass,
@@ -253,10 +285,9 @@ namespace stan {
 
       identifier_r.name("identifier");
       identifier_r
-        %= (lexeme[char_("a-zA-Z") 
-                   >> *char_("a-zA-Z0-9_.")]);
+        %= lexeme[char_("a-zA-Z") 
+                   >> *char_("a-zA-Z0-9_.")];
 
-      
     }
 
   }

@@ -858,8 +858,12 @@ namespace stan {
         o << "local";
       else if (vo == function_argument_origin)
         o << "function argument";
+      else if (vo == function_argument_origin_lp)
+        o << "function argument '_lp' suffixed";
+      else if (vo == function_argument_origin_rng)
+        o << "function argument '_rng' suffixed";
       else 
-        o << "UNKNOWN ORIGIN";
+        o << "UNKNOWN ORIGIN=" << vo;
     }
 
 
@@ -1278,6 +1282,14 @@ namespace stan {
         && s[n-4] == '_';
     }
 
+    bool has_lp_suffix(const std::string& s) {
+      int n = s.size();
+      return n > 3
+        && s[n-1] == 'p'
+        && s[n-2] == 'l'
+        && s[n-3] == '_';
+    }
+
     bool is_assignable(const expr_type& l_type,
                        const expr_type& r_type,
                        const std::string& failure_message,
@@ -1302,7 +1314,12 @@ namespace stan {
     }
 
 
-
+    bool ends_with(const std::string& suffix, 
+                   const std::string& s) {
+      size_t idx = s.rfind(suffix);
+      return idx != std::string::npos
+        && idx == (s.size() - suffix.size());
+    }
 
   }
 }

@@ -104,8 +104,39 @@ namespace stan {
                                                                     arg_types,
                                                                     error_msgs);
 
-        pass = !has_rng_suffix(fun.name_) || var_origin == derived_origin;
-        if (fun.name_ == "abs"
+        if (has_rng_suffix(fun.name_)) {  
+          if (!( var_origin == derived_origin
+                 || var_origin == function_argument_origin_rng )) {
+            error_msgs << "random number generators only allowed in"
+                       << " generated quantities block or"
+                       << " user-defined functions with names ending in _rng"
+                       << "; found function=" << fun.name_
+                       << " in block=";
+          print_var_origin(error_msgs,var_origin);
+          error_msgs << std::endl;
+          pass = false;
+          return;
+          }
+        }
+
+        if (has_lp_suffix(fun.name_)) {
+          if (!( var_origin == parameter_origin
+                 || var_origin == transformed_parameter_origin
+                 || var_origin == function_argument_origin
+                 || var_origin == local_origin )) {
+            error_msgs << "lp suffixed functions only allowed in"
+                       << " transformed parameter, function argument, or model"
+                       << " blocks;  found function=" << fun.name_ 
+                       << " in block=";
+            print_var_origin(error_msgs,var_origin);
+            error_msgs << std::endl;
+            pass = false;
+            return;
+          }
+        }
+
+        if (fun.name_ == "abs" 
+            && fun.args_.size() > 0 
             && fun.args_[0].expression_type().is_primitive_double()) {
           error_msgs << "Warning: Function abs(real) is deprecated."
                      << std::endl
@@ -114,16 +145,6 @@ namespace stan {
                      << "         Use fabs(real) instead."
                      << std::endl << std::endl;
         }
-
-
-        if (!pass) {
-          error_msgs << "random number generators only allowed in generated quantities block"
-                     << "; found function=" << fun.name_
-                     << " in block=";
-          print_var_origin(error_msgs,var_origin);
-          error_msgs << std::endl;
-        }
-
         fun_result = fun;
       }
     };

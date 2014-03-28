@@ -382,7 +382,8 @@ namespace stan {
     const int derived_origin = 5;
     const int local_origin = 6;
     const int function_argument_origin = 7;
-
+    const int function_argument_origin_lp = 8;
+    const int function_argument_origin_rng = 9;
 
     void print_var_origin(std::ostream& o, const var_origin& vo);
 
@@ -777,6 +778,7 @@ namespace stan {
     void generate_expression(const expression& e, std::ostream& o);
 
     bool has_rng_suffix(const std::string& s);
+    bool has_lp_suffix(const std::string& s);
 
 
     struct contains_var : public boost::static_visitor<bool> {
@@ -819,6 +821,9 @@ namespace stan {
                        const std::string& failure_message,
                        std::ostream& error_msgs);
 
+
+    bool ends_with(const std::string& suffix, 
+                   const std::string& s);
 
   }
 }
