@@ -12,6 +12,7 @@
 #include <stan/version.hpp>
 #include <stan/io/cmd_line.hpp>
 #include <stan/io/dump.hpp>
+#include <stan/io/json.hpp>
 #include <stan/io/mcmc_writer.hpp>
 
 #include <stan/gm/arguments/argument_parser.hpp>
@@ -117,7 +118,7 @@ namespace stan {
       
       std::fstream data_stream(data_file.c_str(),
                                std::fstream::in);
-      stan::io::dump data_var_context(data_stream);
+      stan::json::json_data data_var_context(data_stream);
       data_stream.close();
       
       // Sample output

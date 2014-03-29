@@ -26,16 +26,16 @@ void test_int_var(stan::json::json_data& jdata,
                   const std::string& name,
                   const std::vector<int>& expected_vals,
                   const std::vector<long unsigned int>& expected_dims) {
-  std::cout << "json: " << text << std::endl;
-  std::cout << "int var name: " << name << std::endl;
+  // std::cout << "json: " << text << std::endl;
+  // std::cout << "int var name: " << name << std::endl;
   EXPECT_EQ(true,jdata.contains_i(name));
   std::vector<long unsigned int> dims = jdata.dims_i(name);
   EXPECT_EQ(expected_dims.size(),dims.size());
-  for (int i = 0; i<dims.size(); i++) 
+  for (size_t i = 0; i<dims.size(); i++) 
     EXPECT_EQ(expected_dims[i],dims[i]);
   std::vector<int> vals = jdata.vals_i(name);
   EXPECT_EQ(expected_vals.size(),vals.size());
-  for (int i = 0; i<vals.size(); i++) 
+  for (size_t i = 0; i<vals.size(); i++) 
     EXPECT_EQ(expected_vals[i],vals[i]);
 }
 
@@ -44,16 +44,16 @@ void test_real_var(stan::json::json_data& jdata,
                   const std::string& name,
                   const std::vector<double>& expected_vals,
                   const std::vector<long unsigned int>& expected_dims) {
-  std::cout << "json: " << text << std::endl;
-  std::cout << "real var name: " << name << std::endl;
+  // std::cout << "json: " << text << std::endl;
+  // std::cout << "real var name: " << name << std::endl;
   EXPECT_EQ(true,jdata.contains_r(name));
   std::vector<long unsigned int> dims = jdata.dims_r(name);
   EXPECT_EQ(expected_dims.size(),dims.size());
-  for (int i = 0; i<dims.size(); i++) 
+  for (size_t i = 0; i<dims.size(); i++) 
     EXPECT_EQ(expected_dims[i],dims[i]);
   std::vector<double> vals = jdata.vals_r(name);
   EXPECT_EQ(expected_vals.size(),vals.size());
-  for (int i = 0; i<vals.size(); i++) 
+  for (size_t i = 0; i<vals.size(); i++) 
     EXPECT_EQ(expected_vals[i],vals[i]);
 }
 
@@ -64,8 +64,6 @@ void test_exception(const std::string& input,
     std::stringstream s(input);
     stan::json::json_data jdata(s);
   } catch (const std::exception& e) {
-    std::cout << "e.what: " << e.what() << std::endl;
-    std::cout << "expect: " << exception_text << std::endl;
     EXPECT_EQ(e.what(), exception_text);
     return;
   }
@@ -303,6 +301,21 @@ TEST(ioJson,jsonData_array_err3) {
 TEST(ioJson,jsonData_array_err4) {
   std::string txt = "{ \"foo\" : [[[]]] }";
   test_exception(txt,"variable: foo, error: empty array not allowed");
+}
+
+TEST(ioJson,jsonData_array_err5) {
+  std::string txt = "{ \"foo\" : [1, 2, 3, 4, [5], 6, 7] }";
+  test_exception(txt,"variable: foo, error: non-scalar array value");
+}
+
+TEST(ioJson,jsonData_array_err6) {
+  std::string txt = "{ \"foo\" : [[1], 2, 3, 4, 5, 6, 7] }";
+  test_exception(txt,"variable: foo, error: non-rectangular array");
+}
+
+TEST(ioJson,jsonData_array_err7) {
+  std::string txt = "{ \"foo\" : [1, 2, 3, 4, 5, 6, [7]] }";
+  test_exception(txt,"variable: foo, error: non-scalar array value");
 }
 
 

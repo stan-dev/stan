@@ -42,10 +42,11 @@ namespace stan {
       std::string key_;
       std::vector<double> values_r_;
       std::vector<int> values_i_;
-      std::vector<long unsigned int> dims_;
-      std::vector<long unsigned int> dims_verify_;
+      std::vector<size_t> dims_;
+      std::vector<size_t> dims_verify_;
       std::vector<bool> dims_unknown_;
-      unsigned int dim_idx_;
+      size_t dim_idx_;
+      size_t dim_last_;
       bool is_int_;
 
       void reset() {
@@ -56,6 +57,7 @@ namespace stan {
         dims_verify_.clear();
         dims_unknown_.clear();
         dim_idx_ = 0;
+        dim_last_ = 0;
         is_int_ = true;
       }
 
@@ -67,40 +69,42 @@ namespace stan {
                 && dims_verify_.size() == 0
                 && dims_unknown_.size() == 0
                 && dim_idx_ == 0
+                && dim_last_ == 0
                 && is_int_);
       }
 
 
     public:
-
-      // constructor has member initialization list
-      // first call superclass constructor
       json_data_handler(vars_map_r& vars_r, vars_map_i& vars_i) : 
         json_handler(), vars_r_(vars_r), vars_i_(vars_i), 
         key_(), values_r_(), values_i_(), 
         dims_(), dims_verify_(), dims_unknown_(), 
-        dim_idx_(), is_int_() {
+        dim_idx_(), dim_last_(), is_int_() {
       }
 
       void start_text() {
-        std::cout << "start_text" << std::endl;
+        // std::cout << "start_text" << std::endl;
         vars_i_.clear();
         vars_r_.clear();
         reset();
       }
 
       void end_text() {
-        std::cout << "end_text" << std::endl;
+        // std::cout << "end_text" << std::endl;
         reset(); 
       }
 
       void start_array() {
-        std::cout << "start_array" << std::endl;
+        // std::cout << "start_array" << std::endl;
         if (0 == key_.size()) {
           throw json_error("expecting JSON object, found array");
         }
-        //        std::cout << "begin dim_idx: " << dim_idx_ << " num dims: " << dims_.size() << std::endl;
-        if (dim_idx_ > 0) incr_dim_size();
+        if (dim_idx_ > 0 && dim_last_ == dim_idx_) {
+            std::stringstream errorMsg;
+            errorMsg << "variable: " << key_ << ", error: non-scalar array value";
+            throw json_error(errorMsg.str());
+          }
+        incr_dim_size();
         dim_idx_++;
         if (dims_.size() < dim_idx_) {
           dims_.push_back(0);
@@ -109,13 +113,10 @@ namespace stan {
         } else {
           dims_verify_[dim_idx_-1] = 0;
         }
-        //        std::cout << "end dim_idx: " << dim_idx_ << " num dims: " << dims_.size() << std::endl;
-        //        std::cout.flush();
       }
 
       void end_array() {
-        std::cout << "end_array" << std::endl;
-        //        std::cout << "begin dim_idx: " << dim_idx_ << " num dims: " << dims_.size() << std::endl;
+        // std::cout << "end_array" << std::endl;
         if (dims_[dim_idx_-1] == 0) {
           std::stringstream errorMsg;
           errorMsg << "variable: " << key_ << ", error: empty array not allowed";
@@ -128,13 +129,14 @@ namespace stan {
           errorMsg << "variable: " << key_ << ", error: non-rectangular array";
           throw json_error(errorMsg.str());
         }
+        if (0 == dim_last_ 
+            && ((is_int_ && values_i_.size() > 0) || (values_r_.size() > 0))) 
+          dim_last_ = dim_idx_;
         dim_idx_--;
-        //        std::cout << "end dim_idx: " << dim_idx_ << " num dims: " << dims_.size() << std::endl;
-        //        std::cout.flush();
       }
 
       void start_object() {
-        std::cout << "start_object" << std::endl;
+        // std::cout << "start_object" << std::endl;
         if (!is_init()) {
           std::stringstream errorMsg;
           errorMsg << "variable: " << key_ << ", error: nested objects not allowed";
@@ -143,27 +145,27 @@ namespace stan {
       }
 
       void end_object() {
-        std::cout << "end_object" << std::endl;
+        // std::cout << "end_object" << std::endl;
         save_current_key_value_pair();
         reset(); 
       }
 
       void null() {
-        std::cout << "null literal" << std::endl;
+        // std::cout << "null literal" << std::endl;
         std::stringstream errorMsg;
         errorMsg << "variable: " << key_ << ", error: null values not allowed";
         throw json_error(errorMsg.str());
       }
 
       void boolean(bool p) {
-        std::cout << "bool literal" << std::endl;
+        // std::cout << "bool literal" << std::endl;
         std::stringstream errorMsg;
         errorMsg << "variable: " << key_ << ", error: boolean values not allowed";
         throw json_error(errorMsg.str());
       }
 
       void string(const std::string& s) {
-        std::cout << "string: " << s << std::endl;
+        // std::cout << "string: " << s << std::endl;
         double tmp;
         if (0 == s.compare("-inf")) {
           tmp = -std::numeric_limits<double>::infinity();
@@ -184,14 +186,15 @@ namespace stan {
       }
 
       void key(const std::string& key) {
-        std::cout << "key: " << key << std::endl;
+        // std::cout << "key: " << key << std::endl;
         save_current_key_value_pair();
         reset();
         key_ = key;
       }
 
       void number_double(double x) { 
-        std::cout << "double value: " << x << std::endl;
+        // std::cout << "double value: " << x << std::endl;
+        set_last_dim();
         if (is_int_) {
           for (std::vector<int>::iterator it = values_i_.begin(); 
                it != values_i_.end(); ++it)
@@ -203,7 +206,8 @@ namespace stan {
       }
 
       void number_long(long n) { 
-        std::cout << "long value: " << n << std::endl;
+        // std::cout << "long value: " << n << std::endl;
+        set_last_dim();
         if (is_int_) {
           values_i_.push_back(n);
         } else {
@@ -214,8 +218,8 @@ namespace stan {
       }
 
       void number_unsigned_long(unsigned long n) { 
-        std::cout << "ul value: " << n << std::endl;
-        std::cout.flush();
+        // std::cout << "ul value: " << n << std::endl;
+        set_last_dim();
         if (is_int_) {
           // check number in range?
           values_i_.push_back(n);
@@ -226,6 +230,37 @@ namespace stan {
         incr_dim_size();
       }
 
+      void save_current_key_value_pair() {
+        if (0 == key_.size()) return;  // json object is empty?
+
+        // std::cout << "save key_: " << key_ << std::endl;
+        // redefinition or variables not allowed
+        if (vars_r_.find(key_) != vars_r_.end()
+            || vars_i_.find(key_) != vars_i_.end()) {
+            std::stringstream errorMsg;
+            errorMsg << "attempt to redefine variable: " << key_;
+            throw json_error(errorMsg.str());
+        }
+        if (is_int_) {
+          std::pair<std::vector<int>, 
+                    std::vector<size_t> > pair = make_pair(values_i_, dims_);
+          vars_i_[key_] = pair;
+        } else {
+          vars_r_[key_]
+            = std::pair<std::vector<double>, 
+                        std::vector<size_t> >(values_r_, dims_);
+        }
+      }
+
+      void set_last_dim() {
+        if (dim_last_ > 0 && dim_idx_ < dim_last_) {
+          std::stringstream errorMsg;
+          errorMsg << "variable: " << key_ << ", error: non-rectangular array";
+          throw json_error(errorMsg.str());
+        }
+        dim_last_ = dim_idx_;
+      }
+
       void incr_dim_size() {
         if (dim_idx_ > 0) {
           if (dims_unknown_[dim_idx_-1])
@@ -234,34 +269,6 @@ namespace stan {
             dims_verify_[dim_idx_-1]++;
         }
       }
-
-      void save_current_key_value_pair() {
-        if (0 == key_.size()) return;  // json object is empty?
-
-        std::cout << "save key_: " << key_ << std::endl;
-        // redefinition or variables not allowed
-        if (vars_r_.find(key_) != vars_r_.end()
-            || vars_i_.find(key_) != vars_i_.end()) {
-            std::stringstream errorMsg;
-            errorMsg << "attempt to redefine variable: " << key_;
-            throw json_error(errorMsg.str());
-        }
-
-        if (is_int_) {
-          std::pair<std::vector<int>, 
-                    std::vector<size_t> > pair = make_pair(values_i_, dims_);
-          vars_i_[key_] = pair;
-
-          std::cout << "vars_i_ size: " << vars_i_.size() << std::endl;
-        } else {
-          vars_r_[key_]
-            = std::pair<std::vector<double>, 
-                        std::vector<size_t> >(values_r_, dims_);
-          std::cout << "vars_r_ size: " << vars_r_.size() << std::endl;
-        }
-        std::cout.flush();
-      }
-
 
     };
 

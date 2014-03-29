@@ -66,8 +66,7 @@ namespace stan {
       json_data(std::istream& in) : vars_r_(), vars_i_() {
         json_data_handler handler(vars_r_, vars_i_);
         stan::json::parse(in, handler);
-        std::cout << "parsed" << std::endl;
-        std::cout.flush();
+        //        std::cout << "parsed" << std::endl;
       }
 
       /**

@@ -232,7 +232,7 @@ namespace stan {
         }
 
         void get_chars(const std::string& s) {
-          for (int i = 0; i < s.size(); ++i) {
+          for (size_t i = 0; i < s.size(); ++i) {
             char c = get_char();
             if (c != s[i])
               throw json_exception("expecting rest of literal: " 
