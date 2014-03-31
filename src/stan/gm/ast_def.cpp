@@ -102,6 +102,9 @@ namespace stan {
     bool expr_type::is_ill_formed() const {
       return base_type_ == ILL_FORMED_T;
     }
+    bool expr_type::is_void() const {
+      return base_type_ == VOID_T;
+    }
     base_expr_type expr_type::type() const {
       return base_type_;
     }
@@ -446,9 +449,10 @@ namespace stan {
     }
     bool returns_type_vis::operator()(const return_statement& st) const  {
       // return checked for type
-      return is_assignable(return_type_, st.return_value_.expression_type(),
-                           "Returned expression does not match return type",
-                           error_msgs_);
+      return return_type_ == VOID_T
+        || is_assignable(return_type_, st.return_value_.expression_type(),
+                         "Returned expression does not match return type",
+                         error_msgs_);
     }
 
     bool returns_type(const expr_type& return_type,
@@ -862,6 +866,12 @@ namespace stan {
         o << "function argument '_lp' suffixed";
       else if (vo == function_argument_origin_rng)
         o << "function argument '_rng' suffixed";
+      else if (vo == void_function_argument_origin)
+        o << "void function argument";
+      else if (vo == void_function_argument_origin_lp)
+        o << "void function argument '_lp' suffixed";
+      else if (vo == void_function_argument_origin_rng)
+        o << "void function argument '_rng' suffixed";
       else 
         o << "UNKNOWN ORIGIN=" << vo;
     }

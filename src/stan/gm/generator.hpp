@@ -1469,7 +1469,9 @@ namespace stan {
         o_ << ");" << EOL;
       }
       void operator()(expression const& x) const {
-        throw std::invalid_argument("expression statements not yet supported");
+        generate_indent(indent_,o_);
+        generate_expression(x,o_);
+        o_ << ";" << EOL;
       }
       void operator()(sample const& x) const {
         if (!include_sampling_) return;
@@ -1589,7 +1591,9 @@ namespace stan {
       void operator()(const return_statement& rs) const {
         generate_indent(indent_,o_);
         o_ << "return ";
-        generate_expression(rs.return_value_, o_);
+        if (!rs.return_value_.expression_type().is_ill_formed()
+            && !rs.return_value_.expression_type().is_void())
+          generate_expression(rs.return_value_, o_);
         o_ << ";" << EOL;
       }
       void operator()(const for_statement& x) const {
@@ -4072,6 +4076,9 @@ namespace stan {
             << scalar_t_name
             << ", Eigen::Dynamic,Eigen::Dynamic>";
         is_template_type = true;
+        break;
+      case VOID_T:
+        out << "void";
         break;
       default:
         out << "UNKNOWN TYPE";

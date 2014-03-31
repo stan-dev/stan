@@ -83,10 +83,12 @@ namespace stan {
     struct validate_return_allowed {
       template <typename T1, typename T2, typename T3>
       struct result { typedef void type; };
-      void operator()(bool return_allowed,
+      void operator()(var_origin origin,
                       bool& pass,
                       std::ostream& error_msgs) const {
-        if (!return_allowed) {
+        if (origin != function_argument_origin
+            && origin != function_argument_origin_lp
+            && origin != function_argument_origin_rng) {
           error_msgs << "Returns only allowed from function bodies." << std::endl;
           pass = false;
           return;
@@ -95,6 +97,25 @@ namespace stan {
       }
     };
     boost::phoenix::function<validate_return_allowed> validate_return_allowed_f;
+
+    struct validate_void_return_allowed {
+      template <typename T1, typename T2, typename T3>
+      struct result { typedef void type; };
+      void operator()(var_origin origin,
+                      bool& pass,
+                      std::ostream& error_msgs) const {
+        if (origin != void_function_argument_origin
+            && origin != void_function_argument_origin_lp
+            && origin != void_function_argument_origin_rng) {
+          error_msgs << "Void returns only allowed from function bodies of void return type." 
+                     << std::endl;
+          pass = false;
+          return;
+        }
+        pass = true;
+      }
+    };
+    boost::phoenix::function<validate_void_return_allowed> validate_void_return_allowed_f;
 
 
     struct validate_assignment {
@@ -315,24 +336,28 @@ namespace stan {
       void operator()(bool& pass,
                       const stan::gm::expression& expr,
                       std::stringstream& error_msgs) const {
-        error_msgs << "Illegal statement beginning with expression parsed as"
-                   << std::endl << "  ";
-        generate_expression(expr.expr_,error_msgs);
-        error_msgs << std::endl
-           << "Not a legal assignment or sampling statement.  Note that"
-           << std::endl
-           << "  * Assignment statements only allow variables (with optional indexes) on the left;"
-           << std::endl
-           << "    if you see an outer function logical_lt (<) with negated (-) second argument,"
-           << std::endl
-           << "    it indicates an assignment statement A <- B with illegal left"
-           << std::endl
-           << "    side A parsed as expression (A < (-B))."
-           << std::endl
-           << "  * Sampling statements allow arbitrary value-denoting expressions on the left."
-           << std::endl
-           << std::endl << std::endl;
-        pass = false;
+        if (expr.expression_type() != VOID_T) {
+          error_msgs << "Illegal statement beginning with non-void expression parsed as"
+                     << std::endl << "  ";
+          generate_expression(expr.expr_,error_msgs);
+          error_msgs << std::endl
+                     << "Not a legal assignment or sampling statement.  Note that"
+                     << std::endl
+                     << "  * Assignment statements only allow variables (with optional indexes) on the left;"
+                     << std::endl
+                     << "    if you see an outer function logical_lt (<) with negated (-) second argument,"
+                     << std::endl
+                     << "    it indicates an assignment statement A <- B with illegal left"
+                     << std::endl
+                     << "    side A parsed as expression (A < (-B))."
+                     << std::endl
+                     << "  * Sampling statements allow arbitrary value-denoting expressions on the left."
+                     << std::endl
+                     << std::endl << std::endl;
+          pass = false;
+          return;
+        }
+        pass = true;
       }
     };
     boost::phoenix::function<expression_as_statement> expression_as_statement_f;
@@ -483,7 +508,8 @@ namespace stan {
         | while_statement_r(_r1,_r2,_r3)            // key "while"
         | statement_2_g(_r1,_r2,_r3)                // key "if"
         | print_statement_r(_r2)                    // key "print"
-        | return_statement_r(_r2,_r3)               // key "return"
+        | return_statement_r(_r1,_r2)               // key "return"
+        | void_return_statement_r(_r2)              // key "return"
         | assignment_r(_r2)                         // lvalue "<-"
         | sample_r(_r1,_r2)                         // expression "~"
         | expression_g(_r2)                         // expression
@@ -637,12 +663,21 @@ namespace stan {
         > lit(']')
         ;
 
+      // _r1 = allow sampling, _r2 = var origin
       return_statement_r.name("return statement");
       return_statement_r
         %= lit("return")
         >> expression_g(_r1)
         >> lit(';') [ validate_return_allowed_f(_r2,_pass,
                                                 boost::phoenix::ref(error_msgs_)) ]
+        ;
+
+      // _r1 = var origin
+      void_return_statement_r.name("void return statement");
+      void_return_statement_r
+        = lit("return")[_val = expression()]
+        >> lit(';') [ validate_void_return_allowed_f(_r1,_pass,
+                                                     boost::phoenix::ref(error_msgs_)) ]
         ;
 
       no_op_statement_r.name("no op statement");

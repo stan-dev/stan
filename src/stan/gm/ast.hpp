@@ -59,6 +59,7 @@ namespace stan {
 
     // forward declarable enum hack (can't fwd-decl enum)
     typedef int base_expr_type;
+    const int VOID_T = 0;
     const int INT_T = 1;
     const int DOUBLE_T = 2;
     const int VECTOR_T = 3;
@@ -85,6 +86,7 @@ namespace stan {
       bool is_primitive_int() const;
       bool is_primitive_double() const;
       bool is_ill_formed() const;
+      bool is_void() const;
       base_expr_type type() const;
       size_t num_dims() const;
     };
@@ -384,6 +386,9 @@ namespace stan {
     const int function_argument_origin = 7;
     const int function_argument_origin_lp = 8;
     const int function_argument_origin_rng = 9;
+    const int void_function_argument_origin = 10;
+    const int void_function_argument_origin_lp = 11;
+    const int void_function_argument_origin_rng = 12;
 
     void print_var_origin(std::ostream& o, const var_origin& vo);
 

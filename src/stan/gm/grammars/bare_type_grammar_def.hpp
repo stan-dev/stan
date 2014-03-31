@@ -67,7 +67,8 @@ namespace stan {
       
       type_identifier_r
         %= 
-        lit("int")[_val = INT_T]
+        lit("void")[_val = VOID_T]
+        | lit("int")[_val = INT_T]
         | lit("real")[_val = DOUBLE_T]
         | lit("vector")[_val = VECTOR_T]
         | lit("row_vector")[_val = ROW_VECTOR_T]

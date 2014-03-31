@@ -527,7 +527,14 @@ real relative_diff(real x, real y) {
 This declares \code{relative\_diff} to be a function that takes two
 real-valued argumnts and returns a real-valued result.
 
-
+For example, the \code{normal\_log} could be
+overloaded to produce a function implementing unit normal densities,
+%
+\begin{quote}
+\begin{Verbatim}
+real normal_log(real y) { return normal_log(y,0,1); }
+\end{Verbatim}
+\end{quote}
 
 \chapter{Regression Models}
 

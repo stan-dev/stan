@@ -1372,7 +1372,7 @@ denotes $2.7 \times 10^3$ and \code{-2E-5} denotes $-2 \times
 10^{-5}$.
 
 
-\section{Variables}
+\section{Variables}\label{variables.section}
 
 A variable by itself is a well-formed expression of the same type as
 the variable.  Variables in Stan consist of \ASCII strings containing
@@ -2102,11 +2102,6 @@ example, \code{row\_vector~*~vector} returns a value of type
 \code{real}, which is declared in the function documentation and index
 as \code{real~operator*(row\_vector,vector)}.
 
-% \subsection{Extending Stan with User-Defined Functions}
-
-% Stan enables users to add their own functions by defining appropriate
-% \Cpp functions and registering their signatures with the Stan
-% compiler.  Details are provided in \refappendix{user-defined-functions}.
 
 
 \section{Chain Rule and Derivatives}
@@ -2730,17 +2725,6 @@ all values within bounds.
 Stan does not (yet) support vectorization of distribution functions
 with truncation.
 
-% \subsection{User-Defined Distributions}
-
-% Users may add their own probability functions and cumulative
-% distribution by adding functions of the appropriate type.  If the
-% appropriate cumulative distribution is available to match a
-% probability function, truncated versions of that probability function
-% may be used. 
-
-% See \refappendix{user-defined-functions} for details on how to add
-% user-defined functions to Stan.
-
 
 \section{For Loops}
 
@@ -3169,80 +3153,160 @@ not-a-number of infinite values, both of which will be printed.
 
 
 
-\chapter{User-Defined Functions}\label{functions.chapter}
-
+\chapter{User-Defined Functions}\label{functions.chapter}%
+%
 \noindent
-Stan supports user-defined function definitions.  These appear in the
-functions block block before all of the other blocks.  Forward
-declarations are allowed in order to support recursive functions.
+Stan allows users to define their own functions.  The basic syntax is
+a simplified version of that used in C and \Cpp.
+
+\section{Function-Definition Block}
+
+User-defined functions appear in a special function-definition block
+before all of the other program blocks. 
+%
+\begin{quote}
+\begin{Verbatim}
+functions {
+   ... function declarations and definitions ...
+}
+data { 
+  ...
+\end{Verbatim}
+\end{quote}
+%
+Function definitions and declarations may appear in any order, subject
+to the condition that a function must be declared before it is used.
+Forward declarations are allowed in order to support recursive
+functions; see \refsection{function-overloading} for the precise rules
+governing declarations and definitions.
 
 \section{Function Names}
 
-The rules for function naming are like any other identifiers.
-Function arguments are ordered, but not named in Stan.
-All function arguments are mandatory.
+The rules for function naming and function-argument naming are the
+same as for other variables; see \refsection{variables} for more
+information on valid identifiers.  For example,
+%
+\begin{quote}
+\begin{Verbatim}
+real foo(real mu, real sigma);
+\end{Verbatim}
+\end{quote}
+%
+declares a function named \code{foo} with two argument variables of
+types \code{real} and \code{real}.  The arguments are named \code{mu}
+and \code{sigma}, but that is not part of the declaration.  Two
+functions may have the same name if they have different sequences of
+argument types; see \refsection{function-overloading} for details.
 
-\section{Unsized Variable Types}
+\section{Calling Functions}
+
+All function arguments are mandatory---there are no default values
+(though see \refsection{function-overloading} for alternatives based
+on overloading).
+
+\subsection{Functions as Expressions}
+
+Functions with non-void return types are called just like any other
+built-in function in Stan---they are applied to appropriately typed
+arguments to produce an expression, which has a value when executed.
+
+\subsection{Functions as Statements}
+
+Functions with void return types may be applied to arguments and used
+as statements.  These act like sampling statements or print
+statements.  Such uses are only appropriate for functions that act
+through side effects, such as incrementing the log probability
+accumulator, printing, or raising exceptions.
+
+\subsection{Probability Functions in Sampling Stateme}
+
+Functions whose name ends in \code{\_log} may be used as probability
+functions and may be used in place of parameterized distributions on
+the right-hand-side of sampling statements.  
+
+\subsection{Restritions on Placement}
+
+Functions of certain types are restricted on scope of usage.
+Functions whose names end in \code{\_lp} assume access to the log
+probability accumulator and are only available in the transformed
+parameter and model blocks.  Functions whose names end in \code{\_rng}
+assume access to the random number generator and may only be used
+within the generated quantities block.  See \refsection{function-bodies} for more
+information on these two special types of function. 
+
+\section{Unsized Argument Types}
 
 Stan's functions all have declared types for both arguments and
-returned value.  Like Stan's built-in functions, Stan's functions are
-only declared for base argument type and dimensionality.
+returned value.  As with built-in functions, user-defined functions are
+only declared for base argument type and dimensionality.  This
+requires a different syntax than for declaring other variables.  The
+choice of language was made so that return types and argument types
+could use the same declaration syntax.
+
 
 \subsection{Base Variable Type Declaration}
 
 The base variable types are \code{integer}, \code{real},
 \code{vector}, \code{row\_vector}, and \code{matrix}.  No lower-bound
 or upper-bound constraints are allowed (e.g., \code{real<lower=0>} is
-illegal).  Specialized types (e.g., \code{simplex}) are also not
-allowed.
+illegal).  Specialized types are also not allowed (e.g.,
+\code{simplex} is illegal) .
 
 \subsection{Dimensionality Declaration}
 
 Arguments and return types may be arrays, and these are indicated with
 optional brackets and commas as would be used for indexing.  For
 example, \code{int} denotes a single integer argument or return,
-whereas \code{real[]} indicates a one-dimensional array of reals,
-\code{real[,]} a two-dimensional array and \code{real[,,]} a
-three-dimensional array.  
+whereas \code{real[\,]} indicates a one-dimensional array of reals,
+\code{real[\,,\,]} a two-dimensional array and \code{real[\,,\,,\,]} a
+three-dimensional array; whitespace is optional, as usual.  
 
 The dimensions for vectors and matrices are not included, so that
 \code{matrix} is the type of a single matrix argument or return type.
-Matrices implicitly have two indexing dimensions.  The type
-\code{matrix[,]} is a two-dimensional array of matrices, for a total
-of four indexing dimensions.
+Thus if a variable is declared as \code{matrix a}, then \code{a} has
+two indexing dimensions, so that \code{a[1]} is a row vector and
+\code{a[1,1]} a real value.  Matrices implicitly have two indexing
+dimensions.  The type declaration \code{matrix[,]~b} specifies that
+\code{b} is a two-dimensional array of matrices, for a total of four
+indexing dimensions, with \code{b[1,1,1,1]} picking out a real value.
 
 
-\section{Function Bodies}
+\section{Function Bodies}\label{function-bodies.section}
 
 The body of a function is bounded by curly braces (\code{\{} and
-\code{\}}) and may contain local variable declarations at the top as
-in any other block of statements.  
+\code{\}}).  The body may contain local variable declarations at the
+top of the function body's block and these scope the same way as local
+variables used in any other statement block.
 
-The only restrictions on statements in function bodies are external.  
+The only restrictions on statements in function bodies are external,
+and determine whether the log probability accumulator or random
+number generators are available;  see the rest of this section for details.
 
 \subsection{Random Number Generating Functions}
 
-Functions that use random number generators internally must have a
-name that ends in \code{\_rng};  attempts to use random-number
-generators in other functions leads to a compile-time error.
+Functions that call random number generating functions in their bodies
+must have a name that ends in \code{\_rng}; attempts to use
+random-number generators in other functions leads to a compile-time
+error. 
 
-Like other random number generating functions, functions with names
-that end in \code{\_rng} may only be used in the generated quantities
-block.   An attempt to use such a function elsewhere results in a
-compile-time error.
+Like other random number generating functions, user-defined functions
+with names that end in \code{\_rng} may be used only in the generated
+quantities block.  An attempt to use such a function elsewhere results
+in a compile-time error.
 
 \subsection{Log Probability Access in Functions}
 
 Functions that include sampling statements or log probability
 increment statements must have a name that ends in \code{\_lp}.
 Attempts to use sampling statements or increment log probability
-statements in otehr functions leads to a compile-time error.
+statements in other functions leads to a compile-time error.
 
-Like other log probability access, functions with names that end in
-\code{\_lp} may only be used in blocks where the log probability
-accumulator is accessible, namely the transformed parameters and model
-blocks.  An attempt to use such a function elsewhere results in a
-compile-time error.
+Like the \code{increment\_log\_prob} statement and sampling
+statements, user-defined functions with names that end in \code{\_lp}
+may only be used in blocks where the log probability accumulator is
+accessible, namely the transformed parameters and model blocks.  An
+attempt to use such a function elsewhere results in a compile-time
+error.
 
 \subsection{Definining Probability Functions for Sampling Statements}
 
@@ -3250,29 +3314,81 @@ Functions whose names end in \code{\_log} can be used as probability
 functions in sampling statements.  As with the built-in functions, the
 first argument will appear on the left of the sampling
 statement operator (\Verb|~|) in the sampling statement and the other
-arguments follow.
+arguments follow.  For example, with a function declared with signature
+%
+\begin{quote}
+\begin{Verbatim}
+real foo_log(real y, vector theta);
+\end{Verbatim}
+\end{quote}
+%
+allows the use of 
+%
+\begin{quote}
+\begin{Verbatim}
+real z;
+vector[K] phi;
+...
+z ~ foo(phi);
+\end{Verbatim}
+\end{quote}
+%
+to have the exact same effect as
+%
+\begin{quote}
+\begin{Verbatim}
+increment_log_prob(foo_log(z,phi);
+\end{Verbatim}
+\end{quote}
+%
+so that functions that are going to be accessed as distributions
+should be defined on the log scale.
 
+Unlike built-in probability functions, user-defined probability
+functions like the example \code{foo} above will not automatically
+drop constant terms.
+
+\section{Parameters are Constant}
+
+Within function definition bodies, the parameters may be used like any
+other variable.  But the parameters are constant in the sense that
+they can't be assigned to (i.e., can't appear on the left side of an
+assignment (\code{<-}) statement.  In other words, their value remains
+constant throughout the function body.  Attempting to assign a value
+to a function parameter value will raise a compile-time error.%
+%
+\footnote{Despite being declared constant and appearing to have a
+  pass-by-value syntax in Stan, the implementation of the language
+  passes function arguments by constant reference in C++.}
+
+Local variables may be declared at the top of the function block and
+scope as usual.
 
 \section{Return Value}
 
-Functions must have a return statement that returns an appropriately
-typed expression.  If the expression in a return statement does not
-have the same type as the return type declared for the function, a
-compile-time error is raised.  
+Non-void functions must have a return statement that returns an
+appropriately typed expression.   If the expression in a return
+statement does not have the same type as the return type declared for
+the function, a compile-time error is raised.
+
+Void functions may use \code{return} only without an argument, but
+return statements are not mandatory.
 
 \subsection{Return Guarantee Required}
 
-Unlike C++, Stan enforces a syntactic guarantee that control will
-leave the function due to a return statement.  To enforce this,
+Unlike \Cpp, Stan enforces a syntactic guarantee for non-void
+functions that ensures control will leave a non-void function through
+an appropriately typed return statement or because an exception is
+raised in the execution of the function.  To enforce this condition,
 functions must have a return statement as the last statement in their
 body.  This notion of last is defined recursively in terms of
-qualifying statements, where as a base case,
+statements that qualify as bodies for functions.  The base case is that
 %
 \begin{itemize}
 \item a return statement qualifies,
 \end{itemize}
 %
-and where as recursive cases,
+and the recursive cases are that
 %
 \begin{itemize}
 \item a sequence of statements qualifies if its last statement
@@ -3329,13 +3445,37 @@ real fancy_log(real x) {
 because there's a default else clause and each condition body has
 return as its final statement.
 
-\section{Overloading}
 
-Stan allows function overloading, so that the same name function may
-be used for different numbers of arguments.  For instance, an
-overloaded unit-normal log density function might be declared with an
-overload of the function \code{unit\_normal\_log}, giving it three
-signatures with one argument each.
+\section{Void Functions as Statements}
+
+\subsection{Void Functions}
+
+A function can be declared without a return value by using \code{void}
+in place of a return type.
+
+\subsection{Usage as Statement}
+
+A void function may be used as a statement after the function is
+declared;  see \refsection{forward-declarations} for rules on declaration.
+
+Because there is no return, such a usage is only for side effects,
+such as incrementing the log probability function, printing, or
+raising an error.
+
+\subsection{Special Return Statements}
+
+In a return statement within a void function's definition, the
+\code{return} keyword is followed immediately by a semicolon
+(\code{;}) rather than by the expression whose value is returned.
+
+
+\section{Overloading}\label{function-overloading.section}
+
+Stan allows function overloading, where two functions have the same
+name.  For example, an overloaded unit-normal log density function
+might be declared with an overload of the function
+\code{unit\_normal\_log}, giving it three signatures with one argument
+each.
 %
 \begin{quote}
 \begin{Verbatim}
@@ -3345,15 +3485,52 @@ real unit_normal_log(row_vector y);
 \end{Verbatim}
 \end{quote}
 %
-The sequence of arguments must be distinct for each overload; it is
-illegal to declare two functions with the same name and argument type
-sequence and different return types.
+The sequence of argument types must be distinct for each distinct
+function; attempting to declare two functions with the same name
+and argument type sequence will cause a compile-time error, even if
+the return types or argument names are different.  For instance, it
+would not be possible to add the following declaration to those
+above. 
+%
+\begin{quote}
+\begin{Verbatim}
+vector unit_normal_log(vector y);
+\end{Verbatim}
+\end{quote}
 
-\section{Forward Declarations}
+
+\subsection{Overloading for Defaults}
+
+In order to write functions with default values, the function must be
+overloaded; see \refsection{function-overloading} for more on
+overloading.  Overloading comes with no guarantees that the overloaded
+functions all share an underlying implementation.   For example, the function
+\code{unit\_normal\_log} above could've just been named
+\code{normal\_log} and used to overload the regular normal function
+with default parameter values (0 location and 1 scale).
+
+Functions are not called using named arguments, the options for
+defaults are more limited than with named arguments in languages such
+as R.  For example, it would not be possible to define two
+two-argument normal density functions, one of which specified a
+location and one of which specified a scale, 
+%
+\begin{quote}
+\begin{Verbatim}
+real normal_log(real y, real mu);
+real normal_log(real y, real sigma); // illegal 
+\end{Verbatim}
+\end{quote}
+%
+because they have the same argument-type sequence, (\code{real},
+\code{real}).
+
+
+\section{Declarations}\label{forward-declarations.section}
 
 In general, functions must be declared before they are used.  Stan
-supports forward declarations in terms of function definitions without
-bodies.  For example,
+supports forward declarations, which look like function definitions
+without bodies.  For example,
 %
 \begin{quote}
 \begin{Verbatim}
@@ -3361,10 +3538,10 @@ real unit_normal_log(real y);
 \end{Verbatim}
 \end{quote}
 %
-is a function declaration that declares a function named
-\code{unit\_normal\_log} that consumes a single real-valued input and
-produces a real-valued output.  A function definition with a body
-simultaneously declares and defines the named function, as in
+declares a function named \code{unit\_normal\_log} that consumes a
+single real-valued input and produces a real-valued output.  A
+function definition with a body simultaneously declares and defines
+the named function, as in
 %
 \begin{quote}
 \begin{Verbatim}
@@ -3374,7 +3551,6 @@ real unit_normal_log(real y) {
 \end{Verbatim}
 \end{quote}
 %
-
 
 A user-defined Stan function may be declared and then later defined,
 or just defined without being declared.  No other combination of
@@ -3462,7 +3638,7 @@ skeletal Stan program.
 \begin{quote}
 \begin{Verbatim} 
 functions {
-  ... function definitions ...
+  ... function declarations and definitions ...
 }
 data { 
   ... declarations ...
@@ -3485,6 +3661,18 @@ generated quantities {
 \end{Verbatim}
 \end{quote}
 %
+The function-definition block contains user-defined functions.  The
+data block declares the required data for the model.  The transformed
+data block allows the definition of constants and transforms of the
+data.  The parameters block declares the model's parameters --- the
+unconstrained version of the parameters is what's sampled or
+optimized.  The transformed parameters block allows variables to be
+defined in terms of data and parameters that may be used later and
+will be saved.  The model block is where the log probability function
+is defined.  The generated quantities block allows derived quantities
+based on parameters, data, and optionally (pseudo) random number
+generation.
+
 
 \subsection{Optionality and Ordering}
 
@@ -4079,7 +4267,7 @@ var_decls_statements ::= '{' var_decl* statement* '}'
 funtion_decl ::= unsized_type identifier '(' unsized_types ')' statement
 
 unsized_types ::= unsized_type % ','
-unsized_type ::= basic_type ?unsized_dims
+unsized_type ::= 'void' | (basic_type ?unsized_dims)
 basic_type ::= 'int' | 'real' | 'vector' | 'row_vector' | 'matrix'
 unsized_dims ::= '['  ','*  ']'
 \end{Verbatim}
@@ -4158,7 +4346,8 @@ statement ::= atomic_statement | nested_statement
 atomic_statement ::= atomic_statement_body ';'
 atomic_statement_body
 ::=  lhs '<-' expression
-   | expression '~' identifier '(' ?expressions ')' ?truncation
+   | expression '~' identifier '(' expressions ')' ?truncation
+   | function_literal '(' expressions ')'
    | 'increment_log_prob '(' expression ')'
    | 'print' '(' (expression | string_literal)* ')'
    | 'return' expression

@@ -46,25 +46,52 @@ namespace stan {
 
   namespace gm {
 
-    struct set_allows_sampling {
+    struct set_void_function {
+      template <typename T1, typename T2, typename T3, typename T4>
+      struct result { typedef void type; };
+      void operator()(const expr_type& return_type,
+                      var_origin& origin,
+                      bool& pass,
+                      std::ostream& error_msgs) const {
+        if (return_type.is_void() && return_type.num_dims() > 0) {
+          error_msgs << "Void return type may not have dimensions declared."
+                     << std::endl;
+          pass = false;
+          return;
+        }
+        origin = return_type.is_void()
+          ? void_function_argument_origin 
+          : function_argument_origin;
+      }
+    };
+    boost::phoenix::function<set_void_function> set_void_function_f;
+
+    struct set_allows_sampling_origin {
       template <typename T1, typename T2, typename T3>
       struct result { typedef void type; };
       void operator()(const std::string& identifier,
                       bool& allow_sampling,
                       int& origin) const {
+        bool is_void_function_origin = (origin == void_function_argument_origin);
         if (ends_with("_lp", identifier)) {
           allow_sampling = true;
-          origin = function_argument_origin_lp;
+          origin = is_void_function_origin
+            ? void_function_argument_origin_lp
+            : function_argument_origin_lp;
         } else if (ends_with("_rng", identifier)) {
           allow_sampling = false;
-          origin = function_argument_origin_rng;
+          origin = is_void_function_origin
+            ? void_function_argument_origin_rng
+            : function_argument_origin_rng;
         } else {
           allow_sampling = false;
-          origin = function_argument_origin;
+          origin = is_void_function_origin
+            ? void_function_argument_origin
+            : function_argument_origin;
         }
       }
     };
-    boost::phoenix::function<set_allows_sampling> set_allows_sampling_f;
+    boost::phoenix::function<set_allows_sampling_origin> set_allows_sampling_origin_f;
 
     struct validate_declarations {
       template <typename T1, typename T2, typename T3, typename T4>
@@ -253,8 +280,9 @@ namespace stan {
       // locals: _a = allow sampling, _b = origin (function, rng/lp)
       function_r.name("function declaration or definition");
       function_r
-        %= bare_type_g
-        >> identifier_r[ set_allows_sampling_f(_1,_a,_b) ]
+        %= bare_type_g[ set_void_function_f(_1,_b, _pass, 
+                                            boost::phoenix::ref(error_msgs_)) ]
+        >> identifier_r[ set_allows_sampling_origin_f(_1,_a,_b) ]
         >> lit('(')
         >> arg_decls_r
         >> lit(')')

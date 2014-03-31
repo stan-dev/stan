@@ -87,10 +87,15 @@ namespace stan {
 
 
       boost::spirit::qi::rule<Iterator,
-                              return_statement(var_origin,bool),
+                              return_statement(bool,var_origin),
                               whitespace_grammar<Iterator> >
       return_statement_r;
 
+      boost::spirit::qi::rule<Iterator,
+                              return_statement(var_origin),
+                              whitespace_grammar<Iterator> >
+      void_return_statement_r;
+  
 
 
 
