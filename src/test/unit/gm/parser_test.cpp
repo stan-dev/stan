@@ -6,6 +6,8 @@
 #include <exception>
 #include <stdexcept>
 
+#include <boost/lexical_cast.hpp>
+
 #include <stan/gm/ast.hpp>
 #include <stan/gm/parser.hpp>
 #include <stan/gm/generator.hpp>
@@ -61,12 +63,6 @@ TEST(gm_parser,eight_schools) {
 TEST(gm_parser,bugs_1_kidney) {
   EXPECT_TRUE(is_parsable("src/models/bugs_examples/vol1/kidney/kidney.stan"));
 }
-/*TEST(gm_parser,bugs_1_leuk) {
-  EXPECT_TRUE(is_parsable("src/models/bugs_examples/vol1/leuk/leuk.stan"));
-  }*/
-/*TEST(gm_parser,bugs_1_leukfr) {
-  EXPECT_TRUE(is_parsable("src/models/bugs_examples/vol1/leukfr/leukfr.stan"));
-}*/
 TEST(gm_parser,bugs_1_mice) {
   EXPECT_TRUE(is_parsable("src/models/bugs_examples/vol1/mice/mice.stan"));
 }
@@ -170,10 +166,10 @@ TEST(gm_parser,parsable_test_bad4) {
   EXPECT_THROW(is_parsable("src/test/test-models/reference/gm/bad4.stan"),
                std::invalid_argument);
 }
-// TEST(gm_parser,parsable_test_bad5) {
-//    EXPECT_THROW(is_parsable("src/test/test-models/reference/gm/bad5.stan"),
-//                 std::invalid_argument);
-// }
+TEST(gm_parser,parsable_test_bad5) {
+  EXPECT_THROW(is_parsable("src/test/test-models/reference/gm/bad5.stan"),
+               std::invalid_argument);
+}
 
 TEST(gm_parser,parsable_test_bad6) {
   EXPECT_THROW(is_parsable("src/test/test-models/reference/gm/bad6.stan"),
@@ -226,41 +222,41 @@ TEST(gmParser,declareVarWithSameNameAsModel) {
   EXPECT_THROW(is_parsable("src/test/test-models/reference/gm/bad_model_name_var.stan"),
                std::invalid_argument);
 }
-// TEST(gm_parser,function_signatures) {
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/good_inf.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures1.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures6.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures7.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_bernoulli.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_beta.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_beta_binomial.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_binomial.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_categorical.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_cauchy.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_chi_square.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_dirichlet.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_double_exponential.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_exponential.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_gamma.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_hypergeometric.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_inv_chi_square.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_inv_gamma.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_logistic.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_lognormal.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_multinomial.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_neg_binomial.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_normal.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_ordered_logistic.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_pareto.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_poisson.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_scaled_inv_chi_square.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_student_t_0.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_student_t_1.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_student_t_2.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_student_t_3.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_uniform.stan"));
-//   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_weibull.stan"));
-// }
+TEST(gm_parser,function_signatures) {
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/good_inf.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures1.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures6.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures7.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_bernoulli.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_beta.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_beta_binomial.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_binomial.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_categorical.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_cauchy.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_chi_square.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_dirichlet.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_double_exponential.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_exponential.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_gamma.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_hypergeometric.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_inv_chi_square.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_inv_gamma.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_logistic.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_lognormal.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_multinomial.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_neg_binomial.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_normal.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_ordered_logistic.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_pareto.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_poisson.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_scaled_inv_chi_square.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_student_t_0.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_student_t_1.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_student_t_2.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_student_t_3.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_uniform.stan"));
+  EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_weibull.stan"));
+}
 
 
 void test_parsable(const std::string& model_name) {
@@ -284,15 +280,16 @@ void test_throws(const std::string& model_name, const std::string& error_msg) {
   try {
     is_parsable_folder(model_name, "reference", &msgs);
   } catch (const std::invalid_argument& e) {
-    if (std::string(e.what()).find_first_of(error_msg) == std::string::npos
-        && msgs.str().find_first_of(error_msg) == std::string::npos) {
-      std::cout << std::endl;
-      std::cout << "model name=" << model_name << std::endl;
-      std::cout << "expected error_msg=" << error_msg << std::endl;
-      std::cout << "found msg=" << msgs.str() << std::endl;
-      std::cout << "e.what()=" << e.what() << std::endl;
-      std::cout << std::endl;
-      EXPECT_TRUE(false);
+    if (std::string(e.what()).find(error_msg) == std::string::npos
+        && msgs.str().find(error_msg) == std::string::npos) {
+      std::cout << std::endl << "*********************************" << std::endl
+                << "model name=" << model_name << std::endl
+                << "*** EXPECTED: error_msg=" << error_msg << std::endl
+                << "*** FOUND: e.what()=" << e.what() << std::endl
+                << "*** FOUND: msgs.str()=" << msgs.str() << std::endl
+                << "*********************************" << std::endl
+                << std::endl;
+      FAIL();
     }
     return;
   }
@@ -368,39 +365,39 @@ TEST(gmParserVarDeclsGrammarDef, validateIntExpr) {
   test_parsable("validate_validate_int_expr_good");
   for (int i = 1; i <= 13; ++i) {
     std::string model_name("validate_validate_int_expr_bad");
-    model_name += i;
+    model_name += boost::lexical_cast<std::string>(i);
     test_throws(model_name,
                 "expression denoting integer required");
   }
 }
 TEST(gmParserVarDeclsGrammarDef, setIntRangeLower) {
   test_parsable("validate_set_int_range_lower_good");
-  test_throws("validate_set_int_range_lower_bad_1",
+  test_throws("validate_set_int_range_lower_bad1",
               "expression denoting integer required");
-  test_throws("validate_set_int_range_lower_bad_2",
+  test_throws("validate_set_int_range_lower_bad2",
               "expression denoting integer required");
-  test_throws("validate_set_int_range_lower_bad_3",
+  test_throws("validate_set_int_range_lower_bad3",
               "expression denoting integer required");
 }
 TEST(gmParserVarDeclsGrammarDef, setIntRangeUpper) {
   test_parsable("validate_set_int_range_upper_good");
-  test_throws("validate_set_int_range_upper_bad_1",
+  test_throws("validate_set_int_range_upper_bad1",
               "expression denoting integer required");
-  test_throws("validate_set_int_range_upper_bad_2",
+  test_throws("validate_set_int_range_upper_bad2",
               "expression denoting integer required");
 }
 TEST(gmParserVarDeclsGrammarDef, setDoubleRangeLower) {
   test_parsable("validate_set_double_range_lower_good");
-  test_throws("validate_set_double_range_lower_bad_1",
+  test_throws("validate_set_double_range_lower_bad1",
               "expression denoting real required");
-  test_throws("validate_set_double_range_lower_bad_2",
+  test_throws("validate_set_double_range_lower_bad2",
               "expression denoting real required");
 }
 TEST(gmParserVarDeclsGrammarDef, setDoubleRangeUpper) {
   test_parsable("validate_set_double_range_upper_good");
-  test_throws("validate_set_double_range_upper_bad_1",
+  test_throws("validate_set_double_range_upper_bad1",
               "expression denoting real required");
-  test_throws("validate_set_double_range_upper_bad_2",
+  test_throws("validate_set_double_range_upper_bad2",
               "expression denoting real required");
 }
 TEST(gmParserStatementGrammarDef, jacobianAdjustmentWarning) {
@@ -427,6 +424,6 @@ TEST(gmParserStatementGrammarDef, comparisonsInBoundsTest) {
 TEST(parserFunctions, good_test) {
   test_parsable("validate_functions"); // tests proper definitions and use
   test_parsable("functions-good1");
-  test_throws("functions-bad1",
-              "12345");
+  test_throws("functions-bad1","Function already declared");
+  test_throws("functions-bad2","Function declared, but not defined");
 }
