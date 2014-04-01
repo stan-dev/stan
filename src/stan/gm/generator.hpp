@@ -188,10 +188,13 @@ namespace stan {
           if (i > 0) o_ << ',';
           boost::apply_visitor(*this, fx.args_[i].expr_);
         }
+        if (fx.args_.size() > 0 
+            && (has_rng_suffix(fx.name_) || has_lp_suffix(fx.name_)))
+          o_ << ", ";
         if (has_rng_suffix(fx.name_))
-          o_ << ", base_rng__";
+          o_ << "base_rng__";
         if (has_lp_suffix(fx.name_))
-          o_ << ", lp__, lp_accum__";
+          o_ << "lp__, lp_accum__";
         o_ << ')';
       }
       void operator()(const binary_op& expr) const {
@@ -1301,7 +1304,6 @@ namespace stan {
       o << EOL;
       generate_comment("initialized transformed params to avoid seg fault on val access",
                        indent,o);
-      generate_indent(indent,o);
       for (size_t i = 0; i < vs.size(); ++i)
         boost::apply_visitor(vis,vs[i].decl_);
     }
@@ -4120,23 +4122,17 @@ namespace stan {
       if (is_lp) {
         if (num_args > 0)
           ss << ", ";
-        ss << "T_lp";
+        ss << "T_lp__";
       }
       ss << ">::type";
       return ss.str();
     }
 
-    void generate_function(const function_decl_def& fun,
-                           std::ostream& out) {
-      // promoted scalar type for return and intermediate vars
-      // ends_with defined in ast.hpp
-      bool is_rng = ends_with("_rng", fun.name_);
-      bool is_lp = ends_with("_lp", fun.name_);
-      bool is_log = ends_with("_log", fun.name_);
-      std::string scalar_t_name 
-        = return_scalar_type(fun.arg_decls_.size(), is_lp);
-
-      // template parameters
+    void generate_function_template_parameters(const function_decl_def& fun,
+                                               bool is_rng,
+                                               bool is_lp,
+                                               bool is_log,
+                                               std::ostream& out) {
       if (fun.arg_decls_.size() > 0) {
         out << INDENT << "template <";
         if (is_log)
@@ -4150,25 +4146,42 @@ namespace stan {
         if (is_rng)
           out << ", class RNG";
         else if (is_lp)
-          out << ", typename T_lp, typename T_lp_accum";
+          out << ", typename T_lp__, typename T_lp_accum__";
         out << ">" << EOL;
       } else {
         if (is_rng) {
           // nullary RNG case
-          out << "template <class RNG>" << EOL;
+          out << INDENT << "template <class RNG>" << EOL;
         } else if (is_lp) {
-          out << "template <typename T_lp, typename T_lp_accum>" << EOL;
+          out << INDENT << "template <typename T_lp__, typename T_lp_accum__>" 
+              << EOL;
+        } else if (is_log) {
+          out << INDENT << "template <bool propto>" 
+              << EOL;
         }
       }
-      // return
+    }
+
+    void generate_function_inline_return_type(const function_decl_def& fun,
+                                              const std::string& scalar_t_name,
+                                              std::ostream& out) {
       out << INDENT << "inline" << EOL;
       out << INDENT;
       generate_bare_type(fun.return_type_,scalar_t_name,out);
       out << EOL;
+    }
 
-      // name
+    void generate_function_name(const function_decl_def& fun,
+                                std::ostream& out) {
       out << INDENT << fun.name_;
+    }
 
+
+    void generate_function_arguments(const function_decl_def& fun,
+                                     bool is_rng,
+                                     bool is_lp,
+                                     bool is_log,
+                                     std::ostream& out) {
       // arguments
       out << "(";
       for (size_t i = 0; i < fun.arg_decls_.size(); ++i) {
@@ -4185,7 +4198,7 @@ namespace stan {
       if (is_rng)
         out << "RNG& base_rng__";
       else if (is_lp)
-        out << "T_lp& lp__, T_lp_accum& lp_accum__";
+        out << "T_lp__& lp__, T_lp_accum__& lp_accum__";
       out << ")";
 
       // no-op body
@@ -4193,8 +4206,12 @@ namespace stan {
         out << ";" << EOL2;
         return;
       } 
+    }
 
-      // standard body
+
+    void generate_function_body(const function_decl_def& fun,
+                                const std::string& scalar_t_name,
+                                std::ostream& out) {
       out << " {" << EOL;
       out << INDENT2 
           << "typedef " << scalar_t_name << " return_t__;"
@@ -4205,6 +4222,49 @@ namespace stan {
                          is_fun_return);
       out << INDENT << "}" 
           << EOL2;
+    }
+
+    void generate_propto_default_function_body(const function_decl_def& fun,
+                                               std::ostream& out) {
+      out << " {" << EOL;
+      out << INDENT2 << "return ";
+      out << fun.name_ << "<false>(";
+      for (size_t i = 0; i < fun.arg_decls_.size(); ++i) {
+        if (i > 0) 
+          out << ",";
+        out << fun.arg_decls_[i].name_;
+      }
+      out << ");" << EOL;
+      out << INDENT << "}" << EOL;
+    }
+
+    void generate_propto_default_function(const function_decl_def& fun,
+                                          const std::string& scalar_t_name,
+                                          std::ostream& out) {
+      generate_function_template_parameters(fun,false,false,false,out);
+      generate_function_inline_return_type(fun,scalar_t_name,out);
+      generate_function_name(fun,out);
+      generate_function_arguments(fun,false,false,false,out);
+      generate_propto_default_function_body(fun,out);
+    }
+
+    void generate_function(const function_decl_def& fun,
+                           std::ostream& out) {
+      bool is_rng = ends_with("_rng", fun.name_);
+      bool is_lp = ends_with("_lp", fun.name_);
+      bool is_log = ends_with("_log", fun.name_);
+      std::string scalar_t_name 
+        = return_scalar_type(fun.arg_decls_.size(), is_lp);
+
+      generate_function_template_parameters(fun,is_rng,is_lp,is_log,out);
+      generate_function_inline_return_type(fun,scalar_t_name,out);
+      generate_function_name(fun,out);
+      generate_function_arguments(fun,is_rng,is_lp,is_log,out);
+      generate_function_body(fun,scalar_t_name,out);
+
+      if (is_log)
+        generate_propto_default_function(fun,scalar_t_name,out);
+      out << EOL;
     }
 
     void generate_functions(const std::vector<function_decl_def>& funs,
