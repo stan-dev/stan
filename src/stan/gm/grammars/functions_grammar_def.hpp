@@ -300,7 +300,9 @@ namespace stan {
       
       arg_decls_r.name("function argument declaration sequence");
       arg_decls_r
-        %= arg_decl_r % ',';
+        %= arg_decl_r % ','
+        | eps
+        ;
 
       arg_decl_r.name("function argument declaration");
       arg_decl_r 

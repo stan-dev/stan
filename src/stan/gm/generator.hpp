@@ -4132,29 +4132,34 @@ namespace stan {
       // ends_with defined in ast.hpp
       bool is_rng = ends_with("_rng", fun.name_);
       bool is_lp = ends_with("_lp", fun.name_);
+      bool is_log = ends_with("_log", fun.name_);
       std::string scalar_t_name 
         = return_scalar_type(fun.arg_decls_.size(), is_lp);
 
       // template parameters
       if (fun.arg_decls_.size() > 0) {
         out << INDENT << "template <";
+        if (is_log)
+          out << "bool propto";
         for (size_t i = 0; i < fun.arg_decls_.size(); ++i) {
-          if (i > 0) 
+          if (i > 0 || is_log) {
             out << ", ";
+          }
           out << "typename T" << i << "__";
-          if (is_rng)
-            out << ", class RNG";
-          else if (is_lp)
-            out << ", typename T_lp, typename T_lp_accum";
         }
+        if (is_rng)
+          out << ", class RNG";
+        else if (is_lp)
+          out << ", typename T_lp, typename T_lp_accum";
         out << ">" << EOL;
-      } else if (is_rng) {
-        // nullary RNG case
-        out << "template <class RNG>" << EOL;
-      } else if (is_lp) {
-        out << "template <typename T_lp>" << EOL;
+      } else {
+        if (is_rng) {
+          // nullary RNG case
+          out << "template <class RNG>" << EOL;
+        } else if (is_lp) {
+          out << "template <typename T_lp, typename T_lp_accum>" << EOL;
+        }
       }
-
       // return
       out << INDENT << "inline" << EOL;
       out << INDENT;
@@ -4174,13 +4179,13 @@ namespace stan {
           for (int i = 0; i <= fun.name_.size(); ++i)
             out << " ";
         }
-        if ((is_rng || is_lp) && fun.arg_decls_.size() > 0)
-          out << ", ";
-        if (is_rng)
-          out << "RNG& base_rng__";
-        else if (is_lp)
-          out << "T_lp& lp__, T_lp_accum& lp_accum__";
       }
+      if ((is_rng || is_lp) && fun.arg_decls_.size() > 0)
+        out << ", ";
+      if (is_rng)
+        out << "RNG& base_rng__";
+      else if (is_lp)
+        out << "T_lp& lp__, T_lp_accum& lp_accum__";
       out << ")";
 
       // no-op body
