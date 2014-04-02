@@ -63,7 +63,7 @@ namespace stan {
 
 
       boost::spirit::qi::rule<Iterator, 
-                              increment_log_prob_statement(var_origin), 
+                              increment_log_prob_statement(bool,var_origin), 
                               whitespace_grammar<Iterator> > 
       increment_log_prob_statement_r;
 

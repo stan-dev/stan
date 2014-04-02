@@ -123,6 +123,17 @@ namespace stan {
     struct add_function_signature {
       template <typename T1, typename T2, typename T3, typename T4, typename T5>
       struct result { typedef void type; };
+      static bool fun_exists(const std::set<std::pair<std::string, 
+                                                      function_signature_t> >& existing,
+                             const std::pair<std::string,function_signature_t>& name_sig) {
+        for (std::set<std::pair<std::string, function_signature_t> >::iterator it = existing.begin();
+             it != existing.end();
+             ++it)
+          if (name_sig.first == (*it).first 
+              && name_sig.second.second == (*it).second.second)
+            return true;  // name and arg sequences match
+        return false;
+      }
       void operator()(const function_decl_def& decl,
                       bool& pass,
                       std::set<std::pair<std::string, 
@@ -143,14 +154,14 @@ namespace stan {
         
         // check that not already declared if just declaration
         if (decl.body_.is_no_op_statement()
-            && functions_declared.find(name_sig) != functions_declared.end()) {
+            && fun_exists(functions_declared,name_sig)) {
           error_msgs << "Parse Error.  Function already declared, name=" << decl.name_;
           pass = false;
           return;
         }
 
         // check not already defined
-        if (functions_defined.find(name_sig) != functions_defined.end()) {
+        if (fun_exists(functions_defined, name_sig)) {
           error_msgs << "Parse Error.  Function already defined, name=" << decl.name_;
           pass = false;
           return;
@@ -282,17 +293,17 @@ namespace stan {
       function_r
         %= bare_type_g[ set_void_function_f(_1,_b, _pass, 
                                             boost::phoenix::ref(error_msgs_)) ]
-        >> identifier_r[ set_allows_sampling_origin_f(_1,_a,_b) ]
-        >> lit('(')
-        >> arg_decls_r
-        >> lit(')')
-        >> eps [ scope_lp_f(boost::phoenix::ref(var_map_)) ]
-        >> statement_g(_a,_b,true)
-        >> eps [ unscope_variables_f(_val,
+        > identifier_r[ set_allows_sampling_origin_f(_1,_a,_b) ]
+        > lit('(')
+        > arg_decls_r
+        > lit(')')
+        > eps [ scope_lp_f(boost::phoenix::ref(var_map_)) ]
+        > statement_g(_a,_b,true)
+        > eps [ unscope_variables_f(_val,
                                      boost::phoenix::ref(var_map_)) ]
-        >> eps [ validate_return_type_f(_val,_pass,
+        > eps [ validate_return_type_f(_val,_pass,
                                         boost::phoenix::ref(error_msgs_)) ]
-        >> eps [ add_function_signature_f(_val,_pass,
+        > eps [ add_function_signature_f(_val,_pass,
                                           boost::phoenix::ref(functions_declared_),
                                           boost::phoenix::ref(functions_defined_),
                                           boost::phoenix::ref(error_msgs_) ) ]

@@ -258,7 +258,6 @@ TEST(gm_parser,function_signatures) {
   EXPECT_TRUE(is_parsable("src/test/test-models/syntax-only/function_signatures_weibull.stan"));
 }
 
-
 void test_parsable(const std::string& model_name) {
   EXPECT_TRUE(is_parsable_folder(model_name, "syntax-only"));
 }
@@ -293,6 +292,9 @@ void test_throws(const std::string& model_name, const std::string& error_msg) {
     }
     return;
   }
+  std::cout << "model name=" << model_name 
+            << " is parsable and were exepecting msg=" << error_msg
+            << std::endl;
   FAIL();
 }
 
@@ -421,9 +423,60 @@ TEST(gmParserStatementGrammarDef, comparisonsInBoundsTest) {
                std::invalid_argument);
 }
 
-TEST(parserFunctions, good_test) {
+TEST(parserFunctions, funsGood) {
   test_parsable("validate_functions"); // tests proper definitions and use
   test_parsable("functions-good1");
+}
+TEST(parserFunctions, funsBad1) {
   test_throws("functions-bad1","Function already declared");
+}
+TEST(parserFunctions, funsBad2) {
   test_throws("functions-bad2","Function declared, but not defined");
+}
+TEST(parserFunctions, funsBad3) {
+  test_throws("functions-bad3","EXPECTED: \"(\" BUT FOUND");
+}
+TEST(parserFunctions,funsBad4) {
+  test_throws("functions-bad4",
+              "Functions used as statements must be declared to have void returns");
+}
+TEST(parserFunctions,funsBad5) {
+  test_throws("functions-bad5",
+              "base type mismatch in assignment");
+}
+TEST(parserFunctions,funsBad6) {
+  test_throws("functions-bad6",
+              "lp suffixed functions only allowed in");
+}
+TEST(parserFunctions,funsBad7) {
+  test_throws("functions-bad7",
+              "lp suffixed functions only allowed in");
+}
+TEST(parserFunctions,funsBad8) {
+  test_throws("functions-bad8",
+              "random number generators only allowed in");
+}
+TEST(parserFunctions,funsBad9) {
+  test_throws("functions-bad9",
+              "random number generators only allowed in");
+}
+TEST(parserFunctions,funsBad10) {
+  test_throws("functions-bad10",
+              "random number generators only allowed in");
+}
+TEST(parserFunctions,funsBad11) {
+  test_throws("functions-bad11",
+              "sampling only allowed in model");
+}
+TEST(parserFunctions,funsBad12) {
+  test_throws("functions-bad12",
+              "sampling only allowed in model");
+}
+TEST(parserFunctions,funsBad13) {
+  test_throws("functions-bad13",
+              "Illegal to assign to function argument variables");
+}
+TEST(parserFunctions,funsBad14) {
+  test_throws("functions-bad14",
+              "Function already defined");
 }

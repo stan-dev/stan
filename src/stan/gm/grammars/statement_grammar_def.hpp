@@ -135,7 +135,7 @@ namespace stan {
                      << std::endl;
           return false;
         }
-        
+
         // validate origin
         var_origin lhs_origin = vm.get_origin(name);
         if (lhs_origin != local_origin
@@ -146,6 +146,21 @@ namespace stan {
           error_msgs << std::endl;
           return false;
         }
+
+        // enforce constancy of function args
+        if (lhs_origin == function_argument_origin
+            || lhs_origin == function_argument_origin_lp
+            || lhs_origin == function_argument_origin_rng
+            || lhs_origin == void_function_argument_origin
+            || lhs_origin == void_function_argument_origin_lp
+            || lhs_origin == void_function_argument_origin_rng) {
+          error_msgs << "Illegal to assign to function argument variables."
+                     << std::endl
+                     << "Use local variables instead.";
+          return false;
+        }
+            
+        
 
         // validate types
         a.var_type_ = vm.get(name);
@@ -341,7 +356,7 @@ namespace stan {
                      << std::endl << "  ";
           generate_expression(expr.expr_,error_msgs);
           error_msgs << std::endl
-                     << "Not a legal assignment or sampling statement.  Note that"
+                     << "Not a legal assignment, sampling, or function statement.  Note that"
                      << std::endl
                      << "  * Assignment statements only allow variables (with optional indexes) on the left;"
                      << std::endl
@@ -353,6 +368,7 @@ namespace stan {
                      << std::endl
                      << "  * Sampling statements allow arbitrary value-denoting expressions on the left."
                      << std::endl
+                     << "  * Functions used as statements must be declared to have void returns"
                      << std::endl << std::endl;
           pass = false;
           return;
@@ -503,7 +519,7 @@ namespace stan {
       statement_r
         %= no_op_statement_r                        // key ";"
         | statement_seq_r(_r1,_r2,_r3)              // key "{"
-        | increment_log_prob_statement_r(_r2)       // key "increment"
+        | increment_log_prob_statement_r(_r1,_r2)   // key "increment_log_prob"
         | for_statement_r(_r1,_r2,_r3)              // key "for"
         | while_statement_r(_r1,_r2,_r3)            // key "while"
         | statement_2_g(_r1,_r2,_r3)                // key "if"
@@ -529,11 +545,14 @@ namespace stan {
       local_var_decls_r
         %= var_decls_g(false,local_origin); // - constants
 
+      // inherited  _r1 = true if samples allowed as statements
       increment_log_prob_statement_r.name("increment log prob statement");
       increment_log_prob_statement_r
-        = lit("increment_log_prob")
+        = lit("increment_log_prob") 
+        > eps[ validate_allow_sample_f(_r1,_pass,
+                                       boost::phoenix::ref(error_msgs_)) ]
         > lit('(')
-        > expression_g(_r1)
+        > expression_g(_r2)
         > lit(')')
         > lit(';') 
         ;

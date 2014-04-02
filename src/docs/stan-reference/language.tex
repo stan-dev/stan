@@ -3218,11 +3218,12 @@ statements.  Such uses are only appropriate for functions that act
 through side effects, such as incrementing the log probability
 accumulator, printing, or raising exceptions.
 
-\subsection{Probability Functions in Sampling Stateme}
+\subsection{Probability Functions in Sampling Statements}
 
 Functions whose name ends in \code{\_log} may be used as probability
 functions and may be used in place of parameterized distributions on
-the right-hand-side of sampling statements.  
+the right-hand-side of sampling statements.   There is no restriction
+on where such functions may be used.
 
 \subsection{Restritions on Placement}
 
