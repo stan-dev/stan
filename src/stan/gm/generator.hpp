@@ -133,13 +133,6 @@ namespace stan {
       } 
     }
 
-    std::string base_type_to_string(const base_expr_type& bt) {
-      std::stringstream s;
-      s << bt;
-      return s.str();
-    }
-                                    
-
     struct expression_visgen : public visgen {
       expression_visgen(std::ostream& o) : visgen(o) {  }
       void operator()(nil const& /*x*/) const { 
@@ -154,7 +147,7 @@ namespace stan {
       }
       void operator()(const array_literal& x) const { 
         o_ << "stan::math::new_array<";
-        generate_type("foobar", // not enough to use: base_type_to_string(x.type_.base_type_),
+        generate_type("foobar",
                       x.args_,
                       x.args_.size(),
                       o_);
@@ -4185,7 +4178,8 @@ namespace stan {
       // arguments
       out << "(";
       for (size_t i = 0; i < fun.arg_decls_.size(); ++i) {
-        std::string template_type_i = "T" + std::to_string(i) + "__";
+        std::string template_type_i 
+          = "T" + boost::lexical_cast<std::string>(i) + "__";
         generate_arg_decl(true,true,fun.arg_decls_[i],template_type_i,out);
         if (i + 1 < fun.arg_decls_.size()) {
           out << "," << EOL << INDENT;
