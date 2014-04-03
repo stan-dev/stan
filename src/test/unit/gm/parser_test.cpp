@@ -426,6 +426,7 @@ TEST(gmParserStatementGrammarDef, comparisonsInBoundsTest) {
 TEST(parserFunctions, funsGood) {
   test_parsable("validate_functions"); // tests proper definitions and use
   test_parsable("functions-good1");
+  test_parsable("functions-good-void");
 }
 TEST(parserFunctions, funsBad1) {
   test_throws("functions-bad1","Function already declared");
