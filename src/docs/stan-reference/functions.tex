@@ -2199,6 +2199,28 @@ eigenvalues of 0).
 %   the self-adjoint view of a matrix.}
 %
 
+\subsection{QR Decomposition}
+
+\begin{description}
+%
+\fitem{matrix}{qr\_Q}{matrix \farg{A}}{
+The orthogonal matrix in the QR decomposition of \farg{A}}
+%
+\fitem{matrix}{qr\_R}{matrix \farg{A}}{ The matrix with
+  the upper triangular matrix in the QR decomposition of \farg{A}}
+%
+\end{description}
+%
+Multiplying a column of an orthogonal matrix by $-1$ still results in 
+an orthogonal matrix, and you can multiply the corresponding row of 
+the upper triangular matrix by $-1$ without changing the product. Thus,
+Stan adopts the normalization that the diagonal elements of the upper
+triangular matrix are strictly positive and the columns of the 
+orthogonal matrix are rescaled if necessary. The input matrix $A$ need
+not be square but must have at least as many rows as it has columns.
+Also, this QR decomposition algorithm does not utilize pivoting and 
+thus is faster but may be numerically unstable.
+
 \subsubsection{Cholesky Decomposition}
 
 Every symmetric, positive-definite matrix (such as a correlation or
