@@ -507,35 +507,6 @@ Only arrays in Stan are allowed to store integer values.
 
 
 
-\chapter{User-Defined Functions}
-
-An example of a function to compute the absolute relative difference
-between two variables is
-%
-\begin{quote}
-\begin{Verbatim}
-real relative_diff(real x, real y) {
-  real abs_diff;
-  real avg_scale;
-  abs_diff <- abs(x - y);
-  avg_scale <- (abs(x) + abs(y)) / 2;
-  return abs_diff / avg_scale;
-}
-\end{Verbatim}
-\end{quote}
-%
-This declares \code{relative\_diff} to be a function that takes two
-real-valued argumnts and returns a real-valued result.
-
-For example, the \code{normal\_log} could be
-overloaded to produce a function implementing unit normal densities,
-%
-\begin{quote}
-\begin{Verbatim}
-real normal_log(real y) { return normal_log(y,0,1); }
-\end{Verbatim}
-\end{quote}
-
 \chapter{Regression Models}
 
 \noindent
@@ -5115,6 +5086,36 @@ the same posterior because Stan only needs the log probability up to
 an additive constant.  If \code{lambda} and \code{y} are both
 constants, the sampling statement will drop both terms (but still
 check for out-of-domain errors on the inputs).
+
+
+\chapter{User-Defined Functions}\label{functions-programming.tex}
+
+An example of a function to compute the absolute relative difference
+between two variables is
+%
+\begin{quote}
+\begin{Verbatim}
+real relative_diff(real x, real y) {
+  real abs_diff;
+  real avg_scale;
+  abs_diff <- abs(x - y);
+  avg_scale <- (abs(x) + abs(y)) / 2;
+  return abs_diff / avg_scale;
+}
+\end{Verbatim}
+\end{quote}
+%
+This declares \code{relative\_diff} to be a function that takes two
+real-valued argumnts and returns a real-valued result.
+
+For example, the \code{normal\_log} could be
+overloaded to produce a function implementing unit normal densities,
+%
+\begin{quote}
+\begin{Verbatim}
+real normal_log(real y) { return normal_log(y,0,1); }
+\end{Verbatim}
+\end{quote}
 
 
 
