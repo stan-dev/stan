@@ -12,15 +12,18 @@ namespace stan {
     template <typename T>
     Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
     qr_Q(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& m) {
+      typedef Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> matrix_t;
       validate_nonzero_size(m,"qr_Q");
       validate_greater_or_equal(m.rows(),m.cols(),"m.rows()", "m.cols()", "qr_Q");
-      Eigen::HouseholderQR< Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > qr(m.rows(), m.cols());
+      Eigen::HouseholderQR<matrix_t> qr(m.rows(), m.cols());
       qr.compute(m);
-      Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> Q = qr.householderQ();
-      const T zero = 0.0;
-      for (int i=0; i<m.cols(); i++) if (qr.matrixQR()(i,i) < zero) Q.col(i) *= -1.0;
+      matrix_t Q = qr.householderQ();
+      for (int i = 0; i < m.cols(); i++) 
+        if (qr.matrixQR()(i,i) < 0) 
+          Q.col(i) *= -1.0;
       return Q;
     }
+
   }
 }
 #endif
