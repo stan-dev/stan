@@ -5,21 +5,23 @@
 #include <gtest/gtest.h>
 #include <test/unit/agrad/util.hpp>
 #include <stan/agrad/fwd.hpp>
-#include <stan/agrad/fwd/matrix.hpp>
+#include <stan/agrad/rev.hpp>
 
-/*
 TEST(MathMatrix, qr_R) {
-  stan::agrad::matrix_fd m0(0,0);
-  stan::agrad::matrix_fd m1(3,2);
+  typedef Eigen::Matrix<stan::agrad::fvar<double>,
+                        Eigen::Dynamic,Eigen::Dynamic> matrix_fwd_t;
+
+  matrix_fwd_t m0(0,0);
+  matrix_fwd_t m1(3,2);
   m1 << 1, 2, 3, 4, 5, 6;
 
-  using stan::agrad::qr_R;
-  using stan::agrad::qr_Q;
+  using stan::math::qr_R;
+  using stan::math::qr_Q;
   using stan::math::transpose;
   EXPECT_THROW(qr_R(m0),std::domain_error);
   EXPECT_NO_THROW(qr_R(m1));
 
-  stan::agrad::matrix_fd m2(3,2);
+  matrix_fwd_t m2(3,2);
   m2 = qr_Q(m1) * qr_R(m1);
   for (unsigned int i=0; i<m1.rows(); i++) {
     for (unsigned int j=0; j<m1.cols(); j++) {
@@ -28,5 +30,5 @@ TEST(MathMatrix, qr_R) {
   }
   EXPECT_THROW(qr_R(transpose(m1)),std::domain_error);
 }
-*/
+
 
