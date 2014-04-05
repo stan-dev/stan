@@ -42,6 +42,27 @@ namespace stan {
         return 0;
       }
       
+      /**
+       * Find the minima in an interval [loX, hiX] of a cubic function which
+       * interpolates the points, function values and gradients provided.
+       *
+       * Implicitly, this function constructs an interpolating polynomial
+       *     g(x) = a_3 x^3 + a_2 x^2 + a_1 x + a_0
+       * such that g(0) = 0, g(x1) = f1, g'(0) = df0, g'(x1) = df1 where 
+       *     g'(x) = 3 a_3 x^2 + 2 a_2 x + a_1 
+       * is the derivative of g(x).  It then computes the roots of g'(x) and
+       * finds the minimal value of g(x) on the interval [loX,hiX] including
+       * the end points.
+       *
+       * This function implements the full parameter version of CubicInterp(). 
+       *
+       * @param df0 First derivative value, f'(x0)
+       * @param x1 Second point
+       * @param f1 Second function value, f(x1)
+       * @param df1 Second derivative value, f'(x1)
+       # @param loX Lower bound on the interval of solutions
+       # @param hiX Upper bound on the interval of solutions
+       **/
       template<typename Scalar>
       Scalar CubicInterp(const Scalar &df0,
                          const Scalar &x1, const Scalar &f1, const Scalar &df1,
@@ -99,7 +120,7 @@ namespace stan {
        * such that g(x0) = f0, g(x1) = f1, g'(x0) = df0, g'(x1) = df1 where 
        *     g'(x) = 3 a_3 x^2 + 2 a_2 x + a_1 
        * is the derivative of g(x).  It then computes the roots of g'(x) and
-       * finds the minimal value of g(x) on the interval loX,hiX] including
+       * finds the minimal value of g(x) on the interval [loX,hiX] including
        * the end points.
        *
        * @param x0 First point
@@ -118,7 +139,10 @@ namespace stan {
       {
         return x0 + CubicInterp(df0,x1-x0,f1-f0,df1,loX-x0,hiX-x0);
       }
-      
+
+      /**
+       * A utility function for implementing WolfeLineSearch()
+       **/
       template<typename FunctorType, typename Scalar, typename XType>
       int WolfLSZoom(Scalar &alpha, XType &newX, Scalar &newF, XType &newDF,
                      FunctorType &func,
