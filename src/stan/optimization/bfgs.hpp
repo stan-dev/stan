@@ -185,7 +185,7 @@ namespace stan {
      * \f]
      * satisfying the strong Wolfe conditions:
      *  1) \f$ f(x_0 + \alpha p) \leq f(x_0) + c_1 \alpha p^T g(x_0) \f$
-     *  2) \f$ \vert p^T g(x_0 + \alpha p) \vert \geq c_2 \vert p^T g(x_0) \vert \f$
+     *  2) \f$ \vert p^T g(x_0 + \alpha p) \vert \leq c_2 \vert p^T g(x_0) \vert \f$
      * where \f$g(x) = \frac{\partial f}{\partial x}\f$ is the gradient of f(x).
      *
      * @tparam FunctorType A type which supports being called as 
@@ -372,9 +372,11 @@ namespace stan {
       }
 
       /**
-       * Compute the search direction based on the current approximation and given gradient.
+       * Compute the search direction based on the current (inverse) Hessian
+       * approximation and given gradient.
        *
-       * @param[out] pk The negative product of the inverse Hessian and gradient direction gk.
+       * @param[out] pk The negative product of the inverse Hessian and gradient
+       * direction gk.
        * @param[in] gk Gradient direction.
        **/
       inline void search_direction(VectorT &pk, const VectorT &gk) const {
@@ -452,7 +454,8 @@ namespace stan {
       }
 
       /**
-       * Compute the search direction based on the current approximation and given gradient.
+       * Compute the search direction based on the current (inverse) Hessian
+       * approximation and given gradient.
        *
        * @param[out] pk The negative product of the inverse Hessian and gradient direction gk.
        * @param[in] gk Gradient direction.

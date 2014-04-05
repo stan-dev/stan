@@ -39,6 +39,9 @@ TEST(OptimizationBFGS, cubic_interp) {
 
 class linesearch_testfunc {
 public:
+  double operator()(const Eigen::Matrix<double,Eigen::Dynamic,1> &x) {
+    return x.dot(x) - 1.0;
+  } 
   int operator()(const Eigen::Matrix<double,Eigen::Dynamic,1> &x, 
                  double &f, Eigen::Matrix<double,Eigen::Dynamic,1> &g) {
     f = x.dot(x) - 1.0;
@@ -73,6 +76,10 @@ TEST(OptimizationBFGS, wolfe_line_search) {
                         c1, c2, minAlpha);
   EXPECT_EQ(0,ret);
   EXPECT_NEAR(0.5,alpha,1e-8);
+  EXPECT_NEAR(0,(x1 - (x0 + alpha*p)).norm(),1e-8);
+  EXPECT_EQ(f1,func1(x1));
+  EXPECT_LE(f1,f0 + c1*alpha*p.dot(gradx0));
+  EXPECT_LE(std::fabs(p.dot(gradx1)),c2*std::fabs(p.dot(gradx0)));
 
   alpha = 10.0;
   ret = WolfeLineSearch(func1, alpha,
@@ -81,6 +88,10 @@ TEST(OptimizationBFGS, wolfe_line_search) {
                         c1, c2, minAlpha);
   EXPECT_EQ(0,ret);
   EXPECT_NEAR(0.5,alpha,1e-8);
+  EXPECT_NEAR(0,(x1 - (x0 + alpha*p)).norm(),1e-8);
+  EXPECT_EQ(f1,func1(x1));
+  EXPECT_LE(f1,f0 + c1*alpha*p.dot(gradx0));
+  EXPECT_LE(std::fabs(p.dot(gradx1)),c2*std::fabs(p.dot(gradx0)));
 
   alpha = 0.25;
   ret = WolfeLineSearch(func1, alpha,
@@ -89,5 +100,9 @@ TEST(OptimizationBFGS, wolfe_line_search) {
                         c1, c2, minAlpha);
   EXPECT_EQ(0,ret);
   EXPECT_NEAR(0.25,alpha,1e-8);
+  EXPECT_NEAR(0,(x1 - (x0 + alpha*p)).norm(),1e-8);
+  EXPECT_EQ(f1,func1(x1));
+  EXPECT_LE(f1,f0 + c1*alpha*p.dot(gradx0));
+  EXPECT_LE(std::fabs(p.dot(gradx1)),c2*std::fabs(p.dot(gradx0)));
 }
 
