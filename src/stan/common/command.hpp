@@ -50,6 +50,7 @@
 #include <stan/common/init_adapt.hpp>
 #include <stan/common/init_windowed_adapt.hpp>
 #include <stan/common/recorder/csv.hpp>
+#include <stan/common/recorder/messages.hpp>
 
 namespace stan {
 
@@ -580,9 +581,12 @@ namespace stan {
         
         stan::common::recorder::csv sample_recorder(output_stream, "# ");
         stan::common::recorder::csv diagnostic_recorder(diagnostic_stream, "# ");
+        stan::common::recorder::messages message_recorder(output_stream, "# ");
         
-        stan::io::mcmc_writer<Model, stan::common::recorder::csv, stan::common::recorder::csv> 
-          writer(sample_recorder, diagnostic_recorder, &std::cout);
+        stan::io::mcmc_writer<Model, 
+                              stan::common::recorder::csv, stan::common::recorder::csv,
+                              stan::common::recorder::messages> 
+          writer(sample_recorder, diagnostic_recorder, message_recorder, &std::cout);
         
         // Sampling parameters
         int num_warmup = dynamic_cast<stan::gm::int_argument*>(

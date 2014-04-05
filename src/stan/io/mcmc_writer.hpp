@@ -23,14 +23,17 @@ namespace stan {
      * @tparam SampleRecorder Class for recording samples
      * @tparam DiagnosticRecorder Class for diagnostic samples
      */
-    template <class M, class SampleRecorder, class DiagnosticRecorder>
+    template <class M, 
+              class SampleRecorder, class DiagnosticRecorder,
+              class MessageRecorder>
     class mcmc_writer {
 
     private:
       SampleRecorder sample_recorder_;
       DiagnosticRecorder diagnostic_recorder_;
+      MessageRecorder message_recorder_;
+      
       std::ostream* msg_stream_;
-      stan::common::recorder::csv msg_recorder_;
       
     public:
       
@@ -47,11 +50,12 @@ namespace stan {
        */
       mcmc_writer(SampleRecorder& sample_recorder,
                   DiagnosticRecorder& diagnostic_recorder,
+                  MessageRecorder& message_recorder,
                   std::ostream* msg_stream = 0)
         : sample_recorder_(sample_recorder),
           diagnostic_recorder_(diagnostic_recorder),
-          msg_stream_(msg_stream),
-          msg_recorder_(stan::common::recorder::csv(msg_stream, "")) {
+          message_recorder_(message_recorder),
+          msg_stream_(msg_stream) {
       }
       
       /**
@@ -263,7 +267,7 @@ namespace stan {
       void write_timing(double warmDeltaT, double sampleDeltaT) {
         write_timing(warmDeltaT, sampleDeltaT, sample_recorder_);
         write_timing(warmDeltaT, sampleDeltaT, diagnostic_recorder_);
-        write_timing(warmDeltaT, sampleDeltaT, msg_recorder_);
+        write_timing(warmDeltaT, sampleDeltaT, message_recorder_);
       }
             
     };

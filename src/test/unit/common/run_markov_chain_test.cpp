@@ -40,11 +40,13 @@ public:
     
     stan::common::recorder::csv sample_recorder(&std::cout, "# ");
     stan::common::recorder::csv diagnostic_recorder(&std::cout, "# ");
+    stan::common::recorder::messages message_recorder(&std::cout, "# ");
 
     writer = new stan::io::mcmc_writer<stan_model,
                                        stan::common::recorder::csv,
-                                       stan::common::recorder::csv>
-      (sample_recorder, diagnostic_recorder, &std::cout);
+                                       stan::common::recorder::csv,
+                                       stan::common::recorder::messages>
+      (sample_recorder, diagnostic_recorder, message_recorder, &std::cout);
 
     base_rng.seed(123456);
     
@@ -63,7 +65,8 @@ public:
   stan_model* model;
   stan::io::mcmc_writer<stan_model, 
                         stan::common::recorder::csv,
-                        stan::common::recorder::csv>* writer;
+                        stan::common::recorder::csv,
+                        stan::common::recorder::messages>* writer;
   rng_t base_rng;
   Eigen::VectorXd q;
   double log_prob;
