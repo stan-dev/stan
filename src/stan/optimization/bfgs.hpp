@@ -187,7 +187,7 @@ namespace stan {
        * \f[
        *       \min_\alpha f(x_0 + \alpha p)
        * \f]
-       * which satisfies the Strong Wolfe conditions
+       * satisfying the strong Wolfe conditions:
        *  1) \f$ f(x_0 + \alpha p) \leq f(x_0) + c_1 \alpha p^T g(x_0) \f$
        *  2) \f$ \vert p^T g(x_0 + \alpha p) \vert \geq c_2 \vert p^T g(x_0) \vert \f$
        * where \f$g(x) = \frac{\partial f}{\partial x}\f$ is the gradient of f(x).

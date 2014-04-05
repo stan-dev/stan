@@ -3,8 +3,8 @@
 
 TEST(OptimizationBFGS, cubic_interp) {
   using stan::optimization::CubicInterp;
-  const unsigned int nVals = 5;
-  const double xVals[5] = { -2.0, -1.0, 0.0, 1.0, 2.0 };
+  static const unsigned int nVals = 5;
+  static const double xVals[5] = { -2.0, -1.0, 0.0, 1.0, 2.0 };
   double xMin;
 
   for (unsigned int i = 0; i < nVals; i++) {
@@ -37,4 +37,54 @@ TEST(OptimizationBFGS, cubic_interp) {
   }
 }
 
+class linesearch_testfunc {
+public:
+  int operator()(const Eigen::Matrix<double,Eigen::Dynamic,1> &x, 
+                 double &f, Eigen::Matrix<double,Eigen::Dynamic,1> &g) {
+    f = x.dot(x) - 1.0;
+    g = 2.0*x;
+    return 0;
+  }
+};
+
+TEST(OptimizationBFGS, wolfe_line_search) {
+  using stan::optimization::WolfeLineSearch;
+
+  static const double c1 = 1e-4;
+  static const double c2 = 0.9;
+  static const double minAlpha = 1e-16;
+
+  linesearch_testfunc func1;
+  Eigen::Matrix<double,-1,1> x0,x1;
+  double f0,f1;
+  Eigen::Matrix<double,-1,1> p, gradx0,gradx1;
+  double alpha;
+  int ret;
+
+  x0.setOnes(5,1);
+  func1(x0,f0,gradx0);
+
+  p = -gradx0;
+
+  alpha = 2.0;
+  ret = WolfeLineSearch(func1, alpha,
+                        x1, f1, gradx1,
+                        p, x0, f0, gradx0,
+                        c1, c2, minAlpha);
+  EXPECT_NEAR(0.5,alpha,1e-8);
+
+  alpha = 10.0;
+  ret = WolfeLineSearch(func1, alpha,
+                        x1, f1, gradx1,
+                        p, x0, f0, gradx0,
+                        c1, c2, minAlpha);
+  EXPECT_NEAR(0.5,alpha,1e-8);
+
+  alpha = 0.25;
+  ret = WolfeLineSearch(func1, alpha,
+                        x1, f1, gradx1,
+                        p, x0, f0, gradx0,
+                        c1, c2, minAlpha);
+  EXPECT_NEAR(0.25,alpha,1e-8);
+}
 
