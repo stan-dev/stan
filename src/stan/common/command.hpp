@@ -535,7 +535,7 @@ namespace stan {
           }
           std::cout << "  " << bfgs.get_code_string(ret) << std::endl;
         } else if (algo->value() == "lbfgs") {
-          typedef stan::optimization::BFGSLineSearch<Model,double,Eigen::Dynamic,1,stan::optimization::LBFGSUpdate<double,Eigen::Dynamic> > Optimizer;
+          typedef stan::optimization::BFGSLineSearch<Model,double,Eigen::Dynamic,stan::optimization::LBFGSUpdate<double,Eigen::Dynamic> > Optimizer;
           Optimizer bfgs(model, cont_vector, disc_vector, &std::cout);
 
           bfgs.get_qnupdate().set_history_size(dynamic_cast<gm::int_argument*>(

@@ -285,7 +285,6 @@ namespace stan {
           std::swap(prevDF,gradx1);
           prevDFp = newDFp;
           
-//          alpha1 = std::min(2.0*alpha0,maxAlpha);
           alpha1 *= 10.0;
           
           nits++;
@@ -326,6 +325,11 @@ namespace stan {
     };
 
 
+    /**
+     * Implement a limited memory version of the BFGS update.  This
+     * class maintains a circular buffer of inverse Hessian updates
+     * which can be applied to compute the search direction.
+     **/
     template<typename Scalar = double,
              int DimAtCompile = Eigen::Dynamic>
     class LBFGSUpdate {
@@ -336,12 +340,31 @@ namespace stan {
 
       LBFGSUpdate(size_t L = 5) : _buf(L) {}
 
+      /**
+       * Set the number of inverse Hessian updates to keep.
+       *
+       * @param L New size of buffer.
+       **/
       void set_history_size(size_t L) {
         _buf.rset_capacity(L);
       }
 
+      /**
+       * Reset the approximation of the inverse Hessian to a scaled identity.
+       *
+       * @param B0 Scale of the Hessian matrix.
+       * @param N Dimension of state vector for the problem.
+       **/
       inline void reset(const Scalar &B0,size_t N) {
+        _buf.clear();
       }
+
+      /**
+       * Add a new set of update vectors to the history.
+       *
+       * @param yk Difference between the current and previous gradient vector.
+       * @param sk Difference between the current and previous state vector.
+       **/
       inline void update(const VectorT &yk, const VectorT &sk) {
         // New updates are pushed to the "back" of the circular buffer
         Scalar skyk = yk.dot(sk);
@@ -350,6 +373,13 @@ namespace stan {
         _buf.push_back();
         _buf.back() = boost::tie(invskyk,yk,sk);
       }
+
+      /**
+       * Compute the search direction based on the current approximation and given gradient.
+       *
+       * @param[out] pk The negative product of the inverse Hessian and gradient direction gk.
+       * @param[in] gk Gradient direction.
+       **/
       inline void search_direction(VectorT &pk, const VectorT &gk) const {
         std::vector<Scalar> alphas(_buf.size());
         typename boost::circular_buffer<UpdateT>::const_reverse_iterator buf_rit;
@@ -396,9 +426,22 @@ namespace stan {
       typedef Eigen::Matrix<Scalar,DimAtCompile,1> VectorT;
       typedef Eigen::Matrix<Scalar,DimAtCompile,DimAtCompile> HessianT;
 
+      /**
+       * Reset the approximation of the inverse Hessian to a scaled identity.
+       *
+       * @param B0 Scale of the Hessian matrix.
+       * @param N Dimension of state vector for the problem.
+       **/
       inline void reset(const Scalar &B0,size_t N) {
           _Hk.noalias() = (1.0/B0)*HessianT::Identity(N,N);
       }
+
+      /**
+       * Update the inverse Hessian approximation.
+       *
+       * @param yk Difference between the current and previous gradient vector.
+       * @param sk Difference between the current and previous state vector.
+       **/
       inline void update(const VectorT &yk, const VectorT &sk) {
         Scalar rhok, skyk;
         HessianT Hupd;
@@ -410,6 +453,13 @@ namespace stan {
                                         - rhok*sk*yk.transpose();
         _Hk = Hupd*_Hk*Hupd.transpose() + rhok*sk*sk.transpose();
       }
+
+      /**
+       * Compute the search direction based on the current approximation and given gradient.
+       *
+       * @param[out] pk The negative product of the inverse Hessian and gradient direction gk.
+       * @param[in] gk Gradient direction.
+       **/
       inline void search_direction(VectorT &pk, const VectorT &gk) const {
         pk.noalias() = -(_Hk*gk);
       }
@@ -420,7 +470,6 @@ namespace stan {
 
     template<typename FunctorType, typename Scalar = double,
              int DimAtCompile = Eigen::Dynamic,
-             int LineSearchMethod = 1,
              typename QNUpdateType = LBFGSUpdate<Scalar,DimAtCompile> >
     class BFGSMinimizer {
     public:
@@ -704,13 +753,12 @@ namespace stan {
     
     template<typename M, typename Scalar = double,
              int DimAtCompile = Eigen::Dynamic,
-             int LineSearchMethod = 1,
              typename QNUpdateType = LBFGSUpdate<Scalar,DimAtCompile> >
-    class BFGSLineSearch : public BFGSMinimizer<ModelAdaptor<M>,Scalar,DimAtCompile,LineSearchMethod,QNUpdateType> {
+    class BFGSLineSearch : public BFGSMinimizer<ModelAdaptor<M>,Scalar,DimAtCompile,QNUpdateType> {
     private:
       ModelAdaptor<M> _adaptor;
     public:
-      typedef BFGSMinimizer<ModelAdaptor<M>,Scalar,DimAtCompile,LineSearchMethod,QNUpdateType> BFGSBase;
+      typedef BFGSMinimizer<ModelAdaptor<M>,Scalar,DimAtCompile,QNUpdateType> BFGSBase;
       typedef typename BFGSBase::VectorT vector_t;
       typedef typename vector_t::size_type idx_t;
       
