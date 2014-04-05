@@ -15,33 +15,6 @@
 namespace stan {
   namespace optimization {
     namespace {
-      template<typename FunctorType, typename Scalar, typename XType>
-      int BTLineSearch(FunctorType &func,
-                       Scalar &alpha, 
-                       XType &x1, Scalar &f1, XType &gradx1,
-                       const XType &p,
-                       const XType &x0, const Scalar &f0, const XType &gradx0,
-                       const Scalar &rho, const Scalar &c,
-                       const Scalar &minAlpha)
-      {
-        const Scalar cdfdp(c*gradx0.dot(p));
-        int ret;
-        
-        while (1) {
-          x1 = x0 + alpha*p;
-          ret = func(x1,f1);
-          if (ret!=0 && f1 <= f0 + alpha*cdfdp)
-            break;
-          else
-            alpha *= rho;
-          
-          if (alpha < minAlpha)
-            return 1;
-        }
-        func.df(x1,gradx1);
-        return 0;
-      }
-      
       /**
        * Find the minima in an interval [loX, hiX] of a cubic function which
        * interpolates the points, function values and gradients provided.
@@ -341,13 +314,11 @@ namespace stan {
     class LSOptions {
     public:
       LSOptions() {
-        rho = 0.75;
         c1 = 1e-4;
         c2 = 0.9;
         minAlpha = 1e-12;
         alpha0 = 1e-3;
       }
-      Scalar rho;
       Scalar c1;
       Scalar c2;
       Scalar alpha0;
@@ -561,17 +532,10 @@ namespace stan {
           }
           // Perform the line search.  If successful, the results are in the 
           // variables: _xk_1, _fk_1 and _gk_1.
-          if (LineSearchMethod == 0) {
-            retCode = BTLineSearch(_func, _alpha, _xk_1, _fk_1, _gk_1,
-                                   _pk, _xk, _fk, _gk, _ls_opts.rho, 
-                                   _ls_opts.c1, _ls_opts.minAlpha);
-          }
-          else if (LineSearchMethod == 1) {
-            retCode = WolfeLineSearch(_func, _alpha, _xk_1, _fk_1, _gk_1,
-                                      _pk, _xk, _fk, _gk,
-                                      _ls_opts.c1, _ls_opts.c2, 
-                                      _ls_opts.minAlpha);
-          }
+          retCode = WolfeLineSearch(_func, _alpha, _xk_1, _fk_1, _gk_1,
+                                    _pk, _xk, _fk, _gk,
+                                    _ls_opts.c1, _ls_opts.c2, 
+                                    _ls_opts.minAlpha);
           if (retCode) {
             if (resetB) {
               // Line-search failed and nothing left to try
