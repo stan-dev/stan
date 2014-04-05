@@ -29,6 +29,8 @@
 #include <stan/mcmc/hmc/nuts/adapt_diag_e_nuts.hpp>
 #include <stan/mcmc/hmc/nuts/adapt_dense_e_nuts.hpp>
 
+#include <stan/vb/base_vb.hpp>
+
 #include <stan/model/util.hpp>
 
 #include <stan/optimization/newton.hpp>
@@ -789,6 +791,17 @@ namespace stan {
         writer.print_timing(warmDeltaT, sampleDeltaT);
         
         if (sampler_ptr) delete sampler_ptr;
+        
+      }
+      
+      //////////////////////////////////////////////////
+      //            Variational Algorithms            //
+      //////////////////////////////////////////////////
+      
+      if (parser.arg("method")->arg("vb")) {
+        
+        stan::vb::base_vb<Model, rng_t> vb(model, base_rng, &std::cout, &std::cout);
+        vb.test(cont_params);
         
       }
       
