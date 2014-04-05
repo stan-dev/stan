@@ -46,14 +46,14 @@ namespace stan {
         
         // We can do the same with an explicit distribution,
         // although we don't quite have the same convenient
-        // wrappers to the autodiff library
+        // wrappers to the autodiff library -- see the local
+        // functional defined above
         
         // true is a template parameters specifying whether
         // to compute constants of proportionality or not
         stan::prob::normal_log<false>(q, 0, 1);
         
         try {
-          stan::model::gradient(model_, q, log_p, grad, err_stream_);
           stan::agrad::gradient(normal_functional(), q, log_p, grad);
         } catch (const std::exception& e) {
           this->_write_error_msg(err_stream_, e);
