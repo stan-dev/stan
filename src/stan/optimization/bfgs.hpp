@@ -89,6 +89,28 @@ namespace stan {
         
         return minX;
       }
+
+      /**
+       * Find the minima in an interval [loX, hiX] of a cubic function which
+       * interpolates the points, function values and gradients provided.
+       *
+       * Implicitly, this function constructs an interpolating polynomial
+       *     g(x) = a_3 x^3 + a_2 x^2 + a_1 x + a_0
+       * such that g(x0) = f0, g(x1) = f1, g'(x0) = df0, g'(x1) = df1 where 
+       *     g'(x) = 3 a_3 x^2 + 2 a_2 x + a_1 
+       * is the derivative of g(x).  It then computes the roots of g'(x) and
+       * finds the minimal value of g(x) on the interval loX,hiX] including
+       * the end points.
+       *
+       * @param x0 First point
+       * @param f0 First function value, f(x0)
+       * @param df0 First derivative value, f'(x0)
+       * @param x1 Second point
+       * @param f1 Second function value, f(x1)
+       * @param df1 Second derivative value, f'(x1)
+       # @param loX Lower bound on the interval of solutions
+       # @param hiX Upper bound on the interval of solutions
+       **/
       template<typename Scalar>
       Scalar CubicInterp(const Scalar &x0, const Scalar &f0, const Scalar &df0,
                          const Scalar &x1, const Scalar &f1, const Scalar &df1,
@@ -159,7 +181,52 @@ namespace stan {
         }
         return 0;
       }
-      
+
+      /**
+       * Perform a line search which finds an approximate solution to:
+       * \f[
+       *       \min_\alpha f(x_0 + \alpha p)
+       * \f]
+       * which satisfies the Strong Wolfe conditions
+       *  1) \f$ f(x_0 + \alpha p) \leq f(x_0) + c_1 \alpha p^T g(x_0) \f$
+       *  2) \f$ \vert p^T g(x_0 + \alpha p) \vert \geq c_2 \vert p^T g(x_0) \vert \f$
+       * where \f$g(x) = \frac{\partial f}{\partial x}\f$ is the gradient of f(x).
+       *
+       * @tparam FunctorType A type which supports being called as 
+       *        ret = func(x,f,g)
+       * where x is the input point, f and g are the function value and
+       * gradient at x and ret is non-zero if function evaluation fails.
+       *
+       * @param func Function which is being minimized.
+       *
+       * @param alpha First value of \f$ \alpha \f$ to try.  Upon return this 
+       * contains the final value of the \f$ \alpha \f$.
+       *
+       * @param x1 Final point, equal to \f$ x_0 + \alpha p \f$.
+       *
+       * @param f1 Final point function value, equal to \f$ f(x_0 + \alpha p) \f$.
+
+       * @param gradx1 Final point gradient, equal to \f$ g(x_0 + \alpha p) \f$.
+       *
+       * @param p Search direction.  It is assumed to be a descent direction such
+       * that \f$ p^T g(x_0) < 0 \f$.
+       *
+       * @param x0 Value of starting point, \f$ x_0 \f$.
+       *
+       * @param f0 Value of function at starting point, \f$ f(x_0) \f$.
+       *
+       * @param gradx0 Value of function gradient at starting point, \f$ g(x_0) \f$.
+       *
+       * @param c1 Parameter of the Wolfe conditions. \f$ 0 < c_1 < c_2 < 1 \f$
+       * Typically c1 = 1e-4.
+       *
+       * @param c2 Parameter of the Wolfe conditions. \f$ 0 < c_1 < c_2 < 1 \f$
+       * Typically c2 = 0.9.
+       *
+       * @param minAlpha Smallest allowable step-size. 
+       *
+       * @return Returns zero on success, non-zero otherwise.
+       **/
       template<typename FunctorType, typename Scalar, typename XType>
       int WolfeLineSearch(FunctorType &func,
                           Scalar &alpha,
