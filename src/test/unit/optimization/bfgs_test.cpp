@@ -71,6 +71,7 @@ TEST(OptimizationBFGS, wolfe_line_search) {
                         x1, f1, gradx1,
                         p, x0, f0, gradx0,
                         c1, c2, minAlpha);
+  EXPECT_EQ(0,ret);
   EXPECT_NEAR(0.5,alpha,1e-8);
 
   alpha = 10.0;
@@ -78,6 +79,7 @@ TEST(OptimizationBFGS, wolfe_line_search) {
                         x1, f1, gradx1,
                         p, x0, f0, gradx0,
                         c1, c2, minAlpha);
+  EXPECT_EQ(0,ret);
   EXPECT_NEAR(0.5,alpha,1e-8);
 
   alpha = 0.25;
@@ -85,6 +87,7 @@ TEST(OptimizationBFGS, wolfe_line_search) {
                         x1, f1, gradx1,
                         p, x0, f0, gradx0,
                         c1, c2, minAlpha);
+  EXPECT_EQ(0,ret);
   EXPECT_NEAR(0.25,alpha,1e-8);
 }
 
