@@ -4098,22 +4098,35 @@ namespace stan {
         out << "&";
       out << " " << decl.name_;
     }
+    
+    bool has_only_int_args(const function_decl_def& fun) {
+      for (size_t i = 0; i < fun.arg_decls_.size(); ++i)
+        if (fun.arg_decls_[i].arg_type_.base_type_ != INT_T)
+          return false;
+      return true;
+    }
 
-    std::string return_scalar_type(size_t num_args, bool is_lp) {
+    std::string return_scalar_type(const function_decl_def& fun,
+                                   bool is_lp) {
+      size_t num_args = fun.arg_decls_.size();
       // nullary, non-lp
-      if (num_args == 0 && !is_lp)
+      if (has_only_int_args(fun) && !is_lp)
         return "double";
 
       // need template metaprogram to construct return
       std::stringstream ss;
       ss << "typename boost::math::tools::promote_args<";
+      bool continuing_tps = false;
       for (size_t i = 0; i < num_args; ++i) {
-        if (i > 0) 
-          ss << ", ";
-        ss << "T" << i << "__";
+        if (fun.arg_decls_[i].arg_type_.base_type_ != INT_T) {
+          if (continuing_tps)
+            ss << ", ";
+          ss << "T" << i << "__";
+          continuing_tps = true;
+        }
       }
       if (is_lp) {
-        if (num_args > 0)
+        if (continuing_tps > 0)
           ss << ", ";
         ss << "T_lp__";
       }
@@ -4128,20 +4141,34 @@ namespace stan {
                                                std::ostream& out) {
       if (fun.arg_decls_.size() > 0) {
         out << INDENT << "template <";
-        if (is_log)
+        bool continuing_tps = false;
+        if (is_log) {
           out << "bool propto";
-        for (size_t i = 0; i < fun.arg_decls_.size(); ++i) {
-          if (i > 0 || is_log) {
-            out << ", ";
-          }
-          out << "typename T" << i << "__";
+          continuing_tps = true;
         }
-        if (is_rng)
-          out << ", class RNG";
-        else if (is_lp)
-          out << ", typename T_lp__, typename T_lp_accum__";
+        for (size_t i = 0; i < fun.arg_decls_.size(); ++i) {
+          // no template parameter for int-based args
+          if (fun.arg_decls_[i].arg_type_.base_type_ != INT_T) {
+            if (continuing_tps)
+              out << ", ";
+            out << "typename T" << i << "__";
+            continuing_tps = true;
+          }
+        }
+        if (is_rng) {
+          if (continuing_tps)
+            out << ", ";
+          out << "class RNG";
+          continuing_tps = true;
+        }
+        else if (is_lp) {
+          if (continuing_tps)
+            out << ", ";
+          out << "typename T_lp__, typename T_lp_accum__";
+          continuing_tps = true;
+        }
         out << ">" << EOL;
-      } else {
+      } else { // no-arg function
         if (is_rng) {
           // nullary RNG case
           out << INDENT << "template <class RNG>" << EOL;
@@ -4248,7 +4275,7 @@ namespace stan {
       bool is_lp = ends_with("_lp", fun.name_);
       bool is_log = ends_with("_log", fun.name_);
       std::string scalar_t_name 
-        = return_scalar_type(fun.arg_decls_.size(), is_lp);
+        = return_scalar_type(fun, is_lp);
 
       generate_function_template_parameters(fun,is_rng,is_lp,is_log,out);
       generate_function_inline_return_type(fun,scalar_t_name,out);
