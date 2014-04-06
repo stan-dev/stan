@@ -4140,7 +4140,7 @@ namespace stan {
                                                bool is_log,
                                                std::ostream& out) {
       if (fun.arg_decls_.size() > 0) {
-        out << INDENT << "template <";
+        out << "template <";
         bool continuing_tps = false;
         if (is_log) {
           out << "bool propto";
@@ -4171,12 +4171,12 @@ namespace stan {
       } else { // no-arg function
         if (is_rng) {
           // nullary RNG case
-          out << INDENT << "template <class RNG>" << EOL;
+          out << "template <class RNG>" << EOL;
         } else if (is_lp) {
-          out << INDENT << "template <typename T_lp__, typename T_lp_accum__>" 
+          out << "template <typename T_lp__, typename T_lp_accum__>" 
               << EOL;
         } else if (is_log) {
-          out << INDENT << "template <bool propto>" 
+          out << "template <bool propto>" 
               << EOL;
         }
       }
@@ -4185,15 +4185,14 @@ namespace stan {
     void generate_function_inline_return_type(const function_decl_def& fun,
                                               const std::string& scalar_t_name,
                                               std::ostream& out) {
-      out << INDENT << "inline" << EOL;
-      out << INDENT;
+      out << "inline" << EOL;
       generate_bare_type(fun.return_type_,scalar_t_name,out);
       out << EOL;
     }
 
     void generate_function_name(const function_decl_def& fun,
                                 std::ostream& out) {
-      out << INDENT << fun.name_;
+      out << fun.name_;
     }
 
 
@@ -4221,34 +4220,33 @@ namespace stan {
       else if (is_lp)
         out << "T_lp__& lp__, T_lp_accum__& lp_accum__";
       out << ")";
-
-      // no-op body
-      if (fun.body_.is_no_op_statement()) {
-        out << ";" << EOL2;
-        return;
-      } 
     }
 
 
     void generate_function_body(const function_decl_def& fun,
                                 const std::string& scalar_t_name,
                                 std::ostream& out) {
+      // no-op body
+      if (fun.body_.is_no_op_statement()) {
+        out << ";" << EOL;
+        return;
+      } 
       out << " {" << EOL;
-      out << INDENT2 
+      out << INDENT
           << "typedef " << scalar_t_name << " return_t__;"
           << EOL;
       bool is_var = false;
       bool is_fun_return = true;
-      generate_statement(fun.body_,2,out,false,is_var,
+      generate_statement(fun.body_,1,out,false,is_var,
                          is_fun_return);
-      out << INDENT << "}" 
-          << EOL2;
+      out << "}" 
+          << EOL;
     }
 
     void generate_propto_default_function_body(const function_decl_def& fun,
                                                std::ostream& out) {
       out << " {" << EOL;
-      out << INDENT2 << "return ";
+      out << INDENT << "return ";
       out << fun.name_ << "<false>(";
       for (size_t i = 0; i < fun.arg_decls_.size(); ++i) {
         if (i > 0) 
@@ -4256,7 +4254,7 @@ namespace stan {
         out << fun.arg_decls_[i].name_;
       }
       out << ");" << EOL;
-      out << INDENT << "}" << EOL;
+      out << "}" << EOL;
     }
 
     void generate_propto_default_function(const function_decl_def& fun,
@@ -4283,6 +4281,7 @@ namespace stan {
       generate_function_arguments(fun,is_rng,is_lp,is_log,out);
       generate_function_body(fun,scalar_t_name,out);
 
+      // need a second function def for default propto=false for _log funs
       if (is_log)
         generate_propto_default_function(fun,scalar_t_name,out);
       out << EOL;
