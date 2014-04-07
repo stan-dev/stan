@@ -291,18 +291,32 @@ namespace stan {
       return retCode;
     }
 
+    typedef enum {
+      TERM_SUCCESS = 0,
+      TERM_ABSX = 10,
+      TERM_ABSF = 20,
+      TERM_RELF = 21,
+      TERM_GRAD = 30,
+      TERM_MAXIT = 40,
+      TERM_LSFAIL = -1
+    } TerminationCondition;
+    
     template<typename Scalar = double>
     class ConvergenceOptions {
     public:
       ConvergenceOptions() {
         maxIts = 10000;
-        tolX = 1e-8;
-        tolF = 1e-8;
+        tolAbsX = 1e-8;
+        tolAbsF = 1e-8;
+        tolRelF = 1e-6;
+        fScale = 1.0;
         tolGrad = 1e-8;
       }
       size_t maxIts;
-      Scalar tolX;
-      Scalar tolF;
+      Scalar tolAbsX;
+      Scalar tolAbsF;
+      Scalar tolRelF;
+      Scalar fScale;
       Scalar tolGrad;
     };
 
@@ -511,17 +525,19 @@ namespace stan {
       
       std::string get_code_string(int retCode) {
         switch(retCode) {
-          case 0:
+          case TERM_SUCCESS:
             return std::string("Successful step completed");
-          case 1:
-            return std::string("Convergence detected: change in objective function was below tolerance");
-          case 2:
+          case TERM_ABSF:
+            return std::string("Convergence detected: absolute change in objective function was below tolerance");
+          case TERM_RELF:
+            return std::string("Convergence detected: relative change in objective function was below tolerance");
+          case TERM_GRAD:
             return std::string("Convergence detected: gradient norm is below tolerance");
-          case 3:
-            return std::string("Convergence detected: parameter change was below tolerance");
-          case 4:
+          case TERM_ABSX:
+            return std::string("Convergence detected: absolute parameter change was below tolerance");
+          case TERM_MAXIT:
             return std::string("Maximum number of iterations hit, may not be at an optima");
-          case -1:
+          case TERM_LSFAIL:
             return std::string("Line search failed to achieve a sufficient decrease, no more progress can be made");
           default:
             return std::string("Unknown termination code");
@@ -543,7 +559,7 @@ namespace stan {
       }
       
       int step() {
-        Scalar gradNorm;
+        Scalar gradNorm, stepNorm, fDecrease;
         VectorT sk, yk;
         int retCode;
         int resetB(0);
@@ -588,7 +604,7 @@ namespace stan {
           if (retCode) {
             if (resetB) {
               // Line-search failed and nothing left to try
-              retCode = -1;
+              retCode = TERM_LSFAIL;
               return retCode;
             }
             else {
@@ -607,26 +623,31 @@ namespace stan {
         _gk.swap(_gk_1);
         _pk.swap(_pk_1);
         
-        gradNorm = _gk.norm();
-
         sk.noalias() = _xk - _xk_1;
         yk.noalias() = _gk - _gk_1;
 
+        gradNorm = _gk.norm();
+        stepNorm = sk.norm();
+        fDecrease = std::fabs(_fk - _fk_1);
+
         // Check for convergence
-        if (std::fabs(_fk - _fk_1) < _conv_opts.tolF) {
-          retCode = 1; // Objective function improvement wasn't sufficient
+        if (fDecrease < _conv_opts.tolAbsF) {
+          retCode = TERM_ABSF; // Objective function improvement wasn't sufficient
+        }
+        else if (fDecrease/std::max(std::fabs(_fk_1),_conv_opts.fScale) < _conv_opts.tolRelF) {
+          retCode = TERM_RELF; // Relative improvement in objective function wasn't sufficient
         }
         else if (gradNorm < _conv_opts.tolGrad) {
-          retCode = 2; // Gradient norm was below threshold
+          retCode = TERM_GRAD; // Gradient norm was below threshold
         }
-        else if (sk.norm() < _conv_opts.tolX) {
-          retCode = 3; // Change in x was too small
+        else if (stepNorm < _conv_opts.tolAbsX) {
+          retCode = TERM_ABSX; // Change in x was too small
         }
         else if (_itNum >= _conv_opts.maxIts) {
-          retCode = 4; // Max number of iterations hit
+          retCode = TERM_MAXIT; // Max number of iterations hit
         }
         else {
-          retCode = 0; // Step was successful more progress to be made
+          retCode = TERM_SUCCESS; // Step was successful more progress to be made
         }
 
         if (resetB) {

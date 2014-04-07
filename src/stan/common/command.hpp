@@ -467,11 +467,13 @@ namespace stan {
                                                          &std::cout);
           bfgs._ls_opts.alpha0 = dynamic_cast<stan::gm::real_argument*>(
                          algo->arg("bfgs")->arg("init_alpha"))->value();
-          bfgs._conv_opts.tolF = dynamic_cast<stan::gm::real_argument*>(
+          bfgs._conv_opts.tolAbsF = dynamic_cast<stan::gm::real_argument*>(
                          algo->arg("bfgs")->arg("tol_obj"))->value();
+          bfgs._conv_opts.tolRelF = dynamic_cast<stan::gm::real_argument*>(
+                         algo->arg("bfgs")->arg("tol_rel_obj"))->value();
           bfgs._conv_opts.tolGrad = dynamic_cast<stan::gm::real_argument*>(
                          algo->arg("bfgs")->arg("tol_grad"))->value();
-          bfgs._conv_opts.tolX = dynamic_cast<stan::gm::real_argument*>(
+          bfgs._conv_opts.tolAbsX = dynamic_cast<stan::gm::real_argument*>(
                          algo->arg("bfgs")->arg("tol_param"))->value();
           bfgs._conv_opts.maxIts = num_iterations;
           
@@ -542,11 +544,13 @@ namespace stan {
                          algo->arg("lbfgs")->arg("history_size"))->value());
           bfgs._ls_opts.alpha0 = dynamic_cast<gm::real_argument*>(
                          algo->arg("lbfgs")->arg("init_alpha"))->value();
-          bfgs._conv_opts.tolF = dynamic_cast<gm::real_argument*>(
+          bfgs._conv_opts.tolAbsF = dynamic_cast<gm::real_argument*>(
                          algo->arg("lbfgs")->arg("tol_obj"))->value();
+          bfgs._conv_opts.tolRelF = dynamic_cast<gm::real_argument*>(
+                         algo->arg("lbfgs")->arg("tol_rel_obj"))->value();
           bfgs._conv_opts.tolGrad = dynamic_cast<gm::real_argument*>(
                          algo->arg("lbfgs")->arg("tol_grad"))->value();
-          bfgs._conv_opts.tolX = dynamic_cast<gm::real_argument*>(
+          bfgs._conv_opts.tolAbsX = dynamic_cast<gm::real_argument*>(
                          algo->arg("lbfgs")->arg("tol_param"))->value();
           bfgs._conv_opts.maxIts = num_iterations;
           
