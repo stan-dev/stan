@@ -4,6 +4,7 @@
 #include <cmath>
 #include <cstdlib>
 #include <string>
+#include <limits>
 
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/tuple/tuple.hpp>
@@ -308,7 +309,7 @@ namespace stan {
         maxIts = 10000;
         tolAbsX = 1e-8;
         tolAbsF = 1e-8;
-        tolRelF = 1e-6;
+        tolRelF = 1e+7;
         fScale = 1.0;
         tolGrad = 1e-8;
       }
@@ -559,7 +560,7 @@ namespace stan {
       }
       
       int step() {
-        Scalar gradNorm, stepNorm, fDecrease;
+        Scalar gradNorm, stepNorm, fDecrease, fDenom;
         VectorT sk, yk;
         int retCode;
         int resetB(0);
@@ -629,12 +630,13 @@ namespace stan {
         gradNorm = _gk.norm();
         stepNorm = sk.norm();
         fDecrease = std::fabs(_fk - _fk_1);
+        fDenom = std::max(std::fabs(_fk_1),std::max(std::fabs(_fk),_conv_opts.fScale));
 
         // Check for convergence
         if (fDecrease < _conv_opts.tolAbsF) {
           retCode = TERM_ABSF; // Objective function improvement wasn't sufficient
         }
-        else if (fDecrease/std::max(std::fabs(_fk_1),_conv_opts.fScale) < _conv_opts.tolRelF) {
+        else if (fDecrease/fDenom < _conv_opts.tolRelF*std::numeric_limits<Scalar>::epsilon()) {
           retCode = TERM_RELF; // Relative improvement in objective function wasn't sufficient
         }
         else if (gradNorm < _conv_opts.tolGrad) {
