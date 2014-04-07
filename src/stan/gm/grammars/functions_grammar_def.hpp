@@ -126,7 +126,8 @@ namespace stan {
       static bool fun_exists(const std::set<std::pair<std::string, 
                                                       function_signature_t> >& existing,
                              const std::pair<std::string,function_signature_t>& name_sig) {
-        for (std::set<std::pair<std::string, function_signature_t> >::iterator it = existing.begin();
+        for (std::set<std::pair<std::string, function_signature_t> >::iterator it 
+               = existing.begin();
              it != existing.end();
              ++it)
           if (name_sig.first == (*it).first 
@@ -170,7 +171,11 @@ namespace stan {
         // add declaration in local sets and in parser function sigs
         if (functions_declared.find(name_sig) == functions_declared.end()) {
             functions_declared.insert(name_sig);
-            function_signatures::instance().add(decl.name_,result_type,arg_types);
+            function_signatures::instance()
+              .add(decl.name_,
+                   result_type,arg_types);
+            function_signatures::instance()
+              .set_user_defined(name_sig);
         }
         
         // add as definition if there's a body

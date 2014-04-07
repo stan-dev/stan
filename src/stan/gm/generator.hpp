@@ -188,6 +188,13 @@ namespace stan {
           o_ << "base_rng__";
         if (has_lp_suffix(fx.name_))
           o_ << "lp__, lp_accum__";
+        if (is_user_defined(fx)) {
+          if (fx.args_.size() > 0 
+              || has_rng_suffix(fx.name_) 
+              || has_lp_suffix(fx.name_))
+            o_ << ", ";
+          o_ << "pstream__";
+        }
         o_ << ')';
       }
       void operator()(const binary_op& expr) const {
@@ -4219,6 +4226,9 @@ namespace stan {
         out << "RNG& base_rng__";
       else if (is_lp)
         out << "T_lp__& lp__, T_lp_accum__& lp_accum__";
+      if (is_rng || is_lp || fun.arg_decls_.size() > 0)
+        out << ", ";
+      out << "std::ostream* pstream__";
       out << ")";
     }
 

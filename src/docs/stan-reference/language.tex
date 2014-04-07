@@ -3157,7 +3157,12 @@ not-a-number of infinite values, both of which will be printed.
 %
 \noindent
 Stan allows users to define their own functions.  The basic syntax is
-a simplified version of that used in C and \Cpp.
+a simplified version of that used in C and \Cpp.  This chapter
+specifies how functions are declare, defined, and used in Stan; see
+\refchapter{functions-programming} for a more programming-oriented
+perspective.
+
+
 
 \section{Function-Definition Block}
 
@@ -3365,7 +3370,7 @@ to a function parameter value will raise a compile-time error.%
 Local variables may be declared at the top of the function block and
 scope as usual.
 
-\section{Return Value}
+\section{Return Value}\label{function-returns.section}
 
 Non-void functions must have a return statement that returns an
 appropriately typed expression.   If the expression in a return

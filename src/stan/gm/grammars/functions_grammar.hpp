@@ -23,8 +23,11 @@ namespace stan {
                                    std::vector<function_decl_def>(),
                                    whitespace_grammar<Iterator> > {
 
-      // global info for function defs
+      // global variable info
       variable_map& var_map_;
+
+      // local info to keep track of which functions declared defined
+      // so far
       std::set<std::pair<std::string, 
                          function_signature_t> > functions_declared_;
       std::set<std::pair<std::string, 

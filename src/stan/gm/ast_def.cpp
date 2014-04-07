@@ -138,6 +138,19 @@ namespace stan {
         sigs_ = new function_signatures;
       return *sigs_;
     }
+    void
+    function_signatures::set_user_defined(const
+                                          std::pair<std::string,
+                                                    function_signature_t>&
+                                          name_sig) {
+      user_defined_set_.insert(name_sig);
+    }
+    bool 
+    function_signatures::is_user_defined(const std::pair<std::string,
+                                                         function_signature_t>&
+                                              name_sig) {
+      return user_defined_set_.find(name_sig) != user_defined_set_.end();
+    }
     void function_signatures::add(const std::string& name,
                                    const expr_type& result_type,
                                    const std::vector<expr_type>& arg_types) {
@@ -274,6 +287,31 @@ namespace stan {
       }
       return num_promotions;
     }
+    int function_signatures::get_signature_matches(const std::string& name,
+                              const std::vector<expr_type>& args,
+                              function_signature_t& signature) {
+
+      std::vector<function_signature_t> signatures = sigs_map_[name];
+      size_t match_index = 0; 
+      size_t min_promotions = std::numeric_limits<size_t>::max(); 
+      size_t num_matches = 0;
+
+      for (size_t i = 0; i < signatures.size(); ++i) {
+        signature = signatures[i];
+        int promotions = num_promotions(args,signature.second);
+        if (promotions < 0) continue; // no match
+        size_t promotions_ui = static_cast<size_t>(promotions);
+        if (promotions_ui < min_promotions) {
+          min_promotions = promotions_ui;
+          match_index = i;
+          num_matches = 1;
+        } else if (promotions_ui == min_promotions) {
+          ++num_matches;
+        }
+      }
+      return num_matches;
+    }
+        
     expr_type function_signatures::get_result_type(
                                          const std::string& name,
                                          const std::vector<expr_type>& args,
@@ -330,9 +368,9 @@ namespace stan {
       using std::set;
       using std::string;
       using std::vector;
-      // inefficient:  if used intensively, should provide const iterator adaptor
       set<string> result;
-      for (map<string,vector<function_signature_t> >::const_iterator it = sigs_map_.begin();
+      for (map<string,vector<function_signature_t> >::const_iterator 
+             it = sigs_map_.begin();
            it != sigs_map_.end();
            ++it)
         result.insert(it->first);
@@ -1300,6 +1338,21 @@ namespace stan {
         && s[n-1] == 'p'
         && s[n-2] == 'l'
         && s[n-3] == '_';
+    }
+
+    bool is_user_defined(const fun& fx) {
+      std::vector<expr_type> arg_types;
+      for (size_t i = 0; i < fx.args_.size(); ++i)
+        arg_types.push_back(fx.args_[i].expression_type());
+      function_signature_t sig;
+      int matches
+        = function_signatures::instance()
+        .get_signature_matches(fx.name_,arg_types,sig);
+      if (matches != 1)
+        return false; // reall shouldn't come up;  throw instead?
+      std::pair<std::string, function_signature_t> 
+        name_sig(fx.name_, sig);
+      return function_signatures::instance().is_user_defined(name_sig);
     }
 
     bool is_assignable(const expr_type& l_type,

@@ -104,6 +104,10 @@ namespace stan {
     class function_signatures {
     public:
       static function_signatures& instance();
+      void set_user_defined(const std::pair<std::string,function_signature_t>&
+                            name_sig);
+      bool is_user_defined(const std::pair<std::string,function_signature_t>&
+                           name_sig);
       void add(const std::string& name,
                const expr_type& result_type,
                const std::vector<expr_type>& arg_types);
@@ -161,11 +165,16 @@ namespace stan {
       expr_type get_result_type(const std::string& name,
                                 const std::vector<expr_type>& args,
                                 std::ostream& error_msgs);
+      int get_signature_matches(const std::string& name,
+                                const std::vector<expr_type>& args,
+                                function_signature_t& signature);
+
       std::set<std::string> key_set() const;
     private:
       function_signatures(); 
       function_signatures(const function_signatures& fs);
       std::map<std::string, std::vector<function_signature_t> > sigs_map_;
+      std::set<std::pair<std::string,function_signature_t> > user_defined_set_;
       static function_signatures* sigs_;  // init below outside of class
     };
     
@@ -405,7 +414,7 @@ namespace stan {
 
     struct variable_map {
       typedef std::pair<base_var_decl,var_origin> range_t;
-      std::map<std::string, range_t> map_;
+
       bool exists(const std::string& name) const;
       base_var_decl get(const std::string& name) const;
       base_expr_type get_base_type(const std::string& name) const;
@@ -415,6 +424,8 @@ namespace stan {
                const base_var_decl& base_decl,
                const var_origin& vo);
       void remove(const std::string& name);
+
+      std::map<std::string, range_t> map_;
     };
 
     struct int_var_decl : public base_var_decl {
@@ -778,13 +789,13 @@ namespace stan {
                  expression& expr);
     };
   
-    // FIXME:  is this next necessary dependency?
+    // FIXME:  is this next dependency necessary?
     // from generator.hpp
     void generate_expression(const expression& e, std::ostream& o);
 
     bool has_rng_suffix(const std::string& s);
     bool has_lp_suffix(const std::string& s);
-
+    bool is_user_defined(const fun& fx);
 
     struct contains_var : public boost::static_visitor<bool> {
       const variable_map& var_map_;
