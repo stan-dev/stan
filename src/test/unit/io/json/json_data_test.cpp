@@ -57,7 +57,6 @@ void test_real_var(stan::json::json_data& jdata,
     EXPECT_EQ(expected_vals[i],vals[i]);
 }
 
-
 void test_exception(const std::string& input,
                     const std::string& exception_text) {
   try {
@@ -69,6 +68,8 @@ void test_exception(const std::string& input,
   }
   FAIL();  // didn't throw an exception as expected.
 }
+
+
 
 
 TEST(ioJson,jsonData_scalar_int) {
@@ -195,16 +196,17 @@ TEST(ioJson,jsonData_real_array_2D) {
   stan::json::json_data jdata(in);
   std::vector<double> expected_vals;
   expected_vals.push_back(1.1);
-  expected_vals.push_back(1.2);
   expected_vals.push_back(2.1);
-  expected_vals.push_back(2.2);
   expected_vals.push_back(3.1);
+  expected_vals.push_back(1.2);
+  expected_vals.push_back(2.2);
   expected_vals.push_back(3.2);
   std::vector<long unsigned int> expected_dims;
   expected_dims.push_back(3);
   expected_dims.push_back(2);
   test_real_var(jdata,txt,"foo",expected_vals,expected_dims);
 }
+
 
 TEST(ioJson,jsonData_real_array_3D) {
   std::string txt = "{ \"foo\" : [ [ [ 11.1, 11.2, 11.3, 11.4 ], [ 12.1, 12.2, 12.3, 12.4 ], [ 13.1, 13.2, 13.3, 13.4] ],"
@@ -213,28 +215,28 @@ TEST(ioJson,jsonData_real_array_3D) {
   stan::json::json_data jdata(in);
   std::vector<double> expected_vals;
   expected_vals.push_back(11.1);
-  expected_vals.push_back(11.2);
-  expected_vals.push_back(11.3);
-  expected_vals.push_back(11.4);
-  expected_vals.push_back(12.1);
-  expected_vals.push_back(12.2);
-  expected_vals.push_back(12.3);
-  expected_vals.push_back(12.4);
-  expected_vals.push_back(13.1);
-  expected_vals.push_back(13.2);
-  expected_vals.push_back(13.3);
-  expected_vals.push_back(13.4);
   expected_vals.push_back(21.1);
-  expected_vals.push_back(21.2);
-  expected_vals.push_back(21.3);
-  expected_vals.push_back(21.4);
+  expected_vals.push_back(12.1);
   expected_vals.push_back(22.1);
-  expected_vals.push_back(22.2);
-  expected_vals.push_back(22.3);
-  expected_vals.push_back(22.4);
+  expected_vals.push_back(13.1);
   expected_vals.push_back(23.1);
+  expected_vals.push_back(11.2);
+  expected_vals.push_back(21.2);
+  expected_vals.push_back(12.2);
+  expected_vals.push_back(22.2);
+  expected_vals.push_back(13.2);
   expected_vals.push_back(23.2);
+  expected_vals.push_back(11.3);
+  expected_vals.push_back(21.3);
+  expected_vals.push_back(12.3);
+  expected_vals.push_back(22.3);
+  expected_vals.push_back(13.3);
   expected_vals.push_back(23.3);
+  expected_vals.push_back(11.4);
+  expected_vals.push_back(21.4);
+  expected_vals.push_back(12.4);
+  expected_vals.push_back(22.4);
+  expected_vals.push_back(13.4);
   expected_vals.push_back(23.4);
   std::vector<long unsigned int> expected_dims;
   expected_dims.push_back(2);  // two rows
@@ -250,28 +252,28 @@ TEST(ioJson,jsonData_int_array_3D) {
   stan::json::json_data jdata(in);
   std::vector<int> expected_vals;
   expected_vals.push_back(111);
-  expected_vals.push_back(112);
-  expected_vals.push_back(113);
-  expected_vals.push_back(114);
-  expected_vals.push_back(121);
-  expected_vals.push_back(122);
-  expected_vals.push_back(123);
-  expected_vals.push_back(124);
-  expected_vals.push_back(131);
-  expected_vals.push_back(132);
-  expected_vals.push_back(133);
-  expected_vals.push_back(134);
   expected_vals.push_back(211);
-  expected_vals.push_back(212);
-  expected_vals.push_back(213);
-  expected_vals.push_back(214);
+  expected_vals.push_back(121);
   expected_vals.push_back(221);
-  expected_vals.push_back(222);
-  expected_vals.push_back(223);
-  expected_vals.push_back(224);
+  expected_vals.push_back(131);
   expected_vals.push_back(231);
+  expected_vals.push_back(112);
+  expected_vals.push_back(212);
+  expected_vals.push_back(122);
+  expected_vals.push_back(222);
+  expected_vals.push_back(132);
   expected_vals.push_back(232);
+  expected_vals.push_back(113);
+  expected_vals.push_back(213);
+  expected_vals.push_back(123);
+  expected_vals.push_back(223);
+  expected_vals.push_back(133);
   expected_vals.push_back(233);
+  expected_vals.push_back(114);
+  expected_vals.push_back(214);
+  expected_vals.push_back(124);
+  expected_vals.push_back(224);
+  expected_vals.push_back(134);
   expected_vals.push_back(234);
   std::vector<long unsigned int> expected_dims;
   expected_dims.push_back(2);  // two rows
@@ -314,7 +316,29 @@ TEST(ioJson,jsonData_array_err6) {
 }
 
 TEST(ioJson,jsonData_array_err7) {
-  std::string txt = "{ \"foo\" : [1, 2, 3, 4, 5, 6, [7]] }";
+  std::string txt = "{  \"foo\" : [1, 2, 3, 4, 5, 6, [7]] }";
+  test_exception(txt,"variable: foo, error: non-scalar array value");
+}
+
+
+TEST(ioJson,jsonData_array_err8) {
+  std::string txt = "{ \"baz\" : [[1.0,2.0,3.0],[4.0,5.0,6]],  \"foo\" : [1, 2, 3, 4, [5], 6, 7] }";
+  test_exception(txt,"variable: foo, error: non-scalar array value");
+}
+
+TEST(ioJson,jsonData_array_err9) {
+  std::string txt = "{ \"baz\":[[1,2],[3,4.0]],  \"foo\" : [[1], 2, 3, 4, 5, 6, 7] }";
+  test_exception(txt,"variable: foo, error: non-rectangular array");
+}
+
+TEST(ioJson,jsonData_array_err10) {
+  std::string txt = "{  \"baz\":[1,2,\"-inf\"], \"foo\" : [1, 2, 3, 4, 5, 6, [7]] }";
+  test_exception(txt,"variable: foo, error: non-scalar array value");
+}
+
+TEST(ioJson,jsonData_array_err11) {
+  std::string txt = "{\"a\":1,  \"baz\":[1,2,\"-inf\"], \"b\":2.0, "
+    "\"foo\" : [1, 2, 3, 4, 5, 6, [7]] }";
   test_exception(txt,"variable: foo, error: non-scalar array value");
 }
 

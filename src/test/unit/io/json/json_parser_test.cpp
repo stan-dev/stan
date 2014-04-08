@@ -5,7 +5,8 @@
 class recording_handler : public stan::json::json_handler {
 public:
   std::stringstream os_;
-  recording_handler() : json_handler(), os_() { }
+  recording_handler() : json_handler(), os_() {
+  }
   void start_text() {
     os_ << "S:text";
   }
@@ -48,8 +49,8 @@ public:
 };
 
 bool hasEnding(std::string const &fullString, std::string const &ending) {
-  //  std::cout << "found: " << fullString << std::endl;
-  //  std::cout << "expect: " << ending << std::endl;
+  // std::cout << "found: " << fullString << std::endl;
+  // std::cout << "expect: " << ending << std::endl;
   if (fullString.length() >= ending.length()) {
     return (0 == fullString.compare (fullString.length() - ending.length(), ending.length(), ending));
   } else {
@@ -59,9 +60,12 @@ bool hasEnding(std::string const &fullString, std::string const &ending) {
 
 void test_parser(const std::string& input,
                  const std::string& expected_output) {
+  // std::cout << "input string: " << input << std::endl;
   recording_handler handler;
   std::stringstream s(input);
   stan::json::parse(s, handler);
+  //  std::cout << "parsing s: " << s.str() << std::endl;
+  //  std::cout << "result: " << handler.os_.str() << std::endl;
   EXPECT_EQ(expected_output, handler.os_.str());
 }
 
@@ -300,6 +304,59 @@ TEST(ioJson,jsonParserStr9) {
               "E:arr" "E:text");
 }
 
+TEST(ioJson,jsonParserStr10) {
+  test_parser("[ \"\\u0069\" ]",
+              "S:text" "S:arr" "STR:\"i\"" "E:arr" "E:text");
+}
+
+// surrogate pair for G clef character from extended multilingual plane:
+// specified here using hex values for non-ASCII UTF-8 bytes 
+TEST(ioJson,jsonParserStr11) {
+  test_parser("[ \"\\uD834\\uDD1E\" ]",
+              "S:text" "S:arr" "STR:\"\xf0\x9D\x84\x9E\"" "E:arr" "E:text");
+}
+
+
+// string w/ two non-ascii Latin 1 chars
+TEST(ioJson,jsonParserStr12) {
+  test_parser("[ \"D\\u00E9j\\u00E0 vu\" ]",
+              "S:text" "S:arr" "STR:\"D\xc3\xa9j\xc3\xa0 vu\"" "E:arr" "E:text");
+}
+
+// same string w/ non-ASCII chars not \u escaped (specified as hex byte values)
+TEST(ioJson,jsonParserStr13) {
+  test_parser("[ \"D\xc3\xa9j\xc3\xa0 vu\" ]",
+              "S:text" "S:arr" "STR:\"D\xc3\xa9j\xc3\xa0 vu\"" "E:arr" "E:text");
+}
+
+
+// surrogate pair boundary conditions
+TEST(ioJson,jsonParserStr14) {
+  test_parser("[ \"\\uD800\\uDC00\" ]",
+              "S:text" "S:arr" "STR:\"\xf0\x90\x80\x80\"" "E:arr" "E:text");
+}
+
+// surrogate pair boundary conditions
+TEST(ioJson,jsonParserStr15) {
+  test_parser("[ \"\\uD800\\uDFFF\" ]",
+              "S:text" "S:arr" "STR:\"\xf0\x90\x8F\xBF\"" "E:arr" "E:text");
+}
+
+// surrogate pair boundary conditions
+TEST(ioJson,jsonParserStr16) {
+  test_parser("[ \"\\uDBFF\\uDC00\" ]",
+              "S:text" "S:arr" "STR:\"\xf4\x8f\xb0\x80\"" "E:arr" "E:text");
+}
+
+// surrogate pair boundary conditions
+TEST(ioJson,jsonParserStr17) {
+  test_parser("[ \"a\\uE000\" ]",
+              "S:text" "S:arr" "STR:\"a\xEE\x80\x80\"" "E:arr" "E:text");
+}
+
+
+
+
 TEST(ioJson,jsonParserErr01) {
   test_exception(" \n \n   5    ",
                  "expecting start of object ({) or array ([)\n");
@@ -309,6 +366,23 @@ TEST(ioJson,jsonParserErr02) {
   test_exception("[ .5 ]",
                  "illegal value, expecting object, array, number, string, or literal true/false/null\n");
 }
+
+TEST(ioJson,jsonParserErr02a) {
+  test_exception("[ 0",
+                 "unexpected end of stream\n");
+}
+
+TEST(ioJson,jsonParserErr02b) {
+  test_exception("[ 0.",
+                 "unexpected end of stream\n");
+}
+
+
+TEST(ioJson,jsonParserErr02c) {
+  test_exception("[ 99.9",
+                 "unexpected end of stream\n");
+}
+
 
 TEST(ioJson,jsonParserErr03) {
   test_exception("[ 000.005 ]",
@@ -326,10 +400,52 @@ TEST(ioJson,jsonParserErr05) {
 }
 
 
+/*
 TEST(ioJson,jsonParserErr06) {
   test_exception("[ \"\\uFFFF\" ]",
                  "unicode escapes not supported\n");
 }
+*/
+
+TEST(ioJson,jsonParserErr06a) {
+  test_exception("[ \"\\uDD1Eabd \" ]",
+                 "illegal unicode values, found low-surrogate, missing high-surrogate\n");
+}
+
+TEST(ioJson,jsonParserErr06b) {
+  test_exception("[ \"\\uD834abc\" ]",
+                 "illegal unicode values, found high-surrogate, expecting low-surrogate\n");
+}
+
+
+// surrogate pair boundary conditions
+TEST(ioJson,jsonParserErr06c) {
+  test_exception("[ \"\\uDC00\\uDFFFF\" ]",
+              "illegal unicode values, found low-surrogate, missing high-surrogate\n");
+}
+
+
+// surrogate pair boundary conditions
+TEST(ioJson,jsonParserErr06d) {
+  test_exception("[ \"\\uE000\\uDFFF\" ]",
+                 "illegal unicode values, found low-surrogate, missing high-surrogate\n");
+}
+
+TEST(ioJson,jsonParserErr06e) {
+  test_exception("[ \"\\uD834",
+                 "unexpected end of stream\n");
+}
+
+TEST(ioJson,jsonParserErr06f) {
+  test_exception("[ \"\\uD8",
+                 "unexpected end of stream\n");
+}
+
+TEST(ioJson,jsonParserErr06g) {
+  test_exception("[ \"\\uE000\\uD",
+                 "unexpected end of stream\n");
+}
+
 
 TEST(ioJson,jsonParserErr07) {
   test_exception("[ \"\\aFFFF\" ]",
@@ -341,7 +457,7 @@ TEST(ioJson,jsonParserErr08) {
   char c = 11;
   ss << "[ \"" << c << "\" ]";
   test_exception(ss.str(),
-                 "illegal string character with code point less than U+0020\n");
+                 "found control character, char values less than U+0020 must be \\u escaped\n");
 }
 
 TEST(ioJson,jsonParserErr09) {
@@ -456,3 +572,23 @@ TEST(ioJson,jsonParserErr18) {
 }
 
 
+TEST(ioJson,jsonParserErr19a) {
+  test_exception("[ 1111111111111111111111111111 ]",
+                 "number exceeds integer range\n");
+}
+
+TEST(ioJson,jsonParserErr19b) {
+  test_exception("[ -1111111111111111111111111111 ]",
+                 "number exceeds integer range\n");
+}
+
+
+TEST(ioJson,jsonParserErr19c) {
+  test_exception("[ 9.9999999e-1000000000000 ]",
+                 "number exceeds double range\n");
+}
+
+TEST(ioJson,jsonParserErr19d) {
+  test_exception("[ 9.19191919191919e1000000000000 ]",
+                 "number exceeds double range\n");
+}

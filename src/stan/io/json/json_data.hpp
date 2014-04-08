@@ -22,14 +22,26 @@ namespace stan {
   namespace json {
 
     /**
-     * A json_data object represents a set of named arrays of any dimensionality.
-     * The values for an array are typed to double or int.  
+     * A <code>json_data</code> is a <code>var_context</code> object
+     * that represents a set of named values which are typed to either
+     * <code>double</code> or <code>int</code> and can be either scalar
+     * value or a non-empty array of values of any dimensionality.
+     * Arrays must be retangular and the values of an array are all of
+     * the same type, either double or int.
+     * 
+     * <p>The dimensions and values of variables are accessed by variable name. 
+     * The values of a variable are stored as a vector of values and
+     * a vector of array dimensions, where a scalar value consists of
+     * a single value and an emtpy vector for the dimensionality.
+     * Multidimensional arrays are stored in column-major order,
+     * meaning the first index changes the most quickly.
+     * If all the values of an array are int values, the array will be
+     * stored as a vector of ints, else the array will be stored
+     * as a vector of type double.
      *
-     * <p>Json_Data objects are created by using the json_parser to read
-     * a single JSON text from an input stream using the json_parser. 
-     *
-     * <p>The dimensions and values of variables
-     * may be accessed by name. 
+     * <p><code>json_data</code> objects are created by using the 
+     * <code>json_parser</code> and a <code>json_data_handler</code>
+     * to read a single JSON text from an input stream. 
      */
     class json_data : public stan::io::var_context {
     private: 
@@ -39,7 +51,6 @@ namespace stan {
       std::vector<double> const empty_vec_r_;
       std::vector<int> const empty_vec_i_;
       std::vector<size_t> const empty_vec_ui_;
-
 
       /**
        * Return <code>true</code> if this json_data contains the specified
@@ -53,6 +64,7 @@ namespace stan {
       bool contains_r_only(const std::string& name) const {
         return vars_r_.find(name) != vars_r_.end();
       }
+
     public: 
 
       /**
@@ -66,7 +78,6 @@ namespace stan {
       json_data(std::istream& in) : vars_r_(), vars_i_() {
         json_data_handler handler(vars_r_, vars_i_);
         stan::json::parse(in, handler);
-        //        std::cout << "parsed" << std::endl;
       }
 
       /**

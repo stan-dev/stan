@@ -7,6 +7,8 @@
 #include <sstream>
 #include <string>
 
+#include <boost/lexical_cast.hpp>
+
 #include <stan/io/json/json_error.hpp>
 
 namespace stan {
@@ -14,6 +16,20 @@ namespace stan {
   namespace json {
 
     namespace {
+
+      const unsigned int MIN_HIGH_SURROGATE = 0xD800;
+      const unsigned int MAX_HIGH_SURROGATE = 0xDBFF;
+      const unsigned int MIN_LOW_SURROGATE = 0xDC00;
+      const unsigned int MAX_LOW_SURROGATE = 0xDFFF;
+      const unsigned int MIN_SUPPLEMENTARY_CODE_POINT = 0x010000;            
+
+      inline bool is_high_surrogate(unsigned int cp) {
+        return (cp >= MIN_HIGH_SURROGATE && cp <= MAX_HIGH_SURROGATE);
+      }
+
+      inline bool is_low_surrogate(unsigned int cp) {
+        return (cp >= MIN_LOW_SURROGATE && cp <= MAX_LOW_SURROGATE);
+      }
 
       inline bool is_whitespace(char c) {
         return c == ' ' || c == '\n' || c == '\t' || c == '\r';
@@ -164,19 +180,34 @@ namespace stan {
           }
           unget_char();
 
-
+          // need to check that number is in long or double range
           if (is_integer) {
             if (is_positive) {
               unsigned long n;
+              try {   
+                n = boost::lexical_cast<unsigned long>(ss.str());
+              } catch (const boost::bad_lexical_cast & ) {
+                throw json_exception("number exceeds integer range");
+              }
               ss >> n;
               h_.number_unsigned_long(n);
             } else {
               long n;
+              try {   
+                n = boost::lexical_cast<unsigned long>(ss.str());
+              } catch (const boost::bad_lexical_cast & ) {
+                throw json_exception("number exceeds integer range");
+              }
               ss >> n;
               h_.number_long(n);
             }
           } else {
             double x;
+            try {   
+              x = boost::lexical_cast<double>(ss.str());
+            } catch (const boost::bad_lexical_cast & ) {
+              throw json_exception("number exceeds double range");
+            }
             ss >> x;
             h_.number_double(x);
           }
@@ -203,14 +234,14 @@ namespace stan {
               } else if (c == 't') {
                 s << '\t';
               } else if (c == 'u') {
-                throw json_exception("unicode escapes not supported");
+                get_escaped_unicode(s);
               } else {
                 throw json_exception("expecting legal escape");
               }
               continue;
-            } else if (c < 0x20) {
-              throw json_exception("illegal string character with code point"
-                                   " less than U+0020");
+            } else if (c > 0 && c < 0x20) { // ASCII control characters
+              throw json_exception("found control character, "
+                                   "char values less than U+0020 must be \\u escaped");
             }
             s << c;
           }
@@ -229,6 +260,66 @@ namespace stan {
         void parse_null_literal() {
           get_chars("ull");
           h_.null();
+        }
+
+        // escaped unicode can handle surrogate pairs
+        void get_escaped_unicode(std::stringstream& s) {
+          unsigned int codepoint = get_int_as_hex_chars();
+          if (!(is_high_surrogate(codepoint) || is_low_surrogate(codepoint))) {
+            putCodepoint(s,codepoint);
+          } else if (!is_high_surrogate(codepoint)) {
+              throw json_exception("illegal unicode values, "
+                                   "found low-surrogate, missing high-surrogate");
+          } else {
+            char c = get_char();
+            if (! (c == '\\'))
+              throw json_exception("illegal unicode values, "
+                                   "found high-surrogate, expecting low-surrogate");
+            c = get_char();
+            if (! (c == 'u'))
+              throw json_exception("illegal unicode values, "
+                                   "found high-surrogate, expecting low-surrogate");
+            unsigned int codepoint2 = get_int_as_hex_chars();
+            unsigned int supplemental 
+              = ((codepoint - MIN_HIGH_SURROGATE) << 10)
+              + (codepoint2 - MIN_LOW_SURROGATE) 
+              + MIN_SUPPLEMENTARY_CODE_POINT;
+            putCodepoint(s,supplemental);
+          }
+        }
+
+        unsigned int get_int_as_hex_chars() {
+          std::stringstream s;
+          s << std::hex;
+          for (int i=0; i<4; i++) {
+            char c = get_char();
+            if (! ((c >= 'a' && c<= 'f') 
+                   || (c >= 'A' && c<= 'F')
+                   || (c >= '0' && c<= '9')))
+              throw json_exception("illegal unicode code point");
+            s << c;
+          }
+          unsigned int hex;
+          s >> hex;
+          return hex;
+        }
+
+        void putCodepoint(std::stringstream& s, unsigned int codepoint){
+          if (codepoint <= 0x7f)
+            s.put(codepoint);
+          else if (codepoint <= 0x7ff) {
+            s.put(0xc0 | ((codepoint >> 6) & 0x1f));
+            s.put(0x80 | (codepoint & 0x3f));
+          } else if (codepoint <= 0xffff) {
+            s.put(0xe0 | ((codepoint >> 12) & 0x0f));
+            s.put(0x80 | ((codepoint >> 6) & 0x3f));
+            s.put(0x80 | (codepoint & 0x3f));
+          } else {
+            s.put(0xf0 | ((codepoint >> 18) & 0x07));
+            s.put(0x80 | ((codepoint >> 12) & 0x3f));
+            s.put(0x80 | ((codepoint >> 6) & 0x3f));
+            s.put(0x80 | (codepoint & 0x3f));
+          }
         }
 
         void get_chars(const std::string& s) {
