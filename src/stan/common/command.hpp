@@ -118,7 +118,7 @@ namespace stan {
       
       std::fstream data_stream(data_file.c_str(),
                                std::fstream::in);
-      stan::json::json_data data_var_context(data_stream);
+      stan::io::dump data_var_context(data_stream);
       data_stream.close();
       
       // Sample output
