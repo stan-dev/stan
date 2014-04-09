@@ -35,6 +35,12 @@ namespace stan {
         return c == ' ' || c == '\n' || c == '\t' || c == '\r';
       }
 
+      /**
+       * A <code>json_parser</code> is a SAX-style streaming parser
+       * that enforces JSON syntax and parses JSON elements 
+       * from an input stream, sending callbacks to a user-supplied
+       * <code>json_handler</code>.
+       */
       template <typename Handler, bool Validate_UTF_8>
       class parser {
 
