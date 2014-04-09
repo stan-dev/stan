@@ -180,7 +180,6 @@ namespace stan {
           }
           unget_char();
 
-          // need to check that number is in long or double range
           if (is_integer) {
             if (is_positive) {
               unsigned long n;
@@ -262,7 +261,6 @@ namespace stan {
           h_.null();
         }
 
-        // escaped unicode can handle surrogate pairs
         void get_escaped_unicode(std::stringstream& s) {
           unsigned int codepoint = get_int_as_hex_chars();
           if (!(is_high_surrogate(codepoint) || is_low_surrogate(codepoint))) {
