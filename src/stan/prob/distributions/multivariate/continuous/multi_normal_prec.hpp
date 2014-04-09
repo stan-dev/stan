@@ -34,7 +34,8 @@ namespace stan {
                           const T_loc& mu,
                           const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& Sigma) {
       static const char* function = "stan::prob::multi_normal_prec_log(%1%)";
-      typename boost::math::tools::promote_args<typename scalar_type<T_y>::type, typename scalar_type<T_loc>::type, T_covar>::type lp(0.0);
+      typedef typename boost::math::tools::promote_args<typename scalar_type<T_y>::type, typename scalar_type<T_loc>::type, T_covar>::type lp_type;
+      lp_type lp(0.0);
       
       using stan::math::check_not_nan;
       using stan::math::check_symmetric;
@@ -135,14 +136,16 @@ namespace stan {
         lp += NEG_LOG_SQRT_TWO_PI * size_y * size_vec;
 
       if (include_summand<propto,T_y,T_loc,T_covar>::value) {
+        lp_type sum_lp_vec(0.0);
         for (size_t i = 0; i < size_vec; i++) {
           Matrix<typename 
               boost::math::tools::promote_args<typename scalar_type<T_y>::type, typename scalar_type<T_loc>::type>::type,
               Dynamic, 1> y_minus_mu(size_y);
           for (int j = 0; j < size_y; j++)
             y_minus_mu(j) = y_vec[i](j)-mu_vec[i](j);
-          lp -= 0.5 * trace_quad_form(Sigma,y_minus_mu);
+          sum_lp_vec += trace_quad_form(Sigma,y_minus_mu);
         }
+        lp -= 0.5*sum_lp_vec;
       }
       return lp;
     }

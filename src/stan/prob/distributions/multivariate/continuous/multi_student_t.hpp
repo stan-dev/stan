@@ -47,8 +47,8 @@ namespace stan {
       using stan::math::LDLT_factor;
       using stan::math::check_ldlt_factor;
 
-      typename boost::math::tools::promote_args<typename scalar_type<T_y>::type,T_dof,typename scalar_type<T_loc>::type,T_scale>::type
-      lp(0.0);
+      typedef typename boost::math::tools::promote_args<typename scalar_type<T_y>::type,T_dof,typename scalar_type<T_loc>::type,T_scale>::type lp_type;
+      lp_type lp(0.0);
       
       // allows infinities
       if (!check_not_nan(function, nu, 
@@ -156,16 +156,16 @@ namespace stan {
       }
 
       if (include_summand<propto,T_y,T_dof,T_loc,T_scale>::value) {
+        lp_type sum_lp_vec(0.0);
         for (size_t i = 0; i < size_vec; i++) {
           Matrix<typename 
               boost::math::tools::promote_args<typename scalar_type<T_y>::type, typename scalar_type<T_loc>::type>::type,
               Dynamic, 1> y_minus_mu(size_y);
           for (int j = 0; j < size_y; j++)
             y_minus_mu(j) = y_vec[i](j)-mu_vec[i](j);
-          lp -= 0.5 
-            * (nu + size_y)
-            * log(1.0 + trace_inv_quad_form_ldlt(ldlt_Sigma,y_minus_mu) / nu);
+          sum_lp_vec += log(1.0 + trace_inv_quad_form_ldlt(ldlt_Sigma,y_minus_mu) / nu);
         }
+        lp -= 0.5 * (nu + size_y) * sum_lp_vec;
       }
       return lp;
     }

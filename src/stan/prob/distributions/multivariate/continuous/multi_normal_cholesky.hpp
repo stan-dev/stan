@@ -62,7 +62,8 @@ namespace stan {
       using stan::math::check_cov_matrix;
       using boost::math::tools::promote_args;
 
-      typename boost::math::tools::promote_args<typename scalar_type<T_y>::type, typename scalar_type<T_loc>::type, T_covar>::type lp(0.0);
+      typedef typename boost::math::tools::promote_args<typename scalar_type<T_y>::type, typename scalar_type<T_loc>::type, T_covar>::type lp_type;
+      lp_type lp(0.0);
 
       VectorViewMvt<const T_y> y_vec(y);
       VectorViewMvt<const T_loc> mu_vec(mu);
@@ -138,6 +139,7 @@ namespace stan {
         }
         
       if (include_summand<propto,T_y,T_loc,T_covar>::value) {
+        lp_type sum_lp_vec(0.0);
         for (size_t i = 0; i < size_vec; i++) {
           Eigen::Matrix<typename 
             boost::math::tools::promote_args<typename scalar_type<T_y>::type,typename scalar_type<T_loc>::type>::type,
@@ -153,8 +155,9 @@ namespace stan {
           //               boost::math::tools::promote_args<T_covar,typename scalar_type<T_loc>::type,typename scalar_type<T_y>::type>::type>::type,
           //               Eigen::Dynamic, 1> 
           //   half(mdivide_left_tri_low(L,subtract(y,mu)));
-          lp -= 0.5 * dot_self(half);
+          sum_lp_vec += dot_self(half);
         }
+        lp -= 0.5*sum_lp_vec;
       }
       return lp;
     }
