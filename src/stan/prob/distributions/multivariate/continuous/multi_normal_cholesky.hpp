@@ -66,12 +66,13 @@ namespace stan {
 
       VectorViewMvt<const T_y> y_vec(y);
       VectorViewMvt<const T_loc> mu_vec(mu);
-      size_t size = max_size_mvt(y, mu);
+      //size of std::vector of Eigen vectors
+      size_t size_vec = max_size_mvt(y, mu);
 
       //Check if every vector of the array has the same size
       int size_y = y_vec[0].size();
       int size_mu = mu_vec[0].size();
-      if (size > 1) {
+      if (size_vec > 1) {
         int size_y_old = size_y;
         int size_y_new;
         for (size_t i = 1, size_ = length_mvt(y); i < size_; i++) {
@@ -117,7 +118,7 @@ namespace stan {
                             &lp))
         return lp;
         
-      for (size_t i = 0; i < size; i++) { 
+      for (size_t i = 0; i < size_vec; i++) { 
         if (!check_finite(function, mu_vec[i], "Location parameter", &lp)) 
           return lp;
         if (!check_not_nan(function, y_vec[i], "Random variable", &lp)) 
@@ -129,15 +130,15 @@ namespace stan {
 
       
         if (include_summand<propto>::value) 
-          lp += NEG_LOG_SQRT_TWO_PI * size_y * size;
+          lp += NEG_LOG_SQRT_TWO_PI * size_y * size_vec;
         
         if (include_summand<propto,T_covar>::value) {
           Eigen::Matrix<T_covar,Eigen::Dynamic,1> L_log_diag = L.diagonal().array().log().matrix();
-          lp -= sum(L_log_diag) * size;
+          lp -= sum(L_log_diag) * size_vec;
         }
         
-      for (size_t i = 0; i < size; i++) {      
-        if (include_summand<propto,T_y,T_loc,T_covar>::value) {
+      if (include_summand<propto,T_y,T_loc,T_covar>::value) {
+        for (size_t i = 0; i < size_vec; i++) {
           Eigen::Matrix<typename 
             boost::math::tools::promote_args<typename scalar_type<T_y>::type,typename scalar_type<T_loc>::type>::type,
             Eigen::Dynamic, 1> y_minus_mu(size_y);
