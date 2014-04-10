@@ -64,7 +64,6 @@ void test_parser(const std::string& input,
   recording_handler handler;
   std::stringstream s(input);
   stan::json::parse(s, handler);
-  //  std::cout << "parsing s: " << s.str() << std::endl;
   //  std::cout << "result: " << handler.os_.str() << std::endl;
   EXPECT_EQ(expected_output, handler.os_.str());
 }
