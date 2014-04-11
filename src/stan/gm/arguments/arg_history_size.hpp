@@ -18,8 +18,8 @@ namespace stan {
         _default = "5";
         _default_value = 5;
         _constrained = true;
-        _good_value = 2.0;
-        _bad_value = -1.0;
+        _good_value = 2;
+        _bad_value = -1;
         _value = _default_value;
       };
       
