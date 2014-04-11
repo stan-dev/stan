@@ -297,7 +297,8 @@ namespace stan {
       TERM_ABSX = 10,
       TERM_ABSF = 20,
       TERM_RELF = 21,
-      TERM_GRAD = 30,
+      TERM_ABSGRAD = 30,
+      TERM_RELGRAD = 31,
       TERM_MAXIT = 40,
       TERM_LSFAIL = -1
     } TerminationCondition;
@@ -307,18 +308,22 @@ namespace stan {
     public:
       ConvergenceOptions() {
         maxIts = 10000;
+        fScale = 1.0;
+
         tolAbsX = 1e-8;
         tolAbsF = 1e-8;
+        tolAbsGrad = 1e-8;
+
         tolRelF = 1e+7;
-        fScale = 1.0;
-        tolGrad = 1e-8;
+        tolRelGrad = 1e+3;
       }
       size_t maxIts;
       Scalar tolAbsX;
       Scalar tolAbsF;
       Scalar tolRelF;
       Scalar fScale;
-      Scalar tolGrad;
+      Scalar tolAbsGrad;
+      Scalar tolRelGrad;
     };
 
     template<typename Scalar = double>
@@ -362,28 +367,33 @@ namespace stan {
       }
 
       /**
-       * Reset the approximation of the inverse Hessian to a scaled identity.
-       *
-       * @param B0 Scale of the Hessian matrix.
-       * @param N Dimension of state vector for the problem.
-       **/
-      inline void reset(const Scalar &B0,size_t N) {
-        _buf.clear();
-      }
-
-      /**
        * Add a new set of update vectors to the history.
        *
        * @param yk Difference between the current and previous gradient vector.
        * @param sk Difference between the current and previous state vector.
+       * @param reset Whether to reset the approximation, forgetting about previous values.
+       * @return In the case of a reset, returns the optimal scaling of the initial Hessian
+       * approximation which is useful for predicting step-sizes.
        **/
-      inline void update(const VectorT &yk, const VectorT &sk) {
-        // New updates are pushed to the "back" of the circular buffer
+      inline Scalar update(const VectorT &yk, const VectorT &sk, bool reset = false) {
         Scalar skyk = yk.dot(sk);
+
+        Scalar B0fact;
+        if (reset) {
+          B0fact = yk.squaredNorm()/skyk;
+          _buf.clear();
+        }
+        else {
+          B0fact = 1.0;
+        }
+
+        // New updates are pushed to the "back" of the circular buffer
         Scalar invskyk = 1.0/skyk;
         _gammak = skyk/yk.squaredNorm();
         _buf.push_back();
         _buf.back() = boost::tie(invskyk,yk,sk);
+
+        return B0fact;
       }
 
       /**
@@ -441,23 +451,16 @@ namespace stan {
       typedef Eigen::Matrix<Scalar,DimAtCompile,DimAtCompile> HessianT;
 
       /**
-       * Reset the approximation of the inverse Hessian to a scaled identity.
-       *
-       * @param B0 Scale of the Hessian matrix.
-       * @param N Dimension of state vector for the problem.
-       **/
-      inline void reset(const Scalar &B0,size_t N) {
-          _Hk.noalias() = (1.0/B0)*HessianT::Identity(N,N);
-      }
-
-      /**
        * Update the inverse Hessian approximation.
        *
        * @param yk Difference between the current and previous gradient vector.
        * @param sk Difference between the current and previous state vector.
+       * @param reset Whether to reset the approximation, forgetting about previous values.
+       * @return In the case of a reset, returns the optimal scaling of the initial Hessian
+       * approximation which is useful for predicting step-sizes.
        **/
-      inline void update(const VectorT &yk, const VectorT &sk) {
-        Scalar rhok, skyk;
+      inline Scalar update(const VectorT &yk, const VectorT &sk, bool reset = false) {
+        Scalar rhok, skyk, B0fact;
         HessianT Hupd;
 
         skyk = yk.dot(sk);
@@ -465,7 +468,16 @@ namespace stan {
 
         Hupd.noalias() = HessianT::Identity(yk.size(),yk.size()) 
                                         - rhok*sk*yk.transpose();
-        _Hk = Hupd*_Hk*Hupd.transpose() + rhok*sk*sk.transpose();
+        if (reset) {
+          B0fact = yk.squaredNorm()/skyk;
+          _Hk.noalias() = ((1.0/B0fact)*Hupd)*Hupd.transpose();
+        }
+        else {
+          B0fact = 1.0;
+          _Hk = Hupd*_Hk*Hupd.transpose();
+        }
+        _Hk.noalias() += rhok*sk*sk.transpose();
+        return B0fact;
       }
 
       /**
@@ -518,6 +530,13 @@ namespace stan {
       const VectorT &prev_p() const { return _pk_1; }
       Scalar prev_step_size() const { return _pk_1.norm()*_alphak_1; }
 
+      inline Scalar rel_grad_norm() const {
+        return _pk.dot(_gk) / std::max(std::fabs(_fk),_conv_opts.fScale);
+      }
+      inline Scalar rel_obj_decrease() const { 
+        return std::fabs(_fk_1 - _fk) / std::max(std::fabs(_fk_1),std::max(std::fabs(_fk),_conv_opts.fScale));
+      }
+
       const Scalar &alpha0() const { return _alpha0; }
       const Scalar &alpha() const { return _alpha; }
       const size_t iter_num() const { return _itNum; }
@@ -532,8 +551,10 @@ namespace stan {
             return std::string("Convergence detected: absolute change in objective function was below tolerance");
           case TERM_RELF:
             return std::string("Convergence detected: relative change in objective function was below tolerance");
-          case TERM_GRAD:
+          case TERM_ABSGRAD:
             return std::string("Convergence detected: gradient norm is below tolerance");
+          case TERM_RELGRAD:
+            return std::string("Convergence detected: relative gradient magnitude is below tolerance");
           case TERM_ABSX:
             return std::string("Convergence detected: absolute parameter change was below tolerance");
           case TERM_MAXIT:
@@ -560,9 +581,9 @@ namespace stan {
       }
       
       int step() {
-        Scalar gradNorm, stepNorm, fDecrease, fDenom;
+        Scalar gradNorm, stepNorm;
         VectorT sk, yk;
-        int retCode;
+        int retCode(0);
         int resetB(0);
         
         _itNum++;
@@ -581,11 +602,10 @@ namespace stan {
             // Reset the Hessian approximation
             _pk.noalias() = -_gk;
           }
-          else {
-            _qn.search_direction(_pk,_gk);
-          }
-          
+
+          // Get an initial guess for the step size (alpha)
           if (_itNum > 1 && resetB != 2) {
+            // use cubic interpolation based on the previous step
             _alpha0 = _alpha = std::min(1.0,
                                         1.01*CubicInterp(_gk_1.dot(_pk_1),
                                                          _alphak_1,
@@ -594,8 +614,10 @@ namespace stan {
                                                          _ls_opts.minAlpha, 1.0));
           }
           else {
+            // On the first step (or, after a reset) use the default step size
             _alpha0 = _alpha = _ls_opts.alpha0;
           }
+
           // Perform the line search.  If successful, the results are in the 
           // variables: _xk_1, _fk_1 and _gk_1.
           retCode = WolfeLineSearch(_func, _alpha, _xk_1, _fk_1, _gk_1,
@@ -603,15 +625,16 @@ namespace stan {
                                     _ls_opts.c1, _ls_opts.c2, 
                                     _ls_opts.minAlpha);
           if (retCode) {
+            // Line search failed...
             if (resetB) {
-              // Line-search failed and nothing left to try
+              // did a Hessian reset and it still failed, and nothing left to try
               retCode = TERM_LSFAIL;
               return retCode;
             }
             else {
-              // Line-search failed, try ditching the Hessian approximation
+              // try resetting the Hessian approximation
               resetB = 2;
-              _note += "LS failed, BFGS reset; ";
+              _note += "LS failed, Hessian reset";
               continue;
             }
           }
@@ -629,18 +652,30 @@ namespace stan {
 
         gradNorm = _gk.norm();
         stepNorm = sk.norm();
-        fDecrease = std::fabs(_fk - _fk_1);
-        fDenom = std::max(std::fabs(_fk_1),std::max(std::fabs(_fk),_conv_opts.fScale));
+
+        // Update QN approximation
+        if (resetB) {
+          // If the QN approximation was reset, automatically scale it
+          // and update the step-size accordingly
+          Scalar B0fact = _qn.update(yk,sk,true);
+          _pk_1 /= B0fact;
+          _alphak_1 = _alpha*B0fact;
+        }
+        else {
+          _qn.update(yk,sk);
+          _alphak_1 = _alpha;
+        }
+
+
+        // Compute search direction for next step
+        _qn.search_direction(_pk,_gk);
 
         // Check for convergence
-        if (fDecrease < _conv_opts.tolAbsF) {
+        if (std::fabs(_fk_1 - _fk) < _conv_opts.tolAbsF) {
           retCode = TERM_ABSF; // Objective function improvement wasn't sufficient
         }
-        else if (fDecrease/fDenom < _conv_opts.tolRelF*std::numeric_limits<Scalar>::epsilon()) {
-          retCode = TERM_RELF; // Relative improvement in objective function wasn't sufficient
-        }
-        else if (gradNorm < _conv_opts.tolGrad) {
-          retCode = TERM_GRAD; // Gradient norm was below threshold
+        else if (gradNorm < _conv_opts.tolAbsGrad) {
+          retCode = TERM_ABSGRAD; // Gradient norm was below threshold
         }
         else if (stepNorm < _conv_opts.tolAbsX) {
           retCode = TERM_ABSX; // Change in x was too small
@@ -648,20 +683,15 @@ namespace stan {
         else if (_itNum >= _conv_opts.maxIts) {
           retCode = TERM_MAXIT; // Max number of iterations hit
         }
+        else if (rel_obj_decrease() < _conv_opts.tolRelF*std::numeric_limits<Scalar>::epsilon()) {
+          retCode = TERM_RELF; // Relative improvement in objective function wasn't sufficient
+        }
+        else if (rel_grad_norm() < _conv_opts.tolRelGrad*std::numeric_limits<Scalar>::epsilon()) {
+          retCode = TERM_RELGRAD; // Relative gradient norm was below threshold
+        }
         else {
           retCode = TERM_SUCCESS; // Step was successful more progress to be made
         }
-
-        if (resetB) {
-          Scalar B0fact = yk.squaredNorm()/yk.dot(sk);
-          _qn.reset(B0fact,yk.size());
-          _pk_1 /= B0fact;
-          _alphak_1 = _alpha*B0fact;
-        }
-        else {
-          _alphak_1 = _alpha;
-        }
-        _qn.update(yk,sk);
 
         return retCode;
       }
