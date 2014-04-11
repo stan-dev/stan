@@ -1340,42 +1340,56 @@ configuration.  The other arguments may appear in any order.
 %
     \hiercmdarg{\indentarrow\indentarrow}{algorithm}{$$list element$$}
       {Optimization algorithm}
-      {Valid values: \  \code{nesterov, bfgs, newton}}
+      {Valid values: \  \code{nesterov, bfgs, lbfgs, newton}}
       {Defaults to \code{bfgs}}
 \end{description}
 %
-The following options are for the BFGS optimizer.  BFGS is the default
+The following options are for the (L-)BFGS optimizer.  BFGS is the default
 optimizer and also much faster than the other optimizers.  
 
-Convergence monitoring in BFGS is controlled by a number of tolerance
+Convergence monitoring in (L-)BFGS is controlled by a number of tolerance
 values, any one of which being satisified causes the algorithm to
 terminate with a solution.
 %
 \begin{itemize}
 \item The log probability is considered to have converged if
 \[
-\left| \log p(\theta^{(i)}|y) - \log p(\theta^{(i-1)}|y) \right| <
-\mbox{\code{tol\_obj}}.
+\left| \log p(\theta_{i}|y) - \log p(\theta_{i-1}|y) \right| <
+\mbox{\code{tol\_obj}}
+\]
+or
+\[
+\frac{\left| \log p(\theta_{i}|y) - \log p(\theta_{i-1}|y) \right|}{\
+\max\left(\left| \log p(\theta_{i}|y)\right|,\left| \log p(\theta_{i-1}|y)\right|,1.0\right)}
+ < \mbox{\code{tol\_rel\_obj}} * \epsilon.
 \]
 \item The parameters are considered to have converged if
 %
 \\
 \[
-|| \theta^{(i)} - \theta^{(i-1)} || < \mbox{\code{tol\_param}}.
+|| \theta_{i} - \theta_{i-1} || < \mbox{\code{tol\_param}}.
 \]
 %
 \item The gradient is considered to have converged to 0 if 
 \[
-|| \nabla_{\theta} \log p(\theta^{(i)}|y) || < \mbox{\code{tol\_grad}}.
+|| g_{i} || < \mbox{\code{tol\_grad}}
+\]
+or
+\[
+\frac{g_{i}^T \hat{H}_{i}^{-1} g_{i} }{ \max\left(\left|\log p(\theta_{i}|y)\right|,1.0\right) } < \mbox{\code{tol\_rel\_grad}} * \epsilon.
 \]
 \end{itemize}
 %
-Here, $i$ is the current iteration, $\theta^{(i)}$ is the value of the
-parameters at iteration $i$, $y$ is the data, $p(\theta^{(i)}|y)$ is
-the posterior probability of $\theta^{(i)}$ up to a proportion,
+Here, $i$ is the current iteration, $\theta_{i}$ is the value of the
+parameters at iteration $i$, $y$ is the data, $p(\theta_{i}|y)$ is
+the posterior probability of $\theta_{i}$ up to a proportion,
 $\nabla_{\theta}$ is the gradient operator with respect to $\theta$,
-$|u|$ is absolute value (L1 norm) of $u$, and $||u||$ is vector length
-(L2 norm) of $u$.
+$g_{i} = \nabla_{\theta} \log p(\theta_{i}|y)$ is the gradient at
+iteration $i$, $\hat{H}_{i}$ is the estimate of the Hessian at 
+iteration $i$, $|u|$ is absolute value (L1 norm) of $u$,
+$||u||$ is vector length (L2 norm) of $u$, and $\epsilon \approx 2e-16$ is
+machine precision.  Any of the convergence tests can be disabled
+by setting its corresponding tolerance parameter to zero.
 
 The other command-line argument for BFGS is \code{init\_alpha}, which
 is first step size to try on the initial iteration. If the first
@@ -1390,31 +1404,54 @@ before the line search finds a good step length. It's not a critical
 parameter, but for optimizing the same model multiple times (as
 you tweak things or with different data) being able to change it can
 save some real time.
+
+Finally, L-BFGS has a additional command-line argument, \code{history\_size},
+which controls how much memory is used maintaining the approximation of
+the Hessian.  This should be less than the dimensionality of the parameter
+space and, in general, relatively small values (5 - 10) are sufficient.
+If L-BFGS performs badly but BFGS is performing well, then consider increasing
+this.  Note that increasing this will increase the memory usage, although
+this is unlikely to be an issue for typical Stan models.
 %
 \begin{description}
-      \hierlongcmd{\indentarrow\indentarrow\indentarrow}{\farg{\bfseries bfgs}}
-        {BFGS with linesearch}
-        {Valid subarguments: \code{stepsize}}
+      \hierlongcmd{\indentarrow\indentarrow\indentarrow}{\farg{\bfseries (l)bfgs}}
+        {(L-)BFGS with linesearch}
+        {Valid subarguments: \code{init\_alpha}, \code{tol\_obj}, \code{tol\_rel\_obj}, \code{tol\_grad}, \code{tol\_rel\_grad}, \code{tol\_param}, \code{history\_size} (lbfgs only)}
 %
         \hiercmdarg{\indentarrow\indentarrow\indentarrow\indentarrow}{init\_alpha}{$$double$$}
            {Line search step size for first iteration}
-           {Valid values: $0 < \mbox{\code{init\_alpha}}$}
+           {Valid values: $0 \leq \mbox{\code{init\_alpha}}$}
            {Defaults to \code{0.001}}
 %
         \hiercmdarg{\indentarrow\indentarrow\indentarrow\indentarrow}{tol\_obj}{$$double$$}
            {Convergence tolerance on changes in objective function value}
-           {Valid values: $0 < \mbox{\code{tol\_obj}}$}
+           {Valid values: $0 \leq \mbox{\code{tol\_obj}}$}
            {Defaults to \code{1e-8}}
+%
+        \hiercmdarg{\indentarrow\indentarrow\indentarrow\indentarrow}{tol\_rel\_obj}{$$double$$}
+           {Convergence tolerance on changes in objective function value}
+           {Valid values: $0 \leq \mbox{\code{tol\_rel\_obj}}$}
+           {Defaults to \code{1e+7}}
 %
         \hiercmdarg{\indentarrow\indentarrow\indentarrow\indentarrow}{tol\_grad}{$$double$$}
         {Convergence tolerance on the norm of the gradient}
-        {Valid values: $0 < \mbox{\code{tol\_grad}}$}
+        {Valid values: $0 \leq \mbox{\code{tol\_grad}}$}
         {Defaults to \code{1e-8}}
+%
+        \hiercmdarg{\indentarrow\indentarrow\indentarrow\indentarrow}{tol\_rel\_grad}{$$double$$}
+        {Convergence tolerance on the norm of the gradient}
+        {Valid values: $0 \leq \mbox{\code{tol\_rel\_grad}}$}
+        {Defaults to \code{1e+7}}
 %
         \hiercmdarg{\indentarrow\indentarrow\indentarrow\indentarrow}{tol\_param}{$$double$$}
         {Convergence tolerance on changes in parameter value}
-        {Valid values: $0 < \mbox{\code{tol\_param}}$}
+        {Valid values: $0 \leq \mbox{\code{tol\_param}}$}
         {Defaults to \code{1e-8}}
+%
+        \hiercmdarg{\indentarrow\indentarrow\indentarrow\indentarrow}{history\_size}{$$int$$}
+           {Number of update vectors to use in Hessian approximations (lbfgs only)}
+           {Valid values: $0 < \mbox{\code{history\_size}}$}
+           {Defaults to \code{5}}
 %
 \end{description}
 %
@@ -2051,9 +2088,10 @@ interdependence.
 %
 Stan supports several optimizers.  These share many of their
 configuration options with the samplers.  The default optimizer is the
-Broyden-Fletcher-Goldfarb-Shanno (BFGS) method (see
-\citep{NocedalWright:2006} for more information on BFGS).  The command
-skeleton for BFGS is in \reffigure{bfgs-command}.
+Broyden-Fletcher-Goldfarb-Shanno (BFGS) method and a the
+limited-memory version of this algorithm, L-BFGS, is also implemented
+(see \citep{NocedalWright:2006} for more information on BFGS and L-BFGS).
+The command skeleton for BFGS is in \reffigure{bfgs-command}.
 %
 \begin{figure}
 \begin{quote}
@@ -2062,7 +2100,9 @@ skeleton for BFGS is in \reffigure{bfgs-command}.
                  algorithm=bfgs                         \
                      [init_alpha=<double>]              \
                      [tol_obj=<double>]                 \
+                     [tol_rel_obj=<double>]             \
                      [tol_grad=<double>]                \
+                     [tol_rel_grad=<double>]            \
                      [tol_param=<double>]               \
                  [iter=<int>]                           \
                  [save_iterations=<boolean>]            \
