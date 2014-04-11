@@ -1,4 +1,4 @@
-##
+#
 # LIBGTEST is the google test library
 # GTEST_MAIN is the file that contains the google test
 ##
@@ -76,11 +76,9 @@ endif
 # tests.
 ## 
 .PHONY: runtest/%
-.PRECIOUS: test/%
-.SECONDARY:
 runtest/% : %
 	@echo '------------------------------------------------------------'
-	$< --gtest_output="xml:$*.xml";
+	$(WINE) $< --gtest_output="xml:$*.xml";
 
 ##
 # target path_separator for use in some tests that need to 
@@ -180,7 +178,7 @@ TEST_MODELS := $(shell find src/test/test-models -type f -name '*.stan')
 # Compile these with no main.
 ##
 $(patsubst %.stan,%.cpp,$(filter src/test/test-models/no-main/%,$(TEST_MODELS))) : %.cpp : %.stan bin/stanc$(EXE)
-	bin$(PATH_SEPARATOR)stanc$(EXE) --o=$@ --no_main $<
+	$(WINE) bin$(PATH_SEPARATOR)stanc$(EXE) --o=$@ --no_main $<
 
 
 ##
@@ -219,7 +217,7 @@ test/unit-distribution/generate_tests$(EXE) : src/test/unit-distribution/generat
 
 src/test/unit-distribution/%_00000_generated_test.cpp : src/test/unit-distribution/%_test.hpp | test/unit-distribution/generate_tests$(EXE)
 	@echo "--- Generating tests for $(notdir $<) ---"
-	test/unit-distribution/generate_tests$(EXE) $<
+	$(WINE) test/unit-distribution/generate_tests$(EXE) $<
 
 
 
@@ -237,7 +235,6 @@ $(filter src/test/unit-distribution%,$(TEST_TARGETS)): src/test/unit-distributio
 
 endif
 
-##
 # Set the variable GENERATE_TESTS to non-empty string
 # when the target is generating distribution tests.
 # This indicates whether make should be rerun.
