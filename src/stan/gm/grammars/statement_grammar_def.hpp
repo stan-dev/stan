@@ -486,6 +486,27 @@ namespace stan {
     };
     boost::phoenix::function<validate_allow_sample> validate_allow_sample_f;
 
+    // REMOVE ME
+    namespace stan { 
+      namespace gm {
+        void generate_statement(const statement& s,
+                                int indent,
+                                std::ostream& os,
+                                bool is_var, bool is_fun_return, bool include_sampling);
+      }
+    }
+
+    struct print_expression {
+      template <typename T1>
+      struct result { typedef void type; };
+
+      void operator()(const expression& e) const {
+        std::stringstream ss;
+        generate_expression(e,ss);
+      }
+    };
+    boost::phoenix::function<print_expression> print_expression_f;
+    
 
     template <typename Iterator>
     statement_grammar<Iterator>::statement_grammar(variable_map& var_map,
@@ -524,7 +545,7 @@ namespace stan {
         | while_statement_r(_r1,_r2,_r3)            // key "while"
         | statement_2_g(_r1,_r2,_r3)                // key "if"
         | print_statement_r(_r2)                    // key "print"
-        | return_statement_r(_r1,_r2)               // key "return"
+        | return_statement_r(_r2)               // key "return"
         | void_return_statement_r(_r2)              // key "return"
         | assignment_r(_r2)                         // lvalue "<-"
         | sample_r(_r1,_r2)                         // expression "~"
@@ -548,11 +569,11 @@ namespace stan {
       // inherited  _r1 = true if samples allowed as statements
       increment_log_prob_statement_r.name("increment log prob statement");
       increment_log_prob_statement_r
-        = lit("increment_log_prob") 
+        %= lit("increment_log_prob") 
         > eps[ validate_allow_sample_f(_r1,_pass,
                                        boost::phoenix::ref(error_msgs_)) ]
         > lit('(')
-        > expression_g(_r2)
+        > expression_g(_r2) [ print_expression_f(_1) ]
         > lit(')')
         > lit(';') 
         ;
@@ -687,7 +708,7 @@ namespace stan {
       return_statement_r
         %= lit("return")
         >> expression_g(_r1)
-        >> lit(';') [ validate_return_allowed_f(_r2,_pass,
+        >> lit(';') [ validate_return_allowed_f(_r1,_pass,
                                                 boost::phoenix::ref(error_msgs_)) ]
         ;
 

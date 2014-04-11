@@ -6,7 +6,7 @@ functions {
 parameters {
   real y;
 }
-tranformed parameters {
+transformed parameters {
   real z;
   z <- foo_rng(1.3);
 }

@@ -104,6 +104,7 @@ namespace stan {
                                                                     arg_types,
                                                                     error_msgs);
 
+
         if (has_rng_suffix(fun.name_)) {  
           if (!( var_origin == derived_origin
                  || var_origin == function_argument_origin_rng )) {
@@ -145,7 +146,9 @@ namespace stan {
                      << "         Use fabs(real) instead."
                      << std::endl << std::endl;
         }
+
         fun_result = fun;
+        pass = true;
       }
     };
     boost::phoenix::function<set_fun_type_named> set_fun_type_named_f;

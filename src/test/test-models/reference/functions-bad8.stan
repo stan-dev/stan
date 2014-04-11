@@ -1,9 +1,9 @@
 functions {
   real foo_rng(real x) {
-    return 3.0 + 2.0 * normal_rng(0,1);
+    return 3.0; //  + 2.0 * normal_rng(0,1);
   }
 }
-tranformed data {
+transformed data {
   real z;
   z <- foo_rng(1.3);
 }

@@ -19,6 +19,8 @@ namespace stan {
 
   namespace gm {
 
+    void generate_expression(const expression& e, std::ostream& o);
+
     const std::string EOL("\n");
     const std::string EOL2("\n\n");
     const std::string INDENT("    ");
@@ -4245,14 +4247,19 @@ namespace stan {
       out << INDENT
           << "typedef " << scalar_t_name << " return_t__;"
           << EOL;
+      out << INDENT
+          << "const static bool propto__ = true;"
+          << EOL
+          << "(void) propto__;" 
+          << EOL;
       bool is_var = false;
       bool is_fun_return = true;
-      generate_statement(fun.body_,1,out,false,is_var,
-                         is_fun_return);
+      bool include_sampling = true;
+      generate_statement(fun.body_,1,out,
+                         include_sampling,is_var,is_fun_return);
       out << "}" 
           << EOL;
     }
-
     void generate_propto_default_function_body(const function_decl_def& fun,
                                                std::ostream& out) {
       out << " {" << EOL;
