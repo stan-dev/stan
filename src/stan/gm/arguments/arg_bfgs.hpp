@@ -23,7 +23,7 @@ namespace stan {
         _subarguments.push_back(new arg_tolerance("tol_obj","Convergence tolerance on absolute changes in objective function value",1e-8));
         _subarguments.push_back(new arg_tolerance("tol_rel_obj","Convergence tolerance on relative changes in objective function value",1e+7));
         _subarguments.push_back(new arg_tolerance("tol_grad","Convergence tolerance on the norm of the gradient",1e-8));
-        _subarguments.push_back(new arg_tolerance("tol_rel_grad","Convergence tolerance on the relative norm of the gradient",1e+3));
+        _subarguments.push_back(new arg_tolerance("tol_rel_grad","Convergence tolerance on the relative norm of the gradient",1e+7));
         _subarguments.push_back(new arg_tolerance("tol_param","Convergence tolerance on changes in parameter value",1e-8));
 
       }

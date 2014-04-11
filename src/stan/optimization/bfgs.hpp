@@ -531,7 +531,7 @@ namespace stan {
       Scalar prev_step_size() const { return _pk_1.norm()*_alphak_1; }
 
       inline Scalar rel_grad_norm() const {
-        return _pk.dot(_gk) / std::max(std::fabs(_fk),_conv_opts.fScale);
+        return -_pk.dot(_gk) / std::max(std::fabs(_fk),_conv_opts.fScale);
       }
       inline Scalar rel_obj_decrease() const { 
         return std::fabs(_fk_1 - _fk) / std::max(std::fabs(_fk_1),std::max(std::fabs(_fk),_conv_opts.fScale));
@@ -575,6 +575,7 @@ namespace stan {
         if (ret) {
           throw std::runtime_error("Error evaluating initial BFGS point.");
         }
+        _pk = -_gk;
         
         _itNum = 0;
         _note = "";
@@ -642,6 +643,8 @@ namespace stan {
             break;
           }
         }
+
+        // Swap things so that k is the most recent iterate
         std::swap(_fk,_fk_1);
         _xk.swap(_xk_1);
         _gk.swap(_gk_1);
