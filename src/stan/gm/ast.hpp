@@ -205,8 +205,6 @@ namespace stan {
       // template <typename T> expr_type operator()(const T& e) const;
     };
 
-    
-
 
     struct expression;
 
@@ -795,6 +793,11 @@ namespace stan {
 
     bool has_rng_suffix(const std::string& s);
     bool has_lp_suffix(const std::string& s);
+    bool is_user_defined(const std::string& name,
+                         const std::vector<expression>& args);
+    bool is_user_defined_prob_function(const std::string& name,
+                                       const expression& variate,
+                                       const std::vector<expression>& params);
     bool is_user_defined(const fun& fx);
 
     struct contains_var : public boost::static_visitor<bool> {

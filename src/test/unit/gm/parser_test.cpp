@@ -483,3 +483,7 @@ TEST(parserFunctions,funsBad14) {
   test_throws("functions-bad14",
               "Function already defined");
 }
+TEST(parserFunctions,funsBad15) {
+  test_throws("functions-bad15",
+              "attempt to increment log prob with void expression");
+}

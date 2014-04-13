@@ -40,6 +40,9 @@ namespace stan {
       case ILL_FORMED_T :
         o << "ill formed";
         break;
+      case VOID_T :
+        o << "void";
+        break;
       default:
         o << "UNKNOWN";
       }
@@ -295,7 +298,6 @@ namespace stan {
       size_t match_index = 0; 
       size_t min_promotions = std::numeric_limits<size_t>::max(); 
       size_t num_matches = 0;
-
       for (size_t i = 0; i < signatures.size(); ++i) {
         signature = signatures[i];
         int promotions = num_promotions(args,signature.second);
@@ -1340,19 +1342,34 @@ namespace stan {
         && s[n-3] == '_';
     }
 
-    bool is_user_defined(const fun& fx) {
+    bool is_user_defined(const std::string& name,
+                         const std::vector<expression>& args) {
       std::vector<expr_type> arg_types;
-      for (size_t i = 0; i < fx.args_.size(); ++i)
-        arg_types.push_back(fx.args_[i].expression_type());
+      for (size_t i = 0; i <  args.size(); ++i)
+        arg_types.push_back(args[i].expression_type());
       function_signature_t sig;
       int matches
         = function_signatures::instance()
-        .get_signature_matches(fx.name_,arg_types,sig);
+        .get_signature_matches(name,arg_types,sig);
       if (matches != 1)
         return false; // reall shouldn't come up;  throw instead?
       std::pair<std::string, function_signature_t> 
-        name_sig(fx.name_, sig);
+        name_sig(name, sig);
       return function_signatures::instance().is_user_defined(name_sig);
+    }
+
+    bool is_user_defined_prob_function(const std::string& name,
+                                       const expression& variate,
+                                       const std::vector<expression>& params) {
+      std::vector<expression> variate_params;
+      variate_params.push_back(variate);
+      for (size_t i = 0; i < params.size(); ++i)
+        variate_params.push_back(params[i]);
+      return is_user_defined(name,variate_params);
+    }
+
+    bool is_user_defined(const fun& fx) {
+      return is_user_defined(fx.name_, fx.args_);
     }
 
     bool is_assignable(const expr_type& l_type,

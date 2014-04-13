@@ -1486,6 +1486,11 @@ namespace stan {
           o_ << ", ";
           generate_expression(x.dist_.args_[i],o_);
         }
+        if (is_user_defined_prob_function(x.dist_.family_ + "_log",
+                                          x.expr_,
+                                          x.dist_.args_)) {
+          o_ << ", pstream__";
+        }
         o_ << "));" << EOL;
         // rest of impl is for truncation
         // generate bounds test
@@ -4270,6 +4275,9 @@ namespace stan {
           out << ",";
         out << fun.arg_decls_[i].name_;
       }
+      if (fun.arg_decls_.size() > 0)
+        out << ", ";
+      out << "pstream__";
       out << ");" << EOL;
       out << "}" << EOL;
     }

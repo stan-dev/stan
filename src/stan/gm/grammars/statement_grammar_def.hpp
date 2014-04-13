@@ -486,26 +486,30 @@ namespace stan {
     };
     boost::phoenix::function<validate_allow_sample> validate_allow_sample_f;
 
-    // REMOVE ME
-    namespace stan { 
-      namespace gm {
-        void generate_statement(const statement& s,
-                                int indent,
-                                std::ostream& os,
-                                bool is_var, bool is_fun_return, bool include_sampling);
-      }
-    }
+    // // REMOVE ME
+    // namespace stan { 
+    //   namespace gm {
+    //     void generate_statement(const statement& s,
+    //                             int indent,
+    //                             std::ostream& os,
+    //                             bool is_var, bool is_fun_return, bool include_sampling);
+    //   }
+    // }
 
-    struct print_expression {
-      template <typename T1>
+    struct validate_non_void_expression {
+      template <typename T1, typename T2, typename T3>
       struct result { typedef void type; };
-
-      void operator()(const expression& e) const {
-        std::stringstream ss;
-        generate_expression(e,ss);
+      
+      void operator()(const expression& e, 
+                      bool& pass, 
+                      std::ostream& error_msgs) const {
+        pass = !e.expression_type().is_void();
+        if (!pass) {
+          error_msgs << "attempt to increment log prob with void expression" << std::endl;
+        }
       }
     };
-    boost::phoenix::function<print_expression> print_expression_f;
+    boost::phoenix::function<validate_non_void_expression> validate_non_void_expression_f;
     
 
     template <typename Iterator>
@@ -573,7 +577,8 @@ namespace stan {
         > eps[ validate_allow_sample_f(_r1,_pass,
                                        boost::phoenix::ref(error_msgs_)) ]
         > lit('(')
-        > expression_g(_r2) [ print_expression_f(_1) ]
+        > expression_g(_r2) [ validate_non_void_expression_f(_1,_pass,
+                                                             boost::phoenix::ref(error_msgs_)) ]
         > lit(')')
         > lit(';') 
         ;
