@@ -1,3 +1,5 @@
+include(StanTesting)
+
 include_directories(${GTEST_INCLUDE_DIRS})
 
 # Disable optimization for building tests
@@ -8,9 +10,9 @@ foreach(flag_var
   string(REGEX REPLACE "/O[^0]" "/O0" ${flag_var} "${${flag_var}}")
 endforeach(flag_var)
 
-add_subdirectory(unit-distribution)
+add_subdirectory(test-models)
 
-set(TEST_DIRS integration math test-models 
+set(TEST_DIRS integration math 
               unit unit-agrad-fwd  unit-agrad-rev)
 
 foreach(curr_test ${TEST_DIRS})
@@ -28,4 +30,6 @@ foreach(curr_test ${TEST_DIRS})
              ${executable} --gtest_output="xml:${executable}.xml")
   endforeach()
 endforeach()
+
+add_subdirectory(unit-distribution)
 
