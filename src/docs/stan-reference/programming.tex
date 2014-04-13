@@ -6168,10 +6168,10 @@ intractable posterior.
 A hierarchical model such as the above will suffer from the same kind
 of inefficiencies as Neal's funnel, though typically not so extreme,
 because the values of \Verb|beta|, \Verb|mu_beta| and
-\Verb|sigma_beta| are highly correlated in the posterior.  Such a
-hierarchical model can be made much more efficient in terms of
-effective sample size by reparameterizing in exactly the same way as
-the funnel example.
+\Verb|sigma_beta| are highly correlated in the posterior. When there is a lot of data, such a
+hierarchical model can be made much more efficient by shifting the data's correlation with the 
+parameters to the hyperparameters. Similar to the funnel example, this will be much more 
+efficient in terms of effective sample size~\citep{Betancourt-Girolami:2013}.
 %
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
