@@ -8,7 +8,8 @@ foreach(stanfile ${NOMAIN_MODELS})
   stan_model(srcfile ${stanfile} NOMAIN NOBUILD)
   list(APPEND NOMAIN_SRCS "${CMAKE_CURRENT_BINARY_DIR}/${srcfile}")
 endforeach()
-add_custom_target(Test_NoMain_Models SOURCES ${NOMAIN_SRCS})
+set(NOMAIN_MODEL_SRCS ${NOMAIN_SRCS} PARENT_SCOPE)
+#add_custom_target(Test_NoMain_Models SOURCES ${NOMAIN_SRCS})
 
 # syntax-only models
 file(GLOB_RECURSE SYNTAXONLY_MODELS
@@ -24,5 +25,8 @@ foreach(stanfile ${SYNTAXONLY_MODELS})
              ${CMAKE_CXX_COMPILER_WITH_PATH} ${CMAKE_CXX_FLAGS} -O0 -fsyntax-only ${srcfile})
   endif()
 endforeach()
+set(SYNTAXONLY_MODEL_SRCS ${SYNTAXONLY_SRCS} PARENT_SCOPE)
+# This next line causes the stan files to be parsed every time, we probably
+# shouldn't use it...
 add_custom_target(Test_SyntaxOnly_Models SOURCES ${SYNTAXONLY_SRCS})
 

@@ -27,7 +27,7 @@ foreach(curr_test ${TEST_DIRS})
     add_executable(${executable} ${source})
     # A small number of tests rely on generated code, add this dependency to
     # ensure it is generated before trying to build the executable
-    add_dependencies(${executable} Test_NoMain_Models)
+    add_dependencies(${executable} ${NOMAIN_MODEL_SRCS})
     target_link_libraries(${executable} stan stanc ${GTEST_LIBRARIES})
     add_test(test_${curr_test}
              ${executable} --gtest_output="xml:${executable}.xml")
