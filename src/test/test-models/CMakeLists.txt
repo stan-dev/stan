@@ -1,0 +1,4 @@
+file(GLOB_RECURSE NOMAIN_MODELS
+     RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}"
+     no-main/*.stan)
+
