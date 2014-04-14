@@ -1,6 +1,6 @@
 include(StanTesting)
 
-include_directories(${GTEST_INCLUDE_DIRS})
+include_directories(SYSTEM "${GTEST_INCLUDE_DIRS}")
 
 # Disable optimization for building tests
 foreach(flag_var

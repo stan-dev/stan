@@ -20,17 +20,17 @@ option(USE_SYSTEM_GTEST
 # Find Eigen
 if(USE_SYSTEM_EIGEN)
   find_package( Eigen3 REQUIRED )
-  include_directories("${EIGEN3_INCLUDE_DIR}")
+  include_directories(SYSTEM "${EIGEN3_INCLUDE_DIR}")
 else()
-  include_directories("${PROJECT_SOURCE_DIR}/lib/eigen_3.2.0")
+  include_directories(SYSTEM "${PROJECT_SOURCE_DIR}/lib/eigen_3.2.0")
 endif()
 
 # Find Boost
 if(USE_SYSTEM_BOOST)
   find_package( Boost 1.54 REQUIRED )
-  include_directories("${Boost_INCLUDE_DIR}")
+  include_directories(SYSTEM "${Boost_INCLUDE_DIR}")
 else()
-  include_directories("${PROJECT_SOURCE_DIR}/lib/boost_1.54.0")
+  include_directories(SYSTEM "${PROJECT_SOURCE_DIR}/lib/boost_1.54.0")
 endif()
 
 # Setup GTest library
@@ -60,8 +60,7 @@ add_definitions(-DBOOST_RESULT_OF_USE_TR1
                 -DBOOST_NO_DECLTYPE
                 -DBOOST_DISABLE_ASSERTS)
 # Top level include
-include_directories("${PROJECT_SOURCE_DIR}/src")
-include_directories("${PROJECT_BINARY_DIR}/src")
+include_directories("${PROJECT_SOURCE_DIR}/src" "${PROJECT_BINARY_DIR}/src")
 
 # add src/stan/gm directory to build libstanc.a
 add_subdirectory(src/stan/gm)
