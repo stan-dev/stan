@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 2.8)
 
-project(Stan)
+project(Stan CXX)
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
@@ -47,10 +47,13 @@ if(HAVE_PIPE_FLAG)
   add_compile_options( -pipe )
 endif(HAVE_PIPE_FLAG)
 
-check_cxx_compiler_flag("-Wall" HAVE_WALL_FLAG)
-if(HAVE_WALL_FLAG)
-  add_compile_options( -Wall )
-endif(HAVE_WALL_FLAG)
+# FIXME: If any of these warning flags will break compilers, we can check for
+# them like is being done with -pipe
+add_compile_options( -Wall -Wno-unused-function -Wno-tautological-compare
+                     -Wno-c++11-long-long )
+
+# This is used for the syntax-only test compiles
+check_cxx_compiler_flag("-fsyntax-only" HAVE_SYNTAXONLY_FLAG)
 
 # Setup boost defines
 add_definitions(-DBOOST_RESULT_OF_USE_TR1
@@ -58,6 +61,7 @@ add_definitions(-DBOOST_RESULT_OF_USE_TR1
                 -DBOOST_DISABLE_ASSERTS)
 # Top level include
 include_directories("${PROJECT_SOURCE_DIR}/src")
+include_directories("${PROJECT_BINARY_DIR}/src")
 
 # add src/stan/gm directory to build libstanc.a
 add_subdirectory(src/stan/gm)

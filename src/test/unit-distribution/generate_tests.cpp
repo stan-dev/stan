@@ -64,7 +64,7 @@ void write_includes(vector<std::ostream *>& outs, const string& include) {
     *out << "#include <gtest/gtest.h>" << endl;
     *out << "#include <boost/mpl/vector.hpp>" << endl;
     *out << "#include <test/unit-distribution/test_fixture.hpp>" << endl;
-    *out << "#include <" << include.substr(include.find("src/")+4) << ">" << endl;  
+    *out << "#include <" << include << ">" << endl;  
     *out << endl;
   }
 }

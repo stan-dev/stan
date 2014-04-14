@@ -6,7 +6,8 @@ file(GLOB_RECURSE DIST_TEST_HDRS
      RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
      *_test.hpp)
 
-include_directories(${CURRENT_SOURCE_DIR})
+# Generated unit tests include their header files relative to this directory
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 # Generate distribution unit tests
 foreach(curr_hdr ${DIST_TEST_HDRS})
