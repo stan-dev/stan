@@ -7,7 +7,6 @@
 #include <stdexcept>
 #include <sstream>
 #include <vector>
-#include <boost/multi_array.hpp>
 #include <boost/throw_exception.hpp>
 #include <boost/math/tools/promotion.hpp>
 #include <stan/agrad/rev/matrix.hpp>
