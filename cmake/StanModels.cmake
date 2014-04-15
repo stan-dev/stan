@@ -27,6 +27,11 @@ function(stan_model target stanfile)
     endif()
   endforeach()
 
+  # Make the output directory
+  get_filename_component(TARGET_DIR "${CMAKE_CURRENT_BINARY_DIR}/${srcfile}" DIRECTORY)
+  file(MAKE_DIRECTORY "${TARGET_DIR}")
+
+
   # Construct stanc arguments
   set(stanc_args "${CMAKE_CURRENT_SOURCE_DIR}/${stanfile}"
                  --o="${CMAKE_CURRENT_BINARY_DIR}/${srcfile}")
@@ -37,7 +42,7 @@ function(stan_model target stanfile)
   # Add custom command to build the source file
   add_custom_command(OUTPUT ${srcfile}
      COMMAND ${STANC_BIN} ${stanc_args}
-     DEPENDS stanc)
+     DEPENDS stanc-bin)
 
   if(do_build)
     # Add the model executable
