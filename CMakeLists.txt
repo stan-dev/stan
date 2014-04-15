@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 2.8)
 
-project(Stan CXX)
+project(Stan C CXX)
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 

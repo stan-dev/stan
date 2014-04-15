@@ -12,6 +12,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 # Generate distribution unit tests
 foreach(curr_hdr ${DIST_TEST_HDRS})
   string(REPLACE "/"  "_" dist_name ${curr_hdr})
+  string(REPLACE "\\"  "_" dist_name ${dist_name})
   string(REPLACE "_test.hpp"  "${empty_string}" dist_name ${dist_name})
 
   # Count how many tests there are
@@ -33,10 +34,13 @@ foreach(curr_hdr ${DIST_TEST_HDRS})
 
   foreach(curr_src ${curr_srcs})
     string(REPLACE ".cpp" "${empty_string}" executable ${curr_src})
+    string(REPLACE "/"  "_" executable ${executable})
+    string(REPLACE "\\"  "_" executable ${executable})
+    set(executable unitdist_${executable})
 
     add_executable(${executable} ${curr_src})
     target_link_libraries(${executable} stan stanc ${GTEST_LIBRARIES})
-    add_test(test_unit_dist_gen_${dist_name}
+    add_test(UnitDistributionTests_${dist_name}
              ${executable} --gtest_output="xml:${executable}.xml")
   endforeach()
 endforeach()
