@@ -17,26 +17,32 @@ function(stan_model target stanfile)
   string(REPLACE ".stan" ".cpp" srcfile ${stanfile})
 
   # Parse any extra keyword arguments
-  foreach(word ${ARGV})
-    if(${word} STREQUAL NOMAIN)
+  foreach(word ${ARGN})
+    if("${word}" STREQUAL NOMAIN)
       set(no_main ON)
-    elseif(${word} STREQUAL NOBUILD)
+    elseif("${word}" STREQUAL NOBUILD)
       set(do_build OFF)
     else()
-      message(ERROR "Unrecognized stanmodel option: ${word}")
+      message(ERROR "Unrecognized stanmodel option: \"${word}\"")
     endif()
   endforeach()
 
+  # Make the output directory
+  get_filename_component(TARGET_DIR "${CMAKE_CURRENT_BINARY_DIR}/${srcfile}" DIRECTORY)
+  file(MAKE_DIRECTORY "${TARGET_DIR}")
+
+
   # Construct stanc arguments
-  set(extra_stanc_args "\"${CMAKE_CURRENT_SOURCE_DIR}/${stanfile}\" --o=\"${CMAKE_CURRENT_BINARY_DIR}/${srcfile}\"")
+  set(stanc_args "${CMAKE_CURRENT_SOURCE_DIR}/${stanfile}"
+                 --o="${CMAKE_CURRENT_BINARY_DIR}/${srcfile}")
   if(no_main)
-    set(stanc_args "${extra_stanc_args} --no_main")
+    set(stanc_args ${stanc_args} --no_main)
   endif()
 
   # Add custom command to build the source file
   add_custom_command(OUTPUT ${srcfile}
      COMMAND ${STANC_BIN} ${stanc_args}
-     DEPENDS stanc)
+     DEPENDS stanc-bin)
 
   if(do_build)
     # Add the model executable

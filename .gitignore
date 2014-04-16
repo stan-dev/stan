@@ -4,6 +4,7 @@
 /test
 /*.dSYM
 /bin
+/build
 
 # other binary
 *.o
@@ -36,6 +37,7 @@ stan.kdev4
 
 # tests: compiled models
 /src/test/test-models/**
+!/src/test/test-models/**.txt
 !/src/test/test-models/**.stan
 !/src/test/test-models/**/.gitignore
 
