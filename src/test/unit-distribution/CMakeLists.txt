@@ -22,26 +22,18 @@ foreach(curr_hdr ${DIST_TEST_HDRS})
   gen_test_srcs(${curr_hdr} ${numtests} curr_srcs)
 
   # Copy the header file to the build directory if it's different
-  if (NOT (${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR}))
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${curr_hdr}
-                   ${CMAKE_CURRENT_BINARY_DIR}/${curr_hdr} COPYONLY)
-  endif()
+#  if (NOT (${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR}))
+#    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${curr_hdr}
+#                   ${CMAKE_CURRENT_BINARY_DIR}/${curr_hdr} COPYONLY)
+#  endif()
 
   # Add a custom command to build the test generation program
   add_custom_command(OUTPUT ${curr_srcs}
-                     COMMAND generate_tests ${curr_hdr}
+                     COMMAND ${RUNCMD} generate_tests ${curr_hdr}
                      DEPENDS generate_tests ${curr_hdr})
 
   foreach(curr_src ${curr_srcs})
-    string(REPLACE ".cpp" "${empty_string}" executable ${curr_src})
-    string(REPLACE "/"  "_" executable ${executable})
-    string(REPLACE "\\"  "_" executable ${executable})
-    set(executable unitdist_${executable})
-
-    add_executable(${executable} ${curr_src})
-    target_link_libraries(${executable} stan stanc ${GTEST_LIBRARIES})
-    add_test(UnitDistributionTests_${dist_name}
-             ${executable} --gtest_output="xml:${executable}.xml")
+    add_stan_gtest(UnitDistributionTests "${curr_src}")
   endforeach()
 endforeach()
 

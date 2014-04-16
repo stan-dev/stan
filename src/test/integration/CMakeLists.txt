@@ -1,3 +1,6 @@
+# FIXME: The compiled_models integration test isn't working right yet as 
+# compiled_models_test.cpp is basically a no-op.  Need to do something
+# different here.
 
 file( GLOB_RECURSE TEST_SRCS
       RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} 
@@ -8,12 +11,9 @@ foreach(source ${TEST_SRCS})
   string(REPLACE "\\"  "_" executable ${executable})
   set(executable integration_${executable})
   add_executable(${executable} ${source})
-  # A small number of tests rely on generated code, add this dependency to
-  # ensure it is generated before trying to build the executable
-#  add_dependencies(${executable} ${NOMAIN_SRCS})
-  add_dependencies(${executable} Test_NoMain_Models)
+  add_dependencies(${executable} Test_SyntaxOnly_Models)
   target_link_libraries(${executable} stan stanc ${GTEST_LIBRARIES})
-  add_test(IntegrationTests_${curr_test}
-           ${executable} --gtest_output="xml:${executable}.xml")
+  add_test(IntegrationTests
+           ${RUNCMD} ${CMAKE_CURRENT_BINARY_DIR}/${executable} --gtest_output="xml:${executable}.xml")
 endforeach()
 

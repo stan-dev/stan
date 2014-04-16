@@ -69,6 +69,18 @@ add_subdirectory(src/stan/gm)
 set(LIBSTAN_SRCS ${PROJECT_SOURCE_DIR}/src/stan/agrad/rev/var_stack.cpp)
 add_library(stan STATIC ${LIBSTAN_SRCS})
 
+set(RUNCMD "")
+if(MINGW)
+  find_program(WINE_EXE wine DOC "Path the the wine executable")
+  if(WINE_EXE STREQUAL WINE_EXE-NOTFOUND)
+    message(error "Wine is required for building with mingw and could not be found")
+  else()
+    message(STATUS "Found Wine executable at: ${WINE_EXE}")
+    set(RUNCMD "${WINE_EXE}")
+  endif()
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libgcc -static-libstdc++")
+endif()
+
 # stanc
 set(STANC_SRCS ${PROJECT_SOURCE_DIR}/src/stan/command/stanc.cpp)
 add_executable(stanc-bin ${STANC_SRCS})
