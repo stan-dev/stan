@@ -41,7 +41,7 @@ function(stan_model target stanfile)
 
   # Add custom command to build the source file
   add_custom_command(OUTPUT ${srcfile}
-     COMMAND ${STANC_BIN} ${stanc_args}
+     COMMAND ${RUNCMD} ${STANC_BIN} ${stanc_args}
      DEPENDS stanc-bin)
 
   if(do_build)

@@ -41,4 +41,14 @@ function(gen_test_srcs hdrname numtests srcvar)
   set(${srcvar} ${SRCS} PARENT_SCOPE)
 endfunction(gen_test_srcs)
 
-
+function(add_stan_gtest groupname source)
+  string(REPLACE ".cpp" "${empty_string}" executable ${source})
+  string(REPLACE "/"  "_" executable ${executable})
+  string(REPLACE "\\"  "_" executable ${executable})
+  string(TOLOWER "${groupname}" groupname_l)
+  set(executable ${groupname_l}_${executable})
+  add_executable(${executable} ${source})
+  target_link_libraries(${executable} stan stanc ${GTEST_LIBRARIES})
+  add_test(${groupname}
+           ${RUNCMD} ${CMAKE_CURRENT_BINARY_DIR}/${executable} --gtest_output="xml:${executable}.xml")
+endfunction(add_stan_gtest)

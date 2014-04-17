@@ -14,7 +14,7 @@ foreach(source ${TEST_SRCS})
 #  add_dependencies(${executable} ${NOMAIN_SRCS})
   add_dependencies(${executable} Test_NoMain_Models)
   target_link_libraries(${executable} stan stanc ${GTEST_LIBRARIES})
-  add_test(UnitTests_${curr_test}
-           ${executable} --gtest_output="xml:${executable}.xml")
+  add_test(UnitTests
+           ${RUNCMD} ${CMAKE_CURRENT_BINARY_DIR} ${executable} --gtest_output="xml:${executable}.xml")
 endforeach()
 
