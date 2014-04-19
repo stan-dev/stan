@@ -78,7 +78,7 @@ if(MINGW)
     message(STATUS "Found Wine executable at: ${WINE_EXE}")
     set(RUNCMD "${WINE_EXE}")
   endif()
-  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libgcc -static-libstdc++")
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static -lwinpthread")
 endif()
 
 # stanc
