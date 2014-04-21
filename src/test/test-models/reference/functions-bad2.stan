@@ -1,6 +1,6 @@
 functions {
-  real foo(real x);
-  // error not defining foo
+  real barfoo(real x);
+  // error not defining barfoo
 }
 parameters {
   real y;

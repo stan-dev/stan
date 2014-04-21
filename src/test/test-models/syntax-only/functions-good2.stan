@@ -1,11 +1,11 @@
 functions {
-  real foo0() {
+  real foo_bar0() {
     return 0.0;
   }
-  real foo1(real x) {
+  real foo_bar1(real x) {
     return 1.0;
   }
-  real foo2(real x, real y) {
+  real foo_bar2(real x, real y) {
     return 2.0;
   }
 }

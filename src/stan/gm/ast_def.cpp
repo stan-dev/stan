@@ -154,6 +154,15 @@ namespace stan {
                                               name_sig) {
       return user_defined_set_.find(name_sig) != user_defined_set_.end();
     }
+    bool
+    function_signatures::is_defined(const std::string& name, 
+                                    const function_signature_t& sig) {
+      const std::vector<function_signature_t> sigs = sigs_map_[name];
+      for (size_t i = 0; i < sigs.size(); ++i)
+        if (sig.second  == sigs[i].second)
+          return true;
+      return false;
+    }
     void function_signatures::add(const std::string& name,
                                    const expr_type& result_type,
                                    const std::vector<expr_type>& arg_types) {

@@ -423,11 +423,19 @@ TEST(gmParserStatementGrammarDef, comparisonsInBoundsTest) {
                std::invalid_argument);
 }
 
-TEST(parserFunctions, funsGood) {
+TEST(parserFunctions, funsGood0) {
   test_parsable("validate_functions"); // tests proper definitions and use
+}
+TEST(parserFunctions, funsGood1) {
   test_parsable("functions-good1");
+}
+TEST(parserFunctions, funsGood2) {
   test_parsable("functions-good2");
+}
+TEST(parserFunctions, funsGood3) {
   test_parsable("functions-good3");
+}
+TEST(parserFunctions, funsGood4) {
   test_parsable("functions-good-void");
 }
 TEST(parserFunctions, funsBad1) {
@@ -486,4 +494,8 @@ TEST(parserFunctions,funsBad14) {
 TEST(parserFunctions,funsBad15) {
   test_throws("functions-bad15",
               "attempt to increment log prob with void expression");
+}
+TEST(parserFunctions,funsBad16) {
+  test_throws("functions-bad16",
+              "Function system defined");
 }

@@ -2050,14 +2050,14 @@ The type of a variable declared locally or in a previous block is
 determined by its declaration.  The type of a loop variable is
 \code{int}.  
 
-There is always a unique declaration for each variable because Stan
-prohibits the redeclaration of an already-declared variables.%
+There is always a unique declaration for each variable in each scope
+because Stan prohibits the redeclaration of an already-declared
+variables.%
 %
 \footnote{Languages such as \Cpp and R allow the declaration of a
   variable of a given name in a narrower scope to hide (take
   precedence over for evaluation) a variable defined in a containing
-  scope.  Stan will have to introduce this behavior eventually for
-  user-defined functions written in Stan.}
+  scope.}
 
 \subsubsection{Indexing}
 
@@ -3162,8 +3162,6 @@ specifies how functions are declare, defined, and used in Stan; see
 \refchapter{functions-programming} for a more programming-oriented
 perspective.
 
-
-
 \section{Function-Definition Block}
 
 User-defined functions appear in a special function-definition block
@@ -3201,7 +3199,9 @@ declares a function named \code{foo} with two argument variables of
 types \code{real} and \code{real}.  The arguments are named \code{mu}
 and \code{sigma}, but that is not part of the declaration.  Two
 functions may have the same name if they have different sequences of
-argument types; see \refsection{function-overloading} for details.
+argument types; see \refsection{function-overloading} for details.  A
+function may not have the same name and argument type sequence as
+another function, including a built-in function.
 
 \section{Calling Functions}
 
@@ -3276,6 +3276,22 @@ dimensions.  The type declaration \code{matrix[,]~b} specifies that
 \code{b} is a two-dimensional array of matrices, for a total of four
 indexing dimensions, with \code{b[1,1,1,1]} picking out a real value.
 
+\subsection{Dimensionality Checks and Exceptions}
+
+Function argument and return types are not themselves checked for
+dimensionality.  A matrix of any size may be passed in as a matrix
+argument.  Nevertheless, a user-defined function might call a function
+(such as a multivariate normal density) that itself does
+dimensionality checks.
+
+Dimensions of function return values will be checked if they're
+assigned to a previously declared variable.  They may also be checked
+if they are used as the argument to a function.  
+
+Any errors raised by calls to functions inside user functions or
+return type mismatches are simply passed on;  this typically results
+in a warning message and rejection of a proposal during sampling or
+optimization.  
 
 \section{Function Bodies}\label{function-bodies.section}
 

@@ -5162,8 +5162,102 @@ this is enforced.
 
 \subsection{Type Declarations for Functions}
 
+\begin{figure}
+\begin{center}
+\begin{tabular}{l|l|l}
+{\it Functions:} & {\it Locals Variables:} & {\it Nonlocal Variables:} \\
+{\it Undimensioned} & {\it Unconstrained} & {\it Constrained} \\
+\hline \hline
+\code{int} 
+& \code{int} 
+& \code{int<lower=L>}
+\\
+& &  \code{int<upper=U>}
+\\
+& &  \code{int<lower=L,upper=U>}
+%
+\\ \hline
+%
+\code{real} 
+& \code{real} 
+& \code{real<lower=L>}
+\\
+& &  \code{real<upper=U>}
+\\
+& & \code{real<lower=L,upper=U>}
+%
+\\ \hline
+%
+\code{vector}
+& 
+\code{vector[N]}
+& \code{vector<lower=L>[N]}
+\\
+& &  \code{vector<upper=U>[N]}
+\\
+& &  \code{vector<lower=L,upper=U>[N]}
+\\[4pt]
+& & \code{simplex[N]}
+\\
+& & \code{ordered[N]}
+\\
+& & \code{positive\_ordered[N]}
+\\
+& & \code{unit\_vector[N]}
+%
+\\ \hline
+%
+\code{row\_vector}
+& \code{row\_vector[M]}
+& \code{row\_vector<lower=L>[M]}
+\\
+& &  \code{row\_vector<upper=U>[M]}
+\\
+& &  \code{row\_vector<lower=L,upper=U>[M]}
+%
+\\ \hline
+%
+\code{matrix} 
+& \code{matrix[M,N]} 
+& \code{matrix<lower=L>[M,N]}
+\\
+& &  \code{matrix<upper=U>[M,N]}
+\\
+& &  \code{matrix<lower=L,upper=U>[M,N]}
+\\[4pt]
+& & \code{cov\_matrix[K]}
+\\
+& & \code{corr\_matrix[K]} 
+\\
+& & \code{cholesky\_factor\_cov[K]}
+\end{tabular}
+\end{center}
+\caption{\small\it The leftmost column is a list of the unconstrained
+  and undimensioned basic types; these are used as function return
+  types and argument types.  The middle column is of unconstrained
+  types with dimensions; these are used as local variable types.  The
+  rightmost column lists the corresponding constrained types.  An
+  expression of any righthand column type may be assigned to its
+  corresponding lefthand column basic type.  At runtime, dimensions
+  are checked for consistency for all variables; containers of any
+  sizes may be assigned to function arguments.  The constrained matrix
+  types \code{cov\_matrix[K]}, \code{corr\_matrix[K]}, and
+  \code{cholesky\_factor\_cov[K]} are only assignable to matrices of
+  dimensions \code{matrix[K,K]} types. Stan also allows arrays of any
+  of these types, with slightly different declarations for function
+  arguments and return types and variables.
+}\label{constrained-types.figure}
+\end{figure}
+
+Function argument and return types are not declared with their sizes.
+They also may not contain any constraints;  see
+\reffigure{constrained-types} for a list.
+
 Unlike type declarations for variables, function type declarations for
-matrix and vector types are not declared with their sizes.  For
+matrix and vector types are not declared with their sizes.  Like local
+variable declarations, function argument type declarations
+
+For
 example, here's a function to compute the entropy of a categorical
 distribution with simplex parameter \code{theta}.
 %
@@ -5188,7 +5282,7 @@ as return types or argument types in function declarations.
 
 Array arguments have their own syntax, which follows that used in this
 manual for function signatures.  For example, a function that operates
-on a one-dimensional array to produce a two-dimensional array might be
+on a two-dimensional array to produce a one-dimensional array might be
 declared as follows.
 %
 \begin{quote}
@@ -5493,7 +5587,13 @@ Doxygen, so this just looks like a big comment starting with \code{/*}
 and ending with \code{*/} to the Stan parser.
 
 For functions that raise exceptions, these can be documented using
-\code{@throws}.  For example,
+\code{@throws}.%
+%
+\footnote{As of Stan 2.2.0, the only way a user-defined
+producer will raise an exception is if a function it calls (including
+sampling statements) raises an exception.}
+%
+For example,
 %
 \begin{quote}
 \begin{Verbatim}

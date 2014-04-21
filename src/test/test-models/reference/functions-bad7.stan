@@ -1,5 +1,5 @@
 functions {
-  real foo_lp(real x) {
+  real barfoo_lp(real x) {
     return 2.0 * x;
   }
 }
@@ -11,5 +11,5 @@ model {
 }
 generated quantities {
   real z;
-  z <- foo_lp(1.3);
+  z <- barfoo_lp(1.3);
 }

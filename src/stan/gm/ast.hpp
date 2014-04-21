@@ -168,7 +168,8 @@ namespace stan {
       int get_signature_matches(const std::string& name,
                                 const std::vector<expr_type>& args,
                                 function_signature_t& signature);
-
+      bool is_defined(const std::string& name, 
+                      const function_signature_t& sig);
       std::set<std::string> key_set() const;
     private:
       function_signatures(); 

@@ -1,9 +1,9 @@
 functions {
-  real foo(real x);
-  real foo(real x) {
+  real flib(real x);
+  real flib(real x) {
     return x;
   }
-  real foo(real x); // error redeclaring function
+  real flib(real x); // error redeclaring function
 }
 parameters {
   real y;

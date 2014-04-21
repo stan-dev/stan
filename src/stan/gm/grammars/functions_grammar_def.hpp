@@ -161,9 +161,17 @@ namespace stan {
           return;
         }
 
-        // check not already defined
+        // check not already user defined
         if (fun_exists(functions_defined, name_sig)) {
           error_msgs << "Parse Error.  Function already defined, name=" << decl.name_;
+          pass = false;
+          return;
+        }
+
+        // check not already system defined
+        if (!fun_exists(functions_declared,name_sig)
+            && function_signatures::instance().is_defined(decl.name_, sig)) {
+          error_msgs << "Parse Error.  Function system defined, name=" << decl.name_;
           pass = false;
           return;
         }
