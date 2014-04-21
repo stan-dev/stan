@@ -340,12 +340,12 @@ TEST(AgradFwdMatrixMdivideLeftTriLow,fv_vector_fv_matrix_fv_2ndDeriv) {
   AVEC q = createAVEC(Y(0,0).val(),Y(0,1).val(),Y(0,2).val(),Y(1,0).val(),Y(1,1).val(),Y(1,2).val());
   VEC h;
   output(0,0).d_.grad(q,h);
-  EXPECT_FLOAT_EQ(2.0,h[0]);
-  EXPECT_FLOAT_EQ(0.0,h[1]);
-  EXPECT_FLOAT_EQ(0.0,h[2]);
-  EXPECT_FLOAT_EQ(0.0,h[3]);
-  EXPECT_FLOAT_EQ(0.0,h[4]);
-  EXPECT_FLOAT_EQ(0.0,h[5]);
+  EXPECT_NEAR(2.0,h[0],1e-15);
+  EXPECT_NEAR(0.0,h[1],1e-15);
+  EXPECT_NEAR(0.0,h[2],1e-15);
+  EXPECT_NEAR(0.0,h[3],1e-15);
+  EXPECT_NEAR(0.0,h[4],1e-15);
+  EXPECT_NEAR(0.0,h[5],1e-15);
 }
 TEST(AgradFwdMatrixMdivideLeftTriLow,fv_vector_matrix_fv_1stDeriv) {
   using stan::agrad::matrix_fv;
@@ -413,12 +413,12 @@ TEST(AgradFwdMatrixMdivideLeftTriLow,fv_vector_matrix_fv_2ndDeriv) {
   AVEC q = createAVEC(Y(0,0).val(),Y(0,1).val(),Y(0,2).val(),Y(1,0).val(),Y(1,1).val(),Y(1,2).val());
   VEC h;
   output(0,0).d_.grad(q,h);
-  EXPECT_FLOAT_EQ(4.0,h[0]);
-  EXPECT_FLOAT_EQ(0.0,h[1]);
-  EXPECT_FLOAT_EQ(0.0,h[2]);
-  EXPECT_FLOAT_EQ(0.0,h[3]);
-  EXPECT_FLOAT_EQ(0.0,h[4]);
-  EXPECT_FLOAT_EQ(0.0,h[5]);
+  EXPECT_NEAR(4.0,h[0],1e-15);
+  EXPECT_NEAR(0.0,h[1],1e-15);
+  EXPECT_NEAR(0.0,h[2],1e-15);
+  EXPECT_NEAR(0.0,h[3],1e-15);
+  EXPECT_NEAR(0.0,h[4],1e-15);
+  EXPECT_NEAR(0.0,h[5],1e-15);
 }
 TEST(AgradFwdMatrixMdivideLeftTriLow,fv_vector_fv_matrix_1stDeriv) {
   using stan::math::matrix_d;
@@ -584,12 +584,12 @@ TEST(AgradFwdMatrixMdivideLeftTriLow,fv_matrix_fv_matrix_fv_2ndDeriv) {
   AVEC q = createAVEC(Y(0,0).val(),Y(0,1).val(),Y(0,2).val(),Y(1,0).val(),Y(1,1).val(),Y(1,2).val());
   VEC h;
   output(0,0).d_.grad(q,h);
-  EXPECT_FLOAT_EQ(-2.0,h[0]);
-  EXPECT_FLOAT_EQ(0.0,h[1]);
-  EXPECT_FLOAT_EQ(0.0,h[2]);
-  EXPECT_FLOAT_EQ(0.0,h[3]);
-  EXPECT_FLOAT_EQ(0.0,h[4]);
-  EXPECT_FLOAT_EQ(0.0,h[5]);
+  EXPECT_NEAR(-2.0,h[0],1e-15);
+  EXPECT_NEAR(0.0,h[1],1e-15);
+  EXPECT_NEAR(0.0,h[2],1e-15);
+  EXPECT_NEAR(0.0,h[3],1e-15);
+  EXPECT_NEAR(0.0,h[4],1e-15);
+  EXPECT_NEAR(0.0,h[5],1e-15);
 }
 TEST(AgradFwdMatrixMdivideLeftTriLow,fv_matrix_fv_matrix_1stDeriv) {
   using stan::agrad::matrix_fv;
@@ -639,12 +639,12 @@ TEST(AgradFwdMatrixMdivideLeftTriLow,fv_matrix_fv_matrix_1stDeriv) {
   AVEC q = createAVEC(Z(0,0).val(),Z(0,1).val(),Z(0,2).val(),Z(1,0).val(),Z(1,1).val(),Z(1,2).val());
   VEC h;
   output(0,0).val_.grad(q,h);
-  EXPECT_FLOAT_EQ(-1.0,h[0]);
-  EXPECT_FLOAT_EQ(0.0,h[1]);
-  EXPECT_FLOAT_EQ(0.0,h[2]);
-  EXPECT_FLOAT_EQ(0.0,h[3]);
-  EXPECT_FLOAT_EQ(0.0,h[4]);
-  EXPECT_FLOAT_EQ(0.0,h[5]);
+  EXPECT_NEAR(-1.0,h[0],1e-15);
+  EXPECT_NEAR(0.0,h[1],1e-15);
+  EXPECT_NEAR(0.0,h[2],1e-15);
+  EXPECT_NEAR(0.0,h[3],1e-15);
+  EXPECT_NEAR(0.0,h[4],1e-15);
+  EXPECT_NEAR(0.0,h[5],1e-15);
 }
 TEST(AgradFwdMatrixMdivideLeftTriLow,fv_matrix_fv_matrix_2ndDeriv) {
   using stan::agrad::matrix_fv;
@@ -1203,12 +1203,12 @@ TEST(AgradFwdMatrixMdivideLeftTriLow,ffv_vector_ffv_matrix_ffv_2ndDeriv_2) {
   AVEC q = createAVEC(Y(0,0).val().val(),Y(0,1).val().val(),Y(0,2).val().val(),Y(1,0).val().val(),Y(1,1).val().val(),Y(1,2).val().val());
   VEC h;
   output(0,0).d_.val().grad(q,h);
-  EXPECT_FLOAT_EQ(2.0,h[0]);
-  EXPECT_FLOAT_EQ(0.0,h[1]);
-  EXPECT_FLOAT_EQ(0.0,h[2]);
-  EXPECT_FLOAT_EQ(0.0,h[3]);
-  EXPECT_FLOAT_EQ(0.0,h[4]);
-  EXPECT_FLOAT_EQ(0.0,h[5]);
+  EXPECT_NEAR(2.0,h[0],1e-15);
+  EXPECT_NEAR(0.0,h[1],1e-15);
+  EXPECT_NEAR(0.0,h[2],1e-15);
+  EXPECT_NEAR(0.0,h[3],1e-15);
+  EXPECT_NEAR(0.0,h[4],1e-15);
+  EXPECT_NEAR(0.0,h[5],1e-15);
 }
 TEST(AgradFwdMatrixMdivideLeftTriLow,ffv_vector_ffv_matrix_ffv_3rdDeriv) {
   using stan::agrad::matrix_ffv;
@@ -1345,12 +1345,12 @@ TEST(AgradFwdMatrixMdivideLeftTriLow,ffv_vector_matrix_ffv_2ndDeriv_2) {
   AVEC q = createAVEC(Y(0,0).val().val(),Y(0,1).val().val(),Y(0,2).val().val(),Y(1,0).val().val(),Y(1,1).val().val(),Y(1,2).val().val());
   VEC h;
   output(0,0).d_.val().grad(q,h);
-  EXPECT_FLOAT_EQ(4.0,h[0]);
-  EXPECT_FLOAT_EQ(0.0,h[1]);
-  EXPECT_FLOAT_EQ(0.0,h[2]);
-  EXPECT_FLOAT_EQ(0.0,h[3]);
-  EXPECT_FLOAT_EQ(0.0,h[4]);
-  EXPECT_FLOAT_EQ(0.0,h[5]);
+  EXPECT_NEAR(4.0,h[0],1e-15);
+  EXPECT_NEAR(0.0,h[1],1e-15);
+  EXPECT_NEAR(0.0,h[2],1e-15);
+  EXPECT_NEAR(0.0,h[3],1e-15);
+  EXPECT_NEAR(0.0,h[4],1e-15);
+  EXPECT_NEAR(0.0,h[5],1e-15);
 }
 TEST(AgradFwdMatrixMdivideLeftTriLow,ffv_vector_matrix_ffv_3rdDeriv) {
   using stan::agrad::matrix_ffv;
@@ -1636,12 +1636,12 @@ TEST(AgradFwdMatrixMdivideLeftTriLow,ffv_matrix_ffv_matrix_ffv_2ndDeriv_2) {
   AVEC q = createAVEC(Y(0,0).val().val(),Y(0,1).val().val(),Y(0,2).val().val(),Y(1,0).val().val(),Y(1,1).val().val(),Y(1,2).val().val());
   VEC h;
   output(0,0).d_.val().grad(q,h);
-  EXPECT_FLOAT_EQ(-2.0,h[0]);
-  EXPECT_FLOAT_EQ(0.0,h[1]);
-  EXPECT_FLOAT_EQ(0.0,h[2]);
-  EXPECT_FLOAT_EQ(0.0,h[3]);
-  EXPECT_FLOAT_EQ(0.0,h[4]);
-  EXPECT_FLOAT_EQ(0.0,h[5]);
+  EXPECT_NEAR(-2.0,h[0],1e-15);
+  EXPECT_NEAR(0.0,h[1],1e-15);
+  EXPECT_NEAR(0.0,h[2],1e-15);
+  EXPECT_NEAR(0.0,h[3],1e-15);
+  EXPECT_NEAR(0.0,h[4],1e-15);
+  EXPECT_NEAR(0.0,h[5],1e-15);
 }
 TEST(AgradFwdMatrixMdivideLeftTriLow,ffv_matrix_ffv_matrix_ffv_3rdDeriv) {
   using stan::agrad::matrix_ffv;
@@ -1735,12 +1735,12 @@ TEST(AgradFwdMatrixMdivideLeftTriLow,ffv_matrix_ffv_matrix_1stDeriv) {
   AVEC q = createAVEC(Z(0,0).val().val(),Z(0,1).val().val(),Z(0,2).val().val(),Z(1,0).val().val(),Z(1,1).val().val(),Z(1,2).val().val());
   VEC h;
   output(0,0).val_.val().grad(q,h);
-  EXPECT_FLOAT_EQ(-1.0,h[0]);
-  EXPECT_FLOAT_EQ(0.0,h[1]);
-  EXPECT_FLOAT_EQ(0.0,h[2]);
-  EXPECT_FLOAT_EQ(0.0,h[3]);
-  EXPECT_FLOAT_EQ(0.0,h[4]);
-  EXPECT_FLOAT_EQ(0.0,h[5]);
+  EXPECT_NEAR(-1.0,h[0],1e-15);
+  EXPECT_NEAR(0.0,h[1],1e-15);
+  EXPECT_NEAR(0.0,h[2],1e-15);
+  EXPECT_NEAR(0.0,h[3],1e-15);
+  EXPECT_NEAR(0.0,h[4],1e-15);
+  EXPECT_NEAR(0.0,h[5],1e-15);
 }
 TEST(AgradFwdMatrixMdivideLeftTriLow,ffv_matrix_ffv_matrix_2ndDeriv_1) {
   using stan::agrad::matrix_ffv;

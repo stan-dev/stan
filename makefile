@@ -40,6 +40,7 @@ CFLAGS_GTEST = -DGTEST_USE_OWN_TR1_TUPLE
 LDLIBS = -Lbin -lstan
 LDLIBS_STANC = -Lbin -lstanc
 EXE = 
+WINE =
 PATH_SEPARATOR = /
 
 
@@ -213,6 +214,7 @@ endif
 -include make/doxygen  # doxygen
 -include make/manual   # manual: manual, doc/stan-reference.pdf
 -include make/demo     # for building demos
+-include make/local    # for local stuff
 
 ifneq (,$(filter-out runtest/%,$(filter-out clean%,$(MAKECMDGOALS))))
   -include $(addsuffix .d,$(subst $(EXE),,$(MAKECMDGOALS)))

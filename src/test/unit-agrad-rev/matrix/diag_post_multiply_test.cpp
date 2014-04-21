@@ -169,7 +169,7 @@ TEST(MathMatrix,diagPostMultiplyGrad_vd) {
     EXPECT_FLOAT_EQ(g1[i], g2[i]);
 }
 
-TEST(MathMatrix,diagPreMultiplyGrad_dv) {
+TEST(MathMatrix,diagPostMultiplyGrad_dv) {
   Matrix<double,Dynamic,Dynamic> m1(3,3);
   m1 << 1, 2, 3, 4, 5, 6, 7, 8, 9;
 
@@ -213,7 +213,7 @@ TEST(MathMatrix,diagPreMultiplyGrad_dv) {
 }
 
 
-TEST(MathMatrix,diagPreMultiplyException) {
+TEST(MathMatrix,diagPostMultiplyException) {
   Matrix<var,Dynamic,Dynamic> m(2,2);
   m << 
     2, 3,
