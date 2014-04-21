@@ -499,3 +499,7 @@ TEST(parserFunctions,funsBad16) {
   test_throws("functions-bad16",
               "Function system defined");
 }
+TEST(parserFunctions,funsBad17) {
+  test_throws("functions-bad17",
+              "Require real return type for functions ending in _log");
+}

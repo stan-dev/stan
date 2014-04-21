@@ -203,6 +203,16 @@ namespace stan {
         pass = decl.body_.is_no_op_statement()
           || stan::gm::returns_type(decl.return_type_, decl.body_, 
                                     error_msgs);
+        if (!pass) {
+          error_msgs << "Improper return in body of function.";
+          return;
+        }
+
+        if (ends_with("_log",decl.name_)
+            && !decl.return_type_.is_primitive_double()) {
+            pass = false;
+            error_msgs << "Require real return type for functions ending in _log.";
+        }
       }
     };
     boost::phoenix::function<validate_return_type> validate_return_type_f;
