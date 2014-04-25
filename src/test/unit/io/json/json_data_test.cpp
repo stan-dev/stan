@@ -232,7 +232,7 @@ TEST(ioJson,jsonData_int_array_3D) {
   std::stringstream in(txt);
   stan::json::json_data jdata(in);
   std::vector<int> expected_vals;
-  expected_vals.push_back(111);
+  expected_vals.push_back(111);  
   expected_vals.push_back(211);
   expected_vals.push_back(121);
   expected_vals.push_back(221);
