@@ -507,7 +507,6 @@ Only arrays in Stan are allowed to store integer values.
 
 
 
-
 \chapter{Regression Models}
 
 \noindent
@@ -5089,6 +5088,560 @@ constants, the sampling statement will drop both terms (but still
 check for out-of-domain errors on the inputs).
 
 
+\chapter{User-Defined Functions}\label{functions-programming.chapter}
+
+\noindent
+This chapter explains functions from a user perspective with examples;
+see \refchapter{functions} for the full specification.  User-defined
+functions allow computations to be encapsulated into a single named
+unit and invoked elsewhere by name.  Similarly, functions allow
+complex procedures to be broken down into more understandable
+components.  Writing modular code using descriptively named functions
+is easier to understand than a monolithic program, even if the latter
+is heavily commented.%
+%
+\footnote{The main problem with comments is that they can be
+  misleading, either due to misunderstandings on the programmer's part
+  or because the program's behavior is modified after the comment is
+  written.  The program always behaves the way the code is written,
+  which is why refactoring complex code into understandable units is
+  preferable to simply adding comments.}
+
+\section{Basic Functions}
+
+Here's an example of a skeletal Stan program with a user-defined
+relative difference function employed in the generated quantities
+block to compute a relative differences between two parameters.
+%
+\begin{quote}
+\begin{Verbatim}
+functions {
+  real relative_diff(real x, real y) {
+    real abs_diff;
+    real avg_scale;
+    abs_diff <- fabs(x - y);
+    avg_scale <- (fabs(x) + fabs(y)) / 2;
+    return abs_diff / avg_scale;
+  }
+}
+...
+generated quantities {
+  real rdiff;
+  rdiff <- relative_diff(alpha,beta);
+}
+\end{Verbatim}
+\end{quote}
+%
+The function is named \code{relative\_diff}, and is declared to have
+two real-valued arguments and return a real-valued result.   It is
+used the same way a built-in function would be used in the generated
+quantities block.
+
+\subsection{User-Defined Functions Block}
+
+All functions are defined in their own block, which is labeled
+\code{functions} and must appear before all other program blocks.  The
+user-defined functions block is optional.
+
+\subsection{Function Bodies}
+
+The body (the part between the curly braces) contains ordinary Stan
+code, including local variables.  The new function is used in the
+generated quantities block just as any of Stan's built-in functions
+would be used.
+
+\subsection{Return Statements}
+
+Return statements, such as the one on the last line of the definition
+of \code{relative\_diff} above, are only allowed in the bodies of
+function definitions.  Return statements may appear anywhere in a
+function, but functions with non-void return types must end in a
+return statement; see \refsection{function-returns} for details on how
+this is enforced.
+
+
+\subsection{Type Declarations for Functions}
+
+\begin{figure}
+\begin{center}
+\begin{tabular}{l|l|l}
+{\it Functions:} & {\it Locals Variables:} & {\it Nonlocal Variables:} \\
+{\it Undimensioned} & {\it Unconstrained} & {\it Constrained} \\
+\hline \hline
+\code{int} 
+& \code{int} 
+& \code{int<lower=L>}
+\\
+& &  \code{int<upper=U>}
+\\
+& &  \code{int<lower=L,upper=U>}
+%
+\\ \hline
+%
+\code{real} 
+& \code{real} 
+& \code{real<lower=L>}
+\\
+& &  \code{real<upper=U>}
+\\
+& & \code{real<lower=L,upper=U>}
+%
+\\ \hline
+%
+\code{vector}
+& 
+\code{vector[N]}
+& \code{vector<lower=L>[N]}
+\\
+& &  \code{vector<upper=U>[N]}
+\\
+& &  \code{vector<lower=L,upper=U>[N]}
+\\[4pt]
+& & \code{simplex[N]}
+\\
+& & \code{ordered[N]}
+\\
+& & \code{positive\_ordered[N]}
+\\
+& & \code{unit\_vector[N]}
+%
+\\ \hline
+%
+\code{row\_vector}
+& \code{row\_vector[M]}
+& \code{row\_vector<lower=L>[M]}
+\\
+& &  \code{row\_vector<upper=U>[M]}
+\\
+& &  \code{row\_vector<lower=L,upper=U>[M]}
+%
+\\ \hline
+%
+\code{matrix} 
+& \code{matrix[M,N]} 
+& \code{matrix<lower=L>[M,N]}
+\\
+& &  \code{matrix<upper=U>[M,N]}
+\\
+& &  \code{matrix<lower=L,upper=U>[M,N]}
+\\[4pt]
+& & \code{cov\_matrix[K]}
+\\
+& & \code{corr\_matrix[K]} 
+\\
+& & \code{cholesky\_factor\_cov[K]}
+\end{tabular}
+\end{center}
+\caption{\small\it The leftmost column is a list of the unconstrained
+  and undimensioned basic types; these are used as function return
+  types and argument types.  The middle column is of unconstrained
+  types with dimensions; these are used as local variable types.  The
+  rightmost column lists the corresponding constrained types.  An
+  expression of any righthand column type may be assigned to its
+  corresponding lefthand column basic type.  At runtime, dimensions
+  are checked for consistency for all variables; containers of any
+  sizes may be assigned to function arguments.  The constrained matrix
+  types \code{cov\_matrix[K]}, \code{corr\_matrix[K]}, and
+  \code{cholesky\_factor\_cov[K]} are only assignable to matrices of
+  dimensions \code{matrix[K,K]} types. Stan also allows arrays of any
+  of these types, with slightly different declarations for function
+  arguments and return types and variables.
+}\label{constrained-types.figure}
+\end{figure}
+
+Function argument and return types are not declared with their sizes.
+They also may not contain any constraints;  see
+\reffigure{constrained-types} for a list.
+
+Unlike type declarations for variables, function type declarations for
+matrix and vector types are not declared with their sizes.  Like local
+variable declarations, function argument type declarations
+
+For
+example, here's a function to compute the entropy of a categorical
+distribution with simplex parameter \code{theta}.
+%
+\begin{quote}
+\begin{Verbatim}
+real entropy(vector theta) {
+  return sum(theta .* log(theta));
+}
+\end{Verbatim}
+\end{quote}
+%
+Although \code{theta} must be a simplex, only the type \code{vector}
+is used and no error checking is carried out.%
+%
+\footnote{User-invoked exceptions along with a range of built-in
+  validation routines are coming to Stan soon!} 
+%
+Upper or lower bounds on values or constrained types are not allowed
+as return types or argument types in function declarations.  
+
+\subsection{Array Types for Function Declarations}
+
+Array arguments have their own syntax, which follows that used in this
+manual for function signatures.  For example, a function that operates
+on a two-dimensional array to produce a one-dimensional array might be
+declared as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+real[] baz(real[,] x);
+\end{Verbatim}
+\end{quote}
+%
+The notation \code{[\,]} is used for one-dimensional arrays (as in the
+return above), \code{[\,,\,]} for two-dimensional arrays,
+\code{[\,,\,,\,]} for three-dimensional arrays, and so on.  
+
+Functions support arrays of any type, including matrix and vector
+types.  As with other types, no constraints are allowed.
+
+
+\section{Functions as Statements}
+
+In some cases, it makes sense to have functions that do not return a
+value.  For example, a routine to print the lower-triangular portion
+of a matrix can be defined as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+functions {
+  void pretty_print_tri_lower(matrix x) {
+    if (rows(x) == 0) {
+      print("empty matrix");
+      return;
+    }
+    print("rows=", rows(x), " cols=", cols(x));
+    for (m in 1:rows(x))
+      for (n in 1:m)
+        print("[", m, ",", n, "]=", x[m,n]);
+  }
+}
+\end{Verbatim}
+\end{quote}
+%
+The special symbol \code{void} is used as the return type.  This is
+not a type itself in that there are no values of type \code{void}; it
+merely indicates the lack of a value.  As such, return statements for
+void functions are not allowed to have arguments, as in the return
+statement in the body of the previous example.
+
+Void functions applied to appropriately typed arguments may be used on
+their own as statements.  For example, the pretty-print function
+defined above may be applied to a covariance matrix being defined in
+the transformed parameters block. 
+%
+\begin{quote}
+\begin{Verbatim}
+transformed parameters {
+  cov_matrix[K] Sigma;
+  ... code to set Sigma ...
+  pretty_print_tri_lower(Sigma);
+  ...
+\end{Verbatim}
+\end{quote}
+
+
+\section{Functions Accessing the Log Probability  Accumulator}
+
+Functions whose names end in \code{\_lp} are allowed to use sampling
+statements and \code{increment\_log\_prob()} statements; other
+functions are not.  Because of this access, their use is restricted to
+the transformed parameters and model blocks.
+
+Here is an example of a function to return the centered coefficients
+derived from a non-centered vector of parameters \code{beta\_raw}
+along with the location \code{mu} of the center and the scale
+\code{sigma}; see \refsection{reparameterization} for more information
+on centering.
+%
+\begin{quote}
+\begin{Verbatim}
+functions {
+  vector center_lp(vector beta_raw, real mu, real sigma) {
+    beta_raw ~ normal(0,1);
+    sigma ~ cauchy(0,5);
+    mu ~ cauchy(0,2.5);
+    return sigma * beta_raw + mu;
+  }
+  ...
+}
+parameters {
+  vector[K] beta_raw;
+  real mu_beta;
+  real<lower=0> sigma_beta;
+  ...
+transformed parameters {
+  vector[K] beta;
+  ...
+  beta <- center_lp(beta_raw, mu_beta, sigma_beta);
+  ...
+\end{Verbatim}
+\end{quote}
+
+
+\section{Functions Acting as Random Number Generators}
+
+A user-specified function can be declared to act as a (pseudo) random
+number generator (PRNG) by giving it a name that ends in \code{\_rng}.
+Giving a function a name that ends in \code{\_rng} allows it to access
+built-in functions and user-defined functions that end in
+\code{\_rng}, whihc includes all the built-in PRNG functions.  Only
+functions ending in \code{\_rng} are able access the built-in PRNG
+functions.  The use of functions ending in \code{\_rng} must therefore
+be restricted to the generated quantities block like other PRNG
+functions.
+
+For example, the following function generates an $N \times K$ data
+matrix, the first column of which is filled with 1 values for the
+intercept and the remaining entries of which have values drawn
+from a unit normal PRNG.
+%
+\begin{quote}
+\begin{Verbatim}
+matrix predictors_rng(int N, int K) {
+  matrix[N,K] x;
+  for (n in 1:N) {
+    x[n,1] <- 1.0;  // intercept
+    for (k in 2:K)
+      x[n,k] <- normal_rng(0,1);
+  }
+  return x;
+}
+\end{Verbatim}
+\end{quote}
+%
+The following function defines a simulator for regression outcomes
+based on a data matrix \code{x}, coefficients \code{beta}, and noise
+scale \code{sigma}.
+%
+\begin{quote}
+\begin{Verbatim}
+vector regression_rng(vector beta, matrix x, real sigma) {
+  vector[rows(x)] y;
+  vector[rows(x)] mu;
+  mu <- x * beta;
+  for (n in 1:rows(x))
+    y[n] <- normal_rng(mu[n], sigma);
+  return y;
+}
+\end{Verbatim}
+\end{quote}
+%
+These might be used in a generated quantity block to simulate some
+fake data from a fitted regression model as follows.
+%
+\begin{quote}
+\begin{Verbatim}
+parameters {
+  vector[K] beta;
+  real<lower=0> sigma;
+  ...
+generated quantities {
+  matrix[N_sim,K] x_sim;
+  vector[N_sim] y_sim;
+  x_sim <- predictors_rng(N_sim,K);
+  y_sim <- regression_rng(beta,x_sim,sigma);
+}
+\end{Verbatim}
+\end{quote}
+%
+A more sophisticated simulation might fit a multivariate normal to the
+predictors \code{x} and use the resulting parameters to generate
+multivariate normal draws for \code{x\_sim}.
+
+\section{User-Defined Probability Functions}
+
+Probability functions are distinguished in Stan by names ending in
+\code{\_log} and \code{real} return types.  
+
+Suppose a model uses several unit normal distributions, for which
+there is not a specific overloaded density nor defaults in Stan.  So
+rather than writing out the location of 0 and scale of 1 for all of
+them, a new density function may be defined and reused.
+%
+\begin{quote}
+\begin{Verbatim}
+functions {
+  real unit_normal_log(real y) { 
+    return normal_log(y,0,1); 
+  }
+}
+...
+model {
+  alpha ~ unit_normal();
+  beta ~ unit_normal();
+  ...
+}
+\end{Verbatim}
+\end{quote}
+%
+The ability to use the \code{unit\_normal} function as a density is
+keyed off its name ending in \code{\_log}.  
+
+In general, if \code{foo\_log} is defined to consume $N + 1$ arguments,
+then
+%
+\begin{quote}
+\begin{Verbatim}
+y ~ foo(theta1,...,thetaN);
+\end{Verbatim}
+\end{quote}
+%
+can be used as shorthand for 
+%
+\begin{quote}
+\begin{Verbatim}
+increment_log_prob(foo_log(y,theta1,...,thetaN));
+\end{Verbatim}
+\end{quote}
+%
+As with the built-in functions, the suffix \code{\_log} is dropped and
+the first argument moves to the left of the sampling symbol (\Verb|~|)
+in the sampling statement.
+
+
+\section{Overloading Functions}
+
+Stan permits overloading (i.e., different functions with the same
+name).  For example, the function \code{unit\_normal} defined above
+could be named \code{normal}, thus overloading with the built-in
+function of the same name.
+
+For example, built-in functions might be written to convert sequences
+of scalar arguments to vectors, leading to the following overloading
+of the name \code{as\_vector} in four distinct functions.
+%
+\begin{quote}
+\begin{Verbatim}
+vector as_vector();
+vector as_vector(real a);
+vector as_vector(real a, real b);
+vector as_vector(real a, real b, real c);
+\end{Verbatim}
+\end{quote}
+
+A function's name combined with its argument type sequence must be
+unique.  Therefore, it is not possible to have two functions of the
+same name and argument sequence with different return types.  It is
+possible to have two functions of the same name and number of
+arguments as long as the arguments are of different types.  For
+example, the following signatures are legal together.
+%
+\begin{quote}
+\begin{Verbatim}
+real bar(matrix m);
+real bar(vector v);
+real bar(row_vector rv);
+real bar(real[] a1);
+real bar(real[,] a2);
+\end{Verbatim}
+\end{quote}
+%
+They could be used to define an operation that can apply to any one-
+or two-dimensional container.
+
+Overloaded functions only share names---their implementations are not
+intrinsically related.  Nevertheless, it is good programming practice
+to only reuse names for related functions---otherwise, those reading
+the program will be confused.
+
+
+\section{Documenting Functions}\label{documenting-functions.section}
+
+Functions will ideally be documented at their interface level.  The
+Stan style guide for function documentation follows the same format as
+used by the Doxygen (\Cpp) and Javadoc (Java) automatic documentation
+systems.  Such specifications indicate the variables and their types
+and the return value, prefaced with some descriptive text.
+
+For example, here's some documentation for the prediction matrix
+generator.
+%
+\begin{quote}
+\begin{Verbatim}
+/**
+ * Return a data matrix of specified size with rows 
+ * correspdonding to items and the first column filled 
+ * with the value 1 to represent the intercept and the 
+ * remaining columns randomly filled with unit-normal draws.
+ *
+ * @param N Number of rows correspdong to data items
+ * @param K Number of predictors, counting the intercept, per
+ *          item.
+ * @return Simulated predictor matrix.
+ */
+matrix predictors_rng(int N, int K) { 
+  ...
+\end{Verbatim}
+\end{quote}
+%
+The comment begins with \code{/**}, ends with \code{*/}, and has an
+asterisk (\code{*}) on each line.  It uses \code{@param} followed by
+the argument's identifier to document a function argument.  The tag
+\code{@return} is used to indicate the return value.  Stan does not
+(yet) have an automatic documentation generator like Javadoc or
+Doxygen, so this just looks like a big comment starting with \code{/*}
+and ending with \code{*/} to the Stan parser.
+
+For functions that raise exceptions, these can be documented using
+\code{@throws}.%
+%
+\footnote{As of Stan 2.2.0, the only way a user-defined
+producer will raise an exception is if a function it calls (including
+sampling statements) raises an exception.}
+%
+For example,
+%
+\begin{quote}
+\begin{Verbatim}
+ ...
+ * @param theta 
+ * @throws If any of the entries of theta is negative.
+ */
+real entropy(vector theta) {
+  ...
+\end{Verbatim}
+\end{quote}
+%
+Usually an exception type would be provided, but these are not exposed
+as part of the Stan language, so there is no need to document them.
+
+
+\section{Summary of Function Types}
+
+Functions may have a void or non-void return type and they may or may
+not have one of the special suffixes, \code{\_log}, \code{\_lp}, or
+\code{\_rng}.
+
+\subsection{Void vs. Non-Void Return}
+
+Only functions declared to return \code{void} may be used as
+statements.  These are also the only functions that use \code{return}
+statements with no arguments.
+
+Only functions declared to return non-\code{void} values may be used
+as expressions.  These functions require \code{return} statements with
+arguments of a type that matches the declared return type.
+
+\subsection{Suffixed or Non-Suffixed}
+
+Only functions ending in \code{\_log} and with return type \code{real}
+may be used as probability functions in sampling statements. 
+
+Only functions ending in \code{\_lp} may access the log probability
+accumulator through sampling statements or
+\code{increment\_log\_prob()} statements.  Such functions may only be
+used in the transformed parameters or model blocks.
+
+Only functions ending in \code{\_rng} may access the built-in
+pseudo-random number generators.  Such functions may only be used in
+the generated quantities block.
+
+
+
 
 \chapter{Problematic Posteriors}\label{problematic-posteriors.chapter}%
 \noindent
@@ -5834,7 +6387,7 @@ is a clear indication that something is amiss in the model.
 This chapter provides a grab bag of techniques for optimizing \Stan
 code, including vectorization, sufficient statistics, and conjugacy.
 
-\section{Reparameterization}
+\section{Reparameterization}\label{reparameterization.section}
 
 Stan's sampler can be slow in sampling from distributions with
 difficult posterior geometries.  One way to speed up such models is
@@ -6168,10 +6721,10 @@ intractable posterior.
 A hierarchical model such as the above will suffer from the same kind
 of inefficiencies as Neal's funnel, though typically not so extreme,
 because the values of \Verb|beta|, \Verb|mu_beta| and
-\Verb|sigma_beta| are highly correlated in the posterior.  Such a
-hierarchical model can be made much more efficient in terms of
-effective sample size by reparameterizing in exactly the same way as
-the funnel example.
+\Verb|sigma_beta| are highly correlated in the posterior. When there is a lot of data, such a
+hierarchical model can be made much more efficient by shifting the data's correlation with the 
+parameters to the hyperparameters. Similar to the funnel example, this will be much more 
+efficient in terms of effective sample size~\citep{Betancourt-Girolami:2013}.
 %
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
