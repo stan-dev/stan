@@ -10,6 +10,7 @@
 #include <stan/gm/ast.hpp>
 #include <stan/gm/grammars/whitespace_grammar.hpp>
 #include <stan/gm/grammars/expression_grammar.hpp>
+#include <stan/gm/grammars/expression07_grammar.hpp>
 
 namespace stan {
 
@@ -32,7 +33,7 @@ namespace stan {
       // grammars
       expression_grammar<Iterator> expression_g;      
 
-      expression_grammar<Iterator> expression07_g;      
+      expression07_grammar<Iterator> expression07_g;      
 
       // rules
 
@@ -129,13 +130,13 @@ namespace stan {
       boost::spirit::qi::rule<Iterator, 
                               boost::spirit::qi::locals<bool>, 
                               var_decl(bool,var_origin), 
-               whitespace_grammar<Iterator> > 
+                              whitespace_grammar<Iterator> > 
       var_decl_r;
 
       boost::spirit::qi::rule<Iterator, 
                               boost::spirit::qi::locals<bool>, 
                               std::vector<var_decl>(bool,var_origin), 
-               whitespace_grammar<Iterator> > 
+                              whitespace_grammar<Iterator> > 
       var_decls_r;
 
 
