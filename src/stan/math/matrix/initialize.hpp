@@ -18,7 +18,7 @@ namespace stan {
     }
     template <typename T, typename V>
     inline 
-    typename boost::enable_if_c<boost::is_arithmetic<V>::value, void>
+    typename boost::enable_if_c<boost::is_arithmetic<V>::value, void>::type
     initialize(T& x, V v) {
       x = v;
     }

@@ -12,6 +12,7 @@
 #include <stan/gm/grammars/expression_grammar.hpp>
 #include <stan/gm/grammars/var_decls_grammar.hpp>
 #include <stan/gm/grammars/statement_grammar.hpp>
+#include <stan/gm/grammars/functions_grammar.hpp>
 
 namespace stan { 
 
@@ -34,6 +35,7 @@ namespace stan {
       expression_grammar<Iterator> expression_g;
       var_decls_grammar<Iterator> var_decls_g;
       statement_grammar<Iterator> statement_g;
+      functions_grammar<Iterator> functions_g;
 
       // rules
 
