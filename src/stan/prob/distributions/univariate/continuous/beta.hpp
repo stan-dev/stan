@@ -5,9 +5,10 @@
 #include <boost/random/gamma_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
 
-#include <stan/agrad.hpp>
+#include <stan/agrad/partials_vari.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/functions/log1m.hpp>
+#include <stan/math/functions/multiply_log.hpp>
 #include <stan/math/functions/value_of.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
@@ -270,10 +271,6 @@ namespace stan {
       agrad::OperandsAndPartials<T_y, T_scale_succ, T_scale_fail> 
         operands_and_partials(y, alpha, beta);
 
-      std::fill(operands_and_partials.all_partials,
-                operands_and_partials.all_partials 
-                + operands_and_partials.nvaris, 0.0);
-
       // Explicit return for extreme values
       // The gradients are technically ill-defined, but treated as zero
       for (size_t i = 0; i < stan::length(y); i++) {
@@ -430,10 +427,6 @@ namespace stan {
       agrad::OperandsAndPartials<T_y, T_scale_succ, T_scale_fail> 
         operands_and_partials(y, alpha, beta);
 
-      std::fill(operands_and_partials.all_partials,
-                operands_and_partials.all_partials 
-                + operands_and_partials.nvaris, 0.0);
-      
       // Compute CDF and its gradients
       using boost::math::ibeta;
       using boost::math::ibeta_derivative;
@@ -563,10 +556,6 @@ namespace stan {
       agrad::OperandsAndPartials<T_y, T_scale_succ, T_scale_fail> 
         operands_and_partials(y, alpha, beta);
 
-      std::fill(operands_and_partials.all_partials,
-                operands_and_partials.all_partials
-                + operands_and_partials.nvaris, 0.0);
-      
       // Compute CDF and its gradients
       using boost::math::ibeta;
       using boost::math::ibeta_derivative;

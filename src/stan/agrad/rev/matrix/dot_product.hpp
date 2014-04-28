@@ -12,7 +12,7 @@
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/vari.hpp>
 #include <stan/agrad/rev/matrix/typedefs.hpp>
-#include <stan/agrad/rev/value_of.hpp>
+#include <stan/agrad/rev/functions/value_of.hpp>
 
 namespace stan {
   namespace agrad {

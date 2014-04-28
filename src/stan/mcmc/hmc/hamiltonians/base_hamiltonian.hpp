@@ -42,19 +42,15 @@ namespace stan {
       
       virtual void update(P& z) {
         
-        std::vector<double> grad_lp(this->_model.num_params_r());
-        
         try {
-          z.V = - stan::model::log_prob_grad<true,true>(_model,z.q, z.r, 
-                                                        grad_lp, 
-                                                        _err_stream);
-        } catch (std::domain_error e) {
+          stan::model::gradient(_model, z.q, z.V, z.g, _err_stream);
+          z.V *= -1;
+        } catch (const std::exception& e) {
           this->_write_error_msg(_err_stream, e);
           z.V = std::numeric_limits<double>::infinity();
         }
         
-        Eigen::Map<Eigen::VectorXd> eigen_g(&(grad_lp[0]), grad_lp.size());
-        z.g = - eigen_g;
+        z.g *= -1;
         
       }
       
@@ -65,7 +61,7 @@ namespace stan {
         std::ostream* _err_stream;
       
         void _write_error_msg(std::ostream* error_msgs,
-                             const std::domain_error& e) {
+                             const std::exception& e) {
           
           if (!error_msgs) return;
           

@@ -60,16 +60,16 @@ namespace stan {
         sample.get_sample_params(values);
         sampler.get_sampler_params(values);
         
-        std::vector<double> model_values;
+        Eigen::VectorXd model_values;
         
         model.write_array(rng,
-                          const_cast<std::vector<double>&>(sample.cont_params()),
-                          const_cast<std::vector<int>&>(sample.disc_params()),
+                          const_cast<Eigen::VectorXd&>(sample.cont_params()),
                           model_values,
                           true, true,
                           msg_stream_); 
-        
-        values.insert(values.end(), model_values.begin(), model_values.end());
+
+        for (int i = 0; i < model_values.size(); ++i)
+          values.push_back(model_values(i));
         
         (*sample_stream_) << values.at(0);
         for (size_t i = 1; i < values.size(); ++i) {
@@ -137,7 +137,7 @@ namespace stan {
       }
       
       void print_timing(double warmDeltaT, double sampleDeltaT, 
-                        std::ostream* stream, const char prefix = '\0') {
+                        std::ostream* stream, const std::string& prefix = "") {
         if (!stream) return;
         
         std::string title(" Elapsed Time: ");
@@ -154,8 +154,8 @@ namespace stan {
       }
       
       void print_timing(double warmDeltaT, double sampleDeltaT) {
-        print_timing(warmDeltaT, sampleDeltaT, sample_stream_, '#');
-        print_timing(warmDeltaT, sampleDeltaT, diagnostic_stream_, '#');
+        print_timing(warmDeltaT, sampleDeltaT, sample_stream_, "#");
+        print_timing(warmDeltaT, sampleDeltaT, diagnostic_stream_, "#");
         print_timing(warmDeltaT, sampleDeltaT, &std::cout);
       }
       

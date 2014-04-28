@@ -1,9 +1,23 @@
 \part{Built-In Functions}\label{built-in-functions.part}
 
 
-\chapter{Vectorization}
+\chapter{Vectorization}\label{vectorization.chapter}
 
-\section{Vectorized Functions}\label{prob-vectorization.section}
+\noindent
+Stan's scalar log probability functions all support vectorized
+function application, with results defined to be the sum of the
+elementwise application of the function.  In all cases, matrix
+operations are faster than loops and vectorized log probability
+functions are faster than their equivalent form defined with loops. 
+
+Stan also overloads some scalar functions, such as \code{log} and
+\code{exp}, to apply to vectors (arrays) and return vectors (arrays).  
+These vectorizations are defined elementwise and unlike the
+probability functions, provide only minimal efficiency speedups over
+repeated application and assignment in a loop.
+
+
+\section{Vectorized Function Signatures}\label{prob-vectorization.section}
 
 The normal probability function is specified with the signature
 %
@@ -20,9 +34,53 @@ vector, or a row-vector.  If there is more than one array or vector
 argument, their types can be anything but their size must match.  For
 instance, it is legal to use
 \code{normal\_log(row\_vector,vector,real)} as long as the vector and
-row vector have the same size.
+row vector have the same size.  
 
-The pseudo-type \code{ints} is used for vectorized arguments.
+The pseudo-type \code{ints} is used for vectorized integer arguments.
+
+
+\section{Evaluating Vectorized Functions}
+
+The result of a vectorized log probability function is equivalent to
+the sum of the evaluations on each element.  Any non-vector argument,
+namely \code{real} or \code{int}, is repeated.  For instance, if
+\code{y} is a vector of size \code{N}, \code{mu} is a vector of size
+\code{N}, and \code{sigma} is a scalar, then
+%
+\begin{quote}
+\begin{Verbatim}
+ll <- normal_log(y, mu, sigma);
+\end{Verbatim}
+\end{quote}
+%
+is just a more efficient way to write
+%
+\begin{quote}
+\begin{Verbatim}
+ll <- 0;
+for (n in 1:N)
+  ll <- ll + normal_log(y[n], mu[n], sigma);
+\end{Verbatim}
+\end{quote}
+%
+With the same arguments, the vectorized sampling statement
+%
+\begin{quote}
+\begin{Verbatim}
+y ~ normal(mu, sigma);
+\end{Verbatim}
+\end{quote}
+%
+has the same effect on the total log probability as
+%
+\begin{quote}
+\begin{Verbatim}
+for (n in 1:N)
+  y[n] ~ normal(mu[n], sigma);
+\end{Verbatim}
+\end{quote}
+
+
 
 
 \chapter{Void Functions}
@@ -38,14 +96,22 @@ Although it's not part of Stan's type language, in this chapter,
 \section{Increment Log Probability}
 
 There is a special function \code{increment\_log\_prob} takes a single
-real-valued argument and adds the result to the log probability.
+argument of any expression type \code{T}.
 %
 \begin{description}
-\fitem{void}{increment\_log\_prob}{real \farg{lp}}{Add \farg{lp} to
-  the total log probability accumulator returned by the log
-  probability function defined by a Stan model.}
+  \fitem{void}{increment\_log\_prob}{T \farg{lp}}{Add \farg{lp} (or
+    elements of \farg{lp} if \code{T} is a container type) to the
+    total log probability accumulator returned by the log probability
+    function defined by a Stan model.}
 \end{description}
 %
+The expression \code{lp} can be of any expression type.  Specifically,
+it can be an integer or real primitive, a vector, row vector, or
+matrix, or an array of any type, including multidimensional arrays and
+arrays of matrices, vectors, or row vectors.  Vector arguments are
+included for convenience and have no speed advantage over adding
+values in a loop.
+
 The full behavior of the \code{increment\_log\_prob} statement and its
 relation to sampling statements is described in
 \refsection{increment-log-prob}.
@@ -337,6 +403,9 @@ is zero, returns 0 without evaluating \code{b}.
 
 \subsection{Logical Functions}
 
+The logical functions introduce conditional behavior functionally and
+are primarily provided for compatibility with BUGS and JAGS.
+%
 \begin{description}
 %
 \fitem{real}{if\_else}{int \farg{cond}, real \farg{x}, real \farg{y}}{
@@ -345,9 +414,54 @@ the ternary operator in \Cpp, Stan's \code{if\_else} function always
 evaluates both arguments \farg{x} and \farg{y}}
 %
 \fitem{real}{step}{real \farg{x}}{
-0 if \farg{x} is negative and 1 otherwise; equivalent to \code{x > 0.0}}
+1 if \farg{x} is positive and 0 otherwise; equivalent to \code{x > 0.0}}
 %
 \end{description}
+
+The log probability function and gradient evaluations are more
+efficient in Stan when implemented using conditional statements.  If
+\code{y} is a \code{real} variable, and \code{c}, \code{x1}, and
+\code{x2} are scalar expressions (type \code{real} or \code{int}),
+then the assignment statements
+%
+\begin{quote}
+\begin{Verbatim}
+y <- x1 * step(c) + x2 * (1 - step(c));
+\end{Verbatim}
+\end{quote}
+%
+and
+%
+\begin{quote}
+\begin{Verbatim}
+y <- if_else(c > 0, x1, x2);
+\end{Verbatim}
+\end{quote}
+%
+are more efficiently written with the conditional statement
+%
+\begin{quote}
+\begin{Verbatim}
+if (c > 0)
+  y <- x1;
+else
+  y <- x2;
+\end{Verbatim}
+\end{quote}
+%
+The reason the functional versions are slower is that they evaluate
+all of their arguments; the step function approach is particularly
+slow as it also introduces arithmetic operations.  The overhead will
+be more noticeable if \code{c}, \code{x1} or \code{x2}
+are parameters (including transformed parameters and local variables
+that depend on parameters) or if \code{x1} and \code{x2} are
+complicated expressions rather than constants or simple variables.  
+
+\emph{Warning: } \ If \code{y} is a parameter (including transformed
+parameters and local variables in model blocks) and any of \code{c},
+\code{x1}, or \code{x2} is a parameter, then all of the above
+approaches introduce the same discontinuities into the derivative of
+\code{y} with respect to the parameter arguments.
 
 
 \section{Real-Valued Arithmetic Operators}\label{real-valued-arithmetic-operators.section}
@@ -445,6 +559,30 @@ see warning at start of \refsection{step-functions}}
 
 
 \subsection{Rounding Functions}
+
+{\it Warning:}\ Rounding functions convert real values to integers.
+Because the output is an integer, any gradient information resulting
+from functions applied to the integer is not passed to the real value
+it was derived from.  With MCMC sampling using HMC or NUTS, the
+Metropolis/slice procedure will correct for any error due to poor
+gradient calculations, but the result is likely to be reduced
+acceptance probabilities and less efficient sampling.
+
+One case where rounding is reasonable is linear interpolation of
+function values.   For
+example, consider
+%
+\begin{quote}
+\begin{Verbatim}
+xm <- x[floor(c)];
+xp <- x[ceil(c)];
+x <- (c - floor(c))*xp + (ceil(c) - c)*xm;
+\end{Verbatim}
+\end{quote}
+%
+In this example, the first derivative for \code{x} with respect to
+\code{c} will be reasonable, but the second derivatives will all be
+zero.
 
 \begin{description}
 %
@@ -616,7 +754,11 @@ The error function of \farg{x}}
 The complementary error function of \farg{x}}
 %
 \fitemindexsort{real}{Phi}{real \farg{x}}{
-The cumulative unit normal density function of \farg{x}}{Phi}{phi}
+The cumulative unit normal density function of \farg{x};
+\code{Phi(\farg{x})} will underflow to 0 for \farg{x} below -37.5 and overflow
+to 1 for \farg{x} above 8.25;  derivatives will underflow to 0 below
+-27.5 and overflow to 1 above 27.5.
+}{Phi}{phi}
 %
 \fitemindexsort{real}{Phi\_approx}{real \farg{x}}{
 Fast approximation of the cumulative unit normal density
@@ -717,9 +859,9 @@ Q(a,z) =
   \farg{y}}{ The natural logarithm of the binomial coefficient of
   \farg{x} and \farg{y}.  For non-negative integer inputs, this is
   pronounced ``\farg{x} choose \farg{y},'' written as
-  ${x \choose y}$, and defined by
+  $\binom{x}{y}$, and defined by
 \[
-{x \choose y} = \frac{x!}{(x - y)! \, y!}.
+\binom{x}{y} = \frac{x!}{(x - y)! \, y!}.
 \]
 This Stan function extends the domain to continuous quantities through the
 $\Gamma$ function, defining
@@ -845,11 +987,14 @@ The natural logarithm of 1 minus the inverse logit function of \farg{x}}
 
 \chapter{Array Operations}
 
-\section{Reductions}
+\section{Reductions}\label{array-reductions.section}
 
 The following operations take arrays as input and produce single
 output values.
 %
+
+\subsection{Minimum and Maximum}
+
 \begin{description}
 \fitem{real}{min}{real \farg{x}[]}{
 The minimum value in \farg{x}, or $+\infty$ if \farg{x} is empty}
@@ -863,10 +1008,16 @@ The maximum value in \farg{x}, or $-\infty$ if \farg{x} is empty}
 \fitem{int}{max}{int \farg{x}[]}{
 The maximum value in \farg{x}, or raise exception if \farg{x} is empty}
 %
-\fitem{real}{sum}{real \farg{x}[]}{
+\end{description}
+
+\subsection{Sum, Product, and Log Sum of Exp}
+
+\begin{description}
+%
+\fitem{int}{sum}{int \farg{x}[]}{
 The sum of the elements in \farg{x}, or 0 if \farg{x} is empty.}
 %
-\fitem{real}{sum}{int \farg{x}[]}{
+\fitem{real}{sum}{real \farg{x}[]}{
 The sum of the elements in \farg{x}, or 0 if \farg{x} is empty.}
 %
 \fitem{real}{prod}{real \farg{x}[]}{
@@ -875,38 +1026,110 @@ The product of the elements in \farg{x}, or 1 if \farg{x} is empty.}
 \fitem{real}{prod}{int \farg{x}[]}{
 The product of the elements in \farg{x}, or 1 if \farg{x} is empty.}
 %
-\fitem{real}{mean}{real \farg{x}[]}{
-The sample mean of the elements in \farg{x}, or raise exception
-if \farg{x} is empty}
-%
-\fitem{real}{variance}{real \farg{x}[]}{
-The sample variance of the elements in \farg{x} (based on
-dividing by \code{length - 1}), or 0 if \farg{x} is empty}
-%
-\fitem{real}{sd}{real \farg{x}[]}{The sample standard deviation of
-elements in \farg{x} (divide by \code{length - 1}), or 0 if \farg{x}
-is empty}
-%
-% \fitem{real}{dist}{real \farg{x}[], real \farg{y}[]}{The Euclidean
-%   distance between \farg{x} and \farg{y}, defined by
-% \[
-% \mbox{dist}(\mbox{\farg{x}},\mbox{\farg{y}}) 
-% = \sqrt{\textstyle \sum_{n=1}^N (\mbox{\farg{x}}[n] - \mbox{\farg{y}}[n])^2},
-% \]
-% where \code{N} is the size of \farg{x} and \farg{y}.
-% }
-%
-% \fitem{real}{squared\_dist}{real \farg{x}[], real \farg{y}[]}{The Euclidean
-%   distance between \farg{x} and \farg{y}, defined by
-% \[
-% \mbox{squared\_dist}(\mbox{\farg{x}},\mbox{\farg{y}}) 
-% = \textstyle \sum_{n=1}^N (\mbox{\farg{x}}[n] - \mbox{\farg{y}}[n])^2,
-% \]
-% where \code{N} is the size of \farg{x} and \farg{y}.
-% }
-%
 \fitem{real}{log\_sum\_exp}{real \farg{x}[]}{
 The natural logarithm of the sum of the exponentials of the elements in \farg{x}}
+\end{description}
+
+
+\subsection{Moments}
+
+Moments are only defined for arrays $x$ of size $N \geq 1$; it is an
+error to call them with arrays of size $N = 0$.  The sample mean is
+defined by
+\[
+\mbox{mean}(x) = \frac{1}{N} \sum_{n=1}^N x_n.
+\]
+%
+For $N \geq 2$, sample variance is defined for $N \geq 1$ by
+\[
+\mbox{variance}(x) 
+= 
+\frac{1}{N-1} \sum_{n=1}^N (x_n - \mbox{mean}(x))^2
+\]
+and sample standard deviation by 
+\[
+\mbox{sd}(x) = \sqrt{\, \mbox{variance}(x)},
+\]
+For convenience, when $N = 1$, $\mbox{variance(x)}$ and 
+$\mbox{sd}(x)$ are defined to be 0.
+
+% leaving gradients following for ref and in case we want
+% to add them for all functions at some point
+
+% For $N \geq 2$,
+% \[
+% \frac{\partial}{\partial x_n} \mbox{mean}(x)
+% = \frac{1}{N}.
+% \]
+% For $N \geq 2$,
+% \[
+% \frac{\partial}{\partial x_n} \mbox{variance}(x)
+% = \frac{2}{N-1} 
+%   \left( x_n - \mbox{mean}(x) \right).
+% \]
+% For $N \geq 2$,
+% \[
+% \frac{\partial}{\partial x_n} \mbox{sd}(x)
+% = \frac{1}{(N - 1) \, \mbox{sd}(x)} 
+%   \left( x_m - \mbox{mean}(x) \right)
+% \]
+% For $N \geq 2$, in the limit where $\mbox{sd}(x) = 0$, 
+% % 
+% \[
+% \frac{\partial}{\partial x_n} \mbox{sd}(x)
+% = \frac{1}{\sqrt{N}}.
+% \]
+
+
+
+\begin{description}
+\fitem{real}{mean}{real \farg{x}[]}{
+The sample mean of the elements in \farg{x}}
+%
+\fitem{real}{variance}{real \farg{x}[]}{
+The sample variance of the elements in \farg{x}}
+%
+\fitem{real}{sd}{real \farg{x}[]}{The sample standard deviation of
+elements in \farg{x}}
+\end{description}
+
+\subsection{Distance and Squared Distance}
+
+\begin{description}
+\fitem{real}{distance}{vector \farg{x}, vector \farg{y}}{The Euclidean
+  distance between \farg{x} and \farg{y}, defined by
+\[
+\mbox{distance}(\mbox{\farg{x}},\mbox{\farg{y}}) 
+= \sqrt{\textstyle \sum_{n=1}^N (\mbox{\farg{x}}[n] - \mbox{\farg{y}}[n])^2},
+\]
+where \code{N} is the size of \farg{x} and \farg{y}.}
+%
+\fitem{real}{distance}{vector \farg{x}, row\_vector \farg{y}}{The Euclidean
+  distance between \farg{x} and \farg{y}}
+%
+\fitem{real}{distance}{row\_vector \farg{x}, vector \farg{y}}{The Euclidean
+  distance between \farg{x} and \farg{y}}
+%
+\fitem{real}{distance}{row\_vector \farg{x}, row\_vector \farg{y}}{The Euclidean
+  distance between \farg{x} and \farg{y}}
+%
+\fitem{real}{squared\_distance}{vector \farg{x}, vector \farg{y}[]}{The Euclidean
+  distance between \farg{x} and \farg{y}, defined by
+\[
+\mbox{squared\_distance}(\mbox{\farg{x}},\mbox{\farg{y}}) 
+= \textstyle \sum_{n=1}^N (\mbox{\farg{x}}[n] - \mbox{\farg{y}}[n])^2,
+\]
+where \code{N} is the size of \farg{x} and \farg{y}.}
+%
+\fitem{real}{squared\_distance}{vector \farg{x}, row\_vector \farg{y}[]}{The Euclidean
+  distance between \farg{x} and \farg{y}}
+%
+\fitem{real}{squared\_distance}{row\_vector \farg{x}, vector \farg{y}[]}{The Euclidean
+  distance between \farg{x} and \farg{y}}
+%
+\fitem{real}{squared\_distance}{row\_vector \farg{x}, row\_vector \farg{y}[]}{The Euclidean
+  distance between \farg{x} and \farg{y}}
+%
 \end{description}
 
 \section{Array Size and Dimension Function}
@@ -1020,7 +1243,26 @@ equal to \code{a[m,n]} where it is defined, for \code{j} in \code{1:3},
 \code{k} in \code{1:4}, \code{m} in \code{1:5}, and \code{n} in
 \code{1:6}.
 
-\section{Other functions}
+\section{Sorting functions}\label{sorting-functions.section}
+
+Sorting can be used to sort values or the indices of those values in
+either ascending or descending order.  For example, if \code{v} is
+declared as a real array of size 3, with values
+\[
+\mbox{\code{v}} = (1, -10.3, 20.987),
+\]
+then the various sort routines produce
+%
+\begin{eqnarray*}
+\mbox{\code{sort\_asc(v)}} & = &  (-10.3,1,20.987)
+\\[4pt]
+\mbox{\code{sort\_desc(v)}} & = &  (20.987,1,-10.3)
+\\[4pt]
+\mbox{\code{sort\_indices\_asc(v)}} & = &  (2,1,3)
+\\[4pt]
+\mbox{\code{sort\_indices\_desc(v)}} & = &  (3,1,2)
+\end{eqnarray*}
+
 \begin{description}
 %
 \fitem{real[]}{sort\_asc}{real[] \farg{v}}{
@@ -1035,6 +1277,22 @@ Sort the elements of \farg{v} in descending order}
 \fitem{int[]}{sort\_desc}{int[] \farg{v}}{
 Sort the elements of \farg{v} in descending order}
 %
+\fitem{int[]}{sort\_indices\_asc}{real[] \farg{v}}{
+Return an array of indices between 1 and the size of \farg{v},
+sorted to index \farg{v} in ascending order.}
+%
+\fitem{int[]}{sort\_indices\_asc}{int[] \farg{v}}{
+Return an array of indices between 1 and the size of \farg{v},
+sorted to index \farg{v} in ascending order.}
+%
+\fitem{int[]}{sort\_indices\_desc}{real[] \farg{v}}{
+Return an array of indices between 1 and the size of \farg{v},
+sorted to index \farg{v} in descending order.}
+%
+\fitem{int[]}{sort\_indices\_desc}{int[] \farg{v}}{
+Return an array of indices between 1 and the size of \farg{v},
+sorted to index \farg{v} in descending order.}
+%
 \fitem{int}{rank}{real[] \farg{v}, int \farg{s}}{
 Number of components of \farg{v} less than \farg{v[s]}}
 %
@@ -1042,6 +1300,7 @@ Number of components of \farg{v} less than \farg{v[s]}}
 Number of components of \farg{v} less than \farg{v[s]}}
 %
 \end{description}
+
 
 \chapter{Matrix Operations}\label{matrix-operations.chapter}
 \noindent
@@ -1358,7 +1617,7 @@ The dot product of the rows of \farg{x} with themselves}
 %
 \end{description}
 
-\subsection{Specialized Products}
+\subsection{Specialized Products}\label{specialized-products.section}
 
 
 \begin{description}
@@ -1390,6 +1649,16 @@ The quadratic form, i.e., \code{B'~*~A~*~B}.}
 %
 \fitem{real}{quad\_form}{matrix \farg{A}, vector \farg{B}}{
 The quadratic form, i.e., \code{B'~*~A~*~B}.}
+%
+\fitem{matrix}{quad\_form\_diag}{matrix \farg{m}, vector \farg{v}}
+  {The quadratic form using the column vector
+  \farg{v} as a diagonal matrix, i.e.,
+  \code{diag\_matrix(\farg{v})~*~\farg{m}~*~diag\_matrix(\farg{v})}.}
+%
+\fitem{matrix}{quad\_form\_diag}{matrix \farg{m}, row\_vector \farg{rv}}
+  {The quadratic form using the row vector
+  \farg{rv} as a diagonal matrix, i.e.,
+  \code{diag\_matrix(\farg{rv})~*~\farg{m}~*~diag\_matrix(\farg{rv})}.}
 %
 \fitem{real}{trace\_quad\_form}{matrix \farg{A}, matrix \farg{B}}{ 
 The trace of the quadratic form, i.e., \code{trace(B'~*~A~*~B)}.}
@@ -1499,48 +1768,50 @@ The product of the values in \farg{x}, or 1 if \farg{x} is empty}
 
 \subsection{Sample Moments}
 
+Full definitions are provided for sample moments in
+\refsection{array-reductions}.
+
 \begin{description}
 %
 \fitem{real}{mean}{vector \farg{x}}{
-The sample mean of the values in \farg{x}, or raise
-exception if \farg{x} is empty}
+The sample mean of the values in \farg{x};  
+see \refsection{array-reductions} for details.}
 %
 \fitem{real}{mean}{row\_vector \farg{x}}{
-The sample mean of the values in \farg{x}, or raise
-exception if \farg{x} is empty}
+The sample mean of the values in \farg{x};
+see \refsection{array-reductions} for details.}
 %
 \fitem{real}{mean}{matrix \farg{x}}{
-The sample mean of the values in \farg{x}, or raise
-exception if \farg{x} is empty}
+The sample mean of the values in \farg{x};
+see \refsection{array-reductions} for details.}
 %
 \vspace*{4pt}
 %
 \fitem{real}{variance}{vector \farg{x}}{
-The sample variance of the values in \farg{x}
-(divide by size minus 1), or 0 if \farg{x} is empty}
+  The sample variance of the values in 
+  \farg{x}; see \refsection{array-reductions} for details.}
 %
-\fitem{real}{variance}{row\_vector \farg{x}}{ The sample variance of
-  the values in \farg{x} (divide by size minus 1), or 0 if \farg{x} is
-  empty}
+\fitem{real}{variance}{row\_vector \farg{x}}{ 
+  The sample variance of the values in 
+  \farg{x}; see \refsection{array-reductions} for details.}
 %
 \fitem{real}{variance}{matrix \farg{x}}{
 The sample variance of the values in 
-\farg{x} (divide by size minus 1), or 0 if \farg{x} is empty}
+\farg{x}; see \refsection{array-reductions} for details.}
 %
 \vspace*{4pt}
 %
 \fitem{real}{sd}{vector \farg{x}}{
-The sample standard deviation of the values in \farg{x}
-(divide by size minus 1), or 0 if \farg{x} is empty}
+The sample standard deviation of the values in \farg{x};  see 
+\refsection{array-reductions} for details.}
 %
 \fitem{real}{sd}{row\_vector \farg{x}}{ 
-The sample standard deviation of the values in \farg{x} (divide by
-size minus 1), or 0 if \farg{x} is empty}
+The sample standard deviation of the values in \farg{x}; see
+\refsection{array-reductions} for details.}
 %
 \fitem{real}{sd}{matrix \farg{x}}{
-The sample standard deviation of the values in 
-\farg{x} (divide by size minus 1), or 0 if \farg{x} is empty}
-%
+The sample standard deviation of the values in \farg{x};
+see \refsection{array-reductions} for details.}%
 \end{description}
 
 
@@ -1854,17 +2125,30 @@ The left division of \farg{b} by a triangular view of
 
 \subsection{Linear Algebra Functions}
 
+\subsubsection{Trace}
+
 \begin{description}
 %
 \fitem{real}{trace}{matrix \farg{A}}{
 The trace of \farg{A}, or 0 if \farg{A} is empty;  \farg{A} is not
 required to be diagonal}
 %
+\end{description}
+
+\subsubsection{Determinants}
+
+\begin{description}
 \fitem{real}{determinant}{matrix \farg{A}}{
 The determinant of \farg{A}}
 %
 \fitem{real}{log\_determinant}{matrix \farg{A}}{
 The log of the absolute value of the determinant of \farg{A}}
+%
+\end{description}
+
+\subsubsection{Inverses}
+
+\begin{description}
 %
 \fitem{matrix}{inverse}{matrix \farg{A}}{
 The inverse of \farg{A}}
@@ -1872,13 +2156,36 @@ The inverse of \farg{A}}
 \fitem{matrix}{inverse\_spd}{matrix \farg{A}}{
 The inverse of \farg{A} where A is symmetric, positive definite}
 %
+\end{description}
+
+\subsubsection{Eigendecomposition}
+
+\begin{description}
+%
 \fitem{vector}{eigenvalues\_sym}{matrix \farg{A}}{
 The vector of eigenvalues of a symmetric matrix \farg{A} 
-in descending order}
+in asscending order}
 %
-\fitem{matrix}{eigenvectors\_sym}{matrix \farg{A}}{
-The matrix with the eigenvectors of symmetric matrix
-\farg{A}}
+\fitem{matrix}{eigenvectors\_sym}{matrix \farg{A}}{ The matrix with
+  the (column) eigenvectors of symmetric matrix \farg{A} in the same
+  order as returned by the function \code{eigenvalues\_sym}}
+%
+\end{description}
+%
+Because multiplying an eigenvector by $-1$ results in an eigenvector,
+eigenvectors returned by a decomposition are only identified up to a
+sign change.  In order to compare the eigenvectors produced by Stan's
+eigendecomposition to others, signs may need to be normalized in some
+way, such as by fixing the sign of a component, or doing comparisons
+allowig a multiplication by $-1$.
+
+The condition number of a symmetric matrix is defined to be the ratio
+of the largest eigenvalue to the smallest eigenvalue.  Large condition
+numbers lead to difficulty in numerical algorithms such as computing
+inverses, and thus known as ``ill conditioned.''  The ratio can even
+be infinite in the case of singular matrices (i.e., those with
+eigenvalues of 0).
+
 %
 % \fitem{vector}{eigenvalues\_self\_adjoint}{matrix \farg{A}}{The vector
 %   of eigenvalues of the self-adjoint view of \farg{A} in descending
@@ -1891,18 +2198,65 @@ The matrix with the eigenvectors of symmetric matrix
 %   \farg{A}.  See \code{eigenvalues\_self\_adjoint} for information on
 %   the self-adjoint view of a matrix.}
 %
+
+\subsubsection{QR Decomposition}
+
+\begin{description}
+%
+\fitem{matrix}{qr\_Q}{matrix \farg{A}}{
+The orthogonal matrix in the QR decomposition of \farg{A}}
+%
+\fitem{matrix}{qr\_R}{matrix \farg{A}}{
+  The upper triangular matrix in the QR decomposition of \farg{A}}
+%
+\end{description}
+%
+Multiplying a column of an orthogonal matrix by $-1$ still results in 
+an orthogonal matrix, and you can multiply the corresponding row of 
+the upper triangular matrix by $-1$ without changing the product. Thus,
+Stan adopts the normalization that the diagonal elements of the upper
+triangular matrix are strictly positive and the columns of the 
+orthogonal matrix are rescaled if necessary. The input matrix $A$ need
+not be square but must have at least as many rows as it has columns.
+Also, this QR decomposition algorithm does not utilize pivoting and 
+thus is faster but may be numerically unstable.
+
+\subsubsection{Cholesky Decomposition}
+
+Every symmetric, positive-definite matrix (such as a correlation or
+covariance matrix) has a Cholesky decomposition.  If $\Sigma$ is a
+symmetric, positive-definite matrix, its Cholesky decomposition is the
+lower-triangular vector $L$ such that
+\[
+\Sigma = L \, L^{\top}.
+\]
+
+\begin{description}
+%
 \fitem{matrix}{cholesky\_decompose}{matrix \farg{A}}{
-The lower-triangular Cholesky factor of \farg{A}}
+The lower-triangular Cholesky factor of the symmetric
+positive-definite matrix \farg{A}}
+% 
+\end{description}
+
+\subsubsection{Singular Value Decomposition}
+
+Stan only provides functions for the singular values, not for the
+singular vectors involved in a singular value decomposition (SVD).
+
+\begin{description}
 %
 \fitem{vector}{singular\_values}{matrix \farg{A}}{
 The singular values of \farg{A} in descending order}
 %
-
-
 \end{description}
 
 
-\section{Other functions}
+\section{Sort Functions}
+
+See \refsection{sorting-functions} for examples of how the functions
+work. 
+
 \begin{description}
 %
 \fitem{vector}{sort\_asc}{vector \farg{v}}{
@@ -1916,6 +2270,22 @@ Sort the elements of \farg{v} in descending order}
 %
 \fitem{row\_vector}{sort\_desc}{row\_vector \farg{v}}{
 Sort the elements of \farg{v} in descending order}
+%
+\fitem{int[]}{sort\_indices\_asc}{vector \farg{v}}{
+Return an array of indices between 1 and the size of \farg{v},
+sorted to index \farg{v} in ascending order.}
+%
+\fitem{int[]}{sort\_indices\_asc}{row\_vector \farg{v}}{
+Return an array of indices between 1 and the size of \farg{v},
+sorted to index \farg{v} in ascending order.}
+%
+\fitem{int[]}{sort\_indices\_desc}{vector \farg{v}}{
+Return an array of indices between 1 and the size of \farg{v},
+sorted to index \farg{v} in descending order.}
+%
+\fitem{int[]}{sort\_indices\_desc}{row\_vector \farg{v}}{
+Return an array of indices between 1 and the size of \farg{v},
+sorted to index \farg{v} in descending order.}
 %
 \fitem{int}{rank}{vector \farg{v}, int \farg{s}}{
 Number of components of \farg{v} less than \farg{v[s]}}

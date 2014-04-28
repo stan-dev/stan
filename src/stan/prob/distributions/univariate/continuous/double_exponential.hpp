@@ -4,20 +4,17 @@
 #include <boost/random/uniform_01.hpp>
 #include <boost/random/variate_generator.hpp>
 
-#include <stan/agrad.hpp>
+#include <stan/agrad/partials_vari.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/functions/value_of.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
+#include <stan/math/functions/sign.hpp>
 
 namespace stan {
 
   namespace prob {
-    template<typename T>
-    inline int sign(const T& z) {
-      return (z == 0) ? 0 : z < 0 ? -1 : 1;
-    }
 
     // DoubleExponential(y|mu,sigma)  [sigma > 0]
     // FIXME: add documentation
@@ -37,6 +34,7 @@ namespace stan {
       using stan::prob::include_summand;
       using std::log;
       using std::fabs;
+      using stan::math::sign;
 
       // check if any vectors are zero length
       if (!(stan::length(y) 

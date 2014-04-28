@@ -36,7 +36,7 @@ namespace stan {
       
       base_nuts(M &m, BaseRNG& rng, std::ostream* o, std::ostream* e):
       base_hmc<M, P, H, I, BaseRNG>(m, rng, o, e),
-      _depth(0), _max_depth(5), _max_delta(1000)
+      _depth(0), _max_depth(5), _max_delta(1000), _n_leapfrog(0), _n_divergent(0)
       {};
       
       ~base_nuts() {};
@@ -53,15 +53,14 @@ namespace stan {
       int get_max_depth() { return this->_max_depth; }
       double get_max_delta() { return this->_max_delta; }
       
-      sample transition(sample& init_sample)
-      {
+      sample transition(sample& init_sample) {
         
         // Initialize the algorithm
         this->sample_stepsize();
         
         nuts_util util;
         
-        this->seed(init_sample.cont_params(), init_sample.disc_params());
+        this->seed(init_sample.cont_params());
         
         this->_hamiltonian.sample_p(this->_z, this->_rand_int);
         this->_hamiltonian.init(this->_z);
@@ -88,24 +87,23 @@ namespace stan {
         int n_valid = 0;
         
         this->_depth = 0;
+        this->_n_divergent = 0;
+        
+        util.n_tree = 0;
+        util.sum_prob = 0;
         
         while (util.criterion && (this->_depth <= this->_max_depth) ) {
-          
-          util.n_tree = 0;
-          util.sum_prob = 0;
           
           // Randomly sample a direction in time
           ps_point* z = 0;
           Eigen::VectorXd* rho = 0;
           
-          if (this->_rand_uniform() > 0.5)
-          {
+          if (this->_rand_uniform() > 0.5) {
             z = &z_plus;
             rho = &rho_plus;
             util.sign = 1;
           }
-          else
-          {
+          else {
             z = &z_minus;
             rho = &rho_minus;
             util.sign = -1;
@@ -115,6 +113,7 @@ namespace stan {
           this->_z.ps_point::operator=(*z);
           
           int n_valid_subtree = build_tree(_depth, *rho, 0, z_propose, util);
+          ++(this->_depth);
           
           *z = this->_z;
 
@@ -141,36 +140,39 @@ namespace stan {
           Eigen::VectorXd delta_rho = rho_minus + rho_init + rho_plus;
 
           util.criterion = compute_criterion(z_minus, this->_z, delta_rho);
-          
-          ++(this->_depth);
 
         }
         
-        --(this->_depth); // Correct for increment at end of loop
+        this->_n_leapfrog = util.n_tree;
         
         double accept_prob = util.sum_prob / static_cast<double>(util.n_tree);
         
         this->_z.ps_point::operator=(z_sample);
-        return sample(this->_z.q, this->_z.r, - this->_z.V, accept_prob);
+        return sample(this->_z.q, - this->_z.V, accept_prob);
         
       }
       
       void write_sampler_param_names(std::ostream& o) {
-        o << "stepsize__,treedepth__,";
+        o << "stepsize__,treedepth__,n_leapfrog__,n_divergent__,";
       }
       
       void write_sampler_params(std::ostream& o) {
-        o << this->_epsilon << "," << this->_depth << ",";
+        o << this->_epsilon    << "," << this->_depth << ","
+          << this->_n_leapfrog << "," << this->_n_divergent << ",";
       }
       
       void get_sampler_param_names(std::vector<std::string>& names) {
         names.push_back("stepsize__");
         names.push_back("treedepth__");
+        names.push_back("n_leapfrog__");
+        names.push_back("n_divergent__");
       }
       
       void get_sampler_params(std::vector<double>& values) {
         values.push_back(this->_epsilon);
         values.push_back(this->_depth);
+        values.push_back(this->_n_leapfrog);
+        values.push_back(this->_n_divergent);
       }
 
       virtual bool compute_criterion(ps_point& start, P& finish, Eigen::VectorXd& rho) = 0;
@@ -197,7 +199,8 @@ namespace stan {
           if (boost::math::isnan(h)) h = std::numeric_limits<double>::infinity();
           
           util.criterion = util.log_u + (h - util.H0) < this->_max_delta;
-          
+          if (!util.criterion) ++(this->_n_divergent);
+
           util.sum_prob += stan::math::min(1, std::exp(util.H0 - h));
           util.n_tree += 1;
           
@@ -244,6 +247,9 @@ namespace stan {
       int _depth;
       int _max_depth;
       double _max_delta;
+
+      int _n_leapfrog;
+      int _n_divergent;
       
     };
     

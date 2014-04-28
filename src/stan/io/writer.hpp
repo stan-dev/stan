@@ -130,9 +130,7 @@ namespace stan {
        * @throw std::runtime_error if y is lower than the lower bound provided.
        */
       void scalar_lb_unconstrain(double lb, T& y) {
-        if (y < lb)
-          BOOST_THROW_EXCEPTION(std::runtime_error ("y is lower than the lower bound"));
-        data_r_.push_back(log(y - lb));
+        data_r_.push_back(stan::prob::lb_free(y,lb));
       }
 
       /**
@@ -146,9 +144,7 @@ namespace stan {
        * @throw std::runtime_error if y is higher than the upper bound provided.
        */
       void scalar_ub_unconstrain(double ub, T& y) {
-        if (y > ub)
-          BOOST_THROW_EXCEPTION(std::runtime_error ("y is higher than the lower bound"));
-        data_r_.push_back(log(ub - y));
+        data_r_.push_back(stan::prob::ub_free(y,ub));
       }
 
       /**
@@ -164,9 +160,7 @@ namespace stan {
        * @throw std::runtime_error if y is not between the lower and upper bounds
        */
       void scalar_lub_unconstrain(double lb, double ub, T& y) {
-        if (y < lb || y > ub)
-          BOOST_THROW_EXCEPTION(std::runtime_error ("y is not between the lower and upper bounds"));
-        data_r_.push_back(stan::math::logit((y - lb) / (ub - lb)));
+        data_r_.push_back(stan::prob::lub_free(y,lb,ub));
       }
 
       /**
@@ -180,9 +174,7 @@ namespace stan {
        * @throw std::runtime_error if y is not between -1.0 and 1.0
        */
       void corr_unconstrain(T& y) {
-        if (y > 1.0 || y < -1.0)
-          BOOST_THROW_EXCEPTION(std::runtime_error ("y is not between -1.0 and 1.0"));
-        data_r_.push_back(atanh(y));
+        data_r_.push_back(stan::prob::corr_free(y));
       }
 
       /**
@@ -197,9 +189,7 @@ namespace stan {
        * @throw std::runtime_error if y is not between 0.0 and 1.0
         */
       void prob_unconstrain(T& y) {
-        if (y > 1.0 || y < 0.0)
-          BOOST_THROW_EXCEPTION(std::runtime_error ("y is not between 0.0 and 1.0"));
-        data_r_.push_back(stan::math::logit(y));
+        data_r_.push_back(stan::prob::prob_free(y));
       }
 
       /**
@@ -242,6 +232,7 @@ namespace stan {
        * @throw std::runtime_error if vector is not in ascending order.
        */
       void positive_ordered_unconstrain(vector_t& y) {
+        // reimplements pos_ordered_free in prob to avoid malloc
         if (y.size() == 0) return;
         stan::math::check_positive_ordered("stan::io::positive_ordered_unconstrain(%1%)", y, "Vector");
         data_r_.push_back(log(y[0]));

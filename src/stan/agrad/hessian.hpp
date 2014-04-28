@@ -3,8 +3,8 @@
 
 #include <vector>
 
-#include <stan/agrad/agrad.hpp>
-#include <stan/agrad/fvar.hpp>
+#include <stan/agrad/rev.hpp>
+#include <stan/agrad/fwd.hpp>
 
 #include <stan/math/matrix/Eigen.hpp>
 

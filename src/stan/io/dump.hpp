@@ -9,6 +9,7 @@
 #include <string>
 #include <vector>
 #include <boost/throw_exception.hpp>
+#include <boost/lexical_cast.hpp>
 #include <stan/math/matrix.hpp>
 #include <stan/io/var_context.hpp>
 
@@ -426,6 +427,7 @@ namespace stan {
      */
     class dump_reader {
     private:
+      std::string buf_;
       std::string name_;
       std::vector<int> stack_i_;
       std::vector<double> stack_r_;
@@ -435,6 +437,7 @@ namespace stan {
 
       bool scan_single_char(char c_expected) {
         int c = in_.peek();
+        if (in_.fail()) return false;
         if (c != c_expected)
           return false;
         char c_skip;
@@ -454,6 +457,7 @@ namespace stan {
       bool scan_char(char c_expected) {
         char c;
         in_ >> c;
+        if (in_.fail()) return false;
         if (c != c_expected) {
           in_.putback(c);
           return false;
@@ -464,6 +468,7 @@ namespace stan {
       bool scan_name_unquoted() {
         char c;
         in_ >> c; // 
+        if (in_.fail()) return false;
         if (!std::isalpha(c)) return false;
         name_.push_back(c); 
         while (in_.get(c)) { // get turns off auto space skip
@@ -490,6 +495,26 @@ namespace stan {
         return true;
       }
 
+
+      bool scan_chars(const char *s, bool case_sensitive = true) {
+        for (size_t i = 0; s[i]; ++i) {
+          char c;
+          if (!(in_ >> c)) {
+            for (size_t j = 1; j < i; ++j) 
+              in_.putback(s[i-j]);
+            return false;
+          }
+          // all ASCII, so toupper is OK
+          if ((case_sensitive && c != s[i])
+              || (!case_sensitive && ::toupper(c) != ::toupper(s[i]))) {
+            in_.putback(c);
+            for (size_t j = 1; j < i; ++j) 
+              in_.putback(s[i-j]);
+            return false;
+          }
+        }
+        return true;
+      }
 
       bool scan_chars(std::string s, bool case_sensitive = true) {
         for (size_t i = 0; i < s.size(); ++i) {
@@ -528,40 +553,44 @@ namespace stan {
 
         char c;
         bool is_double = false;
-        std::string buf;
+        buf_.clear();
         while (in_.get(c)) {
           if (std::isdigit(c)) { // before pre-scan || c == '-' || c == '+') {
-            buf.push_back(c);
+            buf_.push_back(c);
           } else if (c == '.'
                      || c == 'e'
                      || c == 'E'
                      || c == '-'
                      || c == '+') {
             is_double = true;
-            buf.push_back(c);
+            buf_.push_back(c);
           } else {
             in_.putback(c);
             break;
           }
         }
-        if (!is_double && stack_r_.size() == 0) {
-          int n;
-          if (!(std::stringstream(buf) >> n))
-            return false;
-          stack_i_.push_back(negate_val ? -n : n);
-          scan_optional_long();
-        } else {
-          for (size_t j = 0; j < stack_i_.size(); ++j)
-            stack_r_.push_back(static_cast<double>(stack_i_[j]));
-          // negate_val 
-          // ? -static_cast<double>(stack_i_[j])
-          // : static_cast<double>(stack_i_[j]));
-          stack_i_.clear();
-          double x;
-          if (!(std::stringstream(buf) >> x))
-            return false;
-          stack_r_.push_back(negate_val ? -x : x);
+        try {
+          if (!is_double && stack_r_.size() == 0) {
+            int n;
+            n = boost::lexical_cast<int>(buf_);
+            stack_i_.push_back(negate_val ? -n : n);
+            scan_optional_long();
+          } else {
+            for (size_t j = 0; j < stack_i_.size(); ++j)
+              stack_r_.push_back(static_cast<double>(stack_i_[j]));
+            // negate_val 
+            // ? -static_cast<double>(stack_i_[j])
+            // : static_cast<double>(stack_i_[j]));
+            stack_i_.clear();
+            double x;
+            x = boost::lexical_cast<double>(buf_);
+            stack_r_.push_back(negate_val ? -x : x);
+          }
         }
+        catch ( const boost::bad_lexical_cast &exc ) {
+          return false;
+        }
+
         return true;
       }
 
