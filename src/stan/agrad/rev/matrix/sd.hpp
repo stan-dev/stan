@@ -38,7 +38,7 @@ namespace stan {
         double sd = sqrt(variance);
         double* partials = (double*) memalloc_.alloc(size * sizeof(double));
         if (sum_of_squares < 1e-20) {
-          double grad_limit = 1 / std::sqrt(size);
+          double grad_limit = 1 / std::sqrt((double)size);
           for (size_t i = 0; i < size; ++i)
             partials[i] = grad_limit;
         } else {

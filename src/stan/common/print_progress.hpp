@@ -19,7 +19,7 @@ namespace stan {
                         const std::string prefix,
                         const std::string suffix,
                         std::ostream& o) {
-      int it_print_width = std::ceil(std::log10(finish));
+      int it_print_width = std::ceil(std::log10((double) finish));
       if (do_print(m, (start + m + 1 == finish), refresh)) {
         o << prefix;
         o << "Iteration: ";
