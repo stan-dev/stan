@@ -302,7 +302,6 @@ namespace stan {
         dim_last_ = dim_idx_;
       }
 
-
       // convert row-major offset to column-major offset
       size_t convert_offset_rtl_2_ltr(size_t rtl_offset, const std::vector<size_t>& dims) {
         size_t rtl_dsize = 1;
@@ -310,7 +309,7 @@ namespace stan {
           rtl_dsize *= dims[i];
 
         // array index should be valid, but check just in case
-        if (rtl_offset > rtl_dsize*dims[0]) {
+        if (rtl_offset >= rtl_dsize*dims[0]) {
           std::stringstream errorMsg;
           errorMsg << "variable: " << key_ << ", unexpected error";
           throw json_error(errorMsg.str());
@@ -326,7 +325,6 @@ namespace stan {
           size_t idx = rem / rtl_dsize;
           ltr_offset +=  idx * ltr_dsize;
           rem = rem - idx * rtl_dsize;
-          if (rem < 0) rem = 0;
           rtl_dsize = rtl_dsize / dims[i+1];
           ltr_dsize *= dims[i];
         }

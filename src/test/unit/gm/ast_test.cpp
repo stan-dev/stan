@@ -123,3 +123,125 @@ TEST(gm_ast,function_signatures_add) {
   
 }
 
+TEST(gmAst,voidType) {
+  EXPECT_EQ(stan::gm::VOID_T, 0);
+  std::stringstream ss;
+  stan::gm::write_base_expr_type(ss, stan::gm::VOID_T);
+  EXPECT_EQ("void",ss.str());
+
+  expr_type et(stan::gm::VOID_T,0);
+  EXPECT_TRUE(et.is_void());
+}
+
+TEST(gmAst,baseVarDecl) {
+  std::vector<stan::gm::expression> dims;
+  dims.push_back(stan::gm::expression(stan::gm::int_literal(0)));
+  stan::gm::base_var_decl bvd("foo", dims, INT_T);
+  EXPECT_EQ("foo",bvd.name_);
+  EXPECT_EQ(1, bvd.dims_.size());
+  EXPECT_EQ(stan::gm::expression(stan::gm::int_literal(0)).expression_type(),
+            bvd.dims_[0].expression_type());
+  EXPECT_EQ(INT_T, bvd.base_type_);
+}
+
+TEST(gmAst,argDecl) {
+  stan::gm::arg_decl ad;
+  ad.arg_type_ = expr_type(INT_T,0);
+  ad.name_ = "foo";
+  stan::gm::base_var_decl bvd = ad.base_variable_declaration();
+  EXPECT_EQ("foo", bvd.name_);
+  EXPECT_EQ(0, bvd.dims_.size());
+  EXPECT_EQ(INT_T, bvd.base_type_);
+}
+
+TEST(gmAst,functionDeclDef) {
+  stan::gm::function_decl_def fdd(expr_type(stan::gm::INT_T,0),
+                                  "foo",
+                                  std::vector<stan::gm::arg_decl>(),
+                                  stan::gm::statement(stan::gm::no_op_statement()));
+  EXPECT_EQ("foo",fdd.name_);
+  EXPECT_TRUE(fdd.body_.is_no_op_statement());
+  EXPECT_EQ(0,fdd.arg_decls_.size());
+  EXPECT_TRUE(fdd.return_type_.is_primitive_int());
+}
+TEST(gmAst,functionDeclDefs) {
+  stan::gm::function_decl_def fdd1(expr_type(stan::gm::INT_T,0),
+                                  "foo",
+                                  std::vector<stan::gm::arg_decl>(),
+                                  stan::gm::statement(stan::gm::no_op_statement()));
+  stan::gm::arg_decl ad;
+  ad.arg_type_ = expr_type(INT_T,0);
+  ad.name_ = "foo";
+  std::vector<stan::gm::arg_decl> arg_decls;
+  arg_decls.push_back(ad);
+  stan::gm::function_decl_def fdd2(expr_type(stan::gm::DOUBLE_T,3),
+                                  "bar",
+                                   arg_decls,
+                                   stan::gm::statement(stan::gm::no_op_statement()));
+  std::vector<stan::gm::function_decl_def> vec_fdds;
+  vec_fdds.push_back(fdd1);
+  vec_fdds.push_back(fdd2);
+  stan::gm::function_decl_defs fdds(vec_fdds);
+  EXPECT_EQ(2,fdds.decl_defs_.size());
+}
+
+TEST(gmAst, hasRngSuffix) {
+  EXPECT_TRUE(stan::gm::has_rng_suffix("foo_rng"));
+  EXPECT_FALSE(stan::gm::has_rng_suffix("foo.rng"));
+  EXPECT_FALSE(stan::gm::has_rng_suffix("foo.bar"));
+}
+TEST(gmAst, hasLpSuffix) {
+  EXPECT_TRUE(stan::gm::has_lp_suffix("foo_lp"));
+  EXPECT_FALSE(stan::gm::has_lp_suffix("foo.lp"));
+  EXPECT_FALSE(stan::gm::has_lp_suffix("foo.bar"));
+}
+
+TEST(gmAst, isUserDefined) {
+  using stan::gm::function_signature_t;
+  using stan::gm::expr_type;
+  using stan::gm::expression;
+  using stan::gm::is_user_defined;
+  using stan::gm::int_literal;
+  using stan::gm::double_literal;
+  using std::vector;
+  using std::string;
+  using std::pair;
+  vector<expression> args;
+  string name = "foo";
+  EXPECT_FALSE(is_user_defined(name,args));
+  args.push_back(expression(int_literal(0)));
+  EXPECT_FALSE(is_user_defined(name,args));
+
+  vector<expr_type> arg_types;
+  arg_types.push_back(expr_type(INT_T,0));
+  expr_type result_type(DOUBLE_T,0);
+  // must add first, before making user defined
+  function_signatures::instance().add(name, result_type, arg_types);
+  function_signature_t sig(result_type, arg_types);
+  pair<string,function_signature_t> name_sig(name,sig);
+
+  function_signatures::instance().set_user_defined(name_sig);
+  
+  EXPECT_TRUE(is_user_defined(name,args));
+
+  
+  EXPECT_TRUE(function_signatures::instance().is_user_defined(name_sig));
+                           
+  EXPECT_FALSE(is_user_defined_prob_function("foo",
+                                             expression(double_literal(1.3)),
+                                             args));
+
+  string name_pf = "bar_log";
+  pair<string,function_signature_t> name_sig_pf(name_pf,sig);
+  function_signatures::instance().add(name_pf, result_type, arg_types);
+  function_signatures::instance().set_user_defined(name_sig_pf);
+
+  vector<expression> args_pf;
+  EXPECT_TRUE(is_user_defined_prob_function("bar_log",
+                                            expression(int_literal(2)), // first arg
+                                            args_pf));                  // remaining args
+  
+
+
+}
+
