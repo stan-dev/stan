@@ -1781,6 +1781,69 @@ if (x != 0) ...
 % \end{Verbatim}
 % \end{quote}
 
+\section{Functions}
+
+Functions are laid out the same way as in languages such as Java and
+\Cpp.  For example,
+%
+\begin{quote}
+\begin{Verbatim}
+real foo(real x, real y) {
+  return sqrt(x * log(y));
+}
+\end{Verbatim}
+\end{quote}
+%
+The return type is flush left, the parentheses for the arguments are
+adjacent to the arguments and function name, and there is a space
+after the comma for arguments after the first.  The open curly brace
+for the body is on the same line as the function name, following the
+layout of loops and conditionals.  The body itself is indented; here
+we use two spaces.  The close curly brace appears on its own line.
+%
+If function names or argument lists are long, they can be
+written as
+%
+\begin{quote}
+\begin{Verbatim}
+matrix
+function_to_do_some_hairy_algebra(matrix thingamabob,
+                                  vector doohickey2) {
+  ...body...
+}
+\end{Verbatim}
+\end{quote}
+%
+The function starts a new line, under the type.  The arguments are
+aligned under each other.
+
+Function documentation should follow the Javadoc and Doxygen styles.
+Here's an example repeated from \refsection{documenting-functions}.
+%
+\begin{quote}
+\begin{Verbatim}
+/**
+ * Return a data matrix of specified size with rows 
+ * correspdonding to items and the first column filled 
+ * with the value 1 to represent the intercept and the 
+ * remaining columns randomly filled with unit-normal draws.
+ *
+ * @param N Number of rows correspdong to data items
+ * @param K Number of predictors, counting the intercept, per
+ *          item.
+ * @return Simulated predictor matrix.
+ */
+matrix predictors_rng(int N, int K) {  
+  ...
+\end{Verbatim}
+\end{quote}
+%
+The open comment is \code{/**}, asterisks are aligned below the first
+asterisk of the open comment, and the end comment \code{*/} is also
+aligned on the asterisk.  The tags \code{@param} and \code{@return}
+are used to label function arguments (i.e., parameters) and return
+values.  
+
 \section{White Space}
 
 Stan allows spaces between elements of a program.  The white space
