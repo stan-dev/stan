@@ -1466,41 +1466,148 @@ namespace stan {
 
     template <typename T>
     Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
-    cholesky_corr_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x,
+    cholesky_corr_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& y,
                             int K) {
-      stan::math::validate_square(x,"cholesky_corr_constrain/3");
+      using std::sqrt;
+      using Eigen::Matrix;
+      using Eigen::Dynamic;
+      using stan::math::square;
       int k_choose_2 = (K * (K - 1)) / 2;
-      if (k_choose_2 != x.size())
-        throw std::domain_error("x is not a valid unconstrained cholesky correlation matrix.");
-      Eigen::Array<T,Eigen::Dynamic,1> cpcs(k_choose_2);
+      if (k_choose_2 != y.size()) {
+        std::cout << "k_choose_2 = " << k_choose_2 << " y.size()=" << y.size() << std::endl;
+        throw std::domain_error("y is not a valid unconstrained cholesky correlation matrix."
+                                "Require (K choose 2) elements in y.");
+      }
+      Matrix<T,Dynamic,1> z(k_choose_2);
       for (int i = 0; i < k_choose_2; ++i)
-        cpcs(i) = corr_constrain(x(i));
-      return read_corr_L(cpcs, K);
+        z(i) = corr_constrain(y(i));
+      Matrix<T,Dynamic,Dynamic> x(K,K);
+      if (K == 0) return x;
+      T zero(0);
+      for (int j = 1; j < K; ++j)
+        for (int i = 0; i < j; ++i)
+          x(i,j) = zero;
+      x(0,0) = 1;
+      int k = 0;
+      for (int i = 1; i < K; ++i) {
+        x(i,0) = z(k++);
+        T sum_sqs(square(x(i,0)));
+        for (int j = 1; j < i; ++j) {
+          x(i,j) = z(k++) * sqrt(1.0 - sum_sqs);
+          sum_sqs += square(x(i,j));
+        }
+        x(i,i) = sqrt(1.0 - sum_sqs);
+      }
+      return x;
     }
 
+    // FIXME to match above after debugged
     template <typename T>
     Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
-    cholesky_corr_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x,
+    cholesky_corr_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& y,
                             int K,
                             T& lp) {
-      stan::math::validate_square(x,"cholesky_corr_constrain/3");
+      using std::sqrt;
+      using Eigen::Matrix;
+      using Eigen::Dynamic;
+      using stan::math::log1m;
+      using stan::math::square;
       int k_choose_2 = (K * (K - 1)) / 2;
-      if (k_choose_2 != x.size())
-        throw std::domain_error("x is not a valid unconstrained cholesky correlation matrix.");
-      Eigen::Array<T,Eigen::Dynamic,1> cpcs(k_choose_2);
+      if (k_choose_2 != y.size()) {
+        std::cout << "k_choose_2 = " << k_choose_2 << " y.size()=" << y.size() << std::endl;
+        throw std::domain_error("y is not a valid unconstrained cholesky correlation matrix."
+                                " Require (K choose 2) elements in y.");
+      }
+      Matrix<T,Dynamic,1> z(k_choose_2);
       for (int i = 0; i < k_choose_2; ++i)
-        cpcs(i) = corr_constrain(x(i));
-      return read_corr_L(cpcs, K, lp);
+        z(i) = corr_constrain(y(i),lp);
+      Matrix<T,Dynamic,Dynamic> x(K,K);
+      if (K == 0) return x;
+      T zero(0);
+      for (int j = 1; j < K; ++j)
+        for (int i = 0; i < j; ++i)
+          x(i,j) = zero;
+      x(0,0) = 1;
+      int k = 0;
+      for (int i = 1; i < K; ++i) {
+        x(i,0) = z(k++);
+        T sum_sqs = square(x(i,0));
+        for (int j = 1; j < i; ++j) {
+          lp += 0.5 * log1m(sum_sqs);
+          x(i,j) = z(k++) * sqrt(1.0 - sum_sqs);
+          sum_sqs += square(x(i,j));
+        }
+        x(i,i) = sqrt(1.0 - sum_sqs);
+      }
+      return x;
     }
+
+    
 
     template <typename T>
     Eigen::Matrix<T,Eigen::Dynamic,1>
-    cholesky_corr_free(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& L) {
-      stan::math::validate_square(L,"cholesky_corr_free");
-      Eigen::Array<T,Eigen::Dynamic,1> cpcs((L.rows() * (L.rows() - 1)) / 2);
-      factor_L(cpcs,L);
-      return cpcs;
+    cholesky_corr_free(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& x) {
+      using std::sqrt;
+      using Eigen::Matrix;
+      using Eigen::Dynamic;
+      using stan::math::square;
+
+      stan::math::validate_square(x,"cholesky_corr_free");
+      // should validate lower-triangular, unit lengths
+
+      int K = (x.rows() * (x.rows() - 1)) / 2;
+      Matrix<T,Dynamic,1> z(K);
+      int k = 0;
+      for (int i = 1; i < x.rows(); ++i) {
+        z(k++) = corr_free(x(i,0));
+        double sum_sqs = square(x(i,0));
+        for (int j = 1; j < i; ++j) {
+          z(k++) = corr_free(x(i,j) / sqrt(1.0 - sum_sqs));
+          sum_sqs += square(x(i,j));
+        }
+      }
+      return z;
     }
+
+    // template <typename T>
+    // Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
+    // cholesky_corr_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x,
+    //                         int K) {
+    //   int k_choose_2 = (K * (K - 1)) / 2;
+    //   if (k_choose_2 != x.size())
+    //     throw std::domain_error("x is not a valid unconstrained cholesky correlation matrix."
+    //                             "Require (K choose 2) elements in x.");
+    //   Eigen::Array<T,Eigen::Dynamic,1> cpcs(k_choose_2);
+    //   for (int i = 0; i < k_choose_2; ++i)
+    //     cpcs(i) = corr_constrain(x(i));
+    //   return read_corr_L(cpcs, K);
+    // }
+
+    // template <typename T>
+    // Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
+    // cholesky_corr_constrain(const Eigen::Matrix<T,Eigen::Dynamic,1>& x,
+    //                         int K,
+    //                         T& lp) {
+    //   stan::math::validate_square(x,"cholesky_corr_constrain/3");
+    //   int k_choose_2 = (K * (K - 1)) / 2;
+    //   if (k_choose_2 != x.size())
+    //     throw std::domain_error("x is not a valid unconstrained cholesky correlation matrix.");
+    //   Eigen::Array<T,Eigen::Dynamic,1> cpcs(k_choose_2);
+    //   for (int i = 0; i < k_choose_2; ++i)
+    //     cpcs(i) = corr_constrain(x(i),lp);
+    //   return read_corr_L(cpcs, K, lp);
+    // }
+
+    // template <typename T>
+    // Eigen::Matrix<T,Eigen::Dynamic,1>
+    // cholesky_corr_free(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& L) {
+    //   stan::math::validate_square(L,"cholesky_corr_free");
+    //   Eigen::Array<T,Eigen::Dynamic,1> cpcs((L.rows() * (L.rows() - 1)) / 2);
+    //   factor_L(cpcs,L);
+    //   for (int i = 0; i < cpcs.size(); ++i)
+    //     cpcs(i) = corr_free(cpcs(i));
+    //   return cpcs;
+    // }
 
     
 

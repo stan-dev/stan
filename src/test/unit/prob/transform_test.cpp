@@ -912,3 +912,167 @@ TEST(ProbTransform,factorL) {
   factor_L(CPCs,L);
   EXPECT_FLOAT_EQ(CPCs(0),atanh(L(1,0)));
 }
+
+TEST(ProbTransform,CholeskyCorrelation4) {
+  using Eigen::Matrix;
+  using Eigen::Dynamic;
+  Matrix<double,Dynamic,Dynamic> L(4,4);
+  L << 
+    1, 0, 0, 0,
+    -0.2, 0.9797959, 0, 0,
+    0.5, -0.3, 0.8124038, 0,
+    0.7, -0.2, 0.6, 0.3316625;
+
+  Matrix<double,Dynamic,1> y
+    = stan::prob::cholesky_corr_free(L);
+
+  Matrix<double,Dynamic,Dynamic> x
+    = stan::prob::cholesky_corr_constrain(y,4);
+  
+  Matrix<double,Dynamic,1> yrt
+    = stan::prob::cholesky_corr_free(x);
+
+  EXPECT_EQ(y.size(), yrt.size());
+  for (int i = 0; i < yrt.size(); ++i)
+    EXPECT_FLOAT_EQ(y(i), yrt(i));
+
+  for (int m = 0; m < 4; ++m)
+    for (int n = 0; n < 4; ++n)
+      EXPECT_FLOAT_EQ(L(m,n), x(m,n));
+}
+
+void 
+test_cholesky_correlation_values(const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& L) {
+  using std::vector;
+  using stan::prob::cholesky_corr_constrain;
+  using stan::prob::cholesky_corr_free;
+  int K = L.rows();
+  int K_choose_2 = (K * (K - 1)) / 2;
+
+  // test number of free parameters
+  Matrix<double,Dynamic,1> y
+    = stan::prob::cholesky_corr_free(L);
+  EXPECT_EQ(K_choose_2, y.size());
+
+  // test transform roundtrip without Jacobian
+  Matrix<double,Dynamic,Dynamic> x
+    = stan::prob::cholesky_corr_constrain(y,K);
+  
+  Matrix<double,Dynamic,1> yrt
+    = stan::prob::cholesky_corr_free(x);
+
+  EXPECT_EQ(y.size(), yrt.size());
+  for (int i = 0; i < yrt.size(); ++i)
+    EXPECT_FLOAT_EQ(y(i), yrt(i));
+
+  for (int m = 0; m < K; ++m)
+    for (int n = 0; n < K; ++n)
+      EXPECT_FLOAT_EQ(L(m,n), x(m,n));
+
+
+  // test transform roundtrip with Jacobian (Jacobian itself tested above)
+  double lp;
+  Matrix<double,Dynamic,Dynamic> x2
+    = stan::prob::cholesky_corr_constrain(y,K,lp);
+  
+  Matrix<double,Dynamic,1> yrt2
+    = stan::prob::cholesky_corr_free(x2);
+
+  EXPECT_EQ(y.size(), yrt2.size());
+  for (int i = 0; i < yrt2.size(); ++i)
+    EXPECT_FLOAT_EQ(y(i), yrt2(i));
+
+  for (int m = 0; m < K; ++m)
+    for (int n = 0; n < K; ++n)
+      EXPECT_FLOAT_EQ(L(m,n), x2(m,n));
+}
+
+TEST(ProbTransform,CholeskyCorrelationRoundTrips) {
+  using Eigen::Matrix;
+  using Eigen::Dynamic;
+
+  Matrix<double,Dynamic,Dynamic> L1(1,1);
+  L1 << 1;
+  test_cholesky_correlation_values(L1);
+
+  Matrix<double,Dynamic,Dynamic> L2(2,2);
+  L2 << 
+    1, 0,
+    -0.5, 0.8660254;
+  test_cholesky_correlation_values(L2);
+    
+  Matrix<double,Dynamic,Dynamic> L4(4,4);
+  L4 << 
+    1, 0, 0, 0,
+    -0.2, 0.9797959, 0, 0,
+    0.5, -0.3, 0.8124038, 0,
+    0.7, -0.2, 0.6, 0.3316625;
+  test_cholesky_correlation_values(L4);
+}
+
+
+void test_cholesky_correlation_jacobian(const Eigen::Matrix<stan::agrad::var,Eigen::Dynamic,1>& y,
+                                        int K) {
+  using std::vector;
+  using Eigen::Matrix;
+  using Eigen::Dynamic;
+  using stan::agrad::var;
+  using stan::prob::cholesky_corr_constrain;
+
+  int K_choose_2 = (K * (K - 1)) / 2;
+
+  vector<var> indeps;
+  for (int i = 0; i < y.size(); ++i)
+    indeps.push_back(y(i));
+
+  var lp = 0;
+  Matrix<var,Dynamic,Dynamic> x
+    = cholesky_corr_constrain(y,K,lp);
+
+  vector<var> deps;
+  for (int i = 1; i < K; ++i)
+    for (int j = 0; j < i; ++j)
+      deps.push_back(x(i,j));
+  
+  vector<vector<double> > jacobian;
+  stan::agrad::jacobian(deps,indeps,jacobian);
+
+  Matrix<double,Dynamic,Dynamic> J(K_choose_2,K_choose_2);
+  for (int m = 0; m < K_choose_2; ++m)
+    for (int n = 0; n < K_choose_2; ++n)
+      J(m,n) = jacobian[m][n];
+
+  
+  double det_J = J.determinant();
+  double log_det_J = log(fabs(det_J));
+
+  EXPECT_FLOAT_EQ(log_det_J, lp.val()) << "J = " << J << std::endl << "det_J = " << det_J;
+  
+}
+
+TEST(probTransform,choleskyCorrJacobian) {
+  using Eigen::Matrix;
+  using Eigen::Dynamic;
+  using stan::agrad::var;
+
+  // K = 1; (K choose 2) = 0
+  Matrix<var,Dynamic,1> y1;
+  EXPECT_EQ(0,y1.size());
+  test_cholesky_correlation_jacobian(y1,1);
+
+  // K = 2; (K choose 2) = 1
+  Matrix<var,Dynamic,1> y2(1);
+  y2 << -1.7;
+  test_cholesky_correlation_jacobian(y2,2);
+
+  // K = 3; (K choose 2) = 3
+  Matrix<var,Dynamic,1> y3(3);
+  y3 << -1.7, 2.9, 0.01;
+  test_cholesky_correlation_jacobian(y3,3);
+
+  // K = 4;  (K choose 2) = 6
+  Matrix<var,Dynamic,1> y4(6);
+  y4 << 1.0, 2.0, -3.0, 1.5, 0.2, 2.0;
+  test_cholesky_correlation_jacobian(y4,4);
+}
+

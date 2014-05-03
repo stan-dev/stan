@@ -831,8 +831,6 @@ namespace stan {
         > lit(']') 
         > identifier_r 
         > opt_dims_r(_r1)
-        > lit(';')
-        > eps
         ;
 
       cov_matrix_decl_r.name("covariance matrix declaration");

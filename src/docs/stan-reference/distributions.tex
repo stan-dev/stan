@@ -2037,38 +2037,68 @@ See \citep{LewandowskiKurowickaJoe:2009} for definitions.
 \end{description}
 
 
-% \section{Cholesky LKJ Correlation Distribution}
+\section{Cholesky LKJ Correlation Distribution}
 
-% \subsubsection{Probability Density Function}
+Stan provides a parameterization of the LKJ correlation matrix
+densities directly in terms of their Cholesky factors.  For example, 
+if \code{L} is a matrix parameter, then
+%
+\begin{quote}
+\begin{Verbatim}
+L ~ lkj_corr_cholesky(2.0);
+\end{Verbatim}
+\end{quote}
+%
+Because Stan requires models to have support on all valid constrained
+parameters, \code{L} will almost always
+%
+\footnote{It is possible to build up a valid \code{L} within Stan, but that
+would then require Jacobian adjustments.}
+%
+be a parameter declared with the type of a
+Cholesky factor for a correlation matrix; for example,
+%
+\begin{quote}
+\begin{Verbatim}
+parameters {
+  cholesky_factor_corr[K] L;
+  ...
+\end{Verbatim}
+\end{quote}
+%
 
-% For $\eta > 0$, if $L$ is the Cholesky factor of a positive-definite
-% matrix with unit diagonal (i.e., a correlation matrix), then
-% \[
-% \distro{LkjCholesky}(L|\eta) 
-% \propto \det(L L^\top)^{(\eta - 1)} 
-% = \det(L)^{(2 \eta - 2)}.
-% \]
-% See the previous section for details on interpreting the shape
-% parameter $\eta$.
 
-% \pitem{L}{lkj\_corr\_cholesky}{eta}
+\subsubsection{Probability Density Function}
 
-% \subsubsection{Stan Functions}
+For $\eta > 0$, if $L$ is the Cholesky factor of a symmetric
+positive-definite matrix with unit diagonal (i.e., a correlation
+matrix), then
+\[
+\distro{LkjCholesky}(L|\eta) 
+\propto \det(L L^\top)^{(\eta - 1)} 
+= \det(L)^{(2 \eta - 2)}.
+\]
+See the previous section for details on interpreting the shape
+parameter $\eta$.
 
-% \begin{description}
-% %
-%   \fitem{real}{lkj\_corr\_cholesky\_log}{matrix \farg{L}, real
-%     \farg{eta}}{The log of the LKJ density for the lower-triangular
-%     Cholesky factor \farg{L} of a correlation matrix given shape
-%     \farg{eta}.}
-% %
-% \end{description}
-% \begin{description}
-% \fitem{matrix}{lkj\_corr\_cholesky\_rng}{int \farg{K}, real \farg{eta}}{
-%   Generate a random Cholesky factor of a LKJ random correlation matrix
-%   of order \farg{K} with shape \farg{eta}; may only be used in 
-%   generated quantities block}
-% \end{description}
+\pitem{L}{lkj\_corr\_cholesky}{eta}
+
+\subsubsection{Stan Functions}
+
+\begin{description}
+%
+  \fitem{real}{lkj\_corr\_cholesky\_log}{matrix \farg{L}, real
+    \farg{eta}}{The log of the LKJ density for the lower-triangular
+    Cholesky factor \farg{L} of a correlation matrix given shape
+    \farg{eta}.}
+%
+\end{description}
+\begin{description}
+\fitem{matrix}{lkj\_corr\_cholesky\_rng}{int \farg{K}, real \farg{eta}}{
+  Generate a random Cholesky factor of a LKJ random correlation matrix
+  of order \farg{K} with shape \farg{eta}; may only be used in 
+  generated quantities block}
+\end{description}
 
 
 

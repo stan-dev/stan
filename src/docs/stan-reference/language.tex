@@ -813,6 +813,30 @@ declares \code{Sigma} to be a $3 \times 3$ correlation matrix.
 Correlation matrices may be assigned to other matrices, including
 unconstrained matrices, if their dimensions match, and vice-versa.
 
+\subsection{Cholesky Factors of Correlation Matrices}
+
+Matrix variables may be constrained to represent the Cholesky factors
+of a correlation matrix.  
+
+A Cholesky factor for a correlation matrix $L$ is a $K \times K$
+lower-triangular matrix with positive diagonal entries and rows that
+are of length 1 (i.e., $\sum_{n=1}^K L_{m,n}^2 = 1$).  If $L$ is a
+Cholesky factor for a correlation matrix, then $L\,L^{\top}$ is a
+correlation matrix (i.e., symmetric postive definite with a unit
+diagonal).
+
+A declaration such as 
+follows.
+%
+\begin{quote}
+\begin{Verbatim}
+cholesky_factor_corr[K] L;
+\end{Verbatim}
+\end{quote}
+%
+declares \code{L} to be a Cholesky factor for a \code{K} by \code{K}
+correlation matrix.  
+
 \subsection{Covariance Matrices}
 
 Matrix variables may be constrained to represent covariance matrices.
