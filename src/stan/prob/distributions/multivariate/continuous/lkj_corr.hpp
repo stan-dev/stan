@@ -99,9 +99,10 @@ namespace stan {
       using stan::math::check_not_nan;
       using stan::math::check_positive;
       using stan::math::check_corr_matrix;
+      using stan::math::sum;
       using boost::math::tools::promote_args;
       
-      typename promote_args<T_y,T_shape>::type lp;
+      typename promote_args<T_y,T_shape>::type lp(0.0);
       if (!check_positive(function, eta, "Shape parameter", &lp))
         return lp;      
       if (!check_size_match(function, 
@@ -119,13 +120,20 @@ namespace stan {
       if (K == 0)
         return 0.0;
 
-      Eigen::LLT< Eigen::Matrix<T_y, Eigen::Dynamic, Eigen::Dynamic> > Cholesky = y.llt();
-      // FIXME: check_numerical_issue function?
-      if (Cholesky.info() == Eigen::NumericalIssue)
+      if (include_summand<propto,T_shape>::value)
+        lp += do_lkj_constant(eta, K);
+
+      if ( (eta == 1.0) &&
+          stan::is_constant<typename stan::scalar_type<T_shape> >::value )
         return lp;
 
-      Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic> L = Cholesky.matrixL();
-      return lkj_corr_cholesky_log<propto>(L, eta);
+      if (!include_summand<propto,T_y,T_shape>::value)
+          return lp;
+
+      Eigen::Matrix<T_y,Eigen::Dynamic,1> values =
+        y.ldlt().vectorD().array().log().matrix();
+      lp += (eta - 1.0) * sum(values);
+      return lp;
     }
 
     template <typename T_y, typename T_shape>
