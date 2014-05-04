@@ -14,31 +14,29 @@ namespace stan {
     template <typename T_shape>
     T_shape do_lkj_constant(const T_shape& eta, const unsigned int& K) {
 
-      // Lewandowski, Kurowicka, and Joe (2009) equations 15 and 16
-      
-      if (stan::is_constant<typename stan::scalar_type<T_shape> >::value
-          && eta == 1.0) {
-        double sum = 0.0;
-        double constant = 0.0;
-        double beta_arg = 0.0;
-        for (unsigned int k = 1; k < K; k++) { // yes, go from 1 to K - 1
-          beta_arg = 0.5 * (k + 1.0);
-          constant += k * (2.0 * lgamma(beta_arg) - lgamma(2.0 * beta_arg));
-          sum += pow(static_cast<double>(k),2.0);
-        }
-        constant += sum * LOG_TWO;
-        return constant;
+      using stan::math::sum;
+      using stan::math::lgamma;
+
+      // Lewandowski, Kurowicka, and Joe (2009) theorem 5
+      T_shape constant;
+      const int Km1 = K - 1;
+      if (eta == 1.0) {
+        // C++ integer division is appropriate in this block
+        Eigen::VectorXd numerator( Km1 / 2 );
+        for(size_t k = 1; k <= numerator.rows(); k++)
+          numerator(k-1) = lgamma(2 * k);
+        constant = sum(numerator);
+        if ( (K % 2) == 1 ) constant += 0.25 * (K * K - 1) * LOG_PI -
+          0.25 * (Km1 * Km1) * LOG_TWO - Km1 * lgamma( (K + 1) / 2);
+        else constant += 0.25 * K * (K - 2) * LOG_PI +
+          0.25 * (3 * K * K - 4 * K) * LOG_TWO +
+          K * lgamma(K / 2) - Km1 * lgamma(K);
       }
-      T_shape sum = 0.0;
-      T_shape constant = 0.0;
-      T_shape beta_arg;
-      for (unsigned int k = 1; k < K; k++) { // yes, go from 1 to K - 1
-        unsigned int diff = K - k;
-        beta_arg = eta + 0.5 * (diff - 1);
-        constant += diff * (2.0 * lgamma(beta_arg) - lgamma(2.0 * beta_arg));
-        sum += (2.0 * eta - 2.0 + diff) * diff;
+      else {
+        constant = -Km1 * lgamma(eta + 0.5 * Km1);
+        for (size_t k = 1; k <= Km1; k++)
+          constant += 0.5 * k * LOG_PI + lgamma(eta + 0.5 * (Km1 - k));
       }
-      constant += sum * LOG_TWO;
       return constant;
     }
 
