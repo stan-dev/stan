@@ -15,7 +15,7 @@ namespace stan {
       
       *error_stream << std::endl
                     << "Informational Message: The current Metropolis proposal is about to be"
-                    << " rejected becuase of the following issue:"
+                    << " rejected because of the following issue:"
                     << std::endl
                     << e.what() << std::endl
                     << "If this warning occurs sporadically, such as for highly constrained"
