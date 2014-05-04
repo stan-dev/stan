@@ -530,6 +530,37 @@ TEST(prob_transform,corr_matrix_free_exception) {
   y << 0, 0, 0, 0;
   EXPECT_THROW(stan::prob::corr_matrix_free(y), std::runtime_error);
 }
+TEST(prob_transform,corr_matrix_jacobian) {
+  using stan::agrad::var;
+  using stan::math::determinant;
+  using std::log;
+  using std::fabs;
+
+  int K = 4;
+  int K_choose_2 = 6;
+  Matrix<var,Dynamic,1> X(K_choose_2);
+  X << 1.0, 2.0, -3.0, 1.7, 9.8, -1.2;
+  std::vector<var> x;
+  for (int i = 0; i < X.size(); ++i)
+    x.push_back(X(i));
+  var lp = 0.0;
+  Matrix<var,Dynamic,Dynamic> Sigma = stan::prob::corr_matrix_constrain(X,K,lp);
+  std::vector<var> y;
+  for (Matrix<var,Dynamic,Dynamic>::size_type m = 0; m < K; ++m)
+    for (Matrix<var,Dynamic,Dynamic>::size_type n = 0; n <= m; ++n)
+      y.push_back(Sigma(m,n));
+
+  std::vector<std::vector<double> > j;
+  stan::agrad::jacobian(y,x,j);
+
+  Matrix<double,Dynamic,Dynamic> J(10,10);
+  for (int m = 0; m < 10; ++m)
+    for (int n = 0; n < 10; ++n)
+      J(m,n) = j[m][n];
+
+  double log_abs_jacobian_det = log(fabs(determinant(J)));
+  EXPECT_FLOAT_EQ(log_abs_jacobian_det,lp.val());
+}
 
 
 TEST(prob_transform,lkj_cov_matrix_rt) {
