@@ -2113,19 +2113,21 @@ z_{n,n} & \mbox{if } m > n.
 %
 The absolute Jacobian determinant of the second transform is thus
 \[
-2^{K} 
-\
-\prod_{m = 1}^{K} \ \prod_{n=1}^{m} z_{n,n}.
+2^{K} \ \prod_{m = 1}^{K} \ \prod_{n=1}^{m} z_{n,n}
+\ = \
+\prod_{n=1}^K \ \prod_{m=n}^K z_{n,n}
+\ = \ 
+2^{K} \ \prod_{k=1}^K z_{k,k}^{K - k + 1}.
 \]
 Finally, the full absolute Jacobian determinant of the inverse
 of the covariance matrix transform from the unconstrained lower-triangular 
 $y$ to a symmetric, positive definite matrix $x$ is the product of the
 Jacobian determinants of the exponentiation and product transforms,
 \[
-2^{K} 
-\
 \left( \prod_{k=1}^K z_{k,k} \right)
-\left( \prod_{m = 1}^{K} \ \prod_{n=1}^{m} z_{n,n} \right)
+\left( 
+2^{K} \ \prod_{k=1}^K z_{k,k}^{K - k + 1}
+\right) 
 \ = \
 2^K
 \, \prod_{k=1}^K z_{k,k}^{K-k+2}.
