@@ -1,15 +1,16 @@
 #include <gtest/gtest.h>
 #include "stan/prob/distributions/multivariate/continuous/lkj_corr.hpp"
+#include "stan/prob/distributions/univariate/continuous/uniform.hpp"
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/math/distributions.hpp>
 
 TEST(ProbDistributionsLkjCorr,testIdentity) {
+  boost::random::mt19937 rng;
   unsigned int K = 4;
   Eigen::MatrixXd Sigma(K,K);
   Sigma.setZero();
   Sigma.diagonal().setOnes();
-  srand(time(0));
-  double eta = rand() / double(RAND_MAX) + 0.5;
+  double eta = stan::prob::uniform_rng(0,2,rng);
   double f = stan::prob::do_lkj_constant(eta, K);
   EXPECT_FLOAT_EQ(f, stan::prob::lkj_corr_log(Sigma, eta));
   eta = 1.0;
@@ -19,11 +20,12 @@ TEST(ProbDistributionsLkjCorr,testIdentity) {
 
 
 TEST(ProbDistributionsLkjCorr,testHalf) {
+  boost::random::mt19937 rng;
   unsigned int K = 4;
   Eigen::MatrixXd Sigma(K,K);
   Sigma.setConstant(0.5);
   Sigma.diagonal().setOnes();
-  double eta = rand() / double(RAND_MAX) + 0.5;
+  double eta = stan::prob::uniform_rng(0,2,rng);
   double f = stan::prob::do_lkj_constant(eta, K);
   EXPECT_FLOAT_EQ(f + (eta - 1.0) * log(0.3125), stan::prob::lkj_corr_log(Sigma, eta));
   eta = 1.0;
@@ -32,11 +34,12 @@ TEST(ProbDistributionsLkjCorr,testHalf) {
 }
 
 TEST(ProbDistributionsLkjCorr,Sigma) {
+  boost::random::mt19937 rng;
   unsigned int K = 4;
   Eigen::MatrixXd Sigma(K,K);
   Sigma.setZero();
   Sigma.diagonal().setOnes();
-  double eta = rand() / double(RAND_MAX) + 0.5;
+  double eta = stan::prob::uniform_rng(0,2,rng);
   EXPECT_NO_THROW (stan::prob::lkj_corr_log(Sigma, eta));
   
   EXPECT_THROW (stan::prob::lkj_corr_log(Sigma, -eta), std::domain_error);
