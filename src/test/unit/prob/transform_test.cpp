@@ -530,6 +530,7 @@ TEST(prob_transform,corr_matrix_free_exception) {
   y << 0, 0, 0, 0;
   EXPECT_THROW(stan::prob::corr_matrix_free(y), std::runtime_error);
 }
+
 TEST(prob_transform,corr_matrix_jacobian) {
   using stan::agrad::var;
   using stan::math::determinant;
@@ -547,16 +548,19 @@ TEST(prob_transform,corr_matrix_jacobian) {
   Matrix<var,Dynamic,Dynamic> Sigma = stan::prob::corr_matrix_constrain(X,K,lp);
   std::vector<var> y;
   for (Matrix<var,Dynamic,Dynamic>::size_type m = 0; m < K; ++m)
-    for (Matrix<var,Dynamic,Dynamic>::size_type n = 0; n <= m; ++n)
+    for (Matrix<var,Dynamic,Dynamic>::size_type n = 0; n < m; ++n)
       y.push_back(Sigma(m,n));
+  std::cout << "y.size()=" << y.size() << std::endl;
 
   std::vector<std::vector<double> > j;
   stan::agrad::jacobian(y,x,j);
 
-  Matrix<double,Dynamic,Dynamic> J(10,10);
-  for (int m = 0; m < 10; ++m)
-    for (int n = 0; n < 10; ++n)
+  Matrix<double,Dynamic,Dynamic> J(X.size(),X.size());
+  for (int m = 0; m < J.rows(); ++m)
+    for (int n = 0; n < J.cols(); ++n)
       J(m,n) = j[m][n];
+
+  std::cout << "J=" << J << " determinant(J)=" << determinant(J) << std::endl;
 
   double log_abs_jacobian_det = log(fabs(determinant(J)));
   EXPECT_FLOAT_EQ(log_abs_jacobian_det,lp.val());
