@@ -13,7 +13,7 @@
 /doc/api
 /doc/*.pdf
 
-# temporary files
+# temporary latex files
 *~
 *.idx
 *.ilg
