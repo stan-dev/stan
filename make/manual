@@ -8,8 +8,6 @@ VERSION_STRING := $(MAJOR_VERSION).$(MINOR_VERSION).$(PATCH_VERSION)
 
 manual: $(STAN_HOME)src/docs/stan-reference/stan-reference.pdf
 	mkdir -p doc/
-	@echo $^
-	@echo $(basename $(notdir $^))
 	$(foreach artifact, $^, cp $(artifact) doc/$(basename $(notdir $(artifact)))-$(VERSION_STRING).pdf;)
 
 MANUAL_FLAGS=
