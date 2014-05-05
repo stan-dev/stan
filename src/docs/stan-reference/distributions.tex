@@ -1980,7 +1980,7 @@ $\theta \in \mbox{$K$-simplex}$,
 %
 \begin{description}
 \fitem{vector}{dirichlet\_rng}{vector \farg{alpha}}{Generate a
-  Dirichlet variate with prior counts (plus one) \farg{alpha}; 
+  Dirichlet variate with prior counts2 (plus one) \farg{alpha}; 
 may only be used in generated quantities block}
 \end{description}
 
@@ -1990,8 +1990,10 @@ may only be used in generated quantities block}
 \noindent
 The correlation matrix distributions have support on the (Cholesky
 factors of) correlation matrices.  A Cholesky factor $L$ for a $K
-\times K$ covariance matrix of dimensions $K$ has rows of unit length
-so that the diagonal of $L L^{\top}$ is the unit $K$-vector.
+\times K$ correlation matrix $\Sigma$ of dimension $K$ has rows of unit
+length so that the diagonal of $L L^{\top}$ is the unit $K$-vector. Even
+though models are usually conceptualized in terms of correlation matrices,
+it is better to operationalize them in terms of their Cholesky factors.
 
 
 \section{LKJ Correlation Distribution}\label{lkj-correlation.section}
@@ -2012,12 +2014,20 @@ of a symmetric beta distribution.
 \item if $\eta = 1$, then the density is uniform over all correlation
   matrices of a given order;
 \item if $\eta > 1$, the identity matrix is the modal correlation
-  matrix, with sharper peaks in the density around the identity matrix
+  matrix, with a sharper peak in the density at the identity matrix
   for larger $\eta$; and
 \item for $0 < \eta < 1$, the density has a trough at the identity
   matrix.
+\item if $\eta$ were an unknown parameter, the Jeffrey's prior is
+  proportional to $\sqrt{\prod_{k=1}^{K-1}\left(
+  2\psi_1\left(\eta+\frac{K-k-1}{2}\right) - 
+  4\psi_1\left(2\eta+K-k-1 \right)\right)}$, where $\psi_1()$ is the
+  trigamma function
 \end{itemize}
-See \citep{LewandowskiKurowickaJoe:2009} for definitions.
+See \citep{LewandowskiKurowickaJoe:2009} for definitions. However, it
+is much better computationally to work directly with the Cholesky factor
+of $\Sigma$, so this distribution should never be explicitly used in 
+practice.
 
 \pitem{y}{lkj\_corr}{eta}
 
@@ -2027,7 +2037,10 @@ See \citep{LewandowskiKurowickaJoe:2009} for definitions.
 %
   \fitem{real}{lkj\_corr\_log}{matrix \farg{y}, real
     \farg{eta}}{The log of the LKJ density for the correlation matrix
-    \farg{y} given nonnegative shape \farg{eta}.}
+    \farg{y} given nonnegative shape \farg{eta}. The only reason to
+    use this density function is if you want the code to run slower
+    and consume more memory with more risk of numerical errors. 
+    Use its Cholesky factor as described in the next section.}
 %
 \end{description}
 \begin{description}
@@ -2039,13 +2052,15 @@ See \citep{LewandowskiKurowickaJoe:2009} for definitions.
 
 \section{Cholesky LKJ Correlation Distribution}
 
-Stan provides a parameterization of the LKJ correlation matrix
-densities directly in terms of their Cholesky factors.  For example, 
-if \code{L} is a matrix parameter, then
+Stan provides an implicit parameterization of the LKJ correlation matrix
+densities in terms of their Cholesky factors, which you should use rather
+than the explicit parameterization in the previous section. For example, 
+if \code{L} is a Cholesky factor of a correlation matrix, then
 %
 \begin{quote}
 \begin{Verbatim}
 L ~ lkj_corr_cholesky(2.0);
+# implies L * L' ~ lkj_corr(2.0);
 \end{Verbatim}
 \end{quote}
 %
@@ -2053,7 +2068,7 @@ Because Stan requires models to have support on all valid constrained
 parameters, \code{L} will almost always
 %
 \footnote{It is possible to build up a valid \code{L} within Stan, but that
-would then require Jacobian adjustments.}
+would then require Jacobian adjustments to imply the intended posterior.}
 %
 be a parameter declared with the type of a
 Cholesky factor for a correlation matrix; for example,
@@ -2061,7 +2076,8 @@ Cholesky factor for a correlation matrix; for example,
 \begin{quote}
 \begin{Verbatim}
 parameters {
-  cholesky_factor_corr[K] L;
+  cholesky_factor_corr[K] L; 
+  # rather than corr_matrix[K] Sigma;
   ...
 \end{Verbatim}
 \end{quote}
@@ -2075,11 +2091,14 @@ positive-definite matrix with unit diagonal (i.e., a correlation
 matrix), then
 \[
 \distro{LkjCholesky}(L|\eta) 
-\propto \det(L L^\top)^{(\eta - 1)} 
-= \det(L)^{(2 \eta - 2)}.
+\propto \left|J\right|\det(L L^\top)^{(\eta - 1)} 
+= \prod_{k=2}^K L_{kk}^{K-k+2\eta-2}.
 \]
 See the previous section for details on interpreting the shape
-parameter $\eta$.
+parameter $\eta$. Note that even if $\eta=1$, it is still essential to
+evaluate the density function because the density of $L$ is not
+constant, regardless of the value of $\eta$, even though the density of
+$LL^\top$ is constant iff $\eta=1$.
 
 \pitem{L}{lkj\_corr\_cholesky}{eta}
 
@@ -2095,9 +2114,9 @@ parameter $\eta$.
 \end{description}
 \begin{description}
 \fitem{matrix}{lkj\_corr\_cholesky\_rng}{int \farg{K}, real \farg{eta}}{
-  Generate a random Cholesky factor of a LKJ random correlation matrix
-  of order \farg{K} with shape \farg{eta}; may only be used in 
-  generated quantities block}
+  Generate a random Cholesky factor of a correlation matrix of order
+  \farg{K} that is distributed LKJ with shape \farg{eta}; may only be 
+  used in generated quantities block}
 \end{description}
 
 

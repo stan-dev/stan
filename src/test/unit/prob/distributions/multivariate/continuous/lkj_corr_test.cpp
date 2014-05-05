@@ -43,11 +43,15 @@ TEST(ProbDistributionsLkjCorr,Sigma) {
   EXPECT_NO_THROW (stan::prob::lkj_corr_log(Sigma, eta));
   
   EXPECT_THROW (stan::prob::lkj_corr_log(Sigma, -eta), std::domain_error);
-  
+
   Sigma = Sigma * -1.0;
   EXPECT_THROW (stan::prob::lkj_corr_log(Sigma, eta), std::domain_error);
   Sigma = Sigma * (0.0 / 0.0);
   EXPECT_THROW (stan::prob::lkj_corr_log(Sigma, eta), std::domain_error);
+
+  Sigma.setConstant(0.5);
+  Sigma.diagonal().setOnes();
+  EXPECT_THROW (stan::prob::lkj_corr_cholesky_log(Sigma, eta), std::domain_error);
 }
 
 TEST(ProbDistributionsLKJCorr, error_check) {
@@ -94,4 +98,35 @@ TEST(ProbDistributionsLKJCorr, chiSquareGoodnessFitTest) {
     chi += ((bin[j] - expect[j]) * (bin[j] - expect[j]) / expect[j]);
 
   EXPECT_TRUE(chi < quantile(complement(mydist, 1e-6)));
+}
+
+TEST(ProbDistributionsLkjCorrCholesky,testIdentity) {
+  boost::random::mt19937 rng;
+  unsigned int K = 4;
+  Eigen::MatrixXd Sigma(K,K);
+  Sigma.setZero();
+  Sigma.diagonal().setOnes();
+  double eta = stan::prob::uniform_rng(0,2,rng);
+  double f = stan::prob::do_lkj_constant(eta, K);
+  EXPECT_FLOAT_EQ(f, stan::prob::lkj_corr_cholesky_log(Sigma, eta));
+  eta = 1.0;
+  f = stan::prob::do_lkj_constant(eta, K);
+  EXPECT_FLOAT_EQ(f, stan::prob::lkj_corr_cholesky_log(Sigma, eta));
+}
+
+TEST(ProbDistributionsLkjCorrCholesky,testHalf) {
+  boost::random::mt19937 rng;
+  unsigned int K = 4;
+  Eigen::MatrixXd Sigma(K,K);
+  Sigma.setConstant(0.5);
+  Sigma.diagonal().setOnes();
+  Eigen::MatrixXd L = Sigma.llt().matrixL();
+  double eta = stan::prob::uniform_rng(0,2,rng);
+  double f = stan::prob::do_lkj_constant(eta, K);
+  EXPECT_FLOAT_EQ(stan::prob::lkj_corr_log(Sigma, eta) - 0.4904146,
+                  stan::prob::lkj_corr_cholesky_log(L, eta));
+  eta = 1.0;
+  f = stan::prob::do_lkj_constant(eta, K);
+  EXPECT_FLOAT_EQ(f - 0.4904146,
+                  stan::prob::lkj_corr_cholesky_log(L, eta));
 }

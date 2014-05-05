@@ -54,22 +54,35 @@ namespace stan {
 
       using boost::math::tools::promote_args;
       using stan::math::check_positive;
+      using stan::math::check_lower_triangular;
+      using stan::math::sum;
       
       typename promote_args<T_covar,T_shape>::type lp(0.0);
       if (!check_positive(function, eta, "Shape parameter", &lp))
         return lp;      
+      if (!check_lower_triangular(function, L, "Random variable", &lp))
+        return lp;
 
       const unsigned int K = L.rows();
       if (K == 0)
         return 0.0;
-      
+            
       if (include_summand<propto,T_shape>::value) 
         lp += do_lkj_constant(eta, K);
       if (include_summand<propto,T_covar,T_shape>::value) {
+        const int Km1 = K - 1;
+        Eigen::Matrix<T_covar,Eigen::Dynamic,1> log_diagonals =
+          L.diagonal().tail(Km1).array().log();
+        Eigen::Matrix<T_covar,Eigen::Dynamic,1> values(Km1);
+        for (size_t k = 0; k < Km1; k++)
+          values(k) = (Km1 - k - 1) * log_diagonals(k);
         if ( (eta == 1.0) &&
-            stan::is_constant<typename stan::scalar_type<T_shape> >::value)
-          return lp;
-        lp += (eta - 1.0) * 2.0 * L.diagonal().array().log().sum();
+            stan::is_constant<typename stan::scalar_type<T_shape> >::value) {
+            lp += sum(values);
+            return(lp);
+        }
+        values += (2.0 * eta - 2.0) * log_diagonals;
+        lp += sum(values);
       }
       
       return lp;
