@@ -1,6 +1,9 @@
 cmake_minimum_required (VERSION 2.8)
 
 project(Stan C CXX)
+set(Stan_VERSION_MAJOR "2")
+set(Stan_VERSION_MINOR "2")
+set(Stan_VERSION_PATCH "0")
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
@@ -16,6 +19,15 @@ option(USE_SYSTEM_BOOST
 option(USE_SYSTEM_GTEST
        "Whether to use the system version of GTest or the included version"
        OFF)
+option(BUILD_DOXYGEN_DOCS
+       "Whether the doxygen-based documentation should be generated"
+       ON)
+
+if(BUILD_DOXYGEN_DOCS)
+  find_package( Doxygen REQUIRED )
+
+  add_subdirectory( src/doxygen ) 
+endif()
 
 # Find Eigen
 if(USE_SYSTEM_EIGEN)
@@ -69,7 +81,6 @@ add_subdirectory(src/stan/gm)
 set(LIBSTAN_SRCS ${PROJECT_SOURCE_DIR}/src/stan/agrad/rev/var_stack.cpp)
 add_library(stan STATIC ${LIBSTAN_SRCS})
 
-set(RUNCMD "")
 if(MINGW)
   find_program(WINE_EXE wine DOC "Path the the wine executable")
   if(WINE_EXE STREQUAL WINE_EXE-NOTFOUND)
@@ -79,6 +90,8 @@ if(MINGW)
     set(RUNCMD "${WINE_EXE}")
   endif()
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static -lwinpthread")
+else()
+  set(RUNCMD "")
 endif()
 
 # stanc
