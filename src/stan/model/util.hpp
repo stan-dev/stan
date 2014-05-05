@@ -254,8 +254,8 @@ namespace stan {
      * @param model Model.
      * @param params_r Real-valued parameter vector.
      * @param params_i Integer-valued parameter vector.
-     * @param epsilon Real-valued scalar saying how much to perturb. Defaults to 1e-6.
-     * @param error Real-valued scalar saying how much error to allow. Defaults to 1e-6.
+     * @param epsilon Real-valued scalar saying how much to perturb. Used to default to 1e-6.
+     * @param error Real-valued scalar saying how much error to allow. Used to default to 1e-6.
      * @param o Output stream for messages.
      * @param msgs Stream to which Stan programs write. Defaults to 0.
      * @return number of failed gradient comparisons versus allowed
@@ -265,8 +265,8 @@ namespace stan {
     int test_gradients(const M& model,
                        std::vector<double>& params_r,
                        std::vector<int>& params_i,
-                       double epsilon = 1e-6,
-                       double error = 1e-6,
+                       double epsilon,
+                       double error,
                        std::ostream& o,
                        std::ostream* msgs = 0) {
       std::vector<double> grad;

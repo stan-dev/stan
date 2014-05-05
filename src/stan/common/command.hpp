@@ -613,7 +613,7 @@ namespace stan {
 
         if (algo->value() == "fixed_param") {
           
-          sampler_ptr = new stan::mcmc::fixed_param_sampler();
+          sampler_ptr = new stan::mcmc::fixed_param_sampler(&std::cout, &std::cerr);
           
           adapt_engaged = false;
           

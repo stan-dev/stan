@@ -15,7 +15,7 @@ namespace stan {
       
     public:
       
-      fixed_param_sampler(std::ostream* o = &std::cout, std::ostream* e = 0):
+      fixed_param_sampler(std::ostream* o, std::ostream* e):
         base_mcmc(o, e) { this->_name = "Fixed Parameter Sampler"; }
       
       sample transition(sample& init_sample) { return init_sample; }
