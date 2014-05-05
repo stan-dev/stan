@@ -1994,8 +1994,18 @@ factors of) correlation matrices.  A Cholesky factor $L$ for a $K
 length so that the diagonal of $L L^{\top}$ is the unit $K$-vector. Even
 though models are usually conceptualized in terms of correlation matrices,
 it is better to operationalize them in terms of their Cholesky factors.
-
-
+If you are interested in the posterior distribution of the correlations,
+you can recover them in the generated quantities block via
+%
+\begin{quote}
+\begin{Verbatim}
+generated quantities {
+  corr_matrix[K] Sigma;
+  Sigma <- multiply_lower_self_transpose(L);
+}
+\end{Verbatim}
+\end{quote}
+%
 \section{LKJ Correlation Distribution}\label{lkj-correlation.section}
 
 \subsubsection{Probability Density Function}
@@ -2008,8 +2018,9 @@ unit diagonal (i.e., a correlation matrix), then
 \propto \det \left( \Sigma \right)^{(\eta - 1)}.
 \]
 %
-The shape parameter $\eta$ can be interpreted like the shape parameter
-of a symmetric beta distribution. 
+The expectation is the identity matrix for any positive value of the 
+shape parameter $\eta$, which can be interpreted like the shape parameter
+of a symmetric beta distribution:
 \begin{itemize}
 \item if $\eta = 1$, then the density is uniform over all correlation
   matrices of a given order;
@@ -2018,10 +2029,10 @@ of a symmetric beta distribution.
   for larger $\eta$; and
 \item for $0 < \eta < 1$, the density has a trough at the identity
   matrix.
-\item if $\eta$ were an unknown parameter, the Jeffrey's prior is
-  proportional to $\sqrt{\prod_{k=1}^{K-1}\left(
-  2\psi_1\left(\eta+\frac{K-k-1}{2}\right) - 
-  4\psi_1\left(2\eta+K-k-1 \right)\right)}$, where $\psi_1()$ is the
+\item if $\eta$ were an unknown parameter, the Jeffreys prior is
+  proportional to $\sqrt{2\sum_{k=1}^{K-1}\left(
+  \psi_1\left(\eta+\frac{K-k-1}{2}\right) - 
+  2\psi_1\left(2\eta+K-k-1 \right)\right)}$, where $\psi_1()$ is the
   trigamma function
 \end{itemize}
 See \citep{LewandowskiKurowickaJoe:2009} for definitions. However, it
@@ -2053,7 +2064,7 @@ practice.
 \section{Cholesky LKJ Correlation Distribution}
 
 Stan provides an implicit parameterization of the LKJ correlation matrix
-densities in terms of their Cholesky factors, which you should use rather
+density in terms of its Cholesky factor, which you should use rather
 than the explicit parameterization in the previous section. For example, 
 if \code{L} is a Cholesky factor of a correlation matrix, then
 %
