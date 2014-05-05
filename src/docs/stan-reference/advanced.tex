@@ -1948,9 +1948,14 @@ as
 
 \subsection{Absolute Jacobian Determinant of the Correlation
   Matrix Inverse Transform}
-
-The only description so far is in the \Stan transform code.
-
+From the inverse of equation 11 in \cite{LewandowskiKurowickaJoe:2009},
+the absolute Jacobian determinant is
+%
+\[
+\sqrt{\prod_{i=1}^{K-1}\prod_{j=i+1}^K \left(1-z_{i,j}^2\right)^{K-i-1}} \
+\times \prod_{i=1}^{K-1}\prod_{j=i+1}^K 
+\frac{\partial \tanh z_{i,j}}{\partial y_{i,j}}
+\]
 \subsection{Correlation Matrix Transform}
 
 The correlation transform is defined by reversing the steps of the
