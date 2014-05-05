@@ -12,6 +12,7 @@
 #include <stan/version.hpp>
 #include <stan/io/cmd_line.hpp>
 #include <stan/io/dump.hpp>
+#include <stan/io/json.hpp>
 #include <stan/io/mcmc_writer.hpp>
 
 #include <stan/gm/arguments/argument_parser.hpp>

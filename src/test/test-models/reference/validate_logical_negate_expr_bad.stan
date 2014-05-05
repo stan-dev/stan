@@ -1,5 +1,5 @@
 transformed data {
-  vector v;
+  vector[3] v;
   v <- !v;
 }
 parameters {

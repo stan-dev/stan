@@ -340,6 +340,8 @@ transformed data {
   transformed_data_matrix <- eigenvectors_sym(d_matrix);
   transformed_data_matrix <- cholesky_decompose(d_matrix);
   transformed_data_vector <- singular_values(d_matrix);
+  transformed_data_matrix <- qr_Q(d_matrix);
+  transformed_data_matrix <- qr_R(d_matrix);
 }
 parameters {
   real p_real;
@@ -981,6 +983,10 @@ transformed parameters {
   transformed_param_matrix <- cholesky_decompose(p_matrix);
   transformed_param_vector <- singular_values(d_matrix);
   transformed_param_vector <- singular_values(p_matrix);
+  transformed_param_matrix <- qr_Q(d_matrix);
+  transformed_param_matrix <- qr_R(d_matrix);
+  transformed_param_matrix <- qr_Q(p_matrix);
+  transformed_param_matrix <- qr_R(p_matrix);
 }
 model {  
 }
