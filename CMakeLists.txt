@@ -4,6 +4,7 @@ project(Stan C CXX)
 set(Stan_VERSION_MAJOR "2")
 set(Stan_VERSION_MINOR "2")
 set(Stan_VERSION_PATCH "0")
+set(Stan_VERSION "${Stan_VERSION_MAJOR}.${Stan_VERSION_MINOR}.${Stan_VERSION_PATCH}")
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
@@ -22,6 +23,15 @@ option(USE_SYSTEM_GTEST
 option(BUILD_DOXYGEN_DOCS
        "Whether the doxygen-based documentation should be generated"
        ON)
+option(BUILD_REFERENCE_MANUAL
+       "Whether the Stan reference manual"
+       ON)
+
+if(BUILD_REFERENCE_MANUAL)
+  include(UseLATEX)
+
+  add_subdirectory( src/docs/stan-reference )
+endif()
 
 if(BUILD_DOXYGEN_DOCS)
   find_package( Doxygen REQUIRED )
