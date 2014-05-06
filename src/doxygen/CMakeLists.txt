@@ -1,6 +1,6 @@
 set( doxyfile_in          ${CMAKE_CURRENT_SOURCE_DIR}/doxygen.cfg.in   )
 set( doxyfile             ${CMAKE_CURRENT_BINARY_DIR}/docygen.cfg      )
-set( doxy_html_index_file ${PROJECT_BINARY_DIR}/doc/api/index.html )
+set( doxy_html_index_file ${CMAKE_CURRENT_BINARY_DIR}/index.html )
 set( doxy_extra_files     ${CMAKE_CURRENT_SOURCE_DIR}/Eigen.dox
                           ${CMAKE_CURRENT_SOURCE_DIR}/boost.dox     
                           ${CMAKE_CURRENT_SOURCE_DIR}/error_handling.dox     

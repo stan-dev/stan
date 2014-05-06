@@ -52,7 +52,7 @@ PROJECT_LOGO           = @PROJECT_SOURCE_DIR@/logos/stanlogo-main.png
 # If a relative path is entered, it will be relative to the location
 # where doxygen was started. If left blank the current directory will be used.
 
-OUTPUT_DIRECTORY       = @PROJECT_BINARY_DIR@/doc/api
+OUTPUT_DIRECTORY       = @PROJECT_BINARY_DIR@/src/doxygen
 
 # If the CREATE_SUBDIRS tag is set to YES, then doxygen will create
 # 4096 sub-directories (in 2 levels) under the output directory of each output
@@ -1495,8 +1495,8 @@ SEARCH_INCLUDES        = YES
 # contain include files that are not input files but should be processed by
 # the preprocessor.
 
-INCLUDE_PATH           = doc \
-                         src
+INCLUDE_PATH           = @PROJECT_SOURCE_DIR@/doc \
+                         @PROJECT_SOURCE_DIR@/src
 
 # You can use the INCLUDE_FILE_PATTERNS tag to specify one or more wildcard
 # patterns (like *.h and *.hpp) to filter out the header-files in the
