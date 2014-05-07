@@ -431,6 +431,10 @@ numbers (i.e., the non-negative integers).
 
 \section{Negative Binomial Distribution}
 
+For the negative binomial distribution Stan uses the parameterization
+described in \citet{GelmanEtAl:2013}.
+For an alternative parametrization, see section \ref{sec:nbalt}
+
 \subsubsection{Probability Mass Function}
 
 If $\alpha \in \posreals$ and $\beta \in \posreals$, then for $n \in
@@ -471,6 +475,10 @@ where $\Psi$ is the digamma function, defined as
 \[
 \Psi(x) = \frac{\partial}{\partial x} \log \Gamma(x).
 \]
+\[
+\mbox{With mean } E[Y] = \frac{\alpha}{\beta} \mbox{ and variance } Var[Y] =
+\frac{\alpha}{\beta^2} (\beta + 1)
+\]
 
 \pitem{n}{neg\_binomial}{alpha,beta}
 
@@ -505,6 +513,7 @@ where $\Psi$ is the digamma function, defined as
 
 
 \section{Negative Binomial Distribution, alternative parameterization}
+\label{sec:nbalt}
 
 Stan also provides an alternative parameterization of the negative
 binomial distribution using the mean and inverse scale
@@ -512,7 +521,7 @@ binomial distribution using the mean and inverse scale
 
 \subsubsection{Probability Mass Function}
 
-If $\eta \in \reals$ and $\phi \in \posreals$, then for $y \in
+If $\eta \in \reals$, $\mu \in \posreals$ and $\phi \in \posreals$, then for $y \in
 \nats$,
 \[
 \distro{NegativeBinomial2}(y|\mu,\phi)
@@ -528,9 +537,9 @@ If $\eta \in \reals$ and $\phi \in \posreals$, then for $y \in
 \mu + \frac{\mu^2}{\phi}
 \]
 
-\pitem{y}{neg\_2\_binomial}{mu, phi}
+\pitem{y}{neg\_binomial\_2}{mu, phi}
 
-\pitem{y}{neg\_2\_binomial\_log}{eta, phi}
+\pitem{y}{neg\_binomial\_2\_log}{eta, phi}
 
 \subsubsection{Stan Functions}
 
