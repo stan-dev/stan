@@ -5,6 +5,7 @@
 #include <ostream>
 #include <string>
 #include <stdexcept>
+#include <vector>
 
 namespace stan {
   namespace common {
