@@ -92,6 +92,7 @@ set(LIBSTAN_SRCS ${PROJECT_SOURCE_DIR}/src/stan/agrad/rev/var_stack.cpp)
 add_library(stan STATIC ${LIBSTAN_SRCS})
 
 if(MINGW)
+  add_compile_options( -flto=jobserver -ffat-lto-objects )
   find_program(WINE_EXE wine DOC "Path the the wine executable")
   if(WINE_EXE STREQUAL WINE_EXE-NOTFOUND)
     message(error "Wine is required for building with mingw and could not be found")
