@@ -4,8 +4,9 @@
 #include <boost/random/exponential_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
 
-#include <stan/agrad.hpp>
+#include <stan/agrad/partials_vari.hpp>
 #include <stan/math/error_handling.hpp>
+#include <stan/math/constants.hpp>
 #include <stan/math/functions/value_of.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
@@ -184,10 +185,6 @@ namespace stan {
       agrad::OperandsAndPartials<T_y, T_loc, T_scale>
         operands_and_partials(y, mu, sigma);
           
-      std::fill(operands_and_partials.all_partials,
-                operands_and_partials.all_partials
-                + operands_and_partials.nvaris, 0.0);
-          
       // Explicit return for extreme values
       // The gradients are technically ill-defined, but treated as zero
           
@@ -287,10 +284,6 @@ namespace stan {
       agrad::OperandsAndPartials<T_y, T_loc, T_scale> 
         operands_and_partials(y, mu, sigma);
           
-      std::fill(operands_and_partials.all_partials,
-                operands_and_partials.all_partials 
-                + operands_and_partials.nvaris, 0.0);
-          
       // Explicit return for extreme values
       // The gradients are technically ill-defined, but treated as zero
           
@@ -374,10 +367,6 @@ namespace stan {
           
       agrad::OperandsAndPartials<T_y, T_loc, T_scale> 
         operands_and_partials(y, mu, sigma);
-          
-      std::fill(operands_and_partials.all_partials,
-                operands_and_partials.all_partials 
-                + operands_and_partials.nvaris, 0.0);
           
       // Explicit return for extreme values
       // The gradients are technically ill-defined, but treated as zero

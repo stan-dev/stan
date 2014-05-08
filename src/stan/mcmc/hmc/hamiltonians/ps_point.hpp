@@ -14,13 +14,15 @@ namespace stan {
 
     // Point in a generic phase space
     class ps_point {
+      friend class ps_point_test;
       
     public:
       
-      ps_point(int n, int m): q(n), r(m), p(n), V(0), g(n) {};
+      ps_point(int n): q(n), p(n), V(0), g(n) {};
   
-      ps_point(const ps_point& z): q(z.q), r(z.r), p(z.p.size()), V(z.V), g(z.g.size())
+      ps_point(const ps_point& z): q(z.q.size()), p(z.p.size()), V(z.V), g(z.g.size())
       {
+        _fast_vector_copy<double>(q, z.q);
         _fast_vector_copy<double>(p, z.p);
         _fast_vector_copy<double>(g, z.g);
       }
@@ -31,8 +33,7 @@ namespace stan {
         
         if(this == &z) return *this;
         
-        q = z.q;
-        r = z.r;
+        _fast_vector_copy<double>(q, z.q);
         
         V = z.V;
         
@@ -43,8 +44,7 @@ namespace stan {
         
       }
       
-      std::vector<double> q;
-      std::vector<int> r;
+      Eigen::VectorXd q;
       Eigen::VectorXd p;
       
       double V;
@@ -52,20 +52,20 @@ namespace stan {
         
       virtual void get_param_names(std::vector<std::string>& model_names,
                                    std::vector<std::string>& names) {
-        for(size_t i = 0; i < q.size(); ++i)
+        for(int i = 0; i < q.size(); ++i)
           names.push_back(model_names.at(i));
-        for(size_t i = 0; i < q.size(); ++i)
+        for(int i = 0; i < q.size(); ++i)
           names.push_back(std::string("p_") + model_names.at(i));
-        for(size_t i = 0; i < q.size(); ++i)
+        for(int i = 0; i < q.size(); ++i)
           names.push_back(std::string("g_") + model_names.at(i));
       }
 
       virtual void get_params(std::vector<double>& values) {
-        for(size_t i = 0; i < q.size(); ++i)
-          values.push_back(q.at(i));
-        for(size_t i = 0; i < q.size(); ++i)
+        for(int i = 0; i < q.size(); ++i)
+          values.push_back(q(i));
+        for(int i = 0; i < q.size(); ++i)
           values.push_back(p(i));
-        for(size_t i = 0; i < q.size(); ++i)
+        for(int i = 0; i < q.size(); ++i)
           values.push_back(g(i));
       }
       
@@ -77,16 +77,23 @@ namespace stan {
     protected:
       
       template <typename T>
-      inline void _fast_vector_copy(Eigen::Matrix<T, Eigen::Dynamic, 1>& v_to, const Eigen::Matrix<T, Eigen::Dynamic, 1>& v_from) {
-        v_to.resize(v_from.size());
-        std::memcpy(&v_to(0), &v_from(0), v_from.size() * sizeof(double));
+      static inline void _fast_vector_copy(Eigen::Matrix<T, Eigen::Dynamic, 1>& v_to, const Eigen::Matrix<T, Eigen::Dynamic, 1>& v_from) {
+	int sz = v_from.size();
+        v_to.resize(sz);
+	if (sz > 0) {
+	  std::memcpy(&v_to(0), &v_from(0), v_from.size() * sizeof(double));
+	}
       }
 
       template <typename T>
-      inline void _fast_matrix_copy(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& v_to,
+      static inline void _fast_matrix_copy(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& v_to,
                                     const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& v_from) {
-        v_to.resize(v_from.rows(), v_from.cols());
-        std::memcpy(&v_to(0), &v_from(0), v_from.size() * sizeof(double));
+	int nr = v_from.rows();
+	int nc = v_from.cols();
+        v_to.resize(nr, nc);
+	if (nr > 0 && nc > 0) {
+	  std::memcpy(&v_to(0), &v_from(0), v_from.size() * sizeof(double));
+	}
       }
       
     };

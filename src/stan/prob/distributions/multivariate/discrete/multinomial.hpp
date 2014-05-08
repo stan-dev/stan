@@ -78,16 +78,16 @@ namespace stan {
       check_simplex(function, theta, "Probabilites parameter");
       check_positive(function,N,"number of trials variables");
 
-      std::vector<int> result(N,0);
+      std::vector<int> result(theta.size(),0);
       double mass_left = 1.0;
       int n_left = N;
       for (int k = 0; n_left > 0 && k < theta.size(); ++k) {
-        result[k] = binomial_rng(n_left,theta[k] / mass_left,rng);
+        double p = theta[k] / mass_left;
+        if (p > 1.0) p = 1.0;
+        result[k] = binomial_rng(n_left,p,rng);
         n_left -= result[k];
         mass_left -= theta[k];
       }
-      // for (int n = 0; n < N; ++n)
-      //   ++result[categorical_rng(theta,rng) - 1];
       return result;
     }
 

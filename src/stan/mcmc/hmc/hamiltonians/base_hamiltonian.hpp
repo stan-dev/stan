@@ -42,19 +42,15 @@ namespace stan {
       
       virtual void update(P& z) {
         
-        std::vector<double> grad_lp(this->_model.num_params_r());
-        
         try {
-          z.V = - stan::model::log_prob_grad<true,true>(_model,z.q, z.r, 
-                                                        grad_lp, 
-                                                        _err_stream);
-        } catch (std::domain_error e) {
+          stan::model::gradient(_model, z.q, z.V, z.g, _err_stream);
+          z.V *= -1;
+        } catch (const std::exception& e) {
           this->_write_error_msg(_err_stream, e);
           z.V = std::numeric_limits<double>::infinity();
         }
         
-        Eigen::Map<Eigen::VectorXd> eigen_g(&(grad_lp[0]), grad_lp.size());
-        z.g = - eigen_g;
+        z.g *= -1;
         
       }
       
@@ -65,21 +61,20 @@ namespace stan {
         std::ostream* _err_stream;
       
         void _write_error_msg(std::ostream* error_msgs,
-                             const std::domain_error& e) {
+                             const std::exception& e) {
           
           if (!error_msgs) return;
           
           *error_msgs << std::endl
-                      << "Informational Message: The parameter state is about to be Metropolis"
-                      << " rejected due to the following underlying, non-fatal (really)"
-                      << " issue (and please ignore that what comes next might say 'error'): "
-                      << e.what()
+                      << "Informational Message: The current Metropolis proposal is about to be "
+                      << "rejected because of the following issue:"
                       << std::endl
-                      << "If the problem persists across multiple draws, you might have"
-                      << " a problem with an initial state or a gradient somewhere."
+                      << e.what() << std::endl
+                      << "If this warning occurs sporadically, such as for highly constrained "
+                      << "variable types like covariance matrices, then the sampler is fine,"
                       << std::endl
-                      << " If the problem does not persist, the resulting samples will still"
-                      << " be drawn from the posterior."
+                      << "but if this warning occurs often then your model may be either severely "
+                      << "ill-conditioned or misspecified."
                       << std::endl;
           
       }
@@ -89,6 +84,6 @@ namespace stan {
   } // mcmc
 
 } // stan
-          
+
 
 #endif

@@ -4,8 +4,10 @@
 #include <boost/random/bernoulli_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
 
-#include <stan/agrad.hpp>
+#include <stan/agrad/partials_vari.hpp>
 #include <stan/math/error_handling.hpp>
+#include <stan/math/constants.hpp>
+#include <stan/math/functions/inv_logit.hpp>
 #include <stan/math/functions/log1m.hpp>
 #include <stan/math/functions/value_of.hpp>
 #include <stan/meta/traits.hpp>
@@ -72,17 +74,21 @@ namespace stan {
         // avoid nans when sum == N or sum == 0
         if (sum == N) {
           logp += N * log(theta_dbl);
-          operands_and_partials.d_x1[0] += N / theta_dbl;
+          if (!is_constant_struct<T_prob>::value)
+            operands_and_partials.d_x1[0] += N / theta_dbl;
         } else if (sum == 0) {
           logp += N * log1m(theta_dbl);
-          operands_and_partials.d_x1[0] += N / (theta_dbl - 1);
+          if (!is_constant_struct<T_prob>::value)
+            operands_and_partials.d_x1[0] += N / (theta_dbl - 1);
         } else {
           const double log_theta = log(theta_dbl);
           const double log1m_theta = log1m(theta_dbl);
-          if (include_summand<propto,T_prob>::value) {
-            logp += sum * log_theta;
-            logp += (N - sum) * log1m_theta;
-    
+
+          logp += sum * log_theta;
+          logp += (N - sum) * log1m_theta;
+
+          // gradient
+          if (!is_constant_struct<T_prob>::value) {
             operands_and_partials.d_x1[0] += sum / theta_dbl;
             operands_and_partials.d_x1[0] += (N - sum) / (theta_dbl - 1);
           }
@@ -93,15 +99,13 @@ namespace stan {
           const int n_int = value_of(n_vec[n]);
           const double theta_dbl = value_of(theta_vec[n]);
     
-          if (include_summand<propto,T_prob>::value) {
-            if (n_int == 1)
-              logp += log(theta_dbl);
-            else
-              logp += log1m(theta_dbl);
-          }
+          if (n_int == 1)
+            logp += log(theta_dbl);
+          else
+            logp += log1m(theta_dbl);
     
           // gradient
-          if (include_summand<propto,T_prob>::value) {
+          if (!is_constant_struct<T_prob>::value) {
             if (n_int == 1)
               operands_and_partials.d_x1[n] += 1.0 / theta_dbl;
             else
@@ -177,16 +181,14 @@ namespace stan {
         const double ntheta = sign * theta_dbl;
         const double exp_m_ntheta = exp(-ntheta);
   
-        if (include_summand<propto,T_prob>::value) {
-          // Handle extreme values gracefully using Taylor approximations.
-          const static double cutoff = 20.0;
-          if (ntheta > cutoff)
-            logp -= exp_m_ntheta;
-          else if (ntheta < -cutoff)
-            logp += ntheta;
-          else
-            logp -= log1p(exp_m_ntheta);
-        }
+        // Handle extreme values gracefully using Taylor approximations.
+        const static double cutoff = 20.0;
+        if (ntheta > cutoff)
+          logp -= exp_m_ntheta;
+        else if (ntheta < -cutoff)
+          logp += ntheta;
+        else
+          logp -= log1p(exp_m_ntheta);
 
         // gradients
         if (!is_constant_struct<T_prob>::value) {
@@ -248,10 +250,6 @@ namespace stan {
       // Compute vectorized CDF and gradient
       using stan::math::value_of;
       agrad::OperandsAndPartials<T_prob> operands_and_partials(theta);
-          
-      std::fill(operands_and_partials.all_partials,
-                operands_and_partials.all_partials 
-                + operands_and_partials.nvaris, 0.0);
           
       // Explicit return for extreme values
       // The gradients are technically ill-defined, but treated as zero
@@ -318,10 +316,6 @@ namespace stan {
       using stan::math::value_of;
       agrad::OperandsAndPartials<T_prob> operands_and_partials(theta);
           
-      std::fill(operands_and_partials.all_partials,
-                operands_and_partials.all_partials 
-                + operands_and_partials.nvaris, 0.0);
-          
       // Explicit return for extreme values
       // The gradients are technically ill-defined, but treated as zero
       for (size_t i = 0; i < stan::length(n); i++) {
@@ -383,10 +377,6 @@ namespace stan {
       // Compute vectorized cdf_log and gradient
       using stan::math::value_of;
       agrad::OperandsAndPartials<T_prob> operands_and_partials(theta);
-          
-      std::fill(operands_and_partials.all_partials,
-                operands_and_partials.all_partials 
-                + operands_and_partials.nvaris, 0.0);
           
       // Explicit return for extreme values
       // The gradients are technically ill-defined, but treated as zero
