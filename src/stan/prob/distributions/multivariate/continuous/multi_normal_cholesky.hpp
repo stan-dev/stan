@@ -21,6 +21,9 @@
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
 
+#include <boost/random/normal_distribution.hpp>
+#include <boost/random/variate_generator.hpp>
+
 namespace stan {
 
   namespace prob {
@@ -221,6 +224,30 @@ namespace stan {
                               const Eigen::Matrix<T_loc,Eigen::Dynamic,1>& mu,
                               const Eigen::Matrix<T_covar,Eigen::Dynamic,Eigen::Dynamic>& L) {
       return multi_normal_cholesky_log<false>(y,mu,L);
+    }
+    
+    template <class RNG>
+    inline Eigen::VectorXd
+    multi_normal_cholesky_rng(const Eigen::Matrix<double,Eigen::Dynamic,1>& mu,
+                     const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& S,
+                     RNG& rng) {
+      using boost::variate_generator;
+      using boost::normal_distribution;
+
+      static const char* function = "stan::prob::multi_normal_cholesky_rng(%1%)";
+
+      using stan::math::check_finite;
+ 
+      check_finite(function, mu, "Location parameter");
+
+      variate_generator<RNG&, normal_distribution<> >
+        std_normal_rng(rng, normal_distribution<>(0,1));
+
+      Eigen::VectorXd z(S.cols());
+      for(int i = 0; i < S.cols(); i++)
+        z(i) = std_normal_rng();
+
+      return mu + S * z;
     }
 
   }
