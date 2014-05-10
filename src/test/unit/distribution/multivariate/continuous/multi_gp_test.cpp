@@ -4,9 +4,9 @@
 
 // UTILITY FUNCTIONS FOR TESTING
 #include <vector>
-#include <test/agrad/distributions/expect_eq_diffs.hpp>
-#include <test/agrad/distributions/multivariate/continuous/test_gradients.hpp>
-#include <test/agrad/distributions/multivariate/continuous/agrad_distributions_multi_gp.hpp>
+#include <test/unit/distribution/expect_eq_diffs.hpp>
+#include <test/unit/distribution/multivariate/continuous/test_gradients.hpp>
+#include <test/unit/distribution/multivariate/continuous/agrad_distributions_multi_gp.hpp>
 
 using Eigen::Dynamic;
 using Eigen::Matrix;
