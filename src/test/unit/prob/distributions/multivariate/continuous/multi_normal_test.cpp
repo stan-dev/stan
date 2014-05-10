@@ -79,18 +79,6 @@ TEST(ProbDistributionsMultiNormal,MultiNormalOneRow) {
   EXPECT_FLOAT_EQ(-11.73908, stan::prob::multi_normal_log(y,mu,Sigma));
 }
 
-TEST(ProbDistributionsMultiNormal,MultiNormalMultiRow) {
-  Matrix<double,Dynamic,Dynamic> y(2,3);
-  y << 2.0, -2.0, 11.0,
-       4.0, -4.0, 22.0;
-  Matrix<double,Dynamic,1> mu(3,1);
-  mu << 1.0, -1.0, 3.0;
-  Matrix<double,Dynamic,Dynamic> Sigma(3,3);
-  Sigma << 9.0, -3.0, 0.0,
-    -3.0,  4.0, 0.0,
-    0.0, 0.0, 5.0;
-  EXPECT_FLOAT_EQ(-54.2152, stan::prob::multi_normal_log(y,mu,Sigma));
-}
 TEST(ProbDistributionsMultiNormal,SigmaMultiRow) {
   Matrix<double,Dynamic,Dynamic> y(1,2);
   y << 2.0, -2.0;
@@ -128,7 +116,7 @@ TEST(ProbDistributionsMultiNormal,MuMultiRow) {
   EXPECT_THROW (stan::prob::multi_normal_log(y, mu, Sigma), std::domain_error);
 }
 TEST(ProbDistributionsMultiNormal,SizeMismatch) {
-  Matrix<double,Dynamic,Dynamic> y(1,3);
+  Matrix<double,1,Dynamic> y(1,3);
   y << 2.0, -2.0, 11.0;
   Matrix<double,Dynamic,1> mu(2,1);
   mu << 1.0, -1.0;
