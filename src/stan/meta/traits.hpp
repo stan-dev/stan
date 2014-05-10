@@ -457,18 +457,19 @@ namespace stan {
     struct scalar_type_helper_pre<true, T, T_container> {
       typedef typename scalar_type_helper_pre<is_vector<typename T::value_type>::value, typename T::value_type, typename T_container::value_type>::type type;
     };
-
-    /**
-     * Metaprogram structure to determine the type of first container of
-     * the base scalar type of a template argument.
-     *
-     * @tparam T Type of object.
-     */
-    template <typename T>
-    struct scalar_type_pre {
-      typedef typename scalar_type_helper_pre<is_vector<typename T::value_type>::value, typename T::value_type, T>::type type;
-    };
   }
+  
+  /**
+    * Metaprogram structure to determine the type of first container of
+    * the base scalar type of a template argument.
+    *
+    * @tparam T Type of object.
+  */
+  template <typename T>
+  struct scalar_type_pre {
+    typedef typename scalar_type_helper_pre<is_vector<typename T::value_type>::value, typename T::value_type, T>::type type;
+  };
+
 
   template <typename T,
             bool is_array = stan::is_vector_like<typename T::value_type>::value,

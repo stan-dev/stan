@@ -10,6 +10,7 @@
 
 using Eigen::Dynamic;
 using Eigen::Matrix;
+using std::vector;
 
 template <typename T_y, typename T_dof, typename T_loc, typename T_scale>
 void expect_propto(T_y y1, T_dof nu1, T_loc mu1, T_scale sigma1,
@@ -185,7 +186,7 @@ struct multi_student_t_fun {
 };
 
 TEST(MultiStudentT, TestGradFunctional) {
-  std::vector<double> x(3 + 3 + 3 * 3 + 1);
+  std::vector<double> x(3 + 3 + 3 * 2 + 1);
   // y
   x[0] = 1.0;
   x[1] = 2.0;
@@ -213,4 +214,103 @@ TEST(MultiStudentT, TestGradFunctional) {
   u[3] = 5;
   
   test_grad(multi_student_t_fun(1), u);
+}
+
+
+struct vectorized_multi_student_t_fun {
+  const int K_; //size of each vector and order of square matrix sigma
+  const int L_; //size of the array of eigen vectors
+
+  vectorized_multi_student_t_fun(int K, int L) : K_(K), L_(L) { }
+
+  template <typename T>
+  T operator()(const std::vector<T>& x) const {
+    T nu;
+    vector<Matrix<T,Dynamic,1> > y(L_, Matrix<T,Dynamic,1> (K_));
+    vector<Matrix<T,Dynamic,1> > mu(L_, Matrix<T,Dynamic,1> (K_));
+    Matrix<T,Dynamic,Dynamic> Sigma(K_,K_);
+    int pos = 0;
+    for (int i = 0; i < L_; ++i) 
+      for (int j = 0; j < K_; ++j)
+        y[i](j) = x[pos++];
+        
+    for (int i = 0; i < L_; ++i)         
+      for (int j = 0; j < K_; ++j)
+        mu[i](j) = x[pos++];
+    
+    for (int j = 0; j < K_; ++j) {
+      for (int i = 0; i <= j; ++i) {
+        Sigma(i,j) = x[pos++];
+        Sigma(j,i) = Sigma(i,j);
+      }
+    }
+    nu = x[pos++];
+    return stan::prob::multi_student_t_log<false>(y,nu,mu,Sigma);
+  }
+};
+
+TEST(MultiStudentT, TestGradFunctionalVectorized) {
+  
+  {
+  vector<double> x(13);
+  // y
+  x[0] = 1.0;
+  x[1] = 2.0;
+  x[2] = -3.0;
+  // mu
+  x[3] = 0.0;
+  x[4] = -2.0;
+  x[5] = -3.0;
+  // Sigma
+  x[6] = 1;
+  x[7] = -1;
+  x[8] = 10;
+  x[9] = -2;
+  x[10] = 20;
+  x[11] = 56;
+  // nu
+  x[12] = 5;
+
+  test_grad(vectorized_multi_student_t_fun(3, 1), x);
+  }
+  
+  vector<double> x(19);
+  // y[1]
+  x[0] = 1.0;
+  x[1] = 2.0;
+  x[2] = -3.0;
+  // y[2]
+  x[3] = 0.0;
+  x[4] = -2.0;
+  x[5] = -3.0;
+  
+  // mu[1]
+  x[6] = 0.0;
+  x[7] = 1.0;
+  x[8] = 3.0;
+  // mu[2]
+  x[9] = 0.0;
+  x[10] = -1.0;
+  x[11] = -2.0;
+  
+  // Sigma
+  x[12] = 1;
+  x[13] = -1;
+  x[14] = 10;
+  x[15] = -2;
+  x[16] = 20;
+  x[17] = 56;
+
+  // nu
+  x[18] = 5;
+
+  test_grad(vectorized_multi_student_t_fun(3, 2), x);
+  
+  vector<double> u(4);
+  u[0] = 1.9;
+  u[1] = -2.7;
+  u[2] = 0.48;
+  u[3] = 5;
+  
+  test_grad(vectorized_multi_student_t_fun(1, 1), u);
 }
