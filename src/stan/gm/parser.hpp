@@ -38,6 +38,7 @@
 #include <stan/gm/grammars/program_grammar.hpp>
 #include <stan/gm/grammars/whitespace_grammar.hpp>
 #include <stan/gm/grammars/expression_grammar.hpp>
+#include <stan/gm/grammars/expression07_grammar.hpp>
 #include <stan/gm/grammars/statement_grammar.hpp>
 #include <stan/gm/grammars/var_decls_grammar.hpp>
 

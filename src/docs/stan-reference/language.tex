@@ -1,9 +1,9 @@
 \part{Modeling Language Reference}
 
-\chapter{Execution of a \Stan Program}
+\chapter{Execution of a Stan Program}
 
 \noindent 
-This chapter provides a sketch of how a compiled \Stan model is
+This chapter provides a sketch of how a compiled Stan model is
 executed using sampling.  Optimization shares the same data reading
 and initialization steps, but then does optimization rather than sampling.
 
@@ -20,10 +20,10 @@ optimization and diagnostics.
 \subsection{Read Data}
 
 The first step of execution is to read data into memory.  
-For the \Stan model executable, data is read from a file in the dump
+For the Stan model executable, data is read from a file in the dump
 format (see \refchapter{dump}).%
 %
-\footnote{The \Cpp code underlying \Stan is flexible enough to allow
+\footnote{The \Cpp code underlying Stan is flexible enough to allow
   data to be read from memory or file.  Calls from \R, for instance,
   can be configured to read data from file or directly from \R's
   memory.}
@@ -177,7 +177,7 @@ sampler (\NUTS) will determine the number of leapfrog steps adaptively
 
 During each leapfrog step, the log probability function and its
 gradient must be calculated.  This is where most of the time in the
-\Stan algorithm is spent.  This log probability function, which is
+Stan algorithm is spent.  This log probability function, which is
 used by the sampling algorithm, is defined over the unconstrained
 parameters.
 
@@ -205,7 +205,7 @@ probability.  This includes all of the transformed parameter
 operations and all of the Jacobian adjustments.  This tree is then
 used to evaluate the gradients by propagating partial derivatives
 backward along the expression graph.  The gradient calculations
-account for the majority of the cycles consumed by a \Stan program.
+account for the majority of the cycles consumed by a Stan program.
 
 \subsection{Metropolis Accept/Reject}
 
@@ -225,7 +225,7 @@ steps will be required to move the same distance.  If step sizes are
 large, more updates will be rejected, but fewer steps will be required
 to move the same distance.  Thus a balance between effort and
 rejection rate is required.  If the user has not specified a step
-size, \Stan will tune the step size during warmup sampling to achieve
+size, Stan will tune the step size during warmup sampling to achieve
 a desired rejection rate (thus balancing rejection versus number of
 steps).
 
@@ -277,12 +277,12 @@ quantities are written.  Local variables are not written, nor is the
 data or transformed data.  All values are written in their constrained
 forms, that is the form that is used in the model definitions.
 
-In the executable form of a \Stan models, parameters, transformed
+In the executable form of a Stan models, parameters, transformed
 parameters, and generated quantities are written to a file in
 comma-separated value (\acronym{csv}) notation with a header defining
 the names of the parameters (including indices for multivariate
 parameters).%
-\footnote{In the \R version of \Stan, the values may either be
+\footnote{In the \R version of Stan, the values may either be
 written to a \acronym{csv} file or directly back to \R's memory.}
 
 % PSEUDOCODE FOR STAN MODEL
@@ -314,8 +314,8 @@ written to a \acronym{csv} file or directly back to \R's memory.}
 \chapter{Data Types and Variable Declarations}\label{data-types.chapter}
 
 \noindent 
-This chapter covers the data types for expressions in \Stan.  Every
-variable used in a \Stan program must have a declared data type.  Only
+This chapter covers the data types for expressions in Stan.  Every
+variable used in a Stan program must have a declared data type.  Only
 values of that type will be assignable to the variable (except for
 temporary states of transformed data and transformed parameter
 values).  This follows the convention of programming languages like
@@ -330,7 +330,7 @@ The motivation for strong, static typing is threefold.
   to debug and maintain.
 \item Strong typing allows programming errors relative to the
   declared intent to be caught sooner (at compile time) rather than
-  later (at run time).  The \Stan compiler (see \refsection{stanc})
+  later (at run time).  The Stan compiler (see \refsection{stanc})
   will flag any type errors and indicate the offending expressions
   quickly when the program is compiled.
 \item Constrained types will catch runtime data, initialization, and
@@ -346,7 +346,7 @@ invocations of the program.
 
 \subsection{Basic Data Types}
 
-The primitive \Stan data types are \code{real} for continuous scalar
+The primitive Stan data types are \code{real} for continuous scalar
 quantities and \code{int} for integer values.  The compound data
 types include \code{vector} (of real values), \code{row\_vector} (of
 real values), and \code{matrix} (of real values).
@@ -367,7 +367,7 @@ product with own transpose is a covariance matrix).
 
 \subsection{Arrays}
 
-\Stan supports arrays of arbitrary order of any of the basic data
+Stan supports arrays of arbitrary order of any of the basic data
 types or constrained basic data types.  This includes
 three-dimensional arrays of integers, one-dimensional arrays of
 positive reals, four-dimensional arrays of simplexes, one-dimensional
@@ -387,7 +387,7 @@ Stan uses 32-bit (4-byte) integers for all of its integer
 representations.  The maximum value that can be represented
 as an integer is $2^{31}-1$; the minimum value is $-(2^{31})$.
 
-When integers overflow, their values wrap.  Thus it is up to the \Stan
+When integers overflow, their values wrap.  Thus it is up to the Stan
 programmer to make sure the integer values in their programs stay in
 range.  In particular, every intermediate expression must have an
 integer value that is in range.
@@ -398,17 +398,17 @@ subtraction, and multiplication, but rounds the result of division
 
 \subsection{Reals}
 
-\Stan uses 64-bit (8-byte) floating point representations of real
-numbers.  \Stan roughly%
+Stan uses 64-bit (8-byte) floating point representations of real
+numbers.  Stan roughly%
 %
-\footnote{\Stan compiles integers to \code{int} and reals to
+\footnote{Stan compiles integers to \code{int} and reals to
   \code{double} types in \Cpp.  Precise details of rounding will depend
   on the compiler and hardware architecture on which the code is run.}
 %
 follows the {\sc ieee} 754 standard for floating-point computation.
 The range of a 64-bit number is roughly $\pm 2^{1022}$, which is
 slightly larger than $\pm 10^{307}$.  It is a good idea to stay well
-away from such extreme values in \Stan models as they are prone to
+away from such extreme values in Stan models as they are prone to
 cause overflow.
 
 64-bit floating point representations have roughly 15 decimal digits
@@ -422,7 +422,7 @@ error value is referred to as ``not a number.''
 
 \subsection{Promoting Integers to Reals}
 
-\Stan automatically promotes integer values to real values if
+Stan automatically promotes integer values to real values if
 necessary, but does not automatically demote real values to integers.
 For very large integers, this will cause a rounding error to fewer
 significant digits in the floating point representation than in the
@@ -438,7 +438,7 @@ thus be avoided where possible.
 
 \section{Univariate Data Types and Variable Declarations}
 
-All variables used in a \Stan program must have an explicitly declared
+All variables used in a Stan program must have an explicitly declared
 data type.  The form of a declaration includes the type and the name
 of a variable.  This section covers univariate types, the next section
 vector and matrix types, and the following section array types.
@@ -500,7 +500,7 @@ Real variables may be bounded using the same syntax as integers.  In
 theory (that is, with arbitrary-precision arithmetic), the bounds on
 real values would be exclusive.  Unfortunately, finite-precision
 arithmetic rounding errors will often lead to values on the
-boundaries, so they are allowed in \Stan.
+boundaries, so they are allowed in Stan.
  
 The variable \code{sigma} may be declared to be non-negative as follows.
 %
@@ -597,7 +597,7 @@ structured values like vectors.
 \subsection{Indexing}
 
 Vectors and matrices, as well as arrays, are indexed starting from one
-in \Stan.  This follows the convention in statistics and linear
+in Stan.  This follows the convention in statistics and linear
 algebra as well as their implementations in the statistical software
 packages \R, \MATLAB, \BUGS, and \JAGS.  General computer programming
 languages, on the other hand, such as \Cpp and Python, index arrays
@@ -606,7 +606,7 @@ starting from zero.
 
 \subsection{Vectors}
 
-Vectors in \Stan are column vectors; see the next subsection for
+Vectors in Stan are column vectors; see the next subsection for
 information on row vectors.  Vectors are declared with a size (i.e., a
 dimensionality).  For example, a 3-dimensional vector is declared with
 the keyword \code{vector}, as follows.
@@ -678,7 +678,7 @@ imprecision.
 
 \subsection{Ordered Vectors}
 
-An ordered vector type in \Stan represents a vector whose entries are
+An ordered vector type in Stan represents a vector whose entries are
 sorted in ascending order.  For instance, $(-1.3,2.7,2.71)^{\top}$ is
 an ordered 3-vector.  Ordered vectors are most often employed as cut
 points in ordered logistic regression models (see
@@ -867,7 +867,7 @@ declared as \code{cov\_matrix[3]} or
 
 Checks are carried out at the end of each relevant block of statements
 to ensure constraints are enforced.  This includes run-time size
-checks.  The \Stan compiler isn't able to catch the fact that an
+checks.  The Stan compiler isn't able to catch the fact that an
 attempt may be made to assign a matrix of one dimensionality to a
 matrix of mismatching dimensionality.  
 
@@ -899,7 +899,7 @@ second element in the vector.  If \code{m} is a matrix, then
 
 Providing a matrix with a single index returns the specified row.  For
 instance, if \code{m} is a matrix, then \code{m[2]} is the second row.
-This allows \Stan blocks such as
+This allows Stan blocks such as
 %
 \begin{quote}
 \begin{Verbatim} 
@@ -917,11 +917,11 @@ row of \code{m}.  Thus it is possible to write \code{m[2][3]} instead
 of \code{m[2,3]} to access the third element in the second row.  When
 given a choice, the form \code{m[2,3]} is preferred.%
 %
-\footnote{As of \Stan version 1.0, the form
+\footnote{As of Stan version 1.0, the form
   \code{m[2,3]} is more efficient because it does not require the
   creation and use of an intermediate expression template for
   \code{m[2]}.  In later versions, explicit calls to \code{m[2][3]}
-  may be optimized to be as efficient as \code{m[2,3]} by the \Stan
+  may be optimized to be as efficient as \code{m[2,3]} by the Stan
   compiler.\label{array-index-style.footnote}}
 
 
@@ -945,7 +945,7 @@ quantities.
 
 \section{Array Data Types}\label{array-data-types.section}
 
-\Stan supports arrays of arbitrary dimension.  An array's elements may
+Stan supports arrays of arbitrary dimension.  An array's elements may
 be any of the basic data types, that is univariate integers,
 univariate reals, vectors, row vectors matrices, including all of the
 constrained forms.
@@ -1029,7 +1029,7 @@ column of the third row of \code{y}.  The form \code{y[3,1]} is the
 preferred form (see \refnote{array-index-style} in this chapter).
 
 Subarrays may be manipulated and assigned just like any other
-variables.  Similar to the behavior of matrices, \Stan allows blocks
+variables.  Similar to the behavior of matrices, Stan allows blocks
 such as 
 %
 \begin{quote}
@@ -1304,7 +1304,7 @@ statements in the generated quantities block have executed.
 
 In order to refer to data types, it is convenient to have a way to
 refer to them.  The type naming notation outlined in this section is
-not part of the \Stan programming language, but rather a convention
+not part of the Stan programming language, but rather a convention
 adopted in this document to enable a concise description of a type.
 
 Because size information is not part of a data type, data
@@ -1319,14 +1319,14 @@ two-dimensional array of vectors.
 \chapter{Expressions}
 
 \noindent 
-An expression is the basic syntactic unit in a \Stan program that
-denotes a value.  Every expression in a well-formed \Stan program has
+An expression is the basic syntactic unit in a Stan program that
+denotes a value.  Every expression in a well-formed Stan program has
 a type that is determined statically (at compile time).  If an
-expressions type cannot be determined statically, the \Stan compiler
+expressions type cannot be determined statically, the Stan compiler
 (see \refsection{stanc}) will report the location of the problem.
 
 This chapter covers the syntax, typing, and usage of the various forms
-of expressions in \Stan. 
+of expressions in Stan. 
 
 \section{Numeric Literals}
 
@@ -1372,10 +1372,10 @@ denotes $2.7 \times 10^3$ and \code{-2E-5} denotes $-2 \times
 10^{-5}$.
 
 
-\section{Variables}
+\section{Variables}\label{variables.section}
 
 A variable by itself is a well-formed expression of the same type as
-the variable.  Variables in \Stan consist of \ASCII strings containing
+the variable.  Variables in Stan consist of \ASCII strings containing
 only the basic lower-case and upper-case Roman letters, digits, and
 the underscore (\code{\_}) character.  Variables must start with a
 letter (\code{a--z} and \code{A--Z}) and may not end with two underscores
@@ -1392,7 +1392,7 @@ Examples of legal variable identifiers are as follows.
 \ \code{myCamelCaseVariable}
 \end{quote}
 %
-Unlike in \R and \BUGS, variable identifiers in \Stan may not contain
+Unlike in \R and \BUGS, variable identifiers in Stan may not contain
 a period character.  
 
 \subsection{Reserved Names}
@@ -1416,7 +1416,7 @@ match the model.
 
 \subsubsection{Reserved Words from Stan Language}
 
-The following list contains reserved words for \Stan's programming
+The following list contains reserved words for Stan's programming
 language.  Not all of these features are implemented in Stan yet, but
 the tokens are reserved for future use.
 %
@@ -1629,10 +1629,10 @@ parentheses, this grouping may be made explicit with the expression
 
 \section{Arithmetic and Matrix Expressions}\label{arithmetic-expressions.section}
 
-For integer and real-valued expressions, \Stan supports the basic
+For integer and real-valued expressions, Stan supports the basic
 binary arithmetic operations of addition (\code{+}), subtraction
 (\code{-}), multiplication (\code{*}) and division (\code{/}) in the
-usual ways.  \Stan also supports the unary operation of negation for
+usual ways.  Stan also supports the unary operation of negation for
 integer and real-valued expressions.  For example, assuming \code{n}
 and \code{m} are integer variables and \code{x} and \code{y} real
 variables, the following expressions are legal.
@@ -1730,7 +1730,7 @@ tabular form in \reffigure{operator-precedence}.
 \\
 \code{-} & 1 & n/a & unary prefix & negation
 \\ 
-\code{+} & 1 & n/a & unary prefix & promotion (no-op in \Stan)
+\code{+} & 1 & n/a & unary prefix & promotion (no-op in Stan)
 \\ \hline
 \code{'} & 0 & n/a & unary postfix & transposition
 \\ \hline \hline
@@ -1773,7 +1773,7 @@ Transposition binds tighter than all other operations, so that
 
 \section{Subscripting}
 
-\Stan arrays, matrices, vectors, and row vectors are all accessed
+Stan arrays, matrices, vectors, and row vectors are all accessed
 using the same array-like notation.  For instance, if \code{x} is a
 variable of type \code{real[]} (a one-dimensional array of reals)
 then \code{x[1]} is the value of the first element of the
@@ -1803,7 +1803,7 @@ type \code{row\_vector}.
 
 \subsection{Mixing Array and Vector/Matrix Indexes}
 
-\Stan supports mixed indexing of arrays and their vector, row vector
+Stan supports mixed indexing of arrays and their vector, row vector
 or matrix values.  For example, if \code{m} is of type
 \code{matrix[,]}, a two-dimensional array of matrices, then
 \code{m[1]} refers to the first row of the array, which is a
@@ -1818,10 +1818,10 @@ row and second column of the array \code{m}.
 
 \section{Function Application}\label{function-application.section}
 
-\Stan provides a broad-range of built in mathematical and statistical
+Stan provides a broad-range of built in mathematical and statistical
 functions, which are documented in \refpart{built-in-functions}.
 
-Expressions in \Stan may consist of the name of function followed by a
+Expressions in Stan may consist of the name of function followed by a
 sequence of zero or more argument expressions.  For instance,
 \code{log(2.0)} is the expression of type \code{real} denoting the
 result of applying the natural logarithm to the value of the real
@@ -1868,7 +1868,7 @@ subexpressions.
 
 \subsection{Constants}
 
-Constants in \Stan are nothing more than nullary (no-argument)
+Constants in Stan are nothing more than nullary (no-argument)
 functions.  For instance, the mathematical constants $\pi$ and $e$ are
 represented as nullary functions named \code{pi()} and \code{e()}.
 See \refsection{built-in-constants} for a list of built-in constants.
@@ -1877,7 +1877,7 @@ See \refsection{built-in-constants} for a list of built-in constants.
 
 Because of integer to real type promotion, rules must be established
 for which function is called given a sequence of argument types.  The
-scheme employed by \Stan is the same as that used by \Cpp, which
+scheme employed by Stan is the same as that used by \Cpp, which
 resolves a function call to the function requiring the minimum number
 of type promotions.  
 
@@ -1906,7 +1906,7 @@ promoting the integer expression \code{1} to type \code{real}, it is
 able to match \code{foo(real,real)}, and hence the type of the
 function expression \code{foo(1,1.0)} is \code{real}.
 
-In some cases (though not for any built-in \Stan functions), a
+In some cases (though not for any built-in Stan functions), a
 situation may arise in which the function referred to by an
 expression remains ambiguous.  For example, consider a situation in
 which there are exactly two functions named \code{bar} with the
@@ -1929,7 +1929,7 @@ it matches the second signature.  The problem is that these both
 require one promotion, so the function name \code{bar} is ambiguous.
 If there is not a unique function requiring fewer promotions than all
 others, as with \code{bar(1,1)} given the two declarations above, 
-the \Stan compiler will flag the expression as illegal. 
+the Stan compiler will flag the expression as illegal. 
 
 \subsection{Random-Number Generating Functions}
 
@@ -2050,14 +2050,14 @@ The type of a variable declared locally or in a previous block is
 determined by its declaration.  The type of a loop variable is
 \code{int}.  
 
-There is always a unique declaration for each variable because Stan
-prohibits the redeclaration of an already-declared variables.%
+There is always a unique declaration for each variable in each scope
+because Stan prohibits the redeclaration of an already-declared
+variables.%
 %
 \footnote{Languages such as \Cpp and R allow the declaration of a
   variable of a given name in a narrower scope to hide (take
   precedence over for evaluation) a variable defined in a containing
-  scope.  Stan will have to introduce this behavior eventually for
-  user-defined functions written in Stan.}
+  scope.}
 
 \subsubsection{Indexing}
 
@@ -2102,11 +2102,6 @@ example, \code{row\_vector~*~vector} returns a value of type
 \code{real}, which is declared in the function documentation and index
 as \code{real~operator*(row\_vector,vector)}.
 
-% \subsection{Extending \Stan with User-Defined Functions}
-
-% \Stan enables users to add their own functions by defining appropriate
-% \Cpp functions and registering their signatures with the \Stan
-% compiler.  Details are provided in \refappendix{user-defined-functions}.
 
 
 \section{Chain Rule and Derivatives}
@@ -2203,16 +2198,16 @@ not-a-number output.
 \chapter{Statements}
 
 \noindent 
-The blocks of a \Stan program (see \refchapter{blocks}) are made up of
+The blocks of a Stan program (see \refchapter{blocks}) are made up of
 variable declarations and statements.  Unlike programs in \BUGS, the
-declarations and statements making up a \Stan program are executed in
+declarations and statements making up a Stan program are executed in
 the order in which they are written.  Variables must be defined to
 have some value (as well as declared to have some type) before they
 are used --- if they do not, the behavior is undefined.
 
-Like \BUGS, \Stan has two kinds of atomic statements, assignment
+Like \BUGS, Stan has two kinds of atomic statements, assignment
 statements and sampling statements.  Also like \BUGS, statements may
-be grouped into sequences and into for-each loops.  In addition, \Stan
+be grouped into sequences and into for-each loops.  In addition, Stan
 allows local variables to be declared in blocks and also allows an
 empty statement consisting only of a semicolon.
 
@@ -2248,7 +2243,7 @@ assignment operator, the right-hand-side expression and the
 semicolon).
 
 Because the right-hand side is evaluated first, it is possible to
-increment a variable in \Stan just as in \Cpp and other programming
+increment a variable in Stan just as in \Cpp and other programming
 languages by writing
 %
 \begin{quote}
@@ -2286,7 +2281,7 @@ This example also illustrates the preferred form of splitting a
 complex assignment statement and its expression across lines.
 
 Assignments to slices of larger multi-variate data structures are
-supported by \Stan.  For example, \code{a} is an array of type
+supported by Stan.  For example, \code{a} is an array of type
 \code{real[~,~]} and \code{b} is an array of type \code{real[]}, then
 the following two statements are both well-formed.
 %
@@ -2313,9 +2308,9 @@ Y[2] <- x;
 
 In \R, if \code{x} is a matrix or two-dimensional array, its first row
 is \code{x[1,]} and its first column is \code{x[,1]}.  As of version
-2.0, this notation is not supported by \Stan.  There are functions to
+2.0, this notation is not supported by Stan.  There are functions to
 access rows and columns of matrices, but general array slicing is not
-supported.  Similarly, \Stan 2.0 does not support providing an array of
+supported.  Similarly, Stan 2.0 does not support providing an array of
 indices as an argument to create a piecemeal subarray of a larger
 array.
 
@@ -2427,7 +2422,7 @@ printed every time \code{lp\_\_} is used.
 
 \section{Sampling Statements}\label{sampling-statements.section}
 
-Like \BUGS and \JAGS, \Stan supports probability statements in
+Like \BUGS and \JAGS, Stan supports probability statements in
 sampling notation, such as
 %
 \begin{quote}
@@ -2442,7 +2437,7 @@ be an unknown parameter or known, modeled data, is being declared
 to have the distribution indicated by the right-hand side of the
 sampling statement.
 
-Executing such a statement does not perform any sampling.  In \Stan, a
+Executing such a statement does not perform any sampling.  In Stan, a
 sampling statement is merely a notational convenience.  The above
 sampling statement could be expressed as a direct increment on the
 total log probability as
@@ -2593,7 +2588,7 @@ log\_diff\_exp operation as
 
 
 
-As in \BUGS and \JAGS, \Stan allows probability functions to be
+As in \BUGS and \JAGS, Stan allows probability functions to be
 truncated.  For example, a truncated unit normal distribution
 restricted to $(-0.5, 2.1)$ is encoded as follows.
 %
@@ -2730,17 +2725,6 @@ all values within bounds.
 Stan does not (yet) support vectorization of distribution functions
 with truncation.
 
-% \subsection{User-Defined Distributions}
-
-% Users may add their own probability functions and cumulative
-% distribution by adding functions of the appropriate type.  If the
-% appropriate cumulative distribution is available to match a
-% probability function, truncated versions of that probability function
-% may be used. 
-
-% See \refappendix{user-defined-functions} for details on how to add
-% user-defined functions to \Stan.
-
 
 \section{For Loops}
 
@@ -2777,7 +2761,7 @@ greater than or equal to 5 and less than or equal to 2.
 
 \subsection{Order Sensitivity and Repeated Variables}
 
-Unlike in \BUGS, \Stan allows variables to be reassigned.  For
+Unlike in \BUGS, Stan allows variables to be reassigned.  For
 example, the variable \code{theta} in the following program is
 reassigned in each iteration of the loop.
 %
@@ -2802,8 +2786,8 @@ a local variable by replacing \code{theta} in the above example with
 \code{theta[1]}, \ldots, \code{theta[N]}.  Of course, this is not a
 hack if the value of \code{theta[n]} is required for all \code{n}.}
 
-In \Stan, assignments are executed in the order they are encountered.
-As a consequence, the following \Stan program has a very different
+In Stan, assignments are executed in the order they are encountered.
+As a consequence, the following Stan program has a very different
 interpretation than the previous one.
 %
 \begin{quote}
@@ -2820,7 +2804,7 @@ probability statement.  This presupposes it was defined before the
 first loop iteration (otherwise behavior is undefined), and then each
 loop uses the assignment from the previous iteration. 
 
-\Stan loops may be used to accumulate values.  Thus it is possible to
+Stan loops may be used to accumulate values.  Thus it is possible to
 sum the values of an array directly using code such as the
 following.
 %
@@ -2947,7 +2931,7 @@ for (n in 1:N) {
 The open curly bracket (\code{\{}) is the first character of the block
 and the close curly bracket (\code{\}}) is the last character.
 
-Because whitespace is ignored in \Stan, the following program will
+Because whitespace is ignored in Stan, the following program will
 not compile.
 %
 \begin{quote}
@@ -3000,7 +2984,7 @@ for (n in 1:N) {
 The local variable \code{theta} is declared here inside the for loop.
 The scope of a local variable is just the block in which it is
 defined.  Thus \code{theta} is available for use inside the for loop,
-but not outside of it.  As in other situations, \Stan does not allow
+but not outside of it.  As in other situations, Stan does not allow
 variable hiding.  So it is illegal to declare a local variable
 \code{theta} if the variable theta is already defined in the scope of
 the for loop.  For instance, the following is not legal.
@@ -3053,7 +3037,7 @@ for (m in 1:M) {
 The variable declaration \code{int n;} is the first element of an
 embedded block and so has scope within that block.  The for loop
 defines its own local block implicitly over the statement following it
-in which the loop variable is defined.  As far as \Stan is concerned,
+in which the loop variable is defined.  As far as Stan is concerned,
 these two uses of \code{n} are unrelated.  
 
 \section{Print Statements}\label{print-statements.section}
@@ -3169,11 +3153,475 @@ not-a-number of infinite values, both of which will be printed.
 
 
 
+\chapter{User-Defined Functions}\label{functions.chapter}%
+%
+\noindent
+Stan allows users to define their own functions.  The basic syntax is
+a simplified version of that used in C and \Cpp.  This chapter
+specifies how functions are declare, defined, and used in Stan; see
+\refchapter{functions-programming} for a more programming-oriented
+perspective.
+
+\section{Function-Definition Block}
+
+User-defined functions appear in a special function-definition block
+before all of the other program blocks. 
+%
+\begin{quote}
+\begin{Verbatim}
+functions {
+   ... function declarations and definitions ...
+}
+data { 
+  ...
+\end{Verbatim}
+\end{quote}
+%
+Function definitions and declarations may appear in any order, subject
+to the condition that a function must be declared before it is used.
+Forward declarations are allowed in order to support recursive
+functions; see \refsection{function-overloading} for the precise rules
+governing declarations and definitions.
+
+\section{Function Names}
+
+The rules for function naming and function-argument naming are the
+same as for other variables; see \refsection{variables} for more
+information on valid identifiers.  For example,
+%
+\begin{quote}
+\begin{Verbatim}
+real foo(real mu, real sigma);
+\end{Verbatim}
+\end{quote}
+%
+declares a function named \code{foo} with two argument variables of
+types \code{real} and \code{real}.  The arguments are named \code{mu}
+and \code{sigma}, but that is not part of the declaration.  Two
+functions may have the same name if they have different sequences of
+argument types; see \refsection{function-overloading} for details.  A
+function may not have the same name and argument type sequence as
+another function, including a built-in function.
+
+\section{Calling Functions}
+
+All function arguments are mandatory---there are no default values
+(though see \refsection{function-overloading} for alternatives based
+on overloading).
+
+\subsection{Functions as Expressions}
+
+Functions with non-void return types are called just like any other
+built-in function in Stan---they are applied to appropriately typed
+arguments to produce an expression, which has a value when executed.
+
+\subsection{Functions as Statements}
+
+Functions with void return types may be applied to arguments and used
+as statements.  These act like sampling statements or print
+statements.  Such uses are only appropriate for functions that act
+through side effects, such as incrementing the log probability
+accumulator, printing, or raising exceptions.
+
+\subsection{Probability Functions in Sampling Statements}
+
+Functions whose name ends in \code{\_log} may be used as probability
+functions and may be used in place of parameterized distributions on
+the right-hand-side of sampling statements.   There is no restriction
+on where such functions may be used.
+
+\subsection{Restritions on Placement}
+
+Functions of certain types are restricted on scope of usage.
+Functions whose names end in \code{\_lp} assume access to the log
+probability accumulator and are only available in the transformed
+parameter and model blocks.  Functions whose names end in \code{\_rng}
+assume access to the random number generator and may only be used
+within the generated quantities block.  See \refsection{function-bodies} for more
+information on these two special types of function. 
+
+\section{Unsized Argument Types}
+
+Stan's functions all have declared types for both arguments and
+returned value.  As with built-in functions, user-defined functions are
+only declared for base argument type and dimensionality.  This
+requires a different syntax than for declaring other variables.  The
+choice of language was made so that return types and argument types
+could use the same declaration syntax.
+
+
+\subsection{Base Variable Type Declaration}
+
+The base variable types are \code{integer}, \code{real},
+\code{vector}, \code{row\_vector}, and \code{matrix}.  No lower-bound
+or upper-bound constraints are allowed (e.g., \code{real<lower=0>} is
+illegal).  Specialized types are also not allowed (e.g.,
+\code{simplex} is illegal) .
+
+\subsection{Dimensionality Declaration}
+
+Arguments and return types may be arrays, and these are indicated with
+optional brackets and commas as would be used for indexing.  For
+example, \code{int} denotes a single integer argument or return,
+whereas \code{real[\,]} indicates a one-dimensional array of reals,
+\code{real[\,,\,]} a two-dimensional array and \code{real[\,,\,,\,]} a
+three-dimensional array; whitespace is optional, as usual.  
+
+The dimensions for vectors and matrices are not included, so that
+\code{matrix} is the type of a single matrix argument or return type.
+Thus if a variable is declared as \code{matrix a}, then \code{a} has
+two indexing dimensions, so that \code{a[1]} is a row vector and
+\code{a[1,1]} a real value.  Matrices implicitly have two indexing
+dimensions.  The type declaration \code{matrix[,]~b} specifies that
+\code{b} is a two-dimensional array of matrices, for a total of four
+indexing dimensions, with \code{b[1,1,1,1]} picking out a real value.
+
+\subsection{Dimensionality Checks and Exceptions}
+
+Function argument and return types are not themselves checked for
+dimensionality.  A matrix of any size may be passed in as a matrix
+argument.  Nevertheless, a user-defined function might call a function
+(such as a multivariate normal density) that itself does
+dimensionality checks.
+
+Dimensions of function return values will be checked if they're
+assigned to a previously declared variable.  They may also be checked
+if they are used as the argument to a function.  
+
+Any errors raised by calls to functions inside user functions or
+return type mismatches are simply passed on;  this typically results
+in a warning message and rejection of a proposal during sampling or
+optimization.  
+
+\section{Function Bodies}\label{function-bodies.section}
+
+The body of a function is bounded by curly braces (\code{\{} and
+\code{\}}).  The body may contain local variable declarations at the
+top of the function body's block and these scope the same way as local
+variables used in any other statement block.
+
+The only restrictions on statements in function bodies are external,
+and determine whether the log probability accumulator or random
+number generators are available;  see the rest of this section for details.
+
+\subsection{Random Number Generating Functions}
+
+Functions that call random number generating functions in their bodies
+must have a name that ends in \code{\_rng}; attempts to use
+random-number generators in other functions leads to a compile-time
+error. 
+
+Like other random number generating functions, user-defined functions
+with names that end in \code{\_rng} may be used only in the generated
+quantities block.  An attempt to use such a function elsewhere results
+in a compile-time error.
+
+\subsection{Log Probability Access in Functions}
+
+Functions that include sampling statements or log probability
+increment statements must have a name that ends in \code{\_lp}.
+Attempts to use sampling statements or increment log probability
+statements in other functions leads to a compile-time error.
+
+Like the \code{increment\_log\_prob} statement and sampling
+statements, user-defined functions with names that end in \code{\_lp}
+may only be used in blocks where the log probability accumulator is
+accessible, namely the transformed parameters and model blocks.  An
+attempt to use such a function elsewhere results in a compile-time
+error.
+
+\subsection{Definining Probability Functions for Sampling Statements}
+
+Functions whose names end in \code{\_log} can be used as probability
+functions in sampling statements.  As with the built-in functions, the
+first argument will appear on the left of the sampling
+statement operator (\Verb|~|) in the sampling statement and the other
+arguments follow.  For example, with a function declared with signature
+%
+\begin{quote}
+\begin{Verbatim}
+real foo_log(real y, vector theta);
+\end{Verbatim}
+\end{quote}
+%
+allows the use of 
+%
+\begin{quote}
+\begin{Verbatim}
+real z;
+vector[K] phi;
+...
+z ~ foo(phi);
+\end{Verbatim}
+\end{quote}
+%
+to have the exact same effect as
+%
+\begin{quote}
+\begin{Verbatim}
+increment_log_prob(foo_log(z,phi);
+\end{Verbatim}
+\end{quote}
+%
+so that functions that are going to be accessed as distributions
+should be defined on the log scale.
+
+Unlike built-in probability functions, user-defined probability
+functions like the example \code{foo} above will not automatically
+drop constant terms.
+
+\section{Parameters are Constant}
+
+Within function definition bodies, the parameters may be used like any
+other variable.  But the parameters are constant in the sense that
+they can't be assigned to (i.e., can't appear on the left side of an
+assignment (\code{<-}) statement.  In other words, their value remains
+constant throughout the function body.  Attempting to assign a value
+to a function parameter value will raise a compile-time error.%
+%
+\footnote{Despite being declared constant and appearing to have a
+  pass-by-value syntax in Stan, the implementation of the language
+  passes function arguments by constant reference in C++.}
+
+Local variables may be declared at the top of the function block and
+scope as usual.
+
+\section{Return Value}\label{function-returns.section}
+
+Non-void functions must have a return statement that returns an
+appropriately typed expression.   If the expression in a return
+statement does not have the same type as the return type declared for
+the function, a compile-time error is raised.
+
+Void functions may use \code{return} only without an argument, but
+return statements are not mandatory.
+
+\subsection{Return Guarantee Required}
+
+Unlike \Cpp, Stan enforces a syntactic guarantee for non-void
+functions that ensures control will leave a non-void function through
+an appropriately typed return statement or because an exception is
+raised in the execution of the function.  To enforce this condition,
+functions must have a return statement as the last statement in their
+body.  This notion of last is defined recursively in terms of
+statements that qualify as bodies for functions.  The base case is that
+%
+\begin{itemize}
+\item a return statement qualifies,
+\end{itemize}
+%
+and the recursive cases are that
+%
+\begin{itemize}
+\item a sequence of statements qualifies if its last statement
+  qualifies,
+\item a for loop or while loop qualifies if its body qualifies, and
+\item a conditional statement qualifies if it has a default else
+  clause and all of its body statements qualify.
+\end{itemize}
+%
+These rules disqualify
+%
+\begin{quote}
+\begin{Verbatim}
+real foo(real x) {
+  if (x > 2) return 1.0;
+  else if (x <= 2) return -1.0;
+}
+\end{Verbatim}
+\end{quote}
+%
+because there is no default \code{else} clause, and 
+disqualify
+%
+\begin{quote}
+\begin{Verbatim}
+real foo(real x) {
+  real y;
+  y <- x;
+  while (x < 10) {
+    if (x > 0) return x;
+    y <- x / 2;
+  }
+}
+\end{Verbatim}
+\end{quote}
+%
+beause the return statement is not the last statement in the while
+loop.  A bogus dummy return could be placed after the while loop in
+this case.  The rules for returns allow
+%
+\begin{quote}
+\begin{Verbatim}
+real fancy_log(real x) {
+  if (x < 1e-30)
+    return x;
+  else if (x < 1e-14)
+    return x * x;
+  else
+    return log(x);
+}
+\end{Verbatim}
+\end{quote}
+%
+because there's a default else clause and each condition body has
+return as its final statement.
+
+
+\section{Void Functions as Statements}
+
+\subsection{Void Functions}
+
+A function can be declared without a return value by using \code{void}
+in place of a return type.
+
+\subsection{Usage as Statement}
+
+A void function may be used as a statement after the function is
+declared;  see \refsection{forward-declarations} for rules on declaration.
+
+Because there is no return, such a usage is only for side effects,
+such as incrementing the log probability function, printing, or
+raising an error.
+
+\subsection{Special Return Statements}
+
+In a return statement within a void function's definition, the
+\code{return} keyword is followed immediately by a semicolon
+(\code{;}) rather than by the expression whose value is returned.
+
+
+\section{Overloading}\label{function-overloading.section}
+
+Stan allows function overloading, where two functions have the same
+name.  For example, an overloaded unit-normal log density function
+might be declared with an overload of the function
+\code{unit\_normal\_log}, giving it three signatures with one argument
+each.
+%
+\begin{quote}
+\begin{Verbatim}
+real unit_normal_log(real y);
+real unit_normal_log(vector y);
+real unit_normal_log(row_vector y);
+\end{Verbatim}
+\end{quote}
+%
+The sequence of argument types must be distinct for each distinct
+function; attempting to declare two functions with the same name
+and argument type sequence will cause a compile-time error, even if
+the return types or argument names are different.  For instance, it
+would not be possible to add the following declaration to those
+above. 
+%
+\begin{quote}
+\begin{Verbatim}
+vector unit_normal_log(vector y);
+\end{Verbatim}
+\end{quote}
+
+
+\subsection{Overloading for Defaults}
+
+In order to write functions with default values, the function must be
+overloaded; see \refsection{function-overloading} for more on
+overloading.  Overloading comes with no guarantees that the overloaded
+functions all share an underlying implementation.   For example, the function
+\code{unit\_normal\_log} above could've just been named
+\code{normal\_log} and used to overload the regular normal function
+with default parameter values (0 location and 1 scale).
+
+Functions are not called using named arguments, the options for
+defaults are more limited than with named arguments in languages such
+as R.  For example, it would not be possible to define two
+two-argument normal density functions, one of which specified a
+location and one of which specified a scale, 
+%
+\begin{quote}
+\begin{Verbatim}
+real normal_log(real y, real mu);
+real normal_log(real y, real sigma); // illegal 
+\end{Verbatim}
+\end{quote}
+%
+because they have the same argument-type sequence, (\code{real},
+\code{real}).
+
+
+\section{Declarations}\label{forward-declarations.section}
+
+In general, functions must be declared before they are used.  Stan
+supports forward declarations, which look like function definitions
+without bodies.  For example,
+%
+\begin{quote}
+\begin{Verbatim}
+real unit_normal_log(real y); 
+\end{Verbatim}
+\end{quote}
+%
+declares a function named \code{unit\_normal\_log} that consumes a
+single real-valued input and produces a real-valued output.  A
+function definition with a body simultaneously declares and defines
+the named function, as in
+%
+\begin{quote}
+\begin{Verbatim}
+real unit_normal_log(real y) {
+  return -0.5 * square(y);
+}
+\end{Verbatim}
+\end{quote}
+%
+
+A user-defined Stan function may be declared and then later defined,
+or just defined without being declared.  No other combination of
+declaration and definition is legal, so that, for instance, a function
+may not be declared more than once, nor may it be defined more than
+once.  If there is a declaration, there must be a definition.  These
+rules together ensure that all the declared functions are eventually
+defined.
+
+\subsection{Recursive Functions}
+
+Forward declarations allow the definition of mutually recursive
+functions.  For instance, consider the following code to sum the
+application of \code{foo} to each element of a vector.
+%
+\begin{quote}
+\begin{Verbatim}
+real foo(real z) {
+  return 2 * log(z);
+}
+
+real sum_foo_2(vector x1, vector x2);
+
+real sum_foo(vector x) {
+  if (x.size() == 0) return 0;
+  else if (x.size() == 1) return foo(x);
+  else return sum_foo_2(x.first(x.size() / 2), 
+                        x.last(x.size() - x.size() / 2));
+}
+
+real sum_foo_2(vector x, vector y) {
+  return sum_foo(x) + sum_foo(y);
+}
+\end{Verbatim}
+\end{quote}
+%
+Without the forward declaration of \code{sum\_foo\_2}, the body of the
+definition of \code{sum\_foo} would fail to compile, because the
+identifier \code{sum\_foo\_2} would not be the name of a known
+function with appropriate argument and return types.
+
+
+
+
 
 \chapter{Program Blocks}\label{blocks.chapter}
 
 \noindent
-A \Stan program is organized into a sequence of named blocks, the
+A Stan program is organized into a sequence of named blocks, the
 bodies of which consist of variable declarations, followed in the case
 of some blocks with statements.  
 
@@ -3204,13 +3652,16 @@ encodings like UTF-16, Big5, etc.%
   \code{*/} and \code{*/}.}
 
 
-\section{Overview of \Stan's Program Blocks}
+\section{Overview of Stan's Program Blocks}
 
 The full set of named program blocks is exemplified in the following
-skeletal \Stan program.
+skeletal Stan program.
 %
 \begin{quote}
 \begin{Verbatim} 
+functions {
+  ... function declarations and definitions ...
+}
 data { 
   ... declarations ...
 }
@@ -3232,6 +3683,18 @@ generated quantities {
 \end{Verbatim}
 \end{quote}
 %
+The function-definition block contains user-defined functions.  The
+data block declares the required data for the model.  The transformed
+data block allows the definition of constants and transforms of the
+data.  The parameters block declares the model's parameters --- the
+unconstrained version of the parameters is what's sampled or
+optimized.  The transformed parameters block allows variables to be
+defined in terms of data and parameters that may be used later and
+will be saved.  The model block is where the log probability function
+is defined.  The generated quantities block allows derived quantities
+based on parameters, data, and optionally (pseudo) random number
+generation.
+
 
 \subsection{Optionality and Ordering}
 
@@ -3247,10 +3710,31 @@ The variables declared in each block have scope over all subsequent
 statements.  Thus a variable declared in the transformed data block
 may be used in the model block.  But a variable declared in the
 generated quantities block may not be used in any earlier block,
-including the model block.
+including the model block.  The exception to this rule is that
+variables declared in the model block are always local to the model
+block and may not be accessed in the generated quantities block; to
+make a variable accessible in the model and generated quantities
+block, it must be declared as a transformed parameter.
 
-However, variables declared in the model block are always local to 
-the model block.
+Variables declared as function parameters have scope only within that
+function definition's body, and may not be assigned to (they are
+constant).
+
+\subsection{Function Scope}
+
+Functions defined in the function block may be used in any appropriate
+block.  Most functions can be used in any block and applied to a
+mixture of parameters and data (including constants or program
+literals).  
+
+Random-number-generating functions are restricted to the generated
+quantities block; such functions are suffixed with \code{\_rng}.
+Log-probability modifying functions to blocks where the log
+probability accumulator is in scope (transformed parameters and
+model); such functions are suffixed with \code{\_lp}.
+
+Density functions defined in the program may be used in sampling
+statements.  
 
 \subsection{Automatic Variable Definitions}
 
@@ -3332,7 +3816,7 @@ defined is given in \reffigure{block-actions}.
 \end{tabular}
 \end{center}
 \caption{\it The read, write, transform, and evaluate actions and
-  periodicities listed in the last column correspond to the \Stan
+  periodicities listed in the last column correspond to the Stan
   program blocks in the first column.  The middle column indicates
   whether the block allows statements.  The last row indicates that 
   parameter initialization requires a read and transform operation
@@ -3423,7 +3907,7 @@ loop indices & loop statement
 \cite[p.~366]{GelmanHill:2007} provides a taxonomy of the kinds of
 variables used in Bayesian models.  \reffigure{variable-kinds} contains
 Gelman and Hill's taxonomy along with a missing-data kind along with
-the corresponding locations of declarations and definitions in \Stan.
+the corresponding locations of declarations and definitions in Stan.
 
 Constants can be built into a model as literals, data variables, or
 as transformed data variables.  If specified as variables, their
@@ -3483,7 +3967,7 @@ used to indicate a size that is not part of the model itself.
 The other variables declared in the data and transformed data block are
 examples of unmodeled parameters, also known as hyperparameters.
 Unmodeled parameters are parameters to probability densities that are
-not themselves modeled probabilistically.  In \Stan, unmodeled
+not themselves modeled probabilistically.  In Stan, unmodeled
 parameters that appear in the \code{data} block may be specified on a
 per-model execution basis as part of the data read.  In the above
 model, \code{mu\_mu} and \code{sigma\_mu} are configurable unmodeled
@@ -3539,7 +4023,7 @@ process will read the data exactly once.%
 %
 \footnote{With multiple threads, or even running chains sequentially
   in a single thread, data could be read only once per set of
-  chains. \Stan was designed to be thread safe and future versions 
+  chains. Stan was designed to be thread safe and future versions 
   will provide a multithreading option for Markov chains.\label{thread.footnote}}
 %
 
@@ -3599,16 +4083,16 @@ used.  Random number generating functions are also prohibited.
 
 Any constraints on variables declared in the \code{transformed data}
 block are checked after the statements are executed.  If any defined
-variable violates its constraints, \Stan will halt with a diagnostic
+variable violates its constraints, Stan will halt with a diagnostic
 error message.
 
 
 \section{Program Block: \code{parameters}}
 
 The variables declared in the \code{parameters} program block
-correspond directly to the variables being sampled by \Stan's samplers
+correspond directly to the variables being sampled by Stan's samplers
 (\HMC and \NUTS).  From a user's perspective, the parameters in the
-program block \emph{are} the parameters being sampled by \Stan.  
+program block \emph{are} the parameters being sampled by Stan.  
 
 Variables declared as parameters cannot be directly assigned values.
 So there is no block of statements in the \code{parameters} program
@@ -3618,7 +4102,7 @@ or may be defined as local variables in any statement blocks following
 their declaration.
 
 There is a substantial amount of computation involved for parameter
-variables in a \Stan program at each leapfrog step within the
+variables in a Stan program at each leapfrog step within the
 \HMC or \NUTS samplers, and a bit more computation along with writes
 involved for saving the parameter values corresponding to a sample.
 
@@ -3633,20 +4117,20 @@ unconstrained.
 
 In practice, the samplers keep an unconstrained parameter vector in
 memory representing the current state of the sampler.  The model
-defined by the compiled \Stan program defines an (unnormalized) log
+defined by the compiled Stan program defines an (unnormalized) log
 probability function over the unconstrained parameters.  In order to
 do this, the log probability function must apply the inverse transform
 to the unconstrained parameters to calculate the constrained
-parameters defined in \Stan's \code{parameters} program block.  The
+parameters defined in Stan's \code{parameters} program block.  The
 log Jacobian of the inverse transform is then added to the accumulated
-log probability function.  This then allows the \Stan model to be
+log probability function.  This then allows the Stan model to be
 defined in terms of the constrained parameters.
 
 In some cases, the number of parameters is reduced in the
 unconstrained space.  For instance, a $K$-simplex only requires $K-1$
 unconstrained parameters, and a $K$-correlation matrix only requires
 $\binom{K}{2}$ unconstrained parameters.  This means that the
-probability function defined by the compiled \Stan program may have
+probability function defined by the compiled Stan program may have
 fewer parameters than it would appear from looking at the declarations
 in the \code{parameters} program block. 
 
@@ -3664,7 +4148,7 @@ to be evaluated during every leapfrog step.  There may be one leapfrog
 step per sample or hundreds, with more being required for models with
 complex posterior distribution geometries.
 
-Gradients are calculated behind the scenes using \Stan's algorithmic
+Gradients are calculated behind the scenes using Stan's algorithmic
 differentiation library.  The time to compute the gradient does not
 depend directly on the number of parameters, only on the number of
 subexpressions in the calculation of the log probability.  This
@@ -3676,7 +4160,7 @@ calculations.
 
 \subsection{Writing Samples}
 
-In the basic \Stan compiled program, the values of variables are
+In the basic Stan compiled program, the values of variables are
 written to a file for each sample.  The constrained versions of the
 variables are written, again in the order they are defined in the
 \code{parameters} block.  In order to do this, the transformed
@@ -3735,7 +4219,7 @@ generated quantities block are
 \end{itemize}
 %
 Forward samples, event probabilities and statistics may all be
-calculated directly using plug-in estimates.  \Stan automatically
+calculated directly using plug-in estimates.  Stan automatically
 provides full Bayesian inference by producing samples from the
 posterior distribution of any calculated event probabilities,
 predictions, or statistics.  See \refchapter{bayesian} for more
@@ -3759,7 +4243,7 @@ the output.
 \chapter{Modeling Language Syntax}
 
 \noindent
-This chapter defines the basic syntax of the \Stan modeling language
+This chapter defines the basic syntax of the Stan modeling language
 using a Backus-Naur form (\BNF) grammar plus extra-grammatical
 constraints on function typing and operator precedence and
 associativity.
@@ -3770,16 +4254,20 @@ associativity.
 \subsection{Syntactic Conventions}
 
 In the following \BNF grammars, literal strings are indicated in
-single quotes (\code{'}).  Grammar non-terminals are unquoted strings.
-A prefix question mark (\code{?})  indicates optionality.  A postfixed
-Kleene star (\code{*}) indicates zero or more occurrences.
+single quotes (\Verb|'|).  Grammar non-terminals are unquoted strings.
+A prefix question mark (\code{?A}) indicates optionality of \code{A}.
+A postfixed Kleene star (\code{A*}) indicates zero or more occurrences
+of \code{A}.  The notation \code{A \% B}, following the Boost Spirit
+parser library's notation, is shorthand for \code{?(A (B A)*)}, i.e.,
+any number of \code{A} (including zero), separated by \code{B}.
 
 \subsection{Programs}
 
 {\small
 \begin{Verbatim}[fontsize=\small]
-program ::= ?data ?tdata ?params ?tparams model ?generated
+program ::= ?functions ?data ?tdata ?params ?tparams model ?generated
 
+functions ::= 'functions' function_decls
 data ::= 'data' var_decls
 tdata ::= 'transformed data' var_decls_statements
 params ::= 'parameters' var_decls
@@ -3787,8 +4275,23 @@ tparams ::= 'transformed parameters' var_decls_statements
 model ::= 'model' statement
 generated ::= 'generated quantities' var_decls_statements
 
+function_decls ::= '{' function_decl* '}'
 var_decls ::= '{' var_decl* '}'
 var_decls_statements ::= '{' var_decl* statement* '}'
+\end{Verbatim}
+}
+
+\subsection{Function Declarations}
+
+{
+\small
+\begin{Verbatim}[fontsize=\small]
+funtion_decl ::= unsized_type identifier '(' unsized_types ')' statement
+
+unsized_types ::= unsized_type % ','
+unsized_type ::= 'void' | (basic_type ?unsized_dims)
+basic_type ::= 'int' | 'real' | 'vector' | 'row_vector' | 'matrix'
+unsized_dims ::= '['  ','*  ']'
 \end{Verbatim}
 }
 
@@ -3818,7 +4321,7 @@ range ::= 'lower' '=' expression ',' 'upper' = expression
         | 'lower' '=' expression
         | 'upper' '=' expression
 
-dims ::= '['  expression (',' expression)*  ']'
+dims ::= '['  expressions ']'
 
 variable ::= identifier
 
@@ -3831,6 +4334,7 @@ identifier ::= [a-zA-Z] [a-zA-Z0-9_]*
 {
 \small
 \begin{Verbatim}[fontsize=\small]
+expressions ::= expression % ','
 expression ::= numeric_literal
              | variable
              | expression infixOp expression
@@ -3840,8 +4344,7 @@ expression ::= numeric_literal
              | function_literal '(' ?expressions ')'
              | '(' expression ')'
 
-expressions ::= expression
-              | expression ',' expressions
+expressions ::= expression % ','
 
 numeric_literal ::= int_literal | real_literal
 
@@ -3860,26 +4363,33 @@ function_literal ::= identifier
 {
 \small
 \begin{Verbatim}[fontsize=\small]
-statement 
-::= lhs '<-' expression ';'
-  | expression '~' identifier '(' ?expressions ')' ?truncation ';'
+statement ::= atomic_statement | nested_statement
+
+atomic_statement ::= atomic_statement_body ';'
+atomic_statement_body
+::=  lhs '<-' expression
+   | expression '~' identifier '(' expressions ')' ?truncation
+   | function_literal '(' expressions ')'
+   | 'increment_log_prob '(' expression ')'
+   | 'print' '(' (expression | string_literal)* ')'
+   | 'return' expression
+   | ''
+
+string_literal ::= '"' char* '"'
+
+truncation ::= 'T' '[' ?expression ',' ?expression ']'
+
+lhs ::= identifier ?indices
+indices ::= '[' expressions ']'
+
+nested_statement
+::=
   | 'if' '(' expression ')' statement
     ('else' 'if' '(' expression ')' statement)*
     ?('else' statement)
   | 'while' '(' expression ')' statement
   | 'for' '(' identifier 'in' expression ':' expression ')' statement
   | '{' var_decl* statement+ '}'
-  | 'print' '(' (expression | string_literal)* ')'
-  | 'increment_log_prob '(' expression ')'
-  | ';'
-
-string_literal ::= '"' char* '"'
-
-truncation ::= 'T' '[' ?expression ',' ?expression ']'
-
-lhs ::= identifier
-      | identifier '[' expressions ']'
-
 \end{Verbatim}
 %
 }
@@ -3888,7 +4398,7 @@ lhs ::= identifier
 
 \subsection{Type Constraints}
 
-A well-formed \Stan program
+A well-formed Stan program
 must satisfy the type constraints imposed by functions and
 distributions.  For example, the binomial distribution requires an
 integer total count parameter and integer variate and when truncated
@@ -3899,9 +4409,9 @@ argument types, see \refpart{built-in-functions}.
 
 \subsection{Operator Precedence and Associativity}
 
-In the \Stan grammar provided in this chapter, the expression \code{1
+In the Stan grammar provided in this chapter, the expression \code{1
   + 2 * 3} has two parses.  As described in
-\refsection{arithmetic-expressions}, \Stan disambiguates between the
+\refsection{arithmetic-expressions}, Stan disambiguates between the
 meaning $1 + (2 \times 3)$ and the meaning $(1 + 2) \times 3$ based on
 operator precedences and associativities. 
 
