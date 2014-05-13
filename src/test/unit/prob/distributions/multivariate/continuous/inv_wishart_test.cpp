@@ -77,6 +77,32 @@ TEST(ProbDistributionsInvWishart,DefaultPolicy) {
   EXPECT_THROW(inv_wishart_log(Y, nu, Sigma), std::domain_error);
 }
 
+TEST(ProbDistributionsInvWishart, identity_sigma) {
+  boost::random::mt19937 rng;
+  using Eigen::MatrixXd;
+  
+  MatrixXd sigma;
+  MatrixXd Z;
+  int N = 1e5;
+  double tol = .1;
+  for (int k = 1; k < 5; k++) {
+    sigma = MatrixXd::Identity(k, k);
+    Z = MatrixXd::Zero(k, k);
+    for (int i = 0; i < N; i++)
+      Z += stan::prob::inv_wishart_rng(k + 2, sigma, rng);
+    Z /= N;
+    //std::cout << Z << std::endl;
+    for (int j = 0; j < k; j++) {
+      for (int i = 0; i < k; i++) {
+        if (j == i)
+          EXPECT_NEAR(Z(i, j), 1.0, tol);
+        else
+          EXPECT_NEAR(Z(i, j), 0.0, tol);
+      }
+    }
+  }
+}
+
 TEST(ProbDistributionsInvWishart, error_checks) {
   boost::random::mt19937 rng;
 
