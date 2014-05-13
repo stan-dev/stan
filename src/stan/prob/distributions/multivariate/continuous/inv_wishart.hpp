@@ -157,7 +157,7 @@ namespace stan {
         Z(j,j) = std::sqrt(chi_square_rng(nu--, rng));
       }
       
-      Z = Z * S.llt().matrixU();
+      Z = Z * S.inverse().transpose().llt().matrixU();
 
       return (Z.transpose() * Z).inverse();
     }
