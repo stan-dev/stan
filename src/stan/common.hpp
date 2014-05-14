@@ -9,6 +9,7 @@
 #include <stan/common/init_windowed_adapt.hpp>
 #include <stan/common/print_progress.hpp>
 #include <stan/common/run_markov_chain.hpp>
+#include <stan/common/recorder.hpp>
 #include <stan/common/sample.hpp>
 #include <stan/common/warmup.hpp>
 #include <stan/common/write_error_msg.hpp>
