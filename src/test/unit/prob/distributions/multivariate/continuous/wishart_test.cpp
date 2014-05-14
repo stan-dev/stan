@@ -155,3 +155,30 @@ TEST(ProbDistributionsWishart, marginalTwoChiSquareGoodnessFitTest) {
 
   EXPECT_TRUE(chi < quantile(complement(mydist, 1e-6)));
 }
+
+
+TEST(ProbDistributionsWishart, SpecialChiSquare) {
+  boost::random::mt19937 rng;
+  using Eigen::MatrixXd;
+  using Eigen::VectorXd;
+
+  MatrixXd sigma(3,3);
+  sigma << 9.0, -3.0, 1.0,
+    2.0,  4.0, -1.0,
+    2.0, 1.0, 3.0;
+  
+  VectorXd C(3);
+  C << 2, 1, 3;
+  
+  size_t N = 10000;
+  int k = 20;
+  double tol = 0.001;
+  std::vector<double> acum;
+  acum.reserve(N);
+  for (size_t i = 0; i < N; i++)
+    acum.push_back((C.transpose() * stan::prob::wishart_rng(k, sigma, rng) * C)(0) /
+           (C.transpose() * sigma * C)(0));
+
+  EXPECT_NEAR(k, stan::math::mean(acum), tol);
+  EXPECT_NEAR(2*k, stan::math::variance(acum), tol);
+}

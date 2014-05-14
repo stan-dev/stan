@@ -167,7 +167,8 @@ namespace stan {
       
       //return stan::math::multiply_lower_tri_self_transpose(S.llt().matrixL() * B);
       
-      B = B * S.transpose().llt().matrixU();
+      
+      B = B * (0.5 * (S + S.transpose())).llt().matrixU();
       
       return B.transpose() * B;
     }
