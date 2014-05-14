@@ -9,12 +9,9 @@
 #include <stan/agrad/rev.hpp>
 #include <stan/agrad/rev/matrix.hpp>
 #include <stan/prob/distributions/multivariate/continuous/wishart.hpp>
-#include <stan/prob/distributions/univariate/continuous/chi_square.hpp>
-#include <stan/prob/distributions/univariate/continuous/normal.hpp>
 #include <stan/math/matrix/log_determinant_ldlt.hpp>
 #include <stan/math/matrix/mdivide_left_ldlt.hpp>
 #include <stan/math/error_handling/matrix/check_ldlt_factor.hpp>
-
 
 namespace stan {
   namespace prob {
@@ -134,7 +131,7 @@ namespace stan {
 
     template <class RNG>
     inline Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>
-    inv_wishart_rng(double nu,
+    inv_wishart_rng(const double nu,
                     const Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& S,
                     RNG& rng) {
 
@@ -144,22 +141,16 @@ namespace stan {
       using stan::math::check_size_match;
       using Eigen::MatrixXd;
 
-      typename Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>::size_type k = S.rows();
+      typename MatrixXd::size_type k = S.rows();
       check_greater(function, nu, k-1, "Degrees of freedom parameter");
       check_size_match(function, 
                        k, "Rows of scale parameter",
                        S.cols(), "columns of scale parameter");
 
-      MatrixXd Z = MatrixXd::Zero(k, k);
-      for (int j = 0; j < k; ++j) {
-        for (int i = 0; i < j; ++i)
-          Z(i, j) = normal_rng(0, 1, rng);
-        Z(j,j) = std::sqrt(chi_square_rng(nu--, rng));
-      }
-      
-      Z = Z * S.inverse().transpose().llt().matrixU();
+      MatrixXd S_inv = MatrixXd::Identity(k, k);
+      S_inv = S.ldlt().solve(S_inv);
 
-      return (Z.transpose() * Z).inverse();
+      return wishart_rng(nu, S_inv, rng).inverse();
     }
   }
 }
