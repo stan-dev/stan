@@ -426,9 +426,9 @@ The posterior mean is often called {\it the}\ Bayesian estimator,
 because it's the estimator that minimizes the expected square error of
 the estimate.
 
-An estimate of the posterior mean for each parameter is returned by Stan's
-\code{bin/print} command (see \refchapter{print-command}) under the
-column headed \code{Mean}.
+An estimate of the posterior mean for each parameter is returned by
+Stan's interfaces;  see the RStan, CmdStan, and PyStan user's guides
+for details on the interfaces and data formats.  
 
 Posterior means exist in many situations where posterior
 modes do not exist.  For example, in the $\distro{Beta}(0.1, 0.1)$
@@ -453,8 +453,9 @@ the case of a uniform distribution on a closed interval.
 The posterior median (i.e., 50th percentile or 0.5 quantile) is
 another popular point estimate reported for Bayesian models.  The
 posterior median minimizes the expected absolute error of estimates.
-These estimates are returned in the columns headed by \Verb|50%|
-in \code{bin/print} (see \refchapter{print-command}).
+These estimates are returned in the various Stan interfaces;  see the
+RStan, PyStan and CmdStan user's guides for more information on
+format. 
 
 Although posterior medians may fail to be meaningful, they often exist
 even where posterior means do not, as in the Cauchy distribution.
@@ -1172,11 +1173,11 @@ In addition to standard \HMC, \Stan implements an adaptive version of
 tunes a step sizes during warmup.  A global step size is optimized for
 a target Metropolis-Hastings reject rate using dual averaging; see
 \citep{Nesterov:2009} for details of dual averaging and
-\citep{Hoffman-Gelman:2011,Hoffman-Gelman:2014} 
-for details of its use in \Stan.  For
-information on run-time configuration of step-size adaptation, see
-\refsection{stan-command-line-options}.  Then step sizes per parameter
-are estimated during warmup.  
+\citep{Hoffman-Gelman:2011,Hoffman-Gelman:2014} for details of its use
+in \Stan.  For information on run-time configuration of step-size
+adaptation, see the interface-specific user's guides for RStan,
+PyStan, or CmdStan.  The step sizes per parameter are estimated
+during warmup.
 
 \subsection{Number of Steps}
 
