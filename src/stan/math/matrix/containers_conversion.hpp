@@ -25,7 +25,7 @@ namespace stan {
     //matrix to_matrix(real[,])
     template <typename T>
     inline Matrix<T, Dynamic, Dynamic>
-    to_matrix(const std::vector< std::vector<T> > & vec) {
+    to_matrix(const vector< vector<T> > & vec) {
       vector<int> RC = dims(vec);
       int R = RC[0];
       int C = RC[1];
@@ -39,7 +39,7 @@ namespace stan {
     
     //matrix to_matrix(int[,])
     inline Matrix<double, Dynamic, Dynamic>
-    to_matrix(const std::vector< std::vector<int> > & vec) {
+    to_matrix(const vector< vector<int> > & vec) {
       vector<int> RC = dims(vec);
       int R = RC[0];
       int C = RC[1];
@@ -63,13 +63,13 @@ namespace stan {
     //vector to_vector(real[])
     template <typename T>
     inline Matrix<T, Dynamic, 1>
-    to_vector(const std::vector<T> & vec) {
+    to_vector(const vector<T> & vec) {
       return Matrix<T, Dynamic, 1>::Map(vec.data(), vec.size());
     }
     
     //vector to_vector(int[])
     inline Matrix<double, Dynamic, 1>
-    to_vector(const std::vector<int> & vec) {
+    to_vector(const vector<int> & vec) {
       int R = vec.size();
       Matrix<double, Dynamic, 1> result(R);
       double* datap = result.data();
@@ -90,13 +90,13 @@ namespace stan {
     //row_vector to_row_vector(real[])
     template <typename T>
     inline Matrix<T, 1, Dynamic>
-    to_row_vector(const std::vector<T> & vec) {
+    to_row_vector(const vector<T> & vec) {
       return Matrix<T, 1, Dynamic>::Map(vec.data(), vec.size());
     }
     
     //row_vector to_row_vector(int[])
     inline Matrix<double, 1, Dynamic>
-    to_row_vector(const std::vector<int> & vec) {
+    to_row_vector(const vector<int> & vec) {
       int C = vec.size();
       Matrix<double, 1, Dynamic> result(C);
       double* datap = result.data();
@@ -134,20 +134,20 @@ namespace stan {
 
     //real[] to_array_1d(...)
     template <typename T>
-    inline std::vector<T>
-    to_array_1d(const std::vector<T> & x) {
+    inline vector<T>
+    to_array_1d(const vector<T> & x) {
       return x;
     }
-
+        
     //real[] to_array_1d(...)    
     template <typename T>
-    inline std::vector<typename stan::scalar_type<T>::type>
-    to_array_1d(const std::vector< std::vector<T> > & x) {
+    inline vector<typename scalar_type<T>::type>
+    to_array_1d(const vector< vector<T> > & x) {
       size_t size1 = x.size();
       size_t size2 = 0;
       if (size1 != 0)
         size2 = x[0].size();
-      std::vector<T> y(size1*size2);
+      vector<T> y(size1*size2);
       for(size_t i=0, ij=0; i < size1; i++)
         for(size_t j=0; j < size2; j++, ij++)
           y[ij] = x[i][j];
