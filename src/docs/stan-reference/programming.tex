@@ -305,6 +305,118 @@ the reality of the code.  A misleading comment or one that is wrong is
 worse than no comment at all!
 
 
+\chapter{Data Types}
+
+\noindent
+Every expression in Stan that denotes a value, such as variables,
+constants, function or operator applications, indexing, and so on, has
+a type.   The following chapter provides a detailed comparison of the
+differences among the container types: arrays, vectors, and matrices.
+
+\section{Basic Data Types}
+
+Stan provides two primitive data types, \code{real} for continuous
+values and \code{int} for integer values.
+
+Stan provides three matrix-based data types, \code{vector} for column
+vectors, \code{row\_vector} for row vectors, and \code{matrix} for
+matrices.
+
+\section{Constrained Data Types}
+
+Declarations of data, transformed data, parameter, transformed
+parameter, and generated quantities variables may involve constrained
+forms of the basic data types.
+
+Constraints provide error checking for data, transformed data,
+transformed parameter, and generated quantities types.  
+
+Constraints are critical for variables declared in the
+\code{parameters} block.  The constraints on parameters must match the
+support on the parameters in the model for sampling or optimization to
+work efficiently (or at all).
+
+
+\subsection{Upper and Lower Bounds}
+
+All of the basic data types may be given lower and upper bounds using
+syntax such as
+%
+\begin{quote}
+\begin{Verbatim}
+int<lower=1> N;
+real<upper=0> log_p;
+vector<lower=-1,upper=1>[3,3] corr;
+\end{Verbatim}
+\end{quote}
+
+\subsection{Structured Vectors}
+
+There are also special data types for structured vectors.  These are
+\code{ordered} for a vector of values ordered in increasing order, and
+\code{positive\_ordered} for a vector of positive values ordered in
+increasing order.  
+
+There is also a type \code{simplex} for vectors of non-negative values
+that sum to one, and \code{unit\_vector} for vectors of values whose
+squares sum to one.
+
+\subsection{Structured Matrices}
+
+Symmetric, positive-definite matrices have the type
+\code{cov\_matrix}.  Correlation matrices, which are symmetric
+positive-definite matrices with unit diagonals, have the type
+\code{corr\_matrix}.
+
+For both correlation and covariance matrices, there are corresponding
+Cholesky factor types, \code{cholesky\_corr} and
+\code{cholesky\_cov}.  Using these can be much more efficient than the
+full correlation and covariance matrices because they are easier to
+factor and scale.
+
+
+\section{Arrays}
+
+Any type can be made into an array type by declaring array arguments.
+For example,
+%
+\begin{quote}
+\begin{Verbatim}
+real x[10];
+matrix<lower=-1,upper=1>[3,3] m[6,7];
+\end{Verbatim}
+\end{quote}
+delcares \code{x} to be a one-dimensional array of size 10 containing
+real values, and declares \code{m} to be a two-dimensional array of
+size $6 \times 7$ containing values that are $3 \times 3$ matrices
+with values falling between -1 and 1.
+
+
+\section{Assignment and Argument Passing}
+
+\subsection{Assignment}
+
+Constrained data values may be assigned to unconstrained variables of
+matching basic type and vice-versa.   Matching is interpreted strictly
+as having the same basic type and number of array dimensions.
+Constraints are not considered, but basic data types are.  
+
+Vectors and matrices are basic types, whereas arrays are collections
+of values of some basic types.  Arrays cannot be assigned to vectors
+and vice-versa.  Similarly, vectors cannot be assigned to matrices and
+vice-versa, even if their dimensions conform.  \refchapter{containers}
+provides more information on the distinctions between vectors and
+arrays and when each is appropriate.
+
+\subsection{Function Invocation}
+
+Stan functions are only specified for the basic (and array) data type
+of their arguments, not for constraints.  Variables with constrained
+types may nevertheless be passed to 
+
+
+
+
 \chapter{Containers: Arrays, Vectors, and Matrices}\label{containers.chapter}
 
 \noindent
@@ -609,7 +721,7 @@ data {
 }
 parameters {
   real alpha;           // intercept
-  vector[N] beta;       // coefficients for predictors
+  vector[K] beta;       // coefficients for predictors
   real<lower=0,upper=10> sigma;  // error scale
 }
 model {
@@ -631,6 +743,26 @@ The sampling statement in the model above is equivalent to
 With Stan's matrix indexing scheme, \code{x[n]} picks out row \code{n}
 of the matrix \code{x};  because \code{beta} is a column vector, 
 the product \code{x[n] * beta} is a scalar of type \code{real}.
+
+\subsubsection{Intercepts as Inputs}
+
+In the model formulation
+%
+\begin{quote}
+\begin{Verbatim}
+  y ~ normal(x * beta, sigma);
+\end{Verbatim}
+\end{quote}
+%
+there is no longer an intercept \code{alpha}.  Instead, we have
+assumed that the first column of the input matrix \code{x} is a column
+of 1 values.  This way, \code{beta[1]} plays the role of the
+intercept.  If the intercept gets a different prior than the the slope
+terms, then it would be clearer to break it out.  It is also slightly
+more efficient in its explicit form with the intercept variable
+singled out because there's one fewer multiplications;  it should not
+make that much of a difference to speed, though, so the choice should
+be based on clarity.
 
 
 \section{Coefficient and Noise Priors}
@@ -721,7 +853,7 @@ follows.
 \begin{Verbatim}[fontsize=\small]
 data {
   int<lower=0> N;
-  real x[N];
+  vector[N] x;
   int<lower=0,upper=1> y[N];
 }
 parameters {
@@ -729,18 +861,58 @@ parameters {
   real beta;
 }
 model {
-  for (n in 1:N)
-    y[n] ~ bernoulli(inv_logit(alpha + beta * x[n]));
+  y ~ bernoulli_logit(alpha + beta * x);
 } 
 \end{Verbatim}
 \end{quote}
 %
 The noise parameter is built into the Bernoulli formulation here
-rather than specified directly.
+rather than specified directly.  
 
 Logistic regression is a kind of generalized linear model with binary
-outcomes and the log odds (logit) link function.  The inverse of the
-link function appears in the model.  
+outcomes and the log odds (logit) link function, defined by
+%
+\[
+\mbox{logit}(v) = \log \left( \frac{v}{1-v} \right).
+\]
+%
+The inverse of the link function appears in the model.  
+%
+\[
+\mbox{logit}^{-1}(u) = \frac{1}{1 + \exp(-u)}.
+\]
+%
+
+The model formulation above uses the logit-parameterized version of
+the Bernoulli distribution, which is defined by 
+%
+\[
+\distro{BernoulliLogit}(y|\alpha) 
+=
+\distro{Bernoulli}(y | \mbox{logit}^{-1}(\alpha)).
+\]
+%
+The formulation is also vectorized in the sense that \code{alpha} and
+\code{beta} are scalars and \code{x} is a vector, so that \code{alpha
+  + beta * x} is a vector.  The vectorized formulation is equivalent
+to the less efficient version
+%
+\begin{quote}
+\begin{Verbatim}
+for (n in 1:N)
+  y[n] ~ bernoulli_logit(alpha + beta * x[n]);
+\end{Verbatim}
+\end{quote}
+%
+Expanding out the Bernoulli logit, the model is equivalent to the more
+explicit, but less efficient and less arithmetically stable
+%
+\begin{quote}
+\begin{Verbatim}
+for (n in 1:N)
+  y[n] ~ bernoulli(inv_logit(alpha + beta * x[n]));
+\end{Verbatim}
+\end{quote}
 
 Other link functions may be used in the same way.  For example, probit
 regression uses the cumulative normal distribution function, which is
@@ -1406,7 +1578,7 @@ data {
   vector[N] y;                 // outcomes
 }
 parameters {
-  corr_matrix[K] Omega;     // prior covariance
+  corr_matrix[K] Omega;     // prior correlation
   vector<lower=0>[K] tau;   // prior scale
   matrix[L,K] gamma;        // group coeffs
   vector[K] beta[J];        // indiv coeffs by group
@@ -4228,7 +4400,7 @@ model {
   matrix[N,N] Sigma;
   // off-diagonal elements
   for (i in 1:(N-1)) {
-    for (j in i:N) {
+    for (j in (i+1):N) {
       Sigma[i,j] <- eta_sq * exp(-rho_sq * pow(x[i] - x[j],2));
       Sigma[j,i] <- Sigma[i,j];
     }
