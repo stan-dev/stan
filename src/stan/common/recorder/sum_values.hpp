@@ -1,6 +1,9 @@
 #ifndef __STAN__COMMON__RECORDER__SUM_VALUES_HPP__
 #define __STAN__COMMON__RECORDER__SUM_VALUES_HPP__
 
+#include <vector>
+#include <string>
+
 namespace stan {
   namespace common {
     namespace recorder {
