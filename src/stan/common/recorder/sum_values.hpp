@@ -2,6 +2,7 @@
 #define __STAN__COMMON__RECORDER__SUM_VALUES_HPP__
 
 #include <vector>
+#include <stdexcept>
 #include <string>
 
 namespace stan {
