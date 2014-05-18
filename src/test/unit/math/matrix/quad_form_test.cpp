@@ -110,7 +110,7 @@ TEST(MathMatrix, quad_form_sym_symmetry) {
   
   // double-double
   matrix_d resd = quad_form_sym(ad,bd);
-  EXPECT_FLOAT_EQ(resd(1,0), resd(0,1));
+  EXPECT_EQ(resd(1,0), resd(0,1));
   
   bd.resize(4,3);
   bd << 100, 10, 11,
@@ -118,9 +118,9 @@ TEST(MathMatrix, quad_form_sym_symmetry) {
   -3, -3, 34,
   5,  2, 44;
   resd = quad_form_sym(ad,bd);
-  EXPECT_FLOAT_EQ(resd(1,0), resd(0,1));  
-  EXPECT_FLOAT_EQ(resd(2,0), resd(0,2));  
-  EXPECT_FLOAT_EQ(resd(2,1), resd(1,2));  
+  EXPECT_EQ(resd(1,0), resd(0,1));  
+  EXPECT_EQ(resd(2,0), resd(0,2));  
+  EXPECT_EQ(resd(2,1), resd(1,2));  
 }
 
 TEST(MathMatrix, quad_form_sym_asymmetric) {
