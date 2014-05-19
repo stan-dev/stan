@@ -155,7 +155,7 @@ namespace stan {
 
       double U3 = uniform_rng(0.0, 1.0, rng) - 0.5;
 
-      double sign = ((U3 > 0) - (U3 < 0));
+      double sign = ((U3 >= 0) - (U3 <= 0));
 
       return mu + sign * std::acos(W);
     }
