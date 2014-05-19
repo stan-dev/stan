@@ -1,4 +1,5 @@
 #include <stan/optimization/bfgs.hpp>
+#include <stan/optimization/bfgs_linesearch.hpp>
 #include <gtest/gtest.h>
 
 TEST(OptimizationBFGS, cubic_interp) {

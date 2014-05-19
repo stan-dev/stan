@@ -17,11 +17,14 @@ namespace stan {
        *
        * @param yk Difference between the current and previous gradient vector.
        * @param sk Difference between the current and previous state vector.
-       * @param reset Whether to reset the approximation, forgetting about previous values.
-       * @return In the case of a reset, returns the optimal scaling of the initial Hessian
-       * approximation which is useful for predicting step-sizes.
+       * @param reset Whether to reset the approximation, forgetting about 
+       * previous values.
+       * @return In the case of a reset, returns the optimal scaling of the
+       * initial Hessian approximation which is useful for predicting
+       * step-sizes.
        **/
-      inline Scalar update(const VectorT &yk, const VectorT &sk, bool reset = false) {
+      inline Scalar update(const VectorT &yk, const VectorT &sk,
+                           bool reset = false) {
         Scalar rhok, skyk, B0fact;
         HessianT Hupd;
 
@@ -46,7 +49,8 @@ namespace stan {
        * Compute the search direction based on the current (inverse) Hessian
        * approximation and given gradient.
        *
-       * @param[out] pk The negative product of the inverse Hessian and gradient direction gk.
+       * @param[out] pk The negative product of the inverse Hessian and gradient
+       * direction gk.
        * @param[in] gk Gradient direction.
        **/
       inline void search_direction(VectorT &pk, const VectorT &gk) const {

@@ -39,11 +39,14 @@ namespace stan {
        *
        * @param yk Difference between the current and previous gradient vector.
        * @param sk Difference between the current and previous state vector.
-       * @param reset Whether to reset the approximation, forgetting about previous values.
-       * @return In the case of a reset, returns the optimal scaling of the initial Hessian
+       * @param reset Whether to reset the approximation, forgetting about
+       * previous values.
+       * @return In the case of a reset, returns the optimal scaling of the
+       * initial Hessian
        * approximation which is useful for predicting step-sizes.
        **/
-      inline Scalar update(const VectorT &yk, const VectorT &sk, bool reset = false) {
+      inline Scalar update(const VectorT &yk, const VectorT &sk,
+                           bool reset = false) {
         Scalar skyk = yk.dot(sk);
 
         Scalar B0fact;
