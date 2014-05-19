@@ -50,10 +50,16 @@
 #include <stan/common/init_nuts.hpp>
 #include <stan/common/init_adapt.hpp>
 #include <stan/common/init_windowed_adapt.hpp>
+#include <stan/common/recorder/csv.hpp>
+#include <stan/common/recorder/messages.hpp>
 
 namespace stan {
 
   namespace common {
+
+    struct NoOpFunctor {
+      void operator()() { }
+    };
 
     template <class Model>
     int command(int argc, const char* argv[]) {
@@ -574,7 +580,14 @@ namespace stan {
         std::cout << "Adjust your expectations accordingly!" << std::endl << std::endl;
         std::cout << std::endl;
         
-        stan::io::mcmc_writer<Model> writer(output_stream, diagnostic_stream, &std::cout);
+        stan::common::recorder::csv sample_recorder(output_stream, "# ");
+        stan::common::recorder::csv diagnostic_recorder(diagnostic_stream, "# ");
+        stan::common::recorder::messages message_recorder(output_stream, "# ");
+        
+        stan::io::mcmc_writer<Model, 
+                              stan::common::recorder::csv, stan::common::recorder::csv,
+                              stan::common::recorder::messages> 
+          writer(sample_recorder, diagnostic_recorder, message_recorder, &std::cout);
         
         // Sampling parameters
         int num_warmup = dynamic_cast<stan::gm::int_argument*>(
@@ -757,37 +770,45 @@ namespace stan {
         }
         
         // Headers
-        writer.print_sample_names(s, sampler_ptr, model);
-        writer.print_diagnostic_names(s, sampler_ptr, model);
+        writer.write_sample_names(s, sampler_ptr, model);
+        writer.write_diagnostic_names(s, sampler_ptr, model);
         
+        std::string prefix = "";
+        std::string suffix = "\n";
+        NoOpFunctor startTransitionCallback;
+
         // Warm-Up
         clock_t start = clock();
         
         warmup<Model, rng_t>(sampler_ptr, num_warmup, num_samples, num_thin,
                              refresh, save_warmup,
                              writer,
-                             s, model, base_rng);
+                             s, model, base_rng,
+                             prefix, suffix, std::cout,
+                             startTransitionCallback);
         
         clock_t end = clock();
         warmDeltaT = (double)(end - start) / CLOCKS_PER_SEC;
         
         if (adapt_engaged) {
           dynamic_cast<mcmc::base_adapter*>(sampler_ptr)->disengage_adaptation();
-          writer.print_adapt_finish(sampler_ptr);
+          writer.write_adapt_finish(sampler_ptr);
         }
         
         // Sampling
         start = clock();
         
         sample<Model, rng_t>(sampler_ptr, num_warmup, num_samples, num_thin,
-                                       refresh, true,
-                                       writer,
-                                       s, model, base_rng);
+                             refresh, true,
+                             writer,
+                             s, model, base_rng,
+                             prefix, suffix, std::cout,
+                             startTransitionCallback);
         
         end = clock();
         sampleDeltaT = (double)(end - start) / CLOCKS_PER_SEC;
         
-        writer.print_timing(warmDeltaT, sampleDeltaT);
+        writer.write_timing(warmDeltaT, sampleDeltaT);
         
         if (sampler_ptr) delete sampler_ptr;
         
