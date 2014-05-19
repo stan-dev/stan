@@ -1426,12 +1426,12 @@ this is unlikely to be an issue for typical Stan models.
         \hiercmdarg{\indentarrow\indentarrow\indentarrow\indentarrow}{tol\_obj}{$$double$$}
            {Convergence tolerance on changes in objective function value}
            {Valid values: $0 \leq \mbox{\code{tol\_obj}}$}
-           {Defaults to \code{1e-8}}
+           {Defaults to \code{1e-12}}
 %
         \hiercmdarg{\indentarrow\indentarrow\indentarrow\indentarrow}{tol\_rel\_obj}{$$double$$}
-           {Convergence tolerance on changes in objective function value}
+           {Convergence tolerance on relative changes in objective function value}
            {Valid values: $0 \leq \mbox{\code{tol\_rel\_obj}}$}
-           {Defaults to \code{1e+7}}
+           {Defaults to \code{1e+4}}
 %
         \hiercmdarg{\indentarrow\indentarrow\indentarrow\indentarrow}{tol\_grad}{$$double$$}
         {Convergence tolerance on the norm of the gradient}
@@ -1439,7 +1439,7 @@ this is unlikely to be an issue for typical Stan models.
         {Defaults to \code{1e-8}}
 %
         \hiercmdarg{\indentarrow\indentarrow\indentarrow\indentarrow}{tol\_rel\_grad}{$$double$$}
-        {Convergence tolerance on the norm of the gradient}
+        {Convergence tolerance on the relative norm of the gradient}
         {Valid values: $0 \leq \mbox{\code{tol\_rel\_grad}}$}
         {Defaults to \code{1e+7}}
 %
