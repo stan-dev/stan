@@ -133,6 +133,7 @@ TEST(OptimizationBFGS, rosenbrock_bfgs_convergence) {
   bfgs.params_r(cont_vector);
 
 //  std::cerr << "Convergence condition: " << bfgs.get_code_string(ret) << std::endl;
+//  std::cerr << "Converged after " << bfgs.iter_num() << " iterations and " << bfgs.grad_evals() << " gradient evaluations." << std::endl;
 
   // Check that the return code is normal
   EXPECT_GE(ret,0);
@@ -143,6 +144,7 @@ TEST(OptimizationBFGS, rosenbrock_bfgs_convergence) {
 
   // Check that it didn't take too long to get there
   EXPECT_LE(bfgs.iter_num(), 35);
+  EXPECT_LE(bfgs.grad_evals(), 70);
 }
 
 TEST(OptimizationBFGS, rosenbrock_lbfgs_convergence) {
@@ -167,6 +169,9 @@ TEST(OptimizationBFGS, rosenbrock_lbfgs_convergence) {
   }
   bfgs.params_r(cont_vector);
 
+//  std::cerr << "Convergence condition: " << bfgs.get_code_string(ret) << std::endl;
+//  std::cerr << "Converged after " << bfgs.iter_num() << " iterations and " << bfgs.grad_evals() << " gradient evaluations." << std::endl;
+
   // Check that the return code is normal
   EXPECT_GE(ret,0);
 
@@ -176,5 +181,6 @@ TEST(OptimizationBFGS, rosenbrock_lbfgs_convergence) {
 
   // Check that it didn't take too long to get there
   EXPECT_LE(bfgs.iter_num(), 35);
+  EXPECT_LE(bfgs.grad_evals(), 70);
 }
 
