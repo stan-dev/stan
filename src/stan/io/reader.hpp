@@ -757,7 +757,7 @@ namespace stan {
        * <p>See <code>stan::math::check_unit_vector</code>.
        *
        * @param k Size of returned unit_vector.
-       * @return Simplex read from the specified size number of scalars.
+       * @return unit_vector read from the specified size number of scalars.
        * @throw std::runtime_error if the k values is not a unit_vector.
        */
       inline vector_t unit_vector(size_t k) {
@@ -774,7 +774,7 @@ namespace stan {
        * <p>See <code>stan::prob::unit_vector_constrain(Eigen::Matrix)</code>.
        *
        * @param k Number of dimensions in resulting unit_vector.
-       * @return Simplex derived from next <code>k-1</code> scalars.
+       * @return unit_vector derived from next <code>k-1</code> scalars.
        */
       inline 
       Eigen::Matrix<T,Eigen::Dynamic,1> unit_vector_constrain(size_t k) {
