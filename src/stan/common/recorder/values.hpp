@@ -31,7 +31,7 @@ namespace stan {
           : m_(0), N_(x.size()), M_(0),
             x_(x) {
           if (N_ > 0)
-            M_ = x_.at(0).size();
+            M_ = x_[0].size();
         }
 
         void operator()(const std::vector<std::string>& x) { }
@@ -43,7 +43,7 @@ namespace stan {
           if (m_ == M_) 
             throw std::out_of_range("");
           for (size_t n = 0; n < N_; n++)
-            x_.at(n)[m_] = x[n];
+            x_[n][m_] = x[n];
           m_++;
         }
       
@@ -57,7 +57,7 @@ namespace stan {
           return false;
         }
 
-        const std::vector<InternalVector>& x() {
+        const std::vector<InternalVector>& x() const {
           return x_;
         }
       };
