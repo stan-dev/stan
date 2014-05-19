@@ -157,7 +157,12 @@ TEST(ProbDistributionsWishart, marginalTwoChiSquareGoodnessFitTest) {
 }
 
 
-TEST(ProbDistributionsWishart, SpecialChiSquare) {
+TEST(ProbDistributionsWishart, SpecialRNGTest) {
+  //For any vector C != 0
+  //(C' * W * C) / (C' * S * C)
+  //must be chi-square distributed with df = k
+  //which has mean = k and variance = 2k
+  
   boost::random::mt19937 rng;
   using Eigen::MatrixXd;
   using Eigen::VectorXd;
@@ -170,15 +175,16 @@ TEST(ProbDistributionsWishart, SpecialChiSquare) {
   VectorXd C(3);
   C << 2, 1, 3;
   
-  size_t N = 10000;
+  size_t N = 1e4;
   int k = 20;
-  double tol = 0.001;
+  double tol = 0.2; //tolerance for variance
   std::vector<double> acum;
   acum.reserve(N);
   for (size_t i = 0; i < N; i++)
     acum.push_back((C.transpose() * stan::prob::wishart_rng(k, sigma, rng) * C)(0) /
            (C.transpose() * sigma * C)(0));
+  
 
-  EXPECT_NEAR(k, stan::math::mean(acum), tol);
+  EXPECT_NEAR(k, stan::math::mean(acum), std::pow(tol, 2));
   EXPECT_NEAR(2*k, stan::math::variance(acum), tol);
 }
