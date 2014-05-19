@@ -42,6 +42,7 @@
 #include <stan/common/write_model.hpp>
 #include <stan/common/write_error_msg.hpp>
 #include <stan/common/do_print.hpp>
+#include <stan/common/do_bfgs_optimize.hpp>
 #include <stan/common/print_progress.hpp>
 #include <stan/common/run_markov_chain.hpp>
 #include <stan/common/warmup.hpp>
@@ -487,65 +488,10 @@ namespace stan {
                          algo->arg("bfgs")->arg("tol_param"))->value();
           bfgs._conv_opts.maxIts = num_iterations;
           
-          lp = bfgs.logp();
-          
-          std::cout << "initial log joint probability = " << lp << std::endl;
-          if (output_stream && save_iterations) {
-            write_iteration(*output_stream, model, base_rng,
-                            lp, cont_vector, disc_vector);
-          }
-
-          int ret = 0;
-          
-          while (ret == 0) {  
-            if (do_print(bfgs.iter_num(), 50*refresh)) {
-              std::cout << "    Iter ";
-              std::cout << "     log prob ";
-              std::cout << "       ||dx|| ";
-              std::cout << "     ||grad|| ";
-              std::cout << "      alpha ";
-              std::cout << "     alpha0 ";
-              std::cout << " # evals ";
-              std::cout << " Notes " << std::endl;
-            }
-            
-            ret = bfgs.step();
-            lp = bfgs.logp();
-            bfgs.params_r(cont_vector);
-            
-            if (do_print(bfgs.iter_num(), ret != 0 || !bfgs.note().empty(),refresh)) {
-              std::cout << " " << std::setw(7) << bfgs.iter_num() << " ";
-              std::cout << " " << std::setw(12) << std::setprecision(6) 
-                        << lp << " ";
-              std::cout << " " << std::setw(12) << std::setprecision(6) 
-                        << bfgs.prev_step_size() << " ";
-              std::cout << " " << std::setw(12) << std::setprecision(6) 
-                        << bfgs.curr_g().norm() << " ";
-              std::cout << " " << std::setw(10) << std::setprecision(4) 
-                        << bfgs.alpha() << " ";
-              std::cout << " " << std::setw(10) << std::setprecision(4) 
-                        << bfgs.alpha0() << " ";
-              std::cout << " " << std::setw(7) 
-                        << bfgs.grad_evals() << " ";
-              std::cout << " " << bfgs.note() << " ";
-              std::cout << std::endl;
-            }
-            
-            if (output_stream && save_iterations) {
-              write_iteration(*output_stream, model, base_rng,
-                              lp, cont_vector, disc_vector);
-            }
-          }
-          
-          
-          if (ret >= 0) {
-            std::cout << "Optimization terminated normally: " << std::endl;
-            return_code = stan::gm::error_codes::OK;
-          } else {
-            std::cout << "Optimization terminated with error: " << std::endl;
-            return_code = stan::gm::error_codes::SOFTWARE;
-          }
-          std::cout << "  " << bfgs.get_code_string(ret) << std::endl;
+          return_code = do_bfgs_optimize(model,bfgs, base_rng,
+                                         lp, cont_vector, disc_vector,
+                                         output_stream, &std::cout, 
+                                         save_iterations, refresh);
         } else if (algo->value() == "lbfgs") {
           typedef stan::optimization::BFGSLineSearch<Model,stan::optimization::LBFGSUpdate<> > Optimizer;
           Optimizer bfgs(model, cont_vector, disc_vector, &std::cout);
@@ -565,66 +511,11 @@ namespace stan {
           bfgs._conv_opts.tolAbsX = dynamic_cast<gm::real_argument*>(
                          algo->arg("lbfgs")->arg("tol_param"))->value();
           bfgs._conv_opts.maxIts = num_iterations;
-          
-          lp = bfgs.logp();
-          
-          std::cout << "initial log joint probability = " << lp << std::endl;
-          if (output_stream && save_iterations) {
-            write_iteration(*output_stream, model, base_rng,
-                            lp, cont_vector, disc_vector);
-          }
 
-          int ret = 0;
-          
-          while (ret == 0) {  
-            if (do_print(bfgs.iter_num(), 50*refresh)) {
-              std::cout << "    Iter ";
-              std::cout << "     log prob ";
-              std::cout << "       ||dx|| ";
-              std::cout << "     ||grad|| ";
-              std::cout << "      alpha ";
-              std::cout << "     alpha0 ";
-              std::cout << " # evals ";
-              std::cout << " Notes " << std::endl;
-            }
-            
-            ret = bfgs.step();
-            lp = bfgs.logp();
-            bfgs.params_r(cont_vector);
-            
-            if (do_print(bfgs.iter_num(), ret != 0 || !bfgs.note().empty(),refresh)) {
-              std::cout << " " << std::setw(7) << bfgs.iter_num() << " ";
-              std::cout << " " << std::setw(12) << std::setprecision(6) 
-                        << lp << " ";
-              std::cout << " " << std::setw(12) << std::setprecision(6) 
-                        << bfgs.prev_step_size() << " ";
-              std::cout << " " << std::setw(12) << std::setprecision(6) 
-                        << bfgs.curr_g().norm() << " ";
-              std::cout << " " << std::setw(10) << std::setprecision(4) 
-                        << bfgs.alpha() << " ";
-              std::cout << " " << std::setw(10) << std::setprecision(4) 
-                        << bfgs.alpha0() << " ";
-              std::cout << " " << std::setw(7) 
-                        << bfgs.grad_evals() << " ";
-              std::cout << " " << bfgs.note() << " ";
-              std::cout << std::endl;
-            }
-            
-            if (output_stream && save_iterations) {
-              write_iteration(*output_stream, model, base_rng,
-                              lp, cont_vector, disc_vector);
-            }
-          }
-          
-          
-          if (ret >= 0) {
-            std::cout << "Optimization terminated normally: " << std::endl;
-            return_code = stan::gm::error_codes::OK;
-          } else {
-            std::cout << "Optimization terminated with error: " << std::endl;
-            return_code = stan::gm::error_codes::SOFTWARE;
-          }
-          std::cout << "  " << bfgs.get_code_string(ret) << std::endl;
+          return_code = do_bfgs_optimize(model,bfgs, base_rng,
+                                         lp, cont_vector, disc_vector,
+                                         output_stream, &std::cout, 
+                                         save_iterations, refresh);
         } else {
           return_code = stan::gm::error_codes::CONFIG;
         }
