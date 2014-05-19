@@ -1,5 +1,8 @@
 #include <stan/optimization/bfgs.hpp>
 #include <stan/optimization/bfgs_linesearch.hpp>
+
+#include <test/test-models/no-main/optimization/rosenbrock.cpp>
+
 #include <gtest/gtest.h>
 
 TEST(OptimizationBFGS, cubic_interp) {
@@ -105,5 +108,73 @@ TEST(OptimizationBFGS, wolfe_line_search) {
   EXPECT_EQ(f1,func1(x1));
   EXPECT_LE(f1,f0 + c1*alpha*p.dot(gradx0));
   EXPECT_LE(std::fabs(p.dot(gradx1)),c2*std::fabs(p.dot(gradx0)));
+}
+
+TEST(OptimizationBFGS, rosenbrock_bfgs_convergence) {
+  // -1,1 is the standard initialization for the Rosenbrock function
+  std::vector<double> cont_vector(2);
+  cont_vector[0] = -1; cont_vector[1] = 1;
+  std::vector<int> disc_vector;
+
+  typedef rosenbrock_model_namespace::rosenbrock_model Model;
+  typedef stan::optimization::BFGSLineSearch<Model,stan::optimization::BFGSUpdate_HInv<> > Optimizer;
+
+  static const std::string DATA = "";
+  std::stringstream data_stream(DATA);
+  stan::io::dump dummy_context(data_stream);
+
+  Model rb_model(dummy_context);
+  Optimizer bfgs(rb_model, cont_vector, disc_vector, &std::cout);
+
+  int ret = 0;
+  while (ret == 0) {
+    ret = bfgs.step();
+  }
+  bfgs.params_r(cont_vector);
+
+//  std::cerr << "Convergence condition: " << bfgs.get_code_string(ret) << std::endl;
+
+  // Check that the return code is normal
+  EXPECT_GE(ret,0);
+
+  // Check the correct minimum was found
+  EXPECT_NEAR(cont_vector[0],1.0,1e-6);
+  EXPECT_NEAR(cont_vector[1],1.0,1e-6);
+
+  // Check that it didn't take too long to get there
+  EXPECT_LE(bfgs.iter_num(), 35);
+}
+
+TEST(OptimizationBFGS, rosenbrock_lbfgs_convergence) {
+  // -1,1 is the standard initialization for the Rosenbrock function
+  std::vector<double> cont_vector(2);
+  cont_vector[0] = -1; cont_vector[1] = 1;
+  std::vector<int> disc_vector;
+
+  typedef rosenbrock_model_namespace::rosenbrock_model Model;
+  typedef stan::optimization::BFGSLineSearch<Model,stan::optimization::LBFGSUpdate<> > Optimizer;
+
+  static const std::string DATA = "";
+  std::stringstream data_stream(DATA);
+  stan::io::dump dummy_context(data_stream);
+
+  Model rb_model(dummy_context);
+  Optimizer bfgs(rb_model, cont_vector, disc_vector, &std::cout);
+
+  int ret = 0;
+  while (ret == 0) {
+    ret = bfgs.step();
+  }
+  bfgs.params_r(cont_vector);
+
+  // Check that the return code is normal
+  EXPECT_GE(ret,0);
+
+  // Check the correct minimum was found
+  EXPECT_NEAR(cont_vector[0],1.0,1e-6);
+  EXPECT_NEAR(cont_vector[1],1.0,1e-6);
+
+  // Check that it didn't take too long to get there
+  EXPECT_LE(bfgs.iter_num(), 35);
 }
 

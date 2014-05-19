@@ -470,8 +470,9 @@ namespace stan {
           }
           return_code = stan::gm::error_codes::OK;
         } else if (algo->value() == "bfgs") {
-          stan::optimization::BFGSLineSearch<Model> bfgs(model, cont_vector, disc_vector,
-                                                         &std::cout);
+          typedef stan::optimization::BFGSLineSearch<Model,stan::optimization::BFGSUpdate_HInv<> > Optimizer;
+          Optimizer bfgs(model, cont_vector, disc_vector, &std::cout);
+
           bfgs._ls_opts.alpha0 = dynamic_cast<stan::gm::real_argument*>(
                          algo->arg("bfgs")->arg("init_alpha"))->value();
           bfgs._conv_opts.tolAbsF = dynamic_cast<stan::gm::real_argument*>(
@@ -546,7 +547,7 @@ namespace stan {
           }
           std::cout << "  " << bfgs.get_code_string(ret) << std::endl;
         } else if (algo->value() == "lbfgs") {
-          typedef stan::optimization::BFGSLineSearch<Model,double,Eigen::Dynamic,stan::optimization::LBFGSUpdate<double,Eigen::Dynamic> > Optimizer;
+          typedef stan::optimization::BFGSLineSearch<Model,stan::optimization::LBFGSUpdate<> > Optimizer;
           Optimizer bfgs(model, cont_vector, disc_vector, &std::cout);
 
           bfgs.get_qnupdate().set_history_size(dynamic_cast<gm::int_argument*>(

@@ -36,10 +36,10 @@ namespace stan {
         fScale = 1.0;
 
         tolAbsX = 1e-8;
-        tolAbsF = 1e-8;
+        tolAbsF = 1e-12;
         tolAbsGrad = 1e-8;
 
-        tolRelF = 1e+7;
+        tolRelF = 1e+4;
         tolRelGrad = 1e+3;
       }
       size_t maxIts;
@@ -67,9 +67,8 @@ namespace stan {
     };
 
 
-    template<typename FunctorType, typename Scalar = double,
-             int DimAtCompile = Eigen::Dynamic,
-             typename QNUpdateType = LBFGSUpdate<Scalar,DimAtCompile> >
+    template<typename FunctorType, typename QNUpdateType,
+             typename Scalar = double, int DimAtCompile = Eigen::Dynamic>
     class BFGSMinimizer {
     public:
       typedef Eigen::Matrix<Scalar,DimAtCompile,1> VectorT;
@@ -379,14 +378,13 @@ namespace stan {
       }
     };
     
-    template<typename M, typename Scalar = double,
-             int DimAtCompile = Eigen::Dynamic,
-             typename QNUpdateType = LBFGSUpdate<Scalar,DimAtCompile> >
-    class BFGSLineSearch : public BFGSMinimizer<ModelAdaptor<M>,Scalar,DimAtCompile,QNUpdateType> {
+    template<typename M, typename QNUpdateType, typename Scalar = double,
+             int DimAtCompile = Eigen::Dynamic>
+    class BFGSLineSearch : public BFGSMinimizer<ModelAdaptor<M>,QNUpdateType,Scalar,DimAtCompile> {
     private:
       ModelAdaptor<M> _adaptor;
     public:
-      typedef BFGSMinimizer<ModelAdaptor<M>,Scalar,DimAtCompile,QNUpdateType> BFGSBase;
+      typedef BFGSMinimizer<ModelAdaptor<M>,QNUpdateType,Scalar,DimAtCompile> BFGSBase;
       typedef typename BFGSBase::VectorT vector_t;
       typedef typename vector_t::size_type idx_t;
       
