@@ -222,6 +222,8 @@ add_binary("double_exponential_rng");
 add_nullary("e");
 add("eigenvalues_sym",VECTOR_T,MATRIX_T);
 add("eigenvectors_sym",MATRIX_T,MATRIX_T);
+add("qr_Q",MATRIX_T,MATRIX_T);
+add("qr_R",MATRIX_T,MATRIX_T);
 add("elt_divide",VECTOR_T,VECTOR_T,VECTOR_T);
 add("elt_divide",ROW_VECTOR_T,ROW_VECTOR_T,ROW_VECTOR_T);
 add("elt_divide",MATRIX_T,MATRIX_T,MATRIX_T);
@@ -512,6 +514,7 @@ add("modified_bessel_second_kind",DOUBLE_T,INT_T,DOUBLE_T);
   }
 }
 add("multi_normal_rng",VECTOR_T,VECTOR_T,MATRIX_T);
+add("multi_normal_cholesky_rng",VECTOR_T,VECTOR_T,MATRIX_T);
 add("multi_student_t_rng",VECTOR_T, DOUBLE_T,VECTOR_T,MATRIX_T);
 add("multinomial_log",DOUBLE_T, expr_type(INT_T,1U), VECTOR_T);
 add("multinomial_rng",expr_type(INT_T,1U), VECTOR_T, INT_T);
@@ -608,6 +611,10 @@ add("prod",DOUBLE_T,ROW_VECTOR_T);
 add("prod",DOUBLE_T,MATRIX_T);
 add("quad_form",DOUBLE_T,MATRIX_T,VECTOR_T);
 add("quad_form",MATRIX_T,MATRIX_T,MATRIX_T);
+add("quad_form_sym",DOUBLE_T,MATRIX_T,VECTOR_T);
+add("quad_form_sym",MATRIX_T,MATRIX_T,MATRIX_T);
+add("quad_form_diag",MATRIX_T,MATRIX_T,VECTOR_T);
+add("quad_form_diag",MATRIX_T,MATRIX_T,ROW_VECTOR_T);
 add("rank",INT_T,expr_type(INT_T,1),INT_T);
 add("rank",INT_T,expr_type(DOUBLE_T,1),INT_T);
 add("rank",INT_T,VECTOR_T,INT_T);

@@ -97,7 +97,7 @@ TEST(AgradRevMatrix, quad_form_mat_grad_vd) {
   
   matrix_d dqda(bd*matrix_d::Ones(2,2)*bd.transpose());
   
-  // var-var
+  // var-double
   res = sum(quad_form(av,bd));
   
   vars.clear();
@@ -141,7 +141,7 @@ TEST(AgradRevMatrix, quad_form_mat_grad_dv) {
   
   matrix_d dqdb((ad*bd + ad.transpose()*bd)*matrix_d::Ones(2,2));
   
-  // var-var
+  // double-var
   res = sum(quad_form(ad,bv));
   
   vars.clear();
@@ -248,6 +248,7 @@ TEST(AgradRevMatrix, quad_form_sym_mat) {
   EXPECT_FLOAT_EQ(3396, resd(0,1));
   EXPECT_FLOAT_EQ(3396, resd(1,0));
   EXPECT_FLOAT_EQ(725, resd(1,1));
+  EXPECT_EQ(resd(1,0), resd(0,1));
   
   // var-double
   res = quad_form_sym(av,bd);
@@ -255,6 +256,7 @@ TEST(AgradRevMatrix, quad_form_sym_mat) {
   EXPECT_FLOAT_EQ(3396, res(0,1).val());
   EXPECT_FLOAT_EQ(3396, res(1,0).val());
   EXPECT_FLOAT_EQ(725, res(1,1).val());
+  EXPECT_EQ(res(1,0).val(), res(0,1).val());
   
   // double-var
   res = quad_form_sym(ad,bv);
@@ -262,6 +264,7 @@ TEST(AgradRevMatrix, quad_form_sym_mat) {
   EXPECT_FLOAT_EQ(3396, res(0,1).val());
   EXPECT_FLOAT_EQ(3396, res(1,0).val());
   EXPECT_FLOAT_EQ(725, res(1,1).val());
+  EXPECT_EQ(res(1,0).val(), res(0,1).val());
   
   // var-var
   res = quad_form_sym(av,bv);
@@ -269,6 +272,7 @@ TEST(AgradRevMatrix, quad_form_sym_mat) {
   EXPECT_FLOAT_EQ(3396, res(0,1).val());
   EXPECT_FLOAT_EQ(3396, res(1,0).val());
   EXPECT_FLOAT_EQ(725, res(1,1).val());
+  EXPECT_EQ(res(1,0).val(), res(0,1).val());
 }
 
 TEST(AgradRevMatrix, quad_form_sym_mat_grad_vd) {
@@ -301,7 +305,7 @@ TEST(AgradRevMatrix, quad_form_sym_mat_grad_vd) {
   
   matrix_d dqda(bd*matrix_d::Ones(2,2)*bd.transpose());
   
-  // var-var
+  // var-double
   res = sum(quad_form_sym(av,bd));
   
   vars.clear();
@@ -345,7 +349,7 @@ TEST(AgradRevMatrix, quad_form_sym_mat_grad_dv) {
   
   matrix_d dqdb((ad*bd + ad.transpose()*bd)*matrix_d::Ones(2,2));
   
-  // var-var
+  // double-var
   res = sum(quad_form_sym(ad,bv));
   
   vars.clear();

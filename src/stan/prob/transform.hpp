@@ -7,7 +7,6 @@
 #include <stdexcept>
 #include <sstream>
 #include <vector>
-#include <boost/multi_array.hpp>
 #include <boost/throw_exception.hpp>
 #include <boost/math/tools/promotion.hpp>
 #include <stan/agrad/rev/matrix.hpp>
@@ -177,8 +176,6 @@ namespace stan {
      * extended onion method Journal of Multivariate Analysis 100
      * (2009) 1989–2001 </li></ul>
      *
-     * // FIXME: explain which CPCs we're dealing with
-     * 
      * @param CPCs The (K choose 2) canonical partial correlations in
      * (-1,1).
      * @param K Dimensionality of correlation matrix.
@@ -194,30 +191,23 @@ namespace stan {
                 const size_t K,
                 T& log_prob) {
 
-      size_t k = 0; 
-      size_t i = 0;
-      T log_1cpc2;
-      double lead = K - 2.0; 
+      using stan::math::log1m;
+      using stan::math::square;
+      using stan::math::sum;
+
+      Eigen::Matrix<T,Eigen::Dynamic,1> values(CPCs.rows() - 1);
+      size_t pos = 0;
       // no need to abs() because this Jacobian determinant 
       // is strictly positive (and triangular)
-      // skip last row (odd indexing) because it adds nothing by design
-      typedef typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type size_type;
-      for (size_type j = 0; 
-           j < (CPCs.rows() - 1);
-           ++j) {
-        using stan::math::log1m;
-        using stan::math::square;
-        log_1cpc2 = log1m(square(CPCs[j]));
-        // derivative of correlation wrt CPC
-        log_prob += lead / 2.0 * log_1cpc2; 
-        i++;
-        if (i > K) {
-          k++;
-          i = k + 1;
-          lead = K - k - 1.0;
+      // see inverse of Jacobian in equation 11 of LKJ paper
+      for (size_t k = 1; k <= (K - 2); k++)
+        for (size_t i = k + 1; i <= K; i++) {
+          values(pos) = (K - k - 1) * log1m(square(CPCs(pos)));
+          pos++;
         }
-      }
-      return read_corr_L(CPCs, K);
+
+      log_prob += 0.5 * sum(values);
+      return read_corr_L(CPCs,K);
     }
 
     /**

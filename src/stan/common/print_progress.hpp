@@ -5,7 +5,6 @@
 #include <iomanip>
 #include <stan/common/do_print.hpp>
 
-// FIXME: this calls std::cout directly.
 #include <iostream>
 
 namespace stan {
@@ -19,7 +18,7 @@ namespace stan {
                         const std::string prefix,
                         const std::string suffix,
                         std::ostream& o) {
-      int it_print_width = std::ceil(std::log10(finish));
+      int it_print_width = std::ceil(std::log10((double) finish));
       if (do_print(m, (start + m + 1 == finish), refresh)) {
         o << prefix;
         o << "Iteration: ";
@@ -33,17 +32,6 @@ namespace stan {
         o << std::flush;
       }
     }
-
-    void print_progress(const int m, 
-                        const int start, 
-                        const int finish, 
-                        const int refresh, 
-                        const bool warmup) {
-      print_progress(m, start, finish, refresh, warmup,
-                     "", "\n",
-                     std::cout);
-    }
-
 
   } // namespace common
 
