@@ -239,7 +239,9 @@ namespace stan {
 
       }
       
-      static bool read_samples(std::istream& in, Eigen::MatrixXd& samples, stan_csv_timing& timing) {
+      static bool read_samples(std::istream& in, Eigen::MatrixXd& samples, 
+                               stan_csv_timing& timing, 
+                               std::ostream& out) {
         
         std::stringstream ss;
         std::string line;
@@ -281,8 +283,8 @@ namespace stan {
             if (cols == -1) {
               cols = current_cols;
             } else if (cols != current_cols) {
-              std::cout << "Error: expected " << cols << " columns, but found " 
-                        << current_cols << " instead for row " << rows + 1 << std::endl;
+              out << "Error: expected " << cols << " columns, but found " 
+                  << current_cols << " instead for row " << rows + 1 << std::endl;
               return false;
             }
             rows++;
@@ -303,9 +305,7 @@ namespace stan {
             for (int col = 0; col < cols; col++) {
               std::getline(ls, line, ',');
               boost::trim(line);
-              //std::cout << "line: !" << line << "@" << std::endl;
               samples(row, col) = boost::lexical_cast<double>(line);
-              //std::cout << "after" << std::endl << std::endl;
             }
           }
         }
@@ -316,28 +316,28 @@ namespace stan {
        * Parses the file.
        * 
        */
-      static stan_csv parse(std::istream& in) {
+      static stan_csv parse(std::istream& in, std::ostream& out) {
         
         stan_csv data;
         
         if (!read_metadata(in, data.metadata)) {
-          std::cout << "Warning: non-fatal error reading metadata" << std::endl;
+          out << "Warning: non-fatal error reading metadata" << std::endl;
         }
         
         if (!read_header(in, data.header)) {
-          std::cout << "Error: error reading header" << std::endl;
+          out << "Error: error reading header" << std::endl;
           throw std::invalid_argument("Error with header of input file in parse");
         }
 
         if (!read_adaptation(in, data.adaptation)) {
-          std::cout << "Warning: non-fatal error reading adapation data" << std::endl;
+          out << "Warning: non-fatal error reading adapation data" << std::endl;
         }
 
         data.timing.warmup = 0;
         data.timing.sampling = 0;
         
-        if (!read_samples(in, data.samples, data.timing)) {
-          std::cout << "Warning: non-fatal error reading samples" << std::endl;
+        if (!read_samples(in, data.samples, data.timing, out)) {
+          out << "Warning: non-fatal error reading samples" << std::endl;
         }
         
         return data;
