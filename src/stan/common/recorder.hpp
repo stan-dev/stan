@@ -5,6 +5,7 @@
 #include <stan/common/recorder/filtered_values.hpp>
 #include <stan/common/recorder/messages.hpp>
 #include <stan/common/recorder/no_op.hpp>
+#include <stan/common/recorder/sum_values.hpp>
 #include <stan/common/recorder/values.hpp>
 
 #endif

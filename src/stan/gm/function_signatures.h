@@ -589,6 +589,8 @@ add("prod",DOUBLE_T,ROW_VECTOR_T);
 add("prod",DOUBLE_T,MATRIX_T);
 add("quad_form",DOUBLE_T,MATRIX_T,VECTOR_T);
 add("quad_form",MATRIX_T,MATRIX_T,MATRIX_T);
+add("quad_form_sym",DOUBLE_T,MATRIX_T,VECTOR_T);
+add("quad_form_sym",MATRIX_T,MATRIX_T,MATRIX_T);
 add("quad_form_diag",MATRIX_T,MATRIX_T,VECTOR_T);
 add("quad_form_diag",MATRIX_T,MATRIX_T,ROW_VECTOR_T);
 add("rank",INT_T,expr_type(INT_T,1),INT_T);

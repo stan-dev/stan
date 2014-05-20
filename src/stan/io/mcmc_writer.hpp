@@ -29,9 +29,9 @@ namespace stan {
     class mcmc_writer {
 
     private:
-      SampleRecorder sample_recorder_;
-      DiagnosticRecorder diagnostic_recorder_;
-      MessageRecorder message_recorder_;
+      SampleRecorder& sample_recorder_;
+      DiagnosticRecorder& diagnostic_recorder_;
+      MessageRecorder& message_recorder_;
       
       std::ostream* msg_stream_;
       

@@ -1637,10 +1637,10 @@ expressions, which are also much more efficient.
 \begin{description}
 %
 \fitem{matrix}{quad\_form}{matrix \farg{A}, matrix \farg{B}}{
-The quadratic form, i.e., \code{B'~*~A~*~B}.}
+  The quadratic form, i.e., \code{B'~*~A~*~B}.}
 %
 \fitem{real}{quad\_form}{matrix \farg{A}, vector \farg{B}}{
-The quadratic form, i.e., \code{B'~*~A~*~B}.}
+  The quadratic form, i.e., \code{B'~*~A~*~B}.}
 %
 \fitem{matrix}{quad\_form\_diag}{matrix \farg{m}, vector \farg{v}}
   {The quadratic form using the column vector
@@ -1651,6 +1651,14 @@ The quadratic form, i.e., \code{B'~*~A~*~B}.}
   {The quadratic form using the row vector
   \farg{rv} as a diagonal matrix, i.e.,
   \code{diag\_matrix(\farg{rv})~*~\farg{m}~*~diag\_matrix(\farg{rv})}.}
+%
+\fitem{matrix}{quad\_form\_sym}{matrix \farg{A}, matrix \farg{B}}{
+  Similarly to quad\_form, gives \code{B'~*~A~*~B}, but additionally
+  checks if A is symmetric and ensures that the result is also symmetric.}
+%
+\fitem{real}{quad\_form\_sym}{matrix \farg{A}, vector \farg{B}}{
+  Similarly to quad\_form, gives \code{B'~*~A~*~B}, but additionally
+  checks if A is symmetric and ensures that the result is also symmetric.}
 %
 \fitem{real}{trace\_quad\_form}{matrix \farg{A}, matrix \farg{B}}{ 
 The trace of the quadratic form, i.e., \code{trace(B'~*~A~*~B)}.}
