@@ -4,9 +4,6 @@
 #include <ostream>
 #include <vector>
 #include <stan/common/write_iteration_csv.hpp>
-
-// FIXME: write_iteration calls std::cout directly.
-//   once removed, remove this include
 #include <iostream>
 
 
