@@ -9,6 +9,44 @@
 using Eigen::Dynamic;
 using Eigen::Matrix;
 
+
+TEST(ProbDistributionsWishart,LowerTriangular) {
+  //Tests if only of the lower triangular portion of
+  //outcome and scale matrices is taken
+  using Eigen::MatrixXd;
+  using stan::prob::wishart_log;
+  
+  MatrixXd Sigma(4,4);
+  MatrixXd Sigma_sym(4,4);
+  MatrixXd Y(4,4);
+  MatrixXd Y_sym(4,4);
+
+  Y << 7.988168,  -10.955605, -14.47483,   4.395895,
+    -9.555605,  44.750570,  49.21577, -15.454186,
+    -14.474830,  49.215769,  60.08987, -20.481079,
+    4.395895, -18.454186, -21.48108, 7.885833;
+
+  Y_sym << 7.988168,  -9.555605, -14.474830,   4.395895,
+    -9.555605,  44.750570,  49.215769, -18.454186,
+    -14.474830,  49.215769,  60.08987, -21.48108,
+    4.395895, -18.454186, -21.48108, 7.885833;
+  
+  Sigma << 2.9983662,  0.2898776, -2.650523,  0.1055911,
+    0.2898776, 11.4803610,  7.157993, -3.1129955,
+    -2.6505229,  7.1579931, 11.676181, -3.5866852,
+    0.1055911, -3.1129955, -3.586685,  1.4482736;
+  
+  Sigma_sym << 2.9983662,  0.2898776, -2.6505229,  0.1055911,
+    0.2898776, 11.4803610,  7.1579931, -3.1129955,
+    -2.6505229,  7.1579931, 11.676181, -3.586685,
+    0.1055911, -3.1129955, -3.586685,  1.4482736;
+
+  unsigned int dof = 5;
+   
+  EXPECT_EQ(wishart_log(Y,dof,Sigma), wishart_log(Y_sym,dof,Sigma));
+  EXPECT_EQ(wishart_log(Y,dof,Sigma), wishart_log(Y,dof,Sigma_sym));
+  EXPECT_EQ(wishart_log(Y,dof,Sigma), wishart_log(Y_sym,dof,Sigma_sym));
+}
 TEST(ProbDistributionsWishart,2x2) {
   Matrix<double,Dynamic,Dynamic> Sigma(2,2);
   Sigma << 1.848220, 1.899623, 

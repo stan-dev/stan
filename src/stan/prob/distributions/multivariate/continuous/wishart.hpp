@@ -122,7 +122,7 @@ namespace stan {
 //          const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic> >(
 //                                                                   &W(0), W.size(), 1);
 //        lp -= 0.5 * dot_product(S_inv_vec, W_vec); // trace(S^-1 * W)
-        Eigen::Matrix<typename promote_args<T_y,T_scale>::type,Eigen::Dynamic,Eigen::Dynamic> Sinv_W(mdivide_left_ldlt(ldlt_S,W));
+        Eigen::Matrix<typename promote_args<T_y,T_scale>::type,Eigen::Dynamic,Eigen::Dynamic> Sinv_W(mdivide_left_ldlt(ldlt_S, static_cast<Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic> >(W.template selfadjointView<Eigen::Lower>())));
         lp -= 0.5*trace(Sinv_W);
       }
 

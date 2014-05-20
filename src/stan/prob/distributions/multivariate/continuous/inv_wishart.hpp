@@ -112,7 +112,7 @@ namespace stan {
 //          const Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic> >(
 //                                                                       &S(0), S.size(), 1);
 //        lp -= 0.5 * dot_product(S_vec, W_inv_vec); // trace(S * W^-1)
-        Eigen::Matrix<typename promote_args<T_y,T_scale>::type,Eigen::Dynamic,Eigen::Dynamic> Winv_S(mdivide_left_ldlt(ldlt_W,S));
+        Eigen::Matrix<typename promote_args<T_y,T_scale>::type,Eigen::Dynamic,Eigen::Dynamic> Winv_S(mdivide_left_ldlt(ldlt_W, static_cast<Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic> >(S.template selfadjointView<Eigen::Lower>())));
         lp -= 0.5*trace(Winv_S);
       }
       if (include_summand<propto,T_dof,T_scale>::value)
