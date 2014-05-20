@@ -157,7 +157,7 @@ namespace stan {
 
       double sign = ((U3 >= 0) - (U3 <= 0));
 
-      return std::fmod(mu + sign * std::acos(W) + 2 * stan::math::pi(), 2 * stan::math::pi());
+      return std::fmod(std::fmod(mu + sign * std::acos(W), TWO_PI) + TWO_PI, TWO_PI);
     }
 
   } 
