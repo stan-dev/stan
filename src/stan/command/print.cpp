@@ -17,7 +17,7 @@
 int main(int argc, const char* argv[]) {
   
   if (argc == 1) {
-    print_usage();
+    print_usage(std::cout);
     return 0;
   }
   
@@ -34,7 +34,7 @@ int main(int argc, const char* argv[]) {
       continue;
     
     if (std::string("--help") == std::string(argv[i])) {
-      print_usage();
+      print_usage(std::cout);
       return 0;
     }
     

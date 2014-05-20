@@ -97,20 +97,18 @@ Eigen::VectorXi calculate_column_widths(const Eigen::MatrixXd& values,
   return column_widths;
 }
 
-void print_usage() {
+void print_usage(std::ostream& o) {
+  o << "USAGE:  print <filename 1> [<filename 2> ... <filename N>]"
+    << std::endl
+    << std::endl;
   
-  std::cout << "USAGE:  print <filename 1> [<filename 2> ... <filename N>]"
-            << std::endl
-            << std::endl;
-  
-  std::cout << "OPTIONS:" << std::endl << std::endl;
-  std::cout << "  --autocorr=<chain_index>\tAppend the autocorrelations for the given chain"
-            << std::endl
-            << std::endl;
-  std::cout << "  --sig_figs=<int>\tSet significant figures of output (Defaults to 2)"
-            << std::endl
-            << std::endl;
-  
+  o << "OPTIONS:" << std::endl << std::endl;
+  o << "  --autocorr=<chain_index>\tAppend the autocorrelations for the given chain"
+    << std::endl
+    << std::endl;
+  o << "  --sig_figs=<int>\tSet significant figures of output (Defaults to 2)"
+    << std::endl
+    << std::endl;
 }
 
 bool is_matrix(const std::string& parameter_name) {
