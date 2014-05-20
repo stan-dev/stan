@@ -10,6 +10,7 @@
 #include "stan/prob/distributions/univariate/continuous/normal.hpp"
 #include "stan/prob/distributions/univariate/continuous/chi_square.hpp"
 #include <stan/math/functions/lmgamma.hpp>
+#include <stan/math/matrix/crossprod.hpp>
 #include <stan/math/matrix/columns_dot_product.hpp>
 #include <stan/math/matrix/trace.hpp>
 #include <stan/math/matrix/log_determinant_ldlt.hpp>
@@ -164,13 +165,8 @@ namespace stan {
           B(i, j) = normal_rng(0, 1, rng);
         B(j,j) = std::sqrt(chi_square_rng(nu - j, rng));
       }
-      
-      //return stan::math::multiply_lower_tri_self_transpose(S.llt().matrixL() * B);
-      
-      
-      B = B * (0.5 * (S + S.transpose())).llt().matrixU();
-      
-      return B.transpose() * B;
+                
+      return stan::math::crossprod(B * S.llt().matrixU());
     }
   }
 }

@@ -95,8 +95,8 @@ TEST(ProbDistributionsInvWishart, chiSquareGoodnessFitTest) {
   boost::random::mt19937 rng;
   Matrix<double,Dynamic,Dynamic> sigma(3,3);
   sigma << 9.0, -3.0, 0.0,
-    -3.0,  4.0, 0.0,
-    2.0, 1.0, 3.0;
+    -3.0,  4.0, 1.0,
+    0.0, 1.0, 3.0;
   int N = 10000;
   boost::math::chi_squared mydist(1);
 
