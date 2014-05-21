@@ -20,7 +20,7 @@ namespace stan {
     public:
       
       adapt_unit_e_static_hmc(M &m, BaseRNG& rng,
-                              std::ostream* o, std::ostream* e):
+                              std::ostream* o = &std::cout, std::ostream* e = 0):
       unit_e_static_hmc<M, BaseRNG>(m, rng, o, e) {};
       
       ~adapt_unit_e_static_hmc() {};

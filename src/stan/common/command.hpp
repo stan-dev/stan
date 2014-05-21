@@ -626,7 +626,7 @@ namespace stan {
 
         if (algo->value() == "fixed_param") {
           
-          sampler_ptr = new stan::mcmc::fixed_param_sampler(&std::cout, &std::cerr);
+          sampler_ptr = new stan::mcmc::fixed_param_sampler();
           
           adapt_engaged = false;
           
@@ -714,7 +714,7 @@ namespace stan {
               typedef stan::mcmc::adapt_unit_e_static_hmc<Model, rng_t> sampler;
               sampler_ptr = new sampler(model, base_rng, &std::cout, &std::cout);
               if (!init_static_hmc<sampler>(sampler_ptr, algo)) return 0;
-              if (!init_adapt<sampler>(sampler_ptr, adapt, cont_params, std::cerr)) return 0;
+              if (!init_adapt<sampler>(sampler_ptr, adapt, cont_params)) return 0;
               break;
             }
             
@@ -722,7 +722,7 @@ namespace stan {
               typedef stan::mcmc::adapt_unit_e_nuts<Model, rng_t> sampler;
               sampler_ptr = new sampler(model, base_rng, &std::cout, &std::cout);
               if (!init_nuts<sampler>(sampler_ptr, algo)) return 0;
-              if (!init_adapt<sampler>(sampler_ptr, adapt, cont_params, std::cerr)) return 0;
+              if (!init_adapt<sampler>(sampler_ptr, adapt, cont_params)) return 0;
               break;
             }
             
@@ -730,8 +730,7 @@ namespace stan {
               typedef stan::mcmc::adapt_diag_e_static_hmc<Model, rng_t> sampler;
               sampler_ptr = new sampler(model, base_rng, &std::cout, &std::cout);
               if (!init_static_hmc<sampler>(sampler_ptr, algo)) return 0;
-              if (!init_windowed_adapt<sampler>(sampler_ptr, adapt, num_warmup, cont_params, 
-                                                std::cerr)) 
+              if (!init_windowed_adapt<sampler>(sampler_ptr, adapt, num_warmup, cont_params)) 
                 return 0;
               break;
             }
@@ -740,8 +739,7 @@ namespace stan {
               typedef stan::mcmc::adapt_diag_e_nuts<Model, rng_t> sampler;
               sampler_ptr = new sampler(model, base_rng, &std::cout, &std::cout);
               if (!init_nuts<sampler>(sampler_ptr, algo)) return 0;
-              if (!init_windowed_adapt<sampler>(sampler_ptr, adapt, num_warmup, cont_params,
-                                                std::cerr)) 
+              if (!init_windowed_adapt<sampler>(sampler_ptr, adapt, num_warmup, cont_params)) 
                 return 0;
               break;
             }
@@ -750,8 +748,7 @@ namespace stan {
               typedef stan::mcmc::adapt_dense_e_static_hmc<Model, rng_t> sampler;
               sampler_ptr = new sampler(model, base_rng, &std::cout, &std::cout);
               if (!init_static_hmc<sampler>(sampler_ptr, algo)) return 0;
-              if (!init_windowed_adapt<sampler>(sampler_ptr, adapt, num_warmup, cont_params,
-                                                std::cerr)) 
+              if (!init_windowed_adapt<sampler>(sampler_ptr, adapt, num_warmup, cont_params)) 
                 return 0;
               break;
             }
@@ -760,8 +757,7 @@ namespace stan {
               typedef stan::mcmc::adapt_dense_e_nuts<Model, rng_t> sampler;
               sampler_ptr = new sampler(model, base_rng, &std::cout, &std::cout);
               if (!init_nuts<sampler>(sampler_ptr, algo)) return 0;
-              if (!init_windowed_adapt<sampler>(sampler_ptr, adapt, num_warmup, cont_params,
-                                                std::cerr))
+              if (!init_windowed_adapt<sampler>(sampler_ptr, adapt, num_warmup, cont_params))
                 return 0;
               break;
             }

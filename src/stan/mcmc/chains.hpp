@@ -32,7 +32,6 @@
 #include <stan/prob/autocovariance.hpp>
 
 #include <stan/io/stan_csv_reader.hpp>
-#include <stan/math/error_handling/matrix/check_size_match.hpp>
 
 namespace stan {  
 
@@ -75,8 +74,8 @@ namespace stan {
 
       static double covariance(const Eigen::VectorXd& x, 
                                const Eigen::VectorXd& y) {
-        stan::math::check_size_match("covariance(%1%)", x.size(), "x", y.size(), "y");
-
+        if (x.rows() != y.rows())
+          std::cerr << "warning: covariance of different length chains";
         using boost::accumulators::accumulator_set;
         using boost::accumulators::stats;
         using boost::accumulators::tag::variance;
@@ -94,8 +93,8 @@ namespace stan {
 
       static double correlation(const Eigen::VectorXd& x, 
                                 const Eigen::VectorXd& y) {
-        stan::math::check_size_match("correlation(%1%)", x.size(), "x", y.size(), "y");
-
+        if (x.rows() != y.rows())
+          std::cerr << "warning: covariance of different length chains";
         using boost::accumulators::accumulator_set;
         using boost::accumulators::stats;
         using boost::accumulators::tag::variance;

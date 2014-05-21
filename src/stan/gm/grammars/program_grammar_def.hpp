@@ -172,6 +172,7 @@ namespace stan {
         while (!error_section.eof() && !(last_char == '}')) {
           last_char = (char)error_section.get();
           rest_of_section += last_char;
+          //std::cout << rest_of_section.size() << std::endl;
           if (error_section.eof() && rest_of_section.size() == 1) {
             rest_of_section = "'end of file'";
           }
