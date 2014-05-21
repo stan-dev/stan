@@ -1639,7 +1639,8 @@ distribution requires strictly positive parameters, $\alpha, \beta >
 \chapter{Circular Distributions}
 
 \noindent
-Circular distributions are defined for finite values \farg{y} in any interval of length $2\pi$.
+Circular distributions are defined for finite values \farg{y} in any
+interval of length $2\pi$.  
 
 
 \section{Von Mises Distribution}
@@ -1648,12 +1649,35 @@ Circular distributions are defined for finite values \farg{y} in any interval of
 
 If $\mu \in \reals$ and $\kappa \in \posreals$, then for $y \in
 \reals$,
+%
 \[
 \distro{VonMises}(y|\mu,\kappa)
 =
 \frac{\exp(\kappa\cos(y-\mu))}{2\pi I_0(\kappa)}
 \!.
 \]
+%
+In order for this density to properly nomralize, $y$ must be
+restricted to some interval  $(c, c + 2\pi)$ of length $2 \pi$,
+because
+%
+\[
+\int_{c}^{c + 2\pi} \distro{VonMises}(y|\mu,\kappa) dy
+= 1.
+\]
+%
+Similarly, if $\mu$ is a parameter, it will typically be restricted to
+the same range as $y$.  
+
+A von Mises distribution with its $2 \pi$ interval of support centered
+around its location $\mu$ will have a single mode at $\mu$; for
+example, restricting $y$ to $(-\pi,\pi)$ and taking $\mu = 0$ leads to
+a single local optimum at the model $\mu$.  If the location $\mu$ is
+not in the center of the support, the density is circularly translated
+and there will be a second local maximum at the boundary furthest from
+the mode.  Ideally, the parameterization and support will be set up so
+that the bulk of the probability mass is in a continuous interval
+around the mean $\mu$.
 
 \pitem{y}{von\_mises}{mu,kappa}
 

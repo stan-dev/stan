@@ -308,37 +308,94 @@ worse than no comment at all!
 \chapter{Data Types}
 
 \noindent
-Every expression in Stan that denotes a value, such as variables,
-constants, function or operator applications, indexing, and so on, has
-a type.   The following chapter provides a detailed comparison of the
-differences among the container types: arrays, vectors, and matrices.
+This chapter discusses the data types available for variable
+declarations and expression values in Stan.  Variable types are
+important for declaring parameters, checking data consistency, calling
+functions, and assigning values to variables.
+
+In Stan, every expression and variable declaration has an associated
+type that is determined statically (i.e., when the program is
+compiled).  Sizes of vectors, matrices, and arrays, on the other hand,
+are determined dynamically (i.e., when the program is run).  This is
+very different than a language like R, which lets you assign a string
+to a variable and then later assign a matrix to it.
+
+Expressions may be primitive, such as variables or constants, or they
+may be composed of other components, such as a function or operator
+applied to arguments.  
+
+This chapter concentrates on the basic data types and how they are
+declared, assigned, and used.  The following chapter provides a
+detailed comparison of the differences among the container types:
+arrays, vectors, and matrices.
 
 \section{Basic Data Types}
+
+Arguments for built-in and user-defined functions and local variables
+are required to be basic data types, meaning an unconstrained
+primitive, vector, or matrix type or an array of such.
+
+\subsection{Primitive Types}
 
 Stan provides two primitive data types, \code{real} for continuous
 values and \code{int} for integer values.
 
+\subsection{Vector and Matrix Types}
 Stan provides three matrix-based data types, \code{vector} for column
 vectors, \code{row\_vector} for row vectors, and \code{matrix} for
 matrices.
 
+\subsection{Array Types}
+
+Any type (including the constrained types discussed in the next
+section) can be made into an array type by declaring array arguments.
+For example,
+%
+\begin{quote}
+\begin{Verbatim}
+real x[10];
+matrix[3,3] m[6,7];
+\end{Verbatim}
+\end{quote}
+%
+delcares \code{x} to be a one-dimensional array of size 10 containing
+real values, and declares \code{m} to be a two-dimensional array of
+size $6 \times 7$ containing values that are $3 \times 3$ matrices.
+
+
 \section{Constrained Data Types}
 
-Declarations of data, transformed data, parameter, transformed
-parameter, and generated quantities variables may involve constrained
-forms of the basic data types.
+Declarations of variables other than local variables may be provided
+with constraints.  Each constrained data type corresponds to a basic
+data type with constraints.
 
-Constraints provide error checking for data, transformed data,
-transformed parameter, and generated quantities types.  
+Constraints provide error checking for variables defined in the \code{data},
+\code{transformed data}, \code{transformed parameters}, and 
+\code{generated quantities} blocks.
 
 Constraints are critical for variables declared in the
-\code{parameters} block.  The constraints on parameters must match the
-support on the parameters in the model for sampling or optimization to
-work efficiently (or at all).
+\code{parameters} block, where they determine the transformation from
+constrained variables (those satisfying the declared constraint) to
+unconstrained variables (those ranging over all of $\mathbb{R}^n$).
 
+It is worth calling out the most important aspect of constrained data
+types: 
+%
+\begin{quote}
+\it
+The model must have support (non-zero density) at every value of the
+parameters that meets their declared constraints.
+\end{quote}
+%
+If the declared parameter constraints are less strict than the
+support, the samplers and optimizers may be have any of a number of
+pathologies including just getting stuck, failure to initialize,
+excessive Metropolis rejection, or biased samples due to inability to
+explore the tails of the distribution.
 
 \subsection{Upper and Lower Bounds}
 
+Variables may be declared with constraints
 All of the basic data types may be given lower and upper bounds using
 syntax such as
 %
@@ -375,21 +432,6 @@ full correlation and covariance matrices because they are easier to
 factor and scale.
 
 
-\section{Arrays}
-
-Any type can be made into an array type by declaring array arguments.
-For example,
-%
-\begin{quote}
-\begin{Verbatim}
-real x[10];
-matrix<lower=-1,upper=1>[3,3] m[6,7];
-\end{Verbatim}
-\end{quote}
-delcares \code{x} to be a one-dimensional array of size 10 containing
-real values, and declares \code{m} to be a two-dimensional array of
-size $6 \times 7$ containing values that are $3 \times 3$ matrices
-with values falling between -1 and 1.
 
 
 \section{Assignment and Argument Passing}
@@ -401,19 +443,19 @@ matching basic type and vice-versa.   Matching is interpreted strictly
 as having the same basic type and number of array dimensions.
 Constraints are not considered, but basic data types are.  
 
-Vectors and matrices are basic types, whereas arrays are collections
-of values of some basic types.  Arrays cannot be assigned to vectors
-and vice-versa.  Similarly, vectors cannot be assigned to matrices and
-vice-versa, even if their dimensions conform.  \refchapter{containers}
-provides more information on the distinctions between vectors and
-arrays and when each is appropriate.
+Arrays cannot be assigned to vectors and vice-versa.  Similarly,
+vectors cannot be assigned to matrices and vice-versa, even if their
+dimensions conform.  \refchapter{containers} provides more information
+on the distinctions between vectors and arrays and when each is
+appropriate.
 
 \subsection{Function Invocation}
 
-Stan functions are only specified for the basic (and array) data type
-of their arguments, not for constraints.  Variables with constrained
-types may nevertheless be passed to 
-
+Passing arguments to functions in Stan works just like assignment to
+basic types.  Stan functions are only specified for the basic data
+types of their arguments, including array dimensionality, but not for
+sizes or constraints.  Of course, functions often check constraints as
+part of their behavior.  
 
 
 
@@ -3148,6 +3190,102 @@ such point, the log of $\theta_k \times
 array \code{ps}.  Then the log probability is incremented with the log
 sum of exponentials of those values.
 
+
+\section{Zero-Inflated Models}\label{zero-inflation.section}
+
+Zero-inflated models, as defined by \citet{Lambert:1992}, add
+additional probability mass to the outcome of zero.  These can be
+defined in Stan directly as mixture models. 
+
+Consider the following example for zero-inflated Poisson
+distributions.  It uses a parameter \code{theta} here there is a
+probability $\theta$ of drawing a zero, and a probability $1 - \theta$
+of drawing from $\distro{Poisson}(\lambda)$.  The probability function
+is thus
+\[
+p(y_n|\theta,\lambda) 
+= 
+\left\{
+\begin{array}{ll}
+\theta + (1 - \theta) \times \distro{Poisson}(0|\lambda) & \mbox{ if } y_n = 0, \mbox{ and}
+\\[3pt]
+(1-\theta) \times \distro{Poisson}(y_n|\lambda) & \mbox{ if } y_n > 0.
+\end{array}
+\right.
+\] 
+%
+The log probability function can be implemented directly in Stan as follows.
+%
+\begin{quote}
+\begin{Verbatim}[fontsize=\small]
+data {
+  int<lower=0> N;
+  int<lower=0> y[N];
+}
+parameters {
+  real<lower=0,upper=1> theta;
+  real lambda;
+}
+model {
+  for (n in 1:N) {
+    if (y[n] == 0)
+      increment_log_prob(log_sum_exp(bernoulli_log(1,theta),
+                                     bernoulli_log(0,theta) 
+                                     + poisson_log(y[n],lambda)));
+    else
+      increment_log_prob(bernoulli_log(0,theta)
+                         + poisson_log(y[n],lambda));
+  }
+}
+\end{Verbatim}
+\end{quote}
+%
+The \code{log\_sum\_exp(lp1,lp2)} function adds the log probabilities
+on the linear scale; it is defined to be equal to \code{log(exp(lp1) +
+  exp(lp2))}, but is more arithmetically stable and faster.
+
+Although it might be tempting to try to use the \code{if\_else} syntax
+within the \code{increment\_log\_prob} function, it is not recommended
+because \code{if\_else(c,e1,e2)} evaluates both \code{e1} and
+\code{e2} no matter what the value of \code{c} is.
+
+Other distributions than the Poisson can also be inflated in this
+way.  Similarly, the boundary conditions can be reorganized so that
+\code{theta} represents the probability that $y > 0$, and the Poisson
+is only used for values greater than zero.  For example, the following
+model is properly normalized.
+%
+\begin{quote}
+\begin{Verbatim}
+   (y[n] == 0) ~ bernoulli(1,theta);
+   if (y[n] > 0)
+     y[n] - 1 ~ poisson(lambda);
+\end{Verbatim}
+\end{quote}
+%
+A little algebra shows that this will produce the same posterior as
+the following, which is coded more directly as a mixture.
+%
+\begin{quote}
+\begin{Verbatim}
+    if (y[n] == 0)
+      increment_log_prob(bernoulli_log(1,theta));
+    else
+      increment_log_prob(bernoulli_log(0,theta)
+                         + poisson_log(y[n],lambda));
+\end{Verbatim}
+\end{quote}
+
+
+\subsection{No Zero-Inflated Parameters}
+
+Note that the outcome array \code{y} is declared as data in this
+model.  Zero-inflated parameters, such as one might want to use for
+regression coefficients to carry out variable selection, will not work
+if coded this way in Stan.  The problem is that they introduce a
+discontinuity in the posterior that messes up the ability of
+Stan's gradient-based MCMC and optimization routines to follow
+gradients smoothly.
 
 
 \chapter{Measurement Error and Meta-Analysis}

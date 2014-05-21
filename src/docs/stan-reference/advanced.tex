@@ -233,7 +233,7 @@ data {
 ...
 model {
   ...
-  increment_log_prob(lambda * dot_self(beta));
+  increment_log_prob(- lambda * dot_self(beta));
 }
 \end{Verbatim}
 \end{quote}
@@ -251,8 +251,8 @@ r(\beta) = \lambda \sum_{k=1}^K | \beta_k |.
 The lasso is also called L1 shrinkage due to its relation to the L1
 norm, which is also known as taxicab distance or Manattan distance.
 
- Because the derivative of the
-penalty does not depend on the value of the $\beta_k$,
+Because the derivative of the penalty does not depend on the value of
+the $\beta_k$,
 \[
 \frac{d}{d\beta_k} \lambda \sum_{k=1}^K | \beta_k | =
 \mbox{signum}(\beta_k),
@@ -260,6 +260,10 @@ penalty does not depend on the value of the $\beta_k$,
 it has the effect of shrinking parameters all the way to 0 in maximum
 likelihood estimates.  Thus it can be used for variable selection as
 well as just shrinkage.
+
+But there is one drawback.  Stan's optimizers are not set up to deal
+with the absolute value in the formula, so they are unlikely to drive
+estimates all the way to 0.  
 
 The lasso can be implemented in Stan just as easily as ridge
 regression, with the magnitude declared as data and the penalty added
@@ -275,7 +279,7 @@ data {
 model {
   ...
   for (k in 1:K)
-    increment_log_prob(lambda * abs(beta[k]));
+    increment_log_prob(- lambda * abs(beta[k]));
 }
 \end{Verbatim}
 \end{quote}

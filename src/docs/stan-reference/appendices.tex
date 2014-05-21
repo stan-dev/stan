@@ -32,6 +32,13 @@ are not distributed with \Stan, but are required to build and run
 \begin{quote}
 \url{http://www.opensource.org/licenses/BSD-3-Clause}
 \end{quote}
+%
+The copyright holder of each contribution is the developer or his or
+her assignee.%
+%
+\footnote{Universities or companies often own the copyright of
+  computer programs developed by their employees.}
+
 
 \section{Boost License}
 
@@ -41,6 +48,10 @@ License version 1.0.
 \begin{quote}
 \url{http://www.opensource.org/licenses/BSL-1.0}
 \end{quote}
+%
+The copyright for each Boost package is held by its developers or their
+assginees.
+
 
 \section{Eigen License} 
 %
@@ -50,6 +61,9 @@ version 2.
 \begin{quote}
 \url{http:/http://opensource.org/licenses/mpl-2.0}
 \end{quote}
+%
+The copyright of Eigen is owned jointly by its developers or their
+assignees. 
 
 \section{Google Test License}
 
@@ -376,49 +390,8 @@ language section of this manual.
 %
 \item Stan supports general conditional statements using a standard
   if-else syntax.  For example, a zero-inflated (or -deflated) Poisson
-  mixture model of the form defined by \citet{Lambert:1992} 
-  may be defined as follows, where there is a probability $\theta$ of
-  drawing a zero, and a probability $1 - \theta$ of drawing from
-  $\distro{Poisson}(\lambda)$.  The probability function is thus
-\[
-p(y_n|\theta,\lambda) 
-= 
-\left\{
-\begin{array}{ll}
-\theta + (1 - \theta) \times \distro{Poisson}(0|\lambda) & \mbox{ if } y_n = 0, \mbox{ and}
-\\[3pt]
-(1-\theta) \times \distro{Poisson}(y_n|\lambda) & \mbox{ if } y_n > 0.
-\end{array}
-\right.
-\] 
-%
-The log probability function can be implemented directly in Stan as follows.
-%
-\begin{quote}
-\begin{Verbatim}[fontsize=\small]
-data {
-  int<lower=0> N;
-  int<lower=0> y[N];
-  ...
-}
-model {
-  for (n in 1:N) {
-    if (y[n] == 0)
-      increment_log_prob(log_sum_exp(bernoulli_log(1,theta),
-                                     bernoulli_log(0,theta) 
-                                     + poisson_log(y[n],lambda)));
-    else
-      increment_log_prob(bernoulli_Log(0,theta)
-                         + poisson_log(y[n],lambda));
-  }
-  ...
-}
-\end{Verbatim}
-\end{quote}
-%
-The \code{log\_sum\_exp(lp1,lp2)} function adds the log probabilities
-on the linear scale; it is defined to be equal to \code{log(exp(lp1) +
-  exp(lp2))}, but is more arithmetically stable.
+  mixture model is defined using the if-else syntax as described in
+  \refsection{zero-inflated}. 
 %
 \item Stan supports general while loops using a standard syntax.  
 While loops give Stan full Turing equivalent computational power.
