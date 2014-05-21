@@ -55,7 +55,7 @@ generated quantities {
   theta <- dirichlet_rng(alpha);
   v <- multi_normal_rng(mu,Sigma);
   // v <- multi_normal_prec_rng(mu,Sigma);
-  // v <- multi_normal_cholesky_rng(mu,L);
+  v <- multi_normal_cholesky_rng(mu,L);
   v <- multi_student_t_rng(3.0,mu,Sigma);
   Sigma <- wishart_rng(3.0,Sigma);
   Sigma <- inv_wishart_rng(3.0,Sigma);
