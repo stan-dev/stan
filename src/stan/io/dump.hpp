@@ -261,11 +261,6 @@ namespace stan {
     public:
 
       /**
-       * Construct a dump writer writing to standard output.
-       */
-      dump_writer() : out_(std::cout) { }
-      
-      /**
        * Construct a dump writer writing to the specified output
        * stream.
        *
@@ -708,32 +703,29 @@ namespace stan {
       }
 
       /**
-       * Helper function prints diagnostic information to std::cout.
+       * Helper function prints diagnostic information to the stream provided.
+       *
+       * @param out stream to print diagnostic information to.
        */
-      void print() {
-        std::cout << "var name=|" << name_ << "|" << std::endl;
-        std:: cout << "dims=(";
+      void print(std::ostream& out) {
+        out << "var name=|" << name_ << "|" << std::endl;
+        out << "dims=(";
         for (size_t i = 0; i < dims_.size(); ++i) {
           if (i > 0)
-            std::cout << ",";
-          std::cout << dims_[i];
+            out << ",";
+          out << dims_[i];
         }
-        std::cout << ")" << std::endl;
-        std::cout << "float stack:" << std::endl;
+        out << ")" << std::endl;
+        out << "float stack:" << std::endl;
         for (size_t i = 0; i < stack_r_.size(); ++i)
-          std::cout << "  [" << i << "] " << stack_r_[i] << std::endl;
-        std::cout << "int stack" << std::endl;
+          out << "  [" << i << "] " << stack_r_[i] << std::endl;
+        out << "int stack" << std::endl;
         for (size_t i = 0; i < stack_i_.size(); ++i)
-          std::cout << "  [" << i << "] " << stack_i_[i] << std::endl;
+          out << "  [" << i << "] " << stack_i_[i] << std::endl;
       }
 
 
     public:
-      /**
-       * Construct a reader for standard input.
-       */
-      dump_reader() : in_(std::cin) { }
-
       /**
        * Construct a reader for the specified input stream.
        *

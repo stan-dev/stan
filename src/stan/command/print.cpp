@@ -17,7 +17,7 @@
 int main(int argc, const char* argv[]) {
   
   if (argc == 1) {
-    print_usage();
+    print_usage(std::cout);
     return 0;
   }
   
@@ -34,7 +34,7 @@ int main(int argc, const char* argv[]) {
       continue;
     
     if (std::string("--help") == std::string(argv[i])) {
-      print_usage();
+      print_usage(std::cout);
       return 0;
     }
     
@@ -62,7 +62,7 @@ int main(int argc, const char* argv[]) {
   
   ifstream.open(filenames[0].c_str());
   
-  stan::io::stan_csv stan_csv = stan::io::stan_csv_reader::parse(ifstream);
+  stan::io::stan_csv stan_csv = stan::io::stan_csv_reader::parse(ifstream, std::cerr);
   warmup_times(0) = stan_csv.timing.warmup;
   sampling_times(0) = stan_csv.timing.sampling;
   
@@ -74,7 +74,7 @@ int main(int argc, const char* argv[]) {
   for (std::vector<std::string>::size_type chain = 1; 
        chain < filenames.size(); chain++) {
     ifstream.open(filenames[chain].c_str());
-    stan_csv = stan::io::stan_csv_reader::parse(ifstream);
+    stan_csv = stan::io::stan_csv_reader::parse(ifstream, std::cerr);
     chains.add(stan_csv);
     ifstream.close();
     thin(chain) = stan_csv.metadata.thin;

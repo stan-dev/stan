@@ -57,8 +57,8 @@ void delete_file(std::ostream* err_stream,
   int deleted = std::remove(file_name.c_str());
   if (deleted != 0 && file_name.size() > 0)
     if (err_stream) 
-      std::cerr << "Could not remove output file=" << file_name
-                << std::endl;
+      *err_stream << "Could not remove output file=" << file_name
+                  << std::endl;
 }      
 
 

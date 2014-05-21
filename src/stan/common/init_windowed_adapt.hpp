@@ -13,9 +13,10 @@ namespace stan {
     bool init_windowed_adapt(stan::mcmc::base_mcmc* sampler, 
                              stan::gm::categorical_argument* adapt, 
                              unsigned int num_warmup, 
-                             const Eigen::VectorXd& cont_params) {
+                             const Eigen::VectorXd& cont_params,
+                             std::ostream& err) {
       
-      init_adapt<Sampler>(sampler, adapt, cont_params);
+      init_adapt<Sampler>(sampler, adapt, cont_params, err);
       
       unsigned int init_buffer 
         = dynamic_cast<stan::gm::u_int_argument*>(adapt->arg("init_buffer"))->value();
@@ -24,7 +25,7 @@ namespace stan {
       unsigned int window = dynamic_cast<stan::gm::u_int_argument*>(adapt->arg("window"))->value();
       
       dynamic_cast<Sampler*>(sampler)->set_window_params(num_warmup, init_buffer, 
-                                                         term_buffer, window, &std::cout);
+                                                         term_buffer, window, &err);
       
       return true;
       

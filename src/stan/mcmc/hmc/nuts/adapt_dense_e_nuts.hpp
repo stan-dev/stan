@@ -19,7 +19,7 @@ namespace stan {
     public:
       
         adapt_dense_e_nuts(M &m, BaseRNG& rng,
-                           std::ostream* o = &std::cout, std::ostream* e = 0):
+                           std::ostream* o, std::ostream* e):
         dense_e_nuts<M, BaseRNG>(m, rng, o, e),
         stepsize_covar_adapter(m.num_params_r())
       {};

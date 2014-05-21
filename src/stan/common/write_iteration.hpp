@@ -4,9 +4,6 @@
 #include <ostream>
 #include <vector>
 #include <stan/common/write_iteration_csv.hpp>
-
-// FIXME: write_iteration calls std::cout directly.
-//   once removed, remove this include
 #include <iostream>
 
 
@@ -24,7 +21,7 @@ namespace stan {
                          std::vector<int>& disc_vector) {
       std::vector<double> model_values;
       model.write_array(base_rng, cont_vector, disc_vector, model_values,
-                        true, true, &std::cout);  
+                        true, true, &output_stream);  
       write_iteration_csv(output_stream, lp, model_values);
     }
 
