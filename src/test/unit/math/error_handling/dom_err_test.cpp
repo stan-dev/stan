@@ -84,9 +84,9 @@ TEST_F(MathErrorHandling_dom_err, int_double_double) {
 
 
 TEST_F(MathErrorHandling_dom_err, var_var_var) {
-  typedef int T;
-  typedef double T_result;
-  typedef double T_msg;
+  typedef stan::agrad::var T;
+  typedef stan::agrad::var T_result;
+  typedef stan::agrad::var T_msg;
   
   T y = 10;
   T_msg msg2 = 50;
