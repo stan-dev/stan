@@ -29,7 +29,6 @@ namespace stan {
                        const char* name,
                        T_result* result) {
       typedef typename Eigen::Matrix<T_prob,Eigen::Dynamic,1>::size_type size_t;
-      using stan::math::policies::raise_domain_error;
       if (theta.size() == 0) {
         std::string message(name);
         message += " is not a valid simplex. %1% elements in the vector.";

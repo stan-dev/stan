@@ -26,7 +26,6 @@ namespace stan {
                                 const Eigen::Matrix<T_y,Eigen::Dynamic,1>& y,
                                 const char* name,
                                 T_result* result) {
-      using stan::math::policies::raise_domain_error;
       typedef typename Eigen::Matrix<T_y,Eigen::Dynamic,1>::size_type size_t;
       if (y.size() == 0) {
         return true;

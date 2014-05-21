@@ -26,7 +26,7 @@ namespace stan {
                         const T_y& y,
                         const char* name,
                         const char* error_msg,
-                        T_msg2 error_msg2,
+                        const T_msg2 error_msg2,
                         T_result* result) {
       using stan::math::policies::raise_domain_error;
       std::ostringstream msg_o;
