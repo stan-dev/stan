@@ -847,6 +847,14 @@ transformed parameters {
   transformed_param_matrix <- quad_form(d_matrix,p_matrix);
   transformed_param_matrix <- quad_form(p_matrix,d_matrix);
   transformed_param_matrix <- quad_form(p_matrix,p_matrix);
+  transformed_param_real <- quad_form_sym(d_matrix,d_vector);
+  transformed_param_real <- quad_form_sym(d_matrix,p_vector);
+  transformed_param_real <- quad_form_sym(p_matrix,d_vector);
+  transformed_param_real <- quad_form_sym(p_matrix,p_vector);
+  transformed_param_matrix <- quad_form_sym(d_matrix,d_matrix);
+  transformed_param_matrix <- quad_form_sym(d_matrix,p_matrix);
+  transformed_param_matrix <- quad_form_sym(p_matrix,d_matrix);
+  transformed_param_matrix <- quad_form_sym(p_matrix,p_matrix);
   transformed_param_real <- trace_quad_form(d_matrix,d_vector);
   transformed_param_real <- trace_quad_form(d_matrix,p_vector);
   transformed_param_real <- trace_quad_form(p_matrix,d_vector);

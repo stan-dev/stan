@@ -43,9 +43,9 @@ namespace stan {
             return;
         
           if (x.size() != 0) {
-            *o_ << x.at(0);
+            *o_ << x[0];
             for (typename std::vector<T>::size_type n = 1; n < x.size(); n++) {
-              *o_ << "," << x.at(n);
+              *o_ << "," << x[n];
             }
           }
           *o_ << std::endl;

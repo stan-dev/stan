@@ -1840,7 +1840,13 @@ triangular and such that $LL^{\top}$ is positive definite, then for $y
   factor of the covariance matrix \farg{L}}
 %
 \end{description}
-
+%
+\begin{description}
+\fitem{vector}{multi\_normal\_cholesky\_rng}{vector \farg{mu}, matrix
+  \farg{L}}{Generate a multivariate normal variate with location
+  \farg{mu} and lower-triangular Cholesky factor of the covariance 
+  matrix \farg{L}; may only be used in generated quantities block}
+\end{description}
 
 
 \section{Multivariate Student-$t$ Distribution}
