@@ -28,13 +28,16 @@ namespace stan {
       }
     }
 
+    // currently ignoring T_result
     template <typename T,
+              typename T_result,
               typename T_msg>
-    inline void dom_err(const char* function,
+    inline bool dom_err(const char* function,
                         const T& y,
                         const char* name,
                         const char* error_msg,
-                        const T_msg error_msg2) {
+                        const T_msg error_msg2,
+                        T_result* result) {
       std::ostringstream msg_o;
       msg_o << name << error_msg << error_msg2;
       
@@ -46,20 +49,7 @@ namespace stan {
       msg += msg_o.str();
       
       throw std::domain_error((boost::format(msg) % y).str());
-    }
 
-    template <typename T,
-              typename T_result,
-              typename T_msg>
-    inline bool dom_err(const char* function,
-                        const T& y,
-                        const char* name,
-                        const char* error_msg,
-                        const T_msg error_msg2,
-                        T_result* result) {
-      dom_err(function, y, name, error_msg, error_msg2);
-      if (result != 0)
-        *result = std::numeric_limits<T_result>::quiet_NaN();
       return false;
     }
     
