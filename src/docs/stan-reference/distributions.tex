@@ -2128,15 +2128,15 @@ the multivariate Gamma function,
 \begin{description}
 %
 \fitem{real}{wishart\_log}{matrix \farg{W}, real \farg{nu}, matrix
- \farg{Sigma}}{The log of the Wishart density for positive-definite matrix
- \farg{W} given degrees of freedom \farg{nu} and scale matrix
+ \farg{Sigma}}{The log of the Wishart density for symmetric and positive-definite matrix
+ \farg{W} given degrees of freedom \farg{nu} and symmetric and positive-definite scale matrix
  \farg{Sigma}}
 %
 \end{description}
 %
 \begin{description}
 \fitem{matrix}{wishart\_rng}{real \farg{nu}, matrix \farg{Sigma}}{Generate a
-  Wishart variate with degrees of freedom \farg{nu} and scale matrix
+  Wishart variate with degrees of freedom \farg{nu} and symmetric and positive-definite scale matrix
  \farg{Sigma}; may only be used in generated quantities block}
 \end{description}
 
@@ -2174,8 +2174,8 @@ positive-definite $W \in \reals^{K \times K}$,
 \begin{description}
 %
 \fitem{real}{inv\_wishart\_log}{matrix \farg{W}, real \farg{nu}, matrix
- \farg{Sigma}}{The log of the inverse Wishart density for positive-definite matrix
- \farg{W} given degrees of freedom \farg{nu} and scale matrix
+ \farg{Sigma}}{The log of the inverse Wishart density for symmetric and positive-definite matrix
+ \farg{W} given degrees of freedom \farg{nu} and symmetric and positive-definite scale matrix
  \farg{Sigma}}
 %
 \end{description}
@@ -2183,7 +2183,7 @@ positive-definite $W \in \reals^{K \times K}$,
 \begin{description}
 \fitem{matrix}{inv\_wishart\_rng}{real \farg{nu}, matrix
   \farg{Sigma}}{Generate an inverse Wishart variate with degrees of 
-freedom \farg{nu} and scale matrix
+freedom \farg{nu} and symmetric and positive-definite scale matrix
  \farg{Sigma}; may only be used in generated quantities block}
 \end{description}
 
