@@ -813,8 +813,9 @@ namespace stan {
     typename boost::math::tools::promote_args<T,TL,TU>::type
     lub_free(const T y, TL lb, TU ub) {
       using stan::math::logit;
-      stan::math::check_bounded("stan::prob::lub_free(%1%)",
-                                y, lb, ub, "Bounded variable");
+      stan::math::check_bounded<T, TL, TU, typename scalar_type<T>::type>
+        ("stan::prob::lub_free(%1%)",
+         y, lb, ub, "Bounded variable", 0);
       if (lb == -std::numeric_limits<double>::infinity())
         return ub_free(y,ub);
       if (ub == std::numeric_limits<double>::infinity())
@@ -894,8 +895,9 @@ namespace stan {
     inline
     T prob_free(const T y) {
       using stan::math::logit;
-      stan::math::check_bounded("stan::prob::prob_free(%1%)",
-                                y, 0, 1, "Probability variable");
+      stan::math::check_bounded<T,double,double,T>
+        ("stan::prob::prob_free(%1%)",
+         y, 0, 1, "Probability variable",0);
       return logit(y);
     }
     
@@ -960,8 +962,9 @@ namespace stan {
     template <typename T>
     inline
     T corr_free(const T y) {
-      stan::math::check_bounded("stan::prob::lub_free(%1%)",
-                                y, -1, 1, "Correlation variable");
+      stan::math::check_bounded<T,double,double,double>
+        ("stan::prob::lub_free(%1%)",
+         y, -1, 1, "Correlation variable", 0);
       return atanh(y);
     }
 

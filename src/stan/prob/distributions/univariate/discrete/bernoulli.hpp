@@ -419,8 +419,8 @@ namespace stan {
  
       if (!check_finite(function, theta, "Probability parameter"))
         return 0;
-      if (!check_bounded(function, theta, 0.0, 1.0,
-                         "Probability parameter"))
+      if (!check_bounded<double,double,double,double>(function, theta, 0, 1,
+                                                      "Probability parameter", 0))
         return 0;
 
       variate_generator<RNG&, bernoulli_distribution<> >

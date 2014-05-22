@@ -623,7 +623,8 @@ namespace stan {
       template <typename TL, typename TU>
       inline T scalar_lub(const TL lb, const TU ub) {
         T x(scalar());
-        stan::math::check_bounded("stan::io::scalar_lub(%1%)", x, lb, ub, "Constrained scalar");
+        stan::math::check_bounded<T,TL,TU,T>
+          ("stan::io::scalar_lub(%1%)", x, lb, ub, "Constrained scalar",0);
         return x;
       }
 
@@ -673,7 +674,8 @@ namespace stan {
        */
       inline T prob() {
         T x(scalar());
-        stan::math::check_bounded("stan::io::prob(%1%)", x, 0, 1, "Constrained probability");
+        stan::math::check_bounded<T,double,double,double>
+          ("stan::io::prob(%1%)", x, 0, 1, "Constrained probability", 0);
         return x;
       }
 
@@ -719,7 +721,8 @@ namespace stan {
        */
       inline T corr() {
         T x(scalar());
-        stan::math::check_bounded("stan::io::corr(%1%)", x, -1, 1, "Correlation value");
+        stan::math::check_bounded<T,double,double,double>
+          ("stan::io::corr(%1%)", x, -1, 1, "Correlation value",0);
         return x;
       }
 

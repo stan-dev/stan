@@ -101,7 +101,7 @@ namespace stan {
       using stan::math::check_bounded;
       using stan::math::check_positive;
 
-      if (!check_bounded(function, N, 0, a+b, "Draws parameter"))
+      if (!check_bounded<int,int,int,int>(function, N, 0, a+b, "Draws parameter", 0))
         return 0;
       if (!check_positive(function,N,"Draws parameter"))
         return 0;

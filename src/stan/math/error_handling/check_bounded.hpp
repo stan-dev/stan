@@ -85,18 +85,6 @@ namespace stan {
         ::check(function,y,low,high,name,result);
     }
 
-    // public check_bounded function without pointer to result
-    template <typename T_y, typename T_low, typename T_high>
-    inline bool check_bounded(const char* function,
-                              const T_y& y,
-                              const T_low& low,
-                              const T_high& high,
-                              const char* name) {
-      return detail::bounded<T_y,T_low,T_high,typename scalar_type<T_y>::type,
-                             is_vector_like<T_y>::value>
-        ::check(function,y,low,high,name,0);
-    }
-
   }
 }
 #endif
