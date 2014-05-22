@@ -6,6 +6,7 @@
 #include <vector>
 #include <test/unit/distribution/expect_eq_diffs.hpp>
 #include <test/unit/distribution/multivariate/continuous/test_gradients.hpp>
+#include <test/unit/distribution/multivariate/continuous/test_gradients_multi_normal.hpp>
 #include <test/unit/distribution/multivariate/continuous/agrad_distributions_multi_normal_multi_row.hpp>
 #include <test/unit/distribution/multivariate/continuous/agrad_distributions_multi_normal.hpp>
 
@@ -246,26 +247,32 @@ struct vectorized_multi_normal_fun {
 
   vectorized_multi_normal_fun(int K, int L) : K_(K), L_(L) { }
 
-  template <typename T>
-  T operator()(const std::vector<T>& x) const {
-    vector<Matrix<T,Dynamic,1> > y(L_, Matrix<T,Dynamic,1> (K_));
-    vector<Matrix<T,Dynamic,1> > mu(L_, Matrix<T,Dynamic,1> (K_));
-    Matrix<T,Dynamic,Dynamic> Sigma(K_,K_);
+  template <typename T_y, typename T_mu, typename T_sigma>
+  typename boost::math::tools::promote_args<T_y, T_mu, T_sigma>::type
+  operator() (const std::vector<T_y>& y_vec,
+              const std::vector<T_mu>& mu_vec,
+              const std::vector<T_sigma>& sigma_vec) const {
+    vector<Matrix<T_y,Dynamic,1> > y(L_, Matrix<T_y,Dynamic,1> (K_));
+    vector<Matrix<T_mu,Dynamic,1> > mu(L_, Matrix<T_mu,Dynamic,1> (K_));
+    Matrix<T_sigma,Dynamic,Dynamic> Sigma(K_, K_);
     int pos = 0;
     for (int i = 0; i < L_; ++i) 
       for (int j = 0; j < K_; ++j)
-        y[i](j) = x[pos++];
-        
+        y[i](j) = y_vec[pos++];
+
+    pos = 0;        
     for (int i = 0; i < L_; ++i)         
       for (int j = 0; j < K_; ++j)
-        mu[i](j) = x[pos++];
+        mu[i](j) = mu_vec[pos++];
     
+    pos = 0;
     for (int j = 0; j < K_; ++j) {
       for (int i = 0; i <= j; ++i) {
-        Sigma(i,j) = x[pos++];
+        Sigma(i,j) = sigma_vec[pos++];
         Sigma(j,i) = Sigma(i,j);
       }
     }
+    
     return stan::prob::multi_normal_log<false>(y,mu,Sigma);
   }
 };
@@ -273,59 +280,108 @@ struct vectorized_multi_normal_fun {
 TEST(MultiNormal, TestGradFunctionalVectorized) {
   
   {
-  vector<double> x(12);
+  vector<double> y_(3), mu_(3), sigma_(6);
   // y
-  x[0] = 1.0;
-  x[1] = 2.0;
-  x[2] = -3.0;
+  y_[0] = 1.0;
+  y_[1] = 2.0;
+  y_[2] = -3.0;
   // mu
-  x[3] = 0.0;
-  x[4] = -2.0;
-  x[5] = -3.0;
+  mu_[0] = 0.0;
+  mu_[1] = -2.0;
+  mu_[2] = -3.0;
   // Sigma
-  x[6] = 1;
-  x[7] = -1;
-  x[8] = 10;
-  x[9] = -2;
-  x[10] = 20;
-  x[11] = 56;
+  sigma_[0] = 1;
+  sigma_[1] = -1;
+  sigma_[2] = 10;
+  sigma_[3] = -2;
+  sigma_[4] = 20;
+  sigma_[5] = 56;
 
-  test_grad(vectorized_multi_normal_fun(3, 1), x);
+  test_grad_multi_normal(vectorized_multi_normal_fun(3, 1),
+                         y_, mu_, sigma_);
+  test_grad_multi_normal(vectorized_multi_normal_fun(3, 1),
+                         y_, mu_, get_vvar(sigma_));
+  test_grad_multi_normal(vectorized_multi_normal_fun(3, 1),
+                         y_, get_vvar(mu_), sigma_);
+  test_grad_multi_normal(vectorized_multi_normal_fun(3, 1),
+                         y_, get_vvar(mu_), get_vvar(sigma_));
+  test_grad_multi_normal(vectorized_multi_normal_fun(3, 1),
+                         get_vvar(y_), mu_, sigma_);
+  test_grad_multi_normal(vectorized_multi_normal_fun(3, 1),
+                         get_vvar(y_), mu_, get_vvar(sigma_));
+  test_grad_multi_normal(vectorized_multi_normal_fun(3, 1),
+                         get_vvar(y_), get_vvar(mu_), sigma_);
+  test_grad_multi_normal(vectorized_multi_normal_fun(3, 1),
+                         get_vvar(y_), get_vvar(mu_), get_vvar(sigma_));
   }
   
-  vector<double> x(18);
+  {
+  vector<double> y_(6), mu_(6), sigma_(6);
   // y[1]
-  x[0] = 1.0;
-  x[1] = 2.0;
-  x[2] = -3.0;
+  y_[0] = 1.0;
+  y_[1] = 2.0;
+  y_[2] = -3.0;
   // y[2]
-  x[3] = 0.0;
-  x[4] = -2.0;
-  x[5] = -3.0;
+  y_[3] = 0.0;
+  y_[4] = -2.0;
+  y_[5] = -3.0;
   
   // mu[1]
-  x[6] = 0.0;
-  x[7] = 1.0;
-  x[8] = 3.0;
+  mu_[0] = 0.0;
+  mu_[1] = 1.0;
+  mu_[2] = 3.0;
   // mu[2]
-  x[9] = 0.0;
-  x[10] = -1.0;
-  x[11] = -2.0;
+  mu_[3] = 0.0;
+  mu_[4] = -1.0;
+  mu_[5] = -2.0;
   
   // Sigma
-  x[12] = 1;
-  x[13] = -1;
-  x[14] = 10;
-  x[15] = -2;
-  x[16] = 20;
-  x[17] = 56;
-
-  test_grad(vectorized_multi_normal_fun(3, 2), x);
+  sigma_[0] = 1;
+  sigma_[1] = -1;
+  sigma_[2] = 10;
+  sigma_[3] = -2;
+  sigma_[4] = 20;
+  sigma_[5] = 56;
   
-  vector<double> u(3);
-  u[0] = 1.9;
-  u[1] = -2.7;
-  u[2] = 0.48;
+  test_grad_multi_normal(vectorized_multi_normal_fun(3, 2),
+                         y_, mu_, sigma_);
+  test_grad_multi_normal(vectorized_multi_normal_fun(3, 2),
+                         y_, mu_, get_vvar(sigma_));
+  test_grad_multi_normal(vectorized_multi_normal_fun(3, 2),
+                         y_, get_vvar(mu_), sigma_);
+  test_grad_multi_normal(vectorized_multi_normal_fun(3, 2),
+                         y_, get_vvar(mu_), get_vvar(sigma_));
+  test_grad_multi_normal(vectorized_multi_normal_fun(3, 2),
+                         get_vvar(y_), mu_, sigma_);
+  test_grad_multi_normal(vectorized_multi_normal_fun(3, 2),
+                         get_vvar(y_), mu_, get_vvar(sigma_));
+  test_grad_multi_normal(vectorized_multi_normal_fun(3, 2),
+                         get_vvar(y_), get_vvar(mu_), sigma_);
+  test_grad_multi_normal(vectorized_multi_normal_fun(3, 2),
+                         get_vvar(y_), get_vvar(mu_), get_vvar(sigma_));
+  }
+  {
+  vector<double> y_(1), mu_(1), sigma_(1);
+  y_[0] = 1.9;
+  mu_[0] = -2.7;
+  sigma_[0] = 0.48;
   
-  test_grad(vectorized_multi_normal_fun(1, 1), u);
+  
+  test_grad_multi_normal(vectorized_multi_normal_fun(1, 1),
+                         y_, mu_, sigma_);
+  test_grad_multi_normal(vectorized_multi_normal_fun(1, 1),
+                         y_, mu_, get_vvar(sigma_));
+  test_grad_multi_normal(vectorized_multi_normal_fun(1, 1),
+                         y_, get_vvar(mu_), sigma_);
+  test_grad_multi_normal(vectorized_multi_normal_fun(1, 1),
+                         y_, get_vvar(mu_), get_vvar(sigma_));
+  test_grad_multi_normal(vectorized_multi_normal_fun(1, 1),
+                         get_vvar(y_), mu_, sigma_);
+  test_grad_multi_normal(vectorized_multi_normal_fun(1, 1),
+                         get_vvar(y_), mu_, get_vvar(sigma_));
+  test_grad_multi_normal(vectorized_multi_normal_fun(1, 1),
+                         get_vvar(y_), get_vvar(mu_), sigma_);
+  test_grad_multi_normal(vectorized_multi_normal_fun(1, 1),
+                         get_vvar(y_), get_vvar(mu_), get_vvar(sigma_));
+  }
 }
