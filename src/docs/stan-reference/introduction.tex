@@ -34,29 +34,55 @@ functionality.
 \subsection{CmdStan}
 
 CmdStan allows Stan to be run from the command line.  In some sense,
-CmdStan is the reference implementation of Stan.  This manual
-currently doubles as the CmdStan documentation.  In the near term,
-the CmdStan documentation will be broken out of this manual and given
-its own manual.
+CmdStan is the reference implementation of Stan.  The CmdStan
+documentation used to be part of this document, but is now its own
+standalone document.  The CmdStan home page, with links to download
+and installation instructions and the manual is code and manual is
+%
+\begin{quote}
+\url{http://mc-stan.org/cmdstan.html}
+\end{quote}
 
 \subsection{RStan}
 
-RStan is the R interface to Stan.  The installation and getting
-started guide for RStan can be found on GitHub at:
-
+RStan is the R interface to Stan.  RStan interfaces to Stan through
+R's memory rather than just calling Stan from the outside, as in the
+R2WinBUGS and R2jags interfaces on which it was modeled.  The RStan
+home page, with links to download and installation instructions and the 
+manual is
+%
 \begin{quote}
-\url{https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started}
+\url{http://mc-stan.org/rstan.html}
 \end{quote}
 
 \subsection{PyStan}
 
-PyStan is the Python interface to Stan.  The installation and getting
-started guide for PyStan can be found on Read the Docs at:
-
+PyStan is the Python interface to Stan.  Like RStan, it interfaces at
+the Python memory level rather than calling Stan from the outside.
+The PyStan home page, with links to download and installation
+instructions and the manual is
+%
 \begin{quote}
-\url{https://pystan.readthedocs.org/en/latest/getting_started.html}
+\url{http://mc-stan.org/pystan.html}
 \end{quote}
 
+
+\subsection{Future Interfaces}
+
+Work is underway to develop interfaces for Stan in:
+%
+\begin{itemize}
+\item MATLAB
+\item Julia
+\item Stata
+\end{itemize}
+%
+For more information, or to get involved in the design or coding, see
+the Stan message groups at
+%
+\begin{quote}
+\url{http://mc-stan.org/groups.html}
+\end{quote}
 
 
 \section{Stan Programs}
@@ -275,13 +301,5 @@ likelihood rather than posterior modes of a full model.  Sometimes
 Empirical Bayes point estimates will be obtained using moment matching
 (see, e.g., the rat-tumor example in Chapter 5 of
 \citep{GelmanEtAl:2013}).
-
-
-\subsection{Experimental Feature}
-
-Stan's optimizers have not been as well tested as its samplers, so
-they are still considered an ``experimental'' feature.  We would love
-to hear back about successess or failures users have with
-optimization.  
 
 
