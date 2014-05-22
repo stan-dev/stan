@@ -6,6 +6,7 @@
 #include <vector>
 #include <test/unit/distribution/expect_eq_diffs.hpp>
 #include <test/unit/distribution/multivariate/continuous/test_gradients.hpp>
+#include <test/unit/distribution/multivariate/continuous/test_gradients_multi_student_t.hpp>
 #include <test/unit/distribution/multivariate/continuous/agrad_distributions_multi_student_t.hpp>
 
 using Eigen::Dynamic;
@@ -216,101 +217,224 @@ TEST(MultiStudentT, TestGradFunctional) {
   test_grad(multi_student_t_fun(1), u);
 }
 
-
+template <int is_row_vec_y, int is_row_vec_mu>
 struct vectorized_multi_student_t_fun {
   const int K_; //size of each vector and order of square matrix sigma
   const int L_; //size of the array of eigen vectors
+  const bool dont_vectorize_y; //direct use eigen vector for y
+  const bool dont_vectorize_mu; //direct use eigen vector for mu
+  
+  vectorized_multi_student_t_fun<is_row_vec_y, is_row_vec_mu>(int K, int L, bool M = false, bool N = false) : K_(K), L_(L), 
+                                        dont_vectorize_y(M),
+                                        dont_vectorize_mu(N) {
+    if ((dont_vectorize_y || dont_vectorize_mu) && L != 1)
+      throw std::runtime_error("attempt to disable vectorization with vector bigger than 1");
+  }
 
-  vectorized_multi_student_t_fun(int K, int L) : K_(K), L_(L) { }
-
-  template <typename T>
-  T operator()(const std::vector<T>& x) const {
-    T nu;
-    vector<Matrix<T,Dynamic,1> > y(L_, Matrix<T,Dynamic,1> (K_));
-    vector<Matrix<T,Dynamic,1> > mu(L_, Matrix<T,Dynamic,1> (K_));
-    Matrix<T,Dynamic,Dynamic> Sigma(K_,K_);
+  template <typename T_y, typename T_mu, typename T_sigma, typename T_nu>
+  typename boost::math::tools::promote_args<T_y, T_mu, T_sigma, T_nu>::type
+  operator() (const std::vector<T_y>& y_vec,
+              const std::vector<T_mu>& mu_vec,
+              const std::vector<T_sigma>& sigma_vec,
+              const T_nu & nu) const {
+    vector<Matrix<T_y,is_row_vec_y,is_row_vec_y*-1> > y(L_, Matrix<T_y,is_row_vec_y,is_row_vec_y*-1> (K_));
+    vector<Matrix<T_mu,is_row_vec_mu,is_row_vec_mu*-1> > mu(L_, Matrix<T_mu,is_row_vec_mu,is_row_vec_mu*-1> (K_));
+    Matrix<T_sigma,Dynamic,Dynamic> Sigma(K_, K_);
     int pos = 0;
     for (int i = 0; i < L_; ++i) 
       for (int j = 0; j < K_; ++j)
-        y[i](j) = x[pos++];
-        
+        y[i](j) = y_vec[pos++];
+
+    pos = 0;        
     for (int i = 0; i < L_; ++i)         
       for (int j = 0; j < K_; ++j)
-        mu[i](j) = x[pos++];
+        mu[i](j) = mu_vec[pos++];
     
+    pos = 0;
     for (int j = 0; j < K_; ++j) {
       for (int i = 0; i <= j; ++i) {
-        Sigma(i,j) = x[pos++];
+        Sigma(i,j) = sigma_vec[pos++];
         Sigma(j,i) = Sigma(i,j);
       }
     }
-    nu = x[pos++];
-    return stan::prob::multi_student_t_log<false>(y,nu,mu,Sigma);
+    
+    if (dont_vectorize_y) {
+      if (dont_vectorize_mu)
+        return stan::prob::multi_student_t_log<false>(y[0], nu, mu[0], Sigma);
+      else
+        return stan::prob::multi_student_t_log<false>(y[0], nu, mu, Sigma);
+    }
+    else {
+      if (dont_vectorize_mu)
+        return stan::prob::multi_student_t_log<false>(y, nu, mu[0], Sigma);
+      else
+        return stan::prob::multi_student_t_log<false>(y, nu, mu, Sigma);
+    }
   }
 };
 
-TEST(MultiStudentT, TestGradFunctionalVectorized) {
-  
+template <int is_row_vec_y, int is_row_vec_mu>
+void test_all() {
   {
-  vector<double> x(13);
-  // y
-  x[0] = 1.0;
-  x[1] = 2.0;
-  x[2] = -3.0;
-  // mu
-  x[3] = 0.0;
-  x[4] = -2.0;
-  x[5] = -3.0;
-  // Sigma
-  x[6] = 1;
-  x[7] = -1;
-  x[8] = 10;
-  x[9] = -2;
-  x[10] = 20;
-  x[11] = 56;
-  // nu
-  x[12] = 5;
-
-  test_grad(vectorized_multi_student_t_fun(3, 1), x);
+    vector<double> y_(3), mu_(3), sigma_(6);
+    // y
+    y_[0] = 1.0;
+    y_[1] = 2.0;
+    y_[2] = -3.0;
+    // mu
+    mu_[0] = 0.0;
+    mu_[1] = -2.0;
+    mu_[2] = -3.0;
+    // Sigma
+    sigma_[0] = 1;
+    sigma_[1] = -1;
+    sigma_[2] = 10;
+    sigma_[3] = -2;
+    sigma_[4] = 20;
+    sigma_[5] = 56;
+    for (int ii = 0; ii < 2; ii++)
+      for (int jj = 0; jj < 2; jj++) {
+        test_grad_multi_student_t(vectorized_multi_student_t_fun<is_row_vec_y, is_row_vec_mu>(3, 1, ii, jj),
+                               y_, mu_, sigma_, 5);
+        test_grad_multi_student_t(vectorized_multi_student_t_fun<is_row_vec_y, is_row_vec_mu>(3, 1, ii, jj),
+                               y_, mu_, get_vvar(sigma_), 5);
+        test_grad_multi_student_t(vectorized_multi_student_t_fun<is_row_vec_y, is_row_vec_mu>(3, 1, ii, jj),
+                               y_, get_vvar(mu_), sigma_, 5);
+        test_grad_multi_student_t(vectorized_multi_student_t_fun<is_row_vec_y, is_row_vec_mu>(3, 1, ii, jj),
+                               y_, get_vvar(mu_), get_vvar(sigma_), 5);
+        test_grad_multi_student_t(vectorized_multi_student_t_fun<is_row_vec_y, is_row_vec_mu>(3, 1, ii, jj),
+                               get_vvar(y_), mu_, sigma_, 5);
+        test_grad_multi_student_t(vectorized_multi_student_t_fun<is_row_vec_y, is_row_vec_mu>(3, 1, ii, jj),
+                               get_vvar(y_), mu_, get_vvar(sigma_), 5);
+        test_grad_multi_student_t(vectorized_multi_student_t_fun<is_row_vec_y, is_row_vec_mu>(3, 1, ii, jj),
+                               get_vvar(y_), get_vvar(mu_), sigma_, 5);
+        test_grad_multi_student_t(vectorized_multi_student_t_fun<is_row_vec_y, is_row_vec_mu>(3, 1, ii, jj),
+                               get_vvar(y_), get_vvar(mu_), get_vvar(sigma_), 5);
+        test_grad_multi_student_t(vectorized_multi_student_t_fun<is_row_vec_y, is_row_vec_mu>(3, 1, ii, jj),
+                               y_, mu_, sigma_, var(5));
+        test_grad_multi_student_t(vectorized_multi_student_t_fun<is_row_vec_y, is_row_vec_mu>(3, 1, ii, jj),
+                               y_, mu_, get_vvar(sigma_), var(5));
+        test_grad_multi_student_t(vectorized_multi_student_t_fun<is_row_vec_y, is_row_vec_mu>(3, 1, ii, jj),
+                               y_, get_vvar(mu_), sigma_, var(5));
+        test_grad_multi_student_t(vectorized_multi_student_t_fun<is_row_vec_y, is_row_vec_mu>(3, 1, ii, jj),
+                               y_, get_vvar(mu_), get_vvar(sigma_), var(5));
+        test_grad_multi_student_t(vectorized_multi_student_t_fun<is_row_vec_y, is_row_vec_mu>(3, 1, ii, jj),
+                               get_vvar(y_), mu_, sigma_, var(5));
+        test_grad_multi_student_t(vectorized_multi_student_t_fun<is_row_vec_y, is_row_vec_mu>(3, 1, ii, jj),
+                               get_vvar(y_), mu_, get_vvar(sigma_), var(5));
+        test_grad_multi_student_t(vectorized_multi_student_t_fun<is_row_vec_y, is_row_vec_mu>(3, 1, ii, jj),
+                               get_vvar(y_), get_vvar(mu_), sigma_, var(5));
+        test_grad_multi_student_t(vectorized_multi_student_t_fun<is_row_vec_y, is_row_vec_mu>(3, 1, ii, jj),
+                               get_vvar(y_), get_vvar(mu_), get_vvar(sigma_), var(5));
+    }
   }
   
-  vector<double> x(19);
-  // y[1]
-  x[0] = 1.0;
-  x[1] = 2.0;
-  x[2] = -3.0;
-  // y[2]
-  x[3] = 0.0;
-  x[4] = -2.0;
-  x[5] = -3.0;
-  
-  // mu[1]
-  x[6] = 0.0;
-  x[7] = 1.0;
-  x[8] = 3.0;
-  // mu[2]
-  x[9] = 0.0;
-  x[10] = -1.0;
-  x[11] = -2.0;
-  
-  // Sigma
-  x[12] = 1;
-  x[13] = -1;
-  x[14] = 10;
-  x[15] = -2;
-  x[16] = 20;
-  x[17] = 56;
+  {
+    vector<double> y_(6), mu_(6), sigma_(6);
+    // y[1]
+    y_[0] = 1.0;
+    y_[1] = 2.0;
+    y_[2] = -3.0;
+    // y[2]
+    y_[3] = 0.0;
+    y_[4] = -2.0;
+    y_[5] = -3.0;
+    
+    // mu[1]
+    mu_[0] = 0.0;
+    mu_[1] = 1.0;
+    mu_[2] = 3.0;
+    // mu[2]
+    mu_[3] = 0.0;
+    mu_[4] = -1.0;
+    mu_[5] = -2.0;
+    
+    // Sigma
+    sigma_[0] = 1;
+    sigma_[1] = -1;
+    sigma_[2] = 10;
+    sigma_[3] = -2;
+    sigma_[4] = 20;
+    sigma_[5] = 56;
+    
+    test_grad_multi_student_t(vectorized_multi_student_t_fun<is_row_vec_y, is_row_vec_mu>(3, 2),
+                           y_, mu_, sigma_, 5);
+    test_grad_multi_student_t(vectorized_multi_student_t_fun<is_row_vec_y, is_row_vec_mu>(3, 2),
+                           y_, mu_, get_vvar(sigma_), 5);
+    test_grad_multi_student_t(vectorized_multi_student_t_fun<is_row_vec_y, is_row_vec_mu>(3, 2),
+                           y_, get_vvar(mu_), sigma_, 5);
+    test_grad_multi_student_t(vectorized_multi_student_t_fun<is_row_vec_y, is_row_vec_mu>(3, 2),
+                           y_, get_vvar(mu_), get_vvar(sigma_), 5);
+    test_grad_multi_student_t(vectorized_multi_student_t_fun<is_row_vec_y, is_row_vec_mu>(3, 2),
+                           get_vvar(y_), mu_, sigma_, 5);
+    test_grad_multi_student_t(vectorized_multi_student_t_fun<is_row_vec_y, is_row_vec_mu>(3, 2),
+                           get_vvar(y_), mu_, get_vvar(sigma_), 5);
+    test_grad_multi_student_t(vectorized_multi_student_t_fun<is_row_vec_y, is_row_vec_mu>(3, 2),
+                           get_vvar(y_), get_vvar(mu_), sigma_, 5);
+    test_grad_multi_student_t(vectorized_multi_student_t_fun<is_row_vec_y, is_row_vec_mu>(3, 2),
+                           get_vvar(y_), get_vvar(mu_), get_vvar(sigma_), 5);
+    test_grad_multi_student_t(vectorized_multi_student_t_fun<is_row_vec_y, is_row_vec_mu>(3, 2),
+                           y_, mu_, sigma_, var(5));
+    test_grad_multi_student_t(vectorized_multi_student_t_fun<is_row_vec_y, is_row_vec_mu>(3, 2),
+                           y_, mu_, get_vvar(sigma_), var(5));
+    test_grad_multi_student_t(vectorized_multi_student_t_fun<is_row_vec_y, is_row_vec_mu>(3, 2),
+                           y_, get_vvar(mu_), sigma_, var(5));
+    test_grad_multi_student_t(vectorized_multi_student_t_fun<is_row_vec_y, is_row_vec_mu>(3, 2),
+                           y_, get_vvar(mu_), get_vvar(sigma_), var(5));
+    test_grad_multi_student_t(vectorized_multi_student_t_fun<is_row_vec_y, is_row_vec_mu>(3, 2),
+                           get_vvar(y_), mu_, sigma_, var(5));
+    test_grad_multi_student_t(vectorized_multi_student_t_fun<is_row_vec_y, is_row_vec_mu>(3, 2),
+                           get_vvar(y_), mu_, get_vvar(sigma_), var(5));
+    test_grad_multi_student_t(vectorized_multi_student_t_fun<is_row_vec_y, is_row_vec_mu>(3, 2),
+                           get_vvar(y_), get_vvar(mu_), sigma_, var(5));
+    test_grad_multi_student_t(vectorized_multi_student_t_fun<is_row_vec_y, is_row_vec_mu>(3, 2),
+                           get_vvar(y_), get_vvar(mu_), get_vvar(sigma_), var(5));
+  }
+  {
+    vector<double> y_(1), mu_(1), sigma_(1);
+    y_[0] = 1.9;
+    mu_[0] = -2.7;
+    sigma_[0] = 0.48;
+    
+    
+    test_grad_multi_student_t(vectorized_multi_student_t_fun<is_row_vec_y, is_row_vec_mu>(1, 1),
+                           y_, mu_, sigma_, 5);
+    test_grad_multi_student_t(vectorized_multi_student_t_fun<is_row_vec_y, is_row_vec_mu>(1, 1),
+                           y_, mu_, get_vvar(sigma_), 5);
+    test_grad_multi_student_t(vectorized_multi_student_t_fun<is_row_vec_y, is_row_vec_mu>(1, 1),
+                           y_, get_vvar(mu_), sigma_, 5);
+    test_grad_multi_student_t(vectorized_multi_student_t_fun<is_row_vec_y, is_row_vec_mu>(1, 1),
+                           y_, get_vvar(mu_), get_vvar(sigma_), 5);
+    test_grad_multi_student_t(vectorized_multi_student_t_fun<is_row_vec_y, is_row_vec_mu>(1, 1),
+                           get_vvar(y_), mu_, sigma_, 5);
+    test_grad_multi_student_t(vectorized_multi_student_t_fun<is_row_vec_y, is_row_vec_mu>(1, 1),
+                           get_vvar(y_), mu_, get_vvar(sigma_), 5);
+    test_grad_multi_student_t(vectorized_multi_student_t_fun<is_row_vec_y, is_row_vec_mu>(1, 1),
+                           get_vvar(y_), get_vvar(mu_), sigma_, 5);
+    test_grad_multi_student_t(vectorized_multi_student_t_fun<is_row_vec_y, is_row_vec_mu>(1, 1),
+                           get_vvar(y_), get_vvar(mu_), get_vvar(sigma_), 5);
+    test_grad_multi_student_t(vectorized_multi_student_t_fun<is_row_vec_y, is_row_vec_mu>(1, 1),
+                           y_, mu_, sigma_, var(5));
+    test_grad_multi_student_t(vectorized_multi_student_t_fun<is_row_vec_y, is_row_vec_mu>(1, 1),
+                           y_, mu_, get_vvar(sigma_), var(5));
+    test_grad_multi_student_t(vectorized_multi_student_t_fun<is_row_vec_y, is_row_vec_mu>(1, 1),
+                           y_, get_vvar(mu_), sigma_, var(5));
+    test_grad_multi_student_t(vectorized_multi_student_t_fun<is_row_vec_y, is_row_vec_mu>(1, 1),
+                           y_, get_vvar(mu_), get_vvar(sigma_), var(5));
+    test_grad_multi_student_t(vectorized_multi_student_t_fun<is_row_vec_y, is_row_vec_mu>(1, 1),
+                           get_vvar(y_), mu_, sigma_, var(5));
+    test_grad_multi_student_t(vectorized_multi_student_t_fun<is_row_vec_y, is_row_vec_mu>(1, 1),
+                           get_vvar(y_), mu_, get_vvar(sigma_), var(5));
+    test_grad_multi_student_t(vectorized_multi_student_t_fun<is_row_vec_y, is_row_vec_mu>(1, 1),
+                           get_vvar(y_), get_vvar(mu_), sigma_, var(5));
+    test_grad_multi_student_t(vectorized_multi_student_t_fun<is_row_vec_y, is_row_vec_mu>(1, 1),
+                           get_vvar(y_), get_vvar(mu_), get_vvar(sigma_), var(5));
+  }
+}
 
-  // nu
-  x[18] = 5;
-
-  test_grad(vectorized_multi_student_t_fun(3, 2), x);
-  
-  vector<double> u(4);
-  u[0] = 1.9;
-  u[1] = -2.7;
-  u[2] = 0.48;
-  u[3] = 5;
-  
-  test_grad(vectorized_multi_student_t_fun(1, 1), u);
+TEST(MultiNormal, TestGradFunctionalVectorized) {
+  test_all<1,1>();
+  test_all<1,-1>();
+  test_all<-1,1>();
+  test_all<-1,-1>();
 }
