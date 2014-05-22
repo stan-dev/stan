@@ -150,10 +150,11 @@ namespace stan {
       using stan::math::check_size_match;
       using stan::math::check_positive;
 
-      check_positive(function,nu,"degrees of freedom", (double*)0);
+      check_positive(function,nu,"degrees of freedom",(double*)0);
       check_size_match(function, 
                        S.rows(), "Rows of scale parameter",
-                       S.cols(), "columns of scale parameter");
+                       S.cols(), "columns of scale parameter",
+                       (double*)0);
 
       Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> B(S.rows(), S.cols());
       B.setZero();

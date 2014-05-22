@@ -1031,7 +1031,8 @@ namespace stan {
     Eigen::Matrix<T,Eigen::Dynamic,1> 
     unit_vector_free(const Eigen::Matrix<T,Eigen::Dynamic,1>& x) {
       typedef typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type size_type;
-      stan::math::check_unit_vector("stan::prob::unit_vector_free(%1%)", x, "Unit vector variable");
+      stan::math::check_unit_vector("stan::prob::unit_vector_free(%1%)", 
+                                    x, "Unit vector variable", (double*)0);
       int Km1 = x.size() - 1;
       Eigen::Matrix<T,Eigen::Dynamic,1> y(Km1);
       T sumSq = x(Km1)*x(Km1);
@@ -1136,7 +1137,8 @@ namespace stan {
     simplex_free(const Eigen::Matrix<T,Eigen::Dynamic,1>& x) {
       using stan::math::logit;
       typedef typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type size_type;
-      stan::math::check_simplex("stan::prob::simplex_free(%1%)", x, "Simplex variable");
+      stan::math::check_simplex("stan::prob::simplex_free(%1%)", x, "Simplex variable",
+                                (double*)0);
       int Km1 = x.size() - 1;
       Eigen::Matrix<T,Eigen::Dynamic,1> y(Km1);
       T stick_len(x(Km1));
@@ -1299,7 +1301,7 @@ namespace stan {
     Eigen::Matrix<T,Eigen::Dynamic,1> 
     positive_ordered_free(const Eigen::Matrix<T,Eigen::Dynamic,1>& y) {
       stan::math::check_positive_ordered("stan::prob::positive_ordered_free(%1%)", 
-                                y, "Positive ordered variable");
+                                         y, "Positive ordered variable", (double*)0);
       typedef typename Eigen::Matrix<T,Eigen::Dynamic,1>::size_type size_type;
       size_type k = y.size();
       Eigen::Matrix<T,Eigen::Dynamic,1> x(k);

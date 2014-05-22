@@ -767,7 +767,8 @@ namespace stan {
        */
       inline vector_t unit_vector(size_t k) {
         vector_t theta(vector(k));
-        stan::math::check_unit_vector("stan::io::unit_vector(%1%)", theta, "Constrained vector");
+        stan::math::check_unit_vector("stan::io::unit_vector(%1%)", theta, "Constrained vector",
+                                      (double*)0);
         return theta;
       }
 
@@ -814,7 +815,8 @@ namespace stan {
        */
       inline vector_t simplex(size_t k) {
         vector_t theta(vector(k));
-        stan::math::check_simplex("stan::io::simplex(%1%)", theta, "Constrained vector");
+        stan::math::check_simplex("stan::io::simplex(%1%)", theta, "Constrained vector",
+                                  (double*)0);
         return theta;
       }
 
@@ -905,7 +907,9 @@ namespace stan {
        */
       inline vector_t positive_ordered(size_t k) {
         vector_t x(vector(k));
-        stan::math::check_positive_ordered("stan::io::positive_ordered(%1%)", x, "Constrained vector");
+        stan::math::check_positive_ordered("stan::io::positive_ordered(%1%)", 
+                                           x, "Constrained vector",
+                                           (double*)0);
         return x;
       }
 
@@ -949,7 +953,9 @@ namespace stan {
        */
       inline matrix_t cholesky_factor(size_t M, size_t N) {
         matrix_t y(matrix(M,N));
-        stan::math::check_cholesky_factor("stan::io::cholesky_factor(%1%)", y, "Constrained matrix");
+        stan::math::check_cholesky_factor("stan::io::cholesky_factor(%1%)", 
+                                          y, "Constrained matrix",
+                                          (double*)0);
         return y;
       }
 
@@ -1000,7 +1006,8 @@ namespace stan {
        */
       inline matrix_t cov_matrix(size_t k) {
         matrix_t y(matrix(k,k));
-        stan::math::check_cov_matrix("stan::io::cov_matrix(%1%)", y, "Constrained matrix");
+        stan::math::check_cov_matrix("stan::io::cov_matrix(%1%)", y, "Constrained matrix",
+                                     (double*)0);
         return y;
       }
 
@@ -1045,7 +1052,9 @@ namespace stan {
        */
       inline matrix_t corr_matrix(size_t k) {
         matrix_t x(matrix(k,k));
-        stan::math::check_corr_matrix("stan::math::corr_matrix(%1%)", x, "Constrained matrix");
+        stan::math::check_corr_matrix("stan::math::corr_matrix(%1%)", 
+                                      x, "Constrained matrix",
+                                      (double*)0);
         return x;
       }
 
