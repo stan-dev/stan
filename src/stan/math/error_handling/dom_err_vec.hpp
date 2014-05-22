@@ -21,15 +21,13 @@ namespace stan {
   namespace math {
 
     template <typename T,
-              typename T_result,
               typename T_msg>
-    inline bool dom_err_vec(const size_t i,
+    inline void dom_err_vec(const size_t i,
                             const char* function,
                             const T& y,
                             const char* name,
                             const char* error_msg,
-                            const T_msg error_msg2,
-                            T_result* result) {
+                            const T_msg error_msg2) {
       std::ostringstream msg_o;
       msg_o << name << "[" << i << "] " << error_msg << error_msg2;
 
@@ -41,16 +39,25 @@ namespace stan {
       msg += msg_o.str();
       
       throw std::domain_error((boost::format(msg) % stan::get(y,i)).str());
+    }
 
+
+    template <typename T,
+              typename T_result,
+              typename T_msg>
+    inline bool dom_err_vec(const size_t i,
+                            const char* function,
+                            const T& y,
+                            const char* name,
+                            const char* error_msg,
+                            const T_msg error_msg2,
+                            T_result* result) {
+      dom_err_vec(i, function, y, name, error_msg, error_msg2);
       if (result != 0)
         *result = std::numeric_limits<T_result>::quiet_NaN();
-      
       return false;
     }
     
   }
 }
 #endif
-
-
-#include <stan/math/error_handling__/dom_err_vec.hpp>
