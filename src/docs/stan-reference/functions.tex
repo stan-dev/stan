@@ -389,6 +389,10 @@ There are corresponding real-argument versions.
 
 \subsubsection{Boolean Operator Short Circuiting}
 
+{\it Warning:} \ As of Stan 2.2.0, the boolean operators do {\it not}
+short circuit.  This is a known bug and will be fixed in a future
+release.  The intended behavior in the future is as described below.
+
 Like in \Cpp, the boolean operators are implemented to short circuit
 directly to a return value after evaluating the first argument if it
 is sufficient to resolve the result.  In evaluating \code{a~||~b}, if
@@ -568,21 +572,9 @@ Metropolis/slice procedure will correct for any error due to poor
 gradient calculations, but the result is likely to be reduced
 acceptance probabilities and less efficient sampling.
 
-One case where rounding is reasonable is linear interpolation of
-function values.   For
-example, consider
-%
-\begin{quote}
-\begin{Verbatim}
-xm <- x[floor(c)];
-xp <- x[ceil(c)];
-x <- (c - floor(c))*xp + (ceil(c) - c)*xm;
-\end{Verbatim}
-\end{quote}
-%
-In this example, the first derivative for \code{x} with respect to
-\code{c} will be reasonable, but the second derivatives will all be
-zero.
+The rounding functions cannot be used as indices to arrays because
+they return real values.  Stan may introduce integer-valued versions
+of these in the future, but as of now, there is no good workaround.
 
 \begin{description}
 %
@@ -1686,7 +1678,8 @@ matrix of the same dimensions as \farg{x}\, with \code{L(m,n)} equal to
   \code{\farg{x}(m,n)} for $\mbox{\code{n}} \leq \mbox{\code{m}}$ and
 \code{L(m,n)} equal to 0 if $\mbox{\code{n}} > \mbox{\code{m}}$, the
 result is the symmetric matrix $\mbox{\code{L}}\,\mbox{\code{L}}^{\top}$.
-This is a specialization of tcrossprod(x) for lower-triangular matrices.}
+This is a specialization of tcrossprod(x) for lower-triangular
+matrices.  The input matrix does not need to be square.}
 %
 \end{description}
 
