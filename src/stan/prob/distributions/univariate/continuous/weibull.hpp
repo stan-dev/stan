@@ -349,13 +349,13 @@ namespace stan {
       using stan::math::check_not_nan;
       using stan::math::check_positive;
   
-      if(!check_finite(function, alpha, "Shape parameter"))
+      if(!check_finite(function, alpha, "Shape parameter", (double*)0))
         return 0;
-      if(!check_positive(function, alpha, "Shape parameter"))
+      if(!check_positive(function, alpha, "Shape parameter", (double*)0))
         return 0;
-      if(!check_not_nan(function, sigma, "Scale parameter"))
+      if(!check_not_nan(function, sigma, "Scale parameter", (double*)0))
         return 0;
-      if(!check_positive(function, sigma, "Scale parameter"))
+      if(!check_positive(function, sigma, "Scale parameter", (double*)0))
         return 0;
 
       variate_generator<RNG&, weibull_distribution<> >

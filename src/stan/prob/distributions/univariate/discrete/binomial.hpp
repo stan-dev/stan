@@ -502,16 +502,16 @@ namespace stan {
       using stan::math::check_nonnegative;
 
       if (!check_nonnegative(function, N,
-                             "Population size parameter"))
+                             "Population size parameter", (double*)0))
         return 0;
       if (!check_finite(function, theta,
-                        "Probability parameter"))
+                        "Probability parameter", (double*)0))
         return 0;
       if (!check_less_or_equal(function, theta, 1.0,
-                         "Probability parameter"))
+                         "Probability parameter", (double*)0))
         return 0;
       if (!check_greater_or_equal(function, theta, 0.0,
-                         "Probability parameter"))
+                         "Probability parameter", (double*)0))
         return 0;
 
       variate_generator<RNG&, binomial_distribution<> >

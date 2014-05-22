@@ -152,21 +152,21 @@ namespace stan {
       using stan::math::check_bounded;
 
       if (!check_finite(function, eta, 
-                        "Location parameter"))
+                        "Location parameter", (double*)0))
         return 0;
       if (!check_greater(function, c.size(), 0,
-                         "Size of cut points parameter"))
+                         "Size of cut points parameter", (double*)0))
         return 0;
       for (int i = 1; i < c.size(); ++i) {
         if (!check_greater(function, c(i), c(i - 1),
-                           "Cut points parameter"))
+                           "Cut points parameter", (double*)0))
           return 0;
       }
       if (!check_finite(function, c(c.size()-1), 
-                        "Cut points parameter"))
+                        "Cut points parameter", (double*)0))
         return 0;
       if (!check_finite(function, c(0),
-                        "Cut points parameter")) 
+                        "Cut points parameter", (double*)0)) 
         return 0;
 
       Eigen::VectorXd cut(c.rows());

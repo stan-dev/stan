@@ -141,10 +141,10 @@ namespace stan {
       using stan::math::check_size_match;
 
       typename Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>::size_type k = S.rows();
-      check_greater(function, nu, k-1, "Degrees of freedom parameter");
+      check_greater(function, nu, k-1, "Degrees of freedom parameter", (double*)0);
       check_size_match(function, 
                        S.rows(), "Rows of scale parameter",
-                       S.cols(), "columns of scale parameter");
+                       S.cols(), "columns of scale parameter", (double*)0);
 
       Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> S_inv(S.rows(), S.cols());
       S_inv = Eigen::MatrixXd::Identity(S.cols(),S.cols());

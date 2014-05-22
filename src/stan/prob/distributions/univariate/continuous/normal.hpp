@@ -383,13 +383,13 @@ namespace stan {
 
       static const char* function = "stan::prob::normal_rng(%1%)";
 
-      if (!check_finite(function, mu, "Location parameter"))
+      if (!check_finite(function, mu, "Location parameter", (double*)0))
         return 0;
-      if (!check_not_nan(function, mu, "Location parameter"))
+      if (!check_not_nan(function, mu, "Location parameter", (double*)0))
         return 0;
-      if (!check_positive(function, sigma, "Scale parameter"))
+      if (!check_positive(function, sigma, "Scale parameter", (double*)0))
         return 0;
-       if (!check_not_nan(function, sigma, "Scale parameter"))
+       if (!check_not_nan(function, sigma, "Scale parameter", (double*)0))
         return 0;
 
       variate_generator<RNG&, normal_distribution<> >

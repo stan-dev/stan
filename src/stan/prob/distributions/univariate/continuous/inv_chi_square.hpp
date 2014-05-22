@@ -458,9 +458,9 @@ namespace stan {
       using stan::math::check_finite;      
       using stan::math::check_positive;
 
-      if (!check_finite(function, nu, "Degrees of freedom parameter"))
+      if (!check_finite(function, nu, "Degrees of freedom parameter", (double*)0))
         return 0;
-      if (!check_positive(function, nu, "Degrees of freedom parameter"))
+      if (!check_positive(function, nu, "Degrees of freedom parameter", (double*)0))
         return 0;
 
       variate_generator<RNG&, chi_squared_distribution<> >

@@ -293,13 +293,13 @@ namespace stan {
       using stan::math::check_finite;
       using stan::math::check_positive;
 
-      if (!check_finite(function, mu, "Location parameter"))
+      if (!check_finite(function, mu, "Location parameter", (double*)0))
         return 0;
-      if (!check_finite(function, phi, "Inverse scale parameter"))
+      if (!check_finite(function, phi, "Inverse scale parameter", (double*)0))
         return 0;
-      if (!check_positive(function, mu, "Location parameter"))
+      if (!check_positive(function, mu, "Location parameter", (double*)0))
         return 0;
-      if (!check_positive(function, phi, "Inverse scale parameter"))
+      if (!check_positive(function, phi, "Inverse scale parameter", (double*)0))
         return 0;
 
       return stan::prob::poisson_rng(stan::prob::gamma_rng(phi,phi/mu,
@@ -319,11 +319,11 @@ namespace stan {
       using stan::math::check_finite;
       using stan::math::check_positive;
 
-      if (!check_finite(function, eta, "Log-location parameter"))
+      if (!check_finite(function, eta, "Log-location parameter", (double*)0))
         return 0;
-      if (!check_finite(function, phi, "Inverse scale parameter"))
+      if (!check_finite(function, phi, "Inverse scale parameter", (double*)0))
         return 0;
-      if (!check_positive(function, phi, "Inverse scale parameter"))
+      if (!check_positive(function, phi, "Inverse scale parameter", (double*)0))
         return 0;
 
       return stan::prob::poisson_rng(stan::prob::gamma_rng(phi,phi/std::exp(eta),

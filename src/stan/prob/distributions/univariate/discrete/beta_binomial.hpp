@@ -580,15 +580,15 @@ DoubleVectorView<!is_constant_struct<T_size1>::value,
       using stan::math::check_nonnegative;
       using stan::math::check_positive;
   
-      if (!check_nonnegative(function, N, "Population size parameter"))
+      if (!check_nonnegative(function, N, "Population size parameter", (double*)0))
         return 0;
-      if (!check_finite(function, alpha, "First prior sample size parameter"))
+      if (!check_finite(function, alpha, "First prior sample size parameter", (double*)0))
         return 0;
-      if (!check_positive(function, alpha, "First prior sample size parameter"))
+      if (!check_positive(function, alpha, "First prior sample size parameter", (double*)0))
         return 0;
-      if (!check_finite(function, beta, "Second prior sample size parameter"))
+      if (!check_finite(function, beta, "Second prior sample size parameter", (double*)0))
         return 0;
-      if (!check_positive(function, beta, "Second prior sample size parameter"))
+      if (!check_positive(function, beta, "Second prior sample size parameter", (double*)0))
         return 0;
 
     double a = stan::prob::beta_rng(alpha, beta, rng);

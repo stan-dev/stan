@@ -101,13 +101,13 @@ namespace stan {
       using stan::math::check_bounded;
       using stan::math::check_positive;
 
-      if (!check_bounded<int,int,int,int>(function, N, 0, a+b, "Draws parameter", 0))
+      if (!check_bounded(function, N, 0, a+b, "Draws parameter", (int*)0))
         return 0;
-      if (!check_positive(function,N,"Draws parameter"))
+      if (!check_positive(function,N,"Draws parameter", (int*)0))
         return 0;
-      if (!check_positive(function,a,"Successes in population parameter"))
+      if (!check_positive(function,a,"Successes in population parameter", (int*)0))
         return 0;
-      if (!check_positive(function,b,"Failures in population parameter"))
+      if (!check_positive(function,b,"Failures in population parameter", (int*)0))
         return 0;
 
       boost::math::hypergeometric_distribution<>dist (b, N, a + b);

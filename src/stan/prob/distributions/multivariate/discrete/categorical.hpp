@@ -141,7 +141,7 @@ namespace stan {
       static const char* function = "stan::prob::categorical_rng(%1%)";
 
       check_simplex(function, theta,
-                    "Probabilities parameter");
+                    "Probabilities parameter", (double*)0);
 
       variate_generator<RNG&, uniform_01<> >
         uniform01_rng(rng, uniform_01<>());

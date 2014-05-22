@@ -328,7 +328,7 @@ namespace stan {
 
       using stan::math::check_positive;
 
-      if (!check_positive(function, sigma, "Scale parameter"))
+      if (!check_positive(function, sigma, "Scale parameter", (double*)0))
         return 0;
 
       variate_generator<RNG&, uniform_real_distribution<> >

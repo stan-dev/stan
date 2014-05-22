@@ -238,7 +238,7 @@ namespace stan {
 
       using stan::math::check_finite;
  
-      check_finite(function, mu, "Location parameter");
+      check_finite(function, mu, "Location parameter", (double*)0);
 
       variate_generator<RNG&, normal_distribution<> >
         std_normal_rng(rng, normal_distribution<>(0,1));

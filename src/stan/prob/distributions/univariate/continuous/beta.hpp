@@ -646,13 +646,13 @@ namespace stan {
       using stan::math::check_nonnegative;
       using stan::math::check_less_or_equal;
         
-      if (!check_finite(function, alpha, "First shape parameter"))
+      if (!check_finite(function, alpha, "First shape parameter", (double*)0))
         return 0;
-      if (!check_positive(function, alpha, "First shape parameter"))
+      if (!check_positive(function, alpha, "First shape parameter", (double*)0))
         return 0;
-      if (!check_finite(function, beta, "Second shape parameter"))
+      if (!check_finite(function, beta, "Second shape parameter", (double*)0))
         return 0;
-      if (!check_positive(function, beta, "Second shape parameter"))
+      if (!check_positive(function, beta, "Second shape parameter", (double*)0))
         return 0;
 
       variate_generator<RNG&, gamma_distribution<> >

@@ -318,9 +318,9 @@ namespace stan {
       using stan::math::check_finite;
 
 
-      if (!check_finite(function, mu, "Location parameter"))
+      if (!check_finite(function, mu, "Location parameter", (double*)0))
         return 0;
-      if (!check_positive(function, beta, "Scale parameter")) 
+      if (!check_positive(function, beta, "Scale parameter", (double*)0)) 
         return 0;
 
       variate_generator<RNG&, uniform_01<> >

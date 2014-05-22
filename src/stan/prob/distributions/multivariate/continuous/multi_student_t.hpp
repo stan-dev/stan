@@ -148,12 +148,12 @@ namespace stan {
       using stan::math::check_symmetric;
       using stan::math::check_positive;      
  
-      check_finite(function, mu, "Location parameter");
-      check_symmetric(function, s, "Scale parameter");
+      check_finite(function, mu, "Location parameter", (double*)0);
+      check_symmetric(function, s, "Scale parameter", (double*)0);
       check_not_nan(function, nu, 
-                    "Degrees of freedom parameter");
+                    "Degrees of freedom parameter", (double*)0);
       check_positive(function, nu, 
-                     "Degrees of freedom parameter");
+                     "Degrees of freedom parameter", (double*)0);
 
       Eigen::VectorXd z(s.cols());
       z.setZero();

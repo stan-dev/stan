@@ -559,13 +559,13 @@ namespace stan {
       using stan::math::check_positive;
       using stan::math::check_finite;
  
-      if (!check_finite(function, alpha, "Shape parameter")) 
+      if (!check_finite(function, alpha, "Shape parameter", (double*)0)) 
         return 0;
-      if (!check_positive(function, alpha, "Shape parameter"))
+      if (!check_positive(function, alpha, "Shape parameter", (double*)0))
         return 0;
-      if (!check_finite(function, beta, "Scale parameter"))
+      if (!check_finite(function, beta, "Scale parameter", (double*)0))
         return 0;
-      if (!check_positive(function, beta, "Scale parameter")) 
+      if (!check_positive(function, beta, "Scale parameter", (double*)0)) 
         return 0;
 
       variate_generator<RNG&, gamma_distribution<> >

@@ -408,10 +408,10 @@ namespace stan {
       using stan::math::check_nonnegative;
  
       if (!check_not_nan(function, lambda,
-                         "Rate parameter"))
+                         "Rate parameter", (double*)0))
         return 0;
       if (!check_nonnegative(function, lambda,
-                             "Rate parameter"))
+                             "Rate parameter", (double*)0))
         return 0;
 
       variate_generator<RNG&, poisson_distribution<> >

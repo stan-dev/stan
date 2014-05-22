@@ -541,13 +541,13 @@ namespace stan {
       using stan::math::check_finite;
       using stan::math::check_positive;
       
-      if (!check_finite(function, alpha, "Shape parameter")) 
+      if (!check_finite(function, alpha, "Shape parameter", (double*)0)) 
         return 0;
-      if (!check_positive(function, alpha, "Shape parameter")) 
+      if (!check_positive(function, alpha, "Shape parameter", (double*)0)) 
         return 0;
-      if (!check_finite(function, beta, "Inverse scale parameter"))
+      if (!check_finite(function, beta, "Inverse scale parameter", (double*)0))
         return 0;
-      if (!check_positive(function, beta, "Inverse scale parameter"))
+      if (!check_positive(function, beta, "Inverse scale parameter", (double*)0))
         return 0;
 
       /*

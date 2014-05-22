@@ -146,7 +146,7 @@ namespace stan {
 
       using stan::math::check_positive;
       
-      check_positive(function, eta, "Shape parameter");
+      check_positive(function, eta, "Shape parameter", (double*)0);
 
       Eigen::ArrayXd CPCs( (K * (K - 1)) / 2 );
       double alpha = eta + 0.5 * (K - 1);
@@ -172,7 +172,7 @@ namespace stan {
 
       using stan::math::check_positive;
       
-      check_positive(function, eta, "Shape parameter");
+      check_positive(function, eta, "Shape parameter", (double*)0);
 
       using stan::math::multiply_lower_tri_self_transpose;
       return multiply_lower_tri_self_transpose(

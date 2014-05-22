@@ -213,9 +213,9 @@ namespace stan {
       using stan::math::check_finite;
       using stan::math::check_symmetric;
  
-      check_positive(function, S.rows(), "Covariance matrix rows");
-      check_symmetric(function, S, "Covariance matrix");
-      check_finite(function, mu, "Location parameter");
+      check_positive(function, S.rows(), "Covariance matrix rows", (double*)0);
+      check_symmetric(function, S, "Covariance matrix", (double*)0);
+      check_finite(function, mu, "Location parameter", (double*)0);
 
       variate_generator<RNG&, normal_distribution<> >
         std_normal_rng(rng, normal_distribution<>(0,1));

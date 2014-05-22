@@ -75,8 +75,8 @@ namespace stan {
       using stan::math::check_simplex;
       using stan::math::check_positive;
 
-      check_simplex(function, theta, "Probabilites parameter");
-      check_positive(function,N,"number of trials variables");
+      check_simplex(function, theta, "Probabilites parameter", (double*)0);
+      check_positive(function,N,"number of trials variables", (double*)0);
 
       std::vector<int> result(theta.size(),0);
       double mass_left = 1.0;

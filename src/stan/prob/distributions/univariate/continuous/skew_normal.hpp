@@ -440,11 +440,11 @@ namespace stan {
       using stan::math::check_positive;
       using stan::math::check_finite;
 
-      if (!check_finite(function, mu, "Location parameter"))
+      if (!check_finite(function, mu, "Location parameter", (double*)0))
         return 0;
-      if (!check_finite(function, alpha, "Shape parameter"))
+      if (!check_finite(function, alpha, "Shape parameter", (double*)0))
         return 0;
-      if (!check_positive(function, sigma, "Scale parameter"))
+      if (!check_positive(function, sigma, "Scale parameter", (double*)0))
         return 0;
 
       return quantile(dist, stan::prob::uniform_rng(0.0,1.0,rng));

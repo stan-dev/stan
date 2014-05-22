@@ -431,13 +431,13 @@ namespace stan {
       using stan::math::check_finite;
       using stan::math::check_positive;
 
-      if (!check_finite(function, y_min, "Scale parameter"))
+      if (!check_finite(function, y_min, "Scale parameter", (double*)0))
         return 0;
-      if (!check_positive(function, y_min, "Scale parameter"))
+      if (!check_positive(function, y_min, "Scale parameter", (double*)0))
         return 0;
-      if (!check_finite(function, alpha, "Shape parameter"))
+      if (!check_finite(function, alpha, "Shape parameter", (double*)0))
         return 0;
-      if (!check_positive(function, alpha, "Shape parameter"))
+      if (!check_positive(function, alpha, "Shape parameter", (double*)0))
         return 0;
 
       variate_generator<RNG&, exponential_distribution<> >
