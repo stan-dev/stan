@@ -417,7 +417,7 @@ namespace stan {
       using stan::math::check_finite;
       using stan::math::check_bounded;
  
-      if (!check_finite(function, theta, "Probability parameter"))
+      if (!check_finite(function, theta, "Probability parameter", (double*)0))
         return 0;
       if (!check_bounded(function, theta, 0, 1,
                          "Probability parameter", (double*)0))

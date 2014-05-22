@@ -461,7 +461,8 @@ namespace stan {
     template <typename T>
     inline
     T positive_free(const T y) {
-      stan::math::check_positive("stan::prob::positive_free(%1%)", y, "Positive variable");
+      stan::math::check_positive("stan::prob::positive_free(%1%)", y, 
+                                 "Positive variable", (double*)0);
       return log(y);
     }
 
@@ -542,7 +543,8 @@ namespace stan {
       if (lb == -std::numeric_limits<double>::infinity())
         return identity_free(y);
       stan::math::check_greater_or_equal("stan::prob::lb_free(%1%)",
-                                         y, lb, "Lower bounded variable");
+                                         y, lb, "Lower bounded variable",
+                                         (double*)0);
       return log(y - lb);
     }
     
@@ -639,7 +641,8 @@ namespace stan {
       if (ub == std::numeric_limits<double>::infinity())
         return identity_free(y);
       stan::math::check_less_or_equal("stan::prob::ub_free(%1%)",
-                                      y, ub, "Upper bounded variable");
+                                      y, ub, "Upper bounded variable",
+                                      (double*)0);
       return log(ub - y);
     }
 
@@ -815,7 +818,7 @@ namespace stan {
       using stan::math::logit;
       stan::math::check_bounded<T, TL, TU, typename scalar_type<T>::type>
         ("stan::prob::lub_free(%1%)",
-         y, lb, ub, "Bounded variable", 0);
+         y, lb, ub, "Bounded variable", (double*)0);
       if (lb == -std::numeric_limits<double>::infinity())
         return ub_free(y,ub);
       if (ub == std::numeric_limits<double>::infinity())
@@ -897,7 +900,7 @@ namespace stan {
       using stan::math::logit;
       stan::math::check_bounded<T,double,double,T>
         ("stan::prob::prob_free(%1%)",
-         y, 0, 1, "Probability variable",0);
+         y, 0, 1, "Probability variable",(double*)0);
       return logit(y);
     }
     
@@ -964,7 +967,7 @@ namespace stan {
     T corr_free(const T y) {
       stan::math::check_bounded<T,double,double,double>
         ("stan::prob::lub_free(%1%)",
-         y, -1, 1, "Correlation variable", 0);
+         y, -1, 1, "Correlation variable", (double*)0);
       return atanh(y);
     }
 

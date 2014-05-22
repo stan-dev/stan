@@ -472,7 +472,7 @@ namespace stan {
       inline T scalar_pos() {
         T x(scalar());
         stan::math::check_positive("stan::io::scalar_pos(%1%)", x, 
-                                   "Constrained scalar");
+                                   "Constrained scalar", (double*)0);
         return x;
       }
 
@@ -517,7 +517,8 @@ namespace stan {
       inline T scalar_lb(const TL lb) {
         T x(scalar());
         stan::math::check_greater_or_equal("stan::io::scalar_lb(%1%)",
-                                           x, lb, "Constrained scalar");
+                                           x, lb, "Constrained scalar", 
+                                           (double*)0);
         return x;
       }
 
@@ -570,7 +571,8 @@ namespace stan {
       template <typename TU>
       inline T scalar_ub(TU ub) {
         T x(scalar());
-        stan::math::check_less_or_equal("stan::io::scalar_ub(%1%)", x, ub, "Constrained scalar");
+        stan::math::check_less_or_equal("stan::io::scalar_ub(%1%)", x, ub, 
+                                        "Constrained scalar", (double*)0);
         return x;
       }
 
