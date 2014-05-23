@@ -4,7 +4,7 @@
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/LDLT_factor.hpp>
 #include <stan/math/matrix/validate_multiplicable.hpp>
-#include <stan/math/matrix/validate_square.hpp>
+#include <stan/math/error_handling/matrix/check_square.hpp>
 
 namespace stan {
   namespace math {
@@ -20,7 +20,8 @@ namespace stan {
                                  const stan::math::LDLT_factor<double,R2,C2> &A,
                                  const Eigen::Matrix<double,R3,C3> &B) {
     
-      stan::math::validate_square(D,"trace_gen_inv_quad_form_ldlt");
+      stan::math::check_square("trace_gen_inv_quad_form_ldlt(%1%)",D,"D",
+                               (double*)0);
       stan::math::validate_multiplicable(A,B,"trace_gen_inv_quad_form_ldlt");
       stan::math::validate_multiplicable(B,D,"trace_gen_inv_quad_form_ldlt");
       

@@ -8,7 +8,6 @@
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/math/matrix/validate_multiplicable.hpp>
 #include <stan/math/matrix/validate_matching_sizes.hpp>
-#include <stan/math/matrix/validate_square.hpp>
 #include <stan/agrad/rev/matrix/to_var.hpp>
 #include <stan/agrad/rev/matrix/dot_product.hpp>
 #include <stan/agrad/rev/operators/operator_multiplication.hpp>

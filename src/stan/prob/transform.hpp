@@ -13,7 +13,6 @@
 #include <stan/math.hpp>
 #include <stan/math/matrix.hpp>
 #include <stan/math/matrix/sum.hpp>
-#include <stan/math/matrix/validate_less.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/matrix_error_handling.hpp>
 
@@ -680,7 +679,7 @@ namespace stan {
     inline
     typename boost::math::tools::promote_args<T,TL,TU>::type
     lub_constrain(const T x, TL lb, TU ub) {
-      stan::math::validate_less(lb,ub,"lb","ub","lub_constrain/3");
+      stan::math::check_less("lub_constrain(%1%)",lb,ub,"lb",(double*)0);
 
       if (lb == -std::numeric_limits<double>::infinity())
         return ub_constrain(x,ub);

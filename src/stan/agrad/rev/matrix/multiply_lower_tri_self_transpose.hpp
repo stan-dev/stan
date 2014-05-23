@@ -7,7 +7,7 @@
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/math/matrix/validate_multiplicable.hpp>
 #include <stan/math/matrix/validate_matching_sizes.hpp>
-#include <stan/math/matrix/validate_square.hpp>
+#include <stan/math/error_handling/matrix/check_square.hpp>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/numeric_limits.hpp>
 #include <stan/agrad/rev/matrix/typedefs.hpp>
@@ -19,7 +19,8 @@ namespace stan {
     
     inline matrix_v 
     multiply_lower_tri_self_transpose(const matrix_v& L) {
-      //      stan::math::validate_square(L,"multiply_lower_tri_self_transpose");
+      stan::math::check_square("multiply_lower_tri_self_transpose(%1%)",
+                               L,"L",(double*)0);
       int K = L.rows();
       int J = L.cols();
       matrix_v LLt(K,K);

@@ -7,7 +7,7 @@
 #include <stan/math/matrix/mdivide_left_tri.hpp>
 #include <stan/math/matrix/transpose.hpp>
 #include <stan/math/matrix/validate_multiplicable.hpp>
-#include <stan/math/matrix/validate_square.hpp>
+#include <stan/math/error_handling/matrix/check_square.hpp>
 
 namespace stan {
   namespace math {
@@ -27,7 +27,7 @@ namespace stan {
     Eigen::Matrix<typename boost::math::tools::promote_args<T1,T2>::type,R1,C2>
     mdivide_right_tri(const Eigen::Matrix<T1,R1,C1> &b,
                       const Eigen::Matrix<T2,R2,C2> &A) {
-      stan::math::validate_square(A,"mdivide_left_tri_low");
+      stan::math::check_square("mdivide_left_tri_low(%1%)",A,"A",(double*)0);
       stan::math::validate_multiplicable(b,A,"mdivide_right_tri");
       // FIXME: This is nice and general but requires some extra memory and copying.
       if (TriView == Eigen::Lower) {

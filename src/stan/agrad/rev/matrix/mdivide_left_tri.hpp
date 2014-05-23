@@ -5,7 +5,7 @@
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/math/matrix/validate_multiplicable.hpp>
-#include <stan/math/matrix/validate_square.hpp>
+#include <stan/math/error_handling/matrix/check_square.hpp>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/matrix/typedefs.hpp>
 
@@ -297,7 +297,7 @@ namespace stan {
                      const Eigen::Matrix<var,R2,C2> &b) {
       Eigen::Matrix<var,R1,C2> res(b.rows(),b.cols());
       
-      stan::math::validate_square(A,"mdivide_left_tri");
+      stan::math::check_square("mdivide_left_tri(%1%)",A,"A",(double*)0);
       stan::math::validate_multiplicable(A,b,"mdivide_left_tri");
       
       // NOTE: this is not a memory leak, this vari is used in the 
@@ -319,7 +319,7 @@ namespace stan {
                      const Eigen::Matrix<var,R2,C2> &b) {
       Eigen::Matrix<var,R1,C2> res(b.rows(),b.cols());
       
-      stan::math::validate_square(A,"mdivide_left_tri");
+      stan::math::check_square("mdivide_left_tri(%1%)",A,"A",(double*)0);
       stan::math::validate_multiplicable(A,b,"mdivide_left_tri");
       
       // NOTE: this is not a memory leak, this vari is used in the 
@@ -341,7 +341,7 @@ namespace stan {
                      const Eigen::Matrix<double,R2,C2> &b) {
       Eigen::Matrix<var,R1,C2> res(b.rows(),b.cols());
       
-      stan::math::validate_square(A,"mdivide_left_tri");
+      stan::math::check_square("mdivide_left_tri(%1%)",A,"A",(double*)0);
       stan::math::validate_multiplicable(A,b,"mdivide_left_tri");
       
       // NOTE: this is not a memory leak, this vari is used in the 

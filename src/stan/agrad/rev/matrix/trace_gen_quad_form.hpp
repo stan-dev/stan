@@ -11,7 +11,7 @@
 #include <stan/agrad/rev/matrix/typedefs.hpp>
 #include <stan/math/matrix/trace_gen_quad_form.hpp>
 #include <stan/math/matrix/validate_multiplicable.hpp>
-#include <stan/math/matrix/validate_square.hpp>
+#include <stan/math/error_handling/matrix/check_square.hpp>
 
 namespace stan {
   namespace agrad {
@@ -112,8 +112,8 @@ namespace stan {
                         const Eigen::Matrix<TA,RA,CA> &A,
                         const Eigen::Matrix<TB,RB,CB> &B)
     {
-      stan::math::validate_square(A,"trace_gen_quad_form");
-      stan::math::validate_square(D,"trace_gen_quad_form");
+      stan::math::check_square("trace_gen_quad_form(%1%)",A,"A",(double*)0);
+      stan::math::check_square("trace_gen_quad_form(%1%)",D,"D",(double*)0);
       stan::math::validate_multiplicable(A,B,"trace_gen_quad_form");
       stan::math::validate_multiplicable(B,D,"trace_gen_quad_form");
       

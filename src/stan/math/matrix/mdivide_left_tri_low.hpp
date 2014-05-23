@@ -4,7 +4,7 @@
 #include <boost/math/tools/promotion.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/mdivide_left_tri.hpp>
-
+//#include <stan/math/error_checking/matrix/check_square.hpp>
 namespace stan {
   namespace math {
 
@@ -14,7 +14,7 @@ namespace stan {
     R1,C2>
     mdivide_left_tri_low(const Eigen::Matrix<T1,R1,C1> &A,
                          const Eigen::Matrix<T2,R2,C2> &b) {
-//      stan::math::validate_square(A,"mdivide_left_tri_low/2");
+//      stan::math::check_square("mdivide_left_tri_low(%1%)",A,"A",(double*)0);
 //      stan::math::validate_multiplicable(A,b,"mdivide_left_tri_low");
 //      return promote_common<Eigen::Matrix<T1,R1,C1>,
 //      Eigen::Matrix<T2,R1,C1> >(A)
@@ -28,7 +28,7 @@ namespace stan {
     Eigen::Matrix<T,R1,C1>
     mdivide_left_tri_low(const 
                          Eigen::Matrix<T,R1,C1> &A) {
-//      stan::math::validate_square(A,"mdivide_left_tri_low/1");
+//      stan::math::check_square("mdivide_left_tri_low(%1%)",A,"A",(double*)0);
 //      int n = A.rows();
 //      Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> b;
 //      b.setIdentity(n,n);

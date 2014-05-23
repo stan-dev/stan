@@ -1,9 +1,8 @@
 #ifndef __STAN__MATH__ERROR_HANDLING_CHECK_GREATER_OR_EQUAL_HPP__
 #define __STAN__MATH__ERROR_HANDLING_CHECK_GREATER_OR_EQUAL_HPP__
 
-#include <stan/math/error_handling/dom_err.hpp>
 #include <stan/math/error_handling/dom_err_vec.hpp>
-#include <stan/meta/traits.hpp>
+#include <stan/math/error_handling/dom_err.hpp>
 
 namespace stan {
   namespace math {
