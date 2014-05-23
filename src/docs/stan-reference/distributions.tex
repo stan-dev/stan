@@ -1877,6 +1877,38 @@ triangular and such that $LL^{\top}$ is positive definite, then for $y
 \end{description}
 
 
+\section{Multivariate Gaussian Process Distribution}
+
+\subsubsection{Probability Density Function}
+
+If $K,N \in \nats$, $\Sigma \in \reals^{N \times N}$ is symmetric,
+positive definite kernel matrix and $w \in \reals^{K}$ is a vector of positive
+inverse scales, then for $y \in \reals^{K \times N}$,
+\[
+\distro{MultiGP}(y|\Sigma,w)
+=
+\prod_{i=1}^{K} \distro{MultiNormal}(y_i|0,w_i^{-1} \Sigma).
+\]
+where $y_i$ is the $i$th row of $y$.  This is used to efficiently handle
+Gaussian Processes with multi-variate outputs where only the output dimensions
+share a kernel function but vary based on their scale.  Note that this
+function does not take into account the mean prediction.
+
+\pitem{y}{multi\_gp}{Sigma,w}
+
+\subsubsection{Stan Functions}
+
+\begin{description}
+%
+\fitem{real}{multi\_gp\_log}{vector \farg{y}, matrix \farg{Sigma},
+  vector \farg{w}}{The log of the multivariate GP density of matrix
+  \farg{y} given kernel matrix \farg{Sigma} and inverses scales
+  \farg{w}}
+%
+\end{description}
+
+
+
 \section{Multivariate Student-$t$ Distribution}
 
 \subsubsection{Probability Density Function}
