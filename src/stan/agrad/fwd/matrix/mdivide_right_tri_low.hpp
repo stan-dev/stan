@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <stan/math/matrix/Eigen.hpp>
+#include <stan/math/matrix/mdivide_right.hpp>
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/math/matrix/validate_multiplicable.hpp>
 #include <stan/agrad/fwd/matrix/typedefs.hpp>

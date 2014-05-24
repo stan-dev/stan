@@ -6,6 +6,7 @@
 #include <boost/math/special_functions/gamma.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 
+#include <stan/math/matrix.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/matrix_error_handling.hpp>
 #include <stan/prob/constants.hpp>
