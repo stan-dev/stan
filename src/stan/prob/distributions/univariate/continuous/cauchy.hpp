@@ -10,6 +10,7 @@
 #include <stan/math/constants.hpp>
 #include <stan/math/functions/square.hpp>
 #include <stan/math/functions/value_of.hpp>
+#include <stan/math/functions/log1p.hpp>
 #include <stan/prob/constants.hpp>
 
 namespace stan {
