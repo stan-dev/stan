@@ -57,6 +57,46 @@ void test_val(std::string name, T val, std::string s) {
   test_list2(reader,name,vals,expected_dims);
 }
 
+void test_exception(const std::string& input) {
+  try {
+    std::cout << "input: " << input << std::endl;
+    std::stringstream in(input);
+    stan::io::dump_reader reader(in);
+    bool has_next = reader.next();
+    EXPECT_EQ(true,has_next);
+    std::cout << "read value" << std::endl;
+  } catch (const std::exception& e) {
+    return;
+  }
+  FAIL(); // didn't throw an exception as expected.
+}
+
+
+
+bool hasEnding(std::string const &fullString, std::string const &ending) {
+   if (fullString.length() >= ending.length()) {
+    return (0 == fullString.compare (fullString.length() - ending.length(), ending.length(), ending));
+  } else {
+    return false;
+  }
+}
+
+void test_exception(const std::string& input,
+                    const std::string& exception_text) {
+  try {
+    std::stringstream in(input);
+    stan::io::dump_reader reader(in);
+    std::vector<int> vals = reader.int_values();
+  } catch (const std::exception& e) {
+    EXPECT_TRUE(hasEnding(e.what(), exception_text));
+    return;
+  }
+  FAIL(); // didn't throw an exception as expected.
+}
+
+
+
+
 TEST(io_dump, reader_double) {
   test_val("a",-5.0,"a <- -5.0");
   test_val("a",5.0,"a <- 5.0");
@@ -434,4 +474,9 @@ TEST(io_dump, it_sign_ksvanhorn) {
   EXPECT_EQ(1U,sigma_values.size());
   EXPECT_FLOAT_EQ(3,sigma_values[0]);
   
+}
+
+// test for too large integer value
+TEST(io_dump, int_too_large) {
+  test_exception("k <- 999999999999999999999999999 \n");
 }
