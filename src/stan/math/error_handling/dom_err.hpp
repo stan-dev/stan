@@ -1,6 +1,7 @@
 #ifndef __STAN__MATH__ERROR_HANDLING__DOM_ERR_HPP__
 #define __STAN__MATH__ERROR_HANDLING__DOM_ERR_HPP__
 
+#include <typeinfo>
 #ifdef BOOST_MSVC
 #  pragma warning(push) // Quiet warnings in boost/format.hpp
 #  pragma warning(disable: 4996) // _SCL_SECURE_NO_DEPRECATE

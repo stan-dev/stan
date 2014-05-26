@@ -8,6 +8,7 @@
 #include <stan/prob/traits.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/constants.hpp>
+#include <stan/math/functions/log1p.hpp>
 #include <stan/math/functions/square.hpp>
 #include <stan/math/functions/value_of.hpp>
 #include <stan/prob/constants.hpp>

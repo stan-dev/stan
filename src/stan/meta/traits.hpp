@@ -9,7 +9,7 @@
 #include <boost/type_traits/is_arithmetic.hpp> 
 
 #include <boost/math/tools/promotion.hpp>
-#include <stan/math/matrix.hpp>
+#include <stan/math/matrix/Eigen.hpp>
 
 namespace stan {
 
@@ -447,9 +447,5 @@ namespace stan {
       };
     };
 
-
-
-
 }
-
 #endif

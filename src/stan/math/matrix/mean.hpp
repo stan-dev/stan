@@ -21,7 +21,7 @@ namespace stan {
     inline 
     typename boost::math::tools::promote_args<T>::type
     mean(const std::vector<T>& v) {
-      //stan::math::check_nonzero_size("mean(%1%)",v,"v", (double*)0);
+      stan::math::check_nonzero_size("mean(%1%)",v,"v", (double*)0);
       T sum(v[0]);
       for (size_t i = 1; i < v.size(); ++i)
         sum += v[i];

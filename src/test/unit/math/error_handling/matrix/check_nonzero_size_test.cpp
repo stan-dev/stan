@@ -7,14 +7,14 @@ TEST(MathErrorHandlingMatrix, checkNonzeroSizeMatrix) {
   
   y.resize(3,3);
   EXPECT_TRUE(stan::math::check_nonzero_size("checkNonzeroSize(%1%)",
-                                          y, "y", &result));
+                                             y, "y", &result));
   y.resize(2, 3);
   EXPECT_TRUE(stan::math::check_nonzero_size("checkNonzeroSize(%1%)",
-                                          y, "y", &result));
+                                             y, "y", &result));
 
   y.resize(0,0);
   EXPECT_THROW(stan::math::check_nonzero_size("checkNonzeroSize(%1%)",y, "y", 
-                                           &result), 
+                                              &result), 
                std::domain_error);
 
   std::vector<double> a;
@@ -24,17 +24,15 @@ TEST(MathErrorHandlingMatrix, checkNonzeroSizeMatrix) {
   a.push_back(3.0);
 
 
-   EXPECT_TRUE(stan::math::check_nonzero_size("checkNonzeroSize(%1%)",
-                                              a, "a", &result));
+  EXPECT_TRUE(stan::math::check_nonzero_size("checkNonzeroSize(%1%)",
+                                             a, "a", &result));
 
-  // a.resize(2);
-  // EXPECT_TRUE(stan::math::check_nonzero_size("checkNonzeroSize(%1%)",
-  //                                            a, "a", &result));
+  a.resize(2);
+  EXPECT_TRUE(stan::math::check_nonzero_size("checkNonzeroSize(%1%)",
+                                             a, "a", &result));
 
-  // a.resize(0);
-  // EXPECT_THROW(stan::math::check_nonzero_size("checkNonzeroSize(%1%)",a, "a", 
-  //                                          &result), 
-  //              std::domain_error);
-
-
+  a.resize(0);
+  EXPECT_THROW(stan::math::check_nonzero_size("checkNonzeroSize(%1%)",a, "a", 
+                                              &result), 
+               std::domain_error);
 }

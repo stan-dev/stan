@@ -1,10 +1,10 @@
 #ifndef __STAN__MATH__MATRIX__QR_R_HPP__
 #define __STAN__MATH__MATRIX__QR_R_HPP__
 
-#include <stan/math/error_handling/check_greater_or_equal.hpp>
-#include <stan/math/error_handling/matrix/check_nonzero_size.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <Eigen/QR>
+#include <stan/math/error_handling/check_greater_or_equal.hpp>
+#include <stan/math/error_handling/matrix/check_nonzero_size.hpp>
 
 namespace stan {
   namespace math {
