@@ -54,7 +54,7 @@ namespace stan {
           if (x.size() != N_)
             throw std::length_error("vector provided does not match the parameter length");
           for (size_t n = 0; n < N_filter_; n++)
-            tmp.at(n) = x.at(filter_.at(n));
+            tmp[n] = x[filter_[n]];
           values_(tmp);
         }
       
