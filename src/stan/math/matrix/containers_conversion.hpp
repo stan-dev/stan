@@ -2,7 +2,6 @@
 #define __STAN__MATH__MATRIX__CONTAINERS_CONVERSION_HPP__
 
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/matrix/dims.hpp>
 #include <stan/meta/traits.hpp> //stan::scalar_type
 #include <vector>
 
@@ -26,29 +25,35 @@ namespace stan {
     template <typename T>
     inline Matrix<T, Dynamic, Dynamic>
     to_matrix(const vector< vector<T> > & vec) {
-      vector<int> RC = dims(vec);
-      int R = RC[0];
-      int C = RC[1];
-      Matrix<T, Dynamic, Dynamic> result(R, C);
-      T* datap = result.data();
-      for (int i=0, ij=0; i < C; i++)
-        for (int j=0; j < R; j++, ij++)
-          datap[ij] = vec[j][i];
-      return result;
+      size_t R = vec.size();
+      if (R != 0) {
+        size_t C = vec[0].size();
+        Matrix<T, Dynamic, Dynamic> result(R, C);
+        T* datap = result.data();
+        for (size_t i=0, ij=0; i < C; i++)
+          for (size_t j=0; j < R; j++, ij++)
+            datap[ij] = vec[j][i];
+        return result;
+      } else {
+        return Matrix<T, Dynamic, Dynamic> (0, 0);
+      }
     }
     
     //matrix to_matrix(int[,])
     inline Matrix<double, Dynamic, Dynamic>
     to_matrix(const vector< vector<int> > & vec) {
-      vector<int> RC = dims(vec);
-      int R = RC[0];
-      int C = RC[1];
-      Matrix<double, Dynamic, Dynamic> result(R, C);
-      double* datap = result.data();
-      for (int i=0, ij=0; i < C; i++)
-        for (int j=0; j < R; j++, ij++)
-          datap[ij] = vec[j][i];
-      return result;
+      size_t R = vec.size();
+      if (R != 0) {
+        size_t C = vec[0].size();
+        Matrix<double, Dynamic, Dynamic> result(R, C);
+        double* datap = result.data();
+        for (size_t i=0, ij=0; i < C; i++)
+          for (size_t j=0; j < R; j++, ij++)
+            datap[ij] = vec[j][i];
+        return result;
+      } else {
+        return Matrix<double, Dynamic, Dynamic> (0, 0);
+      }
     }
 
     //vector to_vector(matrix)
