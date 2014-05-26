@@ -2949,15 +2949,16 @@ does not report values above 300 pounds.
 
 One way to model censored data is to treat the censored data as
 missing data that is constrained to fall in the censored range of
-values.  Because \Stan does not allow unknown values in its arrays or
-matrices, the censored values must be represented explicitly.
+values.  Since \Stan does not allow unknown values in its arrays or
+matrices, the censored values must be represented explicitly, as in the
+following right-censored case.
 %
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
 data {
   int<lower=0> N_obs;
   int<lower=0> N_cens;
-  real<lower=0> y_obs[N_obs];
+  real y_obs[N_obs];
   real<lower=max(y_obs)> U;
 }
 parameters {
@@ -2966,10 +2967,8 @@ parameters {
   real<lower=0> sigma;
 }
 model {
-  for (n in 1:N_obs)
-    y_obs[n] ~ normal(mu,sigma);
-  for (n in 1:N_cens)
-    y_cens[n] ~ normal(mu,sigma);
+  y_obs ~ normal(mu,sigma);
+  y_cens ~ normal(mu,sigma);
 }
 \end{Verbatim}
 \end{quote}
@@ -3001,17 +3000,14 @@ is
 \[
 \log \prod_{m=1}^M \mbox{Pr}[y_m > U]
 = \log \left( 1 - \Phi\left(\frac{y - \mu}{\sigma}\right)\right)^{M}
-= M \, \log \left( 1 - \Phi\left(\frac{y - \mu}{\sigma}\right)\right)
-\]
-% 
-Although \Stan implements $\Phi$ with the function $\code{Phi}$, \Stan
-also provides the cumulative distribution function \code{normal\_cdf},
-defined by
-\[
-\code{normal\_cdf}(y,\mu,\sigma) = \Phi \left( \frac{y - \mu}{\sigma} \right).
+= M \, \code{normal\_ccdf\_log}(y,\mu,\sigma),
 \]
 %
-The following model assumes
+where \code{normal\_ccdf\_log} is the log of complementary CDF
+(\Stan provides \code{<distr>\_ccdf\_log} for each distribution
+implemented in \Stan).
+
+The following right-censored model assumes
 that the censoring point is known, so it is declared as data.
 %
 \begin{quote}
@@ -3019,7 +3015,7 @@ that the censoring point is known, so it is declared as data.
 data {
   int<lower=0> N_obs;
   int<lower=0> N_cens;
-  real<lower=0> y_obs[N_obs];
+  real y_obs[N_obs];
   real<lower=max(y_obs)> U;
 }
 parameters {
@@ -3027,9 +3023,8 @@ parameters {
   real<lower=0> sigma;
 }
 model {
-  for (n in 1:N_obs)
-    y_obs[n] ~ normal(mu,sigma); 
-  increment_log_prob(N_cens * log1m(normal_cdf(U,mu,sigma)));
+  y_obs ~ normal(mu,sigma); 
+  increment_log_prob(N_cens * normal_ccdf_log(U,mu,sigma));
 }
 \end{Verbatim}
 \end{quote}
@@ -3037,14 +3032,33 @@ model {
 For the observed values in \Verb|y_obs|, the normal sampling model is
 used without truncation.  The log probability is directly incremented
 using the calculated log cumulative normal probability of the censored
-data items.  The built-in function \code{log1m} is used, which maps
-$x$ to $\log (1 - x)$ in an arithmetically stable way.
+data items.
 
-To deal with situations where the censoring point variable \code{U} is
-unknown, the declaration of \code{U} should be moved from the data
-block to the parameters block.
-
-
+For the left-censored data the CDF
+(\code{normal\_cdf\_log}) has to be used instead of complementary CDF.
+If the censoring point variable (\code{L}) is unknown,
+its declaration should be moved from the data to the parameters block. 
+%
+\begin{quote}
+\begin{Verbatim}[fontsize=\small]
+data {
+  int<lower=0> N_obs;
+  int<lower=0> N_cens;
+  real y_obs[N_obs];
+}
+parameters {
+  real<upper=min(y_obs)> L;
+  real mu;
+  real<lower=0> sigma;
+}
+model {
+  L ~ normal(mu,sigma);
+  y_obs ~ normal(mu,sigma);
+  increment_log_prob(N_cens * normal_cdf_log(L,mu,sigma));
+}
+\end{Verbatim}
+\end{quote}
+%
 
 \chapter{Mixture Modeling}\label{mixture-modeling.chapter}
 
