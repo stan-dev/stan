@@ -2289,11 +2289,19 @@ Number of components of \farg{v} less than \farg{v[s]}}
 
 
 \chapter{Mixed Operations}
-These functions perform conversions between Stan containers matrix, vector, row vector and arrays. 
 
-Whenever a conversion implies reduction of dimensionality (like converting a matrix to a vector or a two dimensional array to an one dimensional array), the conversion is proceed in row-major order when the input is an array and in column-major order when the input is a vector, a row vector or a matrix.
+These functions perform conversions between Stan containers matrix,
+vector, row vector and arrays.
 
-If the dimensionality is preserved (like when converting a matrix to a two dimensional array), then the indexes are also fully preserved which implies easy reversibility of the operation.
+Whenever a conversion implies reduction of dimensionality (like
+converting a matrix to a vector or a two dimensional array to a one
+dimensional array), the conversion is proceed in row-major order when
+the input is an array and in column-major order when the input is a
+vector, a row vector or a matrix.
+
+If the dimensionality is preserved (like when converting a matrix to a
+two dimensional array), then the indexes are also fully preserved
+which implies easy reversibility of the operation.
 
 \begin{description}
 %
@@ -2301,16 +2309,18 @@ If the dimensionality is preserved (like when converting a matrix to a two dimen
 Return the matrix \farg{m} itself.}
 %
 \fitem{matrix}{to\_matrix}{vector \farg{v}}{
-Convert the column vector \farg{v} to a Nx1 matrix.}
+Convert the column vector \farg{v} to a \code{size(\farg{v})} by 1 matrix.}
 %
 \fitem{matrix}{to\_matrix}{row\_vector \farg{v}}{
-Convert the row vector \farg{v} to a 1xN matrix.}
+Convert the row vector \farg{v} to a 1 by \code{size(\farg{v})} matrix.}
 %
 \fitem{matrix}{to\_matrix}{real[,] \farg{a}}{
-Convert the two dimensional array \farg{a} to a matrix.}
+Convert the two dimensional array \farg{a} to a matrix with the same
+dimensions and indexing order.}
 %
 \fitem{matrix}{to\_matrix}{int[,] \farg{a}}{
-Convert the two dimensional array \farg{a} to a matrix.}
+Convert the two dimensional array \farg{a} to a matrix with the same
+dimensions and indexing order.}
 %
 %
 %
@@ -2327,7 +2337,7 @@ Convert the row vector \farg{v} to a column vector.}
 Convert the one-dimensional array \farg{a} to a column vector.}
 %
 \fitem{vector}{to\_vector}{int[] \farg{a}}{
-Convert the one-dimensional array \farg{a} to a column vector.}
+Convert the one-dimensional integer array \farg{a} to a column vector.}
 %
 %
 %
@@ -2335,7 +2345,7 @@ Convert the one-dimensional array \farg{a} to a column vector.}
 Convert the matrix \farg{m} to a row vector in column-major order.}
 %
 \fitem{row\_vector}{to\_row\_vector}{vector \farg{v}}{
-Convert the column vector \farg{v} a a row vector.}
+Convert the column vector \farg{v} to a row vector.}
 %
 \fitem{row\_vector}{to\_row\_vector}{row\_vector \farg{v}}{
 Return the row vector \farg{v} itself.}
@@ -2349,23 +2359,24 @@ Convert the one-dimensional array \farg{a} to a row vector.}
 %
 %
 \fitem{real[,]}{to\_array\_2d}{matrix \farg{m}}{
-Convert the matrix \farg{m} to a two dimensional array.}
+Convert the matrix \farg{m} to a two dimensional array with the same 
+dimensions and indexing order.}
 %
 %
 %
 \fitem{real[]}{to\_array\_1d}{vector \farg{v}}{
-Convert the column vector \farg{v} to an one-dimensional array.}
+Convert the column vector \farg{v} to a one-dimensional array.}
 %
 \fitem{real[]}{to\_array\_1d}{row\_vector \farg{v}}{
-Convert the row vector \farg{v} to an one-dimensional array.}
+Convert the row vector \farg{v} to a one-dimensional array.}
 %
 \fitem{real[]}{to\_array\_1d}{matrix \farg{m}}{
-Convert the matrix \farg{m} to an one-dimensional array in column-major order.}
+Convert the matrix \farg{m} to a one-dimensional array in column-major order.}
 %
 \fitem{real[]}{to\_array\_1d}{real[...] \farg{a}}{
-Convert the array \farg{a} (of any dimension up to 10) to an one-dimensional array in row-major order.}
+Convert the array \farg{a} (of any dimension up to 10) to a one-dimensional array in row-major order.}
 %
 \fitem{int[]}{to\_array\_1d}{int[...] \farg{a}}{
-Convert the array \farg{a} (of any dimension up to 10) to an one-dimensional array in row-major order.}
+Convert the array \farg{a} (of any dimension up to 10) to a one-dimensional array in row-major order.}
 %
 \end{description}
