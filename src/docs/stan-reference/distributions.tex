@@ -91,8 +91,8 @@ If $\alpha \in \reals$, then for $c \in \setlist{0,1}$,
 \begin{description}
 %
 \fitem{real}{bernoulli\_logit\_log}{ints \farg{y}, reals \farg{alpha}}{The
-  log Bernoulli probability mass of \farg{y} given logit chance of success
-  \code{exp(\farg{alpha})}}
+  log Bernoulli probability mass of \farg{y} given chance of success
+  \code{inv\_logit(\farg{alpha})}}
 %
 \end{description}
 
@@ -431,6 +431,10 @@ numbers (i.e., the non-negative integers).
 
 \section{Negative Binomial Distribution}
 
+For the negative binomial distribution Stan uses the parameterization
+described in \citet{GelmanEtAl:2013}.
+For an alternative parametrization, see section \ref{sec:nbalt}
+
 \subsubsection{Probability Mass Function}
 
 If $\alpha \in \posreals$ and $\beta \in \posreals$, then for $n \in
@@ -471,6 +475,10 @@ where $\Psi$ is the digamma function, defined as
 \[
 \Psi(x) = \frac{\partial}{\partial x} \log \Gamma(x).
 \]
+\[
+\mbox{With mean } E[Y] = \frac{\alpha}{\beta} \mbox{ and variance } Var[Y] =
+\frac{\alpha}{\beta^2} (\beta + 1)
+\]
 
 \pitem{n}{neg\_binomial}{alpha,beta}
 
@@ -505,6 +513,7 @@ where $\Psi$ is the digamma function, defined as
 
 
 \section{Negative Binomial Distribution, alternative parameterization}
+\label{sec:nbalt}
 
 Stan also provides an alternative parameterization of the negative
 binomial distribution using the mean and inverse scale
@@ -512,7 +521,7 @@ binomial distribution using the mean and inverse scale
 
 \subsubsection{Probability Mass Function}
 
-If $\eta \in \reals$ and $\phi \in \posreals$, then for $y \in
+If $\eta \in \reals$, $\mu \in \posreals$ and $\phi \in \posreals$, then for $y \in
 \nats$,
 \[
 \distro{NegativeBinomial2}(y|\mu,\phi)
@@ -528,9 +537,9 @@ If $\eta \in \reals$ and $\phi \in \posreals$, then for $y \in
 \mu + \frac{\mu^2}{\phi}
 \]
 
-\pitem{y}{neg\_2\_binomial}{mu, phi}
+\pitem{y}{neg\_binomial\_2}{mu, phi}
 
-\pitem{y}{neg\_2\_binomial\_log}{eta, phi}
+\pitem{y}{neg\_binomial\_2\_log}{eta, phi}
 
 \subsubsection{Stan Functions}
 
@@ -651,7 +660,7 @@ If $K \in \nats$, $N \in \nats$, and $\theta \in \mbox{$K$-simplex}$,
 then for $y \in \nats^K$ such that $\sum_{k=1}^K y_k = N$,
 %
 \[
-\distro{Multinomial}(y|\theta,N)
+\distro{Multinomial}(y|\theta)
 = \binom{N}{y_1,\ldots,y_K}
 \prod_{k=1}^K \theta_k^{y_k},
 \]
@@ -661,13 +670,13 @@ where the multinomial coefficient is defined by
 = \frac{N!}{\prod_{k=1}^K y_k!}.
 \]
 
-\pitem{y}{multinomial}{theta,N}
+\pitem{y}{multinomial}{theta}
 
 \subsubsection{Stan Functions}
 
 \begin{description}
  \fitem{real}{multinomial\_log}{int[] \farg{y}, vector
-    \farg{theta}, int \farg{N}}{The log multinomial probability mass function with
+    \farg{theta}}{The log multinomial probability mass function with
     outcome array \code{y} of size $K$ given the $K$-simplex
     distribution parameter \farg{theta} and (implicit) total count
     \code{N = sum(\farg{y})}}
@@ -1585,8 +1594,12 @@ If $\alpha \in \posreals$ and $\beta \in \posreals$, then for $\theta
 ,
 \] 
 where the beta function $\Betafun()$ is as defined in
-\refsection{betafun}.  If $\theta = 0$ or $\theta = 1$, then
-the log probability is $-\infty$.
+\refsection{betafun}.  
+
+{\it Warning:}\ If $\theta = 0$ or $\theta = 1$, then the probability
+is 0 and the log probability is $-\infty$.  Similarly, the
+distribution requires strictly positive parameters, $\alpha, \beta >
+0$.
 
 \pitem{theta}{beta}{alpha,beta}
 
@@ -1626,7 +1639,8 @@ the log probability is $-\infty$.
 \chapter{Circular Distributions}
 
 \noindent
-Circular distributions are defined for finite values \farg{y} in any interval of length $2\pi$.
+Circular distributions are defined for finite values \farg{y} in any
+interval of length $2\pi$.  
 
 
 \section{Von Mises Distribution}
@@ -1635,12 +1649,35 @@ Circular distributions are defined for finite values \farg{y} in any interval of
 
 If $\mu \in \reals$ and $\kappa \in \posreals$, then for $y \in
 \reals$,
+%
 \[
 \distro{VonMises}(y|\mu,\kappa)
 =
 \frac{\exp(\kappa\cos(y-\mu))}{2\pi I_0(\kappa)}
 \!.
 \]
+%
+In order for this density to properly nomralize, $y$ must be
+restricted to some interval  $(c, c + 2\pi)$ of length $2 \pi$,
+because
+%
+\[
+\int_{c}^{c + 2\pi} \distro{VonMises}(y|\mu,\kappa) dy
+= 1.
+\]
+%
+Similarly, if $\mu$ is a parameter, it will typically be restricted to
+the same range as $y$.  
+
+A von Mises distribution with its $2 \pi$ interval of support centered
+around its location $\mu$ will have a single mode at $\mu$; for
+example, restricting $y$ to $(-\pi,\pi)$ and taking $\mu = 0$ leads to
+a single local optimum at the model $\mu$.  If the location $\mu$ is
+not in the center of the support, the density is circularly translated
+and there will be a second local maximum at the boundary furthest from
+the mode.  Ideally, the parameterization and support will be set up so
+that the bulk of the probability mass is in a continuous interval
+around the mean $\mu$.
 
 \pitem{y}{von\_mises}{mu,kappa}
 
@@ -1790,7 +1827,7 @@ If $K \in \nats$, $\mu \in \reals^K$, and $\Omega \in \reals^{K \times
 = \distro{MultiNormal}(y|\mu,\Sigma^{-1})
 \]
 
-\pitem{y}{multi\_norm\_prec}{mu,Omega}
+\pitem{y}{multi\_normal\_prec}{mu,Omega}
 
 \subsubsection{Stan Functions}
 
@@ -1829,6 +1866,44 @@ triangular and such that $LL^{\top}$ is positive definite, then for $y
   \farg{mu}, matrix \farg{L}}{The log of the multivariate normal density of vector
   \farg{y} given location \farg{mu} and lower-triangular Cholesky
   factor of the covariance matrix \farg{L}}
+%
+\end{description}
+%
+\begin{description}
+\fitem{vector}{multi\_normal\_cholesky\_rng}{vector \farg{mu}, matrix
+  \farg{L}}{Generate a multivariate normal variate with location
+  \farg{mu} and lower-triangular Cholesky factor of the covariance 
+  matrix \farg{L}; may only be used in generated quantities block}
+\end{description}
+
+
+\section{Multivariate Gaussian Process Distribution}
+
+\subsubsection{Probability Density Function}
+
+If $K,N \in \nats$, $\Sigma \in \reals^{N \times N}$ is symmetric,
+positive definite kernel matrix and $w \in \reals^{K}$ is a vector of positive
+inverse scales, then for $y \in \reals^{K \times N}$,
+\[
+\distro{MultiGP}(y|\Sigma,w)
+=
+\prod_{i=1}^{K} \distro{MultiNormal}(y_i|0,w_i^{-1} \Sigma).
+\]
+where $y_i$ is the $i$th row of $y$.  This is used to efficiently handle
+Gaussian Processes with multi-variate outputs where only the output dimensions
+share a kernel function but vary based on their scale.  Note that this
+function does not take into account the mean prediction.
+
+\pitem{y}{multi\_gp}{Sigma,w}
+
+\subsubsection{Stan Functions}
+
+\begin{description}
+%
+\fitem{real}{multi\_gp\_log}{vector \farg{y}, matrix \farg{Sigma},
+  vector \farg{w}}{The log of the multivariate GP density of matrix
+  \farg{y} given kernel matrix \farg{Sigma} and inverses scales
+  \farg{w}}
 %
 \end{description}
 
@@ -1968,6 +2043,12 @@ $\theta \in \mbox{$K$-simplex}$,
 .
 \]
 
+{\it Warning:}\ If any of the components of $\theta$ satisfies
+$\theta_i = 0$ or $\theta_i = 1$, then the probability is 0 and the log
+probability is $-\infty$.  Similarly, the distribution requires
+strictly positive parameters, with $\alpha_i > 0$ for each $i$.
+
+
 \pitem{theta}{dirichlet}{alpha}
 
 \subsubsection{Stan Functions}
@@ -2098,7 +2179,7 @@ and positive definite, then for symmetric and positive-definite $W \in
 \
 \left| W \right|^{(\nu - K - 1)/2}
 \
-\exp \! \left(\frac{1}{2} \ \mbox{tr}\left( S^{-1} W \right) \right)
+\exp \! \left(- \frac{1}{2} \ \mbox{tr}\left( S^{-1} W \right) \right)
 \! ,
 \]
 %
@@ -2148,7 +2229,7 @@ positive-definite $W \in \reals^{K \times K}$,
 \
 \left| S \right|^{\nu/2}
 \
-\left| W \right|^{-(\nu - K - 1)/2}
+\left| W \right|^{-(\nu + K + 1)/2}
 \
 \exp \! \left( 
 - \frac{1}{2}

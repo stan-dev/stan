@@ -5,7 +5,11 @@
 #include <cstddef>
 #include <sstream>
 #include <stdexcept>
-#include <stdint.h> // FIXME: replace with cstddef?
+#if defined(_MSC_VER)
+    #include <msinttypes.h>  // Microsoft Visual Studio lacks compliant stdint.h
+#else
+    #include <stdint.h> // FIXME: replace with cstddef?
+#endif
 #include <vector>
 #include <stan/memory/stack_alloc.hpp>
 

@@ -373,6 +373,8 @@ transformed data {
   transformed_data_matrix <- eigenvectors_sym(d_matrix);
   transformed_data_matrix <- cholesky_decompose(d_matrix);
   transformed_data_vector <- singular_values(d_matrix);
+  transformed_data_matrix <- qr_Q(d_matrix);
+  transformed_data_matrix <- qr_R(d_matrix);
 }
 parameters {
   real p_real;
@@ -881,6 +883,14 @@ transformed parameters {
   transformed_param_matrix <- quad_form(d_matrix,p_matrix);
   transformed_param_matrix <- quad_form(p_matrix,d_matrix);
   transformed_param_matrix <- quad_form(p_matrix,p_matrix);
+  transformed_param_real <- quad_form_sym(d_matrix,d_vector);
+  transformed_param_real <- quad_form_sym(d_matrix,p_vector);
+  transformed_param_real <- quad_form_sym(p_matrix,d_vector);
+  transformed_param_real <- quad_form_sym(p_matrix,p_vector);
+  transformed_param_matrix <- quad_form_sym(d_matrix,d_matrix);
+  transformed_param_matrix <- quad_form_sym(d_matrix,p_matrix);
+  transformed_param_matrix <- quad_form_sym(p_matrix,d_matrix);
+  transformed_param_matrix <- quad_form_sym(p_matrix,p_matrix);
   transformed_param_real <- trace_quad_form(d_matrix,d_vector);
   transformed_param_real <- trace_quad_form(d_matrix,p_vector);
   transformed_param_real <- trace_quad_form(p_matrix,d_vector);
@@ -1057,6 +1067,10 @@ transformed parameters {
   transformed_param_matrix <- cholesky_decompose(p_matrix);
   transformed_param_vector <- singular_values(d_matrix);
   transformed_param_vector <- singular_values(p_matrix);
+  transformed_param_matrix <- qr_Q(d_matrix);
+  transformed_param_matrix <- qr_R(d_matrix);
+  transformed_param_matrix <- qr_Q(p_matrix);
+  transformed_param_matrix <- qr_R(p_matrix);
 }
 model {  
 }
