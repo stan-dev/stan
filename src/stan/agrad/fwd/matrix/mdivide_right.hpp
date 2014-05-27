@@ -10,6 +10,11 @@
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <stan/agrad/fwd/matrix/inverse.hpp>
 #include <stan/agrad/fwd/matrix/multiply.hpp>
+#include <stan/math/matrix/multiply.hpp>
+#include <stan/agrad/fwd/matrix/to_fvar.hpp>
+#include <stan/math/matrix/inverse.hpp>
+#include <stan/agrad/fwd/matrix/inverse.hpp>
+#include <stan/math/matrix/mdivide_right.hpp>
 
 namespace stan {
   namespace agrad {
