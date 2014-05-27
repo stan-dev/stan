@@ -4,7 +4,7 @@
 #include <vector>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/typedefs.hpp>
-#include <stan/math/matrix/validate_multiplicable.hpp>
+#include <stan/math/error_handling/matrix/check_multiplicable.hpp>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/matrix/typedefs.hpp>
 #include <stan/math/error_handling/matrix/check_square.hpp>
@@ -266,7 +266,8 @@ namespace stan {
       Eigen::Matrix<var,R1,C2> res(b.rows(),b.cols());
       
       stan::math::check_square("mdivide_left(%1%)",A,"A",(double*)0);
-      stan::math::validate_multiplicable(A,b,"mdivide_left");
+      stan::math::check_multiplicable("mdivide_left(%1%)",A,"A",
+                                      b,"b",(double*)0);
       
       // NOTE: this is not a memory leak, this vari is used in the 
       // expression graph to evaluate the adjoint, but is not needed
@@ -289,7 +290,8 @@ namespace stan {
       Eigen::Matrix<var,R1,C2> res(b.rows(),b.cols());
       
       stan::math::check_square("mdivide_left(%1%)",A,"A",(double*)0);
-      stan::math::validate_multiplicable(A,b,"mdivide_left");
+      stan::math::check_multiplicable("mdivide_left(%1%)",A,"A",
+                                      b,"b",(double*)0);
       
       // NOTE: this is not a memory leak, this vari is used in the 
       // expression graph to evaluate the adjoint, but is not needed
@@ -312,7 +314,8 @@ namespace stan {
       Eigen::Matrix<var,R1,C2> res(b.rows(),b.cols());
       
       stan::math::check_square("mdivide_left(%1%)",A,"A",(double*)0);
-      stan::math::validate_multiplicable(A,b,"mdivide_left");
+      stan::math::check_multiplicable("mdivide_left(%1%)",A,"A",
+                                      b,"b",(double*)0);
       
       // NOTE: this is not a memory leak, this vari is used in the 
       // expression graph to evaluate the adjoint, but is not needed

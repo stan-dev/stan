@@ -4,7 +4,7 @@
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits.hpp>
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/matrix/validate_multiplicable.hpp>
+#include <stan/math/error_handling/matrix/check_multiplicable.hpp>
 #include <stan/math/error_handling/matrix/check_square.hpp>
 
 namespace stan {
@@ -18,7 +18,8 @@ namespace stan {
                     const Eigen::Matrix<double,RB,CB> &B)
     {
       stan::math::check_square("trace_quad_form(%1%)",A,"A",(double*)0);
-      validate_multiplicable(A,B,"trace_quad_form");
+      stan::math::check_multiplicable("trace_quad_form(%1%)",A,"A",
+                                      B,"B",(double*)0);
       return (B.transpose()*A*B).trace();
     }
   }

@@ -5,7 +5,7 @@
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/mdivide_left.hpp>
 #include <stan/math/matrix/transpose.hpp>
-#include <stan/math/matrix/validate_multiplicable.hpp>
+#include <stan/math/error_handling/matrix/check_multiplicable.hpp>
 #include <stan/math/error_handling/matrix/check_square.hpp>
 
 namespace stan {
@@ -25,7 +25,8 @@ namespace stan {
     mdivide_right(const Eigen::Matrix<T1,R1,C1> &b,
                   const Eigen::Matrix<T2,R2,C2> &A) {
       stan::math::check_square("mdivide_right(%1%)",A,"A",(double*)0);
-      stan::math::validate_multiplicable(b,A,"mdivide_right");
+      stan::math::check_multiplicable("mdivide_right(%1%)",b,"b",
+                                      A,"A",(double*)0);
       // FIXME: This is nice and general but likely slow.
       return transpose(mdivide_left(transpose(A),transpose(b)));
 //      return promote_common<Eigen::Matrix<T1,R2,C2>,

@@ -23,7 +23,7 @@ namespace stan {
           for (size_t n = 0; n < length(eq); n++) {
             if (!(y == eq_vec[n]))
               return dom_err(function,y,name,
-                             " is %1%, but must be greater than ",
+                             " is %1%, but must be equal to ",
                              eq_vec[n],result);
           }
           return true;

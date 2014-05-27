@@ -2,8 +2,6 @@
 #define __STAN__PROB__DISTRIBUTIONS__MULTIVARIATE__CONTINUOUS__INV_WISHART_HPP__
 
 #include <stan/prob/constants.hpp>
-#include <stan/math/matrix_error_handling.hpp>
-#include <stan/math/error_handling.hpp>
 #include <stan/prob/traits.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/agrad/rev.hpp>
@@ -12,6 +10,8 @@
 #include <stan/math/matrix/log_determinant_ldlt.hpp>
 #include <stan/math/matrix/mdivide_left_ldlt.hpp>
 #include <stan/math/error_handling/matrix/check_ldlt_factor.hpp>
+#include <stan/math/error_handling/check_greater.hpp>
+#include <stan/math/error_handling/matrix/check_size_match.hpp>
 
 namespace stan {
   namespace prob {

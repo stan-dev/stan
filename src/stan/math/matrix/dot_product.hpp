@@ -3,8 +3,8 @@
 
 #include <vector>
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/matrix/validate_vector.hpp>
-#include <stan/math/matrix/validate_matching_sizes.hpp>
+#include <stan/math/error_handling/matrix/check_vector.hpp>
+#include <stan/math/error_handling/matrix/check_matching_sizes.hpp>
 
 namespace stan {
   namespace math {
@@ -21,9 +21,10 @@ namespace stan {
     template<int R1,int C1,int R2, int C2>
     inline double dot_product(const Eigen::Matrix<double, R1, C1>& v1, 
                               const Eigen::Matrix<double, R2, C2>& v2) {
-      validate_vector(v1,"dot_product");
-      validate_vector(v2,"dot_product");
-      validate_matching_sizes(v1,v2,"dot_product");
+      stan::math::check_vector("dot_product(%1%)",v1,"v1",(double*)0);
+      stan::math::check_vector("dot_product(%1%)",v2,"v2",(double*)0);
+      stan::math::check_matching_sizes("dot_product(%1%)",v1,"v1",
+                                       v2,"v2",(double*)0);
       return v1.dot(v2);
     }
     /**
@@ -47,7 +48,8 @@ namespace stan {
      */
     inline double dot_product(const std::vector<double>& v1,
                               const std::vector<double>& v2) {
-      validate_matching_sizes(v1,v2,"dot_product");
+      stan::math::check_matching_sizes("dot_product(%1%)",v1,"v1",
+                                       v2,"v2",(double*)0);
       return dot_product(&v1[0], &v2[0], v1.size());
     }
     

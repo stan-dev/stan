@@ -4,7 +4,7 @@
 #include <boost/math/tools/promotion.hpp>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/promote_common.hpp>
-#include <stan/math/matrix/validate_multiplicable.hpp>
+#include <stan/math/error_handling/matrix/check_multiplicable.hpp>
 #include <stan/math/error_handling/matrix/check_square.hpp>
 
 namespace stan {
@@ -24,7 +24,8 @@ namespace stan {
     mdivide_left(const Eigen::Matrix<T1,R1,C1> &A,
                  const Eigen::Matrix<T2,R2,C2> &b) {
       stan::math::check_square("mdivide_left(%1%)",A,"A",(double*)0);
-      stan::math::validate_multiplicable(A,b,"mdivide_left");
+      stan::math::check_multiplicable("mdivide_left(%1%)",A,"A",
+                                      b,"b",(double*)0);
       return promote_common<Eigen::Matrix<T1,R1,C1>,
                             Eigen::Matrix<T2,R1,C1> >(A)
         .lu()

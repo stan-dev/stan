@@ -3,7 +3,7 @@
 
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/LDLT_factor.hpp>
-#include <stan/math/matrix/validate_multiplicable.hpp>
+#include <stan/math/error_handling/matrix/check_multiplicable.hpp>
 
 namespace stan {
   namespace math {
@@ -17,7 +17,8 @@ namespace stan {
     inline double
     trace_inv_quad_form_ldlt(const stan::math::LDLT_factor<double,R2,C2> &A,
                              const Eigen::Matrix<double,R3,C3> &B) {
-      stan::math::validate_multiplicable(A,B,"trace_inv_quad_form_ldlt");
+      stan::math::check_multiplicable("trace_inv_quad_form_ldlt(%1%)",A,"A",
+                                      B,"B",(double*)0);
       
       return (B.transpose()*A._ldltP->solve(B)).trace();
     }
