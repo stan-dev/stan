@@ -7,6 +7,7 @@
 #include <stan/math/error_handling/check_positive.hpp>
 #include <stan/math/error_handling/matrix/check_pos_definite.hpp>
 #include <stan/math/error_handling/matrix/check_symmetric.hpp>
+#include <stan/math/error_handling/matrix/check_size_match.hpp>
 #include <stan/math/error_handling/matrix/constraint_tolerance.hpp>
 
 namespace stan {
@@ -33,12 +34,12 @@ namespace stan {
                                   const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
                                   const char* name,
                                   T_result* result) {
-      check_size_match(function, 
-                       y.rows(), "Rows of correlation matrix",
-                       y.cols(), "columns of correlation matrix",
-                       result);
-      check_positive(function, y.rows(), "rows", result);
-      check_symmetric(function, y, "y", result);
+      stan::math::check_size_match(function, 
+                                   y.rows(), "Rows of correlation matrix",
+                                   y.cols(), "columns of correlation matrix",
+                                   result);
+      stan::math::check_positive(function, y.rows(), "rows", result);
+      stan::math::check_symmetric(function, y, "y", result);
       for (typename Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>::size_type
              k = 0; k < y.rows(); ++k) {
         if (fabs(y(k,k) - 1.0) > CONSTRAINT_TOLERANCE) {
@@ -50,7 +51,7 @@ namespace stan {
           return dom_err(function,y(k,k),name,msg.c_str(),"",result);
         }
       }
-      check_pos_definite(function, y, "y", result);
+      stan::math::check_pos_definite(function, y, "y", result);
       return true;
     }
 

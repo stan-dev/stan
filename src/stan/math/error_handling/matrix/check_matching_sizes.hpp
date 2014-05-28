@@ -20,7 +20,7 @@ namespace stan {
         return true;
 
       std::ostringstream msg;
-      msg << " (" << typeid(T_y1).name() <<") has size %1% and (" 
+      msg << " (" << typeid(T_y1).name() <<") has size %1% and ("
           << typeid(T_y2).name() << ") has size " << y2.size() 
           << " but they must match in size";
       std::string tmp(msg.str());
