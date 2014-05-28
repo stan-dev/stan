@@ -58,14 +58,15 @@ void test_val(std::string name, T val, std::string s) {
 }
 
 void test_exception(const std::string& input) {
+  //  std::cout << "expect failure for: " << input << std::endl;
   try {
-    std::cout << "input: " << input << std::endl;
     std::stringstream in(input);
     stan::io::dump_reader reader(in);
     bool has_next = reader.next();
     EXPECT_EQ(true,has_next);
-    std::cout << "read value" << std::endl;
   } catch (const std::exception& e) {
+    //    std::cout << "failed, msg: " << e.what() << std::endl;
+    //    std::cout.flush();
     return;
   }
   FAIL(); // didn't throw an exception as expected.
@@ -93,8 +94,6 @@ void test_exception(const std::string& input,
   }
   FAIL(); // didn't throw an exception as expected.
 }
-
-
 
 
 TEST(io_dump, reader_double) {
@@ -195,6 +194,8 @@ TEST(io_dump, reader_vec_data_backward) {
   stan::io::dump_reader reader(in);
   test_list2(reader,"foo",expected_vals,expected_dims);
 }
+
+
 TEST(io_dump, reader_vec_data_long_suffix) {
   std::vector<int> expected_vals;
   for (int i = 10; i >= -9; --i)
@@ -476,7 +477,121 @@ TEST(io_dump, it_sign_ksvanhorn) {
   
 }
 
-// test for too large integer value
+/* tests for numbers on boundary and outside of range
+ * use string representations for values above/below limits
+ *
+ * limits platform dependent.
+ * these tests based on values specified in <climits>
+ * INT_MIN Min int -32767 
+ * INT_MAX Max int 32767
+ * UINT_MAX Max unsigned int 65535
+ * LONG_MIN Min long int -2147483647
+ * LONG_MAX Max long int 2147483647
+ * ULONG_MAX Max unsigned long int 
+ * LLONG_MIN Min long long int -9223372036854775807
+ * LLONG_MAX Max long long int 9223372036854775807
+ * ULLONG_MAX Max unsigned long long int 18446744073709551615
+ */
+
+
+TEST(io_dump, reader_max_int) {
+  test_val("a",32767,"a <- 32767");
+  test_val("a",-32767,"a <- -32767");
+  test_val("a",65535,"a <- 65535");
+  test_val("a",2147483647,"a <- 2147483647L");
+  test_val("a",-2147483647,"a <- -2147483647L");
+}
+
+TEST(io_dump, reader_max_ints) {
+  std::vector<int> vs;
+  vs.push_back(32767);
+  vs.push_back(-32767);
+  vs.push_back(65535);
+  vs.push_back(2147483647);
+  vs.push_back(-2147483647);
+
+  test_list("a",vs,"a <- c(32767,-32767,65535,2147483647L,-2147483647L)");
+}
+
+
+TEST(io_dump, reader_vec_data_max_dims) {
+  std::vector<int> expected_vals;
+  for (int i = 1; i <= 65535; ++i)
+    expected_vals.push_back(i);
+  std::vector<size_t> expected_dims;
+  expected_dims.push_back(65535U);
+
+  std::string txt = "foo <- structure(1:65535, .Dim = c(65535))";
+  std::stringstream in(txt);
+  stan::io::dump_reader reader(in);
+  test_list2(reader,"foo",expected_vals,expected_dims);
+}
+
+
+TEST(io_dump, reader_max_doubles) {
+  test_val("a",0.032767,"a <- 0.032767");
+  test_val("a",-0.032767,"a <- -0.032767");
+  test_val("a",0.065535,"a <- 0.065535");
+  test_val("a",0.02147483647e9,"a <- 0.02147483647e9");
+  test_val("a",-2147483647E9,"a <- -2147483647E9");
+}
+
+
+
+
+TEST(io_dump, very_large_pos_int) {
+  test_exception("k <- 999918446744073709551616L");
+}
+
+TEST(io_dump, very_large_neg_int) {
+  test_exception("k <- -999918446744073709551616L");
+}
+
+TEST(io_dump, ullong_too_large) {
+  test_exception("k <- 18446744073709551616L");
+}
+
+TEST(io_dump, llong_too_large) {
+  test_exception("k <- 9223372036854775808L");
+}
+
+TEST(io_dump, llong_too_small) {
+  test_exception("k <- -9223372036854775808L");
+}
+
+TEST(io_dump, ulong_too_large) {
+  test_exception("k <- 4294967296L");
+}
+
+TEST(io_dump, long_too_large) {
+  test_exception("k <- 2147483648L");
+}
+
+TEST(io_dump, long_neg_too_large) {
+  test_exception("k <- -2147483648L");
+}
+
 TEST(io_dump, int_too_large) {
-  test_exception("k <- 999999999999999999999999999 \n");
+  test_exception("k <- 2147483648");
+}
+
+TEST(io_dump, int_neg_too_large) {
+  test_exception("k <- -2147483648");
+}
+
+TEST(io_dump, int_too_large_v) {
+  test_exception("k <- c(2147483648)");
+}
+
+TEST(io_dump, int_neg_too_large_v) {
+  test_exception("k <- c(-2147483648)");
+}
+
+
+TEST(io_dump, dim_too_large_v) {
+  test_exception("foo <- structure(1:2, .Dim = c(184467440737095516159))");
+}
+
+TEST(io_dump, double_too_large) {
+  test_exception("a <- -2147483647890890890890E999999999999");
 }

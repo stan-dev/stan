@@ -537,11 +537,73 @@ namespace stan {
         return true;
       }
 
-      // scan number returns true or throws bad lexical cast exception
-      // change signature to void - note exception
+      size_t scan_dim() {
+        char c;
+        buf_.clear();
+        while (in_.get(c)) {
+          if (std::isspace(c)) continue;
+          if (std::isdigit(c)) {
+            buf_.push_back(c);
+          } else {
+            in_.putback(c);
+            break;
+          }
+        }
+        scan_optional_long();
+        size_t d = 0;
+        try {
+          d = boost::lexical_cast<size_t>(buf_);
+        }
+        catch ( const boost::bad_lexical_cast &exc ) {
+          std::string msg = "value " + buf_ + " beyond array dimension range";
+          BOOST_THROW_EXCEPTION (std::invalid_argument (msg));
+        }
+        return d;
+      }
+
+      int scan_int() {
+        char c;
+        buf_.clear();
+        while (in_.get(c)) {
+          if (std::isspace(c)) continue;
+          if (std::isdigit(c)) {
+            buf_.push_back(c);
+          } else {
+            in_.putback(c);
+            break;
+          }
+        }
+        return(get_int());
+      }
+
+      int get_int() {
+        int n = 0;
+        try {
+          n = boost::lexical_cast<int>(buf_);
+        }
+        catch ( const boost::bad_lexical_cast &exc ) {
+          std::string msg = "value " + buf_ + " beyond int range";
+          BOOST_THROW_EXCEPTION (std::invalid_argument (msg));
+        }
+        return n;
+      }
+
+      double scan_double() {
+        double x = 0;
+        try {
+          x = boost::lexical_cast<double>(buf_);
+        }
+        catch ( const boost::bad_lexical_cast &exc ) {
+          std::string msg = "value " + buf_ + " beyond numeric range";
+          BOOST_THROW_EXCEPTION (std::invalid_argument (msg));
+        }
+        return x;
+      }
+
+
+
+      // scan number stores number or throws bad lexical cast exception
       void scan_number(bool negate_val) {
-        std::cout << "scan number" << std::endl;
-        std::cout.flush();
         // must take longest first!
         if (scan_chars("Inf")) { 
           scan_chars("inity"); // read past if there
@@ -574,30 +636,14 @@ namespace stan {
           }
         }
         if (!is_double && stack_r_.size() == 0) {
-          int n;
-          try {
-            std::cout << "read int" << std::endl;
-            n = boost::lexical_cast<int>(buf_);
-            std::cout << "got n" << std::endl;
-          }
-          catch ( const boost::bad_lexical_cast &exc ) {
-            std::string msg = "value " + buf_ + " exceeds int range";
-            BOOST_THROW_EXCEPTION (std::invalid_argument (msg));
-          }
+          int n = get_int();
           stack_i_.push_back(negate_val ? -n : n);
           scan_optional_long();
         } else {
           for (size_t j = 0; j < stack_i_.size(); ++j)
             stack_r_.push_back(static_cast<double>(stack_i_[j]));
           stack_i_.clear();
-          double x;
-          try {
-            x = boost::lexical_cast<double>(buf_);
-          }
-          catch ( const boost::bad_lexical_cast &exc ) {
-            std::string msg = "value " + buf_ + " exceeds numeric range";
-            BOOST_THROW_EXCEPTION (std::invalid_argument (msg));
-          }
+          double x = scan_double();
           stack_r_.push_back(negate_val ? -x : x);
         }
       }
@@ -635,17 +681,15 @@ namespace stan {
         if (scan_char('c')) { 
           scan_seq_value();
         } else {
-          size_t start;
-          in_ >> start;
+          int start = scan_int();
           if (!scan_char(':'))
             return false;
-          size_t end;
-          in_ >> end;
+          int end = scan_int();
           if (start <= end) {
-            for (size_t i = start; i <= end; ++i)
+            for (int i = start; i <= end; ++i)
               stack_i_.push_back(i);
           } else {
-            for (size_t i = start; i >= end; --i)
+            for (int i = start; i >= end; --i)
               stack_i_.push_back(i);
           }
         } 
@@ -656,23 +700,19 @@ namespace stan {
         if (!scan_char('=')) return false;
         if (scan_char('c')) {
           if (!scan_char('(')) return false;
-          size_t dim;
-          in_ >> dim;
-          scan_optional_long(); 
+          size_t dim = scan_dim();
           dims_.push_back(dim);
           while (scan_char(',')) {
-            in_ >> dim;
-            scan_optional_long(); 
+            dim = scan_dim();
             dims_.push_back(dim);
           }
           if (!scan_char(')')) return false;
-        } else {
-          size_t start;
-          in_ >> start;
+        } 
+        else {
+          size_t start = scan_dim();
           if (!scan_char(':'))
             return false;
-          size_t end;
-          in_ >> end;
+          size_t end = scan_dim();
           if (start < end) {
             for (size_t i = start; i <= end; ++i)
               dims_.push_back(i);
@@ -685,20 +725,16 @@ namespace stan {
         return true;
       }
 
-  
-
       bool scan_value() {
         if (scan_char('c'))
           return scan_seq_value();
         if (scan_chars("structure"))
           return scan_struct_value();
-        //        if (!scan_number()) 
         scan_number();
         if (!scan_char(':'))
           return true;
         if (stack_i_.size() != 1)
           return false;
-        //        if (!scan_number())
         scan_number();
         if (stack_i_.size() != 2)
           return false;
@@ -822,19 +858,15 @@ namespace stan {
         name_.erase();
         if (!scan_name())  // set name
           return false;
-        std::cout << "next value: " << name_ << std::endl;
-        std::cout.flush();
         if (!scan_char('<')) // set <- 
           return false;
         if (!scan_char('-')) 
           return false;
         try {
-          std::cout << "next value: " << name_ << " scan_value " << std::endl;
-          std::cout.flush();
           scan_value(); // set stack_r_, stack_i_, dims_
         }
-        catch ( const boost::bad_lexical_cast &exc ) {
-          std::string msg = name_ + " bad data " + exc.what();
+        catch ( const std::invalid_argument &exc ) {
+          std::string msg = " variable " + name_ + " error: " + exc.what();
           BOOST_THROW_EXCEPTION (std::invalid_argument (msg));
         }
         return true;
