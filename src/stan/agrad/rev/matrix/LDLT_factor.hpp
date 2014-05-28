@@ -115,6 +115,7 @@ namespace stan {
       inline size_t cols() const { return _alloc->N_; }
       
       typedef size_t size_type;
+      typedef stan::agrad::var value_type;
 
       /**
        * The LDLT_alloc object actually contains the factorization but is
