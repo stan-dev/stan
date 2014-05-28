@@ -667,7 +667,6 @@ namespace stan {
           dims_.push_back(0U);
           return true;
         }
-        //        if (!scan_number()) return false;; // first entry
         scan_number(); // first entry
         while (scan_char(',')) {
           scan_number();
@@ -863,10 +862,14 @@ namespace stan {
         if (!scan_char('-')) 
           return false;
         try {
-          scan_value(); // set stack_r_, stack_i_, dims_
+          bool okSyntax = scan_value(); // set stack_r_, stack_i_, dims_
+          if (!okSyntax) {
+            std::string msg = "syntax error";
+            BOOST_THROW_EXCEPTION (std::invalid_argument (msg));
+          }
         }
         catch ( const std::invalid_argument &exc ) {
-          std::string msg = " variable " + name_ + " error: " + exc.what();
+          std::string msg = "data " + name_ + " " + exc.what();
           BOOST_THROW_EXCEPTION (std::invalid_argument (msg));
         }
         return true;
