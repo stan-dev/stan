@@ -47,4 +47,26 @@ if (!exists("anova_radon_nopred.sm")) {
 
 dataList.1 <- list(N=length(y), y=y, county=county,J=85)
 anova_radon_nopred.sf1 <- sampling(anova_radon_nopred.sm, dataList.1)
-print(anova_radon_nopred.sf1,pars = c("a","sigma_y","lp__"))
+print(anova_radon_nopred.sf1,pars = c("a","sigma_y","lp__","s_a","s_y"))
+
+anova.df <- summary(anova_radon_nopred.sf1, c("s_y", "s_a"))$summary
+anova.df <- data.frame(anova.df,
+                       Source = factor(rownames(anova.df),
+                                       levels = rownames(anova.df),
+                                       labels = c("error", "county")),
+                       df = with(dataList.1, c(N-J, J-1)))
+
+# (close to) Figure 22.4
+p <- ggplot(anova.df, aes(x = Source, y = X50., ymin = X2.5., ymax = X97.5.)) +
+     geom_linerange()+ # 95% interval
+     geom_linerange(aes(ymin = X25., ymax = X75.), size = 1)+ # 50% interval
+     geom_point(size = 2)+ # Median
+     scale_x_discrete("Source (df)",
+                      labels = with(anova.df, paste0(Source, " (", df, ")"))) +
+     scale_y_continuous("Est. sd of coefficients",
+                        breaks = seq(0, .8, by=.2), # Breaks from 0 to 0.8
+                        limits = c(0, max(anova.df$X97.5) + 0.1),
+                        expand = c(0,0)) + # Remove y padding
+     coord_flip() +
+     theme_bw()
+print(p)

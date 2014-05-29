@@ -27,7 +27,7 @@ generated quantities {
   real<lower=0> s_y;
   vector[N] e_y;
 
-  real<lower=0> s_a;
-  real<lower=0> s_y;
-  vector[N] e_y;
+  e_y <- y - y_hat;
+  s_a <- sd(a);
+  s_y <- sd(e_y);
 }
