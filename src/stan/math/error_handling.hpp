@@ -10,7 +10,6 @@
 #include <boost/type_traits/is_unsigned.hpp>
 
 #include <stan/meta/traits.hpp>
-#include <stan/math/error_handling/raise_domain_error.hpp>
 #include <stan/math/error_handling/dom_err.hpp>
 #include <stan/math/error_handling/dom_err_vec.hpp>
 #include <stan/math/error_handling/check_not_nan.hpp>
