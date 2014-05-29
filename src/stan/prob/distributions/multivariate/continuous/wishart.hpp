@@ -67,24 +67,20 @@ namespace stan {
 
       typename Eigen::Matrix<T_scale,Eigen::Dynamic,Eigen::Dynamic>::size_type k = W.rows();
       typename promote_args<T_y,T_dof,T_scale>::type lp(0.0);
-      if (!check_greater(function, nu, k-1, 
-                         "Degrees of freedom parameter", &lp))
-        return lp;
-      if (!check_size_match(function, 
-                            W.rows(), "Rows of random variable",
-                            W.cols(), "columns of random variable",
-                            &lp))
-        return lp;
-      if (!check_size_match(function, 
-                            S.rows(), "Rows of scale parameter",
-                            S.cols(), "columns of scale parameter",
-                            &lp))
-        return lp;
-      if (!check_size_match(function, 
-                            W.rows(), "Rows of random variable",
-                            S.rows(), "columns of scale parameter",
-                            &lp))
-        return lp;
+      check_greater(function, nu, k-1, 
+                    "Degrees of freedom parameter", &lp);
+      check_size_match(function, 
+                       W.rows(), "Rows of random variable",
+                       W.cols(), "columns of random variable",
+                       &lp);
+      check_size_match(function, 
+                       S.rows(), "Rows of scale parameter",
+                       S.cols(), "columns of scale parameter",
+                       &lp);
+      check_size_match(function, 
+                       W.rows(), "Rows of random variable",
+                       S.rows(), "columns of scale parameter",
+                       &lp);
       // FIXME: domain checks
 
       using stan::math::log_determinant_ldlt;

@@ -36,18 +36,13 @@ namespace stan {
       double logp = 0.0;
 
       // Validate arguments.
-      if (!check_finite(function, y, "Random variable", &logp))
-        return logp;
-      if(!check_finite(function, mu, "Location paramter", &logp))
-        return logp;
-      if(!check_finite(function, kappa, "Scale parameter", &logp))
-        return logp;
-      if(!check_positive(function, kappa, "Scale parameter", &logp))
-        return logp;
-      if(!check_consistent_sizes(function, y, mu, kappa, "Random variable",
-                                  "Location parameter", "Scale parameter",
-                                  &logp))
-        return logp;
+      check_finite(function, y, "Random variable", &logp);
+      check_finite(function, mu, "Location paramter", &logp);
+      check_finite(function, kappa, "Scale parameter", &logp);
+      check_positive(function, kappa, "Scale parameter", &logp);
+      check_consistent_sizes(function, y, mu, kappa, "Random variable",
+                             "Location parameter", "Scale parameter",
+                             &logp);
  
       // check if no variables are involved and prop-to
       if (!include_summand<propto,T_y,T_loc,T_scale>::value) 

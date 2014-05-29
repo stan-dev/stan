@@ -51,43 +51,35 @@ namespace stan {
       typename promote_args<T_y,T_dof,T_loc,T_scale>::type lp(0.0);
       
       // allows infinities
-      if (!check_not_nan(function, nu, 
-                         "Degrees of freedom parameter", &lp))
-        return lp;
-      if (!check_positive(function, nu, 
-                          "Degrees of freedom parameter", &lp))
-        return lp;
+      check_not_nan(function, nu, 
+                    "Degrees of freedom parameter", &lp);
+      check_positive(function, nu, 
+                     "Degrees of freedom parameter", &lp);
       
       using boost::math::isinf;
 
       if (isinf(nu)) // already checked nu > 0
         return multi_normal_log(y,mu,Sigma);
       
-      if (!check_size_match(function, 
-          y.size(), "Size of random variable",
-          mu.size(), "size of location parameter",
-          &lp))
-        return lp;
-      if (!check_size_match(function, 
-          y.size(), "Size of random variable",
-          Sigma.rows(), "rows of scale parameter",
-          &lp))
-        return lp;
-      if (!check_size_match(function, 
-          y.size(), "Size of random variable",
-          Sigma.cols(), "columns of scale parameter",
-          &lp))
-        return lp;
-      if (!check_finite(function, mu, "Location parameter", &lp))
-        return lp;
-      if (!check_not_nan(function, y, "Random variable", &lp)) 
-        return lp;
-      if (!check_symmetric(function, Sigma, "Scale parameter", &lp))
-        return lp;
+      check_size_match(function, 
+                       y.size(), "Size of random variable",
+                       mu.size(), "size of location parameter",
+                       &lp);
+      check_size_match(function, 
+                       y.size(), "Size of random variable",
+                       Sigma.rows(), "rows of scale parameter",
+                       &lp);
+      check_size_match(function, 
+                       y.size(), "Size of random variable",
+                       Sigma.cols(), "columns of scale parameter",
+                       &lp);
+      check_finite(function, mu, "Location parameter", &lp);
+      check_not_nan(function, y, "Random variable", &lp);
+      check_symmetric(function, Sigma, "Scale parameter", &lp);
 
       LDLT_factor<T_scale,Eigen::Dynamic,Eigen::Dynamic> ldlt_Sigma(Sigma);
-      if(!check_ldlt_factor(function,ldlt_Sigma,"LDLT_Factor of scale parameter",&lp))
-        return lp;
+      check_ldlt_factor(function,ldlt_Sigma,"LDLT_Factor of scale parameter",
+                        &lp);
 
       double d = y.size();
 
