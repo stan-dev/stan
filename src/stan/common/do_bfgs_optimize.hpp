@@ -3,6 +3,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <iomanip>
 #include <vector>
 
 #include <stan/gm/error_codes.hpp>
