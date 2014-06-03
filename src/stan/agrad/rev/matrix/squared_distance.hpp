@@ -97,7 +97,7 @@ namespace stan {
                                 const Eigen::Matrix<var, R2, C2>& v2) {
       stan::math::check_vector("squared_distance(%1%)",v1,"v1",(double*)0);
       stan::math::check_vector("squared_distance(%1%)",v2,"v2",(double*)0);
-      stan::math::check_matching_sizes("squared_distance",v1,"v1",
+      stan::math::check_matching_sizes("squared_distance(%1%)",v1,"v1",
                                        v2,"v2",(double*)0);
       return var(new squared_distance_vv_vari(v1,v2));
     }
@@ -106,7 +106,7 @@ namespace stan {
                                 const Eigen::Matrix<double, R2, C2>& v2) {
       stan::math::check_vector("squared_distance(%1%)",v1,"v1",(double*)0);
       stan::math::check_vector("squared_distance(%1%)",v2,"v2",(double*)0);
-      stan::math::check_matching_sizes("squared_distance",v1,"v1",
+      stan::math::check_matching_sizes("squared_distance(%1%)",v1,"v1",
                                        v2,"v2",(double*)0);
       return var(new squared_distance_vd_vari(v1,v2));
     }
@@ -115,7 +115,7 @@ namespace stan {
                                 const Eigen::Matrix<var, R2, C2>& v2) {
       stan::math::check_vector("squared_distance(%1%)",v1,"v1",(double*)0);
       stan::math::check_vector("squared_distance(%1%)",v2,"v2",(double*)0);
-      stan::math::check_matching_sizes("squared_distance",v1,"v1",
+      stan::math::check_matching_sizes("squared_distance(%1%)",v1,"v1",
                                        v2,"v2",(double*)0);
       return var(new squared_distance_vd_vari(v2,v1));
     }
