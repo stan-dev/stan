@@ -2,8 +2,10 @@
 #define __STAN__MATH__ERROR_HANDLING__MATRIX__CHECK_VECTOR_HPP__
 
 #include <sstream>
+#include <stan/meta/traits.hpp>
 #include <stan/math/error_handling/dom_err.hpp>
 #include <stan/math/matrix/Eigen.hpp>
+
 namespace stan {
   namespace math {
 
@@ -19,7 +21,9 @@ namespace stan {
       msg << name << " (%1%) has " << x.rows() << " rows and " 
           << x.cols() << " columns but it should be a vector so it should either have 1 row or 1 column";
       std::string tmp(msg.str());
-      return dom_err(function,x,name,
+      return dom_err(function, 
+                     typename scalar_type<T>::type(),
+                     name,
                      tmp.c_str(),"",
                      result);
     }

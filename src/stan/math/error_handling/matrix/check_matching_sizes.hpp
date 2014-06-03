@@ -5,6 +5,7 @@
 #include <stan/math/error_handling/dom_err.hpp>
 #include <string>
 #include <typeinfo>
+#include <stan/math/error_handling/matrix/check_size_match.hpp>
 
 namespace stan {
   namespace math {
@@ -16,18 +17,9 @@ namespace stan {
                                      const T_y2& y2,
                                      const char* name2,
                                      T_result* result) {
-      if (y1.size() == y2.size())
-        return true;
-
-      std::ostringstream msg;
-      msg << " (" << typeid(T_y1).name() <<") has size %1% and ("
-          << typeid(T_y2).name() << ") has size " << y2.size() 
-          << " but they must match in size";
-      std::string tmp(msg.str());
-      return dom_err(function,
-                     typename scalar_type<T_y1>::type(),
-                     name1, tmp.c_str(), "", result);
-      return false;
+      stan::math::check_size_match(function,y1.size(), "size of y1",
+                                   y2.size(), "size of y2",result);
+      return true;
     }
 
   }

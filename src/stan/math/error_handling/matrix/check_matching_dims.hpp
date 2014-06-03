@@ -4,6 +4,8 @@
 #include <sstream>
 #include <stan/math/error_handling/dom_err.hpp>
 #include <stan/math/matrix/Eigen.hpp>
+#include <stan/math/error_handling/matrix/check_size_match.hpp>
+
 namespace stan {
   namespace math {
 
@@ -15,18 +17,15 @@ namespace stan {
                                     const Eigen::Matrix<T2,R2,C2>& y2,
                                     const char* name2,
                                     T_result* result) {
-      if ((y1.rows() == y2.rows()) && (y1.cols() == y2.cols()))
-        return true;
-
-      std::ostringstream msg;
-      msg << name1 << " (%1%) has " << y1.rows() << " rows and " 
-          << y1.cols() << " columns and " << name2 << " (" << y2 
-          << ") has " << y2.rows() << " rows and " << y2.cols()
-          << " columns but they must match in dimensions";
-      std::string tmp(msg.str());
-      return dom_err(function,y1,name1,
-                     tmp.c_str(),"",
-                     result);
+      stan::math::check_size_match(function, 
+                       y1.rows(), "Rows of matrix 1",
+                       y2.rows(), "Rows of matrix 2",
+                       result);
+      stan::math::check_size_match(function, 
+                       y1.cols(), "Columns of matrix 1",
+                       y2.cols(), "Columns of matrix 2",
+                       result);
+      return true;
     }
 
   }

@@ -27,7 +27,7 @@ TEST(AgradRevMatrix, squared_distance_vector_vector_exception) {
   vector_v v1(3);
   vector_d d2(2);
   vector_v v2(4);
-
+  stan::agrad::squared_distance(v1, d2);
   EXPECT_THROW(stan::agrad::squared_distance(v1, d2), std::domain_error);
   EXPECT_THROW(stan::agrad::squared_distance(d1, v2), std::domain_error);
   EXPECT_THROW(stan::agrad::squared_distance(v1, v2), std::domain_error);

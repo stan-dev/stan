@@ -26,7 +26,7 @@ namespace stan {
     row(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& m, 
         size_t i) {
       stan::math::check_greater_or_equal("row(%1%)",i,1,"i",(double*)0);
-      stan::math::check_less_or_equal("row(%1%)",i,m.rows()-1,"i",(double*)0);     
+      stan::math::check_less_or_equal("row(%1%)",i,m.rows(),"i",(double*)0);     
       return m.row(i - 1);
     }
 

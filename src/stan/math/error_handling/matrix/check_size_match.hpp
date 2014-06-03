@@ -17,16 +17,16 @@ namespace stan {
                                  const char* name_j,
                                  T_result* result) {
       typedef typename boost::common_type<T_size1,T_size2>::type common_type;
-      if (static_cast<common_type>(i) != static_cast<common_type>(j)) {
-        std::ostringstream msg;
-        msg << name_i << " (%1%) and " 
-            << name_j << " (" << j << ") must match in size";
-        std::string tmp(msg.str());
-        return dom_err(function,i,name_i,
-                       tmp.c_str(),"",
-                       result);
-      }
-      return true;
+      if (static_cast<common_type>(i) == static_cast<common_type>(j))
+        return true;
+
+      std::ostringstream msg;
+      msg << name_i << " (%1%) and " 
+          << name_j << " (" << j << ") must match in size";
+      std::string tmp(msg.str());
+      return dom_err(function,i,name_i,
+                     tmp.c_str(),"",
+                     result);
     }
 
   }

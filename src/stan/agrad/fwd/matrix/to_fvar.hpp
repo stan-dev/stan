@@ -131,7 +131,8 @@ namespace stan {
     to_fvar(const Eigen::Matrix<T,R,C>& val,
             const Eigen::Matrix<T,R,C>& deriv) {
       
-      stan::math::check_matching_dims("to_fvar(%1%)", val,deriv, "to_fvar");
+      stan::math::check_matching_dims("to_fvar(%1%)",val,"value",
+                                      deriv, "deriv",(double*)0);
       Eigen::Matrix<fvar<T>,R,C> ret(val.rows(), val.cols());
       for(size_type i = 0; i < val.rows(); i++) {
         for(size_type j = 0; j < val.cols(); j++) {
