@@ -565,3 +565,39 @@ TEST(MetaTraits,containsFvar) {
   EXPECT_TRUE((contains_fvar<fvar<double>, fvar<var> >::value));
   EXPECT_TRUE((contains_fvar<fvar<fvar<double> > >::value));
 }
+TEST(MetaTraits, fvar_inner_type) {
+  using stan::agrad::fvar;
+  using stan::fvar_inner_type;
+
+  stan::fvar_inner_type<fvar<double> >::type a(2.0);
+  EXPECT_EQ(2.0,a);
+  stan::fvar_inner_type<fvar<double> >::type b(4.0);
+  EXPECT_EQ(4.0,b);
+  stan::fvar_inner_type<fvar<fvar<double> > >::type c(7.0,1.0);
+  EXPECT_EQ(7.0,c.val_);
+  EXPECT_EQ(1.0,c.d_);
+}
+TEST(MetaTraits, partials_return_type) {
+  using stan::agrad::fvar;
+  using stan::agrad::var;
+  using stan::partials_return_type;
+
+  partials_return_type<double,fvar<double> >::type a(5.0);
+  EXPECT_EQ(5.0,a);
+
+  partials_return_type<double,fvar<fvar<double> > >::type b(3.0,2.0);
+  EXPECT_EQ(3.0,b.val_);
+  EXPECT_EQ(2.0,b.d_);
+
+  partials_return_type<double,fvar<fvar<var> > >::type c(3.0,2.0);
+  EXPECT_EQ(3.0,c.val_.val());
+  EXPECT_EQ(2.0,c.d_.val());
+
+  partials_return_type<double,double,var,fvar<fvar<var> > >::type d(3.0,2.0);
+  EXPECT_EQ(3.0,d.val_.val());
+  EXPECT_EQ(2.0,d.d_.val());
+
+  partials_return_type<double,double, favr<fvar<double> >, fvar<fvar<double> > >::type e(3.0,2.0);
+  EXPECT_EQ(3.0,e.val_);
+  EXPECT_EQ(2.0,e.d_);
+}

@@ -394,6 +394,14 @@ namespace stan {
     enum { value = true };
   };
 
+  template <typename T>
+  struct fvar_inner_type {
+    typedef T type;
+  };
+  template <typename T>
+  struct fvar_inner_type<stan::agrad::fvar<T> > {
+    typedef T type;
+  };
 
   template <typename T>
   struct is_var {
@@ -429,7 +437,6 @@ namespace stan {
       };
     };
 
-
     template <typename T1, 
               typename T2 = double, 
               typename T3 = double, 
@@ -448,6 +455,22 @@ namespace stan {
     };
 
 
+    template <typename T1, 
+              typename T2 = double, 
+              typename T3 = double, 
+              typename T4 = double, 
+              typename T5 = double, 
+              typename T6 = double>
+    struct partials_return_type {
+      typedef typename 
+      boost::math::tools::promote_args<typename fvar_inner_type<T1>::type,
+                                       typename fvar_inner_type<T2>::type,
+                                       typename fvar_inner_type<T3>::type,
+                                       typename fvar_inner_type<T4>::type,
+                                       typename fvar_inner_type<T5>::type,
+                                       typename fvar_inner_type<T6>::type>::type
+      type;
+    };
 
 
 }
