@@ -395,12 +395,16 @@ namespace stan {
   };
 
   template <typename T>
-  struct fvar_inner_type {
+  struct partials_type {
     typedef T type;
   };
   template <typename T>
-  struct fvar_inner_type<stan::agrad::fvar<T> > {
+  struct partials_type<stan::agrad::fvar<T> > {
     typedef T type;
+  };
+  template <>
+  struct partials_type<stan::agrad::var> {
+    typedef double type;
   };
 
   template <typename T>
@@ -463,12 +467,12 @@ namespace stan {
               typename T6 = double>
     struct partials_return_type {
       typedef typename 
-      boost::math::tools::promote_args<typename fvar_inner_type<T1>::type,
-                                       typename fvar_inner_type<T2>::type,
-                                       typename fvar_inner_type<T3>::type,
-                                       typename fvar_inner_type<T4>::type,
-                                       typename fvar_inner_type<T5>::type,
-                                       typename fvar_inner_type<T6>::type>::type
+      boost::math::tools::promote_args<typename partials_type<T1>::type,
+                                       typename partials_type<T2>::type,
+                                       typename partials_type<T3>::type,
+                                       typename partials_type<T4>::type,
+                                       typename partials_type<T5>::type,
+                                       typename partials_type<T6>::type>::type
       type;
     };
 
