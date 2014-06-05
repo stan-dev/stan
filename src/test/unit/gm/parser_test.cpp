@@ -71,7 +71,7 @@ bool is_parsable_folder(const std::string& model_name,
   return is_parsable(path,msgs);
 }
 
-/** test that model with specified name in syntax-only path
+/** test that model with specified name in folder "syntax-only"
  *  parses without throwing an exception
  *
  * @param model_name Name of model to parse
@@ -83,7 +83,7 @@ void test_parsable(const std::string& model_name) {
 }
 
 
-/** test that model with specified name in syntax-only path throws
+/** test that model with specified name in folder "reference" throws
  * an exception containing the second arg as a substring
  *
  * @param model_name Name of model to parse
@@ -188,9 +188,10 @@ TEST(gm_parser,bugs_2_ice) {
   EXPECT_TRUE(is_parsable("src/models/bugs_examples/vol2/ice/ice.stan"));
 }
 
-/*TEST(gm_parser,bugs_2_stagnant) {
-  EXPECT_TRUE(is_parsable("src/models/bugs_examples/vol2/stagnant/stagnant.stan"));
-  }*/
+// why commented out?
+//TEST(gm_parser,bugs_2_stagnant) {
+//  EXPECT_TRUE(is_parsable("src/models/bugs_examples/vol2/stagnant/stagnant.stan"));
+//  }
 
 TEST(gm_parser,good_trunc) {
   EXPECT_TRUE(is_parsable("src/test/test-models/reference/gm/good_trunc.stan"));
@@ -400,6 +401,14 @@ TEST(gmParserStatementGrammar, validateAllowSample) {
               "sampling only allowed in model");
 }
 
+
+
+TEST(gmParserTermGrammar, infixExponentiation) {
+  test_parsable("validate_exponentiation_good");
+  test_throws("validate_exponentiation_bad", 
+              "type mismatch in assignment; left variable=z;");
+}
+
 TEST(gmParserTermGrammar, multiplicationFun) {
   test_parsable("validate_multiplication");
 }
@@ -410,9 +419,6 @@ TEST(gmParserTermGrammar, divisionFun) {
   test_parsable("validate_division_good");
 }
 
-TEST(gmParserTermGrammar, infixExponentiation) {
-  test_parsable("validate_exponentiation_good");
-}
 
 TEST(gmParserTermGrammar, leftDivisionFun) {
   test_parsable("validate_left_division_good");
@@ -620,5 +626,6 @@ TEST(parserFunctions,funsBad17) {
   test_throws("functions-bad17",
               "Require real return type for functions ending in _log");
 }
+
 
 
