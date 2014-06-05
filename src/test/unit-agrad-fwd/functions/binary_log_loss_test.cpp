@@ -245,12 +245,13 @@ TEST(AgradFwdBinaryLogLoss,FvarFvarVar_3rdDeriv) {
   fvar<fvar<var> > y;
   y.val_.val_ = 0.4;
   y.d_.val_ = 1.0;
+  y.val_.d_ = 1.0;
 
   fvar<fvar<var> > a = binary_log_loss(0,y);
 
   AVEC p = createAVEC(y.val_.val_);
   VEC g;
   a.d_.d_.grad(p,g);
-  EXPECT_FLOAT_EQ(0, g[0]);
+  EXPECT_FLOAT_EQ(9.2592592, g[0]);
 }
 
