@@ -1,4 +1,5 @@
 #include <stan/agrad/fwd/matrix/dot_self.hpp>
+#include <stan/math/matrix/dot_self.hpp>
 #include <gtest/gtest.h>
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/agrad/rev.hpp>
