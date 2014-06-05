@@ -141,3 +141,23 @@ TEST(AgradPartialsVari, OperandsAndPartials_check_throw) {
   EXPECT_NO_THROW(o4.d_x5[0]);
   EXPECT_NO_THROW(o4.d_x6[0]);
 }
+TEST(AgradPartialsVari, OperandsAndPartialsFvar) {
+  using stan::agrad::OperandsAndPartials;
+  using stan::agrad::fvar;
+
+  fvar<double> x1 = 2.0;
+  fvar<double> x2 = 3.0;
+  fvar<double> x3 = 5.0;
+  x1.d_ = 2.0;
+  x2.d_ = -1.0;
+  x3.d_ = 4.0;
+
+  OperandsAndPartials<fvar<double>,fvar<double>,fvar<double> > o(x1, x2, x3);
+  o.d_x1[0] += 17.0; 
+  o.d_x2[0] += 19.0;  
+  o.d_x3[0] += 23.0;
+  fvar<double> y = o.to_fvar(-1.0,x1,x2,x3);
+
+  EXPECT_FLOAT_EQ(107,y.d_);
+  EXPECT_FLOAT_EQ(-1,y.val_);
+}
