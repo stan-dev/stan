@@ -623,12 +623,18 @@ TEST(AgradFwdMatrixSD, ffv_vector_3rdDeriv) {
 
   vector_ffv v1(6);
   v1 << 1, 2, 3, 4, 5, 6;
-   v1(0).d_ = 1.0;
-   v1(1).d_ = 2.0;
-   v1(2).d_ = 2.0;
-   v1(3).d_ = 2.0;
-   v1(4).d_ = 2.0;
-   v1(5).d_ = 2.0;
+   v1(0).d_.val_ = 1.0;
+   v1(1).d_.val_ = 1.0;
+   v1(2).d_.val_ = 1.0;
+   v1(3).d_.val_ = 1.0;
+   v1(4).d_.val_ = 1.0;
+   v1(5).d_.val_ = 1.0;
+   v1(0).val_.d_ = 1.0;
+   v1(1).val_.d_ = 1.0;
+   v1(2).val_.d_ = 1.0;
+   v1(3).val_.d_ = 1.0;
+   v1(4).val_.d_ = 1.0;
+   v1(5).val_.d_ = 1.0;
 
   AVEC q = createAVEC(v1(0).val().val(),v1(1).val().val(),v1(2).val().val(),v1(3).val().val(),v1(4).val().val(),v1(5).val().val());
   VEC h;
@@ -748,12 +754,18 @@ TEST(AgradFwdMatrixSD, ffv_rowvector_3rdDeriv) {
 
   row_vector_ffv v1(6);
   v1 << 1, 2, 3, 4, 5, 6;
-   v1(0).d_ = 1.0;
-   v1(1).d_ = 2.0;
-   v1(2).d_ = 2.0;
-   v1(3).d_ = 2.0;
-   v1(4).d_ = 2.0;
-   v1(5).d_ = 2.0;
+   v1(0).d_.val_ = 1.0;
+   v1(1).d_.val_ = 1.0;
+   v1(2).d_.val_ = 1.0;
+   v1(3).d_.val_ = 1.0;
+   v1(4).d_.val_ = 1.0;
+   v1(5).d_.val_ = 1.0;
+   v1(0).val_.d_ = 1.0;
+   v1(1).val_.d_ = 1.0;
+   v1(2).val_.d_ = 1.0;
+   v1(3).val_.d_ = 1.0;
+   v1(4).val_.d_ = 1.0;
+   v1(5).val_.d_ = 1.0;
   
   AVEC q = createAVEC(v1(0).val().val(),v1(1).val().val(),v1(2).val().val(),v1(3).val().val(),v1(4).val().val(),v1(5).val().val());
   VEC h;
@@ -872,12 +884,18 @@ TEST(AgradFwdMatrixSD, ffv_matrix_3rdDeriv) {
 
   matrix_ffv v1(2, 3);
   v1 << 1, 2, 3, 4, 5, 6;
-   v1(0).d_ = 1.0;
-   v1(1).d_ = 2.0;
-   v1(2).d_ = 2.0;
-   v1(3).d_ = 2.0;
-   v1(4).d_ = 2.0;
-   v1(5).d_ = 2.0;
+   v1(0).d_.val_ = 1.0;
+   v1(1).d_.val_ = 1.0;
+   v1(2).d_.val_ = 1.0;
+   v1(3).d_.val_ = 1.0;
+   v1(4).d_.val_ = 1.0;
+   v1(5).d_.val_ = 1.0;
+   v1(0).val_.d_ = 1.0;
+   v1(1).val_.d_ = 1.0;
+   v1(2).val_.d_ = 1.0;
+   v1(3).val_.d_ = 1.0;
+   v1(4).val_.d_ = 1.0;
+   v1(5).val_.d_ = 1.0;
   
   AVEC q = createAVEC(v1(0,0).val().val(),v1(0,1).val().val(),v1(0,2).val().val(),v1(1,0).val().val(),v1(1,1).val().val(),v1(1,2).val().val());
   VEC h;
