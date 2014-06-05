@@ -2,6 +2,7 @@
 #include <stan/agrad/fwd.hpp>
 #include <stan/agrad/rev.hpp>
 #include <test/unit/agrad/util.hpp>
+#include <stan/math/matrix/cumulative_sum.hpp>
 
 template <typename T>
 void test_cumulative_sum() {
