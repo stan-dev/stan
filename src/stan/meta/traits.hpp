@@ -467,12 +467,12 @@ namespace stan {
               typename T6 = double>
     struct partials_return_type {
       typedef typename 
-      boost::math::tools::promote_args<typename partials_type<T1>::type,
-                                       typename partials_type<T2>::type,
-                                       typename partials_type<T3>::type,
-                                       typename partials_type<T4>::type,
-                                       typename partials_type<T5>::type,
-                                       typename partials_type<T6>::type>::type
+      boost::math::tools::promote_args<typename partials_type<typename scalar_type<T1>::type>::type,
+                                       typename partials_type<typename scalar_type<T2>::type>::type,
+                                       typename partials_type<typename scalar_type<T3>::type>::type,
+                                       typename partials_type<typename scalar_type<T4>::type>::type,
+                                       typename partials_type<typename scalar_type<T5>::type>::type,
+                                       typename partials_type<typename scalar_type<T6>::type>::type>::type
       type;
     };
 

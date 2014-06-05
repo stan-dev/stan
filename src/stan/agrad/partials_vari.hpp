@@ -4,7 +4,7 @@
 #include <stan/meta/traits.hpp>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/vari.hpp>
-
+#include <stan/agrad/fwd/fvar.hpp>
 namespace stan {
   namespace agrad {
 
@@ -70,22 +70,23 @@ namespace stan {
      * A variable implementation that stores operands and
      * derivatives with respect to the variable.
      */
-    template<typename T1=double, typename T2=double, typename T3=double, 
+template<typename T1=double, typename T2=double, typename T3=double, 
              typename T4=double, typename T5=double, typename T6=double, 
-             typename T_return_type=typename return_type<T1,T2,T3,T4,T5,T6>::type,
-             bool contain_fvar=stan::contains_fvar<T1,T2,T3,T4,T5,T6>::value >
+         typename T_return_type=typename return_type<T1,T2,T3,T4,T5,T6>::type,
+         typename T_partials_return=typename stan::partials_return_type<T1,T2,T3,T4,T5,T6>::type,
+         bool contain_fvar=stan::contains_fvar<T1,T2,T3,T4,T5,T6>::value >
     struct OperandsAndPartials {
       const static bool all_constant = is_constant<T_return_type>::value;
       size_t nvaris;
       agrad::vari** all_varis;
       double* all_partials;
 
-      VectorView<double*, is_vector<T1>::value, is_constant_struct<T1>::value> d_x1;
-      VectorView<double*, is_vector<T2>::value, is_constant_struct<T2>::value> d_x2;
-      VectorView<double*, is_vector<T3>::value, is_constant_struct<T3>::value> d_x3;
-      VectorView<double*, is_vector<T4>::value, is_constant_struct<T4>::value> d_x4;
-      VectorView<double*, is_vector<T5>::value, is_constant_struct<T5>::value> d_x5;
-      VectorView<double*, is_vector<T6>::value, is_constant_struct<T6>::value> d_x6;
+      VectorView<T_partials_return*, is_vector<T1>::value, is_constant_struct<T1>::value> d_x1;
+      VectorView<T_partials_return*, is_vector<T2>::value, is_constant_struct<T2>::value> d_x2;
+      VectorView<T_partials_return*, is_vector<T3>::value, is_constant_struct<T3>::value> d_x3;
+      VectorView<T_partials_return*, is_vector<T4>::value, is_constant_struct<T4>::value> d_x4;
+      VectorView<T_partials_return*, is_vector<T5>::value, is_constant_struct<T5>::value> d_x5;
+      VectorView<T_partials_return*, is_vector<T6>::value, is_constant_struct<T6>::value> d_x6;
       
       OperandsAndPartials(const T1& x1=0, const T2& x2=0, const T3& x3=0, 
                           const T4& x4=0, const T5& x5=0, const T6& x6=0)
@@ -136,128 +137,257 @@ namespace stan {
       }
 
       T_return_type
-      to_var(double logp) {
+      to_var(T_partials_return logp) {
         return partials_to_var<T_return_type>(logp, nvaris, all_varis, all_partials);
       }
     };
 
-    template<typename T1=double, typename T2=double, typename T3=double, 
-             typename T4=double, typename T5=double, typename T6=double, 
-             typename T_return_type=typename return_type<T1,T2,T3,T4,T5,T6>::type,
-             bool contain_fvar=true>
-    struct OperandsAndPartials {
-      typename T_partials_return = stan::partials_return_type<T1,T2,T3,T4,T5,T6>;
+    // template<typename T1=double, typename T2=double, typename T3=double, 
+    //          typename T4=double, typename T5=double, typename T6=double, 
+    //          typename T_return_type=typename return_type<T1,T2,T3,T4,T5,T6>::type,
+    //          typename T_partials_return=typename stan::partials_return_type<T1,T2,T3,T4,T5,T6>::type,
+    //          bool contain_fvar=stan::contains_fvar<T1,T2,T3,T4,T5,T6>::value >
+    // struct OperandsAndPartials {
+    //   const static bool all_constant = is_constant<T_return_type>::value;
+    //   size_t nvaris;
+    //   agrad::vari** all_varis;
+    //   double* all_partials;
 
-      const static bool all_constant = is_constant<T_return_type>::value;
-      size_t nvaris;
-      agrad::vari** all_varis;
-      double* all_partials;
-
-      VectorView<T_partials_return*, is_vector<T1>::value, 
-                 is_constant_struct<T1>::value> d_x1;
-      VectorView<T_partials_return*, is_vector<T2>::value, 
-                 is_constant_struct<T2>::value> d_x2;
-      VectorView<T_partials_return*, is_vector<T3>::value, 
-                 is_constant_struct<T3>::value> d_x3;
-      VectorView<T_partials_return*, is_vector<T4>::value, 
-                 is_constant_struct<T4>::value> d_x4;
-      VectorView<T_partials_return*, is_vector<T5>::value, 
-                 is_constant_struct<T5>::value> d_x5;
-      VectorView<T_partials_return*, is_vector<T6>::value, 
-                 is_constant_struct<T6>::value> d_x6;
+    //   VectorView<T_partials_return*, is_vector<T1>::value, 
+    //              is_constant_struct<T1>::value> d_x1;
+    //   VectorView<T_partials_return*, is_vector<T2>::value, 
+    //              is_constant_struct<T2>::value> d_x2;
+    //   VectorView<T_partials_return*, is_vector<T3>::value, 
+    //              is_constant_struct<T3>::value> d_x3;
+    //   VectorView<T_partials_return*, is_vector<T4>::value, 
+    //              is_constant_struct<T4>::value> d_x4;
+    //   VectorView<T_partials_return*, is_vector<T5>::value, 
+    //              is_constant_struct<T5>::value> d_x5;
+    //   VectorView<T_partials_return*, is_vector<T6>::value, 
+    //              is_constant_struct<T6>::value> d_x6;
       
-      OperandsAndPartials(const T1& x1=0, const T2& x2=0, const T3& x3=0, 
-                          const T4& x4=0, const T5& x5=0, const T6& x6=0)
-        : nvaris(!is_constant_struct<T1>::value * length(x1) +
-                 !is_constant_struct<T2>::value * length(x2) +
-                 !is_constant_struct<T3>::value * length(x3) +
-                 !is_constant_struct<T4>::value * length(x4) +
-                 !is_constant_struct<T5>::value * length(x5) +
-                 !is_constant_struct<T6>::value * length(x6)),
-          all_varis((agrad::vari**)agrad::chainable::operator new(sizeof(agrad::vari*) * nvaris)), 
-          all_partials((double*)agrad::chainable::operator new(sizeof(double) * nvaris)),
-          d_x1(all_partials),
-          d_x2(all_partials 
-               + (!is_constant_struct<T1>::value) * length(x1)),
-          d_x3(all_partials 
-               + (!is_constant_struct<T1>::value) * length(x1)
-               + (!is_constant_struct<T2>::value) * length(x2)),
-          d_x4(all_partials 
-               + (!is_constant_struct<T1>::value) * length(x1)
-               + (!is_constant_struct<T2>::value) * length(x2)
-               + (!is_constant_struct<T3>::value) * length(x3)),
-          d_x5(all_partials 
-               + (!is_constant_struct<T1>::value) * length(x1)
-               + (!is_constant_struct<T2>::value) * length(x2)
-               + (!is_constant_struct<T3>::value) * length(x3)
-               + (!is_constant_struct<T4>::value) * length(x4)),
-          d_x6(all_partials 
-               + (!is_constant_struct<T1>::value) * length(x1)
-               + (!is_constant_struct<T2>::value) * length(x2)
-               + (!is_constant_struct<T3>::value) * length(x3)
-               + (!is_constant_struct<T4>::value) * length(x4)
-               + (!is_constant_struct<T5>::value) * length(x5))
-      {
-        size_t base = 0;
-        if (!is_constant_struct<T1>::value)
-          base += set_varis<T1>().set(&all_varis[base], x1);
-        if (!is_constant_struct<T2>::value)
-          base += set_varis<T2>().set(&all_varis2[base], x2);
-        if (!is_constant_struct<T3>::value)
-          base += set_varis<T3>().set(&all_varis[base], x3);
-        if (!is_constant_struct<T4>::value)
-          base += set_varis<T4>().set(&all_varis[base], x4);
-        if (!is_constant_struct<T5>::value)
-          base += set_varis<T5>().set(&all_varis[base], x5);
-        if (!is_constant_struct<T6>::value)
-          set_varis<T6>().set(&all_varis[base], x6);
-        std::fill(all_partials, all_partials+nvaris, 0);
-      }
+    //   OperandsAndPartials(const T1& x1=0, const T2& x2=0, const T3& x3=0, 
+    //                       const T4& x4=0, const T5& x5=0, const T6& x6=0)
+    //     : nvaris(!is_constant_struct<T1>::value * length(x1) +
+    //              !is_constant_struct<T2>::value * length(x2) +
+    //              !is_constant_struct<T3>::value * length(x3) +
+    //              !is_constant_struct<T4>::value * length(x4) +
+    //              !is_constant_struct<T5>::value * length(x5) +
+    //              !is_constant_struct<T6>::value * length(x6)),
+    //       all_varis((agrad::vari**)agrad::chainable::operator new(sizeof(agrad::vari*) * nvaris)), 
+    //       all_partials((double*)agrad::chainable::operator new(sizeof(double) * nvaris)),
+    //       d_x1(all_partials),
+    //       d_x2(all_partials 
+    //            + (!is_constant_struct<T1>::value) * length(x1)),
+    //       d_x3(all_partials 
+    //            + (!is_constant_struct<T1>::value) * length(x1)
+    //            + (!is_constant_struct<T2>::value) * length(x2)),
+    //       d_x4(all_partials 
+    //            + (!is_constant_struct<T1>::value) * length(x1)
+    //            + (!is_constant_struct<T2>::value) * length(x2)
+    //            + (!is_constant_struct<T3>::value) * length(x3)),
+    //       d_x5(all_partials 
+    //            + (!is_constant_struct<T1>::value) * length(x1)
+    //            + (!is_constant_struct<T2>::value) * length(x2)
+    //            + (!is_constant_struct<T3>::value) * length(x3)
+    //            + (!is_constant_struct<T4>::value) * length(x4)),
+    //       d_x6(all_partials 
+    //            + (!is_constant_struct<T1>::value) * length(x1)
+    //            + (!is_constant_struct<T2>::value) * length(x2)
+    //            + (!is_constant_struct<T3>::value) * length(x3)
+    //            + (!is_constant_struct<T4>::value) * length(x4)
+    //            + (!is_constant_struct<T5>::value) * length(x5))
+    //   {
+    //     size_t base = 0;
+    //     if (!is_constant_struct<T1>::value)
+    //       base += set_varis<T1>().set(&all_varis[base], x1);
+    //     if (!is_constant_struct<T2>::value)
+    //       base += set_varis<T2>().set(&all_varis[base], x2);
+    //     if (!is_constant_struct<T3>::value)
+    //       base += set_varis<T3>().set(&all_varis[base], x3);
+    //     if (!is_constant_struct<T4>::value)
+    //       base += set_varis<T4>().set(&all_varis[base], x4);
+    //     if (!is_constant_struct<T5>::value)
+    //       base += set_varis<T5>().set(&all_varis[base], x5);
+    //     if (!is_constant_struct<T6>::value)
+    //       set_varis<T6>().set(&all_varis[base], x6);
+    //     std::fill(all_partials, all_partials+nvaris, 0);
+    //   }
 
-      T_return_type
-      to_fvar(T_partials_return logp, size_t N) {
-        T_partials_return temp_deriv;
-        for (size_t n = 0; n < N; ++n) {
-          if (!is_constant_struct<T1>::value) {
-            if (is_vector_like<T1>::value)
-              temp_deriv += d_x1[n] * x1[n].d_;
-            else
-              temp_deriv += d_x1[n] * x1[n].d_ / N;
-          }
-          if (!is_constant_struct<T2>::value) {
-            if (is_vector_like<T1>::value)
-              temp_deriv += d_x2[n] * x2[n].d_;
-            else
-              temp_deriv += d_x2[n] * x2[n].d_ / N;
-          }
-          if (!is_constant_struct<T3>::value) {
-            if (is_vector_like<T1>::value)
-              temp_deriv += d_x3[n] * x3[n].d_;
-            else
-              temp_deriv += d_x3[n] * x3[n].d_ / N;
-          }
-          if (!is_constant_struct<T4>::value) {
-            if (is_vector_like<T1>::value)
-              temp_deriv += d_x4[n] * x4[n].d_;
-            else
-              temp_deriv += d_x4[n] * x4[n].d_ / N;
-          }
-          if (!is_constant_struct<T5>::value) {
-            if (is_vector_like<T1>::value)
-              temp_deriv += d_x5[n] * x5[n].d_;
-            else
-              temp_deriv += d_x5[n] * x5[n].d_ / N;
-          }
-          if (!is_constant_struct<T5>::value) {
-            if (is_vector_like<T1>::value)
-              temp_deriv += d_x6[n] * x6[n].d_;
-            else
-              temp_deriv += d_x6[n] * x6[n].d_ / N;
-          }
-        }
-        return stan::agrad::to_fvar(logp,temp_deriv);
-      }
-    };
+    //   T_return_type to_var(double logp,size_t& N,
+    //                        const T1& x1=0, const T2& x2=0, const T3& x3=0, 
+    //                        const T4& x4=0, const T5& x5=0, const T6& x6=0) {
+    //     if (contain_fvar)
+    //       to_fvar(logp, N,x1,x2,x3,x4,x5,x6);
+    //     else
+    //       return partials_to_var<T_return_type>(logp, nvaris, all_varis, all_partials);
+    //   }
+
+    //   T_return_type
+    //   to_fvar(const T_partials_return& logp, const size_t& N,
+    //           const T1& x1=0, const T2& x2=0, const T3& x3=0, 
+    //           const T4& x4=0, const T5& x5=0, const T6& x6=0) {
+    //     T_partials_return temp_deriv;
+    //     for (size_t n = 0; n < N; ++n) {
+    //       if (!is_constant_struct<T1>::value) {
+    //         if (is_vector_like<T1>::value)
+    //           temp_deriv += d_x1[n] * x1[n].d_;
+    //         else
+    //           temp_deriv += d_x1[n] * x1.d_ / N;
+    //       }
+    //       if (!is_constant_struct<T2>::value) {
+    //         if (is_vector_like<T1>::value)
+    //           temp_deriv += d_x2[n] * x2[n].d_;
+    //         else
+    //           temp_deriv += d_x2[n] * x2.d_ / N;
+    //       }
+    //       if (!is_constant_struct<T3>::value) {
+    //         if (is_vector_like<T1>::value)
+    //           temp_deriv += d_x3[n] * x3[n].d_;
+    //         else
+    //           temp_deriv += d_x3[n] * x3.d_ / N;
+    //       }
+    //       if (!is_constant_struct<T4>::value) {
+    //         if (is_vector_like<T1>::value)
+    //           temp_deriv += d_x4[n] * x4[n].d_;
+    //         else
+    //           temp_deriv += d_x4[n] * x4.d_ / N;
+    //       }
+    //       if (!is_constant_struct<T5>::value) {
+    //         if (is_vector_like<T1>::value)
+    //           temp_deriv += d_x5[n] * x5[n].d_;
+    //         else
+    //           temp_deriv += d_x5[n] * x5.d_ / N;
+    //       }
+    //       if (!is_constant_struct<T5>::value) {
+    //         if (is_vector_like<T1>::value)
+    //           temp_deriv += d_x6[n] * x6[n].d_;
+    //         else
+    //           temp_deriv += d_x6[n] * x6.d_ / N;
+    //       }
+    //     }
+    //     return stan::agrad::fvar<T_partials_return>(logp,temp_deriv);
+    //   }
+       
+    // };
+
+    // template<typename T1=double, typename T2=double, typename T3=double, 
+    //          typename T4=double, typename T5=double, typename T6=double, 
+    //          typename T_return_type=typename return_type<T1,T2,T3,T4,T5,T6>::type,
+    //          bool contain_fvar=true>
+    // struct OperandsAndPartials {
+    //   typename T_partials_return = stan::partials_return_type<T1,T2,T3,T4,T5,T6>;
+
+    //   const static bool all_constant = is_constant<T_return_type>::value;
+    //   size_t nvaris;
+    //   agrad::vari** all_varis;
+    //   double* all_partials;
+
+    //   VectorView<T_partials_return*, is_vector<T1>::value, 
+    //              is_constant_struct<T1>::value> d_x1;
+    //   VectorView<T_partials_return*, is_vector<T2>::value, 
+    //              is_constant_struct<T2>::value> d_x2;
+    //   VectorView<T_partials_return*, is_vector<T3>::value, 
+    //              is_constant_struct<T3>::value> d_x3;
+    //   VectorView<T_partials_return*, is_vector<T4>::value, 
+    //              is_constant_struct<T4>::value> d_x4;
+    //   VectorView<T_partials_return*, is_vector<T5>::value, 
+    //              is_constant_struct<T5>::value> d_x5;
+    //   VectorView<T_partials_return*, is_vector<T6>::value, 
+    //              is_constant_struct<T6>::value> d_x6;
+      
+    //   OperandsAndPartials(const T1& x1=0, const T2& x2=0, const T3& x3=0, 
+    //                       const T4& x4=0, const T5& x5=0, const T6& x6=0)
+    //     : nvaris(!is_constant_struct<T1>::value * length(x1) +
+    //              !is_constant_struct<T2>::value * length(x2) +
+    //              !is_constant_struct<T3>::value * length(x3) +
+    //              !is_constant_struct<T4>::value * length(x4) +
+    //              !is_constant_struct<T5>::value * length(x5) +
+    //              !is_constant_struct<T6>::value * length(x6)),
+    //       all_varis((agrad::vari**)agrad::chainable::operator new(sizeof(agrad::vari*) * nvaris)), 
+    //       all_partials((double*)agrad::chainable::operator new(sizeof(double) * nvaris)),
+    //       d_x1(all_partials),
+    //       d_x2(all_partials 
+    //            + (!is_constant_struct<T1>::value) * length(x1)),
+    //       d_x3(all_partials 
+    //            + (!is_constant_struct<T1>::value) * length(x1)
+    //            + (!is_constant_struct<T2>::value) * length(x2)),
+    //       d_x4(all_partials 
+    //            + (!is_constant_struct<T1>::value) * length(x1)
+    //            + (!is_constant_struct<T2>::value) * length(x2)
+    //            + (!is_constant_struct<T3>::value) * length(x3)),
+    //       d_x5(all_partials 
+    //            + (!is_constant_struct<T1>::value) * length(x1)
+    //            + (!is_constant_struct<T2>::value) * length(x2)
+    //            + (!is_constant_struct<T3>::value) * length(x3)
+    //            + (!is_constant_struct<T4>::value) * length(x4)),
+    //       d_x6(all_partials 
+    //            + (!is_constant_struct<T1>::value) * length(x1)
+    //            + (!is_constant_struct<T2>::value) * length(x2)
+    //            + (!is_constant_struct<T3>::value) * length(x3)
+    //            + (!is_constant_struct<T4>::value) * length(x4)
+    //            + (!is_constant_struct<T5>::value) * length(x5))
+    //   {
+    //     size_t base = 0;
+    //     if (!is_constant_struct<T1>::value)
+    //       base += set_varis<T1>().set(&all_varis[base], x1);
+    //     if (!is_constant_struct<T2>::value)
+    //       base += set_varis<T2>().set(&all_varis2[base], x2);
+    //     if (!is_constant_struct<T3>::value)
+    //       base += set_varis<T3>().set(&all_varis[base], x3);
+    //     if (!is_constant_struct<T4>::value)
+    //       base += set_varis<T4>().set(&all_varis[base], x4);
+    //     if (!is_constant_struct<T5>::value)
+    //       base += set_varis<T5>().set(&all_varis[base], x5);
+    //     if (!is_constant_struct<T6>::value)
+    //       set_varis<T6>().set(&all_varis[base], x6);
+    //     std::fill(all_partials, all_partials+nvaris, 0);
+    //   }
+
+    //   T_return_type
+    //   to_fvar(T_partials_return logp, size_t N) {
+    //     T_partials_return temp_deriv;
+    //     for (size_t n = 0; n < N; ++n) {
+    //       if (!is_constant_struct<T1>::value) {
+    //         if (is_vector_like<T1>::value)
+    //           temp_deriv += d_x1[n] * x1[n].d_;
+    //         else
+    //           temp_deriv += d_x1[n] * x1[n].d_ / N;
+    //       }
+    //       if (!is_constant_struct<T2>::value) {
+    //         if (is_vector_like<T1>::value)
+    //           temp_deriv += d_x2[n] * x2[n].d_;
+    //         else
+    //           temp_deriv += d_x2[n] * x2[n].d_ / N;
+    //       }
+    //       if (!is_constant_struct<T3>::value) {
+    //         if (is_vector_like<T1>::value)
+    //           temp_deriv += d_x3[n] * x3[n].d_;
+    //         else
+    //           temp_deriv += d_x3[n] * x3[n].d_ / N;
+    //       }
+    //       if (!is_constant_struct<T4>::value) {
+    //         if (is_vector_like<T1>::value)
+    //           temp_deriv += d_x4[n] * x4[n].d_;
+    //         else
+    //           temp_deriv += d_x4[n] * x4[n].d_ / N;
+    //       }
+    //       if (!is_constant_struct<T5>::value) {
+    //         if (is_vector_like<T1>::value)
+    //           temp_deriv += d_x5[n] * x5[n].d_;
+    //         else
+    //           temp_deriv += d_x5[n] * x5[n].d_ / N;
+    //       }
+    //       if (!is_constant_struct<T5>::value) {
+    //         if (is_vector_like<T1>::value)
+    //           temp_deriv += d_x6[n] * x6[n].d_;
+    //         else
+    //           temp_deriv += d_x6[n] * x6[n].d_ / N;
+    //       }
+    //     }
+    //     return stan::agrad::to_fvar(logp,temp_deriv);
+    //   }
+    // };
 
   } 
 } 

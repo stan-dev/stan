@@ -590,7 +590,7 @@ TEST(MetaTraits, partials_return_type) {
   using stan::agrad::var;
   using stan::partials_return_type;
 
-  partials_return_type<double,fvar<double> >::type a(5.0);
+  partials_return_type<double,fvar<double>, std::vector<fvar<double> > >::type a(5.0);
   EXPECT_EQ(5.0,a);
 
   partials_return_type<double,fvar<fvar<double> > >::type b(3.0,2.0);
@@ -611,4 +611,7 @@ TEST(MetaTraits, partials_return_type) {
 
   partials_return_type<double,stan::agrad::var>::type f(5.0);
   EXPECT_EQ(5.0,f);
+
+  partials_return_type<double,stan::agrad::var,std::vector<stan::agrad::var>::type g(5.0);
+  EXPECT_EQ(5.0,g);
 }
