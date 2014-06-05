@@ -558,6 +558,8 @@ TEST(MetaTraits,containsFvar) {
   using stan::agrad::fvar;
   using stan::contains_fvar;
   EXPECT_FALSE(contains_fvar<double>::value);
+  EXPECT_FALSE(contains_fvar<var>::value);
+  EXPECT_FALSE(contains_fvar<std::vector<var> >::value);
   EXPECT_FALSE((contains_fvar<double,int,var>::value));
   EXPECT_TRUE((contains_fvar<fvar<double> >::value));
   EXPECT_TRUE((contains_fvar<double, fvar<double> >::value));
@@ -612,6 +614,6 @@ TEST(MetaTraits, partials_return_type) {
   partials_return_type<double,stan::agrad::var>::type f(5.0);
   EXPECT_EQ(5.0,f);
 
-  partials_return_type<double,stan::agrad::var,std::vector<stan::agrad::var>::type g(5.0);
+  partials_return_type<double,stan::agrad::var,std::vector<stan::agrad::var> >::type g(5.0);
   EXPECT_EQ(5.0,g);
 }
