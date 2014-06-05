@@ -3,6 +3,8 @@
 
 #include <boost/math/tools/promotion.hpp>
 #include <stan/math/functions/inv_logit.hpp>
+#include <stan/agrad/fwd/functions/pow.hpp>
+#include <stan/agrad/rev/functions/pow.hpp>
 
 namespace stan {
   namespace math {
@@ -21,7 +23,9 @@ namespace stan {
     template <typename T>
     inline typename boost::math::tools::promote_args<T>::type
     Phi_approx(T x) {
-      return inv_logit(0.07056 * std::pow(x,3.0) + 1.5976 * x);
+      using std::pow;
+      using stan::agrad::pow;
+      return inv_logit(0.07056 * pow(x,3.0) + 1.5976 * x);
     }
 
   }
