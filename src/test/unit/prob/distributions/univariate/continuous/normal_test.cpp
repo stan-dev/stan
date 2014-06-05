@@ -22,8 +22,6 @@ TEST(ProbDistributionsNormal, intVsDouble) {
     double lp2adj = lp2.adj();
     EXPECT_FLOAT_EQ(lp1val,lp2val);
     EXPECT_FLOAT_EQ(lp1adj,lp2adj);
-    std::cout << lp1val << std::endl;
-    std::cout << lp2val << std::endl;
   }
 }
 

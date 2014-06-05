@@ -164,9 +164,10 @@ template<typename T1=double, typename T2=double, typename T3=double,
         return partials_to_var<T_return_type>(logp, nvaris, all_varis, all_partials);
       }
 
-      T_return_type to_fvar(T_partials_return logp,
-                           const T1& x1=0, const T2& x2=0, const T3& x3=0, 
-                           const T4& x4=0, const T5& x5=0, const T6& x6=0) {
+      T_return_type 
+      to_fvar(T_partials_return logp,
+              const T1& x1=0, const T2& x2=0, const T3& x3=0, 
+              const T4& x4=0, const T5& x5=0, const T6& x6=0) {
         T_partials_return temp_deriv = 0;
         temp_deriv += incr_deriv<VectorView<T_partials_return*, is_vector<T1>::value, is_constant_struct<T1>::value>,T1,T_partials_return>().incr(d_x1,x1);
         temp_deriv += incr_deriv<VectorView<T_partials_return*, is_vector<T2>::value, is_constant_struct<T2>::value>,T2,T_partials_return>().incr(d_x2,x2);
