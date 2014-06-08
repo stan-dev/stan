@@ -413,8 +413,6 @@ namespace stan {
                       std::vector<std::vector<stan::gm::expression> >& dimss,
                       bool& pass,
                       std::ostream& error_msgs) const {
-        //        std::cout << "add_expression_dimss_f" << std::endl;
-        //        std::cout.flush();
         index_op iop(expression,dimss);
         iop.infer_type();
         if (iop.type_.is_ill_formed()) {
