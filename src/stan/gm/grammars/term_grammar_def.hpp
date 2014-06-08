@@ -169,8 +169,6 @@ namespace stan {
         // handle raising each member of a vector to a power?
         // }
         print_var_origin(error_msgs,var_origin);
-        std::cout << "exponentiation_f " << expr1.expression_type() << " " << expr2.expression_type() << std::endl;
-        std::cout.flush();
         if (!expr1.expression_type().is_primitive() 
             || !expr2.expression_type().is_primitive()) {
           error_msgs << "arguments to ^ must be primitive (real or int)"
@@ -203,8 +201,6 @@ namespace stan {
                       const expression& expr2,
                       std::ostream& error_msgs) const {
 
-        std::cout << "multiplication_f" << std::endl;
-        std::cout.flush();
         if (expr1.expression_type().is_primitive()
             && expr2.expression_type().is_primitive()) {
           expr1 *= expr2;;
@@ -230,8 +226,6 @@ namespace stan {
       void operator()(expression& expr1,
                       const expression& expr2,
                       std::ostream& error_msgs) const {
-        std::cout << "division_f" << std::endl;
-        std::cout.flush();
         if (expr1.expression_type().is_primitive_int() 
             && expr2.expression_type().is_primitive_int()) {
           // getting here, but not printing?  only print error if problems?
@@ -277,8 +271,6 @@ namespace stan {
       void operator()(expression& expr1,
                       const expression& expr2,
                       std::ostream& error_msgs) const {
-        std::cout << "left_division_f" << std::endl;
-        std::cout.flush();
         std::vector<expression> args;
         args.push_back(expr1);
         args.push_back(expr2);
@@ -306,8 +298,6 @@ namespace stan {
       void operator()(expression& expr1,
                       const expression& expr2,
                       std::ostream& error_msgs) const {
-        std::cout << "elt_multiplication_f" << std::endl;
-        std::cout.flush();
 
         if (expr1.expression_type().is_primitive()
             && expr2.expression_type().is_primitive()) {
@@ -332,8 +322,6 @@ namespace stan {
       void operator()(expression& expr1,
                       const expression& expr2,
                       std::ostream& error_msgs) const {
-        std::cout << "elt_division_f" << std::endl;
-        std::cout.flush();
 
         if (expr1.expression_type().is_primitive()
             && expr2.expression_type().is_primitive()) {
@@ -363,8 +351,6 @@ namespace stan {
       void operator()(expression& expr_result,
                       const expression& expr,
                       std::ostream& error_msgs) const {
-        std::cout << "negate_expr_f" << std::endl;
-        std::cout.flush();
         if (expr.expression_type().is_primitive()) {
           expr_result = expression(unary_op('-', expr));
           return;
@@ -386,8 +372,6 @@ namespace stan {
       void operator()(expression& expr_result,
                       const expression& expr,
                       std::ostream& error_msgs) const {
-        std::cout << "logical_negate_expr_f" << std::endl;
-        std::cout.flush();
         if (!expr.expression_type().is_primitive()) {
           error_msgs << "logical negation operator ! only applies to int or real types; ";
           expr_result = expression();
@@ -408,8 +392,6 @@ namespace stan {
 
       expression operator()(const expression& expr,
                             std::ostream& error_msgs) const {
-        std::cout << "transpose_f" << std::endl;
-        std::cout.flush();
 
         if (expr.expression_type().is_primitive()) {
           return expr; // transpose of basic is self -- works?
@@ -431,8 +413,8 @@ namespace stan {
                       std::vector<std::vector<stan::gm::expression> >& dimss,
                       bool& pass,
                       std::ostream& error_msgs) const {
-        std::cout << "add_expression_dimss_f" << std::endl;
-        std::cout.flush();
+        //        std::cout << "add_expression_dimss_f" << std::endl;
+        //        std::cout.flush();
         index_op iop(expression,dimss);
         iop.infer_type();
         if (iop.type_.is_ill_formed()) {
