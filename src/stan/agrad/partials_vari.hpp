@@ -28,18 +28,150 @@ namespace stan {
     };
 
     namespace {
-      template<typename T>
-      T partials_to_var(double logp, size_t /* nvaris */,
-                        agrad::vari** /* all_varis */,
-                        double* /* all_partials */) {
-        return logp;
-      }
-      template<>
-      var partials_to_var<var>(double logp, size_t nvaris,
-                               agrad::vari** all_varis,
-                               double* all_partials) {
-        return var(new agrad::partials_vari(logp, nvaris, all_varis, all_partials));
-      }
+      template<typename T1, typename T2, typename T3,
+               bool is_vec = is_vector<T2>::value, 
+               bool is_const = is_constant_struct<T2>::value>
+      struct incr_deriv {
+        inline T3 incr(T1 d_x, const T2& x_d ) {
+          return 0;
+        }
+      };
+      template<typename T1, typename T2, typename T3>
+      struct incr_deriv <T1,T2,T3,true,false>{
+        inline T3 deriv(T1 d_x, const T2& x_d) {
+        T2 temp = 0;
+          for (size_t n = 0; n < length(x_d); n++)
+            temp += d_x[n] * x_d[n].d_;
+          return temp;
+        }
+      };
+      template<typename T1, typename T2, typename T3>
+      struct incr_deriv <T1,T2,T3,false,false>{
+        inline T3 incr(T1 d_x, const T2& x_d) {
+          return d_x[1]*x_d.d_;
+        }
+      };
+
+      template<typename T_return_type, typename T_partials_return, 
+               typename T1, typename T2, typename T3, typename T4,
+               typename T5, typename T6,
+               bool is_fvar = stan::contains_fvar<T_return_type>::value,
+               bool is_const = stan::is_constant_struct<T_return_type>::value>    
+      struct partials_to_var {
+        inline
+        T_return_type to_var(double logp, size_t /* nvaris */,
+                             agrad::vari** /* all_varis */,
+                             double* /* all_partials */,
+                             const T1& x1, const T2& x2, const T3& x3, const T4& x4, 
+                             const T5& x5, const T6& x6,
+                             VectorView<T_partials_return*, 
+                             is_vector<T1>::value, 
+                             is_constant_struct<T1>::value> d_x1,
+                             VectorView<T_partials_return*, 
+                             is_vector<T2>::value, 
+                             is_constant_struct<T2>::value> d_x2, 
+                             VectorView<T_partials_return*, 
+                             is_vector<T3>::value, 
+                             is_constant_struct<T3>::value> d_x3, 
+                             VectorView<T_partials_return*, 
+                             is_vector<T4>::value, 
+                             is_constant_struct<T4>::value> d_x4,
+                             VectorView<T_partials_return*, 
+                             is_vector<T5>::value, 
+                             is_constant_struct<T5>::value> d_x5, 
+                             VectorView<T_partials_return*, 
+                             is_vector<T6>::value, 
+                             is_constant_struct<T6>::value> d_x6) {
+          return logp;
+        }
+      };
+
+        template<typename T_return_type, typename T_partials_return, 
+                 typename T1, typename T2, typename T3, typename T4,
+                 typename T5, typename T6>
+        struct partials_to_var <T_return_type,T_partials_return,T1,T2,T3,T4,T5,T6,
+                                false,false> {
+          inline T_return_type to_var (T_partials_return logp, size_t nvaris,
+                                       agrad::vari** all_varis, double* all_partials,
+                                       const T1& x1, const T2& x2, const T3& x3, 
+                                       const T4& x4, const T5& x5, const T6& x6,
+                                       VectorView<T_partials_return*,
+                                       is_vector<T1>::value,
+                                       is_constant_struct<T1>::value> d_x1,
+                                       VectorView<T_partials_return*,
+                                       is_vector<T2>::value, 
+                                       is_constant_struct<T2>::value> d_x2, 
+                                       VectorView<T_partials_return*,
+                                       is_vector<T3>::value, 
+                                       is_constant_struct<T3>::value> d_x3, 
+                                       VectorView<T_partials_return*,
+                                       is_vector<T4>::value, 
+                                       is_constant_struct<T4>::value> d_x4,
+                                       VectorView<T_partials_return*,
+                                       is_vector<T5>::value, 
+                                       is_constant_struct<T5>::value> d_x5, 
+                                       VectorView<T_partials_return*,
+                                       is_vector<T6>::value, 
+                                       is_constant_struct<T6>::value> d_x6) {
+          return var(new agrad::partials_vari(logp, nvaris, all_varis, all_partials));
+        }
+    };
+
+        template<typename T_return_type, typename T_partials_return, 
+                 typename T1, typename T2, typename T3, typename T4,
+                 typename T5, typename T6>
+        struct partials_to_var <T_return_type,T_partials_return,T1,T2,T3,T4,T5,T6,
+                                true,false> {
+          inline T_return_type to_var(T_partials_return logp, size_t nvaris,
+                                      agrad::vari** all_varis, double* all_partials,
+                                      const T1& x1, const T2& x2, const T3& x3, 
+                                      const T4& x4, const T5& x5, const T6& x6,
+                                      VectorView<T_partials_return*,
+                                      is_vector<T1>::value,
+                                      is_constant_struct<T1>::value> d_x1,
+                                      VectorView<T_partials_return*,
+                                      is_vector<T2>::value, 
+                                      is_constant_struct<T2>::value> d_x2, 
+                                      VectorView<T_partials_return*,
+                                      is_vector<T3>::value, 
+                                      is_constant_struct<T3>::value> d_x3, 
+                                      VectorView<T_partials_return*,
+                                      is_vector<T4>::value, 
+                                      is_constant_struct<T4>::value> d_x4,
+                                      VectorView<T_partials_return*,
+                                      is_vector<T5>::value, 
+                                      is_constant_struct<T5>::value> d_x5, 
+                                      VectorView<T_partials_return*,
+                                      is_vector<T6>::value, 
+                                      is_constant_struct<T6>::value> d_x6) {
+        T_partials_return temp_deriv = 0;
+        temp_deriv += incr_deriv<VectorView<T_partials_return*,
+                                            is_vector<T1>::value,
+                                            is_constant_struct<T1>::value>,
+                                 T1,T_partials_return>().incr(d_x1,x1);
+        temp_deriv += incr_deriv<VectorView<T_partials_return*,
+                                            is_vector<T2>::value,
+                                            is_constant_struct<T2>::value>,
+                                 T2,T_partials_return>().incr(d_x2,x2);
+        temp_deriv += incr_deriv<VectorView<T_partials_return*,
+                                      is_vector<T3>::value,
+                                      is_constant_struct<T3>::value>,
+                                 T3,T_partials_return>().incr(d_x3,x3);
+        temp_deriv += incr_deriv<VectorView<T_partials_return*,
+                                      is_vector<T4>::value,
+                                      is_constant_struct<T4>::value>,
+                                 T4,T_partials_return>().incr(d_x4,x4);
+        temp_deriv += incr_deriv<VectorView<T_partials_return*,
+                                      is_vector<T5>::value,
+                                      is_constant_struct<T5>::value>,
+                                 T5,T_partials_return>().incr(d_x5,x5);
+        temp_deriv += incr_deriv<VectorView<T_partials_return*,
+                                      is_vector<T6>::value,
+                                      is_constant_struct<T6>::value>,
+                                 T6,T_partials_return>().incr(d_x6,x6);
+        return stan::agrad::fvar<T_partials_return>(logp,temp_deriv);
+          }
+        };
 
       template<typename T, 
                bool is_vec = is_vector<T>::value, 
@@ -64,52 +196,42 @@ namespace stan {
           return (1);
         }
       };
-
-      template<typename T1, typename T2, typename T3,
-               bool is_vec = is_vector<T2>::value, 
-               bool is_const = is_constant_struct<T2>::value>
-      struct incr_deriv {
-        inline T3 incr(T1 d_x, const T2& x_d ) {
-          return 0;
-        }
-      };
-      template<typename T1, typename T2, typename T3>
-      struct incr_deriv <T1,T2,T3,true,false>{
-        inline T3 deriv(T1 d_x, const T2& x_d) {
-        T2 temp = 0;
-          for (size_t n = 0; n < length(x_d); n++)
-            temp += d_x[n] * x_d[n].d_;
-          return temp;
-        }
-      };
-      template<typename T1, typename T2, typename T3>
-      struct incr_deriv <T1,T2,T3,false,false>{
-        inline T3 incr(T1 d_x, const T2& x_d) {
-          return d_x[1]*x_d.d_;
-        }
-      };
     }
 
     /**
      * A variable implementation that stores operands and
      * derivatives with respect to the variable.
      */
-template<typename T1=double, typename T2=double, typename T3=double, 
-         typename T4=double, typename T5=double, typename T6=double, 
-         typename T_return_type=typename return_type<T1,T2,T3,T4,T5,T6>::type,
-         typename T_partials_return=typename stan::partials_return_type<T1,T2,T3,T4,T5,T6>::type>
+    template<typename T1=double, typename T2=double, 
+             typename T3=double, 
+             typename T4=double, typename T5=double, typename T6=double>
     struct OperandsAndPartials {
+      typedef typename stan::partials_return_type<T1,T2,T3,T4,T5,T6>::type T_partials_return;
+      typedef typename stan::return_type<T1,T2,T3,T4,T5,T6>::type T_return_type;
+
       const static bool all_constant = is_constant<T_return_type>::value;
       size_t nvaris;
       agrad::vari** all_varis;
       double* all_partials;
 
-      VectorView<T_partials_return*, is_vector<T1>::value, is_constant_struct<T1>::value> d_x1;
-      VectorView<T_partials_return*, is_vector<T2>::value, is_constant_struct<T2>::value> d_x2;
-      VectorView<T_partials_return*, is_vector<T3>::value, is_constant_struct<T3>::value> d_x3;
-      VectorView<T_partials_return*, is_vector<T4>::value, is_constant_struct<T4>::value> d_x4;
-      VectorView<T_partials_return*, is_vector<T5>::value, is_constant_struct<T5>::value> d_x5;
-      VectorView<T_partials_return*, is_vector<T6>::value, is_constant_struct<T6>::value> d_x6;
+      VectorView<T_partials_return*, 
+                 is_vector<T1>::value, 
+                 is_constant_struct<T1>::value> d_x1;
+      VectorView<T_partials_return*, 
+                 is_vector<T2>::value, 
+                 is_constant_struct<T2>::value> d_x2;
+      VectorView<T_partials_return*,
+                 is_vector<T3>::value, 
+                 is_constant_struct<T3>::value> d_x3;
+      VectorView<T_partials_return*,
+                 is_vector<T4>::value, 
+                 is_constant_struct<T4>::value> d_x4;
+      VectorView<T_partials_return*,
+                 is_vector<T5>::value, 
+                 is_constant_struct<T5>::value> d_x5;
+      VectorView<T_partials_return*, 
+                 is_vector<T6>::value, 
+                 is_constant_struct<T6>::value> d_x6;
 
       OperandsAndPartials(const T1& x1=0, const T2& x2=0, const T3& x3=0, 
                           const T4& x4=0, const T5& x5=0, const T6& x6=0)
@@ -160,26 +282,17 @@ template<typename T1=double, typename T2=double, typename T3=double,
       }
 
       T_return_type
-      to_var(T_partials_return logp) {
-        return partials_to_var<T_return_type>(logp, nvaris, all_varis, all_partials);
+      to_var(T_partials_return logp,
+             const T1& x1=0, const T2& x2=0, const T3& x3=0, 
+             const T4& x4=0, const T5& x5=0, const T6& x6=0) {
+        return partials_to_var<T_return_type,T_partials_return,T1,
+                               T2,T3,T4,T5,T6>().to_var(logp, nvaris, all_varis, 
+                                                        all_partials,
+                                                        x1,x2,x3,x4,x5,x6,d_x1,d_x2,
+                                                        d_x3,d_x4,d_x5,d_x6);
       }
-
-      T_return_type 
-      to_fvar(T_partials_return logp,
-              const T1& x1=0, const T2& x2=0, const T3& x3=0, 
-              const T4& x4=0, const T5& x5=0, const T6& x6=0) {
-        T_partials_return temp_deriv = 0;
-        temp_deriv += incr_deriv<VectorView<T_partials_return*, is_vector<T1>::value, is_constant_struct<T1>::value>,T1,T_partials_return>().incr(d_x1,x1);
-        temp_deriv += incr_deriv<VectorView<T_partials_return*, is_vector<T2>::value, is_constant_struct<T2>::value>,T2,T_partials_return>().incr(d_x2,x2);
-        temp_deriv += incr_deriv<VectorView<T_partials_return*, is_vector<T3>::value, is_constant_struct<T3>::value>,T3,T_partials_return>().incr(d_x3,x3);
-        temp_deriv += incr_deriv<VectorView<T_partials_return*, is_vector<T4>::value, is_constant_struct<T4>::value>,T4,T_partials_return>().incr(d_x4,x4);
-        temp_deriv += incr_deriv<VectorView<T_partials_return*, is_vector<T5>::value, is_constant_struct<T5>::value>,T5,T_partials_return>().incr(d_x5,x5);
-        temp_deriv += incr_deriv<VectorView<T_partials_return*, is_vector<T6>::value, is_constant_struct<T6>::value>,T6,T_partials_return>().incr(d_x6,x6);
-        return stan::agrad::fvar<T_partials_return>(logp,temp_deriv);
-      }
-  
 };
-
+   
 
   } 
 } 

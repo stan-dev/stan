@@ -126,13 +126,8 @@ namespace stan {
             += -inv_sigma[n] + inv_sigma[n] * y_minus_mu_over_sigma_squared;
       }
 
-      if (stan::contains_fvar<T_y,T_loc,T_scale>::value) {
-        std::cout<<"does it go through here?";
-        return operands_and_partials.to_fvar(logp,y,mu,sigma);
-      }
-      else {
-        return operands_and_partials.to_var(logp);
-      }
+      
+      return operands_and_partials.to_var(logp,y,mu,sigma);
 
     }
 

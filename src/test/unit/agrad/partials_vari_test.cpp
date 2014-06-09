@@ -32,7 +32,7 @@ TEST(AgradPartialsVari, OperandsAndPartials) {
   o4.d_x1[2] = 30.0;
   o4.d_x1[3] = 40.0;
   
-  var v = o4.to_var(10.0);
+  var v = o4.to_var(10.0,v_vec);
   v.grad(v_vec, grad);
   EXPECT_EQ(4U, o4.nvaris);
   EXPECT_FLOAT_EQ(10.0, v.val());
@@ -156,7 +156,7 @@ TEST(AgradPartialsVari, OperandsAndPartialsFvar) {
   o.d_x1[0] += 17.0; 
   o.d_x2[0] += 19.0;  
   o.d_x3[0] += 23.0;
-  fvar<double> y = o.to_fvar(-1.0,x1,x2,x3);
+  fvar<double> y = o.to_var(-1.0,x1,x2,x3);
 
   EXPECT_FLOAT_EQ(107,y.d_);
   EXPECT_FLOAT_EQ(-1,y.val_);
