@@ -1,7 +1,6 @@
 #include <stan/agrad/rev.hpp>
 #include <stan/agrad/fwd.hpp>
 #include <stan/prob/distributions/univariate/continuous/normal.hpp>
-#include <stan/agrad/fwd/prob/univariate/continuous/normal.hpp>
 #include <gtest/gtest.h>
 #include <vector>
 

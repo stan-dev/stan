@@ -1,6 +1,8 @@
 #ifndef __STAN__AGRAD__FWD__FVAR__HPP__
 #define __STAN__AGRAD__FWD__FVAR__HPP__
 
+#include <ostream>
+
 namespace stan {
 
   namespace agrad {
@@ -121,6 +123,13 @@ namespace stan {
         fvar<T> result(val_,d_);
         --val_;
         return result;
+      }
+
+
+      friend
+      std::ostream& 
+      operator<<(std::ostream& os, const fvar<T>& v) {
+         return os << v.val_ << ':' << v.d_;
       }
     };
   }

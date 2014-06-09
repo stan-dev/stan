@@ -36,10 +36,10 @@ namespace stan {
      */
     template <bool propto, 
               typename T_y, typename T_loc, typename T_scale>
-    typename boost::enable_if_c<is_var_or_arithmetic<T_y,T_loc,T_scale>::value,
-                                typename return_type<T_y,T_loc,T_scale>::type>::type
+    typename return_type<T_y,T_loc,T_scale>::type
     normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
       static const char* function = "stan::prob::normal_log(%1%)";
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type T_partials_return;
 
       using std::log;
       using stan::is_constant_struct;
@@ -57,7 +57,7 @@ namespace stan {
         return 0.0;
 
       // set up return value accumulator
-      double logp(0.0);
+      T_partials_return logp(0.0);
 
       // validate args (here done over var, which should be OK)
       if (!check_not_nan(function, y, "Random variable", &logp))
@@ -96,13 +96,13 @@ namespace stan {
 
       for (size_t n = 0; n < N; n++) {
         // pull out values of arguments
-        const double y_dbl = value_of(y_vec[n]);
-        const double mu_dbl = value_of(mu_vec[n]);
+        const T_partials_return y_dbl = value_of(y_vec[n]);
+        const T_partials_return mu_dbl = value_of(mu_vec[n]);
       
         // reusable subexpression values
-        const double y_minus_mu_over_sigma 
+        const T_partials_return y_minus_mu_over_sigma 
           = (y_dbl - mu_dbl) * inv_sigma[n];
-        const double y_minus_mu_over_sigma_squared 
+        const T_partials_return y_minus_mu_over_sigma_squared 
           = y_minus_mu_over_sigma * y_minus_mu_over_sigma;
 
         static double NEGATIVE_HALF = - 0.5;
