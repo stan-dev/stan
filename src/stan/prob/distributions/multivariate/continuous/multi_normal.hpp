@@ -7,6 +7,7 @@
 #include <stan/agrad/rev.hpp>
 #include <stan/agrad/rev/matrix.hpp>
 #include <stan/math/error_handling.hpp>
+#include <stan/math/matrix/trace_inv_quad_form_ldlt.hpp>
 #include <stan/math/matrix_error_handling.hpp>
 #include <stan/math/matrix/log_determinant_ldlt.hpp>
 #include <stan/meta/traits.hpp>
