@@ -3,9 +3,11 @@
 
 #include <vector>
 #include <stan/agrad/rev/matrix.hpp>
+#include <stan/agrad/fwd/fvar.hpp>
 
 using std::vector;
 using stan::agrad::var;
+using stan::agrad::fvar;
 using stan::is_vector;
 using stan::is_constant_struct;
 using stan::scalar_type;
@@ -86,6 +88,34 @@ var get_params<var>(const vector<vector<double> >& parameters, const size_t p) {
   return param;
 }
 template<>
+fvar<double> get_params<fvar<double> >(const vector<vector<double> >& parameters, const size_t p) {
+  fvar<double> param(0);
+  if (p < parameters[0].size())
+    param = parameters[0][p];
+  return param;
+}
+template<>
+fvar<var> get_params<fvar<var> >(const vector<vector<double> >& parameters, const size_t p) {
+  fvar<var> param(0);
+  if (p < parameters[0].size())
+    param = parameters[0][p];
+  return param;
+}
+template<>
+fvar<fvar<double> > get_params<fvar<fvar<double> > >(const vector<vector<double> >& parameters, const size_t p) {
+  fvar<fvar<double> > param(0);
+  if (p < parameters[0].size())
+    param = parameters[0][p];
+  return param;
+}
+template<>
+fvar<fvar<var> > get_params<fvar<fvar<var> > >(const vector<vector<double> >& parameters, const size_t p) {
+  fvar<fvar<var> > param(0);
+  if (p < parameters[0].size())
+    param = parameters[0][p];
+  return param;
+}
+template<>
 int get_params<int>(const vector<vector<double> >& parameters, const size_t p) {
   int param(0);
   if (p < parameters[0].size())
@@ -112,6 +142,38 @@ vector<double> get_params<vector<double> >(const vector<vector<double> >& parame
 template <>
 vector<var> get_params<vector<var> >(const vector<vector<double> >& parameters, const size_t p) {
   vector<var> param(parameters.size());
+  for (size_t n = 0; n < parameters.size(); n++)
+    if (p < parameters[0].size())
+      param[n] = parameters[n][p];
+  return param;
+}
+template <>
+vector<fvar<double> > get_params<vector<fvar<double> > >(const vector<vector<double> >& parameters, const size_t p) {
+  vector<fvar<double> > param(parameters.size());
+  for (size_t n = 0; n < parameters.size(); n++)
+    if (p < parameters[0].size())
+      param[n] = parameters[n][p];
+  return param;
+}
+template <>
+vector<fvar<var> > get_params<vector<fvar<var> > >(const vector<vector<double> >& parameters, const size_t p) {
+  vector<fvar<var> > param(parameters.size());
+  for (size_t n = 0; n < parameters.size(); n++)
+    if (p < parameters[0].size())
+      param[n] = parameters[n][p];
+  return param;
+}
+template <>
+vector<fvar<fvar<double> > > get_params<vector<fvar<fvar<double> > > >(const vector<vector<double> >& parameters, const size_t p) {
+  vector<fvar<fvar<double> > > param(parameters.size());
+  for (size_t n = 0; n < parameters.size(); n++)
+    if (p < parameters[0].size())
+      param[n] = parameters[n][p];
+  return param;
+}
+template <>
+vector<fvar<fvar<var> > > get_params<vector<fvar<fvar<var> > > >(const vector<vector<double> >& parameters, const size_t p) {
+  vector<fvar<fvar<var> > > param(parameters.size());
   for (size_t n = 0; n < parameters.size(); n++)
     if (p < parameters[0].size())
       param[n] = parameters[n][p];
@@ -152,6 +214,34 @@ var get_params<var>(const vector<vector<double> >& parameters, const size_t n, c
   return param;
 }
 template<>
+fvar<double> get_params<fvar<double> >(const vector<vector<double> >& parameters, const size_t n, const size_t p) {
+  fvar<double> param(0);
+  if (p < parameters[0].size())
+    param = parameters[n][p];
+  return param;
+}
+template<>
+fvar<var> get_params<fvar<var> >(const vector<vector<double> >& parameters, const size_t n, const size_t p) {
+  fvar<var> param(0);
+  if (p < parameters[0].size())
+    param = parameters[n][p];
+  return param;
+}
+template<>
+fvar<fvar<double> > get_params<fvar<fvar<double> > >(const vector<vector<double> >& parameters, const size_t n, const size_t p) {
+  fvar<fvar<double> > param(0);
+  if (p < parameters[0].size())
+    param = parameters[n][p];
+  return param;
+}
+template<>
+fvar<fvar<var> > get_params<fvar<fvar<var> > >(const vector<vector<double> >& parameters, const size_t n, const size_t p) {
+  fvar<fvar<var> > param(0);
+  if (p < parameters[0].size())
+    param = parameters[n][p];
+  return param;
+}
+template<>
 int get_params<int>(const vector<vector<double> >& parameters, const size_t n, const size_t p) {
   int param(0);
   if (p < parameters[0].size())
@@ -178,6 +268,38 @@ vector<double> get_params<vector<double> >(const vector<vector<double> >& parame
 template <>
 vector<var> get_params<vector<var> >(const vector<vector<double> >& parameters, const size_t /*n*/, const size_t p) {
   vector<var> param(parameters.size());
+  for (size_t i = 0; i < parameters.size(); i++)
+    if (p < parameters[0].size())
+      param[i] = parameters[i][p];
+  return param;
+}
+template <>
+vector<fvar<double> > get_params<vector<fvar<double> > >(const vector<vector<double> >& parameters, const size_t /*n*/, const size_t p) {
+  vector<fvar<double> > param(parameters.size());
+  for (size_t i = 0; i < parameters.size(); i++)
+    if (p < parameters[0].size())
+      param[i] = parameters[i][p];
+  return param;
+}
+template <>
+vector<fvar<var> > get_params<vector<fvar<var> > >(const vector<vector<double> >& parameters, const size_t /*n*/, const size_t p) {
+  vector<fvar<var> > param(parameters.size());
+  for (size_t i = 0; i < parameters.size(); i++)
+    if (p < parameters[0].size())
+      param[i] = parameters[i][p];
+  return param;
+}
+template <>
+vector<fvar<fvar<double> > > get_params<vector<fvar<fvar<double> > > >(const vector<vector<double> >& parameters, const size_t /*n*/, const size_t p) {
+  vector<fvar<fvar<double> > > param(parameters.size());
+  for (size_t i = 0; i < parameters.size(); i++)
+    if (p < parameters[0].size())
+      param[i] = parameters[i][p];
+  return param;
+}
+template <>
+vector<fvar<fvar<var> > > get_params<vector<fvar<fvar<var> > > >(const vector<vector<double> >& parameters, const size_t /*n*/, const size_t p) {
+  vector<fvar<fvar<var> > > param(parameters.size());
   for (size_t i = 0; i < parameters.size(); i++)
     if (p < parameters[0].size())
       param[i] = parameters[i][p];
@@ -220,6 +342,34 @@ var get_repeated_params<var>(const vector<double>& parameters, const size_t p, c
   return param;
 }
 template<>
+fvar<double> get_repeated_params<fvar<double> >(const vector<double>& parameters, const size_t p, const size_t /*N_REPEAT*/) {
+  fvar<double> param(0);
+  if (p < parameters.size())
+    param = parameters[p];
+  return param;
+}
+template<>
+fvar<var> get_repeated_params<fvar<var> >(const vector<double>& parameters, const size_t p, const size_t /*N_REPEAT*/) {
+  fvar<var> param(0);
+  if (p < parameters.size())
+    param = parameters[p];
+  return param;
+}
+template<>
+fvar<fvar<double> > get_repeated_params<fvar<fvar<double> > >(const vector<double>& parameters, const size_t p, const size_t /*N_REPEAT*/) {
+  fvar<fvar<double> > param(0);
+  if (p < parameters.size())
+    param = parameters[p];
+  return param;
+}
+template<>
+fvar<fvar<var> > get_repeated_params<fvar<fvar<var> > >(const vector<double>& parameters, const size_t p, const size_t /*N_REPEAT*/) {
+  fvar<fvar<var> > param(0);
+  if (p < parameters.size())
+    param = parameters[p];
+  return param;
+}
+template<>
 int get_repeated_params<int>(const vector<double>& parameters, const size_t p, const size_t /*N_REPEAT*/) {
   int param(0);
   if (p < parameters.size())
@@ -246,6 +396,39 @@ vector<double> get_repeated_params<vector<double> >(const vector<double>& parame
 template <>
 vector<var> get_repeated_params<vector<var> >(const vector<double>& parameters, const size_t p, const size_t N_REPEAT) {
   vector<var> param(N_REPEAT);
+  for (size_t n = 0; n < N_REPEAT; n++)
+    if (p < parameters.size())
+      param[n] = parameters[p];
+  return param;
+}
+
+template <>
+vector<fvar<double> > get_repeated_params<vector<fvar<double> > >(const vector<double>& parameters, const size_t p, const size_t N_REPEAT) {
+  vector<fvar<double> > param(N_REPEAT);
+  for (size_t n = 0; n < N_REPEAT; n++)
+    if (p < parameters.size())
+      param[n] = parameters[p];
+  return param;
+}
+template <>
+vector<fvar<var> > get_repeated_params<vector<fvar<var> > >(const vector<double>& parameters, const size_t p, const size_t N_REPEAT) {
+  vector<fvar<var> > param(N_REPEAT);
+  for (size_t n = 0; n < N_REPEAT; n++)
+    if (p < parameters.size())
+      param[n] = parameters[p];
+  return param;
+}
+template <>
+vector<fvar<fvar<double> > > get_repeated_params<vector<fvar<fvar<double> > > >(const vector<double>& parameters, const size_t p, const size_t N_REPEAT) {
+  vector<fvar<fvar<double> > > param(N_REPEAT);
+  for (size_t n = 0; n < N_REPEAT; n++)
+    if (p < parameters.size())
+      param[n] = parameters[p];
+  return param;
+}
+template <>
+vector<fvar<fvar<var> > > get_repeated_params<vector<fvar<fvar<var> > > >(const vector<double>& parameters, const size_t p, const size_t N_REPEAT) {
+  vector<fvar<fvar<var> > > param(N_REPEAT);
   for (size_t n = 0; n < N_REPEAT; n++)
     if (p < parameters.size())
       param[n] = parameters[p];
