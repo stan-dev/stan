@@ -37,18 +37,18 @@ namespace stan {
         }
       };
       template<typename T1, typename T2, typename T3>
-      struct incr_deriv <T1,T2,T3,true,false>{
-        inline T3 deriv(T1 d_x, const T2& x_d) {
-        T2 temp = 0;
-          for (size_t n = 0; n < length(x_d); n++)
-            temp += d_x[n] * x_d[n].d_;
-          return temp;
-        }
-      };
-      template<typename T1, typename T2, typename T3>
       struct incr_deriv <T1,T2,T3,false,false>{
         inline T3 incr(T1 d_x, const T2& x_d) {
           return d_x[1]*x_d.d_;
+        }
+      };
+      template<typename T1, typename T2, typename T3>
+      struct incr_deriv <T1,T2,T3,true,false>{
+        inline T3 incr(T1 d_x, const T2& x_d) {
+          T3 temp = 0;
+          for (size_t n = 0; n < length(x_d); n++)
+            temp += d_x[n] * x_d[n].d_;
+          return temp;
         }
       };
 
@@ -177,22 +177,31 @@ namespace stan {
 
       template<typename T, 
                bool is_vec = is_vector<T>::value, 
-               bool is_const = is_constant_struct<T>::value>
+               bool is_const = is_constant_struct<T>::value,
+               bool contain_fvar = contains_fvar<T>::value>
       struct set_varis {
         inline size_t set(agrad::vari** /*varis*/, const T& /*x*/) {
           return 0U;
         }
       };
       template<typename T>
-      struct set_varis <T,true,false>{
+      struct set_varis <T,true,false,false>{
         inline size_t set(agrad::vari** varis, const T& x) {
           for (size_t n = 0; n < length(x); n++)
             varis[n] = x[n].vi_;
           return length(x);
         }
       };
+      template<typename T>
+      struct set_varis <T,true,false,true>{
+        inline size_t set(agrad::vari** varis, const T& x) {
+          for (size_t n = 0; n < length(x); n++)
+            varis[n] = 0;
+          return length(x);
+        }
+      };
       template<>
-      struct set_varis<agrad::var, false, false> {
+      struct set_varis<agrad::var, false, false,false> {
         inline size_t set(agrad::vari** varis, const agrad::var& x) {
           varis[0] = x.vi_;
           return (1);

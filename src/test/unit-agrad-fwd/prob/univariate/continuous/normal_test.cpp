@@ -56,11 +56,12 @@ TEST(ProbAgradDistributionsNormal, derivatives) {
   fvar<double> lp = normal_log<false>(0,0,fvar<double>(1.0,1));
   EXPECT_FLOAT_EQ(grad[2], lp.tangent());
 
-  fvar<var> y (2,1);
-  fvar<var> mu (0,1);
-  fvar<var> sigma (1,1);
-
-  fvar<var> logp = normal_log(y,mu,sigma);
+  fvar<fvar<double> > y (1.0);
+  fvar<double> x (1.0,2.0);
+  EXPECT_NO_THROW(normal_log(y,1,1));
+  EXPECT_FLOAT_EQ(normal_log(x,1,1).val_,-0.918938533204672741780);
+  EXPECT_FLOAT_EQ(normal_log(x,2,1).d_,2);
+  
 
 }
 TEST(ProbAgradDistributionsNormal, FvarVar_1stDeriv) {
@@ -95,5 +96,4 @@ TEST(ProbAgradDistributionsNormal, FvarVar_2ndDeriv) {
   VEC g;
   logp.d_.grad(y,g);
   EXPECT_FLOAT_EQ(-1, g[0]);
-
 }
