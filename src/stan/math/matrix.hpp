@@ -14,6 +14,7 @@
 #include <stan/math/matrix/columns_dot_product.hpp>
 #include <stan/math/matrix/columns_dot_self.hpp>
 #include <stan/math/matrix/common_type.hpp>
+#include <stan/math/matrix/containers_conversion.hpp>
 #include <stan/math/matrix/crossprod.hpp>
 #include <stan/math/matrix/cumulative_sum.hpp>
 #include <stan/math/matrix/determinant.hpp>
@@ -86,7 +87,6 @@
 #include <stan/math/matrix/sum.hpp>
 #include <stan/math/matrix/tail.hpp>
 #include <stan/math/matrix/tcrossprod.hpp>
-#include <stan/math/matrix/to_vector.hpp>
 #include <stan/math/matrix/trace.hpp>
 #include <stan/math/matrix/trace_gen_inv_quad_form_ldlt.hpp>
 #include <stan/math/matrix/trace_gen_quad_form.hpp>

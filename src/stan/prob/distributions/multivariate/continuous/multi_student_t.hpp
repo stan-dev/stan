@@ -8,6 +8,9 @@
 
 #include <stan/math/matrix.hpp>
 #include <stan/math/error_handling.hpp>
+#include <stan/math/matrix/multiply.hpp>
+#include <stan/math/matrix/dot_product.hpp>
+#include <stan/math/matrix/subtract.hpp>
 #include <stan/math/matrix_error_handling.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>

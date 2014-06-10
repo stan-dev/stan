@@ -2,6 +2,7 @@
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <stan/math/matrix/log_determinant.hpp>
 #include <stan/agrad/fwd/matrix/log_determinant.hpp>
+#include <stan/math/matrix/log_determinant.hpp>
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/agrad/rev.hpp>
 #include <stan/agrad/rev/matrix/multiply.hpp>
