@@ -16,7 +16,7 @@ using std::pair;
 
 const int N_TESTS = 100;
 
-vector<string> lookup_argument(const string& argument) {
+vector<string> lookup_argument(const string& argument, const int& ind) {
   using boost::iequals;
   vector<string> args;
   if (iequals(argument, "int")) {
@@ -34,10 +34,36 @@ vector<string> lookup_argument(const string& argument) {
     args.push_back("std::vector<double>");
     args.push_back("Eigen::Matrix<double, Eigen::Dynamic, 1>");
     args.push_back("Eigen::Matrix<double, 1, Eigen::Dynamic>");
+    if (ind == 1) {
     args.push_back("var");
     args.push_back("std::vector<var>");
     args.push_back("Eigen::Matrix<var, Eigen::Dynamic, 1>");
     args.push_back("Eigen::Matrix<var, 1, Eigen::Dynamic>");
+    }
+    else if (ind == 2) {
+    args.push_back("fvar<double>");
+    args.push_back("std::vector<fvar<double> >");
+    args.push_back("Eigen::Matrix<fvar<double>, Eigen::Dynamic, 1>");
+    args.push_back("Eigen::Matrix<fvar<double>, 1, Eigen::Dynamic>");
+    }
+    else if (ind == 3) {
+    args.push_back("fvar<var>");
+    args.push_back("std::vector<fvar<var> >");
+    args.push_back("Eigen::Matrix<fvar<var>, Eigen::Dynamic, 1>");
+    args.push_back("Eigen::Matrix<fvar<var>, 1, Eigen::Dynamic>");
+    }
+    else if (ind == 4) {
+    args.push_back("fvar<fvar<double> >");
+    args.push_back("std::vector<fvar<fvar<double> > >");
+    args.push_back("Eigen::Matrix<fvar<fvar<double> >, Eigen::Dynamic, 1>");
+    args.push_back("Eigen::Matrix<fvar<fvar<double> >, 1, Eigen::Dynamic>");
+    }
+    else if (ind == 5) {
+    args.push_back("fvar<fvar<var> >");
+    args.push_back("std::vector<fvar<fvar<var> > >");
+    args.push_back("Eigen::Matrix<fvar<fvar<var> >, Eigen::Dynamic, 1>");
+    args.push_back("Eigen::Matrix<fvar<fvar<var> >, 1, Eigen::Dynamic>");
+    }
   }
   return args;
 }
@@ -148,11 +174,12 @@ pair<string, string> read_test_name_from_file(const string& in_name) {
   return name;
 }
 
-vector<vector<string> > build_argument_sequence(const string& arguments) {
+vector<vector<string> > build_argument_sequence(const string& arguments, 
+                                                const int& ind) {
   vector<string> argument_list = tokenize_arguments(arguments);
   vector<vector<string> > argument_sequence;
   for (size_t n = 0; n < argument_list.size(); n++)
-    argument_sequence.push_back(lookup_argument(argument_list[n]));
+    argument_sequence.push_back(lookup_argument(argument_list[n],ind));
   return argument_sequence;
 }
 
@@ -211,15 +238,7 @@ void write_test_cases(vector<std::ostream *>& outs, const string& in_name, const
   write_test(outs, test_name, fixture_name, size(argument_sequence));
 }
 
-/** 
- * Generate test cases.
- * 
- * @param argc Number of arguments
- * @param argv Arguments. Should contain one argument with a filename.
- * 
- * @return 0 for success, negative number otherwise.
- */
-int main(int argc, const char* argv[]) {
+int create_files(const int& argc, const char* argv[],const int& index) {
   if (argc != 2)
     return -1;
   string in_suffix = "_test.hpp";
@@ -230,14 +249,23 @@ int main(int argc, const char* argv[]) {
   string out_name_base = in_name.substr(0, last_in_suffix);
   
   string arguments = read_arguments_from_file(in_name);
-  vector<vector<string> > argument_sequence = build_argument_sequence(arguments);
+  vector<vector<string> > argument_sequence = build_argument_sequence(arguments,index);
   
   vector<std::ostream *> outs;
   for (int n = 0; n < int(size(argument_sequence) / N_TESTS) + 1; n++) {
     stringstream out_name;
     out_name << out_name_base;
     out_name << "_" << std::setw(5) << std::setfill('0') << n;
-    out_name << "_generated_test.cpp";
+    if (index == 1)
+      out_name << "_generated_test.cpp";
+    else if (index == 2)
+      out_name << "_fvar_double_generated_test.cpp";
+    else if (index == 3)
+      out_name << "_fvar_var_generated_test.cpp";
+    else if (index == 4)
+      out_name << "_fvar_fvar_double_generated_test.cpp";
+    else if (index == 5)
+      out_name << "_fvar_fvar_var_generated_test.cpp";
     std::string tmp(out_name.str());
     outs.push_back(new std::ofstream(tmp.c_str()));
   }
@@ -250,6 +278,24 @@ int main(int argc, const char* argv[]) {
     delete(outs[n]);
   }
   outs.clear();
+
+  return 0;
+}
+
+/** 
+ * Generate test cases.
+ * 
+ * @param argc Number of arguments
+ * @param argv Arguments. Should contain one argument with a filename.
+ * 
+ * @return 0 for success, negative number otherwise.
+ */
+int main(int argc, const char* argv[]) {
+  create_files(argc,argv,1);
+  create_files(argc,argv,2);
+  create_files(argc,argv,3);
+  create_files(argc,argv,4);
+  create_files(argc,argv,5);
   
   return 0;
 }
