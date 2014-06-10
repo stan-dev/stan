@@ -557,6 +557,29 @@ TEST(MetaTraits,isFvar) {
   EXPECT_TRUE(is_fvar<fvar<fvar<double> > >::value);
   EXPECT_FALSE(is_fvar<var>::value);
 }
+TEST(MetaTraits,isFvarVar) {
+  using stan::agrad::var;
+  using stan::agrad::fvar;
+  using stan::is_fvar_var;
+  
+  EXPECT_FALSE(is_fvar_var<double>::value);
+  EXPECT_FALSE(is_fvar_var<fvar<double> >::value);
+  EXPECT_TRUE(is_fvar_var<fvar<var> >::value);
+  EXPECT_FALSE(is_fvar_var<fvar<fvar<var> > >::value);
+  EXPECT_FALSE(is_fvar_var<var>::value);
+}
+TEST(MetaTraits,isFvarFvarVar) {
+  using stan::agrad::var;
+  using stan::agrad::fvar;
+  using stan::is_fvar_fvar_var;
+  
+  EXPECT_FALSE(is_fvar_fvar_var<double>::value);
+  EXPECT_FALSE(is_fvar_fvar_var<fvar<double> >::value);
+  EXPECT_FALSE(is_fvar_fvar_var<fvar<var> >::value);
+  EXPECT_TRUE(is_fvar_fvar_var<fvar<fvar<var> > >::value);
+  EXPECT_FALSE(is_fvar_fvar_var<fvar<fvar<double> > >::value);
+  EXPECT_FALSE(is_fvar_fvar_var<var>::value);
+}
 
 TEST(MetaTraits,containsFvar) {
   using stan::agrad::var;
