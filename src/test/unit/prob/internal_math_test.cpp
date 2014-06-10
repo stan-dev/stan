@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <stan/prob/internal_math.hpp>
+#include <stan/agrad/fwd/fvar.hpp>
 
 TEST(ProbInternalMath, gradRegIncGamma_typical) {
   double a = 0.5;
@@ -18,4 +19,14 @@ TEST(ProbInternalMath, gradRegIncGamma_infLoopInVersion2_0_1) {
   
   EXPECT_THROW(stan::math::gradRegIncGamma(a, b, g, dig),
                std::domain_error);
+}
+TEST(ProbInternalMath, gradRegIncGamma_fvar) {
+  using stan::agrad::fvar;
+
+  fvar<double> a = 0.5;
+  fvar<double> b = 1.0;
+  fvar<double> g = 1.77245;
+  fvar<double> dig = -1.96351;
+  
+  EXPECT_FLOAT_EQ(0.38984156, stan::math::gradRegIncGamma(a, b, g, dig).val());
 }
