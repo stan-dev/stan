@@ -25,6 +25,7 @@ namespace stan {
               typename T_n, typename T_rate>
     typename return_type<T_rate>::type
     poisson_log(const T_n& n, const T_rate& lambda) {
+      typedef typename stan::partials_return_type<T_n,T_rate>::type T_partials_return;
 
       static const char* function = "stan::prob::poisson_log(%1%)";
       
@@ -41,7 +42,7 @@ namespace stan {
         return 0.0;
 
       // set up return value accumulator
-      double logp(0.0);
+      T_partials_return logp(0.0);
 
       // validate args
       if (!check_nonnegative(function, n, "Random variable", &logp))
@@ -111,6 +112,7 @@ namespace stan {
               typename T_n, typename T_log_rate>
     typename return_type<T_log_rate>::type
     poisson_log_log(const T_n& n, const T_log_rate& alpha) {
+      typedef typename stan::partials_return_type<T_n,T_log_rate>::type T_partials_return;
 
       static const char* function = "stan::prob::poisson_log_log(%1%)";
       
@@ -128,7 +130,7 @@ namespace stan {
         return 0.0;
 
       // set up return value accumulator
-      double logp(0.0);
+      T_partials_return logp(0.0);
 
       // validate args
       if (!check_nonnegative(function, n, "Random variable", &logp))
@@ -164,8 +166,9 @@ namespace stan {
       agrad::OperandsAndPartials<T_log_rate> operands_and_partials(alpha);
 
       // FIXME: cache value_of for alpha_vec?  faster if only one?
-      DoubleVectorView<include_summand<propto,T_log_rate>::value,
-        is_vector<T_log_rate>::value>
+      DoubleVectorView<T_partials_return,
+                       include_summand<propto,T_log_rate>::value,
+                       is_vector<T_log_rate>::value>
         exp_alpha(length(alpha));
       for (size_t i = 0; i < length(alpha); i++)
         if (include_summand<propto,T_log_rate>::value)
@@ -200,7 +203,8 @@ namespace stan {
     typename return_type<T_rate>::type
     poisson_cdf(const T_n& n, const T_rate& lambda) {
       static const char* function = "stan::prob::poisson_cdf(%1%)";
-          
+      typedef typename stan::partials_return_type<T_n,T_rate>::type T_partials_return;
+
       using stan::math::check_not_nan;
       using stan::math::check_nonnegative;
       using stan::math::value_of;
@@ -210,7 +214,7 @@ namespace stan {
       if (!(stan::length(n) && stan::length(lambda))) 
         return 1.0;
           
-      double P(1.0);
+      T_partials_return P(1.0);
           
       // Validate arguments
       if (!check_not_nan(function, lambda, "Rate parameter", &P))
@@ -247,9 +251,9 @@ namespace stan {
         if (value_of(n_vec[i]) == std::numeric_limits<double>::infinity())
           continue;
           
-        const double n_dbl = value_of(n_vec[i]);
-        const double lambda_dbl = value_of(lambda_vec[i]);
-        const double Pi = gamma_q(n_dbl+1, lambda_dbl);
+        const T_partials_return n_dbl = value_of(n_vec[i]);
+        const T_partials_return lambda_dbl = value_of(lambda_vec[i]);
+        const T_partials_return Pi = gamma_q(n_dbl+1, lambda_dbl);
 
         P *= Pi;
   
@@ -269,7 +273,8 @@ namespace stan {
     typename return_type<T_rate>::type
     poisson_cdf_log(const T_n& n, const T_rate& lambda) {
       static const char* function = "stan::prob::poisson_cdf_log(%1%)";
-          
+      typedef typename stan::partials_return_type<T_n,T_rate>::type T_partials_return;
+
       using stan::math::check_not_nan;
       using stan::math::check_nonnegative;
       using stan::math::value_of;
@@ -279,7 +284,7 @@ namespace stan {
       if (!(stan::length(n) && stan::length(lambda))) 
         return 0.0;
           
-      double P(0.0);
+      T_partials_return P(0.0);
           
       // Validate arguments
       if (!check_not_nan(function, lambda, "Rate parameter", &P))
@@ -316,9 +321,9 @@ namespace stan {
         if (value_of(n_vec[i]) == std::numeric_limits<double>::infinity())
           continue;
           
-        const double n_dbl = value_of(n_vec[i]);
-        const double lambda_dbl = value_of(lambda_vec[i]);
-        const double Pi = gamma_q(n_dbl+1, lambda_dbl);
+        const T_partials_return n_dbl = value_of(n_vec[i]);
+        const T_partials_return lambda_dbl = value_of(lambda_vec[i]);
+        const T_partials_return Pi = gamma_q(n_dbl+1, lambda_dbl);
 
         P += log(Pi);
   
@@ -334,7 +339,8 @@ namespace stan {
     typename return_type<T_rate>::type
     poisson_ccdf_log(const T_n& n, const T_rate& lambda) {
       static const char* function = "stan::prob::poisson_ccdf_log(%1%)";
-          
+      typedef typename stan::partials_return_type<T_n,T_rate>::type T_partials_return;
+
       using stan::math::check_not_nan;
       using stan::math::check_nonnegative;
       using stan::math::value_of;
@@ -344,7 +350,7 @@ namespace stan {
       if (!(stan::length(n) && stan::length(lambda))) 
         return 0.0;
           
-      double P(0.0);
+      T_partials_return P(0.0);
           
       // Validate arguments
       if (!check_not_nan(function, lambda, "Rate parameter", &P))
@@ -381,9 +387,9 @@ namespace stan {
         if (value_of(n_vec[i]) == std::numeric_limits<double>::infinity())
           return operands_and_partials.to_var(stan::math::negative_infinity());
           
-        const double n_dbl = value_of(n_vec[i]);
-        const double lambda_dbl = value_of(lambda_vec[i]);
-        const double Pi = 1.0 - gamma_q(n_dbl+1, lambda_dbl);
+        const T_partials_return n_dbl = value_of(n_vec[i]);
+        const T_partials_return lambda_dbl = value_of(lambda_vec[i]);
+        const T_partials_return Pi = 1.0 - gamma_q(n_dbl+1, lambda_dbl);
 
         P += log(Pi);
   

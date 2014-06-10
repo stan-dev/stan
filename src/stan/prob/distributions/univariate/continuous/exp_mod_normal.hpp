@@ -26,6 +26,7 @@ namespace stan {
     exp_mod_normal_log(const T_y& y, const T_loc& mu, const T_scale& sigma, 
                        const T_inv_scale& lambda) {
       static const char* function = "stan::prob::exp_mod_normal_log(%1%)";
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale,T_inv_scale>::type T_partials_return;
 
       using stan::is_constant_struct;
       using stan::math::check_positive;
@@ -43,7 +44,7 @@ namespace stan {
         return 0.0;
 
       // set up return value accumulator
-      double logp(0.0);
+      T_partials_return logp(0.0);
 
       // validate args (here done over var, which should be OK)
       if (!check_not_nan(function, y, "Random variable", &logp))
@@ -83,12 +84,12 @@ namespace stan {
 
       for (size_t n = 0; n < N; n++) {
         //pull out values of arguments
-        const double y_dbl = value_of(y_vec[n]);
-        const double mu_dbl = value_of(mu_vec[n]);
-        const double sigma_dbl = value_of(sigma_vec[n]);
-        const double lambda_dbl = value_of(lambda_vec[n]);
+        const T_partials_return y_dbl = value_of(y_vec[n]);
+        const T_partials_return mu_dbl = value_of(mu_vec[n]);
+        const T_partials_return sigma_dbl = value_of(sigma_vec[n]);
+        const T_partials_return lambda_dbl = value_of(lambda_vec[n]);
 
-        const double pi_dbl = boost::math::constants::pi<double>();
+        const T_partials_return pi_dbl = boost::math::constants::pi<double>();
 
         // log probability
         if (include_summand<propto>::value)
@@ -103,7 +104,7 @@ namespace stan {
                                     / (std::sqrt(2.0) * sigma_dbl)));
 
         // gradients
-        const double deriv_logerfc 
+        const T_partials_return deriv_logerfc 
           = -2.0 / std::sqrt(pi_dbl) 
           * exp(-(mu_dbl + lambda_dbl * sigma_dbl * sigma_dbl - y_dbl) 
                 / (std::sqrt(2.0) * sigma_dbl) 
@@ -151,6 +152,7 @@ namespace stan {
     exp_mod_normal_cdf(const T_y& y, const T_loc& mu, const T_scale& sigma, 
                        const T_inv_scale& lambda) {
       static const char* function = "stan::prob::exp_mod_normal_cdf(%1%)";
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale,T_inv_scale>::type T_partials_return;
 
       using stan::math::check_positive;
       using stan::math::check_finite;
@@ -158,7 +160,7 @@ namespace stan {
       using stan::math::check_consistent_sizes;
       using stan::math::value_of;
 
-      double cdf(1.0);
+      T_partials_return cdf(1.0);
       //check if any vectors are zero length
       if (!(stan::length(y) 
             && stan::length(mu) 
@@ -207,25 +209,25 @@ namespace stan {
             return operands_and_partials.to_var(0.0);
         }
 
-        const double y_dbl = value_of(y_vec[n]);
-        const double mu_dbl = value_of(mu_vec[n]);
-        const double sigma_dbl = value_of(sigma_vec[n]);
-        const double lambda_dbl = value_of(lambda_vec[n]);
-        const double u = lambda_dbl * (y_dbl - mu_dbl);
-        const double v = lambda_dbl * sigma_dbl ;
-        const double v_sq = v * v;
-        const double scaled_diff = (y_dbl - mu_dbl) / (SQRT_2 * sigma_dbl);
-        const double scaled_diff_sq = scaled_diff * scaled_diff;
-        const double erf_calc = 0.5 * (1 + erf(-v / SQRT_2 + scaled_diff));
-        const double deriv_1 = lambda_dbl * exp(0.5 * v_sq - u) * erf_calc;
-        const double deriv_2 = SQRT_2 / sqrt_pi * 0.5 * exp(0.5 * v_sq 
+        const T_partials_return y_dbl = value_of(y_vec[n]);
+        const T_partials_return mu_dbl = value_of(mu_vec[n]);
+        const T_partials_return sigma_dbl = value_of(sigma_vec[n]);
+        const T_partials_return lambda_dbl = value_of(lambda_vec[n]);
+        const T_partials_return u = lambda_dbl * (y_dbl - mu_dbl);
+        const T_partials_return v = lambda_dbl * sigma_dbl ;
+        const T_partials_return v_sq = v * v;
+        const T_partials_return scaled_diff = (y_dbl - mu_dbl) / (SQRT_2 * sigma_dbl);
+        const T_partials_return scaled_diff_sq = scaled_diff * scaled_diff;
+        const T_partials_return erf_calc = 0.5 * (1 + erf(-v / SQRT_2 + scaled_diff));
+        const T_partials_return deriv_1 = lambda_dbl * exp(0.5 * v_sq - u) * erf_calc;
+        const T_partials_return deriv_2 = SQRT_2 / sqrt_pi * 0.5 * exp(0.5 * v_sq 
                                                             - (scaled_diff 
                                 - (v / SQRT_2)) * (scaled_diff 
                                 - (v / SQRT_2)) - u) / sigma_dbl;
-        const double deriv_3 = SQRT_2 / sqrt_pi * 0.5 * exp(-scaled_diff_sq) 
+        const T_partials_return deriv_3 = SQRT_2 / sqrt_pi * 0.5 * exp(-scaled_diff_sq) 
           / sigma_dbl;
 
-        const double cdf_ = 0.5 * (1 + erf(u / (v * SQRT_2))) 
+        const T_partials_return cdf_ = 0.5 * (1 + erf(u / (v * SQRT_2))) 
           - exp(-u + v_sq * 0.5) * (erf_calc);
 
           cdf *= cdf_;
@@ -274,6 +276,7 @@ namespace stan {
     exp_mod_normal_cdf_log(const T_y& y, const T_loc& mu, const T_scale& sigma, 
                        const T_inv_scale& lambda) {
       static const char* function = "stan::prob::exp_mod_normal_cdf_log(%1%)";
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale,T_inv_scale>::type T_partials_return;
 
       using stan::math::check_positive;
       using stan::math::check_finite;
@@ -281,7 +284,7 @@ namespace stan {
       using stan::math::check_consistent_sizes;
       using stan::math::value_of;
 
-      double cdf_log(0.0);
+      T_partials_return cdf_log(0.0);
       //check if any vectors are zero length
       if (!(stan::length(y) 
             && stan::length(mu) 
@@ -333,26 +336,26 @@ namespace stan {
             return operands_and_partials.to_var(0.0);
         }
 
-        const double y_dbl = value_of(y_vec[n]);
-        const double mu_dbl = value_of(mu_vec[n]);
-        const double sigma_dbl = value_of(sigma_vec[n]);
-        const double lambda_dbl = value_of(lambda_vec[n]);
-        const double u = lambda_dbl * (y_dbl - mu_dbl);
-        const double v = lambda_dbl * sigma_dbl ;
-        const double v_sq = v * v;
-        const double scaled_diff = (y_dbl - mu_dbl) / (SQRT_2 * sigma_dbl);
-        const double scaled_diff_sq = scaled_diff * scaled_diff;
-        const double erf_calc1 = 0.5 * (1 + erf(u / (v * SQRT_2)));
-        const double erf_calc2 = 0.5 * (1 + erf(u / (v * SQRT_2) - v / SQRT_2));
-        const double deriv_1 = lambda_dbl * exp(0.5 * v_sq - u) * erf_calc2;
-        const double deriv_2 = SQRT_2 / sqrt_pi * 0.5 
+        const T_partials_return y_dbl = value_of(y_vec[n]);
+        const T_partials_return mu_dbl = value_of(mu_vec[n]);
+        const T_partials_return sigma_dbl = value_of(sigma_vec[n]);
+        const T_partials_return lambda_dbl = value_of(lambda_vec[n]);
+        const T_partials_return u = lambda_dbl * (y_dbl - mu_dbl);
+        const T_partials_return v = lambda_dbl * sigma_dbl ;
+        const T_partials_return v_sq = v * v;
+        const T_partials_return scaled_diff = (y_dbl - mu_dbl) / (SQRT_2 * sigma_dbl);
+        const T_partials_return scaled_diff_sq = scaled_diff * scaled_diff;
+        const T_partials_return erf_calc1 = 0.5 * (1 + erf(u / (v * SQRT_2)));
+        const T_partials_return erf_calc2 = 0.5 * (1 + erf(u / (v * SQRT_2) - v / SQRT_2));
+        const T_partials_return deriv_1 = lambda_dbl * exp(0.5 * v_sq - u) * erf_calc2;
+        const T_partials_return deriv_2 = SQRT_2 / sqrt_pi * 0.5 
           * exp(0.5 * v_sq - (-scaled_diff + (v / SQRT_2)) 
                 * (-scaled_diff + (v / SQRT_2)) - u) / sigma_dbl;
-        const double deriv_3 = SQRT_2 / sqrt_pi * 0.5 * exp(-scaled_diff_sq) 
+        const T_partials_return deriv_3 = SQRT_2 / sqrt_pi * 0.5 * exp(-scaled_diff_sq) 
           / sigma_dbl;
 
-        const double denom = erf_calc1 - erf_calc2 * exp(0.5 * v_sq - u);
-        const double cdf_ = erf_calc1 - exp(-u + v_sq * 0.5) * (erf_calc2);
+        const T_partials_return denom = erf_calc1 - erf_calc2 * exp(0.5 * v_sq - u);
+        const T_partials_return cdf_ = erf_calc1 - exp(-u + v_sq * 0.5) * (erf_calc2);
 
         cdf_log += log(cdf_);
 
@@ -389,6 +392,7 @@ namespace stan {
     exp_mod_normal_ccdf_log(const T_y& y, const T_loc& mu, const T_scale& sigma, 
                        const T_inv_scale& lambda) {
       static const char* function = "stan::prob::exp_mod_normal_ccdf_log(%1%)";
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale,T_inv_scale>::type T_partials_return;
 
       using stan::math::check_positive;
       using stan::math::check_finite;
@@ -396,7 +400,7 @@ namespace stan {
       using stan::math::check_consistent_sizes;
       using stan::math::value_of;
 
-      double ccdf_log(0.0);
+      T_partials_return ccdf_log(0.0);
       //check if any vectors are zero length
       if (!(stan::length(y) 
             && stan::length(mu) 
@@ -448,27 +452,27 @@ namespace stan {
             return operands_and_partials.to_var(0.0);
         }
 
-        const double y_dbl = value_of(y_vec[n]);
-        const double mu_dbl = value_of(mu_vec[n]);
-        const double sigma_dbl = value_of(sigma_vec[n]);
-        const double lambda_dbl = value_of(lambda_vec[n]);
-        const double u = lambda_dbl * (y_dbl - mu_dbl);
-        const double v = lambda_dbl * sigma_dbl ;
-        const double v_sq = v * v;
-        const double scaled_diff = (y_dbl - mu_dbl) / (SQRT_2 * sigma_dbl);
-        const double scaled_diff_sq = scaled_diff * scaled_diff;
-        const double erf_calc1 = 0.5 * (1 + erf(u / (v * SQRT_2)));
-        const double erf_calc2 = 0.5 * (1 + erf(u / (v * SQRT_2) - v / SQRT_2));
+        const T_partials_return y_dbl = value_of(y_vec[n]);
+        const T_partials_return mu_dbl = value_of(mu_vec[n]);
+        const T_partials_return sigma_dbl = value_of(sigma_vec[n]);
+        const T_partials_return lambda_dbl = value_of(lambda_vec[n]);
+        const T_partials_return u = lambda_dbl * (y_dbl - mu_dbl);
+        const T_partials_return v = lambda_dbl * sigma_dbl ;
+        const T_partials_return v_sq = v * v;
+        const T_partials_return scaled_diff = (y_dbl - mu_dbl) / (SQRT_2 * sigma_dbl);
+        const T_partials_return scaled_diff_sq = scaled_diff * scaled_diff;
+        const T_partials_return erf_calc1 = 0.5 * (1 + erf(u / (v * SQRT_2)));
+        const T_partials_return erf_calc2 = 0.5 * (1 + erf(u / (v * SQRT_2) - v / SQRT_2));
 
-        const double deriv_1 = lambda_dbl * exp(0.5 * v_sq - u) * erf_calc2;
-        const double deriv_2 = SQRT_2 / sqrt_pi * 0.5 
+        const T_partials_return deriv_1 = lambda_dbl * exp(0.5 * v_sq - u) * erf_calc2;
+        const T_partials_return deriv_2 = SQRT_2 / sqrt_pi * 0.5 
           * exp(0.5 * v_sq 
                 - (-scaled_diff + (v / SQRT_2)) * (-scaled_diff  
                                                    + (v / SQRT_2)) - u) 
           / sigma_dbl;
-        const double deriv_3 = SQRT_2 / sqrt_pi * 0.5 * exp(-scaled_diff_sq) / sigma_dbl;
+        const T_partials_return deriv_3 = SQRT_2 / sqrt_pi * 0.5 * exp(-scaled_diff_sq) / sigma_dbl;
 
-        const double ccdf_ = 1.0 - erf_calc1 + exp(-u + v_sq * 0.5) * (erf_calc2);
+        const T_partials_return ccdf_ = 1.0 - erf_calc1 + exp(-u + v_sq * 0.5) * (erf_calc2);
 
         ccdf_log += log(ccdf_);
 

@@ -25,7 +25,8 @@ namespace stan {
                            const T_loc& mu, const T_scale& sigma) {
       static const char* function
         = "stan::prob::double_exponential_log(%1%)";
-      
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type T_partials_return;
+
       using stan::is_constant_struct;
       using stan::math::check_finite;
       using stan::math::check_positive;
@@ -43,7 +44,7 @@ namespace stan {
         return 0.0;
 
       // set up return value accumulator
-      double logp(0.0);
+      T_partials_return logp(0.0);
       if(!check_finite(function, y, "Random variable", &logp))
         return logp;
       if(!check_finite(function, mu, "Location parameter", 
@@ -70,16 +71,23 @@ namespace stan {
       VectorView<const T_loc> mu_vec(mu);
       VectorView<const T_scale> sigma_vec(sigma);
       size_t N = max_size(y, mu, sigma);
-      agrad::OperandsAndPartials<T_y,T_loc,T_scale> operands_and_partials(y, mu, sigma);
+      agrad::OperandsAndPartials<T_y,T_loc,T_scale> 
+        operands_and_partials(y, mu, sigma);
 
-      DoubleVectorView<include_summand<propto,T_y,T_loc,T_scale>::value,is_vector<T_scale>::value> 
+      DoubleVectorView<T_partials_return,
+                       include_summand<propto,T_y,T_loc,T_scale>::value,
+                       is_vector<T_scale>::value> 
         inv_sigma(length(sigma));
-      DoubleVectorView<!is_constant_struct<T_scale>::value,is_vector<T_scale>::value> 
+      DoubleVectorView<T_partials_return,
+                       !is_constant_struct<T_scale>::value,
+                       is_vector<T_scale>::value> 
         inv_sigma_squared(length(sigma));
-      DoubleVectorView<include_summand<propto,T_scale>::value,is_vector<T_scale>::value> 
+      DoubleVectorView<T_partials_return,
+                       include_summand<propto,T_scale>::value,
+                       is_vector<T_scale>::value> 
         log_sigma(length(sigma));
       for (size_t i = 0; i < length(sigma); i++) {
-        const double sigma_dbl = value_of(sigma_vec[i]);
+        const T_partials_return sigma_dbl = value_of(sigma_vec[i]);
         if (include_summand<propto,T_y,T_loc,T_scale>::value)
           inv_sigma[i] = 1.0 / sigma_dbl;
         if (include_summand<propto,T_scale>::value) 
@@ -90,12 +98,12 @@ namespace stan {
 
 
       for (size_t n = 0; n < N; n++) {
-        const double y_dbl = value_of(y_vec[n]);
-        const double mu_dbl = value_of(mu_vec[n]);
+        const T_partials_return y_dbl = value_of(y_vec[n]);
+        const T_partials_return mu_dbl = value_of(mu_vec[n]);
   
         // reusable subexpressions values
-        const double y_m_mu = y_dbl - mu_dbl;
-        const double fabs_y_m_mu = fabs(y_m_mu);
+        const T_partials_return y_m_mu = y_dbl - mu_dbl;
+        const T_partials_return fabs_y_m_mu = fabs(y_m_mu);
 
         // log probability
         if (include_summand<propto>::value)
@@ -106,7 +114,7 @@ namespace stan {
           logp -= fabs_y_m_mu * inv_sigma[n];
   
         // gradients
-        double sign_y_m_mu_times_inv_sigma(0);
+        T_partials_return sign_y_m_mu_times_inv_sigma(0);
         if (!is_constant_struct<T_y>::value || !is_constant_struct<T_loc>::value)
           sign_y_m_mu_times_inv_sigma = sign(y_m_mu) * inv_sigma[n];
         if (!is_constant_struct<T_y>::value) {
@@ -149,7 +157,8 @@ namespace stan {
                            const T_loc& mu, const T_scale& sigma) {
       static const char* function
         = "stan::prob::double_exponential_cdf(%1%)";
-      
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type T_partials_return;
+
       // Size checks
       if ( !( stan::length(y) && stan::length(mu) 
               && stan::length(sigma) ) ) 
@@ -161,7 +170,7 @@ namespace stan {
       using stan::math::check_not_nan;
       using boost::math::tools::promote_args;
 
-      double cdf(1.0);
+      T_partials_return cdf(1.0);
       if(!check_not_nan(function, y, "Random variable", &cdf))
         return cdf;
       if(!check_finite(function, mu, "Location parameter", &cdf))
@@ -181,11 +190,11 @@ namespace stan {
 
       //cdf
       for (size_t n = 0; n < N; n++) {
-        const double y_dbl = value_of(y_vec[n]);
-        const double mu_dbl = value_of(mu_vec[n]);
-        const double sigma_dbl = value_of(sigma_vec[n]);
-        const double scaled_diff = (y_dbl - mu_dbl) / (sigma_dbl);
-        const double exp_scaled_diff = exp(scaled_diff);
+        const T_partials_return y_dbl = value_of(y_vec[n]);
+        const T_partials_return mu_dbl = value_of(mu_vec[n]);
+        const T_partials_return sigma_dbl = value_of(sigma_vec[n]);
+        const T_partials_return scaled_diff = (y_dbl - mu_dbl) / (sigma_dbl);
+        const T_partials_return exp_scaled_diff = exp(scaled_diff);
 
         if(y_dbl < mu_dbl) {
           cdf *= exp_scaled_diff * 0.5;
@@ -196,12 +205,12 @@ namespace stan {
 
       //gradients
       for (size_t n = 0; n < N; n++) {
-        const double y_dbl = value_of(y_vec[n]);
-        const double mu_dbl = value_of(mu_vec[n]);
-        const double sigma_dbl = value_of(sigma_vec[n]);
-        const double scaled_diff = (y_dbl - mu_dbl) / sigma_dbl;
-        const double exp_scaled_diff = exp(scaled_diff);
-        const double inv_sigma = 1.0 / sigma_dbl;
+        const T_partials_return y_dbl = value_of(y_vec[n]);
+        const T_partials_return mu_dbl = value_of(mu_vec[n]);
+        const T_partials_return sigma_dbl = value_of(sigma_vec[n]);
+        const T_partials_return scaled_diff = (y_dbl - mu_dbl) / sigma_dbl;
+        const T_partials_return exp_scaled_diff = exp(scaled_diff);
+        const T_partials_return inv_sigma = 1.0 / sigma_dbl;
         
         if(y_dbl < mu_dbl) {
           if (!is_constant_struct<T_y>::value)
@@ -212,8 +221,8 @@ namespace stan {
             operands_and_partials.d_x3[n] -= scaled_diff * inv_sigma  * cdf;
         }
         else {
-          const double rep_deriv = cdf * inv_sigma / (2.0 * exp_scaled_diff
-                                                      - 1.0);
+          const T_partials_return rep_deriv = cdf * inv_sigma 
+            / (2.0 * exp_scaled_diff - 1.0);
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] += rep_deriv;
         if (!is_constant_struct<T_loc>::value)
@@ -231,14 +240,15 @@ namespace stan {
                                const T_scale& sigma) {
       static const char* function
         = "stan::prob::double_exponential_cdf_log(%1%)";
-      
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type T_partials_return;
+
       using stan::math::check_finite;
       using stan::math::check_not_nan;
       using stan::math::check_positive;
       using stan::math::check_consistent_sizes;
       using stan::math::value_of;
 
-      double cdf_log(0.0);
+      T_partials_return cdf_log(0.0);
 
       // check if any vectors are zero length
       if (!(stan::length(y) 
@@ -272,11 +282,11 @@ namespace stan {
       size_t N = max_size(y, mu, sigma);
 
       for (size_t n = 0; n < N; n++) {
-        const double y_dbl = value_of(y_vec[n]);
-        const double mu_dbl = value_of(mu_vec[n]);
-        const double sigma_dbl = value_of(sigma_vec[n]);
-        const double scaled_diff = (y_dbl - mu_dbl) / sigma_dbl;
-        const double inv_sigma = 1.0 / sigma_dbl;
+        const T_partials_return y_dbl = value_of(y_vec[n]);
+        const T_partials_return mu_dbl = value_of(mu_vec[n]);
+        const T_partials_return sigma_dbl = value_of(sigma_vec[n]);
+        const T_partials_return scaled_diff = (y_dbl - mu_dbl) / sigma_dbl;
+        const T_partials_return inv_sigma = 1.0 / sigma_dbl;
         if(y_dbl < mu_dbl) {
           // log cdf
           cdf_log += log_half + scaled_diff;
@@ -294,7 +304,8 @@ namespace stan {
           cdf_log += log(1.0 - 0.5 * exp(-scaled_diff));
 
           //gradients
-          const double rep_deriv = 1.0 / (2.0 * exp(scaled_diff) - 1.0);
+          const T_partials_return rep_deriv = 1.0 
+            / (2.0 * exp(scaled_diff) - 1.0);
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] += rep_deriv * inv_sigma;
         if (!is_constant_struct<T_loc>::value)
@@ -313,14 +324,15 @@ namespace stan {
                                const T_scale& sigma) {
       static const char* function
         = "stan::prob::double_exponential_ccdf_log(%1%)";
-      
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type T_partials_return;
+
       using stan::math::check_finite;
       using stan::math::check_not_nan;
       using stan::math::check_positive;
       using stan::math::check_consistent_sizes;
       using stan::math::value_of;
 
-      double ccdf_log(0.0);
+      T_partials_return ccdf_log(0.0);
 
       // check if any vectors are zero length
       if (!(stan::length(y) 
@@ -354,17 +366,18 @@ namespace stan {
       size_t N = max_size(y, mu, sigma);
 
       for (size_t n = 0; n < N; n++) {
-        const double y_dbl = value_of(y_vec[n]);
-        const double mu_dbl = value_of(mu_vec[n]);
-        const double sigma_dbl = value_of(sigma_vec[n]);
-        const double scaled_diff = (y_dbl - mu_dbl) / sigma_dbl;
-        const double inv_sigma = 1.0 / sigma_dbl;
+        const T_partials_return y_dbl = value_of(y_vec[n]);
+        const T_partials_return mu_dbl = value_of(mu_vec[n]);
+        const T_partials_return sigma_dbl = value_of(sigma_vec[n]);
+        const T_partials_return scaled_diff = (y_dbl - mu_dbl) / sigma_dbl;
+        const T_partials_return inv_sigma = 1.0 / sigma_dbl;
         if(y_dbl < mu_dbl) {
           //log ccdf
           ccdf_log += log(1.0 - 0.5 * exp(scaled_diff));
 
           //gradients
-          const double rep_deriv = 1.0 / (2.0 * exp(-scaled_diff) - 1.0);
+          const T_partials_return rep_deriv = 1.0 
+            / (2.0 * exp(-scaled_diff) - 1.0);
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] -= rep_deriv * inv_sigma;
         if (!is_constant_struct<T_loc>::value)

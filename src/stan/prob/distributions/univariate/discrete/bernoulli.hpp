@@ -25,6 +25,7 @@ namespace stan {
     bernoulli_log(const T_n& n,
                   const T_prob& theta) {
       static const char* function = "stan::prob::bernoulli_log(%1%)";
+      typedef typename stan::partials_return_type<T_n,T_prob>::type T_partials_return;
 
       using stan::math::check_finite;
       using stan::math::check_bounded;
@@ -39,7 +40,7 @@ namespace stan {
         return 0.0;
       
       // set up return value accumulator
-      double logp(0.0);
+      T_partials_return logp(0.0);
 
       // validate args (here done over var, which should be OK)
       if (!check_bounded(function, n, 0, 1, "n", &logp))
@@ -70,7 +71,7 @@ namespace stan {
         for (size_t n = 0; n < N; n++) {
           sum += value_of(n_vec[n]);
         }
-        const double theta_dbl = value_of(theta_vec[0]);
+        const T_partials_return theta_dbl = value_of(theta_vec[0]);
         // avoid nans when sum == N or sum == 0
         if (sum == N) {
           logp += N * log(theta_dbl);
@@ -81,8 +82,8 @@ namespace stan {
           if (!is_constant_struct<T_prob>::value)
             operands_and_partials.d_x1[0] += N / (theta_dbl - 1);
         } else {
-          const double log_theta = log(theta_dbl);
-          const double log1m_theta = log1m(theta_dbl);
+          const T_partials_return log_theta = log(theta_dbl);
+          const T_partials_return log1m_theta = log1m(theta_dbl);
 
           logp += sum * log_theta;
           logp += (N - sum) * log1m_theta;
@@ -97,7 +98,7 @@ namespace stan {
         for (size_t n = 0; n < N; n++) {
           // pull out values of arguments
           const int n_int = value_of(n_vec[n]);
-          const double theta_dbl = value_of(theta_vec[n]);
+          const T_partials_return theta_dbl = value_of(theta_vec[n]);
     
           if (n_int == 1)
             logp += log(theta_dbl);
@@ -147,7 +148,7 @@ namespace stan {
         return 0.0;
 
       // set up return value accumulator
-      double logp(0.0);
+      T_partials_return logp(0.0);
       
       // validate args (here done over var, which should be OK)
       if (!check_bounded(function, n, 0, 1, "n", &logp))
@@ -174,12 +175,12 @@ namespace stan {
       for (size_t n = 0; n < N; n++) {
         // pull out values of arguments
         const int n_int = value_of(n_vec[n]);
-        const double theta_dbl = value_of(theta_vec[n]);
+        const T_partials_return theta_dbl = value_of(theta_vec[n]);
 
         // reusable subexpression values
         const int sign = 2*n_int-1;
-        const double ntheta = sign * theta_dbl;
-        const double exp_m_ntheta = exp(-ntheta);
+        const T_partials_return ntheta = sign * theta_dbl;
+        const T_partials_return exp_m_ntheta = exp(-ntheta);
   
         // Handle extreme values gracefully using Taylor approximations.
         const static double cutoff = 20.0;
@@ -218,7 +219,8 @@ namespace stan {
     typename return_type<T_prob>::type
     bernoulli_cdf(const T_n& n, const T_prob& theta) {
       static const char* function = "stan::prob::bernoulli_cdf(%1%)";
-      
+      typedef typename stan::partials_return_type<T_n,T_prob>::type T_partials_return;
+
       using stan::math::check_finite;
       using stan::math::check_bounded;
       using stan::math::check_consistent_sizes;
@@ -228,7 +230,7 @@ namespace stan {
       if (!(stan::length(n) && stan::length(theta)))
         return 1.0;
           
-      double P(1.0);
+      T_partials_return P(1.0);
           
       // Validate arguments
       if (!check_finite(function, theta, "Probability parameter", &P))
@@ -264,7 +266,7 @@ namespace stan {
         // The gradients are technically ill-defined, but treated as zero
         if (value_of(n_vec[i]) >= 1) continue;
         else {
-          const double Pi = 1 - value_of(theta_vec[i]);
+          const T_partials_return Pi = 1 - value_of(theta_vec[i]);
                     
           P *= Pi;
                     
@@ -283,7 +285,8 @@ namespace stan {
     typename return_type<T_prob>::type
     bernoulli_cdf_log(const T_n& n, const T_prob& theta) {
       static const char* function = "stan::prob::bernoulli_cdf_log(%1%)";
-      
+      typedef typename stan::partials_return_type<T_n,T_prob>::type T_partials_return;
+ 
       using stan::math::check_finite;
       using stan::math::check_bounded;
       using stan::math::check_consistent_sizes;
@@ -293,7 +296,7 @@ namespace stan {
       if (!(stan::length(n) && stan::length(theta)))
         return 0.0;
           
-      double P(0.0);
+      T_partials_return P(0.0);
           
       // Validate arguments
       if (!check_finite(function, theta, "Probability parameter", &P))
@@ -329,7 +332,7 @@ namespace stan {
         // The gradients are technically ill-defined, but treated as zero
         if (value_of(n_vec[i]) >= 1) continue;
         else {
-          const double Pi = 1 - value_of(theta_vec[i]);
+          const T_partials_return Pi = 1 - value_of(theta_vec[i]);
                     
           P += log(Pi);
                     
@@ -345,7 +348,8 @@ namespace stan {
     typename return_type<T_prob>::type
     bernoulli_ccdf_log(const T_n& n, const T_prob& theta) {
       static const char* function = "stan::prob::bernoulli_ccdf_log(%1%)";
-      
+      typedef typename stan::partials_return_type<T_n,T_prob>::type T_partials_return;
+
       using stan::math::check_finite;
       using stan::math::check_bounded;
       using stan::math::check_consistent_sizes;
@@ -355,7 +359,7 @@ namespace stan {
       if (!(stan::length(n) && stan::length(theta)))
         return 0.0;
           
-      double P(0.0);
+      T_partials_return P(0.0);
           
       // Validate arguments
       if (!check_finite(function, theta, "Probability parameter", &P))
@@ -392,7 +396,7 @@ namespace stan {
         if (value_of(n_vec[i]) >= 1) 
           return operands_and_partials.to_var(stan::math::negative_infinity());
         else {
-          const double Pi = value_of(theta_vec[i]);
+          const T_partials_return Pi = value_of(theta_vec[i]);
                     
           P += log(Pi);
                     

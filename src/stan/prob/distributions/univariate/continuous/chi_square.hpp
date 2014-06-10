@@ -42,6 +42,7 @@ namespace stan {
     typename return_type<T_y,T_dof>::type
     chi_square_log(const T_y& y, const T_dof& nu) {
       static const char* function = "stan::prob::chi_square_log(%1%)";
+      typedef typename stan::partials_return_type<T_y,T_dof>::type T_partials_return;
 
       // check if any vectors are zero length
       if (!(stan::length(y) 
@@ -55,7 +56,7 @@ namespace stan {
       using stan::math::check_consistent_sizes;
       using stan::math::value_of;
       
-      double logp(0.0);
+      T_partials_return logp(0.0);
       if (!check_not_nan(function, y, "Random variable", &logp))
         return logp;
       if (!check_nonnegative(function, y, "Random variable", &logp))
@@ -88,25 +89,30 @@ namespace stan {
       using boost::math::lgamma;
       using stan::math::multiply_log;
 
-      DoubleVectorView<include_summand<propto,T_y,T_dof>::value,
-        is_vector<T_y>::value> log_y(length(y));
+      DoubleVectorView<T_partials_return,
+                       include_summand<propto,T_y,T_dof>::value,
+                       is_vector<T_y>::value> log_y(length(y));
       for (size_t i = 0; i < length(y); i++)
         if (include_summand<propto,T_y,T_dof>::value)
           log_y[i] = log(value_of(y_vec[i]));
 
-      DoubleVectorView<include_summand<propto,T_y>::value,
-        is_vector<T_y>::value> inv_y(length(y));
+      DoubleVectorView<T_partials_return,
+                       include_summand<propto,T_y>::value,
+                       is_vector<T_y>::value> inv_y(length(y));
       for (size_t i = 0; i < length(y); i++)
         if (include_summand<propto,T_y>::value)
           inv_y[i] = 1.0 / value_of(y_vec[i]);
 
-      DoubleVectorView<include_summand<propto,T_dof>::value,
-        is_vector<T_dof>::value> lgamma_half_nu(length(nu));
-      DoubleVectorView<!is_constant_struct<T_dof>::value,
-        is_vector<T_dof>::value> digamma_half_nu_over_two(length(nu));
+      DoubleVectorView<T_partials_return,
+                       include_summand<propto,T_dof>::value,
+                       is_vector<T_dof>::value> lgamma_half_nu(length(nu));
+      DoubleVectorView<T_partials_return,
+                       !is_constant_struct<T_dof>::value,
+                       is_vector<T_dof>::value> 
+        digamma_half_nu_over_two(length(nu));
 
       for (size_t i = 0; i < length(nu); i++) {
-        double half_nu = 0.5 * value_of(nu_vec[i]);
+        T_partials_return half_nu = 0.5 * value_of(nu_vec[i]);
         if (include_summand<propto,T_dof>::value)
           lgamma_half_nu[i] = lgamma(half_nu);
         if (!is_constant_struct<T_dof>::value)
@@ -117,10 +123,10 @@ namespace stan {
       agrad::OperandsAndPartials<T_y,T_dof> operands_and_partials(y, nu);
 
       for (size_t n = 0; n < N; n++) {
-        const double y_dbl = value_of(y_vec[n]);
-        const double half_y = 0.5 * y_dbl;
-        const double nu_dbl = value_of(nu_vec[n]);
-        const double half_nu = 0.5 * nu_dbl;
+        const T_partials_return y_dbl = value_of(y_vec[n]);
+        const T_partials_return half_y = 0.5 * y_dbl;
+        const T_partials_return nu_dbl = value_of(nu_vec[n]);
+        const T_partials_return half_nu = 0.5 * nu_dbl;
         if (include_summand<propto,T_dof>::value)
           logp += nu_dbl * NEG_LOG_TWO_OVER_TWO - lgamma_half_nu[n];
         if (include_summand<propto,T_y,T_dof>::value)
@@ -159,6 +165,7 @@ namespace stan {
     typename return_type<T_y,T_dof>::type
     chi_square_cdf(const T_y& y, const T_dof& nu) {
       static const char* function = "stan::prob::chi_square_cdf(%1%)";
+      typedef typename stan::partials_return_type<T_y,T_dof>::type T_partials_return;
 
       using stan::math::check_positive;
       using stan::math::check_finite;
@@ -167,7 +174,7 @@ namespace stan {
       using stan::math::check_consistent_sizes;
       using stan::math::value_of;
 
-      double cdf(1.0);
+      T_partials_return cdf(1.0);
 
      // Size checks
       if (!(stan::length(y) && stan::length(nu))) 
@@ -209,16 +216,18 @@ namespace stan {
       using boost::math::tgamma;
           
       // Cache a few expensive function calls if nu is a parameter
-      DoubleVectorView<!is_constant_struct<T_dof>::value,
+      DoubleVectorView<T_partials_return,
+                       !is_constant_struct<T_dof>::value,
                        is_vector<T_dof>::value> 
         gamma_vec(stan::length(nu));
-      DoubleVectorView<!is_constant_struct<T_dof>::value,
+      DoubleVectorView<T_partials_return,
+                       !is_constant_struct<T_dof>::value,
                        is_vector<T_dof>::value> 
         digamma_vec(stan::length(nu));
           
       if (!is_constant_struct<T_dof>::value) {
         for (size_t i = 0; i < stan::length(nu); i++) {
-          const double alpha_dbl = value_of(nu_vec[i]) * 0.5;
+          const T_partials_return alpha_dbl = value_of(nu_vec[i]) * 0.5;
           gamma_vec[i] = tgamma(alpha_dbl);
           digamma_vec[i] = digamma(alpha_dbl);
         }
@@ -232,12 +241,12 @@ namespace stan {
           continue;
               
         // Pull out values
-        const double y_dbl = value_of(y_vec[n]);
-        const double alpha_dbl = value_of(nu_vec[n]) * 0.5;
-        const double beta_dbl = 0.5;
+        const T_partials_return y_dbl = value_of(y_vec[n]);
+        const T_partials_return alpha_dbl = value_of(nu_vec[n]) * 0.5;
+        const T_partials_return beta_dbl = 0.5;
               
         // Compute
-        const double Pn = gamma_p(alpha_dbl, beta_dbl * y_dbl);
+        const T_partials_return Pn = gamma_p(alpha_dbl, beta_dbl * y_dbl);
               
         cdf *= Pn;
               
@@ -266,6 +275,7 @@ namespace stan {
     typename return_type<T_y,T_dof>::type
     chi_square_cdf_log(const T_y& y, const T_dof& nu) {
       static const char* function = "stan::prob::chi_square_cdf_log(%1%)";
+      typedef typename stan::partials_return_type<T_y,T_dof>::type T_partials_return;
 
       using stan::math::check_positive;
       using stan::math::check_finite;
@@ -274,7 +284,7 @@ namespace stan {
       using stan::math::check_consistent_sizes;
       using stan::math::value_of;
 
-      double cdf_log(0.0);
+      T_partials_return cdf_log(0.0);
 
      // Size checks
       if (!(stan::length(y) && stan::length(nu))) 
@@ -316,16 +326,18 @@ namespace stan {
       using boost::math::tgamma;
           
       // Cache a few expensive function calls if nu is a parameter
-      DoubleVectorView<!is_constant_struct<T_dof>::value,
+      DoubleVectorView<T_partials_return,
+                       !is_constant_struct<T_dof>::value,
                        is_vector<T_dof>::value> 
         gamma_vec(stan::length(nu));
-      DoubleVectorView<!is_constant_struct<T_dof>::value,
+      DoubleVectorView<T_partials_return,
+                       !is_constant_struct<T_dof>::value,
                        is_vector<T_dof>::value> 
         digamma_vec(stan::length(nu));
           
       if (!is_constant_struct<T_dof>::value) {
         for (size_t i = 0; i < stan::length(nu); i++) {
-          const double alpha_dbl = value_of(nu_vec[i]) * 0.5;
+          const T_partials_return alpha_dbl = value_of(nu_vec[i]) * 0.5;
           gamma_vec[i] = tgamma(alpha_dbl);
           digamma_vec[i] = digamma(alpha_dbl);
         }
@@ -339,12 +351,12 @@ namespace stan {
           return operands_and_partials.to_var(0.0);
               
         // Pull out values
-        const double y_dbl = value_of(y_vec[n]);
-        const double alpha_dbl = value_of(nu_vec[n]) * 0.5;
-        const double beta_dbl = 0.5;
+        const T_partials_return y_dbl = value_of(y_vec[n]);
+        const T_partials_return alpha_dbl = value_of(nu_vec[n]) * 0.5;
+        const T_partials_return beta_dbl = 0.5;
               
         // Compute
-        const double Pn = gamma_p(alpha_dbl, beta_dbl * y_dbl);
+        const T_partials_return Pn = gamma_p(alpha_dbl, beta_dbl * y_dbl);
               
         cdf_log += log(Pn);
               
@@ -366,6 +378,7 @@ namespace stan {
     typename return_type<T_y,T_dof>::type
     chi_square_ccdf_log(const T_y& y, const T_dof& nu) {
       static const char* function = "stan::prob::chi_square_ccdf_log(%1%)";
+      typedef typename stan::partials_return_type<T_y,T_dof>::type T_partials_return;
 
       using stan::math::check_positive;
       using stan::math::check_finite;
@@ -374,7 +387,7 @@ namespace stan {
       using stan::math::check_consistent_sizes;
       using stan::math::value_of;
 
-      double ccdf_log(0.0);
+      T_partials_return ccdf_log(0.0);
 
      // Size checks
       if (!(stan::length(y) && stan::length(nu))) 
@@ -416,16 +429,18 @@ namespace stan {
       using boost::math::tgamma;
           
       // Cache a few expensive function calls if nu is a parameter
-      DoubleVectorView<!is_constant_struct<T_dof>::value,
+      DoubleVectorView<T_partials_return,
+                       !is_constant_struct<T_dof>::value,
                        is_vector<T_dof>::value> 
         gamma_vec(stan::length(nu));
-      DoubleVectorView<!is_constant_struct<T_dof>::value,
+      DoubleVectorView<T_partials_return,
+                       !is_constant_struct<T_dof>::value,
                        is_vector<T_dof>::value> 
         digamma_vec(stan::length(nu));
           
       if (!is_constant_struct<T_dof>::value) {
         for (size_t i = 0; i < stan::length(nu); i++) {
-          const double alpha_dbl = value_of(nu_vec[i]) * 0.5;
+          const T_partials_return alpha_dbl = value_of(nu_vec[i]) * 0.5;
           gamma_vec[i] = tgamma(alpha_dbl);
           digamma_vec[i] = digamma(alpha_dbl);
         }
@@ -439,12 +454,12 @@ namespace stan {
           return operands_and_partials.to_var(stan::math::negative_infinity());
               
         // Pull out values
-        const double y_dbl = value_of(y_vec[n]);
-        const double alpha_dbl = value_of(nu_vec[n]) * 0.5;
-        const double beta_dbl = 0.5;
+        const T_partials_return y_dbl = value_of(y_vec[n]);
+        const T_partials_return alpha_dbl = value_of(nu_vec[n]) * 0.5;
+        const T_partials_return beta_dbl = 0.5;
               
         // Compute
-        const double Pn = 1.0 - gamma_p(alpha_dbl, beta_dbl * y_dbl);
+        const T_partials_return Pn = 1.0 - gamma_p(alpha_dbl, beta_dbl * y_dbl);
               
         ccdf_log += log(Pn);
               

@@ -23,6 +23,7 @@ namespace stan {
     typename return_type<T_y,T_shape,T_scale>::type
     weibull_log(const T_y& y, const T_shape& alpha, const T_scale& sigma) {
       static const char* function = "stan::prob::weibull_log(%1%)";
+      typedef typename stan::partials_return_type<T_y,T_shape,T_scale>::type T_partials_return;
 
       using stan::math::check_finite;
       using stan::math::check_not_nan;
@@ -38,7 +39,7 @@ namespace stan {
         return 0.0;
 
       // set up return value accumulator
-      double logp(0.0);
+      T_partials_return logp(0.0);
       if(!check_finite(function, y, "Random variable", &logp))
         return logp;
       if(!check_finite(function, alpha, "Shape parameter", 
@@ -69,48 +70,54 @@ namespace stan {
       size_t N = max_size(y, alpha, sigma);
 
       for (size_t n = 0; n < N; n++) {
-        const double y_dbl = value_of(y_vec[n]);
+        const T_partials_return y_dbl = value_of(y_vec[n]);
         if (y_dbl < 0)
           return LOG_ZERO;
       }
       
-      DoubleVectorView<include_summand<propto,T_shape>::value,
-        is_vector<T_shape>::value> log_alpha(length(alpha));
+      DoubleVectorView<T_partials_return,
+                       include_summand<propto,T_shape>::value,
+                       is_vector<T_shape>::value> log_alpha(length(alpha));
       for (size_t i = 0; i < length(alpha); i++)
         if (include_summand<propto,T_shape>::value)
           log_alpha[i] = log(value_of(alpha_vec[i]));
       
-      DoubleVectorView<include_summand<propto,T_y,T_shape>::value,
-        is_vector<T_y>::value> log_y(length(y));
+      DoubleVectorView<T_partials_return,
+                       include_summand<propto,T_y,T_shape>::value,
+                       is_vector<T_y>::value> log_y(length(y));
       for (size_t i = 0; i < length(y); i++)
         if (include_summand<propto,T_y,T_shape>::value)
           log_y[i] = log(value_of(y_vec[i]));
 
-      DoubleVectorView<include_summand<propto,T_shape,T_scale>::value,
-        is_vector<T_scale>::value> log_sigma(length(sigma));
+      DoubleVectorView<T_partials_return,
+                       include_summand<propto,T_shape,T_scale>::value,
+                       is_vector<T_scale>::value> log_sigma(length(sigma));
       for (size_t i = 0; i < length(sigma); i++)
         if (include_summand<propto,T_shape,T_scale>::value)
           log_sigma[i] = log(value_of(sigma_vec[i]));
 
-      DoubleVectorView<include_summand<propto,T_y,T_shape,T_scale>::value,
-        is_vector<T_scale>::value> inv_sigma(length(sigma));
+      DoubleVectorView<T_partials_return,
+                       include_summand<propto,T_y,T_shape,T_scale>::value,
+                       is_vector<T_scale>::value> inv_sigma(length(sigma));
       for (size_t i = 0; i < length(sigma); i++)
         if (include_summand<propto,T_y,T_shape,T_scale>::value)
           inv_sigma[i] = 1.0 / value_of(sigma_vec[i]);
       
-      DoubleVectorView<include_summand<propto,T_y,T_shape,T_scale>::value,
-        is_vector<T_y>::value | is_vector<T_shape>::value | is_vector<T_scale>::value>
+      DoubleVectorView<T_partials_return,
+                       include_summand<propto,T_y,T_shape,T_scale>::value,
+                       is_vector<T_y>::value | is_vector<T_shape>::value 
+                       | is_vector<T_scale>::value>
         y_div_sigma_pow_alpha(N);
       for (size_t i = 0; i < N; i++)
         if (include_summand<propto,T_y,T_shape,T_scale>::value) {
-          const double y_dbl = value_of(y_vec[i]);
-          const double alpha_dbl = value_of(alpha_vec[i]);
+          const T_partials_return y_dbl = value_of(y_vec[i]);
+          const T_partials_return alpha_dbl = value_of(alpha_vec[i]);
           y_div_sigma_pow_alpha[i] = pow(y_dbl * inv_sigma[i], alpha_dbl);
         }
 
       agrad::OperandsAndPartials<T_y,T_shape,T_scale> operands_and_partials(y,alpha,sigma);
       for (size_t n = 0; n < N; n++) {
-        const double alpha_dbl = value_of(alpha_vec[n]);
+        const T_partials_return alpha_dbl = value_of(alpha_vec[n]);
         if (include_summand<propto,T_shape>::value)
           logp += log_alpha[n];
         if (include_summand<propto,T_y,T_shape>::value)
@@ -121,7 +128,7 @@ namespace stan {
           logp -= y_div_sigma_pow_alpha[n];
 
         if (!is_constant_struct<T_y>::value) {
-          const double inv_y = 1.0 / value_of(y_vec[n]);
+          const T_partials_return inv_y = 1.0 / value_of(y_vec[n]);
           operands_and_partials.d_x1[n] 
             += (alpha_dbl-1.0) * inv_y 
             - alpha_dbl * y_div_sigma_pow_alpha[n] * inv_y;
@@ -148,6 +155,7 @@ namespace stan {
     template <typename T_y, typename T_shape, typename T_scale>
     typename return_type<T_y,T_shape,T_scale>::type
     weibull_cdf(const T_y& y, const T_shape& alpha, const T_scale& sigma) {
+      typedef typename stan::partials_return_type<T_y,T_shape,T_scale>::type T_partials_return;
 
       static const char* function = "stan::prob::weibull_cdf(%1%)";
 
@@ -163,7 +171,7 @@ namespace stan {
             && stan::length(sigma)))
         return 1.0;
 
-      double cdf(1.0);
+      T_partials_return cdf(1.0);
       if (!check_nonnegative(function, y, "Random variable", &cdf))
         return cdf;
       if (!check_finite(function, alpha, "Shape parameter", &cdf))
@@ -183,18 +191,18 @@ namespace stan {
       VectorView<const T_shape> alpha_vec(alpha);
       size_t N = max_size(y, sigma, alpha);
       for (size_t n = 0; n < N; n++) {
-        const double y_dbl = value_of(y_vec[n]);
-        const double sigma_dbl = value_of(sigma_vec[n]);
-        const double alpha_dbl = value_of(alpha_vec[n]);
-        const double pow_ = pow(y_dbl / sigma_dbl, alpha_dbl);
-        const double exp_ = exp(-pow_);
-        const double cdf_ = 1.0 - exp_;
+        const T_partials_return y_dbl = value_of(y_vec[n]);
+        const T_partials_return sigma_dbl = value_of(sigma_vec[n]);
+        const T_partials_return alpha_dbl = value_of(alpha_vec[n]);
+        const T_partials_return pow_ = pow(y_dbl / sigma_dbl, alpha_dbl);
+        const T_partials_return exp_ = exp(-pow_);
+        const T_partials_return cdf_ = 1.0 - exp_;
 
         //cdf
         cdf *= cdf_;
 
         //gradients
-        const double rep_deriv = exp_ * pow_ / cdf_;
+        const T_partials_return rep_deriv = exp_ * pow_ / cdf_;
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] += rep_deriv * alpha_dbl / y_dbl;
         if (!is_constant_struct<T_shape>::value)
@@ -219,6 +227,7 @@ namespace stan {
     template <typename T_y, typename T_shape, typename T_scale>
     typename return_type<T_y,T_shape,T_scale>::type
     weibull_cdf_log(const T_y& y, const T_shape& alpha, const T_scale& sigma) {
+      typedef typename stan::partials_return_type<T_y,T_shape,T_scale>::type T_partials_return;
 
       static const char* function = "stan::prob::weibull_cdf_log(%1%)";
 
@@ -234,7 +243,7 @@ namespace stan {
             && stan::length(sigma)))
         return 0.0;
 
-      double cdf_log(0.0);
+      T_partials_return cdf_log(0.0);
       if (!check_nonnegative(function, y, "Random variable", &cdf_log))
         return cdf_log;
       if (!check_finite(function, alpha, "Shape parameter", &cdf_log))
@@ -254,18 +263,18 @@ namespace stan {
       VectorView<const T_shape> alpha_vec(alpha);
       size_t N = max_size(y, sigma, alpha);
       for (size_t n = 0; n < N; n++) {
-        const double y_dbl = value_of(y_vec[n]);
-        const double sigma_dbl = value_of(sigma_vec[n]);
-        const double alpha_dbl = value_of(alpha_vec[n]);
-        const double pow_ = pow(y_dbl / sigma_dbl, alpha_dbl);
-        const double exp_ = exp(-pow_);
-        const double cdf_log_ = 1.0 - exp_;
+        const T_partials_return y_dbl = value_of(y_vec[n]);
+        const T_partials_return sigma_dbl = value_of(sigma_vec[n]);
+        const T_partials_return alpha_dbl = value_of(alpha_vec[n]);
+        const T_partials_return pow_ = pow(y_dbl / sigma_dbl, alpha_dbl);
+        const T_partials_return exp_ = exp(-pow_);
+        const T_partials_return cdf_log_ = 1.0 - exp_;
 
         //cdf_log
         cdf_log += log(cdf_log_);
 
         //gradients
-        const double rep_deriv = pow_ / (1.0 / exp_ - 1.0);
+        const T_partials_return rep_deriv = pow_ / (1.0 / exp_ - 1.0);
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] += rep_deriv * alpha_dbl / y_dbl;
         if (!is_constant_struct<T_shape>::value)
@@ -280,6 +289,7 @@ namespace stan {
     template <typename T_y, typename T_shape, typename T_scale>
     typename return_type<T_y,T_shape,T_scale>::type
     weibull_ccdf_log(const T_y& y, const T_shape& alpha, const T_scale& sigma) {
+      typedef typename stan::partials_return_type<T_y,T_shape,T_scale>::type T_partials_return;
 
       static const char* function = "stan::prob::weibull_ccdf_log(%1%)";
 
@@ -295,7 +305,7 @@ namespace stan {
             && stan::length(sigma)))
         return 0.0;
 
-      double ccdf_log(0.0);
+      T_partials_return ccdf_log(0.0);
       if (!check_nonnegative(function, y, "Random variable", &ccdf_log))
         return ccdf_log;
       if (!check_finite(function, alpha, "Shape parameter", &ccdf_log))
@@ -315,10 +325,10 @@ namespace stan {
       VectorView<const T_shape> alpha_vec(alpha);
       size_t N = max_size(y, sigma, alpha);
       for (size_t n = 0; n < N; n++) {
-        const double y_dbl = value_of(y_vec[n]);
-        const double sigma_dbl = value_of(sigma_vec[n]);
-        const double alpha_dbl = value_of(alpha_vec[n]);
-        const double pow_ = pow(y_dbl / sigma_dbl, alpha_dbl);
+        const T_partials_return y_dbl = value_of(y_vec[n]);
+        const T_partials_return sigma_dbl = value_of(sigma_vec[n]);
+        const T_partials_return alpha_dbl = value_of(alpha_vec[n]);
+        const T_partials_return pow_ = pow(y_dbl / sigma_dbl, alpha_dbl);
 
         //ccdf_log
         ccdf_log -= pow_;

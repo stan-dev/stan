@@ -31,6 +31,7 @@ namespace stan {
     neg_binomial_2_log(const T_n& n,
                      const T_location& mu,
                      const T_inv_scale& phi) {
+      typedef typename stan::partials_return_type<T_n,T_location,T_inv_scale>::type T_partials_return;
 
       static const char* function = "stan::prob::neg_binomial_log(%1%)";
 
@@ -47,7 +48,7 @@ namespace stan {
             && stan::length(phi)))
         return 0.0;
 
-      double logp(0.0);
+      T_partials_return logp(0.0);
       if (!check_nonnegative(function, n, "Failures variable", &logp))
         return logp;
       if (!check_finite(function, mu, "Location parameter", &logp))
@@ -90,28 +91,28 @@ namespace stan {
       size_t len_ep = max_size(mu, phi);
       size_t len_np = max_size(n, phi);
       
-      DoubleVectorView<true, is_vector<T_location>::value>
+      DoubleVectorView<T_partials_return,true, is_vector<T_location>::value>
         mu__(length(mu));
       for (size_t i = 0, size = length(mu); i < size; ++i)
         mu__[i] = value_of(mu_vec[i]);
   
-      DoubleVectorView<true, is_vector<T_inv_scale>::value>
+      DoubleVectorView<T_partials_return,true, is_vector<T_inv_scale>::value>
         phi__(length(phi));
       for (size_t i = 0, size = length(phi); i < size; ++i)
         phi__[i] = value_of(phi_vec[i]);
       
-      DoubleVectorView<true, is_vector<T_inv_scale>::value>
+      DoubleVectorView<T_partials_return,true, is_vector<T_inv_scale>::value>
         log_phi(length(phi));
       for (size_t i = 0, size = length(phi); i < size; ++i)
         log_phi[i] = log(phi__[i]);
 
-      DoubleVectorView<true, (is_vector<T_location>::value
+      DoubleVectorView<T_partials_return,true, (is_vector<T_location>::value
                              || is_vector<T_inv_scale>::value)>
         log_mu_plus_phi(len_ep);
       for (size_t i = 0; i < len_ep; ++i)
         log_mu_plus_phi[i] = log(mu__[i] + phi__[i]);
 
-      DoubleVectorView<true, (is_vector<T_n>::value
+      DoubleVectorView<T_partials_return,true, (is_vector<T_n>::value
                              || is_vector<T_inv_scale>::value)>
         n_plus_phi(len_np);
       for (size_t i = 0; i < len_np; ++i)
@@ -147,8 +148,8 @@ namespace stan {
     inline
     typename return_type<T_location, T_inv_scale>::type
     neg_binomial_2_log(const T_n& n,
-                     const T_location& mu,
-                     const T_inv_scale& phi) {
+                       const T_location& mu,
+                       const T_inv_scale& phi) {
       return neg_binomial_2_log<false>(n, mu, phi);
     }
 
@@ -159,8 +160,9 @@ namespace stan {
               typename T_log_location, typename T_inv_scale>
     typename return_type<T_log_location, T_inv_scale>::type
     neg_binomial_2_log_log(const T_n& n,
-                     const T_log_location& eta,
-                     const T_inv_scale& phi) {
+                           const T_log_location& eta,
+                           const T_inv_scale& phi) {
+      typedef typename stan::partials_return_type<T_n,T_log_location,T_inv_scale>::type T_partials_return;
 
       static const char* function = "stan::prob::neg_binomial_log(%1%)";
 
@@ -177,7 +179,7 @@ namespace stan {
             && stan::length(phi)))
         return 0.0;
 
-      double logp(0.0);
+      T_partials_return logp(0.0);
       if (!check_nonnegative(function, n, "Failures variable", &logp))
         return logp;
       if (!check_finite(function, eta, "Log location parameter", &logp))
@@ -218,29 +220,29 @@ namespace stan {
       size_t len_ep = max_size(eta, phi);
       size_t len_np = max_size(n, phi);
 
-      DoubleVectorView<true, is_vector<T_log_location>::value>
+      DoubleVectorView<T_partials_return,true, is_vector<T_log_location>::value>
         eta__(length(eta));
       for (size_t i = 0, size = length(eta); i < size; ++i)
         eta__[i] = value_of(eta_vec[i]);
   
-      DoubleVectorView<true, is_vector<T_inv_scale>::value>
+      DoubleVectorView<T_partials_return,true, is_vector<T_inv_scale>::value>
         phi__(length(phi));
       for (size_t i = 0, size = length(phi); i < size; ++i)
         phi__[i] = value_of(phi_vec[i]);  
         
 
-      DoubleVectorView<true, is_vector<T_inv_scale>::value>
+      DoubleVectorView<T_partials_return,true, is_vector<T_inv_scale>::value>
         log_phi(length(phi));
       for (size_t i = 0, size = length(phi); i < size; ++i)
         log_phi[i] = log(phi__[i]);
 
-      DoubleVectorView<true, (is_vector<T_log_location>::value
+      DoubleVectorView<T_partials_return,true, (is_vector<T_log_location>::value
                              || is_vector<T_inv_scale>::value)>
         logsumexp_eta_logphi(len_ep);
       for (size_t i = 0; i < len_ep; ++i)
         logsumexp_eta_logphi[i] = log_sum_exp(eta__[i], log_phi[i]);
 
-      DoubleVectorView<true, (is_vector<T_n>::value
+      DoubleVectorView<T_partials_return,true, (is_vector<T_n>::value
                              || is_vector<T_inv_scale>::value)>
         n_plus_phi(len_np);
       for (size_t i = 0; i < len_np; ++i)

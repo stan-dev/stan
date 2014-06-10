@@ -22,7 +22,8 @@ namespace stan {
     typename return_type<T_y,T_loc,T_scale>::type
     logistic_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
       static const char* function = "stan::prob::logistic_log(%1%)";
-      
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type T_partials_return;
+
       using stan::math::check_positive;
       using stan::math::check_finite;
       using stan::math::check_consistent_sizes;
@@ -37,7 +38,7 @@ namespace stan {
 
 
       // set up return value accumulator
-      double logp(0.0);
+      T_partials_return logp(0.0);
         
       // validate args (here done over var, which should be OK)      
       if (!check_finite(function, y, "Random variable", &logp))
@@ -71,9 +72,11 @@ namespace stan {
       VectorView<const T_scale> sigma_vec(sigma);
       size_t N = max_size(y, mu, sigma);
 
-      DoubleVectorView<true,is_vector<T_scale>::value> 
+      DoubleVectorView<T_partials_return,
+                       true,is_vector<T_scale>::value> 
         inv_sigma(length(sigma));
-      DoubleVectorView<include_summand<propto,T_scale>::value,
+      DoubleVectorView<T_partials_return,
+                       include_summand<propto,T_scale>::value,
                        is_vector<T_scale>::value> log_sigma(length(sigma));
       for (size_t i = 0; i < length(sigma); i++) {
         inv_sigma[i] = 1.0 / value_of(sigma_vec[i]);
@@ -81,10 +84,12 @@ namespace stan {
           log_sigma[i] = log(value_of(sigma_vec[i]));
       }
 
-      DoubleVectorView<!is_constant_struct<T_loc>::value, 
+      DoubleVectorView<T_partials_return,
+                       !is_constant_struct<T_loc>::value, 
                        is_vector<T_loc>::value || is_vector<T_scale>::value> 
         exp_mu_div_sigma(max_size(mu,sigma));
-      DoubleVectorView<!is_constant_struct<T_loc>::value, 
+      DoubleVectorView<T_partials_return,
+                       !is_constant_struct<T_loc>::value, 
                        is_vector<T_y>::value || is_vector<T_scale>::value> 
         exp_y_div_sigma(max_size(y,sigma));
       if (!is_constant_struct<T_loc>::value) {
@@ -98,15 +103,15 @@ namespace stan {
 
       using stan::math::log1p;
       for (size_t n = 0; n < N; n++) {
-        const double y_dbl = value_of(y_vec[n]);
-        const double mu_dbl = value_of(mu_vec[n]);
+        const T_partials_return y_dbl = value_of(y_vec[n]);
+        const T_partials_return mu_dbl = value_of(mu_vec[n]);
   
-        const double y_minus_mu = y_dbl - mu_dbl;
-        const double y_minus_mu_div_sigma = y_minus_mu * inv_sigma[n];
-        double exp_m_y_minus_mu_div_sigma(0);
+        const T_partials_return y_minus_mu = y_dbl - mu_dbl;
+        const T_partials_return y_minus_mu_div_sigma = y_minus_mu * inv_sigma[n];
+        T_partials_return exp_m_y_minus_mu_div_sigma(0);
         if (include_summand<propto,T_y,T_loc,T_scale>::value)
           exp_m_y_minus_mu_div_sigma = exp(-y_minus_mu_div_sigma);
-        double inv_1p_exp_y_minus_mu_div_sigma(0);
+        T_partials_return inv_1p_exp_y_minus_mu_div_sigma(0);
         if (!is_constant_struct<T_y>::value 
             || !is_constant_struct<T_scale>::value)
           inv_1p_exp_y_minus_mu_div_sigma = 1 / (1 + exp(y_minus_mu_div_sigma));
@@ -145,7 +150,8 @@ namespace stan {
     template <typename T_y, typename T_loc, typename T_scale>
     typename return_type<T_y, T_loc, T_scale>::type
     logistic_cdf(const T_y& y, const T_loc& mu, const T_scale& sigma) {
-          
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type T_partials_return;
+
       // Size checks
       if ( !( stan::length(y) && stan::length(mu) 
               && stan::length(sigma) ) ) 
@@ -161,7 +167,7 @@ namespace stan {
       using stan::math::value_of;
       using boost::math::tools::promote_args;
           
-      double P(1.0);
+      T_partials_return P(1.0);
           
       if (!check_not_nan(function, y, "Random variable", &P))
         return P;
@@ -203,13 +209,13 @@ namespace stan {
         }
               
         // Pull out values
-        const double y_dbl = value_of(y_vec[n]);
-        const double mu_dbl = value_of(mu_vec[n]);
-        const double sigma_dbl = value_of(sigma_vec[n]);
-        const double sigma_inv_vec = 1.0 / value_of(sigma_vec[n]);
+        const T_partials_return y_dbl = value_of(y_vec[n]);
+        const T_partials_return mu_dbl = value_of(mu_vec[n]);
+        const T_partials_return sigma_dbl = value_of(sigma_vec[n]);
+        const T_partials_return sigma_inv_vec = 1.0 / value_of(sigma_vec[n]);
               
         // Compute
-        const double Pn = 1.0 / ( 1.0 + exp( - (y_dbl - mu_dbl) 
+        const T_partials_return Pn = 1.0 / ( 1.0 + exp( - (y_dbl - mu_dbl) 
                                              * sigma_inv_vec ) );
                     
         P *= Pn;
@@ -245,7 +251,8 @@ namespace stan {
     template <typename T_y, typename T_loc, typename T_scale>
     typename return_type<T_y, T_loc, T_scale>::type
     logistic_cdf_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
-          
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type T_partials_return;
+    
       // Size checks
       if ( !( stan::length(y) && stan::length(mu) && stan::length(sigma) ) )
         return 0.0;
@@ -260,7 +267,7 @@ namespace stan {
       using stan::math::value_of;
       using boost::math::tools::promote_args;
           
-      double P(0.0);
+      T_partials_return P(0.0);
           
       if (!check_not_nan(function, y, "Random variable", &P))
         return P;
@@ -302,13 +309,13 @@ namespace stan {
         }
               
         // Pull out values
-        const double y_dbl = value_of(y_vec[n]);
-        const double mu_dbl = value_of(mu_vec[n]);
-        const double sigma_dbl = value_of(sigma_vec[n]);
-        const double sigma_inv_vec = 1.0 / value_of(sigma_vec[n]);
+        const T_partials_return y_dbl = value_of(y_vec[n]);
+        const T_partials_return mu_dbl = value_of(mu_vec[n]);
+        const T_partials_return sigma_dbl = value_of(sigma_vec[n]);
+        const T_partials_return sigma_inv_vec = 1.0 / value_of(sigma_vec[n]);
               
         // Compute
-        const double Pn = 1.0 / ( 1.0 + exp( - (y_dbl - mu_dbl) 
+        const T_partials_return Pn = 1.0 / ( 1.0 + exp( - (y_dbl - mu_dbl) 
                                              * sigma_inv_vec ) );
         P += log(Pn);
               
@@ -329,7 +336,8 @@ namespace stan {
     template <typename T_y, typename T_loc, typename T_scale>
     typename return_type<T_y, T_loc, T_scale>::type
     logistic_ccdf_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
-          
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type T_partials_return;
+  
       // Size checks
       if ( !( stan::length(y) && stan::length(mu) && stan::length(sigma) ) ) 
         return 0.0;
@@ -344,7 +352,7 @@ namespace stan {
       using stan::math::value_of;
       using boost::math::tools::promote_args;
           
-      double P(0.0);
+      T_partials_return P(0.0);
           
       if (!check_not_nan(function, y, "Random variable", &P))
         return P;
@@ -386,13 +394,13 @@ namespace stan {
         }
               
         // Pull out values
-        const double y_dbl = value_of(y_vec[n]);
-        const double mu_dbl = value_of(mu_vec[n]);
-        const double sigma_dbl = value_of(sigma_vec[n]);
-        const double sigma_inv_vec = 1.0 / value_of(sigma_vec[n]);
+        const T_partials_return y_dbl = value_of(y_vec[n]);
+        const T_partials_return mu_dbl = value_of(mu_vec[n]);
+        const T_partials_return sigma_dbl = value_of(sigma_vec[n]);
+        const T_partials_return sigma_inv_vec = 1.0 / value_of(sigma_vec[n]);
               
         // Compute
-        const double Pn = 1.0 - 1.0 / ( 1.0 + exp( - (y_dbl - mu_dbl) 
+        const T_partials_return Pn = 1.0 - 1.0 / ( 1.0 + exp( - (y_dbl - mu_dbl) 
                                              * sigma_inv_vec ) );
         P += log(Pn);
               

@@ -39,6 +39,7 @@ namespace stan {
     typename return_type<T_y,T_loc,T_scale>::type
     cauchy_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
       static const char* function = "stan::prob::cauchy_log(%1%)";
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type T_partials_return;
 
       using stan::is_constant_struct;
       using stan::math::check_positive;
@@ -54,7 +55,7 @@ namespace stan {
         return 0.0;
       
       // set up return value accumulator
-      double logp(0.0);
+      T_partials_return logp(0.0);
 
       // validate args (here done over var, which should be OK)
       if (!check_not_nan(function, y, "Random variable", &logp))
@@ -85,12 +86,14 @@ namespace stan {
       VectorView<const T_scale> sigma_vec(sigma);
       size_t N = max_size(y, mu, sigma);
 
-      DoubleVectorView<true, is_vector<T_scale>::value> inv_sigma(length(sigma));
-      DoubleVectorView<true, is_vector<T_scale>::value> sigma_squared(length(sigma));
-      DoubleVectorView<include_summand<propto,T_scale>::value,
+      DoubleVectorView<T_partials_return,true, 
+                       is_vector<T_scale>::value> inv_sigma(length(sigma));
+      DoubleVectorView<T_partials_return,true,
+                       is_vector<T_scale>::value> sigma_squared(length(sigma));
+      DoubleVectorView<T_partials_return,include_summand<propto,T_scale>::value,
                        is_vector<T_scale>::value> log_sigma(length(sigma));
       for (size_t i = 0; i < length(sigma); i++) {
-        const double sigma_dbl = value_of(sigma_vec[i]);
+        const T_partials_return sigma_dbl = value_of(sigma_vec[i]);
         inv_sigma[i] = 1.0 / sigma_dbl;
         sigma_squared[i] = sigma_dbl * sigma_dbl;
         if (include_summand<propto,T_scale>::value) {
@@ -102,17 +105,17 @@ namespace stan {
 
       for (size_t n = 0; n < N; n++) {
         // pull out values of arguments
-        const double y_dbl = value_of(y_vec[n]);
-        const double mu_dbl = value_of(mu_vec[n]);
+        const T_partials_return y_dbl = value_of(y_vec[n]);
+        const T_partials_return mu_dbl = value_of(mu_vec[n]);
   
         // reusable subexpression values
-        const double y_minus_mu
+        const T_partials_return y_minus_mu
           = y_dbl - mu_dbl;
-        const double y_minus_mu_squared
+        const T_partials_return y_minus_mu_squared
           = y_minus_mu * y_minus_mu;
-        const double y_minus_mu_over_sigma 
+        const T_partials_return y_minus_mu_over_sigma 
           = y_minus_mu * inv_sigma[n];
-        const double y_minus_mu_over_sigma_squared 
+        const T_partials_return y_minus_mu_over_sigma_squared 
           = y_minus_mu_over_sigma * y_minus_mu_over_sigma;
 
         // log probability
@@ -160,7 +163,8 @@ namespace stan {
     template <typename T_y, typename T_loc, typename T_scale>
     typename return_type<T_y,T_loc,T_scale>::type
     cauchy_cdf(const T_y& y, const T_loc& mu, const T_scale& sigma) {
-        
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type T_partials_return;
+
       // Size checks
       if ( !( stan::length(y) && stan::length(mu) 
               && stan::length(sigma) ) ) 
@@ -175,7 +179,7 @@ namespace stan {
       using boost::math::tools::promote_args;
       using stan::math::value_of;
 
-      double P(1.0);
+      T_partials_return P(1.0);
         
       if(!check_not_nan(function, y, "Random variable", &P))
         return P;
@@ -221,14 +225,14 @@ namespace stan {
         }
             
         // Pull out values
-        const double y_dbl = value_of(y_vec[n]);
-        const double mu_dbl = value_of(mu_vec[n]);
-        const double sigma_inv_dbl = 1.0 / value_of(sigma_vec[n]);
+        const T_partials_return y_dbl = value_of(y_vec[n]);
+        const T_partials_return mu_dbl = value_of(mu_vec[n]);
+        const T_partials_return sigma_inv_dbl = 1.0 / value_of(sigma_vec[n]);
             
-        const double z = (y_dbl - mu_dbl) * sigma_inv_dbl;
+        const T_partials_return z = (y_dbl - mu_dbl) * sigma_inv_dbl;
           
         // Compute
-        const double Pn = atan(z) / pi() + 0.5;
+        const T_partials_return Pn = atan(z) / pi() + 0.5;
             
         P *= Pn;
             
@@ -263,7 +267,8 @@ namespace stan {
     template <typename T_y, typename T_loc, typename T_scale>
     typename return_type<T_y,T_loc,T_scale>::type
     cauchy_cdf_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
-        
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type T_partials_return;
+              
       // Size checks
       if ( !( stan::length(y) && stan::length(mu) 
               && stan::length(sigma) ) ) 
@@ -278,7 +283,7 @@ namespace stan {
       using boost::math::tools::promote_args;
       using stan::math::value_of;
 
-      double cdf_log(0.0);
+      T_partials_return cdf_log(0.0);
         
       if(!check_not_nan(function, y, "Random variable", &cdf_log))
         return cdf_log;
@@ -310,18 +315,18 @@ namespace stan {
       for (size_t n = 0; n < N; n++) {
             
         // Pull out values
-        const double y_dbl = value_of(y_vec[n]);
-        const double mu_dbl = value_of(mu_vec[n]);
-        const double sigma_inv_dbl = 1.0 / value_of(sigma_vec[n]);
-        const double sigma_dbl = value_of(sigma_vec[n]);
+        const T_partials_return y_dbl = value_of(y_vec[n]);
+        const T_partials_return mu_dbl = value_of(mu_vec[n]);
+        const T_partials_return sigma_inv_dbl = 1.0 / value_of(sigma_vec[n]);
+        const T_partials_return sigma_dbl = value_of(sigma_vec[n]);
             
         const double z = (y_dbl - mu_dbl) * sigma_inv_dbl;
           
         // Compute
-        const double Pn = atan(z) / pi() + 0.5;
+        const T_partials_return Pn = atan(z) / pi() + 0.5;
         cdf_log += log(Pn);
             
-        const double rep_deriv = 1.0 / (pi() * Pn 
+        const T_partials_return rep_deriv = 1.0 / (pi() * Pn 
                                         * (z * z * sigma_dbl + sigma_dbl));
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] += rep_deriv;
@@ -336,7 +341,8 @@ namespace stan {
     template <typename T_y, typename T_loc, typename T_scale>
     typename return_type<T_y,T_loc,T_scale>::type
     cauchy_ccdf_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
-        
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type T_partials_return;
+
       // Size checks
       if ( !( stan::length(y) && stan::length(mu) 
               && stan::length(sigma) ) ) 
@@ -351,7 +357,7 @@ namespace stan {
       using boost::math::tools::promote_args;
       using stan::math::value_of;
 
-      double ccdf_log(0.0);
+      T_partials_return ccdf_log(0.0);
         
       if(!check_not_nan(function, y, "Random variable", &ccdf_log))
         return ccdf_log;
@@ -383,18 +389,18 @@ namespace stan {
       for (size_t n = 0; n < N; n++) {
             
         // Pull out values
-        const double y_dbl = value_of(y_vec[n]);
-        const double mu_dbl = value_of(mu_vec[n]);
-        const double sigma_inv_dbl = 1.0 / value_of(sigma_vec[n]);
-        const double sigma_dbl = value_of(sigma_vec[n]);
-        const double z = (y_dbl - mu_dbl) * sigma_inv_dbl;
+        const T_partials_return y_dbl = value_of(y_vec[n]);
+        const T_partials_return mu_dbl = value_of(mu_vec[n]);
+        const T_partials_return sigma_inv_dbl = 1.0 / value_of(sigma_vec[n]);
+        const T_partials_return sigma_dbl = value_of(sigma_vec[n]);
+        const T_partials_return z = (y_dbl - mu_dbl) * sigma_inv_dbl;
           
         // Compute
-        const double Pn = 0.5 - atan(z) / pi();
+        const T_partials_return Pn = 0.5 - atan(z) / pi();
         ccdf_log += log(Pn);
             
-        const double rep_deriv = 1.0 / (Pn * pi() 
-                                        * (z * z * sigma_dbl + sigma_dbl));
+        const T_partials_return rep_deriv = 1.0 / (Pn * pi() 
+                                                   * (z * z * sigma_dbl + sigma_dbl));
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] -= rep_deriv;
         if (!is_constant_struct<T_loc>::value)

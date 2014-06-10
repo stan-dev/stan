@@ -168,7 +168,7 @@ namespace stan {
       using stan::math::value_of;
       using stan::math::check_consistent_sizes;
 
-      double cdf(1.0);
+      T_partials_return cdf(1.0);
 
       // check if any vectors are zero length
       if (!(stan::length(y) 
@@ -249,7 +249,7 @@ namespace stan {
       using stan::math::check_consistent_sizes;
       using stan::math::value_of;
 
-      double cdf_log(0.0);
+      T_partials_return cdf_log(0.0);
       // check if any vectors are zero length
       if (!(stan::length(y) 
             && stan::length(mu) 
@@ -320,7 +320,7 @@ namespace stan {
       using stan::math::check_consistent_sizes;
       using stan::math::value_of;
 
-      double ccdf_log(0.0);
+      T_partials_return ccdf_log(0.0);
       // check if any vectors are zero length
       if (!(stan::length(y) 
             && stan::length(mu) 

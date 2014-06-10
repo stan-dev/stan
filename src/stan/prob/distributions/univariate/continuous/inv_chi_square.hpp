@@ -42,6 +42,7 @@ namespace stan {
     typename return_type<T_y,T_dof>::type
     inv_chi_square_log(const T_y& y, const T_dof& nu) {
       static const char* function = "stan::prob::inv_chi_square_log(%1%)";
+      typedef typename stan::partials_return_type<T_y,T_dof>::type T_partials_return;
 
       // check if any vectors are zero length
       if (!(stan::length(y) 
@@ -54,7 +55,7 @@ namespace stan {
       using stan::math::value_of;
       using stan::math::check_consistent_sizes;
 
-      double logp(0.0);
+      T_partials_return logp(0.0);
       if (!check_finite(function, nu, "Degrees of freedom parameter", &logp))
         return logp;
       if (!check_positive(function, nu, "Degrees of freedom parameter", &logp))
@@ -81,24 +82,29 @@ namespace stan {
       using boost::math::lgamma;
       using stan::math::multiply_log;
 
-      DoubleVectorView<include_summand<propto,T_y,T_dof>::value,
-        is_vector<T_y>::value> log_y(length(y));
+      DoubleVectorView<T_partials_return,
+                       include_summand<propto,T_y,T_dof>::value,
+                       is_vector<T_y>::value> log_y(length(y));
       for (size_t i = 0; i < length(y); i++)
         if (include_summand<propto,T_y,T_dof>::value)
           log_y[i] = log(value_of(y_vec[i]));
 
-      DoubleVectorView<include_summand<propto,T_y>::value,
-        is_vector<T_y>::value> inv_y(length(y));
+      DoubleVectorView<T_partials_return,
+                       include_summand<propto,T_y>::value,
+                       is_vector<T_y>::value> inv_y(length(y));
       for (size_t i = 0; i < length(y); i++)
         if (include_summand<propto,T_y>::value)
           inv_y[i] = 1.0 / value_of(y_vec[i]);
 
-      DoubleVectorView<include_summand<propto,T_dof>::value,
-        is_vector<T_dof>::value> lgamma_half_nu(length(nu));
-      DoubleVectorView<!is_constant_struct<T_dof>::value,
-        is_vector<T_dof>::value> digamma_half_nu_over_two(length(nu));
+      DoubleVectorView<T_partials_return,
+                       include_summand<propto,T_dof>::value,
+                       is_vector<T_dof>::value> lgamma_half_nu(length(nu));
+      DoubleVectorView<T_partials_return,
+                       !is_constant_struct<T_dof>::value,
+                       is_vector<T_dof>::value> 
+        digamma_half_nu_over_two(length(nu));
       for (size_t i = 0; i < length(nu); i++) {
-        double half_nu = 0.5 * value_of(nu_vec[i]);
+        T_partials_return half_nu = 0.5 * value_of(nu_vec[i]);
         if (include_summand<propto,T_dof>::value)
           lgamma_half_nu[i] = lgamma(half_nu);
         if (!is_constant_struct<T_dof>::value)
@@ -107,8 +113,8 @@ namespace stan {
 
       agrad::OperandsAndPartials<T_y, T_dof> operands_and_partials(y, nu);
       for (size_t n = 0; n < N; n++) {
-        const double nu_dbl = value_of(nu_vec[n]);
-        const double half_nu = 0.5 * nu_dbl;
+        const T_partials_return nu_dbl = value_of(nu_vec[n]);
+        const T_partials_return half_nu = 0.5 * nu_dbl;
   
         if (include_summand<propto,T_dof>::value)
           logp += nu_dbl * NEG_LOG_TWO_OVER_TWO - lgamma_half_nu[n];
@@ -140,7 +146,8 @@ namespace stan {
     template <typename T_y, typename T_dof>
     typename return_type<T_y,T_dof>::type
     inv_chi_square_cdf(const T_y& y, const T_dof& nu) {
-          
+      typedef typename stan::partials_return_type<T_y,T_dof>::type T_partials_return;
+
       // Size checks
       if ( !( stan::length(y) && stan::length(nu) ) ) return 1.0;
           
@@ -155,7 +162,7 @@ namespace stan {
       using boost::math::tools::promote_args;
       using stan::math::value_of;
           
-      double P(1.0);
+      T_partials_return P(1.0);
           
       if (!check_finite(function, nu, "Degrees of freedom parameter", &P))
         return P;
@@ -192,14 +199,16 @@ namespace stan {
       using boost::math::digamma;
           
       // Cache a few expensive function calls if nu is a parameter
-      DoubleVectorView<!is_constant_struct<T_dof>::value,
+      DoubleVectorView<T_partials_return,
+                       !is_constant_struct<T_dof>::value,
                        is_vector<T_dof>::value> gamma_vec(stan::length(nu));
-      DoubleVectorView<!is_constant_struct<T_dof>::value, 
+      DoubleVectorView<T_partials_return,
+                       !is_constant_struct<T_dof>::value, 
                        is_vector<T_dof>::value> digamma_vec(stan::length(nu));
           
       if (!is_constant_struct<T_dof>::value)  {
         for (size_t i = 0; i < stan::length(nu); i++) {
-          const double nu_dbl = value_of(nu_vec[i]);
+          const T_partials_return nu_dbl = value_of(nu_vec[i]);
           gamma_vec[i] = tgamma(0.5 * nu_dbl);
           digamma_vec[i] = digamma(0.5 * nu_dbl);
         }
@@ -215,12 +224,12 @@ namespace stan {
         }
 
         // Pull out values
-        const double y_dbl = value_of(y_vec[n]);
-        const double y_inv_dbl = 1.0 / y_dbl;
-        const double nu_dbl = value_of(nu_vec[n]);
+        const T_partials_return y_dbl = value_of(y_vec[n]);
+        const T_partials_return y_inv_dbl = 1.0 / y_dbl;
+        const T_partials_return nu_dbl = value_of(nu_vec[n]);
                   
         // Compute
-        const double Pn = gamma_q(0.5 * nu_dbl, 0.5 * y_inv_dbl);
+        const T_partials_return Pn = gamma_q(0.5 * nu_dbl, 0.5 * y_inv_dbl);
                   
         P *= Pn;
                   
@@ -249,7 +258,8 @@ namespace stan {
     template <typename T_y, typename T_dof>
     typename return_type<T_y,T_dof>::type
     inv_chi_square_cdf_log(const T_y& y, const T_dof& nu) {
-          
+      typedef typename stan::partials_return_type<T_y,T_dof>::type T_partials_return;
+
       // Size checks
       if ( !( stan::length(y) && stan::length(nu) ) ) return 0.0;
           
@@ -264,7 +274,7 @@ namespace stan {
       using boost::math::tools::promote_args;
       using stan::math::value_of;
           
-      double P(0.0);
+      T_partials_return P(0.0);
           
       if (!check_finite(function, nu, "Degrees of freedom parameter", &P))
         return P;
@@ -300,14 +310,16 @@ namespace stan {
       using boost::math::digamma;
           
       // Cache a few expensive function calls if nu is a parameter
-      DoubleVectorView<!is_constant_struct<T_dof>::value,
+      DoubleVectorView<T_partials_return,
+                       !is_constant_struct<T_dof>::value,
                        is_vector<T_dof>::value> gamma_vec(stan::length(nu));
-      DoubleVectorView<!is_constant_struct<T_dof>::value, 
+      DoubleVectorView<T_partials_return,
+                       !is_constant_struct<T_dof>::value, 
                        is_vector<T_dof>::value> digamma_vec(stan::length(nu));
           
       if (!is_constant_struct<T_dof>::value)  {
         for (size_t i = 0; i < stan::length(nu); i++) {
-          const double nu_dbl = value_of(nu_vec[i]);
+          const T_partials_return nu_dbl = value_of(nu_vec[i]);
           gamma_vec[i] = tgamma(0.5 * nu_dbl);
           digamma_vec[i] = digamma(0.5 * nu_dbl);
         }
@@ -323,12 +335,12 @@ namespace stan {
         }
 
         // Pull out values
-        const double y_dbl = value_of(y_vec[n]);
-        const double y_inv_dbl = 1.0 / y_dbl;
-        const double nu_dbl = value_of(nu_vec[n]);
+        const T_partials_return y_dbl = value_of(y_vec[n]);
+        const T_partials_return y_inv_dbl = 1.0 / y_dbl;
+        const T_partials_return nu_dbl = value_of(nu_vec[n]);
                   
         // Compute
-        const double Pn = gamma_q(0.5 * nu_dbl, 0.5 * y_inv_dbl);
+        const T_partials_return Pn = gamma_q(0.5 * nu_dbl, 0.5 * y_inv_dbl);
                   
         P += log(Pn);
                   
@@ -346,10 +358,11 @@ namespace stan {
       return operands_and_partials.to_var(P);
     }
       
-  template <typename T_y, typename T_dof>
+    template <typename T_y, typename T_dof>
     typename return_type<T_y,T_dof>::type
     inv_chi_square_ccdf_log(const T_y& y, const T_dof& nu) {
-          
+      typedef typename stan::partials_return_type<T_y,T_dof>::type T_partials_return;
+
       // Size checks
       if ( !( stan::length(y) && stan::length(nu) ) ) return 0.0;
           
@@ -364,7 +377,7 @@ namespace stan {
       using boost::math::tools::promote_args;
       using stan::math::value_of;
           
-      double P(0.0);
+      T_partials_return P(0.0);
           
       if (!check_finite(function, nu, "Degrees of freedom parameter", &P))
         return P;
@@ -400,14 +413,16 @@ namespace stan {
       using boost::math::digamma;
           
       // Cache a few expensive function calls if nu is a parameter
-      DoubleVectorView<!is_constant_struct<T_dof>::value,
+      DoubleVectorView<T_partials_return,
+                       !is_constant_struct<T_dof>::value,
                        is_vector<T_dof>::value> gamma_vec(stan::length(nu));
-      DoubleVectorView<!is_constant_struct<T_dof>::value, 
+      DoubleVectorView<T_partials_return,
+                       !is_constant_struct<T_dof>::value, 
                        is_vector<T_dof>::value> digamma_vec(stan::length(nu));
           
       if (!is_constant_struct<T_dof>::value)  {
         for (size_t i = 0; i < stan::length(nu); i++) {
-          const double nu_dbl = value_of(nu_vec[i]);
+          const T_partials_return nu_dbl = value_of(nu_vec[i]);
           gamma_vec[i] = tgamma(0.5 * nu_dbl);
           digamma_vec[i] = digamma(0.5 * nu_dbl);
         }
@@ -423,12 +438,12 @@ namespace stan {
         }
 
         // Pull out values
-        const double y_dbl = value_of(y_vec[n]);
-        const double y_inv_dbl = 1.0 / y_dbl;
-        const double nu_dbl = value_of(nu_vec[n]);
+        const T_partials_return y_dbl = value_of(y_vec[n]);
+        const T_partials_return y_inv_dbl = 1.0 / y_dbl;
+        const T_partials_return nu_dbl = value_of(nu_vec[n]);
                   
         // Compute
-        const double Pn = 1.0 - gamma_q(0.5 * nu_dbl, 0.5 * y_inv_dbl);
+        const T_partials_return Pn = 1.0 - gamma_q(0.5 * nu_dbl, 0.5 * y_inv_dbl);
                   
         P += log(Pn);
                   

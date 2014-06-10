@@ -17,6 +17,7 @@ namespace stan {
     typename return_type<T_y,T_loc,T_scale>::type
     von_mises_log(T_y const& y, T_loc const& mu, T_scale const& kappa) {
       static char const* const function = "stan::prob::von_mises_log(%1%)";
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type T_partials_return;
 
       // check if any vectors are zero length
       if (!(stan::length(y) 
@@ -33,7 +34,7 @@ namespace stan {
       using stan::math::value_of;
 
       // Result accumulator.
-      double logp = 0.0;
+      T_partials_return logp = 0.0;
 
       // Validate arguments.
       if (!check_finite(function, y, "Random variable", &logp))
@@ -68,8 +69,11 @@ namespace stan {
       VectorView<const T_loc> mu_vec(mu);
       VectorView<const T_scale> kappa_vec(kappa);
 
-      DoubleVectorView<true,is_vector<T_scale>::value> kappa_dbl(length(kappa));
-      DoubleVectorView<include_summand<propto,T_scale>::value,is_vector<T_scale>::value> log_bessel0(length(kappa));
+      DoubleVectorView<T_partials_return,
+                       true,is_vector<T_scale>::value> kappa_dbl(length(kappa));
+      DoubleVectorView<T_partials_return,
+                       include_summand<propto,T_scale>::value,
+                       is_vector<T_scale>::value> log_bessel0(length(kappa));
       for (size_t i = 0; i < length(kappa); i++) {
         kappa_dbl[i] = value_of(kappa_vec[i]);
         if (include_summand<propto,T_scale>::value)
@@ -81,19 +85,19 @@ namespace stan {
 
       for (size_t n = 0; n < N; n++) {
         // Extract argument values.
-        const double y_ = value_of(y_vec[n]);
-        const double y_dbl =  y_ - std::floor(y_ / TWO_PI) * TWO_PI;
-        const double mu_dbl = value_of(mu_vec[n]);
+        const T_partials_return y_ = value_of(y_vec[n]);
+        const T_partials_return y_dbl =  y_ - std::floor(y_ / TWO_PI) * TWO_PI;
+        const T_partials_return mu_dbl = value_of(mu_vec[n]);
         
         // Reusable values.
-        double bessel0 = 0;
+        T_partials_return bessel0 = 0;
         if (compute_bessel0)
           bessel0 = boost::math::cyl_bessel_i(0, kappa_dbl[n]);
-        double bessel1 = 0;
+        T_partials_return bessel1 = 0;
         if (compute_bessel1)
           bessel1 = boost::math::cyl_bessel_i(-1, kappa_dbl[n]);
-        const double kappa_sin = kappa_dbl[n] * std::sin(mu_dbl - y_dbl);
-        const double kappa_cos = kappa_dbl[n] * std::cos(mu_dbl - y_dbl);
+        const T_partials_return kappa_sin = kappa_dbl[n] * std::sin(mu_dbl - y_dbl);
+        const T_partials_return kappa_cos = kappa_dbl[n] * std::cos(mu_dbl - y_dbl);
         
         // Log probability.
         if (include_summand<propto>::value) 

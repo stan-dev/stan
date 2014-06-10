@@ -49,6 +49,7 @@ namespace stan {
     student_t_log(const T_y& y, const T_dof& nu, const T_loc& mu, 
                   const T_scale& sigma) {
       static const char* function = "stan::prob::student_t_log(%1%)";
+      typedef typename stan::partials_return_type<T_y,T_dof,T_loc,T_scale>::type T_partials_return;
 
       using stan::math::check_positive;
       using stan::math::check_finite;
@@ -62,7 +63,7 @@ namespace stan {
             && stan::length(sigma)))
         return 0.0;
 
-      double logp(0.0);
+      T_partials_return logp(0.0);
 
       // validate args (here done over var, which should be OK)
       if (!check_not_nan(function, y, "Random variable", &logp))
@@ -106,24 +107,31 @@ namespace stan {
       using stan::math::square;
       using stan::math::value_of;
 
-      DoubleVectorView<include_summand<propto,T_y,T_dof,T_loc,T_scale>::value,
-        is_vector<T_dof>::value> half_nu(length(nu));
+      DoubleVectorView<T_partials_return,
+                       include_summand<propto,T_y,T_dof,T_loc,T_scale>::value,
+                       is_vector<T_dof>::value> half_nu(length(nu));
       for (size_t i = 0; i < length(nu); i++) 
         if (include_summand<propto,T_y,T_dof,T_loc,T_scale>::value) 
           half_nu[i] = 0.5 * value_of(nu_vec[i]);
-      DoubleVectorView<include_summand<propto,T_dof>::value,
-        is_vector<T_dof>::value> lgamma_half_nu(length(nu));
-      DoubleVectorView<include_summand<propto,T_dof>::value,
-        is_vector<T_dof>::value> lgamma_half_nu_plus_half(length(nu));
+      DoubleVectorView<T_partials_return,
+                       include_summand<propto,T_dof>::value,
+                       is_vector<T_dof>::value> lgamma_half_nu(length(nu));
+      DoubleVectorView<T_partials_return,
+                       include_summand<propto,T_dof>::value,
+                       is_vector<T_dof>::value> 
+        lgamma_half_nu_plus_half(length(nu));
       if (include_summand<propto,T_dof>::value)
         for (size_t i = 0; i < length(nu); i++) {
           lgamma_half_nu[i] = lgamma(half_nu[i]);
           lgamma_half_nu_plus_half[i] = lgamma(half_nu[i] + 0.5);
         }
-      DoubleVectorView<!is_constant_struct<T_dof>::value,
-        is_vector<T_dof>::value> digamma_half_nu(length(nu));
-      DoubleVectorView<!is_constant_struct<T_dof>::value,
-        is_vector<T_dof>::value> digamma_half_nu_plus_half(length(nu));
+      DoubleVectorView<T_partials_return,
+                       !is_constant_struct<T_dof>::value,
+                       is_vector<T_dof>::value> digamma_half_nu(length(nu));
+      DoubleVectorView<T_partials_return,
+                       !is_constant_struct<T_dof>::value,
+                       is_vector<T_dof>::value>
+        digamma_half_nu_plus_half(length(nu));
       if (!is_constant_struct<T_dof>::value)
         for (size_t i = 0; i < length(nu); i++) {
           digamma_half_nu[i] = digamma(half_nu[i]);
@@ -132,26 +140,30 @@ namespace stan {
     
 
 
-      DoubleVectorView<include_summand<propto,T_dof>::value,
-        is_vector<T_dof>::value> log_nu(length(nu));
+      DoubleVectorView<T_partials_return,
+                       include_summand<propto,T_dof>::value,
+                       is_vector<T_dof>::value> log_nu(length(nu));
       for (size_t i = 0; i < length(nu); i++)
         if (include_summand<propto,T_dof>::value)
           log_nu[i] = log(value_of(nu_vec[i]));
-      DoubleVectorView<include_summand<propto,T_scale>::value,
-        is_vector<T_scale>::value> log_sigma(length(sigma));
+      DoubleVectorView<T_partials_return,
+                       include_summand<propto,T_scale>::value,
+                       is_vector<T_scale>::value> log_sigma(length(sigma));
       for (size_t i = 0; i < length(sigma); i++)
         if (include_summand<propto,T_scale>::value)
           log_sigma[i] = log(value_of(sigma_vec[i]));
 
-      DoubleVectorView<include_summand<propto,T_y,T_dof,T_loc,T_scale>::value,
-        is_vector<T_y>::value 
+      DoubleVectorView<T_partials_return,
+                       include_summand<propto,T_y,T_dof,T_loc,T_scale>::value,
+                       is_vector<T_y>::value 
                        || is_vector<T_dof>::value 
                        || is_vector<T_loc>::value 
                        || is_vector<T_scale>::value> 
         square_y_minus_mu_over_sigma__over_nu(N);
 
-      DoubleVectorView<include_summand<propto,T_y,T_dof,T_loc,T_scale>::value,
-        is_vector<T_y>::value 
+      DoubleVectorView<T_partials_return,
+                       include_summand<propto,T_y,T_dof,T_loc,T_scale>::value,
+                       is_vector<T_y>::value 
                        || is_vector<T_dof>::value
                        || is_vector<T_loc>::value 
                        || is_vector<T_scale>::value> 
@@ -159,10 +171,10 @@ namespace stan {
 
       for (size_t i = 0; i < N; i++) 
         if (include_summand<propto,T_y,T_dof,T_loc,T_scale>::value) {
-          const double y_dbl = value_of(y_vec[i]);
-          const double mu_dbl = value_of(mu_vec[i]);
-          const double sigma_dbl = value_of(sigma_vec[i]);
-          const double nu_dbl = value_of(nu_vec[i]);
+          const T_partials_return y_dbl = value_of(y_vec[i]);
+          const T_partials_return mu_dbl = value_of(mu_vec[i]);
+          const T_partials_return sigma_dbl = value_of(sigma_vec[i]);
+          const T_partials_return nu_dbl = value_of(nu_vec[i]);
           square_y_minus_mu_over_sigma__over_nu[i] 
             = square((y_dbl - mu_dbl) / sigma_dbl) / nu_dbl;
           log1p_exp[i] = log1p(square_y_minus_mu_over_sigma__over_nu[i]);
@@ -171,10 +183,10 @@ namespace stan {
       agrad::OperandsAndPartials<T_y,T_dof,T_loc,T_scale>
         operands_and_partials(y,nu,mu,sigma);
       for (size_t n = 0; n < N; n++) {
-        const double y_dbl = value_of(y_vec[n]);
-        const double mu_dbl = value_of(mu_vec[n]);
-        const double sigma_dbl = value_of(sigma_vec[n]);
-        const double nu_dbl = value_of(nu_vec[n]);
+        const T_partials_return y_dbl = value_of(y_vec[n]);
+        const T_partials_return mu_dbl = value_of(mu_vec[n]);
+        const T_partials_return sigma_dbl = value_of(sigma_vec[n]);
+        const T_partials_return nu_dbl = value_of(nu_vec[n]);
         if (include_summand<propto>::value)
           logp += NEG_LOG_SQRT_PI;
         if (include_summand<propto,T_dof>::value)
@@ -193,7 +205,7 @@ namespace stan {
             * (2.0 * (y_dbl - mu_dbl) / square(sigma_dbl) / nu_dbl);
         }
         if (!is_constant_struct<T_dof>::value) {
-          const double inv_nu = 1.0 / nu_dbl;
+          const T_partials_return inv_nu = 1.0 / nu_dbl;
           operands_and_partials.d_x2[n] 
             += 0.5*digamma_half_nu_plus_half[n] - 0.5*digamma_half_nu[n]
             - 0.5 * inv_nu
@@ -209,7 +221,7 @@ namespace stan {
             * (2.0 * (mu_dbl - y_dbl) / (sigma_dbl*sigma_dbl*nu_dbl));
         }
         if (!is_constant_struct<T_scale>::value) {
-          const double inv_sigma = 1.0 / sigma_dbl;
+          const T_partials_return inv_sigma = 1.0 / sigma_dbl;
           operands_and_partials.d_x4[n] 
             += -inv_sigma
             + (nu_dbl + 1.0) / (1.0 + square_y_minus_mu_over_sigma__over_nu[n]) 
@@ -231,7 +243,8 @@ namespace stan {
     typename return_type<T_y, T_dof, T_loc, T_scale>::type
     student_t_cdf(const T_y& y, const T_dof& nu, const T_loc& mu, 
                   const T_scale& sigma) {
-          
+      typedef typename stan::partials_return_type<T_y,T_dof,T_loc,T_scale>::type T_partials_return;
+
       // Size checks
       if (!(stan::length(y) && stan::length(nu) && stan::length(mu) 
             && stan::length(sigma))) 
@@ -245,7 +258,7 @@ namespace stan {
       using stan::math::check_consistent_sizes;
       using stan::math::value_of;
           
-      double P(1.0);
+      T_partials_return P(1.0);
           
       if (!check_not_nan(function, y, "Random variable", &P))
         return P;
@@ -285,20 +298,28 @@ namespace stan {
       // Cache a few expensive function calls if nu is a parameter
       double digammaHalf = 0;
           
-      DoubleVectorView<!is_constant_struct<T_dof>::value,is_vector<T_dof>::value> 
+      DoubleVectorView<T_partials_return,
+                       !is_constant_struct<T_dof>::value,
+                       is_vector<T_dof>::value> 
         digamma_vec(stan::length(nu));
-      DoubleVectorView<!is_constant_struct<T_dof>::value,is_vector<T_dof>::value> 
+      DoubleVectorView<T_partials_return,
+                       !is_constant_struct<T_dof>::value,
+                       is_vector<T_dof>::value> 
         digammaNu_vec(stan::length(nu));
-      DoubleVectorView<!is_constant_struct<T_dof>::value,is_vector<T_dof>::value>
+      DoubleVectorView<T_partials_return,
+                       !is_constant_struct<T_dof>::value,
+                       is_vector<T_dof>::value>
         digammaNuPlusHalf_vec(stan::length(nu));
-      DoubleVectorView<!is_constant_struct<T_dof>::value,is_vector<T_dof>::value> 
+      DoubleVectorView<T_partials_return,
+                       !is_constant_struct<T_dof>::value,
+                       is_vector<T_dof>::value> 
         betaNuHalf_vec(stan::length(nu));
           
       if (!is_constant_struct<T_dof>::value) {
         digammaHalf = digamma(0.5);
               
         for (size_t i = 0; i < stan::length(nu); i++) {
-          const double nu_dbl = value_of(nu_vec[i]);
+          const T_partials_return nu_dbl = value_of(nu_vec[i]);
                   
           digammaNu_vec[i] = digamma(0.5 * nu_dbl);
           digammaNuPlusHalf_vec[i] = digamma(0.5 + 0.5 * nu_dbl);
@@ -315,20 +336,20 @@ namespace stan {
           continue;
         }
                     
-        const double sigma_inv = 1.0 / value_of(sigma_vec[n]);
-        const double t = (value_of(y_vec[n]) - value_of(mu_vec[n])) * sigma_inv;
-        const double nu_dbl = value_of(nu_vec[n]);
-        const double q = nu_dbl / (t * t);
-        const double r = 1.0 / (1.0 + q);
-        const double J = 2 * r * r * q / t;
+        const T_partials_return sigma_inv = 1.0 / value_of(sigma_vec[n]);
+        const T_partials_return t = (value_of(y_vec[n]) - value_of(mu_vec[n])) * sigma_inv;
+        const T_partials_return nu_dbl = value_of(nu_vec[n]);
+        const T_partials_return q = nu_dbl / (t * t);
+        const T_partials_return r = 1.0 / (1.0 + q);
+        const T_partials_return J = 2 * r * r * q / t;
         double zJacobian = t > 0 ? - 0.5 : 0.5;
                     
         if(q < 2)
           {
 
-            double z = ibeta(0.5 * nu_dbl, 0.5, 1.0 - r);
-            const double Pn = t > 0 ? 1.0 - 0.5 * z : 0.5 * z;
-            const double d_ibeta = ibeta_derivative(0.5 * nu_dbl, 0.5, 1.0 - r);
+            T_partials_return z = ibeta(0.5 * nu_dbl, 0.5, 1.0 - r);
+            const T_partials_return Pn = t > 0 ? 1.0 - 0.5 * z : 0.5 * z;
+            const T_partials_return d_ibeta = ibeta_derivative(0.5 * nu_dbl, 0.5, 1.0 - r);
                       
             P *= Pn;
 
@@ -337,8 +358,8 @@ namespace stan {
                 += - zJacobian * d_ibeta * J * sigma_inv / Pn;
             if (!is_constant_struct<T_dof>::value) {
                           
-              double g1 = 0;
-              double g2 = 0;
+              T_partials_return g1 = 0;
+              T_partials_return g2 = 0;
                           
               stan::math::gradRegIncBeta(g1, g2, 0.5 * nu_dbl, 0.5, 1.0 - r, 
                                          digammaNu_vec[n], digammaHalf,
@@ -359,12 +380,12 @@ namespace stan {
           }
         else {
                   
-            double z = 1 - ibeta(0.5, 0.5 * nu_dbl, r);
+            T_partials_return z = 1 - ibeta(0.5, 0.5 * nu_dbl, r);
             zJacobian *= -1;
                   
-            const double Pn = t > 0 ? 1.0 - 0.5 * z : 0.5 * z;
+            const T_partials_return Pn = t > 0 ? 1.0 - 0.5 * z : 0.5 * z;
                   
-            double d_ibeta = ibeta_derivative(0.5, 0.5 * nu_dbl, r);
+            T_partials_return d_ibeta = ibeta_derivative(0.5, 0.5 * nu_dbl, r);
                   
             P *= Pn;
                   
@@ -373,8 +394,8 @@ namespace stan {
                 += zJacobian * d_ibeta * J * sigma_inv / Pn;
             if (!is_constant_struct<T_dof>::value) {
                       
-              double g1 = 0;
-              double g2 = 0;
+              T_partials_return g1 = 0;
+              T_partials_return g2 = 0;
                       
               stan::math::gradRegIncBeta(g1, g2, 0.5, 0.5 * nu_dbl, r, 
                                          digammaHalf, digammaNu_vec[n], 
@@ -413,7 +434,8 @@ namespace stan {
     typename return_type<T_y, T_dof, T_loc, T_scale>::type
     student_t_cdf_log(const T_y& y, const T_dof& nu, const T_loc& mu, 
                       const T_scale& sigma) {
-          
+      typedef typename stan::partials_return_type<T_y,T_dof,T_loc,T_scale>::type T_partials_return;
+
       // Size checks
       if (!(stan::length(y) && stan::length(nu) && stan::length(mu) 
             && stan::length(sigma))) 
@@ -427,7 +449,7 @@ namespace stan {
       using stan::math::check_consistent_sizes;
       using stan::math::value_of;
           
-      double P(0.0);
+      T_partials_return P(0.0);
           
       if (!check_not_nan(function, y, "Random variable", &P))
         return P;
@@ -467,20 +489,28 @@ namespace stan {
       // Cache a few expensive function calls if nu is a parameter
       double digammaHalf = 0;
           
-      DoubleVectorView<!is_constant_struct<T_dof>::value,is_vector<T_dof>::value> 
+      DoubleVectorView<T_partials_return,
+                       !is_constant_struct<T_dof>::value,
+                       is_vector<T_dof>::value> 
         digamma_vec(stan::length(nu));
-      DoubleVectorView<!is_constant_struct<T_dof>::value,is_vector<T_dof>::value> 
+      DoubleVectorView<T_partials_return,
+                       !is_constant_struct<T_dof>::value,
+                       is_vector<T_dof>::value> 
         digammaNu_vec(stan::length(nu));
-      DoubleVectorView<!is_constant_struct<T_dof>::value,is_vector<T_dof>::value>
+      DoubleVectorView<T_partials_return,
+                       !is_constant_struct<T_dof>::value,
+                       is_vector<T_dof>::value>
         digammaNuPlusHalf_vec(stan::length(nu));
-      DoubleVectorView<!is_constant_struct<T_dof>::value,is_vector<T_dof>::value> 
+      DoubleVectorView<T_partials_return,
+                       !is_constant_struct<T_dof>::value,
+                       is_vector<T_dof>::value> 
         betaNuHalf_vec(stan::length(nu));
           
       if (!is_constant_struct<T_dof>::value) {
         digammaHalf = digamma(0.5);
               
         for (size_t i = 0; i < stan::length(nu); i++) {
-          const double nu_dbl = value_of(nu_vec[i]);
+          const T_partials_return nu_dbl = value_of(nu_vec[i]);
                   
           digammaNu_vec[i] = digamma(0.5 * nu_dbl);
           digammaNuPlusHalf_vec[i] = digamma(0.5 + 0.5 * nu_dbl);
@@ -497,18 +527,18 @@ namespace stan {
           continue;
         }
                     
-        const double sigma_inv = 1.0 / value_of(sigma_vec[n]);
-        const double t = (value_of(y_vec[n]) - value_of(mu_vec[n])) * sigma_inv;
-        const double nu_dbl = value_of(nu_vec[n]);
-        const double q = nu_dbl / (t * t);
-        const double r = 1.0 / (1.0 + q);
-        const double J = 2 * r * r * q / t;
-        double zJacobian = t > 0 ? - 0.5 : 0.5;
+        const T_partials_return sigma_inv = 1.0 / value_of(sigma_vec[n]);
+        const T_partials_return t = (value_of(y_vec[n]) - value_of(mu_vec[n])) * sigma_inv;
+        const T_partials_return nu_dbl = value_of(nu_vec[n]);
+        const T_partials_return q = nu_dbl / (t * t);
+        const T_partials_return r = 1.0 / (1.0 + q);
+        const T_partials_return J = 2 * r * r * q / t;
+        T_partials_return zJacobian = t > 0 ? - 0.5 : 0.5;
                     
         if(q < 2) {
-            double z = ibeta(0.5 * nu_dbl, 0.5, 1.0 - r);
-            const double Pn = t > 0 ? 1.0 - 0.5 * z : 0.5 * z;
-            const double d_ibeta = ibeta_derivative(0.5 * nu_dbl, 0.5, 1.0 - r);
+            T_partials_return z = ibeta(0.5 * nu_dbl, 0.5, 1.0 - r);
+            const T_partials_return Pn = t > 0 ? 1.0 - 0.5 * z : 0.5 * z;
+            const T_partials_return d_ibeta = ibeta_derivative(0.5 * nu_dbl, 0.5, 1.0 - r);
                       
             P += log(Pn);
 
@@ -518,8 +548,8 @@ namespace stan {
                       
             if (!is_constant_struct<T_dof>::value) {
                           
-              double g1 = 0;
-              double g2 = 0;
+              T_partials_return g1 = 0;
+              T_partials_return g2 = 0;
                           
               stan::math::gradRegIncBeta(g1, g2, 0.5 * nu_dbl, 0.5, 1.0 - r, 
                                          digammaNu_vec[n], digammaHalf,
@@ -540,12 +570,12 @@ namespace stan {
           }
         else {
                   
-            double z = 1 - ibeta(0.5, 0.5 * nu_dbl, r);
+            T_partials_return z = 1 - ibeta(0.5, 0.5 * nu_dbl, r);
             zJacobian *= -1;
                   
-            const double Pn = t > 0 ? 1.0 - 0.5 * z : 0.5 * z;
+            const T_partials_return Pn = t > 0 ? 1.0 - 0.5 * z : 0.5 * z;
                   
-            double d_ibeta = ibeta_derivative(0.5, 0.5 * nu_dbl, r);
+            T_partials_return d_ibeta = ibeta_derivative(0.5, 0.5 * nu_dbl, r);
                   
             P += log(Pn);
                   
@@ -555,8 +585,8 @@ namespace stan {
                   
             if (!is_constant_struct<T_dof>::value) {
                       
-              double g1 = 0;
-              double g2 = 0;
+              T_partials_return g1 = 0;
+              T_partials_return g2 = 0;
                       
               stan::math::gradRegIncBeta(g1, g2, 0.5, 0.5 * nu_dbl, r, 
                                          digammaHalf, digammaNu_vec[n], 
@@ -583,7 +613,8 @@ namespace stan {
     typename return_type<T_y, T_dof, T_loc, T_scale>::type
     student_t_ccdf_log(const T_y& y, const T_dof& nu, const T_loc& mu, 
                       const T_scale& sigma) {
-          
+      typedef typename stan::partials_return_type<T_y,T_dof,T_loc,T_scale>::type T_partials_return;
+    
       // Size checks
       if (!(stan::length(y) && stan::length(nu) && stan::length(mu) 
             && stan::length(sigma))) 
@@ -597,7 +628,7 @@ namespace stan {
       using stan::math::check_consistent_sizes;
       using stan::math::value_of;
           
-      double P(0.0);
+      T_partials_return P(0.0);
           
       if (!check_not_nan(function, y, "Random variable", &P))
         return P;
@@ -637,20 +668,28 @@ namespace stan {
       // Cache a few expensive function calls if nu is a parameter
       double digammaHalf = 0;
           
-      DoubleVectorView<!is_constant_struct<T_dof>::value,is_vector<T_dof>::value> 
+      DoubleVectorView<T_partials_return,
+                       !is_constant_struct<T_dof>::value,
+                       is_vector<T_dof>::value> 
         digamma_vec(stan::length(nu));
-      DoubleVectorView<!is_constant_struct<T_dof>::value,is_vector<T_dof>::value> 
+      DoubleVectorView<T_partials_return,
+                       !is_constant_struct<T_dof>::value,
+                       is_vector<T_dof>::value> 
         digammaNu_vec(stan::length(nu));
-      DoubleVectorView<!is_constant_struct<T_dof>::value,is_vector<T_dof>::value>
+      DoubleVectorView<T_partials_return,
+                       !is_constant_struct<T_dof>::value,
+                       is_vector<T_dof>::value>
         digammaNuPlusHalf_vec(stan::length(nu));
-      DoubleVectorView<!is_constant_struct<T_dof>::value,is_vector<T_dof>::value> 
+      DoubleVectorView<T_partials_return,
+                       !is_constant_struct<T_dof>::value,
+                       is_vector<T_dof>::value> 
         betaNuHalf_vec(stan::length(nu));
           
       if (!is_constant_struct<T_dof>::value) {
         digammaHalf = digamma(0.5);
               
         for (size_t i = 0; i < stan::length(nu); i++) {
-          const double nu_dbl = value_of(nu_vec[i]);
+          const T_partials_return nu_dbl = value_of(nu_vec[i]);
                   
           digammaNu_vec[i] = digamma(0.5 * nu_dbl);
           digammaNuPlusHalf_vec[i] = digamma(0.5 + 0.5 * nu_dbl);
@@ -667,18 +706,18 @@ namespace stan {
           return operands_and_partials.to_var(stan::math::negative_infinity());
         }
                     
-        const double sigma_inv = 1.0 / value_of(sigma_vec[n]);
-        const double t = (value_of(y_vec[n]) - value_of(mu_vec[n])) * sigma_inv;
-        const double nu_dbl = value_of(nu_vec[n]);
-        const double q = nu_dbl / (t * t);
-        const double r = 1.0 / (1.0 + q);
-        const double J = 2 * r * r * q / t;
-        double zJacobian = t > 0 ? - 0.5 : 0.5;
+        const T_partials_return sigma_inv = 1.0 / value_of(sigma_vec[n]);
+        const T_partials_return t = (value_of(y_vec[n]) - value_of(mu_vec[n])) * sigma_inv;
+        const T_partials_return nu_dbl = value_of(nu_vec[n]);
+        const T_partials_return q = nu_dbl / (t * t);
+        const T_partials_return r = 1.0 / (1.0 + q);
+        const T_partials_return J = 2 * r * r * q / t;
+        T_partials_return zJacobian = t > 0 ? - 0.5 : 0.5;
                     
         if(q < 2) {
-            double z = ibeta(0.5 * nu_dbl, 0.5, 1.0 - r);
-            const double Pn = t > 0 ? 0.5 * z : 1.0 - 0.5 * z;
-            const double d_ibeta = ibeta_derivative(0.5 * nu_dbl, 0.5, 1.0 - r);
+            T_partials_return z = ibeta(0.5 * nu_dbl, 0.5, 1.0 - r);
+            const T_partials_return Pn = t > 0 ? 0.5 * z : 1.0 - 0.5 * z;
+            const T_partials_return d_ibeta = ibeta_derivative(0.5 * nu_dbl, 0.5, 1.0 - r);
                       
             P += log(Pn);
 
@@ -688,8 +727,8 @@ namespace stan {
                       
             if (!is_constant_struct<T_dof>::value) {
                           
-              double g1 = 0;
-              double g2 = 0;
+              T_partials_return g1 = 0;
+              T_partials_return g2 = 0;
                           
               stan::math::gradRegIncBeta(g1, g2, 0.5 * nu_dbl, 0.5, 1.0 - r, 
                                          digammaNu_vec[n], digammaHalf,
@@ -710,12 +749,12 @@ namespace stan {
           }
         else {
                   
-            double z = 1 - ibeta(0.5, 0.5 * nu_dbl, r);
+            T_partials_return z = 1 - ibeta(0.5, 0.5 * nu_dbl, r);
             zJacobian *= -1;
                   
-            const double Pn = t > 0 ? 0.5 * z : 1.0 - 0.5 * z;
+            const T_partials_return Pn = t > 0 ? 0.5 * z : 1.0 - 0.5 * z;
                   
-            double d_ibeta = ibeta_derivative(0.5, 0.5 * nu_dbl, r);
+            T_partials_return d_ibeta = ibeta_derivative(0.5, 0.5 * nu_dbl, r);
                   
             P += log(Pn);
                   
@@ -725,8 +764,8 @@ namespace stan {
                   
             if (!is_constant_struct<T_dof>::value) {
                       
-              double g1 = 0;
-              double g2 = 0;
+              T_partials_return g1 = 0;
+              T_partials_return g2 = 0;
                       
               stan::math::gradRegIncBeta(g1, g2, 0.5, 0.5 * nu_dbl, r, 
                                          digammaHalf, digammaNu_vec[n], 

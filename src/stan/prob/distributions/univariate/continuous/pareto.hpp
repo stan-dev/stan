@@ -23,7 +23,8 @@ namespace stan {
     typename return_type<T_y,T_scale,T_shape>::type
     pareto_log(const T_y& y, const T_scale& y_min, const T_shape& alpha) {
       static const char* function = "stan::prob::pareto_log(%1%)";
-      
+      typedef typename stan::partials_return_type<T_y,T_scale,T_shape>::type T_partials_return;
+
       using stan::math::value_of;
       using stan::math::check_finite;
       using stan::math::check_positive;
@@ -37,7 +38,7 @@ namespace stan {
         return 0.0;
       
       // set up return value accumulator
-      double logp(0.0);
+      T_partials_return logp(0.0);
       
       // validate args (here done over var, which should be OK)
       if (!check_not_nan(function, y, "Random variable", &logp))
@@ -74,33 +75,38 @@ namespace stan {
       agrad::OperandsAndPartials<T_y,T_scale,T_shape> 
         operands_and_partials(y, y_min, alpha);
       
-      DoubleVectorView<include_summand<propto,T_y,T_shape>::value,
+      DoubleVectorView<T_partials_return,
+                       include_summand<propto,T_y,T_shape>::value,
                        is_vector<T_y>::value> log_y(length(y));
       if (include_summand<propto,T_y,T_shape>::value)
         for (size_t n = 0; n < length(y); n++)
           log_y[n] = log(value_of(y_vec[n]));
 
-      DoubleVectorView<!is_constant_struct<T_y>::value
+      DoubleVectorView<T_partials_return,
+                       !is_constant_struct<T_y>::value
                        ||!is_constant_struct<T_shape>::value,
                        is_vector<T_y>::value> inv_y(length(y));
       if (!is_constant_struct<T_y>::value||!is_constant_struct<T_shape>::value)
         for (size_t n = 0; n < length(y); n++)
           inv_y[n] = 1 / value_of(y_vec[n]);
 
-      DoubleVectorView<include_summand<propto,T_scale,T_shape>::value,
+      DoubleVectorView<T_partials_return,
+                       include_summand<propto,T_scale,T_shape>::value,
                        is_vector<T_scale>::value> 
         log_y_min(length(y_min));
       if (include_summand<propto,T_scale,T_shape>::value)
         for (size_t n = 0; n < length(y_min); n++)
           log_y_min[n] = log(value_of(y_min_vec[n]));
 
-      DoubleVectorView<include_summand<propto,T_shape>::value,
+      DoubleVectorView<T_partials_return,
+                       include_summand<propto,T_shape>::value,
                        is_vector<T_shape>::value> log_alpha(length(alpha));
       if (include_summand<propto,T_shape>::value)
         for (size_t n = 0; n < length(alpha); n++)
           log_alpha[n] = log(value_of(alpha_vec[n]));
       
-      DoubleVectorView<!is_constant_struct<T_shape>::value,
+      DoubleVectorView<T_partials_return,
+                       !is_constant_struct<T_shape>::value,
                        is_vector<T_shape>::value> inv_alpha(length(alpha));
       if (!is_constant_struct<T_shape>::value)
         for (size_t n = 0; n < length(alpha); n++)
@@ -109,7 +115,7 @@ namespace stan {
       using stan::math::multiply_log;
 
       for (size_t n = 0; n < N; n++) {
-        const double alpha_dbl = value_of(alpha_vec[n]);
+        const T_partials_return alpha_dbl = value_of(alpha_vec[n]);
         // log probability
         if (include_summand<propto,T_shape>::value)
           logp += log_alpha[n];
@@ -140,7 +146,8 @@ namespace stan {
     template <typename T_y, typename T_scale, typename T_shape>
     typename return_type<T_y, T_scale, T_shape>::type
     pareto_cdf(const T_y& y, const T_scale& y_min, const T_shape& alpha) {
-          
+      typedef typename stan::partials_return_type<T_y,T_scale,T_shape>::type T_partials_return;
+
       // Check sizes
       // Size checks
       if ( !( stan::length(y) && stan::length(y_min) && stan::length(alpha) ) )
@@ -157,7 +164,7 @@ namespace stan {
       using stan::math::check_nonnegative;
       using stan::math::value_of;
           
-      double P(1.0);
+      T_partials_return P(1.0);
           
       if (!check_not_nan(function, y, "Random variable", &P))
         return P;
@@ -204,13 +211,13 @@ namespace stan {
         }
               
         // Pull out values
-        const double log_dbl = log( value_of(y_min_vec[n]) 
+        const T_partials_return log_dbl = log( value_of(y_min_vec[n]) 
                                     / value_of(y_vec[n]) );
-        const double y_min_inv_dbl = 1.0 / value_of(y_min_vec[n]);
-        const double alpha_dbl = value_of(alpha_vec[n]);
+        const T_partials_return y_min_inv_dbl = 1.0 / value_of(y_min_vec[n]);
+        const T_partials_return alpha_dbl = value_of(alpha_vec[n]);
               
         // Compute
-        const double Pn = 1.0 - exp( alpha_dbl * log_dbl );
+        const T_partials_return Pn = 1.0 - exp( alpha_dbl * log_dbl );
                     
         P *= Pn;
               
@@ -245,7 +252,8 @@ namespace stan {
     template <typename T_y, typename T_scale, typename T_shape>
     typename return_type<T_y, T_scale, T_shape>::type
     pareto_cdf_log(const T_y& y, const T_scale& y_min, const T_shape& alpha) {
-          
+      typedef typename stan::partials_return_type<T_y,T_scale,T_shape>::type T_partials_return;
+   
       // Size checks
       if ( !( stan::length(y) && stan::length(y_min) && stan::length(alpha) ) )
         return 0.0;
@@ -261,7 +269,7 @@ namespace stan {
       using stan::math::check_nonnegative;
       using stan::math::value_of;
           
-      double P(0.0);
+      T_partials_return P(0.0);
           
       if (!check_not_nan(function, y, "Random variable", &P))
         return P;
@@ -308,13 +316,13 @@ namespace stan {
         }
               
         // Pull out values
-        const double log_dbl = log( value_of(y_min_vec[n]) 
+        const T_partials_return log_dbl = log( value_of(y_min_vec[n]) 
                                     / value_of(y_vec[n]) );
-        const double y_min_inv_dbl = 1.0 / value_of(y_min_vec[n]);
-        const double alpha_dbl = value_of(alpha_vec[n]);
+        const T_partials_return y_min_inv_dbl = 1.0 / value_of(y_min_vec[n]);
+        const T_partials_return alpha_dbl = value_of(alpha_vec[n]);
               
         // Compute
-        const double Pn = 1.0 - exp(alpha_dbl * log_dbl );
+        const T_partials_return Pn = 1.0 - exp(alpha_dbl * log_dbl );
                     
         P += log(Pn);
               
@@ -336,7 +344,8 @@ namespace stan {
     typename return_type<T_y, T_scale, T_shape>::type
     pareto_ccdf_log(const T_y& y, const T_scale& y_min,
                     const T_shape& alpha) {
-          
+      typedef typename stan::partials_return_type<T_y,T_scale,T_shape>::type T_partials_return;
+
       // Size checks
       if ( !( stan::length(y) && stan::length(y_min) && stan::length(alpha) ) )
         return 0.0;
@@ -352,7 +361,7 @@ namespace stan {
       using stan::math::check_nonnegative;
       using stan::math::value_of;
           
-      double P(0.0);
+      T_partials_return P(0.0);
           
       if (!check_not_nan(function, y, "Random variable", &P))
         return P;
@@ -399,10 +408,10 @@ namespace stan {
         }
               
         // Pull out values
-        const double log_dbl = log( value_of(y_min_vec[n]) 
+        const T_partials_return log_dbl = log( value_of(y_min_vec[n]) 
                                     / value_of(y_vec[n]) );
-        const double y_min_inv_dbl = 1.0 / value_of(y_min_vec[n]);
-        const double alpha_dbl = value_of(alpha_vec[n]);
+        const T_partials_return y_min_inv_dbl = 1.0 / value_of(y_min_vec[n]);
+        const T_partials_return alpha_dbl = value_of(alpha_vec[n]);
               
         P += alpha_dbl * log_dbl;
               

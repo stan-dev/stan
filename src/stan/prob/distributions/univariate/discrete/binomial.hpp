@@ -31,6 +31,7 @@ namespace stan {
     binomial_log(const T_n& n, 
                  const T_N& N, 
                  const T_prob& theta) {
+      typedef typename stan::partials_return_type<T_n,T_N,T_prob>::type T_partials_return;
 
       static const char* function = "stan::prob::binomial_log(%1%)";
       
@@ -47,7 +48,7 @@ namespace stan {
             && stan::length(theta)))
         return 0.0;
 
-      double logp = 0;
+      T_partials_return logp = 0;
       if (!check_bounded(function, n, 0, N,
                          "Successes variable",
                          &logp))
@@ -93,7 +94,9 @@ namespace stan {
         for (size_t i = 0; i < size; ++i)
           logp += binomial_coefficient_log(N_vec[i],n_vec[i]);
 
-      DoubleVectorView<true,is_vector<T_prob>::value> log1m_theta(length(theta));
+      DoubleVectorView<T_partials_return,
+                       true,is_vector<T_prob>::value> 
+        log1m_theta(length(theta));
       for (size_t i = 0; i < length(theta); ++i)
         log1m_theta[i] = log1m(value_of(theta_vec[i]));
 
@@ -103,8 +106,8 @@ namespace stan {
           + (N_vec[i] - n_vec[i]) * log1m_theta[i];
 
       if (length(theta) == 1) {
-        double temp1 = 0;
-        double temp2 = 0;
+        T_partials_return temp1 = 0;
+        T_partials_return temp2 = 0;
         for (size_t i = 0; i < size; ++i) {
           temp1 += n_vec[i];
           temp2 += N_vec[i] - n_vec[i];
@@ -163,7 +166,7 @@ namespace stan {
             && stan::length(alpha)))
         return 0.0;
 
-      double logp = 0;
+      T_partials_return logp = 0;
       if (!check_bounded(function, n, 0, N,
                          "Successes variable",
                          &logp))
@@ -204,11 +207,15 @@ namespace stan {
         for (size_t i = 0; i < size; ++i)
           logp += binomial_coefficient_log(N_vec[i],n_vec[i]);
 
-      DoubleVectorView<true,is_vector<T_prob>::value> log_inv_logit_alpha(length(alpha));
+      DoubleVectorView<T_partials_return,
+                       true,is_vector<T_prob>::value> 
+        log_inv_logit_alpha(length(alpha));
       for (size_t i = 0; i < length(alpha); ++i)
         log_inv_logit_alpha[i] = log_inv_logit(value_of(alpha_vec[i]));
 
-      DoubleVectorView<true,is_vector<T_prob>::value> log_inv_logit_neg_alpha(length(alpha));
+      DoubleVectorView<T_partials_return,
+                       true,is_vector<T_prob>::value> 
+        log_inv_logit_neg_alpha(length(alpha));
       for (size_t i = 0; i < length(alpha); ++i)
         log_inv_logit_neg_alpha[i] = log_inv_logit(-value_of(alpha_vec[i]));
 
@@ -217,8 +224,8 @@ namespace stan {
           + (N_vec[i] - n_vec[i]) * log_inv_logit_neg_alpha[i];
 
       if (length(alpha) == 1) {
-        double temp1 = 0;
-        double temp2 = 0;
+        T_partials_return temp1 = 0;
+        T_partials_return temp2 = 0;
         for (size_t i = 0; i < size; ++i) {
           temp1 += n_vec[i];
           temp2 += N_vec[i] - n_vec[i];
@@ -256,7 +263,8 @@ namespace stan {
     template <typename T_n, typename T_N, typename T_prob>
     typename return_type<T_prob>::type
     binomial_cdf(const T_n& n, const T_N& N, const T_prob& theta) {
-          
+      typedef typename stan::partials_return_type<T_n,T_N,T_prob>::type T_partials_return;
+
       static const char* function = "stan::prob::binomial_cdf(%1%)";
           
       using stan::math::check_finite;
@@ -270,7 +278,7 @@ namespace stan {
       if (!(stan::length(n) && stan::length(N) && stan::length(theta)))
         return 1.0;
           
-      double P(1.0);
+      T_partials_return P(1.0);
           
       // Validate arguments
       if (!check_nonnegative(function, N, "Population size parameter", &P))
@@ -316,11 +324,11 @@ namespace stan {
           continue;
         }
           
-        const double n_dbl = value_of(n_vec[i]);
-        const double N_dbl = value_of(N_vec[i]);
-        const double theta_dbl = value_of(theta_vec[i]);
+        const T_partials_return n_dbl = value_of(n_vec[i]);
+        const T_partials_return N_dbl = value_of(N_vec[i]);
+        const T_partials_return theta_dbl = value_of(theta_vec[i]);
 
-        const double Pi = ibeta(N_dbl - n_dbl, n_dbl + 1, 1 - theta_dbl);
+        const T_partials_return Pi = ibeta(N_dbl - n_dbl, n_dbl + 1, 1 - theta_dbl);
           
         P *= Pi;
 
@@ -342,7 +350,8 @@ namespace stan {
     template <typename T_n, typename T_N, typename T_prob>
     typename return_type<T_prob>::type
     binomial_cdf_log(const T_n& n, const T_N& N, const T_prob& theta) {
-          
+      typedef typename stan::partials_return_type<T_n,T_N,T_prob>::type T_partials_return;
+
       static const char* function = "stan::prob::binomial_cdf_log(%1%)";
           
       using stan::math::check_finite;
@@ -356,7 +365,7 @@ namespace stan {
       if (!(stan::length(n) && stan::length(N) && stan::length(theta)))
         return 0.0;
           
-      double P(0.0);
+      T_partials_return P(0.0);
           
       // Validate arguments
       if (!check_nonnegative(function, N, "Population size parameter", &P))
@@ -397,10 +406,10 @@ namespace stan {
         if (value_of(n_vec[i]) >= value_of(N_vec[i])) {
           continue;
         }
-        const double n_dbl = value_of(n_vec[i]);
-        const double N_dbl = value_of(N_vec[i]);
-        const double theta_dbl = value_of(theta_vec[i]);
-        const double Pi = ibeta(N_dbl - n_dbl, n_dbl + 1, 1 - theta_dbl);
+        const T_partials_return n_dbl = value_of(n_vec[i]);
+        const T_partials_return N_dbl = value_of(N_vec[i]);
+        const T_partials_return theta_dbl = value_of(theta_vec[i]);
+        const T_partials_return Pi = ibeta(N_dbl - n_dbl, n_dbl + 1, 1 - theta_dbl);
           
         P += log(Pi);
 
@@ -415,7 +424,8 @@ namespace stan {
     template <typename T_n, typename T_N, typename T_prob>
     typename return_type<T_prob>::type
     binomial_ccdf_log(const T_n& n, const T_N& N, const T_prob& theta) {
-          
+      typedef typename stan::partials_return_type<T_n,T_N,T_prob>::type T_partials_return;
+
       static const char* function = "stan::prob::binomial_ccdf_log(%1%)";
           
       using stan::math::check_finite;
@@ -429,7 +439,7 @@ namespace stan {
       if (!(stan::length(n) && stan::length(N) && stan::length(theta)))
         return 0.0;
           
-      double P(0.0);
+      T_partials_return P(0.0);
           
       // Validate arguments
       if (!check_nonnegative(function, N, "Population size parameter", &P))
@@ -470,10 +480,10 @@ namespace stan {
         if (value_of(n_vec[i]) >= value_of(N_vec[i])) {
           return operands_and_partials.to_var(stan::math::negative_infinity());
         }
-        const double n_dbl = value_of(n_vec[i]);
-        const double N_dbl = value_of(N_vec[i]);
-        const double theta_dbl = value_of(theta_vec[i]);
-        const double Pi = 1.0 - ibeta(N_dbl - n_dbl, n_dbl + 1, 1 - theta_dbl);
+        const T_partials_return n_dbl = value_of(n_vec[i]);
+        const T_partials_return N_dbl = value_of(N_vec[i]);
+        const T_partials_return theta_dbl = value_of(theta_vec[i]);
+        const T_partials_return Pi = 1.0 - ibeta(N_dbl - n_dbl, n_dbl + 1, 1 - theta_dbl);
           
         P += log(Pi);
 

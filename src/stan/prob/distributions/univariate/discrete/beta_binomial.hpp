@@ -30,6 +30,7 @@ namespace stan {
                       const T_size1& alpha, 
                       const T_size2& beta) {
       static const char* function = "stan::prob::beta_binomial_log(%1%)";
+      typedef typename stan::partials_return_type<T_n,T_N,T_size1,T_size2>::type T_partials_return;
 
       using stan::math::check_finite;
       using stan::math::check_nonnegative;
@@ -45,7 +46,7 @@ namespace stan {
             && stan::length(beta)))
         return 0.0;
       
-      double logp(0.0);
+      T_partials_return logp(0.0);
       if (!check_nonnegative(function, N, "Population size parameter", &logp))
         return logp;
       if (!check_finite(function, alpha, "First prior sample size parameter", &logp))
@@ -84,7 +85,8 @@ namespace stan {
       using stan::math::binomial_coefficient_log;
       using boost::math::digamma;
 
-      DoubleVectorView<include_summand<propto>::value,
+      DoubleVectorView<T_partials_return,
+                       include_summand<propto>::value,
                        is_vector<T_n>::value || is_vector<T_N>::value> 
       normalizing_constant(max_size(N,n));
     for (size_t i = 0; i < max_size(N,n); i++)
@@ -92,7 +94,8 @@ namespace stan {
         normalizing_constant[i] 
           = binomial_coefficient_log(N_vec[i],n_vec[i]);
       
-    DoubleVectorView<include_summand<propto,T_size1,T_size2>::value,
+    DoubleVectorView<T_partials_return,
+                     include_summand<propto,T_size1,T_size2>::value,
                      is_vector<T_n>::value || is_vector<T_N>::value 
                      || is_vector<T_size1>::value || is_vector<T_size2>::value>
     lbeta_numerator(size);
@@ -101,7 +104,8 @@ namespace stan {
       lbeta_numerator[i] = lbeta(n_vec[i] + value_of(alpha_vec[i]),
                                  N_vec[i] - n_vec[i] 
                                  + value_of(beta_vec[i]));
-  DoubleVectorView<include_summand<propto,T_size1,T_size2>::value,
+  DoubleVectorView<T_partials_return,
+                   include_summand<propto,T_size1,T_size2>::value,
                    is_vector<T_size1>::value || is_vector<T_size2>::value>
   lbeta_denominator(max_size(alpha,beta));
 for (size_t i = 0; i < max_size(alpha,beta); i++)
@@ -109,7 +113,8 @@ for (size_t i = 0; i < max_size(alpha,beta); i++)
     lbeta_denominator[i] = lbeta(value_of(alpha_vec[i]), 
                                  value_of(beta_vec[i]));
       
-DoubleVectorView<!is_constant_struct<T_size1>::value,
+ DoubleVectorView<T_partials_return,
+                  !is_constant_struct<T_size1>::value,
                  is_vector<T_n>::value || is_vector<T_size1>::value> 
   digamma_n_plus_alpha(max_size(n,alpha));
  for (size_t i = 0; i < max_size(n,alpha); i++)
@@ -117,7 +122,8 @@ DoubleVectorView<!is_constant_struct<T_size1>::value,
      digamma_n_plus_alpha[i] 
        = digamma(n_vec[i] + value_of(alpha_vec[i]));
 
- DoubleVectorView<!is_constant_struct<T_size1>::value
+ DoubleVectorView<T_partials_return,
+                  !is_constant_struct<T_size1>::value
                   || !is_constant_struct<T_size2>::value,
                   is_vector<T_N>::value 
                   || is_vector<T_size1>::value 
@@ -129,7 +135,8 @@ DoubleVectorView<!is_constant_struct<T_size1>::value,
         digamma_N_plus_alpha_plus_beta[i] 
           = digamma(N_vec[i] + value_of(alpha_vec[i]) + value_of(beta_vec[i]));
 
-    DoubleVectorView<!is_constant_struct<T_size1>::value
+    DoubleVectorView<T_partials_return,
+                     !is_constant_struct<T_size1>::value
                      || !is_constant_struct<T_size2>::value,
                      is_vector<T_size1>::value
                      || is_vector<T_size1>::value> 
@@ -140,14 +147,16 @@ DoubleVectorView<!is_constant_struct<T_size1>::value,
         digamma_alpha_plus_beta[i] 
           = digamma(value_of(alpha_vec[i]) + value_of(beta_vec[i]));
 
-    DoubleVectorView<!is_constant_struct<T_size1>::value, 
+    DoubleVectorView<T_partials_return,
+                     !is_constant_struct<T_size1>::value, 
                      is_vector<T_size1>::value>
     digamma_alpha(length(alpha));
     for (size_t i = 0; i < length(alpha); i++)
       if (!is_constant_struct<T_size1>::value)
         digamma_alpha[i] = digamma(value_of(alpha_vec[i]));
 
-    DoubleVectorView<!is_constant_struct<T_size2>::value, 
+    DoubleVectorView<T_partials_return,
+                     !is_constant_struct<T_size2>::value, 
                      is_vector<T_size2>::value>
     digamma_beta(length(beta));
     for (size_t i = 0; i < length(beta); i++)
@@ -197,7 +206,8 @@ DoubleVectorView<!is_constant_struct<T_size1>::value,
                     const T_size2& beta) {
           
     static const char* function = "stan::prob::beta_binomial_cdf(%1%)";
-          
+    typedef typename stan::partials_return_type<T_n,T_N,T_size1,T_size2>::type T_partials_return;
+
     using stan::math::check_finite;
     using stan::math::check_nonnegative;
     using stan::math::check_positive;
@@ -210,7 +220,7 @@ DoubleVectorView<!is_constant_struct<T_size1>::value,
           && stan::length(beta)))
       return 1.0;
           
-    double P(1.0);
+    T_partials_return P(1.0);
           
     // Validate arguments
     if (!check_nonnegative(function, N, "Population size parameter", &P))
@@ -265,18 +275,18 @@ DoubleVectorView<!is_constant_struct<T_size1>::value,
         continue;
       }
               
-      const double n_dbl = value_of(n_vec[i]);
-      const double N_dbl = value_of(N_vec[i]);
-      const double alpha_dbl = value_of(alpha_vec[i]);
-      const double beta_dbl = value_of(beta_vec[i]);
+      const T_partials_return n_dbl = value_of(n_vec[i]);
+      const T_partials_return N_dbl = value_of(N_vec[i]);
+      const T_partials_return alpha_dbl = value_of(alpha_vec[i]);
+      const T_partials_return beta_dbl = value_of(beta_vec[i]);
               
-      const double mu = alpha_dbl + n_dbl + 1;
-      const double nu = beta_dbl + N_dbl - n_dbl - 1;
+      const T_partials_return mu = alpha_dbl + n_dbl + 1;
+      const T_partials_return nu = beta_dbl + N_dbl - n_dbl - 1;
               
-      const double F = stan::math::F32(1, mu, -N_dbl + n_dbl + 1, n_dbl + 2, 
+      const T_partials_return F = stan::math::F32(1, mu, -N_dbl + n_dbl + 1, n_dbl + 2, 
                                        1 - nu, 1);
               
-      double C = lgamma(nu) - lgamma(N_dbl - n_dbl);
+      T_partials_return C = lgamma(nu) - lgamma(N_dbl - n_dbl);
       C += lgamma(mu) - lgamma(n_dbl + 2);
       C += lgamma(N_dbl + 2) - lgamma(N_dbl + alpha_dbl + beta_dbl);
       C = std::exp(C);
@@ -284,13 +294,13 @@ DoubleVectorView<!is_constant_struct<T_size1>::value,
       C *= F / boost::math::beta(alpha_dbl, beta_dbl);
       C /= N_dbl + 1;
               
-      const double Pi = 1 - C;
+      const T_partials_return Pi = 1 - C;
               
       P *= Pi;
               
-      double dF[6];
-      double digammaOne = 0;
-      double digammaTwo = 0;
+      T_partials_return dF[6];
+      T_partials_return digammaOne = 0;
+      T_partials_return digammaTwo = 0;
               
       if ( (!is_constant_struct<T_size1>::value) 
            || (!is_constant_struct<T_size2>::value) ) {
@@ -300,14 +310,14 @@ DoubleVectorView<!is_constant_struct<T_size1>::value,
                             1 - nu, 1);
       }
       if (!is_constant_struct<T_size1>::value) {
-        const double g 
+        const T_partials_return g 
           = - C * (digamma(mu) - digammaOne + dF[1] / F
                    - digamma(alpha_dbl) + digammaTwo);
         operands_and_partials.d_x1[i] 
           += g / Pi;
       }
       if (!is_constant_struct<T_size2>::value) {
-        const double g 
+        const T_partials_return g 
           = - C * (digamma(nu) - digammaOne - dF[4] / F - digamma(beta_dbl) 
                    + digammaTwo);
         operands_and_partials.d_x2[i] 
@@ -332,7 +342,8 @@ DoubleVectorView<!is_constant_struct<T_size1>::value,
                         const T_size2& beta) {
           
     static const char* function = "stan::prob::beta_binomial_cdf_log(%1%)";
-          
+    typedef typename stan::partials_return_type<T_n,T_N,T_size1,T_size2>::type T_partials_return;
+
     using stan::math::check_finite;
     using stan::math::check_nonnegative;
     using stan::math::check_positive;
@@ -345,7 +356,7 @@ DoubleVectorView<!is_constant_struct<T_size1>::value,
           && stan::length(beta)))
       return 0.0;
           
-    double P(0.0);
+    T_partials_return P(0.0);
           
     // Validate arguments
     if (!check_nonnegative(function, N, "Population size parameter", &P))
@@ -395,18 +406,18 @@ DoubleVectorView<!is_constant_struct<T_size1>::value,
         continue;
       }
               
-      const double n_dbl = value_of(n_vec[i]);
-      const double N_dbl = value_of(N_vec[i]);
-      const double alpha_dbl = value_of(alpha_vec[i]);
-      const double beta_dbl = value_of(beta_vec[i]);
+      const T_partials_return n_dbl = value_of(n_vec[i]);
+      const T_partials_return N_dbl = value_of(N_vec[i]);
+      const T_partials_return alpha_dbl = value_of(alpha_vec[i]);
+      const T_partials_return beta_dbl = value_of(beta_vec[i]);
               
-      const double mu = alpha_dbl + n_dbl + 1;
-      const double nu = beta_dbl + N_dbl - n_dbl - 1;
+      const T_partials_return mu = alpha_dbl + n_dbl + 1;
+      const T_partials_return nu = beta_dbl + N_dbl - n_dbl - 1;
               
-      const double F = stan::math::F32(1, mu, -N_dbl + n_dbl + 1, n_dbl + 2, 
+      const T_partials_return F = stan::math::F32(1, mu, -N_dbl + n_dbl + 1, n_dbl + 2, 
                                        1 - nu, 1);
               
-      double C = lgamma(nu) - lgamma(N_dbl - n_dbl);
+      T_partials_return C = lgamma(nu) - lgamma(N_dbl - n_dbl);
       C += lgamma(mu) - lgamma(n_dbl + 2);
       C += lgamma(N_dbl + 2) - lgamma(N_dbl + alpha_dbl + beta_dbl);
       C = std::exp(C);
@@ -414,13 +425,13 @@ DoubleVectorView<!is_constant_struct<T_size1>::value,
       C *= F / boost::math::beta(alpha_dbl, beta_dbl);
       C /= N_dbl + 1;
               
-      const double Pi = 1 - C;
+      const T_partials_return Pi = 1 - C;
               
       P += log(Pi);
               
-      double dF[6];
-      double digammaOne = 0;
-      double digammaTwo = 0;
+      T_partials_return dF[6];
+      T_partials_return digammaOne = 0;
+      T_partials_return digammaTwo = 0;
               
       if ( (!is_constant_struct<T_size1>::value) 
            || (!is_constant_struct<T_size2>::value) ) {
@@ -430,13 +441,13 @@ DoubleVectorView<!is_constant_struct<T_size1>::value,
                             1 - nu, 1);
       }
       if (!is_constant_struct<T_size1>::value) {
-        const double g 
+        const T_partials_return g 
           = - C * (digamma(mu) - digammaOne + dF[1] / F
                    - digamma(alpha_dbl) + digammaTwo);
         operands_and_partials.d_x1[i] += g / Pi;
       }
       if (!is_constant_struct<T_size2>::value) {
-        const double g 
+        const T_partials_return g 
           = - C * (digamma(nu) - digammaOne - dF[4] / F - digamma(beta_dbl) 
                    + digammaTwo);
         operands_and_partials.d_x2[i] += g / Pi;
@@ -453,7 +464,8 @@ DoubleVectorView<!is_constant_struct<T_size1>::value,
                         const T_size2& beta) {
           
     static const char* function = "stan::prob::beta_binomial_ccdf_log(%1%)";
-          
+    typedef typename stan::partials_return_type<T_n,T_N,T_size1,T_size2>::type T_partials_return;
+
     using stan::math::check_finite;
     using stan::math::check_nonnegative;
     using stan::math::check_positive;
@@ -466,7 +478,7 @@ DoubleVectorView<!is_constant_struct<T_size1>::value,
           && stan::length(beta)))
       return 0.0;
           
-    double P(0.0);
+    T_partials_return P(0.0);
           
     // Validate arguments
     if (!check_nonnegative(function, N, "Population size parameter", &P))
@@ -516,18 +528,18 @@ DoubleVectorView<!is_constant_struct<T_size1>::value,
         return operands_and_partials.to_var(stan::math::negative_infinity());
       }
               
-      const double n_dbl = value_of(n_vec[i]);
-      const double N_dbl = value_of(N_vec[i]);
-      const double alpha_dbl = value_of(alpha_vec[i]);
-      const double beta_dbl = value_of(beta_vec[i]);
+      const T_partials_return n_dbl = value_of(n_vec[i]);
+      const T_partials_return N_dbl = value_of(N_vec[i]);
+      const T_partials_return alpha_dbl = value_of(alpha_vec[i]);
+      const T_partials_return beta_dbl = value_of(beta_vec[i]);
               
-      const double mu = alpha_dbl + n_dbl + 1;
-      const double nu = beta_dbl + N_dbl - n_dbl - 1;
+      const T_partials_return mu = alpha_dbl + n_dbl + 1;
+      const T_partials_return nu = beta_dbl + N_dbl - n_dbl - 1;
               
-      const double F = stan::math::F32(1, mu, -N_dbl + n_dbl + 1, n_dbl + 2, 
+      const T_partials_return F = stan::math::F32(1, mu, -N_dbl + n_dbl + 1, n_dbl + 2, 
                                        1 - nu, 1);
               
-      double C = lgamma(nu) - lgamma(N_dbl - n_dbl);
+      T_partials_return C = lgamma(nu) - lgamma(N_dbl - n_dbl);
       C += lgamma(mu) - lgamma(n_dbl + 2);
       C += lgamma(N_dbl + 2) - lgamma(N_dbl + alpha_dbl + beta_dbl);
       C = std::exp(C);
@@ -535,13 +547,13 @@ DoubleVectorView<!is_constant_struct<T_size1>::value,
       C *= F / boost::math::beta(alpha_dbl, beta_dbl);
       C /= N_dbl + 1;
               
-      const double Pi = C;
+      const T_partials_return Pi = C;
               
       P += log(Pi);
               
-      double dF[6];
-      double digammaOne = 0;
-      double digammaTwo = 0;
+      T_partials_return dF[6];
+      T_partials_return digammaOne = 0;
+      T_partials_return digammaTwo = 0;
               
       if ( (!is_constant_struct<T_size1>::value) 
            || (!is_constant_struct<T_size2>::value) ) {
@@ -551,13 +563,13 @@ DoubleVectorView<!is_constant_struct<T_size1>::value,
                             1 - nu, 1);
       }
       if (!is_constant_struct<T_size1>::value) {
-        const double g 
+        const T_partials_return g 
           = - C * (digamma(mu) - digammaOne + dF[1] / F
                    - digamma(alpha_dbl) + digammaTwo);
         operands_and_partials.d_x1[i] -= g / Pi;
       }
       if (!is_constant_struct<T_size2>::value) {
-        const double g 
+        const T_partials_return g 
           = - C * (digamma(nu) - digammaOne - dF[4] / F - digamma(beta_dbl) 
                    + digammaTwo);
         operands_and_partials.d_x2[i] -= g / Pi;

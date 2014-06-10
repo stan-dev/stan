@@ -30,6 +30,7 @@ namespace stan {
     neg_binomial_log(const T_n& n, 
                      const T_shape& alpha, 
                      const T_inv_scale& beta) {
+      typedef typename stan::partials_return_type<T_n,T_shape,T_inv_scale>::type T_partials_return;
 
       static const char* function = "stan::prob::neg_binomial_log(%1%)";
 
@@ -46,7 +47,7 @@ namespace stan {
             && stan::length(beta)))
         return 0.0;
       
-      double logp(0.0);
+      T_partials_return logp(0.0);
       if (!check_nonnegative(function, n, "Failures variable", &logp))
         return logp;
       if (!check_finite(function, alpha, "Shape parameter", &logp))
@@ -85,23 +86,23 @@ namespace stan {
         operands_and_partials(alpha,beta);
 
       size_t len_ab = max_size(alpha,beta);
-      DoubleVectorView<true,(is_vector<T_shape>::value 
+      DoubleVectorView<T_partials_return,true,(is_vector<T_shape>::value 
                              || is_vector<T_inv_scale>::value)>
         lambda(len_ab);
       for (size_t i = 0; i < len_ab; ++i) 
         lambda[i] = value_of(alpha_vec[i]) / value_of(beta_vec[i]);
 
-      DoubleVectorView<true,is_vector<T_inv_scale>::value>
+      DoubleVectorView<T_partials_return,true,is_vector<T_inv_scale>::value>
         log1p_beta(length(beta));
       for (size_t i = 0; i < length(beta); ++i)
         log1p_beta[i] = log1p(value_of(beta_vec[i]));
 
-      DoubleVectorView<true,is_vector<T_inv_scale>::value>
+      DoubleVectorView<T_partials_return,true,is_vector<T_inv_scale>::value>
         log_beta_m_log1p_beta(length(beta));
       for (size_t i = 0; i < length(beta); ++i)
         log_beta_m_log1p_beta[i] = log(value_of(beta_vec[i])) - log1p_beta[i];
 
-      DoubleVectorView<true,(is_vector<T_inv_scale>::value
+      DoubleVectorView<T_partials_return,true,(is_vector<T_inv_scale>::value
                              || is_vector<T_shape>::value)>
         alpha_times_log_beta_over_1p_beta(len_ab);
       for (size_t i = 0; i < len_ab; ++i)
@@ -110,23 +111,24 @@ namespace stan {
           * log(value_of(beta_vec[i]) 
                 / (1.0 + value_of(beta_vec[i])));
 
-      DoubleVectorView<!is_constant_struct<T_shape>::value, 
+      DoubleVectorView<T_partials_return,!is_constant_struct<T_shape>::value, 
         is_vector<T_shape>::value>
         digamma_alpha(length(alpha));
       if (!is_constant_struct<T_shape>::value)
         for (size_t i = 0; i < length(alpha); ++i)
           digamma_alpha[i] = digamma(value_of(alpha_vec[i]));
 
-      DoubleVectorView<!is_constant_struct<T_shape>::value,
-        is_vector<T_inv_scale>::value>
+      DoubleVectorView<T_partials_return,!is_constant_struct<T_shape>::value,
+                       is_vector<T_inv_scale>::value>
         log_beta(length(beta));
       if (!is_constant_struct<T_shape>::value)
         for (size_t i = 0; i < length(beta); ++i)
           log_beta[i] = log(value_of(beta_vec[i]));
 
-      DoubleVectorView<!is_constant_struct<T_inv_scale>::value, 
-        (is_vector<T_shape>::value
-         || is_vector<T_inv_scale>::value)>
+      DoubleVectorView<T_partials_return,
+                       !is_constant_struct<T_inv_scale>::value, 
+                       (is_vector<T_shape>::value
+                        || is_vector<T_inv_scale>::value)>
         lambda_m_alpha_over_1p_beta(len_ab);
       if (!is_constant_struct<T_inv_scale>::value)
         for (size_t i = 0; i < len_ab; ++i)
@@ -192,7 +194,8 @@ namespace stan {
     neg_binomial_cdf(const T_n& n, const T_shape& alpha, 
                      const T_inv_scale& beta) {
       static const char* function = "stan::prob::neg_binomial_cdf(%1%)";
-          
+      typedef typename stan::partials_return_type<T_n,T_shape,T_inv_scale>::type T_partials_return;
+
       using stan::math::check_finite;      
       using stan::math::check_nonnegative;
       using stan::math::check_positive;
@@ -203,7 +206,7 @@ namespace stan {
       if (!(stan::length(n) && stan::length(alpha) && stan::length(beta)))
         return 1.0;
           
-      double P(1.0);
+      T_partials_return P(1.0);
           
       // Validate arguments
       if (!check_finite(function, alpha, "Shape parameter", &P))
@@ -252,24 +255,28 @@ namespace stan {
       }
           
       // Cache a few expensive function calls if alpha is a parameter
-      DoubleVectorView<!is_constant_struct<T_shape>::value,
-        is_vector<T_shape>::value> 
+      DoubleVectorView<T_partials_return,
+                       !is_constant_struct<T_shape>::value,
+                       is_vector<T_shape>::value> 
         digammaN_vec(stan::length(alpha));
-      DoubleVectorView<!is_constant_struct<T_shape>::value, 
-        is_vector<T_shape>::value> 
+      DoubleVectorView<T_partials_return,
+                       !is_constant_struct<T_shape>::value, 
+                       is_vector<T_shape>::value> 
         digammaAlpha_vec(stan::length(alpha));
-      DoubleVectorView<!is_constant_struct<T_shape>::value, 
-        is_vector<T_shape>::value> 
+      DoubleVectorView<T_partials_return,
+                       !is_constant_struct<T_shape>::value, 
+                       is_vector<T_shape>::value> 
         digammaSum_vec(stan::length(alpha));
-      DoubleVectorView<!is_constant_struct<T_shape>::value, 
-        is_vector<T_shape>::value> 
+      DoubleVectorView<T_partials_return,
+                       !is_constant_struct<T_shape>::value, 
+                       is_vector<T_shape>::value> 
         betaFunc_vec(stan::length(alpha));
           
       if (!is_constant_struct<T_shape>::value) {
               
         for (size_t i = 0; i < stan::length(alpha); i++) {
-          const double n_dbl = value_of(n_vec[i]);
-          const double alpha_dbl = value_of(alpha_vec[i]);
+          const T_partials_return n_dbl = value_of(n_vec[i]);
+          const T_partials_return alpha_dbl = value_of(alpha_vec[i]);
                   
           digammaN_vec[i] = digamma(n_dbl + 1);
           digammaAlpha_vec[i] = digamma(alpha_dbl);
@@ -286,22 +293,22 @@ namespace stan {
             == std::numeric_limits<double>::infinity())
           continue;
               
-        const double n_dbl = value_of(n_vec[i]);
-        const double alpha_dbl = value_of(alpha_vec[i]);
-        const double beta_dbl = value_of(beta_vec[i]);
+        const T_partials_return n_dbl = value_of(n_vec[i]);
+        const T_partials_return alpha_dbl = value_of(alpha_vec[i]);
+        const T_partials_return beta_dbl = value_of(beta_vec[i]);
               
-        const double p_dbl = beta_dbl / (1.0 + beta_dbl);
-        const double d_dbl = 1.0 / ( (1.0 + beta_dbl) 
+        const T_partials_return p_dbl = beta_dbl / (1.0 + beta_dbl);
+        const T_partials_return d_dbl = 1.0 / ( (1.0 + beta_dbl) 
                                      * (1.0 + beta_dbl) );
               
-        const double Pi = ibeta(alpha_dbl, n_dbl + 1.0, p_dbl);
+        const T_partials_return Pi = ibeta(alpha_dbl, n_dbl + 1.0, p_dbl);
               
         P *= Pi;
               
         if (!is_constant_struct<T_shape>::value) {
                   
-          double g1 = 0;
-          double g2 = 0;
+          T_partials_return g1 = 0;
+          T_partials_return g2 = 0;
 
           stan::math::gradRegIncBeta(g1, g2, alpha_dbl, 
                                      n_dbl + 1, p_dbl, 
@@ -339,7 +346,8 @@ namespace stan {
     neg_binomial_cdf_log(const T_n& n, const T_shape& alpha, 
                      const T_inv_scale& beta) {
       static const char* function = "stan::prob::neg_binomial_cdf_log(%1%)";
-          
+      typedef typename stan::partials_return_type<T_n,T_shape,T_inv_scale>::type T_partials_return;
+
       using stan::math::check_finite;      
       using stan::math::check_nonnegative;
       using stan::math::check_positive;
@@ -350,7 +358,7 @@ namespace stan {
       if (!(stan::length(n) && stan::length(alpha) && stan::length(beta)))
         return 0.0;
           
-      double P(0.0);
+      T_partials_return P(0.0);
           
       // Validate arguments
       if (!check_finite(function, alpha, "Shape parameter", &P))
@@ -393,23 +401,27 @@ namespace stan {
       }
           
       // Cache a few expensive function calls if alpha is a parameter
-      DoubleVectorView<!is_constant_struct<T_shape>::value,
-        is_vector<T_shape>::value> 
+      DoubleVectorView<T_partials_return,
+                       !is_constant_struct<T_shape>::value,
+                       is_vector<T_shape>::value> 
         digammaN_vec(stan::length(alpha));
-      DoubleVectorView<!is_constant_struct<T_shape>::value, 
-        is_vector<T_shape>::value> 
+      DoubleVectorView<T_partials_return,
+                       !is_constant_struct<T_shape>::value, 
+                       is_vector<T_shape>::value> 
         digammaAlpha_vec(stan::length(alpha));
-      DoubleVectorView<!is_constant_struct<T_shape>::value, 
-        is_vector<T_shape>::value> 
+      DoubleVectorView<T_partials_return,
+                       !is_constant_struct<T_shape>::value, 
+                       is_vector<T_shape>::value> 
         digammaSum_vec(stan::length(alpha));
-      DoubleVectorView<!is_constant_struct<T_shape>::value, 
-        is_vector<T_shape>::value> 
+      DoubleVectorView<T_partials_return,
+                       !is_constant_struct<T_shape>::value, 
+                       is_vector<T_shape>::value> 
         betaFunc_vec(stan::length(alpha));
           
       if (!is_constant_struct<T_shape>::value) {
         for (size_t i = 0; i < stan::length(alpha); i++) {
-          const double n_dbl = value_of(n_vec[i]);
-          const double alpha_dbl = value_of(alpha_vec[i]);
+          const T_partials_return n_dbl = value_of(n_vec[i]);
+          const T_partials_return alpha_dbl = value_of(alpha_vec[i]);
                   
           digammaN_vec[i] = digamma(n_dbl + 1);
           digammaAlpha_vec[i] = digamma(alpha_dbl);
@@ -425,19 +437,19 @@ namespace stan {
             == std::numeric_limits<double>::infinity())
           continue;
               
-        const double n_dbl = value_of(n_vec[i]);
-        const double alpha_dbl = value_of(alpha_vec[i]);
-        const double beta_dbl = value_of(beta_vec[i]);
-        const double p_dbl = beta_dbl / (1.0 + beta_dbl);
-        const double d_dbl = 1.0 / ( (1.0 + beta_dbl) 
+        const T_partials_return n_dbl = value_of(n_vec[i]);
+        const T_partials_return alpha_dbl = value_of(alpha_vec[i]);
+        const T_partials_return beta_dbl = value_of(beta_vec[i]);
+        const T_partials_return p_dbl = beta_dbl / (1.0 + beta_dbl);
+        const T_partials_return d_dbl = 1.0 / ( (1.0 + beta_dbl) 
                                      * (1.0 + beta_dbl) );
-        const double Pi = ibeta(alpha_dbl, n_dbl + 1.0, p_dbl);
+        const T_partials_return Pi = ibeta(alpha_dbl, n_dbl + 1.0, p_dbl);
               
         P += log(Pi);
               
         if (!is_constant_struct<T_shape>::value) {
-          double g1 = 0;
-          double g2 = 0;
+          T_partials_return g1 = 0;
+          T_partials_return g2 = 0;
 
           stan::math::gradRegIncBeta(g1, g2, alpha_dbl, 
                                      n_dbl + 1, p_dbl, 
@@ -461,7 +473,8 @@ namespace stan {
     neg_binomial_ccdf_log(const T_n& n, const T_shape& alpha, 
                      const T_inv_scale& beta) {
       static const char* function = "stan::prob::neg_binomial_ccdf_log(%1%)";
-          
+      typedef typename stan::partials_return_type<T_n,T_shape,T_inv_scale>::type T_partials_return;
+
       using stan::math::check_finite;      
       using stan::math::check_nonnegative;
       using stan::math::check_positive;
@@ -472,7 +485,7 @@ namespace stan {
       if (!(stan::length(n) && stan::length(alpha) && stan::length(beta)))
         return 0.0;
           
-      double P(0.0);
+      T_partials_return P(0.0);
           
       // Validate arguments
       if (!check_finite(function, alpha, "Shape parameter", &P))
@@ -515,23 +528,27 @@ namespace stan {
       }
           
       // Cache a few expensive function calls if alpha is a parameter
-      DoubleVectorView<!is_constant_struct<T_shape>::value,
-        is_vector<T_shape>::value> 
+      DoubleVectorView<T_partials_return,
+                       !is_constant_struct<T_shape>::value,
+                       is_vector<T_shape>::value> 
         digammaN_vec(stan::length(alpha));
-      DoubleVectorView<!is_constant_struct<T_shape>::value, 
-        is_vector<T_shape>::value> 
+      DoubleVectorView<T_partials_return,
+                       !is_constant_struct<T_shape>::value, 
+                       is_vector<T_shape>::value> 
         digammaAlpha_vec(stan::length(alpha));
-      DoubleVectorView<!is_constant_struct<T_shape>::value, 
-        is_vector<T_shape>::value> 
+      DoubleVectorView<T_partials_return,
+                       !is_constant_struct<T_shape>::value, 
+                       is_vector<T_shape>::value> 
         digammaSum_vec(stan::length(alpha));
-      DoubleVectorView<!is_constant_struct<T_shape>::value, 
-        is_vector<T_shape>::value> 
+      DoubleVectorView<T_partials_return,
+                       !is_constant_struct<T_shape>::value, 
+                       is_vector<T_shape>::value> 
         betaFunc_vec(stan::length(alpha));
           
       if (!is_constant_struct<T_shape>::value) {
         for (size_t i = 0; i < stan::length(alpha); i++) {
-          const double n_dbl = value_of(n_vec[i]);
-          const double alpha_dbl = value_of(alpha_vec[i]);
+          const T_partials_return n_dbl = value_of(n_vec[i]);
+          const T_partials_return alpha_dbl = value_of(alpha_vec[i]);
                   
           digammaN_vec[i] = digamma(n_dbl + 1);
           digammaAlpha_vec[i] = digamma(alpha_dbl);
@@ -547,19 +564,19 @@ namespace stan {
             == std::numeric_limits<double>::infinity())
           return operands_and_partials.to_var(stan::math::negative_infinity());
               
-        const double n_dbl = value_of(n_vec[i]);
-        const double alpha_dbl = value_of(alpha_vec[i]);
-        const double beta_dbl = value_of(beta_vec[i]);
-        const double p_dbl = beta_dbl / (1.0 + beta_dbl);
-        const double d_dbl = 1.0 / ( (1.0 + beta_dbl) 
+        const T_partials_return n_dbl = value_of(n_vec[i]);
+        const T_partials_return alpha_dbl = value_of(alpha_vec[i]);
+        const T_partials_return beta_dbl = value_of(beta_vec[i]);
+        const T_partials_return p_dbl = beta_dbl / (1.0 + beta_dbl);
+        const T_partials_return d_dbl = 1.0 / ( (1.0 + beta_dbl) 
                                      * (1.0 + beta_dbl) );
-        const double Pi = 1.0 - ibeta(alpha_dbl, n_dbl + 1.0, p_dbl);
+        const T_partials_return Pi = 1.0 - ibeta(alpha_dbl, n_dbl + 1.0, p_dbl);
               
         P += log(Pi);
               
         if (!is_constant_struct<T_shape>::value) {
-          double g1 = 0;
-          double g2 = 0;
+          T_partials_return g1 = 0;
+          T_partials_return g2 = 0;
 
           stan::math::gradRegIncBeta(g1, g2, alpha_dbl, 
                                      n_dbl + 1, p_dbl, 
