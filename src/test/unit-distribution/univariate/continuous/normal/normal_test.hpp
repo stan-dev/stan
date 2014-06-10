@@ -2,7 +2,6 @@
 #include <stan/prob/distributions/univariate/continuous/normal.hpp>
 
 #include <stan/math/constants.hpp>
-#include <stan/math/functions/square.hpp>
 
 using std::vector;
 using std::numeric_limits;
@@ -62,44 +61,31 @@ public:
   }
 
   template <typename T_y, typename T_loc, typename T_scale,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_y, T_loc, T_scale>::type 
   log_prob(const T_y& y, const T_loc& mu, const T_scale& sigma,
-     const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+           const T3&, const T4&, const T5&) {
     return stan::prob::normal_log(y, mu, sigma);
   }
 
   template <bool propto, 
-      typename T_y, typename T_loc, typename T_scale,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            typename T_y, typename T_loc, typename T_scale,
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_y, T_loc, T_scale>::type 
   log_prob(const T_y& y, const T_loc& mu, const T_scale& sigma,
-     const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+     const T3&, const T4&, const T5&) {
     return stan::prob::normal_log<propto>(y, mu, sigma);
   }
   
   
   template <typename T_y, typename T_loc, typename T_scale,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
-  var log_prob_function(const T_y& y, const T_loc& mu, const T_scale& sigma,
-      const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
-    using stan::prob::include_summand;
+            typename T3, typename T4, typename T5>
+  typename stan::return_type<T_y,T_loc,T_scale,T3,T4,T5>::type
+  log_prob_function(const T_y& y, const T_loc& mu, const T_scale& sigma,
+                    const T3&, const T4&, const T5&) {
     using stan::math::pi;
-    using stan::math::square;
-    var lp(0.0);
-    if (include_summand<true,T_y,T_loc,T_scale>::value)
-      lp -= 0.5 * (y - mu) * (y - mu) / (sigma * sigma);
-    if (include_summand<true,T_scale>::value)
-      lp -= log(sigma);
-    if (include_summand<true>::value)
-      lp -= log(sqrt(2.0 * pi()));
-    return lp;
+    return -0.5 * (y - mu) * (y - mu) / (sigma * sigma) 
+      - log(sigma) -log(sqrt(2.0 * pi()));
   }
 };
 

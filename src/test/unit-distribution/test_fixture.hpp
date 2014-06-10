@@ -254,10 +254,6 @@ public:
   typedef typename at_c<typename at_c<T,1>::type, 3>::type T3;
   typedef typename at_c<typename at_c<T,1>::type, 4>::type T4;
   typedef typename at_c<typename at_c<T,1>::type, 5>::type T5;
-  typedef typename at_c<typename at_c<T,1>::type, 6>::type T6;
-  typedef typename at_c<typename at_c<T,1>::type, 7>::type T7;
-  typedef typename at_c<typename at_c<T,1>::type, 8>::type T8;
-  typedef typename at_c<typename at_c<T,1>::type, 9>::type T9;
 
   typedef typename scalar_type<T0>::type Scalar0;
   typedef typename scalar_type<T1>::type Scalar1;
@@ -265,11 +261,7 @@ public:
   typedef typename scalar_type<T3>::type Scalar3;
   typedef typename scalar_type<T4>::type Scalar4;
   typedef typename scalar_type<T5>::type Scalar5;
-  typedef typename scalar_type<T6>::type Scalar6;
-  typedef typename scalar_type<T7>::type Scalar7;
-  typedef typename scalar_type<T8>::type Scalar8;
-  typedef typename scalar_type<T9>::type Scalar9;
-  
+
   void call_all_versions() {
     vector<double> log_prob;
     vector<vector<double> > parameters;
@@ -281,24 +273,20 @@ public:
     T3 p3 = get_params<T3>(parameters, 3);
     T4 p4 = get_params<T4>(parameters, 4);
     T5 p5 = get_params<T5>(parameters, 5);
-    T6 p6 = get_params<T6>(parameters, 6);
-    T7 p7 = get_params<T7>(parameters, 7);
-    T8 p8 = get_params<T8>(parameters, 8);
-    T9 p9 = get_params<T9>(parameters, 9);
-    
+
     EXPECT_NO_THROW(({ TestClass.template log_prob
-            <T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>
-            (p0, p1, p2, p3, p4, p5, p6, p7, p8, p9); }))
+            <T0, T1, T2, T3, T4, T5>
+            (p0, p1, p2, p3, p4, p5); }))
       << "Calling log_prob throws exception with default parameters";
 
     EXPECT_NO_THROW(({ TestClass.template log_prob
-            <true, T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>
-            (p0, p1, p2, p3, p4, p5, p6, p7, p8, p9); }))
+            <true, T0, T1, T2, T3, T4, T5>
+            (p0, p1, p2, p3, p4, p5); }))
       << "Calling log_prob throws exception with propto=true";
 
     EXPECT_NO_THROW(({ TestClass.template log_prob
-            <false, T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>
-            (p0, p1, p2, p3, p4, p5, p6, p7, p8, p9); }))
+            <false, T0, T1, T2, T3, T4, T5>
+            (p0, p1, p2, p3, p4, p5); }))
       << "Calling log_prob throws exception with propto=false";
   }
 
@@ -314,35 +302,31 @@ public:
       T3 p3 = get_params<T3>(parameters, n, 3);
       T4 p4 = get_params<T4>(parameters, n, 4);
       T5 p5 = get_params<T5>(parameters, n, 5);
-      T6 p6 = get_params<T6>(parameters, n, 6);
-      T7 p7 = get_params<T7>(parameters, n, 7);
-      T8 p8 = get_params<T8>(parameters, n, 8);
-      T9 p9 = get_params<T9>(parameters, n, 9);
 
       var lp(0);
       EXPECT_NO_THROW(({ lp = TestClass.template log_prob
-              <true,T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>
-              (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9); }))
+              <true,T0,T1,T2,T3,T4,T5>
+              (p0,p1,p2,p3,p4,p5); }))
         << "Valid parameters failed at index: " << n << " -- " 
         << parameters[n];
 
-      if (all_constant<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
+      if (all_constant<T0,T1,T2,T3,T4,T5>::value) {
         // all double inputs should result in a log probability of 0
         EXPECT_FLOAT_EQ(0.0, lp.val())
           << "All constant inputs should result in 0 log probability. Failed at index: " << n;
       }
-      if (all_scalar<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
+      if (all_scalar<T0,T1,T2,T3,T4,T5>::value) {
         lp = TestClass.template log_prob
-          <false,T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>
-          (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
+          <false,T0,T1,T2,T3,T4,T5>
+          (p0,p1,p2,p3,p4,p5);
         EXPECT_FLOAT_EQ(log_prob[n], lp.val())
           << "For all scalar inputs, when propto is false, log_prob should match the provided value. Failed at index: " << n;
       }
-      if (all_constant<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value 
-          && all_scalar<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
+      if (all_constant<T0,T1,T2,T3,T4,T5>::value 
+          && all_scalar<T0,T1,T2,T3,T4,T5>::value) {
         lp = TestClass.template log_prob
-          <T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>
-          (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
+          <T0,T1,T2,T3,T4,T5>
+          (p0,p1,p2,p3,p4,p5);
         EXPECT_FLOAT_EQ(log_prob[n], lp.val())
           << "For all scalar and all constant inputs log_prob should match the provided value. Failed at index: " << n;
       }
@@ -360,21 +344,17 @@ public:
     Scalar3 p3 = get_param<Scalar3>(invalid_params, 3);
     Scalar4 p4 = get_param<Scalar4>(invalid_params, 4);
     Scalar5 p5 = get_param<Scalar5>(invalid_params, 5);
-    Scalar6 p6 = get_param<Scalar6>(invalid_params, 6);
-    Scalar7 p7 = get_param<Scalar7>(invalid_params, 7);
-    Scalar8 p8 = get_param<Scalar8>(invalid_params, 8);
-    Scalar9 p9 = get_param<Scalar9>(invalid_params, 9);
       
     EXPECT_THROW(({ TestClass.template log_prob
-            <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9>
-            (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9); }),
+            <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5>
+            (p0,p1,p2,p3,p4,p5); }),
       std::domain_error) 
       << "NaN value at index " << n << " should have failed" << std::endl
       << invalid_params;
   }
   
   void test_invalid_values() {
-    if (!all_scalar<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value)
+    if (!all_scalar<T0,T1,T2,T3,T4,T5>::value)
       return;
 
     vector<double> parameters = this->first_valid_params();
@@ -394,14 +374,10 @@ public:
       Scalar3 p3 = get_param<Scalar3>(invalid_params, 3);
       Scalar4 p4 = get_param<Scalar4>(invalid_params, 4);
       Scalar5 p5 = get_param<Scalar5>(invalid_params, 5);
-      Scalar6 p6 = get_param<Scalar6>(invalid_params, 6);
-      Scalar7 p7 = get_param<Scalar7>(invalid_params, 7);
-      Scalar8 p8 = get_param<Scalar8>(invalid_params, 8);
-      Scalar9 p9 = get_param<Scalar9>(invalid_params, 9);
 
       EXPECT_THROW(({ TestClass.template log_prob
-              <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9>
-              (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9); }),
+              <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5>
+              (p0,p1,p2,p3,p4,p5); }),
         std::domain_error) 
         << "Invalid value " << n << " should have failed" << std::endl
         << invalid_params;
@@ -418,22 +394,14 @@ public:
       test_nan_value(parameters, 4);
     if (std::numeric_limits<Scalar5>::has_quiet_NaN && parameters.size() > 5) 
       test_nan_value(parameters, 5);
-    if (std::numeric_limits<Scalar6>::has_quiet_NaN && parameters.size() > 6) 
-      test_nan_value(parameters, 6);
-    if (std::numeric_limits<Scalar7>::has_quiet_NaN && parameters.size() > 7) 
-      test_nan_value(parameters, 7);
-    if (std::numeric_limits<Scalar8>::has_quiet_NaN && parameters.size() > 8) 
-      test_nan_value(parameters, 8);
-    if (std::numeric_limits<Scalar9>::has_quiet_NaN && parameters.size() > 9) 
-      test_nan_value(parameters, 9);
   }
 
   void test_propto() {
-    if (all_constant<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
+    if (all_constant<T0,T1,T2,T3,T4,T5>::value) {
       SUCCEED() << "No test for all double arguments";
       return;
     }
-    if (any_vector<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
+    if (any_vector<T0,T1,T2,T3,T4,T5>::value) {
       SUCCEED() << " No test for vector arguments";
       return;
     }
@@ -449,19 +417,15 @@ public:
       Scalar3 p3 = get_param<Scalar3>(parameters[0], 3);
       Scalar4 p4 = get_param<Scalar4>(parameters[0], 4);
       Scalar5 p5 = get_param<Scalar5>(parameters[0], 5);
-      Scalar6 p6 = get_param<Scalar6>(parameters[0], 6);
-      Scalar7 p7 = get_param<Scalar7>(parameters[0], 7);
-      Scalar8 p8 = get_param<Scalar8>(parameters[0], 8);
-      Scalar9 p9 = get_param<Scalar9>(parameters[0], 9);
 
       reference_logprob_true 
         = TestClass.template log_prob
-        <true,Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9>
-        (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
+        <true,Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5>
+        (p0,p1,p2,p3,p4,p5);
       reference_logprob_false 
         = TestClass.template log_prob
-        <false,Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9>
-        (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
+        <false,Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5>
+        (p0,p1,p2,p3,p4,p5);
     }
     
     for (size_t n = 0; n < parameters.size(); n++) {
@@ -471,19 +435,15 @@ public:
       Scalar3 p3 = select_var_param<T3>(parameters, n, 3);
       Scalar4 p4 = select_var_param<T4>(parameters, n, 4);
       Scalar5 p5 = select_var_param<T5>(parameters, n, 5);
-      Scalar6 p6 = select_var_param<T6>(parameters, n, 6);
-      Scalar7 p7 = select_var_param<T7>(parameters, n, 7);
-      Scalar8 p8 = select_var_param<T8>(parameters, n, 8);
-      Scalar9 p9 = select_var_param<T9>(parameters, n, 9);
 
       var logprob_true
         = TestClass.template log_prob
-        <true,Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9>
-        (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
+        <true,Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5>
+        (p0,p1,p2,p3,p4,p5);
       var logprob_false
         = TestClass.template log_prob
-        <false,Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9>
-        (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
+        <false,Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5>
+        (p0,p1,p2,p3,p4,p5);
 
       EXPECT_FLOAT_EQ(reference_logprob_false.val() - logprob_false.val(),
                       reference_logprob_true.val() - logprob_true.val())
@@ -503,9 +463,9 @@ public:
     const double e = 1e-8;
     const double e2 = 2 * e;
 
-    vector<double> plus(10);
-    vector<double> minus(10);
-    for (size_t i = 0; i < 10; i++) {
+    vector<double> plus(6);
+    vector<double> minus(6);
+    for (size_t i = 0; i < 6; i++) {
       plus[i] = get_param<double>(params, i);
       minus[i] = get_param<double>(params, i);
     }
@@ -513,9 +473,9 @@ public:
     minus[n] -= e;
     
     double lp_plus = TestClass.log_prob
-      (plus[0],plus[1],plus[2],plus[3],plus[4],plus[5],plus[6],plus[7],plus[8],plus[9]);
+      (plus[0],plus[1],plus[2],plus[3],plus[4],plus[5]);
     double lp_minus = TestClass.log_prob
-      (minus[0],minus[1],minus[2],minus[3],minus[4],minus[5],minus[6],minus[7],minus[8],minus[9]);
+      (minus[0],minus[1],minus[2],minus[3],minus[4],minus[5]);
     
     finite_diff.push_back((lp_plus - lp_minus) / e2);
   }
@@ -534,14 +494,6 @@ public:
       add_finite_diff(params, finite_diff, 4);
     if (!is_constant_struct<Scalar5>::value && !is_empty<Scalar5>::value)
       add_finite_diff(params, finite_diff, 5);
-    if (!is_constant_struct<Scalar6>::value && !is_empty<Scalar6>::value)
-      add_finite_diff(params, finite_diff, 6);
-    if (!is_constant_struct<Scalar7>::value && !is_empty<Scalar7>::value)
-      add_finite_diff(params, finite_diff, 7);
-    if (!is_constant_struct<Scalar8>::value && !is_empty<Scalar8>::value)
-      add_finite_diff(params, finite_diff, 8);
-    if (!is_constant_struct<Scalar9>::value && !is_empty<Scalar9>::value)
-      add_finite_diff(params, finite_diff, 9);
   }
 
   double calculate_gradients(const vector<double>& params, vector<double>& grad) {
@@ -551,16 +503,12 @@ public:
     Scalar3 p3 = get_param<Scalar3>(params, 3);
     Scalar4 p4 = get_param<Scalar4>(params, 4);
     Scalar5 p5 = get_param<Scalar5>(params, 5);
-    Scalar6 p6 = get_param<Scalar6>(params, 6);
-    Scalar7 p7 = get_param<Scalar7>(params, 7);
-    Scalar8 p8 = get_param<Scalar8>(params, 8);
-    Scalar9 p9 = get_param<Scalar9>(params, 9);
     
     var logprob = TestClass.template log_prob
-      <false,Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9>
-      (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
+      <false,Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5>
+      (p0,p1,p2,p3,p4,p5);
     vector<var> x;
-    add_vars(x, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+    add_vars(x, p0, p1, p2, p3, p4, p5);
     logprob.grad(x, grad);
     return logprob.val();
   }
@@ -572,26 +520,22 @@ public:
     Scalar3 p3 = get_param<Scalar3>(params, 3);
     Scalar4 p4 = get_param<Scalar4>(params, 4);
     Scalar5 p5 = get_param<Scalar5>(params, 5);
-    Scalar6 p6 = get_param<Scalar6>(params, 6);
-    Scalar7 p7 = get_param<Scalar7>(params, 7);
-    Scalar8 p8 = get_param<Scalar8>(params, 8);
-    Scalar9 p9 = get_param<Scalar9>(params, 9);
     
     var logprob = TestClass.template log_prob_function
-      <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9>
-      (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
+      <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5>
+      (p0,p1,p2,p3,p4,p5);
     vector<var> x;
-    add_vars(x, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+    add_vars(x, p0, p1, p2, p3, p4, p5);
     logprob.grad(x, grad);
     return logprob.val();
   }
 
   void test_finite_diff() {
-    if (all_constant<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
+    if (all_constant<T0,T1,T2,T3,T4,T5>::value) {
       SUCCEED() << "No test for all double arguments";
       return;
     }
-    if (any_vector<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
+    if (any_vector<T0,T1,T2,T3,T4,T5>::value) {
       SUCCEED() << "No test for vector arguments";
       return;
     }
@@ -619,11 +563,11 @@ public:
   }
 
   void test_gradient_function() {
-    if (all_constant<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
+    if (all_constant<T0,T1,T2,T3,T4,T5>::value) {
       SUCCEED() << "No test for all double arguments";
       return;
     }
-    if (any_vector<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
+    if (any_vector<T0,T1,T2,T3,T4,T5>::value) {
       SUCCEED() << "No test for vector arguments";
       return;
     }
@@ -668,11 +612,11 @@ public:
   }
 
   void test_repeat_as_vector() {
-    if (all_constant<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
+    if (all_constant<T0,T1,T2,T3,T4,T5>::value) {
       SUCCEED() << "No test for all double arguments";
       return;
     }
-    if (!any_vector<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
+    if (!any_vector<T0,T1,T2,T3,T4,T5>::value) {
       SUCCEED() << "No test for non-vector arguments";
       return;
     }
@@ -691,17 +635,13 @@ public:
       T3 p3 = get_repeated_params<T3>(parameters[n], 3, N_REPEAT);
       T4 p4 = get_repeated_params<T4>(parameters[n], 4, N_REPEAT);
       T5 p5 = get_repeated_params<T5>(parameters[n], 5, N_REPEAT);
-      T6 p6 = get_repeated_params<T6>(parameters[n], 6, N_REPEAT);
-      T7 p7 = get_repeated_params<T7>(parameters[n], 7, N_REPEAT);
-      T8 p8 = get_repeated_params<T8>(parameters[n], 8, N_REPEAT);
-      T9 p9 = get_repeated_params<T9>(parameters[n], 9, N_REPEAT);
 
       var multiple_lp = TestClass.template log_prob
-        <T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>
-        (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
+        <T0,T1,T2,T3,T4,T5>
+        (p0,p1,p2,p3,p4,p5);
       vector<double> multiple_gradients;
       vector<var> x;
-      add_vars(x, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+      add_vars(x, p0, p1, p2, p3, p4, p5);
       multiple_lp.grad(x, multiple_gradients);
       
 
@@ -741,31 +681,11 @@ public:
                                       single_gradients, pos_single,
                                       multiple_gradients, pos_multiple,
                                       N_REPEAT);
-      if (!is_constant_struct<T6>::value && !is_empty<T6>::value)
-        test_multiple_gradient_values(is_vector<T6>::value, 
-                                      single_gradients, pos_single,
-                                      multiple_gradients, pos_multiple,
-                                      N_REPEAT);
-      if (!is_constant_struct<T7>::value && !is_empty<T7>::value)
-        test_multiple_gradient_values(is_vector<T7>::value, 
-                                      single_gradients, pos_single,
-                                      multiple_gradients, pos_multiple,
-                                      N_REPEAT);
-      if (!is_constant_struct<T8>::value && !is_empty<T8>::value)
-        test_multiple_gradient_values(is_vector<T8>::value, 
-                                      single_gradients, pos_single,
-                                      multiple_gradients, pos_multiple,
-                                      N_REPEAT);
-      if (!is_constant_struct<T9>::value && !is_empty<T9>::value)
-        test_multiple_gradient_values(is_vector<T9>::value, 
-                                      single_gradients, pos_single,
-                                      multiple_gradients, pos_multiple,
-                                      N_REPEAT);
     }
   }
 
   void test_length_0_vector() {
-    if (!any_vector<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
+    if (!any_vector<T0,T1,T2,T3,T4,T5>::value) {
       SUCCEED() << "No test for non-vector arguments";
       return;
     }
@@ -780,14 +700,10 @@ public:
     T3 p3 = get_repeated_params<T3>(parameters[0], 3, N_REPEAT);
     T4 p4 = get_repeated_params<T4>(parameters[0], 4, N_REPEAT);
     T5 p5 = get_repeated_params<T5>(parameters[0], 5, N_REPEAT);
-    T6 p6 = get_repeated_params<T6>(parameters[0], 6, N_REPEAT);
-    T7 p7 = get_repeated_params<T7>(parameters[0], 7, N_REPEAT);
-    T8 p8 = get_repeated_params<T8>(parameters[0], 8, N_REPEAT);
-    T9 p9 = get_repeated_params<T9>(parameters[0], 9, N_REPEAT);
 
     var lp = TestClass.template log_prob
-      <T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>
-      (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
+      <T0,T1,T2,T3,T4,T5>
+      (p0,p1,p2,p3,p4,p5);
 
     EXPECT_FLOAT_EQ(0.0, lp.val())
       << "log prob with an empty vector should return 0.0";
@@ -856,10 +772,6 @@ public:
   typedef typename at_c<typename at_c<T,1>::type, 3>::type T3;
   typedef typename at_c<typename at_c<T,1>::type, 4>::type T4;
   typedef typename at_c<typename at_c<T,1>::type, 5>::type T5;
-  typedef typename at_c<typename at_c<T,1>::type, 6>::type T6;
-  typedef typename at_c<typename at_c<T,1>::type, 7>::type T7;
-  typedef typename at_c<typename at_c<T,1>::type, 8>::type T8;
-  typedef typename at_c<typename at_c<T,1>::type, 9>::type T9;
 
   typedef typename scalar_type<T0>::type Scalar0;
   typedef typename scalar_type<T1>::type Scalar1;
@@ -867,10 +779,6 @@ public:
   typedef typename scalar_type<T3>::type Scalar3;
   typedef typename scalar_type<T4>::type Scalar4;
   typedef typename scalar_type<T5>::type Scalar5;
-  typedef typename scalar_type<T6>::type Scalar6;
-  typedef typename scalar_type<T7>::type Scalar7;
-  typedef typename scalar_type<T8>::type Scalar8;
-  typedef typename scalar_type<T9>::type Scalar9;
   
   void call_all_versions() {
     vector<double> cdf;
@@ -883,14 +791,10 @@ public:
     T3 p3 = get_params<T3>(parameters, 3);
     T4 p4 = get_params<T4>(parameters, 4);
     T5 p5 = get_params<T5>(parameters, 5);
-    T6 p6 = get_params<T6>(parameters, 6);
-    T7 p7 = get_params<T7>(parameters, 7);
-    T8 p8 = get_params<T8>(parameters, 8);
-    T9 p9 = get_params<T9>(parameters, 9);
     
     EXPECT_NO_THROW(({ TestClass.template cdf
-            <T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>
-            (p0, p1, p2, p3, p4, p5, p6, p7, p8, p9); }))
+            <T0, T1, T2, T3, T4, T5>
+            (p0, p1, p2, p3, p4, p5); }))
       << "Calling cdf throws exception with default parameters";
   }
 
@@ -906,15 +810,11 @@ public:
       T3 p3 = get_params<T3>(parameters, n, 3);
       T4 p4 = get_params<T4>(parameters, n, 4);
       T5 p5 = get_params<T5>(parameters, n, 5);
-      T6 p6 = get_params<T6>(parameters, n, 6);
-      T7 p7 = get_params<T7>(parameters, n, 7);
-      T8 p8 = get_params<T8>(parameters, n, 8);
-      T9 p9 = get_params<T9>(parameters, n, 9);
 
       var cdf(0);
       EXPECT_NO_THROW(({ cdf = TestClass.template cdf
-              <T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>
-              (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9); }))
+              <T0,T1,T2,T3,T4,T5>
+              (p0,p1,p2,p3,p4,p5); }))
         << "Valid parameters failed at index: " << n << " -- " 
         << parameters[n];
       EXPECT_TRUE(cdf.val() >= 0)
@@ -924,7 +824,7 @@ public:
         << "cdf value must be less than or equal to 1. cdf value: "
         << cdf;
 
-      if (all_scalar<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
+      if (all_scalar<T0,T1,T2,T3,T4,T5>::value) {
         EXPECT_FLOAT_EQ(expected_cdf[n], cdf.val())
           << "For all scalar inputs cdf should match the provided value. Failed at index: " << n;
       }
@@ -942,14 +842,10 @@ public:
     Scalar3 p3 = get_param<Scalar3>(invalid_params, 3);
     Scalar4 p4 = get_param<Scalar4>(invalid_params, 4);
     Scalar5 p5 = get_param<Scalar5>(invalid_params, 5);
-    Scalar6 p6 = get_param<Scalar6>(invalid_params, 6);
-    Scalar7 p7 = get_param<Scalar7>(invalid_params, 7);
-    Scalar8 p8 = get_param<Scalar8>(invalid_params, 8);
-    Scalar9 p9 = get_param<Scalar9>(invalid_params, 9);
       
     EXPECT_THROW(({ TestClass.template cdf
-            <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9>
-            (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9); }),
+            <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5>
+            (p0,p1,p2,p3,p4,p5); }),
       std::domain_error) 
       << "NaN value at index " << n << " should have failed" << std::endl
       << invalid_params;
@@ -973,14 +869,10 @@ public:
       Scalar3 p3 = get_param<Scalar3>(invalid_params, 3);
       Scalar4 p4 = get_param<Scalar4>(invalid_params, 4);
       Scalar5 p5 = get_param<Scalar5>(invalid_params, 5);
-      Scalar6 p6 = get_param<Scalar6>(invalid_params, 6);
-      Scalar7 p7 = get_param<Scalar7>(invalid_params, 7);
-      Scalar8 p8 = get_param<Scalar8>(invalid_params, 8);
-      Scalar9 p9 = get_param<Scalar9>(invalid_params, 9);
 
       EXPECT_THROW(({ TestClass.template cdf
-              <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9>
-              (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9); }),
+              <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5>
+              (p0,p1,p2,p3,p4,p5); }),
         std::domain_error) 
         << "Invalid value " << n << " should have failed" << std::endl
         << invalid_params;      
@@ -997,14 +889,6 @@ public:
       test_nan_value(parameters, 4);
     if (std::numeric_limits<Scalar5>::has_quiet_NaN && parameters.size() > 5) 
       test_nan_value(parameters, 5);
-    if (std::numeric_limits<Scalar6>::has_quiet_NaN && parameters.size() > 6) 
-      test_nan_value(parameters, 6);
-    if (std::numeric_limits<Scalar7>::has_quiet_NaN && parameters.size() > 7) 
-      test_nan_value(parameters, 7);
-    if (std::numeric_limits<Scalar8>::has_quiet_NaN && parameters.size() > 8) 
-      test_nan_value(parameters, 8);
-    if (std::numeric_limits<Scalar9>::has_quiet_NaN && parameters.size() > 9) 
-      test_nan_value(parameters, 9);
   }
 
   void add_finite_diff(const vector<double>& params, 
@@ -1023,9 +907,9 @@ public:
     minus[n] -= e;
     
     double cdf_plus = TestClass.cdf
-      (plus[0],plus[1],plus[2],plus[3],plus[4],plus[5],plus[6],plus[7],plus[8],plus[9]);
+      (plus[0],plus[1],plus[2],plus[3],plus[4],plus[5]);
     double cdf_minus = TestClass.cdf
-      (minus[0],minus[1],minus[2],minus[3],minus[4],minus[5],minus[6],minus[7],minus[8],minus[9]);
+      (minus[0],minus[1],minus[2],minus[3],minus[4],minus[5]);
     
     finite_diff.push_back((cdf_plus - cdf_minus) / e2);
   }
@@ -1043,14 +927,6 @@ public:
       add_finite_diff(params, finite_diff, 4);
     if (!is_constant_struct<Scalar5>::value && !is_empty<Scalar5>::value)
       add_finite_diff(params, finite_diff, 5);
-    if (!is_constant_struct<Scalar6>::value && !is_empty<Scalar6>::value)
-      add_finite_diff(params, finite_diff, 6);
-    if (!is_constant_struct<Scalar7>::value && !is_empty<Scalar7>::value)
-      add_finite_diff(params, finite_diff, 7);
-    if (!is_constant_struct<Scalar8>::value && !is_empty<Scalar8>::value)
-      add_finite_diff(params, finite_diff, 8);
-    if (!is_constant_struct<Scalar9>::value && !is_empty<Scalar9>::value)
-      add_finite_diff(params, finite_diff, 9);
   }
 
   double calculate_gradients(const vector<double>& params, vector<double>& grad) {
@@ -1060,16 +936,12 @@ public:
     Scalar3 p3 = get_param<Scalar3>(params, 3);
     Scalar4 p4 = get_param<Scalar4>(params, 4);
     Scalar5 p5 = get_param<Scalar5>(params, 5);
-    Scalar6 p6 = get_param<Scalar6>(params, 6);
-    Scalar7 p7 = get_param<Scalar7>(params, 7);
-    Scalar8 p8 = get_param<Scalar8>(params, 8);
-    Scalar9 p9 = get_param<Scalar9>(params, 9);
     
     var cdf = TestClass.template cdf
-      <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9>
-      (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
+      <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5>
+      (p0,p1,p2,p3,p4,p5);
     vector<var> x;
-    add_vars(x, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+    add_vars(x, p0, p1, p2, p3, p4, p5);
     cdf.grad(x, grad);
     return cdf.val();
   }
@@ -1081,26 +953,22 @@ public:
     Scalar3 p3 = get_param<Scalar3>(params, 3);
     Scalar4 p4 = get_param<Scalar4>(params, 4);
     Scalar5 p5 = get_param<Scalar5>(params, 5);
-    Scalar6 p6 = get_param<Scalar6>(params, 6);
-    Scalar7 p7 = get_param<Scalar7>(params, 7);
-    Scalar8 p8 = get_param<Scalar8>(params, 8);
-    Scalar9 p9 = get_param<Scalar9>(params, 9);
     
     var cdf = TestClass.template cdf_function
-      <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9>
-      (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
+      <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5>
+      (p0,p1,p2,p3,p4,p5);
     vector<var> x;
-    add_vars(x, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+    add_vars(x, p0, p1, p2, p3, p4, p5);
     cdf.grad(x, grad);
     return cdf.val();
   }
   
   void test_finite_diff() {
-    if (all_constant<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
+    if (all_constant<T0,T1,T2,T3,T4,T5>::value) {
       SUCCEED() << "No test for all double arguments";
       return;
     }
-    if (any_vector<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
+    if (any_vector<T0,T1,T2,T3,T4,T5>::value) {
       SUCCEED() << "No test for vector arguments";
       return;
     }
@@ -1128,11 +996,11 @@ public:
   }
 
   void test_gradient_function() {
-    if (all_constant<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
+    if (all_constant<T0,T1,T2,T3,T4,T5>::value) {
       SUCCEED() << "No test for all double arguments";
       return;
     }
-    if (any_vector<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
+    if (any_vector<T0,T1,T2,T3,T4,T5>::value) {
       SUCCEED() << "No test for vector arguments";
       return;
     }
@@ -1180,7 +1048,7 @@ public:
   }
 
   void test_repeat_as_vector() {
-    if (!any_vector<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
+    if (!any_vector<T0,T1,T2,T3,T4,T5>::value) {
       SUCCEED() << "No test for non-vector arguments";
       return;
     }
@@ -1199,17 +1067,13 @@ public:
       T3 p3 = get_repeated_params<T3>(parameters[n], 3, N_REPEAT);
       T4 p4 = get_repeated_params<T4>(parameters[n], 4, N_REPEAT);
       T5 p5 = get_repeated_params<T5>(parameters[n], 5, N_REPEAT);
-      T6 p6 = get_repeated_params<T6>(parameters[n], 6, N_REPEAT);
-      T7 p7 = get_repeated_params<T7>(parameters[n], 7, N_REPEAT);
-      T8 p8 = get_repeated_params<T8>(parameters[n], 8, N_REPEAT);
-      T9 p9 = get_repeated_params<T9>(parameters[n], 9, N_REPEAT);
 
       var multiple_cdf = TestClass.template cdf
-        <T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>
-        (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
+        <T0,T1,T2,T3,T4,T5>
+        (p0,p1,p2,p3,p4,p5);
       vector<double> multiple_gradients;
       vector<var> x;
-      add_vars(x, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+      add_vars(x, p0, p1, p2, p3, p4, p5);
       multiple_cdf.grad(x, multiple_gradients);
       
 
@@ -1255,30 +1119,6 @@ public:
                                       single_gradients, pos_single,
                                       multiple_gradients, pos_multiple,
                                       N_REPEAT);
-      if (!is_constant_struct<T6>::value && !is_empty<T6>::value)
-        test_multiple_gradient_values(is_vector<T6>::value, 
-                                      single_cdf,
-                                      single_gradients, pos_single,
-                                      multiple_gradients, pos_multiple,
-                                      N_REPEAT);
-      if (!is_constant_struct<T7>::value && !is_empty<T7>::value)
-        test_multiple_gradient_values(is_vector<T7>::value, 
-                                      single_cdf,
-                                      single_gradients, pos_single,
-                                      multiple_gradients, pos_multiple,
-                                      N_REPEAT);
-      if (!is_constant_struct<T8>::value && !is_empty<T8>::value)
-        test_multiple_gradient_values(is_vector<T8>::value, 
-                                      single_cdf,
-                                      single_gradients, pos_single,
-                                      multiple_gradients, pos_multiple,
-                                      N_REPEAT);
-      if (!is_constant_struct<T9>::value && !is_empty<T9>::value)
-        test_multiple_gradient_values(is_vector<T9>::value, 
-                                      single_cdf,
-                                      single_gradients, pos_single,
-                                      multiple_gradients, pos_multiple,
-                                      N_REPEAT);
     }
   }
 
@@ -1308,14 +1148,10 @@ public:
       T3 p3 = get_repeated_params<T3>(parameters[n], 3, N_REPEAT);
       T4 p4 = get_repeated_params<T4>(parameters[n], 4, N_REPEAT);
       T5 p5 = get_repeated_params<T5>(parameters[n], 5, N_REPEAT);
-      T6 p6 = get_repeated_params<T6>(parameters[n], 6, N_REPEAT);
-      T7 p7 = get_repeated_params<T7>(parameters[n], 7, N_REPEAT);
-      T8 p8 = get_repeated_params<T8>(parameters[n], 8, N_REPEAT);
-      T9 p9 = get_repeated_params<T9>(parameters[n], 9, N_REPEAT);
       
       var cdf_at_lower_bound = TestClass.template cdf
-        <T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>
-        (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
+        <T0,T1,T2,T3,T4,T5>
+        (p0,p1,p2,p3,p4,p5);
       EXPECT_FLOAT_EQ(0.0, cdf_at_lower_bound.val())
         << "CDF evaluated at lower bound should equal 0";
     }
@@ -1347,21 +1183,17 @@ public:
       T3 p3 = get_repeated_params<T3>(parameters[n], 3, N_REPEAT);
       T4 p4 = get_repeated_params<T4>(parameters[n], 4, N_REPEAT);
       T5 p5 = get_repeated_params<T5>(parameters[n], 5, N_REPEAT);
-      T6 p6 = get_repeated_params<T6>(parameters[n], 6, N_REPEAT);
-      T7 p7 = get_repeated_params<T7>(parameters[n], 7, N_REPEAT);
-      T8 p8 = get_repeated_params<T8>(parameters[n], 8, N_REPEAT);
-      T9 p9 = get_repeated_params<T9>(parameters[n], 9, N_REPEAT);
       
       var cdf_at_upper_bound = TestClass.template cdf
-        <T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>
-        (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
+        <T0,T1,T2,T3,T4,T5>
+        (p0,p1,p2,p3,p4,p5);
       EXPECT_FLOAT_EQ(1.0, cdf_at_upper_bound.val())
         << "CDF evaluated at upper bound should equal 1";
     }
   }
 
   void test_length_0_vector() {
-    if (!any_vector<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
+    if (!any_vector<T0,T1,T2,T3,T4,T5>::value) {
       SUCCEED() << "No test for non-vector arguments";
       return;
     }
@@ -1376,14 +1208,10 @@ public:
     T3 p3 = get_repeated_params<T3>(parameters[0], 3, N_REPEAT);
     T4 p4 = get_repeated_params<T4>(parameters[0], 4, N_REPEAT);
     T5 p5 = get_repeated_params<T5>(parameters[0], 5, N_REPEAT);
-    T6 p6 = get_repeated_params<T6>(parameters[0], 6, N_REPEAT);
-    T7 p7 = get_repeated_params<T7>(parameters[0], 7, N_REPEAT);
-    T8 p8 = get_repeated_params<T8>(parameters[0], 8, N_REPEAT);
-    T9 p9 = get_repeated_params<T9>(parameters[0], 9, N_REPEAT);
 
     var cdf = TestClass.template cdf
-      <T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>
-      (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
+      <T0,T1,T2,T3,T4,T5>
+      (p0,p1,p2,p3,p4,p5);
 
     EXPECT_FLOAT_EQ(1.0, cdf.val())
       << "cdf with an empty vector should return 1.0";
@@ -1457,10 +1285,6 @@ public:
   typedef typename at_c<typename at_c<T,1>::type, 3>::type T3;
   typedef typename at_c<typename at_c<T,1>::type, 4>::type T4;
   typedef typename at_c<typename at_c<T,1>::type, 5>::type T5;
-  typedef typename at_c<typename at_c<T,1>::type, 6>::type T6;
-  typedef typename at_c<typename at_c<T,1>::type, 7>::type T7;
-  typedef typename at_c<typename at_c<T,1>::type, 8>::type T8;
-  typedef typename at_c<typename at_c<T,1>::type, 9>::type T9;
 
   typedef typename scalar_type<T0>::type Scalar0;
   typedef typename scalar_type<T1>::type Scalar1;
@@ -1468,11 +1292,7 @@ public:
   typedef typename scalar_type<T3>::type Scalar3;
   typedef typename scalar_type<T4>::type Scalar4;
   typedef typename scalar_type<T5>::type Scalar5;
-  typedef typename scalar_type<T6>::type Scalar6;
-  typedef typename scalar_type<T7>::type Scalar7;
-  typedef typename scalar_type<T8>::type Scalar8;
-  typedef typename scalar_type<T9>::type Scalar9;
-  
+
   void call_all_versions() {
     vector<double> cdf_log;
     vector<vector<double> > parameters;
@@ -1484,14 +1304,10 @@ public:
     T3 p3 = get_params<T3>(parameters, 3);
     T4 p4 = get_params<T4>(parameters, 4);
     T5 p5 = get_params<T5>(parameters, 5);
-    T6 p6 = get_params<T6>(parameters, 6);
-    T7 p7 = get_params<T7>(parameters, 7);
-    T8 p8 = get_params<T8>(parameters, 8);
-    T9 p9 = get_params<T9>(parameters, 9);
     
     EXPECT_NO_THROW(({ TestClass.template cdf_log
-            <T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>
-            (p0, p1, p2, p3, p4, p5, p6, p7, p8, p9); }))
+            <T0, T1, T2, T3, T4, T5>
+            (p0, p1, p2, p3, p4, p5); }))
       << "Calling cdf_log throws exception with default parameters";
   }
 
@@ -1507,15 +1323,11 @@ public:
       T3 p3 = get_params<T3>(parameters, n, 3);
       T4 p4 = get_params<T4>(parameters, n, 4);
       T5 p5 = get_params<T5>(parameters, n, 5);
-      T6 p6 = get_params<T6>(parameters, n, 6);
-      T7 p7 = get_params<T7>(parameters, n, 7);
-      T8 p8 = get_params<T8>(parameters, n, 8);
-      T9 p9 = get_params<T9>(parameters, n, 9);
 
       var cdf_log(0);
       EXPECT_NO_THROW(({ cdf_log = TestClass.template cdf_log
-              <T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>
-              (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9); }))
+              <T0,T1,T2,T3,T4,T5>
+              (p0,p1,p2,p3,p4,p5); }))
         << "Valid parameters failed at index: " << n << " -- " 
         << parameters[n];
       EXPECT_TRUE(cdf_log.val() <= 0)
@@ -1525,7 +1337,7 @@ public:
         << "cdf_log value must be less than or equal to 0. cdf_log value: "
         << cdf_log;
 
-      if (all_scalar<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
+      if (all_scalar<T0,T1,T2,T3,T4,T5>::value) {
         EXPECT_FLOAT_EQ(expected_cdf_log[n], cdf_log.val())
           << "For all scalar inputs cdf_log should match the provided value. Failed at index: " << n;
       }
@@ -1543,14 +1355,10 @@ public:
     Scalar3 p3 = get_param<Scalar3>(invalid_params, 3);
     Scalar4 p4 = get_param<Scalar4>(invalid_params, 4);
     Scalar5 p5 = get_param<Scalar5>(invalid_params, 5);
-    Scalar6 p6 = get_param<Scalar6>(invalid_params, 6);
-    Scalar7 p7 = get_param<Scalar7>(invalid_params, 7);
-    Scalar8 p8 = get_param<Scalar8>(invalid_params, 8);
-    Scalar9 p9 = get_param<Scalar9>(invalid_params, 9);
       
     EXPECT_THROW(({ TestClass.template cdf_log
-            <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9>
-            (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9); }),
+            <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5>
+            (p0,p1,p2,p3,p4,p5); }),
       std::domain_error) 
       << "NaN value at index " << n << " should have failed" << std::endl
       << invalid_params;
@@ -1574,14 +1382,10 @@ public:
       Scalar3 p3 = get_param<Scalar3>(invalid_params, 3);
       Scalar4 p4 = get_param<Scalar4>(invalid_params, 4);
       Scalar5 p5 = get_param<Scalar5>(invalid_params, 5);
-      Scalar6 p6 = get_param<Scalar6>(invalid_params, 6);
-      Scalar7 p7 = get_param<Scalar7>(invalid_params, 7);
-      Scalar8 p8 = get_param<Scalar8>(invalid_params, 8);
-      Scalar9 p9 = get_param<Scalar9>(invalid_params, 9);
 
       EXPECT_THROW(({ TestClass.template cdf_log
-              <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9>
-              (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9); }),
+              <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5>
+              (p0,p1,p2,p3,p4,p5); }),
         std::domain_error) 
         << "Invalid value " << n << " should have failed" << std::endl
         << invalid_params;      
@@ -1598,14 +1402,6 @@ public:
       test_nan_value(parameters, 4);
     if (std::numeric_limits<Scalar5>::has_quiet_NaN && parameters.size() > 5) 
       test_nan_value(parameters, 5);
-    if (std::numeric_limits<Scalar6>::has_quiet_NaN && parameters.size() > 6) 
-      test_nan_value(parameters, 6);
-    if (std::numeric_limits<Scalar7>::has_quiet_NaN && parameters.size() > 7) 
-      test_nan_value(parameters, 7);
-    if (std::numeric_limits<Scalar8>::has_quiet_NaN && parameters.size() > 8) 
-      test_nan_value(parameters, 8);
-    if (std::numeric_limits<Scalar9>::has_quiet_NaN && parameters.size() > 9) 
-      test_nan_value(parameters, 9);
   }
 
   void add_finite_diff(const vector<double>& params, 
@@ -1644,14 +1440,6 @@ public:
       add_finite_diff(params, finite_diff, 4);
     if (!is_constant_struct<Scalar5>::value && !is_empty<Scalar5>::value)
       add_finite_diff(params, finite_diff, 5);
-    if (!is_constant_struct<Scalar6>::value && !is_empty<Scalar6>::value)
-      add_finite_diff(params, finite_diff, 6);
-    if (!is_constant_struct<Scalar7>::value && !is_empty<Scalar7>::value)
-      add_finite_diff(params, finite_diff, 7);
-    if (!is_constant_struct<Scalar8>::value && !is_empty<Scalar8>::value)
-      add_finite_diff(params, finite_diff, 8);
-    if (!is_constant_struct<Scalar9>::value && !is_empty<Scalar9>::value)
-      add_finite_diff(params, finite_diff, 9);
   }
 
   double calculate_gradients(const vector<double>& params, vector<double>& grad) {
@@ -1661,16 +1449,12 @@ public:
     Scalar3 p3 = get_param<Scalar3>(params, 3);
     Scalar4 p4 = get_param<Scalar4>(params, 4);
     Scalar5 p5 = get_param<Scalar5>(params, 5);
-    Scalar6 p6 = get_param<Scalar6>(params, 6);
-    Scalar7 p7 = get_param<Scalar7>(params, 7);
-    Scalar8 p8 = get_param<Scalar8>(params, 8);
-    Scalar9 p9 = get_param<Scalar9>(params, 9);
     
     var cdf_log = TestClass.template cdf_log
-      <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9>
-      (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
+      <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5>
+      (p0,p1,p2,p3,p4,p5);
     vector<var> x;
-    add_vars(x, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+    add_vars(x, p0, p1, p2, p3, p4, p5);
     cdf_log.grad(x, grad);
     return cdf_log.val();
   }
@@ -1682,26 +1466,22 @@ public:
     Scalar3 p3 = get_param<Scalar3>(params, 3);
     Scalar4 p4 = get_param<Scalar4>(params, 4);
     Scalar5 p5 = get_param<Scalar5>(params, 5);
-    Scalar6 p6 = get_param<Scalar6>(params, 6);
-    Scalar7 p7 = get_param<Scalar7>(params, 7);
-    Scalar8 p8 = get_param<Scalar8>(params, 8);
-    Scalar9 p9 = get_param<Scalar9>(params, 9);
     
     var cdf_log = TestClass.template cdf_log_function
-      <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9>
-      (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
+      <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5>
+      (p0,p1,p2,p3,p4,p5);
     vector<var> x;
-    add_vars(x, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+    add_vars(x, p0, p1, p2, p3, p4, p5);
     cdf_log.grad(x, grad);
     return cdf_log.val();
   }
   
   void test_finite_diff() {
-    if (all_constant<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
+    if (all_constant<T0,T1,T2,T3,T4,T5>::value) {
       SUCCEED() << "No test for all double arguments";
       return;
     }
-    if (any_vector<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
+    if (any_vector<T0,T1,T2,T3,T4,T5>::value) {
       SUCCEED() << "No test for vector arguments";
       return;
     }
@@ -1729,11 +1509,11 @@ public:
   }
 
   void test_gradient_function() {
-    if (all_constant<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
+    if (all_constant<T0,T1,T2,T3,T4,T5>::value) {
       SUCCEED() << "No test for all double arguments";
       return;
     }
-    if (any_vector<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
+    if (any_vector<T0,T1,T2,T3,T4,T5>::value) {
       SUCCEED() << "No test for vector arguments";
       return;
     }
@@ -1781,7 +1561,7 @@ public:
   }
 
   void test_repeat_as_vector() {
-    if (!any_vector<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
+    if (!any_vector<T0,T1,T2,T3,T4,T5>::value) {
       SUCCEED() << "No test for non-vector arguments";
       return;
     }
@@ -1800,17 +1580,13 @@ public:
       T3 p3 = get_repeated_params<T3>(parameters[n], 3, N_REPEAT);
       T4 p4 = get_repeated_params<T4>(parameters[n], 4, N_REPEAT);
       T5 p5 = get_repeated_params<T5>(parameters[n], 5, N_REPEAT);
-      T6 p6 = get_repeated_params<T6>(parameters[n], 6, N_REPEAT);
-      T7 p7 = get_repeated_params<T7>(parameters[n], 7, N_REPEAT);
-      T8 p8 = get_repeated_params<T8>(parameters[n], 8, N_REPEAT);
-      T9 p9 = get_repeated_params<T9>(parameters[n], 9, N_REPEAT);
 
       var multiple_cdf_log = TestClass.template cdf_log
-        <T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>
-        (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
+        <T0,T1,T2,T3,T4,T5>
+        (p0,p1,p2,p3,p4,p5);
       vector<double> multiple_gradients;
       vector<var> x;
-      add_vars(x, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+      add_vars(x, p0, p1, p2, p3, p4, p5);
       multiple_cdf_log.grad(x, multiple_gradients);
       
 
@@ -1856,30 +1632,6 @@ public:
                                       single_gradients, pos_single,
                                       multiple_gradients, pos_multiple,
                                       N_REPEAT);
-      if (!is_constant_struct<T6>::value && !is_empty<T6>::value)
-        test_multiple_gradient_values(is_vector<T6>::value, 
-                                      single_cdf_log,
-                                      single_gradients, pos_single,
-                                      multiple_gradients, pos_multiple,
-                                      N_REPEAT);
-      if (!is_constant_struct<T7>::value && !is_empty<T7>::value)
-        test_multiple_gradient_values(is_vector<T7>::value, 
-                                      single_cdf_log,
-                                      single_gradients, pos_single,
-                                      multiple_gradients, pos_multiple,
-                                      N_REPEAT);
-      if (!is_constant_struct<T8>::value && !is_empty<T8>::value)
-        test_multiple_gradient_values(is_vector<T8>::value, 
-                                      single_cdf_log,
-                                      single_gradients, pos_single,
-                                      multiple_gradients, pos_multiple,
-                                      N_REPEAT);
-      if (!is_constant_struct<T9>::value && !is_empty<T9>::value)
-        test_multiple_gradient_values(is_vector<T9>::value, 
-                                      single_cdf_log,
-                                      single_gradients, pos_single,
-                                      multiple_gradients, pos_multiple,
-                                      N_REPEAT);
     }
   }
 
@@ -1909,14 +1661,10 @@ public:
       T3 p3 = get_repeated_params<T3>(parameters[n], 3, N_REPEAT);
       T4 p4 = get_repeated_params<T4>(parameters[n], 4, N_REPEAT);
       T5 p5 = get_repeated_params<T5>(parameters[n], 5, N_REPEAT);
-      T6 p6 = get_repeated_params<T6>(parameters[n], 6, N_REPEAT);
-      T7 p7 = get_repeated_params<T7>(parameters[n], 7, N_REPEAT);
-      T8 p8 = get_repeated_params<T8>(parameters[n], 8, N_REPEAT);
-      T9 p9 = get_repeated_params<T9>(parameters[n], 9, N_REPEAT);
       
       var cdf_log_at_lower_bound = TestClass.template cdf_log
-        <T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>
-        (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
+        <T0,T1,T2,T3,T4,T5>
+        (p0,p1,p2,p3,p4,p5);
       EXPECT_FLOAT_EQ(stan::math::negative_infinity(), cdf_log_at_lower_bound.val())
         << "cdf_log evaluated at lower bound should equal negative infinity";
     }
@@ -1948,21 +1696,17 @@ public:
       T3 p3 = get_repeated_params<T3>(parameters[n], 3, N_REPEAT);
       T4 p4 = get_repeated_params<T4>(parameters[n], 4, N_REPEAT);
       T5 p5 = get_repeated_params<T5>(parameters[n], 5, N_REPEAT);
-      T6 p6 = get_repeated_params<T6>(parameters[n], 6, N_REPEAT);
-      T7 p7 = get_repeated_params<T7>(parameters[n], 7, N_REPEAT);
-      T8 p8 = get_repeated_params<T8>(parameters[n], 8, N_REPEAT);
-      T9 p9 = get_repeated_params<T9>(parameters[n], 9, N_REPEAT);
       
       var cdf_log_at_upper_bound = TestClass.template cdf_log
-        <T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>
-        (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
+        <T0,T1,T2,T3,T4,T5>
+        (p0,p1,p2,p3,p4,p5);
       EXPECT_FLOAT_EQ(0.0, cdf_log_at_upper_bound.val())
         << "cdf_log evaluated at upper bound should equal 0";
     }
   }
 
   void test_length_0_vector() {
-    if (!any_vector<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
+    if (!any_vector<T0,T1,T2,T3,T4,T5>::value) {
       SUCCEED() << "No test for non-vector arguments";
       return;
     }
@@ -1977,14 +1721,10 @@ public:
     T3 p3 = get_repeated_params<T3>(parameters[0], 3, N_REPEAT);
     T4 p4 = get_repeated_params<T4>(parameters[0], 4, N_REPEAT);
     T5 p5 = get_repeated_params<T5>(parameters[0], 5, N_REPEAT);
-    T6 p6 = get_repeated_params<T6>(parameters[0], 6, N_REPEAT);
-    T7 p7 = get_repeated_params<T7>(parameters[0], 7, N_REPEAT);
-    T8 p8 = get_repeated_params<T8>(parameters[0], 8, N_REPEAT);
-    T9 p9 = get_repeated_params<T9>(parameters[0], 9, N_REPEAT);
 
     var cdf_log = TestClass.template cdf_log
-      <T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>
-      (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
+      <T0,T1,T2,T3,T4,T5>
+      (p0,p1,p2,p3,p4,p5);
 
     EXPECT_FLOAT_EQ(0.0, cdf_log.val())
       << "cdf_log with an empty vector should return 0.0";
@@ -2058,10 +1798,6 @@ public:
   typedef typename at_c<typename at_c<T,1>::type, 3>::type T3;
   typedef typename at_c<typename at_c<T,1>::type, 4>::type T4;
   typedef typename at_c<typename at_c<T,1>::type, 5>::type T5;
-  typedef typename at_c<typename at_c<T,1>::type, 6>::type T6;
-  typedef typename at_c<typename at_c<T,1>::type, 7>::type T7;
-  typedef typename at_c<typename at_c<T,1>::type, 8>::type T8;
-  typedef typename at_c<typename at_c<T,1>::type, 9>::type T9;
 
   typedef typename scalar_type<T0>::type Scalar0;
   typedef typename scalar_type<T1>::type Scalar1;
@@ -2069,10 +1805,6 @@ public:
   typedef typename scalar_type<T3>::type Scalar3;
   typedef typename scalar_type<T4>::type Scalar4;
   typedef typename scalar_type<T5>::type Scalar5;
-  typedef typename scalar_type<T6>::type Scalar6;
-  typedef typename scalar_type<T7>::type Scalar7;
-  typedef typename scalar_type<T8>::type Scalar8;
-  typedef typename scalar_type<T9>::type Scalar9;
   
   void call_all_versions() {
     vector<double> ccdf_log;
@@ -2085,14 +1817,10 @@ public:
     T3 p3 = get_params<T3>(parameters, 3);
     T4 p4 = get_params<T4>(parameters, 4);
     T5 p5 = get_params<T5>(parameters, 5);
-    T6 p6 = get_params<T6>(parameters, 6);
-    T7 p7 = get_params<T7>(parameters, 7);
-    T8 p8 = get_params<T8>(parameters, 8);
-    T9 p9 = get_params<T9>(parameters, 9);
     
     EXPECT_NO_THROW(({ TestClass.template ccdf_log
-            <T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>
-            (p0, p1, p2, p3, p4, p5, p6, p7, p8, p9); }))
+            <T0, T1, T2, T3, T4, T5>
+            (p0, p1, p2, p3, p4, p5); }))
       << "Calling ccdf_log throws exception with default parameters";
   }
 
@@ -2108,15 +1836,11 @@ public:
       T3 p3 = get_params<T3>(parameters, n, 3);
       T4 p4 = get_params<T4>(parameters, n, 4);
       T5 p5 = get_params<T5>(parameters, n, 5);
-      T6 p6 = get_params<T6>(parameters, n, 6);
-      T7 p7 = get_params<T7>(parameters, n, 7);
-      T8 p8 = get_params<T8>(parameters, n, 8);
-      T9 p9 = get_params<T9>(parameters, n, 9);
 
       var ccdf_log(0);
       EXPECT_NO_THROW(({ ccdf_log = TestClass.template ccdf_log
-              <T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>
-              (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9); }))
+              <T0,T1,T2,T3,T4,T5>
+              (p0,p1,p2,p3,p4,p5); }))
         << "Valid parameters failed at index: " << n << " -- " 
         << parameters[n];
       EXPECT_TRUE(ccdf_log.val() <= 0)
@@ -2126,7 +1850,7 @@ public:
         << "ccdf_log value must be less than or equal to 0. ccdf_log value: "
         << ccdf_log;
 
-      if (all_scalar<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
+      if (all_scalar<T0,T1,T2,T3,T4,T5>::value) {
         EXPECT_FLOAT_EQ(expected_ccdf_log[n], ccdf_log.val())
           << "For all scalar inputs ccdf_log should match the provided value. Failed at index: " << n;
       }
@@ -2144,14 +1868,10 @@ public:
     Scalar3 p3 = get_param<Scalar3>(invalid_params, 3);
     Scalar4 p4 = get_param<Scalar4>(invalid_params, 4);
     Scalar5 p5 = get_param<Scalar5>(invalid_params, 5);
-    Scalar6 p6 = get_param<Scalar6>(invalid_params, 6);
-    Scalar7 p7 = get_param<Scalar7>(invalid_params, 7);
-    Scalar8 p8 = get_param<Scalar8>(invalid_params, 8);
-    Scalar9 p9 = get_param<Scalar9>(invalid_params, 9);
       
     EXPECT_THROW(({ TestClass.template ccdf_log
-            <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9>
-            (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9); }),
+            <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5>
+            (p0,p1,p2,p3,p4,p5); }),
       std::domain_error) 
       << "NaN value at index " << n << " should have failed" << std::endl
       << invalid_params;
@@ -2175,14 +1895,10 @@ public:
       Scalar3 p3 = get_param<Scalar3>(invalid_params, 3);
       Scalar4 p4 = get_param<Scalar4>(invalid_params, 4);
       Scalar5 p5 = get_param<Scalar5>(invalid_params, 5);
-      Scalar6 p6 = get_param<Scalar6>(invalid_params, 6);
-      Scalar7 p7 = get_param<Scalar7>(invalid_params, 7);
-      Scalar8 p8 = get_param<Scalar8>(invalid_params, 8);
-      Scalar9 p9 = get_param<Scalar9>(invalid_params, 9);
 
       EXPECT_THROW(({ TestClass.template ccdf_log
-              <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9>
-              (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9); }),
+              <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5>
+              (p0,p1,p2,p3,p4,p5); }),
         std::domain_error) 
         << "Invalid value " << n << " should have failed" << std::endl
         << invalid_params;      
@@ -2199,14 +1915,6 @@ public:
       test_nan_value(parameters, 4);
     if (std::numeric_limits<Scalar5>::has_quiet_NaN && parameters.size() > 5) 
       test_nan_value(parameters, 5);
-    if (std::numeric_limits<Scalar6>::has_quiet_NaN && parameters.size() > 6) 
-      test_nan_value(parameters, 6);
-    if (std::numeric_limits<Scalar7>::has_quiet_NaN && parameters.size() > 7) 
-      test_nan_value(parameters, 7);
-    if (std::numeric_limits<Scalar8>::has_quiet_NaN && parameters.size() > 8) 
-      test_nan_value(parameters, 8);
-    if (std::numeric_limits<Scalar9>::has_quiet_NaN && parameters.size() > 9) 
-      test_nan_value(parameters, 9);
   }
 
   void add_finite_diff(const vector<double>& params, 
@@ -2217,7 +1925,7 @@ public:
 
     vector<double> plus(10);
     vector<double> minus(10);
-    for (size_t i = 0; i < 10; i++) {
+    for (size_t i = 0; i < 6; i++) {
       plus[i] = get_param<double>(params, i);
       minus[i] = get_param<double>(params, i);
     }
@@ -2225,9 +1933,9 @@ public:
     minus[n] -= e;
     
     double ccdf_log_plus = TestClass.ccdf_log
-      (plus[0],plus[1],plus[2],plus[3],plus[4],plus[5],plus[6],plus[7],plus[8],plus[9]);
+      (plus[0],plus[1],plus[2],plus[3],plus[4],plus[5]);
     double ccdf_log_minus = TestClass.ccdf_log
-      (minus[0],minus[1],minus[2],minus[3],minus[4],minus[5],minus[6],minus[7],minus[8],minus[9]);
+      (minus[0],minus[1],minus[2],minus[3],minus[4],minus[5]);
     
     finite_diff.push_back((ccdf_log_plus - ccdf_log_minus) / e2);
   }
@@ -2245,14 +1953,6 @@ public:
       add_finite_diff(params, finite_diff, 4);
     if (!is_constant_struct<Scalar5>::value && !is_empty<Scalar5>::value)
       add_finite_diff(params, finite_diff, 5);
-    if (!is_constant_struct<Scalar6>::value && !is_empty<Scalar6>::value)
-      add_finite_diff(params, finite_diff, 6);
-    if (!is_constant_struct<Scalar7>::value && !is_empty<Scalar7>::value)
-      add_finite_diff(params, finite_diff, 7);
-    if (!is_constant_struct<Scalar8>::value && !is_empty<Scalar8>::value)
-      add_finite_diff(params, finite_diff, 8);
-    if (!is_constant_struct<Scalar9>::value && !is_empty<Scalar9>::value)
-      add_finite_diff(params, finite_diff, 9);
   }
 
   double calculate_gradients(const vector<double>& params, vector<double>& grad) {
@@ -2262,16 +1962,12 @@ public:
     Scalar3 p3 = get_param<Scalar3>(params, 3);
     Scalar4 p4 = get_param<Scalar4>(params, 4);
     Scalar5 p5 = get_param<Scalar5>(params, 5);
-    Scalar6 p6 = get_param<Scalar6>(params, 6);
-    Scalar7 p7 = get_param<Scalar7>(params, 7);
-    Scalar8 p8 = get_param<Scalar8>(params, 8);
-    Scalar9 p9 = get_param<Scalar9>(params, 9);
     
     var ccdf_log = TestClass.template ccdf_log
-      <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9>
-      (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
+      <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5>
+      (p0,p1,p2,p3,p4,p5);
     vector<var> x;
-    add_vars(x, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+    add_vars(x, p0, p1, p2, p3, p4, p5);
     ccdf_log.grad(x, grad);
     return ccdf_log.val();
   }
@@ -2283,26 +1979,22 @@ public:
     Scalar3 p3 = get_param<Scalar3>(params, 3);
     Scalar4 p4 = get_param<Scalar4>(params, 4);
     Scalar5 p5 = get_param<Scalar5>(params, 5);
-    Scalar6 p6 = get_param<Scalar6>(params, 6);
-    Scalar7 p7 = get_param<Scalar7>(params, 7);
-    Scalar8 p8 = get_param<Scalar8>(params, 8);
-    Scalar9 p9 = get_param<Scalar9>(params, 9);
     
     var ccdf_log = TestClass.template ccdf_log_function
-      <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5,Scalar6,Scalar7,Scalar8,Scalar9>
-      (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
+      <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5>
+      (p0,p1,p2,p3,p4,p5);
     vector<var> x;
-    add_vars(x, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+    add_vars(x, p0, p1, p2, p3, p4, p5);
     ccdf_log.grad(x, grad);
     return ccdf_log.val();
   }
   
   void test_finite_diff() {
-    if (all_constant<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
+    if (all_constant<T0,T1,T2,T3,T4,T5>::value) {
       SUCCEED() << "No test for all double arguments";
       return;
     }
-    if (any_vector<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
+    if (any_vector<T0,T1,T2,T3,T4,T5>::value) {
       SUCCEED() << "No test for vector arguments";
       return;
     }
@@ -2330,11 +2022,11 @@ public:
   }
 
   void test_gradient_function() {
-    if (all_constant<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
+    if (all_constant<T0,T1,T2,T3,T4,T5>::value) {
       SUCCEED() << "No test for all double arguments";
       return;
     }
-    if (any_vector<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
+    if (any_vector<T0,T1,T2,T3,T4,T5>::value) {
       SUCCEED() << "No test for vector arguments";
       return;
     }
@@ -2382,7 +2074,7 @@ public:
   }
 
   void test_repeat_as_vector() {
-    if (!any_vector<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
+    if (!any_vector<T0,T1,T2,T3,T4,T5>::value) {
       SUCCEED() << "No test for non-vector arguments";
       return;
     }
@@ -2401,17 +2093,13 @@ public:
       T3 p3 = get_repeated_params<T3>(parameters[n], 3, N_REPEAT);
       T4 p4 = get_repeated_params<T4>(parameters[n], 4, N_REPEAT);
       T5 p5 = get_repeated_params<T5>(parameters[n], 5, N_REPEAT);
-      T6 p6 = get_repeated_params<T6>(parameters[n], 6, N_REPEAT);
-      T7 p7 = get_repeated_params<T7>(parameters[n], 7, N_REPEAT);
-      T8 p8 = get_repeated_params<T8>(parameters[n], 8, N_REPEAT);
-      T9 p9 = get_repeated_params<T9>(parameters[n], 9, N_REPEAT);
 
       var multiple_ccdf_log = TestClass.template ccdf_log
-        <T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>
-        (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
+        <T0,T1,T2,T3,T4,T5>
+        (p0,p1,p2,p3,p4,p5);
       vector<double> multiple_gradients;
       vector<var> x;
-      add_vars(x, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+      add_vars(x, p0, p1, p2, p3, p4, p5);
       multiple_ccdf_log.grad(x, multiple_gradients);
       
 
@@ -2457,30 +2145,6 @@ public:
                                       single_gradients, pos_single,
                                       multiple_gradients, pos_multiple,
                                       N_REPEAT);
-      if (!is_constant_struct<T6>::value && !is_empty<T6>::value)
-        test_multiple_gradient_values(is_vector<T6>::value, 
-                                      single_ccdf_log,
-                                      single_gradients, pos_single,
-                                      multiple_gradients, pos_multiple,
-                                      N_REPEAT);
-      if (!is_constant_struct<T7>::value && !is_empty<T7>::value)
-        test_multiple_gradient_values(is_vector<T7>::value, 
-                                      single_ccdf_log,
-                                      single_gradients, pos_single,
-                                      multiple_gradients, pos_multiple,
-                                      N_REPEAT);
-      if (!is_constant_struct<T8>::value && !is_empty<T8>::value)
-        test_multiple_gradient_values(is_vector<T8>::value, 
-                                      single_ccdf_log,
-                                      single_gradients, pos_single,
-                                      multiple_gradients, pos_multiple,
-                                      N_REPEAT);
-      if (!is_constant_struct<T9>::value && !is_empty<T9>::value)
-        test_multiple_gradient_values(is_vector<T9>::value, 
-                                      single_ccdf_log,
-                                      single_gradients, pos_single,
-                                      multiple_gradients, pos_multiple,
-                                      N_REPEAT);
     }
   }
 
@@ -2510,14 +2174,10 @@ public:
       T3 p3 = get_repeated_params<T3>(parameters[n], 3, N_REPEAT);
       T4 p4 = get_repeated_params<T4>(parameters[n], 4, N_REPEAT);
       T5 p5 = get_repeated_params<T5>(parameters[n], 5, N_REPEAT);
-      T6 p6 = get_repeated_params<T6>(parameters[n], 6, N_REPEAT);
-      T7 p7 = get_repeated_params<T7>(parameters[n], 7, N_REPEAT);
-      T8 p8 = get_repeated_params<T8>(parameters[n], 8, N_REPEAT);
-      T9 p9 = get_repeated_params<T9>(parameters[n], 9, N_REPEAT);
       
       var ccdf_log_at_lower_bound = TestClass.template ccdf_log
-        <T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>
-        (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
+        <T0,T1,T2,T3,T4,T5>
+        (p0,p1,p2,p3,p4,p5);
       EXPECT_FLOAT_EQ(0.0, ccdf_log_at_lower_bound.val())
         << "ccdf_log evaluated at lower bound should equal 0.0";
     }
@@ -2549,21 +2209,17 @@ public:
       T3 p3 = get_repeated_params<T3>(parameters[n], 3, N_REPEAT);
       T4 p4 = get_repeated_params<T4>(parameters[n], 4, N_REPEAT);
       T5 p5 = get_repeated_params<T5>(parameters[n], 5, N_REPEAT);
-      T6 p6 = get_repeated_params<T6>(parameters[n], 6, N_REPEAT);
-      T7 p7 = get_repeated_params<T7>(parameters[n], 7, N_REPEAT);
-      T8 p8 = get_repeated_params<T8>(parameters[n], 8, N_REPEAT);
-      T9 p9 = get_repeated_params<T9>(parameters[n], 9, N_REPEAT);
       
       var ccdf_log_at_upper_bound = TestClass.template ccdf_log
-        <T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>
-        (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
+        <T0,T1,T2,T3,T4,T5>
+        (p0,p1,p2,p3,p4,p5);
       EXPECT_FLOAT_EQ(stan::math::negative_infinity(), ccdf_log_at_upper_bound.val())
         << "ccdf_log evaluated at upper bound should equal negative infinity";
     }
   }
 
   void test_length_0_vector() {
-    if (!any_vector<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::value) {
+    if (!any_vector<T0,T1,T2,T3,T4,T5>::value) {
       SUCCEED() << "No test for non-vector arguments";
       return;
     }
@@ -2578,14 +2234,10 @@ public:
     T3 p3 = get_repeated_params<T3>(parameters[0], 3, N_REPEAT);
     T4 p4 = get_repeated_params<T4>(parameters[0], 4, N_REPEAT);
     T5 p5 = get_repeated_params<T5>(parameters[0], 5, N_REPEAT);
-    T6 p6 = get_repeated_params<T6>(parameters[0], 6, N_REPEAT);
-    T7 p7 = get_repeated_params<T7>(parameters[0], 7, N_REPEAT);
-    T8 p8 = get_repeated_params<T8>(parameters[0], 8, N_REPEAT);
-    T9 p9 = get_repeated_params<T9>(parameters[0], 9, N_REPEAT);
 
     var ccdf_log = TestClass.template ccdf_log
-      <T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>
-      (p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
+      <T0,T1,T2,T3,T4,T5>
+      (p0,p1,p2,p3,p4,p5);
 
     EXPECT_FLOAT_EQ(0.0, ccdf_log.val())
       << "ccdf_log with an empty vector should return 0.0";

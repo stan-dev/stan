@@ -14,6 +14,7 @@ TEST(AgradFwdOperatorEqual, Fvar) {
   EXPECT_FALSE(d5 == v4);
   EXPECT_FALSE(v5 == d4);
   EXPECT_FALSE(d5 == d4);
+  EXPECT_TRUE(d5 == v5);
 
   int i4 = 4;
   int i5 = 5;

@@ -43,40 +43,33 @@ public:
   }
 
   template <class T_n, class T_rate, typename T2,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_n, T_rate>::type 
   log_prob(const T_n& n, const T_rate& alpha, const T2&,
-     const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+           const T3&, const T4&, const T5&) {
     return stan::prob::poisson_log_log(n, alpha);
   }
 
   template <bool propto, 
-      class T_n, class T_rate, typename T2,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            class T_n, class T_rate, typename T2,
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_n, T_rate>::type 
   log_prob(const T_n& n, const T_rate& alpha, const T2&,
-     const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+           const T3&, const T4&, const T5&) {
     return stan::prob::poisson_log_log<propto>(n, alpha);
   }
   
   
   template <class T_n, class T_rate, typename T2,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
-  var log_prob_function(const T_n& n, const T_rate& alpha, const T2&,
-      const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+            typename T3, typename T4, typename T5>
+  typename stan::return_type<T_n, T_rate>::type 
+  log_prob_function(const T_n& n, const T_rate& alpha, const T2&,
+                    const T3&, const T4&, const T5&) {
     using std::exp;
     using boost::math::lgamma;
     using stan::math::multiply_log;
     using stan::prob::LOG_ZERO;
-    using stan::prob::include_summand;
 
-    var logp(0);
 
     if (alpha == -std::numeric_limits<double>::infinity())
       return n == 0 ? 0 : LOG_ZERO;
@@ -84,10 +77,6 @@ public:
     if (alpha == std::numeric_limits<double>::infinity())
       return LOG_ZERO;
     
-    if (include_summand<true>::value)
-      logp -= lgamma(n + 1.0);
-    if (include_summand<true,T_rate>::value)
-      logp += n * alpha - exp(alpha);
-    return logp;
+    return -lgamma(n + 1.0) + n * alpha - exp(alpha);
   }
 };

@@ -164,7 +164,7 @@ void write_types_typedef(vector<std::ostream *>& outs, string base, size_t& N, v
       write_types_typedef(outs, base + args[n] + ", ", N, argument_sequence, depth);
   } else {
     string extra_args;
-    for (size_t n = depth; n < 10; n++) {
+    for (size_t n = depth; n < 6; n++) {
       extra_args += ", empty";
     }
     for (size_t n = 0; n < args.size(); n++) {

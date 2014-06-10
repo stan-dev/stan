@@ -290,9 +290,7 @@ empty select_var_param<empty>(const vector<vector<double> >& /*parameters*/, con
 
 //------------------------------------------------------------
 template <typename T0, typename T1, typename T2,
-    typename T3, typename T4, typename T5, 
-    typename T6, typename T7, typename T8, 
-    typename T9>
+    typename T3, typename T4, typename T5>
 struct all_scalar {
   enum {
     value = (!is_vector<T0>::value || is_empty<T0>::value)
@@ -301,17 +299,11 @@ struct all_scalar {
     && (!is_vector<T3>::value || is_empty<T3>::value)
     && (!is_vector<T4>::value || is_empty<T4>::value)
     && (!is_vector<T5>::value || is_empty<T5>::value)
-    && (!is_vector<T6>::value || is_empty<T6>::value)
-    && (!is_vector<T7>::value || is_empty<T7>::value)
-    && (!is_vector<T8>::value || is_empty<T8>::value)
-    && (!is_vector<T9>::value || is_empty<T9>::value)
   };
 };
 
 template <typename T0, typename T1, typename T2,
-    typename T3, typename T4, typename T5, 
-    typename T6, typename T7, typename T8, 
-    typename T9>
+    typename T3, typename T4, typename T5>
 struct all_constant {
   enum {
     value = (is_constant_struct<T0>::value || is_empty<T0>::value)
@@ -320,17 +312,11 @@ struct all_constant {
     && (is_constant_struct<T3>::value || is_empty<T3>::value)
     && (is_constant_struct<T4>::value || is_empty<T4>::value)
     && (is_constant_struct<T5>::value || is_empty<T5>::value)
-    && (is_constant_struct<T6>::value || is_empty<T6>::value)
-    && (is_constant_struct<T7>::value || is_empty<T7>::value)
-    && (is_constant_struct<T8>::value || is_empty<T8>::value)
-    && (is_constant_struct<T9>::value || is_empty<T9>::value)
   };
 };
 
 template <typename T0, typename T1, typename T2,
-    typename T3, typename T4, typename T5, 
-    typename T6, typename T7, typename T8, 
-    typename T9>
+    typename T3, typename T4, typename T5>
 struct all_var {
   enum {
     value = (!is_constant_struct<T0>::value || is_empty<T0>::value)
@@ -339,18 +325,12 @@ struct all_var {
     && (!is_constant_struct<T3>::value || is_empty<T3>::value)
     && (!is_constant_struct<T4>::value || is_empty<T4>::value)
     && (!is_constant_struct<T5>::value || is_empty<T5>::value)
-    && (!is_constant_struct<T6>::value || is_empty<T6>::value)
-    && (!is_constant_struct<T7>::value || is_empty<T7>::value)
-    && (!is_constant_struct<T8>::value || is_empty<T8>::value)
-    && (!is_constant_struct<T9>::value || is_empty<T9>::value)
   };
 };
 
 
 template <typename T0, typename T1, typename T2,
-    typename T3, typename T4, typename T5, 
-    typename T6, typename T7, typename T8, 
-    typename T9>
+    typename T3, typename T4, typename T5>
 struct any_vector {
   enum {
     value = is_vector<T0>::value
@@ -359,10 +339,6 @@ struct any_vector {
     || is_vector<T3>::value
     || is_vector<T4>::value
     || is_vector<T5>::value
-    || is_vector<T6>::value
-    || is_vector<T7>::value
-    || is_vector<T8>::value
-    || is_vector<T9>::value
   };
 };
 
@@ -394,12 +370,9 @@ void add_var<Eigen::Matrix<var, Eigen::Dynamic, 1> >(vector<var>& x, Eigen::Matr
 }
 
 template <typename T0, typename T1, typename T2,
-    typename T3, typename T4, typename T5, 
-    typename T6, typename T7, typename T8, 
-    typename T9>
+          typename T3, typename T4, typename T5>
 void add_vars(vector<var>& x, T0& p0, T1& p1, T2& p2, 
-        T3& p3, T4& p4, T5& p5, T6& p6, T7& p7, 
-        T8& p8, T9& p9) {
+              T3& p3, T4& p4, T5& p5) {
   if (!is_constant_struct<T0>::value)
     add_var(x, p0);
   if (!is_constant_struct<T1>::value)
@@ -412,14 +385,6 @@ void add_vars(vector<var>& x, T0& p0, T1& p1, T2& p2,
     add_var(x, p4);
   if (!is_constant_struct<T5>::value)
     add_var(x, p5);
-  if (!is_constant_struct<T6>::value)
-    add_var(x, p6);
-  if (!is_constant_struct<T7>::value)
-    add_var(x, p7);
-  if (!is_constant_struct<T8>::value)
-    add_var(x, p8);
-  if (!is_constant_struct<T9>::value)
-    add_var(x, p9);
 }
 
 

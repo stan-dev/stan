@@ -50,25 +50,20 @@ public:
   }
     
   template <typename T_y, typename T_dof, typename T2,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_y, T_dof>::type 
   cdf(const T_y& y, const T_dof& nu, const T2&,
-      const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+      const T3&, const T4&, const T5&) {
     return stan::prob::inv_chi_square_cdf(y, nu);
   }
 
 
   
   template <typename T_y, typename T_dof, typename T2,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_y, T_dof>::type 
   cdf_function(const T_y& y, const T_dof& nu, const T2&,
-               const T3&, const T4&, const T5&, const T6&, const T7&, 
-               const T8&, const T9&) {
+               const T3&, const T4&, const T5&) {
     using stan::agrad::gamma_q;
     using stan::math::gamma_q;
     

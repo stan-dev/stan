@@ -79,47 +79,33 @@ public:
   }
 
   template <typename T_y, typename T_loc, typename T_scale,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_y, T_loc, T_scale>::type 
   log_prob(const T_y& y, const T_loc& mu, const T_scale& sigma,
-     const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+           const T3&, const T4&, const T5&) {
     return stan::prob::double_exponential_log(y, mu, sigma);
   }
 
   template <bool propto, 
-      typename T_y, typename T_loc, typename T_scale,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            typename T_y, typename T_loc, typename T_scale,
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_y, T_loc, T_scale>::type 
   log_prob(const T_y& y, const T_loc& mu, const T_scale& sigma,
-     const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+           const T3&, const T4&, const T5&) {
     return stan::prob::double_exponential_log<propto>(y, mu, sigma);
   }
   
   
   template <typename T_y, typename T_loc, typename T_scale,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
-  var log_prob_function(const T_y& y, const T_loc& mu, const T_scale& sigma,
-      const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+            typename T3, typename T4, typename T5>
+  typename stan::return_type<T_y, T_loc, T_scale>::type 
+  log_prob_function(const T_y& y, const T_loc& mu, const T_scale& sigma,
+                        const T3&, const T4&, const T5&) {
     using std::log;
     using std::fabs;
-    using stan::prob::include_summand;
     using stan::prob::NEG_LOG_TWO;
 
-    var logp(0);
-    
-    if (include_summand<true>::value)
-      logp += NEG_LOG_TWO;
-    if (include_summand<true,T_scale>::value)
-      logp -= log(sigma);
-    if (include_summand<true,T_y,T_loc,T_scale>::value)
-      logp -= fabs(y - mu) / sigma;
-    return logp;
+    return NEG_LOG_TWO- log(sigma) - fabs(y - mu) / sigma;
   }
 };
 

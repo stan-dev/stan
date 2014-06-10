@@ -70,24 +70,18 @@ public:
   }
 
   template <typename T_y, typename T_shape, typename T_scale,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_y, T_shape, T_scale>::type 
   ccdf_log(const T_y& y, const T_shape& alpha, const T_scale& sigma,
-           const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, 
-           const T9&) {
+           const T3&, const T4&, const T5&) {
     return stan::prob::weibull_ccdf_log(y, alpha, sigma);
   }
   
   template <typename T_y, typename T_shape, typename T_scale,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_y, T_shape, T_scale>::type 
   ccdf_log_function(const T_y& y, const T_shape& alpha, const T_scale& sigma,
-               const T3&, const T4&, const T5&, const T6&, const T7&, 
-               const T8&, const T9&) {
+                    const T3&, const T4&, const T5&) {
     using std::log;
     using std::pow;
     return (-pow(y / sigma, alpha));

@@ -75,50 +75,37 @@ public:
   }
 
   template <class T_y, class T_dof, class T_loc, class T_scale,
-      typename T4, typename T5, typename T6, 
-      typename T7, typename T8, typename T9>
+            typename T4, typename T5>
   typename stan::return_type<T_y, T_dof, T_loc, T_scale>::type 
   log_prob(const T_y& y, const T_dof& nu, const T_loc& mu, const T_scale& sigma,
-     const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+           const T4&, const T5&) {
     return stan::prob::student_t_log(y, nu, mu, sigma);
   }
   
   template <bool propto, 
-      class T_y, class T_dof, class T_loc, class T_scale,
-      typename T4, typename T5, typename T6, 
-      typename T7, typename T8, typename T9>
+            class T_y, class T_dof, class T_loc, class T_scale,
+            typename T4, typename T5>
   typename stan::return_type<T_y, T_dof, T_loc, T_scale>::type 
   log_prob(const T_y& y, const T_dof& nu, const T_loc& mu, const T_scale& sigma,
-     const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+           const T4&, const T5&) {
     return stan::prob::student_t_log<propto>(y, nu, mu, sigma);
   }
   
   
   template <class T_y, class T_dof, class T_loc, class T_scale,
-      typename T4, typename T5, typename T6, 
-      typename T7, typename T8, typename T9>
-  var log_prob_function(const T_y& y, const T_dof& nu, const T_loc& mu, const T_scale& sigma,
-      const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+            typename T4, typename T5>
+  typename stan::return_type<T_y, T_dof, T_loc, T_scale>::type 
+  log_prob_function(const T_y& y, const T_dof& nu, const T_loc& mu, 
+                    const T_scale& sigma, const T4&, const T5&) {
     using std::log;
     using stan::math::square;
     using stan::math::log1p;
     using boost::math::lgamma;
-    using stan::prob::include_summand;
     using stan::prob::NEG_LOG_SQRT_PI;
     
-    var logp(0);
-    if (include_summand<true,T_dof>::value)
-      logp += lgamma( (nu + 1.0) / 2.0) - lgamma(nu / 2.0);
-    if (include_summand<true>::value)
-      logp += NEG_LOG_SQRT_PI;
-    if (include_summand<true,T_dof>::value)
-      logp -= 0.5 * log(nu);
-    if (include_summand<true,T_scale>::value)
-      logp -= log(sigma);
-    if (include_summand<true,T_y,T_dof,T_loc,T_scale>::value)
-      logp -= ((nu + 1.0) / 2.0) 
-  * log1p( square(((y - mu) / sigma)) / nu);
-    return logp;
+    return lgamma( (nu + 1.0) / 2.0) - lgamma(nu / 2.0) 
+      + NEG_LOG_SQRT_PI - 0.5 * log(nu) - log(sigma) 
+      - ((nu + 1.0) / 2.0) * log1p( square(((y - mu) / sigma)) / nu);
   }
 };
 

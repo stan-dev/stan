@@ -59,42 +59,30 @@ public:
   }
 
   template <typename T_y, typename T_loc, typename T_scale,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_y, T_loc, T_scale>::type 
   log_prob(const T_y& y, const T_loc& mu, const T_scale& beta,
-     const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+           const T3&, const T4&, const T5&) {
     return stan::prob::gumbel_log(y, mu, beta);
   }
 
   template <bool propto, 
-      typename T_y, typename T_loc, typename T_scale,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            typename T_y, typename T_loc, typename T_scale,
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_y, T_loc, T_scale>::type 
   log_prob(const T_y& y, const T_loc& mu, const T_scale& beta,
-     const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+           const T3&, const T4&, const T5&) {
     return stan::prob::gumbel_log<propto>(y, mu, beta);
   }
   
   
   template <typename T_y, typename T_loc, typename T_scale,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
-  var log_prob_function(const T_y& y, const T_loc& mu, const T_scale& beta,
-      const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
-    using stan::prob::include_summand;
+            typename T3, typename T4, typename T5>
+  typename stan::return_type<T_y, T_loc, T_scale>::type 
+  log_prob_function(const T_y& y, const T_loc& mu, const T_scale& beta,
+                        const T3&, const T4&, const T5&) {
 
-    var lp(0.0);
-
-    if (include_summand<true,T_scale>::value)
-      lp -= log(beta);
-    if (include_summand<true,T_y,T_loc,T_scale>::value)
-      lp -= (y - mu) / beta + exp((mu - y) / beta);
-    return lp;
+    return -log(beta) - (y - mu) / beta + exp((mu - y) / beta);
   }
 };
 

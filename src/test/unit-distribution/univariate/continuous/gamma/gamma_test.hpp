@@ -64,45 +64,32 @@ public:
   }
 
   template <typename T_y, typename T_shape, typename T_inv_scale,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_y, T_shape, T_inv_scale>::type 
   log_prob(const T_y& y, const T_shape& alpha, const T_inv_scale& beta,
-     const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+           const T3&, const T4&, const T5&) {
     return stan::prob::gamma_log(y, alpha, beta);
   }
 
   template <bool propto, 
       typename T_y, typename T_shape, typename T_inv_scale,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_y, T_shape, T_inv_scale>::type 
   log_prob(const T_y& y, const T_shape& alpha, const T_inv_scale& beta,
-     const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+           const T3&, const T4&, const T5&) {
     return stan::prob::gamma_log<propto>(y, alpha, beta);
   }
   
   
   template <typename T_y, typename T_shape, typename T_inv_scale,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
-  var log_prob_function(const T_y& y, const T_shape& alpha, const T_inv_scale& beta,
-      const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
-    using stan::prob::include_summand;
+            typename T3, typename T4, typename T5>
+  typename stan::return_type<T_y, T_shape, T_inv_scale>::type 
+  log_prob_function(const T_y& y, const T_shape& alpha, 
+                        const T_inv_scale& beta,
+                        const T3&, const T4&, const T5&) {
     using stan::math::multiply_log;
     
-    var lp(0);
-    if (include_summand<true,T_shape>::value)
-      lp -= lgamma(alpha);
-    if (include_summand<true,T_shape,T_inv_scale>::value)
-      lp += multiply_log(alpha,beta);
-    if (include_summand<true,T_y,T_shape>::value)
-      lp += multiply_log(alpha-1.0,y);
-    if (include_summand<true,T_y,T_inv_scale>::value)
-      lp -= beta * y;
-    return lp;
+    return -lgamma(alpha) + multiply_log(alpha,beta) 
+      + multiply_log(alpha-1.0,y) - beta * y;
   }
 };

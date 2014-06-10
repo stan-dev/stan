@@ -70,46 +70,31 @@ public:
   }
 
   template <typename T_y, typename T_loc, typename T_scale,
-      typename T_shape, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            typename T_shape, typename T4, typename T5>
   typename stan::return_type<T_y, T_loc, T_scale,T_shape>::type 
   log_prob(const T_y& y, const T_loc& mu, const T_scale& sigma,
-     const T_shape& alpha, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+           const T_shape& alpha, const T4&, const T5&) {
     return stan::prob::skew_normal_log(y, mu, sigma, alpha);
   }
 
   template <bool propto, 
-      typename T_y, typename T_loc, typename T_scale,
-      typename T_shape, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            typename T_y, typename T_loc, typename T_scale,
+            typename T_shape, typename T4, typename T5>
   typename stan::return_type<T_y, T_loc, T_scale, T_shape>::type 
   log_prob(const T_y& y, const T_loc& mu, const T_scale& sigma,
-     const T_shape& alpha, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+           const T_shape& alpha, const T4&, const T5&) {
     return stan::prob::skew_normal_log<propto>(y, mu, sigma, alpha);
   }
   
   
   template <typename T_y, typename T_loc, typename T_scale,
-      typename T_shape, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
-  var log_prob_function(const T_y& y, const T_loc& mu, const T_scale& sigma,
-      const T_shape& alpha, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
-    using stan::prob::include_summand;
-
-    var logp(0.0);
-
-    if (include_summand<true>::value)
-      logp -=  0.5 * log(2.0 * boost::math::constants::pi<double>());
-    if (include_summand<true, T_scale>::value)
-      logp -= log(sigma);
-    if (include_summand<true,T_y, T_loc, T_scale>::value)
-      logp -= (y - mu) / sigma * (y - mu) / sigma * 0.5;
-    if (include_summand<true,T_y,T_loc,T_scale,T_shape>::value)
-      logp += log(erfc(-alpha * (y - mu) / (sigma * std::sqrt(2.0))));
-    return logp;
+            typename T_shape, typename T4, typename T5>
+  typename stan::return_type<T_y, T_loc, T_scale, T_shape>::type 
+  log_prob_function(const T_y& y, const T_loc& mu, const T_scale& sigma,
+                    const T_shape& alpha, const T4&, const T5&) {
+    return -0.5 * log(2.0 * boost::math::constants::pi<double>()) 
+      - log(sigma) - (y - mu) / sigma * (y - mu) / sigma * 0.5 
+      + log(erfc(-alpha * (y - mu) / (sigma * std::sqrt(2.0))));
   }
 };
 

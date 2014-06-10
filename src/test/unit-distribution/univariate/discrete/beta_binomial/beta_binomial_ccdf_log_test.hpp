@@ -48,23 +48,19 @@ public:
   }
 
   template <typename T_n, typename T_N, typename T_size1, typename T_size2, 
-        typename T4, typename T5, typename T6, 
-        typename T7, typename T8, typename T9>
+            typename T4, typename T5>
   typename stan::return_type<T_size1,T_size2>::type
   ccdf_log(const T_n& n, const T_N& N, const T_size1& alpha,
-          const T_size2& beta, const T4&, const T5&, const T6&, 
-          const T7&, const T8&, const T9&) {
+           const T_size2& beta, const T4&, const T5&) {
     return stan::prob::beta_binomial_ccdf_log(n, N, alpha, beta);
   }
 
 
   template <typename T_n, typename T_N, typename T_size1, typename T_size2, 
-        typename T4, typename T5, typename T6, 
-        typename T7, typename T8, typename T9>
+            typename T4, typename T5>
   typename stan::return_type<T_size1,T_size2>::type
   ccdf_log_function(const T_n& n, const T_N& N, const T_size1& alpha, 
-                   const T_size2& beta, const T4&, const T5&, const T6&, 
-                   const T7&, const T8&, const T9&) {
+                    const T_size2& beta, const T4&, const T5&) {
 
     using std::exp;
     using stan::math::lbeta;

@@ -57,53 +57,36 @@ public:
 
 
   template <class T_y, class T_dof, class T_scale,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            typename T3, typename T4, typename T5
   typename stan::return_type<T_y, T_dof, T_scale>::type 
   log_prob(const T_y& y, const T_dof& nu, const T_scale& s,
-     const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+           const T3&, const T4&, const T5&) {
     return stan::prob::scaled_inv_chi_square_log(y, nu, s);
   }
 
   template <bool propto, 
-      class T_y, class T_dof, class T_scale,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+            class T_y, class T_dof, class T_scale,
+            typename T3, typename T4, typename T5>
   typename stan::return_type<T_y, T_dof, T_scale>::type 
   log_prob(const T_y& y, const T_dof& nu, const T_scale& s,
-     const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+           const T3&, const T4&, const T5&) {
     return stan::prob::scaled_inv_chi_square_log<propto>(y, nu, s);
   }
   
   
   template <class T_y, class T_dof, class T_scale,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
-  var log_prob_function(const T_y& y, const T_dof& nu, const T_scale& s,
-      const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+            typename T3, typename T4, typename T5>
+  typename stan::return_type<T_y, T_dof, T_scale>::type 
+  log_prob_function(const T_y& y, const T_dof& nu, const T_scale& s,
+                    const T3&, const T4&, const T5&) {
     using std::log;
-    using stan::prob::include_summand;
     using stan::math::multiply_log;
     using stan::math::square;
 
-    
     if (y <= 0)
       return stan::prob::LOG_ZERO;
     
-    var logp(0);
-    if (include_summand<true,T_dof>::value) {
-      var half_nu = 0.5 * nu;
-      logp += multiply_log(half_nu,half_nu) - lgamma(half_nu);
-    }
-    if (include_summand<true,T_dof,T_scale>::value)
-      logp += nu * log(s);
-    if (include_summand<true,T_dof,T_y>::value)
-      logp -= multiply_log(nu*0.5+1.0, y);
-    if (include_summand<true,T_dof,T_y,T_scale>::value)
-      logp -= nu * 0.5 * square(s) / y;
-    return logp;
+    return multiply_log(0.5*nu,0.5*nu) - lgamma(0.5*nu) + nu * log(s) 
+      - multiply_log(nu*0.5+1.0, y) - nu * 0.5 * square(s) / y;
   }
 };

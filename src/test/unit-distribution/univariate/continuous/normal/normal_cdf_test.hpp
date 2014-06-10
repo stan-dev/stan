@@ -2,6 +2,9 @@
 #include <stan/prob/distributions/univariate/continuous/normal.hpp>
 
 #include <stan/math/constants.hpp>
+#include <stan/agrad/fwd/fvar.hpp>
+#include <stan/agrad/fwd/functions.hpp>
+#include <boost/utility/enable_if.hpp>
 
 using std::vector;
 using std::numeric_limits;
@@ -69,23 +72,19 @@ public:
   }
 
   template <typename T_y, typename T_loc, typename T_scale,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+      typename T3, typename T4, typename T5>
   typename stan::return_type<T_y, T_loc, T_scale>::type 
   cdf(const T_y& y, const T_loc& mu, const T_scale& sigma,
-      const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+      const T3&, const T4&, const T5&) {
     return stan::prob::normal_cdf(y, mu, sigma);
   }
 
 
   template <typename T_y, typename T_loc, typename T_scale,
-      typename T3, typename T4, typename T5, 
-      typename T6, typename T7, typename T8, 
-      typename T9>
+      typename T3, typename T4, typename T5>
   typename stan::return_type<T_y, T_loc, T_scale>::type 
   cdf_function(const T_y& y, const T_loc& mu, const T_scale& sigma,
-         const T3&, const T4&, const T5&, const T6&, const T7&, const T8&, const T9&) {
+               const T3&, const T4&, const T5&) {
     using stan::math::SQRT_2;
     return (0.5 + 0.5 * erf((y - mu) / (sigma * SQRT_2)));
   }
