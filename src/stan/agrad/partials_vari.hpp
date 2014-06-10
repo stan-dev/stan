@@ -61,7 +61,7 @@ namespace stan {
         inline
         T_return_type to_var(double logp, size_t /* nvaris */,
                              agrad::vari** /* all_varis */,
-                             double* /* all_partials */,
+                             T_partials_return* /* all_partials */,
                              const T1& x1, const T2& x2, const T3& x3, const T4& x4, 
                              const T5& x5, const T6& x6,
                              VectorView<T_partials_return*, 
@@ -92,7 +92,8 @@ namespace stan {
         struct partials_to_var <T_return_type,T_partials_return,T1,T2,T3,T4,T5,T6,
                                 false,false> {
           inline T_return_type to_var (T_partials_return logp, size_t nvaris,
-                                       agrad::vari** all_varis, double* all_partials,
+                                       agrad::vari** all_varis, 
+                                       T_partials_return* all_partials,
                                        const T1& x1, const T2& x2, const T3& x3, 
                                        const T4& x4, const T5& x5, const T6& x6,
                                        VectorView<T_partials_return*,
@@ -123,7 +124,8 @@ namespace stan {
         struct partials_to_var <T_return_type,T_partials_return,T1,T2,T3,T4,T5,T6,
                                 true,false> {
           inline T_return_type to_var(T_partials_return logp, size_t nvaris,
-                                      agrad::vari** all_varis, double* all_partials,
+                                      agrad::vari** all_varis, 
+                                      T_partials_return* all_partials,
                                       const T1& x1, const T2& x2, const T3& x3, 
                                       const T4& x4, const T5& x5, const T6& x6,
                                       VectorView<T_partials_return*,
@@ -212,7 +214,7 @@ namespace stan {
       const static bool all_constant = is_constant<T_return_type>::value;
       size_t nvaris;
       agrad::vari** all_varis;
-      double* all_partials;
+      T_partials_return* all_partials;
 
       VectorView<T_partials_return*, 
                  is_vector<T1>::value, 
@@ -242,7 +244,7 @@ namespace stan {
                  !is_constant_struct<T5>::value * length(x5) +
                  !is_constant_struct<T6>::value * length(x6)),
           all_varis((agrad::vari**)agrad::chainable::operator new(sizeof(agrad::vari*) * nvaris)), 
-          all_partials((double*)agrad::chainable::operator new(sizeof(double) * nvaris)),
+          all_partials((T_partials_return*)agrad::chainable::operator new(sizeof(T_partials_return) * nvaris)),
           d_x1(all_partials),
           d_x2(all_partials 
                + (!is_constant_struct<T1>::value) * length(x1)),

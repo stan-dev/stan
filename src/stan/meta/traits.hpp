@@ -275,6 +275,7 @@ namespace stan {
     scalar_t* x_;
   };
 
+
   /**
    *
    *  VectorView that has const correctness.
@@ -332,7 +333,7 @@ namespace stan {
    *
    *  These values are mutable.
    */
-  template<bool used, bool is_vec>
+  template<typename partials_return,bool used, bool is_vec>
   class DoubleVectorView {
   public:
     DoubleVectorView(size_t /* n */) { }
@@ -341,24 +342,24 @@ namespace stan {
     }
   };
 
-  template<>
-  class DoubleVectorView<true, false> {
+  template<typename partials_return>
+  class DoubleVectorView<partials_return,true, false> {
   private:
-    double x_;
+    partials_return x_;
   public:
     DoubleVectorView(size_t /* n */) : x_(0.0) { }
-    double& operator[](size_t /* i */) {
+    partials_return& operator[](size_t /* i */) {
       return x_;
     }
   };
 
-  template<>
-  class DoubleVectorView<true, true> {
+  template<typename partials_return>
+  class DoubleVectorView<partials_return,true, true> {
   private:
-    std::vector<double> x_;
+    std::vector<partials_return> x_;
   public:
     DoubleVectorView(size_t n) : x_(n) { }
-    double& operator[](size_t i) {
+    partials_return& operator[](size_t i) {
       return x_[i];
     }
   };

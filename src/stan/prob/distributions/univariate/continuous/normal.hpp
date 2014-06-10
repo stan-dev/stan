@@ -86,8 +86,8 @@ namespace stan {
       VectorView<const T_scale> sigma_vec(sigma);
       size_t N = max_size(y, mu, sigma);
 
-      DoubleVectorView<true,is_vector<T_scale>::value> inv_sigma(length(sigma));
-      DoubleVectorView<include_summand<propto,T_scale>::value,is_vector<T_scale>::value> log_sigma(length(sigma));
+      DoubleVectorView<T_partials_return,true,is_vector<T_scale>::value> inv_sigma(length(sigma));
+      DoubleVectorView<T_partials_return,include_summand<propto,T_scale>::value,is_vector<T_scale>::value> log_sigma(length(sigma));
       for (size_t i = 0; i < length(sigma); i++) {
         inv_sigma[i] = 1.0 / value_of(sigma_vec[i]);
         if (include_summand<propto,T_scale>::value)
@@ -116,7 +116,7 @@ namespace stan {
           logp += NEGATIVE_HALF * y_minus_mu_over_sigma_squared;
 
         // gradients
-        double scaled_diff = inv_sigma[n] * y_minus_mu_over_sigma;
+        T_partials_return scaled_diff = inv_sigma[n] * y_minus_mu_over_sigma;
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] -= scaled_diff;
         if (!is_constant_struct<T_loc>::value)
@@ -160,6 +160,7 @@ namespace stan {
     typename return_type<T_y,T_loc,T_scale>::type
     normal_cdf(const T_y& y, const T_loc& mu, const T_scale& sigma) {
       static const char* function = "stan::prob::normal_cdf(%1%)";
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type T_partials_return;
 
       using stan::math::check_positive;
       using stan::math::check_finite;
@@ -202,11 +203,12 @@ namespace stan {
       const double SQRT_TWO_OVER_PI = std::sqrt(2.0 / stan::math::pi());
 
       for (size_t n = 0; n < N; n++) {
-        const double y_dbl = value_of(y_vec[n]);
-        const double mu_dbl = value_of(mu_vec[n]);
-        const double sigma_dbl = value_of(sigma_vec[n]);
-        const double scaled_diff = (y_dbl - mu_dbl) / (sigma_dbl * SQRT_2);
-        const double cdf_ = 0.5 * (1.0 + erf(scaled_diff));
+        const T_partials_return y_dbl = value_of(y_vec[n]);
+        const T_partials_return mu_dbl = value_of(mu_vec[n]);
+        const T_partials_return sigma_dbl = value_of(sigma_vec[n]);
+        const T_partials_return scaled_diff = (y_dbl - mu_dbl) 
+          / (sigma_dbl * SQRT_2);
+        const T_partials_return cdf_ = 0.5 * (1.0 + erf(scaled_diff));
 
         // cdf
         cdf *= cdf_;
@@ -239,6 +241,7 @@ namespace stan {
     typename return_type<T_y,T_loc,T_scale>::type
     normal_cdf_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
       static const char* function = "stan::prob::normal_cdf_log(%1%)";
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type T_partials_return;
 
       using stan::math::check_positive;
       using stan::math::check_finite;
@@ -280,13 +283,14 @@ namespace stan {
     
       const double SQRT_TWO_OVER_PI = std::sqrt(2.0 / stan::math::pi());
       for (size_t n = 0; n < N; n++) {
-        const double y_dbl = value_of(y_vec[n]);
-        const double mu_dbl = value_of(mu_vec[n]);
-        const double sigma_dbl = value_of(sigma_vec[n]);
+        const T_partials_return y_dbl = value_of(y_vec[n]);
+        const T_partials_return mu_dbl = value_of(mu_vec[n]);
+        const T_partials_return sigma_dbl = value_of(sigma_vec[n]);
 
-        const double scaled_diff = (y_dbl - mu_dbl) / (sigma_dbl * SQRT_2);
+        const T_partials_return scaled_diff = (y_dbl - mu_dbl) 
+          / (sigma_dbl * SQRT_2);
         
-        const double one_p_erf = 1.0 + erf(scaled_diff);
+        const T_partials_return one_p_erf = 1.0 + erf(scaled_diff);
         // log cdf
         cdf_log += log_half + log(one_p_erf);
 
@@ -308,6 +312,7 @@ namespace stan {
     typename return_type<T_y,T_loc,T_scale>::type
     normal_ccdf_log(const T_y& y, const T_loc& mu, const T_scale& sigma) {
       static const char* function = "stan::prob::normal_ccdf_log(%1%)";
+      typedef typename stan::partials_return_type<T_y,T_loc,T_scale>::type T_partials_return;
 
       using stan::math::check_positive;
       using stan::math::check_finite;
@@ -349,13 +354,14 @@ namespace stan {
     
       const double SQRT_TWO_OVER_PI = std::sqrt(2.0 / stan::math::pi());
       for (size_t n = 0; n < N; n++) {
-        const double y_dbl = value_of(y_vec[n]);
-        const double mu_dbl = value_of(mu_vec[n]);
-        const double sigma_dbl = value_of(sigma_vec[n]);
+        const T_partials_return y_dbl = value_of(y_vec[n]);
+        const T_partials_return mu_dbl = value_of(mu_vec[n]);
+        const T_partials_return sigma_dbl = value_of(sigma_vec[n]);
 
-        const double scaled_diff = (y_dbl - mu_dbl) / (sigma_dbl * SQRT_2);
+        const T_partials_return scaled_diff = (y_dbl - mu_dbl) 
+          / (sigma_dbl * SQRT_2);
         
-        const double one_m_erf = 1.0 - erf(scaled_diff);
+        const T_partials_return one_m_erf = 1.0 - erf(scaled_diff);
         // log ccdf
         ccdf_log += log_half + log(one_m_erf);
 
