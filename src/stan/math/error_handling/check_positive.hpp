@@ -1,10 +1,10 @@
-#ifndef __STAN__MATH__ERROR_HANDLING__CHECK_POSITIVE_HPP__
-#define __STAN__MATH__ERROR_HANDLING__CHECK_POSITIVE_HPP__
+#ifndef __STAN__MATH__ERROR_HANDLING_CHECK_POSITIVE_HPP__
+#define __STAN__MATH__ERROR_HANDLING_CHECK_POSITIVE_HPP__
 
-#include <boost/type_traits/is_unsigned.hpp>
-#include <stan/meta/traits.hpp>
 #include <stan/math/error_handling/dom_err.hpp>
 #include <stan/math/error_handling/dom_err_vec.hpp>
+#include <boost/type_traits/is_unsigned.hpp>
+#include <stan/meta/traits.hpp>
 
 namespace stan {
   namespace math {
@@ -51,13 +51,6 @@ namespace stan {
                                T_result* result) {
       return positive<T_y,T_result,is_vector_like<T_y>::value>
         ::check(function, y, name, result);
-    }
-    template <typename T>
-    inline bool check_positive(const char* function,
-                               const T& x,
-                               const char* name) {
-      return check_positive<T,typename scalar_type<T>::type *>
-        (function,x,name,0);
     }
 
   }

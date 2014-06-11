@@ -1,9 +1,9 @@
 #ifndef __STAN__MATH__MATRIX__SOFTMAX_HPP__
 #define __STAN__MATH__MATRIX__SOFTMAX_HPP__
 
+#include <stan/math/error_handling/matrix/check_nonzero_size.hpp>
 #include <cmath>
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/matrix/validate_nonzero_size.hpp>
 
 namespace stan {
   namespace math {
@@ -19,7 +19,7 @@ namespace stan {
     inline Eigen::Matrix<T,Eigen::Dynamic,1>
     softmax(const Eigen::Matrix<T,Eigen::Dynamic,1>& v) {
       using std::exp;
-      stan::math::validate_nonzero_size(v,"vector softmax");
+      stan::math::check_nonzero_size("softmax(%1%)",v,"v",(double*)0);
       Eigen::Matrix<T,Eigen::Dynamic,1> theta(v.size());
       T sum(0.0);
       T max_v = v.maxCoeff();

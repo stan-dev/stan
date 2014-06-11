@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <stan/math/matrix/cumulative_sum.hpp>
 #include <stan/agrad/fwd.hpp>
 #include <stan/agrad/rev.hpp>
 #include <test/unit/agrad/util.hpp>

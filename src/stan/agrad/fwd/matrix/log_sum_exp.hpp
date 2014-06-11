@@ -19,13 +19,13 @@ namespace stan{
       using std::exp;
       std::vector<T> vals(v.size());
       for (int i = 0; i < v.size(); ++i)
-        vals[i] = v[i].val_;
+        vals[i] = v(i).val_;
       T deriv(0.0);
       T denominator(0.0);
       for (size_t i = 0; i < v.size(); ++i) {
         T exp_vi = exp(vals[i]);
         denominator += exp_vi;
-        deriv += v[i].d_ * exp_vi;
+        deriv += v(i).d_ * exp_vi;
       }
       return fvar<T>(log_sum_exp(vals), deriv / denominator);
     }

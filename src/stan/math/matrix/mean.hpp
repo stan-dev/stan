@@ -4,7 +4,7 @@
 #include <vector>
 #include <boost/math/tools/promotion.hpp>
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/matrix/validate_nonzero_size.hpp>
+#include <stan/math/error_handling/matrix/check_nonzero_size.hpp>
 
 namespace stan {
   namespace math {
@@ -21,7 +21,7 @@ namespace stan {
     inline 
     typename boost::math::tools::promote_args<T>::type
     mean(const std::vector<T>& v) {
-      validate_nonzero_size(v,"mean");
+      stan::math::check_nonzero_size("mean(%1%)",v,"v", (double*)0);
       T sum(v[0]);
       for (size_t i = 1; i < v.size(); ++i)
         sum += v[i];
@@ -38,7 +38,7 @@ namespace stan {
     inline  
     typename boost::math::tools::promote_args<T>::type
     mean(const Eigen::Matrix<T,R,C>& m) {
-      validate_nonzero_size(m,"mean");
+      stan::math::check_nonzero_size("mean(%1%)",m,"m", (double*)0);
       return m.mean();
     }    
     

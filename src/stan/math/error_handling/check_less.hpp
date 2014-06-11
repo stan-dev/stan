@@ -1,5 +1,5 @@
-#ifndef __STAN__MATH__ERROR_HANDLING__CHECK_LESS_HPP__
-#define __STAN__MATH__ERROR_HANDLING__CHECK_LESS_HPP__
+#ifndef __STAN__MATH__ERROR_HANDLING_CHECK_LESS_HPP__
+#define __STAN__MATH__ERROR_HANDLING_CHECK_LESS_HPP__
 
 #include <stan/math/error_handling/dom_err.hpp>
 #include <stan/math/error_handling/dom_err_vec.hpp>
@@ -8,10 +8,7 @@ namespace stan {
   namespace math {
 
     namespace {
-      template <typename T_y,
-                typename T_high,
-                typename T_result,
-                bool is_vec>
+      template <typename T_y, typename T_high, typename T_result, bool is_vec>
       struct less {
         static bool check(const char* function,
                           const T_y& y,
@@ -30,9 +27,7 @@ namespace stan {
         }
       };
     
-      template <typename T_y,
-                typename T_high,
-                typename T_result>
+      template <typename T_y, typename T_high, typename T_result>
       struct less<T_y, T_high, T_result, true> {
         static bool check(const char* function,
                           const T_y& y,
@@ -60,15 +55,6 @@ namespace stan {
       return less<T_y,T_high,T_result,is_vector_like<T_y>::value>
         ::check(function,y,high,name,result);
     }
-    template <typename T_y, typename T_high>
-    inline bool check_less(const char* function,
-                           const T_y& y,
-                           const T_high& high,
-                           const char* name) {
-      return check_less<T_y,T_high,typename scalar_type<T_y>::type *>
-        (function,y,high,name,0);
-    }
-
   }
 }
 #endif

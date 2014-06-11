@@ -3,11 +3,7 @@
 
 #include <sstream>
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/error_handling/check_positive.hpp>
-#include <stan/math/error_handling/matrix/check_pos_definite.hpp>
-#include <stan/math/error_handling/matrix/check_symmetric.hpp>
 #include <stan/math/error_handling/matrix/check_size_match.hpp>
-
 
 namespace stan {
   namespace math {
@@ -27,21 +23,13 @@ namespace stan {
                  const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
                  const char* name,
                  T_result* result) {
-      if (!check_size_match(function, 
-                            y.rows(), "Rows of matrix",
-                            y.cols(), "columns of matrix",
-                            result))
-        return false;
+      check_size_match(function, 
+                       y.rows(), "Rows of matrix",
+                       y.cols(), "columns of matrix",
+                       result);
       return true;
     }
 
-    template <typename T>
-    inline bool check_square(const char* function,
-                             const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& y,
-                             const char* name,
-                             T* result = 0) {
-      return check_square<T,T>(function,y,name,result);
-    }
   }
 }
 #endif
