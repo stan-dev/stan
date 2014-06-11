@@ -1,16 +1,22 @@
 data { 
   int d_int;
   int d_int_array[d_int];
+  int d_int_array_2[d_int, d_int];
+  int d_int_array_3[d_int, d_int, d_int];
   real d_real;
   real d_real_array[d_int];
+  real d_real_array_2[d_int, d_int];
+  real d_real_array_3[d_int, d_int, d_int];
   matrix[d_int,d_int] d_matrix;
   vector[d_int] d_vector;
   row_vector[d_int] d_row_vector;
 }
 transformed data {
   int transformed_data_int;
+  int transformed_data_int_array[d_int];
   real transformed_data_real;
   real transformed_data_real_array[d_int];
+  real transformed_data_real_array_2[d_int, d_int];
   matrix[d_int,d_int] transformed_data_matrix;
   vector[d_int] transformed_data_vector;
   row_vector[d_int] transformed_data_row_vector;
@@ -307,8 +313,35 @@ transformed data {
   transformed_data_matrix <- rep_matrix(d_real, d_int, d_int);
   transformed_data_matrix <- rep_matrix(d_vector, d_int);
   transformed_data_matrix <- rep_matrix(d_row_vector, d_int);
-  transformed_data_vector <- to_vector(d_row_vector);
+  
+  //Containers Conversion Functions
   transformed_data_vector <- to_vector(d_matrix);
+  transformed_data_vector <- to_vector(d_vector);
+  transformed_data_vector <- to_vector(d_row_vector);
+  transformed_data_vector <- to_vector(d_int_array);
+  transformed_data_vector <- to_vector(d_real_array);
+
+  transformed_data_row_vector <- to_row_vector(d_matrix);
+  transformed_data_row_vector <- to_row_vector(d_vector);
+  transformed_data_row_vector <- to_row_vector(d_row_vector);
+  transformed_data_row_vector <- to_row_vector(d_int_array);
+  transformed_data_row_vector <- to_row_vector(d_real_array);
+
+  transformed_data_matrix <- to_matrix(d_matrix);
+  transformed_data_matrix <- to_matrix(d_vector);
+  transformed_data_matrix <- to_matrix(d_row_vector);
+  transformed_data_matrix <- to_matrix(d_int_array_2);
+  transformed_data_matrix <- to_matrix(d_real_array_2);
+
+  transformed_data_real_array_2 <- to_array_2d(d_matrix);
+
+  transformed_data_real_array <- to_array_1d(d_matrix);
+  transformed_data_real_array <- to_array_1d(d_vector);
+  transformed_data_real_array <- to_array_1d(d_row_vector);
+  transformed_data_real_array <- to_array_1d(d_real_array_2);
+  transformed_data_int_array <- to_array_1d(d_int_array_2);
+  transformed_data_real_array <- to_array_1d(d_real_array_3);
+  transformed_data_int_array <- to_array_1d(d_int_array_3);
 
   // Slice and Package Functions
   //   diagonal matrices
@@ -346,6 +379,8 @@ transformed data {
 parameters {
   real p_real;
   real p_real_array[d_int];
+  real p_real_array_2[d_int, d_int];
+  real p_real_array_3[d_int, d_int, d_int];
   matrix[d_int,d_int] p_matrix;
   vector[d_int] p_vector;
   row_vector[d_int] p_row_vector;
@@ -353,6 +388,7 @@ parameters {
 transformed parameters {
   real transformed_param_real;
   real transformed_param_real_array[d_int];
+  real transformed_param_real_array_2[d_int, d_int];
   matrix[d_int,d_int] transformed_param_matrix;
   vector[d_int] transformed_param_vector;
   row_vector[d_int] transformed_param_row_vector;
@@ -847,6 +883,14 @@ transformed parameters {
   transformed_param_matrix <- quad_form(d_matrix,p_matrix);
   transformed_param_matrix <- quad_form(p_matrix,d_matrix);
   transformed_param_matrix <- quad_form(p_matrix,p_matrix);
+  transformed_param_real <- quad_form_sym(d_matrix,d_vector);
+  transformed_param_real <- quad_form_sym(d_matrix,p_vector);
+  transformed_param_real <- quad_form_sym(p_matrix,d_vector);
+  transformed_param_real <- quad_form_sym(p_matrix,p_vector);
+  transformed_param_matrix <- quad_form_sym(d_matrix,d_matrix);
+  transformed_param_matrix <- quad_form_sym(d_matrix,p_matrix);
+  transformed_param_matrix <- quad_form_sym(p_matrix,d_matrix);
+  transformed_param_matrix <- quad_form_sym(p_matrix,p_matrix);
   transformed_param_real <- trace_quad_form(d_matrix,d_vector);
   transformed_param_real <- trace_quad_form(d_matrix,p_vector);
   transformed_param_real <- trace_quad_form(p_matrix,d_vector);
@@ -925,11 +969,51 @@ transformed parameters {
   transformed_param_matrix <- rep_matrix(d_row_vector, d_int);
   transformed_param_matrix <- rep_matrix(p_row_vector, d_int);
 
-  transformed_param_vector <- to_vector(d_row_vector);
-  transformed_param_vector <- to_vector(p_row_vector);
+  //Containers Conversion Functions
   transformed_param_vector <- to_vector(d_matrix);
   transformed_param_vector <- to_vector(p_matrix);
+  transformed_param_vector <- to_vector(d_vector);
+  transformed_param_vector <- to_vector(p_vector);
+  transformed_param_vector <- to_vector(d_row_vector);
+  transformed_param_vector <- to_vector(p_row_vector);
+  transformed_param_vector <- to_vector(d_int_array);
+  transformed_param_vector <- to_vector(d_real_array);
+  transformed_param_vector <- to_vector(p_real_array);
 
+  transformed_param_row_vector <- to_row_vector(d_matrix);
+  transformed_param_row_vector <- to_row_vector(p_matrix);
+  transformed_param_row_vector <- to_row_vector(d_vector);
+  transformed_param_row_vector <- to_row_vector(p_vector);
+  transformed_param_row_vector <- to_row_vector(d_row_vector);
+  transformed_param_row_vector <- to_row_vector(p_row_vector);
+  transformed_param_row_vector <- to_row_vector(d_int_array);
+  transformed_param_row_vector <- to_row_vector(d_real_array);
+  transformed_param_row_vector <- to_row_vector(p_real_array);
+
+  transformed_param_matrix <- to_matrix(d_matrix);
+  transformed_param_matrix <- to_matrix(p_matrix);
+  transformed_param_matrix <- to_matrix(d_vector);
+  transformed_param_matrix <- to_matrix(p_vector);
+  transformed_param_matrix <- to_matrix(d_row_vector);
+  transformed_param_matrix <- to_matrix(p_row_vector);
+  transformed_param_matrix <- to_matrix(d_int_array_2);
+  transformed_param_matrix <- to_matrix(d_real_array_2);
+  transformed_param_matrix <- to_matrix(p_real_array_2);
+
+  transformed_param_real_array_2 <- to_array_2d(d_matrix);
+  transformed_param_real_array_2 <- to_array_2d(p_matrix);
+
+  transformed_param_real_array <- to_array_1d(d_matrix);
+  transformed_param_real_array <- to_array_1d(p_matrix);
+  transformed_param_real_array <- to_array_1d(d_vector);
+  transformed_param_real_array <- to_array_1d(p_vector);
+  transformed_param_real_array <- to_array_1d(d_row_vector);
+  transformed_param_real_array <- to_array_1d(p_row_vector);
+  transformed_param_real_array <- to_array_1d(d_real_array_2);
+  transformed_param_real_array <- to_array_1d(p_real_array_2);
+  transformed_param_real_array <- to_array_1d(d_real_array_3);
+  transformed_param_real_array <- to_array_1d(p_real_array_3);  
+  
   // Slice and Package Functions
   //   diagonal matrices
   transformed_param_vector <- diagonal(d_matrix);

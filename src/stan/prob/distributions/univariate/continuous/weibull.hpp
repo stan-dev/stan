@@ -39,25 +39,16 @@ namespace stan {
 
       // set up return value accumulator
       double logp(0.0);
-      if(!check_finite(function, y, "Random variable", &logp))
-        return logp;
-      if(!check_finite(function, alpha, "Shape parameter", 
-                       &logp))
-        return logp;
-      if(!check_positive(function, alpha, "Shape parameter",
-                         &logp))
-        return logp;
-      if(!check_not_nan(function, sigma, "Scale parameter",
-                        &logp))
-        return logp;
-      if(!check_positive(function, sigma, "Scale parameter", 
-                         &logp))
-        return logp;
-      if (!(check_consistent_sizes(function,
-                                   y,alpha,sigma,
-                                   "Random variable","Shape parameter","Scale parameter",
-                                   &logp)))
-        return logp;
+      check_finite(function, y, "Random variable", &logp);
+      check_finite(function, alpha, "Shape parameter", &logp);
+      check_positive(function, alpha, "Shape parameter", &logp);
+      check_not_nan(function, sigma, "Scale parameter", &logp);
+      check_positive(function, sigma, "Scale parameter", &logp);
+      check_consistent_sizes(function,
+                             y,alpha,sigma,
+                             "Random variable","Shape parameter",
+                             "Scale parameter",
+                             &logp);
 
       // check if no variables are involved and prop-to
       if (!include_summand<propto,T_y,T_shape,T_scale>::value)
@@ -164,16 +155,11 @@ namespace stan {
         return 1.0;
 
       double cdf(1.0);
-      if (!check_nonnegative(function, y, "Random variable", &cdf))
-        return cdf;
-      if (!check_finite(function, alpha, "Shape parameter", &cdf))
-        return cdf;
-      if (!check_positive(function, alpha, "Shape parameter", &cdf))
-        return cdf;
-      if (!check_finite(function, sigma, "Scale parameter", &cdf))
-        return cdf;
-      if (!check_positive(function, sigma, "Scale parameter", &cdf))
-        return cdf;
+      check_nonnegative(function, y, "Random variable", &cdf);
+      check_finite(function, alpha, "Shape parameter", &cdf);
+      check_positive(function, alpha, "Shape parameter", &cdf);
+      check_finite(function, sigma, "Scale parameter", &cdf);
+      check_positive(function, sigma, "Scale parameter", &cdf);
       
       agrad::OperandsAndPartials<T_y, T_shape, T_scale> 
         operands_and_partials(y, alpha, sigma);
@@ -235,16 +221,11 @@ namespace stan {
         return 0.0;
 
       double cdf_log(0.0);
-      if (!check_nonnegative(function, y, "Random variable", &cdf_log))
-        return cdf_log;
-      if (!check_finite(function, alpha, "Shape parameter", &cdf_log))
-        return cdf_log;
-      if (!check_positive(function, alpha, "Shape parameter", &cdf_log))
-        return cdf_log;
-      if (!check_finite(function, sigma, "Scale parameter", &cdf_log))
-        return cdf_log;
-      if (!check_positive(function, sigma, "Scale parameter", &cdf_log))
-        return cdf_log;
+      check_nonnegative(function, y, "Random variable", &cdf_log);
+      check_finite(function, alpha, "Shape parameter", &cdf_log);
+      check_positive(function, alpha, "Shape parameter", &cdf_log);
+      check_finite(function, sigma, "Scale parameter", &cdf_log);
+      check_positive(function, sigma, "Scale parameter", &cdf_log);
       
       agrad::OperandsAndPartials<T_y, T_shape, T_scale> 
         operands_and_partials(y, alpha, sigma);
@@ -296,16 +277,11 @@ namespace stan {
         return 0.0;
 
       double ccdf_log(0.0);
-      if (!check_nonnegative(function, y, "Random variable", &ccdf_log))
-        return ccdf_log;
-      if (!check_finite(function, alpha, "Shape parameter", &ccdf_log))
-        return ccdf_log;
-      if (!check_positive(function, alpha, "Shape parameter", &ccdf_log))
-        return ccdf_log;
-      if (!check_finite(function, sigma, "Scale parameter", &ccdf_log))
-        return ccdf_log;
-      if (!check_positive(function, sigma, "Scale parameter", &ccdf_log))
-        return ccdf_log;
+      check_nonnegative(function, y, "Random variable", &ccdf_log);
+      check_finite(function, alpha, "Shape parameter", &ccdf_log);
+      check_positive(function, alpha, "Shape parameter", &ccdf_log);
+      check_finite(function, sigma, "Scale parameter", &ccdf_log);
+      check_positive(function, sigma, "Scale parameter", &ccdf_log);
       
       agrad::OperandsAndPartials<T_y, T_shape, T_scale> 
         operands_and_partials(y, alpha, sigma);
@@ -349,14 +325,10 @@ namespace stan {
       using stan::math::check_not_nan;
       using stan::math::check_positive;
   
-      if(!check_finite(function, alpha, "Shape parameter"))
-        return 0;
-      if(!check_positive(function, alpha, "Shape parameter"))
-        return 0;
-      if(!check_not_nan(function, sigma, "Scale parameter"))
-        return 0;
-      if(!check_positive(function, sigma, "Scale parameter"))
-        return 0;
+      check_finite(function, alpha, "Shape parameter", (double*)0);
+      check_positive(function, alpha, "Shape parameter", (double*)0);
+      check_not_nan(function, sigma, "Scale parameter", (double*)0);
+      check_positive(function, sigma, "Scale parameter", (double*)0);
 
       variate_generator<RNG&, weibull_distribution<> >
         weibull_rng(rng, weibull_distribution<>(alpha, sigma));

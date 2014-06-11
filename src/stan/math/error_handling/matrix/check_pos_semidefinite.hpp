@@ -49,14 +49,6 @@ namespace stan {
       return true;
     }
 
-    template <typename T>
-    inline bool check_pos_semidefinite(const char* function,
-                                       const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& y,
-                                       const char* name,
-                                       T* result = 0) {
-      return check_pos_semidefinite<T,T>(function,y,name,result);
-    }
-
   }
 }
 #endif

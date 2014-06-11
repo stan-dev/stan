@@ -54,14 +54,11 @@ namespace stan {
       using stan::math::multiply_log;
       
       typename promote_args<T_prob,T_prior_sample_size>::type lp(0.0);      
-      if (!check_consistent_sizes(function, theta, alpha,
-				  "probabilities", "prior sample sizes",
-				  &lp))
-	return lp;
-      if (!check_positive(function, alpha, "prior sample sizes", &lp))
-	return lp;
-      if (!check_simplex(function, theta, "probabilities", &lp))
-	return lp;
+      check_consistent_sizes(function, theta, alpha,
+                             "probabilities", "prior sample sizes",
+                             &lp);
+      check_positive(function, alpha, "prior sample sizes", &lp);
+      check_simplex(function, theta, "probabilities", &lp);
 
       if (include_summand<propto,T_prior_sample_size>::value) {
         lp += lgamma(alpha.sum());

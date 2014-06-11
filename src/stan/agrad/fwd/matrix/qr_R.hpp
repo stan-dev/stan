@@ -3,10 +3,9 @@
 
 #include <stan/math/matrix/Eigen.hpp>
 #include <Eigen/QR>
-#include <stan/math/matrix/validate_nonzero_size.hpp>
-#include <stan/math/matrix/validate_greater_or_equal.hpp>
+#include <stan/math/error_handling/matrix/check_nonzero_size.hpp>
+#include <stan/math/error_handling/check_greater_or_equal.hpp>
 #include <stan/agrad/fwd/fvar.hpp>
-#include <stan/agrad/fwd/operators/operator_less_than.hpp>
 
 namespace stan {
   namespace agrad {
@@ -15,8 +14,9 @@ namespace stan {
     Eigen::Matrix<fvar<T>,Eigen::Dynamic,Eigen::Dynamic>
     qr_R(const Eigen::Matrix<fvar<T>,Eigen::Dynamic,Eigen::Dynamic>& m) {
       typedef Eigen::Matrix<fvar<T>,Eigen::Dynamic,Eigen::Dynamic> matrix_fwd_t;
-      stan::math::validate_nonzero_size(m,"qr_R");
-      stan::math::validate_greater_or_equal(m.rows(),m.cols(),"m.rows()", "m.cols()", "qr_R");
+      stan::math::check_nonzero_size("qr_R(%1%)",m,"m",(double*)0);
+      stan::math::check_greater_or_equal("qr_R(%1%)",m.rows(),m.cols(),"m.rows()",
+                                         (double*)0);
       Eigen::HouseholderQR< matrix_fwd_t > qr(m.rows(), m.cols());
       qr.compute(m);
       matrix_fwd_t R = qr.matrixQR().topLeftCorner(m.rows(),m.cols());

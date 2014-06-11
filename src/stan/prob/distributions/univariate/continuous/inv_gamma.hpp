@@ -57,26 +57,16 @@ namespace stan {
       // set up return value accumulator
       double logp(0.0);
 
-      if (!check_not_nan(function, y, "Random variable", &logp))
-        return logp;
-      if (!check_finite(function, alpha, "Shape parameter", 
-                        &logp)) 
-        return logp;
-      if (!check_positive(function, alpha, "Shape parameter",
-                          &logp)) 
-        return logp;
-      if (!check_finite(function, beta, "Scale parameter",
-                        &logp)) 
-        return logp;
-      if (!check_positive(function, beta, "Scale parameter", 
-                          &logp)) 
-        return logp;
-      if (!(check_consistent_sizes(function,
-                                   y,alpha,beta,
-                                   "Random variable","Shape parameter",
-                                   "Scale parameter",
-                                   &logp)))
-        return logp;
+      check_not_nan(function, y, "Random variable", &logp);
+      check_finite(function, alpha, "Shape parameter", &logp);
+      check_positive(function, alpha, "Shape parameter", &logp);
+      check_finite(function, beta, "Scale parameter", &logp);
+      check_positive(function, beta, "Scale parameter", &logp);
+      check_consistent_sizes(function,
+                             y,alpha,beta,
+                             "Random variable","Shape parameter",
+                             "Scale parameter",
+                             &logp);
 
       // check if no variables are involved and prop-to
       if (!include_summand<propto,T_y,T_shape,T_scale>::value)
@@ -208,24 +198,17 @@ namespace stan {
           
       double P(1.0);
           
-      if (!check_finite(function, alpha, "Shape parameter", &P)) 
-        return P;
-      if (!check_positive(function, alpha, "Shape parameter", &P)) 
-        return P;
-      if (!check_finite(function, beta, "Scale parameter", &P)) 
-        return P;
-      if (!check_positive(function, beta, "Scale parameter", &P)) 
-        return P;
-      if (!check_not_nan(function, y, "Random variable", &P))
-        return P;
-      if (!check_nonnegative(function, y, "Random variable", &P)) 
-        return P;
-      if (!(check_consistent_sizes(function, y, alpha, beta,
-                                   "Random variable", "Shape parameter", 
-                                   "Scale Parameter",
-                                   &P)))
-        return P;
-          
+      check_finite(function, alpha, "Shape parameter", &P);
+      check_positive(function, alpha, "Shape parameter", &P); 
+      check_finite(function, beta, "Scale parameter", &P);
+      check_positive(function, beta, "Scale parameter", &P); 
+      check_not_nan(function, y, "Random variable", &P);
+      check_nonnegative(function, y, "Random variable", &P); 
+      check_consistent_sizes(function, y, alpha, beta,
+                             "Random variable", "Shape parameter", 
+                             "Scale Parameter",
+                             &P);
+
       // Wrap arguments in vectors
       VectorView<const T_y> y_vec(y);
       VectorView<const T_shape> alpha_vec(alpha);
@@ -335,23 +318,16 @@ namespace stan {
           
       double P(0.0);
           
-      if (!check_finite(function, alpha, "Shape parameter", &P)) 
-        return P;
-      if (!check_positive(function, alpha, "Shape parameter", &P)) 
-        return P;
-      if (!check_finite(function, beta, "Scale parameter", &P)) 
-        return P;
-      if (!check_positive(function, beta, "Scale parameter", &P)) 
-        return P;
-      if (!check_not_nan(function, y, "Random variable", &P))
-        return P;
-      if (!check_nonnegative(function, y, "Random variable", &P)) 
-        return P;
-      if (!(check_consistent_sizes(function, y, alpha, beta,
-                                   "Random variable", "Shape parameter", 
-                                   "Scale Parameter",
-                                   &P)))
-        return P;
+      check_finite(function, alpha, "Shape parameter", &P);
+      check_positive(function, alpha, "Shape parameter", &P);
+      check_finite(function, beta, "Scale parameter", &P);
+      check_positive(function, beta, "Scale parameter", &P);
+      check_not_nan(function, y, "Random variable", &P);
+      check_nonnegative(function, y, "Random variable", &P);
+      check_consistent_sizes(function, y, alpha, beta,
+                             "Random variable", "Shape parameter", 
+                             "Scale Parameter",
+                             &P);
           
       // Wrap arguments in vectors
       VectorView<const T_y> y_vec(y);
@@ -452,23 +428,16 @@ namespace stan {
           
       double P(0.0);
           
-      if (!check_finite(function, alpha, "Shape parameter", &P)) 
-        return P;
-      if (!check_positive(function, alpha, "Shape parameter", &P)) 
-        return P;
-      if (!check_finite(function, beta, "Scale parameter", &P)) 
-        return P;
-      if (!check_positive(function, beta, "Scale parameter", &P)) 
-        return P;
-      if (!check_not_nan(function, y, "Random variable", &P))
-        return P;
-      if (!check_nonnegative(function, y, "Random variable", &P)) 
-        return P;
-      if (!(check_consistent_sizes(function, y, alpha, beta,
-                                   "Random variable", "Shape parameter", 
-                                   "Scale Parameter",
-                                   &P)))
-        return P;
+      check_finite(function, alpha, "Shape parameter", &P);
+      check_positive(function, alpha, "Shape parameter", &P);
+      check_finite(function, beta, "Scale parameter", &P);
+      check_positive(function, beta, "Scale parameter", &P); 
+      check_not_nan(function, y, "Random variable", &P);
+      check_nonnegative(function, y, "Random variable", &P);
+      check_consistent_sizes(function, y, alpha, beta,
+                             "Random variable", "Shape parameter", 
+                             "Scale Parameter",
+                             &P);
           
       // Wrap arguments in vectors
       VectorView<const T_y> y_vec(y);
@@ -559,14 +528,10 @@ namespace stan {
       using stan::math::check_positive;
       using stan::math::check_finite;
  
-      if (!check_finite(function, alpha, "Shape parameter")) 
-        return 0;
-      if (!check_positive(function, alpha, "Shape parameter"))
-        return 0;
-      if (!check_finite(function, beta, "Scale parameter"))
-        return 0;
-      if (!check_positive(function, beta, "Scale parameter")) 
-        return 0;
+      check_finite(function, alpha, "Shape parameter", (double*)0);
+      check_positive(function, alpha, "Shape parameter", (double*)0);
+      check_finite(function, beta, "Scale parameter", (double*)0);
+      check_positive(function, beta, "Scale parameter", (double*)0); 
 
       variate_generator<RNG&, gamma_distribution<> >
         gamma_rng(rng, gamma_distribution<>(alpha, 1 / beta));
