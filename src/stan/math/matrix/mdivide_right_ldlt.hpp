@@ -5,7 +5,7 @@
 #include <stan/math/matrix/LDLT_factor.hpp>
 #include <stan/math/matrix/mdivide_left_ldlt.hpp>
 #include <stan/math/matrix/transpose.hpp>
-#include <stan/math/matrix/validate_multiplicable.hpp>
+#include <stan/math/error_handling/matrix/check_multiplicable.hpp>
 #include <boost/math/tools/promotion.hpp>
 
 namespace stan {
@@ -25,7 +25,8 @@ namespace stan {
     mdivide_right_ldlt(const Eigen::Matrix<T1,R1,C1> &b,
                        const stan::math::LDLT_factor<T2,R2,C2> &A) {
       using stan::math::transpose;
-      stan::math::validate_multiplicable(b,A,"mdivide_right_ldlt");
+      stan::math::check_multiplicable("mdivide_right_ldlt(%1%)",b,"b",
+                                      A,"A",(double*)0);
 
       return transpose(mdivide_left_ldlt(A,transpose(b)));
     }
@@ -34,8 +35,8 @@ namespace stan {
     inline Eigen::Matrix<double,R1,C2>
     mdivide_right_ldlt(const Eigen::Matrix<double,R1,C1> &b,
                        const stan::math::LDLT_factor<double,R2,C2> &A) {
-      stan::math::validate_multiplicable(b,A,"mdivide_right_ldlt");
-
+      stan::math::check_multiplicable("mdivide_right_ldlt(%1%)",b,"b",
+                                      A,"A",(double*)0);
       return A.solveRight(b);
     }
 

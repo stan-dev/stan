@@ -47,21 +47,20 @@ namespace stan {
       size_t size = max_size(n, N, a, b);
       
       double logp(0.0);
-      if (!check_bounded(function, n, 0, a, "Successes variable", &logp))
-        return logp;
-      if (!check_greater(function, N, n, "Draws parameter", &logp))
-        return logp;
+      check_bounded(function, n, 0, a, "Successes variable", &logp);
+      check_greater(function, N, n, "Draws parameter", &logp);
       for (size_t i = 0; i < size; i++) {
-        if (!check_bounded(function, N_vec[i]-n_vec[i], 0, b_vec[i], "Draws parameter minus successes variable", &logp))
-          return logp;
-        if (!check_bounded(function, N_vec[i], 0, a_vec[i]+b_vec[i], "Draws parameter", &logp))
-          return logp;
+        check_bounded(function, N_vec[i]-n_vec[i], 0, b_vec[i], 
+                      "Draws parameter minus successes variable", &logp);
+        check_bounded(function, N_vec[i], 0, a_vec[i]+b_vec[i], 
+                      "Draws parameter", &logp);
       }
-      if (!(check_consistent_sizes(function,
-                                   n,N,a,b,
-                                   "Successes variable","Draws parameter","Successes in population parameter","Failures in population parameter",
-                                   &logp)))
-        return logp;
+      check_consistent_sizes(function,
+                             n,N,a,b,
+                             "Successes variable","Draws parameter",
+                             "Successes in population parameter",
+                             "Failures in population parameter",
+                             &logp);
       
       // check if no variables are involved and prop-to
       if (!include_summand<propto>::value)
@@ -101,14 +100,10 @@ namespace stan {
       using stan::math::check_bounded;
       using stan::math::check_positive;
 
-      if (!check_bounded(function, N, 0, a+b, "Draws parameter"))
-        return 0;
-      if (!check_positive(function,N,"Draws parameter"))
-        return 0;
-      if (!check_positive(function,a,"Successes in population parameter"))
-        return 0;
-      if (!check_positive(function,b,"Failures in population parameter"))
-        return 0;
+      check_bounded(function, N, 0, a+b, "Draws parameter", (int*)0);
+      check_positive(function,N,"Draws parameter", (int*)0);
+      check_positive(function,a,"Successes in population parameter", (int*)0);
+      check_positive(function,b,"Failures in population parameter", (int*)0);
 
       boost::math::hypergeometric_distribution<>dist (b, N, a + b);
       std::vector<double> index(a);

@@ -234,7 +234,8 @@ namespace stan {
       void positive_ordered_unconstrain(vector_t& y) {
         // reimplements pos_ordered_free in prob to avoid malloc
         if (y.size() == 0) return;
-        stan::math::check_positive_ordered("stan::io::positive_ordered_unconstrain(%1%)", y, "Vector");
+        stan::math::check_positive_ordered("stan::io::positive_ordered_unconstrain(%1%)", 
+                                           y, "Vector", (double*)0);
         data_r_.push_back(log(y[0]));
         for (typename vector_t::size_type i = 1; i < y.size(); ++i) {
           data_r_.push_back(log(y[i] - y[i-1]));
@@ -333,7 +334,8 @@ namespace stan {
        * @throw std::runtime_error if the vector is not a unit_vector.
        */
       void unit_vector_unconstrain(vector_t& y) {
-        stan::math::check_unit_vector("stan::io::unit_vector_unconstrain(%1%)", y, "Vector");
+        stan::math::check_unit_vector("stan::io::unit_vector_unconstrain(%1%)", 
+                                      y, "Vector", (double*)0);
         vector_t uy = stan::prob::unit_vector_free(y);
         for (typename vector_t::size_type i = 0; i < uy.size(); ++i) 
           data_r_.push_back(uy[i]);
@@ -355,7 +357,9 @@ namespace stan {
        * @throw std::runtime_error if the vector is not a simplex.
        */
       void simplex_unconstrain(vector_t& y) {
-        stan::math::check_simplex("stan::io::simplex_unconstrain(%1%)", y, "Vector");
+        stan::math::check_simplex("stan::io::simplex_unconstrain(%1%)", 
+                                  y, "Vector",
+                                  (double*)0);
         vector_t uy = stan::prob::simplex_free(y);
         for (typename vector_t::size_type i = 0; i < uy.size(); ++i) 
           data_r_.push_back(uy[i]);
@@ -425,7 +429,9 @@ namespace stan {
        *    on log scale are unconstrained.
        */
       void corr_matrix_unconstrain(matrix_t& y) {
-        stan::math::check_corr_matrix("stan::io::corr_matrix_unconstrain(%1%)", y, "Matrix");
+        stan::math::check_corr_matrix("stan::io::corr_matrix_unconstrain(%1%)", 
+                                      y, "Matrix",
+                                      (double*)0);
         size_t k = y.rows();
         size_t k_choose_2 = (k * (k-1)) / 2;
         array_vec_t cpcs(k_choose_2);

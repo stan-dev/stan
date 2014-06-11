@@ -1,8 +1,10 @@
-#ifndef __STAN__MATH__ERROR_HANDLING__CHECK_FINITE_HPP__
-#define __STAN__MATH__ERROR_HANDLING__CHECK_FINITE_HPP__
+#ifndef __STAN__MATH__ERROR_HANDLING_CHECK_FINITE_HPP__
+#define __STAN__MATH__ERROR_HANDLING_CHECK_FINITE_HPP__
 
 #include <stan/math/error_handling/dom_err.hpp>
 #include <stan/math/error_handling/dom_err_vec.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
+#include <stan/meta/traits.hpp>
 
 namespace stan {
   namespace math {
@@ -53,15 +55,6 @@ namespace stan {
       return finite<T_y,T_result,is_vector_like<T_y>::value>
         ::check(function, y, name, result);
     }
-
-    template <typename T>
-    inline bool check_finite(const char* function,
-                             const T& y,
-                             const char* name) {
-      return check_finite<T,typename scalar_type<T>::type *>
-        (function,y,name,0);
-    }
- 
   }
 }
 #endif

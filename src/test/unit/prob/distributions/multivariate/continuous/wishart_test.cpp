@@ -4,7 +4,7 @@
 #include <boost/math/special_functions/digamma.hpp>
 #include <boost/math/distributions.hpp>
 #include <stan/math/matrix/determinant.hpp>
-
+#include <stan/math/matrix/variance.hpp>
 
 using Eigen::Dynamic;
 using Eigen::Matrix;

@@ -2,8 +2,8 @@
 #define __STAN__MATH__ERROR_HANDLING__MATRIX__CHECK_SIMPLEX_HPP__
 
 #include <sstream>
-#include <stan/math/error_handling/dom_err.hpp>
 #include <stan/math/matrix/Eigen.hpp>
+#include <stan/math/error_handling/dom_err.hpp>
 #include <stan/math/error_handling/matrix/constraint_tolerance.hpp>
 
 namespace stan {
@@ -28,8 +28,7 @@ namespace stan {
                        const Eigen::Matrix<T_prob,Eigen::Dynamic,1>& theta,
                        const char* name,
                        T_result* result) {
-      typedef typename Eigen::Matrix<T_prob,Eigen::Dynamic,1>::size_type size_t;
-      using stan::math::policies::raise_domain_error;
+      typedef typename Eigen::Matrix<T_prob,Eigen::Dynamic,1>::size_type size_type;
       if (theta.size() == 0) {
         std::string message(name);
         message += " is not a valid simplex. %1% elements in the vector.";
@@ -48,7 +47,7 @@ namespace stan {
                        tmp.c_str(),"",
                        result);
       }
-      for (size_t n = 0; n < theta.size(); n++) {
+      for (size_type n = 0; n < theta.size(); n++) {
         if (!(theta[n] >= 0)) {
           std::ostringstream stream;
           stream << name << " is not a valid simplex."
@@ -63,14 +62,6 @@ namespace stan {
       return true;
     }                         
     
-    template <typename T>
-    inline bool check_simplex(const char* function,
-                              const Eigen::Matrix<T,Eigen::Dynamic,1>& theta,
-                              const char* name,
-                              T* result = 0) {
-      return check_simplex<T,T>(function,theta,name,result);
-    }
-
   }
 }
 #endif
