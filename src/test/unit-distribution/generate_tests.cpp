@@ -89,7 +89,10 @@ void write_includes(vector<std::ostream *>& outs, const string& include) {
     std::ostream* out = outs[n];
     *out << "#include <gtest/gtest.h>" << endl;
     *out << "#include <boost/mpl/vector.hpp>" << endl;
-    *out << "#include <test/unit-distribution/test_fixture.hpp>" << endl;
+    *out << "#include <test/unit-distribution/test_fixture_distr.hpp>" << endl;
+    // *out << "#include <test/unit-distribution/test_fixture_cdf.hpp>" << endl;
+    // *out << "#include <test/unit-distribution/test_fixture_cdf_log.hpp>" << endl;
+    // *out << "#include <test/unit-distribution/test_fixture_ccdf_log.hpp>" << endl;
     *out << "#include <" << include.substr(include.find("src/")+4) << ">" << endl;  
     *out << endl;
   }
@@ -292,10 +295,10 @@ int create_files(const int& argc, const char* argv[],const int& index) {
  */
 int main(int argc, const char* argv[]) {
   create_files(argc,argv,1);
-  create_files(argc,argv,2);
-  create_files(argc,argv,3);
-  create_files(argc,argv,4);
-  create_files(argc,argv,5);
+  // create_files(argc,argv,2);
+  // create_files(argc,argv,3);
+  // create_files(argc,argv,4);
+  // create_files(argc,argv,5);
   
   return 0;
 }
