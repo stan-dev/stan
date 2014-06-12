@@ -44,19 +44,15 @@ namespace stan {
       double logp(0.0);
 
       // validate args
-      if (!check_nonnegative(function, n, "Random variable", &logp))
-        return logp;
-      if (!check_not_nan(function, lambda,
-                         "Rate parameter", &logp))
-        return logp;
-      if (!check_nonnegative(function, lambda,
-                             "Rate parameter", &logp))
-        return logp;
-      if (!(check_consistent_sizes(function,
-                                   n,lambda,
-                                   "Random variable","Rate parameter",
-                                   &logp)))
-        return logp;
+      check_nonnegative(function, n, "Random variable", &logp);
+      check_not_nan(function, lambda,
+                    "Rate parameter", &logp);
+      check_nonnegative(function, lambda,
+                        "Rate parameter", &logp);
+      check_consistent_sizes(function,
+                             n,lambda,
+                             "Random variable","Rate parameter",
+                             &logp);
       
       // check if no variables are involved and prop-to
       if (!include_summand<propto,T_rate>::value)
@@ -131,16 +127,13 @@ namespace stan {
       double logp(0.0);
 
       // validate args
-      if (!check_nonnegative(function, n, "Random variable", &logp))
-        return logp;
-      if (!check_not_nan(function, alpha,
-                         "Log rate parameter", &logp))
-        return logp;
-      if (!(check_consistent_sizes(function,
-                                   n,alpha,
-                                   "Random variable","Log rate parameter",
-                                   &logp)))
-        return logp;
+      check_nonnegative(function, n, "Random variable", &logp);
+      check_not_nan(function, alpha,
+                    "Log rate parameter", &logp);
+      check_consistent_sizes(function,
+                             n,alpha,
+                             "Random variable","Log rate parameter",
+                             &logp);
       
       // check if no variables are involved and prop-to
       if (!include_summand<propto,T_log_rate>::value)
@@ -213,14 +206,11 @@ namespace stan {
       double P(1.0);
           
       // Validate arguments
-      if (!check_not_nan(function, lambda, "Rate parameter", &P))
-        return P;
-      if (!check_nonnegative(function, lambda, "Rate parameter", &P))
-        return P;
-      if (!(check_consistent_sizes(function, n,lambda,
-                                   "Random variable","Rate parameter",
-                                   &P)))
-        return P;
+      check_not_nan(function, lambda, "Rate parameter", &P);
+      check_nonnegative(function, lambda, "Rate parameter", &P);
+      check_consistent_sizes(function, n,lambda,
+                             "Random variable","Rate parameter",
+                             &P);
           
       // Wrap arguments into vector views
       VectorView<const T_n> n_vec(n);
@@ -282,14 +272,11 @@ namespace stan {
       double P(0.0);
           
       // Validate arguments
-      if (!check_not_nan(function, lambda, "Rate parameter", &P))
-        return P;
-      if (!check_nonnegative(function, lambda, "Rate parameter", &P))
-        return P;
-      if (!(check_consistent_sizes(function, n,lambda,
-                                   "Random variable","Rate parameter",
-                                   &P)))
-        return P;
+      check_not_nan(function, lambda, "Rate parameter", &P);
+      check_nonnegative(function, lambda, "Rate parameter", &P);
+      check_consistent_sizes(function, n,lambda,
+                             "Random variable","Rate parameter",
+                             &P);
           
       // Wrap arguments into vector views
       VectorView<const T_n> n_vec(n);
@@ -347,14 +334,11 @@ namespace stan {
       double P(0.0);
           
       // Validate arguments
-      if (!check_not_nan(function, lambda, "Rate parameter", &P))
-        return P;
-      if (!check_nonnegative(function, lambda, "Rate parameter", &P))
-        return P;
-      if (!(check_consistent_sizes(function, n,lambda,
-                                   "Random variable","Rate parameter",
-                                   &P)))
-        return P;
+      check_not_nan(function, lambda, "Rate parameter", &P);
+      check_nonnegative(function, lambda, "Rate parameter", &P);
+      check_consistent_sizes(function, n,lambda,
+                             "Random variable","Rate parameter",
+                             &P);
           
       // Wrap arguments into vector views
       VectorView<const T_n> n_vec(n);
@@ -407,12 +391,10 @@ namespace stan {
       using stan::math::check_not_nan;
       using stan::math::check_nonnegative;
  
-      if (!check_not_nan(function, lambda,
-                         "Rate parameter"))
-        return 0;
-      if (!check_nonnegative(function, lambda,
-                             "Rate parameter"))
-        return 0;
+      check_not_nan(function, lambda,
+                    "Rate parameter", (double*)0);
+      check_nonnegative(function, lambda,
+                        "Rate parameter", (double*)0);
 
       variate_generator<RNG&, poisson_distribution<> >
         poisson_rng(rng, poisson_distribution<>(lambda));

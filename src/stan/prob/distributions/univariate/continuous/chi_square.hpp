@@ -56,19 +56,14 @@ namespace stan {
       using stan::math::value_of;
       
       double logp(0.0);
-      if (!check_not_nan(function, y, "Random variable", &logp))
-        return logp;
-      if (!check_nonnegative(function, y, "Random variable", &logp))
-        return logp;
-      if (!check_finite(function, nu, "Degrees of freedom parameter", &logp))
-        return logp;
-      if (!check_positive(function, nu, "Degrees of freedom parameter", &logp))
-        return logp;
-      if (!(check_consistent_sizes(function,
-                                   y,nu,
-                                   "Random variable","Degrees of freedom parameter",
-                                   &logp)))
-        return logp;
+      check_not_nan(function, y, "Random variable", &logp);
+      check_nonnegative(function, y, "Random variable", &logp);
+      check_finite(function, nu, "Degrees of freedom parameter", &logp);
+      check_positive(function, nu, "Degrees of freedom parameter", &logp);
+      check_consistent_sizes(function,
+                             y,nu,
+                             "Random variable","Degrees of freedom parameter",
+                             &logp);
     
       
       // set up template expressions wrapping scalars into vector views
@@ -173,19 +168,14 @@ namespace stan {
       if (!(stan::length(y) && stan::length(nu))) 
         return cdf;
 
-      if (!check_not_nan(function, y, "Random variable", &cdf))
-        return cdf;
-      if (!check_nonnegative(function, y, "Random variable", &cdf))
-        return cdf;
-      if (!check_finite(function, nu, "Degrees of freedom parameter", &cdf))
-        return cdf;
-      if (!check_positive(function, nu, "Degrees of freedom parameter", &cdf))
-        return cdf;
-      if (!(check_consistent_sizes(function,
-                                   y,nu,
-                                   "Random variable","Degrees of freedom parameter",
-                                   &cdf)))
-        return cdf;
+      check_not_nan(function, y, "Random variable", &cdf);
+      check_nonnegative(function, y, "Random variable", &cdf);
+      check_finite(function, nu, "Degrees of freedom parameter", &cdf);
+      check_positive(function, nu, "Degrees of freedom parameter", &cdf);
+      check_consistent_sizes(function,
+                             y,nu,
+                             "Random variable","Degrees of freedom parameter",
+                             &cdf);
 
       // Wrap arguments in vectors
       VectorView<const T_y> y_vec(y);
@@ -280,19 +270,14 @@ namespace stan {
       if (!(stan::length(y) && stan::length(nu))) 
         return cdf_log;
 
-      if (!check_not_nan(function, y, "Random variable", &cdf_log))
-        return cdf_log;
-      if (!check_nonnegative(function, y, "Random variable", &cdf_log))
-        return cdf_log;
-      if (!check_finite(function, nu, "Degrees of freedom parameter", &cdf_log))
-        return cdf_log;
-      if (!check_positive(function, nu, "Degrees of freedom parameter", &cdf_log))
-        return cdf_log;
-      if (!(check_consistent_sizes(function,
-                                   y,nu,
-                                   "Random variable","Degrees of freedom parameter",
-                                   &cdf_log)))
-        return cdf_log;
+      check_not_nan(function, y, "Random variable", &cdf_log);
+      check_nonnegative(function, y, "Random variable", &cdf_log);
+      check_finite(function, nu, "Degrees of freedom parameter", &cdf_log);
+      check_positive(function, nu, "Degrees of freedom parameter", &cdf_log);
+      check_consistent_sizes(function,
+                             y,nu,
+                             "Random variable","Degrees of freedom parameter",
+                             &cdf_log);
 
       // Wrap arguments in vectors
       VectorView<const T_y> y_vec(y);
@@ -380,19 +365,14 @@ namespace stan {
       if (!(stan::length(y) && stan::length(nu))) 
         return ccdf_log;
 
-      if (!check_not_nan(function, y, "Random variable", &ccdf_log))
-        return ccdf_log;
-      if (!check_nonnegative(function, y, "Random variable", &ccdf_log))
-        return ccdf_log;
-      if (!check_finite(function, nu, "Degrees of freedom parameter", &ccdf_log))
-        return ccdf_log;
-      if (!check_positive(function, nu, "Degrees of freedom parameter", &ccdf_log))
-        return ccdf_log;
-      if (!(check_consistent_sizes(function,
-                                   y,nu,
-                                   "Random variable","Degrees of freedom parameter",
-                                   &ccdf_log)))
-        return ccdf_log;
+      check_not_nan(function, y, "Random variable", &ccdf_log);
+      check_nonnegative(function, y, "Random variable", &ccdf_log);
+      check_finite(function, nu, "Degrees of freedom parameter", &ccdf_log);
+      check_positive(function, nu, "Degrees of freedom parameter", &ccdf_log);
+      check_consistent_sizes(function,
+                             y,nu,
+                             "Random variable","Degrees of freedom parameter",
+                             &ccdf_log);
 
       // Wrap arguments in vectors
       VectorView<const T_y> y_vec(y);
@@ -474,10 +454,8 @@ namespace stan {
       using stan::math::check_positive;
       using stan::math::check_finite;
       
-      if (!check_finite(function, nu, "Degrees of freedom parameter"))
-        return 0;
-      if (!check_positive(function, nu, "Degrees of freedom parameter"))
-        return 0;
+      check_finite(function, nu, "Degrees of freedom parameter", (double*)0);
+      check_positive(function, nu, "Degrees of freedom parameter", (double*)0);
     
 
       variate_generator<RNG&, chi_squared_distribution<> >

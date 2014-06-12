@@ -31,10 +31,9 @@ namespace stan {
       int lb = 1;
 
       double lp = 0.0;
-      if (!check_bounded(function, n, lb, theta.size(),
-                         "Number of categories",
-                         &lp))
-        return lp;
+      check_bounded(function, n, lb, theta.size(),
+                    "Number of categories",
+                    &lp);
       
       if (!stan::is_constant_struct<T_prob>::value) {
         Eigen::Matrix<double,Eigen::Dynamic,1> theta_dbl(theta.size());
@@ -83,10 +82,9 @@ namespace stan {
 
       double lp = 0.0;
       for (size_t i = 0; i < ns.size(); ++i)
-        if (!check_bounded(function, ns[i], lb, theta.size(),
-                           "element of outcome array",
-                           &lp))
-        return lp;
+        check_bounded(function, ns[i], lb, theta.size(),
+                      "element of outcome array",
+                      &lp);
       
       if (!stan::is_constant_struct<T_prob>::value) {
         Eigen::Matrix<double,Eigen::Dynamic,1> theta_dbl(theta.size());
@@ -141,7 +139,7 @@ namespace stan {
       static const char* function = "stan::prob::categorical_rng(%1%)";
 
       check_simplex(function, theta,
-                    "Probabilities parameter");
+                    "Probabilities parameter", (double*)0);
 
       variate_generator<RNG&, uniform_01<> >
         uniform01_rng(rng, uniform_01<>());

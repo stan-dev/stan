@@ -3,7 +3,7 @@
 
 #include <sstream>
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/error_handling/raise_domain_error.hpp>
+#include <stan/math/error_handling/dom_err.hpp>
 
 namespace stan {
   namespace math {

@@ -58,18 +58,13 @@ namespace stan {
       using stan::math::value_of;
       
       double logp(0.0);
-      if(!check_not_nan(function, y, "Random variable", &logp))
-        return logp;
-      if(!check_finite(function, beta, "Inverse scale parameter", &logp))
-        return logp;
-      if(!check_positive(function, beta, "Inverse scale parameter", &logp))
-        return logp;
-
-      if (!(check_consistent_sizes(function,
-                                   y,beta,
-                                   "Random variable","Inverse scale parameter",
-                                   &logp)))
-        return logp;
+      check_not_nan(function, y, "Random variable", &logp);
+      check_finite(function, beta, "Inverse scale parameter", &logp);
+      check_positive(function, beta, "Inverse scale parameter", &logp);
+      check_consistent_sizes(function,
+                             y,beta,
+                             "Random variable","Inverse scale parameter",
+                             &logp);
       
       
       // set up template expressions wrapping scalars into vector views
@@ -143,14 +138,10 @@ namespace stan {
             && stan::length(beta)))
         return cdf;
 
-      if(!check_not_nan(function, y, "Random variable", &cdf))
-        return cdf;
-      if(!check_nonnegative(function, y, "Random variable", &cdf))
-        return cdf;
-      if(!check_finite(function, beta, "Inverse scale parameter", &cdf))
-        return cdf;
-      if(!check_positive(function, beta, "Inverse scale parameter", &cdf))
-        return cdf;
+      check_not_nan(function, y, "Random variable", &cdf);
+      check_nonnegative(function, y, "Random variable", &cdf);
+      check_finite(function, beta, "Inverse scale parameter", &cdf);
+      check_positive(function, beta, "Inverse scale parameter", &cdf);
 
       agrad::OperandsAndPartials<T_y, T_inv_scale> 
         operands_and_partials(y, beta);
@@ -202,14 +193,10 @@ namespace stan {
             && stan::length(beta)))
         return cdf_log;
 
-      if(!check_not_nan(function, y, "Random variable", &cdf_log))
-        return cdf_log;
-      if(!check_nonnegative(function, y, "Random variable", &cdf_log))
-        return cdf_log;
-      if(!check_finite(function, beta, "Inverse scale parameter", &cdf_log))
-        return cdf_log;
-      if(!check_positive(function, beta, "Inverse scale parameter", &cdf_log))
-        return cdf_log;
+      check_not_nan(function, y, "Random variable", &cdf_log);
+      check_nonnegative(function, y, "Random variable", &cdf_log);
+      check_finite(function, beta, "Inverse scale parameter", &cdf_log);
+      check_positive(function, beta, "Inverse scale parameter", &cdf_log);
 
       agrad::OperandsAndPartials<T_y, T_inv_scale> 
         operands_and_partials(y, beta);
@@ -253,14 +240,10 @@ namespace stan {
             && stan::length(beta)))
         return ccdf_log;
 
-      if(!check_not_nan(function, y, "Random variable", &ccdf_log))
-        return ccdf_log;
-      if(!check_nonnegative(function, y, "Random variable", &ccdf_log))
-        return ccdf_log;
-      if(!check_finite(function, beta, "Inverse scale parameter", &ccdf_log))
-        return ccdf_log;
-      if(!check_positive(function, beta, "Inverse scale parameter", &ccdf_log))
-        return ccdf_log;
+      check_not_nan(function, y, "Random variable", &ccdf_log);
+      check_nonnegative(function, y, "Random variable", &ccdf_log);
+      check_finite(function, beta, "Inverse scale parameter", &ccdf_log);
+      check_positive(function, beta, "Inverse scale parameter", &ccdf_log);
 
       agrad::OperandsAndPartials<T_y, T_inv_scale> 
         operands_and_partials(y, beta);
@@ -295,10 +278,8 @@ namespace stan {
       using stan::math::check_finite;
       using stan::math::check_positive;
 
-      if(!check_finite(function, beta, "Inverse scale parameter"))
-        return 0;
-      if(!check_positive(function, beta, "Inverse scale parameter"))
-        return 0;
+      check_finite(function, beta, "Inverse scale parameter", (double*)0);
+      check_positive(function, beta, "Inverse scale parameter", (double*)0);
 
       variate_generator<RNG&, exponential_distribution<> >
         exp_rng(rng, exponential_distribution<>(beta));

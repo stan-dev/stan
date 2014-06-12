@@ -78,37 +78,14 @@ namespace stan {
       int K = c.size() + 1;
 
       typename boost::math::tools::promote_args<T_lambda,T_cut>::type lp(0.0);
-      if (!check_bounded(function, y, 1, K,
-                         "Random variable", 
-                         &lp))
-        return lp;
+      check_bounded(function, y, 1, K, "Random variable", &lp);
+      check_finite(function, lambda, "Location parameter", &lp);
+      check_greater(function, c.size(), 0, "Size of cut points parameter", &lp);
+      for (int i = 1; i < c.size(); ++i)
+        check_greater(function, c(i), c(i - 1), "Cut points parameter", &lp);
 
-      if (!check_finite(function, lambda, 
-                        "Location parameter", &lp))
-        return lp;
-
-      if (!check_greater(function, c.size(), 0,
-                         "Size of cut points parameter",
-                         &lp))
-        return lp;
-
-
-      for (int i = 1; i < c.size(); ++i) {
-        if (!check_greater(function, c(i), c(i - 1),
-                           "Cut points parameter",
-                           &lp))
-          return lp;
-      }
-
-      if (!check_finite(function, c(c.size()-1), 
-                        "Cut points parameter",
-                        &lp))
-        return lp;
-      
-      if (!check_finite(function, c(0),
-                        "Cut points parameter",
-                        &lp)) 
-        return lp;
+      check_finite(function, c(c.size()-1), "Cut points parameter", &lp);
+      check_finite(function, c(0), "Cut points parameter", &lp);
 
       // log(1 - inv_logit(lambda))
       if (y == 1)
@@ -151,23 +128,17 @@ namespace stan {
       using stan::math::check_greater;
       using stan::math::check_bounded;
 
-      if (!check_finite(function, eta, 
-                        "Location parameter"))
-        return 0;
-      if (!check_greater(function, c.size(), 0,
-                         "Size of cut points parameter"))
-        return 0;
+      check_finite(function, eta, "Location parameter", (double*)0);
+      check_greater(function, c.size(), 0, "Size of cut points parameter", 
+                    (double*)0);
       for (int i = 1; i < c.size(); ++i) {
-        if (!check_greater(function, c(i), c(i - 1),
-                           "Cut points parameter"))
-          return 0;
+        check_greater(function, c(i), c(i - 1),
+                      "Cut points parameter", (double*)0);
       }
-      if (!check_finite(function, c(c.size()-1), 
-                        "Cut points parameter"))
-        return 0;
-      if (!check_finite(function, c(0),
-                        "Cut points parameter")) 
-        return 0;
+      check_finite(function, c(c.size()-1), 
+                   "Cut points parameter", (double*)0);
+      check_finite(function, c(0),
+                   "Cut points parameter", (double*)0);
 
       Eigen::VectorXd cut(c.rows());
       cut(0) = 1 - inv_logit(eta - c(0));

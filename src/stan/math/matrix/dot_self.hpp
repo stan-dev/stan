@@ -2,7 +2,7 @@
 #define __STAN__MATH__MATRIX__DOT_SELF_HPP__
 
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/matrix/validate_vector.hpp>
+#include <stan/math/error_handling/matrix/check_vector.hpp>
 
 namespace stan {
   namespace math {
@@ -16,7 +16,7 @@ namespace stan {
      */
     template <int R, int C>
     inline double dot_self(const Eigen::Matrix<double, R, C>& v) {
-      validate_vector(v,"dot_self");
+      stan::math::check_vector("dot_self(%1%)",v,"v",(double*)0);
       return v.squaredNorm();
     }    
     

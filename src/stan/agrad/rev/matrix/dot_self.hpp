@@ -4,7 +4,7 @@
 #include <vector>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/typedefs.hpp>
-#include <stan/math/matrix/validate_vector.hpp>
+#include <stan/math/error_handling/matrix/check_vector.hpp>
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/matrix/typedefs.hpp>
 
@@ -75,7 +75,7 @@ namespace stan {
      */
     template<int R, int C>
     inline var dot_self(const Eigen::Matrix<var, R, C>& v) {
-      stan::math::validate_vector(v,"dot_self");
+      stan::math::check_vector("dot_self(%1%)",v,"v",(double*)0);
       return var(new dot_self_vari(v));
     }
 

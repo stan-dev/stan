@@ -1,5 +1,6 @@
-#include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <gtest/gtest.h>
+#include <stan/agrad/fwd/matrix/typedefs.hpp>
+#include <stan/math/matrix/log_determinant.hpp>
 #include <stan/agrad/fwd/matrix/log_determinant.hpp>
 #include <stan/math/matrix/log_determinant.hpp>
 #include <stan/agrad/fwd/fvar.hpp>
