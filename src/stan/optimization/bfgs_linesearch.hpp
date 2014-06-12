@@ -108,70 +108,72 @@ namespace stan {
       return x0 + CubicInterp(df0,x1-x0,f1-f0,df1,loX-x0,hiX-x0);
     }
 
-    /**
-     * A utility function for implementing WolfeLineSearch()
-     **/
-    template<typename FunctorType, typename Scalar, typename XType>
-    int WolfLSZoom(Scalar &alpha, XType &newX, Scalar &newF, XType &newDF,
-                   FunctorType &func,
-                   const XType &x, const Scalar &f, const Scalar &dfp,
-                   const Scalar &c1dfp, const Scalar &c2dfp, const XType &p,
-                   Scalar alo, Scalar aloF, Scalar aloDFp,
-                   Scalar ahi, Scalar ahiF, Scalar ahiDFp,
-                   const Scalar &min_range)
-    {
-      Scalar d1, d2, newDFp;
-      int itNum(0);
+    namespace {
+      /**
+       * An internal utility function for implementing WolfeLineSearch()
+       **/
+      template<typename FunctorType, typename Scalar, typename XType>
+      int WolfLSZoom(Scalar &alpha, XType &newX, Scalar &newF, XType &newDF,
+                     FunctorType &func,
+                     const XType &x, const Scalar &f, const Scalar &dfp,
+                     const Scalar &c1dfp, const Scalar &c2dfp, const XType &p,
+                     Scalar alo, Scalar aloF, Scalar aloDFp,
+                     Scalar ahi, Scalar ahiF, Scalar ahiDFp,
+                     const Scalar &min_range)
+      {
+        Scalar d1, d2, newDFp;
+        int itNum(0);
  
-      while (1) {
-        itNum++;
+        while (1) {
+          itNum++;
           
-        if (std::fabs(alo-ahi) < min_range)
-          return 1;
-          
-        if (itNum%5 == 0) {
-          alpha = 0.5*(alo+ahi);
-        }
-        else {
-          // Perform cubic interpolation to determine next point to try
-          d1 = aloDFp + ahiDFp - 3*(aloF-ahiF)/(alo-ahi);
-          d2 = std::sqrt(d1*d1 - aloDFp*ahiDFp);
-          if (ahi < alo)
-            d2 = -d2;
-          alpha = ahi - (ahi - alo)*(ahiDFp + d2 - d1)/(ahiDFp - aloDFp + 2*d2);
-          if (!boost::math::isfinite(alpha) ||
-              alpha < std::min(alo,ahi)+0.01*std::fabs(alo-ahi) ||
-              alpha > std::max(alo,ahi)-0.01*std::fabs(alo-ahi))
-            alpha = 0.5*(alo+ahi);
-        }
-
-        newX = x + alpha*p;
-        while (func(newX,newF,newDF)) {
-          alpha = 0.5*(alpha+std::min(alo,ahi));
-          if (std::fabs(std::min(alo,ahi)-alpha) < min_range)
+          if (std::fabs(alo-ahi) < min_range)
             return 1;
-          newX = x + alpha*p;
-        }
-        newDFp = newDF.dot(p);
-        if (newF > (f + alpha*c1dfp) || newF >= aloF) {
-          ahi = alpha;
-          ahiF = newF;
-          ahiDFp = newDFp;
-        }
-        else {
-          if (std::fabs(newDFp) <= -c2dfp)
-            break;
-          if (newDFp*(ahi-alo) >= 0) {
-            ahi = alo;
-            ahiF = aloF;
-            ahiDFp = aloDFp;
+          
+          if (itNum%5 == 0) {
+            alpha = 0.5*(alo+ahi);
           }
-          alo = alpha;
-          aloF = newF;
-          aloDFp = newDFp;
+          else {
+            // Perform cubic interpolation to determine next point to try
+            d1 = aloDFp + ahiDFp - 3*(aloF-ahiF)/(alo-ahi);
+            d2 = std::sqrt(d1*d1 - aloDFp*ahiDFp);
+            if (ahi < alo)
+              d2 = -d2;
+            alpha = ahi - (ahi - alo)*(ahiDFp + d2 - d1)/(ahiDFp - aloDFp + 2*d2);
+            if (!boost::math::isfinite(alpha) ||
+                alpha < std::min(alo,ahi)+0.01*std::fabs(alo-ahi) ||
+                alpha > std::max(alo,ahi)-0.01*std::fabs(alo-ahi))
+              alpha = 0.5*(alo+ahi);
+          }
+
+          newX = x + alpha*p;
+          while (func(newX,newF,newDF)) {
+            alpha = 0.5*(alpha+std::min(alo,ahi));
+            if (std::fabs(std::min(alo,ahi)-alpha) < min_range)
+              return 1;
+            newX = x + alpha*p;
+          }
+          newDFp = newDF.dot(p);
+          if (newF > (f + alpha*c1dfp) || newF >= aloF) {
+            ahi = alpha;
+            ahiF = newF;
+            ahiDFp = newDFp;
+          }
+          else {
+            if (std::fabs(newDFp) <= -c2dfp)
+              break;
+            if (newDFp*(ahi-alo) >= 0) {
+              ahi = alo;
+              ahiF = aloF;
+              ahiDFp = aloDFp;
+            }
+            alo = alpha;
+            aloF = newF;
+            aloDFp = newDFp;
+          }
         }
+        return 0;
       }
-      return 0;
     }
 
     /**
