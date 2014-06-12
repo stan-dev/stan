@@ -105,7 +105,9 @@ namespace stan {
         return -_pk.dot(_gk) / std::max(std::fabs(_fk),_conv_opts.fScale);
       }
       inline Scalar rel_obj_decrease() const { 
-        return std::fabs(_fk_1 - _fk) / std::max(std::fabs(_fk_1),std::max(std::fabs(_fk),_conv_opts.fScale));
+        return std::fabs(_fk_1 - _fk) / std::max(std::fabs(_fk_1),
+                                                 std::max(std::fabs(_fk),
+                                                          _conv_opts.fScale));
       }
 
       const Scalar &alpha0() const { return _alpha0; }
@@ -395,12 +397,15 @@ namespace stan {
         : BFGSBase(_adaptor),
           _adaptor(model,params_i,msgs)
       {
+        initialize(params_r);
+      }
 
+      void initialize(const std::vector<double>& params_r) {
         Eigen::Matrix<double,Eigen::Dynamic,1> x;
         x.resize(params_r.size());
         for (size_t i = 0; i < params_r.size(); i++)
           x[i] = params_r[i];
-        this->initialize(x);
+        BFGSBase::initialize(x);
       }
 
       size_t grad_evals() { return _adaptor.fevals(); }
