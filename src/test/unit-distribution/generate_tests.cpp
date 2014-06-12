@@ -186,12 +186,13 @@ vector<vector<string> > build_argument_sequence(const string& arguments,
   return argument_sequence;
 }
 
-void write_types_typedef(vector<std::ostream *>& outs, string base, size_t& N, vector<vector<string> > argument_sequence, const size_t depth) {
+void write_types_typedef(vector<std::ostream *>& outs, string base, size_t& N, vector<vector<string> > argument_sequence, const size_t depth, const int& index) {
   vector<string> args = argument_sequence.front();
   argument_sequence.erase(argument_sequence.begin());
   if (argument_sequence.size() > 0) {
     for (size_t n = 0; n < args.size(); n++)
-      write_types_typedef(outs, base + args[n] + ", ", N, argument_sequence, depth);
+      write_types_typedef(outs, base + args[n] + ", ", N, argument_sequence,
+                          depth, index);
   } else {
     string extra_args;
     for (size_t n = depth; n < 6; n++) {
@@ -201,47 +202,80 @@ void write_types_typedef(vector<std::ostream *>& outs, string base, size_t& N, v
       std::ostream* out = outs[int(N / N_TESTS)];
       *out << "typedef boost::mpl::vector<" << base << args[n] << extra_args;
       if (extra_args.size() == 0)
-  *out << " ";
-      *out << "> type_" << N << ";" << endl;
+        *out << " ";
+      if (index == 1)
+        *out << "> type_v_" << N << ";" << endl;
+      else if (index == 2)
+        *out << "> type_fd_" << N << ";" << endl;
+      else if (index == 3)
+        *out << "> type_fv_" << N << ";" << endl;
+      else if (index == 4)
+        *out << "> type_ffd_" << N << ";" << endl;
+      else if (index == 5)
+        *out << "> type_ffv_" << N << ";" << endl;
       N++;
     }
   }
 }
 
-void write_types(vector<std::ostream *>& outs, const vector<vector<string> >& argument_sequence) {
+void write_types(vector<std::ostream *>& outs, 
+                 const vector<vector<string> >& argument_sequence,
+                 const int& index) {
   size_t N = 0;
-  write_types_typedef(outs, "", N, argument_sequence, argument_sequence.size());
+  write_types_typedef(outs, "", N, argument_sequence, argument_sequence.size(),index);
   for (size_t n = 0; n < outs.size(); n++)
     *outs[n] << endl;
 }
 
-void write_test(vector<std::ostream *>& outs, const string& test_name, const string& fixture_name, const size_t N) {
+void write_test(vector<std::ostream *>& outs, const string& test_name, 
+                const string& fixture_name, const size_t N, const int& index) {
   for (size_t n = 0; n < N; n++) {
     std::ostream *out = outs[int(n / N_TESTS)];
-    *out << "typedef boost::mpl::vector<" << test_name << ", type_" << n << "> " << test_name << "_" << n << ";" << endl;
+    if (index == 1)
+      *out << "typedef boost::mpl::vector<" << test_name << ", type_v_" << n << "> " << test_name << "_v_" << n << ";" << endl;
+    else if (index == 2)
+      *out << "typedef boost::mpl::vector<" << test_name << ", type_fd_" << n << "> " << test_name << "_fd_" << n << ";" << endl;
+    else if (index == 3)
+      *out << "typedef boost::mpl::vector<" << test_name << ", type_fv_" << n << "> " << test_name << "_fv_" << n << ";" << endl;
+    else if (index == 4)
+      *out << "typedef boost::mpl::vector<" << test_name << ", type_ffd_" << n << "> " << test_name << "_ffd_" << n << ";" << endl;
+    else if (index == 5)
+      *out << "typedef boost::mpl::vector<" << test_name << ", type_ffv_" << n << "> " << test_name << "_ffv_" << n << ";" << endl;
   }
   for (size_t i = 0; i < outs.size(); i++) {
     *outs[i] << endl;
   }
   for (size_t n = 0; n < N; n++) {
     std::ostream *out = outs[int(n / N_TESTS)];
-    *out << "INSTANTIATE_TYPED_TEST_CASE_P(" << test_name << "_" << n << ", " << fixture_name << ", " <<  test_name << "_" << n << ");" << endl;
+    if (index == 1)
+      *out << "INSTANTIATE_TYPED_TEST_CASE_P(" << test_name << "_v_" << n << ", " << fixture_name << ", " <<  test_name << "_v_" << n << ");" << endl;
+    else if (index == 2)
+      *out << "INSTANTIATE_TYPED_TEST_CASE_P(" << test_name << "_v_" << n << ", " << fixture_name << ", " <<  test_name << "_fd_" << n << ");" << endl;
+    else if (index == 3)
+      *out << "INSTANTIATE_TYPED_TEST_CASE_P(" << test_name << "_v_" << n << ", " << fixture_name << ", " <<  test_name << "_fv_" << n << ");" << endl;
+    else if (index == 4)
+      *out << "INSTANTIATE_TYPED_TEST_CASE_P(" << test_name << "_v_" << n << ", " << fixture_name << ", " <<  test_name << "_ffd_" << n << ");" << endl;
+    else if (index == 5)
+      *out << "INSTANTIATE_TYPED_TEST_CASE_P(" << test_name << "_v_" << n << ", " << fixture_name << ", " <<  test_name << "_ffv_" << n << ");" << endl;
   }
   for (size_t i = 0; i < outs.size(); i++) {
     *outs[i] << endl;
   }
 }
 
-void write_test_cases(vector<std::ostream *>& outs, const string& in_name, const vector<vector<string> >& argument_sequence) {
+void write_test_cases(vector<std::ostream *>& outs, const string& in_name,
+                      const vector<vector<string> >& argument_sequence,
+                      const int& index) {
   pair<string, string> name = read_test_name_from_file(in_name);
   string test_name = name.first;
   string fixture_name = name.second;
   
-  write_types(outs, argument_sequence); 
-  write_test(outs, test_name, fixture_name, size(argument_sequence));
+  write_types(outs, argument_sequence,index); 
+  write_test(outs, test_name, fixture_name, size(argument_sequence),index);
 }
 
-int create_files(const int& argc, const char* argv[],const int& index) {
+int create_files(const int& argc, const char* argv[],const int& index, 
+                 const int& start) {
   if (argc != 2)
     return -1;
   string in_suffix = "_test.hpp";
@@ -255,26 +289,17 @@ int create_files(const int& argc, const char* argv[],const int& index) {
   vector<vector<string> > argument_sequence = build_argument_sequence(arguments,index);
   
   vector<std::ostream *> outs;
-  for (int n = 0; n < int(size(argument_sequence) / N_TESTS) + 1; n++) {
+  for (int n = start+1; n < start+1+int(size(argument_sequence) / N_TESTS) + 1; n++) {
     stringstream out_name;
     out_name << out_name_base;
     out_name << "_" << std::setw(5) << std::setfill('0') << n;
-    if (index == 1)
-      out_name << "_generated_test.cpp";
-    else if (index == 2)
-      out_name << "_fvar_double_generated_test.cpp";
-    else if (index == 3)
-      out_name << "_fvar_var_generated_test.cpp";
-    else if (index == 4)
-      out_name << "_fvar_fvar_double_generated_test.cpp";
-    else if (index == 5)
-      out_name << "_fvar_fvar_var_generated_test.cpp";
+    out_name << "_generated_test.cpp";
     std::string tmp(out_name.str());
     outs.push_back(new std::ofstream(tmp.c_str()));
   }
 
   write_includes(outs, in_name);
-  write_test_cases(outs, in_name, argument_sequence);
+  write_test_cases(outs, in_name, argument_sequence,index);
 
   for (size_t n = 0; n < outs.size(); n++) {
     static_cast<std::ofstream*>(outs[n])->close();
@@ -282,7 +307,7 @@ int create_files(const int& argc, const char* argv[],const int& index) {
   }
   outs.clear();
 
-  return 0;
+  return start+int(size(argument_sequence) / N_TESTS);
 }
 
 /** 
@@ -294,11 +319,11 @@ int create_files(const int& argc, const char* argv[],const int& index) {
  * @return 0 for success, negative number otherwise.
  */
 int main(int argc, const char* argv[]) {
-  create_files(argc,argv,1);
-  // create_files(argc,argv,2);
-  // create_files(argc,argv,3);
-  // create_files(argc,argv,4);
-  // create_files(argc,argv,5);
+  int var_num = create_files(argc,argv,1,-1);
+  int fd_num = create_files(argc,argv,2,var_num+1);
+  int fv_num = create_files(argc,argv,3,fd_num+1);
+  int ffd_num = create_files(argc,argv,4,fv_num+1);
+  int ffv_num = create_files(argc,argv,5,ffd_num+1);
   
   return 0;
 }
