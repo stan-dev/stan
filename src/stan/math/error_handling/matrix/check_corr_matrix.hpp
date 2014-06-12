@@ -3,10 +3,11 @@
 
 #include <sstream>
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/error_handling/check_positive.hpp>
 #include <stan/math/error_handling/dom_err.hpp>
+#include <stan/math/error_handling/check_positive.hpp>
 #include <stan/math/error_handling/matrix/check_pos_definite.hpp>
 #include <stan/math/error_handling/matrix/check_symmetric.hpp>
+#include <stan/math/error_handling/matrix/check_size_match.hpp>
 #include <stan/math/error_handling/matrix/constraint_tolerance.hpp>
 
 namespace stan {
@@ -33,15 +34,12 @@ namespace stan {
                                   const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
                                   const char* name,
                                   T_result* result) {
-      if (!check_size_match(function, 
-                            y.rows(), "Rows of correlation matrix",
-                            y.cols(), "columns of correlation matrix",
-                            result)) 
-        return false;
-      if (!check_positive(function, y.rows(), "rows", result))
-        return false;
-      if (!check_symmetric(function, y, "y", result))
-        return false;
+      stan::math::check_size_match(function, 
+                                   y.rows(), "Rows of correlation matrix",
+                                   y.cols(), "columns of correlation matrix",
+                                   result);
+      stan::math::check_positive(function, y.rows(), "rows", result);
+      stan::math::check_symmetric(function, y, "y", result);
       for (typename Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>::size_type
              k = 0; k < y.rows(); ++k) {
         if (fabs(y(k,k) - 1.0) > CONSTRAINT_TOLERANCE) {
@@ -53,17 +51,8 @@ namespace stan {
           return dom_err(function,y(k,k),name,msg.c_str(),"",result);
         }
       }
-      if (!check_pos_definite(function, y, "y", result))
-        return false;
+      stan::math::check_pos_definite(function, y, "y", result);
       return true;
-    }
-
-    template <typename T>
-    inline bool check_corr_matrix(const char* function,
-                                  const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& y,
-                                  const char* name,
-                                  T* result = 0) {
-      return check_corr_matrix<T,T>(function,y,name,result);
     }
 
   }

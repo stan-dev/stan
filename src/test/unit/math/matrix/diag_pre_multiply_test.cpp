@@ -37,7 +37,7 @@ TEST(MathMatrix,diagPreMultiply2) {
   Matrix<double,1,Dynamic> rv(3);
   rv << 1, 2, 3;
   expect_matrix_eq(v_m * m, diag_pre_multiply(rv,m));
-}
+} 
 
 TEST(MathMatrix,diagPreMultiplyException) {
   Matrix<double,Dynamic,Dynamic> m(2,2);

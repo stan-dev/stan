@@ -1,12 +1,11 @@
 #ifndef __STAN__MATH__MATRIX__HEAD_HPP__
 #define __STAN__MATH__MATRIX__HEAD_HPP__
 
-#include <vector>
-
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/matrix/validate_column_index.hpp>
-#include <stan/math/matrix/validate_row_index.hpp>
-#include <stan/math/matrix/validate_std_vector_index.hpp>
+#include <vector>
+#include <stan/math/error_handling/matrix/check_column_index.hpp>
+#include <stan/math/error_handling/matrix/check_row_index.hpp>
+#include <stan/math/error_handling/matrix/check_std_vector_index.hpp>
 
 namespace stan {
   namespace math {
@@ -25,7 +24,7 @@ namespace stan {
     head(const Eigen::Matrix<T,Eigen::Dynamic,1>& v,
          size_t n) {
       if (n != 0)
-        validate_row_index(v, n, "head");
+        stan::math::check_row_index("head(%1%)",n,v,"n",(double*)0);
       return v.head(n);
     }
 
@@ -42,8 +41,8 @@ namespace stan {
     Eigen::Matrix<T,1,Eigen::Dynamic>
     head(const Eigen::Matrix<T,1,Eigen::Dynamic>& rv,
          size_t n) {
-      if (n != 0) 
-        validate_column_index(rv, n, "head");
+      if (n != 0)
+        stan::math::check_column_index("head(%1%)",n,rv,"n",(double*)0);
       return rv.head(n);
     }
 
@@ -59,7 +58,8 @@ namespace stan {
     std::vector<T> head(const std::vector<T>& sv,
                         size_t n) {
       if (n != 0)
-        validate_std_vector_index(sv, n, "head");
+        stan::math::check_std_vector_index("head(%1%)",n,sv,"n",(double*)0);
+
       std::vector<T> s;
       for (size_t i = 0; i < n; ++i)
         s.push_back(sv[i]);

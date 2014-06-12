@@ -2,7 +2,8 @@
 #define __STAN__MATH__MATRIX__CHOLESKY_DECOMPOSE_HPP__
 
 #include <stan/math/matrix/Eigen.hpp>
-#include <stan/math/matrix/validate_symmetric.hpp>
+#include <stan/math/error_handling/matrix/check_square.hpp>
+#include <stan/math/error_handling/matrix/check_symmetric.hpp>
 
 namespace stan {
   namespace math {
@@ -20,7 +21,8 @@ namespace stan {
     template <typename T>
     Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>
     cholesky_decompose(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& m) {
-      validate_symmetric(m,"cholesky decomposition");
+      stan::math::check_square("cholesky_decompose(%1%)",m,"m",(double*)0);
+      stan::math::check_symmetric("cholesky_decompose(%1%)",m,"m",(double*)0);
       Eigen::LLT<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> >llt(m.rows());
       llt.compute(m);
       return llt.matrixL();

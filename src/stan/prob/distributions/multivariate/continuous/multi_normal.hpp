@@ -7,12 +7,15 @@
 #include <stan/agrad/rev.hpp>
 #include <stan/agrad/rev/matrix.hpp>
 #include <stan/math/error_handling.hpp>
-#include <stan/math/matrix_error_handling.hpp>
+#include <stan/math/matrix/trace_inv_quad_form_ldlt.hpp>
 #include <stan/math/matrix/log_determinant_ldlt.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
 #include <stan/math/error_handling/matrix/check_ldlt_factor.hpp>
+#include <stan/math/error_handling/matrix/check_size_match.hpp>
+#include <stan/math/error_handling/check_finite.hpp>
+#include <stan/math/error_handling/matrix/check_symmetric.hpp>
 
 namespace stan {
 
@@ -34,39 +37,31 @@ namespace stan {
       using stan::math::check_symmetric;
       using stan::math::check_ldlt_factor;
       
-      if (!check_size_match(function, 
-                            Sigma.rows(), "Rows of covariance parameter",
-                            Sigma.cols(), "columns of covariance parameter",
-                            &lp))
-        return lp;
-      if (!check_positive(function, Sigma.rows(), "Covariance matrix rows", &lp))
-        return lp;
-      if (!check_symmetric(function, Sigma, "Covariance matrix", &lp))
-        return lp;
+      check_size_match(function, 
+                       Sigma.rows(), "Rows of covariance parameter",
+                       Sigma.cols(), "columns of covariance parameter",
+                       &lp);
+      check_positive(function, Sigma.rows(), "Covariance matrix rows", &lp);
+      check_symmetric(function, Sigma, "Covariance matrix", &lp);
       
       stan::math::LDLT_factor<T_covar,Eigen::Dynamic,Eigen::Dynamic> ldlt_Sigma(Sigma);
-      if(!check_ldlt_factor(function,ldlt_Sigma,"LDLT_Factor of covariance parameter",&lp))
-        return lp;
+      check_ldlt_factor(function,ldlt_Sigma,
+                        "LDLT_Factor of covariance parameter",&lp);
 
-      if (!check_size_match(function, 
-                            y.size(), "Size of random variable",
-                            mu.size(), "size of location parameter",
-                            &lp))
-        return lp;
-      if (!check_size_match(function, 
-                            y.size(), "Size of random variable",
-                            Sigma.rows(), "rows of covariance parameter",
-                            &lp))
-        return lp;
-      if (!check_size_match(function, 
-                            y.size(), "Size of random variable",
-                            Sigma.cols(), "columns of covariance parameter",
-                            &lp))
-        return lp;
-      if (!check_finite(function, mu, "Location parameter", &lp))
-        return lp;
-      if (!check_not_nan(function, y, "Random variable", &lp))
-        return lp;
+      check_size_match(function, 
+                       y.size(), "Size of random variable",
+                       mu.size(), "size of location parameter",
+                       &lp);
+      check_size_match(function, 
+                       y.size(), "Size of random variable",
+                       Sigma.rows(), "rows of covariance parameter",
+                       &lp);
+      check_size_match(function, 
+                       y.size(), "Size of random variable",
+                       Sigma.cols(), "columns of covariance parameter",
+                       &lp);
+      check_finite(function, mu, "Location parameter", &lp);
+      check_not_nan(function, y, "Random variable", &lp);
       
       if (y.rows() == 0)
         return lp;
@@ -117,39 +112,30 @@ namespace stan {
       using stan::math::check_not_nan;
       using stan::math::check_ldlt_factor;
       
-      if (!check_size_match(function, 
-                            Sigma.rows(), "Rows of covariance matrix",
-                            Sigma.cols(), "columns of covariance matrix",
-                            &lp))
-        return lp;
-      if (!check_positive(function, Sigma.rows(), "Covariance matrix rows", &lp))
-        return lp;
-      if (!check_symmetric(function, Sigma, "Covariance matrix", &lp))
-        return lp;
+      check_size_match(function, 
+                       Sigma.rows(), "Rows of covariance matrix",
+                       Sigma.cols(), "columns of covariance matrix",
+                       &lp);
+      check_positive(function, Sigma.rows(), "Covariance matrix rows", &lp);
+      check_symmetric(function, Sigma, "Covariance matrix", &lp);
 
       stan::math::LDLT_factor<T_covar,Eigen::Dynamic,Eigen::Dynamic> ldlt_Sigma(Sigma);
-      if(!check_ldlt_factor(function,ldlt_Sigma,"LDLT_Factor of Sigma",&lp))
-        return lp;
-
-      if (!check_size_match(function, 
-                            y.cols(), "Columns of random variable",
-                            mu.rows(), "rows of location parameter",
-                            &lp))
-        return lp;
-      if (!check_size_match(function, 
-                            y.cols(), "Columns of random variable",
-                            Sigma.rows(), "rows of covariance parameter",
-                            &lp))
-        return lp;
-      if (!check_size_match(function, 
-                            y.cols(), "Columns of random variable",
-                            Sigma.cols(), "columns of covariance parameter",
-                            &lp))
-        return lp;
-      if (!check_finite(function, mu, "Location parameter", &lp))
-        return lp;
-      if (!check_not_nan(function, y, "Random variable", &lp))
-        return lp;
+      check_ldlt_factor(function,ldlt_Sigma,"LDLT_Factor of Sigma",&lp);
+      
+      check_size_match(function, 
+                       y.cols(), "Columns of random variable",
+                       mu.rows(), "rows of location parameter",
+                       &lp);
+      check_size_match(function, 
+                       y.cols(), "Columns of random variable",
+                       Sigma.rows(), "rows of covariance parameter",
+                       &lp);
+      check_size_match(function, 
+                       y.cols(), "Columns of random variable",
+                       Sigma.cols(), "columns of covariance parameter",
+                       &lp);
+      check_finite(function, mu, "Location parameter", &lp);
+      check_not_nan(function, y, "Random variable", &lp);
       
       if (y.cols() == 0)
         return lp;
@@ -213,9 +199,9 @@ namespace stan {
       using stan::math::check_finite;
       using stan::math::check_symmetric;
  
-      check_positive(function, S.rows(), "Covariance matrix rows");
-      check_symmetric(function, S, "Covariance matrix");
-      check_finite(function, mu, "Location parameter");
+      check_positive(function, S.rows(), "Covariance matrix rows", (double*)0);
+      check_symmetric(function, S, "Covariance matrix", (double*)0);
+      check_finite(function, mu, "Location parameter", (double*)0);
 
       variate_generator<RNG&, normal_distribution<> >
         std_normal_rng(rng, normal_distribution<>(0,1));

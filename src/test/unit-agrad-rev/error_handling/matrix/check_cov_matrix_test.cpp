@@ -15,6 +15,6 @@ TEST(AgradRevErrorHandlingMatrix,CheckCovMatrix) {
   Sigma.resize(1,1);
   Sigma << 1;
 
-  EXPECT_NO_THROW(check_cov_matrix(function, Sigma, &result))
+  EXPECT_NO_THROW(check_cov_matrix(function, Sigma,"Sigma", &result))
     << "check_cov_matrix should not throw exception with Sigma";
 }

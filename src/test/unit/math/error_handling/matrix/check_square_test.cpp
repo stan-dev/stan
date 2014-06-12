@@ -8,12 +8,8 @@ TEST(MathErrorHandlingMatrix, checkSquareMatrix) {
   y.resize(3,3);
   EXPECT_TRUE(stan::math::check_square("checkSquareMatrix(%1%)",
                                            y, "y", &result));
-  EXPECT_TRUE(stan::math::check_square("checkSquareMatrix(%1%)",
-                                           y, "y"));
 
   y.resize(3, 2);
   EXPECT_THROW(stan::math::check_square("checkSquareMatrix(%1%)", y, "y", &result), 
-               std::domain_error);
-  EXPECT_THROW(stan::math::check_square("checkSquareMatrix(%1%)", y, "y"),
                std::domain_error);
 }

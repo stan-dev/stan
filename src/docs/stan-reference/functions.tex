@@ -1863,15 +1863,6 @@ x <- rep_vector(1.0, 3);
 %
 There are no integer vector or matrix types, so integer values are
 automatically promoted.
-%
-\begin{description}
-%
-\fitem{vector}{to\_vector}{matrix \farg{m}}{
-Return the matrix \farg{m} as a vector in column-major order.}
-%
-\fitem{vector}{to\_vector}{row\_vector \farg{m}}{
-Return the row vector \farg{m} as a vector in column-major order.}
-\end{description}
 
 \section{Slice and Package Functions}
 
@@ -2293,5 +2284,99 @@ Number of components of \farg{v} less than \farg{v[s]}}
 %
 \fitem{int}{rank}{row\_vector \farg{v}, int \farg{s}}{
 Number of components of \farg{v} less than \farg{v[s]}}
+%
+\end{description}
+
+
+\chapter{Mixed Operations}
+
+These functions perform conversions between Stan containers matrix,
+vector, row vector and arrays.
+
+Whenever a conversion implies reduction of dimensionality (like
+converting a matrix to a vector or a two dimensional array to a one
+dimensional array), the conversion is proceed in row-major order when
+the input is an array and in column-major order when the input is a
+vector, a row vector or a matrix.
+
+If the dimensionality is preserved (like when converting a matrix to a
+two dimensional array), then the indexes are also fully preserved
+which implies easy reversibility of the operation.
+
+\begin{description}
+%
+\fitem{matrix}{to\_matrix}{matrix \farg{m}}{
+Return the matrix \farg{m} itself.}
+%
+\fitem{matrix}{to\_matrix}{vector \farg{v}}{
+Convert the column vector \farg{v} to a \code{size(\farg{v})} by 1 matrix.}
+%
+\fitem{matrix}{to\_matrix}{row\_vector \farg{v}}{
+Convert the row vector \farg{v} to a 1 by \code{size(\farg{v})} matrix.}
+%
+\fitem{matrix}{to\_matrix}{real[,] \farg{a}}{
+Convert the two dimensional array \farg{a} to a matrix with the same
+dimensions and indexing order.}
+%
+\fitem{matrix}{to\_matrix}{int[,] \farg{a}}{
+Convert the two dimensional array \farg{a} to a matrix with the same
+dimensions and indexing order.}
+%
+%
+%
+\fitem{vector}{to\_vector}{matrix \farg{m}}{
+Convert the matrix \farg{m} to a column vector in column-major order.}
+%
+\fitem{vector}{to\_vector}{vector \farg{v}}{
+Return the column vector \farg{v} itself.}
+%
+\fitem{vector}{to\_vector}{row\_vector \farg{v}}{
+Convert the row vector \farg{v} to a column vector.}
+%
+\fitem{vector}{to\_vector}{real[] \farg{a}}{
+Convert the one-dimensional array \farg{a} to a column vector.}
+%
+\fitem{vector}{to\_vector}{int[] \farg{a}}{
+Convert the one-dimensional integer array \farg{a} to a column vector.}
+%
+%
+%
+\fitem{row\_vector}{to\_row\_vector}{matrix \farg{m}}{
+Convert the matrix \farg{m} to a row vector in column-major order.}
+%
+\fitem{row\_vector}{to\_row\_vector}{vector \farg{v}}{
+Convert the column vector \farg{v} to a row vector.}
+%
+\fitem{row\_vector}{to\_row\_vector}{row\_vector \farg{v}}{
+Return the row vector \farg{v} itself.}
+%
+\fitem{row\_vector}{to\_row\_vector}{real[] \farg{a}}{
+Convert the one-dimensional array \farg{a} to a row vector.}
+%
+\fitem{row\_vector}{to\_row\_vector}{int[] \farg{a}}{
+Convert the one-dimensional array \farg{a} to a row vector.}
+%
+%
+%
+\fitem{real[,]}{to\_array\_2d}{matrix \farg{m}}{
+Convert the matrix \farg{m} to a two dimensional array with the same 
+dimensions and indexing order.}
+%
+%
+%
+\fitem{real[]}{to\_array\_1d}{vector \farg{v}}{
+Convert the column vector \farg{v} to a one-dimensional array.}
+%
+\fitem{real[]}{to\_array\_1d}{row\_vector \farg{v}}{
+Convert the row vector \farg{v} to a one-dimensional array.}
+%
+\fitem{real[]}{to\_array\_1d}{matrix \farg{m}}{
+Convert the matrix \farg{m} to a one-dimensional array in column-major order.}
+%
+\fitem{real[]}{to\_array\_1d}{real[...] \farg{a}}{
+Convert the array \farg{a} (of any dimension up to 10) to a one-dimensional array in row-major order.}
+%
+\fitem{int[]}{to\_array\_1d}{int[...] \farg{a}}{
+Convert the array \farg{a} (of any dimension up to 10) to a one-dimensional array in row-major order.}
 %
 \end{description}

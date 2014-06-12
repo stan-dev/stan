@@ -1,5 +1,5 @@
-#include <stan/math/matrix/qr_R.hpp>
 #include <stan/math/matrix/qr_Q.hpp>
+#include <stan/math/matrix/qr_R.hpp>
 #include <stan/math/matrix/typedefs.hpp>
 #include <stan/math/matrix/transpose.hpp>
 #include <gtest/gtest.h>
