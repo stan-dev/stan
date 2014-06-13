@@ -66,7 +66,6 @@ public:
   typedef typename scalar_type<T5>::type Scalar5;
 
   typedef typename stan::agrad::fvar<typename stan::partials_return_type<T0,T1,T2,T3,T4,T5>::type> T_fvar_return;
-  typedef typename stan::partials_return_type<T0,T1,T2,T3,T4,T5>::type T_partials_return;
   typedef typename stan::return_type<T0,T1,T2,T3,T4,T5>::type T_return_type;
 
   void call_all_versions() {
@@ -126,7 +125,7 @@ public:
         lp = TestClass.template log_prob
           <false,T0,T1,T2,T3,T4,T5>
           (p0,p1,p2,p3,p4,p5);
-        EXPECT_TRUE(lp == log_prob[n])
+        EXPECT_TRUE(lp - log_prob[n] < 1e-8)
           << "For all scalar inputs, when propto is false, log_prob should match the provided value. Failed at index: " << n;
       }
       if (all_constant<T0,T1,T2,T3,T4,T5>::value 
@@ -134,7 +133,7 @@ public:
         lp = TestClass.template log_prob
           <T0,T1,T2,T3,T4,T5>
           (p0,p1,p2,p3,p4,p5);
-        EXPECT_TRUE(lp == log_prob[n])
+        EXPECT_TRUE(lp - log_prob[n] < 1e-8)
           << "For all scalar and all constant inputs log_prob should match the provided value. Failed at index: " << n;
       }
     }
@@ -286,64 +285,64 @@ public:
   }
 
 
-  void add_finite_diff_2ndorder(const vector<double>& params, 
-                                vector<double>& finite_diff, 
-                                const size_t n) {
-    const double e = 1e-8;
-    const double e2 = e * e;
+  // void add_finite_diff_2ndorder(const vector<double>& params, 
+  //                               vector<double>& finite_diff, 
+  //                               const size_t n) {
+  //   const double e = 1e-4;
+  //   const double e2 = e * e;
 
-    vector<double> plus(6);
-    vector<double> minus(6);
-    vector<double> neutral(6);
-    for (size_t i = 0; i < 6; i++) {
-      plus[i] = get_param<double>(params, i);
-      minus[i] = get_param<double>(params, i);
-      neutral[i] = get_param<double>(params, i);
-    }
-    minus[n] -= e;
-    plus[n] += e;
+  //   vector<double> plus(6);
+  //   vector<double> minus(6);
+  //   vector<double> neutral(6);
+  //   for (size_t i = 0; i < 6; i++) {
+  //     plus[i] = get_param<double>(params, i);
+  //     minus[i] = get_param<double>(params, i);
+  //     neutral[i] = get_param<double>(params, i);
+  //   }
+  //   minus[n] -= e;
+  //   plus[n] += e;
     
-    double lp_neutral = TestClass.log_prob
-      (neutral[0],neutral[1],neutral[2],neutral[3],neutral[4],neutral[5]);
-    double lp_plus = TestClass.log_prob
-      (plus[0],plus[1],plus[2],plus[3],plus[4],plus[5]);
-    double lp_minus = TestClass.log_prob
-      (minus[0],minus[1],minus[2],minus[3],minus[4],minus[5]);
+  //   double lp_neutral = TestClass.log_prob
+  //     (neutral[0],neutral[1],neutral[2],neutral[3],neutral[4],neutral[5]);
+  //   double lp_plus = TestClass.log_prob
+  //     (plus[0],plus[1],plus[2],plus[3],plus[4],plus[5]);
+  //   double lp_minus = TestClass.log_prob
+  //     (minus[0],minus[1],minus[2],minus[3],minus[4],minus[5]);
  
-    finite_diff.push_back((lp_plus - 2*lp_neutral + lp_minus) / e2);
-  }
+  //   finite_diff.push_back((lp_plus - 2*lp_neutral + lp_minus) / e2);
+  // }
 
-  void add_finite_diff_3rdorder(const vector<double>& params, 
-                                vector<double>& finite_diff, 
-                                const size_t n) {
-    const double e = 1e-8;
-    const double e3 = e * e * e;
+  // void add_finite_diff_3rdorder(const vector<double>& params, 
+  //                               vector<double>& finite_diff, 
+  //                               const size_t n) {
+  //   const double e = 1e-6;
+  //   const double e3 = e * e * e;
 
-    vector<double> plus2(6);
-    vector<double> plus(6);
-    vector<double> minus(6);
-    vector<double> minus2(6);
-    for (size_t i = 0; i < 6; i++) {
-      plus[i] = get_param<double>(params, i);
-      minus[i] = get_param<double>(params, i);
-      minus2[i] = get_param<double>(params, i);
-      plus[i] = get_param<double>(params, i);
-    }
-    plus2[n] += 2*e;
-    plus[n] += e;
-    minus[n] -= e;
-    minus2[n] -= 2*e;
+  //   vector<double> plus2(6);
+  //   vector<double> plus(6);
+  //   vector<double> minus(6);
+  //   vector<double> minus2(6);
+  //   for (size_t i = 0; i < 6; i++) {
+  //     plus[i] = get_param<double>(params, i);
+  //     minus[i] = get_param<double>(params, i);
+  //     minus2[i] = get_param<double>(params, i);
+  //     plus[i] = get_param<double>(params, i);
+  //   }
+  //   plus2[n] += 2*e;
+  //   plus[n] += e;
+  //   minus[n] -= e;
+  //   minus2[n] -= 2*e;
     
-    double lp_plus2 = TestClass.log_prob
-      (plus2[0],plus2[1],plus2[2],plus2[3],plus2[4],plus2[5]);
-    double lp_plus = TestClass.log_prob
-      (plus[0],plus[1],plus[2],plus[3],plus[4],plus[5]);
-    double lp_minus2 = TestClass.log_prob
-      (minus2[0],minus2[1],minus2[2],minus2[3],minus2[4],minus2[5]);
-    double lp_minus = TestClass.log_prob
-      (minus[0],minus[1],minus[2],minus[3],minus[4],minus[5]);
-    finite_diff.push_back((0.5*lp_plus2 - lp_plus + lp_minus - 0.5*lp_minus2) / e3);
-  }
+  //   double lp_plus2 = TestClass.log_prob
+  //     (plus2[0],plus2[1],plus2[2],plus2[3],plus2[4],plus2[5]);
+  //   double lp_plus = TestClass.log_prob
+  //     (plus[0],plus[1],plus[2],plus[3],plus[4],plus[5]);
+  //   double lp_minus2 = TestClass.log_prob
+  //     (minus2[0],minus2[1],minus2[2],minus2[3],minus2[4],minus2[5]);
+  //   double lp_minus = TestClass.log_prob
+  //     (minus[0],minus[1],minus[2],minus[3],minus[4],minus[5]);
+  //   finite_diff.push_back((0.5*lp_plus2 - lp_plus + lp_minus - 0.5*lp_minus2) / e3);
+  // }
   
 
   void calculate_finite_diff(const vector<double>& params, 
@@ -375,44 +374,44 @@ public:
         && !is_fvar_fvar_double<Scalar5>::value)
       add_finite_diff_1storder(params, finite_diff1, 5);
 
-    if (!is_constant_struct<Scalar0>::value && !is_empty<Scalar0>::value &&
-        (is_fvar_var<Scalar0>::value || is_fvar_fvar_var<Scalar0>::value) )
-      add_finite_diff_2ndorder(params, finite_diff2, 0);
-    if (!is_constant_struct<Scalar1>::value && !is_empty<Scalar1>::value &&
-        (is_fvar_var<Scalar1>::value || is_fvar_fvar_var<Scalar1>::value) )
-      add_finite_diff_2ndorder(params, finite_diff2, 1);
-    if (!is_constant_struct<Scalar2>::value && !is_empty<Scalar2>::value &&
-        (is_fvar_var<Scalar2>::value || is_fvar_fvar_var<Scalar2>::value) )
-      add_finite_diff_2ndorder(params, finite_diff2, 2);
-    if (!is_constant_struct<Scalar3>::value && !is_empty<Scalar3>::value &&
-        (is_fvar_var<Scalar3>::value || is_fvar_fvar_var<Scalar3>::value) )
-      add_finite_diff_2ndorder(params, finite_diff2, 3);
-    if (!is_constant_struct<Scalar4>::value && !is_empty<Scalar4>::value &&
-        (is_fvar_var<Scalar4>::value || is_fvar_fvar_var<Scalar4>::value) )
-      add_finite_diff_2ndorder(params, finite_diff2, 4);
-    if (!is_constant_struct<Scalar5>::value && !is_empty<Scalar5>::value &&
-        (is_fvar_var<Scalar5>::value || is_fvar_fvar_var<Scalar5>::value) )
-      add_finite_diff_2ndorder(params, finite_diff2, 5);
+    // if (!is_constant_struct<Scalar0>::value && !is_empty<Scalar0>::value &&
+    //     (is_fvar_var<Scalar0>::value || is_fvar_fvar_var<Scalar0>::value) )
+    //   add_finite_diff_2ndorder(params, finite_diff2, 0);
+    // if (!is_constant_struct<Scalar1>::value && !is_empty<Scalar1>::value &&
+    //     (is_fvar_var<Scalar1>::value || is_fvar_fvar_var<Scalar1>::value) )
+    //   add_finite_diff_2ndorder(params, finite_diff2, 1);
+    // if (!is_constant_struct<Scalar2>::value && !is_empty<Scalar2>::value &&
+    //     (is_fvar_var<Scalar2>::value || is_fvar_fvar_var<Scalar2>::value) )
+    //   add_finite_diff_2ndorder(params, finite_diff2, 2);
+    // if (!is_constant_struct<Scalar3>::value && !is_empty<Scalar3>::value &&
+    //     (is_fvar_var<Scalar3>::value || is_fvar_fvar_var<Scalar3>::value) )
+    //   add_finite_diff_2ndorder(params, finite_diff2, 3);
+    // if (!is_constant_struct<Scalar4>::value && !is_empty<Scalar4>::value &&
+    //     (is_fvar_var<Scalar4>::value || is_fvar_fvar_var<Scalar4>::value) )
+    //   add_finite_diff_2ndorder(params, finite_diff2, 4);
+    // if (!is_constant_struct<Scalar5>::value && !is_empty<Scalar5>::value &&
+    //     (is_fvar_var<Scalar5>::value || is_fvar_fvar_var<Scalar5>::value) )
+    //   add_finite_diff_2ndorder(params, finite_diff2, 5);
 
 
-    if (!is_constant_struct<Scalar0>::value && !is_empty<Scalar0>::value &&
-        is_fvar_fvar_var<Scalar0>::value)
-      add_finite_diff_3rdorder(params, finite_diff3, 0);
-    if (!is_constant_struct<Scalar1>::value && !is_empty<Scalar1>::value &&
-        is_fvar_fvar_var<Scalar1>::value) 
-      add_finite_diff_3rdorder(params, finite_diff3, 1);
-    if (!is_constant_struct<Scalar2>::value && !is_empty<Scalar2>::value &&
-        is_fvar_fvar_var<Scalar2>::value)
-      add_finite_diff_3rdorder(params, finite_diff3, 2);
-    if (!is_constant_struct<Scalar3>::value && !is_empty<Scalar3>::value &&
-        is_fvar_fvar_var<Scalar3>::value) 
-      add_finite_diff_3rdorder(params, finite_diff3, 3);
-    if (!is_constant_struct<Scalar4>::value && !is_empty<Scalar4>::value &&
-        is_fvar_fvar_var<Scalar4>::value) 
-      add_finite_diff_3rdorder(params, finite_diff3, 4);
-    if (!is_constant_struct<Scalar5>::value && !is_empty<Scalar5>::value &&
-        is_fvar_fvar_var<Scalar5>::value) 
-      add_finite_diff_3rdorder(params, finite_diff3, 5);
+    // if (!is_constant_struct<Scalar0>::value && !is_empty<Scalar0>::value &&
+    //     is_fvar_fvar_var<Scalar0>::value)
+    //   add_finite_diff_3rdorder(params, finite_diff3, 0);
+    // if (!is_constant_struct<Scalar1>::value && !is_empty<Scalar1>::value &&
+    //     is_fvar_fvar_var<Scalar1>::value) 
+    //   add_finite_diff_3rdorder(params, finite_diff3, 1);
+    // if (!is_constant_struct<Scalar2>::value && !is_empty<Scalar2>::value &&
+    //     is_fvar_fvar_var<Scalar2>::value)
+    //   add_finite_diff_3rdorder(params, finite_diff3, 2);
+    // if (!is_constant_struct<Scalar3>::value && !is_empty<Scalar3>::value &&
+    //     is_fvar_fvar_var<Scalar3>::value) 
+    //   add_finite_diff_3rdorder(params, finite_diff3, 3);
+    // if (!is_constant_struct<Scalar4>::value && !is_empty<Scalar4>::value &&
+    //     is_fvar_fvar_var<Scalar4>::value) 
+    //   add_finite_diff_3rdorder(params, finite_diff3, 4);
+    // if (!is_constant_struct<Scalar5>::value && !is_empty<Scalar5>::value &&
+    //     is_fvar_fvar_var<Scalar5>::value) 
+    //   add_finite_diff_3rdorder(params, finite_diff3, 5);
   }
 
   // works for <double>
@@ -530,15 +529,43 @@ public:
                                 const vector<double>& gradients ) {
 
     ASSERT_EQ(finite_diffs.size(), gradients.size()) 
-      << "Number of finite diff gradients and calculated gradients must match -- error in test fixture";
+      << "Number of first order finite diff gradients and calculated gradients must match -- error in test fixture";
     for (size_t i = 0; i < finite_diffs.size(); i++) {
       EXPECT_NEAR(finite_diffs[i], gradients[i], 1e-4)
-        << "Comparison of finite diff to calculated gradient failed for i=" << i 
+        << "Comparison of first order finite diff to calculated gradient failed for i=" << i 
         << ": " << parameters << std::endl 
         << "  finite diffs: " << finite_diffs << std::endl
         << "  grads:        " << gradients;
       }
   }
+  // void  test_finite_diffs_equal_2nd(const vector<double>& parameters,
+  //                               const vector<double>& finite_diffs,
+  //                               const vector<double>& gradients ) {
+
+  //   ASSERT_EQ(finite_diffs.size(), gradients.size()) 
+  //     << "Number of second order finite diff gradients and calculated gradients must match -- error in test fixture";
+  //   for (size_t i = 0; i < finite_diffs.size(); i++) {
+  //     EXPECT_NEAR(finite_diffs[i], gradients[i], 1e-3)
+  //       << "Comparison of second order finite diff to calculated gradient failed for i=" << i 
+  //       << ": " << parameters << std::endl 
+  //       << "  finite diffs: " << finite_diffs << std::endl
+  //       << "  grads:        " << gradients;
+  //     }
+  // }
+  // void  test_finite_diffs_equal_3rd(const vector<double>& parameters,
+  //                               const vector<double>& finite_diffs,
+  //                               const vector<double>& gradients ) {
+
+  //   ASSERT_EQ(finite_diffs.size(), gradients.size()) 
+  //     << "Number of third order finite diff gradients and calculated gradients must match -- error in test fixture";
+  //   for (size_t i = 0; i < finite_diffs.size(); i++) {
+  //     EXPECT_NEAR(finite_diffs[i], gradients[i], 1e-4)
+  //       << "Comparison of third order finite diff to calculated gradient failed for i=" << i 
+  //       << ": " << parameters << std::endl 
+  //       << "  finite diffs: " << finite_diffs << std::endl
+  //       << "  grads:        " << gradients;
+  //     }
+  // }
 
   void test_finite_diff() {
     if (all_constant<T0,T1,T2,T3,T4,T5>::value) {
@@ -578,31 +605,23 @@ public:
         calculate_finite_diff(parameters[n], finite_diffs1, 
                               finite_diffs2, finite_diffs3);
 
-        Scalar0 p0 = get_param<Scalar0>(parameters[n], 0);
-        Scalar1 p1 = get_param<Scalar1>(parameters[n], 1);
-        Scalar2 p2 = get_param<Scalar2>(parameters[n], 2);
-        Scalar3 p3 = get_param<Scalar3>(parameters[n], 3);
-        Scalar4 p4 = get_param<Scalar4>(parameters[n], 4);
-        Scalar5 p5 = get_param<Scalar5>(parameters[n], 5);
-    
-        vector<var> x1;
-        vector<var> x2;
-        vector<var> x3;
-        add_vars(x1, p0, p1, p2, p3, p4, p5);
-        add_vars(x2, p0, p1, p2, p3, p4, p5);
-        add_vars(x3, p0, p1, p2, p3, p4, p5);
-          
-        T_return_type logprob = TestClass.template log_prob
-          <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5>
-          (p0,p1,p2,p3,p4,p5);
+        Scalar0 p0_ = get_param<Scalar0>(parameters[n], 0);
+        Scalar1 p1_ = get_param<Scalar1>(parameters[n], 1);
+        Scalar2 p2_ = get_param<Scalar2>(parameters[n], 2);
+        Scalar3 p3_ = get_param<Scalar3>(parameters[n], 3);
+        Scalar4 p4_ = get_param<Scalar4>(parameters[n], 4);
+        Scalar5 p5_ = get_param<Scalar5>(parameters[n], 5);
+        vector<var> x;
+        add_vars(x,p0_,p1_,p2_,p3_,p4_,p5_);
 
-        calculate_gradients_1storder(gradients1, logprob, x1);
-        calculate_gradients_2ndorder(gradients2, logprob, x2);
-        calculate_gradients_3rdorder(gradients3, logprob, x3);
+        T_return_type logprob = TestClass.template log_prob
+          <false,Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5>
+          (p0_,p1_,p2_,p3_,p4_,p5_);
+        calculate_gradients_1storder(gradients1, logprob, x);
+        //calculate_gradients_2ndorder(gradients2, logprob, parameters[n]);
+        //calculate_gradients_3rdorder(gradients3, logprob, parameters[n]);
 
         test_finite_diffs_equal(parameters[n], finite_diffs1, gradients1);
-        test_finite_diffs_equal(parameters[n], finite_diffs2, gradients2);
-        test_finite_diffs_equal(parameters[n], finite_diffs3, gradients3);
       }
       
     }
