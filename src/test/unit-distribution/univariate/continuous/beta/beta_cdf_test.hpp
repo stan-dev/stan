@@ -12,10 +12,10 @@ public:
     vector<double> param(3);
 
     param[0] = 0.5;           // y
-    param[1] = 4.4;           // alpha (Success Scale)
-    param[2] = 3.2;           // beta  (Faiulre Scale)
+    param[1] = 2.0;           // alpha (Success Scale)
+    param[2] = 5.0;           // beta  (Faiulre Scale)
     parameters.push_back(param);
-    cdf.push_back(0.3223064740892);  // expected CDF
+    cdf.push_back(0.890625);  // expected CDF
 
   }
   

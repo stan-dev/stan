@@ -17,17 +17,17 @@ public:
                     vector<double>& log_prob) {
     vector<double> param(3);
 
-    param[0] = 0.2;           // y
-    param[1] = 1.0;           // alpha
-    param[2] = 1.0;           // beta
+    param[0] = 0.4;           // y
+    param[1] = 0.5;           // alpha
+    param[2] = 0.5;           // beta
     parameters.push_back(param);
-    log_prob.push_back(0.0); // expected log_prob
+    log_prob.push_back(-0.4311717080293276382896); // expected log_prob
 
-    param[0] = 0.3;           // y
-    param[1] = 12.0;          // alpha
-    param[2] = 25.0;          // beta
+    param[0] = 0.5;           // y
+    param[1] = 2.0;          // alpha
+    param[2] = 5.0;          // beta
     parameters.push_back(param);
-    log_prob.push_back(1.628758); // expected log_prob
+    log_prob.push_back(-0.06453852113757105324332); // expected log_prob
   }
  
   void invalid_values(vector<size_t>& index, 
