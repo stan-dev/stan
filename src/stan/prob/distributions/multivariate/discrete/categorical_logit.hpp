@@ -27,14 +27,12 @@ namespace stan {
       using stan::math::log_sum_exp;
 
       double lp = 0.0;
-      if (!check_bounded(function, n, 1, beta.size(),
-                         "categorical outcome out of support",
-                         &lp))
-        return lp;
-
-      if (!check_finite(function, beta, "log odds parameter", &lp))
-        return lp;
-
+      check_bounded(function, n, 1, beta.size(),
+                    "categorical outcome out of support",
+                    &lp);
+      
+      check_finite(function, beta, "log odds parameter", &lp);
+      
       if (!include_summand<propto,T_prob>::value)
         return 0.0;
         
@@ -64,13 +62,11 @@ namespace stan {
 
       double lp = 0.0;
       for (size_t k = 0; k < ns.size(); ++k)
-        if (!check_bounded(function, ns[k], 1, beta.size(),
-                           "categorical outcome out of support",
-                           &lp))
-          return lp;
-
-      if (!check_finite(function, beta, "log odds parameter", &lp))
-        return lp;
+        check_bounded(function, ns[k], 1, beta.size(),
+                      "categorical outcome out of support",
+                      &lp);
+      
+      check_finite(function, beta, "log odds parameter", &lp);
 
       if (!include_summand<propto,T_prob>::value)
         return 0.0;

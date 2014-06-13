@@ -3,8 +3,8 @@
 
 #include <stan/math/matrix/Eigen.hpp>
 #include <boost/math/tools/promotion.hpp>
-#include <stan/math/matrix/validate_square.hpp>
-#include <stan/math/matrix/validate_equal.hpp>
+#include <stan/math/error_handling/matrix/check_square.hpp>
+#include <stan/math/error_handling/check_equal.hpp>
 
 namespace stan {
   namespace math {
@@ -20,10 +20,10 @@ namespace stan {
           const Matrix<T2, R, C>& vec) {
       if (vec.cols() != 1 && vec.rows() != 1)
         throw std::domain_error("error in call to quad_form_diag: vec must be a vector");
-      stan::math::validate_square(mat, "quad_form_diag");
+      stan::math::check_square("quad_form_diag(%1%)",mat,"mat",(double*)0);
       int size = vec.size();
-      stan::math::validate_equal(mat.rows(), size, "matrix size",
-                                 "vector size", "quad_form_diag");
+      stan::math::check_equal("quad_form_diag(%1%)",mat.rows(), size, "matrix size",
+                              (double*)0);
       Matrix<typename promote_args<T1,T2>::type, Dynamic, Dynamic>
         result(size, size);
       for (int i = 0; i < size; i++) {

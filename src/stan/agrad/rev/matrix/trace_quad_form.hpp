@@ -10,8 +10,8 @@
 #include <stan/agrad/rev/vari.hpp>
 #include <stan/agrad/rev/matrix/typedefs.hpp>
 #include <stan/math/matrix/trace_quad_form.hpp>
-#include <stan/math/matrix/validate_multiplicable.hpp>
-#include <stan/math/matrix/validate_square.hpp>
+#include <stan/math/error_handling/matrix/check_multiplicable.hpp>
+#include <stan/math/error_handling/matrix/check_square.hpp>
 
 namespace stan {
   namespace agrad {
@@ -99,8 +99,9 @@ namespace stan {
     trace_quad_form(const Eigen::Matrix<TA,RA,CA> &A,
                     const Eigen::Matrix<TB,RB,CB> &B)
     {
-      stan::math::validate_square(A,"trace_quad_form");
-      stan::math::validate_multiplicable(A,B,"trace_quad_form");
+      stan::math::check_square("trace_quad_form(%1%)",A,"A",(double*)0);
+      stan::math::check_multiplicable("trace_quad_form(%1%)",A,"A",
+                                      B,"B",(double*)0);
       
       trace_quad_form_vari_alloc<TA,RA,CA,TB,RB,CB> *baseVari = new trace_quad_form_vari_alloc<TA,RA,CA,TB,RB,CB>(A,B);
       

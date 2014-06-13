@@ -43,18 +43,14 @@ namespace stan {
       T_partials_return logp(0.0);
 
       // validate args (here done over var, which should be OK)
-      if (!check_bounded(function, n, 0, 1, "n", &logp))
-        return logp;
-      if (!check_finite(function, theta, "Probability parameter", &logp))
-        return logp;
-      if (!check_bounded(function, theta, 0.0, 1.0,
-                         "Probability parameter", &logp))
-        return logp;
-      if (!(check_consistent_sizes(function,
-                                   n,theta,
-                                   "Random variable","Probability parameter",
-                                   &logp)))
-        return logp;
+      check_bounded(function, n, 0, 1, "n", &logp);
+      check_finite(function, theta, "Probability parameter", &logp);
+      check_bounded(function, theta, 0.0, 1.0,
+                    "Probability parameter", &logp);
+      check_consistent_sizes(function,
+                             n,theta,
+                             "Random variable","Probability parameter",
+                             &logp);
 
       // check if no variables are involved and prop-to
       if (!include_summand<propto,T_prob>::value)
@@ -151,16 +147,13 @@ namespace stan {
       T_partials_return logp(0.0);
       
       // validate args (here done over var, which should be OK)
-      if (!check_bounded(function, n, 0, 1, "n", &logp))
-        return logp;
-      if (!check_not_nan(function, theta, "Logit transformed probability parameter",
-                         &logp))
-        return logp;
-      if (!(check_consistent_sizes(function,
-                                   n,theta,
-                                   "Random variable","Probability parameter",
-                                   &logp)))
-        return logp;
+      check_bounded(function, n, 0, 1, "n", &logp);
+      check_not_nan(function, theta, "Logit transformed probability parameter",
+                    &logp);
+      check_consistent_sizes(function,
+                             n,theta,
+                             "Random variable","Probability parameter",
+                             &logp);
       
       // check if no variables are involved and prop-to
       if (!include_summand<propto,T_prob>::value)
@@ -233,16 +226,13 @@ namespace stan {
       T_partials_return P(1.0);
           
       // Validate arguments
-      if (!check_finite(function, theta, "Probability parameter", &P))
-        return P;
-      if (!check_bounded(function, theta, 0.0, 1.0,
-                         "Probability parameter", &P))
-        return P;
-      if (!(check_consistent_sizes(function,
-                                   n, theta,
-                                   "Random variable","Probability parameter",
-                                   &P)))
-        return P;
+      check_finite(function, theta, "Probability parameter", &P);
+      check_bounded(function, theta, 0.0, 1.0,
+                    "Probability parameter", &P);
+      check_consistent_sizes(function,
+                             n, theta,
+                             "Random variable","Probability parameter",
+                             &P);
           
       // set up template expressions wrapping scalars into vector views
       VectorView<const T_n> n_vec(n);
@@ -299,16 +289,13 @@ namespace stan {
       T_partials_return P(0.0);
           
       // Validate arguments
-      if (!check_finite(function, theta, "Probability parameter", &P))
-        return P;
-      if (!check_bounded(function, theta, 0.0, 1.0,
-                         "Probability parameter", &P))
-        return P;
-      if (!(check_consistent_sizes(function,
-                                   n, theta,
-                                   "Random variable","Probability parameter",
-                                   &P)))
-        return P;
+      check_finite(function, theta, "Probability parameter", &P);
+      check_bounded(function, theta, 0.0, 1.0,
+                    "Probability parameter", &P);
+      check_consistent_sizes(function,
+                             n, theta,
+                             "Random variable","Probability parameter",
+                             &P);
           
       // set up template expressions wrapping scalars into vector views
       VectorView<const T_n> n_vec(n);
@@ -362,16 +349,13 @@ namespace stan {
       T_partials_return P(0.0);
           
       // Validate arguments
-      if (!check_finite(function, theta, "Probability parameter", &P))
-        return P;
-      if (!check_bounded(function, theta, 0.0, 1.0,
-                         "Probability parameter", &P))
-        return P;
-      if (!(check_consistent_sizes(function,
-                                   n, theta,
-                                   "Random variable","Probability parameter",
-                                   &P)))
-        return P;
+      check_finite(function, theta, "Probability parameter", &P);
+      check_bounded(function, theta, 0.0, 1.0,
+                    "Probability parameter", &P);
+      check_consistent_sizes(function,
+                             n, theta,
+                             "Random variable","Probability parameter",
+                             &P);
           
       // set up template expressions wrapping scalars into vector views
       VectorView<const T_n> n_vec(n);
@@ -421,11 +405,9 @@ namespace stan {
       using stan::math::check_finite;
       using stan::math::check_bounded;
  
-      if (!check_finite(function, theta, "Probability parameter"))
-        return 0;
-      if (!check_bounded(function, theta, 0.0, 1.0,
-                         "Probability parameter"))
-        return 0;
+      check_finite(function, theta, "Probability parameter", (double*)0);
+      check_bounded(function, theta, 0, 1,
+                    "Probability parameter", (double*)0);
 
       variate_generator<RNG&, bernoulli_distribution<> >
         bernoulli_rng(rng, bernoulli_distribution<>(theta));

@@ -16,6 +16,8 @@ namespace stan {
       T val() { return val_; }
       T tangent() { return d_; }
 
+      typedef fvar value_type;
+
       // TV and TD must be assignable to T
       template <typename TV, typename TD>
       fvar(const TV& val, const TD& deriv) : val_(val), d_(deriv) {  }
@@ -124,7 +126,6 @@ namespace stan {
         --val_;
         return result;
       }
-
 
       friend
       std::ostream& 

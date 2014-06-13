@@ -47,24 +47,21 @@ namespace stan {
         return 0.0;
       
       T_partials_return logp(0.0);
-      if (!check_nonnegative(function, N, "Population size parameter", &logp))
-        return logp;
-      if (!check_finite(function, alpha, "First prior sample size parameter", &logp))
-        return logp;
-      if (!check_positive(function, alpha, "First prior sample size parameter", &logp))
-        return logp;
-      if (!check_finite(function, beta, "Second prior sample size parameter", &logp))
-        return logp;
-      if (!check_positive(function, beta, "Second prior sample size parameter", &logp))
-        return logp;
-      if (!(check_consistent_sizes(function,
-                                   n,N,alpha,beta,
-                                   "Successes variable",
-                                   "Population size parameter",
-                                   "First prior sample size parameter",
-                                   "Second prior sample size parameter",
-                                   &logp)))
-        return logp;
+      check_nonnegative(function, N, "Population size parameter", &logp);
+      check_finite(function, alpha, "First prior sample size parameter", &logp);
+      check_positive(function, alpha, "First prior sample size parameter", 
+                     &logp);
+      check_finite(function, beta, "Second prior sample size parameter", 
+                   &logp);      
+      check_positive(function, beta, "Second prior sample size parameter",  
+                     &logp);
+      check_consistent_sizes(function,
+                             n,N,alpha,beta,
+                             "Successes variable",
+                             "Population size parameter",
+                             "First prior sample size parameter",
+                             "Second prior sample size parameter",
+                             &logp);
 
       // check if no variables are involved and prop-to
       if (!include_summand<propto,T_size1,T_size2>::value)
@@ -223,30 +220,19 @@ for (size_t i = 0; i < max_size(alpha,beta); i++)
     T_partials_return P(1.0);
           
     // Validate arguments
-    if (!check_nonnegative(function, N, "Population size parameter", &P))
-      return P;
-          
-    if (!check_finite(function, alpha, "First prior sample size parameter", &P))
-      return P;
-          
-    if (!check_positive(function, alpha, "First prior sample size parameter", &P))
-      return P;
-          
-    if (!check_finite(function, beta, "Second prior sample size parameter", &P))
-      return P;
-          
-    if (!check_positive(function, beta, "Second prior sample size parameter", &P))
-      return P;
-          
-    if (!(check_consistent_sizes(function,
-                                 n, N, alpha, beta,
-                                 "Successes variable",
-                                 "Population size parameter",
-                                 "First prior sample size parameter",
-                                 "Second prior sample size parameter",
-                                 &P)))
-      return P;
-          
+    check_nonnegative(function, N, "Population size parameter", &P);
+    check_finite(function, alpha, "First prior sample size parameter", &P);
+    check_positive(function, alpha, "First prior sample size parameter", &P);
+    check_finite(function, beta, "Second prior sample size parameter", &P);
+    check_positive(function, beta, "Second prior sample size parameter", &P);
+    check_consistent_sizes(function,
+                           n, N, alpha, beta,
+                           "Successes variable",
+                           "Population size parameter",
+                           "First prior sample size parameter",
+                           "Second prior sample size parameter",
+                           &P);
+
     // Wrap arguments in vector views
     VectorView<const T_n> n_vec(n);
     VectorView<const T_N> N_vec(N);
@@ -359,25 +345,19 @@ for (size_t i = 0; i < max_size(alpha,beta); i++)
     T_partials_return P(0.0);
           
     // Validate arguments
-    if (!check_nonnegative(function, N, "Population size parameter", &P))
-      return P;
-    if (!check_finite(function, alpha, "First prior sample size parameter", &P))
-      return P;
-    if (!check_positive(function, alpha, "First prior sample size parameter", &P))
-      return P;
-    if (!check_finite(function, beta, "Second prior sample size parameter", &P))
-      return P;
-    if (!check_positive(function, beta, "Second prior sample size parameter", &P))
-      return P;
-    if (!(check_consistent_sizes(function,
-                                 n, N, alpha, beta,
-                                 "Successes variable",
-                                 "Population size parameter",
-                                 "First prior sample size parameter",
-                                 "Second prior sample size parameter",
-                                 &P)))
-      return P;
-          
+    check_nonnegative(function, N, "Population size parameter", &P);
+    check_finite(function, alpha, "First prior sample size parameter", &P);
+    check_positive(function, alpha, "First prior sample size parameter", &P);
+    check_finite(function, beta, "Second prior sample size parameter", &P);
+    check_positive(function, beta, "Second prior sample size parameter", &P);
+    check_consistent_sizes(function,
+                           n, N, alpha, beta,
+                           "Successes variable",
+                           "Population size parameter",
+                           "First prior sample size parameter",
+                           "Second prior sample size parameter",
+                           &P);
+
     // Wrap arguments in vector views
     VectorView<const T_n> n_vec(n);
     VectorView<const T_N> N_vec(N);
@@ -481,25 +461,19 @@ for (size_t i = 0; i < max_size(alpha,beta); i++)
     T_partials_return P(0.0);
           
     // Validate arguments
-    if (!check_nonnegative(function, N, "Population size parameter", &P))
-      return P;
-    if (!check_finite(function, alpha, "First prior sample size parameter", &P))
-      return P;
-    if (!check_positive(function, alpha, "First prior sample size parameter", &P))
-      return P;
-    if (!check_finite(function, beta, "Second prior sample size parameter", &P))
-      return P;
-    if (!check_positive(function, beta, "Second prior sample size parameter", &P))
-      return P;
-    if (!(check_consistent_sizes(function,
-                                 n, N, alpha, beta,
-                                 "Successes variable",
-                                 "Population size parameter",
-                                 "First prior sample size parameter",
-                                 "Second prior sample size parameter",
-                                 &P)))
-      return P;
-          
+    check_nonnegative(function, N, "Population size parameter", &P);
+    check_finite(function, alpha, "First prior sample size parameter", &P);
+    check_positive(function, alpha, "First prior sample size parameter", &P);
+    check_finite(function, beta, "Second prior sample size parameter", &P);
+    check_positive(function, beta, "Second prior sample size parameter", &P);
+    check_consistent_sizes(function,
+                           n, N, alpha, beta,
+                           "Successes variable",
+                           "Population size parameter",
+                           "First prior sample size parameter",
+                           "Second prior sample size parameter",
+                           &P);
+
     // Wrap arguments in vector views
     VectorView<const T_n> n_vec(n);
     VectorView<const T_N> N_vec(N);
@@ -592,16 +566,15 @@ for (size_t i = 0; i < max_size(alpha,beta); i++)
       using stan::math::check_nonnegative;
       using stan::math::check_positive;
   
-      if (!check_nonnegative(function, N, "Population size parameter"))
-        return 0;
-      if (!check_finite(function, alpha, "First prior sample size parameter"))
-        return 0;
-      if (!check_positive(function, alpha, "First prior sample size parameter"))
-        return 0;
-      if (!check_finite(function, beta, "Second prior sample size parameter"))
-        return 0;
-      if (!check_positive(function, beta, "Second prior sample size parameter"))
-        return 0;
+      check_nonnegative(function, N, "Population size parameter", (double*)0);
+      check_finite(function, alpha, "First prior sample size parameter", 
+                   (double*)0);
+      check_positive(function, alpha, "First prior sample size parameter", 
+                     (double*)0);
+      check_finite(function, beta, "Second prior sample size parameter", 
+                   (double*)0);
+      check_positive(function, beta, "Second prior sample size parameter",
+                     (double*)0);
 
     double a = stan::prob::beta_rng(alpha, beta, rng);
     while(a > 1 || a < 0) 

@@ -59,25 +59,17 @@ namespace stan {
         return 0.0;
 
       T_partials_return logp(0.0);
-      if (!check_not_nan(function, y, "Random variable", &logp))
-        return logp;
-      if (!check_finite(function, nu, "Degrees of freedom parameter",
-                        &logp))
-        return logp;
-      if (!check_positive(function, nu, "Degrees of freedom parameter", 
-                          &logp))
-        return logp;
-      if (!check_finite(function, s, "Scale parameter", &logp))
-        return logp;
-      if (!check_positive(function, s, "Scale parameter", &logp))
-        return logp;
-      if (!(check_consistent_sizes(function,
-                                   y,nu,s,
-                                   "Random variable",
-                                   "Degrees of freedom parameter",
-                                   "Scale parameter",
-                                   &logp)))
-        return logp;
+      check_not_nan(function, y, "Random variable", &logp);
+      check_finite(function, nu, "Degrees of freedom parameter", &logp);
+      check_positive(function, nu, "Degrees of freedom parameter", &logp);
+      check_finite(function, s, "Scale parameter", &logp);
+      check_positive(function, s, "Scale parameter", &logp);
+      check_consistent_sizes(function,
+                             y,nu,s,
+                             "Random variable",
+                             "Degrees of freedom parameter",
+                             "Scale parameter",
+                             &logp);
 
       // check if no variables are involved and prop-to
       if (!include_summand<propto,T_y,T_dof,T_scale>::value)
@@ -223,24 +215,17 @@ namespace stan {
           
       T_partials_return P(1.0);
           
-      if (!check_not_nan(function, y, "Random variable", &P))
-        return P;
-      if (!check_nonnegative(function, y, "Random variable", &P))
-        return P;
-      if (!check_finite(function, nu, "Degrees of freedom parameter", &P))
-        return P;
-      if (!check_positive(function, nu, "Degrees of freedom parameter", &P))
-        return P;
-      if (!check_finite(function, s, "Scale parameter", &P))
-        return P;
-      if (!check_positive(function, s, "Scale parameter", &P))
-        return P;
-      if (!(check_consistent_sizes(function, y, nu, s,
-                                   "Random variable", 
-                                   "Degrees of freedom parameter",
-                                   "Scale parameter",
-                                   &P)))
-        return P;
+      check_not_nan(function, y, "Random variable", &P);
+      check_nonnegative(function, y, "Random variable", &P);
+      check_finite(function, nu, "Degrees of freedom parameter", &P);
+      check_positive(function, nu, "Degrees of freedom parameter", &P);
+      check_finite(function, s, "Scale parameter", &P);
+      check_positive(function, s, "Scale parameter", &P);
+      check_consistent_sizes(function, y, nu, s,
+                             "Random variable", 
+                             "Degrees of freedom parameter",
+                             "Scale parameter",
+                             &P);
           
       // Wrap arguments in vectors
       VectorView<const T_y> y_vec(y);
@@ -360,24 +345,17 @@ namespace stan {
           
       T_partials_return P(0.0);
           
-      if (!check_not_nan(function, y, "Random variable", &P))
-        return P;
-      if (!check_nonnegative(function, y, "Random variable", &P))
-        return P;
-      if (!check_finite(function, nu, "Degrees of freedom parameter", &P))
-        return P;
-      if (!check_positive(function, nu, "Degrees of freedom parameter", &P))
-        return P;
-      if (!check_finite(function, s, "Scale parameter", &P))
-        return P;
-      if (!check_positive(function, s, "Scale parameter", &P))
-        return P;
-      if (!(check_consistent_sizes(function, y, nu, s,
-                                   "Random variable", 
-                                   "Degrees of freedom parameter",
-                                   "Scale parameter",
-                                   &P)))
-        return P;
+      check_not_nan(function, y, "Random variable", &P);
+      check_nonnegative(function, y, "Random variable", &P);
+      check_finite(function, nu, "Degrees of freedom parameter", &P);
+      check_positive(function, nu, "Degrees of freedom parameter", &P);
+      check_finite(function, s, "Scale parameter", &P);
+      check_positive(function, s, "Scale parameter", &P);
+      check_consistent_sizes(function, y, nu, s,
+                             "Random variable", 
+                             "Degrees of freedom parameter",
+                             "Scale parameter",
+                             &P);
           
       // Wrap arguments in vectors
       VectorView<const T_y> y_vec(y);
@@ -483,24 +461,17 @@ namespace stan {
           
       T_partials_return P(0.0);
           
-      if (!check_not_nan(function, y, "Random variable", &P))
-        return P;
-      if (!check_nonnegative(function, y, "Random variable", &P))
-        return P;
-      if (!check_finite(function, nu, "Degrees of freedom parameter", &P))
-        return P;
-      if (!check_positive(function, nu, "Degrees of freedom parameter", &P))
-        return P;
-      if (!check_finite(function, s, "Scale parameter", &P))
-        return P;
-      if (!check_positive(function, s, "Scale parameter", &P))
-        return P;
-      if (!(check_consistent_sizes(function, y, nu, s,
-                                   "Random variable", 
-                                   "Degrees of freedom parameter",
-                                   "Scale parameter",
-                                   &P)))
-        return P;
+      check_not_nan(function, y, "Random variable", &P);
+      check_nonnegative(function, y, "Random variable", &P);
+      check_finite(function, nu, "Degrees of freedom parameter", &P);
+      check_positive(function, nu, "Degrees of freedom parameter", &P);
+      check_finite(function, s, "Scale parameter", &P);
+      check_positive(function, s, "Scale parameter", &P);
+      check_consistent_sizes(function, y, nu, s,
+                             "Random variable", 
+                             "Degrees of freedom parameter",
+                             "Scale parameter",
+                             &P);
           
       // Wrap arguments in vectors
       VectorView<const T_y> y_vec(y);
@@ -598,14 +569,10 @@ namespace stan {
       using stan::math::check_finite;
       using stan::math::check_positive;
 
-      if (!check_finite(function, nu, "Degrees of freedom parameter"))
-        return 0;
-      if (!check_positive(function, nu, "Degrees of freedom parameter")) 
-        return 0;
-      if (!check_finite(function, s, "Scale parameter"))
-        return 0;
-      if (!check_positive(function, s, "Scale parameter"))
-        return 0;
+      check_finite(function, nu, "Degrees of freedom parameter", (double*)0);
+      check_positive(function, nu, "Degrees of freedom parameter", (double*)0);
+      check_finite(function, s, "Scale parameter", (double*)0);
+      check_positive(function, s, "Scale parameter", (double*)0);
 
       variate_generator<RNG&, chi_squared_distribution<> >
         chi_square_rng(rng, chi_squared_distribution<>(nu));

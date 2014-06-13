@@ -48,24 +48,16 @@ namespace stan {
         return 0.0;
       
       T_partials_return logp(0.0);
-      if (!check_nonnegative(function, n, "Failures variable", &logp))
-        return logp;
-      if (!check_finite(function, alpha, "Shape parameter", &logp))
-        return logp;
-      if (!check_positive(function, alpha, "Shape parameter", &logp))
-        return logp;
-      if (!check_finite(function, beta, "Inverse scale parameter",
-                        &logp))
-        return logp;
-      if (!check_positive(function, beta, "Inverse scale parameter", 
-                          &logp))
-        return logp;
-      if (!(check_consistent_sizes(function,
-                                   n,alpha,beta,
-                                   "Failures variable",
-                                   "Shape parameter","Inverse scale parameter",
-                                   &logp)))
-        return logp;
+      check_nonnegative(function, n, "Failures variable", &logp);
+      check_finite(function, alpha, "Shape parameter", &logp);
+      check_positive(function, alpha, "Shape parameter", &logp);
+      check_finite(function, beta, "Inverse scale parameter", &logp);
+      check_positive(function, beta, "Inverse scale parameter", &logp);
+      check_consistent_sizes(function,
+                             n,alpha,beta,
+                             "Failures variable",
+                             "Shape parameter","Inverse scale parameter",
+                             &logp);
 
       // check if no variables are involved and prop-to
       if (!include_summand<propto,T_shape,T_inv_scale>::value)
@@ -209,27 +201,16 @@ namespace stan {
       T_partials_return P(1.0);
           
       // Validate arguments
-      if (!check_finite(function, alpha, "Shape parameter", &P))
-        return P;
-          
-      if (!check_positive(function, alpha, "Shape parameter", &P))
-        return P;
-          
-      if (!check_finite(function, beta, "Inverse scale parameter",
-                        &P))
-        return P;
-          
-      if (!check_positive(function, beta, "Inverse scale parameter", 
-                          &P))
-        return P;
-          
-      if (!(check_consistent_sizes(function,
-                                   n, alpha, beta,
-                                   "Failures variable",
-                                   "Shape parameter",
-                                   "Inverse scale parameter",
-                                   &P)))
-        return P;
+      check_finite(function, alpha, "Shape parameter", &P);
+      check_positive(function, alpha, "Shape parameter", &P);
+      check_finite(function, beta, "Inverse scale parameter", &P);
+      check_positive(function, beta, "Inverse scale parameter", &P);
+      check_consistent_sizes(function,
+                             n, alpha, beta,
+                             "Failures variable",
+                             "Shape parameter",
+                             "Inverse scale parameter",
+                             &P);
           
       // Wrap arguments in vector views
       VectorView<const T_n> n_vec(n);
@@ -361,21 +342,16 @@ namespace stan {
       T_partials_return P(0.0);
           
       // Validate arguments
-      if (!check_finite(function, alpha, "Shape parameter", &P))
-        return P;
-      if (!check_positive(function, alpha, "Shape parameter", &P))
-        return P;
-      if (!check_finite(function, beta, "Inverse scale parameter", &P))
-        return P;
-      if (!check_positive(function, beta, "Inverse scale parameter", &P))
-        return P;
-      if (!(check_consistent_sizes(function,
-                                   n, alpha, beta,
-                                   "Failures variable",
-                                   "Shape parameter",
-                                   "Inverse scale parameter",
-                                   &P)))
-        return P;
+      check_finite(function, alpha, "Shape parameter", &P);
+      check_positive(function, alpha, "Shape parameter", &P);
+      check_finite(function, beta, "Inverse scale parameter", &P);
+      check_positive(function, beta, "Inverse scale parameter", &P);
+      check_consistent_sizes(function,
+                             n, alpha, beta,
+                             "Failures variable",
+                             "Shape parameter",
+                             "Inverse scale parameter",
+                             &P);
           
       // Wrap arguments in vector views
       VectorView<const T_n> n_vec(n);
@@ -488,21 +464,16 @@ namespace stan {
       T_partials_return P(0.0);
           
       // Validate arguments
-      if (!check_finite(function, alpha, "Shape parameter", &P))
-        return P;
-      if (!check_positive(function, alpha, "Shape parameter", &P))
-        return P;
-      if (!check_finite(function, beta, "Inverse scale parameter", &P))
-        return P;
-      if (!check_positive(function, beta, "Inverse scale parameter", &P))
-        return P;
-      if (!(check_consistent_sizes(function,
-                                   n, alpha, beta,
-                                   "Failures variable",
-                                   "Shape parameter",
-                                   "Inverse scale parameter",
-                                   &P)))
-        return P;
+      check_finite(function, alpha, "Shape parameter", &P);
+      check_positive(function, alpha, "Shape parameter", &P);
+      check_finite(function, beta, "Inverse scale parameter", &P);
+      check_positive(function, beta, "Inverse scale parameter", &P);
+      check_consistent_sizes(function,
+                             n, alpha, beta,
+                             "Failures variable",
+                             "Shape parameter",
+                             "Inverse scale parameter",
+                             &P);
           
       // Wrap arguments in vector views
       VectorView<const T_n> n_vec(n);
@@ -607,14 +578,10 @@ namespace stan {
       using stan::math::check_finite;      
       using stan::math::check_positive;
 
-      if (!check_finite(function, alpha, "Shape parameter"))
-        return 0;
-      if (!check_positive(function, alpha, "Shape parameter"))
-        return 0;
-      if (!check_finite(function, beta, "Inverse scale parameter"))
-        return 0;
-      if (!check_positive(function, beta, "Inverse scale parameter"))
-        return 0;
+      check_finite(function, alpha, "Shape parameter", (double*)0);
+      check_positive(function, alpha, "Shape parameter", (double*)0);
+      check_finite(function, beta, "Inverse scale parameter", (double*)0);
+      check_positive(function, beta, "Inverse scale parameter", (double*)0);
 
       return stan::prob::poisson_rng(stan::prob::gamma_rng(alpha, beta,
                                                            rng),rng);
