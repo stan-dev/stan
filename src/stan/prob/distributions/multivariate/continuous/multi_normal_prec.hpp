@@ -47,39 +47,31 @@ namespace stan {
       using stan::math::LDLT_factor;
       using stan::math::check_ldlt_factor;
       
-      if (!check_size_match(function, 
-                            Sigma.rows(), "Rows of precision parameter",
-                            Sigma.cols(), "columns of precision parameter",
-                            &lp))
-        return lp;
-      if (!check_positive(function, Sigma.rows(), "Precision matrix rows", &lp))
-        return lp;
-      if (!check_symmetric(function, Sigma, "Precision matrix", &lp))
-        return lp;
+      check_size_match(function, 
+                       Sigma.rows(), "Rows of precision parameter",
+                       Sigma.cols(), "columns of precision parameter",
+                       &lp);
+      check_positive(function, Sigma.rows(), "Precision matrix rows", &lp);
+      check_symmetric(function, Sigma, "Precision matrix", &lp);
       
       LDLT_factor<T_covar,Eigen::Dynamic,Eigen::Dynamic> ldlt_Sigma(Sigma);
-      if(!check_ldlt_factor(function,ldlt_Sigma,"LDLT_Factor of precision parameter",&lp))
-        return lp;
+      check_ldlt_factor(function,ldlt_Sigma,
+                        "LDLT_Factor of precision parameter",&lp);
 
-      if (!check_size_match(function, 
-                            y.size(), "Size of random variable",
-                            mu.size(), "size of location parameter",
-                            &lp))
-        return lp;
-      if (!check_size_match(function, 
-                            y.size(), "Size of random variable",
-                            Sigma.rows(), "rows of covariance parameter",
-                            &lp))
-        return lp;
-      if (!check_size_match(function, 
-                            y.size(), "Size of random variable",
-                            Sigma.cols(), "columns of covariance parameter",
-                            &lp))
-        return lp;
-      if (!check_finite(function, mu, "Location parameter", &lp)) 
-        return lp;
-      if (!check_not_nan(function, y, "Random variable", &lp)) 
-        return lp;
+      check_size_match(function, 
+                       y.size(), "Size of random variable",
+                       mu.size(), "size of location parameter",
+                       &lp);
+      check_size_match(function, 
+                       y.size(), "Size of random variable",
+                       Sigma.rows(), "rows of covariance parameter",
+                       &lp);
+      check_size_match(function, 
+                       y.size(), "Size of random variable",
+                       Sigma.cols(), "columns of covariance parameter",
+                       &lp);
+      check_finite(function, mu, "Location parameter", &lp);
+      check_not_nan(function, y, "Random variable", &lp); 
       
       if (y.rows() == 0)
         return lp;
@@ -133,39 +125,31 @@ namespace stan {
       using stan::math::LDLT_factor;
       using stan::math::check_ldlt_factor;
       
-      if (!check_size_match(function, 
-                            Sigma.rows(), "Rows of precision matrix",
-                            Sigma.cols(), "columns of precision matrix",
-                            &lp))
-        return lp;
-      if (!check_positive(function, Sigma.rows(), "Precision matrix rows", &lp))
-        return lp;
-      if (!check_symmetric(function, Sigma, "Precision matrix", &lp))
-        return lp;
+      check_size_match(function, 
+                       Sigma.rows(), "Rows of precision matrix",
+                       Sigma.cols(), "columns of precision matrix",
+                       &lp);
+      check_positive(function, Sigma.rows(), "Precision matrix rows", &lp);
+      check_symmetric(function, Sigma, "Precision matrix", &lp);
       
       LDLT_factor<T_covar,Eigen::Dynamic,Eigen::Dynamic> ldlt_Sigma(Sigma);
-      if(!check_ldlt_factor(function,ldlt_Sigma,"LDLT_Factor of precision matrix",&lp))
-        return lp;
+      check_ldlt_factor(function,ldlt_Sigma,"LDLT_Factor of precision matrix",
+                        &lp);
       
-      if (!check_size_match(function, 
-                            y.cols(), "Columns of random variable",
-                            mu.rows(), "rows of location parameter",
-                            &lp))
-        return lp;
-      if (!check_size_match(function, 
-                            y.cols(), "Columns of random variable",
-                            Sigma.rows(), "rows of covariance parameter",
-                            &lp))
-        return lp;
-      if (!check_size_match(function, 
-                            y.cols(), "Columns of random variable",
-                            Sigma.cols(), "columns of covariance parameter",
-                            &lp))
-        return lp;
-      if (!check_finite(function, mu, "Location parameter", &lp)) 
-        return lp;
-      if (!check_not_nan(function, y, "Random variable", &lp)) 
-        return lp;
+      check_size_match(function, 
+                       y.cols(), "Columns of random variable",
+                       mu.rows(), "rows of location parameter",
+                       &lp);
+      check_size_match(function, 
+                       y.cols(), "Columns of random variable",
+                       Sigma.rows(), "rows of covariance parameter",
+                       &lp);
+      check_size_match(function, 
+                       y.cols(), "Columns of random variable",
+                       Sigma.cols(), "columns of covariance parameter",
+                       &lp);
+      check_finite(function, mu, "Location parameter", &lp);
+      check_not_nan(function, y, "Random variable", &lp);
       
       if (y.cols() == 0)
         return lp;

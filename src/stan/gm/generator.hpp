@@ -783,7 +783,7 @@ namespace stan {
           generate_expression(x.range_.low_.expr_,o_);
           o_ << ",\"";
           generate_loop_var(x.name_,x.dims_.size());
-          o_ << "\");" << EOL;
+          o_ << "\", (double *)0);" << EOL;
         }
         if (x.range_.has_high()) {
           generate_indent(indents_ + 1 + x.dims_.size(),o_);
@@ -793,7 +793,7 @@ namespace stan {
           generate_expression(x.range_.high_.expr_,o_);
           o_ << ",\"";
           generate_loop_var(x.name_,x.dims_.size());
-          o_ << "\");" << EOL;
+          o_ << "\", (double *)0);" << EOL;
         }
         generate_indent(indents_ + x.dims_.size(),o_);
         o_ << "} catch (const std::exception& e) { "
@@ -829,7 +829,7 @@ namespace stan {
         generate_loop_var(x.name_,x.dims_.size());
         o_ << ",\"";
         generate_loop_var(x.name_,x.dims_.size());
-        o_ << "\"); } catch (const std::exception& e) { throw std::domain_error(std::string(\"Invalid value of " << x.name_ << ": \") + std::string(e.what())); };" << EOL;
+        o_ << "\", (double *)0); } catch (const std::exception& e) { throw std::domain_error(std::string(\"Invalid value of " << x.name_ << ": \") + std::string(e.what())); };" << EOL;
         generate_end_for_dims(x.dims_.size());
       }
       void operator()(unit_vector_var_decl const& x) const {

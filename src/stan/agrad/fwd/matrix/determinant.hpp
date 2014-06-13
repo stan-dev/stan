@@ -10,6 +10,7 @@
 #include <stan/agrad/fwd/matrix/multiply.hpp>
 #include <stan/math/matrix/inverse.hpp>
 #include <stan/agrad/fwd/matrix/inverse.hpp>
+#include <stan/math/error_handling/matrix/check_square.hpp>
 
 namespace stan {
   namespace agrad {
@@ -20,7 +21,7 @@ namespace stan {
     determinant(const Eigen::Matrix<fvar<T>, R, C>& m) {
       using stan::math::multiply;
 
-      stan::math::validate_square(m, "determinant");
+      stan::math::check_square("determinant(%1%)",m,"m",(double*)0);
       Eigen::Matrix<T,R,C> m_deriv(m.rows(), m.cols());
       Eigen::Matrix<T,R,C> m_val(m.rows(), m.cols());
       Eigen::Matrix<T,R,C> m_inv(m.rows(), m.cols());

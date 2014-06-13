@@ -67,26 +67,21 @@ namespace stan {
 
       typename promote_args<T_y,T_loc,T_covar>::type lp(0.0);
 
-      if (!check_size_match(function, 
-                            y.size(), "Size of random variable",
-                            mu.size(), "size of location parameter",
-                            &lp))
-        return lp;
-      if (!check_size_match(function, 
-                            y.size(), "Size of random variable",
-                            L.rows(), "rows of covariance parameter",
-                            &lp))
-        return lp;
-      if (!check_size_match(function, 
-                            y.size(), "Size of random variable",
-                            L.cols(), "columns of covariance parameter",
-                            &lp))
-        return lp;
-      if (!check_finite(function, mu, "Location parameter", &lp)) 
-        return lp;
-      if (!check_not_nan(function, y, "Random variable", &lp)) 
-        return lp;
-
+      check_size_match(function, 
+                       y.size(), "Size of random variable",
+                       mu.size(), "size of location parameter",
+                       &lp);
+      check_size_match(function, 
+                       y.size(), "Size of random variable",
+                       L.rows(), "rows of covariance parameter",
+                       &lp);
+      check_size_match(function, 
+                       y.size(), "Size of random variable",
+                       L.cols(), "columns of covariance parameter",
+                       &lp);
+      check_finite(function, mu, "Location parameter", &lp);
+      check_not_nan(function, y, "Random variable", &lp);
+      
       if (y.rows() == 0)
         return lp;
       
@@ -152,25 +147,20 @@ namespace stan {
 
       typename promote_args<T_y,T_loc,T_covar>::type lp(0.0);
 
-      if (!check_size_match(function, 
-                            y.cols(), "Columns of random variable",
-                            mu.rows(), "rows of location parameter",
-                            &lp))
-        return lp;
-      if (!check_size_match(function, 
-                            y.cols(), "Columns of random variable",
-                            L.rows(), "rows of covariance parameter",
-                            &lp))
-        return lp;
-      if (!check_size_match(function, 
-                            y.cols(), "Columns of random variable",
-                            L.cols(), "columns of covariance parameter",
-                            &lp))
-        return lp;
-      if (!check_finite(function, mu, "Location parameter", &lp)) 
-        return lp;
-      if (!check_not_nan(function, y, "Random variable", &lp)) 
-        return lp;
+      check_size_match(function, 
+                       y.cols(), "Columns of random variable",
+                       mu.rows(), "rows of location parameter",
+                       &lp);
+      check_size_match(function, 
+                       y.cols(), "Columns of random variable",
+                       L.rows(), "rows of covariance parameter",
+                       &lp);
+      check_size_match(function, 
+                       y.cols(), "Columns of random variable",
+                       L.cols(), "columns of covariance parameter",
+                       &lp);
+      check_finite(function, mu, "Location parameter", &lp);
+      check_not_nan(function, y, "Random variable", &lp);
 
       if (y.cols() == 0)
         return lp;
@@ -238,7 +228,7 @@ namespace stan {
 
       using stan::math::check_finite;
  
-      check_finite(function, mu, "Location parameter");
+      check_finite(function, mu, "Location parameter", (double*)0);
 
       variate_generator<RNG&, normal_distribution<> >
         std_normal_rng(rng, normal_distribution<>(0,1));

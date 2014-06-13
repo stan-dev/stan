@@ -1,8 +1,10 @@
-#ifndef __STAN__MATH__ERROR_HANDLING__CHECK_NONNEGATIVE_HPP__
-#define __STAN__MATH__ERROR_HANDLING__CHECK_NONNEGATIVE_HPP__
+#ifndef __STAN__MATH__ERROR_HANDLING_CHECK_NONNEGATIVE_HPP__
+#define __STAN__MATH__ERROR_HANDLING_CHECK_NONNEGATIVE_HPP__
 
 #include <stan/math/error_handling/dom_err.hpp>
 #include <stan/math/error_handling/dom_err_vec.hpp>
+#include <boost/type_traits/is_unsigned.hpp>
+#include <stan/meta/traits.hpp>
 
 namespace stan {
   namespace math {
@@ -50,14 +52,6 @@ namespace stan {
       return nonnegative<T_y,T_result,is_vector_like<T_y>::value>
         ::check(function, y, name, result);
     }
-    template <typename T_y>
-    inline bool check_nonnegative(const char* function,
-                                  const T_y& y,
-                                  const char* name) {
-      return check_nonnegative<T_y,typename scalar_type<T_y>::type *>
-        (function,y,name,0);
-    }
-
   }
 }
 #endif

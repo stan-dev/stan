@@ -6,7 +6,7 @@
 #include <stdexcept>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/log_sum_exp.hpp>
-#include <stan/math/matrix/validate_nonzero_size.hpp>
+#include <stan/math/error_handling/matrix/check_nonzero_size.hpp>
 
 namespace stan {
   namespace math {
@@ -24,7 +24,7 @@ namespace stan {
       using std::exp;
       using std::log;
       using stan::math::log_sum_exp;
-      stan::math::validate_nonzero_size(v,"vector softmax");
+      stan::math::check_nonzero_size("log_softmax(%1%)",v,"v", (double*)0);
       Eigen::Matrix<T,Eigen::Dynamic,1> theta(v.size());
       T z = log_sum_exp(v);
       for (int i = 0; i < v.size(); ++i)

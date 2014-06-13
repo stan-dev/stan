@@ -1,3 +1,4 @@
+#include <limits>
 #include <stan/io/dump.hpp>
 #include <gtest/gtest.h>
 #include <boost/math/special_functions/fpclassify.hpp>
@@ -56,6 +57,47 @@ void test_val(std::string name, T val, std::string s) {
   std::vector<size_t> expected_dims;
   test_list2(reader,name,vals,expected_dims);
 }
+
+void test_exception(const std::string& input) {
+  //  std::cout << "expect failure for: " << input << std::endl;
+  try {
+    std::stringstream in(input);
+    stan::io::dump_reader reader(in);
+    bool has_next = reader.next();
+    while (has_next) {
+      has_next = reader.next();
+    }
+  } catch (const std::exception& e) {
+    //    std::cout << "failed, msg: " << e.what() << std::endl;
+    //    std::cout.flush();
+    return;
+  }
+  FAIL(); // didn't throw an exception as expected.
+}
+
+
+
+bool hasEnding(std::string const &fullString, std::string const &ending) {
+   if (fullString.length() >= ending.length()) {
+    return (0 == fullString.compare (fullString.length() - ending.length(), ending.length(), ending));
+  } else {
+    return false;
+  }
+}
+
+void test_exception(const std::string& input,
+                    const std::string& exception_text) {
+  try {
+    std::stringstream in(input);
+    stan::io::dump_reader reader(in);
+    std::vector<int> vals = reader.int_values();
+  } catch (const std::exception& e) {
+    EXPECT_TRUE(hasEnding(e.what(), exception_text));
+    return;
+  }
+  FAIL(); // didn't throw an exception as expected.
+}
+
 
 TEST(io_dump, reader_double) {
   test_val("a",-5.0,"a <- -5.0");
@@ -155,6 +197,8 @@ TEST(io_dump, reader_vec_data_backward) {
   stan::io::dump_reader reader(in);
   test_list2(reader,"foo",expected_vals,expected_dims);
 }
+
+
 TEST(io_dump, reader_vec_data_long_suffix) {
   std::vector<int> expected_vals;
   for (int i = 10; i >= -9; --i)
@@ -434,4 +478,121 @@ TEST(io_dump, it_sign_ksvanhorn) {
   EXPECT_EQ(1U,sigma_values.size());
   EXPECT_FLOAT_EQ(3,sigma_values[0]);
   
+}
+
+/* tests for numbers on boundary and outside of range
+ * use string representations for values above/below limits
+ */
+
+TEST(io_dump, reader_max_int) {
+  int imax = INT_MAX - 1;
+  int imin = INT_MIN + 1;
+
+  std::stringstream sa;
+  sa << "a <- " << imax ;
+  test_val("a",imax,sa.str());
+
+  std::stringstream sb;
+  sb << "b <- " << imax << "L";
+  test_val("b",imax,sb.str());
+ 
+  std::stringstream sc;
+  sc << "c <- " << imin ;
+  test_val("c",imin,sc.str());
+
+  std::stringstream sd;
+  sd << "d <- " << imin << "L";
+  test_val("d",imin,sd.str());
+
+}
+
+TEST(io_dump, reader_max_ints) {
+  int imax = INT_MAX - 1;
+  int imin = INT_MIN + 1;
+  std::vector<int> vs;
+  vs.push_back(imax);
+  vs.push_back(imin);
+  vs.push_back(imax);
+  vs.push_back(imin);
+  std::stringstream se;
+  se << "e <- c(" << imax<< "," << imin << "," << imax << "L," << imin << "L)";
+  test_list("e",vs,se.str());
+}
+
+
+TEST(io_dump, reader_vec_data_max_dims) {
+  std::vector<int> expected_vals;
+  for (int i = 1; i <= 65535; ++i)
+    expected_vals.push_back(i);
+  std::vector<size_t> expected_dims;
+  expected_dims.push_back(65535U);
+
+  std::string txt = "foo <- structure(1:65535, .Dim = c(65535))";
+  std::stringstream in(txt);
+  stan::io::dump_reader reader(in);
+  test_list2(reader,"foo",expected_vals,expected_dims);
+}
+
+
+TEST(io_dump, reader_big_doubles) {
+  double dmax = std::numeric_limits<double>::max();
+  double dmin = std::numeric_limits<double>::min();
+  std::stringstream sa;
+  sa << "a <- " << dmax ;
+  test_val("a",dmax,sa.str());
+  std::stringstream sb;
+  sb << "b <- " << dmin ;
+  test_val("b",dmin,sb.str());
+
+}
+
+TEST(io_dump, very_large_pos_int) {
+  test_exception("k <- 999918446744073709551616");
+}
+
+TEST(io_dump, very_large_neg_int) {
+  test_exception("k <- -999918446744073709551616");
+}
+
+TEST(io_dump, very_large_pos_intL) {
+  test_exception("k <- 999918446744073709551616L");
+}
+
+TEST(io_dump, very_large_neg_intL) {
+  test_exception("k <- -999918446744073709551616L");
+}
+
+TEST(io_dump, int_too_large_v) {
+  test_exception("k <- c(999918446744073709551616L)");
+}
+
+TEST(io_dump, int_neg_too_large_v) {
+  test_exception("k <- c(-999918446744073709551616L)");
+}
+
+TEST(io_dump, dim_too_large_v) {
+  test_exception("foo <- structure(1:2, .Dim = c(184467440737095516159))");
+}
+
+TEST(io_dump, double_too_large) {
+  test_exception("a <- 2.797693134862316991999E+309912");
+}
+
+TEST(io_dump, double_too_small) {
+  test_exception("a <- 4.940656458412465E-324994079409");
+}
+
+
+/* syntax errors */
+
+TEST(io_dump, bad_syntax_seq) {
+  test_exception("a <- c(1,2,3, ");
+}
+
+TEST(io_dump, bad_syntax_seq2) {
+  test_exception("a <- c(1:2 ");
+}
+
+TEST(io_dump, bad_syntax_struct) {
+  test_exception("a <- structure(1:2, .Dim = c(2,3) ");
 }

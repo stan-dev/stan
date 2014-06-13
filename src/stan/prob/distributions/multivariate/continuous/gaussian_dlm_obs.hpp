@@ -109,83 +109,59 @@ namespace stan {
       int n = G.rows(); // number of states
 
       // check y
-      if (!check_finite(function, y, "y", &lp))
-        return lp;
-      if (!check_not_nan(function, y, "y", &lp))
-        return lp;
+      check_finite(function, y, "y", &lp);
+      check_not_nan(function, y, "y", &lp);
       // check F
-      if (!check_size_match(function,
-                            F.cols(), "columns of F",
-                            y.rows(), "rows of y",
-                            &lp))
-        return lp;
-      if (!check_size_match(function,
-                            F.rows(), "rows of F",
-                            G.rows(), "rows of G",
-                            &lp))
-        return lp;
-      if (!check_finite(function, F, "F", &lp))
-        return lp;
-      if (!check_not_nan(function, F, "F", &lp))
-        return lp;
+      check_size_match(function,
+                       F.cols(), "columns of F",
+                       y.rows(), "rows of y",
+                       &lp);
+      check_size_match(function,
+                       F.rows(), "rows of F",
+                       G.rows(), "rows of G",
+                       &lp);
+      check_finite(function, F, "F", &lp);
+      check_not_nan(function, F, "F", &lp);
       // check G
-      if (!check_size_match(function,
-                            G.rows(), "rows of G",
-                            G.cols(), "columns of G",
-                            &lp))
-        return lp;
-      if (!check_finite(function, G, "G", &lp))
-        return lp;
-      if (!check_not_nan(function, G, "G", &lp))
-        return lp;
+      check_size_match(function,
+                       G.rows(), "rows of G",
+                       G.cols(), "columns of G",
+                       &lp);
+      check_finite(function, G, "G", &lp);
+      check_not_nan(function, G, "G", &lp);
       // check V
-      if (!check_size_match(function,
-                            V.rows(), "rows of V",
-                            y.rows(), "rows of y",
-                            &lp))
-        return lp;
+      check_size_match(function,
+                       V.rows(), "rows of V",
+                       y.rows(), "rows of y",
+                       &lp);
       // TODO: incorporate support for infinite V
-      if (!check_finite(function, V, "V", &lp))
-        return lp;
-      if (!check_not_nan(function, V, "V", &lp))
-        return lp;
-      if (!check_spsd_matrix(function, V, "V", &lp))
-        return lp;
+      check_finite(function, V, "V", &lp);
+      check_not_nan(function, V, "V", &lp);
+      check_spsd_matrix(function, V, "V", &lp);
       // check W
-      if (!check_size_match(function,
-                            W.rows(), "rows of W",
-                            G.rows(), "rows of G",
-                            &lp))
-        return lp;
+      check_size_match(function,
+                       W.rows(), "rows of W",
+                       G.rows(), "rows of G",
+                       &lp);
       // TODO: incorporate support for infinite W
-      if (!check_finite(function, W, "W", &lp))
-        return lp;
-      if (!check_not_nan(function, W, "W", &lp))
-        return lp;
-      if (!check_spsd_matrix(function, W, "W", &lp))
-        return lp;
+      check_finite(function, W, "W", &lp);
+      check_not_nan(function, W, "W", &lp);
+      check_spsd_matrix(function, W, "W", &lp);
       // check m0
-      if (!check_size_match(function,
-                            m0.size(), "size of m0",
-                            G.rows(), "rows of G",
-                            &lp))
-        return lp;
-      if (!check_finite(function, m0, "m0", &lp))
-        return lp;
-      if (!check_not_nan(function, m0, "m0", &lp))
-        return lp;
+      check_size_match(function,
+                       m0.size(), "size of m0",
+                       G.rows(), "rows of G",
+                       &lp);
+      check_finite(function, m0, "m0", &lp);
+      check_not_nan(function, m0, "m0", &lp);
       // check C0
-      if (!check_size_match(function,
-                            C0.rows(), "rows of C0",
-                            G.rows(), "rows of G",
-                            &lp))
-        return lp;
-      if (!check_cov_matrix(function, C0, "C0", &lp))
-        return lp;
-      if (!check_finite(function, C0, "C0", &lp))
-        return lp;
-      if (!check_not_nan(function, C0, "C0", &lp))
-        return lp;
+      check_size_match(function,
+                       C0.rows(), "rows of C0",
+                       G.rows(), "rows of G",
+                       &lp);
+      check_cov_matrix(function, C0, "C0", &lp);
+      check_finite(function, C0, "C0", &lp);
+      check_not_nan(function, C0, "C0", &lp);
 
       if (y.cols() == 0 || y.rows() == 0)
         return lp;
@@ -342,83 +318,59 @@ namespace stan {
       int n = G.rows(); // number of states
 
       // check y
-      if (!check_finite(function, y, "y", &lp))
-        return lp;
-      if (!check_not_nan(function, y, "y", &lp))
-        return lp;
+      check_finite(function, y, "y", &lp);
+      check_not_nan(function, y, "y", &lp);
       // check F
-      if (!check_size_match(function,
-                            F.cols(), "columns of F",
-                            y.rows(), "rows of y",
-                            &lp))
-        return lp;
-      if (!check_size_match(function,
-                            F.rows(), "rows of F",
-                            G.rows(), "rows of G",
-                            &lp))
-        return lp;
-      if (!check_finite(function, F, "F", &lp))
-        return lp;
-      if (!check_not_nan(function, F, "F", &lp))
-        return lp;
+      check_size_match(function,
+                       F.cols(), "columns of F",
+                       y.rows(), "rows of y",
+                       &lp);
+      check_size_match(function,
+                       F.rows(), "rows of F",
+                       G.rows(), "rows of G",
+                       &lp);
+      check_finite(function, F, "F", &lp);
+      check_not_nan(function, F, "F", &lp);
       // check G
-      if (!check_size_match(function,
-                            G.rows(), "rows of G",
-                            G.cols(), "columns of G",
-                            &lp))
-        return lp;
-      if (!check_finite(function, G, "G", &lp))
-        return lp;
-      if (!check_not_nan(function, G, "G", &lp))
-        return lp;
+      check_size_match(function,
+                       G.rows(), "rows of G",
+                       G.cols(), "columns of G",
+                       &lp);
+      check_finite(function, G, "G", &lp);
+      check_not_nan(function, G, "G", &lp);
       // check V
-      if (!check_nonnegative(function, V, "V", &lp))
-        return lp;
-      if (!check_size_match(function,
-                            V.size(), "size of V",
-                            y.rows(), "rows of y",
-                            &lp))
-        return lp;
+      check_nonnegative(function, V, "V", &lp);
+      check_size_match(function,
+                       V.size(), "size of V",
+                       y.rows(), "rows of y",
+                       &lp);
       // TODO: support infinite V
-      if (!check_finite(function, V, "V", &lp))
-        return lp;
-      if (!check_not_nan(function, V, "V", &lp))
-        return lp;
+      check_finite(function, V, "V", &lp);
+      check_not_nan(function, V, "V", &lp);
       // check W
-      if (!check_spsd_matrix(function, W, "W", &lp))
-        return lp;
-      if (!check_size_match(function,
-                            W.rows(), "rows of W",
-                            G.rows(), "rows of G",
-                            &lp))
-        return lp;
+      check_spsd_matrix(function, W, "W", &lp);
+      check_size_match(function,
+                       W.rows(), "rows of W",
+                       G.rows(), "rows of G",
+                       &lp);
       // TODO: support infinite W
-      if (!check_finite(function, W, "W", &lp))
-        return lp;
-      if (!check_not_nan(function, W, "W", &lp))
-        return lp;
+      check_finite(function, W, "W", &lp);
+      check_not_nan(function, W, "W", &lp);
       // check m0
-      if (!check_size_match(function,
-                            m0.size(), "size of m0",
-                            G.rows(), "rows of G",
-                            &lp))
-        return lp;
-      if (!check_finite(function, m0, "m0", &lp))
-        return lp;
-      if (!check_not_nan(function, m0, "m0", &lp))
-        return lp;
+      check_size_match(function,
+                       m0.size(), "size of m0",
+                       G.rows(), "rows of G",
+                       &lp);
+      check_finite(function, m0, "m0", &lp);
+      check_not_nan(function, m0, "m0", &lp);
       // check C0
-      if (!check_cov_matrix(function, C0, "C0", &lp))
-        return lp;
-      if (!check_size_match(function,
-                            C0.rows(), "rows of C0",
-                            G.rows(), "rows of G",
-                            &lp))
-        return lp;
-      if (!check_finite(function, C0, "C0", &lp))
-        return lp;
-      if (!check_not_nan(function, C0, "C0", &lp))
-        return lp;
+      check_cov_matrix(function, C0, "C0", &lp);
+      check_size_match(function,
+                       C0.rows(), "rows of C0",
+                       G.rows(), "rows of G",
+                       &lp);
+      check_finite(function, C0, "C0", &lp);
+      check_not_nan(function, C0, "C0", &lp);
 
       if (y.cols() == 0 || y.rows() == 0)
         return lp;
