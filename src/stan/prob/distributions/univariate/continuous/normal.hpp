@@ -295,7 +295,7 @@ namespace stan {
         cdf_log += log_half + log(one_p_erf);
 
         // gradients
-        const double rep_deriv = SQRT_TWO_OVER_PI 
+        const T_partials_return rep_deriv = SQRT_TWO_OVER_PI 
           * exp(-scaled_diff * scaled_diff) / one_p_erf;
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] += rep_deriv / sigma_dbl;
@@ -366,7 +366,7 @@ namespace stan {
         ccdf_log += log_half + log(one_m_erf);
 
         // gradients
-        const double rep_deriv = SQRT_TWO_OVER_PI 
+        const T_partials_return rep_deriv = SQRT_TWO_OVER_PI 
           * exp(-scaled_diff * scaled_diff) / one_m_erf;
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] -= rep_deriv / sigma_dbl;
