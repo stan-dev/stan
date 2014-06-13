@@ -96,7 +96,7 @@ namespace stan {
       }
 
 
-      return operands_and_partials.to_var(logp);
+      return operands_and_partials.to_var(logp,y,lambda);
     }
     
     template <typename T_n,
@@ -187,7 +187,7 @@ namespace stan {
         if (!is_constant_struct<T_log_rate>::value)
           operands_and_partials.d_x1[i] += n_vec[i] - exp_alpha[i];
       }
-      return operands_and_partials.to_var(logp);
+      return operands_and_partials.to_var(logp,y,lambda);
     }
     
     template <typename T_n,
@@ -242,7 +242,7 @@ namespace stan {
       // The gradients are technically ill-defined, but treated as zero
       for (size_t i = 0; i < stan::length(n); i++) {
         if (value_of(n_vec[i]) < 0) 
-          return operands_and_partials.to_var(0.0);
+          return operands_and_partials.to_var(0.0,y,lambda);
       }
         
       for (size_t i = 0; i < size; i++) {
@@ -266,7 +266,7 @@ namespace stan {
         for(size_t i = 0; i < stan::length(lambda); ++i) 
           operands_and_partials.d_x1[i] *= P;
       
-      return operands_and_partials.to_var(P);
+      return operands_and_partials.to_var(P,y,lambda);
     }
 
     template <typename T_n, typename T_rate>
@@ -312,13 +312,13 @@ namespace stan {
       // The gradients are technically ill-defined, but treated as neg infinity
       for (size_t i = 0; i < stan::length(n); i++) {
         if (value_of(n_vec[i]) < 0) 
-          return operands_and_partials.to_var(stan::math::negative_infinity());
+          return operands_and_partials.to_var(stan::math::negative_infinity(),y,lambda);
       }
         
       for (size_t i = 0; i < size; i++) {
         // Explicit results for extreme values
         // The gradients are technically ill-defined, but treated as zero
-        if (value_of(n_vec[i]) == std::numeric_limits<double>::infinity())
+        if (value_of(n_vec[i]) == std::numeric_limits<double>::infinity(),y,lambda)
           continue;
           
         const T_partials_return n_dbl = value_of(n_vec[i]);
@@ -332,7 +332,7 @@ namespace stan {
             -= gamma_p_derivative(n_dbl + 1, lambda_dbl) / Pi;
       }
       
-      return operands_and_partials.to_var(P);
+      return operands_and_partials.to_var(P,y,lambda);
     }
 
     template <typename T_n, typename T_rate>
@@ -378,14 +378,14 @@ namespace stan {
       // The gradients are technically ill-defined, but treated as neg infinity
       for (size_t i = 0; i < stan::length(n); i++) {
         if (value_of(n_vec[i]) < 0) 
-          return operands_and_partials.to_var(0.0);
+          return operands_and_partials.to_var(0.0,y,lambda);
       }
         
       for (size_t i = 0; i < size; i++) {
         // Explicit results for extreme values
         // The gradients are technically ill-defined, but treated as zero
         if (value_of(n_vec[i]) == std::numeric_limits<double>::infinity())
-          return operands_and_partials.to_var(stan::math::negative_infinity());
+          return operands_and_partials.to_var(stan::math::negative_infinity(),y,lambda);
           
         const T_partials_return n_dbl = value_of(n_vec[i]);
         const T_partials_return lambda_dbl = value_of(lambda_vec[i]);
@@ -398,7 +398,7 @@ namespace stan {
             += gamma_p_derivative(n_dbl + 1, lambda_dbl) / Pi;
       }
       
-      return operands_and_partials.to_var(P);
+      return operands_and_partials.to_var(P,y,lambda);
     }
 
     template <class RNG>

@@ -150,7 +150,7 @@ namespace stan {
           operands_and_partials.d_x3[n] 
             += (logy_m_mu_div_sigma * logy_m_mu - 1) * inv_sigma[n];
       }
-      return operands_and_partials.to_var(logp);
+      return operands_and_partials.to_var(logp,y,mu,sigma);
     }
 
     template <typename T_y, typename T_loc, typename T_scale>
@@ -205,7 +205,7 @@ namespace stan {
 
       for (size_t i = 0; i < stan::length(y); i++) {
         if (value_of(y_vec[i]) == 0.0) 
-          return operands_and_partials.to_var(0.0);
+          return operands_and_partials.to_var(0.0,y,mu,sigma);
       }
 
       for (size_t n = 0; n < N; n++) {
@@ -240,7 +240,7 @@ namespace stan {
         for (size_t n = 0; n < stan::length(sigma); ++n) 
           operands_and_partials.d_x3[n] *= cdf;
 
-      return operands_and_partials.to_var(cdf);
+      return operands_and_partials.to_var(cdf,y,mu,sigma);
     }
 
     template <typename T_y, typename T_loc, typename T_scale>
@@ -287,7 +287,7 @@ namespace stan {
 
       for (size_t i = 0; i < stan::length(y); i++) {
         if (value_of(y_vec[i]) == 0.0) 
-          return operands_and_partials.to_var(stan::math::negative_infinity());
+          return operands_and_partials.to_var(stan::math::negative_infinity(),y,mu,sigma);
       }
 
       const double log_half = std::log(0.5);
@@ -314,7 +314,7 @@ namespace stan {
             / erfc_calc;
       }
 
-      return operands_and_partials.to_var(cdf_log);
+      return operands_and_partials.to_var(cdf_log,y,mu,sigma);
     }
 
     template <typename T_y, typename T_loc, typename T_scale>
@@ -361,7 +361,7 @@ namespace stan {
 
       for (size_t i = 0; i < stan::length(y); i++) {
         if (value_of(y_vec[i]) == 0.0) 
-          return operands_and_partials.to_var(0.0);
+          return operands_and_partials.to_var(0.0,y,mu,sigma);
       }
 
       const double log_half = std::log(0.5);
@@ -388,7 +388,7 @@ namespace stan {
             / erfc_calc;
       }
 
-      return operands_and_partials.to_var(ccdf_log);
+      return operands_and_partials.to_var(ccdf_log,y,mu,sigma);
     }
 
 

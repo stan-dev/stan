@@ -134,7 +134,7 @@ namespace stan {
             += 1 / lambda_dbl + lambda_dbl * sigma_dbl * sigma_dbl 
             + mu_dbl - y_dbl + deriv_logerfc * sigma_dbl / std::sqrt(2.0);
       }
-      return operands_and_partials.to_var(logp);
+      return operands_and_partials.to_var(logp,y,mu,sigma,lambda);
     }
 
     template <typename T_y, typename T_loc, typename T_scale, 
@@ -206,7 +206,7 @@ namespace stan {
 
         if(boost::math::isinf(y_vec[n])) {
           if (y_vec[n] < 0.0)
-            return operands_and_partials.to_var(0.0);
+            return operands_and_partials.to_var(0.0,y,mu,sigma,lambda);
         }
 
         const T_partials_return y_dbl = value_of(y_vec[n]);
@@ -267,7 +267,7 @@ namespace stan {
           operands_and_partials.d_x4[n] *= cdf;
       }
 
-      return operands_and_partials.to_var(cdf);
+      return operands_and_partials.to_var(cdf,y,mu,sigma,lambda);
     }
 
     template <typename T_y, typename T_loc, typename T_scale, 
@@ -331,7 +331,7 @@ namespace stan {
 
         if(boost::math::isinf(y_vec[n])) {
           if (y_vec[n] < 0.0)
-            return operands_and_partials.to_var(stan::math::negative_infinity());
+            return operands_and_partials.to_var(stan::math::negative_infinity(),y,mu,sigma,lambda);
           else
             return operands_and_partials.to_var(0.0);
         }
@@ -383,7 +383,7 @@ namespace stan {
             / denom;
       }
 
-      return operands_and_partials.to_var(cdf_log);
+      return operands_and_partials.to_var(cdf_log,y,mu,sigma,lambda);
     }
 
     template <typename T_y, typename T_loc, typename T_scale, 
@@ -447,7 +447,7 @@ namespace stan {
 
         if(boost::math::isinf(y_vec[n])) {
           if (y_vec[n] > 0.0)
-            return operands_and_partials.to_var(stan::math::negative_infinity());
+            return operands_and_partials.to_var(stan::math::negative_infinity(),y,mu,sigma,lambda);
           else
             return operands_and_partials.to_var(0.0);
         }
@@ -498,7 +498,7 @@ namespace stan {
             / ccdf_;
       }
 
-      return operands_and_partials.to_var(ccdf_log);
+      return operands_and_partials.to_var(ccdf_log,y,mu,sigma,lambda);
     }
 
     template <class RNG>

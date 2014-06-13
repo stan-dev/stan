@@ -214,7 +214,7 @@ namespace stan {
         cdf *= cdf_;
 
         // gradients
-        const double rep_deriv = SQRT_TWO_OVER_PI * 0.5 
+        const T_partials_return rep_deriv = SQRT_TWO_OVER_PI * 0.5 
           * exp(-scaled_diff * scaled_diff) / cdf_ / sigma_dbl;
         if (!is_constant_struct<T_y>::value)
           operands_and_partials.d_x1[n] += rep_deriv;
@@ -234,7 +234,7 @@ namespace stan {
         for (size_t n = 0; n < stan::length(sigma); ++n) 
           operands_and_partials.d_x3[n] *= cdf;
 
-      return operands_and_partials.to_var(cdf);
+      return operands_and_partials.to_var(cdf,y,mu,sigma);
     }
 
     template <typename T_y, typename T_loc, typename T_scale>
@@ -305,7 +305,7 @@ namespace stan {
           operands_and_partials.d_x3[n] -= rep_deriv * scaled_diff 
             * stan::math::SQRT_2 / sigma_dbl;
       }
-      return operands_and_partials.to_var(cdf_log);
+      return operands_and_partials.to_var(cdf_log,y,mu,sigma);
     }
 
     template <typename T_y, typename T_loc, typename T_scale>
@@ -376,7 +376,7 @@ namespace stan {
           operands_and_partials.d_x3[n] += rep_deriv * scaled_diff 
             * stan::math::SQRT_2 / sigma_dbl;
       }
-      return operands_and_partials.to_var(ccdf_log);
+      return operands_and_partials.to_var(ccdf_log,y,mu,sigma);
     }
 
     template <class RNG>

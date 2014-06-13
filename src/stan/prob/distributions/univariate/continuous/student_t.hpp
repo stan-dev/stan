@@ -228,7 +228,7 @@ namespace stan {
             * (square_y_minus_mu_over_sigma__over_nu[n] * inv_sigma);
         }
       }
-      return operands_and_partials.to_var(logp);
+      return operands_and_partials.to_var(logp,y,nu,mu,sigma);
     }
 
     template <typename T_y, typename T_dof, typename T_loc, typename T_scale>
@@ -287,7 +287,7 @@ namespace stan {
       // The gradients are technically ill-defined, but treated as zero
       for (size_t i = 0; i < stan::length(y); i++) {
         if (value_of(y_vec[i]) == -std::numeric_limits<double>::infinity()) 
-          return operands_and_partials.to_var(0.0);
+          return operands_and_partials.to_var(0.0,y,nu,mu,sigma);
       }
           
       using boost::math::ibeta;
@@ -427,7 +427,7 @@ namespace stan {
         for(size_t n = 0; n < stan::length(sigma); ++n)
           operands_and_partials.d_x4[n] *= P;
           
-      return operands_and_partials.to_var(P);
+      return operands_and_partials.to_var(P,y,nu,mu,sigma);
     }
           
     template <typename T_y, typename T_dof, typename T_loc, typename T_scale>
@@ -478,7 +478,7 @@ namespace stan {
       // The gradients are technically ill-defined, but treated as zero
       for (size_t i = 0; i < stan::length(y); i++) {
         if (value_of(y_vec[i]) == -std::numeric_limits<double>::infinity()) 
-          return operands_and_partials.to_var(stan::math::negative_infinity());
+          return operands_and_partials.to_var(stan::math::negative_infinity(),y,nu,mu,sigma);
       }
           
       using boost::math::ibeta;
@@ -606,7 +606,7 @@ namespace stan {
           }
       }
 
-      return operands_and_partials.to_var(P);
+      return operands_and_partials.to_var(P,y,nu,mu,sigma);
     }
 
     template <typename T_y, typename T_dof, typename T_loc, typename T_scale>
@@ -657,7 +657,7 @@ namespace stan {
       // The gradients are technically ill-defined, but treated as zero
       for (size_t i = 0; i < stan::length(y); i++) {
         if (value_of(y_vec[i]) == -std::numeric_limits<double>::infinity()) 
-          return operands_and_partials.to_var(0.0);
+          return operands_and_partials.to_var(0.0,y,nu,mu,sigma);
       }
           
       using boost::math::ibeta;
@@ -703,7 +703,7 @@ namespace stan {
         // Explicit results for extreme values
         // The gradients are technically ill-defined, but treated as zero
         if (value_of(y_vec[n]) == std::numeric_limits<double>::infinity()) {
-          return operands_and_partials.to_var(stan::math::negative_infinity());
+          return operands_and_partials.to_var(stan::math::negative_infinity(),y,nu,mu,sigma);
         }
                     
         const T_partials_return sigma_inv = 1.0 / value_of(sigma_vec[n]);
@@ -785,7 +785,7 @@ namespace stan {
           }
       }
 
-      return operands_and_partials.to_var(P);
+      return operands_and_partials.to_var(P,y,nu,mu,sigma);
     }
 
     template <class RNG>

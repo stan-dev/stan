@@ -140,7 +140,7 @@ namespace stan {
             += 1.0 - n_plus_phi[i]/(mu__[i] + phi__[i])
             + log_phi[i] - log_mu_plus_phi[i] - digamma(phi__[i]) + digamma(n_plus_phi[i]);
       }
-      return operands_and_partials.to_var(logp);
+      return operands_and_partials.to_var(logp,n,eta,phi);
     }
 
     template <typename T_n,
@@ -269,7 +269,7 @@ namespace stan {
             += 1.0 - n_plus_phi[i]/(exp(eta__[i]) + phi__[i])
             + log_phi[i] - logsumexp_eta_logphi[i] - digamma(phi__[i]) + digamma(n_plus_phi[i]);
       }
-      return operands_and_partials.to_var(logp);
+      return operands_and_partials.to_var(logp,n,eta,phi);
     }
 
     template <typename T_n,

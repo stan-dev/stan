@@ -86,14 +86,15 @@ TEST(ProbAgradDistributionsNormal, FvarVar_2ndDeriv) {
   using stan::agrad::var;
   using stan::prob::normal_log;
    
-  fvar<var> y_ (2,1);
-  double mu (0);
-  double sigma (1);
-
+  double y_ (1);
+  fvar<var> mu (0,1);
+  fvar<var> sigma (1,1);
   fvar<var> logp = normal_log(y_,mu,sigma);
 
-  AVEC y = createAVEC(y_.val_);
+  std::cout<<logp<<std::endl;
+  AVEC y = createAVEC(mu.val_,sigma.val_);
   VEC g;
   logp.d_.grad(y,g);
   EXPECT_FLOAT_EQ(-1, g[0]);
+  EXPECT_FLOAT_EQ(-1, g[1]);
 }

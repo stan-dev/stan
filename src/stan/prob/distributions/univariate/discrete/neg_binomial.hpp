@@ -174,7 +174,7 @@ namespace stan {
               - n_vec[i]  / (value_of(beta_vec[i]) + 1.0);
         }
       }
-      return operands_and_partials.to_var(logp);
+      return operands_and_partials.to_var(logp,n,alpha,beta);
     }
 
     template <typename T_n, 
@@ -251,7 +251,7 @@ namespace stan {
       // The gradients are technically ill-defined, but treated as zero
       for (size_t i = 0; i < stan::length(n); i++) {
         if (value_of(n_vec[i]) <= 0) 
-          return operands_and_partials.to_var(0.0);
+          return operands_and_partials.to_var(0.0,n,alpha,beta);
       }
           
       // Cache a few expensive function calls if alpha is a parameter
@@ -336,7 +336,7 @@ namespace stan {
         for(size_t i = 0; i < stan::length(beta); ++i)
           operands_and_partials.d_x2[i] *= P;
           
-      return operands_and_partials.to_var(P);
+      return operands_and_partials.to_var(P,n,alpha,beta);
           
     }
 
@@ -397,7 +397,7 @@ namespace stan {
       // The gradients are technically ill-defined, but treated as zero
       for (size_t i = 0; i < stan::length(n); i++) {
         if (value_of(n_vec[i]) <= 0) 
-          return operands_and_partials.to_var(stan::math::negative_infinity());
+          return operands_and_partials.to_var(stan::math::negative_infinity(),n,alpha,beta);
       }
           
       // Cache a few expensive function calls if alpha is a parameter
@@ -464,7 +464,7 @@ namespace stan {
             += d_dbl * ibeta_derivative(alpha_dbl, n_dbl + 1, p_dbl) / Pi;
       }
           
-      return operands_and_partials.to_var(P);
+      return operands_and_partials.to_var(P,n,alpha,beta);
     }
 
     template <typename T_n, typename T_shape, 
@@ -524,7 +524,7 @@ namespace stan {
       // The gradients are technically ill-defined, but treated as zero
       for (size_t i = 0; i < stan::length(n); i++) {
         if (value_of(n_vec[i]) <= 0) 
-          return operands_and_partials.to_var(0.0);
+          return operands_and_partials.to_var(0.0,n,alpha,beta);
       }
           
       // Cache a few expensive function calls if alpha is a parameter
@@ -562,7 +562,7 @@ namespace stan {
         // The gradients are technically ill-defined, but treated as zero
         if (value_of(n_vec[i]) 
             == std::numeric_limits<double>::infinity())
-          return operands_and_partials.to_var(stan::math::negative_infinity());
+          return operands_and_partials.to_var(stan::math::negative_infinity(),n,alpha,beta);
               
         const T_partials_return n_dbl = value_of(n_vec[i]);
         const T_partials_return alpha_dbl = value_of(alpha_vec[i]);
@@ -591,7 +591,7 @@ namespace stan {
             -= d_dbl * ibeta_derivative(alpha_dbl, n_dbl + 1, p_dbl) / Pi;
       }
           
-      return operands_and_partials.to_var(P);
+      return operands_and_partials.to_var(P,n,alpha,beta);
     }
       
     template <class RNG>

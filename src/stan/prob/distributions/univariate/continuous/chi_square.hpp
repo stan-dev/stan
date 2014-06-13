@@ -142,7 +142,7 @@ namespace stan {
             += NEG_LOG_TWO_OVER_TWO - digamma_half_nu_over_two[n] + log_y[n]*0.5; 
         }
       }
-      return operands_and_partials.to_var(logp);
+      return operands_and_partials.to_var(logp,y,nu);
     }
 
     template <typename T_y, typename T_dof>
@@ -206,7 +206,7 @@ namespace stan {
       // The gradients are technically ill-defined, but treated as zero
       for (size_t i = 0; i < stan::length(y); i++) {
         if (value_of(y_vec[i]) == 0) 
-          return operands_and_partials.to_var(0.0);
+          return operands_and_partials.to_var(0.0,y,nu);
       }
           
       // Compute CDF and its gradients
@@ -268,7 +268,7 @@ namespace stan {
         for (size_t n = 0; n < stan::length(nu); ++n) 
           operands_and_partials.d_x2[n] *= cdf;
           
-      return operands_and_partials.to_var(cdf);
+      return operands_and_partials.to_var(cdf,y,nu);
     }
 
     template <typename T_y, typename T_dof>
@@ -316,7 +316,7 @@ namespace stan {
       // The gradients are technically ill-defined, but treated as zero
       for (size_t i = 0; i < stan::length(y); i++) {
         if (value_of(y_vec[i]) == 0) 
-          return operands_and_partials.to_var(stan::math::negative_infinity());
+          return operands_and_partials.to_var(stan::math::negative_infinity(),y,nu);
       }
           
       // Compute cdf_log and its gradients
@@ -348,7 +348,7 @@ namespace stan {
         // Explicit results for extreme values
         // The gradients are technically ill-defined, but treated as zero
         if (value_of(y_vec[n]) == std::numeric_limits<double>::infinity())
-          return operands_and_partials.to_var(0.0);
+          return operands_and_partials.to_var(0.0,y,nu);
               
         // Pull out values
         const T_partials_return y_dbl = value_of(y_vec[n]);
@@ -371,7 +371,7 @@ namespace stan {
                                                  digamma_vec[n]) / Pn;
       }
           
-      return operands_and_partials.to_var(cdf_log);
+      return operands_and_partials.to_var(cdf_log,y,nu);
     }
 
     template <typename T_y, typename T_dof>
@@ -419,7 +419,7 @@ namespace stan {
       // The gradients are technically ill-defined, but treated as zero
       for (size_t i = 0; i < stan::length(y); i++) {
         if (value_of(y_vec[i]) == 0) 
-          return operands_and_partials.to_var(0.0);
+          return operands_and_partials.to_var(0.0,y,nu);
       }
           
       // Compute ccdf_log and its gradients
@@ -451,7 +451,7 @@ namespace stan {
         // Explicit results for extreme values
         // The gradients are technically ill-defined, but treated as zero
         if (value_of(y_vec[n]) == std::numeric_limits<double>::infinity())
-          return operands_and_partials.to_var(stan::math::negative_infinity());
+          return operands_and_partials.to_var(stan::math::negative_infinity(),y,nu);
               
         // Pull out values
         const T_partials_return y_dbl = value_of(y_vec[n]);
@@ -474,7 +474,7 @@ namespace stan {
                                                  digamma_vec[n]) / Pn;
       }
           
-      return operands_and_partials.to_var(ccdf_log);
+      return operands_and_partials.to_var(ccdf_log,y,nu);
     }
 
     template <class RNG>

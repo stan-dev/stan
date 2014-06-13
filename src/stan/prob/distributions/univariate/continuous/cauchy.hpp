@@ -134,7 +134,7 @@ namespace stan {
         if (!is_constant_struct<T_scale>::value)
           operands_and_partials.d_x3[n] += (y_minus_mu_squared - sigma_squared[n]) * inv_sigma[n] / (sigma_squared[n] + y_minus_mu_squared);
       }
-      return operands_and_partials.to_var(logp);
+      return operands_and_partials.to_var(logp,y,mu,sigma);
     }
 
     template <typename T_y, typename T_loc, typename T_scale>
@@ -208,7 +208,7 @@ namespace stan {
       // The gradients are technically ill-defined, but treated as zero
       for (size_t i = 0; i < stan::length(y); i++) {
         if (value_of(y_vec[i]) == -std::numeric_limits<double>::infinity()) 
-          return operands_and_partials.to_var(0.0);
+          return operands_and_partials.to_var(0.0,y,mu,sigma);
       }
         
       // Compute CDF and its gradients
@@ -261,7 +261,7 @@ namespace stan {
           operands_and_partials.d_x3[n] *= P;
       }
         
-      return operands_and_partials.to_var(P);
+      return operands_and_partials.to_var(P,y,mu,sigma);
     }
 
     template <typename T_y, typename T_loc, typename T_scale>
@@ -335,7 +335,7 @@ namespace stan {
         if (!is_constant_struct<T_scale>::value)
           operands_and_partials.d_x3[n] -= rep_deriv * z;
       }
-      return operands_and_partials.to_var(cdf_log);
+      return operands_and_partials.to_var(cdf_log,y,mu,sigma);
     }
 
     template <typename T_y, typename T_loc, typename T_scale>
@@ -408,7 +408,7 @@ namespace stan {
         if (!is_constant_struct<T_scale>::value)
           operands_and_partials.d_x3[n] += rep_deriv * z;
       }
-      return operands_and_partials.to_var(ccdf_log);
+      return operands_and_partials.to_var(ccdf_log,y,mu,sigma);
     }
 
     template <class RNG>

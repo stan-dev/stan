@@ -177,7 +177,7 @@ namespace stan {
             += nu_dbl / s_dbl - nu_dbl * inv_y[n] * s_dbl;
         }
       }
-      return operands_and_partials.to_var(logp);
+      return operands_and_partials.to_var(logp,y,nu,s);
     }
 
     template <typename T_y, typename T_dof, typename T_scale>
@@ -256,7 +256,7 @@ namespace stan {
           
       for (size_t i = 0; i < stan::length(y); i++) {
         if (value_of(y_vec[i]) == 0) 
-          return operands_and_partials.to_var(0.0);
+          return operands_and_partials.to_var(0.0,y,nu,s);
       }
           
       // Compute CDF and its gradients
@@ -335,7 +335,7 @@ namespace stan {
         for(size_t n = 0; n < stan::length(s); ++n) 
           operands_and_partials.d_x3[n] *= P;
           
-      return operands_and_partials.to_var(P);
+      return operands_and_partials.to_var(P,y,nu,s);
     }
       
     template <typename T_y, typename T_dof, typename T_scale>
@@ -392,7 +392,7 @@ namespace stan {
       // The gradients are technically ill-defined, but treated as zero
       for (size_t i = 0; i < stan::length(y); i++) {
         if (value_of(y_vec[i]) == 0) 
-          return operands_and_partials.to_var(stan::math::negative_infinity());
+          return operands_and_partials.to_var(stan::math::negative_infinity(),y,nu,s);
       }
           
       // Compute cdf_log and its gradients
@@ -458,7 +458,7 @@ namespace stan {
             * gamma_p_derivative(half_nu_dbl, half_nu_s2_overx_dbl) / Pn;
       }
 
-      return operands_and_partials.to_var(P);
+      return operands_and_partials.to_var(P,y,nu,s);
     }      
 
     template <typename T_y, typename T_dof, typename T_scale>
@@ -515,7 +515,7 @@ namespace stan {
       // The gradients are technically ill-defined, but treated as zero
       for (size_t i = 0; i < stan::length(y); i++) {
         if (value_of(y_vec[i]) == 0) 
-          return operands_and_partials.to_var(0.0);
+          return operands_and_partials.to_var(0.0,y,nu,s);
       }
           
       // Compute cdf_log and its gradients
@@ -546,7 +546,7 @@ namespace stan {
         // Explicit results for extreme values
         // The gradients are technically ill-defined, but treated as zero
         if (value_of(y_vec[n]) == std::numeric_limits<double>::infinity()) {
-          return operands_and_partials.to_var(stan::math::negative_infinity());
+          return operands_and_partials.to_var(stan::math::negative_infinity(),y,nu,s);
         }
               
         // Pull out values
@@ -581,7 +581,7 @@ namespace stan {
             * gamma_p_derivative(half_nu_dbl, half_nu_s2_overx_dbl) / Pn;
       }
 
-      return operands_and_partials.to_var(P);
+      return operands_and_partials.to_var(P,y,nu,s);
     }  
 
     template <class RNG>

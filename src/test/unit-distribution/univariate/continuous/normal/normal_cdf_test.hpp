@@ -16,29 +16,29 @@ public:
         vector<double>& cdf) {
     vector<double> param(3);
 
-    param[0] = 0;           // y
-    param[1] = 0;           // mu
+    param[0] = 0.1;           // y
+    param[1] = 0.5;           // mu
     param[2] = 1;           // sigma
     parameters.push_back(param);
-    cdf.push_back(0.5);     // expected cdf
+    cdf.push_back(0.3445782583896758177744);     // expected cdf
 
     param[0] = 1;           // y
-    param[1] = 0;           // mu
+    param[1] = 0.1;           // mu
     param[2] = 1;           // sigma
     parameters.push_back(param);
-    cdf.push_back(0.8413447); // expected cdf
+    cdf.push_back(0.8159398746532404711473); // expected cdf
 
     param[0] = -2;          // y
-    param[1] = 0;           // mu
+    param[1] = 0.1;           // mu
     param[2] = 1;           // sigma
     parameters.push_back(param);
-    cdf.push_back(0.02275013); // expected cdf
+    cdf.push_back(0.01786442056281655615946); // expected cdf
 
     param[0] = -3.5;          // y
     param[1] = 1.9;           // mu
     param[2] = 7.2;           // sigma
     parameters.push_back(param);
-    cdf.push_back(0.2266274); // expected cdf
+    cdf.push_back(0.22662735237686821); // expected cdf
   }
   
   void invalid_values(vector<size_t>& index, 

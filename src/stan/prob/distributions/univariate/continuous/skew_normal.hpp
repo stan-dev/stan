@@ -136,7 +136,7 @@ namespace stan {
           operands_and_partials.d_x4[n] 
             += deriv_logerf * y_minus_mu_over_sigma / std::sqrt(2.0);
       }
-      return operands_and_partials.to_var(logp);
+      return operands_and_partials.to_var(logp,y,mu,sigma,alpha);
     }
 
     template <typename T_y, typename T_loc, typename T_scale, typename T_shape>
@@ -248,7 +248,7 @@ namespace stan {
         for (size_t n = 0; n < stan::length(alpha); ++n) 
           operands_and_partials.d_x4[n] *= cdf;
 
-      return operands_and_partials.to_var(cdf);    
+      return operands_and_partials.to_var(cdf,y,mu,sigma,alpha);    
     }
 
     template <typename T_y, typename T_loc, typename T_scale, typename T_shape>
@@ -339,7 +339,7 @@ namespace stan {
                 + alpha_dbl_sq)) / ((1 + alpha_dbl_sq) * 2.0 * pi()) / cdf_log_;
       }
 
-      return operands_and_partials.to_var(cdf_log);    
+      return operands_and_partials.to_var(cdf_log,y,mu,sigma,alpha);    
     }
 
     template <typename T_y, typename T_loc, typename T_scale, typename T_shape>
@@ -430,7 +430,7 @@ namespace stan {
                    + alpha_dbl_sq)) / ((1 + alpha_dbl_sq) * 2.0 * pi()) / ccdf_log_;
       }
 
-      return operands_and_partials.to_var(ccdf_log);    
+      return operands_and_partials.to_var(ccdf_log,y,mu,sigma,alpha);    
     }
 
     template <class RNG>

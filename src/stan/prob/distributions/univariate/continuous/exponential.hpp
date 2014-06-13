@@ -100,7 +100,7 @@ namespace stan {
         if (!is_constant_struct<T_inv_scale>::value) 
           operands_and_partials.d_x2[n] += 1 / beta_dbl - y_dbl;
       }
-      return operands_and_partials.to_var(logp);
+      return operands_and_partials.to_var(logp,y,beta);
     }
     
     template <typename T_y, typename T_inv_scale>
@@ -182,7 +182,7 @@ namespace stan {
           operands_and_partials.d_x2[n] += rep_deriv * y_dbl * cdf;
       }
 
-      return operands_and_partials.to_var(cdf);
+      return operands_and_partials.to_var(cdf,y,beta);
     }
 
     template <typename T_y, typename T_inv_scale>
@@ -234,7 +234,7 @@ namespace stan {
         if (!is_constant_struct<T_inv_scale>::value)
           operands_and_partials.d_x2[n] -= rep_deriv * y_dbl;
       }
-      return operands_and_partials.to_var(cdf_log);
+      return operands_and_partials.to_var(cdf_log,y,beta);
     }
 
     template <typename T_y, typename T_inv_scale>
@@ -284,7 +284,7 @@ namespace stan {
         if (!is_constant_struct<T_inv_scale>::value)
           operands_and_partials.d_x2[n] -= y_dbl;
       }
-      return operands_and_partials.to_var(ccdf_log);
+      return operands_and_partials.to_var(ccdf_log,y,beta);
     }
 
     template <class RNG>

@@ -133,7 +133,7 @@ namespace stan {
           operands_and_partials.d_x3[n] 
             += 1 / alpha_dbl + log_y_min[n] - log_y[n];
       }
-      return operands_and_partials.to_var(logp);
+      return operands_and_partials.to_var(logp,y,y_min,alpha);
     }
 
     template <typename T_y, typename T_scale, typename T_shape>
@@ -197,7 +197,7 @@ namespace stan {
           
       for (size_t i = 0; i < stan::length(y); i++) {
         if (value_of(y_vec[i]) < value_of(y_min_vec[i])) 
-          return operands_and_partials.to_var(0.0);
+          return operands_and_partials.to_var(0.0,y,y_min,alpha);
       }
           
       // Compute vectorized CDF and its gradients
@@ -246,7 +246,7 @@ namespace stan {
           operands_and_partials.d_x3[n] *= P;
       }
           
-      return operands_and_partials.to_var(P);
+      return operands_and_partials.to_var(P,y,y_min,alpha);
     }
 
     template <typename T_y, typename T_scale, typename T_shape>
@@ -302,7 +302,7 @@ namespace stan {
           
       for (size_t i = 0; i < stan::length(y); i++) {
         if (value_of(y_vec[i]) < value_of(y_min_vec[i])) 
-          return operands_and_partials.to_var(stan::math::negative_infinity());
+          return operands_and_partials.to_var(stan::math::negative_infinity(),y,y_min,alpha);
       }
           
       // Compute vectorized cdf_log and its gradients
@@ -312,7 +312,7 @@ namespace stan {
         // Explicit results for extreme values
         // The gradients are technically ill-defined, but treated as zero
         if (value_of(y_vec[n]) == std::numeric_limits<double>::infinity()) {
-          return operands_and_partials.to_var(0.0);
+          return operands_and_partials.to_var(0.0,y,y_min,alpha);
         }
               
         // Pull out values
@@ -337,7 +337,7 @@ namespace stan {
             -= exp( alpha_dbl * log_dbl ) * log_dbl / Pn;
       }
           
-      return operands_and_partials.to_var(P);
+      return operands_and_partials.to_var(P,y,y_min,alpha);
     }
 
     template <typename T_y, typename T_scale, typename T_shape>
@@ -394,7 +394,7 @@ namespace stan {
           
       for (size_t i = 0; i < stan::length(y); i++) {
         if (value_of(y_vec[i]) < value_of(y_min_vec[i])) 
-          return operands_and_partials.to_var(0.0);
+          return operands_and_partials.to_var(0.0,y,y_min,alpha);
       }
           
       // Compute vectorized cdf_log and its gradients
@@ -404,7 +404,7 @@ namespace stan {
         // Explicit results for extreme values
         // The gradients are technically ill-defined, but treated as zero
         if (value_of(y_vec[n]) == std::numeric_limits<double>::infinity()) {
-          return operands_and_partials.to_var(stan::math::negative_infinity());
+          return operands_and_partials.to_var(stan::math::negative_infinity(),y,y_min,alpha);
         }
               
         // Pull out values
@@ -424,7 +424,7 @@ namespace stan {
           operands_and_partials.d_x3[n] += log_dbl;
       }
           
-      return operands_and_partials.to_var(P);
+      return operands_and_partials.to_var(P,y,y_min,alpha);
     }
       
     template <class RNG>

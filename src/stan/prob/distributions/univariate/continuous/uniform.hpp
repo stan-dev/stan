@@ -120,7 +120,7 @@ namespace stan {
         if (!is_constant_struct<T_high>::value)
           operands_and_partials.d_x3[n] -= inv_beta_minus_alpha[n];
       }
-      return operands_and_partials.to_var(logp);
+      return operands_and_partials.to_var(logp,y,alpha,beta);
     }
 
     template <typename T_y, typename T_low, typename T_high>
@@ -209,7 +209,7 @@ namespace stan {
         for (size_t n = 0; n < stan::length(beta); ++n) 
           operands_and_partials.d_x3[n] *= cdf;
 
-      return operands_and_partials.to_var(cdf);
+      return operands_and_partials.to_var(cdf,y,alpha,beta);
     }
    
     template <typename T_y, typename T_low, typename T_high>
@@ -262,7 +262,7 @@ namespace stan {
             || y_dbl > value_of(beta_vec[n]))
           return stan::math::negative_infinity();
         if (y_dbl == value_of(beta_vec[n]))
-          return operands_and_partials.to_var(0.0);
+          return operands_and_partials.to_var(0.0,y,alpha,beta);
       }
 
       for (size_t n = 0; n < N; n++) {
@@ -285,7 +285,7 @@ namespace stan {
           operands_and_partials.d_x3[n] -= 1.0 / b_min_a;
       }
 
-      return operands_and_partials.to_var(cdf_log);
+      return operands_and_partials.to_var(cdf_log,y,alpha,beta);
     }
 
   template <typename T_y, typename T_low, typename T_high>
@@ -361,7 +361,7 @@ namespace stan {
             / b_min_a / ccdf_log_;
       }
 
-      return operands_and_partials.to_var(ccdf_log);
+      return operands_and_partials.to_var(ccdf_log,y,alpha,beta);
     }
 
     template <class RNG>

@@ -133,7 +133,7 @@ namespace stan {
             - 0.5*log_y[n];
         }
       }
-      return operands_and_partials.to_var(logp);
+      return operands_and_partials.to_var(logp,y,nu);
     }
 
     template <typename T_y, typename T_dof>
@@ -190,7 +190,7 @@ namespace stan {
 
       for (size_t i = 0; i < stan::length(y); i++)
         if (value_of(y_vec[i]) == 0) 
-          return operands_and_partials.to_var(0.0);
+          return operands_and_partials.to_var(0.0,y,nu);
         
       // Compute CDF and its gradients
       using boost::math::gamma_p_derivative;
@@ -252,7 +252,7 @@ namespace stan {
         for (size_t n = 0; n < stan::length(nu); ++n) 
           operands_and_partials.d_x2[n] *= P;
           
-      return operands_and_partials.to_var(P);
+      return operands_and_partials.to_var(P,y,nu);
     }
 
     template <typename T_y, typename T_dof>
@@ -301,7 +301,7 @@ namespace stan {
 
       for (size_t i = 0; i < stan::length(y); i++)
         if (value_of(y_vec[i]) == 0) 
-          return operands_and_partials.to_var(stan::math::negative_infinity());
+          return operands_and_partials.to_var(stan::math::negative_infinity(),y,nu);
         
       // Compute cdf_log and its gradients
       using boost::math::gamma_p_derivative;
@@ -355,7 +355,7 @@ namespace stan {
                                                  digamma_vec[n]) / Pn;
       }
               
-      return operands_and_partials.to_var(P);
+      return operands_and_partials.to_var(P,y,nu);
     }
       
     template <typename T_y, typename T_dof>
@@ -404,7 +404,7 @@ namespace stan {
 
       for (size_t i = 0; i < stan::length(y); i++)
         if (value_of(y_vec[i]) == 0) 
-          return operands_and_partials.to_var(0.0);
+          return operands_and_partials.to_var(0.0,y,nu);
         
       // Compute ccdf_log and its gradients
       using boost::math::gamma_p_derivative;
@@ -434,7 +434,7 @@ namespace stan {
         // Explicit results for extreme values
         // The gradients are technically ill-defined, but treated as zero
         if (value_of(y_vec[n]) == std::numeric_limits<double>::infinity()) {
-          return operands_and_partials.to_var(stan::math::negative_infinity());
+          return operands_and_partials.to_var(stan::math::negative_infinity(),y,nu);
         }
 
         // Pull out values
@@ -458,7 +458,7 @@ namespace stan {
                                                  digamma_vec[n]) / Pn;
       }
               
-      return operands_and_partials.to_var(P);
+      return operands_and_partials.to_var(P,y,nu);
     }
 
     template <class RNG>

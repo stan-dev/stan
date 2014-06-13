@@ -114,7 +114,7 @@ namespace stan {
           }
         }
       }
-      return operands_and_partials.to_var(logp);
+      return operands_and_partials.to_var(logp,n,theta);
     }
 
     template <typename T_y, typename T_prob>
@@ -202,7 +202,7 @@ namespace stan {
             operands_and_partials.d_x1[n] += sign * exp_m_ntheta / (exp_m_ntheta + 1);
         }
       }
-      return operands_and_partials.to_var(logp);
+      return operands_and_partials.to_var(logp,n,theta);
     }
 
     template <typename T_n,
@@ -257,7 +257,7 @@ namespace stan {
       // The gradients are technically ill-defined, but treated as zero
       for (size_t i = 0; i < stan::length(n); i++) {
         if (value_of(n_vec[i]) < 0) 
-          return operands_and_partials.to_var(0.0);
+          return operands_and_partials.to_var(0.0,n,theta);
       }
           
       for (size_t i = 0; i < size; i++) {
@@ -278,7 +278,7 @@ namespace stan {
       if (!is_constant_struct<T_prob>::value) {
         for(size_t i = 0; i < stan::length(theta); ++i) operands_and_partials.d_x1[i] *= P;
       }
-      return operands_and_partials.to_var(P);
+      return operands_and_partials.to_var(P,n,theta);
     }
       
     template <typename T_n, typename T_prob>
@@ -323,7 +323,7 @@ namespace stan {
       // The gradients are technically ill-defined, but treated as zero
       for (size_t i = 0; i < stan::length(n); i++) {
         if (value_of(n_vec[i]) < 0) 
-          return operands_and_partials.to_var(stan::math::negative_infinity());
+          return operands_and_partials.to_var(stan::math::negative_infinity(),n,theta);
       }
           
       for (size_t i = 0; i < size; i++) {
@@ -341,7 +341,7 @@ namespace stan {
         }
       }
        
-      return operands_and_partials.to_var(P);
+      return operands_and_partials.to_var(P,n,theta);
     }
 
     template <typename T_n, typename T_prob>
@@ -386,7 +386,7 @@ namespace stan {
       // The gradients are technically ill-defined, but treated as zero
       for (size_t i = 0; i < stan::length(n); i++) {
         if (value_of(n_vec[i]) < 0) 
-          return operands_and_partials.to_var(0.0);
+          return operands_and_partials.to_var(0.0,n,theta);
       }
           
       for (size_t i = 0; i < size; i++) {
@@ -394,7 +394,7 @@ namespace stan {
         // Explicit results for extreme values
         // The gradients are technically ill-defined, but treated as zero
         if (value_of(n_vec[i]) >= 1) 
-          return operands_and_partials.to_var(stan::math::negative_infinity());
+          return operands_and_partials.to_var(stan::math::negative_infinity(),n,theta);
         else {
           const T_partials_return Pi = value_of(theta_vec[i]);
                     
@@ -405,7 +405,7 @@ namespace stan {
         }
       }
        
-      return operands_and_partials.to_var(P);
+      return operands_and_partials.to_var(P,n,theta);
     }
 
 

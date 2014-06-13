@@ -116,7 +116,7 @@ namespace stan {
           oap.d_x3[n] += kappa_cos / kappa_dbl[n] - bessel1 / bessel0;
       }
       
-      return oap.to_var(logp);
+      return oap.to_var(logp,y,mu,kappa);
     }
 
     template<typename T_y, typename T_loc, typename T_scale>

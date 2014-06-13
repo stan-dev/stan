@@ -98,7 +98,7 @@ namespace stan {
           operands_and_partials.d_x2[n] 
             += y_over_sigma * scaled_diff - 2.0 * inv_sigma[n];
       }
-      return operands_and_partials.to_var(logp);
+      return operands_and_partials.to_var(logp,y,sigma);
     }
 
     template <typename T_y, typename T_scale>
@@ -184,7 +184,7 @@ namespace stan {
             * inv_sigma[n] * exp_div_1m_exp * cdf;
       }
 
-      return operands_and_partials.to_var(cdf);
+      return operands_and_partials.to_var(cdf,y,sigma);
     }
 
     template <typename T_y, typename T_scale>
@@ -255,7 +255,7 @@ namespace stan {
             * inv_sigma[n] * exp_div_1m_exp;
       }
 
-      return operands_and_partials.to_var(cdf_log);
+      return operands_and_partials.to_var(cdf_log,y,sigma);
     }
 
     template <typename T_y, typename T_scale>
@@ -323,7 +323,7 @@ namespace stan {
             * inv_sigma[n];
       }
 
-      return operands_and_partials.to_var(ccdf_log);
+      return operands_and_partials.to_var(ccdf_log,y,sigma);
     }
 
     template <class RNG>

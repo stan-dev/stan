@@ -206,7 +206,7 @@ namespace stan {
           operands_and_partials.d_x3[n] 
             += log1m_y[n] + digamma_alpha_beta[n] - digamma_beta[n];
       }
-      return operands_and_partials.to_var(logp);
+      return operands_and_partials.to_var(logp,y,alpha,beta);
     }
 
     template <typename T_y, typename T_scale_succ, typename T_scale_fail>
@@ -286,7 +286,7 @@ namespace stan {
       // The gradients are technically ill-defined, but treated as zero
       for (size_t i = 0; i < stan::length(y); i++) {
         if (value_of(y_vec[i]) <= 0) 
-          return operands_and_partials.to_var(0.0);
+          return operands_and_partials.to_var(0.0,y,alpha,beta);
       }
       
       // Compute CDF and its gradients
@@ -387,7 +387,7 @@ namespace stan {
           operands_and_partials.d_x3[n] *= P;
       }
         
-      return operands_and_partials.to_var(P);
+      return operands_and_partials.to_var(P,y,alpha,beta);
     }
 
     template <typename T_y, typename T_scale_succ, typename T_scale_fail>
@@ -521,7 +521,7 @@ namespace stan {
           operands_and_partials.d_x3[n]  += g2 / Pn;
       }
         
-      return operands_and_partials.to_var(cdf_log);
+      return operands_and_partials.to_var(cdf_log,y,alpha,beta);
     }
 
    template <typename T_y, typename T_scale_succ, typename T_scale_fail>
@@ -652,7 +652,7 @@ namespace stan {
           operands_and_partials.d_x3[n] -= g2 / Pn;
       }
         
-      return operands_and_partials.to_var(ccdf_log);
+      return operands_and_partials.to_var(ccdf_log,y,alpha,beta);
     }
 
     template <class RNG>
