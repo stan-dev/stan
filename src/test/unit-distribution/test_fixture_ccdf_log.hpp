@@ -90,6 +90,9 @@ public:
   typedef typename scalar_type<T4>::type Scalar4;
   typedef typename scalar_type<T5>::type Scalar5;
   
+  typedef typename stan::agrad::fvar<typename stan::partials_return_type<T0,T1,T2,T3,T4,T5>::type> T_fvar_return;
+  typedef typename stan::return_type<T0,T1,T2,T3,T4,T5>::type T_return_type;
+
   void call_all_versions() {
     vector<double> ccdf_log;
     vector<vector<double> > parameters;
@@ -121,28 +124,27 @@ public:
       T4 p4 = get_params<T4>(parameters, n, 4);
       T5 p5 = get_params<T5>(parameters, n, 5);
 
-      var ccdf_log(0);
+      T_return_type ccdf_log(0);
       EXPECT_NO_THROW(({ ccdf_log = TestClass.template ccdf_log
               <T0,T1,T2,T3,T4,T5>
               (p0,p1,p2,p3,p4,p5); }))
         << "Valid parameters failed at index: " << n << " -- " 
         << parameters[n];
-      EXPECT_TRUE(ccdf_log.val() <= 0)
+      EXPECT_TRUE(ccdf_log <= 0)
         << "ccdf_log value must be less than or equal to 0. ccdf_log value: " 
         << ccdf_log;
-      EXPECT_TRUE(ccdf_log.val() <= 0)
+      EXPECT_TRUE(ccdf_log <= 0)
         << "ccdf_log value must be less than or equal to 0. ccdf_log value: "
         << ccdf_log;
 
       if (all_scalar<T0,T1,T2,T3,T4,T5>::value) {
-        EXPECT_FLOAT_EQ(expected_ccdf_log[n], ccdf_log.val())
+        EXPECT_TRUE(expected_ccdf_log[n] - ccdf_log < 1e-8)
           << "For all scalar inputs ccdf_log should match the provided value. Failed at index: " << n;
       }
     }
   }
 
   void test_nan_value(const vector<double>& parameters, const size_t n) {
-    var ccdf_log(0);
     vector<double> invalid_params(parameters);
     invalid_params[n] = std::numeric_limits<double>::quiet_NaN();
     
@@ -169,7 +171,6 @@ public:
     TestClass.invalid_values(index, invalid_values);
 
     for (size_t n = 0; n < index.size(); n++) {
-      var ccdf_log(0);
       vector<double> invalid_params(parameters);
       invalid_params[index[n]] = invalid_values[n];
       
@@ -201,14 +202,14 @@ public:
       test_nan_value(parameters, 5);
   }
 
-  void add_finite_diff(const vector<double>& params, 
-                       vector<double>& finite_diff, 
-                       const size_t n) {
+  void add_finite_diff_1storder(const vector<double>& params, 
+                                vector<double>& finite_diff, 
+                                const size_t n) {
     const double e = 1e-8;
     const double e2 = 2 * e;
 
-    vector<double> plus(10);
-    vector<double> minus(10);
+    vector<double> plus(6);
+    vector<double> minus(6);
     for (size_t i = 0; i < 6; i++) {
       plus[i] = get_param<double>(params, i);
       minus[i] = get_param<double>(params, i);
@@ -220,57 +221,201 @@ public:
       (plus[0],plus[1],plus[2],plus[3],plus[4],plus[5]);
     double ccdf_log_minus = TestClass.ccdf_log
       (minus[0],minus[1],minus[2],minus[3],minus[4],minus[5]);
-    
+
     finite_diff.push_back((ccdf_log_plus - ccdf_log_minus) / e2);
   }
 
-  void calculate_finite_diff(const vector<double>& params, vector<double>& finite_diff) {
-    if (!is_constant_struct<Scalar0>::value && !is_empty<Scalar0>::value)
-      add_finite_diff(params, finite_diff, 0);
-    if (!is_constant_struct<Scalar1>::value && !is_empty<Scalar1>::value)
-      add_finite_diff(params, finite_diff, 1);
-    if (!is_constant_struct<Scalar2>::value && !is_empty<Scalar2>::value)
-      add_finite_diff(params, finite_diff, 2);
-    if (!is_constant_struct<Scalar3>::value && !is_empty<Scalar3>::value)
-      add_finite_diff(params, finite_diff, 3);
-    if (!is_constant_struct<Scalar4>::value && !is_empty<Scalar4>::value)
-      add_finite_diff(params, finite_diff, 4);
-    if (!is_constant_struct<Scalar5>::value && !is_empty<Scalar5>::value)
-      add_finite_diff(params, finite_diff, 5);
+  void calculate_finite_diff(const vector<double>& params, 
+                             vector<double>& finite_diff1, 
+                             vector<double>& finite_diff2, 
+                             vector<double>& finite_diff3) {
+    if (!is_constant_struct<Scalar0>::value && !is_empty<Scalar0>::value 
+        && !is_fvar_double<Scalar0>::value 
+        && !is_fvar_fvar_double<Scalar0>::value)
+      add_finite_diff_1storder(params, finite_diff1, 0);
+    if (!is_constant_struct<Scalar1>::value && !is_empty<Scalar1>::value  
+        && !is_fvar_double<Scalar1>::value 
+        && !is_fvar_fvar_double<Scalar1>::value)
+      add_finite_diff_1storder(params, finite_diff1, 1);
+    if (!is_constant_struct<Scalar2>::value && !is_empty<Scalar2>::value 
+        && !is_fvar_double<Scalar2>::value 
+        && !is_fvar_fvar_double<Scalar2>::value)
+      add_finite_diff_1storder(params, finite_diff1, 2);
+    if (!is_constant_struct<Scalar3>::value && !is_empty<Scalar3>::value 
+        && !is_fvar_double<Scalar3>::value 
+        && !is_fvar_fvar_double<Scalar3>::value)
+      add_finite_diff_1storder(params, finite_diff1, 3);
+    if (!is_constant_struct<Scalar4>::value && !is_empty<Scalar4>::value 
+        && !is_fvar_double<Scalar4>::value 
+        && !is_fvar_fvar_double<Scalar4>::value)
+      add_finite_diff_1storder(params, finite_diff1, 4);
+    if (!is_constant_struct<Scalar5>::value && !is_empty<Scalar5>::value 
+        && !is_fvar_double<Scalar5>::value 
+        && !is_fvar_fvar_double<Scalar5>::value)
+      add_finite_diff_1storder(params, finite_diff1, 5);
+
+    // if (!is_constant_struct<Scalar0>::value && !is_empty<Scalar0>::value &&
+    //     (is_fvar_var<Scalar0>::value || is_fvar_fvar_var<Scalar0>::value) )
+    //   add_finite_diff_2ndorder(params, finite_diff2, 0);
+    // if (!is_constant_struct<Scalar1>::value && !is_empty<Scalar1>::value &&
+    //     (is_fvar_var<Scalar1>::value || is_fvar_fvar_var<Scalar1>::value) )
+    //   add_finite_diff_2ndorder(params, finite_diff2, 1);
+    // if (!is_constant_struct<Scalar2>::value && !is_empty<Scalar2>::value &&
+    //     (is_fvar_var<Scalar2>::value || is_fvar_fvar_var<Scalar2>::value) )
+    //   add_finite_diff_2ndorder(params, finite_diff2, 2);
+    // if (!is_constant_struct<Scalar3>::value && !is_empty<Scalar3>::value &&
+    //     (is_fvar_var<Scalar3>::value || is_fvar_fvar_var<Scalar3>::value) )
+    //   add_finite_diff_2ndorder(params, finite_diff2, 3);
+    // if (!is_constant_struct<Scalar4>::value && !is_empty<Scalar4>::value &&
+    //     (is_fvar_var<Scalar4>::value || is_fvar_fvar_var<Scalar4>::value) )
+    //   add_finite_diff_2ndorder(params, finite_diff2, 4);
+    // if (!is_constant_struct<Scalar5>::value && !is_empty<Scalar5>::value &&
+    //     (is_fvar_var<Scalar5>::value || is_fvar_fvar_var<Scalar5>::value) )
+    //   add_finite_diff_2ndorder(params, finite_diff2, 5);
+
+
+    // if (!is_constant_struct<Scalar0>::value && !is_empty<Scalar0>::value &&
+    //     is_fvar_fvar_var<Scalar0>::value)
+    //   add_finite_diff_3rdorder(params, finite_diff3, 0);
+    // if (!is_constant_struct<Scalar1>::value && !is_empty<Scalar1>::value &&
+    //     is_fvar_fvar_var<Scalar1>::value) 
+    //   add_finite_diff_3rdorder(params, finite_diff3, 1);
+    // if (!is_constant_struct<Scalar2>::value && !is_empty<Scalar2>::value &&
+    //     is_fvar_fvar_var<Scalar2>::value)
+    //   add_finite_diff_3rdorder(params, finite_diff3, 2);
+    // if (!is_constant_struct<Scalar3>::value && !is_empty<Scalar3>::value &&
+    //     is_fvar_fvar_var<Scalar3>::value) 
+    //   add_finite_diff_3rdorder(params, finite_diff3, 3);
+    // if (!is_constant_struct<Scalar4>::value && !is_empty<Scalar4>::value &&
+    //     is_fvar_fvar_var<Scalar4>::value) 
+    //   add_finite_diff_3rdorder(params, finite_diff3, 4);
+    // if (!is_constant_struct<Scalar5>::value && !is_empty<Scalar5>::value &&
+    //     is_fvar_fvar_var<Scalar5>::value) 
+    //   add_finite_diff_3rdorder(params, finite_diff3, 5);
+  }
+ // works for <double>
+  double calculate_gradients_1storder(vector<double>& grad,
+                                      double& ccdf_log,
+                                      vector<var>& x) {
+    return ccdf_log;
+  }
+  double calculate_gradients_2ndorder(vector<double>& grad,
+                                      double& ccdf_log,
+                                      vector<var>& x) {
+    return ccdf_log;
+  }
+  double calculate_gradients_3rdorder(vector<double>& grad,
+                                      double& ccdf_log, 
+                                      vector<var>& x) {
+    return ccdf_log;
   }
 
-  double calculate_gradients(const vector<double>& params, vector<double>& grad) {
-    Scalar0 p0 = get_param<Scalar0>(params, 0);
-    Scalar1 p1 = get_param<Scalar1>(params, 1);
-    Scalar2 p2 = get_param<Scalar2>(params, 2);
-    Scalar3 p3 = get_param<Scalar3>(params, 3);
-    Scalar4 p4 = get_param<Scalar4>(params, 4);
-    Scalar5 p5 = get_param<Scalar5>(params, 5);
-    
-    var ccdf_log = TestClass.template ccdf_log
-      <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5>
-      (p0,p1,p2,p3,p4,p5);
-    vector<var> x;
-    add_vars(x, p0, p1, p2, p3, p4, p5);
+  // works for <var>
+  double calculate_gradients_1storder(vector<double>& grad,
+                                      var& ccdf_log,
+                                      vector<var>& x) {
     ccdf_log.grad(x, grad);
     return ccdf_log.val();
   }
-  
-  double calculate_gradients_with_function(const vector<double>& params, vector<double>& grad) {
-    Scalar0 p0 = get_param<Scalar0>(params, 0);
-    Scalar1 p1 = get_param<Scalar1>(params, 1);
-    Scalar2 p2 = get_param<Scalar2>(params, 2);
-    Scalar3 p3 = get_param<Scalar3>(params, 3);
-    Scalar4 p4 = get_param<Scalar4>(params, 4);
-    Scalar5 p5 = get_param<Scalar5>(params, 5);
-    
-    var ccdf_log = TestClass.template ccdf_log_function
-      <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5>
-      (p0,p1,p2,p3,p4,p5);
-    vector<var> x;
-    add_vars(x, p0, p1, p2, p3, p4, p5);
-    ccdf_log.grad(x, grad);
+  double calculate_gradients_2ndorder(vector<double>& grad,
+                                      var& ccdf_log,
+                                      vector<var>& x) {
     return ccdf_log.val();
+  }
+  double calculate_gradients_3rdorder(vector<double>& grad,
+                                      var& ccdf_log, 
+                                      vector<var>& x) {
+    return ccdf_log.val();
+  }
+
+  //works for fvar<double>
+  double calculate_gradients_1storder(vector<double>& grad,
+                                      fvar<double>& ccdf_log,
+                                      vector<var>& x) {
+    x.push_back(ccdf_log.d_);
+    return ccdf_log.val();
+  }
+  double calculate_gradients_2ndorder(vector<double>& grad,
+                                      fvar<double>& ccdf_log, 
+                                      vector<var>& x) {
+    return ccdf_log.val();
+  }
+  double calculate_gradients_3rdorder(vector<double>& grad,
+                                      fvar<double>& ccdf_log, 
+                                      vector<var>& x) {
+    return ccdf_log.val();
+  }
+
+  //works for fvar<fvar<double> >
+  double calculate_gradients_1storder(vector<double>& grad,
+                                      fvar<fvar<double> >& ccdf_log, 
+                                      vector<var>& x) {
+    x.push_back(ccdf_log.d_.val_);
+    return ccdf_log.val().val();
+  }
+  double calculate_gradients_2ndorder(vector<double>& grad,
+                                      fvar<fvar<double> >& ccdf_log,
+                                      vector<var>& x) {
+    return ccdf_log.val().val();
+  }
+  double calculate_gradients_3rdorder(vector<double>& grad,
+                                      fvar<fvar<double> >& ccdf_log, 
+                                      vector<var>& x) {
+    return ccdf_log.val().val();
+  }
+
+  // works for fvar<var>
+  double calculate_gradients_1storder(vector<double>& grad,
+                                      fvar<var>& ccdf_log, 
+                                      vector<var>& x) {
+    ccdf_log.val_.grad(x, grad);
+    return ccdf_log.val_.val();
+  }
+  double calculate_gradients_2ndorder(vector<double>& grad, 
+                                      fvar<var>& ccdf_log, 
+                                      vector<var>& x) {
+    ccdf_log.d_.grad(x, grad);
+    return ccdf_log.val_.val();
+  }
+  double calculate_gradients_3rdorder(vector<double>& grad, 
+                                      fvar<var>& ccdf_log, 
+                                      vector<var>& x) {
+    return ccdf_log.val_.val();
+  }
+
+  // works for fvar<fvar<var> >
+  double calculate_gradients_1storder(vector<double>& grad,
+                                      fvar<fvar<var> >& ccdf_log,
+                                      vector<var>& x) {
+    ccdf_log.val_.val_.grad(x, grad);
+    return ccdf_log.val_.val_.val();
+  }
+  double calculate_gradients_2ndorder(vector<double>& grad,
+                                      fvar<fvar<var> >& ccdf_log, 
+                                      vector<var>& x) {
+    ccdf_log.d_.val_.grad(x, grad);
+    return ccdf_log.val_.val_.val();
+  }
+  double calculate_gradients_3rdorder(vector<double>& grad,
+                                      fvar<fvar<var> >& ccdf_log, 
+                                      vector<var>& x) {
+    ccdf_log.d_.d_.grad(x, grad);
+    return ccdf_log.val_.val_.val();
+  }
+
+  void test_finite_diffs_equal(const vector<double>& parameters,
+                               const vector<double>& finite_dif,
+                               const vector<double>& gradients) {
+
+    ASSERT_EQ(finite_dif.size(), gradients.size()) 
+      << "Number of finite diff gradients and calculated gradients must match -- error in test fixture";
+    for (size_t i = 0; i < finite_dif.size(); i++) {
+      EXPECT_NEAR(finite_dif[i], gradients[i], 1e-4)
+        << "Comparison of finite diff to calculated gradient failed for i=" << i 
+        << ": " << parameters << std::endl 
+        << "  finite diffs: " << finite_dif << std::endl
+        << "  grads:        " << gradients;
+      }
   }
   
   void test_finite_diff() {
@@ -287,21 +432,60 @@ public:
     TestClass.valid_values(parameters, expected_ccdf_log);
     
     for (size_t n = 0; n < parameters.size(); n++) {
-      vector<double> finite_diffs;
-      vector<double> gradients;
+      vector<double> finite_diffs1;
+      vector<double> finite_diffs2;
+      vector<double> finite_diffs3;
+      vector<double> gradients1;
+      vector<double> gradients2;
+      vector<double> gradients3;
 
-      calculate_finite_diff(parameters[n], finite_diffs);
-      calculate_gradients(parameters[n], gradients);
+      if (!is_fvar_double<Scalar0>::value &&
+          !is_fvar_fvar_double<Scalar0>::value &&
+          !is_fvar_double<Scalar1>::value &&
+          !is_fvar_fvar_double<Scalar1>::value &&
+          !is_fvar_double<Scalar2>::value &&
+          !is_fvar_fvar_double<Scalar2>::value &&
+          !is_fvar_double<Scalar3>::value &&
+          !is_fvar_fvar_double<Scalar3>::value &&
+          !is_fvar_double<Scalar4>::value &&
+          !is_fvar_fvar_double<Scalar4>::value &&
+          !is_fvar_double<Scalar5>::value &&
+          !is_fvar_fvar_double<Scalar5>::value) {
 
-      ASSERT_EQ(finite_diffs.size(), gradients.size()) 
-        << "Number of finite diff gradients and calculated gradients must match -- error in test fixture";
-      for (size_t i = 0; i < finite_diffs.size(); i++) {
-        EXPECT_NEAR(finite_diffs[i], gradients[i], 1e-4)
-          << "Comparison of finite diff to calculated gradient failed for i=" << i 
-          << ": " << parameters[n] << std::endl 
-          << "  finite diffs: " << finite_diffs << std::endl
-          << "  grads:        " << gradients;
+        calculate_finite_diff(parameters[n], finite_diffs1, 
+                              finite_diffs2, finite_diffs3);
+        Scalar0 p0 = get_param<Scalar0>(parameters[n], 0);
+        Scalar1 p1 = get_param<Scalar1>(parameters[n], 1);
+        Scalar2 p2 = get_param<Scalar2>(parameters[n], 2);
+        Scalar3 p3 = get_param<Scalar3>(parameters[n], 3);
+        Scalar4 p4 = get_param<Scalar4>(parameters[n], 4);
+        Scalar5 p5 = get_param<Scalar5>(parameters[n], 5);
+    
+        vector<var> x1;
+        add_vars(x1, p0, p1, p2, p3, p4, p5);
+          
+        T_return_type ccdf_log = TestClass.template ccdf_log
+          <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5>
+          (p0,p1,p2,p3,p4,p5);
+
+        calculate_gradients_1storder(gradients1, ccdf_log, x1);
+        //calculate_gradients_2ndorder(gradients2, ccdf_log, x2);
+        //calculate_gradients_3rdorder(gradients3, ccdf_log, x3);
+
+        test_finite_diffs_equal(parameters[n], finite_diffs1, gradients1);
+        //test_finite_diffs_equal(parameters[n], finite_diffs2, gradients2);
+        //test_finite_diffs_equal(parameters[n], finite_diffs3, gradients3);
       }
+    }
+  }
+  void  test_gradients_equal(const vector<double>& expected_gradients,
+                             const vector<double>& gradients ) {
+
+    ASSERT_EQ(expected_gradients.size(), gradients.size()) 
+      << "Number of expected gradients and calculated gradients must match -- error in test fixture";
+    for (size_t i = 0; i < expected_gradients.size(); i++) {
+      EXPECT_FLOAT_EQ(expected_gradients[i], gradients[i])
+        << "Comparison of expected gradient to calculated gradient failed";
     }
   }
 
@@ -314,32 +498,66 @@ public:
       SUCCEED() << "No test for vector arguments";
       return;
     }
-    vector<double> log_prob;
+    vector<double> ccdf_log;
     vector<vector<double> > parameters;
-    TestClass.valid_values(parameters, log_prob);
+    TestClass.valid_values(parameters, ccdf_log);
     
     for (size_t n = 0; n < parameters.size(); n++) {
-      vector<double> expected_gradients;
-      vector<double> gradients;
+      vector<double> expected_gradients1;
+      vector<double> expected_gradients2;
+      vector<double> expected_gradients3;
+      vector<double> gradients1;
+      vector<double> gradients2;
+      vector<double> gradients3;
 
-      double expected_ccdf_log = calculate_gradients_with_function(parameters[n], expected_gradients);
-      double ccdf_log = calculate_gradients(parameters[n], gradients);
+      Scalar0 p0 = get_param<Scalar0>(parameters[n], 0);
+      Scalar1 p1 = get_param<Scalar1>(parameters[n], 1);
+      Scalar2 p2 = get_param<Scalar2>(parameters[n], 2);
+      Scalar3 p3 = get_param<Scalar3>(parameters[n], 3);
+      Scalar4 p4 = get_param<Scalar4>(parameters[n], 4);
+      Scalar5 p5 = get_param<Scalar5>(parameters[n], 5);
+    
+      vector<var> x1;
+      vector<var> x2;
+      vector<var> x3;
+      vector<var> y1;
+      vector<var> y2;
+      vector<var> y3;
+      add_vars(x1, p0, p1, p2, p3, p4, p5);
+      add_vars(x2, p0, p1, p2, p3, p4, p5);
+      add_vars(x3, p0, p1, p2, p3, p4, p5);
+      add_vars(y1, p0, p1, p2, p3, p4, p5);
+      add_vars(y2, p0, p1, p2, p3, p4, p5);
+      add_vars(y3, p0, p1, p2, p3, p4, p5);
+      
+          
+      T_return_type ccdf_log = TestClass.template ccdf_log
+        <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5>
+        (p0,p1,p2,p3,p4,p5);
 
-      EXPECT_FLOAT_EQ(expected_ccdf_log, ccdf_log);
+      T_return_type ccdf_log_funct = TestClass.template ccdf_log_function
+        <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5>
+        (p0,p1,p2,p3,p4,p5);
 
-      ASSERT_EQ(expected_gradients.size(), gradients.size()) 
-        << "Number of expected gradients and calculated gradients must match -- error in test fixture";
-      for (size_t i = 0; i < expected_gradients.size(); i++) {
-        EXPECT_NEAR(expected_gradients[i], gradients[i], 1e-6)
-          << "Comparison of expected gradient to calculated gradient failed";
-      }
+      calculate_gradients_1storder(expected_gradients1, ccdf_log_funct, x1);
+      calculate_gradients_1storder(gradients1, ccdf_log, y1);
+      calculate_gradients_2ndorder(expected_gradients2, ccdf_log_funct, x2);
+      calculate_gradients_2ndorder(gradients2, ccdf_log, y2);
+      calculate_gradients_3rdorder(expected_gradients3, ccdf_log_funct, x3);
+      calculate_gradients_3rdorder(gradients3, ccdf_log, y3);
+      
+      test_gradients_equal(expected_gradients1,gradients1);
+      test_gradients_equal(expected_gradients2,gradients2);
+      test_gradients_equal(expected_gradients3,gradients3);
     }
   }
 
   void test_multiple_gradient_values(const bool is_vec,
                                      const double single_ccdf_log,
-                                     const vector<double>& single_gradients, size_t& pos_single,
-                                     const vector<double>& multiple_gradients, size_t& pos_multiple,
+                                     const vector<double>& single_gradients, 
+                                     size_t& pos_single,
+                                     const vector<double>& multiple_gradients, 
+                                     size_t& pos_multiple,
                                      const size_t N_REPEAT) {
     if (is_vec) {
       for (size_t i = 0; i < N_REPEAT; i++) {
@@ -368,8 +586,30 @@ public:
     TestClass.valid_values(parameters, expected_ccdf_log);
     
     for (size_t n = 0; n < parameters.size(); n++) {
-      vector<double> single_gradients;
-      double single_ccdf_log = calculate_gradients(parameters[n], single_gradients);
+      vector<double> single_gradients1;
+      vector<double> single_gradients2;
+      vector<double> single_gradients3;
+
+      Scalar0 p0_ = get_param<Scalar0>(parameters[n], 0);
+      Scalar1 p1_ = get_param<Scalar1>(parameters[n], 1);
+      Scalar2 p2_ = get_param<Scalar2>(parameters[n], 2);
+      Scalar3 p3_ = get_param<Scalar3>(parameters[n], 3);
+      Scalar4 p4_ = get_param<Scalar4>(parameters[n], 4);
+      Scalar5 p5_ = get_param<Scalar5>(parameters[n], 5);
+      vector<var> s1;
+      vector<var> s2;
+      vector<var> s3;
+      add_vars(s1,p0_,p1_,p2_,p3_,p4_,p5_);
+      add_vars(s2,p0_,p1_,p2_,p3_,p4_,p5_);
+      add_vars(s3,p0_,p1_,p2_,p3_,p4_,p5_);
+
+      T_return_type ccdf_log = TestClass.template ccdf_log
+        <Scalar0,Scalar1,Scalar2,Scalar3,Scalar4,Scalar5>
+        (p0_,p1_,p2_,p3_,p4_,p5_);
+
+      double single_ccdf_log = calculate_gradients_1storder(single_gradients1,ccdf_log,s1);
+      calculate_gradients_2ndorder(single_gradients2,ccdf_log,s2);
+      calculate_gradients_3rdorder(single_gradients3,ccdf_log,s3);
       
       T0 p0 = get_repeated_params<T0>(parameters[n], 0, N_REPEAT);
       T1 p1 = get_repeated_params<T1>(parameters[n], 1, N_REPEAT);
@@ -378,61 +618,160 @@ public:
       T4 p4 = get_repeated_params<T4>(parameters[n], 4, N_REPEAT);
       T5 p5 = get_repeated_params<T5>(parameters[n], 5, N_REPEAT);
 
-      var multiple_ccdf_log = TestClass.template ccdf_log
+      T_return_type multiple_ccdf_log = TestClass.template ccdf_log
         <T0,T1,T2,T3,T4,T5>
         (p0,p1,p2,p3,p4,p5);
-      vector<double> multiple_gradients;
-      vector<var> x;
-      add_vars(x, p0, p1, p2, p3, p4, p5);
-      multiple_ccdf_log.grad(x, multiple_gradients);
-      
+      vector<double> multiple_gradients1;
+      vector<double> multiple_gradients2;
+      vector<double> multiple_gradients3;
+      vector<var> x1;
+      vector<var> x2;
+      vector<var> x3;
+      add_vars(x1, p0, p1, p2, p3, p4, p5);
+      add_vars(x2, p0, p1, p2, p3, p4, p5);
+      add_vars(x3, p0, p1, p2, p3, p4, p5);
 
-      EXPECT_FLOAT_EQ(single_ccdf_log * N_REPEAT, multiple_ccdf_log.val())
+      calculate_gradients_1storder(multiple_gradients1,multiple_ccdf_log,x1);
+      calculate_gradients_1storder(multiple_gradients2,multiple_ccdf_log,x1);
+      calculate_gradients_1storder(multiple_gradients3,multiple_ccdf_log,x1);
+      
+      EXPECT_TRUE(single_ccdf_log *N_REPEAT - multiple_ccdf_log < 1e-8)
         << "ccdf_log with repeated vector input should match "
         << "a multiple of ccdf_log of single input";
 
       size_t pos_single = 0;
       size_t pos_multiple = 0;
-      if (!is_constant_struct<T0>::value && !is_empty<T0>::value)
-        test_multiple_gradient_values(is_vector<T0>::value,
-                                      single_ccdf_log,
-                                      single_gradients, pos_single,
-                                      multiple_gradients, pos_multiple,
+      if (!is_constant_struct<T0>::value && !is_empty<T0>::value &&
+          !is_fvar_double<Scalar0>::value &&
+          !is_fvar_fvar_double<Scalar0>::value)
+        test_multiple_gradient_values(is_vector<T0>::value, single_ccdf_log,
+                                      single_gradients1, pos_single,
+                                      multiple_gradients1, pos_multiple,
                                       N_REPEAT);
-      if (!is_constant_struct<T1>::value && !is_empty<T1>::value)
-        test_multiple_gradient_values(is_vector<T1>::value, 
-                                      single_ccdf_log,
-                                      single_gradients, pos_single,
-                                      multiple_gradients, pos_multiple,
+      if (!is_constant_struct<T1>::value && !is_empty<T1>::value &&
+          !is_fvar_double<Scalar1>::value &&
+          !is_fvar_fvar_double<Scalar1>::value)
+        test_multiple_gradient_values(is_vector<T1>::value, single_ccdf_log,
+                                      single_gradients1, pos_single,
+                                      multiple_gradients1, pos_multiple,
                                       N_REPEAT);
-      if (!is_constant_struct<T2>::value && !is_empty<T2>::value)
-        test_multiple_gradient_values(is_vector<T2>::value, 
-                                      single_ccdf_log,
-                                      single_gradients, pos_single,
-                                      multiple_gradients, pos_multiple,
+      if (!is_constant_struct<T2>::value && !is_empty<T2>::value &&
+          !is_fvar_double<Scalar2>::value &&
+          !is_fvar_fvar_double<Scalar2>::value)
+        test_multiple_gradient_values(is_vector<T2>::value, single_ccdf_log,
+                                      single_gradients1, pos_single,
+                                      multiple_gradients1, pos_multiple,
                                       N_REPEAT);
-      if (!is_constant_struct<T3>::value && !is_empty<T3>::value)
-        test_multiple_gradient_values(is_vector<T3>::value, 
-                                      single_ccdf_log,
-                                      single_gradients, pos_single,
-                                      multiple_gradients, pos_multiple,
+      if (!is_constant_struct<T3>::value && !is_empty<T3>::value &&
+          !is_fvar_double<Scalar3>::value &&
+          !is_fvar_fvar_double<Scalar3>::value)
+        test_multiple_gradient_values(is_vector<T3>::value, single_ccdf_log, 
+                                      single_gradients1, pos_single,
+                                      multiple_gradients1, pos_multiple,
                                       N_REPEAT);
-      if (!is_constant_struct<T4>::value && !is_empty<T4>::value)
-        test_multiple_gradient_values(is_vector<T4>::value, 
-                                      single_ccdf_log,
-                                      single_gradients, pos_single,    
-                                      multiple_gradients, pos_multiple,
+      if (!is_constant_struct<T4>::value && !is_empty<T4>::value &&
+          !is_fvar_double<Scalar4>::value &&
+          !is_fvar_fvar_double<Scalar4>::value)
+        test_multiple_gradient_values(is_vector<T4>::value, single_ccdf_log, 
+                                      single_gradients1, pos_single,
+                                      multiple_gradients1, pos_multiple,
                                       N_REPEAT);
-      if (!is_constant_struct<T5>::value && !is_empty<T5>::value)
-        test_multiple_gradient_values(is_vector<T5>::value, 
-                                      single_ccdf_log,
-                                      single_gradients, pos_single,
-                                      multiple_gradients, pos_multiple,
+      if (!is_constant_struct<T5>::value && !is_empty<T5>::value &&
+          !is_fvar_double<Scalar5>::value &&
+          !is_fvar_fvar_double<Scalar5>::value)
+        test_multiple_gradient_values(is_vector<T5>::value, single_ccdf_log, 
+                                      single_gradients1, pos_single,
+                                      multiple_gradients1, pos_multiple,
+                                      N_REPEAT);
+
+      pos_single = 0;
+      pos_multiple = 0;
+      if (!is_constant_struct<T0>::value && !is_empty<T0>::value &&
+          (stan::is_fvar_var<typename scalar_type<T0>::type>::value ||
+           stan::is_fvar_fvar_var<typename scalar_type<T0>::type>::value) )
+        test_multiple_gradient_values(is_vector<T0>::value, single_ccdf_log, 
+                                      single_gradients2, pos_single,
+                                      multiple_gradients2, pos_multiple,
+                                      N_REPEAT);
+      if (!is_constant_struct<T1>::value && !is_empty<T1>::value &&
+          (stan::is_fvar_var<typename scalar_type<T1>::type>::value ||
+           stan::is_fvar_fvar_var<typename scalar_type<T1>::type>::value) )
+        test_multiple_gradient_values(is_vector<T1>::value, single_ccdf_log, 
+                                      single_gradients2, pos_single,
+                                      multiple_gradients2, pos_multiple,
+                                      N_REPEAT);
+      if (!is_constant_struct<T2>::value && !is_empty<T2>::value &&
+          (stan::is_fvar_var<typename scalar_type<T2>::type>::value ||
+           stan::is_fvar_fvar_var<typename scalar_type<T2>::type>::value) )
+        test_multiple_gradient_values(is_vector<T2>::value, single_ccdf_log, 
+                                      single_gradients2, pos_single,
+                                      multiple_gradients2, pos_multiple,
+                                      N_REPEAT);
+      if (!is_constant_struct<T3>::value && !is_empty<T3>::value&&
+          (stan::is_fvar_var<typename scalar_type<T3>::type>::value ||
+           stan::is_fvar_fvar_var<typename scalar_type<T3>::type>::value) )
+        test_multiple_gradient_values(is_vector<T3>::value, single_ccdf_log, 
+                                      single_gradients2, pos_single,
+                                      multiple_gradients2, pos_multiple,
+                                      N_REPEAT);
+      if (!is_constant_struct<T4>::value && !is_empty<T4>::value &&
+          (stan::is_fvar_var<typename scalar_type<T4>::type>::value ||
+           stan::is_fvar_fvar_var<typename scalar_type<T4>::type>::value) )
+        test_multiple_gradient_values(is_vector<T4>::value, single_ccdf_log, 
+                                      single_gradients2, pos_single,
+                                      multiple_gradients2, pos_multiple,
+                                      N_REPEAT);
+      if (!is_constant_struct<T5>::value && !is_empty<T5>::value &&
+          (stan::is_fvar_var<typename scalar_type<T5>::type>::value ||
+           stan::is_fvar_fvar_var<typename scalar_type<T5>::type>::value) )
+        test_multiple_gradient_values(is_vector<T5>::value, single_ccdf_log, 
+                                      single_gradients2, pos_single,
+                                      multiple_gradients2, pos_multiple,
+                                      N_REPEAT);
+
+      pos_single = 0;
+      pos_multiple = 0;
+      if (!is_constant_struct<T0>::value && !is_empty<T0>::value &&
+          stan::is_fvar_fvar_var<typename scalar_type<T0>::type>::value)
+        test_multiple_gradient_values(is_vector<T0>::value, single_ccdf_log, 
+                                      single_gradients3, pos_single,
+                                      multiple_gradients3, pos_multiple,
+                                      N_REPEAT);
+      if (!is_constant_struct<T1>::value && !is_empty<T1>::value &&
+          stan::is_fvar_fvar_var<typename scalar_type<T1>::type>::value)
+        test_multiple_gradient_values(is_vector<T1>::value, single_ccdf_log, 
+                                      single_gradients3, pos_single,
+                                      multiple_gradients3, pos_multiple,
+                                      N_REPEAT);
+      if (!is_constant_struct<T2>::value && !is_empty<T2>::value &&
+          stan::is_fvar_fvar_var<typename scalar_type<T2>::type>::value)
+        test_multiple_gradient_values(is_vector<T2>::value, single_ccdf_log, 
+                                      single_gradients3, pos_single,
+                                      multiple_gradients3, pos_multiple,
+                                      N_REPEAT);
+      if (!is_constant_struct<T3>::value && !is_empty<T3>::value &&
+          stan::is_fvar_fvar_var<typename scalar_type<T3>::type>::value)
+        test_multiple_gradient_values(is_vector<T3>::value, single_ccdf_log, 
+                                      single_gradients3, pos_single,
+                                      multiple_gradients3, pos_multiple,
+                                      N_REPEAT);
+      if (!is_constant_struct<T4>::value && !is_empty<T4>::value &&
+          stan::is_fvar_fvar_var<typename scalar_type<T4>::type>::value)
+        test_multiple_gradient_values(is_vector<T4>::value, single_ccdf_log, 
+                                      single_gradients3, pos_single,
+                                      multiple_gradients3, pos_multiple,
+                                      N_REPEAT);
+      if (!is_constant_struct<T5>::value && !is_empty<T5>::value &&
+          stan::is_fvar_fvar_var<typename scalar_type<T5>::type>::value)
+        test_multiple_gradient_values(is_vector<T5>::value, single_ccdf_log, 
+                                      single_gradients3, pos_single,
+                                      multiple_gradients3, pos_multiple,
                                       N_REPEAT);
     }
   }
 
   void test_lower_bound() {
+    using stan::agrad::value_of;
     const size_t N_REPEAT = 3;
     vector<double> expected_ccdf_log;
     vector<vector<double> > parameters;
@@ -441,7 +780,7 @@ public:
     if (!TestClass.has_lower_bound()) {
       if (!std::numeric_limits<Scalar0>::has_infinity) {
         for (size_t n = 0; n < parameters.size(); n++)
-          parameters[n][0] = stan::agrad::value_of(std::numeric_limits<Scalar0>::min());
+          parameters[n][0] = value_of(value_of(value_of(std::numeric_limits<Scalar0>::min())));
       } else {
         for (size_t n = 0; n < parameters.size(); n++)
           parameters[n][0] = -std::numeric_limits<double>::infinity();
@@ -459,15 +798,16 @@ public:
       T4 p4 = get_repeated_params<T4>(parameters[n], 4, N_REPEAT);
       T5 p5 = get_repeated_params<T5>(parameters[n], 5, N_REPEAT);
       
-      var ccdf_log_at_lower_bound = TestClass.template ccdf_log
+      T_return_type ccdf_log_at_lower_bound = TestClass.template ccdf_log
         <T0,T1,T2,T3,T4,T5>
         (p0,p1,p2,p3,p4,p5);
-      EXPECT_FLOAT_EQ(0.0, ccdf_log_at_lower_bound.val())
+      EXPECT_TRUE(0.0 == ccdf_log_at_lower_bound)
         << "ccdf_log evaluated at lower bound should equal 0.0";
     }
   }
   
   void test_upper_bound() {
+    using stan::agrad::value_of;
     const size_t N_REPEAT = 3;
     vector<double> expected_ccdf_log;
     vector<vector<double> > parameters;
@@ -476,7 +816,7 @@ public:
     if (!TestClass.has_upper_bound()) {
       if (!std::numeric_limits<Scalar0>::has_infinity) {
         for (size_t n = 0; n < parameters.size(); n++)
-          parameters[n][0] = stan::agrad::value_of(std::numeric_limits<Scalar0>::max());
+          parameters[n][0] = value_of(value_of(value_of(std::numeric_limits<Scalar0>::max())));
       } else {
         for (size_t n = 0; n < parameters.size(); n++)
           parameters[n][0] = std::numeric_limits<double>::infinity();
@@ -494,10 +834,10 @@ public:
       T4 p4 = get_repeated_params<T4>(parameters[n], 4, N_REPEAT);
       T5 p5 = get_repeated_params<T5>(parameters[n], 5, N_REPEAT);
       
-      var ccdf_log_at_upper_bound = TestClass.template ccdf_log
+      T_return_type ccdf_log_at_upper_bound = TestClass.template ccdf_log
         <T0,T1,T2,T3,T4,T5>
         (p0,p1,p2,p3,p4,p5);
-      EXPECT_FLOAT_EQ(stan::math::negative_infinity(), ccdf_log_at_upper_bound.val())
+      EXPECT_TRUE(stan::math::negative_infinity() == ccdf_log_at_upper_bound)
         << "ccdf_log evaluated at upper bound should equal negative infinity";
     }
   }
@@ -519,11 +859,11 @@ public:
     T4 p4 = get_repeated_params<T4>(parameters[0], 4, N_REPEAT);
     T5 p5 = get_repeated_params<T5>(parameters[0], 5, N_REPEAT);
 
-    var ccdf_log = TestClass.template ccdf_log
+    T_return_type ccdf_log = TestClass.template ccdf_log
       <T0,T1,T2,T3,T4,T5>
       (p0,p1,p2,p3,p4,p5);
 
-    EXPECT_FLOAT_EQ(0.0, ccdf_log.val())
+    EXPECT_TRUE(0.0 == ccdf_log)
       << "ccdf_log with an empty vector should return 0.0";
   }
 

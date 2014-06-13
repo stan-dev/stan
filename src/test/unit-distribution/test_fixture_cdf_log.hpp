@@ -171,7 +171,6 @@ public:
     TestClass.invalid_values(index, invalid_values);
 
     for (size_t n = 0; n < index.size(); n++) {
-      var cdf_log(0);
       vector<double> invalid_params(parameters);
       invalid_params[index[n]] = invalid_values[n];
       
