@@ -21,7 +21,7 @@ namespace stan {
           using stan::length;
           VectorView<const T_low> low_vec(low);
           for (size_t n = 0; n < length(low); n++) {
-            if (!(static_cast<typename scalar_type<T_low>::type>(y) >= low_vec[n]))
+            if (!(y >= low_vec[n]))
               return dom_err(function,y,name,
                              " is %1%, but must be greater than ",
                              low_vec[n],result);
