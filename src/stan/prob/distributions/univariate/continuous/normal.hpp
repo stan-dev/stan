@@ -342,17 +342,15 @@ namespace stan {
 
         const double scaled_diff = (y_dbl - mu_dbl) / (sigma_dbl * SQRT_2);
         
-        const double one_m_erf = 1.0 - erf(scaled_diff);
-
-        // double one_m_erf;
-        // if (scaled_diff*SQRT_2 < -37.5)
-        //   one_m_erf = 2.0;
-        // else if (scaled_diff*SQRT_2 < -5.0)
-        //   one_m_erf =  2.0 - erfc(-scaled_diff);
-        // else if (scaled_diff*SQRT_2 > 8.25)
-        //   one_m_erf = 0.0;
-        // else
-        //   one_m_erf = 1.0 - erf(scaled_diff);
+        double one_m_erf;
+        if (scaled_diff*SQRT_2 < -37.5)
+          one_m_erf = 2.0;
+        else if (scaled_diff*SQRT_2 < -5.0)
+          one_m_erf =  2.0 - erfc(-scaled_diff);
+        else if (scaled_diff*SQRT_2 > 8.25)
+          one_m_erf = 0.0;
+        else
+          one_m_erf = 1.0 - erf(scaled_diff);
 
         // log ccdf
         ccdf_log += log_half + log(one_m_erf);

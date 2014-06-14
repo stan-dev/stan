@@ -4,7 +4,7 @@
 #include <boost/math/distributions.hpp>
 #include <boost/random/mersenne_twister.hpp>
 
-TEST(ProbDistributionsNormal, cdf) {
+TEST(ProbDistributionsNormal, cdf_tails) {
   using stan::agrad::var;
   using stan::prob::normal_cdf;
 
@@ -105,7 +105,7 @@ TEST(ProbDistributionsNormal, cdf) {
   EXPECT_FLOAT_EQ(1, 1 / normal_cdf(var(9.5),0,1).val());
   EXPECT_FLOAT_EQ(1, 1 / normal_cdf(var(10),0,1).val()); 
 }
-TEST(ProbDistributionsNormal, cdf_log) {
+TEST(ProbDistributionsNormal, cdf_log_tails) {
   using stan::agrad::var;
   using stan::prob::normal_cdf_log;
   using std::exp;
@@ -208,13 +208,13 @@ TEST(ProbDistributionsNormal, cdf_log) {
   EXPECT_FLOAT_EQ(1, 1 / exp(normal_cdf_log(var(10),0,1).val())); 
 }
 
-// TEST(ProbDistributionsNormal, ccdf_log) {
-//   using stan::agrad::var;
-//   using stan::prob::normal_ccdf_log;
-//   using std::exp;
+TEST(ProbDistributionsNormal, ccdf_log) {
+   using stan::agrad::var;
+   using stan::prob::normal_ccdf_log;
+   using std::exp;
 
-//   EXPECT_FLOAT_EQ(1, (1-exp(normal_ccdf_log(var(-37.5),0,1).val()))/4.60535300958196e-308);
-// }
+   EXPECT_FLOAT_EQ(1, -4.015998644826973564545e-11/(normal_ccdf_log(var(-6.5),0,1).val()));
+}
 
 
 TEST(ProbDistributionsNormal, intVsDouble) {
