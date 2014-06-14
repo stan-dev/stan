@@ -190,7 +190,15 @@ namespace stan {
         const double mu_dbl = value_of(mu_vec[n]);
         const double sigma_dbl = value_of(sigma_vec[n]);
         const double scaled_diff = (y_dbl - mu_dbl) / (sigma_dbl * SQRT_2);
-        const double cdf_ = 0.5 * (1.0 + erf(scaled_diff));
+        double cdf_;
+        if (scaled_diff*SQRT_2 < -37.5)
+          cdf_ = 0.0;
+        else if (scaled_diff*SQRT_2 < -5.0)
+          cdf_ = 0.5 * erfc(-scaled_diff);
+        else if (scaled_diff*SQRT_2 > 8.25)
+          cdf_ = 1;
+        else
+          cdf_ = 0.5 * (1.0 + erf(scaled_diff));
 
         // cdf
         cdf *= cdf_;
@@ -263,7 +271,16 @@ namespace stan {
 
         const double scaled_diff = (y_dbl - mu_dbl) / (sigma_dbl * SQRT_2);
         
-        const double one_p_erf = 1.0 + erf(scaled_diff);
+        double one_p_erf;
+        if (scaled_diff*SQRT_2 < -37.5)
+          one_p_erf = 0.0;
+        else if (scaled_diff*SQRT_2 < -5.0)
+          one_p_erf =  erfc(-scaled_diff);
+        else if (scaled_diff*SQRT_2 > 8.25)
+          one_p_erf = 2.0;
+        else
+          one_p_erf = 1.0 + erf(scaled_diff);
+
         // log cdf
         cdf_log += log_half + log(one_p_erf);
 
@@ -326,6 +343,17 @@ namespace stan {
         const double scaled_diff = (y_dbl - mu_dbl) / (sigma_dbl * SQRT_2);
         
         const double one_m_erf = 1.0 - erf(scaled_diff);
+
+        // double one_m_erf;
+        // if (scaled_diff*SQRT_2 < -37.5)
+        //   one_m_erf = 2.0;
+        // else if (scaled_diff*SQRT_2 < -5.0)
+        //   one_m_erf =  2.0 - erfc(-scaled_diff);
+        // else if (scaled_diff*SQRT_2 > 8.25)
+        //   one_m_erf = 0.0;
+        // else
+        //   one_m_erf = 1.0 - erf(scaled_diff);
+
         // log ccdf
         ccdf_log += log_half + log(one_m_erf);
 
