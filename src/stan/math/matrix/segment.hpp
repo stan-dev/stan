@@ -20,10 +20,10 @@ namespace stan {
     segment(const Eigen::Matrix<T,Eigen::Dynamic,1>& v,
             size_t i, size_t n) {
       stan::math::check_greater("segment(%1%)",i,0.0,"n",(double*)0);
-      stan::math::check_less_or_equal("segment(%1%)",i,v.rows(),"n",(double*)0);
+      stan::math::check_less_or_equal("segment(%1%)",i,static_cast<size_t>(v.rows()),"n",(double*)0);
       if (n != 0) {
         stan::math::check_greater("segment(%1%)",i+n-1,0.0,"n",(double*)0);
-        stan::math::check_less_or_equal("segment(%1%)",i+n-1,v.rows(),"n",(double*)0);
+        stan::math::check_less_or_equal("segment(%1%)",i+n-1,static_cast<size_t>(v.rows()),"n",(double*)0);
       } 
       return v.segment(i-1,n);
     }
