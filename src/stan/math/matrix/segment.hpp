@@ -34,10 +34,10 @@ namespace stan {
     segment(const Eigen::Matrix<T,1,Eigen::Dynamic>& v,
             size_t i, size_t n) {
       stan::math::check_greater("segment(%1%)",i,0.0,"n",(double*)0);
-      stan::math::check_less_or_equal("segment(%1%)",i,v.cols(),"n",(double*)0);    
+      stan::math::check_less_or_equal("segment(%1%)",i,static_cast<size_t>(v.cols()),"n",(double*)0);    
       if (n != 0) {
         stan::math::check_greater("segment(%1%)",i+n-1,0.0,"n",(double*)0);
-        stan::math::check_less_or_equal("segment(%1%)",i+n-1,v.cols(),"n",(double*)0);
+        stan::math::check_less_or_equal("segment(%1%)",i+n-1,static_cast<size_t>(v.cols()),"n",(double*)0);
       } 
       
       return v.segment(i-1,n);
@@ -52,7 +52,7 @@ namespace stan {
       stan::math::check_less_or_equal("segment(%1%)",i,sv.size(),"i",(double*)0);
       if (n != 0) {
         stan::math::check_greater("segment(%1%)",i+n-1,0.0,"i+n-1",(double*)0);
-        stan::math::check_less_or_equal("segment(%1%)",i+n-1,sv.size(),"i+n-1",
+        stan::math::check_less_or_equal("segment(%1%)",i+n-1,static_cast<size_t>(sv.size()),"i+n-1",
                                         (double*)0);
       }
       std::vector<T> s;
