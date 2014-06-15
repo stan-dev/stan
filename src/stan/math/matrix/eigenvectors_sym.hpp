@@ -4,6 +4,14 @@
 #include <stan/math/error_handling/matrix/check_nonzero_size.hpp>
 #include <stan/math/error_handling/matrix/check_symmetric.hpp>
 #include <stan/math/matrix/Eigen.hpp>
+#include <stan/agrad/fwd/operators.hpp>
+#include <stan/agrad/rev/operators.hpp>
+#include <stan/agrad/fwd/functions/abs.hpp>
+#include <stan/agrad/rev/functions/abs.hpp>
+#include <stan/agrad/fwd/functions/sqrt.hpp>
+#include <stan/agrad/rev/functions/sqrt.hpp>
+#include <stan/agrad/fwd/functions/fabs.hpp>
+#include <stan/agrad/rev/functions/fabs.hpp>
 
 namespace stan {
   namespace math {
