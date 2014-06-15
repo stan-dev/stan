@@ -1,4 +1,4 @@
-#include <stan/math/matrix/trace_gen_quad_form.hpp>
+#include <stan/agrad/fwd/matrix/trace_gen_quad_form.hpp>
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
 #include <test/unit/agrad/util.hpp>
 #include <gtest/gtest.h>
@@ -7,7 +7,7 @@ using stan::agrad::fvar;
 using stan::agrad::var;
 
 TEST(AgradFwdMatrixTraceGenQuadForm, mat_fd) {
-  using stan::math::trace_gen_quad_form;
+  using stan::agrad::trace_gen_quad_form;
   using stan::agrad::matrix_fd;
   
   matrix_fd ad(4,4);
@@ -62,7 +62,7 @@ TEST(AgradFwdMatrixTraceGenQuadForm, mat_fd) {
 }
 
 TEST(AgradFwdMatrixTraceGenQuadForm, mat_ffd) {
-  using stan::math::trace_gen_quad_form;
+  using stan::agrad::trace_gen_quad_form;
   using stan::agrad::matrix_ffd;
   
   matrix_ffd ad(4,4);
@@ -117,7 +117,7 @@ TEST(AgradFwdMatrixTraceGenQuadForm, mat_ffd) {
 }
 
 TEST(AgradFwdMatrixTraceGenQuadForm, mat_fv_1st_deriv) {
-  using stan::math::trace_gen_quad_form;
+  using stan::agrad::trace_gen_quad_form;
   using stan::agrad::matrix_fv;
   
   matrix_fv ad(4,4);
@@ -233,7 +233,7 @@ TEST(AgradFwdMatrixTraceGenQuadForm, mat_fv_1st_deriv) {
 }
 
 TEST(AgradFwdMatrixTraceGenQuadForm, mat_fv_2nd_deriv) {
-  using stan::math::trace_gen_quad_form;
+  using stan::agrad::trace_gen_quad_form;
   using stan::agrad::matrix_fv;
   
   matrix_fv ad(4,4);
@@ -349,7 +349,7 @@ TEST(AgradFwdMatrixTraceGenQuadForm, mat_fv_2nd_deriv) {
 }
 
 TEST(AgradFwdMatrixTraceGenQuadForm, mat_ffv_1st_deriv) {
-  using stan::math::trace_gen_quad_form;
+  using stan::agrad::trace_gen_quad_form;
   using stan::agrad::matrix_ffv;
   
   matrix_ffv ad(4,4);
@@ -465,7 +465,7 @@ TEST(AgradFwdMatrixTraceGenQuadForm, mat_ffv_1st_deriv) {
 }
 
 TEST(AgradFwdMatrixTraceGenQuadForm, mat_ffv_2nd_deriv) {
-  using stan::math::trace_gen_quad_form;
+  using stan::agrad::trace_gen_quad_form;
   using stan::agrad::matrix_ffv;
   
   matrix_ffv ad(4,4);
@@ -581,7 +581,7 @@ TEST(AgradFwdMatrixTraceGenQuadForm, mat_ffv_2nd_deriv) {
 }
 
 TEST(AgradFwdMatrixTraceGenQuadForm, mat_ffv_3rd_deriv) {
-  using stan::math::trace_gen_quad_form;
+  using stan::agrad::trace_gen_quad_form;
   using stan::agrad::matrix_ffv;
   
   matrix_ffv ad(4,4);

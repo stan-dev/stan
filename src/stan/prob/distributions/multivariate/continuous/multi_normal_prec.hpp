@@ -18,6 +18,7 @@
 #include <stan/math/matrix/subtract.hpp>
 #include <stan/math/matrix/sum.hpp>
 #include <stan/math/matrix/trace_quad_form.hpp>
+#include <stan/agrad/rev/matrix/trace_quad_form.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
@@ -43,6 +44,7 @@ namespace stan {
       using stan::math::check_finite;
       using stan::math::sum;
       using stan::math::trace_quad_form;
+      using stan::agrad::trace_quad_form;
       using stan::math::log_determinant_ldlt;
       using stan::math::LDLT_factor;
       using stan::math::check_ldlt_factor;
@@ -121,6 +123,7 @@ namespace stan {
       using stan::math::check_finite;
       using stan::math::sum;
       using stan::math::trace_quad_form;
+      using stan::agrad::trace_quad_form;
       using stan::math::log_determinant_ldlt;
       using stan::math::LDLT_factor;
       using stan::math::check_ldlt_factor;

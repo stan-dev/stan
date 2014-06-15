@@ -6,6 +6,8 @@
 #include <stdexcept>
 #include <stan/math/matrix/Eigen.hpp>
 #include <stan/math/matrix/log_sum_exp.hpp>
+#include <stan/agrad/rev/matrix/log_sum_exp.hpp>
+#include <stan/agrad/fwd/matrix/log_sum_exp.hpp>
 #include <stan/math/error_handling/matrix/check_nonzero_size.hpp>
 
 namespace stan {
