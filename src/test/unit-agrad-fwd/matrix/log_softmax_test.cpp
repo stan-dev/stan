@@ -6,7 +6,7 @@
 #include <test/unit/agrad/util.hpp>
 
 TEST(AgradFwdMatrixLogSoftmax,fd) {
-  using stan::math::log_softmax;
+  using stan::agrad::log_softmax;
   using Eigen::Matrix;
   using Eigen::Dynamic;
   using stan::agrad::vector_fd;
@@ -51,7 +51,7 @@ TEST(AgradFwdMatrixLogSoftmax,fd) {
   EXPECT_FLOAT_EQ(-1.6699361e-05, theta3[2].d_);
 }
 TEST(AgradFwdMatrixLogSoftmax,fv_1stDeriv) {
-  using stan::math::log_softmax;
+  using stan::agrad::log_softmax;
   using Eigen::Matrix;
   using Eigen::Dynamic;
   using stan::agrad::vector_fv;
@@ -104,7 +104,7 @@ TEST(AgradFwdMatrixLogSoftmax,fv_1stDeriv) {
   EXPECT_FLOAT_EQ(-0.99985993,h[2]);
 }
 TEST(AgradFwdMatrixLogSoftmax,fv_2ndDeriv) {
-  using stan::math::log_softmax;
+  using stan::agrad::log_softmax;
   using Eigen::Matrix;
   using Eigen::Dynamic;
   using stan::agrad::vector_fv;
@@ -127,7 +127,7 @@ TEST(AgradFwdMatrixLogSoftmax,fv_2ndDeriv) {
   EXPECT_FLOAT_EQ(1.6697022e-05,h[2]);
 }
 TEST(AgradFwdMatrixLogSoftmax,ffd) {
-  using stan::math::log_softmax;
+  using stan::agrad::log_softmax;
   using Eigen::Matrix;
   using Eigen::Dynamic;
   using stan::agrad::vector_ffd;
@@ -172,7 +172,7 @@ TEST(AgradFwdMatrixLogSoftmax,ffd) {
   EXPECT_FLOAT_EQ(-1.6699361e-05, theta3[2].d_.val());
 }
 TEST(AgradFwdMatrixLogSoftmax,ffv_1stDeriv) {
-  using stan::math::log_softmax;
+  using stan::agrad::log_softmax;
   using Eigen::Matrix;
   using Eigen::Dynamic;
   using stan::agrad::vector_ffv;
@@ -225,7 +225,7 @@ TEST(AgradFwdMatrixLogSoftmax,ffv_1stDeriv) {
   EXPECT_FLOAT_EQ(-0.99985993,h[2]);
 }
 TEST(AgradFwdMatrixLogSoftmax,ffv_2ndDeriv_1) {
-  using stan::math::log_softmax;
+  using stan::agrad::log_softmax;
   using Eigen::Matrix;
   using Eigen::Dynamic;
   using stan::agrad::vector_ffv;
@@ -249,7 +249,7 @@ TEST(AgradFwdMatrixLogSoftmax,ffv_2ndDeriv_1) {
 }
 
 TEST(AgradFwdMatrixLogSoftmax,ffv_2ndDeriv_2) {
-  using stan::math::log_softmax;
+  using stan::agrad::log_softmax;
   using Eigen::Matrix;
   using Eigen::Dynamic;
   using stan::agrad::vector_ffv;
@@ -273,7 +273,7 @@ TEST(AgradFwdMatrixLogSoftmax,ffv_2ndDeriv_2) {
 }
 
 TEST(AgradFwdMatrixLogSoftmax,ffv_3rdDeriv) {
-  using stan::math::log_softmax;
+  using stan::agrad::log_softmax;
   using Eigen::Matrix;
   using Eigen::Dynamic;
   using stan::agrad::vector_ffv;
