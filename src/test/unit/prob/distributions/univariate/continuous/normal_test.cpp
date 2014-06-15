@@ -208,7 +208,7 @@ TEST(ProbDistributionsNormal, cdf_log_tails) {
   EXPECT_FLOAT_EQ(1, 1 / exp(normal_cdf_log(var(10),0,1).val())); 
 }
 
-TEST(ProbDistributionsNormal, ccdf_log) {
+TEST(ProbDistributionsNormal, ccdf_log_tail) {
    using stan::agrad::var;
    using stan::prob::normal_ccdf_log;
    using std::exp;
