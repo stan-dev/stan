@@ -1,9 +1,7 @@
 #include <stan/agrad/fwd/matrix/inverse.hpp>
-#include <gtest/gtest.h>
 #include <stan/agrad/fwd/matrix/typedefs.hpp>
-#include <stan/agrad/rev.hpp>
-#include <stan/agrad/rev/matrix/multiply.hpp>
 #include <test/unit/agrad/util.hpp>
+#include <gtest/gtest.h>
 
 TEST(AgradFwdMatrixInverse,fd) {
   using stan::agrad::matrix_fd;
