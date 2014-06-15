@@ -2,6 +2,12 @@
 #define __STAN__MATH__MATRIX__SINGULAR_VALUES_HPP__
 
 #include <stan/math/matrix/Eigen.hpp>
+#include <stan/agrad/fwd/operators.hpp>
+#include <stan/agrad/rev/operators.hpp>
+#include <stan/agrad/fwd/functions/sqrt.hpp>
+#include <stan/agrad/rev/functions/sqrt.hpp>
+#include <stan/agrad/fwd/functions/abs.hpp>
+#include <stan/agrad/rev/functions/abs.hpp>
 
 namespace stan {
   namespace math {
