@@ -14,8 +14,7 @@
 #include <stan/math/matrix/dot_product.hpp>
 #include <stan/math/matrix/multiply.hpp>
 #include <stan/math/matrix/transpose.hpp>
-#include <stan/agrad/fwd.hpp>
-#include <stan/agrad/rev.hpp>
+#include <stan/agrad/rev/operators.hpp>
 
 namespace stan {
   namespace math {
