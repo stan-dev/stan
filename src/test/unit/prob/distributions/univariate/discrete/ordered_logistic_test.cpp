@@ -197,11 +197,8 @@ TEST(ProbDistributionOrderedLogistic, chiSquareGoodnessFitTest) {
 
   double chi = 0;
 
-  for(int j = 0; j < K; j++) {
+  for(int j = 0; j < K; j++)
     chi += ((bin[j] - expect[j]) * (bin[j] - expect[j]) / expect[j]);
-    std::cout<<j<<" bin   "<<bin[j]<<std::endl;
-    std::cout<<j<<" exp   "<<expect[j]<<std::endl;
-  }
   EXPECT_TRUE(chi < quantile(complement(mydist, 1e-6)));
 }
 
