@@ -161,9 +161,9 @@ TEST(ProbDistributionOrderedLogistic, chiSquareGoodnessFitTest) {
   int N = 10000;
   double eta = 1.0;
   Eigen::VectorXd theta(3);
-  theta << -1.4, 
-    21.0,
-    139.2;
+  theta << -0.4, 
+    4.0,
+    6.2;
   Eigen::VectorXd prob(4);
   prob(0) = 1 - inv_logit(eta - theta(0));
   prob(1) = inv_logit(eta - theta(0)) - inv_logit(eta - theta(1));
@@ -197,9 +197,11 @@ TEST(ProbDistributionOrderedLogistic, chiSquareGoodnessFitTest) {
 
   double chi = 0;
 
-  for(int j = 0; j < K; j++)
+  for(int j = 0; j < K; j++) {
     chi += ((bin[j] - expect[j]) * (bin[j] - expect[j]) / expect[j]);
-
+    std::cout<<j<<" bin   "<<bin[j]<<std::endl;
+    std::cout<<j<<" exp   "<<expect[j]<<std::endl;
+  }
   EXPECT_TRUE(chi < quantile(complement(mydist, 1e-6)));
 }
 
