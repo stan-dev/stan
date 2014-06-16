@@ -119,10 +119,10 @@ TEST(AgradFwdMatrixEigenvaluesSym, matrix_fv_2nd_deriv) {
   AVEC z = createAVEC(m1(0,0).val_,m1(0,1).val_,m1(1,0).val_,m1(1,1).val_);
   VEC h;
   res0(1).d_.grad(z,h);
-  EXPECT_FLOAT_EQ(-1.110223e-16,h[0]);
-  EXPECT_FLOAT_EQ(0.0,h[1]);
-  EXPECT_FLOAT_EQ(-2.7755576e-17,h[2]);
-  EXPECT_FLOAT_EQ(1.110223e-16,h[3]);
+  EXPECT_NEAR(-1.110223e-16,h[0],1e-8);
+  EXPECT_NEAR(0.0,h[1],1e-8);
+  EXPECT_NEAR(-2.7755576e-17,h[2],1e-8);
+  EXPECT_NEAR(1.110223e-16,h[3],1e-8);
 }
 
 
@@ -169,10 +169,10 @@ TEST(AgradFwdMatrixEigenvaluesSym, matrix_ffv_2nd_deriv) {
   AVEC z = createAVEC(m1(0,0).val_.val_,m1(0,1).val_.val_,m1(1,0).val_.val_,m1(1,1).val_.val_);
   VEC h;
   res0(1).d_.val_.grad(z,h);
-  EXPECT_FLOAT_EQ(-1.110223e-16,h[0]);
-  EXPECT_FLOAT_EQ(0.0,h[1]);
-  EXPECT_FLOAT_EQ(-2.7755576e-17,h[2]);
-  EXPECT_FLOAT_EQ(1.110223e-16,h[3]);
+  EXPECT_NEAR(-1.110223e-16,h[0],1e-8);
+  EXPECT_NEAR(0.0,h[1],1e-8);
+  EXPECT_NEAR(-2.7755576e-17,h[2],1e-8);
+  EXPECT_NEAR(1.110223e-16,h[3],1e-8);
 }
 TEST(AgradFwdMatrixEigenvaluesSym, matrix_ffv_3rd_deriv) {
   stan::agrad::matrix_ffv m0;
@@ -198,9 +198,9 @@ TEST(AgradFwdMatrixEigenvaluesSym, matrix_ffv_3rd_deriv) {
                       m1(1,0).val_.val_,m1(1,1).val_.val_);
   VEC h;
   res0(1).d_.d_.grad(z,h);
-  EXPECT_FLOAT_EQ(1.110223e-16,h[0]);
-  EXPECT_FLOAT_EQ(0.0,h[1]);
-  EXPECT_FLOAT_EQ(2.7755576e-17,h[2]);
-  EXPECT_FLOAT_EQ(-1.110223e-16,h[3]);
+  EXPECT_NEAR(1.110223e-16,h[0],1e-8);
+  EXPECT_NEAR(0.0,h[1],1e-8);
+  EXPECT_NEAR(2.7755576e-17,h[2],1e-8);
+  EXPECT_NEAR(-1.110223e-16,h[3],1e-8);
 }
 

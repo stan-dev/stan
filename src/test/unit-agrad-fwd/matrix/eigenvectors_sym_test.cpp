@@ -243,8 +243,8 @@ TEST(AgradFwdMatrixEigenvectorsSym, matrix_ffv_3rd_deriv) {
                       m1(1,0).val_.val_,m1(1,1).val_.val_);
   VEC h;
   res0(0,0).d_.d_.grad(z,h);
-  EXPECT_FLOAT_EQ(0.088388346,h[0]);
-  EXPECT_FLOAT_EQ(0.0,h[1]);
-  EXPECT_FLOAT_EQ(0.0,h[2]);
-  EXPECT_FLOAT_EQ(-0.088388346,h[3]);
+  EXPECT_NEAR(0.088388346,h[0],1e-8);
+  EXPECT_NEAR(0.0,h[1],1e-8);
+  EXPECT_NEAR(0.0,h[2],1e-8);
+  EXPECT_NEAR(-0.088388346,h[3],1e-8);
 }
