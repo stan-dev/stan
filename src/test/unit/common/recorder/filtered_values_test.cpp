@@ -15,11 +15,11 @@ public:
 
     recorder_ptr = new stan::common::recorder::filtered_values
       <std::vector<double> >(N, M, filter);
-    for (size_t n = 0; n < N_filter; n++)
+    for (int n = 0; n < N_filter; n++)
       preallocated_values.push_back(std::vector<double>(M));
 
-    for (size_t n = 0; n < N_filter; n++)
-      for (size_t m = 0; m < M; m++)
+    for (int n = 0; n < N_filter; n++)
+      for (int m = 0; m < M; m++)
         preallocated_values[n][m] = -1.0;
   }
   

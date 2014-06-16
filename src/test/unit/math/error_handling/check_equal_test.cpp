@@ -41,8 +41,6 @@ TEST(MathErrorHandling,CheckEqual) {
 TEST(MathErrorHandling,CheckEqualMatrix) {
   const char* function = "check_equal(%1%)";
   double result;
-  double x;
-  double eq;
   Eigen::Matrix<double,Eigen::Dynamic,1> x_vec;
   Eigen::Matrix<double,Eigen::Dynamic,1> eq_vec;
   x_vec.resize(3);
