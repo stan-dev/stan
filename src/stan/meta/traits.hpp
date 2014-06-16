@@ -343,7 +343,7 @@ namespace stan {
   class DoubleVectorView {
   public:
     DoubleVectorView(size_t /* n */) { }
-    double& operator[](size_t /* i */) {
+    partials_return& operator[](size_t /* i */) {
       throw std::runtime_error("used is false. this should never be called");
     }
   };
@@ -498,7 +498,6 @@ namespace stan {
       };
     };
 
-
     template <typename T1, 
               typename T2 = double, 
               typename T3 = double, 
@@ -515,7 +514,5 @@ namespace stan {
                                        typename partials_type<typename scalar_type<T6>::type>::type>::type
       type;
     };
-
-
 }
 #endif

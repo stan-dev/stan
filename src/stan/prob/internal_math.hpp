@@ -15,6 +15,9 @@
 #include <stan/math/functions/gamma_p.hpp>
 #include <boost/math/special_functions/beta.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
+#include <stan/agrad/rev/functions/value_of.hpp>
+#include <stan/agrad/fwd/functions/value_of.hpp>
+#include <stan/math/functions/value_of.hpp>
 
 namespace stan {
     
@@ -159,6 +162,8 @@ namespace stan {
     {
       using std::log;
       using std::exp;
+      using stan::agrad::value_of;
+      using stan::math::value_of;
 
       T c1 = log(z);
       T c2 = log(1 - z);
@@ -169,7 +174,7 @@ namespace stan {
       T dF1 = 0;
       T dF2 = 0;
           
-      if(C) grad2F1(dF1, dF2, a + b, 1, a + 1, z);
+      if(value_of(value_of(C))) grad2F1(dF1, dF2, a + b, (T)1.0, a + 1, z);
 
           
       g1 = (c1 - 1.0 / a) * c3 + C * (dF1 + dF2);
@@ -201,7 +206,7 @@ namespace stan {
     // dig = boost::math::digamma(a)
     template<typename T>
     T gradRegIncGamma(T a, T z, T g, T dig, 
-                           T precision = 1e-6) {
+                      T precision = 1e-6) {
       using stan::math::gamma_p;
       using std::log;
       using std::exp;
