@@ -1,6 +1,47 @@
 STAN RELEASE NOTES
 ======================================================================
 
+v2.3.0 (16 June 2014)
+======================================================================
+Bug Fixes
+------------
+* fixed poisson_rng, neg_binomial_rng
+* integer overflow now throws errors
+* allow < and > within range constraints
+* support MS Visual Studio 2008
+* fixed bug in lkj
+
+
+Features
+------------
+* functions added to Stan language!
+* turned off eigen asserts
+* CmdStan is now in its own repository
+* added quad_form_sym, multi_gp_log, multi_gp, 
+  multi_normal_cholesky_rng, to_matrix, to_vector, to_array, flatten,
+  qr_Q, qr_R
+* added JSON parser to Stan
+* a^b syntax for pow(a,b)
+
+
+v2.2.0 (14 February 2014)
+======================================================================
+Bug Fixes
+-------------
+* increment_log_prob is now vectorized and compiles with vector arguments
+* multinomial random number generator used the wrong size for the return value
+* fixed memory leaks in auto-diff implementation
+* variables can start with the prefix 'inf'
+* fixed parameter output order for arrays when using optimization
+
+Features
+-------------
+* suppress command line output with refresh <= 0
+* added 1 to treedepth to match usual definition of treedepth
+* added distance, squared_distance, diag_pre_multiply, diag_pre_multiply to Stan modeling lnaguage
+* added a 'fixed_param' sampler for use with the generated quantities block
+
+
 
 
 v2.0.1 (24 October 2013)

@@ -153,8 +153,46 @@ namespace stan {
     };
     boost::phoenix::function<set_fun_type_named> set_fun_type_named_f;
 
-
  
+    struct exponentiation_expr {
+      template <typename T1, typename T2, typename T3, typename T4, typename T5>
+      struct result { typedef void type; };
+
+      void operator()(expression& expr1,
+                      const expression& expr2,
+                      const var_origin& var_origin,
+                      bool& pass,
+                      std::ostream& error_msgs) const {
+
+        //        if (expr1.expression_type().is_vector() 
+        //            && !expr2.expression_type().is_primitive()) {
+        // handle raising each member of a vector to a power?
+        // }
+        print_var_origin(error_msgs,var_origin);
+        if (!expr1.expression_type().is_primitive() 
+            || !expr2.expression_type().is_primitive()) {
+          error_msgs << "arguments to ^ must be primitive (real or int)"
+                     << "; cannot exponentiate "
+                     << expr1.expression_type()
+                     << " by " 
+                     << expr2.expression_type()
+                     << " in block=";
+          print_var_origin(error_msgs,var_origin);
+          error_msgs << std::endl;
+          pass = false;
+          return;
+        }
+        std::vector<expression> args;
+        args.push_back(expr1);
+        args.push_back(expr2);
+        set_fun_type sft;
+        fun f("pow",args);
+        sft(f,error_msgs);
+        expr1 = expression(f);
+      }
+    };
+    boost::phoenix::function<exponentiation_expr> exponentiation_f;
+
     struct multiplication_expr {
       template <typename T1, typename T2, typename T3>
       struct result { typedef void type; };
@@ -354,6 +392,7 @@ namespace stan {
 
       expression operator()(const expression& expr,
                             std::ostream& error_msgs) const {
+
         if (expr.expression_type().is_primitive()) {
           return expr; // transpose of basic is self -- works?
         }
@@ -496,15 +535,25 @@ namespace stan {
              )
         ;
 
-
       negated_factor_r 
         = lit('-') >> negated_factor_r(_r1) 
                       [negate_expr_f(_val,_1,boost::phoenix::ref(error_msgs_))]
         | lit('!') >> negated_factor_r(_r1) 
                       [logical_negate_expr_f(_val,_1,boost::phoenix::ref(error_msgs_))]
         | lit('+') >> negated_factor_r(_r1)  [_val = _1]
+        | exponentiated_factor_r(_r1) [_val = _1]
         | indexed_factor_r(_r1) [_val = _1];
 
+
+      exponentiated_factor_r.name("(optionally) exponentiated factor");
+      exponentiated_factor_r 
+        = ( factor_r(_r1) [_val = _1] 
+            >> lit('^') 
+            > negated_factor_r(_r1)
+            [exponentiation_f(_val,_1,_r1,_pass,
+                              boost::phoenix::ref(error_msgs_))] 
+            )
+        ;
 
       indexed_factor_r.name("(optionally) indexed factor [sub]");
       indexed_factor_r 
@@ -518,6 +567,8 @@ namespace stan {
                [_val = transpose_f(_val, boost::phoenix::ref(error_msgs_))] 
                )
         ;
+      
+
 
 
       factor_r.name("factor");

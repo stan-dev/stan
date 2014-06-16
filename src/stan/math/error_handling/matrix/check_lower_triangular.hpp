@@ -2,9 +2,8 @@
 #define __STAN__MATH__ERROR_HANDLING__MATRIX__CHECK_LOWER_TRIANGULAR_HPP__
 
 #include <sstream>
-#include <boost/type_traits/common_type.hpp>
-#include <stan/math/error_handling/dom_err.hpp>
 #include <stan/math/matrix/Eigen.hpp>
+#include <stan/math/error_handling/dom_err.hpp>
 
 namespace stan {
 
@@ -40,14 +39,6 @@ namespace stan {
         }
       }
       return true;
-    }
-
-    template <typename T>
-    inline bool check_lower_triangular(const char* function,
-                const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& y,
-                const char* name,
-                T* result = 0) {
-      return check_lower_triangular<T,T>(function,y,name,result);
     }
 
   }

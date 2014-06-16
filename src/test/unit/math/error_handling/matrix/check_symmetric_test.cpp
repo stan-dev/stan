@@ -9,12 +9,8 @@ TEST(MathErrorHandlingMatrix, checkSymmetric) {
   y << 1, 3, 3, 1;
   EXPECT_TRUE(stan::math::check_symmetric("checkSymmetric(%1%)",
                                           y, "y", &result));
-  EXPECT_TRUE(stan::math::check_symmetric("checkSymmetric(%1%)",
-                                          y, "y"));
 
   y(0,1) = 3.5;
   EXPECT_THROW(stan::math::check_symmetric("checkSymmetric(%1%)", y, "y", &result), 
-               std::domain_error);
-  EXPECT_THROW(stan::math::check_symmetric("checkSymmetric(%1%)", y, "y"),
                std::domain_error);
 }
