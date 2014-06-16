@@ -399,7 +399,7 @@ namespace stan {
     }
     base_var_decl arg_decl::base_variable_declaration() {
       std::vector<expression> dims;
-      for (int i = 0; i < arg_type_.num_dims_; ++i)
+      for (size_t i = 0; i < arg_type_.num_dims_; ++i)
         dims.push_back(expression(int_literal(0))); // dummy value 0
       return base_var_decl(name_,dims,arg_type_.base_type_);
     }
