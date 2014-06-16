@@ -10,11 +10,11 @@ public:
     recorder(N, M) { }
 
   void SetUp() { 
-    for (size_t n = 0; n < N; n++)
+    for (int n = 0; n < N; n++)
       preallocated_values.push_back(std::vector<double>(M));
 
-    for (size_t n = 0; n < N; n++)
-      for (size_t m = 0; m < M; m++)
+    for (int n = 0; n < N; n++)
+      for (int m = 0; m < M; m++)
         preallocated_values[n][m] = -1.0;
   }
   

@@ -319,7 +319,7 @@ namespace stan {
         : param_names_(param_names) { }
 
       chains(const std::vector<std::string>& param_names) : param_names_(param_names.size()) {
-          for (int i = 0; i < param_names.size(); i++)
+          for (size_t i = 0; i < param_names.size(); i++)
               param_names_(i) = param_names[i];
       }
       
