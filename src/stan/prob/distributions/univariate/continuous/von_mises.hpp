@@ -153,7 +153,7 @@ namespace stan {
       double sign = ((U3 >= 0) - (U3 <= 0));
       double TWO_PI = stan::math::pi() * 2.0;
 
-      return mu + sign * std::acos(W) + stan::math::pi();
+      return mu + sign * std::acos(W);
     }
 
   } 

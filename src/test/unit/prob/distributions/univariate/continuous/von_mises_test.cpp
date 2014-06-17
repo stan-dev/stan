@@ -34,6 +34,8 @@ TEST(ProbDistributionsVonMises, chiSquareGoodnessFitTest) {
     3.661367, 3.690358, 3.720728, 3.752694, 3.786522, 3.822550, 3.861212,
     3.903079, 3.948925, 3.999839, 4.057427, 4.124191, 4.204379, 4.306094, 
     4.448103, 4.694153;
+  for (int i = 0; i < K; i ++)
+    loc[i] = loc[i] - stan::math::pi();
 
   int count = 0;
   int bin [K];
@@ -45,11 +47,9 @@ TEST(ProbDistributionsVonMises, chiSquareGoodnessFitTest) {
 
   while (count < N) {
     double a = stan::prob::von_mises_rng(0,3.0,rng);
-    std::cout<<a<<std::endl;
     int i = 0;
     while (i < K-1 && a > loc[i]) 
       ++i;
-    std::cout<<i<<std::endl;
     ++bin[i];
     count++;
    }
@@ -58,12 +58,8 @@ TEST(ProbDistributionsVonMises, chiSquareGoodnessFitTest) {
 
   for(int j = 0; j < K; j++) {
     chi += ((bin[j] - expect[j]) * (bin[j] - expect[j]) / expect[j]);
-    std::cout<<bin[j]<<std::endl;
   }
 
-  std::cout<<chi<<std::endl;
-  std::cout<<quantile(complement(mydist, 1e-6))<<std::endl;
-  std::cout<<bin[0]<<std::endl;
   EXPECT_TRUE(chi < quantile(complement(mydist, 1e-6)));
 }
 
