@@ -335,39 +335,87 @@ TEST(gmParser,declareVarWithSameNameAsModel) {
 
 
 TEST(gm_parser,function_signatures) {
-  test_parsable("good_inf");
-  test_parsable("function_signatures1");
-  test_parsable("function_signatures6");
-  test_parsable("function_signatures7");
-  test_parsable("function_signatures_bernoulli");
-  test_parsable("function_signatures_beta");
-  test_parsable("function_signatures_beta_binomial");
-  test_parsable("function_signatures_binomial");
-  test_parsable("function_signatures_categorical");
-  test_parsable("function_signatures_cauchy");
-  test_parsable("function_signatures_chi_square");
-  test_parsable("function_signatures_dirichlet");
-  test_parsable("function_signatures_double_exponential");
-  test_parsable("function_signatures_exponential");
-  test_parsable("function_signatures_gamma");
-  test_parsable("function_signatures_hypergeometric");
-  test_parsable("function_signatures_inv_chi_square");
-  test_parsable("function_signatures_inv_gamma");
-  test_parsable("function_signatures_logistic");
-  test_parsable("function_signatures_lognormal");
-  test_parsable("function_signatures_multinomial");
-  test_parsable("function_signatures_neg_binomial");
-  test_parsable("function_signatures_normal");
-  test_parsable("function_signatures_ordered_logistic");
-  test_parsable("function_signatures_pareto");
-  test_parsable("function_signatures_poisson");
-  test_parsable("function_signatures_scaled_inv_chi_square");
-  test_parsable("function_signatures_student_t_0");
-  test_parsable("function_signatures_student_t_1");
-  test_parsable("function_signatures_student_t_2");
-  test_parsable("function_signatures_student_t_3");
-  test_parsable("function_signatures_uniform");
-  test_parsable("function_signatures_weibull");
+  //DISTRIBUTIONS
+  //DISCRETE
+  //UNIVARIATE
+  test_parsable("function-signatures/distributions/univariate/discrete/bernoulli/bernoulli_ccdf_log");
+  test_parsable("function-signatures/distributions/univariate/discrete/bernoulli/bernoulli_cdf_log");
+  test_parsable("function-signatures/distributions/univariate/discrete/bernoulli/bernoulli_cdf");
+  test_parsable("function-signatures/distributions/univariate/discrete/bernoulli/bernoulli_log");
+  test_parsable("function-signatures/distributions/univariate/discrete/bernoulli/bernoulli_logit_log");
+
+  test_parsable("function-signatures/distributions/univariate/discrete/beta_binomial/beta_binomial_ccdf_log");
+  test_parsable("function-signatures/distributions/univariate/discrete/beta_binomial/beta_binomial_cdf_log");
+  test_parsable("function-signatures/distributions/univariate/discrete/beta_binomial/beta_binomial_cdf");
+  test_parsable("function-signatures/distributions/univariate/discrete/beta_binomial/beta_binomial_log");
+
+  test_parsable("function-signatures/distributions/univariate/discrete/binomial/binomial_ccdf_log");
+  test_parsable("function-signatures/distributions/univariate/discrete/binomial/binomial_cdf_log");
+  test_parsable("function-signatures/distributions/univariate/discrete/binomial/binomial_cdf");
+  test_parsable("function-signatures/distributions/univariate/discrete/binomial/binomial_log");
+
+  test_parsable("function-signatures/distributions/univariate/discrete/hypergeometric/hypergeometric_log");
+
+  test_parsable("function-signatures/distributions/univariate/discrete/neg_binomial/neg_binomial_ccdf_log");
+  test_parsable("function-signatures/distributions/univariate/discrete/neg_binomial/neg_binomial_cdf_log");
+  test_parsable("function-signatures/distributions/univariate/discrete/neg_binomial/neg_binomial_cdf");
+  test_parsable("function-signatures/distributions/univariate/discrete/neg_binomial/neg_binomial_log");
+
+  test_parsable("function-signatures/distributions/univariate/discrete/poisson/poisson_ccdf_log");
+  test_parsable("function-signatures/distributions/univariate/discrete/poisson/poisson_cdf_log");
+  test_parsable("function-signatures/distributions/univariate/discrete/poisson/poisson_cdf");
+  test_parsable("function-signatures/distributions/univariate/discrete/poisson/poisson_log_log");
+  test_parsable("function-signatures/distributions/univariate/discrete/poisson/poisson_log");
+
+  //CONTINUOUS
+  test_parsable("function-signatures/distributions/univariate/continuous/beta/beta_ccdf_log");
+  test_parsable("function-signatures/distributions/univariate/continuous/beta/beta_cdf_log");
+  test_parsable("function-signatures/distributions/univariate/continuous/beta/beta_cdf");
+  test_parsable("function-signatures/distributions/univariate/continuous/beta/beta_log");
+
+  test_parsable("function-signatures/distributions/univariate/continuous/cauchy/cauchy_ccdf_log");
+  test_parsable("function-signatures/distributions/univariate/continuous/cauchy/cauchy_cdf_log");
+  test_parsable("function-signatures/distributions/univariate/continuous/cauchy/cauchy_cdf");
+  test_parsable("function-signatures/distributions/univariate/continuous/cauchy/cauchy_log");
+
+  test_parsable("function-signatures/distributions/univariate/continuous/chi_square/chi_square_ccdf_log");
+  test_parsable("function-signatures/distributions/univariate/continuous/chi_square/chi_square_cdf_log");
+  test_parsable("function-signatures/distributions/univariate/continuous/chi_square/chi_square_cdf");
+  test_parsable("function-signatures/distributions/univariate/continuous/chi_square/chi_square_log");
+
+  // test_parsable("good_inf");
+  // test_parsable("function_signatures1");
+  // test_parsable("function_signatures6");
+  // test_parsable("function_signatures7");
+  // test_parsable("function_signatures_bernoulli");
+  // test_parsable("function_signatures_beta");
+  // test_parsable("function_signatures_beta_binomial");
+  // test_parsable("function_signatures_binomial");
+  // test_parsable("function_signatures_categorical");
+  // test_parsable("function_signatures_cauchy");
+  // test_parsable("function_signatures_chi_square");
+  // test_parsable("function_signatures_dirichlet");
+  // test_parsable("function_signatures_double_exponential");
+  // test_parsable("function_signatures_exponential");
+  // test_parsable("function_signatures_gamma");
+  // test_parsable("function_signatures_hypergeometric");
+  // test_parsable("function_signatures_inv_chi_square");
+  // test_parsable("function_signatures_inv_gamma");
+  // test_parsable("function_signatures_logistic");
+  // test_parsable("function_signatures_lognormal");
+  // test_parsable("function_signatures_multinomial");
+  // test_parsable("function_signatures_neg_binomial");
+  // test_parsable("function_signatures_normal");
+  // test_parsable("function_signatures_ordered_logistic");
+  // test_parsable("function_signatures_pareto");
+  // test_parsable("function_signatures_poisson");
+  // test_parsable("function_signatures_scaled_inv_chi_square");
+  // test_parsable("function_signatures_student_t_0");
+  // test_parsable("function_signatures_student_t_1");
+  // test_parsable("function_signatures_student_t_2");
+  // test_parsable("function_signatures_student_t_3");
+  // test_parsable("function_signatures_uniform");
+  // test_parsable("function_signatures_weibull");
 }
 
 

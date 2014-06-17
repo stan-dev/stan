@@ -9,10 +9,12 @@ data {
 transformed data {
   real transformed_data_real;
 
+  transformed_data_real <- bernoulli_log(d_int, d_int);
   transformed_data_real <- bernoulli_log(d_int, d_real);
   transformed_data_real <- bernoulli_log(d_int, d_vector);
   transformed_data_real <- bernoulli_log(d_int, d_row_vector);
   transformed_data_real <- bernoulli_log(d_int, d_real_array);
+  transformed_data_real <- bernoulli_log(d_int_array, d_int);
   transformed_data_real <- bernoulli_log(d_int_array, d_real);
   transformed_data_real <- bernoulli_log(d_int_array, d_vector);
   transformed_data_real <- bernoulli_log(d_int_array, d_row_vector);
@@ -21,6 +23,7 @@ transformed data {
 parameters {
   real p_real;
   real p_real_array[d_int];
+  matrix[d_int,d_int] p_matrix;
   vector[d_int] p_vector;
   row_vector[d_int] p_row_vector;
 
@@ -29,6 +32,7 @@ parameters {
 transformed parameters {
   real transformed_param_real;
 
+  transformed_param_real <- bernoulli_log(d_int, d_int);
   transformed_param_real <- bernoulli_log(d_int, d_real);
   transformed_param_real <- bernoulli_log(d_int, p_real);
   transformed_param_real <- bernoulli_log(d_int, d_vector);
@@ -37,6 +41,7 @@ transformed parameters {
   transformed_param_real <- bernoulli_log(d_int, p_row_vector);
   transformed_param_real <- bernoulli_log(d_int, d_real_array);
   transformed_param_real <- bernoulli_log(d_int, p_real_array);
+  transformed_param_real <- bernoulli_log(d_int_array, d_int);
   transformed_param_real <- bernoulli_log(d_int_array, d_real);
   transformed_param_real <- bernoulli_log(d_int_array, p_real);
   transformed_param_real <- bernoulli_log(d_int_array, d_vector);
