@@ -137,14 +137,14 @@ namespace stan {
 
       double r = 1 + pow((1 + 4 * kappa * kappa), 0.5);
       double rho = 0.5 * (r - pow(2 * r, 0.5)) / kappa;
-      double delta = 0.5 * (1 + rho * rho) / rho;
+      double s = 0.5 * (1 + rho * rho) / rho;
 
       bool done = 0;
       double W;
       while (!done) {
         double Z = std::cos(stan::math::pi() * uniform_rng(0.0, 1.0, rng));
-        W = (1 + delta * Z) / (delta + Z);
-        double Y = kappa * (delta - W);
+        W = (1 + s * Z) / (s + Z);
+        double Y = kappa * (s - W);
         double U2 = uniform_rng(0.0, 1.0, rng);
         done = Y * (2 - Y) - U2 > 0;
         
@@ -155,9 +155,9 @@ namespace stan {
 
       double U3 = uniform_rng(0.0, 1.0, rng) - 0.5;
 
-      double sign = ((U3 > 0) - (U3 < 0));
+      double sign = ((U3 >= 0) - (U3 <= 0));
 
-      return mu + sign * std::acos(W);
+      return std::fmod(std::fmod(mu + sign * std::acos(W), TWO_PI) + TWO_PI, TWO_PI);
     }
 
   } 
