@@ -445,6 +445,66 @@ TEST(gm_parser,function_signatures) {
   test_parsable("function-signatures/distributions/univariate/continuous/normal/normal_cdf");
   test_parsable("function-signatures/distributions/univariate/continuous/normal/normal_log");
 
+  test_parsable("function-signatures/distributions/univariate/continuous/pareto/pareto_ccdf_log");
+  test_parsable("function-signatures/distributions/univariate/continuous/pareto/pareto_cdf_log");
+  test_parsable("function-signatures/distributions/univariate/continuous/pareto/pareto_cdf");
+  test_parsable("function-signatures/distributions/univariate/continuous/pareto/pareto_log");
+
+  test_parsable("function-signatures/distributions/univariate/continuous/rayleigh/rayleigh_ccdf_log");
+  test_parsable("function-signatures/distributions/univariate/continuous/rayleigh/rayleigh_cdf_log");
+  test_parsable("function-signatures/distributions/univariate/continuous/rayleigh/rayleigh_cdf");
+  test_parsable("function-signatures/distributions/univariate/continuous/rayleigh/rayleigh_log");
+
+  test_parsable("function-signatures/distributions/univariate/continuous/scaled_inv_chi_square/scaled_inv_chi_square_ccdf_log");
+  test_parsable("function-signatures/distributions/univariate/continuous/scaled_inv_chi_square/scaled_inv_chi_square_cdf_log");
+  test_parsable("function-signatures/distributions/univariate/continuous/scaled_inv_chi_square/scaled_inv_chi_square_cdf");
+  test_parsable("function-signatures/distributions/univariate/continuous/scaled_inv_chi_square/scaled_inv_chi_square_log");
+
+  test_parsable("function-signatures/distributions/univariate/continuous/skew_normal/skew_normal_ccdf_log_1");
+  test_parsable("function-signatures/distributions/univariate/continuous/skew_normal/skew_normal_ccdf_log_2");
+  test_parsable("function-signatures/distributions/univariate/continuous/skew_normal/skew_normal_ccdf_log_3");
+  test_parsable("function-signatures/distributions/univariate/continuous/skew_normal/skew_normal_ccdf_log_4");
+  test_parsable("function-signatures/distributions/univariate/continuous/skew_normal/skew_normal_cdf_log_1");
+  test_parsable("function-signatures/distributions/univariate/continuous/skew_normal/skew_normal_cdf_log_2");
+  test_parsable("function-signatures/distributions/univariate/continuous/skew_normal/skew_normal_cdf_log_3");
+  test_parsable("function-signatures/distributions/univariate/continuous/skew_normal/skew_normal_cdf_log_4");
+  test_parsable("function-signatures/distributions/univariate/continuous/skew_normal/skew_normal_cdf_1");
+  test_parsable("function-signatures/distributions/univariate/continuous/skew_normal/skew_normal_cdf_2");
+  test_parsable("function-signatures/distributions/univariate/continuous/skew_normal/skew_normal_cdf_3");
+  test_parsable("function-signatures/distributions/univariate/continuous/skew_normal/skew_normal_cdf_4");
+  test_parsable("function-signatures/distributions/univariate/continuous/skew_normal/skew_normal_log_1");
+  test_parsable("function-signatures/distributions/univariate/continuous/skew_normal/skew_normal_log_2");
+  test_parsable("function-signatures/distributions/univariate/continuous/skew_normal/skew_normal_log_3");
+  test_parsable("function-signatures/distributions/univariate/continuous/skew_normal/skew_normal_log_4");
+
+  test_parsable("function-signatures/distributions/univariate/continuous/student_t/student_t_ccdf_log_1");
+  test_parsable("function-signatures/distributions/univariate/continuous/student_t/student_t_ccdf_log_2");
+  test_parsable("function-signatures/distributions/univariate/continuous/student_t/student_t_ccdf_log_3");
+  test_parsable("function-signatures/distributions/univariate/continuous/student_t/student_t_ccdf_log_4");
+  test_parsable("function-signatures/distributions/univariate/continuous/student_t/student_t_cdf_log_1");
+  test_parsable("function-signatures/distributions/univariate/continuous/student_t/student_t_cdf_log_2");
+  test_parsable("function-signatures/distributions/univariate/continuous/student_t/student_t_cdf_log_3");
+  test_parsable("function-signatures/distributions/univariate/continuous/student_t/student_t_cdf_log_4");
+  test_parsable("function-signatures/distributions/univariate/continuous/student_t/student_t_cdf_1");
+  test_parsable("function-signatures/distributions/univariate/continuous/student_t/student_t_cdf_2");
+  test_parsable("function-signatures/distributions/univariate/continuous/student_t/student_t_cdf_3");
+  test_parsable("function-signatures/distributions/univariate/continuous/student_t/student_t_cdf_4");
+  test_parsable("function-signatures/distributions/univariate/continuous/student_t/student_t_log_1");
+  test_parsable("function-signatures/distributions/univariate/continuous/student_t/student_t_log_2");
+  test_parsable("function-signatures/distributions/univariate/continuous/student_t/student_t_log_3");
+  test_parsable("function-signatures/distributions/univariate/continuous/student_t/student_t_log_4");
+
+  test_parsable("function-signatures/distributions/univariate/continuous/uniform/uniform_ccdf_log");
+  test_parsable("function-signatures/distributions/univariate/continuous/uniform/uniform_cdf_log");
+  test_parsable("function-signatures/distributions/univariate/continuous/uniform/uniform_cdf");
+  test_parsable("function-signatures/distributions/univariate/continuous/uniform/uniform_log");
+
+  test_parsable("function-signatures/distributions/univariate/continuous/von_mises/von_mises_log");
+
+  test_parsable("function-signatures/distributions/univariate/continuous/weibull/weibull_ccdf_log");
+  test_parsable("function-signatures/distributions/univariate/continuous/weibull/weibull_cdf_log");
+  test_parsable("function-signatures/distributions/univariate/continuous/weibull/weibull_cdf");
+  test_parsable("function-signatures/distributions/univariate/continuous/weibull/weibull_log");
 
   // test_parsable("good_inf");
   // test_parsable("function_signatures1");
@@ -452,25 +512,8 @@ TEST(gm_parser,function_signatures) {
   // test_parsable("function_signatures7");
   // test_parsable("function_signatures_categorical");
   // test_parsable("function_signatures_dirichlet");
-  // test_parsable("function_signatures_gamma");
-  // test_parsable("function_signatures_hypergeometric");
-  // test_parsable("function_signatures_inv_chi_square");
-  // test_parsable("function_signatures_inv_gamma");
-  // test_parsable("function_signatures_logistic");
-  // test_parsable("function_signatures_lognormal");
   // test_parsable("function_signatures_multinomial");
-  // test_parsable("function_signatures_neg_binomial");
-  // test_parsable("function_signatures_normal");
   // test_parsable("function_signatures_ordered_logistic");
-  // test_parsable("function_signatures_pareto");
-  // test_parsable("function_signatures_poisson");
-  // test_parsable("function_signatures_scaled_inv_chi_square");
-  // test_parsable("function_signatures_student_t_0");
-  // test_parsable("function_signatures_student_t_1");
-  // test_parsable("function_signatures_student_t_2");
-  // test_parsable("function_signatures_student_t_3");
-  // test_parsable("function_signatures_uniform");
-  // test_parsable("function_signatures_weibull");
 }
 
 

@@ -876,5 +876,5 @@ transformed parameters {
   transformed_param_real <- lognormal_ccdf_log(p_row_vector, p_row_vector, p_vector);
   transformed_param_real <- lognormal_ccdf_log(p_row_vector, p_row_vector, p_row_vector);}
 model {  
-  y_p ~ lognormal(0,1); // in case anyone tries to run it
+  y_p ~ normal(0,1); // in case anyone tries to run it
 }
