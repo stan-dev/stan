@@ -361,6 +361,9 @@ TEST(gm_parser,function_signatures) {
   test_parsable("function-signatures/distributions/univariate/discrete/neg_binomial/neg_binomial_cdf");
   test_parsable("function-signatures/distributions/univariate/discrete/neg_binomial/neg_binomial_log");
 
+  test_parsable("function-signatures/distributions/univariate/discrete/neg_binomial_2/neg_binomial_2_log_log");
+  test_parsable("function-signatures/distributions/univariate/discrete/neg_binomial_2/neg_binomial_2_log");
+
   test_parsable("function-signatures/distributions/univariate/discrete/poisson/poisson_ccdf_log");
   test_parsable("function-signatures/distributions/univariate/discrete/poisson/poisson_cdf_log");
   test_parsable("function-signatures/distributions/univariate/discrete/poisson/poisson_cdf");
@@ -506,14 +509,32 @@ TEST(gm_parser,function_signatures) {
   test_parsable("function-signatures/distributions/univariate/continuous/weibull/weibull_cdf");
   test_parsable("function-signatures/distributions/univariate/continuous/weibull/weibull_log");
 
+
+  //MULTIVARIATE
+  //DISCRETE
+  test_parsable("function-signatures/distributions/multivariate/discrete/categorical/categorical_log");
+  test_parsable("function-signatures/distributions/multivariate/discrete/categorical/categorical_logit_log");
+
+  test_parsable("function-signatures/distributions/multivariate/discrete/multinomial/multinomial_log");
+
+  test_parsable("function-signatures/distributions/multivariate/discrete/ordered_logistic/ordered_logistic_log");
+
+  //CONTINUOUS
+  test_parsable("function-signatures/distributions/multivariate/continuous/dirichlet/dirichlet_log");
+
+
+  //FUNCTIONS
+    test_parsable("function-signatures/math/functions/abs");
+    test_parsable("function-signatures/math/functions/int_step");
+    test_parsable("function-signatures/math/functions/max");
+    test_parsable("function-signatures/math/functions/min");
+    test_parsable("function-signatures/math/functions/operators_int");
+    test_parsable("function-signatures/math/functions/operators_real");
+
   // test_parsable("good_inf");
   // test_parsable("function_signatures1");
   // test_parsable("function_signatures6");
   // test_parsable("function_signatures7");
-  // test_parsable("function_signatures_categorical");
-  // test_parsable("function_signatures_dirichlet");
-  // test_parsable("function_signatures_multinomial");
-  // test_parsable("function_signatures_ordered_logistic");
 }
 
 

@@ -22,24 +22,7 @@ transformed data {
   row_vector[d_int] transformed_data_row_vector;
 
   //*** Integer-Valued Basic Functions ***
-  // integer-valued arithmetic operators
-  //   binary infix operators
-  transformed_data_int <- d_int + d_int;
-  transformed_data_int <- d_int - d_int;
-  transformed_data_int <- d_int * d_int;
-  transformed_data_int <- d_int / d_int;
-
-  //   unary prefix operators
-  transformed_data_int <- -d_int;
-  transformed_data_int <- +d_int;
-  
-  //   absolute functions
-  transformed_data_int <- abs(d_int);
-  transformed_data_int <- int_step(d_int);
-
   //   bound functions
-  transformed_data_int <- min(d_int, d_int);
-  transformed_data_int <- max(d_int, d_int);
 
   //*** Real-Valued Basic Functions ***
   // mathematical constants
@@ -60,18 +43,8 @@ transformed data {
   transformed_data_real <- step(d_real);
   
   // real-valued arithmetic operators
-  //   binary infix operators
-  transformed_data_real <- d_real + d_real;
-  transformed_data_real <- d_real - d_real;
-  transformed_data_real <- d_real * d_real;
-  transformed_data_real <- d_real / d_real;
-
-  //   unary prefix operators
-  transformed_data_real <- -d_real;
-  transformed_data_real <- +d_real;
 
   //   absolute functions
-  transformed_data_real <- abs(d_real);
   transformed_data_real <- fabs(d_real);
   transformed_data_real <- fdim(d_real, d_real);
 
@@ -416,29 +389,7 @@ transformed parameters {
   transformed_param_real <- step(p_real);
   
   // real-valued arithmetic operators
-  //   binary infix operators
-  transformed_param_real <- d_real + d_real;
-  transformed_param_real <- p_real + d_real;
-  transformed_param_real <- d_real + p_real;
-  transformed_param_real <- p_real + p_real;
-  transformed_param_real <- d_real - d_real;
-  transformed_param_real <- p_real - d_real;
-  transformed_param_real <- d_real - p_real;
-  transformed_param_real <- p_real - p_real;
-  transformed_param_real <- d_real * d_real;
-  transformed_param_real <- p_real * d_real;
-  transformed_param_real <- d_real * p_real;
-  transformed_param_real <- p_real * p_real;
-  transformed_param_real <- d_real / d_real;
-  transformed_param_real <- p_real / d_real;
-  transformed_param_real <- d_real / p_real;
-  transformed_param_real <- p_real / p_real;
-
-  //   unary prefix operators
-  transformed_param_real <- -d_real;
-  transformed_param_real <- -p_real;
-  transformed_param_real <- +d_real;
-  transformed_param_real <- +p_real;
+ 
 
   //   absolute functions
   transformed_param_real <- abs(d_real);
@@ -671,18 +622,7 @@ transformed parameters {
 
   //*** Matrix Operations ***
   // Integer-Valued Matrix Size Functions
-  transformed_param_real <- int_step(rows(d_vector)); // using int_step to test integer output
-  transformed_param_real <- int_step(rows(p_vector)); 
-  transformed_param_real <- int_step(rows(d_row_vector));
-  transformed_param_real <- int_step(rows(p_row_vector));
-  transformed_param_real <- int_step(rows(d_matrix));
-  transformed_param_real <- int_step(rows(p_matrix));
-  transformed_param_real <- int_step(cols(d_vector)); // using int_step to test integer output
-  transformed_param_real <- int_step(cols(p_vector)); 
-  transformed_param_real <- int_step(cols(d_row_vector));
-  transformed_param_real <- int_step(cols(p_row_vector));
-  transformed_param_real <- int_step(cols(d_matrix));
-  transformed_param_real <- int_step(cols(p_matrix));
+
 
   // Matrix Arithmetic Operators
   //   negation prefix operators
