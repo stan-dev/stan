@@ -19,14 +19,15 @@ optimization and diagnostics.
 
 \subsection{Read Data}
 
-The first step of execution is to read data into memory.  
-For the Stan model executable, data is read from a file in the dump
-format (see \refchapter{dump}).%
+The first step of execution is to read data into memory.   Data may be
+read in through file (in CmdStan) or through memory (RStan and
+PyStan);  see their respective manuals for details.
 %
 \footnote{The \Cpp code underlying Stan is flexible enough to allow
   data to be read from memory or file.  Calls from \R, for instance,
   can be configured to read data from file or directly from \R's
   memory.}
+%
 All of the variables declared in the \code{data} block will be read.
 If a variable cannot be read, the program will halt with a message
 indicating which data variable is missing.
@@ -247,11 +248,10 @@ for sampling.
 
 Model diagnostics are like sampling and optimization in that they
 depend on a model's data being read and its parameters being
-initialized.  The output, at least so far, is just to the command
-line.  See \refsection{diagnostics} for information on the
-available diagnostics (as of Stan 2.0, just gradients and log
-probabilities at the initialization state).
-
+initialized.  The user's guides for the interfaces (RStan, PyStan,
+CmdStan) provide more details on the diagnostics available; as of Stan
+2.0, that's just gradients on the unconstrained scale and log
+probabilities. 
 
 \section{Output}
 
@@ -328,11 +328,11 @@ The motivation for strong, static typing is threefold.
 \item Strong typing forces the programmer's intent to be declared with
   the variable, making programs easier to comprehend and hence easier
   to debug and maintain.
-\item Strong typing allows programming errors relative to the
-  declared intent to be caught sooner (at compile time) rather than
-  later (at run time).  The Stan compiler (see \refsection{stanc})
-  will flag any type errors and indicate the offending expressions
-  quickly when the program is compiled.
+\item Strong typing allows programming errors relative to the declared
+  intent to be caught sooner (at compile time) rather than later (at
+  run time).  The Stan compiler (called through an interface such as
+  CmdStan, RStan, or PyStan) will flag any type errors and indicate
+  the offending expressions quickly when the program is compiled.
 \item Constrained types will catch runtime data, initialization, and
   intermediate value errors as soon as they occur rather than allowing
   them to propagate and potentially pollute final results.
@@ -1323,7 +1323,7 @@ An expression is the basic syntactic unit in a Stan program that
 denotes a value.  Every expression in a well-formed Stan program has
 a type that is determined statically (at compile time).  If an
 expressions type cannot be determined statically, the Stan compiler
-(see \refsection{stanc}) will report the location of the problem.
+will report the location of the problem.
 
 This chapter covers the syntax, typing, and usage of the various forms
 of expressions in Stan. 
@@ -1632,10 +1632,12 @@ parentheses, this grouping may be made explicit with the expression
 For integer and real-valued expressions, Stan supports the basic
 binary arithmetic operations of addition (\code{+}), subtraction
 (\code{-}), multiplication (\code{*}) and division (\code{/}) in the
-usual ways.  Stan also supports the unary operation of negation for
+usual ways.  
+Stan also supports the unary operation of negation for
 integer and real-valued expressions.  For example, assuming \code{n}
 and \code{m} are integer variables and \code{x} and \code{y} real
 variables, the following expressions are legal.
+%
 \begin{quote}
 \code{3.0 + 0.14}, 
 \ \ \code{-15},
@@ -1681,6 +1683,36 @@ The type of subexpression \code{(y - mu)' * Sigma} is inferred to be
 \code{row\_vector}, being the result of multiplying a row vector by a
 matrix.  The whole expression's type is thus the type of a row vector
 multiplied by a (column) vector, which produces a \code{real} value.
+
+Stan supports exponentiation (\code{\textasciicircum}) of integer and real-valued expressions.
+The return type of exponentiation is always a real-value.
+For example, assuming \code{n}
+and \code{m} are integer variables and \code{x} and \code{y} real
+variables, the following expressions are legal.
+%
+\begin{quote}
+\code{3 \textasciicircum\ 2},
+\ \ \code{3.0 \textasciicircum\ -2},
+\ \ \code{3.0 \textasciicircum\ 0.14},
+\\
+\ \ \code{x \textasciicircum\ n},
+\ \ \code{n \textasciicircum\ x},
+\ \ \code{n \textasciicircum\ m},
+\ \ \code{x \textasciicircum\ y}
+\end{quote}
+%
+Exponentiation is right associative, so the expression 
+%
+\begin{quote}
+\code{2 \textasciicircum\ 3 \textasciicircum\ 4}
+\end{quote}
+%
+is equivalent to the following well-formed, fully specified form.
+%
+\begin{quote}
+\code{2 \textasciicircum\ (3 \textasciicircum\ 4)}
+\end{quote}
+%
 
 
 
@@ -1733,6 +1765,8 @@ tabular form in \reffigure{operator-precedence}.
 \code{+} & 1 & n/a & unary prefix & promotion (no-op in Stan)
 \\ \hline
 \code{'} & 0 & n/a & unary postfix & transposition
+\\ 
+\code{\textasciicircum} & 0 & right & binary infix & exponentiation
 \\ \hline \hline
 \code{()} & 0 & n/a & prefix, wrap & function application
 \\
@@ -1767,9 +1801,15 @@ expression \code{a*b+c} is interpreted as \code{(a*b)+c} and the
 expression \code{a+b*c} is interpreted as \code{a+(b*c)}.  Similarly,
 \code{2*x+3*-y} is interpreted as \code{(2*x)+(3*(-y))}.
 
-Transposition binds tighter than all other operations, so that
+Transposition and exponentiation tighter than all other operations.
+For vectors, row vectors, and matrices, 
 \code{-u'} is interpreted as \code{-(u')}, \code{u*v'} as
-\code{u*(v')}, and \code{u'*v} as \code{(u')*v}.
+\code{u*(v')}, \code{u'*v} as \code{(u')*v}.
+For integer and reals,
+\code{-n \textasciicircum\ 3}
+is interpreted as \code{-(n \textasciicircum\ 3)}.
+
+
 
 \section{Subscripting}
 
@@ -4028,7 +4068,8 @@ process will read the data exactly once.%
 %
 
 Data variables are not transformed in any way.  The format for data
-files is provided in \refchapter{dump}.
+files or data in memory depends on the interface; see the user's
+guides and interface documentation for PyStan, RStan, and CmdStan for details.
 
 \subsection{Statements}
 

@@ -5,7 +5,7 @@
 #include <stan/agrad/rev/var.hpp>
 #include <stan/agrad/rev/matrix/LDLT_alloc.hpp>
 #include <stan/agrad/rev/matrix/LDLT_factor.hpp>
-#include <stan/math/matrix/validate_multiplicable.hpp>
+#include <stan/math/error_handling/matrix/check_multiplicable.hpp>
 
 namespace stan {
   namespace agrad {
@@ -244,8 +244,9 @@ namespace stan {
                       const Eigen::Matrix<var,R2,C2> &b) {
       Eigen::Matrix<var,R1,C2> res(b.rows(),b.cols());
 
-      stan::math::validate_multiplicable(A,b,"mdivide_left_ldlt");
-      
+      stan::math::check_multiplicable("mdivide_left_ldlt(%1%)",A,"A",
+                                      b,"b",(double*)0);     
+     
       mdivide_left_ldlt_vv_vari<R1,C1,R2,C2> *baseVari = new mdivide_left_ldlt_vv_vari<R1,C1,R2,C2>(A,b);
       
       int pos = 0;
@@ -269,8 +270,9 @@ namespace stan {
                       const Eigen::Matrix<double,R2,C2> &b) {
       Eigen::Matrix<var,R1,C2> res(b.rows(),b.cols());
       
-      stan::math::validate_multiplicable(A,b,"mdivide_left_ldlt");
-      
+      stan::math::check_multiplicable("mdivide_left_ldlt(%1%)",A,"A",
+                                      b,"b",(double*)0);     
+
       mdivide_left_ldlt_vd_vari<R1,C1,R2,C2> *baseVari = new mdivide_left_ldlt_vd_vari<R1,C1,R2,C2>(A,b);
       
       int pos = 0;
@@ -294,7 +296,8 @@ namespace stan {
                       const Eigen::Matrix<var,R2,C2> &b) {
       Eigen::Matrix<var,R1,C2> res(b.rows(),b.cols());
       
-      stan::math::validate_multiplicable(A,b,"mdivide_left_ldlt");
+      stan::math::check_multiplicable("mdivide_left_ldlt(%1%)",A,"A",
+                                      b,"b",(double*)0);     
       
       mdivide_left_ldlt_dv_vari<R1,C1,R2,C2> *baseVari = new mdivide_left_ldlt_dv_vari<R1,C1,R2,C2>(A,b);
       

@@ -27,9 +27,6 @@ namespace stan {
                                    const Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>& y,
                                    const char* name,
                                    T_result* result) {
-      typedef 
-        typename Eigen::Matrix<T_y,Eigen::Dynamic,Eigen::Dynamic>::size_type 
-        size_type;
       if (y.rows() == 1 && y(0,0) <= CONSTRAINT_TOLERANCE) {
         std::ostringstream message;
         message << name << " is not positive definite. " 
@@ -49,14 +46,6 @@ namespace stan {
         return dom_err(function,y(0,0),name,msg.c_str(),"",result);
       }
       return true;
-    }
-
-    template <typename T>
-    inline bool check_pos_definite(const char* function,
-                                   const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& y,
-                                   const char* name,
-                                   T* result = 0) {
-      return check_pos_definite<T,T>(function,y,name,result);
     }
 
   }

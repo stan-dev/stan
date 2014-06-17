@@ -14,6 +14,7 @@
 #include <stan/math/matrix/columns_dot_product.hpp>
 #include <stan/math/matrix/columns_dot_self.hpp>
 #include <stan/math/matrix/common_type.hpp>
+#include <stan/math/matrix/containers_conversion.hpp>
 #include <stan/math/matrix/crossprod.hpp>
 #include <stan/math/matrix/cumulative_sum.hpp>
 #include <stan/math/matrix/determinant.hpp>
@@ -86,7 +87,6 @@
 #include <stan/math/matrix/sum.hpp>
 #include <stan/math/matrix/tail.hpp>
 #include <stan/math/matrix/tcrossprod.hpp>
-#include <stan/math/matrix/to_vector.hpp>
 #include <stan/math/matrix/trace.hpp>
 #include <stan/math/matrix/trace_gen_inv_quad_form_ldlt.hpp>
 #include <stan/math/matrix/trace_gen_quad_form.hpp>
@@ -94,20 +94,6 @@
 #include <stan/math/matrix/trace_quad_form.hpp>
 #include <stan/math/matrix/transpose.hpp>
 #include <stan/math/matrix/typedefs.hpp>
-#include <stan/math/matrix/validate_column_index.hpp>
-#include <stan/math/matrix/validate_greater.hpp>
-#include <stan/math/matrix/validate_greater_or_equal.hpp>
-#include <stan/math/matrix/validate_less.hpp>
-#include <stan/math/matrix/validate_less_or_equal.hpp>
-#include <stan/math/matrix/validate_matching_dims.hpp>
-#include <stan/math/matrix/validate_matching_sizes.hpp>
-#include <stan/math/matrix/validate_multiplicable.hpp>
-#include <stan/math/matrix/validate_nonzero_size.hpp>
-#include <stan/math/matrix/validate_row_index.hpp>
-#include <stan/math/matrix/validate_square.hpp>
-#include <stan/math/matrix/validate_std_vector_index.hpp>
-#include <stan/math/matrix/validate_symmetric.hpp>
-#include <stan/math/matrix/validate_vector.hpp>
 #include <stan/math/matrix/variance.hpp>
 
 #endif

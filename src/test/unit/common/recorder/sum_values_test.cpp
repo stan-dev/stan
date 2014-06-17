@@ -42,7 +42,7 @@ TEST_F(StanCommonRecorder, sum_values_constructor) {
 TEST_F(StanCommonRecorder, sum_values_vector_double) {
   std::vector<double> x;
 
-  for (int i = 1; i <= N_; i++) 
+  for (size_t i = 1; i <= N_; i++) 
     x.push_back(i);
 
   for (size_t i = 1; i <= 100; i++) {
@@ -59,7 +59,7 @@ TEST_F(StanCommonRecorder, sum_values_vector_double) {
   for (size_t i = 1; i <= skip_; i++) {
     EXPECT_NO_THROW(recorder2(x));
     EXPECT_EQ(i, recorder2.called());
-    EXPECT_EQ(0, recorder2.recorded());
+    EXPECT_EQ(0U, recorder2.recorded());
     
     for (size_t n = 0; n < N_; n++) {
       EXPECT_FLOAT_EQ(0.0, recorder2.sum()[n]);

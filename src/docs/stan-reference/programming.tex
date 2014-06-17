@@ -305,6 +305,160 @@ the reality of the code.  A misleading comment or one that is wrong is
 worse than no comment at all!
 
 
+\chapter{Data Types}
+
+\noindent
+This chapter discusses the data types available for variable
+declarations and expression values in Stan.  Variable types are
+important for declaring parameters, checking data consistency, calling
+functions, and assigning values to variables.
+
+In Stan, every expression and variable declaration has an associated
+type that is determined statically (i.e., when the program is
+compiled).  Sizes of vectors, matrices, and arrays, on the other hand,
+are determined dynamically (i.e., when the program is run).  This is
+very different than a language like R, which lets you assign a string
+to a variable and then later assign a matrix to it.
+
+Expressions may be primitive, such as variables or constants, or they
+may be composed of other components, such as a function or operator
+applied to arguments.  
+
+This chapter concentrates on the basic data types and how they are
+declared, assigned, and used.  The following chapter provides a
+detailed comparison of the differences among the container types:
+arrays, vectors, and matrices.
+
+\section{Basic Data Types}
+
+Arguments for built-in and user-defined functions and local variables
+are required to be basic data types, meaning an unconstrained
+primitive, vector, or matrix type or an array of such.
+
+\subsection{Primitive Types}
+
+Stan provides two primitive data types, \code{real} for continuous
+values and \code{int} for integer values.
+
+\subsection{Vector and Matrix Types}
+Stan provides three matrix-based data types, \code{vector} for column
+vectors, \code{row\_vector} for row vectors, and \code{matrix} for
+matrices.
+
+\subsection{Array Types}
+
+Any type (including the constrained types discussed in the next
+section) can be made into an array type by declaring array arguments.
+For example,
+%
+\begin{quote}
+\begin{Verbatim}
+real x[10];
+matrix[3,3] m[6,7];
+\end{Verbatim}
+\end{quote}
+%
+delcares \code{x} to be a one-dimensional array of size 10 containing
+real values, and declares \code{m} to be a two-dimensional array of
+size $6 \times 7$ containing values that are $3 \times 3$ matrices.
+
+
+\section{Constrained Data Types}
+
+Declarations of variables other than local variables may be provided
+with constraints.  Each constrained data type corresponds to a basic
+data type with constraints.
+
+Constraints provide error checking for variables defined in the \code{data},
+\code{transformed data}, \code{transformed parameters}, and 
+\code{generated quantities} blocks.
+
+Constraints are critical for variables declared in the
+\code{parameters} block, where they determine the transformation from
+constrained variables (those satisfying the declared constraint) to
+unconstrained variables (those ranging over all of $\mathbb{R}^n$).
+
+It is worth calling out the most important aspect of constrained data
+types: 
+%
+\begin{quote}
+\it
+The model must have support (non-zero density) at every value of the
+parameters that meets their declared constraints.
+\end{quote}
+%
+If the declared parameter constraints are less strict than the
+support, the samplers and optimizers may be have any of a number of
+pathologies including just getting stuck, failure to initialize,
+excessive Metropolis rejection, or biased samples due to inability to
+explore the tails of the distribution.
+
+\subsection{Upper and Lower Bounds}
+
+Variables may be declared with constraints
+All of the basic data types may be given lower and upper bounds using
+syntax such as
+%
+\begin{quote}
+\begin{Verbatim}
+int<lower=1> N;
+real<upper=0> log_p;
+vector<lower=-1,upper=1>[3,3] corr;
+\end{Verbatim}
+\end{quote}
+
+\subsection{Structured Vectors}
+
+There are also special data types for structured vectors.  These are
+\code{ordered} for a vector of values ordered in increasing order, and
+\code{positive\_ordered} for a vector of positive values ordered in
+increasing order.  
+
+There is also a type \code{simplex} for vectors of non-negative values
+that sum to one, and \code{unit\_vector} for vectors of values whose
+squares sum to one.
+
+\subsection{Structured Matrices}
+
+Symmetric, positive-definite matrices have the type
+\code{cov\_matrix}.  Correlation matrices, which are symmetric
+positive-definite matrices with unit diagonals, have the type
+\code{corr\_matrix}.
+
+For both correlation and covariance matrices, there are corresponding
+Cholesky factor types, \code{cholesky\_corr} and
+\code{cholesky\_cov}.  Using these can be much more efficient than the
+full correlation and covariance matrices because they are easier to
+factor and scale.
+
+
+
+
+\section{Assignment and Argument Passing}
+
+\subsection{Assignment}
+
+Constrained data values may be assigned to unconstrained variables of
+matching basic type and vice-versa.   Matching is interpreted strictly
+as having the same basic type and number of array dimensions.
+Constraints are not considered, but basic data types are.  
+
+Arrays cannot be assigned to vectors and vice-versa.  Similarly,
+vectors cannot be assigned to matrices and vice-versa, even if their
+dimensions conform.  \refchapter{containers} provides more information
+on the distinctions between vectors and arrays and when each is
+appropriate.
+
+\subsection{Function Invocation}
+
+Passing arguments to functions in Stan works just like assignment to
+basic types.  Stan functions are only specified for the basic data
+types of their arguments, including array dimensionality, but not for
+sizes or constraints.  Of course, functions often check constraints as
+part of their behavior.  
+
+
+
 \chapter{Containers: Arrays, Vectors, and Matrices}\label{containers.chapter}
 
 \noindent
@@ -609,7 +763,7 @@ data {
 }
 parameters {
   real alpha;           // intercept
-  vector[N] beta;       // coefficients for predictors
+  vector[K] beta;       // coefficients for predictors
   real<lower=0,upper=10> sigma;  // error scale
 }
 model {
@@ -631,6 +785,26 @@ The sampling statement in the model above is equivalent to
 With Stan's matrix indexing scheme, \code{x[n]} picks out row \code{n}
 of the matrix \code{x};  because \code{beta} is a column vector, 
 the product \code{x[n] * beta} is a scalar of type \code{real}.
+
+\subsubsection{Intercepts as Inputs}
+
+In the model formulation
+%
+\begin{quote}
+\begin{Verbatim}
+  y ~ normal(x * beta, sigma);
+\end{Verbatim}
+\end{quote}
+%
+there is no longer an intercept \code{alpha}.  Instead, we have
+assumed that the first column of the input matrix \code{x} is a column
+of 1 values.  This way, \code{beta[1]} plays the role of the
+intercept.  If the intercept gets a different prior than the the slope
+terms, then it would be clearer to break it out.  It is also slightly
+more efficient in its explicit form with the intercept variable
+singled out because there's one fewer multiplications;  it should not
+make that much of a difference to speed, though, so the choice should
+be based on clarity.
 
 
 \section{Coefficient and Noise Priors}
@@ -721,7 +895,7 @@ follows.
 \begin{Verbatim}[fontsize=\small]
 data {
   int<lower=0> N;
-  real x[N];
+  vector[N] x;
   int<lower=0,upper=1> y[N];
 }
 parameters {
@@ -729,18 +903,58 @@ parameters {
   real beta;
 }
 model {
-  for (n in 1:N)
-    y[n] ~ bernoulli(inv_logit(alpha + beta * x[n]));
+  y ~ bernoulli_logit(alpha + beta * x);
 } 
 \end{Verbatim}
 \end{quote}
 %
 The noise parameter is built into the Bernoulli formulation here
-rather than specified directly.
+rather than specified directly.  
 
 Logistic regression is a kind of generalized linear model with binary
-outcomes and the log odds (logit) link function.  The inverse of the
-link function appears in the model.  
+outcomes and the log odds (logit) link function, defined by
+%
+\[
+\mbox{logit}(v) = \log \left( \frac{v}{1-v} \right).
+\]
+%
+The inverse of the link function appears in the model.  
+%
+\[
+\mbox{logit}^{-1}(u) = \frac{1}{1 + \exp(-u)}.
+\]
+%
+
+The model formulation above uses the logit-parameterized version of
+the Bernoulli distribution, which is defined by 
+%
+\[
+\distro{BernoulliLogit}(y|\alpha) 
+=
+\distro{Bernoulli}(y | \mbox{logit}^{-1}(\alpha)).
+\]
+%
+The formulation is also vectorized in the sense that \code{alpha} and
+\code{beta} are scalars and \code{x} is a vector, so that \code{alpha
+  + beta * x} is a vector.  The vectorized formulation is equivalent
+to the less efficient version
+%
+\begin{quote}
+\begin{Verbatim}
+for (n in 1:N)
+  y[n] ~ bernoulli_logit(alpha + beta * x[n]);
+\end{Verbatim}
+\end{quote}
+%
+Expanding out the Bernoulli logit, the model is equivalent to the more
+explicit, but less efficient and less arithmetically stable
+%
+\begin{quote}
+\begin{Verbatim}
+for (n in 1:N)
+  y[n] ~ bernoulli(inv_logit(alpha + beta * x[n]));
+\end{Verbatim}
+\end{quote}
 
 Other link functions may be used in the same way.  For example, probit
 regression uses the cumulative normal distribution function, which is
@@ -1406,7 +1620,7 @@ data {
   vector[N] y;                 // outcomes
 }
 parameters {
-  corr_matrix[K] Omega;     // prior covariance
+  corr_matrix[K] Omega;     // prior correlation
   vector<lower=0>[K] tau;   // prior scale
   matrix[L,K] gamma;        // group coeffs
   vector[K] beta[J];        // indiv coeffs by group
@@ -2735,15 +2949,16 @@ does not report values above 300 pounds.
 
 One way to model censored data is to treat the censored data as
 missing data that is constrained to fall in the censored range of
-values.  Because \Stan does not allow unknown values in its arrays or
-matrices, the censored values must be represented explicitly.
+values.  Since \Stan does not allow unknown values in its arrays or
+matrices, the censored values must be represented explicitly, as in the
+following right-censored case.
 %
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
 data {
   int<lower=0> N_obs;
   int<lower=0> N_cens;
-  real<lower=0> y_obs[N_obs];
+  real y_obs[N_obs];
   real<lower=max(y_obs)> U;
 }
 parameters {
@@ -2752,10 +2967,8 @@ parameters {
   real<lower=0> sigma;
 }
 model {
-  for (n in 1:N_obs)
-    y_obs[n] ~ normal(mu,sigma);
-  for (n in 1:N_cens)
-    y_cens[n] ~ normal(mu,sigma);
+  y_obs ~ normal(mu,sigma);
+  y_cens ~ normal(mu,sigma);
 }
 \end{Verbatim}
 \end{quote}
@@ -2787,17 +3000,14 @@ is
 \[
 \log \prod_{m=1}^M \mbox{Pr}[y_m > U]
 = \log \left( 1 - \Phi\left(\frac{y - \mu}{\sigma}\right)\right)^{M}
-= M \, \log \left( 1 - \Phi\left(\frac{y - \mu}{\sigma}\right)\right)
-\]
-% 
-Although \Stan implements $\Phi$ with the function $\code{Phi}$, \Stan
-also provides the cumulative distribution function \code{normal\_cdf},
-defined by
-\[
-\code{normal\_cdf}(y,\mu,\sigma) = \Phi \left( \frac{y - \mu}{\sigma} \right).
+= M \, \code{normal\_ccdf\_log}(y,\mu,\sigma),
 \]
 %
-The following model assumes
+where \code{normal\_ccdf\_log} is the log of complementary CDF
+(\Stan provides \code{<distr>\_ccdf\_log} for each distribution
+implemented in \Stan).
+
+The following right-censored model assumes
 that the censoring point is known, so it is declared as data.
 %
 \begin{quote}
@@ -2805,7 +3015,7 @@ that the censoring point is known, so it is declared as data.
 data {
   int<lower=0> N_obs;
   int<lower=0> N_cens;
-  real<lower=0> y_obs[N_obs];
+  real y_obs[N_obs];
   real<lower=max(y_obs)> U;
 }
 parameters {
@@ -2813,9 +3023,8 @@ parameters {
   real<lower=0> sigma;
 }
 model {
-  for (n in 1:N_obs)
-    y_obs[n] ~ normal(mu,sigma); 
-  increment_log_prob(N_cens * log1m(normal_cdf(U,mu,sigma)));
+  y_obs ~ normal(mu,sigma); 
+  increment_log_prob(N_cens * normal_ccdf_log(U,mu,sigma));
 }
 \end{Verbatim}
 \end{quote}
@@ -2823,14 +3032,33 @@ model {
 For the observed values in \Verb|y_obs|, the normal sampling model is
 used without truncation.  The log probability is directly incremented
 using the calculated log cumulative normal probability of the censored
-data items.  The built-in function \code{log1m} is used, which maps
-$x$ to $\log (1 - x)$ in an arithmetically stable way.
+data items.
 
-To deal with situations where the censoring point variable \code{U} is
-unknown, the declaration of \code{U} should be moved from the data
-block to the parameters block.
-
-
+For the left-censored data the CDF
+(\code{normal\_cdf\_log}) has to be used instead of complementary CDF.
+If the censoring point variable (\code{L}) is unknown,
+its declaration should be moved from the data to the parameters block. 
+%
+\begin{quote}
+\begin{Verbatim}[fontsize=\small]
+data {
+  int<lower=0> N_obs;
+  int<lower=0> N_cens;
+  real y_obs[N_obs];
+}
+parameters {
+  real<upper=min(y_obs)> L;
+  real mu;
+  real<lower=0> sigma;
+}
+model {
+  L ~ normal(mu,sigma);
+  y_obs ~ normal(mu,sigma);
+  increment_log_prob(N_cens * normal_cdf_log(L,mu,sigma));
+}
+\end{Verbatim}
+\end{quote}
+%
 
 \chapter{Mixture Modeling}\label{mixture-modeling.chapter}
 
@@ -2976,6 +3204,102 @@ such point, the log of $\theta_k \times
 array \code{ps}.  Then the log probability is incremented with the log
 sum of exponentials of those values.
 
+
+\section{Zero-Inflated Models}\label{zero-inflated.section}
+
+Zero-inflated models, as defined by \citet{Lambert:1992}, add
+additional probability mass to the outcome of zero.  These can be
+defined in Stan directly as mixture models. 
+
+Consider the following example for zero-inflated Poisson
+distributions.  It uses a parameter \code{theta} here there is a
+probability $\theta$ of drawing a zero, and a probability $1 - \theta$
+of drawing from $\distro{Poisson}(\lambda)$.  The probability function
+is thus
+\[
+p(y_n|\theta,\lambda) 
+= 
+\left\{
+\begin{array}{ll}
+\theta + (1 - \theta) \times \distro{Poisson}(0|\lambda) & \mbox{ if } y_n = 0, \mbox{ and}
+\\[3pt]
+(1-\theta) \times \distro{Poisson}(y_n|\lambda) & \mbox{ if } y_n > 0.
+\end{array}
+\right.
+\] 
+%
+The log probability function can be implemented directly in Stan as follows.
+%
+\begin{quote}
+\begin{Verbatim}[fontsize=\small]
+data {
+  int<lower=0> N;
+  int<lower=0> y[N];
+}
+parameters {
+  real<lower=0,upper=1> theta;
+  real lambda;
+}
+model {
+  for (n in 1:N) {
+    if (y[n] == 0)
+      increment_log_prob(log_sum_exp(bernoulli_log(1,theta),
+                                     bernoulli_log(0,theta) 
+                                     + poisson_log(y[n],lambda)));
+    else
+      increment_log_prob(bernoulli_log(0,theta)
+                         + poisson_log(y[n],lambda));
+  }
+}
+\end{Verbatim}
+\end{quote}
+%
+The \code{log\_sum\_exp(lp1,lp2)} function adds the log probabilities
+on the linear scale; it is defined to be equal to \code{log(exp(lp1) +
+  exp(lp2))}, but is more arithmetically stable and faster.
+
+Although it might be tempting to try to use the \code{if\_else} syntax
+within the \code{increment\_log\_prob} function, it is not recommended
+because \code{if\_else(c,e1,e2)} evaluates both \code{e1} and
+\code{e2} no matter what the value of \code{c} is.
+
+Other distributions than the Poisson can also be inflated in this
+way.  Similarly, the boundary conditions can be reorganized so that
+\code{theta} represents the probability that $y > 0$, and the Poisson
+is only used for values greater than zero.  For example, the following
+model is properly normalized.
+%
+\begin{quote}
+\begin{Verbatim}
+   (y[n] == 0) ~ bernoulli(1,theta);
+   if (y[n] > 0)
+     y[n] - 1 ~ poisson(lambda);
+\end{Verbatim}
+\end{quote}
+%
+A little algebra shows that this will produce the same posterior as
+the following, which is coded more directly as a mixture.
+%
+\begin{quote}
+\begin{Verbatim}
+    if (y[n] == 0)
+      increment_log_prob(bernoulli_log(1,theta));
+    else
+      increment_log_prob(bernoulli_log(0,theta)
+                         + poisson_log(y[n],lambda));
+\end{Verbatim}
+\end{quote}
+
+
+\subsection{No Zero-Inflated Parameters}
+
+Note that the outcome array \code{y} is declared as data in this
+model.  Zero-inflated parameters, such as one might want to use for
+regression coefficients to carry out variable selection, will not work
+if coded this way in Stan.  The problem is that they introduce a
+discontinuity in the posterior that messes up the ability of
+Stan's gradient-based MCMC and optimization routines to follow
+gradients smoothly.
 
 
 \chapter{Measurement Error and Meta-Analysis}
@@ -4228,7 +4552,7 @@ model {
   matrix[N,N] Sigma;
   // off-diagonal elements
   for (i in 1:(N-1)) {
-    for (j in i:N) {
+    for (j in (i+1):N) {
       Sigma[i,j] <- eta_sq * exp(-rho_sq * pow(x[i] - x[j],2));
       Sigma[j,i] <- Sigma[i,j];
     }
@@ -5589,7 +5913,7 @@ and ending with \code{*/} to the Stan parser.
 For functions that raise exceptions, these can be documented using
 \code{@throws}.%
 %
-\footnote{As of Stan 2.2.0, the only way a user-defined
+\footnote{As of Stan 2.3.0, the only way a user-defined
 producer will raise an exception is if a function it calls (including
 sampling statements) raises an exception.}
 %

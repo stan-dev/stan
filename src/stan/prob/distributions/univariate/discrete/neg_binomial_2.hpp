@@ -48,25 +48,17 @@ namespace stan {
         return 0.0;
 
       double logp(0.0);
-      if (!check_nonnegative(function, n, "Failures variable", &logp))
-        return logp;
-      if (!check_finite(function, mu, "Location parameter", &logp))
-        return logp;
-      if (!check_positive(function, mu, "Location parameter", &logp))
-        return logp;
-      if (!check_finite(function, phi, "Inverse scale parameter",
-                        &logp))
-        return logp;
-      if (!check_positive(function, phi, "Inverse scale parameter",
-                          &logp))
-        return logp;
-      if (!(check_consistent_sizes(function,
-                                   n,mu,phi,
-                                   "Failures variable",
-                                   "Location parameter",
-                                   "Inverse scale parameter",
-                                   &logp)))
-        return logp;
+      check_nonnegative(function, n, "Failures variable", &logp);
+      check_finite(function, mu, "Location parameter", &logp);
+      check_positive(function, mu, "Location parameter", &logp);
+      check_finite(function, phi, "Inverse scale parameter", &logp);
+      check_positive(function, phi, "Inverse scale parameter", &logp);
+      check_consistent_sizes(function,
+                             n,mu,phi,
+                             "Failures variable",
+                             "Location parameter",
+                             "Inverse scale parameter",
+                             &logp);
 
       // check if no variables are involved and prop-to
       if (!include_summand<propto,T_location,T_inv_scale>::value)
@@ -178,23 +170,16 @@ namespace stan {
         return 0.0;
 
       double logp(0.0);
-      if (!check_nonnegative(function, n, "Failures variable", &logp))
-        return logp;
-      if (!check_finite(function, eta, "Log location parameter", &logp))
-        return logp;
-      if (!check_finite(function, phi, "Inverse scale parameter",
-                        &logp))
-        return logp;
-      if (!check_positive(function, phi, "Inverse scale parameter",
-                          &logp))
-        return logp;
-      if (!(check_consistent_sizes(function,
-                                   n,eta,phi,
-                                   "Failures variable",
-                                   "Log location parameter",
-                                   "Inverse scale parameter",
-                                   &logp)))
-        return logp;
+      check_nonnegative(function, n, "Failures variable", &logp);
+      check_finite(function, eta, "Log location parameter", &logp);
+      check_finite(function, phi, "Inverse scale parameter", &logp);
+      check_positive(function, phi, "Inverse scale parameter", &logp);
+      check_consistent_sizes(function,
+                             n,eta,phi,
+                             "Failures variable",
+                             "Log location parameter",
+                             "Inverse scale parameter",
+                             &logp);
 
       // check if no variables are involved and prop-to
       if (!include_summand<propto,T_log_location,T_inv_scale>::value)
@@ -293,14 +278,10 @@ namespace stan {
       using stan::math::check_finite;
       using stan::math::check_positive;
 
-      if (!check_finite(function, mu, "Location parameter"))
-        return 0;
-      if (!check_finite(function, phi, "Inverse scale parameter"))
-        return 0;
-      if (!check_positive(function, mu, "Location parameter"))
-        return 0;
-      if (!check_positive(function, phi, "Inverse scale parameter"))
-        return 0;
+      check_finite(function, mu, "Location parameter", (double*)0);
+      check_finite(function, phi, "Inverse scale parameter", (double*)0);
+      check_positive(function, mu, "Location parameter", (double*)0);
+      check_positive(function, phi, "Inverse scale parameter", (double*)0);
 
       return stan::prob::poisson_rng(stan::prob::gamma_rng(phi,phi/mu,
                                                            rng),rng);
@@ -319,12 +300,9 @@ namespace stan {
       using stan::math::check_finite;
       using stan::math::check_positive;
 
-      if (!check_finite(function, eta, "Log-location parameter"))
-        return 0;
-      if (!check_finite(function, phi, "Inverse scale parameter"))
-        return 0;
-      if (!check_positive(function, phi, "Inverse scale parameter"))
-        return 0;
+      check_finite(function, eta, "Log-location parameter", (double*)0);
+      check_finite(function, phi, "Inverse scale parameter", (double*)0);
+      check_positive(function, phi, "Inverse scale parameter", (double*)0);
 
       return stan::prob::poisson_rng(stan::prob::gamma_rng(phi,phi/std::exp(eta),
                                                            rng),rng);

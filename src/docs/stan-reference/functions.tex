@@ -389,6 +389,10 @@ There are corresponding real-argument versions.
 
 \subsubsection{Boolean Operator Short Circuiting}
 
+{\it Warning:} \ As of Stan 2.3.0, the boolean operators do {\it not}
+short circuit.  This is a known bug and will be fixed in a future
+release.  The intended behavior in the future is as described below.
+
 Like in \Cpp, the boolean operators are implemented to short circuit
 directly to a return value after evaluating the first argument if it
 is sufficient to resolve the result.  In evaluating \code{a~||~b}, if
@@ -568,21 +572,9 @@ Metropolis/slice procedure will correct for any error due to poor
 gradient calculations, but the result is likely to be reduced
 acceptance probabilities and less efficient sampling.
 
-One case where rounding is reasonable is linear interpolation of
-function values.   For
-example, consider
-%
-\begin{quote}
-\begin{Verbatim}
-xm <- x[floor(c)];
-xp <- x[ceil(c)];
-x <- (c - floor(c))*xp + (ceil(c) - c)*xm;
-\end{Verbatim}
-\end{quote}
-%
-In this example, the first derivative for \code{x} with respect to
-\code{c} will be reasonable, but the second derivatives will all be
-zero.
+The rounding functions cannot be used as indices to arrays because
+they return real values.  Stan may introduce integer-valued versions
+of these in the future, but as of now, there is no good workaround.
 
 \begin{description}
 %
@@ -1645,10 +1637,10 @@ expressions, which are also much more efficient.
 \begin{description}
 %
 \fitem{matrix}{quad\_form}{matrix \farg{A}, matrix \farg{B}}{
-The quadratic form, i.e., \code{B'~*~A~*~B}.}
+  The quadratic form, i.e., \code{B'~*~A~*~B}.}
 %
 \fitem{real}{quad\_form}{matrix \farg{A}, vector \farg{B}}{
-The quadratic form, i.e., \code{B'~*~A~*~B}.}
+  The quadratic form, i.e., \code{B'~*~A~*~B}.}
 %
 \fitem{matrix}{quad\_form\_diag}{matrix \farg{m}, vector \farg{v}}
   {The quadratic form using the column vector
@@ -1659,6 +1651,14 @@ The quadratic form, i.e., \code{B'~*~A~*~B}.}
   {The quadratic form using the row vector
   \farg{rv} as a diagonal matrix, i.e.,
   \code{diag\_matrix(\farg{rv})~*~\farg{m}~*~diag\_matrix(\farg{rv})}.}
+%
+\fitem{matrix}{quad\_form\_sym}{matrix \farg{A}, matrix \farg{B}}{
+  Similarly to quad\_form, gives \code{B'~*~A~*~B}, but additionally
+  checks if A is symmetric and ensures that the result is also symmetric.}
+%
+\fitem{real}{quad\_form\_sym}{matrix \farg{A}, vector \farg{B}}{
+  Similarly to quad\_form, gives \code{B'~*~A~*~B}, but additionally
+  checks if A is symmetric and ensures that the result is also symmetric.}
 %
 \fitem{real}{trace\_quad\_form}{matrix \farg{A}, matrix \farg{B}}{ 
 The trace of the quadratic form, i.e., \code{trace(B'~*~A~*~B)}.}
@@ -1678,7 +1678,8 @@ matrix of the same dimensions as \farg{x}\, with \code{L(m,n)} equal to
   \code{\farg{x}(m,n)} for $\mbox{\code{n}} \leq \mbox{\code{m}}$ and
 \code{L(m,n)} equal to 0 if $\mbox{\code{n}} > \mbox{\code{m}}$, the
 result is the symmetric matrix $\mbox{\code{L}}\,\mbox{\code{L}}^{\top}$.
-This is a specialization of tcrossprod(x) for lower-triangular matrices.}
+This is a specialization of tcrossprod(x) for lower-triangular
+matrices.  The input matrix does not need to be square.}
 %
 \end{description}
 
@@ -1862,15 +1863,6 @@ x <- rep_vector(1.0, 3);
 %
 There are no integer vector or matrix types, so integer values are
 automatically promoted.
-%
-\begin{description}
-%
-\fitem{vector}{to\_vector}{matrix \farg{m}}{
-Return the matrix \farg{m} as a vector in column-major order.}
-%
-\fitem{vector}{to\_vector}{row\_vector \farg{m}}{
-Return the row vector \farg{m} as a vector in column-major order.}
-\end{description}
 
 \section{Slice and Package Functions}
 
@@ -2292,5 +2284,99 @@ Number of components of \farg{v} less than \farg{v[s]}}
 %
 \fitem{int}{rank}{row\_vector \farg{v}, int \farg{s}}{
 Number of components of \farg{v} less than \farg{v[s]}}
+%
+\end{description}
+
+
+\chapter{Mixed Operations}
+
+These functions perform conversions between Stan containers matrix,
+vector, row vector and arrays.
+
+Whenever a conversion implies reduction of dimensionality (like
+converting a matrix to a vector or a two dimensional array to a one
+dimensional array), the conversion is proceed in row-major order when
+the input is an array and in column-major order when the input is a
+vector, a row vector or a matrix.
+
+If the dimensionality is preserved (like when converting a matrix to a
+two dimensional array), then the indexes are also fully preserved
+which implies easy reversibility of the operation.
+
+\begin{description}
+%
+\fitem{matrix}{to\_matrix}{matrix \farg{m}}{
+Return the matrix \farg{m} itself.}
+%
+\fitem{matrix}{to\_matrix}{vector \farg{v}}{
+Convert the column vector \farg{v} to a \code{size(\farg{v})} by 1 matrix.}
+%
+\fitem{matrix}{to\_matrix}{row\_vector \farg{v}}{
+Convert the row vector \farg{v} to a 1 by \code{size(\farg{v})} matrix.}
+%
+\fitem{matrix}{to\_matrix}{real[,] \farg{a}}{
+Convert the two dimensional array \farg{a} to a matrix with the same
+dimensions and indexing order.}
+%
+\fitem{matrix}{to\_matrix}{int[,] \farg{a}}{
+Convert the two dimensional array \farg{a} to a matrix with the same
+dimensions and indexing order.}
+%
+%
+%
+\fitem{vector}{to\_vector}{matrix \farg{m}}{
+Convert the matrix \farg{m} to a column vector in column-major order.}
+%
+\fitem{vector}{to\_vector}{vector \farg{v}}{
+Return the column vector \farg{v} itself.}
+%
+\fitem{vector}{to\_vector}{row\_vector \farg{v}}{
+Convert the row vector \farg{v} to a column vector.}
+%
+\fitem{vector}{to\_vector}{real[] \farg{a}}{
+Convert the one-dimensional array \farg{a} to a column vector.}
+%
+\fitem{vector}{to\_vector}{int[] \farg{a}}{
+Convert the one-dimensional integer array \farg{a} to a column vector.}
+%
+%
+%
+\fitem{row\_vector}{to\_row\_vector}{matrix \farg{m}}{
+Convert the matrix \farg{m} to a row vector in column-major order.}
+%
+\fitem{row\_vector}{to\_row\_vector}{vector \farg{v}}{
+Convert the column vector \farg{v} to a row vector.}
+%
+\fitem{row\_vector}{to\_row\_vector}{row\_vector \farg{v}}{
+Return the row vector \farg{v} itself.}
+%
+\fitem{row\_vector}{to\_row\_vector}{real[] \farg{a}}{
+Convert the one-dimensional array \farg{a} to a row vector.}
+%
+\fitem{row\_vector}{to\_row\_vector}{int[] \farg{a}}{
+Convert the one-dimensional array \farg{a} to a row vector.}
+%
+%
+%
+\fitem{real[,]}{to\_array\_2d}{matrix \farg{m}}{
+Convert the matrix \farg{m} to a two dimensional array with the same 
+dimensions and indexing order.}
+%
+%
+%
+\fitem{real[]}{to\_array\_1d}{vector \farg{v}}{
+Convert the column vector \farg{v} to a one-dimensional array.}
+%
+\fitem{real[]}{to\_array\_1d}{row\_vector \farg{v}}{
+Convert the row vector \farg{v} to a one-dimensional array.}
+%
+\fitem{real[]}{to\_array\_1d}{matrix \farg{m}}{
+Convert the matrix \farg{m} to a one-dimensional array in column-major order.}
+%
+\fitem{real[]}{to\_array\_1d}{real[...] \farg{a}}{
+Convert the array \farg{a} (of any dimension up to 10) to a one-dimensional array in row-major order.}
+%
+\fitem{int[]}{to\_array\_1d}{int[...] \farg{a}}{
+Convert the array \farg{a} (of any dimension up to 10) to a one-dimensional array in row-major order.}
 %
 \end{description}
