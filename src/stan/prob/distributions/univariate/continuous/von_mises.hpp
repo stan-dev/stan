@@ -127,8 +127,8 @@ namespace stan {
 
       static const char* function = "stan::prob::von_mises_rng(%1%)";
 
-      stan::math::check_finite(function,kappa,"inverse of variance");
-      stan::math::check_positive(function,kappa,"inverse of variance");
+      stan::math::check_finite(function,kappa,"inverse of variance",(double*)0);
+      stan::math::check_positive(function,kappa,"inverse of variance",(double*)0);
 
       double r = 1 + pow((1 + 4 * kappa * kappa), 0.5);
       double rho = 0.5 * (r - pow(2 * r, 0.5)) / kappa;
@@ -151,8 +151,9 @@ namespace stan {
       double U3 = uniform_rng(0.0, 1.0, rng) - 0.5;
 
       double sign = ((U3 >= 0) - (U3 <= 0));
+      double TWO_PI = stan::math::pi() * 2.0;
 
-      return std::fmod(std::fmod(mu + sign * std::acos(W), TWO_PI) + TWO_PI, TWO_PI);
+      return mu + sign * std::acos(W) + stan::math::pi();
     }
 
   } 
