@@ -1689,6 +1689,12 @@ around the mean $\mu$.
     location \farg{mu} and scale \farg{kappa}}
 \end{description}
 
+\begin{description}
+  \fitem{real}{von\_mises\_rng}{reals \farg{mu}, reals
+    \farg{kappa}}{Generate a Von Mises variate with location
+  \farg{mu} and scale \farg{kappa} (i.e. returns values in the interval $[\mu-\pi,\mu+\pi]$); may only
+    be used in generated quantities block}
+\end{description}
 \subsubsection{Numerical Stability}
 
 Evaluating the Von Mises distribution for $\kappa > 100$ is
