@@ -7,7 +7,7 @@
 #include <stan/agrad/rev/internal/dv_vari.hpp>
 #include <stan/agrad/rev/internal/vd_vari.hpp>
 #include <stan/math/functions/gamma_q.hpp>
-#include <stan/prob/internal_math.hpp>
+#include <stan/prob/internal_math/math/grad_reg_inc_gamma.hpp>
 #include <boost/math/special_functions/gamma.hpp>
 #include <boost/math/special_functions/digamma.hpp>
 

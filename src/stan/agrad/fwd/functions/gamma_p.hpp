@@ -4,7 +4,6 @@
 #include <stan/agrad/fwd/fvar.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/math/functions/gamma_p.hpp>
-#include <stan/prob/internal_math.hpp>
 
 namespace stan{
 
