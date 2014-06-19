@@ -23,7 +23,7 @@ namespace stan {
         }
         void chain() {
           avi_->adj_ += adj_ 
-            * stan::math::gradRegIncGamma(avi_->val_, bvi_->val_,
+            * stan::math::grad_reg_inc_gamma(avi_->val_, bvi_->val_,
                                           boost::math::tgamma(avi_->val_),
                                           boost::math::digamma(avi_->val_));
           bvi_->adj_ -= adj_ 
@@ -39,7 +39,7 @@ namespace stan {
         }
         void chain() {
           avi_->adj_ += adj_ 
-            * stan::math::gradRegIncGamma(avi_->val_, bd_,
+            * stan::math::grad_reg_inc_gamma(avi_->val_, bd_,
                                           boost::math::tgamma(avi_->val_),
                                           boost::math::digamma(avi_->val_));
         }

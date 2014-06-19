@@ -23,8 +23,8 @@ namespace stan {
     // g   = boost::math::tgamma(a)
     // dig = boost::math::digamma(a)
     template<typename T>
-    T gradRegIncGamma(T a, T z, T g, T dig, 
-                      T precision = 1e-6) {
+    T grad_reg_inc_gamma(T a, T z, T g, T dig, 
+                         T precision = 1e-6) {
       using stan::math::gamma_p;
       using std::log;
       using std::exp;
