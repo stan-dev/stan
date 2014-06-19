@@ -14,7 +14,7 @@ public:
     param[0] = 3.0;           // y
     param[1] = 0.5;           // Degrees of freedom
     parameters.push_back(param);
-    cdf.push_back(0.317528);  // expected cdf
+    cdf.push_back(0.317528038297796704186230);  // expected cdf
 
   }
   

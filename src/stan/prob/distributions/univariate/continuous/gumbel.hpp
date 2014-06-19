@@ -9,7 +9,6 @@
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
-#include <stan/prob/internal_math.hpp>
 #include <stan/math/functions/value_of.hpp>
 
 namespace stan {

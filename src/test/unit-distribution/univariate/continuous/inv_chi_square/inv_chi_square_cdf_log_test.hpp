@@ -14,7 +14,7 @@ public:
     param[0] = 3.0;           // y
     param[1] = 0.5;           // Degrees of freedom
     parameters.push_back(param);
-    cdf_log.push_back(std::log(0.317528));  // expected cdf_log
+    cdf_log.push_back(std::log(0.317528038297796704186230));  // expected cdf_log
 
   }
   
