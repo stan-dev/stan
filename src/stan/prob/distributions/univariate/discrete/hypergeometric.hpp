@@ -25,7 +25,6 @@ namespace stan {
     hypergeometric_log(const T_n& n, const T_N& N, 
                        const T_a& a, const T_b& b) {
       static const char* function = "stan::prob::hypergeometric_log(%1%)";
-      typedef typename stan::partials_return_type<T_n,T_N,T_a,T_b>::type T_partials_return;
 
       using stan::math::check_finite;      
       using stan::math::check_bounded;
@@ -47,7 +46,7 @@ namespace stan {
       VectorView<const T_b> b_vec(b);
       size_t size = max_size(n, N, a, b);
       
-      T_partials_return logp(0.0);
+      double logp(0.0);
       check_bounded(function, n, 0, a, "Successes variable", &logp);
       check_greater(function, N, n, "Draws parameter", &logp);
       for (size_t i = 0; i < size; i++) {
