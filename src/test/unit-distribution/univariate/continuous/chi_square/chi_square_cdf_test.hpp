@@ -16,12 +16,12 @@ public:
     param[0] = 7.9;                 // y
     param[1] = 3.0;                 // nu
     parameters.push_back(param);
-    cdf.push_back(0.951876);  // expected cdf
+    cdf.push_back(0.951875748155839862541);  // expected cdf
 
     param[0] = 1.9;                 // y
     param[1] = 0.5;                 // nu
     parameters.push_back(param);
-    cdf.push_back(0.926775);    // expected cdf
+    cdf.push_back(0.9267752080547182469417);    // expected cdf
   }
  
   void invalid_values(vector<size_t>& index, 

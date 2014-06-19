@@ -16,12 +16,12 @@ public:
     param[0] = 7.9;                 // y
     param[1] = 3.0;                 // nu
     parameters.push_back(param);
-    cdf_log.push_back(-0.049320769);  // expected cdf_log
+    cdf_log.push_back(std::log(0.951875748155839862541));  // expected cdf_log
 
     param[0] = 1.9;                 // y
     param[1] = 0.5;                 // nu
     parameters.push_back(param);
-    cdf_log.push_back(-0.076044239);    // expected cdf_log
+    cdf_log.push_back(std::log(0.9267752080547182469417)); // expected cdf_log
   }
  
   void invalid_values(vector<size_t>& index, 
