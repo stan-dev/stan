@@ -16,7 +16,18 @@
 #include <stan/prob/traits.hpp>
 #include <stan/prob/constants.hpp>
 
+#include <stan/prob/internal_math/math/inc_beta.hpp>
+#include <stan/prob/internal_math/rev/inc_beta.hpp>
+#include <stan/prob/internal_math/fwd/inc_beta.hpp>
+
 #include <stan/math/functions/binomial_coefficient_log.hpp>
+#include <stan/math/functions/lbeta.hpp>
+#include <stan/agrad/fwd/functions/binomial_coefficient_log.hpp>
+#include <stan/agrad/fwd/functions/exp.hpp>
+#include <stan/agrad/fwd/functions/pow.hpp>
+#include <stan/agrad/fwd/functions/lbeta.hpp>
+#include <stan/agrad/rev/functions/exp.hpp>
+#include <stan/agrad/rev/functions/pow.hpp>
 
 namespace stan {
 
@@ -121,7 +132,7 @@ namespace stan {
         }
       }
 
-      return operands_and_partials.to_var(logp,n,N,theta);
+      return operands_and_partials.to_var(logp,theta);
     }
 
     template <typename T_n, 
@@ -145,6 +156,7 @@ namespace stan {
     binomial_logit_log(const T_n& n, 
                        const T_N& N, 
                        const T_prob& alpha) {
+      typedef typename stan::partials_return_type<T_n,T_N,T_prob>::type T_partials_return;
 
       static const char* function = "stan::prob::binomial_logit_log(%1%)";
       
@@ -235,7 +247,7 @@ namespace stan {
         }
       }
 
-      return operands_and_partials.to_var(logp,n,N,theta);
+      return operands_and_partials.to_var(logp,alpha);
     }
 
     template <typename T_n, 
@@ -289,8 +301,14 @@ namespace stan {
           
       // Compute vectorized CDF and gradient
       using stan::math::value_of;
-      using boost::math::ibeta;
-      using boost::math::ibeta_derivative;
+      using stan::math::inc_beta;
+      using stan::math::lbeta;
+      using std::exp;
+      using std::pow;
+      using stan::agrad::inc_beta;
+      using stan::agrad::lbeta;
+      using stan::agrad::exp;
+      using stan::agrad::pow;
           
       agrad::OperandsAndPartials<T_prob> operands_and_partials(theta);
           
@@ -298,7 +316,7 @@ namespace stan {
       // The gradients are technically ill-defined, but treated as zero
       for (size_t i = 0; i < stan::length(n); i++) {
         if (value_of(n_vec[i]) < 0) 
-          return operands_and_partials.to_var(0.0,n,N,theta);
+          return operands_and_partials.to_var(0.0,theta);
       }
         
       for (size_t i = 0; i < size; i++) {
@@ -313,22 +331,21 @@ namespace stan {
         const T_partials_return N_dbl = value_of(N_vec[i]);
         const T_partials_return theta_dbl = value_of(theta_vec[i]);
 
-        const T_partials_return Pi = ibeta(N_dbl - n_dbl, n_dbl + 1, 1 - theta_dbl);
+        const T_partials_return Pi = inc_beta(N_dbl - n_dbl, n_dbl + 1, 1 - theta_dbl);
           
         P *= Pi;
 
         if (!is_constant_struct<T_prob>::value)
-          operands_and_partials.d_x1[i] 
-            += - ibeta_derivative(N_dbl - n_dbl, n_dbl + 1, 1 - theta_dbl) / Pi;
-          
-              
+          operands_and_partials.d_x1[i] -= pow(theta_dbl,n_dbl)
+            * pow(1-theta_dbl,N_dbl-n_dbl-1) / exp(lbeta(N_dbl-n_dbl,n_dbl+1)) / Pi;
       }
           
       if (!is_constant_struct<T_prob>::value) {
-        for(size_t i = 0; i < stan::length(theta); ++i) operands_and_partials.d_x1[i] *= P;
+        for(size_t i = 0; i < stan::length(theta); ++i)
+          operands_and_partials.d_x1[i] *= P;
       }
           
-      return operands_and_partials.to_var(P,n,N,theta);
+      return operands_and_partials.to_var(P,theta);
         
     }
 
@@ -370,8 +387,14 @@ namespace stan {
           
       // Compute vectorized cdf_log and gradient
       using stan::math::value_of;
-      using boost::math::ibeta;
-      using boost::math::ibeta_derivative;
+      using stan::math::inc_beta;
+      using stan::math::lbeta;
+      using std::exp;
+      using std::pow;
+      using stan::agrad::inc_beta;
+      using stan::agrad::lbeta;
+      using stan::agrad::exp;
+      using stan::agrad::pow;
           
       agrad::OperandsAndPartials<T_prob> operands_and_partials(theta);
           
@@ -379,7 +402,7 @@ namespace stan {
       // The gradients are technically ill-defined, but treated as negative infinity
       for (size_t i = 0; i < stan::length(n); i++) {
         if (value_of(n_vec[i]) < 0) 
-          return operands_and_partials.to_var(stan::math::negative_infinity(),n,N,theta);
+          return operands_and_partials.to_var(stan::math::negative_infinity(),theta);
       }
         
       for (size_t i = 0; i < size; i++) {
@@ -391,16 +414,16 @@ namespace stan {
         const T_partials_return n_dbl = value_of(n_vec[i]);
         const T_partials_return N_dbl = value_of(N_vec[i]);
         const T_partials_return theta_dbl = value_of(theta_vec[i]);
-        const T_partials_return Pi = ibeta(N_dbl - n_dbl, n_dbl + 1, 1 - theta_dbl);
-          
+        const T_partials_return Pi = inc_beta(N_dbl - n_dbl, n_dbl + 1, 1 - theta_dbl);
+
         P += log(Pi);
 
         if (!is_constant_struct<T_prob>::value)
-          operands_and_partials.d_x1[i] 
-            += - ibeta_derivative(N_dbl - n_dbl, n_dbl + 1, 1 - theta_dbl) / Pi;
+          operands_and_partials.d_x1[i] -= pow(theta_dbl,n_dbl)
+            * pow(1-theta_dbl,N_dbl-n_dbl-1) / exp(lbeta(N_dbl-n_dbl,n_dbl+1)) / Pi;
       }
           
-      return operands_and_partials.to_var(P,n,N,theta);
+      return operands_and_partials.to_var(P,theta);
     }
 
     template <typename T_n, typename T_N, typename T_prob>
@@ -441,8 +464,14 @@ namespace stan {
           
       // Compute vectorized cdf_log and gradient
       using stan::math::value_of;
-      using boost::math::ibeta;
-      using boost::math::ibeta_derivative;
+      using stan::math::inc_beta;
+      using stan::math::lbeta;
+      using std::exp;
+      using std::pow;
+      using stan::agrad::inc_beta;
+      using stan::agrad::lbeta;
+      using stan::agrad::exp;
+      using stan::agrad::pow;
           
       agrad::OperandsAndPartials<T_prob> operands_and_partials(theta);
           
@@ -450,28 +479,28 @@ namespace stan {
       // The gradients are technically ill-defined, but treated as negative infinity
       for (size_t i = 0; i < stan::length(n); i++) {
         if (value_of(n_vec[i]) < 0) 
-          return operands_and_partials.to_var(0.0,n,N,theta);
+          return operands_and_partials.to_var(0.0,theta);
       }
         
       for (size_t i = 0; i < size; i++) {
         // Explicit results for extreme values
         // The gradients are technically ill-defined, but treated as zero
         if (value_of(n_vec[i]) >= value_of(N_vec[i])) {
-          return operands_and_partials.to_var(stan::math::negative_infinity(),n,N,theta);
+          return operands_and_partials.to_var(stan::math::negative_infinity(),theta);
         }
         const T_partials_return n_dbl = value_of(n_vec[i]);
         const T_partials_return N_dbl = value_of(N_vec[i]);
         const T_partials_return theta_dbl = value_of(theta_vec[i]);
-        const T_partials_return Pi = 1.0 - ibeta(N_dbl - n_dbl, n_dbl + 1, 1 - theta_dbl);
-          
+        const T_partials_return Pi = 1.0 - inc_beta(N_dbl - n_dbl, n_dbl + 1, 1 - theta_dbl);
+
         P += log(Pi);
 
         if (!is_constant_struct<T_prob>::value)
-          operands_and_partials.d_x1[i] 
-            += ibeta_derivative(N_dbl - n_dbl, n_dbl + 1, 1 - theta_dbl) / Pi;
+          operands_and_partials.d_x1[i] += pow(theta_dbl,n_dbl)
+            * pow(1-theta_dbl,N_dbl-n_dbl-1) / exp(lbeta(N_dbl-n_dbl,n_dbl+1)) / Pi;
       }
           
-      return operands_and_partials.to_var(P,n,N,theta);
+      return operands_and_partials.to_var(P,theta);
     }
 
 
