@@ -7,13 +7,32 @@
 #include <stan/agrad/partials_vari.hpp>
 #include <stan/math/error_handling.hpp>
 #include <stan/math/constants.hpp>
-#include <stan/math/functions/square.hpp>
-#include <stan/math/functions/multiply_log.hpp>
 #include <stan/math/functions/value_of.hpp>
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
-#include <stan/prob/internal_math.hpp>
+
+#include <stan/prob/internal_math/math/grad_reg_inc_gamma.hpp>
+
+#include <stan/agrad/fwd/functions/gamma_q.hpp>
+#include <stan/agrad/fwd/functions/exp.hpp>
+#include <stan/agrad/fwd/functions/pow.hpp>
+#include <stan/agrad/fwd/functions/square.hpp>
+#include <stan/agrad/fwd/functions/tgamma.hpp>
+#include <stan/agrad/fwd/functions/lgamma.hpp>
+#include <stan/agrad/fwd/functions/digamma.hpp>
+#include <stan/agrad/rev/functions/gamma_q.hpp>
+#include <stan/agrad/rev/functions/exp.hpp>
+#include <stan/agrad/rev/functions/square.hpp>
+#include <stan/agrad/rev/functions/pow.hpp>
+#include <stan/agrad/rev/functions/tgamma.hpp>
+#include <stan/agrad/rev/functions/lgamma.hpp>
+#include <stan/agrad/rev/functions/digamma.hpp>
+#include <stan/math/functions/gamma_q.hpp>
+#include <stan/math/functions/digamma.hpp>
+#include <stan/math/functions/lgamma.hpp>
+#include <stan/math/functions/square.hpp>
+
 
 namespace stan {
 
@@ -85,10 +104,12 @@ namespace stan {
           return LOG_ZERO;
       }
 
-      using boost::math::lgamma;
-      using boost::math::digamma;
-      using stan::math::multiply_log;
+      using stan::math::lgamma;
+      using stan::math::digamma;
       using stan::math::square;
+      using stan::agrad::lgamma;
+      using stan::agrad::digamma;
+      using stan::agrad::square;
       
       DoubleVectorView<T_partials_return,
                        include_summand<propto,T_dof,T_y,T_scale>::value,
@@ -245,10 +266,15 @@ namespace stan {
       }
           
       // Compute CDF and its gradients
-      using boost::math::gamma_p_derivative;
-      using boost::math::gamma_q;
-      using boost::math::digamma;
+      using stan::math::gamma_q;
+      using stan::math::digamma;
       using boost::math::tgamma;
+      using stan::agrad::tgamma;
+      using stan::agrad::gamma_q;
+      using stan::agrad::exp;
+      using stan::agrad::pow;
+      using std::exp;
+      using std::pow;
           
       // Cache a few expensive function calls if nu is a parameter
       DoubleVectorView<T_partials_return,
@@ -286,27 +312,29 @@ namespace stan {
                     
         // Compute
         const T_partials_return Pn = gamma_q(half_nu_dbl, half_nu_s2_overx_dbl);
-                    
+        const T_partials_return gamma_p_deriv = exp(-half_nu_s2_overx_dbl)
+          * pow(half_nu_s2_overx_dbl,half_nu_dbl-1) / tgamma(half_nu_dbl);
+
         P *= Pn;
               
         if (!is_constant_struct<T_y>::value)
-          operands_and_partials.d_x1[n] 
-            += half_nu_s2_overx_dbl * y_inv_dbl 
-            * gamma_p_derivative(half_nu_dbl, half_nu_s2_overx_dbl) / Pn;
+          operands_and_partials.d_x1[n] += half_nu_s2_overx_dbl * y_inv_dbl 
+            * gamma_p_deriv / Pn;
                     
+
+
         if (!is_constant_struct<T_dof>::value)
           operands_and_partials.d_x2[n] 
-            += (0.5 * stan::math::gradRegIncGamma(half_nu_dbl,
+            += (0.5 * stan::math::grad_reg_inc_gamma(half_nu_dbl,
                                                   half_nu_s2_overx_dbl,
                                                   gamma_vec[n], digamma_vec[n])
-                - half_s2_overx_dbl 
-                * gamma_p_derivative(half_nu_dbl, half_nu_s2_overx_dbl) )
+                - half_s2_overx_dbl * gamma_p_deriv)
             / Pn;
                     
         if (!is_constant_struct<T_scale>::value)
           operands_and_partials.d_x3[n] 
             += - 2.0 * half_nu_dbl * s_dbl * y_inv_dbl 
-            * gamma_p_derivative(half_nu_dbl, half_nu_s2_overx_dbl) / Pn;
+            * gamma_p_deriv / Pn;
               
       }
           
@@ -374,10 +402,15 @@ namespace stan {
       }
           
       // Compute cdf_log and its gradients
-      using boost::math::gamma_p_derivative;
-      using boost::math::gamma_q;
-      using boost::math::digamma;
+      using stan::math::gamma_q;
+      using stan::math::digamma;
       using boost::math::tgamma;
+      using stan::agrad::tgamma;
+      using stan::agrad::gamma_q;
+      using stan::agrad::exp;
+      using stan::agrad::pow;
+      using std::exp;
+      using std::pow;
           
       // Cache a few expensive function calls if nu is a parameter
       DoubleVectorView<T_partials_return,
@@ -415,25 +448,24 @@ namespace stan {
                     
         // Compute
         const T_partials_return Pn = gamma_q(half_nu_dbl, half_nu_s2_overx_dbl);
+        const T_partials_return gamma_p_deriv = exp(-half_nu_s2_overx_dbl)
+          * pow(half_nu_s2_overx_dbl,half_nu_dbl-1) / tgamma(half_nu_dbl);
                     
         P += log(Pn);
               
         if (!is_constant_struct<T_y>::value)
-          operands_and_partials.d_x1[n] 
-            += half_nu_s2_overx_dbl * y_inv_dbl 
-            * gamma_p_derivative(half_nu_dbl, half_nu_s2_overx_dbl) / Pn;
+          operands_and_partials.d_x1[n] += half_nu_s2_overx_dbl * y_inv_dbl 
+            * gamma_p_deriv / Pn;
         if (!is_constant_struct<T_dof>::value)
           operands_and_partials.d_x2[n] 
-            += (0.5 * stan::math::gradRegIncGamma(half_nu_dbl,
+            += (0.5 * stan::math::grad_reg_inc_gamma(half_nu_dbl,
                                                   half_nu_s2_overx_dbl,
                                                   gamma_vec[n], digamma_vec[n])
-                - half_s2_overx_dbl 
-                * gamma_p_derivative(half_nu_dbl, half_nu_s2_overx_dbl) )
+                - half_s2_overx_dbl * gamma_p_deriv)
             / Pn;
         if (!is_constant_struct<T_scale>::value)
-          operands_and_partials.d_x3[n] 
-            += - 2.0 * half_nu_dbl * s_dbl * y_inv_dbl 
-            * gamma_p_derivative(half_nu_dbl, half_nu_s2_overx_dbl) / Pn;
+          operands_and_partials.d_x3[n] += - 2.0 * half_nu_dbl * s_dbl * y_inv_dbl 
+            * gamma_p_deriv / Pn;
       }
 
       return operands_and_partials.to_var(P,y,nu,s);
@@ -490,10 +522,15 @@ namespace stan {
       }
           
       // Compute cdf_log and its gradients
-      using boost::math::gamma_p_derivative;
-      using boost::math::gamma_q;
-      using boost::math::digamma;
+      using stan::math::gamma_q;
+      using stan::math::digamma;
       using boost::math::tgamma;
+      using stan::agrad::tgamma;
+      using stan::agrad::gamma_q;
+      using stan::agrad::exp;
+      using stan::agrad::pow;
+      using std::exp;
+      using std::pow;
           
       // Cache a few expensive function calls if nu is a parameter
       DoubleVectorView<T_partials_return,
@@ -531,25 +568,24 @@ namespace stan {
                     
         // Compute
         const T_partials_return Pn = 1.0 - gamma_q(half_nu_dbl, half_nu_s2_overx_dbl);
-                    
+        const T_partials_return gamma_p_deriv = exp(-half_nu_s2_overx_dbl)
+          * pow(half_nu_s2_overx_dbl,half_nu_dbl-1) / tgamma(half_nu_dbl);     
+     
         P += log(Pn);
               
         if (!is_constant_struct<T_y>::value)
-          operands_and_partials.d_x1[n] 
-            -= half_nu_s2_overx_dbl * y_inv_dbl 
-            * gamma_p_derivative(half_nu_dbl, half_nu_s2_overx_dbl) / Pn;
+          operands_and_partials.d_x1[n] -= half_nu_s2_overx_dbl * y_inv_dbl 
+            * gamma_p_deriv / Pn;
         if (!is_constant_struct<T_dof>::value)
           operands_and_partials.d_x2[n] 
-            -= (0.5 * stan::math::gradRegIncGamma(half_nu_dbl,
+            -= (0.5 * stan::math::grad_reg_inc_gamma(half_nu_dbl,
                                                   half_nu_s2_overx_dbl,
                                                   gamma_vec[n], digamma_vec[n])
-                - half_s2_overx_dbl 
-                * gamma_p_derivative(half_nu_dbl, half_nu_s2_overx_dbl) )
+                - half_s2_overx_dbl * gamma_p_deriv)
             / Pn;
         if (!is_constant_struct<T_scale>::value)
-          operands_and_partials.d_x3[n] 
-            += 2.0 * half_nu_dbl * s_dbl * y_inv_dbl 
-            * gamma_p_derivative(half_nu_dbl, half_nu_s2_overx_dbl) / Pn;
+          operands_and_partials.d_x3[n] += 2.0 * half_nu_dbl * s_dbl * y_inv_dbl 
+            * gamma_p_deriv / Pn;
       }
 
       return operands_and_partials.to_var(P,y,nu,s);

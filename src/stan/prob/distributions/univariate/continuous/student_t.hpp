@@ -12,7 +12,26 @@
 #include <stan/meta/traits.hpp>
 #include <stan/prob/constants.hpp>
 #include <stan/prob/traits.hpp>
-#include <stan/prob/internal_math.hpp>
+
+#include <stan/prob/internal_math/math/grad_reg_inc_beta.hpp>
+#include <stan/prob/internal_math/math/inc_beta.hpp>
+#include <stan/prob/internal_math/fwd/inc_beta.hpp>
+#include <stan/prob/internal_math/rev/inc_beta.hpp>
+
+#include <stan/agrad/fwd/functions/square.hpp>
+#include <stan/agrad/fwd/functions/lbeta.hpp>
+#include <stan/agrad/fwd/functions/lgamma.hpp>
+#include <stan/agrad/fwd/functions/digamma.hpp>
+#include <stan/agrad/fwd/functions/pow.hpp>
+#include <stan/agrad/fwd/functions/exp.hpp>
+#include <stan/agrad/rev/functions/square.hpp>
+#include <stan/agrad/rev/functions/digamma.hpp>
+#include <stan/agrad/rev/functions/lgamma.hpp>
+#include <stan/agrad/rev/functions/pow.hpp>
+#include <stan/agrad/rev/functions/exp.hpp>
+#include <stan/math/functions/lbeta.hpp>
+#include <stan/math/functions/lgamma.hpp>
+#include <stan/math/functions/digamma.hpp>
 
 namespace stan {
 
@@ -90,8 +109,11 @@ namespace stan {
       size_t N = max_size(y, nu, mu, sigma);
 
       using std::log;
-      using boost::math::digamma;
-      using boost::math::lgamma;
+      using stan::math::digamma;
+      using stan::math::lgamma;
+      using stan::agrad::digamma;
+      using stan::agrad::lgamma;
+      using stan::agrad::square;
       using stan::math::square;
       using stan::math::value_of;
 
@@ -271,14 +293,20 @@ namespace stan {
         if (value_of(y_vec[i]) == -std::numeric_limits<double>::infinity()) 
           return operands_and_partials.to_var(0.0,y,nu,mu,sigma);
       }
-          
-      using boost::math::ibeta;
-      using boost::math::ibeta_derivative;
-      using boost::math::digamma;
-      using boost::math::beta;
-          
+
+      using stan::math::digamma;
+      using stan::math::lbeta;
+      using stan::math::inc_beta;
+      using stan::agrad::pow;
+      using stan::agrad::exp;
+      using stan::agrad::digamma;
+      using stan::agrad::lbeta;
+      using stan::agrad::inc_beta;
+      using std::pow;
+      using std::exp;
+
       // Cache a few expensive function calls if nu is a parameter
-      double digammaHalf = 0;
+      T_partials_return digammaHalf = 0;
           
       DoubleVectorView<T_partials_return,
                        !is_constant_struct<T_dof>::value,
@@ -305,7 +333,7 @@ namespace stan {
                   
           digammaNu_vec[i] = digamma(0.5 * nu_dbl);
           digammaNuPlusHalf_vec[i] = digamma(0.5 + 0.5 * nu_dbl);
-          betaNuHalf_vec[i] = beta(0.5, 0.5 * nu_dbl);
+          betaNuHalf_vec[i] = exp(lbeta(0.5,0.5*nu_dbl));
         }
       }
           
@@ -329,10 +357,12 @@ namespace stan {
         if(q < 2)
           {
 
-            T_partials_return z = ibeta(0.5 * nu_dbl, 0.5, 1.0 - r);
+            T_partials_return z = inc_beta(0.5 * nu_dbl, 0.5, 1.0 - r)
+              / betaNuHalf_vec[n];
             const T_partials_return Pn = t > 0 ? 1.0 - 0.5 * z : 0.5 * z;
-            const T_partials_return d_ibeta = ibeta_derivative(0.5 * nu_dbl, 0.5, 1.0 - r);
-                      
+            const T_partials_return d_ibeta = pow(r, -0.5)
+              * pow(1.0 - r, 0.5*nu_dbl - 1) / betaNuHalf_vec[n];
+
             P *= Pn;
 
             if (!is_constant_struct<T_y>::value)
@@ -343,7 +373,8 @@ namespace stan {
               T_partials_return g1 = 0;
               T_partials_return g2 = 0;
                           
-              stan::math::gradRegIncBeta(g1, g2, 0.5 * nu_dbl, 0.5, 1.0 - r, 
+              stan::math::grad_reg_inc_beta(g1, g2, 0.5 * nu_dbl, 
+                                         (T_partials_return)0.5, 1.0 - r, 
                                          digammaNu_vec[n], digammaHalf,
                                          digammaNuPlusHalf_vec[n], 
                                          betaNuHalf_vec[n]);
@@ -362,12 +393,15 @@ namespace stan {
           }
         else {
                   
-            T_partials_return z = 1 - ibeta(0.5, 0.5 * nu_dbl, r);
+            T_partials_return z = 1.0 - inc_beta(0.5, 0.5*nu_dbl, r)
+              / betaNuHalf_vec[n];
+
             zJacobian *= -1;
                   
             const T_partials_return Pn = t > 0 ? 1.0 - 0.5 * z : 0.5 * z;
-                  
-            T_partials_return d_ibeta = ibeta_derivative(0.5, 0.5 * nu_dbl, r);
+
+            T_partials_return d_ibeta = pow(1.0-r,0.5*nu_dbl-1) * pow(r,-0.5) 
+              / betaNuHalf_vec[n];
                   
             P *= Pn;
                   
@@ -379,7 +413,8 @@ namespace stan {
               T_partials_return g1 = 0;
               T_partials_return g2 = 0;
                       
-              stan::math::gradRegIncBeta(g1, g2, 0.5, 0.5 * nu_dbl, r, 
+              stan::math::grad_reg_inc_beta(g1, g2, (T_partials_return)0.5, 
+                                         0.5 * nu_dbl, r, 
                                          digammaHalf, digammaNu_vec[n], 
                                          digammaNuPlusHalf_vec[n], 
                                          betaNuHalf_vec[n]);
@@ -457,13 +492,19 @@ namespace stan {
           return operands_and_partials.to_var(stan::math::negative_infinity(),y,nu,mu,sigma);
       }
           
-      using boost::math::ibeta;
-      using boost::math::ibeta_derivative;
-      using boost::math::digamma;
-      using boost::math::beta;
+      using stan::math::digamma;
+      using stan::math::lbeta;
+      using stan::math::inc_beta;
+      using stan::agrad::pow;
+      using stan::agrad::exp;
+      using stan::agrad::digamma;
+      using stan::agrad::lbeta;
+      using stan::agrad::inc_beta;
+      using std::pow;
+      using std::exp;
           
       // Cache a few expensive function calls if nu is a parameter
-      double digammaHalf = 0;
+      T_partials_return digammaHalf = 0;
           
       DoubleVectorView<T_partials_return,
                        !is_constant_struct<T_dof>::value,
@@ -490,7 +531,7 @@ namespace stan {
                   
           digammaNu_vec[i] = digamma(0.5 * nu_dbl);
           digammaNuPlusHalf_vec[i] = digamma(0.5 + 0.5 * nu_dbl);
-          betaNuHalf_vec[i] = beta(0.5, 0.5 * nu_dbl);
+          betaNuHalf_vec[i] = exp(lbeta(0.5, 0.5 * nu_dbl));
         }
       }
           
@@ -512,10 +553,12 @@ namespace stan {
         T_partials_return zJacobian = t > 0 ? - 0.5 : 0.5;
                     
         if(q < 2) {
-            T_partials_return z = ibeta(0.5 * nu_dbl, 0.5, 1.0 - r);
+            T_partials_return z = inc_beta(0.5 * nu_dbl, 0.5, 1.0 - r)
+              / betaNuHalf_vec[n];
             const T_partials_return Pn = t > 0 ? 1.0 - 0.5 * z : 0.5 * z;
-            const T_partials_return d_ibeta = ibeta_derivative(0.5 * nu_dbl, 0.5, 1.0 - r);
-                      
+            const T_partials_return d_ibeta = pow(r, -0.5)
+              * pow(1.0 - r, 0.5*nu_dbl - 1) / betaNuHalf_vec[n];    
+                  
             P += log(Pn);
 
             if (!is_constant_struct<T_y>::value)
@@ -527,7 +570,8 @@ namespace stan {
               T_partials_return g1 = 0;
               T_partials_return g2 = 0;
                           
-              stan::math::gradRegIncBeta(g1, g2, 0.5 * nu_dbl, 0.5, 1.0 - r, 
+              stan::math::grad_reg_inc_beta(g1, g2, 0.5 * nu_dbl, 
+                                         (T_partials_return)0.5, 1.0 - r, 
                                          digammaNu_vec[n], digammaHalf,
                                          digammaNuPlusHalf_vec[n], 
                                          betaNuHalf_vec[n]);
@@ -546,13 +590,15 @@ namespace stan {
           }
         else {
                   
-            T_partials_return z = 1 - ibeta(0.5, 0.5 * nu_dbl, r);
+            T_partials_return z = 1.0 - inc_beta(0.5, 0.5*nu_dbl, r)
+              / betaNuHalf_vec[n];
             zJacobian *= -1;
                   
             const T_partials_return Pn = t > 0 ? 1.0 - 0.5 * z : 0.5 * z;
-                  
-            T_partials_return d_ibeta = ibeta_derivative(0.5, 0.5 * nu_dbl, r);
-                  
+
+            T_partials_return d_ibeta = pow(1.0-r,0.5*nu_dbl-1) * pow(r,-0.5) 
+              / betaNuHalf_vec[n];        
+          
             P += log(Pn);
                   
             if (!is_constant_struct<T_y>::value)
@@ -564,7 +610,8 @@ namespace stan {
               T_partials_return g1 = 0;
               T_partials_return g2 = 0;
                       
-              stan::math::gradRegIncBeta(g1, g2, 0.5, 0.5 * nu_dbl, r, 
+              stan::math::grad_reg_inc_beta(g1, g2, (T_partials_return)0.5, 
+                                         0.5 * nu_dbl, r, 
                                          digammaHalf, digammaNu_vec[n], 
                                          digammaNuPlusHalf_vec[n], 
                                          betaNuHalf_vec[n]);
@@ -630,13 +677,19 @@ namespace stan {
           return operands_and_partials.to_var(0.0,y,nu,mu,sigma);
       }
           
-      using boost::math::ibeta;
-      using boost::math::ibeta_derivative;
-      using boost::math::digamma;
-      using boost::math::beta;
+      using stan::math::digamma;
+      using stan::math::lbeta;
+      using stan::math::inc_beta;
+      using stan::agrad::pow;
+      using stan::agrad::exp;
+      using stan::agrad::digamma;
+      using stan::agrad::lbeta;
+      using stan::agrad::inc_beta;
+      using std::pow;
+      using std::exp;
           
       // Cache a few expensive function calls if nu is a parameter
-      double digammaHalf = 0;
+      T_partials_return digammaHalf = 0;
           
       DoubleVectorView<T_partials_return,
                        !is_constant_struct<T_dof>::value,
@@ -663,7 +716,7 @@ namespace stan {
                   
           digammaNu_vec[i] = digamma(0.5 * nu_dbl);
           digammaNuPlusHalf_vec[i] = digamma(0.5 + 0.5 * nu_dbl);
-          betaNuHalf_vec[i] = beta(0.5, 0.5 * nu_dbl);
+          betaNuHalf_vec[i] = exp(lbeta(0.5, 0.5 * nu_dbl));
         }
       }
           
@@ -685,9 +738,11 @@ namespace stan {
         T_partials_return zJacobian = t > 0 ? - 0.5 : 0.5;
                     
         if(q < 2) {
-            T_partials_return z = ibeta(0.5 * nu_dbl, 0.5, 1.0 - r);
+            T_partials_return z = inc_beta(0.5 * nu_dbl, 0.5, 1.0 - r)
+              / betaNuHalf_vec[n];
             const T_partials_return Pn = t > 0 ? 0.5 * z : 1.0 - 0.5 * z;
-            const T_partials_return d_ibeta = ibeta_derivative(0.5 * nu_dbl, 0.5, 1.0 - r);
+            const T_partials_return d_ibeta = pow(r, -0.5)
+              * pow(1.0 - r, 0.5*nu_dbl - 1) / betaNuHalf_vec[n];
                       
             P += log(Pn);
 
@@ -700,7 +755,8 @@ namespace stan {
               T_partials_return g1 = 0;
               T_partials_return g2 = 0;
                           
-              stan::math::gradRegIncBeta(g1, g2, 0.5 * nu_dbl, 0.5, 1.0 - r, 
+              stan::math::grad_reg_inc_beta(g1, g2, 0.5 * nu_dbl,
+                                         (T_partials_return)0.5, 1.0 - r, 
                                          digammaNu_vec[n], digammaHalf,
                                          digammaNuPlusHalf_vec[n], 
                                          betaNuHalf_vec[n]);
@@ -719,12 +775,14 @@ namespace stan {
           }
         else {
                   
-            T_partials_return z = 1 - ibeta(0.5, 0.5 * nu_dbl, r);
+            T_partials_return z = 1.0 - inc_beta(0.5, 0.5*nu_dbl, r)
+              / betaNuHalf_vec[n];
             zJacobian *= -1;
                   
             const T_partials_return Pn = t > 0 ? 0.5 * z : 1.0 - 0.5 * z;
                   
-            T_partials_return d_ibeta = ibeta_derivative(0.5, 0.5 * nu_dbl, r);
+            T_partials_return d_ibeta = pow(1.0-r,0.5*nu_dbl-1) * pow(r,-0.5) 
+              / betaNuHalf_vec[n];
                   
             P += log(Pn);
                   
@@ -737,7 +795,8 @@ namespace stan {
               T_partials_return g1 = 0;
               T_partials_return g2 = 0;
                       
-              stan::math::gradRegIncBeta(g1, g2, 0.5, 0.5 * nu_dbl, r, 
+              stan::math::grad_reg_inc_beta(g1, g2, (T_partials_return)0.5,
+                                         0.5 * nu_dbl, r, 
                                          digammaHalf, digammaNu_vec[n], 
                                          digammaNuPlusHalf_vec[n], 
                                          betaNuHalf_vec[n]);

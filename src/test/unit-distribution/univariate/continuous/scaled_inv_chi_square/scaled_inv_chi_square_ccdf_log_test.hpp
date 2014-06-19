@@ -15,7 +15,7 @@ public:
     param[1] = 0.5;           // nu (Degrees of Freedom)
     param[2] = 3.3;           // s  (Scale)
     parameters.push_back(param);
-    ccdf_log.push_back(std::log(1.0 - 0.0781210912));  // expected ccdf_log
+    ccdf_log.push_back(std::log(1.0 - 0.078121091257371137070194));  // expected ccdf_log
 
   }
   

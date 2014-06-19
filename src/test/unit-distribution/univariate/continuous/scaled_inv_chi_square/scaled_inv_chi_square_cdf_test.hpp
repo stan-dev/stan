@@ -15,7 +15,7 @@ public:
     param[1] = 0.5;           // nu (Degrees of Freedom)
     param[2] = 3.3;           // s  (Scale)
     parameters.push_back(param);
-    cdf.push_back(0.0781210912);  // expected CDF
+    cdf.push_back(0.078121091257371137070194);  // expected CDF
   }
   
   void invalid_values(vector<size_t>& index, 
