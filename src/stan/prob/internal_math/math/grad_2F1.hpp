@@ -17,6 +17,7 @@ namespace stan {
     {
           
       using stan::agrad::fabs;
+      using std::fabs;
 
       gradA = 0;
       gradC = 0;

@@ -6,6 +6,7 @@
 #include <stan/agrad/fwd/functions/log.hpp>
 #include <stan/agrad/fwd/functions/fabs.hpp>
 #include <stan/agrad/fwd/operators.hpp>
+#include <stan/agrad/fwd/fvar.hpp>
 #include <stan/agrad/rev/functions/exp.hpp>
 #include <stan/agrad/rev/functions/log.hpp>
 #include <stan/agrad/rev/functions/fabs.hpp>
@@ -16,23 +17,23 @@ namespace stan {
   namespace math {
 
     template<typename T>
-    T F32(T a, T b, T c, T d, T e, T z, T precision = 1e-6)
-    {
+    T F32(T a, T b, T c, T d, T e, T z, T precision = 1e-6) {
       using std::exp;
       using std::log;
+      using std::fabs;
       using stan::agrad::exp;
       using stan::agrad::log;
       using stan::agrad::fabs;
 
-      T F = 1;
+      T F = 1.0;
           
-      T tNew = 0;
+      T tNew = 0.0;
           
-      T logT = 0;
-          
+      T logT = 0.0;
+
       T logZ = log(z);
           
-      int k = 0;
+      int k = 0.0;
           
       while( (fabs(tNew) > precision) || (k == 0) )
         {
@@ -43,7 +44,7 @@ namespace stan {
           // after a finite number of interations
           if(p == 0) break;
               
-          logT += (p > 0 ? 1 : -1) * log(fabs(p)) + logZ;
+          logT +=  (p > 0 ? 1.0 : -1.0) * log(fabs(p)) + logZ;
               
           tNew = exp(logT);
               

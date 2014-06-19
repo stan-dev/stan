@@ -6,6 +6,7 @@
 #include <stan/agrad/fwd/functions/log.hpp>
 #include <stan/agrad/fwd/functions/fabs.hpp>
 #include <stan/agrad/fwd/operators.hpp>
+#include <stan/agrad/fwd/fvar.hpp>
 #include <stan/agrad/rev/functions/exp.hpp>
 #include <stan/agrad/rev/functions/log.hpp>
 #include <stan/agrad/rev/functions/fabs.hpp>
@@ -16,9 +17,9 @@ namespace stan {
   namespace math {
       
     template<typename T>
-    void gradF32(T* g, T a, T b, T c, T d, T e, T z, T precision = 1e-6)
-    {
+    void gradF32(T* g, T a, T b, T c, T d, T e, T z, T precision = 1e-6) {
       using std::log;
+      using std::fabs;
       using std::exp;
       using stan::agrad::log;
       using stan::agrad::exp;
