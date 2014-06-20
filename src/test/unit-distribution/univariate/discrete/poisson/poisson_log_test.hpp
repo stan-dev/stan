@@ -19,12 +19,12 @@ public:
     param[0] = 17;           // n
     param[1] = log(13.0);         // alpha
     parameters.push_back(param);
-    log_prob.push_back(-2.900934); // expected log_prob
+    log_prob.push_back(-2.900934373290765311282); // expected log_prob
 
     param[0] = 192;          // n
     param[1] = log(42.0);         // alpha
     parameters.push_back(param);
-    log_prob.push_back(-145.3547); // expected log_prob
+    log_prob.push_back(-145.3546649655311853166); // expected log_prob
 
     param[0] = 0;            // n
     param[1] = log(3.0);          // alpha

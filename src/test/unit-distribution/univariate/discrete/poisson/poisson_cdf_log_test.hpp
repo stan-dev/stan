@@ -14,17 +14,17 @@ public:
     param[0] = 17;           // n
     param[1] = 13.0;         // lambda
     parameters.push_back(param);
-    cdf_log.push_back(std::log(0.890465)); // expected cdf_log
+    cdf_log.push_back(std::log(0.8904649795242025600572)); // expected cdf_log
 
     param[0] = 82;           // n
     param[1] = 42.0;         // lambda
     parameters.push_back(param);
-    cdf_log.push_back(-1.546967345906366968062046e-8); // expected cdf_log
+    cdf_log.push_back(std::log(0.9999999845303266798879)); // expected cdf_log
     
     param[0] = 0.0;          // n
     param[1] = 3.0;          // lambda
     parameters.push_back(param);
-    cdf_log.push_back(std::log(0.04978707)); // expected cdf_log
+    cdf_log.push_back(std::log(0.04978706836786394446248)); // expected cdf_log
   }
   
   void invalid_values(vector<size_t>& index, 

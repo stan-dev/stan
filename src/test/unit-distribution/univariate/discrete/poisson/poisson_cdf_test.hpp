@@ -14,17 +14,17 @@ public:
     param[0] = 17;           // n
     param[1] = 13.0;         // lambda
     parameters.push_back(param);
-    cdf.push_back(0.890465); // expected cdf
+    cdf.push_back(0.8904649795242025600572); // expected cdf
 
     param[0] = 82;           // n
     param[1] = 42.0;         // lambda
     parameters.push_back(param);
-    cdf.push_back(0.99999998); // expected cdf
+    cdf.push_back(0.9999999845303266798879); // expected cdf
     
     param[0] = 0.0;          // n
     param[1] = 3.0;          // lambda
     parameters.push_back(param);
-    cdf.push_back(0.04978707); // expected cdf
+    cdf.push_back(0.04978706836786394446248); // expected cdf
   }
   
   void invalid_values(vector<size_t>& index, 

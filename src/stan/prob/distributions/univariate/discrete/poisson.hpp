@@ -16,6 +16,15 @@
 #include <stan/prob/traits.hpp>
 #include <stan/prob/constants.hpp>
 
+#include <stan/agrad/fwd/functions/gamma_q.hpp>
+#include <stan/agrad/fwd/functions/tgamma.hpp>
+#include <stan/agrad/fwd/functions/exp.hpp>
+#include <stan/agrad/fwd/functions/pow.hpp>
+#include <stan/agrad/rev/functions/gamma_q.hpp>
+#include <stan/agrad/rev/functions/tgamma.hpp>
+#include <stan/agrad/rev/functions/exp.hpp>
+#include <stan/agrad/rev/functions/pow.hpp>
+
 namespace stan {
 
   namespace prob {
@@ -223,9 +232,14 @@ namespace stan {
           
       // Compute vectorized CDF and gradient
       using stan::math::value_of;
-      using boost::math::gamma_p_derivative;
-      using boost::math::gamma_q;
-          
+      using stan::math::gamma_q;
+      using boost::math::tgamma;
+      using stan::agrad::gamma_q;
+      using stan::agrad::tgamma;
+      using stan::agrad::pow;
+      using std::exp;
+      using std::pow;
+
       agrad::OperandsAndPartials<T_rate> operands_and_partials(lambda);
         
       // Explicit return for extreme values
@@ -238,7 +252,7 @@ namespace stan {
       for (size_t i = 0; i < size; i++) {
         // Explicit results for extreme values
         // The gradients are technically ill-defined, but treated as zero
-        if (value_of(n_vec[i]) == std::numeric_limits<double>::infinity())
+        if (value_of(n_vec[i]) == std::numeric_limits<int>::max())
           continue;
           
         const T_partials_return n_dbl = value_of(n_vec[i]);
@@ -248,8 +262,8 @@ namespace stan {
         P *= Pi;
   
         if (!is_constant_struct<T_rate>::value)
-          operands_and_partials.d_x1[i] 
-            -= gamma_p_derivative(n_dbl + 1, lambda_dbl) / Pi;
+          operands_and_partials.d_x1[i] -= exp(-lambda_dbl) 
+            * pow(lambda_dbl,n_dbl) / tgamma(n_dbl+1) / Pi;
       }
       
       if (!is_constant_struct<T_rate>::value)
@@ -290,8 +304,13 @@ namespace stan {
           
       // Compute vectorized cdf_log and gradient
       using stan::math::value_of;
-      using boost::math::gamma_p_derivative;
-      using boost::math::gamma_q;
+      using stan::math::gamma_q;
+      using boost::math::tgamma;
+      using stan::agrad::gamma_q;
+      using stan::agrad::tgamma;
+      using stan::agrad::pow;
+      using std::exp;
+      using std::pow;
           
       agrad::OperandsAndPartials<T_rate> operands_and_partials(lambda);
 
@@ -315,8 +334,9 @@ namespace stan {
         P += log(Pi);
   
         if (!is_constant_struct<T_rate>::value)
-          operands_and_partials.d_x1[i] 
-            -= gamma_p_derivative(n_dbl + 1, lambda_dbl) / Pi;
+          operands_and_partials.d_x1[i] -= exp(-lambda_dbl) 
+            * pow(lambda_dbl,n_dbl) / tgamma(n_dbl+1) / Pi;
+
       }
       
       return operands_and_partials.to_var(P,lambda);
@@ -353,8 +373,13 @@ namespace stan {
           
       // Compute vectorized cdf_log and gradient
       using stan::math::value_of;
-      using boost::math::gamma_p_derivative;
-      using boost::math::gamma_q;
+      using stan::math::gamma_q;
+      using boost::math::tgamma;
+      using stan::agrad::gamma_q;
+      using stan::agrad::tgamma;
+      using stan::agrad::pow;
+      using std::exp;
+      using std::pow;
           
       agrad::OperandsAndPartials<T_rate> operands_and_partials(lambda);
 
@@ -368,8 +393,9 @@ namespace stan {
       for (size_t i = 0; i < size; i++) {
         // Explicit results for extreme values
         // The gradients are technically ill-defined, but treated as zero
-        if (value_of(n_vec[i]) == std::numeric_limits<double>::infinity())
-          return operands_and_partials.to_var(stan::math::negative_infinity(),lambda);
+        if (value_of(n_vec[i]) == std::numeric_limits<int>::max())
+          return operands_and_partials.to_var(stan::math::negative_infinity(),
+                                              lambda);
           
         const T_partials_return n_dbl = value_of(n_vec[i]);
         const T_partials_return lambda_dbl = value_of(lambda_vec[i]);
@@ -378,8 +404,9 @@ namespace stan {
         P += log(Pi);
   
         if (!is_constant_struct<T_rate>::value)
-          operands_and_partials.d_x1[i] 
-            += gamma_p_derivative(n_dbl + 1, lambda_dbl) / Pi;
+          operands_and_partials.d_x1[i] -= exp(-lambda_dbl) 
+            * pow(lambda_dbl,n_dbl) / tgamma(n_dbl+1) / Pi;
+
       }
       
       return operands_and_partials.to_var(P,lambda);

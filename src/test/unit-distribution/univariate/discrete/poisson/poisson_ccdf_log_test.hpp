@@ -14,12 +14,12 @@ public:
     param[0] = 17;           // n
     param[1] = 13.0;         // lambda
     parameters.push_back(param);
-    ccdf_log.push_back(std::log(1.0 - 0.890465)); // expected ccdf_log
+    ccdf_log.push_back(std::log(1.0 - 0.8904649795242025600572)); // expected ccdf_log
     
     param[0] = 0.0;          // n
     param[1] = 3.0;          // lambda
     parameters.push_back(param);
-    ccdf_log.push_back(std::log(1.0 - 0.04978707)); // expected ccdf_log
+    ccdf_log.push_back(std::log(1.0 - 0.04978706836786394446248)); // expected ccdf_log
   }
   
   void invalid_values(vector<size_t>& index, 
