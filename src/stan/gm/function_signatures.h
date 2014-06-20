@@ -377,6 +377,13 @@ add("inv_wishart_log",DOUBLE_T, MATRIX_T,DOUBLE_T,MATRIX_T);
 add("inv_wishart_rng",MATRIX_T,DOUBLE_T,MATRIX_T);
 add("inverse",MATRIX_T,MATRIX_T);
 add("inverse_spd",MATRIX_T,MATRIX_T);
+for (size_t i = 0; i < vector_types.size(); ++i)
+  for (size_t j = 0; j < vector_types.size(); ++j)
+      add("laplace_log",
+          DOUBLE_T, // result
+          vector_types[i], vector_types[j]); // args
+add_binary("laplace_cdf");
+add_unary("laplace_rng");
 add_binary("lbeta");
 add_unary("lgamma");
 add("lkj_corr_cholesky_log",DOUBLE_T, MATRIX_T,DOUBLE_T);
@@ -845,5 +852,6 @@ for (size_t i = 0; i < vector_types.size(); ++i)
             vector_types[i], vector_types[j], vector_types[k]); // args
     }
 add_binary("weibull_rng");
+add("wiener_log",DOUBLE_T,DOUBLE_T,DOUBLE_T,DOUBLE_T,DOUBLE_T,DOUBLE_T);  // wienerstan
 add("wishart_log",DOUBLE_T, MATRIX_T,DOUBLE_T,MATRIX_T);
 add("wishart_rng",MATRIX_T, DOUBLE_T,MATRIX_T);
